@@ -25,7 +25,7 @@
 # what two or more systems make up! :-)  Clusters are defined by the
 # member nodes sharing one or more filesystem spaces.  Separate clusters
 # do not have to share any filesystem spaces (although they may) in
-# order to belong to the same system.  Clusters are therefor a group of
+# order to belong to the same system.  Clusters are therefore a group of
 # fairly tightly coupled nodes, while systems are a fairly loosely coupled
 # set of clusters.  Systems are (generally) supposed to survive the 
 # loss of one or more clusters and still provide some level of basic
