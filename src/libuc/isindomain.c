@@ -1,4 +1,5 @@
 /* isindomain */
+/* lang=C20 */
 
 /* subroutine to determine if the name is in the given domain */
 /* version %I% last-modified %G% */
@@ -15,31 +16,28 @@
 
 /*******************************************************************************
 
-	This subroutine determines if a given hostname is in the specified
-	domain or not.
+	Name:
+	isindomain
+
+	Description:
+	This subroutine determines if a given hostname is in the
+	specified domain or not.
 
 	Synopsis:
 
-	int isindomain(nodename,domainname)
-	const char	nodename[] ;
-	const char	domainname[] ;
+	int isindomain(cchar *nodename,cchar *domainname) noex
 
 	Arguments:
-
 	nodename	if not NULL, a buffer to hold the resulting hostname
 	domainname	if not NULL, the domain name to check against
 
 	Returns:
-
 	TRUE		it is an INET address
 	FALSE		it is not
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -48,8 +46,8 @@
 #include	<stdlib.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<strxcmp.h>
 #include	<localmisc.h>
 
 
@@ -70,18 +68,16 @@
 
 /* exported subroutines */
 
-
-int isindomain(const char *name,const char *domainname)
-{
+int isindomain(cchar *name,cchar *domainname) noex {
+	int		f = true ;
 	char		*tp ;
-
-	if ((tp = strchr(name,'.')) == NULL)
-	    return TRUE ;
-
-	if (tp[1] == '\0')
-	    return FALSE ;
-
-	return (strcasecmp((tp + 1),domainname) == 0) ;
+	if ((tp = strchr(name,'.')) != nullptr) {
+	    f = false ;
+	    if (tp[1]) {
+		f = (strcasecmp((tp + 1),domainname) == 0) ;
+	    } /* end if */
+	} /* end if */
+	return f ;
 }
 /* end subroutine (isindomain) */
 
