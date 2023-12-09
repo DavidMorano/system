@@ -1,4 +1,8 @@
 /* getfname INCLUDE */
+/* lang=C20 */
+
+/* get a file name according to rules */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,7 +15,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETFNAME_INCLUDE
-#define	GETFNAME_INCLUDE	1
+#define	GETFNAME_INCLUDE
 
 
 #ifndef	GETFNAME_TYPELOCAL
@@ -21,19 +25,16 @@
 #endif
 
 
-#if	(! defined(GETFNAME_MASTER)) || (GETFNAME_MASTER == 0)
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int getfname(char *,char *,int,char *) ;
+extern int getfname(char *,char *,int,char *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* GETFNAME_MASTER */
 
 #endif /* GETFNAME_INCLUDE */
 
