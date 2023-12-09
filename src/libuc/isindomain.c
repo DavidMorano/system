@@ -47,7 +47,6 @@
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<strxcmp.h>
 #include	<localmisc.h>
 
 
