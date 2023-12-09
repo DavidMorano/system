@@ -1,10 +1,9 @@
-/* isNotPresent */
-/* lang=C20 */
+/* isNot */
+/* lang=C++20 */
 
 /* determine if a file is not present from its return-status */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -17,11 +16,18 @@
 
 /*******************************************************************************
 
+	Names:
+	isNotPresent
+	isNotAcces
+	isNotValid
+	isNotLib
+
+	Description:
 	This subroutine determines if a file is not present from its
 	return-status.
 
 	Synopsis:
-	int isNotPresent(int rs)
+	int isNot{X}(int rs) noex
 
 	Arguments:
 	rs		return-status from a file access
@@ -37,13 +43,14 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"isoneof.h"
+#include	"isnot.h"
+
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	isOneOf(const int *,int) ;
 
 
 /* external variables */
@@ -57,7 +64,7 @@ extern int	isOneOf(const int *,int) ;
 
 /* local variables */
 
-static const int	nofiles[] = {
+static constexpr int	npresent[] = {
 	SR_NOENT,
 	SR_ACCESS,
 	SR_NETUNREACH,
@@ -70,14 +77,49 @@ static const int	nofiles[] = {
 	0	
 } ;
 
+static constexpr int	naccess[] = {
+	SR_NOENT,
+	SR_ACCESS,
+	0	
+} ;
+
+static constexpr int	nvalid[] = {
+	SR_INVALID,
+	SR_DOM,
+	SR_RANGE,
+	0	
+} ;
+
+static constexpr int	nlib[] = {
+	SR_NOENT,
+	SR_ACCESS,
+	SR_LIBACC,
+	SR_NOTDIR,
+	SR_STALE,
+	0	
+} ;
+
 
 /* exported subroutines */
 
-
-int isNotPresent(int rs)
-{
-	return isOneOf(nofiles,rs) ;
+int isNotPresent(int rs) noex {
+	return isOneOf(npresent,rs) ;
 }
 /* end subroutine (isNotPresent) */
+
+int isNotAccess(int rs) noex {
+	return isOneOf(naccess,rs) ;
+}
+/* end subroutine (isNotAccess) */
+
+int isNotValid(int rs) noex {
+	return isOneOf(nvalid,rs) ;
+}
+/* end subroutine (isNotValid) */
+
+int isNotLib(int rs) noex {
+	return isOneOf(nlib,rs) ;
+}
+/* end subroutine (isNotLib) */
 
 

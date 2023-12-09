@@ -175,7 +175,7 @@ OBJ067= digbfsizes.o
 OBJ068= getportnum.o getenver.o getourenv.o
 OBJ069= nextpowtwo.o ndigits.o ipow.o llpow.o findbit.o
 OBJ070= isFailOpen.o isFailConn.o
-OBJ071= isNotPresent.o isNotAccess.o isNotValid.o isIOError.o isOneOf.o
+OBJ071= isnot.o isIOError.o isOneOf.o
 
 OBJ072= filebuf.o filebuf_writers.o filebuf_mailsupport.o
 OBJ073= inetpton.o perm.o sperm.o getprogpath.o findxfile.o xfile.o
@@ -1287,7 +1287,8 @@ inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
 sperm.o:		sperm.cc xperm.h ids.h
 perm.o:			perm.c xperm.h ids.h
-
+isoneof.o:		isoneof.c isoneof.h
+isnot.o:		isnot.cc isnot.h isoneof.h
 
 
 
