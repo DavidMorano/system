@@ -17,24 +17,24 @@
 /*******************************************************************************
 
 	Names:
-	isIOError
 	isFailOpen
 	isFailConn
 	isBadSend
 	isBadRecv
 	isBadMsg
+	isIOError
 
 	Description:
 	This subroutine determines if an operation resulted in a
 	bad message.
 
 	Synopsis:
-	extern int isIOError(int rs) noex
 	extern int isFailOpen(int rs) noex
 	extern int isFailConn( rs) noex 
 	extern int isBadSend(int rs) noex 
 	extern int isBadRecv(int rs) noex 
 	extern int isBadMsg(int rs) noex 
+	extern int isIOError(int rs) noex
 
 	Arguments:
 	rs		value to check
