@@ -1,5 +1,6 @@
-RightcoreMainBase
+System (system software development)
 
-This is the primary (main) repository for the Rightcore-Network-Services
-(RNS) code base.
+This repository holds holds developing system related software.
+This software consists mainly of system related applications,
+for system administration and management.
 
