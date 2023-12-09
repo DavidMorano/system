@@ -34,18 +34,21 @@
 
 int isprime(uint n) noex {
 	int		f = true ;
-	if ((n > 2) && ((n & 1) == 1)) {
-	    double	fn = n ;
-	    double	fr ;
-	    uint	root ;
-	    fn = n ;
-	    fr = sqrt(fn) ;
-	    root = (uint) ceil(fr) ;	/* safety due to floating errors */
-	    for (uint i = 3 ; i <= root ; i += 1) {
-	        f = ((n % i) != 0) ;
-	        if (!f) break ;
-	    } /* end for */
-	} /* end if (number greater than '2' and not even) */
+	if (n != 2) {
+	    f = false ;
+	    if ((n != 1) && ((n & 1) == 1)) {
+	        double	fn = n ;
+	        double	fr ;
+	        uint	root ;
+	        fn = n ;
+	        fr = sqrt(fn) ;
+	        root = (uint) ceil(fr) ; /* safety due to floating errors */
+	        for (uint i = 3 ; i <= root ; i += 1) {
+	            f = ((n % i) != 0) ;
+	            if (!f) break ;
+	        } /* end for */
+	    } /* end if (number not '1' and not odd) */
+	} /* end if (number not '2') */
 	return f ;
 }
 /* end subroutine (isprime) */
