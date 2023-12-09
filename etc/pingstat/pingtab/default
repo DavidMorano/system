@@ -1,0 +1,53 @@
+# PINGTAB (default)
+
+# This is the 'ping' table.  Put the hosts that you want to maintain
+# 'ping' connectovity for in this file.
+#
+# Example entries:
+#
+#	hostname	minimum	timeout
+#----------------------------------------------
+#
+#	ucbvax		4h	20
+#	colocos		4h	30
+#	alegra		4h	25
+#	research	4h	25
+#
+
+#
+# The default minimum is something like maybe 5 minutes or so.
+# The timeout value is in seconds.  If no timeout value is given,
+# a default of 10 seconds is used.
+#
+#
+
+
+# local RC hosts
+
+rca		9m		10
+rcb		9m		10
+rcc		9m		10
+rcd		9m		10
+rce		9m		10
+rcf		9m		10
+rcg		9m		10
+
+# local RC printers
+
+# 'ping'ing the printer apparently keeps it from going into power-down mode!
+hp0		9m		10
+airport		9m		10
+jig		9m		10
+
+
+
+# ECE
+
+gateway		1h
+frodo		1h
+vinson		1h
+#olive		1h
+
+
+
+

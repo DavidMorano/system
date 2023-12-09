@@ -1,0 +1,72 @@
+.\"	$Id: lpdvi.1,v 1.2 1994/06/17 19:30:42 gc Exp $
+.\"	CRC=91758378
+.\"
+.TH LPDVI 1L 94/06/17 "Div113 local"
+.SH NAME
+lpdvi \- print TeX DVI files on PostScript printers
+.SH SYNOPSIS
+.B lpdvi
+.RB [ \-P printer]
+.RB [ \- dvi_options]
+.RB [ + plus_options]
+[file ...]
+.SH DESCRIPTION
+.I Lpdvi
+converts TeX DVI files
+to PostScript,
+and sends them
+to the designated
+PostScript printer.
+If no files are given,
+it reads the standard input;
+thus it can be used as a filter.
+.PP
+The options are:
+.PP
+.PD 0
+.TP 10
+.BI \-P printer
+overide the environment variable
+.B $PRINTER
+and send the output to
+.IR printer .
+.TP 10
+.BI \- dvi_options
+options passed down to
+.IR dvips ,
+see
+.IR dvips (1L)
+manual page.
+.TP 10
+.BI + plus_options
+common printer commands options;
+see
+.IR plusopts (1L)
+manual page.
+.PD
+.PP
+.SH "SEE ALSO"
+dvips(1L)
+plusopts(1L)
+.SH EXAMPLES
+To print a TeX DVI file on printer
+.I xyz
+on both sides of the paper,
+use:
+.nf
+.RS 5
+lpdvi \-Pxyz +duplex file1
+.RE
+.fi
+.PP
+To print a TeX DVI file in landscape format
+with 2 pages on each sheet,
+on your default printer 
+(specified in your
+.B $PRINTER
+variable) use:
+.nf
+.RS 5
+lpdvi +landscape +2perpage file2
+.RE
+.fi

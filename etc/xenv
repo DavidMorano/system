@@ -1,0 +1,45 @@
+# XENV
+#
+# These are default environment variables for export to child programs
+# from PCS servers that spawn child programs (usually to fulfill some
+# service).
+# 
+#
+#
+
+# these may be set elsewhere but whatever!
+CLUSTER=	rc
+SYSTEM=		ark3
+
+
+XPG4=		/usr/xpg4
+EXTRA=		/usr/extra
+
+LOCAL=		/usr/add-on/local
+AST=		/usr/add-on/ast
+NCMP=		/usr/add-on/ncmp
+DWB=		/usr/add-on/dwb
+DWBHOME=	/usr/add-on/dwb
+
+GNU=		/usr/add-on/gnu
+PCS=		/usr/add-on/pcs
+TOOLS=		/usr/add-on/exptools
+WWB=		/usr/add-on/wwb
+
+DT=		/usr/dt
+XDIR=		/usr/add-on/X11
+OPENWINHOME=	/usr/add-on/openwin
+
+
+ATALK=		/usr/atalk
+MAGICK_HOME=	/usr/add-on/ncmp
+TETEXDIR=	/usr/add-on/tetex
+TEXMF=		/usr/add-on/tetex/share/texmf
+
+
+# KSH
+FPATH=		/home/dam/fbin:/usr/add-on/local/fbin:/usr/extra/fbin
+VISUAL=emacs
+
+
+

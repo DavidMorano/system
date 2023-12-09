@@ -1,0 +1,14 @@
+# CONF (initinfo)
+
+
+# disclaimer
+#disclaimer		disclaimer.txt
+
+# default PATH
+#defpath		/usr/xpg4/bin:/usr/bin:/usr/extra/bin
+
+# default UMASK
+#defumask	022
+
+
+

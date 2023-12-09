@@ -1,0 +1,19 @@
+# PINGTAB
+
+#
+# format of entries:
+#	name		minint	timeout
+#
+#
+
+
+verizon-gw		10m
+
+dns1.bellatlantic.net	1h
+dns2.bellatlantic.net	1h
+
+#dns1.verizon.com	1h
+dns2.verizon.com	1h
+
+
+

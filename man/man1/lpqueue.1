@@ -1,0 +1,32 @@
+.\"	$Id: lpqueue.1,v 1.2 1994/06/17 19:47:04 gc Exp $
+.\"	CRC=146358273
+.\"
+.TH LPQUEUE 1L 94/06/17 "Div113 local"
+.SH NAME
+lpqueue \-
+interface to the
+.IR lpq (1)
+command
+.SH SYNOPSIS
+.B lpqueue
+.RB [ \-P printer]
+[lpq_args]
+.SH DESCRIPTION
+.I Lpqueue
+is a front-end to the printer queue query command
+.IR lpq (1).
+It prints the results on standard output.
+.PP
+The options are:
+.PP
+.PD 0
+.TP 10
+.BI \-P printer
+overide the environment variable
+.B $PRINTER
+and inquire about
+.IR printer .
+.PD
+.PP
+.SH "SEE ALSO"
+lpq(1)

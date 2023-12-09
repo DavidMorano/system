@@ -1,0 +1,20 @@
+# technology societies
+
+#
+# format of entries:
+#	name		minint	timeout
+#
+
+
+www.ieee.org		1d
+
+
+
+# these are ALWAYS down!!?
+www.acm.org		4d
+portal.acm.org		4d
+www.computer.org	4d
+
+
+
+

@@ -1,0 +1,334 @@
+.\"_
+.TH opr 1 "90/04/09 v1" UNISON
+.SH NAME
+opr \- off line print
+.SH SYNOPSIS
+.\"_
+'\" t
+.\"_
+.\"	Module:   uopr.1, Level 1.1
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.uopr.1
+.\"_
+.\"	Modified: 4/9/90  13:47:17
+.\"	Fetched:  11/15/90  21:40:29
+.\"_
+.ds pn opr
+.ds PN OPR
+.ds Pn Opr
+.de ML
+..
+.\"_
+opr
+[ option ... ]
+[ filename ... ]
+.SH DESCRIPTION
+.ad b
+.I \*(Pn
+causes the named files to be printed by building and executing a \fIprt\fR command.
+The options specified are converted to the corresponding \fIprt\fR command options.
+If no filenames appear,
+.I \*(pn
+reads the standard input.
+The special filename `\-' 
+stands for standard input.
+.PP
+The following options may appear in any order preceding the file names:
+.TP 13
+.BI \-d "\ dest"
+Print the output at remote station
+.IR dest .
+By default, dest is taken from the environment variable DEST.
+If DEST is null or not set, the first two characters
+of the system network node name are used as the default.
+.TP
+.BI \-b "\ bin"
+Put the output in bin number
+.IR bin .
+By default, the bin number is taken from the environment
+variable BIN unless it is null, in which case it
+is taken from the password file.
+.TP
+.BI \-t "\ type"
+Select the \f2type\fP of printer to print on.
+\f2Type\fP is \f3xr\fP for a Xerox printer, or \f3pr\fP
+for a standard line printer.
+The default is taken from the environment variable TYPE.
+If TYPE is null or not set, type pr is used.
+.TP
+.BI \-f "\ forms"
+Print the output using printer forms
+.IR forms .
+For Xerox printers (print type \f3xr\fP), possiblities include:
+.PP
+.RS 8m
+.PP
+.nf
+hole		8.5 x 11 paper with holes (default)
+nohole		8.5 x 11 paper with no holes
+.fi
+.RE
+.IP "" 13
+Other forms may be available at some locations.
+Consult your computation center operations staff.
+.IP "" 13
+The default forms may be changed by setting the
+environment variable FORMS.
+.TP
+.BI \-1
+Print on
+.I 1
+side of a sheet of paper.
+Valid only for Xerox printers.
+.TP
+.BI \-2
+Print on
+.I 2
+sides of a sheet of paper.
+Valid only for Xerox printers.
+Default at most sites;
+ignored at sites without the duplexing feature.
+.TP 13
+.BI \-p "\ printmode"
+Print the output in the mode
+.IR printmode .
+This option is used only with Xerox printers.
+Possibilities include:
+.PP
+.RS 8m
+.nf
+land[scape]	computer output orientation(default)
+port[rait]	8.5 x 11, letter orientation
+2on1		2 landscape pages on 1 side of a portrait sheet
+.fi
+.RE
+.TP 13
+.BI \-y "\ style"
+Print using font style
+.I style.
+Default is \f3bell\fP in landscape and portrait modes (spaced to produce 66
+lines per page), and \f3mini\fP (a miniature version of \f3bell\fP style)
+in 2on1 mode.
+Valid only for printing on Xerox printers.
+.ne 8
+Allowable styles are:
+.sp
+.RS 8m
+.TS
+c c c c c s c s
+c c c c c c c c
+l r r l r r r r.
+			full	dflt lin/page	max chr/lin
+style	chr/in	lin/in	TX	port	land	port	land
+
+vint	12.0	6.5	yes	66	50	94	126
+elit	12.0	6.5	yes	66	50	94	126
+pica	10.0	6.0	yes	62	46	78	105
+goth	10.0	6.0	yes	62	46	78	105
+bell	13.6	8.5	yes	88	66	106	132
+mini	17.6	12.5	yes	132	96	132	132
+xr18	6.8	4.0	yes	42	31	53	71
+vg14	5.2	4.2	yes	43	32	40	55
+tr14	NA	4.2	yes	43	32	NA	NA
+pr14	~7.0	5.5	no	50	37	~54	~73
+pr18	~6.0	4.5	no	41	31	~47	~63
+pr24	~4.5	3.0	no	30	22	~35	~47
+.TE
+.RE
+.IP "" 13
+The full TX column indicates which styles (fonts) contain the full
+character set of the BTL TX train.
+The pr fonts contain only capital letters, digits, period, comma, hyphen,
+and diagonal.
+.IP "" 13
+The xr, vg, tr, and pr styles are large fonts for viewgraphs, where the
+third and fourth characters of the names indicate the approximate point
+size of the font.
+.IP "" 13
+The tr and pr styles are proportionally spaced fonts
+which may not align horizontally for such constructs as
+centered text and indented lists. 
+.TP 13
+.BI \-k "\ mask"
+The
+.I mask
+is the name of an electronic form to be overlaid on each page.
+Normally, the mode of the mask will match the printmode,
+i.e., a portrait mode mask will be overprinted on a portrait mode page.
+To specify the mask mode, append a \f2p\fP (portrait) or \f2l\fP (landscape)
+to the mask name.
+Thus, -k prin2p would force a portrait mask.
+Consult your computation center for the names of current masks.
+.TP
+.BI \-l n
+Print
+.IR n
+lines per page.
+Default is 66
+for the line printer
+and for the default font style on Xerox printers.
+See the
+.B -y
+option for defaults for other Xerox styles.
+.TP
+.BI \-e n
+Do a logical page eject every
+.IR n
+lines.
+Similar to
+.BR \-l ,
+but begins each page 4 lines down from the top rather than at the top.
+A useful option for continuous output without page headers is
+.BR \-e58 .
+.TP
+.BI \-o n
+Offset the output
+.IR n
+spaces from the left margin.
+Default is 0.
+.TP
+.BI \-n
+Number the lines in sequence as they are printed.
+Begin at 1 for each file.
+.TP
+.BI \-r
+Raw mode.
+The first character of each line is taken to be the carriage control
+(e.g., `1', `\ ', `+').
+Normally used only in conjunction with
+.IR npf (1).
+.TP 13
+.BI \-c n
+Make
+.IR n
+copies of the output.
+Default is 1; max is 99.
+.TP
+.BI \-8
+Print at 8 lines per inch. Default is 6 lines per inch.
+This option is valid only for high-speed line printers
+(not for Xerox prints, and not at all locations).
+.TP
+.BI \-s
+Silent.
+Suppress the one-line message which contains the submitted job name.
+.ML
+.TP
+.BI \-mail "\ address"
+Send the output to bin \f3MAIL\fP for delivery via company mail,
+instead of to the bin indicated by the \f3-b\fP option.
+Use \f2address\fP
+as a string to specify the name and company mail address of the
+recipient to appear on the banner page.
+Semicolons can
+be used to split the address string so that a multi-line address
+(maximum 7 lines) is displayed on the banner page.
+The \f3-d\fP option can be used to speed mail delivery by printing the job
+at a remote station near the recipient where it will enter
+the company mail for final delivery.
+\f2Note\fP: some locations do not support mailed computer output from the
+computer center.
+..
+.TP
+.BI \-j "\ jobname"
+Use
+.IR jobname
+(1 to 8 characters) instead of the default
+.IR jobname
+supplied by
+.BI UNIX
+on the banner page of the printout.
+The
+.IR jobname
+parameter may contain any alphanumeric or national (@, $, #)
+characters and may range from one to eight characters in length.
+The first character must be an alphabetic or national character.
+Illegal characters are automatically changed to pound signs '#',
+and names longer than 8 characters are truncated to 8.
+.TP
+.BI \-u "\ uname"
+Use
+.IR uname
+(1 to 8 characters) instead of your login name on the banner
+page of the printout.
+The rules for
+.IR uname
+are the same as for
+.IR jobname.
+.TP 13
+.BI \-a "\ acct"
+Use
+.IR acct
+as the account number for the job.
+By default, \f2acct\fP is taken from the password file.
+.TP
+.BI \-z
+Write the generated job stream to standard output, instead of submitting
+it as a job.
+This option is used primarily for debugging.
+.PP
+.IR \*(Pn
+queues a job to do the printing
+when facilities become available.
+The named files may be re-used immediately without affecting the printing.
+.PP
+.IR \*(Pn
+performs optimal carriage control and prints a full 66 lines to a page
+unless any of the
+.BR \-l ,
+.BR \-e ,
+.BR \-y " (for Xerox output only)"
+and
+.BR \-r
+options are used.
+A new sheet is begun for each file.
+Backspaces, form feeds, carriage returns, and tabs are handled.
+Escape characters result in a fatal error.
+All other control characters are passed on to the output.
+Tab stops are assumed every 8 spaces.
+.SH EXAMPLES
+.ne 4
+.IR \*(Pn
+is a useful output sink for
+.IR nroff (1)
+and
+.IR pr (1).
+To get a paginated and titled listing:
+.nf
+.sp
+          pr name ... | \*(pn
+.fi
+.sp
+.ne 4
+To print a file on a Xerox printer in portrait mode, using style xr18:
+.nf
+.sp
+          \*(pn -txr -pport -yxr18 filename
+.fi
+.sp
+To print \f2sendfile\fP on a Xerox printer and mail it (with a two-line address)
+in the company mail to John Doe:
+.IP
+opr -txr -mail "J. A. Doe;MT 7Z-248" sendfile
+.PP
+.SH FILES
+.nf
+.ta 22n
+/etc/passwd	account number and bin number
+.fi
+.SH SEE ALSO
+mmx(1), pr(1), prt(1), npf(1), col(1), uname(1), x9700(1)
+.SH DIAGNOSTICS
+Various diagnostics are produced with respect to invalid command
+line options.
+The message `escape sequence invalid' is produced if the file
+contains ASCII escape sequences typically generated by the \s-1\f3-TX\fP\s0
+or the \s-1\f3-T37\fP\s0 options of \f2nroff\fP(1).
+.SH BUGS
+The Xerox printers have a limited overprinting capability.
+If this limit is exceeded, the page will be blank.
+.br
+Lines longer than 159 characters are silently truncated.
+.br
+The use of the \f3-y\fP, \f3-k\fP, or \f3-p\fP options with files
+that already have Xerox control information (e.g. from \f2x9700\fP(1))
+will result in strange output.

@@ -1,0 +1,23 @@
+# PATH (search PATH)
+#
+
+#
+# This file contains directories that are searched by PCS 
+# server-dispatch-type programs for finding target server programs to
+# execute (this is sort of like the 'Path' file in newer UUCP
+# distributions).
+#
+
+
+/usr/add-on/local/bin
+/usr/add-on/ast/bin
+/usr/add-on/ncmp/bin
+
+/usr/bin
+
+/usr/add-on/pcs/bin
+/usr/add-on/gnu/bin
+/usr/add-on/exptools/bin
+
+
+

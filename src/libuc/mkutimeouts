@@ -1,0 +1,9 @@
+#!/bin/ksh
+# MKTIMEOUTS
+
+while read T ; do
+  LC=$( print -- $T | tr '[A-Z]' '[a-z]' )
+  print -- "	utimeout[${LC}] = $T ;"
+done < ii
+
+

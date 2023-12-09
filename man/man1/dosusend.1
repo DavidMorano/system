@@ -1,0 +1,107 @@
+.\"_
+.TH USEND 1 94/12/02 LOCAL
+.SH NAME
+usend, dosusend \- send files from one machine to another
+.SH SYNOPSIS
+.B usend
+.OP -d "  nodename"
+.OP -u "  username"
+.I file
+.MW [
+.I file(s) ...
+.MW ]
+.br
+.B usend
+.OP -d "  nodename"
+.OP -u "  username"
+.OP -f "  filename"
+.B <
+.I file
+.br
+.B dosusend
+.OP -d "  nodename"
+.OP -u "  username"
+.I file
+.MW [
+.I file(s) ...
+.MW ]
+.br
+.B dosusend
+.OP -d "  nodename"
+.OP -u "  username"
+.OP -f "  filename"
+.B <
+.I file
+.SH DESCRIPTION
+.sp
+.SS Introduction
+.PP
+This program simply transfers one or more files from one computer machine
+to another.  The different computers may be UNIX or DOS based.
+In the case of a DOS based computer as the source machine, the 
+command \fBdosusend\fP may be suitable for converting DOS based line
+encoded text files to the normal UNIX line encoding.
+Both of the commands, \fBusend\fP and \fBdosusend\fP, are the same
+except that \fBdosusend\fP does a line encoding conversion on its
+input files before sending to the destination machine.
+This latter command is therefor oriented towards running from a
+DOS based PC platform to transfer files to a UNIX platform.
+All files are only transferred to the destination machine user's
+RJE directory.  If the destination user's RJE directory already has
+a file with the same name then it will be overwritten if its
+write permissions allow for \fIother\fPs to write to the file.
+Otherwise, this command will fail in some way that may or may not
+provide notification back to the sending user.
+.\"_
+.SS Command Arguments
+.IP "-d  \fIdst\fP" 10
+This key letter and its associated value \fBmust\fP be supplied.
+This argument provides the nodename for the destination machine.
+.IP "-u  \fIuser\fP" 10
+This argument must also be supplied and it provides the recipient
+user to receive the file transfer(s).  A valid user name on the
+destination machine is required here.
+.IP "-f  \fIfilename\fP" 10
+This option must be used when the \fIstandard input\fP is used
+instead of naming files on the command line.
+This argument must be a simple file name which will be used for
+the name of the file on the destination machine in the destination
+user's RJE directory.  No paths for this filename argument are
+allowed.
+.PP
+If files are present on the command line, they will be sent to
+the destination machine/user pair and any input waiting on
+\fIstandard input\fP is ignored.  If there are no files on the
+command line, then the \fIstandard input\fP is read to obtain
+the file contents.
+.\"_
+.SH EXAMPLES
+.IP \(rh 5
+send a DOS based line coded file to the file path
+\fC/home/gav/rje/newfile\fP on the UNIX platform \fCmtgbcs\fP,
+using the local UUCP machine \fCmtsva\fP as the gateway :
+.EX
+uux -p mtsva!dosusend -d mtgbcs -u gav -f newfile < file
+.EE
+Note that the \fB-f\fP argument is required when reading source
+from standard input.
+.IP \(rh 5
+send a binary file (named \fIfile\fP) from a DOS based platform
+to the file path
+\fC/home/wen/rje/file\fP on the UNIX platform \fCdrutx\fP using
+the PC's UUCP partner machine \fCmtsva\fP as a gateway :
+.EX
+uux -p mtsva!usend -d drutx -u wen !file
+.EE
+Not all implementations of UUCP appear to support the syntax above
+for specifying local files on a UUX command line.
+.SH SEE ALSO
+uux(1), uucp(1), uuto(1), usend(1)
+.SH CAVEATS
+Do not attempt to send binary files using the \fBdosusend\fP command.
+Use the straight \fBusend\fP, \fBuucp\fP, or the \fBuuto\fP command
+instead for this.
+.SH PATH TO
+This program is currently located in 
+\fC/usr/add-on/local/bin\fP on most systems.
+.\"_

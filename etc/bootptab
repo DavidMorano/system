@@ -1,0 +1,76 @@
+# BOTTPTAB - database for bootp server (often '/etc/bin/bootpd')
+#
+#	This file should be named '/etc/bootptab' for
+#	compatibility with the 'bootpd' daemon.
+#
+# Blank lines and lines beginning with '#' are ignored.
+#
+# Legend:
+#
+#	first field -- hostname
+#			(may be full domain name and probably should be)
+#
+#	bf -- bootfile
+#	cs -- cookie servers
+#	ds -- domain name servers
+#	gw -- gateways
+#	ha -- hardware address
+#	hd -- home directory
+#	hn -- send nodename w/ request (no argument to this option)
+#	ht -- hardware type
+#	im -- impress servers
+#	ip -- host IP address
+#	lg -- log servers
+#	lp -- LPR servers
+#	ns -- IEN-116 name servers
+#	rl -- resource location protocol servers
+#	sm -- subnet mask
+#	tc -- template host (points to similar host entry)
+#	to -- time offset (seconds from GMT)
+#	ts -- time servers (INET port 37/UDP or 37/TCP)
+#
+#
+# Be careful about including backslashes where they're needed.  Weird (bad)
+# things can happen when a backslash is omitted where one is intended.
+#
+
+
+# First, we define a global entry which specifies the stuff every host uses.
+
+global.tc:\
+	:sm=255.255.255.0:\
+	:hn:hd=/tmp:bf=/dev/null:\
+	:ds=192.168.0.1 192.168.0.2:\
+	:ts=192.168.0.1 192.168.0.2:\
+	:to=18000:
+
+
+# Next, we can define different master entries for each subnet. . .
+
+subnet0.tc:\
+	:tc=global.tc:gw=192.168.0.1:
+
+
+
+#
+# We should be able to use as many levels of indirection as desired.  
+# Use your imagination ...
+#
+
+
+
+
+# Macintosh
+rcc:\
+	:tc=subnet0.tc:ht=ether:vm=rfc1048:ha=0800075EEEA3:\
+	:ip=192.168.0.3:
+
+#
+# HP LaserJet 4 Si MX
+hp0:\
+	:tc=subnet0.tc:ht=ether:vm=rfc1048:ha=0800097F9571:\
+	:ip=192.168.0.4:
+
+
+
+

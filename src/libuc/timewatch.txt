@@ -1,0 +1,18 @@
+#include	<timewatch.hh>
+
+
+	    cint	to = utimeout[uto_busy] ;
+
+	    } else if (! finitdone) {
+	        timewatch	tw(to) ;
+	        auto lamb = [this] () -> int {
+	            int		rs = SR_OK ;
+	            if (!finit) {
+		        rs = SR_LOCKLOST ;		/* <- failure */
+	            } else if (finitdone) {
+		        rs = 1 ;			/* <- OK ready */
+	            }
+	            return rs ;
+	        } ; /* end lambda (lamb) */
+	        rs = tw(lamb) ;		/* <- time-watching occurs in there */
+

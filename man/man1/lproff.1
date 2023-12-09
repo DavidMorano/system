@@ -1,0 +1,116 @@
+.\"	$Id: lproff.1,v 1.4 1994/06/17 17:28:57 gc Exp $
+.\"	CRC=4117290613
+.\"
+.TH LPROFF 1L 94/06/17 "Div113 local"
+.SH NAME
+lproff \-
+print TROFF files on PostScript printers
+.SH SYNOPSIS
+.B lproff
+.RB [ \-P printer]
+.RB [ \-t ]
+.RB [ \-T device]
+.RB [ \-e dpost_options]
+.RB [ \- troff_options]
+.RB [ + plus_options]
+[file ...]
+.SH DESCRIPTION
+.I Lproff
+processes troff input file[s]
+and sends the output to the designated
+PostScript printer.
+If no files are given,
+it reads the standard input;
+thus it can be used as a filter.
+.PP
+The program will first resolve all 
+.B .so
+include requests, and run the standard
+troff pre-processors:
+.IR grap (dwb),
+.IR pic (dwb),
+.IR tbl (dwb),
+and
+.IR eqn (dwb).
+The pre-processed input is then
+run through
+.IR troff (dwb)
+and the standard PostScript post-processor
+.IR dpost (dwb),
+unless post-processing was cancelled by the
+.B \-T
+flag.
+.PP
+The options are:
+.PP
+.PD 0
+.TP 10
+.BI \-P printer
+overide the environment variable
+.B $PRINTER
+and send the output to
+.IR printer .
+.TP 10
+.B \-t
+print the result on standard output.
+.TP 10
+.BI \-T device
+use given device instead of
+.I post 
+(implies the 
+.B \-t
+option).
+.TP 10
+.BI \-e dpost_options
+options to be passed down to
+.IR dpost ;
+see
+.IR dpost (dwb)
+manual page.
+.TP 10
+.BI \- troff_options
+options to be passwd down to
+.IR troff ;
+see
+.IR troff (dwb)
+manual page.
+.TP 10
+.BI + plus_options
+common printer commands options;
+see
+.IR plusopts (1L)
+manual page.
+.PD
+.PP
+.SH "SEE ALSO"
+grap(dwb),
+pic(dwb),
+tbl(dwb),
+eqn(dwb).
+dpost(dwb),
+troff(dwb),
+plusopts(1L)
+.SH EXAMPLES
+To print a memo with the
+.I mm
+macros, on printer
+.I xyz
+on both sides of the paper,
+use:
+.nf
+.RS 5
+lproff \-Pxyz \-mm +duplex file1
+.RE
+.fi
+.PP
+To print a manual page to your default
+printer 
+(specified in your
+.B $PRINTER
+variable) use:
+.nf
+.RS 5
+lproff \-man file2
+.RE
+.fi
+.\"	.SH DIAGNOSTICS

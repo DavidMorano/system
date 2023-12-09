@@ -1,0 +1,15 @@
+# PRINGTAB
+
+#
+# format of entries:
+#	name		minint	timeout
+#
+#
+
+
+# web weather (suitable for LYNX)
+weather.noaa.gov	1d
+
+
+
+

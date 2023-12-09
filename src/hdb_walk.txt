@@ -1,0 +1,44 @@
+
+#ifdef	COMMENT
+
+/* walk the database (deprecated) */
+
+/****
+	Visit each entry by calling 'nodefunc()' with 'key', 'data'
+	and 'argp' as arguments.
+
+****/
+
+int hdb_walk(HDB *op,int (*nodefunc)(),voiod *argp) noex {
+{
+	HDB_ENT		*hp, *nhp ;
+	HDB_ENT		**hepp ;
+	unsigned	idx ;
+	int		rs = SR_OK ;
+
+	if (op == NULL) return SR_FAULT ;
+
+	if (HDB_BADMAGIC(op)) return SR_NOTOPEN ;
+
+	hepp = op->htaddr ;
+	for (idx = 0 ; idx < op->htlen ; idx += 1) {
+	    for (hp = hepp[idx] ; hp != NULL; hp = hp->next) {
+	        if ((rs = (*nodefunc)(hp->key,hp->val,argp)) >= 0) {
+	            nhp = hp ;
+	            while (nhp->same != NULL) {
+	                nhp = nhp->same ;
+	                rs = (*nodefunc)(nhp->key,nhp->val,argp) ;
+	                if (rs < 0) break ;
+	            } /* end while */
+	        } /* end if (ok) */
+	        if (rs < 0) break ;
+	    } /* end for (inner) */
+	    if (rs < 0) break ;
+	} /* end for (outer) */
+
+	return rs ;
+}
+/* end subroutine (hdb_walk) */
+
+#endif /* COMMENT */
+

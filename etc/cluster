@@ -1,0 +1,27 @@
+# CLUSTER
+
+#
+# Format of entries:
+#
+# cluster: node1, node2, node(s)
+#
+#
+
+mail:	rca, rcb, rcc
+mail:	rc, mail, www, mailhost, uucphost
+
+rc:	rca, rcb, rcc
+rc:	mail, www, dnscache
+
+mac:	rcd, rce, rcf, rcg, jig
+
+ece:
+	gateway,
+	frodo,
+	winson,
+	olive,
+	lespaul,
+	gilmore
+
+
+

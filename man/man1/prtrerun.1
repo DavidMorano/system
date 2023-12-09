@@ -1,0 +1,121 @@
+.\"_
+.TH PRTRERUN 1 90/10/14 UNISON
+.SH NAME
+prtrerun - rerun UNISON output requests with the specified attributes
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtrerun.1, Level 3.6
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtrerun.1
+.\"_
+.\"	Modified: 10/14/90  12:45:10
+.\"	Fetched:  11/15/90  21:40:28
+.\"_
+.tr ~
+.ds Un \fIprtrerun\fR
+.ds PN \fIPRTRERUN\fR
+.ds Pn \fIPrtrerun\fR
+.\"_
+.nf
+\fBprtrerun\fR [options] [\fB-A\fR]~~[\fB-q\fR]~~[\fB-z\fR] [\fIsystem\fR]
+.fi
+.SH DESCRIPTION
+\*(Un reruns the requests with the specified attributes.  If no
+\fB-r\fR \fIreqid\fR option is given, all requests on the current
+system that have attributes matching those specified are rerun.
+If a \fB-r\fR \fIreqid\fR option is given and the \fIreqid\fR can
+not be found on the current system, the \*(Un is executed remotely
+on a system where the request is likely to be queued.
+If \fIsystem\fR is given, the command is remotely executed on the specified
+system.
+.P
+Only an administrator, operator, or the owner of a request can rerun it.  
+A request can be rerun only if it is still queued for processing, or if
+a copy of the completed request was retained by UNISON, (-k option of
+\fIustart(1m)\fR.)
+.SS "Options"
+Each of the following options is optional. 
+.sp
+.TP 25
+.BI \-A
+Confirms that the administrator or operator wants to resubmit all matching requests.
+If \fB-A\fR is not specified, only the administrator or operator's own requests
+will be modified.
+.TP 25
+.BI \-b "\ \fR\fIbin\fR
+Select requests by bin.  
+.TP 25
+.BI  \-c "\ \fR\fIcopies\fR
+Select requests by copies.  
+.TP 25
+.BI  \-d "\ \fR\fIdest\fR
+Select requests by destination.  \fIdest\fR is of the form
+\fIdest/device\fR.  
+.TP 25
+.BI \-f "\ \fR\fIform\fR
+Select requests by form.
+.TP 25
+.BI \-h 
+Print full help message.
+.TP 25
+.BI  \-j "\ \fR\fIjobname\fR
+Select requests by jobname.
+.TP 25
+.BI  \-l "\ \fR\fIlanguage\fR
+Select requests by language.
+.TP 25
+.BI  \-o "\ \fR\fIfilter\fR
+Select requests by filter.
+.TP 25
+.BI  \-P
+Move all matching requests to the head of the print queue.
+This option can be used only by printer administrators and operators.
+.TP 25
+.BI  \-p "\ \fR\fImode\fR
+Select requests by printmode.
+.TP 25
+.BI  \-r "\ \fR\fIrequestid\fR
+Select requests by requestid.
+.TP 25
+.BI  \-s "\ \fR\fIsides\fR
+Select requests by number of sides specified.
+.TP 25
+.BI  \-u "\ \fR\fIuser\fR
+Select requests by jobname.
+.TP 25
+.BI  \-z
+List the requests that would be selected to be rerun, but do 
+not rerun them.  
+.TP 25
+.BI  \-q
+Do not list requestids of requests that have been  rerun.
+.P
+.SH "EXAMPLES"
+.sp
+Rerun requestid abcdhomxb:
+.nf
+
+	   \fBprtrerun -r abcdhomxb\fR
+
+.fi
+.sp
+Rerun requests on the current system  destined
+for printer xerox:
+.nf
+
+	   \fBprtrerun -d xerox\fR
+	
+.fi
+.sp
+Rerun all requests on the current system 
+that are 2 sided, destined for
+printer xr2, and have forms hole:
+.nf
+
+	   \fBprtrerun -d xr2 -s 2 -f hole
+	
+.fi
+.SH "SEE ALSO"
+prtmod(1), prt(1), prtstat(1), prtq(1).
+.SH FILES
+$UNISON/*

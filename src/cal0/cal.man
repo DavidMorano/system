@@ -1,0 +1,108 @@
+'\" t
+.TH CAL 1 "1995-02-13" LOCAL
+.SH NAME
+cal \- display a specified month of some year
+.SH SYNOPSIS
+.\"_
+.so tmac.att
+.\"_
+.B cal
+\&{
+.I alphamonth
+.MW |
+.RI [ month ]
+.I year
+.MW |
+.I year/month
+\&}
+.I -\fInumber\fP
+.\"_
+.SH DESCRIPTION
+.\"_
+.SS Introduction
+.PP
+The CAL program
+is used to print out (to standard output) a calendar of a month
+that is specified as an argument.
+If a month is specified alone (as in the case with
+.I alphamonth
+), it must consist of non-numeric
+characters.
+This is necessary in order to distinguish it from a year being
+specified.
+Anywhere a month is specified, it may also be specified
+as a character string representing the month.
+All month names can be abbreviated to the first three characters
+without any ambiguity.
+.\"_
+.SS Options
+There are some argument options that can be used to
+provide values in addition to the standard way of supplying them.
+.PP
+.RS 5
+.TP 15
+.BI "-<number>"
+A single minus sign followed by a number is interpreted to ispecify
+the number of total months to print out, including the starting
+month specified with the other arguments (if any).mean that
+.TP 15
+.BI "-m  " month
+This will override any month that is specified using the mornal
+arguments.
+.TP 15
+.BI "-y  " year
+This will specify a year to override any that is supplied in
+the normal way.
+.RE
+.\"_
+.SS Output
+The printed output of this program is identical to that of 
+the standard calendar program 
+(
+.MW cal
+)
+that is supplied with the UNIX System
+.\"_
+.SH ENVIRONMENT VARIABLES
+See the standard
+.MW cal
+program.
+.\"_
+.SH EXAMPLES
+.IP \(rh 5
+print the the month of May for the current year:
+.EX
+\f(CWcal May \fP
+.EE
+.IP \(rh 5
+print out the month of May for the year 2007:
+.EX
+\f(CWcal May 2007 \fP
+.EE
+.IP \(rh 5
+print out the month of May for the year 2007:
+.EX
+\f(CWcal 2007/May \fP
+.EE
+.\"_
+.SH SEE ALSO
+cal(1), calendar(1)
+.\"_
+.SH PATH TO
+This program is currently located in \fC/usr/add-on/local/bin\fP
+or possibly where ever "local" programs are stored on your system.
+This is often at
+.MW "${LOCAL}/bin"
+on some systems.
+.\"_
+.\"_
+.SH WARNINGS
+Note that at least one white-space character must be put
+between all option key-letters 
+and the associated key-letter parameter.
+.\"_
+.SH AUTHOR
+David A.D. Morano
+.\"_
+.\"_
+.\"_

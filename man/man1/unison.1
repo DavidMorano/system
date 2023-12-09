@@ -1,0 +1,94 @@
+.\"_
+.TH UNISON 1 89/06/01 UNISON
+.SH NAME
+unison \- distributed output spooler
+.SH DESCRIPTION
+.\"_
+.\"_
+.\"	Module:   unison.1, Level 3.4
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.unison.1
+.\"_
+.\"	Modified: 6/1/89  08:33:46
+.\"	Fetched:  11/15/90  21:40:29
+.\"_
+.ds Un \fIprt\fR
+.ds PN \fIPRT\fR
+.ds Pn \fIprt\fR
+.ds Un \fIunison\fR
+.ds PN \fIUNISON\fR
+.ds Pn \fIunison\fR
+.\"_
+.ad b
+.I \*(PN
+is an R&D UNIX\s-2\u\d\s0 
+System software tool that provides comprehensive, 
+distributed printing services.
+Through the R&D UNIX System and 
+.I \*(PN, 
+you can access small and 
+large printers located across the hall or across the country\(emwith 
+a simple set of commands:
+.sp 1
+.nf
+.ce
+.B
+UNISON Command Summary
+.sp
+.in 5
+.ta 16 35n
+prt	submits a print request without formatting
+prtc	cancels print requests
+prtdstart	starts a private printer
+prtdstop	stops a private printer
+prtfmt	generates a formatting command pipeline 
+	and submits a print request
+prtinfo	gives information about devices
+prtlog	prints the log for a particular device or 
+	for the UNISON log
+prtmail	prints mail in an appropriate format
+prtmod	changes the attributes of print requests
+prtq	displays the workload of specific printers
+prtstat	displays the status of print requests
+ .prt	an optional file for defining customized 
+	printing defaults
+.fi
+.in 0
+.sp 2
+.P
+The following list highlights 
+.I \*(PN's 
+features:
+.sp
+.tr ~
+.in+3
+.ti-3
+.I \*(PN
+provides access to local, small aisle printers and centralized,
+large laser printers with the same commands.
+.sp
+.ti-3
+.I \*(PN
+operates in all computer architectures that support
+UNIX System V, Release 2 and above.
+.sp
+.ti-3
+.I \*(PN
+manages print requests for off-site printers\(emand
+printers attached to computers not running a UNIX operating
+system\(emwith simple command options.
+.sp
+.ti-3
+The \f2prtfmt\f1 command automates the creation of command pipelines
+for printing formatted files.
+.sp
+.ti-3
+The \f2.prt\f1 file simplifies many tasks by
+customizing print options.
+.in-3
+.SH FILES
+$HOME/.prt
+.SH SEE ALSO
+prt(1), prtc(1), prtdstart(1), prtdstop(1), prtfmt(1), prtinfo(1), 
+prtlog(1), prtmail(1), prtmod(1), prtq(1), prtstat(1), .prt(4)
+
+

@@ -1,0 +1,89 @@
+# SYSTEMS (rfinger)
+#
+
+
+localhost	uss /tmp/local/fingers/srv -o log
+localhost	tcp
+localhost	prog -o log /usr/add-on/local/bin/fingers +
+#localhost	ussmux /tmp/local/tcpmuxd/srv -o log
+localhost	tcpnls
+
+rc		uss /tmp/local/fingers/srv -o log
+rc		prog -o log /usr/add-on/local/bin/fingers +
+rc		tcpnls
+
+rca		uss /tmp/local/fingers/srv -o log
+rcb		uss /tmp/local/fingers/srv -o log
+rcc		uss /tmp/local/fingers/srv -o log
+
+rca		prog -o log /usr/add-on/local/bin/fingers +
+rcb		prog -o log /usr/add-on/local/bin/fingers +
+rcc		prog -o log /usr/add-on/local/bin/fingers +
+
+rca		tcpnls
+rcb		tcpnls
+rcc		tcpnls
+
+rca		tcp
+rcb		tcp
+rcc		tcp
+
+rca		tcpmux 5108
+rcb		tcpmux 5108
+rcc		tcpmux 5108
+
+rcd		tcpnls rca:listen
+rce		tcpnls rca:listen
+rcf		tcpnls rca:listen
+rcg		tcpnls rca:listen
+
+rightcore.com		uss /tmp/local/fingers/srv -o log
+rightcore.com		prog -o log /usr/add-on/local/bin/fingers +
+
+www.rightcore.com	uss /tmp/local/fingers/srv -o log
+www.rightcore.com	prog -o log /usr/add-on/local/bin/fingers +
+
+*.rightcore.com	tcpnls rca:listen
+*.rightcore.org	tcpnls rca:listen
+
+*.christian-update.org \
+		tcpnls rca:listen
+
+
+frodo		tcpmux frodo:5108
+vinson		tcpmux frodo:5108
+olive		tcpmux frodo:5108
+gilmore		tcpmux frodo:5108
+
+ece		tcpmux frodo:5108
+ece		tcpmux vinson:5108
+
+ece.neu.edu	tcpmux frodo:5108
+ece.neu.edu	tcpmux vinson:5108
+
+*.ece.neu.edu	tcpmux frodo:5108
+*.ece.neu.edu	tcpmux vonson:5108
+
+
+#
+# hocpa		uucp ~/uuts/%j.%s
+# hodia		uux rbbpost
+# ece		prog ${LOCAL}/sbin/dialday
+# localhost	uss ${LOCAL}/var/fingers/%N.srv
+# rc		uss ${LOCAL}/var/fingers/%N.srv
+# rca		uss ${LOCAL}/var/fingers/%N.srv
+# rcb		uss ${LOCAL}/var/fingers/%N.srv
+# rcc		uss ${LOCAL}/var/fingers/%N.srv
+#
+
+
+testproghost	prog -o log /usr/add-on/local/bin/fingers +
+
+testuss		uss /tmp/local/fingers/srv -o log
+
+# everything else
+
+*		tcp
+
+
+

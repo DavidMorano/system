@@ -1,0 +1,8 @@
+# ALIASES
+
+
+localthing:	"|/usr/add-on/local/bin/thing"
+
+test2:		localthing,dam
+
+

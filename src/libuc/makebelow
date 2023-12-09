@@ -1,0 +1,111 @@
+#!/bin/ksh
+# MAKEBELOW
+
+
+PROG_WHICH=/bin/which
+PROG_DOMAINNAME=/bin/domainname
+PROG_FGREP=/bin/fgrep
+PROG_CUT=/bin/cut
+PROG_UNAME=/bin/uname
+PROG_BASENAME=/bin/basename
+
+
+PN=${0##*/}
+
+TARGETS=
+DIRS=
+
+RF_DEBUG=false
+RF_QUIET=false
+RF_TARGETS=false
+RF_DIRS=false
+RF_OK=true
+
+S=targets
+OS=
+for A in "${@}" ; do
+  case $A in
+  '-D' )
+    RF_DEBUG=true
+    ;;
+  '-d' )
+    OS=${S}
+    S=dirs
+    ;;
+  '-q' )
+    RF_QUIET=1
+    ;;
+  '-'* )
+    print -u2 -- "${PN}: unknown option \"${A}\""
+    RF_OK=false
+    ;;
+  * )
+    case $S in
+    targets )
+      RF_TARGETS=1
+      TARGETS="${TARGETS} ${A}"
+      ;;
+    dirs )
+      RF_DIRS=1
+      DIRS="${DIRS} ${A}"
+      S=${OS}
+      ;;
+    esac
+    ;;
+  esac
+done
+
+TMPFILE=${TMPDIR:=/tmp}/mb${RANDOM}${$}
+
+cleanup() {
+  rm -f $TMPFILE
+}
+
+trap 'cleanup ; exit 1' 1 2 3 15 16 17
+
+function makesub {
+  typeset D T=${1}
+  if [[ -n "${T}" ]] ; then
+    D=${T%.*}
+    if [[ -d "${D}" ]] ; then (
+      if cd $D ; then
+        make $T
+        if [[ -r ${T} ]] ; then
+          if [[ -r ../${T} ]] ; then
+            if samefile $T ../${T} ; then :
+            else
+              ln -f $T ../${T}
+            fi
+          else
+            ln -f $T ../${T}
+          fi
+          
+        fi
+      fi
+    ) ; fi
+  fi
+}
+
+for T in $TARGETS ; do
+  D=${T%.*}
+  if [[ -d "${D}" ]] ; then
+    TF=${D}.o
+    if [[ -r ${D}/Makefile ]] ; then
+      if [[ -r "${TF}" ]] && [[ -r ${D}/${TF} ]] ; then
+        {
+          find $D -type f -newer $TF -print
+          find $D -type f -newer ${D}/${TF} -print
+        } > ${TMPFILE}
+        if [[ -s ${TMPFILE} ]] ; then
+	  makesub $TF
+        fi
+      else
+	makesub $TF
+      fi
+    fi
+  fi
+done
+
+cleanup
+
+

@@ -1,0 +1,207 @@
+.\"_
+.TH DOSPRT 1 94/12/02 LOCAL
+.SH NAME
+dosprt, dosprtfmt, dosprtmin \- print out files from a DOS based PC
+.SH SYNOPSIS
+.B dosprt
+.OP -d "  dst" ] [
+.OP -c "  copies" ] [
+.OP -s "  sides" ] [
+.OP -l "  lang" ] [
+.OP -p "  mode" ] [
+.OP -f "  form" ] [
+.br
+.B dosprtfmt
+.OP -d "  dst" ] [
+.OP -c "  copies" ] [
+.OP -s "  sides" ] [
+.OP -p "  mode" ] [
+.OP -f "  form" ] [
+.MW [
+.I other_options ...
+.MW ]
+.br
+.B dosprtmin
+.OP -d "  dst" ] [
+.OP -c "  copies" ] [
+.OP -s "  sides" ] [
+.OP -p "  mode" ] [
+.OP -f "  form" ] [
+.\"_
+.SH DESCRIPTION
+.\"_
+.SS Introduction
+.PP
+These commands are the DOS counterparts to the same commands on the
+UNIX system but named without the \fIdos\fP prefix.  They work similarly
+to the non-DOS versions (since they really call the straight versions of
+these programs anyway) but strip off the brain damaged DOS style
+line coding junk that DOS systems include in line coded text files.
+.PP
+Specifically, these programs do the following :
+.\"_
+.IP DOSPRT 15
+This program prints files out using the features available with the
+common \f(CWprt\fP command.  These features include printing out
+files containing special graphics formats in addition to text like
+\fItiff\fP, \fIgif\fP, \fItek\fP (Tektronix plotting instructions),
+\fIpict\fP (or \fIpct\fP as often seen on DOS or UNIX platforms),
+\fIplot\fP, et cetera.  This command is most commonly used to 
+simply print out straight text files.  The default language, when not
+specified, is \f(CWtext\fP.
+.\"_
+.IP DOSPRTFMT 15
+This command is used to print out files that contain AT&T Documentor's
+Workbench typesetting input.  Common examples include MM macro
+formatted input source or MS macro formatted input source.
+The choice of the proper macro packages to use is determined
+dynamically by the command.  The choice of the appropriate 
+preprocessors is also determined dynamically.
+.\"_
+.IP DOSPRTMIN 15
+This is used to print out a straight text file in a "mini" type of
+font like in the old days with the Xerox printers with the old Bell
+Laboratories "mini" font on them.  Each output page contains
+almost two
+pages worth of lines.  The lines are not separated
+into page "images" as with other "save paper" like techniques but
+rather in a single combined page image.
+.\"_
+.PP
+Note carefully that these commands only accept and format data on their
+standard input.  File names placed on the command line will result
+in an error about not finding the file but under no circumstance
+will anything be printed if a file name is accidentally placed
+on the command invocation line.  
+This behavior is different from the non-DOS
+versions of these commands which can take file names on their command
+lines.
+.\"_
+.SS Options
+.IP "-d  \fIdst\fP" 10
+This allows for the specification of the printer destination.
+If this option is not specified, then a default printer is selected
+by some means.
+.IP "-c  \fIcopies\fP" 10
+The \fB-c\fP option allows for the specification of the number of
+copies of the mail message to print out.
+.IP "-s  \fIsides\fP" 10
+The \fB-s\fP option allows for the specification of the number of
+sides of paper to use for the printed.
+Valid values associated with this option key are '\fB1\fP' and '\fB2\fP'.
+If this option is not specified then the default number of sides
+configured for the printer will be used.  For one-sided printers,
+this value will be set to '\fB1\fP' regardless of the user
+supplied value.
+.IP "-p  \fImode\fP" 10
+This allows for specifying a print mode such as :
+.EX
+land	\fRor\fP	landscape
+port	\fRor\fP	portrait
+.EE
+.IP "-f  \fIform\fP" 10
+This option allows for the specification of a printer form and
+can take on different values depending on the printer destination.
+Examples of the common values are :
+.\"_
+.\"_ note that the number of tabs are a hack to make it look right on
+.\"_ output ; i'm too lazy to figure out how to do it correctly !
+.EX
+nohole			(\fR8.5x11 -- the default\fP)
+hole				(\fR8.5x11\fP)
+11x17 \fRor\fP ledger
+11x14 \fRor\fP legal
+.EE
+Not all printers accept all of these forms and most printers
+do not really accept any of them except for \fCnohole\fP.
+.IP "-l  \fIland\fP" 10
+This option allows for the specification of the printer language
+in the user's file or files.  This option is only allowed for
+the \fBdosprt\fP command.  All files on a single command execution must
+contain the same printer language.
+.SS Execution
+These commands are usually executed using the UUCP facility or something
+similar.  Typical execution using UUCP would be of the form :
+.EX
+uux -p mtsvd!dosprt -l post -d lp1 < file.ps
+.EE
+.PP
+Note that, currently, no files can be specified on the command line.
+Input will only be properly accepted when it is on the \fIstandard input\fP.
+If there are files
+specified on the command line, then no data will be printed and some sort
+of error diagnostic may be given.
+.\"_
+.SH EXAMPLES
+.PP
+.IP \(rh 5
+To print a file (from a PC or other UUCP machine)
+containing PostScript language to the default printer, use
+a command like :
+.EX
+uux -p mtsvd!dosprt -l post < file.ps
+.EE
+Note carefully, that this command \fBwill not\fP necessarily work
+for PostScript files that contain binary data.  Use the plain old
+\fBprt\fP command for this purpose from the DOS PC platform instead
+of \fBdosprt\fP.
+.IP \(rh 5
+To print a file containing just ASCII text to the default printer, use :
+.EX
+uux -p mtsvd!dosprt < file.txt
+.EE
+.IP \(rh 5
+To print a file containing just ASCII text to
+the specified printer but in \fBmini\fP format, use some thing like :
+.EX
+uux -p mtsvd!dosprtmin -d lp1 < file.c
+.EE
+.IP \(rh 5
+To print a file containing standard DWB typesetting 
+instructions (MM, MS, troff,
+et cetera) to a specified printer :
+.EX
+uux -p mtsvd!dosprtfmt -d lp1 < file.dwb
+.EE
+.IP \(rh 5
+To print a file containing standard DWB typesetting 
+instructions to the site's
+default printer, use :
+.EX
+uux -p mtsvd!dosprt < file.mm
+.EE
+.IP \(rh 5
+To print a DOS line encoded file that is already on a UNIX system
+to the site
+default printer, use :
+.EX
+dosprt < file.mm
+.EE
+.\"_
+.SH SEE ALSO
+uux(1), uucp(1), prt(1), prtfmt(1), prtmin(1), .prt(4)
+.\"_
+.SH CAVEATS
+Not all platforms are supported equally with respect to
+continued user control over the disposition of the print job
+with respect to
+being either monitored (\fIprtq\fP) or canceled (\fIprtc\fP).
+Also, these commands currently only accept standard input and
+cannot be used to print a file by placing the name of the
+file on the command line like with the non-DOS command counterparts.
+.\"_
+.SH PATH TO
+This program is currently located in 
+\fC/usr/add-on/local/bin\fP on most systems.
+.\"_
+.SH WARNINGS
+Be careful to put a space between all option key letters and the associated
+key letter parameter.
+.\"_
+.SH AUTHOR
+Dave Morano
+.SH ACKNOWLEDGEMENTS
+The idea for this program was taken from the UNISON \f(CWprt(1)\fP
+program.
+.\_"
+.\_"

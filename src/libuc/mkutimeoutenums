@@ -1,0 +1,9 @@
+#!/bin/ksh
+# MKUTIMEOUTENUMS
+
+while read T ; do
+  LC=$( print -- $T | tr '[A-Z]' '[a-z]' )
+  print -- "	${LC},"
+done < ii
+
+

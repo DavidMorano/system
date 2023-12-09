@@ -1,0 +1,42 @@
+/* getbufsize */
+/* lang=C++23 */
+
+/* get various system buffer sizes */
+/* last modified %G% version %I% */
+
+#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
+#define	CF_DEBUGN	0		/* special */
+
+/* revision history:
+
+	= 2001-04-11, David D-A- Morano
+	This subroutine was written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2001 David D-A- Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	getbufsize
+
+	Description:
+        We return various system buffer sizes. Some of these are extracted from
+        the operating system. The rest we just made up values by ourselves.
+
+	Synopsis:
+	int getbufsize(int w)
+
+	Arguments:
+	w		which source to use:
+
+	Returns:
+	<0		error
+	==0		?
+	>0		buffer size
+
+
+*******************************************************************************/
+
+

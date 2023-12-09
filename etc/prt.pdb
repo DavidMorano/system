@@ -1,0 +1,39 @@
+# PRT.PDB
+# printer capabilities (for PRT)
+#
+#
+#
+
+
+default:
+	use=hp0,
+	sourcedb=LOCAL
+
+
+# primary printer
+hp0:
+	handle=disco,
+	trofftype=post,
+	yoffset=-0.1
+
+hp0ps:
+	trofftype=post,
+	yoffset=-0.1
+
+hpnp0:
+	trofftype=post,
+	yoffset=-0.1
+
+
+# fake printer to print PostScript to a file in RJE
+postscript:
+	handle=postscript,
+	trofftype=post,
+	yoffset=-0.1
+
+postfile:
+	trofftype=post,
+	yoffset=-0.1
+
+
+

@@ -1,0 +1,9 @@
+# CONF (pwi)
+
+
+# cache refresh interval
+refresh		12h
+
+
+
+

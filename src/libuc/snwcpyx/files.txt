@@ -1,0 +1,10 @@
+snwcpy.c
+snwcpyclean.c
+snwcpycompact.c
+snwcpyhyphen.c
+snwcpylatin.c
+snwcpyopaque.c
+snwcpyrev.c
+snwcpyshrink.c
+snwcpywidehdr.c
+snwcpyxc.cc

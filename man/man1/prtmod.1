@@ -1,0 +1,167 @@
+.\"_
+.TH PRTMOD 1 "90/04/07 3.8" UNISON
+.SH NAME
+prtmod \- modify the attributes of UNISON output requests
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtmod.1, Level 3.8
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtmod.1
+.\"_
+.\"	Modified: 4/7/90  12:41:45
+.\"	Fetched:  11/15/90  21:40:27
+.\"_
+.tr ~
+.ds Un \fIprtmod\fR
+.ds PN \fIPRTMOD\fR
+.ds Pn \fIPrtmod\fR
+.\"_
+.nf
+\fBprtmod\fR [options] [\fB-A\fR] [\fB-M \fImsg\fR] [\fB-q\fR]~~[\fB-z\fR] [\fB-P\fR] [\fIsystem\fR]
+.fi
+.SH DESCRIPTION
+\*(Un modifies the specified attributes of one or more requests.  If no
+\fB-r\fR \fIreqid\fR option is given, all requests on the current
+system that have attributes matching those specified are modified.
+Multiple attributes can be modified, except when using the -P option 
+(see below).  If a \fB-r\fR \fIreqid\fR option is given and the 
+\fIreqid\fR can not be found on the current system, the \*(Un is 
+executed remotely on a system where the request is likely to be queued.
+If \fIsystem\fR is given, the command is remotely executed on the specified
+system.
+.P
+Only an administrator, operator, or the owner of a request can modify it.  
+A request can be modified only if it is still queued for processing.
+.SS "Options"
+Each of the following options is optional.  For any option with an
+argument that is
+specified on the command line, its argument must appear in one of
+these three forms:
+.nf
+.ce3
+     \fIoldvalue:newvalue
+     oldvalue
+     :newvalue\fR
+.fi
+.sp
+.TP 25
+.BI \-A
+Confirms that the administrator or operator wants to modify all matching requests.
+If \fB-A\fR is not specified, only the administrator or operator's own
+requests will be modified.
+.TP 25
+.BI \-a "\ \fIacct\fR"
+Select requests by account number.
+The account number can not be changed.
+.TP 25
+.BI \-b "\ \fR\fIbin\fR\fI:new-value\fR"
+Select requests by bin.  
+If \fI:new-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI  \-c "\ \fR\fIcopies\fR\fI:new-value\fR"
+Select requests by copies.  
+If \fInew-value\fR is specified, it will replace the current value of this 
+field. 
+.TP 25
+.BI  \-d "\ \fR\fIdest\fR\fI:new-value\fR"
+Select requests by destination.  \fIdest\fR is of the form
+\fIdest/device\fR.  
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI \-f "\ \fR\fIform\fR\fI:new-value\fR"
+Select requests by form.  
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI \-h 
+Print full help message.
+.TP 25
+.BI  \-j "\ \fR\fIjobname\fR\fI:new-value\fR"
+Select requests by jobname.
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI  \-l "\ \fR\fIlanguage\fR\fI:new-value\fR"
+Select requests by language.
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI  \-M "\ msg"
+The message \fImsg\fR is mailed to the owner of the request modified.
+.TP 25
+.BI  \-m 
+Send a mail message to all owners of modified requests describing 
+the changed attributes.
+.TP 25
+.BI  \-o "\ \fR\fIfilter\fR\fI:new-value\fR"
+Select requests by filter.
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI  \-P
+Move all matching requests to the head of the print queue.
+This option can be used only by printer administrators and operators.
+It is not permissible to use this option when modifying any other
+attribute.
+.TP 25
+.BI  \-p "\ \fR\fImode\fR\fI:new-value\fR"
+Select requests by printmode.
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI  \-r "\ \fR\fIrequestid\fR"
+Select requests by requestid.
+.TP 25
+.BI  \-s "\ \fR\fIsides\fR\fI:new-value\fR"
+Select requests by number of sides specified.
+If \fInew-value\fR is specified, it will replace the current value of this 
+field.
+.TP 25
+.BI  \-u "\ \fIuser\fR"
+Select requests by userid.
+The userid can not be changed.
+.TP 25
+.BI  \-z
+List the requests that would be selected for modification, but do 
+not modify them.  
+.TP 25
+.BI  \-q
+Do not list requestids of requests that have been modified and resubmitted.
+.P
+.SH "CAVEATS"
+If \*(Un is used to modify the device of a request that was submitted
+with a filter specified, the filter for the request may need to be modified
+to be made consistent with the new device type.  In some cases, modification
+of a request's attributes may cause routing of the request to another
+system.
+.SH "EXAMPLES"
+.sp
+Modify the number of copies for requestid abcdhomxb to 10:
+.nf
+
+	   \fBprtmod -c :10 -r abcdhomxb\fR
+
+.fi
+.sp
+Reroute to printer xr2 all requests on the current system destined
+for printer xerox and send a mail message:
+.nf
+
+	   \fBprtmod -d xerox:xr2 -M "printer xerox has been renamed xr2"\fR
+	
+.fi
+.sp
+Reset the forms to nohole for all jobs on the current system
+that are 2 sided, destined for
+printer xr2, and have forms hole:
+.nf
+
+	   \fBprtmod -d xr2 -s 2 -f hole:nohole\fR
+	
+.fi
+.SH "SEE ALSO"
+prtrerun(1), prt(1), prtstat(1), prtq(1).
+.SH FILES
+$UNISON/*

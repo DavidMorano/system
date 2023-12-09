@@ -1,0 +1,62 @@
+# DOMAIN
+#
+# This is the (famous) domain table for PCS mail.  This file holds
+# domain strings that are looked up in order to route mail.  The format
+# of this file is that of a SVCTAB file (this is just a SVCTAB file).
+# The service is a domain name to lookup.  Keywords are:
+#
+#	keyword		description
+#---------------------------------------------------------------
+#	mailer		mailer to use for next hop
+#	relay		name of machine to relay mail to
+#	gateway		name of machine to use as a gateway
+#	aliases		mailalias profiles to use for this domain
+#
+# There are some built-in mailers:
+#
+#	mailer		description
+#---------------------------------------------------------------
+#	LOCAL		local delivery
+#
+#
+#
+
+
+# handle local and cluster deliveries
+
+local:
+	mailer= LOCAL,
+
+mailhost.rightcore.com:
+	mailer= relay,
+
+
+
+# our domains
+
+rightcore.com:
+	mailer= LOCAL,
+	relay= mail.rightcore.com,
+	aliases= <default spam> ,
+
+rightcore.org:
+	mailer= LOCAL,
+	relay= mailhost,
+	aliases= rcorg
+
+christian-update.org:
+	mailer= LOCAL,
+	relay= mailhost,
+	aliases= cuorg
+
+busgisrealbad.info:
+	mailer= LOCAL,
+	relay= mailhost,
+	aliases= bushbad
+
+*:
+	mailer= default,
+	relay= mailhost
+
+
+

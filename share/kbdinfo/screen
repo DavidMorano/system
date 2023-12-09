@@ -1,0 +1,50 @@
+# KBD (screen)
+
+#
+# type	number	name
+#
+
+# these are eseentially common to all keyboards
+
+PF	P	PF1
+PF	Q	PF2
+PF	R	PF3
+PF	S	PF4
+
+CSI	A	CurUp
+CSI	B	CurDown
+CSI	C	CurRight	
+CSI	D	CurLeft
+
+
+# these are fairly unique to the Dec-VT keyboards
+
+FKEY	17	F6
+FKEY	18	F7
+FKEY	19	F8
+FKEY	20	F9
+FKEY	21	F10
+
+FKEY	23	F11
+FKEY	24	F12
+FKEY	25	F13
+FKEY	26	F14
+
+FKEY	28	Help
+FKEY	29	Do
+
+FKEY	31	F17
+FKEY	32	F18
+FKEY	33	F19
+FKEY	34	F20
+
+FKEY	1	Find
+FKEY	2	Insert
+FKEY	3	Remove
+FKEY	4	Select
+FKEY	5	Previous
+FKEY	6	Next
+
+
+
+

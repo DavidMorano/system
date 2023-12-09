@@ -1,0 +1,120 @@
+# MAP
+# PROGSWITCH map file
+#
+# Note:
+# The special path '/usr/bin' is always searched last (unless it is
+# already listed).  So there is no need to add it to the end of any list.
+#
+#
+
+# the XPG4 version of VI on Slowlaris is BROKEN!! -- it core dumps!!
+vi:
+	/usr/bin/vi
+
+# GNU shows the proper username when multiple usernames are available
+ls:
+	${GNU}/bin/ls
+	${AST}/bin/ls
+	$(NCMP}/bin/ls
+
+# no FMT program is really correct; the AST version being quite bad! :-(
+fmt:
+	${GNU}/bin/fmt
+
+# C language utilities
+indent:
+	/opt/SUNWspro/bin/indent
+	${GNU}/bin/indent
+	${NCMP}/bin/indent
+
+# these utilies are "stupid" in all but GNU implementations!
+ln:
+	${GNU}/bin/ln
+	/usr/xpg4/bin/ln
+	${AST}/bin/ln
+
+cp:
+	${GNU}/bin/cp
+	/usr/xpg4/bin/cp
+	${AST}/bin/cp
+
+mv:
+	${GNU}/bin/mv
+	/usr/xpg4/bin/mv
+	${AST}/bin/mv
+
+# these seem to be OK; most others are broken in one or more ways!
+id:
+	${GNU}/bin/id
+	/usr/xpg4/bin/id
+
+# MORE program
+more:
+	/usr/bin/more
+
+# LESS programs
+less:
+	${GNU}/bin/less
+
+lessecho:
+	${GNU}/bin/lessecho
+
+lesskey:
+	${GNU}/bin/lesskey
+
+# so far the Solaris MAILX seems best
+mailx:
+	/usr/preroot/bin/mailx
+	${NCMP}/bin/mailx
+	/usr/bin/mailx
+	${AST}/bin/mailx
+	/usr/ucb/mailx
+	/usr/ucb/Mail
+
+# XARGS (almost all out there are BROKEN!)
+xargs:
+	${NCMP}/bin/xargs
+
+# redirect to use POSTFIX versions
+mailq:
+	${POSTFIX}/bin/mailq
+	${GNU}/bin/mailq
+
+newaliases:
+	${POSTFIX}/bin/newaliases
+	${GNU}/bin/newaliases
+
+sendmail:
+	${POSTFIX}/bin/sendmail
+	${GNU}/bin/sendmail
+
+# yes, GNU TAR is best right now -- others have problems!
+tar:
+	$(GNU)/bin/tar
+
+# the NCMP version is broken!
+fortune:
+	/usr/games/fortune
+
+# these supprt the UUX dialer
+uux:
+	${NCMP}/bin/uux
+
+uuname:
+	${NCMP}/bin/uuname
+
+# the BIBLE family
+bb:
+	${LOCAL}/bin/biblebook
+
+# the AT&T-lineage ROFF family
+troff:
+	${DWB}/bin/troff
+	/usr/bin/troff
+	${GNU}/bin/troff
+
+dpost:
+	${DWB}/bin/dpost
+	/usr/lib/lp/postscript/dpost
+
+

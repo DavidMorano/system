@@ -1,0 +1,140 @@
+.\"_ 
+.TH DMAIL 1 "1988-11-28" PCS
+.SH NAME
+dmail, dmailbox \- program for processing local mail messages
+.SH SYNOPSIS
+.\"_
+.so tmac.att
+.\"_ 
+.BR dmail
+.RI [ recipient(s) ]
+.OP -f " from" ] [
+.OP -s " subject" ] [
+.in +2
+.br
+.OP -d "" ] [
+.OP -o " option(s)" ] [
+.OP -s " protocol" ] [
+.OP -pm " program-mode" ] [
+.OP -sn " search-name" ] [
+.in -2
+.br
+.BR dmailbox
+.RI [ recipient(s) ]
+.OP -f " from" ] [
+.OP -s " subject" ] [
+.OP -m " mailbox" ] [
+.in +2
+.br
+.OP -o " option(s)" ] [
+.OP -s " protocol" ] [
+.OP -pm " program-mode" ] [
+.OP -sn " search-name" ] [
+.in -2
+.\"_
+.\"_
+.SH DESCRIPTION
+.\"_
+.LP
+These programs perform the low-level mail-message delivery function.
+The
+.B dmail
+program performs delivery to the system mail-spool deliver area.
+The
+.B dmailbox
+program performs delivery to a specific mailbox of a specified user.
+One or more optional recipients can be specified for 
+{delivery (with either program).
+If no recipients are specified, a default recipient is used corresponding
+to the user inboking the program.
+Mail messages (optionally more than one in UNIX® MAILBOX format) are provided
+on standard-input.
+.\"_
+.\"_
+.SH OPTIONS
+.\"_
+.LP
+.TP 15
+.BI \-f " from"
+Specify an optional 
+.MW from 
+address.  
+By default the "from" address is automatically determined and is
+associated with the user invoking the program.
+.TP
+.BI \-s " subject"
+An optional subject string can be specified.
+The default is to use any subject which may already be present in the
+mail message.
+.TP
+.BI \-m " mailbox"
+For the
+.B dmailbox
+program, this option allows for an optional mailbox to be specified
+to receive the mail message.
+By default the target mailbox is 
+.MW copy
+\& .
+.TP
+.B \-d
+This option is ignored for historical reasons.
+.TP
+.BI \-o " option(s)"
+Options in the form of key-value pairs can be specified.
+The value part can be omitted.
+.TP
+.BI \-p " protocol"
+An optional "protocol" can be supplied specifying how this program was
+called, not what this program will do.
+.TP
+.BI \-pm " program-mode"
+Generally used for testing, the program-mode can be specified.
+Valid program modes are: 
+.MW dmail
+, and 
+.MW dmailbox
+\&.
+The program mode specifies what mode the program operates in.
+.TP
+.BI \-sn " search-name"
+Generally used for testing, a program search-name can be specified.
+Valid program modes are: 
+.MW dmail
+, and 
+.MW dmailbox
+\&.
+The program search-name specifies under what name the program searches
+for optional files (like a configuration file).
+.\"_
+.\"_
+.SH FILES
+.\"_
+.LP
+.TP 20
+.B /var/mail
+this is the default system mail-spool delivery directory
+.TP 
+.B /var/adm/mail
+this is the default mail-spool delivery directory for mail that
+cannot be delived normally (for whatever reason)
+.PD
+.\"_
+.\"_
+.SH "SEE ALSO"
+.LP
+.BR biff (1), 
+.BR mail (1),
+.BR uucp (1C),
+.BR uux (1C),
+.\"_
+.\"_
+.SH NOTES
+.LP
+This is a SETGID program and will not (likely) be able to access the
+mail spool area for delivery if it is not installed SETGID.
+.\"_
+.\"_
+.SH AUTHOR
+David A.D. Morano
+.\"_
+.\"_

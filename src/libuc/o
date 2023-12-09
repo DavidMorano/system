@@ -1,0 +1,15 @@
+constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+
+namespace {
+    struct terminit {
+	char		terms[termsize] = {} ;
+	constexpr terminit(cchar *s) noex {
+	    while (*s) {
+		cint	ch = mkchar(*s++) ;
+		baset(terms,ch) ;
+	    }
+	} ;
+    } ; /* end struct (terminit) */
+}
+
+

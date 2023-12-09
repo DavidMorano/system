@@ -1,0 +1,60 @@
+.\"_
+.TH PRTLOG 1 "90/02/08 3.4" UNISON
+.SH NAME
+prtlog \- print a UNISON log 
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtlog.1, Level 3.4
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtlog.1
+.\"_
+.\"	Modified: 2/8/90  11:46:20
+.\"	Fetched:  11/15/90  21:40:26
+.\"_
+.tr ~
+.ds Un prtlog
+.\"_
+.B \*(Un
+[ \fB-f\fR ] [ \fB-h\fR ]  \fB-d\fR \fIprinter\fR | \fIprinter\fR | \fIday\fR | \fBtoday\fR
+.SH DESCRIPTION
+.ad b
+.I \*(Un
+writes to standard output the log file for the printer specified by \fIprinter\fR
+or the log for the day specified by \fIday\fR, or today's log.
+The day may be \fBMon, Tue, Wed, Thu, Fri, Sat, \fRor\fB Sun.\fR
+.PP
+The log for a printer contains information reported during transmission of the
+last job to the printer. It also contains information about the status of the
+printer such as "out of paper."
+The log for the day reports general UNISON activity.
+.SS Options
+.TP 13
+.BI \-d "\ printer"
+The log for the specified printer is printed.
+Note that printer can also be specified without the \fB-d\fR.
+.TP 13
+.BI \-f "\ "
+The complete log is written and then lines are printed as they are added to the log.
+This allows "following" the log as activity happens.
+.TP 13
+.BI \-h "\ "
+A short help message is printer.
+.PD
+.SH EXAMPLE
+.sp
+Follow the log for the printer \fIloon\fR by typing
+.sp
+\fB	prtlog  -f -d loon\fR
+.sp
+or
+.sp
+\fB	prtlog  -f  loon\fR
+.sp
+Print the log for Tuesday by typing
+.sp
+\fB	prtlog Tue\fR
+.sp
+.SH FILES
+$UNISONHOME/log.\fIdate\fR
+.in
+$UNISONHOME/log.\fIdevicename\fR

@@ -1,0 +1,221 @@
+/* vecstr_addpath */
+/* lang=C++20 */
+
+/* add a "path" compnent to the string-list */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-06-01, David A­D­ Morano
+	This subroutine was originally written.
+
+	= 2023-10-27, David A­D­ Morano
+	I changed to make the MAXPATHLEN value dynamic.
+
+*/
+
+/* Copyright © 1998,2023 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	------------------------------------------------------------------------
+	Name:
+	vecstr_addpathclean
+
+	Description:
+	This subroutine adds a "path" componment to the vector-string
+	list.  It cleans up the path-component first by passing it
+	through 'pathclean(3dam)'.
+
+	Synopsis:
+	int vecstr_addpathclean(vecstr *lp,cchar *pp,int pl) noex
+
+	Arguments:
+	lp		vector-string list object pointer
+	pp		path-string pointer
+	pl		length of given string
+
+	Returns:
+	>=0		OK
+	<0		some error
+
+
+	------------------------------------------------------------------------
+	Name:
+	vecstr_addcspath
+
+	Description:
+	This subroutine will add (uniquely) the Condig-String (CS) 
+	PATH value to the vector-list.
+
+	Synopsis:
+	int vecstr_addcspath(vecstr *) noex
+
+	Arguments:
+	vsp		pointer to VECSTR object
+
+	Returns:
+	>=0		number of elements loaded
+	<0		error
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>
+#include	<limits.h>
+#include	<unistd.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
+#include	<vecstr.h>
+#include	<bufsizevar.hh>
+#include	<localmisc.h>
+
+
+/* local defines */
+
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+#define	DEFPATH		"/usr/preroot/bin:/usr/xpg4/bin:" \
+				"/usr/ccs/bin:/usr/bin:/usr/sbin:/sbin"
+#elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#define	DEFPATH		"/usr/preroot/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+#else
+#define	DEFPATH		"/usr/preroot/bin:/usr/bin:/usr/sbin:/sbin"
+#endif
+
+
+/* external subroutines */
+
+extern "C" {
+    extern int	pathclean(char *,const char *,int) noex ;
+    extern int	isOneOf(cint *,int) noex ;
+}
+
+extern "C" {
+    extern char	*strnpbrk(cchar *,int,cchar *) ;
+}
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+static const int	rsdefs[] = {
+	SR_NOTFOUND,
+	SR_OVERFLOW,
+	0
+} ;
+
+
+/* exported subroutines */
+
+int vecstr_addpathclean(vecstr *vlp,cchar *lp,int ll) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (vlp && lp) {
+	    rs = SR_OK ;
+	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll > 0) {
+		if ((rs = maxpathlen) >= 0) {
+		    cint	dlen = rs ;
+		    char	*dbuf ;
+		    if ((rs = uc_libmalloc((dlen+1),&dbuf)) >= 0) {
+	                cchar	*tp ;
+	                while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
+		            if ((tp-lp) >= 0) {
+	    	                if ((rs = pathclean(dbuf,lp,(tp-lp))) >= 0) {
+		                    rs = vecstr_adduniq(vlp,dbuf,rs) ;
+		                    if (rs < INT_MAX) c += 1 ;
+		                }
+		            }
+		            ll -= ((tp+1)-lp) ;
+		            lp = (tp+1) ;
+		            if (rs < 0) break ;
+	                } /* end while */
+	                if ((rs >= 0) && (ll > 0)) {
+	    	            if ((rs = pathclean(dbuf,lp,ll)) >= 0) {
+		                rs = vecstr_adduniq(vlp,dbuf,rs) ;
+		                if (rs < INT_MAX) c += 1 ;
+		            }
+	                }
+			rs1 = uc_libfree(dbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a) */
+		} /* end if (maxpathlen) */
+	    } /* end if (non-zero) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecstr_addpathclean) */
+
+int vecstr_addpath(vecstr *vlp,cchar *lp,int ll) noex {
+	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (vlp && lp) {
+	    rs = SR_OK ;
+	    if (ll < 0) ll = strlen(lp) ;
+	    if (ll > 0) {
+	        cchar	*tp ;
+	        while ((tp = strnpbrk(lp,ll,":;")) != nullptr) {
+		    if ((tp-lp) >= 0) {
+		        rs = vecstr_adduniq(vlp,lp,(tp-lp)) ;
+		        if (rs < INT_MAX) c += 1 ;
+		    }
+		    ll -= ((tp+1)-lp) ;
+		    lp = (tp+1) ;
+		    if (rs < 0) break ;
+	        } /* end while */
+	        if ((rs >= 0) && (ll > 0)) {
+		    rs = vecstr_adduniq(vlp,lp,ll) ;
+		    if (rs < INT_MAX) c += 1 ;
+	        }
+	    } /* end if (non-zero) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecstr_addpath) */
+
+int vecstr_addcspath(vecstr *vsp) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (vsp) {
+	    if ((rs = maxpathlen) >= 0) {
+		cint	plen = (2*rs) ;
+	        char	*pbuf ;
+	        if ((rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
+		    cint	req = _CS_PATH ;
+	            int		dl = -1 ;
+	            cchar	*dp = DEFPATH ;
+	            if ((rs = uc_confstr(pbuf,plen,req)) >= 0) {
+		        dl = rs ;
+	                dp = pbuf ;
+	            } else if (isOneOf(rsdefs,rs)) {
+	                rs = SR_OK ;
+	            }
+	            if (rs >= 0) {
+	                rs = vecstr_addpath(vsp,dp,dl) ;
+	                c += rs ;
+	            } /* end if */
+	            rs1 = uc_libfree(pbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (maxpathlen) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecstr_addcspath) */
+
+

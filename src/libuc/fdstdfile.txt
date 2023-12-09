@@ -1,0 +1,13 @@
+#ifndef	FD_STDIN
+#define	FD_STDIN	0
+#endif
+#ifndef	FD_STDOUT
+#define	FD_STDOUT	1
+#endif
+#ifndef	FD_STDERR
+#define	FD_STDERR	2
+#endif
+#ifndef	FD_STDLOG
+#define	FD_STDLOG	3
+#endif
+

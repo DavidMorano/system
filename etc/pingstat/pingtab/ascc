@@ -1,0 +1,25 @@
+# PRINGTAB
+# ASCC (Physics) at Northeastern University
+
+
+#
+# format of entries:
+#	name		minint	timeout
+#
+#
+# URI
+
+
+stardec.ascc.neu.edu		2h
+aries.ascc.neu.edu		2h
+tarus.ascc.neu.edu		2h
+gemini.ascc.neu.edu		2h
+cygnus.ascc.neu.edu		2h
+
+
+
+
+
+
+
+

@@ -1,0 +1,318 @@
+.\"_
+.TH PLUSOPTS 1 "27 March 1992"
+.SH NAME
+plusopts \- options to printer commands
+.SH SYNOPSIS
+prt... \f(CB+\fP\fIoption\fP ...
+.SH DESCRIPTION
+.de cW
+\&\f(CW\\$1\fP\\$2
+..
+Many of the 113-MH printer commands
+are pipelines of other commands.
+For example, the
+.I *roff
+commands invoke
+.cW troff
+and
+.cW dpost
+while the
+.I *print
+commands invoke
+.cW pr
+and
+.cW postprint .
+It is not always obvious which command line arguments
+get passed to which element of the pipeline.
+By default,
+.I *roff
+arguments are turned over to
+.cW troff
+and
+.I *print
+arguments to
+.cW postprint .
+As a result, users must specify different options
+to get ``the same thing'' done.
+For example, to get 2 copies of each page, the
+.I *print
+commands pass argument
+.cW \-n2
+to
+.cW postprint .
+But the
+.I *roff
+commands pass
+.cW \-n2
+to
+.cW troff
+where it determines the number on the first page.
+Users must specify
+.cW \-e\-n2
+to pass argument
+.cW \-n2
+to
+.cW dpost .
+The potential for confusion is obvious.
+.PP
+The
+.cW +
+options were introduced as an alternate method
+of requesting certain options.
+For example,
+.cW +2copies
+will cause the
+.I *print,
+.I *roff
+and
+.I *dvi
+commands to generate 2 copies of each page.
+Regrettably,
+not all options are recognized by all the printer commands,
+and some options are only supported on certain printers.
+The notation
+[dprP]
+will mean that the option is recognized by the
+.I *dvi ,
+.I *print,
+.I *roff,
+and
+.I *post
+commands.
+If a command does not support an option,
+its initial will be omitted from the group.
+In general,
+unsupported options are simply ignored.
+.PP
+All options must be written as a single word.
+No white space can be embedded.
+No abbreviations are recognized.
+.TP
+.cW +portrait
+[dpr]
+Orient the printing with the narrow edge of the paper at the top of the page.
+.TP
+.cW +landscape
+[dpr]
+Orient the printing with the wide edge of the paper at the top of the page.
+The
+.I *print
+commands will change the width at which lines are folded
+to accommodate the wider format.
+The input to the
+.I *roff
+and
+.I *dvi
+commands would have to inform the corresponding formatters
+about the unusual page layout.
+.TP
+.cW +reverse
+[dprP]
+Run
+.cW postreverse
+(for
+.I *roff,
+.I *print,
+and
+.I *post
+)
+or give the
+.cW -r
+option to
+.cW dvips
+(for
+.I *dvi
+)
+to reverse the order of the pages.
+This is the default on printers that have face-up output
+trays (e.g. the LaserWriters).
+.TP
+.cW +noreverse
+[dprP]
+Do not run any page-reversal software.
+This is the default on printers that have face-down output
+trays (currently, the HP LaserJet IIISi and QMS 2210 11x17 printers).
+.TP
+.cW +blastpage
+[dprP]
+Print a blast page.  This is the default.
+.TP
+.cW +noblastpage
+[dprP]
+Do not print a blast page.
+.PP
+The following options apply to
+.I *roff
+commands only, and cause the input
+to be processed by the corresponding filter.
+They have the same effect as the
+.cW \-f
+arguments to the
+.I *roff
+commands.
+.TP
+.cW +tbl
+.TP
+.cW +eqn
+.TP
+.cW +pic
+.TP
+.cW +grap
+.cW pic
+is always invoked if
+.cW grap
+is specified.
+.PP
+The following options
+take numeric arguments.
+The numbers may precede
+or follow
+the option name,
+but no white space may intervene.
+For example,
+.cW +1.25up
+or
+.cW +up1.25
+may be used, but not
+.cW "+up 1.25" .
+.TP
+.cW +copies
+[dpr]
+Make the specified number of copies of each page.
+It should be noted that photocopiers
+are faster and cheaper than laser printers.
+.TP
+.cW +magnify
+[pr]
+Magnify the printed image.
+Numbers less than 1.0 will shrink the image.
+Numbers greater than 1.0 run the risk of clipping the image.
+.TP
+.cW +perpage
+[dprP]
+Print the specified number of logical pages
+on each sheet of paper.
+.cW persheet
+is recognized as a synonym.
+The
+.I *dvi
+and
+.I *post
+commands implement this by using
+.cW psnup ,
+thus restricting the number of logical pages to be a power of 2.
+.TP
+.cW +right
+.TP
+.cW +left
+.TP
+.cW +up
+.TP
+.cW +down
+[pr]
+The printed image is shifted the specified number of inches
+in the specified direction.
+The number can be signed, with
+.cW +up.25
+equivalent to
+.cW +down-.25 ,
+both shifting the image .25 inches toward the top of the page.
+.PP
+The following options take lists of pages as an argument.
+A list is a comma-delimited set of page ranges and page numbers.
+A page range is a pair of page numbers separated by a hyphen.
+If the first number in a range is missing,
+page 1 is assumed.
+If the second number in a range is missing,
+the last page in the document is assumed.
+If no list is specified,
+the options are assumed to apply to all pages in the document.
+Because of the way
+.cW dvips
+works, The
+.I *dvi
+commands cannot handle lists,
+only a single page or a single range, and the
+.I *post
+commands, since they don't parse the postscript
+into pages, will only apply the options to all pages in the document.
+.TP
+.cW +pages
+[dpr]
+Display only the specified pages.
+Only a single page or a single range may be specified
+for the
+.I *dvi
+commands.
+.TP
+.cW +manualfeed
+[dprP]
+Take the specified pages from the manual feed.
+.I *dvi
+commands will take
+.I all
+pages from the manual feed;
+the option cannot be limited to a subset of the printed pages.
+.cW manual
+is recognized as a synonym.
+If you specify this option,
+you must be present at the printer when the job arrives
+to insert paper in the manual feeder.
+If you are not, the job will time out.
+.TP
+.cW +letterhead
+[dprP]
+Take the specified pages from the alternate paper feed.
+This only works on printers with two input feeds.
+The intent is to keep one Dataproducts printer
+loaded with company letterhead in the alternate feed.
+.TP
+.cW +11x17
+[dprP]
+Take the specified pages from the 11 by 17 inch paper tray.
+The intent is to keep one Dataproducts printer
+loaded with 11 by 17 inch paper in the alternate feed.
+.TP
+.cW +duplex
+[dprP]
+Print the specified pages in duplex (2-sided) mode.
+.TP
+.cW +noduplex
+.TP
+.cW +simplex
+[dprP]
+Print the specified pages in simplex (1-sided) mode.
+.TP
+.cW +bindlong
+[dprP]
+In duplex mode, orient the images on each side of the paper assuming
+that the long edge is the one that's stapled.
+This is the default.
+.TP
+.cW +bindshort
+[dprP]
+In duplex mode, orient the images on each side of the paper assuming
+that the short edge is the one that's stapled.
+This is useful when the +2perpage or +6perpage option is used.
+.TP
+.cW +quality:draft
+.TP
+.cW +quality:standard
+.TP
+.cW +quality:enhanced
+.TP
+.cW +quality:premium
+[dprP]
+Use the given quality setting when printing the pages.
+Currently applies only to the Tektronix Phaser III PXi printers.
+.SH AUTHOR
+John P. Linderman
+.SH DIAGNOSTICS
+.TP
+.cW +help
+or
+.TP
+.cW +?
+will generate a summary of the options,
+and cause the command to exit with a non-zero
+exit status.

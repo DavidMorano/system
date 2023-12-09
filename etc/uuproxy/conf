@@ -1,0 +1,30 @@
+# UUPROXY.CONF
+# UUPROXY Configuration File
+
+
+#
+# facility specifications take on the following form :
+#
+# 		name	prefix	base_directory
+#
+
+facility	root	""	/
+facility	ncmp	ncmp	${NCMP}
+facility	pcs	pcs	${PCS}
+facility	area11	bl	boole:pcsuucp
+
+
+# UUPROXY spool base directory
+
+#spool	%R/spool/uuproxy/
+
+
+# additional directory for 'systems' files
+
+systems	%R/var/uuproxy/
+users	%R/var/uuproxy/
+
+
+
+
+

@@ -1,0 +1,202 @@
+# SRV
+# TCPMUXD service table
+#
+#	The format of entries are:
+#
+#	service:
+#		program= /usr/bin/prog,
+#		args=	arg0 arg1,
+#		user=	uucp,
+#		group=	other,
+#		opts=	options,
+#		access=	netgroup(s)
+#
+#
+
+#	The following substitutions are made on keyword value strings:
+
+#		%V	TCPMUXD version string
+#		%R	TCPMUXD program root
+#		%N	local nodename
+#		%D	local domainname
+#		%H	local hostname
+
+#		%s	service
+#		%a	service arguments (if available)
+#		%p	socket peername (if available)
+
+#	The following are made on some authenticating servers:
+
+#		%h	originating host (if known)
+#		%u	network username (if known)
+#		%(pass)	network password (if known)
+#
+#		${define}	substituted defines
+#		${environment}	substituted environment variable
+#
+
+#
+#	There are some built-in servers on some of the listener daemon
+#	programs.  Some of these are listed below.  These internal
+#	servers can be overridden by making an entry with the same
+#	service name in this file.
+#
+# HELP:
+#	**BUILT-IN** ('tcpmuxd' only)
+#
+#	This is a 'tcpmux' (by appropriate RFC) service requirement.
+#
+# TIME:
+#	**BUILT-IN** ('tcpmuxd' only)
+#
+#	This is the same as INET 'time' service.
+#
+# DAYTIME:
+#	**BUILT-IN** ('tcpmuxd' only)
+#
+#	This is the same as INET 'daytime' service.
+#
+# SHELLCMD:
+#	**BUILT-IN** ('rexecd' only)
+#
+#	This is the same as Berkeley 'rsh' and 'rexec' services.
+#
+# CMD:
+#	**BUILT_IN** ('rexecd' only)
+#
+#	This is what is provided by the old PCS 'REX' service.
+#
+#
+
+
+finger:
+	p= ${LOCAL}/bin/fingers
+
+rsyslog:
+	p= ${LOCAL}/bin/poplogd
+
+poplog:
+	p= ${LOCAL}/bin/poplogd
+
+pingstat:
+	access= rightcore ece,
+	p= ${LOCAL}/bin/pingstat,
+	a= pingstat -i
+
+uucp:
+	access= rightcore ece,
+	p= /usr/lib/uucico,
+	a = uucico -n nuucp
+
+bbpost:
+	p= ${PCS}/bin/rbbpost
+
+notice:
+	a= notice %a
+
+grope:
+	p= ${TOOLS}/bin/grope,
+	a= grope %a
+
+netstat:
+	p= /usr/extra/sbin/netstatd
+
+cotd:
+	so= lkcmd:commandment,
+	a= + +
+
+votd:
+	so= lkcmd:bibleverse,
+	a= bibleverse -o bookname +
+
+hotd:
+	so= lkcmd:calyear,
+	a= calyear +
+
+qotd:
+	p= qotd
+
+dmail:
+	p= ${PCS}/bin/dmail,
+	a= dmail -R ${PCS} -p %s:%h %a
+
+rmail:
+	p= /usr/bin/rmail,
+	a= rmail %a
+
+rmailer:
+	p= ${PCS}/bin/rmailerd,
+	a= rmailerd
+
+mailbridge:
+	p= ${PCS}/bin/dmail,
+	a= dmail -R ${PCS} -p %s:%h dam
+
+echo:
+	p= ${LOCAL}/bin/echod,
+	a= echod -s
+
+exec:
+	p= /usr/sbin/in.rexecd,
+	access= rightcore 
+
+sync:
+	p= /usr/bin/sync,
+	a= sync
+
+maint:
+	a= -ksh -i
+
+mailalias:
+	so= lkcmd,
+	a= mailalias %{ss}
+
+
+# testing
+
+echoargs:
+	a= echoargs %a
+
+echostuff:
+	a= echo %V %R %N %D %s %{ss},
+	access= rightcore 
+
+enum:
+	p= ${TESTSERVERDIR}/enum,
+	a= enum '%a'
+
+modlist:
+	a= modlist
+
+env:
+	access= rightcore,
+	username= admin,
+	a= envget
+
+whoami:
+	access= rightcore,
+	a= echo "rhost=%P user=%U"
+
+peername:
+	a= echo %P
+
+helloworld:
+	a= echo n=5
+
+testshlib:
+	access= rightcore,
+	so= lkcmd:userinfo,
+	a= + - fullname projectinfo
+
+testshlib1:
+	access= rightcore,
+	so= lkcmd:userinfo,
+	a= + - fullname projectinfo
+
+testshlib2:
+	access= rightcore,
+	so= lkcmd : userinfo,
+	a= + - fullname projectinfo
+
+
+

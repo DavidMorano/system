@@ -1,0 +1,119 @@
+/* ucmem */
+/* lang=C++20 */
+
+/* provide some memory UNIX® operations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-08-20, David A­D­ Morano
+	This is new code.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	uc_mincoreset
+
+	Description:
+	Set bits in the supplied byte-array corresponding
+	to the resident pages in memory for the present process.
+
+	Synosis:
+	int uc_mincoreset(void *ca,size_t cs,char *bits) noex ;
+
+	Arguments:
+	ca		core address
+	cs		core size
+	bits		pointer to array of |char| to receive result
+
+	Return:
+	>=0		OK
+	<0		error
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>
+#include	<limits.h>		/* <- |CHAR_BIT| */
+#include	<unistd.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
+#include	<usupport.h>
+#include	<sysval.hh>
+#include	<intfloor.h>
+#include	<intceil.h>
+#include	<baops.h>
+#include	<localmisc.h>
+
+#include	"ucmem.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* local structures */
+
+static int		pagesize(sysval_ps) ;
+
+
+/* forward references */
+
+static size_t		getnpages(int ps,void *ca,size_t cs) noex ;
+
+
+/* exported subroutines */
+
+int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (ca && bits) {
+	    rs = SR_INVALID ;
+	    if (cs > 0) {
+		if ((rs = pagesize) >= 0) {
+		    csize	npages = getnpages(rs,ca,cs) ;
+		    size_t	nbytes ;
+		    char	*ba ;
+		    nbytes = (npages / CHAR_BIT) ;
+		    memclear(bits,nbytes) ;
+		    if ((rs = uc_libmalloc(npages,&ba)) >= 0) {
+			if ((rs = u_mincore(ca,cs,ba)) >= 0) {
+			    for (size_t bi = 0z ; bi < npages ; bi += 1) {
+			        if (ba[bi]) {
+				    BASET(bits,bi) ;
+				}
+			   } /* end for */
+			} /* end if (u_mincore) */
+			rs1 = uc_libfree(ba) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+		} /* end if (pagesize) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (uc_mincore) */
+
+
+/* local subroutines */
+
+static size_t getnpages(int ps,void *ma,size_t ms) noex {
+	uintptr_t	ua = uintptr_t(ma) ;
+	uintptr_t	fa, ea, ca ; ;
+	fa = uipfloor(ua,ps) ;
+	ea = (ua + ms) ;
+	ca = uipceil(ea,ps) ;
+	return ((ca - fa) / ps) ;
+}
+/* end subroutine (getnpages) */
+
+

@@ -1,0 +1,425 @@
+.\"_
+.TH timrep 1 90/04/09 LOCAL
+.SH NAME 
+timrep, timecard, trep \- collect weekly time reports
+.SH SYNOPSIS
+.\"_
+.\"#ident "@(#)trep.man	1.13	90/04/09	19:00:16"
+.\"#******************************************
+.\"#*           AT&T PROPRIETARY             *
+.\"#*  Use pursuant to Company Instructions  *
+.\"#******************************************
+.\"_
+.B timrep | timecard | trep
+[-d printer|-o file] [-h] [-j] [-k] [-e|-l|-s [year]] [-p [num]] [-r mm/dd[/yy]] [-t] [-u user] [-b] [mm/dd[/yy]]
+.SH DESCRIPTION
+This program is used to collect data for weekly time reports.
+It displays a formatted
+screen with read-only user profile fields and other fields that
+allow a user to enter hours for a specified week on 1 to 12 different
+case numbers.
+The program name is \fItimrep\fR, but may be called by the names
+\fItimecard\fR or \fItrep\fR on some systems depending on how it
+was installed.
+.P
+Time reports may be entered for multiple weeks in a single session by
+pressing the \fBCTRL-W\fR key.
+This allows a user to move forward or backward one week at a time
+to change or add reports as desired.
+After the data is entered for a week, the user is asked if 
+the data should be saved.
+If the user responds \fB"y"\fR to the save request, the data is marked
+for saving, and the user is asked if a report should be printed
+for the week marked for saving.
+If the user responds \fB"y"\fR to the print request, then a time report is
+printed for the week.
+.P
+The program interacts with the timecard database to check the validity
+of the user running the program and to insure that only legal case
+numbers are entered.
+If the UNIX login id of a user running the program is not unique in the
+timecard data files, then the program looks for a file
+called \fB.trepssn\fR in the user's home directory that contains
+a single line with the format \fIlogin_id:ssn\fR (\fIlogin_id\fR
+is the user's login id, and \fIssn\fR is the user's social security
+number).
+The social security number is used to resolve the login id ambiguity.
+If a \fB.trepssn\fR does not exist, then the program prompts the
+user for their social security number to resolve the conflict.
+If the UNIX login id is missing from the timecard
+data files, then the program prompts the user for a social security
+number and that is used to locate the user's record.
+.P
+Timecard administrators may change the user timesheet that is displayed
+in the timecard window by
+pressing the key \fBCTRL-A\fR key and entering an \fBid\fR (i.e. login id,
+name, social security number, or department number) of the new
+user in the status line window at the bottom of the timecard screen.
+The \fBid\fR may be a regular expression as in \fIed(1)\fR.
+If the id is unique, the new user's records are displayed.
+If the id
+is not unique, type a \fB*\fR to display a window of the users
+that match the id.
+The keystroke commands \fB(D)own\fR, \fB(U)p\fR, \fB(N)ext Pg\fR,
+\fB(P)rev Pg\fR navigate through the window.
+Select a record by highlighting it and typing a RETURN
+(\fBCR\fR).
+Typing \fB(Q)uit\fR quits without selecting a record.
+The id entry line accepts the following intra-line editing commands,
+.IP \fB^A\fR 10
+Go to the beginning of the id field
+.IP \fB^B\fR 10
+Move left one character
+(left arrow key also works)
+.IP \fB^E\fR 10
+Go to the end of the id field
+.IP \fB^F\fR 10
+Move right one character
+(right arrow key also works)
+.IP \fB^K\fR 10
+Clear to end of line
+.P
+Command line options include
+.IP "\fB-d printer\fR" 12
+This option defines the printer destination for the time report.
+If this option is not specified, the printout goes to the printer
+specified by the environment variable \fBDESTINATION\fR.
+If this environment variables is not set, then the printer in the
+user's \fB.prt\fR file is used.
+If a user does not have a .prt file, then the printout goes to the
+system default printer is used.
+The timecard sheet is printed using the command \fBprtfmt\fR.
+To check the management field on the timesheet, include the line,
+.sp
+\fBset mgmt_flag=yes\fR
+.sp
+in your \fB.treprc\fR file (see below).
+To check the non-management field, include the line,
+.sp
+\fBset mgmt_flag=no\fR.
+.IP \fB-h\fR 12
+Display the timecard commands.
+.IP \fB-j\fR 12
+Display the valid cases from the timecard database.
+.IP \fB-k\fR 12
+Remove a user's data lock file.
+The timecard program locks a user's data file to prevent simultaneous
+updates to the timecard database.
+This option allows a user to remove the lock file if a
+previous timecard program terminated abnormally.
+The program displays information on who has the user data files locked
+and the date and time at which they were locked.
+It then queries to see if the lock should be removed.
+.IP "\fB-s [year]\fR" 12
+Generate a short summary report for the current user.
+This report includes a project summary, an activity summary, and
+a list of time-off days taken for the year to date.
+The reports are printed on the user's terminal.
+Optionally, the user may specify a year (eg., trep -s 89),
+in which case the summary report
+is generated for the year specified.
+If the year specified is greater than the current year, then a summary report
+is generated for the current year-to-date.
+.IP "\fB-l [year]\fR" 12
+Generate a long summary report for the current user.
+This includes the reports displayed for a short summary plus a listing
+of all the cases worked on for each week since the beginning of the year.
+Optionally, the user may specify a year (e.g., trep -s 89),
+in which case the summary report
+is generated for the year specified.
+If the year specified is greater than the current year, then a summary report
+is generated for the current year-to-date.
+.IP "\fB-e [year]\fR" 12
+Generate a long summary report for the current user (see above)
+that includes only the exception time (e.g vacation) cases.
+.IP "\fB-o file\fR" 12
+Put the troff output of the time report into file \fBfile\fR instead of
+sending it to a printer.
+.IP "\fB-p [num]\fR" 12
+If \fBnum\fR is not specified, then display the report for the previous
+week, rather than the current week.
+This option is used by a user who prepares weekly
+time reports on Monday for the previous week.
+If a user always wants the previous week to be displayed on startup rather
+than the current week, then they may set the \fBTRDEFAULTWK\f environment
+variable as follows:
+.sp
+\fBTRDEFAULTWK=P\fR
+.br
+\fBexport TRDEFAULTWK\fR
+.sp
+An optional argument following \fB-p\fR
+allows you to go back \fBnum\fR weeks from the current week.
+.IP "\fB-r mm/dd[/yy]\fR" 12
+Generate a hard copy time report for the week containing the
+date \fBmm/dd[/yy]\fR (e.g. 7/4/94).
+If the year is not specified, then it defaults to the current year.
+.IP "\fB-t\fR" 12
+This option causes the program to pause waiting for carriage return before
+it brings up the timecard screen.
+It is to debug the timecard software.
+.IP "\fB-u user\fR" 12
+This option is available only for timecard administrators.
+Run the program for a user whose UNIX login id, name,
+social security number, or department number is \fBuser\fR.
+The program accepts regular expression strings as in \fIed(1)\fR.
+If this option is used, then the default cases file (see below) is not read
+and the report contains a \fBPrepared by:\f line with the name of the person
+who created the report.
+If there is more than one user with id \fBuser\fR in the timecard
+database, then the program displays a menu of users whose login ids
+are in conflict.
+The administrator can choose the menu item of the user whose timesheet is
+to be edited.
+.IP "\fB-b\fR" 12
+This causes the program to run in batch mode.
+The cases from a \fB.treprc\fR file (see below) populate the current week
+if the week is otherwise empty without bringing up the timesheet screen.
+This is useful for running timrep from \fIat(1)\fR or \fIcrontab(1)\fR.
+.IP \fBmm/dd[/yy]\fR 12
+Start the timecard program for the week containing the date \fBmm/dd[/yy]\fR.
+If the year is not specified, then it defaults to the current year.
+.P
+The user may create a file call \fB\.treprc\fR in their home directory
+that contains the default cases and hours to be displayed at startup.
+This makes it easy to produce standard reports with little effort.
+This file contains one record for each default case number containing
+6 colon separated fields, case:n:n:n:n:n,
+where \fBn\fR is the number of hours for the case number for each standard
+work day - Monday through Friday.
+No overtime or weekend hours can be specified in the default file.
+An example \fB.treprc\fR file is shown below:
+.P
+E04010:8
+.br
+E09010:0:8
+.br
+E06510
+.br
+V10010
+.sp
+The above example shows a default file with 8 hours for case ZE04010
+on Monday and 8 hours for case ZE09010 on Tuesday.
+Cases ZE06510 and ZV10010 are displayed without hours, and the user
+has to fill in the hours for each day as they are worked (this option
+gives the user the ability to enter a time report template with all
+the appropriate case numbers filled in, but all the hours
+fields blank).
+Case numbers in the \fB.treprc\fR file may contain the
+prefix that appears in the read only field on the timecard screen.
+For example, the case number ZE04010 may appear as E04010 or ZE04010.
+.P
+The \fB.treprc\fR file may contain the keyword \fIset\fR followed
+by the string \fIprint=<print_command>\fR, where \fI<print_cmd>\fR
+is the full pathname to a command that you want to use to print
+your timesheet.
+For example,
+.P
+\fBset print=/usr/add-on/unison/bin/prtfmt -Tpost -s 1\fR
+.P
+or,
+.P
+\fBset print=/usr/add-on/local/bin/pfmt\fR
+.P
+The \fB.treprc\fR file may contain a full path name that points to a
+file containing the cases/hours (only one level of indirection
+is allowed).
+The pathname must begin in column 1 on the first line of the file.
+This allows a coach to define the default
+cases/hours for their group, and then have each group member create
+a \fB.treprc\fR file that points to the default file.
+The \fB.treprc\fR file may be generated automatically from within the
+timecard program by typing \fB^B\fR (control-b).
+The data on the currently displayed timesheet is used to generate
+the \fB.treprc\fR file.
+The program reports an error if the current timesheet contains exception
+time (e.g vacation), weekend time, or overtime.
+If the user already has a \fB.treprc\fR file in their home directory,
+then the program asks if it should be overwritten.
+.P
+You can create a personalized list of valid cases that are displayed when
+a star \fB"*"\fR is typed in the project field  (see \fICOMMANDS\fR section
+below).
+This feature is useful if there are many valid cases and you want
+to see only the cases that apply to you.
+To use this feature, create a file containing your case numbers
+(use the \fB-j\fR option to get a list of the cases), then
+set and export the environment variable \fBTREPCASES\fR to point to this
+file.
+For example,
+.sp
+\fBTREPCASES=$HOME/.trepcases\fR
+.br
+\fBexport TREPCASES\fR
+.sp
+You can add an optional comment to each case separated from it by
+a colon (':') to identify the case number.
+For example,
+.DS
+A11044:Novell
+A11049:Training
+V24010:DEFINITY 92
+.DE
+.P
+Alternately, the valid cases file may contain a full path name that
+points to another file containing a list of valid cases.
+This allows a group supervisor to define the valid cases
+for his/her group, and then have each group member point to this
+list.
+Case numbers in the \fB.trepcases\fR file may contain the
+prefix that appears in the read only field on the timecard screen.
+For example, the case number ZE04010 may appear as E04010 or ZE04010.
+.P
+You can prevent your social security number from being displayed
+on printed copies of timesheets by putting the line,
+.P
+\fBset hide_ssn\fR
+.P
+in the \fB.treprc\fR file in your home directory.
+.P
+You can change the video attribute of the error line displayed
+at the bottom of the screen with the resource setting,
+.P
+\fBset err_video_attr=attribute\fR
+.P
+where \fBattribute\fR is \fBblink, bold, dim, normal, reverse,
+underline\fR, or \fBstandout\fR.
+The default attribute is \fBstandout\fR.
+Some terminals may not support all the video attributes.
+.P
+.SH COMMANDS
+The following keystroke commands are available from the data entry screen.
+.IP \fB?\fR 10
+Display this help text
+.IP \fBDEL\fR 10
+EXIT program WITHOUT saving hours entered
+(DEL is your delete or interrupt key)
+.IP \fB^A\fR 10
+Change to a new user's timesheet (administrators only)
+.IP \fB^D\fR 10
+Move Down to next case number line (same as down arrow)
+.IP \fB^E\fR 10
+Erase current field
+.IP \fB^F\fR 10
+Fill the current record with the default
+case number values (from $HOME/.treprc)
+.IP \fB^G\fR 10
+Copy a week's data into all the weeks in the month
+containing the week
+.IP \fB^L\fR 10
+Erase all fields in current project line
+.IP \fB^N\fR 10
+Move to Next field (also RETURN & TAB & right arrow)
+.IP \fB^O\fR 10
+Toggle between regular, paid overtime, and unpaid overtime fields
+.IP \fB^P\fR 10
+Move to Previous field (same as left arrow)
+.IP \fB^R\fR 10
+Erase all fields in current record
+.IP \fB^T\fR 10
+Display information about the current user
+.IP \fB^U\fR 10
+Move Up to previous project line (same as up arrow)
+.IP \fB^V\fR 10
+Refresh the screen
+.IP \fB^W \fR 10
+Move the collection week (F)orward or (B)ackward.
+Also allows you to (M)ark or (C)opy the case number data
+for a week.
+To copy, you must first mark a week, then move forward or
+backward to the desired week and then press 'C' to
+copy the case number data to the desired week.
+.IP \fB^X\fR 10
+EXIT program (you will be asked if you want to
+save hours added or changed since the last save)
+.IP \fB^Z\fR 10
+Save the current report (the data will not be 
+written to the file until the user correctly
+exits trep).  This command may be used to request
+printing a hardcopy or the current week (ie., press
+^Z without making any changes, and you will be asked
+if you want to print the report).
+.IP \fB*\fR 10
+Display list of legal field values in a pop-up window
+.IP \fBD\fR 10
+Scroll down in a pop-up window (same as down arrow)
+.IP \fBU\fR 10
+Scroll up in a pop-up window (same as up arrow)
+.IP \fBN\fR 10
+Display next page in a pop-up window
+.IP \fBP\fR 10
+Display previous page in a pop-up window
+.IP \fBQ\fR 10
+Exit from a pop-up window
+.IP \fBRETURN\fR 10
+Select the highlighted item in a pop-up window
+.P
+If a field fails a validation check, an error message is printed
+on the last line of the screen.  Touch any key to clear the error
+message and return to the field.
+.SH "ENVIRONMENT VARIABLES"
+The following environment variables must be set for the timecard
+software to work correctly.
+In the MT GBCS environment, these variables are set automatically
+by the standard login files and do \fInot\fR need to be
+set explicitly.
+.IP TRROOT 12
+This points to the root of the timecard program directory tree
+(e.g. lib, bin, man).
+This is set to \fB/usr/add-on/tools/timecard\fR in the MT GBCS environment.
+.IP TRDATA_ROOT 12
+This points to the directory containing the timecard database
+files (e.g PERSONNEL, PROJECTS).
+This is set to \fB/mt/mtgzfs8/timecards\fR in the MT GBCS environment.
+.IP TRDATA 12
+This points to a user data file directory.
+In the MT GBCS environment, this is set to a value that depends
+on the department of the caller of the timecard program.
+In non-GBCS environments, this normally set to the same value
+as \fB$TRDATA_ROOT\fR.
+.IP TREPCASES 12
+Points to a file that contains a list of cases that are displayed
+when project case field help is requested.
+.IP TRDEFAULTWK 12
+If set, this variable says that a user wants to start the timecard
+program in the previous week.
+.IP DESTINATION 12
+Contains the name of a printer to which timecard sheets are printed.
+.SH FILES
+.PD 0
+.TP 25
+$HOME/.treprc
+.TP
+$HOME/.trepcases
+.TP
+$HOME/.trepssn
+.SH SEE ALSO
+at(1), crontab(1)
+.sp
+\fBTreprg\fP is a command that generates useful reports from the
+timecard database.
+See the \fBtreprg\fR manual page for more details.
+.sp
+\fBwkdir\fR is a command that generates work direction reports from
+the timecard database.
+See the \fBwkdir\fR manual page for more details.
+.SH CAVEATS
+The timecard sheet is printed in landscape mode using the
+troff tbl macros.
+Since these landscape tables are wider than fit on a portrait
+page, the user receives warnings about tables that are too wide.
+These warnings should be ignored.
+.sp
+The timecard program displays the current week on startup.
+Users that do their time reporting on Monday for
+the previous week should use the \fB-p\fR option to get the previous week
+displayed on startup or set the \fBTRDEFAULTWK\fR environment variable.
+Alternatively, a user may type \fBCTRL-W\fR command to move
+backward from the current week.
+.sp
+The timecard program requires a minimum
+window size allowable is 24 rows by 80 columns.
+Anything smaller than this causes unpredictable results.
+.sp
+The command names \fBtimrep\fR, \fBtimecard\fR, and \fBtrep\fR are
+aliases for each other.

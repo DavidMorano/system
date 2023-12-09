@@ -1,0 +1,23 @@
+OPENSRV
+
+#
+# filename:
+#	opensrv¥%local/etc/opensrv/daytime[­<arg(s)>]
+#	opensrv¥local­daytime[­<arg(s)>]
+#
+
+so	%local/lib/opensrv/daytime.so
+prog	%local/bin/daytime
+args	+ -d tcpmux:5108 frodo
+
+listen	rvc /tmp/opensrv/daytime/rvc
+
+#listen	uss /tmp/opensrv/daytime/srv
+
+env	DAYTIME_PROGRAMROOT=%local
+env	DAYTIME_MNT=/tmp/opensrv/daytime/srv
+env	DAYTIME_RVC=/tmp/opensrv/daytime/rvc
+env	DAYTIME_SVCARGS=%{a}
+
+
+

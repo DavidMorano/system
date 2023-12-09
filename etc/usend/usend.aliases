@@ -1,0 +1,18 @@
+# UUPROXY.ALIASES
+# Note: names are only aliased after not being found directly !
+#
+
+
+
+piranha		uri
+leviathan	uri
+*.ele.uri.edu	uri
+
+
+lespaul		ece
+
+
+rc		rca
+
+
+

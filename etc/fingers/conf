@@ -1,0 +1,123 @@
+# FINGERS.CONF
+# Finger Server (FINGERS)
+
+#
+#	All command line arguments have precedence over any corresponding
+#	arguments in this configuration file.  The entries in this file
+#	do not have any special order except that entries that may accumulate
+#	are processed in the order given.  Defaults are applied in a
+#	defined sequence that is independent of the order of defaults
+#	in this file.
+#
+#	Environment variables are expanded out when called for like in
+#	SHELL programs.  Also one can "define" environment-like
+#	variables but they do not add to the exported environment.
+#	Note that for a conflicting variable name, whether a "define"
+#	type or an "export" (environment) type, the "define" type
+#	always has precedence.  Newly created environment variables
+#	are NOT available for substitution in this file.  Rather,
+#	a reassigned variable ('define' or 'environment') has its new
+#	value appended to the existing value with a colon character (':')
+#	separting the values.  This mechanism always builds a path of 
+#	values for a variable.  Use the 'unset' keyword to remove all
+#	existing values from a variable.
+#
+#	There are also a few program escapes that can be expanded out.
+#	They are introduced as a single letter with a percent sign
+#	in front of it.  These are listed below.
+#
+#
+
+
+#
+# lines are of the general form:
+#
+#	key	any_further_arguments
+#
+# possible keys and their meanings are:
+#
+#	root		- program root
+#	pidfile		- lock file to hold (traditionally) the daemon PID
+#	lockfile	- regular lock file to handle messed up NFS !!
+#	log		- file path name for the ACTIVITY log file
+#	envfile		- environment file
+#	pathsfile	- execution paths file
+#	srvtab		- server table file
+#	workdir		- working directory
+#	user		- default user name for spawned programs
+#	group		- default groupname for spawned programs
+#	port		- port for server to listen on
+#	userpass	- user password file
+#	machpass	- machine password file
+#	define		- define a local variable for use later
+#	export		- environment variable & value to be exported
+#	unset		- unset all values from a variable
+#
+#
+# the following program escapes are also expanded out:
+#
+#	escape_key	description
+#
+#	V		- REXECD daemon program version string
+#	S		- search name
+#	R		- program root directory path
+#	N		- computer machine node name (like a UUCP name)
+#	D		- the local machine domain name (like INET domains)
+#	H		- hostname (combination of the two above)
+#
+#
+
+
+
+# make some definitions here for use later in this file
+
+
+#
+# the following lines specify defaults for the program
+#
+#work		/tmp
+#svcfile	%R/etc/fingers/svc
+#logfile	%R/log/fingers
+#pidfile	%R/var/run/%S
+#reqfile	%R/var/%S/%N.req
+#passfile	%R/var/%S/%N.pass
+#
+
+
+# no port
+#port=		-
+#pass=		var/%S/%N.pass
+#pass=		/tmp/local/%S/pass
+
+# organization code
+#orgcode	RC
+
+# turn on using a PID mutex file
+pidfile		var/run/%N.%S
+
+# user sub-service server file
+usersrv		var/svc/ufinger
+
+# listeners
+listen		uss /tmp/%{RN}/%S/srv
+listen		pass /tmp/%{RN}/%S/pass
+listen		tcp 5112
+
+# this is a PRIVILEDGED port!
+listen		tcp finger
+
+# specifying an IPv6 listener without also specifying a specific host ...
+# creates a listener that listens on BOTH IPv6 AND IPv4 local addresses!
+# instead it is good practice to always specify a specific host when ...
+# dealing with IPv6 addresses
+#listen		tcp inet6::5112
+
+# the following are currently broken (proper plumbing is not available)
+#listen		tcp inet6:localhost:finger
+#listen		tcp inet6:%N:finger
+
+listen		tcp inet6:localhost:5112
+listen		tcp inet6:%N:5112
+
+
+

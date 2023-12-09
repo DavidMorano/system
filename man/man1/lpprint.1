@@ -1,0 +1,73 @@
+.\"	$Id: lpprint.1,v 1.1 1994/06/17 18:13:24 gc Exp $
+.\"	CRC=0
+.\"
+.TH LPPRINT 1L 94/06/17 "Div113 local"
+.SH NAME
+lpprint \-
+print ASCII files on PostScript printers
+.SH SYNOPSIS
+.B lpprint
+.RB [ \-P printer]
+.RB [ \- postprint_options]
+.RB [ + plus_options]
+[file ...]
+.SH DESCRIPTION
+.I Lpprint
+processes ASCII character files,
+converts them to PostScript,
+and sends the output to the designated
+PostScript printer.
+If no files are given,
+it reads the standard input;
+thus it can be used as a filter.
+.PP
+The options are:
+.PP
+.PD 0
+.TP 10
+.BI \-P printer
+overide the environment variable
+.B $PRINTER
+and send the output to
+.IR printer .
+.TP 10
+.BI \- postprint_options
+options to be passwd down to
+.IR postprint ;
+see
+.IR postprint (dwb)
+manual page.
+.TP 10
+.BI + plus_options
+common printer commands options;
+see
+.IR plusopts (1L)
+manual page.
+.PD
+.PP
+.SH "SEE ALSO"
+postprint(dwb),
+plusopts(1L)
+.SH EXAMPLES
+To print a file on printer
+.I xyz
+on both sides of the paper,
+use:
+.nf
+.RS 5
+lpprint \-Pxyz +duplex file1
+.RE
+.fi
+.PP
+To print a file in landscape format
+with 2 pages on each sheet,
+on your default printer 
+(specified in your
+.B $PRINTER
+variable) use:
+.nf
+.RS 5
+lpprint +landscape +2perpage file2
+.RE
+.fi
+.\"	.SH DIAGNOSTICS

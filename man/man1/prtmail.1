@@ -1,0 +1,94 @@
+.\"_
+.TH PRTMAIL 1 "89/07/07 3.2" "UNISON"
+.SH NAME
+prtmail \- format and print mail
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtmail.1 Level 3.2
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtmail.1
+.\"_
+.\"	Modified: 7/7/89  11:36:37
+.\"	Fetched:  11/15/90  21:40:26
+.\"_
+.\"_
+.B  prtmail
+[
+.I prtfmt_options
+]  [
+.I prt_options
+]
+.SH DESCRIPTION
+.I prtmail
+builds the pipeline of commands to format and print mail message that contains a
+.B troff
+document.
+It reads
+.I stdin
+and prints without formatting up to the first troff request,
+at which point it loads the appropriate macros (e.\|g. mm or man) and
+formats the remainder of the document.
+.BR tbl ,
+.BR pic ,
+and
+.B eqn
+requests are recognized and the appropriate preprocessors are added
+to the pipeline.
+.PP
+The
+.I prtfmt
+option
+.B -T
+must be specified in either the command line or the file
+.I $HOME/.prt
+(see
+.IR .prt (4)).
+.PP
+The following options may appear in any order:
+.TP 13
+.I prtfmt_options
+See
+.IR prtfmt (1).
+.TP 13
+.I prt_options
+See
+.IR prt (1).
+.SH EXAMPLES
+To print Email while using
+.BR post :
+if
+.I $HOME/.prt
+contains
+.nf
+.in +1i
+.sp
+-Tpost -dqms-a
+.sp
+.in
+.fi
+then at the \fBpost\fP message prompt enter:
+.nf
+.in +1i
+.sp
+\fBpi prtmail\fR
+.fi
+.sp
+.in
+The current mail message will be formatted and printed on the
+PostScript\u\s-3\(rg\s+3\d printer qms-a.
+.sp
+To specify the the device type and the printer on the command line, enter:
+.nf
+.in +1i
+.sp
+\fBpi "prtmail -Tpost -dqms-a"\fR
+.sp
+.in
+.fi
+N.B.
+.B post
+requires the command and its arguments to be enclosed in quotation marks.
+.SH SEE ALSO
+prt(1), .prt(4), prtfmt(1)
+.SH FILES
+$HOME/.prt

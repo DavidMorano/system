@@ -1,0 +1,16 @@
+HOLIDAYS
+
+Holiday files in this directory take the form and are searched for in the
+order:
+
+	<year>.holidays
+	holidays
+
+Files of the form:
+
+	holidays<year>
+
+are for reference purposes only.
+
+
+

@@ -1,0 +1,83 @@
+# LOCALNAMES
+
+#
+# This file contains the various names that the local-host is known by.
+# The node-name, cluster-name, and node-domain-name (using the default
+# domain) are generally figured out by software components without any
+# entries here.  But all strange names for the local-host should be listed
+# since there is no way to automatically figure them out (no easy way).
+# 
+
+#
+# format of entries:
+#
+# <node>: <name(s)>
+#
+# where <name(s)> are a comma-separated list of names
+#
+
+
+rca:
+	mail, 
+	dnscache,
+	www,
+	mailhost,
+	uucphost,
+	a,
+	rightcore.org,
+	www.rightcore.org,
+	bushisrealbad.info,
+	www.bushisrealbad.info,
+
+rcb:
+	b,
+	mail, dnscache,
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+rcc:
+	c,
+	mail, dnscache,
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+rcd:
+	d,
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+rce:
+	e,
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+rcf:
+	f,
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+rcg:
+	g,
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+jig:
+	rightcore.com,
+	www.rightcore.com,
+	rightcore.org,
+	www.rightcore.org,
+
+
+

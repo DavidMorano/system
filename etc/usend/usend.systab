@@ -1,0 +1,26 @@
+# USEND.SYSTAB
+
+
+#
+# format of entries :
+#
+# name:
+#	DEVICE	facility extra_arguments
+#
+#
+#
+
+
+ece:
+	UUCP	ncmp
+	UUX	ncmp	usendserv
+	UUMUX	ncmp	usendserv
+
+uri:
+	UUCP	ncmp
+	UUX	ncmp	usendserv
+	UUMUX	ncmp	usendserv
+
+
+
+

@@ -1,0 +1,26 @@
+# SYSTEMS (rsyslog)
+#
+
+
+localhost	prog -o log /usr/add-on/local/bin/poplogd +
+localhost	tcpmux
+
+rc		prog -o log /usr/add-on/local/bin/poplogd +
+rc		tcpmux	rca
+
+rca		prog -o log /usr/add-on/local/bin/poplogd +
+rcb		prog -o log /usr/add-on/local/bin/poplogd +
+rcc		prog -o log /usr/add-on/local/bin/poplogd +
+
+rca		tcpmux
+rcb		tcpmux
+rcc		tcpmux
+
+*.rightcore.com	tcpmux
+*.rightcore.org	tcpmux
+
+*.christian-update.org \
+		tcpmux
+
+
+

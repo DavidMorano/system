@@ -1,0 +1,32 @@
+.\"	$Id: lpremove.1,v 1.2 1994/06/17 19:44:56 gc Exp $
+.\"	CRC=94060493
+.\"
+.TH LPREMOVE 1L 94/06/17 "Div113 local"
+.SH NAME
+lpremove \-
+interface to the
+.IR lprm (1)
+command
+.SH SYNOPSIS
+.B lpremove
+.RB [ \-P printer]
+[lprm_args]
+.SH DESCRIPTION
+.I Lpremove
+is a front-end to the printer job management command
+.IR lprm (1).
+It prints the results on standard output.
+.PP
+The options are:
+.PP
+.PD 0
+.TP 10
+.BI \-P printer
+overide the environment variable
+.B $PRINTER
+and remove jobs from the queue of
+.IR printer .
+.PD
+.PP
+.SH "SEE ALSO"
+lprm(1)

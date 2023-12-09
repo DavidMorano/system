@@ -1,0 +1,12 @@
+template<typename ... Args>
+static inline int vecpstr_ctor(vecpstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+
+	}
+	return rs ;
+}
+
+	if ((rs = vecpstr_ctor(op,sp)) >= 0) {
+

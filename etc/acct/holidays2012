@@ -1,0 +1,63 @@
+* @(#)holidays 2012
+*
+* Prime/Nonprime Table for UNIX Accounting System
+*
+* Curr	Prime	Non-Prime
+* Year	Start	Start
+*
+  2012	0800	1800
+*
+*
+* Notes:
+* + only the first column (month/day) is significiant for accouting
+* + aditional "columns" (the rest of a line) is a description
+* + the first word of the description is used as a description-key
+* + comment lines start with an asterisk
+* + continuation lines are not supported
+* 
+* Idealy, there should not be either a plus ('+') or a minus ('-') sign
+* in the first word of the description (called the description-key above).
+* This is because a plus or minus sign is used as a field separator
+* in the CALYEARS database facility, which draws on this database for
+* resolving description-keys.
+*
+*
+* month/day	Company
+* 		Holiday
+*
+1/1		NewYears
+1/17		Lee-Jackson
+2/2		Groundhog
+2/14		Valentines
+2/21		Presidents
+3/13		Daylight Savings Time starts
+3/17		Patricks
+3/20		Vernal Equinox
+4/1		Fools
+4/22		GoodFriday
+4/24		Easter
+4/15		Tax
+5/8		Mothers
+5/30		Memorial
+6/3		Davis (birthday of Jefferson Davis)
+6/14		Flag
+6/19		Fathers
+6/20		Summer Solstice
+7/4		Revolution War Rebellion
+9/5		Labor
+9/22		Autumnal Equinox
+10/5		Chrysanthemum Festival
+10/10		Columbus
+10/31		Halloween (All Saints Day Eve)
+11/1		AllSaints
+* "Election Day" in the United States (first Tuesday after first Monday)
+11/8		Election
+11/6		Daylight Savings Time ends
+11/11		Veterans
+11/24		Thanksgiving
+11/25		Thanksgiving (day after)
+12/21		Winter Solstice
+12/25		Christmas
+*
+*
+*

@@ -1,0 +1,29 @@
+#!/bin/ksh
+# LINKGNU
+
+CMDS=" gar gcc gcov gcpp gld gnm gpp granlib"
+CMDBIN=${REPOROOT}/bin
+
+PN=${0##*/}
+if [[ -d "${CMDBIN}" ]] ; then
+  for TDIR in "${@}" ; do
+    if [[ -d "${TDIR}" ]] ; then
+      for C in ${CMDS} ; do
+         if [[ -r ${CMDBIN}/${C} ]] ; then
+	   if [[ -f ${TDIR}/${C} ]] ; then
+	       if samefile ${CMDBIN}/${C} ${TDIR}/${C} ; then :
+	       else
+	         ln -f ${CMDBIN}/${C} ${TDIR}
+	       fi
+	   else
+	     ln ${CMDBIN}/${C} ${TDIR}
+	   fi
+         fi
+      done
+    fi
+  done
+else
+  print -u2 "${PN}: no command directory found"
+fi
+
+

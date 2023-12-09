@@ -1,0 +1,59 @@
+.\"_
+.TH PRTINFO 1 "90/03/10 3.3" UNISON
+.SH NAME
+prtinfo \- report general information about the UNISON output processing system
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtinfo.1, Level 3.3
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtinfo.1
+.\"_
+.\"	Modified: 3/10/90  15:24:03
+.\"	Fetched:  11/15/90  21:40:26
+.\"_
+.ds Un \fIprtinfo\fR
+.\"_
+.nf
+\fBprtinfo\fR [\fB-h\fR] [[\fB-123456\fR] [\fB-abc\fR]]
+.SH DESCRIPTION
+\*(Un reports general information about the UNISON output processing system.
+If no options are given, a list of categories of available information
+is reported to the user.  The user can interactively pick
+and choose categories of information and advance to more
+detailed levels of information.
+.nf
+
+	The following information is available:
+
+	1)  devices and destinations
+	2)  permission levels for devices
+	3)  system defaults
+	4)  filters and languages
+	5)  commands
+	6)  UNISON release number
+
+.fi
+.PP
+This main menu can be skipped by giving
+the number of the desired item (1 - 6)
+as an option to \*(Un.
+The secondary menu levels in \*(Un
+can be bypassed by selecting the desired option as the second
+parameter.  See examples below.
+.PP
+For more information about \*(Un,
+follow the menu and enter 'h' for additional help information.
+.SH EXAMPLES
+To report the UNISON release number,
+.sp
+.in 5
+\fB\*(Un\fR -6
+.sp
+To report the public devices at the current site,
+.sp
+.in 5
+\fB\*(Un\fR -1 -a
+.SH FILES
+$UNISON/*
+.SH SEE ALSO
+prt(1), info.tab(4)

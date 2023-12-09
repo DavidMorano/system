@@ -1,0 +1,18 @@
+# XFPATH
+
+
+#
+# function paths to be exported by daemons
+#
+#
+
+
+/home/dam/fbin
+
+/usr/add-on/local/fbin
+/usr/add-on/ast/fbin
+
+/usr/extra/fbin
+
+
+

@@ -1,0 +1,23 @@
+# XLIBPATH
+
+
+/usr/add-on/local/lib
+/usr/add-on/ast/lib
+/usr/add-on/ncmp/lib
+/usr/add-on/dwb/lib
+
+/usr/dt/lib
+/usr/openwin/lib
+/usr/java/lib
+
+/usr/add-on/X11/lib
+
+/opt/SUNWspro/lib
+
+/usr/add-on/gnu/lib
+/usr/add-on/pcs/lib
+/usr/add-on/exptools/lib
+/usr/add-on/wwb/lib
+
+
+

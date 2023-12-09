@@ -1,0 +1,117 @@
+'\" t
+.TH PCSPROJINFO 1 0 PCS
+.SH NAME
+pcsprojinfo \- get or set the PCS project-information
+.SH SYNOPSIS
+.\"_
+.so tmac.att
+.\"_
+.BR pcsprojinfo
+.OP -u " user" ] [
+.OP -s " project-information" ] [
+.OP -R " program-root" ] [
+.OP -D\fR[=<\fIn\fP>]\fP "" ] [
+.OP -V "" ] [
+.SH DESCRIPTION
+.sp
+.SS Introduction
+.PP
+The \fIpcsprojinfo\fP program
+is used by the Personal Communication Services (PCS) user to get or
+to set his personal project-information string.
+By default the project-information a user is set by the
+system administrator, but that can be changed by
+the use of this program.
+By default (without any program options specified)
+the project-information string of the user is printed to standard-output.
+.\"_
+.SS Options
+The following options can be used to change the mode of operation.
+.PP
+.RS 5
+.TP 15
+\fB-u\fP  \fIusername\fP
+Operate on an alternative user besides the default calling user.
+Proper privileges are required for setting the project information of
+another user.
+.TP 15
+\fB-s\fP  \fIproject-information\fP
+This option allows for setting of the project-information string for the user.
+The project-information string should be quoted if it contains 
+either whitespace
+or other characters that would be interpreted by a SHELL.
+.TP 15
+\fB-R\fP  \fIprogram-root\fP
+This option allows for setting the program-root of the program.
+This is largely used for special debugging purposes.
+.TP 15
+\fB-V\fP
+This option makes the program print the version of the program
+to standard-error and then causes the program to exit (no other
+functions are performed).
+.RE
+.\"_
+.SH ENVIRONMENT VARIABLES
+The following environment variables may change the default behavior of the
+program.
+.RS 5
+.TP 15
+.B PCSPROJINFO_PROGRAMROOT
+This environment variable is taken to contain
+the program root over any other such environment variable.
+The \fB-R\fP argument overides this environment variable.
+.\"_
+.TP 15
+.B PCS
+This environment variable is normally taken to contain
+the program root.
+The \fB-R\fP argument overides this environment variable.
+.\"_
+.TP 15
+.B PROGRAMROOT
+This environment variable is taken to contain
+the program root if not other suitable environment variable
+this this purpose are in the environment.
+The \fB-R\fP argument overides this environment variable.
+.RE
+.\"_
+.SH EXAMPLES
+.IP \(rh 5
+simply get the current PCS project-information string:
+.EX
+ \f(CWpcsprojinfo \fP
+.EE
+.IP \(rh 5
+get the PCS project-information string for another user:
+.EX
+ \f(CWpcsprojinfo -u johny\fP
+.EE
+.IP \(rh 5
+set an organization name:
+.EX
+ \f(CWpcsprojinfo -s "Acne Plumbing"\fP
+.EE
+.\"_
+.SH SEE ALSO
+pcsname(1), pcsorg(1), bb(1), vmail(1), msgs(1)
+.\"_
+.SH PATH TO
+This program is currently located 
+in \f(CW /usr/add-on/pcs/bin \fP
+or possibly where ever PCS programs are stored on your system.
+This is often 
+at \f(CW ${PCS}/bin \fP
+on some systems.
+.\"_
+.SH WARNINGS
+Be careful to put at one space between all option key 
+letters and the associated
+key letter parameter.
+.\"_
+.SH ACKNOWLEDGEMENTS
+All previous PCS contributors and administrators.
+.\"_
+.SH AUTHOR
+David A.D. Morano
+.\"_
+.\"_

@@ -1,0 +1,14 @@
+# USEND.FACILITY
+#
+
+
+root:
+	root= /,
+	prefix=
+
+pcs:
+	root= ${PCS},
+	prefix=	pcs
+
+
+

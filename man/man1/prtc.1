@@ -1,0 +1,132 @@
+.\"_
+.TH PRTC 1 "90/04/13 3.11" UNISON
+.SH NAME
+prtc \- cancel a UNISON request
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtc.1, Level 3.11
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtc.1
+.\"_
+.\"	Modified: 4/13/90  13:21:03
+.\"	Fetched:  11/15/90  21:40:25
+.\"_
+.\"_
+.\"_
+.\" updated by un87-02805 on 02/05/87 by TPS
+.\" updated by un88-03402 on 02/04/87 by TPS
+.\" updated by un88-17303 on 06/21/88 by TPS
+.\" updated by un88-02908 on 01/13/89 by TPS
+.\" updated by un89-01935 on 01/19/89 by TPS
+.\"_
+.tr ~
+.ds Un \fIprtc\fR
+.\"_
+.nf
+\fBprtc\fR \fB-r~\fIreqid\fR [\fB-M~\fImsg\fR] [\fB-u~\fIuserid\fR]
+\fBprtc\fR [\fB-j~\fIjobname\fR] [\fB-M~\fImsg\fR] [\fB-q\fR] [\fB-u~\fIuserid\fR]
+\fBprtc\fR \fB-d~\fIdevice\fR [\fB-f~\fIform\fR] [\fB-M~\fImsg\fR] [\fB-r~\fIreqid\fR] [\fB-u~\fIuserid\fR]
+\fBprtc\fR \fB-h\fR
+.fi
+.SH DESCRIPTION
+\*(Un cancels or unqueues UNISON requests.  A request may be cancelled or unqueued
+at any point between the time it is submitted to UNISON and the time it completes.
+Users may cancel or unqueue only their own requests; 
+device administrators or operators may unqueue any requests queued for their devices;
+persons with userid or groupid 'unison' may cancel or unqueue any request;
+root may cancel or unqueue any request on the current system.
+.sp
+\*(Un without the \fB-d\fR option is a request to cancel \(em a cancelled request
+will disappear completely from the UNISON system.
+\*(Un with the \fB-d\fR option is a request to unqueue \(em an unqueued request
+will disappear from the queue(s) of the specified device(s), but will be 
+otherwise unaffected.  If a request is unqueued from every device on which it could
+print, it is automatically cancelled.
+.sp
+\*(Un with no options will list your currently active requests and ask if
+you'd like to cancel each of them.
+.SS Commonly Used Options
+.TP 13
+.BI \-h
+Print full help message.  \fB-h\fR overrides all other options.
+.TP 13
+.BI  \-j "\ jobname"
+Only requests with job name \fIjobname\fR are cancelled.  The requests to be
+cancelled must belong to the current user, or to the user specified with
+the \fB-u\fR option.  If more than one request is found with the specified
+job name and \fB-q\fR is not specified, 
+the issuer is prompted for whether to cancel each request.
+.TP 13
+.BI  \-r "\ reqid"
+Only requests with request ID \fIreqid\fR are cancelled or unqueued.
+If a requestid is given without the system nodename component, the current
+system nodename is automatically appended; 
+thus, on mhuxo, \fB-r 8bc9\fR becomes \fB-r 8bc9mhuxo\fR.
+.SS Additional Options
+.TP 13
+.BI \-d "\ device"
+Specifying \fB-d\fR makes this invocation of \*(Un an "unqueue" request.
+Requests queued for \fIdevice\fR will be unqueued.  If no other options
+are present, all requests queued for \fIdevice\fR will be unqueued; this behavior
+can be limited with \fB-r\fR, \fB-f\fR, \fB-u\fR, or any combination of
+these options.  \fIdevice\fR is of the
+form \fIsystem/device\fR.  \fIdevice\fR
+can be any single device or a device group; if a group, requests are unqueued
+from each device in the group.  If 
+.I system 
+is not specified, the device or group must be known to the current system.
+If 
+.I system
+is specified, the device or group must be known to \fIsystem\fR.
+Examples are \fB-dqms12\fR or \fB-dhomxb/g45265\fR.
+.TP 13
+.BI  \-f "\ form"
+Only requests for form name \fIform\fR are unqueued.  An example is
+\fB-f nohole\fR.  This option is only valid in conjunction with \fB-d\fR.
+.TP 13
+.BI \-M "\ msg"
+The message \fImsg\fR is mailed 
+to the owner of each request cancelled.
+If \fB-M\fR is not specified, mail is sent only if the cancelling user is
+different than the owner of the cancelled request.  Even without \fB-M\fR,
+a standard message is sent to the owner of a request that was cancelled
+by another user.
+.TP 13
+.BI \-q"
+\*(Un will run quietly.  Without \fB-q\fR, 
+if more than one request is found that matches the \fB-j\fR option, or if
+no \fB-j\fR option is given, you will be prompted for
+confirmation before each is cancelled.  This option conflicts with \fB-r\fR
+and \fB-d\fR.
+.TP 13
+.BI  \-u "\ userid"
+When cancelling by job name, \fB-u\fR specifies which user's requests
+are to be searched for the given job name.  \fB-u\fR defaults to the
+current user.  It is of the form \fIsystem!userid\fR.
+.SH EXAMPLES
+To cancel all your requests, with an interactive
+verification prompt for each request:
+.nf
+	\fBprtc\fR
+.fi
+.sp
+To cancel request 2ou7cbuts:
+.nf
+	\fBprtc -r2ou7cbuts\fR
+.fi
+.sp
+A superuser can cancel (and send a message for) a request with 
+jobname \fIhaydn\fR and owned by user \fIclassics\fR by typing:
+.nf
+	\fBprtc -j haydn -M "runaway request!" -u classics\fR
+.fi
+.sp
+A private device operator can unqueue all requests for form \fInohole\fR
+that are queued for his/her device group \fIitsmygrp\fR by typing:
+.nf
+	\fBprtc -d itsmygrp -f nohole -u ALL\fR
+.fi
+.SH "SEE ALSO"
+prt(1), prtfmt(1), prtstat(1), prtq(1)
+.SH FILES
+$UNISON/*

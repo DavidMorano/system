@@ -1,0 +1,62 @@
+.\"_
+.TH DOSPUT 1 94/12/02 LOCAL
+.SH NAME
+dosput \- send files from DOS based PC to a UNIX based computer
+.SH SYNOPSIS
+.B dosput
+.I dstfile
+.B <
+.I srcfile
+.SH DESCRIPTION
+.SS Introduction
+.PP
+This program simply transfers a file from a DOS based PC platform
+to a UNIX platform but strips off the brain damaged line coding
+junk (namely the carriage return characters and the control-Z character
+which may be found at the end of a DOS file) that DOS 
+platforms put into line coded text files.  This program only
+reads the \fIstandard input\fP for the source.  Note that the single
+argument must be the name of a \fBfile\fP that the converted data
+will be written into.
+.\"_
+.SS Options
+There are no options to this program.  Just the one file name that
+must be present on the command line.
+.\"_
+.SH EXAMPLES
+.IP \(rh 5
+To just convert a file 
+(with a filename of \fC/file\fP)
+from a DOS line encoded format to UNIX line encoding (with a filename of
+(\fC/home/dam/rje/filename\gP), execute :
+.EX
+dosput /home/dam/rje/filename < file
+.EE
+.IP \(rh 5
+send a DOS based line coded file to the file path
+\fC/home/dam/rje/filename\fP on the UNIX platform \fCmtsva\fP :
+.EX
+uux -p mtsva!dosput /home/dam/rje/filename < file
+.EE
+.IP \(rh 5
+send a DOS based line coded file to the file path
+\fC/home/wen/rje/newname\fP on the UNIX platform \fCmtsva\fP :
+.EX
+uux -p mtsva!dosput /home/wen/rje/newname < file
+.EE
+.SH SEE ALSO
+uux(1), uucp(1), uuto(1), usend(1)
+.SH CAVEATS
+Do not attempt to send binary files using this command.
+Use the straight \fBuucp\fP, \fBuuto\fP, or \fBusend\fP command
+instead for this.
+.PP
+Files can only be sent to machines that are known to the
+source machine (but cross mounted file-systems count as local).  
+There is no forwarding of file transfer requests
+as is sometimes possible (if configured properly) with other
+UUCP oriented commands such as \fBuucp\fP and \fBuuto\fP.
+.SH PATH TO
+This program is currently located in 
+\fC/usr/add-on/local/bin\fP on most systems.
+.\"_

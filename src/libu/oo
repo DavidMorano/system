@@ -1,0 +1,3 @@
+	This module manages UNIX® STREAMS.  These are the STREAMS
+	invented by Dennis Ritchie (and perhaps othes) for UNIX®
+	System V Release 4.

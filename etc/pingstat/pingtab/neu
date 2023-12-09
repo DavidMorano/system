@@ -1,0 +1,16 @@
+# PRINGTAB
+
+#
+# format of entries:
+#	name		minint	timeout
+#
+#
+# ECE
+
+gateway			9m
+frodo			9m
+vinson			9m
+#olive			9m
+
+
+

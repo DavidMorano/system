@@ -1,0 +1,9 @@
+#!/bin/ksh
+# MKVARECLARE
+
+while read N ; do
+  LN=$( echo $N | tr '[A-Z]' '[a-z]' )
+  /bin/echo "static const char varnames::${LN}[] ;"
+done
+
+

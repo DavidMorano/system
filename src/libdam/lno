@@ -1,0 +1,10 @@
+#!/bin/ksh
+# LNO
+OD=../libuc
+for N in si*.c ; do
+   if [[ ! -f ${OD}/$N ]] ; then
+     ln $N ${OD}/${N}
+   fi
+done
+
+

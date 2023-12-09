@@ -1,0 +1,53 @@
+# HELP.FILESCHED
+
+#
+# These are the possible locations of HELP files for various programs.
+# Each path is tried in order from top to bottom.  The first one that
+# hits is the one used.
+#
+
+
+#
+# keys are normally:
+#
+#	r	program root
+#	l	"lib" (maybe someday it could be something else!)
+#	n	<program name>
+#	f	<program help filename> (usually "help")
+#
+#
+
+
+# old traditional
+%r/%l/%n/%n.%f
+%r/%l/%n/%f
+
+
+# new standard
+%r/share/help/%n.%f
+%r/share/help/%n
+
+
+# special
+/usr/extra/share/%n.%f
+/usr/extra/share/%n
+
+
+# old standard
+%r/%l/help/%n.%f
+%r/%l/help/%n
+
+
+# common older location
+%r/%l/%n.%f
+
+
+# desperate
+%r/%n.%f
+
+
+# more desperate
+%n.%f
+
+
+

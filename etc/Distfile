@@ -1,0 +1,23 @@
+# DISTFILE for RDIST
+
+
+HOSTS=(
+	dds
+)
+
+LOCAL=(
+	bin
+	doc
+	etc
+	include
+	lib
+	man
+)
+
+
+local:
+	${LOCAL} -> ${HOSTS}
+		install -R -i -w /di05/local ;
+
+
+

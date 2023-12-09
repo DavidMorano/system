@@ -1,0 +1,78 @@
+# BOOTPTAB - database for bootp server (often '/etc/bootpd')
+# Last update Mon 11/7/88 18:03
+# Blank lines and lines beginning with '#' are ignored.
+#
+# Legend:
+#
+#	first field -- hostname
+#			(may be full domain name and probably should be)
+#
+#	bf -- bootfile
+#	cs -- cookie servers
+#	ds -- domain name servers
+#	gw -- gateways
+#	ha -- hardware address
+#	hd -- home directory
+#	hn -- send host name with request (no argument)
+#	ht -- hardware type
+#	im -- impress servers
+#	ip -- host IP address
+#	lg -- log servers
+#	lp -- LPR servers
+#	ns -- IEN-116 name servers
+#	rl -- resource location protocol servers
+#	sm -- subnet mask
+#	tc -- template host (points to similar host entry)
+#	to -- time offset (seconds)
+#	ts -- time servers
+#
+#
+#
+# Be careful about including backslashes where they're needed.  Weird (bad)
+# things can happen when a backslash is omitted where one is intended.
+#
+
+
+# First, we define a global entry which specifies the stuff every host uses.
+
+global.tc:\
+	:sm=255.255.255.0:\
+	:hd=/:bf=null:\
+	:ds=192.11.33.5 192.11.33.243:\
+	:ns=192.11.33.5 192.11.33.243:\
+	:ts=192.11.33.5 192.11.33.243:\
+	:to=18000:
+
+
+# Next, we can define different master entries for each subnet. . .
+
+# Boole sub-net
+subnet1.tc:\
+	tc=global.tc:gw=192.11.92.238:
+
+# Ramanujan sub-net
+subnet2.tc:\
+	:tc=global.tc:gw=192.128.15.38:
+
+# Ramanujan sub-net
+subnet3.tc:\
+	:tc=global.tc:gw=192.20.33.38:
+
+# Ramanujan sub-net
+subnet4.tc:\
+	:tc=global.tc:gw=192.11.92.38:
+#
+# We should be able to use as many levels of indirection as desired.  Use
+# your imagination. . .
+#
+
+
+# Individual entries (could also have different servers for some/all of these
+# hosts, but we don't really use this feature at CMU):
+
+# our clients
+
+ncdtmp:tc=subnet3.tc:ht=ethernet:ha=0000A7145914:ip=192.20.33.39:
+
+
+

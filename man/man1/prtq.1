@@ -1,0 +1,183 @@
+.\"_
+.TH PRTQ 1 90/11/13 UNISON
+.SH NAME
+prtq \- report UNISON device status and workload
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtq.1, Level 3.12
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtq.1
+.\"_
+.\"	Modified: 11/13/90  10:59:31
+.\"	Fetched:  11/15/90  21:40:27
+.\"_
+.\" updated by un87-02805 on 02/05/87 by TPS
+.\" updated by un87-02202 on 10/19/87 by TPS
+.\" updated by un88-03402 on 02/04/88 by TPS
+.\" updated by un88-23102 on 08/26/88 by PAH
+.\" updated by un88-02909 on 11/23/88 by TPS
+.\" updated by un90-21802 on 08/24/90 by MTB
+.\"_
+.tr ~
+.ds Un \fIprtq\fR
+.\"_
+.nf
+\fBprtq\fR [\fB-d~\fIdestination\fR] [\fB-f~\fIform\fR] [\fB-h\fR] [\fB-p\fR] [\fB-S\fR] [\fB-s~\fIsides\fR] [\fB-v\fR]
+.fi
+.SH DESCRIPTION
+.I \*(Un
+gives the status and workload of UNISON devices.
+If the command is executed for a local device, the output will be written
+to \fIstdout\fR.
+If the command is executed for a remote device, the output also will be written to \fIstdout\fR unless it was sent as a batch job.
+If sent as a batch job then output will be returned as mail.
+The \fB-d\fR, \fB-f\fR, and \fB-s\fR options control the list of devices
+for which the status and workload is given.
+The workload is given in number of requests and number of kilobytes (Kb).
+.sp
+Requests may be queued for more than one device.  In this case the request
+will show up as part of the workload for several devices.  (It will only
+print on the first available of these devices.)  If the \fB-v\fR option
+is specified, an asterisk marks each request that is queued for only one
+device.
+.SS Options
+.TP 13
+.BI \-d "\ destination"
+The status and workload of device(s) is(are) given.
+\fIdestination\fR has two parts: \fIlocation\fR and \fIdevice\fR (\fIlocation/device)\fR;
+both parts can be given together or either part can be given alone.
+\fIlocation\fR can be a network node name or a site code. 
+\fIdevice\fR can be a specific device name or a device group.
+The two parts are separated by a slash.
+When specifying \fIlocation\fR alone, the slash is required.
+When specifying \fIdevice\fR alone, the slash is not necessary.
+If a site code is given without a device group, 
+the status and workload for all devices
+on a gateway system for that site will be given.
+The default for \fIlocation\fR is the network node name of the current system
+if \fIdevice\fR is not given, or the location of the device or group if 
+\fIdevice\fR is given.
+The default for \fIdevice\fR is all devices on the \fIlocation\fR system.
+Examples of \fIdevice\fR are: \fBho3m4, /i300-a, x9700,
+hou2a/, whuts/postgroup, ho, \fRand\fB mh/grizzly\fR.
+.TP 13
+.BI \-f "\ form"
+The status of a device requested through \fB-d\fR is given only if it is
+currently configured with form name \fIform\fR.  The workload for these
+devices is shown, broken down by the form requested.
+If \fB-f ALL\fR is given, no devices are excluded, but the workload is
+still broken down by the form requested.
+If \fB-v\fR is also given, the form requested by each individual request
+queued for any of the devices displayed is given.
+Examples of \fIform\fR are \fBALL, standard, vugr, hole, \fRand\fB nohole\fR.
+.TP 13
+.BI \-h "\ "
+Give a short help description for each 
+.I \*(Un
+option, without showing the status or workload for any devices.  This option
+overrides all others.
+.TP 13
+.BI \-p "\ "
+The priority of each individual request queued for any of the displayed 
+devices is given.  This option automatically triggers the \fB-v\fR option.
+Priorities are assigned in the range [\fB~A~\fR-\fB~Z~\fR],
+where \fBA\fR is the highest and \fBZ\fR is the lowest priority.  (These
+are UNISON-assigned priorities, not grade-of-service values.)  The priority
+algorithm for each device is specified via the \fI-p\fR option
+of \fIprtconfig(1m)\fR.   The default priority algorithm is \fIFIFO\fR,
+and all such requests are assigned  priority \fIB\fR.  
+If the priority algorithm reported by \fIprtconfig(1m)\fR is \fISIZE-1\fR,
+a priority is assigned based on the size of each request.
+Use the  \fI-v\fR option to display requests in the order in which
+they will print.  
+.TP 13
+.BI \-S "\ "
+The status of each individual request queued for any of the displayed 
+devices is given.  This option automatically triggers the \fB-v\fR option.
+Examples of status codes are
+.sp
+.nf
+.ta 20n 36n
+waitfilter	waiting for filtering 
+filtering	being filtered 
+waitdevice	waiting for device 
+ondevice	on device 
+waitpurge	waiting to be purged
+.fi
+.TP 13
+.BI \-s "\ sides"
+The status of a device requested through \fB-d\fR is given only if it is
+currently configured with sides \fIsides\fR.  The workload for these
+devices is shown, broken down by the sides requested.
+If \fB-s ALL\fR is given, no devices are excluded, but the workload is
+still broken down by the sides requested.
+If \fB-v\fR is also given, the sides requested by each individual request
+queued for any of the devices displayed is given.
+The value for \fIsides\fR should be \fB1\fR, \fB2\fR, or \fBALL\fR.
+.TP 13
+.BI \-v "\ "
+Give the verbose form of workload information.  The individual requests in
+each category (and their length in Kb) will be given, rather than just the 
+number of requests (and the total length in Kb).  The \fI-v\fR option
+displays requests in the order in which
+they will print.  
+.SH EXAMPLES
+Print the status of UNISON devices attached to the system:
+.sp
+\fBprtq\fR
+.sp
+.in 5
+.nf
+Queue for device qms23
+.ta 5n 24n 36n 48n 
+	REQUESTS	DEVICE	LENGTH
+	2	qms23	138
+	1	q2group	81
+
+.fi
+.nf
+Queue for device hocc-1
+.ta 5n 24n 36n 48n
+	REQUESTS	DEVICE	LENGTH
+	124	x9700	4312
+	357	xerox	6520
+	12	hocc-1	205
+
+.fi
+Queue for device imagen3
+.sp 2
+.nf
+.ta 12n 24n 36n 48n 50n
+DEVICE	TYPE	STATUS	USER	START_TIME     
+qms23	post	3rf1homxb	homxb!tps	Nov 23 11:28:19
+hocc-1	x9700	3alvhound	hound1!alf	Nov 23 11:24:18
+imagen3	i300	IDLE		
+.fi
+.sp 2
+.in -2
+Print the status and individual requests queued for UNISON device hocc-2:
+.sp
+\fBprtq -d hocc-2 -v\fR
+.sp
+.in 5
+.nf 
+.ta 5n 24n 34n 44n 56n 74n 86n
+Queue for device hocc-2
+	REQUEST_ID	DEVICE	TYPE	USER	ARRIVAL_TIME	LENGTH
+	*zit0homxb	hocc-2	x9700	homxb!tps	Nov 23 14:14:24	1
+	*zit1homxb	hocc-2	x9700	homxb!tps	Nov 23 14:14:24	1
+	~zimmmhuxd	ANY	x9700	mhuxd!root	Nov 23 13:13:18	642
+	*zjt9homxb	hocc-2		homxb!tps	Nov 23 14:34:24	1382
+.fi
+.sp
+.nf
+.ta 10n 20n 30n 40n 50n
+DEVICE	TYPE	STATUS	USER	START_TIME
+hocc-2	x9700	STOPPED
+.fi
+    WARNING: device hocc-2 stopped to change forms
+.in -5
+.SH "SEE ALSO"
+prt(1), prtfmt(1), prtstat(1), prtc(1), prtdstart(1m), prtdstop(1m), prtdchg(1m), prtconfig(1m)
+.SH FILES
+$UNISON/*

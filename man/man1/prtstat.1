@@ -1,0 +1,204 @@
+.\"_
+.TH PRTSTAT 1 90/08/01 UNISON
+.SH NAME
+prtstat \- report status information about UNISON requests 
+.SH SYNOPSIS
+.\"_
+.\"_
+.\"	Module:   prtstat.1, Level 3.14
+.\"	File:     /az07/kls/UNISON.SCCS.3/man/u_man/man1/s.prtstat.1
+.\"_
+.\"	Modified: 8/1/90  14:55:55
+.\"	Fetched:  11/15/90  21:40:28
+.\"_
+.\" updated by un86-30002 on 10/27/86 by TPS
+.\" updated by un87-02805 on 02/05/87 by TPS
+.\" updated by un88-33401 on 11/28/88 by PAH
+.\" updated by un88-06303 on 12/30/88 by TPS
+.\" updated by un89-01909 on 03/15/89 by TPS
+.\" updated by un86-30403 on 03/16/89 by CSA
+.\" updated by un89-01909 on 03/17/89 by CSA
+.\"_
+.tr ~
+.tr `-
+.ds Un \fIprtstat\fR
+.\"_
+.B \*(Un
+[\fB`A~\fR] [\fB`c\fR] [\fB`d~\fIdevice\fR] [\fB`f~\fIform\fR] [\fB`h\fR] [\fB`j~\fIjobname\fR] [\fB`R~\fB0\fR] [\fB`r~\fIreqid\fR] [\fB`t~\fItime\fR] [\fB`u~\fIuserid\fR] [\fB`v\fR]
+.SH DESCRIPTION
+\*(Un reports status information about UNISON requests (see 
+\fIprt\fR(1)).
+The default output includes the request ID, job name and most recent status
+of requests queued for the current user ID.
+.PP
+Some types of status information that may be reported follow:
+.PP
+.br
+          submitted - the request has not been accepted into UNISON
+.br
+          accepted - UNISON has accepted the request and it is waiting to be processed
+.br
+          filtering - the request is being translated to a language the printer understands
+.br 
+          filtered - the request has been filtered and is waiting to print
+.br
+          printing - the request is being printed
+.br
+          printed on xxxx - the request has printed on the printer named xxxx
+.br
+          sent to yyyyy - the request has been sent to system yyyyy to be printed
+.br
+          failed filtering - the request could not be filtered
+.br
+          routing to MVS/JES3 - the request has been sent to an MVS/JES3 printer
+.br
+          canceled - the request was canceled because UNISON was unable to print
+the job. 
+.br
+.SS Commonly Used Options
+.TP 13
+.BI \-c"
+Print the status output of requests that have already been
+completed, in addition to requests queued. This information is 
+obtained from a log file, usually
+kept around for at least a day.  
+.TP 13
+.BI \-h
+Print full help message.
+.TP 13
+.BI \-j "\ jobname"
+Limit the status output to requests with job name \fIjobname\fR.
+.TP 13
+.BI \-r "\ reqid"
+Limit the status output to the request with request ID \fIreqid\fR.
+If a request ID is given without the system nodename component, the current
+system nodename is automatically appended; 
+thus \fB-r 8bc9\fR becomes \fB-r 8bc9mhuxo\fR.
+.TP 13
+.BI \-v"
+\*(Un will give a verbose response.  
+The user's system, account number, bin, destination, device requested, 
+form, copies, grade, language, bytes, print mode,
+and sides
+of each request will also be given.  
+In addition, a status history of each request will be given, 
+rather than only the most recent status.
+.SS Additional Options
+.TP 13
+.BI \-A"
+The status for any requests satisfying the rest of the parameters will be
+given, regardless of the requests' owners.  This option is used
+to override the default value of the \fB-u\fR option when the actual userid
+is unknown.  If \fB-A\fR is specified without \fB-r\fR on a heavily-used system,
+\*(Un may take quite a long time to generate its output.
+.TP 13
+.BI \-d "\ device"
+Limit the status output to requests with device \f2device\f1.
+\f2device\f1 has two parts;
+both parts can be given together, or either part can be given alone.
+When specifying both parts, the \f2device\f1 argument should appear
+in the form \f2location\f1/\f2output_device\f1.
+\f2location\f1 can be a network node name or a site code. 
+\f2output_device\f1 can be a specific printer name 
+or a generic device type.
+The two parts are separated by a slash ( / ).
+.sp
+When specifying \f2location\f1 alone, the slash is required.
+When specifying \f2output_device\f1 alone, the slash is not necessary.
+The default for \f2location\f1 is the network node name of the current system.
+Examples of \f2device\f1 are: \f3ho2g4, imagen1, i300, x9700, aps,
+prism, hou2a/, ihuxj/, ho, wh, /i300, mh/i300\f1 and \f3ih/im1\f1.
+.TP 13
+.BI \-f "\ form"
+Limit the status output to requests with form name \fIform\fR.
+.TP 13
+.B \-R 0
+Do \fInot\fR attempt any remote executions to get better (more up-to-date)
+statuses.  Normally, if a request is routed to another system for
+processing/printing,
+\*(Un will attempt a remote execution on that system to get a more
+up-to-date status.  Depending upon the network used, this could
+cause delays in the display of your output.  \fB-R 0\fR forces
+\*(Un to obtain status information only from the local system,
+thereby eliminating any potential delays in the display of your output.
+.TP 13
+.BI \-t "\ time"
+Limit the status output to requests whose status has changed within time
+\fItime\fR.  \fItime\fR can be specified as \fIdays:hours\fR,
+\fIdays:\fR or \fIhours\fR.
+\fIdays\fR and \fIhours\fR must be integer
+values, with \fIhours\fR restricted to the range of 0-23.
+If \fB-t\fR is not specified, the status output is not limited by
+time (i.e., all available statuslog entries are used).
+Specifying \fB-t 0\fR, \fB-t 0:\fR or \fB-t 0:0\fR is equivalent
+to not specifying \fB-t\fR at all.  Examples of \fItime\fR are:
+\fB2\fR (two hours), \fB3:\fR (three days) and \fB4:12\fR (four days
+and twelve hours).
+.TP 13
+.BI \-u "\ userid"
+Limit the status output to requests with user ID \fIuserid\fR.
+Note that if \fB-u\fR is not specified, it defaults to the current user
+ID (see also \fB-A\fR).
+\f2userid\f1 has two parts;
+both parts can be given together, or either part can be given alone.
+When specifying both parts, the \f2userid\f1 argument should appear
+in the form \f2system\f1!\f2user\f1.
+\f2system\f1 is a network node name and \f2user\f1 is a login id.
+The two parts are separated by an exclamation point ( ! ).
+.sp
+When specifying \f2system\f1 alone, the "!" is required.
+When specifying \f2user\f1 alone, the "!" is not necessary.
+Examples of \f2userid\f1 are: \f3pete, homxc!tom, hou2h!, !kat\f1.
+.SH EXAMPLES
+To get a short status of all your uncompleted requests,
+.sp
+.in+3
+\fBprtstat\fR 
+.sp
+.in+5
+.nf
+.ta 1n 25n 40n 55n
+ar56baghdad(job-3)	homxb!kmj	accepted	Jun 25  03:48:30
+as0gbaghdad(job-2)	homxb!kmj	sent to amman	Jun 25  03:49:34
+as0gbaghdad(job-2)	homxb!kmj	filtered	Jun 25  03:50:25
+atcxbaghdad      	homxb!kmj	printed on cario	Jun 25  03:49:34
+.fi
+.in-8
+.sp
+To get a status history of request lm90riyadh submitted by an unknown user,
+.sp
+.in+3
+\fBprtstat -v -c -A -r lm90riyadh\fR
+.sp
+.in+5
+.nf
+.ta 1n  25n 45n
+request:  lm90riyadh 	jobname:  quell   	userssys: riyadh
+userid:   tps        	account:  hoj399  	bin:      1558
+dest:     baghdad    	device:   x9700  	form:     ANY
+copies:   1          	grade:    s       	language:
+bytes:    100          	mode:     ANY        	sides:    1
+status:   submitted   	date:     Jun 25   	time:     04:35:03
+status:   accepted   	date:     Jun 25   	time:     04:35:40
+origsys:  riyadh
+status:   sent       	date:     Jun 25    	time:     04:35:43
+sent to:  damascus
+status:   sent       	date:     Jun 25    	time:     04:35:50
+sent to:  cairo
+status:   sent       	date:     Jun 25    	time:     04:56:32
+sent to:  beirut
+status:   accepted   	date:     Jun 25   	time:     04:57:03
+origsys:  riyadh
+status:   filtering   	date:     Jun 25   	time:     04:57:14
+filter:   /usr/lbin/x9700
+status:   filtered   	date:     Jun 25   	time:     04:57:16
+language: x9700   	bytes:    1883535
+status:   printing   	date:     Jun 25   	time:     04:57:24
+status:   completed   	date:     Jun 25   	time:     04:58:47
+destused: beirut   	typeused: x9700   	devused:  xerox1
+.fi
+.in-8
+.SH FILES
+$UNISON/*
+.SH SEE ALSO
+prt(1)

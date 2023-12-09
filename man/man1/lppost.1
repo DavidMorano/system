@@ -1,0 +1,65 @@
+.\"	$Id: lppost.1,v 1.4 1994/06/17 18:32:39 gc Exp $
+.\"	CRC=3992301999
+.\"
+.TH LPPOST 1L 94/06/17 "Div113 local"
+.SH NAME
+lppost \- print PostScript files on PostScript printers
+.SH SYNOPSIS
+.B lppost
+.RB [ \-P printer]
+.RB [ + plus_options]
+[file ...]
+.SH DESCRIPTION
+.I Lppost
+sends PostScript files
+to the designated
+PostScript printer.
+If no files are given,
+it reads the standard input;
+thus it can be used as a filter.
+.PP
+The options are:
+.PP
+.PD 0
+.TP 10
+.BI \-P printer
+overide the environment variable
+.B $PRINTER
+and send the output to
+.IR printer .
+.TP 10
+.BI + plus_options
+common printer commands options;
+see
+.IR plusopts (1L)
+manual page.
+.PD
+.PP
+.SH "SEE ALSO"
+plusopts(1L)
+.SH EXAMPLES
+To print a PostScript file on printer
+.I xyz
+on both sides of the paper,
+use:
+.nf
+.RS 5
+lppost \-Pxyz +duplex file1
+.RE
+.fi
+.PP
+To print a PostScript file in landscape format
+with 2 pages on each sheet,
+on your default printer 
+(specified in your
+.B $PRINTER
+variable) use:
+.nf
+.RS 5
+lppost +landscape +2perpage file2
+.RE
+.fi
+.SH CAVEAT
+A PostScript file must begin with the
+.B %!PS
+characters!

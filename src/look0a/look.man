@@ -1,0 +1,108 @@
+.\"_
+.TH look 1 "1993-06-14" LOCAL
+.SH NAME
+look \- display lines beginning with a given string
+.SH SYNOPSIS
+.\"_
+.so tmac.att
+.\"_
+.BR look
+.OP -d "" ] [
+.OP -f "" ] [
+.OP -t " termchar" ] [
+.IR string
+.RI [ file ]
+.\"_
+.SH DESCRIPTION
+The 
+.MW look
+utility displays any lines in
+.IR file
+that contain
+.IR string
+as a prefix.
+As
+.MW look
+performs a binary search, the lines in
+.IR file
+must be sorted.
+.PP
+If
+.IR file
+is not specified, the file
+.MW /usr/share/dict/words
+is used, only alphanumeric characters are compared and the case of
+alphabetic characters is ignored.
+.PP
+Options:
+.\"_
+.RS 5
+.TP 15
+\fB-d\fP 
+Dictionary character set and order: only alphanumeric characters
+and the blank (space) character
+are compared.
+.TP 15
+\fB-f\fP 
+Ignore the case of alphabetic characters.
+.TP 15
+\fB-t\fP \fItermchar\fP
+Specify a string termination character, i.e. only the characters in
+.IR string
+up to and including the first occurrence of
+.IR termchar
+are compared.
+.TP 15
+\fB-w\fP 
+Match only whole words rather than leading parts of words.
+.TP 15
+\fB-V\fP 
+Print the program version to standard-error and then exit.
+.RE
+.\"_
+.PP
+The
+.MW look
+utility exits with 
+.MW 0 
+if one or more lines were found and displayed,
+It exits with
+.MW 1
+if no lines were found, and greater than
+.MW 1
+if an error occurred.
+.\"_
+.SH FILES
+.PP
+.MW /usr/add-on/ncmp/dict/words
+or
+.MW /usr/share/dict/words
+are default dictionary files
+.\"_
+.SH SEE ALSO
+.PP
+.MW grep(1),
+.MW sort(1)
+.\"_
+.SH COMPATIBILITY
+.PP
+The original manual page stated that tabs and blank characters participated
+in comparisons when the
+.MW d
+option was specified.
+The current implemtnation only compares alphanumeric and the blank (space)
+character when "dictionary" order comparison is in effect (both by default
+and when the 
+.MW d
+option is specified).
+.\"_
+.SH HISTORY
+.PP
+The
+.MW LOOK
+program first appeared in the UNIX System Version 7.
+.\"_
+.SH AUTHOR
+David A.D. Morano
+.\"_
+.\"_

@@ -1,0 +1,50 @@
+#!/bin/ksh
+# LINKALL
+
+
+# Name:
+# linkall
+#
+# Description:
+# This program links the files listed (in their given directories)
+# into all of the other directories (under this present directory)
+# if the file is not already present there and is the same file.
+#
+# Synopsis:
+# $ linkfiles <basefile(s)> 
+#
+
+RF_DEBUG=false
+
+PN=${0##*/}
+if ${RF_DEBUG} ; then
+  print -u2 "${PN}: enter"
+fi
+
+alias local=typeset
+
+function linkone {
+  local NP=${1}
+  local N=${NP##*/}
+  ls -1 | while read D ; do
+    if [[ -d "${D}" ]] ; then
+      if [[ -f ${D}/${N} ]] ; then
+	if samefile ${NP} ${D}/${N} ; then :
+	else
+	  if ${RF_DEBUG} ; then :
+	    print -u2 "${PN}: diff ${D}/${N}"
+          else
+            print -- tar=${D}/${N}
+	    ln -f ${NP} ${D}
+	  fi
+	fi
+      fi
+    fi
+  done
+}
+
+for NP in "${@}" ; do
+  linkone ${NP}
+done
+
+

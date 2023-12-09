@@ -1,0 +1,37 @@
+# LOGTAB
+# log check file table
+
+# format of file
+#
+#	log_file		size_in_bytes
+#
+#
+
+
+log/badlinks			80000
+log/checklogs			80000
+log/chostname			80000
+log/daytime			80000
+log/fingerd			80000
+log/mkkey			80000
+log/referm			80000
+log/rshe			80000
+log/suexec			80000
+log/tcpmuxd			80000
+log/inetping			80000
+log/prt				80000
+log/lp				80000
+log/rfinger			80000
+log/unlinkd			80000
+log/poplogd			80000
+log/weather			80000
+log/ismailaddr			80000
+log/fingers			80000
+log/msu				80000
+log/sysdialer			80000
+log/cex				80000
+log/pingstat			80000
+log/pingstat.sum		80000
+
+
+

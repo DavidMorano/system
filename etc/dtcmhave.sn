@@ -1,0 +1,12 @@
+# Systems
+
+
+rca		udp -bp 5115
+
+
+rightcore.com	udp -bp 5115
+#rightcore.com	program ${LOCAL}/bin/dtcmhs + -i 30
+
+
+
+

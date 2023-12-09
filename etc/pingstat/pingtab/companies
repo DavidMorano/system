@@ -1,0 +1,14 @@
+# PINGTAB
+# for some companies
+
+
+
+#www.hp.com			<-- never responds to ICMP pings!
+www.apple.com		1d
+#www.sun.com		1d	<-- never responds
+#www.intel.com			<-- never responds to ICMP pings!
+www.motorola.com	1d
+www.dell.com		1d
+
+
+

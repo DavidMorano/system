@@ -1,0 +1,9 @@
+#!/bin/ksh
+# LINKOVER
+for N in has*.c* ; do
+  if [[ ! -f ../libuc/${N} ]] ; then
+    ln $N ../libuc
+  fi
+done
+
+

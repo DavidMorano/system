@@ -1,0 +1,13 @@
+#!/bin/ksh
+# MKSUB
+
+ls -1 mk*.[ch]* | while read N ; do 
+  if [[ ! -r ../${N} ]] ; then
+    ln ${N} ..
+  else
+    if [[ ${N} -nt ../${N} ]] ; then
+      ln -f ${N} ..
+    fi
+  fi
+done
+

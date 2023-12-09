@@ -1,0 +1,26 @@
+# DIRS (for MOTD)
+
+# format of table:
+#
+# admin		directory_of_MOTDs
+#
+
+
+default		${LOCAL}/var/motd
+
+admin		~/var/motd
+uucp		~/var/motd
+local		~/var/motd
+pcs		~/var/motd
+gnu		~/var/motd
+ncmp		~/var/motd
+exptools	~/var/motd
+genserv		~/var/motd
+
+
+# testing
+#dam		~dam/var/motd
+#dam		~dam/var/special
+
+
+
