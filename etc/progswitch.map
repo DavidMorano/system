@@ -96,7 +96,7 @@ tar:
 fortune:
 	/usr/games/fortune
 
-# these supprt the UUX dialer
+# these support the UUX dialer
 uux:
 	${NCMP}/bin/uux
 
