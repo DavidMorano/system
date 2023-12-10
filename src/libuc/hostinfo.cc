@@ -374,7 +374,7 @@ int hostinfo_getcanonical(hostinfo *op,cchar **rpp) noex {
 }
 /* end subroutine (hostinfo_getcanonical) */
 
-int hostinfo_curbegin(hostinfo *op,HOSTINFO_CUR *curp) noex {
+int hostinfo_curbegin(hostinfo *op,hostinfo_cur *curp) noex {
 	int		rs ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
 	        curp->i = -1 ;
@@ -383,7 +383,7 @@ int hostinfo_curbegin(hostinfo *op,HOSTINFO_CUR *curp) noex {
 }
 /* end subroutine (hostinfo_curbegin) */
 
-int hostinfo_curend(hostinfo *op,HOSTINFO_CUR *curp) noex {
+int hostinfo_curend(hostinfo *op,hostinfo_cur *curp) noex {
 	int		rs ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
 	        curp->i = -1 ;
@@ -393,11 +393,11 @@ int hostinfo_curend(hostinfo *op,HOSTINFO_CUR *curp) noex {
 /* end subroutine (hostinfo_curend) */
 
 /* enumerate the next hostname */
-int hostinfo_enumname(hostinfo *op,HOSTINFO_CUR *curp,cchar **rpp) noex {
+int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		nlen = 0 ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
-	        HOSTINFO_CUR	dcur ;
+	        hostinfo_cur	dcur ;
 	        bool		f_cur = false ;
 	        if (rpp) *rpp = nullptr ;
 	        if (curp == nullptr) {
@@ -456,11 +456,11 @@ int hostinfo_enumname(hostinfo *op,HOSTINFO_CUR *curp,cchar **rpp) noex {
 /* end subroutine (hostinfo_enumname) */
 
 /* enumerate the next host address */
-int hostinfo_enumaddr(hostinfo *op,HOSTINFO_CUR *curp,cuchar **rpp) noex {
+int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	int		rs ;
 	int		alen = 0 ;
 	if ((rs = hostinfo_magic(op,curp)) >= 0) {
-	        HOSTINFO_CUR	dcur ;
+	        hostinfo_cur	dcur ;
 	        bool		f_cur = false ;
 	        if (rpp) *rpp = nullptr ;
 	        if (curp == nullptr) {
@@ -476,7 +476,7 @@ int hostinfo_enumaddr(hostinfo *op,HOSTINFO_CUR *curp,cuchar **rpp) noex {
 	            vog_f	vg = vecobj_get ;
 	            bool	f_exit = false ;
 	            repeat {
-	                int	i ;
+	                int	i = 0 ; /* used afterwards */
 		        void	*vp{} ;
 	                for (i = ci ; (rs = vg(alp,i,&vp)) >= 0 ; i += 1) {
 		            aep = (HOSTINFO_A *) vp ;
