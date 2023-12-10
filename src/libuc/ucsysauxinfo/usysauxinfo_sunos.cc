@@ -44,6 +44,9 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 
