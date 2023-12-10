@@ -86,6 +86,8 @@ static constexpr int	nvalid[] = {
 	SR_INVALID,
 	SR_DOM,
 	SR_RANGE,
+	SR_NOENT,
+	SR_NOTSUP,
 	0	
 } ;
 
