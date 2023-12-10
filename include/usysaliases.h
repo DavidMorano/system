@@ -81,6 +81,10 @@
 #define	UTSNAME		struct utsname
 #endif
 
+#ifndef	RLIMIT
+#define	RLIMIT		struct rlimit
+#endif
+
 #ifndef	SIGACTION
 #define	SIGACTION	struct sigaction
 #endif
@@ -93,20 +97,28 @@
 #define	SIGVAL		union sigval	
 #endif
 
-#ifndef	RLIMIT
-#define	RLIMIT		struct rlimit
-#endif
-
-#ifndef	DIRENT
-#define	DIRENT		struct dirent
-#endif
-
 #ifndef	USTAT
 #define	USTAT		struct ustat
 #endif
 
 #ifndef	USTATVFS
 #define	USTATVFS	struct ustatvfs
+#endif
+
+#ifndef	DIRENT
+#define	DIRENT		struct dirent
+#endif
+
+#ifndef	FLOCK
+#define	FLOCK		struct flock
+#endif
+
+#ifndef	AIOCB
+#define	AIOCB		struct aiocb
+#endif
+
+#ifndef	IOVCEC
+#define	IOVCEC		struct iovec
 #endif
 
 #ifndef	SOCKADDR
@@ -117,8 +129,9 @@
 #define	MSGHDR		struct msghdr
 #endif
 
-#ifndef	WINSIZE
-#define	WINSIZE		struct winsize
+/* not constant - "Control-Message-Header" */
+#ifndef	CMSGHDR
+#define	CMSGHDR		struct cmsghdr
 #endif
 
 #ifndef	TIMEVAL
@@ -141,45 +154,32 @@
 #define	TIMEB		struct timeb
 #endif
 
-#ifndef	ADDRINFO
-#define	ADDRINFO	struct addrinfo
-#endif
-
-#ifndef	HOSTENT
-#define	HOSTENT		struct hostent
-#endif
-
 #ifndef	TERMIOS
 #define	TERMIOS		struct termios
 #endif
 
-#ifndef	STRBUF
-#define	STRBUF		struct strbuf
+#ifndef	WINSIZE
+#define	WINSIZE		struct winsize
 #endif
 
 #ifndef	POLLFD
 #define	POLLFD		struct pollfd
 #endif
 
+#ifndef	STRBUF
+#define	STRBUF		struct strbuf
+#endif
+
 #ifndef	STRRECVFD
 #define	STRRECVFD	struct strrecvfd
 #endif
 
-#ifndef	IOVCEC
-#define	IOVCEC		struct iovec
+#ifndef	MQATTR
+#define	MQATTR		struct mq_attr		/* for SysV-IPC */
 #endif
 
-#ifndef	MSGIDDS
-#define	MSGIDDS		struct msqid_ds		/* for SysV-IPC */
-#endif
-
-/* not constant - "Control-Message-Header" */
-#ifndef	CMSGHDR
-#define	CMSGHDR		struct cmsghdr
-#endif
-
-#ifndef	FLOCK
-#define	FLOCK		struct flock
+#ifndef	MSQIDDS
+#define	MSQIDDS		struct msqid_ds		/* for SysV-IPC */
 #endif
 
 /* constant versions of above */
@@ -196,7 +196,7 @@
 #define	CSOCKADDR	const struct sockaddr
 #endif
 
-/* C-language library structures */
+/* SYSDB account management structures */
 
 #ifndef	PASSWD
 #define	PASSWD		struct passwd
@@ -216,6 +216,28 @@
 
 #ifndef	USERATTR
 #define	USERATTR	userattr
+#endif
+
+/* SYSDB network related structures */
+
+#ifndef	PROTOENT
+#define	PROTOENT	struct protoent
+#endif
+
+#ifndef	NETENT
+#define	NETENT		struct netent
+#endif
+
+#ifndef	HOSTENT
+#define	HOSTENT		struct hostent
+#endif
+
+#ifndef	SERVENT
+#define	SERVENT		struct servent
+#endif
+
+#ifndef	ADDRINFO
+#define	ADDRINFO	struct addrinfo
 #endif
 
 /* constant versions of above */
@@ -238,24 +260,6 @@
 
 #ifndef	CUSERATTR
 #define	CUSERATTR	const USERATTR
-#endif
-
-/* network related structures */
-
-#ifndef	PROTOENT
-#define	PROTOENT	struct protoent
-#endif
-
-#ifndef	NETENT
-#define	NETENT		struct netent
-#endif
-
-#ifndef	HOSTENT
-#define	HOSTENT		struct hostent
-#endif
-
-#ifndef	SERVENT
-#define	SERVENT		struct servent
 #endif
 
 #ifndef	CPROTOENT
