@@ -42,9 +42,14 @@
 	fname		the name of the input file to check for
 
 	Returns:
-	>0		try file at new path
-	0		try file as is
+	>0		try file at path in 'rbuf'
+	0		file-name is already absolute (but not tested)
 	<0		error (system-return)
+
+	Usage-note:
+	The size of the receiving buffer (represented w/ the variable
+	|rbuf| above) must be the length of the maximum file-name
+	length plus one (for a terminating NUL character).
 
 *******************************************************************************/
 
@@ -87,6 +92,27 @@
 
 /* local structures */
 
+namespace {
+    struct subinfo {
+	cchar		*pr ;
+	cchar		*fname ;
+	char		*rbuf ;
+	int		am ;
+	bool		ft ;
+	subinfo(cc *p,char *r,int t,cc *f,int a) noex {
+	    pr = p ;
+	    rbuf = r ;
+	    fname = f ;
+	    am = (a & O_ACCMODE) ;
+	    ft = bool(t) ;
+	} ;
+	operator int () noex ;
+	int round() noex ;
+	int rem() noex ;
+	int loc() noex ;
+    } ; /* end struct (subinfo) */
+}
+
 
 /* forward references */
 
@@ -98,70 +124,96 @@ constexpr int		rsn = SR_NOTFOUND ;
 
 /* exported subroutines */
 
-int getfname(cchar *pr,char *rbuf,int type,cchar *fname,mode_t fm) noex {
+int getfname(cchar *pr,char *rbuf,int type,cchar *fname,int am) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (pr && rbuf && fname) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-		USTAT	sb ;
-		bool	f_done = FALSE ;
-		bool	f_local = FALSE ;
+	    if ((type >= 0) && fname[0]) {
 		rs = SR_OK ;
 	        if (fname[0] != '/') {
-/* second */
-	            if ((rs >= 0) && (! f_done)) {
-	                if ((type == GETFNAME_TYPEROOT) && pr) {
-	                    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
-	                        len = rs ;
-	                        if ((rs = perm(rbuf,-1,-1,nullptr,W_OK)) >= 0) {
-		                    f_done = true ;	
-	                        } else if (rs == rsn) {
-		                    rs = SR_OK ;
-	                        }
-	                    } /* end if (mkpath) */
-	                } else {
-	                    f_local = TRUE ;
-	                    if ((rs = perm(fname,-1,-1,nullptr,W_OK)) >= 0) {
-	                        if ((rs = u_stat(fname,&sb)) >= 0) {
-		                    if (! S_ISDIR(sb.st_mode)) {
-			                f_done = true ;
-		                    }
-		                } /* end if (stat) */
-	                    } else if (isNotAccess(rs)) {
-		                rs = SR_OK ;
-	                    } /* end if (perm) */
-	                } /* end if */
-	            } /* end if (needed) */
-/* third */
-	            if ((rs >= 0) && (! f_done)) {
-	                if ((type == GETFNAME_TYPELOCAL) && (pr != nullptr)) {
-	                    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
-	    		        len = rs ;
-	    			if ((rs = perm(rbuf,-1,-1,nullptr,W_OK)) >= 0) {
-				    f_done = true ;
-				}
-			    } /* end if (mkpath) */
-			} /* end if (type) */
-	            } else if (! f_local) {
-	                if ((rs = perm(fname,-1,-1,nullptr,W_OK)) >= 0) {
-	        	    if ((rs = u_stat(fname,&sb)) >= 0) {
-				if (! S_ISDIR(sb.st_mode)) {
-				    len = 0 ;
-	    			}
-			    }
-			} /* end if */
-		    } /* end if (needed) */
-/* forth */
-	            if (type != GETFNAME_TYPEROOT) {
-	    	        len = 0 ;
-		    }
-		} /* end if (need search for non-rooted file) */
+		    subinfo	si(pr,rbuf,type,fname,am) ;
+		    rs = si ;
+		    len = rs ;
+		} /* end if (relative file-name) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getrbuf) */
+
+
+/* local subroutines */
+
+subinfo::operator int () noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	for (int i = 0 ; (rs >= 0) && (i < 2) ; i += 1) {
+	    rs = round() ;
+	    len = rs ;
+	    if (len > 0) break ;
+	} /* end for */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (subinfo::operator) */
+
+int subinfo::round() noex {
+	int		rs = 0 ;
+	if (ft) {
+	    rs = rem() ;
+	} else {
+	    rs = loc() ;
+	}
+	ft = (!ft) ;
+	return rs ;
+}
+/* end method (subinfo::round) */
+
+int subinfo::loc() noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = perm(fname,-1,-1,nullptr,am)) >= 0) {
+	    USTAT	sb ;
+	    if ((rs = uc_stat(fname,&sb)) >= 0) {
+		if (! S_ISDIR(sb.st_mode)) {
+		    rs = mkpath(rbuf,fname) ;
+		    len = rs ;
+		}
+	    } else if (isNotAccess(rs)) {
+	        rs = SR_OK ;
+	    }
+	} else if (isNotAccess(rs)) {
+	    rs = SR_OK ;
+	}
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (subinfo::loc) */
+
+int subinfo::rem() noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	if (pr) {
+	    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
+		len = rs ;
+	        if ((rs = perm(rbuf,-1,-1,nullptr,am)) >= 0) {
+	            USTAT	sb ;
+	            if ((rs = uc_stat(fname,&sb)) >= 0) {
+		        if (S_ISDIR(sb.st_mode)) {
+		            len = 0 ;
+			}
+		    } else if (isNotAccess(rs)) {
+			len = 0 ;
+			rs = SR_OK ;
+		    }
+	        } else if (isNotAccess(rs)) {
+		    len = 0 ;
+	            rs = SR_OK ;
+	        }
+	    } /* end if (mkpath) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (subinfo::loc) */
 
 
