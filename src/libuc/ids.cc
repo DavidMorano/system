@@ -44,7 +44,6 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
-#include	<gidend.hh>
 #include	<localmisc.h>
 
 #include	"ids.h"
@@ -79,7 +78,7 @@ static int	ids_ngids(const ids *) noex ;
 
 static idsreserve	ids_data ;
 
-static constexpr gid_t	gidend = mkgidend() ;
+static constexpr gid_t	gidend = gid_t(-1) ;
 
 
 /* exported subroutines */

@@ -34,7 +34,6 @@
 #include	<cq.h>
 #include	<strwcpy.h>
 #include	<libmallocxx.h>
-#include	<gidend.hh>
 #include	<localmisc.h>
 
 #include	"filegrp.h"
@@ -119,7 +118,7 @@ static int	entry_load(ENT *,REC *) noex ;
 
 /* local variables */
 
-static constexpr gid_t	gidend = mkgidend() ;
+static constexpr gid_t	gidend = gid_t(-1) ;
 
 static bufsizevar	gnl(getbufsize_gn) ;
 

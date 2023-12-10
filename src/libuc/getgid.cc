@@ -58,7 +58,6 @@
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<gidend.hh>
 #include	<nulstr.h>
 #include	<getax.h>
 #include	<cfdec.h>
@@ -82,7 +81,7 @@
 
 /* local variables */
 
-static constexpr gid_t	gidend = mkgidend() ;
+static constexpr gid_t	gidend = gid_t(-1) ;
 
 
 /* exported subroutines */
