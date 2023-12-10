@@ -122,6 +122,7 @@ int umsg::operator () (int msqid,void *msgp,int msgl,int msgflag) noex {
 	int		rs ;
 	bool		f_exit = false ;
 	repeat {
+	    errno = 0 ;
 	    if ((rs = (this->*m)(msqid,msgp,msgl,msgflag)) < 0) {
 	        switch (rs) {
 	        case SR_NOSR:

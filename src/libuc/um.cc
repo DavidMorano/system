@@ -263,6 +263,7 @@ int um::operator () (void *ma,size_t ms) noex {
 	int		rs ;
 	bool		f_exit = false ;
 	repeat {
+	    errno = 0 ;
 	    if ((rs = (this->*m)(ma,ms)) < 0) {
 	        switch (rs) {
 	        case SR_NOSR:
