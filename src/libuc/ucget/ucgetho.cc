@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This nwogram was originally written.
+	This program was originally written.
 
 */
 
@@ -33,9 +33,9 @@
 
 	Arguments:
 	- pep		pointer to 'hostent' structure
-	- hobuf		nwoto-ent buffer pointer
-	- pelen		nwoto-ent buffer length
-	- name		nwotocol name to lookup
+	- hobuf		host-ent buffer pointer
+	- pelen		host-ent buffer length
+	- name		host-name to lookup
 	- ap		address pointer
 	- al		address length
 	- af		address family
@@ -142,23 +142,23 @@ int uc_gethoend() noex {
 /* end subroutine (uc_gethoend) */
 
 int uc_gethoent(ucentho *hop,char *hobuf,int holen) noex {
-	ucgetho		nwo(nullptr) ;
-	nwo.m = &ucgetho::getho_ent ;
-	return nwo(hop,hobuf,holen) ;
+	ucgetho		hoo(nullptr) ;
+	hoo.m = &ucgetho::getho_ent ;
+	return hoo(hop,hobuf,holen) ;
 }
 /* end subroutine (uc_gethoent) */
 
 int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
-	ucgetho		nwo(name) ;
-	nwo.m = &ucgetho::getho_nam ;
-	return nwo(hop,hobuf,holen) ;
+	ucgetho		hoo(name) ;
+	hoo.m = &ucgetho::getho_nam ;
+	return hoo(hop,hobuf,holen) ;
 }
 /* end subroutine (uc_gethonam) */
 
 int uc_gethoadd(ucentho *hop,char *hobuf,int holen,cv *ap,int al,int af) noex {
-	ucgetho		nwo(nullptr,ap,al,af) ;
-	nwo.m = &ucgetho::getho_add ;
-	return nwo(hop,hobuf,holen) ;
+	ucgetho		hoo(nullptr,ap,al,af) ;
+	hoo.m = &ucgetho::getho_add ;
+	return hoo(hop,hobuf,holen) ;
 }
 /* end subroutine (uc_gethoadd) */
 
