@@ -66,7 +66,6 @@
 
 static constexpr int	npresent[] = {
 	SR_NOENT,
-	SR_ACCESS,
 	SR_NETUNREACH,
 	SR_NETDOWN,
 	SR_HOSTUNREACH,
@@ -78,8 +77,8 @@ static constexpr int	npresent[] = {
 } ;
 
 static constexpr int	naccess[] = {
-	SR_NOENT,
 	SR_ACCESS,
+	SR_PERM,
 	0	
 } ;
 
@@ -108,7 +107,10 @@ int isNotPresent(int rs) noex {
 /* end subroutine (isNotPresent) */
 
 int isNotAccess(int rs) noex {
-	return isOneOf(naccess,rs) ;
+	int		f = false ;
+	f = f || isOneOf(naccess,rs) ;
+	f = f || isOneOf(npresent,rs) ;
+	return f ;
 }
 /* end subroutine (isNotAccess) */
 
