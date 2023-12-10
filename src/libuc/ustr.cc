@@ -121,6 +121,7 @@ int ustr::operator () (int fd,STRBUF *cmp,STRBUF *dmp) noex {
 	int		nfds = 0 ;
 	bool		f_exit = false ;
 	repeat {
+	    errno = 0 ;
 	    if ((rs = (this->*m)(fd,cmp,dmp)) < 0) {
 	        switch (rs) {
 	        case SR_NOSR:
