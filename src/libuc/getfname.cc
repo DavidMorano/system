@@ -1,5 +1,5 @@
 /* getfname */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a file name according to rules */
 /* version %I% last-modified %G% */
@@ -59,6 +59,7 @@
 #include	<usystem.h>
 #include	<mkpathx.h>
 #include	<xperm.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getfname.h"
@@ -92,10 +93,12 @@
 
 /* local variables */
 
+constexpr int		rsn = SR_NOTFOUND ;
+
 
 /* exported subroutines */
 
-int getrbuf(cchar *pr,char *rbuf,int type,char fname) noex {
+int getfname(cchar *pr,char *rbuf,int type,cchar *fname,mode_t fm) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (pr && rbuf && fname) {
@@ -103,54 +106,58 @@ int getrbuf(cchar *pr,char *rbuf,int type,char fname) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 		USTAT	sb ;
-		int	f_local = FALSE ;
+		bool	f_done = FALSE ;
+		bool	f_local = FALSE ;
 		rs = SR_OK ;
 	        if (fname[0] != '/') {
-
 /* second */
-
-	if ((type == GETFNAME_TYPEROOT) && (pr != NULL)) {
-
-	    rs = mkpath2(rbuf,pr,fname) ;
-	    len = rs ;
-	    if (perm(rbuf,-1,-1,NULL,W_OK) >= 0)
-	        goto ret0 ;
-
-	} else {
-
-	    f_local = TRUE ;
-	    if ((perm(fname,-1,-1,NULL,W_OK) >= 0) &&
-	        (u_stat(fname,&sb) >= 0) && (! S_ISDIR(sb.st_mode))) {
-		goto ret0 ;
-	    }
-
-	} /* end if */
-
+	            if ((rs >= 0) && (! f_done)) {
+	                if ((type == GETFNAME_TYPEROOT) && pr) {
+	                    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
+	                        len = rs ;
+	                        if ((rs = perm(rbuf,-1,-1,nullptr,W_OK)) >= 0) {
+		                    f_done = true ;	
+	                        } else if (rs == rsn) {
+		                    rs = SR_OK ;
+	                        }
+	                    } /* end if (mkpath) */
+	                } else {
+	                    f_local = TRUE ;
+	                    if ((rs = perm(fname,-1,-1,nullptr,W_OK)) >= 0) {
+	                        if ((rs = u_stat(fname,&sb)) >= 0) {
+		                    if (! S_ISDIR(sb.st_mode)) {
+			                f_done = true ;
+		                    }
+		                } /* end if (stat) */
+	                    } else if (isNotAccess(rs)) {
+		                rs = SR_OK ;
+	                    } /* end if (perm) */
+	                } /* end if */
+	            } /* end if (needed) */
 /* third */
-
-	if ((type == GETFNAME_TYPELOCAL) && (pr != NULL)) {
-
-	    rs = mkpath2(rbuf,pr,fname) ;
-	    len = rs ;
-	    if (perm(rbuf,-1,-1,NULL,W_OK) >= 0)
-	        goto ret0 ;
-
-	} else if (! f_local) {
-
-	    if ((perm(fname,-1,-1,NULL,W_OK) >= 0) &&
-	        (u_stat(fname,&sb) >= 0) && (! S_ISDIR(sb.st_mode))) {
-		len = 0 ;
-		goto ret0 ;
-	    }
-
-	} /* end if */
-
+	            if ((rs >= 0) && (! f_done)) {
+	                if ((type == GETFNAME_TYPELOCAL) && (pr != nullptr)) {
+	                    if ((rs = mkpath(rbuf,pr,fname)) >= 0) {
+	    		        len = rs ;
+	    			if ((rs = perm(rbuf,-1,-1,nullptr,W_OK)) >= 0) {
+				    f_done = true ;
+				}
+			    } /* end if (mkpath) */
+			} /* end if (type) */
+	            } else if (! f_local) {
+	                if ((rs = perm(fname,-1,-1,nullptr,W_OK)) >= 0) {
+	        	    if ((rs = u_stat(fname,&sb)) >= 0) {
+				if (! S_ISDIR(sb.st_mode)) {
+				    len = 0 ;
+	    			}
+			    }
+			} /* end if */
+		    } /* end if (needed) */
 /* forth */
-
-	if (type != GETFNAME_TYPEROOT)
-	    len = 0 ;
-
-		/* end if (need search for non-rooted file) */
+	            if (type != GETFNAME_TYPEROOT) {
+	    	        len = 0 ;
+		    }
+		} /* end if (need search for non-rooted file) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

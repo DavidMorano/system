@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-extern int getfname(char *,char *,int,char *) noex ;
+extern int getfname(cchar *,char *,int,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }
