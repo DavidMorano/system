@@ -48,7 +48,7 @@
 
 	Usage-note:
 	The size of the receiving buffer (represented w/ the variable
-	|rbuf| above) must be the length of the maximum file-name
+	|rbuf| above) must be the length of the maximum file-path
 	length plus one (for a terminating NUL character).
 
 *******************************************************************************/
