@@ -56,9 +56,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<errno.h>
+#include	<climits>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>
@@ -69,11 +69,10 @@
 
 /* local structures */
 
-struct ucsysconf ;
-
-typedef int (ucsysconf::*mem_f)(int) ;
-
-struct ucsysconf {
+namespace {
+    struct ucsysconf ;
+    typedef int (ucsysconf::*mem_f)(int) ;
+    struct ucsysconf {
 	mem_f		m ;
 	char		*rbuf ;
 	long		*lp ;
@@ -83,7 +82,8 @@ struct ucsysconf {
 	int mconfsys(int) noex ;
 	int mconfstr(int) noex ;
 	int operator () (int) noex ;
-} ; /* end struct (ucsysconf) */
+    } ; /* end struct (ucsysconf) */
+}
 
 
 /* forward references */

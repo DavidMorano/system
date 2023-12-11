@@ -1,4 +1,4 @@
-/* perm */
+/* xperm */
 /* lang=C++20 */
 
 /* test the permissions on a file -- similar to |access(2)| */
@@ -16,8 +16,10 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
 	perm
+	xperm
+	sperm
 
 	Description:
 	This module is sort of the "effective_user" version of
@@ -47,9 +49,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<localmisc.h>
@@ -58,8 +60,6 @@
 
 
 /* local defines */
-
-#define	TRYER	struct tryer
 
 
 /* external subroutines */
@@ -86,7 +86,6 @@ namespace {
 	int grp(USTAT *,int) noex ;
 	int other(USTAT *,int) noex ;
 	int finish() noex ;
-	
     } ; /* end struct (tryer) */
 }
 
@@ -106,8 +105,8 @@ static tryer_f tries[] = {
 	nullptr
 } ;
 
-static constexpr uid_t	uidany = (-1) ;
-static constexpr gid_t	gidany = (-1) ;
+static constexpr uid_t	uidend = (-1) ;
+static constexpr gid_t	gidend = (-1) ;
 
 
 /* exported subroutines */
@@ -160,7 +159,7 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 	if (sbp) {
 	    rs = SR_OK ;
 	    if (am != 0) {
-	        TRYER	t{} ;
+	        tryer	t{} ;
 	        am &= 007 ;
 	        if ((rs = t.start(euid,egid,gids)) >= 0) {
 	            for (int i = 0 ; tries[i] ; i += 1) {
@@ -180,21 +179,21 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 
 int tryer::start(uid_t eu,gid_t eg,gid_t *gs) noex {
 	int		rs  ;
-	if (eu == uidany) eu = geteuid() ;
-	if (eg == gidany) eg = getegid() ;
+	if (eu == uidend) eu = geteuid() ;
+	if (eg == gidend) eg = getegid() ;
 	euid = eu ;
 	egid = eg ;
 	gids = gs ;
 	if ((rs = getngroups()) >= 0) {
-	    cint	n = rs ;
+	    cint	ng = rs ;
 	    if (gids == nullptr) {
-	        cint	gsize = ((n+1)*sizeof(gid_t)) ;
+	        cint	gsize = ((ng+1)*sizeof(gid_t)) ;
 	        void	*vp{} ;
 	        if ((rs = uc_libmalloc(gsize,&vp)) >= 0) {
 		    gids = (gid_t *) vp ;
 		    f_gidalloc = true ;
-	            if ((rs = u_getgroups(n,gids)) >= 0) {
-		        gids[rs] = -1 ;
+	            if ((rs = u_getgroups(ng,gids)) >= 0) {
+		        gids[rs] = gidend ;
 		    }
 		    if (rs < 0) {
 		        uc_libfree(gids) ;
@@ -244,7 +243,7 @@ int tryer::grp(USTAT *sbp,int am) noex {
 	    rs = ((gm & am) == am) ? 1 : SR_ACCES ;
 	} else if (gids != nullptr) {
 	    bool	f = false ;
-	    for (int i = 0 ; gids[i] != gidany ; i += 1) {
+	    for (int i = 0 ; gids[i] != gidend ; i += 1) {
 	        f = (sbp->st_gid == gids[i]) ;
 		if (f) break ;
 	    } /* end for */

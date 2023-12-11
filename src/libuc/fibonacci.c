@@ -1,6 +1,8 @@
 /* fibonacci */
+/* lang=C++20 */
 
 /* Fibonacci function */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,28 +16,28 @@
 
 /*******************************************************************************
 
-	This subroutine implements the Fibonacci function.  We calculate
-	the result using recursion (so watch out for large inputs -> stack 
-	overflow!).
+	Name:
+	fibonacci
+
+	Description:
+	This subroutine implements the Fibonacci function.  We
+	calculate the result using recursion (so watch out for large
+	inputs -> stack overflow!).
 
 	Synopsis:
-
-	LONG fibonacci(unsigned int n)
+	long fibonacci(uint n) noex
 
 	Arguments:
-
 	n	number to return Fibonacci value for
 
 	Returns:
-
 	-	the Fibonacci number of the input
 
-
+	Notes:
 	The original Fibonacci function:
 
-	LONG fibonacci(int n)
-	{
-	    int	v = 0 ;
+	longLONG fibonacci(int n) {
+	    long	v = 0 ;
 	    if ((n == 1) || (n == 2)) {
 	        n = 1 ;
 	    } else (n > 2) {
@@ -44,26 +46,29 @@
 	    return v ;
 	}
 
-        Note that when putting the result into a 32-bit unsigned integer (which
-        is what we are doing here) the largest valued input (domain) of the
-        Fibonacci function that can be represented in the result is 47. An input
-        value of 48 overflows the 32-bit unsigned integer result. For this
-        reason, the table of values below is only 48 entries, with the last
-        entry (#47) storing the last representable result for a 32-bit unsigned
-        integer.
-
+	Note that when putting the result into a 32-bit unsigned
+	integer (which is what we are doing here) the largest valued
+	input (domain) of the Fibonacci function that can be
+	represented in the result is 47. An input value of 48
+	overflows the 32-bit unsigned integer result. For this
+	reason, the table of values below is only 48 entries, with
+	the last entry (#47) storing the last representable result
+	for a 32-bit unsigned integer.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
 #include	<limits.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
+
+#include	"fibonacci.h"
 
 
 /* local variables */
 
-static const unsigned int fibotab[] = {
+static constexpr long	fibotab[] = {
 	0x00000000, 0x00000001, 0x00000001, 0x00000002,
 	0x00000003, 0x00000005, 0x00000008, 0x0000000d,
 	0x00000015, 0x00000022, 0x00000037, 0x00000059,
@@ -81,13 +86,11 @@ static const unsigned int fibotab[] = {
 
 /* exported subroutines */
 
-
-LONG fibonacci(int n)
-{
-	const int	ntab = nelem(fibotab) ;
-	LONG		v = -1 ;
+long fibonacci(int n) noex {
+	cint		ntab = nelem(fibotab) ;
+	long		v = -1 ;
 	if (n < ntab) {
-	    v = fibotab[n] & UINT_MAX ;
+	    v = fibotab[n] & ULONG_MAX ;
 	} else {
 	    v = fibonacci(n-1) * fibonacci(n-2) ;
 	}
