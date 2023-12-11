@@ -16,7 +16,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<grp.h>
 #include	<errno.h>
 #include	<usystem.h>
 
