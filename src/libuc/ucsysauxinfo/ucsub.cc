@@ -1,4 +1,4 @@
-/* usysauxinfo */
+/* ucsub */
 /* lang=C++20 */
 
 /* UNIX® system-auxillary-information */
@@ -61,10 +61,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern char	*strwcpy(char *,cchar *,int) noex ;
-}
 
 
 /* local structures */

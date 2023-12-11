@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h sysauxinfonames.h
 
 
-OBJ0_UCSYSAUXINFO= usysauxinfo.o
+OBJ0_UCSYSAUXINFO= ucsub.o
 OBJ1_UCSYSAUXINFO= usysauxinfo_sunos.o
 OBJ2_UCSYSAUXINFO= usysauxinfo_darwin.o
 OBJ3_UCSYSAUXINFO= usysauxinfo_linux.o
@@ -122,7 +122,8 @@ obj3_ucsysauxinfo.o:	$(OBJ3_UCSYSAUXINFO)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSYSAUXINFO)
 
 
-usysauxinfo.o:		usysauxinfo.cc sysauxinfo.h $(INCS)
+ucsub.o:		ucsub.cc sysauxinfo.h $(INCS)
+
 usysauxinfo_sunos.o:	usysauxinfo_sunos.cc usysauxinfo_sunos.h $(INCS)
 usysauxinfo_darwin.o:	usysauxinfo_darwin.cc usysauxinfo_darwin.h $(INCS)
 usysauxinfo_linux.o:	usysauxinfo_linux.cc usysauxinfo_linux.h $(INCS)

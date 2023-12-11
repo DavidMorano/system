@@ -1,9 +1,9 @@
-# APTAB (Alias-Profile Table)
+# APTAB (Alias-Profile-Table)
 #
 #
 # This file contains mail-alias profiles.  Each profile consists of
 # one or more filepaths specifying mailalias files.  Each mailalias
-# file is in the format of 'aliases(4)'.
+# file is in the format of |aliases(4)|.
 #
 # Format of entries:
 #

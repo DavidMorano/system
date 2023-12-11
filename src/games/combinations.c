@@ -1,9 +1,8 @@
 /* combinations */
+/* lang=C20 */
 
 /* n-choose-k function WITHOUT repitition */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,10 +16,14 @@
 
 /*******************************************************************************
 
+	Name:
+	combinations
+
+	Description:
 	We calculate the combinations n-C-k *without* repititions.
 
 	Synopsis:
-	LONG combinations(int n,int k)
+	long combinations(int n,int k)
 
 	Arguments:
 	n	number of items to choose from
@@ -30,11 +33,9 @@
 	-	the Fibonacci number of the input
 
 	= Notes:
-
 	· Combinations *without* repetition (this subroutine):
 
 	special cases
-	
 	+ k == 0 -> ans = 1
 	+ k == 1 -> ans = n 
 	+ k == n -> ans = 1
@@ -58,29 +59,24 @@
 	A subroutine for multicombinations is provied (below) and is:
 
 	Synopsis:
-	LONG multicombinations(int n,int k)
-
+	long multicombinations(int n,int k)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
 #include	<limits.h>
+#include	<utypedef.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* external subroutines */
 
-extern LONG	factorial(int) ;
-extern LONG	permutations(int,int) ;
+extern long	factorial(int) noex ;
+extern long	permutations(int,int) noex ;
 
 
 /* forward references */
@@ -91,10 +87,8 @@ extern LONG	permutations(int,int) ;
 
 /* exported subroutines */
 
-
-LONG combinations(int n,int k)
-{
-	LONG		ans = -1 ;
+long combinations(int n,int k) noex {
+	long		ans = -1 ;
 	if ((n >= 0) && (k >= 0)) {
 	    ans = 1 ;
 	    if (k == 1) {
@@ -102,8 +96,8 @@ LONG combinations(int n,int k)
 	    } else if (k == n) {
 		ans = 1 ;
 	    } else if (k > 0) {
-	        const LONG	num = permutations(n,k) ;
-	        const LONG	den = factorial(k) ;
+	        clong	num = permutations(n,k) ;
+	        clong	den = factorial(k) ;
 		if ((num >= 0) && (den > 0)) {
 	            ans = num / den ;
 		} else {
@@ -117,9 +111,7 @@ LONG combinations(int n,int k)
 }
 /* end subroutine (combinations) */
 
-
-LONG multicombinations(int n,int k)
-{
+long multicombinations(int n,int k) noex {
 	return combinations(n+k-1,k) ;
 }
 /* end subroutine (multicombinations) */

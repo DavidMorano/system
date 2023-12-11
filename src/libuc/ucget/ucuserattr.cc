@@ -33,6 +33,11 @@
 	not reentrant!  Yes, that is what you get to when you have
 	extreme brain damaged system developers.
 
+	Implementation-note: These function, except for the first
+	two below, do not use or set the ERRNO variable. They just
+	return a NULL pointer or a non-NULL pointer, indicating
+	failure or success.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

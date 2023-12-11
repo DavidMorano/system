@@ -1,9 +1,8 @@
 /* uc_initgroups */
+/* lang=C20 */
 
 /* interface component for UNIX® library-3c */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,25 +14,26 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<grp.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 
 
 /* exported subroutines */
 
-
-int uc_initgroups(cchar *name,gid_t gid)
-{
-	int		rs = SR_OK ;
-	if (name == NULL) return SR_FAULT ;
-	if (name[0] == '\0') return SR_INVALID ;
-	if (initgroups(name,gid) < 0) rs = (- errno) ;
+int uc_initgroups(cchar *name,gid_t gid) {
+	int		rs = SR_FAULT ;
+	if (name) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+		rs = SR_OK ;
+	        if (initgroups(name,gid) < 0) {
+		    rs = (- errno) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_initgroups) */

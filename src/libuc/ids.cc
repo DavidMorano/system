@@ -44,13 +44,17 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
-#include	<gidend.hh>
 #include	<localmisc.h>
 
 #include	"ids.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;
 
 
 /* external subroutines */
@@ -61,13 +65,6 @@
 
 /* local structures */
 
-namespace {
-    struct idsreserve {
-	int		ngroups ;
-	operator int () noex ;
-    } ; /* end struct (idsreserve) */
-}
-
 
 /* forward references */
 
@@ -77,25 +74,24 @@ static int	ids_ngids(const ids *) noex ;
 
 /* local variables */
 
-static idsreserve	ids_data ;
-
-static constexpr gid_t	gidend = mkgidend() ;
+static constexpr gid_t	gidend = gid_t(-1) ;
 
 
 /* exported subroutines */
 
 int ids_load(ids *op) noex {
 	int		rs ;
-	int		n = 0 ;
+	int		ng = 0 ;
 	if ((rs = ids_ctor(op)) >= 0) {
-	    if ((rs = ids_data) >= 0) {
+	    nullptr_t	np{} ;
+	    if ((rs = u_getgroups(0,np)) >= 0) {
 	        cint	size = ((rs+1)*sizeof(gid_t)) ;
 	        void	*vp{} ;
-	        n = rs ;
+	        ng = rs ;
 	        if ((rs = uc_libmalloc(size,&vp)) >= 0) {
 		    op->gids = (gid_t *) vp ;
-		    if ((rs = u_getgroups(n,op->gids)) >= 0) {
-		        op->gids[n] = gid_t(-1) ;
+		    if ((rs = u_getgroups(ng,op->gids)) >= 0) {
+		        op->gids[ng] = gidend ;
 		    }
 		    if (rs < 0) {
 		        uc_libfree(op->gids) ;
@@ -104,7 +100,7 @@ int ids_load(ids *op) noex {
 	        } /* end if (m-a) */
 	    } /* end if (ids_data) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? ng : rs ;
 }
 /* end subroutine (ids_load) */
 
@@ -125,14 +121,14 @@ int ids_release(ids *op) noex {
 
 int ids_ngroups(ids *op) noex {
 	int		rs = SR_FAULT ;
-	int		n = 0 ;
+	int		ng = 0 ;
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->gids) {
-	        for (n = 0 ; op->gids[n] != gidend ; n += 1) ;
+	        for (ng = 0 ; op->gids[ng] != gidend ; ng += 1) ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? ng : rs ;
 }
 /* end subroutine (ids_ngroups) */
 
@@ -162,10 +158,10 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	    if ((rs = ids_ngids(otherp)) >= 0) {
 	        cint	n = rs ;
 	        int	size = 0 ;
-	        void	*p ;
+	        void	*p{} ;
 	        size += ((n+1)*sizeof(gid_t)) ;
 	        if ((rs = uc_libmalloc(size,&p)) >= 0) {
-	            int		i ;
+	            int		i = 0 ; /* <- used afterwards */
 		    op->gids = (gid_t *) p ;
 		    for (i = 0 ; otherp->gids[i] ; i += 1) {
 		        op->gids[i] = otherp->gids[i] ;
@@ -203,17 +199,6 @@ static int ids_ngids(const ids *op) noex {
 	return n ;
 }
 /* end subroutine (ids_ngids) */
-
-idsreserve::operator int () noex {
-	int		rs ;
-	if ((rs = ngroups) == 0) {
-	    gid_t	dummy[1] ;
-	    rs = u_getgroups(0,dummy) ;
-	    ngroups = rs ;
-	}
-	return rs ;
-}
-/* end subroutine (idsreserve::operator) */
 
 ids_co::operator int () noex {
 	int		rs = SR_BUGCHECK ;

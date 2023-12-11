@@ -1,10 +1,8 @@
 /* igcd */
+/* lang=C20 */
 
 /* integer Greastest Common Divisor (GCD) */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 
 /* revision history:
@@ -18,29 +16,30 @@
 
 /*******************************************************************************
 
+	Name:
+	igcd
+
+	Description:
         This subroutine calculates the Greastest Common Divisor (GCD) of
         two integer numbers.
 
 	Synopsis:
-
-	int igcd(int a,int b)
+	int igcd(int a,int b) noex
 
 	Arguments:
-
 	a	number
 	b	number
 
 	Returns:
-
 	-	GCD(a,b)
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>		/* more types */
+#include	<utypedef.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -63,9 +62,7 @@
 
 /* exported subroutines */
 
-
-int igcd(int a,int b)
-{
+int igcd(int a,int b) noex {
 	int		r ;
 	while ((r = (a % b)) > 0) {
 	    a = b ;

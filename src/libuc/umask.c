@@ -1,5 +1,5 @@
 /* umask */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* UNIX® UMASK (file-creation-mask) management */
 /* version %I% last-modified %G% */
@@ -62,8 +62,6 @@ struct umask {
 
 /* forward references */
 
-int		umask_fini() noex ;
-
 static void	umask_atforkbefore() noex ;
 static void	umask_atforkafter() noex ;
 static void	umask_exit() noex ;
@@ -71,41 +69,42 @@ static void	umask_exit() noex ;
 
 /* local variables */
 
-static struct umask	umask_data ; /* zero-initialized */
+static struct umask	umask_data ;
 
 
 /* exported subroutines */
 
 int umask_init() noex {
 	struct umask	*uip = &umask_data ;
-	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		rs = SR_NXIO ;
+	int		f = false ;
 	if (! uip->f_void) {
-	if (! uip->f_init) {
-	    uip->f_init = TRUE ;
-	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
-	        void_f	b = umask_atforkbefore ;
-	        void_f	a = umask_atforkafter ;
-	        if ((rs = uc_atfork(b,a,a)) >= 0) {
-	            if ((rs = uc_atexit(umask_exit)) >= 0) {
-	    	        uip->f_initdone = TRUE ;
-		        f = TRUE ;
-		    }
-		    if (rs < 0)
-		        uc_atforkexpunge(b,a,a) ;
-	        } /* end if (uc_atfork) */
-	 	if (rs < 0)
-		    ptm_destroy(&uip->m) ;
-	    } /* end if (ptm_create) */
-	    if (rs < 0)
-	        uip->f_init = FALSE ;
-	} else {
-	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
-	        rs = msleep(1) ;
-	        if (rs == SR_INTR) rs = SR_OK ;
+	    rs = SR_OK ;
+	    if (! uip->f_init) {
+	        uip->f_init = true ;
+	        if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
+	            void_f	b = umask_atforkbefore ;
+	            void_f	a = umask_atforkafter ;
+	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	                if ((rs = uc_atexit(umask_exit)) >= 0) {
+	    	            uip->f_initdone = true ;
+		            f = true ;
+		        }
+		        if (rs < 0)
+		            uc_atforkexpunge(b,a,a) ;
+	            } /* end if (uc_atfork) */
+	 	    if (rs < 0)
+		        ptm_destroy(&uip->m) ;
+	        } /* end if (ptm_create) */
+	        if (rs < 0)
+	            uip->f_init = false ;
+	    } else {
+	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
+	            rs = msleep(1) ;
+	            if (rs == SR_INTR) rs = SR_OK ;
+	        }
+	        if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
 	    }
-	    if ((rs >= 0) && (! uip->f_init)) rs = SR_LOCKLOST ;
-	}
 	} /* end if (not-voided) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -116,7 +115,7 @@ int umask_fini() noex {
 	int		rs = SR_NXIO ;
 	int		rs1 ;
 	if (uip->f_initdone && (! uip->f_void)) {
-	    uip->f_void = FALSE ;
+	    uip->f_void = false ;
 	    rs = SR_OK ;
 	    {
 	        void_f	b = umask_atforkbefore ;
@@ -141,7 +140,7 @@ int umaskget() noex {
 	int		rs ;
 	int		rs1 ;
 	int		cmask = 0 ;
-	if ((rs = sigblocker_start(&b,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
 	    if ((rs = umask_init()) >= 0) {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	            if ((rs = ptm_lock(&uip->m)) >= 0) { /* single */
@@ -159,7 +158,6 @@ int umaskget() noex {
 	    rs1 = sigblocker_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
-
 	cmask &= INT_MAX ;
 	return (rs >= 0) ? cmask : rs ;
 }
@@ -171,7 +169,7 @@ int umaskset(mode_t cmask) noex {
 	int		rs ;
 	int		rs1 ;
 	int		omask = 0 ;
-	if ((rs = sigblocker_start(&b,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
 	    if ((rs = umask_init()) >= 0) {
 	        if ((rs = uc_forklockbegin(-1)) >= 0) { /* multi */
 	            if ((rs = ptm_lock(&uip->m)) >= 0) { /* single */

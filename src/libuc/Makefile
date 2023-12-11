@@ -178,7 +178,7 @@ OBJ070= isFailOpen.o isFailConn.o
 OBJ071= isnot.o iserror.o isoneof.o
 
 OBJ072= filebuf.o filebuf_writers.o filebuf_mailsupport.o
-OBJ073= inetpton.o perm.o sperm.o getprogpath.o findxfile.o xfile.o
+OBJ073= inetpton.o xperm.o getprogpath.o findxfile.o xfile.o
 OBJ074= vecstr.o vecstr_adduniqs.o vecstr_addpath.o
 OBJ075= vecstr_env.o vecstr_envfile.o vecstr_loadfile.o
 OBJ076= vecpstr.o vecpstr_loadfile.o vecpstr_addpath.o
@@ -1282,11 +1282,10 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 
 # UTILITY
-gidend.o:		gidend.cc gidend.hh
+getngroups.o:		getngroups.cc getngroups.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
-sperm.o:		sperm.cc xperm.h ids.h
-perm.o:			perm.c xperm.h ids.h
+xperm.o:		xperm.cc xperm.h ids.h
 isoneof.o:		isoneof.c isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h

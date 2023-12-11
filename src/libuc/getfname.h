@@ -26,14 +26,16 @@
 
 
 #ifdef	__cplusplus
+
 extern "C" {
-#endif
+    extern int getfname(cchar *,char *,int,cchar *,int = 0) noex ;
+}
+
+#else /* __cplusplus */
 
 extern int getfname(cchar *,char *,int,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+#endif /* __cplusplus */
 
 
 #endif /* GETFNAME_INCLUDE */
