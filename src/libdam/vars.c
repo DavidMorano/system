@@ -17,14 +17,15 @@
 
 /*******************************************************************************
 
+	Name:
+	vars
+
 	Description:
 	This subroutine opens and allows for reading or auditing
 	of a VAR database (which currently consists of two files).
 
 	Synopsis:
-	int vars_open(op,dbname)
-	VARS		*op ;
-	const char	dbname[] ;
+	int vars_open(VARS *op,cchar *dbname) noex
 
 	Arguments:
 	- op		object pointer

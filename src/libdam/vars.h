@@ -1,6 +1,9 @@
 /* vars INCLUDE */
 /* lang=C20 */
 
+/* read or audit a VAR database */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

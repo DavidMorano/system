@@ -1,5 +1,5 @@
 
-Part 1: Determine if a string of parens is balanced
+Part 1: Determine if a string of parentheses is balanced
 
 “” -> true
 “(“ -> false
@@ -66,7 +66,7 @@ std::set<std::string> Generate(const int N) {
 
     for (i = 0 ; i < (N-1) ; i += 1) {
       
-trysyting(res,N,s,ch) {
+trystring(res,N,s,ch) {
     if (s.length() == N) {
        if (isBal(s)) {
           res.push_back(s) ;
