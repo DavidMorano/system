@@ -26,9 +26,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<errno.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<cerrno>
+#include	<climits>
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

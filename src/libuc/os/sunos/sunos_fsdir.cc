@@ -38,10 +38,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/dirent.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<dirent.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

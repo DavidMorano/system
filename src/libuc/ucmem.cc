@@ -40,8 +40,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>		/* <- |CHAR_BIT| */
 #include	<unistd.h>
+#include	<climits>		/* <- |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

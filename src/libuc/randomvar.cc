@@ -51,10 +51,10 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<cfdec.h>
 #include	<randlc.h>

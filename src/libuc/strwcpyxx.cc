@@ -122,7 +122,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
+#include	<climits>
 #include	<cstddef>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<utypedefs.h>

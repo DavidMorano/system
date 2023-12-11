@@ -25,7 +25,7 @@
 #include	<sys/types.h>
 #include	<sys/msg.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>

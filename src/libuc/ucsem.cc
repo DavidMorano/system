@@ -31,8 +31,8 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
 #include	<semaphore.h>
+#include	<cerrno>
 #include	<cstring>
 #include	<usystem.h>
 #include	<utypedefs.h>

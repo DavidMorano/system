@@ -28,10 +28,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<semaphore.h>
-#include	<errno.h>
+#include	<cerrno>
+#include	<climits>
 #include	<usystem.h>
 #include	<localmisc.h>
 #include	<usupport.h>

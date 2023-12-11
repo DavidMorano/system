@@ -58,7 +58,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<limits.h>
+#include	<climits>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>

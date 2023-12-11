@@ -43,7 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
+#include	<climits>
 #include	<cstring>
 #include	<usystem.h>
 #include	<stdintx.h>

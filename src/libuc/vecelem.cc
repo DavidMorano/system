@@ -28,7 +28,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>

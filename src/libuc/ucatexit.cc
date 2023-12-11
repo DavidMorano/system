@@ -23,10 +23,10 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>		/* |atexit(3c)| */
-#include	<errno.h>
+#include	<cerrno>
+#include	<climits>
+#include	<cstdlib>		/* |atexit(3c)| */
 #include	<usystem.h>
 
 

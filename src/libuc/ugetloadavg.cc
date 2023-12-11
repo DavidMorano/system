@@ -69,7 +69,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>

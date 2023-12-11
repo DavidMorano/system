@@ -46,8 +46,8 @@
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<pthread.h>
-#include	<signal.h>
 #include	<unistd.h>
+#include	<csignal>
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>

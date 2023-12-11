@@ -31,9 +31,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<errno.h>
+#include	<cerrno>
+#include	<climits>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<stdintx.h>
 #include	<localmisc.h>

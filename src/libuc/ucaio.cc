@@ -46,7 +46,7 @@
 #include	<unistd.h>
 #include	<poll.h>
 #include	<aio.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>

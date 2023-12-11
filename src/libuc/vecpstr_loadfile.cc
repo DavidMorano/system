@@ -59,9 +59,9 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>		/* <- for |UCHAR_MAX| */
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

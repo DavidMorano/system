@@ -29,9 +29,9 @@
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 #include	<sys/types.h>
-#include	<errno.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<cerrno>
+#include	<climits>
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

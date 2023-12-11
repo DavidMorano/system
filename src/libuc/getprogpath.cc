@@ -43,7 +43,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -54,6 +54,8 @@
 #include	<strn.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
+
+#include	"getprogpath.h"
 
 
 /* local defines */

@@ -87,7 +87,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>

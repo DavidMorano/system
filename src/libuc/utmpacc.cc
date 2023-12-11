@@ -52,8 +52,8 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>		/* for |getsid(3c)| */
+#include	<climits>
 #include	<cstring>
 #include	<atomic>
 #include	<usystem.h>

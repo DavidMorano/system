@@ -38,7 +38,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstring>
 #include	<usystem.h>
 #include	<char.h>

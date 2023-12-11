@@ -1,7 +1,7 @@
-/* mkquoted INCLUDE */
+/* getprogpath INCLUDE */
 /* lang=C20 */
 
-/* Make-a-Quoted c-string (from a source c-string) */
+/* convert a single character to a given case */
 /* version %I% last-modified %G% */
 
 
@@ -14,26 +14,27 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MKQUOTED_INCLUDE
-#define	MKQUOTED_INCLUDE
+#ifndef	GETPROGPATH_INCLUDE
+#define	GETPROGPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<char.h>
 
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int mkquoted(char *,int,cchar *,int) noex ;
+extern int getprogpath(ids *,vecstr *,char *,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-#endif /* MKQUOTED_INCLUDE */
+#endif /* GETPROGPATH_INCLUDE */
 
 

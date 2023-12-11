@@ -36,9 +36,9 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>

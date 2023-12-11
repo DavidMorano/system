@@ -57,7 +57,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<climits>
 #include	<usystem.h>
 #include	<usupport.h>

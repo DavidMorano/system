@@ -73,8 +73,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstring>
 #include	<usystem.h>
 #include	<timewatch.hh>

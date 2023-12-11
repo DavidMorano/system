@@ -43,7 +43,7 @@
 #include	<sys/types.h>
 #include	<sys/random.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>

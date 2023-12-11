@@ -29,8 +29,8 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<errno.h>
-#include	<limits.h>
+#include	<cerrno>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<utypedefs.h>

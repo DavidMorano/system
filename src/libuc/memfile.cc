@@ -26,9 +26,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>

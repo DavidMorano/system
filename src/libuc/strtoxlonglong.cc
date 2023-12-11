@@ -68,9 +68,9 @@
 
 #include <envstandards.h>	/* compilation-environment configuration */
 #include <sys/types.h>
-#include <errno.h>
-#include <limits.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
 #include <ctype.h>
 #include <clanguage.h>
 #include <stdintx.h>
