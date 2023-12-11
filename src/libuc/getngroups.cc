@@ -83,7 +83,7 @@ namespace {
 	atomic_int	ng ;
 	operator int () noex ;
 	int operator () (int) noex ;
-    } ;
+    } ; /* end struct (groupinfo) */
 }
 
 

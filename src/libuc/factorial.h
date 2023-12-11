@@ -1,7 +1,7 @@
-/* fibonacci INCLUDE */
+/* factorial INCLUDE */
 /* lang=C20 */
 
-/* calculate fibonacci */
+/* calculate factorial */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	FIBONACCI_INCLUDE
-#define	FIBONACCI_INCLUDE
+#ifndef	FACTORIAL_INCLUDE
+#define	FACTORIAL_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,13 +28,13 @@
 extern "C" {
 #endif
 
-extern long fibonacci(int) noex ;
+extern long factorial(int) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-#endif /* FIBONACCI_INCLUDE */
+#endif /* FACTORIAL_INCLUDE */
 
 

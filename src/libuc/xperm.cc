@@ -79,13 +79,14 @@ namespace {
 	gid_t		*gids ;
 	uid_t		euid ;
 	gid_t		egid ;
-	int		f_gidalloc ;
-	int start(uid_t eu,gid_t eg,gid_t *gids) noex ;
+	bool		f_gidalloc = false ;
+	int start() noex ;
 	int root(USTAT *,int) noex ;
 	int user(USTAT *,int) noex ;
 	int grp(USTAT *,int) noex ;
 	int other(USTAT *,int) noex ;
 	int finish() noex ;
+	tryer(uid_t,gid_t,gid_t *) noex ;
     } ; /* end struct (tryer) */
 }
 
@@ -159,9 +160,9 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 	if (sbp) {
 	    rs = SR_OK ;
 	    if (am != 0) {
-	        tryer	t{} ;
+	        tryer	t(euid,egid,gids) ;
 	        am &= 007 ;
-	        if ((rs = t.start(euid,egid,gids)) >= 0) {
+	        if ((rs = t.start()) >= 0) {
 	            for (int i = 0 ; tries[i] ; i += 1) {
 			tryer_f	m = tries[i] ;
 	                rs = (t.*m)(sbp,am) ;
@@ -177,13 +178,17 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 }
 /* end subroutine (permer) */
 
-int tryer::start(uid_t eu,gid_t eg,gid_t *gs) noex {
+tryer::tryer(uid_t eu,gid_t eg,gid_t *gs) noex {
+	    if (eu == uidend) eu = geteuid() ;
+	    if (eg == gidend) eg = getegid() ;
+	    gids = gs ;
+	    euid = eu ;
+	    egid = eg ;
+}
+/* end method (tryer::ctor) */
+
+int tryer::start() noex {
 	int		rs  ;
-	if (eu == uidend) eu = geteuid() ;
-	if (eg == gidend) eg = getegid() ;
-	euid = eu ;
-	egid = eg ;
-	gids = gs ;
 	if ((rs = getngroups()) >= 0) {
 	    cint	ng = rs ;
 	    if (gids == nullptr) {
