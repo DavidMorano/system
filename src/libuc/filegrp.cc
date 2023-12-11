@@ -23,7 +23,7 @@
 #include	<envstandards.h>	/* operating-system configuration */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<time.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strken(3c)| */
 #include	<grp.h>
