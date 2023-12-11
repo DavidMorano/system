@@ -72,33 +72,37 @@ extern int	getngroups() noex ;
 
 /* local structures */
 
-struct tryer {
+namespace {
+    struct tryer ;
+    typedef int (tryer::*tryer_f)(USTAT *,int) noex ;
+    struct tryer {
 	gid_t		*gids ;
 	uid_t		euid ;
 	gid_t		egid ;
 	int		f_gidalloc ;
-} ;
+	int start(uid_t eu,gid_t eg,gid_t *gids) noex ;
+	int root(USTAT *,int) noex ;
+	int user(USTAT *,int) noex ;
+	int grp(USTAT *,int) noex ;
+	int other(USTAT *,int) noex ;
+	int finish() noex ;
+	
+    } ; /* end struct (tryer) */
+}
 
 
 /* forward references */
 
 static int permer(USTAT *,uid_t,gid_t,gid_t *,int) noex ;
 
-static int try_start(TRYER *,uid_t,gid_t,gid_t *) noex ;
-static int try_finish(TRYER *) noex ;
-static int try_root(TRYER *,USTAT *,int) noex ;
-static int try_user(TRYER *,USTAT *,int) noex ;
-static int try_group(TRYER *,USTAT *,int) noex ;
-static int try_other(TRYER *,USTAT *,int) noex ;
-
 
 /* local variables */
 
-static int	(*tries[])(TRYER *,USTAT *,int) = {
-	try_root,
-	try_user,
-	try_group,
-	try_other,
+static tryer_f tries[] = {
+	&tryer::root,
+	&tryer::user,
+	&tryer::grp,
+	&tryer::other,
 	nullptr
 } ;
 
@@ -158,89 +162,90 @@ static int permer(USTAT *sbp,uid_t euid,gid_t egid,gid_t *gids,int am) noex {
 	    if (am != 0) {
 	        TRYER	t{} ;
 	        am &= 007 ;
-	        if ((rs = try_start(&t,euid,egid,gids)) >= 0) {
+	        if ((rs = t.start(euid,egid,gids)) >= 0) {
 	            for (int i = 0 ; tries[i] ; i += 1) {
-	                rs = (*tries[i])(&t,sbp,am) ;
+			tryer_f	m = tries[i] ;
+	                rs = (t.*m)(sbp,am) ;
 	                if (rs != 0) break ;
 	            } /* end for */
 	            if (rs == 0) rs = SR_ACCESS ;
-	            rs1 = try_finish(&t) ;
+	            rs1 = t.finish() ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (try) */
 	    } /* end if (access mode) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (perm) */
+/* end subroutine (permer) */
 
-static int try_start(TRYER *tip,uid_t eu,gid_t eg,gid_t *gids) noex {
+int tryer::start(uid_t eu,gid_t eg,gid_t *gs) noex {
 	int		rs  ;
 	if (eu == uidany) eu = geteuid() ;
 	if (eg == gidany) eg = getegid() ;
-	tip->euid = eu ;
-	tip->egid = eg ;
-	tip->gids = gids ;
+	euid = eu ;
+	egid = eg ;
+	gids = gs ;
 	if ((rs = getngroups()) >= 0) {
 	    cint	n = rs ;
 	    if (gids == nullptr) {
 	        cint	gsize = ((n+1)*sizeof(gid_t)) ;
-	        void	*p = nullptr ;
-	        if ((rs = uc_libmalloc(gsize,&p)) >= 0) {
-		    tip->gids = (gid_t *) p ;
-		    tip->f_gidalloc = true ;
-	            if ((rs = u_getgroups(n,tip->gids)) >= 0) {
-		        tip->gids[rs] = -1 ;
+	        void	*vp{} ;
+	        if ((rs = uc_libmalloc(gsize,&vp)) >= 0) {
+		    gids = (gid_t *) vp ;
+		    f_gidalloc = true ;
+	            if ((rs = u_getgroups(n,gids)) >= 0) {
+		        gids[rs] = -1 ;
 		    }
 		    if (rs < 0) {
-		        uc_libfree(tip->gids) ;
-		        tip->gids = nullptr ;
-		        tip->f_gidalloc = false ;
+		        uc_libfree(gids) ;
+		        gids = nullptr ;
+		        f_gidalloc = false ;
 	            }
 	        }
 	    } /* end if (empty GIDs) */
 	} /* end if (getngroups) */
 	return rs ;
 }
-/* end subroutine (try_start) */
+/* end method (tryer::start) */
 
-static int try_finish(TRYER *tip) noex {
+int tryer::finish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (tip->f_gidalloc) {
-	    tip->f_gidalloc = false ;
-	    rs1 = uc_libfree(tip->gids) ;
+	if (f_gidalloc) {
+	    f_gidalloc = false ;
+	    rs1 = uc_libfree(gids) ;
 	    if (rs >= 0) rs = rs1 ;
-	    tip->gids = nullptr ;
+	    gids = nullptr ;
 	}
 	return rs ;
 }
-/* end subroutine (try_finish) */
+/* end method (tryer::finish) */
 
-static int try_root(TRYER *tip,USTAT *,int) noex {
-	return (tip->euid == 0) ;
+int tryer::root(USTAT *,int) noex {
+	return (euid == 0) ;
 }
-/* end subroutine (try_root) */
+/* end method (try_root) */
 
-static int try_user(TRYER *tip,USTAT *sbp,int am) noex {
+int tryer::user(USTAT *sbp,int am) noex {
 	int		rs = SR_OK ;
-	if (tip->euid == sbp->st_uid) {
+	if (euid == sbp->st_uid) {
 	    cint	um = (sbp->st_mode >> 6) ;
 	    rs = ((um & am) == am) ? 1 : SR_ACCES ;
 	}
 	return rs ;
 }
-/* end subroutine (try_user) */
+/* end method (tryer::user) */
 
-static int try_group(TRYER *tip,USTAT *sbp,int am) noex {
+int tryer::grp(USTAT *sbp,int am) noex {
 	int		rs = SR_OK ;
 	int		gm ;
 	gm = (sbp->st_mode >> 3) ;
-	if (tip->egid == sbp->st_gid) {
+	if (egid == sbp->st_gid) {
 	    rs = ((gm & am) == am) ? 1 : SR_ACCES ;
-	} else if (tip->gids != nullptr) {
+	} else if (gids != nullptr) {
 	    bool	f = false ;
-	    for (int i = 0 ; tip->gids[i] != gidany ; i += 1) {
-	        f = (sbp->st_gid == tip->gids[i]) ;
+	    for (int i = 0 ; gids[i] != gidany ; i += 1) {
+	        f = (sbp->st_gid == gids[i]) ;
 		if (f) break ;
 	    } /* end for */
 	    if (f) {
@@ -249,12 +254,12 @@ static int try_group(TRYER *tip,USTAT *sbp,int am) noex {
 	}
 	return rs ;
 }
-/* end subroutine (try_group) */
+/* end method (tryer::group) */
 
-static int try_other(TRYER *,USTAT *sbp,int am) noex {
+int tryer::other(USTAT *sbp,int am) noex {
 	cint		om = sbp->st_mode ;
 	return ((om & am) == am) ;
 }
-/* end subroutine (try_other) */
+/* end method (tryer::other) */
 
 

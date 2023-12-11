@@ -10,14 +10,18 @@
 	= 1998-07-01, David A­D­ Morano
 	This subroutine was originally written.
 
+	= 2023-12-11,
+	I switched to using C++11 |atomic|.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2023 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	Name:
 	getngroups
+	getngroupsx
 
 	Description:
 	Here we get the maximum number of supplemtary groups (GIDs)
@@ -30,9 +34,10 @@
 
 	Synopsis:
 	int getngroups() noex
+	int getngroupsx(int cmd) noex
 
 	Arguments:
-	-
+	cmd		command for |getngroupsx| (0=get, 1=invalidate)
 
 	Returns:
 	<0		error (errno)
