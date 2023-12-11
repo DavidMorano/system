@@ -1,5 +1,5 @@
 /* getngroups */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get the maximum number of supplemetary groups allowed per process */
 /* version %I% last-modified %G% */
@@ -45,14 +45,24 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
+#include	<atomic>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"getngroups.h"
 
 
 /* local defines */
 
-#define	GETNGROUPS	struct getngroups
+
+/* local namespaces */
+
+using std::atomic_int ;
+using std::memory_order_relaxed ;
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -63,9 +73,13 @@
 
 /* local structures */
 
-struct getngroups {
-	int		n ;
-} ;
+namespace {
+    struct groupinfo {
+	atomic_int	ng ;
+	operator int () noex ;
+	int operator () (int) noex ;
+    } ;
+}
 
 
 /* forward references */
@@ -73,22 +87,48 @@ struct getngroups {
 
 /* local variables */
 
-static GETNGROUPS	getngroups_data ;
+static groupinfo	getngroups_data ;
 
 
 /* exported subroutines */
 
 int getngroups() noex {
-	GETNGROUPS	*gnp = &getngroups_data ;
+	return getngroups_data ;
+}
+/* end subroutine (getngroups) */
+
+int getngroupsx(int x) noex {
+	return getngroups_data(x) ;
+}
+/* end subroutine (getngroups) */
+
+
+/* local subroutines */
+
+groupinfo::operator int () noex {
 	int		rs ;
-	if ((rs = gnp->n) == 0) {
+	if ((rs = ng) == 0) {
 	    cint	cmd = _SC_NGROUPS_MAX ;
 	    if ((rs = uc_confsys(cmd,nullptr)) >= 0) {
-	        gnp->n = rs ;
+	        ng = rs ;
 	    }
 	} /* end if (needed value) */
 	return rs ;
 }
-/* end subroutine (getngroups) */
+/* end method (groupinfo::operator) */
+
+int groupinfo::operator () (int x) noex {
+	int		rs = SR_INVALID ;
+	switch (x) {
+	case 0:
+	    rs = (*this) ;
+	    break ;
+	case 1:
+	    rs = ng.exchange(0,memord_relaxed) ;
+	    break ;
+	} /* end switch */
+	return rs ;
+}
+/* end method (groupinfo::operator) */
 
 

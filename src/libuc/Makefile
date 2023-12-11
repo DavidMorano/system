@@ -1282,6 +1282,7 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 
 # UTILITY
+getngroups.o:		getngroups.cc getngroups.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
 xperm.o:		xperm.cc xperm.h ids.h
