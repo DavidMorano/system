@@ -1,11 +1,10 @@
 /* hdbstr_loadfile2 */
+/* lang=C++20 */
 
 /* load strings from a file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,27 +17,24 @@
 
 /*****************************************************************************
 
-        This subroutine will read (process) a file and put all of the strings
-        found into the string (supplied) list, consisting of an HDBSTR object.
+	This subroutine will read (process) a file and put all of
+	the strings found into the string (supplied) list, consisting
+	of an HDBSTR object.
 
 	Note: 
-        This is NOT the same as 'vecstr_loadfile(3dam)'! This subroutine only
-        reads the first TWO strings on the line and puts them into the hash DB
-        as key-value pairs! If there is only one string on a line, it is a key
-        without a value.
-
+	This is NOT the same as 'vecstr_loadfile(3dam)'! This
+	subroutine only reads the first TWO strings on the line and
+	puts them into the hash DB as key-value pairs! If there is
+	only one string on a line, it is a key without a value.
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>

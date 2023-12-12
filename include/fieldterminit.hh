@@ -40,7 +40,7 @@
 
 
 #include	<envstandards.h>
-#include	<limits.h>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>

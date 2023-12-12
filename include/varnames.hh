@@ -19,7 +19,6 @@
 	This object contains various commonly used environment variable
 	names.
 
-
 *******************************************************************************/
 
 #ifndef	VARNAMES_INCLUDE

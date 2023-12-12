@@ -121,7 +121,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
 #include	<algorithm>

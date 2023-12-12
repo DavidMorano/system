@@ -34,7 +34,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstring>
 #include	<usystem.h>
 #include	<vecpstr.h>

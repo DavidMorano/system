@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* convert an integer value into a c-string, given a value and base */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -56,9 +57,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<bit>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<varnames.hh>
 #include	<stdintx.h>
-#include	<clanguage.h>
 #include	<localmisc.h>
 
 

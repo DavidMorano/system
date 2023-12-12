@@ -22,7 +22,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>		/* <- for |CHAR_BIT| */
+#include	<climits>		/* <- for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<bit>

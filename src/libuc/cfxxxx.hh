@@ -47,27 +47,23 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucvariables.hh>
 #include	<stdintx.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<snwcpy.h>
+#include	<sfx.h>
 #include	<ischarx.h>
+#include	<checkbase.h>
 #include	<localmisc.h>
-#include	<ucvariables.hh>
 
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
 
 extern "C" {
-    extern int snwcpyshrink(char *,int,cchar *,int) noex ;
-    extern int sfshrink(cchar *,int,cchar **) noex ;
-    extern int checkbase(cchar *,int,int) noex ;
+    typedef int (*snwcpy_f)(char *,int,cc *,int) noex ;
 }
 
 /* max for |int256_t| + sign */
@@ -95,10 +91,9 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 		    nsl = r ;
 		} /* end if */
 	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) {
-		    typedef int (*loadf)(char *,int,cc *,int) ;
 		    if (sp[sl] != '\0') {
-			loadf	load = snwcpyshrink ;
-			cint	dlen = nsl ;
+			snwcpy_f	load = snwcpyshrink ;
+			cint		dlen = nsl ;
 	                if (nsl <= cfxxxx_maxstack) {
 	                    char	dbuf[dlen+1] ;
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {

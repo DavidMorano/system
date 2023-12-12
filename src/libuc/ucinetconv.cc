@@ -69,7 +69,7 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<usystem.h>
 #include	<uinet.h>

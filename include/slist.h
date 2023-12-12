@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* regular (no-frills) pointer queue */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -42,24 +43,27 @@ struct slist_head {
 	int		count ;
 } ;
 
+typedef	SLIST		slist ;
+typedef	SLIST_ENT	slist_ent ;
+typedef	SLIST_CUR	slist_cur ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int slist_start(SLIST *) noex ;
-extern int slist_ins(SLIST *,SLIST_ENT *) noex ;
-extern int slist_insgroup(SLIST *,SLIST_ENT *,int,int) noex ;
-extern int slist_present(SLIST *,SLIST_ENT *) noex ;
-extern int slist_gettail(SLIST *,SLIST_ENT **) noex ;
-extern int slist_rem(SLIST *,SLIST_ENT **) noex ;
-extern int slist_unlink(SLIST *,SLIST_ENT *) noex ;
-extern int slist_curbegin(SLIST *,SLIST_CUR *) noex ;
-extern int slist_curend(SLIST *,SLIST_CUR *) noex ;
-extern int slist_enum(SLIST *,SLIST_CUR *,SLIST_ENT **) noex ;
-extern int slist_count(SLIST *) noex ;
-extern int slist_audit(SLIST *) noex ;
-extern int slist_finish(SLIST *) noex ;
+extern int slist_start(slist *) noex ;
+extern int slist_ins(slist *,slist_ent *) noex ;
+extern int slist_insgroup(slist *,slist_ent *,int,int) noex ;
+extern int slist_present(slist *,slist_ent *) noex ;
+extern int slist_gettail(slist *,slist_ent **) noex ;
+extern int slist_rem(slist *,slist_ent **) noex ;
+extern int slist_unlink(slist *,slist_ent *) noex ;
+extern int slist_curbegin(slist *,slist_cur *) noex ;
+extern int slist_curend(slist *,slist_cur *) noex ;
+extern int slist_enum(slist *,slist_cur *,slist_ent **) noex ;
+extern int slist_count(slist *) noex ;
+extern int slist_audit(slist *) noex ;
+extern int slist_finish(slist *) noex ;
 
 #ifdef	__cplusplus
 }

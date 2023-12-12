@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* provide buffer sizes for c-string digits */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

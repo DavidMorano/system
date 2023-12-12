@@ -92,9 +92,9 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>		/* <- for |getdtablesize(3c)| */
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

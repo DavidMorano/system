@@ -26,10 +26,10 @@
 #include	<envstandards.h>	/* <- system configuration */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |memcpy(3c)| */
 #include	<netdb.h>

@@ -38,12 +38,12 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/dirent.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<new>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<snwcpy.h>

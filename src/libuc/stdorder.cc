@@ -39,8 +39,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdint.h>
+#include	<climits>
+#include	<cstdint>
 #include	<stdintx.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>

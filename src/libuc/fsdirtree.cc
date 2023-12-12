@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* file-system directory tree (traversing) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -50,13 +51,12 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<fcntl.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
+#include	<cstdint>
 #include	<cstring>
-#include	<cinttypes>
-#include	<cctype>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<fsdir.h>

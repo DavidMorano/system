@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* this provides a variable with a buffer-size */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

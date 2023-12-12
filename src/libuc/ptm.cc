@@ -22,8 +22,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<pthread.h>
+#include	<climits>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<utimeout.h>

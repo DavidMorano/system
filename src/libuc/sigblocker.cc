@@ -23,7 +23,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<usystem.h>
 #include	<localmisc.h>
 

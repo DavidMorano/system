@@ -26,13 +26,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<climits>
 #include	<cstdlib>
-#include	<cstring>
 #include	<cstdarg>
+#include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
 #include	<usupport.h>

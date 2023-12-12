@@ -74,10 +74,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<signal.h>
-#include	<time.h>
+#include	<csignal>
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| */
+#include	<ctime>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<sigblocker.h>

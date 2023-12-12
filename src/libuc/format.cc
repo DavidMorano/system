@@ -98,6 +98,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstdlib>
+#include	<cstdint>
 #include	<cstring>
 #include	<wchar.h>
 #include	<stdarg.h>
@@ -133,7 +134,7 @@
 #define	FD_WRITE	4
 
 #undef	CH_BADSUB
-#define	CH_BADSUB	'Â¿'
+#define	CH_BADSUB	'¿'
 
 #ifndef	SWUCHAR
 #define	SWUCHAR(ch)	((ch) & 0xff)

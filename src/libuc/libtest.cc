@@ -13,7 +13,7 @@ using namespace std ;
 
 extern "C" {
     extern void sub() noex ;
-    extern void exit(int) ;
+    extern void exit(int) noex ;
 }
 
 extern "C" {

@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* convert a decimal digit string to its binary integer value */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,6 +20,10 @@
 
 
 *******************************************************************************/
+
+#ifndef	CFCHARSX_INCLUDE
+#define	CFCHARSX_INCLUDE
+
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<charconv>
@@ -57,5 +62,8 @@ int cfcharsx(cchar *sp,int sl,int b,T *rp) noex {
 	return rs ;
 }
 /* end subroutine-template (cfcharsx) */
+
+
+#endif /* CFCHARSX_INCLUDE */
 
 

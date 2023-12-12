@@ -34,8 +34,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<errno.h>
 #include	<fcntl.h>
+#include	<cerrno>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>

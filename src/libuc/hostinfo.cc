@@ -51,7 +51,7 @@
 #include	<strn.h>
 #include	<snxxx.h>
 #include	<sncpyx.h>
-#include	<snwcpyx.h>
+#include	<snwcpy.h>
 #include	<nleadstr.h>
 #include	<inetconv.h>
 #include	<isinetaddr.h>
@@ -206,6 +206,7 @@ static constexpr const struct known	knowns[] = {
 
 static bufsizevar	maxhostlen(getbufsize_hn) ;
 
+constexpr int		af0 = AF_UNSPEC ;
 constexpr int		af4 = AF_INET4 ;
 constexpr int		af6 = AF_INET6 ;
 
@@ -213,11 +214,11 @@ constexpr bool		f_hostbyname = CF_HOSTBYNAME ;
 constexpr bool		f_fastaddr = CF_FASTADDR ;
 
 static inline bool isaf4(int a) noex {
-	return ((a == AF_UNSPEC) || (a == af4)) ;
+	return ((a == af0) || (a == af4)) ;
 }
 
 static inline bool isaf6(int a) noex {
-	return ((a == AF_UNSPEC) || (a == af6)) ;
+	return ((a == af0) || (a == af6)) ;
 }
 
 
@@ -239,11 +240,11 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 	                    if ((rs = vecobj_start(alp,osz,10,vo)) >= 0) {
 	                        rs = 0 ;
 	                        if (isaf4(af)) {
-	                            rs = getinet(op,AF_INET4) ;
+	                            rs = getinet(op,af4) ;
 	                        }
 	                        if (rs == 0) {
 			            if (isaf6(af)) {
-	                                rs = getinet(op,AF_INET6) ;
+	                                rs = getinet(op,af6) ;
 			            }
 	                        }
 	                        if (rs >= 0) {
@@ -424,10 +425,10 @@ int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	                    rs = SR_OK ;
 	                    if ((! op->f.inet4) || (! op->f.inet6)) {
 	                        if ((rs == 0) && (! op->f.inet4)) {
-	                            rs = getinet(op,AF_INET4) ;
+	                            rs = getinet(op,af4) ;
 	                        }
 	                        if ((rs == 0) && (! op->f.inet6)) {
-	                            rs = getinet(op,AF_INET6) ;
+	                            rs = getinet(op,af6) ;
 	                        }
 	                        f_exit = (rs == 0) ;
 	                    } else {
@@ -487,10 +488,10 @@ int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	                    rs = SR_OK ;
 	                    if ((op->f.inet4) || (! op->f.inet6)) {
 	                        if ((rs == 0) && (! op->f.inet4)) {
-	                            rs = getinet(op,AF_INET4) ;
+	                            rs = getinet(op,af4) ;
 	                        }
 	                        if ((rs == 0) && (! op->f.inet6)) {
-	                            rs = getinet(op,AF_INET6) ;
+	                            rs = getinet(op,af6) ;
 	                        }
 	                        f_exit = (rs == 0) ;
 	                    } else {
@@ -643,10 +644,10 @@ static int hostinfo_findcanonical(hostinfo *op) noex {
 	            rs = SR_OK ;
 	            if ((! op->f.inet4) || (! op->f.inet6)) {
 	                if ((rs == 0) && (! op->f.inet4)) {
-	                    rs = getinet(op,AF_INET4) ;
+	                    rs = getinet(op,af4) ;
 	                }
 	                if ((rs == 0) && (! op->f.inet6)) {
-	                    rs = getinet(op,AF_INET6) ;
+	                    rs = getinet(op,af6) ;
 	                }
 	                f_continue = (rs > 0) ;
 	            } else {
@@ -689,7 +690,7 @@ static int hostinfo_getname(hostinfo *op,int af,cchar *name) noex {
 	int		c = 0 ;
 	bool		f_inet4 = false ;
 	if constexpr (f_hostbyname) {
-	    f_inet4 = (af == AF_INET4) ;
+	    f_inet4 = (af == af4) ;
 	}
 	if ((rs = getbufsize(getbufsize_ho)) >= 0) {
 	    HOSTENT	he, *hep = nullptr ;
@@ -741,7 +742,7 @@ static int hostinfo_getaddr(hostinfo *op,int af) noex {
 	int		c = 0 ;
 	bool		f_inet4 = false ;
 	if constexpr (f_hostbyname) {
-	    f_inet4 = (af == AF_INET4) ;
+	    f_inet4 = (af == af4 ) ;
 	}
 	if (op->f.addr && (af == op->addr.af)) {
 	    if ((rs = getbufsize(getbufsize_ho)) >= 0) {
@@ -964,7 +965,7 @@ static int getinet(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ; /* count-of-names */
 	if (af > 0) {
-	    if ((op->arg.af == AF_UNSPEC) || (op->arg.af == af)) {
+	    if ((op->arg.af == af0) || (op->arg.af == af)) {
 	        switch (af) {
 	        case AF_INET4:
 	            op->f.inet4 = true ; /* mark as tried */
@@ -1124,7 +1125,7 @@ static int getinet_known(hostinfo *op,int af) noex {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
 	}
 	if ((rs >= 0) && f_continue) {
-	    if ((af == AF_UNSPEC) || (af == AF_INET4)) {
+	    if ((af == af0) || (af == af4)) {
 	        if ((rs = hostinfo_domain(op)) >= 0) {
 	            cint	hlen = MAXHOSTNAMELEN ;
 	            int		nl ;

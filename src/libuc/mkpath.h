@@ -21,10 +21,9 @@
 #include	<envstandards.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
-#include	<mknpathx.h>
-#include	<mknpathxw.h>
 
 
 #endif /* MKPATH_INCLUDE */

@@ -2,7 +2,7 @@
 /* lang=C++20 */
 
 #include	<envstandards.h>	/* <- configure for syhstem */
-#include	<limits.h>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstdio>
 #include	<cstring>
 #include	<iostream>

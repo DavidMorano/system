@@ -32,7 +32,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
+#include	<climits>
 #include	<cstring>
 #include	<bitset>
 #include	<utypedefs.h>

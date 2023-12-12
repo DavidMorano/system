@@ -29,12 +29,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<intfloor.h>

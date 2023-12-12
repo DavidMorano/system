@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

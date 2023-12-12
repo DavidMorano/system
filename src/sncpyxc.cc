@@ -23,7 +23,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<utypedefs.h>
 #include	<usysrets.h>
 #include	<clanguage.h>

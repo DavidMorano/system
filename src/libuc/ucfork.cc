@@ -34,7 +34,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>

@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -31,10 +32,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<utimeout.h>
 #include	<usupport.h>
@@ -57,7 +58,7 @@
 
 struct uctimer ;
 
-typedef int (uctimer::*mem_f)(timer_t) ;
+typedef int (uctimer::*mem_f)(timer_t) noex ;
 
 struct uctimer {
 	mem_f		m ;

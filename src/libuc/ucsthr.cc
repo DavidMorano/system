@@ -66,7 +66,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<thread.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<csignal>
 #include	<cstring>
 #include	<usystem.h>

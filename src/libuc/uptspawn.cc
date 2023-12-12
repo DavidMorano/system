@@ -25,7 +25,6 @@
 	module.  This module contains the subroutine |utpspawn()|.
 
 	Name:
-
 	int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t *start,
 		void *op,void *arg) noex
 
@@ -46,8 +45,8 @@
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<pthread.h>
-#include	<signal.h>
 #include	<unistd.h>
+#include	<csignal>
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>

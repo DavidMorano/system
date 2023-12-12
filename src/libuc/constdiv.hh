@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* perform divion of a 32-bit value by a constant w/o using division */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -72,7 +73,7 @@ struct constdiv {
 		} until (!((q1 < delta) || (q1 == delta && r1 == 0))) ;
 		m = q2 + 1 ;
 		s = p - 32 ;
-	    } /* end if (valild divisor) */
+	    } /* end if (valid divisor) */
 	} ; /* end constructor */
 	constexpr uint operator () (uint n) noex {
 	    ulong	hi = ulong((ulong(m) * ulong(n)) >> 32) ;

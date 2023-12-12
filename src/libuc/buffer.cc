@@ -49,10 +49,10 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstdlib>
-#include	<cstring>
 #include	<cstdarg>
+#include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
 #include	<usupport.h>

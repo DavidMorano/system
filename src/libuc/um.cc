@@ -60,7 +60,7 @@
 #include	<sys/types.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>

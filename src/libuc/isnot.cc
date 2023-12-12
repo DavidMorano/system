@@ -1,4 +1,4 @@
-/* isNot */
+/* isnot */
 /* lang=C++20 */
 
 /* determine if a file is not present from its return-status */
