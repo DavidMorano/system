@@ -25,7 +25,6 @@
 	module.  This module contains the subroutine |utpspawn()|.
 
 	Name:
-
 	int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t *start,
 		void *op,void *arg) noex
 

@@ -72,15 +72,16 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<time.h>
-#include	<signal>
+#include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<sncpyx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"ucproguser.h"
@@ -99,10 +100,6 @@ typedef volatile sig_atomic_t	vaflag ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	isNotPresent(int) noex ;
-}
 
 
 /* external variables */
@@ -160,6 +157,7 @@ int ucproguser_init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! uip->f_void) {
+	    rs = SR_OK ;
 	    if (! uip->f_init) {
 	        uip->f_init = true ;
 	        if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
@@ -273,7 +271,7 @@ int ucproguser_nameset(cchar *cbuf,int clen,uid_t uid,int ttl) noex {
 	        if (ttl < 0) ttl = TO_TTL ;
 	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
 	            if ((rs = ucproguser_init()) >= 0) {
-			typedef int (*un_f)(UPROGUSER *,cchar *,int) ;
+			typedef int (*un_f)(UPROGUSER *,cchar *,int) noex ;
 	                UPROGUSER	*uip = &ucproguser_data ;
 	                if ((rs = uc_forklockbegin(-1)) >= 0) {
 	                    if ((rs = ptm_lock(&uip->m)) >= 0) {

@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* will an addition (generic) overflow? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,7 +16,12 @@
 
 /******************************************************************************
 
-	This generic subroutine will determine if an addition will overflow.
+	Name:
+	willAddOver
+
+	Description:
+	This generic subroutine will determine if an addition will
+	overflow.
 
 	Synopsis:
 	int willAddOver(T n1, T n2)
@@ -30,9 +36,15 @@
 
 ******************************************************************************/
 
+#ifndef	WILLADDOVER_INCLUDE
+#define	WILLADDOVER_INCLUDE
+
+
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<valuelimits.hh>
 #include	<localmisc.h>
 
@@ -72,5 +84,8 @@ int willAddOver(T n1,T n2) noex {
 	return f ;
 }
 /* end subroutine (willAddOver) */
+
+
+#endif /* WILLADDOVER_INCLUDE */
 
 

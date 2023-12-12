@@ -22,9 +22,7 @@
 	This simple object provides a facility to watch variables
 	for changes.
 
-
 *******************************************************************************/
-
 
 #ifndef	TIMEWATCH_INCLUDE
 #define	TIMEWATCH_INCLUDE

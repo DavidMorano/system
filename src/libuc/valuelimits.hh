@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
+#include	<climits>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>

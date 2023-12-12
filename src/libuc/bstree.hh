@@ -77,7 +77,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<new>
 #include	<initializer_list>
 #include	<algorithm>

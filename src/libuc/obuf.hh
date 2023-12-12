@@ -20,9 +20,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<string>		/* <- C++ |string| */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 

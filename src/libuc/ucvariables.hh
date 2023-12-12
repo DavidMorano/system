@@ -4,6 +4,7 @@
 /* this is a database of commonly used environment variable names */
 /* version %I% last-modified %G% */
 
+
 /* revision history:
 
 	= 2001-04-11, David A-D- Morano

@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -37,7 +38,6 @@
 
 	Subroutines to convert digit strings to binary integers.
 
-
 *******************************************************************************/
 
 #ifndef	CFDIGX_INCLUDE
@@ -46,28 +46,23 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<bit>
 #include	<usystem.h>
 #include	<stdintx.h>
 #include	<char.h>
-#include	<sfstr.h>
-#include	<localmisc.h>
+#include	<sfx.h>
 #include	<ucvariables.hh>
+#include	<checkbase.h>
+#include	<localmisc.h>
 
 
 #ifndef	TYPEDEF_CC
 #define	TYPEDEF_CC
 typedef const char	cc ;
 #endif
-
-extern "C" {
-    extern int snwcpyshrink(char *,int,cchar *,int) noex ;
-    extern int sfshrink(cchar *,int,cchar **) noex ;
-    extern int checkbase(cchar *,int,int) noex ;
-}
 
 inline bool iszero(int ch) noex {
 	ch &= 0xFF ;

@@ -47,28 +47,20 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucvariables.hh>
 #include	<stdintx.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<snwcpy.h>
+#include	<sfx.h>
 #include	<ischarx.h>
+#include	<checkbase.h>
 #include	<localmisc.h>
-#include	<ucvariables.hh>
 
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
-extern "C" {
-    extern int snwcpyshrink(char *,int,cchar *,int) noex ;
-    extern int sfshrink(cchar *,int,cchar **) noex ;
-    extern int checkbase(cchar *,int,int) noex ;
-}
 
 /* max for |int256_t| + sign */
 inline constexpr int	cfxxxx_maxstack = (256+1) ;
