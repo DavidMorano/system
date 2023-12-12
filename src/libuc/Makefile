@@ -1206,8 +1206,8 @@ sfx.o:			sfx.dir
 sfx.dir:
 	makebelow $@
 
-snwcpyx.o:		snwcpyx.dir
-snwcpyx.dir:
+snwcpy.o:		snwcpy.dir
+snwcpy.dir:
 	makebelow $@
 
 # UCENT
