@@ -16,13 +16,32 @@
 
 /*******************************************************************************
 
-	We facilitate output buffering.
+	This object facilitates output buffering, but with just a 
+	dynamically sized buffer -- no actual output of any sort.
+
+	Names:
+	-ctor-		
+	operator-int	
+	+=
+
+	Synopses:
+	obuf(cchar *sbuf = nullptr,int slen = -1) noex
+	int add(cchar *sp,int sl = -1) noex
+	int adv(int al) noex
+	int len() noex
+	int operator-int
+
+	Returns:
+	>=0		current additional legnth of buffer (beyonf the start)
+	<0		error (system-return) 
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<new>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"obuf.hh"
@@ -78,5 +97,9 @@ int obuf::adv(int al) noex {
 	return rl ;
 }
 /* end subroutine (obuf::adv) */
+
+obuf::operator int () const noex {
+ 	return (b.size() - oi) ;
+} 
 
 
