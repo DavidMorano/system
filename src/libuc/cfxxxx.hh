@@ -62,6 +62,10 @@
 #include	<localmisc.h>
 
 
+extern "C" {
+    typedef int (*snwcpy_f)(char *,int,cc *,int) noex ;
+}
+
 /* max for |int256_t| + sign */
 inline constexpr int	cfxxxx_maxstack = (256+1) ;
 
@@ -87,12 +91,9 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 		    nsl = r ;
 		} /* end if */
 	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) {
-		    extern "C" {
-		        typedef int (*load_f)(char *,int,cc *,int) noex ;
-		    }
 		    if (sp[sl] != '\0') {
-			load_f	load = snwcpyshrink ;
-			cint	dlen = nsl ;
+			snwcpy_f	load = snwcpyshrink ;
+			cint		dlen = nsl ;
 	                if (nsl <= cfxxxx_maxstack) {
 	                    char	dbuf[dlen+1] ;
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
