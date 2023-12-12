@@ -6,7 +6,7 @@ FILEGLOB=
 FILEGLOB+=" cvtdig.[ch]* ct*.[ch]* cf*.[ch]* xxtostr.[ch]* *strto*.[ch]* "
 FILEGLOB+="digbufsizes.[ch]* "
 
-CADIR=${REPOROOT}/store
+CADIR=${HOME}/store/src
 CAFILE=${CADIR}/${CAN}.ca.bz2
 
 : ${TMPDIR:=/tmp}
@@ -15,10 +15,10 @@ PN=${0##*/}
 TEF=${TMPDIR}/storedigithand${$}
 if [[ -d ${CADIR} ]] ; then
   find ${FILEGLOB}  -type f -print | gcpio -oc 2> ${TEF} | bzip2 > ${CAFILE}
+  print -u2 -- "${PN}: $( < ${TEF} )"
+  rm -f ${TEF}
 else
   print -u2 -- "${PN}: store directory not present"
 fi
-print -u2 -- "${PN}: $( < ${TEF} )"
-rm -f ${TEF}
 sync &
 

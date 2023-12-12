@@ -36,6 +36,21 @@
 	We eschew the use of NGROUPS_MAX and rather allocate
 	dynamically.
 
+	Example-usage:
+	{
+	    groupids	g ;
+	    int		rs ;
+	    int		rs1 ;
+	    if ((rs = g.start) >= 0) {
+	        {
+		    gid_t	*gids = g.gids ;
+
+		}
+		rs1 = g.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	}
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
