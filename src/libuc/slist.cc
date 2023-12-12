@@ -40,7 +40,7 @@
 
 /* exported subroutines */
 
-int slist_start(SLIST *qhp) noex {
+int slist_start(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp) {
 	    qhp->head = NULL ;
@@ -51,7 +51,7 @@ int slist_start(SLIST *qhp) noex {
 }
 /* end subroutine (slist_start) */
 
-int slist_finish(SLIST *qhp) noex {
+int slist_finish(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp) {
 	    qhp->head = NULL ;
@@ -62,14 +62,14 @@ int slist_finish(SLIST *qhp) noex {
 }
 /* end subroutine (slist_finish) */
 
-int slist_ins(SLIST *qhp,SLIST_ENT *ep) noex {
+int slist_ins(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && ep) {
 	    rs = SR_OK ;
 	    ep->next = NULL ;
 	    if (qhp->head) {
-	        SLIST_ENT	*pep = qhp->tail ;
+	        slist_ent	*pep = qhp->tail ;
 		if (pep) {
 	            pep->next = ep ;
 	            qhp->tail = ep ;
@@ -93,7 +93,7 @@ int slist_ins(SLIST *qhp,SLIST_ENT *ep) noex {
 }
 /* end subroutine (slist_ins) */
 
-int slist_insgroup(SLIST *qhp,SLIST_ENT *gp,int esize,int n) noex {
+int slist_insgroup(slist *qhp,slist_ent *gp,int esize,int n) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && gp) {
@@ -102,8 +102,8 @@ int slist_insgroup(SLIST *qhp,SLIST_ENT *gp,int esize,int n) noex {
 		caddr_t		p = (caddr_t) gp ;
 	        rs = SR_OK ;
 	        if (n > 0) {
-		    SLIST_ENT	*ep = (SLIST_ENT *) p ;
-	            SLIST_ENT	*pep ;
+		    slist_ent	*ep = (slist_ent *) p ;
+	            slist_ent	*pep ;
 	            if (qhp->head) {
 	                pep = qhp->tail ;
 	                pep->next = ep ;
@@ -113,7 +113,7 @@ int slist_insgroup(SLIST *qhp,SLIST_ENT *gp,int esize,int n) noex {
 	            pep = ep ;
 	            p += esize ;
 	            for (int i = 1 ; i < n ; i += 1) {
-	                ep = (SLIST_ENT *) p ;
+	                ep = (slist_ent *) p ;
 	                pep->next = ep ;
 	                p += esize ;
 	                pep = ep ;
@@ -129,11 +129,11 @@ int slist_insgroup(SLIST *qhp,SLIST_ENT *gp,int esize,int n) noex {
 }
 /* end subroutine (slist_insgroup) */
 
-int slist_present(SLIST *qhp,SLIST_ENT *ep) noex {
+int slist_present(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (qhp && ep) {
-	    SLIST_ENT	*nep = qhp->head ;
+	    slist_ent	*nep = qhp->head ;
 	    rs = SR_OK ;
 	    while (nep && (!f)) {
 		f = (ep == nep) ;
@@ -144,12 +144,12 @@ int slist_present(SLIST *qhp,SLIST_ENT *ep) noex {
 }
 /* end subroutine (slist_present) */
 
-int slist_unlink(SLIST *qhp,SLIST_ENT *ep) noex {
+int slist_unlink(slist *qhp,slist_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		f = 0 ;
 	if (qhp && ep) {
-	    SLIST_ENT	*nep = qhp->head ;
-	    SLIST_ENT	*pep = nullptr ;
+	    slist_ent	*nep = qhp->head ;
+	    slist_ent	*pep = nullptr ;
 	    rs = SR_OK ;
 	    while (nep) {
 		if ((f = (ep == nep))) break ;
@@ -180,11 +180,11 @@ int slist_unlink(SLIST *qhp,SLIST_ENT *ep) noex {
 }
 /* end subroutine (slist_unlink) */
 
-int slist_rem(SLIST *qhp,SLIST_ENT **epp) noex {
+int slist_rem(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && epp) {
-	    SLIST_ENT	*ep = nullptr ;
+	    slist_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 		ep = qhp->head ;
@@ -205,11 +205,11 @@ int slist_rem(SLIST *qhp,SLIST_ENT **epp) noex {
 }
 /* end subroutine (slist_rem) */
 
-int slist_gettail(SLIST *qhp,SLIST_ENT **epp) noex {
+int slist_gettail(slist *qhp,slist_ent **epp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp && epp) {
-	    SLIST_ENT	*ep = nullptr ;
+	    slist_ent	*ep = nullptr ;
 	    rs = SR_EMPTY ;
 	    if (qhp->head && qhp->tail) {
 	        ep = qhp->tail ;
@@ -225,7 +225,7 @@ int slist_gettail(SLIST *qhp,SLIST_ENT **epp) noex {
 }
 /* end subroutine (slist_gettail) */
 
-int slist_count(SLIST *qhp) noex {
+int slist_count(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp) {
@@ -235,12 +235,12 @@ int slist_count(SLIST *qhp) noex {
 }
 /* end subroutine (slist_count) */
 
-int slist_audit(SLIST *qhp) noex {
+int slist_audit(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qhp) {
 	    if (qhp->head && qhp->tail) {
-	        SLIST_ENT	*ep = qhp->head ;
+	        slist_ent	*ep = qhp->head ;
 		for (c = 0 ; ep && (c < INT_MAX) ; c += 1) {
 		    ep = ep->next ;
 	        } /* end for */
