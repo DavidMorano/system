@@ -21,22 +21,17 @@
 	Notes:
 
 	Q. How do we handle iterative traversal?
-
 	A. There are at least three popular ways to handle iterative
 	traveral:
-
 	1. maintain a stack of pointers to previous node at each
 	   level of the tree; space would be O(depth)
-
 	2. use a so-called "threaded" tree structure where each
 	   dangling right-side node (with no additional right-child)
 	   actually has a pointer to its in-order successor
-
 	3. use the "parent" method where each node has a pointer
 	   to its own parent; we use this method below
 
 	The "parent" scheme:
-
 	If we find that there is no right-child (from our current
 	node), we traverse back up to our parent, checking (at each
 	step) if we (the current node) is equal to the right-child
@@ -73,7 +68,6 @@
 		return it ;
 	    } ;
 	} ;
-
 
 *******************************************************************************/
 
