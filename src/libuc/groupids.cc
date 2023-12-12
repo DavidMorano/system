@@ -76,6 +76,19 @@ static constexpr gid_t	gidend = gid_t(-1) ;
 
 /* exported subroutines */
 
+int groupids::get(gid_t **gpp) noex {
+	int		rs = SR_FAULT ;
+	if (gpp) {
+	    *gpp = gids ;
+	    rs = ng ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (groupids::get) */
+
+
+/* local subroutines */
+
 int groupids::istart(gid_t **gpp) noex {
 	int		rs ;
 	nullptr_t	np{} ;
@@ -101,16 +114,6 @@ int groupids::istart(gid_t **gpp) noex {
 }
 /* end method (groupids::istart) */
 
-int groupids::get(gid_t **gpp) noex {
-	int		rs = SR_FAULT ;
-	if (gpp) {
-	    *gpp = gids ;
-	    rs = ng ;
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end method (groupids::get) */
-
 int groupids::ifinish() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -122,7 +125,7 @@ int groupids::ifinish() noex {
 	ng = 0 ;
 	return rs ;
 }
-/* end subroutine (groupids::release) */
+/* end subroutine (groupids::ifinish) */
 
 groupids_ster::operator int () noex {
 	return op->istart(nullptr) ;

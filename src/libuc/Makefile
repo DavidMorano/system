@@ -1285,6 +1285,7 @@ syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 getngroups.o:		getngroups.cc getngroups.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
+groupids.o:		groupids.cc groupids.hh
 xperm.o:		xperm.cc xperm.h ids.h
 isoneof.o:		isoneof.c isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
