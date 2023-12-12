@@ -18,6 +18,9 @@
 #define	VALUELIMITS_INCLUDE
 
 
+#ifdef	__cplusplus
+
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<utypedefs.h>
@@ -50,6 +53,8 @@ struct valuelimits {
 	    mklonglong() ;
 	} ;
 } ; /* end subroutine (valuelimits) */
+
+#endif /* __cplusplus */
 
 
 #endif /* VALUELIMITS_INCLUDE */

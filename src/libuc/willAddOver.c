@@ -1,7 +1,8 @@
-/* willAddOver */
+/* willaddover */
 /* lang=C98 */
 
 /* will an addition (long integer) overflow? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,7 +13,6 @@
 */
 
 /* Copyright (c) 2011 David A-D- Morano.  All rights reserved. */
-
 
 /******************************************************************************
 
@@ -33,19 +33,22 @@
 	0 (false)	will not overflow
 	1 (true)	will overflow
 
-
 ******************************************************************************/
 
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<limits.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
+
+#include	"willaddover.h"
 
 
 int willAddOver(long n1,long n2) noex {
 	int	f = FALSE ;
-	f = f || (n1 > 0) && (n2 > 0) && (n1 > (LONG_MAX - n2)) ;
-	f = f || (n1 < 0) && (n2 < 0) && (n1 < (LONG_MIN - n2)) ;
+	f = f || ((n1 > 0) && (n2 > 0) && (n1 > (LONG_MAX - n2))) ;
+	f = f || ((n1 < 0) && (n2 < 0) && (n1 < (LONG_MIN - n2))) ;
 	return f ;
 }
 /* end subroutine (willAddOver) */
