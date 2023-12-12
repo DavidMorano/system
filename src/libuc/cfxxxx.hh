@@ -87,9 +87,11 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 		    nsl = r ;
 		} /* end if */
 	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) {
-		    typedef int (*loadf)(char *,int,cc *,int) ;
+		    extern "C" {
+		        typedef int (*load_f)(char *,int,cc *,int) noex ;
+		    }
 		    if (sp[sl] != '\0') {
-			loadf	load = snwcpyshrink ;
+			load_f	load = snwcpyshrink ;
 			cint	dlen = nsl ;
 	                if (nsl <= cfxxxx_maxstack) {
 	                    char	dbuf[dlen+1] ;
