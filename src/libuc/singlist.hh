@@ -33,7 +33,6 @@
 
 	Enjoy.
 
-
 *******************************************************************************/
 
 #ifndef	SINGLIST_INCLUDE
@@ -42,7 +41,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<new>
 #include	<initializer_list>
 #include	<usystem.h>
