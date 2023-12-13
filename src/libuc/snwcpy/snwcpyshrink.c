@@ -50,20 +50,17 @@
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<char.h>
+#include	<sfx.h>
 #include	<strmgr.h>
+#include	<strn.h>
 
-#include	"snwcpyx.h"
+#include	"snwcpyx."
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	sfshrink(cchar *,int,cchar **) noex ;
-extern int	snwcpy(char *,int,cchar *,int) noex ;
-
-extern char	*strnchr(cchar *,int,int) noex ;
 
 
 /* exported subroutines */

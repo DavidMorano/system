@@ -1206,8 +1206,8 @@ sfx.o:			sfx.dir
 sfx.dir:
 	makebelow $@
 
-snwcpyx.o:		snwcpyx.dir
-snwcpyx.dir:
+snwcpy.o:		snwcpy.dir
+snwcpy.dir:
 	makebelow $@
 
 # UCENT
@@ -1282,6 +1282,7 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 
 # UTILITY
+willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h

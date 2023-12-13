@@ -14,6 +14,13 @@
 
 /* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	See the source support file ('obuf.cc') for a descruption
+	of this object.
+
+*******************************************************************************/
+
 #ifndef	OBUF_INCLUDE
 #define	OBUF_INCLUDE
 
@@ -29,11 +36,6 @@
 #include	<localmisc.h>
 
 
-#ifndef	mkchar
-#define	mkchar(ch)	((ch) & UCHAR_MAX)
-#endif
-
-
 class obuf {
 	std::string	b ;
 	int		oi ;		/* output index */
@@ -41,16 +43,13 @@ public:
 	obuf() noex : oi(0) { } ;
 	obuf(const obuf &) = delete ;
 	obuf &operator = (const obuf &) = delete ;
-	obuf(cchar *sbuf) noex : oi(0) { 
-	    for (int i = 0 ; sbuf[i] ; i += 1) {
-		b.push_back(sbuf[i]) ;
-	    }
-	} ;
-	obuf(cchar *sbuf,int slen) noex : oi(0) {
-	    if (slen < 0) slen = strlen(sbuf) ;
-	    for (int i = 0 ; sbuf[i] ; i += 1) {
-		b.push_back(sbuf[i]) ;
-	    }
+	obuf(cchar *sbuf = nullptr,int slen = -1) noex : oi(0) {
+	    if (sbuf) {
+	        if (slen < 0) slen = strlen(sbuf) ;
+	        for (int i = 0 ; sbuf[i] ; i += 1) {
+		    b.push_back(sbuf[i]) ;
+	        }
+	    } /* end if (non-null) */
 	} ;
 	int operator [] (int i) const noex {
 	    cint	n = b.size() ;
@@ -86,6 +85,7 @@ public:
 	    return rch ;
 	} ;
 	int adv(int) noex ;
+	operator int () const noex ;
 } ; /* end class (obuf) */
 
 

@@ -31,8 +31,8 @@
 
 struct lookaside_head {
 	caddr_t		eap ;		/* entry allocation pointer base */
-	pq		cq ;		/* chunk list */
-	pq		estack ;	/* stack of free blocks */
+	pq		*cqp ;		/* chunk list queue pointer */
+	pq		*esp ;		/* empty-stack queue pointer */
 	int		nchunks ;	/* number of chunks allocated */
 	int		esize ;		/* entry size */
 	int		eaoff ;		/* entry-array offset */

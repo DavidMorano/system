@@ -1,5 +1,5 @@
-/* willAddOver */
-/* lang=C++20 */
+/* willaddover */
+/* lang=C20 */
 
 /* will an addition (generic) overflow? */
 /* version %I% last-modified %G% */
@@ -42,16 +42,28 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<climits>
+#include	<limits.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<valuelimits.hh>
 #include	<localmisc.h>
 
 
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+extern int willAddOver(long n1,long n2) noex ;
+
+#ifdef	__cplusplus
+}
+#endif
+
+#ifdef	__cplusplus
+
 template<T>
 int willAddOver(T n1,T n2) noex {
-	const int	s = sizeof(T) ;
+	cint		s = sizeof(T) ;
 	T		min = 0 ;
 	T		max = 0 ;
 	int		f = FALSE ;
@@ -84,6 +96,8 @@ int willAddOver(T n1,T n2) noex {
 	return f ;
 }
 /* end subroutine (willAddOver) */
+
+#endif /* __cplusplus */
 
 
 #endif /* WILLADDOVER_INCLUDE */
