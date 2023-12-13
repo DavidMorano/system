@@ -141,8 +141,9 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 		op->eaoff = iceil(csize,qalign) ;
 		if ((rs = pq_start(op->cqp)) >= 0) {
 	    	    rs = pq_start(op->esp) ;
-	    	    if (rs < 0)
+	    	    if (rs < 0) {
 			pq_finish(op->cqp) ;
+		    }
 		} /* end if (pq_start) */
 	    } /* end if (valid) */
 	    if (rs < 0) {

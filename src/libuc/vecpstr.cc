@@ -71,6 +71,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
 #include	<algorithm>
 #include	<usystem.h>
 #include	<usupport.h>
