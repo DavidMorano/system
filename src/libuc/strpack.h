@@ -24,14 +24,14 @@
 
 struct strpack_chunk {
 	char		*cdata ;
-	int		csize ;		/* allocated buffer length */
+	int		csz ;		/* allocated buffer length */
 	int		i ;		/* index length */
 	int		c ;		/* item count within chunk */
 } ;
 
 struct strpack_head {
 	STRPACK_CHUNK	*ccp ;		/* current chunk pointer */
-	vechand		chunks ;
+	vechand		*clp ;		/* chunk-list-pointer */
 	uint		magic ;
 	int		chsize ;
 	int		totalsize ;

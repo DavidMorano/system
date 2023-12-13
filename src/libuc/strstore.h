@@ -41,7 +41,7 @@ struct strstore_cursor {
 
 struct strstore_chunk {
 	char		*cdata ;
-	int		csize ;		/* allocated buffer length */
+	int		csz ;		/* allocated buffer length */
 	int		i ;		/* index length */
 	int		c ;		/* item count within chunk */
 } ;
@@ -49,11 +49,11 @@ struct strstore_chunk {
 struct strstore_head {
 	uint		magic ;
 	STRSTORE_CHUNK	*ccp ;		/* current chunk pointer */
-	vechand		chunks ;
-	vechand		list ;		/* so we can index strings by number */
-	lookaside	imgr ;		/* integer-manager */
-	hdb		smgr ;		/* string-manager */
-	int		chunksize ;
+	vechand		*clp ;		/* chunk-list-pointer */
+	vechand		*nlp ;		/* number-list-pointer */
+	lookaside	*lap ;		/* look-aside-pointer */
+	hdb		*hlp ;		/* hash-list-pointer */
+	int		chsize ;
 	int		totalsize ;
 	int		c ;		/* total count */
 } ;

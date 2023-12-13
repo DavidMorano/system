@@ -106,6 +106,7 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<vecobj.h>
@@ -137,6 +138,9 @@
 
 /* local namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
@@ -148,7 +152,9 @@ extern "C" {
 
 /* external subroutines */
 
-extern int	nextpowtwo(int) noex ;
+extern "C" {
+    extern int	nextpowtwo(int) noex ;
+}
 
 
 /* local structures */
@@ -166,15 +172,50 @@ template<typename ... Args>
 static inline int strtab_ctor(strtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ccp = nullptr ;
 	    op->chsize = 0 ;
 	    op->stsize = 0 ;
 	    op->count = 0 ;
+	    if ((op->clp = new(nothrow) vechand) != np) {
+		if ((op->hlp = new(nothrow) hdb) != np) {
+		    if ((op->lap = new(nothrow) lookaside) != np) {
+			rs = SR_OK ;
+		    } /* end if (new-lookaside) */
+		    if (rs < 0) {
+			delete op->hlp ;
+			op->hlp = nullptr ;
+		    }
+	        } /* end if (new-hdb) */
+		if (rs < 0) {
+		    delete op->clp ;
+		    op->clp = nullptr ;
+		}
+	    } /* end if (new-vechand) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strtab_ctor) */
+
+static int strtab_dtor(strtab *op) noex {
+	int		rs = SR_OK ;
+	if (op->lap) {
+	    delete op->lap ;
+	    op->lap = nullptr ;
+	}
+	if (op->hlp) {
+	    delete op->hlp ;
+	    op->hlp = nullptr ;
+	}
+	if (op->clp) {
+	    delete op->clp ;
+	    op->clp = nullptr ;
 	}
 	return rs ;
 }
+/* end subroutine (strtab_dtor) */
 
 template<typename ... Args>
 static inline int strtab_magic(strtab *op,Args ... args) noex {
@@ -184,6 +225,7 @@ static inline int strtab_magic(strtab *op,Args ... args) noex {
 	}
 	return rs ;
 }
+/* end subroutine (strtab_magic) */
 
 static int	strtab_stuff(strtab *,cchar *,int) noex ;
 static int	strtab_finishchunks(strtab *) noex ;
@@ -223,33 +265,39 @@ static inline int hashindex(uint hv,int n) noex {
 
 /* exported subroutines */
 
-int strtab_start(strtab *op,int startsize) noex {
+int strtab_start(strtab *op,int startsz) noex {
 	int		rs ;
 	if ((rs = strtab_ctor(op)) >= 0) {
-	    if (startsize < STRTAB_STARTSIZE) startsize = STRTAB_STARTSIZE ;
+	    if (startsz < STRTAB_STARTSIZE) startsz = STRTAB_STARTSIZE ;
 	    if ((rs = pagesize) >= 0) {
-		cint		ne = (startsize / 4) ;
-		int		opts = 0 ;
-	        op->chsize = iceil(startsize,pagesize) ;
-	        if ((rs = vechand_start(&op->chunks,ne,opts)) >= 0) {
+		cint	ne = (startsz / 4) ;
+		int	opts = 0 ;
+	        op->chsize = iceil(startsz,pagesize) ;
+	        if ((rs = vechand_start(op->clp,ne,opts)) >= 0) {
 		    nullptr_t	n{} ;
-	            if ((rs = hdb_start(&op->strdb,ne,true,n,n)) >= 0) {
+	            if ((rs = hdb_start(op->hlp,ne,true,n,n)) >= 0) {
 	                cint	size = sizeof(int) ;
-	                if ((rs = STRTAB_AOSTART(&op->intdb,size,ne)) >= 0) {
+	                if ((rs = STRTAB_AOSTART(op->lap,size,ne)) >= 0) {
 	                    op->count = 0 ;
 	                    if ((rs = strtab_newchunk(op,0)) >= 0) {
 	                        op->magic = STRTAB_MAGIC ;
 	                    }
-	                    if (rs < 0)
-	                        STRTAB_AOFINISH(&op->intdb) ;
-	                }
-	                if (rs < 0)
-		            hdb_finish(&op->strdb) ;
-	            }
-	            if (rs < 0)
-	                vechand_finish(&op->chunks) ;
+	                    if (rs < 0) {
+	                        STRTAB_AOFINISH(op->lap) ;
+			    }
+	                } /* end if (strab-aostart) */
+	                if (rs < 0) {
+		            hdb_finish(op->hlp) ;
+			}
+	            } /* end if (hdb-start) */
+	            if (rs < 0) {
+	                vechand_finish(op->clp) ;
+		    }
 	        } /* end if (vechand-start) */
 	    } /* end if (pagesize) */
+	    if (rs < 0) {
+		strtab_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -259,23 +307,27 @@ int strtab_finish(strtab *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = strtab_magic(op)) >= 0) {
-		{
-	            rs1 = STRTAB_AOFINISH(&op->intdb) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = hdb_finish(&op->strdb) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = strtab_finishchunks(op) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = vechand_finish(&op->chunks) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-	        op->magic = 0 ;
+            {
+                rs1 = STRTAB_AOFINISH(op->lap) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = hdb_finish(op->hlp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = strtab_finishchunks(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = vechand_finish(op->clp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+	    {
+                rs1 = strtab_dtor(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -287,11 +339,11 @@ int strtab_add(strtab *op,cchar *sp,int sl) noex {
 	if ((rs = strtab_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-		HDB_DATUM	key{} ;
-		HDB_DATUM	val{} ;
+		hdb_dat	key{} ;
+		hdb_dat	val{} ;
 	        key.buf = sp ;
 	        key.len = sl ;
-	        if ((rs = hdb_fetch(&op->strdb,key,nullptr,&val)) >= 0) {
+	        if ((rs = hdb_fetch(op->hlp,key,nullptr,&val)) >= 0) {
 	            int		*ip = (int *) val.buf ;
 	            vi = *ip ;
 	        } else if (rs == SR_NOTFOUND) {
@@ -322,11 +374,11 @@ int strtab_already(strtab *op,cchar *sp,int sl) noex {
 	if ((rs = strtab_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        HDB_DATUM	key{} ;
-	        HDB_DATUM	val{} ;
+	        hdb_dat	key{} ;
+	        hdb_dat	val{} ;
 	        key.buf = sp ;
 	        key.len = sl ;
-	        if ((rs = hdb_fetch(&op->strdb,key,nullptr,&val)) >= 0) {
+	        if ((rs = hdb_fetch(op->hlp,key,nullptr,&val)) >= 0) {
 	            int		*ip = (int *) val.buf ;
 	            vi = *ip ;
 	        } /* end if */
@@ -363,7 +415,7 @@ int strtab_strmk(strtab *op,char *tabdata,int tabsize) noex {
 		    cint	stsize = iceil(op->stsize,sizeof(int)) ;
 	   	    rs = SR_OVERFLOW ;
 		    if (tabsize >= stsize) {
-			vechand		*vlp = &op->chunks ;
+			vechand		*vlp = op->clp ;
 	    		char		*bp = tabdata ;
 			vhg_f		vg = vechand_get ;
 			void		*vp{} ;
@@ -410,14 +462,14 @@ int strtab_recmk(strtab *op,int *rec,int recsize) noex {
 	            HDB_CUR	cur{} ;
 	            int		*ip ;
 	            rec[c++] = 0 ;	/* ZERO-entry is NUL-string */
-	            if ((rs = hdb_curbegin(&op->strdb,&cur)) >= 0) {
-	                HDB_DATUM	key{} ;
-	                HDB_DATUM	val{} ;
-	                while (hdb_enum(&op->strdb,&cur,&key,&val) >= 0) {
+	            if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
+	                hdb_dat	key{} ;
+	                hdb_dat	val{} ;
+	                while (hdb_enum(op->hlp,&cur,&key,&val) >= 0) {
 	                    ip = (int *) val.buf ;
 	                    rec[c++] = *ip ;
 	                } /* end while (looping through strings) */
-	                hdb_curend(&op->strdb,&cur) ;
+	                hdb_curend(op->hlp,&cur) ;
 	            } /* end if */
 	            rec[c] = -1 ;
 	        } /* end if (tabsize OK) */
@@ -465,12 +517,12 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 		    if ((rs = vecobj_start(&ses,esize,op->count,vo)) >= 0) {
 	    	        STRENTRY	se ;
 	    	        HDB_CUR		cur ;
-	    	        HDB_DATUM	key{} ;
-	    	        HDB_DATUM	val{} ;
+	    	        hdb_dat	key{} ;
+	    	        hdb_dat	val{} ;
 	    	        uint		khash, chash, nhash ;
 	    	        int		lhi, nhi, hi, si ;
-	                if ((rs = hdb_curbegin(&op->strdb,&cur)) >= 0) {
-			    hdb		*hp = &op->strdb ;
+	                if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
+			    hdb		*hp = op->hlp ;
 		            int		*ip ;
 		            int		sl ;
 		            cchar	*sp ;
@@ -494,7 +546,7 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 	                        } /* end if */
 	                        if (rs < 0) break ;
 	                    } /* end while (looping through strings) */
-	                    hdb_curend(&op->strdb,&cur) ;
+	                    hdb_curend(op->hlp,&cur) ;
 	                } /* end if (cursor) */
 	                if (rs >= 0) {
 			    vog_f	v = vecobj_get ;
@@ -558,15 +610,15 @@ static int strtab_stuff(strtab *op,cchar *sp,int sl) noex {
 	    vi = op->stsize ;
 	    if ((rs = chunk_add(op->ccp,sp,sl,&vp)) >= 0) {
 		int	*ip ;
-	        if ((rs = STRTAB_AOGET(&op->intdb,&ip)) >= 0) {
-		    HDB_DATUM	key{} ;
-		    HDB_DATUM	val{} ;
+	        if ((rs = STRTAB_AOGET(op->lap,&ip)) >= 0) {
+		    hdb_dat	key{} ;
+		    hdb_dat	val{} ;
 	            *ip = vi ;
 	            key.buf = vp ;
 	            key.len = sl ;
 	            val.buf = ip ;
 	            val.len = sizeof(int) ;
-	            if ((rs = hdb_store(&op->strdb,key,val)) >= 0) {
+	            if ((rs = hdb_store(op->hlp,key,val)) >= 0) {
 	                op->stsize += amount ;
 	                op->count += 1 ;
 	            }
@@ -578,7 +630,7 @@ static int strtab_stuff(strtab *op,cchar *sp,int sl) noex {
 /* end subroutine (strtab_stuff) */
 
 static int strtab_finishchunks(strtab *op) noex {
-	vechand		*clp = &op->chunks ;
+	vechand		*clp = op->clp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -630,7 +682,7 @@ static int strtab_newchunk(strtab *op,int amount) noex {
 	        start = 1 ;
 	    }
 	    if ((rs = chunk_start(op->ccp,amount,start)) >= 0) {
-		rs = vechand_add(&op->chunks,op->ccp) ;
+		rs = vechand_add(op->clp,op->ccp) ;
 		if (rs < 0)
 		    chunk_finish(op->ccp) ;
 	    }
@@ -650,7 +702,7 @@ static int chunk_start(strtab_ch *ccp,int chsize,int start) noex {
 	memclear(ccp) ;
 	if (start > chsize) chsize = start ;
 	if ((rs = uc_malloc(chsize,&ccp->cdata)) >= 0) {
-	    ccp->csize = chsize ;
+	    ccp->csz = chsize ;
 	    ccp->cdata[0] = '\0' ;
 	    ccp->cl = start ;
 	} /* end if (m-a) */
@@ -666,7 +718,7 @@ static int chunk_finish(strtab_ch *ccp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    ccp->cdata = nullptr ;
 	}
-	ccp->csize = 0 ;
+	ccp->csz = 0 ;
 	ccp->cl = 0 ;
 	return rs ;
 }
@@ -674,7 +726,7 @@ static int chunk_finish(strtab_ch *ccp) noex {
 
 static int chunk_check(strtab_ch *ccp,int amount) noex {
 	int		rs = SR_OK ;
-	if (amount > (ccp->csize - ccp->cl)) {
+	if (amount > (ccp->csz - ccp->cl)) {
 	    rs = SR_OVERFLOW ;
 	}
 	return rs ;
@@ -684,7 +736,7 @@ static int chunk_check(strtab_ch *ccp,int amount) noex {
 static int chunk_add(strtab_ch *ccp,cchar *sp,int sl,cchar **spp) noex {
 	cint		amount = (sl + 1) ;
 	int		rs = SR_OK ;
-	if (amount <= (ccp->csize - ccp->cl)) {
+	if (amount <= (ccp->csz - ccp->cl)) {
 	    char	*bp = (ccp->cdata + ccp->cl) ;
 	    *spp = bp ;
 	    strwcpy(bp,sp,sl) ;

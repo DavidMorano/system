@@ -91,12 +91,12 @@ static int lookaside_ctor(lookaside *op,Args ... args) noex {
 	    if ((op->cqp = new(nothrow) pq) != np) {
 	        if ((op->esp = new(nothrow) pq) != np) {
 		    rs = SR_OK ;
-	        } /* end if (new) */
+	        } /* end if (new-pq) */
 		if (rs < 0) {
-		    op->cqp->~pq() ;
+		    delete op->cqp ;
 		    op->cqp = np ;
 		}
-	    } /* end if (new) */
+	    } /* end if (new-pq) */
 	} /* end if (non-null) */
 	return rs ;
 }

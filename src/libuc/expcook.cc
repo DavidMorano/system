@@ -1,4 +1,4 @@
-/* EX */
+/* expcook */
 /* lang=C++20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */
@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	expcook
+
+	Description:
 	This little object is used to set up the substitution
 	variables and to do the substitution expansions for string
 	buffers with cookie escapes in it.
@@ -34,6 +38,7 @@
 
 #include	<envstandards.h>
 #include	<cstring>		/* <- for |strlen(3c)| */
+#include	<new>
 #include	<usystem.h>
 #include	<hdbstr.h>
 #include	<sbuf.h>
@@ -51,6 +56,12 @@
 #define	EX		expcook
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
 /* external subroutines */
 
 
@@ -64,6 +75,30 @@
 
 int		expcook_expbuf(EX *,int,buffer *,cchar *,int) noex ;
 
+static inline int expcook_ctor(EX *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    if ((op->hlp = new(nothrow) hdbstr) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-hdbstr) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (expcook_ctor) */
+
+static inline int expcook_dtor(EX *op) noex {
+	int		rs = SR_OK ;
+	if (op->hlp) {
+	    delete op->hlp ;
+	    op->hlp = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (expcook_dtor) */
+
 template<typename ... Args>
 static inline int expcook_magic(EX *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
@@ -72,6 +107,7 @@ static inline int expcook_magic(EX *op,Args ... args) noex {
 	}
 	return rs ;
 }
+/* end subroutine (expcook_magic) */
 
 static int	expcook_prockey(EX *,int,buffer *,cchar *,int) noex ;
 
@@ -86,13 +122,16 @@ static int	mkcomp(char *,int,cchar *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int expcook_start(EX *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = expcook_ctor(op)) >= 0) {
 	    op->magic = 0 ;
-	    if ((rs = hdbstr_start(&op->subs,10)) >= 0) {
+	    if ((rs = hdbstr_start(op->hlp,10)) >= 0) {
 	        op->magic = EXPCOOK_MAGIC ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		expcook_dtor(op) ;
+	    }
+	} /* end if (expcook_ctor) */
 	return rs ;
 }
 /* end subroutine (expcook_start) */
@@ -102,8 +141,12 @@ int expcook_finish(EX *op) noex {
 	int		rs1 ;
 	if ((rs = expcook_magic(op)) >= 0) {
 	    {
-	        hdbstr	*slp = &op->subs ;
+	        hdbstr	*slp = op->hlp ;
 		rs1 = hdbstr_finish(slp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = expcook_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -116,7 +159,7 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,kbuf)) >= 0) {
 	    nullptr_t	n{} ;
-	    hdbstr	*slp = &op->subs ;
+	    hdbstr	*slp = op->hlp ;
 	    int		kl = strlen(kbuf) ;
 	    if ((rs = hdbstr_fetch(slp,kbuf,kl,n,n)) >= 0) {
 	        rs = hdbstr_delkey(slp,kbuf,kl) ;
@@ -134,8 +177,16 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,curp)) >= 0) {
-	    hdbstr	*slp = &op->subs ;
-	    rs = hdbstr_curbegin(slp,&curp->cur) ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
+	        hdbstr	*slp = op->hlp ;
+	        rs = hdbstr_curbegin(slp,curp->clp) ;
+		if (rs < 0) {
+		    delete curp->clp ;
+		    curp->clp = nullptr ;
+		}
+	    } /* end if (new-hdbstr) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -143,9 +194,17 @@ int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 
 int expcook_curend(EX *op,expcook_cur *curp) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = expcook_magic(op,curp)) >= 0) {
-	    hdbstr	*slp = &op->subs ;
-	    rs = hdbstr_curend(slp,&curp->cur) ;
+	    {
+	        hdbstr	*slp = op->hlp ;
+	        rs1 = hdbstr_curend(slp,curp->clp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    if (curp->clp) {
+		delete curp->clp ;
+		curp->clp = nullptr ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -156,10 +215,10 @@ int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	int		vl ;
 	int		bl = 0 ;
 	if ((rs = expcook_magic(op,curp,rbuf)) >= 0) {
-	    hdbstr	*slp = &op->subs ;
+	    hdbstr	*slp = op->hlp ;
 	    cchar	*kp{} ;
 	    cchar	*vp{} ;
-	    if ((rs = hdbstr_enum(slp,&curp->cur,&kp,&vp,&vl)) >= 0) {
+	    if ((rs = hdbstr_enum(slp,curp->clp,&kp,&vp,&vl)) >= 0) {
 	        int	kl = rs ;
 	        rs = mkcomp(rbuf,rlen,kp,kl,vp,vl) ;
 	        bl = rs ;
@@ -172,7 +231,7 @@ int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 int expcook_findkey(EX *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,kp,rpp)) >= 0) {
-	    hdbstr	*slp = &op->subs ;
+	    hdbstr	*slp = op->hlp ;
 	    rs = hdbstr_fetch(slp,kp,kl,nullptr,rpp) ;
 	} /* end if (magic) */
 	return rs ;
@@ -182,7 +241,7 @@ int expcook_findkey(EX *op,cchar *kp,int kl,cchar **rpp) noex {
 int expcook_delkey(EX *op,cchar *key) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,key)) >= 0) {
-	    hdbstr	*slp = &op->subs ;
+	    hdbstr	*slp = op->hlp ;
 	    rs = hdbstr_delkey(slp,key,-1) ;
 	} /* end if (magic) */
 	return rs ;
@@ -285,7 +344,7 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 /* private subroutines */
 
 static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
-	hdbstr		*slp = &op->subs ;
+	hdbstr		*slp = op->hlp ;
 	int		rs = SR_NOTFOUND ;
 	int		len = 0 ;
 	if (kl < 0) kl = strlen(kp) ;

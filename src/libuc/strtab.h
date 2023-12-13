@@ -29,7 +29,7 @@
 
 struct strtab_chunk {
 	char		*cdata ;
-	int		csize ;		/* allocated extent */
+	int		csz ;		/* allocated extent */
 	int		cl ;		/* amount used */
 	int		count ;		/* number of items */
 } ;
@@ -37,9 +37,9 @@ struct strtab_chunk {
 struct strtab_head {
 	uint		magic ;
 	strtab_chunk	*ccp ;
-	vechand		chunks ;
-	hdb		strdb ;
-	lookaside	intdb ;
+	vechand		*clp ;		/* chunk-list-pointer */
+	hdb		*hlp ;		/* hash-list-pointer */
+	lookaside	*lap ;		/* lookaside-list-pointer */
 	int		chsize ;
 	int		stsize ;	/* "string table" size */
 	int		count ;		/* total item count */
