@@ -94,15 +94,13 @@
 
 /* namespaces */
 
-using std::sort ;
+using std::sort ;			/* actor */
+using std::min ;			/* actor */
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef cchar	cc ;
-#endif
 
 typedef vecpstr_ch	chunk ;
 
@@ -130,6 +128,7 @@ struct strentry {
 /* forward references */
 
 static int	vecpstr_ctor(vecpstr *) noex ;
+static int	vecpstr_dtor(vecpstr *) noex ;
 static int	vecpstr_setopts(vecpstr *,int) noex ;
 static int	vecpstr_finchunks(vecpstr *) noex ;
 static int	vecpstr_extstr(vecpstr *,int) noex ;
@@ -195,10 +194,13 @@ int vecpstr_start(vecpstr *op,int n,int chsize,int opts) noex {
 	    op->chsize = chsize ;
 	    op->an = n ;
 	    if ((rs = vecpstr_setopts(op,opts)) >= 0) {
-	        cint	nc = MIN(((n * 6) / chsize),1) ;
-	        if ((rs = vechand_start(&op->chunks,nc,0)) >= 0) {
+	        cint	nc = min(((n * 6) / chsize),1) ;
+	        if ((rs = vechand_start(op->clp,nc,0)) >= 0) {
 	            op->magic = VECPSTR_MAGIC ;
 	        }
+	    }
+	    if (rs < 0) {
+		vecpstr_dtor(op) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -209,16 +211,24 @@ int vecpstr_finish(vecpstr *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = vecpstr_magic(op)) >= 0) {
-	        if (op->va) {
-	            rs1 = uc_libfree(op->va) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->va = nullptr ;
-	        }
+	    if (op->va) {
+	        rs1 = uc_libfree(op->va) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->va = nullptr ;
+	    }
+	    {
 	        rs1 = vecpstr_finchunks(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        rs1 = vechand_finish(&op->chunks) ;
+	    }
+	    {
+	        rs1 = vechand_finish(op->clp) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->magic = 0 ;
+	    }
+	    {
+		rs1 = vecpstr_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -416,7 +426,7 @@ int vecpstr_delall(vecpstr *op) noex {
 	        op->ccp = nullptr ;
 	    }
 	    {
-	        rs1 = vechand_delall(&op->chunks) ;
+	        rs1 = vechand_delall(op->clp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->va) {
@@ -611,7 +621,7 @@ int vecpstr_strmk(vecpstr *op,char *tab,int tabsize) noex {
 		    cint	stsize = uceil(op->stsize,sizeof(int)) ;
 		    rs = SR_OVERFLOW ;
 	            if (tabsize >= stsize) {
-			vechand		*clp = &op->chunks ;
+			vechand		*clp = op->clp ;
 	                char		*bp = tab ;
 			void		*vp{} ;
 			get_f 		get = vechand_get ;
@@ -744,7 +754,8 @@ int vecpstr_getvec(vecpstr *op,cchar ***rppp) noex {
 static int vecpstr_ctor(vecpstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->c = 0 ;
 	    op->i = 0 ;
@@ -755,10 +766,23 @@ static int vecpstr_ctor(vecpstr *op) noex {
 	    op->magic = 0 ;
 	    op->chsize = 0 ;
 	    op->an = 0 ;
-	}
+	    if ((op->clp = new(nothrow) vechand) != np) {
+	        rs = SR_OK ;
+	    } /* end if (new) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (vecpstr_ctor) */
+
+static int vecpstr_dtor(vecpstr *op) noex {
+	int		rs = SR_OK ;
+	if (op->clp) {
+	    delete op->clp ;
+	    op->clp = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (vecpstr_dtor) */
 
 static int vecpstr_setopts(vecpstr *op,int vopts) noex {
 	int		rs = SR_INVALID ;
@@ -778,7 +802,7 @@ static int vecpstr_setopts(vecpstr *op,int vopts) noex {
 /* end subroutine (vecpstr_setopts) */
 
 static int vecpstr_finchunks(vecpstr *op) noex {
-	vechand		*clp = &op->chunks ;
+	vechand		*clp = op->clp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -823,7 +847,7 @@ static int vecpstr_newchunk(vecpstr *op,int amount) noex {
 	    op->ccp = (vecpstr_ch *) vp ;
 	    if (amount < op->chsize) amount = op->chsize ;
 	    if ((rs = chunk_start(op->ccp,amount)) >= 0) {
-	        rs = vechand_add(&op->chunks,op->ccp) ;
+	        rs = vechand_add(op->clp,op->ccp) ;
 		if (rs < 0)
 		    chunk_finish(op->ccp) ;
 	    } /* end if (chunk) */

@@ -105,10 +105,12 @@ static int lookaside_ctor(lookaside *op,Args ... args) noex {
 static int lookaside_dtor(lookaside *op) noex {
 	int		rs = SR_OK ;
 	if (op->esp) {
-	    op->esp->~pq() ;
+	    delete op->esp ;
+	    op->esp = nullptr ;
 	}
 	if (op->cqp) {
-	    op->cqp->~pq() ;
+	    delete op->cqp ;
+	    op->cqp = nullptr ;
 	}
 	return rs ;
 }
@@ -173,6 +175,10 @@ int lookaside_finish(lookaside *op) noex {
 	    }
 	    {
 		rs1 = pq_finish(op->cqp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = lookaside_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
