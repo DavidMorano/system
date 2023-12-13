@@ -89,7 +89,7 @@ static inline int expcook_ctor(EX *op) noex {
 }
 /* end subroutine (expcook_ctor) */
 
-static inline int expcook_dtor(EX *op) noex {
+static int expcook_dtor(EX *op) noex {
 	int		rs = SR_OK ;
 	if (op->hlp) {
 	    delete op->hlp ;
