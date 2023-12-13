@@ -29,6 +29,7 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<cstring>
+#include	<new>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<pq.h>
@@ -43,6 +44,19 @@
 #define	OURMALLOC(size,pointer)		uc_libmalloc((size),(pointer))
 #define	OURREALLOC(p1,size,p2)		uc_librealloc((p1),(size),(p2))
 #define	OURFREE(pointer)		uc_libfree((pointer))
+
+
+/* local namespaces */
+
+using std::nullptr_t ;
+using std::nothrow ;
+
+
+/* local typedefs */
+
+struct lookaside_ch ;
+
+typedef lookaside_ch	*chunkp ;
 
 
 /* external subroutines */
@@ -61,10 +75,11 @@ struct lookaside_ch {
 /* forward references */
 
 template<typename ... Args>
-static inline int lookaside_ctor(lookaside *op,Args ... args) noex {
+static int lookaside_ctor(lookaside *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->eap = nullptr ;
 	    op->nchunks = 0 ;
 	    op->esize = 0 ;
@@ -73,10 +88,33 @@ static inline int lookaside_ctor(lookaside *op,Args ... args) noex {
 	    op->i = 0 ;
 	    op->nfree = 0 ;
 	    op->nused = 0 ;
+	    if ((op->cqp = new(nothrow) pq) != np) {
+	        if ((op->esp = new(nothrow) pq) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new) */
+		if (rs < 0) {
+		    op->cqp->~pq() ;
+		    op->cqp = np ;
+		}
+	    } /* end if (new) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (lookaside_ctor) */
+
+static int lookaside_dtor(lookaside *op) noex {
+	int		rs = SR_OK ;
+	if (op->esp) {
+	    op->esp->~pq() ;
+	}
+	if (op->cqp) {
+	    op->cqp->~pq() ;
 	}
 	return rs ;
 }
+/* end subroutine (lookaside_dtor) */
 
+static int	lookaside_dtor(lookaside *) noex ;
 static int	lookaside_newchunk(lookaside *) noex ;
 
 
@@ -99,12 +137,15 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 		op->n = n ;
 		op->i = -1 ;
 		op->eaoff = iceil(csize,qalign) ;
-		if ((rs = pq_start(&op->cq)) >= 0) {
-	    	    rs = pq_start(&op->estack) ;
+		if ((rs = pq_start(op->cqp)) >= 0) {
+	    	    rs = pq_start(op->esp) ;
 	    	    if (rs < 0)
-			pq_finish(&op->cq) ;
+			pq_finish(op->cqp) ;
 		} /* end if (pq_start) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		lookaside_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -115,23 +156,23 @@ int lookaside_finish(lookaside *op) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (op) {
-	    pq		*cqp = &op->cq ; /* loop invariant */
+	    pq		*cqp = op->cqp ; /* loop invariant */
 	    pq_ent	*rep = nullptr ;
 	    rs = SR_OK ;
-	    op->eap = NULL ;
+	    op->eap = nullptr ;
 	    while (pq_rem(cqp,&rep) >= 0) {
-	        lookaside_ch	*cp = (lookaside_ch *) rep ;
+	        lookaside_ch	*cp = chunkp(rep) ;
 	        c += 1 ;
 	        op->nchunks -= 1 ;
 	        rs1 = OURFREE(cp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end while */
 	    {
-		rs1 = pq_finish(&op->estack) ;
+		rs1 = pq_finish(op->esp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs1 = pq_finish(&op->cq) ;
+		rs1 = pq_finish(op->cqp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -145,7 +186,7 @@ int lookaside_get(lookaside *op,void *p) noex {
 	    rs = SR_OK ;
 	    if (op->nfree > 0) {
 	        pq_ent	**epp = (pq_ent **) p ;
-	        if ((rs = pq_remtail(&op->estack,epp)) >= 0) {
+	        if ((rs = pq_remtail(op->esp,epp)) >= 0) {
 	            op->nfree -= 1 ;
 	        }
 	    } else {
@@ -168,7 +209,7 @@ int lookaside_release(lookaside *op,void *p) noex {
 	int		rs = SR_FAULT ;
 	if (op && p) {
 	    pq_ent	*ep = (pq_ent *) p ;
-	    if ((rs = pq_ins(&op->estack,ep)) >= 0) {
+	    if ((rs = pq_ins(op->esp,ep)) >= 0) {
 	        op->nfree += 1 ;
 	        op->nused -= 1 ;
 	    }
@@ -189,8 +230,8 @@ int lookaside_count(lookaside *op) noex {
 int lookaside_audit(lookaside *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if ((rs = pq_audit(&op->cq)) >= 0) {
-	        rs = pq_audit(&op->estack) ;
+	    if ((rs = pq_audit(op->cqp)) >= 0) {
+	        rs = pq_audit(op->esp) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -207,7 +248,7 @@ static int lookaside_newchunk(lookaside *op) noex {
 	    caddr_t	a ;
 	    if ((rs = OURMALLOC(size,&a)) >= 0) {
 		pq_ent	*nep = (pq_ent *) a ;
-	        if ((rs = pq_ins(&op->cq,nep)) >= 0) {
+	        if ((rs = pq_ins(op->cqp,nep)) >= 0) {
 	            op->eap = caddr_t(a + op->eaoff) ;
 	            op->i = 0 ;
 	            op->nchunks += 1 ;

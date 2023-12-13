@@ -43,8 +43,9 @@
 int slist_start(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp) {
-	    qhp->head = NULL ;
-	    qhp->tail = NULL ;
+	    rs = SR_OK ;
+	    qhp->head = nullptr ;
+	    qhp->tail = nullptr ;
 	    qhp->count = 0 ;
 	}
 	return rs ;
@@ -54,8 +55,9 @@ int slist_start(slist *qhp) noex {
 int slist_finish(slist *qhp) noex {
 	int		rs = SR_FAULT ;
 	if (qhp) {
-	    qhp->head = NULL ;
-	    qhp->tail = NULL ;
+	    rs = SR_OK ;
+	    qhp->head = nullptr ;
+	    qhp->tail = nullptr ;
 	    qhp->count = 0 ;
 	}
 	return rs ;
@@ -67,7 +69,7 @@ int slist_ins(slist *qhp,slist_ent *ep) noex {
 	int		c = 0 ;
 	if (qhp && ep) {
 	    rs = SR_OK ;
-	    ep->next = NULL ;
+	    ep->next = nullptr ;
 	    if (qhp->head) {
 	        slist_ent	*pep = qhp->tail ;
 		if (pep) {
@@ -118,7 +120,7 @@ int slist_insgroup(slist *qhp,slist_ent *gp,int esize,int n) noex {
 	                p += esize ;
 	                pep = ep ;
 	            } /* end for */
-	            pep->next = NULL ;
+	            pep->next = nullptr ;
 	            qhp->tail = pep ;
 	            qhp->count += n ;
 	            c = qhp->count ;
@@ -199,7 +201,7 @@ int slist_rem(slist *qhp,slist_ent **epp) noex {
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (was not empty) */
-	    *epp = (rs >= 0) ? ep : NULL ;
+	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -219,7 +221,7 @@ int slist_gettail(slist *qhp,slist_ent **epp) noex {
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    }
-	    *epp = (rs >= 0) ? ep : NULL ;
+	    *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
