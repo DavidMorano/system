@@ -24,7 +24,7 @@
 #include	<strwcpyx.h>
 #include	<strdcpyx.h>
 #include	<strn.h>
-#include	<sfstr.h>
+#include	<sfx.h>
 #include	<sistr.h>
 #include	<mkpathx.h>
 #include	<mknpathx.h>
