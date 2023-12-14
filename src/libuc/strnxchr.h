@@ -28,8 +28,8 @@
 extern "C" {
 #endif
 
-char *strnochr(cchar *,int,int) noex ;
-char *strnrchr(cchar *,int,int) noex ;
+extern char *strnochr(cchar *,int,int) noex ;
+extern char *strnrchr(cchar *,int,int) noex ;
 
 static inline char *strnchr(cchar *sp,int sl,int sch) noex {
 	return strnochr(sp,sl,sch) ;
