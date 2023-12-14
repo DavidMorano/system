@@ -4,6 +4,7 @@
 /* Apple Darwin operating system support */
 /* version %I% last-modified %G% */
 
+#define	CF_PSEMADAPT	1		/* 1=adapt, 0=no-adapt */
 
 /* revision history:
 
@@ -19,7 +20,7 @@
 
 /*******************************************************************************
 
-	This file contains the UNIX system types that the brain-damaged
+	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
@@ -41,13 +42,10 @@
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
 #include	<signal.h>
 #include	<pthread.h>
+#include	<semaphore.h>
 #include	<time.h>
 #include	<clanguage.h>
 
-
-#ifndef	CTIMESPEC
-#define	CTIMESPEC	const struct timespec
-#endif
 
 #ifndef	SIGEVENT
 #define	SIGEVENT	struct sigevent
@@ -55,6 +53,10 @@
 
 #ifndef	SIGVAL
 #define	SIGVAL		union sigval
+#endif
+
+#ifndef	CTIMESPEC
+#define	CTIMESPEC	const struct timespec
 #endif
 
 #ifndef	CSIGVAL
@@ -186,6 +188,7 @@ extern int pthread_cond_reltimedwait_np(PTC *,PTM *,CTIMESPEC *) noex ;
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
 
+
 /* MUTEXROBUST start */
 #if	(!defined(SYSHAS_MUTEXROBUST)) || (SYSHAS_MUTEXROBUST == 0)
 
@@ -240,6 +243,29 @@ extern int memcntl(void *,size_t,int,void *,int,int) noex ;
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
+
+
+/* PSEM begin (unnamed POSIX® semaphores) */
+#if	CF_PSEMADAPT
+#if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
+
+#ifndef	SUBROUTINE_SEMINIT
+#define	SUBROUTINE_SEMINIT
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+extern int darwinsem_init(sem_t *,int,unsigned int) noex ;
+extern int darwinsem_destroy(sem_t *) noex ;
+
+#ifdef	__cplusplus
+}
+#endif
+#endif /* SUBROUTINE_SEMINIT */
+
+#endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
+#endif /* CF_PSEMADAPT */
+/* PSEM end */
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
