@@ -20,7 +20,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<vechand.h>
 #include	<buffer.h>
 #include	<bfile.h>
@@ -42,12 +43,6 @@
 #define	VARSUB_OBRACE		(1<<2)	/* substitute on braces */
 #define	VARSUB_OPAREN		(1<<3)	/* substitute on parentheses */
 
-#define	VARSUB_MBLANK		VARSUB_OBLANK
-#define	VARSUB_MNOBLANK		VARSUB_ONOBLANK
-#define	VARSUB_MBADNOKEY	VARSUB_OBADNOKEY
-#define	VARSUB_MBRACE		VARSUB_OBRACE
-#define	VARSUB_MPAREN		VARSUB_OPAREN
-
 
 struct varsub_flags {
 	uint		badnokey:1 ;
@@ -62,7 +57,7 @@ struct varsub_cursor {
 } ;
 
 struct varsub_head {
-	vechand		subs ;
+	vechand		*slp ;
 	VARSUB_FL	f ;
 	uint		magic ;
 	int		n ;		/* current allocated length */
@@ -78,20 +73,20 @@ typedef VARSUB_CUR	varsub_cur ;
 extern "C" {
 #endif
 
-extern int	varsub_start(VARSUB *,int) noex ;
-extern int	varsub_add(VARSUB *,cchar *,int,cchar *,int) noex ;
-extern int	varsub_addva(VARSUB *,cchar **) noex ;
-extern int	varsub_addquick(VARSUB *,cchar *,int,cchar *,int) noex ;
-extern int	varsub_addvaquick(VARSUB *,cchar **) noex ;
-extern int	varsub_curbegin(VARSUB *,VARSUB_CUR *) noex ;
-extern int	varsub_enum(VARSUB *,VARSUB_CUR *,cchar **,cchar **) noex ;
-extern int	varsub_curend(VARSUB *,VARSUB_CUR *) noex ;
-extern int	varsub_del(VARSUB *,const char *,int) noex ;
-extern int	varsub_fetch(VARSUB *,cchar *,int,cchar **) noex ;
-extern int	varsub_expand(VARSUB *,char *,int,cchar *,int) noex ;
-extern int	varsub_expandbuf(VARSUB *,buffer *,cchar *,int) noex ;
-extern int	varsub_expandfile(VARSUB *,bfile *,bfile *) noex ;
-extern int	varsub_finish(VARSUB *) noex ;
+extern int	varsub_start(varsub *,int) noex ;
+extern int	varsub_add(varsub *,cchar *,int,cchar *,int) noex ;
+extern int	varsub_addva(varsub *,cchar **) noex ;
+extern int	varsub_addquick(varsub *,cchar *,int,cchar *,int) noex ;
+extern int	varsub_addvaquick(varsub *,cchar **) noex ;
+extern int	varsub_curbegin(varsub *,varsub_cur *) noex ;
+extern int	varsub_enum(varsub *,varsub_cur *,cchar **,cchar **) noex ;
+extern int	varsub_curend(varsub *,varsub_cur *) noex ;
+extern int	varsub_del(varsub *,const char *,int) noex ;
+extern int	varsub_fetch(varsub *,cchar *,int,cchar **) noex ;
+extern int	varsub_expand(varsub *,char *,int,cchar *,int) noex ;
+extern int	varsub_expandbuf(varsub *,buffer *,cchar *,int) noex ;
+extern int	varsub_expandfile(varsub *,bfile *,bfile *) noex ;
+extern int	varsub_finish(varsub *) noex ;
 
 #ifdef	__cplusplus
 }

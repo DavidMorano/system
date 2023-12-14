@@ -33,9 +33,9 @@
 
 
 struct csem_head {
+	ptm		*mxp ;
+	ptc		*cvp ;
 	uint		magic ;
-	ptm		m ;
-	ptc		c ;
 	int		count ;		/* this is the real data! */
 	int		waiters ;	/* this is some extra */
 } ;

@@ -1,6 +1,9 @@
 /* psem INCLUDE */
 /* lang=C20 */
 
+/* POSIX® unnamed-Semaphore (PSEM) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

@@ -45,7 +45,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
+#include	<new>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>
@@ -56,10 +57,68 @@
 /* local defines */
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* forward references */
+
+template<typename ... Args>
+static inline int lockrw_ctor(lockrw *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    op->readers = 0 ;
+	    op->writers = 0 ;
+	    op->waitwriters = 0 ;
+	    op->waitreaders = 0 ;
+	    if ((op->mxp = new(nothrow) ptm) != np) {
+	        if ((op->cvp = new(nothrow) ptc) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-ptc) */
+	 	if (rs < 0) {
+		    delete op->mxp ;
+		    op->mxp = nullptr ;
+		}
+	    } /* end if (new-ptm) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (lockrw_ctor) */
+
+static int lockrw_dtor(lockrw *op) noex {
+	int		rs = SR_OK ;
+	if (op->cvp) {
+	    delete op->cvp ;
+	    op->cvp = nullptr ;
+	}
+	if (op->mxp) {
+	    delete op->mxp ;
+	    op->mxp = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (lockrw_dtor) */
+
+template<typename ... Args>
+static inline int lockrw_magic(lockrw *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LOCKRW_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (lockrw_magic) */
 
 static int	lockrw_ptminit(lockrw *,int) noex ;
 static int	lockrw_ptcinit(lockrw *,int) noex ;
@@ -71,145 +130,136 @@ static int	lockrw_notready(lockrw *,int) noex ;
 
 /* exported subroutines */
 
-int lockrw_create(lockrw *psp,int f_shared) noex {
-	int		rs = SR_FAULT ;
-	if (psp) {
-	    psp->magic = 0 ;
-	    psp->readers = 0 ;
-	    psp->writers = 0 ;
-	    psp->waitwriters = 0 ;
-	    psp->waitreaders = 0 ;
-	    if ((rs = lockrw_ptminit(psp,f_shared)) >= 0) {
-	        if ((rs = lockrw_ptcinit(psp,f_shared)) >= 0) {
-		    psp->magic = LOCKRW_MAGIC ;
+int lockrw_create(lockrw *op,int f_shared) noex {
+	int		rs ;
+	if ((rs = lockrw_ctor(op)) >= 0) {
+	    if ((rs = lockrw_ptminit(op,f_shared)) >= 0) {
+	        if ((rs = lockrw_ptcinit(op,f_shared)) >= 0) {
+		    op->magic = LOCKRW_MAGIC ;
 		}
-	        if (rs < 0)
-		    ptm_destroy(&psp->m) ;
+	        if (rs < 0) {
+		    ptm_destroy(op->mxp) ;
+		}
 	    } /* end if (PTM created) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		lockrw_dtor(op) ;
+	    }
+	} /* end if (lockrw_ctor) */
 	return rs ;
 }
 /* end subroutine (lockrw_create) */
 
-int lockrw_destroy(lockrw *psp) noex {
-	int		rs = SR_FAULT ;
+int lockrw_destroy(lockrw *op) noex {
+	int		rs ;
 	int		rs1 ;
-	if (psp) {
-	    rs = SR_NOTOPEN ;
-	    if (psp->magic == LOCKRW_MAGIC) {
-		rs = SR_OK ;
-	        rs1 = ptc_destroy(&psp->c) ;
-	        if (rs >= 0) rs = rs1 ;
-	        rs1 = ptm_destroy(&psp->m) ;
-	        if (rs >= 0) rs = rs1 ;
-	        psp->magic = 0 ;
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	if ((rs = lockrw_magic(op)) >= 0) {
+		{
+	            rs1 = ptc_destroy(op->cvp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = ptm_destroy(op->mxp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+		    rs1 = lockrw_dtor(op) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+	        op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lockrw_destroy) */
 
-int lockrw_rdlock(lockrw *psp,int to) noex {
-	int		rs = SR_FAULT ;
+int lockrw_rdlock(lockrw *op,int to) noex {
+	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (psp) {
-	    rs = SR_NOTOPEN ;
-	    if (psp->magic == LOCKRW_MAGIC) {
+	if ((rs = lockrw_magic(op)) >= 0) {
 	        TIMESPEC	ts{} ;
 	        if (to >= 0) {
 	            clock_gettime(CLOCK_REALTIME,&ts) ;
 	            ts.tv_sec += to ;
 	        }
-	        if ((rs = ptm_lockto(&psp->m,to)) >= 0) {
-	            psp->waitreaders += 1 ;
-	            while ((rs >= 0) && lockrw_notready(psp,1)) {
+	        if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+	            op->waitreaders += 1 ;
+	            while ((rs >= 0) && lockrw_notready(op,1)) {
 		        if (to >= 0) {
-	                    rs = ptc_timedwait(&psp->c,&psp->m,&ts) ;
+	                    rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
 		        } else {
-	                    rs = ptc_wait(&psp->c,&psp->m) ;
+	                    rs = ptc_wait(op->cvp,op->mxp) ;
 		        }
 	            } /* end while */
 	            if (rs >= 0) {
-		        n = psp->readers ;
-		        psp->readers += 1 ;
+		        n = op->readers ;
+		        op->readers += 1 ;
 	            }
-	            psp->waitreaders -= 1 ;
-	            rs1 = ptm_unlock(&psp->m) ;
+	            op->waitreaders -= 1 ;
+	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (lockrw_rdlock) */
 
-int lockrw_wrlock(lockrw *psp,int to) noex {
-	int		rs = SR_FAULT ;
+int lockrw_wrlock(lockrw *op,int to) noex {
+	int		rs ;
 	int		rs1 ;
-	if (psp) {
-	    rs = SR_NOTOPEN ;
-	    if (psp->magic == LOCKRW_MAGIC) {
+	if ((rs = lockrw_magic(op)) >= 0) {
 	        TIMESPEC	ts{} ;
 	        if (to >= 0) {
 	            clock_gettime(CLOCK_REALTIME,&ts) ;
 	            ts.tv_sec += to ;
 	        }
-	        if ((rs = ptm_lockto(&psp->m,to)) >= 0) {
-	            psp->waitwriters += 1 ;
-	            while ((rs >= 0) && lockrw_notready(psp,0)) {
+	        if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+	            op->waitwriters += 1 ;
+	            while ((rs >= 0) && lockrw_notready(op,0)) {
 		        if (to >= 0) {
-	                    rs = ptc_timedwait(&psp->c,&psp->m,&ts) ;
+	                    rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
 		        } else {
-	                    rs = ptc_wait(&psp->c,&psp->m) ;
+	                    rs = ptc_wait(op->cvp,op->mxp) ;
 		        }
 	            } /* end while */
-	            if (rs >= 0) psp->writers += 1 ;
-	            psp->waitwriters -= 1 ;
-	            rs1 = ptm_unlock(&psp->m) ;
+	            if (rs >= 0) op->writers += 1 ;
+	            op->waitwriters -= 1 ;
+	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lockrw_wrlock) */
 
-int lockrw_unlock(lockrw *psp) noex {
-	int		rs = SR_FAULT ;
+int lockrw_unlock(lockrw *op) noex {
+	int		rs ;
 	int		rs1 ;
-	if (psp) {
-	    rs = SR_NOTOPEN ;
-	    if (psp->magic == LOCKRW_MAGIC) {
-	        if ((rs = ptm_lock(&psp->m)) >= 0) {
-	            if (psp->readers > 0) psp->readers -= 1 ;
-	            if (psp->writers > 0) psp->writers -= 1 ;
-	            if ((psp->waitreaders > 0) || (psp->waitwriters > 0)) {
-	                rs = ptc_broadcast(&psp->c) ;
+	if ((rs = lockrw_magic(op)) >= 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+	            if (op->readers > 0) op->readers -= 1 ;
+	            if (op->writers > 0) op->writers -= 1 ;
+	            if ((op->waitreaders > 0) || (op->waitwriters > 0)) {
+	                rs = ptc_broadcast(op->cvp) ;
 	            }
-	            rs1 = ptm_unlock(&psp->m) ;
+	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex-lock) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lockrw_unlock) */
 
-int lockrw_readers(lockrw *psp) noex {
-	int		rs = SR_FAULT ;
+int lockrw_readers(lockrw *op) noex {
+	int		rs ;
 	int		rs1 ;
 	int		v = 0 ;
-	if (psp) {
-	    rs = SR_NOTOPEN ;
-	    if (psp->magic == LOCKRW_MAGIC) {
-	        if ((rs = ptm_lock(&psp->m)) >= 0) {
-	            v = psp->readers ; /* this is really already atomic! */
-	            rs1 = ptm_unlock(&psp->m) ;
+	if ((rs = lockrw_magic(op)) >= 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+	            v = op->readers ; /* this is really already atomic! */
+	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex-lock) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (lockrw_readers) */
@@ -217,7 +267,7 @@ int lockrw_readers(lockrw *psp) noex {
 
 /* private subroutines */
 
-static int lockrw_ptminit(lockrw *psp,int f_shared) noex {
+static int lockrw_ptminit(lockrw *op,int f_shared) noex {
 	ptma		a ;
 	int		rs ;
 	int		rs1 ;
@@ -228,19 +278,19 @@ static int lockrw_ptminit(lockrw *psp,int f_shared) noex {
 		rs = ptma_setpshared(&a,v) ;
 	    }
 	    if (rs >= 0) {
-	        rs = ptm_create(&psp->m,&a) ;
+	        rs = ptm_create(op->mxp,&a) ;
 		f_ptm = (rs >= 0) ;
 	    }
 	    rs1 = ptma_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptm) ptm_destroy(&psp->m) ;
+	    if ((rs < 0) && f_ptm) ptm_destroy(op->mxp) ;
 	} /* end if (ptma) */
 	return rs ;
 }
 /* end subroutine (lockrw_ptminit) */
 
-static int lockrw_ptcinit(lockrw *psp,int f_shared) noex {
-	PTCA		a ;
+static int lockrw_ptcinit(lockrw *op,int f_shared) noex {
+	ptca		a ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptca_create(&a)) >= 0) {
@@ -250,23 +300,23 @@ static int lockrw_ptcinit(lockrw *psp,int f_shared) noex {
 		rs = ptca_setpshared(&a,v) ;
 	    }
 	    if (rs >= 0) {
-	        rs = ptc_create(&psp->c,&a) ;
+	        rs = ptc_create(op->cvp,&a) ;
 		f_ptc = (rs >= 0) ;
 	    }
 	    rs1 = ptca_destroy(&a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && f_ptc) ptc_destroy(&psp->c) ;
+	    if ((rs < 0) && f_ptc) ptc_destroy(op->cvp) ;
 	} /* end if (ptca) */
 	return rs ;
 }
 /* end subroutine (lockrw_ptcinit) */
 
-static int lockrw_notready(lockrw *psp,int f_read) noex {
-	bool	f_notready = (psp->writers > 0) ;
+static int lockrw_notready(lockrw *op,int f_read) noex {
+	bool	f_notready = (op->writers > 0) ;
 	if (f_read) {
-	    f_notready = f_notready || (psp->waitwriters > 0) ;
+	    f_notready = f_notready || (op->waitwriters > 0) ;
 	} else {
-	    f_notready = f_notready || (psp->readers > 0) ;
+	    f_notready = f_notready || (op->readers > 0) ;
 	} /* end if */
 	return f_notready ;
 }

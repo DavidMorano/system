@@ -20,6 +20,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<lookaside.h>
 #include	<localmisc.h>
 
@@ -57,7 +59,7 @@ struct vecobj_flags {
 
 struct vecobj_head {
 	void		**va ;
-	lookaside	la ;
+	lookaside	*lap ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */

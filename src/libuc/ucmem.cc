@@ -89,7 +89,7 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 			if ((rs = u_mincore(ca,cs,ba)) >= 0) {
 			    for (size_t bi = 0z ; bi < npages ; bi += 1) {
 			        if (ba[bi]) {
-				    BASET(bits,bi) ;
+				    baset(bits,bi) ;
 				}
 			   } /* end for */
 			} /* end if (u_mincore) */

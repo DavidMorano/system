@@ -27,9 +27,9 @@
 
 
 struct lockrw_head {
+	ptm		*mxp ;
+	ptc		*cvp ;
 	uint		magic ;
-	ptm		m ;
-	ptc		c ;
 	int		readers ;
 	int		writers ;
 	int		waitwriters ;

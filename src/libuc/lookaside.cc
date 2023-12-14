@@ -91,12 +91,12 @@ static int lookaside_ctor(lookaside *op,Args ... args) noex {
 	    if ((op->cqp = new(nothrow) pq) != np) {
 	        if ((op->esp = new(nothrow) pq) != np) {
 		    rs = SR_OK ;
-	        } /* end if (new) */
+	        } /* end if (new-pq) */
 		if (rs < 0) {
-		    op->cqp->~pq() ;
+		    delete op->cqp ;
 		    op->cqp = np ;
 		}
-	    } /* end if (new) */
+	    } /* end if (new-pq) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -105,10 +105,12 @@ static int lookaside_ctor(lookaside *op,Args ... args) noex {
 static int lookaside_dtor(lookaside *op) noex {
 	int		rs = SR_OK ;
 	if (op->esp) {
-	    op->esp->~pq() ;
+	    delete op->esp ;
+	    op->esp = nullptr ;
 	}
 	if (op->cqp) {
-	    op->cqp->~pq() ;
+	    delete op->cqp ;
+	    op->cqp = nullptr ;
 	}
 	return rs ;
 }
@@ -139,8 +141,9 @@ int lookaside_start(lookaside *op,int esize,int n) noex {
 		op->eaoff = iceil(csize,qalign) ;
 		if ((rs = pq_start(op->cqp)) >= 0) {
 	    	    rs = pq_start(op->esp) ;
-	    	    if (rs < 0)
+	    	    if (rs < 0) {
 			pq_finish(op->cqp) ;
+		    }
 		} /* end if (pq_start) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
@@ -173,6 +176,10 @@ int lookaside_finish(lookaside *op) noex {
 	    }
 	    {
 		rs1 = pq_finish(op->cqp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = lookaside_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */

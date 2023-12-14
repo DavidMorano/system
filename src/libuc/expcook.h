@@ -34,12 +34,12 @@
 
 
 struct expcook_cursor {
-	hdbstr_cur	cur ;
+	hdbstr_cur	*clp ;
 } ;
 
 struct expcook_head {
 	uint		magic ;
-	hdbstr		subs ;
+	hdbstr		*hlp ;
 } ;
 
 typedef EXPCOOK		expcook ;

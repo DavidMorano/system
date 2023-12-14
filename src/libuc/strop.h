@@ -37,8 +37,8 @@ enum stropmems {
 } ;
 struct strop ;
 struct strop_co {
-	strop		*op ;
-	int		w ;
+	strop		*op = nullptr ;
+	int		w = -1 ;
 	void operator () (strop *p,int m) noex {
 	    op = p ;
 	    w = m ;

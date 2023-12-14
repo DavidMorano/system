@@ -48,6 +48,7 @@
 #include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<vechand.h>
@@ -66,6 +67,15 @@
 #endif
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -75,18 +85,33 @@
 /* forward references */
 
 template<typename ... Args>
-static inline int strpack_ctor(strpack *op,Args ... args) noex {
+static int strpack_ctor(strpack *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->ccp = nullptr ;
 	    op->magic = 0 ;
 	    op->chsize = 0 ;
 	    op->totalsize = 0 ;
 	    op->c = 0 ;
+	    if ((op->clp = new(nothrow) vechand) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strpack_ctor) */
+
+static int strpack_dtor(strpack *op) noex {
+	int		rs = SR_OK ;
+	if (op->clp) {
+	    delete op->clp ;
+	    op->clp = nullptr ;
 	}
 	return rs ;
 }
+/* end subroutine (strpack_dtor) */
 
 template<typename ... Args>
 static inline int strpack_magic(strpack *op,Args ... args) noex {
@@ -96,6 +121,7 @@ static inline int strpack_magic(strpack *op,Args ... args) noex {
 	}
 	return rs ;
 }
+/* end subroutine (strpack_magic) */
 
 static int	strpack_chunknew(strpack *,int) noex ;
 static int	strpack_chunkfins(strpack *) noex ;
@@ -118,16 +144,20 @@ int strpack_start(strpack *op,int chsize) noex {
 	    cint	vo = VECHAND_OORDERED ;
 	    if (chsize < STRPACK_CHSIZE) chsize = STRPACK_CHSIZE ;
 	    op->chsize = chsize ;
-	    if ((rs = vechand_start(&op->chunks,0,vo)) >= 0) {
+	    if ((rs = vechand_start(op->clp,0,vo)) >= 0) {
 		if constexpr (f_prealloc) {
 	    	    rs = strpack_chunknew(op,0) ;
 		}
 	        if (rs >= 0) {
 		    op->magic = STRPACK_MAGIC ;
 	        }
-	        if (rs < 0)
-		    vechand_finish(&op->chunks) ;
+	        if (rs < 0) {
+		    vechand_finish(op->clp) ;
+		}
 	    } /* end if (vechand_start) */
+	    if (rs < 0) {
+		strpack_dtor(op) ;
+	    }
 	} /* end if (strpack_ctor) */
 	return rs ;
 }
@@ -137,16 +167,20 @@ int strpack_finish(strpack *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = strpack_magic(op)) >= 0) {
-		{
-		    rs1 = strpack_chunkfins(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = vechand_finish(&op->chunks) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		op->ccp = nullptr ;
-		op->magic = 0 ;
+	    {
+		rs1 = strpack_chunkfins(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vechand_finish(op->clp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = strpack_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->ccp = nullptr ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -159,7 +193,7 @@ int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 	    {
 	        strpack_ch	*ccp = op->ccp ;
 	        int		amount = (sl + 1) ;
-	        if ((ccp == nullptr) || (amount > (ccp->csize - ccp->i))) {
+	        if ((ccp == nullptr) || (amount > (ccp->csz - ccp->i))) {
 	            rs = strpack_chunknew(op,amount) ;
 	            ccp = op->ccp ;
 	        }
@@ -200,32 +234,34 @@ int strpack_size(strpack *op) noex {
 /* private subroutines */
 
 static int strpack_chunknew(strpack *op,int amount) noex {
-	cint		csize = sizeof(strpack_ch) ;
+	cint		csz = sizeof(strpack_ch) ;
 	int		rs ;
 	void		*vp{} ;
 	if (op->chsize > amount) amount = op->chsize ;
-	if ((rs = uc_libmalloc(csize,&vp)) >= 0) {
+	if ((rs = uc_libmalloc(csz,&vp)) >= 0) {
 	    strpack_ch	*cep = (strpack_ch *) vp ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) {
-	        if ((rs = vechand_add(&op->chunks,cep)) >= 0) {
+	        if ((rs = vechand_add(op->clp,cep)) >= 0) {
 	            op->ccp = cep ;
 	            if (op->totalsize == 0) {
 	                chunk_adv(cep) ;
 	                op->totalsize = 1 ;
 	            }
 		} /* end if (vechand) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            chunk_finish(cep) ;
+		}
 	    } /* end if (chunk) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uc_libfree(cep) ;
+	    }
 	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (strpack_chunknew) */
 
 static int strpack_chunkfins(strpack *op) noex {
-	vechand		*clp = &op->chunks ;
+	vechand		*clp = op->clp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
@@ -246,13 +282,13 @@ static int strpack_chunkfins(strpack *op) noex {
 }
 /* end subroutine (strpack_chunkfins) */
 
-static int chunk_start(strpack_ch *cnp,int csize) noex {
+static int chunk_start(strpack_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
 	memclear(cnp,sizeof(strpack_ch)) ;
-	if (csize > 0) {
-	    cnp->csize = csize ;
+	if (csz > 0) {
+	    cnp->csz = csz ;
 	    void	*vp{} ;
-	    if ((rs = uc_libmalloc(csize,&vp)) >= 0) {
+	    if ((rs = uc_libmalloc(csz,&vp)) >= 0) {
 	        cnp->cdata = (char *) vp ;
 	    }
 	}
@@ -279,7 +315,7 @@ static int chunk_finish(strpack_ch *cnp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    cnp->cdata = nullptr ;
 	}
-	cnp->csize = 0 ;
+	cnp->csz = 0 ;
 	cnp->i = 0 ;
 	cnp->c = 0 ;
 	return rs ;

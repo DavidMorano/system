@@ -1,7 +1,8 @@
 /* psem */
 /* lang=C++20 */
 
-/* Posix Semaphore (PSEM) */
+/* POSIX® unnamed-Semaphore (PSEM) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

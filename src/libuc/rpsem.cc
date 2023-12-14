@@ -1,9 +1,10 @@
 /* psem */
 /* lang=C++20 */
 
-/* Posix Semaphore (PSEM) */
+/* POSIX© unnamed Semaphore (PSEM) */
 /* version %I% last-modified %G% */
 
+#define	CF_TESTNATIVE	0		/* test-only using native facility */
 
 /* revision history:
 
@@ -16,18 +17,38 @@
 
 /*******************************************************************************
 
-        This module provides a sanitized version of the standard POSIX®
-        semaphore facility provided with some new UNIX®i. Some operating system
-        problems are managed within these routines for the common stuff that
-        happens when a poorly configured OS gets overloaded!
+	This module provides a sanitized version of the standard
+	POSIX® semaphore facility provided with some new UNIX®i.
+	Some operating system problems are managed within these
+	routines for the common stuff that happens when a poorly
+	configured OS gets overloaded!
 
 	Enjoy!
 
+	Important-note:
+	The Apple-Darwin operating system has the unnamed POSIX®
+	semaphores depracated. This produces bad and very annoying
+	error messages to appear from the compiler when attempting
+	to use the |init| and |destroy| subroutines (methods) of
+	the POSIX® semaphore object.  There is no easy fix for this
+	that I know of.  So to get around this, I redefine (using
+	the C/C++ language preprocessor (CPP) to redefine the
+	names for those subroutines to something else (which are
+	defined) elsewhere ) so that at least we get a clear ocmpile
+	for code test purposes.  Not that for real run-time, the
+	native Apple-Darwin implementation of POSIX® is completely
+	bypassed with my own implementation. See the pre-processor
+	definitions under the section below named "local defines"
+	to see how I deal with this (crap)!  
+
 *******************************************************************************/
+
+#ifndef	CF_TESTNATIVE
+#define	CF_TESTNATIVE	0
+#endif
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<semaphore.h>
 #include	<cerrno>
@@ -36,7 +57,18 @@
 #include	<localmisc.h>
 #include	<usupport.h>
 
+#if	CF_TESTNATIVE
+#include	"rpsem.h"
+#else /* CF_TESTNATIVE */
 #include	"psem.h"
+#endif /* CF_TESTNATIVE */
+
+#if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
+#define	sem_init	darwinsem_init
+#define	sem_destroy	darwinsem_destroy
+#endif
+#endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
 
 
 /* local defines */
@@ -56,7 +88,7 @@
 
 /* exported subroutines */
 
-int psem_create(PSEM *psp,int pshared,int count) noex {
+int psem_create(psem *psp,int pshared,int count) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    cint	ic = int(count & INT_MAX) ;
@@ -70,7 +102,7 @@ int psem_create(PSEM *psp,int pshared,int count) noex {
 }
 /* end subroutine (psem_create) */
 
-int psem_destroy(PSEM *psp) noex {
+int psem_destroy(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
@@ -84,7 +116,7 @@ int psem_destroy(PSEM *psp) noex {
 /* end subroutine (psem_destroy) */
 
 #ifdef	COMMENT
-int psem_getvalue(PSEM *psp) noex {
+int psem_getvalue(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (psp) {
@@ -101,7 +133,7 @@ int psem_getvalue(PSEM *psp) noex {
 /* end subroutine (psem_getvalue) */
 #endif /* COMMENT */
 
-int psem_waiti(PSEM *psp) noex {
+int psem_waiti(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	        repeat {
@@ -114,7 +146,7 @@ int psem_waiti(PSEM *psp) noex {
 }
 /* end subroutine (psem_waiti) */
 
-int psem_wait(PSEM *psp) noex {
+int psem_wait(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
@@ -127,7 +159,7 @@ int psem_wait(PSEM *psp) noex {
 }
 /* end subroutine (psem_wait) */
 
-int psem_trywait(PSEM *psp) noex {
+int psem_trywait(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {
@@ -140,7 +172,7 @@ int psem_trywait(PSEM *psp) noex {
 }
 /* end subroutine (psem_trywait) */
 
-int psem_waiter(PSEM *psp,int to) noex {
+int psem_waiter(psem *psp,int to) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
@@ -173,7 +205,7 @@ int psem_waiter(PSEM *psp,int to) noex {
 }
 /* end subroutine (psem_waiter) */
 
-int psem_post(PSEM *psp) noex {
+int psem_post(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
 	    repeat {

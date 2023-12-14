@@ -1,6 +1,9 @@
 /* psem INCLUDE */
 /* lang=C20 */
 
+/* POSIX© unnamed Semaphore (PSEM) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -23,8 +26,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<semaphore.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 #define	PSEM		sem_t
@@ -38,12 +41,12 @@ typedef PSEM		psem ;
 extern "C" {
 #endif
 
-extern int	psem_create(PSEM *,int,int) noex ;
-extern int	psem_destroy(PSEM *) noex ;
-extern int	psem_wait(PSEM *) noex ;
-extern int	psem_waiter(PSEM *,int) noex ;
-extern int	psem_trywait(PSEM *) noex ;
-extern int	psem_post(PSEM *) noex ;
+extern int	psem_create(psem *,int,int) noex ;
+extern int	psem_destroy(psem *) noex ;
+extern int	psem_wait(psem *) noex ;
+extern int	psem_waiter(psem *,int) noex ;
+extern int	psem_trywait(psem *) noex ;
+extern int	psem_post(psem *) noex ;
 
 #ifdef	__cplusplus
 }

@@ -72,7 +72,7 @@ struct vecpstr_head {
 	VECPSTR_CH	*ccp ;
 	uint		magic ;
 	VECPSTR_FL	f ;
-	vechand		chunks ;
+	vechand		*clp ;		/* chunk-list-pointer */
 	int		chsize ;
 	int		an ;		/* suggested add-number */
 	int		c ;		/* total item count */

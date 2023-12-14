@@ -31,6 +31,7 @@
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<new>
 #include	<algorithm>
 #include	<usystem.h>
 #include	<lookaside.h>
@@ -44,7 +45,9 @@
 
 /* local namespaces */
 
-using std::min ;
+using std::min ;			/* actor */
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -61,6 +64,7 @@ extern "C" {
 /* forward references */
 
 static int	vecobj_ctor(vecobj *) noex ;
+static int	vecobj_dtor(vecobj *) noex ;
 static int	vecobj_setopts(vecobj *,int) noex ;
 static int	vecobj_extend(vecobj *) noex ;
 static int	vecobj_iget(vecobj *,int,void **) noex ;
@@ -99,20 +103,25 @@ int vecobj_start(vecobj *op,int osize,int n,int opts) noex {
 	        op->esize = osize ;
 	        if ((rs = vecobj_setopts(op,opts)) >= 0) {
 	            cint	size = (n + 1) * sizeof(char **) ;
-	            void	*p ;
+	            void	*vp{} ;
 	            op->i = 0 ;
 	            op->c = 0 ;
 	            op->fi = 0 ;
-	            if ((rs = uc_libmalloc(size,&p)) >= 0) {
-	                op->va = (void **) p ;
+	            if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+	                op->va = (void **) vp ;
 	                op->va[0] = nullptr ;
 	                op->n = n ;
-	                rs = lookaside_start(&op->la,osize,n) ;
-	                if (rs < 0)
-	                    uc_libfree(p) ;
+	                rs = lookaside_start(op->lap,osize,n) ;
+	                if (rs < 0) {
+	                    uc_libfree(vp) ;
+			    op->va = nullptr ;
+			}
 	            } /* end if */
 	        } /* end if (options) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		vecobj_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -126,13 +135,17 @@ int vecobj_finish(vecobj *op) noex {
 	    if (op->va) {
 		rs = SR_OK ;
 		{
-		    rs1 = lookaside_finish(&op->la) ;
+		    rs1 = lookaside_finish(op->lap) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
 		    rs1 = uc_libfree(op->va) ;
 		    if (rs >= 0) rs = rs1 ;
 		    op->va = nullptr ;
+		}
+		{
+		    rs1 = vecobj_dtor(op) ;
+		    if (rs >= 0) rs = rs1 ;
 		}
 		op->c = 0 ;
 		op->i = 0 ;
@@ -183,7 +196,7 @@ int vecobj_addnew(vecobj *op,void **epp) noex {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
 	        void	*sp = nullptr ;		/* storage pointer */
-	        if ((rs = lookaside_get(&op->la,&sp)) >= 0) {
+	        if ((rs = lookaside_get(op->lap,&sp)) >= 0) {
 	            bool	f = true ;;
 	            bool	f_done = false ;
 	            f = f && (op->f.oreuse || op->f.oconserve) ;
@@ -215,7 +228,7 @@ int vecobj_addnew(vecobj *op,void **epp) noex {
 	                op->c += 1 ;		/* increment list count */
 	                op->f.issorted = false ;
 	            } else {
-	                lookaside_release(&op->la,sp) ;
+	                lookaside_release(op->lap,sp) ;
 	            }
 	        } /* end if (entry allocated) */
 	        if (epp) *epp = (rs >= 0) ? sp : nullptr ;
@@ -338,7 +351,7 @@ int vecobj_del(vecobj *op,int i) noex {
 		    rs = SR_OK ;
 	            if (op->va[i]) {
 	                op->c -= 1 ;		/* decrement list count */
-	                rs = lookaside_release(&op->la,op->va[i]) ;
+	                rs = lookaside_release(op->lap,op->va[i]) ;
 	                op->va[i] = nullptr ;
 	            }
 	            if (rs >= 0) {
@@ -405,7 +418,7 @@ int vecobj_delall(vecobj *op) noex {
 		rs = SR_OK ;
 	        for (int i = 0 ; i < op->i ; i += 1) {
 	            if (op->va[i]) {
-	                rs1 = lookaside_release(&op->la,op->va[i]) ;
+	                rs1 = lookaside_release(op->lap,op->va[i]) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
 	        } /* end for */
@@ -687,7 +700,7 @@ int vecobj_audit(vecobj *op) noex {
 	        } /* end for */
 	        rs = (c == op->c) ? SR_OK : SR_BADFMT ;
 	        if (rs >= 0) {
-	            rs = lookaside_audit(&op->la) ;
+	            rs = lookaside_audit(op->lap) ;
 	        }
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -701,17 +714,32 @@ int vecobj_audit(vecobj *op) noex {
 static int vecobj_ctor(vecobj *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->c = 0 ;
 	    op->i = 0 ;
 	    op->n = 0 ;
 	    op->fi = 0 ;
 	    op->esize = 0 ;
-	}
+	    if ((op->lap = new(nothrow) lookaside) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (vecobj_ctor) */
+
+static int vecobj_dtor(vecobj *op) noex {
+	int		rs = SR_OK ;
+	if (op->lap) {
+	    delete op->lap ;
+	    op->lap = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (vecobj_dtor) */
+
 static int vecobj_setopts(vecobj *op,int opts) noex {
 	int		rs = SR_INVALID ;
 	if ((opts & optmask) == 0) {

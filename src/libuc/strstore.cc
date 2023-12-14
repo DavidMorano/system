@@ -69,7 +69,9 @@
 
 /* local namespaces */
 
-using std::max ;
+using std::max ;			/* actor */
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -83,7 +85,9 @@ extern "C" {
 
 /* external subroutines */
 
-extern int	nextpowtwo(int) noex ;
+extern "C" {
+    extern int	nextpowtwo(int) noex ;
+}
 
 
 /* local structures */
@@ -104,15 +108,60 @@ template<typename ... Args>
 static inline int strstore_ctor(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ccp = nullptr ;
-	    op->chunksize = 0 ;
+	    op->chsize = 0 ;
 	    op->totalsize = 0 ;
 	    op->c = 0 ;
+	    if ((op->clp = new(nothrow) vechand) != np) {
+	        if ((op->nlp = new(nothrow) vechand) != np) {
+	            if ((op->lap = new(nothrow) lookaside) != np) {
+	                if ((op->hlp = new(nothrow) hdb) != np) {
+			    rs = SR_OK ;
+	                } /* end if (new-hdb) */
+		        if (rs < 0) {
+		            delete op->lap ;
+		            op->lap = nullptr ;
+		        }
+	            } /* end if (new-lookaside) */
+		    if (rs < 0) {
+		        delete op->nlp ;
+		        op->nlp = nullptr ;
+		    }
+	        } /* end if (new-vechand) */
+		if (rs < 0) {
+		    delete op->clp ;
+		    op->clp = nullptr ;
+		}
+	    } /* end if (new-vechand) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (strstore_ctor) */
+
+static int strstore_dtor(strstore *op) noex {
+	int		rs = SR_OK ;
+	if (op->hlp) {
+	    delete op->hlp ;
+	    op->hlp = nullptr ;
+	}
+	if (op->lap) {
+	    delete op->lap ;
+	    op->lap = nullptr ;
+	}
+	if (op->nlp) {
+	    delete op->nlp ;
+	    op->nlp = nullptr ;
+	}
+	if (op->clp) {
+	    delete op->clp ;
+	    op->clp = nullptr ;
 	}
 	return rs ;
 }
+/* end subroutine (strstore_dtor) */
 
 template<typename ... Args>
 static inline int strstore_magic(strstore *op,Args ... args) noex {
@@ -164,35 +213,41 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	if (n < STRSTORE_STARTLEN) n = STRSTORE_STARTLEN ;
 	if (csz < STRSTORE_CHUNKSIZE) csz = STRSTORE_CHUNKSIZE ;
 	if ((rs = strstore_ctor(op)) >= 0) {
-	    vechand	*clp = &op->chunks ;
+	    vechand	*clp = op->clp ;
 	    cint	vo = VECHAND_OORDERED ;
 	    cint	nch = max((n/6),6) ;
-	    op->chunksize = csz ;
+	    op->chsize = csz ;
 	    if ((rs = vechand_start(clp,nch,vo)) >= 0) {
-	        if ((rs = vechand_start(&op->list,n,vo)) >= 0) {
+	        if ((rs = vechand_start(op->nlp,n,vo)) >= 0) {
 		    cint	isize = sizeof(int) ;
-	            if ((rs = lookaside_start(&op->imgr,isize,n)) >= 0) {
+	            if ((rs = lookaside_start(op->lap,isize,n)) >= 0) {
 		        cint		hn = ((n*3)/2) ;
 		        nullptr_t	n = 0 ;
-	                if ((rs = hdb_start(&op->smgr,hn,true,n,n)) >= 0) {
+	                if ((rs = hdb_start(op->hlp,hn,true,n,n)) >= 0) {
 	                    op->magic = STRSTORE_MAGIC ;
 			    if constexpr (f_prealloc) {
 	                        rs = strstore_chunknew(op,0) ;
 	                        if (rs < 0)  {
-	                            hdb_finish(&op->smgr) ;
+	                            hdb_finish(op->hlp) ;
 	                            op->magic = 0 ;
 	                        }
 			    } /* end if-constexpr (f_prealloc) */
 	                } /* end if (hdb-start) */
-	                if (rs < 0)
-	                    lookaside_finish(&op->imgr) ;
+	                if (rs < 0) {
+	                    lookaside_finish(op->lap) ;
+			}
 	            } /* end if (lookaside_start) */
-	            if (rs < 0)
-		        vechand_finish(&op->list) ;
+	            if (rs < 0) {
+		        vechand_finish(op->nlp) ;
+		    }
 	        } /* end if (vechand) */
-	        if (rs < 0)
-		    vechand_finish(&op->chunks) ;
+	        if (rs < 0) {
+		    vechand_finish(op->clp) ;
+		}
 	    } /* end if (vechand) */
+	    if (rs < 0) {
+		strstore_dtor(op) ;
+	    }
 	} /* end if (strstore_ctor) */
 	return rs ;
 }
@@ -202,29 +257,32 @@ int strstore_finish(strstore *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = strstore_magic(op)) >= 0) {
-		{
-	            rs1 = hdb_finish(&op->smgr) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = lookaside_finish(&op->imgr) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = vechand_finish(&op->list) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = strstore_chunkfins(op) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-
-	            rs1 = vechand_finish(&op->chunks) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-	        op->ccp = nullptr ;
-	        op->magic = 0 ;
+            {
+                rs1 = hdb_finish(op->hlp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = lookaside_finish(op->lap) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = vechand_finish(op->nlp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = strstore_chunkfins(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = vechand_finish(op->clp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = strstore_dtor(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            op->ccp = nullptr ;
+            op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -254,7 +312,7 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 	        STRSTORE_CHUNK	*ccp = op->ccp ;
 		cint		amount = (sl + 1) ;
 		char		*ep = nullptr ;
-	        if ((ccp == nullptr) || (amount > (ccp->csize - ccp->i))) {
+	        if ((ccp == nullptr) || (amount > (ccp->csz - ccp->i))) {
 	            rs = strstore_chunknew(op,amount) ;
 	            ccp = op->ccp ;
 	        }
@@ -262,10 +320,10 @@ int strstore_store(strstore *op,cchar *sp,int sl,cchar **rpp) noex {
 		    ep = (ccp->cdata + ccp->i) ;
 	            si = op->totalsize ;
 	            strwcpy(ep,sp,sl) ;
-	            if ((rs = vechand_add(&op->list,ep)) >= 0) {
+	            if ((rs = vechand_add(op->nlp,ep)) >= 0) {
 	                cint	i = rs ;
 	                rs = strstore_manage(op,ep,sl,si) ;
-	                if (rs < 0) vechand_del(&op->list,i) ;
+	                if (rs < 0) vechand_del(op->nlp,i) ;
 	            }
 	        } /* end if */
 	        if (rs >= 0) {
@@ -306,11 +364,11 @@ int strstore_enum(strstore *op,strstore_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		cl = 0 ;
 	if ((rs = strstore_magic(op,curp,rpp)) >= 0) {
-	        int	val = (curp->i >= 0) ? (curp->i+1) : 0 ;
+	        cint	val = (curp->i >= 0) ? (curp->i+1) : 0 ;
 		rs = SR_NOTFOUND ;
 	        if (val < op->c) {
 		    void	*vp{} ;
-	            if ((rs = vechand_get(&op->list,val,&vp)) >= 0) {
+	            if ((rs = vechand_get(op->nlp,val,&vp)) >= 0) {
 			cchar	*cp = (cchar *) vp ;
 	                cl = strlen(cp) ;
 	                if (rpp) *rpp = cp ;
@@ -329,10 +387,10 @@ int strstore_already(strstore *op,cchar *sp,int sl) noex {
 	    rs = SR_NOTOPEN ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (op->magic == STRSTORE_MAGIC) {
-	        HDB_DATUM	key, val ;
+	        hdb_dat	key, val ;
 	        key.buf = sp ;
 	        key.len = sl ;
-	        if ((rs = hdb_fetch(&op->smgr,key,nullptr,&val)) >= 0) {
+	        if ((rs = hdb_fetch(op->hlp,key,nullptr,&val)) >= 0) {
 	            int		*ip = (int *) val.buf ;
 	            si = *ip ;
 	        } /* end if */
@@ -376,7 +434,7 @@ int strstore_strmk(strstore *op,char *tabp,int tabl) noex {
 		cint	size = iceil(op->totalsize,sizeof(int)) ;
 		rs = SR_OVERFLOW ;
 		if (tabl >= size) {
-		    vechand	*vhp = &op->chunks ;
+		    vechand	*vhp = op->clp ;
 		    char	*bp = tabp ;
 		    void	*vp{} ;
 		    rs = SR_OK ;
@@ -418,9 +476,9 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 		cint	size = (n + 1) * sizeof(int) ;
 		rs = SR_OVERFLOW ;
 	        if (rsize >= size) {
-		    HDB		*hp = &op->smgr ;
+		    HDB		*hp = op->hlp ;
 	            HDB_CUR	cur ;
-	            HDB_DATUM	key, val ;
+	            hdb_dat	key, val ;
 	            rdata[c++] = 0 ;	/* ZERO-entry is NUL-string */
 	            if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
 	                while (hdb_enum(hp,&cur,&key,&val) >= 0) {
@@ -473,9 +531,9 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	            memset(it,0,isize) ;
 	            if ((rs = vecobj_start(&ses,esize,op->c,vo)) >= 0) {
 	                STRENTRY	se ;
-			HDB		*hp = &op->smgr ;
+			HDB		*hp = op->hlp ;
 	                HDB_CUR		cur ;
-	                HDB_DATUM	key, val ;
+	                hdb_dat	key, val ;
 	                uint		khash, chash, nhash ;
 	                int		lhi, nhi, hi, si ;
 	                if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
@@ -558,10 +616,10 @@ static int strstore_chunknew(strstore *op,int amount) noex {
 	STRSTORE_CHUNK	*cep ;
 	const int	csize = sizeof(STRSTORE_CHUNK) ;
 	int		rs ;
-	if (op->chunksize > amount) amount = op->chunksize ;
+	if (op->chsize > amount) amount = op->chsize ;
 	if ((rs = uc_malloc(csize,&cep)) >= 0) {
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) {
-	        if ((rs = vechand_add(&op->chunks,cep)) >= 0) {
+	        if ((rs = vechand_add(op->clp,cep)) >= 0) {
 	    	    op->ccp = cep ;
 	            if (op->totalsize == 0) {
 	                chunk_adv(cep) ;
@@ -579,17 +637,21 @@ static int strstore_chunknew(strstore *op,int amount) noex {
 /* end subroutine (strstore_chunknew) */
 
 static int strstore_chunkfins(strstore *op) noex {
-	vechand		*clp = &op->chunks ;
+	vechand		*clp = op->clp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(clp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 	        strstore_ch	*ccp = (strstore_ch *) vp ;
-	        rs1 = chunk_finish(ccp) ;
-	        if (rs >= 0) rs = rs1 ;
-	        rs1 = uc_free(ccp) ;
-	        if (rs >= 0) rs = rs1 ;
+		{
+	            rs1 = chunk_finish(ccp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(ccp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
 	    }
 	} /* end for */
 	return rs ;
@@ -599,16 +661,16 @@ static int strstore_chunkfins(strstore *op) noex {
 static int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 	int		rs = SR_OK ;
 	int		*ip{} ;
-	if ((rs = lookaside_get(&op->imgr,&ip)) >= 0) {
-	    HDB_DATUM	key, val ;
+	if ((rs = lookaside_get(op->lap,&ip)) >= 0) {
+	    hdb_dat	key, val ;
 	    *ip = si ;
 	    key.buf = kp ;
 	    key.len = kl ;
 	    val.buf = ip ;
 	    val.len = sizeof(int *) ;
-	    rs = hdb_store(&op->smgr,key,val) ;
+	    rs = hdb_store(op->hlp,key,val) ;
 	    if (rs < 0)
-	        lookaside_release(&op->imgr,ip) ;
+	        lookaside_release(op->lap,ip) ;
 	} /* end if */
 	return rs ;
 }
@@ -618,7 +680,7 @@ static int chunk_start(strstore_ch *cnp,int csize) noex {
 	int		rs = SR_INVALID ;
 	memclear(cnp) ;
 	if (csize > 0) {
-	    cnp->csize = csize ;
+	    cnp->csz = csize ;
 	    rs = uc_malloc(csize,&cnp->cdata) ;
 	}
 	return rs ;
@@ -640,7 +702,7 @@ static int chunk_finish(strstore_ch *cnp) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    cnp->cdata = nullptr ;
 	}
-	cnp->csize = 0 ;
+	cnp->csz = 0 ;
 	cnp->i = 0 ;
 	cnp->c = 0 ;
 	return rs ;
