@@ -150,12 +150,9 @@ int lockrw_create(lockrw *op,int f_shared) noex {
 /* end subroutine (lockrw_create) */
 
 int lockrw_destroy(lockrw *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == LOCKRW_MAGIC) {
-		rs = SR_OK ;
+	if ((rs = lockrw_magic(op)) >= 0) {
 		{
 	            rs1 = ptc_destroy(op->cvp) ;
 	            if (rs >= 0) rs = rs1 ;
@@ -169,19 +166,16 @@ int lockrw_destroy(lockrw *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 	        op->magic = 0 ;
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lockrw_destroy) */
 
 int lockrw_rdlock(lockrw *op,int to) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == LOCKRW_MAGIC) {
+	if ((rs = lockrw_magic(op)) >= 0) {
 	        TIMESPEC	ts{} ;
 	        if (to >= 0) {
 	            clock_gettime(CLOCK_REALTIME,&ts) ;
@@ -204,18 +198,15 @@ int lockrw_rdlock(lockrw *op,int to) noex {
 	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (lockrw_rdlock) */
 
 int lockrw_wrlock(lockrw *op,int to) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == LOCKRW_MAGIC) {
+	if ((rs = lockrw_magic(op)) >= 0) {
 	        TIMESPEC	ts{} ;
 	        if (to >= 0) {
 	            clock_gettime(CLOCK_REALTIME,&ts) ;
@@ -235,18 +226,15 @@ int lockrw_wrlock(lockrw *op,int to) noex {
 	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lockrw_wrlock) */
 
 int lockrw_unlock(lockrw *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == LOCKRW_MAGIC) {
+	if ((rs = lockrw_magic(op)) >= 0) {
 	        if ((rs = ptm_lock(op->mxp)) >= 0) {
 	            if (op->readers > 0) op->readers -= 1 ;
 	            if (op->writers > 0) op->writers -= 1 ;
@@ -256,26 +244,22 @@ int lockrw_unlock(lockrw *op) noex {
 	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex-lock) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (lockrw_unlock) */
 
 int lockrw_readers(lockrw *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
 	int		v = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == LOCKRW_MAGIC) {
+	if ((rs = lockrw_magic(op)) >= 0) {
 	        if ((rs = ptm_lock(op->mxp)) >= 0) {
 	            v = op->readers ; /* this is really already atomic! */
 	            rs1 = ptm_unlock(op->mxp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex-lock) */
-	    } /* end if (was open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (lockrw_readers) */
