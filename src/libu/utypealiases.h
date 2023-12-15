@@ -182,18 +182,32 @@
 #define	MSQIDDS		struct msqid_ds		/* for SysV-IPC */
 #endif
 
+/* UTMPX */
+
+#ifndef	UTMPX
+#define	UTMPX		struct utmpx
+#endif
+
 /* constant versions of above */
 
 #ifndef	CSIGVAL
-#define	CSIGVAL		const union sigval	
+#define	CSIGVAL		const SIGVAL
 #endif
 
 #ifndef	CTIMESPEC
-#define	CTIMESPEC	const struct timespec
+#define	CTIMESPEC	const TIMESPEC
+#endif
+
+#ifndef	CITIMERSPEC
+#define	CITIMERSPEC	const ITIMERSPEC
 #endif
 
 #ifndef	CSOCKADDR
-#define	CSOCKADDR	const struct sockaddr
+#define	CSOCKADDR	const SOCKADDR
+#endif
+
+#ifndef	CUTMPX
+#define	CUTMPX		const UTMPX
 #endif
 
 /* SYSDB account management structures */
@@ -219,10 +233,6 @@
 #endif
 
 /* SYSDB network related structures */
-
-#ifndef	PROTOENT
-#define	PROTOENT	struct protoent
-#endif
 
 #ifndef	NETENT
 #define	NETENT		struct netent
@@ -276,6 +286,10 @@
 
 #ifndef	CSERVENT
 #define	CSERVENT	const struct servent
+#endif
+
+#ifndef	CADDRINFO
+#define	CADDRINFO	const struct addrinfo
 #endif
 
 

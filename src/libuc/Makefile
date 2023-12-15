@@ -198,10 +198,10 @@ OBJ087= hostinfo.o hostaddr.o hostent.o inetaddr.o sockaddress.o ucpwcache.o
 OBJ088= strsub.o
 OBJ089= strnsub.o strncasesub.o 
 OBJ090= strncpyxc.o
-OBJ091= strnkeycmp.o strnleadcmp.o strnncmp.o strnlen.o strnnlen.o
+OBJ091= strnnlen.o
 OBJ092= strnxpbrk.o
 OBJ093= strnsetblanks.o strnset.o strnwcpy.o
-OBJ094=
+OBJ094= strnxcmp.o
 OBJ095= strdcpyx.o strdcpyxw.o
 
 OBJ096=
@@ -1090,8 +1090,6 @@ quoteshellarg.o:	quoteshellarg.c
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
 
-intsat.o:		intsat.c intsat.h
-
 tmtime.o:		tmtime.c tmtime.h
 
 getnodedomain.o:	getnodedomain.c
@@ -1127,7 +1125,7 @@ ucprogdata.o:		ucprogdata.cc ucprogdata.h
 ucclustername.o:	ucclustername.c ucclustername.h
 ucpwcache.o:		ucpwcache.c ucpwcache.h recarr.h
 utmpacc.o:		utmpacc.cc utmpacc.h
-utmpaccent.o:		utmpaccent.c utmpaccent.h
+utmpaccent.o:		utmpaccent.cc utmpaccent.h
 tmpx.o:			tmpx.cc tmpx.h
 
 # part of string-to-integer interface
@@ -1241,6 +1239,11 @@ ucenum.o:		ucenum.dir
 ucenum.dir:
 	makebelow $@
 
+# STRNXCMP
+strnxcmp.o:		strnxcmp.dir
+strnxcmp.dir:
+	makebelow $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -1282,6 +1285,9 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 
 # UTILITY
+intsat.o:		intsat.cc intsat.h
+intfloor.o:		intfloor.cc intfloor.h
+intceil.o:		intceil.cc intceil.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h

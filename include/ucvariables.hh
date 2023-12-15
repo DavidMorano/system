@@ -25,6 +25,8 @@
 #define	UCVARIABLES_INCLUDE
 
 
+#if	__cplusplus /* everything is C++ only */
+
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<usystem.h>
@@ -37,6 +39,8 @@
 extern const varnames		varname ;
 extern const valuelimits	valuelimit ;
 extern const digbufsizes	digbufsize ;
+
+#endif	/* __cplusplus */
 
 
 #endif /* UCVARIABLES_INCLUDE */

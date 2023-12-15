@@ -1,4 +1,5 @@
 /* uclibsubs INCLUDE */
+/* lang=C20 */
 
 /* version %I% last-modified %G% */
 /* UNIX® C-language library (standard) subroutines */
@@ -72,6 +73,7 @@
 #include	<ucopeninfo.h>
 #include	<ucfdmanip.h>
 #include	<ucuserattr.h>
+#include	<uctimer.h>
 
 
 #ifdef	__cplusplus

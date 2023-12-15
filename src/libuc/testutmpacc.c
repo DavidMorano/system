@@ -41,8 +41,7 @@ extern const char 	*getourenv(const char **,const char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,const char **argv,const char **envv) {
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint	mo_start = 0 ;

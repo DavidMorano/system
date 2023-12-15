@@ -28,6 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -58,6 +60,8 @@ extern "C" {
 typedef int	(*timeout_met)(void *,uint,int) noex ;
 
 extern int timeout_load(TIMEOUT *,time_t,void *,timeout_met,uint,int) noex ;
+
+extern int uc_timeout(int,TIMEOUT *) noex ;
 
 #ifdef	__cplusplus
 }
