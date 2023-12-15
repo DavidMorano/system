@@ -57,15 +57,9 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	(2*1024)
-#endif
-
 #define	VARSUB_DEFENT	10
 #define	VARSUB_NLINES	10
 #define	VARSUB_SUB	struct varsub_sub
-
-#define	BUFLEN		(2 * LINEBUFLEN)
 
 
 /* local namespaces */
@@ -96,14 +90,13 @@ struct varsub_sub {
 typedef VARSUB_SUB	ent ;
 typedef ent		*entp ;
 
-int		varsub_expandbuf(varsub *,buffer *,cchar *,int) noex ;
-
 template<typename ... Args>
 static inline int varsub_ctor(varsub *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_NOMEM ;
 	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
 	    if ((op->slp = new(nothrow) vechand) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
@@ -114,12 +107,10 @@ static inline int varsub_ctor(varsub *op,Args ... args) noex {
 
 static int varsub_dtor(varsub *op) noex {
 	int		rs = SR_OK ;
-	if (op) {
-	    if (op->slp) {
-		delete op->slp ;
-		op->slp = nullptr ;
-	    }
-	} /* end if (non-null) */
+	if (op->slp) {
+	    delete op->slp ;
+	    op->slp = nullptr ;
+	}
 	return rs ;
 }
 /* end subroutine (varsub_dtor) */
@@ -141,6 +132,7 @@ static int	varsub_sort(varsub *) noex ;
 static int	varsub_procvalue(varsub *,buffer *,cchar *,int) noex ;
 static int	varsub_procsub(varsub *,buffer *,cchar *,int) noex ;
 static int	varsub_getval(varsub *,cchar *,int,cchar **) noex ;
+static int	varsub_expfiler(varsub *,bfile *,bfile *) noex ;
 static int	varsub_writebuf(varsub *,bfile *,buffer *) noex ;
 static int	varsub_entfins(varsub *) noex ;
 
@@ -149,10 +141,6 @@ static int	entry_keycmp(ent *,ent *) noex ;
 static int	entry_finish(ent *) noex ;
 static int	entry_tmp(ent *,cchar *,int,cchar *,int) noex ;
 static int	entry_valcmp(ent *,ent *) noex ;
-
-#ifdef	COMMENT
-static int	entry_cmp(ent *,ent *) noex ;
-#endif
 
 static int	getkey(cchar *,int,int [][2]) noex ;
 static int	ventcmp(cvoid **,cvoid **) noex ;
@@ -401,77 +389,54 @@ int varsub_enum(varsub *op,varsub_cur *curp,cchar **kpp,cchar **vpp) noex {
 }
 /* end subroutine (varsub_enum) */
 
-int varsub_expandfile(varsub *op,bfile *ifp,bfile *ofp) noex {
+int varsub_expfile(varsub *op,bfile *ifp,bfile *ofp) noex {
 	int		rs ;
-	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = varsub_magic(op,ifp,ofp)) >= 0) {
 	    if ((rs = varsub_sort(op)) >= 0) {
-	        buffer	b ;
-	        cint	startlen = (VARSUB_NLINES * LINEBUFLEN) ;
-	        op->badline = -1 ;
-	        if ((rs = buffer_start(&b,startlen)) >= 0) {
-	            cint	llen = LINEBUFLEN ;
-		    int		nlines = 0 ;
-	            int		len ;
-	            char	lbuf[LINEBUFLEN + 1] ;
-	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
-	                len = rs ;
-	                if (lbuf[len-1] == '\n') nlines += 1 ;
-	                if ((rs = varsub_expandbuf(op,&b,lbuf,len)) >= 0) {
-	                    if (nlines >= VARSUB_NLINES) {
-	                        nlines = 0 ;
-	                        rs = varsub_writebuf(op,ofp,&b) ;
-			        wlen += rs ;
-			    }
-	                } /* end if (flush) */
-	                if (rs < 0) break ;
-	            } /* end while (reading file lines) */
-	            if ((rs >= 0) && (nlines > 0)) {
-	                rs = varsub_writebuf(op,ofp,&b) ;
-		        wlen += rs ;
-	            }
-	            rs1 = buffer_finish(&b) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (buffer) */
+		rs = varsub_expfiler(op,ifp,ofp) ;
+		wlen = rs ;
 	    } /* end if (varsub_sort) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (varsub_expandfile) */
+/* end subroutine (varsub_expfile) */
 
-int varsub_expand(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
+int varsub_exp(varsub *op,char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		bl = 0 ;
 	if ((rs = varsub_magic(op,dbuf,sbuf)) >= 0) {
-	    rs = SR_TOOBIG ;
-	    if (slen < 0) slen = strlen(sbuf) ;
-	    if (dlen < 0) dlen = LINEBUFLEN ;
-	    op->badline = -1 ;
-	    if (dlen >= slen) {
-	        if ((rs = varsub_sort(op)) >= 0) {
-		    auto	vsp = varsub_procvalue ;
-	            buffer	b ;
-	            if ((rs = buffer_start(&b,LINEBUFLEN)) >= 0) {
-	                cchar	*bp{} ;
-	                if ((rs = vsp(op,&b,sbuf,slen)) >= 0) {
-	                    if ((rs = buffer_get(&b,&bp)) >= 0) {
-	                        bl = rs ;
-	                        rs = snwcpy(dbuf,dlen,bp,bl) ;
+	    if ((rs = maxlinelen) >= 0) {
+		cint	mll = rs ;
+	        rs = SR_TOOBIG ;
+	        if (slen < 0) slen = strlen(sbuf) ;
+	        if (dlen < 0) dlen = mll ;
+	        op->badline = -1 ;
+	        if (dlen >= slen) {
+	            if ((rs = varsub_sort(op)) >= 0) {
+		        auto	vsp = varsub_procvalue ;
+	                buffer	b ;
+	                if ((rs = buffer_start(&b,mll)) >= 0) {
+	                    cchar	*bp{} ;
+	                    if ((rs = vsp(op,&b,sbuf,slen)) >= 0) {
+	                        if ((rs = buffer_get(&b,&bp)) >= 0) {
+	                            bl = rs ;
+	                            rs = snwcpy(dbuf,dlen,bp,bl) ;
+	                        }
 	                    }
-	                }
-	                rs1 = buffer_finish(&b) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (buffer) */
-	        } /* end if (varsub_sort) */
-	    } /* end if (valid) */
+	                    rs1 = buffer_finish(&b) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (buffer) */
+	            } /* end if (varsub_sort) */
+	        } /* end if (valid) */
+	    } /* end if (maxlinelen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? bl : rs ;
 }
-/* end subroutine (varsub_expand) */
+/* end subroutine (varsub_exp) */
 
-int varsub_expandbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
+int varsub_expbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
 	int		rs ;
 	if ((rs = varsub_magic(op,bufp,sbuf)) >= 0) {
 	    if (slen < 0) slen = strlen(sbuf) ;
@@ -481,7 +446,7 @@ int varsub_expandbuf(varsub *op,buffer *bufp,cchar *sbuf,int slen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (varsub_expandbuf) */
+/* end subroutine (varsub_expbuf) */
 
 
 /* private subroutines */
@@ -707,6 +672,46 @@ static int varsub_getval(varsub *op,cchar *kp,int kl,cchar **vpp) noex {
 }
 /* end subroutine (varsub_getval) */
 
+static int varsub_expfiler(varsub *op,bfile *ifp,bfile *ofp) noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	char		*lbuf{} ;
+	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    if ((rs = maxlinelen) >= 0) {
+	        buffer	b ;
+	        cint	stlen = (VARSUB_NLINES * rs) ;
+	        op->badline = -1 ;
+	        if ((rs = buffer_start(&b,stlen)) >= 0) {
+		    int		nlines = 0 ;
+	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
+	                int	len = rs ;
+	                if (lbuf[len-1] == '\n') nlines += 1 ;
+	                if ((rs = varsub_expbuf(op,&b,lbuf,len)) >= 0) {
+	                    if (nlines >= VARSUB_NLINES) {
+	                        nlines = 0 ;
+	                        rs = varsub_writebuf(op,ofp,&b) ;
+			        wlen += rs ;
+			    }
+	                } /* end if (flush) */
+	                if (rs < 0) break ;
+	            } /* end while (reading file lines) */
+	            if ((rs >= 0) && (nlines > 0)) {
+	                rs = varsub_writebuf(op,ofp,&b) ;
+		        wlen += rs ;
+	            }
+	            rs1 = buffer_finish(&b) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (buffer) */
+	    } /* end if (maxlinelen) */
+	    rs1 = uc_free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (varsub_expfiler) */
+
 static int varsub_writebuf(varsub *op,bfile *ofp,buffer *bufp) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
@@ -828,13 +833,12 @@ static int entry_valcmp(ent *ep,ent *e2p) noex {
 static int getkey(cchar *sp,int sl,int sses[][2]) noex {
 	int		kl = -1 ;
 	if (sl > 1) {
-	    int		ch ;
 	    int		i = 0 ; /* <- used afterwards */
 	    bool	f = false ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	    for (i = 0 ; sses[i][0] != 0 ; i += 1) {
-	        ch = (*sp & 0xff) ;
+	        int	ch = (*sp & 0xff) ;
 	        f = (ch == sses[i][0]) ;
 	        if (f) break ;
 	    } /* end for */
