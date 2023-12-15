@@ -30,11 +30,13 @@
 	upper case still comes before lower case.
 
 	Synopsis:
-	int strnndictcmp(cchar *s1,cchar *s2) noex
+	int strnndictcmp(cchar *s1,iny s1len,cchar *s2,int s2len) noex
 
 	Arguments:
 	s1	one string
 	s2	second string
+	s1len	c-string s1 length
+	s2len	c-string s2 length
 
 	Returns:
 	>0	the first string is bigger than the second
@@ -49,6 +51,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>
+#include	<ischarx.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
@@ -60,10 +64,6 @@
 
 
 /* external subroutines */
-
-extern int	strwcmp(cchar *,cchar *,int) noex ;
-extern int	isalnumlatin(int) noex ;
-extern int	isdict(int) noex ;
 
 
 /* external variables */

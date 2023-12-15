@@ -1,5 +1,5 @@
 /* strnncmp */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* compare the minimum common characters of two strings */
 /* version %I% last-modified %G% */
@@ -42,12 +42,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<cstring>		/* <- |strlen(3c)| + |strncmp(3c)| */
+#include	<algorithm>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"strnxcmp.h"
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+using std::min ;
+
+
+/* local typedefs */
 
 
 /* exported subroutines */
@@ -57,7 +69,7 @@ int strnncmp(cchar *s1,int n1,cchar *s2,int n2) noex {
 	int		n ;
 	if (n1 < 0) n1 = strlen(s1) ;
 	if (n2 < 0) n2 = strlen(s2) ;
-	n = MIN(n1,n2) ;
+	n = min(n1,n2) ;
 	if ((rc = strncmp(s1,s2,n)) == 0) {
 	    rc = (n1 - n2) ;
 	}
