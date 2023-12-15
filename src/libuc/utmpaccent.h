@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utmpx.h>		/* <- POSIX */
+#include	<utmpx.h>		/* <- POSIX® (the money shot) */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<localmisc.h>
@@ -33,8 +33,8 @@
 #define	CUTMPFENT		const struct utmpx
 #endif
 
-#define	UTMPACCENT		struct utmpaccent
-#define	CUTMPACCENT		const struct utmpaccent
+#define	UTMPACCENT		struct utmpaccent_s
+#define	CUTMPACCENT		const struct utmpaccent_s
 
 #define	UTMPACCENT_BUFLEN	332
 
@@ -60,7 +60,7 @@
 #endif
 
 
-struct utmpaccent {
+struct utmpaccent_s {
 	cchar		*user ;
 	cchar		*line ;
 	cchar		*host ;
@@ -71,17 +71,18 @@ struct utmpaccent {
 	ushort		syslen ;
 	short		e_exit ;
 	short		e_term ;
-	char		id[4+1] ;
+	char		id[UTMPACCENT_LID+1] ;
 } ; /* end struct (utmpaccent) */
 
-typedef utmpaccent	utmpacc_ent ;
+typedef UTMPACCENT	utmpaccent ;
+
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int utmpaccent_load(utmpacc_ent *,char *,int,CUTMPFENT *) noex ;
-extern int utmpaccent_size(const utmpacc_ent *) noex ;
+extern int utmpaccent_load(UTMPACCENT *,char *,int,CUTMPFENT *) noex ;
+extern int utmpaccent_size(CUTMPACCENT *) noex ;
 
 #ifdef	__cplusplus
 }

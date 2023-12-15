@@ -85,6 +85,7 @@ struct utmpacc_cursor {
 
 typedef	UTMPACC_SB	utmpacc_sb ;
 typedef	UTMPACC_CUR	utmpacc_cur ;
+typedef	UTMPACC_ENT	utmpacc_ent ;
 
 #ifdef	__cplusplus
 extern "C" {
@@ -95,6 +96,7 @@ extern int utmpacc_boottime(time_t *) noex ;
 extern int utmpacc_runlevel() noex ;
 extern int utmpacc_users(int) noex ;
 extern int utmpacc_entsid(utmpacc_ent *,char *,int,pid_t) noex ;
+extern int utmpacc_entline(utmpacc_ent *,char *,int,cchar *,int) noex ;
 extern int utmpacc_stats(utmpacc_sb *) noex ;
 extern int utmpacc_extract(int) noex ;
 extern int utmpacc_fini() noex ;

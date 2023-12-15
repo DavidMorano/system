@@ -59,13 +59,15 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<timewatch.hh>
+#include	<syshasutmpx.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<sigblocker.h>
 #include	<filemap.h>
-#include	<localmisc.h>
-#include	<syshasutmpx.h>
 #include	<filebuf.h>
+#include	<mkchar.h>
+#include	<strnxcmp.h>		/* <- for |strnncmp(3uc)| */
+#include	<localmisc.h>
 
 #include	"utmpacc.h"
 
@@ -82,7 +84,8 @@
 #define	UTMPACC_INTENT		10
 #define	UTMPACC_TOCAP		(5*60)
 
-#define	ENT			UTMPACC_ENT
+#define	ENT			utmpaccent
+#define	ARG			utmpacc_a
 
 
 /* local namespaces */
@@ -103,7 +106,7 @@ namespace {
 	time_t		t ;		/* create-time */
 	uint		v ;		/* value */
     } ;
-enum utmpaccmems {
+    enum utmpaccmems {
 	utmpaccmem_init,
 	utmpaccmem_fini,
 	utmpaccmem_capbegin,
@@ -113,9 +116,9 @@ enum utmpaccmems {
 	utmpaccmem_runlevel,
 	utmpaccmem_users,
 	utmpaccmem_overlast
-} ;
-struct utmpacc ;
-struct utmpacc_co {
+    } ;
+    struct utmpacc ;
+    struct utmpacc_co {
 	utmpacc		*op = nullptr ;
 	int		w = -1 ;
 	void operator () (utmpacc *p,int m) noex {
@@ -130,6 +133,18 @@ struct utmpacc_co {
 	    return callout(-1) ;
 	} ;
     } ; /* end struct (utmpacc_co) */
+    struct utmpacc_a {
+	ENT		*uep ;
+	time_t		dt = 0 ;
+	char		*uebuf ;
+	int		uelen ;
+	utmpacc_a(time_t t,ENT *p,char *b,int l) noex {
+	    dt = t ;
+	    uep = p ;
+	    uebuf = b ;
+	    uelen = l ;
+	} ; /* end ctor */
+    } ; /* end struct (utmpacc_a) */
     struct utmpacc {
 	utmpacc_co	init ;
 	utmpacc_co	fini ;
@@ -170,11 +185,13 @@ struct utmpacc_co {
 	int boottime(time_t *) noex ;
 	int irunlevel() noex ;
 	int iusers(int) noex ;
-	int entsid(ENT *,char *,int,pid_t) noex ;
+	int entsid(ARG *,pid_t) noex ;
+	int entline(ARG *,cchar *,int) noex ;
 	int stats(utmpacc_sb *) noex ;
 	int extract(int) noex ;
 	int scan(time_t) noex ;
-	int getentsid(time_t,ENT *,char *,int,pid_t) noex ;
+	int getentsid(ARG *,pid_t) noex ;
+	int getentline(ARG *,cchar *,int) noex ;
 	int getextract(int) noex ;
     } ; /* end struct (utmpacc) */
 }
@@ -188,10 +205,17 @@ extern "C" {
     static void	utmpacc_exit() noex ;
 }
 
-static int utmpx_eterm(const utmpx *) noex ;
+static int utmpx_eterm(CUTMPX *) noex ;
+
+static int utmpaccent_loada(ARG *,CUTMPX *) noex ;
 
 
 /* local variables */
+
+[[maybe_unused]] constexpr int 		lid   = UTMPACCENT_LID ;
+[[maybe_unused]] constexpr int 		luser = UTMPACCENT_LUSER ;
+[[maybe_unused]] constexpr int 		lline = UTMPACCENT_LLINE ;
+[[maybe_unused]] constexpr int 		lhost = UTMPACCENT_LHOST ;
 
 static utmpacc		utmpacc_data ;
 
@@ -219,7 +243,13 @@ int utmpacc_users(int w) noex {
 }
 
 int utmpacc_entsid(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
-	return utmpacc_data.entsid(uep,uebuf,uelen,sid) ;
+	utmpacc_a	a(0,uep,uebuf,uelen) ;
+	return utmpacc_data.entsid(&a,sid) ;
+}
+
+int utmpacc_entline(ENT *uep,char *uebuf,int uelen,cchar *lp,int ll) noex {
+	utmpacc_a	a(0,uep,uebuf,uelen) ;
+	return utmpacc_data.entline(&a,lp,ll) ;
 }
 
 int utmpacc_stats(utmpacc_sb *usp) noex {
@@ -344,7 +374,7 @@ int utmpacc::icapbegin(int to) noex {
 	if ((rs = mx.lockbegin(to)) >= 0) {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
-	        rs = cv.waiter(&mx,to) ;
+	        rs = cv.wait(&mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcapture = true ;
@@ -392,7 +422,7 @@ int utmpacc::boottime(time_t *tp) noex {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
-	                    const time_t	dt = time(NULL) ;
+	                    const time_t	dt = time(nullptr) ;
 	                    const int		to = UTMPACC_INTBOOT ;
 	                    if ((dt - btime.t) >= to) {
 	                        rs = scan(dt) ;
@@ -420,7 +450,7 @@ int utmpacc::irunlevel() noex {
 	    if ((rs = init) >= 0) {
 	        if ((rs = capbegin(-1)) >= 0) {
 		    if ((rs = begin) >= 0) {
-	                const time_t	dt = time(NULL) ;
+	                const time_t	dt = time(nullptr) ;
 	                const int	to = UTMPACC_INTRUNLEVEL ;
 	                if ((dt - rlevel.t) >= to) {
 	                    rs = scan(dt) ;
@@ -448,7 +478,7 @@ int utmpacc::iusers(int w) noex {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {
-	                    const time_t	dt = time(NULL) ;
+	                    const time_t	dt = time(nullptr) ;
 	                    const int		to = UTMPACC_INTUSERS ;
 	                    if ((dt - nusers[w].t) >= to) {
 	                        rs = scan(dt) ;
@@ -465,24 +495,22 @@ int utmpacc::iusers(int w) noex {
 	} /* end if (valid) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end method (utmpacc::users) */
+/* end method (utmpacc::iusers) */
 
-int utmpacc::entsid(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
+int utmpacc::entsid(ARG *ap,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (uep && uebuf) {
+	if (ap && ap->uep && ap->uebuf) {
 	    sigblocker	b ;
-	    memclear(uep) ;
-	    uebuf[0] = '\0' ;
+	    memclear(ap->uep) ;
+	    ap->uebuf[0] = '\0' ;
 	    if (sid <= 0) sid = getsid(0) ;
 	    if ((rs = b.start) >= 0) {
 	        if ((rs = init) >= 0) {
 	            if ((rs = capbegin(-1)) >= 0) {
 		        if ((rs = begin) >= 0) {	
-	                    const time_t	dt = time(NULL) ;
-			    int			ul = uelen ;
-			    char		*up = uebuf ;
-	                    rs = getentsid(dt,uep,up,ul,sid) ;
+	                    ap->dt = time(nullptr) ;
+	                    rs = getentsid(ap,sid) ;
 	                } /* end if */
 	                rs1 = capend ;
 	                if (rs >= 0) rs = rs1 ;
@@ -491,11 +519,38 @@ int utmpacc::entsid(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
 	        rs1 = b.finish ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
-	    if ((rs >= 0) && (uep->line == NULL)) rs = SR_NOTFOUND ;
+	    if ((rs >= 0) && (ap->uep->line == nullptr)) rs = SR_NOTFOUND ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (utmpacc::entsid) */
+
+int utmpacc::entline(ARG *ap,cchar *lp,int ll) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (ap && ap->uep && ap->uebuf && lp) {
+	    sigblocker	b ;
+	    memclear(ap->uep) ;
+	    ap->uebuf[0] = '\0' ;
+	    if ((rs = b.start) >= 0) {
+	        if ((rs = init) >= 0) {
+	            if ((rs = capbegin(-1)) >= 0) {
+		        if ((rs = begin) >= 0) {	
+	                    ap->dt = time(nullptr) ;
+	                    rs = getentline(ap,lp,ll) ;
+	                } /* end if */
+	                rs1 = capend ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (capture-exclusion) */
+	        } /* end if (init) */
+	        rs1 = b.finish ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (sigblock) */
+	    if ((rs >= 0) && (ap->uep->line == nullptr)) rs = SR_NOTFOUND ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (utmpacc::entline) */
 
 int utmpacc::stats(utmpacc_sb *usp) noex {
 	int		rs = SR_FAULT ;
@@ -550,7 +605,7 @@ int utmpacc::extract(int fd) noex {
 /* end method (utmpacc::extract) */
 
 int utmpacc::scan(time_t dt) noex {
-	const utmpx	*up ;
+	CUTMPX		*up ;
 	int		rs = SR_OK ;
 	int		nu = 0 ;
 	int		ne = 0 ;
@@ -562,7 +617,7 @@ int utmpacc::scan(time_t dt) noex {
 	    case UTMPACC_TRUNLEVEL:
 	        {
 	            cint	eterm = utmpx_eterm(up) ;
-	            rlevel.v = MKCHAR(eterm) ;
+	            rlevel.v = mkchar(eterm) ;
 	            rlevel.t = dt ;
 	        }
 		break ;
@@ -597,66 +652,89 @@ int utmpacc::scan(time_t dt) noex {
 	    }
 	    if (nu > maxusers) maxusers = nu ;
 	    if (ne > maxents) maxents = ne ;
-	}
+	} /* end if (ok) */
 	return rs ;
 }
 /* end method (utmpacc::scan) */
 
-int utmpacc::getentsid(time_t dt,ENT *uep,
-		char *uebuf,int uelen,pid_t sid) noex {
-	const utmpx	*up ;
+int utmpacc::getentsid(ARG *ap,pid_t sid) noex {
+	CUTMPX		*up ;
 	int		rs = SR_OK ;
 	int		ffound = false ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
-	    int		pt = -1 ;
 	    switch (up->ut_type) {
 	    case UTMPACC_TRUNLEVEL:
 	        {
 	            cint	eterm = utmpx_eterm(up) ;
-	            rlevel.v = MKCHAR(eterm) ;
-	            rlevel.t = dt ;
+	            rlevel.v = mkchar(eterm) ;
+	            rlevel.t = ap->dt ;
 	        }
 		break ;
 	    case UTMPACC_TBOOTTIME:
 		{
 	            btime.v = up->ut_tv.tv_sec ;
-	            btime.t = dt ;
+	            btime.t = ap->dt ;
 	        }
 		break ;
-	    case UTMPACC_TPROCUSER:
-	            if (up->ut_user[0] != '\0') {
-		    pt = utxproctype_user ;
-	                if (up->ut_pid == sid)  {
-			    ffound = true ;
-	                    rs = utmpaccent_load(uep,uebuf,uelen,up) ;
-	                }
-	            } /* end if (non-nul) */
-		break ;
 	    case UTMPACC_TPROCINIT:
-		pt = utxproctype_init ;
-		break ;
+	    case UTMPACC_TPROCUSER:
 	    case UTMPACC_TPROCLOGIN:
-		pt = utxproctype_login ;
-		break ;
-	    case UTMPACC_TPROCDEAD:
-		pt = utxproctype_dead ;
-		break ;
+	        if (up->ut_user[0] != '\0') {
+	            if (up->ut_pid == sid)  {
+			ffound = true ;
+			rs = utmpaccent_loada(ap,up) ;
+	            }
+	        } /* end if (non-nul) */
 	    } /* end switch (UTMP entry types) */
-	        if ((pt >= 0) && (up->ut_user[0] != '\0')) {
-	            nusers[pt].v += 1 ;
-		} /* end if */
+	    if (ffound) break ;
 	    if (rs < 0) break ;
 	} /* end while (reading UTMPX entries) */
 	endutxent() ;
-	if (rs >= 0) {
-	    for (int i = 0 ; i < utxproctype_overlast ; i += 1) {
-	        nusers[i].t = dt ;
-	    }
-	}
 	return (rs >= 0) ? ffound : rs ;
 }
 /* end method (utmpacc::getentsid) */
+
+int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
+	CUTMPX		*up ;
+	int		rs = SR_OK ;
+	int		ffound = false ;
+	setutxent() ;
+	while ((up = getutxent()) != nullptr) {
+	    switch (up->ut_type) {
+	    case UTMPACC_TRUNLEVEL:
+	        {
+	            cint	eterm = utmpx_eterm(up) ;
+	            rlevel.v = mkchar(eterm) ;
+	            rlevel.t = ap->dt ;
+	        }
+		break ;
+	    case UTMPACC_TBOOTTIME:
+		{
+	            btime.v = up->ut_tv.tv_sec ;
+	            btime.t = ap->dt ;
+	        }
+		break ;
+	    case UTMPACC_TPROCINIT:
+	    case UTMPACC_TPROCLOGIN:
+	    case UTMPACC_TPROCUSER:
+	        if (up->ut_user[0] != '\0') {
+		    if (ap->uep->line == nullptr) {
+	                if (strnncmp(up->ut_line,lline,lp,ll) == 0)  {
+			    ffound = true ;
+			    rs = utmpaccent_loada(ap,up) ;
+		        } /* end if (matched) */
+	            } /* end if (line-field was empty) */
+	        } /* end if (non-nul) */
+		break ;
+	    } /* end switch (UTMP entry types) */
+	    if (ffound) break ;
+	    if (rs < 0) break ;
+	} /* end while (reading UTMPX entries) */
+	endutxent() ;
+	return (rs >= 0) ? ffound : rs ;
+}
+/* end method (utmpacc::getentline) */
 
 int utmpacc::getextract(int fd) noex {
 	filebuf		fb ;
@@ -664,21 +742,22 @@ int utmpacc::getextract(int fd) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = filebuf_start(&fb,fd,0z,0,0)) >= 0) {
-	    static constexpr int	ul = sizeof(utmpx) ;
-	    const utmpx	*up ;
-	    setutxent() ;
-	    while ((up = getutxent()) != nullptr) {
-		rs = filebuf_write(&fb,up,ul) ;
-	        if (rs < 0) break ;
-	    } /* end while (reading UTMPX entries) */
-	    endutxent() ;
+	    {
+	        constexpr int	ul = sizeof(UTMPX) ;
+	        CUTMPX	*up ;
+	        setutxent() ;
+	        while ((up = getutxent()) != nullptr) {
+		    rs = filebuf_write(&fb,up,ul) ;
+	            if (rs < 0) break ;
+	        } /* end while (reading UTMPX entries) */
+	        endutxent() ;
+	    } /* end block */
 	    rs1 = filebuf_finish(&fb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filebuf) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end method (utmpacc::getextract) */
-
 
 static void utmpacc_atforkbefore() noex {
 	utmpacc_data.capbegin() ;
@@ -698,17 +777,21 @@ static void utmpacc_exit() noex {
 }
 /* end subroutine (utmpacc_exit) */
 
+static int utmpaccent_loada(ARG *ap,CUTMPX *up) noex {
+	return utmpaccent_load(ap->uep,ap->uebuf,ap->uelen,up) ;
+}
+
 /* special local subroutines (depending on OS capability) */
 
 #if	defined(SYSHASUTMP_EXIT) && (SYSHASUTMP_EXIT > 0)
 
-static int utmpx_eterm(const utmpx *up) noex {
+static int utmpx_eterm(CUTMPX *up) noex {
 	return up->ut_exit.e_termination ;
 }
 
 #else /* defined(SYSHASUTMP_EXIT) && (SYSHASUTMP_EXIT > 0) */
 
-static int utmpx_eterm(const utmpx *) noex {
+static int utmpx_eterm(CUTMPX *) noex {
 	return 0 ;
 }
 
