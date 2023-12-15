@@ -99,7 +99,8 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -186,13 +187,38 @@ template<typename ... Args>
 static inline int nodedb_ctor(nodedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
 	    op->checktime = 0 ;
 	    op->magic = 0 ;
 	    op->cursors = 0 ;
+	    if ((op->filep = new(nothrow) vecobj) != np) {
+	        if ((op->entsp = new(nothrow) hdb) != np) {
+		    rs = SR_OK ;
+		} /* end if (new-vecobj) */
+		if (rs < 0) {
+		    delete op->filep ;
+		    op->filep = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (nodedb_ctor) */
+
+static int nodedb_dtor(nodedb *op) noex {
+	int		rs = SR_OK ;
+	if (op->entsp) {
+	    delete op->entsp ;
+	    op->entsp = nullptr ;
+	}
+	if (op->filep) {
+	    delete op->filep ;
+	    op->filep = nullptr ;
 	}
 	return rs ;
 }
+/* end subroutine (nodedb_dtor) */
 
 template<typename ... Args>
 static inline int nodedb_magic(nodedb *op,Args ... args) noex {
@@ -202,6 +228,7 @@ static inline int nodedb_magic(nodedb *op,Args ... args) noex {
 	}
 	return rs ;
 }
+/* end subroutine (nodedb_magic) */
 
 static int	nodedb_fileadder(nodedb *op,cchar *fname) noex ;
 static int	nodedb_filefins(nodedb *) noex ;
@@ -256,11 +283,11 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 	    if ((rs = nodedb_ctor(op,fname)) >= 0) {
 	        rs = SR_INVALID ;
 	        if (fname[0]) {
-		    vecobj	*flp = &op->files ;
+		    vecobj	*flp = op->filep ;
 	            cint	fsize = sizeof(NODEDB_FILE) ;
 	            cint	vo = VECOBJ_OREUSE ;
 	            if ((rs = vecobj_start(flp,fsize,nf,vo)) >= 0) {
-		        hdb		*elp = &op->entries ;
+		        hdb		*elp = op->entsp ;
 	                nullptr_t	n{} ;
 	                if ((rs = hdb_start(elp,defents,0,n,n)) >= 0) {
 	                    op->checktime = time(nullptr) ;
@@ -271,13 +298,18 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 	                            op->magic = 0 ;
 	                        }
 	                    } /* end if (had an optional file) */
-	                    if (rs < 0)
-	                        hdb_finish(&op->entries) ;
+	                    if (rs < 0) {
+	                        hdb_finish(op->entsp) ;
+			    }
 	                } /* end if (entries) */
-	                if (rs < 0)
-	                    vecobj_finish(&op->files) ;
+	                if (rs < 0) {
+	                    vecobj_finish(op->filep) ;
+			}
 	            } /* end if (files) */
 	        } /* end if (valid) */
+		if (rs < 0) {
+		    nodedb_dtor(op) ;
+		}
 	    } /* end if (non-null) */
 	} /* end if (mkterms) */
 	return rs ;
@@ -297,11 +329,15 @@ int nodedb_close(nodedb *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = hdb_finish(&op->entries) ;
+	        rs1 = hdb_finish(op->entsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecobj_finish(&op->files) ;
+	        rs1 = vecobj_finish(op->filep) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = nodedb_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;
@@ -339,7 +375,7 @@ int nodedb_curbegin(nodedb *op,NODEDB_CUR *curp) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
-	    if ((rs = hdb_curbegin(&op->entries,&curp->ec)) >= 0) {
+	    if ((rs = hdb_curbegin(op->entsp,&curp->ec)) >= 0) {
 	        op->cursors += 1 ;
 	    }
 	} /* end if (magic) */
@@ -351,7 +387,7 @@ int nodedb_curend(nodedb *op,NODEDB_CUR *curp) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
-	    if ((rs = hdb_curend(&op->entries,&curp->ec)) >= 0) {
+	    if ((rs = hdb_curend(op->entsp,&curp->ec)) >= 0) {
 	        op->cursors -= 1 ;
 	    }
 	} /* end if (magic) */
@@ -363,10 +399,10 @@ int nodedb_enum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
 	int		rs ;
 	int		svclen = 0 ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
-	    HDB_DATUM	key{} ;
-	    HDB_DATUM	val{} ;
-	    HDB_CUR	cur = curp->ec ;
-	    if ((rs = hdb_enum(&op->entries,&cur,&key,&val)) >= 0) {
+	    hdb_dat	key{} ;
+	    hdb_dat	val{} ;
+	    hdb_cur	cur = curp->ec ;
+	    if ((rs = hdb_enum(op->entsp,&cur,&key,&val)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	        if (ep && ebuf) {
 	            rs = entry_load(ep,ebuf,elen,iep) ;
@@ -388,13 +424,13 @@ int nodedb_fetch(ND *op,cc *svcbuf,ND_C *curp,
 	int		rs ;
 	int		svclen = 0 ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
-	        HDB_DATUM	key{} ;
-	        HDB_DATUM	val{} ;
-	        HDB_CUR		hcur{} ;
+	        hdb_dat	key{} ;
+	        hdb_dat	val{} ;
+	        hdb_cur		hcur{} ;
 	        key.buf = svcbuf ;
 	        key.len = strlen(svcbuf) ;
 	        hcur = curp->ec ;
-	        if ((rs = hdb_fetch(&op->entries,key,&hcur,&val)) >= 0) {
+	        if ((rs = hdb_fetch(op->entsp,key,&hcur,&val)) >= 0) {
 	            NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	            if (ep && ebuf) {
 	                rs = entry_load(ep,ebuf,elen,iep) ;
@@ -432,7 +468,7 @@ static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	NODEDB_FILE	fe{} ;
 	int		rs ;
 	if ((rs = file_start(&fe,fname)) >= 0) {
-	    vecobj	*flp = &op->files ;
+	    vecobj	*flp = op->filep ;
 	    vecobj_vcmp	vcf = vecobj_vcmp(vcmpfname) ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = vecobj_search(flp,&fe,vcf,nullptr)) == rsn) {
@@ -453,7 +489,7 @@ static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 /* end subroutine (nodedb_fileadder) */
 
 static int nodedb_filefins(nodedb *op) noex {
-	vecobj		*flp = &op->files ;
+	vecobj		*flp = op->filep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
@@ -469,7 +505,7 @@ static int nodedb_filefins(nodedb *op) noex {
 /* end subroutine (nodedb_filefins) */
 
 static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
-	vecobj		*flp = &op->files ;
+	vecobj		*flp = op->filep ;
 	int		rs = SR_OK ;
 	int		c_changed = 0 ;
 	void		*vp{} ;
@@ -495,7 +531,7 @@ static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
 /* end subroutine (nodedb_checkfiles) */
 
 static int nodedb_fileparse(nodedb *op,int fi) noex {
-	vecobj		*flp = &op->files ;
+	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		c = 0 ;
 	void		*vp{} ;
@@ -644,34 +680,35 @@ static int nodedb_addentry(nodedb *op,int fi,SVCENTRY *sep) noex {
 	    if ((rs = uc_malloc(size,&vp)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) vp ;
 	        if ((rs = ientry_start(iep,fi,sep)) >= 0) {
-	            HDB_DATUM	key ;
-	            HDB_DATUM	val ;
+	            hdb_dat	key ;
+	            hdb_dat	val ;
 	            key.buf = iep->svc ;
 	            key.len = strlen(iep->svc) ;
 	            val.buf = iep ;
 	            val.len = sizeof(NODEDB_IE) ;
-	            rs = hdb_store(&op->entries,key,val) ;
-	            if (rs < 0)
+	            rs = hdb_store(op->entsp,key,val) ;
+	            if (rs < 0) {
 	                ientry_finish(iep) ;
-	        }
-	        if (rs < 0)
+		    }
+	        } /* end if (ientry-start) */
+	        if (rs < 0) {
 	            uc_free(iep) ;
+		}
 	    } /* end if (memory-allocation) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (nodedb_addentry) */
 
-/* free up all of the entries in this nodedb list associated w/ a file */
 static int nodedb_filedump(nodedb *op,int fi) noex {
-	HDB		*elp = &op->entries ;
-	HDB_CUR		cur{} ;
+	hdb		*elp = op->entsp ;
+	hdb_cur		cur{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = hdb_curbegin(elp,&cur)) >= 0) {
-	    HDB_DATUM	key ;
-	    HDB_DATUM	val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    while (hdb_enum(elp,&cur,&key,&val) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	        if ((iep->fi == fi) || (fi < 0)) {
@@ -698,7 +735,7 @@ static int nodedb_filedump(nodedb *op,int fi) noex {
 /* end subroutine (nodedb_filedump) */
 
 static int nodedb_filedel(nodedb *op,int fi) noex {
-	vecobj		*flp = &op->files ;
+	vecobj		*flp = op->filep ;
 	int		rs ;
 	int		rs1 ;
 	void		*vp{} ;

@@ -51,9 +51,10 @@ struct paramfile_head {
 	cchar		*a ;		/* memory allocation */
 	char		*lbuf ;
 	char		*fbuf ;
-	vecobj		files ;
-	vecobj		entries ;	/* parameter entries */
-	varsub		d, e ;
+	vecobj		*filep ;	/* files */
+	vecobj		*entsp ;	/* parameter entries */
+	varsub		*defp ;		/* defines */
+	varsub		*envp ;		/* environment-variables */
 	PARAMFILE_FL	f ;
 	time_t		ti_check ;	/* time last checked */
 	uint		magic ;
