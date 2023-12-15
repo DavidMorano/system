@@ -1,5 +1,5 @@
 /* intsat (Integer-Saturation) */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* perform a variety of integer saturation addition-subtractions */
 /* version %I% last-modified %G% */
@@ -22,8 +22,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
+#include	<ucvariables.hh>	/* <- for variable |valuelimit| */
 #include	<localmisc.h>
 
 #include	"intsat.h"
@@ -31,8 +31,42 @@
 
 /* local defines */
 
+#ifndef	LONGLONG_MIN
+#define	LONGLONG_MIN	valuelimit.llmin
+#endif
+
+#ifndef	LONGLONG_MAX
+#define	LONGLONG_MAX	valuelimit.llmax
+#endif
+
+#ifndef	ULONGLONG_MAX
+#define	ULONGLONG_MAX	valuelimit.ullmax
+#endif
+
+
+/* local subroutine-templates */
+
+template<typename T>
+int intsatx(T v) noex {
+	int	r = int(v) ;
+	if (v > INT_MAX) {
+	    r = INT_MAX ;
+	} else if (v < INT_MIN) {
+	    r = INT_MIN ;
+	}
+	return r ;
+}
+
 
 /* exported subroutines */
+
+int intsatl(long v) noex {
+	return intsatx(v) ;
+}
+
+int intsatll(longlong v) noex {
+	return intsatx(v) ;
+}
 
 int iaddsat(int v1,int v2) noex {
 	int		vr = (v1+v2) ;
