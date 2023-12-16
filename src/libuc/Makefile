@@ -1268,6 +1268,11 @@ umsg.o:			umsg.cc umsg.h
 ucmemla.o:		ucmemla.cc ucmemla.h
 
 
+# PATH
+pathadd.o:		pathadd.cc pathadd.h
+pathclean.o:		pathclean.cc pathclean.h
+
+
 nodedb.o:		nodedb.cc nodedb.h
 bits.o:			bits.cc bits.h
 envs.o:			envs.cc envs.h

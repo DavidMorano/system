@@ -43,6 +43,7 @@
 
 #ifndef	CFXXXX_INCLUDE
 #define	CFXXXX_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -127,6 +128,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 /* end subroutine-template (cfxxxx) */
 
 
+#endif	/* __cplusplus */
 #endif /* CFXXXX_INCLUDE */
 
 

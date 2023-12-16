@@ -64,7 +64,7 @@
 
 namespace {
     struct ucgetpid {
-	ptm		m ;		/* data mutex */
+	ptm		mx ;		/* data mutex */
 	pid_t		pid ;
 	aflag		fvoid ;
 	aflag		finit ;
@@ -183,8 +183,7 @@ int ucgetpid::init() noex {
 int ucgetpid::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (finitdone) {
-	    fvoid = true ;
+	if (finitdone && (! fvoid.testandset)) {
 	    {
 	        void_f	b = ucgetpid_atforkbefore ;
 	        void_f	ap = ucgetpid_atforkparent ;

@@ -37,6 +37,7 @@
 
 #ifndef	SINGLIST_INCLUDE
 #define	SINGLIST_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -47,11 +48,6 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-
-/* external subroutines */
-
-
-/* local structures */
 
 template <typename T>
 class singlist ;
@@ -350,6 +346,7 @@ public:
 } ; /* end class (singlist) */
 
 
+#endif	/* __cplusplus */
 #endif /* SINGLIST_INCLUDE */
 
 

@@ -73,6 +73,7 @@
 
 #ifndef	BSTREE_INCLUDE
 #define	BSTREE_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -596,6 +597,7 @@ public:
 } ; /* end class (bstree) */
 
 
+#endif	/* __cplusplus */
 #endif /* BSTREE_INCLUDE */
 
 

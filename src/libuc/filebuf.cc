@@ -49,6 +49,9 @@
 
 #define	MEMCPYLEN	100
 
+#define	PIPEBUFLEN	1024
+#define	BLOCKBUFLEN	512
+
 #define	ISCONT(b,bl)	\
 	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
@@ -588,7 +591,7 @@ static int filebuf_adjbuf(filebuf *op,int bufsize) noex {
 	    op->dt = filetype(sb.st_mode) ;
 	    if (bufsize <= 0) {
 	        if (S_ISFIFO(sb.st_mode)) {
-	            bufsize = 1024 ;
+	            bufsize = PIPEBUFLEN ;
 	        } else {
 		    if ((rs = pagesize) >= 0) {
 			off_t	ps = off_t(rs) ;
@@ -596,7 +599,7 @@ static int filebuf_adjbuf(filebuf *op,int bufsize) noex {
 	        	cint	of = op->of ;
 		        if ((of & O_ACCMODE) == O_RDONLY) {
 		            off_t fs = ((sb.st_size == 0) ? 1 : sb.st_size) ;
-		            cs = BCEIL(fs,512) ;
+		            cs = BCEIL(fs,BLOCKBUFLEN) ;
 	                    bufsize = (int) min(ps,cs) ;
 	                } else {
 		            bufsize = ps ;

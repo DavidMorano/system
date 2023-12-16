@@ -36,6 +36,7 @@ const char varnames::user[] = "USER" ;
 const char varnames::group[] = "GROUP" ;
 const char varnames::cdpath[] = "CDPATH" ;
 const char varnames::path[] = "PATH" ;
+const char varnames::fpath[] = "FPATH" ;
 const char varnames::binpath[] = "BINPATH" ;
 const char varnames::libpath[] = "LIBPATH" ;
 const char varnames::incpath[] = "INCPATH" ;

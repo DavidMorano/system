@@ -42,6 +42,7 @@
 
 #ifndef	CFDIGX_INCLUDE
 #define	CFDIGX_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -100,6 +101,7 @@ int cfdigux(cc *sp,int sl,int b,T *rp) noex {
 /* end subroutine-template (cfdigx) */
 
 
+#endif	/* __cplusplus */
 #endif /* CFDIGX_INCLUDE */
 
 

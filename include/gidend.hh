@@ -16,6 +16,7 @@
 
 #ifndef	GIDEND_INCLUDE
 #define	GIDEND_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -37,6 +38,7 @@ consteval gid_t mkgidend() noex {
 #endif
 
 
+#endif	/* __cplusplus */
 #endif /* GIDEND_INCLUDE */
 
 

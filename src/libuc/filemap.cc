@@ -265,13 +265,13 @@ static int filemap_openmap(filemap *fmp,int fd,size_t fsize) noex {
 	size_t		ms ;
 	int		rs ;
 	if ((rs = pagesize) >= 0) {
-	    nullptr_t	n{} ;
+	    nullptr_t	np{} ;
 	    csize	ps = size_t(rs) ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;
 	    void	*md{} ;
 	    ms = max(ps,fsize) ;
-	    if ((rs = u_mmap(n,ms,mp,mf,fd,0L,&md)) >= 0) {
+	    if ((rs = u_mmap(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	        cint		madv = MADV_SEQUENTIAL ;
 	        if ((rs = uc_madvise(md,ms,madv)) >= 0) {
 	            fmp->mapdata = md ;

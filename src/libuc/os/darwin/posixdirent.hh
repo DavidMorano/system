@@ -23,6 +23,7 @@
 
 #ifndef	POSIXDIRENT_INCLUDE
 #define	POSIXDIRENT_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -75,6 +76,7 @@ public:
 } ; /* end struct (posixdirent) */
 
 
+#endif	/* __cplusplus */
 #endif /* POSIXDIRENT_INCLUDE */
 
 

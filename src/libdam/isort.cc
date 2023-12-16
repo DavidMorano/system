@@ -47,7 +47,9 @@
 
 /* type defs */
 
-typedef int	(*sortcmp_t)(const void *,const void *) noex ;
+extern "C" {
+    typedef int	(*sortcmp_t)(const void *,const void *) noex ;
+}
 
 
 /* name-spaces */

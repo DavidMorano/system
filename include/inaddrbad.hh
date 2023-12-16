@@ -16,6 +16,7 @@
 
 #ifndef	INADDRBAD_INCLUDE
 #define	INADDRBAD_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -24,20 +25,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 consteval in_addr_t mkinaddrbad() noex {
 	in_addr_t	a = 0 ;
 	return (~a) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
 
-
+#endif	/* __cplusplus */
 #endif /* INADDRBAD_INCLUDE */
 
 

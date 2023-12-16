@@ -1,5 +1,5 @@
 /* fieldterm INCLUDE */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* convenience object for handling "field" terminators ("terms") */
 /* version %I% last-modified %G% */

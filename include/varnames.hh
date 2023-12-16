@@ -23,6 +23,7 @@
 
 #ifndef	VARNAMES_INCLUDE
 #define	VARNAMES_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -39,6 +40,7 @@ struct varnames {
 	static const char group[] ;
 	static const char cdpath[] ;
 	static const char path[] ;
+	static const char fpath[] ;
 	static const char binpath[] ;
 	static const char libpath[] ;
 	static const char incpath[] ;
@@ -79,6 +81,7 @@ struct varnames {
 extern const varnames	varname ;
 
 
+#endif	/* __cplusplus */
 #endif /* VARNAMES_INCLUDE */
 
 

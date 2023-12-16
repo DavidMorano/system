@@ -59,15 +59,14 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<sncpyx.h>
-#include	<sncpyxw.h>
-#include	<snwcpy.h>
-#include	<strwcpy.h>
+#include	<ucvariables.hh>
+#include	<bufsizevar.hh>
 #include	<strwcpy.h>
 #include	<storebuf.h>
-#include	<ucvariables.hh>
-#include	<getbufsize.h>
-#include	<bufsizevar.hh>
+#include	<sfx.h>
+#include	<strn.h>
+#include	<isnot.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 
@@ -87,12 +86,8 @@
 
 extern "C" int	pathadd(char *,int,cchar *) noex ;
 extern "C" int	pathaddw(char *,int,cchar *,int) noex ;
-extern "C" int	sfbasename(cchar *,int,cchar **) noex ;
-extern "C" int	isNotPresent(int) noex ;
 
 extern "C" cchar	*getenver(cchar *,int) noex ;
-
-extern "C" char		*strnchr(cchar *,int,int) noex ;
 
 
 /* external variables */
@@ -100,23 +95,24 @@ extern "C" char		*strnchr(cchar *,int,int) noex ;
 
 /* local structures */
 
-class mkcdpathsub {
+namespace {
+    class mkcdpathsub {
 	int		vl = 0 ;
 	int		sl ;
 	int		bl = 0 ;
-	cchar		*plist = NULL ;
-	cchar		*vp = NULL ;
+	cchar		*plist = nullptr ;
+	cchar		*vp = nullptr ;
 	cchar		*sp ;
-	cchar		*bp = NULL ;
+	cchar		*bp = nullptr ;
 	char		*ebuf ;
-public:
+    public:
 	mkcdpathsub(char *abuf,cchar *asp,int asl) noex : sl(asl), sp(asp) {
 	    ebuf = abuf ;
 	    vp = sp ;
 	} ;
 	int getvarname() noex {
 	    cchar	*tp ;
-	    if ((tp = strnchr(sp,sl,'/')) != NULL) {
+	    if ((tp = strnchr(sp,sl,'/')) != nullptr) {
 		vl = (tp-sp) ;
 		sl -= ((tp+1)-sp) ;
 		sp = (tp+1) ;
@@ -127,7 +123,7 @@ public:
 	     int	rs = SR_OK ;
 	     if (vl > 0) {
 		char	*vn ;
-		if ((vn = new char [vl+1]) != NULL) {
+		if ((vn = new char [vl+1]) != nullptr) {
 		    strwcpyuc(vn,vp,vl) ;
 		    plist = getenver(vn,vl) ;
 		    delete [] vn ;
@@ -149,8 +145,8 @@ public:
 	int testpath(cchar *,int) noex ;
 	int mkjoin(cchar *,int) noex ;
 	int mkresult(int) noex ;
-} ;
-/* end class (mkcdpathsub) */
+    } ; /* end class (mkcdpathsub) */
+}
 
 
 /* forward references */
@@ -172,7 +168,7 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 	    cint	ec = CH_EXPAND ;
 	    ebuf[0] = '\0' ;
 	    if (fl < 0) fl = strlen(fp) ;
-	    if ((fl > 0) && (MKCHAR(fp[0]) == ec)) {
+	    if ((fl > 0) && (mkchar(fp[0]) == ec)) {
 	        mkcdpathsub 	*sip = new mkcdpathsub(ebuf,(fp+1),(fl+1)) ;
 	        if ((rs = sip->getvarname()) >= 0) {
 		    if ((rs = sip->getplist()) >= 0) {
@@ -197,11 +193,11 @@ int mkcdpath(char *ebuf,cchar *fp,int fl) noex {
 int mkcdpathsub::testpaths() noex {
 	int		rs = SR_OK ;
 	int		el = 0 ;
-	if (plist != NULL) {
+	if (plist != nullptr) {
 	    int		pl = strlen(plist) ;
 	    cchar	*pp = plist ;
 	    cchar	*tp ;
-	    while ((tp = strnchr(pp,pl,':')) != NULL) {
+	    while ((tp = strnchr(pp,pl,':')) != nullptr) {
 		if ((tp-pp) > 0) {
 		    rs = testpath(pp,(tp-pp)) ;
 		    el = rs ;

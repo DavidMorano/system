@@ -1,4 +1,4 @@
-/* ismisx */
+/* ischarx */
 /* lang=C++20 */
 
 /* test a character for a property */

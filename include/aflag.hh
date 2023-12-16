@@ -16,6 +16,7 @@
 
 #ifndef	AFLAG_INCLUDE
 #define	AFLAG_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -72,6 +73,7 @@ struct aflag {
 } ; /* end struct (aflag) */
 
 
+#endif /* __cplusplus */
 #endif /* AFLAG_INCLUDE */
 
 

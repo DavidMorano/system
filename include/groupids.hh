@@ -16,6 +16,7 @@
 
 #ifndef	GROUPIDS_INCLUDE
 #define	GROUPIDS_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -76,6 +77,7 @@ struct groupids {
 } ; /* end struct (groupids) */
 
 
+#endif	/* __cplusplus */
 #endif /* GROUPIDS_INCLUDE */
 
 

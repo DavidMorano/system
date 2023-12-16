@@ -22,7 +22,7 @@
 
 	Description:
 	This subroutine creates a resolved filename path from the
-	coded form.
+	coded username-prefix form.
 
 	Synopsis:
 	int mkuserpath(char *rbuf,cchar *un,cchar *pp,int pl) noex
@@ -139,7 +139,7 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	    pp += pl ;
 	    pl = 0 ;
 	}
-	if ((ul == 0) && (un != nullptr)) {
+	if ((ul == 0) && un) {
 	    up = un ;
 	    ul = -1 ;
 	}
@@ -192,7 +192,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	    }
 	    if (rs >= 0) {
 	        if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	            passwd	pw ;
+	            PASSWD	pw ;
 	            cint	pwlen = rs ;
 	            char	*pwbuf{} ;
 	            if ((rs = uc_libmalloc((pwlen+1),&pwbuf)) >= 0) {

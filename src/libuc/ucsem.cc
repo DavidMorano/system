@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	These are (secretly) POSIX® "named" semaphores!
+	These do NOT have the same API as the w/ regular POSIX®
+	interface.
+
 	This module provides a sanitized version of the standard
 	POSIX® semaphore facility provided with some new UNIX®i.
 	Some operating system problems are managed within these
@@ -37,10 +41,8 @@
 #include	<cerrno>
 #include	<cstring>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<getbufsize.h>
 #include	<usupport.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getgid.h>
 #include	<mkpathx.h>

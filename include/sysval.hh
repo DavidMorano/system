@@ -33,6 +33,7 @@
 
 #ifndef	SYSVAL_INCLUDE
 #define	SYSVAL_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -63,6 +64,7 @@ struct sysval {
 } ; /* end class (sysval) */
 
 
+#endif	/* __cplusplus */
 #endif /* SYSVAL_INCLUDE */
 
 

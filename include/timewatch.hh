@@ -26,6 +26,7 @@
 
 #ifndef	TIMEWATCH_INCLUDE
 #define	TIMEWATCH_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -60,6 +61,7 @@ public:
 } ; /* end class (timewatch) */
 
 
+#endif	/* __cplusplus */
 #endif /* TIMEWATCH_INCLUDE */
 
 
