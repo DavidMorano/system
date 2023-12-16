@@ -73,14 +73,14 @@ namespace {
 	int fini() noex ;
 	int igetpid() noex ;
         void atforkbefore() noex {
-	    ptm_lock(&m) ;
+	    mx.lockbegin() ;
         }
         void atforkparent() noex {
-	    ptm_unlock(&m) ;
+	    mx.lockend() ;
         }
         void atforkchild() noex {
 	    pid = 0 ;
-	    ptm_unlock(&m) ;
+	    mx.lockend() ;
         }
 	~ucgetpid() noex {
 	    int		rs = fini() ;
@@ -145,7 +145,7 @@ int ucgetpid::init() noex {
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    if (! finit.testandset) {
-	        if ((rs = m.create) >= 0) {
+	        if ((rs = mx.create) >= 0) {
 	            void_f	b = ucgetpid_atforkbefore ;
 	            void_f	ap = ucgetpid_atforkparent ;
 	            void_f	ac = ucgetpid_atforkchild ;
@@ -154,14 +154,17 @@ int ucgetpid::init() noex {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,ap,ac) ;
+			}
 	            } /* end if (uc_atfork) */
-	 	    if (rs < 0)
-		        m.destroy() ;
+	 	    if (rs < 0) {
+		        mx.destroy() ;
+		    }
 	        } /* end if (ptm_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            finit = false ;
+		}
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -192,7 +195,7 @@ int ucgetpid::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ptm_destroy(&m) ;
+	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    finitdone = false ;
@@ -229,7 +232,7 @@ static void ucgetpid_atforkchild() noex {
 /* end subroutine (ucgetpid_atforkchild) */
 
 static void ucgetpid_exit() noex {
-	ucgetpid_data.fvoid = true ;
+	ucgetpid_data.fini() ;
 }
 /* end subroutine (ucgetpid_exit) */
 

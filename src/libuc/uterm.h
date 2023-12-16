@@ -1,6 +1,8 @@
 /* uterm */
+/* lang=C20 */
 
 /* object to handle UNIX terminal stuff */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,15 +15,16 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UTERM_INCLUDE
-#define	UTERM_INCLUDE	1
+#define	UTERM_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<termios.h>
 #include	<limits.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<charq.h>
 #include	<localmisc.h>		/* extra types */
 
@@ -30,6 +33,7 @@
 #define	UTERM_PROMPT	struct uterm_prompt
 #define	UTERM_LOAD	struct uterm_load
 #define	UTERM_FL	struct uterm_flags
+
 
 enum utermcmds {
 	utermcmd_noop,
@@ -69,23 +73,23 @@ struct uterm_flags {
 
 /* prompt-output before input */
 struct uterm_prompt {
-	const char	*pbuf ;
+	cchar		*pbuf ;
 	int		plen ;
 } ;
 
 /* pre-loading the input buffer */
 struct uterm_load {
-	const char	*lbuf ;
+	cchar		*lbuf ;
 	int		llen ;
 } ;
 
 struct uterm_head {
 	uint		magic ;
 	UTERM_FL	f ;
-	struct termios	ts_old ;
-	struct termios	ts_new ;
-	CHARQ		taq ;
-	CHARQ		ecq ;
+	TERMIOS		ts_old ;
+	TERMIOS		ts_new ;
+	charq		taq ;
+	charq		ecq ;
 	time_t		ti_start ;
 	uid_t		uid ;
 	int		fd ;
@@ -93,38 +97,37 @@ struct uterm_head {
 	int		timeout ;	/* timeout timer counter */
 	int		mode ;
 	int		ch_read, ch_write ;
-	int		stat ;
+	int		status ;
 	uchar		rterms[32] ;
 } ;
 
-
-#if	(! defined(UTERM_MASTER)) || (UTERM_MASTER == 0)
+typedef UTERM		uterm ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int uterm_start(UTERM *,int) ;
-extern int uterm_control(UTERM *,int,...) ;
-extern int uterm_status(UTERM *,int,...) ;
-extern int uterm_read(UTERM *,char *,int) ;
-extern int uterm_reade(UTERM *,char *,int,int,int,UTERM_PROMPT *,UTERM_LOAD *) ;
-extern int uterm_write(UTERM *,const char *,int) ;
-extern int uterm_suspend(UTERM *) ;
-extern int uterm_resume(UTERM *) ;
-extern int uterm_restore(UTERM *) ;
-extern int uterm_ensure(UTERM *) ;
-extern int uterm_getmesg(UTERM *) ;
-extern int uterm_getbiff(UTERM *) ;
-extern int uterm_getpop(UTERM *) ;
-extern int uterm_setpop(UTERM *,int) ;
-extern int uterm_finish(UTERM *) ;
+extern int uterm_start(uterm *,int) noex ;
+extern int uterm_control(uterm *,int,...) noex ;
+extern int uterm_status(uterm *,int,...) noex ;
+extern int uterm_read(uterm *,char *,int) noex ;
+extern int uterm_reade(uterm *,char *,int,int,int,
+		UTERM_PROMPT *,UTERM_LOAD *) noex ;
+extern int uterm_write(uterm *,cchar *,int) noex ;
+extern int uterm_suspend(uterm *) noex ;
+extern int uterm_resume(uterm *) noex ;
+extern int uterm_restore(uterm *) noex ;
+extern int uterm_ensure(uterm *) noex ;
+extern int uterm_getmesg(uterm *) noex ;
+extern int uterm_getbiff(uterm *) noex ;
+extern int uterm_getpop(uterm *) noex ;
+extern int uterm_setpop(uterm *,int) noex ;
+extern int uterm_finish(uterm *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* UTERM_MASTER */
 
 #endif /* UTERM_INCLUDE */
 

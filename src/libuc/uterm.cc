@@ -1,24 +1,23 @@
 /* uterm */
+/* lang=C++20 */
 
 /* "UNIX Terminal" helper routines */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0	/* compile-time debug print-outs */
-#define	CF_SIGNAL	1	/* 1={local handle}, 0={UNIXÂ® handles} */
+#define	CF_SIGNAL	1	/* 1={local handle}, 0={UNIX® handles} */
 #define	CF_FIRSTREAD	0	/* perform an initial 'read()'? */
 #define	CF_WRITEATOM	1	/* atomic write */
-#define	CF_SUBUNIX	1	/* allow UNIXÂ® to handle Control-Z */
-
+#define	CF_SUBUNIX	1	/* allow UNIX® to handle Control-Z */
 
 /* revision history:
 
-	= 1998-02-01, David AÂ­DÂ­ Morano
+	= 1998-02-01, David A­D­ Morano
 	This module was originally written.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -29,9 +28,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>
@@ -39,7 +36,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
@@ -48,16 +44,13 @@
 #include	<buffer.h>
 #include	<sbuf.h>
 #include	<sigign.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"uterm.h"
 
 
 /* local defines */
-
-#ifndef	MKCHAR
-#define	MKCHAR(c)	((c) & 0xff)
-#endif
 
 #define	UTERM_MAGIC	0x33442281
 
@@ -101,14 +94,18 @@
 
 /* externals subroutines */
 
-extern int	tcsetmesg(int,int) ;
-extern int	tcsetbiff(int,int) ;
-extern int	tcgetlines(int) ;
-extern int	tcsetlines(int,int) ;
-extern int	isprintlatin(int) ;
+extern "C" {
+    extern int	tcsetmesg(int,int) noex ;
+    extern int	tcsetbiff(int,int) noex ;
+    extern int	tcgetlines(int) noex ;
+    extern int	tcsetlines(int,int) noex ;
+    extern int	isprintlatin(int) noex ;
+}
 
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern "C" {
+    extern char	*strnchr(cchar *,int,int) noex ;
+    extern char	*strnpbrk(cchar *,int,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -119,21 +116,20 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-static int	uterm_attrbegin(UTERM *) ;
-static int	uterm_attrend(UTERM *) ;
-static int	uterm_qbegin(UTERM *) ;
-static int	uterm_qend(UTERM *) ;
-static int	uterm_controlmode(UTERM *) ;
-static int	uterm_writeproc(UTERM *,const char *,int) ;
+static int	uterm_attrbegin(uterm *) noex ;
+static int	uterm_attrend(uterm *) noex ;
+static int	uterm_qbegin(uterm *) noex ;
+static int	uterm_qend(uterm *) noex ;
+static int	uterm_controlmode(uterm *) noex ;
+static int	uterm_writeproc(uterm *,cchar *,int) noex ;
 
-static int	tty_wait() ;
-static int	tty_echo() ;
-static int	tty_risr(UTERM *,const char *,int) ;
-static int	tty_wps(UTERM *,const char *,int) ;
-static int	tty_loadchar(UTERM *,const char *,int) ;
+static int	tty_wait() noex ;
+static int	tty_echo() noex ;
+static int	tty_risr(uterm *,cchar *,int) noex ;
+static int	tty_wps(uterm *,cchar *,int) noex ;
+static int	tty_loadchar(uterm *,cchar *,int) noex ;
 
-/* String-Index-Not-Printable */
-static int	sinotprint(const char *,int) ;
+static int	sinotprint(cchar *,int) noex ;
 
 
 /* local variables */
@@ -149,7 +145,7 @@ static const uchar	uterms[] = {
 	0x00, 0x00, 0x00, 0x00, 
 } ;
 
-static const int	sigouts[] = {
+static cint		sigouts[] = {
 	SIGTTOU,
 	0
 } ;
@@ -157,10 +153,7 @@ static const int	sigouts[] = {
 
 /* exported subroutines */
 
-
-/* TTY initialization routine */
-int uterm_start(UTERM *op,int fd)
-{
+int uterm_start(uterm *op,int fd) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -174,7 +167,7 @@ int uterm_start(UTERM *op,int fd)
 	memcpy(op->rterms,uterms,32) ;
 
 	if ((rs = uc_tcgetpgrp(fd)) == SR_NOTTY) {
-	    op->f.noctty = TRUE ;
+	    op->f.noctty = true ;
 	    rs = SR_OK ;
 	}
 
@@ -196,9 +189,7 @@ int uterm_start(UTERM *op,int fd)
 }
 /* end subroutine (uterm_start) */
 
-
-int uterm_finish(UTERM *op)
-{
+int uterm_finish(uterm *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -217,27 +208,19 @@ int uterm_finish(UTERM *op)
 }
 /* end subroutine (uterm_finish) */
 
-
-int uterm_suspend(UTERM *op)
-{
+int uterm_suspend(uterm *op) noex {
 
 	return uterm_restore(op) ;
 }
 /* end subroutine (uterm_suspend) */
 
-
-int uterm_resume(UTERM *op)
-{
-
+int uterm_resume(uterm *op) noex {
 	return uterm_ensure(op) ;
 }
 /* end subroutine (uterm_resume) */
 
-
-/* restore settings */
-int uterm_restore(UTERM *op)
-{
-	struct termios	*attrp ;
+int uterm_restore(uterm *op) noex {
+	TERMIOS		*attrp ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -253,11 +236,8 @@ int uterm_restore(UTERM *op)
 }
 /* end subroutine (uterm_restore) */
 
-
-/* ensure settings */
-int uterm_ensure(UTERM *op)
-{
-	struct termios	*attrp ;
+int uterm_ensure(uterm *op) noex {
+	TERMIOS		*attrp ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -271,10 +251,7 @@ int uterm_ensure(UTERM *op)
 }
 /* end subroutine (uterm_ensure) */
 
-
-/* control function */
-int uterm_control(UTERM *op,int cmd,...)
-{
+int uterm_control(uterm *op,int cmd,...) noex {
 	int		rs = SR_OK ;
 	int		iw, *iwp ;
 
@@ -289,14 +266,14 @@ int uterm_control(UTERM *op,int cmd,...)
 
 	{
 	    va_list	ap ;
-	    const int	fc = (cmd & FM_CMDMASK) ;
+	    cint		fc = (cmd & FM_CMDMASK) ;
 	    va_begin(ap,cmd) ;
 	    switch (fc) {
 	    case utermcmd_noop:
 		break ;
 	    case utermcmd_getuid:
 		if (op->uid < 0) {
-		    struct ustat	sb ;
+		    USTAT		sb ;
 	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 			op->uid = sb.st_uid ;
 		    }
@@ -323,7 +300,7 @@ int uterm_control(UTERM *op,int cmd,...)
 		break ;
 	    case utermcmd_reestablish:
 		{
-		    struct termios	*attrp = &op->ts_new ;
+		    TERMIOS		*attrp = &op->ts_new ;
 	            rs = uc_tcsetattr(op->fd,TCSADRAIN,attrp) ;
 		}
 	        break ;
@@ -341,7 +318,7 @@ int uterm_control(UTERM *op,int cmd,...)
 		break ;
 	    case utermcmd_setbiff:
 		{
-		    const int	f = (int) va_arg(ap,int) ;
+		    cint		f = (int) va_arg(ap,int) ;
 	            rs = tcsetbiff(op->fd,f) ;
 		}
 		break ;
@@ -363,7 +340,7 @@ int uterm_control(UTERM *op,int cmd,...)
 		break ;
 	    case utermcmd_setpop:
 		{
-		    const int	v = (int) va_arg(ap,int) ;
+		    cint		v = (int) va_arg(ap,int) ;
 	            rs = uterm_setpop(op,v) ;
 		}
 		break ;
@@ -382,10 +359,7 @@ int uterm_control(UTERM *op,int cmd,...)
 }
 /* end subroutine (uterm_control) */
 
-
-/* status function */
-int uterm_status(UTERM *op,int cmd,...)
-{
+int uterm_status(uterm *op,int cmd,...) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -409,7 +383,7 @@ int uterm_status(UTERM *op,int cmd,...)
 	        break ;
 	    case utermcmd_setlines:
 	        {
-	            const int	v = (int) va_arg(ap,int) ;
+	            cint		v = (int) va_arg(ap,int) ;
 	            rs = tcsetlines(op->fd,v) ;
 	        }
 	        break ;
@@ -438,15 +412,8 @@ int uterm_status(UTERM *op,int cmd,...)
 
 
 /* read a line from the terminal with extended parameters */
-int uterm_reade(op,rbuf,rlen,timeout,fc,lpp,llp)
-UTERM		*op ;
-char		rbuf[] ;
-int		rlen ;
-int		timeout ;
-int		fc ;
-UTERM_PROMPT	*lpp ;
-UTERM_LOAD	*llp ;
-{
+int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
+		UTERM_PROMPT *lpp,UTERM_LOAD *llp) noex {
 	int		rs = SR_OK ;
 	int		ch = -1 ;
 	int		count = 0 ;
@@ -467,10 +434,10 @@ UTERM_LOAD	*llp ;
 	if (fc & fm_noecho) fc |= fm_notecho ;
 
 	terms = op->rterms ;
-	op->f.cc = FALSE ;
-	op->f.co = FALSE ;		/* cancel ^O effect */
+	op->f.cc = false ;
+	op->f.co = false ;		/* cancel ^O effect */
 
-	op->f.read = TRUE ;		/* read is in progress */
+	op->f.read = true ;		/* read is in progress */
 
 /* top of further access */
 top:
@@ -487,7 +454,7 @@ top:
 /* check TA buffer first */
 next:
 	while ((rs >= 0) && (count < rlen)) {
-	    int	f_eot = FALSE ;
+	    int	f_eot = false ;
 
 	    while (charq_rem(&op->taq,qbuf) == SR_EMPTY) {
 
@@ -529,7 +496,7 @@ next:
 	        switch (ch) {
 	        case CH_EOT:
 	            if (count == 0)
-	                f_eot = TRUE ;
+	                f_eot = true ;
 	            ch = -1 ;
 	            break ;
 	        case CH_NAK:
@@ -614,23 +581,17 @@ next:
 	debugprintf("uterm_reade: ret rs=%d count=%u\n",rs,count) ;
 #endif
 
-	op->f.read = FALSE ;
+	op->f.read = false ;
 	return (rs >= 0) ? count : rs ;
 }
 /* end subroutine (uterm_reade) */
 
-
-int uterm_read(UTERM *op,char *rbuf,int rlen)
-{
-
+int uterm_read(uterm *op,char *rbuf,int rlen) noex {
 	return uterm_reade(op,rbuf,rlen,-1,0,NULL,NULL) ;
 }
 /* end subroutine (uterm_read) */
 
-
-/* write routine */
-int uterm_write(UTERM *op,cchar *wbuf,int wlen)
-{
+int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
 	int		rs = SR_OK ;
 	int		tlen = 0 ;
 
@@ -677,25 +638,19 @@ ret0:
 }
 /* end subroutine (uterm_write) */
 
-
-/* cancel a terminal request */
-/* ARGSUSED */
-int uterm_cancel(UTERM *op,int fc,int cparam)
-{
+int uterm_cancel(uterm *op,int fc,int cparam) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
 
+	(void) cparam ;
 	return rs ;
 }
 /* end subroutine (uterm_cancel) */
 
-
-/* poll for a character */
-int uterm_poll(UTERM *op)
-{
+int uterm_poll(uterm *op) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -710,10 +665,8 @@ int uterm_poll(UTERM *op)
 }
 /* end subroutine (uterm_poll) */
 
-
-int uterm_getmesg(UTERM *op)
-{
-	struct ustat	sb ;
+int uterm_getmesg(uterm *op) noex {
+	USTAT		sb ;
 	int		rs ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
@@ -724,10 +677,8 @@ int uterm_getmesg(UTERM *op)
 }
 /* end subroutine (uterm_getmesg) */
 
-
-int uterm_getbiff(UTERM *op)
-{
-	struct ustat	sb ;
+int uterm_getbiff(uterm *op) noex {
+	USTAT		sb ;
 	int		rs ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
@@ -738,10 +689,8 @@ int uterm_getbiff(UTERM *op)
 }
 /* end subroutine (uterm_getbiff) */
 
-
-int uterm_getpop(UTERM *op)
-{
-	struct ustat	sb ;
+int uterm_getpop(uterm *op) noex {
+	USTAT		sb ;
 	int		rs ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
@@ -755,10 +704,8 @@ int uterm_getpop(UTERM *op)
 }
 /* end subroutine (uterm_getpop) */
 
-
-int uterm_setpop(UTERM *op,int v)
-{
-	struct ustat	sb ;
+int uterm_setpop(uterm *op,int v) noex {
+	USTAT		sb ;
 	int		rs ;
 	int		rv = 0 ;
 	if (op == NULL) return SR_FAULT ;
@@ -782,14 +729,12 @@ int uterm_setpop(UTERM *op,int v)
 
 /* private subroutines */
 
-
-static int uterm_attrbegin(UTERM *op)
-{
-	const int	fd = op->fd ;
+static int uterm_attrbegin(uterm *op) noex {
+	cint		fd = op->fd ;
 	int		rs ;
 
 	if ((rs = uc_tcgetattr(fd,&op->ts_old)) >= 0) {
-	    struct termios	*tp = &op->ts_new ;
+	    TERMIOS		*tp = &op->ts_new ;
 	    op->ts_new = op->ts_old ;
 
 	tp->c_iflag &= 
@@ -827,17 +772,17 @@ static int uterm_attrbegin(UTERM *op)
 /* set the new attributes */
 
 	    rs = uc_tcsetattr(fd,TCSADRAIN,tp) ;
-
+	    if (rs < 0) {
+		uc_tcsetattr(fd,TCSADRAIN,&op->ts_old) ;
+	    }
 	} /* end if */
 
 	return rs ;
 }
 /* end subroutine (uterm_attrbegin) */
 
-
-static int uterm_attrend(UTERM *op)
-{
-	const int	fd = op->fd ;
+static int uterm_attrend(uterm *op) noex {
+	cint		fd = op->fd ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -848,9 +793,7 @@ static int uterm_attrend(UTERM *op)
 }
 /* end subroutine (uterm_attrend) */
 
-
-static int uterm_qbegin(UTERM *op)
-{
+static int uterm_qbegin(uterm *op) noex {
 	int		rs ;
 
 	if ((rs = charq_start(&op->taq,TA_SIZE)) >= 0) {
@@ -863,9 +806,7 @@ static int uterm_qbegin(UTERM *op)
 }
 /* end subroutine (uterm_qbegin) */
 
-
-static int uterm_qend(UTERM *op)
-{
+static int uterm_qend(uterm *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -879,32 +820,29 @@ static int uterm_qend(UTERM *op)
 }
 /* end subroutine (uterm_qend) */
 
-
-static int uterm_controlmode(UTERM *op)
-{
-	const int	mode = op->mode ;
+static int uterm_controlmode(uterm *op) noex {
+	cint		mode = op->mode ;
 	int		rs = SR_OK ;
 	op->f.nosig = ((mode & fm_nosig) != 0) ;
 	return rs ;
 }
 /* end subroutine (uterm_controlmode) */
 
-
-static int uterm_writeproc(UTERM *op,cchar *wbuf,int wlen)
-{
+static int uterm_writeproc(uterm *op,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
+	int		sl = -1 ;
 	int		tlen = 0 ;
-	cchar		*tp ;
+	cchar	*tp ;
+	cchar	*sp ;
 
-	if ((tp = strnchr(wbuf,wlen,'\n')) != NULL) {
-	    BUFFER	pb ;
+	tlen = buflen ;
+	if ((tp = strnchr(buf,buflen,'\n')) != NULL) {
+	    buffer	pb ;
 
-	    if ((rs = buffer_start(&pb,(wlen + 10))) >= 0) {
-	        int	bl = wlen ;
-		int	sl ;
-	        cchar	*bp = wbuf ;
-		cchar	*sp ;
+	    if ((rs = buffer_start(&pb,(buflen + 10))) >= 0) {
+	        int		bl = buflen ;
+	        cchar	*bp = buf ;
 
 	        buffer_buf(&pb,bp,(tp - bp)) ;
 
@@ -932,10 +870,10 @@ static int uterm_writeproc(UTERM *op,cchar *wbuf,int wlen)
 	            buffer_buf(&pb,bp,bl) ;
 	        }
 
-	        if ((rs = buffer_get(&pb,&sp)) > 0) {
-	            sl = rs ;
+	        rs = buffer_get(&pb,&sp) ;
+	        sl = rs ;
+	        if ((rs >= 0) && (sl > 0)) {
 	            rs = u_write(op->fd,sp,sl) ;
-		    tlen = rs ;
 		}
 
 	        rs1 = buffer_finish(&pb) ;
@@ -944,35 +882,33 @@ static int uterm_writeproc(UTERM *op,cchar *wbuf,int wlen)
 
 	} else {
 	    rs = u_write(op->fd,buf,buflen) ;
-	    tlen = rs ;
 	}
 
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (uterm_writeproc) */
 
-
-/* write out a prompt string */
-static int tty_wps(UTERM *op,cchar *wbuf,int wlen)
-{
+static int tty_wps(uterm *op,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
-	int		len = 0 ;
 	int		ci ;
 
-	if (wlen < 0) wlen = strlen(wbuf) ;
-	
-	if ((ci = sinotprint(wbuf,wlen)) >= 0) {
-	    BUFFER	pb ;
+	if (buflen < 0)
+	    buflen = strlen(buf) ;
 
-	    if ((rs = buffer_start(&pb,wlen)) >= 0) {
-	        int	bl = wlen ;
+	if (buflen == 0)
+	    goto ret0 ;
+
+	if ((ci = sinotprint(buf,buflen)) >= 0) {
+	    buffer	pb ;
+	    if ((rs = buffer_start(&pb,buflen)) >= 0) {
+	        int	bl = buflen ;
 	        int	sl = -1 ;
 	        cchar	*sp ;
-	        cchar	*bp = wbuf ;
+	        cchar	*bp = buf ;
 
-	        if (ci > 0)
+	        if (ci > 0) {
 	            buffer_buf(&pb,bp,ci) ;
+		}
 
 	        bp += (ci + 1) ;
 	        bl -= (ci + 1) ;
@@ -983,52 +919,43 @@ static int tty_wps(UTERM *op,cchar *wbuf,int wlen)
 	            bl -= (ci + 1) ;
 	        } /* end while */
 
-	        if (bl > 0)
+	        if (bl > 0) {
 	            buffer_buf(&pb,bp,bl) ;
-
-	        if ((rs = buffer_get(&pb,&sp)) > 0) {
-	            sl = rs ;
-	            rs = u_write(op->fd,sp,sl) ;
-		    len = rs ;
 		}
 
-	        rs1 = buffer_finish(&pb) ;
-		if (rs >= 0) rs = rs1 ;
+	        rs = buffer_get(&pb,&sp) ;
+	        sl = rs ;
+	        if ((rs >= 0) && (sl > 0))
+	            rs = u_write(op->fd,sp,sl) ;
+
+	        buffer_finish(&pb) ;
 	    } /* end if (initialize buffer) */
 
 	} else {
 	    rs = u_write(op->fd,buf,buflen) ;
-	    len = rs ;
 	}
 
-	return (rs >= 0) ? len : rs ;
+ret0:
+	return (rs >= 0) ? buflen : rs ;
 }
 /* end subroutine (tty_wps) */
 
-
-static int tty_loadchar(UTERM *op,cchar *pbuf,int plen)
-{
+static int tty_loadchar(uterm *op,cchar *pbuf,int pbuflen) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
-
-	for (i = 0 ; (rs >= 0) && (i < plen) ; i += 1) {
-	    const int	ch = MKCHAR(pbuf[i]) ;
+	for (int i = 0 ; (rs >= 0) && (i < pbuflen) ; i += 1) {
+	    cint	ch = MKCHAR(pbuf[i]) ;
 	    if (isprintlatin(ch)) {
 	        c += 1 ;
 	        rs = charq_ins(&op->taq,ch) ;
 	    }
 	} /* end for */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (tty_loadchar) */
 
-
-/* wait for a character to arrive */
-static int tty_wait(UTERM *op,int timeout)
-{
-	struct pollfd	fds[2] ;
+static int tty_wait(uterm *op,int timeout) noex {
+	POLLFD		fds[2] ;
 	time_t		daytime, lasttime ;
 	int		rs ;
 	int		i ;
@@ -1063,14 +990,14 @@ static int tty_wait(UTERM *op,int timeout)
 
 	rs = u_read(op->fd,cbuf,TTY_READCHARS) ;
 	len = rs ;
-	f_starting = TRUE ;
+	f_starting = true ;
 	goto enter ;
 
 #endif /* CF_FIRSTREAD */
 
 /* loop it */
 loop:
-	f_starting = FALSE ;
+	f_starting = false ;
 
 #if	CF_DEBUGS
 	debugprintf("tty_wait: top loop, timeout=%d\n",op->timeout) ;
@@ -1196,13 +1123,10 @@ ret0:
 }
 /* end subroutine (tty_wait) */
 
-
-/* check if the receiver got some thing */
-static int tty_risr(UTERM *op,cchar *sp,int sl)
-{
+static int tty_risr(uterm *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		i ;
-	int		f_dle = FALSE ;
+	int		f_dle = false ;
 
 	for (i = 0 ; i < sl ; i += 1) {
 	    int	ch = MKCHAR(sp[i]) ;
@@ -1211,20 +1135,20 @@ static int tty_risr(UTERM *op,cchar *sp,int sl)
 #endif
 	    if (op->f.nosig) {
 	        rs = charq_ins(&op->taq,ch) ;
-	        op->f.rw = TRUE ;
+	        op->f.rw = true ;
 	    } else {
 	        switch (ch) {
 	        case CH_XOFF:
-	            op->f.suspend = TRUE ;
+	            op->f.suspend = true ;
 	            break ;
 	        case CH_XON:
-	            op->f.suspend = FALSE ;
+	            op->f.suspend = false ;
 	            break ;
 	        case CH_SO:
 	            if (op->f.co) {
-	                op->f.co = FALSE ;
+	                op->f.co = false ;
 	            } else {
-	                op->f.co = TRUE ;
+	                op->f.co = true ;
 		    	if (! op->f.nosigecho)
 	                rs = tty_echo(op," ^O\r\n",5) ;
 	            }
@@ -1232,27 +1156,27 @@ static int tty_risr(UTERM *op,cchar *sp,int sl)
 	        case CH_ETX:
 		    if (! op->f.nosigecho)
 	            rs = tty_echo(op," ^C\r\n",5) ;
-	            op->f.cc = TRUE ;
-	            op->f.rw = TRUE ;
+	            op->f.cc = true ;
+	            op->f.rw = true ;
 	            break ;
 	        case CH_EM:
 		    if (! op->f.nosigecho)
 	            rs = tty_echo(op," ^Y\r\n",5) ;
-	            op->f.cc = TRUE ;
-	            op->f.rw = TRUE ;
+	            op->f.cc = true ;
+	            op->f.rw = true ;
 	            break ;
 	        case CH_DLE:
-	            f_dle = TRUE ;
+	            f_dle = true ;
 	            break ;
 /* Control-Z (substitute) */
 	        case CH_SUB:
 		    if (op->f.noctty) {
-		        op->f.cz = TRUE ;
+		        op->f.cz = true ;
 		    } else {
 #if	CF_SUBUNIX
 		        rs = uc_raise(SIGTSTP) ;
 #else
-		        op->f.cz = TRUE ;
+		        op->f.cz = true ;
 #endif
 		    }
 	            break ;
@@ -1262,7 +1186,7 @@ static int tty_risr(UTERM *op,cchar *sp,int sl)
 	                while (charq_rem(&op->taq,&dch) >= 0) ;
 	            } else {
 	                rs = charq_ins(&op->taq,ch) ;
-	                op->f.rw = TRUE ;
+	                op->f.rw = true ;
 	            }
 	            break ;
 	        } /* end switch */
@@ -1274,41 +1198,36 @@ static int tty_risr(UTERM *op,cchar *sp,int sl)
 }
 /* end subroutine (tty_risr) */
 
-
-/* echo */
-static int tty_echo(UTERM *op,cchar *wbuf,int wlen)
-{
+static int tty_echo(uterm *op,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
 
-	if (wlen < 0)
-	    wlen = strlen(wbuf) ;
+#if	CF_DEBUGS
+	char	hexbuf[HEXBUFLEN + 1] ;
+#endif
+
+	if (buflen < 0) buflen = strlen(buf) ;
 
 #if	CF_DEBUGS
 	{
-	    char	hexbuf[HEXBUFLEN + 1] ;
-	    int		sl ;
-	    debugprintf("tty_echo: wlen=%d\n",wlen) ;
-	    sl = mkhexstr(hexbuf,HEXBUFLEN,wbuf,MIN(wlen,20)) ;
+	    int	sl ;
+	    debugprintf("tty_echo: buflen=%d\n",buflen) ;
+	    sl = mkhexstr(hexbuf,HEXBUFLEN,buf,MIN(buflen,20)) ;
 	    debugprintf("tty_echo: buf= %t\n",hexbuf,sl) ;
 	}
 #endif
 
-	if (wlen > 0) {
-	    rs = u_write(op->fd,wbuf,wlen) ;
+	if (buflen > 0) {
+	    rs = u_write(op->fd,buf,buflen) ;
 	}
 
 	return rs ;
 }
 /* end subroutine (tty_echo) */
 
-
-/* String-Index-Not-Printable */
-static int sinotprint(cchar *sp,int sl)
-{
+static int sinotprint(cchar *sp,int sl) noex {
 	int		ch ;
 	int		i ;
-	int		f = FALSE ;
-
+	bool		f = false ;
 	for (i = 0 ; (i < sl) && sp[0] ; i += 1) {
 	    ch = MKCHAR(sp[0]) ;
 	    f = isprintlatin(ch) ;

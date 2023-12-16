@@ -133,7 +133,7 @@ namespace {
 	cchar		*aux ;	/* string allocation for "aux" */
     } ;
     struct uinfo {
-	ptm		m ;		/* data mutex */
+	ptm		mx ;		/* data mutex */
 	uinfo_alloc	a ;		/* memory allocations */
 	uinfo_infoname	name ;
 	uinfo_infoaux	aux ;
@@ -145,10 +145,10 @@ namespace {
 	int getname(uinfo_infoname *) noex ;
 	int getaux(uinfo_infoaux *) noex ;
 	void atforkbefore() noex {
-	    m.lockbegin() ;
+	    mx.lockbegin() ;
 	} ;
 	void atforkafter() noex {
-	    m.lockend() ;
+	    mx.lockend() ;
 	} ;
 	~uinfo() noex {
 	    int		rs = fini() ;
@@ -209,7 +209,7 @@ int uinfo::init() noex {
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    if (! finit.testandset) {
-	        if ((rs = m.create) >= 0) {
+	        if ((rs = mx.create) >= 0) {
 	            void_f	b = uinfo_atforkbefore ;
 	            void_f	a = uinfo_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -217,14 +217,17 @@ int uinfo::init() noex {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	 	    if (rs < 0)
-		        m.destroy() ;
+	 	    if (rs < 0) {
+		        mx.destroy() ;
+		    }
 	        } /* end if (ptm_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            finit = false ;
+		}
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -269,7 +272,7 @@ int uinfo::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = m.destroy ;
+	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    finit = false ;
@@ -321,14 +324,14 @@ int uinfo::getname(uinfo_infoname *unp) noex {
 	                    } /* end if (uname) */
 	                    if (rs >= 0) {
 	                        if ((rs = uc_forklockbegin(-1)) >= 0) {
-	                            if ((rs = m.lockbegin) >= 0) {
+	                            if ((rs = mx.lockbegin) >= 0) {
 	                                if (uap->name) {
 	                                    uap->name = nnamep ;
 	                                    name = tmpname ;
 	                                    nnamep = nullptr ;
 	                                    f = false ;
 	                                }
-	                                rs1 = m.lockend ;
+	                                rs1 = mx.lockend ;
 					if (rs >= 0) rs = rs1 ;
 	                            } /* end if (mutex) */
 	                            rs1 = uc_forklockend() ;
@@ -399,14 +402,14 @@ int uinfo::getaux(uinfo_infoaux *uxp) noex {
 	                    } /* end if (uaux) */
 	                    if (rs >= 0) { /* resolve possible race */
 	                        if ((rs = uc_forklockbegin(-1)) >= 0) {
-	                            if ((rs = m.lockbegin) >= 0) {
+	                            if ((rs = mx.lockbegin) >= 0) {
 	                                if (uap->aux) {
 	                                    uap->aux = nauxp ;
 	                                    aux = tmpaux ;
 	                                    nauxp = nullptr ;
 	                                    f = false ;
 				        }
-	                                rs1 = m.lockend ;
+	                                rs1 = mx.lockend ;
 					if (rs >= 0) rs = rs1 ;
 	                            } /* end if (mutex) */
 	                            rs1 = uc_forklockend() ;
