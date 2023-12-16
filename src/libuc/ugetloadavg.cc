@@ -1,5 +1,5 @@
 /* ugetloadavg */
-/* lang=C++23 */
+/* lang=C++20 */
 
 /* get the standard load averages maintained by the kernel */
 /* version %I% last-modified %G% */

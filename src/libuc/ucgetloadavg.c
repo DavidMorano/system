@@ -1,4 +1,4 @@
-/* uc_getloadavg */
+/* ucgetloadavg */
 /* lang=C20 */
 
 /* get load averages as floating doubles (relatively now standard!) */

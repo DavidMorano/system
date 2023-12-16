@@ -14,7 +14,9 @@
 
 /*******************************************************************************
 
-	This module implements an emulated POSIX semaphore.  I have
+	These are "unnamed" POSIX® semaphores.
+
+	This module implements an emulated POSIX® semaphore.  I have
 	to write a look-alike implementation of POSIX semaphores
 	myself because the Apple Darwin implemention does not allow
 	for the un-named semaphore use case!  Yes, once and (and again,

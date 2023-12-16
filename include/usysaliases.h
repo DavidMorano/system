@@ -234,6 +234,10 @@
 
 /* SYSDB network related structures */
 
+#ifndef	PROTOENT
+#define	PROTOENT	struct protoent
+#endif
+
 #ifndef	NETENT
 #define	NETENT		struct netent
 #endif

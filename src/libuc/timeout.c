@@ -68,7 +68,7 @@ typedef timeout_met	t_m ;
 
 /* exported subroutines */
 
-int timeout_load(TIMEOUT *top,time_t v,void *o,t_m m,uint tag,int arg) noex {
+int timeout_load(timeout *top,time_t v,void *o,t_m m,uint tag,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (top) {
 	    top->id = -1 ;
