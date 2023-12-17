@@ -226,9 +226,9 @@ int filebuf_readline(filebuf *op,char *rbuf,int rlen,int to) noex {
 	    while ((rs >= 0) && (tlen < rlen)) {
 	        int		mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
-		        cint	fd = op->fd ;
-		        cint	bufsize = op->bufsize ;
-		        char	*buf = op->buf ;
+		    cint	fd = op->fd ;
+		    cint	bufsize = op->bufsize ;
+		    char	*buf = op->buf ;
 	            op->bp = op->buf ;
 		    if (to >= 0) {
 	                rs = uc_reade(fd,buf,bufsize,to,fmo) ;
@@ -252,7 +252,7 @@ int filebuf_readline(filebuf *op,char *rbuf,int rlen,int to) noex {
 	            while (bp < lastp) {
 	                if ((*rbp++ = *bp++) == '\n') break ;
 	            } /* end while */
-	            i = bp - op->bp ;
+	            i = (bp - op->bp) ;
 	            op->bp += i ;
 	            tlen += i ;
 	            op->len -= i ;
@@ -387,7 +387,7 @@ int filebuf_reserve(filebuf *op,int len) noex {
 }
 /* end subroutine (filebuf_reserve) */
 
-int filebuf_print(filebuf *op,cchar *sp,int sl) noex {
+int filebuf_println(filebuf *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && sp) {
@@ -414,7 +414,7 @@ int filebuf_print(filebuf *op,cchar *sp,int sl) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_print) */
+/* end subroutine (filebuf_println) */
 
 int filebuf_vprintf(filebuf *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
