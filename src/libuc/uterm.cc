@@ -21,11 +21,9 @@
 
 /*******************************************************************************
 
-	These routines provide a stand-alone TTY environment.
-
+	These routines provide a stand-alone terminal environment.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -44,7 +42,9 @@
 #include	<buffer.h>
 #include	<sbuf.h>
 #include	<sigign.h>
+#include	<strn.h>
 #include	<mkchar.h>
+#include	<fieldterm.h>
 #include	<localmisc.h>
 
 #include	"uterm.h"
@@ -102,11 +102,6 @@ extern "C" {
     extern int	isprintlatin(int) noex ;
 }
 
-extern "C" {
-    extern char	*strnchr(cchar *,int,int) noex ;
-    extern char	*strnpbrk(cchar *,int,cchar *) noex ;
-}
-
 
 /* external variables */
 
@@ -116,6 +111,17 @@ extern "C" {
 
 /* forward references */
 
+template<typename ... Args>
+static inline int uterm_magic(uterm *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == UTERM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (uterm_magic) */
+
+static int	uterm_loadterms(uterm *,cchar *) noex ;
 static int	uterm_attrbegin(uterm *) noex ;
 static int	uterm_attrend(uterm *) noex ;
 static int	uterm_qbegin(uterm *) noex ;
@@ -134,7 +140,9 @@ static int	sinotprint(cchar *,int) noex ;
 
 /* local variables */
 
-static const uchar	uterms[] = {
+constexpr uid_t		uidend(-1) ;
+
+static constexpr char	uterms[] = {
 	0xEF, 0xFC, 0xC0, 0xFE,
 	0x00, 0x00, 0x00, 0x00, 
 	0x00, 0x00, 0x00, 0x00, 
@@ -145,7 +153,7 @@ static const uchar	uterms[] = {
 	0x00, 0x00, 0x00, 0x00, 
 } ;
 
-static cint		sigouts[] = {
+static constexpr int		sigouts[] = {
 	SIGTTOU,
 	0
 } ;
@@ -154,62 +162,54 @@ static cint		sigouts[] = {
 /* exported subroutines */
 
 int uterm_start(uterm *op,int fd) noex {
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (fd < 0) return SR_INVALID ;
-
-	memset(op,0,sizeof(UTERM)) ;
-	op->ti_start = time(NULL) ;
-	op->fd = fd ;
-	op->uid = -1 ;
-	memcpy(op->rterms,uterms,32) ;
-
-	if ((rs = uc_tcgetpgrp(fd)) == SR_NOTTY) {
-	    op->f.noctty = true ;
-	    rs = SR_OK ;
-	}
-
-	if (rs >= 0) {
-	    if ((rs = uterm_attrbegin(op)) >= 0) {
-		if ((rs = uterm_qbegin(op)) >= 0) {
-		    op->magic = UTERM_MAGIC ;
-		}
-	 	if (rs < 0)
-		    uterm_attrend(op) ;
-	    }
-	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("uterm_start: ret rs=%d\n",rs) ;
-#endif
-
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_INVALID ;
+	    if (fd >= 0) {
+	        op->ti_start = time(NULL) ;
+	        op->fd = fd ;
+	        op->uid = -1 ;
+	        if ((rs = uc_tcgetpgrp(fd)) == SR_NOTTY) {
+	            op->f.noctty = true ;
+	            rs = SR_OK ;
+	        }
+	        if (rs >= 0) {
+		    if ((rs = uterm_loadterms(op,uterms)) >= 0) {
+	                if ((rs = uterm_attrbegin(op)) >= 0) {
+		            if ((rs = uterm_qbegin(op)) >= 0) {
+		                op->magic = UTERM_MAGIC ;
+		            }
+	 	            if (rs < 0) {
+		                uterm_attrend(op) ;
+		            }
+	                }
+		    } /* end if (uterm_loadterms) */
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uterm_start) */
 
 int uterm_finish(uterm *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = uterm_qend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = uterm_attrend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = uterm_magic(op)) >= 0) {
+	    {
+		rs1 = uterm_qend(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = uterm_attrend(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_finish) */
 
 int uterm_suspend(uterm *op) noex {
-
 	return uterm_restore(op) ;
 }
 /* end subroutine (uterm_suspend) */
@@ -220,65 +220,46 @@ int uterm_resume(uterm *op) noex {
 /* end subroutine (uterm_resume) */
 
 int uterm_restore(uterm *op) noex {
-	TERMIOS		*attrp ;
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	attrp = &op->ts_old ;
-	if ((rs = uc_tcsetattr(op->fd,TCSADRAIN,attrp)) >= 0) {
-	    rs = op->fd ;
-	}
-
+	if ((rs = uterm_magic(op)) >= 0) {
+	    TERMIOS	*attrp = &op->ts_old ;
+	    if ((rs = uc_tcsetattr(op->fd,TCSADRAIN,attrp)) >= 0) {
+	        rs = op->fd ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_restore) */
 
 int uterm_ensure(uterm *op) noex {
-	TERMIOS		*attrp ;
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	attrp = &op->ts_new ;
-	rs = uc_tcsetattr(op->fd,TCSADRAIN,attrp) ;
-
+	if ((rs = uterm_magic(op)) >= 0) {
+	    TERMIOS	*attrp = &op->ts_new ;
+	    rs = uc_tcsetattr(op->fd,TCSADRAIN,attrp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_ensure) */
 
 int uterm_control(uterm *op,int cmd,...) noex {
-	int		rs = SR_OK ;
-	int		iw, *iwp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("uterm_control: cmd=%u\n",
-	    (cmd & FM_MASK)) ;
-#endif
-
-	{
+	int		rs ;
+	if ((rs = uterm_magic(op)) >= 0) {
 	    va_list	ap ;
-	    cint		fc = (cmd & FM_CMDMASK) ;
+	    cint	fc = (cmd & FM_CMDMASK) ;
+	    int		iw, *iwp ;
 	    va_begin(ap,cmd) ;
 	    switch (fc) {
 	    case utermcmd_noop:
 		break ;
 	    case utermcmd_getuid:
-		if (op->uid < 0) {
-		    USTAT		sb ;
-	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-			op->uid = sb.st_uid ;
+		if (op->uid == uidend) {
+		    USTAT	sb ;
+	            if ((rs = u_fuid(op->fd) >= 0) {
+			op->uid = rs ;
 		    }
+		} else {
+		    rs = op->uid ;
 		}
-		if (rs >= 0) rs = op->uid ;
 	        break ;
 	    case utermcmd_getsid:
 	        rs = uc_tcgetsid(op->fd) ;
@@ -349,24 +330,14 @@ int uterm_control(uterm *op,int cmd,...) noex {
 	        break ;
 	    } /* end switch */
 	    va_end(ap) ;
-	} /* end block (variable arguments) */
-
-#if	CF_DEBUGS
-	debugprintf("uterm_control: ret rs=%d\n",rs) ;
-#endif
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_control) */
 
 int uterm_status(uterm *op,int cmd,...) noex {
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	{
+	int		rs ;
+	if ((rs = uterm_magic(op)) >= 0) {
 	    va_list	ap ;
 	    va_begin(ap,cmd) ;
 	    switch (cmd) {
@@ -374,7 +345,7 @@ int uterm_status(uterm *op,int cmd,...) noex {
 	        break ;
 	    case utermcmd_setmesg:
 	        {
-	            int	v = (int) va_arg(ap,int) ;
+	            int		v = (int) va_arg(ap,int) ;
 	            rs = tcsetmesg(op->fd,v) ;
 	        }
 	        break ;
@@ -383,7 +354,7 @@ int uterm_status(uterm *op,int cmd,...) noex {
 	        break ;
 	    case utermcmd_setlines:
 	        {
-	            cint		v = (int) va_arg(ap,int) ;
+	            cint	v = (int) va_arg(ap,int) ;
 	            rs = tcsetlines(op->fd,v) ;
 	        }
 	        break ;
@@ -404,8 +375,7 @@ int uterm_status(uterm *op,int cmd,...) noex {
 	        break ;
 	    } /* end switch */
 	    va_end(ap) ;
-	} /* end block (variable arguments) */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_status) */
@@ -414,21 +384,12 @@ int uterm_status(uterm *op,int cmd,...) noex {
 /* read a line from the terminal with extended parameters */
 int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 		UTERM_PROMPT *lpp,UTERM_LOAD *llp) noex {
-	int		rs = SR_OK ;
-	int		ch = -1 ;
+	int		rs ;
 	int		count = 0 ;
-	const uchar	*terms ;
+	if ((rs = uterm_magic(op,rbuf)) >= 0) {
+	int		ch = -1 ;
+	cchar	*terms ;
 	char		qbuf[2] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("uterm_reade: ent to=%d\n",timeout) ;
-#endif
-
 	fc |= op->mode ;
 	if (fc & fm_rawin) fc |= fm_nofilter ;
 	if (fc & fm_noecho) fc |= fm_notecho ;
@@ -436,7 +397,6 @@ int uterm_reade(uterm *op,char *rbuf,int rlen,int timeout,int fc,
 	terms = op->rterms ;
 	op->f.cc = false ;
 	op->f.co = false ;		/* cancel ^O effect */
-
 	op->f.read = true ;		/* read is in progress */
 
 /* top of further access */
@@ -460,10 +420,6 @@ next:
 
 	        rs = tty_wait(op,timeout) ;
 
-#if	CF_DEBUGS
-	        debugprintf("uterm_reade: tty_wait() rs=%d\n",rs) ;
-#endif
-
 	        if ((timeout >= 0) && (op->timeout <= 0)) break ;
 	        if (rs < 0) break ;
 	    } /* end while */
@@ -477,13 +433,8 @@ next:
 	    if (op->f.cc)
 	        break ;
 
-	    ch = MKCHAR(qbuf[0]) ;
+	    ch = mkchar(qbuf[0]) ;
 	    rbuf[count] = ch ;
-
-#if	CF_DEBUGS
-	    debugprintf("uterm_reade: got a character ch=%c (%02X)\n",
-	        (isprintlatin(ch) ? ch : ' '),ch) ;
-#endif
 
 /* check for terminator */
 
@@ -551,11 +502,6 @@ next:
 
 /* exit processing */
 
-#if	CF_DEBUGS
-	debugprintf("uterm_reade: exit processing rs=%d count=%u\n",
-	    rs,count) ;
-#endif
-
 	if ((rs >= 0) && (ch >= 0) && BATST(terms,ch)) {
 	    switch (ch) {
 	    case CH_CR:
@@ -577,11 +523,8 @@ next:
 	    count += 1 ;
 	} /* end if (terminator processing) */
 
-#if	CF_DEBUGS
-	debugprintf("uterm_reade: ret rs=%d count=%u\n",rs,count) ;
-#endif
-
 	op->f.read = false ;
+	} /* end if (magic) */
 	return (rs >= 0) ? count : rs ;
 }
 /* end subroutine (uterm_reade) */
@@ -592,142 +535,116 @@ int uterm_read(uterm *op,char *rbuf,int rlen) noex {
 /* end subroutine (uterm_read) */
 
 int uterm_write(uterm *op,cchar *wbuf,int wlen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		tlen = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->f.co)
-	    goto ret0 ;
-
-	if (wlen < 0)
-	    wlen = strlen(wbuf) ;
-
-	if (op->mode & fm_rawout) {
-
-#if	CF_WRITEATOM
-	    rs = u_write(op->fd,wbuf,wlen) ;
-#else /* CF_WRITEATOM */
-	    {
-	        int	blen = wlen ;
-	        int	mlen ;
-	        char	*bp = wbuf ;
-
-	        while ((rs >= 0) && (blen > 0) && (! op->f.co)) {
-	            mlen = MIN(blen,WBUFLEN) ;
-	            rs = u_write(op->fd,bp,mlen) ;
-	            blen -= mlen ;
-	            tlen += mlen ;
-	            bp += mlen ;
-	        } /* end while */
-
-	    }
-#endif /* CF_WRITEATOM */
-
-	} else {
-
-	    rs = uterm_writeproc(op,wbuf,wlen) ;
-	    tlen = rs ;
-
-	}
-
-ret0:
+	if ((rs = uterm_magic(op)) >= 0) {
+	    if (! op->f.co) {
+	        if (wlen < 0) wlen = strlen(wbuf) ;
+	        if (op->mode & fm_rawout) {
+	            rs = u_write(op->fd,wbuf,wlen) ;
+		    tlen = rs ;
+	        } else {
+	            rs = uterm_writeproc(op,wbuf,wlen) ;
+	            tlen = rs ;
+	        }
+	    } /* end if (not-in-cancel) */
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (uterm_write) */
 
 int uterm_cancel(uterm *op,int fc,int cparam) noex {
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	(void) cparam ;
+	int		rs ;
+	if ((rs = uterm_magic(op)) >= 0) {
+	    rs = cparam ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_cancel) */
 
 int uterm_poll(uterm *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = tty_wait(op,0)) >= 0) {
-	    if (op->f.cc) rs = SR_CANCELED ;
-	}
-
+	if ((rs = uterm_magic(op)) >= 0) {
+	    if ((rs = tty_wait(op,0)) >= 0) {
+	        if (op->f.cc) rs = SR_CANCELED ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_poll) */
 
 int uterm_getmesg(uterm *op) noex {
-	USTAT		sb ;
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	    rs = ((sb.st_mode&S_IWGRP) != 0) ;
-	}
+	if ((rs = uterm_magic(op)) >= 0) {
+	    USTAT	sb ;
+	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	        rs = bool(sb.st_mode & S_IWGRP) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_getmesg) */
 
 int uterm_getbiff(uterm *op) noex {
-	USTAT		sb ;
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	    rs = ((sb.st_mode&S_IXUSR) != 0) ;
-	}
+	if ((rs = uterm_magic(op)) >= 0) {
+	    USTAT	sb ;
+	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	        rs = bool(sb.st_mode & S_IXUSR) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_getbiff) */
 
 int uterm_getpop(uterm *op) noex {
-	USTAT		sb ;
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	    int	v = 0 ;
-	    if (sb.st_mode&S_IXUSR) v |= 0x01 ;
-	    if (sb.st_mode&S_IWGRP) v |= 0x02 ;
-	    rs = v ;
-	}
+	if ((rs = uterm_magic(op)) >= 0) {
+	    USTAT	sb ;
+	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	        int		v = 0 ;
+	        if (sb.st_mode&S_IXUSR) v |= 0x01 ;
+	        if (sb.st_mode&S_IWGRP) v |= 0x02 ;
+	        rs = v ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uterm_getpop) */
 
 int uterm_setpop(uterm *op,int v) noex {
-	USTAT		sb ;
 	int		rs ;
 	int		rv = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->magic != UTERM_MAGIC) return SR_NOTOPEN ;
-	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	    mode_t	fm = sb.st_mode ;
-	    if (sb.st_mode&S_IXUSR) rv |= 0x01 ;
-	    if (sb.st_mode&S_IWGRP) rv |= 0x02 ;
-	    if (v != rv) {
-		fm &= S_IXUSR ;
-		if (v & 0x01) fm |= S_IXUSR ;
-		fm &= S_IWGRP ;
-		if (v & 0x02) fm |= S_IWGRP ;
-		rs = u_fchmod(op->fd,fm) ;
-	    } /* end if (needed update) */
-	} /* end if (stat) */
+	if ((rs = uterm_magic(op)) >= 0) {
+	    USTAT	sb ;
+	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	        mode_t	fm = sb.st_mode ;
+	        if (sb.st_mode&S_IXUSR) rv |= 0x01 ;
+	        if (sb.st_mode&S_IWGRP) rv |= 0x02 ;
+	        if (v != rv) {
+		    fm &= S_IXUSR ;
+		    if (v & 0x01) fm |= S_IXUSR ;
+		    fm &= S_IWGRP ;
+		    if (v & 0x02) fm |= S_IWGRP ;
+		    rs = u_fchmod(op->fd,fm) ;
+	        } /* end if (needed update) */
+	    } /* end if (stat) */
+	} /* end if (magic) */
 	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (uterm_setpop) */
 
 
 /* private subroutines */
+
+static int uterm_loadterms(uterm *op,cchar *ut) noex {
+	int		rs = SR_FAULT ;
+	if (ut) {
+	    rs = SR_OK ;
+	    memcpy(op->rterms,ut,field_termtabsize) ;
+	}
+	return rs ;
+}
 
 static int uterm_attrbegin(uterm *op) noex {
 	cint		fd = op->fd ;
@@ -763,11 +680,6 @@ static int uterm_attrbegin(uterm *op) noex {
 	tp->c_cc[VSUSP] = CH_SUB ;	/* Control-Z */
 	tp->c_cc[VREPRINT] = CH_DC2 ;	/* Control-R */
 	tp->c_cc[VDISCARD] = CH_SO ;	/* Control-O */
-
-#if	CF_DEBUGS
-	debugprintf("uterm_start: MINCHARS=%u MINTIME=%u\n",
-	    tp->c_cc[VEOF],tp->c_cc[VEOL]) ;
-#endif
 
 /* set the new attributes */
 
@@ -944,7 +856,7 @@ static int tty_loadchar(uterm *op,cchar *pbuf,int pbuflen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	for (int i = 0 ; (rs >= 0) && (i < pbuflen) ; i += 1) {
-	    cint	ch = MKCHAR(pbuf[i]) ;
+	    cint	ch = mkchar(pbuf[i]) ;
 	    if (isprintlatin(ch)) {
 	        c += 1 ;
 	        rs = charq_ins(&op->taq,ch) ;
@@ -999,10 +911,6 @@ static int tty_wait(uterm *op,int timeout) noex {
 loop:
 	f_starting = false ;
 
-#if	CF_DEBUGS
-	debugprintf("tty_wait: top loop, timeout=%d\n",op->timeout) ;
-#endif
-
 /* zero out the buffer so that we can tell if Solaris screws us later */
 
 	for (i = 0 ; i < TTY_READCHARS ; i += 1)
@@ -1012,22 +920,7 @@ loop:
 
 	rs = u_poll(fds,1,polltime) ;
 
-#if	CF_DEBUGS
-	debugprintf("tty_wait: u_poll() rs=%d\n",rs) ;
-	if (rs > 0) {
-	    if (fds[0].revents & POLLIN) {
-	        debugprintf("tty_wait: POLLIN\n") ;
-	    } else
-	        debugprintf("tty_wait: returned due to %08X\n",
-	            fds[0].revents) ;
-	} /* end if */
-#endif /* CF_DEBUGS */
-
 	if (rs == SR_INTR) {
-
-#if	CF_DEBUGS
-	    debugprintf("tty_wait: u_poll() interrupt rs=%d\n",rs) ;
-#endif
 
 	    goto loop ;
 	}
@@ -1039,10 +932,6 @@ loop:
 	    len = rs ;
 	}  /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("tty_wait: return or not, rs=%d\n",rs) ;
-#endif
-
 enter:
 	if (rs < 0)
 	    goto ret0 ;
@@ -1053,14 +942,7 @@ enter:
 
 	if (len == 0) {
 	    daytime = time(NULL) ;
-
 	    if (op->timeout >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("tty_wait: timeout check timeout=%d\n",
-	            op->timeout) ;
-#endif
-
 	        op->timeout -= (daytime - lasttime) ;
 	        if (op->timeout <= 0)
 	            return SR_OK ;
@@ -1070,18 +952,10 @@ enter:
 	    if ((! f_starting) && 
 	        ((daytime - op->ti_start) >= TO_HANGUP)) {
 
-#if	CF_DEBUGS
-	        debugprintf("tty_wait: loop check\n") ;
-#endif
-
 	        f_looping = (op->loopcount > MAXLOOPS) ;
 	        op->ti_start = daytime ;
 	        op->loopcount = 0 ;
 	        if (f_looping) {
-
-#if	CF_DEBUGS
-	            debugprintf("tty_wait: looping failure\n") ;
-#endif
 
 	            rs = SR_NOANODE ;
 	            goto ret0 ;
@@ -1094,12 +968,6 @@ enter:
 /* skip over leading zero characters fabricated by Solaris SVR4 */
 
 	    for (i = 0 ; (i < len) && (cbuf[i] == '\0') ; i += 1) {
-
-#if	CF_DEBUGS
-	        debugprintf("tty_wait: %d zero characters from Solaris!\n",
-	            i) ;
-#endif
-
 	    } /* end for */
 
 /* call the Receive-Interrupt-Service-Routine with what we do have */
@@ -1125,14 +993,9 @@ ret0:
 
 static int tty_risr(uterm *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		f_dle = false ;
-
-	for (i = 0 ; i < sl ; i += 1) {
-	    int	ch = MKCHAR(sp[i]) ;
-#if	CF_DEBUGS
-	    debugprintf("uterm/tty_risr: ch=%02X\n",ch) ;
-#endif
+	for (int i = 0 ; i < sl ; i += 1) {
+	    cint	ch = mkchar(sp[i]) ;
 	    if (op->f.nosig) {
 	        rs = charq_ins(&op->taq,ch) ;
 	        op->f.rw = true ;
@@ -1200,41 +1063,23 @@ static int tty_risr(uterm *op,cchar *sp,int sl) noex {
 
 static int tty_echo(uterm *op,cchar *buf,int buflen) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	char	hexbuf[HEXBUFLEN + 1] ;
-#endif
-
 	if (buflen < 0) buflen = strlen(buf) ;
-
-#if	CF_DEBUGS
-	{
-	    int	sl ;
-	    debugprintf("tty_echo: buflen=%d\n",buflen) ;
-	    sl = mkhexstr(hexbuf,HEXBUFLEN,buf,MIN(buflen,20)) ;
-	    debugprintf("tty_echo: buf= %t\n",hexbuf,sl) ;
-	}
-#endif
-
 	if (buflen > 0) {
 	    rs = u_write(op->fd,buf,buflen) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (tty_echo) */
 
 static int sinotprint(cchar *sp,int sl) noex {
-	int		ch ;
-	int		i ;
+	int		i = 0 ; /* used afterwards */
 	bool		f = false ;
 	for (i = 0 ; (i < sl) && sp[0] ; i += 1) {
-	    ch = MKCHAR(sp[0]) ;
+	    cint	ch = mkchar(sp[0]) ;
 	    f = isprintlatin(ch) ;
 	    f = f || (ch == CH_SI) || (ch == CH_SO) ;
 	    if (! f) break ;
 	} /* end for */
-
 	return (f) ? -1 : i ;
 }
 /* end subroutine (sinotprint) */

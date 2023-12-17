@@ -110,6 +110,17 @@ int charq_rem(charq *op,char *cp) noex {
 }
 /* end subroutine (charq_rem) */
 
+int charq_remall(charq *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    op->ri = 0 ;
+	    op->wi = 0 ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (charq_remall) */
+
 int charq_size(charq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {

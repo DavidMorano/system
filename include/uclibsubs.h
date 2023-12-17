@@ -154,6 +154,8 @@ extern int	uc_fdetach(cchar *) noex ;
 extern int	uc_minmod(cchar *,mode_t) noex ;
 extern int	uc_fminmod(int,mode_t) noex ;
 extern int	uc_fsize(int) noex ;
+extern int	uc_fuid(int) noex ;
+extern int	uc_fgid(int) noex ;
 
 extern int	uc_opensocket(cchar *,int,int) noex ;
 extern int	uc_openproto(cchar *,int,int,int) noex ;

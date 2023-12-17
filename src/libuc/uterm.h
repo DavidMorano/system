@@ -98,7 +98,7 @@ struct uterm_head {
 	int		mode ;
 	int		ch_read, ch_write ;
 	int		status ;
-	uchar		rterms[32] ;
+	char		rterms[32] ;
 } ;
 
 typedef UTERM		uterm ;

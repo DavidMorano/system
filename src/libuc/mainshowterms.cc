@@ -191,6 +191,17 @@ static constexpr cchar	envs_dterms[termsize] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
+static constexpr cchar	uterm_uterms[] = {
+	0xEF, 0xFC, 0xC0, 0xFE,
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+	0x00, 0x00, 0x00, 0x00, 
+} ;
+
 
 /* exported subroutines */
 
@@ -212,6 +223,7 @@ int main(int,cchar **,cchar **) {
 	showterms(loadkeys_fterms) ;
 	showterms(envs_vterms) ;
 	showterms(envs_dterms) ;
+	showterms(uterm_uterms) ;
 }
 /* end subroutine (main) */
 
@@ -231,7 +243,11 @@ static void showterms(cchar *terms) noexcept {
 		if (strchr("\n\r\f\v\b",ch)) {
 		    printf("¯\\x%02X",ch) ;
 		} else {
-		    printf("¯%c",ch) ;
+		    if (ch < 0x20) {
+		       printf("¯»%02X«",ch) ;
+		    } else if (ch == 0xA0) {
+		       printf("¯NBSP",ch) ;
+		    }
 		}
 	    }
 	} /* end for */

@@ -1,10 +1,8 @@
-/* uc_fsize */
+/* ucfstat */
+/* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
 /* get the size of an open file */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -16,24 +14,19 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
-
+#include	<cerrno>
+#include	<climits>		/* <- for |INT_MAX| */
 #include	<usystem.h>
 
 
 /* exported subroutines */
 
-
-int uc_fsize(int fd)
-{
-	struct ustat	sb ;
+int uc_fsize(int fd) noex {
+	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
 	    rs = (sb.st_size & INT_MAX) ;
@@ -41,5 +34,25 @@ int uc_fsize(int fd)
 	return rs ;
 }
 /* end subroutine (uc_fsize) */
+
+int uc_fuid(int fd) noex {
+	USTAT		sb ;
+	int		rs ;
+	if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    rs = int(sb.st_uid & INT_MAX) ;
+	}
+	return rs ;
+}
+/* end subroutine (uc_fuid) */
+
+int uc_fgid(int fd) noex {
+	USTAT		sb ;
+	int		rs ;
+	if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    rs = int(sb.st_gid & INT_MAX) ;
+	}
+	return rs ;
+}
+/* end subroutine (uc_fgid) */
 
 
