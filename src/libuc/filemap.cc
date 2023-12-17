@@ -74,67 +74,71 @@ static sysval		pagesize(sysval_ps) ;
 
 /* exported subroutines */
 
-int filemap_open(filemap *fmp,cchar *fname,int oflags,size_t max) noex {
+int filemap_open(filemap *op,cchar *fname,int oflags,size_t max) noex {
 	int		rs = SR_FAULT ;
-	if (fmp && fname) {
+	if (op && fname) {
 	    rs = SR_INVALID ;
-	    memclear(fmp) ;
+	    op->maxsize = 0 ;
+	    op->mapsize = 0 ;
+	    op->mapdata = nullptr ;
+	    op->bp = nullptr ;
+	    op->sb = {} ;
 	    if (fname[0]) {
 	        if (max <= 0) max = ULONG_MAX ;
-	        fmp->maxsize = max ;
-		rs = filemap_opener(fmp,fname,oflags) ;
+	        op->maxsize = max ;
+		rs = filemap_opener(op,fname,oflags) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (filemap_open) */
 
-int filemap_close(filemap *fmp) noex {
+int filemap_close(filemap *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (fmp) {
+	if (op) {
 	    rs = SR_OK ;
-	    if (fmp->mapdata) {
-	        size_t	ms = fmp->mapsize ;
-	        void	*ma = fmp->mapdata ;
-	        rs1 = u_munmap(ma,ms) ;
+	    if (op->mapdata) {
+	        size_t	ms = op->mapsize ;
+	        void	*ma = op->mapdata ;
+	        rs1 = u_mmapend(ma,ms) ;
 		if (rs >= 0) rs = rs1 ;
-	        fmp->mapdata = nullptr ;
-	        fmp->mapsize = 0 ;
+	        op->mapdata = nullptr ;
+	        op->mapsize = 0 ;
 	    }
-	    fmp->bp = nullptr ;
+	    op->bp = nullptr ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (filemap_close) */
 
-int filemap_stat(filemap *fmp,USTAT *sbp) noex {
+int filemap_stat(filemap *op,USTAT *sbp) noex {
 	int		rs = SR_FAULT ;
-	if (fmp && sbp) {
+	if (op && sbp) {
 	    rs = SR_NOTOPEN ;
-	    if (fmp->mapdata) {
-		*sbp = fmp->sb ;
+	    if (op->mapdata) {
+		*sbp = op->sb ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (filemap_stat) */
 
-int filemap_read(filemap *fmp,int rlen,void *vp) noex {
+int filemap_read(filemap *op,int rlen,void *vp) noex {
 	int		rs = SR_FAULT ;
-	if (fmp && vp) {
-	    size_t	fsize = size_t(fmp->sb.st_size) ;
+	if (op && vp) {
+	    size_t	fsize = size_t(op->sb.st_size) ;
 	    rs = SR_NOTOPEN ;
-	    if (fmp->mapdata) {
-		cchar	*bdata = (cchar *) fmp->mapdata ;
+	    if (op->mapdata) {
+		cchar	*bdata = (cchar *) op->mapdata ;
 	        cvoid	**bpp = (cvoid **) vp ;
-		cchar	*sbp = fmp->bp ;
-		if (fsize > fmp->maxsize) fsize = fmp->maxsize ;
+		cchar	*sbp = op->bp ;
+		if (fsize > op->maxsize) fsize = op->maxsize ;
 		{
 		    cchar	*ebp = (bdata + fsize) ;
-		    fmp->bp = min(ebp,(sbp+rlen)) ;
+		    op->bp = min(ebp,(sbp+rlen)) ;
 		    *bpp = (void *) sbp ;
-		    rs = (fmp->bp - sbp) ;
+		    rs = (op->bp - sbp) ;
 		} /* end block */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -142,22 +146,22 @@ int filemap_read(filemap *fmp,int rlen,void *vp) noex {
 }
 /* end subroutine (filemap_read) */
 
-int filemap_getline(filemap *fmp,cchar **bpp) noex {
+int filemap_getline(filemap *op,cchar **bpp) noex {
 	int		rs = SR_FAULT ;
-	if (fmp && bpp) {
-	    size_t	fsize = size_t(fmp->sb.st_size) ;
+	if (op && bpp) {
+	    size_t	fsize = size_t(op->sb.st_size) ;
 	    rs = SR_NOTOPEN ;
-	    if (fmp->mapdata) {
-	        cchar	*bdata = (cchar *) fmp->mapdata ;
-		cchar	*sbp = fmp->bp ;
-		if (fsize > fmp->maxsize) fsize = fmp->maxsize ;
+	    if (op->mapdata) {
+	        cchar	*bdata = (cchar *) op->mapdata ;
+		cchar	*sbp = op->bp ;
+		if (fsize > op->maxsize) fsize = op->maxsize ;
 		{
 		    cchar	*ebp = (bdata + fsize) ;
-		    while (fmp->bp < ebp) {
-	    	        if (*fmp->bp++ == '\n') break ;
+		    while (op->bp < ebp) {
+	    	        if (*op->bp++ == '\n') break ;
 		    } /* end while */
 		    *bpp = sbp ;
-		    rs = (fmp->bp - sbp) ;
+		    rs = (op->bp - sbp) ;
 		} /* end block */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -165,23 +169,23 @@ int filemap_getline(filemap *fmp,cchar **bpp) noex {
 }
 /* end subroutine (filemap_getline) */
 
-int filemap_seek(filemap *fmp,off_t off,int w) noex {
+int filemap_seek(filemap *op,off_t off,int w) noex {
 	int		rs = SR_FAULT ;
-	if (fmp) {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	    if (fmp->mapdata) {
+	    if (op->mapdata) {
 		off_t	noff = 0 ;
 	        switch (w) {
 	        case SEEK_SET:
 		    noff = off ;
 	            break ;
 	        case SEEK_END:
-	            noff = (fmp->sb.st_size + off) ;
+	            noff = (op->sb.st_size + off) ;
 	            break ;
 	        case SEEK_CUR:
 	            {
-		        cchar	*bdata = (cchar *) fmp->mapdata ;
-	                noff = ((fmp->bp - bdata) + off) ;
+		        cchar	*bdata = (cchar *) op->mapdata ;
+	                noff = ((op->bp - bdata) + off) ;
 	            }
 	            break ;
 	        default:
@@ -189,16 +193,16 @@ int filemap_seek(filemap *fmp,off_t off,int w) noex {
 	            break ;
 	        } /* end switch */
 	        if (rs >= 0) {
-	            cchar	*bdata = (cchar *) fmp->mapdata ;
+	            cchar	*bdata = (cchar *) op->mapdata ;
 	            if (noff < 0) {
 	                rs = SR_INVALID ;
 	            } else {
-			off_t	moff = off_t(fmp->mapsize) ;
+			off_t	moff = off_t(op->mapsize) ;
 			if (noff > moff) {
 	                    noff = moff ;
 			}
 		    }
-	            fmp->bp = (bdata + noff) ;
+	            op->bp = (bdata + noff) ;
 	        } /* end if */
 	    } /* end if (open) */
 	} /* end if (non-null) */
@@ -206,27 +210,27 @@ int filemap_seek(filemap *fmp,off_t off,int w) noex {
 }
 /* end subroutine (filemap_seek) */
 
-int filemap_tell(filemap *fmp,off_t *offp) noex {
+int filemap_tell(filemap *op,off_t *offp) noex {
 	int		rs = SR_FAULT ;
-	if (fmp) {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	    if (fmp->mapdata) {
-	        cchar	*bdata = (cchar *) fmp->mapdata ;
-	        if (offp) *offp = (fmp->bp - bdata) ;
-	        rs = int((fmp->bp - bdata) & INT_MAX) ;
+	    if (op->mapdata) {
+	        cchar	*bdata = (cchar *) op->mapdata ;
+	        if (offp) *offp = (op->bp - bdata) ;
+	        rs = int((op->bp - bdata) & INT_MAX) ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (filemap_tell) */
 
-int filemap_rewind(filemap *fmp) noex {
+int filemap_rewind(filemap *op) noex {
 	int		rs = SR_FAULT ;
-	if (fmp) {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	    if (fmp->mapdata) {
+	    if (op->mapdata) {
 		rs = SR_OK ;
-		fmp->bp = (char *) fmp->mapdata ;
+		op->bp = (char *) op->mapdata ;
 	    } /* end if (open) */
 	} /* end if (non-null) */
 	return rs ;
@@ -236,19 +240,19 @@ int filemap_rewind(filemap *fmp) noex {
 
 /* local subroutines */
 
-static int filemap_opener(filemap *fmp,cchar *fn,int of) noex {
-	csize		max = fmp->maxsize ;
+static int filemap_opener(filemap *op,cchar *fn,int of) noex {
+	csize		max = op->maxsize ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = uc_open(fn,of,0666)) >= 0) {
-	    USTAT	*sbp = &fmp->sb ;
+	    USTAT	*sbp = &op->sb ;
 	    cint	fd = rs ;
 	    if ((rs = uc_fstat(fd,sbp)) >= 0) {
 		if (S_ISREG(sbp->st_mode)) {
 		    csize	fsize = size_t(sbp->st_size) ;
 		    rs = SR_TOOBIG ;
 		    if ((max > 0) && (fsize <= max)) {
-			rs = filemap_openmap(fmp,fd,fsize) ;
+			rs = filemap_openmap(op,fd,fsize) ;
 		    } /* end if (size appropriate) */
 	        } else {
 	            rs = SR_PROTO ;
@@ -261,7 +265,7 @@ static int filemap_opener(filemap *fmp,cchar *fn,int of) noex {
 }
 /* end subroutine (filemap_opener) */
 
-static int filemap_openmap(filemap *fmp,int fd,size_t fsize) noex {
+static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	size_t		ms ;
 	int		rs ;
 	if ((rs = pagesize) >= 0) {
@@ -271,15 +275,15 @@ static int filemap_openmap(filemap *fmp,int fd,size_t fsize) noex {
 	    cint	mf = MAP_SHARED ;
 	    void	*md{} ;
 	    ms = max(ps,fsize) ;
-	    if ((rs = u_mmap(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	        cint		madv = MADV_SEQUENTIAL ;
-	        if ((rs = uc_madvise(md,ms,madv)) >= 0) {
-	            fmp->mapdata = md ;
-	            fmp->mapsize = ms ;
-	            fmp->bp = (cchar *) md ;
+	        if ((rs = u_madvise(md,ms,madv)) >= 0) {
+	            op->mapdata = md ;
+	            op->mapsize = ms ;
+	            op->bp = (cchar *) md ;
 	        }
 	        if (rs < 0) {
-	            u_munmap(md,ms) ;
+	            u_mmapend(md,ms) ;
 	        }
 	    } /* end if (mmap) */
 	} /* end if (pagesize) */
