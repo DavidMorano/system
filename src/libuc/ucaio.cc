@@ -21,8 +21,10 @@
 	uc_aioread
 	uc_aiowrite
 	uc_aiocancel
+	uc_aiofsync
 	uc_aioreturn
 	uc_aiolist
+	uc_suspend
 
 	Description:
 	Get some amount of data and time it also so that we can
@@ -32,8 +34,10 @@
 	int uc_aioread(AIOCB *aiocbp) noex
 	int uc_aiowrite(AIOCB *aiocbp) noex
 	int uc_aiocancel(AIOCB *aiocbp,int fd) noex
+	int uc_aiofsync(AIUCB *aiocbp,int x) noex
 	int uc_aioreturn(AIOCB *aiocbp) noex
 	int uc_aiolist(int mode,AIOCB *const *aiocbpp,int n,SIGEVENT *sep) noex
+	int uc_aiosuspend(CAIOCB *const *aiocbpp,int n,CTIMESPEC *tsp) noex
 
 	Arguments:
 	aiocbp		AIO block pointer
@@ -90,6 +94,7 @@ namespace {
 	int read(AIOCB *) noex ;
 	int write(AIOCB *) noex ;
 	int cancel(AIOCB *) noex ;
+	int fsync(AIOCB *) noex ;
 	int suspend(AIOCB *) noex ;
 	int operator () (AIOCB *) noex ;
     } ; /* end struct (ucaio) */
@@ -116,6 +121,12 @@ int uc_aiowrite(AIOCB *aiocbp) noex {
 int uc_aiocancel(AIOCB *aiocbp,int fd) noex {
 	ucaio		ao(fd) ;
 	ao.m = &ucaio::cancel ;
+	return ao(aiocbp) ;
+}
+
+int uc_aiofsync(AIOCB *aiocbp,int cmd) noex {
+	ucaio		ao(cmd) ;
+	ao.m = &ucaio::fsync ;
 	return ao(aiocbp) ;
 }
 
@@ -234,6 +245,16 @@ int ucaio::cancel(AIOCB *aiocbp) noex {
 	return rs ;
 }
 /* end method (ucaio::cancel) */
+
+int ucaio::fsync(AIOCB *aiocbp) noex {
+	int		rs ;
+	errno = 0 ;
+	if ((rs = aio_fsync(fd,aiocbp)) == -1) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (ucaio::fsync) */
 
 int ucaio::suspend(AIOCB *aiocbp) noex {
 	const AIOCB *const *aiocbpp = (AIOCB *const *) aiocbp ;
