@@ -1,9 +1,8 @@
 /* uc_sighold */
+/* lang=C20 */
 
 /* interface component for UNIX® library-3c */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,25 +14,21 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<signal.h>
 #include	<errno.h>
-
 #include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* exported subroutines */
 
-
-int uc_sighold(int sn)
-{
+int uc_sighold(int sn) noex {
 	int		rs ;
-
-	if ((rs = sighold(sn)) < 0) rs = (- errno) ;
-
+	if ((rs = sighold(sn)) < 0) {
+	    rs = (- errno) ;
+	}
 	return rs ;
 }
 /* end subroutine (uc_sighold) */

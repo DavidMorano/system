@@ -13,25 +13,22 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
+#include	<usystem.h>
+#include	<localmisc.h>
 
 
 /* exported subroutines */
 
-
-int uc_reuseaddr(int s)
-{
-	const int	optlen = sizeof(int) ;
+int uc_reuseaddr(int fd) noex {
+	cint		optlen = sizeof(int) ;
+	cint		sol = SOL_SOCKET ;
+	cint		so = SO_REUSEADDR ;
 	int		rs ;
 	int		one = 1 ;
-
-	rs = u_setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&one,optlen) ;
-
-	return rs ;
+	return u_setsockopt(fd,col,so,&one,optlen) ;
 }
 /* end subroutine (uc_reuseaddr) */
 
