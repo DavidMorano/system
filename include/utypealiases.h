@@ -117,8 +117,8 @@
 #define	AIOCB		struct aiocb
 #endif
 
-#ifndef	IOVCEC
-#define	IOVCEC		struct iovec
+#ifndef	IOVEC
+#define	IOVEC		struct iovec
 #endif
 
 #ifndef	SOCKADDR
@@ -192,6 +192,10 @@
 
 #ifndef	CSIGVAL
 #define	CSIGVAL		const SIGVAL
+#endif
+
+#ifndef	CAIOCB
+#define	CAIOCB		const AIOCB
 #endif
 
 #ifndef	CTIMESPEC
