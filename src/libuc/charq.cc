@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-	This module implement a character queue object.
+	This module implements a character queue object.
 
 *******************************************************************************/
 
@@ -69,7 +69,7 @@ int charq_finish(charq *op) noex {
 	    if (op->buf) {
 	        rs1 = uc_libfree(op->buf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->buf = NULL ;
+	        op->buf = nullptr ;
 	    }
 	    op->size = 0 ;
 	    op->count = 0 ;
@@ -83,9 +83,8 @@ int charq_ins(charq *op,int ch) noex {
 	if (op) {
 	    rs = SR_OVERFLOW ;
 	    if (op->count < op->size) {
-	        (op->buf)[op->wi] = ch ;
-	        op->wi += 1 ;
-	        if (op->wi == op->size) op->wi = 0 ;
+	        op->buf[op->wi] = ch ;
+	        op->wi = ((op->wi + 1) % op->size) ;
 	        op->count += 1 ;
 	        rs = op->count ;
 	    }
@@ -99,9 +98,8 @@ int charq_rem(charq *op,char *cp) noex {
 	if (op) {
 	    rs = SR_EMPTY ;
 	    if (op->count > 0) {
-	        if (cp) *cp = (op->buf)[op->ri] ;
-	        op->ri += 1 ;
-	        if (op->ri == op->size) op->ri = 0 ;
+	        if (cp) *cp = op->buf[op->ri] ;
+	        op->ri = ((op->ri + 1) % op->size) ;
 	        op->count -= 1 ;
 	        rs = op->count ;
 	    }
@@ -116,6 +114,7 @@ int charq_remall(charq *op) noex {
 	    rs = SR_OK ;
 	    op->ri = 0 ;
 	    op->wi = 0 ;
+	    op->count = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
