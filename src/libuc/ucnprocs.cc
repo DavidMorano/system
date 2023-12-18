@@ -2,17 +2,18 @@
 /* lang=C++20 */
 
 /* get the number of processes on the system */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1997-11-18, David A-D­ Morano
-        This little subroutine was put together to get the current number of
-        processes executing on the system.
+	This little subroutine was put together to get the current
+	number of processes executing on the system.
 
 	= 2019-01-14, David A-D- Morano
-	Enhanced (after all this time) to ignore special entries (now common on
-	newer OSes).
+	Enhanced (after all this time) to ignore special entries
+	(now common on newer OSes).
 
 */
 
@@ -61,12 +62,15 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<usystem.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<getbufsize.h>
+#include	<libmallocxx.h>
 #include	<mkchar.h>
 #include	<fsdir.h>
+#include	<mkpathx.h>
+#include	<pathadd.h>
+#include	<cfdec.h>
+#include	<ischarx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 
@@ -82,13 +86,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkpath1(char *,cchar *) noex ;
-    extern int	pathadd(char *,int,cchar *) noex ;
-    extern int	cfdeci(cchar *,int,int *) noex ;
-    extern int	isdigitlatin(int) noex ;
-}
 
 
 /* external variables */
@@ -112,17 +109,15 @@ int uc_nprocs(int w) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	char		*nbuf ;
-	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
-	    cint	nlen = rs ;
-	    if ((rs = uc_libmalloc(nlen,&nbuf)) >= 0) {
+	if ((rs = libmalloc_mn(&nbuf)) >= 0) {
+	        cint	nlen = rs ;
 		{
 	            rs = ucnprocs_fsdir(nbuf,nlen,w) ;
 		    c = rs ;
 		}
 		rs1 = uc_libfree(nbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (lib-allocation-free) */
-	} /* end if (getbufsize) */
+	} /* end if (lib-allocation-free) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (uc_nprocs) */
@@ -131,8 +126,8 @@ int uc_nprocs(int w) noex {
 /* local subroutines */
 
 static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
-	FSDIR		d ;
-	FSDIR_ENT	de ;
+	fsdir		d ;
+	fsdir_ent	de ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -140,7 +135,7 @@ static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
         if ((rs = fsdir_open(&d,procdname)) >= 0) {
             if ((rs = getbufsize(getbufsize_mp)) >= 0) {
                 cint        plen = rs ;
-                char        *pbuf ;
+                char        *pbuf{} ;
                 switch (w) {
                 case 0: /* all processes */
                     {
@@ -162,22 +157,25 @@ static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
                                     cchar   *np = de.name ;
                                     if ((rs = pathadd(pbuf,pl,np)) >= 0) {
                                         USTAT       sb ;
-                                        if (u_stat(pbuf,&sb) >= 0) {
+                                        if ((rs = u_stat(pbuf,&sb)) >= 0) {
                                             if (sb.st_uid < UIDSYS) n += 1 ;
-                                        }
-                                    }
-                                }
+                                        } else if (isNotAccess(rs)) {
+					    rs = SR_OK ;
+					}
+                                    } /* end if (pathadd) */
+                                } /* end if (is-digit) */
                                 if (rs < 0) break ;
                             } /* end while */
                         } /* end if (mkpath) */
-                        uc_libfree(pbuf) ;
-                    } /* end if (m-a) */
+                        rs1 = uc_libfree(pbuf) ;
+			if (rs >= 0) rs = rs1 ;
+                    } /* end if (m-a-f) */
                     break ;
                 case 2: /* user processes */
                     if ((rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
                         if ((rs = mkpath1(pbuf,procdname)) >= 0) {
                             const uid_t		uid = getuid() ;
-                            cint            pl = rs ;
+                            cint		pl = rs ;
                             while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
                                 cint        ch = mkchar(de.name[0]) ;
                                 if (isdigitlatin(ch)) {
@@ -186,13 +184,16 @@ static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
                                         USTAT       sb ;
                                         if (u_stat(pbuf,&sb) >= 0) {
                                             if (sb.st_uid == uid) n += 1 ;
-                                        }
-                                    }
-                                }
+                                        } else if (isNotAccess(rs)) {
+					    rs = SR_OK ;
+					}
+                                    } /* end if (pathadd) */
+                                } /* end if (is-digit) */
                                 if (rs < 0) break ;
                             } /* end while */
                         } /* end if (mkpath) */
-                        uc_libfree(pbuf) ;
+                        rs1 = uc_libfree(pbuf) ;
+			if (rs >= 0) rs = rs1 ;
                     } /* end if (m-a) */
                     break ;
                 case 3: /* session processes */
@@ -201,8 +202,8 @@ static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
                         while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
                             cint    ch = mkchar(de.name[0]) ;
                             if (isdigitlatin(ch)) {
-                                int v ;
-                                if (cfdeci(de.name,rs,&v) >= 0) {
+                                int 	v{} ;
+                                if ((rs = cfdeci(de.name,rs,&v)) >= 0) {
                                     const pid_t             cid = v ;
                                     if (cid > 0) {
                                         pid_t               csid ;
@@ -210,8 +211,10 @@ static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
                                             if (csid == sid) n += 1 ;
                                         }
                                     }
-                                }
-                            }
+                                } else if (isNotValid(rs)) {
+				    rs = SR_OK ;
+				}
+                            } /* end if (is-digit) */
                         } /* end while */
                     } /* end block */
                     break ;

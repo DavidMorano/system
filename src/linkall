@@ -8,7 +8,7 @@
 # Description:
 # This program links the files listed (in their given directories)
 # into all of the other directories (under this present directory)
-# if the file is not already present there and is the same file.
+# if the file is already present there.
 #
 # Synopsis:
 # $ linkfiles <basefile(s)> 

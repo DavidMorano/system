@@ -40,20 +40,26 @@
 #include	<cstring>		/* <- for |strncmp(3c)| */
 #include	<iostream>
 
-#ifndef	FD_STDIN
-#define	FD_STDIN	0
-#endif
 
-#ifndef	TERMBUFLEN
-#define	TERMBUFLEN	256
-#endif
+/* local defines */
 
-#ifndef	DEVPREFIX
-#define	DEVPREFIX	"/dev/"
-#endif
+
+/* local namespaces */
 
 using std::cout ;
 using std::string_view ;
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* forward references */
 
 static int findsid() noexcept ;
 static int findline() noexcept ;

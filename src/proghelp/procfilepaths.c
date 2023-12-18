@@ -1,4 +1,5 @@
 /* procfilepaths */
+/* lang=C20 */
 
 /* process a paths file */
 /* version %I% last-modified %G% */
@@ -18,25 +19,21 @@
 
 /*******************************************************************************
 
-        This subroutine will read (process) a file that has directory paths in
-        it.
+	This subroutine will read (process) a file that has directory
+	paths in it.
 
-        This reads the directory paths in the file and creates a new single
-        environment variable named 'PATH'. That environment variable is then
-        added to the specified list.
-
+	This reads the directory paths in the file and creates a
+	new single environment variable named 'PATH'. That environment
+	variable is then added to the specified list.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecstr.h>
@@ -98,20 +95,13 @@ static const uchar	fterms[32] = {
 /* exported subroutines */
 
 
-int procfilepaths(programroot,fname,lp)
-const char	programroot[] ;
-const char	fname[] ;
-VECSTR		*lp ;
-{
+int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 	FIELD	fsb ;
-
 	bfile	pfile, *pfp = &pfile ;
-
 	int	rs, rs1 ;
 	int	c, len ;
 	int	fl, cl ;
 	int	psi, pbi ;
-
 	char	linebuf[LINEBUFLEN + 1] ;
 	char	buf[BUFLEN + 1] ;
 	char	pathbuf[PATHBUFLEN + 1], *pp ;
@@ -297,14 +287,10 @@ ret0:
 
 /* local subroutines */
 
-
 #if	CF_DEBUGS
-static int pathdump(pathbuf,pbi)
-const char	pathbuf[] ;
-int		pbi ;
-	{
+static int pathdump(cchar *pathbuf,int pbi) noex {
 	int	rs = SR_OK ;
-		int	mlen, rlen = pbi ;
+	int	mlen, rlen = pbi ;
 	int	wlen = 0 ;
 		const char	*pp = pathbuf ;
 		while (rlen > 0) {
@@ -317,7 +303,7 @@ int		pbi ;
 			rlen -= mlen ;
 		}
 	return (rs >= 0) ? wlen : rs ;
-	}
+}
 /* end subroutine (pathdump) */
 #endif /* CF_DEBUGS */
 
