@@ -1,6 +1,6 @@
-# MAKEFILES (six)
+# MAKEFILES (strn)
 
-T= six
+T= strn
 
 ALL= $(T).o $(T).a
 
@@ -51,19 +51,18 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h sysauxinfonames.h
+INCS= strn.h
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o sicasechr.o
-OBJ1_SIX= sicasesub.o sichr.o sicite.o sidigit.o sidquote.o
-OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o siterm.o
+OBJ0_STRN= strnxsub.o
+OBJ1_STRN= strnnlen.o
+OBJ2_STRN= strnxchr.o strnxpbrk.o 
+OBJ3_STRN= strnset.o strnwcpy.o strncpyxc.o 
 
+OBJA_STRN= obj0_strn.o obj1_strn.o
+OBJB_STRN= obj2_strn.o obj3_strn.o
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
-
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_STRN= $(OBJA_STRN) $(OBJB_STRN)
 
 
 default:		$(T).o
@@ -86,10 +85,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_STRN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRN)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_STRN)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,16 +108,25 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_strn.o:	$(OBJ0_STRN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRN)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_strn.o:	$(OBJ1_STRN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRN)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_strn.o:	$(OBJ2_STRN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRN)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_strn.o:	$(OBJ3_STRN)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRN)
+
+
+strnxsub.o:		strnxsub.cc $(INCS)
+strnnlen.o:		strnnlen.c $(INCS)
+strnxchr.o:		strnxchr.cc $(INCS)
+strnxpbrk.o:		strnxpbrk.cc $(INCS)
+strnwcpy.o:		strnwcpy.cc $(INCS)
+strncpyxc.o:		strncpyxc.cc $(INCS)
+strnset.o:		strnset.c $(INCS)
 
 

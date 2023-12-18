@@ -57,7 +57,6 @@ struct varnames {
 	static const char ostype[] ;
 	static const char osvers[] ;
 	static const char mail[] ;
-	static const char fpath[] ;
 	static const char node[] ;
 	static const char domain[] ;
 	static const char editor[] ;

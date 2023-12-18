@@ -68,6 +68,11 @@
 /* local variables */
 
 
+/* exported variables */
+
+int toxc_nosymbols ;
+
+
 /* exported subroutines */
 
 #ifndef	TOXC_STATICINLINE

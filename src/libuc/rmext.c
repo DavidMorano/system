@@ -42,6 +42,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
+#include	<matstr.h>
 #include	<localmisc.h>
 
 #include	"rmx.h"
@@ -51,8 +52,6 @@
 
 
 /* external subroutines */
-
-extern int	matstr(cchar **,cchar *,int) noex ;
 
 
 /* forward references */

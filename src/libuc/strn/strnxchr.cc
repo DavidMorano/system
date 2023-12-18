@@ -6,6 +6,7 @@
 
 #define	CF_STRCHR	1		/* use |strchr(3c)| */
 #define	CF_STRRCHR	1		/* use |strrchr(3c)| */
+#define	CF_MEMCHR	1		/* use |memchr(3c)| */
 
 /* revision history:
 
@@ -20,14 +21,14 @@
 /*******************************************************************************
 
 	Name:
-	strnchr
+	strn{x}chr
 
 	Description:
 	Yes, this is quite the same as |strchr(3c)| except that a
 	length of the test string (the first argument) can be given.
 
 	Synopsis:
-	char *strnchr(cchar *sp,int sl,int ch) noex
+	char *strn{x}chr(cchar *sp,int sl,int ch) noex
 
 	Arguments:
 	sp		string to search through
@@ -35,33 +36,13 @@
 	ch		the character to search for
 
 	Returns:
-	nullptr		did not find the character
-	!= nullptr	address of found character in searched string
-
-
-	Name:
-	strnrchr
-
-	Description:
-	Yes, this is quite the same as |strrchr(3c)| except that a
-	length of the test string (the first argument) can be given.
-
-	Synopsis:
-	char *strnrchr(cchar *sp,int sl,int ch) noex
-
-	Arguments:
-	sp		pointer to string
-	sl		length of string
-	ch		character to search for
-
-	Returns:
-	-		address of found character or nullptr if not found
+	-		address of found character or |nullptr| if not found
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -81,11 +62,27 @@
 #define	CF_STRRCHR	0
 #endif
 
+#ifndef	CF_MEMCHR
+#define	CF_MEMCHR	0
+#endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+typedef char	*charp ;
+
+
+/* forward references */
+
 
 /* local variables */
 
 constexpr bool		f_strchr = CF_STRCHR ;
 constexpr bool		f_strrchr = CF_STRRCHR ;
+constexpr bool		f_memchr = CF_MEMCHR ;
 
 
 /* exported subroutines */
@@ -107,13 +104,20 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 		    if (f) rsp = ((char *) sp) ;
 	        } /* end if-constexpr (f_strchr) */
 	    } else {
-	        cchar	*lsp = (sp + sl) ;
-	        while ((sp < lsp) && *sp) {
-	            f = (mkchar(*sp) == sch) ;
-		    if (f) break ;
-	            sp += 1 ;
-	        } /* end while */
-		if (f) rsp = ((char *) sp) ;
+		if constexpr (f_memchr) {
+		    cchar	*tp = charp(memchr(sp,sch,sl)) ;
+		    if (tp) {
+			rsp = charp(tp) ;
+		    }
+		} else {
+	            cchar	*lsp = (sp + sl) ;
+	            while ((sp < lsp) && *sp) {
+	                f = (mkchar(*sp) == sch) ;
+		        if (f) break ;
+	                sp += 1 ;
+	            } /* end while */
+		    if (f) rsp = charp(sp) ;
+		} /* end if */
 	    } /* end if */
 	} /* end if (non-null) */
 	return rsp ;

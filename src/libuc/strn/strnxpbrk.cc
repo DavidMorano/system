@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	strnpbrk
+	strn{x}pbrk
 
 	Description:
 	This subroutine is, of course, like the standard 'strpbrk(3c)'
@@ -26,33 +26,12 @@
 	acts just like 'strpbrk(3c)'.
 
 	Synopsis:
-	char *strnpbrk(cchar *sp,int sl,cchar *ss) noex
+	char *str{x}npbrk(cchar *sp,int sl,cchar *ss) noex
 
 	Arguments:
 	sp		string to test
 	sl		length of string to test
 	ss		string of characters to compare against
-
-	Returns:
-	-		pointer to found character or nullptr if not found
-
-
-	Name:
-	strnrpbrk
-
-	Description:
-	This subroutine is similar to the standard |strnpbrk(3c)|
-	except that a pointer to the last character matching a
-	character in the break-string is returned (instead of a
-	pointer to the first character in the break-string).
-
-	Synopsis:
-	char *strnrpbrk(cchar *sp,int sl,cchar *ss) noex
-
-	Arguments:
-	sp		pointer to string to test
-	sl		length of string to test
-	ss		search-string
 
 	Returns:
 	-		pointer to found character or nullptr if not found
@@ -63,11 +42,11 @@
 #include	<sys/types.h>
 #include	<cstring>
 #include	<utypedefs.h>
-#include	<vlanguage.h>
+#include	<clanguage.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"strn.h"
+#include	"strnxpbrk.h"
 
 
 /* local defines */
@@ -78,7 +57,7 @@
 
 /* exported subroutines */
 
-char *strnpbrk(cchar *sp,int sl,cchar *ss) {
+char *strnopbrk(cchar *sp,int sl,cchar *ss) noex {
 	char		*rsp = nullptr ;
 	if (sp && ss) {
 	    if (sl >= 0) {	
@@ -97,7 +76,7 @@ char *strnpbrk(cchar *sp,int sl,cchar *ss) {
 	} /* end if (non-null) */
 	return rsp ;
 }
-/* end subroutine (strnpbrk) */
+/* end subroutine (strnopbrk) */
 
 char *strnrpbrk(cchar *sp,int sl,cchar *ss) noex {
 	bool		f = false ;

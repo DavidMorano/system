@@ -53,7 +53,6 @@ const char varnames::osrel[] = "OSREL" ;
 const char varnames::ostype[] = "OSTYPE" ;
 const char varnames::osvers[] = "OSVERS" ;
 const char varnames::mail[] = "MAIL" ;
-const char varnames::fpath[] = "FPATH" ;
 const char varnames::node[] = "NODE" ;
 const char varnames::domain[] = "DOMAIN" ;
 const char varnames::editor[] = "EDITOR" ;

@@ -23,7 +23,9 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	<strnxcmp.h>
 #include	<strnxchr.h>
+#include	<strnxpbrk.h>
 #include	<strncpyxc.h>
 
 
@@ -31,11 +33,12 @@
 extern "C" {
 #endif
 
+/* calculate string length */
+extern int strnnlen(cchar *,int,int) noex ;
+
 /* find */
 extern char *strnsub(cchar *,int,cchar *) noex ;
 extern char *strncasesub(cchar *,int,cchar *) noex ;
-extern char *strnpbrk(cchar *,int,cchar *) noex ;
-extern char *strnrpbrk(cchar *,int,cchar *) noex ;
 
 /* copy-set */
 extern char *strnset(char *,int,int) noex ;

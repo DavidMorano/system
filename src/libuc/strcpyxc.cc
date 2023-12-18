@@ -26,6 +26,8 @@
 #include	<toxc.h>
 #include	<localmisc.h>
 
+#include	"strcpyxc.h"
+
 
 /* local defines */
 

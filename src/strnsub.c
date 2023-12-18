@@ -1,5 +1,5 @@
-/* strnsub */
-/* lang=C20 */
+/* strnxsub */
+/* lang=C++20 */
 
 /* find a substring within a larger string */
 /* version %I% last-modified %G% */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	strnsub
+	strn{x}sub
 
 	Description:
 	This subroutine determines if the parameter string (argument
@@ -26,7 +26,7 @@
 	the begining of the found substring or nullptr if not found.
 
 	Synopsis:
-	char *strnsub(cchar *sp,int sl,cchar *ss) noex
+	char *strn{x}sub(cchar *sp,int sl,cchar *ss) noex
 
 	Arguments:
 	sp	string to be examined
@@ -40,9 +40,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<string.h>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<char.h>
+#include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"strn.h"
@@ -74,6 +76,34 @@ char *strnsub(cchar *sp,int sl,cchar *ss) noex {
 }
 /* end subroutine (strnsub) */
 
+char *strncasesub(cchar *sp,int sl,cchar *s2) noex {
+	char		*rp = nullptr ;
+	if (sp && s2) {
+	    cint	s2len = strlen(s2) ;
+	    rp = (char *) sp ;
+	    if (s2len > 0) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        if (s2len <= sl) {
+		    cint	s2lead = CHAR_TOLC(s2[0]) ;
+	            int		i ;
+		    int		f = false ;
+	            for (i = 0 ; i <= (sl-s2len) ; i += 1) {
+	                if (CHAR_TOLC(sp[i]) == s2lead) {
+	                    cint	m = nleadcasestr((sp+i),s2,s2len) ;
+	                    f = (m == s2len) ;
+			    if (f) break ;
+	                } /* end if */
+	            } /* end for */
+	            rp = (char *) ((f) ? (sp+i) : nullptr) ;
+	        } else {
+	            rp = nullptr ;
+	        }
+	    } /* end if (positive) */
+	} /* end if (non-null) */
+	return rp ;
+}
+/* end subroutine (strncasesub) */
+
 
 /* local subroutines */
 
@@ -83,7 +113,7 @@ char *strnsub_local(cchar *sp,int sl,cchar *s2) noex {
 	if (s2len > 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (s2len <= sl) {
-	        int	i ;
+	        int	i ; /* <- used afterwards */
 		bool	f = false ;
 	        for (i = 0 ; i <= (sl-s2len) ; i += 1) {
 	            f = ((s2len == 0) || (sp[i] == s2[0])) ;

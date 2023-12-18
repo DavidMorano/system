@@ -9,14 +9,12 @@
 
 /* revision history:
 
-	= 1998-03-01, David A­D­ Morano
-
+	= 1999-03-01, David A­D­ Morano
 	This subroutine was originally written.
-
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -53,7 +51,6 @@
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 
 #include	<usystem.h>
 #include	<baops.h>
@@ -110,6 +107,7 @@ extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
+extern int	isNotPresent(int) ;
 
 #if	CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
@@ -210,6 +208,8 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
+	cchar		*pn = pip->progname ;
+	cchar		*fmt ;
 
 	if (aip == NULL) return SR_FAULT ;
 
@@ -220,25 +220,26 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
 
 	if (dbname == NULL) {
 	    rs = SR_FAULT ;
-	    bprintf(pip->efp,"%s: no database specified (%d)\n",
-	        pip->progname,rs) ;
+	    fmt = "%s: no database specified (%d)\n" ;
+	    bprintf(pip->efp,fmt,pn,rs) ;
 	}
 
 	if ((rs >= 0) && (dbname[0] == '\0')) {
 	    rs = SR_INVALID ;
-	    bprintf(pip->efp,"%s: no database specified (%d)\n",
-	        pip->progname,rs) ;
+	    fmt = "%s: no database specified (%d)\n" ;
+	    bprintf(pip->efp,fmt,pn,rs) ;
 	}
 
 	if ((rs >= 0) && (pip->debuglevel > 0)) {
-	    bprintf(pip->efp,"%s: db=%s\n",pip->progname,dbname) ;
+	    fmt = "%s: db=%s\n" ;
+	    bprintf(pip->efp,fmt,pn,dbname) ;
 	}
 
 	if (rs >= 0) {
 	    if ((rs = progids_begin(pip)) >= 0) {
 	        const mode_t	m = MKINV_DIRPERM ;
 	        if ((rs = procdbcheck(pip,dbname,m)) >= 0) {
-	            SUBINFO		si, *sip = &si ;
+	            SUBINFO	si, *sip = &si ;
 	            pip->sip = sip ;
 	            if ((rs = subinfo_start(sip,pip,dbname)) >= 0) {
     		        {
@@ -403,7 +404,6 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 {
 	vecstr		*alp = &aip->args ;
 	int		rs = SR_OK ;
-	int		rs1 ;
 	int		pan = 0 ;
 	int		i ;
 	int		c_tagref = 0 ;
@@ -419,35 +419,27 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 /* process the arguments */
 
 	for (i = 0 ; vecstr_get(alp,i,&cp) >= 0 ; i += 1) {
-	    if (cp == NULL) continue ;
-
-	    pan += 1 ;
-	    rs1 = procfile(pip,cp) ;
+	    if (cp != NULL) {
+	        pan += 1 ;
+	        if ((rs = procfile(pip,cp)) >= 0) {
+	            c_tagref += rs ;
+		} else {
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(5))
-	        debugprintf("proginv/procfiles: procfile() rs=%d\n",rs1) ;
+	        debugprintf("proginv/procfiles: procfile() rs=%d\n",rs) ;
 #endif
 
-	    if (rs1 > 0)
-	        c_tagref += rs1 ;
+	            if (*cp == '-') cp = "*stdinput*" ;
+	            if (pip->quietlevel <= 1) {
+	                fmt = "%s: error processing file (%d)\n" ;
+	                bprintf(pip->efp,fmt,pn,rs) ;
+	                bprintf(pip->efp,"%s: file=%s\n",pn,cp) ;
+	            }  /* end if (not quiet) */
 
-	    if (rs1 < 0) {
+	        } /* end if (error) */
 
-	        if (*cp == '-')
-	            cp = "*stdinput*" ;
-
-	        if (pip->quietlevel <= 1) {
-	            fmt = "%s: error processing file (%d)\n" ;
-	            bprintf(pip->efp,fmt,pn,rs1) ;
-	            bprintf(pip->efp,"%s: file=%s\n",pn,cp) ;
-	            if ((rs1 != SR_NOENT) && (rs1 != SR_ACCESS)) {
-	                rs = rs1 ;
-	            }
-	        }  /* end if (not quiet) */
-
-	    } /* end if (error) */
-
+	    }
 	    if (rs < 0) break ;
 	} /* end for (processing arguments) */
 
@@ -461,7 +453,7 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 /* end subroutine (procfiles) */
 
 
-static int procfile(PROGINFO *pip,cchar fname[])
+static int procfile(PROGINFO *pip,cchar *fname)
 {
 	SUBINFO		*sip = pip->sip ;
 	KTAG		e ;
@@ -956,9 +948,10 @@ static int subinfo_txtopen(SUBINFO *sip)
 	if (pip == NULL) return SR_FAULT ;
 
 #if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("subinfo_txtopen: f_txtopen=%u\n",
-	        sip->f.txtopen) ;
+	if (DEBUGLEVEL(3)) {
+	    debugprintf("subinfo_txtopen: ent f_txtopen=%u\n",sip->f.txtopen) ;
+	    debugprintf("subinfo_txtopen: dbname=%s\n",sip->dbname) ;
+	}
 #endif
 
 	memset(&ta,0,sizeof(TXTINDEXMK_PA)) ;
@@ -972,8 +965,14 @@ static int subinfo_txtopen(SUBINFO *sip)
 	    if (sip->dbname != NULL) {
 		const mode_t	om = MKINV_INDPERM ;
 		const int	of = O_CREAT ;
-	        rs = txtindexmk_open(&sip->tm,&ta,sip->dbname,of,om) ;
-	        sip->f.txtopen = (rs >= 0) ;
+		cchar		*db = sip->dbname ;
+	        if ((rs = txtindexmk_open(&sip->tm,&ta,db,of,om)) >= 0) {
+	            sip->f.txtopen = TRUE ;
+		} else if (isNotPresent(rs)) {
+		    cchar	*pn = pip->progname ;
+		    cchar	*fmt = "%s: failed-open db=%s (%d)\n" ;
+		    bprintf(pip->efp,fmt,pn,db,rs) ;
+		}
 	    } else
 	        rs = SR_FAULT ;
 	}

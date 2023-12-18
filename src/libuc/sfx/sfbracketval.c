@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* find the string-value within brackets */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
