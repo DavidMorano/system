@@ -239,15 +239,14 @@ int procer::selection() noex {
 				case ucproctype_group:
 				    uint	uv{} ;
 				    if ((rs = cfdecui(pbuf,-1,&uv)) >= 0) {
-					pid_t	mpid ;
 					switch (w) {
 					case ucproctype_session:
-					    mpid = getsid(uv) ;
-				    	    if (mpid == sid) n += 1 ;
+					    rs = u_getsid(uv) ;
+				    	    if (rs == sid) n += 1 ;
 					    break ;
 					case ucproctype_group:
-					    mpid = getpgid(uv) ;
-				    	    if (mpid == pgid) n += 1 ;
+					    rs = u_getpgid(uv) ;
+				    	    if (rs == pgid) n += 1 ;
 					    break ;
 					} /* end switch */
 				    } /* end if (cfdec) */
