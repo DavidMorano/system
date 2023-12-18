@@ -73,6 +73,8 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"ucproctypes.h"
+
 
 /* local defines */
 
@@ -93,51 +95,94 @@
 
 /* local structures */
 
+namespace {
+    struct procer {
+	char		*nbuf{} ;
+	uid_t		uid ;
+	pid_t		sid ;
+	pid_t		pgid ;
+	int		nlen ;
+	int		w = 0 ;
+	fsdir		d ;
+	fsdir_ent	de ;
+	procer(int aw) noex : w(aw) { } ;
+	int fsdent() noex ;
+	int selection() noex ;
+	int setid() noex ;
+	operator int () noex ;
+    } ; /* end struct (procer) */
+}
+
 
 /* forward references */
 
-static int	ucnprocs_fsdir(char *,int,int) noex ;
-
 
 /* local variables */
+
+constexpr cchar		dn[] = PROCDNAME ;
 
 
 /* exported subroutines */
 
 int uc_nprocs(int w) noex {
-	int		rs ;
-	int		rs1 ;
-	int		c = 0 ;
-	char		*nbuf ;
-	if ((rs = libmalloc_mn(&nbuf)) >= 0) {
-	        cint	nlen = rs ;
-		{
-	            rs = ucnprocs_fsdir(nbuf,nlen,w) ;
-		    c = rs ;
-		}
-		rs1 = uc_libfree(nbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	} /* end if (lib-allocation-free) */
-	return (rs >= 0) ? c : rs ;
+	procer		po(w) ;
+	return po ;
 }
 /* end subroutine (uc_nprocs) */
 
 
 /* local subroutines */
 
-static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
-	fsdir		d ;
-	fsdir_ent	de ;
+procer::operator int () noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if ((rs = setid()) >= 0) {
+	    if ((rs = libmalloc_mn(&nbuf)) >= 0) {
+	        nlen = rs ;
+		{
+	            rs = fsdent() ;
+		    c = rs ;
+		}
+		rs1 = uc_libfree(nbuf) ;
+		if (rs >= 0) rs = rs1 ;
+		nbuf = nullptr ;
+	    } /* end if (lib-allocation-free) */
+	} /* end if (valid) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (procer::operator) */
+
+
+/* local subroutines */
+
+int procer::setid() noex {
+	int		rs = SR_INVALID ;
+	if ((w >= 0) && (w < ucproctype_overlast)) {
+	    rs = SR_OK ;
+	    switch (w) {
+	    case ucproctype_user:
+		uid = getuid() ;
+		break ;
+	    case ucproctype_session:
+		sid = getsid(0) ;
+		break ;
+	    case ucproctype_group:
+		pgid = getpgrp() ;
+		break ;
+	    } /* end switch */
+	} /* end if (valid) */
+	return rs ;
+}
+/* end method (procer::setid) */
+
+int procer::fsdent() noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	cchar		*procdname = PROCDNAME ;
-        if ((rs = fsdir_open(&d,procdname)) >= 0) {
-            if ((rs = getbufsize(getbufsize_mp)) >= 0) {
-                cint        plen = rs ;
-                char        *pbuf{} ;
+        if ((rs = fsdir_open(&d,dn)) >= 0) {
                 switch (w) {
-                case 0: /* all processes */
+                case ucproctype_all: /* all processes */
                     {
                         while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
                             cint    ch = mkchar(de.name[0]) ;
@@ -147,87 +192,80 @@ static int ucnprocs_fsdir(char *nbuf,int nlen,int w) noex {
                         } /* end while */
                     } /* end block */
                     break ;
-                case 1: /* system processes */
-                    if ((rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
-                        if ((rs = mkpath1(pbuf,procdname)) >= 0) {
-                            cint    pl = rs ;
-                            while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-                                cint        ch = mkchar(de.name[0]) ;
-                                if (isdigitlatin(ch)) {
-                                    cchar   *np = de.name ;
-                                    if ((rs = pathadd(pbuf,pl,np)) >= 0) {
-                                        USTAT       sb ;
-                                        if ((rs = u_stat(pbuf,&sb)) >= 0) {
-                                            if (sb.st_uid < UIDSYS) n += 1 ;
-                                        } else if (isNotAccess(rs)) {
-					    rs = SR_OK ;
-					}
-                                    } /* end if (pathadd) */
-                                } /* end if (is-digit) */
-                                if (rs < 0) break ;
-                            } /* end while */
-                        } /* end if (mkpath) */
-                        rs1 = uc_libfree(pbuf) ;
-			if (rs >= 0) rs = rs1 ;
-                    } /* end if (m-a-f) */
-                    break ;
-                case 2: /* user processes */
-                    if ((rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
-                        if ((rs = mkpath1(pbuf,procdname)) >= 0) {
-                            const uid_t		uid = getuid() ;
-                            cint		pl = rs ;
-                            while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-                                cint        ch = mkchar(de.name[0]) ;
-                                if (isdigitlatin(ch)) {
-                                    cchar   *np = de.name ;
-                                    if ((rs = pathadd(pbuf,pl,np)) >= 0) {
-                                        USTAT       sb ;
-                                        if (u_stat(pbuf,&sb) >= 0) {
-                                            if (sb.st_uid == uid) n += 1 ;
-                                        } else if (isNotAccess(rs)) {
-					    rs = SR_OK ;
-					}
-                                    } /* end if (pathadd) */
-                                } /* end if (is-digit) */
-                                if (rs < 0) break ;
-                            } /* end while */
-                        } /* end if (mkpath) */
-                        rs1 = uc_libfree(pbuf) ;
-			if (rs >= 0) rs = rs1 ;
-                    } /* end if (m-a) */
-                    break ;
-                case 3: /* session processes */
-                    {
-                        const pid_t	sid = getsid(0) ;
-                        while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
-                            cint    ch = mkchar(de.name[0]) ;
-                            if (isdigitlatin(ch)) {
-                                int 	v{} ;
-                                if ((rs = cfdeci(de.name,rs,&v)) >= 0) {
-                                    const pid_t             cid = v ;
-                                    if (cid > 0) {
-                                        pid_t               csid ;
-                                        if ((csid = getsid(cid)) >= 0) {
-                                            if (csid == sid) n += 1 ;
-                                        }
-                                    }
-                                } else if (isNotValid(rs)) {
-				    rs = SR_OK ;
-				}
-                            } /* end if (is-digit) */
-                        } /* end while */
-                    } /* end block */
-                    break ;
+                case ucproctype_sys: /* system processes */
+                case ucproctype_user: /* all-user processes */
+                case ucproctype_session: /* session processes */
+                case ucproctype_group: /* group processes */
+		    rs = selection() ;
+		    n = rs ;
+		    break ;
                 default:
                     rs = SR_NOSYS ;
                     break ;
                 } /* end switch */
-            } /* end if (getbufsize) */
             rs1 = fsdir_close(&d) ;
             if (rs >= 0) rs = rs1 ;
-        } /* end if (fsdir) */
+	} /* end if (fsdir) */
 	return (rs >= 0) ? n : rs ;
 }
-/* end subroutine (uc_nprocs) */
+/* end subroutine (procer::fsdent) */
+
+int procer::selection() noex {
+	int		rs ;
+	int		rs1 ;
+	int		n = 0 ;
+	char		*pbuf{} ;
+	if ((rs = libmalloc_mp(&pbuf)) >= 0) {
+	    if ((rs = mkpath1(pbuf,dn)) >= 0) {
+		cint    pl = rs ;
+		while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+		    cint        ch = mkchar(de.name[0]) ;
+		    if (isdigitlatin(ch)) {
+		        cchar   *np = de.name ;
+                        if ((rs = pathadd(pbuf,pl,np)) >= 0) {
+                            USTAT       sb ;
+                            if ((rs = u_stat(pbuf,&sb)) >= 0) {
+				switch (w) {
+				case ucproctype_all:
+				    n += 1 ;
+				    break ;
+				case ucproctype_user:
+				    if (sb.st_uid == uid) n += 1 ;
+				    break ;
+				case ucproctype_sys:
+				    if (sb.st_uid < UIDSYS) n += 1 ;
+				    break ;
+				case ucproctype_session:
+				case ucproctype_group:
+				    uint	uv{} ;
+				    if ((rs = cfdecui(pbuf,-1,&uv)) >= 0) {
+					pid_t	mpid ;
+					switch (w) {
+					case ucproctype_session:
+					    mpid = getsid(uv) ;
+				    	    if (mpid == sid) n += 1 ;
+					    break ;
+					case ucproctype_group:
+					    mpid = getpgid(uv) ;
+				    	    if (mpid == pgid) n += 1 ;
+					    break ;
+					} /* end switch */
+				    } /* end if (cfdec) */
+				    break ;
+				} /* end switch */
+                            } else if (isNotAccess(rs)) {
+				rs = SR_OK ;
+			    }
+                        } /* end if (pathadd) */
+		    } /* end if (is-digit) */
+		    if (rs < 0) break ;
+		} /* end while */
+	    } /* end if (mkpath) */
+	    rs1 = uc_libfree(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end method (procer::selection) */
 
 
