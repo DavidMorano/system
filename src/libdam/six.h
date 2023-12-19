@@ -27,7 +27,8 @@
 extern "C" {
 #endif
 
-extern int sichr(cchar *,int,int) noex ;
+extern int siochr(cchar *,int,int) noex ;
+extern int sirchr(cchar *,int,int) noex ;
 extern int sialpha(cchar *,int) noex ;
 extern int sidigit(cchar *,int) noex ;
 extern int sialnum(cchar *,int) noex ;
@@ -42,6 +43,10 @@ extern int sisub(cchar *,int,cchar *) noex ;
 extern int sirec(cchar *,int,int) noex ;
 extern int sicite(cchar *,int,cchar *,int) noex ;
 extern int siterm(cchar *,int,cchar *) noex ;
+
+static inline int sichr(cchar *sp,int sl,int sch) noex {
+	return siochr(sp,sl,sch) ;
+}
 
 #ifdef	__cplusplus
 }
