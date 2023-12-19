@@ -73,7 +73,7 @@
 /* forward references */
 
 static int	getthing(cchar *,int,cchar *,cchar **) noex ;
-static int	hasgood(const char *,int) noex ;
+static int	hasgood(cchar *,int) noex ;
 static int	isour(int) noex ;
 
 
@@ -109,7 +109,7 @@ int sfthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 
 static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = 0 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*cp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl > 0) {
@@ -136,7 +136,7 @@ static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 
 static int hasgood(cchar *sp,int sl) noex {
 	int		ch ;
-	int		f = TRUE ;
+	int		f = true ;
 	for (int i = 0 ; i < sl ; i += 1) {
 	    ch = (sp[i] & 0xff) ;
 	    if (ch == '=') break ;
