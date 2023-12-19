@@ -53,8 +53,9 @@
 	PROC FS back in the mid-1980s or so. It is amazing how much
 	stuff that AT&T invented in the 1980s for UNIX® that has
 	passed the test of time. The only real problem with the
-	PROC FS is that it is possible that it can be unmounted
-	(not mounted), in which case everyone has nothing!
+	PROC FS is that it is possible that orifinally it could be
+	unmounted (not mounted), in which case everyone is left
+	with nothing. But some news OSes do not allow
 
 *******************************************************************************/
 
@@ -249,6 +250,7 @@ int procer::selection() noex {
 				    	    if (rs == pgid) n += 1 ;
 					    break ;
 					} /* end switch */
+					if (rs == SR_SRCH) rs = SR_OK ;
 				    } /* end if (cfdec) */
 				    break ;
 				} /* end switch */
