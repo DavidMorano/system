@@ -56,6 +56,7 @@ extern const short		char_dictorder[] ;
 #define	CHAR_ISWHITE(c)		char_iswhite(c)
 #define	CHAR_ISLC(c)		char_islc(c)
 #define	CHAR_ISUC(c)		char_isuc(c)
+#define	CHAR_ISDIG(c)		char_isdig(c)
 
 /* our super-fast conversions */
 #define	CHAR_TOBC(c)		((c) & 0xff)
@@ -82,6 +83,20 @@ static inline bool char_isspacetab(int ch) noex {
 #ifdef	__cplusplus
 }
 #endif
+
+#ifdef	__cplusplus
+
+inline bool char_isdig(int ch) noex {
+	return ((ch >= '0') && (ch <= '9')) ;
+}
+
+#else /* __cplusplus */
+
+static inline bool char_isdig(int ch) noex {
+	return ((ch >= '0') && (ch <= '9')) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* CHAR_INCLUDE */

@@ -32,8 +32,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstring>
+#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<bitset>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -44,21 +44,24 @@
 #include	"char.h"
 
 
+/* local defines */
+
+
 /* local namespaces */
 
 using std::bitset ;
 
 
-/* local variables */
+/* local typedefs */
 
-constexpr int   chtablen = (UCHAR_MAX+1) ;
 
-constexpr bool	f_varname = CF_VARNAME ;
+/* external subroutines */
 
 
 /* local structures */
 
 namespace {
+    constexpr int   chtablen = (UCHAR_MAX+1) ;
     struct charinfo {
 	bitset<chtablen>	iswhite{} ;
 	bitset<chtablen>	islc{} ;
@@ -75,6 +78,11 @@ namespace {
 	} ;
     } ; /* end struct (charinfo) */
 }
+
+
+/* local variables */
+
+constexpr bool	f_varname = CF_VARNAME ;
 
 
 /* exported variables */
