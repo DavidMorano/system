@@ -46,6 +46,8 @@
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
+#include	"pathclean.h"
+
 
 /* local defines */
 

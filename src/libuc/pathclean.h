@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-extern int pathclean(char *,int,cchar *,int) noex ;
+extern int pathclean(char *,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }

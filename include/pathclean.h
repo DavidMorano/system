@@ -1,4 +1,4 @@
-/* pathadd INCLUDE */
+/* pathclean INCLUDE */
 /* lang=C20 */
 
 /* add a c-string to the end of an existing path c-string */
@@ -14,8 +14,8 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	PATHADD_INCLUDE
-#define	PATHADD_INCLUDE
+#ifndef	PATHCLEAN_INCLUDE
+#define	PATHCLEAN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,14 +27,13 @@
 extern "C" {
 #endif
 
-extern int pathaddw(char *,int,cchar *,int) noex ;
-extern int pathadd(char *,int,cchar *) noex ;
+extern int pathclean(char *,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-#endif /* PATHADD_INCLUDE */
+#endif /* PATHCLEAN_INCLUDE */
 
 
