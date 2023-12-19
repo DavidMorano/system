@@ -2,11 +2,19 @@ template<typename ... Args>
 static inline int vecpstr_ctor(vecpstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
 	    rs = SR_OK ;
 
 	}
 	return rs ;
 }
+/* end subroutine (memfile_ctor) */
+
+static int memfile_dtor(memfile *op) noex {
+	return SR_OK ;
+}
+/* end subroutine (memfile_dtor) */
+
 
 	if ((rs = vecpstr_ctor(op,sp)) >= 0) {
 

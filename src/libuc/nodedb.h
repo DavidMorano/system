@@ -42,8 +42,8 @@ struct nodedb_cursor {
 } ;
 
 struct nodedb_head {
-	vecobj		files ;		/* files */
-	hdb		entries ;
+	vecobj		*filep ;		/* files */
+	hdb		*entsp ;
 	time_t		checktime ;
 	uint		magic ;
 	int		cursors ;
@@ -72,7 +72,7 @@ extern int nodedb_fileadd(nodedb *,cchar *) noex ;
 extern int nodedb_curbegin(nodedb *,nodedb_cur *) noex ;
 extern int nodedb_curend(nodedb *,nodedb_cur *) noex ;
 extern int nodedb_fetch(nodedb *,cchar *,nodedb_cur *,
-		NODEDB_ENT *,char *,int) noex ;
+		nodedb_ent *,char *,int) noex ;
 extern int nodedb_enum(nodedb *,nodedb_cur *,nodedb_ent *,char *,int) noex ;
 extern int nodedb_check(nodedb *,time_t) noex ;
 extern int nodedb_close(nodedb *) noex ;

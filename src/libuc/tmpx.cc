@@ -64,6 +64,16 @@
 
 int		tmpx_close(tmpx *) noex ;
 
+template<typename ... Args>
+static inline int tmpx_magic(tmpx *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TMPX_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (tmpx_magic) */
+
 static int	tmpx_writable(tmpx *,int) noex ;
 static int	tmpx_openbegin(tmpx *,cchar *) noex ;
 static int	tmpx_openend(tmpx *) noex ;
@@ -74,23 +84,12 @@ static int	tmpx_fileclose(tmpx *) noex ;
 static int	tmpx_mapents(tmpx *,int,int,tmpx_ent **) noex ;
 static int	tmpx_mapper(tmpx *,int,uint,uint) noex ;
 
-template<typename ... Args>
-static inline int tmpx_magic(tmpx *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == TMPX_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-
-
-
 static int	isproctype(int) noex ;
 
 
 /* local variables */
 
-static const int	proctypes[] = {
+static constexpr int	proctypes[] = {
 	TMPX_TPROCINIT,
 	TMPX_TPROCLOGIN,
 	TMPX_TPROCUSER,
@@ -109,11 +108,23 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	    dbfn = TMPX_DEFUTMP ;
 	}
 	if (op) {
-	    memset(op,0,sizeof(TMPX)) ;
+	    op->fname = nullptr ;
+	    op->mapdata = 0 ;
+	    op->ti_open = 0 ;
+	    op->ti_mod = 0 ;
+	    op->ti_check = 0 ;
+	    op->mapsize = 0 ;
+	    op->fsize = 0 ;
+	    op->f = {} ;
+	    op->mapoff = 0 ;
+	    op->magic = 0 ;
 	    op->pagesize = getpagesize() ;
 	    op->oflags = oflags ;
+	    op->operms = 0 ;
 	    op->fd = -1 ;
-	    op->fname = nullptr ;
+	    op->ncursors = 0 ;
+	    op->mapei = 0 ;
+	    op->mapen = 0 ;
 	    if ((rs = tmpx_writable(op,oflags)) >= 0) {
 	        rs = tmpx_openbegin(op,dbfn) ;
 	    }
@@ -126,15 +137,15 @@ int tmpx_close(tmpx *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = tmpx_magic(op)) >= 0) {
-	        if (op->mapdata && (op->mapsize > 0)) {
-	            rs1 = u_munmap(op->mapdata,op->mapsize) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-		{
-		    rs1 = tmpx_openend(op) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	       op->magic = 0 ;
+	    if (op->mapdata && (op->mapsize > 0)) {
+		rs1 = u_mmapend(op->mapdata,op->mapsize) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = tmpx_openend(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

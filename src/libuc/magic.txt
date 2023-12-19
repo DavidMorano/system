@@ -6,3 +6,4 @@ static inline int vecpstr_magic(vecpstr *op,Args ... args) noex {
 	}
 	return rs ;
 }
+/* end subroutine (memfile_magic) */

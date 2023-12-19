@@ -37,6 +37,7 @@
 
 #ifndef	FIELDTERMINIT_INCLUDE
 #define	FIELDTERMINIT_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -61,6 +62,7 @@ struct fieldterminit {
 } ; /* end struct (fieldterminit) */
 
 
+#endif	/* __cplusplus */
 #endif /* FIELDTERMINIT_INCLUDE */
 
 

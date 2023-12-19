@@ -23,6 +23,7 @@
 
 #ifndef	UCVARIABLES_INCLUDE
 #define	UCVARIABLES_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -39,6 +40,7 @@ extern const valuelimits	valuelimit ;
 extern const digbufsizes	digbufsize ;
 
 
+#endif	/* __cplusplus */
 #endif /* UCVARIABLES_INCLUDE */
 
 

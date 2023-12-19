@@ -37,13 +37,13 @@ typedef MEMFILE		memfile ;
 extern "C" {
 #endif
 
-extern int	memfile_open(MEMFILE *,cchar *,int,mode_t) noex ;
-extern int	memfile_write(MEMFILE *,cvoid *,int) noex ;
-extern int	memfile_len(MEMFILE *) noex ;
-extern int	memfile_allocation(MEMFILE *) noex ;
-extern int	memfile_tell(MEMFILE *,off_t *) noex ;
-extern int	memfile_buf(MEMFILE *,void *) noex ;
-extern int	memfile_close(MEMFILE *) noex ;
+extern int	memfile_open(memfile *,cchar *,int,mode_t) noex ;
+extern int	memfile_write(memfile *,cvoid *,int) noex ;
+extern int	memfile_len(memfile *) noex ;
+extern int	memfile_allocation(memfile *) noex ;
+extern int	memfile_tell(memfile *,off_t *) noex ;
+extern int	memfile_buf(memfile *,void *) noex ;
+extern int	memfile_close(memfile *) noex ;
 
 #ifdef	__cplusplus
 }

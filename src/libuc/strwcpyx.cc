@@ -36,6 +36,11 @@
 /* local subroutine-templates */
 
 
+/* exported variables */
+
+int strwcpyx_nosymbols ;
+
+
 /* exported subroutines */
 
 

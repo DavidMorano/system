@@ -83,9 +83,9 @@ extern int	varsub_enum(varsub *,varsub_cur *,cchar **,cchar **) noex ;
 extern int	varsub_curend(varsub *,varsub_cur *) noex ;
 extern int	varsub_del(varsub *,const char *,int) noex ;
 extern int	varsub_fetch(varsub *,cchar *,int,cchar **) noex ;
-extern int	varsub_expand(varsub *,char *,int,cchar *,int) noex ;
-extern int	varsub_expandbuf(varsub *,buffer *,cchar *,int) noex ;
-extern int	varsub_expandfile(varsub *,bfile *,bfile *) noex ;
+extern int	varsub_exp(varsub *,char *,int,cchar *,int) noex ;
+extern int	varsub_expbuf(varsub *,buffer *,cchar *,int) noex ;
+extern int	varsub_expfile(varsub *,bfile *,bfile *) noex ;
 extern int	varsub_finish(varsub *) noex ;
 
 #ifdef	__cplusplus

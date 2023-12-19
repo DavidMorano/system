@@ -2,6 +2,7 @@
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -26,15 +27,14 @@
 	n		suggested starting size
 
 	Returns:
-	<		error
 	>=0		ok
+	<		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>

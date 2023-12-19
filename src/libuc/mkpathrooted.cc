@@ -17,26 +17,23 @@
 /*******************************************************************************
 
 	Name:
-	mkfdfnam
+	mkpathrooted
 
 	Description:
-	This subroutine creates a string that represents a file
-	that is actually already open on a given file-descriptor
-	(FD).  The filename looks like:
-		*<fd>
-	where:
-	fd		is the decimal representation of the FD
+	This subroutine examines the source file or path given
+	and returns either the original source-path as it is
+	or an absolute-path version it, depending on whether the
+	source as already absolute or not.
 
 	Synopsis:
-	int mkfdfname(char *dbuf,int dlen,int fd)
+	int mkpathrooted(char *rbuf,cchar *sbuf) noex
 
 	Arguments:
-	dbuf		destination buffer pointer
-	dlen		destination buffer length
-	int		fd ;
+	rbuf		result buffer
+	sbuf		source buffer
 
 	Returns:
-	>=0		length of created string
+	>=0		length of resulting c-string
 	<0		error
 
 *******************************************************************************/

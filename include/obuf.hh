@@ -23,6 +23,7 @@
 
 #ifndef	OBUF_INCLUDE
 #define	OBUF_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -40,7 +41,6 @@ class obuf {
 	std::string	b ;
 	int		oi ;		/* output index */
 public:
-	obuf() noex : oi(0) { } ;
 	obuf(const obuf &) = delete ;
 	obuf &operator = (const obuf &) = delete ;
 	obuf(cchar *sbuf = nullptr,int slen = -1) noex : oi(0) {
@@ -89,6 +89,7 @@ public:
 } ; /* end class (obuf) */
 
 
+#endif /* __cplusplus */
 #endif /* OBUF_INCLUDE */
 
 

@@ -1,7 +1,8 @@
 /* u_getsid */
+/* lang=C++20 */
 
 /* get a session ID */
-/* translation layer interface for UNIX® equivalents */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,13 +14,10 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

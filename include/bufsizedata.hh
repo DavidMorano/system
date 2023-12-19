@@ -33,6 +33,7 @@
 
 #ifndef	BUFSIZEDATA_INCLUDE
 #define	BUFSIZEDATA_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>
@@ -149,6 +150,7 @@ constexpr bufsizedata::bufsizedata() noex {
 /* end method (bufsizedata:bufsizedata) */
 
 
+#endif	/* __cplusplus */
 #endif /* BUFSIZEDATA_INCLUDE */
 
 

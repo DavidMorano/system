@@ -28,17 +28,14 @@
 	nleadbasestr
 
 	Description:
-        Calculate the number of characters that two string have in common from
-        their leading edges. If we get a match at all we return the number of
-        characters matched. If we do not get a match, we return a negative
-        number. The second given string is allowed to have an optional length
-        supplied.
+	Calculate the number of characters that two string have in
+	common from their leading edges. If we get a match at all
+	we return the number of characters matched. If we do not
+	get a match, we return a negative number. The second given
+	string is allowed to have an optional length supplied.
 
 	Synopsis:
-	int nleadbasestr(bs,sp,sl)
-	cchar		bs[] ;
-	cchar		*sp ;
-	int		sl ;
+	int nlead{x}str(cchar **bs,cchar *sp,int sl) noex
 
 	Arguments:
 	bs		base string to compare against
@@ -48,40 +45,6 @@
 	Returns:
 	>=0		match found and it matched up to this length
 	<0		no match
-
-
-	Name:
-	nleadcasestr
-
-	Description:
-        Check that the given string matches (case independently) the LEADING
-        part of some string in the given array of strings. If we get a match, we
-        return the number of characters matched. If we do not match, we return a
-        negative number.
-
-	Synopsis:
-	int nleadcasestr(bs,sp,sl)
-	cchar		bs[] ;
-	cchar		sp[] ;
-	int		sl ;
-
-	Arguments:
-	bs		base string to compare against
-	sp		test-string to test against the base string
-	sl		length of test-string
-
-	Returns:
-	>=0		match found and it matched up to this length
-	<0		no match
-
-
-	Name:
-	nleadfoldstr
-
-	Description:
-	This is the same as the above version but using folding case for
-	comparisons.
-
 
 	Notes:
 	1. Rationale for using templates rather than passing a 
@@ -116,7 +79,7 @@
 
 /* local typedefs */
 
-extenr "C" {
+extern "C" {
     typedef int (*toxc_f)(int) noex ;
 }
 

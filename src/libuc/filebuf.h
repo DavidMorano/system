@@ -67,11 +67,11 @@ extern "C" {
 extern int	filebuf_start(filebuf *,int,off_t,int,int) noex ;
 extern int	filebuf_read(filebuf *,void *,int,int) noex ;
 extern int	filebuf_readp(filebuf *,void *,int,off_t,int) noex ;
-extern int	filebuf_readline(filebuf *,char *,int,int) noex ;
-extern int	filebuf_readlines(filebuf *,char *,int,int,int *) noex ;
+extern int	filebuf_readln(filebuf *,char *,int,int) noex ;
+extern int	filebuf_readlns(filebuf *,char *,int,int,int *) noex ;
 extern int	filebuf_write(filebuf *,cvoid *,int) noex ;
 extern int	filebuf_writeto(filebuf *,cvoid *,int,int) noex ;
-extern int	filebuf_print(filebuf *,cchar *,int) noex ;
+extern int	filebuf_println(filebuf *,cchar *,int) noex ;
 extern int	filebuf_vprintf(filebuf *,cchar *,va_list) noex ;
 extern int	filebuf_printf(filebuf *,cchar *,...) noex ;
 extern int	filebuf_reserve(filebuf *,int) noex ;

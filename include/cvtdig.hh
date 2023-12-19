@@ -53,6 +53,7 @@
 
 #ifndef	CVTDIG_INCLUDE
 #define	CVTDIG_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -99,6 +100,7 @@ constexpr int cvtdig(char *rbuf,int rlen,UT &val,int n,int b) noex {
 /* end subroutine-template (cvtdig) */
 
 
+#endif	/* __cplusplus */
 #endif /* CVTDIG_INCLUDE */
 
 

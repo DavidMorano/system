@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<limits.h>
 #include	<stdint.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -31,6 +32,9 @@
 extern "C" {
 #endif
 
+extern int intsatl(long) noex ;
+extern int intsatll(longlong) noex ;
+
 extern int iaddsat(int,int) noex ;
 extern long laddsat(long,long) noex ;
 extern longlong lladdsat(longlong,longlong) noex ;
@@ -41,6 +45,17 @@ extern ulonglong ulladdsat(ulonglong,ulonglong) noex ;
 #ifdef	__cplusplus
 }
 #endif
+
+#ifdef	__cplusplus
+
+static inline int intsat(long v) noex {
+	return intsatl(v) ;
+}
+static inline int intsat(longlong v) noex {
+	return intsatll(v) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* INTSAT_INCLUDE */

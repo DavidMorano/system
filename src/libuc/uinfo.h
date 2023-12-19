@@ -23,8 +23,8 @@
 #include	<clanguage.h>
 
 
-#define	UINFO_NAME	struct uinfo_infoname
-#define	UINFO_AUX	struct uinfo_infoaux
+#define	UINFO_NAMES	struct uinfo_infoname
+#define	UINFO_AUXS	struct uinfo_infoaux
 
 
 struct uinfo_infoname {
@@ -43,16 +43,16 @@ struct uinfo_infoaux {
 	cchar		*nisdomain ;
 } ;
 
-typedef UINFO_NAME	uinfo_name ;
-typedef UINFO_AUX	uinfo_aux ;
+typedef UINFO_NAMES	uinfo_names ;
+typedef UINFO_AUXS	uinfo_auxs ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
 extern int uinfo_init() noex ;
-extern int uinfo_name(UINFO_NAME *) noex ;
-extern int uinfo_aux(UINFO_AUX *) noex ;
+extern int uinfo_name(uinfo_names *) noex ;
+extern int uinfo_aux(uinfo_auxs *) noex ;
 extern int uinfo_fini() noex ;
 
 #ifdef	__cplusplus

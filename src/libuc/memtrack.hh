@@ -37,6 +37,7 @@
 
 #ifndef	MEMTRACK_INCLUDE
 #define	MEMTRACK_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -114,6 +115,7 @@ struct memtrack {
 } ; /* end struct (memtrack) */
 
 
+#endif	/* __cplusplus */
 #endif /* MEMTRACK_INCLUDE */
 
 

@@ -66,7 +66,7 @@ enum fsdirmems {
 struct fsdir ;
 struct fsdir_opener {
 	fsdir		*op = nullptr ;
-	cchar		*name ;
+	cchar		*name = nullptr ;
 	void operator () (fsdir *p,cchar *n) noex {
 	    op = p ;
 	    name = n ;
@@ -98,7 +98,6 @@ struct fsdir : fsdir_head {
 	    audit(this,fsdirmem_audit) ;
 	    close(this,fsdirmem_close) ;
 	} ; /* end ctor */
-	fsdir() noex : fsdir(nullptr) { } ;
 	fsdir(const fsdir &) = delete ;
 	fsdir &operator = (const fsdir &) = delete ;
 	int read(ent *,char *,int) noex ;

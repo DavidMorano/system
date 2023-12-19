@@ -23,6 +23,7 @@
 
 #ifndef	CFCHARSX_INCLUDE
 #define	CFCHARSX_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -64,6 +65,7 @@ int cfcharsx(cchar *sp,int sl,int b,T *rp) noex {
 /* end subroutine-template (cfcharsx) */
 
 
+#endif	/* __cplusplus */
 #endif /* CFCHARSX_INCLUDE */
 
 

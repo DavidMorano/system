@@ -16,8 +16,6 @@
 
 #ifndef	VALUELIMITS_INCLUDE
 #define	VALUELIMITS_INCLUDE
-
-
 #ifdef	__cplusplus
 
 
@@ -54,9 +52,8 @@ struct valuelimits {
 	} ;
 } ; /* end subroutine (valuelimits) */
 
+
 #endif /* __cplusplus */
-
-
 #endif /* VALUELIMITS_INCLUDE */
 
 

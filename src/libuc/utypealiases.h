@@ -117,8 +117,8 @@
 #define	AIOCB		struct aiocb
 #endif
 
-#ifndef	IOVCEC
-#define	IOVCEC		struct iovec
+#ifndef	IOVEC
+#define	IOVEC		struct iovec
 #endif
 
 #ifndef	SOCKADDR
@@ -154,6 +154,10 @@
 #define	TIMEB		struct timeb
 #endif
 
+#ifndef	TM
+#define	TM		struct tm
+#endif
+
 #ifndef	TERMIOS
 #define	TERMIOS		struct termios
 #endif
@@ -182,18 +186,36 @@
 #define	MSQIDDS		struct msqid_ds		/* for SysV-IPC */
 #endif
 
+/* UTMPX */
+
+#ifndef	UTMPX
+#define	UTMPX		struct utmpx
+#endif
+
 /* constant versions of above */
 
 #ifndef	CSIGVAL
-#define	CSIGVAL		const union sigval	
+#define	CSIGVAL		const SIGVAL
+#endif
+
+#ifndef	CAIOCB
+#define	CAIOCB		const AIOCB
 #endif
 
 #ifndef	CTIMESPEC
-#define	CTIMESPEC	const struct timespec
+#define	CTIMESPEC	const TIMESPEC
+#endif
+
+#ifndef	CITIMERSPEC
+#define	CITIMERSPEC	const ITIMERSPEC
 #endif
 
 #ifndef	CSOCKADDR
-#define	CSOCKADDR	const struct sockaddr
+#define	CSOCKADDR	const SOCKADDR
+#endif
+
+#ifndef	CUTMPX
+#define	CUTMPX		const UTMPX
 #endif
 
 /* SYSDB account management structures */
@@ -276,6 +298,10 @@
 
 #ifndef	CSERVENT
 #define	CSERVENT	const struct servent
+#endif
+
+#ifndef	CADDRINFO
+#define	CADDRINFO	const struct addrinfo
 #endif
 
 

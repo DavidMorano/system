@@ -48,20 +48,28 @@ Y
 #endif
 
 #ifndef	forever
-#define	forever		for (;;)
+#define	forever			for (;;)
 #endif
 
 #ifndef	nelements
-#define	nelements(n)	(sizeof(n) / sizeof((n)[0]))
+#define	nelements(n)		(sizeof(n) / sizeof((n)[0]))
 #endif
 
 #ifndef	nelem
-#define	nelem(n)	(sizeof(n) / sizeof((n)[0]))
+#define	nelem(n)		(sizeof(n) / sizeof((n)[0]))
 #endif
 
+#ifdef	__cplusplus
 #ifndef	npack
-#define	npack(args)	sizeof...(args)
+#define	npack(args)		sizeof...(args)
 #endif
+#endif /* __cplusplus */
+
+#ifdef	__cplusplus
+#ifndef	typeof
+#define	typeof(expr)		decltype(expr)
+#endif
+#endif /* __cplusplus */
 
 
 #endif /* CLANGUAGE_INCLUDE */

@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	mkfdfnam
+	mkfdfname
 
 	Description:
 	This subroutine creates a string that represents a file
@@ -28,7 +28,7 @@
 	fd		is the decimal representation of the FD
 
 	Synopsis:
-	int mkfdfname(char *dbuf,int dlen,int fd)
+	int mkfdfname(char *dbuf,int dlen,int fd) noex
 
 	Arguments:
 	dbuf		destination buffer pointer
@@ -62,12 +62,12 @@
 
 /* forward references */
 
-static int getdlen(int) noex ;
+static int		getdlen(int) noex ;
 
 
 /* local variables */
 
-static bufsizevar		maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
 /* exported subroutines */
@@ -93,9 +93,12 @@ int mkfdfname(char *dbuf,int dlen,int fd) noex {
 /* local subroutines */
 
 static int getdlen(int dlen) noex {
-	int		rs = dlen ;
-	if (dlen < 0) {
-	    rs = maxpathlen ;
+	int		rs = SR_OK ;
+	if (dlen < 2) {
+	    rs = SR_INVALID ;
+	    if (dlen < 0) {
+	        rs = maxpathlen ;
+	    }
 	}
 	return rs ;
 }

@@ -16,6 +16,7 @@
 
 #ifndef	DIGBUFSIZES_INCLUDE
 #define	DIGBUFSIZES_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -135,6 +136,7 @@ struct digbufsizes {
 } ; /* end subroutine (digbufsizes) */
 
 
+#endif	/* __cplusplus */
 #endif /* DIGBUFSIZES_INCLUDE */
 
 

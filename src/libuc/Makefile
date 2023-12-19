@@ -196,12 +196,12 @@ OBJ086= sbuf.o sbuf_addquoted.o sbuf_termconseq.o
 OBJ087= hostinfo.o hostaddr.o hostent.o inetaddr.o sockaddress.o ucpwcache.o
 
 OBJ088= strsub.o
-OBJ089= strnsub.o strncasesub.o 
-OBJ090= strncpyxc.o
-OBJ091= strnkeycmp.o strnleadcmp.o strnncmp.o strnlen.o strnnlen.o
-OBJ092= strnxpbrk.o
-OBJ093= strnsetblanks.o strnset.o strnwcpy.o
-OBJ094=
+OBJ089=
+OBJ090=
+OBJ091=
+OBJ092=
+OBJ093=
+OBJ094= strnxcmp.o
 OBJ095= strdcpyx.o strdcpyxw.o
 
 OBJ096=
@@ -402,6 +402,15 @@ TOBJG0= $(TOBJA)
 TOBJ= $(TOBJG0) $(TOBJG1)
 
 
+UOBJ00= matstr.o nleadstr.o toxc.o char.o varnames.o rmx.o
+UOBJ01= strn.o sfx.o strnxcmp.o
+UOBJ02= strcpyxc.o
+UOBJ03= strwcpyxc.o strwcpyxx.o
+UOBJ04= ischarx.o
+
+UOBJ= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) $(UOBJ04)
+
+
 .SUFFIXES:		.ls .i .cx .cs
 
 
@@ -437,6 +446,9 @@ a:			$(T).a
 .cc.o:
 	$(CXX) -c $(CPPFLAGS) $(CCFLAGS) $<
 
+
+libuserhome.a:		$(UOBJ)
+	$(AR) -rc $@ $?
 
 $(TT).a:		$(TOBJ)
 	$(AR) -rc $@ $?
@@ -1090,8 +1102,6 @@ quoteshellarg.o:	quoteshellarg.c
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
 
-intsat.o:		intsat.c intsat.h
-
 tmtime.o:		tmtime.c tmtime.h
 
 getnodedomain.o:	getnodedomain.c
@@ -1100,14 +1110,6 @@ format.o:		format.cc format.h
 
 strshrink.o:		strshrink.c
  
-# strnwx
-strnwcpy.o:		strnwcpy.cc strn.h
-strncpyxc.o:		strncpyxc.cc strncpyxc.h
-
-# chracter-find
-strnxchr.o:		strnxchr.cc strnxchr.h strn.h
-strnxpbrk.o:		strnxpbrk.cc strn.h
-
 # digit-character management
 ndigits.o:		ndigits.c
 getdig.o:		getdig.cc getdig.h
@@ -1127,7 +1129,7 @@ ucprogdata.o:		ucprogdata.cc ucprogdata.h
 ucclustername.o:	ucclustername.c ucclustername.h
 ucpwcache.o:		ucpwcache.c ucpwcache.h recarr.h
 utmpacc.o:		utmpacc.cc utmpacc.h
-utmpaccent.o:		utmpaccent.c utmpaccent.h
+utmpaccent.o:		utmpaccent.cc utmpaccent.h
 tmpx.o:			tmpx.cc tmpx.h
 
 # part of string-to-integer interface
@@ -1189,26 +1191,39 @@ mkchar.o:		mkchar.c mkchar.h
 ischarx.o:		ischarx.cc ischarx.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
+# RMX
+OBJ_RMX= rmeol.o rmext.o rmchr.o
+
+rmx.o:			$(OBJ_RMX)
+	$(LD) -r -o $@ $(OBJ_RMX)
+
 rmeol.o:		rmeol.c rmx.h
 rmext.o:		rmext.c rmx.h
 rmchr.o:		rmchr.c rmx.h
 
+# STRW
+OBJ_STRW= strwcpyxc.o strwcpyxx.o
+
+strw.o:			$(OBJ_STRW)
+	$(LD) -r -o $@ $(OBJ_STRW)
+
+
 # system-auxillary-information
 ucsysauxinfo.o:		ucsysauxinfo.dir
 ucsysauxinfo.dir:
-	makebelow $@
+	makesubdir $@
 
 six.o:			six.dir
 six.dir:
-	makebelow $@
+	makesubdir $@
 
 sfx.o:			sfx.dir
 sfx.dir:
-	makebelow $@
+	makesubdir $@
 
 snwcpy.o:		snwcpy.dir
 snwcpy.dir:
-	makebelow $@
+	makesubdir $@
 
 # UCENT
 ucentpw.o:		ucentpw.cc ucentpw.h
@@ -1224,22 +1239,32 @@ ucentsv.o:		ucentsv.cc ucentsv.h
 # UCSYS
 ucsys.o:		ucsys.dir
 ucsys.dir:
-	makebelow $@
+	makesubdir $@
 
 # UCENT
 ucent.o:		ucent.dir
 ucent.dir:
-	makebelow $@
+	makesubdir $@
 
 # UCGET
 ucget.o:		ucget.dir
 ucget.dir:
-	makebelow $@
+	makesubdir $@
 
 # UCENUM
 ucenum.o:		ucenum.dir
 ucenum.dir:
-	makebelow $@
+	makesubdir $@
+
+# STRN
+strn.o:			strn.dir
+strn.dir:
+	makesubdir $@
+
+# STRNXCMP
+strnxcmp.o:		strnxcmp.dir
+strnxcmp.dir:
+	makesubdir $@
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1265,6 +1290,11 @@ umsg.o:			umsg.cc umsg.h
 ucmemla.o:		ucmemla.cc ucmemla.h
 
 
+# PATH
+pathadd.o:		pathadd.cc pathadd.h
+pathclean.o:		pathclean.cc pathclean.h
+
+
 nodedb.o:		nodedb.cc nodedb.h
 bits.o:			bits.cc bits.h
 envs.o:			envs.cc envs.h
@@ -1282,6 +1312,9 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 
 # UTILITY
+intsat.o:		intsat.cc intsat.h
+intfloor.o:		intfloor.cc intfloor.h
+intceil.o:		intceil.cc intceil.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h

@@ -54,7 +54,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 /* exported subroutines */
 
-int outbuf_start(OUTBUF *oop,char *obuf,int olen) noex {
+int outbuf_start(outbuf *oop,char *obuf,int olen) noex {
 	int		rs = SR_FAULT ;
 	if (oop && obuf) {
 	    rs = SR_INVALID ;
@@ -75,7 +75,7 @@ int outbuf_start(OUTBUF *oop,char *obuf,int olen) noex {
 }
 /* end subroutine (outbuf_start) */
 
-int outbuf_finish(OUTBUF *oop) noex {
+int outbuf_finish(outbuf *oop) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (oop) {
@@ -91,7 +91,7 @@ int outbuf_finish(OUTBUF *oop) noex {
 }
 /* end subroutine (outbuf_finish) */
 
-int outbuf_get(OUTBUF *oop,char **onpp) noex {
+int outbuf_get(outbuf *oop,char **onpp) noex {
 	int		rs = SR_FAULT ;
 	if (oop && onpp) {
 	    rs = SR_OK ;
@@ -99,11 +99,11 @@ int outbuf_get(OUTBUF *oop,char **onpp) noex {
 	        oop->obuf[0] = '\0' ;
 	        *onpp = oop->obuf ;
 	    } else {
-	        if (oop->obuf) {
+	        if (oop->obuf == nullptr) {
 		    cint	size = (oop->olen+1) ;
-	            char	*p ;
-	            if ((rs = uc_valloc(size,&p)) >= 0) {
-	                oop->obuf = p ;
+	            char	*vp{} ;
+	            if ((rs = uc_valloc(size,&vp)) >= 0) {
+	                oop->obuf = vp ;
 	                oop->f_alloc = true ;
 	                oop->obuf[0] = '\0' ;
 	                *onpp = oop->obuf ;

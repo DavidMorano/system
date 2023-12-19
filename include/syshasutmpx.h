@@ -1,7 +1,7 @@
 /* syshasutmp INCLUDE */
 /* lang=C20 */
 
-/* System-Has-UTMP X */
+/* System-Has-UTMPX */
 /* version %I% last-modified %G% */
 
 

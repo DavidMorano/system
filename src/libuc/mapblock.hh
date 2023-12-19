@@ -17,6 +17,7 @@
 
 #ifndef	MAPBLOCK_INCLUDE
 #define	MAPBLOCK_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -139,6 +140,7 @@ int mapblock<K,Block>::finish() noex {
 }
 
 
+#endif	/* __cplusplus */
 #endif /* MAPBLOCK_INCLUDE */
 
 

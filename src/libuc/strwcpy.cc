@@ -32,6 +32,11 @@
 /* local subroutine-templates */
 
 
+/* exported variables */
+
+int strwcpy_nosymbols ;
+
+
 /* exported subroutines */
 
 

@@ -31,6 +31,7 @@
 
 #ifndef	CONSTDIV_INCLUDE
 #define	CONSTDIV_INCLUDE
+#ifdef	__cplusplus /* everything is C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -88,6 +89,7 @@ struct constdiv {
 } ; /* end subroutine (constdiv) */
 
 
+#endif	/* __cplusplus */
 #endif /* CONSTDIV_INCLUDE */
 
 

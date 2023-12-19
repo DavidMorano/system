@@ -1,7 +1,7 @@
 HAVEPROGRAM
 
-This tiny program just determines if the name given as the first argument is a
-valid user on the current system or not.
+This tiny program just determines if the name given as the first
+argument is a valid executable program on the current system or not.
 
 Synopsis:
 $ haveprogram <progname(s)>

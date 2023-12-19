@@ -4,8 +4,6 @@
 /* random number generation object */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		1		/* safety */
-#define	CF_SAFE2	0		/* safety (level-2) */
 
 /* revision history:
 

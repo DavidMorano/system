@@ -25,9 +25,8 @@
 
 #ifndef	TIMECOUNT_INCLUDE
 #define	TIMECOUNT_INCLUDE
-
-
 #ifdef	__cplusplus
+
 
 #include	<envstandards.h>
 #include	<utypedefs.h>
@@ -61,9 +60,8 @@ public:
 	} ; /* end method (operator) */
 } ; /* end class (timecount) */
 
+
 #endif /* __cplusplus */
-
-
 #endif /* TIMECOUNT_INCLUDE */
 
 

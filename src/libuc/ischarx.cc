@@ -1,4 +1,4 @@
-/* ismisx */
+/* ischarx */
 /* lang=C++20 */
 
 /* test a character for a property */
@@ -224,7 +224,7 @@ constexpr void ischarinfo::mkisalpha() noex {
 	isalpha.set(UC('×'),false) ;
 	isalpha.set(UC('÷'),false) ;
 }
-/* end method (charinfo::mkisalpha) */
+/* end method (ischarinfo::mkisalpha) */
 
 constexpr void ischarinfo::mkisalnum() noex {
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
@@ -240,7 +240,7 @@ constexpr void ischarinfo::mkisalnum() noex {
 	isalnum.set(UC('×'),false) ;
 	isalnum.set(UC('÷'),false) ;
 }
-/* end method (charinfo::mkisalnum) */
+/* end method (ischarinfo::mkisalnum) */
 
 constexpr void ischarinfo::mkishex() noex {
 	for (int ch = '0' ; ch <= '9' ; ch += 1) {
@@ -251,7 +251,7 @@ constexpr void ischarinfo::mkishex() noex {
 	    ishex.set((ch+0x20),true) ;
 	}
 }
-/* end method (charinfo::mkishex) */
+/* end method (ischarinfo::mkishex) */
 
 
 /* local variables */

@@ -116,7 +116,7 @@ namespace {
 	uint		running_disper:1 ;
     } ;
     struct uctimeout {
-	ptm		m ;		/* data mutex */
+	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
 	vechand		ents ;
 	ciq		pass ;
@@ -271,28 +271,32 @@ int uctimeout::init() noex {
 	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    if (! finit.testandset) {
-	        if ((rs = m.create) >= 0) {
+	        if ((rs = mx.create) >= 0) {
 	            if ((rs = cv.create) >= 0) {
-	                void	(*b)() = uctimeout_atforkbefore ;
-	                void	(*ap)() = uctimeout_atforkparent ;
-	                void	(*ac)() = uctimeout_atforkchild ;
+	                void_f	b = uctimeout_atforkbefore ;
+	                void_f	ap = uctimeout_atforkparent ;
+	                void_f	ac = uctimeout_atforkchild ;
 	                if ((rs = uc_atfork(b,ap,ac)) >= 0) {
 	                    if ((rs = uc_atexit(uctimeout_exit)) >= 0) {
 	                        finitdone = true ;
 	                        pid = getpid() ;
 	                        f = true ;
 	                    }
-	                    if (rs < 0)
+	                    if (rs < 0) {
 	                        uc_atforkexpunge(b,ap,ac) ;
+			    }
 	                } /* end if (uc_atfork) */
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    cv.destroy() ;
-	            } /* end if (ptc_create) */
-	            if (rs < 0)
-	                m.destroy() ;
-	        } /* end if (ptm_create) */
-	        if (rs < 0)
+			}
+	            } /* end if (ptc::create) */
+	            if (rs < 0) {
+	                mx.destroy() ;
+		    }
+	        } /* end if (ptm::create) */
+	        if (rs < 0) {
 	            finit = false ;
+		}
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
@@ -321,9 +325,9 @@ int uctimeout::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void	(*b)() = uctimeout_atforkbefore ;
-	        void	(*ap)() = uctimeout_atforkparent ;
-	        void	(*ac)() = uctimeout_atforkchild ;
+	        void_f	b = uctimeout_atforkbefore ;
+	        void_f	ap = uctimeout_atforkparent ;
+	        void_f	ac = uctimeout_atforkchild ;
 	        rs1 = uc_atforkexpunge(b,ap,ac) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -332,7 +336,7 @@ int uctimeout::fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = m.destroy ;
+	        rs1 = mx.destroy ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    finit = false ;
@@ -349,7 +353,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	    TIMEOUT	*ep ;
 	    cint	esize = sizeof(TIMEOUT) ;
 	    if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
-	        if ((rs = m.lockbegin) >= 0) {
+	        if ((rs = mx.lockbegin) >= 0) {
 	            vechand	*elp = &ents ;
 	            if ((rs = vechand_add(elp,ep)) >= 0) {
 	                cint	ei = rs ;
@@ -361,11 +365,12 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 	                if (rs < 0)
 	                    vechand_del(elp,ei) ;
 	            } /* end if (vechand_add) */
-	            rs1 = m.lockend ;
+	            rs1 = mx.lockend ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ptm) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uc_libfree(ep) ;
+		}
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;
@@ -375,7 +380,7 @@ int uctimeout::cmdset(TIMEOUT *valp) noex {
 int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = m.lockbegin) >= 0) {
+	if ((rs = mx.lockbegin) >= 0) {
 	    vechand	*elp = &ents ;
 	    cint	id = valp->id ;
 	    void	*vp ;
@@ -388,8 +393,8 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 	            if ((rs = vecsorthand_delhand(pqp,ep)) >= 0) {
 			f_free = true ;
 		    } else if (rs == nrs) {
-	                ciq		*cqp = &pass ;
-	                if ((rs = ciq_remhand(cqp,ep)) >= 0) {
+	                ciq	*cqp = &pass ;
+	                if ((rs = ciq_rement(cqp,ep)) >= 0) {
 			    f_free = true ;
 			} else if (rs == nrs) {
 	                    rs = SR_OK ;
@@ -400,7 +405,7 @@ int uctimeout::cmdcancel(TIMEOUT *valp) noex {
 		    }
 	        } /* end if (vechand_del) */
 	    } /* end if (vechand_get) */
-	    rs1 = m.lockend ;
+	    rs1 = mx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -454,16 +459,16 @@ int uctimeout::timerset(time_t val) noex {
 int uctimeout::capbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = m.lockbegin(to)) >= 0) {
+	if ((rs = mx.lockbegin(to)) >= 0) {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
-	        rs = cv.waiter(&m,to) ;
+	        rs = cv.wait(&mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcapture = true ;
 	    }
 	    waiters -= 1 ;
-	    rs1 = m.lockend ;
+	    rs1 = mx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -473,12 +478,12 @@ int uctimeout::capbegin(int to) noex {
 int uctimeout::capend() noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = m.lockbegin) >= 0) {
+	if ((rs = mx.lockbegin) >= 0) {
 	    fcapture = false ;
 	    if (waiters > 0) {
 	        rs = cv.signal ;
 	    }
-	    rs1 = m.lockend ;
+	    rs1 = mx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
 	return rs ;
@@ -867,7 +872,7 @@ int uctimeout::sigerserve() noex {
 	            if ((rs = vecsorthand_del(pqp,ei)) >= 0) {
 	                if ((rs = ciq_ins(&pass,tep)) >= 0) {
 	                    fcmd = true ;
-	                    rs = ptc_signal(&cv) ;
+	                    rs = cv.signal ;
 	                }
 	            }
 	        }
@@ -953,16 +958,16 @@ int uctimeout::disprecv() noex {
 	int		rs1 ;
 	int		to = TO_DISPRECV ;
 	int		cmd = dispcmd_exit ;
-	if ((rs = ptm_lockto(&m,-1)) >= 0) {
+	if ((rs = mx.lockbegin) >= 0) {
 	    waiters += 1 ;
 	    while ((rs >= 0) && (! fcmd)) {
-	        rs = ptc_waiter(&cv,&m,to) ;
+	        rs = cv.wait(&mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcmd = false ;
 	        if (! freqexit) cmd = dispcmd_handle ;
 	        if (waiters > 1) {
-	            rs = ptc_signal(&cv) ;
+	            rs = cv.signal ;
 	        }
 	    } else if (rs == SR_TIMEDOUT) {
 	        if (! freqexit) cmd = dispcmd_timeout ;
@@ -971,7 +976,7 @@ int uctimeout::disprecv() noex {
 	        cmd = dispcmd_exit ;
 	    }
 	    waiters -= 1 ;
-	    rs1 = ptm_unlock(&m) ;
+	    rs1 = mx.lockend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mutex-section) */
 	return (rs >= 0) ? cmd : rs ;
@@ -1022,12 +1027,12 @@ static int uctimeout_dispworker(uctimeout *uip) noex {
 }
 
 static void uctimeout_atforkbefore() noex {
-	uctimeout_data.m.lockbegin() ;
+	uctimeout_data.mx.lockbegin() ;
 }
 /* end subroutine (uctimeout_atforkbefore) */
 
 static void uctimeout_atforkparent() noex {
-	uctimeout_data.m.lockend() ;
+	uctimeout_data.mx.lockend() ;
 }
 /* end subroutine (uctimeout_atforkparent) */
 
