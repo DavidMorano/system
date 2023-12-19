@@ -154,6 +154,10 @@
 #define	TIMEB		struct timeb
 #endif
 
+#ifndef	TM
+#define	TM		struct tm
+#endif
+
 #ifndef	TERMIOS
 #define	TERMIOS		struct termios
 #endif
