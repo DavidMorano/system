@@ -100,6 +100,7 @@ static inline int dirlist_ctor(dirlist *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
+	    op->tlen = 0 ;
 	    if ((op->dbp = new(nothrow) vecobj) != nullptr) {
 		rs = SR_OK ;
 	    }
@@ -148,15 +149,16 @@ constexpr bool		f_nulpath = CF_NULPATH ;
 /* exported subroutines */
 
 int dirlist_start(dirlist *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
+	int		rs ;
+	if ((rs = dirlist_ctor(op)) >= 0) {
 	    cint	esize = sizeof(ent) ;
-	    cint	n = DIRLIST_NDEF ;
+	    cint	ne = DIRLIST_NDEF ;
 	    cint	vo = VECOBJ_OORDERED ;
-	    rs = SR_OK ;
-	    memset(op,0,sizeof(DIRLIST)) ;
-	    if ((rs = vecobj_start(op->dbp,esize,n,vo)) >= 0) {
+	    if ((rs = vecobj_start(op->dbp,esize,ne,vo)) >= 0) {
 	        op->magic = DIRLIST_MAGIC ;
+	    }
+	    if (rs < 0) {
+		dirlist_dtor(op) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -245,27 +247,27 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	    char	*pbuf{} ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = malloc_mp(&pbuf)) >= 0) {
-	        int	plen = rs ;
+	        int	pl{} ;
 	        if ((sl == 0) || ((sl == 1) && (sp[0] == '.'))) {
 	            pbuf[0] = '.' ;
 	            pbuf[1] = '\0' ;
-	            plen = 1 ;
+	            pl = 1 ;
 	        } else {
 	            rs = pathclean(pbuf,sp,sl) ;
-	            plen = rs ;
+	            pl = rs ;
 	        }
 	        if (rs >= 0) {
 	            ent		e ;
 	            cint	rsn = SR_NOTFOUND ;
 /* any NUL (blank) paths need to be converted to "." */
-	            if (plen == 0) {
+	            if (pl == 0) {
 	                pbuf[0] = '.' ;
 	                pbuf[1] = '\0' ;
-	                plen = 1 ;
+	                pl = 1 ;
 	            }
 /* now see if it is already in the list by NAME */
 	            e.np = pbuf ;
-	            e.nl = plen ;
+	            e.nl = pl ;
 	            vecobj_vcmp	vcf = vecobj_vcmp(vcmpname) ;
 	            void	*vp{} ;
 	            if ((rs = vecobj_search(op->dbp,&e,vcf,&vp)) == rsn) {
@@ -282,7 +284,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	                            dev_t	d = sb.st_dev ;
 	                            uino_t	i = sb.st_ino ;
 	                            f_added = true ;
-	                            if ((rs = es(&e,pbuf,plen,d,i)) >= 0) {
+	                            if ((rs = es(&e,pbuf,pl,d,i)) >= 0) {
 	                                op->tlen += (rs+1) ;
 	                                rs = vecobj_add(op->dbp,&e) ;
 	                                if (rs < 0) {
