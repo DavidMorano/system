@@ -54,16 +54,17 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h sysauxinfonames.h
 
 
-OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o sfbreak.o sfcasesub.o
+OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o sfbreak.o
 OBJ1_SFX= sfcenter.o sfcookkey.o sfdequote.o sfdirname.o
-OBJ2_SFX= sfkey.o sflast.o sfmisc.o sfnamecomp.o sfprogroot.o 
-OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o
-OBJ4_SFX= sfsubstance.o sfthing.o sfwhitedot.o sfword.o
+OBJ2_SFX= sfkey.o sflast.o sfnamecomp.o sfprogroot.o 
+OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o sfcasesub.o
+OBJ4_SFX= sfsubstance.o sfthing.o sfwhitedot.o sfword.o sfprogname.o
+OBJ5_SFX= sfnext.o
 
 
 OBJA_SFX= obj0_sfx.o obj1_sfx.o
 OBJB_SFX= obj2_sfx.o obj3_sfx.o
-OBJC_SFX= obj4_sfx.o
+OBJC_SFX= obj4_sfx.o obj5_sfx.o
 
 OBJ_SFX= $(OBJA_SFX) $(OBJB_SFX) $(OBJC_SFX)
 

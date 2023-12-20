@@ -60,7 +60,7 @@
 /* exported subroutines */
 
 int sialpha(cchar *sp,int sl) noex {
-	int		i ;
+	int		i = 0 ;
 	bool		f = false ;
 	for (i = 0 ; sl && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
