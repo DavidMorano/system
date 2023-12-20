@@ -34,6 +34,7 @@
 #include	<unistd.h>
 #include	<climits>
 #include	<cstdlib>
+#include	<cstdio>
 #include	<cstring>
 #include	<string>
 #include	<iostream>
@@ -53,6 +54,7 @@
 /* local namespaces */
 
 using std::cout ;
+using std::cerr ;
 using std::clog ;
 using std::string ;
 
@@ -222,14 +224,14 @@ int userinfo::findutmp(uid_t) noex {
 	    } /* end if (match) */
 	    if (rs != 0) break ;
 	} /* end while */
-	if (rs > 0) {
+	if ((rs > 0) && un) {
 	    PASSWD	*pwp ;
 	    char	ubuf[rs+1] ;
 	    strwcpy(ubuf,un,rs) ;
 	    if ((pwp = getpwnam(ubuf)) != nullptr) {
 		us = ubuf ;
 		un = us.c_str() ;
-		uh = pwp->pw_name ;
+		uh = pwp->pw_dir ;
 	    } else {
 		rs = 0 ;
 	    }

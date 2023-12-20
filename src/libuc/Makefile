@@ -403,12 +403,13 @@ TOBJ= $(TOBJG0) $(TOBJG1)
 
 
 UOBJ00= matstr.o nleadstr.o toxc.o char.o varnames.o rmx.o
-UOBJ01= strn.o sfx.o strnxcmp.o
+UOBJ01= strn.o strnxcmp.o sfx.o six.o 
 UOBJ02= strcpyxc.o
 UOBJ03= strwcpyxc.o strwcpyxx.o
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
+OBJ005= nleadstr.o nleadkeystr.o
 
-UOBJ= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) $(UOBJ04)
+UOBJ= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) $(UOBJ04) $(UOBJ05)
 
 
 .SUFFIXES:		.ls .i .cx .cs
