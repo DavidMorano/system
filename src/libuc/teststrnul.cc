@@ -25,7 +25,7 @@ typedef std::string_view	strview ;
 typedef const char		cchar ;
 typedef const char *const 	*mainv ;
 
-int main(int argc,mainv,mainv) {
+int main(int,mainv,mainv) {
 	int		ex = 0 ;
 	constexpr cchar	sp1[] = "Hello world!" ;
 	constexpr cchar	sp2[] = "Muck raker!" ;
@@ -33,17 +33,17 @@ int main(int argc,mainv,mainv) {
 	    strnul	s(sp1,11) ;
 	    cchar	*rp ;
 	    rp = s ;
-	    cout << rp << '\n' ;
+	    cout << rp << eol ;
 	    s(sp2,7) ;
 	    rp = s ;
-	    cout << rp << '\n' ;
+	    cout << rp << eol ;
 	    rp = s(sp1,3) ;
-	    cout << rp << '\n' ;
-	    cout << s(sp1,9) << '\n' ;
-	    cout << s(sp2,8) << '\n' ;
+	    cout << rp << eol ;
+	    cout << s(sp1,9) << eol ;
+	    cout << s(sp2,8) << eol ;
 	    {
 		strview	sv(sp2,10) ;
-	        cout << sv << '\n' ;
+	        cout << sv << eol ;
 	    }
 	}
 	return ex ;
