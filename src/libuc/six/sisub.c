@@ -45,6 +45,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
+#include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -57,8 +58,6 @@
 
 
 /* external subroutines */
-
-extern int	nleadstr(cchar *,cchar *,int) noex ;
 
 
 /* exported subroutines */
