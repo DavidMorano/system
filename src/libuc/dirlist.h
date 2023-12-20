@@ -37,8 +37,8 @@ struct dirlist_c {
 } ;
 
 struct dirlist_head {
+	vecobj		*dbp ;
 	uint		magic ;
-	vecobj		db ;
 	int		tlen ;
 } ;
 

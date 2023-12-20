@@ -31,8 +31,7 @@
 	fl		file-name length
 
 	Returns:
-	==0		does not have an approved extension
-	>0		has an approved extension (and this is base-str length)
+	>=0		string-lengh w/o extension
 
 *******************************************************************************/
 

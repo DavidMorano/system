@@ -348,14 +348,13 @@ bool hasdig(cchar *sp,int sl) noex {
 bool hasempty(cchar *sp,int sl) noex {
 	bool		f = true ;
 	while (sl && *sp) {
-	    cint	ch = mkchar(*sp) ;
-	    f = CHAR_ISWHITE(ch) ;
+	    f = CHAR_ISWHITE(*sp) ;
 	    if (! f) break ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	} /* end while */
 	if ((!f) && *sp) {
-	    f = hasallchr(sp,sl,'\n') ;
+	    f = (*sp == '\n') ;
 	} /* end if */
 	return f ;
 }
