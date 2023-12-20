@@ -60,7 +60,6 @@
 	required machine instructions) this present implemtnation
 	is adequate.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

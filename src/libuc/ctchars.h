@@ -17,6 +17,7 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<localmisc.h>

@@ -1,5 +1,5 @@
 /* strnul INCLUDE */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* assert a NUL-terminated string */
 /* version %I% last-modified %G% */
@@ -16,6 +16,7 @@
 
 #ifndef	STRNUL_INCLUDE
 #define	STRNUL_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -76,6 +77,7 @@ struct strnul {
 } ; /* end struct (strnul) */
 
 
+#endif /* __cplusplus */
 #endif /* STRNUL_INCLUDE */
 
 

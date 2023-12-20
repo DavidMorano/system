@@ -32,6 +32,7 @@ int main(int,mainv,mainv) {
 	{
 	    strnul	s(sp1,11) ;
 	    cchar	*rp ;
+	    cout << sp1 << eol ;
 	    rp = s ;
 	    cout << rp << eol ;
 	    s(sp2,7) ;
@@ -40,6 +41,7 @@ int main(int,mainv,mainv) {
 	    rp = s(sp1,3) ;
 	    cout << rp << eol ;
 	    cout << s(sp1,9) << eol ;
+	    cout << sp2 << eol ;
 	    cout << s(sp2,8) << eol ;
 	    {
 		strview	sv(sp2,10) ;
