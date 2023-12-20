@@ -25,19 +25,21 @@
 #include	<localmisc.h>
 
 
-#define	SILETTER	struct siletter
+#define	SILETTER	struct siletter_result 
 
 
-struct siletter {
+struct siletter_result {
 	cchar		*lp ;
 	int		ll ;
 } ;
+
+typedef SILETTER	siletter_res ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int	siletter(SILETTER *,cchar *,int) noex ;
+extern int	siletter(siletter_res *,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }

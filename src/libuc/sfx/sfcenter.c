@@ -44,6 +44,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sfx.h"
@@ -74,10 +75,10 @@ int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	cchar		*cp = NULL ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl >= 2) {
-	    int	sch = MKCHAR(ss[0]) ;
+	    int		sch = mkchar(ss[0]) ;
 	    cchar	*tp ;
 	    if ((tp = strnchr(sp,sl,sch)) != NULL) {
-	        sch = MKCHAR(ss[1]) ;
+	        sch = mkchar(ss[1]) ;
 		cp = (tp+1) ;
 	        sl -= ((tp+1)-sp) ;
 	        sp = (tp+1) ;

@@ -54,10 +54,10 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h sysauxinfonames.h
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o sicasechr.o
-OBJ1_SIX= sicasesub.o sichr.o sicite.o sidigit.o sidquote.o
+OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
+OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
 OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o siterm.o
+OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
 
 
 OBJA_SIX= obj0_six.o obj1_six.o

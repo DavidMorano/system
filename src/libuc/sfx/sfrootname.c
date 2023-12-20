@@ -33,6 +33,10 @@
 	Returns:
 	-		length of found string
 
+	Examples:
+	source c-string:	/usr/add-on/pcs/bin/pcsv
+	root-name is:		pcs
+
 *******************************************************************************/
 
 #include	<envstandards.h>

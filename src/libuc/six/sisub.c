@@ -1,7 +1,7 @@
 /* sisub */
 /* lang=C20 */
 
-/* match a substring within a larger string */
+/* find the string-index of a sub-stringin the given c-string */
 /* version %I% last-modified %G% */
 
 

@@ -1,7 +1,7 @@
 UTMP
 
-This little program is used to login or logout out without actually logging in
-or logging out.
+This little program is used to log-in or log-out without actually
+logging in or logging out.
 
 Synopsis:
 $ utmp [-y|-n] [-h <hostname>] [<searchline>] [-z] [-V]

@@ -297,6 +297,18 @@ static int twochars(char *,cchar *,int) noex ;
 
 /* exported subroutines */
 
+bool haswhite(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    f = CHAR_ISWHITE(*sp) ;
+	    if (f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (haswhite) */
+
 bool haslc(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while (sl && *sp) {
@@ -321,11 +333,30 @@ bool hasuc(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasuc) */
 
+bool hasdig(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    f = CHAR_ISDIG(*sp) ;
+	    if (f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasdig) */
+
 bool hasempty(cchar *sp,int sl) noex {
 	bool		f = true ;
-	if (sp) {
-	    f = hasallwhite(sp,sl) ;
-	}
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = CHAR_ISWHITE(ch) ;
+	    if (! f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	if ((!f) && *sp) {
+	    f = hasallchr(sp,sl,'\n') ;
+	} /* end if */
 	return f ;
 }
 /* end subroutine (hasempty) */
@@ -377,18 +408,6 @@ bool hasnum(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasnum) */
 
-bool haswhite(cchar *sp,int sl) noex {
-	bool		f = false ;
-	while (sl && *sp) {
-	    f = CHAR_ISWHITE(*sp) ;
-	    if (f) break ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	return f ;
-}
-/* end subroutine (haswhite) */
-
 bool hasdoublewhite(cchar *sp,int sl) noex {
 	bool		f_prev = false ;
 	bool		f = false ;
@@ -416,13 +435,13 @@ bool hasnonwhite(cchar *sp,int sl) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	}
+	} /* end if (non-null) */
 	return f ;
 }
 /* end subroutine (hasnonwhite) */
 
 bool hascontent(cchar *sp,int sl) noex {
-	return hasnonwhite(sp,sl) ;
+	return hasnotempty(sp,sl) ;
 }
 /* end subroutine (hascontent) */
 
@@ -491,20 +510,19 @@ bool hasallalnum(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasallalnum) */
 
-bool hasalldig(cchar *sp,int sl) noex {
-	bool		f = false ;
+bool hasallwhite(cchar *sp,int sl) noex {
+	bool		f = true ;
 	while (sl && *sp) {
-	    cint	ch = mkchar(*sp) ;
-	    f = isdigitlatin(ch) ;
+	    f = CHAR_ISWHITE(*sp) ;
 	    if (! f) break ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	} /* end while */
 	return f ;
 }
-/* end subroutine (hasalldig) */
+/* end subroutine (hasallwhite) */
 
-bool haslllc(cchar *sp,int sl) noex {
+bool hasalllc(cchar *sp,int sl) noex {
 	bool		f = true ;
 	while (sl && *sp) {
 	    f = CHAR_ISLC(*sp) ;
@@ -514,7 +532,7 @@ bool haslllc(cchar *sp,int sl) noex {
 	} /* end while */
 	return f ;
 }
-/* end subroutine (haslllc) */
+/* end subroutine (hasalllc) */
 
 bool hasalluc(cchar *sp,int sl) noex {
 	bool		f = true ;
@@ -527,6 +545,19 @@ bool hasalluc(cchar *sp,int sl) noex {
 	return f ;
 }
 /* end subroutine (hasalluc) */
+
+bool hasalldig(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = isdigitlatin(ch) ;
+	    if (! f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasalldig) */
 
 bool hasallminus(cchar *sp,int sl) noex {
 	bool		f = false ;
@@ -548,18 +579,6 @@ bool hasallplusminus(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasallplusminus) */
 
-bool hasallwhite(cchar *sp,int sl) noex {
-	bool		f = true ;
-	while (sl && *sp) {
-	    f = CHAR_ISWHITE(*sp) ;
-	    if (! f) break ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	} /* end while */
-	return f ;
-}
-/* end subroutine (hasallwhite) */
-
 bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
 	if ((b >= 2) && (b <= maxbase)) {
@@ -577,6 +596,19 @@ bool hasallbase(cchar *sp,int sl,int b) noex {
 }
 /* end subroutine (hasallbase) */
 
+bool hasallchr(cchar *sp,int sl,int sch) noex {
+	bool		f = true ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = (ch == sch) ;
+	    if (!f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasallchr) */
+
 bool hasvarpathprefix(cchar *sp,int sl) noex {
 	bool		f = false ;
 	if (sp) {
@@ -587,7 +619,7 @@ bool hasvarpathprefix(cchar *sp,int sl) noex {
 	        f = f && ((sl < 0) || (sl > 1)) ;
 		f = f && (sp[0] == '/') && (sp[1] == ec) ;
 	    }
-	}
+	} /* end if (non-null) */
 	return f ;
 }
 /* end subroutine (hasvarpathprefix) */
@@ -628,7 +660,7 @@ bool hasvalidmagic(char *tbuf,int tlen,char *ms) noex {
 }
 /* end subroutine (hasvalidmagic) */
 
-bool hasnotdots(const char *np,int nl) noex {
+bool hasnotdots(cchar *np,int nl) noex {
 	bool		f = true ;
 	if (np[0] == '.') {
 	    if (nl < 0) nl = strlen(np) ;
@@ -651,6 +683,19 @@ bool hasnotdots(const char *np,int nl) noex {
 	return f ;
 }
 /* end subroutine (hasnotdots) */
+
+bool hasnotempty(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = ((!CHAR_ISWHITE(ch)) && (ch != CH_NL)) ;
+	    if (f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasnotempty) */
 
 
 /* local subroutines */

@@ -45,7 +45,10 @@ typedef cchar	*charp ;
 static int	liner(int,size_t) noex ;
 
 
-/* local constants */
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

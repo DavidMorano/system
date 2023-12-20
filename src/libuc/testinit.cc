@@ -10,11 +10,15 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#include	<iostream>
+#include	<cstdlib>
 #include	<cstdio>
+#include	<iostream>
 
 
 using std::cout ;
+
+typedef const char		cchar ;
+typedef const char *const 	*mainv ;
 
 struct multi {
 	int	a ;
@@ -38,7 +42,11 @@ int main(int argc,const char **argv,const char **envv) {
 	int		ex = 0 ;
 	if ((rs = srs) >= 0) {
 	    printf("aa.a=%08x aa.b=%08x\n",aa.a,aa.b) ;
-	}
+	    {
+		cchar	*pn = getprogname() ;
+		cout << "pn=" << pn << '\n' ; 
+	    } /* end block */
+	} /* end if */
 	if (rs < 0) ex = 1 ;
 	return ex ;
 }

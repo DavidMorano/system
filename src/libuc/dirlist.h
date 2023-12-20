@@ -1,12 +1,15 @@
 /* dirlist INCLUDE */
 /* lang=C20 */
 
+/* directory list manager */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
 	= 2000-09-10, David A­D­ Morano
 	I created this modeled after something similar that was
-	used for some of my PCS programs.
+	used for some of my PCS programs ('bbnews' I think).
 
 */
 
@@ -35,27 +38,30 @@ struct dirlist_c {
 
 struct dirlist_head {
 	uint		magic ;
-	VECOBJ		db ;
+	vecobj		db ;
 	int		tlen ;
 } ;
+
+typedef DIRLIST		dirlist ;
+typedef DIRLIST_CUR	dirlist_cur ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int dirlist_start(DIRLIST *) noex ;
-extern int dirlist_semi(DIRLIST *) noex ;
-extern int dirlist_adds(DIRLIST *,cchar *,int) noex ;
-extern int dirlist_add(DIRLIST *,cchar *,int) noex ;
-extern int dirlist_strsize(DIRLIST *) noex ;
-extern int dirlist_curbegin(DIRLIST *,DIRLIST_CUR *) noex ;
-extern int dirlist_curend(DIRLIST *,DIRLIST_CUR *) noex ;
-extern int dirlist_enum(DIRLIST *,DIRLIST_CUR *,char *,int) noex ;
-extern int dirlist_get(DIRLIST *,DIRLIST_CUR *,cchar **) noex ;
-extern int dirlist_join(DIRLIST *) noex ;
-extern int dirlist_joinsize(DIRLIST *) noex ;
-extern int dirlist_joinmk(DIRLIST *,char *,int) noex ;
-extern int dirlist_finish(DIRLIST *) noex ;
+extern int dirlist_start(dirlist *) noex ;
+extern int dirlist_semi(dirlist *) noex ;
+extern int dirlist_adds(dirlist *,cchar *,int) noex ;
+extern int dirlist_add(dirlist *,cchar *,int) noex ;
+extern int dirlist_strsize(dirlist *) noex ;
+extern int dirlist_curbegin(dirlist *,dirlist_cur *) noex ;
+extern int dirlist_curend(dirlist *,dirlist_cur *) noex ;
+extern int dirlist_enum(dirlist *,dirlist_cur *,char *,int) noex ;
+extern int dirlist_get(dirlist *,dirlist_cur *,cchar **) noex ;
+extern int dirlist_join(dirlist *) noex ;
+extern int dirlist_joinsize(dirlist *) noex ;
+extern int dirlist_joinmk(dirlist *,char *,int) noex ;
+extern int dirlist_finish(dirlist *) noex ;
 
 #ifdef	__cplusplus
 }

@@ -191,7 +191,7 @@ OBJ081= vechand.o vecsorthand.o vecobj.o vecelem.o recarr.o
 OBJ082= envlist.o hdb.o lookaside.o ids.o linefold.o nulstr.o 
 OBJ083= dirseen.o dirseen_not.o
 OBJ084= strpack.o strmgr.o strtab.o
-OBJ085= varray.o dirlist.o randomvar.o sigign.o ucsem.o
+OBJ085= varray.o randomvar.o sigign.o ucsem.o
 OBJ086= sbuf.o sbuf_addquoted.o sbuf_termconseq.o
 OBJ087= hostinfo.o hostaddr.o hostent.o inetaddr.o sockaddress.o ucpwcache.o
 
@@ -937,10 +937,9 @@ csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
 
-dirlist.o:		dirlist.c dirlist.h
+dirlist.o:		dirlist.cc dirlist.h
 
 dirseen.o:		dirseen.c dirseen.h
-
 dirseen_not.o:		dirseen_not.c dirseen.h
 
 randomvar.o:		randomvar.cc randomvar.h

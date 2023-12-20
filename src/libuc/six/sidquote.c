@@ -54,7 +54,7 @@
 
 /* exported subroutines */
 
-int sidquote(const char *sp,int sl) noex {
+int sidquote(cchar *sp,int sl) noex {
 	int		i ;
 	bool		f_skip = false ;
 	bool		f_done = false ;

@@ -1,7 +1,7 @@
-/* sialpha */
+/* sichr */
 /* lang=C20 */
 
-/* subroutine to find the index of an alpha character in a given string */
+/* subroutine to find the index of a character in a given string */
 /* version %I% last-modified %G% */
 
 
@@ -17,20 +17,22 @@
 /*******************************************************************************
 
 	Name:
-	sialpha
+	sichr
+	sirchr
 
 	Description:
-	This subroutine searchs for an alpha character within a
-	given string and returns the index to that character (if
-	it is found).  It returns -1 if the character does not exist
+	This subroutine searches for a character within a given
+	string and returns the index to that character (if it is
+	found).  It returns (-1) if the character does not exist
 	within the given string.
 
 	Synopsis:
-	int sialpha(cchar *sp,int sl) noex
+	int sichr(cchar *sp,int sl,int sch) noex
 
 	Arguments:
 	sp	string to be examined
 	sl	length of string of break character to break on
+	sch	character to search for
 
 	Returns:
 	>=0	index of search character in the given string
@@ -39,14 +41,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<limits.h>		/* <- for |UCHAR_MAX| */
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 #include	<ascii.h>
 #include	<toxc.h>
+#include	<localmisc.h>
 
 #include	"six.h"
 
@@ -59,17 +62,32 @@
 
 /* exported subroutines */
 
-int sialpha(cchar *sp,int sl) noex {
+int siochr(cchar *sp,int sl,int sch) noex {
 	int		i = 0 ;
 	bool		f = false ;
-	for (i = 0 ; sl && sp[i] ; i += 1) {
+	sch &= UCHAR_MAX ;
+	for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
-	    f = isalphalatin(ch) ;
+	    f = (ch == sch) ;
 	    if (f) break ;
-	    sl -= 1 ;
 	} /* end for */
 	return (f) ? i : -1 ;
 }
-/* end subroutine (sialpha) */
+/* end subroutine (siochr) */
+
+int sirchr(cchar *sp,int sl,int sch) noex {
+	int		i = 0 ;
+	bool		f = false ;
+	sch &= UCHAR_MAX ;
+	if (sp) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    for (i = (sl-1) ; i >= 0 ; i -= 1) {
+	        cint	ch = mkchar(sp[i]) ;
+		if ((f = (ch == sch))) break ;
+	    }
+	} /* end if (non-null) */
+	return (f) ? i : -1 ;
+}
+/* end subroutine (sirchr) */
 
 

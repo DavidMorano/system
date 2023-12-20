@@ -1,7 +1,7 @@
 /* silbrace */
 /* lang=C20 */
 
-/* is the next character a left-brace? */
+/* is the next non-whatspace character a left-brace? */
 /* version %I% last-modified %G% */
 
 
@@ -63,7 +63,7 @@
 
 /* exported subroutines */
 
-int silbrace(const char *sp,int sl) noex {
+int silbrace(cchar *sp,int sl) noex {
 	int		si = 0 ;
 	while (sl && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;

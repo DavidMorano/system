@@ -40,9 +40,11 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<matstr.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"hasfext.h"
@@ -52,10 +54,6 @@
 
 
 /* external subroutines */
-
-extern int	matstr(cchar **,cchar *,int) noex ;
-
-extern char	*strnrchr(cchar *,int,int) noex ;
 
 
 /* local structures */
@@ -74,7 +72,7 @@ int hasfext(cchar **exts,cchar *fp,int fl) noex {
 	int		si = 0 ;
 	bool		f = false ;
 	if (fl < 0) fl = strlen(fp) ;
-	if ((tp = strnrchr(fp,fl,'.')) != NULL) {
+	if ((tp = strnrchr(fp,fl,'.')) != nullptr) {
 	    cint	el = ((fp+fl)-(tp+1)) ;
 	    cchar	*ep = (tp+1) ;
 	    si = (tp-fp) ;
