@@ -103,7 +103,7 @@ int rmeol(cchar *sp,int sl) noex {
 int rmchr(cchar *sp,int sl,int ch) noex {
 	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
-	if ((tp = strnchr(sp,sl,ch)) != nullptr) {
+	if ((tp = strnrchr(sp,sl,ch)) != nullptr) {
 	    sl = (tp-sp) ;
 	} /* end if */
 	return sl ;
