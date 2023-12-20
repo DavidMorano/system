@@ -54,7 +54,6 @@ inline int iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
 inline bool iszero(int ch) noex {
-	ch &= 0xFF ;
 	return (ch == '0') ;
 }
 
@@ -64,7 +63,6 @@ static inline int iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
 static inline bool iszero(int ch) noex {
-	ch &= 0xFF ;
 	return (ch == '0') ;
 }
 
