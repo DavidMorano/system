@@ -25,7 +25,7 @@
 #include	<strdcpyx.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<sistr.h>
+#include	<six.h>
 #include	<mkpathx.h>
 #include	<mknpathx.h>
 #include	<mkfnamesuf.h>
