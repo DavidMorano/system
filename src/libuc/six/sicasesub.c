@@ -54,9 +54,10 @@
 #include	<clanguage.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 #include	<ascii.h>
 #include	<toxc.h>
+#include	<nleadstr.h>
+#include	<localmisc.h>
 
 #include	"six.h"
 
@@ -65,8 +66,6 @@
 
 
 /* external subroutines */
-
-extern int	nleadcasestr(cchar *,cchar *,int) noex ;
 
 
 /* external variables */
