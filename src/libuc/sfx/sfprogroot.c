@@ -1,7 +1,7 @@
 /* sfprogroot */
 /* lang=C20 */
 
-/* try to get a program-root */
+/* try to find a program-root in a given c-string */
 /* version %I% last-modified %G% */
 
 
@@ -85,7 +85,7 @@ int sfprogroot(cchar *pp,int pl,cchar **rpp) noex {
 	int		dl ;
 	int		sl = -1 ;
 	cchar		*dp ;
-	cchar		*sp = NULL ;
+	cchar		*sp = nullptr ;
 	if ((dl = sfdirname(pp,pl,&dp)) > 0) {
 	    int		f ;
 	    cchar	*bp ;
@@ -100,7 +100,7 @@ int sfprogroot(cchar *pp,int pl,cchar **rpp) noex {
 	    }
 	} /* end if */
 	if (rpp) {
-	    *rpp = (sl >= 0) ? sp : NULL ;
+	    *rpp = (sl >= 0) ? sp : nullptr ;
 	}
 	return sl ;
 }

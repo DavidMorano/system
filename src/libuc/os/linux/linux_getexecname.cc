@@ -31,6 +31,9 @@
 	Returns:
 	-		the exec-name pointer or NULL (if not found)
 
+	Implementation-note:
+	The ELF preprocessor define 'AT_EXECFN' is the money shot on this one.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -80,10 +83,10 @@ typedef char	*charp ;
 /* exported subroutines */
 
 cchar *getexecname() noex {
-	culong	at = AT_EXEC ;
-	ulong	r = getauxval(at) ;
+	culong	at = AT_EXECFN ;
+	ulong	r ;
 	cchar	*rp = nullprt ;
-	if (r) {
+	if ((r = getauxval(at)) != 0) {
 	    rp = charp(r) ;
 	} /* end if (have entry) */
 	return rp ;
