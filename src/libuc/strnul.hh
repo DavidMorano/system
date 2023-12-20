@@ -20,6 +20,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<string>
+#include	<string_view>
+#include	<iostream>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -30,7 +33,9 @@
 
 
 struct strnul {
+	typedef std::string_view	strview ;
 	typedef const char	*charp ;
+	cchar		*rp = nullptr ;
 	cchar		*sp = nullptr ;
 	char		*as = nullptr ;
 	int		sl = 0 ;
@@ -38,16 +43,28 @@ struct strnul {
 	strnul(cchar *ap,int al = -1) noex : sp(ap), sl(al) { 
 	    buf[0] = '\0' ;
 	} ; /* end ctor */
+	strnul(strview &sv) noex {
+	    buf[0] = '\0' ;
+	    sp = sv.data() ;
+	    sl = sv.length() ;
+	} ; /* end ctor */
 	strnul() noex : strnul(nullptr,0) { } ;
 	strnul(const strnul &) = delete ;
 	strnul &operator = (const strnul &) = delete ;
-	void operator () (cchar *ap,int al) noex {
+	charp operator () (cchar *ap,int al) noex {
+	    rp = nullptr ;
 	    if (as) {
 		delete [] as ;
 		as = nullptr ;
 	    }
 	    sp = ap ;
 	    sl = al ;
+	    return operator charp () ;
+	} ; /* end method */
+	charp operator () (strview &sv) noex {
+	    cchar	*ap = sv.data() ;
+	    cint	al = sv.length() ;
+	    return operator () (ap,al) ;
 	} ; /* end method */
 	operator charp () noex ;
 	~strnul() noex {

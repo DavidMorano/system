@@ -26,6 +26,7 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
 #include	<usystem.h>
+#include	<ulogerror.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -49,24 +50,25 @@ using std::nothrow ;
 /* exported subroutines */
 
 strnul::operator charp () noex {
-	cchar		*rp = sp ;
-	if (sl >= 0) {
-	    if (sp[sl] != '\0') {
+	if (rp == nullptr) {
+	    rp = sp ;
+	    if ((sl >= 0) && (sp[sl] != '\0')) {
 	        if (sl > STRNUL_SHORTLEN) {
 		    if ((as = new(nothrow) char[(sl+1)]) != nullptr) {
 			strwcpy(as,sp,sl) ;
 			rp = as ;
 		    } else {
-			rp = nullptr ;
+			ulogerror("strnul",SR_NOMEM,"mem-alloc failure") ;
+			rp = "«mem-alloc-failure»" ;
 		    }
 	        } else {
 		    strwcpy(buf,sp,sl) ;
 		    rp = buf ;
 	        }
-	    } /* end if (required) */
-	} /* end if (possibly required) */
+	    } /* end if (possibly required) */
+	} /* end if (need calculation) */
 	return rp ;
 }
-/* end method (strnul_co::operator) */
+/* end method (strnul::operator) */
 
 

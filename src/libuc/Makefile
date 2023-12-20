@@ -406,7 +406,7 @@ UOBJ00= matstr.o nleadstr.o toxc.o char.o varnames.o rmx.o
 UOBJ01= strn.o sfx.o strnxcmp.o
 UOBJ02= strcpyxc.o
 UOBJ03= strwcpyxc.o strwcpyxx.o
-UOBJ04= ischarx.o
+UOBJ04= ischarx.o ulogerror.o strdcpyx.o
 
 UOBJ= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) $(UOBJ04)
 
@@ -1191,21 +1191,13 @@ ischarx.o:		ischarx.cc ischarx.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
 # RMX
-OBJ_RMX= rmeol.o rmext.o rmchr.o
-
-rmx.o:			$(OBJ_RMX)
-	$(LD) -r -o $@ $(OBJ_RMX)
-
-rmeol.o:		rmeol.c rmx.h
-rmext.o:		rmext.c rmx.h
-rmchr.o:		rmchr.c rmx.h
+rmx.o:			rmx.cc rmx.h
 
 # STRW
 OBJ_STRW= strwcpyxc.o strwcpyxx.o
 
 strw.o:			$(OBJ_STRW)
 	$(LD) -r -o $@ $(OBJ_STRW)
-
 
 # system-auxillary-information
 ucsysauxinfo.o:		ucsysauxinfo.dir

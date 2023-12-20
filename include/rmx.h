@@ -22,13 +22,12 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<rmeol.h>		/* <- |rmeol(3uc)| is in there */
-
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
+extern int	rmeol(cchar *,int) noex ;
 extern int	rmchr(cchar *,int,int) noex ;
 extern int	rmext(cchar *,int) noex ;
 
