@@ -354,11 +354,11 @@ int vecint_find(vecint *op,VECINT_TYPE v) noex {
 	    if (op->f.issorted) {
 	        cint		esz = sizeof(VECINT_TYPE) ;
 	        qsortcmp_f	qcf = qsortcmp_f(deftypecmp) ;
-	        int	*rpp2 ;
-	        rpp2 = (int *) bsearch(&v,op->va,op->i,esz,qcf) ;
+	        int		*rpp ;
+	        rpp = (int *) bsearch(&v,op->va,op->i,esz,qcf) ;
 	        rs = SR_NOTFOUND ;
-	        if (rpp2) {
-	            i = rpp2 - op->va ;
+	        if (rpp) {
+	            i = (rpp - op->va) ;
 	            rs = SR_OK ;
 	        }
 	    } else {
@@ -484,8 +484,8 @@ static int vecint_setopts(vecint *op,int vo) noex {
 static int vecint_addval(vecint *op,VECINT_TYPE v) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ; /* ¥ GCC false complaint */
-	int		f_done = false ;
-	int		f ;
+	bool		f_done = false ;
+	bool		f ;
 /* can we fit this new entry within the existing extent? */
 	f = (op->f.oreuse || op->f.oconserve) && (! op->f.oordered) ;
 	if (f && (op->c < op->i)) {

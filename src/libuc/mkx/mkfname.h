@@ -1,4 +1,8 @@
 /* mkfname */
+/* lang=C20 */
+
+/* make a file name from several parts */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,27 +15,44 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MKFNAME_INCLUDE
-#define	MKFNAME_INCLUDE		1
+#define	MKFNAME_INCLUDE
+
+
+#include	<envstandards.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int mkfname(char *,int,const char *,...) ;
-extern int mkfname1(char *,const char *,const char *) ;
-extern int mkfname2(char *,const char *,const char *,const char *) ;
-extern int mkfname3(char *,const char *,const char *,const char *,
-		const char *) ;
-extern int mkfname4(char *,const char *,const char *,const char *,
-		const char *,const char *) ;
-extern int mkfname5(char *,const char *,const char *,const char *,
-		const char *,const char *,const char *) ;
+extern int mkfnamex(char *,int,...) noex ;
+
+extern int mkfname1(char *,cc *) noex ;
+extern int mkfname2(char *,cc *,cc *) noex ;
+extern int mkfname3(char *,cc *,cc *,cc *) noex ;
+extern int mkfname4(char *,cc *,cc *,cc *,cc *) noex ;
+extern int mkfname5(char *,cc *,cc *,cc *,cc *,cc *) noex ;
+extern int mkfname6(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* MKFNAME_INCLUDE	*/
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline int mkfname(char *dp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return mkfnamex(dp,na,args ...) ;
+}
+
+#endif /* __cplusplus */
+
+
+#endif /* MKFNAME_INCLUDE */
 
 

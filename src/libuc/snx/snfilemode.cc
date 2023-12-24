@@ -1,5 +1,5 @@
 /* snfilemode */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of the file-mode flags */
 /* version %I% last-modified %G% */
@@ -40,6 +40,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
+#include	<unistd.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<usystem.h>
@@ -47,6 +48,7 @@
 #include	<localmisc.h>
 
 #include	"snflags.h"
+#include	"snx.h"
 
 
 /* local defines */
@@ -54,6 +56,24 @@
 #ifndef	OCTBUFLEN
 #define	OCTBUFLEN	47
 #endif
+
+#ifndef	S_IAMB
+#define	S_IAMB		0x1FF
+#endif
+
+#ifndef	S_IFNAM
+#define	S_IFNAM		0x5000		/* MicroSoft XENIX® named file */
+#endif
+
+#ifndef	S_IFDOOR
+#define	S_IFDOOR	0xD000		/* Solaris® "door" file */
+#endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -75,11 +95,11 @@ struct flagstrs {
 
 /* local variables */
 
-static const struct flagstrs	fileperms[] = {
+static constexpr struct flagstrs	fileperms[] = {
 	{ S_ISUID, "SUID" },
 	{ S_ISGID, "SGID" },
 	{ S_ISVTX, "SAVETXT" },
-	{ 0, NULL }
+	{ 0, nullptr }
 } ;
 
 
@@ -92,7 +112,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 	    SNFLAGS	ss ;
 	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
 	        cint	ft = (fm & S_IFMT) ;
-	        cchar	*ms = NULL ;
+	        cchar	*ms = nullptr ;
 	        switch (ft) {
 	        case S_IFIFO:
 	            ms = "FIFO" ;

@@ -1,5 +1,5 @@
 /* snflags */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of some flags */
 /* version %I% last-modified %G% */
@@ -22,8 +22,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
-#include	<usystem.h>
+#include	<cstring>
+#include	<usystem.h>		/* <- for |memclear(3u)| */
 #include	<usupport.h>
 #include	<storebuf.h>
 #include	<localmisc.h>

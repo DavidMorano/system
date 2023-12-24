@@ -22,7 +22,8 @@
 extern "C" {
 #endif
 
-extern int mkfnamesuf(char *,int,cc *,...) noex ;
+extern int mkfnamesufx(char *,int,cc *,...) noex ;
+
 extern int mkfnamesuf1(char *,cc *,cc *) noex ;
 extern int mkfnamesuf2(char *,cc *,cc *,cc *) noex ;
 extern int mkfnamesuf3(char *,cc *,cc *,cc *,cc *) noex ;
@@ -32,6 +33,16 @@ extern int mkfnamesuf5(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 #ifdef	__cplusplus
 }
 #endif
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline int mkfnamesuf(char *dp,cc *bp,Args ... args) noex {
+	cint	na = npack(Args) ;
+	return mkfnamesufx(dp,na,bp,args ...) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* MKFNAMESUF_INCLUDE */

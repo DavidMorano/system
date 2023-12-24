@@ -48,7 +48,7 @@
 #include	<storebuf.h>
 #include	<localmisc.h>
 
-#include	"sn.h"
+#include	"snx.h"
 
 
 /* local defines */

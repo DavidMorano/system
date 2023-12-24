@@ -1,5 +1,8 @@
-/* sn INCLUDE */
+/* snx INCLUDE */
 /* lang=C20 */
+
+/* counted c-string operations */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	SN_INCLUDE
-#define	SN_INCLUDE
+#ifndef	SNX_INCLUDE
+#define	SNX_INCLUDE
 
 
 #include	<envstandards.h>
@@ -20,7 +23,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<sncpy.h>
+#include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<snxxx.h>
 
@@ -43,6 +46,6 @@ extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 #endif
 
 
-#endif /* SN_INCLUDE */
+#endif /* SNX_INCLUDE */
 
 

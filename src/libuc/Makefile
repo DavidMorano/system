@@ -1223,8 +1223,16 @@ sfx.o:			sfx.dir
 sfx.dir:
 	makesubdir $@
 
+snx.o:			snx.dir
+snx.dir:
+	makesubdir $@
+
 snwcpy.o:		snwcpy.dir
 snwcpy.dir:
+	makesubdir $@
+
+hash.o:			hash.dir
+hash.dir:
 	makesubdir $@
 
 # UCENT

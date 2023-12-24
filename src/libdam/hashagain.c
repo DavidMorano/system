@@ -40,6 +40,8 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<string.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 

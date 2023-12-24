@@ -1,4 +1,4 @@
-/* snflags INCLUDE */
+/* snaddw INCLUDE */
 /* lang=C20 */
 
 /* make string version of some flags */
@@ -20,40 +20,27 @@
 
 ******************************************************************************/
 
-#ifndef	SNFLAGS_INCLUDE
-#define	SNFLAGS_INCLUDE
+#ifndef	SNADDW_INCLUDE
+#define	SNADDW_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
-
-#define	SNFLAGS		struct snflags_head
-
-
-struct snflags_head {
-	char		*bp ;
-	int		c ;
-	int		bl ;
-	int		bi ;
-} ;
-
-typedef SNFLAGS		snflags ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int snflags_start(snflags *,char *,int) noex ;
-extern int snflags_addstr(snflags *,cchar *) noex ;
-extern int snflags_addstrw(snflags *,cchar *,int) noex ;
-extern int snflags_finish(snflags *) noex ;
+extern int snaddw(char *,int,int,cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-#endif /* SNFLAGS_INCLUDE */
+#endif /* SNADDW_INCLUDE */
 
 

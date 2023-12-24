@@ -1,32 +1,35 @@
-/* snmkuuid */
+/* snuuid */
+/* lang=C20 */
+
+/* string-UUID (String-UUID) */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	SNMKUUID_INCLUDE
-#define	SNMKUUID_INCLUDE	1
+#ifndef	SNUUID_INCLUDE
+#define	SNUUID_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<mkuuid.h>
 #include	<localmisc.h>
 
-
-#if	(! defined(SNMKUUID_MASTER)) || (SNMKUUID_MASTER == 0)
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int snmkuuid(char *,int,MKUUID *) ;
+extern int snuuid(char *,int,MKUUID *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* SNMKUUID_MASTER */
 
-#endif /* SNMKUUID_INCLUDE */
+#endif /* SNUUID_INCLUDE */
 
 

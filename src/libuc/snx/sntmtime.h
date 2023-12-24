@@ -1,6 +1,9 @@
 /* sntmtime INCLUDE */
 /* lang=C20 */
 
+/* counted c-string operations */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -18,6 +21,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 
 

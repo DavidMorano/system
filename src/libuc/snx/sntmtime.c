@@ -306,7 +306,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	            case 'D':
 	                rs = sbuf_dated(ssp,tmp) ;
 	                break ;
-	            case mkchar('Ð'):
+	            case MKCHAR('Ð'):
 	                rs = sbuf_dater(ssp,tmp) ;
 	                break ;
 	            case 'x':

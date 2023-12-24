@@ -47,7 +47,9 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
