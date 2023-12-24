@@ -56,8 +56,11 @@
 #include	<storebuf.h>
 #include	<dirseen.h>
 #include	<nulstr.h>
+#include	<strn.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
+#include	<xperm.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 
@@ -73,21 +76,11 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 
 /* external subroutines */
 
-extern int	sperm(IDS *,USTAT *,int) noex ;
 extern int	getnodedomain(char *,char *) noex ;
 extern int	mkpr(char *,int,cchar *,cchar *) noex ;
-extern int	isNotPresse(int) noex ;
-extern int	isNotAccess(int) noex ;
-
-extern char	*strnchr(const char *,int,int) noex ;
 
 
 /* external variables */

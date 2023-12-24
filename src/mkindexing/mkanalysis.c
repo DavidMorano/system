@@ -1,11 +1,11 @@
 /* mkanalysis */
+/* lang=C20 */
 
 /* invert the data (keys to pointers) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG 	0		/* compile-time debugging */
 #define	CF_TESTSLEEP	0
-
 
 /* revision history:
 
@@ -18,30 +18,25 @@
 
 /*******************************************************************************
 
+	Name:
+	mkanalysis
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
-	int mkanalysis(pip,aip,dbname)
-	struct proginfo	*pip ;
-	struct arginfo	*aip ;
-	const char	dbname[] ;
+	int mkanalysis(PROGINFO *pip,ARGINFO *aip,cchar *dbname) noex
 
 	Arguments:
-
 	- pip		program information pointer
 
 	Returns:
-
 	>=0		OK
 	<0		error code
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -70,23 +65,25 @@
 
 #define	DEFLISTLEN	8
 
+#define	KEYINFO		struct keyinfo
+
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkfname2(char *,const char *,const char *) ;
-extern int	mkfname3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkfname2(char *,cchar *,cchar *) ;
+extern int	mkfname3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 
 extern int	procanalysis(struct proginfo *,vecint *,int,bfile *,
-			struct keyinfo *,HDBSTR *,const char *) ;
-extern int	mkhashfile(struct proginfo *,vecint *,int, struct keyinfo *,
-			const char *) ;
+			KEYINFO *,hdbstr *,cchar *) ;
+extern int	mkhashfile(struct proginfo *,vecint *,int, KEYINFO *,
+			cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -103,15 +100,10 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* exported subroutines */
 
+int mkanalysis(PROGINFO *pip,ARGINFO *aip,cchar *dbname) noex {
+	KEYINFO	ki ;
 
-int mkanalysis(pip,aip,dbname)
-struct proginfo	*pip ;
-struct arginfo	*aip ;
-const char	dbname[] ;
-{
-	struct keyinfo	ki ;
-
-	HDBSTR	stab ;
+	hdbstr	stab ;
 
 	bfile	hashfile, tagfile ;
 
@@ -154,7 +146,7 @@ const char	dbname[] ;
 
 	for (i = 0 ; i < tablen ; i += 1) {
 
-	    rs = vecint_start((table + i),DEFLISTLEN,VECINT_PORDERED) ;
+	    rs = vecint_start((table + i),DEFLISTLEN,VECINT_OORDERED) ;
 
 	    if (rs < 0)
 	        break ;
@@ -200,7 +192,7 @@ const char	dbname[] ;
 	if (rs < 0)
 		goto ret4 ;
 
-	memset(&ki,0,sizeof(struct keyinfo)) ;
+	memset(&ki,0,sizeof(KEYINFO)) ;
 
 	ki.minlen = INT_MAX ;
 
@@ -477,10 +469,5 @@ ret0:
 	return (rs >= 0) ? pan : rs ;
 }
 /* end subroutine (mkanalysis) */
-
-
-
-/* LOCAL SUBROUTINES */
-
 
 

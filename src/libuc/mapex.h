@@ -22,19 +22,21 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
 #ifndef	MAPEX
-#define	MAPEX		struct mapex
+#define	MAPEX		struct mapex_map
 #endif
 
 
-#ifndef	STRUCT_MAPEX
-#define	STRUCT_MAPEX
-struct mapex {
+#ifndef	STRUCT_MAPEXMAP
+#define	STRUCT_MAPEXMAP
+struct mapex_map {
 	int	rs, ex ;
 } ;
-#endif /* STRUCT_MAPEX */
+#endif /* STRUCT_MAPEXMAP */
 
 
 #ifndef	EXTERN_MAXEX
@@ -44,7 +46,7 @@ struct mapex {
 extern "C" {
 #endif
 
-extern int	mapex(const MAXPEX *,int) noex ;
+extern int	mapex(const MAPEX *,int) noex ;
 
 #ifdef	__cplusplus
 }

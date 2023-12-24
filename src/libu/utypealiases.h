@@ -192,6 +192,12 @@
 #define	UTMPX		struct utmpx
 #endif
 
+/* scheduler paramters */
+
+#ifndef	SCHEDPARAM
+#define	SCHEDPARAM	struct sched_param
+#endif
+
 /* constant versions of above */
 
 #ifndef	CSIGVAL

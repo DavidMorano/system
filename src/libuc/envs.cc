@@ -62,8 +62,6 @@ using std::nullptr_t ;
 
 /* local typedefs */
 
-typedef cchar	*ccharp ;
-
 
 /* external subroutines */
 

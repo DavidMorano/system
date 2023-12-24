@@ -24,12 +24,6 @@
 #include	<strdcpyxw.h>
 
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
-
 #ifdef	__cplusplus
 extern "C" {
 #endif

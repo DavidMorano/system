@@ -1,7 +1,7 @@
-/* mapex */
+/* mapex INCLUDE */
 /* lang=C20 */
 
-/* map return status values to exit codes */
+/* map status-return (SR) values to program exit-codes (EX) */
 /* version %I% last-modified %G% */
 
 
@@ -14,38 +14,39 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
-
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MAPEX_INCLUDE
 #define	MAPEX_INCLUDE
 
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
-
-#ifndef	STRUCT_MAPEX
-#define	STRUCT_MAPEX	1
 
 #ifndef	MAPEX
-#define	MAPEX		struct mapex
+#define	MAPEX		struct mapex_map
 #endif
 
-struct mapex {
+
+#ifndef	STRUCT_MAPEXMAP
+#define	STRUCT_MAPEXMAP
+struct mapex_map {
 	int	rs, ex ;
 } ;
-
-#endif /* STRUCT_MAPEX */
+#endif /* STRUCT_MAPEXMAP */
 
 
 #ifndef	EXTERN_MAXEX
-#define	EXTERN_MAXEX	1
+#define	EXTERN_MAXEX
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int	mapex(const struct mapex *,int) ;
+extern int	mapex(const MAPEX *,int) noex ;
 
 #ifdef	__cplusplus
 }

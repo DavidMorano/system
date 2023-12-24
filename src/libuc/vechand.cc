@@ -72,15 +72,15 @@ static int	vechand_validx(vechand *,int) noex ;
 /* local subroutines */
 
 consteval int mkoptmask() noex {
-	int	r = 0 ;
-	r = r | VECHAND_OREUSE ;
-	r = r | VECHAND_OCOMPACT ;
-	r = r | VECHAND_OSWAP ;
-	r = r | VECHAND_OSTATIONARY ;
-	r = r | VECHAND_OCONSERVE ;
-	r = r | VECHAND_OSORTED ;
-	r = r | VECHAND_OORDERED ;
-	return r ;
+	int		m = 0 ;
+	m |= VECHAND_OREUSE ;
+	m |= VECHAND_OCOMPACT ;
+	m |= VECHAND_OSWAP ;
+	m |= VECHAND_OSTATIONARY ;
+	m |= VECHAND_OCONSERVE ;
+	m |= VECHAND_OSORTED ;
+	m |= VECHAND_OORDERED ;
+	return m ;
 }
 /* end subroutine (mkoptmask) */
 
@@ -461,18 +461,18 @@ static int vechand_ctor(vechand *op) noex {
 }
 /* end subroutine (vechand_ctor) */
 
-static int vechand_setopts(vechand *op,int opts) noex {
+static int vechand_setopts(vechand *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((opts & optmask) == 0) {
+	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
-	    if (opts & VECHAND_OREUSE) op->f.oreuse = 1 ;
-	    if (opts & VECHAND_OSWAP) op->f.oswap = 1 ;
-	    if (opts & VECHAND_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (opts & VECHAND_OCOMPACT) op->f.ocompact = 1 ;
-	    if (opts & VECHAND_OSORTED) op->f.osorted = 1 ;
-	    if (opts & VECHAND_OORDERED) op->f.oordered = 1 ;
-	    if (opts & VECHAND_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & VECHAND_OREUSE) op->f.oreuse = 1 ;
+	    if (vo & VECHAND_OSWAP) op->f.oswap = 1 ;
+	    if (vo & VECHAND_OSTATIONARY) op->f.ostationary = 1 ;
+	    if (vo & VECHAND_OCOMPACT) op->f.ocompact = 1 ;
+	    if (vo & VECHAND_OSORTED) op->f.osorted = 1 ;
+	    if (vo & VECHAND_OORDERED) op->f.oordered = 1 ;
+	    if (vo & VECHAND_OCONSERVE) op->f.oconserve = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }

@@ -175,11 +175,6 @@ typedef const char		cchar ;
 typedef const signed char	cschar ;
 #endif /* TYPEDEF_SCHAR */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char		cc ;
-#endif
-
 #ifndef	TYPEDEF_CSHORT
 #define	TYPEDEF_CSHORT
 typedef const short		cshort ;
@@ -231,6 +226,36 @@ typedef const unsigned long	culong ;
 #endif /* TYPEDEF_CULONG */
 
 /* specials */
+
+#ifndef	TYPEDEF_CC
+#define	TYPEDEF_CC
+typedef const char		cc ;
+#endif
+
+#ifndef	TYPEDEF_CCP
+#define	TYPEDEF_CCP
+typedef const char		*ccp ;
+#endif
+
+#ifndef	TYPEDEF_CHARP
+#define	TYPEDEF_CHARP
+typedef char			*charp ;
+#endif
+
+#ifndef	TYPEDEF_CCHARP
+#define	TYPEDEF_CCHARP
+typedef const char		*ccharp ;
+#endif
+
+#ifndef	TYPEDEF_CPCCHAR
+#define	TYPEDEF_CPCCHAR
+typedef const char *const	cpcchar ;
+#endif
+
+#ifndef	TYPEDEF_CPCCHARP
+#define	TYPEDEF_CPCCHARP
+typedef const char *const	*cpccharp ;
+#endif
 
 #ifndef	TYPEDEF_IN6ADDRT
 #define	TYPEDEF_IN6ADDRT

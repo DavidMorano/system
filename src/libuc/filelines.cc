@@ -37,8 +37,6 @@ using std::nullptr_t ;
 
 /* local typedefs */
 
-typedef cchar	*charp ;
-
 
 /* forward references */
 

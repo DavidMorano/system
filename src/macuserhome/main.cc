@@ -72,13 +72,13 @@ typedef const char *const 	*mainv ;
 
 /* local structures */
 
-enum progmodes {
+enum prognames {
 	progmode_username,
 	progmode_userhome,
 	progmode_overlast
 } ;
 
-static constexpr const char	*progmodes[] = {
+static constexpr const char	*prognames[] = {
 	"username",
 	"userhome",
 	nullptr
@@ -126,7 +126,7 @@ int main(int argc,mainv argv,mainv) noexcept {
 	    cint	pl = rs ;
 	    if ((rs = ui.find(uid)) > 0) {
 	        int	pm ;
-	        if ((pm = matstr(progmodes,pn,pl)) >= 0) {
+	        if ((pm = matstr(prognames,pn,pl)) >= 0) {
 		    switch (pm) {
 		    case progmode_username:
 		        cout << ui.un << '\n' ;
@@ -150,18 +150,18 @@ int main(int argc,mainv argv,mainv) noexcept {
 static int getpn(int argc,mainv argv,cchar **rpp) noexcept {
 	int		rs = SR_FAULT ;
 	if (argv && rpp) {
-	    int		bl ;
-	    cchar	*bp{} ;
 	    rs = SR_INVALID ;
 	    if ((argc > 0) && (argv[0] != nullptr)) {
+	        int	bl ;
+	        cchar	*bp{} ;
 	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
 		    int		pl = rmchr(bp,bl,'.') ;
 		    cchar	*pp = bp ;
 		    if (pl > 0) {
 			int	i ;
-	                if ((i = matstr(progmodes,pp,pl)) >= 0) {
-		            *rpp = progmodes[i] ;
-		            rs = strlen(progmodes[i]) ;
+	                if ((i = matstr(prognames,pp,pl)) >= 0) {
+		            *rpp = prognames[i] ;
+		            rs = strlen(prognames[i]) ;
 	                }
 		    } /* end if (non-zero positive progname) */
 		} /* end if (have base-name) */

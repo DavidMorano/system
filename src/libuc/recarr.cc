@@ -89,15 +89,15 @@ static int	recarr_extend(recarr *,int = 0) noex ;
 /* local subroutines */
 
 consteval int mkoptmask() noex {
-	int	r = 0 ;
-	r = r | RECARR_OREUSE ;
-	r = r | RECARR_OCOMPACT ;
-	r = r | RECARR_OSWAP ;
-	r = r | RECARR_OSTATIONARY ;
-	r = r | RECARR_OCONSERVE ;
-	r = r | RECARR_OSORTED ;
-	r = r | RECARR_OORDERED ;
-	return r ;
+	int		m = 0 ;
+	m |= RECARR_OREUSE ;
+	m |= RECARR_OCOMPACT ;
+	m |= RECARR_OSWAP ;
+	m |= RECARR_OSTATIONARY ;
+	m |= RECARR_OCONSERVE ;
+	m |= RECARR_OSORTED ;
+	m |= RECARR_OORDERED ;
+	return m ;
 }
 /* end subroutine (mkoptmask) */
 
@@ -453,18 +453,18 @@ int recarr_extent(recarr *op) noex {
 
 /* private subroutines */
 
-static int recarr_setopts(recarr *op,int opts) noex {
+static int recarr_setopts(recarr *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((opts & optmask) == 0) {
+	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
-	    if (opts & RECARR_OREUSE) op->f.oreuse = 1 ;
-	    if (opts & RECARR_OCOMPACT) op->f.ocompact = 1 ;
-	    if (opts & RECARR_OSWAP) op->f.oswap = 1 ;
-	    if (opts & RECARR_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (opts & RECARR_OCONSERVE) op->f.oconserve = 1 ;
-	    if (opts & RECARR_OSORTED) op->f.osorted = 1 ;
-	    if (opts & RECARR_OORDERED) op->f.oordered = 1 ;
+	    if (vo & RECARR_OREUSE) op->f.oreuse = 1 ;
+	    if (vo & RECARR_OCOMPACT) op->f.ocompact = 1 ;
+	    if (vo & RECARR_OSWAP) op->f.oswap = 1 ;
+	    if (vo & RECARR_OSTATIONARY) op->f.ostationary = 1 ;
+	    if (vo & RECARR_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & RECARR_OSORTED) op->f.osorted = 1 ;
+	    if (vo & RECARR_OORDERED) op->f.oordered = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }

@@ -12,12 +12,6 @@
 
 using std::cout ;
 
-#ifndef	TYPEDEF_CCP
-#define	TYPEDEF_CCP
-typedef const char	*ccp ;
-#endif
-
-
 template<typename ... A>
 int thingx(cchar *,int,A ... arg,int) noex {
     return 0 ;

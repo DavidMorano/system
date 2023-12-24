@@ -77,15 +77,15 @@ static inline int vecelem_magic(vecelem *op,Args ... args) noex {
 /* local subroutines */
 
 consteval int mkoptmask() noex {
-	int	r = 0 ;
-	r = r | VECELEM_OREUSE ;
-	r = r | VECELEM_OCOMPACT ;
-	r = r | VECELEM_OSWAP ;
-	r = r | VECELEM_OSTATIONARY ;
-	r = r | VECELEM_OCONSERVE ;
-	r = r | VECELEM_OSORTED ;
-	r = r | VECELEM_OORDERED ;
-	return r ;
+	int		m = 0 ;
+	m |= VECELEM_OREUSE ;
+	m |= VECELEM_OCOMPACT ;
+	m |= VECELEM_OSWAP ;
+	m |= VECELEM_OSTATIONARY ;
+	m |= VECELEM_OCONSERVE ;
+	m |= VECELEM_OSORTED ;
+	m |= VECELEM_OORDERED ;
+	return m ;
 }
 /* end subroutine (mkoptmask) */
 
@@ -311,18 +311,18 @@ static int vecelem_ctor(vecelem *op) noex {
 }
 /* end subroutine (vecelem_ctor) */
 
-static int vecelem_setopts(vecelem *op,int opts) noex {
+static int vecelem_setopts(vecelem *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((opts & optmask) == 0) {
+	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
-	    if (opts & VECELEM_OREUSE) op->f.oreuse = 1 ;
-	    if (opts & VECELEM_OSWAP) op->f.oswap = 1 ;
-	    if (opts & VECELEM_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (opts & VECELEM_OCOMPACT) op->f.ocompact = 1 ;
-	    if (opts & VECELEM_OSORTED) op->f.osorted = 1 ;
-	    if (opts & VECELEM_OORDERED) op->f.oordered = 1 ;
-	    if (opts & VECELEM_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & VECELEM_OREUSE) op->f.oreuse = 1 ;
+	    if (vo & VECELEM_OSWAP) op->f.oswap = 1 ;
+	    if (vo & VECELEM_OSTATIONARY) op->f.ostationary = 1 ;
+	    if (vo & VECELEM_OCOMPACT) op->f.ocompact = 1 ;
+	    if (vo & VECELEM_OSORTED) op->f.osorted = 1 ;
+	    if (vo & VECELEM_OORDERED) op->f.oordered = 1 ;
+	    if (vo & VECELEM_OCONSERVE) op->f.oconserve = 1 ;
 	}
 	return rs ;
 }

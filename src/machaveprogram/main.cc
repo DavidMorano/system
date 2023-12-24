@@ -16,7 +16,9 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
+	pathenum
+	pathto
 	haveprogram
 
 	Description:
@@ -27,6 +29,19 @@
 	$ pathto
 	$ haveprogram
 
+	Returns:
+	0		for normal operation success
+	126		haveprogram: some program found but not executable
+	127		haveprogram: program not found
+
+	Implementation-note:
+	The whole purpose of this program (in all three forms) is
+	to be able to be built without using any of the more elaborate
+	system services that are normally provided by the libraries
+	|libdam|, |libuc|, and |libu|.  Several minimalistic services
+	are required from |libuc| and at least one (|u_stat(3u)|)
+	from |libu|.
+
 *******************************************************************************/
 
 #include	<envstandards.h>
@@ -36,36 +51,56 @@
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<string>
+#include	<string_view>
 #include	<vector>
 #include	<iostream>
 #include	<usystem.h>
+#include	<varnames.hh>
+#include	<strn.h>
 #include	<sfx.h>
 #include	<matstr.h>
-#include	<rmx.h>
 #include	<strwcpy.h>
-#include	<varnames.h>
+#include	<varnames.hh>
+#include	<strnul.hh>
+#include	<sncpyx.h>
+#include	<isnot.h>
+#include	<mapex.h>
+#include	<getourenv.h>
+#include	<exitcodes.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
+#ifndef	MAXPATH
+#define	MAXPATH		4096
+#endif
+
 
 /* local namespaces */
 
+using std::nullptr_t ;
+using std::nothrow ;
 using std::cout ;
 using std::clog ;
 using std::string ;
+using std::string_view ;
 using std::vector ;
 
 
 /* local typedefs */
 
-typedef cchar *const 	*mainv ;
+typedef cpccharp	mainv ;
+typedef string_view	strview ;
 
 
 /* external subroutines */
+
+extern "C" {
+    extern int u_stat(cchar *,USTAT *) noex ;
+}
 
 
 /* external variables */
@@ -73,67 +108,168 @@ typedef cchar *const 	*mainv ;
 
 /* local structures */
 
-enum progmodes {
-	progmode_pathenum,
-	progmode_pathto,
-	progmode_haveprogram,
-	progmode_overlast
-} ;
-
-static constexpr cchar	*progmodes[] = {
-	"pathenum",
-	"pathto",
-	"haveprogram",
-	nullptr
-} ;
-
 namespace {
-    struct userinfo {
-	string		us ;
-	cchar		*un{} ;
-	cchar		*uh{} ;
-	int find(uid_t) noex ;
-	int findenv(uid_t) noex ;
-	int findutmp(uid_t) noex ;
-	int finduid(uid_t) noex ;
-    } ; /* end struct (userinfo) */
+    struct pathent {
+	string		ps ;
+	dev_t		dev ;
+	ino_t		ino ;
+	pathent() noex = default ;
+	pathent(dev_t d,ino_t i,cchar *pp,int pl = -1) noex {
+	    if (pl < 0) pl = strlen(pp) ;
+	    strview	s(pp,pl) ;
+	    try {
+	        ps = s ;
+	        dev = d ;
+	        ino = i ;
+	    } catch (...) {
+		dev = 0 ;
+		ino = 0 ;
+	    }
+	} ; /* end if (ctor) */
+    } ; /* end struct (pathent) */
+    enum proginfomems {
+	proginfomem_start,
+	proginfomem_finish,
+	proginfomem_pathbegin,
+	proginfomem_pathend,
+	proginfomem_overlast
+    } ;
+    struct proginfo ;
+    struct proginfo_co {
+	proginfo	*op = nullptr ;
+	int		w = -1 ;
+	void operator () (proginfo *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+    } ; /* end struct (proginfo_co) */
+    struct proginfo {
+	typedef vector<pathent>::iterator	plit_t ;
+	friend proginfo_co ;
+	proginfo_co	start ;
+	proginfo_co	finish ;
+	proginfo_co	pathbegin ;
+	proginfo_co	pathend ;
+	mainv		argv ;
+	mainv		envv ;
+	cchar		*pn = nullptr ;
+	vector<pathent>	pl ;
+	int		argc ;
+	int		pm ;
+	bool		ffound = false ;
+	proginfo(int c,mainv a,mainv e) noex : argc(c), argv(a), envv(e) { 
+	    start(this,proginfomem_start) ;
+	    finish(this,proginfomem_finish) ;
+	    pathbegin(this,proginfomem_pathbegin) ;
+	    pathend(this,proginfomem_pathend) ;
+	} ;
+	proginfo() noex : proginfo(0,nullptr,nullptr) { } ;
+	void operator () (int c,mainv a,mainv e) noex {
+	    argc = c ;
+	    argv = a ;
+	    envv = e ;
+	} ;
+	int pathcandidate(cchar *,int) noex ;
+	int pathalready(dev_t,ino_t) noex ;
+	int pathenum() noex ;
+	int pathto() noex ;
+    private:
+	int istart() noexcept ;
+	int ifinish() noexcept ;
+	int ipathbegin() noexcept ;
+	int ipathend() noexcept ;
+    } ; /* end struct (proginfo) */
 }
 
 
 /* forward references */
 
-static int	getpn(int,mainv,cchar **) noexcept ;
-
 
 /* local variables */
+
+enum progmodes {
+	progmode_pathenum,
+	progmode_pe,
+	progmode_pathto,
+	progmode_pt,
+	progmode_haveprogram,
+	progmode_overlast
+} ;
+
+static constexpr cpcchar	prognames[] = {
+	"pathenum",
+	"pe",
+	"pathto",
+	"pt",
+	"haveprogram",
+	nullptr
+} ;
+
+static constexpr MAPEX	mapexs[] = {
+	{ SR_NOENT,	EX_NOUSER },
+	{ SR_AGAIN,	EX_TEMPFAIL },
+	{ SR_DEADLK,	EX_TEMPFAIL },
+	{ SR_NOLCK,	EX_TEMPFAIL },
+	{ SR_TXTBSY,	EX_TEMPFAIL },
+	{ SR_ACCESS,	EX_NOPERM },
+	{ SR_REMOTE,	EX_PROTOCOL },
+	{ SR_NOSPC,	EX_TEMPFAIL },
+	{ SR_INTR,	EX_INTR },
+	{ SR_EXIT,	EX_TERM },
+	{ SR_NOMSG,	EX_OSERR },
+	{ SR_NOSYS,	EX_OSFILE },
+	{ 0, 0 }
+} ;
+
+constexpr int		maxpathlen = MAXPATH ;
 
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv) noexcept {
-	const uid_t	uid = getuid() ;
-	int		ex = EXIT_FAILURE ;
-	int		rs = 0 ;
-	cchar		*pn{} ;
-	if ((rs = getpn(argc,argv,&pn)) >= 0) {
-	    userinfo	ui ;
-	    cint	pl = rs ;
-	    if ((rs = ui.find(uid)) > 0) {
-	        int	pm ;
-	        if ((pm = matstr(progmodes,pn,pl)) >= 0) {
-		    switch (pm) {
-		    case progmode_username:
-		        cout << ui.un << '\n' ;
-		        break ;
-		    case progmode_userhome:
-		        cout << ui.uh << '\n' ;
-		        break ;
-		    } /* end switch */
-		    ex = EXIT_SUCCESS ;
-	        } /* end if (matstr) */
-	    } /* end if (findenv) */
-	} /* end if (getpn) */
-	if (rs < 0) ex = EXIT_FAILURE ;
+int main(int argc,mainv argv,mainv envv) noexcept {
+	proginfo	pi(argc,argv,envv) ;
+	int		ex = EX_OK ;
+	int		rs ;
+	int		rs1 ;
+	if ((rs = pi.start) >= 0) {
+	    if ((rs = pi.pathbegin) >= 0) {
+	        switch (pi.pm) {
+		case progmode_pathenum:
+		case progmode_pe:
+		    rs = pi.pathenum() ;
+		    break ;
+		case progmode_pt:
+		    pi.pm = progmode_pathto ;
+		    /* FALLTHROUGH */
+		case progmode_pathto:
+		    rs = pi.pathto() ;
+		    break ;
+		case progmode_haveprogram:
+		    if ((rs = pi.pathto()) == 0) {
+			ex = (pi.ffound) ? EX_NOEXEC : EX_NOPROG ;
+		    } else if (rs < 0) {
+			switch (rs) {
+			case SR_NOTFOUND:
+			    ex = EX_NOPROG ;
+			    break ;
+			case SR_ACCESS:
+			    ex = EX_NOEXEC ;
+			    break ;
+			} /* end switch */
+		    }
+		    break ;
+		} /* end switch */
+		rs1 = pi.pathend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (proginfo::path) */
+	    rs1 = pi.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (proginfo::getpn) */
+	if ((rs < 0) && (ex == EX_OK)) ex = mapex(mapexs,rs) ;
 	return ex ;
 }
 /* end subroutine (main) */
@@ -141,109 +277,179 @@ int main(int argc,mainv argv,mainv) noexcept {
 
 /* local subroutines */
 
-static int getpn(int argc,mainv argv,cchar **rpp) noexcept {
+int proginfo::istart() noexcept {
 	int		rs = SR_FAULT ;
-	if (argv && rpp) {
-	    int		bl ;
-	    cchar	*bp{} ;
-	    rs = SR_INVALID ;
-	    if ((argc > 0) && (argv[0] != nullptr)) {
-	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
-		    int		pl = rmchr(bp,bl,'.') ;
-		    cchar	*pp = bp ;
-		    if (pl > 0) {
-			int	i ;
-	                if ((i = matstr(progmodes,pp,pl)) >= 0) {
-		            *rpp = progmodes[i] ;
-		            rs = strlen(progmodes[i]) ;
-	                }
-		    } /* end if (non-zero positive progname) */
+	if (argv) {
+	    rs = SR_NOMSG ;
+	    if ((argc > 0) && argv[0]) {
+	        int	bl ;
+	        cchar	*bp{} ;
+		rs = SR_NOSYS ;
+	        if ((bl = sfprogname(argv[0],-1,&bp)) > 0) {
+	            if ((pm = matstr(prognames,bp,bl)) >= 0) {
+			pn = prognames[pm] ;
+		        rs = SR_OK ;
+	            }
 		} /* end if (have base-name) */
 	    } /* end if (have first argument) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (getpn) */
+/* end method (proginfo::istart) */
 
-static bool isourtype(UTMPX *up) noexcept {
-	bool	f = false ;
-	f = f || (up->ut_type == INIT_PROCESS) ;
-	f = f || (up->ut_type == LOGIN_PROCESS) ;
-	f = f || (up->ut_type == USER_PROCESS) ;
-	return f ;
+int proginfo::ifinish() noex {
+	return SR_OK ;
 }
+/* end method (proginfo::ifinish) */
 
-int userinfo::find(uid_t uid) noex {
-	int		rs ;
-	if ((rs = findenv(uid)) == 0) {
-	    if ((rs = findutmp(uid)) == 0) {
-	        rs = finduid(uid) ;
+int proginfo::ipathbegin() noex {
+	int		rs = SR_OK ;
+	cchar		*vn = varname.path ;
+	cchar		*valp ;
+	if ((valp = getourenv(envv,vn)) != nullptr) {
+	    cchar	*sp = valp ;
+	    char	*tp ;
+	    int		sl = strlen(sp) ;
+	    while ((tp = strnchr(sp,sl,':')) != nullptr) {
+	 	rs = pathcandidate(sp,(tp-sp)) ;
+		sl -= ((tp+1) - sp) ;
+		sp = (tp+1) ;
+		if (rs < 0) break ;
+	    } /* end while */
+	    if ((rs >= 0) && (sl > 0)) {
+	 	rs = pathcandidate(sp,sl) ;
 	    }
+	} /* end if (got value) */
+	return rs ;
+}
+/* end method (proginfo::ipathbegin) */
+
+int proginfo::pathcandidate(cchar *sp,int sl) noex {
+	USTAT		sb ;
+	strnul		s(sp,sl) ;
+	int		rs ;
+	if ((rs = u_stat(s,&sb)) >= 0) {
+	    if (S_ISDIR(sb.st_mode)) {
+	        const dev_t	d = sb.st_dev ;
+	        const ino_t	i = sb.st_ino ;
+	        if ((rs = pathalready(d,i)) == 0) {
+		    pathent	e(d,i,sp,sl) ;
+		    try {
+			if ((e.dev != 0) && (e.ino != 0)) {
+		            pl.push_back(e) ;
+			} else {
+			    rs = SR_NOMEM ;
+			}
+		    } catch (...) {
+			rs = SR_NOMEM ;
+		    }
+	        } /* end if (not-already) */
+	    } /* end if (is-dir) */
+	} else if (isNotAccess(rs)) {
+	    rs = SR_OK ;
 	}
 	return rs ;
 }
+/* end method (proginfo::pathcandidate) */
 
-int userinfo::findenv(uid_t uid) noex {
-	int		rs = 0 ;
-	for (int i = 0 ; (rs == 0) && envs[i] ; i += 1) {
-	    cchar	*rp ;
-	    if ((rp = getenv(envs[i])) != nullptr) {
-		int	cl ;
-		cchar	*cp{} ;
-		if ((cl = sfbasename(rp,-1,&cp)) > 0) {
-		    PASSWD	*pwp ;
-		    if ((pwp = getpwnam(rp)) != nullptr) {
-		        if (pwp->pw_uid == uid) {
-		            un = pwp->pw_name ;
-		            uh = pwp->pw_dir ;
-			    rs = strlen(un) ;
-		        }
-		    } /* end if (getpwnam) */
-		} /* end if (sfbasename) */
-	    } /* end if (getenv) */
+int proginfo::ipathend() noex {
+	return SR_OK ;
+}
+/* end method (proginfo::ipathend) */
+
+int proginfo::pathalready(dev_t d,ino_t i) noex {
+	int		rs = SR_OK ;
+	bool		f = false ;
+	for (auto const &e : pl) {
+	    f = ((e.dev == d) && (e.ino == i)) ;
+	    if (f) break ;
+	} /* end for */
+	return (rs >= 0) ? f : rs ;
+}
+/* end method (proginfo::pathalready) */
+
+int proginfo::pathenum() noex {
+	int		rs = SR_OK ;
+	for (auto const &e : pl) {
+	    cout << e.ps << eol ;
 	} /* end for */
 	return rs ;
 }
-/* end subroutine (userinfo::findenv) */
+/* end subroutine (proginfo::pathenum) */
 
-int userinfo::findutmp(uid_t) noex {
-	const pid_t	sid = getsid(0) ;
-	int		rs = SR_OK ;
-	utmpx		*up ;
-	setutxent() ;
-	while ((up = getutxent()) != nullptr) {
-	    if ((up->ut_pid == sid) && isourtype(up)) {
-		un = up->ut_user ;
-		rs = strnlen(un,sizeof(up->ut_user)) ;
-	    } /* end if (match) */
-	    if (rs != 0) break ;
-	} /* end while */
-	if (rs > 0) {
-	    PASSWD	*pwp ;
-	    char	ubuf[rs+1] ;
-	    strwcpy(ubuf,un,rs) ;
-	    if ((pwp = getpwnam(ubuf)) != nullptr) {
-		us = ubuf ;
-		un = us.c_str() ;
-		uh = pwp->pw_name ;
-	    } else {
-		rs = 0 ;
-	    }
-	} /* end if (got one) */
+int proginfo::pathto() noex {
+	int		rs ;
+	int		ctotal = 0 ;
+	if ((rs = maxpathlen) >= 0) {
+	    cint	pm_pt = progmode_pathto ;
+	    cint	pm_hp = progmode_haveprogram ;
+	    cint	plen = rs ;
+	    char	*pbuf ;
+	    rs = SR_NOMEM ;
+	    if ((pbuf = new(nothrow) char[plen+1]) != nullptr) {
+		rs = SR_OK ;
+	        for (int ai = 1 ; (ai < argc) && argv[ai] ; ai += 1) {
+	            cchar	*aprog = argv[ai] ;
+		    int		c = 0 ;
+	            if (aprog) {
+			ffound = false ;
+	                for (auto const &e : pl) {
+			    cchar	*pp = e.ps.c_str() ; /* <- throw? */
+			    if ((rs = sncpy(pbuf,plen,pp,"/",aprog)) >= 0) {
+				USTAT	sb ;
+			 	if ((rs = u_stat(pbuf,&sb)) >= 0) {
+				    cmode	fm = sb.st_mode ;
+				    ffound = true ;
+				    if (S_ISREG(fm)) {
+					cmode	xxx = 0111 ;
+					if ((fm & xxx) == xxx) {
+					    c += 1 ;
+					    if (pm == pm_pt) {
+	                                        cout << pbuf << eol ;
+					    }
+					} /* end if is-exec) */
+				    } /* end if (is-reg) */
+				} else if (isNotAccess(rs)) {
+				    rs = SR_OK ;
+				} /* end if (u_stat) */
+			    } /* end if (sncpyx) */
+			    if ((pm == pm_hp) && (c > 0)) break ;
+			    if (rs < 0) break ;
+	                } /* end for (paths) */
+			if ((rs >= 0) && (pm == pm_hp) && (c == 0)) {
+			    rs = (ffound) ? SR_ACCESS : SR_NOTFOUND ;
+			} /* end if */
+	            } /* end if (non-empty) */
+		    ctotal += c ;
+		    if (rs < 0) break ;
+	        } /* end for (args) */
+	        delete [] pbuf ;
+	    } /* end if (m-a-f) */
+	} /* end if (maxpathlen) */
+	return (rs >= 0) ? ctotal : rs ;
+}
+/* end subroutine (proginfo::pathto) */
+
+int proginfo_co::operator () (int) noex {
+	int	rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case proginfomem_start:
+	        rs = op->istart() ;
+	        break ;
+	    case proginfomem_finish:
+	        rs = op->ifinish() ;
+	        break ;
+	    case proginfomem_pathbegin:
+	        rs = op->ipathbegin() ;
+	        break ;
+	    case proginfomem_pathend:
+	        rs = op->ipathend() ;
+	        break ;
+	    } /* end switch */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (userinfo::findutmp) */
-
-int userinfo::finduid(uid_t uid) noex {
-	int		rs = SR_OK ;
-	PASSWD		*pwp ;
-	if ((pwp = getpwuid(uid)) != nullptr) {
-	    un = pwp->pw_name ;
-	    uh = pwp->pw_dir ;
-	    rs = strlen(un) ;
-	} /* end if */
-	return rs ;
-}
-/* end subroutine (userinfo::finduid) */
+/* end method (proginfo_co::operator) */
 
 

@@ -145,11 +145,6 @@
 #define	ULONG		unsigned long
 #endif
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char		cchar ;
-#endif
-
 #ifndef	TYPEDEF_SCHAR
 #define	TYPEDEF_SCHAR
 typedef signed char		schar ;

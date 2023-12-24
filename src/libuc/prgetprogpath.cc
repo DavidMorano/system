@@ -57,21 +57,19 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<vecstr.h>
 #include	<ids.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
 #include	<storebuf.h>
+#include	<strn.h>
+#include	<xperm.h>
+#include	<isnot.h>
 #include	<localmisc.h>
-#include	<bufsizevar.hh>
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
 
 
 /* local defines */
@@ -87,13 +85,6 @@ typedef const char	cchar ;
 
 extern "C" {
     extern int	pathaddw(char *,int,cchar *,int) noex ;
-    extern int	sperm(IDS *,USTAT *,int) noex ;
-    extern int	isNotPresent(int) noex ;
-    extern int	isOneOf(const int *,int) noex ;
-}
-
-extern "C" {
-    extern char	*strnchr(cchar *,int,int) noex ;
 }
 
 

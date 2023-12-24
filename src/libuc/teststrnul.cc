@@ -22,7 +22,6 @@ using std::cout ;
 using std::string_view ;
 
 typedef std::string_view	strview ;
-typedef const char		cchar ;
 typedef const char *const 	*mainv ;
 
 int main(int,mainv,mainv) {

@@ -60,11 +60,6 @@
 #include	<localmisc.h>
 
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 inline bool iszero(int ch) noex {
 	ch &= 0xFF ;
 	return (ch == '0') ;

@@ -49,11 +49,6 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 
 /* external subroutines */
 

@@ -24,16 +24,6 @@
 #include	<sncpyxw.h>
 
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
-#ifndef	TYPEDEF_CCHARP
-#define	TYPEDEF_CCHARP
-typedef const char	*ccharp ;
-#endif
-
 #ifdef	__cplusplus
 extern "C" {
 #endif

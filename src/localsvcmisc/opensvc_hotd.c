@@ -127,11 +127,6 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* local structures */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
-
 typedef int (*subhave_t)(const char *) ;
 typedef int (*subcall_t)(const char *,int,const char **,const char **,void *) ;
 typedef int (*subcalla_t)(const void *,int,const char **,const char **,void *) ;

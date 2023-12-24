@@ -21,6 +21,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<pthread.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 
 
@@ -36,25 +38,25 @@ typedef PTA	pta ;
 extern "C" {
 #endif
 
-extern int	pta_create(PTA *) noex ;
-extern int	pta_destroy(PTA *) noex ;
-extern int	pta_setstacksize(PTA *,size_t) noex ;
-extern int	pta_getstacksize(PTA *,size_t *) noex ;
-extern int	pta_setguardsize(PTA *,size_t) noex ;
-extern int	pta_getguardsize(PTA *,size_t *) noex ;
-extern int	pta_setstackaddr(PTA *,void *) noex ;
-extern int	pta_getstackaddr(PTA *,void **) noex ;
-extern int	pta_setdetachstate(PTA *,int) noex ;
-extern int	pta_getdetachstate(PTA *,int *) noex ;
-extern int	pta_setscope(PTA *,int) noex ;
-extern int	pta_getscope(PTA *,int *) noex ;
-extern int	pta_setinheritsched(PTA *,int) noex ;
-extern int	pta_getinheritsched(PTA *,int *) noex ;
-extern int	pta_setschedpolicy(PTA *,int) noex ;
-extern int	pta_getschedpolicy(PTA *,int *) noex ;
-extern int	pta_setschedparam(PTA *,const struct sched_param *) noex ;
-extern int	pta_getschedparam(PTA *,struct sched_param *) noex ;
-extern int	pta_setstack(PTA *,void *,size_t) noex ;
+extern int	pta_create(pta *) noex ;
+extern int	pta_destroy(pta *) noex ;
+extern int	pta_setstacksize(pta *,size_t) noex ;
+extern int	pta_getstacksize(pta *,size_t *) noex ;
+extern int	pta_setguardsize(pta *,size_t) noex ;
+extern int	pta_getguardsize(pta *,size_t *) noex ;
+extern int	pta_setstackaddr(pta *,void *) noex ;
+extern int	pta_getstackaddr(pta *,void **) noex ;
+extern int	pta_setdetachstate(pta *,int) noex ;
+extern int	pta_getdetachstate(pta *,int *) noex ;
+extern int	pta_setscope(pta *,int) noex ;
+extern int	pta_getscope(pta *,int *) noex ;
+extern int	pta_setinheritsched(pta *,int) noex ;
+extern int	pta_getinheritsched(pta *,int *) noex ;
+extern int	pta_setschedpolicy(pta *,int) noex ;
+extern int	pta_getschedpolicy(pta *,int *) noex ;
+extern int	pta_setschedparam(pta *,const SCHEDPARAM *) noex ;
+extern int	pta_getschedparam(pta *,SCHEDPARAM *) noex ;
+extern int	pta_setstack(pta *,void *,size_t) noex ;
 
 #ifdef	__cplusplus
 }

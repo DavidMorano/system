@@ -33,6 +33,7 @@ extern int sfcasesub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfdequote(cchar *,int,cchar **) noex ;
 extern int sfkey(cchar *,int,cchar **) noex ;
 extern int sfprogroot(cchar *,int,cchar **) noex ;
+extern int sfprogname(cchar *,int,cchar **) noex ;
 extern int sfskipwhite(cchar *,int,cchar **) noex ;
 extern int sfsub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfthing(cchar *,int,cchar *,cchar **) noex ;

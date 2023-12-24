@@ -99,7 +99,7 @@ enum errnomssings {
 #else
 #define	SR_L2NSYNC	(- errnomissing_l2nsync)
 #endif
-#ifndef	EL3HLT
+#ifdef	EL3HLT
 #define	SR_L3HLT	(- EL3HLT)	/* Level 3 halted */
 #else
 #define	SR_L3HLT	(- errnomissing_l3hlt)

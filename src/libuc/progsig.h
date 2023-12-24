@@ -21,12 +21,6 @@
 #include	<sys/types.h>
 
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
-
-
 #define	PROGSIG_NENTS	30
 #define	PROGSIG_NOTE	struct progsig_note
 

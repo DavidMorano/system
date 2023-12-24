@@ -162,16 +162,16 @@ static int	indexsize(int) noex ;
 /* local subroutines */
 
 consteval int mkoptmask() noex {
-	int	r = 0 ;
-	r = r | VECPSTR_ODEFAULT ;
-	r = r | VECPSTR_OREUSE ;
-	r = r | VECPSTR_OCOMPACT ;
-	r = r | VECPSTR_OSWAP ;
-	r = r | VECPSTR_OSTATIONARY ;
-	r = r | VECPSTR_OCONSERVE ;
-	r = r | VECPSTR_OSORTED ;
-	r = r | VECPSTR_OORDERED ;
-	return r ;
+	int		m = 0 ;
+	m |= VECPSTR_ODEFAULT ;
+	m |= VECPSTR_OREUSE ;
+	m |= VECPSTR_OCOMPACT ;
+	m |= VECPSTR_OSWAP ;
+	m |= VECPSTR_OSTATIONARY ;
+	m |= VECPSTR_OCONSERVE ;
+	m |= VECPSTR_OSORTED ;
+	m |= VECPSTR_OORDERED ;
+	return m ;
 }
 /* end subroutine (mkoptmask) */
 
@@ -785,18 +785,18 @@ static int vecpstr_dtor(vecpstr *op) noex {
 }
 /* end subroutine (vecpstr_dtor) */
 
-static int vecpstr_setopts(vecpstr *op,int vopts) noex {
+static int vecpstr_setopts(vecpstr *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vopts & optmask) == 0) {
+	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
-	    if (vopts & VECPSTR_OREUSE) op->f.oreuse = 1 ;
-	    if (vopts & VECPSTR_OSWAP) op->f.oswap = 1 ;
-	    if (vopts & VECPSTR_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vopts & VECPSTR_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vopts & VECPSTR_OSORTED) op->f.osorted = 1 ;
-	    if (vopts & VECPSTR_OORDERED) op->f.oordered = 1 ;
-	    if (vopts & VECPSTR_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & VECPSTR_OREUSE) op->f.oreuse = 1 ;
+	    if (vo & VECPSTR_OSWAP) op->f.oswap = 1 ;
+	    if (vo & VECPSTR_OSTATIONARY) op->f.ostationary = 1 ;
+	    if (vo & VECPSTR_OCOMPACT) op->f.ocompact = 1 ;
+	    if (vo & VECPSTR_OSORTED) op->f.osorted = 1 ;
+	    if (vo & VECPSTR_OORDERED) op->f.oordered = 1 ;
+	    if (vo & VECPSTR_OCONSERVE) op->f.oconserve = 1 ;
 	} /* end if (valid vopts) */
 	return rs ;
 }

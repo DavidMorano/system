@@ -27,10 +27,10 @@ typedef PTCA		ptca ;
 extern "C" {
 #endif
 
-extern int	ptca_create(PTCA *) noex ;
-extern int	ptca_destroy(PTCA *) noex ;
-extern int	ptca_setpshared(PTCA *,int) noex ;
-extern int	ptca_getpshared(PTCA *,int *) noex ;
+extern int	ptca_create(ptca *) noex ;
+extern int	ptca_destroy(ptca *) noex ;
+extern int	ptca_setpshared(ptca *,int) noex ;
+extern int	ptca_getpshared(ptca *,int *) noex ;
 
 #ifdef	__cplusplus
 }

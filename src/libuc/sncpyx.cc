@@ -52,12 +52,7 @@
 #include	"sncpyx.h"
 
 
-/* typedefs */
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
+/* local typedefs */
 
 
 /* external subroutines */

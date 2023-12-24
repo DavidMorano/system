@@ -23,8 +23,6 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<time.h>
-#include	<usystem.h>
-#include	<usupport.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -81,11 +79,9 @@ struct ptc : pthread_cond_t {
 	int wait(ptm *,int = -1) noex ;
 	int timedwait(ptm *,CTIMESPEC *) noex ;
 	int reltimedwaitnp(ptm *,CTIMESPEC *) noex ;
+	void dtor() noex ;
 	~ptc() noex {
-	    int		rs = destroy ;
-	    if (rs < 0) {
-	        ulogerror("ptc",rs,"destroy") ;
-	    }
+	    dtor() ;
 	} ; /* end dtor (ptc) */
 } ; /* end class (ptc) */
 #else

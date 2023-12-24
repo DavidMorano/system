@@ -14,15 +14,11 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CCHAR
-#deifne	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
-
-
 static void showchars(cchar *) noexcept ;
 static void showterms(cchar *) noexcept ;
 
+
+/* local variables */
 
 constexpr int		tablen = (UCHAR_MAX+1) ;
 

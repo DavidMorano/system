@@ -138,11 +138,6 @@ extern char	**environ ;
 
 typedef int (*subcmd_t)(int,cchar **,cchar **,void *) ;
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef cchar	cchar ;
-#endif
-
 #ifndef	TYPEDEF_TWORKER
 #define	TYPEDEF_TWORKER	1
 typedef	int (*tworker)(void *) ;

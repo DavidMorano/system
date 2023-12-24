@@ -156,7 +156,7 @@ int vecpstr_envfile(vecpstr *vlp,cchar *fname) noex {
 			        cint	llen = si.llen ;
 	                        int	len ;
 	                        int	cl ;
-		                rls_f	rls = filebuf_readlines ;
+		                rls_f	rls = filebuf_readlns ;
 			        char	*lbuf = si.lbuf ;
 		                nullptr_t	n{} ;
 	                        while ((rs = rls(dfp,lbuf,llen,to,n)) > 0) {

@@ -131,14 +131,14 @@ static void	vecstr_arrsort(vecstr *,vecstr_vcmp) noex ;
 /* local subroutines */
 
 consteval int mkoptmask() noex {
-	int	m = 0 ;
-	m = m | VECSTR_OREUSE ;
-	m = m | VECSTR_OCOMPACT ;
-	m = m | VECSTR_OSWAP ;
-	m = m | VECSTR_OSTATIONARY ;
-	m = m | VECSTR_OCONSERVE ;
-	m = m | VECSTR_OSORTED ;
-	m = m | VECSTR_OORDERED ;
+	int		m = 0 ;
+	m |= VECSTR_OREUSE ;
+	m |= VECSTR_OCOMPACT ;
+	m |= VECSTR_OSWAP ;
+	m |= VECSTR_OSTATIONARY ;
+	m |= VECSTR_OCONSERVE ;
+	m |= VECSTR_OSORTED ;
+	m |= VECSTR_OORDERED ;
 	return m ;
 }
 /* end subroutine (mkoptmask) */
@@ -183,18 +183,21 @@ int vecstr_finish(vecstr *op) noex {
 	    rs = SR_OK ;
 	    if (op->va) {
 	        for (int i = 0 ; i < op->i ; i += 1) {
-	            if (op->va[i] != nullptr) {
-	                rs1 = uc_libfree(op->va[i]) ;
+		    cchar	*ep = op->va[i] ;
+	            if (ep) {
+	                rs1 = uc_libfree(ep) ;
 		        if (rs >= 0) rs = rs1 ;
 	            }
 	        } /* end for */
-    /* free the pointer vector array itself */
-	        rs1 = uc_libfree(op->va) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->va = nullptr ;
-	        op->i = 0 ;
-	        op->n = 0 ;
+		{
+	            rs1 = uc_libfree(op->va) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->va = nullptr ;
+		}
 	    } /* end if (populated) */
+	    op->i = 0 ;
+	    op->n = 0 ;
+	    op->c = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -767,23 +770,23 @@ static int vecstr_ctor(vecstr *op) noex {
 	    op->n = 0 ;
 	    op->fi = 0 ;
 	    op->stsize = 0 ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (vecstr_ctor) */
 
-static int vecstr_setopts(vecstr *op,int vopts) noex {
+static int vecstr_setopts(vecstr *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((vopts & optmask) == 0) {
+	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
-	    if (vopts & VECSTR_OREUSE) op->f.oreuse = 1 ;
-	    if (vopts & VECSTR_OSWAP) op->f.oswap = 1 ;
-	    if (vopts & VECSTR_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (vopts & VECSTR_OCOMPACT) op->f.ocompact = 1 ;
-	    if (vopts & VECSTR_OSORTED) op->f.osorted = 1 ;
-	    if (vopts & VECSTR_OORDERED) op->f.oordered = 1 ;
-	    if (vopts & VECSTR_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & VECSTR_OREUSE) op->f.oreuse = 1 ;
+	    if (vo & VECSTR_OSWAP) op->f.oswap = 1 ;
+	    if (vo & VECSTR_OSTATIONARY) op->f.ostationary = 1 ;
+	    if (vo & VECSTR_OCOMPACT) op->f.ocompact = 1 ;
+	    if (vo & VECSTR_OSORTED) op->f.osorted = 1 ;
+	    if (vo & VECSTR_OORDERED) op->f.oordered = 1 ;
+	    if (vo & VECSTR_OCONSERVE) op->f.oconserve = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }

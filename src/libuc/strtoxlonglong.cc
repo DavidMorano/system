@@ -80,11 +80,6 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif /* TYPEDEF_CCHAR */
-
 
 /* local variables */
 

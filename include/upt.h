@@ -30,18 +30,17 @@
 extern "C" {
 #endif
 
-typedef int (*upt_f)(void *) noex ;
-typedef void (*uptvoid_f)(void *) noex ;
+typedef int (*uptsub_f)(void *) noex ;
 
-extern int uptcreate(pthread_t *,pthread_attr_t *,upt_f,void *) noex ;
+extern int uptcreate(pthread_t *,pthread_attr_t *,uptsub_f,void *) noex ;
 extern int uptexit(int) noex ;
-extern int uptonce(pthread_once_t *,uptvoid_f) noex ;
+extern int uptonce(pthread_once_t *,void_f) noex ;
 extern int uptjoin(pthread_t,int *) noex ;
 extern int uptdetach(pthread_t) noex ;
 extern int uptcancel(pthread_t) noex ;
 extern int uptkill(pthread_t,int) noex ;
-extern int uptsetschedparam(pthread_t,int,struct sched_param *) noex ;
-extern int uptgetschedparam(pthread_t,int *,struct sched_param *) noex ;
+extern int uptsetschedparam(pthread_t,int,SCHEDPARAM *) noex ;
+extern int uptgetschedparam(pthread_t,int *,SCHEDPARAM *) noex ;
 extern int uptgetconcurrency() noex ;
 extern int uptsetconcurrency(int) noex ;
 extern int uptsetcancelstate(int,int *) noex ;
@@ -49,8 +48,8 @@ extern int uptsetcanceltype(int,int *) noex ;
 extern int upttestcancel() noex ;
 extern int uptequal(pthread_t,pthread_t) noex ;
 extern int uptself(pthread_t *) noex ;
-extern int uptatfork(uptvoid_f,uptvoid_f,uptvoid_f) noex ;
-extern int uptncpus(int) ;
+extern int uptatfork(void_f,void_f,void_f) noex ;
+extern int uptncpus(int) noex ;
 
 #ifdef	__cplusplus
 }

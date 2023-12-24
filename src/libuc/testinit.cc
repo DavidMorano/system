@@ -17,7 +17,6 @@
 
 using std::cout ;
 
-typedef const char		cchar ;
 typedef const char *const 	*mainv ;
 
 struct multi {

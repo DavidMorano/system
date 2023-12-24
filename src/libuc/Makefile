@@ -407,9 +407,19 @@ UOBJ01= strn.o strnxcmp.o sfx.o six.o
 UOBJ02= strcpyxc.o
 UOBJ03= strwcpyxc.o strwcpyxx.o
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
-OBJ005= nleadstr.o nleadkeystr.o
+UOBJ05= nleadstr.o nleadkeystr.o
+UOBJ06= mapex.o strnul.o
+UOBJ07= getourenv.o
 
-UOBJ= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) $(UOBJ04) $(UOBJ05)
+UOBJ08= matkeystr.o strkeycmp.o
+UOBJ09= ustat.o
+UOBJ10= isnot.o isoneof.o
+UOBJ11= sncpyx.o strwcpy.o
+
+UOBJ=
+UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
+UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
+UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -650,7 +660,7 @@ obj_vecpstr.o:	$(OBJ_VECPSTR)
 
 
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o
-OBJB_VEC= vechand.o recarr.o raqhand.o
+OBJB_VEC= vechand.o recarr.o raqhand.o vecint.o
 OBJ_VEC= obja_vec.o objb_vec.o
 
 obja_vec.o:	$(OBJA_VEC)
@@ -979,9 +989,9 @@ itimerspec.o:		itimerspec.c itimerspec.h
 
 timeout.o:		timeout.c timeout.h
 
-upt.o:			upt.c upt.h
+upt.o:			upt.cc upt.h
 
-base64.o:		base64.c base64.h
+base64.o:		base64.cc base64.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
@@ -1309,6 +1319,7 @@ intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
+getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
 groupids.o:		groupids.cc groupids.hh

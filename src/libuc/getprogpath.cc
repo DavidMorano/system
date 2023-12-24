@@ -53,6 +53,7 @@
 #include	<ids.h>
 #include	<strn.h>
 #include	<vecstr.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getprogpath.h"
@@ -73,7 +74,6 @@ typedef vecstr		vs ;
 
 extern "C" {
     extern int	xfile(ids *,cchar *) noex ;
-    extern int	isNotPresent(int) noex ;
 }
 
 

@@ -174,7 +174,7 @@ static int vecpstr_loadfd(vecpstr *vsp,int fu,int fd) noex {
 			typedef int (*rl_f)(filebuf *,char *,int,int) ;
 			filebuf		loadfile, *lfp = &loadfile ;
 	        	if ((rs = filebuf_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
-			    rl_f	rl = filebuf_readline ;
+			    rl_f	rl = filebuf_readln ;
 	                    while ((rs = rl(lfp,lbuf,llen,to)) > 0) {
 	                        int	len = rs ;
 	                        if (lbuf[len - 1] == '\n') len -= 1 ;

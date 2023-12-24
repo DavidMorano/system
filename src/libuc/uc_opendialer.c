@@ -141,11 +141,6 @@ extern char	**environ ;
 
 /* local structures */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
-
 typedef int (*subdialer_t)(const char *,const char *,const char *,
 	    int,mode_t,const char **,const char **,int) ;
 
