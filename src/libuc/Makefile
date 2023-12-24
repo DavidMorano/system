@@ -205,17 +205,17 @@ OBJ094= strnxcmp.o
 OBJ095= strdcpyx.o strdcpyxw.o
 
 OBJ096=
-OBJ097= sncpyx.o sncpyxw.o sncpyxc.o 
-OBJ098= snflags.o snfsflags.o snpollflags.o snopenflags.o snfilemode.o
-OBJ099= snxxx.o sntmtime.o snshellunder.o 
+OBJ097=
+OBJ098=
+OBJ099=
 OBJ100= pathadd.o pathclean.o
 OBJ101=
 OBJ102= mkvarpath.o mkuserpath.o mkcdpath.o mkexpandpath.o
 OBJ103= mkquoted.o mksofname.o 
 
-OBJ104= sichr.o rmext.o
-OBJ105= sfskipwhite.o
-OBJ106= sfshrink.o sfdirname.o sfbasename.o sfwhitedot.o sfprogroot.o
+OBJ104= six.o rmx.o
+OBJ105=
+OBJ106=
 OBJ107=
 OBJ108=
 OBJ109= matstr.o matostr.o matkeystr.o 

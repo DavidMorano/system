@@ -51,6 +51,10 @@ Y
 #define	forever			for (;;)
 #endif
 
+#ifndef	fallthrough
+#define	fallthrough		/* FALLTHROUGH */
+#endif
+
 #ifndef	nelements
 #define	nelements(n)		(sizeof(n) / sizeof((n)[0]))
 #endif

@@ -37,10 +37,9 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* <- for |UINT_MAX| */
 #include	<cstring>
-#include	<usystem.h>
+#include	<usystem.h>		/* <- for |memclear| */
 #include	<usupport.h>
 #include	<mkuuid.h>
 #include	<localmisc.h>
@@ -70,7 +69,7 @@ static int mkuunode(MKUUID *,uint *) noex ;
 /* exported subroutines */
 
 int mkuuid(MKUUID *up,int) noex {
-	cint		rsize = (NWORDS*sizeof(uint)) ;
+	cint		rsize = (NWORDS * sizeof(uint)) ;
 	uint		rwords[NWORDS+1] ;
 	int		rs ;
 	memclear(up) ;
@@ -98,7 +97,7 @@ static int mkuutime(MKUUID *up,uint *rwords) noex {
 	    v = (rwords[1] & UINT_MAX) ;
 	    tv |= (v << 32) ;
 	}
-	up->time = (uint64_t) tv ;
+	up->time = tv ;
 	return 0 ;
 }
 /* end subroutine (mkuutime) */
@@ -109,7 +108,7 @@ static int mkuuclk(MKUUID *up,uint *rwords) noex {
 	    v = (rwords[2] & UINT_MAX) ;
 	    v >>= 16 ;
 	}
-	up->clk = (uint16_t) v ;
+	up->clk = v ;
 	return 0 ;
 }
 /* end subroutine (mkuuclk) */
@@ -126,7 +125,7 @@ static int mkuunode(MKUUID *up,uint *rwords) noex {
 	    v = (rwords[3] & UINT_MAX) ;
 	    nv |= v ;
 	}
-	up->node = (uint64_t) nv ;
+	up->node = nv ;
 	return 0 ;
 }
 /* end subroutine (mkuunode) */
