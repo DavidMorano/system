@@ -1,5 +1,5 @@
-/* ctdecf */
-/* lang=C20 */
+/* ctdecf SUPPORT */
+/* lang=C++20 */
 
 /* subroutines to convert an floating-value to a decimal string */
 /* version %I% last-modified %G% */
@@ -16,20 +16,16 @@
 
 /*******************************************************************************
 
+	Name:
+	ctdecf
+
 	Description:
-	This subroutine provides a rather flexible way to get a binary floating
-	point variables converted to a decimal string (with decimal points and
-	the such).
+	This subroutine provides a rather flexible way to get a
+	binary floating point variables converted to a decimal
+	string (with decimal points and the such).
 
 	Synopsis:
-	int ctdecf(dbuf,dlen,dv,fcode,w,p,fill)
-	char		dbuf[] ;
-	int		dlen ;
-	double		dv ;
-	int		fcode ;
-	int		w ;
-	int		p ;
-	int		fill ;
+	int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill)
 
 	Arguments:
 	dbuf		caller supplied buffer
@@ -43,7 +39,6 @@
 	Returns:
 	>=0		length of buffer used by the conversion
 	<0		error in the conversion
-
 
 *******************************************************************************/
 
@@ -87,11 +82,11 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	SUBINFO_FL	f ;		/* flags */
 	char		*ubuf ;		/* user's buffer */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current usage count */
 	int		mode ;		/* format mode */
+	SUBINFO_FL	f ;		/* flags */
 } ;
 
 
@@ -130,13 +125,16 @@ int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {
 /* local subroutines */
 
 static int subinfo_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
-	memset(sip,0,sizeof(SUBINFO)) ;
-	sip->ubuf = ubuf ;
-	sip->ulen = ulen ;
-	sip->mode = mode ;
-	sip->f.mclean = (mode & FORMAT_OCLEAN) ;
-	sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    memclear(sip) ;
+	    sip->ubuf = ubuf ;
+	    sip->ulen = ulen ;
+	    sip->mode = mode ;
+	    sip->f.mclean = (mode & FORMAT_OCLEAN) ;
+	    sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
@@ -165,15 +163,15 @@ static int subinfo_float(SUBINFO *sip,int fcode,double v,
 	int		f_varprec ;
 	int		f_varwidth ;
 	char		stage[DOFLOAT_STAGELEN + 1] ;
-	f_varprec = FALSE ;
+	f_varprec = false ;
 	if (prec < 0) {
 	    prec = DOFLOAT_DEFPREC ;
-	    f_varprec = TRUE ;
+	    f_varprec = true ;
 	}
-	f_varwidth = FALSE ;
+	f_varwidth = false ;
 	if (width <= 0) {
 	    width = DOFLOAT_STAGELEN ;
-	    f_varwidth = TRUE ;
+	    f_varwidth = true ;
 	}
 	if (prec > MAXPREC) prec = MAXPREC ;
 /* fill up extra field width which may be specified (for some reason) */
@@ -205,7 +203,7 @@ static int subinfo_float(SUBINFO *sip,int fcode,double v,
 	    outlen = MIN(stagelen,prec) ;
 	    while ((remlen > 0) && (outlen > 0)) {
 	        if ((! f_varprec) || (buf[j - 1] != '0')) {
-	            f_varprec = FALSE ;
+	            f_varprec = false ;
 	            stage[--i] = buf[--j] ;
 	            remlen -= 1 ;
 	            outlen -= 1 ;
@@ -288,7 +286,7 @@ static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
 	    cint	rlen = (sip->ulen - sip->len) ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (sl > rlen) sip->f.ov = TRUE ;
+	    if (sl > rlen) sip->f.ov = true ;
 	    ml = MIN(sl,rlen) ;
 	    if (ml > 0) {
 	        char	*bp = (sip->ubuf + sip->len) ;
