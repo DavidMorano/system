@@ -1,8 +1,9 @@
-APPLETERMINAL_TITLE
+APPLETERMINAL
 
-This program sends a command to the Apple-Terminal to set the
-Present-Working-Directory (PWD).
+This program sends a command to the Apple-Terminal to set either
+the Present-Working-Directory (PWD) or a current "document."
 
 Synopsis:
-$ appleterminal_title <current-path> <optioanl-hostname>
+$ appleterminal_pwd <current-path> <optioanl-hostname>
+$ appleterminal_doc <document>
 

@@ -1,4 +1,4 @@
-/* ipasswd */
+/* ipasswd INCLUDE */
 /* lang=C20 */
 
 /* indexed PASSWD GECOS DB */
@@ -20,6 +20,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<realname.h>
 #include	<localmisc.h>
 
@@ -47,7 +49,7 @@
 
 
 struct ipasswd_obj {
-	const char	*name ;
+	cchar	*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -88,9 +90,9 @@ struct ipasswd_flags {
 
 struct ipasswd_head {
 	uint		magic ;
-	const char	*fname ;
+	cchar	*fname ;
 	caddr_t		mapdata ;
-	const char	*stab ;
+	cchar	*stab ;
 	uint		(*recind[IPASSWD_NINDICES])[2] ;
 	IPASSWD_ENT	*rectab ;
 	IPASSWD_FL	f ;
@@ -117,16 +119,17 @@ struct ipasswd_head {
 extern "C" {
 #endif
 
-extern int	ipasswd_open(IPASSWD *,const char *) ;
-extern int	ipasswd_info(IPASSWD *,IPASSWD_INFO *) ;
-extern int	ipasswd_curbegin(IPASSWD *,IPASSWD_CUR *) ;
-extern int	ipasswd_curend(IPASSWD *,IPASSWD_CUR *) ;
+extern int	ipasswd_open(IPASSWD *,cchar *) noex ;
+extern int	ipasswd_info(IPASSWD *,IPASSWD_INFO *) noex ;
+extern int	ipasswd_curbegin(IPASSWD *,IPASSWD_CUR *) noex ;
+extern int	ipasswd_curend(IPASSWD *,IPASSWD_CUR *) noex ;
 extern int	ipasswd_enum(IPASSWD *,IPASSWD_CUR *,char *,cchar **,
-			char *,int) ;
+			char *,int) noex ;
 extern int	ipasswd_fetcher(IPASSWD *,IPASSWD_CUR *,int,char *,cchar **,
-			int) ;
-extern int	ipasswd_fetch(IPASSWD *,REALNAME *,IPASSWD_CUR *,int,char *) ;
-extern int	ipasswd_close(IPASSWD *) ;
+			int) noex ;
+extern int	ipasswd_fetch(IPASSWD *,REALNAME *,IPASSWD_CUR *,
+			int,char *) noex ;
+extern int	ipasswd_close(IPASSWD *) noex ;
 
 #ifdef	__cplusplus
 }

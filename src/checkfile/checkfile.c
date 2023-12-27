@@ -1,39 +1,36 @@
 /* File Checksum Program */
+/* lang=C20 */
 
 /*
 	David A.D. Morano
 	October 1988
 */
 
-
-#define	PRINT		0
-
+#define	CF_DEBUGS		0
 
 
-/************************************************************************
+/*******************************************************************************
 
 	Arguments:
-
 	- file name of file to be checked
 	- optional file name of file to be used as database
 	- optional mail address
 
+*******************************************************************************/
 
-************************************************************************/
-
-
+#include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/path.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
+#include	<stddef.h>
 #include	<pwd.h>
-
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<bfile.h>
-
-#include	"stddef.h"
-
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -42,14 +39,9 @@
 #define	MAXNAMELEN	256
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NROW		32
 #define	NCOL		32
 #define	HOLDSIZE	(NROW * NCOL * 4)
-
 
 
 /* external subroutines */
@@ -65,27 +57,17 @@ struct sumentry {
 } ;
 
 
+/* exported subroutines */
 
-
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	struct sumentry		entry ;
-
-	struct ustat	ss, *sp = &ss ;
-
-	struct passwd	*pwsp ;
-
-	bfile	errfile, *efp = &errfile ;
-	bfile	infile, *ifp = &infile ;
-	bfile	sumfile, *sfp = &sumfile ;
-	bfile	tempfile, *tfp = &tempfile ;
-
+	USTAT		ss, *sp = &ss ;
+	PASSWD		*pwsp ;
+	bfile		errfile, *efp = &errfile ;
+	bfile		infile, *ifp = &infile ;
+	bfile		sumfile, *sfp = &sumfile ;
+	bfile		tempfile, *tfp = &tempfile ;
 	offset_t	sumoff, emptyoff ;
-
 	long	hold[NROW][NCOL] ;
 	long	xoracc, sumrow, sumcol ;
 	long	clock ;
@@ -114,55 +96,34 @@ char	*envv[] ;
 
 	mailaddress = pwsp->pw_name ;
 
-
 	switch (argc) {
-
 	case 1:
 	    bprintf(efp,"no file given as argument\n") ;
-
 	    bclose(efp) ;
-
 	    return BAD ;
-
 	case 2:
 	    stat(argv[1],sp) ;
-
 	    if (! (sp->st_mode & S_IFREG)) goto exit2 ;
-
 	    rs = bopen(ifp,argv[1],"r",0666) ;
 	    if (rs < 0) goto nofile ;
-
 	    rs = bopen(sfp,"sumfile","rwc",0666) ;
 	    if (rs < 0) goto nobase ;
-
 	    break ;
-
 	case 3:
 	case 4:
 	    stat(argv[1],sp) ;
-
 	    if (! (sp->st_mode & S_IFREG)) goto exit2 ;
-
 	    rs = bopen(ifp,argv[1],"r",0666) ;
 	    if (rs < 0) goto nofile ;
-
 	    rs = bopen(sfp,argv[2],"rw",0666) ;
 	    if (rs < 0) goto nobase ;
-
 	    if ((argc == 4) && (argv[3] != "")) mailaddress = argv[3] ;
-
 	    break ;
-
 	default:
 	    bprintf(efp,"can't handle this yet\n") ;
-
 	    bclose(efp) ;
-
 	    return BAD ;
-
 	} /* end switch */
-
-
 
 /* calculate the full path name to this file */
 
@@ -208,7 +169,7 @@ char	*envv[] ;
 
 	name[0] = 0 ;
 
-#if	PRINT
+#if	CF_DEBUGS
 	bprintf(efp,"path of file %d : %s\n",namelen,namebuf) ;
 #endif
 
@@ -220,7 +181,7 @@ char	*envv[] ;
 
 	namebuf[namelen] = 0 ;
 
-#if	PRINT
+#if	CF_DEBUGS
 	bprintf(efp,"after condense %d : %s\n",namelen,namebuf) ;
 #endif
 

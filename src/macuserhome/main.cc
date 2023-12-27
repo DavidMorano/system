@@ -1,4 +1,4 @@
-/* main */
+/* main (userhome) */
 /* lang=C++20 */
 
 /* generic front-end for SHELL built-ins */
@@ -16,8 +16,10 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
+	username
 	userhome
+	usershell
 
 	Description:
 	Print out the home directory for the given user.
@@ -25,6 +27,7 @@
 	Synopsis:
 	$ username
 	$ userhome
+	$ usershell
 
 *******************************************************************************/
 
@@ -35,7 +38,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstdio>
-#include	<cstring>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<string>
 #include	<iostream>
 #include	<usystem.h>
@@ -54,14 +57,10 @@
 /* local namespaces */
 
 using std::cout ;
-using std::cerr ;
-using std::clog ;
 using std::string ;
 
 
 /* local typedefs */
-
-typedef const char *const 	*mainv ;
 
 
 /* external subroutines */
@@ -75,16 +74,18 @@ typedef const char *const 	*mainv ;
 enum prognames {
 	progmode_username,
 	progmode_userhome,
+	progmode_usershell,
 	progmode_overlast
 } ;
 
-static constexpr const char	*prognames[] = {
+static constexpr cchar	*prognames[] = {
 	"username",
 	"userhome",
+	"usershell",
 	nullptr
 } ;
 
-static constexpr const char	*envs[] = {
+static constexpr cchar	*envs[] = {
 	"USERNAME",
 	"USER",
 	"LOGNAME",
@@ -95,9 +96,9 @@ static constexpr const char	*envs[] = {
 
 namespace {
     struct userinfo {
+	string		un ;
+	string		uh ;
 	string		us ;
-	cchar		*un{} ;
-	cchar		*uh{} ;
 	int find(uid_t) noex ;
 	int findenv(uid_t) noex ;
 	int findutmp(uid_t) noex ;
@@ -108,7 +109,7 @@ namespace {
 
 /* forward references */
 
-static int	getpn(int,mainv,cchar **) noexcept ;
+static int	getpn(int,mainv,cchar **) noex ;
 
 
 /* local variables */
@@ -116,7 +117,7 @@ static int	getpn(int,mainv,cchar **) noexcept ;
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv) noexcept {
+int main(int argc,mainv argv,mainv) noex {
 	const uid_t	uid = getuid() ;
 	int		ex = EXIT_FAILURE ;
 	int		rs = 0 ;
@@ -129,10 +130,13 @@ int main(int argc,mainv argv,mainv) noexcept {
 	        if ((pm = matstr(prognames,pn,pl)) >= 0) {
 		    switch (pm) {
 		    case progmode_username:
-		        cout << ui.un << '\n' ;
+		        cout << ui.un << eol ;
 		        break ;
 		    case progmode_userhome:
-		        cout << ui.uh << '\n' ;
+		        cout << ui.uh << eol ;
+		        break ;
+		    case progmode_usershell:
+		        cout << ui.us << eol ;
 		        break ;
 		    } /* end switch */
 		    ex = EXIT_SUCCESS ;
@@ -147,7 +151,7 @@ int main(int argc,mainv argv,mainv) noexcept {
 
 /* local subroutines */
 
-static int getpn(int argc,mainv argv,cchar **rpp) noexcept {
+static int getpn(int argc,mainv argv,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (argv && rpp) {
 	    rs = SR_INVALID ;
@@ -171,7 +175,7 @@ static int getpn(int argc,mainv argv,cchar **rpp) noexcept {
 }
 /* end subroutine (getpn) */
 
-static bool isourtype(UTMPX *up) noexcept {
+static bool isourtype(UTMPX *up) noex {
 	bool	f = false ;
 	f = f || (up->ut_type == INIT_PROCESS) ;
 	f = f || (up->ut_type == LOGIN_PROCESS) ;
@@ -202,8 +206,9 @@ int userinfo::findenv(uid_t uid) noex {
 		        if (pwp->pw_uid == uid) {
 		            un = pwp->pw_name ;
 		            uh = pwp->pw_dir ;
-			    rs = strlen(un) ;
-		        }
+		            us = pwp->pw_shell ;
+			    rs = un.length() ;
+		        } /* end if (match) */
 		    } /* end if (getpwnam) */
 		} /* end if (sfbasename) */
 	    } /* end if (getenv) */
@@ -216,22 +221,23 @@ int userinfo::findutmp(uid_t) noex {
 	const pid_t	sid = getsid(0) ;
 	int		rs = SR_OK ;
 	utmpx		*up ;
+	cchar		*unp{} ;
 	setutxent() ;
 	while ((up = getutxent()) != nullptr) {
 	    if ((up->ut_pid == sid) && isourtype(up)) {
-		un = up->ut_user ;
-		rs = strnlen(un,sizeof(up->ut_user)) ;
+		unp = up->ut_user ;
+		rs = strnlen(unp,sizeof(up->ut_user)) ;
 	    } /* end if (match) */
 	    if (rs != 0) break ;
 	} /* end while */
-	if ((rs > 0) && un) {
+	if ((rs > 0) && unp) {
 	    PASSWD	*pwp ;
 	    char	ubuf[rs+1] ;
-	    strwcpy(ubuf,un,rs) ;
+	    strwcpy(ubuf,unp,rs) ;
 	    if ((pwp = getpwnam(ubuf)) != nullptr) {
-		us = ubuf ;
-		un = us.c_str() ;
+		un = pwp->pw_name ;
 		uh = pwp->pw_dir ;
+		us = pwp->pw_shell ;
 	    } else {
 		rs = 0 ;
 	    }
@@ -246,7 +252,8 @@ int userinfo::finduid(uid_t uid) noex {
 	if ((pwp = getpwuid(uid)) != nullptr) {
 	    un = pwp->pw_name ;
 	    uh = pwp->pw_dir ;
-	    rs = strlen(un) ;
+	    us = pwp->pw_shell ;
+	    rs = un.length() ;
 	} /* end if */
 	return rs ;
 }

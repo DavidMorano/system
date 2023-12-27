@@ -1,13 +1,15 @@
 /* main (daytimed) */
+/* lang=C20 */
 
 
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdio.h>
+#include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"nistinfo.h"
 #include	"config.h"
@@ -15,40 +17,30 @@
 
 /* local defines */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
 
 extern char	*timestr_nist(time_t,struct nistinfo *,char *) ;
 
 
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	struct nistinfo	ni ;
-	const time_t	dt = time(NULL) ;
+	const time_t	dt = time(nullptr) ;
 	cchar		*orgp ;
 	cchar		*cp ;
 	char		ntbuf[NISTINFO_BUFLEN+ 1] ;
 
-	if ((orgp = getenv(VARORGANIZATION)) == NULL)
+	if ((orgp = getenv(VARORGANIZATION)) == nullptr) {
 		orgp = ORGANIZATION ;
+	}
 
 	memset(&ni,0,sizeof(struct nistinfo)) ;
 
 	sncpy1(ni.org,NISTINFO_ORGSIZE,orgp) ;
 
-	if ((cp = timestr_nist(dt,&ni,ntbuf)) != NULL) {
+	if ((cp = timestr_nist(dt,&ni,ntbuf)) != nullptr) {
 	    fprintf(stdout,"%s\n",ntbuf) ;
 	}
 

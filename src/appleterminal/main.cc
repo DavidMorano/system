@@ -40,9 +40,9 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstdlib>
-#include	<cstdio>
-#include	<cstring>
-#include	<iostream>
+#include	<cstdio>		/* for |snprintf(3c)| */
+#include	<cstring>		/* for |strcmp(3c)| */
+#include	<iostream>		/* unuesed */
 #include	<string>
 #include	<usystem.h>
 #include	<varnames.hh>
@@ -50,7 +50,7 @@
 #include	<matstr.h>
 #include	<rmx.h>
 #include	<strwcpy.h>
-#include	<getfdfile.h>
+#include	<getfdfile.h>		/* for |FD_STDIN| */
 #include	<getourenv.h>
 #include	<localmisc.h>
 
@@ -97,7 +97,10 @@ namespace {
 	cchar		*pn ;
 	int		argc ;
 	int		pm ;
-	proginfo(int c,mainv a,mainv e) noex : argc(c), argv(a), envv(e) { } ;
+	proginfo(int c,mainv a,mainv e) noex : argc(c), argv(a), envv(e) { 
+	    pn = nullptr ;
+	    pm = 0 ;
+	} ;
 	int start(mainv) noex ;
 	int finish() noex ;
 	int getpn(mainv) noex ;
