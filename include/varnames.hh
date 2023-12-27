@@ -73,6 +73,7 @@ struct varnames {
 	static const char columns[] ;
 	static const char display[] ;
 	static const char term[] ;
+	static const char termprogram[] ;
 	static const char tz[] ;
 	static const char printer[] ;
 	static const char pager[] ;

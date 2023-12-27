@@ -1,4 +1,4 @@
-/* ctb26 */
+/* ctb26 SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a base-26 string */
@@ -47,6 +47,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<stdintx.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"ctb26.h"
@@ -59,16 +60,11 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	snwcpy(char *,int,const char *,int) noex ;
-    extern int	sncpy1(char *,int,const char *) noex ;
-}
-
 
 /* forward references */
 
-int ctb26ll(char *,int,int,int,longlong) noex ;
-int ctb26ull(char *,int,int,int,ulonglong) noex ;
+int		ctb26ll(char *,int,int,int,longlong) noex ;
+int		ctb26ull(char *,int,int,int,ulonglong) noex ;
 
 static int	ictb26(char *,int,int,int,ulonglong) noex ;
 

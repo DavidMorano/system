@@ -402,10 +402,10 @@ TOBJG0= $(TOBJA)
 TOBJ= $(TOBJG0) $(TOBJG1)
 
 
-UOBJ00= matstr.o nleadstr.o toxc.o char.o varnames.o rmx.o
+UOBJ00= matstr.o nleadstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o 
 UOBJ02= strcpyxc.o
-UOBJ03= strwcpyxc.o strwcpyxx.o
+UOBJ03= varnames.o rmx.o
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
@@ -414,7 +414,7 @@ UOBJ07= getourenv.o
 UOBJ08= matkeystr.o strkeycmp.o
 UOBJ09= ustat.o
 UOBJ10= isnot.o isoneof.o
-UOBJ11= sncpyx.o strwcpy.o
+UOBJ11= strwcpy.o strwcpyxc.o strwcpyxx.o
 
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
@@ -1083,7 +1083,7 @@ ctoct.o:		ctoct.cc ctoct.h cvtdig.hh
 cthex.o:		cthex.cc cthex.h cvtdig.hh
 ctdec.o:		ctdec.cc ctdec.h cvtdig.hh
 ctdecp.o:		ctdecp.cc ctdecp.h ctdec.h
-ctdecf.o:		ctdecf.c ctdec.h
+ctdecf.o:		ctdecf.cc ctdec.h
 ctchars.o:		ctchars.cc ctchars.h
 xxtostr.o:		xxtostr.cc xxtostr.h
 
@@ -1310,6 +1310,7 @@ bits.o:			bits.cc bits.h
 envs.o:			envs.cc envs.h
 envs_procxe.o:		envs_procxe.cc envs.h
 expcook.o:		expcook.cc expcook.h
+keyopt.o:		keyopt.cc keyopt.h
 
 
 # sring-comparisons

@@ -1,4 +1,4 @@
-/* varnames */
+/* varnames SUPPORT */
 /* lang=C++20 */
 
 /* this is a database of commonly used environment variable names */
@@ -69,6 +69,7 @@ const char varnames::lines[] =		"LINES" ;
 const char varnames::columns[] =	"COLUMNS" ;
 const char varnames::display[] =	"DISPLAY" ;
 const char varnames::term[] =		"TERM" ;
+const char varnames::termprogram[] =	"TERM_PROGRAM" ;
 const char varnames::tz[] =		"TZ" ;
 const char varnames::printer[] =	"PRINTER" ;
 const char varnames::pager[] =		"PAGER" ;

@@ -1,4 +1,4 @@
-/* intceil */
+/* intceil SUPPORT */
 /* lang=C++20 */
 
 /* Integer-Ceiling */
@@ -52,6 +52,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* local subroutine-templates */

@@ -1,4 +1,4 @@
-/* rmx */
+/* rmx SUPPORT */
 /* lang=C++20 */
 
 /* remove characters from the end of the given c-string */
@@ -123,5 +123,14 @@ int rmext(cchar *sp,int sl) noex {
 	return sl ;
 }
 /* end subroutine (rmext) */
+
+int rmtrailchr(cchar *sp,int sl,int sch) noex {
+	if (sl < 0) sl = strlen(sp) ;
+	while ((sl > 0) && (sp[sl-1] == sch)) {
+	   sl -= 1 ;
+	}
+	return sl ;
+}
+/* end subroutine (rmtrailchr) */
 
 

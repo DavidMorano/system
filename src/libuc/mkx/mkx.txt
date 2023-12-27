@@ -29,7 +29,6 @@ mkfnamesuf.o
 mkfromaddr.o
 mkfromname.o
 mkgecosname.o
-mkhashfile.o
 mkintfname.o
 mkjobfile.o
 mklogid.o

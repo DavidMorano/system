@@ -30,6 +30,7 @@ extern "C" {
 extern int	rmeol(cchar *,int) noex ;
 extern int	rmchr(cchar *,int,int) noex ;
 extern int	rmext(cchar *,int) noex ;
+extern int	rmtrailchr(cchar *,int,int) noex ;
 
 #ifdef	__cplusplus
 }

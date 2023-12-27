@@ -1,4 +1,4 @@
-/* ctbin */
+/* ctbin SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a binary-digit string */

@@ -16,7 +16,22 @@
 
 /*******************************************************************************
 
-	Ths object is used in the creation of flags strings.
+	Name:
+	snaddw
+
+	Description:
+	Add some c-string to the end of an existing string. Return the
+	incremental amount added.
+
+	Synopsis:
+	int snaddw(char *rbuf,int rlen,int rl,cchar *sp,int sl) noex
+
+	Arguments:
+	rbuf		c-string buffer pointer
+	rlen		c-string buffer length
+	rl		lenght of buffer already filled
+	sp		new c-string pointer to be added
+	sl		new c-string length to be added
 
 *******************************************************************************/
 

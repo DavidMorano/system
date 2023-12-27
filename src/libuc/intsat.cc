@@ -1,4 +1,4 @@
-/* intsat (Integer-Saturation) */
+/* intsat SUPPORT (Integer-Saturation) */
 /* lang=C++20 */
 
 /* perform a variety of integer saturation addition-subtractions */

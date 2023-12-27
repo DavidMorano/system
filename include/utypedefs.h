@@ -257,6 +257,11 @@ typedef const char *const	cpcchar ;
 typedef const char *const	*cpccharp ;
 #endif
 
+#ifndef	TYPEDEF_MAINV
+#define	TYPEDEF_MAINV
+typedef const char *const	*mainv ;
+#endif
+
 #ifndef	TYPEDEF_IN6ADDRT
 #define	TYPEDEF_IN6ADDRT
 typedef in_addr_t		in4_addr_t ;

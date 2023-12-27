@@ -1,10 +1,8 @@
 /* mktmpfile */
+/* lang=C20 */
 
 /* make a temporary file */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -18,45 +16,38 @@
 
 /*******************************************************************************
 
+	Name:
+	mktmpfile
+
+	Description:
 	Make a temporary file.
 
 	Synopsis:
-
-	int mktmpfile(rbuf,mode,template)
-	char		rbuf[] ;
-	mode_t		mode ;
-	const char	template[] ;
+	int mktmpfile(char *rbuf,cchar *template,mode_t fm) noex
 
 	Arguments:
-
-	- output buffer to hold resultant file name
-	- file creation mode
-	- input file name template string
+	- rbuf		result buffer pointer
+	- template	input file name template string
+	- fm		file-creation mode
 
 	Returns:
-
 	>=0	success and length of created file name
-	<0	failure w/ error number
-
+	<0	error (system-return)
 
 	Notes:
 	Q. What is with |uc_forklock(3uc)|?
-	A. We try to minimize child processes getting an extra (unknown to it)
-	   file-descriptor.
-
+	A. We try to minimize child processes getting an extra
+	(unknown to it) file-descriptor.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -66,7 +57,7 @@
 
 /* external subroutines */
 
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
+extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
 
 
 /* external variables */
@@ -80,21 +71,14 @@ extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 /* exported subroutines */
 
-
-int mktmpfile(char *rbuf,mode_t om,cchar *inname)
-{
-	const int	of = (O_WRONLY|O_CLOEXEC) ;
+int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
+	cint		of = (O_WRONLY|O_CLOEXEC) ;
 	int		rs ;
-	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = uc_forklockbegin(-1)) >= 0) {
 	    if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
-	        u_close(rs) ;
+	        uc_close(rs) ;
 	        len = strlen(rbuf) ;
 	    } /* end if (opentmpfile) */
-	    rs1 = uc_forklockend() ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (uc_forklock) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mktmpfile) */

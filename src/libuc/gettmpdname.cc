@@ -1,7 +1,7 @@
-/* getourenv */
+/* gettmpdname */
 /* lang=C++20 */
 
-/* get (retrieve) a local environment variables */
+/* get the name of the TMPDIR (however one can get it) */
 /* version %I% last-modified %G% */
 
 
@@ -20,33 +20,32 @@
 /*******************************************************************************
 
 	Name:
-	getourenv
+	gettmpdname
 
 	Description:
-	This subroutine is similar to the standard library |getenv(3c)|
-	subroutine but uses a local environment array instead.
+	Retrieve the name of the current TMPDIR.
 
 	Synopsis:
-	cchar *getourenv(cchar *const *envv,cchar *key) noex
+	cchar *gettmpdname(mainv) noex
 
 	Arguments:
 	envv		environment array
-	key		key-string to lookup
 
 	Returns:
-	-		pointer to value for given key
+	-		pointer to value
 	nullptr		key not found in environment database
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<cstring>		/* <- |strchr(3c)| */
+#include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
-#include	<matkeystr.h>
+#include	<varnames.hh>
+#include	<getourenv.h>
 #include	<localmisc.h>
 
-#include	"getourenv.h"
+#include	"gettmpdname.h"
 
 
 /* local defines */
@@ -56,6 +55,11 @@
 
 
 /* local typedefs */
+
+#ifndef	TYPEDEF_MAINV
+#define	TYPEDEF_MAINV
+typedef cpccharp	mainv ;
+#endif
 
 
 /* external subroutines */
@@ -69,17 +73,20 @@
 
 /* exported subroutines */
 
-cchar *getourenv(mainv envv,cchar *key) noex {
+cchar *gettmpdnamex(mainv envv) noex {
+	cchar		*vn = varname.tmpdir ;
 	cchar		*vp = nullptr ;
-	if (envv && (key[0] != '\0')) {
-	    if (int i ; (i = matkeystr(envv,key,-1)) >= 0) {
-		if ((vp = strchr(envv[i],'=')) != nullptr) {
-		    vp += 1 ;
-		}
-	    }
+	if (envv) {
+	    vp = getourenv(envv,vn) ;
+	}
+	if ((vp == nullptr) || (vn[0] == '\0')) {
+	    vp = getenv(vn) ;
+	}
+	if ((vp == nullptr) || (vn[0] == '\0')) {
+	    vp = varname.tmpdname ;
 	}
 	return vp ;
 } 
-/* end subroutine (getourenv) */
+/* end subroutine (gettmpdnamex) */
 
 

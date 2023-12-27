@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h snx.h
 
 
-OBJ0_SNX= mkuuid.o snabbr.o snaddw.o sncpyarray.o
+OBJ0_SNX= snabbr.o snaddw.o sncpyarray.o
 OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o snerrabbr.o
 OBJ2_SNX= snfilemode.o snflags.o snfsflags.o sninetaddr.o
 OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o

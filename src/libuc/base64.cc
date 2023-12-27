@@ -1,4 +1,4 @@
-/* base64 */
+/* base64 SUPPORT */
 /* lang=C++20 */
 
 /* perform BASE64 encoding and decoding */
@@ -40,6 +40,8 @@
 #include	<clanguage.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"base64.h"
 
 
 /* local defines */
@@ -108,6 +110,8 @@ const uchar	base64_dt[] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 } ;
 
+constexpr bool		f_comment = false ;
+
 
 /* exported subroutines */
 
@@ -166,7 +170,7 @@ int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 
 /* encode a group */
 static void base64_eg(cchar *inbuf,char *outbuf) noex {
-	unsigned long	hold = 0 ;
+	ulong	hold = 0 ;
 	int		i ;
 	for (i = 0 ; i < 3 ; i += 1) {
 	    hold = (hold << 8) ;
@@ -180,16 +184,16 @@ static void base64_eg(cchar *inbuf,char *outbuf) noex {
 
 /* decode a group */
 static int base64_dg(cchar *inbuf,char *outbuf) noex {
-	unsigned long	hold = 0 ;
-	uint		c, i ;
-	uint		dlen = 0 ;
+	ulong		hold = 0 ;
+	int		dlen = 0 ;
 	int		rs = 0 ;
-	for (i = 0 ; i < 4 ; i += 1) {
-	    const int	ich = mkchar(inbuf[i]) ;
-	    if ((c = mkchar(base64_dt[ich])) != 0xff) {
+	for (int i = 0 ; i < 4 ; i += 1) {
+	    cint	ich = mkchar(inbuf[i]) ;
+	    int		ch ;
+	    if ((ch = mkchar(base64_dt[ich])) != 0xff) {
 	        hold = (hold << 6) ;
-	        if (c != 0xFE) {
-	            hold |= c ;
+	        if (ch != 0xFE) {
+	            hold |= ch ;
 	            dlen += 1 ;
 	        }
 	    } else {
@@ -197,21 +201,21 @@ static int base64_dg(cchar *inbuf,char *outbuf) noex {
 	    }
 	    if (rs < 0) break ;
 	} /* end for */
-#ifdef	COMMENT
-	if (rs >= 0) {
-	    for (i = 0 ; i < 3 ; i += 1) {
-	        outbuf[i] = mkchar(hold >> ((2 - i) * 6)) ;
+	if constexpr (f_comment) {
+	    if (rs >= 0) {
+	        for (int i = 0 ; i < 3 ; i += 1) {
+	            outbuf[i] = mkchar(hold >> ((2 - i) * 6)) ;
+	        }
+	        dlen -= 1 ;
 	    }
-	    dlen -= 1 ;
-	}
-#else
-	if (rs >= 0) {
-	    outbuf[0] = mkchar(hold >> 16) ;
-	    outbuf[1] = mkchar(hold >> 8) ;
-	    outbuf[2] = mkchar(hold >> 0) ;
-	    dlen -= 1 ;
-	}
-#endif /* COMMENT */
+	} else {
+	    if (rs >= 0) {
+	        outbuf[0] = mkchar(hold >> 16) ;
+	        outbuf[1] = mkchar(hold >> 8) ;
+	        outbuf[2] = mkchar(hold >> 0) ;
+	        dlen -= 1 ;
+	    }
+	} /* end if-constexpr */
 	return (rs >= 0) ? dlen : rs ;
 }
 /* end subroutine (base64_dg) */

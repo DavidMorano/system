@@ -1,7 +1,7 @@
-/* rmx INCLUDE */
+/* pathadd INCLUDE */
 /* lang=C20 */
 
-/* remove EOL (End-Of-Line) characters from the given string */
+/* add a c-string to the end of an existing path c-string */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	RMX_INCLUDE
-#define	RMX_INCLUDE
+#ifndef	PATHADD_INCLUDE
+#define	PATHADD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,16 +27,14 @@
 extern "C" {
 #endif
 
-extern int	rmeol(cchar *,int) noex ;
-extern int	rmchr(cchar *,int,int) noex ;
-extern int	rmext(cchar *,int) noex ;
-extern int	rmtrailchr(cchar *,int,int) noex ;
+extern int pathaddw(char *,int,cchar *,int) noex ;
+extern int pathadd(char *,int,cchar *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
 
-#endif /* RMX_INCLUDE */
+#endif /* PATHADD_INCLUDE */
 
 

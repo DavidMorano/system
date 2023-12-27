@@ -1,6 +1,5 @@
 file		what
 ------------------------
-memfile
-bits
 envs		rm objects from header - replace w/ pointers
+memfile
 getprogroot	lots of cleanup
