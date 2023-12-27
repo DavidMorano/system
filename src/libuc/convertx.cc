@@ -1,0 +1,76 @@
+/* convertx SUPPORT */
+/* lang=C++20 */
+
+/* convert a double floating point value to various representations */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-10, David A­D­ Morano
+        This subroutine was originally written.
+
+*/
+
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+
+/******************************************************************************* 
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
+
+#include	"convertx.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int converte(double v,int prec,int *dpp,int *fsign,char *buf) noex {
+	(void) v ;
+	(void) prec ;
+	(void) dpp ;
+	(void) fsign ;
+	(void) buf ;
+	return 0 ;
+}
+
+int convertf(double v,int prec,int *dpp,int *fsign,char *buf) noex {
+	(void) v ;
+	(void) prec ;
+	(void) dpp ;
+	(void) fsign ;
+	(void) buf ;
+	return 0 ;
+}
+
+int convertg(double v,int prec,int trailing,char *buf) noex {
+	(void) v ;
+	(void) prec ;
+	(void) trailing ;
+	(void) buf ;
+	return 0 ;
+}
+
+
