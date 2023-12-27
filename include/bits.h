@@ -1,4 +1,4 @@
-/* bits */
+/* bits INCLUDE */
 /* lang=C++20 */
 
 /* perform some bit-array type operations */
