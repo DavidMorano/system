@@ -1,4 +1,4 @@
-/* cfdec */
+/* cfdec SUPPORT */
 /* lang=C++20 */
 
 /* convert a decimal digit string to its binary integer value */

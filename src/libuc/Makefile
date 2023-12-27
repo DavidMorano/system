@@ -575,15 +575,19 @@ base.o:		$(OBJ_BASE)
 
 # convert-to (CT)
 OBJ0_CT= ctxxx.o ctbin.o ctoct.o cthex.o ctdec.o ctchars.o 
-OBJ1_CT= ctdecp.o cvtdig.o digbufsizes.o xxtostr.o
+OBJ1_CT= ctdecp.o ctdecf.o cvtdig.o digbufsizes.o
+OBJ2_CT= xxtostr.o convertx.o
 
-OBJ_CT= obj0_ct.o obj1_ct.o
+OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o
 
 obj0_ct.o:	$(OBJ0_CT)
 	$(LD) -r -o $@ $(OBJ0_CT)
 
 obj1_ct.o:	$(OBJ1_CT)
 	$(LD) -r -o $@ $(OBJ1_CT)
+
+obj2_ct.o:	$(OBJ2_CT)
+	$(LD) -r -o $@ $(OBJ2_CT)
 
 ct.o:		$(OBJ_CT)
 	$(LD) -r -o $@ $(OBJ_CT)
@@ -1083,9 +1087,10 @@ ctoct.o:		ctoct.cc ctoct.h cvtdig.hh
 cthex.o:		cthex.cc cthex.h cvtdig.hh
 ctdec.o:		ctdec.cc ctdec.h cvtdig.hh
 ctdecp.o:		ctdecp.cc ctdecp.h ctdec.h
-ctdecf.o:		ctdecf.cc ctdec.h
+ctdecf.o:		ctdecf.cc ctdecf.h convertx.h
 ctchars.o:		ctchars.cc ctchars.h
 xxtostr.o:		xxtostr.cc xxtostr.h
+convertx.o:		convertx.cc convertx.h
 
 dialopts.o:		dialopts.c dialopts.h
 dialprog.o:		dialprog.c dialopts.h

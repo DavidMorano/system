@@ -1,6 +1,9 @@
 /* ctb26 INCLUDE */
 /* lang=C20 */
 
+/* subroutines to convert an integer to a base-26 string */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

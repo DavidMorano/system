@@ -1,6 +1,9 @@
 /* ctbin INCLUDE */
 /* lang=C20 */
 
+/* subroutines to convert an integer to a binary-digit string */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

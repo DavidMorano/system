@@ -1,6 +1,9 @@
 /* ctchars INCLUDE */
 /* lang=C20 */
 
+/* subroutines to convert an integer to a decimal string */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

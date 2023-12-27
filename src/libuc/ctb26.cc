@@ -57,6 +57,10 @@
 
 #define	DIGBASE		26		/* digit base */
 
+#ifndef	CF_REMAINDER
+#define	CF_REMAINDER	0		/* use remainder-division */
+#endif
+
 
 /* external subroutines */
 

@@ -1,7 +1,8 @@
-/* cfhex */
+/* cfhex SUPPORT */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -33,7 +34,6 @@
 /*******************************************************************************
 
 	Subroutines to convert digit c-strings to integers.
-
 
 *******************************************************************************/
 

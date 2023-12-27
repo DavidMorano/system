@@ -1,7 +1,8 @@
-/* cfxxx */
+/* cfxxx SUPPORT */
 /* lang=C++20 */
 
 /* convert a decimal digit string to its binary integer value */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -36,7 +37,6 @@
 /*******************************************************************************
 
 	Subroutines to convert digit strings to binary integers.
-
 
 *******************************************************************************/
 

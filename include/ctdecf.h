@@ -1,6 +1,9 @@
 /* ctdecf INCLUDE */
 /* lang=C++20 */
 
+/* subroutines to convert an floating-value to a decimal string */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
