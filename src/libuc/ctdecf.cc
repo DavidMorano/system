@@ -44,11 +44,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
-#include	<floatingpoint.h>
+#include	<climits>
+#include	<cstring>		/* for |strlen(3c)| */
+#include	<algorithm>		/* for |min(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
+#include	<convertx.h>		/* <- the money shot! */
 
 
 /* local defines */
@@ -60,43 +61,54 @@
 #define	FORMAT_ONOOVERR	(1<<1)		/* do not return error on overflow */
 #endif /* FORMAT_ONOOVERR */
 
-#define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
-#define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)
-
 #define	MAXPREC		41		/* maximum floating precision */
 #define	TMPBUFLEN	(310+MAXPREC+2)	/* must be this large for floats */
+
+#define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
+#define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)
 
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
 
 
+/* local namespaces */
+
+using std::min ;
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
 
-struct subinfo_flags {
+namespace {
+    struct subinfo_flags {
 	uint		ov:1 ;		/* overflow */
 	uint		mclean:1 ;	/* mode: clean-up */
 	uint		mnooverr:1 ;	/* mode: return-error */
-} ;
-
-struct subinfo {
-	char		*ubuf ;		/* user's buffer */
+    } ;
+    struct subinfo {
+	char		*ubuf ;		/* user buffer */
 	int		ulen ;		/* buffer length */
 	int		len ;		/* current usage count */
 	int		mode ;		/* format mode */
 	SUBINFO_FL	f ;		/* flags */
-} ;
+	int start(char *,int,int) noex ;
+	int finish() noex ;
+	int addstrw(cchar *,int) noex ;
+	int addchr(int) noex ;
+	int addfloat(int,double,int,int,int,char *) noex ;
+    } ; /* end struct (subinfo) */
+}
 
 
 /* forward references */
-
-static int subinfo_start(SUBINFO *,char *,int,int) noex ;
-static int subinfo_finish(SUBINFO *) noex ;
-static int subinfo_strw(SUBINFO *,const char *,int) noex ;
-static int subinfo_char(SUBINFO *,int) noex ;
-static int subinfo_float(SUBINFO *,int,double,int,int,int,char *) noex ;
 
 
 /* local variables */
@@ -105,16 +117,16 @@ static int subinfo_float(SUBINFO *,int,double,int,int,int,char *) noex ;
 /* exported subroutines */
 
 int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {
-	SUBINFO		si, *sip = &si ;
+	subinfo		si{} ;
 	int		rs ;
 	int		len = 0 ;
 	char		tmpbuf[TMPBUFLEN + 1] ;
 	if (fcode == 0) fcode = 'f' ;
-	if ((rs = subinfo_start(sip,dbuf,dlen,0)) >= 0) {
+	if ((rs = si.start(dbuf,dlen,0)) >= 0) {
 	    {
-	        rs = subinfo_float(sip,fcode,dv,w,p,fill,tmpbuf) ;
+	        rs = si.addfloat(fcode,dv,w,p,fill,tmpbuf) ;
 	    }
-	    len = subinfo_finish(sip) ;
+	    len = si.finish() ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (subinfo) */
 	return (rs >= 0) ? len : rs ;
@@ -124,34 +136,31 @@ int ctdecf(char *dbuf,int dlen,double dv,int fcode,int w,int p,int fill) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip,char *ubuf,int ulen,int mode) noex {
+int subinfo::start(char *ubuf,int ulen,int mode) noex {
 	int		rs = SR_FAULT ;
-	if (sip) {
-	    memclear(sip) ;
-	    sip->ubuf = ubuf ;
-	    sip->ulen = ulen ;
-	    sip->mode = mode ;
-	    sip->f.mclean = (mode & FORMAT_OCLEAN) ;
-	    sip->f.mnooverr = (mode & FORMAT_ONOOVERR) ;
+	if (this) {
+	    ubuf = ubuf ;
+	    ulen = ulen ;
+	    mode = mode ;
+	    f.mclean = (mode & FORMAT_OCLEAN) ;
+	    f.mnooverr = (mode & FORMAT_ONOOVERR) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (subinfo_start) */
+/* end method (subinfo::start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+int subinfo::finish() noex {
 	int		rs = SR_OK ;
-	int		len = sip->len ;
-	sip->ubuf[len] = '\0' ;
-	if (sip->f.ov) {
-	    if (! sip->f.mnooverr) rs = SR_OVERFLOW ;
+	ubuf[len] = '\0' ;
+	if (f.ov) {
+	    if (! f.mnooverr) rs = SR_OVERFLOW ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (subinfo_finish) */
+/* end method (subinfo::finish) */
 
-static int subinfo_float(SUBINFO *sip,int fcode,double v,
+int subinfo::addfloat(int fcode,double v,
 		int width,int prec,int fill,char *buf) noex {
-{
 	int		rs = SR_OK ;
 	int		i, j ;
 	int		dpp ;		/* (D)ecimal (P)oint (P)osition */
@@ -176,22 +185,22 @@ static int subinfo_float(SUBINFO *sip,int fcode,double v,
 	if (prec > MAXPREC) prec = MAXPREC ;
 /* fill up extra field width which may be specified (for some reason) */
 	while ((rs >= 0) && (width > DOFLOAT_STAGELEN)) {
-	    rs = subinfo_char(sip,' ') ;
+	    rs = addchr(' ') ;
 	    width -= 1 ;
 	} /* end while */
 	if (rs >= 0) {
 /* do the floating decimal conversion */
 	    switch (fcode) {
 	    case 'e':
-	        econvert(v, prec, &dpp,&f_sign,buf) ;
+	        converte(v, prec, &dpp,&f_sign,buf) ;
 	        break ;
 	    case 'f':
-	        fconvert(v, prec, &dpp,&f_sign,buf) ;
+	        convertf(v, prec, &dpp,&f_sign,buf) ;
 	        break ;
 	    case 'g':
 	        {
-	            int	trailing = (width > 0) ;
-	            gconvert(v, prec, trailing,buf) ;
+	            cint	trailing = (width > 0) ;
+	            convertg(v, prec, trailing,buf) ;
 	        }
 	        break ;
 	    } /* end switch */
@@ -200,7 +209,7 @@ static int subinfo_float(SUBINFO *sip,int fcode,double v,
 	    i = DOFLOAT_STAGELEN ;
 	    j = stagelen ;
 /* output any characters after the decimal point */
-	    outlen = MIN(stagelen,prec) ;
+	    outlen = min(stagelen,prec) ;
 	    while ((remlen > 0) && (outlen > 0)) {
 	        if ((! f_varprec) || (buf[j - 1] != '0')) {
 	            f_varprec = false ;
@@ -261,42 +270,42 @@ static int subinfo_float(SUBINFO *sip,int fcode,double v,
 	    }
 /* copy the stage buffer to the output buffer */
 	    while ((rs >= 0) && (i < DOFLOAT_STAGELEN)) {
-	        rs = subinfo_char(sip,stage[i++]) ;
+	        rs = addchr(stage[i++]) ;
 	    }
 	} /* end if (ok) */
 	return rs ;
 }
-/* end subroutine (subinfo_float) */
+/* end method (subinfo::addfloat) */
 
-static int subinfo_char(SUBINFO *sip,int ch) noex {
+int subinfo::addchr(int ch) noex {
 	int		rs = SR_OK ;
 	char		buf[1] ;
 	if (ch != 0) {
 	    buf[0] = ch ;
-	    rs = subinfo_strw(sip,buf,1) ;
+	    rs = addstrw(buf,1) ;
 	}
 	return rs ;
 }
-/* end subroutine (subinfo_char) */
+/* end method (subinfo::addchr) */
 
-static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
+int subinfo::addstrw(cchar *sp,int sl) noex {
 	int		rs = SR_OVERFLOW ;
 	int		ml = 0 ;
-	if (! sip->f.ov) {
-	    cint	rlen = (sip->ulen - sip->len) ;
+	if (! f.ov) {
+	    cint	rlen = (ulen - len) ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (sl > rlen) sip->f.ov = true ;
-	    ml = MIN(sl,rlen) ;
+	    if (sl > rlen) f.ov = true ;
+	    ml = min(sl,rlen) ;
 	    if (ml > 0) {
-	        char	*bp = (sip->ubuf + sip->len) ;
+	        char	*bp = (ubuf + len) ;
 	        memcpy(bp,sp,ml) ;
-	        sip->len += ml ;
+	        len += ml ;
 	    }
-	    if (sip->f.ov) rs = SR_OVERFLOW ;
+	    if (f.ov) rs = SR_OVERFLOW ;
 	} /* end if (noy overflow) */
 	return (rs >= 0) ? ml : rs ;
 }
-/* end subroutine (subinfo_strw) */
+/* end method (subinfo::addstrw) */
 
 
