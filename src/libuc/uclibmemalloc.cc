@@ -1,4 +1,4 @@
-/* uclibmemalloc (3uc) */
+/* uclibmemalloc SUPPORT (3uc) */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -45,6 +45,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

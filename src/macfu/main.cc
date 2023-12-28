@@ -54,8 +54,9 @@
 #include	<strnul.hh>
 #include	<sncpyx.h>
 #include	<isnot.h>
-#include	<mapex.h>
 #include	<getourenv.h>
+#include	<mapblock.hh>
+#include	<mapex.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -71,11 +72,13 @@
 
 using std::nullptr_t ;
 using std::nothrow ;
+using std::cin;
 using std::cout ;
-using std::clog ;
 using std::string ;
 using std::string_view ;
+using std::unordered_map ;
 using std::vector ;
+using std::getline ;
 
 
 /* local typedefs */
@@ -97,28 +100,31 @@ extern "C" {
 /* local structures */
 
 namespace {
-    struct pathent {
-	string		ps ;
+    struct devino {
 	dev_t		dev ;
 	ino_t		ino ;
-	pathent() noex = default ;
-	pathent(dev_t d,ino_t i,cchar *pp,int pl = -1) noex {
+	devino(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
+    } ;
+    struct filenode {
+	string		fn ;
+	int		rc = 0 ;
+	filenode() noex = default ;
+	filenode(cchar *pp,int pl = -1) noex {
 	    if (pl < 0) pl = strlen(pp) ;
 	    strview	s(pp,pl) ;
 	    try {
-	        ps = s ;
-	        dev = d ;
-	        ino = i ;
+	        fn = s ;
+		rc = 1 ;
 	    } catch (...) {
-		dev = 0 ;
-		ino = 0 ;
+		rc = 0 ;
 	    }
 	} ; /* end if (ctor) */
-    } ; /* end struct (pathent) */
+    } ; /* end struct (filenode) */
     enum proginfomems {
 	proginfomem_start,
 	proginfomem_finish,
-	proginfomem_pathend,
+	proginfomem_flistbegin,
+	proginfomem_flistend,
 	proginfomem_overlast
     } ;
     struct proginfo ;
@@ -134,36 +140,26 @@ namespace {
 	    return operator () (0) ;
 	} ;
     } ; /* end struct (proginfo_co) */
-    struct proginfo_pabeg {
-	proginfo	*op = nullptr ;
-	void init(proginfo *p) noex {
-	    op = p ;
-	} ;
-	int operator () (cchar * = nullptr) noex ;
-	operator int () noex {
-	    return operator () (nullptr) ;
-	} ;
-    } ; /* end struct (proginfo_pabeg) */
     struct proginfo {
-	typedef vector<pathent>::iterator	plit_t ;
+	typedef mapblock<devino,filenode>		nodedb ;
+	typedef mapblock<devino,filenode>::iterator	plit_t ;
 	friend proginfo_co ;
-	friend proginfo_pabeg ;
 	proginfo_co	start ;
 	proginfo_co	finish ;
-	proginfo_co	pathend ;
-	proginfo_pabeg	pathbegin ;
+	proginfo_co	flistbegin ;
+	proginfo_co	flistend ;
 	mainv		argv ;
 	mainv		envv ;
 	cchar		*pn = nullptr ;
-	vector<pathent>	pl ;
+	nodedb		flist ;
 	int		argc ;
-	int		pm ;
+	int		pm = 0 ;
 	bool		ffound = false ;
 	proginfo(int c,mainv a,mainv e) noex : argc(c), argv(a), envv(e) { 
 	    start(this,proginfomem_start) ;
 	    finish(this,proginfomem_finish) ;
-	    pathend(this,proginfomem_pathend) ;
-	    pathbegin.init(this) ;
+	    flistbegin(this,proginfomem_flistbegin) ;
+	    flistend(this,proginfomem_flistend) ;
 	} ;
 	proginfo() noex : proginfo(0,nullptr,nullptr) { } ;
 	void operator () (int c,mainv a,mainv e) noex {
@@ -171,16 +167,14 @@ namespace {
 	    argv = a ;
 	    envv = e ;
 	} ;
-	int pathcandidate(cchar *,int) noex ;
-	int pathalready(dev_t,ino_t) noex ;
-	int pathenum() noex ;
-	int pathto() noex ;
+	int filecandidate(cchar *,int) noex ;
+	int filealready(dev_t,ino_t) noex ;
     private:
-	int istart() noexcept ;
-	int ifinish() noexcept ;
-	int ipathbegin(cchar *) noexcept ;
-	int ipathend() noexcept ;
-	int pathenumone(cchar *) noex ;
+	int istart() noex ;
+	int ifinish() noex ;
+	int getpn(mainv) noex ;
+	int iflistbegin() noex ;
+	int iflistend() noex ;
     } ; /* end struct (proginfo) */
 }
 
@@ -191,20 +185,14 @@ namespace {
 /* local variables */
 
 enum progmodes {
-	progmode_pathenum,
-	progmode_pe,
-	progmode_pathto,
-	progmode_pt,
-	progmode_haveprogram,
+	progmode_fileuniq,
+	progmode_fu,
 	progmode_overlast
 } ;
 
 static constexpr cpcchar	prognames[] = {
-	"pathenum",
-	"pe",
-	"pathto",
-	"pt",
-	"haveprogram",
+	"fileuniq",
+	"fu",
 	nullptr
 } ;
 
@@ -229,39 +217,22 @@ constexpr int		maxpathlen = MAXPATH ;
 
 /* exported subroutines */
 
-int main(int argc,mainv argv,mainv envv) noexcept {
+int main(int argc,mainv argv,mainv envv) noex {
 	proginfo	pi(argc,argv,envv) ;
 	int		ex = EX_OK ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = pi.start) >= 0) {
-            switch (pi.pm) {
-            case progmode_pathenum:
-            case progmode_pe:
-                rs = pi.pathenum() ;
-                break ;
-            case progmode_pt:
-                pi.pm = progmode_pathto ;
-		fallthrough ;
-                /* FALLTHROUGH */
-            case progmode_pathto:
-                rs = pi.pathto() ;
-                break ;
-            case progmode_haveprogram:
-                if ((rs = pi.pathto()) == 0) {
-                    ex = (pi.ffound) ? EX_NOEXEC : EX_NOPROG ;
-                } else if (rs < 0) {
-                    switch (rs) {
-                    case SR_NOTFOUND:
-                        ex = EX_NOPROG ;
-                        break ;
-                    case SR_ACCESS:
-                        ex = EX_NOEXEC ;
-                        break ;
-                    } /* end switch */
-                }
-                break ;
-            } /* end switch */
+	    if ((rs = pi.flistbegin()) >= 0) {
+                switch (pi.pm) {
+                case progmode_fileuniq:
+                case progmode_fu:
+                    rs = pi.pathenum() ;
+                    break ;
+                } /* end switch */
+		rs1 = pi.flistend() ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (flist-) */
 	    rs1 = pi.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (proginfo) */
@@ -273,22 +244,11 @@ int main(int argc,mainv argv,mainv envv) noexcept {
 
 /* local subroutines */
 
-int proginfo::istart() noexcept {
-	int		rs = SR_FAULT ;
-	if (argv) {
-	    rs = SR_NOMSG ;
-	    if ((argc > 0) && argv[0]) {
-	        int	bl ;
-	        cchar	*bp{} ;
-		rs = SR_NOSYS ;
-	        if ((bl = sfprogname(argv[0],-1,&bp)) > 0) {
-	            if ((pm = matstr(prognames,bp,bl)) >= 0) {
-			pn = prognames[pm] ;
-		        rs = SR_OK ;
-	            }
-		} /* end if (have base-name) */
-	    } /* end if (have first argument) */
-	} /* end if (non-null) */
+int proginfo::istart() noex {
+	int		rs ;
+	if ((rs = getpn(prognames)) >= 0) {
+	    rs = 0 ;
+	} /* end if (proginfo::getpn) */
 	return rs ;
 }
 /* end method (proginfo::istart) */
@@ -298,34 +258,51 @@ int proginfo::ifinish() noex {
 }
 /* end method (proginfo::ifinish) */
 
-int proginfo::ipathbegin(cchar *vn) noex {
+int proginfo::getpn(mainv names) noex {
 	int		rs = SR_FAULT ;
-	if (vn) {
-	    rs = SR_INVALID ;
-	    if (vn[0]) {
-	        cchar	*valp ;
-		rs = SR_OK ;
-	        if ((valp = getourenv(envv,vn)) != nullptr) {
-	            cchar	*sp = valp ;
-	            char	*tp ;
-	            int		sl = strlen(sp) ;
-	            while ((tp = strnchr(sp,sl,':')) != nullptr) {
-	 	        rs = pathcandidate(sp,(tp-sp)) ;
-		        sl -= ((tp+1) - sp) ;
-		        sp = (tp+1) ;
-		        if (rs < 0) break ;
-	            } /* end while */
-	            if ((rs >= 0) && (sl > 0)) {
-	 	        rs = pathcandidate(sp,sl) ;
-	            }
-	        } /* end if (got value) */
-	    } /* end if (valid) */
+	if (argv) {
+	    rs = SR_NOMSG ;
+	    if ((argc > 0) && argv[0]) {
+	        int	bl ;
+	        cchar	*bp{} ;
+	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
+		    int		pl = rmchr(bp,bl,'.') ;
+		    cchar	*pp = bp ;
+		    if (pl > 0) {
+	                if ((pm = matstr(names,pp,pl)) >= 0) {
+			    pn = names[pm] ;
+		            rs = pm ;
+	                }
+		    } /* end if (non-zero positive progname) */
+		} /* end if (have base-name) */
+	    } /* end if (have first argument) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end method (proginfo::ipathbegin) */
+/* end method (proginfo::getpn) */
 
-int proginfo::pathcandidate(cchar *sp,int sl) noex {
+int proginfo::iflistbegin() noex {
+	cint		llen = MAXPATH ;
+	int		rs = SR_NOMEM ;
+	char		*lbuf ;
+	if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
+	    rs = SR_OK ;
+	    for (int ai = 1 ; (rs >= 0) && (ai < argc) ; ai += 1) {
+		cchar	*fn = argv[i] ;
+		if (fn[0]) {
+		    if (strcmp(fn,"-") == 0) {
+			rs = readin() ;
+		    } else {
+		    }
+		} /* end if */
+	    } /* end for */
+	    delete [] lbuf ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end method (proginfo::iflistbegin) */
+
+int proginfo::filecandidate(cchar *sp,int sl) noex {
 	USTAT		sb ;
 	strnul		s(sp,sl) ;
 	int		rs ;
@@ -333,8 +310,8 @@ int proginfo::pathcandidate(cchar *sp,int sl) noex {
 	    if (S_ISDIR(sb.st_mode)) {
 	        const dev_t	d = sb.st_dev ;
 	        const ino_t	i = sb.st_ino ;
-	        if ((rs = pathalready(d,i)) == 0) {
-		    pathent	e(d,i,sp,sl) ;
+	        if ((rs = filealready(d,i)) == 0) {
+		    filenode	e(d,i,sp,sl) ;
 		    try {
 			if ((e.dev != 0) && (e.ino != 0)) {
 		            pl.push_back(e) ;
@@ -351,15 +328,15 @@ int proginfo::pathcandidate(cchar *sp,int sl) noex {
 	}
 	return rs ;
 }
-/* end method (proginfo::pathcandidate) */
+/* end method (proginfo::filecandidate) */
 
-int proginfo::ipathend() noex {
-	pl.clear() ;
+int proginfo::iflistend() noex {
+	flist.clear() ;
 	return SR_OK ;
 }
-/* end method (proginfo::ipathend) */
+/* end method (proginfo::iflistend) */
 
-int proginfo::pathalready(dev_t d,ino_t i) noex {
+int proginfo::filealready(dev_t d,ino_t i) noex {
 	int		rs = SR_OK ;
 	bool		f = false ;
 	for (auto const &e : pl) {
@@ -368,7 +345,7 @@ int proginfo::pathalready(dev_t d,ino_t i) noex {
 	} /* end for */
 	return (rs >= 0) ? f : rs ;
 }
-/* end method (proginfo::pathalready) */
+/* end method (proginfo::filealready) */
 
 int proginfo::pathenum() noex {
 	int		rs ;
@@ -391,11 +368,11 @@ int proginfo::pathenum() noex {
 int proginfo::pathenumone(cchar *vn) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pathbegin(vn)) >= 0) {
+	if ((rs = flistbegin(vn)) >= 0) {
 	    for (auto const &e : pl) {
 		cout << e.ps << eol ;
 	    } /* end for */
-	    rs1 = pathend ;
+	    rs1 = flistend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (proginfo::path) */
 	return rs ;
@@ -406,7 +383,7 @@ int proginfo::pathto() noex {
 	int		rs ;
 	int		rs1 ;
 	int		ctotal = 0 ;
-	if ((rs = pathbegin) >= 0) {
+	if ((rs = flistbegin) >= 0) {
 	    if ((rs = maxpathlen) >= 0) {
 	        cint	pm_pt = progmode_pathto ;
 	        cint	pm_hp = progmode_haveprogram ;
@@ -453,7 +430,7 @@ int proginfo::pathto() noex {
 	            delete [] pbuf ;
 	        } /* end if (m-a-f) */
 	    } /* end if (maxpathlen) */
-	    rs1 = pathend ;
+	    rs1 = flistend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (proginfo::path) */
 	return (rs >= 0) ? ctotal : rs ;
@@ -470,23 +447,16 @@ int proginfo_co::operator () (int) noex {
 	    case proginfomem_finish:
 	        rs = op->ifinish() ;
 	        break ;
-	    case proginfomem_pathend:
-	        rs = op->ipathend() ;
+	    case proginfomem_flistbegin:
+	        rs = op->iflistend() ;
+	        break ;
+	    case proginfomem_flistend:
+	        rs = op->iflistend() ;
 	        break ;
 	    } /* end switch */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (proginfo_co::operator) */
-
-int proginfo_pabeg::operator () (cchar *vn) noex {
-	int	rs = SR_BUGCHECK ;
-	if (op) {
-	    if (vn == nullptr) vn = varname.path ;
-	    rs = op->ipathbegin(vn) ;
-	}
-	return rs ;
-}
-/* end method (proginfo_pabeg::operator) */
 
 
