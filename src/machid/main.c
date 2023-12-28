@@ -1,18 +1,18 @@
 /* main */
+/* lang=C20 */
 
 /* get the various IDs from the system */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
-
 
 /* revision history:
 
 	= 1988-01-10, David A­D­ Morano
-        This subroutine was written (originally) as a test of the Sun Solaris 
-        UNIX 'kstat' facility.  But now it just prints the machine ID.
+	This subroutine was written (originally) as a test of the
+	Sun Solaris® UNIX® 'kstat' facility.  But now it just prints
+	the machine ID.
 
 */
 
@@ -22,12 +22,9 @@
 
 	Get the IDs from the system.
 
-
 ***************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
@@ -38,8 +35,8 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdio.h>
-
 #include	<usystem.h>
+#include	<getourenv.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -54,10 +51,6 @@
 
 /* external subroutines */
 
-extern int	cfdecl(char *,int,long) ;
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
 
 /* external variables */
 
@@ -70,11 +63,7 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 
 /* exported subroutines */
 
-
-int main(int argc,char **aargv,char **aenvv)
-{
-	cchar	**argv = (cchar **) aargv ;
-	cchar	**envv = (cchar **) aenvv ;
+int main(int argc,mainv argv,mainv envv) {
 	FILE	*fp = stdout ;
 	long	v ;
 	uint	hostid ;

@@ -21,7 +21,6 @@
 #include	<envstandards.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-
 #include	<snwcpyx.h>
 
 

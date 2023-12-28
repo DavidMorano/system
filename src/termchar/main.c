@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* part of TERMCHAR program */
+/* version %I% last-modified %G% */
 
 #define	CF_CHARSETS	0		/* set character sets */
 #define	CF_ANSILEVEL	0		/* set ANSI conformance level */
@@ -13,8 +14,8 @@
 /* revision history:
 
 	= 2004-06-24, David A­D­ Morano
-        I rewrote this from scratch. The previous version of this program was a
-        hack.
+	I rewrote this from scratch. The previous version of this
+	program was a hack.
 
 */
 
@@ -30,7 +31,6 @@
 
 	Synopsis:
 	$ termchar [arguments]
-
 
 *****************************************************************************/
 
@@ -63,17 +63,17 @@ extern int	termcharset(char *,int,int,int,cchar *) noex ;
 
 /* local variables */
 
-static const char	*ss2 = "\033N" ;
-static const char	*ss3 = "\033O" ;
+static cchar	*ss2 = "\033N" ;
+static cchar	*ss3 = "\033O" ;
 
-static const char	*ls0 = "\017" ;		/* also SI */
-static const char	*ls1 = "\016" ;		/* also SO */
-static const char	*ls2 = "\033n" ;
-static const char	*ls3 = "\033o" ;
+static cchar	*ls0 = "\017" ;		/* also SI */
+static cchar	*ls1 = "\016" ;		/* also SO */
+static cchar	*ls2 = "\033n" ;
+static cchar	*ls3 = "\033o" ;
 
-static const char	*ls1r = "\033~" ;
-static const char	*ls2r = "\033}" ;
-static const char	*ls3r = "\033|" ;
+static cchar	*ls1r = "\033~" ;
+static cchar	*ls2r = "\033}" ;
+static cchar	*ls3r = "\033|" ;
 
 
 /* exported subroutines */

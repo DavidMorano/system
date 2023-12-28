@@ -29,7 +29,7 @@ enum lockmemallocsets {
 extern "C" {
 #endif
 
-extern int	lockmemalloc_set(int) ;
+extern int	lockmemalloc_set(int) noex ;
 
 #ifdef	__cplusplus
 }

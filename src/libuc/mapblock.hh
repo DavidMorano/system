@@ -55,11 +55,12 @@ public:
 
 template<typename K,typename Block>
 int mapblock<K,Block>::start(int n) noex {
+	typedef decltype(std::nothrow)	nothrow_t ;
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
 	    rs = SR_NOMEM ;
 	    try {
-		const decltype(std::nothrow)	nt{} ;
+		const nothrow_t		nt{} ;
 		const nullptr_t		np{} ;
 	        if ((mp = new(nt) maptype(n)) != np) {
 	            rs = SR_OK ;
@@ -109,7 +110,7 @@ template<typename K,typename Block>
 int mapblock<K,Block>::get(K k,Block *vp) noex {
 	typedef typename maptype::iterator	iterator ;
 	int		rs = SR_FAULT ;
-	if (vp) {
+	if (mp && vp) {
 	    typedef typename maptype::value_type	v_t ;
 	    const iterator	it_end = mp->end() ;
 	    const iterator	it = mp->find(k) ;
@@ -125,7 +126,11 @@ int mapblock<K,Block>::get(K k,Block *vp) noex {
 
 template<typename K,typename Block>
 int mapblock<K,Block>::count() noex {
-	return mp->size() ;
+	int		rs = SR_BADFMT ;
+	if (mp) {
+	    rs = mp->size() ;
+	}
+	return rs ;
 }
 
 template<typename K,typename Block>

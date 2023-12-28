@@ -1,4 +1,4 @@
-/* um (UNIX® Memory-Management) */
+/* um SUPPORT (UNIX® Memory-Management) */
 /* lang=C++23 */
 
 /* UNIX® Memory-Management interface */
