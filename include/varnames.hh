@@ -45,6 +45,7 @@ struct varnames {
 	static const char libpath[] ;
 	static const char incpath[] ;
 	static const char manpath[] ;
+	static const char manxpath[] ;
 	static const char infopath[] ;
 	static const char architecture[] ;
 	static const char sysname[] ;

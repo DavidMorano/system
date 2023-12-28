@@ -41,6 +41,7 @@ const char varnames::binpath[] =	"BINPATH" ;
 const char varnames::libpath[] =	"LIBPATH" ;
 const char varnames::incpath[] =	"INCPATH" ;
 const char varnames::manpath[] =	"MANPATH" ;
+const char varnames::manxpath[] =	"MANXPATH" ;
 const char varnames::infopath[] =	"INFOPATH" ;
 const char varnames::architecture[] =	"ARCHITECTURE" ;
 const char varnames::sysname[] =	"SYSNAME" ;
