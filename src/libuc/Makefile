@@ -409,7 +409,7 @@ UOBJ03= varnames.o rmx.o
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
-UOBJ07= getourenv.o
+UOBJ07= getourenv.o readln.o
 
 UOBJ08= matkeystr.o strkeycmp.o
 UOBJ09= ustat.o
