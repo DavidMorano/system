@@ -56,11 +56,6 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_MAINV
-#define	TYPEDEF_MAINV
-typedef cpccharp	mainv ;
-#endif
-
 
 /* external subroutines */
 
