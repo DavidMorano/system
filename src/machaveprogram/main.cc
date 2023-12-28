@@ -17,17 +17,21 @@
 /*******************************************************************************
 
 	Names:
-	pathenum
-	pathto
 	haveprogram
+	havefunction
+	fpathto
+	pathto
+	pathenum
 
 	Description:
 	Print out the home directory for the given user.
 
 	Synopsis:
-	$ pathenum
-	$ pathto
 	$ haveprogram
+	$ havefunction
+	$ fpathto
+	$ pathto
+	$ pathenum
 
 	Returns:
 	0		for normal operation success
@@ -51,7 +55,7 @@
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| + |strcmp(3c)| */
 #include	<string>
 #include	<string_view>
 #include	<vector>
@@ -65,6 +69,7 @@
 #include	<varnames.hh>
 #include	<strnul.hh>
 #include	<sncpyx.h>
+#include	<rmx.h>
 #include	<isnot.h>
 #include	<mapex.h>
 #include	<getourenv.h>
@@ -84,7 +89,6 @@
 using std::nullptr_t ;
 using std::nothrow ;
 using std::cout ;
-using std::clog ;
 using std::string ;
 using std::string_view ;
 using std::vector ;
@@ -92,7 +96,6 @@ using std::vector ;
 
 /* local typedefs */
 
-typedef cpccharp	mainv ;
 typedef string_view	strview ;
 
 
@@ -186,7 +189,10 @@ namespace {
 	int pathcandidate(cchar *,int) noex ;
 	int pathalready(dev_t,ino_t) noex ;
 	int pathenum() noex ;
-	int pathto() noex ;
+	int pathtox() noex ;
+	int pathto(cchar * = nullptr) noex ;
+	int getpn(mainv) noex ;
+	int getvn(cchar **) noex ;
     private:
 	int istart() noexcept ;
 	int ifinish() noexcept ;
@@ -207,7 +213,10 @@ enum progmodes {
 	progmode_pe,
 	progmode_pathto,
 	progmode_pt,
+	progmode_fpathto,
+	progmode_manto,
 	progmode_haveprogram,
+	progmode_havefunction,
 	progmode_overlast
 } ;
 
@@ -216,7 +225,10 @@ static constexpr cpcchar	prognames[] = {
 	"pe",
 	"pathto",
 	"pt",
+	"fpathto",
+	"manto",
 	"haveprogram",
+	"havefunction",
 	nullptr
 } ;
 
@@ -257,10 +269,12 @@ int main(int argc,mainv argv,mainv envv) noexcept {
 		fallthrough ;
                 /* FALLTHROUGH */
             case progmode_pathto:
+            case progmode_fpathto:
                 rs = pi.pathto() ;
                 break ;
             case progmode_haveprogram:
-                if ((rs = pi.pathto()) == 0) {
+            case progmode_havefunction:
+                if ((rs = pi.pathtox()) == 0) {
                     ex = (pi.ffound) ? EX_NOEXEC : EX_NOPROG ;
                 } else if (rs < 0) {
                     switch (rs) {
@@ -271,7 +285,7 @@ int main(int argc,mainv argv,mainv envv) noexcept {
                         ex = EX_NOEXEC ;
                         break ;
                     } /* end switch */
-                }
+                } /* end if (pathto) */
                 break ;
             } /* end switch */
 	    rs1 = pi.finish ;
@@ -288,18 +302,7 @@ int main(int argc,mainv argv,mainv envv) noexcept {
 int proginfo::istart() noexcept {
 	int		rs = SR_FAULT ;
 	if (argv) {
-	    rs = SR_NOMSG ;
-	    if ((argc > 0) && argv[0]) {
-	        int	bl ;
-	        cchar	*bp{} ;
-		rs = SR_NOSYS ;
-	        if ((bl = sfprogname(argv[0],-1,&bp)) > 0) {
-	            if ((pm = matstr(prognames,bp,bl)) >= 0) {
-			pn = prognames[pm] ;
-		        rs = SR_OK ;
-	            }
-		} /* end if (have base-name) */
-	    } /* end if (have first argument) */
+	    rs = getpn(prognames) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -309,6 +312,29 @@ int proginfo::ifinish() noex {
 	return SR_OK ;
 }
 /* end method (proginfo::ifinish) */
+
+int proginfo::getpn(mainv names) noex {
+	int		rs = SR_FAULT ;
+	if (argv) {
+	    rs = SR_NOMSG ;
+	    if ((argc > 0) && argv[0]) {
+	        int	bl ;
+	        cchar	*bp{} ;
+	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
+		    int		pl = rmchr(bp,bl,'.') ;
+		    cchar	*pp = bp ;
+		    if (pl > 0) {
+	                if ((pm = matstr(names,pp,pl)) >= 0) {
+			    pn = names[pm] ;
+		            rs = pm ;
+	                }
+		    } /* end if (non-zero positive progname) */
+		} /* end if (have base-name) */
+	    } /* end if (have first argument) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (proginfo::getpn) */
 
 int proginfo::ipathbegin(cchar *vn) noex {
 	int		rs = SR_FAULT ;
@@ -401,8 +427,15 @@ int proginfo::pathenum() noex {
 /* end subroutine (proginfo::pathenum) */
 
 int proginfo::pathenumone(cchar *vn) noex {
+	cchar		*manpath = varname.manpath ;
 	int		rs ;
 	int		rs1 ;
+	if (strcmp(vn,manpath) == 0) {
+	    cchar	*vv = getourenv(envv,vn) ;
+	    if ((vv == nullptr) || (vv[0] == '\0')) {
+		vn = varname.manxpath ;
+	    }
+	} /* end if (manpath match) */
 	if ((rs = pathbegin(vn)) >= 0) {
 	    for (auto const &e : pl) {
 		cout << e.ps << eol ;
@@ -414,14 +447,29 @@ int proginfo::pathenumone(cchar *vn) noex {
 }
 /* end subroutine (proginfo::pathenumone) */
 
-int proginfo::pathto() noex {
+int proginfo::pathtox() noex {
+	int		rs ;
+	cchar		*vn{} ;
+	if ((rs = getvn(&vn)) >= 0) {
+	    rs = pathto(vn) ;
+	} /* end if (getvn) */
+	return rs ;
+}
+/* end subroutine (proginfo::pathtox) */
+
+int proginfo::pathto(cchar *vn) noex {
+	cint		pm_pt = progmode_pathto ;
+	cint		pm_fp = progmode_fpathto ;
+	cint		pm_hp = progmode_haveprogram ;
+	cint		pm_hf = progmode_havefunction ;
 	int		rs ;
 	int		rs1 ;
 	int		ctotal = 0 ;
-	if ((rs = pathbegin) >= 0) {
+	if ((vn == nullptr) && (pm == pm_fp)) {
+	    vn = varname.fpath ;
+	}
+	if ((rs = pathbegin(vn)) >= 0) {
 	    if ((rs = maxpathlen) >= 0) {
-	        cint	pm_pt = progmode_pathto ;
-	        cint	pm_hp = progmode_haveprogram ;
 	        cint	plen = rs ;
 	        char	*pbuf ;
 	        rs = SR_NOMEM ;
@@ -432,6 +480,7 @@ int proginfo::pathto() noex {
 		        int	c = 0 ;
 	                if (ap[0]) {
 			    ffound = false ;
+			    bool	f = false ;
 	                    for (auto const &e : pl) {
 			        cchar	*pp = e.ps.c_str() ; /* <- throw? */
 			        if ((rs = sncpy(pbuf,plen,pp,"/",ap)) >= 0) {
@@ -440,10 +489,22 @@ int proginfo::pathto() noex {
 				        cmode	fm = sb.st_mode ;
 				        ffound = true ;
 				        if (S_ISREG(fm)) {
-					    cmode	xxx = 0111 ;
+					    mode_t	xxx = 0 ;
+					    f = f || (pm == pm_pt) ;
+					    f = f || (pm == pm_fp) ;
+					    switch (pm) {
+					    case progmode_pathto:
+					    case progmode_haveprogram:
+						xxx = 0111 ;
+						break ;
+					    case progmode_fpathto:
+					    case progmode_havefunction:
+						xxx = 0440 ;
+						break ;
+					    } /* end switch */
 					    if ((fm & xxx) == xxx) {
 					        c += 1 ;
-					        if (pm == pm_pt) {
+					        if (f) {
 	                                            cout << pbuf << eol ;
 					        }
 					    } /* end if is-exec) */
@@ -455,7 +516,8 @@ int proginfo::pathto() noex {
 			        if ((pm == pm_hp) && (c > 0)) break ;
 			        if (rs < 0) break ;
 	                    } /* end for (paths) */
-			    if ((rs >= 0) && (pm == pm_hp) && (c == 0)) {
+			    f = ((pm == pm_hp) || (pm == pm_hf)) ;
+			    if ((rs >= 0) && f && (c == 0)) {
 			        rs = (ffound) ? SR_ACCESS : SR_NOTFOUND ;
 			    } /* end if */
 	                } /* end if (non-empty) */
@@ -471,6 +533,41 @@ int proginfo::pathto() noex {
 	return (rs >= 0) ? ctotal : rs ;
 }
 /* end subroutine (proginfo::pathto) */
+
+int proginfo::getvn(cchar **rpp) noex {
+	const nullptr_t	np{} ;
+	int		rs = SR_FAULT ;
+	if (rpp) {
+	    cchar	*vn = nullptr ;
+	    rs = SR_OK ;
+	    switch (pm) {
+	    case progmode_haveprogram:
+	    case progmode_pathto:
+	    case progmode_pt:
+	        vn = varname.path ;
+	        break ;
+	    case progmode_havefunction:
+	    case progmode_fpathto:
+	        vn = varname.fpath ;
+	        break ;
+	    case progmode_manto:
+	        vn = varname.manpath ;
+		{
+		    cchar	*vv = getourenv(envv,vn) ;
+		    if ((vv == np) || (vv[0] == '\0')) {
+			vn = varname.manxpath ;
+		    } /* end if */
+	        } /* end block */
+	        break ;
+	    default:
+		rs = SR_BUGCHECK ;
+		break ;
+	    } /* end switch */
+	    *rpp = (rs >= 0) ? vn : nullptr ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (proginfo::getvn) */
 
 int proginfo_co::operator () (int) noex {
 	int	rs = SR_BUGCHECK ;
