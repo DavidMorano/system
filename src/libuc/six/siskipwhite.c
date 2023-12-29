@@ -1,4 +1,4 @@
-/* siskipwhite */
+/* siskipwhite SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find a character in a given string */
@@ -37,7 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>

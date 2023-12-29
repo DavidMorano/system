@@ -107,10 +107,9 @@ struct memtrack {
 	int	istart(int = 0) noex ;
 	int	icount() noex ;
 	int	ifinish() noex ;
+	void	dtor() noex ;
 	~memtrack() noex {
-	    if (magic) {
-		(void) ifinish() ;
-	    }
+	    dtor() ;
 	} ; /* end if (dtor) */
 } ; /* end struct (memtrack) */
 

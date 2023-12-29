@@ -10,6 +10,10 @@
 	= 1998-04-10, David A­D­ Morano
         This subroutine was originally written.
 
+	= 2023-12-28, David A­D­ Morano
+	This is (substantially) refactored. I went from using
+	|std::getline(3c++)| to |std::iostream::getline(3c++)|.
+
 */
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
@@ -42,6 +46,10 @@
 	>=0		number characters read, including terminating char
 	<0		error (system-return)
 
+	Implementation-node:
+	:-)
+	This is the second implementation of this (2023-12-28).
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -63,8 +71,6 @@
 /* local namespaces */
 
 using std::istream ;			/* type */
-using std::string ;			/* type */
-using std::getline ;			/* subroutine */
 
 
 /* local typedefs */
@@ -93,23 +99,16 @@ int readln(istream &is,char *ibuf,int ilen,int dch) noex {
 	if (dch == 0) dch = eol ;
 	if (ibuf) {
 	    try {
-	        string	iline ;
 		rs = SR_BADFMT ;
-	        if (bool(getline(is,iline,char(dch)))) {
-		    cint	ll = iline.length() ;
-		    cchar	*lp = iline.c_str() ;
-		    if ((rs = snwcpy(ibuf,ilen,lp,ll)) >= 0) {
-			char	*ip = (ibuf+rs) ;
-			cint	il = (ilen-rs) ;
-			len += rs ;
-			if (il > 0) {
-			    *ip++ = dch ;
-			    *ip = '\0' ;
-			    len += 1 ;
-			} else {
-			    rs = SR_OVERFLOW ;
-			}
-		    } /* end if (copy to destination) */
+	        if (bool(is.getline(ibuf,ilen,char(dch)))) {
+		    rs = is.gcount() ;
+		    len += rs ;
+		    if ((ilen - len) > 0) {
+			ibuf[len++] = dch ;
+			ibuf[len] = '\0' ;
+		    } else {
+			rs = SR_OVERFLOW ;
+		    } /* end if (adding delimiter to input buffer) */
 		} else {
 		    cbool	feof	= is.eof() ;
 		    cbool	ffail	= is.fail() ;
@@ -117,7 +116,7 @@ int readln(istream &is,char *ibuf,int ilen,int dch) noex {
 		    if (feof) {
 		        rs = SR_OK ;
 		    } else if (ffail) {
-		        rs = SR_IO ;
+		        rs = SR_NOMSG ;
 		    } else if (fbad) {
 		        rs = SR_IO ;
 	            }

@@ -8,8 +8,8 @@
 /* revision history:
 
 	= 2011-04-12, David A­D­ Morano
-	This subroutine was originally written.  Only the introduction of
-	C++11 has allowed this (finally).
+	This subroutine was originally written.  Only the introduction
+	of C++11 has allowed this (finally).
 
 */
 
@@ -47,7 +47,7 @@ public:
 	int	start(int = 0) noex ;
 	int	ins(K,const Block &) noex ;
 	int	rem(K) noex ;
-	int	present(K) noex ;
+	int	present(K &) noex ;
 	int	get(K,Block *) noex ;
 	int	count() noex ;
 	int	finish() noex ;
@@ -60,7 +60,7 @@ int mapblock<K,Block>::start(int n) noex {
 	if (n >= 0) {
 	    rs = SR_NOMEM ;
 	    try {
-		const nothrow_t		nt{} ;
+		const nothrow_t		nt = std::nothrow ;
 		const nullptr_t		np{} ;
 	        if ((mp = new(nt) maptype(n)) != np) {
 	            rs = SR_OK ;
@@ -99,7 +99,7 @@ int mapblock<K,Block>::rem(K k) noex {
 }
 
 template<typename K,typename Block>
-int mapblock<K,Block>::present(K k) noex {
+int mapblock<K,Block>::present(K &k) noex {
 	typedef typename maptype::iterator	iterator ;
 	const iterator	it_end = mp->end() ;
 	iterator	it = mp->find(k) ;

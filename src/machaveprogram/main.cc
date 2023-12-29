@@ -367,12 +367,14 @@ int proginfo::pathcandidate(cchar *sp,int sl) noex {
 	USTAT		sb ;
 	strnul		s(sp,sl) ;
 	int		rs ;
+	cint		fl = rmtrailchr(sp,sl,'/') ;
+	cchar		*fp = sp ;
 	if ((rs = u_stat(s,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
 	        const dev_t	d = sb.st_dev ;
 	        const ino_t	i = sb.st_ino ;
 	        if ((rs = pathalready(d,i)) == 0) {
-		    pathent	e(d,i,sp,sl) ;
+		    pathent	e(d,i,fp,fl) ;
 		    try {
 			if ((e.dev != 0) && (e.ino != 0)) {
 		            pl.push_back(e) ;

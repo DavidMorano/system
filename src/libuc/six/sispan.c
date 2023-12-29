@@ -1,4 +1,4 @@
-/* sispan */
+/* sispan SUPPORT */
 /* lang=C20 */
 
 /* find the index of character pass a span of a string */

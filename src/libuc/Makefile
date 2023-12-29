@@ -1172,8 +1172,14 @@ ucpasswd.o:		ucpasswd.cc ucpasswd.h
 ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
 
+# UNIX C-language system library support
+uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
+libmallocxx.o:		libmalloccc.xx libmallocxx.h
+
 # UNIX C-language system library memory management
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h
+mapblock.o:		mapblock.cc mapblock.hh
+memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management
@@ -1191,13 +1197,6 @@ usys_linux.o:		usys_linux.cc usys_linux.h
 aflag.o:		aflag.cc aflag.hh
 timewatch.o:		timwatch.cc timewatch.hh
 timecount.o:		timecount.cc timecount.hh
-
-# UNIX C-language system library support
-uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
-
-mapblock.o:		mapblock.cc mapblock.hh
-memtrack.o:		memtrack.cc memtrack.hh
-libmallocxx.o:		libmalloccc.xx libmallocxx.h
 
 # misc-character
 toxc.o:			toxc.c toxc.h

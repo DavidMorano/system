@@ -1,4 +1,4 @@
-/* sialpha */
+/* sialpha SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find the index of an alpha character in a given string */

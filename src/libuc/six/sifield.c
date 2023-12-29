@@ -1,4 +1,4 @@
-/* sifield */
+/* sifield SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find the index of a character in a given string */

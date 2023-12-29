@@ -1,4 +1,4 @@
-/* singlist */
+/* singlist INCLUDE */
 /* lang=C++98 */
 
 /* regular (no-frills) pointer queue (not-circular) */

@@ -5,5 +5,5 @@ to standard-input and writes out only the unique filenames (selecting
 one at random).
 
 Synopsis:
-$ fu <file(s)> [-]
+$ fu [<file(s)>] [-]
 

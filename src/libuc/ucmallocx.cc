@@ -1,4 +1,4 @@
-/* ucmallocx */
+/* ucmallocx SUUPORT */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */
@@ -21,7 +21,7 @@
 	uc_mallocsys
 
 	Description:
-	This subroutine is similar to 'uc_malloc(3uc)' except that
+	This subroutine is similar to |uc_malloc(3uc)| except that
 	it takes a string argument and copies it into the newly
 	allocated space.
 
@@ -41,8 +41,9 @@
 	uc_mallocbuf
 
 	Description:
-        This subroutine is similar to 'uc_malloc(3uc)' except that it takes a
-        string argument and copies it into the newly allocated space.
+	This subroutine is similar to |uc_malloc(3uc)| except that
+	it takes a string argument and copies it into the newly
+	allocated space.
 
 	Synopsis:
 	int uc_mallocbuf(cvoid *sp,int sl,void **rpp) noex

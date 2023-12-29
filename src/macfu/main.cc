@@ -23,7 +23,11 @@
 	This program filters filenames keeping only unique files.
 
 	Synopsis:
-	$ fu
+	$ fu [<file(s)>] [-]
+
+	Arguments:
+	<file(s)>	file(s) to process
+	-		read standard-input for file(s) to process
 
 	Returns:
 	0		for normal operation success
@@ -55,8 +59,9 @@
 #include	<sncpyx.h>
 #include	<isnot.h>
 #include	<getourenv.h>
-#include	<mapblock.hh>
 #include	<mapex.h>
+#include	<mapblock.hh>
+#include	<readln.hh>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -70,20 +75,18 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
-using std::nothrow ;
-using std::cin;
-using std::cout ;
-using std::string ;
-using std::string_view ;
-using std::unordered_map ;
-using std::vector ;
-using std::getline ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+using std::cin;				/* variable */
+using std::cout ;			/* variable */
+using std::string ;			/* type */
+using std::string_view ;		/* type */
+using std::unordered_map ;		/* type */
+using std::vector ;			/* type */
 
 
 /* local typedefs */
 
-typedef cpccharp	mainv ;
 typedef string_view	strview ;
 
 
@@ -104,7 +107,10 @@ namespace {
 	dev_t		dev ;
 	ino_t		ino ;
 	devino(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
-    } ;
+	size_t hashval() const noex {
+	    return size_t(dev | ino) ;
+	} ;
+    } ; /* end struct (devino) */
     struct filenode {
 	string		fn ;
 	int		rc = 0 ;
@@ -167,7 +173,7 @@ namespace {
 	    argv = a ;
 	    envv = e ;
 	} ;
-	int filecandidate(cchar *,int) noex ;
+	int filecandidate(cchar *,int = -1) noex ;
 	int filealready(dev_t,ino_t) noex ;
     private:
 	int istart() noex ;
@@ -175,7 +181,13 @@ namespace {
 	int getpn(mainv) noex ;
 	int iflistbegin() noex ;
 	int iflistend() noex ;
+	int readin() noex ;
     } ; /* end struct (proginfo) */
+    template<> struct std::hash<devino> {
+	size_t operator() (const devino &di) const noex {
+	    return di.hashval() ;
+	} ;
+    } ; /* end struct-template (hash<devino>) */
 }
 
 
@@ -227,7 +239,7 @@ int main(int argc,mainv argv,mainv envv) noex {
                 switch (pi.pm) {
                 case progmode_fileuniq:
                 case progmode_fu:
-                    rs = pi.pathenum() ;
+                    rs = pi.output() ;
                     break ;
                 } /* end switch */
 		rs1 = pi.flistend() ;
@@ -264,8 +276,9 @@ int proginfo::getpn(mainv names) noex {
 	    rs = SR_NOMSG ;
 	    if ((argc > 0) && argv[0]) {
 	        int	bl ;
+		cchar	*arg0 = argv[0] ;
 	        cchar	*bp{} ;
-	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
+	        if ((bl = sfbasename(argv0,-1,&bp)) > 0) {
 		    int		pl = rmchr(bp,bl,'.') ;
 		    cchar	*pp = bp ;
 		    if (pl > 0) {
@@ -282,25 +295,43 @@ int proginfo::getpn(mainv names) noex {
 /* end method (proginfo::getpn) */
 
 int proginfo::iflistbegin() noex {
+	int		rs = SR_OK ;
+	if (argc > 1) {
+	    for (int ai = 1 ; (rs >= 0) && (ai < argc) ; ai += 1) {
+		cchar	*fn = argv[ai] ;
+		if (fn[0]) {
+		    if ((fn[0] == '-') && (fn[1] == '\0')) {
+			rs = readin() ;
+		    } else {
+			rs = filecandidate(fn) ;
+		    }
+		} /* end if */
+	    } /* end for */
+	} else {
+	    rs = readin() ;
+	}
+	return rs ;
+}
+/* end method (proginfo::iflistbegin) */
+
+int proginfo::readin() noex {
 	cint		llen = MAXPATH ;
 	int		rs = SR_NOMEM ;
 	char		*lbuf ;
 	if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
-	    rs = SR_OK ;
-	    for (int ai = 1 ; (rs >= 0) && (ai < argc) ; ai += 1) {
-		cchar	*fn = argv[i] ;
-		if (fn[0]) {
-		    if (strcmp(fn,"-") == 0) {
-			rs = readin() ;
-		    } else {
-		    }
-		} /* end if */
-	    } /* end for */
+	    while ((rs = readln(cin,lbuf,llen)) >= 0) {
+		int	ll = rs ;
+		if ((ll > 0) && (lbuf[ll - 1] == eol)) ll -= 1 ;
+		if (ll > 0) {
+		    rs = flistenter(lbuf,ll) ;
+		}
+		if (rs < 0) break ;
+	    } /* end if (reading lines) */
 	    delete [] lbuf ;
 	} /* end if (m-a-f) */
 	return rs ;
 }
-/* end method (proginfo::iflistbegin) */
+/* end method (proginfo::readin) */
 
 int proginfo::filecandidate(cchar *sp,int sl) noex {
 	USTAT		sb ;
@@ -311,16 +342,9 @@ int proginfo::filecandidate(cchar *sp,int sl) noex {
 	        const dev_t	d = sb.st_dev ;
 	        const ino_t	i = sb.st_ino ;
 	        if ((rs = filealready(d,i)) == 0) {
-		    filenode	e(d,i,sp,sl) ;
-		    try {
-			if ((e.dev != 0) && (e.ino != 0)) {
-		            pl.push_back(e) ;
-			} else {
-			    rs = SR_NOMEM ;
-			}
-		    } catch (...) {
-			rs = SR_NOMEM ;
-		    }
+		    devino	di(d,i) ;
+		    filenode	e(sp,sl) ;
+		    rs = flist.ins(di,e) ;
 	        } /* end if (not-already) */
 	    } /* end if (is-dir) */
 	} else if (isNotAccess(rs)) {
@@ -337,17 +361,19 @@ int proginfo::iflistend() noex {
 /* end method (proginfo::iflistend) */
 
 int proginfo::filealready(dev_t d,ino_t i) noex {
-	int		rs = SR_OK ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
 	bool		f = false ;
-	for (auto const &e : pl) {
-	    f = ((e.dev == d) && (e.ino == i)) ;
-	    if (f) break ;
-	} /* end for */
+	devino		di(d,i) ;
+	if ((rs = flist.present(di)) == rsn) {
+	    rs = SR_OK ;
+	    f = true ;
+	} /* end if (mapblock::present) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end method (proginfo::filealready) */
 
-int proginfo::pathenum() noex {
+int proginfo::output() noex {
 	int		rs ;
 	if (argc > 1) {
 	    rs = SR_OK ;
@@ -363,7 +389,7 @@ int proginfo::pathenum() noex {
 	} /* end if (program arguments) */
 	return rs ;
 }
-/* end subroutine (proginfo::pathenum) */
+/* end subroutine (proginfo::output) */
 
 int proginfo::pathenumone(cchar *vn) noex {
 	int		rs ;

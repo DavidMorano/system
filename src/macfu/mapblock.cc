@@ -8,8 +8,8 @@
 /* revision history:
 
 	= 2011-04-12, David A­D­ Morano
-	This subroutine was originally written.  Only the introduction of
-	C++11 has allowed this (finally).
+	This subroutine was originally written.  Only the introduction
+	of C++11 has allowed this (finally).
 
 */
 

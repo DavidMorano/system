@@ -1,4 +1,4 @@
-/* sialnum */
+/* sialnum SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find the index of an alpha-numeric character */

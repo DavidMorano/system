@@ -1,4 +1,4 @@
-/* sicite */
+/* sicite SUPPORT */
 /* lang=C20 */
 
 /* string-index to a citation escape */

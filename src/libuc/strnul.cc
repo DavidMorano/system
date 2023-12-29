@@ -38,7 +38,7 @@
 
 /* local namespaces */
 
-using std::nothrow ;
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */

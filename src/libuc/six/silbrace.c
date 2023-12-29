@@ -1,4 +1,4 @@
-/* silbrace */
+/* silbrace SUPPORT */
 /* lang=C20 */
 
 /* is the next non-whatspace character a left-brace? */
