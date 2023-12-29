@@ -1,5 +1,5 @@
-/* siterm */
-/* lang=C20 */
+/* siterm SUPPORT */
+/* lang=C++20 */
 
 /* find the index in a c-string up to a terminator character */
 /* version %I% last-modified %G% */
@@ -40,12 +40,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>
 #include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
-#include	<ascii.h>
 #include	<toxc.h>
 #include	<baops.h>
 #include	<localmisc.h>
@@ -66,8 +64,8 @@ int siterm(cchar *sp,int sl,cchar *terms) noex {
 	bool		f = false ;
 	if (sl < 0) sl = strlen(sp) ;
 	for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
-	    cint	ch = MKCHAR(sp[i]) ;
-	    f = BATST(terms,ch) ;
+	    cint	ch = mkchar(sp[i]) ;
+	    f = batst(terms,ch) ;
 	    if (f) break ;
 	} /* end for */
 	return (f) ? i : -1 ;
