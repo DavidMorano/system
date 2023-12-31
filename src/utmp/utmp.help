@@ -1,7 +1,8 @@
 UTMP
 
 This little program is used to log-in or log-out without actually
-logging in or logging out.
+logging in or logging out.  With no arguments, all of the UTMP
+entries are printed.
 
 Synopsis:
 $ utmp [-y|-n] [-h <hostname>] [<searchline>] [-z] [-V]
