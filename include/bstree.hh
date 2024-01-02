@@ -179,14 +179,10 @@ public:
 	bstree_iter<T,Comp> &operator ++ () noex { /* pre-increment */
 	    return findnext(1) ;
 	} ;
-	bstree_iter<T,Comp> operator ++ (int inc) noex { /* post-increment */
-	    btree_iter<T.Comp>	tmp = *this ;
-	    if (inc > 0) {
-	        findnext(inc) ;
-	    } else {
-	        findnext(1) ;
-	    }
-	    return tmp ; /* returns previous PRVALUE */
+	bstree_iter<T,Comp> operator ++ (int) noex { /* post-increment */
+	    btree_iter<T.Comp>	tmp(*this) ;
+	    findnext(1) ;
+	    return tmp ; /* returns previous value */
 	} ;
 	bstree_iter<T,Comp> &operator += (int inc) noex {
 	    return findnext(inc) ;

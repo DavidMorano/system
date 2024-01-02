@@ -1,5 +1,5 @@
 /* readln INCLUDE */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* convert a single character to a given case */
 /* version %I% last-modified %G% */

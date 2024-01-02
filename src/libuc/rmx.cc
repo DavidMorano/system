@@ -18,7 +18,8 @@
 
 	Name:
 	rmeol
-	rmchr
+	rmochr
+	rmrchr
 	rmext
 
 	Description:
@@ -95,12 +96,24 @@ static constexpr cchar	*exts[] = {
 
 int rmeol(cchar *sp,int sl) noex {
 	if (sl < 0) sl = strlen(sp) ;
-	while (sl && iseol(sp[sl-1])) sl -= 1 ;
+	while (sl && iseol(sp[sl-1])) {
+	    sl -= 1 ;
+	}
 	return sl ;
 }
 /* end subroutine (rmeol) */
 
-int rmchr(cchar *sp,int sl,int ch) noex {
+int rmochr(cchar *sp,int sl,int ch) noex {
+	cchar		*tp ;
+	if (sl < 0) sl = strlen(sp) ;
+	if ((tp = strnchr(sp,sl,ch)) != nullptr) {
+	    sl = (tp-sp) ;
+	} /* end if */
+	return sl ;
+}
+/* end subroutine (rmochr) */
+
+int rmrchr(cchar *sp,int sl,int ch) noex {
 	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
 	if ((tp = strnrchr(sp,sl,ch)) != nullptr) {
@@ -108,7 +121,7 @@ int rmchr(cchar *sp,int sl,int ch) noex {
 	} /* end if */
 	return sl ;
 }
-/* end subroutine (rmchr) */
+/* end subroutine (rmrchr) */
 
 int rmext(cchar *sp,int sl) noex {
 	cchar		*tp ;
@@ -132,5 +145,14 @@ int rmtrailchr(cchar *sp,int sl,int sch) noex {
 	return sl ;
 }
 /* end subroutine (rmtrailchr) */
+
+int rmcomment(cchar *lp,int ll) noex {
+	int		nl ;
+	if ((nl = rmochr(lp,ll,'#')) == ll) {
+	   nl = rmeol(lp,nl) ;
+	}
+	return nl ;
+}
+/* end subroutine (rmcomment) */
 
 

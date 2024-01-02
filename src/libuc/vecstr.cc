@@ -884,6 +884,27 @@ static void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 }
 /* end subroutine (vecstr_arrsort) */
 
+int vecstr::start(int n,int o) noex {
+	return vecstr_start(this,n,o) ;
+}
+
+int vecstr::add(cchar *sp,int sl) noex {
+	return vecstr_add(this,sp,sl) ;
+}
+
+int vecstr::adduniq(cchar *sp,int sl) noex {
+	return vecstr_adduniq(this,sp,sl) ;
+}
+
+int vecstr::insert(int i,cchar *sp,int sl) noex {
+	return vecstr_insert(this,i,sp,sl) ;
+}
+
+int vecstr::del(int i) noex {
+	if (i < 0) i = 0 ;
+	return vecstr_del(this,i) ;
+}
+
 vecstr_co::operator int () noex {
 	int	rs = SR_BUGCHECK ;
 	switch (w) {
@@ -910,25 +931,54 @@ vecstr_co::operator int () noex {
 }
 /* end method (vecstr_co::operator) */
 
-int vecstr::start(int n,int o) noex {
-	return vecstr_start(this,n,o) ;
+bool vecstr_iter::operator == (const vecstr_iter &oit) noex {
+	return (va == oit.va) && (i == oit.i) && (ii == oit.ii) ;
 }
 
-int vecstr::add(cchar *sp,int sl) noex {
-	return vecstr_add(this,sp,sl) ;
+bool vecstr_iter::operator != (const vecstr_iter &oit) noex {
+	bool		f = false ;
+	f = f || (va != oit.va) ;
+	f = f || (ii != oit.ii) ;
+	if (!f) {
+	    f = (i < oit.i) ;
+	}
+	return f ;
+}
+/* end method (vecstr_iter::operator) */
+
+vecstr_iter vecstr_iter::operator + (int n) const noex {
+	vecstr_iter	rit(va,i,i) ;
+	rit.i = ((rit.i + n) >= 0) ? (rit.i + n) : 0 ;
+	return rit ;
 }
 
-int vecstr::adduniq(cchar *sp,int sl) noex {
-	return vecstr_adduniq(this,sp,sl) ;
+vecstr_iter vecstr_iter::operator += (int n) noex {
+	vecstr_iter	rit(va,i,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
 }
 
-int vecstr::insert(int i,cchar *sp,int sl) noex {
-	return vecstr_insert(this,i,sp,sl) ;
+vecstr_iter vecstr_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
 }
 
-int vecstr::del(int i) noex {
-	if (i < 0) i = 0 ;
-	return vecstr_del(this,i) ;
+vecstr_iter vecstr_iter::operator ++ (int) noex { /* post */
+	vecstr_iter	pre(*this) ;
+	increment() ;
+	return pre ;
 }
+
+void vecstr_iter::increment(int n) noex {
+	if ((i + n) < 0) n = -i ;
+	if (n != 0) {
+	    i += n ;
+	    while ((i < ii) && (va[i] == nullptr)) {
+	        i += 1 ;
+	    }
+	}
+}
+/* end method (vecstr_iter::increment) */
 
 

@@ -28,9 +28,11 @@ extern "C" {
 #endif
 
 extern int	rmeol(cchar *,int) noex ;
-extern int	rmchr(cchar *,int,int) noex ;
+extern int	rmochr(cchar *,int,int) noex ;
+extern int	rmrchr(cchar *,int,int) noex ;
 extern int	rmext(cchar *,int) noex ;
 extern int	rmtrailchr(cchar *,int,int) noex ;
+extern int	rmcomment(cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }

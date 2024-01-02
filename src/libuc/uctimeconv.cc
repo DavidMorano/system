@@ -1,4 +1,4 @@
-/* uctimeconv */
+/* uctimeconv SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -77,7 +77,7 @@ constexpr bool		f_reentrant = F_REENTRANT ;
 int uc_localtime(const time_t *tp,TM *tsp) noex {
 	int		rs = SR_FAULT ;
 	if (tp && tsp) {
-	    TM		*rp{} ;
+	    TM		*rp ;
 	    errno = 0 ;
 	    if constexpr (f_reentrant) {
 	        if ((rp = localtime_r(tp,tsp)) == nullptr) {
@@ -99,7 +99,7 @@ int uc_localtime(const time_t *tp,TM *tsp) noex {
 int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	int		rs = SR_FAULT ;
 	if (tp && tsp) {
-	    TM		*rp{} ;
+	    TM		*rp ;
 	    errno = 0 ;
 	    if constexpr (f_reentrant) {
 	        if ((rp = gmtime_r(tp,tsp)) == nullptr) {

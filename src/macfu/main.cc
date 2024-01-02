@@ -54,7 +54,6 @@
 #include	<sfx.h>
 #include	<matstr.h>
 #include	<strwcpy.h>
-#include	<varnames.hh>
 #include	<strnul.hh>
 #include	<sncpyx.h>
 #include	<isnot.h>
@@ -76,13 +75,13 @@
 /* local namespaces */
 
 using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
-using std::cin;				/* variable */
-using std::cout ;			/* variable */
 using std::string ;			/* type */
 using std::string_view ;		/* type */
 using std::unordered_map ;		/* type */
 using std::vector ;			/* type */
+using std::cin;				/* variable */
+using std::cout ;			/* variable */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */

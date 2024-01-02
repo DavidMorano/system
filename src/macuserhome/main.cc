@@ -32,6 +32,7 @@
 	groupname
 	uid
 	sid
+	shells
 
 	Description:
 	Print out the home directory (or some other user-related
@@ -45,6 +46,7 @@
 	$ groupname
 	$ uid
 	$ sid
+	$ shells
 
 	Returns:
 	EXIT_SUCCESS	user was found and processed successfully
@@ -60,6 +62,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| + |strnlen(3c)| */
 #include	<string>
+#include	<fstream>
 #include	<iostream>
 #include	<usystem.h>
 #include	<sfx.h>
@@ -70,16 +73,23 @@
 #include	<utmpx.h>
 #include	<pwd.h>
 #include	<grp.h>
+#include	<ccfile.hh>
+#include	<hasx.h>
 
 
 /* local defines */
+
+#define	MAXLINE		(4*1024)
+#define	FNSHELLS	"/etc/shells"
 
 
 /* local namespaces */
 
 using std::string ;			/* type */
+using std::ifstream ;			/* type */
 using std::cout ;			/* variable */
 using std::clog ;			/* variable */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -101,6 +111,7 @@ enum prognames {
 	progmode_groupname,
 	progmode_uid,
 	progmode_sid,
+	progmode_shells,
 	progmode_overlast
 } ;
 
@@ -112,6 +123,7 @@ static constexpr cchar	*prognames[] = {
 	"groupname",
 	"uid",
 	"sid",
+	"shells",
 	nullptr
 } ;
 
@@ -143,11 +155,14 @@ namespace {
 static int	getpn(int,mainv,mainv) noex ;
 static int	procgroup(int,const userinfo *) noex ;
 static int	printgroup(const userinfo *) noex ;
+static int	printshells() noex ;
 
 
 /* local variables */
 
 constexpr gid_t		gidend = gid_t(-1) ;
+
+constexpr cchar		fnshells[] = FNSHELLS ;
 
 
 /* exported subroutines */
@@ -161,15 +176,16 @@ int main(int argc,mainv argv,mainv) noex {
 	    cint	pm = rs ;
 	    switch (pm) {
 	    case progmode_uid:
-		{
-		    cout << uid << eol ;
-		}
+		cout << uid << eol ;
 		break ;
 	    case progmode_sid:
 		{
 		    cint	sid = getsid(0) ;
 		    cout << sid << eol ;
 		}
+		break ;
+	    case progmode_shells:
+		rs = printshells() ;
 		break ;
 	    default:
 	        if ((rs = ui.find(uid)) > 0) {
@@ -258,6 +274,32 @@ static int printgroup(const userinfo *uip) noex {
 	return rs ;
 }
 /* end subroutine (printgroup) */
+
+static int printshells() noex {
+	cint		llen = MAXLINE ;
+	char		*lbuf ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
+	    try {
+		ccfile		fis ;
+		if ((rs = fis.open(fnshells)) >= 0) {
+		    while ((rs = fis.readln(lbuf,llen)) > 0) {
+			if (hasnotempty(lbuf,rs) && (lbuf[0] != '#')) {
+			    cout << lbuf ;
+			} /* end if (hasnotempty) */
+		    } /* end while */
+		    rs1 = fis.close ;
+		    if (rs >= 0) rs = rs1 ;
+ 	        } /* end if (opened) */
+	    } catch (...) {
+		rs = SR_IO ;
+	    }
+	    delete [] lbuf ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end subroutine (printshells) */
 
 static bool isourtype(const UTMPX *up) noex {
 	bool	f = false ;

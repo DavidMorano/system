@@ -1,5 +1,5 @@
 /* vecstr_svcargs */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* load service arguments */
 /* version %I% last-modified %G% */
@@ -23,7 +23,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<vecstr.h>
@@ -45,55 +46,35 @@
 
 /* forward references */
 
+static int	vecstr_arger(vecstr *,int *,cchar *) noex ;
+static int	mkterms() noex ;
 static int	hasLong(cchar *,int) noex ;
 
 
 /* local structures */
 
 
+/* local variables */
+
+constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+
+static char		terms[termsize] ;
+
+
 /* exported subroutines */
 
 int vecstr_svcargs(vecstr *op,int *fp,cchar *abuf) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (abuf && (abuf[0] != '\0')) {
-	    FIELD	fsb ;
-	    const int	alen = strlen(abuf) ;
-	    int		f = FALSE ;
-	    char	terms[32] ;
-	    fieldterms(terms,0," \t") ;
-	    if ((rs = field_start(&fsb,abuf,alen)) >= 0) {
-	        cint	flen = alen ;
-	        char	*fbuf ;
-		if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	            int		fl ;
-	            while ((fl = field_sharg(&fsb,terms,fbuf,flen)) >= 0) {
-			if (c == 0) {
-			     cchar	*tp ;
-			     if ((tp = strnchr(fbuf,fl,'/')) != NULL) {
-				fl = (tp-fbuf) ;
-				if (((fbuf+fl)-tp) >= 2) {
-				    const int	sch = MKCHAR(tp[1]) ;
-				    f = (tolc(sch) == 'w') ;
-				}
-			     }
-	                     rs = vecstr_add(op,fbuf,fl) ;
-			     c += 1 ;
-			} else {
-			    if ((fbuf[0] == '/') && hasLong(fbuf,fl)) {
-			        f = TRUE ;
-			    } else {
-	                        rs = vecstr_add(op,fbuf,fl) ;
-			        c += 1 ;
-			    }
-			}
-	                if (rs < 0) break ;
-	            } /* end while */
-		    uc_free(fbuf) ;
-		} /* end if (m-a) */
-		if (fp != NULL) *fp = f ;
-	        field_finish(&fsb) ;
-	    } /* end if (field) */
+	if (op && fp && abuf) {
+            rs = SR_INVALID ;
+	    if (abuf[0]) {
+	        static cint	srs = mkterms() ;
+	        if ((rs = srs) >= 0) {
+		    rs = vecstr_arger(op,fp,abuf) ;
+		    c = rs ;
+		} /* end if (terms) */
+	    } /* end if (valid) */
 	} /* end if (non-null non-zero) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -102,12 +83,62 @@ int vecstr_svcargs(vecstr *op,int *fp,cchar *abuf) noex {
 
 /* local subroutines */
 
+static int vecstr_arger(vecstr *op,int *fp,cchar *abuf) noex {
+	cint		alen = strlen(abuf) ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	char		*fbuf{} ;
+	if ((rs = uc_malloc((alen+1),&fbuf)) >= 0) {
+	    field	fsb ;
+	    cint	flen = alen ;
+	    if ((rs = field_start(&fsb,abuf,alen)) >= 0) {
+	        int	fl ;
+		int	f = false ;
+	        while ((fl = field_sharg(&fsb,terms,fbuf,flen)) >= 0) {
+		    if (c == 0) {
+			cchar	*tp ;
+			if ((tp = strnchr(fbuf,fl,'/')) != nullptr) {
+			     fl = (tp-fbuf) ;
+			     if (((fbuf+fl)-tp) >= 2) {
+				cint	sch = mkchar(tp[1]) ;
+				f = (tolc(sch) == 'w') ;
+			    }
+			}
+	                rs = vecstr_add(op,fbuf,fl) ;
+			c += 1 ;
+		    } else {
+			if ((fbuf[0] == '/') && hasLong(fbuf,fl)) {
+			    f = true ;
+			} else {
+	                    rs = vecstr_add(op,fbuf,fl) ;
+			    c += 1 ;
+			}
+		    }
+	            if (rs < 0) break ;
+	        } /* end while */
+		if (fp) *fp = f ;
+	        rs1 = field_finish(&fsb) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (field) */
+	    rs1 = uc_free(fbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecstr_arger) */
+
+static int mkterms() noex {
+	return fieldterms(terms,false,'\t',' ') ;
+}
+/* end subroutine (mkterms) */
+
 static int hasLong(cchar *sp,int sl) noex {
-	int		f = FALSE ;
+	int		f = false ;
 	if (sp[0] == '/') {
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (sl >= 2) {
-		const int	sch = MKCHAR(sp[1]) ;
+		cint	sch = mkchar(sp[1]) ;
 		f = (tolc(sch) == 'w') ;
 	    }
 	}

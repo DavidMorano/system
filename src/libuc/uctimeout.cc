@@ -1,4 +1,4 @@
-/* uctimeout */
+/* uctimeout SUPPORT */
 /* lang=C++11 */
 
 /* UNIX® time-out management */

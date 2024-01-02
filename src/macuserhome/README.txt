@@ -16,6 +16,9 @@ userhome
 usershell
 gid
 groupname
+uid
+sid
+shells
 
 Arguments:
 -		NONE, because we are too lean even for that

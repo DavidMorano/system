@@ -4,8 +4,6 @@
 /* get the various IDs from the system */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* run-time debugging */
 
 /* revision history:
 
@@ -81,13 +79,6 @@ int main(int argc,mainv argv,mainv envv) {
 	cchar	*cp ;
 	char	buf[BUFLEN + 1], *bp ;
 
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("main: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
-
 	progname = argv[0] ;
 
 /* print out some common accessible machine parameters */
@@ -106,10 +97,6 @@ int main(int argc,mainv argv,mainv envv) {
 
 	rs1 = uc_sysconf(_SC_TZNAME_MAX,&v) ;
 
-#if	CF_DEBUGS
-	debugprintf("main: TZNAME_MAX uc_sysconf() rs=%d\n",rs1) ;
-#endif
-
 	bl = 0 ;
 	if (rs1 >= 0)
 	bl = ctdecl(buf,BUFLEN,v) ;
@@ -124,10 +111,6 @@ int main(int argc,mainv argv,mainv envv) {
 	    (uint) hostid) ;
 
 	fclose(fp) ;
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
 
 	return EX_OK ;
 }

@@ -20,3 +20,5 @@ Notes:
 The default INET4 |anyhost:listen| TLI address is: 
 \x00020ACE000000000000000000000000
 
+The port number for the AT&T 'listen' service is 2766.
+

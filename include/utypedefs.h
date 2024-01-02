@@ -282,18 +282,24 @@ typedef struct in6_addr		in6_addr_t ;
 
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
 typedef void (*void_f)() noex ;
-
 #ifdef	__cplusplus
 }
 #endif
-
 #endif /* TYPEDEF_VOIDF */
+
+#ifndef	TYPEDEF_FPERM
+#define	TYPEDEF_FPERM
+typedef mode_t	fperm ;
+#endif /* TYPEDEF_FPERM */
+
+#ifndef	TYPEDEF_CFPERM
+#define	TYPEDEF_CFPERM
+typedef mode_t	const cfperm ;
+#endif /* TYPEDEF_CFPERM */
 
 
 #endif /* UTYPEDEFS_INCLUDE */
