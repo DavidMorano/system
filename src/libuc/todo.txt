@@ -1,1 +1,1 @@
-/Users/dam/notes/github/system/todo.txt
+../todo.txt

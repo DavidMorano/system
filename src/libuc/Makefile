@@ -1131,7 +1131,7 @@ checkbase.o:		checkbase.cc
 
 # malloc
 mallocxx.o:		mallocxx.cc mallocxx.h
-mallocstuff.o:		mallocstuff.c mallocstuff.h
+mallocstuff.o:		mallocstuff.cc mallocstuff.h
 
 # special built-ins (user-space enumlated kernel calls)
 uinfo.o:		uinfo.cc uinfo.h

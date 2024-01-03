@@ -66,6 +66,8 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"getprogroot.h"
+
 
 /* local defines */
 
