@@ -5,6 +5,5 @@ file		what
 mapblock
 macfu
 memfile
-getprogroot	lots of cleanup
 convertx
 
