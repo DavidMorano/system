@@ -1,4 +1,4 @@
-/* digbufsizes INCLUDE */
+/* digbufsizes HEADER */
 /* lang=C++20 */
 
 /* provide buffer sizes for c-string digits */

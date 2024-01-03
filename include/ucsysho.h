@@ -1,4 +1,4 @@
-/* ucsysho INCLUDE */
+/* ucsysho HEADER */
 /* lang=C20 */
 
 /* additional operaring-system support for PEOJECT-DB access */

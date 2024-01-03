@@ -1,4 +1,4 @@
-/* ctchars INCLUDE */
+/* ctchars HEADER */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a decimal string */

@@ -1,4 +1,4 @@
-/* randlc INCLUDE */
+/* randlc HEADER */
 /* lang=C20 */
 
 /* implement Linear-Congruential random-number generator (RNG) */

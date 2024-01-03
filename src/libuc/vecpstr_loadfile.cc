@@ -1,4 +1,4 @@
-/* vecpstr_loadfile */
+/* vecpstr_loadfile SUPPORT */
 /* lang=C++20 */
 
 /* load strings from a file */

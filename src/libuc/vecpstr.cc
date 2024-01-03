@@ -1,4 +1,4 @@
-/* vecpstr */
+/* vecpstr SUPPORT */
 /* lang=C++20 */
 
 /* vector-packed-string object */
@@ -941,7 +941,7 @@ static int chunk_start(vecpstr_ch *ccp,int chsize) noex {
 	int		rs ;
 	void		*vp{} ;
 	chsize = iceil(chsize,8) ;
-	memclear(ccp) ;
+	memclear(ccp) ; /* <- potentially dangerous if type changes */
 	if ((rs = uc_libmalloc(chsize,&vp)) >= 0) {
 	    ccp->tab = (char *) vp ;
 	    ccp->tabsize = chsize ;

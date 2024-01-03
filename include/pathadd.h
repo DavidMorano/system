@@ -1,4 +1,4 @@
-/* pathadd INCLUDE */
+/* pathadd HEADER */
 /* lang=C20 */
 
 /* add a c-string to the end of an existing path c-string */

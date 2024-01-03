@@ -1,4 +1,4 @@
-/* recarr INCLUDE */
+/* recarr HEADER */
 /* lang=C++20 */
 
 /* record-array management */

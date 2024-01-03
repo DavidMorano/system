@@ -1,4 +1,4 @@
-/* strdcpyxw INCLUDE */
+/* strdcpyxw HEADER */
 /* lang=C20 */
 
 /* string-copy variant */

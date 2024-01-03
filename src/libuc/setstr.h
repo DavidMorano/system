@@ -1,4 +1,4 @@
-/* setstr INCLUDE */
+/* setstr HEADER */
 /* lang=C20 */
 
 /* a set object for c-strings */

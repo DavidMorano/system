@@ -1,4 +1,4 @@
-/* bufsizedata INCLUDE */
+/* bufsizedata HEADER */
 /* lang=C++20 */
 
 /* buffer-size-data */

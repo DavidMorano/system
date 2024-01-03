@@ -1,4 +1,4 @@
-/* syspasswd INCLUDE */
+/* syspasswd HEADER */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */

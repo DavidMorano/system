@@ -1,4 +1,4 @@
-/* getxusername INCLUDE */
+/* getxusername HEADER */
 /* lang=C20 */
 
 /* get the best approximation of the user's username */

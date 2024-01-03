@@ -1,4 +1,4 @@
-/* opensvc_hotd INCLUDE */
+/* opensvc_hotd HEADER */
 /* lang=C20 */
 
 /* Open-Service for HOTD */

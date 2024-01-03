@@ -1,4 +1,4 @@
-/* ncol INCLUDE */
+/* ncol HEADER */
 /* lang=C20 */
 
 /* calculate column values */

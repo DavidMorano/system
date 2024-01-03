@@ -1,4 +1,4 @@
-/* sfx INCLUDE */
+/* sfx HEADER */
 /* lang=C20 */
 
 

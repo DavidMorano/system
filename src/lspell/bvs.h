@@ -1,4 +1,4 @@
-/* bvs INCLUDE */
+/* bvs HEADER */
 /* lang=C20 */
 
 /* Bible Verse Structure */

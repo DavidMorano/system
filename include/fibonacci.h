@@ -1,4 +1,4 @@
-/* fibonacci INCLUDE */
+/* fibonacci HEADER */
 /* lang=C20 */
 
 /* calculate fibonacci */

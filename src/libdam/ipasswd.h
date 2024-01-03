@@ -1,4 +1,4 @@
-/* ipasswd INCLUDE */
+/* ipasswd HEADER */
 /* lang=C20 */
 
 /* indexed PASSWD GECOS DB */

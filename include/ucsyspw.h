@@ -1,4 +1,4 @@
-/* ucsyspw INCLUDE */
+/* ucsyspw HEADER */
 /* lang=C20 */
 
 /* additional operaring-system support for PASSWD-DB access */

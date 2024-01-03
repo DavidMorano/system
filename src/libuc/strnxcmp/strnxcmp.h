@@ -1,4 +1,4 @@
-/* strnxcmp INCLUDE */
+/* strnxcmp HEADER */
 /* lang=C20 */
 
 /* find a character in a counted c-string */

@@ -1,4 +1,4 @@
-/* cq INCLUDE */
+/* cq HEADER */
 /* lang=C20 */
 
 /* Container-Queue */

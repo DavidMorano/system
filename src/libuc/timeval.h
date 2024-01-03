@@ -1,4 +1,4 @@
-/* timeval INCLUDE */
+/* timeval HEADER */
 /* lang=C20 */
 
 /* time-value object methods */

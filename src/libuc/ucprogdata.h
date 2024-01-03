@@ -1,4 +1,4 @@
-/* ucprogdata INCLUDE */
+/* ucprogdata HEADER */
 /* lang=C20 */
 
 /* UNIX® program-data cache */

@@ -1,4 +1,4 @@
-/* strtod INCLUDE */
+/* strtod HEADER */
 /* lang=C20 */
 
 

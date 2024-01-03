@@ -1,4 +1,4 @@
-/* getourenv INCLUDE */
+/* getourenv HEADER */
 /* lang=C20 */
 
 /* get an environment variable from our local (passed) environment */

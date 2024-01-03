@@ -1,4 +1,4 @@
-/* attachso INCLUDE */
+/* attachso HEADER */
 /* lang=C20 */
 
 /* ATTACHSO function */

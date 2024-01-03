@@ -1,4 +1,4 @@
-/* ucclustername INCLUDE */
+/* ucclustername HEADER */
 /* lang=C20 */
 
 /* UNIX® cluster name */

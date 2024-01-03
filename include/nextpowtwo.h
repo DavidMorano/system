@@ -1,4 +1,4 @@
-/* nextpowtwo INCLUDE */
+/* nextpowtwo HEADER */
 /* lang=C20 */
 
 /* get the next higher power-of-two for a given number */

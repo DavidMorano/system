@@ -1,4 +1,4 @@
-/* bibleq INCLUDE */
+/* bibleq HEADER */
 /* lang=C20 */
 
 

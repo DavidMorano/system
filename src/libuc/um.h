@@ -1,4 +1,4 @@
-/* um INCLUDE */
+/* um HEADER */
 /* lang=C20 */
 
 /* UNIX® Memory-Management interface */

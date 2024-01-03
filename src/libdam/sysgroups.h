@@ -1,4 +1,4 @@
-/* sysgroups INCLUDE */
+/* sysgroups HEADER */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */

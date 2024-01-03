@@ -1,4 +1,4 @@
-/* gettmpdname INCLUDE */
+/* gettmpdname HEADER */
 /* lang=C20 */
 
 /* get the name of the TMPDIR (however one can get it) */

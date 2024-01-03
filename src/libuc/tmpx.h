@@ -1,4 +1,4 @@
-/* tmpx INCLUDE */
+/* tmpx HEADER */
 /* lang=C20 */
 
 /* object to facilitate UTMPX management */

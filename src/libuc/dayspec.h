@@ -1,4 +1,4 @@
-/* dayspec INCLUDE */
+/* dayspec HEADER */
 /* lang=C20 */
 
 /* load a day-specification */

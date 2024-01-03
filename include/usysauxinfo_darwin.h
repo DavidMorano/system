@@ -1,4 +1,4 @@
-/* usysauxinfo_darwin INCLUDE */
+/* usysauxinfo_darwin HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

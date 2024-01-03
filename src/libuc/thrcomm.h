@@ -1,4 +1,4 @@
-/* thrcomm INCLUDE */
+/* thrcomm HEADER */
 /* lang=C20 */
 
 /* Thread-Communication (THRCOMM) */

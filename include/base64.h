@@ -1,4 +1,4 @@
-/* base64 INCLUDE */
+/* base64 HEADER */
 /* lang=C20 */
 
 /* perform BASE64 encoding and decoding */

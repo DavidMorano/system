@@ -1,4 +1,4 @@
-/* projectent INCLUDE */
+/* projectent HEADER */
 /* lang=C20 */
 
 /* subroutines for simple PROJECT object (from UNIX® library-3c) management */

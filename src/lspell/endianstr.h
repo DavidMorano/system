@@ -1,4 +1,4 @@
-/* endianstr INCLUDE */
+/* endianstr HEADER */
 /* lang=C20 */
 
 

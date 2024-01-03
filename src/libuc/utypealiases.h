@@ -1,4 +1,4 @@
-/* utypealiases INCLUDE */
+/* utypealiases HEADER */
 /* lang=C20 */
 
 /* virtual-system definitions */

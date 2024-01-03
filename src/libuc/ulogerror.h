@@ -1,4 +1,4 @@
-/* ulogerror INCLUDE */
+/* ulogerror HEADER */
 /* lang=C20 */
 
 /* log an error */

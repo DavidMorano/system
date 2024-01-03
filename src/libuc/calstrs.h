@@ -1,4 +1,4 @@
-/* calstrs INCLUDE */
+/* calstrs HEADER */
 /* lang=C20 */
 
 /* calendar strings */

@@ -1,4 +1,4 @@
-/* strop INCLUDE */
+/* strop HEADER */
 /* lang=C20 */
 
 /* string-operations */

@@ -1,4 +1,4 @@
-/* upt INCLUDE */
+/* upt HEADER */
 /* lang=C20 */
 
 /* UNIX® POSIX Thread manipulation */

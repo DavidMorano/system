@@ -1,4 +1,4 @@
-/* veclong INCLUE */
+/* veclong HEADER */
 /* lang=C20 */
 
 
@@ -17,6 +17,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 

@@ -1,4 +1,4 @@
-/* ischarx INCLUDE */
+/* ischarx HEADER */
 /* lang=C20 */
 
 /* test a character for a property */

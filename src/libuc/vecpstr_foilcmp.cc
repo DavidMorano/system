@@ -1,4 +1,4 @@
-/* vecpstr_foilcmp */
+/* vecpstr_foilcmp SUPPORT */
 /* lang=C++20 */
 
 /* perform a foil comparison of two VECSTR lists */
@@ -22,6 +22,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<usystem.h>
 #include	<localmisc.h>

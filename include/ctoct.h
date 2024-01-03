@@ -1,4 +1,4 @@
-/* ctoct INCLUDE */
+/* ctoct HEADER */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a OCTAL string */

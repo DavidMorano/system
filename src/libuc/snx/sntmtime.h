@@ -1,4 +1,4 @@
-/* sntmtime INCLUDE */
+/* sntmtime HEADER */
 /* lang=C20 */
 
 /* counted c-string operations */

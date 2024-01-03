@@ -1,4 +1,4 @@
-/* inetaddrparse INCLUDE */
+/* inetaddrparse HEADER */
 /* lang=C20 */
 
 /* this little thing parses an INET address into parts */

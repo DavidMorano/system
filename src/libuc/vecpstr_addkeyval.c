@@ -1,4 +1,4 @@
-/* vecpstr_addkeyval */
+/* vecpstr_addkeyval SUPPORT */
 /* lang=C20 */
 
 /* vector-packed-string object (add environment variable) */

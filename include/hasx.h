@@ -1,4 +1,4 @@
-/* hasx INCLUDE */
+/* hasx HEADER */
 /* lang=C20 */
 
 

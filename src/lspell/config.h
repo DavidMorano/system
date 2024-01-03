@@ -1,4 +1,4 @@
-/* config INCLUDE */
+/* config HEADER */
 /* lang=C20 */
 
 

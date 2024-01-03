@@ -1,4 +1,4 @@
-/* strlistmks INCLUDE */
+/* strlistmks HEADER */
 /* lang=C20 */
 
 /* make a STRLIST database */

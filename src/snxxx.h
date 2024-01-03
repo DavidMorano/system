@@ -1,4 +1,4 @@
-/* snxxx INCLUDE */
+/* snxxx HEADER */
 /* lang=C20 */
 
 /* counted c-string operations */

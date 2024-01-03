@@ -1,4 +1,4 @@
-/* userattr INCLUDE */
+/* userattr HEADER */
 /* lang=C20 */
 
 /* USERATTR operating system data-base support */

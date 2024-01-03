@@ -1,4 +1,4 @@
-/* cfhex INCLUDE */
+/* cfhex HEADER */
 /* lang=C20 */
 
 /* convert a decimal digit string to its binary integer value */

@@ -1,4 +1,4 @@
-/* ptma INCLUDE */
+/* ptma HEADER */
 /* lang=C20 */
 
 /* POSIX® Thread Mutex Attribute manipulation */

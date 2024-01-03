@@ -1,4 +1,4 @@
-/* vecpstr_svcargs */
+/* vecpstr_svcargs SUPPORT */
 /* lang=C++20 */
 
 /* load service arguments */
@@ -24,6 +24,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>

@@ -1,4 +1,4 @@
-/* sncpyxc INCLUDE */
+/* sncpyxc HEADER */
 /* lang=C20 */
 
 /* copy a c-string to a given case */

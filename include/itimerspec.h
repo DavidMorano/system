@@ -1,4 +1,4 @@
-/* itimerspec INCLUDE */
+/* itimerspec HEADER */
 /* lang=C99 */
 
 /* interval-timer object methods */

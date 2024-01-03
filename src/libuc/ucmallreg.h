@@ -1,4 +1,4 @@
-/* ucmallreg INCLUDE */
+/* ucmallreg HEADER */
 /* lang=C20 */
 
 /* support object for UNIX® C-language library Memory-Allocation management */

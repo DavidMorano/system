@@ -1,4 +1,4 @@
-/* vecstr INCLUDE */
+/* vecstr HEADER */
 /* lang=C20 */
 
 /* vector-string container (Vector-String) */

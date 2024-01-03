@@ -1,4 +1,4 @@
-/* mkpr INCLUDE */
+/* mkpr HEADER */
 /* lang=C20 */
 
 /* make a program-root file-path */

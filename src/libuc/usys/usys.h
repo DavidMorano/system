@@ -1,4 +1,4 @@
-/* usys INCLUDE */
+/* usys HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

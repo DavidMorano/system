@@ -664,7 +664,7 @@ obj_vecpstr.o:	$(OBJ_VECPSTR)
 
 
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o
-OBJB_VEC= vechand.o recarr.o raqhand.o vecint.o
+OBJB_VEC= vechand.o recarr.o raqhand.o vecint.o vecitem.o
 OBJ_VEC= obja_vec.o objb_vec.o
 
 obja_vec.o:	$(OBJA_VEC)
@@ -926,8 +926,8 @@ vecpstr_loadpjusers.o:	vecpstr_loadpjusers.cc vecpstr.h
 vecpstr_addsubdirs.o:	vecpstr_addsubdirs.cc vecpstr.h
 
 vecobj.o:		vecobj.cc vecobj.h
-
 vecelem.o:		vecelem.cc vecelem.h
+vecitem.o:		vecitem.cc vecitem.h
 
 hdb.o:			hdb.cc hdb.h
 
@@ -951,11 +951,10 @@ lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
-
 dirlist.o:		dirlist.cc dirlist.h
 
-dirseen.o:		dirseen.c dirseen.h
-dirseen_not.o:		dirseen_not.c dirseen.h
+dirseen.o:		dirseen.cc dirseen.h
+dirseen_not.o:		dirseen_not.cc dirseen.h
 
 randomvar.o:		randomvar.cc randomvar.h
 

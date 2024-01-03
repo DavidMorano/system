@@ -1,4 +1,4 @@
-/* pmq INCLUDE */
+/* pmq HEADER */
 /* lang=C20 */
 
 /* Posix Message Queue (PMQ) */

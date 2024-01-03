@@ -1,4 +1,4 @@
-/* utypedefs INCLUDE */
+/* utypedefs HEADER */
 /* lang=C20 */
 
 /* virtual-system definitions */
@@ -293,12 +293,12 @@ typedef void (*void_f)() noex ;
 
 #ifndef	TYPEDEF_FPERM
 #define	TYPEDEF_FPERM
-typedef mode_t	fperm ;
+typedef mode_t	fsperm ;
 #endif /* TYPEDEF_FPERM */
 
 #ifndef	TYPEDEF_CFPERM
 #define	TYPEDEF_CFPERM
-typedef mode_t	const cfperm ;
+typedef mode_t	const cfsperm ;
 #endif /* TYPEDEF_CFPERM */
 
 

@@ -1,4 +1,4 @@
-/* ctdecp INCLUDE */
+/* ctdecp HEADER */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a decimal string /w precision */

@@ -1,4 +1,4 @@
-/* thrbase INCLUDE */
+/* thrbase HEADER */
 /* lang=C20 */
 
 /* access manager interface to PCS user-mode polling */

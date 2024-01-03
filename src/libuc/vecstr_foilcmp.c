@@ -1,4 +1,4 @@
-/* vecstr_foilcmp */
+/* vecstr_foilcmp SUPPORT */
 /* lang=C20 */
 
 /* perform a foil comparison of two VECSTR lists */

@@ -1,4 +1,4 @@
-/* ucgetloadavg INCLUDE */
+/* ucgetloadavg HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

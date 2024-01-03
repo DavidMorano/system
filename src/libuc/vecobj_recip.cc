@@ -1,4 +1,4 @@
-/* vecobj_recip */
+/* vecobj_recip SUPPORT */
 /* lang=C++20 */
 
 /* extend the VECOBJ object w/ some recipient handling */
@@ -33,6 +33,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>

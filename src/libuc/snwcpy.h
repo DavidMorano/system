@@ -1,4 +1,4 @@
-/* snwcpy INCLUDE */
+/* snwcpy HEADER */
 /* lang=C20 */
 
 /* copy a c-string to a sized destination buffer */

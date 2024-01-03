@@ -1,4 +1,4 @@
-/* cthexstr INCLUDE */
+/* cthexstr HEADER */
 /* lang=C20 */
 
 /* subroutine to convert a value (as a counted string) to a HEX string */

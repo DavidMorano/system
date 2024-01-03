@@ -1,4 +1,4 @@
-/* cfb26 INCLUDE */
+/* cfb26 HEADER */
 /* lang=C20 */
 
 /* convert from base-26 */

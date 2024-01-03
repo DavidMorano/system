@@ -1,4 +1,4 @@
-/* vecint */
+/* vecint SUPPORT */
 /* lang=C++20 */
 
 /* vector integer operations */
@@ -92,7 +92,7 @@ int vecint_start(vecint *op,int n,int opts) noex {
 	int		rs = SR_FAULT ;
 	if (n < 0) n = VECINT_DEFENTS ;
 	if (op) {
-	    memclear(op) ;
+	    memclear(op) ; /* <- potentially dangerous if type changes */
 	    if ((rs = vecint_setopts(op,opts)) >= 0) {
 	        op->n = n ;
 	        if (n > 0) {
@@ -540,6 +540,7 @@ static int vecint_extend(vecint *op,int amount) noex {
 	    if (rs >= 0) {
 	        op->va = va ;
 	        op->n = nn ;
+		op->va[op->i] = INT_MIN ;
 	    }
 	}
 	return rs ;

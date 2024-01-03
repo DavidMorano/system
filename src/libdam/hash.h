@@ -1,4 +1,4 @@
-/* hash INCLUDE */
+/* hash HEADER */
 /* lang=C20 */
 
 /* determine if file-name (just a string) has an approved file-extension */

@@ -1,4 +1,4 @@
-/* sigign INCLUDE */
+/* sigign HEADER */
 /* lang=C20 */
 
 /* little object to block signals */

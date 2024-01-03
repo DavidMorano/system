@@ -1,4 +1,4 @@
-/* ucentpr INCLUDE */
+/* ucentpr HEADER */
 /* lang=C++20 */
 
 /* UCENTPR object management */

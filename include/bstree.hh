@@ -1,4 +1,4 @@
-/* bstree INCLUDE */
+/* bstree HEADER */
 /* lang=C++11 */
 
 /* binary search tree */

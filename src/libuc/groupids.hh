@@ -1,4 +1,4 @@
-/* groupids INCLUDE */
+/* groupids HEADER */
 /* lang=C20 */
 
 /* group-ID fetch (UNIX® group-IDs) */

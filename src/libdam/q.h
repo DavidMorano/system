@@ -1,4 +1,4 @@
-/* q INCLUDE */
+/* q HEADER */
 /* lang=C20 */
 
 /* self-relative double-linked queue */

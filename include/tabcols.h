@@ -1,4 +1,4 @@
-/* tabcols INCLUDE */
+/* tabcols HEADER */
 /* lang=C20 */
 
 /* calculate column values */

@@ -1,4 +1,4 @@
-/* dstr INCLUDE */
+/* dstr HEADER */
 /* lang=C20 */
 
 

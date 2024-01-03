@@ -1,4 +1,4 @@
-/* opensvc_daytime INCLUDE */
+/* opensvc_daytime HEADER */
 /* lang=C20 */
 
 /* Open-Service for DAYTIMR serive */

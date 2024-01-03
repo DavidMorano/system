@@ -1,4 +1,4 @@
-/* pta INCLUDE */
+/* pta HEADER */
 /* lang=C20 */
 
 /* POSIX Thread Attribute manipulation */

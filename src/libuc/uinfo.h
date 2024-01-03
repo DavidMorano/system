@@ -1,4 +1,4 @@
-/* uinfo INCLUDE */
+/* uinfo HEADER */
 /* lang=C20 */
 
 /* UNIX® information (a cache for 'uname(2)' and sisters) */

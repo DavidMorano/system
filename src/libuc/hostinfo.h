@@ -1,4 +1,4 @@
-/* hostinfo INCLUDE */
+/* hostinfo HEADER */
 /* lang=C20 */
 
 /* manipulate host entry structures */

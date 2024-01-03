@@ -1,4 +1,4 @@
-/* ctbin INCLUDE */
+/* ctbin HEADER */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a binary-digit string */

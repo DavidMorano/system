@@ -1,4 +1,4 @@
-/* vecstr */
+/* vecstr SUPPORT */
 /* lang=C++20 */
 
 /* vector string operations */

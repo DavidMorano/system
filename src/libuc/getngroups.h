@@ -1,4 +1,4 @@
-/* getngroups INCLUDE */
+/* getngroups HEADER */
 /* lang=C20 */
 
 /* convert a single character to a given case */

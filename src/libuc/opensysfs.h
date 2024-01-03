@@ -1,4 +1,4 @@
-/* opensysfs INCLUDE */
+/* opensysfs HEADER */
 /* lang=C20 */
 
 /* Open-System-File-System (OpenSysFS) */

@@ -1,4 +1,4 @@
-/* dirlist INCLUDE */
+/* dirlist HEADER */
 /* lang=C20 */
 
 /* directory list manager */

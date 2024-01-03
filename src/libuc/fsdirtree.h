@@ -1,4 +1,4 @@
-/* fsdirtree INCLUDE */
+/* fsdirtree HEADER */
 /* lang=C++20 */
 
 /* traverse directory tree */

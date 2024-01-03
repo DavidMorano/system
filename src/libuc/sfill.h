@@ -1,4 +1,4 @@
-/* sfill INCLUDE */
+/* sfill HEADER */
 /* lang=C20 */
 
 /* text fill */

@@ -1,4 +1,4 @@
-/* snx INCLUDE */
+/* snx HEADER */
 /* lang=C20 */
 
 /* counted c-string operations */

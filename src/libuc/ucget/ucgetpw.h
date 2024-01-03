@@ -1,4 +1,4 @@
-/* ucgetpw INCLUDE */
+/* ucgetpw HEADER */
 /* lang=C20 */
 
 /* UNIX® C-language system database access (UCGET) */

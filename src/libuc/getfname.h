@@ -1,4 +1,4 @@
-/* getfname INCLUDE */
+/* getfname HEADER */
 /* lang=C20 */
 
 /* get a file name according to rules */

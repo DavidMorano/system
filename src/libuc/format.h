@@ -1,4 +1,4 @@
-/* format INCLUDE */
+/* format HEADER */
 /* lang=C20 */
 
 /* header file for the FORMAT subroutine */

@@ -1,4 +1,4 @@
-/* envhelp INCLUDE */
+/* envhelp HEADER */
 /* lang=C20 */
 
 /* help w/ handling environment */

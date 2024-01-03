@@ -1,4 +1,4 @@
-/* fieldterm INCLUDE */
+/* fieldterm HEADER */
 /* lang=C20 */
 
 /* convenience object for handling "field" terminators ("terms") */

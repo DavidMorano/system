@@ -1,4 +1,4 @@
-/* stdintx INCLUDE */
+/* stdintx HEADER */
 /* lang=C20 */
 
 /* extended integer types */

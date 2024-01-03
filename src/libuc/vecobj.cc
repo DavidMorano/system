@@ -1,4 +1,4 @@
-/* vecobj */
+/* vecobj SUPPORT */
 /* lang=C++20 */
 
 /* vector object list operations */
@@ -775,6 +775,7 @@ static int vecobj_extend(vecobj *op) noex {
 	    if (rs >= 0) {
 	        op->va = (void **) np ;
 	        op->n = nn ;
+		op->va[op->i] = nullptr ;
 	    }
 	} /* end if (extension required) */
 	return rs ;

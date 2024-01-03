@@ -1,4 +1,4 @@
-/* ctb26 INCLUDE */
+/* ctb26 HEADER */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a base-26 string */

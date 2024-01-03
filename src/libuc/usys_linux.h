@@ -1,4 +1,4 @@
-/* usys_linux INCLUDE */
+/* usys_linux HEADER */
 /* lang=C20 */
 
 /* Apple Darwin operating system support */

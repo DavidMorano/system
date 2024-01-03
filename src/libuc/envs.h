@@ -1,4 +1,4 @@
-/* envs */
+/* envs HEADER */
 /* lang=C20 */
 
 /* environment-variable list container */
@@ -25,13 +25,13 @@
 
 
 struct envs_cursor {
-	hdb_cur		cur ;
+	hdb_cur		*curp ;
 	int		i ;
 } ;
 
 struct envs_head {
+	hdb		*varp ;
 	uint		magic ;
-	hdb		vars ;
 } ;
 
 typedef ENVS		envs ;

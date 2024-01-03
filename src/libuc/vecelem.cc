@@ -1,4 +1,4 @@
-/* vecelem */
+/* vecelem SUPPORT */
 /* lang=C++20 */
 
 /* vector element-list operations */
@@ -345,6 +345,7 @@ static int vecelem_extend(vecelem *op) noex {
 	    if (rs >= 0) {
 	        op->va = va ;
 	        op->n = nn ;
+		op->va[op->i] = nullptr ;
 	    }
 	} /* end if (extension required) */
 	return rs ;

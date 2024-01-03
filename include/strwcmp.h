@@ -1,4 +1,4 @@
-/* strwcmp INCLUDE */
+/* strwcmp HEADER */
 /* lang=C20 */
 
 /* string-copy variant */

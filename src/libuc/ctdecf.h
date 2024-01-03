@@ -1,4 +1,4 @@
-/* ctdecf INCLUDE */
+/* ctdecf HEADER */
 /* lang=C++20 */
 
 /* subroutines to convert an floating-value to a decimal string */

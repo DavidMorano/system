@@ -1,4 +1,4 @@
-/* strstore INCLUDE */
+/* strstore HEADER */
 /* lang=C20 */
 
 /* string-store */

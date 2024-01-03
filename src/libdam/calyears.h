@@ -1,4 +1,4 @@
-/* calyears INCLUDE */
+/* calyears HEADER */
 /* lang=C20 */
 
 /* CALYEARS object implementation */

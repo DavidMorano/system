@@ -1,4 +1,4 @@
-/* getfdfile INCLUDE */
+/* getfdfile HEADER */
 /* lang=C20 */
 
 /* try to divine a file-descriptor out of a file-name */

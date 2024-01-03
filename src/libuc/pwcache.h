@@ -1,4 +1,4 @@
-/* pwcache INCLUDE */
+/* pwcache HEADER */
 /* lang=C20 */
 
 /* password cache */

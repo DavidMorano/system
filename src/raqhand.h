@@ -1,4 +1,4 @@
-/* raqhand INCLUDE */
+/* raqhand HEADER */
 /* lang=C20 */
 
 /* Random-Access Queue Handler */
@@ -51,7 +51,7 @@ struct raqhand_head {
 	RAQHAND_FL	f ;
 } ;
 
-typedef struct raqhand_head	raqhand ;
+typedef RAQHAND		raqhand ;
 
 #ifdef	__cplusplus
 extern "C" {

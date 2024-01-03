@@ -1,4 +1,4 @@
-/* sigblocker INCLUDE */
+/* sigblocker HEADER */
 /* lang=C20 */
 
 /* little object to block signals */

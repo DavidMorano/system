@@ -1,4 +1,4 @@
-/* uclibmemalloc INCLUDE */
+/* uclibmemalloc HEADER */
 /* lang=C20 */
 
 /* memory allocation facility (for library use) */

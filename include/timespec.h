@@ -1,4 +1,4 @@
-/* timespec INCLUDE */
+/* timespec HEADER */
 /* lang=C99 */
 
 /* time-spec object methods */

@@ -1,4 +1,4 @@
-/* ucmem INCLUDE */
+/* ucmem HEADER */
 /* lang=C20 */
 
 /* provide some memory UNIX® operations*/

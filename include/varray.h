@@ -1,4 +1,4 @@
-/* varray INCLUDE */
+/* varray HEADER */
 /* lang=C20 */
 
 /* object implementing variable-length array of elements */

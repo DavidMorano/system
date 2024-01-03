@@ -1,4 +1,4 @@
-/* ptm INCLUDE */
+/* ptm HEADER */
 /* lang=C20 */
 
 /* POSIX Thread Mutex manipulation */

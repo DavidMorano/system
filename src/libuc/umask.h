@@ -1,4 +1,4 @@
-/* umask INCLUDE */
+/* umask HEADER */
 /* lang=C20 */
 
 /* UNIX® information (a cache for 'uname(2)' and sisters) */

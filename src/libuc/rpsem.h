@@ -1,4 +1,4 @@
-/* psem INCLUDE */
+/* psem HEADER */
 /* lang=C20 */
 
 /* POSIX© unnamed Semaphore (PSEM) */

@@ -1,4 +1,4 @@
-/* shadowent INCLUDE */
+/* shadowent HEADER */
 
 /* SHADOW structure management */
 

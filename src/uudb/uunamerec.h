@@ -1,4 +1,4 @@
-/* uunamerec INCLUDE */
+/* uunamerec HEADER */
 /* lang=C20 */
 
 /* string uunamerec object */

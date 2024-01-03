@@ -1,4 +1,4 @@
-/* getdig INCLUDE */
+/* getdig HEADER */
 /* lang=C20 */
 
 /* create a digit from a value */

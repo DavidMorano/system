@@ -1,4 +1,4 @@
-/* ucsysnw INCLUDE */
+/* ucsysnw HEADER */
 /* lang=C20 */
 
 /* additional operaring-system support for PEOJECT-DB access */

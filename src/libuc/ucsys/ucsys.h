@@ -1,4 +1,4 @@
-/* ucsys INCLUDE */
+/* ucsys HEADER */
 /* lang=C20 */
 
 /* UCSYS object management */

@@ -1,4 +1,4 @@
-/* ucopeninfo INCLUDE */
+/* ucopeninfo HEADER */
 /* lang=C20 */
 
 /* additional UNIX® limits support */

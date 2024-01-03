@@ -1,4 +1,4 @@
-/* vecpstr_srvargs */
+/* vecpstr_srvargs SUPPORT */
 /* lang=C++20 */
 
 /* process server file program arguments */
@@ -29,6 +29,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>

@@ -1,4 +1,4 @@
-/* ucenumho INCLUDE */
+/* ucenumho HEADER */
 /* lang=C20 */
 
 /* enumerate system SYSDB-XX entries */

@@ -1,4 +1,4 @@
-/* lockfile INCLUDE */
+/* lockfile HEADER */
 /* lang=C20 */
 
 /* sister subroutine to |uc_lockf(3uc)| */

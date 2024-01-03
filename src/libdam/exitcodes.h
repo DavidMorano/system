@@ -1,4 +1,4 @@
-/* exitcodes INCLUDE */
+/* exitcodes HEADER */
 /* lang=C20 */
 
 

@@ -1,4 +1,4 @@
-/* usysauxinfo_sunos INCLUDE */
+/* usysauxinfo_sunos HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

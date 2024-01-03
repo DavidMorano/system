@@ -1,4 +1,4 @@
-/* timecount INCLUDE */
+/* timecount HEADER */
 /* lang=C++20 */
 
 /* count-down timer */

@@ -1,4 +1,4 @@
-/* usysauxinfo_linux INCLUDE */
+/* usysauxinfo_linux HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

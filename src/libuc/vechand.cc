@@ -1,4 +1,4 @@
-/* vechand */
+/* vechand SUPPORT */
 /* lang=C++20 */
 
 /* vector list operations */
@@ -496,6 +496,7 @@ static int vechand_extend(vechand *op) noex {
 	    if (rs >= 0) {
 	        op->va = (void **) nva ;
 	        op->n = nn ;
+		op->va[op->i] = nullptr ;
 	    }
 	} /* end if (extension required) */
 	return rs ;

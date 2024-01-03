@@ -1,4 +1,4 @@
-/* strlist INCLUDE */
+/* strlist HEADER */
 /* lang=C20 */
 
 /* read or audit a STRLIST database */

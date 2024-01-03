@@ -1,4 +1,4 @@
-/* cthex INCLUDE */
+/* cthex HEADER */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a HEX string */

@@ -1,6 +1,5 @@
-/* vecpstr INCLUDE */
+/* vecpstr HEADER */
 /* lang=C20 */
-
 
 /* vector-packed-string */
 /* version %I% last-modified %G% */

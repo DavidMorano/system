@@ -1,4 +1,4 @@
-/* lockmemalloc INCLUDE */
+/* lockmemalloc HEADER */
 /* lang=C20 */
 
 /* memory allocation facility w/ locking */

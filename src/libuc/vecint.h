@@ -1,4 +1,4 @@
-/* vecint */
+/* vecint HEADER */
 /* lang=C20 */
 
 /* vector integer operations */
@@ -20,7 +20,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>		/* for 'uint' */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 /* object defines */

@@ -1,4 +1,4 @@
-/* vecobj_hsort */
+/* vecobj_hsort SUPPORT */
 /* lang=C20 */
 
 /* vector object list operations (heapsort) */

@@ -1,4 +1,4 @@
-/* powtwo INCLUDE */
+/* powtwo HEADER */
 /* lang=C20 */
 
 /* handle some power-of-two issues */

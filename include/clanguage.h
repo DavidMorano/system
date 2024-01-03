@@ -1,4 +1,4 @@
-/* clanguage INCLUDE */
+/* clanguage HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

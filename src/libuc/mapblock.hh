@@ -1,4 +1,4 @@
-/* mapblock INCLUDE */
+/* mapblock HEADER */
 /* lang=C++20 */
 
 /* implement a map container of blocks (of a given structure) */

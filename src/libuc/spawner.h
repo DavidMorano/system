@@ -1,4 +1,4 @@
-/* spawner INCLUDE */
+/* spawner HEADER */
 /* lang=C20 */
 
 /* object to facilitate spanwing processes */

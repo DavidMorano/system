@@ -1,4 +1,4 @@
-/* usys_sunos INCLUDE */
+/* usys_sunos HEADER */
 /* lang=C20 */
 
 /* Apple Darwin operating system support */

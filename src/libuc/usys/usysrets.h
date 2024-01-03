@@ -1,4 +1,4 @@
-/* usysrets INCLUDE */
+/* usysrets HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

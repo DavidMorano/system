@@ -1,4 +1,4 @@
-/* vecobj_stringsort */
+/* vecobj_stringsort SUPPORT */
 /* lang=C20 */
 
 /* vector object list operations (stringsort) */
@@ -8,9 +8,7 @@
 /* revision history:
 
 	= 1998-12-01, David A­D­ Morano
-
 	This subroutine was written for Rightcore Network Services.
-
 
 */
 

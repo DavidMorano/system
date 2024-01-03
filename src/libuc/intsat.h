@@ -1,4 +1,4 @@
-/* intsat INCLUDE */
+/* intsat HEADER */
 /* lang=C20 */
 
 /* Integer Saturation Addition */

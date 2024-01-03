@@ -1,4 +1,4 @@
-/* strnxchr INCLUDE */
+/* strnxchr HEADER */
 /* lang=C20 */
 
 /* find a character in a counted c-string */

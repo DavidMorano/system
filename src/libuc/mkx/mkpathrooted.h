@@ -1,4 +1,4 @@
-/* mkpathrooted INCLUDE */
+/* mkpathrooted HEADER */
 /* lang=C20 */
 
 /* make a file rooted from the present-working-directory */

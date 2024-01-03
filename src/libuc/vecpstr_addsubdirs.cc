@@ -1,4 +1,4 @@
-/* vecpstr_addsubdirs */
+/* vecpstr_addsubdirs SUPPORT */
 /* lang=C++20 */
 
 /* find and load UNIX® directories under a given root */
@@ -28,6 +28,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<libmallocxx.h>

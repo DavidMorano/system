@@ -1,4 +1,4 @@
-/* mailmsg_enver INCLUDE */
+/* mailmsg_enver HEADER */
 
 
 /* revision history:

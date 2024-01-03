@@ -1,4 +1,4 @@
-/* mailbox INCLUDE */
+/* mailbox HEADER */
 /* lang=C20 */
 
 /* mailbox handling object */

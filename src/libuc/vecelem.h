@@ -1,4 +1,4 @@
-/* vecelem INCLUDE */
+/* vecelem HEADER */
 /* lang=C20 */
 
 /* vector-element */

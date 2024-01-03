@@ -1,4 +1,4 @@
-/* fmtstr INCLUDE */
+/* fmtstr HEADER */
 /* lang=C20 */
 
 /* header file for the FMTSTR subroutine */

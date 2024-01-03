@@ -1,4 +1,4 @@
-/* veclong */
+/* veclong SUPPORT */
 
 /* vector long-integer operations */
 

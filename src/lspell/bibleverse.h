@@ -1,4 +1,4 @@
-/* bibleverse INCLUDE */
+/* bibleverse HEADER */
 /* lang=C20 */
 
 

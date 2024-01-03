@@ -1,4 +1,4 @@
-/* groupent INCLUDE */
+/* groupent HEADER */
 /* lang=C20 */
 
 /* subroutines for simple GROUP object (from UNIX® library-3c) management */

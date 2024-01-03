@@ -488,6 +488,7 @@ static int recarr_extend(recarr *op,int n) noex {
 	    if (rs >= 0) {
 	        op->va = (void **) np ;
 	        op->n = nn ;
+		op->va[op->i] = nullptr ;
 	    }
 	} /* end if */
 	return rs ;

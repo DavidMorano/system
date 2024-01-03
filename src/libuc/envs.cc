@@ -1,4 +1,4 @@
-/* envs */
+/* envs SUPPORT */
 /* lang=C++20 */
 
 /* environment-variable list container */
@@ -57,7 +57,8 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -74,7 +75,7 @@ using std::nullptr_t ;
 struct envs_e {
 	cchar		*kp ;
 	int		kl ;
-	vecstr		list ;
+	vecstr		elist ;
 } ;
 
 typedef envs_e		*entp ;
@@ -82,8 +83,17 @@ typedef envs_e		*entp ;
 
 /* forward references */
 
-static inline int	envs_enter(envs *op) noex {
-	return (op) ? SR_OK : SR_FAULT ;
+static inline int envs_enter(envs *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    hdb		*p ;
+	    rs = SR_NOMEM ;
+	    if ((p = new(nothrow) hdb) != nullptr) {
+		op->varp = p ;
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 
 template<typename ... Args>
@@ -113,7 +123,7 @@ int envs_start(envs *op,int ne) noex {
 	int		rs ;
 	if ((rs = envs_enter(op)) >= 0) {
 	    nullptr_t	n{} ;
-	    if ((rs = ENVS_DBSTART(&op->vars,ne,n,n)) >= 0) {
+	    if ((rs = ENVS_DBSTART(op->varp,ne,n,n)) >= 0) {
 		op->magic = ENVS_MAGIC ;
 	    }
 	}
@@ -127,8 +137,8 @@ int envs_finish(envs *op) noex {
 	if ((rs = envs_magic(op)) >= 0) {
 	    ENVS_DBCUR		cur ;
 	    ENVS_DBDAT		key, val ;
-	    ENVS_DBCURBEGIN(&op->vars,&cur) ;
-	    while (ENVS_DBENUM(&op->vars,&cur,&key,&val) >= 0) {
+	    ENVS_DBCURBEGIN(op->varp,&cur) ;
+	    while (ENVS_DBENUM(op->varp,&cur,&key,&val) >= 0) {
 	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
 		if (ep) {
 		    {
@@ -142,12 +152,16 @@ int envs_finish(envs *op) noex {
 		}
 	    } /* end while */
 	    {
-	        rs1 = ENVS_DBCUREND(&op->vars,&cur) ;
+	        rs1 = ENVS_DBCUREND(op->varp,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->varp) {
+		rs1 = ENVS_DBFINISH(op->varp) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-		rs1 = ENVS_DBFINISH(&op->vars) ;
-		if (rs >= 0) rs = rs1 ;
+		delete op->varp ;
+		op->varp = nullptr ;
 	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
@@ -165,7 +179,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 	    key.len = strlen(kp) ;
 	    val.buf = nullptr ;
 	    val.len = -1 ;
-	    if ((rs1 = ENVS_DBFETCH(&op->vars,key,nullptr,&val)) >= 0) {
+	    if ((rs1 = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
 	        ep = (ENVS_ENT *) val.buf ;
 	        if (fa) {
 		    rs = entry_append(ep,vp,vl) ;
@@ -183,7 +197,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 		        key.len = knl ;
 		        val.buf = ep ;
 		        val.len = sizeof(ENVS_ENT) ;
-		        rs = ENVS_DBSTORE(&op->vars,key,val) ;
+		        rs = ENVS_DBSTORE(op->varp,key,val) ;
 		        if (rs < 0) {
 			    entry_finish(ep) ;
 		        }
@@ -203,7 +217,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 int envs_count(envs *op) noex {
 	int		rs ;
 	if ((rs = envs_magic(op)) >= 0) {
-	    rs = ENVS_DBCOUNT(&op->vars) ;
+	    rs = ENVS_DBCOUNT(op->varp) ;
 	}
 	return rs ;
 }
@@ -216,7 +230,7 @@ int envs_present(envs *op,cchar *kp,int kl) noex {
 	    if (kl < 0) kl = strlen(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
-	    if ((rs = ENVS_DBFETCH(&op->vars,key,nullptr,&val)) >= 0) {
+	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
 	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
 	        rs = entry_count(ep) ;
 	    }
@@ -228,7 +242,7 @@ int envs_present(envs *op,cchar *kp,int kl) noex {
 int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = envs_magic(op,kp,sp)) >= 0) {
-	    hdb		*vlp = &op->vars ;
+	    hdb		*vlp = op->varp ;
 	    ENVS_DBDAT	key, val ;
 	    if (kl < 0) kl = strlen(kp) ;
 	    if (sl < 0) sl = strlen(sp) ;
@@ -246,8 +260,17 @@ int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 	int		rs ;
 	if ((rs = envs_magic(op,curp)) >= 0) {
+	    cint	osz = sizeof(hdb_cur) ;
+	    hdb_cur	*ocp{} ;
 	    curp->i = -1 ;
-	    rs = ENVS_DBCURBEGIN(&op->vars,&curp->cur) ;
+	    if ((rs = uc_malloc(osz,&ocp)) >= 0) {
+		curp->curp = ocp ;
+	        rs = ENVS_DBCURBEGIN(op->varp,curp->curp) ;
+		if (rs < 0) {
+		    uc_free(curp->curp) ;
+		    curp->curp = nullptr ;
+		}
+	    } /* end if (m-a) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -255,9 +278,18 @@ int envs_curbegin(envs *op,ENVS_CUR *curp) noex {
 
 int envs_curend(envs *op,ENVS_CUR *curp) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = envs_magic(op,curp)) >= 0) {
+	    {
+	        rs1 = ENVS_DBCUREND(op->varp,curp->curp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = uc_free(curp->curp) ;
+		if (rs >= 0) rs = rs1 ;
+		curp->curp = nullptr ;
+	    }
 	    curp->i = -1 ;
-	    rs = ENVS_DBCUREND(&op->vars,&curp->cur) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -268,9 +300,9 @@ int envs_enumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 	int		kl = 0 ;
 	if ((rs = envs_magic(op,curp)) >= 0) {
 	    ENVS_DBDAT	key, val ;
-	    ENVS_DB	*dlp = &op->vars ;
+	    ENVS_DB	*dlp = op->varp ;
 	    if (kpp) *kpp = nullptr ;
-	    if ((rs = ENVS_DBENUM(dlp,&curp->cur,&key,&val)) >= 0) {
+	    if ((rs = ENVS_DBENUM(dlp,curp->curp,&key,&val)) >= 0) {
 	        cchar	*kp = ccharp(key.buf) ;
 	        kl = strlen(kp) ;
 	        if (kpp) *kpp = kp ;
@@ -292,10 +324,10 @@ int envs_enum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	    while (rs >= 0) {
 	       int		i ;
 	       if (curp->i < 0) {
-	            rs = ENVS_DBNEXT(&op->vars,&curp->cur) ;
+	            rs = ENVS_DBNEXT(op->varp,curp->curp) ;
 	        }
 	        if (rs >= 0) {
-	            rs = ENVS_DBGETREC(&op->vars,&curp->cur,&key,&val) ;
+	            rs = ENVS_DBGETREC(op->varp,curp->curp,&key,&val) ;
 	        }
 	        if (rs < 0) break ;
 	        kp = ccharp(key.buf) ;
@@ -330,7 +362,7 @@ int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 	    }
 	    key.buf = kp ;
 	    key.len = kl ;
-	    if ((rs = ENVS_DBFETCH(&op->vars,key,nullptr,&val)) >= 0) {
+	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
 	        cchar	*vp{} ;
 	        ep = (ENVS_ENT *) val.buf ;
 	        if ((rs = entry_get(ep,i,&vp)) >= 0) {
@@ -351,7 +383,7 @@ int envs_delname(envs *op,cchar *kp,int kl) noex {
 	    if (kl < 0) kl = strlen(kp) ;
 	    key.buf = kp ;
 	    key.len = kl ;
-	    rs = ENVS_DBFETCH(&op->vars,key,nullptr,&val) ;
+	    rs = ENVS_DBFETCH(op->varp,key,nullptr,&val) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -361,33 +393,37 @@ int envs_delname(envs *op,cchar *kp,int kl) noex {
 /* private subroutines */
 
 static int entry_start(ENVS_ENT *ep,cc *kp,cc *vn,int vnlen,cc**rpp) noex {
-	int		rs ;
-	cchar		*cp ;
-
-	if ((kp == nullptr) || (kp[0] == '\0')) return SR_INVALID ;
-
-	if ((rs = uc_mallocstrw(kp,-1,&cp)) >= 0) {
-	    cint	n = ENVS_DEFENTS ;
-	    int		vo = 0 ;
-	    ep->kl = (rs - 1) ;
-	    ep->kp = cp ;
-	    vo |= (VECSTR_OCOMPACT | VECSTR_OORDERED) ;
-	    vo |= VECSTR_OREUSE ;
-	    if ((rs = vecstr_start(&ep->list,n,vo)) >= 0) {
-		if (vn == nullptr) vn = (ep->kp + ep->kl) ;
-		if ((rs = vecstr_add(&ep->list,vn,vnlen)) >= 0) {
-		    if (rpp != nullptr) *rpp = ep->kp ;
-		}
-		if (rs < 0)
-		    vecstr_finish(&ep->list) ;
-	    } /* end if (vecstr_start) */
-	    if (rs < 0) {
-		uc_free(ep->kp) ;
-		ep->kp = nullptr ;
-	    }
-	} /* end if (memory-allocation) */
-
-	return (rs >= 0) ? ep->kl : rs ;
+	int		rs = SR_FAULT ;
+	int		kl = 0 ;
+	if (ep && kp) {
+	    rs = SR_INVALID ;
+	    if (kp[0]) {
+	        cchar		*cp{} ;
+	        if ((rs = uc_mallocstrw(kp,-1,&cp)) >= 0) {
+	            cint	n = ENVS_DEFENTS ;
+	            int		vo = 0 ;
+	            ep->kl = (rs - 1) ;
+	            ep->kp = cp ;
+	            vo |= (VECSTR_OCOMPACT | VECSTR_OORDERED) ;
+	            vo |= VECSTR_OREUSE ;
+	            if ((rs = vecstr_start(&ep->elist,n,vo)) >= 0) {
+		        if (vn == nullptr) vn = (ep->kp + ep->kl) ;
+		        if ((rs = vecstr_add(&ep->elist,vn,vnlen)) >= 0) {
+		            kl = ep->kl ;
+		            if (rpp) *rpp = ep->kp ;
+		        }
+		        if (rs < 0) {
+		            vecstr_finish(&ep->elist) ;
+			}
+	            } /* end if (vecstr_start) */
+	            if (rs < 0) {
+		        uc_free(ep->kp) ;
+		        ep->kp = nullptr ;
+	            }
+	        } /* end if (memory-allocation) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (entry_start) */
 
@@ -402,7 +438,7 @@ static int entry_finish(ENVS_ENT *ep) noex {
 		ep->kp = nullptr ;
 	    }
 	    {
-		rs1 = vecstr_finish(&ep->list) ;
+		rs1 = vecstr_finish(&ep->elist) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -411,23 +447,21 @@ static int entry_finish(ENVS_ENT *ep) noex {
 /* end subroutine (entry_finish) */
 
 static int entry_count(ENVS_ENT *ep) noex {
-	return vecstr_count(&ep->list) ;
+	return vecstr_count(&ep->elist) ;
 }
 /* end subroutine (entry_count) */
 
 static int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
 	int		rs ;
-
-	if ((rs = vecstr_delall(&ep->list)) >= 0) {
-	    rs = vecstr_add(&ep->list,vp,vl) ;
+	if ((rs = vecstr_delall(&ep->elist)) >= 0) {
+	    rs = vecstr_add(&ep->elist,vp,vl) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (entry_set) */
 
 static int entry_append(ENVS_ENT *ep,cchar *vp,int vl) noex {
-	return vecstr_add(&ep->list,vp,vl) ;
+	return vecstr_add(&ep->elist,vp,vl) ;
 }
 /* end subroutine (entry_append) */
 
@@ -435,7 +469,7 @@ static int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	cchar		*rp{} ;
-	if ((rs = vecstr_get(&ep->list,i,&rp)) >= 0) {
+	if ((rs = vecstr_get(&ep->elist,i,&rp)) >= 0) {
 	    vl = strlen(rp) ;
 	    if (*rpp) *rpp = rp ;
 	}
@@ -450,10 +484,9 @@ static int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
 	int		f = FALSE ;
 	cchar		*ss ;
 	if ((rs = nulstr_start(&ns,sp,sl,&ss)) >= 0) {
-	    vecstr	*clp = &ep->list ;
-	    int		i ;
-	    cchar	*cp ;
-	    for (i = 0 ; (rs = vecstr_get(clp,i,&cp)) >= 0 ; i += 1) {
+	    vecstr	*clp = &ep->elist ;
+	    cchar	*cp{} ;
+	    for (int i = 0 ; (rs = vecstr_get(clp,i,&cp)) >= 0 ; i += 1) {
 		if (cp) {
 		    f = (strstr(cp,ss) != nullptr) ;
 		    if (f) break ;

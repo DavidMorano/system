@@ -1,4 +1,4 @@
-/* field INCLUDE */
+/* field HEADER */
 /* lang=C20 */
 
 /* structure definition for field extraction calls */

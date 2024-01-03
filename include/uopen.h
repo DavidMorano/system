@@ -1,4 +1,4 @@
-/* uopen INCLUDE */
+/* uopen HEADER */
 /* lang=C20 */
 
 /* additional UNIX® limits support */

@@ -1,4 +1,4 @@
-/* numsign INCLUDE */
+/* numsign HEADER */
 /* lang=C20 */
 
 /* number sign access */

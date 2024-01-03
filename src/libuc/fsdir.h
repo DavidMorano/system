@@ -1,4 +1,4 @@
-/* fsdir INCLUDE */
+/* fsdir HEADER */
 /* lang=C20 */
 
 /* File-System-Direcroy (FSDIR) */

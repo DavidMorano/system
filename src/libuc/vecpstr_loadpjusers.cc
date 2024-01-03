@@ -1,4 +1,4 @@
-/* vecpstr_loadpjusers */
+/* vecpstr_loadpjusers SUPPORT */
 /* lang=C++20 */
 
 /* find and load UNIX® users who have the given project name */
@@ -35,6 +35,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<climits>
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<vecpstr.h>

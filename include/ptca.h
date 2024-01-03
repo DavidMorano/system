@@ -1,4 +1,4 @@
-/* ptca INCLUDE */
+/* ptca HEADER */
 /* lang=C20 */
 
 /* POSIX® Thread (Pthread) Condition-Vvariable Attributes */

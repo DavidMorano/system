@@ -1,4 +1,4 @@
-/* stdorder INCLUDE */
+/* stdorder HEADER */
 /* lang=C20 */
 
 /* standard byte-order serializations */

@@ -1,4 +1,4 @@
-/* modload INCLUDE */
+/* modload HEADER */
 /* lang=C20 */
 
 

@@ -1,4 +1,4 @@
-/* ucproctypes INCLUDE */
+/* ucproctypes HEADER */
 /* lang=C20 */
 
 /* UNIX® C-language library process types */

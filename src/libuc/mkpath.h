@@ -1,4 +1,4 @@
-/* mkpath INCLUDE */
+/* mkpath HEADER */
 /* lang=C20 */
 
 /* make a file-path from multiple component c-strings */

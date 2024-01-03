@@ -1,4 +1,4 @@
-/* fsdir INCLUDE (Darwin) */
+/* fsdir HEADER (Darwin) */
 /* lang=C20 */
 
 /* UNIX® file system dirextory operations */

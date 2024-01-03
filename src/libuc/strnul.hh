@@ -1,4 +1,4 @@
-/* strnul INCLUDE */
+/* strnul HEADER */
 /* lang=C++20 */
 
 /* assert a NUL-terminated string */

@@ -1,4 +1,4 @@
-/* keyopt INCLUDE */
+/* keyopt HEADER */
 /* lang=C20 */
 
 /* paramater option manipulations */

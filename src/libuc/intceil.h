@@ -1,4 +1,4 @@
-/* intceil INCLUDE */
+/* intceil HEADER */
 /* lang=C20 */
 
 /* Integer-Ceiling */

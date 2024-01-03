@@ -1,4 +1,4 @@
-/* ucenumpw INCLUDE */
+/* ucenumpw HEADER */
 /* lang=C20 */
 
 /* enumerate system SYSDB-XX entries */

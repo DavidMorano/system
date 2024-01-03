@@ -1,4 +1,4 @@
-/* ismmclass INCLUDE */
+/* ismmclass HEADER */
 /* lang=C20 */
 
 /* character classes for mail content purposes */

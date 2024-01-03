@@ -1,4 +1,4 @@
-/* vecpstr_envfile */
+/* vecpstr_envfile SUPPORT */
 /* lang=C++20 */
 
 /* process an environment file */

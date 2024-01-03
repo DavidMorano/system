@@ -1,4 +1,4 @@
-/* mapex INCLUDE */
+/* mapex HEADER */
 /* lang=C20 */
 
 /* map status-return (SR) values to program exit-codes (EX) */

@@ -1,4 +1,8 @@
-/* vecitem */
+/* vecitem HEADER */
+/* lang=C++20 */
+
+/* vector¯item operations */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,19 +15,21 @@
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	VECITEM_INCLUDE
-#define	VECITEM_INCLUDE	1
+#define	VECITEM_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>		/* for 'uint' */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 /* object defines */
 
 #define	VECITEM			struct vecitem_head
 #define	VECITEM_FL		struct vecitem_flags
-#define	VECITEM_CUR		struct vecitem_c
+#define	VECITEM_CUR		struct vecitem_cursor
 #define	VECITEM_DEFENTS		10
 
 /* options */
@@ -36,17 +42,6 @@
 #define	VECITEM_OCONSERVE	0x0010
 #define	VECITEM_OSORTED		0x0020
 #define	VECITEM_OORDERED	0x0040
-
-/* policy modes (Vector String Policy) */
-
-#define	VECITEM_PDEFAULT	0		/* default */
-#define	VECITEM_PHOLES		0		/* leave holes */
-#define	VECITEM_PSWAP		VECITEM_OSWAP	/* swap entries */
-#define	VECITEM_PREUSE		VECITEM_OREUSE	/* reuse empty entries */
-#define	VECITEM_PORDERED	VECITEM_OORDERED	/* keep them ordered */
-#define	VECITEM_PSORTED		VECITEM_OSORTED	/* keep them sorted */
-#define	VECITEM_PNOHOLES	VECITEM_OCOMPACT	/* swap entries */
-#define	VECITEM_PCONSERVE	VECITEM_OCONSERVE /* conserve space */
 
 
 struct vecitem_flags {
@@ -70,41 +65,39 @@ struct vecitem_head {
 	int		fi ;		/* free index */
 } ;
 
-struct vecitem_c {
+struct vecitem_cursor  {
 	int		i, c ;
 } ;
 
-
-typedef struct vecitem_head	vecitem ;
-typedef struct vecitem_c	vecitem_cur ;
-
-
-#if	(! defined(VECITEM_MASTER)) || (VECITEM_MASTER == 0)
+typedef VECITEM		vecitem ;
+typedef VECITEM_CUR	vecitem_cur ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int vecitem_start(vecitem *,int,int) ;
-extern int vecitem_finish(vecitem *) ;
-extern int vecitem_add(vecitem *,void *,int) ;
-extern int vecitem_del(vecitem *,int) ;
-extern int vecitem_count(vecitem *) ;
-extern int vecitem_sort(vecitem *,int (*)()) ;
-extern int vecitem_find(vecitem *,void *,int) ;
-extern int vecitem_fetch(vecitem *,void *,vecitem_cur *,int (*)(),void *) ;
-extern int vecitem_search(vecitem *,void *,int (*)(),void *) ;
-extern int vecitem_get(vecitem *,int,void *) ;
-extern int vecitem_getvec(vecitem *,void *) ;
-extern int vecitem_audit(vecitem *) ;
-extern int vecitem_curbegin(VECITEM *,VECITEM_CUR *) ;
-extern int vecitem_curend(VECITEM *,VECITEM_CUR *) ;
+typedef int (*vecitem_cmpf)(cvoid **,cvoid **) noex ;
+
+extern int vecitem_start(vecitem *,int,int) noex ;
+extern int vecitem_finish(vecitem *) noex ;
+extern int vecitem_add(vecitem *,void *,int) noex ;
+extern int vecitem_del(vecitem *,int) noex ;
+extern int vecitem_count(vecitem *) noex ;
+extern int vecitem_sort(vecitem *,vecitem_cmpf) noex ;
+extern int vecitem_find(vecitem *,cvoid *,int) noex ;
+extern int vecitem_fetch(vecitem *,cvoid *,vecitem_cur *,
+		vecitem_cmpf,void *) noex ;
+extern int vecitem_search(vecitem *,cvoid *,vecitem_cmpf,void *) noex ;
+extern int vecitem_get(vecitem *,int,void *) noex ;
+extern int vecitem_getvec(vecitem *,void **) noex ;
+extern int vecitem_audit(vecitem *) noex ;
+extern int vecitem_curbegin(vecitem *,vecitem_cur *) noex ;
+extern int vecitem_curend(vecitem *,vecitem_cur *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* VECITEM_MASTER */
 
 #endif /* VECITEM_INCLUDE */
 

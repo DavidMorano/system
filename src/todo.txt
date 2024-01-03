@@ -1,10 +1,9 @@
-TOTO
+TODO
 
 file		what
 ------------------------
 mapblock
 macfu
-envs		rm objects from header - replace w/ pointers
 memfile
 getprogroot	lots of cleanup
 convertx

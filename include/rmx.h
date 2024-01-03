@@ -1,4 +1,4 @@
-/* rmx INCLUDE */
+/* rmx HEADER */
 /* lang=C20 */
 
 /* remove EOL (End-Of-Line) characters from the given string */

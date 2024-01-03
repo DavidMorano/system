@@ -1,4 +1,4 @@
-/* mailmsghdrfold INCLUDE */
+/* mailmsghdrfold HEADER */
 /* lang=C20 */
 
 /* manage folding of a mail-message header line */

@@ -1,4 +1,4 @@
-/* inetaddr INCLUDE */
+/* inetaddr HEADER */
 /* lang=C20 */
 
 /* object to manipulate INET adresses */

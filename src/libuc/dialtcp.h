@@ -1,4 +1,4 @@
-/* dialtcp INCLUDE */
+/* dialtcp HEADER */
 /* lang=C20 */
 
 /* dial out to a TCP port */

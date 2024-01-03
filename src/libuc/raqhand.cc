@@ -1,4 +1,4 @@
-/* raqhand */
+/* raqhand SUPPORT */
 /* lang=C++20 */
 
 /* random-access queue operations */

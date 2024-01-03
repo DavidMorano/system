@@ -1,4 +1,4 @@
-/* plainq INCLUDE */
+/* plainq HEADER */
 /* lang=C20 */
 
 /* plain self-relative double-linked queue */

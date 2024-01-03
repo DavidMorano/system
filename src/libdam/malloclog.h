@@ -1,4 +1,4 @@
-/* malloclog INCLUDE */
+/* malloclog HEADER */
 /* lang=C20 */
 
 /* malloc logging */

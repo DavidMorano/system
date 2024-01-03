@@ -1,4 +1,4 @@
-/* ptc INCLUDE */
+/* ptc HEADER */
 /* lang=C20 */
 
 /* POSIX Thread Condition manipulation */

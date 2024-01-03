@@ -1,4 +1,4 @@
-/* bcspec INCLUDE */
+/* bcspec HEADER */
 /* lang=C20 */
 
 /* load a Bible-Citation-Specification */

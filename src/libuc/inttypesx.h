@@ -1,4 +1,4 @@
-/* inttypesx INCLUDE */
+/* inttypesx HEADER */
 /* lang=C20 */
 
 /* extended integer types */

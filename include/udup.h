@@ -1,4 +1,4 @@
-/* udup INCLUDE */
+/* udup HEADER */
 /* lang=C20 */
 
 /* UNIX® File-Descriptor Dupplication */

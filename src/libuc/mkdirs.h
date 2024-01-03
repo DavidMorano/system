@@ -1,4 +1,4 @@
-/* mkdirs INCLUDE */
+/* mkdirs HEADER */
 /* lang=C20 */
 
 /* make a series of possibly hierarchical directories */

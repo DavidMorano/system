@@ -1,4 +1,4 @@
-/* vecpstr_env */
+/* vecpstr_env SUPPORT */
 /* lang=C23 */
 
 /* environment-type string handling */

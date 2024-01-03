@@ -1,4 +1,4 @@
-/* lockrw INCLUDE */
+/* lockrw HEADER */
 /* lang=C++20 */
 
 /* Reader-Writer Lock (LOCKRW) */

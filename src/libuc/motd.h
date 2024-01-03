@@ -1,4 +1,4 @@
-/* motd INCLUDE */
+/* motd HEADER */
 /* lang=C20 */
 
 

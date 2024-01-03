@@ -1,4 +1,4 @@
-/* strlistmk INCLUDE */
+/* strlistmk HEADER */
 /* lang=C20 */
 
 /* STRLISTMK management */

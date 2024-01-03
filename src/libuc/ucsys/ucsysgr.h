@@ -1,4 +1,4 @@
-/* ucsysgr INCLUDE */
+/* ucsysgr HEADER */
 /* lang=C20 */
 
 /* additional operaring-system support for GROUP-DB access */

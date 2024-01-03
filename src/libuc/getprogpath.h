@@ -1,4 +1,4 @@
-/* getprogpath INCLUDE */
+/* getprogpath HEADER */
 /* lang=C20 */
 
 /* convert a single character to a given case */

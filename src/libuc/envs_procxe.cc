@@ -1,4 +1,4 @@
-/* envs_procxe */
+/* envs_procxe SUPPORT */
 /* lang=C++20 */
 
 /* process an environment file */

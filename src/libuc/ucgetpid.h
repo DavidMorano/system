@@ -1,4 +1,4 @@
-/* ucgetpid INCLUDE */
+/* ucgetpid HEADER */
 /* lang=C20 */
 
 /* slightly tuned UNIX® look-alike for |getpid(2)| */

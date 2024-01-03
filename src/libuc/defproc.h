@@ -1,4 +1,4 @@
-/* defproc INCLUDE */
+/* defproc HEADER */
 /* lang=C20 */
 
 /* get the Default-Something */

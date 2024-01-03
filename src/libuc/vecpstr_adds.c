@@ -1,4 +1,4 @@
-/* vecpstr_adds */
+/* vecpstr_adds SUPPORT */
 /* lang=C20 */
 
 /* add white-space separated substrings */

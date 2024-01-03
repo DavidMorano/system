@@ -1,4 +1,4 @@
-/* varmks INCLUDE */
+/* varmks HEADER */
 /* lang=C20 */
 
 

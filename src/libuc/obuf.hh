@@ -1,4 +1,4 @@
-/* obuf INCLUDE */
+/* obuf HEADER */
 /* lang=C++20 */
 
 /* Output Buffer */

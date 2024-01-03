@@ -1,4 +1,4 @@
-/* userattrdb INCLUDE */
+/* userattrdb HEADER */
 /* lang=C20 */
 
 /* user-attribute database management */

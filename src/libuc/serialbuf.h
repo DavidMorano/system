@@ -1,4 +1,4 @@
-/* serialbuf INCLUDE */
+/* serialbuf HEADER */
 /* lang=C20 */
 
 /* object that serializes various types into a given buffer */

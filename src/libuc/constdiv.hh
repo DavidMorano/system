@@ -1,4 +1,4 @@
-/* constdiv INCLUDE */
+/* constdiv HEADER */
 /* lang=C++20 */
 
 /* perform divion of a 32-bit value by a constant w/o using division */

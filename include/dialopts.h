@@ -1,4 +1,4 @@
-/* dialopts INCLUDE */
+/* dialopts HEADER */
 /* lang=C20 */
 
 /* set options on dialer file-descriptor */

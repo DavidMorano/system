@@ -1,5 +1,5 @@
 /* getprogroot */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get the program root directory */
 /* version %I% last-modified %G% */
@@ -49,8 +49,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<storebuf.h>
@@ -89,8 +89,8 @@ extern int	mkpr(char *,int,cchar *,cchar *) noex ;
 /* local structures */
 
 struct subinfo {
-	IDS		id ;
-	DIRSEEN		dirs ;
+	ids		id ;
+	dirseen		dirs ;
 	uint		f_dirs:1 ;
 	int		prlen ;
 } ;
@@ -98,16 +98,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *) noex ;
-static int	subinfo_local(SUBINFO *,char *,const char *,int) noex ;
-static int	subinfo_prs(SUBINFO *,cchar **,char *,cchar *,int) noex ;
-static int	subinfo_pr(SUBINFO *,cchar *,char *,cchar *,int) noex ;
-static int	subinfo_other(SUBINFO *,char *,const char *,int) noex ;
-static int	subinfo_check(SUBINFO *,cchar *,int,char *,cchar *,int) noex ;
-static int	subinfo_dirstat(SUBINFO *,USTAT *,cchar *,int) noex ;
-static int	subinfo_record(SUBINFO *,USTAT *,cchar *,int) noex ;
-static int	subinfo_xfile(SUBINFO *,const char *) noex ;
-static int	subinfo_finish(SUBINFO *) noex ;
+static int	subinfo_start(subinfo *) noex ;
+static int	subinfo_local(subinfo *,char *,cchar *,int) noex ;
+static int	subinfo_prs(subinfo *,cchar **,char *,cchar *,int) noex ;
+static int	subinfo_pr(subinfo *,cchar *,char *,cchar *,int) noex ;
+static int	subinfo_other(subinfo *,char *,cchar *,int) noex ;
+static int	subinfo_check(subinfo *,cchar *,int,char *,cchar *,int) noex ;
+static int	subinfo_dirstat(subinfo *,USTAT *,cchar *,int) noex ;
+static int	subinfo_record(subinfo *,USTAT *,cchar *,int) noex ;
+static int	subinfo_xfile(subinfo *,cchar *) noex ;
+static int	subinfo_finish(subinfo *) noex ;
 
 static int	mkdfname(char *,cchar *,int,cchar *,int) noex ;
 
@@ -118,7 +118,7 @@ static int	mkdfname(char *,cchar *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int getprogroot(cc *pr,cc **prnames,int *prlenp,char *obuf,cc *name) noex {
-	SUBINFO		si, *sip = &si ;
+	subinfo		si, *sip = &si ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		namelen ;
@@ -139,40 +139,30 @@ int getprogroot(cc *pr,cc **prnames,int *prlenp,char *obuf,cc *name) noex {
 
 	obuf[0] = '\0' ;
 	if ((rs = subinfo_start(sip)) >= 0) {
-
 	    rs = SR_NOENT ;
 	    if (strnchr(name,namelen,'/') == NULL) {
-
 /* check if the PCS root directory exists */
-
 	        if ((rs < 0) && (rs != SR_NOMEM) && (pr != NULL)) {
 	            rs = subinfo_pr(sip,pr,obuf,name,namelen) ;
 	            outlen = rs ;
 	        }
-
 /* check other program roots */
-
 	        if ((rs < 0) && (rs != SR_NOMEM) && (prnames != NULL)) {
 	            rs = subinfo_prs(sip,prnames,obuf,name,namelen) ;
 	            outlen = rs ;
 	        }
-
 /* search the rest of the execution path */
-
 	        if ((rs < 0) && (rs != SR_NOMEM)) {
 	            rs = subinfo_other(sip,obuf,name,namelen) ;
 	            outlen = rs ;
 	        }
-
 	    } else {
 	        rs = subinfo_local(sip,obuf,name,namelen) ;
 	        outlen = (f_changed) ? namelen : 0 ;
 	    }
-
 	    if (prlenp != NULL) {
 	        *prlenp = sip->prlen ;
 	    }
-
 	    rs1 = subinfo_finish(sip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
@@ -184,7 +174,7 @@ int getprogroot(cc *pr,cc **prnames,int *prlenp,char *obuf,cc *name) noex {
 
 /* local subroutines */
 
-static int subinfo_start(SUBINFO *sip) noex {
+static int subinfo_start(subinfo *sip) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
 	    memset(sip,0,sizeof(SUBINFO)) ;
@@ -194,7 +184,7 @@ static int subinfo_start(SUBINFO *sip) noex {
 }
 /* end subroutine (subinfo_start) */
 
-static int subinfo_finish(SUBINFO *sip) noex {
+static int subinfo_finish(subinfo *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->f_dirs) {
@@ -212,8 +202,8 @@ static int subinfo_finish(SUBINFO *sip) noex {
 static int subinfo_other(SI *sip,char *obuf,cc *np,int nl) noex {
 	int		rs = SR_NOENT ;
 	int		outlen = 0 ;
-	const char	*tp ;
-	const char	*sp = getenv(VARPATH) ;
+	cchar	*tp ;
+	cchar	*sp = getenv(VARPATH) ;
 
 	sip->prlen = 0 ;
 
@@ -240,21 +230,19 @@ static int subinfo_other(SI *sip,char *obuf,cc *np,int nl) noex {
 /* end subroutine (subinfo_other) */
 
 static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *np,int nl) noex {
-	USTAT		sb ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		outlen = 0 ;
-
 	if (sip->f_dirs) {
 	    if ((rs = dirseen_havename(&sip->dirs,d,dlen)) >= 0) {
 	        rs = SR_NOENT ;
 	    } else if (rs == rsn) {
 		rs = SR_OK ;
 	    }
-	}
-
+	} /* end if (f_dirs) */
 	if (rs >= 0) {
+	    USTAT	sb ;
 	    if ((rs = subinfo_dirstat(sip,&sb,d,dlen)) >= 0) {
 	        if ((rs1 = dirseen_havedevino(&sip->dirs,&sb)) >= 0) {
 	            rs = SR_NOENT ;
@@ -266,10 +254,9 @@ static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *np,int nl) noex {
 		    if ((rs = subinfo_xfile(sip,obuf)),isNotAccess(rs)) {
 	    		rs = subinfo_record(sip,&sb,d,dlen) ;
 		    }
-	        }
+		} /* end if (mkdfname) */
 	    }
-	} /* end if (mkdfname) */
-
+	} /* end if (ok) */
 	return (rs >= 0) ? outlen : rs ;
 }
 /* end subroutine (subinfo_check) */
@@ -383,7 +370,7 @@ static int subinfo_xfile(SI *sip,cc *name) noex {
 /* end subroutine (subinfo_xfile) */
 
 static int mkdfname(char *rbuf,cc *d,int dlen,cc *np,int nl) noex {
-	const int	rlen = MAXPATHLEN ;
+	cint		rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (rs >= 0) {

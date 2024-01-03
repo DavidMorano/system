@@ -1,4 +1,4 @@
-/* nulstr INCLUDE */
+/* nulstr HEADER */
 /* lang=C20 */
 
 /* assert a NUL-terminated string */
