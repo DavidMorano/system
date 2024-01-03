@@ -54,6 +54,8 @@
 #include	<mallocxx.h>
 #include	<localmisc.h>
 
+#include	"mapshmtmp.h"
+
 
 /* local defines */
 
