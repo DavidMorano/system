@@ -1,4 +1,4 @@
-/* memtrack */
+/* memtrack SUPPORT */
 /* lang=C++20 */
 
 /* track memory blocks */

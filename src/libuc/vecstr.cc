@@ -85,6 +85,7 @@
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<nulstr.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
@@ -903,6 +904,14 @@ int vecstr::insert(int i,cchar *sp,int sl) noex {
 int vecstr::del(int i) noex {
 	if (i < 0) i = 0 ;
 	return vecstr_del(this,i) ;
+}
+
+
+void vecstr::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("vecstr",rs,"fini-finish") ;
+	}
 }
 
 vecstr_co::operator int () noex {

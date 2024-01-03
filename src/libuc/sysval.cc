@@ -1,4 +1,4 @@
-/* sysval */
+/* sysval SUPPORT */
 /* lang=C++20 */
 
 /* retrieve operating-system values */
@@ -32,7 +32,7 @@
 
 /* local defines */
 
-#define	TO_CACHE	5
+#define	TO_CACHE	(1*60)
 
 
 /* external subroutines */
@@ -86,6 +86,7 @@ sysval::operator int () noex {
 	    switch (name) {
 	    case sysval_po:
 		data.cktimeout(name) ;
+		break ;
 	    } /* end switch */
 	    rs = data[name] ;
 	} /* end if (valid) */

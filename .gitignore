@@ -22,6 +22,10 @@
 *.swp
 
 todo.txt
+src/todo.txt
+src/libu/todo.txt
+src/libuc/todo.txt
+src/libdam/todo.txt
 
 o
 oo

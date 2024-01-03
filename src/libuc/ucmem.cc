@@ -1,4 +1,4 @@
-/* ucmem */
+/* ucmem SUPPORT */
 /* lang=C++20 */
 
 /* provide some memory UNIX® operations */

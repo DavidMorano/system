@@ -1,4 +1,4 @@
-/* mallocstuff */
+/* mallocstuff SUPPORT */
 /* lang=C20 */
 
 /* miscellaneous |malloc(3c)| related */
@@ -27,12 +27,14 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
+#include	<strwcp.h>
 #include	<localmisc.h>
 
 
-/* external subroutines */
+/* local defines */
 
-extern char	*strwcpy(char *,const char *,int) noex ;
+
+/* external subroutines */
 
 
 /* forward references */
@@ -46,7 +48,7 @@ char	*malloctest(int) noex ;
 /* exported subroutines */
 
 char *mallocbuf(void *b,int blen) noex {
-	char	*rp = NULL ;
+	char		*rp = NULL ;
 	if (b == NULL) return NULL ;
 	if (blen < 0) return NULL ;
 	if (uc_malloc((blen + 1),&rp) < 0) rp = NULL ;
@@ -56,8 +58,8 @@ char *mallocbuf(void *b,int blen) noex {
 /* end subroutine (mallocbuf) */
 
 char *mallocstr(cosnt char *s) noex {
-	int	slen ;
-	char	*rp = NULL ;
+	int		slen ;
+	char		*rp = NULL ;
 	if (s == NULL) return NULL ;
 	slen = strlen(s) ;
 	if (uc_malloc((slen+1),&rp) < 0) rp = NULL ;
@@ -67,8 +69,8 @@ char *mallocstr(cosnt char *s) noex {
 /* end subroutine (mallocstr) */
 
 char *mallocstrw(char *sp,int sl) noex {
-	int	f = FALSE ;
-	char	*rp = NULL ;
+	char		*rp = NULL ;
+	bool		f = FALSE ;
 	if (sp == NULL) return NULL ;
 	if (sl < 0) {
 	    f = TRUE ;
@@ -88,12 +90,10 @@ char *mallocstrw(char *sp,int sl) noex {
 /* end subroutine (mallocstrw) */
 
 char *mallocint(v) noex {
-{
-	int	len ;
-	char	*rp = NULL ;
-	len = sizeof(int) ;
+	int		len = sizeof(int) ;
+	char		*rp = NULL ;
 	if (uc_malloc((len+1),&rp) < 0) rp = NULL ;
-	if (rp != NULL)
+	if (rp) {
 	    memcpy(rp,(char *) &v,sizeof(int)) ;
 	}
 	return rp ;

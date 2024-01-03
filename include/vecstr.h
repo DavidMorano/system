@@ -163,8 +163,9 @@ struct vecstr : vecstr_head {
 	    vecstr_iter		it(va,i,i) ;
 	    return it ;
 	} ;
+	void dtor() noex ;
 	~vecstr() noex {
-	    (void) int(finish) ;
+	    dtor() ;
 	} ;
 } ; /* end struct (vecstr) */
 #else	/* __cplusplus */
