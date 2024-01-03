@@ -58,6 +58,14 @@
 /* local defines */
 
 
+/* local namespaces */
+
+using std::nullptr_t ;
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -100,10 +108,11 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
                             uc_unlinkshm(rbuf) ;
                         }
                         if ((rs = shmalloc(fd,shmlen)) >= 0) {
+			    nullptr_t	np{} ;
                             size_t  ms = shmlen ;
                             int     mp = (PROT_READ | PROT_WRITE) ;
                             int     mo = MAP_SHARED ;
-                            rs = u_mmapbegin(NULL,ms,mp,mo,fd,0L,rpp) ;
+                            rs = u_mmapbegin(np,ms,mp,mo,fd,0z,rpp) ;
                         } /* end if */
                         uc_close(fd) ;
                     } /* end if (openshmtmp) */
