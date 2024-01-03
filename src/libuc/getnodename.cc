@@ -1,6 +1,8 @@
-/* getnodename */
+/* getnodename SUPPORT */
+/* lang=C++20 */
 
 /* get the node-name of this node */
+/* version %I% last-modified %G% */
 
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -12,8 +14,8 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-	This subroutine is an extraction of the corresponding code in the
-	'getnodedomain(3dam)' subroutine.
+	This subroutine is an extraction of the corresponding code
+	in the |getnodedomain(3dam)| subroutine.
 
 */
 
@@ -21,50 +23,47 @@
 
 /*******************************************************************************
 
+	Name:
+	getnodename
+
+	Description:
 	This subroutine retrieves the node-name of the current node.
 
 	Synopsis:
-
-	int getnodename(rbuf,rlen)
-	char		rbuf[] ;
-	int		rlen ;
+	int getnodename(char *rbuf,int rlen) noex
 
 	Arguments:
-
 	rbuf		buffer to receive the nodename 
 	rlen		length of supplied buffer (should be NODENAMELEN)
 
 	Returns:
-
 	>=0		length of retrieved nodename
-	<0		could not get the nodename (should be pretty rare!)
+	<0		error (system-return)
 
 	Notes:
-
-        The compiler person can customize how we find the current system
-        nodename. Check out the compile-time defines at the top of this file. If
-        you have it, generally (we think) using UINFO is probably best, because
-        the result is process-wide cached. Nevertheless, we always (as it is
-        now) use SI_HOSTNAME right now as a first resort (if the system supports
-        that).
-
+	The compiler person can customize how we find the current
+	system nodename. Check out the compile-time defines at the
+	top of this file. If you have it, generally (we think) using
+	UINFO is probably best, because the result is process-wide
+	cached. Nevertheless, we always (as it is now) use SI_HOSTNAME
+	right now as a first resort (if the system supports that).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<varnames.hh>
 #include	<uinfo.h>
+#include	<sfx.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>
 
 
@@ -76,21 +75,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy4(char *,int, const char *,const char *,
-			const char *,const char *) ;
-extern int	snwcpylc(const char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfwhitedot(const char *,int,const char **) ;
-
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* local structures */
@@ -104,16 +88,14 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int getnodename(char *nbuf,int nlen)
-{
-	const int	hlen = NODENAMELEN ;
+int getnodename(char *nbuf,int nlen) noex {
+	cint		hlen = NODENAMELEN ;
 #if	CF_UNAME
 	struct utsname	un ;
 #endif
 	int		rs = SR_OK ;
 	int		sl = -1 ;
-	const char	*sp = getenv(VARNODE) ;
+	cchar		*sp = getenv(VARNODE) ;
 	char		hbuf[NODENAMELEN + 1] ;
 
 	if (nbuf == NULL)
@@ -156,10 +138,11 @@ int getnodename(char *nbuf,int nlen)
 
 	if ((rs >= 0) && (sp != NULL)) {
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    rs = 0 ;
-	    if ((cl = sfwhitedot(sp,sl,&cp)) > 0)
+	    if ((cl = sfwhitedot(sp,sl,&cp)) > 0) {
 	        rs = snwcpy(nbuf,nlen,cp,cl) ;
+	    }
 	}
 
 	return rs ;

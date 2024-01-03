@@ -30,7 +30,7 @@
 
 struct varray_head {
 	void		**va ;
-	lookaside	la ;
+	lookaside	*lap ;
 	int		esize ;		/* element size */
 	int		c ;		/* count of items in array */
 	int		n ;		/* extent of array */

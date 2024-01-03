@@ -24,7 +24,7 @@
 #include        <sys/types.h>
 #include        <sys/param.h>
 #include        <cstdlib>
-#include        <time.h>
+#include        <ctime>
 #include        <usystem.h>
 #include        <usupport.h>
 #include        <getbufsize.h>

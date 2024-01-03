@@ -1197,6 +1197,11 @@ aflag.o:		aflag.cc aflag.hh
 timewatch.o:		timwatch.cc timewatch.hh
 timecount.o:		timecount.cc timecount.hh
 
+# USYS
+usys.o:			usys.dir
+usys.dir:
+	makesubdir $@
+
 # misc-character
 toxc.o:			toxc.c toxc.h
 char.o:			char.cc char.h
@@ -1331,6 +1336,7 @@ intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
+getnodename.o:		getnodename.cc getnodename.h
 getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h

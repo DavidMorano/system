@@ -17,7 +17,7 @@
 
 /*****************************************************************************
 
-	These subroutines allocate a fixed amount of memory and
+	These subroutines allocate a suitable amount of memory and
 	then copy the user supplied thing into it.
 
 ****************************************************************************/
@@ -61,6 +61,7 @@ char *mallocbuf(void *bp,int bl) noex {
 	    if (bl < 0) bl = strlen(charp(bp)) ;
 	    if (uc_malloc((bl+1),&rp) >= 0) {
 		memcpy(rp,bp,bl) ;
+		*rp = '\0' ;
 	    }
 	}
 	return rp ;
@@ -90,6 +91,7 @@ char *mallocint(int v) noex {
 	if (uc_malloc((len+1),&rp) >= 0) {
 	    char	*bp = charp(&v) ;
 	    memcpy(rp,bp,len) ;
+	    *rp = '\0' ;
 	}
 	return rp ;
 }

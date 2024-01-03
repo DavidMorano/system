@@ -46,11 +46,13 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
+typedef DIRSEEN_ENT	dirseen_ent ;
 typedef DIRSEEN_ENT	ent ;
 typedef DIRSEEN_ENT	*entp ;
 typedef DIRSEEN_ENT	**entpp ;
@@ -63,7 +65,7 @@ typedef DIRSEEN_ENT	**entpp ;
 
 struct dirseen_e {
 	cchar		*name ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	int		namelen ;
 	uint		f_stat:1 ;
@@ -82,8 +84,8 @@ static inline int dirseen_magic(dirseen *op,Args ... args) noex {
 }
 /* end subroutine (dirseen_magic) */
 
-static int entry_start(DIRSEEN_ENT *,cchar *,int,dev_t,uino_t) noex ;
-static int entry_finish(DIRSEEN_ENT *) noex ;
+static int entry_start(dirseen_ent *,cchar *,int,dev_t,ino_t) noex ;
+static int entry_finish(dirseen_ent *) noex ;
 
 static int vcmpname(cvoid **,cvoid **) noex ;
 static int vcmpdevino(cvoid **,cvoid **) noex ;
@@ -94,35 +96,47 @@ static int vcmpdevino(cvoid **,cvoid **) noex ;
 
 /* exported subroutines */
 
-int dirseen_start(DIRSEEN *op) noex {
+int dirseen_start(dirseen *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    cint	vo = 0 ;
-	    cint	esz = sizeof(DIRSEEN_ENT) ;
-	    memclear(op) ;
-	    if ((rs = vecobj_start(&op->dlist,esz,DIRSEEN_NDEF,vo)) >= 0) {
-	        op->magic = DIRSEEN_MAGIC ;
-	    }
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    op->strsize = 0 ;
+	    if ((op->dlistp = new(nothrow) vecobj) != nullptr) {
+	        cint	vo = 0 ;
+	        cint	esz = sizeof(dirseen_ent) ;
+	        if ((rs = vecobj_start(op->dlistp,esz,DIRSEEN_NDEF,vo)) >= 0) {
+	            op->magic = DIRSEEN_MAGIC ;
+	        }
+		if (rs < 0) {
+		    delete op->dlistp ;
+		    op->dlistp = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (dirseen_start) */
 
-int dirseen_finish(DIRSEEN *op) noex {
+int dirseen_finish(dirseen *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirseen_magic(op)) >= 0) {
 	    void	*vp{} ;
-	    for (int i = 0 ; vecobj_get(&op->dlist,i,&vp) >= 0 ; i += 1) {
+	    for (int i = 0 ; vecobj_get(op->dlistp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
-	            DIRSEEN_ENT	*ep = entp(vp) ;
+	            dirseen_ent	*ep = entp(vp) ;
 	            rs1 = entry_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
 	    } /* end for */
 	    {
-	        rs1 = vecobj_finish(&op->dlist) ;
+	        rs1 = vecobj_finish(op->dlistp) ;
 	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->dlistp) {
+		delete op->dlistp ;
+		op->dlistp = nullptr ;
 	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
@@ -130,12 +144,12 @@ int dirseen_finish(DIRSEEN *op) noex {
 }
 /* end subroutine (dirseen_finish) */
 
-int dirseen_add(DIRSEEN *op,cchar *dbuf,int dlen,USTAT *sbp) noex {
+int dirseen_add(dirseen *op,cchar *dbuf,int dlen,USTAT *sbp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,dbuf,sbp)) >= 0) {
-	    DIRSEEN_ENT	e ;
+	    dirseen_ent	e ;
 	    dev_t	dev = 0 ;
-	    uino_t	ino = 0 ;
+	    ino_t	ino = 0 ;
 	    int		pl ;
 	    cchar	*pp ;
 	    if (dlen < 0) dlen = strlen(dbuf) ;
@@ -153,7 +167,7 @@ int dirseen_add(DIRSEEN *op,cchar *dbuf,int dlen,USTAT *sbp) noex {
 	    }
 	    if ((rs = entry_start(&e,pp,pl,dev,ino)) >= 0) {
 	        op->strsize += rs ;
-	        rs = vecobj_add(&op->dlist,&e) ;
+	        rs = vecobj_add(op->dlistp,&e) ;
 	        if (rs < 0) {
 		    entry_finish(&e) ;
 		}
@@ -163,7 +177,7 @@ int dirseen_add(DIRSEEN *op,cchar *dbuf,int dlen,USTAT *sbp) noex {
 }
 /* end subroutine (dirseen_add) */
 
-int dirseen_havename(DIRSEEN *op,cchar *np,int nl) noex {
+int dirseen_havename(dirseen *op,cchar *np,int nl) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dirseen_magic(op,np)) >= 0) {
@@ -171,9 +185,9 @@ int dirseen_havename(DIRSEEN *op,cchar *np,int nl) noex {
 	    cchar	*name = nullptr ;
 	    if ((rs = nulstr_start(&s,np,nl,&name)) >= 0) {
 	        {
-	            DIRSEEN_ENT	e ;
+	            dirseen_ent	e ;
 	            e.name = name ;
-	            rs = vecobj_search(&op->dlist,&e,vcmpname,nullptr) ;
+	            rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
 	        }
 	        rs1 = nulstr_finish(&s) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -183,28 +197,28 @@ int dirseen_havename(DIRSEEN *op,cchar *np,int nl) noex {
 }
 /* end subroutine (dirseen_havename) */
 
-int dirseen_havedevino(DIRSEEN *op,USTAT *sbp) noex {
+int dirseen_havedevino(dirseen *op,USTAT *sbp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,sbp)) >= 0) {
-	    DIRSEEN_ENT	e ;
+	    dirseen_ent	e ;
 	    e.dev = sbp->st_dev ;
 	    e.ino = sbp->st_ino ;
-	    rs = vecobj_search(&op->dlist,&e,vcmpdevino,nullptr) ;
+	    rs = vecobj_search(op->dlistp,&e,vcmpdevino,nullptr) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dirseen_havedevino) */
 
-int dirseen_count(DIRSEEN *op) noex {
+int dirseen_count(dirseen *op) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op)) >= 0) {
-	    rs = vecobj_count(&op->dlist) ;
+	    rs = vecobj_count(op->dlistp) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dirseen_count) */
 
-int dirseen_curbegin(DIRSEEN *op,DIRSEEN_CUR *curp) noex {
+int dirseen_curbegin(dirseen *op,dirseen_cur *curp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,curp)) >= 0) {
 	    memclear(curp) ;
@@ -213,7 +227,7 @@ int dirseen_curbegin(DIRSEEN *op,DIRSEEN_CUR *curp) noex {
 }
 /* end subroutine (dirseen_curbegin) */
 
-int dirseen_curend(DIRSEEN *op,DIRSEEN_CUR *curp) noex {
+int dirseen_curend(dirseen *op,dirseen_cur *curp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,curp)) >= 0) {
 	    memclear(curp) ;
@@ -222,16 +236,16 @@ int dirseen_curend(DIRSEEN *op,DIRSEEN_CUR *curp) noex {
 }
 /* end subroutine (dirseen_curend) */
 
-int dirseen_enum(DIRSEEN *op,DIRSEEN_CUR *curp,char *rbuf,int rlen) noex {
+int dirseen_enum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,curp,rbuf)) >= 0) {
-	    int		i = (curp->i >= 0) ? curp->i : 0 ;
+	    cint	i = (curp->i >= 0) ? curp->i : 0 ;
 	    void	*vp{} ;
-	    while ((rs = vecobj_get(&op->dlist,i,&vp)) >= 0) {
+	    while ((rs = vecobj_get(op->dlistp,i,&vp)) >= 0) {
 	        if (vp) break ;
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
-	        DIRSEEN_ENT	*ep = entp(vp) ;
+	        dirseen_ent	*ep = entp(vp) ;
 	        if ((rs = sncpy1(rbuf,rlen,ep->name)) >= 0) {
 	            curp->i = (i + 1) ;
 	        }
@@ -244,7 +258,7 @@ int dirseen_enum(DIRSEEN *op,DIRSEEN_CUR *curp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-int entry_start(DIRSEEN_ENT *ep,cchar *np,int nl,dev_t dev,uino_t ino) noex {
+int entry_start(dirseen_ent *ep,cchar *np,int nl,dev_t dev,ino_t ino) noex {
 	int		rs ;
 	cchar	*cp ;
 	memclear(ep) ;
@@ -258,7 +272,7 @@ int entry_start(DIRSEEN_ENT *ep,cchar *np,int nl,dev_t dev,uino_t ino) noex {
 }
 /* end subroutine (entry_start) */
 
-int entry_finish(DIRSEEN_ENT *ep) noex {
+int entry_finish(dirseen_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
@@ -274,12 +288,12 @@ int entry_finish(DIRSEEN_ENT *ep) noex {
 /* end subroutine (entry_finish) */
 
 static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
-	DIRSEEN_ENT	**e1pp = entpp(v1pp) ;
-	DIRSEEN_ENT	**e2pp = entpp(v2pp) ;
+	dirseen_ent	**e1pp = entpp(v1pp) ;
+	dirseen_ent	**e2pp = entpp(v2pp) ;
 	int		rc = 0 ;
 	{
-	    DIRSEEN_ENT	*e1p = *e1pp ;
-	    DIRSEEN_ENT	*e2p = *e2pp ;
+	    dirseen_ent	*e1p = *e1pp ;
+	    dirseen_ent	*e2p = *e2pp ;
 	    if (e1p || e2p) {
 	        rc = 1 ;
 	        if (e1p) {
@@ -299,12 +313,12 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 /* end subroutine (vcmpname) */
 
 static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
-	DIRSEEN_ENT	**e1pp = entpp(v1pp) ;
-	DIRSEEN_ENT	**e2pp = entpp(v2pp) ;
+	dirseen_ent	**e1pp = entpp(v1pp) ;
+	dirseen_ent	**e2pp = entpp(v2pp) ;
 	int		rc = 0 ;
 	{
-	    DIRSEEN_ENT	*e1p = *e1pp ;
-	    DIRSEEN_ENT	*e2p = *e2pp ;
+	    dirseen_ent	*e1p = *e1pp ;
+	    dirseen_ent	*e2p = *e2pp ;
 	    if (e1p || e2p) {
 	        rc = 1 ;
 	        if (e1p) {

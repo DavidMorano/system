@@ -64,22 +64,23 @@
 
 /* local namespaces */
 
-using std::nothrow ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
-typedef DIRLIST_ENT	ent ;
-
 
 /* external subroutines */
+
+int		dirlist_add(dirlist *,cchar *,int) noex ;
 
 
 /* local structures */
 
 struct dirlist_e {
 	cchar		*np ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	int		nl ;
 } ;
@@ -87,12 +88,11 @@ struct dirlist_e {
 
 /* typedefs */
 
+typedef DIRLIST_ENT	ent ;
 typedef ent		*entp ;
 
 
 /* forward references */
-
-int		dirlist_add(dirlist *,cchar *,int) noex ;
 
 template<typename ... Args>
 static inline int dirlist_ctor(dirlist *op,Args ... args) noex {
@@ -135,7 +135,7 @@ extern "C" {
     static int	vcmpdevino(ent **,ent **) noex ;
 }
 
-static int	entry_start(ent *,cchar *,int,dev_t,uino_t) noex ;
+static int	entry_start(ent *,cchar *,int,dev_t,ino_t) noex ;
 static int	entry_finish(ent *) noex ;
 
 
@@ -283,7 +283,7 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 	                        if ((rs = vs(op->dbp,&e,vcf,&vp)) == rsn) {
 				    auto	es = entry_start ;
 	                            dev_t	d = sb.st_dev ;
-	                            uino_t	i = sb.st_ino ;
+	                            ino_t	i = sb.st_ino ;
 	                            f_added = true ;
 	                            if ((rs = es(&e,pbuf,pl,d,i)) >= 0) {
 	                                op->tlen += (rs+1) ;
@@ -439,7 +439,7 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 
 /* private subroutines */
 
-static int entry_start(ent *ep,cc *np,int nl,dev_t dev,uino_t ino) noex {
+static int entry_start(ent *ep,cc *np,int nl,dev_t dev,ino_t ino) noex {
 	int		rs = SR_OK ;
 	memclear(ep) ;
 	ep->dev = dev ;

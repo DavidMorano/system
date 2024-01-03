@@ -1,4 +1,4 @@
-/* randlc (Linear Congruent) */
+/* randlc SUPPORT (Linear Congruent) */
 /* lang=C20 */
 
 /* cheap random number generator */

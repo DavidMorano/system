@@ -1,4 +1,4 @@
-/* format */
+/* format SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to format string output */
@@ -93,19 +93,15 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstdint>
+#include	<cstdarg>
 #include	<cstring>
 #include	<wchar.h>
-#include	<stdarg.h>
-
-#if	CF_LIMITS
-#include	<limits.h>
-#endif
 
 #if	CF_FLOAT && F_SUNOS
 #include	<floatingpoint.h>

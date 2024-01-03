@@ -1,4 +1,4 @@
-/* varray */
+/* varray SUPPORT */
 /* lang=C++20 */
 
 /* object implementing variable-length array of elements */
@@ -40,25 +40,43 @@
 #define	OURFREE(pointer)		uc_libfree((pointer))
 
 
+/* local namespaces */
+
+using std::nothrow ;
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+int		varray_search(varray *,void *,varray_vcmp,void *) noex ;
+
+
+/* local structures */
+
+
 /* forward references */
 
 template<typename ... Args>
 static inline int varray_ctor(varray *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->esize = 0 ;
 	    op->c = 0 ;
 	    op->n = 0 ;
 	    op->imax = 0 ;
-	}
+	    if ((op->lap = new(nothrow) lookaside) != nullptr) {
+		rs = SR_OK ;
+	    } /* end if (new-lookaside) */
+	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (varray_ctor) */
 
 static int	varray_extend(varray *,int) noex ;
-
-int		varray_search(varray *,void *,varray_vcmp,void *) noex ;
 
 
 /* local variables */
@@ -79,9 +97,10 @@ int varray_start(varray *op,int esize,int n) noex {
 	            memclear(vp,size) ;
 	            op->va = (void **) vp ;
 	            op->n = n ;
-	            rs = lookaside_start(&op->la,esize,n) ;
-	            if (rs < 0)
+	            rs = lookaside_start(op->lap,esize,n) ;
+	            if (rs < 0) {
 	                OURFREE(vp) ;
+		    }
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	} /* end if (varray_ctor) */
@@ -97,13 +116,17 @@ int varray_finish(varray *op) noex {
 	    if (op->va) {
 		rs = SR_OK ;
 	        {
-		    rs1 = lookaside_finish(&op->la) ;
+		    rs1 = lookaside_finish(op->lap) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
 	            rs1 = OURFREE(op->va) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
+		}
+		if (op->lap) {
+		    delete op->lap ;
+		    op->lap = nullptr ;
 		}
 	        op->c = 0 ;
 		op->n = 0 ;
@@ -173,7 +196,7 @@ int varray_mk(varray *op,int i,void *rp) noex {
 	            }
 	            if ((rs >= 0) && op->va[i]) {
 	                void	*ep ;
-	                if ((rs = lookaside_get(&op->la,&ep)) >= 0) {
+	                if ((rs = lookaside_get(op->lap,&ep)) >= 0) {
 	                    if (i > op->imax) op->imax = i ;
 	                    op->c += 1 ;
 	                    op->va[i] = ep ;
@@ -201,7 +224,7 @@ int varray_del(varray *op,int i) noex {
 	        if ((i > 0) && (i < op->n)) {
 		    void	*ep = op->va[i] ;
 	            if (ep) {
-	                if ((rs = lookaside_release(&op->la,ep)) >= 0) {
+	                if ((rs = lookaside_release(op->lap,ep)) >= 0) {
 	                    op->va[i] = nullptr ;
 	                    op->c -= 1 ;
 		            c = op->c ;
@@ -224,7 +247,7 @@ int varray_delall(varray *op) noex {
 	        for (int i = 0 ; i < op->n ; i += 1) {
 		    void	*ep = op->va[i] ;
 	    	    if (ep) {
-			rs1 = lookaside_release(&op->la,ep) ;
+			rs1 = lookaside_release(op->lap,ep) ;
 			if (rs >= 0) rs = rs1 ;
 			op->va[i] = nullptr ;
 	    	    }
@@ -306,7 +329,7 @@ int varray_audit(varray *op) noex {
 	        } /* end for */
 	        rs = (c == op->c) ? SR_OK : SR_BADFMT ;
 	        if (rs >= 0) {
-	            rs = lookaside_audit(&op->la) ;
+	            rs = lookaside_audit(op->lap) ;
 	        }
 	    } /* end if (open) */
 	} /* end if (non-null) */

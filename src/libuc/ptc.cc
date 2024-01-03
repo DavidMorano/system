@@ -25,7 +25,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<time.h>		/* for |TIMESPEC| */
+#include	<ctime>			/* for |TIMESPEC| */
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>

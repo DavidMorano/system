@@ -23,7 +23,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -1,4 +1,4 @@
-/* getaf */
+/* getaf SUPPORT */
 /* lang=C++20 */
 
 /* get an address-family by name */

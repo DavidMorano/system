@@ -58,7 +58,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
+#include	<ctime>
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<varnames.hh>

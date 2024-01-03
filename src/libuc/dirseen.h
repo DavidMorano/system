@@ -35,7 +35,7 @@ struct dirseen_cursor {
 } ;
 
 struct dirseen_head {
-	vecobj		dlist ;
+	vecobj		*dlistp ;
 	uint		magic ;
 	int		strsize ;
 } ;
