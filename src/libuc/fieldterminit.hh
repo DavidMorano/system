@@ -1,4 +1,4 @@
-/* fieldterminit INCLUDE */
+/* fieldterminit HEADER */
 /* lang=C++20 */
 
 /* initialize a field-terminator block */

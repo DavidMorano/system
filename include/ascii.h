@@ -1,4 +1,4 @@
-/* ascii INCLUDE */
+/* ascii HEADER */
 /* lang=C20 */
 
 /* ASCII character defines */

@@ -1,9 +1,8 @@
 /* varsub_dumpfd */
+/* lang=C20 */
 
 /* dump the substitution variables of the object */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,11 +15,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<varsub.h>
 #include	<localmisc.h>
@@ -28,16 +24,12 @@
 
 /* external subroutines */
 
-extern int	fdprintf(int,...) ;
+extern int	fdprintf(int,...) noex ;
 
 
 /* exported subroutines */
 
-
-#if	CF_DEBUGS
-
-int varsub_dumpfd(varsub *vshp,int fd)
-{
+int varsub_dumpfd(varsub *vshp,int fd) noex {
 	if (vshp->vsa != NULL) {
 	    varsub_ent	*vsa = vshp->vsa ;
 	    int	i ;
@@ -56,17 +48,5 @@ int varsub_dumpfd(varsub *vshp,int fd)
 	return 0 ;
 }
 /* end subroutine (varsub_dumpfd) */
-
-#else /* CF_DEBUGS */
-
-/* ARGSUSED */
-int varsub_dumpfd(varsub *vsp,int fd)
-{
-	if (vsp == NULL) return SR_FAULT ;
-	return SR_OK ;
-}
-/* end subroutine (varsub_dumpfd) */
-
-#endif /* CF_DEBUGS */
 
 

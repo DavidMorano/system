@@ -1,5 +1,8 @@
-/* ctbin INCLUDE */
+/* ctbin HEADER */
 /* lang=C20 */
+
+/* subroutines to convert an integer to a binary-digit string */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,6 +19,7 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<localmisc.h>

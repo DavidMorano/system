@@ -1,4 +1,4 @@
-/* inaddrbad INCLUDE */
+/* inaddrbad HEADER */
 /* lang=C20 */
 
 /* create an "inaddrbad" constant */

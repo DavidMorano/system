@@ -114,7 +114,6 @@ typedef NODEDB_KEYNAME	nodedb_k ;
 typedef NODEDB_IE	nodedb_i ;
 
 typedef cchar		*(*keytabp)[2] ;
-typedef char		*charp ;
 
 
 /* external subroutines */

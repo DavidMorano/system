@@ -49,11 +49,6 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 
 /* external subroutines */
 
@@ -102,10 +97,7 @@ char *strdcpy6(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,cc *s5,cc *s6) noex {
 }
 /* end subroutine (strdcpy6) */
 
-
-/* local subroutines */
-
-static char *strdcpyx(char *dp,int dl,int n,...) noex {
+char *strdcpyx(char *dp,int dl,int n,...) noex {
 	if (dp) {
 	    va_list	ap ;
 	    va_begin(ap,n) ;

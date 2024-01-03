@@ -1,4 +1,4 @@
-/* fsdir INCLUDE (SunOS) */
+/* fsdir HEADER (SunOS) */
 /* lang=C20 */
 
 /* UNIX® file system dirextory operations */

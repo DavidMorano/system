@@ -1,4 +1,4 @@
-/* wordfill INCLUDE */
+/* wordfill HEADER */
 /* lang=C20 */
 
 /* text fill */

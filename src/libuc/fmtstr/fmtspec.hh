@@ -1,4 +1,4 @@
-/* fmtspec INCLUDE */
+/* fmtspec HEADER */
 /* lang=C++20 */
 
 /* format-specification */

@@ -127,4 +127,7 @@ obj3_sfx.o:	$(OBJ3_SFX)
 obj4_sfx.o:	$(OBJ4_SFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SFX)
 
+obj5_sfx.o:	$(OBJ5_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SFX)
+
 

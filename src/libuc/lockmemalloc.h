@@ -1,4 +1,4 @@
-/* lockmemalloc INCLUDE */
+/* lockmemalloc HEADER */
 /* lang=C20 */
 
 /* memory allocation facility w/ locking */
@@ -29,7 +29,7 @@ enum lockmemallocsets {
 extern "C" {
 #endif
 
-extern int	lockmemalloc_set(int) ;
+extern int	lockmemalloc_set(int) noex ;
 
 #ifdef	__cplusplus
 }

@@ -1,4 +1,4 @@
-/* usys_mqueue INCLUDE */
+/* usys_mqueue HEADER */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */

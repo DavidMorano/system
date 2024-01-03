@@ -1,4 +1,4 @@
-/* inet4int INCLUDE */
+/* inet4int HEADER */
 /* lang=C20 */
 
 /* some INET-related subroutine */

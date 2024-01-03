@@ -1,4 +1,4 @@
-/* syshasutmp INCLUDE */
+/* syshasutmp HEADER */
 /* lang=C20 */
 
 /* System-Has-UTMPX */

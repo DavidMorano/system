@@ -1,4 +1,4 @@
-/* fileines INCLUDE */
+/* fileines HEADER */
 /* lang=C20 */
 
 /* calculate the number of lines in a file */

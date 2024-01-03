@@ -1,4 +1,4 @@
-/* memtrack */
+/* memtrack SUPPORT */
 /* lang=C++20 */
 
 /* track memory blocks */
@@ -49,6 +49,7 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>
 
 #include	"memtrack.hh"
 
@@ -69,6 +70,9 @@ extern int	memtrack_finish() noex ;
 
 
 /* local defines */
+
+
+/* local namespaces */
 
 
 /* local typedefs */
@@ -182,6 +186,17 @@ int memtrack::icount() noex {
 	return rs ;
 }
 /* end method (memtrack::icount) */
+
+void memtrack::dtor() noex {
+	ulogerror("memtrack",SR_BUGCHECK,"fini-dtor called") ;
+	if (magic) {
+	    cint	rs = ifinish() ;
+	    if (rs < 0) {
+		ulogerror("memtrack",rs,"fini-dtor error") ;
+	    }
+	}
+}
+/* end method (memtrack::dtor) */
 
 int memtrack_start::operator () (int n) noex { 
 	int		rs = SR_BUGCHECK ;

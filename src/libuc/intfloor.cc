@@ -1,4 +1,4 @@
-/* intfloor */
+/* intfloor SUPPORT */
 /* lang=C++20 */
 
 /* Integer-Flooring */
@@ -53,6 +53,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* local subroutine-templates */

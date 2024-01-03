@@ -1,5 +1,8 @@
-/* rmleadzero INCLUDE */
+/* rmleadzero HEADER */
 /* lang=C20 */
+
+/* remove leading white-space and zero characters */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

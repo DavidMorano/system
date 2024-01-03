@@ -1,4 +1,4 @@
-/* usys_xxx INCLUDE */
+/* usys_xxx HEADER */
 /* lang=C20 */
 
 /* miscelllaneous (XXX) operating system support */

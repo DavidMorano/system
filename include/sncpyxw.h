@@ -1,4 +1,4 @@
-/* sncpyxw INCLUDE */
+/* sncpyxw HEADER */
 /* lang=C20 */
 
 /* copy a c-string to a given case */
@@ -22,21 +22,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
-#ifndef	TYPEDEF_CCP
-#define	TYPEDEF_CCP
-typedef const char*	ccp ;
-#endif
-
-#ifndef	TYPEDEF_CCHARP
-#define	TYPEDEF_CCHARP
-typedef const char	*ccharp ;
-#endif
 
 #ifdef	__cplusplus
 extern "C" {

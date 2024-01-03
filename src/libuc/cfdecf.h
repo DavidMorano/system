@@ -1,4 +1,4 @@
-/* cfdecf */
+/* cfdecf HEADER */
 /* lang=C20 */
 
 /* convert a decimal digit string to its binary floating value */

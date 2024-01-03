@@ -1,4 +1,4 @@
-/* spawnproc INCLUDE */
+/* spawnproc HEADER */
 /* lang=C20 */
 
 /* a small object to facilitate spawning processes */

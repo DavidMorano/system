@@ -1,4 +1,4 @@
-/* getngroups */
+/* getngroups SUPPORT */
 /* lang=C++20 */
 
 /* get the maximum number of supplemetary groups allowed per process */

@@ -1,4 +1,4 @@
-/* buffer INCLUDE */
+/* buffer HEADER */
 /* lang=C20 */
 
 /* variable-length buffer management */

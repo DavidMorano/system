@@ -1,4 +1,4 @@
-/* ptm INCLUDE */
+/* ptm HEADER */
 /* lang=C20 */
 
 /* POSIX Thread Mutex manipulation */
@@ -77,11 +77,9 @@ struct ptm : pthread_mutex_t {
 	} ;
 	ptm(const ptm &) = delete ;
 	ptm &operator = (const ptm &) = delete ;
+	void dtor() noex ;
 	~ptm() noex {
-	    int		rs = destroy ;
-	    if (rs < 0) {
-	        ulogerror("ptm",rs,"destroy") ;
-	    }
+	    dtor() ;
 	} ; /* end dtor (ptm) */
 } ; /* end class (ptm) */
 #else

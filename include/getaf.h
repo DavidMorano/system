@@ -1,4 +1,4 @@
-/* getaf INCLUDE */
+/* getaf HEADER */
 /* lang=C20 */
 
 /* UNIX® Address-Family (AF) support */

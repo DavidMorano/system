@@ -1,4 +1,4 @@
-/* baops INCLUDE */
+/* baops HEADER */
 /* lang=C20 */
 
 /* Bit-Array Operations (BAO) */

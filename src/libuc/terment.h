@@ -1,4 +1,4 @@
-/* terment INCLUDE */
+/* terment HEADER */
 /* lang=C20 */
 
 /* methods for the TERMENT object */

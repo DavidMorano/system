@@ -1,4 +1,4 @@
-/* votdchdr INCLUDE */
+/* votdchdr HEADER */
 /* lang=C20 */
 
 

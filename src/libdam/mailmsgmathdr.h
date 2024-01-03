@@ -1,4 +1,4 @@
-/* mailmsgmathdr INCLUDE */
+/* mailmsgmathdr HEADER */
 /* lang=C20 */
 
 

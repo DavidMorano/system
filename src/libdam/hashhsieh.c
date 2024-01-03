@@ -7,7 +7,11 @@
 
 #include	<envstandards.h>
 #include	<stdint.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
+
+/* local defines */
 
 #undef get16bits
 #if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
@@ -20,16 +24,19 @@
                        +(uint32_t)(((const uint8_t *)(d))[0]) )
 #endif
 
-uint hash_hsieh(const char *data,int len) noex {
-	uint	hash = len ;
-	uint	tmp 
-	int	rem ;
 
-    if (len <= 0 || data == NULL) return 0;
+/* local varaibles */
 
-    rem = len & 3;
+
+/* exported subroutines */
+
+uint hash_hsieh(cchar *data,int len) noex {
+	uint	hash = 0 ;
+	if ((len > 0) && data) {
+	uint	tmp ;
+	int	rem = (len & 3) ;
+	hash = len ;
     len >>= 2;
-
     /* main loop */
     for (;len > 0; len--) {
         hash  += get16bits (data);
@@ -38,7 +45,6 @@ uint hash_hsieh(const char *data,int len) noex {
         data  += 2*sizeof (uint16_t);
         hash  += hash >> 11;
     } /* end for */
-
     /* handle end cases */
     switch (rem) {
         case 3: hash += get16bits (data);
@@ -55,7 +61,6 @@ uint hash_hsieh(const char *data,int len) noex {
                 hash += hash >> 1;
 		break ;
     } /* end switch */
-
     /* force "avalanching" of final 127 bits */
     hash ^= hash << 3;
     hash += hash >> 5;
@@ -63,8 +68,8 @@ uint hash_hsieh(const char *data,int len) noex {
     hash += hash >> 17;
     hash ^= hash << 25;
     hash += hash >> 6;
-
-    return hash;
+	} /* end if (valid) */
+	return hash ;
 }
 /* end subroutine (hash_hsieh) */
 

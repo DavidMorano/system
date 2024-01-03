@@ -25,8 +25,9 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<time.h>		/* for |TIMESPEC| */
+#include	<ctime>			/* for |TIMESPEC| */
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 #include	<usupport.h>
 
@@ -178,6 +179,26 @@ int ptc_reltimedwaitnp(ptc *op,ptm *mp,CTIMESPEC *tp) noex {
 
 /* local subroutines */
 
+int ptc::wait(ptm *pop,int to) noex {
+	return ptc_waiter(this,pop,to) ;
+}
+
+int ptc::timedwait(ptm *pop,CTIMESPEC *tsp) noex {
+	return ptc_timedwait(this,pop,tsp) ;
+}
+
+int ptc::reltimedwaitnp(ptm *pop,CTIMESPEC *tsp) noex {
+	return ptc_reltimedwaitnp(this,pop,tsp) ;
+}
+
+void ptc::dtor() noex {
+	int		rs = destroy ;
+	if (rs < 0) {
+	    ulogerror("ptc",rs,"destroy") ;
+	}
+} 
+/* end method (ptc::dtor) */
+
 int ptc_creater::operator () (ptca *ap) noex {
 	int	rs = SR_BUGCHECK ;
 	if (op) {
@@ -203,17 +224,5 @@ int ptc_co::operator () (int) noex {
 	return rs ;
 }
 /* end method (ptc_co::operator) */
-
-int ptc::wait(ptm *pop,int to) noex {
-	return ptc_waiter(this,pop,to) ;
-}
-
-int ptc::timedwait(ptm *pop,CTIMESPEC *tsp) noex {
-	return ptc_timedwait(this,pop,tsp) ;
-}
-
-int ptc::reltimedwaitnp(ptm *pop,CTIMESPEC *tsp) noex {
-	return ptc_reltimedwaitnp(this,pop,tsp) ;
-}
 
 

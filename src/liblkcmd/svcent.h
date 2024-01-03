@@ -1,4 +1,4 @@
-/* svcent INCLUDE */
+/* svcent HEADER */
 
 /* subroutines for simple SVCFILE_ENT object management */
 

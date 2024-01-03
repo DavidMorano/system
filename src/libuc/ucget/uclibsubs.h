@@ -1,4 +1,4 @@
-/* uclibsubs INCLUDE */
+/* uclibsubs HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

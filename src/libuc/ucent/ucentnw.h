@@ -1,4 +1,4 @@
-/* ucentnw INCLUDE */
+/* ucentnw HEADER */
 /* lang=C++20 */
 
 /* UCENTNW object management */

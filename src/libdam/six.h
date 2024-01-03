@@ -1,4 +1,4 @@
-/* six INCLUDE */
+/* six HEADER */
 /* lang=C20 */
 
 /* string-index operations */

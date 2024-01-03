@@ -1,4 +1,4 @@
-/* vecsorthand */
+/* vecsorthand SUPPORT */
 /* lang=C++20 */
 
 /* vector of sorted handles */
@@ -24,6 +24,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<cstdlib>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -266,6 +267,7 @@ static int vecsorthand_extend(vecsorthand *op) noex {
 	    if (rs >= 0) {
 	        op->va = np ;
 	        op->e = ne ;
+		op->va[op->i] = nullptr ;
 	    }
 	} /* end if */
 	return rs ;

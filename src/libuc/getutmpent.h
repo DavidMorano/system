@@ -1,4 +1,4 @@
-/* getutmpent INCLUDE */
+/* getutmpent HEADER */
 /* lang=C20 */
 
 /* get UTMP entry */

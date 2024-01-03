@@ -1,4 +1,4 @@
-/* termconseq INCLUDE */
+/* termconseq HEADER */
 /* lang=C20 */
 
 /* Terminal-Control-Sequene */

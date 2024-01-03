@@ -1,5 +1,8 @@
-/* stdintx INCLUDE */
+/* stdintx HEADER */
 /* lang=C20 */
+
+/* extended integer types */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,6 +20,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<stdint.h>
 
 

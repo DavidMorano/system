@@ -1,4 +1,4 @@
-/* sinext */
+/* sinext SUPPORT */
 /* lang=C20 */
 
 /* return index to end of next string-field */
@@ -31,7 +31,7 @@
 	sl	length of string to be examined
 
 	Returns:
-	>=0	index of found substring
+	>=0	index of beginning of next field
 	<0	substring not found
 
 *******************************************************************************/

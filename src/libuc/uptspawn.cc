@@ -43,9 +43,9 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<pthread.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstdint>

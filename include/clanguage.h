@@ -1,4 +1,4 @@
-/* clanguage INCLUDE */
+/* clanguage HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */
@@ -49,6 +49,10 @@ Y
 
 #ifndef	forever
 #define	forever			for (;;)
+#endif
+
+#ifndef	fallthrough
+#define	fallthrough		/* FALLTHROUGH */
 #endif
 
 #ifndef	nelements

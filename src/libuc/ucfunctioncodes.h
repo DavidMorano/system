@@ -1,4 +1,4 @@
-/* ucfunctioncodes INCLUDE */
+/* ucfunctioncodes HEADER */
 /* lang=C20 */
 
 /* additional UNIX® limits support */

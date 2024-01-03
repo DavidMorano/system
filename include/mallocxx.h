@@ -1,4 +1,4 @@
-/* mallocxx INCLUDE */
+/* mallocxx HEADER */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */

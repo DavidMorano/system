@@ -1,4 +1,4 @@
-/* ucultility INCLUDE */
+/* ucultility HEADER */
 /* lang=C20 */
 
 /* UNIX® C-language library utility support */

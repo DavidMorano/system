@@ -1,4 +1,4 @@
-/* ucsem INCLUDE */
+/* ucsem HEADER */
 /* lang=C20 */
 
 /* UNIX® Counting Semaphore (UCSEM) */

@@ -1,4 +1,4 @@
-/* randomvar */
+/* randomvar SUPPORT */
 /* lang=C++20 */
 
 /* random number generation object */

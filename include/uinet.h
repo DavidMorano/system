@@ -1,4 +1,4 @@
-/* uinet INCLUDE */
+/* uinet HEADER */
 /* lang=C20 */
 
 /* UNIX® UINET support */

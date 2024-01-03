@@ -1,4 +1,4 @@
-/* display INCLUDE */
+/* display HEADER */
 /* lang=C20 */
 
 /* manage the display for VMAIL */

@@ -138,7 +138,7 @@ int matbasestr(cchar *const *a,cchar *sp,int sl) noex {
 /* end subroutine (matbasestr) */
 
 int matcasestr(cchar *const *a,cchar *sp,int sl) noex {
-	return matxstr<tolc,nleadcasestr>(a,sp,sl) ;
+	return matxstr<touc,nleadcasestr>(a,sp,sl) ;
 }
 /* end subroutine (matcasestr) */
 

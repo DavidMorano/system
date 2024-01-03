@@ -44,8 +44,6 @@
 
 extern int	bwriteblanks(bfile *,int) noex ;
 
-extern char	*strwcpy(char *,const char *,int) noex ;
-
 
 /* external variables */
 
@@ -61,7 +59,7 @@ extern char	*strwcpy(char *,const char *,int) noex ;
 
 /* exported subroutines */
 
-int sfill_start(SFILL *op,int indent,bfile *ofp) noex {
+int sfill_start(sfill *op,int indent,bfile *ofp) noex {
 	int		rs = SR_FAULT ;
 	if (op && ofp) {
 	    memset(op,0,sizeof(SFILL)) ;
@@ -73,7 +71,7 @@ int sfill_start(SFILL *op,int indent,bfile *ofp) noex {
 }
 /* end subroutine (sfill_start) */
 
-int sfill_finish(SFILL *op) noex {
+int sfill_finish(sfill *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
@@ -85,7 +83,7 @@ int sfill_finish(SFILL *op) noex {
 }
 /* end subroutine (sfill_finish) */
 
-int sfill_remaining(SFILL *op) noex {
+int sfill_remaining(sfill *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = op->clen ;
@@ -94,7 +92,7 @@ int sfill_remaining(SFILL *op) noex {
 }
 /* end subroutine (sfill_remaining) */
 
-int sfill_proc(SFILL *op,int olinelen,cchar *linebuf,int linelen) noex {
+int sfill_proc(sfill *op,int olinelen,cchar *linebuf,int linelen) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && linebuf) {
@@ -121,7 +119,7 @@ int sfill_proc(SFILL *op,int olinelen,cchar *linebuf,int linelen) noex {
 }
 /* end subroutine (sfill_proc) */
 
-int sfill_wline(SFILL *op,int olinelen) noex {
+int sfill_wline(sfill *op,int olinelen) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op) {

@@ -1,4 +1,4 @@
-/* posixdirent INCLUDE */
+/* posixdirent HEADER */
 /* lang=C++20 */
 
 /* help interface to POSIX |dirent(3c)| facility */

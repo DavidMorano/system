@@ -1,4 +1,4 @@
-/* envlist INCLUDE */
+/* envlist HEADER */
 /* lang=C20 */
 
 /* environment container */

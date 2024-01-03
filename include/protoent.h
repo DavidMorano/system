@@ -1,4 +1,4 @@
-/* protoent INCLUDE */
+/* protoent HEADER */
 /* lang=C20 */
 
 

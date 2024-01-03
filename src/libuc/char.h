@@ -1,4 +1,4 @@
-/* char INCLUDE */
+/* char HEADER */
 /* lang=C20 */
 
 /* fast character text and conversion facility */

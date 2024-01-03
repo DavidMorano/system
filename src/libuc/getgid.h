@@ -1,4 +1,4 @@
-/* getgid INCLUDE */
+/* getgid HEADER */
 /* lang=C20 */
 
 /* get the GID for a given group-name */

@@ -1,4 +1,4 @@
-/* hostent INCLUDE */
+/* hostent HEADER */
 /* lang=C20 */
 
 

@@ -1,4 +1,4 @@
-/* nulstr */
+/* nulstr SUPPORT */
 /* lang=C++20 */
 
 /* assert a NUL-terminated string */

@@ -1,4 +1,4 @@
-/* utmpaccent INCLUDE */
+/* utmpaccent HEADER */
 /* lang=C20 */
 
 /* UTMPACCENT management */

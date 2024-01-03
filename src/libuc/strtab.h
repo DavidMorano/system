@@ -1,4 +1,4 @@
-/* strtab INCLUDE */
+/* strtab HEADER */
 /* lang=C20 */
 
 /* string table object */

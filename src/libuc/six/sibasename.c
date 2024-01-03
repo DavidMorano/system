@@ -1,4 +1,4 @@
-/* sibasename */
+/* sibasename SUPPORT */
 /* lang=C20 */
 
 /* get the base file name out of a file-path */
@@ -36,7 +36,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>

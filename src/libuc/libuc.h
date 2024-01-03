@@ -1,4 +1,4 @@
-/* libuc INCLUDE */
+/* libuc HEADER */
 /* lang=C20 */
 
 

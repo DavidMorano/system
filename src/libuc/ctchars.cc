@@ -1,4 +1,4 @@
-/* ctchars */
+/* ctchars SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a decimal string */

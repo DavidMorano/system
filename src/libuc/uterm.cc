@@ -1,4 +1,4 @@
-/* uterm */
+/* uterm SUPPORT */
 /* lang=C++20 */
 
 /* "UNIX Terminal" helper routines */
@@ -30,10 +30,10 @@
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<stdlib>
+#include	<stdarg>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>

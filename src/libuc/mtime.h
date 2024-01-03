@@ -1,4 +1,4 @@
-/* mtime INCLUDE */
+/* mtime HEADER */
 /* lang=C20 */
 
 

@@ -1,4 +1,4 @@
-/* cfchars INCLUDE */
+/* cfchars HEADER */
 /* lang=C20 */
 
 /* convert a digit c-string to its integer value */

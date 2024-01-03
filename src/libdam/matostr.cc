@@ -26,7 +26,7 @@
 	we do not match, we return "less-than-zero".
 
 	Synopsis:
-	int matobasestr(cchar **a,int n,cchar *sp,int sl) noex
+	int matobasestr(cchar *const *a,int n,cchar *sp,int sl) noex
 
 	Arguments:
 	a		array of string to match against
@@ -79,6 +79,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<cstring>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<toxc.h>
 #include	<nleadstr.h>
 #include	<localmisc.h>

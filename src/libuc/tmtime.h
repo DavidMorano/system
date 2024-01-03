@@ -1,4 +1,4 @@
-/* tmtime INCLUDE */
+/* tmtime HEADER */
 /* lang=C20 */
 
 

@@ -1,4 +1,4 @@
-/* memfile INCLUDE */
+/* memfile HEADER */
 /* lang=C20 */
 
 /* support low-overhead file bufferring requirements */

@@ -1,4 +1,4 @@
-/* userattrent INCLUDE */
+/* userattrent HEADER */
 /* lang=C20 */
 
 /* subroutines for simple USERATTR object (from UNIX® library-3c) management */

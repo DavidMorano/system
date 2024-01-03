@@ -1,4 +1,4 @@
-/* cfdecmf INCLUDE */
+/* cfdecmf HEADER */
 /* lang=C20 */
 
 /* Convert-From-Decimal-Multiply-Factor */

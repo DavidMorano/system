@@ -1,4 +1,4 @@
-/* getourenv INCLUDE */
+/* getourenv HEADER */
 /* lang=C20 */
 
 /* get an environment variable from our local (passed) environment */
@@ -23,11 +23,17 @@
 #include	<clanguage.h>
 
 
+#ifndef	TYPEDEF_MAINV
+#define	TYPEDEF_MAINV
+typedef const char *const	*mainv ;
+#endif
+
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern cchar	*getourenv(cchar **,cchar *) noex ;
+extern cchar	*getourenv(mainv,cchar *) noex ;
 
 #ifdef	__cplusplus
 }

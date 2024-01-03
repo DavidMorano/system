@@ -1,4 +1,4 @@
-/* csem INCLUDE */
+/* csem HEADER */
 /* lang=C20 */
 
 /* Counting-Semaphore (CSEM) */

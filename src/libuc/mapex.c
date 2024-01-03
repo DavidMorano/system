@@ -1,4 +1,4 @@
-/* mapex */
+/* mapex SUPPORT */
 /* lang=C20 */
 
 /* map status-return (SR) values to program exit-codes (EX) */
@@ -16,6 +16,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -24,15 +26,18 @@
 
 /* exported subroutines */
 
-int mapex(const struct mapex *mapexs,int rs) noex {
+int mapex(const MAPEX *mapexs,int rs) noex {
 	int		ex = EX_UNKNOWN ;
 	if (mapexs) {
-	    int		i ;
-	    for (i = 0 ; mapexs[i].rs != 0 ; i += 1) {
-	        if (mapexs[i].rs == rs) break ;
-	    } /* end for */
-	    ex = (mapexs[i].rs != 0) ? mapexs[i].ex : EX_UNKNOWN ;
-	}
+	    ex = EX_OK ;
+	    if (rs < 0) {
+	        int	i ;
+	        for (i = 0 ; mapexs[i].rs ; i += 1) {
+	            if (mapexs[i].rs == rs) break ;
+	        } /* end for */
+	        ex = (mapexs[i].rs) ? mapexs[i].ex : EX_UNKNOWN ;
+	    } /* end if */
+	} /* end if */
 	return ex ;
 }
 /* end subroutine (mapex) */

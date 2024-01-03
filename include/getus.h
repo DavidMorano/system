@@ -1,4 +1,4 @@
-/* getus INCLUDE */
+/* getus HEADER */
 /* lang=C20 */
 
 /* get user-shell */

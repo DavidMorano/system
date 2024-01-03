@@ -1,4 +1,4 @@
-/* ipasswd */
+/* ipasswd SUPPORT */
 /* lang=C20 */
 
 /* indexed PASSWD GECOS DB */
@@ -84,13 +84,13 @@
 #include	<storeitem.h>
 #include	<realname.h>
 #include	<pwihdr.h>
-#include	<localmisc.h>
 #include	<intceil.h>
 #include	<hash.h>
 #include	<strwcpy.h>
 #include	<mkpath.h>
 #include	<sfx.h>
 #include	<ischarx.h>
+#include	<localmisc.h>
 
 #include	"ipasswd.h"
 
@@ -114,10 +114,6 @@
 
 #define	TI_MINUPDATE	4		/* minimum time between updates */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NSHIFT		6		/* shift bits for secondary hash */
 
 #if	CF_DEBUGS
@@ -127,21 +123,21 @@
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
 extern int	randlc(int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getfstype(char *,int,int) ;
 extern int	lockfile(int,int,offset_t,offset_t,int) ;
-extern int	islocalfs(const char *,int) ;
+extern int	islocalfs(cchar *,int) ;
 extern int	isValidMagic(cchar *,int,cchar *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnrchr(const char *,int,int) ;
+extern char	*strnrchr(cchar *,int,int) ;
 
 
 /* local structures */
@@ -150,7 +146,7 @@ extern char	*strnrchr(const char *,int,int) ;
 /* forward references */
 
 static int	ipasswd_hdrload(IPASSWD *) ;
-static int	ipasswd_hdrloader(IPASSWD *op) ;
+static int	ipasswd_hdrloader(IPASSWD *) ;
 static int	ipasswd_enterbegin(IPASSWD *,time_t) ;
 static int	ipasswd_enterend(IPASSWD *,time_t) ;
 
@@ -171,15 +167,15 @@ static int	ipaswd_mapcheck(IPASSWD *,time_t) ;
 static int	ipasswd_keymatchlast(IPASSWD *,int,int,char *,int) ;
 #endif
 
-static int	mkourfname(char *,const char *) ;
+static int	mkourfname(char *,cchar *) ;
 
 static int	hashindex(uint,int) ;
 
 #if	CF_DEBUGS
-static int	mkprstr(char *,int,const char *,int) ;
+static int	mkprstr(char *,int,cchar *,int) ;
 #endif
 
-static int	isOurSuf(const char *,const char *,int) ;
+static int	isOurSuf(cchar *,cchar *,int) ;
 
 
 /* local variables */
@@ -372,7 +368,7 @@ int ipasswd_enum(op,curp,ubuf,sa,rbuf,rlen)
 IPASSWD		*op ;
 IPASSWD_CUR	*curp ;
 char		ubuf[] ;
-const char	*sa[] ;
+cchar	*sa[] ;
 char		rbuf[] ;
 int		rlen ;
 {
@@ -453,8 +449,8 @@ int		rlen ;
 	                int		j ;
 	                int		sl ;
 	                int		c = 0 ;
-	                const char	*sp ;
-	                const char	**spp ;
+	                cchar	*sp ;
+	                cchar	**spp ;
 	                for (j = 0 ; (rs >= 0) && (j < 5) ; j += 1) {
 	                    sp = ss[j].sbuf ;
 	                    sl = ss[j].slen ;
@@ -533,7 +529,7 @@ int ipasswd_fetch(IPASSWD *op,REALNAME *np,IPASSWD_CUR *curp,int opts,char *up)
 
 #if	CF_DEBUGS
 	{
-	    const char	*ln ;
+	    cchar	*ln ;
 	    debugprintf("ipasswd_fetch: ent\n") ;
 	    if ((rs1 = realname_getlast(np,&ln)) >= 0) {
 	        debugprintf("ipasswd_fetch: ln=>%s<\n",ln) ;
@@ -568,8 +564,8 @@ int ipasswd_fetch(IPASSWD *op,REALNAME *np,IPASSWD_CUR *curp,int opts,char *up)
 	    const int	ns = NSHIFT ;
 	    int		wi ;
 	    int		hl, c ;
-	    const char	*hp ;
-	    const char	*cp ;
+	    cchar	*hp ;
+	    cchar	*cp ;
 	    char	hbuf[4 + 1] ;
 
 /* continue with regular fetch activities */
@@ -885,8 +881,8 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 	    const int	ns = NSHIFT ;
 	    int		wi ;
 	    int		hl, c ;
-	    const char	*hp ;
-	    const char	*cp ;
+	    cchar	*hp ;
+	    cchar	*cp ;
 	    char	hbuf[4 + 1] ;
 
 /* continue with regular fetch activities */
@@ -1190,7 +1186,7 @@ int ipasswd_check(IPASSWD *op,time_t dt)
 static int ipasswd_hdrload(IPASSWD *op)
 {
 	int		rs = SR_OK ;
-	const char	*cp = (cchar *) op->mapdata ;
+	cchar	*cp = (cchar *) op->mapdata ;
 
 #if	CF_DEBUGS
 	debugprintf("ipasswd_hdrload: ent\n") ;
@@ -1263,7 +1259,7 @@ static int ipasswd_hdrloader(IPASSWD *op)
 	op->rtlen = table[pwihdr_reclen] ;
 	op->rtsize = table[pwihdr_recsize] ;
 
-	op->stab = (const char *) (op->mapdata + table[pwihdr_strtab]) ;
+	op->stab = (cchar *) (op->mapdata + table[pwihdr_strtab]) ;
 	op->stcount = table[pwihdr_strlen] ;
 	op->stsize = table[pwihdr_strsize] ;
 
@@ -1559,8 +1555,8 @@ static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,REALNAME *np)
 {
 	int		si ;
 	int		f = TRUE ;
-	const char	*s = op->stab ;
-	const char	*sp ;
+	cchar	*s = op->stab ;
+	cchar	*sp ;
 
 #if	CF_DEBUGS
 	debugprintf("keymatchall: keyname last=%s first=%s\n",
@@ -1644,11 +1640,11 @@ static int ipaswd_mapcheck(IPASSWD *op,time_t dt)
 /* end subroutine (ipaswd_mapcheck) */
 
 
-static int mkourfname(char *dbfname,const char *dbname)
+static int mkourfname(char *dbfname,cchar *dbname)
 {
 	int		rs ;
-	const char	*suf = IPASSWD_SUF ;
-	const char	*endstr = ((ENDIAN != 0) ? "1" : "0") ;
+	cchar	*suf = IPASSWD_SUF ;
+	cchar	*endstr = ((ENDIAN != 0) ? "1" : "0") ;
 
 	if (isOurSuf(suf,dbname,-1) > 0) {
 	    rs = mkpath1(dbfname,dbname) ;
@@ -1692,14 +1688,14 @@ static int mkprstr(char *rbuf,int rlen,cchar *sp,int sl)
 #endif /* CF_DEBUGS */
 
 
-static int isOurSuf(const char *suf,const char *fname,int fl)
+static int isOurSuf(cchar *suf,cchar *fname,int fl)
 {
 	int		len = 0 ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
-	    const char	*tp ;
+	    cchar	*tp ;
 	    if ((tp = strnrchr(cp,cl,'.')) != NULL) {
 	        const int	suflen = strlen(suf) ;
 	        if (strncmp((tp+1),suf,suflen) == 0) {

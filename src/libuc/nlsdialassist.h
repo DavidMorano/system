@@ -1,4 +1,4 @@
-/* nlsdialassist INCLUDE */
+/* nlsdialassist HEADER */
 /* lang=C20 */
 
 /* assistance for NLS dialing */

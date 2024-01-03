@@ -1,4 +1,4 @@
-/* sysauxinfonames INCLUDE */
+/* sysauxinfonames HEADER */
 /* lang=C20 */
 
 /* UNIX® system-auxillary-information */

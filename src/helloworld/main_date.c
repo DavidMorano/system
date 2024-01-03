@@ -1,4 +1,5 @@
 /* main (date) */
+/* lang=C20 */
 
 
 /* revision history:
@@ -10,36 +11,20 @@
 
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<time.h>
 #include	<stdio.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-
-
-extern int	timestr_log(time_t,char *) ;
-
-
-int main()
-{
-	time_t	daytime ;
-
-	char	timebuf[TIMEBUFLEN + 1] ;
-
-
-	daytime = time(NULL) ;
-
+int main(int,mainv,mainv) {
+	time_t		daytime = time(nullptr) ;
+	char		timebuf[TIMEBUFLEN + 1] ;
 	timestr_log(daytime,timebuf) ;
-
 	fprintf(stdout,"%s\n",timebuf) ;
-
 	return 0 ;
 }
 /* end subroutine (main) */

@@ -1,4 +1,4 @@
-/* strdcpyxw INCLUDE */
+/* strdcpyxw HEADER */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -16,12 +16,6 @@
 
 #ifndef	STRDCPYXW_INCLUDE
 #define	STRDCPYXW_INCLUDE
-
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
 
 
 #ifdef	__cplusplus

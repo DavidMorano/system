@@ -1,4 +1,4 @@
-/* vecstr_avmkstr */
+/* vecstr_avmkstr SUPPORT */
 /* lang=C20 */
 
 /* make the Array-Vector and the String-table */

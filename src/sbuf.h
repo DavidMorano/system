@@ -1,4 +1,4 @@
-/* INCLUDE sbuf */
+/* HEADER sbuf */
 /* lang=C20 */
 
 /* storage buffer (SBuf) object */

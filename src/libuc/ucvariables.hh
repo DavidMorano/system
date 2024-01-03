@@ -1,4 +1,4 @@
-/* ucvariables INCLUDE */
+/* ucvariables HEADER */
 /* lang=C++20 */
 
 /* this is a database of commonly used environment variable names */

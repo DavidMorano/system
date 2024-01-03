@@ -1,4 +1,4 @@
-/* cfdigx INCLUDE */
+/* cfdigx HEADER */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */
@@ -59,11 +59,6 @@
 #include	<checkbase.h>
 #include	<localmisc.h>
 
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
 
 inline bool iszero(int ch) noex {
 	ch &= 0xFF ;

@@ -1,4 +1,4 @@
-/* ucproguser INCLUDE */
+/* ucproguser HEADER */
 /* lang=C20 */
 
 /* UNIX® username and possibly user-home-directory */

@@ -1,4 +1,4 @@
-/* vecpstr_loadgrusers */
+/* vecpstr_loadgrusers SUPPORT */
 /* lang=C++20 */
 
 /* find and load UNIX® users who have the given group as their default */
@@ -39,6 +39,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>

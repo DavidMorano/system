@@ -1,5 +1,8 @@
-/* snxxx INCLUDE */
+/* snxxx HEADER */
 /* lang=C20 */
+
+/* counted c-string operations */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,6 +22,7 @@
 #include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+
 
 #ifdef	__cplusplus
 extern "C" {

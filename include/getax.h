@@ -1,4 +1,4 @@
-/* getax INCLUDE */
+/* getax HEADER */
 /* lang=C20 */
 
 /* UNIX® System databases (PASSWD, SHADOW, GROUP, and PROJECT) */

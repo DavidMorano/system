@@ -1,4 +1,4 @@
-/* strdcpyx INCLUDE */
+/* strdcpyx HEADER */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -22,12 +22,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strdcpyxw.h>
-
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
 
 
 #ifdef	__cplusplus

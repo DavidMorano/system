@@ -1,4 +1,4 @@
-/* vars INCLUDE */
+/* vars HEADER */
 /* lang=C20 */
 
 /* read or audit a VAR database */

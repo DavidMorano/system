@@ -1,4 +1,4 @@
-/* piq INCLUDE */
+/* piq HEADER */
 /* lang=C20 */
 
 /* pointer interlocked queue */

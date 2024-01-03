@@ -1,4 +1,4 @@
-/* uxinetconv INCLUDE */
+/* uxinetconv HEADER */
 /* lang=C20 */
 
 /* UNIX® UCINETCONV support */

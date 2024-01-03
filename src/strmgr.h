@@ -1,4 +1,4 @@
-/* strmgr INCLUDE */
+/* strmgr HEADER */
 /* lang=C20 */
 
 /* string manager */

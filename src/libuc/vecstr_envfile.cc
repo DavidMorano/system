@@ -1,4 +1,4 @@
-/* vecstr_envfile */
+/* vecstr_envfile SUPPORT */
 /* lang=C++20 */
 
 /* process an environment file */
@@ -156,7 +156,7 @@ int vecstr_envfile(vecstr *vlp,cchar *fname) noex {
 			        cint	llen = si.llen ;
 	                        int	len ;
 	                        int	cl ;
-		                rls_f	rls = filebuf_readlines ;
+		                rls_f	rls = filebuf_readlns ;
 			        char	*lbuf = si.lbuf ;
 		                nullptr_t	n{} ;
 	                        while ((rs = rls(dfp,lbuf,llen,to,n)) > 0) {

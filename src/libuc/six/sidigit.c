@@ -1,4 +1,4 @@
-/* sidigit */
+/* sidigit SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find the index of a numeric character */
@@ -20,7 +20,7 @@
 	sidigit
 
 	Description:
-	This subroutine searchs for a numeric character within a
+	This subroutine searches for a numeric character within a
 	given string and returns the index to that character (if
 	it is found). It returns -1 if the character does not exist
 	within the given string.
@@ -39,7 +39,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>

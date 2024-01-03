@@ -1,4 +1,4 @@
-/* ptma INCLUDE */
+/* ptma HEADER */
 /* lang=C20 */
 
 /* POSIX® Thread Mutex Attribute manipulation */
@@ -28,18 +28,18 @@ typedef PTMA		ptma ;
 extern "C" {
 #endif
 
-extern int	ptma_create(PTMA *) noex ;
-extern int	ptma_destroy(PTMA *) noex ;
-extern int	ptma_getprioceiling(PTMA *,int *) noex ;
-extern int	ptma_setprioceiling(PTMA *,int) noex ;
-extern int	ptma_getprotocol(PTMA *,int *) noex ;
-extern int	ptma_setprotocol(PTMA *,int) noex ;
-extern int	ptma_getpshared(PTMA *,int *) noex ;
-extern int	ptma_setpshared(PTMA *,int) noex ;
-extern int	ptma_getrobustnp(PTMA *,int *) noex ;
-extern int	ptma_setrobustnp(PTMA *,int) noex ;
-extern int	ptma_gettype(PTMA *,int *) noex ;
-extern int	ptma_settype(PTMA *,int) noex ;
+extern int	ptma_create(ptma *) noex ;
+extern int	ptma_destroy(ptma *) noex ;
+extern int	ptma_getprioceiling(ptma *,int *) noex ;
+extern int	ptma_setprioceiling(ptma *,int) noex ;
+extern int	ptma_getprotocol(ptma *,int *) noex ;
+extern int	ptma_setprotocol(ptma *,int) noex ;
+extern int	ptma_getpshared(ptma *,int *) noex ;
+extern int	ptma_setpshared(ptma *,int) noex ;
+extern int	ptma_getrobustnp(ptma *,int *) noex ;
+extern int	ptma_setrobustnp(ptma *,int) noex ;
+extern int	ptma_gettype(ptma *,int *) noex ;
+extern int	ptma_settype(ptma *,int) noex ;
 
 #ifdef	__cplusplus
 }

@@ -1,4 +1,4 @@
-/* storebuf INCLUDE */
+/* storebuf HEADER */
 /* lang=C20 */
 
 /* storage buffer manipulation subroutines */

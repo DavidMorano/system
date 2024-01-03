@@ -1,4 +1,4 @@
-/* cfdect */
+/* cfdect SUPPORT */
 /* lang=C++20 */
 
 /* convert from a decimal string with time codes on the end */

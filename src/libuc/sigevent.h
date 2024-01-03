@@ -1,4 +1,4 @@
-/* sigevent INCLUDE */
+/* sigevent HEADER */
 /* lang=C99 */
 
 /* signal event object methods */

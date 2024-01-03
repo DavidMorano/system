@@ -205,17 +205,17 @@ OBJ094= strnxcmp.o
 OBJ095= strdcpyx.o strdcpyxw.o
 
 OBJ096=
-OBJ097= sncpyx.o sncpyxw.o sncpyxc.o 
-OBJ098= snflags.o snfsflags.o snpollflags.o snopenflags.o snfilemode.o
-OBJ099= snxxx.o sntmtime.o snshellunder.o 
+OBJ097=
+OBJ098=
+OBJ099=
 OBJ100= pathadd.o pathclean.o
 OBJ101=
 OBJ102= mkvarpath.o mkuserpath.o mkcdpath.o mkexpandpath.o
 OBJ103= mkquoted.o mksofname.o 
 
-OBJ104= sichr.o rmext.o
-OBJ105= sfskipwhite.o
-OBJ106= sfshrink.o sfdirname.o sfbasename.o sfwhitedot.o sfprogroot.o
+OBJ104= six.o rmx.o
+OBJ105=
+OBJ106=
 OBJ107=
 OBJ108=
 OBJ109= matstr.o matostr.o matkeystr.o 
@@ -402,13 +402,24 @@ TOBJG0= $(TOBJA)
 TOBJ= $(TOBJG0) $(TOBJG1)
 
 
-UOBJ00= matstr.o nleadstr.o toxc.o char.o varnames.o rmx.o
-UOBJ01= strn.o sfx.o strnxcmp.o
+UOBJ00= matstr.o nleadstr.o toxc.o char.o
+UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= strcpyxc.o
-UOBJ03= strwcpyxc.o strwcpyxx.o
-UOBJ04= ischarx.o
+UOBJ03= varnames.o rmx.o
+UOBJ04= ischarx.o ulogerror.o strdcpyx.o
+UOBJ05= nleadstr.o nleadkeystr.o
+UOBJ06= mapex.o strnul.o
+UOBJ07= getourenv.o
 
-UOBJ= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) $(UOBJ04)
+UOBJ08= matkeystr.o strkeycmp.o
+UOBJ09= ustat.o readln.o ccfile.o
+UOBJ10= isnot.o isoneof.o
+UOBJ11= strwcpy.o strwcpyxc.o strwcpyxx.o
+
+UOBJ=
+UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
+UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
+UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -564,15 +575,19 @@ base.o:		$(OBJ_BASE)
 
 # convert-to (CT)
 OBJ0_CT= ctxxx.o ctbin.o ctoct.o cthex.o ctdec.o ctchars.o 
-OBJ1_CT= ctdecp.o cvtdig.o digbufsizes.o xxtostr.o
+OBJ1_CT= ctdecp.o ctdecf.o cvtdig.o digbufsizes.o
+OBJ2_CT= xxtostr.o convertx.o
 
-OBJ_CT= obj0_ct.o obj1_ct.o
+OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o
 
 obj0_ct.o:	$(OBJ0_CT)
 	$(LD) -r -o $@ $(OBJ0_CT)
 
 obj1_ct.o:	$(OBJ1_CT)
 	$(LD) -r -o $@ $(OBJ1_CT)
+
+obj2_ct.o:	$(OBJ2_CT)
+	$(LD) -r -o $@ $(OBJ2_CT)
 
 ct.o:		$(OBJ_CT)
 	$(LD) -r -o $@ $(OBJ_CT)
@@ -649,7 +664,7 @@ obj_vecpstr.o:	$(OBJ_VECPSTR)
 
 
 OBJA_VEC= obj_vecstr.o obj_vecpstr.o
-OBJB_VEC= vechand.o recarr.o raqhand.o
+OBJB_VEC= vechand.o recarr.o raqhand.o vecint.o vecitem.o
 OBJ_VEC= obja_vec.o objb_vec.o
 
 obja_vec.o:	$(OBJA_VEC)
@@ -911,8 +926,8 @@ vecpstr_loadpjusers.o:	vecpstr_loadpjusers.cc vecpstr.h
 vecpstr_addsubdirs.o:	vecpstr_addsubdirs.cc vecpstr.h
 
 vecobj.o:		vecobj.cc vecobj.h
-
 vecelem.o:		vecelem.cc vecelem.h
+vecitem.o:		vecitem.cc vecitem.h
 
 hdb.o:			hdb.cc hdb.h
 
@@ -936,11 +951,10 @@ lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
-
 dirlist.o:		dirlist.cc dirlist.h
 
-dirseen.o:		dirseen.c dirseen.h
-dirseen_not.o:		dirseen_not.c dirseen.h
+dirseen.o:		dirseen.cc dirseen.h
+dirseen_not.o:		dirseen_not.cc dirseen.h
 
 randomvar.o:		randomvar.cc randomvar.h
 
@@ -978,9 +992,9 @@ itimerspec.o:		itimerspec.c itimerspec.h
 
 timeout.o:		timeout.c timeout.h
 
-upt.o:			upt.c upt.h
+upt.o:			upt.cc upt.h
 
-base64.o:		base64.c base64.h
+base64.o:		base64.cc base64.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
@@ -1072,9 +1086,10 @@ ctoct.o:		ctoct.cc ctoct.h cvtdig.hh
 cthex.o:		cthex.cc cthex.h cvtdig.hh
 ctdec.o:		ctdec.cc ctdec.h cvtdig.hh
 ctdecp.o:		ctdecp.cc ctdecp.h ctdec.h
-ctdecf.o:		ctdecf.c ctdec.h
+ctdecf.o:		ctdecf.cc ctdecf.h convertx.h
 ctchars.o:		ctchars.cc ctchars.h
 xxtostr.o:		xxtostr.cc xxtostr.h
+convertx.o:		convertx.cc convertx.h
 
 dialopts.o:		dialopts.c dialopts.h
 dialprog.o:		dialprog.c dialopts.h
@@ -1116,7 +1131,7 @@ checkbase.o:		checkbase.cc
 
 # malloc
 mallocxx.o:		mallocxx.cc mallocxx.h
-mallocstuff.o:		mallocstuff.c mallocstuff.h
+mallocstuff.o:		mallocstuff.cc mallocstuff.h
 
 # special built-ins (user-space enumlated kernel calls)
 uinfo.o:		uinfo.cc uinfo.h
@@ -1156,8 +1171,14 @@ ucpasswd.o:		ucpasswd.cc ucpasswd.h
 ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
 
+# UNIX C-language system library support
+uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
+libmallocxx.o:		libmalloccc.xx libmallocxx.h
+
 # UNIX C-language system library memory management
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h
+mapblock.o:		mapblock.cc mapblock.hh
+memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management
@@ -1176,12 +1197,10 @@ aflag.o:		aflag.cc aflag.hh
 timewatch.o:		timwatch.cc timewatch.hh
 timecount.o:		timecount.cc timecount.hh
 
-# UNIX C-language system library support
-uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
-
-mapblock.o:		mapblock.cc mapblock.hh
-memtrack.o:		memtrack.cc memtrack.hh
-libmallocxx.o:		libmalloccc.xx libmallocxx.h
+# USYS
+usys.o:			usys.dir
+usys.dir:
+	makesubdir $@
 
 # misc-character
 toxc.o:			toxc.c toxc.h
@@ -1191,21 +1210,13 @@ ischarx.o:		ischarx.cc ischarx.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
 # RMX
-OBJ_RMX= rmeol.o rmext.o rmchr.o
-
-rmx.o:			$(OBJ_RMX)
-	$(LD) -r -o $@ $(OBJ_RMX)
-
-rmeol.o:		rmeol.c rmx.h
-rmext.o:		rmext.c rmx.h
-rmchr.o:		rmchr.c rmx.h
+rmx.o:			rmx.cc rmx.h
 
 # STRW
 OBJ_STRW= strwcpyxc.o strwcpyxx.o
 
 strw.o:			$(OBJ_STRW)
 	$(LD) -r -o $@ $(OBJ_STRW)
-
 
 # system-auxillary-information
 ucsysauxinfo.o:		ucsysauxinfo.dir
@@ -1220,8 +1231,16 @@ sfx.o:			sfx.dir
 sfx.dir:
 	makesubdir $@
 
+snx.o:			snx.dir
+snx.dir:
+	makesubdir $@
+
 snwcpy.o:		snwcpy.dir
 snwcpy.dir:
+	makesubdir $@
+
+hash.o:			hash.dir
+hash.dir:
 	makesubdir $@
 
 # UCENT
@@ -1299,6 +1318,7 @@ bits.o:			bits.cc bits.h
 envs.o:			envs.cc envs.h
 envs_procxe.o:		envs_procxe.cc envs.h
 expcook.o:		expcook.cc expcook.h
+keyopt.o:		keyopt.cc keyopt.h
 
 
 # sring-comparisons
@@ -1316,6 +1336,8 @@ intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
+getnodename.o:		getnodename.cc getnodename.h
+getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
 groupids.o:		groupids.cc groupids.hh
@@ -1323,6 +1345,8 @@ xperm.o:		xperm.cc xperm.h ids.h
 isoneof.o:		isoneof.c isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
+readln.o:		readln.cc readln.hh
+ccfile.o:		ccfile.cc ccfile.hh
 
 
 

@@ -1,4 +1,4 @@
-/* estrings INCLUDE */
+/* estrings HEADER */
 /* lang=C++20 */
 
 /* almost all c-string related operations */

@@ -1,4 +1,4 @@
-/* ptrwlock INCLUDE */
+/* ptrwlock HEADER */
 /* lang=C20 */
 
 /* Posix Semaphore (PTRWLOCK) */

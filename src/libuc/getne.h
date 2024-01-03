@@ -1,4 +1,4 @@
-/* getne INCLUDE */
+/* getne HEADER */
 /* lang=C20 */
 
 /* get protocol entry */

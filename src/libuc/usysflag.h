@@ -1,4 +1,4 @@
-/* usysflag INCLUDE */
+/* usysflag HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

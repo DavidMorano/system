@@ -1,4 +1,4 @@
-/* optval INCLUDE */
+/* optval HEADER */
 /* lang=C20 */
 
 /* divine a value (boolean or otherwise) out of a c-sring */

@@ -1,4 +1,4 @@
-/* slist INCLUDE */
+/* slist HEADER */
 /* lang=C20 */
 
 /* regular (no-frills) pointer queue */

@@ -55,11 +55,6 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef cchar	cchar ;
-#endif
-
 
 /* external subroutines */
 

@@ -1,4 +1,4 @@
-/* mkpathx INCLUDE */
+/* mkpathx HEADER */
 /* lang=C20 */
 
 /* make a file-path from multiple component c-strings */
@@ -24,11 +24,6 @@
 #include	<mknpathx.h>
 #include	<mknpathxw.h>
 
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
 
 #ifdef	__cplusplus
 extern "C" {

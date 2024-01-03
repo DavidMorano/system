@@ -1,4 +1,4 @@
-/* sidquote */
+/* sidquote SUPPORT (string-index double-quote) */
 /* lang=C20 */
 
 /* find the index of the character past a double-quoted string */
@@ -37,7 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>

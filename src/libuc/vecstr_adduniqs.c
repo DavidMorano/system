@@ -1,4 +1,4 @@
-/* vecstr_adduniqs */
+/* vecstr_adduniqs SUPPORT */
 /* lang=C20 */
 
 /* add string(s) to a vector-string object */

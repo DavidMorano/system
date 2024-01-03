@@ -1,4 +1,4 @@
-/* vstrcmpx INCLUDE */
+/* vstrcmpx HEADER */
 /* lang=C20 */
 
 /* convert a character string to a given case */

@@ -1,4 +1,4 @@
-/* aflag INCLUDE */
+/* aflag HEADER */
 /* lang=C++20 */
 
 /* atomic-flag */

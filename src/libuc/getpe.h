@@ -1,4 +1,4 @@
-/* getpe INCLUDE */
+/* getpe HEADER */
 /* lang=C20 */
 
 /* get protocol entry */

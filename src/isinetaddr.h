@@ -1,4 +1,4 @@
-/* isinetaddr INCLUDE */
+/* isinetaddr HEADER */
 /* lang=C20 */
 
 /* is a given c-string a valid INET address (either 4 or 6)? */

@@ -1,4 +1,4 @@
-/* strfilemk INCLUDE */
+/* strfilemk HEADER */
 /* lang=C20 */
 
 /* STRFILEMK management */

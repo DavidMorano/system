@@ -1,4 +1,4 @@
-/* snflags INCLUDE */
+/* snflags HEADER */
 /* lang=C20 */
 
 /* make string version of some flags */

@@ -1,4 +1,4 @@
-/* passwdent INCLUDE */
+/* passwdent HEADER */
 /* lang=C20 */
 
 /* PASSWD structure management */

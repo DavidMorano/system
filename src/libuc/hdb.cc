@@ -162,8 +162,6 @@ using std::max ;
 
 /* local typedefs */
 
-typedef const char	*ccharp ;
-
 typedef uint		hdbhv ;		/* HDB hash-value */
 
 

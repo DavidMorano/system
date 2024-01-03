@@ -1,4 +1,4 @@
-/* udomain INCLUDE */
+/* udomain HEADER */
 /* lang=C20 */
 
 /* retrieve a domain-name for a given username */

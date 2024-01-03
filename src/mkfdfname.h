@@ -1,4 +1,4 @@
-/* mkfdfname INCLUDE */
+/* mkfdfname HEADER */
 /* lang=C20 */
 
 /* make an "fd" filename */

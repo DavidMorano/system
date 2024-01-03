@@ -1,4 +1,4 @@
-/* localmisc INCLUDE */
+/* localmisc HEADER */
 /* lang=C20 */
 
 /* miscellaneous stuff which essentially every program wants! */
@@ -143,11 +143,6 @@
 
 #ifndef	ULONG
 #define	ULONG		unsigned long
-#endif
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR
-typedef const char		cchar ;
 #endif
 
 #ifndef	TYPEDEF_SCHAR
@@ -345,6 +340,8 @@ extern int	strlcpy(char *,cchar *,int) noex ;
 #ifndef	TIMEBUFLEN
 #define	TIMEBUFLEN	80
 #endif
+
+#define	eol		'\n'
 
 
 #endif /* LOCALMISC_INCLUDE */

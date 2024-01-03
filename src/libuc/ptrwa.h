@@ -1,4 +1,4 @@
-/* ptrwa INCLUDE */
+/* ptrwa HEADER */
 /* lang=C20 */
 
 /* POSIX® Thread read-write lock attribute manipulation */

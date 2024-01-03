@@ -1,4 +1,4 @@
-/* cfdect INCLUDE */
+/* cfdect HEADER */
 /* lang=C20 */
 
 /* Convert-From-Decimal-Time */

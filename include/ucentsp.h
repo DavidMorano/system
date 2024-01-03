@@ -1,4 +1,4 @@
-/* ucentsp INCLUDE */
+/* ucentsp HEADER */
 /* lang=C++20 */
 
 /* UCENTSP object management */

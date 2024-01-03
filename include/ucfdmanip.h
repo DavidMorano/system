@@ -1,4 +1,4 @@
-/* ucfdmanip INCLUDE */
+/* ucfdmanip HEADER */
 /* lang=C20 */
 
 /* UNIX® File-Descriptor Manipulation */

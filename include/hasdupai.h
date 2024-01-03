@@ -1,4 +1,4 @@
-/* hasdupai INCLUDE */
+/* hasdupai HEADER */
 /* lang=C20 */
 
 /* does the given array of integers have duplicate entries */

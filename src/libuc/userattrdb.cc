@@ -71,11 +71,6 @@
 #define	UA_DN		"dn"		/* INET domain-name */
 #endif
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 #ifndef	CF_UDOMAIN
 #define	CF_UDOMAIN	0
 #endif

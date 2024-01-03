@@ -1,7 +1,8 @@
-/* ctoct */
+/* ctoct SUPPORT */
 /* lang=C++20 */
 
-/* subroutines to convert an integer to a HEX string */
+/* subroutines to convert an integer to a OCTAL string */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,15 +16,16 @@
 
 /*******************************************************************************
 
-	These subroutines that perform conversions which also have an integral
-	power-of-two base are much faster than anything that uses 'lltostr(3c)'
-	(or friends) because there are no division operations needed in the
-	algorithm used.
-
+	These subroutines that perform conversions which also have
+	an integral power-of-two base are much faster than anything
+	that uses 'lltostr(3c)' (or friends) because there are no
+	division operations needed in the algorithm used.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<cvtdig.hh>
 #include	<localmisc.h>
 

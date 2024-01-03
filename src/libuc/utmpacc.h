@@ -1,4 +1,4 @@
-/* utmpacc INCLUDE */
+/* utmpacc HEADER */
 /* lang=C20 */
 
 /* UTMPACC management */

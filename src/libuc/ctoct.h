@@ -1,5 +1,8 @@
-/* ctoct INCLUDE */
+/* ctoct HEADER */
 /* lang=C++20 */
+
+/* subroutines to convert an integer to a OCTAL string */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,6 +19,7 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<localmisc.h>

@@ -1,4 +1,4 @@
-/* timeout INCLUDE */
+/* timeout HEADER */
 /* lang=C99 */
 
 /* time-out interface */

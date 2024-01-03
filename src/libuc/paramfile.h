@@ -1,4 +1,4 @@
-/* paramfile INCLUDE */
+/* paramfile HEADER */
 /* lang=C20 */
 
 /* object to handle parameter files */

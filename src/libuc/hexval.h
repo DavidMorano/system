@@ -1,4 +1,4 @@
-/* hexval INCLUDE */
+/* hexval HEADER */
 /* lang=C20 */
 
 /* get the value of a single hexadecimal digit */

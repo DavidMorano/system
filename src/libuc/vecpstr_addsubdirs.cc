@@ -1,4 +1,4 @@
-/* vecpstr_addsubdirs */
+/* vecpstr_addsubdirs SUPPORT */
 /* lang=C++20 */
 
 /* find and load UNIX® directories under a given root */
@@ -28,8 +28,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<fsdirtree.h>
 #include	<localmisc.h>
 
@@ -59,7 +61,7 @@ int vecpstr_addsubdirs(vecpstr *op,cchar *newsdname) noex {
 	int		c = 0 ;
 	if (op && newsdname) {
 	    char	*fbuf{} ;
-	    if ((rs = libmallocxx_mp(&fbuf)) >= 0) {
+	    if ((rs = libmalloc_mp(&fbuf)) >= 0) {
 	        FSDIRTREE	dir ;
 		cint		flen = rs ;
 	        cint		fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;

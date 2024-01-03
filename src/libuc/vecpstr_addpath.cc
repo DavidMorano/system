@@ -1,4 +1,4 @@
-/* vecpstr_addpath */
+/* vecpstr_addpath SUPPORT */
 /* lang=C++20 */
 
 /* add a "path" compnent to the string-list */

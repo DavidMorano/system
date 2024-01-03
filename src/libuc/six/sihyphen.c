@@ -1,4 +1,4 @@
-/* sihyphen */
+/* sihyphen SUPPORT */
 /* lang=C20 */
 
 /* find a hyphen (a fake hyphen of two minus characters) in a string */
@@ -60,7 +60,7 @@
 /* exported subroutines */
 
 #if	CF_STRNCHR
-int sihyphen(const char *sp,int sl) noex {
+int sihyphen(cchar *sp,int sl) noex {
 	int		si = 0 ;
 	bool		f = false ;
 	cchar		*tp ;
@@ -77,7 +77,7 @@ int sihyphen(const char *sp,int sl) noex {
 }
 /* end subroutine (sihyphen) */
 #else /* CF_STRNCHR */
-int sihyphen(const char *sp,int sl) noex {
+int sihyphen(cchar *sp,int sl) noex {
 	int		i ;
 	bool		f = false ;
 	if (sl < 0) sl = strlen(sp) ;

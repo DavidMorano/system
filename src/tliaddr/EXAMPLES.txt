@@ -1,4 +1,4 @@
-TPIADDR
+TLIADDR
 
 
 Synopsis:
@@ -36,4 +36,6 @@ which does NOT use a sockets-like address format:
 $ tliaddr -i raw /tmp/entropy
 \x2F746D702F657874726F7079
 
+Notes:
+1.  The port number for the AT&T 'listen' service is 2766.
 

@@ -1,4 +1,4 @@
-/* sileader */
+/* sileader SUPPORT */
 /* lang=C20 */
 
 /* retrieve the string-index into a "leader" */

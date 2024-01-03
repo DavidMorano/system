@@ -1,4 +1,4 @@
-/* singlist */
+/* singlist HEADER */
 /* lang=C++98 */
 
 /* regular (no-frills) pointer queue (not-circular) */
@@ -130,10 +130,11 @@ public:
 	    return (*this) ;
 	} ;
 	singlist_iter &operator ++ (int) noex { /* post */
+	    singlist_iter	pre(*this) ; 
 	    if (n != nullptr) {
 	        n = n->next ;
 	    }
-	    return (*this) ;
+	    return pre ;
 	} ;
 	singlist_iter &operator += (int inc) noex {
 	    if (n != nullptr) {

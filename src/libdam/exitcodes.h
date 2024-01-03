@@ -1,4 +1,4 @@
-/* exitcodes INCLUDE */
+/* exitcodes HEADER */
 /* lang=C20 */
 
 
@@ -74,6 +74,8 @@
 
  */
 
+/* exit OK */
+#define	EX_OK		0		/* this is general (good) success */
 
 /* general favorites */
 #define	EX_UNKNOWN	122		/* unknown reason */

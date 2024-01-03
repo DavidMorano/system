@@ -1,4 +1,4 @@
-/* svckv INCLUDE */
+/* svckv HEADER */
 
 /* these subroutines perform key-value type functions */
 

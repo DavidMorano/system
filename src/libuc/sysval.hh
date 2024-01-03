@@ -1,4 +1,4 @@
-/* sysval INCLUDE */
+/* sysval HEADER */
 /* lang=C++20 */
 
 /* retrieve operating-system values */

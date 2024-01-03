@@ -1,4 +1,4 @@
-/* ucent INCLUDE */
+/* ucent HEADER */
 /* lang=C20 */
 
 /* UCENT object management */

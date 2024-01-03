@@ -1,5 +1,8 @@
-/* sncpy INCLUDE */
+/* sncpy HEADER */
 /* lang=C20 */
+
+/* counted c-string copy operations */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

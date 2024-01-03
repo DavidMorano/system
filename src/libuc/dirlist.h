@@ -1,4 +1,4 @@
-/* dirlist INCLUDE */
+/* dirlist HEADER */
 /* lang=C20 */
 
 /* directory list manager */
@@ -28,17 +28,17 @@
 
 
 #define	DIRLIST		struct dirlist_head
-#define	DIRLIST_CUR	struct dirlist_c
+#define	DIRLIST_CUR	struct dirlist_cursor
 #define	DIRLIST_MAGIC	0x09854123
 
 
-struct dirlist_c {
+struct dirlist_cursor {
 	int		i ;
 } ;
 
 struct dirlist_head {
+	vecobj		*dbp ;
 	uint		magic ;
-	vecobj		db ;
 	int		tlen ;
 } ;
 

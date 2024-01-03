@@ -1,4 +1,4 @@
-/* hostaddr INCLUDE */
+/* hostaddr HEADER */
 /* lang=C20 */
 
 /* manipulate host entry structures */

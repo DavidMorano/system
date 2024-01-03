@@ -118,7 +118,7 @@ int nleadbasestr(cchar *bs,cchar *sp,int sl) noex {
 /* end subroutine (nleadbasestr) */
 
 int nleadcasestr(cchar *bs,cchar *sp,int sl) noex {
-	return nleadxxxxstr<tolc>(bs,sp,sl) ;
+	return nleadxxxxstr<touc>(bs,sp,sl) ;
 }
 /* end subroutine (nleadcasestr) */
 

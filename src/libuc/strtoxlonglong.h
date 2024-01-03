@@ -1,4 +1,4 @@
-/* strtoxlonglong INCLUDE */
+/* strtoxlonglong HEADER */
 /* lang=C20 */
 
 /* numeric-character conversion */

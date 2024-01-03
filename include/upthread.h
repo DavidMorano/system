@@ -1,4 +1,4 @@
-/* upthread INCLUDE */
+/* upthread HEADER */
 /* lang=C20 */
 
 /* additional UNIX® limits support */

@@ -1,4 +1,4 @@
-/* isoneof INCLUDE */
+/* isoneof HEADER */
 /* lang=C20 */
 
 /* test is an integer is one of a group of integers */

@@ -1,4 +1,4 @@
-/* stdfnames INCLUDE */
+/* stdfnames HEADER */
 /* lang=C20 */
 
 /* standard byte-order serializations */

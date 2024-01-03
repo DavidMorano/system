@@ -46,8 +46,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<getfdfile.h>		/* <- for |FD_STDxxx| */
 #include	<strdcpy.h>
-#include	<getfdfile.h>
 #include	<localmisc.h>
 
 #include	"ulogerror.h"		/* <- redundant */

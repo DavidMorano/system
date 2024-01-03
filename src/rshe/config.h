@@ -1,4 +1,4 @@
-/* INCLUDE FILE config */
+/* HEADER FILE config */
 
 
 #define	VERSION		"0c"

@@ -1,4 +1,4 @@
-/* getse INCLUDE */
+/* getse HEADER */
 /* lang=C20 */
 
 /* get service entry */

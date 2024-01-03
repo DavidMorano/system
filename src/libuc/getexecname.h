@@ -1,4 +1,4 @@
-/* getexecname INCLUDE */
+/* getexecname HEADER */
 /* lang=C20 */
 
 /* get a the file-name that this program was 'exec'ed from */

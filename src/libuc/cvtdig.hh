@@ -1,4 +1,4 @@
-/* cvtdig INCLUDE */
+/* cvtdig HEADER */
 /* lang=C++20 */
 
 /* convert an integer value into a c-string, given a value and base */

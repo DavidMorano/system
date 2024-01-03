@@ -1,4 +1,4 @@
-/* ctxxx */
+/* ctxxx SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a decimal string */
@@ -59,7 +59,6 @@
 	has such instructions. But short of assembly (and and the
 	required machine instructions) this present implemtnation
 	is adequate.
-
 
 *******************************************************************************/
 

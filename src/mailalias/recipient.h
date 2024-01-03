@@ -1,4 +1,4 @@
-/* recipient INCLUDE */
+/* recipient HEADER */
 
 /* recipient processing structures */
 

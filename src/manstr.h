@@ -1,4 +1,4 @@
-/* manstr INCLUDE */
+/* manstr HEADER */
 /* lang=C20 */
 
 /* special string manipulations */

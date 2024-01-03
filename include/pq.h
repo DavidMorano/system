@@ -1,4 +1,4 @@
-/* pq INCLUDE */
+/* pq HEADER */
 /* lang=C20 */
 
 /* regular (no-frills) pointer queue */

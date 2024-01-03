@@ -1,4 +1,4 @@
-/* sibreak */
+/* sibreak SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find a character in a given string */

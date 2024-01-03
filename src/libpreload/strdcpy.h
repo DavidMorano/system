@@ -1,4 +1,4 @@
-/* strdcpy INCLUDE */
+/* strdcpy HEADER */
 /* lang=C20 */
 
 /* string-copy variant */

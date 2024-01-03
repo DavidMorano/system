@@ -1,4 +1,4 @@
-/* ucentgr INCLUDE */
+/* ucentgr HEADER */
 /* lang=C++20 */
 
 /* UCENTGR object management */

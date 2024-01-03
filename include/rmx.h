@@ -1,4 +1,4 @@
-/* rmx INCLUDE */
+/* rmx HEADER */
 /* lang=C20 */
 
 /* remove EOL (End-Of-Line) characters from the given string */
@@ -22,15 +22,17 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<rmeol.h>		/* <- |rmeol(3uc)| is in there */
-
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int	rmchr(cchar *,int,int) noex ;
+extern int	rmeol(cchar *,int) noex ;
+extern int	rmochr(cchar *,int,int) noex ;
+extern int	rmrchr(cchar *,int,int) noex ;
 extern int	rmext(cchar *,int) noex ;
+extern int	rmtrailchr(cchar *,int,int) noex ;
+extern int	rmcomment(cchar *,int) noex ;
 
 #ifdef	__cplusplus
 }

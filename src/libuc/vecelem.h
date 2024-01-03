@@ -1,4 +1,4 @@
-/* vecelem INCLUDE */
+/* vecelem HEADER */
 /* lang=C20 */
 
 /* vector-element */
@@ -20,18 +20,18 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>		/* for 'uint' */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 /* object defines */
-
 #define	VECELEM_MAGIC		0x73625198
 #define	VECELEM			struct vecelem_head
 #define	VECELEM_FL		struct vecelem_flags
 #define	VECELEM_DEFENTS		2
 
 /* options */
-
 #define	VECELEM_ODEFAULT	0
 #define	VECELEM_OREUSE		(1 << 0)	/* reuse empty slots */
 #define	VECELEM_OCOMPACT	(1 << 1)	/* means NOHOLES */

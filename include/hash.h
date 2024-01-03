@@ -1,4 +1,4 @@
-/* hash INCLUDE */
+/* hash HEADER */
 /* lang=C20 */
 
 /* determine if file-name (just a string) has an approved file-extension */
@@ -22,6 +22,7 @@
 #include	<sys/types.h>		/* <- is this really needed? */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+
 
 #ifdef	__cplusplus
 extern "C" {

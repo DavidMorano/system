@@ -202,6 +202,14 @@ int ucptm::locktry(ptm *op) noex {
 }
 /* end method (ucptm::locktry) */
 
+void ptm::dtor() noex {
+	int		rs = destroy ;
+	if (rs < 0) {
+	    ulogerror("ptm",rs,"destroy") ;
+	}
+} 
+/* end method (ptm::dtor) */
+
 int ptm_creater::operator () (ptma *ap) noex {
 	int	rs = SR_BUGCHECK ;
 	if (op) {

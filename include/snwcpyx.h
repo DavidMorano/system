@@ -1,4 +1,4 @@
-/* snwcpyx INCLUDE */
+/* snwcpyx HEADER */
 /* lang=C20 */
 
 /* string-index operations */

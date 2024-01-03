@@ -1,4 +1,4 @@
-/* intfloor INCLUDE */
+/* intfloor HEADER */
 /* lang=C20 */
 
 /* Integer-Flooring */

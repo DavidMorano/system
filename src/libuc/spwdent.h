@@ -1,4 +1,4 @@
-/* spwdent INCLUDE */
+/* spwdent HEADER */
 /* lang=C20 */
 
 /* SPWD structure management */

@@ -1,4 +1,4 @@
-/* findbit INCLUDE */
+/* findbit HEADER */
 /* lang=C20 */
 
 /* find bit patterns (whatever!) */

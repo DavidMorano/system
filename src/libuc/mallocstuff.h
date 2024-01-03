@@ -1,4 +1,4 @@
-/* mallocstuff INCLUDE */
+/* mallocstuff HEADER */
 /* lang=C20 */
 
 /* miscellaneous |malloc(3c)| related */
@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 
@@ -26,10 +27,10 @@
 extern "C" {
 #endif
 
-char	*mallocbuf(void *,int) noex ;
-char	*mallocstr(const char *) noex ;
-char	*mallocstrw(const char *,int) noex ;
-char	*malloctest(int) noex ;
+extern char	*mallocbuf(void *,int) noex ;
+extern char	*mallocstr(cchar *) noex ;
+extern char	*mallocstrw(cchar *,int) noex ;
+extern char	*malloctest(int) noex ;
 
 #ifdef	__cplusplus
 }

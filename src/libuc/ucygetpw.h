@@ -1,4 +1,4 @@
-/* ucygetpw INCLUDE */
+/* ucygetpw HEADER */
 /* lang=C20 */
 
 /* UNIX® password entry fetching */

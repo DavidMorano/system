@@ -1,4 +1,4 @@
-/* uclibmemalloc INCLUDE */
+/* uclibmemalloc HEADER */
 /* lang=C20 */
 
 /* memory allocation facility (for library use) */
@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
 
@@ -27,13 +28,13 @@
 extern "C" {
 #endif
 
-int uc_libmallocstrw(cchar *,int,cchar **) noex ;
-int uc_libmallocsys(int,char **) noex ;
-int uc_libmalloc(int,void *) noex ;
-int uc_libvalloc(int,void *) noex ;
-int uc_libcalloc(int,int,void *) noex ;
-int uc_librealloc(const void *,int,void *) noex ;
-int uc_libfree(cvoid *) noex ;
+extern int uc_libmallocstrw(cchar *,int,cchar **) noex ;
+extern int uc_libmallocsys(int,char **) noex ;
+extern int uc_libmalloc(int,void *) noex ;
+extern int uc_libvalloc(int,void *) noex ;
+extern int uc_libcalloc(int,int,void *) noex ;
+extern int uc_librealloc(const void *,int,void *) noex ;
+extern int uc_libfree(cvoid *) noex ;
 
 #ifdef	__cplusplus
 }

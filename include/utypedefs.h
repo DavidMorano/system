@@ -1,4 +1,4 @@
-/* utypedefs INCLUDE */
+/* utypedefs HEADER */
 /* lang=C20 */
 
 /* virtual-system definitions */
@@ -175,11 +175,6 @@ typedef const char		cchar ;
 typedef const signed char	cschar ;
 #endif /* TYPEDEF_SCHAR */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char		cc ;
-#endif
-
 #ifndef	TYPEDEF_CSHORT
 #define	TYPEDEF_CSHORT
 typedef const short		cshort ;
@@ -232,6 +227,41 @@ typedef const unsigned long	culong ;
 
 /* specials */
 
+#ifndef	TYPEDEF_CC
+#define	TYPEDEF_CC
+typedef const char		cc ;
+#endif
+
+#ifndef	TYPEDEF_CCP
+#define	TYPEDEF_CCP
+typedef const char		*ccp ;
+#endif
+
+#ifndef	TYPEDEF_CHARP
+#define	TYPEDEF_CHARP
+typedef char			*charp ;
+#endif
+
+#ifndef	TYPEDEF_CCHARP
+#define	TYPEDEF_CCHARP
+typedef const char		*ccharp ;
+#endif
+
+#ifndef	TYPEDEF_CPCCHAR
+#define	TYPEDEF_CPCCHAR
+typedef const char *const	cpcchar ;
+#endif
+
+#ifndef	TYPEDEF_CPCCHARP
+#define	TYPEDEF_CPCCHARP
+typedef const char *const	*cpccharp ;
+#endif
+
+#ifndef	TYPEDEF_MAINV
+#define	TYPEDEF_MAINV
+typedef const char *const	*mainv ;
+#endif
+
 #ifndef	TYPEDEF_IN6ADDRT
 #define	TYPEDEF_IN6ADDRT
 typedef in_addr_t		in4_addr_t ;
@@ -252,18 +282,24 @@ typedef struct in6_addr		in6_addr_t ;
 
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
 typedef void (*void_f)() noex ;
-
 #ifdef	__cplusplus
 }
 #endif
-
 #endif /* TYPEDEF_VOIDF */
+
+#ifndef	TYPEDEF_FPERM
+#define	TYPEDEF_FPERM
+typedef mode_t	fsperm ;
+#endif /* TYPEDEF_FPERM */
+
+#ifndef	TYPEDEF_CFPERM
+#define	TYPEDEF_CFPERM
+typedef mode_t	const cfsperm ;
+#endif /* TYPEDEF_CFPERM */
 
 
 #endif /* UTYPEDEFS_INCLUDE */

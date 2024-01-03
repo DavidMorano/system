@@ -1,4 +1,4 @@
-/* bits */
+/* bits HEADER */
 /* lang=C++20 */
 
 /* perform some bit-array type operations */
@@ -27,11 +27,13 @@
 
 
 #define	BITS		struct bits_head
-#define	BITS_DIGIT	ulonglong
+#define	BITS_TYPEDIGIT	ulonglong
+#define	BITS_SHORTDIGS	2
 
 
 struct bits_head {
-	BITS_DIGIT	*a ;
+	BITS_TYPEDIGIT	*a ;
+	BITS_TYPEDIGIT	na[BITS_SHORTDIGS] ;
 	int		n ;		/* bits addressed */
 	int		nbits ;		/* allocated */
 	int		nwords ;	/* allocated */
@@ -63,8 +65,10 @@ class bits_co {
 public:
 	int operator () (int = 0) noex ;
 	int operator [] (int = 0) noex ;
-	operator int () noex ;
-} ;
+	operator int () noex {
+	    return operator () (0) ;
+	} ;
+} ; /* end struct (bits_co) */
 struct bits : bits_head {
 	bits_co		start ;
 	bits_co		finish ;
@@ -87,10 +91,11 @@ struct bits : bits_head {
 	    count(this,bitsmem_count) ;
 	} ;
 	operator int () noex {
-	    return count() ;
+	    return count ;
 	} ;
+	void dtor() noex ;
 	~bits() {
-	    finish() ;
+	    dtor() ;
 	} ;
 } ; /* end struct (bits) */
 

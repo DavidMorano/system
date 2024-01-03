@@ -1,4 +1,4 @@
-/* mknpathx INCLUDE */
+/* mknpathx HEADER */
 /* lang=C20 */
 
 /* make a file-path from multople component c-strings */
@@ -22,11 +22,6 @@
 #include	<usystem.h>
 #include	<mknpathxw.h>
 
-
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
 
 #ifdef	__cplusplus
 extern "C" {

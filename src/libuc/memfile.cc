@@ -84,10 +84,13 @@ static inline int memfile_ctor(memfile *op,Args ... args) noex {
 /* end subroutine (memfile_ctor) */
 
 static int memfile_dtor(memfile *op) noex {
-	(void) op ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
-/* end subroutine (memfile_ctor) */
+/* end subroutine (memfile_dtor) */
 
 template<typename ... Args>
 static inline int memfile_magic(memfile *op,Args ... args) noex {

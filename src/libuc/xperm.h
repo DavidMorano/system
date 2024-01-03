@@ -1,4 +1,4 @@
-/* xsperm INCLUDE */
+/* xsperm HEADER */
 /* lang=C20 */
 
 /* stat-perm (Status-Permissions) */

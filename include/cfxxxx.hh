@@ -1,4 +1,4 @@
-/* cfxxxx INCLUDE */
+/* cfxxxx HEADER */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */

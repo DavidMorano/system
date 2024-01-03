@@ -1,4 +1,4 @@
-/* ucentho INCLUDE */
+/* ucentho HEADER */
 /* lang=C++20 */
 
 /* UCENTHO object management */

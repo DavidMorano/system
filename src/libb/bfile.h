@@ -1,4 +1,4 @@
-/* bfile INCLUDE */
+/* bfile HEADER */
 /* lang=C20 */
 
 /* header file for the Basic I/O library package */

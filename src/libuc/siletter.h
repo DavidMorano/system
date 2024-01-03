@@ -1,4 +1,4 @@
-/* siletter INCLUDE */
+/* siletter HEADER */
 /* lang=C20 */
 
 /* perform some kind of processsing */

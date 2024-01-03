@@ -1,4 +1,4 @@
-/* ustr INCLUDE */
+/* ustr HEADER */
 /* lang=C20 */
 
 /* UNIX® system STREAMS message interface */

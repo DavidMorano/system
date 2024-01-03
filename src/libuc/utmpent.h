@@ -1,4 +1,4 @@
-/* utmpent INCLUDE */
+/* utmpent HEADER */
 /* lang=C20 */
 
 /* methods for the UTMPENT object */

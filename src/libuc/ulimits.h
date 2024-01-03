@@ -1,4 +1,4 @@
-/* ulimits INCLUDE */
+/* ulimits HEADER */
 /* lang=C20 */
 
 /* additional UNIX® limits support */

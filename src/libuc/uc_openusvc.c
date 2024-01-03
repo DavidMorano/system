@@ -169,11 +169,6 @@ extern const char	**environ ;
 
 /* local structures */
 
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
-
 typedef int (*subsvc_t)(const char *,const char *,
 	    int,mode_t,const char **,const char **,int) ;
 

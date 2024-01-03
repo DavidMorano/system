@@ -1,4 +1,4 @@
-/* strpack INCLUDE */
+/* strpack HEADER */
 /* lang=C20 */
 
 /* string-pack */

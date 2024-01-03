@@ -1,4 +1,4 @@
-/* dirseen INCLUDE */
+/* dirseen HEADER */
 /* lang=C20 */
 
 
@@ -25,34 +25,37 @@
 
 
 #define	DIRSEEN		struct dirseen_head
-#define	DIRSEEN_CUR	struct dirseen_c
+#define	DIRSEEN_CUR	struct dirseen_cursor
 #define	DIRSEEN_MAGIC	0x09854123
 #define	DIRSEEN_NDEF	10
 
 
-struct dirseen_c {
+struct dirseen_cursor {
 	int		i ;
 } ;
 
 struct dirseen_head {
+	vecobj		*dlistp ;
 	uint		magic ;
-	VECOBJ		list ;
 	int		strsize ;
 } ;
+
+typedef DIRSEEN		dirseen ;
+typedef DIRSEEN_CUR	dirseen_cur ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int dirseen_start(DIRSEEN *) noex ;
-extern int dirseen_add(DIRSEEN *,cchar *,int,USTAT *) noex ;
-extern int dirseen_havename(DIRSEEN *,cchar *,int) noex ;
-extern int dirseen_havedevino(DIRSEEN *,USTAT *) noex ;
-extern int dirseen_count(DIRSEEN *) noex ;
-extern int dirseen_curbegin(DIRSEEN *,DIRSEEN_CUR *) noex ;
-extern int dirseen_curend(DIRSEEN *,DIRSEEN_CUR *) noex ;
-extern int dirseen_enum(DIRSEEN *,DIRSEEN_CUR *,char *,int) noex ;
-extern int dirseen_finish(DIRSEEN *) noex ;
+extern int dirseen_start(dirseen *) noex ;
+extern int dirseen_add(dirseen *,cchar *,int,USTAT *) noex ;
+extern int dirseen_havename(dirseen *,cchar *,int) noex ;
+extern int dirseen_havedevino(dirseen *,USTAT *) noex ;
+extern int dirseen_count(dirseen *) noex ;
+extern int dirseen_curbegin(dirseen *,dirseen_cur *) noex ;
+extern int dirseen_curend(dirseen *,dirseen_cur *) noex ;
+extern int dirseen_enum(dirseen *,dirseen_cur *,char *,int) noex ;
+extern int dirseen_finish(dirseen *) noex ;
 
 #ifdef	__cplusplus
 }

@@ -1,4 +1,4 @@
-/* uctimeout */
+/* uctimeout SUPPORT */
 /* lang=C++11 */
 
 /* UNIX® time-out management */
@@ -48,9 +48,9 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<ucontext.h>
-#include	<time.h>
 #include	<csignal>
 #include	<cstring>
+#include	<ctime>
 #include	<queue>
 #include	<usystem.h>
 #include	<usupport.h>

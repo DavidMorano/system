@@ -1,8 +1,8 @@
-/* ucmemalloc (3uc) */
+/* ucmemalloc SUPPORT (3uc) */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* memory allocation facility */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

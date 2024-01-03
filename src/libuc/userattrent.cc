@@ -55,6 +55,9 @@
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
+#include	<sfx.h>
+#include	<strn.h>
+#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"userattrent.h"
@@ -69,19 +72,8 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 
 /* external subroutines */
-
-extern "C" {
-    extern int	sfshrink(cchar *,int,cchar **) noex ;
-    extern int	iceil(int,int) noex ;
-    extern char	*strnchr(cchar *,int,int) noex ;
-}
 
 
 /* external variables */

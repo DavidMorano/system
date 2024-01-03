@@ -1,4 +1,4 @@
-/* filebuf INCLUDE */
+/* filebuf HEADER */
 /* lang=C20 */
 
 /* support some buffered file operations */

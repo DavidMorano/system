@@ -86,8 +86,6 @@ using std::nullptr_t ;
 
 /* local typedefs */
 
-typedef char	*charp ;
-
 extern "C" {
     typedef int (*vog_f)(vecobj *,int,void **) noex ;
 }

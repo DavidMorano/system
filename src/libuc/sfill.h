@@ -1,4 +1,4 @@
-/* sfill INCLUDE */
+/* sfill HEADER */
 /* lang=C20 */
 
 /* text fill */
@@ -20,7 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<system.h>
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<fifostr.h>
 #include	<localmisc.h>
@@ -36,15 +36,17 @@ struct sfill_head {
 	int		indent ;
 } ;
 
+typedef SFILL		sfill ;
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int	sfill_start(SFILL *,int,bfile *) noex ;
-extern int	sfill_remaining(SFILL *) noex ;
-extern int	sfill_proc(SFILL *,int,cchar *,int) noex ;
-extern int	sfill_wline(SFILL *,int) noex ;
-extern int	sfill_finish(SFILL *) noex ;
+extern int	sfill_start(sfill *,int,bfile *) noex ;
+extern int	sfill_remaining(sfill *) noex ;
+extern int	sfill_proc(sfill *,int,cchar *,int) noex ;
+extern int	sfill_wline(sfill *,int) noex ;
+extern int	sfill_finish(sfill *) noex ;
 
 #ifdef	__cplusplus
 }

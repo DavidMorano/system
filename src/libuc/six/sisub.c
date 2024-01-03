@@ -1,4 +1,4 @@
-/* sisub */
+/* sisub SUPPORT */
 /* lang=C20 */
 
 /* find the string-index of a sub-stringin the given c-string */
@@ -41,10 +41,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
+#include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -57,8 +58,6 @@
 
 
 /* external subroutines */
-
-extern int	nleadstr(cchar *,cchar *,int) noex ;
 
 
 /* exported subroutines */

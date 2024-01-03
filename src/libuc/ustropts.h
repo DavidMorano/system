@@ -1,4 +1,4 @@
-/* ustropts INCLUDE */
+/* ustropts HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

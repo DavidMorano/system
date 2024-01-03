@@ -1,4 +1,4 @@
-/* factorial INCLUDE */
+/* factorial HEADER */
 /* lang=C20 */
 
 /* calculate factorial */

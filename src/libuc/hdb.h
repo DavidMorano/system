@@ -1,4 +1,4 @@
-/* hdb INCLUDE */
+/* hdb HEADER */
 /* lang=C20 */
 
 /* general-purpose in-core hashing, DBM-like interface */

@@ -1,4 +1,4 @@
-/* getpwd INCLUDE */
+/* getpwd HEADER */
 /* lang=C20 */
 
 /* get the Present-Working-Directory (PWD) of the process */

@@ -1,4 +1,4 @@
-/* cyimk INCLUDE */
+/* cyimk HEADER */
 /* lang=C20 */
 
 /* make a CYI database */

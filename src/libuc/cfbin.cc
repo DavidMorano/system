@@ -1,4 +1,4 @@
-/* cfbin */
+/* cfbin SUPPORT */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */

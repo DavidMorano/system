@@ -1,4 +1,4 @@
-/* lookaside INCLUDE */
+/* lookaside HEADER */
 /* lang=C++20 */
 
 /* lookaside memory allocation manager */

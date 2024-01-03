@@ -1,4 +1,4 @@
-/* aiq INCLUDE */
+/* aiq HEADER */
 /* lang=C20 */
 
 /* asynchronous interrupt queue */

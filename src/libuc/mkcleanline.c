@@ -1,12 +1,11 @@
 /* mkcleanline */
+/* lang=C++20 */
 
 /* print a clean (cleaned up) line of text */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_CLEAN1	0		/* use CLEAN-1 */
 #define	CF_CLEAN2	1		/* use CLEAN-2 */
-
 
 /* revision history:
 
@@ -19,8 +18,12 @@
 
 /*******************************************************************************
 
-	This subroutine cleans up a line of text.  A mode paramter specifies
-	how clean the resulting line gets.  To wit:
+	Name:
+	mkcleanline
+
+	Description:
+	This subroutine cleans up a line of text.  A mode paramter
+	specifies how clean the resulting line gets.  To wit:
 
 	mode	delete­or­sub	terminate­on­nul
 	----------------------------------------
@@ -30,58 +33,40 @@
 	3	sub		NO
 
 	Synopsis:
-
-	int mkcleanline(lp,ll,m)
-	char		lp[] ;
-	int		ll ;
-	int		m ;
+	int mkcleanline(char *lp,int ll,int m) noex
 
 	Arguments:
-
 	lp		line-buffer to get operated on (must be writable)
 	ll		length of line-buffer on input
 	m		mode parameter (see above on use of mode)
 
 	Returns:
-
 	-		length of resulting line (not NL terminated)
 
 	Important note:
-
-	Resulting lines are nver NL (EOL) terminated - even if the input line
-	was!
-
+	Resulting lines are nver NL (EOL) terminated - even if the
+	input line was!
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<ascii.h>
+#include	<ischarx.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
+#define	MFLAGS		struct mflags
+
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	isprintlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif /* CF_DEBUGS */
 
 
 /* external variables */
@@ -98,14 +83,14 @@ struct mflags {
 /* forward references */
 
 #if	CF_CLEAN1
-static int	clean1(struct mflags *,char *,int) ;
-static int	isshift(int) ;
+static int	clean1(MFLAGS *,char *,int) noex ;
+static int	isshift(int) noex ;
 #else
-static int	clean2(struct mflags *,char *,int) ;
+static int	clean2(MFLAGS *,char *,int) noex ;
 #endif
 
-static int	ischarok(int) ;
-static int	isend(int) ;
+static int	ischarok(int) noex ;
+static int	isend(int) noex ;
 
 
 /* module global variables */
@@ -116,41 +101,24 @@ static int	isend(int) ;
 
 /* exported subroutines */
 
-
-int mkcleanline(char lp[],int ll,int m)
-{
-	struct mflags	mf ;
+int mkcleanline(char *lp,int ll,int m) noex {
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-
-	if (lp == NULL) return SR_FAULT ;
-
-	if (ll < 0)
-	    ll = strlen(lp) ;
-
-	while ((ll > 0) && isend(lp[ll - 1])) {
-	    ll -= 1 ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("mkcleanline: ll=%u lp=>%t<¬\n",ll,
-	    lp,strlinelen(lp,ll,40)) ;
-#endif 
-
-	memset(&mf,0,sizeof(struct mflags)) ;
-	mf.subnul = (m & 1) ;
-	mf.subbad = (m & 2) ;
-
+	if (lp) {
+	    MFLAGS	mf{} ;
+	    if (ll < 0) ll = strlen(lp) ;
+	    while ((ll > 0) && isend(lp[ll - 1])) {
+	        ll -= 1 ;
+	    }
+	    mf.subnul = (m & 1) ;
+	    mf.subbad = (m & 2) ;
 #if	CF_CLEAN1
-	len = clean1(&mf,lp,ll) ;
+	    len = clean1(&mf,lp,ll) ;
 #else
-	len = clean2(&mf,lp,ll) ;
+	    len = clean2(&mf,lp,ll) ;
 #endif
-
-#if	CF_DEBUGS
-	debugprintf("mkcleanline: ret len=^u\n",len) ;
-#endif /* CF_DEBUGS */
-
-	return len ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkcleanline) */
 
@@ -160,11 +128,7 @@ int mkcleanline(char lp[],int ll,int m)
 
 #if	CF_CLEAN1
 
-static int clean1(mfp,lp,ll)
-struct mflags	*mfp ;
-char		*lp ;
-int		ll ;
-{
+static int clean1(MFLAGS *mfp,char *lp,int ll) noex {
 	int		ili ;
 	int		ch ;
 	int		oli = 0 ;
@@ -176,7 +140,7 @@ int		ll ;
 
 	    if (! f_rem) {
 
-	        ch = MKCHAR(lp[ili]) ;
+	        ch = mkchar(lp[ili]) ;
 	        if ((ch == 0) && (! mfp->subnul))
 	            break ;
 
@@ -209,8 +173,7 @@ int		ll ;
 }
 /* end subroutine (clean1) */
 
-tatic int isshift(int ch)
-{
+tatic int isshift(int ch) noex {
 	int		f = FALSE ;
 	f = f || (ch == CH_SS2) ;
 	f = f || (ch == CH_SS3) ;
@@ -223,11 +186,7 @@ tatic int isshift(int ch)
 
 #if	CF_CLEAN2
 
-static int clean2(mfp,lp,ll)
-struct mflags	*mfp ;
-char		*lp ;
-int		ll ;
-{
+static int clean2(MFLAGS *mfp,char *lp,int ll) noex {
 	int		ili ;
 	int		ch ;
 	int		oli = 0 ;
@@ -236,7 +195,7 @@ int		ll ;
 
 	for (ili = 0 ; ili < ll ; ili += 1) {
 
-	    ch = MKCHAR(lp[ili]) ;
+	    ch = mkchar(lp[ili]) ;
 	    if ((ch == 0) && (! mfp->subnul))
 	        break ;
 
@@ -249,8 +208,9 @@ int		ll ;
 		}
 	    } else if (mfp->subbad) {
 	        lp[oli++] = (char) '­' ;
-	    } else
+	    } else {
 	        f_flipped = TRUE ;
+	    }
 
 	} /* end for */
 
@@ -261,16 +221,12 @@ int		ll ;
 
 #endif /* CF_CLEAN2 */
 
-
-static int ischarok(int ch)
-{
+static int ischarok(int ch) noex {
 	return (ch == '\t') || (ch == '\n') ;
 }
 /* end subroutine (ischarok) */
 
-
-static int isend(int ch)
-{
+static int isend(int ch) noex {
 	return (ch == '\n') || (ch == '\r') ;
 }
 /* end subroutine (isend) */

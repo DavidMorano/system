@@ -80,7 +80,6 @@ extern "C" {
     typedef int (*vog_f)(vecobj *,int,void **) noex ;
 }
 
-typedef char	*charp ;
 typedef PF_C	*cursorp ;
 typedef PF_E	*entp ;
 typedef PF_F	*filep ;

@@ -1,5 +1,8 @@
-/* ucbmemalloc INCLUDE */
+/* ucbmemalloc HEADER */
 /* lang=C20 */
+
+/* memory allocation facility */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

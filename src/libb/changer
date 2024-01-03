@@ -2,19 +2,17 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} VECHAND_P "
+NAMES="${NAMES} INCLUDE "
 
 
 DN=/dev/null
-builtin fgrep 2> ${DN}
-
 
 for F in "${@}" ; do
   if [[ -r "${F}" ]] ; then
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/VECHAND_P/s//VECHAND_O/g
+g/ INCLUDE /s// HEADER /g
 	w
 	q
 EOF

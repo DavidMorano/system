@@ -1,4 +1,4 @@
-/* filemap INCLUDE */
+/* filemap HEADER */
 /* lang=C20 */
 
 /* support some buffered file operations */

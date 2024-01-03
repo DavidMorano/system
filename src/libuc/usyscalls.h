@@ -1,4 +1,4 @@
-/* usyscalls INCLUDE */
+/* usyscalls HEADER */
 /* lang=C20 */
 
 /* version %I% last-modified %G% */

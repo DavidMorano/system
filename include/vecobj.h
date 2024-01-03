@@ -1,4 +1,4 @@
-/* vecobj INCLUDE */
+/* vecobj HEADER */
 /* lang=C20 */
 
 /* vector-object */

@@ -14,15 +14,11 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CCHAR
-#deifne	TYPEDEF_CCHAR
-typedef const char	cchar ;
-#endif
-
-
 static void showchars(cchar *) noexcept ;
 static void showterms(cchar *) noexcept ;
 
+
+/* local variables */
 
 constexpr int		tablen = (UCHAR_MAX+1) ;
 
@@ -202,6 +198,17 @@ static constexpr cchar	uterm_uterms[] = {
 	0x00, 0x00, 0x00, 0x00, 
 } ;
 
+static constexpr cchar	varsub_fterms[32] = {
+	0x00, 0x00, 0x00, 0x00,
+	0x09, 0x00, 0x00, 0x20,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
+} ;
+
 
 /* exported subroutines */
 
@@ -224,6 +231,8 @@ int main(int,cchar **,cchar **) {
 	showterms(envs_vterms) ;
 	showterms(envs_dterms) ;
 	showterms(uterm_uterms) ;
+	printf("varsub_fterms\n") ;
+	showterms(varsub_fterms) ;
 }
 /* end subroutine (main) */
 
@@ -247,9 +256,11 @@ static void showterms(cchar *terms) noexcept {
 		       printf("¯»%02X«",ch) ;
 		    } else if (ch == 0xA0) {
 		       printf("¯NBSP",ch) ;
+		    } else {
+		       printf("¯%c¯",ch) ;
 		    }
-		}
-	    }
+		} /* end if (special) */
+	    } /* end if (hit) */
 	} /* end for */
 	printf("\n") ;
 }

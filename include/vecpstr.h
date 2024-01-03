@@ -1,6 +1,5 @@
-/* vecpstr INCLUDE */
+/* vecpstr HEADER */
 /* lang=C20 */
-
 
 /* vector-packed-string */
 /* version %I% last-modified %G% */
@@ -82,8 +81,8 @@ struct vecpstr_head {
 	int		stsize ;	/* string table size */
 } ; /* end struct (vecpstr_head) */
 
-typedef struct vecpstr_head	vecpstr ;
-typedef struct vecpstr_chunk	vecpstr_ch ;
+typedef VECPSTR		vecpstr ;
+typedef VECPSTR_CH	vecpstr_ch ;
 
 #ifdef	__cplusplus
 extern "C" {

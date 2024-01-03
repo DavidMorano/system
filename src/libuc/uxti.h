@@ -1,4 +1,4 @@
-/* uxti INCLUDE */
+/* uxti HEADER */
 /* lang=C20 */
 
 /* additional UNIX® limits support */

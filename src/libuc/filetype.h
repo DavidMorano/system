@@ -1,4 +1,4 @@
-/* filetype INCLUDE */
+/* filetype HEADER */
 /* lang=C20 */
 
 

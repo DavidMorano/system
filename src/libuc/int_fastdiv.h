@@ -1,4 +1,4 @@
-/* int_fastdiv INCLUDE */
+/* int_fastdiv HEADER */
 /* lang=C++20 */
 
 

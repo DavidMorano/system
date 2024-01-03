@@ -1,4 +1,4 @@
-/* ucpeek INCLUDE */
+/* ucpeek HEADER */
 /* lang=C20 */
 
 /* "peek" at any waiting input */

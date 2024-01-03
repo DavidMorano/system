@@ -1,4 +1,4 @@
-/* linefold INCLUDE */
+/* linefold HEADER */
 /* lang=C20 */
 
 /* manage folding of a line */

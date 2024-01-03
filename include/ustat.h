@@ -1,4 +1,4 @@
-/* ustat INCLUDE */
+/* ustat HEADER */
 /* lang=C20 */
 
 /* UNIX® USTAT support */

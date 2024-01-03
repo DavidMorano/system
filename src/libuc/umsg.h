@@ -1,4 +1,4 @@
-/* umsg INCLUDE */
+/* umsg HEADER */
 /* lang=C20 */
 
 /* auxillary operating system support */

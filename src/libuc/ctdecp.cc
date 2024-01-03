@@ -1,4 +1,4 @@
-/* ctdecp */
+/* ctdecp SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a decimal string /w precision */

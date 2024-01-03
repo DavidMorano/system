@@ -1,4 +1,4 @@
-/* mkutmpid INCLUDE */
+/* mkutmpid HEADER */
 /* lang=C20 */
 
 /* make a UTMPX entry ID (c_string) */

@@ -1,4 +1,4 @@
-/* mkprogenv INCLUDE */
+/* mkprogenv HEADER */
 /* lang=C20 */
 
 /* make new environment for a program */

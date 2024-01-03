@@ -1,4 +1,4 @@
-/* vecobj */
+/* vecobj SUPPORT */
 /* lang=C++20 */
 
 /* vector object list operations */
@@ -73,15 +73,15 @@ static int	vecobj_iget(vecobj *,int,void **) noex ;
 /* local subroutines */
 
 consteval int mkoptmask() noex {
-	int	r = 0 ;
-	r = r | VECOBJ_OREUSE ;
-	r = r | VECOBJ_OCOMPACT ;
-	r = r | VECOBJ_OSWAP ;
-	r = r | VECOBJ_OSTATIONARY ;
-	r = r | VECOBJ_OCONSERVE ;
-	r = r | VECOBJ_OSORTED ;
-	r = r | VECOBJ_OORDERED ;
-	return r ;
+	int		m = 0 ;
+	m |= VECOBJ_OREUSE ;
+	m |= VECOBJ_OCOMPACT ;
+	m |= VECOBJ_OSWAP ;
+	m |= VECOBJ_OSTATIONARY ;
+	m |= VECOBJ_OCONSERVE ;
+	m |= VECOBJ_OSORTED ;
+	m |= VECOBJ_OORDERED ;
+	return m ;
 }
 /* end subroutine (mkoptmask) */
 
@@ -740,18 +740,18 @@ static int vecobj_dtor(vecobj *op) noex {
 }
 /* end subroutine (vecobj_dtor) */
 
-static int vecobj_setopts(vecobj *op,int opts) noex {
+static int vecobj_setopts(vecobj *op,int vo) noex {
 	int		rs = SR_INVALID ;
-	if ((opts & optmask) == 0) {
+	if ((vo & (~optmask)) == 0) {
 	    rs = SR_OK ;
 	    op->f = {} ;
-	    if (opts & VECOBJ_OREUSE) op->f.oreuse = 1 ;
-	    if (opts & VECOBJ_OSWAP) op->f.oswap = 1 ;
-	    if (opts & VECOBJ_OSTATIONARY) op->f.ostationary = 1 ;
-	    if (opts & VECOBJ_OCOMPACT) op->f.ocompact = 1 ;
-	    if (opts & VECOBJ_OSORTED) op->f.osorted = 1 ;
-	    if (opts & VECOBJ_OORDERED) op->f.oordered = 1 ;
-	    if (opts & VECOBJ_OCONSERVE) op->f.oconserve = 1 ;
+	    if (vo & VECOBJ_OREUSE) op->f.oreuse = 1 ;
+	    if (vo & VECOBJ_OSWAP) op->f.oswap = 1 ;
+	    if (vo & VECOBJ_OSTATIONARY) op->f.ostationary = 1 ;
+	    if (vo & VECOBJ_OCOMPACT) op->f.ocompact = 1 ;
+	    if (vo & VECOBJ_OSORTED) op->f.osorted = 1 ;
+	    if (vo & VECOBJ_OORDERED) op->f.oordered = 1 ;
+	    if (vo & VECOBJ_OCONSERVE) op->f.oconserve = 1 ;
 	} /* end if (valid options) */
 	return rs ;
 }
@@ -775,6 +775,7 @@ static int vecobj_extend(vecobj *op) noex {
 	    if (rs >= 0) {
 	        op->va = (void **) np ;
 	        op->n = nn ;
+		op->va[op->i] = nullptr ;
 	    }
 	} /* end if (extension required) */
 	return rs ;

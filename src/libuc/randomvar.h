@@ -1,4 +1,4 @@
-/* randomvar INCLUDE */
+/* randomvar HEADER */
 /* lang=C20 */
 
 /* random-variable object */
