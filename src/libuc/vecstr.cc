@@ -90,6 +90,7 @@
 #include	<nleadstr.h>
 #include	<strwcpy.h>
 #include	<vstrcmpx.h>
+#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"vecstr.h"
@@ -112,10 +113,6 @@ extern "C" {
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	iceil(int,int) noex ;
-}
 
 
 /* forward references */

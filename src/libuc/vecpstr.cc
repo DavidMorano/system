@@ -77,9 +77,9 @@
 #include	<usupport.h>
 #include	<vechand.h>
 #include	<vstrcmpx.h>
-#include	<intceil.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>
+#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"vecpstr.h"
