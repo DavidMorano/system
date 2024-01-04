@@ -1,4 +1,4 @@
-/* getrandom */
+/* getrandom SUPPORT */
 /* lang=C++20 */
 
 /* Get-Random-data UNIX® System interposer */

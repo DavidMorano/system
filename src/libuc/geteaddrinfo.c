@@ -1,11 +1,10 @@
 /* geteaddrinfo */
+/* lang=C++20 */
 
 /* subroutine to get a canonical hostname */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,23 +17,23 @@
 
 /*******************************************************************************
 
-	This subroutine is used to get a canonical INET hostname for a supplied
-	name.  Note carefully that the returned hostname, if any, may NOT be a
-	name that can be translated into a good INET address.  In other words,
-	this subroutine uses its own definition of a "canonical" name and that
-	definition does NOT necessarily include the fact that the resulting
-	name can be translated into a good INET address.  If you want a name
-	that is guaranteed to be translatable into a valid INET address then
-	you would use the 'ehostname' name that is supplied as a result of
-	calling this subroutine.
+	This subroutine is used to get a canonical INET hostname
+	for a supplied name.  Note carefully that the returned
+	hostname, if any, may NOT be a name that can be translated
+	into a good INET address.  In other words, this subroutine
+	uses its own definition of a "canonical" name and that
+	definition does NOT necessarily include the fact that the
+	resulting name can be translated into a good INET address.
+	If you want a name that is guaranteed to be translatable
+	into a valid INET address then you would use the 'ehostname'
+	name that is supplied as a result of calling this subroutine.
 
 	Having said that the resuling name is not guaranteed to be
-	translatable, a good translation facility will generally figure out
-	that the given name is something that can be translated given the
-	existing host information.
+	translatable, a good translation facility will generally
+	figure out that the given name is something that can be
+	translated given the existing host information.
 
 	Synopsis:
-
 	int geteaddrinfo(hostname,svcname,hintp,ehostname,rpp)
 	const char	hostname[] ;
 	const char	svcname[] ;
@@ -43,7 +42,6 @@
 	struct addrinfo	**rpp ;
 
 	Arguments:
-
 	hostname	name of host to lookup
 	svcname		name of service to lookup
 	hintp		pointer to 'addrinfo' structure
@@ -51,16 +49,12 @@
 	rpp		pointer to pointer to 'addrinfo' result
 
 	Returns:
-
 	>=0		<name> had a valid INET address
 	<0		<name> did not have a valid address
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -71,7 +65,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

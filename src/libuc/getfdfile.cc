@@ -1,4 +1,4 @@
-/* getfdfile */
+/* getfdfile SUPPORT */
 /* lang=C20 */
 
 /* get an FD out of an FD-File name (if there is one) */

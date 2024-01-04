@@ -1,10 +1,10 @@
-/* getev */
+/* getev SUPPORT */
+/* lang=C20 */
 
 /* get an environment variable by name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,45 +17,39 @@
 
 /*******************************************************************************
 
-	This subroutine is similar to 'getenv(3c)' except that the variable
-	array (an array of pointers to strings) is explicitly passed by the
-	caller.
+	Name:
+	getev
+
+	Description:
+	This subroutine is similar to 'getenv(3c)' except that the
+	variable array (an array of pointers to strings) is explicitly
+	passed by the caller.
 
 	Synopsis:
-
-	int getev(envv,kp,kl,rpp)
-	const char	*envv[] ;
-	const char	kp[] ;
-	int		kl;
-	const char	**rpp ;
+	int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex
 
 	Arguments:
-
 	envv		array of pointers to strings
-	kp		name to search for
-	kl		length of name string
-	rpp		if not NULL a pointer to the found is stored
+	kp		name c-string pointer to search for
+	kl		name c-string length
+	rpp		if not nullptr a pointer to the found is stored
 
 	Returns:
-
 	>=0		length of found string (if any)
 	SR_NOTFOUND	name was not found
-	<0		bad
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* for |strlen(3c)| */
 #include	<usystem.h>
-#include	<localmisc.h>		/* extra types */
+#include	<matkeystr.h>
+#include	<localmisc.h>
 
 
 /* external subroutines */
-
-extern int	matkeystr(cchar **,cchar *,int) ;
 
 
 /* local variables */
@@ -63,32 +57,27 @@ extern int	matkeystr(cchar **,cchar *,int) ;
 
 /* exported subroutines */
 
-
-int getev(cchar **envv,cchar *np,int nl,cchar **rpp)
-{
-	int		rs = SR_OK ;
-	int		ei ;
+int getev(cchar **envv,cchar *np,int nl,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-	const char	*vp = NULL ;
-
-	if (envv == NULL) return SR_FAULT ;
-	if (np == NULL) return SR_FAULT ;
-
-	if (np[0] == '\0') return SR_INVALID ;
-
-	if ((ei = matkeystr(envv,np,nl)) >= 0) {
-	    if ((vp = strchr(envv[ei],'=')) != NULL) {
-	        vp += 1 ;
-	        vl = strlen(vp) ;
-	    }
-	} else {
-	    rs = SR_NOTFOUND ;
+	if (envv && np) {
+	    rs = SR_INVALID ;
+	    if (np[0]) {
+	        int	ei ;
+	        cchar	*vp = nullptr ;
+	        if ((ei = matkeystr(envv,np,nl)) >= 0) {
+	            if ((vp = strchr(envv[ei],'=')) != nullptr) {
+	                vp += 1 ;
+	                vl = strlen(vp) ;
+	            }
+	        } else {
+	            rs = SR_NOTFOUND ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	if (rpp) {
+	    *rpp = (rs >= 0) ? vp : nullptr ;
 	}
-
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? vp : NULL ;
-	}
-
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (getev) */

@@ -16,6 +16,7 @@
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<vecstr.h>
+#include	<localmisc.h>
 
 
 #ifndef	GETXUSERNAME

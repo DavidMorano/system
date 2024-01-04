@@ -1,11 +1,10 @@
-/* getportnum */
+/* getportnum SUPPORT */
+/* lang=C20 */
 
 /* get an INET port number */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 

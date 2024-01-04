@@ -1,4 +1,4 @@
-/* getclustername */
+/* getclustername SUPPORT */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */

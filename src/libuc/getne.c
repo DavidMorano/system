@@ -1,10 +1,10 @@
-/* getne */
+/* getne SUPPORT */
+/* lang=C20 */
 
 /* get protocol entry */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,29 +17,23 @@
 
 /*******************************************************************************
 
-        These subroutines were was written so that we could use a single
-        interface to access the 'netent' database on all UNIX® platforms. This
-        code module provides a platform independent implementation of UNIX®
-        'netent' database access subroutines.
+	These subroutines were was written so that we could use a
+	single interface to access the 'netent' database on all
+	UNIX® platforms. This code module provides a platform
+	independent implementation of UNIX® 'netent' database access
+	subroutines.
 
 	These are the preferred interfaces:
 
 	preferred interfaces: getne_name(), getne_num() ;
 	preferred interfaces: getgr_name(), getgr_gid() ;
 
-
 *******************************************************************************/
 
-
-#define	GETNE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

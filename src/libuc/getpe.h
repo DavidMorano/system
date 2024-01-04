@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* get protocol entry */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -13,6 +14,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<netdb.h>
+#include	<usystem.h>
+#include	<localmisc.h>
 
 
 #ifdef	__cplusplus
@@ -20,10 +23,10 @@ extern "C" {
 #endif
 
 extern int getpe_begin(int) noex ;
-extern int getpe_ent(struct protoent *,char *,int) noex ;
+extern int getpe_ent(PROTOENT *,char *,int) noex ;
+extern int getpe_name(PROTOENT *,char *,int,cchar *) noex ;
+extern int getpe_num(PROTOENT *,char *,int,int) noex ;
 extern int getpe_end() noex ;
-extern int getpe_name(struct protoent *,char *,int,const char *) noex ;
-extern int getpe_num(struct protoent *,char *,int,int) noex ;
 
 #ifdef	__cplusplus
 }

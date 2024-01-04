@@ -1,4 +1,4 @@
-/* getnprocessors */
+/* getnprocessors SUPPORT */
 /* lang=C++20 */
 
 /* get the number of currently online processors */

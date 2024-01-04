@@ -1,4 +1,4 @@
-/* getbufsize */
+/* getbufsize SUPPORT */
 /* lang=C++20 */
 
 /* get various system buffer sizes */

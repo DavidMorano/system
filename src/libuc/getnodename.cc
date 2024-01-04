@@ -5,12 +5,6 @@
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_GETHOSTNAME	0		/* use |gethostname(3c)| */
-#define	CF_UNAME	0		/* allow 'u_uname(3u)' */
-#define	CF_UINFO	1		/* use |uinfo(3uc)| */
-
-
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
@@ -53,8 +47,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/systeminfo.h>
-#include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstdlib>
@@ -62,16 +54,17 @@
 #include	<usystem.h>
 #include	<varnames.hh>
 #include	<uinfo.h>
-#include	<sfx.h>
-#include	<snwcpy.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#ifndef	VARNODE
-#define	VARNODE		"NODE"
-#endif
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -79,74 +72,82 @@
 
 /* local structures */
 
+namespace {
+    struct nodeinfo ;
+    typedef int (nodeinfo::*nodeinfo_f)() noex ;
+    struct nodeinfo {
+	char		*nbuf ;		/* user argument */
+	int		nlen ;		/* user argument */
+	nodeinfo(char *b,int l) noex : nbuf(b), nlen(l) { } ;
+	operator int () noex ;
+	int env() noex ;
+	int uinfo() noex ;
+    } ; /* end struct (nodeinfo) */
+}
+
 
 /* forward references */
 
 
 /* local variables */
 
+static constexpr nodeinfo_f	nodes[] = {
+	&nodeinfo::env,
+	&nodeinfo::uinfo,
+	nullptr
+} ;
+
 
 /* exported subroutines */
 
 int getnodename(char *nbuf,int nlen) noex {
-	cint		hlen = NODENAMELEN ;
-#if	CF_UNAME
-	struct utsname	un ;
-#endif
-	int		rs = SR_OK ;
-	int		sl = -1 ;
-	cchar		*sp = getenv(VARNODE) ;
-	char		hbuf[NODENAMELEN + 1] ;
-
-	if (nbuf == NULL)
-	    return SR_FAULT ;
-
-	nbuf[0] = '\0' ;
-
-#if	defined(SI_HOSTNAME)
-	if (sp == NULL) {
-	    if ((sl = u_sysinfo(SI_HOSTNAME,hbuf,hlen)) >= 0)
-		sp = hbuf ;
+	int		rs = SR_FAULT ;
+	if (nbuf) {
+	    nodeinfo	ni(nbuf,nlen) ;
+	    rs = ni ;
 	}
-#endif /* SI_HOSTNAME */
-
-#if	CF_GETHOSTNAME
-	if (sp == NULL) {
-	    if ((sl = uc_gethostname(hbuf,hlen)) >= 0) {
-		sp = hbuf ;
-	    }
-	} /* end if (trying GETHOSTNAME) */
-#endif /* CF_GETHOSTNAME */
-
-#if	CF_UINFO
-	if (sp == NULL) {
-	    UINFO_NAME	uin ;
-	    if ((sl = uinfo_name(&uin)) >= 0) {
-		sp = uin.nodename ; /* data does not go out of scope */
-	    }
-	} /* end if (trying GETHOSTNAME) */
-#endif /* CF_UINFO */
-
-#if	CF_UNAME
-	if (sp == NULL) {
-	    if ((rs = u_uname(&un)) >= 0) {
-		sp = un.nodename ;
-		sl = -1 ;
-	    }
-	} /* end if (trying UNAME) */
-#endif /* CF_UNAME */
-
-	if ((rs >= 0) && (sp != NULL)) {
-	    int		cl ;
-	    cchar	*cp ;
-	    rs = 0 ;
-	    if ((cl = sfwhitedot(sp,sl,&cp)) > 0) {
-	        rs = snwcpy(nbuf,nlen,cp,cl) ;
-	    }
-	}
-
 	return rs ;
 }
 /* end subroutine (getnodename) */
+
+
+/* local subroutines */
+
+nodeinfo::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs == 0) && nodes[i] ; i += 1) {
+	    nodeinfo_f	m = nodes[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+/* end method (nodeinfo::operator) */
+
+int nodeinfo::env() noex {
+	int		rs = SR_OK ;
+	cchar		*vn = varname.node ;
+	if (vn) {
+	    if (vn[0]) {
+		cchar	*vp = getenv(vn) ;
+	 	if (vp) {
+		    if (vp[0]) {
+			rs = sncpy1(nbuf,nlen,vp) ;
+		    } /* end if (non-empty) */
+		} /* env if (have) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (nodeinfo::env) */
+
+int nodeinfo::uinfo() noex {
+	uinfo_names	uin ;
+	int		rs ;
+	if ((rs = uinfo_name(&uin)) >= 0) {
+	    rs = sncpy1(nbuf,nlen,uin.nodename) ;
+	} /* end if (uinfo_name) */
+	return rs ;
+}
+/* end methode (nodeinfo::uinfo) */
 
 

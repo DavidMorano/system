@@ -1,6 +1,8 @@
-/* getpjid_name */
+/* getpjid_name SUPPORT */
+/* lang=C20 */
 
 /* get the project-ID for a given project-name */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,25 +16,25 @@
 
 /*******************************************************************************
 
-	This subroutine returns a project-ID for a specified program-name. 
+	NameL
+	getpjid_name
+
+	Description:
+	This subroutine returns a project-ID for a specified
+	program-name.
 
 	Synopsis:
-
-	int getpjid_name(cchar *np,int nl)
+	int getpjid_name(cchar *np,int nl) noex
 
 	Arguments:
-
 	np		name of project to look up 
 	nl		length of name (in bytes)
 
 	Returns:
-
-	<0		error
 	>=0		PJID of given project name
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 #include	<sys/types.h>
@@ -49,15 +51,13 @@
 
 /* external subroutines */
 
-extern int	hasalldig(cchar *,int) ;
+extern int	hasalldig(cchar *,int) noex ;
 
 
 /* exported subroutines */
 
-
-int getpjid_name(cchar *np,int nl)
-{
-	NULSTR		n ;
+int getpjid_name(cchar *np,int nl) noex {
+	nulstr		n ;
 	int		rs ;
 	int		rs1 ;
 	int		pjid = 0 ;
@@ -85,9 +85,7 @@ int getpjid_name(cchar *np,int nl)
 }
 /* end subroutine (getpjid_name) */
 
-
-int getpjid_proj(cchar *np,int nl)
-{
+int getpjid_proj(cchar *np,int nl) noex {
 	int		rs ;
 	if (np == NULL) return SR_FAULT ;
 	if (np[0] == '\0') return SR_INVALID ;

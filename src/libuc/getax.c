@@ -1,4 +1,4 @@
-/* getax */
+/* getax SUPPORT */
 /* lang=C20 */
 
 /* UNIX® System databases (PASSWD, SHADOW, GROUP, and PROJECT) */
@@ -25,7 +25,6 @@
 
 	preferred interfaces: getpw_name(), getpw_uid() ;
 	preferred interfaces: getgr_name(), getgr_gid() ;
-
 
 *******************************************************************************/
 

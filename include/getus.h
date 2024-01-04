@@ -13,6 +13,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 
@@ -22,7 +23,7 @@ extern "C" {
 
 extern int getus_begin() noex ;
 extern int getus_ent(char *,int) noex ;
-extern int getus_end() ;
+extern int getus_end() noex ;
 
 #ifdef	__cplusplus
 }
