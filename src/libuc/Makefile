@@ -575,10 +575,11 @@ base.o:		$(OBJ_BASE)
 
 # convert-to (CT)
 OBJ0_CT= ctxxx.o ctbin.o ctoct.o cthex.o ctdec.o ctchars.o 
-OBJ1_CT= ctdecp.o ctdecf.o cvtdig.o digbufsizes.o
-OBJ2_CT= xxtostr.o convertx.o
+OBJ1_CT= ctdecp.o ctdecf.o ctroman.o
+OBJ2_CT= cvtdig.o
+OBJ3_CT= xxtostr.o convertx.o digbufsizes.o
 
-OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o
+OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o obj3_ct.o
 
 obj0_ct.o:	$(OBJ0_CT)
 	$(LD) -r -o $@ $(OBJ0_CT)
@@ -588,6 +589,9 @@ obj1_ct.o:	$(OBJ1_CT)
 
 obj2_ct.o:	$(OBJ2_CT)
 	$(LD) -r -o $@ $(OBJ2_CT)
+
+obj3_ct.o:	$(OBJ3_CT)
+	$(LD) -r -o $@ $(OBJ3_CT)
 
 ct.o:		$(OBJ_CT)
 	$(LD) -r -o $@ $(OBJ_CT)

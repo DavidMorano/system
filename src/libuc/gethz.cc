@@ -1,5 +1,5 @@
 /* gethz SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get the machine HZ */
 /* version %I% last-modified %G% */
@@ -8,8 +8,8 @@
 /* revision history:
 
 	= 2001-04-11, David A­D­ Morano
-	This is a spin off of various programs that needed to get the machine
-	HZ value.
+	This is a spin off of various programs that needed to get
+	the machine HZ value.
 
 */
 
@@ -34,13 +34,13 @@
 				3 -> |sysconf(3c)| 'CLK_TCK' only
 
 	Returns:
-	<0		error
-	==0		?
 	>0		HZ value
+	==0		?
+	<0		error (system-return)
 
 	Notes:
-	1. In the old days, people actually caref about what this value
-	was. That no longer seems to be the case any longer.
+	1. In the old days, people actually cared about what this value
+	was. That no longer seems to be the case.
 
 *******************************************************************************/
 

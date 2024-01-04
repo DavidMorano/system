@@ -22,10 +22,10 @@
 
 	Description:
 	This subroutine takes raw strings that are supposed to be
-	environment variables and processes any substitutions that
-	are found in those strings. It also cleans up those environment
-	variables that are supposed to be directory paths of some
-	kind.
+	environment variables and processes any cookie substitutions
+	that are found in those strings. It also cleans up those
+	environment variables that are supposed to be directory
+	paths of some kind.
 
 	Synopsis:
 	int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex
@@ -65,32 +65,10 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#ifndef	FBUFLEN
-#define	FBUFLEN		(4 * MAXPATHLEN)
-#endif
-
-#define	DEFNAMELEN	120
-
-#define	ENVNAMELEN	120
-
-#define	EBUFLEN		1024
-
-#define	BUFLEN		(4 * MAXPATHLEN)
+#define	EBUFLEN		1024		/* environment-variable buf-length */
 
 #ifndef	DEFNPATHS
 #define	DEFNPATHS	20
-#endif
-
-#ifndef	VARHOME
-#define	VARHOME		"HOME"
 #endif
 
 #define	SUBINFO		struct subinfo
@@ -157,7 +135,7 @@ int envs_subs(envs *nlp,expcook *clp,vecstr *pvp,vecstr *evp) noex {
 	if (nlp && clp && pvp && evp) {
 	    static int	srs = mkvars() ;
 	    if ((rs = srs) >= 0) {
-	        SUBINFO	si, *sip = &si ;
+	        SUBINFO		si, *sip = &si ;
 	        envs_cur	cur ;
 	        sip->evp = evp ;
 	        sip->clp = clp ;
@@ -206,52 +184,34 @@ static int procvarnorm(subinfo *sip,cchar *kp,int kl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
 	if ((rs = buffer_start(&b,EBUFLEN)) >= 0) {
 	    envs_cur	cur ;
 	    int		bl ;
 	    cchar	*bp ;
-
 	    if ((rs = envs_curbegin(sip->nlp,&cur)) >= 0) {
-	        int		vl ;
+	        int	vl ;
 	        cchar	*vp ;
-
 	        while (rs >= 0) {
-
 	            vl = envs_fetch(sip->nlp,kp,kl,&cur,&vp) ;
 	            if (vl == SR_NOTFOUND) break ;
 	            rs = vl ;
-
 	            if ((rs >= 0) && (vl > 0)) {
-
-#ifdef	COMMENT
-	                if (c++ > 0) {
-	                    rs = buffer_char(&b,' ') ;
-			}
-#endif
-
 	                if (rs >= 0) {
 	                    rs = procsub(sip,&b,vp,vl) ;
 			}
-
 	            } /* end if */
-
 	        } /* end while */
-
 	        rs1 = envs_curend(sip->nlp,&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
-
 	    if (rs >= 0) {
 	        if ((bl = buffer_get(&b,&bp)) >= 0) {
 	            rs = vecstr_envadd(sip->evp,kp,bp,bl) ;
 		}
 	    } /* end if */
-
 	    rs1 = buffer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procvarnorm) */
@@ -262,15 +222,11 @@ static int procvarpath(subinfo *sip,cchar *kp,int kl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-
 	if ((rs = vecstr_start(&paths,DEFNPATHS,vo)) >= 0) {
 	    buffer	b ;
-
-	    if ((rs = buffer_start(&b,MAXPATHLEN)) >= 0) {
+	    cint	bslen = var.maxpathlen ;
+	    if ((rs = buffer_start(&b,bslen)) >= 0) {
 		envs_cur	cur ;
-
-/* split out into individual components */
-
 	        if ((rs = envs_curbegin(sip->nlp,&cur)) >= 0) {
 		    int		vl, bl ;
 		    cchar	*vp, *bp ;
@@ -290,9 +246,6 @@ static int procvarpath(subinfo *sip,cchar *kp,int kl) noex {
 	            rs1 = envs_curend(sip->nlp,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (cursor) */
-
-/* join the path-components */
-
 	        if (rs >= 0) {
 	            cint	size = vecstr_strsize(&paths) ;
 	            cint	npaths = vecstr_count(&paths) ;
@@ -304,10 +257,10 @@ static int procvarpath(subinfo *sip,cchar *kp,int kl) noex {
 			int	sl = 0 ;
 	                if ((rs = pathjoin(&paths,bufp,bufl)) > 0) {
 			    sl = rs ;
-				while (sl && (sp[0] == ':')) {
-				    sp += 1 ;
-				    sl -= 1 ;
-				}
+			    while (sl && (sp[0] == ':')) {
+				sp += 1 ;
+				sl -= 1 ;
+			    } /* end while */
 			    len = sl ;
 	                    rs = vecstr_envadd(sip->evp,kp,sp,sl) ;
 			} /* end if (pathjoin) */
@@ -318,11 +271,9 @@ static int procvarpath(subinfo *sip,cchar *kp,int kl) noex {
 	        rs1 = buffer_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (buffer) */
-
 	    rs1 = vecstr_finish(&paths) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr-paths) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (procvarpath) */
@@ -367,36 +318,25 @@ static int procpathsplit(subinfo *sip,vecstr *plp,cchar *vp,int vl) noex {
 #if	CF_EXPAND
 static int procsub(subinfo *sip,buffer *bp,cchar *vp,int vl) noex {
 	int		rs ;
-	int		rs1 ;
+	int		rs1 = SR_NOTFOUND ;
 	int		i ;
-	int		buflen = MAX(EBUFLEN,vl) ;
+	int		buflen = max(EBUFLEN,vl) ;
 	char		*buf = nullptr ;
 	char		*p ;
-
-/* dynamic determination of acceptable buffer size */
-
-	rs1 = SR_NOTFOUND ;
 	for (i = 0 ; (rs = uc_malloc(buflen,&p)) >= 0 ; i += 1) {
-
 	    buf = p ;
 	    rs1 = expcook_exp(sip->clp,0,buf,buflen,vp,vl) ;
-	    if (rs1 >= 0)
-	        break ;
-
+	    if (rs1 >= 0) break ;
 	    buflen += EBUFLEN ;
-
 	    uc_free(buf) ;
 	    buf = nullptr ;
 	} /* end while */
-
 	if ((rs >= 0) && (rs1 > 0)) {
 	    rs = buffer_strw(bp,buf,rs1) ;
 	}
-
 	if (buf != nullptr) {
 	    uc_free(buf) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (procsub) */

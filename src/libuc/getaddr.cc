@@ -84,7 +84,7 @@ static constexpr struct addrfamily	addrfamilies[] = {
 	{ "unspecified", AF_UNSPEC },
 	{ "unix", AF_UNIX },
 	{ "inet", AF_INET },
-	{ "inet4", AF_INET },
+	{ "inet4", AF_INET4 },
 	{ "inet6", AF_INET6 },
 	{ nullptr, 0 }
 } ;

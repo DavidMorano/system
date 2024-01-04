@@ -1,10 +1,8 @@
-/* ctroman */
+/* ctroman SUPPORT */
+/* lang=C++20 */
 
 /* subroutines to convert an integer to a Roman-Numeral representation */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,39 +16,31 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	ctroman
 
-        These subroutines convert an integer (signed or unsigned) into a Roman
-	Numeral representation.
+	Description:
+	These subroutines convert an integer (signed or unsigned)
+	into a Roman Numeral representation.
 
 	Synopsis:
-
-	int ctromanXX(rbuf,rlen,v)
-	char		rbuf[] ;
-	int		rlen ;
-	int		v ;
+	int ctromanXX(char *rbuf,int rlen,int v) noex
 
 	Arguments:
-
 	rbuf		caller supplied buffer
 	rlen		caller supplied buffer length
 	v		integer value to be converted
 
 	Returns:
-
 	>=0		length of buffer used by the conversion
-	<0		error in the conversion
-
+	<0		error in the conversion (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
@@ -58,19 +48,8 @@
 
 /* local defines */
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
 
 
 /* local structures */
@@ -78,14 +57,12 @@ extern int	debugprintf(const char *,...) ;
 
 /* forward references */
 
-int		ctromani(char *,int,int) ;
-
-static int	ictroman(char *,int,ulonglong) ;
+static int	ictroman(char *,int,ulonglong) noex ;
 
 
 /* local variables */
 
-static cchar	*hundreds[] = {
+static constexpr cchar	*hundreds[] = {
 	"",
 	"C",
 	"CC",
@@ -98,7 +75,7 @@ static cchar	*hundreds[] = {
 	"CM"
 } ;
 
-static cchar	*tens[] = {
+static constexpr cchar	*tens[] = {
 	"",
 	"X",
 	"XX",
@@ -111,7 +88,7 @@ static cchar	*tens[] = {
 	"XC"
 } ;
 
-static cchar	*ones[] = {
+static constexpr cchar	*ones[] = {
 	"",
 	"I",
 	"II",
@@ -127,59 +104,40 @@ static cchar	*ones[] = {
 
 /* exported subroutines */
 
-
-int ctroman(char *dbuf,int dlen,int v)
-{
-	return ctromani(dbuf,dlen,v) ;
-}
-/* end subroutine (ctroman) */
-
-
-int ctromani(char *dbuf,int dlen,int v)
-{
+int ctromani(char *dbuf,int dlen,int v) noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromani) */
 
-
-int ctromanl(char *dbuf,int dlen,long v)
-{
+int ctromanl(char *dbuf,int dlen,long v) noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanl) */
 
-
-int ctromanll(char *dbuf,int dlen,longlong v)
-{
+int ctromanll(char *dbuf,int dlen,longlong v) noex {
 	ulonglong	ulv = (longlong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanll) */
 
-
 /* unsigned */
-int ctromanui(char *dbuf,int dlen,uint v)
-{
+int ctromanui(char *dbuf,int dlen,uint v) noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanui) */
 
-
 /* unsigned */
-int ctromanul(char *dbuf,int dlen,ulong v)
-{
+int ctromanul(char *dbuf,int dlen,ulong v) noex {
 	ulonglong	ulv = (ulonglong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
 /* end subroutine (ctromanul) */
 
-
 /* unsigned */
-int ctromanull(char *dbuf,int dlen,ulonglong v)
-{
+int ctromanull(char *dbuf,int dlen,ulonglong v) noex {
 	ulonglong	ulv = (longlong) v ;
 	return ictroman(dbuf,dlen,ulv) ;
 }
@@ -188,26 +146,24 @@ int ctromanull(char *dbuf,int dlen,ulonglong v)
 
 /* local subroutines */
 
-
-static int ictroman(char *dbuf,int dlen,ulonglong v)
-{
-	SBUF		b ;
+static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
+	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
-	cchar		**tabs[] = { hundreds, tens, ones } ;
+	mainv		tabs[] = { hundreds, tens, ones } ;
 	if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
-	    const int	ntabs = nelem(tabs) ;
-	    int		n = 1000 ;
-	    int		r ;
+	    cint	ntabs = nelem(tabs) ;
+	    ulonglong	n = 1000 ;
+	    ulonglong	r ;
 	    if (v >= n) {
-	        const int	i = (v/n) ;
-	        rs = sbuf_nchar(&b,i,'M') ;
+	        cint		i = (v/n) ;
+	        rs = sbuf_nchar(&b,'M',i) ;
 	        v = (v%n) ;
 	    }
 	    n /= 10 ;
 	    for (r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
 	        if (v >= n) {
-	            const int	i = (v/n) ;
+	            cint	i = (v/n) ;
 	            rs = sbuf_strw(&b,tabs[r][i],-1) ;
 	            v = (v%n) ;
 	        }

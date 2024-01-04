@@ -1,4 +1,4 @@
-/* buffer */
+/* buffer SUPPORT */
 /* lang=C++20 */
 
 /* string buffer object */

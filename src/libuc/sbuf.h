@@ -1,4 +1,4 @@
-/* HEADER sbuf */
+/* sbuf HEADER */
 /* lang=C20 */
 
 /* storage buffer (SBuf) object */
@@ -34,7 +34,99 @@ struct sbuf_head {
 	int		index ;		/* current buffer index (changes) */
 } ;
 
-typedef SBUF		sbuf ;
+#ifdef	__cplusplus
+enum sbufmems {
+	sbufmem_deci,
+	sbufmem_hexc,
+	sbufmem_hexi,
+	sbufmem_chr,
+	sbufmem_blanks,
+	sbufmem_rem,
+	sbufmem_getlen,
+	sbufmem_getprev,
+	sbufmem_finish,
+	sbufmem_overlast
+} ;
+struct sbuf_iter {
+	cchar		*cp = nullptr ;
+	sbuf_iter() = default ;
+	sbuf_iter(cchar *p) noex : cp(p) { } ;
+	sbuf_iter(const sbuf_iter &oit) noex {
+	    if (this != &oit) {
+		cp = oit.cp ;
+	    }
+	} ;
+	sbuf_iter &operator = (const sbuf_iter &oit) noex {
+	    if (this != &oit) {
+		cp = oit.cp ;
+	    }
+	    return *this ;
+	} ;
+	bool operator != (const sbuf_iter &) noex ;
+	bool operator == (const sbuf_iter &) noex ;
+	char operator * () noex {
+	    return *cp ;
+	} ;
+	sbuf_iter operator + (int) const noex ;
+	sbuf_iter operator += (int) noex ;
+	sbuf_iter operator ++ () noex ; /* pre */
+	sbuf_iter operator ++ (int) noex ; /* post */
+	void increment(int = 1) noex ;
+} ; /* end struct sbuf_iter) */
+struct sbuf ;
+struct sbuf_co {
+	sbuf		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (sbuf *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = 1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (sbuf_co) */
+struct sbuf : sbuf_head {
+	sbuf_co		deci ;
+	sbuf_co		hexc ;
+	sbuf_co		hexi ;
+	sbuf_co		chr ;
+	sbuf_co		blanks ;
+	sbuf_co		rem ;
+	sbuf_co		getlen ;
+	sbuf_co		getprev ;
+	sbuf_co		finish ;
+	sbuf() noex {
+	    deci(this,sbufmem_deci) ;
+	    hexc(this,sbufmem_hexc) ;
+	    hexi(this,sbufmem_hexi) ;
+	    chr(this,sbufmem_chr) ;
+	    blanks(this,sbufmem_blanks) ;
+	    rem(this,sbufmem_rem) ;
+	    getlen(this,sbufmem_getlen) ;
+	    getprev(this,sbufmem_getprev) ;
+	    finish(this,sbufmem_finish) ;
+	} ;
+	sbuf(const sbuf &) = delete ;
+	sbuf &operator = (const sbuf &) = delete ;
+	int start(char *,int) noex ;
+	int nchr(int,int = 1) noex ;
+	sbuf_iter begin() noex {
+	    sbuf_iter		it(rbuf) ;
+	    return it ;
+	} ;
+	sbuf_iter end() noex {
+	    sbuf_iter		it(rbuf+index) ;
+	    return it ;
+	} ;
+	void dtor() noex ;
+	~sbuf() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (sbuf) */
+#else	/* __cplusplus */
+typedef struct sbuf_head	sbuf ;
+#endif /* __cplusplus */
 
 #ifdef	__cplusplus
 extern "C" {
@@ -42,8 +134,8 @@ extern "C" {
 
 extern int	sbuf_start(sbuf *,char *,int) noex ;
 extern int	sbuf_finish(sbuf *) noex ;
-extern int	sbuf_buf(sbuf *,const char *,int) noex ;
-extern int	sbuf_strw(sbuf *,const char *,int) noex ;
+extern int	sbuf_buf(sbuf *,cchar *,int) noex ;
+extern int	sbuf_strw(sbuf *,cchar *,int) noex ;
 extern int	sbuf_strs(sbuf *,int,cchar **) noex ;
 extern int	sbuf_deci(sbuf *,int) noex ;
 extern int	sbuf_decl(sbuf *,long) noex ;
@@ -66,9 +158,9 @@ extern int	sbuf_adv(sbuf *,int,char **) noex ;
 extern int	sbuf_rem(sbuf *) noex ;
 extern int	sbuf_getlen(sbuf *) noex ;
 extern int	sbuf_getbuf(sbuf *,cchar **) noex ;
-extern int	sbuf_getpoint(sbuf *,const char **) noex ;
+extern int	sbuf_getpoint(sbuf *,cchar **) noex ;
 extern int	sbuf_getprev(sbuf *) noex ;
-extern int	sbuf_printf(sbuf *,const char *,...) noex ;
+extern int	sbuf_printf(sbuf *,cchar *,...) noex ;
 extern int	sbuf_termconseq(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted(sbuf *,cchar *,int) noex ;
 

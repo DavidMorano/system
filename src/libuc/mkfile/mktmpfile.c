@@ -1,4 +1,4 @@
-/* mktmpfile */
+/* mktmpfile SUPPORT */
 /* lang=C20 */
 
 /* make a temporary file */
@@ -50,6 +50,8 @@
 #include	<string.h>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"mktmpfile.h"
 
 
 /* local defines */

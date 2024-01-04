@@ -1,10 +1,11 @@
-#!/bin/ksh
+#!/usr/extra/bin/ksh
 # STOREDIGITHAND
 
 CAN=digithandling
 FILEGLOB=
-FILEGLOB+=" cvtdig.[ch]* ct*.[ch]* cf*.[ch]* xxtostr.[ch]* *strto*.[ch]* "
-FILEGLOB+="digbufsizes.[ch]* "
+FILEGLOB+=" cvtdig.[ch]* ct*.[ch]* "
+FILEGLOB+=" cf*.[ch]* xxtostr.[ch]* *strto*.[ch]* "
+FILEGLOB+=" digbufsizes.[ch]* "
 
 CADIR=${HOME}/store/src
 CAFILE=${CADIR}/${CAN}.ca.bz2
