@@ -1,44 +1,42 @@
-/* uclustername */
+/* uclustername HEADER */
+/* lang=C20 */
 
 /* UNIX® cluster name */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	UCLUSTERNAME_INCLUDE
-#define	UCLUSTERNAME_INCLUDE	1
+#define	UCLUSTERNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<usystem.h>
+#include	<localmisc.h>
 
-
-#if	(! defined(UCLUSTERNAME_MASTER)) || (UCLUSTERNAME_MASTER == 0)
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int uclustername_init() ;
-extern int uclustername_set(const char *,int,const char *,int) ;
-extern int uclustername_get(char *,int,const char *) ;
-extern void uclustername_fini() ;
+extern int uclustername_init() noex ;
+extern int uclustername_set(cchar *,int,cchar *,int) noex ;
+extern int uclustername_get(char *,int,cchar *) noex ;
+extern void uclustername_fini() noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* UCLUSTERNAME_MASTER */
 
 #endif /* UCLUSTERNAME_INCLUDE */
 

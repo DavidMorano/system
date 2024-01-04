@@ -1,5 +1,5 @@
 /* getax SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* UNIX® System databases (PASSWD, SHADOW, GROUP, and PROJECT) */
 /* version %I% last-modified %G% */
