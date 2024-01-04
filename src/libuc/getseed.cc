@@ -1,12 +1,10 @@
-/* getseed */
+/* getseed SUPPORT */
+/* lang=C++20 */
 
 /* get random data from the UNIX® kernel */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_GETHRTIME	1		/* use |gethrtime(3c)| */
-
 
 /* revision history:
 
@@ -19,30 +17,30 @@
 
 /*******************************************************************************
 
+	Name:
+	getseed
 	
 	Synopsis:
-
-	int getseed(int seed)
+	int getseed(int seed) noex
 
 	Arguments:
-
 	seed		given value to add to the mix
 
 	Returns:
-
-	<0		error
 	>0		returned number of bytes
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<usystem.h>
+#include	<cfdec.h>
+#include	<ranlc.h>
 #include	<localmisc.h>
 
 
@@ -54,10 +52,6 @@
 
 
 /* external subroutines */
-
-extern int	randlc(int) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	cfdeci(cchar *,int,int *) ;
 
 
 /* local structures */
@@ -71,10 +65,8 @@ extern int	cfdeci(cchar *,int,int *) ;
 
 /* exported subroutines */
 
-
-int getseed(int seed)
-{
-	struct timeval	tv ;
+int getseed(int seed) noex {
+	TIMEVAL		tv ;
 	const pid_t	pid = getpid() ;
 	const uid_t	uid = getuid() ;
 	uint		rv = 0 ;

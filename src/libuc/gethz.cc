@@ -46,8 +46,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<usystem.h>
 #include	<localmisc.h>
 

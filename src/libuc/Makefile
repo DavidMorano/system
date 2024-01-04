@@ -907,7 +907,7 @@ vechand.o:		vechand.cc vechand.h
 vecsorthand.o:		vecsorthand.cc vecsorthand.h
 
 vecstr.o:		vecstr.cc vecstr.h
-vecstr_env.o:		vecstr_env.c vecstr.h
+vecstr_env.o:		vecstr_env.cc vecstr.h
 vecstr_envfile.o:	vecstr_envfile.cc vecstr.h
 vecstr_adduniqs.o:	vecstr_adduniqs.c vecstr.h
 vecstr_addpath.o:	vecstr_addpath.cc vecstr.h
@@ -915,7 +915,7 @@ vecstr_avmkstr.o:	vecstr_avmkstr.c vecstr.h
 vecstr_loadfile.o:	vecstr_loadfile.cc vecstr.h
 
 vecpstr.o:		vecpstr.cc vecpstr.h
-vecpstr_env.o:		vecpstr_env.c vecpstr.h
+vecpstr_env.o:		vecpstr_env.cc vecpstr.h
 vecpstr_envfile.o:	vecpstr_envfile.cc vecpstr.h
 vecpstr_adduniqs.o:	vecpstr_adduniqs.c vecpstr.h
 vepcstr_addpath.o:	vecpstr_addpath.cc vecpstr.h
@@ -1317,6 +1317,7 @@ nodedb.o:		nodedb.cc nodedb.h
 bits.o:			bits.cc bits.h
 envs.o:			envs.cc envs.h
 envs_procxe.o:		envs_procxe.cc envs.h
+envs_subs.o:		envs_subs.cc envs.h
 expcook.o:		expcook.cc expcook.h
 keyopt.o:		keyopt.cc keyopt.h
 

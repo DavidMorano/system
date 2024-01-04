@@ -1,10 +1,8 @@
-/* getheaddr */
+/* getheaddr SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to get a single host entry by its address */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,65 +16,48 @@
 
 /*******************************************************************************
 
-        This subroutine is a platform independent subroutine to get an INET host
-        entry by its INET address, but does it dumbly on purpose.
+	Name:
+	getheaddr
+
+	Deswcription:
+	This subroutine is a platform independent subroutine to get
+	an INET host entry by its INET address, but does it dumbly
+	on purpose.
 
 	Synopsis:
-
-	int getheaddr(addr,hep,hbuf,hlen)
-	const char	addr[] ;
-	struct hostent	*hep ;
-	char		hbuf[] ;
-	int		hlen ;
+	int getheaddr(cchar *addr,HOSTENT *hep,char *hbuf,int hlen) noex
 
 	Arguments:
-
 	- addr		address to lookup
 	- hep		pointer to 'hostent' structure
 	- hbuf		user supplied hbuffer to hold result
 	- hlen	length of user supplied hbuffer
 
 	Returns:
-
 	>=0		host was found OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<snx.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#ifndef	INET4DOTDECLEN
-#define	INET4DOTDECLEN	16
-#endif
-
-#define	TIMEOUT		3
-
 
 /* external subroutines */
-
-extern int	snddd(char *,int,uint,uint) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
 
 
 /* external variables */
@@ -90,28 +71,13 @@ extern int	debugprintf(const char *,...) ;
 
 /* exported subroutines */
 
-
-int getheaddr(cchar *addr,struct hostent *hep,char *hbuf,int hlen)
-{
-	const int	af = AF_INET ;
-	int		rs ;
-	int		addrlen ;
-
-#if	CF_DEBUGS
-	debugprintf("getheaddr: ent\n") ;
-#endif
-
-	if (addr == NULL) return SR_FAULT ;
-	if (hep == NULL) return SR_FAULT ;
-	if (hbuf == NULL) return SR_FAULT ;
-
-	addrlen = sizeof(struct in_addr) ;
-	rs = uc_gethostbyaddr(addr,addrlen,af,hep,hbuf,hlen) ;
-
-#if	CF_DEBUGS
-	debugprintf("getheaddr: ret rs=%d\n",rs) ;
-#endif
-
+int getheaddr(cchar *addr,HOSTENT *hep,char *hbuf,int hlen) noex {
+	cint		af = AF_INET ;
+	int		rs = SR_FAULT ;
+	if (addr && hep && hbuf) {
+	    cint	addrlen = sizeof(struct in_addr) ;
+	    rs = uc_gethostbyaddr(addr,addrlen,af,hep,hbuf,hlen) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getheaddr) */

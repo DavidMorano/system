@@ -17,41 +17,38 @@
 
 /*******************************************************************************
 
+	Name:
+	getportnum
+
+	Description:
 	This subroutine tries to retrieve a port number given:
 		a. a protocol name
 		b. a service name
 
 	Synopsis:
-
-	int getportnum(protoname,portspec)
-	const char	protoname[] ;
-	const char	portspec[] ;
+	int getportnum(cchar *protoname,cchar *portspec) noex
 
 	Arguments:
-
 	protoname	protocol name
 	portspec	port specification to lookup 
 
 	Return:
-
 	>=0		port-number
-	<0		error
-
+	<0		error (syhstem-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<hasx.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 
@@ -60,10 +57,9 @@
 
 /* external subroutines */
 
-extern int	getserv_name(cchar *,cchar *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isdigitlatin(int) ;
+extern "C" {
+    extern int	getserv_name(cchar *,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -83,34 +79,26 @@ extern int	isdigitlatin(int) ;
 
 /* exported subroutines */
 
-
-int getportnum(cchar *pn,cchar *ps)
-{
-	int		rs = SR_OK ;
-	int		rs1 ;
-	int		pl ;
+int getportnum(cchar *pn,cchar *ps) noex {
+	int		rs = SR_FAULT ;
 	int		port = -1 ;
-
-	if (ps == NULL) return SR_FAULT ;
-
-	if (ps[0] == '\0') return SR_INVALID ;
-
-	pl = strlen(ps) ;
-
-	if (hasalldig(ps,pl)) {
-	    rs = cfdeci(ps,pl,&port) ;
-	} /* end if */
-
-	if ((rs >= 0) && (port < 0) && (pn != NULL)) {
-	    if ((rs = getserv_name(pn,ps)) >= 0) {
-	        port = rs ;
-	    } /* end if (getserv_name) */
-	} /* end if */
-
-	if ((rs >= 0) && (port < 0)) {
-	    rs = SR_NOTFOUND ;
-	}
-
+	if (ps) {
+	    rs = SR_INVALID ;
+	    if (ps[0]) {
+		cint	pl = strlen(ps) ;
+	        if (hasalldig(ps,pl)) {
+	            rs = cfdeci(ps,pl,&port) ;
+	        } /* end if */
+	        if ((rs >= 0) && (port < 0) && (pn != NULL)) {
+	            if ((rs = getserv_name(pn,ps)) >= 0) {
+	                port = rs ;
+	            } /* end if (getserv_name) */
+	        } /* end if */
+	        if ((rs >= 0) && (port < 0)) {
+	            rs = SR_NOTFOUND ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;
 }
 /* end subroutine (getportnum) */

@@ -4,9 +4,7 @@
 /* get the local node name and INET domain name */
 /* version %I% last-modified %G% */
 
-
 #define	CF_GUESS	1	/* try to guess domain names? */
-
 
 /* revision history:
 
@@ -19,31 +17,26 @@
 
 /*******************************************************************************
 
+	Name:
+	getnodedomain
+
+	Description:
 	Get the local host node name and INET domain name.
 
 	Synopsis:
-
-	int getnodedomain(nodename,domainname)
-	char	nodename[] ;
-	char	domainname[] ;
+	int getnodedomain(char *nodename,char *domainname) noex
 
 	Arguments:
-
 	nodename	buffer to receive the local node name
 	domainname	buffer to receive the local INET domain name
 
 	Returns:
-
 	SR_OK		if OK
 	SR_NOTFOUND	if could not get something needed for correct operation
 
-
 	The algorithm for finding the local nodename is:
-
 	1. use the first component of the environment variable NODE
-
 	2. use the first component of the nodename returned from the system
-
 
 	NOTE: Searching for the "current" domain is not an easy task and never
 	has been.  There is no easy way to find out the domain part of the
@@ -73,21 +66,17 @@
 
 	9. return that we couln't find a domain for the current node!
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<strings.h>		/* |strncasecmp()| */
-
+#include	<cstdlib>
+#include	<strings.h>		/* from BSD |strncasecmp()| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<char.h>
