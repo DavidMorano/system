@@ -224,7 +224,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	if (! sip->init.pw) {
 	    PASSWD	*pwp = &sip->pw ;
 	    cint	pwlen = sip->pwlen ;
-	    sip->init.pw = TRUE ;
+	    sip->init.pw = true ;
 	    if (un[0] != '-') {
 	        if (hasalldig(un,-1)) {
 	            uint	uv ;
@@ -319,7 +319,7 @@ static int dirsearch(cchar *basedname,cchar *un) noex {
 	fsdir_ent	ds ;
 	int		rs ;
 	int		rs1 ;
-	int		f_found = FALSE ;
+	int		f_found = false ;
 
 	if ((rs = fsdir_open(&dir,basedname)) >= 0) {
 	    cchar	*fnp ;

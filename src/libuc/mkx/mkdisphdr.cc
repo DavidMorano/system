@@ -47,6 +47,8 @@
 #include	<sbuf.h>
 #include	<localmisc.h>
 
+#include	"mkdisphdr.h"
+
 
 /* local defines */
 
@@ -93,7 +95,7 @@ int mkdisphdr(char *abuf,int alen,cchar *sp,int sl) noex {
 	        if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	            if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 			nullptr_t	np{} ;
-	                cchar	*fp = fbuf ;
+	                cchar		*fp = fbuf ;
 	                int		fl ;
 	                int		c = 0 ;
 	                while ((fl = field_sharg(&fsb,np,fbuf,flen)) >= 0) {

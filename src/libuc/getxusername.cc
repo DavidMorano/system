@@ -311,7 +311,7 @@ int getxusername(GETXUSERNAME *xup) noex {
 
 	xup->ubuf[0] = '\0' ;
 	if (xup->uid < 0) {
-	    xup->f_self = TRUE ;
+	    xup->f_self = true ;
 	    xup->uid = getuid() ;
 	} else {
 	    const uid_t	suid = getuid() ;
@@ -359,7 +359,7 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	        xu.ubuf = ubuf ;
 	        xu.ulen = ulen ;
 	        xu.uid = uid ;
-	        xu.f_tried = TRUE ;
+	        xu.f_tried = true ;
 	        if ((rs = getxusername(&xu)) >= 0) {
 	            rs = xu.unl ;
 	            if (xu.unl <= 0) {
@@ -463,7 +463,7 @@ static int getxusername_map(GETXUSERNAME *xup) noex {
 	uid_t		uid = xup->uid ;
 	int		rs = SR_OK ;
 	int		i ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	xup->unl = 0 ;
 	for (i = 0 ; mapents[i].uid >= 0 ; i += 1) {

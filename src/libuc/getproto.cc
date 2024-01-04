@@ -43,6 +43,8 @@
 #include	<getbufsize.h>
 #include	<localmisc.h>
 
+#include	"getproto.h"
+
 
 /* local defines */
 
@@ -66,14 +68,14 @@ int getproto_name(cchar *protop,int protol) noex {
 	int		rs ;
 	int		rs1 ;
 	int		proto = 0 ;
-	cchar		*pname ;
+	cchar		*pname{} ;
 	if ((rs = nulstr_start(&n,protop,protol,&pname)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_pr)) >= 0) {
-	        struct protoent	pe ;
+	        PROTOENT	pe ;
 	        cint		pelen = rs ;
-	        char		*pebuf ;
+	        char		*pebuf{} ;
 	        if ((rs = uc_malloc((pelen+1),&pebuf)) >= 0) {
-	            if ((rs = uc_getprotobyname(pname,&pe,pebuf,pelen)) >= 0) {
+	            if ((rs = uc_getprotobyname(&pe,pebuf,pelen,pname)) >= 0) {
 	                proto = pe.p_proto ;
 	            }
 	            rs1 = uc_free(pebuf) ;

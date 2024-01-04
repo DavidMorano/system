@@ -59,7 +59,7 @@ int ptma_create(PTMA *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		to_nomem = utimeout[uto_nomem] ;
-	    bool	f_exit = FALSE ;
+	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = pthread_mutexattr_init(op)) > 0) rs = (- rs) ;
 	        if (rs < 0) {
@@ -68,13 +68,13 @@ int ptma_create(PTMA *op) noex {
 	                if (to_nomem-- > 0) {
 		            msleep(1000) ;
 		        } else {
-	                    f_exit = TRUE ;
+	                    f_exit = true ;
 		        }
 	                break ;
 		    case SR_INTR:
 		        break ;
 		    default:
-		        f_exit = TRUE ;
+		        f_exit = true ;
 		        break ;
 		    } /* end switch */
 	        } /* end if (error) */

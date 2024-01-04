@@ -206,7 +206,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 int pwcache_invalidate(pwcache *op,cchar *un) noex {
         int             rs ;
         int             rs1 ;
-        int             f_found = FALSE ;
+        int             f_found = false ;
 	if ((rs = pwcache_magic(op,un)) >= 0) {
                 rs = SR_INVALID ;
                 if (un[0]) {
@@ -215,7 +215,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
                     key.len = strlen(un) ;
                     if ((rs = hdb_fetch(&op->db,key,nullptr,&val)) >= 0) {
         		REC    	*ep = (REC *) val.buf ;
-                        f_found = TRUE ;
+                        f_found = true ;
                         {
                             pq_ent      *pep = (pq_ent *) ep ;
                             rs1 = pq_unlink(&op->lru,pep) ;
@@ -245,7 +245,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
 int pwcache_check(pwcache *op,time_t dt) noex {
         int             rs ;
         int             rs1 ;
-        int             f = FALSE ;
+        int             f = false ;
 	if ((rs = pwcache_magic(op)) >= 0) {
                 hdb_cur         cur{} ;
                 hdb_datum       key{}, val{} ;
@@ -258,7 +258,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
                         if (rs >= 0) {
         	            REC		*ep = (REC *) val.buf ;
                             if ((rs = record_old(ep,dt,op->ttl)) > 0) {
-                                f = TRUE ;
+                                f = true ;
                                 if ((rs = pwcache_recdel(op,ep)) >= 0) {
                                     pq_ent      *pep = (pq_ent *) ep ;
                                     rs = pq_unlink(&op->lru,pep) ;

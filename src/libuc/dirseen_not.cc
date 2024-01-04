@@ -84,7 +84,7 @@ extern "C" {
 int dirseen_notseen(DIRSEEN *dsp,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	cint		nrs = SR_NOENT ;
 	int		rs = SR_FAULT ;
-	int		f = FALSE ;
+	int		f = false ;
 	if (dsp && sbp && dbuf) {
 	    sbp->st_ino = 0 ;
 	    sbp->st_dev = 0 ;
@@ -93,7 +93,7 @@ int dirseen_notseen(DIRSEEN *dsp,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	            if (S_ISDIR(sbp->st_mode)) {
 	    	        if ((rs = dirseen_havedevino(dsp,sbp)) == nrs) {
 			    rs = SR_OK ;
-			    f = TRUE ;
+			    f = true ;
 		        }
 		    }
 	        } else if (isNotPresent(rs)) {

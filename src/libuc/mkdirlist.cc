@@ -213,7 +213,7 @@ int mkdirlist_link(MKDIRLIST *op)
 	            if ((! ep->f.link) && (bbcmp(pep->name,ep->name) == 0)) {
 
 	                pep->link = ep ;
-	                ep->f.link = TRUE ;
+	                ep->f.link = true ;
 
 	                pep = ep ;
 	            } /* end if (board match) */
@@ -360,7 +360,7 @@ static int mkdirlist_procdircache(MKDIRLIST *op,cchar *newsdname,int fd) noex {
 	        USTAT	sb ;
 	        const int	nlen = MAXPATHLEN ;
 	        int	line = 0 ;
-	        int	f_bol = TRUE ;
+	        int	f_bol = true ;
 	        int	f_eol ;
 	        char	nbuf[MAXPATHLEN+1] ;
 	        while ((rs = filebuf_readline(&b,nbuf,nlen,-1)) > 0) {
@@ -528,7 +528,7 @@ int		order ;
 	if (! ep->f.link) {
 	    if (bbcmp(ung,ep->name) == 0) {
 	        rs = 1 ;
-	        ep->f.seen = TRUE ;
+	        ep->f.seen = true ;
 	        ep->f.subscribe = f_sub ;
 	        ep->utime = utime ;
 		ep->order = order ;
@@ -553,7 +553,7 @@ static int entry_show(MKDIRLIST_ENT *ep,cchar *ng,int order) noex {
 	if (! ep->f.link) {
 	    if (bbcmp(ng,ep->name) == 0) {
 		ep->order = order ;
-	        ep->f.show = TRUE ;
+	        ep->f.show = true ;
 	        rs = 1 ;
 	    } /* end if (name match) */
 	} /* end if (not a linked entry) */

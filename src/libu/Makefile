@@ -292,6 +292,10 @@ timewatch.o:		timewatch.cc timewatch.hh
 uuname.o:		uuname.cc
 usysauxinfo.o:		isysauxinfo.cc
 
+# OPEN
+uopen.o:		uopen.cc uopen.h
+
+# OTHER
 u_poll.o:		u_poll.c $(INCS)
 u_statvfs.o:		u_statvfs.c $(INCS)
 u_fstatvfs.o:		u_fstatvfs.c $(INCS)

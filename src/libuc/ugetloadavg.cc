@@ -142,13 +142,13 @@ int ucgetloadavg(double *dla,int n) noex {
 	            if (to_again-- > 0) {
 			msleep(100) ;
 		    } else {
-			f_exit = TRUE ;
+			f_exit = true ;
 		    }
 	            break ;
 	        case SR_INTR:
 	            break ;
 		default:
-		    f_exit = TRUE ;
+		    f_exit = true ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (error) */

@@ -179,7 +179,7 @@ int psem_waiter(psem *psp,int to) noex {
 	if (psp) {
 	    cint	mint = (1000/NLPS) ;
 	    int		cto = (to*NLPS) ;
-	    bool		f_exit = FALSE ;
+	    bool		f_exit = false ;
 	    repeat {
 	        if ((rs = sem_trywait(psp)) < 0) rs = (- errno) ;
 	        if (rs < 0) {

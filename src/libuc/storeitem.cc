@@ -98,7 +98,7 @@ int storeitem_start(storeitem *op,char *dbuf,int dlen) noex {
 	        op->dbuf = dbuf ;
 	        op->dlen = dlen ;
 	        op->index = 0 ;
-	        op->f_overflow = FALSE ;
+	        op->f_overflow = false ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -144,7 +144,7 @@ int storeitem_strw(storeitem *op,cchar *sp,int sl,cchar **rpp) noex {
 	    		    op->index += (wlen + 1) ;
 	            	    if (rpp) *rpp = dbuf ;
 			} else {
-	    		    op->f_overflow = TRUE ;
+	    		    op->f_overflow = true ;
 	    		    rs = SR_OVERFLOW ;
 			    op->index = rs ;
 			}
@@ -180,7 +180,7 @@ int storeitem_buf(storeitem *op,cvoid *vbp,int vbl,cchar **rpp) noex {
 	    		    op->index += (wlen + 1) ;
 	    		    if (rpp) *rpp = dbuf ;
 			} else {
-	    		    op->f_overflow = TRUE ;
+	    		    op->f_overflow = true ;
 	    		    rs = SR_OVERFLOW ;
 	    		    op->index = rs ;
 			}
@@ -214,7 +214,7 @@ int storeitem_dec(storeitem *op,int v,cchar **rpp) noex {
 			        rs = snwcpy(dbuf,dlen,tbuf,rs) ;
 			        wlen = rs ;
 		            } else {
-	                        op->f_overflow = TRUE ;
+	                        op->f_overflow = true ;
 	                        rs = SR_OVERFLOW ;
 		            }
 		        } /* end if */
@@ -250,7 +250,7 @@ int storeitem_char(storeitem *op,int ch,cchar **rpp) noex {
 	    	        op->index += (wlen + 1) ;
 	    	        if (rpp) *rpp = dbuf ;
 		    } else {
-	    	        op->f_overflow = TRUE ;
+	    	        op->f_overflow = true ;
 	    	        rs = SR_OVERFLOW ;
 	    	        op->index = rs ;
 		    }
@@ -292,7 +292,7 @@ int storeitem_block(storeitem *op,int bsize,int align,void **vpp) noex {
 	    		        op->index += inc ;
 	    		        *vpp = (void *) nv ;
 			    } else {
-	    	        	op->f_overflow = TRUE ;
+	    	        	op->f_overflow = true ;
 	    			rs = SR_OVERFLOW ;
 	    			op->index = rs ;
 			    }

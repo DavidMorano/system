@@ -287,7 +287,7 @@ static int try_straight(SUBINFO *mip)
 	const char	*hn = aip->hostname ;
 
 	if (hn != NULL) {
-	    int f = FALSE ;
+	    int f = false ;
 	    f = f || ((hn[0] == 'a') && (strcmp(hn,ANYHOST) == 0)) ;
 	    f = f || (hn[0] == '*') ;
 	    f = f || (hn[0] == '\0') ;

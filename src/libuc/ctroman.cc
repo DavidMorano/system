@@ -154,14 +154,13 @@ static int ictroman(char *dbuf,int dlen,ulonglong v) noex {
 	if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
 	    cint	ntabs = nelem(tabs) ;
 	    ulonglong	n = 1000 ;
-	    ulonglong	r ;
 	    if (v >= n) {
 	        cint		i = (v/n) ;
 	        rs = sbuf_nchar(&b,'M',i) ;
 	        v = (v%n) ;
 	    }
 	    n /= 10 ;
-	    for (r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
+	    for (int r = 0 ; (rs >= 0) && (r < ntabs) ; r += 1) {
 	        if (v >= n) {
 	            cint	i = (v/n) ;
 	            rs = sbuf_strw(&b,tabs[r][i],-1) ;

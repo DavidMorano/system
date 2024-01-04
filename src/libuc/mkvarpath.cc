@@ -170,13 +170,13 @@ static int mkvarpath_list(char *rbuf,cchar *pathlist,cchar *rp) noex {
 	int		pl = 0 ;
 	if ((rs = vecstr_start(&paths,2,0)) >= 0) {
 	    int		sl ;
-	    int		f_zero = FALSE ;
+	    int		f_zero = false ;
 	    cchar	*sp = pathlist ;
 	    cchar	*tp ;
 	    while ((tp = strchr(sp,':')) != nullptr) {
 	        sl = (tp-sp) ;
 	        if (sl || (! f_zero)) {
-	            if ((! f_zero) && (sl == 0)) f_zero = TRUE ;
+	            if ((! f_zero) && (sl == 0)) f_zero = true ;
 	            rs = mkvarpath_one(rbuf,&paths,sp,sl,rp) ;
 	            pl = rs ;
 	        }

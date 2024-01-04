@@ -97,7 +97,7 @@ int getsocktype(int proto)
 {
 	int		rs = SR_NOTFOUND ;
 	int		i ;
-	int		f = FALSE ;
+	int		f = false ;
 	for (i = 0 ; socktypes[i].proto != 0 ; i += 1) {
 	    f = (proto == socktypes[i].proto) ;
 	    if (f) break ;

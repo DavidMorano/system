@@ -60,12 +60,12 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	    cchar	*sp{} ;
 	    rs = SR_DOM ;
 	    if ((sl = sfshrink(sbuf,slen,&sp)) > 0) {
-		bool	f_negative = FALSE ;
+		bool	f_negative = false ;
 		int	res = 0 ;
 	        cchar	*tp ;
 		rs = SR_OK ;
 	        if (sl && (*sp == '-')) {
-	            f_negative = TRUE ;
+	            f_negative = true ;
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }

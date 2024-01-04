@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} INCLUDE "
+NAMES="${NAMES} TRUE"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/ INCLUDE /s// HEADER /g
+g/TRUE/s//true/g
 	w
 	q
 EOF

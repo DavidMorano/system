@@ -260,7 +260,7 @@ static int spawnproc_pipes(SPAWNPROC *psap,cchar *fname,
 	if ((rs = uc_piper(con,3)) >= 0) {
 	    cint	pfd = con[0] ;
 	    cint	cfd = con[1] ;
-	    if ((rs = uc_closeonexec(cfd,TRUE)) >= 0) {
+	    if ((rs = uc_closeonexec(cfd,true)) >= 0) {
 
 	        for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	            switch (psap->disp[i]) {

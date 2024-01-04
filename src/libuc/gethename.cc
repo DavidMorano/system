@@ -110,7 +110,7 @@ int		buflen ;
 #endif
 
 #if	CF_LOG
-	int	f_log = FALSE ;
+	int	f_log = false ;
 #endif
 
 	int	rs ;

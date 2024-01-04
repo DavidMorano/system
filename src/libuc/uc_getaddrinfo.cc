@@ -92,7 +92,7 @@ int uc_getaddrinfo(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	int		to_again = utimeout[uto_again] ;
 	int		rs ;
 	int		rc = 0 ;
-	int		f_exit = FALSE ;
+	int		f_exit = false ;
 	repeat {
 	    rs = SR_OK ;
 	    errno = 0 ;
@@ -101,47 +101,47 @@ int uc_getaddrinfo(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	        switch (rc) {
 	        case EAI_ADDRFAMILY:
 	            rs = SR_AFNOSUPPORT ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_AGAIN:
 	            if (to_again-- > 0) {
 		        msleep(100) ;
 		    } else {
 	                rs = SR_AGAIN ;
-			f_exit = TRUE ;
+			f_exit = true ;
 		    }
 	            break ;
 	        case EAI_BADFLAGS:
 	            rs = SR_INVALID ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_FAIL:
 	            rs = SR_NOANODE ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_FAMILY:
 	            rs = SR_PFNOSUPPORT ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_MEMORY:
 	            rs = SR_NOMEM ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_NODATA:
 	            rs = SR_NODATA ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_NONAME:
 	            rs = SR_NOTFOUND ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_SERVICE:
 	            rs = SR_ADDRNOTAVAIL ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_SOCKTYPE:
 	            rs = SR_SOCKTNOSUPPORT ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 	            break ;
 	        case EAI_SYSTEM:
 	            rs = (- errno) ;
@@ -150,17 +150,17 @@ int uc_getaddrinfo(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	                if (to_again-- > 0) {
 			    msleep(100) ;
 			} else {
-			    f_exit = TRUE ;
+			    f_exit = true ;
 			}
 	                break ;
 		    default:
-		        f_exit = TRUE ;
+		        f_exit = true ;
 			break ;
 	            } /* end switch */
 	            break ;
 	        default:
 	            rs = SR_NOANODE ;
-		    f_exit = TRUE ;
+		    f_exit = true ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (some sort of error condition) */

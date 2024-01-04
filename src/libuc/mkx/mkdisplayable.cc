@@ -85,7 +85,7 @@ int mkdisplayable(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	            case CH_SO:
 	            case CH_SS2:
 	            case CH_SS3:
-		        f_shift = TRUE ;
+		        f_shift = true ;
 	                pch = ch ;
 		        break ;
 	            default:

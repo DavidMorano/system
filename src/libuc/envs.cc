@@ -481,7 +481,7 @@ static int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
 	nulstr		ns ;
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*ss ;
 	if ((rs = nulstr_start(&ns,sp,sl,&ss)) >= 0) {
 	    vecstr	*clp = &ep->elist ;

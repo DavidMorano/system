@@ -133,7 +133,7 @@ int ucsysconf::operator () (int req) noex {
 		    }
 		    break ;
 		default:
-		    f_exit = TRUE ;
+		    f_exit = true ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (error) */

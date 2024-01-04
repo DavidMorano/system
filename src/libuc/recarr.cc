@@ -164,7 +164,7 @@ int recarr_add(recarr *op,cvoid *sp) noex {
 	        if (i < op->i) {
 	            op->va[i] = (void *) sp ;
 	            op->fi = i + 1 ;
-	            f_done = TRUE ;
+	            f_done = true ;
 	        } else {
 	            op->fi = i ;
 	        }
@@ -276,7 +276,7 @@ int recarr_del(recarr *op,int i) noex {
 	            if (op->f.ostationary) {
 	                op->va[i] = nullptr ;
 	                if (i == (op->i - 1)) op->i -= 1 ;
-	                f_fi = TRUE ;
+	                f_fi = true ;
 	            } else if (op->f.issorted || op->f.oordered) {
 	                if (op->f.ocompact) {
 	                    op->i -= 1 ;
@@ -287,7 +287,7 @@ int recarr_del(recarr *op,int i) noex {
 	                } else {
 	                    op->va[i] = nullptr ;
 	                    if (i == (op->i - 1)) op->i -= 1 ;
-	                    f_fi = TRUE ;
+	                    f_fi = true ;
 	                } /* end if */
 	            } else {
 			bool	f = true ;
@@ -300,7 +300,7 @@ int recarr_del(recarr *op,int i) noex {
 	                } else {
 	                    op->va[i] = nullptr ;
 	                    if (i == (op->i - 1)) op->i -= 1 ;
-	                    f_fi = TRUE ;
+	                    f_fi = true ;
 	                } /* end if */
 	            } /* end if */
 	            if (op->f.oconserve) {
@@ -362,7 +362,7 @@ int recarr_sort(recarr *op,recarr_cf vcmp) noex {
 	    if (op->va) {
 		c = op->c ;
 	        if (! op->f.issorted) {
-	            op->f.issorted = TRUE ;
+	            op->f.issorted = true ;
 	            if (op->c > 1) {
 			qsort_f		qcmp = qsort_f(vcmp) ;
 			if constexpr (f_qsort) {
@@ -383,7 +383,7 @@ int recarr_setsorted(recarr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = op->c ;
-	    op->f.issorted = TRUE ;
+	    op->f.issorted = true ;
 	}
 	return rs ;
 }
@@ -397,7 +397,7 @@ int recarr_search(recarr *op,cvoid *ep,recarr_cf vcmp,void *vrp) noex {
 	    cint	esize = sizeof(void *) ;
 	    void	**spp{} ;
 	    if (op->f.osorted && (! op->f.issorted)) {
-	        op->f.issorted = TRUE ;
+	        op->f.issorted = true ;
 	        if (op->c > 1) {
 		    qsort_f	qcmp = qsort_f(vcmp) ;
 		    qsort(op->va,op->i,esize,qcmp) ;

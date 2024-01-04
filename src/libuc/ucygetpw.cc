@@ -116,7 +116,7 @@ static ucygetpw		ucygetpw_data ;
 int ucygetpw_init() noex {
 	ucygetpw		*uip = &ucygetpw_data ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 	if (! uip->finit.testandset) {			/* <- the money shot */
 	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
 	        if ((rs = ptc_create(&uip->c,NULL)) >= 0) {
@@ -124,8 +124,8 @@ int ucygetpw_init() noex {
 	    	    void	(*a)() = ucygetpw_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(ucygetpw_fini)) >= 0) {
-	                    uip->finitdone = TRUE ;
-	                    f = TRUE ;
+	                    uip->finitdone = true ;
+	                    f = true ;
 	                }
 	                if (rs < 0)
 	                    uc_atforkexpunge(b,a,a) ;
@@ -137,7 +137,7 @@ int ucygetpw_init() noex {
 	            ptm_destroy(&uip->m) ;
 	    } /* end if (ptm_create) */
 	    if (rs < 0)
-	        uip->finit = FALSE ;
+	        uip->finit = false ;
 	} else {
 	    while ((rs >= 0) && uip->finit && (! uip->finitdone)) {
 	        rs = msleep(1) ;
@@ -152,7 +152,7 @@ int ucygetpw_init() noex {
 void ucygetpw_fini() noex {
 	ucygetpw		*uip = &ucygetpw_data ;
 	if (uip->finitdone) {
-	    uip->finitdone = FALSE ;
+	    uip->finitdone = false ;
 	    {
 	        if (uip->pwc != NULL) {
 	            ucygetpw_end(uip) ;
@@ -264,7 +264,7 @@ static int ucygetpw_capbegin(ucygetpw *uip,int to) noex {
 	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
-	        uip->f_capture = TRUE ;
+	        uip->f_capture = true ;
 	    }
 	    uip->waiters -= 1 ;
 	    rs1 = ptm_unlock(&uip->m) ;
@@ -278,7 +278,7 @@ static int ucygetpw_capend(ucygetpw *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lock(&uip->m)) >= 0) {
-	    uip->f_capture = FALSE ;
+	    uip->f_capture = false ;
 	    if (uip->waiters > 0) {
 	        rs = ptc_signal(&uip->c) ;
 	    }

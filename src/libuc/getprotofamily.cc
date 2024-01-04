@@ -1,5 +1,5 @@
 /* getprotofamily SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a protocol family from an address family */
 /* version %I% last-modified %G% */
@@ -44,6 +44,8 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"getprotofamily.h"
 
 
 /* local defines */

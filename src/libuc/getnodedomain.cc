@@ -357,9 +357,9 @@ static int try_startvarnode(TRY *tip)
 
 	if (! tip->f.initvarnode) {
 	    cchar	*cp ;
-	    tip->f.initvarnode = TRUE ;
+	    tip->f.initvarnode = true ;
 	    if ((cp = getenv(VARNODE)) != NULL) {
-	        tip->f.varnode = TRUE ;
+	        tip->f.varnode = true ;
 	        tip->varnode = cp ;
 	    }
 	}
@@ -376,13 +376,13 @@ static int try_startuname(TRY *tip)
 
 	if (! tip->f.inituname) {
 	    struct utsname	un ;
-	    tip->f.inituname = TRUE ;
+	    tip->f.inituname = true ;
 	    if ((rs = u_uname(&un)) >= 0) {
 	        cchar	*cp ;
 	        cchar	*np = un.nodename ;
 	        int		nl = strlen(un.nodename) ;
 	        if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
-	            tip->f.uname = TRUE ;
+	            tip->f.uname = true ;
 	            tip->sysnodename = cp ;
 	            rs = 0 ;
 	        } /* end if (memory-allocation) */
@@ -400,14 +400,14 @@ static int try_startsysinfo(TRY *tip)
 
 	if (! tip->f.initsysinfo) {
 	    int	rs1 ;
-	    tip->f.initsysinfo = TRUE ;
+	    tip->f.initsysinfo = true ;
 #ifdef	SI_HOSTNAME
 	    rs1 = u_sysinfo(SI_HOSTNAME,tip->sibuf,NODENAMELEN) ;
 #else
 	    rs1 = SR_NOSYS ;
 #endif /* SI_HOSTNAME */
 	    if (rs1 >= 0) {
-	        tip->f.sysinfo = TRUE ;
+	        tip->f.sysinfo = true ;
 	        rs = 0 ;
 	    }
 	}
@@ -426,7 +426,7 @@ static int try_startnode(TRY *tip)
 	cchar	*cp ;
 
 	if (! tip->f.initnode) {
-	    tip->f.initnode = TRUE ;
+	    tip->f.initnode = true ;
 
 	    if ((rs >= 0) && (sp == NULL)) {
 	        if (! tip->f.initvarnode) rs = try_startvarnode(tip) ;
@@ -451,7 +451,7 @@ static int try_startnode(TRY *tip)
 	    if (rs >= 0) {
 	        if (sp != NULL) {
 	            if ((cl = sfwhitedot(sp,sl,&cp)) > 0) {
-	                tip->f.node = TRUE ;
+	                tip->f.node = true ;
 	                strdcpy1w(tip->nodename,NODENAMELEN,cp,cl) ;
 	            }
 		} else
@@ -639,7 +639,7 @@ static int try_resolvefile(TRY *tip,cchar *fname)
 	const int	dlen = MAXHOSTNAMELEN ;
 	const int	to = TO_READ ;
 	int		rs ;
-	int		f_found = FALSE ;
+	int		f_found = false ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
 	    FILEBUF	b ;
@@ -681,7 +681,7 @@ static int try_resolvefile(TRY *tip,cchar *fname)
 	                cl = (tp - cp) ;
 
 	            if (cl > 0) {
-	                f_found = TRUE ;
+	                f_found = true ;
 	                break ;
 	            }
 

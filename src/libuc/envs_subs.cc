@@ -356,7 +356,7 @@ static int pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	int		bl = 0 ;
-	int		f_semi = FALSE ;
+	int		f_semi = false ;
 	if ((rs = sbuf_start(&b,jbuf,jlen)) >= 0) {
 	    int		sc ;
 	    cchar	*cp ;
@@ -365,7 +365,7 @@ static int pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	        if (cp[0] != ';') {
 	            if (c++ > 0) {
 	                if (f_semi) {
-	                    f_semi = FALSE ;
+	                    f_semi = false ;
 	                    sc = ';' ;
 	                } else {
 	                    sc = ':' ;
@@ -376,7 +376,7 @@ static int pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
 	                rs = sbuf_strw(&b,cp,-1) ;
 		    }
 	        } else {
-	            f_semi = TRUE ;
+	            f_semi = true ;
 		}
 		} /* end if (non-null) */
 	        if (rs < 0) break ;

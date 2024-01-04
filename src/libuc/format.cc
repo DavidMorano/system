@@ -392,9 +392,9 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 /* create the format specification that we will use later */
 
 	        {
-	            int	f_continue = FALSE ;
+	            int	f_continue = false ;
 #if	CF_DEBUGZ && CF_DEBUGZZ
-	            int	f_special = FALSE ;
+	            int	f_special = false ;
 #endif
 
 	            cchar	*fp = fmt ;
@@ -403,35 +403,35 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	            fsp->width = -1 ;
 	            fsp->prec = -1 ;
 
-	            f_continue = TRUE ;
+	            f_continue = true ;
 	            while (f_continue) {
 	                const int	ch = MKCHAR(fp[0]) ;
 	                switch (ch) {
 	                case '-':
-	                    fsp->f.left = TRUE ;
+	                    fsp->f.left = true ;
 	                    break ;
 	                case '+':
-	                    fsp->f.plus = TRUE ;
+	                    fsp->f.plus = true ;
 	                    break ;
 	                case '\'':
-	                    fsp->f.thousands = TRUE ;
+	                    fsp->f.thousands = true ;
 	                    break ;
 	                case '0':
-	                    fsp->f.zerofill = TRUE ;
+	                    fsp->f.zerofill = true ;
 	                    break ;
 	                case '#':
-	                    fsp->f.alternate = TRUE ;
+	                    fsp->f.alternate = true ;
 	                    break ;
 	                case ' ':
-	                    fsp->f.space = TRUE ;
+	                    fsp->f.space = true ;
 	                    break ;
 	                default:
-	                    f_continue = FALSE ;
+	                    f_continue = false ;
 	                    break ;
 	                } /* end switch */
 	                if (f_continue) {
 #if	CF_DEBUGZ && CF_DEBUGZZ
-	                    f_special = TRUE ;
+	                    f_special = true ;
 #endif
 	                    fp += 1 ;
 	                }
@@ -571,8 +571,8 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	        case 'c':
 	            {
 	                int	ch ;
-	                int	f_wchar = FALSE ;
-	                int	f_wint = FALSE ;
+	                int	f_wchar = false ;
+	                int	f_wint = false ;
 
 #if	CF_DEBUGZ
 	                zprintf(NDF,"format: got a character\n") ;
@@ -581,14 +581,14 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                if (fsp->fcode != 'C') {
 	                    switch (fsp->lenmod) {
 	                    case lenmod_wide:
-	                        f_wchar = TRUE ;
+	                        f_wchar = true ;
 	                        break ;
 	                    case lenmod_long:
-	                        f_wint = TRUE ;
+	                        f_wint = true ;
 	                        break ;
 	                    }
 	                } else {
-	                    f_wchar = TRUE ;
+	                    f_wchar = true ;
 			}
 
 	                if (f_wint) {
@@ -632,14 +632,14 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                sd.sl = -1 ;
 
 	                if (fsp->fcode == 'S') {
-	                    sd.f_wchar = TRUE ;
+	                    sd.f_wchar = true ;
 	                } else {
 	                    switch (fsp->lenmod) {
 	                    case lenmod_long:
-	                        sd.f_wint = TRUE ;
+	                        sd.f_wint = true ;
 	                        break ;
 	                    case lenmod_wide:
-	                        sd.f_wchar = TRUE ;
+	                        sd.f_wchar = true ;
 	                        break ;
 	                    } /* end switch */
 	                } /* end if (wide or narrow) */
@@ -847,7 +847,7 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 
 	                if (f_signed && (num < 0)) {
 	                    *--bp = '-' ;
-	                    fsp->f.minus = TRUE ;
+	                    fsp->f.minus = true ;
 	                }
 
 	                bl = ((tbuf+tlen) - bp) ;
@@ -865,7 +865,7 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 #else /* CF_BINARYMIN */
 	                int		f_special = CF_SPECIALHEX ;
 #endif /* CF_BINARYMIN */
-	                int		f_got = FALSE ;
+	                int		f_got = false ;
 	                const char	*digtable = digtable_lo ;
 
 	                switch (fsp->lenmod) {
@@ -899,7 +899,7 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                        for (i = 63 ; i >= 32 ; i -= 1) {
 	                            ch = digtable[(unum>>i) & 1] ;
 	                            if (f_got || (ch != '0')) {
-	                                f_got = TRUE ;
+	                                f_got = true ;
 	                                *bp++ = ch ;
 	                            }
 	                        }
@@ -909,7 +909,7 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                        for (i = 31 ; i >= 16 ; i -= 1) {
 	                            ch = digtable[(unum>>i) & 1] ;
 	                            if (f_got || (ch != '0')) {
-	                                f_got = TRUE ;
+	                                f_got = true ;
 	                                *bp++ = ch ;
 	                            }
 	                        }
@@ -918,7 +918,7 @@ int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex {
 	                    for (i = 15 ; i >= 0 ; i -= 1) {
 	                        ch = digtable[(unum>>i) & 1] ;
 	                        if (f_got || (ch != '0')) {
-	                            f_got = TRUE ;
+	                            f_got = true ;
 	                            *bp++ = ch ;
 	                        }
 	                    } /* end for */
@@ -1164,7 +1164,7 @@ static int subinfo_reserve(SUBINFO *sip,int n) noex {
 	    int		rlen = (sip->ulen - sip->len) ;
 	    rs = SR_OK ;
 	    if (n > rlen) {
-	        sip->f.ov = TRUE ;
+	        sip->f.ov = true ;
 	    }
 	} /* end if (not overflow) */
 	return rs ;
@@ -1185,7 +1185,7 @@ static int subinfo_strw(SUBINFO *sip,cchar *sp,int sl) noex {
 	    int		rlen ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    rlen = (sip->ulen - sip->len) ;
-	    if (sl > rlen) sip->f.ov = TRUE ;
+	    if (sl > rlen) sip->f.ov = true ;
 	    ml = MIN(sl,rlen) ;
 	    if (ml > 0) {
 	        char	*bp = (sip->ubuf + sip->len) ;
@@ -1240,10 +1240,10 @@ static int subinfo_cleanstrw(SUBINFO *sip,cchar *sp,int sl) noex {
 #if	CF_CLEANSTR
 	if (sip->f.mclean) {
 	    int		hl = sl ;
-	    int		f_eol = FALSE ;
+	    int		f_eol = false ;
 	    if ((sl > 0) && (sp[sl-1] == '\n')) {
 	        hl = (sl-1) ;
-	        f_eol = TRUE ;
+	        f_eol = true ;
 	    }
 	    if (hasourbad(sp,hl)) {
 	        int	size = (sl+1) ;
@@ -1277,7 +1277,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	int		sl = sdp->sl ;
 	int		f_wint = sdp->f_wint ;
 	int		f_wchar = sdp->f_wchar ;
-	int		f_memalloc = FALSE ;
+	int		f_memalloc = false ;
 	int		fcode = 0 ;
 	cchar		*sp = sdp->sp ;
 
@@ -1291,7 +1291,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	    const wint_t	*lsp = sdp->lsp ;
 	    const wchar_t	*wsp = sdp->wsp ;
 	    int			i = 0 ;
-	    int			f_notnull = FALSE ;
+	    int			f_notnull = false ;
 	    if (f_wint) {
 	        f_notnull = (lsp != NULL) ;
 	        if (f_notnull) {
@@ -1315,7 +1315,7 @@ static int subinfo_fmtstr(SUBINFO *sip,FMTSPEC *fsp,STRDATA *sdp) noex {
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
 	            int		j ;
 	            int		ch ;
-	            f_memalloc = TRUE ;
+	            f_memalloc = true ;
 	            sp = p ;
 	            sl = i ;
 	            if (f_wint) {
@@ -1405,10 +1405,10 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	int		f_zerofill = fsp->f.zerofill ;
 	int		f_plus = fsp->f.plus ;
 	int		f_minus = fsp->f.minus ;
-	int		f_plusminus = FALSE ;
-	int		f_truncleft = FALSE ;
-	int		f_isdigital = FALSE ;
-	int		f_specialhex = FALSE ;
+	int		f_plusminus = false ;
+	int		f_truncleft = false ;
+	int		f_isdigital = false ;
+	int		f_specialhex = false ;
 
 	if (sp == NULL) return SR_FAULT ;
 
@@ -1447,7 +1447,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	case 'x':
 	case 'P':
 	case 'p':
-	    f_truncleft = TRUE ;
+	    f_truncleft = true ;
 	} /* end switch */
 
 	switch (fcode) {
@@ -1461,7 +1461,7 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	case 'f':
 	case 'E':
 	case 'G':
-	    f_isdigital = TRUE ;
+	    f_isdigital = true ;
 	} /* end switch */
 
 	switch (fcode) {
@@ -1470,10 +1470,10 @@ static int subinfo_emit(SUBINFO *sip,FMTSPEC *fsp,cchar *sp,int sl) noex {
 	case 'x':
 	case 'P':
 	case 'p':
-	    f_specialhex = TRUE ;
+	    f_specialhex = true ;
 	    if (width < 0) {
 	        width = sl ;
-	        f_zerofill = TRUE ;
+	        f_zerofill = true ;
 	    }
 	} /* end switch */
 
@@ -1627,16 +1627,16 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 	    fcode,width,prec) ;
 #endif
 
-	f_varprec = FALSE ;
+	f_varprec = false ;
 	if (prec < 0) {
 	    prec = DOFLOAT_DEFPREC ;
-	    f_varprec = TRUE ;
+	    f_varprec = true ;
 	}
 
-	f_varwidth = FALSE ;
+	f_varwidth = false ;
 	if (width <= 0) {
 	    width = DOFLOAT_STAGELEN ;
-	    f_varwidth = TRUE ;
+	    f_varwidth = true ;
 	}
 
 	if (prec > MAXPREC) prec = MAXPREC ;
@@ -1682,7 +1682,7 @@ static int subinfo_float(SUBINFO *sip,int fcode,double vint ,width,intprec,
 	    while ((remlen > 0) && (outlen > 0)) {
 
 	        if ((! f_varprec) || (buf[j - 1] != '0')) {
-	            f_varprec = FALSE ;
+	            f_varprec = false ;
 	            stage[--i] = buf[--j] ;
 	            remlen -= 1 ;
 	            outlen -= 1 ;
@@ -1830,7 +1830,7 @@ static int binchar(ulong num,int i) noex {
 
 #if	CF_CLEANSTR
 static int hasourbad(cchar *sp,int sl) noex {
-	int		f = FALSE ;
+	int		f = false ;
 	while (sl && *sp) {
 	    cint	ch = MKCHAR(*sp) ;
 	    f = isourbad(ch) ;
@@ -1844,7 +1844,7 @@ static int hasourbad(cchar *sp,int sl) noex {
 #endif /* CF_CLEANSTR */
 
 int isourbad(int ch) noex {
-	int		f = FALSE ;
+	int		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == '\r') || (ch == '\n') ;
 	f = f || (ch == CH_BS) ;

@@ -877,7 +877,7 @@ hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.c hostent.h
 inetaddr.o:		inetaddr.cc inetaddr.h
-sockaddress.o:		sockaddress.c sockaddress.h
+sockaddress.o:		sockaddress.cc sockaddress.h
 
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
@@ -1072,6 +1072,7 @@ strwcpyxx.o:		strwcpyxx.cc strwcpyxx.h
 strdcpyx.o:		strdcpyx.c strdcpyx.h
 strdcpyxw.o:		strdcpyxw.c strdcpyxw.h
 
+# CF
 cfxxxx.o:		cfxxxx.cc cfxxxx.hh
 cfxxx.o:		cfxxx.cc cfxxx.h cfxxxx.hh
 cfbin.o:		cfbin.cc cfbin.h cfxxxx.hh
@@ -1083,6 +1084,7 @@ cfdect.o:		cfdect.cc cfdect.h
 cfdecf.o:		cfdecf.cc cfdecf.h
 cfchars.o:		cfchars.cc cfchars.h
 
+# CT
 cvtdig.o:		cvtdig.cc cvtdig.hh
 ctxxx.o:		ctxxx.cc ctxxx.h
 ctbin.o:		ctbin.cc ctbin.h cvtdig.hh
@@ -1095,10 +1097,11 @@ ctchars.o:		ctchars.cc ctchars.h
 xxtostr.o:		xxtostr.cc xxtostr.h
 convertx.o:		convertx.cc convertx.h
 
-dialopts.o:		dialopts.c dialopts.h
-dialprog.o:		dialprog.c dialopts.h
-dialudp.o:		dialudp.c dialopts.h
-dialtcp.o:		dialtcp.c dialopts.h
+# DIAL
+dialopts.o:		dialopts.cc dialopts.h
+dialprog.o:		dialprog.cc dialopts.h
+dialudp.o:		dialudp.cc dialopts.h
+dialtcp.o:		dialtcp.cc dialopts.h
 dialtcpmux.o:		dialtcpmux.c dialopts.h
 dialtcpnls.o:		dialtcpnls.c nlsdialassist.h dialopts.h
 dialfinger.o:		dialfinger.c dialopts.h

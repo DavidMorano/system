@@ -158,7 +158,7 @@ int prgetprogpath(cchar *pr,char *rbuf,cchar *np,int nl) noex {
 	        subinfo		si{}, *sip = &si ;
 	        if (nl < 0) nl = strlen(np) ;
 	        while ((nl > 0) && (np[nl-1] == '/')) {
-	            sip->f_changed = TRUE ;
+	            sip->f_changed = true ;
 	            nl -= 1 ;
 	        }
 	        if ((rs = subinfo_start(sip,pr)) >= 0) {
@@ -196,7 +196,7 @@ static int subinfo_finish(subinfo *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (sip->f_dirs) {
-	    sip->f_dirs = FALSE ;
+	    sip->f_dirs = false ;
 	    rs1 = vecstr_finish(&sip->dirs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -216,7 +216,7 @@ static int subinfo_tryfull(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 	        if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 		    rl = 0 ;
-		    sip->f_done = TRUE ;
+		    sip->f_done = true ;
 		}
 	    }
 	} /* end if (full-path) */
@@ -248,7 +248,7 @@ static int subinfo_tryroot(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 	    if (rs < 0) break ;
 	} /* end for */
 	if ((rs >= 0) && (rl > 0)) {
-	    sip->f_changed = TRUE ;
+	    sip->f_changed = true ;
 	}
 	return (rs >= 0) ? rl : rs ;
 }
@@ -273,7 +273,7 @@ static int subinfo_tryother(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 	        }
 	    }
 	    if ((rs >= 0) && (rl > 0)) {
-	        sip->f_changed = TRUE ;
+	        sip->f_changed = true ;
 	    }
 	} /* end if (getenv-path) */
 	return (rs >= 0) ? rl : rs ;
