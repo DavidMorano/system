@@ -1,4 +1,4 @@
-/* kvsfile */
+/* kvsfile HEADER */
 /* lang=C20 */
 
 /* perform access table file related functions */
@@ -38,35 +38,35 @@
 
 
 struct kvsfile_c {
-	HDB_CUR		ec ;
+	hdb_cur		ec ;
 	int		i ;
 } ;
 
 struct kvsfile_head {
-	uint		magic ;
 	time_t		ti_check ;
 	vecobj		files ;
 	vecobj		keys ;
-	HDB		keyvals ;	/* indexed by key-value */
-	HDB		entries ;	/* indexed by key */
+	hdb		keyvals ;	/* indexed by key-value */
+	hdb		entries ;	/* indexed by key */
+	uint		magic ;
 } ;
 
-typedef struct kvsfile_head	kvsfile ;
-typedef struct kvsfile_c	kvsfile_cur ;
+typedef KVSFILE		kvsfile ;
+typedef KVSFILE_CUR	kvsfile_cur ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int kvsfile_open(KVSFILE *,int,const char *) ;
-extern int kvsfile_fileadd(KVSFILE *,const char *) ;
-extern int kvsfile_curbegin(KVSFILE *,KVSFILE_CUR *) ;
-extern int kvsfile_curend(KVSFILE *,KVSFILE_CUR *) ;
-extern int kvsfile_enumkey(KVSFILE *,KVSFILE_CUR *,char *,int) ;
-extern int kvsfile_enum(KVSFILE *,KVSFILE_CUR *,char *,int,char *,int) ;
-extern int kvsfile_fetch(KVSFILE *,const char *,KVSFILE_CUR *,char *,int) ;
-extern int kvsfile_check(KVSFILE *,time_t) ;
-extern int kvsfile_close(KVSFILE *) ;
+extern int kvsfile_open(KVSFILE *,int,cchar *) noex ;
+extern int kvsfile_fileadd(KVSFILE *,cchar *) noex ;
+extern int kvsfile_curbegin(KVSFILE *,KVSFILE_CUR *) noex ;
+extern int kvsfile_curend(KVSFILE *,KVSFILE_CUR *) noex ;
+extern int kvsfile_enumkey(KVSFILE *,KVSFILE_CUR *,char *,int) noex ;
+extern int kvsfile_enum(KVSFILE *,KVSFILE_CUR *,char *,int,char *,int) noex ;
+extern int kvsfile_fetch(KVSFILE *,cchar *,KVSFILE_CUR *,char *,int) noex ;
+extern int kvsfile_check(KVSFILE *,time_t) noex ;
+extern int kvsfile_close(KVSFILE *) noex ;
 
 #ifdef	__cplusplus
 }

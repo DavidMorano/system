@@ -1,40 +1,40 @@
-/* clusterdb */
+/* clusterdb HEADER */
+/* lang=C20 */
+
+/* perform access table file related functions */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CLUSTERDB_INCLUDE
-#define	CLUSTERDB_INCLUDE	1
+#define	CLUSTERDB_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<netdb.h>
-
 #include	<kvsfile.h>
 #include	<localmisc.h>
 
 
-/* object defines */
-
 #define	CLUSTERDB	struct clusterdb_head
-#define	CLUSTERDB_CUR	struct clusterdb_c
+#define	CLUSTERDB_CUR	struct clusterdb_cursor
 
 
-struct clusterdb_c {
+struct clusterdb_cursor {
 	KVSFILE_CUR	cur ;
 } ;
 
 struct clusterdb_head {
-	uint		magic ;
 	KVSFILE		clutab ;
+	uint		magic ;
 } ;
 
-
-#if	(! defined(CLUSTERDB_MASTER)) || (CLUSTERDB_MASTER == 0)
+typedef CLUSTERDB	clusterdb ;
+typedef CLUSTERDB_CUR	clusterdb_cur ;
 
 #ifdef	__cplusplus
 extern "C" {
@@ -59,7 +59,6 @@ extern int clusterdb_close(CLUSTERDB *) ;
 }
 #endif
 
-#endif /* CLUSTERDB_MASTER */
 
 #endif /* CLUSTERDB_INCLUDE */
 
