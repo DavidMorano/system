@@ -1,4 +1,4 @@
-/* getfname */
+/* getfname SUPPORT */
 /* lang=C++20 */
 
 /* get a file name according to rules */

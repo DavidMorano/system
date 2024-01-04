@@ -1,13 +1,12 @@
-/* getuid_name */
+/* getuid_name SUPPORT */
+/* lang=C20 */
 
 /* get a UID by looking up the given name */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debugging */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_GETUSER	0		/* compile in |getuser_uid()| */
-
 
 /* revision history:
 
@@ -15,8 +14,8 @@
 	This program was originally written.
 
 	= 2017-11-22, David A­D­ Morano
-	I finally (finally) removed (compiled out) the global function symbol
-	|getuser_uid()|.  Good riddance.
+	I finally (finally) removed (compiled out) the global
+	function symbol |getuser_uid()|.  Good riddance.
 
 */
 
@@ -24,26 +23,25 @@
 
 /*******************************************************************************
 
-        This subroutine will retrieve a UID by looking up a given name, assumed
-        to be a user-name.
+	Name:
+	getuid_name
+
+	Description:
+	This subroutine will retrieve a UID by looking up a given
+	name, assumed to be a user-name.
 
 	Synopsis:
-
-	int getuid_name(cchar *np,int nl)
+	int getuid_name(cchar *np,int nl) noex
 
 	Arguments:
-
 	np		user-name to lookup
 	nl		length of name string
 
 	Returns:
-
-	<0		error
 	>=0		retrieved UID
-
+	<0		error (system-return)
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -53,6 +51,7 @@
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<cfdec.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 
@@ -66,8 +65,6 @@
 
 
 /* external subroutines */
-
-extern int	hasalldig(cchar *,int) ;
 
 
 /* external variables */
@@ -84,10 +81,8 @@ extern int	hasalldig(cchar *,int) ;
 
 /* exported subroutines */
 
-
-int getuid_name(cchar *np,int nl)
-{
-	NULSTR		n ;
+int getuid_name(cchar *np,int nl) noex {
+	nulstr		n ;
 	int		rs ;
 	int		rs1 ;
 	int		uid = 0 ;
@@ -115,9 +110,7 @@ int getuid_name(cchar *np,int nl)
 }
 /* end subroutine (getuid_name) */
 
-
-int getuid_user(cchar *np,int nl)
-{
+int getuid_user(cchar *np,int nl) noex {
 	int		rs ;
 	if (np == NULL) return SR_FAULT ;
 	if (np[0] == '\0') return SR_INVALID ;
@@ -133,10 +126,8 @@ int getuid_user(cchar *np,int nl)
 }
 /* end subroutine (getuid_user) */
 
-
 #if	CF_GETUSER
-int getuser_uid(cchar *np,int nl)
-{
+int getuser_uid(cchar *np,int nl) noex {
 	return getuid_user(np,nl) ;
 }
 #endif /* CF_GETUSER */

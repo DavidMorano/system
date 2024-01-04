@@ -1,4 +1,4 @@
-/* getutmpent */
+/* getutmpent SUPPORT */
 /* lang=C++20 */
 
 /* get user information from UTMP database */

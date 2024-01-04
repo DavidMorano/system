@@ -1,4 +1,4 @@
-/* getclustername */
+/* getclustername SUPPORT */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -93,6 +93,7 @@
 #include	<uclustername.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"nodedb.h"
@@ -115,8 +116,6 @@
 
 
 /* external subroutines */
-
-extern int	isNotPresent(int) noex ;
 
 
 /* external variables */
@@ -148,35 +147,31 @@ static int	subinfo_cdb(SI *) noex ;
 /* exported subroutines */
 
 int getclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
-	SI		si ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (nn == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (nn[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = subinfo_start(&si,pr,rbuf,rlen,nn)) >= 0) {
-	    if ((rs = subinfo_cacheget(&si)) == 0) {
-	        if ((rs = subinfo_ndb(&si)) == 0) {
-	            rs = subinfo_cdb(&si) ;
-	        }
-	        if (rs > 0) {
-	            len = rs ;
-	            rs = subinfo_cacheset(&si) ;
-	        }
-	    } else {
-	        len = rs ;
-	    }
-	    rs1 = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
+	if (pr && rbuf && nn) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (pr[0] && nn[0]) {
+	        SI	si ;
+	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,nn)) >= 0) {
+	            if ((rs = subinfo_cacheget(&si)) == 0) {
+	                if ((rs = subinfo_ndb(&si)) == 0) {
+	                    rs = subinfo_cdb(&si) ;
+	                }
+	                if (rs > 0) {
+	                    len = rs ;
+	                    rs = subinfo_cacheset(&si) ;
+	                }
+	            } else {
+	                len = rs ;
+	            }
+	            rs1 = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getclustername) */

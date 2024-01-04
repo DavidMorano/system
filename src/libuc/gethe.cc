@@ -1,10 +1,8 @@
-/* gethe (Get Host Entry) */
+/* gethe SUPPORT (Get Host Entry) */
+/* lang=C20 */
 
 /* get a host entry from the system database */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 
 /* revision history:
@@ -20,42 +18,33 @@
 
 	Get a host entry from the System Name Server databases.
 
-	This subroutine is used to get a host entry struct for a host name.  It
-	is not too fancy but will try to apply some standard defaults in order
-	to get an entry back.  Names given to lookup will assume the current
-	domain if one is not supplied with the name.  A NULL supplied name is
-	assumed to refer to the current host.  A name specified in the INET
+	This subroutine is used to get a host entry struct for a
+	host name.  It is not too fancy but will try to apply some
+	standard defaults in order to get an entry back.  Names
+	given to lookup will assume the current domain if one is
+	not supplied with the name.  A NULL supplied name is assumed
+	to refer to the current host.  A name specified in the INET
 	style dotted-decimal format is also acceptable.
 
-	Remember that a design goal is to MINIMIZE the number of DNS lookups
-	used.  In general, DNS lookups are very slow.
+	Remember that a design goal is to MINIMIZE the number of
+	DNS lookups used.  In general, DNS lookups are very slow.
 
 	Synopsis:
-
-	int gethe_name(hep,hebuf,helen,name)
-	struct hostent	*hep ;
-	char		hebuf[] ;
-	int		helen ;
-	const char	name[] ;
+	int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex
 
 	Arguments:
-
 	hep		pointer to 'hostent' structure
 	hebuf		user specified storage area for returned data
 	helen		length of user specified storage buffer
 	name		name to lookup an entry for
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
@@ -66,7 +55,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -75,15 +63,6 @@
 
 
 /* external subroutines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	getnodename(char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -103,30 +82,22 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* exported subroutines */
 
-
-int gethe_begin(int stayopen)
-{
+int gethe_begin(int stayopen) noex {
 	return uc_sethostent(stayopen) ;
 }
 /* end subroutine (gethe_begin) */
 
-
-int gethe_end()
-{
+int gethe_end() noex {
 	return uc_endhostent() ;
 }
 /* end subroutine (gethe_end) */
 
-
-int gethe_ent(struct hostent *hep,char *hebuf,int helen)
-{
+int gethe_ent(HOSTENT *hep,char *hebuf,int helen) noex {
 	return uc_gethostent(hep,hebuf,helen) ;
 }
 /* end subroutine (gethe_ent) */
 
-
-int gethe_name(struct hostent *hep,char *hebuf,int helen,cchar *name)
-{
+int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
 	const int	nlen = NODENAMELEN ;
 	int		rs = SR_OK ;
 	char		nbuf[NODENAMELEN+1] ;
@@ -139,11 +110,8 @@ int gethe_name(struct hostent *hep,char *hebuf,int helen,cchar *name)
 }
 /* end subroutine (gethe_name) */
 
-
-int gethe_addr(struct hostent *hep,char *hebuf,int helen,int type,
-		const void *ap,int al)
-{
-	return uc_gethostbyaddr(ap,al,type,hep,hebuf,helen) ;
+int gethe_addr(HOSTENT *hep,char *hb,int hl,int type,cvoid *ap,int al) noex {
+	return uc_gethostbyaddr(ap,al,type,hep,hb,hl) ;
 }
 /* end subroutine (gethe_addr) */
 

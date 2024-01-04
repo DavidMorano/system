@@ -1,4 +1,4 @@
-/* getprogroot */
+/* getprogroot SUPPORT */
 /* lang=C++20 */
 
 /* get the program root directory */

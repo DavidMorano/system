@@ -1,18 +1,14 @@
-/* uclustername */
+/* uclustername SUPPORT */
+/* lang=C20 */
 
 /* set or get a cluster name given a nodename */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
 /* revision history:
 
 	= 2004-11-22, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -20,26 +16,21 @@
 
 /*******************************************************************************
 
+	Description:
 	Get a cluster name given a nodename.
 
 	Synopsis:
-
-	int uclusternameget(rbuf,rlen,nodename)
-	char		rbuf[] ;
-	int		rlen ;
-	const char	nodename[] ;
+	int uclusternameget(char *rbuf,int rlen,cchar *nodename) noex
 
 	Arguments:
-
 	rbuf		buffer to receive the requested cluster name
 	rlen		length of supplied buffer
 	nodename	nodename used to find associated cluster
 
 	Returns:
-
-	==0		could not get a cluster name
 	>0		string length of cluster name
-	<0		some other error
+	==0		could not get a cluster name
+	<0		some other error (system-return)
 
 	Design note:
 
@@ -73,21 +64,21 @@
 	Q. Was it really a good idea?
 	A. I guess not.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<usupport.h>
+#include	<sigblocker.h>
 #include	<ptm.h>
+#include	<sncpyx.h>
+#include	<strwcpy.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 
@@ -103,16 +94,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	msleep(int) ;
-extern int	isNotPresent(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-
 
 /* external variables */
 
@@ -120,10 +101,10 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* local structures */
 
 struct clustername {
-	PTM		m ;		/* data mutex */
+	ptm		m ;		/* data mutex */
 	time_t		et ;
-	const char	*nn ;		/* node-name */
-	const char	*cn ;		/* cluster-name */
+	cchar		*nn ;		/* node-name */
+	cchar		*cn ;		/* cluster-name */
 	char		*a ;		/* memory-allocation */
 	int		ttl ;		/* time-to-live */
 	volatile int	f_init ; 	/* race-condition, blah, blah */
@@ -133,14 +114,14 @@ struct clustername {
 
 struct clustername_a {
 	time_t		et ;
-	const char	*nn ;
-	const char	*cn ;
+	cchar		*nn ;
+	cchar		*cn ;
 	char		*a ;		/* memory-allocation */
 	int		ttl ;		/* time-to-live */
 } ;
 
 struct subinfo {
-	const char	*nn ;
+	cchar		*nn ;
 	char		*rbuf ;
 	time_t		dt ;
 	int		rlen ;
@@ -150,53 +131,55 @@ struct subinfo {
 
 /* forward references */
 
-int		uclustername_init() ;
-void		uclustername_fini() ;
+int		uclustername_init() noex ;
+int		uclustername_fini() noex ;
 
-static void	uclustername_atforkbefore() ;
-static void	uclustername_atforkafter() ;
+static void	uclustername_atforkbefore() noex ;
+static void	uclustername_atforkafter() noex ;
+static void	uclustername_exit() noex ;
 
-static int	uclustername_end(UCLUSTERNAME *) ;
-static int	uclustername_allocbegin(UCLUSTERNAME *,time_t,int) ;
-static int	uclustername_allocend(UCLUSTERNAME *,UCLUSTERNAME_A *) ;
+static int	uclustername_end(UCLUSTERNAME *) noex ;
+static int	uclustername_allocbegin(UCLUSTERNAME *,time_t,int) noex ;
+static int	uclustername_allocend(UCLUSTERNAME *,UCLUSTERNAME_A *) noex ;
 
-static int	subinfo_start(SUBINFO *,char *,int,const char *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_cacheget(SUBINFO *,UCLUSTERNAME *) ;
-static int	subinfo_cacheset(SUBINFO *,UCLUSTERNAME *,int) ;
+static int	subinfo_start(SUBINFO *,char *,int,cchar *) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
+static int	subinfo_cacheget(SUBINFO *,UCLUSTERNAME *) noex ;
+static int	subinfo_cacheset(SUBINFO *,UCLUSTERNAME *,int) noex ;
 
 
 /* local variables */
 
-static UCLUSTERNAME	uclustername_data ; /* zero-initialized */
+static UCLUSTERNAME	uclustername_data ;
 
 
 /* exported subroutines */
 
-
-int uclustername_init()
-{
+int uclustername_init() noex {
 	UCLUSTERNAME	*uip = &uclustername_data ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 	if (! uip->f_init) {
 	    uip->f_init = TRUE ;
 	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
-	        void	(*b)() = uclustername_atforkbefore ;
-	        void	(*a)() = uclustername_atforkafter ;
+	        void_f	b = uclustername_atforkbefore ;
+	        void_f	a = uclustername_atforkafter ;
 	        if ((rs = uc_atfork(b,a,a)) >= 0) {
-	            if ((rs = uc_atexit(uclustername_fini)) >= 0) {
+	            if ((rs = uc_atexit(uclustername_exit)) >= 0) {
 	                uip->f_initdone = TRUE ;
 	                f = TRUE ;
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                uc_atforkexpunge(b,a,a) ;
+		    }
 	        } /* end if (uc_atfork) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            ptm_destroy(&uip->m) ;
+		}
 	    } /* end if (ptm_create) */
-	    if (rs < 0)
-	        uip->f_init = FALSE ;
+	    if (rs < 0) {
+	        uip->f_init = false ;
+	    }
 	} else {
 	    while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 		rs = msleep(1) ;
@@ -208,30 +191,34 @@ int uclustername_init()
 }
 /* end subroutine (uclustername_init) */
 
-
-void uclustername_fini()
-{
+int uclustername_fini() noex {
 	UCLUSTERNAME	*uip = &uclustername_data ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	if (uip->f_initdone) {
-	    uip->f_initdone = FALSE ;
+	    uip->f_initdone = false ;
 	    {
-	        uclustername_end(uip) ;
+	        rs1 = uclustername_end(uip) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
 	        void	(*b)() = uclustername_atforkbefore ;
 	        void	(*a)() = uclustername_atforkafter ;
-	        uc_atforkexpunge(b,a,a) ;
+	        rs1 = uc_atforkexpunge(b,a,a) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
-	    ptm_destroy(&uip->m) ;
-	    memset(uip,0,sizeof(UCLUSTERNAME)) ;
+	    {
+	        rs1 = ptm_destroy(&uip->m) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    uip->f_init = false ;
 	} /* end if (was initialized) */
+	return rs ;
 }
 /* end subroutine (uclustername_fini) */
 
-
-int uclustername_get(char *rbuf,int rlen,cchar *nn)
-{
-	SIGBLOCK	b ;
+int uclustername_get(char *rbuf,int rlen,cchar *nn) noex {
+	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -242,7 +229,7 @@ int uclustername_get(char *rbuf,int rlen,cchar *nn)
 	if (nn[0] == '\0') return SR_INVALID ;
 
 	rbuf[0] = '\0' ;
-	if ((rs = sigblock_start(&b,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 	    if ((rs = uclustername_init()) >= 0) {
 	        SUBINFO		si ;
 	        if ((rs = subinfo_start(&si,rbuf,rlen,nn)) >= 0) {
@@ -255,17 +242,16 @@ int uclustername_get(char *rbuf,int rlen,cchar *nn)
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
 	    } /* end if (uclustername_init) */
-	    sigblock_finish(&b) ;
+	    rs1 = sigblocker_finish(&b) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uclustername_get) */
 
-
-int uclustername_set(cchar *cbuf,int clen,cchar *nn,int to)
-{
-	SIGBLOCK	b ;
+int uclustername_set(cchar *cbuf,int clen,cchar *nn,int to) noex {
+	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
 
@@ -277,7 +263,7 @@ int uclustername_set(cchar *cbuf,int clen,cchar *nn,int to)
 
 	if (clen < 0) clen = strlen(cbuf) ;
 
-	if ((rs = sigblock_start(&b,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 	    if ((rs = uclustername_init()) >= 0) {
 	        SUBINFO		si ;
 	        if ((rs = subinfo_start(&si,(char *) cbuf,clen,nn)) >= 0) {
@@ -289,7 +275,8 @@ int uclustername_set(cchar *cbuf,int clen,cchar *nn,int to)
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subinfo) */
 	    } /* end if (uclustername_init) */
-	    sigblock_finish(&b) ;
+	    rs1 = sigblocker_finish(&b) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
 	return rs ;
@@ -299,12 +286,10 @@ int uclustername_set(cchar *cbuf,int clen,cchar *nn,int to)
 
 /* local subroutines */
 
-
-static int uclustername_end(UCLUSTERNAME *uip)
-{
+static int uclustername_end(UCLUSTERNAME *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (uip->a != NULL) {
+	if (uip->a) {
 	    rs1 = uc_libfree(uip->a) ;
 	    if (rs >= 0) rs = rs1 ;
 	    uip->a = NULL ;
@@ -315,49 +300,33 @@ static int uclustername_end(UCLUSTERNAME *uip)
 }
 /* end subroutine (uclustername_end) */
 
-
-static void uclustername_atforkbefore()
-{
-	UCLUSTERNAME	*uip = &uclustername_data ;
-	ptm_lock(&uip->m) ;
-}
-/* end subroutine (uclustername_atforkbefore) */
-
-
-static void uclustername_atforkafter()
-{
-	UCLUSTERNAME	*uip = &uclustername_data ;
-	ptm_unlock(&uip->m) ;
-}
-/* end subroutine (uclustername_atforkafter) */
-
-
-static int subinfo_start(SUBINFO *sip,char *rbuf,int rlen,cchar *nn)
-{
-	sip->to = TO_TTL ;
-	sip->dt = time(NULL) ;
-	sip->rbuf = rbuf ;
-	sip->rlen = rlen ;
-	sip->nn = nn ;
-	return SR_OK ;
+static int subinfo_start(SUBINFO *sip,char *rbuf,int rlen,cchar *nn) noex {
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    sip->to = TO_TTL ;
+	    sip->dt = time(NULL) ;
+	    sip->rbuf = rbuf ;
+	    sip->rlen = rlen ;
+	    sip->nn = nn ;
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
-	if (sip == NULL) return SR_FAULT ;
-	return SR_OK ;
+static int subinfo_finish(SUBINFO *sip) noex {
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip)
-{
+static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-
 	if ((rs = uc_forklockbegin(-1)) >= 0) {
 	    if ((rs = ptm_lock(&uip->m)) >= 0) {
 	        if (uip->a != NULL) {
@@ -374,22 +343,15 @@ static int subinfo_cacheget(SUBINFO *sip,UCLUSTERNAME *uip)
 	    rs1 = uc_forklockend() ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (forklock) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_cacheget) */
 
-
-static int subinfo_cacheset(SUBINFO *sip,UCLUSTERNAME *uip,int ttl)
-{
+static int subinfo_cacheset(SUBINFO *sip,UCLUSTERNAME *uip,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	char		*aprev = NULL ;
-#if	CF_DEBUGS
-	debugprintf("uclustername/subinfo_cacheset: c=>%t<\n",
-		sip->rbuf,sip->rlen) ;
-#endif
 	if (ttl < 0) ttl = sip->to ;
 	if ((rs = uclustername_allocbegin(uip,sip->dt,ttl)) > 0) {
 	    UCLUSTERNAME_A	uca ;
@@ -419,12 +381,10 @@ static int subinfo_cacheset(SUBINFO *sip,UCLUSTERNAME *uip,int ttl)
 }
 /* end subroutine (subinfo_cacheset) */
 
-
-static int uclustername_allocbegin(UCLUSTERNAME *uip,time_t dt,int ttl)
-{
+static int uclustername_allocbegin(UCLUSTERNAME *uip,time_t dt,int ttl) noex {
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = uc_forklockbegin(-1)) >= 0) {
 	    if ((rs = ptm_lock(&uip->m)) >= 0) {
 	        if ((uip->a == NULL) || ((dt-uip->et) >= ttl)) {
@@ -443,16 +403,14 @@ static int uclustername_allocbegin(UCLUSTERNAME *uip,time_t dt,int ttl)
 }
 /* end subroutine (subinfo_allocbegin) */
 
-
-static int uclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap)
-{
+static int uclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((ap != NULL) && (ap->a != NULL)) {
 	    if ((rs = uc_forklockbegin(-1)) >= 0) {
 	        if ((rs = ptm_lock(&uip->m)) >= 0) {
 	            {
-	                uip->f_allocget = FALSE ;
+	                uip->f_allocget = false ;
 	                uip->a = ap->a ;
 	                uip->nn = ap->nn ;
 	                uip->cn = ap->cn ;
@@ -469,5 +427,22 @@ static int uclustername_allocend(UCLUSTERNAME *uip,UCLUSTERNAME_A *ap)
 	return rs ;
 }
 /* end subroutine (subinfo_allocend) */
+
+static void uclustername_atforkbefore() noex {
+	UCLUSTERNAME	*uip = &uclustername_data ;
+	ptm_lock(&uip->m) ;
+}
+/* end subroutine (uclustername_atforkbefore) */
+
+static void uclustername_atforkafter() noex {
+	UCLUSTERNAME	*uip = &uclustername_data ;
+	ptm_unlock(&uip->m) ;
+}
+/* end subroutine (uclustername_atforkafter) */
+
+static void uclustername_exit() noex {
+	return ;
+}
+/* end subroutine (uclustername_exit) */
 
 

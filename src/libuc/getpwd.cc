@@ -1,4 +1,4 @@
-/* getpwd */
+/* getpwd SUPPORT */
 /* lang=C++20 */
 
 /* get the Present-Working-Directory (PWD) of the process */
@@ -76,6 +76,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<varnames.hh>
 #include	<bufsizevar.hh>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -84,10 +85,6 @@
 
 
 /* local defines */
-
-#ifndef	VARPWD
-#define	VARPWD		"PWD"
-#endif
 
 
 /* external subroutines */
@@ -116,12 +113,13 @@ int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
 	int		rs1 ;
 	int		pl = 0 ;
 	if (pwbuf) {
+	    cchar	*vn = varname.pwd ;
 	    pwbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
 		cchar	*pwd ;
 	        if (pwlen < 0) pwlen = rs ;
 		rs = SR_NOENT ;
-	        if ((pwd = getenv(VARPWD)) != nullptr) {
+	        if ((pwd = getenv(vn)) != nullptr) {
 	            USTAT	*ssbp, sb1, sb2 ;
 	            if ((rs1 = u_stat(pwd,&sb1)) >= 0) {
 		        ssbp = (sbp) ? sbp : &sb2 ;

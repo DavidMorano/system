@@ -1,4 +1,4 @@
-/* getbufsize */
+/* getbufsize SUPPORT */
 /* lang=C++20 */
 
 /* get various system buffer sizes */
@@ -77,9 +77,12 @@
 #include	<climits>
 #include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<vecstr.h>
-#include	<utimeout.h>
+#include	<matostr.h>
+#include	<cfdecmf.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getbufsize.h"
@@ -99,11 +102,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	matocasestr(cchar **,int,cchar *,int) noex ;
-    extern int	cfdecmfi(cchar *,int,int *) noex ;
     extern int	vecstr_envfile(vecstr *,cchar *) noex ;
-    extern int	isNotPresent(int) noex ;
-    extern int	isNotValid(int) noex ;
 }
 
 

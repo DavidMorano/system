@@ -1,4 +1,4 @@
-/* getgid */
+/* getgid SUPPORT */
 /* lang=C++20 */
 
 /* get the GID for a given group-name */
@@ -81,7 +81,7 @@
 
 /* local variables */
 
-static constexpr gid_t	gidend = gid_t(-1) ;
+constexpr gid_t		gidend = gid_t(-1) ;
 
 
 /* exported subroutines */

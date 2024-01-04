@@ -1,10 +1,10 @@
-/* getnodedomain */
+/* getnodedomain SUPPORT */
+/* lang=C20 */
 
 /* get the local node name and INET domain name */
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0	/* compile-time debug print-outs */
 #define	CF_GUESS	1	/* try to guess domain names? */
 
 
@@ -129,18 +129,18 @@
 /* external subroutines */
 
 #if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(const char *,const char *,int) ;
+extern int	strncasecmp(cchar *,cchar *,int) ;
 #endif
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -162,16 +162,16 @@ struct try_flags {
 struct try {
 	char		*nodename ;	/* passed caller argument (returned) */
 	char		*domainname ;	/* passed caller argument (returned) */
-	const char	*varnode ;
-	const char	*sysnodename ;
+	cchar	*varnode ;
+	cchar	*sysnodename ;
 	TRY_FL		f ;
 	char		nodenamebuf[NODENAMELEN + 1] ;
 	char		sibuf[NODENAMELEN + 1] ;
 } ;
 
 struct guess {
-	const char	*name ;
-	const char	*domain ;
+	cchar	*name ;
+	cchar	*domain ;
 } ;
 
 
@@ -191,7 +191,7 @@ static int	try_sysinfo(TRY *) ;
 static int	try_uname(TRY *) ;
 static int	try_gethost(TRY *) ;
 static int	try_resolve(TRY *) ;
-static int	try_resolvefile(TRY *,const char *) ;
+static int	try_resolvefile(TRY *,cchar *) ;
 static int	try_guess(TRY *) ;
 static int	try_finish(TRY *) ;
 
@@ -221,7 +221,7 @@ static int	(*systries[])(TRY *) = {
 	NULL
 } ;
 
-static const char	*resolvefnames[] = {
+static cchar	*resolvefnames[] = {
 	RESOLVFNAME,
 	"/var/run/resolv.conf",
 	NULL
@@ -296,10 +296,6 @@ int getsysdomain(char *dbuf,int dlen)
 	int		rs1 ;
 	int		len = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("getsysdomain: ent\n") ;
-#endif
-
 	if (dbuf == NULL) return SR_FAULT ;
 
 	if (dlen < 0) dlen = MAXHOSTNAMELEN ;
@@ -325,10 +321,6 @@ int getsysdomain(char *dbuf,int dlen)
 	    rs1 = try_finish(&ti) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (try) */
-
-#if	CF_DEBUGS
-	debugprintf("getsysdomain: ret rs=%d len=%u\n",rs,len) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
@@ -375,7 +367,7 @@ static int try_startvarnode(TRY *tip)
 {
 
 	if (! tip->f.initvarnode) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    tip->f.initvarnode = TRUE ;
 	    if ((cp = getenv(VARNODE)) != NULL) {
 	        tip->f.varnode = TRUE ;
@@ -397,8 +389,8 @@ static int try_startuname(TRY *tip)
 	    struct utsname	un ;
 	    tip->f.inituname = TRUE ;
 	    if ((rs = u_uname(&un)) >= 0) {
-	        const char	*cp ;
-	        const char	*np = un.nodename ;
+	        cchar	*cp ;
+	        cchar	*np = un.nodename ;
 	        int		nl = strlen(un.nodename) ;
 	        if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
 	            tip->f.uname = TRUE ;
@@ -441,13 +433,8 @@ static int try_startnode(TRY *tip)
 	int		rs = SR_OK ;
 	int		sl = -1 ;
 	int		cl ;
-	const char	*sp = NULL ;
-	const char	*cp ;
-
-#if	CF_DEBUGS
-	debugprintf("getnodedomain/try_startnode: ent initnode=%u\n",
-		tip->f.initnode) ;
-#endif
+	cchar	*sp = NULL ;
+	cchar	*cp ;
 
 	if (! tip->f.initnode) {
 	    tip->f.initnode = TRUE ;
@@ -458,19 +445,11 @@ static int try_startnode(TRY *tip)
 	        if (tip->f.varnode && (cp != NULL) && (cp[0] != '\0')) sp = cp ;
 	    }
 
-#if	CF_DEBUGS
-	debugprintf("getnodedomain/try_startnode: rs=%d 1 sp=%s\n",rs,sp) ;
-#endif
-
 	    if ((rs >= 0) && (sp == NULL)) {
 	        if (! tip->f.initsysinfo) rs = try_startsysinfo(tip) ;
 	        cp = tip->sibuf ;
 	        if (tip->f.initsysinfo && (cp[0] != '\0')) sp = cp ;
 	    }
-
-#if	CF_DEBUGS
-	debugprintf("getnodedomain/try_startnode: rs=%d 2 sp=%s\n",rs,sp) ;
-#endif
 
 	    if ((rs >= 0) && (sp == NULL)) {
 	        if (! tip->f.inituname) rs = try_startuname(tip) ;
@@ -479,10 +458,6 @@ static int try_startnode(TRY *tip)
 	            if (tip->f.inituname && (cp[0] != '\0')) sp = cp ;
 	        }
 	    }
-
-#if	CF_DEBUGS
-	debugprintf("getnodedomain/try_startnode: rs=%d 3 sp=%s\n",rs,sp) ;
-#endif
 
 	    if (rs >= 0) {
 	        if (sp != NULL) {
@@ -496,11 +471,6 @@ static int try_startnode(TRY *tip)
 
 	} /* end if (needed initialization) */
 
-#if	CF_DEBUGS
-	debugprintf("getnodedomain/try_startnode: ret rs=%d n=%s\n",
-		rs,tip->nodename) ;
-#endif
-
 	return (rs >= 0) ? 0 : rs ;
 }
 /* end subroutine (try_startnode) */
@@ -509,11 +479,11 @@ static int try_startnode(TRY *tip)
 static int try_vardomain(TRY *tip)
 {
 	int		rs = SR_OK ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if ((sp = getenv(VARDOMAIN)) != NULL) {
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cl = sfshrink(sp,-1,&cp)) > 0) {
 	        rs = snwcpy(tip->domainname,MAXHOSTNAMELEN,cp,cl) ;
 	    }
@@ -528,7 +498,7 @@ static int try_varlocaldomain(TRY *tip)
 {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	if ((sp = getenv(VARLOCALDOMAIN)) != NULL) {
 
@@ -559,8 +529,8 @@ static int try_varnode(TRY *tip)
 	if (! tip->f.initvarnode) rs = try_startvarnode(tip) ;
 
 	if ((rs >= 0) && tip->f.varnode) {
-	    const char	*tp, *cp ;
-	    const char	*sp = tip->varnode ;
+	    cchar	*tp, *cp ;
+	    cchar	*sp = tip->varnode ;
 	    if ((tp = strchr(sp,'.')) != NULL) {
 	        cp = (tp + 1) ;
 	        if (cp[0] != '\0')
@@ -580,7 +550,7 @@ static int try_sysinfo(TRY *tip)
 	if (! tip->f.initsysinfo) rs = try_startsysinfo(tip) ;
 
 	if ((rs >= 0) && tip->f.sysinfo) {
-	    const char	*tp, *sp, *cp ;
+	    cchar	*tp, *sp, *cp ;
 	    sp = tip->sibuf ;
 	    rs = 0 ;
 	    if ((tp = strchr(sp,'.')) != NULL) {
@@ -602,7 +572,7 @@ static int try_uname(TRY *tip)
 	if (! tip->f.inituname) rs = try_startuname(tip) ;
 
 	if ((rs >= 0) && tip->f.uname) {
-	    const char	*tp, *sp, *cp ;
+	    cchar	*tp, *sp, *cp ;
 	    sp = tip->sysnodename ;
 	    if ((tp = strchr(sp,'.')) != NULL) {
 	        cp = (tp + 1) ;
@@ -625,7 +595,7 @@ static int try_gethost(TRY *tip)
 	if ((rs >= 0) && tip->f.node) {
 	    struct hostent	he, *hep = &he ;
 	    const int		hlen = HOSTBUFLEN ;
-	    const char		*tp ;
+	    cchar		*tp ;
 	    char		hbuf[HOSTBUFLEN + 1] ;
 	    if ((rs = uc_gethostbyname(tip->nodename,&he,hbuf,hlen)) >= 0) {
 		const int	dlen = MAXHOSTNAMELEN ;
@@ -690,7 +660,7 @@ static int try_resolvefile(TRY *tip,cchar *fname)
 		const int	llen = LINEBUFLEN ;
 		int		len ;
 		int		sl, cl ;
-		const char	*tp, *sp, *cp ;
+		cchar	*tp, *sp, *cp ;
 		char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
@@ -756,8 +726,8 @@ static int try_guess(TRY *tip)
 	    int		m ;
 	    int		m_max = 0 ;
 	    int		gnl ;
-	    const char	*nn = tip->nodename ;
-	    const char	*gnp ;
+	    cchar	*nn = tip->nodename ;
+	    cchar	*gnp ;
 	    rs = 0 ;
 	    for (i = 0 ; ga[i].name != NULL ; i += 1) {
 	        gnp = ga[i].name ;

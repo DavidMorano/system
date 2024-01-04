@@ -1,19 +1,19 @@
-/* getrunlevel */
+/* getrunlevel SUPPORT */
+/* lang=C20 */
 
 /* return the run-level of the system */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_TMPX		1		/* try TMPX (reentrant) */
 #define	CF_UTMPX	0		/* try UTMPX (standard UNIX®) */
 #define	CF_UTMPACC	1		/* try |utmpacc_runlevel(3uc)| */
 
-
 /* revision history:
 
 	= 1998-11-18, David A­D­ Morano
-        This subroutine was written to simplify getting the current "run-level"
-        of the system.
+	This subroutine was written to simplify getting the current
+	"run-level" of the system.
 
 */
 
@@ -21,34 +21,33 @@
 
 /*******************************************************************************
 
-	We use the UTMPX database to query for the "run-level" of the system.
-	If the UTMPX file is not found, we return SR_NOENT.  If we cannot
-	access it we return SR_ACCESS.  If the file is found but there is no
-	"run-level" record in it, we return zero (0).
+	Name:
+	getrunlevel
+
+	Description:
+	We use the UTMPX database to query for the "run-level" of
+	the system.  If the UTMPX file is not found, we return
+	SR_NOENT.  If we cannot access it we return SR_ACCESS.  If
+	the file is found but there is no "run-level" record in it,
+	we return zero (0).
 
 	Synopsis:
 
-	int getrunlevel(utmpxfname)
-	const char	*utmpxfname ;
+	int getrunlevel(cchar *utmpxfname) noex
 
 	Arguments:
-
 	utmpxfname	UTMPX filename
 
 	Returns:
-
-	<0	one of: SR_NOENT, SR_ACCESS, other means some bad happened
 	>=0	run-level (including '0' meaning no record found)
+	<0	one of: SR_NOENT, SR_ACCESS, other means some bad happened
 
-	Notes: Why some subroutine like this was not provided by the UNIX®
-	developers themselves is a mystery.
-
+	Notes: Why some subroutine like this was not provided by
+	the UNIX® developers themselves is a mystery.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>

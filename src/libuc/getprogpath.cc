@@ -1,4 +1,4 @@
-/* getprogpath */
+/* getprogpath SUPPORT */
 /* lang=C++20 */
 
 /* get the path to a program */

@@ -1,7 +1,8 @@
-/* getus */
-/* lang=C++20 */
+/* getus SUPPORT */
+/* lang=C20 */
 
 /* get user-shell entries */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,18 +19,18 @@
 
 /*******************************************************************************
 
-	These subroutines were was written to provide a more consistent
-	interface to the system 'user-shells" database.
+	These subroutines were was written to provide a more
+	consistent interface to the system 'user-shells" database.
 
-	These subroutines are multi-thread safe, because the underlying
-	subroutines are themselves multi-thread safe.
+	These subroutines are multi-thread safe, because the
+	underlying subroutines are themselves multi-thread safe.
 
-	Although safe for multithreading, different threads using these
-	subroutines at the same time will enumerate separate subsets of the
-	accessed database.  This is the way the UNIX® gods seemed to want these
-	sorts of subroutines to work (did they really have a choice given that
-	these existed before multi-threading came into vogue?).
-
+	Although safe for multithreading, different threads using
+	these subroutines at the same time will enumerate separate
+	subsets of the accessed database.  This is the way the UNIX®
+	gods seemed to want these sorts of subroutines to work (did
+	they really have a choice given that these existed before
+	multi-threading came into vogue?).
 
 *******************************************************************************/
 

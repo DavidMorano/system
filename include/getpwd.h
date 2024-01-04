@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
+#include	<localmisc.h>
 
 
 #ifdef	__cplusplus

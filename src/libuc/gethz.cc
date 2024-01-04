@@ -1,4 +1,4 @@
-/* gethz */
+/* gethz SUPPORT */
 /* lang=C20 */
 
 /* get the machine HZ */

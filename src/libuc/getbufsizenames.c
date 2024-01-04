@@ -1,4 +1,4 @@
-/* getbufsizenames */
+/* getbufsizenames SUPPORT */
 /* lang=C23 (MUST-BE C-language) */
 
 /* enumerate the various system buffer-size names */

@@ -1,4 +1,4 @@
-/* getnodeinfo */
+/* getnodeinfo SUPPORT */
 /* lang=C20 */
 
 /* get a cluster name given a nodename */
@@ -21,6 +21,7 @@
 /*******************************************************************************
 
 	Name:
+	getnodeinfo
 
 	Description:
 	Get a cluster name given a nodename.

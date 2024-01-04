@@ -71,13 +71,13 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
 
 extern "C" {
-    typedef int (*rls_f)(filebuf *,char *,int,int,int *) ;
+    typedef int (*rls_f)(filebuf *,char *,int,int,int *) noex ;
     typedef int (*vs_f)(cchar **,cchar **) noex ;
 }
 

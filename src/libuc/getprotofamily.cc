@@ -1,4 +1,4 @@
-/* getprotofamily */
+/* getprotofamily SUPPORT */
 /* lang=C20 */
 
 /* get a protocol family from an address family */
@@ -20,8 +20,8 @@
 	getprotofamily
 
 	Description:
-	This subroutine will find a protocol family (if one exists) that
-	corresponds with a specified address family.
+	This subroutine will find a protocol family (if one exists)
+	that corresponds with a specified address family.
 
 	Synopsis:
 	int getprotofamily(int af) noex
@@ -61,7 +61,7 @@
 /* local structures */
 
 struct typematch {
-	const int	af, pf ;
+	cint	af, pf ;
 } ;
 
 

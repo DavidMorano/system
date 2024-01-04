@@ -1,4 +1,4 @@
-/* getxusername */
+/* getxusername SŒPPORT */
 /* lang=C20 */
 
 /* get the best approximation of the user's username */
@@ -123,7 +123,6 @@
 	when we find am answer, we put it into the local program
 	cache (if we had not retrieved it from there in the first
 	place).
-
 
 *******************************************************************************/
 

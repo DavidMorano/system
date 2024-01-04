@@ -1,5 +1,5 @@
-/* getax */
-/* lang=C20 */
+/* getax SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® System databases (PASSWD, SHADOW, GROUP, and PROJECT) */
 /* version %I% last-modified %G% */
@@ -25,7 +25,6 @@
 
 	preferred interfaces: getpw_name(), getpw_uid() ;
 	preferred interfaces: getgr_name(), getgr_gid() ;
-
 
 *******************************************************************************/
 

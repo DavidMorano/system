@@ -1,11 +1,11 @@
-/* getuserhome */
+/* getuserhome SUPPORT */
+/* lang=C20 */
 
 /* get the home directory of the specified user */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -18,55 +18,50 @@
 
 /*******************************************************************************
 
-	We carry out some searches in order to find the home directory for a
-	specified user (given by username).
+	Name:
+	getusername
+
+	Description:
+	We carry out some searches in order to find the home directory
+	for a specified user (given by username).
 
 	Synopsis:
-
-	int getuserhome(rbuf,rlen,username)
-	char		rbuf[] ;
-	int		rlen ;
-	const char	username[] ;
+	int getuserhome(char *rbuf,int rlen,cchar *username) noex
 
 	Arguments:
-
 	rbuf		buffer to hold result
 	rlen		length of supplied result buffer
 	username	username to check
 
 	Returns:
-
 	>=0		OK
-	<0		some error
-
+	<0		some error (syhstem-return)
 
 	Implementation note:
+	Is "home-searching" faster than just asking the system for
+	the home directory of a user?  It probably is not!  In
+	reality, it is a matter of interacting with the Automount
+	server probably much more than what would have happened if
+	we just first interacted with the Name-Server-Cache and
+	then the Automount server once after that.
 
-	Is "home-searching" faster than just asking the system for the home
-	directory of a user?  It probably is not!  In reality, it is a matter
-	of interacting with the Automount server probably much more than what
-	would have happened if we just first interacted with the
-	Name-Server-Cache and then the Automount server once after that.
+	Note that we NEVER 'stat(2)' a file directly within any of
+	the possible base directories for home-directories without
+	first having a pretty good idea that it is actually there.
+	This is done to avoid those stupid SYSLOG entries saying
+	that a file could not be found within an indirect auto-mount
+	point -- what the base directories usually are now-a-days!
 
-	Note that we NEVER 'stat(2)' a file directly within any of the possible
-	base directories for home-directories without first having a pretty
-	good idea that it is actually there.  This is done to avoid those
-	stupid SYSLOG entries saying that a file could not be found within an
-	indirect auto-mount point -- what the base directories usually are
-	now-a-days!
-
-	On second thought, avoiding asking the "system" may be a good course of
-	action since even though we are going through the name-server cache, it
-	more often than not has to go out to some weirdo-only-knows network NIS+
-	(whatever) server to get the PASSWD information.  This is not unusual
-	in a large organization.
-
+	On second thought, avoiding asking the "system" may be a
+	good course of action since even though we are going through
+	the name-server cache, it more often than not has to go out
+	to some weirdo-only-knows network NIS+ (whatever) server
+	to get the PASSWD information.  This is not unusual in a
+	large organization.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -75,7 +70,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<pwd.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<fsdir.h>

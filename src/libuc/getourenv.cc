@@ -1,4 +1,4 @@
-/* getourenv */
+/* getourenv SUPPORT */
 /* lang=C++20 */
 
 /* get (retrieve) a local environment variables */

@@ -1,4 +1,4 @@
-/* getdig */
+/* getdig SUPPORT */
 /* lang=C++20 */
 
 /* create a digit from a value */

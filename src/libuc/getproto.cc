@@ -1,4 +1,4 @@
-/* getproto */
+/* getproto SUPPORT */
 /* lang=C20 */
 
 /* get a protocol number given a protocol name */
