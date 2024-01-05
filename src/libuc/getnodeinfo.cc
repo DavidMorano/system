@@ -72,6 +72,8 @@
 #include	<getnodename.h>
 #include	<localmisc.h>
 
+#include	"getnodeinfo.h"
+
 
 /* local defines */
 
@@ -131,7 +133,7 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 		if ((rs = malloc_mp(&tbuf)) >= 0) {
 	            if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
 	                nodedb		st ;
-	                nodedb_ent	ste ;
+	                nodedb_ent	ste{} ;
 	                cint		elen = NODEDB_ENTLEN ;
 	                char		ebuf[NODEDB_ENTLEN + 1] ;
 	                if ((rs = nodedb_open(&st,tbuf)) >= 0) {
