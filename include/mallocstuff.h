@@ -1,7 +1,7 @@
-/* matkeystr HEADER */
-/* lang=C++20 */
+/* mallocstuff HEADER */
+/* lang=C20 */
 
-/* match the key part of a string */
+/* miscellaneous |malloc(3c)| related */
 /* version %I% last-modified %G% */
 
 
@@ -14,33 +14,29 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MATKEYSTR_INCLUDE
-#define	MATKEYSTR_INCLUDE
+#ifndef	MALLOCSTUFF_INCLUDE
+#define	MALLOCSTUFF_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
-
-
-#ifndef	TYPEDEF_MAINV
-#define	TYPEDEF_MAINV
-typedef const char *const	*mainv ;
-#endif
 
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int matkeystr(mainv,cchar *,int) noex ;
+extern char	*mallocbuf(void *,int) noex ;
+extern char	*mallocstr(cchar *) noex ;
+extern char	*mallocstrw(cchar *,int) noex ;
+extern char	*malloctest(int) noex ;
 
 #ifdef	__cplusplus
 }
-#endif /* __cplusplus */
+#endif
 
 
-#endif /* MATKEYSTR_INCLUDE */
+#endif /* MALLOCSTUFF_INCLUDE */
 
 

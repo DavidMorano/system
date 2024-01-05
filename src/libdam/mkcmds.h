@@ -1,7 +1,7 @@
-/* mkcmds */
+/* mkcmds HEADER */
 /* lang=C20 */
 
-/* names string storiage: purpose? */
+/* names string storage: purpose? */
 /* version %I% last-modified %G% */
 
 

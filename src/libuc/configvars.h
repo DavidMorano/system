@@ -76,8 +76,10 @@ struct configvars_variable {
 } ;
 
 typedef CONFIGVARS	configvars ;
-typedef CONFIGVRS_VAR	configvars_var ;
-typedef CONFIGVARS_FILE	configvars_file
+typedef CONFIGVARS_VAR	configvars_var ;
+typedef CONFIGVARS_FILE	configvars_file ;
+typedef CONFIGVARS_CUR	configvars_cur ;
+typedef CONFIGVARS_ERR	configvars_err ;
 
 #ifdef	__cplusplus
 extern "C" {
