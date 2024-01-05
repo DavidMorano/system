@@ -37,7 +37,7 @@
 
 
 struct nodedb_cursor {
-	hdb_cur		ec ;
+	hdb_cur		*ecp ;
 	int		i ;
 } ;
 

@@ -1,4 +1,4 @@
-/* nodedb */
+/* nodedb SUPPORT */
 /* lang=C++20 */
 
 /* magement for the NODE-DB file */
@@ -40,12 +40,14 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
-#include	<ctime>
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strcmp(3c)| */
+#include	<cstring>		/* <- for |strcmp(3c)| + |strlen(3c)| */
+#include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
@@ -56,8 +58,7 @@
 #include	<mkpathx.h>
 #include	<sfx.h>
 #include	<mkpathrooted.h>
-#include	<bufsizevar.hh>
-#include	<mallocxx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"nodedb.h"
@@ -85,7 +86,7 @@
 #define	SVCENTRY_KEY		struct svcentry_key
 
 #define	LINEINFO		struct lineinfo
-#define	LINEINFO_field		struct lineinfo_field
+#define	LINEINFO_FIELD		struct lineinfo_field
 
 #define	NODEDB_KA		sizeof(char *(*)[2])
 #define	NODEDB_BO(v)		\
@@ -120,7 +121,6 @@ typedef cchar		*(*keytabp)[2] ;
 
 extern "C" {
     extern int	field_srvarg(field *,cchar *,char *,int) noex ;
-    extern int	isNotPresent(int) noex ;
 }
 
 
@@ -370,23 +370,32 @@ int nodedb_fileadd(nodedb *op,cchar *fname) noex {
 }
 /* end subroutine (nodedb_fileadd) */
 
-int nodedb_curbegin(nodedb *op,NODEDB_CUR *curp) noex {
+int nodedb_curbegin(nodedb *op,nodedb_cur *curp) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
+	    rs = SR_NOMEM ;
 	    curp->i = -1 ;
-	    if ((rs = hdb_curbegin(op->entsp,&curp->ec)) >= 0) {
-	        op->cursors += 1 ;
-	    }
+	    if ((curp->ecp = new(nothrow) hdb_cur) != nullptr) {
+	        if ((rs = hdb_curbegin(op->entsp,curp->ecp)) >= 0) {
+	            op->cursors += 1 ;
+	        }
+		if (rs < 0) {
+		    delete curp->ecp ;
+		    curp->ecp = nullptr ;
+		}
+	    } /* end if (new-hdb_cur) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (nodedb_curbegin) */
 
-int nodedb_curend(nodedb *op,NODEDB_CUR *curp) noex {
+int nodedb_curend(nodedb *op,nodedb_cur *curp) noex {
 	int		rs ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
-	    if ((rs = hdb_curend(op->entsp,&curp->ec)) >= 0) {
+	    if ((rs = hdb_curend(op->entsp,curp->ecp)) >= 0) {
+		delete curp->ecp ;
+		curp->ecp = nullptr ;
 	        op->cursors -= 1 ;
 	    }
 	} /* end if (magic) */
@@ -400,17 +409,14 @@ int nodedb_enum(ND *op,ND_C *curp,ND_E *ep,char *ebuf,int elen) noex {
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
 	    hdb_dat	key{} ;
 	    hdb_dat	val{} ;
-	    hdb_cur	cur = curp->ec ;
-	    if ((rs = hdb_enum(op->entsp,&cur,&key,&val)) >= 0) {
+	    hdb_cur	*ecp = curp->ecp ;
+	    if ((rs = hdb_enum(op->entsp,ecp,&key,&val)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
 	        if (ep && ebuf) {
 	            rs = entry_load(ep,ebuf,elen,iep) ;
 	            svclen = rs ;
 	        } else {
 	            svclen = strlen(iep->svc) ;
-	        }
-	        if (rs >= 0) {
-	            curp->ec = cur ;
 	        }
 	    } /* end if (had an entry) */
 	} /* end if (magic) */
@@ -423,24 +429,20 @@ int nodedb_fetch(ND *op,cc *svcbuf,ND_C *curp,
 	int		rs ;
 	int		svclen = 0 ;
 	if ((rs = nodedb_magic(op,curp)) >= 0) {
-	        hdb_dat	key{} ;
-	        hdb_dat	val{} ;
-	        hdb_cur		hcur{} ;
-	        key.buf = svcbuf ;
-	        key.len = strlen(svcbuf) ;
-	        hcur = curp->ec ;
-	        if ((rs = hdb_fetch(op->entsp,key,&hcur,&val)) >= 0) {
-	            NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
-	            if (ep && ebuf) {
-	                rs = entry_load(ep,ebuf,elen,iep) ;
-	                svclen = rs ;
-	            } else {
-	                svclen = strlen(iep->svc) ;
-	            }
-	            if (rs >= 0) {
-	                curp->ec = hcur ;
-	            }
-	        } /* end if (hdb_fetch) */
+	    hdb_dat	key{} ;
+	    hdb_dat	val{} ;
+	    hdb_cur	*ecp = curp->ecp ;
+	    key.buf = svcbuf ;
+	    key.len = strlen(svcbuf) ;
+	    if ((rs = hdb_fetch(op->entsp,key,ecp,&val)) >= 0) {
+	        NODEDB_IE	*iep = (NODEDB_IE *) val.buf ;
+	        if (ep && ebuf) {
+	            rs = entry_load(ep,ebuf,elen,iep) ;
+	            svclen = rs ;
+	        } else {
+	            svclen = strlen(iep->svc) ;
+	        }
+	    } /* end if (hdb_fetch) */
 	} /* end if (magic) */
 	return (rs >= 0) ? svclen : rs ;
 }
