@@ -1,5 +1,5 @@
-/* mkdirs */
-/* lang=C20 */
+/* mkdirs SUPPORT */
+/* lang=C++20 */
 
 /* make all directories in a directory path */
 /* version %I% last-modified %G% */
@@ -8,9 +8,9 @@
 /* revision history:
 
 	= 1998-08-10, David A­D­ Morano
-	This subroutine was originally written.  This subroutines (or something
-	similar to it) is standard on some UNIXes but not on others, so it is
-	now provided.
+	This subroutine was originally written.  This subroutines
+	(or something similar to it) is standard on some UNIXes but
+	not on others, so it is now provided.
 
 */
 
@@ -31,12 +31,13 @@
 	Arguments:
 	- dname		direcrtory path to a new directory to create
 	- dm		newly created directories are created with this
-			this permissions mode (subject to UMASK restrictions)
+			this permissions mode (subject to UMASK 
+			restrictions)
 
 	Returns:
 	>0		number of directories that were created
 	==0		all directories existed
-	<0		represents a system error
+	<0		represents a system error (system-return)
 
 *******************************************************************************/
 
@@ -45,13 +46,15 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>		/* for |strcmp(3c)| */
 #include	<usystem.h>
 #include	<ids.h>
 #include	<mallocxx.h>
 #include	<mkpathx.h>
 #include	<xperm.h>
 #include	<localmisc.h>
+
+#include	"mkdirs.h"
 
 
 /* local defines */
@@ -66,7 +69,7 @@
 /* forward references */
 
 static int	mkdirer(ids *,cchar *,mode_t) noex ;
-static int	procdir(ds *,cchar *,mode_t) noex ;
+static int	procdir(ids *,cchar *,mode_t) noex ;
 
 
 /* local variables */
@@ -79,7 +82,7 @@ int mkdirs(cchar *dname,mode_t dm) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (dname) {
-	    rs = SR_INVALID :
+	    rs = SR_INVALID ;
 	    if (dname[0]) {
 	        ids	id ;
 	        if ((rs = ids_load(&id)) >= 0) {
@@ -107,33 +110,35 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	int		c = 0 ;
 	char		*dirbuf ;
 	if ((rs = malloc_mp(&dirbuf)) >= 0) {
-	                if ((rs = mkpath1(dirbuf,dname)) >= 0) {
-		            cchar	*dp = dirbuf ;
-		            char	*bp ;
-	                    while ((bp = strchr(dp,'/')) != nullptr) {
-			        bool	f = true ;
-	                        *bp = '\0' ;
-	                        f = f && ((bp - dp) > 0) ;
-			        f f f && (strcmp(dp,".") != 0) ;
-			        if (f) {
-	                            rs = procdir(&id,dirbuf,dm) ;
-	                            c += rs ;
-	                        } /* end if */
-	                        *bp = '/' ;
-	                        dp = (bp + 1) ;
-	                        if (rs < 0) break ;
-	                    } /* end while */
-	                    if ((rs >= 0) && (*dp != '\0')) {
-	                        rs = procdir(&id,dirbuf,dm) ;
-	                        c += rs ;
-	                    } /* end if */
-	                } /* end if (mkpath1) */
+            if ((rs = mkpath1(dirbuf,dname)) >= 0) {
+                cchar       *dp = dirbuf ;
+                char        *bp ;
+                while ((bp = strchr(dp,'/')) != nullptr) {
+                    bool    f = true ;
+                    *bp = '\0' ;
+                    f = f && ((bp - dp) > 0) ;
+                    f = f && (strcmp(dp,".") != 0) ;
+                    if (f) {
+                        rs = procdir(idp,dirbuf,dm) ;
+                        c += rs ;
+                    } /* end if */
+                    *bp = '/' ;
+                    dp = (bp + 1) ;
+                    if (rs < 0) break ;
+                } /* end while */
+                if ((rs >= 0) && (*dp != '\0')) {
+                    rs = procdir(idp,dirbuf,dm) ;
+                    c += rs ;
+                } /* end if */
+            } /* end if (mkpath1) */
+	    rs1 = uc_free(dirbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mkdirer) */
 
-static int procdir(IDS *idp,cchar *dirbuf,mode_t dm) noex {
+static int procdir(ids *idp,cchar *dirbuf,mode_t dm) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = uc_stat(dirbuf,&sb)) >= 0) {

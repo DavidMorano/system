@@ -44,8 +44,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<strn.h>

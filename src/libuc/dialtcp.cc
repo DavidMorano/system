@@ -74,13 +74,19 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<hostinfo.h>
 #include	<hostaddr.h>
 #include	<hostent.h>
+#include	<getproto.h>
+#include	<getprotofamily.h>
 #include	<sockaddress.h>
+#include	<inetconv.h>
+#include	<iserror.h>
+#include	<openaddrinfo.h>
 #include	<localmisc.h>
 
 #include	"dialtcp.h"
@@ -98,7 +104,9 @@
 #define	ADDRBUFLEN	64
 #endif
 
+#ifndef	HEXBUFLEN
 #define	HEXBUFLEN	100
+#endif
 
 #define	RETRIES		1		/* Sun-Solaris problem */
 
@@ -108,15 +116,8 @@
 
 /* external subroutines */
 
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	inetpton(uchar *,int,int,cchar *,int) ;
-extern int	getprotofamily(int) ;
 extern int	getportnum(cchar *,cchar *) ;
-extern int	getproto_name(cchar *,int) ;
 extern int	opensockaddr(int,int,int,SOCKADDR *,int) ;
-extern int	openaddrinfo(ADDRINFO *,int) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	isFailConn(int) ;
 
 
 /* external variables */
@@ -175,38 +176,36 @@ static int	subinfo_makeconn(SUBINFO *,int,SOCKADDR *) noex ;
 
 /* ARGSUSED */
 int dialtcp(cchar *hostname,cchar *portspec,int af,int to,int opts) noex {
-	SUBINFO		si, *sip = &si ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-
-	if (hostname == NULL) return SR_FAULT ;
-	if (portspec == NULL) return SR_FAULT ;
-
-	if (hostname[0] == '\0') rs = SR_INVALID ;
-	if (portspec[0] == '\0') rs = SR_INVALID ;
-
-	if (to == 0) to = 1 ;
-
-	if ((rs = subinfo_start(sip,hostname,portspec,to)) >= 0) {
-	    if ((rs = subinfo_proto(sip)) >= 0) {
-	        if ((rs = subinfo_svc(sip)) >= 0) {
-	            if ((rs = subinfo_addr(sip,af)) >= 0) {
-	                if ((rs = subinfo_try(sip)) >= 0) {
-	                    fd = rs ;
-	                    rs = dialopts(fd,opts) ;
-	                }
-	                if ((rs < 0) && (sip->count == 0)) {
-	                    rs = SR_HOSTUNREACH ;
-			}
-	            } /* end if (subinfo_addr) */
-	        } /* end if (subinfo_svc) */
-	    } /* end if (subinfo_proto) */
-	    rs1 = subinfo_finish(sip) ;
-	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	} /* end if (subinfo) */
-
+	if (hostname && portspec) {
+	    rs = SR_INVALID ;
+	    if (hostname[0] && portspec[0]) {
+	        SUBINFO		si, *sip = &si ;
+	        if (to == 0) to = 1 ;
+	        if ((rs = subinfo_start(sip,hostname,portspec,to)) >= 0) {
+	            if ((rs = subinfo_proto(sip)) >= 0) {
+	                if ((rs = subinfo_svc(sip)) >= 0) {
+	                    if ((rs = subinfo_addr(sip,af)) >= 0) {
+	                        if ((rs = subinfo_try(sip)) >= 0) {
+	                            fd = rs ;
+	                            rs = dialopts(fd,opts) ;
+	                        }
+	                        if ((rs < 0) && (sip->count == 0)) {
+	                            rs = SR_HOSTUNREACH ;
+			        }
+	                    } /* end if (subinfo_addr) */
+	                } /* end if (subinfo_svc) */
+	            } /* end if (subinfo_proto) */
+	            rs1 = subinfo_finish(sip) ;
+	            if (rs >= 0) rs = rs1 ;
+	            if ((rs < 0) && (fd >= 0)) {
+		        uc_close(fd) ;
+	            }
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialtcp) */
@@ -217,7 +216,7 @@ int dialtcp(cchar *hostname,cchar *portspec,int af,int to,int opts) noex {
 static int subinfo_start(SUBINFO *sip,cchar *hn,cchar *ps,int to) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
-	    memset(sip,0,sizeof(SUBINFO)) ;
+	    memclear(sip) ;
 	    sip->hostname = hn ;
 	    sip->portspec = ps ;
 	    sip->protoname = PROTONAME ;
@@ -369,7 +368,7 @@ static int try_inet4(SUBINFO *sip) noex {
 		    SOCKADDR	*sap ;
 	            int		c = 0 ;
 		    int		al ;
-		    cchar	*ap ;
+		    cuchar	*ap ;
 
 	            while (rs >= 0) {
 	                al = hostinfo_enumaddr(&hi,&hc,&ap) ;
@@ -413,140 +412,116 @@ static int try_inet6(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		flags ;
 	int		fd = -1 ;
-
 	flags = AI_ADDRCONFIG ;
 	if ((rs = uc_getipnodebyname(&hep,sip->hostname,af,flags)) >= 0) {
 	    SOCKADDRESS	server ;
 	    cint	pf = PF_INET6 ;
-	    uchar	dummy[2] ;
-
-	    dummy[0] = '\0' ;
+	    uchar	dummy[2] = {} ;
 	    if ((rs = sockaddress_start(&server,af,dummy,sip->port,0)) >= 0) {
 	        hostent_cur	hc ;
-
 	        if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
 	    	    SOCKADDR	*sap ;
 	            int		c = 0 ;
-	    	    cchar	*ap ;
-
+	    	    cuchar	*ap ;
 	            while ((rs1 = hostent_enumaddr(hep,&hc,&ap)) >= 0) {
-
 	                sockaddress_putaddr(&server,ap) ;
-
 	                c += 1 ;
 	                sip->count += 1 ;
 	                sap = (SOCKADDR *) &server ;
 	                rs = subinfo_makeconn(sip,pf,sap) ;
 	                fd = rs ;
-
 	                if (fd >= 0) break ;
 	                if ((rs < 0) && (rs != SR_PFNOSUPPORT)) break ;
 	            } /* end while */
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-
 	            rs1 = hostent_curend(hep,&hc) ;
 		    if (rs >= 0) rs = rs1 ;
 	            if ((rs >= 0) && (c == 0)) rs = SR_HOSTUNREACH ;
 	        } /* end if (cursor) */
-
-	        sockaddress_finish(&server) ;
+	        rs1 = sockaddress_finish(&server) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
-
 	    rs1 = uc_freehostent(hep) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (uc_getipnodebyname) */
-	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-
+	if ((rs < 0) && (fd >= 0)) {
+	    uc_close(fd) ;
+	}
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (try_inet6) */
 
 static int try_addr(SUBINFO *sip) noex {
 	int		rs ;
+	int		rs1 ;
 	int		fd = 0 ;
-
 	if ((rs = getprotofamily(sip->af)) >= 0) {
 	    SOCKADDRESS		server ;
 	    cint		pf = rs ;
 	    cint		port = sip->port ;
 	    uchar		*ap = (uchar *) sip->addrbuf ;
-
 	    if ((rs = sockaddress_start(&server,sip->af,ap,port,0)) >= 0) {
 	        SOCKADDR	*sap ;
-
 	        sip->count += 1 ;
 	        sap = (SOCKADDR *) &server ;
 	        rs = subinfo_makeconn(sip,pf,sap) ;
 	        fd = rs ;
-
-	        sockaddress_finish(&server) ;
+	        rs1 = sockaddress_finish(&server) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
-
 	} /* end if (getprotofamily) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (try_addr) */
 
 #if	CF_TRYINET
 static int try_inet(SUBINFO *sip) noex {
-	ADDRINFO	hint, *aip ;
+	ADDRINFO	hint{} ;
+	ADDRINFO	*aip{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd = -1 ;
-
-	memset(&hint,0,sizeof(ADDRINFO)) ;
 	hint.ai_protocol = sip->proto ;
-
 	if (sip->af >= 0) {
 	    if ((rs = getprotofamily(sip->af)) >= 0) {
 	        hint.ai_family = rs ;	/* documentation says use PF! */
 	    }
 	}
-
 /* do the spin */
-
 	if (rs >= 0) {
-	    HOSTADDR	ha ;
+	    hostaddr	ha ;
 	    cchar	*hn = sip->hostname ;
 	    cchar	*ps = sip->portspec ;
 	    if ((rs = hostaddr_start(&ha,hn,ps,&hint)) >= 0) {
-	        HOSTADDR_CUR	cur ;
-
+	        hostaddr_cur	cur ;
 	        if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) {
 	            int		c = 0 ;
-
 	            while ((rs1 = hostaddr_enum(&ha,&cur,&aip)) >= 0) {
-	                const int	aif = aip->ai_family ; /* PF */
-		        int		f = false ;
-
+	                cint	aif = aip->ai_family ; /* PF */
+		        bool	f = false ;
 	                f = f || (hint.ai_family == 0) ;
 	                f = f || (hint.ai_family == aif) ;
 	                f = f || (aif == 0) ;
 		        if (f) {
-			    const int	to = sip->to ;
+			    cint	to = sip->to ;
 	                    c += 1 ;
 	                    sip->count += 1 ;
 			    rs = openaddrinfo(aip,to) ;
 	                    fd = rs ;
 	                } /* end if (protocol match) */
-
 	                if (fd >= 0) break ;
 	                if ((rs < 0) && (rs != SR_PFNOSUPPORT)) break ;
 	            } /* end while */
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-
 	            rs1 = hostaddr_curend(&ha,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 	            if ((rs >= 0) && (c == 0)) rs = SR_HOSTUNREACH ;
 	        } /* end if (cursor) */
-
 	        rs1 = hostaddr_finish(&ha) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (initialized host addresses) */
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (ok) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (try_inet) */

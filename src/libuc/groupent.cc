@@ -24,7 +24,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
 #include	<utypedefs.h>
@@ -32,6 +32,10 @@
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
+#include	<sfx.h>
+#include	<strn.h>
+#include	<cfdec.h>
+#include	<intceil.h>
 #include	<localmisc.h>
 
 #include	"groupent.h"
@@ -45,14 +49,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	sfshrink(cchar *,int,cchar **) noex ;
-    extern int	sichr(cchar *,int,int) noex ;
-    extern int	cfdeci(cchar *,int,int *) noex ;
-    extern int	iceil(int,int) noex ;
-    extern char	*strnchr(cchar *,int,int) noex ;
-}
 
 
 /* external variables */
