@@ -29,52 +29,45 @@
 	f_new		new TRUE or FALSE setting biffing
 
 	Returns:
-
-	<0		error
 	>=0		previous TRUE or FALSE setting
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<termios.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
 /* exported subroutines */
 
-
-int tcsetbiff(int fd,int f_new)
-{
-	struct ustat	sb ;
-	int		rs ;
+int tcsetbiff(int fd,int f_new) noex {
+	int		rs = SR_BADF ;
 	int		f_old = FALSE ;
-
-	if (fd < 0)
-	    return SR_NOTOPEN ;
-
-	if ((rs = u_fstat(fd,&sb)) >= 0) {
-	    mode_t	m_old = sb.st_mode ;
-	    f_old = (m_old & S_IWGRP) ;
-	    if (! LEQUIV(f_old,f_new)) {
-	        mode_t	m_new ;
-	        if (f_new) {
-	            m_new = (m_old | S_IXUSR) ;
-	        } else {
-	            m_new = (m_old & (~ S_IXUSR)) ;
-		}
-	        rs = u_fchmod(fd,m_new) ;
-	    } /* end if (old and new were different) */
-	} /* end if (stat) */
-
+	if (fd >= 0) {
+	    USTAT		sb ;
+	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+	        mode_t	m_old = sb.st_mode ;
+	        f_old = (m_old & S_IWGRP) ;
+	        if (! LEQUIV(f_old,f_new)) {
+	            mode_t	m_new ;
+	            if (f_new) {
+	                m_new = (m_old | S_IXUSR) ;
+	            } else {
+	                m_new = (m_old & (~ S_IXUSR)) ;
+		    }
+	            rs = u_fchmod(fd,m_new) ;
+	        } /* end if (old and new were different) */
+	    } /* end if (stat) */
+	} /* end if (valid) */
 	return (rs >= 0) ? f_old : rs ;
 }
 /* end subroutine (tcsetbiff) */

@@ -70,9 +70,7 @@
 
 /* exported subroutines */
 
-
-int tcpeek(int fd,char *dbuf,int dlen)
-{
+int tcpeek(int fd,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		len = 0 ;
 

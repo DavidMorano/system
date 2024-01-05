@@ -3,9 +3,6 @@
 /* UNIX® terminal-control "get-window-size" */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
 /* revision history:
 
 	= 1998-08-20, David A­D­ Morano
@@ -29,51 +26,36 @@
 	fd		file-descriptor of terminal
 
 	Returns:
-
-	<0		error
 	>=0		number of lines
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<termios.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
 
 /* exported subroutines */
 
-
-int tcgetws(int fd,struct winsize *wsp)
-{
-	int		rs ;
-
-	if (wsp == NULL) return SR_FAULT ;
-
-	if (fd >= 0) {
-	    memset(wsp,0,sizeof(struct winsize)) ;
-	    rs = u_ioctl(fd,TIOCGWINSZ,wsp) ;
-	} else
-	    rs = SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("tcgetws: ret rs=%d\n",rs) ;
-#endif
+int tcgetws(int fd,WINSIZE *wsp) noex {
+	int		rs = SR_FAULT ;
+	if (wsp) {
+	    rs = SR_BADF ;
+	    if (fd >= 0) {
+	        memclear(wsp) ;
+	        rs = u_ioctl(fd,TIOCGWINSZ,wsp) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (tcgetws) */
