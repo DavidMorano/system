@@ -1,4 +1,4 @@
-/* configvars */
+/* configvars HEADER */
 /* lang=C++20 */
 
 /* Configuration-Variables */
@@ -22,19 +22,19 @@
 #define	CONFIGVARS_MAGIC	0x04311633
 #define	CONFIGVARS		struct configvars_head
 #define	CONFIGVARS_ERR		struct configvars_errline
-#define	CONFIGVARS_VAR		struct configvars_v
-#define	CONFIGVARS_FILE		struct configvars_file
-#define	CONFIGVARS_CUR		struct configvars_c
+#define	CONFIGVARS_VAR		struct configvars_variable
+#define	CONFIGVARS_FILE		struct configvars_filer
+#define	CONFIGVARS_CUR		struct configvars_cursor
+#define	CONFIGVARS_VFL		struct configvars_vflags
 
 #define	CONFIGVARS_NFILES	(sizeof(int) * 8)
 
 
-struct paramfile_c {
+struct paramfile_cursor {
 	int		i ;
 } ;
 
 struct configvars_head {
-	uint		magic ;		/* magic number */
 	vecitem		fes ;		/* file entries */
 	vecitem		defines ;	/* collapsed defined variables */
 	vecitem		unsets ;	/* unset ENV variables */
@@ -42,10 +42,11 @@ struct configvars_head {
 	vecitem		sets ;		/* "set" variables */
 	vecitem		vars ;		/* the user's variables */
 	time_t		checktime ;
+	uint		magic ;		/* magic number */
 } ;
 
-struct configvars_file {
-	const char	*filename ;
+struct configvars_filer {
+	cchar		*filename ;
 	vecitem		defines ;	/* defined variables */
 	vecitem		unsets ;	/* unset ENV variables */
 	vecitem		exports ;	/* environment variables */
@@ -62,45 +63,38 @@ struct configvars_vflags {
 	uint		expanded:1 ;	/* key expanded */
 } ;
 
-struct configvars_v {
+struct configvars_variable {
 	char		*ma ;		/* memory allocation (for ARGV) */
-	char		*key, *value ;
-	char		**argv ;
-	struct configvars_vflags	f ;
+	char		*key ;
+	char		*value ;
+	mainv		argv ;
+	CONFIGVARS_VFL	f ;
 	int		argc ;
 	int		fi ;		/* file index of source */
 	int		fmask ;		/* file mask of dependencies */
 	int		klen, vlen ;
 } ;
 
-
-#ifdef	COMMENT
-
-typedef struct configvars_head		configvars ;
-typedef struct configvars_v		configvars_var ;
-
-#endif /* COMMENT */
-
-
-#if	(! defined(CONFIGVARS_MASTER)) || (CONFIGVARS_MASTER == 0)
+typedef CONFIGVARS	configvars ;
+typedef CONFIGVRS_VAR	configvars_var ;
+typedef CONFIGVARS_FILE	configvars_file
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-int configvars_open(CONFIGVARS *,const char *,VECITEM *) ;
-int configvars_addfile(CONFIGVARS *,const char *,VECITEM *) ;
-int configvars_check(CONFIGVARS *,time_t) ;
-int configvars_curbegin(CONFIGVARS *,CONFIGVARS_CUR *) ;
-int configvars_curend(CONFIGVARS *,CONFIGVARS_CUR *) ;
-int configvars_fetch(CONFIGVARS *,const char *,CONFIGVARS_CUR *,const char **) ;
-int configvars_close(CONFIGVARS *) ;
+int configvars_open(configvars *,cchar *,vecitem *) noex ;
+int configvars_addfile(configvars *,cchar *,vecitem *) noex ;
+int configvars_check(configvars *,time_t) noex ;
+int configvars_curbegin(configvars *,configvars_cur *) noex ;
+int configvars_curend(configvars *,configvars_cur *) noex ;
+int configvars_fetch(configvars *,cchar *,configvars_cur *,cchar **) noex ;
+int configvars_close(configvars *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
 
-#endif /* CONFIGVARS */
 
 #endif /* CONFIGVARS_INCLUDE */
 
