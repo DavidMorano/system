@@ -107,7 +107,6 @@ static constexpr int	pfs[] = {
 
 /* exported subroutines */
 
-/* ARGSUSED */
 int dialudp(cchar *hostname,cchar *portspec,int af,int to,int) noex {
 	int		rs = SR_FAULT ;
 	if (hostname && portspec) {

@@ -1,11 +1,10 @@
-/* dialtcpnls */
+/* dialtcpnls SUPPORT */
+/* lang=C++20 */
 
 /* dial out to a machine server listening on TCPNLS */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -18,8 +17,9 @@
 
 /*******************************************************************************
 
-	This subroutine will dial out to an INET host using the TCPMUX protocol
-	and the optional TCP port and TCPMUX services that is specified.
+	This subroutine will dial out to an INET host using the
+	TCPMUX protocol and the optional TCP port and TCPMUX services
+	that is specified.
 
 	Synopsis:
 

@@ -1,10 +1,8 @@
-/* dialusd */
+/* dialusd SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to dial over to a UNIX® domain socket in data-gram mode */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,50 +16,40 @@
 
 /*******************************************************************************
 
-	Dial UNIX® Socket Data-gram (dialusd)
+	Name:
+	dialusd
 
-	This subroutine will dial out to an UNIX® domain socket datagram
-	address.
+	Description:
+	This subroutine will dial out to an UNIX® domain socket
+	datagram address.
 
 	Synopsis:
-
-	int dialusd(dstpath,timeout,options)
-	const char	srcpath[] ;
-	const char	dstpath[] ;
-	int		timeout ;
-	int		options ;
+	int dialusd(cchar *dst,int to,int dot) noex
 
 	Arguments:
-
-	srcpath		path of UNIX® source domain socket
-	dstpath		path to UNIX® destination domain socket to dial to
-	timeout		timeout ('>=0' mean use one, '-1' means don't)
-	options		any dial options
+	dst		path to UNIX® destination domain socket to dial to
+	to		timeout ('>=0' mean use one, '-1' means don't)
+	dot		any dial options
 
 	Returns:
-
 	>=0		file descriptor
-	<0		error in dialing
-
+	<0		error in dialing (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/poll.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<netdb.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<localmisc.h>
@@ -89,48 +77,35 @@
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int dialusd(dstpath,timeout,options)
-const char	dstpath[] ;
-int		timeout ;
-int		options ;
-{
-	cint	pf = PF_UNIX ;
-	cint	af = AF_UNIX ;
-	int	rs ;
-	int	fd = -1 ;
-
-#if	CF_DEBUGS
-	debugprintf("dialusd: dstpath=%s\n", dstpath) ;
-#endif
-
-	if (dstpath == NULL)
-	    return SR_FAULT ;
-
-	if (dstpath[0] == '\0')
-	    return SR_INVALID ;
-
-/* create the primary socket */
-
-	if ((rs = u_socket(pf,SOCK_DGRAM,0)) >= 0) {
-	    SOCKADDRESS	sa ;
-	    fd = rs ;
-	    if ((rs = sockaddress_start(&sa,af,dstpath,0,0)) >= 0) {
-	 	struct sockaddr	*sap = (struct sockaddr *) &sa ;
-	        int 		sal = rs ;
-
-	        rs = u_connect(fd,sap,sal) ;
-
-	        sockaddress_finish(&sa) ;
-	    } /* end if (sockaddress) */
-	    if (rs < 0) u_close(fd) ;
-	} /* end if (socket) */
-
-#if	CF_DEBUGS
-	debugprintf("dialusd: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
+int dialusd(cchar *dst,int to,int) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		fd = -1 ;
+	if (dst) {
+	    rs = SR_INVALID ;
+	    if (dst[0]) {
+	        cint	pf = PF_UNIX ;
+	        cint	af = AF_UNIX ;
+		cint	st = SOCK_DGRAM ;
+		cint	proto = 0 ;
+	        if ((rs = u_socket(pf,st,proto)) >= 0) {
+	            sockaddress	sa ;
+	            fd = rs ;
+	            if ((rs = sockaddress_start(&sa,af,dst,0,0)) >= 0) {
+	 	        SOCKADDR	*sap = (SOCKADDR *) &sa ;
+	                int 		sal = rs ;
+	                if (to > 0) {
+	                    rs = u_connect(fd,sap,sal) ;
+		        } else {
+	                    rs = u_connect(fd,sap,sal) ;
+			}
+	                rs1 = sockaddress_finish(&sa) ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (sockaddress) */
+	            if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	        } /* end if (socket) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialusd) */

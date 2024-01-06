@@ -116,8 +116,10 @@
 
 /* external subroutines */
 
-extern int	getportnum(cchar *,cchar *) ;
-extern int	opensockaddr(int,int,int,SOCKADDR *,int) ;
+extern "C" {
+    extern int	getportnum(cchar *,cchar *) noex ;
+    extern int	opensockaddr(int,int,int,SOCKADDR *,int) noex ;
+}
 
 
 /* external variables */
@@ -238,7 +240,6 @@ static int subinfo_finish(SUBINFO *sip) noex {
 
 static int subinfo_proto(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-
 #if	CF_PROTO
 	{
 	    int		rs ;
@@ -250,7 +251,6 @@ static int subinfo_proto(SUBINFO *sip) noex {
 #else
 	sip->proto = IPPROTO_TCP ;
 #endif /* CF_PROTO */
-
 	return rs ;
 }
 /* end subroutine (subinfo_proto) */
@@ -259,11 +259,9 @@ static int subinfo_svc(SUBINFO *sip) noex {
 	int		rs ;
 	cchar		*pn = sip->protoname ;
 	cchar		*ps = sip->portspec ;
-
 	if ((rs = getportnum(pn,ps)) >= 0) {
 	    sip->port = rs ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_svc) */
@@ -272,14 +270,12 @@ static int subinfo_addr(SUBINFO *sip,int af) noex {
 	cint		addrlen = ADDRBUFLEN ;
 	int		rs ;
 	cchar		*hn = sip->hostname ;
-
 	if ((rs = inetpton(sip->addrbuf,addrlen,af,hn,-1)) >= 0) {
 	    af = rs ;
 	    sip->f.address = true ;
 	} else if (rs == SR_INVALID) {
 	    rs = SR_OK ;
 	}
-
 	sip->af = af ;
 	return (rs >= 0) ? af : rs ;
 }
@@ -287,14 +283,12 @@ static int subinfo_addr(SUBINFO *sip,int af) noex {
 
 static int subinfo_try(SUBINFO *sip) noex {
 	int		rs ;
-
 	if ((rs = subinfo_tryone(sip)) == SR_TIMEDOUT) {
 	    int		c = RETRIES ;
 	    while ((c-- > 0) && (rs == SR_TIMEDOUT)) {
 	        rs = subinfo_tryone(sip) ;
 	    } /* end while */
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_try) */
@@ -304,46 +298,32 @@ static int subinfo_tryone(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		af = sip->af ;
 	int		fd = -1 ;
-
 	if (sip->f.address) {
 	    rs = try_addr(sip) ;
 	    fd = rs ;
 	} else {
-
 /* first try IPv4 addresses */
-
 	    if ((isFailConn(rs) || (sip->count == 0)) && 
 	        ((af == AF_UNSPEC) || (af == AF_INET4))) {
-
 	        rs1 = try_inet4(sip) ;
 	        fd = rs1 ;
 	        if (rs1 != SR_NOTFOUND) rs = rs1 ;
-
 	    } /* end if (IPv4) */
-
 /* now try IPv6 addresses */
-
 	    if ((isFailConn(rs) || (sip->count == 0)) && 
 	        ((af == AF_UNSPEC) || (af == AF_INET6))) {
-
 	        rs1 = try_inet6(sip) ;
 	        fd = rs1 ;
 	        if (rs1 != SR_NOTFOUND) rs = rs1 ;
-
 	    } /* end if (IPv6) */
-
 #if	CF_TRYINET
 	    if (isFailConn(rs) || (sip->count == 0)) {
-
 	        rs1 = try_inet(sip) ;
 	        fd = rs1 ;
 	        if (rs1 != SR_NOTFOUND) rs = rs1 ;
-
 	    } /* end if (any address family) */
 #endif /* CF_TRYINET */
-
 	} /* end if */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (subinfo_tryone) */
@@ -355,52 +335,41 @@ static int try_inet4(SUBINFO *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-
 	if ((rs = hostinfo_start(&hi,af,sip->hostname)) >= 0) {
 	    SOCKADDRESS	server ;
 	    cint	pf = PF_INET4 ;
-	    uchar	da[2] ; /* dummy address */
-
-	    da[0] = '\0' ;
+	    uchar	da[2] = {} ; /* dummy address */
 	    if ((rs = sockaddress_start(&server,af,da,sip->port,0)) >= 0) {
-
 	        if ((rs = hostinfo_curbegin(&hi,&hc)) >= 0) {
 		    SOCKADDR	*sap ;
 	            int		c = 0 ;
 		    int		al ;
 		    cuchar	*ap ;
-
 	            while (rs >= 0) {
 	                al = hostinfo_enumaddr(&hi,&hc,&ap) ;
 	                if (al == SR_NOTFOUND) break ;
 	                rs = al ;
 	                if (rs < 0) break ;
-
 	                sockaddress_putaddr(&server,ap) ;
-
 	                c += 1 ;
 	                sip->count += 1 ;
 	                sap = (SOCKADDR *) &server ;
 	                rs = subinfo_makeconn(sip,pf,sap) ;
 	                fd = rs ;
-
 	                if (fd >= 0) break ;
 	                if ((rs < 0) && (rs != SR_PFNOSUPPORT)) break ;
 	            } /* end while */
-
 	            rs1 = hostinfo_curend(&hi,&hc) ;
 		    if (rs >= 0) rs = rs1 ;
 	            if ((rs >= 0) && (c == 0)) rs = SR_HOSTUNREACH ;
 	        } /* end if (cursor) */
-
-	        sockaddress_finish(&server) ;
+	        rs1 = sockaddress_finish(&server) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
-
 	    rs1 = hostinfo_finish(&hi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (hostinfo) */
 	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (try_inet4) */
@@ -533,9 +502,7 @@ static int subinfo_makeconn(SUBINFO *sip,int pf,SOCKADDR *sap) noex {
 	cint	proto = sip->proto ;
 	cint	to = sip->to ;
 	int	rs ;
-
 	rs = opensockaddr(pf,st,proto,sap,to) ;
-
 	return rs ;
 }
 /* end subroutine (subinfo_makeconn) */
