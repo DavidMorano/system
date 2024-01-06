@@ -1,4 +1,8 @@
-/* mkcmds */
+/* mkcmds HEADER */
+/* lang=C20 */
+
+/* names string storage: purpose? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,13 +14,15 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	MKCMDS_INCLUDE
-#define	MKCMDS_INCLUDE		1
+#define	MKCMDS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 enum mkcmds {

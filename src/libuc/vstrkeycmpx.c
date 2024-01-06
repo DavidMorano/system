@@ -35,6 +35,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
+#include	<strkeycmp.h>
 
 #include	"vstrkeycmpx.h"
 
@@ -49,8 +50,6 @@
 
 
 /* external subroutines */
-
-extern int	strkeycmp(cchar *,cchar *) noex ;
 
 
 /* external variables */

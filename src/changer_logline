@@ -1,0 +1,24 @@
+#!/usr/extra/bin/ksh
+# CHANGER
+
+NAMES=
+NAMES="${NAMES} LOGLINEBUFLEN "
+
+
+DN=/dev/null
+
+for F in "${@}" ; do
+  if [[ -r "${F}" ]] ; then
+    for N in ${NAMES} ; do
+      if fgrep ${N} $F > ${DN} ; then
+      ed - $F <<\EOF
+g/LOGLINEBUFLEN/s//LOGLINExBUFLEN/g
+	w
+	q
+EOF
+      fi
+    done
+  fi
+done
+
+

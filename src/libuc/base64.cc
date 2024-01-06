@@ -16,10 +16,16 @@
 
 /*******************************************************************************
 
+	Names:
+	base64_e
+	base64_d
+
+	Description:
 	We perform both BASE64 encoding and decoding operations with the
 	subroutines 'base64_e' and 'base64_d' respectively.
 
 	Synopsis:
+	int base64_e(cchar *inbuf,int len,char *outbuf) noex
 	int base64_d(cchar *sp,int sl,char *outbuf) noex
 
 	Arguments:

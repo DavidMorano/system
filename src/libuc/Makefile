@@ -575,10 +575,11 @@ base.o:		$(OBJ_BASE)
 
 # convert-to (CT)
 OBJ0_CT= ctxxx.o ctbin.o ctoct.o cthex.o ctdec.o ctchars.o 
-OBJ1_CT= ctdecp.o ctdecf.o cvtdig.o digbufsizes.o
-OBJ2_CT= xxtostr.o convertx.o
+OBJ1_CT= ctdecp.o ctdecf.o ctroman.o
+OBJ2_CT= cvtdig.o
+OBJ3_CT= xxtostr.o convertx.o digbufsizes.o
 
-OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o
+OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o obj3_ct.o
 
 obj0_ct.o:	$(OBJ0_CT)
 	$(LD) -r -o $@ $(OBJ0_CT)
@@ -588,6 +589,9 @@ obj1_ct.o:	$(OBJ1_CT)
 
 obj2_ct.o:	$(OBJ2_CT)
 	$(LD) -r -o $@ $(OBJ2_CT)
+
+obj3_ct.o:	$(OBJ3_CT)
+	$(LD) -r -o $@ $(OBJ3_CT)
 
 ct.o:		$(OBJ_CT)
 	$(LD) -r -o $@ $(OBJ_CT)
@@ -873,7 +877,7 @@ hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
 hostent.o:		hostent.c hostent.h
 inetaddr.o:		inetaddr.cc inetaddr.h
-sockaddress.o:		sockaddress.c sockaddress.h
+sockaddress.o:		sockaddress.cc sockaddress.h
 
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
@@ -907,7 +911,7 @@ vechand.o:		vechand.cc vechand.h
 vecsorthand.o:		vecsorthand.cc vecsorthand.h
 
 vecstr.o:		vecstr.cc vecstr.h
-vecstr_env.o:		vecstr_env.c vecstr.h
+vecstr_env.o:		vecstr_env.cc vecstr.h
 vecstr_envfile.o:	vecstr_envfile.cc vecstr.h
 vecstr_adduniqs.o:	vecstr_adduniqs.c vecstr.h
 vecstr_addpath.o:	vecstr_addpath.cc vecstr.h
@@ -915,7 +919,7 @@ vecstr_avmkstr.o:	vecstr_avmkstr.c vecstr.h
 vecstr_loadfile.o:	vecstr_loadfile.cc vecstr.h
 
 vecpstr.o:		vecpstr.cc vecpstr.h
-vecpstr_env.o:		vecpstr_env.c vecpstr.h
+vecpstr_env.o:		vecpstr_env.cc vecpstr.h
 vecpstr_envfile.o:	vecpstr_envfile.cc vecpstr.h
 vecpstr_adduniqs.o:	vecpstr_adduniqs.c vecpstr.h
 vepcstr_addpath.o:	vecpstr_addpath.cc vecpstr.h
@@ -1068,6 +1072,7 @@ strwcpyxx.o:		strwcpyxx.cc strwcpyxx.h
 strdcpyx.o:		strdcpyx.c strdcpyx.h
 strdcpyxw.o:		strdcpyxw.c strdcpyxw.h
 
+# CF
 cfxxxx.o:		cfxxxx.cc cfxxxx.hh
 cfxxx.o:		cfxxx.cc cfxxx.h cfxxxx.hh
 cfbin.o:		cfbin.cc cfbin.h cfxxxx.hh
@@ -1079,6 +1084,7 @@ cfdect.o:		cfdect.cc cfdect.h
 cfdecf.o:		cfdecf.cc cfdecf.h
 cfchars.o:		cfchars.cc cfchars.h
 
+# CT
 cvtdig.o:		cvtdig.cc cvtdig.hh
 ctxxx.o:		ctxxx.cc ctxxx.h
 ctbin.o:		ctbin.cc ctbin.h cvtdig.hh
@@ -1091,10 +1097,11 @@ ctchars.o:		ctchars.cc ctchars.h
 xxtostr.o:		xxtostr.cc xxtostr.h
 convertx.o:		convertx.cc convertx.h
 
-dialopts.o:		dialopts.c dialopts.h
-dialprog.o:		dialprog.c dialopts.h
-dialudp.o:		dialudp.c dialopts.h
-dialtcp.o:		dialtcp.c dialopts.h
+# DIAL
+dialopts.o:		dialopts.cc dialopts.h
+dialprog.o:		dialprog.cc dialopts.h
+dialudp.o:		dialudp.cc dialopts.h
+dialtcp.o:		dialtcp.cc dialopts.h
 dialtcpmux.o:		dialtcpmux.c dialopts.h
 dialtcpnls.o:		dialtcpnls.c nlsdialassist.h dialopts.h
 dialfinger.o:		dialfinger.c dialopts.h
@@ -1223,6 +1230,10 @@ ucsysauxinfo.o:		ucsysauxinfo.dir
 ucsysauxinfo.dir:
 	makesubdir $@
 
+dial.o:			dial.dir
+dial.dir:
+	makesubdir $@
+
 six.o:			six.dir
 six.dir:
 	makesubdir $@
@@ -1317,6 +1328,7 @@ nodedb.o:		nodedb.cc nodedb.h
 bits.o:			bits.cc bits.h
 envs.o:			envs.cc envs.h
 envs_procxe.o:		envs_procxe.cc envs.h
+envs_subs.o:		envs_subs.cc envs.h
 expcook.o:		expcook.cc expcook.h
 keyopt.o:		keyopt.cc keyopt.h
 

@@ -1,0 +1,43 @@
+#!/usr/extra/bin/ksh
+# CHANGER_SERIALBUF
+
+NAMES=
+NAMES="${NAMES} serialbuf.h "
+
+
+DN=/dev/null
+
+for F in "${@}" ; do
+  if [[ -r "${F}" ]] ; then
+    for N in ${NAMES} ; do
+      if fgrep ${N} $F > ${DN} ; then
+      ed - $F <<\EOF
+g/_rchar/s//_rc/g
+g/_rshort/s//_rs/g
+g/_rint/s//_ri/g
+g/_rlong/s//_rl/g
+g/_rlonglong/s//_rll/g
+g/_ruchar/s//_ruc/g
+g/_rushort/s//_rus/g
+g/_ruint/s//_rui/g
+g/_rulong/s//_rul/g
+g/_rulonglong/s//_rull/g
+g/_wchar/s//_wc/g
+g/_wshort/s//_ws/g
+g/_wint/s//_wi/g
+g/_wlong/s//_wl/g
+g/_wlonglong/s//_wll/g
+g/_wuchar/s//_wuc/g
+g/_wushort/s//_wus/g
+g/_wuint/s//_wui/g
+g/_wulong/s//_wul/g
+g/_wulonglong/s//_wull/g
+	w
+	q
+EOF
+      fi
+    done
+  fi
+done
+
+

@@ -153,7 +153,7 @@ int vecelem_add(vecelem *op,cvoid *ep) noex {
 	            memcpy(vep,ep,op->esize) ;
 	            op->i = (i+1) ;
 	            op->c += 1 ;	/* increment list count */
-	            op->f.issorted = FALSE ;
+	            op->f.issorted = false ;
 	        } /* end if */
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
@@ -225,7 +225,7 @@ int vecelem_sort(vecelem *op,vecelem_vcmp vcf) noex {
 	if ((rs = vecelem_magic(op,vcf)) >= 0) {
 	        rs = op->c ; 
 	        if (! op->f.issorted) {
-	            op->f.issorted = TRUE ;
+	            op->f.issorted = true ;
 	            if (op->c > 1) {
 			qsort_f	scf = qsort_f(vcf) ;
 		        cint	esize = op->esize ;
@@ -241,7 +241,7 @@ int vecelem_setsorted(vecelem *op) noex {
 	int		rs ;
 	if ((rs = vecelem_magic(op)) >= 0) {
 	        rs = op->c ; 
-		op->f.issorted = TRUE ;
+		op->f.issorted = true ;
 	} /* end if (magic) */
 	return rs ;
 }

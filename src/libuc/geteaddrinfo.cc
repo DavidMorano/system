@@ -62,8 +62,8 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -287,7 +287,7 @@ static int try_straight(SUBINFO *mip)
 	const char	*hn = aip->hostname ;
 
 	if (hn != NULL) {
-	    int f = FALSE ;
+	    int f = false ;
 	    f = f || ((hn[0] == 'a') && (strcmp(hn,ANYHOST) == 0)) ;
 	    f = f || (hn[0] == '*') ;
 	    f = f || (hn[0] == '\0') ;

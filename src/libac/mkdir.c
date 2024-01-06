@@ -1,4 +1,4 @@
-/* mkdir */
+/* mkdir SUPPORT */
 /* lang=C20 */
 
 /* make a directory */
@@ -33,7 +33,7 @@
 
 	Returns:
 	0	OK
-	<0	error
+	<0	error (system-return)
 
 *******************************************************************************/
 
@@ -49,7 +49,7 @@
 int mkdir(cchar *dir,mode_t m) noex {
 	int		rs = SR_FAULT ;
 	if (dir) {
-	    cchar		*dn = "/dev/null" ;
+	    cchar	*dn = "/dev/null" ;
 	    if ((rs = fork()) == 0) {
 	        u_close(1) ;		/* close standard output */
 	        u_open(dn,O_WRONLY,0664) ;

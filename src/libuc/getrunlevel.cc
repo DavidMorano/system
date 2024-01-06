@@ -50,7 +50,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 
 #if	CF_UTMPX && defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0)
 #include	<utmpx.h>
@@ -148,13 +148,13 @@ int getrunlevel(cchar *utmpfname)
 	struct utmpx	*up ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
-	int		f_utf = FALSE ;
+	int		f_utf = false ;
 
 	if ((utmpfname != NULL) && (utmpfname[0] != '\0')) {
 #if	defined(SYSHAS_UTMPXNAME) && (SYSHAS_UTMPXNAME > 0)
 	    {
 	        int rc = utmpxname(utmpfname) ;
-	        f_utf = TRUE ;
+	        f_utf = true ;
 	        rs = (rc == 1) ? SR_OK : SR_INVALID ;
 	    }
 #else
@@ -187,13 +187,13 @@ int getrunlevel(cchar *utmpfname)
 	struct utmp	*up ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
-	int		f_utf = FALSE ;
+	int		f_utf = false ;
 
 	if ((utmpfname != NULL) && (utmpfname[0] != '\0')) {
 #if	defined(SYSHAS_UTMPNAME) && (SYSHAS_UTMPNAME > 0)
 	    {
 	        int	rc = utmpname(utmpfname) ;
-	        f_utf = TRUE ;
+	        f_utf = true ;
 	        rs = (rc == 1) ? SR_OK : SR_INVALID ;
 	    }
 #else

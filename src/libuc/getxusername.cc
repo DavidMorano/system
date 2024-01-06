@@ -1,11 +1,9 @@
-/* getxusername SŒPPORT */
+/* getxusername SUPPORT */
 /* lang=C20 */
 
 /* get the best approximation of the user's username */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGUID	0		/* debug UID-only calls */
 #define	CF_UTMPACC	1		/* use |utmpacc(3uc)| */
 #define	CF_GETUTMPNAME	1		/* use |getutmpname(3dam)| */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
@@ -45,8 +43,7 @@
 	= GETXUSERNAME
 
 	Synopsis:
-	int getxusername(xup)
-	struct getxusername	*xup ;
+	int getxusername(GETXUSERNAME *xup,uid_t uid) noex
 
 	Arguments:
 	xup		pointer to special (private) data structure
@@ -54,15 +51,12 @@
 
 	Returns:
 	>=0		length of resulting username
-	<0		error
+	<0		error (system-return)
 
 	= GETUSERNAME
 
 	Synopsis:
-	int getusername(ubuf,ulen,uid)
-	char		ubuf[] ;
-	int		ulen ;
-	uid_t		uid ;
+	int getusername(char *ubuf,int ulen,uid_t uid) noex
 
 	Arguments:
 	ubuf		buffer to receive username
@@ -70,18 +64,13 @@
 	uid		user-id
 
 	Returns:
-
 	>=0		length of resulting username
-	<0		error
+	<0		error (system-return)
 
 	= GETPWUSERNAME
 
 	Synopsis:
-	int getpwusername(pwp,pwbuf,pwlen,uid)
-	struct passwd	*pwp ;
-	char		pwbuf[] ;
-	int		pwlen ;
-	uid_t		uid ;
+	int getpwusername(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex
 
 	Arguments:
 	pwp		pointer to PASSWD structure (to receive results)
@@ -131,11 +120,12 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<pwd.h>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<ugetpid.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
@@ -203,28 +193,17 @@
 #define	DEBFNAME	"/var/tmp/debuguid.txt"
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	getutmpname(char *,int,pid_t) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-#if	CF_DEBUGUID
-extern int	nprintf(const char *,const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*timestr_logz(time_t,char *) ;
+extern "C" {
+    int		getxusername(GETXUSERNAME *) noex ;
+}
 
 
 /* external variables */
@@ -233,34 +212,28 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct mapent {
+	cchar		*name ;
 	uid_t		uid ;
-	const char	*name ;
 } ;
 
 
 /* forward references */
 
-static int	getusernamer(char *,int,uid_t) ;
+static int	getusernamer(char *,int,uid_t) noex ;
 
-int		getxusername(GETXUSERNAME *) ;
+static int	getxusername_self(GETXUSERNAME *) noex ;
+static int	getxusername_varusername(GETXUSERNAME *) noex ;
+static int	getxusername_varuser(GETXUSERNAME *) noex ;
+static int	getxusername_home(GETXUSERNAME *) noex ;
+static int	getxusername_mail(GETXUSERNAME *) noex ;
+static int	getxusername_varlogname(GETXUSERNAME *) noex ;
+static int	getxusername_utmp(GETXUSERNAME *) noex ;
+static int	getxusername_map(GETXUSERNAME *) noex ;
+static int	getxusername_uid(GETXUSERNAME *) noex ;
 
-static int	getxusername_self(GETXUSERNAME *) ;
-static int	getxusername_varusername(GETXUSERNAME *) ;
-static int	getxusername_varuser(GETXUSERNAME *) ;
-static int	getxusername_home(GETXUSERNAME *) ;
-static int	getxusername_mail(GETXUSERNAME *) ;
-static int	getxusername_varlogname(GETXUSERNAME *) ;
-static int	getxusername_utmp(GETXUSERNAME *) ;
-static int	getxusername_map(GETXUSERNAME *) ;
-static int	getxusername_uid(GETXUSERNAME *) ;
-
-static int	getxusername_var(GETXUSERNAME *,const char *) ;
-static int	getxusername_varbase(GETXUSERNAME *,const char *) ;
-static int	getxusername_lookup(GETXUSERNAME *,const char *) ;
-
-#if	CF_DEBUGUID
-static int	logpop(uid_t) ;
-#endif
+static int	getxusername_var(GETXUSERNAME *,cchar *) noex ;
+static int	getxusername_varbase(GETXUSERNAME *,cchar *) noex ;
+static int	getxusername_lookup(GETXUSERNAME *,cchar *) noex ;
 
 
 /* local variables */
@@ -275,7 +248,7 @@ static int	(*getxusernames[])(GETXUSERNAME *) = {
 	getxusername_utmp,
 	getxusername_map,
 	getxusername_uid,
-	NULL
+	nullptr
 } ;
 
 static const struct mapent	mapents[] = {
@@ -283,56 +256,36 @@ static const struct mapent	mapents[] = {
 	{ 60001, "nobody" },
 	{ 60002, "noaccess" },
 	{ 65534, "nobody4" },
-	{ -1, NULL }
+	{ -1, nullptr }
 } ;
 
 
 /* exported subroutines */
 
-
-int getusername(char ubuf[],int ulen,uid_t uid)
-{
-	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("getusername: ent uid=%d\n",uid) ;
-#endif
-
-	if (ubuf == NULL) return SR_FAULT ;
-	if (ulen == 0) return SR_INVALID ;
-	if (ulen < 0) ulen = USERNAMELEN ;
-
-	ubuf[0] = '\0' ;
-	if ((rs = uproguser_nameget(ubuf,ulen,uid)) == 0) {
-#if	CF_DEBUGS
-	    debugprintf("getusername: full search\n") ;
-#endif
-	    rs = getusernamer(ubuf,ulen,uid) ;
-	} /* end if (uproguser_nameget) */
-
-#if	CF_DEBUGS
-	debugprintf("getusername: ret rs=%d\n",rs) ;
-#endif
-
+int getusername(char *ubuf,int ulen,uid_t uid) noex {
+	int		rs = SR_FAULT ;
+	if (ubuf) {
+	    rs = SR_INVALID ;
+	    if (ulen > 0) {
+	        ubuf[0] = '\0' ;
+	        if ((rs = uproguser_nameget(ubuf,ulen,uid)) == 0) {
+	            rs = getusernamer(ubuf,ulen,uid) ;
+	        } /* end if (uproguser_nameget) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getusername) */
 
-
-int getpwusername(struct passwd *pwp,char pwbuf[],int pwlen,uid_t uid)
-{
+int getpwusername(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	GETXUSERNAME	xu ;
 	int		rs ;
 	char		ubuf[USERNAMELEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("getpwusername: ent uid=%d\n",uid) ;
-#endif
+	if (pwp == nullptr) return SR_FAULT ;
+	if (pwbuf == nullptr) return SR_FAULT ;
 
-	if (pwp == NULL) return SR_FAULT ;
-	if (pwbuf == NULL) return SR_FAULT ;
-
-	memset(&xu,0,sizeof(struct getxusername)) ;
+	memclear(&xu) ;
 	xu.pwp = pwp ;
 	xu.pwbuf = pwbuf ;
 	xu.pwlen = pwlen ;
@@ -342,94 +295,45 @@ int getpwusername(struct passwd *pwp,char pwbuf[],int pwlen,uid_t uid)
 
 	rs = getxusername(&xu) ;
 
-#if	CF_DEBUGS
-	debugprintf("getpwusername: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (getpwusername) */
 
-
-int getxusername(GETXUSERNAME *xup)
-{
-	const int	ttl = GETXUSERNAME_TTL ;
+int getxusername(GETXUSERNAME *xup) noex {
+	cint	ttl = GETXUSERNAME_TTL ;
 	int		rs ;
 	int		rs1 ;
 	int		pwl = 0 ;
 
-	if (xup == NULL) return SR_FAULT ;
-	if (xup->pwp == NULL) return SR_FAULT ;
-	if (xup->ubuf == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("getxusername: ent uid=%u\n",xup->uid) ;
-#endif
+	if (xup == nullptr) return SR_FAULT ;
+	if (xup->pwp == nullptr) return SR_FAULT ;
+	if (xup->ubuf == nullptr) return SR_FAULT ;
 
 	xup->ubuf[0] = '\0' ;
 	if (xup->uid < 0) {
-	    xup->f_self = TRUE ;
+	    xup->f_self = true ;
 	    xup->uid = getuid() ;
 	} else {
 	    const uid_t	suid = getuid() ;
 	    xup->f_self = (xup->uid == suid) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("getxusername: begin uid=%u\n",xup->uid) ;
-#endif
-
 	if ((rs = vecstr_start(&xup->names,10,0)) >= 0) {
-	    int		i ;
-
-	    for (i = 0 ; getxusernames[i] != NULL ; i += 1) {
-
-#if	CF_DEBUGS
-	        debugprintf("getxusername: trying i=%u\n",i) ;
-#endif
-
+	    for (int i = 0 ; getxusernames[i] ; i += 1) {
 	        rs = (*getxusernames[i])(xup) ;
-
-#if	CF_DEBUGS
-	        {
-	            struct passwd	*pwp = xup->pwp ;
-	            debugprintf("getxusername: back i=%u rs=%d\n",i,rs) ;
-		    if ((rs > 0) && (pwp != NULL)) {
-			const char	*name = pwp->pw_name ;
-	                debugprintf("getxusername: back un=%s\n",name) ;
-		    }
-	        }
-#endif /* CF_DEBUGS */
-
 	        if (rs != 0) break ;
 	    } /* end for */
 	    pwl = rs ;
 
-#if	CF_DEBUGS
-	    debugprintf("getxusername: out rs=%d pwl=%u f_self=%u\n",
-		rs,pwl,xup->f_self) ;
-#endif
-
 	    if ((rs > 0) && xup->f_self) {
-		struct passwd	*pwp = xup->pwp ;
+		PASSWD	*pwp = xup->pwp ;
 		rs = uproguser_nameset(pwp->pw_name,-1,xup->uid,ttl) ;
-#if	CF_DEBUGS
-		debugprintf("getxusername: PW un=>%s<\n",pwp->pw_name) ;
-#endif
 	    } /* end if (cache store) */
 
 	    rs1 = vecstr_finish(&xup->names) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecstr) */
 	if ((rs >= 0) && (pwl == 0)) rs = SR_NOTFOUND ;
-
-#if	CF_DEBUGS
-	debugprintf("getxusername: ret rs=%d pwl=%u\n",rs,pwl) ;
-	if ((rs >= 0) && (pwl > 0)) {
-	    const char	*name = xup->pwp->pw_name ;
-	    debugprintf("getxusername: ret username=%s\n",name) ;
-	}
-#endif
 
 	return (rs >= 0) ? pwl : rs ;
 }
@@ -438,24 +342,14 @@ int getxusername(GETXUSERNAME *xup)
 
 /* local subroutines */
 
-
-static int getusernamer(char *ubuf,int ulen,uid_t uid)
-{
+static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("getusernamer: ent uid=%d\n",uid) ;
-#endif
-
-#ifdef	COMMENT
-	memset(&pw,0,sizeof(struct passwd)) ;
-#endif
-
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    struct passwd	pw ;
-	    const int		pwlen = rs ;
-	    char		*pwbuf ;
+	    PASSWD	pw ;
+	    cint	pwlen = rs ;
+	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        GETXUSERNAME	xu ;
 	        memset(&xu,0,sizeof(struct getxusername)) ;
@@ -465,7 +359,7 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid)
 	        xu.ubuf = ubuf ;
 	        xu.ulen = ulen ;
 	        xu.uid = uid ;
-	        xu.f_tried = TRUE ;
+	        xu.f_tried = true ;
 	        if ((rs = getxusername(&xu)) >= 0) {
 	            rs = xu.unl ;
 	            if (xu.unl <= 0) {
@@ -473,9 +367,6 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid)
 	            }
 	        } else if (rs == SR_NOTFOUND) {
 	            uint	v = xu.uid ;
-#if	CF_DEBUGUID
-	            logpop(xu.uid) ;
-#endif /* CF_DEBUGUID */
 	            rs = snsd(ubuf,ulen,"U",v) ;
 	        }
 	        rs1 = uc_free(pwbuf) ;
@@ -483,100 +374,59 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid)
 	    } /* end if (m-a) */
 	} /* end if (getbufsize) */
 
-#if	CF_DEBUGS
-	debugprintf("getusernamer: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (getusernamer) */
 
-
-static int getxusername_self(GETXUSERNAME *xup)
-{
+static int getxusername_self(GETXUSERNAME *xup) noex {
 	int		rs = SR_OK ;
-#if	CF_DEBUGS
-	debugprintf("getxusername_self: f_self=%u\n",xup->f_self) ;
-#endif
 	xup->unl = 0 ;
 	if (xup->f_self && (! xup->f_tried)) {
 	    if ((rs = uproguser_nameget(xup->ubuf,xup->ulen,xup->uid)) > 0) {
-#if	CF_DEBUGS
-		debugprintf("getxusername_self: need search u=%s\n",
-			xup->ubuf) ;
-#endif
 		xup->unl = rs ;
 		rs = getxusername_lookup(xup,xup->ubuf) ;
 	    } /* end if (uproguser_nameget) */
 	} /* end if (self) */
-#if	CF_DEBUGS
-	debugprintf("getxusername_self: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (getxusername_self) */
 
-
-static int getxusername_varusername(GETXUSERNAME *xup)
-{
-
+static int getxusername_varusername(GETXUSERNAME *xup) noex {
 	return getxusername_var(xup,VARUSERNAME) ;
 }
 /* end subroutine (getxusername_varusername) */
 
-
-static int getxusername_varuser(GETXUSERNAME *xup)
-{
-
+static int getxusername_varuser(GETXUSERNAME *xup) noex {
 	return getxusername_var(xup,VARUSER) ;
 }
 /* end subroutine (getxusername_varuser) */
 
-
-static int getxusername_varlogname(GETXUSERNAME *xup)
-{
-
+static int getxusername_varlogname(GETXUSERNAME *xup) noex {
 	return getxusername_var(xup,VARLOGNAME) ;
 }
 /* end subroutine (getxusername_varlogname) */
 
-
-static int getxusername_home(GETXUSERNAME *xup)
-{
-
+static int getxusername_home(GETXUSERNAME *xup) noex {
 	return getxusername_varbase(xup,VARHOME) ;
 }
 /* end subroutine (getxusername_home) */
 
-
-static int getxusername_mail(GETXUSERNAME *xup)
-{
-
+static int getxusername_mail(GETXUSERNAME *xup) noex {
 	return getxusername_varbase(xup,VARMAIL) ;
 }
 /* end subroutine (getxusername_mail) */
 
-
-static int getxusername_utmp(GETXUSERNAME *xup)
-{
+static int getxusername_utmp(GETXUSERNAME *xup) noex {
 	int		rs ;
-	const char	*np ;
-
-#if	CF_DEBUGS
-	debugprintf("getxusername_utmp: ent\n") ;
-#endif
+	cchar	*np ;
 
 #if	CF_UTMPACC
 	{
 	    UTMPACC_ENT	ue ;
-	    const int	uelen = UTMPACC_BUFLEN ;
+	    cint	uelen = UTMPACC_BUFLEN ;
 	    char	uebuf[UTMPACC_BUFLEN+1] ;
 	    if ((rs = utmpacc_entsid(&ue,uebuf,uelen,0)) >= 0) {
-#if	CF_DEBUGS
-		debugprintf("getxusername_utmp: ulen=%d\n",xup->ulen) ;
-		debugprintf("getxusername_utmp: u=%s\n",ue.user) ;
-#endif
-		if (ue.user != NULL) {
+		if (ue.user != nullptr) {
 		    rs = sncpy1(xup->ubuf,xup->ulen,ue.user) ;
 		} else {
 		    rs = SR_NOTFOUND ;
@@ -592,10 +442,6 @@ static int getxusername_utmp(GETXUSERNAME *xup)
 #endif
 #endif /* CF_UTMPACC */
 
-#if	CF_DEBUGS
-	debugprintf("getxusername_utmp: mid rs=%d\n",rs) ;
-#endif
-
 	xup->unl = rs ;
 	if (rs >= 0) {
 	    np = xup->ubuf ;
@@ -608,21 +454,16 @@ static int getxusername_utmp(GETXUSERNAME *xup)
 	    rs = SR_OK ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("getxusername_utmp: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (getxusername_utmp) */
 
 
-static int getxusername_map(GETXUSERNAME *xup)
-{
+static int getxusername_map(GETXUSERNAME *xup) noex {
 	uid_t		uid = xup->uid ;
 	int		rs = SR_OK ;
 	int		i ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	xup->unl = 0 ;
 	for (i = 0 ; mapents[i].uid >= 0 ; i += 1) {
@@ -631,7 +472,7 @@ static int getxusername_map(GETXUSERNAME *xup)
 	} /* end for */
 
 	if (f) {
-	    const char	*np = mapents[i].name ;
+	    cchar	*np = mapents[i].name ;
 	    rs = getxusername_lookup(xup,np) ;
 	}
 
@@ -639,11 +480,8 @@ static int getxusername_map(GETXUSERNAME *xup)
 }
 /* end subroutine (getxusername_map) */
 
-
-static int getxusername_uid(GETXUSERNAME *xup)
-{
+static int getxusername_uid(GETXUSERNAME *xup) noex {
 	int		rs ;
-
 	xup->unl = 0 ;
 	if ((rs = GETPW_UID(xup->pwp,xup->pwbuf,xup->pwlen,xup->uid)) >= 0) {
 	    if (xup->pwp->pw_name[0] != '\0') {
@@ -654,18 +492,15 @@ static int getxusername_uid(GETXUSERNAME *xup)
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
 	}
-
 	return rs ;
 }
 /* end subroutine (getxusername_uid) */
 
-
-static int getxusername_var(GETXUSERNAME *xup,cchar varname[])
-{
+static int getxusername_var(GETXUSERNAME *xup,cchar *varname) noex {
 	int		rs = SR_OK ;
-	const char	*vp = getenv(varname) ;
+	cchar	*vp = getenv(varname) ;
 
-	if (vp != NULL) {
+	if (vp != nullptr) {
 	    xup->unl = 0 ;
 	    rs = getxusername_lookup(xup,vp) ;
 	}
@@ -674,13 +509,11 @@ static int getxusername_var(GETXUSERNAME *xup,cchar varname[])
 }
 /* end subroutine (getxusername_var) */
 
-
-static int getxusername_varbase(GETXUSERNAME *xup,cchar varname[])
-{
+static int getxusername_varbase(GETXUSERNAME *xup,cchar *varname) noex {
 	int		rs = SR_OK ;
-	const char	*vp = getenv(varname) ;
+	cchar	*vp = getenv(varname) ;
 
-	if (vp != NULL) {
+	if (vp != nullptr) {
 	    int		nl ;
 	    cchar	*np ;
 	    if ((nl = sfbasename(vp,-1,&np)) > 0) {
@@ -701,18 +534,12 @@ static int getxusername_varbase(GETXUSERNAME *xup,cchar varname[])
 }
 /* end subroutine (getxusername_varbase) */
 
-
-static int getxusername_lookup(GETXUSERNAME *xup,cchar *np)
-{
+static int getxusername_lookup(GETXUSERNAME *xup,cchar *np) noex {
 	int		rs ;
 	int		pwl = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("getxusername_lookup: n=%s\n",np) ;
-#endif
-
 	if ((rs = vecstr_find(&xup->names,np)) == SR_NOTFOUND) {
-	    const int	pwlen = xup->pwlen ;
+	    cint	pwlen = xup->pwlen ;
 	    char	*pwbuf = xup->pwbuf ;
 	    if ((rs = GETPW_NAME(xup->pwp,pwbuf,pwlen,np)) >= 0) {
 	        if (xup->pwp->pw_uid == xup->uid) {
@@ -727,23 +554,14 @@ static int getxusername_lookup(GETXUSERNAME *xup,cchar *np)
 	    }
 	} /* end if (search) */
 
-#if	CF_DEBUGS
-	{
-	    struct passwd	*pwp = xup->pwp ;
-	    debugprintf("getxusername_lookup: ret rs=%d pwl=%u\n",rs,pwl) ;
-	    debugprintf("getxusername_lookup: un=%s\n",pwp->pw_name) ;
-	}
-#endif
-
 	return (rs >= 0) ? pwl : rs ;
 }
 /* end subroutine (getxusername_lookup) */
 
 
-#if	CF_DEBUGUID
-static int logpop(uid_t uid)
-{
-	time_t		daytime = time(NULL) ;
+#ifdef	COMMENT
+static int logpop(uid_t uid) noex {
+	time_t		daytime = time(nullptr) ;
 	uid_t		pid = ugetpid() ;
 	int		rs ;
 	cchar		*pp = getexecname() ;
@@ -755,6 +573,6 @@ static int logpop(uid_t uid)
 	return rs ;
 }
 /* end subroutine (logpop) */
-#endif /* CF_DEBUGUID */
+#endif /* COMMENT */
 
 

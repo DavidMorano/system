@@ -43,10 +43,19 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<string.h>		/* for |strlen(3c)| */
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<matkeystr.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -60,11 +69,11 @@
 int getev(cchar **envv,cchar *np,int nl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
+	cchar		*vp = nullptr ;
 	if (envv && np) {
 	    rs = SR_INVALID ;
 	    if (np[0]) {
 	        int	ei ;
-	        cchar	*vp = nullptr ;
 	        if ((ei = matkeystr(envv,np,nl)) >= 0) {
 	            if ((vp = strchr(envv[ei],'=')) != nullptr) {
 	                vp += 1 ;

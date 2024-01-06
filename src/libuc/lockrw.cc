@@ -272,7 +272,7 @@ static int lockrw_ptminit(lockrw *op,int f_shared) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptma_create(&a)) >= 0) {
-	    bool	f_ptm = FALSE ;
+	    bool	f_ptm = false ;
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptma_setpshared(&a,v) ;
@@ -294,7 +294,7 @@ static int lockrw_ptcinit(lockrw *op,int f_shared) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptca_create(&a)) >= 0) {
-	    bool	f_ptc = FALSE ;
+	    bool	f_ptc = false ;
 	    if (f_shared) {
 		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptca_setpshared(&a,v) ;

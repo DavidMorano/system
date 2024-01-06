@@ -72,7 +72,11 @@ int serialbuf_finish(serialbuf *sbp) noex {
 /* end subroutine (serialbuf_finish) */
 
 int serialbuf_getlen(serialbuf *sbp) noex {
-	return sbp->i ;
+	int		rs = SR_FAULT ;
+	if (sbp) {
+	    rs = sbp->i ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (serialbuf_getlen) */
 

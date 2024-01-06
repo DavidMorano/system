@@ -71,11 +71,12 @@
 #include	<sys/socket.h>
 #include	<cstring>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<uinet.h>
 #include	<cfdec.h>
 #include	<hasx.h>
 #include	<strdcpy.h>
-#include	<bufsizevar.hh>
+#include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"getaf.h"
@@ -92,10 +93,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	nleadstr(cchar *,cchar *,int) noex ;
-}
 
 
 /* local structures */
@@ -229,7 +226,7 @@ int getaf(cchar *np,int nl) noex {
 	            if ((al = (strdcpy1w(abuf,alen,np,nl)-abuf)) > 0) {
 	                CADDRFAM	*afs = addrfamilies ;
 	                cint		n = 2 ;
-	                int		i ;
+	                int		i{} ;
 	                int		m ;
 	                for (i = 0 ; afs[i].name ; i += 1) {
 	                    cchar	*anp = afs[i].name ;
@@ -249,22 +246,19 @@ int getaf(cchar *np,int nl) noex {
 /* end subroutine (getaf) */
 
 int getaflen(int af) noex {
-	int		rs = SR_OK ;
-	int		alen = SR_AFNOSUPPORT ;
+	int		rs = SR_AFNOSUPPORT ;
 	switch (af) {
 	case AF_UNIX:
-	    if ((rs = maxpathlen) >= 0) {
-	        alen = rs ;
-	    }
+	    rs = maxpathlen ;
 	    break ;
 	case AF_INET4:
-	    alen = INET4ADDRLEN ;
+	    rs = INET4ADDRLEN ;
 	    break ;
 	case AF_INET6:
-	    alen = INET6ADDRLEN ;
+	    rs = INET6ADDRLEN ;
 	    break ;
 	} /* end switch */
-	return (rs >= 0) ? alen : rs ;
+	return rs ;
 }
 /* end subroutine (getaflen) */
 
@@ -276,7 +270,7 @@ int getaddrlen(int af) noex {
 /* reads out as: str-af-name */
 cchar *strafname(int af) noex {
 	const ADDRFAM	*afs = addrfamilies ;
-	int		i ;
+	int		i{} ;
 	for (i = 0 ; afs[i].name ; i += 1) {
 	    if (afs[i].af == af) break ;
 	} /* end for */

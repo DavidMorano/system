@@ -1,4 +1,4 @@
-/* mkuuid */
+/* mkuuid SUPPORT */
 /* lang=C++20 */
 
 /* make UUID (also a specialized object) */

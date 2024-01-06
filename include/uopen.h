@@ -78,6 +78,17 @@
 #endif
 
 
+#ifdef	__cplusplus
+extern "C" {
+#endif
+
+extern int u_socket(int,int,int) noex ;
+
+#ifdef	__cplusplus
+}
+#endif
+
+
 #endif /* UOPEN_INCLUDE */
 
 

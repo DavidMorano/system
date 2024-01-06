@@ -1,6 +1,8 @@
-/* mkcmds */
+/* mkcmds SUPPORT */
+/* lang=C20 */
 
-/* names string storiage: purpose? */
+/* names string storage: purpose? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,13 +14,10 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#ifndef	MKCMDS_INCLUDE
-#define	MKCMDS_INCLUDE	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -31,9 +30,7 @@ const char *mkcmds[] = {
 	"sdn",
 	"sfn",
 	"lang",
-	NULL
+	nullptr
 } ;
-
-#endif /* MKCMDS_INCLUDE */
 
 

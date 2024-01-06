@@ -4,7 +4,6 @@
 /* get the home directory of the specified user */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
@@ -67,10 +66,11 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<getbufsize.h>
 #include	<fsdir.h>
 #include	<getax.h>
@@ -101,30 +101,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mknpath1(char *,int,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	hasalldig(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -136,10 +112,10 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	const char	*un ;
-	SUBINFO_FL	init ;
-	struct passwd	pw ;
+	cchar		*un ;
+	PASSWD		pw ;
 	uid_t		uid ;
+	SUBINFO_FL	init ;
 	int		pwlen ;
 	char		*pwbuf ;
 } ;
@@ -147,29 +123,29 @@ struct subinfo {
 
 /* forward references */
 
-int		getuserhome(char *,int,const char *) ;
+int		getuserhome(char *,int,cchar *) noex ;
 
-static int	subinfo_start(SUBINFO *,const char *) ;
-static int	subinfo_getpw(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+static int	subinfo_start(SUBINFO *,cchar *) noex ;
+static int	subinfo_getpw(SUBINFO *) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
 
-static int	subinfo_getvar(SUBINFO *,char *,int) ;
-static int	subinfo_getdirsearch(SUBINFO *,char *,int) ;
-static int	subinfo_getsysdb(SUBINFO *,char *,int) ;
+static int	subinfo_getvar(SUBINFO *,char *,int) noex ;
+static int	subinfo_getdirsearch(SUBINFO *,char *,int) noex ;
+static int	subinfo_getsysdb(SUBINFO *,char *,int) noex ;
 
-static int	dirsearch(const char *,const char *) ;
+static int	dirsearch(cchar *,cchar *) noex ;
 
 
 /* local variables */
 
-static const char	*homednames[] = {
+static constexpr char	*homednames[] = {
 	"/home",
 	"/usr/add-on",
 	"/sysadm",
 	NULL
 } ;
 
-static int	(*gethomes[])(SUBINFO *,char *,int) = {
+static constexpr int	(*gethomes[])(SUBINFO *,char *,int) = {
 	subinfo_getvar,
 	subinfo_getdirsearch,
 	subinfo_getsysdb,
@@ -179,17 +155,11 @@ static int	(*gethomes[])(SUBINFO *,char *,int) = {
 
 /* exported subroutines */
 
-
-int getuserhome(char *rbuf,int rlen,cchar *un)
-{
+int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 	SUBINFO		si ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("getuserhome: ent un=%s\n",un) ;
-#endif
 
 	if (rbuf == NULL) return SR_FAULT ;
 	if (un == NULL) return SR_FAULT ;
@@ -198,26 +168,16 @@ int getuserhome(char *rbuf,int rlen,cchar *un)
 
 	rbuf[0] = '\0' ;
 	if ((rs = subinfo_start(&si,un)) >= 0) {
-	    int		i ;
-	    for (i = 0 ; gethomes[i] != NULL ; i += 1) {
+	    for (int i = 0 ; gethomes[i] ; i += 1) {
 	        rs = (*gethomes[i])(&si,rbuf,rlen) ;
 	        rl = rs ;
 		if (rs != 0) break ;
 	    } /* end for */
-#if	CF_DEBUGS
-	    debugprintf("getuserhome: for-out rs=%d i=%u\n",rs,i) ;
-#endif
 	    rs1 = subinfo_finish(&si) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
 
 	if ((rs >= 0) && (rl == 0)) rs = SR_NOTFOUND ;
-
-#if	CF_DEBUGS
-	debugprintf("getuserhome: ret rs=%d len=%u\n",rs,rl) ;
-	if (rs >= 0)
-	    debugprintf("getuserhome: home=>%t<\n",rbuf,rl) ;
-#endif
 
 	return (rs >= 0) ? rl : rs ;
 }
@@ -226,95 +186,76 @@ int getuserhome(char *rbuf,int rlen,cchar *un)
 
 /* local subroutines */
 
-
-static int subinfo_start(SUBINFO *sip,cchar *un)
-{
+static int subinfo_start(SUBINFO *sip,cchar *un) noex {
 	int		rs ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->un = un ;
 	sip->uid = -1 ;
-
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    const int	pwlen = rs ;
+	    cint	pwlen = rs ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
 	    }
 	} /* end if (getbufsize) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
-	int		rs = SR_OK ;
+static int subinfo_finish(SUBINFO *sip) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (sip == NULL) return SR_FAULT ;
-
-	if (sip->pwbuf != NULL) {
-	    rs1 = uc_free(sip->pwbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->pwbuf = NULL ;
-	}
-
+	if (sip) {
+	    rs = SR_OK ;
+	    if (sip->pwbuf) {
+	        rs1 = uc_free(sip->pwbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->pwbuf = NULL ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_getpw(SUBINFO *sip)
-{
+static int subinfo_getpw(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	const char	*un = sip->un ;
-
-#if	CF_DEBUGS
-	debugprintf("getuserhome/subinfo_getpw: init.pw=%u\n",sip->init.pw) ;
-	debugprintf("getuserhome/subinfo_getpw: un=%s\n",un) ;
-#endif
-
+	cchar		*un = sip->un ;
 	if (! sip->init.pw) {
-	    const int	pwlen = sip->pwlen ;
-	    sip->init.pw = TRUE ;
+	    PASSWD	*pwp = &sip->pw ;
+	    cint	pwlen = sip->pwlen ;
+	    sip->init.pw = true ;
 	    if (un[0] != '-') {
 	        if (hasalldig(un,-1)) {
 	            uint	uv ;
 	            if ((rs = cfdecui(un,-1,&uv)) >= 0) {
 	                const uid_t	uid = uv ;
-	                rs = getpwusername(&sip->pw,sip->pwbuf,pwlen,uid) ;
+	                rs = getpwusername(pwp,sip->pwbuf,pwlen,uid) ;
 	            }
 	        } else {
-	            rs = GETPW_NAME(&sip->pw,sip->pwbuf,pwlen,un) ;
+	            rs = GETPW_NAME(pwp,sip->pwbuf,pwlen,un) ;
 	        }
 	    } else {
-	        rs = getpwusername(&sip->pw,sip->pwbuf,pwlen,-1) ;
+	        rs = getpwusername(pwp,sip->pwbuf,pwlen,-1) ;
 	    }
 	    if (rs >= 0) {
 	        sip->uid = sip->pw.pw_uid ;
 	    }
 	} /* end if (needed initialization) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_getpw) */
 
-
-static int subinfo_getvar(SUBINFO *sip,char *rbuf,int rlen)
-{
+static int subinfo_getvar(SUBINFO *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	const char	*un = sip->un ;
-
+	cchar		*un = sip->un ;
 	if (un[0] == '-') un = getenv(VARUSERNAME) ;
 	if ((un != NULL) && (un[0] != '\0')) {
-	    const char	*hd = getenv(VARHOME) ;
+	    cchar	*hd = getenv(VARHOME) ;
 	    if ((hd != NULL) && (hd[0] != '\0')) {
-	        const char	*bp ;
-	        int		bl ;
+	        cchar	*bp ;
+	        int	bl ;
 	        if ((bl = sfbasename(hd,-1,&bp)) > 0) {
 	            if (strwcmp(un,bp,bl) == 0) {
 	                rs = mknpath1(rbuf,rlen,hd) ;
@@ -323,24 +264,18 @@ static int subinfo_getvar(SUBINFO *sip,char *rbuf,int rlen)
 	        } /* end if (sfbasename) */
 	    } /* end if */
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_getvar) */
 
-
-static int subinfo_getdirsearch(SUBINFO *sip,char *rbuf,int rlen)
-{
+static int subinfo_getdirsearch(SUBINFO *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	const char	*un = sip->un ;
-
+	cchar		*un = sip->un ;
 	if (un[0] != '-') {
 	    USTAT	sb ;
-	    int		i ;
-	    cchar	*hdn ;
-	    for (i = 0 ; homednames[i] != NULL ; i += 1) {
-	        hdn = homednames[i] ;
+	    for (int i = 0 ; homednames[i] ; i += 1) {
+	        cchar	*hdn = homednames[i] ;
 	        if ((rs = uc_stat(hdn,&sb)) >= 0) {
 		    if (S_ISDIR(sb.st_mode)) {
 	                if ((rs = dirsearch(hdn,un)) > 0) {
@@ -361,43 +296,30 @@ static int subinfo_getdirsearch(SUBINFO *sip,char *rbuf,int rlen)
 	        if ((rs < 0) || (len > 0)) break ;
 	    } /* end for (looping over login-directory root directories) */
 	} /* end if (specified) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_getdirsearch) */
 
-
-static int subinfo_getsysdb(SUBINFO *sip,char *rbuf,int rlen)
-{
+static int subinfo_getsysdb(SUBINFO *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("getuserhome/gethome_sysdb: un=%s\n",sip->un) ;
-#endif
-
 	if (! sip->init.pw) {
 	    rs = subinfo_getpw(sip) ;
 	}
-
 	if (rs >= 0) {
 	    rs = mknpath1(rbuf,rlen,sip->pw.pw_dir) ;
 	    len = rs ;
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_getsysdb) */
 
-
-/* see if the user is in this directory */
-static int dirsearch(cchar *basedname,cchar *un)
-{
-	FSDIR		dir ;
-	FSDIR_ENT	ds ;
+static int dirsearch(cchar *basedname,cchar *un) noex {
+	fsdir		dir ;
+	fsdir_ent	ds ;
 	int		rs ;
 	int		rs1 ;
-	int		f_found = FALSE ;
+	int		f_found = false ;
 
 	if ((rs = fsdir_open(&dir,basedname)) >= 0) {
 	    cchar	*fnp ;

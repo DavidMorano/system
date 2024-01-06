@@ -72,7 +72,7 @@ static inline bool keyend(cint ch) noex {
 int matkeystr(mainv a,cchar *sp,int sl) noex {
 	cint		sch = sp[0] ; /* ok: everything promotes the same */
 	int		i ;
-	int		f = FALSE ;
+	int		f = false ;
 	if (sl >= 0) {
 	    int		m ;
 	    for (i = 0 ; a[i] != NULL ; i += 1) {

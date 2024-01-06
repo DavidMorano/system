@@ -130,7 +130,7 @@ int uptspawn(pthread_t *rp,pthread_attr_t *ptap,objsub_t start,
 static int uptcreator(pthread_t *rp,pthread_attr_t *ptap,void *arg) noex {
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		rs ;
-	bool		f_exit = FALSE ;
+	bool		f_exit = false ;
 	repeat {
 	    if ((rs = pthread_create(rp,ptap,uptruner,arg)) > 0) rs = (- rs) ;
 	    if (rs < 0) {
@@ -139,13 +139,13 @@ static int uptcreator(pthread_t *rp,pthread_attr_t *ptap,void *arg) noex {
 		    if (to_nomem-- > 0) {
 		        msleep(1000) ;
 		    } else {
-		        f_exit = TRUE ;
+		        f_exit = true ;
 		    }
 		    break ;
 	        case SR_INTR:
 		    break ;
 	        default:
-		    f_exit = TRUE ;
+		    f_exit = true ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (error) */

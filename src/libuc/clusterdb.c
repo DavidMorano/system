@@ -1,16 +1,15 @@
-/* clusterdb */
+/* clusterdb SUPPORT */
+/* lang=C++20 */
 
 /* perform access table file related functions */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGTEST	0		/* more */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	- 2004-05-25, David A­D­ Morano
-        This subroutine was generalized from a particular program for wider use.
+	This subroutine was generalized from a particular program
+	for wider use.
 
 */
 
@@ -18,28 +17,22 @@
 
 /*******************************************************************************
 
-        This object processes an access table for use by daemon multiplexing
-        server programs that want to control access to their sub-servers.
-
+	This object processes an access table for use by daemon
+	multiplexing server programs that want to control access
+	to their sub-servers.
 
 *******************************************************************************/
 
-
-#define	CLUSTERDB_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<hdb.h>
@@ -82,12 +75,19 @@
 #define	KEYALIGNMENT		sizeof(char *(*)[2])
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	getpwd(char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+    int		clusterdb_fileadd(CLUSTERDB *,cchar *) noex ;
+    int		clusterdb_curbegin(CLUSTERDB *,CLUSTERDB_CUR *) noex ;
+    int		clusterdb_curend(CLUSTERDB *,CLUSTERDB_CUR *) noex ;
+}
 
 
 /* external variables */
@@ -96,19 +96,19 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct clusterdb_file {
-	const char	*fname ;
+	cchar		*fname ;
 	time_t		mtime ;
 	uint		size ;
 } ;
 
 struct clusterdb_keyname {
-	const char	*kname ;
+	cchar		*kname ;
 	int		count ;
 } ;
 
 struct clusterdb_ie {
-	const char	*(*keys)[2] ;
-	const char	*svc, *clu, *sys ;
+	cchar		*(*keys)[2] ;
+	cchar		*svc, *clu, *sys ;
 	int		nkeys ;			/* number of keys */
 	int		size ;			/* total size */
 	int		fi ;			/* file index */
@@ -116,26 +116,19 @@ struct clusterdb_ie {
 
 struct svcentry {
 	vecobj		keys ;
-	const char	*svc ;
-	const char	*clu ;
-	const char	*sys ;
+	cchar	*svc ;
+	cchar	*clu ;
+	cchar	*sys ;
 } ;
 
 struct svcentry_key {
-	const char	*kname ;
-	const char	*args ;
+	cchar	*kname ;
+	cchar	*args ;
 	int		kl, al ;
 } ;
 
 
 /* forward references */
-
-int		clusterdb_fileadd(CLUSTERDB *,const char *) ;
-
-#if	(CLUSTERDB_MASTER == 1)
-int		clusterdb_curbegin(CLUSTERDB *,CLUSTERDB_CUR *) ;
-int		clusterdb_curend(CLUSTERDB *,CLUSTERDB_CUR *) ;
-#endif
 
 
 /* local variables */
@@ -144,18 +137,9 @@ int		clusterdb_curend(CLUSTERDB *,CLUSTERDB_CUR *) ;
 /* exported subroutines */
 
 
-int clusterdb_open(atp,fname)
-CLUSTERDB	*atp ;
-const char	fname[] ;
-{
-	struct ustat	sb ;
-
-	int	rs ;
-
-
-#if	CF_DEBUGS
-	debugprintf("clusterdb_open: fname=%s\n",fname) ;
-#endif
+int clusterdb_open(clusterddb *atp,cchar *fname) noex {
+	USTAT		sb ;
+	int		rs ;
 
 	if (atp == NULL) return SR_FAULT ;
 	if (fname == NULL) return SR_FAULT ;
@@ -166,29 +150,17 @@ const char	fname[] ;
 
 	if ((rs = u_stat(fname,&sb)) >= 0) {
 	    int	n ;
-#if	CF_DEBUGTEST
-	    n = 10000 ;
-#else
 	    n = MAX((sb.st_size / 4),10) ;
-#endif
 	    if ((rs = kvsfile_open(&atp->clutab,n,fname)) >= 0) {
 	        atp->magic = CLUSTERDB_MAGIC ;
 	    }
 	} /* end if (stat) */
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (clusterdb_open) */
 
-
-/* free up the resources occupied by an CLUSTERDB list object */
-int clusterdb_close(atp)
-CLUSTERDB	*atp ;
-{
+int clusterdb_close(clusterdb *atp) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 
@@ -207,14 +179,8 @@ CLUSTERDB	*atp ;
 }
 /* end subroutine (clusterdb_close) */
 
-
-/* add a file to the list of files */
-int clusterdb_fileadd(atp,fname)
-CLUSTERDB	*atp ;
-const char	fname[] ;
-{
+int clusterdb_fileadd(clusterdb *atp,cchar *fname) noex {
 	int	rs ;
-
 
 	if (atp == NULL) return SR_FAULT ;
 	if (fname == NULL) return SR_FAULT ;
@@ -223,15 +189,7 @@ const char	fname[] ;
 
 	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_fileadd: fname=%s\n",fname) ;
-#endif
-
 	rs = kvsfile_fileadd(&atp->clutab,fname) ;
-
-#if	CF_DEBUGS
-	debugprintf("clusterdb_fileadd: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -298,10 +256,6 @@ int		klen ;
 	ccp = (curp != NULL) ? &curp->cur : NULL ;
 	rs = kvsfile_enumkey(&atp->clutab,ccp,kbuf,klen) ;
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_enumcluster: ret rs=%d \n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (clusterdb_enumcluster) */
@@ -328,10 +282,6 @@ int		klen, vlen ;
 	ccp = (curp != NULL) ? &curp->cur : NULL ;
 	rs = kvsfile_enum(&atp->clutab,ccp,kbuf,klen,vbuf,vlen) ;
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_enum: ret rs=%d \n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (clusterdb_enum) */
@@ -354,16 +304,8 @@ int		vlen ;
 
 	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_fetch: cluname=%s\n",cluname) ;
-#endif
-
 	ccp = (curp != NULL) ? &curp->cur : NULL ;
 	rs = kvsfile_fetch(&atp->clutab,cluname,ccp,vbuf,vlen) ;
-
-#if	CF_DEBUGS
-	debugprintf("clusterdb_fetch: ret rs=%d \n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -396,21 +338,11 @@ int		klen ;
 
 	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_fetchrev: nodename=%s\n",nodename) ;
-#endif
-
 	kop = &atp->clutab ;
 	if (curp != NULL) {
 	    KVSFILE_CUR	*ccp = &curp->cur ;
 
 	    while ((rs = kvsfile_enumkey(kop,ccp,kbuf,klen)) >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("clusterdb_fetchrev: kvsfile_enumkey() rs=%d\n",
-			rs) ;
-	        debugprintf("clusterdb_fetchrev: key=%t\n",kbuf,rs) ;
-#endif
 
 	        if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 
@@ -419,12 +351,6 @@ int		klen ;
 	                rs1 = kvsfile_fetch(kop,kbuf,&vcur,nbuf,nlen) ;
 	                if (rs1 == nrs) break ;
 	                rs = rs1 ;
-
-#if	CF_DEBUGS
-	                debugprintf("clusterdb_fetchrev: "
-				"kvsfile_fetch() rs=%d\n",rs1) ;
-	                debugprintf("clusterdb_fetchrev: nname=%s\n",nbuf) ;
-#endif
 
 	                if (rs >= 0) {
 	                    f_match = (strcmp(nodename,nbuf) == 0) ;
@@ -459,10 +385,6 @@ int		klen ;
 
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_fetchrev: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (clusterdb_fetchrev) */
@@ -484,13 +406,8 @@ time_t		daytime ;
 
 	rs = kvsfile_check(&atp->clutab,daytime) ;
 
-#if	CF_DEBUGS
-	debugprintf("clusterdb_check: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (clusterdb_check) */
-
 
 

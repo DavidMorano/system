@@ -1,8 +1,11 @@
-/* mkdirlist */
+/* mkdirlist SUPPORT */
+/* lang=C++20 */
 
+/* create a list of the newsgroup directories */
+/* version %I% last-modified %G% */
 
 #ifndef	MKDIRLIST_INCLUDE
-#define	MKDIRLIST_INCLUDE	1
+#define	MKDIRLIST_INCLUDE
 
 
 #include	<envstandards.h>
@@ -20,8 +23,8 @@
 
 
 struct mkdirlist_head {
-	uint		magic ;
 	VECHAND		dirs ;
+	uint		magic ;
 } ;
 
 struct mkdirlist_eflags {
@@ -35,7 +38,7 @@ struct mkdirlist_eflags {
 } ;
 
 struct mkdirlist_ent {
-	const char	*name ;
+	cchar		*name ;
 	MKDIRLIST_ENT	*link ;
 	MKDIRLIST_OFL	f ;
 	int		nlen ;
@@ -48,25 +51,28 @@ struct mkdirlist_ent {
 	int		order ;
 } ;
 
+typedef MKDIRLIST	mkdirlist ;
+typedef MKDIRLIST_ENT	mkdirlist_ent ;
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-extern int mkdirlist_start(MKDIRLIST *,const char *,const char *) ;
-extern int mkdirlist_link(MKDIRLIST *) ;
-extern int mkdirlist_defshow(MKDIRLIST *) ;
-extern int mkdirlist_sort(MKDIRLIST *) ;
-extern int mkdirlist_get(MKDIRLIST *,int,MKDIRLIST_ENT **) ;
-extern int mkdirlist_ung(MKDIRLIST *,const char *,time_t,int,int) ;
-extern int mkdirlist_showdef(MKDIRLIST *) ;
-extern int mkdirlist_show(MKDIRLIST *,const char *,int) ;
-extern int mkdirlist_audit(MKDIRLIST *) ;
-extern int mkdirlist_finish(MKDIRLIST *) ;
+extern int mkdirlist_start(MKDIRLIST *,cchar *,cchar *) noex ;
+extern int mkdirlist_link(MKDIRLIST *) noex ;
+extern int mkdirlist_defshow(MKDIRLIST *) noex ;
+extern int mkdirlist_sort(MKDIRLIST *) noex ;
+extern int mkdirlist_get(MKDIRLIST *,int,MKDIRLIST_ENT **) noex ;
+extern int mkdirlist_ung(MKDIRLIST *,cchar *,time_t,int,int) noex ;
+extern int mkdirlist_showdef(MKDIRLIST *) noex ;
+extern int mkdirlist_show(MKDIRLIST *,cchar *,int) noex ;
+extern int mkdirlist_audit(MKDIRLIST *) noex ;
+extern int mkdirlist_finish(MKDIRLIST *) noex ;
 
 #ifdef	__cplusplus
 }
 #endif
+
 
 #endif /* MKDIRLIST_INCLUDE */
 

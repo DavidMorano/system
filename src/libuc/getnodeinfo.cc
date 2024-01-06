@@ -46,7 +46,7 @@
 	Design note:
 	If there is no entry in the NODE DB file for the given
 	nodename, then we proceed on to lookup the nodename in the
-	CLUSTER DB.  Since we are using a NODEDB object to read the
+	CLUSTER DB.  Since we are using a nodedb object to read the
 	CLUSTER DB file, results (key-value pairs) are returned in
 	a random order.  If the idea was to return the => first <=
 	cluster with the given node as a member, this will not
@@ -55,21 +55,24 @@
 	the given node in the NODE DB if deterministic results need
 	to be returned for a cluster name lookup by nodename.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<nodedb.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
+#include	<getnodename.h>
 #include	<localmisc.h>
+
+#include	"getnodeinfo.h"
 
 
 /* local defines */
@@ -87,10 +90,19 @@
 #endif
 
 
+/* local namespaces */
+
+using std::nullptr_t ;
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
-extern int	getnodename(char *,int) noex ;
+extern "C" {
+    extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -107,66 +119,59 @@ extern int	getnodename(char *,int) noex ;
 
 /* exported subroutines */
 
-int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *unn) noex {
+int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = -1 ;
-	cchar		*nn = unn ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-	char		nodenamebuf[NODENAMELEN + 1] ;
-
-	if (pr == NULL)
-	    pr = "/" ;
-
-	if ((nn == NULL) && ((nn = getenv(VARNODE)) == NULL)) {
-	    nn = nodenamebuf ;
-	    rs = getnodename(nodenamebuf,NODENAMELEN) ;
-	}
-
-	if (rs >= 0) {
-	    if ((rs = mkpath2(tmpfname,pr,NODEFNAME)) >= 0) {
-	        NODEDB		st ;
-	        NODEDB_ENT	ste ;
-	        cint		elen = NODEDB_ENTLEN ;
-	        char		ebuf[NODEDB_ENTLEN + 1] ;
-
-	        if ((rs = nodedb_open(&st,tmpfname)) >= 0) {
-		    cint	nlen = NODENAMELEN ;
-
-	            if ((rs = nodedb_fetch(&st,nn,NULL,&ste,ebuf,elen)) >= 0) {
-
-	                if (cbuf != NULL) {
-	                    rs = sncpy1(cbuf,nlen,ste.clu) ;
-			    len = rs ;
-	                } else {
-	                    len = strlen(ste.clu) ;
-			}
-
-	                if ((rs >= 0) && (sbuf != NULL)) {
-	                    rs = sncpy1(sbuf,nlen,ste.sys) ;
-			}
-
-	                if ((rs >= 0) && (klp != NULL)) {
-	                    cchar	*kp, *vp ;
-	                    for (int i = 0 ; ste.keys[i] ; i += 1) {
-	                        kp = ste.keys[i][0] ;
-	                        vp = ste.keys[i][1] ;
-
-	                        rs = vecstr_envadd(klp,kp,vp,-1) ;
-
-	                        if (rs < 0) break ;
-	                    } /* end for */
-	                } /* end if (keys) */
-
-	            } /* end if (fetched result found) */
-
-	            rs1 = nodedb_close(&st) ;
+	char		*nbuf{} ;
+	if (pr == nullptr) pr = "/" ;
+	if ((rs = malloc_nn(&nbuf)) >= 0) {
+	    cint	nlen = rs ;		/* "node" length */
+	    cint	clen = rs ;		/* "cluster" length */
+	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
+		char	*tbuf{} ;
+		if ((rs = malloc_mp(&tbuf)) >= 0) {
+	            if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
+	                nodedb		st ;
+	                nodedb_ent	ste{} ;
+	                cint		elen = NODEDB_ENTLEN ;
+	                char		ebuf[NODEDB_ENTLEN + 1] ;
+	                if ((rs = nodedb_open(&st,tbuf)) >= 0) {
+			    auto	nf = nodedb_fetch ;
+			    nullptr_t	np{} ;
+	                    if ((rs = nf(&st,nn,np,&ste,ebuf,elen)) >= 0) {
+	                        if (cbuf != nullptr) {
+	                            rs = sncpy1(cbuf,clen,ste.clu) ;
+			            len = rs ;
+	                        } else {
+	                            len = strlen(ste.clu) ;
+			        }
+	                        if ((rs >= 0) && (sbuf != nullptr)) {
+	                            rs = sncpy1(sbuf,nlen,ste.sys) ;
+			        }
+	                        if ((rs >= 0) && (klp != nullptr)) {
+	                            cchar	*kp, *vp ;
+	                            for (int i = 0 ; ste.keys[i] ; i += 1) {
+	                                kp = ste.keys[i][0] ;
+	                                vp = ste.keys[i][1] ;
+				        {
+	                                    rs = vecstr_envadd(klp,kp,vp,-1) ;
+				        }
+	                                if (rs < 0) break ;
+	                            } /* end for */
+	                        } /* end if (keys) */
+	                    } /* end if (fetched result found) */
+	                    rs1 = nodedb_close(&st) ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (DB opened) */
+	            } /* end if (mkpath2) */
+		    rs1 = uc_free(tbuf) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (DB opened) */
-
-	    } /* end if (mkpath2) */
-	} /* end if (ok) */
-
+		} /* end if (m-a-f) */
+	    } /* end if (getnodename) */
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getnodeinfo) */

@@ -1,10 +1,8 @@
-/* proginv */
+/* proginv SUPPORT */
+/* lang=C20 */
 
 /* invert the data (keys to pointers) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG 	0		/* run-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,40 +16,34 @@
 
 /*******************************************************************************
 
+	Name:
+	proginv
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
-	int proginv(pip,aip,dbname)
-	PROGINFO	*pip ;
-	ARGINFO		*aip ;
-	cchar		dbname[] ;
+	int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname) noex
 
 	Arguments:
-
 	pip		program information pointer
 	aip		argument-information-pointer
 	dbname		DB name
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -108,11 +100,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	isNotPresent(int) ;
-
-#if	CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strnchr(cchar *,int,int) ;
@@ -202,9 +189,7 @@ static int	ktag_procword(KTAG *,cchar *,int) ;
 
 /* exported subroutines */
 
-
-int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
-{
+int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pan = 0 ;
@@ -212,11 +197,6 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
 	cchar		*fmt ;
 
 	if (aip == NULL) return SR_FAULT ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("proginv: dbname=%s\n",dbname) ;
-#endif
 
 	if (dbname == NULL) {
 	    rs = SR_FAULT ;
@@ -253,11 +233,6 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
 	    } /* end if (progids_end) */
 	} /* end if (ok) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("proginv: ret rs=%d pan=%u\n",rs,pan) ;
-#endif
-
 	return (rs >= 0) ? pan : rs ;
 }
 /* end subroutine (proginv) */
@@ -265,16 +240,9 @@ int proginv(PROGINFO *pip,ARGINFO *aip,cchar *dbname)
 
 /* local subroutines */
 
-
-static int procmk(PROGINFO *pip,ARGINFO *aip)
-{
+static int procmk(PROGINFO *pip,ARGINFO *aip) noex {
 	int		rs ;
 	int		c = 0 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginv/procmk: ent\n") ;
-#endif
 
 	if ((rs = procfiles(pip,aip)) >= 0) {
 	    SUBINFO	*sip = pip->sip ;
@@ -288,31 +256,19 @@ static int procmk(PROGINFO *pip,ARGINFO *aip)
 	    bprintf(pip->efp,"%s: tags=%u\n",pip->progname,c) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginv/procmk: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procmk) */
 
-
-static int procmkeigen(PROGINFO *pip)
-{
+static int procmkeigen(PROGINFO *pip) noex {
 	SUBINFO		*sip = pip->sip ;
 	TXTINDEXMK_KEY	*keys = NULL ;
-	const int	nkeys = pip->eigenwords ;
+	cint		nkeys = pip->eigenwords ;
 	int		rs ;
 	int		c = 0 ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proginv/procmkeigen: ent\n") ;
-#endif
-
 	if ((rs = subinfo_txtopen(sip)) >= 0) {
-	    const int	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
+	    cint	size = (nkeys + 1) * sizeof(TXTINDEXMK_KEY) ;
 	    if ((rs = uc_malloc(size,&keys)) >= 0) {
 		VECPSTR		*esp = &sip->eigenwords ;
 		TXTINDEXMK	*tmp = &sip->tm ;
@@ -350,18 +306,11 @@ static int procmkeigen(PROGINFO *pip)
 	        pip->progname,c) ;
 	}
 
-#if	CF_DEBUG 
-	if (DEBUGLEVEL(4))
-	    debugprintf("proginv/procmkeigen: rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procmkeigen) */
 
-
-static int procdbcheck(PROGINFO *pip,cchar db[],mode_t m)
-{
+static int procdbcheck(PROGINFO *pip,cchar *db,mode_t m) noex {
 	int		rs = SR_OK ;
 	int		dl ;
 	cchar		*dp ;
@@ -375,10 +324,8 @@ static int procdbcheck(PROGINFO *pip,cchar db[],mode_t m)
 }
 /* end subroutine (procdbcheck) */
 
-
-static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
-{
-	struct ustat	sb ;
+static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m) noex {
+	USTAT		sb ;
 	int		rs ;
 
 	if (pip == NULL) return SR_FAULT ;
@@ -399,9 +346,7 @@ static int procdnamecheck(PROGINFO *pip,cchar *dname,mode_t m)
 }
 /* end subroutine (procdnamecheck) */
 
-
-static int procfiles(PROGINFO *pip,ARGINFO *aip)
-{
+static int procfiles(PROGINFO *pip,ARGINFO *aip) noex {
 	vecstr		*alp = &aip->args ;
 	int		rs = SR_OK ;
 	int		pan = 0 ;
@@ -411,11 +356,6 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("proginv/procfiles: ent\n") ;
-#endif
-
 /* process the arguments */
 
 	for (i = 0 ; vecstr_get(alp,i,&cp) >= 0 ; i += 1) {
@@ -424,11 +364,6 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 	        if ((rs = procfile(pip,cp)) >= 0) {
 	            c_tagref += rs ;
 		} else {
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(5))
-	        debugprintf("proginv/procfiles: procfile() rs=%d\n",rs) ;
-#endif
 
 	            if (*cp == '-') cp = "*stdinput*" ;
 	            if (pip->quietlevel <= 1) {
@@ -443,18 +378,11 @@ static int procfiles(PROGINFO *pip,ARGINFO *aip)
 	    if (rs < 0) break ;
 	} /* end for (processing arguments) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("proginv/procfiles: ret rs=%d pan=%u\n",rs,pan) ;
-#endif
-
 	return (rs >= 0) ? pan : rs ;
 }
 /* end subroutine (procfiles) */
 
-
-static int procfile(PROGINFO *pip,cchar *fname)
-{
+static int procfile(PROGINFO *pip,cchar *fname) noex {
 	SUBINFO		*sip = pip->sip ;
 	KTAG		e ;
 	KTAG_PARAMS	ka ;
@@ -462,11 +390,6 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	int		rs = SR_OK ;
 	int		recoff = 0 ;
 	int		c = 0 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("proginv/procfile: fname=%s\n",fname) ;
-#endif
 
 	if (fname == NULL) return SR_FAULT ;
 
@@ -484,7 +407,7 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
 	    TXTINDEXMK_TAG	t ;
 	    TAGINFO		ti ;
-	    const int		llen = LINEBUFLEN ;
+	    cint		llen = LINEBUFLEN ;
 	    int			rlen ;
 	    int			si ;
 	    int			len ;
@@ -497,30 +420,13 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	    cchar		*sp, *cp ;
 	    cchar		*tp ;
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4)) {
-	        debugprintf("proginv/procfile: bopen() rs=%d\n",rs) ;
-	        debugprintf("proginv/procfile: fname=%s\n",fname) ;
-	    }
-#endif
-
 /* go to it, read the file line by line */
 
 	    while (rs >= 0) {
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("proginv/procfile: lo=%u\n",lo) ;
-#endif
-
 	        rs = breadln(ifp,(lbuf + lo),(llen - lo)) ;
 	        rlen = rs ;
 	        if (rs < 0) break ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("proginv/procfile: rlen=%u\n",rlen) ;
-#endif
 
 	        len = (lo + rlen) ;
 	        if (len == 0) break ;
@@ -532,14 +438,6 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	        }
 	        f_eol = f_eol || (rlen == 0) ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4)) {
-	            debugprintf("proginv/procfile: f_eol=%u \n",f_eol) ;
-	            debugprintf("proginv/procfile: recoff=%d\n",recoff) ;
-	            debugprintf("proginv/procfile: line> %t\n",
-	                lbuf,strlinelen(lbuf,len,50)) ;
-	        }
-#endif /* CF_DEBUG */
 	        sp = lbuf ;
 	        sl = len ;
 
@@ -554,44 +452,19 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	            }
 	        }
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("proginv/procfile: f_bol=%u\n",f_bol) ;
-#endif
-
 	        if ((sl > 0) && (sp[0] != '#')) {
 
 	            if (f_bol) {
 
 	                if (sp[0] == '-') {
-
 	                    rs = proccmd(pip,sp,sl) ;
-
 	                } else if (! CHAR_ISWHITE(sp[0])) {
-
 	                    si = taginfo_parse(&ti,sp,sl) ;
-
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("proginv/procfile: "
-	                            "taginfo_parse() si=%d\n",
-	                            si) ;
-#endif
-
 	                    if (f_ent) {
 	                        c += 1 ;
 	                        rs = ktag_mktag(&e,&t) ;
 	                        if (rs >= 0) {
-
 	                            rs = subinfo_addtags(sip,&t,1) ;
-
-#if	CF_DEBUG
-	                            if (DEBUGLEVEL(4))
-	                                debugprintf("proginv/procfile: "
-	                                    "subinfo_addtags() rs=%d\n",
-	                                    rs) ;
-#endif
-
 	                        }
 	                        f_ent = FALSE ;
 	                        ktag_finish(&e) ;
@@ -600,44 +473,19 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	                    if ((rs >= 0) && (si > 0)) {
 	                        cchar	*sip = (sp+si) ;
 	                        int	sil = (sl-si) ;
-
-#if	CF_DEBUG
-	                        if (DEBUGLEVEL(4)) {
-	                            debugprintf("proginv/procfile: "
-	                                "ktag_start()\n") ;
-	                            debugprintf("proginv/procfile: >%t<\n",
-	                                sip,
-	                                strlinelen(sip,sil,40)) ;
-	                        }
-#endif
-
 	                        rs = ktag_start(&e,&ka,&ti,sp,sip,sil) ;
-	                        if (rs >= 0)
+	                        if (rs >= 0) {
 	                            f_ent = TRUE ;
-
-#if	CF_DEBUG
-	                        if (DEBUGLEVEL(4))
-	                            debugprintf("proginv/procfile: "
-	                                "ktag_start() rs=%d\n",
-	                                rs) ;
-#endif
-
+				}
 	                    } /* end if */
 
 	                } else {
-
 	                    if (f_ent && (sl > 0)) {
 	                        rs = ktag_procline(&e,sp,sl) ;
 	                    }
-
 	                } /* end if */
 
 	            } else {
-
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("proginv/procfile: continuation\n") ;
-#endif
 
 	                if (f_ent) {
 	                    rs = ktag_add(&e,sp,sl) ;
@@ -661,31 +509,14 @@ static int procfile(PROGINFO *pip,cchar *fname)
 
 	        f_bol = f_eol ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("proginv/procfile: while-bottom rs=%d\n",rs) ;
-#endif
-
 	    } /* end while (reading lines) */
 
 	    if ((rs >= 0) && f_ent) {
 	        c += 1 ;
 	        rs = ktag_mktag(&e,&t) ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("proginv/procfile: ktag_mktag() rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0) {
 	            rs = subinfo_addtags(sip,&t,1) ;
-
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("proginv/procfile: "
-			    "subinfo_addtags() rs=%d\n", rs) ;
-#endif
-
 	        }
 	        f_ent = FALSE ;
 	        ktag_finish(&e) ;
@@ -699,26 +530,13 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	    bclose(ifp) ;
 	} /* end if (file-open) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("proginv/procfile: ret rs=%d c=%u\n", rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procfile) */
 
-
-static int proccmd(PROGINFO *pip,cchar *sp,int sl)
-{
+static int proccmd(PROGINFO *pip,cchar *sp,int sl) noex {
 	SUBINFO		*sip = pip->sip ;
 	int		rs = SR_OK ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("proginv/proccmd: cmd=>%t<\n",
-	        sp,strlinelen(sp,sl,50)) ;
-#endif
 
 	if (sp[0] == '-') {
 	int		cl ;
@@ -783,9 +601,7 @@ static int proccmd(PROGINFO *pip,cchar *sp,int sl)
 }
 /* end subroutine (proccmd) */
 
-
-static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl)
-{
+static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl) noex {
 	SUBINFO		*sip = pip->sip ;
 	vecpstr		*slp ;
 	int		rs = SR_OK ;
@@ -804,9 +620,7 @@ static int proccmd_eigen(PROGINFO *pip,cchar *sp,int sl)
 }
 /* end subroutine (proccmd_eigen) */
 
-
-static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl)
-{
+static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp ;
@@ -828,9 +642,7 @@ static int loadsubstr(PROGINFO *pip,cchar **rpp,cchar *sp,int sl)
 }
 /* end subroutine (loadsubstr) */
 
-
-static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname)
-{
+static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname) noex {
 	int		rs ;
 	cchar		*cp ;
 
@@ -867,9 +679,7 @@ static int subinfo_start(SUBINFO *sip,PROGINFO *pip,cchar *dbname)
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -903,9 +713,7 @@ static int subinfo_finish(SUBINFO *sip)
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_eigendefs(SUBINFO *sip)
-{
+static int subinfo_eigendefs(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
 	VECPSTR		*esp = &sip->eigenwords ;
 	int		rs ;
@@ -938,21 +746,12 @@ static int subinfo_eigendefs(SUBINFO *sip)
 }
 /* end subroutine (subinfo_eigendefs) */
 
-
-static int subinfo_txtopen(SUBINFO *sip)
-{
+static int subinfo_txtopen(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
 	TXTINDEXMK_PA	ta ;
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    debugprintf("subinfo_txtopen: ent f_txtopen=%u\n",sip->f.txtopen) ;
-	    debugprintf("subinfo_txtopen: dbname=%s\n",sip->dbname) ;
-	}
-#endif
 
 	memset(&ta,0,sizeof(TXTINDEXMK_PA)) ;
 	ta.tablen = sip->tablen ;
@@ -964,7 +763,7 @@ static int subinfo_txtopen(SUBINFO *sip)
 	if (! sip->f.txtopen) {
 	    if (sip->dbname != NULL) {
 		const mode_t	om = MKINV_INDPERM ;
-		const int	of = O_CREAT ;
+		cint		of = O_CREAT ;
 		cchar		*db = sip->dbname ;
 	        if ((rs = txtindexmk_open(&sip->tm,&ta,db,of,om)) >= 0) {
 	            sip->f.txtopen = TRUE ;
@@ -973,22 +772,16 @@ static int subinfo_txtopen(SUBINFO *sip)
 		    cchar	*fmt = "%s: failed-open db=%s (%d)\n" ;
 		    bprintf(pip->efp,fmt,pn,db,rs) ;
 		}
-	    } else
+	    } else {
 	        rs = SR_FAULT ;
+	    }
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("subinfo_txtopen: ret rs=%d \n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (subinfo_txtopen) */
 
-
-static int subinfo_txtclose(SUBINFO *sip)
-{
+static int subinfo_txtclose(SUBINFO *sip) noex {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -999,59 +792,33 @@ static int subinfo_txtclose(SUBINFO *sip)
 	    sip->f.txtopen = FALSE ;
 	    rs1 = txtindexmk_close(&sip->tm) ;
 	    if (rs >= 0) rs = rs1 ;
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("subinfo_txtclose: txtindexmk_close() rs=%d\n",rs) ;
-#endif
 	}
 
 	return rs ;
 }
 /* end subroutine (subinfo_txtclose) */
 
-
-static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn)
-{
+static int subinfo_addtags(SUBINFO *sip,TXTINDEXMK_TAG *tagp,int tagn) noex {
 	PROGINFO	*pip = sip->pip ;
 	int		rs = SR_OK ;
 
 	if (pip == NULL) return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("subinfo_addtags: tagn=%u\n",tagn) ;
-#endif
-
 	if (! sip->f.txtopen) {
 	    rs = subinfo_txtopen(sip) ;
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("subinfo_addtags: subinfo_txtopen() rs=%d\n",rs) ;
-#endif
 	}
 
 	if (rs >= 0) {
 	    rs = txtindexmk_addtags(&sip->tm,tagp,tagn) ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("subinfo_addtags: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (subinfo_addtags) */
 
 
-static int ktag_start(kop,kap,tip,fname,lp,ll)
-KTAG		*kop ;
-KTAG_PARAMS	*kap ;
-TAGINFO		*tip ;
-cchar		*fname ;
-cchar		*lp ;
-int		ll ;
-{
+static int ktag_start(KTAG *kop,KTAG_PARAMS *kap,TAGINFO *tip,
+		cchar *fname,cchar *lp,int ll) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*cp ;
@@ -1061,13 +828,9 @@ int		ll ;
 	kop->recoff = tip->recoff ;
 	kop->reclen = tip->reclen ;
 
-#if	CF_DEBUGS
-	debugprintf("ktag_start: fname=>%t<\n",fname,tip->fnamelen) ;
-#endif
-
 	if ((rs = uc_mallocstrw(fname,tip->fnamelen,&cp)) >= 0) {
-	    const int	size = sizeof(KTAG_KEY) ;
-	    const int	vopts = VECOBJ_OCOMPACT ;
+	    cint	size = sizeof(KTAG_KEY) ;
+	    cint	vopts = VECOBJ_OCOMPACT ;
 	    kop->fname = cp ;
 	    if ((rs = vecobj_start(&kop->keys,size,0,vopts)) >= 0) {
 	        if ((rs = vecpstr_start(&kop->store,10,80,0)) >= 0) {
@@ -1085,18 +848,11 @@ int		ll ;
 	    }
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("ktag_start: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (ktag_start) */
 
-
-static int ktag_finish(kop)
-KTAG		*kop ;
-{
+static int ktag_finish(KTAG *kop) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1122,25 +878,12 @@ KTAG		*kop ;
 }
 /* end subroutine (ktag_finish) */
 
-
-static int ktag_add(kop,lp,ll)
-KTAG		*kop ;
-cchar		*lp ;
-int		ll ;
-{
-	int		rs ;
-
-	rs = ktag_procline(kop,lp,ll) ;
-
-	return rs ;
+static int ktag_add(KTAG *kop,cchar *lp,int ll) noex {
+	return ktag_procline(kop,lp,ll) ;
 }
 /* end subroutine (ktag_add) */
 
-
-static int ktag_mktag(kop,tagp)
-KTAG		*kop ;
-TXTINDEXMK_TAG	*tagp ;
-{
+static int ktag_mktag(KTAG *kop,TXTINDEXMK_TAG *tagp) noex {
 	KTAG_PARAMS	*kap = kop->kap ;
 	KTAG_KEY	**va ;
 	int		rs ;
@@ -1158,16 +901,6 @@ TXTINDEXMK_TAG	*tagp ;
 
 	    tagp->nkeys = rs ;
 
-#if	CF_DEBUGS && 0
-	{
-	    KTAG_KEY	*ep ;
-	    int		i ;
-	    for (i = 0 ; vecobj_get(&kop->keys,i,&ep) >= 0 ; i += 1) {
-	        debugprintf("ktag_mktag: key=>%t<\n",ep->kp,ep->kl) ;
-	    }
-	}
-#endif /* CF_DEBUG */
-
 	size = (tagp->nkeys * sizeof(TXTINDEXMK_KEY)) ;
 	if ((rs = uc_malloc(size,&kea)) >= 0) {
 	    int		i ;
@@ -1179,15 +912,6 @@ TXTINDEXMK_TAG	*tagp ;
 
 	    tagp->keys = kea ;		/* kea: store in the tag */
 
-#if	CF_DEBUGS && 0
-	    {
-	        for (i = 0 ; i < tagp->nkeys ; i += 1) {
-	            debugprintf("ktag_mktag: key=>%t<\n",
-	                tagp->keys[i].kp, tagp->keys[i].kl) ;
-	        }
-	    }
-#endif /* CF_DEBUG */
-
 	    } /* end if (memory-allocation) */
 
 	} /* end if (m-a) */
@@ -1196,12 +920,7 @@ TXTINDEXMK_TAG	*tagp ;
 }
 /* end subroutine (ktag_mktag) */
 
-
-static int ktag_procline(kop,lp,ll)
-KTAG		*kop ;
-cchar		*lp ;
-int		ll ;
-{
+static int ktag_procline(KTAG *kop,cchar *lp,int ll) noex {
 	KTAG_PARAMS	*kap = kop->kap ;
 	XWORDS		w ;
 	int		rs = SR_OK ;
@@ -1212,10 +931,6 @@ int		ll ;
 
 	while ((sl = nextfield(lp,ll,&sp)) > 0) {
 
-#if	CF_DEBUGS
-	    debugprintf("ktag_procline: w=>%t<\n",sp,sl) ;
-#endif
-
 	    if (sl >= kap->minwlen) {
 	        if ((rs = xwords_start(&w,sp,sl)) >= 0) {
 
@@ -1223,10 +938,6 @@ int		ll ;
 	            i = 0 ;
 	            while ((rs >= 0) &&
 	                ((cl = xwords_get(&w,i++,&cp)) > 0)) {
-
-#if	CF_DEBUGS
-	                debugprintf("ktag_procline: k=>%t<\n",cp,cl) ;
-#endif
 
 	                if (cl >= kap->minwlen) {
 	                    rs = ktag_procword(kop,cp,cl) ;
@@ -1248,19 +959,9 @@ int		ll ;
 }
 /* end subroutine (ktag_procline) */
 
-
-static int ktag_procword(kop,cp,cl)
-KTAG		*kop ;
-cchar		*cp ;
-int		cl ;
-{
+static int ktag_procword(KTAG *kop,cchar *cp,int cl) noex {
 	int		rs ;
 	cchar		*sp ;
-
-#if	CF_DEBUG && 0
-	if (DEBUGLEVEL(3))
-	    debugprintf("ktag_procword: k=%t\n",cp,cl) ;
-#endif
 
 	if (cl > KEYBUFLEN)
 	    cl = KEYBUFLEN ;

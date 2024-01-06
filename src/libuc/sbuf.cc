@@ -1,4 +1,4 @@
-/* sbuf */
+/* sbuf SUPPORT */
 /* lang=C++20 */
 
 /* storage buffer (SBuf) object */
@@ -353,7 +353,7 @@ int sbuf_char(sbuf *sbp,int ch) noex {
 /* end subroutine (sbuf_char) */
 
 /* store a character (n-times) */
-int sbuf_nchar(sbuf *sbp,int len,int ch) noex {
+int sbuf_nchar(sbuf *sbp,int ch,int len) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
@@ -507,6 +507,16 @@ int sbuf_getprev(sbuf *sbp) noex {
 }
 /* end subroutine (sbuf_getprev) */
 
+int sbuf::start(char *rp,int rl) noex {
+	return sbuf_start(this,rp,rl) ;
+}
+/* end subroutine (sbuf::start) */
+
+int sbuf::nchr(int ch,int nc) noex {
+	return sbuf_nchar(this,ch,nc) ;
+}
+/* end subroutine (sbuf::nchr) */
+
 
 /* private subroutines */
 
@@ -546,4 +556,40 @@ static int sbuf_addstrw(sbuf *sbp,cchar *sp,int sl) noex {
 }
 /* end subroutine (sbuf_addstrw) */
 
+int sbuf_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case sbufmem_deci:
+		rs = sbuf_deci(op,a) ;
+		break ;
+	    case sbufmem_hexc:
+		rs = sbuf_hexc(op,a) ;
+		break ;
+	    case sbufmem_hexi:
+		rs = sbuf_hexi(op,a) ;
+		break ;
+	    case sbufmem_chr:
+		rs = sbuf_char(op,a) ;
+		break ;
+	    case sbufmem_blanks:
+		rs = sbuf_blanks(op,a) ;
+		break ;
+	    case sbufmem_rem:
+		rs = sbuf_rem(op) ;
+		break ;
+	    case sbufmem_getlen:
+		rs = sbuf_getlen(op) ;
+		break ;
+	    case sbufmem_getprev:
+		rs = sbuf_getprev(op) ;
+		break ;
+	    case sbufmem_finish:
+		rs = sbuf_finish(op) ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (sbuf_co::operator) */
 

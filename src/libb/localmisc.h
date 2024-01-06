@@ -257,19 +257,53 @@ typedef const char	cc ;
 
 /* parameters */
 
+#ifndef	MAXPATHLEN
+#ifdef	PATH_MAX
+#define	MAXPATHLEN	PATH_MAX
+#else
+#define	MAXPATHLEN	1024
+#endif
+#endif
+
+#ifndef	MAXNAMELEN
+#ifdef	NAME_MAX
+#define	MAXNAMELEN	NAME_MAX
+#else
+#define	MAXNAMELEN	256
+#endif
+#endif
+
+#ifndef	MAXLINELEN
+#ifdef	LINE_MAX
+#define	MAXLINELEN	LINE_MAX
+#else
+#define	MAXLINELEN	(2*1024)
+#endif
+#endif
+
+#ifndef	NODENAMELEN
+#define	NODENAMELEN	256
+#endif
+
+#ifndef	HOSTNAMELEN
+#define	HOSTNAMELEN	1024
+#endif
+
 #ifndef	MSGBUFLEN
 #define	MSGBUFLEN	2048
 #endif
 
 /* timezone (zoneinfo) name */
-#ifndef	TZLEN
-#define	TZLEN		60
+#ifndef	TZNAMELEN
+#define	TZNAMELEN	32
 #endif
 
 /* timezone abbreviation */
 #ifndef	ZNAMELEN
 #define	ZNAMELEN	8
 #endif
+
+/* timezone abbreviation */
 #ifndef	TZABBRLEN
 #define	TZABBRLEN	8
 #endif
@@ -285,11 +319,23 @@ typedef const char	cc ;
 #endif
 
 #ifndef	DIGBUFLEN
-#define	DIGBUFLEN	80		/* can hold |int128_t| in decimal */
+#define	DIGBUFLEN	80		/* can hold |int256_t| in decimal */
 #endif
 
 #ifndef	HEXBUFLEN
 #define	HEXBUFLEN	64		/* can hold |int256_t| in hexadecimal */
+#endif
+
+#ifndef	REALNAMELEN
+#define	REALNAMELEN	100
+#endif
+
+#ifndef	TIMEBUFLEN
+#define	TIMEBUFLEN	80
+#endif
+
+#ifndef	COLUMNS
+#define	COLUMNS		80
 #endif
 
 #ifndef	NOFILE
@@ -333,13 +379,6 @@ extern int	strlcpy(char *,cchar *,int) noex ;
 #define	POLLINTMULT	1000		/* poll-time multiplier */
 #endif
 
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
 
 #define	eol		'\n'
 

@@ -1,4 +1,4 @@
-/* mkuuid */
+/* mkuuid HEADER */
 /* lang=C20 */
 
 /* make UUID (also a specialized object) */

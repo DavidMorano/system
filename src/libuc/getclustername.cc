@@ -87,9 +87,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<uclustername.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -113,6 +114,14 @@
 #define	SI		struct subinfo
 
 #define	TO_TTL		(2*3600)	/* two hours */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -180,17 +189,24 @@ int getclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
 /* local subroutines */
 
 static int subinfo_start(SI *sip,cc *pr,char *rbuf,int rlen,cc *nn) noex {
-	sip->pr = pr ;
-	sip->rbuf = rbuf ;
-	sip->rlen = rlen ;
-	sip->nn = nn ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    sip->pr = pr ;
+	    sip->rbuf = rbuf ;
+	    sip->rlen = rlen ;
+	    sip->nn = nn ;
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
 static int subinfo_finish(SI *sip) noex {
-	if (sip == NULL) return SR_FAULT ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
@@ -213,46 +229,43 @@ static int subinfo_ndb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	char		tbuf[MAXPATHLEN+1] ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
-	    NODEDB	st ;
-	    NODEDB_ENT	ste ;
-	    NODEDB_CUR	cur ;
-	    if ((rs = nodedb_open(&st,tbuf)) >= 0) {
-	        if ((rs = nodedb_curbegin(&st,&cur)) >= 0) {
-	            cint	rsn = SR_NOTFOUND ;
-	            cint	elen = NODEDB_ENTLEN ;
-	            char	ebuf[NODEDB_ENTLEN+1] ;
-
-	            while (rs >= 0) {
-
-	                rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
-	                if (rs1 == rsn) break ;
-	                rs = rs1 ;
-
-	                if (rs >= 0) {
-	                    if ((ste.clu != NULL) && (ste.clu[0] != '\0')) {
-	                        rs = sncpy1(rbuf,rlen,ste.clu) ;
-	                        len = rs ;
-	                    }
-	                } /* end if (ok) */
-
-	                if ((rs >= 0) && (len > 0)) break ;
-	                if (rs < 0) break ;
-	            } /* end while (fetching node entries) */
-
-	            nodedb_curend(&st,&cur) ;
-	        } /* end if (nodedb-cursor) */
-
-	        rs1 = nodedb_close(&st) ;
-		if (rs >= 0) rs = rs1 ;
-	    } else if (isNotPresent(rs)) {
-	        rs = SR_OK ;
-	    }
-	} /* end if (mkpath) */
-
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    rbuf[0] = '\0' ;
+	    if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
+	        NODEDB		st ;
+	        NODEDB_ENT	ste ;
+	        NODEDB_CUR	cur ;
+	        if ((rs = nodedb_open(&st,tbuf)) >= 0) {
+	            if ((rs = nodedb_curbegin(&st,&cur)) >= 0) {
+	                cint	rsn = SR_NOTFOUND ;
+	                cint	elen = NODEDB_ENTLEN ;
+	                char	ebuf[NODEDB_ENTLEN+1] ;
+	                while (rs >= 0) {
+	                    rs1 = nodedb_fetch(&st,nn,&cur,&ste,ebuf,elen) ;
+	                    if (rs1 == rsn) break ;
+	                    rs = rs1 ;
+	                    if (rs >= 0) {
+	                        if (ste.clu && (ste.clu[0] != '\0')) {
+	                            rs = sncpy1(rbuf,rlen,ste.clu) ;
+	                            len = rs ;
+	                        }
+	                    } /* end if (ok) */
+	                    if ((rs >= 0) && (len > 0)) break ;
+	                    if (rs < 0) break ;
+	                } /* end while (fetching node entries) */
+	                rs1 = nodedb_curend(&st,&cur) ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (nodedb-cursor) */
+	            rs1 = nodedb_close(&st) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } else if (isNotPresent(rs)) {
+	            rs = SR_OK ;
+	        }
+	    } /* end if (mkpath) */
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_ndb) */
@@ -265,29 +278,36 @@ static int subinfo_cdb(SI *sip) noex {
 	cchar		*pr = sip->pr ;
 	cchar		*nn = sip->nn ;
 	char		*rbuf = sip->rbuf ;
-	char		tbuf[MAXPATHLEN+1] ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
-	    CLUSTERDB	cdb ;
-	    if ((rs = clusterdb_open(&cdb,tbuf)) >= 0) {
-	        cint	rsn = SR_NOTFOUND ;
-	        cint	clen = NODENAMELEN ;
-	        char	cbuf[NODENAMELEN + 1] ;
-
-	        if ((rs = clusterdb_fetchrev(&cdb,nn,NULL,cbuf,clen)) >= 0) {
-	            rs = sncpy1(rbuf,rlen,cbuf) ;
-	            len = rs ;
-	        } else if (rs == rsn)
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    rbuf[0] = '\0' ;
+	    if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
+	        CLUSTERDB	cdb ;
+		nullptr_t	np{} ;
+	        if ((rs = clusterdb_open(&cdb,tbuf)) >= 0) {
+	            auto	cf = clusterdb_fetchrev ;
+	            cint	rsn = SR_NOTFOUND ;
+	            char	*cbuf ;
+    		    if ((rs = malloc_nn(&cbuf)) >= 0) {
+			cint	clen = rs ;
+	                if ((rs = cf(&cdb,nn,np,cbuf,clen)) >= 0) {
+	                    rs = sncpy1(rbuf,rlen,cbuf) ;
+	                    len = rs ;
+	                } else if (rs == rsn) {
+	                    rs = SR_OK ;
+		        }
+	    	        rs1 = uc_free(cbuf) ;
+	    	        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	            rs1 = clusterdb_close(&cdb) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } else if (isNotPresent(rs)) {
 	            rs = SR_OK ;
-
-	        rs1 = clusterdb_close(&cdb) ;
-		if (rs >= 0) rs = rs1 ;
-	    } else if (isNotPresent(rs)) {
-	        rs = SR_OK ;
-	    }
-	} /* end if (mkpath) */
-
+	        }
+	    } /* end if (mkpath) */
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_cdb) */

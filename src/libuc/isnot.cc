@@ -33,8 +33,8 @@
 	rs		return-status from a file access
 
 	Returns:
-	1		file is *not* present (TRUE)
-	0		file is present (FALSE)
+	1		file is *not* present (true)
+	0		file is present (false)
 
 *******************************************************************************/
 

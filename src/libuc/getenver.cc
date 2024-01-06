@@ -43,8 +43,10 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<string.h>		/* for |strlen(3c)| */
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<strn.h>
+#include	<matkeystr.h>
 #include	<localmisc.h>
 
 
@@ -54,10 +56,6 @@ extern mainv	environ ;
 
 
 /* external subroutines */
-
-extern int	matkeystr(cchar **,cchar *,int) noex ;
-
-extern char	*strnchr(cchar *,int,cchar **) noex ;
 
 
 /* local variables */

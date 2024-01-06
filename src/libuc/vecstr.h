@@ -61,7 +61,7 @@ struct vecstr_flags {
 	uint		osorted:1 ;
 	uint		oordered:1 ;
 	uint		oconserve:1 ;
-	uint		stsize:1 ;
+	uint		stsize:1 ;		/* not option (just flag) */
 } ; /* end struct (vecstr_flags) */
 
 struct vecstr_head {
