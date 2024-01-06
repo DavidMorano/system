@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} LINEBUFLEN "
+NAMES="${NAMES} LOGLINEBUFLEN "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/LINEBUFLEN/s//MAXLINELEN/g
+g/LOGLINEBUFLEN/s//LOGLINExBUFLEN/g
 	w
 	q
 EOF

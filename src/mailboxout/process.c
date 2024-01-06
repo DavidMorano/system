@@ -73,11 +73,11 @@
 #define	ADDRLEN		(2 * MAXHOSTNAMELEN)
 #endif
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
+#ifndef	MAXLINELEN
+#define	MAXLINELEN	2048
 #endif
 
-#define	LOGLINEBUFLEN	(80 - 16)
+#define	LOGMAXLINELEN	(80 - 16)
 
 #define	DATEBUFLEN	80
 #define	STACKADDRBUFLEN	(2 * 1024)
@@ -114,7 +114,7 @@ extern char	*trailaddr(const char *,int) ;
 /* local structures */
 
 struct lineinfo {
-	char	lbuf[LINEBUFLEN + 1] ;
+	char	lbuf[MAXLINELEN + 1] ;
 	int	linelen ;
 } ;
 
@@ -181,7 +181,7 @@ vecobj		*fip ;
 	int	narticles = 0 ;
 	int	f_bol, f_eol ;
 
-	char	lbuf[LINEBUFLEN + 1] ;
+	char	lbuf[MAXLINELEN + 1] ;
 	char	hname[BUFLEN + 1] ;
 
 
@@ -202,7 +202,7 @@ vecobj		*fip ;
 	pd.offset = 0L ;
 	pd.off_start = 0L ;
 	f_bol = TRUE ;
-	len = breadln(ifp,lbuf,LINEBUFLEN) ;
+	len = breadln(ifp,lbuf,MAXLINELEN) ;
 
 	if (len > 0) {
 
@@ -229,7 +229,7 @@ vecobj		*fip ;
 	        if ((len <= 1) && (lbuf[0] == '\n')) break ;
 
 		pd.off_start = pd.offset ;
-	        len = breadln(ifp,lbuf,LINEBUFLEN) ;
+	        len = breadln(ifp,lbuf,MAXLINELEN) ;
 	        pd.offset += len ;
 
 	    } /* end while */
@@ -282,7 +282,7 @@ vecobj		*fip ;
 
 		pd.off_start = pd.offset ;
 	        f_bol = TRUE ;
-	        while ((len = breadln(ifp,lbuf,LINEBUFLEN)) > 0) {
+	        while ((len = breadln(ifp,lbuf,MAXLINELEN)) > 0) {
 
 	            f_eol = (lbuf[len - 1] == '\n') ;
 
@@ -451,7 +451,7 @@ int		len ;
 
 	if (pip->open.logfile)
 	logfile_printf(&pip->lh,"  F %t",
-	    mdp->efrom,strnlen(mdp->efrom,(LOGLINEBUFLEN - 4))) ;
+	    mdp->efrom,strnlen(mdp->efrom,(LOGMAXLINELEN - 4))) ;
 
 
 /* initialize an object to track which headers we have processed */
@@ -508,7 +508,7 @@ int		len ;
 	    while (sl > 0) {
 
 	        cp = sp ;
-	        cl = MIN(sl,(LOGLINEBUFLEN - 8)) ;
+	        cl = MIN(sl,(LOGMAXLINELEN - 8)) ;
 
 	        if (f_first) {
 
@@ -582,7 +582,7 @@ int		len ;
 
 	        if ((cp != NULL) && pip->open.logfile)
 	            logfile_printf(&pip->lh,"  sender=%t",
-	                cp,strnlen(cp,(LOGLINEBUFLEN - 9))) ;
+	                cp,strnlen(cp,(LOGMAXLINELEN - 9))) ;
 
 	    } /* end for */
 
@@ -625,7 +625,7 @@ int		len ;
 
 	        if ((cp != NULL) && pip->open.logfile)
 	            logfile_printf(&pip->lh,"  errorsto=%t",
-	                cp,strnlen(cp,(LOGLINEBUFLEN - 11))) ;
+	                cp,strnlen(cp,(LOGMAXLINELEN - 11))) ;
 
 	    } /* end for */
 
@@ -838,7 +838,7 @@ int		len ;
 		    if (pip->open.logfile) {
 
 	            logfile_printf(&pip->lh,"  from=%t",
-	                cp,strnlen(cp,(LOGLINEBUFLEN - 7))) ;
+	                cp,strnlen(cp,(LOGMAXLINELEN - 7))) ;
 
 		    sp = ep->comment ;
 		    if (sp != NULL) {
@@ -847,7 +847,7 @@ int		len ;
 
 			if (cl > 0)
 	            	    logfile_printf(&pip->lh,"       (%t)",
-	                	cp,MIN(cl,(LOGLINEBUFLEN - 9))) ;
+	                	cp,MIN(cl,(LOGMAXLINELEN - 9))) ;
 
 		    }
 
@@ -897,7 +897,7 @@ int		len ;
 	        if (cp != NULL) {
 
 	            logfile_printf(&pip->lh,"  to=%t",
-	                cp,strnlen(cp,(LOGLINEBUFLEN - 7))) ;
+	                cp,strnlen(cp,(LOGMAXLINELEN - 7))) ;
 
 		    sp = ep->comment ;
 		    if (sp != NULL) {
@@ -906,7 +906,7 @@ int		len ;
 
 			if (cl > 0)
 	            	    logfile_printf(&pip->lh,"       (%t)",
-	                	cp,MIN(cl,(LOGLINEBUFLEN - 9))) ;
+	                	cp,MIN(cl,(LOGMAXLINELEN - 9))) ;
 
 		    }
 		}
@@ -1133,7 +1133,7 @@ int		len ;
 	    f_eom = FALSE ;
 	    sl = mdp->clen ;
 	    while ((sl > 0) &&
-	        ((len = breadln(ifp,lbuf,MIN(sl,LINEBUFLEN))) > 0)) {
+	        ((len = breadln(ifp,lbuf,MIN(sl,MAXLINELEN))) > 0)) {
 
 	        mdp->offset += len ;
 	        f_eol = (lbuf[len - 1] == '\n') ;
@@ -1163,7 +1163,7 @@ int		len ;
 #endif
 
 	    f_bol = TRUE ;
-	    while ((len = breadln(ifp,lbuf,LINEBUFLEN)) > 0) {
+	    while ((len = breadln(ifp,lbuf,MAXLINELEN)) > 0) {
 
 	        mdp->offset += len ;
 	        f_eol = (lbuf[len - 1] == '\n') ;
@@ -1458,7 +1458,7 @@ int		addrlen ;
 	        datebuf) ;
 
 	    logfile_printf(&pip->lh,"  |   %c %t",
-	        atypes[atype],addr,MIN(al,(LOGLINEBUFLEN - 8))) ;
+	        atypes[atype],addr,MIN(al,(LOGMAXLINELEN - 8))) ;
 
 	    }
 
@@ -1483,7 +1483,7 @@ int		addrlen ;
 
 	    if (pip->open.logfile)
 	    logfile_printf(&pip->lh,"  > %t",
-	        addrbuf,MIN(sal,(LOGLINEBUFLEN - 4))) ;
+	        addrbuf,MIN(sal,(LOGMAXLINELEN - 4))) ;
 
 	    dater_gettime(&mip->edate,&mip->etime) ;
 
