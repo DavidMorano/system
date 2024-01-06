@@ -55,7 +55,7 @@ union sockaddress_head {
 	struct sockaddress_inet4	a_inet4 ;
 	struct sockaddress_inet6	a_inet6 ;
 	struct sockaddress_path		a_path ;
-	unsigned char			str[32] ; /* handle IPV6 for future */
+	unsigned char			str[32] ; /* general future */
 } ;
 
 typedef	SOCKADDRESS		sockaddress ;

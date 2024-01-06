@@ -1230,6 +1230,10 @@ ucsysauxinfo.o:		ucsysauxinfo.dir
 ucsysauxinfo.dir:
 	makesubdir $@
 
+dial.o:			dial.dir
+dial.dir:
+	makesubdir $@
+
 six.o:			six.dir
 six.dir:
 	makesubdir $@
