@@ -86,12 +86,12 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
-using std::nothrow ;
-using std::cout ;
-using std::string ;
-using std::string_view ;
-using std::vector ;
+using std::nullptr_t ;			/* type */
+using std::string ;			/* type */
+using std::string_view ;		/* type */
+using std::vector ;			/* type */
+using std::cout ;			/* variable */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
