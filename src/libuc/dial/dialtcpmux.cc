@@ -1,12 +1,10 @@
-/* dialtcpmux */
+/* dialtcpmux SUPPORT */
+/* lang=C++20 */
 
 /* dial out to a machine server listening on TCPMUX */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_CR		1		/* stupid CR character */
-
 
 /* revision history:
 
@@ -19,59 +17,49 @@
 
 /*******************************************************************************
 
-	This subroutine will dial out to an INET host using the TCPMUX protocol
-	and the optional TCP port and the TCPMUX service that is specified.
+	Name:
+	dialtcpmux
+
+	Description:
+	This subroutine will dial out to an INET host using the
+	TCPMUX protocol and the optional TCP port and the TCPMUX
+	service that is specified.
 
 	Synopsis:
-
-	int dialtcpmux(hostname,portspec,af,svcbuf,sargs,to,opts)
-	const char	hostname[] ;
-	const char	portspec[] ;
-	int		af ;
-	const char	svcbuf[] ;
-	const char	*sargs[] ;
-	int		to, opts ;
+	int dialtcpmux(cc *hn,cc *ps,int af,cc *svc,mainv sargs,
+		int to,int opts) noex
 
 	Arguments:
-
-	hostname	host to dial to
-	portspec	port specification to use
+	hn		host to dial to
+	ps		port specification to use
 	af		address family
-	svcbuf		service specification
-	argvargs	pointer to array of pointers to arguments
+	svc		service specification
+	sargs		pointer to array of pointers to arguments
 	to		to ('>0' means use one, '-1' means don't)
 	opts		any dial options
 
 	Returns:
-
 	>=0		file descriptor
-	<0		error in dialing
-
+	<0		error in dialing (system-return)
 
 	What is up with the 'to' argument?
-
 	>0		use the to as it is
-
 	==0             asynchronously span the connect and do not wait
 			for it
-
 	<0              use the system default to (xx minutes --
 			whatever)
 
 	Notes:
-
-	Generally, you MUST turn on the compile-time flag at the top of this
-	file named 'CF_CR' in order to enable code that will transmit a CR
-	character in addition to a normal NL character at the end of the
-	service string in the dial sequence.  Many stupid TCPMUX servers out
-	there will not work otherwise.
-
+	Generally, you MUST turn on the compile-time flag at the
+	top of this file named 'CF_CR' in order to enable code that
+	will transmit a CR character in addition to a normal NL
+	character at the end of the service string in the dial
+	sequence.  Many stupid TCPMUX servers out there will not
+	work otherwise.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -79,47 +67,34 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<sbuf.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#define	VERSION		"0"
-#define	NTRIES		2
-#define	BUFLEN		(8 * 1024)
-
-#ifndef	LOGIDLEN
-#define	LOGIDLEN	14
-#endif
-
-#define	LOGTIMEOUT	4		/* seconds */
-
 #ifndef	PORTSPEC_TCPMUX
 #define	PORTSPEC_TCPMUX		"tcpmux"
 #endif
-#define	PORTSPEC_TCPMUXALT	"5108"
 
-#define	QBUFLEN		(MAXNAMELEN +20)
-#define	RBUFLEN		LINEBUFLEN
+#ifndef	CF_CR
+#define	CF_CR		1		/* stupid CR character */
+#endif
 
 
 /* external subroutines */
-
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-extern int	mkquoted(char *,int,const char *,int) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern "C" {
+    extern int	dialtcp(cchar *,cchar *,int,int,int) noex ;
+    extern int	mkquoted(char *,int,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -127,161 +102,74 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* local structures */
 
+namespace {
+    struct muxhelp {
+	cchar		*hn ;
+	cchar		*ps ;
+	cchar		*sp ;
+	mainv		sargs ;
+	char		*mbuf = nullptr ;
+	int		af ;
+	int		sl ;
+	int		to ;
+	int		dot ;
+	int		mlen = 0 ;
+	muxhelp(cc *h,cc *p,int f,cc *s,mainv a,int t,int o) noex {
+	    hn = h ;
+	    ps = p ;
+	    af = f ;
+	    sl = sfshrink(s,-1,&sp) ;
+	    sargs = a ;
+	    to = t ;
+	    dot = o ;
+	} ; /* end ctor */
+	int start() noex ;
+	int finish() noex ;
+	int mkreq() noex ;
+	int blocker() noex ;
+	int reqsvc(int) noex ;
+	~muxhelp() {
+	    (void) finish() ;
+	} ;
+    } ; /* end struct (muxhelp) */
+}
+
 
 /* forward references */
 
-static int	getsvclen(cchar *) ;
-static int	getmuxlen(int,cchar **) ;
-static int	mkmuxreq(char *,int,cchar *,int,cchar **) ;
+static int	getmuxlen(int,mainv) noex ;
+static int	mkmuxreq(char *,int,cchar *,int,mainv) noex ;
 
 
 /* local variables */
 
+constexpr bool	f_cr = CF_CR ;
+
 
 /* exported subroutines */
 
-
-int dialtcpmux(hostname,portspec,af,svcbuf,sargs,to,opts)
-const char	hostname[] ;
-const char	portspec[] ;
-int		af ;
-const char	svcbuf[] ;
-const char	*sargs[] ;
-int		to ;
-int		opts ;
-{
-	int		rs ;
-	int		svclen ;
-	int		muxlen ;
+int dialtcpmux(cc *hn,cc *ps,int af,cc *svc,mainv sargs,int to,int dot) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		fd = -1 ;
-	char		*muxbuf ;
-
-	if (hostname == NULL) return SR_FAULT ;
-	if (svcbuf == NULL) return SR_FAULT ;
-
-	if (hostname[0] == '\0') return SR_INVALID ;
-	if (svcbuf[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("dialtcpmux: hostname=%s portname=%s svcbuf=%s\n",
-	    hostname,portspec,svcbuf) ;
-	debugprintf("dialtcpmux: ent to=%d\n",to) ;
-#endif
-
-	while (CHAR_ISWHITE(*svcbuf)) {
-	    svcbuf += 1 ;
-	}
-
-	svclen = getsvclen(svcbuf) ;
-
-	muxlen = getmuxlen(svclen,sargs) ;
-
-#if	CF_DEBUGS
-	debugprintf("dialtcpmux: final svcbuf=%t\n",svcbuf,svclen) ;
-#endif
-
-	if ((rs = uc_malloc((muxlen+1),&muxbuf)) >= 0) {
-	    if ((rs = mkmuxreq(muxbuf,muxlen,svcbuf,svclen,sargs)) >= 0) {
-		struct sigaction	sighand, osighand ;
-		sigset_t		signalmask ;
-	        const int		mlen = rs ;
-
-/* continue */
-
-	        uc_sigsetempty(&signalmask) ;
-
-	        memset(&sighand,0,sizeof(struct sigaction)) ;
-	        sighand.sa_handler = SIG_IGN ;
-	        sighand.sa_mask = signalmask ;
-	        sighand.sa_flags = 0 ;
-
-	        if ((rs = u_sigaction(SIGPIPE,&sighand,&osighand)) >= 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("dialtcpmux: service buffer, len=%d\n",mlen) ;
-	            debugprintf("dialtcpmux: muxbuf=>%t<\n",
-	                muxbuf,strlinelen(muxbuf,mlen,40)) ;
-#endif
-
-#if	CF_DEBUGS
-	            debugprintf("dialtcpmux: about to portspec=%s\n",
-	                portspec) ;
-#endif
-
-	            if ((portspec == NULL) || (portspec[0] == '\0')) {
-
-#if	CF_DEBUGS
-	                debugprintf("dialtcpmux: NULL portspec\n") ;
-#endif
-
-	                portspec = PORTSPEC_TCPMUX ;
-	                rs = dialtcp(hostname,portspec,af,to,opts) ;
-	                fd = rs ;
-
-	                if ((rs < 0) && (rs != SR_NOMEM)) {
-
-#if	CF_DEBUGS
-	                    debugprintf("dialtcpmux: second chance\n") ;
-#endif
-
-	                    portspec = PORTSPEC_TCPMUXALT ;
-	                    rs = dialtcp(hostname,portspec,af,to,opts) ;
-	                    fd = rs ;
-
-	                } /* end if */
-
-#if	CF_DEBUGS
-	                debugprintf("dialtcpmux: NULL-portspec rs=%d\n",rs) ;
-#endif
-
-	            } else {
-	                rs = dialtcp(hostname,portspec,af,to,0) ;
-	                fd = rs ;
-	            }
-
-#if	CF_DEBUGS
-	            debugprintf("dialtcpmux: dialtcp() rs=%d\n",rs) ;
-#endif
-
-	            if (rs >= 0) {
-
-/* transmit the formatted service code and arguments */
-
-#if	CF_DEBUGS
-	                debugprintf("dialtcpmux: writing service format\n") ;
-#endif
-
-	                if ((rs = uc_writen(fd,muxbuf,mlen)) >= 0) {
-	                    const int	rlen = RBUFLEN ;
-	                    char	rbuf[RBUFLEN+1] = { 0 } ;
-
-	                    if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
-	                        if ((rs == 0) || (rbuf[0] != '+'))
-	                            rs = SR_BADREQUEST ;
-	                    }
-
-	                } /* end if (read response) */
-
-#if	CF_DEBUGS
-	                debugprintf("dialtcpmux: response rs=%d\n",rs) ;
-#endif
-
-	                if (rs < 0) u_close(fd) ;
-	            } /* end if (opened) */
-
-	            u_sigaction(SIGPIPE,&osighand,NULL) ;
-	        } /* end if (signal) */
-
-	    } else {
-	        rs = SR_TOOBIG ;
+	if (hn && svc) {
+	    rs = SR_INVALID ;
+	    if ((ps == nullptr) || (ps[0] == '\0')) {
+		ps = PORTSPEC_TCPMUX ;
 	    }
-	    uc_free(muxbuf) ;
-	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("dialtcpmux: ret rs=%d fd=%d\n",rs,fd) ;
-#endif
-
+	    if (hn[0] && ps[0] && svc[0]) {
+		muxhelp		mo(hn,ps,af,svc,sargs,to,dot) ;
+		if ((rs = mo.start()) >= 0) {
+		    if ((rs = mo.mkreq()) >= 0) {
+			rs = mo.blocker() ;
+			fd = rs ;
+		    }
+		    rs1 = mo.finish() ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (mo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialtcpmux) */
@@ -289,24 +177,82 @@ int		opts ;
 
 /* local subroutines */
 
-
-static int getsvclen(cchar *svcbuf)
-{
-	int		svclen = strlen(svcbuf) ;
-	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1])) {
-	    svclen -= 1 ;
+int muxhelp::start() noex {
+	int		rs ;
+	void		*vp{} ;
+	mlen = getmuxlen(sl,sargs) ;
+	if ((rs = uc_malloc((mlen+1),&vp)) >= 0) {
+	    mbuf = charp(vp) ;
 	}
-	return svclen ;
+	return rs ;
 }
-/* end subroutine (getsvclen) */
+/* end method (muxhelp::start) */
 
+int muxhelp::finish() noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (this && mbuf) {
+	    rs1 = uc_free(mbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    mbuf = nullptr ;
+	}
+	return rs ;
+}
+/* end method (muxhelp::finish) */
 
-static int getmuxlen(int svclen,cchar **sargs)
-{
+int muxhelp::mkreq() noex {
+	return mkmuxreq(mbuf,mlen,sp,sl,sargs) ;
+}
+/* end method (muxhelp::mkreq) */
+
+int muxhelp::blocker() noex {
+	SIGACTION	sighand{} ;
+	SIGACTION	osighand ;
+	sigset_t	signalmask ;
+	int		rs ;
+	int		fd = -1 ;
+	uc_sigsetempty(&signalmask) ;
+	sighand.sa_handler = SIG_IGN ;
+	sighand.sa_mask = signalmask ;
+	sighand.sa_flags = 0 ;
+	if ((rs = u_sigaction(SIGPIPE,&sighand,&osighand)) >= 0) {
+	    if ((rs = dialtcp(hn,ps,af,to,dot)) >= 0) {
+		fd = rs ;
+		rs = reqsvc(fd) ;
+	        if (rs < 0) {
+		    u_close(fd) ;
+		    fd = -1 ;
+		}
+	    } /* end if (opened) */
+	    u_sigaction(SIGPIPE,&osighand,NULL) ;
+	} /* end if (sigaction) */
+	return (rs >= 0) ? fd : rs ;
+}
+/* end method (muxhelp::blocker) */
+
+int muxhelp::reqsvc(int fd) noex {
+	int		rs ;
+	int		rs1 ;
+        if ((rs = uc_writen(fd,mbuf,mlen)) >= 0) {
+            char        *rbuf{}  ;
+	    if ((rs = malloc_mn(&rbuf)) >= 0) {
+		cint	rlen = rs ;
+                if ((rs = uc_readlinetimed(fd,rbuf,rlen,to)) >= 0) {
+                    if ((rs == 0) || (rbuf[0] != '+'))
+                        rs = SR_BADREQUEST ;
+                }
+		rs1 = uc_free(rbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+        } /* end if (read response) */
+	return rs ;
+}
+/* end method (muxhelp::reqsvc) */
+
+static int getmuxlen(int svclen,mainv sargs) noex {
 	int		ml = (svclen+4) ;
-	if (sargs != NULL) {
-	    int	i ;
-	    for (i = 0 ; sargs[i] != NULL ; i += 1) {
+	if (sargs) {
+	    for (int i = 0 ; sargs[i] ; i += 1) {
 		ml += (strlen(sargs[i])+3) ;
 	    } /* end for */
 	} /* end if */
@@ -314,47 +260,39 @@ static int getmuxlen(int svclen,cchar **sargs)
 }
 /* end subroutine (getmuxlen) */
 
-
-/* format the service string to be transmitted */
-static int mkmuxreq(muxbuf,muxlen,svcbuf,svclen,sargs)
-char		muxbuf[] ;
-int		muxlen ;
-const char	svcbuf[] ;
-int		svclen ;
-const char	*sargs[] ;
-{
-	SBUF		b ;
+static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,mainv sargs) noex {
+	sbuf		b ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-
-	if ((rs = sbuf_start(&b,muxbuf,muxlen)) >= 0) {
-	    if ((rs = sbuf_strw(&b,svcbuf,svclen)) >= 0) {
-
-	        if (sargs != NULL) {
-	            int		i ;
-	            const int	qlen = QBUFLEN ;
-	            char	qbuf[QBUFLEN+1] ;
-	            for (i = 0 ; (rs >= 0) && (sargs[i] != NULL) ; i += 1) {
-	                sbuf_char(&b,' ') ;
-	                if ((rs = mkquoted(qbuf,qlen,sargs[i],-1)) >= 0) {
-	                    len = rs ;
-	                    sbuf_buf(&b,qbuf,len) ;
-	                }
-	            } /* end for */
+	if ((rs = sbuf_start(&b,mbuf,mlen)) >= 0) {
+	    if ((rs = sbuf_strw(&b,sp,sl)) >= 0) {
+	        if (sargs) {
+	            char	*qbuf{} ;
+		    if ((rs = malloc_mn(&qbuf)) >= 0) {
+			cint	qlen = rs ;
+	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
+			    cchar	*sa = sargs[i] ;
+	                    sbuf_char(&b,' ') ;
+	                    if ((rs = mkquoted(qbuf,qlen,sa,-1)) >= 0) {
+	                        len = rs ;
+	                        sbuf_buf(&b,qbuf,len) ;
+	                    }
+	                } /* end for */
+		        rs1 = uc_free(qbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 	        } /* end if (svc-args) */
-
 	        if (rs >= 0) {
-#if	CF_CR
-	            sbuf_char(&b,'\r') ;
-#endif
+		    if constexpr (f_cr) {
+	                sbuf_char(&b,'\r') ;
+		    }
 	            sbuf_char(&b,'\n') ;
 	        } /* end if */
-
 	    } /* end if */
 	    len = sbuf_getlen(&b) ;
 	    if (rs >= 0) rs = len ;
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkmuxreq) */
