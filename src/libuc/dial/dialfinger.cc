@@ -17,42 +17,35 @@
 
 /*******************************************************************************
 
-        This subroutine will dial out to an INET host using the FINGER protocol
-        and the optional TCP port and FINGER service that is specified.
+	Name:
+	dialfinger
+
+	Description:
+	This subroutine will dial out to an INET host using the
+	FINGER protocol and the optional TCP port and FINGER service
+	that is specified.
 
 	Synopsis:
-
-	int dialfinger(hostname,portspec,af,svc,sargs,to,opts)
-	cchar	hostname[] ;
-	cchar	portspec[] ;
-	int		af ;
-	cchar	svc[] ;
-	cchar	*sargs[] ;
-	int		to, opts ;
+	int dialfinger(cc *hn,cc *ps,int af,cc *svc,mainv sargs,
+			int to,int dot) noex
 
 	Arguments:
-
-	hostname	host to dial to
-	portspec	port specification to use
+	hn		host to dial to
+	ps		port specification to use
 	af		address family
 	svc		service specification
-	argvargs	pointer to array of pointers to arguments
+	sargs		pointer to array of pointers to arguments
 	to		to ('>0' means use one, '-1' means don't)
-	opts		any dial options
+	dot		any dial options
 
 	Returns:
-
 	>=0		file descriptor
-	<0		error in dialing
-
+	<0		error in dialing (system-return)
 
 	What is up with the 'to' argument?
-
 	>0		use the to as it is
-
 	==0             asynchronously span the connect and do not wait
 			for it
-
 	<0              use the system default to (xx minutes --
 			whatever)
 
@@ -79,6 +72,7 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<sbuf.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -87,17 +81,6 @@
 
 
 /* local defines */
-
-#define	VERSION		"0"
-#define	NTRIES		2
-#define	BUFLEN		(8 * 1024)
-#define	SERIALFILE1	"/tmp/serial"
-#define	SERIALFILE2	"/tmp/dialfinger.serial"
-#define	LOGFNAME	"/tmp/dialfinger.log"
-
-#ifndef	LOGIDLEN
-#define	LOGIDLEN	14
-#endif
 
 #ifndef	PORTSPEC_FINGER
 #define	PORTSPEC_FINGER		"finger"
@@ -109,8 +92,6 @@
 #endif
 
 #define	MUXBUFLEN	(SVCLEN + MAXPATHLEN)
-#define	QBUFLEN		(MAXNAMELEN +20)
-#define	RBUFLEN		LINEBUFLEN
 
 #ifndef	CF_CR
 #define	CF_CR		1		/* stupid CR character */
@@ -146,18 +127,18 @@ constexpr bool	f_cr = CF_CR ;
 
 /* exported subroutines */
 
-int dialfinger(cc *hostname,cc *portspec,int af,cc *svc,
-		mainv sargs,int to,int opts) noex {
+int dialfinger(cc *hn,cc *ps,int af,cc *svc,
+		mainv sargs,int to,int dot) noex {
 	int		rs ;
 	int		svclen ;
 	int		mlen ;
 	int		fd = -1 ;
 	char		*mbuf ;
 
-	if (hostname == NULL) return SR_FAULT ;
-	if (svc == NULL) return SR_FAULT ;
+	if (hn == nullptr) return SR_FAULT ;
+	if (svc == nullptr) return SR_FAULT ;
 
-	if ((hostname[0] == '\0') || (svc[0] == '\0'))
+	if ((hn[0] == '\0') || (svc[0] == '\0'))
 	    return SR_INVALID ;
 
 /* perform some cleanup on the service code specification */
@@ -173,31 +154,25 @@ int dialfinger(cc *hostname,cc *portspec,int af,cc *svc,
 /* format the service string to be transmitted */
 
 	if ((rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
-	    if ((rs = mkmuxreq(mbuf,mlen,svc,svclen,sargs,opts)) >= 0) {
-	        SIGACTION	sighand, osighand ;
+	    if ((rs = mkmuxreq(mbuf,mlen,svc,svclen,sargs,dot)) >= 0) {
+	        SIGACTION	sighand{} ;
+	        SIGACTION	osighand ;
 	        sigset_t	sigmask ;
 	        int		ml = rs ;
-
 	        uc_sigsetempty(&sigmask) ;
-
-	        memset(&sighand,0,sizeof(SIGACTION)) ;
 	        sighand.sa_handler = SIG_IGN ;
 	        sighand.sa_mask = sigmask ;
 	        sighand.sa_flags = 0 ;
-
 	        if ((rs = u_sigaction(SIGPIPE,&sighand,&osighand)) >= 0) {
-
-	            if ((rs = dialourtcp(hostname,portspec,af,to,opts)) >= 0) {
+	            if ((rs = dialourtcp(hn,ps,af,to,dot)) >= 0) {
 	                fd = rs ;
 	                if ((rs = uc_writen(fd,mbuf,ml)) >= 0) {
 	                    rs = u_shutdown(fd,SHUT_WR) ;
 	                }
 	                if (rs < 0) u_close(fd) ;
 	            } /* end if (opened) */
-
-	            u_sigaction(SIGPIPE,&osighand,NULL) ;
+	            u_sigaction(SIGPIPE,&osighand,nullptr) ;
 	        } /* end if (signal) */
-
 	    } else {
 	        rs = SR_TOOBIG ;
 	    }
@@ -234,7 +209,7 @@ static int getmlen(int svclen,mainv sargs) noex {
 static int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
-	if ((ps == NULL) || (ps[0] == '\0')) {
+	if ((ps == nullptr) || (ps[0] == '\0')) {
 	    ps = PORTSPEC_FINGER ;
 	    rs = dialtcp(hs,ps,af,to,opt) ;
 	    fd = rs ;
@@ -252,26 +227,32 @@ static int dialourtcp(cchar *hs,cchar *ps,int af,int to,int opt) noex {
 /* end subroutine (dialourtcp) */
 
 /* format the service code and arguments for transmission */
-static int mkmuxreq(char *mbuf,int mlen,cc *svc,int svclen,
-		mainv sargs,int opts) noex {
+static int mkmuxreq(char *mbuf,int mlen,cc *sp,int sl,
+		mainv sargs,int dot) noex {
 	sbuf		b ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
 	if ((rs = sbuf_start(&b,mbuf,mlen)) >= 0) {
-	    if ((rs = sbuf_strw(&b,svc,svclen)) >= 0) {
-	        if (opts & DIALOPT_LONG) {
+	    if ((rs = sbuf_strw(&b,sp,sl)) >= 0) {
+	        if (dot & DIALOPT_LONG) {
 	            rs = sbuf_strw(&b," /W",3) ;
 	        }
-	        if ((rs >= 0) && (sargs != NULL)) {
-	            cint	qlen = QBUFLEN ;
-	            char	qbuf[QBUFLEN+1] ;
-	            for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
-	                sbuf_char(&b,' ') ;
-	                if ((rs = mkquoted(qbuf,qlen,sargs[i],-1)) >= 0) {
-	                    cint	ql = rs ;
-	                    sbuf_buf(&b,qbuf,ql) ;
-	                }
-	            } /* end for */
+	        if ((rs >= 0) && (sargs != nullptr)) {
+	            char	*qbuf{} ;
+		    if ((rs = malloc_mn(&qbuf)) >= 0) {
+			cint	qlen = rs ;
+	                for (int i = 0 ; (rs >= 0) && sargs[i] ; i += 1) {
+			    cchar	*sa = sargs[i] ;
+	                    sbuf_char(&b,' ') ;
+	                    if ((rs = mkquoted(qbuf,qlen,sa,-1)) >= 0) {
+	                        cint	ql = rs ;
+	                        sbuf_buf(&b,qbuf,ql) ;
+	                    }
+	                } /* end for */
+			rs1 = uc_free(qbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 	        } /* end if */
 	        if (rs >= 0) {
 		    if constexpr (f_cr) {
