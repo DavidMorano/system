@@ -98,6 +98,7 @@ extern int	uc_syspages(int) noex ;
 extern int	uc_nprocs(int) noex ;
 extern int	uc_confsys(int,long *) noex ;
 extern int	uc_confstr(char *,int,int) noex ;
+extern int	uc_confmaxline() noex ;
 
 #if	SYSHAS_TIMER && (SYSHAS_TIMER > 0)
 extern int uc_timercreate(clockid_t,struct sigevent *,timer_t *) noex ;
