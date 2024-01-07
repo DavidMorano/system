@@ -39,8 +39,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
@@ -141,6 +139,24 @@ int malloc_sv(char **rpp) noex {
 int malloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_mallocsys(w,rpp) ;
+}
+
+int malloc_addr(char **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		al = 0 ;
+	if (rpp) {
+	    int		w = getbufsize_hn ;
+	    if ((rs = getbufsize(w)) >= 0) {
+		cint	hnl = rs ;
+		w = getbufsize_nn ;
+		if ((rs = getbufsize(w)) >= 0) {
+		    cint	nnl = rs ;
+		    al = (hnl + (2 * nnl)) ;
+		    rs = uc_malloc((al+1),rpp) ;
+		} /* end if */
+	    } /* end if */
+	} /* end if (non-null) */
+	return (rs >= 0) ? al : rs ;
 }
 
 

@@ -1,4 +1,4 @@
-/* sfcookkey */
+/* sfcookkey SUPPORT */
 /* lang=C20 */
 
 /* string-find a cookie key */

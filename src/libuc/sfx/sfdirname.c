@@ -1,4 +1,4 @@
-/* sfdirname */
+/* sfdirname SUPPORT */
 /* lang=C20 */
 
 /* get the directory part out of a file name path */

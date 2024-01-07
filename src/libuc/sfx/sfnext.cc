@@ -1,4 +1,4 @@
-/* sfnext */
+/* sfnext SUPPORT */
 /* lang=C++20 */
 
 /* string-find operations */

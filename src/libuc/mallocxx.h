@@ -56,6 +56,8 @@ extern int malloc_ho(char **) noex ;
 extern int malloc_sv(char **) noex ;
 extern int malloc_zn(char **) noex ;
 
+extern int malloc_addr(char **) noex ;
+
 #ifdef	__cplusplus
 }
 #endif

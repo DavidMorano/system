@@ -1,4 +1,4 @@
-/* sfsubstance */
+/* sfsubstance SUPPORT */
 /* lang=C20 */
 
 /* find substantive part of string (strip garbage around items) */

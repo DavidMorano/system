@@ -1,4 +1,4 @@
-/* sfnamecomp */
+/* sfnamecomp SUPPORT */
 /* lang=C20 */
 
 /* find something inside a string */

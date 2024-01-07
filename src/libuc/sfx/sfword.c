@@ -1,4 +1,4 @@
-/* sfword */
+/* sfword SUPPORT */
 /* lang=C20 */
 
 /* find an English word within the given string */

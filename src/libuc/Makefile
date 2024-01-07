@@ -1250,20 +1250,15 @@ snwcpy.o:		snwcpy.dir
 snwcpy.dir:
 	makesubdir $@
 
+# MATXSTR
+matxstr.o:		matxstr.dir
+matxstr.dir:
+	makesubdir $@
+
+# HASH
 hash.o:			hash.dir
 hash.dir:
 	makesubdir $@
-
-# UCENT
-ucentpw.o:		ucentpw.cc ucentpw.h
-ucentsp.o:		ucentsp.cc ucentsp.h
-ucentua.o:		ucentua.cc ucentua.h
-ucentgr.o:		ucentgr.cc ucentgr.h
-ucentpj.o:		ucentpj.cc ucentpj.h
-ucentpr.o:		ucentpr.cc ucentpr.h
-ucentnw.o:		ucentnw.cc ucentnw.h
-ucentho.o:		ucentho.cc ucentho.h
-ucentsv.o:		ucentsv.cc ucentsv.h
 
 # UCSYS
 ucsys.o:		ucsys.dir

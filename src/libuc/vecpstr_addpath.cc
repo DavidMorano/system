@@ -53,7 +53,7 @@
 	int vecpstr_addcspath(vecpstr *) noex
 
 	Arguments:
-	vsp		pointer to VECPSTR object
+	vsp		pointer to VECSTR object
 
 	Returns:
 	>=0		number of elements loaded
@@ -69,33 +69,17 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<vecpstr.h>
 #include	<bufsizevar.hh>
+#include	<strn.h>
+#include	<pathclean.h>
+#include	<vecpstr.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#define	DEFPATH		"/usr/preroot/bin:/usr/xpg4/bin:" \
-				"/usr/ccs/bin:/usr/bin:/usr/sbin:/sbin"
-#elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-#define	DEFPATH		"/usr/preroot/bin:/usr/bin:/bin:/usr/sbin:/sbin"
-#else
-#define	DEFPATH		"/usr/preroot/bin:/usr/bin:/usr/sbin:/sbin"
-#endif
-
 
 /* external subroutines */
-
-extern "C" {
-    extern int	pathclean(char *,const char *,int) noex ;
-    extern int	isOneOf(cint *,int) noex ;
-}
-
-extern "C" {
-    extern char	*strnpbrk(cchar *,int,cchar *) ;
-}
 
 
 /* external variables */
@@ -110,12 +94,6 @@ extern "C" {
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
-
-static const int	rsdefs[] = {
-	SR_NOTFOUND,
-	SR_OVERFLOW,
-	0
-} ;
 
 
 /* exported subroutines */
@@ -197,16 +175,8 @@ int vecpstr_addcspath(vecpstr *vsp) noex {
 	        char	*pbuf ;
 	        if ((rs = uc_libmalloc((plen+1),&pbuf)) >= 0) {
 		    cint	req = _CS_PATH ;
-	            int		dl = -1 ;
-	            cchar	*dp = DEFPATH ;
 	            if ((rs = uc_confstr(pbuf,plen,req)) >= 0) {
-		        dl = rs ;
-	                dp = pbuf ;
-	            } else if (isOneOf(rsdefs,rs)) {
-	                rs = SR_OK ;
-	            }
-	            if (rs >= 0) {
-	                rs = vecpstr_addpath(vsp,dp,dl) ;
+	                rs = vecpstr_addpath(vsp,pbuf,rs) ;
 	                c += rs ;
 	            } /* end if */
 	            rs1 = uc_libfree(pbuf) ;

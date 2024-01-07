@@ -1,12 +1,8 @@
-/* dialprog */
+/* dialprog SUPPORT */
+/* lang=C++20 */
 
 /* connect to a local program */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_ENVSORT	0		/* sort the environment? */
-#define	CF_MKVARPATH	0		/* somehow use 'mkvarpath(3dam)' */
 
 
 /* revision history:
@@ -20,19 +16,16 @@
 
 /*******************************************************************************
 
+	Name:
+	dialprog
+
+	Description:
 	This is a dialer to connect to a local program.
 
 	Synopsis:
-
-	int dialprog(fname,of,argv,envv,fd2p)
-	const char	fname[] ;
-	int		of ;
-	char		*argv[] ;
-	char		*envv[] ;
-	int		*fd2p ;
+	int dialprog(cc *fname,int of,mainv argv,mainv envv,int *fd2p) noex
 
 	Arguments:
-
 	fname		program to execute
 	of		open-flags
 	argv		arguments to program
@@ -40,32 +33,27 @@
 	fd2p		pointer to integer to receive STDERR descriptor
 
 	Returns:
-
 	>=0		file descriptor to program STDIN and STDOUT
-	<0		error
+	<0		error (system-return)
 
+	Notes:
 	fd2p		if it was supplied, the pointed-to integer
 			received a file descriptor to the STDERR
 
-
-	Importand note on debugging:
-
-	One some (maybe many) OS systems, turning on any debugging in this
-	subroutine can cause hangs after the 'fork(2)'.  This is due to the
-	famous (infamous) fork-safety problem on many UNIX®i®.  One UNIX® OS
-	that has fork-safe lib-C subroutines (for the greater most part) is
-	Solaris®.  They (the Solaris® people) seem to be among the only ones
-	who took fork-safety seriously in their OS.
-
+	Important note on debugging:
+	One some (maybe many) OS systems, turning on any debugging
+	in this subroutine can cause hangs after the |fork(2)|.
+	This is due to the famous (infamous) fork-safety problem
+	on many UNIX®i.  One UNIX® OS that has fork-safe lib-C
+	subroutines (for the greater most part) is Solaris®.  They
+	(the Solaris® people) seem to be among the only ones who
+	took fork-safety seriously in their OS.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -75,21 +63,9 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	uc_openprogerr(cchar *,int,cchar **,cchar **,int *) ;
-
-#if	CF_DEBUGS
-extern int	nprintf(const char *,const char *,...) ;
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+    extern int	uc_openprogerr(cchar *,int,mainv,mainv,int *) noex ;
+}
 
 
 /* external variables */
@@ -103,9 +79,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* exported subroutines */
 
-
-int dialprog(cchar *fname,int of,cchar **argv,cchar **envv,int *fd2p)
-{
+int dialprog(cchar *fname,int of,mainv argv,mainv envv,int *fd2p) noex {
 	return uc_openprogerr(fname,of,argv,envv,fd2p) ;
 }
 /* end subroutine (dialprog) */

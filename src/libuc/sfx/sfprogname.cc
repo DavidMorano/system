@@ -1,4 +1,4 @@
-/* sfprogname */
+/* sfprogname SUPPORT */
 /* lang=C++20 */
 
 /* try to find a "program" name out of a given c-string */

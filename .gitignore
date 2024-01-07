@@ -22,10 +22,7 @@
 *.swp
 
 todo.txt
-src/todo.txt
-src/libu/todo.txt
-src/libuc/todo.txt
-src/libdam/todo.txt
+tags
 
 o
 oo
@@ -35,5 +32,14 @@ o2
 .DS_Store
 .gitattributes
 .gitnotes
+.tags
+
+.kshrc
+.profile
+.bbnewsrc
+.fullname
+.msgrc
+.swd
+.news_time
 
 

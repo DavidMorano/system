@@ -1,4 +1,4 @@
-/* sfshrink */
+/* sfshrink SUPPORT */
 /* lang=C20 */
 
 /* remove leading and trailing white space */

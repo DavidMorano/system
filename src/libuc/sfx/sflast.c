@@ -1,4 +1,4 @@
-/* sflast */
+/* sflast SUPPORT */
 /* lang=C20 */
 
 /* find the last <n> characters in a given string */

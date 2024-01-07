@@ -1,4 +1,4 @@
-/* sfthing */
+/* sfthing SUPPORT */
 /* lang=C20 */
 
 /* string-find a thing */

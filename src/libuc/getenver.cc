@@ -49,6 +49,8 @@
 #include	<matkeystr.h>
 #include	<localmisc.h>
 
+#include	"getenver.h"
+
 
 /* external variables */
 

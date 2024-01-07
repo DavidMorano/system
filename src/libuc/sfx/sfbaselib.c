@@ -1,4 +1,4 @@
-/* sfbaselib */
+/* sfbaselib SUPPORT */
 /* lang=C20 */
 
 /* string-find a base-library name */

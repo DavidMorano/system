@@ -1,4 +1,4 @@
-/* sfsub */
+/* sfsub SUPPORT */
 /* lang=C20 */
 
 /* match a substring within a larger string */
