@@ -41,7 +41,6 @@ extern "C" {
 
 extern int	getaf(cchar *,int) noex ;
 extern int	getaflen(int) noex ;
-extern int	getaddrlen(int) noex ;
 extern cchar	*strafname(int) noex ;
 
 #ifdef	__cplusplus

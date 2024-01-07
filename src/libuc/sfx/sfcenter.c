@@ -1,4 +1,4 @@
-/* sfcenter */
+/* sfcenter SUPPORT */
 /* lang=C20 */
 
 /* string-find the center sub-string */

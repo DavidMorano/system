@@ -1,4 +1,4 @@
-/* sfrootname */
+/* sfrootname SUPPORT */
 /* lang=C20 */
 
 /* string-find root-name */

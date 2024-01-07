@@ -1,4 +1,4 @@
-/* sfbreak */
+/* sfbreak SUPPORT */
 /* lang=C20 */
 
 /* subroutine to find a sub-string in a given string */

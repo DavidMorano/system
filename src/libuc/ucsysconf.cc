@@ -67,6 +67,19 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+extern "C" {
+    extern int uc_sysconf(int,long *) noex ;
+}
+
+
 /* local structures */
 
 namespace {
@@ -88,9 +101,6 @@ namespace {
 
 /* forward references */
 
-extern "C" {
-    extern int uc_sysconf(int,long *) noex ;
-}
 
 /* exported subroutines */
 
@@ -122,9 +132,6 @@ int ucsysconf::operator () (int req) noex {
 	repeat {
 	    if ((rs = (this->*m)(req)) < 0) {
 	        switch (rs) {
-	        case SR_AGAIN:
-	        case SR_INTR:
-	            break ;
 	        case SR_NOMEM:
 		    if (to_nomem-- > 0) {
 	                msleep(1000) ;
@@ -132,6 +139,9 @@ int ucsysconf::operator () (int req) noex {
 		        f_exit = true ;
 		    }
 		    break ;
+	        case SR_AGAIN:
+	        case SR_INTR:
+	            break ;
 		default:
 		    f_exit = true ;
 		    break ;

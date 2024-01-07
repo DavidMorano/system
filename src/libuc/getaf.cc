@@ -262,11 +262,6 @@ int getaflen(int af) noex {
 }
 /* end subroutine (getaflen) */
 
-int getaddrlen(int af) noex {
-	return getaflen(af) ;
-}
-/* end subroutine (getaddrlen) */
-
 /* reads out as: str-af-name */
 cchar *strafname(int af) noex {
 	const ADDRFAM	*afs = addrfamilies ;

@@ -1,14 +1,21 @@
-/* pwihdr */
+/* pwihdr HEADER */
+/* lang=C20 */
+
+
+/* Password-Index Header (PWI) */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PWIHDR_INCLUDE
-#define	PWIHDR_INCLUDE	1
+#define	PWIHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 

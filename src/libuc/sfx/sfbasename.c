@@ -1,4 +1,4 @@
-/* sfbasename */
+/* sfbasename SUPPORT */
 /* lang=C20 */
 
 /* get the base file name out of a path */

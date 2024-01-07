@@ -115,13 +115,11 @@ int getaddrfamily(cchar *name) noex {
 }
 /* end subroutine (getaddrfamily) */
 
-int getaflen(int af) noex {
-	int		rs ;
-	if ((rs = maxpathlen) >= 0) {
-	    cint	maxpath = rs ;
+int getaddrlen(int af) noex {
+	int		rs = SR_OK ;
 	    switch (af) {
 	    case AF_UNIX:
-	        rs = maxpath ;
+	        rs = maxpathlen ;
 	        break ;
 	    case AF_INET4:
 	        rs = INET4ADDRLEN ;
@@ -133,13 +131,7 @@ int getaflen(int af) noex {
 	        rs = SR_AFNOSUPPORT ;
 	        break ;
 	    } /* end switch */
-	} /* end if (maxpathlen) */
 	return rs ;
-}
-/* end subroutine (getaflen) */
-
-int getaddrlen(int af) noex {
-	return getaflen(af) ;
 }
 /* end subroutine (getaddrlen) */
 

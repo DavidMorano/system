@@ -29,7 +29,6 @@ extern "C" {
 
 extern int getaddrfamily(cchar *) noex ;
 extern int getaddrlen(int) noex ;
-extern int getaflen(int) noex ;
 
 #ifdef	__cplusplus
 }

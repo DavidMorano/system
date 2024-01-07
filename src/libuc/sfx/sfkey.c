@@ -1,4 +1,4 @@
-/* sfkey */
+/* sfkey SUPPORT */
 /* lang=C20 */
 
 /* get the key part of a compound string */

@@ -1,4 +1,4 @@
-/* sfbracketval */
+/* sfbracketval SUPPORT */
 /* lang=C20 */
 
 /* find the string-value within brackets */

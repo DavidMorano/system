@@ -174,6 +174,8 @@ namespace {
 	} ;
 	int filecandidate(cchar *,int = -1) noex ;
 	int filealready(dev_t,ino_t) noex ;
+	int flistenter(cchar *,int) noex ;
+	int snuglines() noex ;
     private:
 	int istart() noex ;
 	int ifinish() noex ;
@@ -204,6 +206,7 @@ enum progmodes {
 static constexpr cpcchar	prognames[] = {
 	"fileuniq",
 	"fu",
+	"snuglines",
 	nullptr
 } ;
 
@@ -235,11 +238,18 @@ int main(int argc,mainv argv,mainv envv) noex {
 	int		rs1 ;
 	if ((rs = pi.start) >= 0) {
 	    if ((rs = pi.flistbegin()) >= 0) {
-                switch (pi.pm) {
-                case progmode_fileuniq:
-                case progmode_fu:
-                    rs = pi.output() ;
-                    break ;
+	        switch(pi.om) {
+		case progmode_snuglines:
+		    rs = pi.snuglines() ;
+		    break ;
+		default:
+                    switch (pi.pm) {
+                    case progmode_fileuniq:
+                    case progmode_fu:
+                        rs = pi.output() ;
+                        break ;
+                    } /* end switch */
+		    break ;
                 } /* end switch */
 		rs1 = pi.flistend() ;
 		if (rs >= 0) rs = rs1 ;

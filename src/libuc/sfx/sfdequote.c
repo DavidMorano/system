@@ -1,4 +1,4 @@
-/* sfdequote */
+/* sfdequote SUPPORT */
 /* lang=C20 */
 
 /* find the dequoted sub-string of the given string */

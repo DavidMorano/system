@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 extern int getnodename(char *,int) noex ;
+extern int getnodedomain(char *,char *) noex ;
 
 #ifdef	__cplusplus
 }

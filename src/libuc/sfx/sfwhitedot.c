@@ -1,4 +1,4 @@
-/* sfwhitedot */
+/* sfwhitedot SUPPORT */
 /* lang=C20 */
 
 /* get a substring present before the first dot */

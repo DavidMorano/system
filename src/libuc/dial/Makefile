@@ -54,11 +54,11 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h sysauxinfonames.h
 
 
-OBJ0_DIAL= dialopts.o
+OBJ0_DIAL= dialopts.o dialhttp.o
 OBJ1_DIAL= dialpass.o dialprog.o dialtcp.o dialtcpmux.o dialfinger.o 
 OBJ2_DIAL= dialtcpnls.o dialticotsord.o dialticotsordmux.o dialticotsordnls.o
 OBJ3_DIAL= dialudp.o dialusd.o dialuss.o dialussmux.o dialussnls.o
-OBJ4_DIAL= dialhttp.o dialcprog.o 
+OBJ4_DIAL= dialcprog.o 
 
 
 OBJA_DIAL= obj0_dial.o obj1_dial.o

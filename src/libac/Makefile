@@ -1,236 +1,130 @@
-# MAKEFILE
+# MAKEFILES (libac)
 
 T= libac
 
-ALL= $(T).a
-
-SECROOT= $(LOCAL)
+ALL= $(T).o $(T).a
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-HELPDIR= $(SRCROOT)/share/help
+BINDIR= $(REPOROOT)/bin
+INCDIR= $(REPOROOT)/include
+LIBDIR= $(REPOROOT)/lib
+MANDIR= $(REPOROOT)/man
+INFODIR= $(REPOROOT)/info
+HELPDIR= $(REPOROOT)/share/help
 
 
+CRTDIR= $(CGS_CRTDIR)
+VALDIR= $(CGS_VALDIR)
+LIBDIR= $(CGS_LIBDIR)
+
+CPP= cpp
 CC= gcc
-GPP= g++
+CXX= gpp
+LD= gld
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
-CCOPTS_GCCALL= -pthreads -fexceptions
-CCOPTS_CCALL= -MT
-
-CCOPTS_GCCOPTSPARC= -mcpu=ultrasparc
-CCOPTS_GCCLIBSPARC= -mno-app-regs
-
-CCOPTS= $(CCOPTS_GCCALL) -O $(CCOPTS_GCCOPTSPARC)
-#CCOPTS= $(CCOPTS_GCCALL) -g -O
-#CCOPTS= $(CCOPTS_GCCALL) -g -pg
-#CCOPTS= $(CCOPTS_GCCALL) -g -Wstrict-aliasing -Wall
-
-CCOPTS_GCCLIB= -fpic $(CCOPTS_GCCLIBSPARC)
-
-#CCOPTS= $(CCOPTS_CCALL) -g -xs
+LORDER= lorder
+TSORT= tsort
+LINT= lint
+RM= rm -f
+TOUCH= touch
+LINT= lint
 
 
-DEF0=
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
+DEFS=
 
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
-
+LDRPATH= $(EXTRA)/lib
 
 INCDIRS= -I$(INCDIR)
 
-CPPFLAGS= $(DEFS) $(INCDIRS)
+LIBDIRS= -L$(LIBDIR)
 
-CFLAGS= $(CCOPTS) 
-
-#LD= $(CC)
-LD= ld
-
-LDFLAGS=
-LIBDIRS=
 LIBS=
 
-LINT= lint
-LINTFLAGS= -uxn -Dlint
 
-NM= nm
-NMFLAGS= -x
-
-CPP= cpp
-
-
-# files
-
-I00=
-I01=
-I02=
-I03=
-I04=
-I05=
-I06=
-I07=
-
-INCSA= $(I00) $(I01) $(I02) $(I03)
-INCSB= $(I04) $(I05) $(I06) $(I07)
-
-INCS= $(INCSA) $(INCSB) $(INCSC) $(INCSD)
+# flag setting
+CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS= $(MAKECFLAGS)
+CCFLAGS= $(MAKECCFLAGS)
+ARFLAGS= $(MAKEARFLAGS)
+LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ00=
-OBJ01= strlen.o strncasecmp.o strlcat.o strlcpy.o
-OBJ02= isalpha.o isdigit.o 
-OBJ03= dirname.o basename.o
-OBJ04= 
-OBJ05= mkdir.o ftime.o 
-OBJ06=
-OBJ07=
-OBJ08=
-OBJ09=
-OBJ10=
-OBJ11=
-OBJ12=
-OBJ13=
-OBJ14=
-OBJ15=
-OBJ16=
-OBJ17=
-OBJ18=
-OBJ19=
-OBJ20=
-OBJ21=
-OBJ22= 
-OBJ23=
-OBJ24=
-OBJ25=
-OBJ26=
-OBJ27=
-OBJ28=
-OBJ29=
-OBJ30=
-OBJ31=
-OBJ32=
-OBJ33=
-OBJ34=
-OBJ35=
-OBJ36=
-OBJ37=
-OBJ38=
-OBJ39=
-OBJ40=
-OBJ41=
-OBJ42=
-OBJ43=
-OBJ44=
-OBJ45=
-OBJ46=
-OBJ47=
-OBJ48=
-OBJ49=
-OBJ50=
-OBJ51=
-OBJ52=
-OBJ53=
-OBJ54=
-OBJ55=
-OBJ56=
-OBJ57=
-OBJ58=
-OBJ59=
-OBJ60=
-OBJ61=
-OBJ62=
-OBJ63=
-
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23) 
-OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
-OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
-OBJH= $(OBJ56) $(OBJ57) $(OBJ58) $(OBJ59) $(OBJ60) $(OBJ61) $(OBJ62) $(OBJ63)
-
-OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG) $(OBJH)
-
-OBJS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o
+INCS=
 
 
+OBJ0_LIBAC= isalpha.o isdigit.o 
+OBJ1_LIBAC= strlen.o strncasecmp.o
+OBJ2_LIBAC= strlcat.o strlcpy.o strncpy.o 
+OBJ3_LIBAC= basename.o dirname.o 
+OBJ4_LIBAC= fork1.o mkdir.o
 
-.SUFFIXES:		.ls
+
+OBJA_LIBAC= obj0_libac.o obj1_libac.o
+OBJB_LIBAC= obj2_libac.o obj3_libac.o obj4_libac.o
+
+OBJ_LIBAC= $(OBJA_LIBAC) $(OBJB_LIBAC)
 
 
-default:		all
+default:		$(T).a
 
 all:			$(ALL)
 
-.c.o:
-	$(CC) -c $(CFLAGS) $(CPPFLAGS) $<
-
 .c.ln:
-	$(LINT) -c -u $(CPPFLAGS) $<
+	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.ls:
 	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
 
+.c.i:
+	$(CPP) $(CPPFLAGS) $< > $(*).i
 
-$(T).a:			$(OBJ)
-	$(AR) -rc $(T).a $?
+.c.o:
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
-$(T).so:		$(OBJS) Makefile localmisc.h $(T).a
-	$(LD) -o $@ -G $(LDFLAGS) $(OBJS)
+.cc.o:
+	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
-obja.o:			$(OBJA)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJA)
 
-objb.o:			$(OBJB)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJB)
+$(T).o:			$(OBJ_LIBAC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBAC)
 
-objc.o:			$(OBJC)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJC)
+$(T).a:			$(OBJ_LIBAC)
+	$(AR) $(ARFLAGS) -rc $@ $?
 
-objd.o:			$(OBJD)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJD)
+$(T).nm:		$(T).so
+	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
-obje.o:			$(OBJE)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJE)
-
-objf.o:			$(OBJF)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJF)
-
-objg.o:			$(OBJG)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJG)
-
-objh.o:			$(OBJH)
-	$(LD) -o $@ -r $(LDFLAGS) $(OBJH)
+$(T).order:		$(OBJ) $(T).a
+	$(LORDER) $(T).a | $(TSORT) > $(T).order
+	$(RM) $(T).a
+	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	$(RM) $(ALL)
+	rm -f $(TALL)
 
-clean:			again
-	$(RM) *.o $(ALL)
-
-safe:
-	makesafe -v=3 -I $(INCDIR) $(OBJ)
-
-install:		$(ALL) Makefile install.incs
-	bsdinstall $(ALL) $(SRCROOT)/lib/$(OFD)
-
-install.incs:		$(INCS)
-	makenewer $(INCS) -d $(INCDIR) -t $@
+clean:
+	makeclean $(ALL)
 
 control:
 	(uname -n ; date) > Control
 
+obj0_libac.o:	$(OBJ0_LIBAC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBAC)
 
-ftime.o:	ftime.mod
-	cp -p ftime.mod ftime.o
+obj1_libac.o:	$(OBJ1_LIBAC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBAC)
 
+obj2_libac.o:	$(OBJ2_LIBAC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBAC)
+
+obj3_libac.o:	$(OBJ3_LIBAC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBAC)
+
+obj4_libac.o:	$(OBJ4_LIBAC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_LIBAC)
 
 

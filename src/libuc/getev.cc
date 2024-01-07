@@ -4,7 +4,6 @@
 /* get an environment variable by name */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -48,6 +47,8 @@
 #include	<matkeystr.h>
 #include	<localmisc.h>
 
+#include	"getev.h"
+
 
 /* local defines */
 
@@ -66,7 +67,7 @@
 
 /* exported subroutines */
 
-int getev(cchar **envv,cchar *np,int nl,cchar **rpp) noex {
+int getev(mainv envv,cchar *np,int nl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
 	cchar		*vp = nullptr ;

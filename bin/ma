@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/usr/extra/bin/ksh
 # MAKEIT
 
 : ${REPOROOT=:${HOME}/github/rc}
@@ -7,6 +7,7 @@ export REPOROOT
 BUILDTYPE=debug
 
 
+: ${CGS_INCDIR:=${REPOROOT}/include}}
 : ${CGS_CRTDIR:=${REPOROOT}/lib}}
 : ${CGS_VALDIR:=${REPOROOT}/lib}}
 : ${CGS_LIBDIR:=${REPOROOT}/lib}}

@@ -1,4 +1,4 @@
-/* sfprogroot */
+/* sfprogroot SUPPORT */
 /* lang=C20 */
 
 /* try to find a program-root in a given c-string */

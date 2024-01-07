@@ -1,4 +1,4 @@
-/* sfskipwhite */
+/* sfskipwhite SUPPORT */
 /* lang=C20 */
 
 /* remove leading white space */

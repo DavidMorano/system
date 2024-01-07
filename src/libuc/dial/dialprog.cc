@@ -64,7 +64,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	uc_openprogerr(cchar *,int,cchar **,cchar **,int *) noex ;
+    extern int	uc_openprogerr(cchar *,int,mainv,mainv,int *) noex ;
 }
 
 
@@ -79,7 +79,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int dialprog(cchar *fname,int of,cchar **argv,cchar **envv,int *fd2p) noex {
+int dialprog(cchar *fname,int of,mainv argv,mainv envv,int *fd2p) noex {
 	return uc_openprogerr(fname,of,argv,envv,fd2p) ;
 }
 /* end subroutine (dialprog) */
