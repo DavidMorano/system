@@ -171,7 +171,7 @@ int ucsysconf::mconfstr(int req) noex {
 	int		len = 0 ;
 	if (rbuf == nullptr) rlen = 0 ; /* indicate return length only */
 	if ((rbuf == nullptr) || (rlen >= 1)) {
-	    const size_t	res_bad = size_t(-1) ;
+	    csize		res_bad = size_t(-1) ;
 	    size_t		result ;
 	    size_t		llen = (rlen+1) ;
 	    rs = SR_OK ;

@@ -405,7 +405,7 @@ TOBJ= $(TOBJG0) $(TOBJG1)
 UOBJ00= matstr.o nleadstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= strcpyxc.o
-UOBJ03= varnames.o rmx.o
+UOBJ03= varnames.o syswords.o rmx.o
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
@@ -550,7 +550,7 @@ prebase.o:	$(OBJ_PREBASE)
 
 
 # base
-OBJ0_BASE= varnames.o valuelimits.o digbufsizes.o ucvariables.o
+OBJ0_BASE= varnames.o syswords.o valuelimits.o digbufsizes.o ucvariables.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE= bufsizedata.o getbufsizenames.o
 OBJ3_BASE= getbufsize.o bufsizevar.o 
@@ -610,75 +610,6 @@ strtox.o:	strtoxlonglong.o
 # string-to-x
 ucstr.o:	ucstrtox.o ucstrtod.o
 ucsysconf.o:	ucsysconf.cc
-
-
-# vec
-
-# vecstr
-OBJA_VECSTR= vecstr.o vecstr_env.o vecstr_envfile.o 
-OBJB_VECSTR= vecstr_adduniqs.o vecstr_addpath.o
-OBJC_VECSTR= vecstr_avmkstr.o vecstr_loadfile.o
-OBJD_VECSTR= vecstr_adds.o vecstr_foilcmp.o
-OBJE_VECSTR= vecstr_srvargs.o vecstr_svcargs.o
-
-obja_vecstr.o:	$(OBJA_VECSTR)
-	$(LD) -r -o $@ $(OBJA_VECSTR)
-objb_vecstr.o:	$(OBJB_VECSTR)
-	$(LD) -r -o $@ $(OBJB_VECSTR)
-objc_vecstr.o:	$(OBJC_VECSTR)
-	$(LD) -r -o $@ $(OBJC_VECSTR)
-objd_vecstr.o:	$(OBJD_VECSTR)
-	$(LD) -r -o $@ $(OBJD_VECSTR)
-obje_vecstr.o:	$(OBJE_VECSTR)
-	$(LD) -r -o $@ $(OBJE_VECSTR)
-
-OBJ_VECSTR+= obja_vecstr.o objb_vecstr.o objc_vecstr.o
-OBJ_VECSTR+= objd_vecstr.o obje_vecstr.o
-
-obj_vecstr.o:	$(OBJ_VECSTR)
-	$(LD) -r -o $@ $(OBJ_VECSTR)
-
-# vecpstr
-OBJA_VECPSTR= vecpstr.o vecpstr_env.o vecpstr_envfile.o 
-OBJB_VECPSTR= vecpstr_adduniqs.o vecpstr_addpath.o
-OBJC_VECPSTR= vecpstr_avmkstr.o vecpstr_loadfile.o
-OBJD_VECPSTR= vecpstr_adds.o vecpstr_foilcmp.o
-OBJE_VECPSTR= vecpstr_srvargs.o vecpstr_svcargs.o
-OBJF_VECPSTR= vecpstr_loadgrusers.o vecpstr_addsubdirs.o
-
-
-obja_vecpstr.o:	$(OBJA_VECPSTR)
-	$(LD) -r -o $@ $(OBJA_VECPSTR)
-objb_vecpstr.o:	$(OBJB_VECPSTR)
-	$(LD) -r -o $@ $(OBJB_VECPSTR)
-objc_vecpstr.o:	$(OBJC_VECPSTR)
-	$(LD) -r -o $@ $(OBJC_VECPSTR)
-objd_vecpstr.o:	$(OBJD_VECPSTR)
-	$(LD) -r -o $@ $(OBJD_VECPSTR)
-obje_vecpstr.o:	$(OBJE_VECPSTR)
-	$(LD) -r -o $@ $(OBJE_VECPSTR)
-objf_vecpstr.o:	$(OBJF_VECPSTR)
-	$(LD) -r -o $@ $(OBJF_VECPSTR)
-
-OBJ_VECPSTR+= obja_vecpstr.o objb_vecpstr.o objc_vecpstr.o 
-OBJ_VECPSTR+= objd_vecpstr.o obje_vecpstr.o objf_vecpstr.o 
-
-obj_vecpstr.o:	$(OBJ_VECPSTR)
-	$(LD) -r -o $@ $(OBJ_VECPSTR)
-
-
-OBJA_VEC= obj_vecstr.o obj_vecpstr.o
-OBJB_VEC= vechand.o recarr.o raqhand.o vecint.o vecitem.o
-OBJ_VEC= obja_vec.o objb_vec.o
-
-obja_vec.o:	$(OBJA_VEC)
-	$(LD) -r -o $@ $(OBJA_VEC)
-objb_vec.o:	$(OBJB_VEC)
-	$(LD) -r -o $@ $(OBJB_VEC)
-
-vec.o:		$(OBJ_VEC)
-	$(LD) -r -o $@ $(OBJ_VEC)
-
 
 # string-find
 OBJ0_SF= sfbaselib.o sfbasename.o sfbracketval.o sfbreak.o 
@@ -977,6 +908,7 @@ getbufsize.o:		getbufsizenames.h usysdefs.h bufsizedata.hh
 
 getbufsizenames.o:	getbufsizenames.c getbufsizenames.h
 varnames.o:		varnames.cc varnames.hh
+syswords.o:		syswords.cc syswords.hh
 valuelimits.o:		valuelimits.cc valuelimits.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
@@ -1288,6 +1220,11 @@ strn.dir:
 # STRNXCMP
 strnxcmp.o:		strnxcmp.dir
 strnxcmp.dir:
+	makesubdir $@
+
+# VEC
+vec.o:			vec.dir
+vec.dir:
 	makesubdir $@
 
 # UCINET
