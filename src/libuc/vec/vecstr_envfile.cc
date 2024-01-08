@@ -129,31 +129,31 @@ static int	mkvars() noex ;
 /* local variables */
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
 static char		fterms[termsize] ;
-
 static vars		var ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int vecstr_envfile(vecstr *vlp,cchar *fname) noex {
-	static cint	srs = mkterms() ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if ((rs = srs) >= 0) {
-	    static cint		srv = mkvars() ;
-	    if ((rs = srv) >= 0) {
-	        rs = SR_FAULT ;
-	        if (vlp && fname) {
-	            rs = SR_INVALID ;
-	            if (fname[0]) {
+	if (vlp && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		static cint	srs = mkterms() ;
+		if ((rs = srs) >= 0) {
+	    	    static cint		srv = mkvars() ;
+	    	    if ((rs = srv) >= 0) {
 		        rs = vecstr_envfiler(vlp,fname) ;
 		        c = rs ;
-	            } /* end if (valid) */
-	        } /* end if (non-null) */
-	    } /* end if (mkvars) */
-	} /* end if (mkterms) */
+	    	    } /* end if (mkvars) */
+		} /* end if (mkterms) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_envfile) */
