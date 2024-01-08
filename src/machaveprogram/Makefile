@@ -1,4 +1,4 @@
-# MAKEFILES (haveprogram)
+# MAKEFILE (haveprogram)
 
 T= haveprogram
 

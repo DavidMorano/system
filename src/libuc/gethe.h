@@ -18,9 +18,7 @@
 #include	<usyhstem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int gethe_begin(int) noex ;
 extern int gethe_ent(HOSTENT *,char *,int) noex ;
@@ -28,9 +26,7 @@ extern int gethe_name(HOSTENT *,char *,int,cchar *) noex ;
 extern int gethe_addr(HOSTENT *,char *,int,in_addr_t) noex ;
 extern int gethe_end() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETHE_INCLUDE */

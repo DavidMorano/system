@@ -40,17 +40,13 @@ struct getxusername {
 } ;
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getxusername(GETXUSERNAME *) noex ;
 extern int getusername(char *,int,uid_t) noex ;
 extern int getpwusername(PASSWD *,char *,int,uid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETXUSERNAME_INCLUDE */

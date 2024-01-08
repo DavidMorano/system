@@ -1,4 +1,4 @@
-# MAKEFILES (fu)
+# MAKEFILE (fu)
 
 T= fu
 

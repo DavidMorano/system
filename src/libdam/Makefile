@@ -217,7 +217,7 @@ OBJ62= hasalldig.o hasallbase.o hasprintbad.o hasallminus.o hasallplusminus.o
 OBJ63= hasdoublewhite.o hasallwhite.o hasfext.o hasallof.o hasourmjd.o
 
 OBJ64= optbool.o optvalue.o
-OBJ65= freadline.o hasMeAlone.o hasEOH.o
+OBJ65= freadln.o hasMeAlone.o hasEOH.o
 OBJ66= fbreadline.o fbread.o fbwrite.o fbprint.o fbprintf.o
 OBJ67= nextpowtwo.o hashelf.o hashagain.o urotate.o
 OBJ68= fmeanvaral.o fmeanvarai.o cpuspeed.o

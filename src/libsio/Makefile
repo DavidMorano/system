@@ -1,8 +1,8 @@
-# MAKEFILE (appleterminal)
+# MAKEFILE (libsio)
 
-T= appleterminal
+T= libsio
 
-ALL= $(T).x
+ALL= $(T).o $(T).a
 
 
 BINDIR= $(REPOROOT)/bin
@@ -21,10 +21,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -38,9 +38,10 @@ DEFS=
 
 LDRPATH= $(EXTRA)/lib
 
+INCDIRS= -I$(INCDIR)
 LIBDIRS= -L$(LIBDIR)
 
-LIBS= -luserhome
+LIBS=
 
 
 # flag setting
@@ -51,13 +52,13 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h
+INCS= stdsio.h
 
 
-OBJ_USERHOME= main.o
+OBJ_LIBSIO= freadln.o
 
 
-default:		$(T).x
+default:		$(T).a
 
 all:			$(ALL)
 
@@ -77,14 +78,22 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).x:			$(OBJ_USERHOME)
-	$(LD) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
+$(T).o:			$(OBJ_LIBSIO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBSIO)
 
-$(T).nm:		$(T).x
+$(T).a:			$(OBJ_LIBSIO)
+	$(AR) $(ARFLAGS) -rc $@ $?
+
+$(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
+$(T).order:		$(OBJ) $(T).a
+	$(LORDER) $(T).a | $(TSORT) > $(T).order
+	$(RM) $(T).a
+	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
+
 again:
-	rm -f $(TALL)
+	rm -f $(ALL)
 
 clean:
 	makeclean $(ALL)
@@ -92,7 +101,19 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+obj0_six.o:	$(OBJ0_LIBSIO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBSIO)
 
-main.o:			main.cc
+obj1_six.o:	$(OBJ1_LIBSIO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBSIO)
+
+obj2_six.o:	$(OBJ2_LIBSIO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBSIO)
+
+obj3_six.o:	$(OBJ3_LIBSIO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBSIO)
+
+
+freadln.o:		freadln.cc stdsio.h
 
 

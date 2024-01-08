@@ -23,7 +23,7 @@ A. This is not a unique problem associated with the Illumos code
 
 
 
-file		description
+file			description
 -------------------------------------------------------------------------------
 
 nss_parse.h		Name-Service-Switch public-part (header)

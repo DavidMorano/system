@@ -1,4 +1,4 @@
-# MAKEFILES (servents)
+# MAKEFILE (servents)
 
 T= servents
 

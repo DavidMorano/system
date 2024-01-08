@@ -61,9 +61,7 @@ struct getutmpent {
 	char		host[GETUTMPENT_LHOST + 1] ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getutmpent(GETUTMPENT *,pid_t) noex ;
 
@@ -72,9 +70,7 @@ extern int getutmphost(char *,int,pid_t) noex ;
 extern int getutmpline(char *,int,pid_t) noex ;
 extern int getutmpid(char *,int,pid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETUTMPENT_INCLUDE */

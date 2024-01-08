@@ -1,10 +1,8 @@
-/* pipe2 */
+/* pipe2 SUPPORT */
+/* lang=C20 */
 
 /* check file access for the current process by its effective UID */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -18,34 +16,31 @@
 
 /*******************************************************************************
 
+	Name:
+	pipe2
+
+	Description:
 	Enhanced |pipe(2)|.
 
 	Synopsis:
-
-	int pipe2(int pipes[2],int of)
+	int pipe2(int pipes[2],int of) noex
 
 	Arguments:
-
 	pipes		array of two integers to receive created pipe FDs
 	om		open flags
 
 	Returns:
-
-	<0		error in dialing
 	>=0		OK
-
+	<0		error in dialing (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -54,11 +49,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -75,9 +65,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* exported subroutines */
 
-
-int pipe2(int *pipes,int of)
-{
+int pipe2(int *pipes,int of) noex {
 	int		rs ;
 	if ((rs = u_pipe(pipes)) >= 0) {
 		const int	f = TRUE ;

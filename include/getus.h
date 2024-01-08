@@ -17,17 +17,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getus_begin() noex ;
 extern int getus_ent(char *,int) noex ;
 extern int getus_end() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETUS_INCLUDE */

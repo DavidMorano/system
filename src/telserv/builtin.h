@@ -1,18 +1,17 @@
 /* builtin */
+/* lang=C20 */
 
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 
 #ifndef	BUILTIN_INCLUDE
-#define	BUILTIN_INCLUDE		1
+#define	BUILTIN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<time.h>
-
 #include	<vecstr.h>
 #include	<svcfile.h>
 #include	<connection.h>
@@ -43,16 +42,16 @@ struct builtin {
 	int		hostnamelen ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(BUILTIN_MASTER)) || (BUILTIN_MASTER == 0)
+extern int builtin_start(BUILTIN *,PROGINFO *) noex ;
+extern int builtin_finish(BUILTIN *) noex ;
+extern int builtin_match(BUILTIN *,const char *) noex ;
+extern int builtin_enum(BUILTIN *,int,const char **) noex ;
+extern int builtin_execute(BUILTIN *,STANDING *,CLIENTINFO *,int,
+		cchar **) noex ;
 
-extern int builtin_start(BUILTIN *,PROGINFO *) ;
-extern int builtin_finish(BUILTIN *) ;
-extern int builtin_match(BUILTIN *,const char *) ;
-extern int builtin_enum(BUILTIN *,int,const char **) ;
-extern int builtin_execute(BUILTIN *,STANDING *,CLIENTINFO *,int,cchar **) ;
-
-#endif /* BUILTIN_MASTER */
+EXTERNC_end
 
 
 #endif /* BUILTIN_INCLUDE */

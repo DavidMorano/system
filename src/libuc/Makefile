@@ -402,7 +402,7 @@ TOBJG0= $(TOBJA)
 TOBJ= $(TOBJG0) $(TOBJG1)
 
 
-UOBJ00= matstr.o nleadstr.o toxc.o char.o
+UOBJ00= matxstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= strcpyxc.o
 UOBJ03= varnames.o syswords.o rmx.o
@@ -411,7 +411,7 @@ UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
-UOBJ08= matkeystr.o strkeycmp.o
+UOBJ08= strkeycmp.o
 UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
 UOBJ11= strwcpy.o strwcpyxc.o strwcpyxx.o

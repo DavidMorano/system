@@ -4,6 +4,6 @@
 
 export PATH=${PATH}:/usr/bin
 
-exec less -c "${@}"
+less -c "${@}"
 
 

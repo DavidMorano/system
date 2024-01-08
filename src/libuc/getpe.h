@@ -18,9 +18,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getpe_begin(int) noex ;
 extern int getpe_ent(PROTOENT *,char *,int) noex ;
@@ -28,9 +26,7 @@ extern int getpe_name(PROTOENT *,char *,int,cchar *) noex ;
 extern int getpe_num(PROTOENT *,char *,int,int) noex ;
 extern int getpe_end() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETPE_INCLUDE */

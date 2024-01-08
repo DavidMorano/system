@@ -23,16 +23,12 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getnodename(char *,int) noex ;
 extern int getnodedomain(char *,char *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETNODENAME_INCLUDE */

@@ -75,6 +75,16 @@ Y
 #endif
 #endif /* __cplusplus */
 
+#ifndef	EXTERNC_begin
+#ifdef	__cplusplus
+#define	EXTERNC_begin	extern "C" {
+#define	EXTERNC_end	}
+#else
+#define	EXTERNC_begin	/* externc_begin */
+#define	EXTERNC_end	/* externc_end */
+#endif /* __cplusplus */
+#endif /* EXTERNC_begin */
+
 
 #endif /* CLANGUAGE_INCLUDE */
 

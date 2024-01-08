@@ -23,10 +23,10 @@
 
 	Description:
 	This object implements a map from a "key" type (|K|)
-	to a given "block" type (|Block|).
+	to a given "block" type (|B|).
 
 	Symopsis:
-	int mapblock_start<typename K,typename Block>(int n = 0) noex
+	int mapblock_start<typename K,typename B>(int n = 0) noex
 
 	Arguments:
 	n		suggested starting size
@@ -52,47 +52,47 @@
 #include	<clanguage.h>
 
 
-template <typename K,typename Block>
+template <typename K,typename B>
 class mapblock_iter {
-	typedef mapblock_node<K,Block>	node ;
-	mapblock_node<K,Block>	*n = nullptr ;
+	typedef mapblock_node<K,B>	node ;
+	mapblock_node<K,B>	*n = nullptr ;
 	mutable K		defval ;
-	mapblock_iter<K,Block>	&findnext(int) ;
+	mapblock_iter<K,B>	&findnext(int) ;
 	typedef mapblock_iter	bit ;
 public:
 	mapblock_iter() noex { } ;
 	mapblock_iter(node *an) : n(an) noex { } ;
-	mapblock_iter(const mapblock_iter<K,Block> &it) noex {
+	mapblock_iter(const mapblock_iter<K,B> &it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 	    }
 	} ;
-	mapblock_iter(mapblock_iter<K,Block> &&it) noex {
+	mapblock_iter(mapblock_iter<K,B> &&it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 		it.n = nullptr ;
 	    }
 	} ;
-	mapblock_iter<K,Block> &operator = (const mapblock_iter<K,Block> &it) noex {
+	mapblock_iter<K,B> &operator = (const mapblock_iter<K,B> &it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 	    }
 	    return (*this) ;
 	} ;
-	mapblock_iter<K,Block> &operator = (mapblock_iter<K,Block> &&it) noex {
+	mapblock_iter<K,B> &operator = (mapblock_iter<K,B> &&it) noex {
 	    if (this != &it) {
 	        n = it.n ;
 		it.n = nullptr ;
 	    }
 	    return (*this) ;
 	} ;
-	mapblock_iter<K,Block> &operator = (const mapblock_iter<K,Block> *ip) noex {
+	mapblock_iter<K,B> &operator = (const mapblock_iter<K,B> *ip) noex {
 	    if (this != ip) {
 	        n = ip->n ;
 	    }
 	    return (*this) ;
 	} ;
-	mapblock_iter<K,Block> &operator = (const node *nn) noex {
+	mapblock_iter<K,B> &operator = (const node *nn) noex {
 	    n = nn ; /* possible nullptr */
 	    return (*this) ;
 	} ;
@@ -109,11 +109,11 @@ public:
 	    }
 	    return rv ;
 	} ;
-	mapblock_iter<K,Block> &operator ++ () noex { /* pre-increment */
+	mapblock_iter<K,B> &operator ++ () noex { /* pre-increment */
 	    return findnext(1) ;
 	} ;
-	mapblock_iter<K,Block> operator ++ (int) noex { /* post-increment */
-	    btree_iter<K.Block>	tmp = *this ;
+	mapblock_iter<K,B> operator ++ (int) noex { /* post-increment */
+	    btree_iter<K.B>	tmp = *this ;
 	    if (inc > 0) {
 	        findnext(inc) ;
 	    } else {
@@ -121,10 +121,10 @@ public:
 	    }
 	    return tmp ; /* returns previous PRVALUE */
 	} ;
-	mapblock_iter<K,Block> &operator += (int inc) noex {
+	mapblock_iter<K,B> &operator += (int inc) noex {
 	    return findnext(inc) ;
 	} ;
-	mapblock_iter<K,Block> &operator + (int inc) noex {
+	mapblock_iter<K,B> &operator + (int inc) noex {
 	    return findnext(inc) ;
 	} ;
 	operator int() const noex {
@@ -133,19 +133,19 @@ public:
 	operator bool() const noex {
 	    return (n != nullptr) ;
 	} ;
-	friend bool operator == (const mapblock_iter<K,Block> &i1,
-		const mapblock_iter<K,Block> &i2) noex {
+	friend bool operator == (const mapblock_iter<K,B> &i1,
+		const mapblock_iter<K,B> &i2) noex {
 	    return (i1.n == i2.n) ;
 	} ;
-	friend bool operator != (const mapblock_iter<K,Block> &i1,
-		const mapblock_iter<K,Block> &i2) noex {
+	friend bool operator != (const mapblock_iter<K,B> &i1,
+		const mapblock_iter<K,B> &i2) noex {
 	    return (i1.n != i2.n) ;
 	} ;
-	friend mapblock<K,Block> ;
+	friend mapblock<K,B> ;
 } ; /* end class (mapblock_iter) */
 
-template <typename K,typename Block>
-mapblock_iter<K,Block> &mapblock_iter<K,Block>::findnext(int inc) noex {
+template <typename K,typename B>
+mapblock_iter<K,B> &mapblock_iter<K,B>::findnext(int inc) noex {
 	if (n != nullptr) {
 	    if (inc > 1) {
 		findnext(1) ;
@@ -157,7 +157,7 @@ mapblock_iter<K,Block> &mapblock_iter<K,Block>::findnext(int inc) noex {
         	        n = n->left ;
         	    }
      	        } else {
-		    mapblock_node<K,Block> *p = n->parent ;
+		    mapblock_node<K,B> *p = n->parent ;
 		    while ((p != nullptr) && (n == p->right)) {
            	        n = p ;
            	        p = p->parent;
@@ -169,11 +169,11 @@ mapblock_iter<K,Block> &mapblock_iter<K,Block>::findnext(int inc) noex {
  	return (*this) ;
 } /* end method (mapblock_iterator::findnext) */
 
-template<typename K,typename Block>
+template<typename K,typename B>
 class mapblock {
-	typedef mapblock_iter<K,Block>			iterator ;
-	typedef typename std::unordered_map<K,Block>	maptype ;
-	std::unordered_map<K,Block>	*mp = nullptr ;
+	typedef mapblock_iter<K,B>			iterator ;
+	typedef typename std::unordered_map<K,B>	maptype ;
+	std::unordered_map<K,B>	*mp = nullptr ;
 public:
 	mapblock(const mapblock &) = delete ;
 	mapblock &operator = (const mapblock &) = delete ;
@@ -185,16 +185,16 @@ public:
 	    }
 	} ; /* end dtor */
 	int	start(int = 0) noex ;
-	int	ins(K,const Block &) noex ;
+	int	ins(K,const B &) noex ;
 	int	rem(K) noex ;
 	int	present(K &) noex ;
-	int	get(K,Block *) noex ;
+	int	get(K,B *) noex ;
 	int	count() noex ;
 	int	finish() noex ;
 } ; /* end class (mapblock) */
 
-template<typename K,typename Block>
-int mapblock<K,Block>::start(int n) noex {
+template<typename K,typename B>
+int mapblock<K,B>::start(int n) noex {
 	typedef decltype(std::nothrow)	nothrow_t ;
 	int		rs = SR_INVALID ;
 	if (n >= 0) {
@@ -212,8 +212,8 @@ int mapblock<K,Block>::start(int n) noex {
 	return rs ;
 }
 
-template<typename K,typename Block>
-int mapblock<K,Block>::ins(K k,const Block &v) noex {
+template<typename K,typename B>
+int mapblock<K,B>::ins(K k,const B &v) noex {
 	typedef	typename maptype::iterator	iterator ;
 	int		rs = SR_OK ;
 	try {
@@ -225,8 +225,8 @@ int mapblock<K,Block>::ins(K k,const Block &v) noex {
 	return rs ;
 }
 
-template<typename K,typename Block>
-int mapblock<K,Block>::rem(K k) noex {
+template<typename K,typename B>
+int mapblock<K,B>::rem(K k) noex {
 	typedef typename maptype::size_type	size_type ;
 	int		rs = SR_OK ;
 	try {
@@ -238,16 +238,16 @@ int mapblock<K,Block>::rem(K k) noex {
 	return rs ;
 }
 
-template<typename K,typename Block>
-int mapblock<K,Block>::present(K &k) noex {
+template<typename K,typename B>
+int mapblock<K,B>::present(K &k) noex {
 	typedef typename maptype::iterator	iterator ;
 	const iterator	it_end = mp->end() ;
 	iterator	it = mp->find(k) ;
 	return (it != it_end) ? SR_OK : SR_NOENT ;
 }
 
-template<typename K,typename Block>
-int mapblock<K,Block>::get(K k,Block *vp) noex {
+template<typename K,typename B>
+int mapblock<K,B>::get(K k,B *vp) noex {
 	typedef typename maptype::iterator	iterator ;
 	int		rs = SR_FAULT ;
 	if (mp && vp) {
@@ -264,8 +264,8 @@ int mapblock<K,Block>::get(K k,Block *vp) noex {
 	return rs ;
 }
 
-template<typename K,typename Block>
-int mapblock<K,Block>::count() noex {
+template<typename K,typename B>
+int mapblock<K,B>::count() noex {
 	int		rs = SR_BADFMT ;
 	if (mp) {
 	    rs = mp->size() ;
@@ -273,8 +273,8 @@ int mapblock<K,Block>::count() noex {
 	return rs ;
 }
 
-template<typename K,typename Block>
-int mapblock<K,Block>::finish() noex {
+template<typename K,typename B>
+int mapblock<K,B>::finish() noex {
 	int		rs = SR_BADFMT ;
 	if (mp) {
 	    delete mp ;

@@ -1,9 +1,8 @@
-/* logbase */
+/* logbase SUPPORT */
+/* lang=C20 */
 
 /* calculate the log of a number given the base also */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,30 +16,28 @@
 
 /*******************************************************************************
 
+	Name:
+	logbase
+
+	Description:
 	Find the log-base-(b) of a number (v).
 
 	Synopsis:
-
-	double logbase(double b,double v)
+	double logbase(double b,double v) noex
 
 	Arguments:
-
 	b		base
 	v		number to take the log-base-(b) of
 
 	Returns:
-
 	-		result
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<math.h>
-
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -69,9 +66,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* exported subroutines */
 
-
-double logbase(double b,double v)
-{
+double logbase(double b,double v) noex {
 	const double	n = log(v) ;
 	const double	d = log(b) ;
 	return (n/d) ;
