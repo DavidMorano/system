@@ -1,7 +1,7 @@
 #!/usr/extra/bin/ksh
 # MKLINKS
 
-CMDS=" username userhome usershell gid groupname uid sid shells"
+CMDS=" username userhome usershell gid groupname uid sid sessionid shells"
 LOCPROG=userhome.x
 
 function linkdir {

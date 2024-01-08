@@ -1,4 +1,4 @@
-/* filebuf */
+/* filebuf SUPPORT */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */
@@ -213,7 +213,7 @@ int filebuf_readp(filebuf op,void *buf,int buflen,off_t off,int to) noex {
 /* end subroutine (filebuf_readp) */
 #endif /* COMMENT */
 
-int filebuf_readline(filebuf *op,char *rbuf,int rlen,int to) noex {
+int filebuf_readln(filebuf *op,char *rbuf,int rlen,int to) noex {
 	int		rs = SR_FAULT ;
 	int		tlen = 0 ;
 	if (op) {
@@ -268,9 +268,9 @@ int filebuf_readline(filebuf *op,char *rbuf,int rlen,int to) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (filebuf_readline) */
+/* end subroutine (filebuf_readln) */
 
-int filebuf_readlines(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
+int filebuf_readlns(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (fp && lbuf) {
@@ -280,7 +280,7 @@ int filebuf_readlines(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
 	    lbuf[0] = '\0' ;
 	    while ((lines == 0) || (f_cont = ISCONT(lbuf,i))) {
 	        if (f_cont) i -= 2 ;
-	        rs = filebuf_readline(fp,(lbuf + i),(llen - i),to) ;
+	        rs = filebuf_readln(fp,(lbuf + i),(llen - i),to) ;
 	        if (rs <= 0) break ;
 	        i += rs ;
 	        lines += 1 ;
@@ -289,7 +289,7 @@ int filebuf_readlines(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (filebuf_readlines) */
+/* end subroutine (filebuf_readlns) */
 
 /* update a section of the buffer */
 int filebuf_update(filebuf *op,off_t roff,cchar *rbuf,int rlen) noex {

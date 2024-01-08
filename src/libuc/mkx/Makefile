@@ -118,7 +118,7 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(TALL)
+	rm -f $(ALL)
 
 clean:
 	makeclean $(ALL)

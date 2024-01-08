@@ -111,6 +111,7 @@ enum prognames {
 	progmode_groupname,
 	progmode_uid,
 	progmode_sid,
+	progmode_sessionid,
 	progmode_shells,
 	progmode_overlast
 } ;
@@ -123,6 +124,7 @@ static constexpr cchar	*prognames[] = {
 	"groupname",
 	"uid",
 	"sid",
+	"sessionid",
 	"shells",
 	nullptr
 } ;
@@ -179,6 +181,7 @@ int main(int argc,mainv argv,mainv) noex {
 		cout << uid << eol ;
 		break ;
 	    case progmode_sid:
+	    case progmode_sessionid:
 		{
 		    cint	sid = getsid(0) ;
 		    cout << sid << eol ;

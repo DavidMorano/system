@@ -151,7 +151,7 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 			        }
 	                        if ((rs >= 0) && (klp != nullptr)) {
 	                            cchar	*kp, *vp ;
-	                            for (int i = 0 ; ste.keys[i] ; i += 1) {
+	                            for (int i = 0 ; ste.keys[i][0] ; i += 1) {
 	                                kp = ste.keys[i][0] ;
 	                                vp = ste.keys[i][1] ;
 				        {

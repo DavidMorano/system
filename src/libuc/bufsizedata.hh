@@ -56,8 +56,13 @@ namespace {
 	bufsizeitem	item[getbufsize_overlast] = {} ;
 	constexpr bufsizedata() noex ;
 	constexpr bufsizeitem operator [] (int w) const noex {
-	    return item[w] ;
-	} ;
+	    bufsizeitem		def{-1,0} ;
+	    bufsizeitem		it = def ;
+	    if ((w >= 0) && (w < getbufsize_overlast)) {
+	        it = item[w] ;
+	    }
+	    return it ;
+	} ; /* end method (operator) */
    } ; /* end class (bufsizedata) */
 }
 

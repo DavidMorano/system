@@ -61,12 +61,11 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
-#include	<getfdfile.h>
 #include	<vecpstr.h>
 #include	<filebuf.h>
 #include	<field.h>
@@ -75,9 +74,21 @@
 
 /* local defines */
 
+#define	LINEBUFMULT	5		/* line-buffer size multiplier */
+
+#ifndef	FD_STDIN
+#define	FD_STDIN	0
+#endif
+
 #define	DEFBUFLEN	1024
 
 #define	TO_READ		-1		/* read timeout */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -90,62 +101,79 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+namespace {
+    struct vars {
+        int             linebuflen ;
+    } ;
+}
+
 /* forward references */
 
-static int	mkterms() noex ;
-
+static int	vecpstr_loadfiler(vecpstr *,int,cchar *) noex ;
 static int	vecpstr_loadfd(vecpstr *,int,int) noex ;
 static int	vecpstr_loadline(vecpstr *,int,cchar *,int) noex ;
-
-
-/* local structures */
+static int	mkterms() noex ;
+static int	mkvars() noex ;
 
 
 /* local variables */
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
 static bufsizevar	maxlinelen(getbufsize_ml) ;
-
 static char		fterms[termsize] ;
+static vars		var ;
 
 
 /* exported subroutines */
 
-int vecpstr_loadfile(vecpstr *vsp,int fu,cchar *fname) noex {
-	static cint	srs = mkterms() ;
-	int		rs ;
+int vecpstr_loadfile(vecpstr *op,int fu,cchar *fname) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if ((rs = srs) >= 0) {
-	    rs = SR_FAULT ;
-	    if (vsp && fname) {
-	        rs = SR_INVALID ;
-	        if (fname[0]) {
-		    int		fd = FD_STDIN ;
-		    bool	f_opened = false ;
-		    rs = SR_OK ;
-	            if (strcmp(fname,"-") != 0) {
-	                if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
-	                    fd = rs ;
-	                    f_opened = true ;
-	                }
-	            }
-	            if (rs >= 0) {
-	                rs = vecpstr_loadfd(vsp,fu,fd) ;
-	                c = rs ;
-	            }
-	            if (f_opened && (fd >= 0)) {
-	                u_close(fd) ;
-	            }
-	        } /* end if (valid) */
-	    } /* end if (non-null) */
-	} /* end if (mkterms) */
+	if (op && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+	        static cint	srs = mkterms() ;
+	        if ((rs = srs) >= 0) {
+	            static cint	srv = mkvars() ;
+	            if ((rs = srv) >= 0) {
+			rs = vecpstr_loadfiler(op,fu,fname) ;
+			c = rs ;
+		    } /* end if (mkvars) */
+		} /* end if (mkterms) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecpstr_loadfile) */
 
 
 /* local subroutines */
+
+static int vecpstr_loadfiler(vecpstr *op,int fu,cchar *fname) noex {
+	int		rs = SR_OK ;
+	int		fd = FD_STDIN ;
+	int		c = 0 ;
+	bool	f_opened = false ;
+	            if (strcmp(fname,"-") != 0) {
+			cint	of = O_RDONLY ;
+			cmode	om = 0666 ;
+	                if ((rs = uc_open(fname,of,om)) >= 0) {
+	                    fd = rs ;
+	                    f_opened = true ;
+	                }
+	            }
+	            if (rs >= 0) {
+	                rs = vecpstr_loadfd(op,fu,fd) ;
+	                c = rs ;
+	            }
+	            if (f_opened && (fd >= 0)) {
+	                u_close(fd) ;
+	            }
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (vecpstr_loadfiler) */
 
 static int vecpstr_loadfd(vecpstr *vsp,int fu,int fd) noex {
 	int		rs ;
@@ -227,5 +255,14 @@ static int mkterms() noex {
 	return fieldterms(fterms,false,'\n','#') ;
 }
 /* end subroutine (mkterms) */
+
+static int mkvars() noex {
+        int             rs ;
+        if ((rs = uc_confmaxline()) >= 0) {
+            var.linebuflen = (rs * LINEBUFMULT) ;
+        }
+        return rs ;
+}       
+/* end subroutine (mkvars) */
 
 
