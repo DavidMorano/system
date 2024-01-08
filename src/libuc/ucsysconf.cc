@@ -1,4 +1,4 @@
-/* ucsysconf */
+/* ucsysconf SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -59,6 +59,7 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<atomic>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>
@@ -68,6 +69,8 @@
 
 
 /* local namespaces */
+
+using std::atomic_int ;			/* type */
 
 
 /* local typedefs */
@@ -82,7 +85,18 @@ extern "C" {
 
 /* local structures */
 
+enum dataitems {
+	dataitem_maxarg,
+	dataitem_maxline,
+	dataitem_maxlogin,
+	dataitem_maxhost,
+	dataitem_overlast
+} ;
+
 namespace {
+    struct ucconfdatas {
+	atomic_int	d[dataitem_overlast] ;
+    } ; /* end struct (ucconfdatas) */
     struct ucsysconf ;
     typedef int (ucsysconf::*mem_f)(int) ;
     struct ucsysconf {
@@ -95,6 +109,7 @@ namespace {
 	int mconfsys(int) noex ;
 	int mconfstr(int) noex ;
 	int operator () (int) noex ;
+	int cache(int) noex ;
     } ; /* end struct (ucsysconf) */
 }
 
@@ -102,14 +117,40 @@ namespace {
 /* forward references */
 
 
+/* local variables */
+
+static ucconfdatas	ucdata ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_confsys(int req,long *rp) noex {
 	ucsysconf	sco(rp) ;
+	int		rs = SR_OK ;
 	sco.m = &ucsysconf::mconfsys ;
-	return sco(req) ;
+	switch (req) {
+	case _SC_ARG_MAX:
+	case _SC_LINE_MAX:
+	case _SC_HOST_NAME_MAX:
+	case _SC_LOGIN_NAME_MAX:
+	    rs = sco.cache(req) ;
+	    break ;
+	default:
+	    rs = sco(req) ;
+	    break ;
+	} /* end switch */
+	return rs ;
 }
 /* end subroutine (uc_confsys) */
+
+int uc_confmaxline() noex {
+	cint		cmd = _SC_LINE_MAX ;
+	return uc_confsys(cmd,nullptr) ;
+}
+/* end subroutine (uc_conmaxline) */
 
 int uc_confstr(char *rbuf,int rlen,int req) noex {
 	ucsysconf	sco(rbuf,rlen) ;
@@ -156,11 +197,11 @@ int ucsysconf::mconfsys(int req) noex {
 	long		result = 0 ;
 	int		rs = SR_OK ;
 	errno = 0 ;
-	if ((result = sysconf(req)) < 0) {
-	    rs = (errno) ? (- errno) : SR_NOTSUP ;
-	} else {
+	if ((result = sysconf(req)) >= 0) {
 	    if (lp) *lp = result ;
 	    rs = int(result & INT_MAX) ;
+	} else {
+	    rs = (errno) ? (- errno) : SR_NOTSUP ;
 	}
 	return rs ;
 }
@@ -189,5 +230,28 @@ int ucsysconf::mconfstr(int req) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (ucsysconf::mconfstr) */
+
+int ucsysconf::cache(int req) noex {
+	int		rs = SR_OK ;
+	int		ii = -1 ;
+	switch (req) {
+	case _SC_ARG_MAX: ii = dataitem_maxarg ; break ;
+	case _SC_LINE_MAX: ii = dataitem_maxline ; break ;
+	case _SC_HOST_NAME_MAX: ii = dataitem_maxhost ; break ;
+	case _SC_LOGIN_NAME_MAX: ii = dataitem_maxlogin ; break ;
+	default:
+	    rs = (*this)(req) ;
+	    break ;
+	} /* end switch */
+	if ((rs >= 0) && (ii >= 0)) {
+	    if ((rs = ucdata.d[ii].load(memord_relaxed)) == 0) {
+		if ((rs = (*this)(req)) > 0) {
+		    ucdata.d[ii].store(rs,memord_relaxed) ;
+		}
+	    }
+	} /* end if */
+	return rs ;
+}
+/* end subroutine (ucsysconf::cache) */
 
 
