@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h
 
 
-OBJ_USERHOME= main.o
+OBJ_FU= main.o
 
 
 default:		$(T).x
@@ -77,8 +77,8 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).x:			$(OBJ_USERHOME)
-	$(LD) $(LDFLAGS) -o $@ $(OBJ_USERHOME) $(LIBDIRS) $(LIBS)
+$(T).x:			$(OBJ_FU)
+	$(LD) $(LDFLAGS) -o $@ $(OBJ_FU) $(LIBDIRS) $(LIBS)
 
 $(T).nm:		$(T).x
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
