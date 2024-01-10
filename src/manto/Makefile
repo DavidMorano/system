@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (manto)
 
 T= manto
 
@@ -20,6 +20,5 @@ install:	$(ALL)
 
 clean:
 	rm -f $(T)
-
 
 

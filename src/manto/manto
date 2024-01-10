@@ -1,56 +1,61 @@
-#!/usr/bin/ksh
+#!/usr/extra/bin/ksh
 # MANTO - prints path to manual page (via searching MANPATH)
 # 
+# Synopsis:
+# $ manto <man-page>
+#
+# Arguments:
+# <man-page>	a manual page base-name to lookup
+#
+# Returns:
+# all file-paths of the man-page are printed to STDOUT
+#
 #
 
-P=manto
+PN=${0##*/}
 
 
 USAGE="USAGE> manto <manual_page>"
 
-if [ $# -lt 1 ] ; then
-
-  echo "${P}: argument required" >&2
-  echo "${P}: ${USAGE}" >&2
-  exit 1
-
+if [[ $# -lt 1 ]] ; then
+  print -u 2 -- "${PN}: argument required"
+  print -u 2 -- "${PN}: ${USAGE}"
+  return 1
 fi
 
-if [ -z "${1}" -o -z "${MANPATH}" ] ; then 
-  exit 0
+if [[ -z "${MANPATH}" ]] ; then
+  if [[ -n "${MANXPATH}" ]] ; then
+    MANPATH=${MANXPATH}
+  else
+    if haveprogram manpath ; then
+      MANPATH=$( manpath )
+    fi
+  fi
+fi
+
+if [[ -z "${1}" ]] || [[ -z "${MANPATH}" ]] ; then 
+  return 0
 fi
 
 CWD=${PWD:-$( pwd )}
 
 for E in "${@}" ; do
-
   IFS=:
   for I in ${MANPATH} ; do
-
-    if [ -z "${I}" ] ; then
-
+    if [[ -z "${I}" ]] ; then
       for M in *man*/${E}.[0-9]* ; do
-
-        if [ -f ${M} ] ; then
-          echo ${CWD}/${M}
+        if [[ -f ${M} ]] ; then
+          print -- ${CWD}/${M}
         fi
-
       done
-
     else
-
       for M in ${I}/*man*/${E}.[0-9]* ; do
-
-        if [ -f ${M} ] ; then
-          echo $M
+        if [[ -f ${M} ]] ; then
+          print -- ${M}
         fi
-
       done
-
     fi
-
   done
-
 done
 
 
