@@ -1,11 +1,8 @@
-/* mksublogid */
-/* lang=C20 */
+/* mksublogid SUPPORT */
+/* lang=C++20 */
 
 /* make a sub (or serial) log-ID */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
 
 
 /* revision history:
@@ -46,23 +43,24 @@
 	v		value
 
 	Returns:
-
-	<0		bad
 	>=0		length of resulting string
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -74,7 +72,13 @@
 #define	MAXBAS		5
 #define	MAXDIG		6		/* same as PID_MAX? */
 
-#define	MIDDLECHAR	'.'
+#define	MIDDLECHAR	'.'		/* middle joining character */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -93,99 +97,86 @@ static int	mkjoin(char *,int,cchar *,int,cchar *,int) noex ;
 
 /* local variables */
 
+constexpr int	vlen = DIGBUFLEN ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
 int mksublogid(char *dbuf,int dlen,cchar *bname,int v) noex {
-	int		rs = SR_OK ;
-	int		max ;
-	int		al ;
-	int		bl ;
-	int		vl = 0 ;
-	cchar	*bp ;
-	cchar	*vp ;
-	char		vbuf[DIGBUFLEN + 1] ;
-
-	if (dbuf == NULL) return SR_FAULT ;
-	if (bname == NULL) return SR_FAULT ;
-
-	if (v < 0) return SR_DOM ;
-
-	if (dlen < 0) dlen = LOGIDLEN ;
-
-	vbuf[0] = '\0' ;
-	vp = vbuf ;
-	if (v >= 0) {
-	    rs = ctdeci(vbuf,DIGBUFLEN,v) ;
-	    vl = rs ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("mksublogid: ctdeci() rs=%d\n",rs) ;
-#endif
-
-	if (rs >= 0) {
-
-	    bp = bname ;
-	    bl = strlen(bname) ;
-
-/* start possible various size reductions */
-
-	    if ((bl + 1 + vl) > dlen) {
-	        max = MAXDIG ;
-	        if (vl > max) {
-	            al = (vl - max) ;
-	            vp += al ;
-	            vl -= al ;
-	        }
-	    } /* end if */
-
-	    if ((bl + 1 + vl) > dlen) {
-	        max = MAXBAS ;
-	        if (bl > max) {
-	            al = (bl - max) ;
-	            bl -= al ;
-	        }
-	    } /* end if */
-
-	    if ((bl + 1 + vl) > dlen) {
-	        max = MIDDIG ;
-	        if (vl > max) {
-	            al = (vl - max) ;
-	            vp += al ;
-	            vl -= al ;
-	        }
-	    } /* end if */
-
-	    if ((bl + 1 + vl) > dlen) {
-	        max = MIDBAS ;
-	        if (bl > max) {
-	            al = (bl - max) ;
-	            bl -= al ;
-	        }
-	    } /* end if */
-
-	    if ((bl + 1 + vl) > dlen) {
-	        max = MINDIG ;
-	        if (vl > max) {
-	            al = (vl - max) ;
-	            vp += al ;
-	            vl -= al ;
-	        }
-	    } /* end if */
-
-	    if ((bl + 1 + vl) > dlen) {
-	        max = MINBAS ;
-	        if (bl > max) {
-	            al = (bl - max) ;
-	            bl -= al ;
-	        }
-	    } /* end if */
-
-	    rs = mkjoin(dbuf,dlen,bp,bl,vp,vl) ;
-
-	} /* end if (ok) */
-
+	int		rs = SR_FAULT ;
+	if (dbuf && bname) {
+	    rs = SR_INVALID ;
+	    if (dlen < 0) dlen = LOGIDLEN ;
+      	    dbuf[0] = '\0' ;
+	    if (v >= 0) {
+        	int		max ;
+        	int		al ;
+        	int		bl ;
+        	int		vl = 0 ;
+        	cchar		*bp ;
+        	cchar		*vp ;
+        	char		vbuf[vlen + 1] ;
+        	rs = SR_OK ;
+        	vp = vbuf ;
+        	if (v >= 0) {
+        	    rs = ctdeci(vbuf,vlen,v) ;
+        	    vl = rs ;
+        	}
+        	if (rs >= 0) {
+        	    bp = bname ;
+        	    bl = strlen(bname) ;
+        	    if ((bl + 1 + vl) > dlen) {
+        	        max = MAXDIG ;
+        	        if (vl > max) {
+        	            al = (vl - max) ;
+        	            vp += al ;
+        	            vl -= al ;
+        	        }
+        	    } /* end if */
+        	    if ((bl + 1 + vl) > dlen) {
+        	        max = MAXBAS ;
+        	        if (bl > max) {
+        	            al = (bl - max) ;
+        	            bl -= al ;
+        	        }
+        	    } /* end if */
+        	    if ((bl + 1 + vl) > dlen) {
+        	        max = MIDDIG ;
+        	        if (vl > max) {
+        	            al = (vl - max) ;
+        	            vp += al ;
+        	            vl -= al ;
+        	        }
+        	    } /* end if */
+        	    if ((bl + 1 + vl) > dlen) {
+        	        max = MIDBAS ;
+        	        if (bl > max) {
+        	            al = (bl - max) ;
+        	            bl -= al ;
+        	        }
+        	    } /* end if */
+        	    if ((bl + 1 + vl) > dlen) {
+        	        max = MINDIG ;
+        	        if (vl > max) {
+        	            al = (vl - max) ;
+        	            vp += al ;
+        	            vl -= al ;
+        	        }
+        	    } /* end if */
+        	    if ((bl + 1 + vl) > dlen) {
+        	        max = MINBAS ;
+        	        if (bl > max) {
+        	            al = (bl - max) ;
+        	            bl -= al ;
+        	        }
+        	    } /* end if */
+        	    rs = mkjoin(dbuf,dlen,bp,bl,vp,vl) ;
+        	} /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mksublogid) */
@@ -198,7 +189,7 @@ static int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
 	int		i = 0 ;
 	if ((rs = storebuf_strw(dbuf,dlen,i,bp,bl)) >= 0) {
 	    i += rs ;
-	    if ((vl >= 0) && (vp[0] != '\0')) {
+	    if ((vl >= 0) && vp[0]) {
 	        if ((rs = storebuf_char(dbuf,dlen,i,MIDDLECHAR)) >= 0) {
 	    	    i += rs ;
 	            rs = storebuf_strw(dbuf,dlen,i,vp,vl) ;

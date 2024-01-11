@@ -1,7 +1,7 @@
 /* mkplogid SUPPORT */
 /* lang=C++20 */
 
-/* make a prefix log ID */
+/* make a prefix log ID (PrefixLogId) */
 /* version %I% last-modified %G% */
 
 
@@ -37,22 +37,24 @@
 	v		value
 
 	Returns:
-	<0		error
 	>=0		length of result
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -79,69 +81,67 @@ extern "C" {
 
 /* local variables */
 
+constexpr int	dlen = DIGBUFLEN ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
 int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
-	cint		maxdigs = ndigits(PID_MAX,10) ;
-	cint		dlen = DIGBUFLEN ;
-	int		rs ;
-	int		modval ;
-	int		nl ;
-	int		ni = 0 ;
-	int		di = 0 ;
+	int		rs = SR_FAULT ;
 	int		tl = 0 ;
-	char		dbuf[DIGBUFLEN+1] ;
-
-	if (rbuf == NULL) return SR_FAULT ;
-	if (nodename == NULL) return SR_FAULT ;
-
-	rbuf[0] = '\0' ;
-	nl = strlen(nodename) ;
-
-	modval = (maxdigs < 10) ? ipow(10,maxdigs) : INT_MAX ;
-	v = (v % modval) ; /* limits the decimal part to maxdigs */
-
-	if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
-	    cint	dl = rs ;
-
-	    tl = nl + dl ;
-
-	    {
-	        for (int ch = 0 ; tl > MAXNC ; ch += 1) {
-	            switch (ch) {
-	            case 0:
-	                if (nl > 3) {
-	                    ni += 2 ;
-	                    nl -= 2 ;
-	                }
-	                break ;
-	            case 1:
-	                if (dl > 5) {
-	                    di = (dl-5) ;
-	                    nl = 5 ;
-	                } else if (nl > 5) {
-	                    nl = 5 ;
-	                }
-	                break ;
-	            case 2:
-	                nl = 5 ;
-	                break ;
-	            } /* end switch */
-	            tl = nl + dl ;
-	        } /* end for */
-	    } /* end block */
-
-	    if ((rlen < 0) || (tl <= rlen)) {
-	        char	*rp = rbuf ;
-	        rp = strwcpy(rp,(nodename + ni),nl) ;
-	        rp = strwcpy(rp,(dbuf + di),dl) ;
-	    } else {
-	        rs = SR_OVERFLOW ;
-	   }
-
-	} /* end if (ctdeci) */
-
+	if (rbuf && nodename) {
+	    int		nl = strlen(nodename) ;
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (v >= 0) {
+		static int	rsm = ndigits(PID_MAX,10) ;
+		if ((rs = rsm) >= 0) {
+	            cint	maxdigs = rs ;
+		    int		modval ;
+		    int		ni = 0 ;
+		    int		di = 0 ;
+		    char	dbuf[dlen + 1] ;
+		    modval = (maxdigs < 10) ? ipow(10,maxdigs) : INT_MAX ;
+		    v = (v % modval) ; /* limits the decimal part to maxdigs */
+		    if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
+	    	        cint	dl = rs ;
+	    	        tl = (nl + dl) ;
+	                for (int ch = 0 ; tl > MAXNC ; ch += 1) {
+	                    switch (ch) {
+	                    case 0:
+	                        if (nl > 3) {
+	                            ni += 2 ;
+	                            nl -= 2 ;
+	                        }
+	                        break ;
+	                    case 1:
+	                        if (dl > 5) {
+	                            di = (dl-5) ;
+	                            nl = 5 ;
+	                        } else if (nl > 5) {
+	                            nl = 5 ;
+	                        }
+	                        break ;
+	                    case 2:
+	                        nl = 5 ;
+	                        break ;
+	                    } /* end switch */
+	                    tl = nl + dl ;
+	                } /* end for */
+	                if ((rlen < 0) || (tl <= rlen)) {
+	                    char	*rp = rbuf ;
+	                    rp = strwcpy(rp,(nodename + ni),nl) ;
+	                    rp = strwcpy(rp,(dbuf + di),dl) ;
+	                } else {
+	                    rs = SR_OVERFLOW ;
+	               }
+	            } /* end if (ctdeci) */
+	        } /* end if (ndigits) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? tl : rs ;
 }
 /* end subroutine (mkplogid) */

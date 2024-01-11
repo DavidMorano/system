@@ -1,8 +1,8 @@
-/* userinfo */
+/* userinfo SUPPORT */
+/* lang=C++20 */
 
 /* get user information from various databases */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_UINFO	1		/* include 'uinfo(3uc)' */
@@ -10,28 +10,29 @@
 #define	CF_OLDUSERINFO	1		/* compile-in old 'userinfo(3dam)' */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
-
 /* revision history:
 
 	= 1999-07-01, David A­D­ Morano
 	This subroutine was originally written.
 
 	= 2005-03-30, David A­D­ Morano
-	I added code to look at the LOCALDOMAIN environment variable in this
-	module.  Yes, yes, it would have been grabbed from the
-	'getnodedomain()' subroutine, but the order was not what I wanted.  I
-	want LOCALDOMAIN to have precedence over the USERATTR domian (if there
-	is one).  Users already could have changed their local domain using the
-	DOMAIN environment variable, but many older applications (very old now)
-	might have still used the LOCALDOMAIN environment variable only
+	I added code to look at the LOCALDOMAIN environment variable
+	in this module.  Yes, yes, it would have been grabbed from
+	the |getnodedomain()| subroutine, but the order was not
+	what I wanted.  I want LOCALDOMAIN to have precedence over
+	the USERATTR domian (if there is one).  Users already could
+	have changed their local domain using the DOMAIN environment
+	variable, but many older applications (very old now) might
+	have still used the LOCALDOMAIN environment variable only
 	(instead of DOMAIN).
 
 	= 2008-08-12, David A­D­ Morano
-	I replaced calls to 'getusernam(3secdb)' and 'udomain(3dam)' by calls
-	to the single object 'userattr(3dam)'.  Since the old UDOMAIN database
-	is now (quietly) queried by the 'userattr(3dam)' object if a lookup on
-	the system user-attribute database fails for the 'id' keyword, any code
-	here that used to call 'udomain(3dam)' was just eliminated (deleted).
+	I replaced calls to |getusernam(3secdb)| and |udomain(3dam)|
+	by calls to the single object 'userattr(3dam)'.  Since the
+	old UDOMAIN database is now (quietly) queried by the
+	|userattr(3dam)| object if a lookup on the system user-attribute
+	database fails for the 'id' keyword, any code here that
+	used to call |udomain(3dam)| was just eliminated (deleted).
 
 */
 
@@ -39,29 +40,26 @@
 
 /*******************************************************************************
 
+	Name:
+	userinfo
+
+	Description:
 	Get user information from PASSWD database.
 
 	Synopsis:
-
-	int userinfo_start(uip,username)
-	USERINFO	*uip ;
-	const char	*username ;
+	int userinfo_start(USERINFO *uip,cchar *username) noex
 
 	Arguments:
-
 	uip		address of 'userinfo' structure
 	username	optional username
 
 	Returns:
-
-	- success or failure
-
+	>=0		success
+	<0		failure (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
@@ -72,7 +70,6 @@
 #include	<grp.h>
 #include	<netdb.h>
 #include	<user_attr.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<getbufsize.h>

@@ -202,6 +202,8 @@ obje_mkx.o:	$(OBJE_MKX)
 
 mkfdfname.o:		mkfdfname.cc mkfdfname.h
 mkgecosname.o:		mkgecosname.cc mkgecosname.h
-
+mklogid.o:		mklogid.cc mkx.h
+mkplogid.o:		mkplogid.cc mkx.h
+mksublogid.o:		mksublogid.cc mkx.h
 
 
