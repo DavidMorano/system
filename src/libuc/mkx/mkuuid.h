@@ -30,15 +30,11 @@ struct mkuuid_head {
 
 /* Note ¹: Micro$oft used 13 bits in the past (we always use 14 bits) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkuuid(MKUUID *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKUUID_INCLUDE */

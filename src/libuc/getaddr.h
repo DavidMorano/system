@@ -23,16 +23,12 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getaddrfamily(cchar *) noex ;
 extern int getaddrlen(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETADDR_INCLUDE */

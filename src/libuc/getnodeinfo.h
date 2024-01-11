@@ -36,15 +36,11 @@
 #include	<vecstr.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getnodeinfo(cchar *,char *,char *,vecstr *,cc *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETNODEINFO_INCLUDE */

@@ -1,4 +1,4 @@
-/* strnnlen */
+/* strnnlen SUPPORT */
 /* lang=C20 */
 
 

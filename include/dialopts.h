@@ -32,15 +32,12 @@
 #define	DIALOPT_EMPTY		(1<<10)	/* use an empty machine first */
 #define	DIALOPT_NOCHECK		(1<<11)	/* don't check cluster DB */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+
+EXTERNC_begin
 
 extern int	dialopts(int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DIALOPTS_INCLUDE */

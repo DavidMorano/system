@@ -17,9 +17,7 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getne_begin(int) noex ;
 extern int getne_ent(NETENT *,char *,int) noex ;
@@ -27,9 +25,7 @@ extern int getne_name(NETENT *,char *,int,cchar *) noex ;
 extern int getne_addr(NETENT *,char *,int,int,int) noex ;
 extern int getne_end() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETNE_INCLUDE */

@@ -1,4 +1,4 @@
-/* mkartfile */
+/* mkartfile SUPPORT */
 /* lang=C++20 */
 
 /* make an article file */
@@ -23,14 +23,14 @@
 	Make an article file.
 
 	Synopsis:
-	int mkartfile(char *rbuf,mode_t om,cc *dname,cc *prefix,int serial) noex
+	int mkartfile(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex
 
 	Arguments:
 	rbuf		result buffer (must be MAXPATHLEN+1 in size)
-	on		open mode
 	dname		directory
 	prefix		prefix to created file
 	serial		a serial number
+	on		open mode
 
 	Returns:
 	>=0	success and length of created file name
@@ -43,6 +43,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* for |UCHAR_MAX| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -55,9 +56,6 @@
 
 
 /* local defines */
-
-#undef	RANDBUFLEN
-#define	RANDBUFLEN	16
 
 
 /* local namespaces */
@@ -76,8 +74,9 @@ typedef unsigned int	ui ;
 
 /* forward reference */
 
-static int	mktry(char *,int,cchar *,uint,uint,uint,mode_t) noex ;
-static int	mkoutname(char *,cchar *,uint,uint,uint) noex ;
+static uint	mkbits(uint,int,int) noex ;
+static int	mktry(char *,int,cchar *,uint,int,int,mode_t) noex ;
+static int	mkoutname(char *,cchar *,uint,int,int) noex ;
 
 
 /* local variables */
@@ -85,29 +84,28 @@ static int	mkoutname(char *,cchar *,uint,uint,uint) noex ;
 
 /* exported subroutines */
 
-int mkartfile(char *rbuf,mode_t om,cchar *dname,cchar *prefix,int serial) noex {
+int mkartfile(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && dname && prefix) {
 	    rs = SR_INVALID ;
 	    if (dname[0] && prefix[0] && (serial >= 0)) {
 	        const time_t	dt = time(nullptr) ;
-	        const mode_t	operm = (om & S_IAMB) ;
+	        const mode_t	fm = (om & S_IAMB) ;
 	        if ((rs = mkpath1(rbuf,dname)) >= 0) {
-	            uint	ts ;
-	            cint	rlen = rs ;
-	            for (ts = uint(dt) ; rs >= 0 ; ts += 1) {
-		        uint	ss ;
-	                for (ss = serial ; (rs >= 0) && (ss < 256) ; ss += 1) {
-		            uint	es ;
-		            for (es = 0 ; (rs >= 0) && (es < 4) ; es += 1) {
-			        rs = mktry(rbuf,rlen,prefix,ts,ss,es,operm) ;
+	            cint	rl = rs ;
+	            for (uint ts = uint(dt) ; rs >= 0 ; ts += 1) {
+			cint	nss = UCHAR_MAX ;
+	                for (int ss = serial ; ss < nss ; ss += 1) {
+		            for (int es = 0 ; es < 4 ; es += 1) {
+			        rs = mktry(rbuf,rl,prefix,ts,ss,es,fm) ;
 		                if (rs > 0) break ;
 			        if (rs == SR_EXISTS) rs = SR_OK ;
+				if (rs < 0) break ;
 		            } /* end for (end-stamp) */
-		            if (rs > 0) break ;
+		            if (rs != 0) break ;
 	                } /* end for (serial-stamp) */
 		        serial = 0 ;
-		        if (rs > 0) break ;
+		        if (rs != 0) break ;
 	            } /* end for (time-stamp) */
 	        } /* end if (mkpath) */
 	    } /* end if (valid) */
@@ -119,7 +117,7 @@ int mkartfile(char *rbuf,mode_t om,cchar *dname,cchar *prefix,int serial) noex {
 
 /* local subroutines */
 
-static int mktry(char *rp,int rl,cc *pre,ui ts,ui ss,ui es,mode_t om) noex {
+static int mktry(char *rp,int rl,cc *pre,ui ts,int ss,int es,mode_t om) noex {
 	cint		of = (O_CREAT|O_EXCL|O_CLOEXEC) ;
 	int		rs ;
 	int		rs1 ;
@@ -141,32 +139,17 @@ static int mktry(char *rp,int rl,cc *pre,ui ts,ui ss,ui es,mode_t om) noex {
 }
 /* end subroutine (mktry) */
 
-static int mkoutname(char *rfname,cchar *pre,uint ts,uint ss,uint es) noex {
-	uint64_t	bits = 0 ;
+static int mkoutname(char *rfname,cchar *pre,uint ts,int ss,int es) noex {
+	uint		bits = mkbits(ts,ss,es) ;
 	char		*bp = rfname ;
 /* load up to 7 prefix characters into output buffer */
 	bp = strwcpy(bp,pre,7) ;
-/* load the 42 bits into the 'bits' variable */
-	{
-	    {
-		bits |= (ts & UINT_MAX) ;
-	    }
-	    {
-	        bits <<= 8 ;
-	        bits |= (ss & 0xff) ;
-	    }
-	    {
-	        bits <<= 2 ;
-	        bits |= (es & 3) ;
-	    }
-	} /* end block (make bits) */
 /* encode the 'bits' above into the output buffer using BASE-64 encoding */
 	{
 	    cint	n = 7 ; /* number of chars (7x6=42 bits) */
-	    int		i ;
 	    int		ch ;
-	    for (i = (n-1) ; i >= 0 ; i -= 1) {
-	        int	bi = (bits & 63) ;
+	    for (int i = (n-1) ; i >= 0 ; i -= 1) {
+	        int	bi = int(bits & 63) ;
 	        ch = base64_et[bi] ;
 	        if (ch == '+') {
 		    ch = 'Þ' ;
@@ -177,11 +160,26 @@ static int mkoutname(char *rfname,cchar *pre,uint ts,uint ss,uint es) noex {
 	        bits >>= 6 ;
 	    } /* end for */
 	    bp += n ;
-	}
+	} /* end block */
 /* done */
 	*bp = '\0' ;
 	return (bp - rfname) ;
 }
 /* end subroutine (mkoutname) */
+
+/* load the 42 bits into the 'bits' variable */
+static uint mkbits(uint ts,int ss,int es) noex {
+	uint	bits = ts ;
+	{
+	        bits <<= 8 ;
+	        bits |= (ss & 0xff) ;
+	}
+	{
+	        bits <<= 2 ;
+	        bits |= (es & 3) ;
+	}
+	return bits ;
+} 
+/* end subroutine (mkbits) */
 
 

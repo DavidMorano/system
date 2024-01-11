@@ -549,18 +549,18 @@ int vecpstr_find(vecpstr *op,cchar *sp) noex {
 int vecpstr_findn(vecpstr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = vecpstr_magic(op,sp)) >= 0) {
-	        int	sch = sp[0] ; /* ok: since all get promoted similarly */
-	        int	i = 0 ; /* <- used afterwards */
-	        rs = SR_NOTFOUND ;
+	    int		sch = sp[0] ; /* ok: since all get promoted similarly */
+	    int		i{} ;		/* <- used afterwards */
+	    rs = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
-	        for (i = 0 ; i < op->i ; i += 1) {
-	            cchar	*ep = op->va[i] ;
-	            if (ep && (sch == ep[0])) {
-		        cint	m = nleadstr(ep,sp,sl) ;
-		        if ((m == sl) && (ep[m] == '\0')) break ;
-	            }
-	        } /* end for */
-	        if (i < op->i) rs = i ;
+	    for (i = 0 ; i < op->i ; i += 1) {
+	        cchar	*ep = op->va[i] ;
+	        if (ep && (sch == ep[0])) {
+		    cint	m = nleadstr(ep,sp,sl) ;
+		    if ((m == sl) && (ep[m] == '\0')) break ;
+	        }
+	    } /* end for */
+	    if (i < op->i) rs = i ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -866,21 +866,21 @@ static int vecpstr_extvec(vecpstr *op,int n) noex {
 	if ((op->i + 1) > op->n) {
 	    int		nn ;
 	    int		vasize ;
-	    void	*np{} ;
+	    void	*na{} ;
 	    if (op->va == nullptr) {
 	        cint	dn = (n > 0) ? n : VECPSTR_DEFENTS ;
 	        nn = op->an ;
 	        if (nn < dn) nn = dn ;
 	        vasize = (nn + 1) * sizeof(char **) ;
-	        rs = uc_libmalloc(vasize,&np) ;
+	        rs = uc_libmalloc(vasize,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
 	        vasize = (nn + 1) * sizeof(char **) ;
-	        rs = uc_librealloc(op->va,vasize,&np) ;
+	        rs = uc_librealloc(op->va,vasize,&na) ;
 	        op->va = nullptr ;
 	    } /* end if */
 	    if (rs >= 0) {
-	        op->va = (cchar **) np ;
+	        op->va = (cchar **) na ;
 	        op->va[op->i] = nullptr ;
 	        op->n = nn ;
 	    }

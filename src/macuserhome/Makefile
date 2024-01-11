@@ -1,4 +1,4 @@
-# MAKEFILES (macuserhome)
+# MAKEFILE (macuserhome)
 
 T= userhome
 

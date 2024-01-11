@@ -35,17 +35,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	getaf(cchar *,int) noex ;
 extern int	getaflen(int) noex ;
 extern cchar	*strafname(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETAF_INCLUDE */

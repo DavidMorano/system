@@ -27,15 +27,11 @@
 
 #if	(! defined(OSNAME_SunOS)) || (OSNAME_SunOS == 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern cchar	*getexecname() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (! defined(OSNAME_SunOS)) || (OSNAME_SunOS == 0) */
 

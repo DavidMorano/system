@@ -1,8 +1,8 @@
 LIBTD
 
-This is a terminal display library. This library contains routines (not unlike
-in the UNIX 'curses' library) to display information in "windows" on a terminal
-display.
+This is a terminal display library. This library contains routines
+(not unlike in the UNIX 'curses' library) to display information
+in "windows" on a terminal display.
 
 Routines:
 

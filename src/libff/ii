@@ -1,7 +1,0 @@
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<stdio.h>
-#include	<errno.h>
-
-#include	<vsystem.h>

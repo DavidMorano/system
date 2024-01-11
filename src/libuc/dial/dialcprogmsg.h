@@ -53,16 +53,12 @@ struct dialcprogmsg_light {
 	SOCKADDRESS	saerr ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int dialcprogmsg_end(char *,int,int,DIALCPROGMSG_END *) noex ;
 extern int dialcprogmsg_light(char *,int,int,DIALCPROGMSG_LIGHT *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DIALCPROGMSG_INCLUDE */

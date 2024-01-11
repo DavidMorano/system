@@ -109,6 +109,7 @@ namespace {
     } ;
 }
 
+
 /* forward references */
 
 static int	vecpstr_loadfiler(vecpstr *,int,cchar *) noex ;

@@ -1,9 +1,8 @@
-/* mkcexsync */
+/* mkcexsync SUPPORT */
+/* lang=C20 */
 
 /* make the synchronization string used for CEX */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,31 +16,27 @@
 
 /*******************************************************************************
 
-	This subroutine creates the synchronization string sequence for use by
-	CEX.
+	Name:
+	mkcexsync
+
+	Description:
+	This subroutine creates the synchronization string sequence
+	for use by CEX.
 
 	Synopsis:
-
-	int mkcexsync(rbuf,rlen)
-	char	rbuf[] ;
-	int	rlen ;
+	int mkcexsync(char *rbuf,int rlen) noex
 
 	Arguments:
-
 	rbuf		host to dial to
 	rlen		length of buffer (really just a check)
 
 	Returns:
-
 	>=0		length of resulting sequence
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netinet/in.h>
@@ -53,7 +48,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -91,9 +85,7 @@ typedef unsigned int	in_addr_t ;
 
 /* exported subroutines */
 
-
-int mkcexsync(char *rbuf,int rlen)
-{
+int mkcexsync(char *rbuf,int rlen) noex {
 	const int	leaderlen = (rlen - MKCEXSYNC_FINLEN) ;
 	int		rs = SR_OK ;
 	int		i = 0 ;

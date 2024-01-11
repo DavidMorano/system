@@ -84,9 +84,7 @@ struct vecpstr_head {
 typedef VECPSTR		vecpstr ;
 typedef VECPSTR_CH	vecpstr_ch ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vecpstr_vcmp)(cchar **,cchar **) noex ;
 
@@ -123,9 +121,7 @@ extern int vecpstr_finish(vecpstr *) noex ;
 
 extern int vecpstr_addsubdirs(vecpstr *,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VECPSTR_INCLUDE */

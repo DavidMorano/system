@@ -19,9 +19,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+
+EXTERNC_begin
 
 extern bool haswhite(cchar *,int) noex ;
 extern bool haslc(cchar *,int) noex ;
@@ -55,9 +54,7 @@ static inline bool hasNotDots(cchar *np,int nl) noex {
 	return hasnotdots(np,nl) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HASX_INCLUDE */

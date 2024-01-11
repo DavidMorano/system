@@ -1,4 +1,8 @@
-/* mkcmds */
+/* mkcmds SUPPORT */
+/* lang=C20 */
+
+/* names string storiage: purpose? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,13 +14,14 @@
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
-
-#ifndef	MKCMDS_INCLUDE
-#define	MKCMDS_INCLUDE		1
+#ifndef	MKTXTINDEXCMDS_INCLUDE
+#define	MKTXTINDEXCMDS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
 enum mkcmds {
@@ -32,9 +37,9 @@ enum mkcmds {
 } ;
 
 
-extern const char	*mkcmds[] ;
+extern cpcchar		mkcmds[] ;
 
 
-#endif /* MKCMDS_INCLUDE */
+#endif /* MKTXTINDEXCMDS_INCLUDE */
 
 

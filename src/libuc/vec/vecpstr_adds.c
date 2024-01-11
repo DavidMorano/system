@@ -42,7 +42,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
-#include	<string.h>
+#include	<string.h>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>
@@ -54,8 +54,6 @@
 
 
 /* external subroutines */
-
-extern int	sfnext(cchar *,int,cchar **) noex ;
 
 
 /* external variables */

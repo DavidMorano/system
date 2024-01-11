@@ -1,9 +1,8 @@
-/* log2 */
+/* log2 SUPPORT */
+/* lang=C20 */
 
 /* calculate the log-base-2 of a number */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,29 +16,27 @@
 
 /*******************************************************************************
 
+	Name:
+	log2
+
+	Description:
 	Find the log-base-2 of a number (v).
 
 	Synopsis:
-
-	double log2(double v)
+	double log2(double v) noex
 
 	Arguments:
-
 	v		number to take the log-base-2 of
 
 	Returns:
-
 	-		result
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<math.h>
-
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -68,9 +65,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* exported subroutines */
 
-
-double log2(double v)
-{
+double log2(double v) noex {
 	const double	n = log(v) ;
 	const double	d = log(2.0) ;
 	return (n/d) ;

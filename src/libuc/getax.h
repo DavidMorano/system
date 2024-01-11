@@ -27,9 +27,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getpw_begin() noex ;
 extern int getpw_end() noex ;
@@ -55,9 +53,7 @@ extern int getpj_name(PROJECT *,char *,int,cchar *) noex ;
 extern int getpj_pid(PROJECT *,char *,int,projid_t) noex ;
 extern int getpj_def(PROJECT *,char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETAX_INCLUDE */

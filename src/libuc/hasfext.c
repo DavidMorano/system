@@ -1,4 +1,4 @@
-/* hasfext */
+/* hasfext SUPPORT */
 /* lang=C20 */
 
 /* determine if file-name (just a string) has an approved file-extension */

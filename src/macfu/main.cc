@@ -109,6 +109,9 @@ namespace {
 	size_t hashval() const noex {
 	    return size_t(dev | ino) ;
 	} ;
+	bool equal_to(const devino &o) noex {
+	    return ((dev == o.dev) && (ino == o.ino)) ;
+	} ;
     } ; /* end struct (devino) */
     struct filenode {
 	string		fn ;
@@ -189,6 +192,11 @@ namespace {
 	    return di.hashval() ;
 	} ;
     } ; /* end struct-template (hash<devino>) */
+    template<> struct std::equal_to<devino> {
+	size_t operator() (const devino *lhs,const devino &rhs) const noex {
+	    return ((lhs.dev == rhs.dev) && (lhs.ino == rhs.ino)) ;
+	} ;
+    } ; /* end struct-template (hash<devino>) */
 }
 
 
@@ -200,6 +208,7 @@ namespace {
 enum progmodes {
 	progmode_fileuniq,
 	progmode_fu,
+	progmode_snuglines,
 	progmode_overlast
 } ;
 
@@ -446,7 +455,7 @@ int proginfo::pathto() noex {
 					        if (pm == pm_pt) {
 	                                            cout << pbuf << eol ;
 					        }
-					    } /* end if is-exec) */
+					    } /* end if (is-exec) */
 				        } /* end if (is-reg) */
 				    } else if (isNotAccess(rs)) {
 				        rs = SR_OK ;

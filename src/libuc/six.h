@@ -23,9 +23,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int siochr(cchar *,int,int) noex ;
 extern int sirchr(cchar *,int,int) noex ;
@@ -48,9 +46,7 @@ static inline int sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SIX_INCLUDE */

@@ -1,9 +1,8 @@
 /* mkfmtphone */
+/* lang=C20 */
 
 /* similar to 'snwcpy(3dam)' but formatting a phone number */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,29 +16,25 @@
 
 /*******************************************************************************
 
+	Name:
+	mkfmtphone
+
+	Description:
 	We format a raw phone number to make it look more pretty.
-
-	See-also:
-
-	snwcpy(3dam),
-	snwcpylatin(3dam), 
-	snwcpyopaque(3dam), 
-	snwcpycompact(3dam), 
-	snwcpyclean(3dam), 
-	snwcpyhyphen(3dam),
 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<limits.h>
-
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<sbuf.h>
+#include	<strn.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 
@@ -47,19 +42,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	snwcpyopaque(char *,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -73,23 +55,20 @@ extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 /* exported subroutines */
 
-
-int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl)
-{
+int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 	int		dl = 0 ;
-	int		rs ;
+	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl ;
 	cchar		*sp ;
-
 	if ((sl = sfshrink(pp,pl,&sp)) > 0) {
 	    if (strnpbrk(sp,sl,"-()") == NULL) {
-	        const int	tlen = sl ;
-	        char		*tbuf ;
+	        cint	tlen = sl ;
+	        char	*tbuf ;
 	        if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 	            if ((rs = snwcpyopaque(tbuf,tlen,sp,sl)) >= 0) {
-			SBUF		b ;
-		        const int	tl = rs ;
+			SBUF	b ;
+		        cint	tl = rs ;
 			if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
 			    if (tl > 10) {
 				rs = sbuf_strw(&b,tbuf,(tl-10)) ;
@@ -125,7 +104,6 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl)
 		dl = rs ;
 	    }
 	} /* end if (sfshrink) */
-
 	return (rs >= 0) ? dl : rs ;
 }
 /* end subroutine (mkfmtphone) */

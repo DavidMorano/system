@@ -18,19 +18,15 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 extern const uchar	base64_et[] ;
 extern const uchar	base64_dt[] ;
+
+EXTERNC_begin
 
 extern int		base64_e(cchar *,int,char *) noex ;
 extern int		base64_d(cchar *,int,char *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* BASE64_INCLUDE */

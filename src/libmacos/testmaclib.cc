@@ -1,7 +1,6 @@
 /* testmaclib */
 /* lang=C++11 */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -16,14 +15,11 @@
 
 	This code tests the use of the VECINT object.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<cstdlib>
-#include	<cinttypes>
 #include	<cstring>
 #include	<new>
 #include	<algorithm>
@@ -44,11 +40,6 @@ using namespace std ;
 
 /* external subroutines */
 
-extern "C" int	sisub(cchar *,int,cchar *) ;
-extern "C" int	mkrevstr(char *,int) ;
-
-extern "C" char	*strwcpy(char *,cchar *,int) ;
-
 
 /* global variables */
 
@@ -66,17 +57,16 @@ static const int	vals[] = { 3, 7, 19, 12, 43 } ;
 
 /* exported subroutines */
 
-int main(int argc,const char **argv,const char **envv) {
+int main(int argc,mainv,mainv) {
 	vecint		vi ;
 	int		rs ;
-
+	int		rs1 ;
 	if ((rs = vecint_start(&vi,5,0)) >= 0) {
 	    const int	n = nelem(vals) ;
 	    if ((rs = vecint_addlist(&vi,vals,n)) >= 0) {
 		if ((rs = vecint_assign(&vi,8,71)) >= 0) {
-	            int		i ;
 	            int		v ;
-	            for (i = 0 ; vecint_getval(&vi,i,&v) >= 0 ; i += 1) {
+	            for (int i = 0 ; vecint_getval(&vi,i,&v) >= 0 ; i += 1) {
 		        cout << " " << v ;
 	            }
 	            cout << endl ;
@@ -84,7 +74,6 @@ int main(int argc,const char **argv,const char **envv) {
 	    }
 	    vecint_finish(&vi) ;
 	} /* end if (vecint) */
-
 	return 0 ;
 }
 /* end subroutine (main) */

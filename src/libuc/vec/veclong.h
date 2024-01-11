@@ -42,17 +42,6 @@
 #define	VECLONG_OSORTED		0x0020		/* keep sorted */
 #define	VECLONG_OORDERED	0x0040		/* keep ordered */
 
-/* policy modes */
-
-#define	VECLONG_PDEFAULT	0			/* default */
-#define	VECLONG_PHOLES		0			/* leave holes */
-#define	VECLONG_PSWAP		VECLONG_OSWAP		/* swap entries */
-#define	VECLONG_PREUSE		VECLONG_OREUSE		/* reuse empties */
-#define	VECLONG_PORDERED	VECLONG_OORDERED	/* keep them ordered */
-#define	VECLONG_PSORTED		VECLONG_OSORTED		/* keep them sorted */
-#define	VECLONG_PNOHOLES	VECLONG_OCOMPACT	/* swap entries */
-#define	VECLONG_PCONSERVE	VECLONG_OCONSERVE 	/* conserve space */
-
 
 struct veclong_c {
 	int		i ;
@@ -80,16 +69,10 @@ struct veclong_head {
 	VECLONG_FL	f ;
 } ;
 
-
 typedef struct veclong_head	veclong ;
 typedef struct veclong_c	veclong_cur ;
 
-
-#if	(! defined(VECLONG_MASTER)) || (VECLONG_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int veclong_start(veclong *,int,int) ;
 extern int veclong_finish(veclong *) ;
@@ -114,11 +97,7 @@ extern int veclong_enum(veclong *,veclong_cur *,VECLONG_TYPE *) ;
 extern int veclong_curend(veclong *,veclong_cur *) ;
 extern int veclong_audit(veclong *) ;
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* VECLONG_MASTER */
+EXTERNC_end
 
 
 #endif /* VECLONG_INCLUDE */

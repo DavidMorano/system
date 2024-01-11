@@ -1,4 +1,4 @@
-/* mkfname */
+/* mkfname HEADER */
 /* lang=C20 */
 
 /* make a file name from several parts */
@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkfnamex(char *,int,...) noex ;
 
@@ -38,9 +36,7 @@ extern int mkfname4(char *,cc *,cc *,cc *,cc *) noex ;
 extern int mkfname5(char *,cc *,cc *,cc *,cc *,cc *) noex ;
 extern int mkfname6(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

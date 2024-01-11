@@ -1,4 +1,4 @@
-/* strnset */
+/* strnset SUPPORT */
 /* lang=C20 */
 
 /* set a string to a number of characters */

@@ -402,16 +402,16 @@ TOBJG0= $(TOBJA)
 TOBJ= $(TOBJG0) $(TOBJG1)
 
 
-UOBJ00= matstr.o nleadstr.o toxc.o char.o
+UOBJ00= matxstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
-UOBJ02= strcpyxc.o
+UOBJ02= snwcpyx.o strcpyxc.o
 UOBJ03= varnames.o syswords.o rmx.o
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
-UOBJ08= matkeystr.o strkeycmp.o
+UOBJ08= strkeycmp.o
 UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
 UOBJ11= strwcpy.o strwcpyxc.o strwcpyxx.o
@@ -930,8 +930,6 @@ timeout.o:		timeout.c timeout.h
 
 upt.o:			upt.cc upt.h
 
-base64.o:		base64.cc base64.h
-
 spawnproc.o:		spawnproc.cc spawnproc.h
 
 getxusername.o:		getxusername.c getxusername.h
@@ -1178,8 +1176,8 @@ snx.o:			snx.dir
 snx.dir:
 	makesubdir $@
 
-snwcpy.o:		snwcpy.dir
-snwcpy.dir:
+snwcpyx.o:		snwcpyx.dir
+snwcpyx.dir:
 	makesubdir $@
 
 # MATXSTR
@@ -1225,6 +1223,16 @@ strnxcmp.dir:
 # VEC
 vec.o:			vec.dir
 vec.dir:
+	makesubdir $@
+
+# MKX
+mkx.o:			mkx.dir
+mkx.dir:
+	makesubdir $@
+
+# MKFILE
+mkfile.o:		mkfile.dir
+mkfile.dir:
 	makesubdir $@
 
 # UCINET
@@ -1275,6 +1283,7 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 
 # UTILITY
+base64.o:		base64.cc base64.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h

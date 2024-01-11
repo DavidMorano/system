@@ -4,9 +4,6 @@
 /* version %I% last-modified %G% */
 
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
-
 /* revision history:
 
 	= 1999-04-01, David A­D­ Morano
@@ -18,35 +15,32 @@
 
 /*******************************************************************************
 
+	Name:
+	eaccess
+
+	Description:
 	Check access by effective UID.
 
 	Synopsis:
-
 	int eaccess(cchar *fname,int am)
 
 	Arguments:
-
 	fname		file-name to check
 	am		access mode
 
 	Returns:
-
-	<0		error in dialing
 	>=0		OK
-
+	<0		error in dialing (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
-#include	<ids.h>
+#include	<xperm.h>
 #include	<localmisc.h>
 
 
@@ -54,14 +48,6 @@
 
 
 /* external subroutines */
-
-extern int	sperm(IDS *,USTAT *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -78,10 +64,8 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* exported subroutines */
 
-
-int eaccess(cchar *fname,int am)
-{
-	return perm(fname,-1,-1,NULL,am) ;
+int eaccess(cchar *fname,int am) noex {
+	return perm(fname,-1,-1,nullptr,am) ;
 }
 /* end subroutine (eaccess) */
 

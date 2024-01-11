@@ -66,9 +66,7 @@ struct vechand_head {
 
 typedef VECHAND		vechand ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vechand_vcmp)(cvoid **,cvoid **) noex ;
 
@@ -90,9 +88,7 @@ extern int vechand_extent(vechand *) noex ;
 extern int vechand_audit(vechand *) noex ;
 extern int vechand_finish(vechand *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VECHAND_INCLUDE */

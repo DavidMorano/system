@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h sysauxinfonames.h
+INCS= six.h
 
 
 OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o

@@ -23,17 +23,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getgid_name(cchar *,int) noex ;
 extern int getgid_group(cchar *,int) noex ;
 extern int getgid_def(cchar *,gid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETGID_INCLUDE */

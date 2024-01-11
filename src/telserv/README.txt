@@ -1,8 +1,9 @@
 TELSERV
 
-This program is a Telnet server that can be configured to provide a variety of
-services. Generally, LOGIN should not be provided through this server as only
-STDIN and STDOUT are mapped to the network Telnet connection.
+This program is a Telnet server that can be configured to provide
+a variety of services. Generally, LOGIN should not be provided
+through this server as only STDIN and STDOUT are mapped to the
+network Telnet connection.
 
 Synopsis:
 $ telserv [-R <pr>] [-d=<n>] [-pass[=<n>]] [<svc>] [-V]

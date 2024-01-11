@@ -25,15 +25,11 @@
 #include	<dialopts.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int dialtcp(cchar *,cchar *,int,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DIALTCP_INCLUDE */

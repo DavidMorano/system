@@ -1,6 +1,8 @@
 /* td */
+/* lang=C20 */
 
 /* terminal display manager */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,14 +15,12 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TD_INCLUDE
-#define	TD_INCLUDE	1
+#define	TD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stdarg.h>
-
 #include	<vecitem.h>
 #include	<termstr.h>
 #include	<localmisc.h>
@@ -72,7 +72,7 @@ struct td_head {
 	uint		magic ;
 	struct td_position	cur ;	/* current position */
 	struct td_flags		f ;
-	const char	*termtype ;	/* given terminal type-name */
+	cchar	*termtype ;	/* given terminal type-name */
 	char		*buf ;		/* storage buffer */
 	TERMSTR		enter ;
 	vecitem		wins ;		/* sub windows */
@@ -85,44 +85,36 @@ struct td_head {
 	int		cols ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(TD_MASTER)) || (TD_MASTER == 0)
+extern int td_start(TD *,int,cchar *,int,int) noex ;
+extern int td_finish(TD *) noex ;
+extern int td_flush(TD *) noex ;
+extern int td_subnew(TD *,int,int,int,int) noex ;
+extern int td_subdel(TD *,int) noex ;
+extern int td_getlines(TD *,int) noex ;
+extern int td_setlines(TD *,int,int) noex ;
+extern int td_move(TD *,int,int,int) noex ;
+extern int td_scroll(TD *,int,int) noex ;
+extern int td_control(TD *,int,int,int) noex ;
+extern int td_setsize(TD *,int,int) noex ;
+extern int td_suspend(TD *,int,int) noex ;
+extern int td_write(TD *,int,cchar *,int) noex ;
+extern int td_pwrite(TD *,int,int,int,cchar *,int) noex ;
+extern int td_pwritegr(TD *,int,int,int,int,cchar *,int) noex ;
+extern int td_vprintf(TD *,int,cchar *,va_list) noex ;
+extern int td_vpprintf(TD *,int,int,int,cchar *,va_list) noex ;
+extern int td_printf(TD *,int,cchar *,...) noex ;
+extern int td_pprintf(TD *,int,int,int,cchar *,...) noex ;
+extern int td_clear(TD *,int) noex ;
+extern int td_ew(TD *,int,int,int) noex ;
+extern int td_el(TD *,int,int) noex ;
+extern int td_ec(TD *,int,int) noex ;
+extern int td_check(TD *) noex ;
+extern int td_position(TD *,int,TD_POSITION *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int td_start(TD *,int,const char *,int,int) ;
-extern int td_finish(TD *) ;
-extern int td_flush(TD *) ;
-extern int td_subnew(TD *,int,int,int,int) ;
-extern int td_subdel(TD *,int) ;
-extern int td_getlines(TD *,int) ;
-extern int td_setlines(TD *,int,int) ;
-extern int td_move(TD *,int,int,int) ;
-extern int td_scroll(TD *,int,int) ;
-extern int td_control(TD *,int,int,int) ;
-extern int td_setsize(TD *,int,int) ;
-extern int td_suspend(TD *,int,int) ;
-extern int td_write(TD *,int,const char *,int) ;
-extern int td_pwrite(TD *,int,int,int,const char *,int) ;
-extern int td_pwritegr(TD *,int,int,int,int,const char *,int) ;
-extern int td_vprintf(TD *,int,const char *,va_list) ;
-extern int td_vpprintf(TD *,int,int,int,const char *,va_list) ;
-extern int td_printf(TD *,int,const char *,...) ;
-extern int td_pprintf(TD *,int,int,int,const char *,...) ;
-extern int td_clear(TD *,int) ;
-extern int td_ew(TD *,int,int,int) ;
-extern int td_el(TD *,int,int) ;
-extern int td_ec(TD *,int,int) ;
-extern int td_check(TD *) ;
-extern int td_position(TD *,int,TD_POSITION *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TD_MASTER */
 
 #endif /* TD_INCLUDE */
 

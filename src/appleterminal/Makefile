@@ -1,4 +1,4 @@
-# MAKEFILES (appleterminal)
+# MAKEFILE (appleterminal)
 
 T= appleterminal
 

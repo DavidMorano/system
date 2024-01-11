@@ -17,9 +17,7 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int getse_begin(int) noex ;
 extern int getse_ent(SERVENT *,char *,int) noex ;
@@ -27,9 +25,7 @@ extern int getse_name(SERVENT *,char *,int,cchar *,cchar *) noex ;
 extern int getse_port(SERVENT *,char *,int,cchar *,int) noex ;
 extern int getse_end() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GETSE_INCLUDE */

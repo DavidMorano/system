@@ -18,17 +18,13 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkdisphdr(char *,int,cchar *,int) noex ;
 extern int mkaddrpart(char *,int,cchar *,int) noex ;
 extern int mkdispaddr(char *,int,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKDISPHDR_INCLUDE */
