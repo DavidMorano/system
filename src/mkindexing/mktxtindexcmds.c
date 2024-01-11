@@ -1,6 +1,8 @@
-/* mkcmds */
+/* mkcmds HEADER */
+/* lang=C20 */
 
 /* names string storiage: purpose? */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,17 +14,18 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#ifndef	MKCMDS_INCLUDE
-#define	MKCMDS_INCLUDE	1
+#ifndef	MKTXTINDEXCMDS_INCLUDE
+#define	MKTXTINDEXCMDS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
-const char *mkcmds[] = {
+const cpcchar	mkcmds[] = {
 	"minwordlen",
 	"maxwordlen",
 	"eigenwords",
@@ -32,8 +35,9 @@ const char *mkcmds[] = {
 	"sfn",
 	"lang",
 	NULL
-} ;
+} ; /* end if (mkcmds) */
 
-#endif /* MKCMDS_INCLUDE */
+
+#endif /* MKTXINDEXCMDS_INCLUDE */
 
 

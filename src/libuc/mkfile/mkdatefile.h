@@ -1,4 +1,4 @@
-/* mkdatefile */
+/* mkdatefile HEADER */
 /* lang=C20 */
 
 /* make a temporary date-type job file */
@@ -25,15 +25,11 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkdatefile(char *,cchar *,cchar *,mode_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKDATEFILE_INCLUDE */

@@ -1,11 +1,9 @@
-/* mkplogid */
-/* lang=C20 */
+/* mkplogid SUPPORT */
+/* lang=C++20 */
 
 /* make a prefix log ID */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
-#define	CF_SBUF		0		/* use 'sbuf(3dam)' */
 
 /* revision history:
 
@@ -85,8 +83,8 @@ extern "C" {
 /* exported subroutines */
 
 int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
-	const int	maxdigs = ndigits(PID_MAX,10) ;
-	const int	dlen = DIGBUFLEN ;
+	cint		maxdigs = ndigits(PID_MAX,10) ;
+	cint		dlen = DIGBUFLEN ;
 	int		rs ;
 	int		modval ;
 	int		nl ;
@@ -105,14 +103,13 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	v = (v % modval) ; /* limits the decimal part to maxdigs */
 
 	if ((rs = ctdeci(dbuf,dlen,v)) >= 0) {
-	    const int	dl = rs ;
+	    cint	dl = rs ;
 
 	    tl = nl + dl ;
 
 	    {
-	        int	c ;
-	        for (c = 0 ; tl > MAXNC ; c += 1) {
-	            switch (c) {
+	        for (int ch = 0 ; tl > MAXNC ; ch += 1) {
+	            switch (ch) {
 	            case 0:
 	                if (nl > 3) {
 	                    ni += 2 ;
@@ -135,25 +132,13 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	        } /* end for */
 	    } /* end block */
 
-#if	CF_SBUF
-	    {
-	        SBUF	b ;
-	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-		    int	rs1 ;
-	            sbuf_strw(&b,(nodename + ni),nl) ;
-	            sbuf_strw(&b,(dbuf + di),dl) ;
-	            rs1 = sbuf_finish(&b) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (sbuf) */
-	    }
-#else
 	    if ((rlen < 0) || (tl <= rlen)) {
 	        char	*rp = rbuf ;
 	        rp = strwcpy(rp,(nodename + ni),nl) ;
 	        rp = strwcpy(rp,(dbuf + di),dl) ;
-	    } else
+	    } else {
 	        rs = SR_OVERFLOW ;
-#endif /* CF_SBUF */
+	   }
 
 	} /* end if (ctdeci) */
 

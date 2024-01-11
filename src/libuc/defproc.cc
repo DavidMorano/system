@@ -1,5 +1,5 @@
-/* defproc */
-/* lang=C20 */
+/* defproc SUPPORT */
+/* lang=C++20 */
 
 /* process a "def" (define) file */
 /* version %I% last-modified %G% */
@@ -21,9 +21,9 @@
 
 	Description:
 	This subroutine will read (process) an "def" (define) file
-	and put all of the environment variables into an VECSTR
-	object (supplied). New environment variables just get added
-	to the list. Old environment variables already on the list
+	and put all of the define-variables into an VECSTR
+	object (supplied). New define-variables just get added
+	to the list. Old define-variables already on the list
 	are deleted with a new definition is encountered.
 
 	Synopsis:
@@ -45,9 +45,10 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -97,7 +98,7 @@ extern char	*strnpbrk(cchar *,int,cchar *) ;
 /* local structures */
 
 struct subinfo {
-	cchar	**envv ;
+	cchar		**envv ;
 	EXPCOOK		*clp ;
 	vecstr		*dlp ;
 } ;

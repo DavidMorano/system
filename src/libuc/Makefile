@@ -1225,6 +1225,16 @@ vec.o:			vec.dir
 vec.dir:
 	makesubdir $@
 
+# MKX
+mkx.o:			mkx.dir
+mkx.dir:
+	makesubdir $@
+
+# MKFILE
+mkfile.o:		mkfile.dir
+mkfile.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 

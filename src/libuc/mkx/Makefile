@@ -54,10 +54,10 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mkx.h
 
 
-OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaltext.o mkartfile.o
+OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaltext.o
 OBJ01_MKX= mkaudit.o mkbangname.o mkbasename.o mkbestaddr.o
 OBJ02_MKX= mkbestfrom.o mkcaselower.o mkcdpath.o mkcexsync.o
-OBJ03_MKX= mkchar.o mkcleanline.o mkcmds.o mkdatefile.o
+OBJ03_MKX= mkchar.o mkcleanline.o
 OBJ04_MKX= mkdisphdr.o mkdisplayable.o
 OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
 OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
@@ -69,8 +69,8 @@ OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
 OBJ12_MKX= mkplogid.o mkprogenv.o mkquery.o mkquoted.o
 OBJ13_MKX= mkrealname.o mkreplyaddr.o mkrevstr.o mksenderaddr.o
 OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o mksublogid.o
-OBJ15_MKX= mktagfname.o mktagprint.o mktmpdir.o mktmpfile.o
-OBJ16_MKX= mktmplock.o mktmpuserdir.o mktxtindexcmds.o mkufname.o
+OBJ15_MKX= mktagfname.o mktagprint.o
+OBJ16_MKX= mktmplock.o mktmpuserdir.o mkufname.o
 OBJ17_MKX= mkuibang.o mkuiname.o mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o mkvarpath.o
 
@@ -200,7 +200,6 @@ obje_mkx.o:	$(OBJE_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_MKX)
 
 
-mkdatefile.o:		mkdatefile.cc mkdatefile.h
 mkfdfname.o:		mkfdfname.cc mkfdfname.h
 mkgecosname.o:		mkgecosname.cc mkgecosname.h
 

@@ -1,12 +1,10 @@
-/* ipow */
+/* ipow SUPPORT */
+/* lang=C20 */
 
 /* return integer-power */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DYNAMIC	1		/* dynamic programming */
-
 
 /* revision history:
 
@@ -19,34 +17,33 @@
 
 /*******************************************************************************
 
-        This subroutine calculates and returns an integer power for a given
-        base.
+	Name:
+	ipow
+
+	Description:
+	This subroutine calculates and returns an integer power for
+	a given base.
 
 	Synopsis:
-
-	int ipow(b,p)
-	int	b, p ;
+	int ipow(int b,int p) noex
 
 	Arguments:
-
 	b	base
 	p	power
 
 	Returns:
-
 	-	result (b**p)
 
 	Notes: 
-
 	Only defined for positive exponents.
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>		/* 'LONG' type */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 /* local defines */
