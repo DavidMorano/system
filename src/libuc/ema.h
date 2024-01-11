@@ -84,6 +84,7 @@ extern int ema_starter(ema *,cchar *,int) noex ;
 extern int ema_start(ema *) noex ;
 extern int ema_parse(ema *,cchar *,int) noex ;
 extern int ema_addent(ema *,ema_ent *) noex ;
+extern int ema_addents(ema *,ema *) noex ;
 extern int ema_get(ema *,int,ema_ent **) noex ;
 extern int ema_getbestaddr(ema *,int,cchar **) noex ;
 extern int ema_count(ema *) noex ;

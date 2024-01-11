@@ -1235,6 +1235,11 @@ mkfile.o:		mkfile.dir
 mkfile.dir:
 	makesubdir $@
 
+# EMA
+ema.o:		ema.dir
+ema.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
