@@ -1,4 +1,8 @@
-/* ema */
+/* ema HEADER */
+/* lang=C20 */
+
+/* E-Mail Address */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,26 +15,22 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	EMA_INCLUDE
-#define	EMA_INCLUDE	1
+#define	EMA_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<usystem.h>
 #include	<vechand.h>
-#include	<localmisc.h>		/* additional types */
-
-
-#ifndef	UINT
-#define	UINT	unsigned int
-#endif
+#include	<localmisc.h>
 
 
 #define	EMA		struct ema_head
-#define	EMA_ENT		struct ema_e
+#define	EMA_ENT		struct ema_entry
 #define	EMA_FL		struct ema_flags
 #define	EMA_MAGIC	0x73169284
 #define	EMADEFENTS	4
 
-/* mailing list types */
+
 enum emnatypes {
 	ematype_reg,			/* regular */
 	ematype_pcs,			/* PCS list */
@@ -48,26 +48,26 @@ enum emaparts {
 } ;
 
 struct ema_head {
+	vechand		*elp ;
 	uint		magic ;
-	vechand		list ;
 	int		n ;
 } ;
 
 struct ema_flags {
-	UINT		error:1 ;	/* address parse error */
-	UINT		expanded:1 ;	/* list has been expanded */
+	uint		error:1 ;	/* address parse error */
+	uint		expanded:1 ;	/* list has been expanded */
 } ;
 
 struct ema_s {
-	const char	*pp ;
+	cchar		*pp ;
 	int		pl ;
 } ;
 
-struct ema_e {
-	const char	*op ;		/* original address */
-	const char	*ap ;		/* regular address part */
-	const char	*rp ;		/* route-address part (if any) */
-	const char	*cp ;		/* comment */
+struct ema_entry {
+	cchar		*op ;		/* original address */
+	cchar		*ap ;		/* regular address part */
+	cchar		*rp ;		/* route-address part (if any) */
+	cchar		*cp ;		/* comment */
 	EMA		*listp ;
 	EMA_FL		f ;
 	int		type ;		/* mailing list type */
@@ -75,27 +75,22 @@ struct ema_e {
 	int		ol, al, rl, cl ;
 } ;
 
+typedef EMA		ema ;
+typedef EMA_ENT		ema_ent ;
 
-#if	(! defined(EMA_MASTER)) || (EMA_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int ema_starter(ema *,cchar *,int) noex ;
+extern int ema_start(ema *) noex ;
+extern int ema_parse(ema *,cchar *,int) noex ;
+extern int ema_addent(ema *,ema_ent *) noex ;
+extern int ema_get(ema *,int,ema_ent **) noex ;
+extern int ema_getbestaddr(ema *,int,cchar **) noex ;
+extern int ema_count(ema *) noex ;
+extern int ema_finish(ema *) noex ;
 
-extern int ema_starter(EMA *,cchar *,int) ;
-extern int ema_start(EMA *) ;
-extern int ema_parse(EMA *,const char *,int) ;
-extern int ema_addent(EMA *,EMA_ENT *) ;
-extern int ema_get(EMA *,int,EMA_ENT **) ;
-extern int ema_getbestaddr(EMA *,int,cchar **) ;
-extern int ema_count(EMA *) ;
-extern int ema_finish(EMA *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* EMA_MASTER */
 
 #endif /* EMA_INCLUDE */
 

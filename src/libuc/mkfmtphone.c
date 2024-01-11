@@ -1,4 +1,4 @@
-/* mkfmtphone */
+/* mkfmtphone SUPPORT */
 /* lang=C20 */
 
 /* similar to 'snwcpy(3dam)' but formatting a phone number */

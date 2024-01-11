@@ -1,0 +1,117 @@
+/* mkbestaddr SUPPORT */
+/* lang=C++20 */
+
+/* get the "best" address out of an EMA type address specification */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1999-02-01, David A­D­ Morano
+	This code was part of another subroutine and I pulled it
+	out to make a subroutine that can be used in multiple places.
+
+*/
+
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Name:
+	mkbestaddr
+
+	Description:
+	This subroutine extracts the "best" address out of an
+	EMA-type of address specification (given in raw string
+	form).
+
+	Synopsis:
+	int mkbestaddr(char *rbuf,int rlen,cchar *sp,int sl) noex
+
+	Arguments:
+	rbuf		result buffer
+	rlen		result buffer length
+	sp		source string
+	sl		source string length
+
+	Returns:
+	>=0		length of resulting string
+	<0		error (system-return)
+
+*******************************************************************************/
+
+#include	<envstandards.h>
+#include	<sys/types.h>
+#include	<cstring>
+#include	<usystem.h>
+#include	<snwcpy.h>
+#include	<sfx.h>
+#include	<ema.h>
+#include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* local subroutines */
+
+
+/* exported subroutines */
+
+int mkbestaddr(char *rbuf,int rlen,cchar *abuf,int alen) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (rbuf && abuf) {
+	    ema		a ;
+	    rbuf[0] = '\0' ;
+	    if ((rs = ema_start(&a)) >= 0) {
+	        if ((rs = ema_parse(&a,abuf,alen)) >= 0) {
+	            ema_ent	*ep ;
+	            for (int i = 0 ; ema_get(&a,i,&ep) >= 0 ; i += 1) {
+	                if (ep) {
+	                    int		sl = 0 ;
+	                    cchar	*sp = NULL ;
+			    if (sl == 0) {
+	                        if ((ep->rp != NULL) && (ep->rl > 0)) {
+				    sp = ep->rp ;
+				    sl = ep->rl ;
+			        }
+			    }
+			    if (sl == 0) {
+	                        if ((ep->ap != NULL) && (ep->al > 0)) {
+				    sp = ep->ap ;
+				    sl = ep->al ;
+	                        }
+			    }
+	                    if (sl > 0) {
+			        int	al ;
+			        cchar	*ap ;
+			        if ((al = sfshrink(sp,sl,&ap)) > 0) {
+	                            rs = snwcpy(rbuf,rlen,ap,al) ;
+	                            len = rs ;
+			        }
+	                    }
+	                } /* end if (non-null) */
+		        if (len > 0) break ;
+		        if (rs < 0) break ;
+	            } /* end for */
+	        } /* end if (parse) */
+	        rs1 = ema_finish(&a) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (ema) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (mkbestaddr) */
+
+

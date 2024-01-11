@@ -1,10 +1,10 @@
-/* mkface */
+/* mkface SUPPORT */
+/* lang=C20 */
 
 /* retrieve the FACE information for this user */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* not-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -17,43 +17,41 @@
 
 /*******************************************************************************
 
-	This subroutine reads the FACE image for the calling user (if it is
-	available) and puts it into the given buffer.
+	Name:
+	mkface
+
+	Description:
+	This subroutine reads the FACE image for the calling user
+	(if it is available) and puts it into the given buffer.
 
 	Synopsis:
-
-	int mkface(pip,rbuf,rlen)
-	PROGINFO	*pip ;
-	char		*rbuf ;
-	int		rlen ;
+	int mkface(PROGINFO *pip,char *rbuf,int rlen) noex
 
 	Arguments:
-
 	pip		pointer to program information
 	rbuf		result buffer
 	rlen		length of result buffer
 
 	Returns:
-
 	>0		OK, got a face and returning length of result in buffer
 	==0		did *not* get a face
-	<0		error
-
+	<0		error (syhstem-error)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<bfile.h>
+#include	<sfx.h>
+#include	<mkpathx.h>
+#include	<isnot.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -68,12 +66,6 @@
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	iseol(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
 
 
 /* local structures */

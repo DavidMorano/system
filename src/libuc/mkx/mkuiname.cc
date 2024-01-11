@@ -77,6 +77,7 @@ int mkuiname(char *rbuf,int rlen,USERINFO *uip) noex {
 	    rbuf[0] = '\0' ;
 	    if (rlen >= 0) {
 		cchar	*np = nullptr ;
+		rs = SR_NOTFOUND ;
 	        if (uip->fullname && (uip->fullname[0] != '\0')) {
 	            np = uip->fullname ;
 	        } else if (uip->name && (uip->name[0] != '\0')) {

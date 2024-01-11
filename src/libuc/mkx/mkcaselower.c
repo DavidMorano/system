@@ -1,4 +1,4 @@
-/* mkcaselower */
+/* mkcaselower SUPPORT */
 /* lang=C20 */
 
 /* change the character case in a c-string to lower-case inplace */

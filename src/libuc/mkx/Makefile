@@ -55,7 +55,7 @@ INCS= mkx.h
 
 
 OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaltext.o
-OBJ01_MKX= mkaudit.o mkbangname.o mkbasename.o mkbestaddr.o
+OBJ01_MKX= mkaudit.o mkbasename.o mkbestaddr.o
 OBJ02_MKX= mkbestfrom.o mkcaselower.o mkcdpath.o mkcexsync.o
 OBJ03_MKX= mkchar.o mkcleanline.o
 OBJ04_MKX= mkdisphdr.o mkdisplayable.o

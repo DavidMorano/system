@@ -1,4 +1,4 @@
-/* mkmagic */
+/* mkmagic SUPPORT */
 /* lang=C20 */
 
 /* create a string with a (pretty much) standard magic string  */
@@ -23,6 +23,10 @@
 	Name:
 	mkmagic
 
+	Descrption:
+	This subroutine creates a magic-string that goes at the front
+	(usualy) of a file in order to identify it (its purpose).
+
 	Synopsis:
 	int mkmagic(char *rbuf,int rlen,cchar *ms) noex
 
@@ -32,8 +36,8 @@
 	ms		source string
 
 	Returns:
-	<0		error
 	>=0		length of resulting string
+	<0		error (system-return)
 
 *******************************************************************************/
 

@@ -175,7 +175,6 @@ int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && gf) {
 	    cchar	*cp{} ;
-	    rs = SR_NOTFOUND ;
 	    if ((rs = getgecosname(gf,-1,&cp)) >= 0) {
 		cint	cl = rs ;
 	        if constexpr (f_hyphen) {
@@ -198,6 +197,7 @@ int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
 	    cint	sch = CH_LPAREN ;
 	    cchar	*tp ;
 	    bool	f = true ;
+	    rs = SR_OK ;
 	    if (glen < 0) glen = strnlen(gbuf,MAXGECOSLEN) ;
 	    f = f && ((cp = strnchr(gbuf,glen,'-')) != np) ;
 	    f = f && ((tp = strnchr(cp,(glen - (cp - gbuf)),sch)) != np) ;

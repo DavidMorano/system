@@ -54,9 +54,18 @@
 #include	"sfx.h"
 
 
+/* local defines */
+
+
+/* external subroutines */
+
+
 /* forward references */
 
 static int	isnotours(int) noex ;
+
+
+/* local variables */
 
 
 /* exported subroutines */

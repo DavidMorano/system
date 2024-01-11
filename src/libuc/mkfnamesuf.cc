@@ -1,4 +1,4 @@
-/* mkfnamesuf */
+/* mkfnamesuf SUPPORT */
 /* lang=C++20 */
 
 /* make a file name from parts (one base and some suffixes) */

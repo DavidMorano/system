@@ -1,4 +1,4 @@
-/* mkcdpath */
+/* mkcdpath SUPPORT */
 /* lang=C++11 */
 
 /* try to make a prefix-variable path */

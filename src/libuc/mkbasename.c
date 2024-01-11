@@ -1,11 +1,9 @@
-/* mkbasename */
+/* mkbasename SUPPORT */
 
 /* make the filename for a shared library (shared object) */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time print-outs */
-
 
 /* revision history:
 

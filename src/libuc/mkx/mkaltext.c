@@ -1,4 +1,4 @@
-/* mkaltext */
+/* mkaltext SUPPORT */
 
 /* make a file-name w/ an alternate extension */
 

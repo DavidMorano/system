@@ -1,14 +1,13 @@
-/* ema */
+/* ema SUPPORT */
+/* lang=C++20 */
 
 /* E-Mail Address */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		0		/* safety? */
 #define	CF_ADDENT	1		/* enable 'ema_addent()' */
 #define	CF_COMPACT	0		/* compact address on storage */
 #define	CF_ALTCOMPACT	1		/* use alternative compacter */
-
 
 /* revision history:
 
@@ -21,28 +20,23 @@
 
 /*******************************************************************************
 
-	This is an email address handling module object.  It can parse out and
-	store hierarchically organized EMAs.
-
+	This is an email address handling module object.  It can
+	parse out and store hierarchically organized EMAs.
 
 *******************************************************************************/
 
-
-#define	EMA_MASTER	1
-
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<usupport.h>		/* for |memclear(3u)| */
+#include	<mallocstuff.h>
+#include	<strn.h>
 #include	<char.h>
 #include	<ascii.h>
-#include	<mallocstuff.h>
 #include	<localmisc.h>
 
 #include	"ema.h"
@@ -57,17 +51,22 @@
 #define	ADDRESSLEN	60		/* starting address length */
 
 #undef	N
-#define	N		NULL
+#define	N		nullptr
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef ema_ent		ent ;
+typedef ema_ent	*	entp ;
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -94,274 +93,234 @@ enum sis {
 
 /* forward references */
 
-int		ema_starter(EMA *,cchar *,int) ;
-int		ema_start(EMA *) ;
-int		ema_parse(EMA *,cchar *,int) ;
-int		ema_finish(EMA *) ;
+template<typename ... Args>
+static inline int ema_ctor(ema *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    op->n = 0 ;
+	    if ((op->elp = new(nothrow) vechand) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (memfile_ctor) */
 
-static int	ema_parseit(EMA *,ASS *) ;
-static int	ema_load(EMA *,cchar *,int,ASS *,EMA *) ;
+static inline int ema_dtor(ema *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (memfile_dtor) */
+
+template<typename ... Args>
+static int ema_magic(ema *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == EMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (ema_magic) */
+
+int		ema_starter(ema *,cchar *,int) noex ;
+int		ema_start(ema *) noex ;
+int		ema_parse(ema *,cchar *,int) noex ;
+int		ema_finish(ema *) noex ;
+
+static int	ema_parseit(ema *,ASS *) noex ;
+static int	ema_load(ema *,cchar *,int,ASS *,ema *) noex ;
 
 #if	CF_ADDENT
-static int	ema_addentone(EMA *,EMA_ENT *) ;
-static int	ema_addents(EMA *,EMA *) ;
+static int	ema_addentone(ema *,ema_ent *) noex ;
+static int	ema_addents(ema *,ema *) noex ;
 #endif
 
-#if	CF_DEBUGS
-static int	ema_debugprint(EMA *,cchar *) ;
-#endif
-
-static int	entry_start(EMA_ENT *) ;
-static int	entry_finish(EMA_ENT *) ;
+static int	entry_start(ema_ent *) noex ;
+static int	entry_finish(ema_ent *) noex ;
 
 #if	CF_ADDENT
-static int	entry_startload(EMA_ENT *,EMA_ENT *) ;
-#endif
-
-#if	CF_DEBUGS
-static int	entry_debugprint(EMA_ENT *,cchar *) ;
+static int	entry_startload(ema_ent *,ema_ent *) noex ;
 #endif
 
 #if	CF_COMPACT
-static int	malloccompactstr(cchar *,int,char **) ;
+static int	malloccompactstr(cchar *,int,char **) noex ;
 #endif
 
-static int	partsbegin(ASS *) ;
-static int	partslen(ASS *) ;
-static int	partsend(ASS *) ;
+static int	partsbegin(ASS *) noex ;
+static int	partslen(ASS *) noex ;
+static int	partsend(ASS *) noex ;
 
-static int	ass_start(ASS *) ;
-static int	ass_add(ASS *,int) ;
-static int	ass_get(ASS *) ;
-static int	ass_getprev(ASS *) ;
-static int	ass_adv(ASS *) ;
-static int	ass_skipwhite(ASS *) ;
-static int	ass_backwhite(ASS *) ;
-static int	ass_len(ASS *) ;
-static int	ass_finish(ASS *) ;
+static int	ass_start(ASS *) noex ;
+static int	ass_add(ASS *,int) noex ;
+static int	ass_get(ASS *) noex ;
+static int	ass_getprev(ASS *) noex ;
+static int	ass_adv(ASS *) noex ;
+static int	ass_skipwhite(ASS *) noex ;
+static int	ass_backwhite(ASS *) noex ;
+static int	ass_len(ASS *) noex ;
+static int	ass_finish(ASS *) noex ;
 
 
 /* local variables */
 
-#if	CF_DEBUGS
-static cchar	*statename[] = {
-	"A",
-	"R",
-	"C",
-	NULL
-} ;
-#endif /* CF_DEBUGS */
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int ema_starter(EMA *hp,cchar *sp,int sl)
-{
+int ema_starter(ema *hp,cchar *sp,int sl) noex {
 	int		rs ;
-
-	if ((rs = ema_start(hp)) >= 0) {
-	    rs = ema_parse(hp,sp,sl) ;
-	    if (rs < 0)
-	        ema_finish(hp) ;
-	} /* end if (ema_start) */
-
+	if ((rs = ema_ctor(hp,sp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	        if ((rs = ema_start(hp)) >= 0) {
+	            rs = ema_parse(hp,sp,sl) ;
+	            if (rs < 0) {
+	                ema_finish(hp) ;
+	            }
+	        } /* end if (ema_start) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		ema_dtor(hp) ;
+	    }
+	} /* end if (ema_ctor) */
 	return rs ;
 }
 /* end subroutine (ema_starter) */
 
-
-int ema_start(EMA *hp)
-{
-	const int	ne = EMADEFENTS ;
+int ema_start(ema *hp) noex {
 	int		rs ;
-
-	if (hp == NULL) return SR_FAULT ;
-
-#ifdef	OPTIONAL
-	memset(hp,0,sizeof(EMA)) ;
-#endif
-
-	hp->magic = 0 ;
-	hp->n = 0 ;
-	if ((rs = vechand_start(&hp->list,ne,0)) >= 0) {
-	    hp->magic = EMA_MAGIC ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("ema_start: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = ema_ctor(hp)) >= 0) {
+	    cint	ne = EMADEFENTS ;
+	    memclear(hp) ;
+	    if ((rs = vechand_start(hp->elp,ne,0)) >= 0) {
+	        hp->magic = EMA_MAGIC ;
+	    }
+	} /* end if (ema_ctor) */
 	return rs ;
 }
 /* end subroutine (ema_start) */
 
-
-/* free up this EMA object */
-int ema_finish(EMA *hp)
-{
-	EMA_ENT		*ep ;
-	int		rs = SR_OK ;
+int ema_finish(ema *hp) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-
-	if (hp == NULL) return SR_FAULT ;
-
-	if (hp->magic != EMA_MAGIC) return SR_NOTOPEN ;
-
-	hp->n = -1 ;
-	for (i = 0 ; vechand_get(&hp->list,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-
-	        rs1 = entry_finish(ep) ;
+	if ((rs = ema_magic(hp)) >= 0) {
+	    hp->n = -1 ;
+	    void	*vp{} ;
+	    for (int i = 0 ; vechand_get(hp->elp,i,&vp) >= 0 ; i += 1) {
+	        if (vp) {
+		    ema_ent		*ep = entp(vp) ;;
+		    {
+	                rs1 = entry_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+	                rs1 = uc_free(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+	        } /* end if (non-null) */
+	    } /* end for */
+	    {
+	        rs1 = vechand_finish(hp->elp) ;
 	        if (rs >= 0) rs = rs1 ;
-
-#ifdef	COMMENT
-	        if (hp->n > 0) hp->n -= 1 ;
-#endif
-	        rs1 = uc_free(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-
 	    }
-	} /* end for */
-
-	rs1 = vechand_finish(&hp->list) ;
-	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("ema_finish: ret rs=%d\n",rs) ;
-#endif
-
-	hp->magic = 0 ;
+	    {
+	        rs1 = ema_dtor(hp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    hp->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ema_finish) */
 
-
-/* parse out EMAs from a hostile environment */
-int ema_parse(EMA *hp,cchar *sp,int sl)
-{
-	ASS		desc ;
-	int		rs = SR_OK ;
-
-	if (hp == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	if (hp->magic != EMA_MAGIC) return SR_NOTOPEN ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("ema_parse: ent o=>%t<\n",sp,sl) ;
-#endif
-
-	desc.sp = (char *) sp ;
-	desc.sl = sl ;
-	if ((rs = ema_parseit(hp,&desc)) > 0) {
-	    hp->n += rs ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("ema_parse: ret rs=%d\n",rs) ;
-#endif
-
+int ema_parse(ema *hp,cchar *sp,int sl) noex {
+	int		rs ;
+	if ((rs = ema_magic(hp,sp)) >= 0) {
+	    ASS		desc ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    desc.sp = (char *) sp ;
+	    desc.sl = sl ;
+	    if ((rs = ema_parseit(hp,&desc)) > 0) {
+	        hp->n += rs ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ema_parse) */
 
-
 #if	CF_ADDENT
 /* whew! this is not easy to implement (like any of this was)! */
-int ema_addent(EMA *op,EMA_ENT *ep)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
-
-	if (op->magic != EMA_MAGIC) return SR_NOTOPEN ;
-
-	rs = ema_addentone(op,ep) ;
-
+int ema_addent(ema *op,ema_ent *ep) noex {
+	int		rs ;
+	if ((rs = ema_magic(op)) >= 0) {
+	    rs = ema_addentone(op,ep) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ema_addent) */
 #endif /* CF_ADDENT */
 
-
-/* get the EMA under the current cursor */
-int ema_get(EMA *hp,int i,EMA_ENT **epp)
-{
+/* get the ema under the current cursor */
+int ema_get(ema *hp,int i,ema_ent **epp) noex {
 	int		rs ;
-
-	if (hp == NULL) return SR_FAULT ;
-	if (epp == NULL) return SR_FAULT ;
-
-	if (hp->magic != EMA_MAGIC) return SR_NOTOPEN ;
-
-	rs = vechand_get(&hp->list,i,epp) ;
-
-#if	CF_DEBUGS
-	debugprintf("ema_get: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = ema_magic(hp,epp)) >= 0) {
+	    void	*vp{} ;
+	    if ((rs = vechand_get(hp->elp,i,&vp)) >= 0) {
+	        *epp = entp(vp) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (ema_get) */
 
-
-int ema_getbestaddr(EMA *hp,int i,cchar **rpp)
-{
-	EMA_ENT		*ep ;
+int ema_getbestaddr(ema *hp,int i,cchar **rpp) noex {
 	int		rs ;
 	int		rl = 0 ;
-	cchar		*rp = NULL ;
-
-	if (hp == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
-
-	if (hp->magic != EMA_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = vechand_get(&hp->list,i,&ep)) >= 0) {
-	    if (ep != NULL) {
-	    	if ((rl == 0) && (ep->rp != NULL) && (ep->rl > 0)) {
-		    rp = ep->rp ;
-		    rl = ep->rl ;
-		}
-	    	if ((rl == 0) && (ep->ap != NULL) && (ep->al > 0)) {
-		    rp = ep->ap ;
-		    rl = ep->al ;
-		}
+	if ((rs = ema_magic(hp)) >= 0) {
+	    cchar	*rp = nullptr ;
+	    void	*vp{} ;
+	    if ((rs = vechand_get(hp->elp,i,&vp)) >= 0) {
+	        if (vp) {
+		    ema_ent		*ep = entp(vp) ;
+	    	    if ((rl == 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
+		        rp = ep->rp ;
+		        rl = ep->rl ;
+		    }
+	    	    if ((rl == 0) && (ep->ap != nullptr) && (ep->al > 0)) {
+		        rp = ep->ap ;
+		        rl = ep->al ;
+		    }
+	        } /* end if (non-null) */
+	    } /* end if (get) */
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? rp : nullptr ;
 	    }
-	} /* end if (get) */
-
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? rp : NULL ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("ema_getbestaddr: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
-
+	} /* end if (magic) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (ema_getbestaddr) */
 
-
 /* return the number of EMAs we have so far */
-int ema_count(EMA *hp)
-{
+int ema_count(ema *hp) noex {
 	int		rs ;
 
-	if (hp == NULL) return SR_FAULT ;
+	if (hp == nullptr) return SR_FAULT ;
 
 	if (hp->magic != EMA_MAGIC) return SR_NOTOPEN ;
 
-	rs = vechand_count(&hp->list) ;
-
-#if	CF_DEBUGS
-	debugprintf("ema_count: ret rs=%d\n",rs) ;
-#endif
+	rs = vechand_count(hp->elp) ;
 
 	return rs ;
 }
@@ -370,12 +329,10 @@ int ema_count(EMA *hp)
 
 /* private subroutines */
 
-
 /* this subroutine parses out EMAs recursively */
-static int ema_parseit(EMA *hp,ASS *bp)
-{
+static int ema_parseit(ema *hp,ASS *bp) noex {
 	ASS		as[si_overlast] ;
-	EMA		*nlp = NULL ;
+	EMA		*nlp = nullptr ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		sl, olen ;
@@ -387,11 +344,6 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	int		f_quote = FALSE ;
 	int		f_exit = FALSE ;
 	cchar		*orig ;
-
-#if	CF_DEBUGS
-	debugprintf("ema_parseit: ent len=%d\n",bp->sl) ;
-	debugprintf("ema_parseit: orig=>%t<\n",bp->sp,bp->sl) ;
-#endif /* CF_DEBUGS */
 
 /* skip over any leading white space */
 
@@ -406,12 +358,6 @@ static int ema_parseit(EMA *hp,ASS *bp)
 
 	state = si_address ;
 	while ((! f_exit) && ((ch = ass_get(bp)) >= 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("ema_parseit: C='%c' S=%s P=%s cl=%d q=%d\n",
-	        ch,statename[state],
-	        statename[pstate],c_comment,f_quote) ;
-#endif
 
 	    switch (ch) {
 
@@ -511,7 +457,7 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	                }
 	                if (rs < 0) {
 	                    uc_free(nlp) ;
-	                    nlp = NULL ;
+	                    nlp = nullptr ;
 	                }
 	            } /* end if (allocation) */
 	        } else {
@@ -540,21 +486,15 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	                n += 1 ;
 	                rs = ema_load(hp,orig,olen,as,nlp) ;
 	            }
-#if	CF_DEBUGS
-	            ema_debugprint(hp,"1") ;
-#endif
 	            partsend(as) ;
 	            if (rs >= 0) {
-	                nlp = NULL ;
+	                nlp = nullptr ;
 	                partsbegin(as) ;
 	                ass_adv(bp) ;
 	                ass_skipwhite(bp) ;
 	                orig = bp->sp ;
 	                state = si_address ;
 	            } /* end if */
-#if	CF_DEBUGS
-	            ema_debugprint(hp,"2") ;
-#endif
 	        } else {
 	            ass_add((as + state),ch) ;
 	            ass_adv(bp) ;
@@ -569,52 +509,22 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	    case '\t':
 	    case ' ':
 	    case MKCHAR(CH_NBSP):
-#if	CF_DEBUGS
-	        debugprintf("ema_parseit: LWSP\n") ;
-#endif
 	        if (! f_quote) {
-#if	CF_DEBUGS
-	            debugprintf("ema_parseit: no-quote\n") ;
-#endif
 	            if (c_comment == 0) {
-#if	CF_DEBUGS
-	                debugprintf("ema_parseit: no-comment\n") ;
-#endif
 	                int	ai = state ;
 	                if ((state == si_route) || (state == si_address)) {
-#if	CF_DEBUGS
-	                    debugprintf("ema_parseit: state={A|R}\n") ;
-#endif
 	                    ass_adv(bp) ;
 	                    break ;
 	                } else if ((as[ai].sl == 0) ||
 	                    (as[ai].sp[as[ai].sl-1] == ' ')) {
-#if	CF_DEBUGS
-	                    debugprintf("ema_parseit: special\n") ;
-#endif
 	                    ch = 0 ;
 	                    ass_adv(bp) ;
 	                    break ;
 	                } /* end if */
 	            } else {
-#if	CF_DEBUGS
-	                debugprintf("ema_parseit: comment=%u\n",
-	                    c_comment) ;
-#endif
 	                sl = ass_len(as+si_comment) ;
-#if	CF_DEBUGS
-	                {
-	                    const int pch = ass_getprev(as+si_comment) ;
-	                    debugprintf("ema_parseit: "
-	                        "sl=%u pch=>%c<(\\x%02x)\n",
-	                        sl,pch,pch) ;
-	                }
-#endif /* CF_DEBUGS */
 	                if ((sl == 0) || 
 	                    (CHAR_ISWHITE(ass_getprev(as+si_comment)))) {
-#if	CF_DEBUGS
-	                    debugprintf("ema_parseit: skip\n") ;
-#endif
 	                    ch = 0 ;
 	                    ass_adv(bp) ;
 	                    break ;
@@ -624,10 +534,6 @@ static int ema_parseit(EMA *hp,ASS *bp)
 
 /* FALLTHROUGH */
 	    default:
-#if	CF_DEBUGS
-	        debugprintf("ema_parseit: default state=%u ch=>%c<\n",
-	            state,ch) ;
-#endif
 	        if (ch > 0) {
 	            if (c_comment) {
 	                ass_add((as + si_comment),ch) ;
@@ -639,17 +545,8 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	        break ;
 
 	    } /* end switch */
-
-#if	CF_DEBUGS
-	    debugprintf("ema_parseit: switch-end rs=%d state=%u\n",rs,state) ;
-#endif
-
 	    if (rs < 0) break ;
 	} /* end while */
-
-#if	CF_DEBUGS
-	debugprintf("ema_parseit: while-end rs=%d\n",rs) ;
-#endif
 
 #ifdef	COMMENT /* not needed here */
 	if (rs >= 0) {
@@ -665,44 +562,19 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	    olen = (bp->sp - orig) ;
 	}
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    debugprintf("ema_parseit: finishing\n") ;
-	    debugprintf("ema_parseit: comment=>%t<\n",
-	        as[si_comment].sp,as[si_comment].sl) ;
-	    for (i = 0 ; i < as[si_comment].sl ; i += 1) {
-	        debugprintf("ema_parseit: comment ch=>%c<\n",
-	            as[si_comment].sp[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
 	if (rs >= 0) {
 	    if ((olen > 0) && (partslen(as) > 0)) {
 
-#if	CF_DEBUGS
-	        debugprintf("ema_parseit: doing the last one\n") ;
-	        debugprintf("ema_parseit: address=>%t<\n",
-	            as[si_address].sp,as[si_address].sl) ;
-	        debugprintf("ema_parseit: route=>%t<\n",
-	            as[si_route].sp,as[si_route].sl) ;
-#endif /* CF_DEBUGS */
-
 	        n += 1 ;
 	        rs = ema_load(hp,orig,olen,as,nlp) ;
-	        nlp = NULL ;
-
-#if	CF_DEBUGS
-	        ema_debugprint(hp,"after") ;
-#endif
+	        nlp = nullptr ;
 
 	    } else {
 
-	        if (nlp != NULL) {
+	        if (nlp != nullptr) {
 	            ema_finish(nlp) ;
 	            uc_free(nlp) ;
-	            nlp = NULL ;
+	            nlp = nullptr ;
 	        }
 
 	    } /* end if */
@@ -710,7 +582,7 @@ static int ema_parseit(EMA *hp,ASS *bp)
 	} /* end if */
 
 	if (rs < 0) {
-	    if (nlp != NULL) {
+	    if (nlp != nullptr) {
 	        ema_finish(nlp) ;
 	        uc_free(nlp) ;
 	    }
@@ -720,37 +592,18 @@ static int ema_parseit(EMA *hp,ASS *bp)
 
 	hp->n += n ;
 
-#if	CF_DEBUGS
-	ema_debugprint(hp,"ret") ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("ema_parseit: ret rs=%d n=%u\n",rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (ema_parseit) */
 
-
-static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
-{
-	EMA_ENT		*ep = NULL ;
+static int ema_load(ema *hp,cchar *orig,int olen,ASS *as,ema *nlp) noex {
+	ema_ent		*ep = nullptr ;
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("ema_load: ent olen=%d orig=>%t<\n",olen,orig,olen) ;
-#endif
-
-	if (olen < 0)
-	    olen = strlen(orig) ;
-
-#if	CF_DEBUGS
-	debugprintf("ema_load: mod olen=%d\n",olen) ;
-#endif
+	if (olen < 0) olen = strlen(orig) ;
 
 	if (olen > 0) {
-	    const int	size = sizeof(EMA_ENT) ;
+	    cint	size = sizeof(ema_ent) ;
 	if ((rs = uc_malloc(size,&ep)) >= 0) {
 	    if ((rs = entry_start(ep)) >= 0) {
 	        int	i ;
@@ -759,16 +612,7 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 	        cchar	*cp ;
 	        for (i = 0 ; (rs >= 0) && (i < si_overlast) ; i += 1) {
 
-#if	CF_DEBUGS
-	            debugprintf("ema_load: i=%d\n",i) ;
-#endif
-
-	            if ((as[i].sp != NULL) && (as[i].sp[0] != '\0')) {
-
-#if	CF_DEBUGS
-	                debugprintf("ema_load: i=%u l=%d >%s<\n",
-	                    i,as[i].sl,as[i].sp) ;
-#endif
+	            if ((as[i].sp != nullptr) && (as[i].sp[0] != '\0')) {
 
 	                sp = as[i].sp ;
 	                sl = as[i].sl ;
@@ -777,14 +621,8 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 	                switch (i) {
 
 	                case si_address:
-#if	CF_DEBUGS
-	                    debugprintf("ema_load: address=>%t<\n",sp,sl) ;
-#endif
 	                    if ((sl >= 1) &&
 	                        ((sp[0] == '~') || (sp[0] == '_'))) {
-#if	CF_DEBUGS
-	                        debugprintf("ema_load: PCS list\n") ;
-#endif
 	                        sp += 1 ;
 	                        sl -= 1 ;
 	                        ep->type = ematype_pcs ;
@@ -796,9 +634,6 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 	                    break ;
 
 	                case si_route:
-#if	CF_DEBUGS
-	                    debugprintf("ema_load: route=>%t<\n",sp,sl) ;
-#endif
 	                    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	                        ep->rp = cp ;
 	                        ep->rl = sl ;
@@ -806,9 +641,6 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 	                    break ;
 
 	                case si_comment:
-#if	CF_DEBUGS
-	                    debugprintf("ema_load: comment=>%t<\n",sp,sl) ;
-#endif
 	                    if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	                        ep->cp = cp ;
 	                        ep->cl = sl ;
@@ -817,22 +649,9 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 
 	                } /* end switch */
 
-#if	CF_DEBUGS
-	                {
-	                    debugprintf("ema_load: i=%u rs=%d len=%d\n",
-	                        i,rs,sl) ;
-	                    if (sl >= 0)
-	                        debugprintf("ema_load: c=>%t<\n",cp,sl) ;
-	                }
-#endif /* CF_DEBUGS */
-
 	            } /* end if */
 
 	        } /* end for */
-
-#if	CF_DEBUGS
-	        debugprintf("ema_load: mid rs=%d\n",rs) ;
-#endif
 
 	        if ((rs >= 0) && (olen > 0)) {
 	            while ((olen > 0) && CHAR_ISWHITE(orig[olen-1])) {
@@ -842,27 +661,15 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 	                ep->op = cp ;
 	                ep->ol = olen ;
 	            }
-#if	CF_DEBUGS
-	            debugprintf("ema_load: original=>%s<\n",ep->op) ;
-#endif
 	        } /* end if */
 
-#if	CF_DEBUGS
-	        debugprintf("ema_load: far rs=%d\n",rs) ;
-#endif
-
-	        if ((rs >= 0) && (nlp != NULL)) {
+	        if ((rs >= 0) && (nlp != nullptr)) {
 	            ep->listp = nlp ;
 	            ep->type = ematype_group ;
 	        }
-#if	CF_DEBUGS
-	        debugprintf("ema_load: loading entry into list\n") ;
-	        entry_debugprint(ep,"before_load") ;
-#endif
-
 	        if (rs >= 0) {
-	            if ((rs = vechand_add(&hp->list,ep)) >= 0) {
-	                ep = NULL ;
+	            if ((rs = vechand_add(hp->elp,ep)) >= 0) {
+	                ep = nullptr ;
 	                hp->n += 1 ;
 	            }
 	        }
@@ -874,28 +681,19 @@ static int ema_load(EMA *hp,cchar *orig,int olen,ASS *as,EMA *nlp)
 	} /* end if (memory-allocation) */
 	} /* end if (positive) */
 
-#if	CF_DEBUGS
-	if ((rs >= 0) && (ep != NULL))
-	    entry_debugprint(ep,"ret") ;
-	debugprintf("ema_load: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (ema_load) */
 
-
 #if	CF_ADDENT
-
-static int ema_addentone(EMA *op,EMA_ENT *ep)
-{
-	EMA_ENT		*nep ;
-	const int	size = sizeof(EMA_ENT) ;
+static int ema_addentone(ema *op,ema_ent *ep) noex {
+	ema_ent		*nep ;
+	cint		size = sizeof(ema_ent) ;
 	int		rs ;
 
 	if ((rs = uc_malloc(size,&nep)) >= 0) {
 	    if ((rs = entry_startload(nep,ep)) >= 0) {
-	        if ((rs = vechand_add(&op->list,nep)) >= 0) {
+	        if ((rs = vechand_add(op->elp,nep)) >= 0) {
 	            op->n += 1 ;
 	        }
 	        if (rs < 0)
@@ -909,96 +707,86 @@ static int ema_addentone(EMA *op,EMA_ENT *ep)
 }
 /* end subroutine (ema_addentone) */
 
-
-static int ema_addents(EMA *op,EMA *oop)
-{
-	EMA_ENT		*oep ;
+static int ema_addents(ema *op,ema *oop) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	for (i = 0 ; vechand_get(&oop->list,i,&oep) >= 0 ; i += 1) {
+	void		*vp{} ;
+	for (int i = 0 ; vechand_get(oop->elp,i,&vp) >= 0 ; i += 1) {
+	    ema_ent	*oep = entp(vp) ;
 	    rs = ema_addentone(op,oep) ;
 	    if (rs < 0) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (ema_addents) */
 
 #endif /* CF_ADDENT */
 
-
-#if	CF_DEBUGS
-static int ema_debugprint(EMA *hp,cchar *s)
-{
-	EMA_ENT		*ep ;
-	int		i ;
-	if (s != NULL)
+#ifdef	COMMENT
+static int ema_debugprint(ema *hp,cchar *s) noex {
+	if (s != nullptr)
 	    debugprintf("ema_debugprint: s=%s\n",s) ;
 	debugprintf("ema_debugprint: n=%u\n",hp->n) ;
-	for (i = 0 ; vechand_get(&hp->list,i,&ep) >= 0 ; i += 1) {
-	    if (ep == NULL) continue ;
-	    entry_debugprint(ep,s) ;
+	void		*vp{} ;
+	for (int i = 0 ; vechand_get(hp->elp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		ema_ent		*ep = entp(vp) ;;
+	        entry_debugprint(ep,s) ;
+	    }
 	} /* end for */
 	return SR_OK ;
 }
 /* end subroutine (ema_debugprint) */
-#endif /* CF_DEBUGS */
+#endif /* COMMENT */
 
-
-static int entry_start(EMA_ENT *ep)
-{
-
-	memset(ep,0,sizeof(EMA_ENT)) ;
+static int entry_start(ema_ent *ep) noex {
+	memset(ep,0,sizeof(ema_ent)) ;
 	ep->type = ematype_reg ;
 	return SR_OK ;
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_finish(EMA_ENT *ep)
-{
+static int entry_finish(ema_ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 #endif
 
-	if (ep->op != NULL) {
+	if (ep->op != nullptr) {
 	    rs1 = uc_free(ep->op) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->op = NULL ;
+	    ep->op = nullptr ;
 	}
 
-	if (ep->ap != NULL) {
+	if (ep->ap != nullptr) {
 	    rs1 = uc_free(ep->ap) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->ap = NULL ;
+	    ep->ap = nullptr ;
 	}
 
-	if (ep->rp != NULL) {
+	if (ep->rp != nullptr) {
 	    rs1 = uc_free(ep->rp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->rp = NULL ;
+	    ep->rp = nullptr ;
 	}
 
-	if (ep->cp != NULL) {
+	if (ep->cp != nullptr) {
 	    rs1 = uc_free(ep->cp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->cp = NULL ;
+	    ep->cp = nullptr ;
 	}
 
-	if (ep->listp != NULL) {
+	if (ep->listp != nullptr) {
 	    rs1 = ema_finish(ep->listp) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(ep->listp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->listp = NULL ;
+	    ep->listp = nullptr ;
 	} /* end if (recursive free-up) */
 
 #ifdef	OPTIONAL
-	memset(ep,0,sizeof(EMA_ENT)) ;
+	memset(ep,0,sizeof(ema_ent)) ;
 #endif
 
 	return rs ;
@@ -1008,27 +796,26 @@ static int entry_finish(EMA_ENT *ep)
 
 #if	CF_ADDENT
 
-static int entry_startload(EMA_ENT *ep,EMA_ENT *oep)
-{
+static int entry_startload(ema_ent *ep,ema_ent *oep) noex {
 	int		rs = SR_OK ;
 
 	*ep = *oep ;
-	if (oep->op != NULL)
+	if (oep->op != nullptr)
 	    ep->op = mallocstrw(oep->op,oep->ol) ;
 
-	if (oep->ap != NULL)
+	if (oep->ap != nullptr)
 	    ep->ap = mallocstrw(oep->ap,oep->al) ;
 
-	if (oep->rp != NULL)
+	if (oep->rp != nullptr)
 	    ep->rp = mallocstrw(oep->rp,oep->rl) ;
 
-	if (oep->cp != NULL)
+	if (oep->cp != nullptr)
 	    ep->cp = mallocstrw(oep->cp,oep->cl) ;
 
-	if (oep->listp != NULL) {
-	    EMA		*nop = NULL ; /* LINT assignment */
+	if (oep->listp != nullptr) {
+	    EMA		*nop = nullptr ; /* LINT assignment */
 	    const int	size = sizeof(EMA) ;
-	    ep->listp = NULL ;
+	    ep->listp = nullptr ;
 	    if ((rs = uc_malloc(size,&nop)) >= 0) {
 	        if ((rs = ema_start(nop)) >= 0) {
 	            if ((rs = ema_addents(nop,oep->listp)) >= 0) {
@@ -1040,7 +827,7 @@ static int entry_startload(EMA_ENT *ep,EMA_ENT *oep)
 	        if (rs < 0)
 	            uc_free(nop) ;
 	    } /* end if (allocation) */
-	} /* end if (non-NULL) */
+	} /* end if (non-nullptr) */
 
 	if (rs < 0)
 	    entry_finish(ep) ;
@@ -1051,14 +838,10 @@ static int entry_startload(EMA_ENT *ep,EMA_ENT *oep)
 
 #endif /* CF_ADDENT */
 
-
-#if	CF_DEBUGS
-static int entry_debugprint(EMA_ENT *ep,cchar *s)
-{
-#if	CF_SAFE
-	if (ep == NULL) return SR_FAULT ;
-#endif
-	if (s != NULL)
+#if	COMMENT
+static int entry_debugprint(ema_ent *ep,cchar *s) noex {
+	if (ep == nullptr) return SR_FAULT ;
+	if (s != nullptr)
 	    debugprintf("entry_debugprint: s=%s\n",s) ;
 	debugprintf("entry_debugprint: type=%u\n",ep->type) ;
 	if (ep->op)
@@ -1076,15 +859,13 @@ static int entry_debugprint(EMA_ENT *ep,cchar *s)
 	return SR_OK ;
 }
 /* end subroutine (entry_debugprint) */
-#endif /* CF_DEBUGS */
-
+#endif /* COMMENT */
 
 #if	CF_COMPACT
 
 #if	CF_ALTCOMPACT
 
-static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
-{
+static int malloccompactstr(cchar *sbuf,int sl,char **rpp) noex {
 	int		rs ;
 	int		size ;
 	int		len = 0 ;
@@ -1127,7 +908,7 @@ static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
 
 	} /* end if (memory-allocation) */
 
-	*rpp = (rs >= 0) ? buf : NULL ;
+	*rpp = (rs >= 0) ? buf : nullptr ;
 
 	return (rs >= 0) ? len : rs ;
 }
@@ -1135,8 +916,7 @@ static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
 
 #else /* CF_ALTCOMPACT */
 
-static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
-{
+static int malloccompactstr(cchar *sbuf,int sl,char **rpp) noex {
 	ASS		s ;
 	int		rs = SR_OK ;
 	int		ch ;
@@ -1149,15 +929,7 @@ static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
 	if (sl < 0)
 	    sl = strlen(sbuf) ;
 
-#if	CF_DEBUGS
-	debugprintf("malloccompactstr: ent >%t<\n",buf,buflen) ;
-#endif
-
 	while ((rs >= 0) && (sl > 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("malloccompactstr: switch >%c<\n",(*sp & 0xFF)) ;
-#endif
 
 	    ch = (*sp & 0xff) ;
 	    switch (ch) {
@@ -1166,9 +938,6 @@ static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
 /* FALLTHROUGH */
 	    default:
 	        if (f_quote || (! CHAR_ISWHITE(ch))) {
-#if	CF_DEBUGS
-	            debugprintf("malloccompactstr: adding >%c<\n",ch) ;
-#endif
 	            rs = ass_add(&s,ch) ;
 	        }
 	        break ;
@@ -1180,8 +949,8 @@ static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
 	} /* end while */
 	len = s.sl ;
 
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? mallocstrw(s.sp,s.sl) : NULL ;
+	if (rpp != nullptr) {
+	    *rpp = (rs >= 0) ? mallocstrw(s.sp,s.sl) : nullptr ;
 	}
 
 	ass_finish(&s) ;
@@ -1194,16 +963,13 @@ static int malloccompactstr(cchar *sbuf,int sl,char **rpp)
 
 #endif /* CF_COMPACT */
 
-
-static int partsbegin(ASS *asp)
-{
-	int		i ;
+static int partsbegin(ASS *asp) noex {
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
-	for (i = 0 ; i < si_overlast ; i += 1) {
+	for (int i = 0 ; i < si_overlast ; i += 1) {
 	    ass_start(asp + i) ;
 	}
 
@@ -1211,19 +977,16 @@ static int partsbegin(ASS *asp)
 }
 /* end subroutine (partsbegin) */
 
-
 /* calculate the combined length of the all of the subparts */
-static int partslen(ASS *asp)
-{
+static int partslen(ASS *asp) noex {
 	int		rs1 ;
-	int		i ;
 	int		len = 0 ;
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
-	for (i = 0 ; i < si_overlast ; i += 1) {
+	for (int i = 0 ; i < si_overlast ; i += 1) {
 	    ass_backwhite(asp+i) ;
 	    rs1 = ass_len(asp+i) ;
 	    if (rs1 >= 0) len += rs1 ;
@@ -1233,18 +996,15 @@ static int partslen(ASS *asp)
 }
 /* end subroutine (partslen) */
 
-
-static int partsend(ASS *asp)
-{
+static int partsend(ASS *asp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
-	for (i = 0 ; i < si_overlast ; i += 1) {
+	for (int i = 0 ; i < si_overlast ; i += 1) {
 	    rs1 = ass_finish(asp + i) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1253,35 +1013,31 @@ static int partsend(ASS *asp)
 }
 /* end subroutine (partsend) */
 
-
-static int ass_start(ASS *asp)
-{
+static int ass_start(ASS *asp) noex {
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
-	asp->sp = NULL ;
+	asp->sp = nullptr ;
 	asp->sl = 0 ;
 	asp->e = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (ass_start) */
 
-
-static int ass_finish(ASS *asp)
-{
+static int ass_finish(ASS *asp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
-	if (asp->sp != NULL) {
+	if (asp->sp != nullptr) {
 	    rs1 = uc_free(asp->sp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    asp->sp = NULL ;
+	    asp->sp = nullptr ;
 	}
 
 	asp->sl = 0 ;
@@ -1290,19 +1046,17 @@ static int ass_finish(ASS *asp)
 }
 /* end subroutine (ass_finish) */
 
-
-static int ass_add(ASS *asp,int ch)
-{
+static int ass_add(ASS *asp,int ch) noex {
 	int		rs = SR_OK ;
 	int		ne ;
 	int		len = 0 ;
 	char		*p ;
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
-	if (asp->sp == NULL) {
+	if (asp->sp == nullptr) {
 	    asp->sl = 0 ;
 	    ne = ADDRESSLEN ;
 	    if ((rs = uc_malloc((ne + 1),&p)) >= 0) {
@@ -1329,9 +1083,7 @@ static int ass_add(ASS *asp,int ch)
 }
 /* end subroutine (ass_add) */
 
-
-static int ass_get(ASS *asp)
-{
+static int ass_get(ASS *asp) noex {
 	int		rs = SR_OK ;
 	int		ch ;
 
@@ -1344,9 +1096,7 @@ static int ass_get(ASS *asp)
 }
 /* end subroutine (ass_get) */
 
-
-static int ass_getprev(ASS *asp)
-{
+static int ass_getprev(ASS *asp) noex {
 	int		rs = SR_OK ;
 	int		ch ;
 
@@ -1359,15 +1109,13 @@ static int ass_getprev(ASS *asp)
 }
 /* end subroutine (ass_getprev) */
 
-
 /* advance one character forward in the string */
-static int ass_adv(ASS *asp)
-{
+static int ass_adv(ASS *asp) noex {
 	int		rs = SR_OK ;
 	int		ch ;
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
 	if (asp->sl > 0) {
@@ -1383,26 +1131,22 @@ static int ass_adv(ASS *asp)
 }
 /* end subroutine (ass_adv) */
 
-
-static int ass_len(ASS *asp)
-{
+static int ass_len(ASS *asp) noex {
 
 #if	CF_SAFE
-	if (asp == NULL) return SR_FAULT ;
+	if (asp == nullptr) return SR_FAULT ;
 #endif
 
 	return asp->sl ;
 }
 /* end subroutine (ass_len) */
 
-
 /* this is not really a method of 'ass', this subroutine breaks the object */
-static int ass_skipwhite(ASS *asp)
-{
+static int ass_skipwhite(ASS *asp) noex {
 	int		i = 0 ;
 
 #if	CF_SAFE
-	if (asp->sp == NULL) return SR_FAULT ;
+	if (asp->sp == nullptr) return SR_FAULT ;
 #endif
 
 	while ((asp->sl != 0) && CHAR_ISWHITE(*(asp->sp))) {
@@ -1415,9 +1159,7 @@ static int ass_skipwhite(ASS *asp)
 }
 /* end subroutine (ass_skipwhite) */
 
-
-static int ass_backwhite(ASS *asp)
-{
+static int ass_backwhite(ASS *asp) noex {
 	int		f = FALSE ;
 	while (asp->sl > 0) {
 	    int	lch = asp->sp[asp->sl-1] ;

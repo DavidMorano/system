@@ -1,22 +1,22 @@
-/* mkmailbox */
+/* mkmailbox SUPPORT */
+/* lang=C20 */
 
 /* make a mailbox file */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_DEBUG	0		/* run-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1994-01-23, David A­D­ Morano
-        This module was copied and modified from the VMAIL original. A variety
-        of enhancements were made to prevent it from crashing due to short
-        buffers. No checks were being made about whether a copy into a buffer
-        was overflowing! Yes, this was one of the causes of the spread of the
-        1988 Internet worm. Of course, nobody likes a program that crashes
-        either (including myself). It was the crashing of this (and other)
-        programs that lead me to fix this crap up in the first place!
+	This subroutine was copied and modified from the VMAIL
+	original.  A variety of enhancements were made to prevent
+	it from crashing due to short buffers. No checks were being
+	made about whether a copy into a buffer was overflowing!
+	Yes, this was one of the causes of the spread of the 1988
+	Internet worm. Of course, nobody likes a program that crashes
+	either (including myself). It was the crashing of this (and
+	other) programs that lead me to fix this crap up in the
+	first place!
 
 	= 1996-06-18, David A­D­ Morano
 	I did:
@@ -32,10 +32,11 @@
 		- added full binary compatibility for new mail
 
 	= 2007-11-13, David A­D­ Morano
-        Oh man! How long have I been toiling with this thing? I added the
-        ability to grab mail from multiple users. I also rewrote from the
-        original (before I started cleaning up this crap in 1994) much of the
-        way that this process takes place.
+	Oh man! How long have I been toiling with this thing? I
+	added the ability to grab mail from multiple users. I also
+	rewrote from the original (before I started cleaning up
+	this crap in 1994) much of the way that this process takes
+	place.
 
 */
 
@@ -43,40 +44,35 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	mkmailbox
 
+	Description:
 	This subroutine creates (makes) a mailbox file.
 
 	Synopsis:
-
-	int mkmailbox(pip,mbname)
-	struct proginfo	*pip ;
-	const char	mbname[] ;
+	int mkmailbox(PROGINFO *pip,cchar *mbname) noex
 
 	Arguments:
-
 	pip		program information pointer
 	mbname		mailbox-name to setup
 
 	Returns:
-
 	>=0	created
-	<0	failed
-
+	<0	failed (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
-
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -88,10 +84,13 @@
 #define	O_FLAGS		(O_WRONLY | O_CREAT)
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -105,60 +104,40 @@ extern int	mkpath2(char *,const char *,const char *) ;
 
 /* exported subroutines */
 
-
-int mkmailbox(pip,mbname)
-struct proginfo	*pip ;
-const char	mbname[] ;
-{
-	struct ustat	sb ;
-	int		rs = SR_OK ;
-	int		fd ;
-	char		mbfname[MAXNAMELEN + 1] ;
-
-	if (pip == NULL) return SR_FAULT ;
-	if (mbname == NULL) return SR_FAULT ;
-
-	if (mbname[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("mkmailbox: mbname=%s\n",mbname) ;
-#endif
-
-	if (pip->folderdname == NULL)
-	    goto ret0 ;
-
-	if (pip->folderdname[0] == '\0')
-	    goto ret0 ;
-
-	rs = mkpath2(mbfname,pip->folderdname,mbname) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs = u_stat(mbfname,&sb) ;
-	if (rs < 0) {
-
-	    rs = u_open(mbfname,O_FLAGS,0664) ;
-	    fd = rs ;
-	    if (rs >= 0) {
-
-	        if (pip->gid_mail > 0)
-	            u_fchown(fd,-1,pip->gid_mail) ;
-
-	        u_close(fd) ;
-
-	    } /* end if (opened) */
-
-	} /* end if (file didn't exist) */
-
-ret0:
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("mkmailbox: ret rs=%d \n",rs) ;
-#endif
-
-	return rs ;
+int mkmailbox(PROGINFO *pip,cchar *mbname) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		rl = 0 ;
+	if (pip && mbname) {
+	    cchar	*mfname = pip->foldername ;
+	    if (mfname) {
+		rs = SR_INVALID ;
+	        if (mbname[0] && mfname[0]) {
+	            char	*mbfname ;
+		    if ((rs = malloc_mn(&mbfname)) >= 0) {
+	                if ((rs = mkpath2(mbfname,mfname,mbname)) >= 0) {
+	                    USTAT	sb ;
+			    rl = rs ;
+	                    rs = u_stat(mbfname,&sb) ;
+	                    if (rs < 0) {
+				cint	of = O_FLAGS ;
+				cmode	om = 0664 ;
+	                        if ((rs = u_open(mbfname,of,om)) >= 0) {
+	                            cint	fd = rs ;
+	                            if (pip->gid_mail > 0) {
+	                                u_fchown(fd,-1,pip->gid_mail) ;
+		                    }
+	                            u_close(fd) ;
+	                        } /* end if (opened) */
+	                    } /* end if (file did not exist) */
+	                } /* end if (mkpath) */
+			rs1 = uc_free(mbfname) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if (valid) */
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkmailbox) */
 

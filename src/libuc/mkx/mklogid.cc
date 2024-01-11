@@ -35,7 +35,7 @@
 	
 	Returns:
 	>=0		length of created ID string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

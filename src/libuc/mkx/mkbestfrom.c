@@ -1,11 +1,11 @@
-/* mkbestfrom */
+/* mkbestfrom SUPPORT */
+/* lang=C20 */
 
 /* try to divine the best "from" address from a raw source string */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_MASSAGE	0		/* allow for massaging */
-
 
 /* revision history:
 
@@ -19,49 +19,42 @@
 
 /*******************************************************************************
 
-	This subroutine extracts the "best" address out of an EMA-type of
-	address specification (given in raw string form).
+	Name:
+	mkbestfrom
+
+	Description:
+	This subroutine extracts the "best" address out of an
+	EMA-type of address specification (given in raw string
+	form).
 
 	Synopsis:
-
-	int mkbestfrom(fbuf,flen,sp,sl)
-	char		fbuf[] ;
-	int		flen ;
-	const char	*sp ;
-	int		sl ;
+	int mkbestfrom(char *fbuf,int flen,cchar *sp,int sl) noex
 
 	Arguments:
-
 	fbuf		result buffer
 	flen		result buffer length
 	sp		source string
 	sl		source string length
 
 	Returns:
-
-	<0		error
 	>=0		length of resulting string
-
+	<0		error (system-return)
 
 	Notes:
-
 	+ Massaging the result:
-        In the old days, before header fields could be encoded in wacko ways,
-        the result here was the final result. It could therefore be massaged to
-        get rid of some cruft that certain mailers (who will remain nameless --
-        for now) would add to the field string value. But now-a-days, the result
-        here could still be wackily encoded, so massaging will at best do
-        nothing, and at worst break the encoded format.
-
+	In the old days, before header fields could be encoded in
+	wacko ways, the result here was the final result. It could
+	therefore be massaged to get rid of some cruft that certain
+	mailers (who will remain nameless -- for now) would add to
+	the field string value. But now-a-days, the result here
+	could still be wackily encoded, so massaging will at best
+	do nothing, and at worst break the encoded format.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ema.h>

@@ -1,13 +1,16 @@
-/* mkmaildirtest */
+/* mkmaildirtest SUPPORT */
+/* lang=C20 */
 
 /* make a test file-directory name for testing a mail directory */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2001-12-03, David A­D­ Morano
-	This code was born out of frustration with cleaning up bad legacy code
-	(of which there is quite a bit -- like almost all of it).
+	This code was born out of frustration with cleaning up bad
+	legacy code (of which there is quite a bit -- like almost
+	all of it).
 
 */
 
@@ -15,20 +18,16 @@
 
 /*******************************************************************************
 
-	This subroutine constructs a filename suitable for testing whether a
-	mail-directory is accessible or not.
-
+	This subroutine constructs a filename suitable for testing
+	whether a mail-directory is accessible or not.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<stdarg.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<storebuf.h>
 
@@ -55,10 +54,8 @@
 
 /* exported subroutines */
 
-
-int mkmaildirtest(char *rbuf,cchar *dp,int dl)
-{
-	const int	rlen = MAXPATHLEN ;
+int mkmaildirtest(char *rbuf,cchar *dp,int dl) noex {
+	cint		rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	cchar		*saved = MAILDIR_SAVED ;

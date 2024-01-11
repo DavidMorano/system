@@ -1,4 +1,4 @@
-/* progaudit */
+/* progaudit SUPPORT */
 
 /* audito an index database */
 

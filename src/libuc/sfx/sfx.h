@@ -34,6 +34,7 @@ extern int sfprogroot(cchar *,int,cchar **) noex ;
 extern int sfprogname(cchar *,int,cchar **) noex ;
 extern int sfskipwhite(cchar *,int,cchar **) noex ;
 extern int sfsub(cchar *,int,cchar *,cchar **) noex ;
+extern int sfsubstance(cchar *,int,cchar **) noex ;
 extern int sfthing(cchar *,int,cchar *,cchar **) noex ;
 extern int sfwhitedot(cchar *,int,cchar **) noex ;
 extern int sfword(cchar *,int,cchar **) noex ;
