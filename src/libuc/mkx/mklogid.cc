@@ -81,12 +81,11 @@ extern "C" {
 
 namespace {
     struct loghelp {
-	char	*rbuf ;
-	cchar	*sp ;
-	int	sl ;
-	int	maxdigs ;
-	int	rlen ;
-	int	val ;
+	char		*rbuf ;
+	cchar		*sp ;
+	int		sl ;
+	int		rlen ;
+	int		val ;
 	loghelp(char *ab,int al,cchar *asp,int asl,int v) noex {
 	    rbuf = ab ;
 	    sp = asp ;
@@ -146,8 +145,8 @@ int loghelp::valcvt(int maxdigs,int maxstrlen) noex {
 	char		dbuf[DIGBUFLEN + 1] ;
 	sl = strnlen(sp,sl) ;
 	modval = (maxdigs < 10) ? ipow(10,maxdigs) : INT_MAX ;
-	val = (val % modval) ; /* limits the decimal part to maxdigs */
-	if ((rs = ctdeci(dbuf,dlen,val)) >= 0) {
+	val = (val % modval) ; /* limits the decimal part to 'maxdigs' */
+	if ((rs = ctdec(dbuf,dlen,val)) >= 0) {
 	    cint	dl = rs ;
 	    int		len ;
 	    int		ml ;
@@ -174,7 +173,6 @@ int loghelp::layout(cchar *dp,int dl,int maxstrlen,int ml) noex {
                 sbuf_strw(&b,(sp + 2),(sl - 2)) ;
                 sbuf_strw(&b,dp,dl) ;
             } else {
-                ml -= 2 ;
                 sp += 2 ;
                 sl -= 2 ;
                 if (sl <= maxstrlen) {
@@ -201,7 +199,7 @@ static int mkmaxstrlen(int maxdigs,int rlen) noex {
 	    maxstrlen = (rlen - maxdigs) ;
 	} else if (rlen < 0) {
 	    maxstrlen = (LOGIDLEN - maxdigs) ;
-	    rlen = INT_MAX ;
+	    rlen = LOGIDLEN ;
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
