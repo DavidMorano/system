@@ -54,8 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mkfile.h
 
 
-#OBJ_MKFILE= mktmpfile.o mkartfile.o mkdatefile.o mkjobfile.o
-OBJ_MKFILE= mktmpfile.o mkartfile.o mkdatefile.o 
+OBJ_MKFILE= mktmpfile.o mkartfile.o mkdatefile.o mkjobfile.o
 
 
 default:		$(T).o

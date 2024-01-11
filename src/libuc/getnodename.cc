@@ -27,8 +27,8 @@
 	int getnodename(char *rbuf,int rlen) noex
 
 	Arguments:
-	rbuf		buffer to receive the nodename 
-	rlen		length of supplied buffer (should be NODENAMELEN)
+	rbuf		result buffer pointer
+	rlen		result buffer length (should be NODENAMELEN)
 
 	Returns:
 	>=0		length of retrieved nodename
