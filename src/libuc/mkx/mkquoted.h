@@ -23,15 +23,12 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
+EXTERNC_begin
 #endif
 
 extern int mkquoted(char *,int,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKQUOTED_INCLUDE */

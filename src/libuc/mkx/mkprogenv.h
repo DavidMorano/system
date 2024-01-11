@@ -31,18 +31,14 @@ struct mkprogenv_head {
 
 typedef MKPROGENV	mkprohenv ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkprogenv_start(MKPROGENV *,cchar **) noex ;
 extern int mkprogenv_envset(MKPROGENV *,cchar *,cchar *,int) noex ;
 extern int mkprogenv_getvec(MKPROGENV *,cchar ***) noex ;
 extern int mkprogenv_finish(MKPROGENV *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKPROGENV_INCLUDE */

@@ -1,10 +1,8 @@
-/* mkfromaddr */
+/* mkfromaddr SUPPORT */
+/* lang=C20 */
 
 /* create a mail-msg FROM-address */
-
-
-#define	CF_DEBUGS	0		/* not-switchable debug print-outs */
-#define	CF_DEBUG	0		/* run-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,34 +16,30 @@
 
 /*******************************************************************************
 
+	Name:
+	mkfromaddr
+
+	Description:
 	This subroutine creates a default FROM-address.
 
 	Synopsis:
-
-	int mkfromaddr(pip)
-	PROGINFO	*pip ;
+	int mkfromaddr(PROGINFO *pip) noex
 
 	Arguments:
-
 	pip		pointer to program information
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-error)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<ascii.h>
@@ -72,7 +66,7 @@
 
 /* external subroutines */
 
-extern int	mkfromname(PROGINFO *) ;
+extern int	mkfromname(PROGINFO *) noex ;
 
 
 /* local structures */
@@ -80,7 +74,7 @@ extern int	mkfromname(PROGINFO *) ;
 
 /* forward references */
 
-static int	procfrom(PROGINFO *) ;
+static int	procfrom(PROGINFO *) noex ;
 
 
 /* local variables */
@@ -88,16 +82,8 @@ static int	procfrom(PROGINFO *) ;
 
 /* exported subroutines */
 
-
-int mkfromaddr(PROGINFO *pip)
-{
+int mkfromaddr(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("mkfromaddr: ent from=>%s<\n",pip->hdr_from) ;
-#endif
-
 	if (pip->hdr_from == NULL) {
 	    cchar	*cp = NULL ;
 	    if ((cp = getenv(VARMAILFROM)) != NULL) {
@@ -114,14 +100,6 @@ int mkfromaddr(PROGINFO *pip)
 	        rs = strlen(pip->hdr_from) ;
 	    }
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	    debugprintf("mkfromaddr: ret rs=%d\n",rs) ;
-	    debugprintf("mkfromaddr: ret from=>%s<\n",pip->hdr_from) ;
-	}
-#endif
-
 	return rs ;
 }
 /* end subroutine (mkfromaddr) */
@@ -129,18 +107,11 @@ int mkfromaddr(PROGINFO *pip)
 
 /* local subroutines */
 
-
-static int procfrom(PROGINFO *pip)
-{
-	BUFFER		b ;
+static int procfrom(PROGINFO *pip) noex {
+	buffer		b ;
 	int		rs ;
 	int		rs1 ;
 	int		bl = 0 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("mkfromaddr/procfrom: ent\n") ;
-#endif
 
 	if ((rs = buffer_start(&b,MABUFLEN)) >= 0) {
 
@@ -173,11 +144,6 @@ static int procfrom(PROGINFO *pip)
 	    rs1 = buffer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("mkfromaddr/procfrom: ret rs=%d bl=%u\n",rs,bl) ;
-#endif
 
 	return (rs >= 0) ? bl : rs ;
 }

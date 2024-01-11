@@ -21,9 +21,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sfshrink(cchar *,int,cchar **) noex ;
 extern int sfbasename(cchar *,int,cchar **) noex ;
@@ -42,9 +40,7 @@ extern int sfword(cchar *,int,cchar **) noex ;
 extern int sfnext(cchar *,int,cchar **) noex ;
 extern int sfnextterm(cchar *,int,cchar *,cchar **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

@@ -18,9 +18,7 @@
 #define	MKFNAMESUF_INCLUDE
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkfnamesufx(char *,int,cc *,...) noex ;
 
@@ -30,9 +28,7 @@ extern int mkfnamesuf3(char *,cc *,cc *,cc *,cc *) noex ;
 extern int mkfnamesuf4(char *,cc *,cc *,cc *,cc *,cc *) noex ;
 extern int mkfnamesuf5(char *,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

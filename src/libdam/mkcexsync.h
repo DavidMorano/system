@@ -1,10 +1,14 @@
-/* mkcexsync */
+/* mkcexsync HEADER */
+/* lang=C20 */
+
+/* make the synchronization string used for CEX */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MKCEXSYNC_INCLUDE
-#define	MKCEXSYNC_INCLUDE	1
+#define	MKCEXSYNC_INCLUDE
 
 
 #define	MKCEXSYNC_MKLEN		10	/* length to create (in bytes) */
@@ -12,15 +16,12 @@
 #define	MKCEXSYNC_FINLEN	2	/* number of finishing bytes */
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkcexsync(char *,int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* MKCEXSYNC_INCLUDE */
 

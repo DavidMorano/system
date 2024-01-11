@@ -53,9 +53,7 @@ struct raqhand_head {
 
 typedef RAQHAND		raqhand ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int raqhand_start(raqhand *,int,int) noex ;
 extern int raqhand_ins(raqhand *,cvoid *) noex ;
@@ -69,9 +67,7 @@ extern int raqhand_get(raqhand *,int,void **) noex ;
 extern int raqhand_ent(raqhand *,cvoid *) noex ;
 extern int raqhand_finish(raqhand *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* RAQHAND_INCLUDE */

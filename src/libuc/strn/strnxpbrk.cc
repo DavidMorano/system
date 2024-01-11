@@ -1,4 +1,4 @@
-/* strnxpbrk */
+/* strnxpbrk SUPPORT */
 /* lang=C++20 */
 
 /* find a character in a counted string */

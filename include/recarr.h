@@ -63,9 +63,7 @@ struct recarr_head {
 
 typedef	struct recarr_head	recarr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*recarr_cf)(cvoid **,cvoid **) noex ;
 
@@ -86,9 +84,7 @@ extern int recarr_extent(recarr *) noex ;
 extern int recarr_audit(recarr *) noex ;
 extern int recarr_finish(recarr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* RECARR_INCLUDE */

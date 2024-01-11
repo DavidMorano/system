@@ -559,7 +559,7 @@ int vecstr_findn(vecstr *op,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (op->va) {
 	        cint	sch = sp[0] ; /* ok: since all get promoted similarly */
-		int	i ;
+	    	int	i{} ;		/* <- used afterwards */
 	        for (i = 0 ; i < op->i ; i += 1) {
 	            cchar	*ep = op->va[i] ;
 	            if (ep && (sch == ep[0])) {
@@ -794,7 +794,7 @@ static int vecstr_extvec(vecstr *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    int		nn, size ;
-	    void	*na ;
+	    void	*na{} ;
 	    if (op->va == nullptr) {
 	        nn = VECSTR_DEFENTS ;
 	        size = (nn + 1) * sizeof(char **) ;

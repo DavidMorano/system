@@ -23,15 +23,11 @@
 
 #ifndef	TYPEDEF_VECENTCMP
 #define	TYPEDEF_VECENTCMP
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vecentcmp_f)(cvoid *,cvoid *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* TYPEDEF_VECENTCMP */
 
 struct vecsorthand_head {
@@ -44,9 +40,9 @@ struct vecsorthand_head {
 
 typedef struct vecsorthand_head	vecsorthand ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
+
+typedef int (*vecsorthand_f)(cvoid **,cvoid **) noex ;
 
 extern int vecsorthand_start(vecsorthand *,int,vecentcmp_f) noex ;
 extern int vecsorthand_add(vecsorthand *,cvoid *) noex ;
@@ -57,9 +53,7 @@ extern int vecsorthand_delhand(vecsorthand *,cvoid *) noex ;
 extern int vecsorthand_count(vecsorthand *) noex ;
 extern int vecsorthand_search(vecsorthand *,cvoid *,void *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VECSORTHAND_INCLUDE */

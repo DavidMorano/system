@@ -1,4 +1,4 @@
-/* hasx */
+/* hasx SUPPORT */
 /* lang=C++20 */
 
 /* has a c-string some characteristic? */

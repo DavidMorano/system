@@ -24,17 +24,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern uint hash_again(uint,int,int) noex ;
 extern uint hash_elf(cchar *,int) noex ;
 extern uint hash_hsieh(cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HASH_INCLUDE */

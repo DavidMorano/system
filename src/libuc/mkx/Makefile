@@ -21,10 +21,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -51,18 +51,18 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h snx.h
+INCS= mkx.h
 
 
 OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaltext.o mkartfile.o
 OBJ01_MKX= mkaudit.o mkbangname.o mkbasename.o mkbestaddr.o
 OBJ02_MKX= mkbestfrom.o mkcaselower.o mkcdpath.o mkcexsync.o
 OBJ03_MKX= mkchar.o mkcleanline.o mkcmds.o mkdatefile.o
-OBJ04_MKX= mkdisphdr.o mkdisplayable.o mkenvfrom.o
-OBJ05_MKX= mkexpandpath.o mkface.o mkfdfname.o mkfingerargs.o
-OBJ06_MKX= mkfingerquery.o mkfmtphone.o mkfname.o mkfnamesuf.o
-OBJ07_MKX= mkfromaddr.o mkfromname.o mkgecosname.o mkhashfile.o
-OBJ08_MKX= mkintfname.o mkjobfile.o mklogid.o mkmagic.o
+OBJ04_MKX= mkdisphdr.o mkdisplayable.o
+OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
+OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
+OBJ07_MKX= mkgecosname.o
+OBJ08_MKX= mkintfname.o mklogid.o mkmagic.o
 OBJ09_MKX= mkmailbox.o mkmaildirtest.o mkmailname.o mkmid.o
 OBJ10_MKX= mkmsgbound.o mknoise.o mknpathx.o mknpathxw.o
 OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
@@ -74,11 +74,11 @@ OBJ16_MKX= mktmplock.o mktmpuserdir.o mktxtindexcmds.o mkufname.o
 OBJ17_MKX= mkuibang.o mkuiname.o mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o mkvarpath.o
 
-OBJA_MKX= obj00_sfx.o obj11_sfx.o obj02_sfx.o obj03_sfx.o
-OBJB_MKX= obj04_sfx.o obj05_sfx.o obj06_sfx.o obj07_sfx.o
-OBJC_MKX= obj08_sfx.o obj09_sfx.o obj10_sfx.o obj11_sfx.o
-OBJD_MKX= obj12_sfx.o obj13_sfx.o obj14_sfx.o obj15_sfx.o
-OBJE_MKX= obj16_sfx.o obj17_sfx.o obj18_sfx.o 
+OBJA_MKX= obj00_mkx.o obj11_mkx.o obj02_mkx.o obj03_mkx.o
+OBJB_MKX= obj04_mkx.o obj05_mkx.o obj06_mkx.o obj07_mkx.o
+OBJC_MKX= obj08_mkx.o obj09_mkx.o obj10_mkx.o obj11_mkx.o
+OBJD_MKX= obj12_mkx.o obj13_mkx.o obj14_mkx.o obj15_mkx.o
+OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o 
 
 OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o 0bjd_mlx.o obje_mkx.o
 
@@ -126,61 +126,61 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj00_sfx.o:	$(OBJ00_MKX)
+obj00_mkx.o:	$(OBJ00_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ00_MKX)
 
-obj01_sfx.o:	$(OBJ01_MKX)
+obj01_mkx.o:	$(OBJ01_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ01_MKX)
 
-obj02_sfx.o:	$(OBJ02_MKX)
+obj02_mkx.o:	$(OBJ02_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ02_MKX)
 
-obj03_sfx.o:	$(OBJ03_MKX)
+obj03_mkx.o:	$(OBJ03_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ03_MKX)
 
-obj04_sfx.o:	$(OBJ04_MKX)
+obj04_mkx.o:	$(OBJ04_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ04_MKX)
 
-obj05_sfx.o:	$(OBJ05_MKX)
+obj05_mkx.o:	$(OBJ05_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ05_MKX)
 
-obj06_sfx.o:	$(OBJ06_MKX)
+obj06_mkx.o:	$(OBJ06_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ06_MKX)
 
-obj07_sfx.o:	$(OBJ07_MKX)
+obj07_mkx.o:	$(OBJ07_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ07_MKX)
 
-obj08_sfx.o:	$(OBJ08_MKX)
+obj08_mkx.o:	$(OBJ08_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ08_MKX)
 
-obj09_sfx.o:	$(OBJ09_MKX)
+obj09_mkx.o:	$(OBJ09_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ09_MKX)
 
-obj10_sfx.o:	$(OBJ10_MKX)
+obj10_mkx.o:	$(OBJ10_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ10_MKX)
 
-obj11_sfx.o:	$(OBJ11_MKX)
+obj11_mkx.o:	$(OBJ11_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ11_MKX)
 
-obj12_sfx.o:	$(OBJ12_MKX)
+obj12_mkx.o:	$(OBJ12_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ12_MKX)
 
-obj13_sfx.o:	$(OBJ13_MKX)
+obj13_mkx.o:	$(OBJ13_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ13_MKX)
 
-obj14_sfx.o:	$(OBJ14_MKX)
+obj14_mkx.o:	$(OBJ14_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ14_MKX)
 
-obj15_sfx.o:	$(OBJ15_MKX)
+obj15_mkx.o:	$(OBJ15_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ15_MKX)
 
-obj16_sfx.o:	$(OBJ16_MKX)
+obj16_mkx.o:	$(OBJ16_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ16_MKX)
 
-obj17_sfx.o:	$(OBJ17_MKX)
+obj17_mkx.o:	$(OBJ17_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ17_MKX)
 
-obj18_sfx.o:	$(OBJ18_MKX)
+obj18_mkx.o:	$(OBJ18_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ18_MKX)
 
 
@@ -201,5 +201,8 @@ obje_mkx.o:	$(OBJE_MKX)
 
 
 mkdatefile.o:		mkdatefile.cc mkdatefile.h
+mkfdfname.o:		mkfdfname.cc mkfdfname.h
+mkgecosname.o:		mkgecosname.cc mkgecosname.h
+
 
 

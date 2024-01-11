@@ -51,7 +51,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"mktmpfile.h"
+#include	"mkfile.h"
 
 
 /* local defines */
@@ -76,12 +76,11 @@ extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
 int mktmpfile(char *rbuf,cchar *inname,mode_t om) noex {
 	cint		of = (O_WRONLY|O_CLOEXEC) ;
 	int		rs ;
-	int		len = 0 ;
-	    if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
-	        uc_close(rs) ;
-	        len = strlen(rbuf) ;
-	    } /* end if (opentmpfile) */
-	return (rs >= 0) ? len : rs ;
+	if ((rs = opentmpfile(inname,of,om,rbuf)) >= 0) {
+	    uc_close(rs) ;
+	    rs = strlen(rbuf) ;
+	} /* end if (opentmpfile) */
+	return rs ;
 }
 /* end subroutine (mktmpfile) */
 

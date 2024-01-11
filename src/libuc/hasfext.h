@@ -22,15 +22,12 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
-int hasfext(cchar **,cchar *,int) noex ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int hasfext(cchar **,cchar *,int) noex ;
+
+EXTERNC_end
 
 
 #endif /* HASFEXT_INCLUDE */

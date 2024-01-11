@@ -1,4 +1,4 @@
-/* mkfname */
+/* mkfname SUPPORT */
 /* lang=C++20 */
 
 /* make a file name from several parts */
@@ -121,7 +121,7 @@ int mkfnamex(char *rbuf,int na,...) noex {
 	    va_list	ap ;
 	    va_begin(ap,na) ;
 	    for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
-	        cc	*sp = (cc *) va_get(ap,cc *) ;
+	        cc	*sp = (cc *) va_arg(ap,cc *) ;
 		if (sp) {
 	            rs = storebuf_strw(rbuf,rlen,rl,sp,-1) ;
 	            rl += rs ;

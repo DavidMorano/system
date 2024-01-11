@@ -24,9 +24,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern char *strnopbrk(cchar *,int,cchar *) noex ;
 extern char *strnrpbrk(cchar *,int,cchar *) noex ;
@@ -35,9 +33,7 @@ static inline char *strnpbrk(cchar *sp,int sl,cchar *ss) noex {
 	return strnopbrk(sp,sl,ss) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRNXPBRK_INCLUDE */

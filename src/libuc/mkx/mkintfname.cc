@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	mkintfname
+
+	Description:
 	This subroutine constructs an open-intercept filename (from
 	its constituent parts).  An open-intercept filename looks
 	like:

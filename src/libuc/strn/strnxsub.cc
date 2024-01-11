@@ -1,4 +1,4 @@
-/* strnxsub */
+/* strnxsub SUPPORT */
 /* lang=C++20 */
 
 /* find a substring within a larger string */

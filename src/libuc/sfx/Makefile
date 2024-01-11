@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h sysauxinfonames.h
+INCS= sfx.h
 
 
 OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o sfbreak.o

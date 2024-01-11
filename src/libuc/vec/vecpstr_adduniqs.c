@@ -43,7 +43,7 @@
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<stdlib.h>
-#include	<string.h>
+#include	<string.h>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecpstr.h>
@@ -55,10 +55,7 @@
 
 /* external subroutines */
 
-extern int	sfshrink(cchar *,int,cchar **) noex ;
 extern int	vecpstr_adduniq(vecpstr *,cchar *,int) noex ;
-
-extern char	*strnpbrk(const char *,int,const char *) noex ;
 
 
 /* external variables */

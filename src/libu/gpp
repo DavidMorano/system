@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/usr/extra/bin/ksh
 # GNU Compiler Collection
 PN=${0##*/}
 RF_OK=true

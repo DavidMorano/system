@@ -73,9 +73,7 @@ struct vecint_head {
 typedef struct vecint_head	vecint ;
 typedef struct vecint_c		vecint_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vecintcmp_f)(int,int) noex ;
 
@@ -103,9 +101,8 @@ extern int vecint_enum(vecint *,vecint_cur *,VECINT_TYPE *) noex ;
 extern int vecint_curend(vecint *,vecint_cur *) noex ;
 extern int vecint_audit(vecint *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* VECINT_INCLUDE */
 

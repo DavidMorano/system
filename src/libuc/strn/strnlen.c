@@ -1,4 +1,4 @@
-/* strnlen */
+/* strnlen SUPPORT */
 /* lang=C20 */
 
 /* calculate the length of a c-string */

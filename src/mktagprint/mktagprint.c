@@ -17,7 +17,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/***********************************************************************
+/*******************************************************************************
 
 	This subroutine processes a single file.
 
@@ -40,7 +40,7 @@
 	<0		error code
 
 
-***********************************************************************/
+*******************************************************************************/
 
 
 #include	<envstandards.h>	/* must be before others */
@@ -66,6 +66,14 @@
 
 
 /* local defines */
+
+#ifndef	LINEBUFLEN
+#ifdef	LINE_MAX
+#define	LINEBUFLEN	MAX(LINE_MAX,2048)
+#else
+#define	LINEBUFLEN	2048
+#endif
+#endif
 
 
 /* external subroutines */
@@ -113,19 +121,15 @@ const char	outfmt[] ;
 const char	outfname[] ;
 {
 	BIBLEBOOK	bb ;
-
-	bfile	outfile, *ofp = &outfile ;
-
-	int	rs = SR_OK ;
-	int	pan ;
-	int	ofi ;
-	int	ai ;
-	int	c_tagref = 0 ;
-	int	f_biblebook = FALSE ;
-	int	f ;
-
-	char	*cp ;
-
+	bfile		outfile, *ofp = &outfile ;
+	int		rs = SR_OK ;
+	int		pan = 0 ;
+	int		ofi ;
+	int		ai ;
+	int		c_tagref = 0 ;
+	int		f_biblebook = FALSE ;
+	int		f ;
+	const char	*cp ;
 
 	if (aip == NULL)
 	    return SR_FAULT ;
@@ -171,12 +175,10 @@ const char	outfname[] ;
 	}
 #endif /* CF_DEBUG */
 
-	pan = 0 ;
-
 	for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
-	    f = (ai <= aip->ai_max) && BATST(aip->argpresent,ai) ;
-	    f = f || (ai > aip->ai_pos) ;
+	    f = (ai <= aip->ai_max) && (bits_test(&aip->pargs,ai) > 0) ;
+	    f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
 	    if (! f) continue ;
 
 	    cp = aip->argv[ai] ;
@@ -212,38 +214,32 @@ const char	outfname[] ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("mktagprint: argfile=%s\n",aip->argfname) ;
+	    debugprintf("mktagprint: argfile=%s\n",aip->afname) ;
 #endif
 
 /* process any tags in the argument list file */
 
-	if ((rs >= 0) && (aip->argfname != NULL) && 
-	    (aip->argfname[0] != '\0')) {
-
+	if ((rs >= 0) && (aip->afname != NULL) && 
+	    (aip->afname[0] != '\0')) {
 	    bfile	argfile ;
 
+	    if (strcmp(aip->afname,"-") != 0) {
+	        rs = bopen(&argfile,aip->afname,"r",0666) ;
 
-	    if (strcmp(aip->argfname,"-") != 0)
-	        rs = bopen(&argfile,aip->argfname,"r",0666) ;
-
-	    else
+	    } else
 	        rs = bopen(&argfile,BFILE_STDIN,"dr",0666) ;
 
 	    if (rs >= 0) {
+	        char	lbuf[LINEBUFLEN + 1] ;
 
-	        int	len ;
+	        while ((rs = breadln(&argfile,lbuf,LINEBUFLEN)) > 0) {
+	            int len = rs ;
 
-	        char	linebuf[LINEBUFLEN + 1] ;
-
-
-	        while ((rs = breadln(&argfile,linebuf,LINEBUFLEN)) > 0) {
-
-	            len = rs ;
-	            if (linebuf[len - 1] == '\n')
+	            if (lbuf[len - 1] == '\n')
 	                len -= 1 ;
 
-	            linebuf[len] = '\0' ;
-	            cp = linebuf ;
+	            lbuf[len] = '\0' ;
+	            cp = lbuf ;
 
 	            if ((cp[0] == '\0') || (cp[0] == '#'))
 	                continue ;
@@ -292,7 +288,7 @@ const char	outfname[] ;
 	            pip->progname,rs) ;
 
 	        bprintf(pip->efp,"%s: argfile=%s\n",
-	            pip->progname,aip->argfname) ;
+	            pip->progname,aip->afname) ;
 
 	    }
 
@@ -300,9 +296,8 @@ const char	outfname[] ;
 
 	if ((rs >= 0) && (pan == 0)) {
 
-	    cp = pip->infname ;
-	    if (cp == NULL)
-	        cp = "-" ;
+	    cp = pip->ifname ;
+	    if (cp == NULL) cp = "-" ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -325,12 +320,9 @@ const char	outfname[] ;
 
 	} /* end if */
 
-/* close the output files */
-ret2:
 	bclose(ofp) ;
 
 retoutopen:
-ret1:
 	if (f_biblebook)
 	    biblebook_close(&bb) ;
 
@@ -357,17 +349,15 @@ int		ofi ;
 bfile		*ofp ;
 const char	tagfname[] ;
 {
-	bfile	tagfile, *tfp = &tagfile ;
-
-	int	rs = SR_OK ;
-	int	len ;
-	int	fnl ;
-	int	c_tagref = 0 ;
-	int	f_bol, f_eol ;
-
-	char	linebuf[LINEBUFLEN + 1] ;
-	char	*cp ;
-
+	bfile		tagfile, *tfp = &tagfile ;
+	const int	llen = LINEBUFLEN ;
+	int		rs = SR_OK ;
+	int		len ;
+	int		fnl ;
+	int		c_tagref = 0 ;
+	int		f_bol, f_eol ;
+	char		lbuf[LINEBUFLEN + 1] ;
+	char		*cp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -391,16 +381,14 @@ const char	tagfname[] ;
 	    goto ret0 ;
 
 	f_bol = TRUE ;
-	while ((rs = breadln(tfp,linebuf,LINEBUFLEN)) > 0) {
-
+	while ((rs = breadln(tfp,lbuf,llen)) > 0) {
 	    len = rs ;
-	    f_eol = (linebuf[len - 1] == '\n') ;
-	    if (f_eol)
-	        len -= 1 ;
 
-	    linebuf[len] = '\0' ;
-	    cp = linebuf ;
+	    f_eol = (lbuf[len - 1] == '\n') ;
+	    if (f_eol) len -= 1 ;
+	    lbuf[len] = '\0' ;
 
+	    cp = lbuf ;
 	    if ((cp[0] == '\0') || (cp[0] == '#'))
 	        continue ;
 
@@ -448,6 +436,5 @@ ret0:
 	return (rs >= 0) ? c_tagref : rs ;
 }
 /* end subroutine (proctagfile) */
-
 
 

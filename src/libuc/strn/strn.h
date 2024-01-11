@@ -29,9 +29,7 @@
 #include	<strncpyxc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 /* calculate string length */
 extern int strnnlen(cchar *,int,int) noex ;
@@ -48,9 +46,7 @@ static inline char *strnsetblanks(char *dp,int dl) noex {
 	return strnset(dp,dl,' ') ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRN_INCLUDE */

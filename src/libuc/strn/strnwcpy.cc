@@ -1,4 +1,4 @@
-/* strnwcpy */
+/* strnwcpy SUPPORT */
 /* lang=C++20 */
 
 /* copy a counted c-string to a sized destination buffer */

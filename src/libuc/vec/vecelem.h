@@ -67,9 +67,7 @@ struct vecelem_head {
 
 typedef struct vecelem_head	vecelem ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vecelem_vcmp)(cvoid **,cvoid **) noex ;
 
@@ -86,9 +84,7 @@ extern int vecelem_getval(vecelem *,int,void *) noex ;
 extern int vecelem_getvec(vecelem *,void *) noex ;
 extern int vecelem_audit(vecelem *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VECELEM_INCLUDE */

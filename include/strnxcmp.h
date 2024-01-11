@@ -24,18 +24,14 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int strnkeycmp(cchar *,cchar *,int) noex ;
 extern int strnleadcmp(cchar *,cchar *,int) noex ;
 extern int strnncmp(cchar *,int,cchar *,int) noex ;
 extern int strnndictcmp(cchar *,int,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRNXCMP_INCLUDE */

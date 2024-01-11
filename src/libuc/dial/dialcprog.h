@@ -18,17 +18,12 @@
 #define	DIALCPROG_INCLUDE
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
 		int to,int opts,int *fd2p) noex ;
 
-
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DIALCPROG_INCLUDE */

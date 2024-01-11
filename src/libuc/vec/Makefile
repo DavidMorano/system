@@ -169,3 +169,39 @@ control:
 	(uname -n ; date) > Control
 
 
+vechand.o:		vechand.cc vechand.h
+vecint.o:		vecint.cc vecint.h
+vecitem.o:		vecitem.cc vecitem.h
+
+vecstr.o:		vecstr.cc vecstr.h
+vecstr_addpath.o:	vecstr.h
+vecstr_adds.o:		vecstr.h
+vecstr_addsubdirs.o:	vecstr.h
+vecstr_adduniqs.o:	vecstr.h
+vecstr_avmkstr.o:	vecstr.h
+vecstr_env.o:		vecstr.h
+vecstr_envfile.o:	vecstr.h
+vecstr_foilcmp.o:	vecstr.h
+vecstr_loadfile.o:	vecstr.h
+vecstr_loadgrusers.o:	vecstr.h
+vecstr_srvargs.o:	vecstr.h
+vecstr_svcargs.o:	vecstr.h
+
+vecpstr.o:		vecpstr.cc vecpstr.h
+vecpstr_addpath.o:	vecpstr.h
+vecpstr_adds.o:		vecpstr.h
+vecpstr_addsubdirs.o:	vecpstr.h
+vecpstr_adduniqs.o:	vecpstr.h
+vecpstr_avmkstr.o:	vecpstr.h
+vecpstr_env.o:		vecpstr.h
+vecpstr_envfile.o:	vecpstr.h
+vecpstr_foilcmp.o:	vecpstr.h
+vecpstr_loadfile.o:	vecpstr.h
+vecpstr_loadgrusers.o:	vecpstr.h
+vecpstr_srvargs.o:	vecpstr.h
+vecpstr_svcargs.o:	vecpstr.h
+
+raqhand.o:		raqhand.cc raqhand.h
+recarr.o:		recarr.cc recarr.h
+
+

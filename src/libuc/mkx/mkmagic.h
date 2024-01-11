@@ -1,5 +1,8 @@
-/* mkmagic */
+/* mkmagic HEADER */
 /* lang=C99 */
+
+/* create a string with a (pretty much) standard magic string  */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,7 +15,7 @@
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MKMAGIC_INCLUDE
-#define	MKMAGIC_INCLUDE	1
+#define	MKMAGIC_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -20,15 +23,11 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int mkmagic(char *,int,cchar *) ;
+extern int mkmagic(char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKMAGIC_INCLUDE */

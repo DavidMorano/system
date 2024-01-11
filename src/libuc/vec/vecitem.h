@@ -72,9 +72,7 @@ struct vecitem_cursor  {
 typedef VECITEM		vecitem ;
 typedef VECITEM_CUR	vecitem_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*vecitem_cmpf)(cvoid **,cvoid **) noex ;
 
@@ -94,9 +92,7 @@ extern int vecitem_audit(vecitem *) noex ;
 extern int vecitem_curbegin(vecitem *,vecitem_cur *) noex ;
 extern int vecitem_curend(vecitem *,vecitem_cur *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VECITEM_INCLUDE */

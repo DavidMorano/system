@@ -1,4 +1,4 @@
-/* mkdatefile */
+/* mkdatefile SUPPORT */
 /* lang=C++20 */
 
 /* make a temporary date-type job file */
@@ -60,7 +60,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"mkdatefile.h"
+#include	"mkfile.h"
 
 
 /* local defines */
@@ -104,8 +104,13 @@ struct tryer {
 
 /* forward references */
 
-static int	mker(char *,cc *,cc *,mode_t) noex ;
 static int	sntmymd(char *,int,TM *) noex ;
+
+static int mker(char *rbuf,cc *dname,cc *fs,mode_t fm) noex {
+	tryer	to(rbuf,dname,fs,fm) ;
+	return to ;
+}
+/* end subroutine (mker) */
 
 
 /* local variables */
@@ -116,12 +121,6 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
 /* exported subroutines */
-
-static int mker(char *rbuf,cc *dname,cc *fs,mode_t fm) noex {
-	tryer	to(rbuf,dname,fs,fm) ;
-	return to ;
-}
-/* end subroutine (mker) */
 
 int mkdatefile(char *rbuf,cchar *dname,cchar *fs,mode_t fm) noex {
 	int		rs = SR_FAULT ;
@@ -213,8 +212,8 @@ static int sntmymd(char *rbuf,int rlen,TM *tmp) noex {
 	cint		mo = (tmp->tm_mon + 1) ;
 	cint		da = tmp->tm_mday ;
 	int		rs = SR_INVALID ;
-	cchar		*fmt = "%02d%02d%02d" ;
 	if (rlen > 0) {
+	    cchar	*fmt = "%02d%02d%02d" ;
 	    if ((rs = snprintf(rbuf,rlen,fmt,yr,mo,da)) >= rlen) {
 	        rs = SR_OVERFLOW ;
 	    }
