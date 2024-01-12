@@ -19,19 +19,30 @@
 	This modules manipulates "real names" (that is like the
 	real name of a person) in various ways.
 
+	Notes:
+	Oh boy!  We want to be careful with those foreign names that
+	have funny article-preposition (whatever?) words in front of
+	their last names.  Some examples, of these might be: a, da, 
+	de, do, du, mc, mac, o, ou, von .
+
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<char.h>
+#include	<usupport.h>
 #include	<sbuf.h>
 #include	<storeitem.h>
 #include	<dstr.h>
+#include	<six.h>
+#include	<snwcpyx.h>
+#include	<char.h>
 #include	<mkchar.h>
+#include	<toxc.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"realname.h"
@@ -45,15 +56,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	snwcpylc(char *,int,cchar *,int) ;
-extern int	snwcpyuc(char *,int,cchar *,int) ;
-extern int	sibreak(cchar *,int,cchar *) ;
-extern int	tolc(int) ;
-extern int	touc(int) ;
-extern int	islowerlatin(int) ;
-extern int	isupperlatin(int) ;
 
 
 /* local structures */
@@ -75,19 +77,19 @@ struct namestr {
 
 /* forward references */
 
-int		realname_startparse(REALNAME *,cchar *,int) ;
+int		realname_startparse(REALNAME *,cchar *,int) noex ;
 
-static int	names_start(NAMES *,char *) ;
-static int	names_add(NAMES *,cchar *,int,int,int) ;
-static int	names_finish(NAMES *) ;
+static int	names_start(NAMES *,char *) noex ;
+static int	names_add(NAMES *,cchar *,int,int,int) noex ;
+static int	names_finish(NAMES *) noex ;
 
-static int	namestr_start(NAMESTR *,cchar *,int) ;
-static int	namestr_next(NAMESTR *,cchar **,int *,int *) ;
-static int	namestr_skipwhite() ;
-static int	namestr_break(NAMESTR *,cchar *,cchar **) ;
-static int	namestr_finish(NAMESTR *) ;
+static int	namestr_start(NAMESTR *,cchar *,int) noex ;
+static int	namestr_next(NAMESTR *,cchar **,int *,int *) noex ;
+static int	namestr_skipwhite(NAMESTR *) noex ;
+static int	namestr_break(NAMESTR *,cchar *,cchar **) noex ;
+static int	namestr_finish(NAMESTR *) noex ;
 
-static int	isAbbr(int) ;
+static int	isAbbr(int) noex ;
 
 
 /* local variables */
@@ -95,26 +97,23 @@ static int	isAbbr(int) ;
 
 /* exported subroutines */
 
-int realname_start(REALNAME *rnp,cchar *sbuf,int slen)
-{
+int realname_start(REALNAME *rnp,cchar *sbuf,int slen) noex {
 	int		rs ;
 	rs = realname_startparse(rnp,sbuf,slen) ;
 	return rs ;
 }
 /* end subroutine (realname_start) */
 
-
-int realname_startparts(REALNAME *rnp,DSTR *stp)
-{
+int realname_startparts(REALNAME *rnp,DSTR *stp) noex {
 	STOREITEM	s ;
-	const int	slen = REALNAME_STORELEN ;
+	int		slen = REALNAME_STORELEN ;
 	int		rs ;
 	int		rs1 ;
 
 	if (rnp == NULL) return SR_FAULT ;
 	if (stp == NULL) return SR_FAULT ;
 
-	memset(rnp,0,sizeof(REALNAME)) ;
+	memclear(rnp) ;
 
 	if ((rs = storeitem_start(&s,rnp->store,slen)) >= 0) {
 	    int		cl ;
@@ -171,12 +170,10 @@ int realname_startparts(REALNAME *rnp,DSTR *stp)
 }
 /* end subroutine (realname_startparts) */
 
-
-int realname_startpieces(REALNAME *rnp,cchar *sa[],int sn)
-{
+int realname_startpieces(REALNAME *rnp,cchar **sa,int sn) noex {
 	STOREITEM	s ;
-	const int	slen = REALNAME_STORELEN ;
-	const int	nparts = REALNAME_NPARTS ;
+	cint		slen = REALNAME_STORELEN ;
+	cint		nparts = REALNAME_NPARTS ;
 	int		rs ;
 	int		c = 0 ;
 	cchar		*pieces[REALNAME_NPARTS] ;
@@ -187,8 +184,7 @@ int realname_startpieces(REALNAME *rnp,cchar *sa[],int sn)
 	if (sn < 0) sn = INT_MAX ;
 
 	{
-	    int	i ;
-	    for (i = 0 ; ( i < sn) && sa[i] && (c < nparts) ; i += 1) {
+	    for (int i = 0 ; ( i < sn) && sa[i] && (c < nparts) ; i += 1) {
 	        if (sa[i][0] != '\0') {
 	            pieces[c++] = sa[i] ;
 	        }
@@ -197,7 +193,7 @@ int realname_startpieces(REALNAME *rnp,cchar *sa[],int sn)
 
 	if (c == 0) return SR_INVALID ;
 
-	memset(rnp,0,sizeof(REALNAME)) ;
+	memclear(rnp) ;
 
 	if ((rs = storeitem_start(&s,rnp->store,slen)) >= 0) {
 	    cchar	*cp ;
@@ -213,9 +209,8 @@ int realname_startpieces(REALNAME *rnp,cchar *sa[],int sn)
 	        rnp->len.last = (uchar) rs ;
 	        rnp->abv.last = f_abv ;
 	        if (c > 0) {
-	            int	i ;
 	            int	n = 0 ;
-	            for (i = 0 ; (rs >= 0) && (i < c) ; i += 1) {
+	            for (int i = 0 ; (rs >= 0) && (i < c) ; i += 1) {
 	                f_abv = FALSE ;
 	                if ((rs = storeitem_strw(&s,pieces[i],-1,&cp)) > 0) {
 	                    if (isAbbr(cp[rs-1])) {
@@ -261,9 +256,7 @@ int realname_startpieces(REALNAME *rnp,cchar *sa[],int sn)
 }
 /* end subroutine (realname_startpieces) */
 
-
-int realname_startparse(realname *rnp,cchar *sbuf,int slen)
-{
+int realname_startparse(realname *rnp,cchar *sbuf,int slen) noex {
 	NAMES		n ;
 	int		rs ;
 	int		rs1 ;
@@ -272,7 +265,7 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 	if (rnp == NULL) return SR_FAULT ;
 	if (sbuf == NULL) return SR_FAULT ;
 
-	memset(rnp,0,sizeof(struct realname_head)) ;
+	memclear(rnp) ;
 
 	if ((rs = names_start(&n,rnp->store)) >= 0) {
 	    NAMESTR	ns ;
@@ -366,68 +359,49 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 }
 /* end subroutine (realname_startparse) */
 
-
-/* get the first */
-int realname_getfirst(realname *rnp,cchar **rpp)
-{
+int realname_getfirst(realname *rnp,cchar **rpp) noex {
 	if (rnp == NULL) return SR_FAULT ;
 	if (rpp != NULL) *rpp = rnp->first ;
 	return rnp->len.first ;
 }
 /* end subroutine (realname_getfirst) */
 
-
-/* get m1 */
-int realname_getm1(realname *rnp,cchar **rpp)
-{
+int realname_getm1(realname *rnp,cchar **rpp) noex {
 	if (rnp == NULL) return SR_FAULT ;
 	if (rpp != NULL) *rpp = rnp->m1 ;
 	return rnp->len.m1 ;
 }
 /* end subroutine (realname_getm1) */
 
-
-/* get m2 */
-int realname_getm2(realname *rnp,cchar **rpp)
-{
+int realname_getm2(realname *rnp,cchar **rpp) noex {
 	if (rnp == NULL) return SR_FAULT ;
 	if (rpp != NULL) *rpp = rnp->m2 ;
 	return rnp->len.m2 ;
 }
 /* end subroutine (realname_getm2) */
 
-
-/* get m3 */
-int realname_getm3(realname *rnp,cchar **rpp)
-{
+int realname_getm3(realname *rnp,cchar **rpp) noex {
 	if (rnp == NULL) return SR_FAULT ;
 	if (rpp != NULL) *rpp = rnp->m3 ;
 	return rnp->len.m3 ;
 }
 /* end subroutine (realname_getm3) */
 
-
-/* get the last name */
-int realname_getlast(realname *rnp,cchar **rpp)
-{
+int realname_getlast(realname *rnp,cchar **rpp) noex {
 	if (rnp == NULL) return SR_FAULT ;
 	if (rpp != NULL) *rpp = rnp->last ;
 	return rnp->len.last ;
 }
 /* end subroutine (realname_getlast) */
 
-
-/* get parts last name */
-int realname_getpieces(realname *rnp,cchar *parts[])
-{
+int realname_getpieces(realname *rnp,cchar **parts) noex {
 	int		c = 0 ;
 
 	if (rnp == NULL) return SR_FAULT ;
 
 	if (parts != NULL) {
-	    int		i ;
-	    cchar	*cp ;
-	    for (i = 0 ; i < 5 ; i += 1) {
+	    cchar	*cp = nullptr ;
+	    for (int i = 0 ; i < 5 ; i += 1) {
 	        switch (i) {
 	        case 0:
 	            cp = rnp->first ;
@@ -456,17 +430,14 @@ int realname_getpieces(realname *rnp,cchar *parts[])
 }
 /* end subroutine (realname_getpieces) */
 
-
-/* create a "mailname" (used in the old days) */
-int realname_mailname(realname *rnp,char *rbuf,int rlen)
-{
-	SBUF		s ;
+int realname_mailname(realname *rnp,char *rbuf,int rlen) noex {
+	sbuf		s ;
 	int		rs, rs1 ;
 
 	if (rnp == NULL) return SR_FAULT ;
 
 	if ((rs = sbuf_start(&s,rbuf,rlen)) >= 0) {
-	    const int	nlen = REALNAME_STORELEN ;
+	    cint	nlen = REALNAME_STORELEN ;
 	    int		len ;
 	    int		nl ;
 	    int		ch ;
@@ -505,11 +476,8 @@ int realname_mailname(realname *rnp,char *rbuf,int rlen)
 }
 /* end subroutine (realname_mailname) */
 
-
-/* create a "fullname" */
-int realname_fullname(realname *rnp,char *rbuf,int rlen)
-{
-	SBUF		s ;
+int realname_fullname(realname *rnp,char *rbuf,int rlen) noex {
+	sbuf		s ;
 	int		rs ;
 
 	if (rnp == NULL) return SR_FAULT ;
@@ -556,21 +524,8 @@ int realname_fullname(realname *rnp,char *rbuf,int rlen)
 }
 /* end subroutine (realname_fullname) */
 
-
-/* create a "name" */
-
-/****
-
-	Oh boy!  We want to be careful with those foreign names that
-	have funny article-preposition (whatever?) words in front of
-	their last names.  Some examples, of these might be: a, da, 
-	de, do, du, mc, mac, o, ou, von .
-
-****/
-
-int realname_name(realname *rnp,char *rbuf,int rlen)
-{
-	SBUF		s ;
+int realname_name(realname *rnp,char *rbuf,int rlen) noex {
+	sbuf		s ;
 	int		rs ;
 	int		rs1 ;
 
@@ -667,9 +622,7 @@ int realname_name(realname *rnp,char *rbuf,int rlen)
 }
 /* end subroutine (realname_name) */
 
-
-int realname_finish(realname *rnp)
-{
+int realname_finish(realname *rnp) noex {
 	if (rnp == NULL) return SR_FAULT ;
 	return SR_OK ;
 }
@@ -678,9 +631,7 @@ int realname_finish(realname *rnp)
 
 /* private subroutines */
 
-
-static int namestr_start(NAMESTR *sp,cchar *sbuf,int slen)
-{
+static int namestr_start(NAMESTR *sp,cchar *sbuf,int slen) noex {
 
 	sp->s = sbuf ;
 
@@ -694,19 +645,13 @@ static int namestr_start(NAMESTR *sp,cchar *sbuf,int slen)
 }
 /* end subroutine (namestr_start) */
 
-
-static int namestr_finish(NAMESTR *sp)
-{
-
+static int namestr_finish(NAMESTR *sp) noex {
 	sp->slen = 0 ;
 	return OK ;
 }
 /* end subroutine (namestr_finish) */
 
-
-static int namestr_skipwhite(NAMESTR *sp)
-{
-
+static int namestr_skipwhite(NAMESTR *sp) noex {
 	while ((sp->slen > 0) && sp->s[0] && CHAR_ISWHITE(sp->s[0])) {
 	    sp->s += 1 ;
 	    sp->slen -= 1 ;
@@ -716,18 +661,14 @@ static int namestr_skipwhite(NAMESTR *sp)
 }
 /* end subroutine (namestr_skipwhite) */
 
-
-static int namestr_break(NAMESTR *nsp,cchar *bs,cchar **rpp)
-{
-	const int	si = sibreak(nsp->s,nsp->slen,bs) ;
+static int namestr_break(NAMESTR *nsp,cchar *bs,cchar **rpp) noex {
+	cint		si = sibreak(nsp->s,nsp->slen,bs) ;
 	*rpp = (si >= 0) ? (nsp->s+si) : NULL ;
 	return si ;
 }
 /* end subroutine (namestr_break) */
 
-
-static int namestr_next(NAMESTR *nsp,cchar **npp,int *fap,int *flp)
-{
+static int namestr_next(NAMESTR *nsp,cchar **npp,int *fap,int *flp) noex {
 	int		i ;
 	int		nlen = 0 ;
 	cchar		*np, *cp ;
@@ -789,17 +730,16 @@ static int namestr_next(NAMESTR *nsp,cchar **npp,int *fap,int *flp)
 
 	} /* end if */
 
-	if (npp != NULL)
+	if (npp) {
 	    *npp = (nlen >= 0) ? np : NULL ;
+	}
 
 	return nlen ;
 }
 /* end subroutine (namestr_next) */
 
-
-static int names_start(NAMES *np,char *rbuf)
-{
-	const int	rlen = REALNAME_STORELEN ;
+static int names_start(NAMES *np,char *rbuf) noex {
+	cint		rlen = REALNAME_STORELEN ;
 	int		rs ;
 
 	if ((rs = storeitem_start(&np->s,rbuf,rlen)) >= 0) {
@@ -816,9 +756,7 @@ static int names_start(NAMES *np,char *rbuf)
 }
 /* end subroutine (names_start) */
 
-
-static int names_add(NAMES *np,cchar *nbuf,int nlen,int f_abv,int f_last)
-{
+static int names_add(NAMES *np,cchar *nbuf,int nlen,int f_abv,int f_last) noex {
 	int		rs ;
 	int		cl ;
 	cchar		*cp ;
@@ -859,9 +797,7 @@ static int names_add(NAMES *np,cchar *nbuf,int nlen,int f_abv,int f_last)
 }
 /* end subroutine (names_add) */
 
-
-static int names_finish(NAMES *np)
-{
+static int names_finish(NAMES *np) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -872,9 +808,7 @@ static int names_finish(NAMES *np)
 }
 /* end subroutine (names_finish) */
 
-
-static int isAbbr(int ch)
-{
+static int isAbbr(int ch) noex {
 	ch &= UCHAR_MAX ;
 	return ((ch == '.') || (ch == MKCHAR('­'))) ;
 }
