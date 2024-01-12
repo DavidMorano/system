@@ -60,6 +60,7 @@ extern int	mksublogid(char *,int,cchar *,int) noex ;
 extern int	mkaddrbest(char *,int,cchar *,int) noex ;
 extern int	mkaddrname(char *,int,cchar *,int) noex ;
 extern int	mkdisphdr(char *,int,cchar *,int) noex ;
+extern int	mkrealname(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 

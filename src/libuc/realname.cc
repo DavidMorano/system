@@ -1,9 +1,8 @@
-/* realname */
+/* realname SUPPORT */
+/* lang=C++20 */
 
 /* manipulate real names */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,28 +16,22 @@
 
 /******************************************************************************
 
-        This modules manipulates "real names" (that is like the real name of a
-        person) in various ways.
-
+	This modules manipulates "real names" (that is like the
+	real name of a person) in various ways.
 
 ******************************************************************************/
 
-
-#define	REALNAME_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<char.h>
 #include	<sbuf.h>
 #include	<storeitem.h>
 #include	<dstr.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"realname.h"
@@ -101,7 +94,6 @@ static int	isAbbr(int) ;
 
 
 /* exported subroutines */
-
 
 int realname_start(REALNAME *rnp,cchar *sbuf,int slen)
 {
@@ -280,10 +272,6 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 	if (rnp == NULL) return SR_FAULT ;
 	if (sbuf == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("realname_startparse: ent\n") ;
-#endif
-
 	memset(rnp,0,sizeof(struct realname_head)) ;
 
 	if ((rs = names_start(&n,rnp->store)) >= 0) {
@@ -299,13 +287,6 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 
 	        while ((nl = namestr_next(&ns,&np,&f_abv,&f_last)) >= 0) {
 
-#if	CF_DEBUGS
-	            debugprintf("realname_startparse: nl=%d part=%t\n",
-	                nl,np,nl) ;
-	            debugprintf("realname_startparse: abv=%d last=%d\n",
-	                f_abv,f_last) ;
-#endif
-
 	            if (nl > 0) {
 	                rs = names_add(&n,np,nl,f_abv,f_last) ;
 	                if (rs < 0) break ;
@@ -316,21 +297,6 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 	        namestr_finish(&ns) ;
 	    } /* end if (namestr) */
 
-#if	CF_DEBUGS
-	    {
-	        debugprintf("realname_startparse: name parts\n") ;
-	        i = (n.li + 1) % REALNAME_NNAMES ;
-	        for (j = 0 ; j < REALNAME_NNAMES ; j += 1) {
-	            if (n.a[i] != NULL) {
-	                debugprintf("realname_startparse: %d part=%s\n",
-	                    i,n.a[i]) ;
-	            } else
-	                debugprintf("realname_startparse: %d part=*\n") ;
-	            i = (i + 1) % REALNAME_NNAMES ;
-	        }
-	    } /* end block */
-#endif /* CF_DEBUGS */
-
 	    if (rs >= 0) {
 
 /* load up the information on the name parts, first the last name part */
@@ -338,21 +304,18 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 	        if (n.li < 0) {
 	            if (n.count >= REALNAME_NNAMES) {
 	                i = n.i ;
-	            } else
+	            } else {
 	                i = ((n.i + REALNAME_NNAMES - 1) % REALNAME_NNAMES) ;
-	        } else
+		    }
+	        } else {
 	            i = n.li ;
+		}
 
 	        rnp->last = n.a[i] ;
 	        rnp->len.last = n.l[i] ;
 	        rnp->abv.last = n.f_abv[i] ;
 
 	        n.a[i] = NULL ;
-
-#if	CF_DEBUGS
-	        debugprintf("realname_startparse: last=%s\n",
-	            rnp->last) ;
-#endif
 
 	        i = (i + 1) % REALNAME_NNAMES ;
 
@@ -398,11 +361,6 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen)
 	    len = rs1 ;
 	    rnp->len.store = (uchar) len ;
 	} /* end if (names) */
-
-#if	CF_DEBUGS
-	debugprintf("realname_startparse: ret rs=%d last=%s storelen=%d\n", 
-	    rs,rnp->last,rnp->len.store) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
@@ -629,10 +587,6 @@ int realname_name(realname *rnp,char *rbuf,int rlen)
 
 	    if ((rnp->first != NULL) && (rnp->first[0] != '\0')) {
 
-#if	CF_DEBUGS
-	        debugprintf("realname_name: first=%s\n",rnp->first) ;
-#endif
-
 	        f = TRUE ;
 	        ch = touc(rnp->first[0]) ;
 
@@ -661,10 +615,6 @@ int realname_name(realname *rnp,char *rbuf,int rlen)
 
 	    if ((rnp->m1 != NULL) && (rnp->m1[0] != '\0')) {
 
-#if	CF_DEBUGS
-	        debugprintf("realname_name: m1=%s\n",rnp->m1) ;
-#endif
-
 	        if (f)
 	            sbuf_char(&s,' ') ;
 
@@ -680,10 +630,6 @@ int realname_name(realname *rnp,char *rbuf,int rlen)
 	    } /* end if (middle name) */
 
 	    if ((rnp->last != NULL) && (rnp->last[0] != '\0')) {
-
-#if	CF_DEBUGS
-	        debugprintf("realname_name: last=%s\n",rnp->last) ;
-#endif
 
 	        if (f)
 	            sbuf_char(&s,' ') ;
@@ -717,10 +663,6 @@ int realname_name(realname *rnp,char *rbuf,int rlen)
 	    if (rs >= 0) rs = len ;
 	} /* end if (buffer) */
 
-#if	CF_DEBUGS
-	debugprintf("realname_name: ret rs=%d name=>%s<\n",rs,rbuf) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (realname_name) */
@@ -739,11 +681,6 @@ int realname_finish(realname *rnp)
 
 static int namestr_start(NAMESTR *sp,cchar *sbuf,int slen)
 {
-
-#if	CF_DEBUGS
-	debugprintf("realname/namestr_start: slen=%d sbuf=>%t<\n",
-	    slen,sbuf,strnlen(sbuf,slen)) ;
-#endif
 
 	sp->s = sbuf ;
 
@@ -886,16 +823,8 @@ static int names_add(NAMES *np,cchar *nbuf,int nlen,int f_abv,int f_last)
 	int		cl ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
-	debugprintf("realname/names_add: nlen=%d\n",nlen) ;
-#endif
-
 	if (nlen <= 0)
 	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("realname/names_add: li=%d i=%d\n",np->li,np->i) ;
-#endif
 
 	if ((np->li >= 0) && (np->i == np->li))
 	    return SR_INVALID ;
@@ -903,18 +832,8 @@ static int names_add(NAMES *np,cchar *nbuf,int nlen,int f_abv,int f_last)
 /* load this new one in */
 
 	if (np->a[np->i] != NULL) {
-
-#if	CF_DEBUGS
-	    debugprintf("realname/names_add: already occupied\n") ;
-#endif
-
 	    np->count -= 1 ;
-
 	}
-
-#if	CF_DEBUGS
-	debugprintf("realname/names_add: loading new one\n") ;
-#endif
 
 	if ((rs = storeitem_strw(&np->s,nbuf,nlen,&cp)) >= 0) {
 	    cl = rs ;
@@ -924,20 +843,14 @@ static int names_add(NAMES *np,cchar *nbuf,int nlen,int f_abv,int f_last)
 
 	    np->f_abv[np->i] = (f_abv)?1:0 ;
 	    np->count += 1 ;
-	    if (f_last)
+	    if (f_last) {
 	        np->li = np->i ;
+	    }
 
 /* saturate if we have not yet seen a last name */
 
 	    if ((np->count < REALNAME_NNAMES) || (np->li >= 0)) {
-
-#if	CF_DEBUGS
-	        debugprintf("realname/names_add: c=%d incrementing index\n",
-	            np->count) ;
-#endif
-
 	        np->i = (np->i + 1) % REALNAME_NNAMES ;
-
 	    } /* end if */
 
 	} /* end if (storeitem) */

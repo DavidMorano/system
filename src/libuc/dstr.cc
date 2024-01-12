@@ -1,4 +1,4 @@
-/* dstr */
+/* dstr SUPPORT */
 /* lang=C++20 */
 
 /* string object */
@@ -22,28 +22,39 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"dstr.h"
 
 
-/* external subroutines */
+/* local defines */
 
-extern char	*strwcpy(char *,cchar *,int) noex ;
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* exported subroutines */
 
-int dstr_start(DSTR *sop,cchar *s,int slen) noex {
+int dstr_start(dstr *sop,cchar *s,int slen) noex {
 	int		rs = SR_NOEXIST ;
-	sop->sbuf = NULL ;
+	sop->sbuf = nullptr ;
 	sop->slen = 0 ;
-	if (s != NULL) {
-	    sop->slen = (slen < 0) ? strlen(s) : slen ;
-	    if ((rs = uc_malloc(sop->slen,&sop->sbuf)) >= 0) {
+	if (s != nullptr) {
+	    void	*vp{} ;
+	    if (slen < 0) slen = strlen(s) ;
+	    sop->slen = slen ;
+	    if ((rs = uc_malloc(sop->slen,&vp)) >= 0) {
+		sop->sbuf = charp(vp) ;
 	        rs = sop->slen ;
 	        strwcpy(sop->sbuf,s,sop->slen) ;
 	    }
@@ -52,20 +63,20 @@ int dstr_start(DSTR *sop,cchar *s,int slen) noex {
 }
 /* end subroutine (dstr_start) */
 
-int dstr_finish(DSTR *sop) noex {
+int dstr_finish(dstr *sop) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (sop->sbuf != NULL) {
+	if (sop->sbuf != nullptr) {
 	    rs1 = uc_free(sop->sbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sop->sbuf = NULL ;
+	    sop->sbuf = nullptr ;
 	}
 	sop->slen = 0 ;
 	return rs ;
 }
 /* end subroutine (dstr_finish) */
 
-int dstr_assign(DSTR *sop,DSTR *sop2) noex {
+int dstr_assign(dstr *sop,dstr *sop2) noex {
 	int		rs ;
 	if ((rs = dstr_finish(sop)) >= 0) {
 	    rs = dstr_start(sop,sop2->sbuf,sop2->slen) ;

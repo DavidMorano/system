@@ -25,7 +25,6 @@
 	creates the associated 'mailname' from that.
 
 	Synopsis:
-
 	int mkmailname(char *rbuf,int rlen,cchar *gn,int gl) noex
 
 	Arguments:

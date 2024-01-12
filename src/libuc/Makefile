@@ -822,7 +822,7 @@ obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
 strop.o:		strop.cc strop.h
-dstr.o:			dstr.c dstr.h
+dstr.o:			dstr.cc dstr.h
 
 field.o:		field.cc field.h
 field_srvarg.o:		field_srvarg.cc field.h
