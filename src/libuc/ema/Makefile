@@ -113,7 +113,7 @@ obj3_ema.o:	$(OBJ3EMA)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3EMA)
 
 
-emaobj.o:		emaobj.cc ema.h parts.hh asstr.hh
+emaobj.o:		emaobj.cc ema.h parts.hh asstr.hh entry.hh
 parts.o:		parts.cc parts.hh asstr.hh
 asstr.o:		asstr.cc asstr.hh
 entry.o:		entry.cc entry.hh ema.h

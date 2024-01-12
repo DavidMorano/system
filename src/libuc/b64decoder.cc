@@ -1,4 +1,4 @@
-/* b64decoder */
+/* b64decoder SUPPORT */
 /* lang=C++98 */
 
 /* Base-64 (B64) decoding */
@@ -50,8 +50,8 @@
 
 /* namespaces */
 
-using std::nothrow ;
-using std::min ;
+using std::min ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
@@ -78,6 +78,14 @@ static inline int b64decoder_ctor(b64decoder *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int b64decoder_dtor(b64decoder *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 static int	b64decoder_cvt(B64DECODER *,cchar *,int) noex ;
 
 
@@ -96,6 +104,9 @@ int b64decoder_start(B64DECODER *op) noex {
 	        op->magic = B64DECODER_MAGIC ;
 	        rs = SR_OK ;
 	    } /* end if (new) */
+	    if (rs < 0) {
+		b64decoder_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -103,6 +114,7 @@ int b64decoder_start(B64DECODER *op) noex {
 
 int b64decoder_finish(B64DECODER *op) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	if (op) {
 	    rs = SR_NOTOPEN ;
 	    if (op->magic == B64DECODER_MAGIC) {
@@ -110,6 +122,10 @@ int b64decoder_finish(B64DECODER *op) noex {
 	            obuf 	*obp = (obuf *) op->outbuf ;
 	            delete obp ;
 	            op->outbuf = nullptr ;
+	        }
+	        {
+		    rs1 = b64decoder_dtor(op) ;
+		    if (rs >= 0) rs = rs1 ;
 	        }
 	        op->magic = 0 ;
 	    } /* end if (magic) */

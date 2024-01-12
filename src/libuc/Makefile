@@ -1308,6 +1308,36 @@ ccfile.o:		ccfile.cc ccfile.hh
 
 
 
+userattrdb.o:		userattrdb.cc	userattrdb.h
+hdb.o:			hdb.cc		hdb.h
+pmq.o:			pmq.cc		pmq.h
+filegrp.o:		filegrp.cc	filegrp.h
+ids.o:			ids.cc		ids.h
+unameo.o:		unameo.cc	unameo.h
+hostaddr.o:		hostaddr.cc	hostaddr.h
+b64decoder.o:		b64decoder.cc	b64decoder.h
+lookaside.o:		lookaside.cc	lookaside.h
+strpack.o:		strpack.cc	strpack.h
+strtab.o:		strtab.cc	strtab.h
+strstore.o:		strstore.cc	strstore.h
+expcook.o:		expcook.cc	expcook.h
+hostinfo.o:		hostinfo.cc	hostinfo.h
+paramfile.o:		paramfile.cc	paramfile.h
+varsub.o:		varsub.cc	varsub.h
+memfile.o:		memfile.cc	memfile.h
+dirlist.o:		dirlist.cc	dirlist.h
+varray.o:		varray.cc	varray.h
+csem.o:			csem.cc		csem.h
+pwcache.o:		pwcache.cc	pwcache.h
+lockrw.o:		lockrw.cc	lockrw.h
+filebuf.o:		filebuf.cc	filebuf.h
+nodedb.o:		nodedb.cc	nodedb.h
+buffer.o:		buffer.cc	buffer.h
+
+
+
+
+
 # testing
 
 X01= testugetpw

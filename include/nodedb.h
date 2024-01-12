@@ -63,9 +63,7 @@ typedef NODEDB		nodedb ;
 typedef NODEDB_CUR	nodedb_cur ;
 typedef NODEDB_ENT	nodedb_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int nodedb_open(nodedb *,cchar *) noex ;
 extern int nodedb_fileadd(nodedb *,cchar *) noex ;
@@ -77,9 +75,7 @@ extern int nodedb_enum(nodedb *,nodedb_cur *,nodedb_ent *,char *,int) noex ;
 extern int nodedb_check(nodedb *,time_t) noex ;
 extern int nodedb_close(nodedb *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* NODEDB_INCLUDE */

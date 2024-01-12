@@ -69,9 +69,7 @@ struct varsub_head {
 typedef VARSUB		varsub ;
 typedef VARSUB_CUR	varsub_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	varsub_start(varsub *,int) noex ;
 extern int	varsub_add(varsub *,cchar *,int,cchar *,int) noex ;
@@ -88,9 +86,7 @@ extern int	varsub_expbuf(varsub *,buffer *,cchar *,int) noex ;
 extern int	varsub_expfile(varsub *,bfile *,bfile *) noex ;
 extern int	varsub_finish(varsub *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VARSUB_INCLUDE */

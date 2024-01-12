@@ -76,6 +76,19 @@ static inline int varray_ctor(varray *op,Args ... args) noex {
 }
 /* end subroutine (varray_ctor) */
 
+static inline int varray_dtor(varray *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->lap) {
+		delete op->lap ;
+		op->lap = nullptr ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (varray_dtor) */
+
 static int	varray_extend(varray *,int) noex ;
 
 
@@ -103,6 +116,9 @@ int varray_start(varray *op,int esize,int n) noex {
 		    }
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		varray_dtor(op) ;
+	    }
 	} /* end if (varray_ctor) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -124,9 +140,9 @@ int varray_finish(varray *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 	            op->va = nullptr ;
 		}
-		if (op->lap) {
-		    delete op->lap ;
-		    op->lap = nullptr ;
+	        {
+		    rs1 = varray_dtor(op) ;
+	            if (rs >= 0) rs = rs1 ;
 		}
 	        op->c = 0 ;
 		op->n = 0 ;

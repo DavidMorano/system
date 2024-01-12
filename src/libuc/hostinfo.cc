@@ -1,4 +1,4 @@
-/* hostinfo */
+/* hostinfo SUPPORT */
 /* lang=C++20 */
 
 /* manipulate host entry structures */
@@ -141,8 +141,16 @@ static inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int hostinfo_dtor(hostinfo *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 template<typename ... Args>
-static inline int hostinfo_magic(hostinfo *op,Args ... args) noex {
+static int hostinfo_magic(hostinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == HOSTINFO_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -270,6 +278,9 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 		    }
 	        } /* end if (hostinfo_bufbegin) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		hostinfo_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -308,7 +319,11 @@ int hostinfo_finish(hostinfo *op) noex {
 		    rs1 = hostinfo_bufend(op) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
-	       op->magic = 0 ;
+	    {
+		rs1 = hostinfo_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

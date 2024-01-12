@@ -57,6 +57,9 @@ EXTERNC_begin
 extern int	mklogid(char *,int,cchar *,int,int) noex ;
 extern int	mkplogid(char *,int,cchar *,int) noex ;
 extern int	mksublogid(char *,int,cchar *,int) noex ;
+extern int	mkaddrbest(char *,int,cchar *,int) noex ;
+extern int	mkaddrname(char *,int,cchar *,int) noex ;
+extern int	mkdisphdr(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 

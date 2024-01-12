@@ -1,4 +1,4 @@
-/* memfile */
+/* memfile SUPPORT */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */
@@ -48,8 +48,8 @@
 
 /* local namespaces */
 
-using std::min ;
-using std::max ;
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */

@@ -38,18 +38,14 @@ struct b64decoder_head {
 
 typedef struct b64decoder_head	b64decoder ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int b64decoder_start(B64DECODER *) noex ;
 extern int b64decoder_load(B64DECODER *,cchar *,int) noex ;
 extern int b64decoder_read(B64DECODER *,char *,int) noex ;
 extern int b64decoder_finish(B64DECODER *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* B64DECODER_INCLUDE */

@@ -42,9 +42,7 @@ struct csem_head {
 
 typedef CSEM		csem ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	csem_create(csem *,int,int) noex ;
 extern int	csem_decr(csem *,int,int) noex ;
@@ -53,9 +51,7 @@ extern int	csem_count(csem *) noex ;
 extern int	csem_waiters(csem *) noex ;
 extern int	csem_destroy(csem *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CSEM_INCLUDE */

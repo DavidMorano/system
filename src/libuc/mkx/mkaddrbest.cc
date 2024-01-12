@@ -1,4 +1,4 @@
-/* mkbestaddr SUPPORT */
+/* mkaddrbest SUPPORT */
 /* lang=C++20 */
 
 /* get the "best" address out of an EMA type address specification */
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	mkbestaddr
+	mkaddrbest
 
 	Description:
 	This subroutine extracts the "best" address out of an
@@ -26,7 +26,7 @@
 	form).
 
 	Synopsis:
-	int mkbestaddr(char *rbuf,int rlen,cchar *sp,int sl) noex
+	int mkaddrbest(char *rbuf,int rlen,cchar *sp,int sl) noex
 
 	Arguments:
 	rbuf		result buffer
@@ -67,7 +67,7 @@
 
 /* exported subroutines */
 
-int mkbestaddr(char *rbuf,int rlen,cchar *abuf,int alen) noex {
+int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -112,6 +112,6 @@ int mkbestaddr(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (mkbestaddr) */
+/* end subroutine (mkaddrbest) */
 
 

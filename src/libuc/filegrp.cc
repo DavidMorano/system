@@ -1,4 +1,4 @@
-/* filegrp */
+/* filegrp SUPPORT */
 /* lang=C++20 */
 
 /* group-name cache */
@@ -85,6 +85,14 @@ static inline int filegrp_ctor(filegrp *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int filegrp_dtor(filegrp *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 static int filegrp_searchgid(FGO *,REC **,gid_t) noex ;
 static int filegrp_newrec(FGO *,time_t,REC **,gid_t,cc *) noex ;
 static int filegrp_recaccess(FGO *,REC *,time_t) noex ;
@@ -141,6 +149,9 @@ int filegrp_start(FGO *op,int max,int ttl) noex {
 	        if (rs < 0)
 		    cq_finish(&op->recsfree) ;
 	    } /* end if (cq-start) */
+	    if (rs < 0) {
+		filegrp_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -179,11 +190,15 @@ int filegrp_finish(FGO *op) noex {
 	    	        if (rs >= 0) rs = rs1 ;
 		    }
 		}
-		{
-	            rs1 = cq_finish(&op->recsfree) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		op->magic = 0 ;
+	    {
+	        rs1 = cq_finish(&op->recsfree) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = filegrp_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

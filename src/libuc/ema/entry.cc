@@ -45,8 +45,6 @@
 /* local namespaces */
 
 using namespace::emaobj ;		/* namespace */
-using std::nullptr_t ;			/* type */
-using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -165,5 +163,28 @@ namespace emaobj {
     } /* end subroutine (entry_startload) */
 
 }
+
+#if	COMMENT
+static int entry_debugprint(ema_ent *ep,cchar *s) noex {
+	if (ep == nullptr) return SR_FAULT ;
+	if (s != nullptr)
+	    debugprintf("entry_debugprint: s=%s\n",s) ;
+	debugprintf("entry_debugprint: type=%u\n",ep->type) ;
+	if (ep->op)
+	    debugprintf("entry_debugprint: O %u %t\n",
+	        ep->ol,ep->op,ep->ol) ;
+	if (ep->ap)
+	    debugprintf("entry_debugprint: A %u %t\n",
+	        ep->al,ep->ap,ep->al) ;
+	if (ep->rp)
+	    debugprintf("entry_debugprint: R %u %t\n",
+	        ep->rl,ep->rp,ep->rl) ;
+	if (ep->cp)
+	    debugprintf("entry_debugprint: C %u %t\n",
+	        ep->cl,ep->cp,ep->cl) ;
+	return SR_OK ;
+}
+/* end subroutine (entry_debugprint) */
+#endif /* COMMENT */
 
 

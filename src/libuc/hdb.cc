@@ -1,4 +1,4 @@
-/* hdb */
+/* hdb SUPPORT */
 /* lang=C++20 */
 
 /* general-purpose in-core hashing */
@@ -230,6 +230,14 @@ static inline int hdb_ctor(hdb *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int hdb_dtor(hdb *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 static int	hdb_entnew(hdb *,ENT **) noex ;
 static int	hdb_entdel(hdb *,ENT *) noex ;
 
@@ -294,7 +302,7 @@ constexpr bool		f_hashelf = CF_HASHELF ;
 /* exported subroutines */
 
 int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if (n < HDB_DEFSIZE) n = HDB_DEFSIZE ;
 	if ((rs = hdb_ctor(op)) >= 0) {
 	    cint	esize = sizeof(ENT) ;
@@ -320,19 +328,13 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	            if (op->at > 0) lookaside_finish(&op->es) ;
 	        }
 	    } /* end if (ok) */
+	    if (rs < 0) {
+		hdb_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (hdb_start) */
-
-/* delete the whole database */
-
-/****
-	Here we free all the memory associated with the DB, we erase
-	the pointers to it, and invalidate the DB to prevent further
-	use via any other possible pointers to it.
-
-****/
 
 int hdb_finish(hdb *op) noex {
 	int		rs ;
@@ -351,7 +353,11 @@ int hdb_finish(hdb *op) noex {
 	            rs1 = lookaside_finish(&op->es) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
-		op->magic = 0 ;
+	    {
+	        rs1 = hdb_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

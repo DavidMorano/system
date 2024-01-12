@@ -1,4 +1,4 @@
-/* pmq (LIBUC) */
+/* pmq SUPPORT (LIBUC) */
 /* lang=C++20 */
 
 /* Posix Message Queue (PMQ) */
@@ -163,6 +163,14 @@ static inline int pmq_ctor(pmq *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int pmq_dtor(pmq *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 template<typename ... Args>
 static inline int pmq_magic(pmq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
@@ -217,6 +225,9 @@ int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {
 		    } /* end if (cleanup on error) */
 	        } /* end if (pmq-nameload) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		pmq_dtor(op) ;
+	    }
 	} /* end if (pmq_ctor) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -236,6 +247,11 @@ int pmq_close(pmq *op) noex {
 	        rs1 = po(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
+	    {
+		rs1 = pmq_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

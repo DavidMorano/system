@@ -81,9 +81,7 @@ struct lockrw : lockrw_head {
 typedef LOCKRW		lockrw ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	lockrw_create(lockrw *,int) noex ;
 extern int	lockrw_rdlock(lockrw *,int) noex ;
@@ -92,9 +90,7 @@ extern int	lockrw_unlock(lockrw *) noex ;
 extern int	lockrw_readers(lockrw *) noex ;
 extern int	lockrw_destroy(lockrw *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* LOCKRW_INCLUDE */

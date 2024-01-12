@@ -50,9 +50,7 @@ struct pwcache_head {
 typedef	PWCACHE		pwcache ;
 typedef PWCACHE_STATS	pwcache_stats ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pwcache_start(pwcache *,int,int) noex ;
 extern int pwcache_lookup(pwcache *,PASSWD *,char *,int,cchar *) noex ;
@@ -61,9 +59,7 @@ extern int pwcache_check(pwcache *,time_t) noex ;
 extern int pwcache_getstats(pwcache *,pwcache_stats *) noex ;
 extern int pwcache_finish(pwcache *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PWCACHE_INCLUDE */

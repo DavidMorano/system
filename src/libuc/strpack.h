@@ -41,9 +41,7 @@ struct strpack_head {
 typedef struct strpack_head	strpack ;
 typedef struct strpack_chunk	strpack_ch ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	strpack_start(STRPACK *,int) noex ;
 extern int	strpack_store(STRPACK *,cchar *,int,cchar **) noex ;
@@ -51,9 +49,7 @@ extern int	strpack_count(STRPACK *) noex ;
 extern int	strpack_size(STRPACK *) noex ;
 extern int	strpack_finish(STRPACK *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRPACK_INCLUDE */

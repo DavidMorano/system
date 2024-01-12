@@ -48,9 +48,7 @@ struct strtab_head {
 typedef struct strtab_head	strtab ;
 typedef struct strtab_chunk	strtab_ch ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	strtab_start(strtab *,int) noex ;
 extern int	strtab_finish(strtab *) noex ;
@@ -66,9 +64,7 @@ extern int	strtab_indlen(strtab *) noex ;
 extern int	strtab_indsize(strtab *) noex ;
 extern int	strtab_indmk(strtab *,int (*)[3],int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRTAB_INCLUDE */

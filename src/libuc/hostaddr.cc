@@ -1,4 +1,4 @@
-/* hostaddr */
+/* hostaddr SUPPORT */
 /* lang=C++20 */
 
 /* manipulate host entry structures */
@@ -128,6 +128,14 @@ static inline int hostaddr_ctor(hostaddr *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int hostaddr_dtor(hostaddr *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 template<typename ... Args>
 static inline int hostaddr_magic(hostaddr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
@@ -177,7 +185,10 @@ int hostaddr_start(HOSTADDR *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 		rs1 = uc_free(ehostname) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		hostaddr_dtor(op) ;
+	    }
+	} /* end if (hostaddr_ctor) */
 	return rs ;
 }
 /* end subroutine (hostaddr_start) */
@@ -195,12 +206,16 @@ int hostaddr_finish(HOSTADDR *op) noex {
 	            rs1 = hostaddr_resultend(op) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
-	        if (op->aip) {
-	            rs1 = uc_freeaddrinfo(op->aip) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->aip = nullptr ;
-	        }
-	        op->magic = 0 ;
+	    if (op->aip) {
+	        rs1 = uc_freeaddrinfo(op->aip) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->aip = nullptr ;
+	    }
+	    {
+	        rs1 = hostaddr_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

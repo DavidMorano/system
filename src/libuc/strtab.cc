@@ -1,4 +1,4 @@
-/* strtab */
+/* strtab SUPPORT */
 /* lang=C++20 */
 
 /* string table object */

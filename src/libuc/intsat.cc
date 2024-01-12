@@ -68,6 +68,18 @@ int intsatll(longlong v) noex {
 	return intsatx(v) ;
 }
 
+int intsatul(ulong v) noex {
+	ulong	im = ulong(INT_MAX) ;
+	if (v > im) v = im ;
+	return int(v) ;
+}
+
+int intsatull(ulonglong v) noex {
+	ulonglong	im = ulonglong(INT_MAX) ;
+	if (v > im) v = im ;
+	return int(v) ;
+}
+
 int iaddsat(int v1,int v2) noex {
 	int		vr = (v1+v2) ;
 	if (v1 >= 0) {

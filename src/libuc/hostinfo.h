@@ -73,9 +73,7 @@ typedef HOSTINFO_ADDR		hostinfo_addr ;
 typedef HOSTINFO_ARGS		hostinfo_args ;
 typedef HOSTINFO_CUR		hostinfo_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int hostinfo_start(hostinfo *,int,cchar *) noex ;
 extern int hostinfo_geteffective(hostinfo *,cchar **) noex ;
@@ -86,9 +84,7 @@ extern int hostinfo_enumname(hostinfo *,hostinfo_cur *,cchar **) noex ;
 extern int hostinfo_enumaddr(hostinfo *,hostinfo_cur *,const uchar **) noex ;
 extern int hostinfo_finish(hostinfo *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HOSTINFO_INCLUDE */

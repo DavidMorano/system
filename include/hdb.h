@@ -79,9 +79,7 @@ typedef struct hdb_datum	hdb_dat ;
 typedef struct hdb_entry	hdb_ent ;
 typedef struct hdb_cursor	hdb_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int hdb_start(hdb *,int,int,hdbhash_f,hdbcmp_f) noex ;
 extern int hdb_store(hdb *,hdb_dat,hdb_dat) noex ;
@@ -105,9 +103,7 @@ extern int hdb_hashtabcounts(hdb *,int *,int) noex ;
 extern int hdb_audit(hdb *) noex ;
 extern int hdb_finish(hdb *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HDB_INCLUDE */

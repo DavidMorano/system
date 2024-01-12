@@ -39,6 +39,7 @@
 #include	<localmisc.h>
 
 #include	"ema.h"
+#include	"entry.hh"
 #include	"asstr.hh"
 #include	"parts.hh"
 
@@ -122,13 +123,6 @@ static int	ema_load(ema *,cchar *,int,asstr *,ema *) noex ;
 
 #if	CF_ADDENT
 static int	ema_addentone(ema *,ema_ent *) noex ;
-#endif
-
-static int	entry_start(ema_ent *) noex ;
-static int	entry_finish(ema_ent *) noex ;
-
-#if	CF_ADDENT
-static int	entry_startload(ema_ent *,ema_ent *) noex ;
 #endif
 
 #if	CF_COMPACT
@@ -559,7 +553,7 @@ static int ema_load(ema *hp,cchar *orig,int olen,asstr *as,ema *nlp) noex {
 	    cint	size = sizeof(ema_ent) ;
 	    if ((rs = uc_malloc(size,&ep)) >= 0) {
 	        if ((rs = entry_start(ep)) >= 0) {
-	            int	sl ;
+	            int		sl ;
 	            cchar	*sp ;
 	            cchar	*cp ;
 	            for (int i = 0 ; (rs >= 0) && (i < si_overlast) ; i += 1) {
@@ -667,121 +661,6 @@ static int ema_debugprint(ema *hp,cchar *s) noex {
 	return SR_OK ;
 }
 /* end subroutine (ema_debugprint) */
-#endif /* COMMENT */
-
-static int entry_start(ema_ent *ep) noex {
-	int		rs = SR_FAULT ;
-	if (ep) {
-	    memclear(ep) ;
-	    ep->type = ematype_reg ;
-	}
-	return rs ;
-}
-/* end subroutine (entry_start) */
-
-static int entry_finish(ema_ent *ep) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (ep) {
-	    rs = SR_OK ;
-	    if (ep->op != nullptr) {
-	        rs1 = uc_free(ep->op) ;
-	        if (rs >= 0) rs = rs1 ;
-	        ep->op = nullptr ;
-	    }
-	    if (ep->ap != nullptr) {
-	        rs1 = uc_free(ep->ap) ;
-	        if (rs >= 0) rs = rs1 ;
-	        ep->ap = nullptr ;
-	    }
-	    if (ep->rp != nullptr) {
-	        rs1 = uc_free(ep->rp) ;
-	        if (rs >= 0) rs = rs1 ;
-	        ep->rp = nullptr ;
-	    }
-	    if (ep->cp != nullptr) {
-	        rs1 = uc_free(ep->cp) ;
-	        if (rs >= 0) rs = rs1 ;
-	        ep->cp = nullptr ;
-	    }
-	    if (ep->listp != nullptr) {
-		{
-	            rs1 = ema_finish(ep->listp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = uc_free(ep->listp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-	        ep->listp = nullptr ;
-	    } /* end if (recursive free-up) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (entry_finish) */
-
-#if	CF_ADDENT
-
-static int entry_startload(ema_ent *ep,ema_ent *oep) noex {
-	int		rs = SR_OK ;
-	*ep = *oep ;
-	if (oep->op != nullptr) {
-	    ep->op = mallocstrw(oep->op,oep->ol) ;
-	}
-	if (oep->ap != nullptr) {
-	    ep->ap = mallocstrw(oep->ap,oep->al) ;
-	}
-	if (oep->rp != nullptr) {
-	    ep->rp = mallocstrw(oep->rp,oep->rl) ;
-	}
-	if (oep->cp != nullptr) {
-	    ep->cp = mallocstrw(oep->cp,oep->cl) ;
-	}
-	if (oep->listp != nullptr) {
-	    ema		*nop = nullptr ; /* LINT assignment */
-	    cint	size = sizeof(ema) ;
-	    ep->listp = nullptr ;
-	    if ((rs = uc_malloc(size,&nop)) >= 0) {
-	        if ((rs = ema_start(nop)) >= 0) {
-	            if ((rs = ema_addents(nop,oep->listp)) >= 0) {
-	                ep->listp = nop ;
-	            }
-	            if (rs < 0) {
-	                ema_finish(nop) ;
-		    }
-	        } /* end if (ema_start) */
-	        if (rs < 0) {
-	            uc_free(nop) ;
-		}
-	    } /* end if (allocation) */
-	} /* end if (non-nullptr) */
-	return rs ;
-}
-/* end subroutine (entry_startload) */
-
-#endif /* CF_ADDENT */
-
-#if	COMMENT
-static int entry_debugprint(ema_ent *ep,cchar *s) noex {
-	if (ep == nullptr) return SR_FAULT ;
-	if (s != nullptr)
-	    debugprintf("entry_debugprint: s=%s\n",s) ;
-	debugprintf("entry_debugprint: type=%u\n",ep->type) ;
-	if (ep->op)
-	    debugprintf("entry_debugprint: O %u %t\n",
-	        ep->ol,ep->op,ep->ol) ;
-	if (ep->ap)
-	    debugprintf("entry_debugprint: A %u %t\n",
-	        ep->al,ep->ap,ep->al) ;
-	if (ep->rp)
-	    debugprintf("entry_debugprint: R %u %t\n",
-	        ep->rl,ep->rp,ep->rl) ;
-	if (ep->cp)
-	    debugprintf("entry_debugprint: C %u %t\n",
-	        ep->cl,ep->cp,ep->cl) ;
-	return SR_OK ;
-}
-/* end subroutine (entry_debugprint) */
 #endif /* COMMENT */
 
 #if	CF_COMPACT

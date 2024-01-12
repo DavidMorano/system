@@ -81,9 +81,7 @@ typedef PARAMFILE		paramfile ;
 typedef PARAMFILE_CUR		paramfile_cur ;
 typedef PARAMFILE_ENT		paramfile_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int paramfile_open(paramfile *,cchar **,cchar *) noex ;
 extern int paramfile_fileadd(paramfile *,cchar *) noex ;
@@ -98,9 +96,7 @@ extern int paramfile_checkint(paramfile *,int) noex ;
 extern int paramfile_check(paramfile *,time_t) noex ;
 extern int paramfile_close(paramfile *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PARAMFILE_INCLUDE */

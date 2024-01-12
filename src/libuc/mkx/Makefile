@@ -71,7 +71,7 @@ OBJ13_MKX= mkrealname.o mkreplyaddr.o mkrevstr.o mksenderaddr.o
 OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o mksublogid.o
 OBJ15_MKX= mktagfname.o mktagprint.o
 OBJ16_MKX= mktmplock.o mktmpuserdir.o mkufname.o
-OBJ17_MKX= mkuibang.o mkuiname.o mkuserpath.o mkutmpid.o
+OBJ17_MKX= mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o mkvarpath.o
 
 OBJA_MKX= obj00_mkx.o obj11_mkx.o obj02_mkx.o obj03_mkx.o
@@ -200,10 +200,14 @@ obje_mkx.o:	$(OBJE_MKX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_MKX)
 
 
-mkfdfname.o:		mkfdfname.cc mkfdfname.h
-mkgecosname.o:		mkgecosname.cc mkgecosname.h
-mklogid.o:		mklogid.cc mkx.h
-mkplogid.o:		mkplogid.cc mkx.h
-mksublogid.o:		mksublogid.cc mkx.h
+mkfdfname.o:		mkfdfname.cc $(INCS) mkfdfname.h
+mkgecosname.o:		mkgecosname.cc $(INCS) mkgecosname.h
+mklogid.o:		mklogid.cc $(INCS)
+mkplogid.o:		mkplogid.cc $(INCS)
+mksublogid.o:		mksublogid.cc $(INCS)
+
+mkaddrname.o:		mkaddrname.cc  $(INCS)
+mkaddrpart.o:		mkaddrpart.cc  $(INCS)
+mkaddrbest.o:		mkaddrbest.cc  $(INCS)
 
 
