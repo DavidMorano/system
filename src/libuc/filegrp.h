@@ -52,8 +52,8 @@ struct filegrp_statistics {
 } ;
 
 struct filegrp_head {
-	cq		recsfree ;
-	vechand		recs ;
+	cq		*flp ;
+	vechand		*alp ;
 	time_t		ti_check ;
 	FILEGRP_STATS	s ;
 	uint		magic ;

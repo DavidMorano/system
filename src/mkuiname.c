@@ -1,4 +1,4 @@
-/* mkuiname SUPPORT */
+/* uiname SUPPORT */
 /* lang=C++20 */
 
 /* try to divine the best real name from a USERINFO object */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	mkuiname
+	uiname
 
 	Description:
 	We try to divine the best name that we can for the current
@@ -25,7 +25,7 @@
 	contained in the USERINFO object.
 
 	Synopsis:
-	int mkuiname(char *rbuf,int rlen,usernfo *uip) noex
+	int uiname(char *rbuf,int rlen,usernfo *uip) noex
 
 	Arguments:
 	rbuf		supplied result buffer
@@ -70,7 +70,7 @@
 
 /* exported subroutines */
 
-int mkuiname(char *rbuf,int rlen,USERINFO *uip) noex {
+int uiname(USERINFO *uip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	if (rbuf && uip) {
 	    rs = SR_INVALID ;
@@ -94,6 +94,6 @@ int mkuiname(char *rbuf,int rlen,USERINFO *uip) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mkuiname) */
+/* end subroutine (uiname) */
 
 

@@ -1,4 +1,4 @@
-/* mkuibang SUPPORT */
+/* uibang SUPPORT */
 /* lang=C++20 */
 
 /* make a "bang" name from USERINFO data */
@@ -19,14 +19,14 @@
 /*******************************************************************************
 
 	Name:
-	mkuibang
+	uibang
 
 	Description:
 	This subroutine create a name that combines the nodename
 	and the username into a "bangname."
 
 	Synopsis:
-	int mkuibang(char *nbuf,int nlen,USERINFO *uip) noex
+	int uibang(char *nbuf,int nlen,USERINFO *uip) noex
 
 	Arguments:
 	nbuf		buffer to receive resulting name
@@ -84,7 +84,7 @@ constexpr bool	f_mailname  = CF_MAILNAME ;
 
 /* exported subroutines */
 
-int mkuibang(char *rbuf,int rlen,USERINFO *uip) noex {
+int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && uip) {
 	    rbuf[0] = '\0' ;
@@ -130,6 +130,6 @@ int mkuibang(char *rbuf,int rlen,USERINFO *uip) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mkuibang) */
+/* end subroutine (uibang) */
 
 
