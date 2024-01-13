@@ -1,0 +1,9 @@
+extern int	mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex ;
+extern int	mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex ;
+extern int	mkbestfrom(char *fbuf,int flen,cchar *sp,int sl) noex ;
+extern int	mkvarpath(char *rbuf,cchar *fp,int fl) noex ;
+extern int	mkufname(char *rbuf,cchar *hn,cchar *rc) noex ;
+extern int	mkaltext(char *dbuf,cchar *name,cchar *ext) noex ;
+extern int	mkmaildirtest(char *rbuf,cchar *dp,int dl) noex ;
+extern int	mkstrunique(char *bp,int bl) noex ;
+extern int	mkcleanline(char *lp,int ll,int m) noex ;

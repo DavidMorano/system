@@ -4,7 +4,6 @@
 /* make a temporary file which is "lockable" */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
 
 /* revision history:
 
@@ -55,6 +54,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
+#include	<mkfile.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 
@@ -100,26 +101,12 @@ char		pathname[] ;
 		continue ;
 	    }
 
-#if	CF_DEBUGS
-	debugprintf("buf=%s\n",buf) ;
-#endif
-
 	    sl = mktmpfile(pathname,perm,buf) ;
 
 	    if (sl >= 0) {
 
-#if	CF_DEBUGS
-	debugprintf("pathname=%s\n",pathname) ;
-#endif
-
 		rs = lockable(pathname) ;
-
-#if	CF_DEBUGS
-	debugprintf("lockable() rs=%d\n",rs) ;
-#endif
-
-		if (rs >= 0)
-		    break ;
+		if (rs >= 0) break ;
 
 		u_unlink(pathname) ;
 

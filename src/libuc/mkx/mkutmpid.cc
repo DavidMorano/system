@@ -96,7 +96,7 @@
 
 	Returns:
 	>=0		OK, and length of resulting ID string
-	<0		some error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -204,6 +204,7 @@ int mkutmpid(char *idbuf,int idlen,cchar *devbuf,int devlen) noex {
 	tmper	to(idbuf,idlen,devbuf,devlen) ;
 	return to ;
 }
+/* end subroutine (mkutmpid) */
 
 
 /* local subroutines */

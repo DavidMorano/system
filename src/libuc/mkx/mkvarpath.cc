@@ -59,7 +59,10 @@
 #include	<hasx.h>
 #include	<strn.h>
 #include	<strwcpy.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -75,10 +78,9 @@
 
 /* external subroutines */
 
-extern int	isNotPresent(int) noex ;
-extern int	isOneOf(cint *,int) noex ;
-
-extern cchar	*getenver(cchar *,int) noex ;
+extern "C" {
+    extern cchar	*getenver(cchar *,int) noex ;
+}
 
 
 /* external variables */

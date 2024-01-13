@@ -44,8 +44,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<usystem.h>
-#include	<ctdec.h>
 #include	<bufsizevar.hh>
+#include	<ctdec.h>
 #include	<localmisc.h>
 
 #include	"mkfdfname.h"
@@ -56,8 +56,16 @@
 #define	CHX_STAR	'*'
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
+
+/* external variables */
 
 
 /* forward references */
@@ -67,7 +75,10 @@ static int		getdlen(int) noex ;
 
 /* local variables */
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxnamelen(getbufsize_mn) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -82,8 +93,8 @@ int mkfdfname(char *dbuf,int dlen,int fd) noex {
 	            dbuf[i++] = CHX_STAR ;
 	            rs = ctdeci((dbuf+i),(dlen-i),fd) ;
 	            i += rs ;
-	        }
-	    }
+	        } /* end if (getdlen) */
+	    } /* end if (valid FD) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -97,7 +108,7 @@ static int getdlen(int dlen) noex {
 	if (dlen < 2) {
 	    rs = SR_INVALID ;
 	    if (dlen < 0) {
-	        rs = maxpathlen ;
+	        rs = maxnamelen ;
 	    }
 	}
 	return rs ;

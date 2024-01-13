@@ -47,7 +47,6 @@
 #include	<mkfname.h>
 #include	<mkfdfname.h>
 #include	<mkdisplayable.h>
-#include	<mkdisphdr.h>
 #include	<mknpath.h>
 #include	<mkpath.h>
 #include	<mkchar.h>
@@ -58,6 +57,21 @@ EXTERNC_begin
 
 extern int	mkrealname(char *,int,cchar *,int) noex ;
 extern int	mknoise(uint *a,int n) noex ;
+extern int	mkbasename(char *,cchar *,int) noex ;
+extern int	mkintfname(char *,cchar *,cchar *,cchar *) noex ;
+extern int	mktagfname(char *,cchar *,cchar *,int) noex ;
+extern int	mkmid(char *,int,cchar *,cchar *,pid_t,int) noex ;
+extern int	mkonefrom(char *,int,cchar *,int) noex ;
+extern int	mkbestfrom(char *,int,cchar *,int) noex ;
+extern int	mkvarpath(char *,cchar *,int) noex ;
+extern int	mkufname(char *,cchar *,cchar *) noex ;
+extern int	mkaltext(char *,cchar *,cchar *) noex ;
+extern int	mkvarpath(char *,cchar *,int) noex ;
+extern int	mkufname(char *,cchar *,cchar *) noex ;
+extern int	mkaltext(char *,cchar *,cchar *) noex ;
+extern int	mkmaildirtest(char *,cchar *,int) noex ;
+extern int	mkstrunique(char *,int) noex ;
+extern int	mkcleanline(char *,int,int) noex ;
 
 EXTERNC_end
 

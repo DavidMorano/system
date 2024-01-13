@@ -28,16 +28,16 @@
 	will be created.
 
 	Synopsis:
-	int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t m) noex
+	int mktmpuserdir(char *rbuf,cchar *un,cchar *dn,mode_t m) noex
 
 	Arguments:
 	rbuf		buffer to receive resulting created directory name
 	un		optional username
-	dname		basename of directory to create
+	dn		basename of directory to create
 	m		directory creation mode
 
 	Returns:
-	>0		length of resulting directory name
+	>=0		length of resulting directory name
 	<0		error (system-return)
 
 *******************************************************************************/
@@ -55,6 +55,8 @@
 #include	<getxusername.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
+
+#include	"mktmp.h"
 
 
 /* local defines */

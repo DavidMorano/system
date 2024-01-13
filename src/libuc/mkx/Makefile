@@ -70,7 +70,7 @@ OBJ12_MKX= mkplogid.o mkquoted.o
 OBJ13_MKX= mkrealname.o mkrevstr.o
 OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o mksublogid.o
 OBJ15_MKX= mktagfname.o
-OBJ16_MKX= mktmplock.o mktmpuserdir.o mkufname.o
+OBJ16_MKX= mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
 OBJ18_MKX= mkuuid.o mkvarpath.o
 
@@ -205,11 +205,22 @@ mkgecosname.o:		mkgecosname.cc $(INCS) mkgecosname.h
 mklogid.o:		mklogid.cc $(INCS)
 mkplogid.o:		mkplogid.cc $(INCS)
 mksublogid.o:		mksublogid.cc $(INCS)
+mkmid.o:		mkmid.cc $(INCS)
 
 mkaddrname.o:		mkaddrname.cc  $(INCS)
 mkaddrpart.o:		mkaddrpart.cc  $(INCS)
 mkaddrbest.o:		mkaddrbest.cc  $(INCS)
 
-strlibval.o:		strlibval.cc strlibval.hh
+mkbasename.o:		mkbasename.c $(INCS)
+
+mkintfname.o:		mkintfname.cc $(INCS)
+mkonefrom.o:		mkonefrom.cc $(INCS)
+mkbestfrom.o:		mkbestfrom.cc $(INCS)
+mkvarpath.o:		mkvarpath.cc $(INCS)
+mkufname.o:		mkufname.cc $(INCS)
+mkaltext.o:		mkaltext.cc $(INCS)
+mkmaildirtest.o:	mkmaildirtest.cc $(INCS)
+mkstrunique.o:		mkstrunique.cc $(INCS)
+mkcleanline.o:		mkcleanline.cc $(INCS)
 
 

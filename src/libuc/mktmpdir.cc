@@ -50,6 +50,8 @@
 #include	<mkfile.h>
 #include	<localmisc.h>
 
+#include	"mktmp.h"
+
 
 /* local defines */
 

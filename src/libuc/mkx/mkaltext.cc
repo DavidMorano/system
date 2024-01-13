@@ -48,6 +48,8 @@
 #include	<sbuf.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 

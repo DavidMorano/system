@@ -48,6 +48,8 @@
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
 
 /* external subroutines */
 

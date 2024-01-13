@@ -29,6 +29,7 @@
 #include	<usupport.h>
 #include	<varnames.hh>
 #include	<syswords.hh>
+#include	<bufsizevar.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<mallocstuff.h>
@@ -83,6 +84,8 @@ constexpr strenv::strenv() noex {
 /* local variables */
 
 constexpr strenv	enver ;
+
+static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
 /* exported variables */
@@ -169,28 +172,31 @@ cchar *strlibval::strpath() noex {
 	    if ((rp = getenv(vn)) == nullptr) {
 		int	rs ;
 		int	rs1 ;
-		char	*tbuf{} ;
-		if ((rs = malloc_mp(&tbuf)) >= 0) {
-		    cchar	*usrlocal = sysword.w_usrlocaldir ;
-		    cint	tlen = rs ;
-		    if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
-			int	tl = rs ;
-			if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
-		            cint	cmd = _CS_PATH ;
-			    cint	clen = (tlen - (tl+rs)) ;
-			    char	*cbuf = (tbuf + (tl+rs)) ;
-			    tl += rs ;
-		            if ((rs = uc_confstr(cbuf,clen,cmd)) >= 0) {
+		if ((rs = maxpathlen) >= 0) {
+		    cint	tlen = (rs * 2) ;
+		    char	*tbuf{} ;
+		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		        cchar	*usrlocal = sysword.w_usrlocaldir ;
+		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
+			    int	tl = rs ;
+			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
+		                cint	cmd = _CS_PATH ;
+			        cint	clen = (tlen - (tl+rs)) ;
+			        char	*cbuf = (tbuf + (tl+rs)) ;
 			        tl += rs ;
-			        a = mallocstrw(tbuf,tl) ;
-			        rp = a ;
-		            } /* end if (uc_confstr) */
-			} /* end if (sncpy) */
-		    } /* end if (mkpath) */
-		    rs1 = uc_free(tbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
+		                if ((rs = uc_confstr(cbuf,clen,cmd)) >= 0) {
+			            tl += rs ;
+			            a = mallocstrw(tbuf,tl) ;
+			            rp = a ;
+		                } /* end if (uc_confstr) */
+			    } /* end if (sncpy) */
+		        } /* end if (mkpath) */
+		        rs1 = uc_free(tbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+		} /* end if (maxpathlen) */
 		if (rs < 0) {
+		    rp = nullptr ;
 		    ulogerror("strlibval::strpath",rs,"path construction") ;
 		}
 	    } /* end if (env-variable access) */

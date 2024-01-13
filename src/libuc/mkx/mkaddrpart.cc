@@ -124,9 +124,4 @@ int mkaddrpart(char *abuf,int alen,cchar *sp,int sl) noex {
 }
 /* end subroutine (mkaddrpart) */
 
-int mkdispaddr(char *abuf,int alen,cchar *sp,int sl) noex {
-	return mkdisphdr(abuf,alen,sp,sl) ;
-}
-/* end subroutine (mkdispaddr) */
-
 

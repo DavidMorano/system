@@ -4,7 +4,6 @@
 /* test whether a string consists of all unique characters */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 
 /* revision history:
 
@@ -44,6 +43,8 @@
 #include	<mkchar.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 
@@ -74,7 +75,7 @@ int mkstrunique(char *bp,int bl) noex {
 	    int		tail = 1 ;
 	    bool_init(seen,256) ;
 	    while (bl-- && *bp) {
-	        ch = MKCHAR(*bp) ;
+	        ch = mkchar(*bp) ;
 		if (!seen[ch]) {
 		    bp[tail++] = ch ;
 	            seen[ch] = true ;

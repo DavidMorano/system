@@ -21,6 +21,7 @@
 EXTERNC_begin
 
 extern int mkgecosname(char *,int,cchar *) noex ;
+extern int getgecosname(cchar *,int,cchar **) noex ;
 
 EXTERNC_end
 
