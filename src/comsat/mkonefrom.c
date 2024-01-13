@@ -1,17 +1,18 @@
-/* mkonefrom */
+/* mkonefrom SUPPORT */
+/* lang=C++20 */
 
 /* try to divine the best "from" address from a raw source string */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_MASSAGE	0		/* allow for massaging */
 
-
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-        This code piece was part of the 'pcsmailcheck(3pcs)' subroutine and I
-        pulled it out to make a subroutine that can be used in multiple places.
+	This code piece was part of the 'pcsmailcheck(3pcs)'
+	subroutine and I pulled it out to make a subroutine that
+	can be used in multiple places.
 
 */
 
@@ -19,90 +20,60 @@
 
 /*******************************************************************************
 
-        This subroutine extracts the "best" address out of an EMA-type of
-        address specification (given in raw string form).
+	Name:
+	mkonefrom
+
+	Description:
+	This subroutine extracts the "best" address out of an
+	EMA-type of address specification (given in raw string
+	form).
 
 	Synopsis:
-
-	int mkonefrom(fbuf,flen,sp,sl)
-	char		fbuf[] ;
-	int		flen ;
-	const char	*sp ;
-	int		sl ;
+	int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex
 
 	Arguments:
-
 	fbuf		result buffer
 	flen		result buffer length
 	sp		source string
 	sl		source string length
 
 	Returns:
-
-	<0		error
 	>=0		length of resulting string
-
+	<0		error (system-return)
 
 	Notes:
-
 	+ Massaging the result:
-        In the old days, before header fields could be encoded in wacko ways,
-        the result here was the final result. It could therefore be massaged to
-        get rid of some cruft that certain mailers (who will remain nameless --
-        for now) would add to the field string value. But now-a-days, the result
-        here could still be wackily encoded, so massaging will at best do
-        nothing, and at worst break the encoded format.
-
+	In the old days, before header fields could be encoded in
+	wacko ways, the result here was the final result. It could
+	therefore be massaged to get rid of some cruft that certain
+	mailers (who will remain nameless -- for now) would add to
+	the field string value. But now-a-days, the result here
+	could still be wackily encoded, so massaging will at best
+	do nothing, and at worst break the encoded format.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ema.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 
-#ifndef	MSGLINEBUFLEN
-#define	MSGLINEBUFLEN	(LINEBUFLEN * 5)
-#endif
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mknpath1(char *,int,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsubstance(const char *,int,const char **) ;
-extern int	mkdisphdr(char *,int,const char *,int) ;
-extern int	isNotPresent(int) ;
-extern int	isOneOf(const int *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* external variables */
@@ -120,7 +91,7 @@ enum atypes {
 
 /* forward references */
 
-static int	emaentry_bestfrom(EMA_ENT *,char *,int) ;
+static int	emaentry_bestfrom(EMA_ENT *,char *,int) noex ;
 
 
 /* local variables */
@@ -128,9 +99,7 @@ static int	emaentry_bestfrom(EMA_ENT *,char *,int) ;
 
 /* exported subroutines */
 
-
-int mkonefrom(char *fbuf,int flen,cchar *sp,int sl)
-{
+int mkonefrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -139,11 +108,6 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl)
 	if (sp == NULL) return SR_FAULT ;
 
 	if (sl < 0) sl = strlen(sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("mkonefrom: ent s=>%t<\n",
-		sp,strlinelen(sp,sl,40)) ;
-#endif
 
 	fbuf[0] = '\0' ;
 	if (sl > 0)  {
@@ -161,10 +125,6 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl)
 	    } /* end if (ema) */
 	} /* end if (non-zero source) */
 
-#if	CF_DEBUGS
-	debugprintf("mkonefrom: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkonefrom) */
@@ -172,14 +132,12 @@ int mkonefrom(char *fbuf,int flen,cchar *sp,int sl)
 
 /* local subroutines */
 
-
-static int emaentry_bestfrom(EMA_ENT *ep,char *fbuf,int flen)
-{
+static int emaentry_bestfrom(EMA_ENT *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
 	int		len = 0 ;
-	const char	*np = NULL ;
+	cchar		*np = NULL ;
 
 	if ((np == NULL) || (nl == 0)) {
 	    if (ep->cp != NULL) {
@@ -201,15 +159,6 @@ static int emaentry_bestfrom(EMA_ENT *ep,char *fbuf,int flen)
 	        nl = sfshrink(ep->rp,ep->rl,&np) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mkonefrom/emaentry_bestfrom: mid rs=%d atype=%d\n",
-		rs,atype) ;
-	if ((np != NULL) && (nl > 0)) {
-	    debugprintf("mkonefrom/emaentry_bestfrom: f=>%t<\n",
-		np,strlinelen(np,nl,40)) ;
-	}
-#endif /* CF_DEBUGS */
 
 #if	CF_MASSAGE
 	if ((np != NULL) && (nl > 0)) {
@@ -244,14 +193,6 @@ static int emaentry_bestfrom(EMA_ENT *ep,char *fbuf,int flen)
 	    } /* end switch */
 	} /* end if (positive) */
 #endif /* CF_MASSAGE */
-
-#if	CF_DEBUGS
-	debugprintf("mkonefrom/emaentry_bestfrom: ret rs=%d len=%u\n",
-		rs,len) ;
-	if (rs >= 0)
-	debugprintf("mkonefrom/emaentry_bestfrom: ret f=>%t<\n",
-		fbuf,strlinelen(fbuf,len,40)) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }

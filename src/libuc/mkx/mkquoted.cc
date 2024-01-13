@@ -1,4 +1,4 @@
-/* mkquoted */
+/* mkquoted SUPPORT */
 /* lang=C++20 */
 
 /* quote arguments for safe passage through a SHELL */

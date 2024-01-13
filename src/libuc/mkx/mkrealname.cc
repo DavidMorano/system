@@ -48,6 +48,8 @@
 #include	<realname.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 

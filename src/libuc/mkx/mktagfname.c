@@ -1,9 +1,8 @@
-/* mktagfname */
+/* mktagfname SUPPORT */
+/* lang=C++20 */
 
 /* make a tag filename */
-
-
-#define	CF_DEBUGS	0		/* used for little object below */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,23 +16,36 @@
 
 /*******************************************************************************
 
-	This subroutine makes (creates) a tag filename given a tag basename and
-	a base directory name.
+	Name:
+	mktagfname
 
+	Description:
+	This subroutine makes (creates) a tag filename given a tag
+	basename and a base directory name.
+
+	Synopsis:
+	int mktagfname(char *rbuf,cchar *bdname,cchar *sp,int sl) noex
+
+	Arguments:
+	rbuf		result buffer pointer
+	bdname		base dir-name
+	sp		file string pointer
+	sl		file string length
+
+	Returns:
+	>=0		number bytes of result
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
-#include	<storebuf.h>
+#include	<mkpathxw.h>
 #include	<localmisc.h>
 
 
@@ -41,8 +53,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
 
 
 /* external variables */
@@ -59,56 +69,8 @@ extern int	snwcpy(char *,int,const char *,int) ;
 
 /* exported subroutines */
 
-
-int mktagfname(fname,basedname,sp,sl)
-char		fname[] ;
-const char	basedname[] ;
-const char	sp[] ;
-int		sl ;
-{
-	const int	maxpl = MAXPATHLEN ;
-	int		rs = SR_OK ;
-
-	if (fname == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-/* initialize */
-
-	fname[0] = '\0' ;
-
-/* get the full tag filename */
-
-	if ((sp[0] != '/') && (basedname != NULL)) {
-	    int	i = 0 ;
-
-	    if (rs >= 0) {
-	        rs = storebuf_strw(fname,maxpl,i,basedname,-1) ;
-	        i += rs ;
-	    }
-
-	    if (rs >= 0) {
-		while ((i > 0) && (fname[i - 1] == '/')) {
-		    i -= 1 ;
-		}
-	    }
-
-	    if (rs >= 0) {
-	        rs = storebuf_char(fname,maxpl,i,'/') ;
-	        i += rs ;
-	    }
-
-	    if (rs >= 0) {
-	        rs = storebuf_strw(fname,maxpl,i,sp,sl) ;
-	        i += rs ;
-	    }
-
-	    if (rs >= 0)
-		rs = i ;
-
-	} else
-	    rs = snwcpy(fname,maxpl,sp,sl) ;
-
-	return rs ;
+int mktagfname(char *rbuf,cchar *basedname,cchar *sp,int sl) noex {
+	return mkpath2w(rbuf,basedname,sp,sl) ;
 }
 /* end subroutine (mktagfname) */
 

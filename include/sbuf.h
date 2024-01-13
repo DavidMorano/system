@@ -86,6 +86,9 @@ struct sbuf_co {
 	    return operator () () ;
 	} ;
 } ; /* end struct (sbuf_co) */
+extern "C" {
+   extern int sbuf_strw(sbuf *,cchar *,int) noex ;
+}
 struct sbuf : sbuf_head {
 	sbuf_co		deci ;
 	sbuf_co		hexc ;
@@ -111,6 +114,11 @@ struct sbuf : sbuf_head {
 	sbuf &operator = (const sbuf &) = delete ;
 	int start(char *,int) noex ;
 	int nchr(int,int = 1) noex ;
+	int strw(cchar *sp,int sl = -1) noex {
+	    return sbuf_strw(this,sp,sl) ;
+	} ;
+	template<typename Decimal> int dec(Decimal) noex ;
+	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
 	sbuf_iter begin() noex {
 	    sbuf_iter		it(rbuf) ;
 	    return it ;
@@ -128,9 +136,7 @@ struct sbuf : sbuf_head {
 typedef struct sbuf_head	sbuf ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	sbuf_start(sbuf *,char *,int) noex ;
 extern int	sbuf_finish(sbuf *) noex ;
@@ -164,9 +170,7 @@ extern int	sbuf_printf(sbuf *,cchar *,...) noex ;
 extern int	sbuf_termconseq(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted(sbuf *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 
@@ -190,6 +194,10 @@ inline int sbuf_dec(sbuf *op,ulonglong v) noex {
 	return sbuf_decull(op,v) ;
 }
 
+template<typename Decimal> int sbuf::dec(Decimal v) noex {
+	return sbuf_dec(this,v) ;
+} ;
+
 inline int sbuf_hex(sbuf *op,int v) noex {
 	return sbuf_hexi(op,v) ;
 }
@@ -209,6 +217,10 @@ inline int sbuf_hex(sbuf *op,ulong v) noex {
 inline int sbuf_hex(sbuf *op,ulonglong v) noex {
 	return sbuf_hexull(op,v) ;
 }
+
+template<typename Hexadecimal> int sbuf::hex(Hexadecimal v) noex {
+	return sbuf_hex(this,v) ;
+} ;
 
 #endif /* __cplusplus */
 

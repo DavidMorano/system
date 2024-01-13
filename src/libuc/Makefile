@@ -1305,6 +1305,7 @@ isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
 readln.o:		readln.cc readln.hh
 ccfile.o:		ccfile.cc ccfile.hh
+strlibval.o:		strlibval.cc strlibval.hh
 
 
 

@@ -1,4 +1,4 @@
-/* mkpathxw */
+/* mkpathxw SUPPORT */
 /* lang=C++20 */
 
 /* make a file-path from multiple component c-strings */

@@ -1,11 +1,10 @@
-/* mktmplock */
+/* mktmplock SUPPORT */
+/* lang=C++20 */
 
 /* make a temporary file which is "lockable" */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
-
 
 /* revision history:
 
@@ -18,48 +17,43 @@
 
 /*******************************************************************************
 
-	Make a temporary file that is also record lockable.
+	Name:
+	mktmplock
 
-	Why does this even exist (you might ask) ??
-
-	Because with the introduction of the 'tmpfs' file-system in System V
-	Release 4 (like Sun Solaris as primary example) in 1988, files put into
-	that file-system are not lockable !!  Unfortunately, '/tmp' is mounted
-	as a 'tmpfs' file-system !!  That is a place where file locks were
-	often kept (sigh)!
+	Description:
+	Make a temporary file that is also record lockable.  Why
+	does this even exist (you might ask)?  Because with the
+	introduction of the 'tmpfs' file-system in System V Release
+	4 (like Sun Solaris as primary example) in 1988, files put
+	into that file-system are not lockable !!  Unfortunately,
+	'/tmp' is mounted as a 'tmpfs' file-system !!  That is a
+	place where file locks were often kept (sigh)!
 
 	Synopsis:
-
 	int mktmplock(tmpdirs,fname,perm,pathname)
-	const char	*tmpdirs[] ;
-	const char	fname[] ;
+	cchar	*tmpdirs[] ;
+	cchar	fname[] ;
 	mode_t		perm ;
 	char		pathname[] ;
 
 	Arguments:
-
 	tmpdirs		array of strings of directory names (NULL terminated)
 	fname		file creation template string
 	perm		file creation mode
 	pathname	resultant buffer to hold final file path name
 
 	Returns:
-
-	<0		error code indicating last type of failure
-	len		length of created temporary file if successful
-
+	>=0		length of created temporary file if successful
+	<0		error code (systerm-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -69,22 +63,17 @@
 
 /* external subroutines */
 
-extern int	mktmpfile(char *,mode_t,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* forward references */
 
-static int	lockable(const char *) ;
+static int	lockable(cchar *) noex ;
 
 
 /* exported subroutines */
 
-
 int mktmplock(tmpdirs,fname,perm,pathname)
-const char	*tmpdirs[] ;
-const char	fname[] ;
+cchar	*tmpdirs[] ;
+cchar	fname[] ;
 mode_t		perm ;
 char		pathname[] ;
 {
@@ -145,10 +134,7 @@ char		pathname[] ;
 
 /* local subroutines */
 
-
-static int lockable(fname)
-const char	fname[] ;
-{
+static int lockable(cchar *fname) noex {
 	int		rs ;
 	if ((rs = u_open(fname,O_RDWR,0666)) >= 0) {
 	    const int	fd = rs ;

@@ -1,4 +1,4 @@
-/* mkutmpid */
+/* mkutmpid SUPPORT */
 /* lang=C++20 */
 
 /* make a UTMPX entry ID (c_string) */

@@ -1,4 +1,4 @@
-/* mkdisphdr SUPPORT */
+/* mkaddrpart SUPPORT */
 /* lang=C++20 */
 
 /* create (in a buffer) a sort of nice mail address for display purposes */
@@ -41,11 +41,13 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -88,8 +90,8 @@ int mkdisphdr(char *abuf,int alen,cchar *sp,int sl) noex {
 	        if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	            if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	                cchar	*fp = fbuf ;
-	                int		fl ;
-	                int		c = 0 ;
+	                int	fl ;
+	                int	c = 0 ;
 	                while ((fl = field_sharg(&fsb,NULL,fbuf,flen)) >= 0) {
 	                    if (fl > 0) {
 				if constexpr (f_nonstandard) {

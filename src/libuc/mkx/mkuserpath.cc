@@ -1,4 +1,4 @@
-/* mkuserpath */
+/* mkuserpath SUPPORT */
 /* lang=C++20 */
 
 /* make a user-path */

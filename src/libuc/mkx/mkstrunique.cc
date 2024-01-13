@@ -1,4 +1,4 @@
-/* mkstrunique */
+/* mkstrunique SUPPORT */
 /* lang=C++11 */
 
 /* test whether a string consists of all unique characters */
@@ -17,24 +17,30 @@
 
 /*******************************************************************************
 
-	We modify the given sring in place to remove any duplicates found.
+	Name:
+	mkstrunique
+
+	Description:
+	We modify the given sring in place to remove any duplicates
+	found.
 
 	Synopsis:
-	int mkstrunique(char *bp,int bl)
+	int mkstrunique(char *bp,int bl) noex
 
 	Arguments:
 	bp		string to test
 	bl		length of string to test
 
 	Returns:
-	-		length of given string
-
+	>=0		length of given string
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -53,7 +59,7 @@
 
 /* forward references */
 
-static void	bool_init(bool *,int) ;
+static void	bool_init(bool *,int) noex ;
 
 
 /* local variables */
@@ -61,8 +67,7 @@ static void	bool_init(bool *,int) ;
 
 /* exported subroutines */
 
-int mkstrunique(char *bp,int bl)
-{
+int mkstrunique(char *bp,int bl) noex {
 	if (bl > 1) {
 	    bool	seen[256] ;
 	    int		ch ;
@@ -85,11 +90,8 @@ int mkstrunique(char *bp,int bl)
 
 /* local subroutines */
 
-
-static void bool_init(bool *bp,int bl)
-{
-	int	i ;
-	for (i = 0 ; i < bl ; i += 1) bp[i] = false ;
+static void bool_init(bool *bp,int bl) noex {
+	for (int i = 0 ; i < bl ; i += 1) bp[i] = false ;
 }
 /* end subroutine (bool_init) */
 

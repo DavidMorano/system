@@ -1,17 +1,17 @@
-/* mkaddrname SUPPORT */
-/* lang=C++20 */
+/* mkbestfrom SUPPORT */
+/* lang=C20 */
 
-/* find the best address-name, if one exists */
+/* try to divine the best "from" address from a raw source string */
 /* version %I% last-modified %G% */
 
-#define	CF_MASSAGE	0		/* allow for "massaging" */
+#define	CF_MASSAGE	0		/* allow for massaging */
 
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-	This code piece was part of the 'pcsmailcheck(3pcs)' subroutine and I
-	pulled it out to make a subroutine that can be used in multiple
-	places.
+	This code piece was part of the |pcsmailcheck(3pcs)|
+	subroutine and I pulled it out to make a subroutine that
+	can be used in multiple places.
 
 */
 
@@ -20,15 +20,15 @@
 /*******************************************************************************
 
 	Name:
-	mkaddrname
+	mkbestfrom
 
 	Description:
-	This subroutine extracts the "best" address out of an
-	EMA-type of address specification (given in raw string
+	This subroutine extracts the "best" from-address out of an
+	ema-type of address specification (given in raw string
 	form).
 
 	Synopsis:
-	int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex
+	int mkbestfrom(char *fbuf,int flen,cchar *sp,int sl) noex
 
 	Arguments:
 	fbuf		result buffer
@@ -41,7 +41,7 @@
 	<0		error (system-return)
 
 	Notes:
-	1. Massaging the result:
+	+ Massaging the result:
 	In the old days, before header fields could be encoded in
 	wacko ways, the result here was the final result. It could
 	therefore be massaged to get rid of some cruft that certain
@@ -54,7 +54,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<cstring>		/* for |strlen(3c)| */
+#include	<string.h>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ema.h>
@@ -66,18 +66,12 @@
 
 /* local defines */
 
-
-/* local namespace */
-
-
-/* local typedefs */
+#ifndef	CF_MASSAGE
+#define	CF_MASSAGE	0		/* allow for massaging */
+#endif
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkdisphdr(char *,int,cchar *,int) noex ;
-}
 
 
 /* external variables */
@@ -95,7 +89,8 @@ enum atypes {
 
 /* forward references */
 
-static int	emaentry_addrname(EMA_ENT *,char *,int) noex ;
+static int	mkaddrx(char *,int,cchar *,int) noex ;
+static int	emaentry_bestfrom(ema_ent *,char *,int) noex ;
 static int	isBadAddr(int) noex ;
 
 
@@ -115,94 +110,105 @@ constexpr bool	f_massage = CF_MASSAGE ;
 
 /* exported subroutines */
 
-int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
+int mkbestfrom(char *fbuf,int flen,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		len = 0 ;
 	if (fbuf && sp) {
-	    rs = SR_OK ;
-	    if (sl < 0) sl = strlen(sp) ;
+	    rs = SR_INVALID ;
 	    fbuf[0] = '\0' ;
-	    if (sl > 0)  {
-	        EMA		a ;
-	        EMA_ENT		*ep{} ;
-	        if ((rs = ema_start(&a)) >= 0) {
-	            if ((rs = ema_parse(&a,sp,sl)) >= 0) {
-			auto	eg = ema_get ;
-		        cint	rsn = SR_NOTFOUND ;
-		        for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
-		            rs = emaentry_addrname(ep,fbuf,flen) ;
-	                    len = rs ;
-			    if (rs != 0) break ;
-		        } /* end for (ema_get) */
-		        if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
-		    } else if (isBadAddr(rs)) {
-		        rs = SR_OK ;
-	            } /* end if (ema_parse) */
-	            rs1 = ema_finish(&a) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (ema) */
-	    } /* end if (non-zero source) */
+	    if (sp[0]) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        if (sl > 0)  {
+	            rs = mkaddrx(fbuf,flen,sp,sl) ;
+		    len = rs ;
+	        } /* end if (non-zero source) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (mkaddrname) */
+/* end subroutine (mkbestfrom) */
 
 
 /* local subroutines */
 
-static int emaentry_addrname(EMA_ENT *ep,char *fbuf,int flen) noex {
+static int mkaddrx(char *rbuf,int rlen,cchar *sp,int sl) noex {
+	ema		a ;
+	ema_ent		*ep ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	    if ((rs = ema_start(&a)) >= 0) {
+	        if ((rs = ema_parse(&a,sp,sl)) >= 0) {
+		    auto	eg = ema_get ;
+		    cint	rsn = SR_NOTFOUND ;
+		    for (int i = 0 ; (rs1 = eg(&a,i,&ep)) >= 0 ; i += 1) {
+		        rs = emaentry_bestfrom(ep,rbuf,rlen) ;
+	                len = rs ;
+			if (rs != 0) break ;
+		    } /* end while (ema_get) */
+		    if ((rs >= 0) && (rs1 != rsn)) rs = rs1 ;
+		} else if (isBadAddr(rs)) {
+		    rs = SR_OK ;
+	        } /* end if (ema_parse) */
+	        rs1 = ema_finish(&a) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (ema) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (mkaddrx) */
+
+static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
 	int		len = 0 ;
-	cchar		*np = nullptr ;
-	if ((np == nullptr) || (nl == 0)) {
+	cchar		*rp = nullptr ;
+	if ((rp == nullptr) || (nl == 0)) {
 	    if (ep->cp != nullptr) {
 	        atype = atype_comment ;
-	        nl = sfshrink(ep->cp,ep->cl,&np) ;
+	        nl = sfshrink(ep->cp,ep->cl,&rp) ;
 	    }
 	}
-	if ((np == nullptr) || (nl == 0)) {
+	if ((rp == nullptr) || (nl == 0)) {
 	    if (ep->ap != nullptr) {
 	        atype = atype_address ;
-	        nl = sfshrink(ep->ap,ep->al,&np) ;
+	        nl = sfshrink(ep->ap,ep->al,&rp) ;
 	    }
 	}
-	if ((np == nullptr) || (nl == 0)) {
+	if ((rp == nullptr) || (nl == 0)) {
 	    if (ep->rp != nullptr) {
 	        atype = atype_route ;
-	        nl = sfshrink(ep->rp,ep->rl,&np) ;
+	        nl = sfshrink(ep->rp,ep->rl,&rp) ;
 	    }
 	}
 	if constexpr (f_massage) {
-	    if ((np != nullptr) && (nl > 0)) {
-	        int		cl ;
+	    if ((rp != nullptr) && (nl > 0)) {
+	        int	cl ;
 	        cchar	*cp ;
 	        switch (atype) {
 	        case atype_comment:
-	            if ((cl = sfsubstance(np,nl,&cp)) > 0) {
+	            if ((cl = sfsubstance(rp,nl,&cp)) > 0) {
 	                rs = snwcpy(fbuf,flen,cp,cl) ;
 	                len = rs ;
 	            }
 	            break ;
 	        case atype_address:
-	            rs = mkdisphdr(fbuf,flen,np,nl) ;
+	            rs = mkdisphdr(fbuf,flen,rp,nl) ;
 	            len = rs ;
 	            break ;
 	        case atype_route:
-	            rs = snwcpy(fbuf,flen,np,nl) ;
+	            rs = snwcpy(fbuf,flen,rp,nl) ;
 	            len = rs ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (positive) */
 	} else {
-	    if ((np != nullptr) && (nl > 0)) {
+	    if ((rp != nullptr) && (nl > 0)) {
 	        switch (atype) {
 	        case atype_comment:
 	        case atype_address:
 	        case atype_route:
-	            rs = snwcpy(fbuf,flen,np,nl) ;
+	            rs = snwcpy(fbuf,flen,rp,nl) ;
 	            len = rs ;
 		    break ;
 	        } /* end switch */
@@ -210,11 +216,11 @@ static int emaentry_addrname(EMA_ENT *ep,char *fbuf,int flen) noex {
 	} /* end if-constexpr (f_massage) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (emaentry_addrname) */
+/* end subroutine (emaentry_bestfrom) */
 
 static int isBadAddr(int rs) noex {
 	return isOneOf(rsbadaddr,rs) ;
 }
-/* end subroutine (emaentry_addrname) */
+/* end subroutine (emaentry_bestfrom) */
 
 

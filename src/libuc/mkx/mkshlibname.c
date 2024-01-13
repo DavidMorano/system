@@ -1,11 +1,10 @@
-/* mkshlibname */
+/* mkshlibname SUPPORT */
+/* lang=C20 */
 
 /* make the filename for a shared library (shared object) */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time print-outs */
-
 
 /* revision history:
 
@@ -18,20 +17,16 @@
 
 /*******************************************************************************
 
-	This subroutine formulates (makes) the file-name for a shared library
-	(shared object).
-
+	This subroutine formulates (makes) the file-name for a
+	shared library (shared object).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -41,25 +36,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -73,9 +49,7 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported subroutines */
 
-
-int mkshlibname(char *shlibname,cchar *pnp,int pnl)
-{
+int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
 	const int	shliblen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;

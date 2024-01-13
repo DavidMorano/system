@@ -22,7 +22,6 @@
 	Description:
 	We format a raw phone number to make it look more pretty.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>
@@ -56,9 +55,9 @@
 /* exported subroutines */
 
 int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
-	int		dl = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
+	int		dl = 0 ;
 	int		sl ;
 	cchar		*sp ;
 	if ((sl = sfshrink(pp,pl,&sp)) > 0) {

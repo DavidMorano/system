@@ -1,4 +1,4 @@
-/* mkpathx */
+/* mkpathx SUPPORT */
 /* lang=C20 */
 
 /* make a file-path from multiple component c-strings */

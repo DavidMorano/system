@@ -1,9 +1,9 @@
 /* mkbasename SUPPORT */
+/* lang=C20 */
 
 /* make the filename for a shared library (shared object) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time print-outs */
 
 /* revision history:
 
@@ -16,21 +16,19 @@
 
 /*******************************************************************************
 
-	This subroutine formulates (makes) the base-name part of a file-name
-	into the result buffer.
-
+	This subroutine formulates (makes) the base-name part of a
+	file-name into the result buffer.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<mkpathxw.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 
@@ -38,25 +36,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	mkpath3w(char *,const char *,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -70,19 +49,17 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported subroutines */
 
-
-int mkbasename(char *rbuf,cchar *pnp,int pnl)
-{
-	int		cl ;
-	int		len ;
-	cchar		*cp ;
-
-	if ((cl = sfbasename(pnp,pnl,&cp)) > 0) {
-	    const int	ml = MIN(MAXNAMELEN,cl) ;
-	    len = strwcpy(rbuf,cp,ml) - rbuf ;
-	}
-
-	return len ;
+int mkbasename(char *rbuf,cchar *pnp,int pnl) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf && pnp) {
+	    int		cl ;
+	    cchar	*cp ;
+	    rs = SR_INVALID ;
+	    if ((cl = sfbasename(pnp,pnl,&cp)) > 0) {
+	        rs = mkpath1w(rbuf,cp,(cp - pnp)) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (mkbasename) */
 

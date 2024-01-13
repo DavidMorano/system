@@ -54,11 +54,11 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mkx.h
 
 
-OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaltext.o
-OBJ01_MKX= mkaudit.o mkbasename.o mkbestaddr.o
-OBJ02_MKX= mkbestfrom.o mkcaselower.o mkcdpath.o mkcexsync.o
+OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaddrbest.o mkaltext.o
+OBJ01_MKX= mkbestfrom.o 
+OBJ02_MKX= mkcaselower.o mkcdpath.o mkcexsync.o mkbasename.o
 OBJ03_MKX= mkchar.o mkcleanline.o
-OBJ04_MKX= mkdisphdr.o mkdisplayable.o
+OBJ04_MKX= mkdisplayable.o
 OBJ05_MKX= mkexpandpath.o mkfdfname.o mkfingerquery.o 
 OBJ06_MKX= mkfmtphone.o mkfname.o mkfnamesuf.o
 OBJ07_MKX= mkgecosname.o
@@ -66,21 +66,21 @@ OBJ08_MKX= mkintfname.o mklogid.o mkmagic.o
 OBJ09_MKX= mkmaildirtest.o mkmailname.o mkmid.o
 OBJ10_MKX= mknoise.o mknpathx.o mknpathxw.o
 OBJ11_MKX= mkonefrom.o mkpathrooted.o mkpathx.o mkpathxw.o
-OBJ12_MKX= mkplogid.o mkprogenv.o mkquoted.o
+OBJ12_MKX= mkplogid.o mkquoted.o
 OBJ13_MKX= mkrealname.o mkrevstr.o
 OBJ14_MKX= mkshlibname.o mksofname.o mkstrunique.o mksublogid.o
-OBJ15_MKX= mktagfname.o mktagprint.o
+OBJ15_MKX= mktagfname.o
 OBJ16_MKX= mktmplock.o mktmpuserdir.o mkufname.o
 OBJ17_MKX= mkuserpath.o mkutmpid.o
-OBJ18_MKX= mkuuid.o mkvarpath.o mkvarpath.o
+OBJ18_MKX= mkuuid.o mkvarpath.o
 
-OBJA_MKX= obj00_mkx.o obj11_mkx.o obj02_mkx.o obj03_mkx.o
+OBJA_MKX= obj00_mkx.o obj01_mkx.o obj02_mkx.o obj03_mkx.o
 OBJB_MKX= obj04_mkx.o obj05_mkx.o obj06_mkx.o obj07_mkx.o
 OBJC_MKX= obj08_mkx.o obj09_mkx.o obj10_mkx.o obj11_mkx.o
 OBJD_MKX= obj12_mkx.o obj13_mkx.o obj14_mkx.o obj15_mkx.o
 OBJE_MKX= obj16_mkx.o obj17_mkx.o obj18_mkx.o 
 
-OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o 0bjd_mlx.o obje_mkx.o
+OBJ_MKX= obja_mkx.o objb_mkx.o objc_mkx.o objd_mkx.o obje_mkx.o
 
 
 default:		$(T).o
@@ -209,5 +209,7 @@ mksublogid.o:		mksublogid.cc $(INCS)
 mkaddrname.o:		mkaddrname.cc  $(INCS)
 mkaddrpart.o:		mkaddrpart.cc  $(INCS)
 mkaddrbest.o:		mkaddrbest.cc  $(INCS)
+
+strlibval.o:		strlibval.cc strlibval.hh
 
 

@@ -45,6 +45,7 @@
 #include	<getpwd.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
 #include	"mkpathrooted.h"
 
 

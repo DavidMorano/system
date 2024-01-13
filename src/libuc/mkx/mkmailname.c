@@ -53,13 +53,31 @@
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -79,7 +97,7 @@ int mkmailname(char *rbuf,int rlen,cchar *gp,int gl) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (readlname) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkmailname) */
 

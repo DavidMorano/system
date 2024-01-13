@@ -49,6 +49,8 @@
 #include	<ema.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 
