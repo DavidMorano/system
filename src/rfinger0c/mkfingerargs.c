@@ -68,25 +68,25 @@ int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,cchar **av) noex {
 	if (qbuf && up) {
 	    rs = SR_INVALID ;
 	    if (qlen > 0) {
-	sbuf		b ;
-	if ((rs = sbuf_start(&b,qbuf,qlen)) >= 0) {
-	    rs = sbuf_strw(&b,up,-1) ;
-	    if ((rs >= 0) && f_long) {
-		sbuf_strw(&b," /W",3) ;
-	    }
-	    if (av) {
-	        for (int i = 0 ; (rs >= 0) && av[i] ; i += 1) {
-	            if ((rs = sbuf_char(&b,' ')) >= 0) {
-			rs = sbuf_addquoted(&b,av[i],-1) ;
-		    }
-	        } /* end for */
-	    } /* end if (argument-vector) */
-	    if (rs >= 0) {
-	        sbuf_strw(&b,"\n\r",2) ;
-	    }
-	    len = sbuf_finish(&b) ;
-	    if (rs >= 0) rs = len ;
-	} /* end if (sbuf) */
+	        sbuf	b ;
+	        if ((rs = sbuf_start(&b,qbuf,qlen)) >= 0) {
+	            rs = sbuf_strw(&b,up,-1) ;
+	            if ((rs >= 0) && f_long) {
+		        sbuf_strw(&b," /W",3) ;
+	            }
+	            if (av) {
+	                for (int i = 0 ; (rs >= 0) && av[i] ; i += 1) {
+	                    if ((rs = sbuf_char(&b,' ')) >= 0) {
+			        rs = sbuf_addquoted(&b,av[i],-1) ;
+		            }
+	                } /* end for */
+	            } /* end if (argument-vector) */
+	            if (rs >= 0) {
+	                sbuf_strw(&b,"\n\r",2) ;
+	            }
+	            len = sbuf_finish(&b) ;
+	            if (rs >= 0) rs = len ;
+	        } /* end if (sbuf) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

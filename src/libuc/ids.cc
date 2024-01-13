@@ -1,4 +1,4 @@
-/* ids */
+/* ids SUPPORT */
 /* lang=C++20 */
 
 /* load up the process identification information (IDs) */
@@ -69,6 +69,7 @@ using std::nullptr_t ;
 /* forward references */
 
 static int	ids_ctor(ids *) noex ;
+static int	ids_dtor(ids *) noex ;
 static int	ids_ngids(const ids *) noex ;
 
 
@@ -99,7 +100,10 @@ int ids_load(ids *op) noex {
 		    }
 	        } /* end if (m-a) */
 	    } /* end if (ids_data) */
-	} /* end if (non-null) */
+	    if (rs < 0) {	
+		ids_dtor(op) ;
+	    }
+	} /* end if (ids_ctor) */
 	return (rs >= 0) ? ng : rs ;
 }
 /* end subroutine (ids_load) */
@@ -113,6 +117,10 @@ int ids_release(ids *op) noex {
 	        rs1 = uc_libfree(op->gids) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->gids = nullptr ;
+	    }
+	    {
+	        rs1 = ids_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -190,6 +198,16 @@ static int ids_ctor(ids *op) noex {
 	return rs ;
 }
 /* end subroutine (ids_ctor) */
+
+static int ids_dtor(ids *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    op->gids = nullptr ;
+	}
+	return rs ;
+}
+/* end subroutine (ids_dtor) */
 
 static int ids_ngids(const ids *op) noex {
 	int		n = 0 ;

@@ -45,9 +45,7 @@ struct expcook_head {
 typedef EXPCOOK		expcook ;
 typedef EXPCOOK_CUR	expcook_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int expcook_start(expcook *) noex ;
 extern int expcook_add(expcook *,cchar *,cchar *,int) noex ;
@@ -60,9 +58,7 @@ extern int expcook_exp(expcook *,int,char *,int,cchar *,int) noex ;
 extern int expcook_expbuf(expcook *,int,buffer *,cchar *,int) noex ;
 extern int expcook_finish(expcook *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* EXPCOOK_INCLUDE */

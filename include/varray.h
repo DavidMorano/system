@@ -37,11 +37,9 @@ struct varray_head {
 	int		imax ;		/* maximum used */
 } ;
 
-typedef struct varray_head	varray ;
+typedef VARRAY		varray ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*varray_vcmp)(cvoid **,cvoid **) noex ;
 
@@ -57,9 +55,7 @@ extern int varray_search(varray *,void *,varray_vcmp,void *) noex ;
 extern int varray_audit(varray *) noex ;
 extern int varray_finish(varray *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VARRAY_INCLUDE */

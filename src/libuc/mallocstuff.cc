@@ -27,6 +27,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -58,12 +59,16 @@ typedef char	*charp ;
 char *mallocbuf(void *bp,int bl) noex {
 	char		*rp = nullptr ;
 	if (bp) {
+	    int		rs ;
 	    if (bl < 0) bl = strlen(charp(bp)) ;
-	    if (uc_malloc((bl+1),&rp) >= 0) {
+	    if ((rs = uc_malloc((bl+1),&rp)) >= 0) {
 		memcpy(rp,bp,bl) ;
 		*rp = '\0' ;
+	    } /* end if (uc_malloc) */
+	    if (rs < 0) {
+		ulogerror("mallocbuf",rs,"uc_malloc") ;
 	    }
-	}
+	} /* end if (non-null) */
 	return rp ;
 }
 /* end subroutine (mallocbuf) */
@@ -71,11 +76,15 @@ char *mallocbuf(void *bp,int bl) noex {
 char *mallocstrw(char *sp,int sl) noex {
 	char		*rp = nullptr ;
 	if (sp) {
+	    int		rs ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (uc_malloc((sl+1),&rp) >= 0) {
+	    if ((rs = uc_malloc((sl+1),&rp)) >= 0) {
 	        strwcpy(rp,sp,sl) ;
+	    } /* end if (uc_malloc) */
+	    if (rs < 0) {
+		ulogerror("mallocstrw",rs,"uc_malloc") ;
 	    }
-	} /* end if */
+	} /* end if (non-null) */
 	return rp ;
 }
 /* end subroutine (mallocstrw) */
@@ -88,10 +97,14 @@ char *mallocstr(cchar *sp) noex {
 char *mallocint(int v) noex {
 	cint		len = sizeof(int) ;
 	char		*rp = nullptr ;
-	if (uc_malloc((len+1),&rp) >= 0) {
+	int		rs ;
+	if ((rs = uc_malloc((len+1),&rp)) >= 0) {
 	    char	*bp = charp(&v) ;
 	    memcpy(rp,bp,len) ;
 	    *rp = '\0' ;
+	} /* end if (uc_malloc) */
+	if (rs < 0) {
+	    ulogerror("mallocint",rs,"uc_malloc") ;
 	}
 	return rp ;
 }

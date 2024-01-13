@@ -1,4 +1,4 @@
-/* mknpathx */
+/* mknpathx SUPPORT */
 /* lang=C++20 */
 
 /* make a file path from components */

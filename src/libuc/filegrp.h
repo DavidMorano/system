@@ -52,8 +52,8 @@ struct filegrp_statistics {
 } ;
 
 struct filegrp_head {
-	cq		recsfree ;
-	vechand		recs ;
+	cq		*flp ;
+	vechand		*alp ;
 	time_t		ti_check ;
 	FILEGRP_STATS	s ;
 	uint		magic ;
@@ -65,9 +65,7 @@ typedef FILEGRP		filegrp ;
 typedef FILEGRP_ENT	filegrp_ent ;
 typedef FILEGRP_STATS	filegrp_sb ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int filegrp_start(filegrp *,int,int) noex ;
 extern int filegrp_add(filegrp *,gid_t,cchar *) noex ;
@@ -77,9 +75,7 @@ extern int filegrp_check(filegrp *,time_t) noex ;
 extern int filegrp_stats(filegrp *,filegrp_sb *) noex ;
 extern int filegrp_finish(filegrp *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FILEGRP_INCLUDE */

@@ -1,4 +1,4 @@
-/* unameo */
+/* unameo SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® information (a cache for |uname(2)|) */
@@ -70,8 +70,19 @@ static inline int unameo_ctor(unameo *op,Args ... args) noex {
 	return rs ;
 }
 
+static inline int unameo_dtor(unameo *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -110,6 +121,9 @@ int unameo_start(unameo *op) noex {
 	        rs1 = uc_free(unp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
+	    if (rs < 0) {
+		unameo_dtor(op) ;
+	    }
 	} /* end if (unameo_ctor) */
 	return rs ;
 }
@@ -129,6 +143,10 @@ int unameo_finish(unameo *op) noex {
 	        op->release = nullptr ;
 	        op->version = nullptr ;
 	        op->machine = nullptr ;
+	    }
+	    {
+	        rs1 = unameo_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

@@ -1,13 +1,16 @@
-/* mksofname */
+/* mksofname SUPPORT */
+/* lang=C++20 */
 
 /* make a shared-object filename from components */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2001-12-03, David A­D­ Morano
-	This code was born out of frustration with cleaning up bad legacy code
-	(of which there is quite a bit -- like almost all of it).
+	This code was born out of frustration with cleaning up bad
+	legacy code (of which there is quite a bit -- like almost
+	all of it).
 
 */
 
@@ -15,18 +18,15 @@
 
 /*******************************************************************************
 
-        This subroutine constructs a filename from various specified components.
-
+	This subroutine constructs a filename from various specified
+	components.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<storebuf.h>
 
@@ -48,9 +48,7 @@
 
 /* exported subroutines */
 
-
-int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext)
-{
+int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex {
 	const int	rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;

@@ -55,17 +55,13 @@ struct userattrdb_head {
 
 typedef USERATTRDB	userattrdb ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int userattrdb_open(userattrdb *,cchar *) noex ;
 extern int userattrdb_lookup(userattrdb *,char *,int,cchar *) noex ;
 extern int userattrdb_close(userattrdb *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* USERATTRDB_INCLUDE */

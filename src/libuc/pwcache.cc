@@ -1,4 +1,4 @@
-/* pwcache */
+/* pwcache SUPPORT */
 /* lang=C++20 */
 
 /* PASSWD cache */

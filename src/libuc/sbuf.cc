@@ -57,6 +57,7 @@
 #include	<cstdarg>
 #include	<algorithm>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<format.h>
 #include	<ctdec.h>
 #include	<cthex.h>
@@ -516,6 +517,14 @@ int sbuf::nchr(int ch,int nc) noex {
 	return sbuf_nchar(this,ch,nc) ;
 }
 /* end subroutine (sbuf::nchr) */
+
+void sbuf::dtor() noex {
+	cint	rs = sbuf_finish(this) ;
+	if (rs < 0) {
+	   ulogerror("sbuf",rs,"fini-finish") ;
+	}
+}
+/* end subroutine (sbuf::dtor) */
 
 
 /* private subroutines */

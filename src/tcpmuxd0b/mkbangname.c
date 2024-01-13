@@ -1,10 +1,9 @@
-/* mkuibang */
-
+/* mkbangname SUPPORT */
+/* lang=C20 */
 
 #define	CF_DEBUGS	0		/* compile-time switchable debugging */
 #define	CF_FULLNAME	0		/* use full-name */
 #define	CF_MAILNAME	1		/* use mail-name */
-
 
 /* revision history:
 

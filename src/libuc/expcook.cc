@@ -1,4 +1,4 @@
-/* expcook */
+/* expcook SUPPORT */
 /* lang=C++20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */

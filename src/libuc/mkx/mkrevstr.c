@@ -1,6 +1,8 @@
-/* mkrevstr */
+/* mkrevstr SUPPORT */
+/* lang=C20 */
 
 /* reverse the characters in a string in place */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,16 +18,12 @@
 
 	Reverse the characters of a string in place.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -54,18 +52,17 @@
 
 /* exported subroutines */
 
-
-int mkrevstr(char *bp,int bl)
-{
-	int		i ;
-	if (bp == NULL) return SR_FAULT ;
-	if (bl < 0) bl = strlen(bp) ;
-	for (i = 0 ; i < (bl/2) ; i += 1) {
-	    int	ch = bp[i] ;
-	    bp[i] = bp[bl-i-1] ;
-	    bp[bl-i-1] = ch ;
-	} /* end for */
-	return bl ;
+int mkrevstr(char *bp,int bl) noex {
+	int		rs = SR_FAULT ;
+	if (bp) {
+	    if (bl < 0) bl = strlen(bp) ;
+	    for (int i = 0 ; i < (bl/2) ; i += 1) {
+	        int	ch = bp[i] ;
+	        bp[i] = bp[bl-i-1] ;
+	        bp[bl-i-1] = ch ;
+	    } /* end for */
+	} /* end if (non-null) */
+	return (rs >= 0) ? bl : rs ;
 }
 /* end subroutine (mkrevstr) */
 

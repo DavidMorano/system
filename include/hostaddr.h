@@ -41,9 +41,7 @@ struct hostaddr_cursor {
 typedef HOSTADDR		hostaddr ;
 typedef HOSTADDR_CUR		hostaddr_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int hostaddr_start(hostaddr *,cchar *,cchar *,ADDRINFO *) noex ;
 extern int hostaddr_getcanonical(hostaddr *,cchar **) noex ;
@@ -52,9 +50,7 @@ extern int hostaddr_curend(hostaddr *,hostaddr_cur *) noex ;
 extern int hostaddr_enum(hostaddr *,hostaddr_cur *,ADDRINFO **) noex ;
 extern int hostaddr_finish(hostaddr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HOSTADDR_INCLUDE */

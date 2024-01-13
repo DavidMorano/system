@@ -1,4 +1,4 @@
-/* mkexpandpath */
+/* mkexpandpath SUPPORT */
 /* lang=C20 */
 
 /* make an expanded path */

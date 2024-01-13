@@ -1,5 +1,11 @@
 
-ls */sbuf.c | while read N ; do B=$( dirname $N ) ; print $B ; done | sort > o1 
 
-ls */sbuf.h | while read N ; do B=$( dirname $N ) ; print $B ; done | sort > o2
+while read D ; do 
+  for N in $( < mkx.txt ) ; do
+    FN=${D}/${N}
+    if [[ -r ${FN} ]] ; then
+      print ${FN}
+    fi
+  done
+done < dirs.txt
 

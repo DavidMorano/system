@@ -1,10 +1,9 @@
-/* mkstrunique */
+/* mkstrunique SUPPORT */
 /* lang=C++11 */
 
 /* test whether a string consists of all unique characters */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 
 /* revision history:
 
@@ -17,26 +16,34 @@
 
 /*******************************************************************************
 
-	We modify the given sring in place to remove any duplicates found.
+	Name:
+	mkstrunique
+
+	Description:
+	We modify the given sring in place to remove any duplicates
+	found.
 
 	Synopsis:
-	int mkstrunique(char *bp,int bl)
+	int mkstrunique(char *bp,int bl) noex
 
 	Arguments:
 	bp		string to test
 	bl		length of string to test
 
 	Returns:
-	-		length of given string
-
+	>=0		length of given string
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -53,7 +60,7 @@
 
 /* forward references */
 
-static void	bool_init(bool *,int) ;
+static void	bool_init(bool *,int) noex ;
 
 
 /* local variables */
@@ -61,15 +68,14 @@ static void	bool_init(bool *,int) ;
 
 /* exported subroutines */
 
-int mkstrunique(char *bp,int bl)
-{
+int mkstrunique(char *bp,int bl) noex {
 	if (bl > 1) {
 	    bool	seen[256] ;
 	    int		ch ;
 	    int		tail = 1 ;
 	    bool_init(seen,256) ;
 	    while (bl-- && *bp) {
-	        ch = MKCHAR(*bp) ;
+	        ch = mkchar(*bp) ;
 		if (!seen[ch]) {
 		    bp[tail++] = ch ;
 	            seen[ch] = true ;
@@ -85,11 +91,8 @@ int mkstrunique(char *bp,int bl)
 
 /* local subroutines */
 
-
-static void bool_init(bool *bp,int bl)
-{
-	int	i ;
-	for (i = 0 ; i < bl ; i += 1) bp[i] = false ;
+static void bool_init(bool *bp,int bl) noex {
+	for (int i = 0 ; i < bl ; i += 1) bp[i] = false ;
 }
 /* end subroutine (bool_init) */
 

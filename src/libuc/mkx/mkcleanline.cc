@@ -1,4 +1,4 @@
-/* mkcleanline */
+/* mkcleanline SUPPORT */
 /* lang=C++20 */
 
 /* print a clean (cleaned up) line of text */
@@ -59,6 +59,8 @@
 #include	<ischarx.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -125,7 +127,6 @@ int mkcleanline(char *lp,int ll,int m) noex {
 
 /* local subroutines */
 
-
 #if	CF_CLEAN1
 
 static int clean1(MFLAGS *mfp,char *lp,int ll) noex {
@@ -182,7 +183,6 @@ tatic int isshift(int ch) noex {
 /* end subroutine (isshift) */
 
 #endif /* CF_CLEAN1 */
-
 
 #if	CF_CLEAN2
 

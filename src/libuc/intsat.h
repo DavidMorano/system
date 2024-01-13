@@ -28,23 +28,23 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int intsatl(long) noex ;
 extern int intsatll(longlong) noex ;
 
+extern int intsatul(ulong) noex ;
+extern int intsatull(ulonglong) noex ;
+
 extern int iaddsat(int,int) noex ;
 extern long laddsat(long,long) noex ;
 extern longlong lladdsat(longlong,longlong) noex ;
+
 extern uint uaddsat(uint,uint) noex ;
 extern ulong uladdsat(ulong,ulong) noex ;
 extern ulonglong ulladdsat(ulonglong,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 
@@ -53,6 +53,13 @@ static inline int intsat(long v) noex {
 }
 static inline int intsat(longlong v) noex {
 	return intsatll(v) ;
+}
+
+static inline int intsat(ulong v) noex {
+	return intsatul(v) ;
+}
+static inline int intsat(ulonglong v) noex {
+	return intsatull(v) ;
 }
 
 #endif /* __cplusplus */

@@ -1,4 +1,4 @@
-/* strstore */
+/* strstore SUPPORT */
 /* lang=C++20 */
 
 /* string storeage-table object */

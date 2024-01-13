@@ -1,4 +1,4 @@
-/* lockrw */
+/* lockrw SUPPORT */
 /* lang=C++20 */
 
 /* Reader-Writer Lock (LOCKRW) */

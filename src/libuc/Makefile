@@ -822,7 +822,7 @@ obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
 strop.o:		strop.cc strop.h
-dstr.o:			dstr.c dstr.h
+dstr.o:			dstr.cc dstr.h
 
 field.o:		field.cc field.h
 field_srvarg.o:		field_srvarg.cc field.h
@@ -1235,6 +1235,11 @@ mkfile.o:		mkfile.dir
 mkfile.dir:
 	makesubdir $@
 
+# EMA
+ema.o:		ema.dir
+ema.dir:
+	makesubdir $@
+
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
 
@@ -1300,6 +1305,37 @@ isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
 readln.o:		readln.cc readln.hh
 ccfile.o:		ccfile.cc ccfile.hh
+strlibval.o:		strlibval.cc strlibval.hh
+
+
+
+userattrdb.o:		userattrdb.cc	userattrdb.h
+hdb.o:			hdb.cc		hdb.h
+pmq.o:			pmq.cc		pmq.h
+filegrp.o:		filegrp.cc	filegrp.h
+ids.o:			ids.cc		ids.h
+unameo.o:		unameo.cc	unameo.h
+hostaddr.o:		hostaddr.cc	hostaddr.h
+b64decoder.o:		b64decoder.cc	b64decoder.h
+lookaside.o:		lookaside.cc	lookaside.h
+strpack.o:		strpack.cc	strpack.h
+strtab.o:		strtab.cc	strtab.h
+strstore.o:		strstore.cc	strstore.h
+expcook.o:		expcook.cc	expcook.h
+hostinfo.o:		hostinfo.cc	hostinfo.h
+paramfile.o:		paramfile.cc	paramfile.h
+varsub.o:		varsub.cc	varsub.h
+memfile.o:		memfile.cc	memfile.h
+dirlist.o:		dirlist.cc	dirlist.h
+varray.o:		varray.cc	varray.h
+csem.o:			csem.cc		csem.h
+pwcache.o:		pwcache.cc	pwcache.h
+lockrw.o:		lockrw.cc	lockrw.h
+filebuf.o:		filebuf.cc	filebuf.h
+nodedb.o:		nodedb.cc	nodedb.h
+buffer.o:		buffer.cc	buffer.h
+
+
 
 
 

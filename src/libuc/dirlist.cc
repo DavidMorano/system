@@ -1,4 +1,4 @@
-/* dirlist */
+/* dirlist SUPPORT */
 /* lang=C++20 */
 
 /* directory list manager */

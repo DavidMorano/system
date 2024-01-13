@@ -44,9 +44,7 @@ struct lookaside_head {
 
 typedef LOOKASIDE	lookaside ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int lookaside_start(lookaside *,int,int) noex ;
 extern int lookaside_get(lookaside *,void *) noex ;
@@ -55,9 +53,7 @@ extern int lookaside_count(lookaside *) noex ;
 extern int lookaside_finish(lookaside *) noex ;
 extern int lookaside_audit(lookaside *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* LOOKASIDE_INCLUDE */

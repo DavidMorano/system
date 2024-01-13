@@ -1,4 +1,4 @@
-/* mkintfname */
+/* mkintfname SUPPORT */
 /* lang=C++20 */
 
 /* make an open-intercept filename from components */
@@ -39,7 +39,7 @@
 	Returns:
 	>0		result string length
 	==		?
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -52,6 +52,8 @@
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* external subroutines */
@@ -71,12 +73,16 @@
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (rbuf && prn && inter) {
+	    rbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
 		cint	rlen = rs ;
 	        if ((rs >= 0) && dn && dn[0]) {

@@ -45,9 +45,7 @@ struct dirlist_head {
 typedef DIRLIST		dirlist ;
 typedef DIRLIST_CUR	dirlist_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int dirlist_start(dirlist *) noex ;
 extern int dirlist_semi(dirlist *) noex ;
@@ -63,9 +61,7 @@ extern int dirlist_joinsize(dirlist *) noex ;
 extern int dirlist_joinmk(dirlist *,char *,int) noex ;
 extern int dirlist_finish(dirlist *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DIRLIST_INCLUDE */

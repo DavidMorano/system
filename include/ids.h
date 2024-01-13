@@ -76,9 +76,7 @@ struct ids : ids_head {
 typedef IDS		ids ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ids_load(ids *) noex ;
 extern int	ids_ngroups(ids *) noex ;
@@ -86,9 +84,7 @@ extern int	ids_release(ids *) noex ;
 extern int	ids_refresh(ids *) noex ;
 extern int	ids_copy(ids *,const ids *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* IDS_INCLUDE */

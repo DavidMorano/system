@@ -58,20 +58,13 @@
 /* local defines */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
-
-
-/* local typedefs */
-
-#if	defined(IRIX) && (! defined(TYPEDEF_INADDRT))
-#define	TYPEDEF_INADDRT	1
-
-typedef unsigned int	in_addr_t ;
-
-#endif
 
 
 /* local structures */
@@ -86,26 +79,21 @@ typedef unsigned int	in_addr_t ;
 /* exported subroutines */
 
 int mkcexsync(char *rbuf,int rlen) noex {
-	const int	leaderlen = (rlen - MKCEXSYNC_FINLEN) ;
+	cint		leaderlen = (rlen - MKCEXSYNC_FINLEN) ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
-
 	if (rlen >= MKCEXSYNC_REQLEN) {
-	    int	j ;
-
+	    int		j ;
 	    for (j = (leaderlen-1) ; j >= 0 ; j -= 1) {
 	        rbuf[i] = (i & 1) ;
 	        i += 1 ;
 	    }
-
 	    for (j = 0 ; j < MKCEXSYNC_FINLEN ; j += 1) {
 	        rbuf[i++] = CH_SYNC ;
 	    }
-
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkcexsync) */

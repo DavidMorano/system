@@ -1,4 +1,4 @@
-#!/usr/bin/ksh
+#!/usr/extra/bin/ksh
 # SUBRENAME
 
 PN=$( basename ${0} )

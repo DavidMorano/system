@@ -35,7 +35,7 @@
 	
 	Returns:
 	>=0		length of created ID string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -117,6 +117,7 @@ int mklogid(char *rbuf,int rlen,cchar *sp,int sl,int v) noex {
 	int		rl = 0 ;
 	if (rbuf && sp) {
 	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
 	        static int	rsm = ndigits(PID_MAX,10) ;
 	        if ((rs = rsm) >= 0) {

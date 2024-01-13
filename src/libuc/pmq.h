@@ -39,9 +39,7 @@ struct pmq_head {
 typedef PMQ		pmq ;
 typedef PMQ_ATTR	pmq_attr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	pmq_open(pmq *,cchar *,int,mode_t,const pmq_attr *) noex ;
 extern int	pmq_close(pmq *) noex ;
@@ -54,9 +52,7 @@ extern int	pmq_unlink(pmq *) noex ;
 
 extern int	uc_unlinkpmq(cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PMQ_INCLUDE */

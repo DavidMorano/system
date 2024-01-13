@@ -39,16 +39,12 @@ struct unameo_head {
 
 typedef UNAMEO		unameo ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int unameo_start(unameo *) noex ;
 extern int unameo_finish(unameo *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UNAMEO_INCLUDE */

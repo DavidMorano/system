@@ -1,4 +1,4 @@
-/* paramfile */
+/* paramfile SUPPORT */
 /* lang=C++20 */
 
 /* read in a file of parameters */

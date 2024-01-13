@@ -58,12 +58,10 @@ struct strstore_head {
 	int		c ;		/* total count */
 } ;
 
-typedef struct strstore_head	strstore ;
-typedef struct strstore_cursor	strstore_cur ;
+typedef STRSTORE	strstore ;
+typedef STRSTORE_CUR	strstore_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	strstore_start(strstore *,int,int) noex ;
 extern int	strstore_already(strstore *,cchar *,int) noex ;
@@ -85,9 +83,7 @@ extern int	strstore_indlen(strstore *) noex ;
 extern int	strstore_indsize(strstore *) noex ;
 extern int	strstore_indmk(strstore *,int (*)[3],int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRSTORE_INCLUDE */

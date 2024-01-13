@@ -1,0 +1,8 @@
+static inline int hdb_dtor(hdb *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+

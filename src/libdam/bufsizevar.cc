@@ -1,14 +1,16 @@
-/* bufsizevar */
+/* bufsizevar SUPPORT */
 /* lang=C++20 */
 
 /* this provides a variable with a buffer-size */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2001-12-03, David A­D­ Morano
-        This code was born out of frustration with cleaning up bad legacy code
-        (of which there is quite a bit -- like almost all of it).
+	This code was born out of frustration with cleaning up bad
+	legacy code (of which there is quite a bit -- like almost
+	all of it).
 
 */
 

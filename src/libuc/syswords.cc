@@ -38,4 +38,9 @@ const char syswords::w_manpath[] =	"manpath" ;
 const char syswords::w_incpath[] =	"incpath" ;
 const char syswords::w_infopath[] =	"infopath" ;
 
+const char syswords::w_tmpdir[] =	"/tmp" ;
+const char syswords::w_maildir[] =	"/var/mail" ;
+const char syswords::w_usrlocaldir[] =	"/usr/local" ;
+const char syswords::w_users[] =	"users" ;
+
 

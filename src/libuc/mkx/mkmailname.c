@@ -1,6 +1,8 @@
-/* mkmailname */
+/* mkmailname SUPPORT */
+/* lang=C20 */
 
 /* fix a name to make it like a mail-name */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,32 +15,27 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
-*									
-*	FUNCTIONAL DESCRIPTION:						
 
-	This subroutine takes the GECOS version of a user name (this is from
-	the fifth field of the system password file) and creates the associated
-	'mailname' from that.
+	Name:
+	mkmailname
+
+	Description:
+	This subroutine takes the GECOS version of a user name (this
+	is from the fifth field of the system password file) and
+	creates the associated 'mailname' from that.
 
 	Synopsis:
-
-	int mkmailname(rbuf,rlen,gn,gl)
-	char		rbuf[] ;
-	int		rlen ;
-	const char	gn[] ;
-	int		gl ;
+	int mkmailname(char *rbuf,int rlen,cchar *gn,int gl) noex
 
 	Arguments:
-
 	rbuf		supplied buffer to receive result
 	rlen		length of supplied buffer
 	gn		source text to work from (should be GECOS-name)
 	gl		source text length
 
 	Returns:
-
 	>=0		length of extracted mailname string
-	<0		error
+	<0		error (syhstem-return)
 
 *	SUBROUTINES CALLED:						
 *		Only system routines are called.
@@ -46,18 +43,23 @@
 *	GLOBAL VARIABLES USED:						
 *		None!!  AS IT SHOULD BE!!
 *
-*
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<realname.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -66,28 +68,36 @@
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int mkmailname(char *rbuf,int rlen,cchar *gp,int gl)
-{
-	REALNAME	rn ;
-	int		rs ;
-
-	if (rbuf == NULL) return SR_FAULT ;
-	if (gp == NULL) return SR_FAULT ;
-
-	if ((rs = realname_start(&rn,gp,gl)) >= 0) {
-
-	    rs = realname_mailname(&rn,rbuf,rlen) ;
-
-	    realname_finish(&rn) ;
-	} /* end if (readlname) */
-
-	return rs ;
+int mkmailname(char *rbuf,int rlen,cchar *gp,int gl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		rl = 0 ;
+	if (rbuf && gp) {
+	    realname	rn ;
+	    if ((rs = realname_start(&rn,gp,gl)) >= 0) {
+	        {
+	            rs = realname_mailname(&rn,rbuf,rlen) ;
+		    rl = rs ;
+	        }
+	        rs1 = realname_finish(&rn) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (readlname) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkmailname) */
 

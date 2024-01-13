@@ -1,4 +1,4 @@
-/* strpack */
+/* strpack SUPPORT */
 /* lang=C++20 */
 
 /* string pack object */

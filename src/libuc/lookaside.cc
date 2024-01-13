@@ -1,4 +1,4 @@
-/* lookaside */
+/* lookaside SUPPORT */
 /* lang=C++20 */
 
 /* lookaside memory management */

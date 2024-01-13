@@ -60,9 +60,7 @@ struct filebuf_head {
 
 typedef FILEBUF		filebuf ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	filebuf_start(filebuf *,int,off_t,int,int) noex ;
 extern int	filebuf_read(filebuf *,void *,int,int) noex ;
@@ -84,9 +82,7 @@ extern int	filebuf_tell(filebuf *,off_t *) noex ;
 extern int	filebuf_poll(filebuf *,int) noex ;
 extern int	filebuf_finish(filebuf *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FILEBUF_INCLUDE */

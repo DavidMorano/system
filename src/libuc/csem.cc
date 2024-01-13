@@ -1,4 +1,4 @@
-/* csem */
+/* csem SUPPORT */
 /* lang=C++20 */
 
 /* Counting-Semaphore (CSEM) */

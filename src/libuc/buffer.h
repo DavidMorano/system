@@ -38,9 +38,7 @@ struct buffer_head {
 
 typedef BUFFER		buffer ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	buffer_start(buffer *,int) noex ;
 extern int	buffer_reset(buffer *) noex ;
@@ -68,9 +66,7 @@ extern int	buffer_getprev(buffer *) noex ;
 extern int	buffer_get(buffer *,cchar **) noex ;
 extern int	buffer_finish(buffer *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

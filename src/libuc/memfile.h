@@ -13,7 +13,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<localmisc.h>		/* extra types */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 #define	MEMFILE_MAGIC	0x54728822
@@ -33,9 +35,7 @@ struct memfile_head {
 
 typedef MEMFILE		memfile ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	memfile_open(memfile *,cchar *,int,mode_t) noex ;
 extern int	memfile_write(memfile *,cvoid *,int) noex ;
@@ -45,9 +45,7 @@ extern int	memfile_tell(memfile *,off_t *) noex ;
 extern int	memfile_buf(memfile *,void *) noex ;
 extern int	memfile_close(memfile *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MEMFILE_INCLUDE */
