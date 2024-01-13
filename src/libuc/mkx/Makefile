@@ -212,6 +212,7 @@ mkaddrpart.o:		mkaddrpart.cc  $(INCS)
 mkaddrbest.o:		mkaddrbest.cc  $(INCS)
 
 mkbasename.o:		mkbasename.c $(INCS)
+mkshlibname.o:		mkshlibname.cc $(INCS)
 
 mkintfname.o:		mkintfname.cc $(INCS)
 mkonefrom.o:		mkonefrom.cc $(INCS)

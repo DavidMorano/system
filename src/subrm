@@ -4,7 +4,7 @@ while read D ; do
   for N in $( < mkx.txt ) ; do
     FN=${D}/${N}
     if [[ -r ${FN} ]] ; then
-      print ${FN}
+      rm ${FN}
     fi
   done
 done < dirs.txt
