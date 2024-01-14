@@ -69,9 +69,7 @@ struct terment {
 	char		answer[TERMENT_LANSWER] ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int terment_start(TERMENT *) noex ;
 extern int terment_settype(TERMENT *,int) noex ;
@@ -95,9 +93,7 @@ extern int terment_gettermtype(TERMENT *,cchar **) noex ;
 extern int terment_getanswer(TERMENT *,cchar **) noex ;
 extern int terment_finish(TERMENT *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TERMENT_INCLUDE */

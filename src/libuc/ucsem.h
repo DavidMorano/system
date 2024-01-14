@@ -30,9 +30,7 @@ struct ucsem_head {
 
 typedef UCSEM		ucsem ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ucsem_open(ucsem *,cchar *,int,mode_t,uint) noex ;
 extern int	ucsem_close(ucsem *) noex ;
@@ -45,9 +43,7 @@ extern int	ucsem_unlink(ucsem *) noex ;
 extern int	ucsemunlink(const char *) noex ;
 extern int	unlinkucsem(const char *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCSEM_INCLUDE */

@@ -23,9 +23,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	rmeol(cchar *,int) noex ;
 extern int	rmochr(cchar *,int,int) noex ;
@@ -38,9 +36,7 @@ static inline int rmchr(cchar *sp,int sl,int ch) noex {
 	return rmochr(sp,sl,ch) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* RMX_INCLUDE */

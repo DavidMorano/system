@@ -31,9 +31,9 @@ struct thrcomm_head {
 	volatile int	f_exiting ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef THRCOMM		thrcomm ;
+
+EXTERNC_begin
 
 extern int	thrcomm_start(THRCOMM *,int) noex ;
 extern int	thrcomm_cmdsend(THRCOMM *,int,int) noex ;
@@ -43,9 +43,7 @@ extern int	thrcomm_rsprecv(THRCOMM *,int) noex ;
 extern int	thrcomm_exiting(THRCOMM *) noex ;
 extern int	thrcomm_finish(THRCOMM *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* THRCOMM_INCLUDE */

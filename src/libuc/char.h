@@ -68,9 +68,7 @@ extern const short		char_dictorder[] ;
 /* dictionary-collating-ordinal */
 #define	CHAR_DICTORDER(c)	(char_dictorder[(c) & 0xff])
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern bool char_iswhite(int) noex ;
 extern bool char_islc(int) noex ;
@@ -80,9 +78,7 @@ static inline bool char_isspacetab(int ch) noex {
 	return CHAR_ISSPACETAB(ch) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

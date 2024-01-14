@@ -28,19 +28,15 @@ struct protoent_curosor {
 	int		i ;
 } ;
 
-typedef struct protoent_curosr	protoent_cur ;
+typedef PROTOENT_CUR	protoent_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uc_getprotobyname(PROTOENT *,char *,int,cchar *) noex ;
 extern int uc_getprotobynumber(PROTOENT *,char *,int,int,int) noex ;
 extern int uc_getprotoent(PROTOENT *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PROTOENT_INCLUDE */

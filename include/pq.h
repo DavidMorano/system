@@ -48,9 +48,7 @@ typedef PQ		pq ;
 typedef PQ_ENT		pq_ent ;
 typedef PQ_CUR		pq_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pq_start(pq *) noex ;
 extern int pq_ins(pq *,pq_ent *) noex ;
@@ -66,9 +64,7 @@ extern int pq_count(pq *) noex ;
 extern int pq_audit(pq *) noex ;
 extern int pq_finish(pq *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PQ_INCLUDE */

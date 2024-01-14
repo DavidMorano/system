@@ -16,9 +16,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ffbsi(uint) noex ;
 extern int ffbsl(ulong) noex ;
@@ -40,9 +38,7 @@ extern int fbscounti(uint) noex ;
 extern int fbscountl(ulong) noex ;
 extern int fbscountll(ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FINDBIT_INCLUDE */

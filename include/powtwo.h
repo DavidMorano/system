@@ -19,12 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	nextpowtwo(int) noex ;
 
@@ -32,9 +31,7 @@ static inline int ispowtwo(int v) noex {
 	return (v && !(v & (v - 1))) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* POWTWO_INCLUDE */

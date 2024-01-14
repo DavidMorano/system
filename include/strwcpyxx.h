@@ -25,19 +25,15 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-char *strwcpyblanks(char *dp,int w) noex ;
-char *strwcpycompact(char *dp,cchar *sp,int sl) noex ;
-char *strwcpyopaque(char *dp,cchar *sp,int sl) noex ;
-char *strwcpyrev(char *dp,cchar *sp,int sl) noex ;
-char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex ;
+extern char *strwcpyblanks(char *dp,int w) noex ;
+extern char *strwcpycompact(char *dp,cchar *sp,int sl) noex ;
+extern char *strwcpyopaque(char *dp,cchar *sp,int sl) noex ;
+extern char *strwcpyrev(char *dp,cchar *sp,int sl) noex ;
+extern char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRWCPYXX_INCLUDE */

@@ -105,9 +105,7 @@ typedef	BITS		bits ;
 
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	bits_start(bits *,int) noex ;
 extern int	bits_set(bits *,int) noex ;
@@ -119,9 +117,7 @@ extern int	bits_extent(bits *) noex ;
 extern int	bits_count(bits *) noex ;
 extern int	bits_finish(bits *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* BITS_INCLUDE */

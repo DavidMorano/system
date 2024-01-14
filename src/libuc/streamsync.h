@@ -29,18 +29,15 @@ struct streamsync_head {
 	int		i ;		/* current length */
 } ;
 
+typedef STREAMSYNC	streamsync ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int streamsync_start(STREAMSYNC *,cchar *,int) noex ;
 extern int streamsync_test(STREAMSYNC *,int) noex ;
 extern int streamsync_finish(STREAMSYNC *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STREAMSYNC_INCLUDE */

@@ -32,10 +32,7 @@
 typedef	hdb		mapstrint ;
 typedef	hdb_cur		mapstrint_cur ;
 
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mapstrint_start(mapstrint *,int) noex ;
 extern int mapstrint_count(mapstrint *) noex ;
@@ -58,9 +55,7 @@ extern int mapstrint_curend(mapstrint *,mapstrint_cur *) noex ;
 extern int mapstrint_setval(mapstrint *,mapstrint_cur *,int) noex ;
 extern int mapstrint_finish(mapstrint *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* mapstrint_INCLUDE */

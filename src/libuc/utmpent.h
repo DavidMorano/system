@@ -62,9 +62,7 @@
 typedef UTMPENT		utmpent ;
 typedef CUTMPENT	cutmpent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int utmpent_start(utmpent *) noex ;
 extern int utmpent_settype(utmpent *,int) noex ;
@@ -83,9 +81,7 @@ extern int utmpent_getuser(utmpent *,cchar **) noex ;
 extern int utmpent_gethost(utmpent *,cchar **) noex ;
 extern int utmpent_finish(utmpent *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UTMPENT_INCLUDE */

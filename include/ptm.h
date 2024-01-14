@@ -86,9 +86,7 @@ struct ptm : pthread_mutex_t {
 typedef PTM	ptm ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ptm_create(ptm *,ptma *) noex ;
 extern int	ptm_destroy(ptm *) noex ;
@@ -99,9 +97,7 @@ extern int	ptm_unlock(ptm *) noex ;
 extern int	ptm_setprioceiling(ptm *,int,int *) noex ;
 extern int	ptm_getprioceiling(ptm *,int *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTM_INCLUDE */

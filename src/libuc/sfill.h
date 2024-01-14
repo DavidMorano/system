@@ -38,9 +38,7 @@ struct sfill_head {
 
 typedef SFILL		sfill ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	sfill_start(sfill *,int,bfile *) noex ;
 extern int	sfill_remaining(sfill *) noex ;
@@ -48,9 +46,7 @@ extern int	sfill_proc(sfill *,int,cchar *,int) noex ;
 extern int	sfill_wline(sfill *,int) noex ;
 extern int	sfill_finish(sfill *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SFILL_INCLUDE */

@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ctb26i(char *,int,int,int,int) noex ;
 extern int ctb26l(char *,int,int,int,long) noex ;
@@ -37,9 +35,7 @@ extern int ctb26ui(char *,int,int,int,uint) noex ;
 extern int ctb26ul(char *,int,int,int,ulong) noex ;
 extern int ctb26ull(char *,int,int,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CTB26_INCLUDE */

@@ -37,9 +37,7 @@
 typedef PSEM		psem ;
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	psem_create(psem *,int,int) noex ;
 extern int	psem_destroy(psem *) noex ;
@@ -48,9 +46,7 @@ extern int	psem_waiter(psem *,int) noex ;
 extern int	psem_trywait(psem *) noex ;
 extern int	psem_post(psem *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PSEM_INCLUDE */

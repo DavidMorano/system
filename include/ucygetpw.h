@@ -43,10 +43,7 @@ struct ucygetpw_stats {
 	uint		pmis, nmis ;
 } ;
 
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucygetpw_init() noex ;
 extern int ucygetpw_name(PASSWD *,char *,int,cchar *) noex ;
@@ -55,9 +52,7 @@ extern int ucygetpw_stats(UCYGETPW_STATS *) noex ;
 extern int ucygetpw_setparam(int,int) noex ;
 extern void ucygetpw_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCYGETPW_INCLUDE */

@@ -38,18 +38,14 @@
 #include	<ustropts.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int u_strmsgget(int,STRBUF *,STRBUF *,int *) noex ;
 extern int u_strmsggetp(int,STRBUF *,STRBUF *,int *,int *) noex ;
 extern int u_strmsgput(int,STRBUF *,STRBUF *,int) noex ;
 extern int u_strmsgputp(int,STRBUF *,STRBUF *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* USTR_INCLUDE */

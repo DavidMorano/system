@@ -30,11 +30,9 @@ struct hostent_c {
 	int		i ;
 } ;
 
-typedef struct hostent_c	hostent_cur ;
+typedef HSOTENT_CUR	hostent_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int hostent_getofficial(HOSTENT *,const char **) ;
 extern int hostent_getcanonical(HOSTENT *,const char **) ;
@@ -47,9 +45,7 @@ extern int hostent_enumaddr(HOSTENT *,HOSTENT_CUR *,const uchar **) ;
 extern int hostent_size(HOSTENT *) ;
 extern int hostent_load(HOSTENT *,char *,int,HOSTENT *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HOSTENT_INCLUDE */

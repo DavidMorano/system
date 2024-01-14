@@ -20,6 +20,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -32,11 +34,9 @@ struct strmgr_head {
 	int		dlen ;
 } ;
 
-typedef struct strmgr_head	strmgr ;
+typedef STRMGR		strmgr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int strmgr_start(STRMGR *,char *,int) noex ;
 extern int strmgr_avail(STRMGR *) noex ;
@@ -45,9 +45,7 @@ extern int strmgr_str(STRMGR *,cchar *,int) noex ;
 extern int strmgr_char(STRMGR *,int) noex ;
 extern int strmgr_finish(STRMGR *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRMGR_INCLUDE */

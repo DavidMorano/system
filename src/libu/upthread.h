@@ -37,24 +37,17 @@
 #include	<clanguage.h>
 
 
-/* POSIX threads stuff */
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 #ifndef	TYPEDEF_VOIDF
 #define	TYPEDEF_VOIDF
 typedef void (*void_f)() noex ;
 #endif
 
-
 extern int	pt_sigmask(int,sigset_t *,sigset_t *) noex ;
 extern int	pt_atfork(void_f,void_f,void_f) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UPTHREAD_INCLUDE */

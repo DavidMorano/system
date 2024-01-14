@@ -71,17 +71,13 @@ enum filetypes {
 #endif
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 static inline int filetype(mode_t m) noex {
 	return ((m & 0170000) >> 12) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FILETYPE_INCLUDE */

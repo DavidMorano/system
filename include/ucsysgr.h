@@ -59,19 +59,15 @@
 #define	CGROUP	const struct group
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	getgrent_rp(GROUP *,char *,int) noex ;
 extern int	getgrnam_rp(GROUP *,char *,int,cchar *) noex ;
 extern int	getgrgid_rp(GROUP *,char *,int,gid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-/* GETGRXXXR begin */
+/* GETGRXXXR end */
 
 
 #endif /* UCSYSGR_INCLUDE */

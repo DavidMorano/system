@@ -88,9 +88,7 @@ struct ptc : pthread_cond_t {
 typedef PTC	ptc ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ptc_create(ptc *,ptca *) noex ;
 extern int	ptc_destroy(ptc *) noex ;
@@ -101,9 +99,7 @@ extern int	ptc_waiter(ptc *,ptm *,int) noex ;
 extern int	ptc_timedwait(ptc *,ptm *,CTIMESPEC *) noex ;
 extern int	ptc_reltimedwaitnp(ptc *,ptm *,CTIMESPEC *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTC_INCLUDE */

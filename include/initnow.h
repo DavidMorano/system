@@ -26,15 +26,11 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int initnow(TIMEB *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* INITNOW_INCLUDE */

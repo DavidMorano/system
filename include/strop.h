@@ -80,9 +80,7 @@ struct strop : strop_head {
 typedef struct strop_head	strop ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	strop_start(strop *,cchar *,int) noex ;
 extern int	strop_breakfield(strop *,cchar *,cchar **) noex ;
@@ -94,9 +92,7 @@ extern int	strop_spanterm(strop *,cchar *) noex ;
 extern int	strop_span(strop *,cchar *) noex ;
 extern int	strop_finish(strop *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

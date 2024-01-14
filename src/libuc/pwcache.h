@@ -37,11 +37,11 @@ struct pwcache_s {
 } ;
 
 struct pwcache_head {
-	uint		magic ;
 	PWCACHE_STATS	s ;
 	hdb		*dbp ;
 	pq		*lrup ;		/* least-recently-used */
 	time_t		ti_check ;
+	uint		magic ;
 	uint		wcount ;	/* write-count */
 	int		ttl ;		/* time-to-live */
 	int		max ;		/* maximum entries */

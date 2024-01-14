@@ -40,21 +40,17 @@
 #define	UCENUMUA_FNAME		"/sysdb/userattr"
 
 
-typedef struct ucenumxx_head	ucenumua ;
-typedef ucentua			ucenumua_ent ;
+typedef UCENUMUA	ucenumua ;
+typedef ucentua		ucenumua_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumua_open(ucenumua *,cchar *) noex ;
 extern int ucenumua_close(ucenumua *) noex ;
 extern int ucenumua_readent(ucenumua *,ucenumua_ent *,char *,int) noex ;
 extern int ucenumua_reset(ucenumua *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMUA_INCLUDE */

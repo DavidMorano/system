@@ -49,9 +49,7 @@ typedef FIFOSTR		fifostr ;
 typedef FIFOSTR_CUR	fifostr_cur ;
 typedef FIFOSTR_ENT	fifostr_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*fifostr_cmp)(cchar *,cchar *) noex ;
 
@@ -69,9 +67,7 @@ extern int fifostr_enum(fifostr *,fifostr_cur *,char *,int) noex ;
 extern int fifostr_del(fifostr *,fifostr_cur *) noex ;
 extern int fifostr_finish(fifostr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FIFOSTR_INCLUDE */

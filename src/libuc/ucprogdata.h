@@ -26,18 +26,14 @@
 #define	UCPROGDATA_DSYSTAT	1	/* sys-stat */
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucprogdata_init() noex ;
 extern int ucprogdata_set(int,cchar *,int,int) noex ;
 extern int ucprogdata_get(int,char *,int) noex ;
 extern int ucprogdata_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCPROGDATA_INCLUDE */

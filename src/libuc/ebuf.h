@@ -62,9 +62,7 @@ struct ebuf_head {
 
 typedef EBUF		ebuf ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ebuf_start(ebuf *,int,uint,int,int,int) noex ;
 extern int ebuf_finish(ebuf *) noex ;
@@ -74,9 +72,7 @@ extern int ebuf_count(ebuf *) noex ;
 extern int ebuf_sync(ebuf *) noex ;
 extern int ebuf_invalidate(ebuf *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* EBUF_INCLUDE */

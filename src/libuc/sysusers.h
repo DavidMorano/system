@@ -25,24 +25,20 @@
 
 
 struct sysusers_head {
-	uint		magic ;
 	filemap		b ;
+	uint		magic ;
 } ;
 
-typedef struct sysusers_head	sysusers ;
+typedef SYSUSRS		sysusers ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sysusers_open(SYSUSERS *,const char *) noex ;
 extern int sysusers_close(SYSUSERS *) noex ;
-extern int sysusers_readent(SYSUSERS *,struct passwd *,char *,int) noex ;
+extern int sysusers_readent(SYSUSERS *,PASSWD *,char *,int) noex ;
 extern int sysusers_reset(SYSUSERS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSUSERS_INCLUDE */

@@ -24,18 +24,14 @@
 typedef	PTRWA		ptrwa ;
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ptrwa_create(PTRWA *) noex ;
 extern int	ptrwa_destroy(PTRWA *) noex ;
 extern int	ptrwa_setpshared(PTRWA *,int) noex ;
 extern int	ptrwa_getpshared(PTRWA *,int *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTRWA_INCLUDE */

@@ -39,17 +39,13 @@ struct zoffparts {
 	int	zoff ;		/* value */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	zoffparts_set(ZOFFPARTS *,int) noex ;
 extern int	zoffparts_get(ZOFFPARTS *,int *) noex ;
 extern int	zoffparts_mkstr(ZOFFPARTS *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ZOFFPARTS_INCLUDE */

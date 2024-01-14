@@ -67,9 +67,7 @@
 
 #ifndef	SUBROUTINE_USERATTR
 #define	SUBROUTINE_USERATTR
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern void setuserattr() noex ;
 extern void enduserattr() noex ;
@@ -78,9 +76,7 @@ extern userattr *getuserattr() noex ;
 extern userattr *getusernam(const char *) noex ;
 extern userattr *getuseruid(uid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_USERATTR */
 
 #endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
@@ -130,15 +126,11 @@ typedef long		sysvmsgtype ;
 
 #ifndef	SUBROUTINE_MEMCNTL
 #define	SUBROUTINE_MEMCNTL
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int memcntl(void *,size_t,int,void *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_MEMCNTL */
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
@@ -174,15 +166,11 @@ enum syshasmemplock {
 
 #ifndef	SUBROUTINE_MEMPLOCK
 #define	SUBROUTINE_MEMPLOCK
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int plock(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_MEMPLOCK */
 
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */

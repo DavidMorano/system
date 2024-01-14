@@ -1,6 +1,9 @@
 /* dirseen HEADER */
 /* lang=C20 */
 
+/* directory list manager */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -43,9 +46,7 @@ struct dirseen_head {
 typedef DIRSEEN		dirseen ;
 typedef DIRSEEN_CUR	dirseen_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int dirseen_start(dirseen *) noex ;
 extern int dirseen_add(dirseen *,cchar *,int,USTAT *) noex ;
@@ -57,9 +58,7 @@ extern int dirseen_curend(dirseen *,dirseen_cur *) noex ;
 extern int dirseen_enum(dirseen *,dirseen_cur *,char *,int) noex ;
 extern int dirseen_finish(dirseen *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DIRSEEN_INCLUDE */

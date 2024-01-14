@@ -1,12 +1,11 @@
-/* spawner */
+/* spawner SUPPORT */
+/* lang=C20 */
 
 /* spawn a local program */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_ENVSORT	0		/* sort the environment? */
-
 
 /* revision history:
 
@@ -19,53 +18,51 @@
 
 /*******************************************************************************
 
-	Here we spawn a process while specifying options for its start-up.
+	Name:
+	spawner
+
+	Description:
+	Here we spawn a process while specifying options for its
+	start-up.
 
 	Synopsis:
-
-	int spawner_start(op,fname,argv,envv)
-	SPAWNER		*op ;
-	const char	fname[] ;
-	const char	*argv[] ;
-	const char	*envv[] ;
+	int spawner_start(spawner *op,cchar *fname,mainv argv,mainv envv) noex
 
 	Arguments:
-
 	op		pointer to optional file descriptor dispositions
 	fname		program to execute
 	argv		arguments to program
 	envv		environment to program
 
 	Returns:
-
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 	Implementation notes:  
 
-        Remember that the 'pipe(2)' system call creates two pipe file
-        descriptors. Both of these file descriptors are open for reading and
-        writing on System V UNIX®. However, on BSD systems (or older BSD systems
-        assuming that they have not yet upgraded to the correct System V
-        behavior) the first file descriptor, the one in the zeroth array
-        element, is only open for reading. The second file descriptor, the one
-        in the oneth array element, is only open for writing. We will follow the
-        BSD semantics for portability but hopefully, someday, the BSD version of
-        UNIX® will get up to speed with the rest of the world!
+	Remember that the |pipe(2)| system call creates two pipe
+	file descriptors. Both of these file descriptors are open
+	for reading and writing on System V UNIX®. However, on BSD
+	systems (or older BSD systems assuming that they have not
+	yet upgraded to the correct System V behavior) the first
+	file descriptor, the one in the zeroth array element, is
+	only open for reading. The second file descriptor, the one
+	in the oneth array element, is only open for writing. We
+	will follow the BSD semantics for portability but hopefully,
+	someday, the BSD version of UNIX® will get up to speed with
+	the rest of the world!
 
-        Also, note that since we are (very) likely to be running in a (hotly)
-        mutli-threaded environment, we have to be quite sure that we try to only
-        call async-signal-safe (really fork-safe) subroutines after the
-        'fork(2)' and before any 'exit(2)'. The thing to avoid that might be
-        used by "accident" is a hidden 'malloc(3c)' (or friends) after the
-        'fork(2)' someplace.
-
+	Also, note that since we are (very) likely to be running
+	in a (hotly) mutli-threaded environment, we have to be quite
+	sure that we try to only call async-signal-safe (really
+	fork-safe) subroutines after the |fork(2)| and before any
+	|exit(2)|. The thing to avoid that might be used by "accident"
+	is a hidden |malloc(3c)| (or friends) after the |fork(2)|
+	someplace.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -75,7 +72,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<ids.h>
@@ -257,11 +253,9 @@ static const struct mapex	mapexs[] = {
 
 /* exported subroutines */
 
-
-int spawner_start(SPAWNER *op,cchar *fname,cchar **argv,cchar **envv)
-{
+int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 	int		rs = SR_OK ;
-	const char	*efname = fname ;
+	cchar		*efname = fname ;
 	char		pwd[MAXPATHLEN + 1] = { 0 } ;
 	char		pbuf[MAXPATHLEN + 1] ;
 

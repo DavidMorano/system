@@ -38,19 +38,14 @@ struct mapex_map {
 } ;
 #endif /* STRUCT_MAPEXMAP */
 
-
 #ifndef	EXTERN_MAXEX
 #define	EXTERN_MAXEX
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	mapex(const MAPEX *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* EXTERN_MAXPEX */
 

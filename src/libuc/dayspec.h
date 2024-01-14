@@ -26,19 +26,15 @@ struct dayspec_head {
 	schar		m, d ;
 } ;
 
-typedef struct dayspec_head	dayspec ;
+typedef DAYSPEC		dayspec ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int dayspec_default(DAYSPEC *) noex ;
 extern int dayspec_load(DAYSPEC *,cchar *,int) noex ;
 extern int dayspec_yday(DAYSPEC *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DAYSPEC_INCLUDE */

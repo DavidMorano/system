@@ -24,9 +24,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uc_libmallocstrw(cchar *,int,cchar **) noex ;
 extern int uc_libmallocsys(int,char **) noex ;
@@ -36,9 +34,7 @@ extern int uc_libcalloc(int,int,void *) noex ;
 extern int uc_librealloc(const void *,int,void *) noex ;
 extern int uc_libfree(cvoid *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCLIBMEMALLOC_INCLUDE */

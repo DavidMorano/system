@@ -36,9 +36,7 @@ struct clusterdb_head {
 typedef CLUSTERDB	clusterdb ;
 typedef CLUSTERDB_CUR	clusterdb_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int clusterdb_open(CLUSTERDB *,const char *) ;
 extern int clusterdb_fileadd(CLUSTERDB *,const char *) ;
@@ -55,9 +53,7 @@ extern int clusterdb_fetchrev(CLUSTERDB *,const char *,CLUSTERDB_CUR *,
 extern int clusterdb_check(CLUSTERDB *,time_t) ;
 extern int clusterdb_close(CLUSTERDB *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CLUSTERDB_INCLUDE */

@@ -35,15 +35,11 @@ struct siletter_result {
 
 typedef SILETTER	siletter_res ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	siletter(siletter_res *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SILETTER_INCLUDE */

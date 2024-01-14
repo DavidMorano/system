@@ -23,15 +23,11 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	lockfile(int,int,off_t,off_t,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* LOCKFILE_INCLUDE */

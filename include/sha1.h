@@ -51,20 +51,14 @@ typedef struct {
     int local;				/* unprocessed amount in data */
 } SHA1_INFO ;
 
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sha1_start(SHA1 *) noex ;
 extern int sha1_update(SHA1 *,const char *, int) noex ;
 extern int sha1_digest(SHA1 *,unsigned char *) noex ;
 extern int sha1_finish(SHA1 *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
-
+EXTERNC_end
 
 #ifdef SHA1_FOR_C
 

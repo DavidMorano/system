@@ -59,19 +59,15 @@
 #define	CPASSWD	const struct passwd
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	getpwent_rp(PASSWD *,char *,int) noex ;
 extern int	getpwnam_rp(PASSWD *,char *,int,cchar *) noex ;
 extern int	getpwuid_rp(PASSWD *,char *,int,uid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-/* GETPWXXXR begin */
+/* GETPWXXXR end */
 
 
 #endif /* UCSYSPW_INCLUDE */

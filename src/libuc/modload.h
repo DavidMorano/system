@@ -46,9 +46,7 @@ struct modload_head {
 
 typdef MODLOAD		modload ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int modload_open(MODLOAD *,cchar *,cchar *,cchar *,int,cchar **) noex ;
 extern int modload_getmv(MODLOAD *,int) noex ;
@@ -56,9 +54,7 @@ extern int modload_getmva(MODLOAD *,int *,int) noex ;
 extern int modload_getsym(MODLOAD *,cchar *,cvoid **) noex ;
 extern int modload_close(MODLOAD *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MODLOAD_INCLUDE */

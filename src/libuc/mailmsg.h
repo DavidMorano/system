@@ -50,31 +50,25 @@ struct mailmsg_head {
 	int		msgstate ;
 } ;
 
+typedef MAILMSG		mailmsg ;
 
-#if	(! defined(MAILMSG_MASTER)) || (MAILMSG_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int mailmsg_start(MAILMSG *) noex ;
+extern int mailmsg_loadline(MAILMSG *,cchar *,int) noex ;
+extern int mailmsg_envcount(MAILMSG *) noex ;
+extern int mailmsg_envaddress(MAILMSG *,int,cchar **) noex ;
+extern int mailmsg_envdate(MAILMSG *,int,cchar **) noex ;
+extern int mailmsg_envremote(MAILMSG *,int,cchar **) noex ;
+extern int mailmsg_hdrcount(MAILMSG *,cchar *) noex ;
+extern int mailmsg_hdrikey(MAILMSG *,int,cchar **) noex ;
+extern int mailmsg_hdriline(MAILMSG *,cchar *,int,int,cchar **) noex ;
+extern int mailmsg_hdrival(MAILMSG *,cchar *,int,cchar **) noex ;
+extern int mailmsg_hdrval(MAILMSG *,cchar *,cchar **) noex ;
+extern int mailmsg_finish(MAILMSG *) noex ;
 
-extern int mailmsg_start(MAILMSG *) ;
-extern int mailmsg_loadline(MAILMSG *,const char *,int) ;
-extern int mailmsg_envcount(MAILMSG *) ;
-extern int mailmsg_envaddress(MAILMSG *,int,const char **) ;
-extern int mailmsg_envdate(MAILMSG *,int,const char **) ;
-extern int mailmsg_envremote(MAILMSG *,int,const char **) ;
-extern int mailmsg_hdrcount(MAILMSG *,const char *) ;
-extern int mailmsg_hdrikey(MAILMSG *,int,const char **) ;
-extern int mailmsg_hdriline(MAILMSG *,const char *,int,int,const char **) ;
-extern int mailmsg_hdrival(MAILMSG *,const char *,int,const char **) ;
-extern int mailmsg_hdrval(MAILMSG *,const char *,const char **) ;
-extern int mailmsg_finish(MAILMSG *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MAILMSG_MASTER */
 
 #endif /* MAILMSG_INCLUDE */
 

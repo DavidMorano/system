@@ -34,13 +34,9 @@
 
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 int memclear(void *,size_t) noex ;
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_MEMCLEAR */
 
 
@@ -60,13 +56,9 @@ int memclear(T *op) noex {
 
 #ifndef	SUBROUTINE_FILETYPE
 #define	SUBROUTINE_FILETYPE
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 extern int filetype(mode_t) noex ;
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
 
 
@@ -80,9 +72,9 @@ typedef int	projid_t ;
 
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
-extern "C" {
+EXTERNC_begin
     extern projid_t getprojid() noex ;
-}
+EXTERNC_end
 #endif /* SUBROUTINE_GETPROJID */
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */

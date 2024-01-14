@@ -60,9 +60,7 @@ struct keyopt_head {
 typedef KEYOPT		keyopt ;
 typedef KEYOPT_CUR	keyopt_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int keyopt_start(keyopt *) noex ;
 extern int keyopt_loads(keyopt *,cchar *,int) noex ;
@@ -80,9 +78,7 @@ extern int keyopt_finish(keyopt *) noex ;
 extern int keyopt_findvalue(keyopt *,cchar *,cchar *,int,KEYOPT_VALUE **) noex ;
 #endif /* COMMENT */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* KEYOPT_INCLUDE */

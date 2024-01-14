@@ -29,9 +29,7 @@ struct envlist_head {
 
 typedef ENVLIST		envlist ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int envlist_start(ENVLIST *,int) noex ;
 extern int envlist_addkeyval(ENVLIST *,cchar *,cchar *,int) noex ;
@@ -40,9 +38,7 @@ extern int envlist_present(ENVLIST *,cchar *,int,cchar **) noex ;
 extern int envlist_count(ENVLIST *) noex ;
 extern int envlist_finish(ENVLIST *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ENVLIST_INCLUDE */

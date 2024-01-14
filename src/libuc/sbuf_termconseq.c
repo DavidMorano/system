@@ -1,4 +1,4 @@
-/* sbuf_termconseq */
+/* sbuf_termconseq SUPPORT */
 /* lang=C20 */
 
 /* extra method for the storage buffer (SBuf) object */
@@ -35,7 +35,7 @@
 	Returns:
 	>=0		amount of new space used by the newly stored item
 			(not including any possible trailing NUL characters)
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -55,6 +55,12 @@
 #ifndef	TERMCONSEQLEN
 #define	TERMCONSEQLEN	84		/* why this value? */
 #endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

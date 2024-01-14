@@ -35,9 +35,7 @@ struct envhelp_head {
 
 typedef ENVHELP		envhelp ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int envhelp_start(ENVHELP *,cchar **,cchar **) noex ;
 extern int envhelp_present(ENVHELP *,cchar *,int,cchar **) noex ;
@@ -47,9 +45,7 @@ extern int envhelp_sort(ENVHELP *) noex ;
 extern int envhelp_getvec(ENVHELP *,cchar ***) noex ;
 extern int envhelp_finish(ENVHELP *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ENVHELP_INCLUDE */

@@ -1,6 +1,8 @@
-/* uproguser */
+/* uproguser SUPPPORT */
+/* lang=C20 */
 
 /* UNIX® username and possibly user-home-directory */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,31 +14,25 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	UPROGUSER_INCLUDE
-#define	UPROGUSER_INCLUDE	1
+#define	UPROGUSER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
-#if	(! defined(UPROGUSER_MASTER)) || (UPROGUSER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int uproguser_init() noex ;
+extern int uproguser_nameset(cchar *,int,uid_t,int) noex ;
+extern int uproguser_nameget(char *,int,uid_t) noex ;
+extern int uproguser_fini() noex ;
 
-extern int uproguser_init() ;
-extern int uproguser_nameset(cchar *,int,uid_t,int) ;
-extern int uproguser_nameget(char *,int,uid_t) ;
-extern void uproguser_fini() ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* UPROGUSER_MASTER */
 
 #endif /* UPROGUSER_INCLUDE */
 

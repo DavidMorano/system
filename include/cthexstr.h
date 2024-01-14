@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 int cthexstring(char *dbuf,int dlen,int f,cchar *sp,int sl) noex ;
 
@@ -36,9 +34,7 @@ static inline int cthexstr(char *dp,int dl,cchar *sp,int sl) noex {
 	return cthexstring(dp,dl,f,sp,sl) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CTHEXSTR_INCLUDE */

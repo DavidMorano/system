@@ -37,9 +37,7 @@ struct envs_head {
 typedef ENVS		envs ;
 typedef ENVS_CUR	envs_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int envs_start(envs *,int) noex ;
 extern int envs_store(envs *,cchar *,int,cchar *,int) noex ;
@@ -54,9 +52,7 @@ extern int envs_delname(envs *,cchar *,int) noex ;
 extern int envs_count(envs *) noex ;
 extern int envs_finish(envs *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ENVS_INCLUDE */

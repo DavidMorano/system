@@ -25,31 +25,30 @@
 #include	<usupport.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-int uc_sthrcreate(caddr_t,size_t,int (*)(void *),cvoid *,long) noex ;
-int uc_sthrexit(intex) noex ;
-int uc_sthrjoin(thread_t,int *) noex ;
-int uc_sthrsuspend(thread_t) noex ;
-int uc_sthrcontinue(thread_t) noex ;
-int uc_sthrminstack() noex ;
-int uc_sthrkill(thread_t,int) noex ;
-int uc_sthrmain() noex ;
-int uc_sthrself() noex ;
-int uc_sthryield() noex ;
-int uc_sthrsigsetmask(int,const sigset_t *,sigset_t *) noex ;
-int uc_sthrstksegment(stack_t *) noex ;
-int uc_sthrkeycreate(thread_key_t *,void (*)(void *)) noex ;
-int uc_sthrsetspecific(thread_key_t,void *) noex ;
-int uc_sthrgetspecific(thread_key_t,void **) noex ;
-int uc_sthrgetconcurrency() noex ;
-int uc_sthrsetconcurrency(int) noex ;
+typedef int (*shtr_sub)(void *) noex ;
+typedef void (*shtr_keyf)(void *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+extern int uc_sthrcreate(caddr_t,size_t,sthr_sun,cvoid *,long) noex ;
+extern int uc_sthrexit(intex) noex ;
+extern int uc_sthrjoin(thread_t,int *) noex ;
+extern int uc_sthrsuspend(thread_t) noex ;
+extern int uc_sthrcontinue(thread_t) noex ;
+extern int uc_sthrminstack() noex ;
+extern int uc_sthrkill(thread_t,int) noex ;
+extern int uc_sthrmain() noex ;
+extern int uc_sthrself() noex ;
+extern int uc_sthryield() noex ;
+extern int uc_sthrsigsetmask(int,const sigset_t *,sigset_t *) noex ;
+extern int uc_sthrstksegment(stack_t *) noex ;
+extern int uc_sthrkeycreate(thread_key_t *,sthr_keyf) noex ;
+extern int uc_sthrsetspecific(thread_key_t,void *) noex ;
+extern int uc_sthrgetspecific(thread_key_t,void **) noex ;
+extern int uc_sthrgetconcurrency() noex ;
+extern int uc_sthrsetconcurrency(int) noex ;
+
+EXTERNC_end
 
 
 #endif /* UCSTHR_INCLUDE */

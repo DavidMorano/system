@@ -22,18 +22,14 @@
 #define	CSPWDENT	const struct spwd
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int spwdent_load(SPWD *,char *,int,CSPWD *) noex ;
 extern int spwdent_parse(SPWD *,char *,int,cchar *,int) noex ;
 extern int spwdent_size(CSPWD *) noex ;
 extern int spwdent_format(CSPWD *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SPWDENT_INCLUDE */

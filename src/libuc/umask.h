@@ -22,9 +22,7 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int umask_init() noex ;
 extern int umask_fini() noex ;
@@ -39,9 +37,7 @@ static inline int setumask(mode_t m) noex {
 	return umaskset(m) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UINFO_INCLUDE */

@@ -76,9 +76,7 @@
 #include	<udup.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	u_brk(cvoid *) noex ;
 extern int	u_sbrk(int,void **) noex ;
@@ -205,9 +203,7 @@ extern int	u_acl(cchar *,int,int,aclent_t *) noex ;
 extern int	u_facl(int,int,int,aclent_t *) noex ;
 #endif /* SYSHAS_ACL */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* USYSCALLS_INCLUDE */

@@ -23,15 +23,11 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
- int udomain(cchar *,char *,int,cchar *) noex ;
+extern int udomain(cchar *,char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UDOMAIN_INCLUDE */

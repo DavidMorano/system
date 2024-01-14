@@ -54,21 +54,19 @@
 #define	CLENHEADER	"content-length"
 
 
-
 /* external subroutines */
 
 extern int	cfdec() ;
 extern int	mheader() ;
-
 extern char	*strbasename() ;
 
 
 /* external variables */
 
 
-/* local data */
+/* local variables */
 
-static char	*tmpdir[] = {
+static char	*tmpdirs[] = {
 	"/tmp",
 	"/var/tmp",
 	"/var/spool/uucppublic",
@@ -77,22 +75,15 @@ static char	*tmpdir[] = {
 } ;
 
 
+/* exported subroutines */
 
-
-
-int main(argc,argv)
-int	argc ;
-char	*argv[] ;
-{
+int main(int argc,mainv argvi,mainv) {
 	bfile		errfile, *efp = &errfile ;
 	bfile		infile, *ifp = &infile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		tmpfile, *tfp = &tmpfile ;
-
-	struct ustat	stat_i ;
-
-	offset_t	offset, off_clen ;
-
+	USTAT		stat_i ;
+	off_t	offset, off_clen ;
 	int	rs ;
 	int	argl, aol ;
 	int	pan ;
@@ -263,13 +254,10 @@ char	*argv[] ;
 #endif
 
 	    if (tmpfname == NULL) {
-
+		cchar	*pat = "acXXXXXXXXXXXX" ;
 	        tmpfname = tmpfnamebuf ;
-
-	        if ((rs = 
-	            mktmplock(tmpdir,"acXXXXXXXXXXXX",0600,tmpfname)) < 0)
+	        if ((rs = mktmplock(tmpdirs,pat,0600,tmpfname)) < 0)
 	            goto badtmpmk ;
-
 	    }
 
 	    if ((rs = bopen(tfp,tmpfname,"rwct",0600)) < 0)

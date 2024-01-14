@@ -111,9 +111,7 @@ struct fsdir : fsdir_head {
 typedef struct fsdir_head	fsdir ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	fsdir_open(fsdir *,cchar *) noex ;
 extern int	fsdir_read(fsdir *,fsdir_ent *,char *,int) noex ;
@@ -123,9 +121,7 @@ extern int	fsdir_rewind(fsdir *) noex ;
 extern int	fsdir_audit(fsdir *) noex ;
 extern int	fsdir_close(fsdir *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FSDIR_INCLUDE */

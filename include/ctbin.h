@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ctbini(char *,int,int) noex ;
 extern int ctbinl(char *,int,long) noex ;
@@ -37,9 +35,7 @@ extern int ctbinui(char *,int,uint) noex ;
 extern int ctbinul(char *,int,ulong) noex ;
 extern int ctbinull(char *,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

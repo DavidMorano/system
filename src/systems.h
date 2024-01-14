@@ -45,9 +45,7 @@ struct systems_head {
 	time_t		checktime ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	systems_open(SYSTEMS *,cchar *) noex ;
 extern int	systems_fileadd(SYSTEMS *,cchar *) noex ;
@@ -60,9 +58,7 @@ extern int	systems_fetch(SYSTEMS *,cchar *,SYSTEMS_CUR *,
 			SYSTEMS_ENT **) noex ;
 extern int	systems_close(SYSTEMS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSTEMS_INCLUDE */

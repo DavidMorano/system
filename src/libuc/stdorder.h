@@ -28,9 +28,7 @@
 #include	<stdintx.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int stdorder_rc(cchar *,char *) noex ;
 extern int stdorder_rs(cchar *,short *) noex ;
@@ -56,9 +54,7 @@ extern int stdorder_wui(char *,uint) noex ;
 extern int stdorder_wul(char *,ulong) noex ;
 extern int stdorder_wull(char *,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STDORDER_INCLUDE */

@@ -81,6 +81,7 @@ static int		lockable(cchar *,mode_t) noex ;
 static strlibval	strtmpdir(strlibval_path) ;
 
 static constexpr cchar	*tmpdirs[] = {
+	"/tmp",
 	"/var/tmp",
 	nullptr
 } ;

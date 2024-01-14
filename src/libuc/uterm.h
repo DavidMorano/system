@@ -103,9 +103,7 @@ struct uterm_head {
 
 typedef UTERM		uterm ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uterm_start(uterm *,int) noex ;
 extern int uterm_control(uterm *,int,...) noex ;
@@ -124,9 +122,7 @@ extern int uterm_getpop(uterm *) noex ;
 extern int uterm_setpop(uterm *,int) noex ;
 extern int uterm_finish(uterm *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UTERM_INCLUDE */

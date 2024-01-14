@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cfhexi(cchar *,int,int *) noex ;
 extern int cfhexl(cchar *,int,long *) noex ;
@@ -37,9 +35,7 @@ extern int cfhexui(cchar *,int,uint *) noex ;
 extern int cfhexul(cchar *,int,ulong *) noex ;
 extern int cfhexull(cchar *,int,ulonglong *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CFHEX_INCLUDE */

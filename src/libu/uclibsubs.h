@@ -76,9 +76,7 @@
 #include	<uctimer.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_exit(int) noex ;
 extern int	uc_atexit(void_f) noex ;
@@ -372,9 +370,7 @@ extern int	uc_getusend() noex ;
 extern int	uc_ztime(struct tm *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCLIBSUBS_INCLUDE */

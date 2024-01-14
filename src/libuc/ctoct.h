@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ctocti(char *,int,int) noex ;
 extern int ctoctl(char *,int,long) noex ;
@@ -37,9 +35,7 @@ extern int ctoctui(char *,int,uint) noex ;
 extern int ctoctul(char *,int,ulong) noex ;
 extern int ctoctull(char *,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

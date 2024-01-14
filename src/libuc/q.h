@@ -46,9 +46,7 @@ struct q_head {
 typedef	Q		q ;
 typedef	Q_ENT		q_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int q_start(Q *,int) noex ;
 extern int q_finish(Q *) noex ;
@@ -58,9 +56,7 @@ extern int q_rem(Q *,Q_ENT **) noex ;
 extern int q_remtail(Q *,Q_ENT **) noex ;
 extern int q_count(Q *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* Q_INCLUDE */

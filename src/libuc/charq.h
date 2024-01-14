@@ -31,9 +31,7 @@ struct charq_head {
 
 typedef CHARQ		charq ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	charq_start(charq *,int) noex ;
 extern int	charq_ins(charq *,int) noex ;
@@ -43,9 +41,7 @@ extern int	charq_size(charq *) noex ;
 extern int	charq_count(charq *) noex ;
 extern int	charq_finish(charq *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CHARQ_INCLUDE */

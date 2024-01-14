@@ -39,12 +39,7 @@ struct progsig_note {
 	char		user[PROGSIG_USERLEN+1] ;
 } ;
 
-
-#if	(! defined(PROGSIG_MASTER)) || (PROGSIG_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	progsig_init(void) ;
 extern void	progsig_fini(void) ;
@@ -65,11 +60,8 @@ extern int	progsig_issig(int) ;
 extern int	progsig_noteread(PROGSIG_NOTE *,int) ;
 extern int	progsig_notedel(int) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* (! defined(PROGSIG_MASTER)) || (PROGSIG_MASTER == 0) */
 
 #endif /* PROGSIG_INCLUDE */
 

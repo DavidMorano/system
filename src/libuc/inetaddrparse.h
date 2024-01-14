@@ -33,15 +33,11 @@ struct inetaddrparse_head {
 typedef INETADDRPARSE		inetaddrparse ;
 typedef INETADDRPARSE_SO	inetaddrparse_so ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int inetaddrparse_load(inetaddrparse *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* INETADDRPARSE_INCLUDE */

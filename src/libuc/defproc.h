@@ -24,15 +24,11 @@
 #include	<expcook.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int defproc(vecstr *dlp,cchar **envv,EXPCOOK *,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* DEFPROC_INCLUDE */

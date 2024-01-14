@@ -56,17 +56,13 @@ struct ucmallreg_reg {
 	size_t		size ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucmallreg_curbegin(UCMALLREG_CUR *) noex ;
 extern int ucmallreg_curend(UCMALLREG_CUR *) noex ;
 extern int ucmallreg_enum(UCMALLREG_CUR *,UCMALLREG_REG *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCMALLREG_INCLUDE */

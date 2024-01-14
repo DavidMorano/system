@@ -23,16 +23,12 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pathaddw(char *,int,cchar *,int) noex ;
 extern int pathadd(char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PATHADD_INCLUDE */

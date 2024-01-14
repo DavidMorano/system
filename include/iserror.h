@@ -21,12 +21,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<char.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int isFailOpen(int) noex ;
 extern int isFailConn(int) noex ;
@@ -35,9 +32,7 @@ extern int isBadRecv(int) noex ;
 extern int isBadMsg(int) noex ;
 extern int isIOError(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ISERROR_INCLUDE */

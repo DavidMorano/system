@@ -23,17 +23,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int inetnetpton(void *,int,int,cchar *,int) noex ;
 extern int inetpton(void *,int,int,cchar *,int) noex ;
 extern int inetntop(char *,int,int,cvoid *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* INETCONV_INCLUDE */

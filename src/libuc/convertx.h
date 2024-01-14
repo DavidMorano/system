@@ -30,17 +30,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int converte(double,int,int *,int *,char *) noex ;
 extern int convertf(double,int,int *,int *,char *) noex ;
 extern int convertg(double,int,int,char *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CONVETX_INCLUDE */

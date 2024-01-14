@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cfb26i(cchar *,int,int *) noex ;
 extern int cfb26l(cchar *,int,long *) noex ;
@@ -37,9 +35,7 @@ extern int cfb26ui(cchar *,int,uint *) noex ;
 extern int cfb26ul(cchar *,int,ulong *) noex ;
 extern int cfb26ull(cchar *,int,ulonglong *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CFB26_INCLUDE */

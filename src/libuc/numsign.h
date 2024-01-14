@@ -34,9 +34,7 @@ constexpr bool numsign(T v) noex {
 
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern bool numsigni(int) noex ;
 extern bool numsignl(long) noex ;
@@ -45,9 +43,7 @@ extern bool numsignui(uint) noex ;
 extern bool numsignul(ulong) noex ;
 extern bool numsignull(ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* NUMSIGN_INCLUDE */

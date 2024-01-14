@@ -32,9 +32,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int libmalloc_ma(char **) noex ;
 extern int libmalloc_mn(char **) noex ;
@@ -56,9 +54,7 @@ extern int libmalloc_ho(char **) noex ;
 extern int libmalloc_sv(char **) noex ;
 extern int libmalloc_zn(char **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* LIBMALLOCXX_INCLUDE */

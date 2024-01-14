@@ -49,18 +49,14 @@
 typedef long		sysvmsgtype ;
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int u_msgget(key_t,int) noex ;
 extern int u_msgctl(int,int,MSQIDDS *) noex ;
 extern int u_msgrcv(int,void *,int,sysvmsgtype,int) noex ;
 extern int u_msgsnd(int,void *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UMSG_INCLUDE */

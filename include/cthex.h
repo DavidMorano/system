@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cthexc(char *,int,int) noex ;
 extern int cthexs(char *,int,int) noex ;
@@ -41,9 +39,7 @@ extern int cthexui(char *,int,uint) noex ;
 extern int cthexul(char *,int,ulong) noex ;
 extern int cthexull(char *,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

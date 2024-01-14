@@ -28,11 +28,9 @@ union inetaddr_head {
 	char		straddr[sizeof(struct in_addr)] ;
 } ;
 
-typedef union inetaddr_head	inetaddr ;
+typedef INETADDR	inetaddr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int inetaddr_start(inetaddr *,cvoid *) noex ;
 extern int inetaddr_startstr(inetaddr *,cchar *,int) noex ;
@@ -41,9 +39,7 @@ extern int inetaddr_gethexaddr(inetaddr *,char *,int) noex ;
 extern int inetaddr_getdotaddr(inetaddr *,char *,int) noex ;
 extern int inetaddr_finish(inetaddr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* INETADDR_INCLUDE */

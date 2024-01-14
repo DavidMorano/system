@@ -29,18 +29,14 @@
 #define	CGROUPENT	const struct group
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int groupent_load(GROUP *,char *,int,CGROUP *) noex ;
 extern int groupent_parse(GROUP *,char *,int,cchar *,int) noex ;
 extern int groupent_size(CGROUP *) noex ;
 extern int groupent_format(CGROUP *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* GROUPENT_INCLUDE */

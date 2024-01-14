@@ -43,9 +43,7 @@ struct plainq_head {
 typedef PLAINQ		plainq ;
 typedef PLAINQ_ENT	plainq_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int plainq_start(plainq *) noex ;
 extern int plainq_finish(plainq *) noex ;
@@ -60,9 +58,7 @@ extern int plainq_gettail(plainq *,plainq_ent **) noex ;
 extern int plainq_count(plainq *) noex ;
 extern int plainq_audit(plainq *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PLAINQ_INCLUDE */

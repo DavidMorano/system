@@ -23,9 +23,7 @@
 #define	PTRWLOCK		pthread_rwlock_t
 #define	PTRWLOCK_NAMELEN	(MAXNAMELEN+1)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ptrwlock_create(PTRWLOCK *,PTRWA *) noex ;
 extern int	ptrwlock_rdlock(PTRWLOCK *) noex ;
@@ -37,9 +35,7 @@ extern int	ptrwlock_wrlockto(PTRWLOCK *,int) noex ;
 extern int	ptrwlock_unlock(PTRWLOCK *) noex ;
 extern int	ptrwlock_destroy(PTRWLOCK *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTRWLOCK_INCLUDE */

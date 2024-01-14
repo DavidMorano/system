@@ -34,16 +34,12 @@
 #define	NLPS_TO		30		/* time-out in seconds */
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	mknlsreq(char *,int,cchar *,int) noex ;
 extern int	readnlsresp(int,char *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* NLSDIALASSIST_INCLUDE */

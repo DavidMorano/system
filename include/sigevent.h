@@ -35,15 +35,11 @@
 #endif
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sigevent_load(SIGEVENT *,int,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SIGEVENT_INCLUDE */

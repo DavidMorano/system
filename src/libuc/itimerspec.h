@@ -34,15 +34,11 @@
 #define	ITIMERSPEC	struct itimerspec
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int itimerspec_load(ITIMERSPEC *,TIMESPEC *,TIMESPEC *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ITIMERSPEC_INCLUDE */

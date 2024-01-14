@@ -23,15 +23,11 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int strwcmpx(cchar *,cchar *,int len) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 
@@ -53,17 +49,13 @@ inline int strwcmpr(cchar *s1,cchar *s2,int len) noex {
 
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 static inline int strwcmp(cchar *s1,cchar *s2,int len) noex {
 	return strwcmpx(s1,s2,len) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRWCMP_INCLUDE */

@@ -24,9 +24,7 @@
 #include	<strdcpyxw.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern char *strdcpyx(char *,int,int,...) noex ;
 
@@ -37,9 +35,7 @@ extern char *strdcpy4(char *,int,cc *,cc *,cc *,cc *) noex ;
 extern char *strdcpy5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
 extern char *strdcpy6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

@@ -1,4 +1,4 @@
-/* termconseq */
+/* termconseq SUPPORT */
 /* lang=C++20 */
 
 /* Terminal Control Sequence */
@@ -37,7 +37,7 @@
 
 	Returns:
 	>=0		length of resulting string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -84,6 +84,7 @@ int termconseqa(char *dp,int dl,int name,cchar *is,int na,...) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
+/* end subroutine (termconseqa) */
 
 int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	int		rs = SR_FAULT ;
@@ -91,7 +92,7 @@ int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	if (dp) {
 	    rs = SR_INVALID ;
 	    if (dl < 0) dl = INT_MAX ;
-	    if (name != 0) {
+	    if (name > 0) {
 		rs = SR_OK ;
 	        if (rs >= 0) {
 	            cchar	*sp = "\033[" ;
@@ -127,6 +128,6 @@ int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (termconseqa) */
+/* end subroutine (termconseqva) */
 
 

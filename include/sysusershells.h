@@ -28,20 +28,16 @@ struct sysusershells_head {
 	filemap		b ;
 } ;
 
-typedef struct sysusershells_head	sysusershells ;
+typedef SYSUSERSHELLS	sysusershells ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sysusershells_open(SYSUSERSHELLS *,const char *) noex ;
 extern int sysusershells_close(SYSUSERSHELLS *) noex ;
 extern int sysusershells_readent(SYSUSERSHELLS *,char *,int) noex ;
 extern int sysusershells_reset(SYSUSERSHELLS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSUSERSHELLS_INCLUDE */

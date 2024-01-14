@@ -27,37 +27,18 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
-/* local defines */
-
-
-/* external subroutines */
-
-
-/* external variables */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* exported subroutines */
-
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ismmclass_7bit(int) noex ;
 extern int ismmclass_8bit(int) noex ;
 extern int ismmclass_binary(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* ISMMCLASS_INCLUDE */
 

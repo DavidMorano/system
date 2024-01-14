@@ -76,17 +76,12 @@ struct utmpaccent_s {
 
 typedef UTMPACCENT	utmpaccent ;
 
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int utmpaccent_load(UTMPACCENT *,char *,int,CUTMPFENT *) noex ;
 extern int utmpaccent_size(CUTMPACCENT *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UTMPACCENT_INCLUDE */

@@ -19,19 +19,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ncolchar(int,int,int) noex ;
 extern int ncolstr(int,int,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+#include	<clanguage.h>
 
 
 #endif /* NCOL_INCLUDE */

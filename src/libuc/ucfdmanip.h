@@ -38,9 +38,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uc_duper(int,int) noex ;
 extern int uc_moveup(int,int) noex ;
@@ -49,9 +47,7 @@ static inline int dupup(int fd,int min) noex {
 	return uc_duper(fd,min) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCFDMANIP_INCLUDE */

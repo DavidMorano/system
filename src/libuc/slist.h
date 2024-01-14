@@ -47,9 +47,7 @@ typedef	SLIST		slist ;
 typedef	SLIST_ENT	slist_ent ;
 typedef	SLIST_CUR	slist_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int slist_start(slist *) noex ;
 extern int slist_ins(slist *,slist_ent *) noex ;
@@ -65,9 +63,7 @@ extern int slist_count(slist *) noex ;
 extern int slist_audit(slist *) noex ;
 extern int slist_finish(slist *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SLIST_INCLUDE */

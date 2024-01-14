@@ -63,9 +63,7 @@ struct motd_head {
 
 typedef	MOTD		motd ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	motd_open(MOTD *,cchar *) noex ;
 extern int	motd_check(MOTD *,time_t) noex ;
@@ -75,9 +73,7 @@ extern int	motd_close(MOTD *) noex ;
 
 extern int	motdid_load(MOTD_ID *,cchar *,cchar *,uid_t,gid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MOTD_INCLUDE */

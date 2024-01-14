@@ -18,7 +18,7 @@
 #define	OPENSYSFS_INCLUDE
 
 
-#define	OPENSYSFS_SYSDNAME	"/tmp/sys"
+#define	OPENSYSFS_SYSDNAME	"/tmp/sysdb"
 #define	OPENSYSFS_DEFTTL	(2*3600)
 
 #define	OPENSYSFS_FUSERHOMES	"userhomes"
@@ -45,15 +45,12 @@
 #define	OPENSYSFS_WSHADOW	9	/* "shadow" */
 #define	OPENSYSFS_WUSERATTR	10	/* "userattr" */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+
+EXTERNC_begin
 
 extern int opensysfs(int,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* OPENSYSFS_INCLUDE */
