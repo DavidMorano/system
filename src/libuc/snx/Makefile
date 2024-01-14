@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h snx.h
+INCS= snx.h
 
 
 OBJ0_SNX= snabbr.o snaddw.o sncpyarray.o
@@ -112,22 +112,27 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_sfx.o:	$(OBJ0_SNX)
+
+obj0_sfx.o:	$(OBJ0_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNX)
 
-obj1_sfx.o:	$(OBJ1_SNX)
+obj1_sfx.o:	$(OBJ1_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNX)
 
-obj2_sfx.o:	$(OBJ2_SNX)
+obj2_sfx.o:	$(OBJ2_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNX)
 
-obj3_sfx.o:	$(OBJ3_SNX)
+obj3_sfx.o:	$(OBJ3_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNX)
 
-obj4_sfx.o:	$(OBJ4_SNX)
+obj4_sfx.o:	$(OBJ4_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNX)
 
-obj5_sfx.o:	$(OBJ5_SNX)
+obj5_sfx.o:	$(OBJ5_SNX) $(INCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNX)
+
+
+snuuid.o:		snuuid.cc $(INCS)
+sntid.o:		sntid.cc $(INCS)
 
 

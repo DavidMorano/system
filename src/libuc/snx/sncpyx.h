@@ -24,9 +24,7 @@
 #include	<sncpyxw.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sncpyx(char *,int,int,...) noex ;
 
@@ -37,9 +35,7 @@ extern int sncpy4(char *,int,cc *,cc *,cc *,cc *) noex ;
 extern int sncpy5(char *,int,cc *,cc *,cc *,cc *,cc *) noex ;
 extern int sncpy6(char *,int,cc *,cc *,cc *,cc *,cc *,cc *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 
