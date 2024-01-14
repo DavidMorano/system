@@ -25,11 +25,11 @@
 
 
 struct sysusernames_head {
+	filemap		*fmp ;
 	uint		magic ;
-	filemap		b ;
 } ;
 
-typedef SYSUSERNAM§S	sysusernames ;
+typedef SYSUSERNAMES	sysusernames ;
 
 EXTERNC_begin
 

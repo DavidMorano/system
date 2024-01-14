@@ -1,4 +1,4 @@
-/* ucenumsv */
+/* ucenumsv SUPPORT */
 /* lang=C++20 */
 
 /* enumerate system SYSDB-XX entries */
@@ -24,8 +24,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

@@ -1,4 +1,4 @@
-/* sysusernames */
+/* sysusernames HEADER */
 /* lang=C20 */
 
 /* system user-name enumeration */
@@ -26,11 +26,11 @@
 
 
 struct sysusernames_head {
-	uint		magic ;
 	filemap		b ;
+	uint		magic ;
 } ;
 
-typedef struct sysusernames_head	sysusernames ;
+typedef SYSUSERNAMES		sysusernames ;
 
 #ifdef	__cplusplus
 extern "C" {

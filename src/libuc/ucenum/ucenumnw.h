@@ -40,21 +40,17 @@
 #define	UCENUMNW_FNAME		"/sysdb/network"
 
 
-typedef struct ucenumxx_head	ucenumnw ;
+typedef UCENUMXX		ucenumnw ;
 typedef ucentnw			ucenumnw_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumnw_open(ucenumnw *,cchar *) noex ;
 extern int ucenumnw_close(ucenumnw *) noex ;
 extern int ucenumnw_readent(ucenumnw *,ucenumnw_ent *,char *,int) noex ;
 extern int ucenumnw_reset(ucenumnw *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMNW_INCLUDE */

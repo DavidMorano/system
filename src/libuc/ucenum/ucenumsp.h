@@ -40,21 +40,17 @@
 #define	UCENUMSP_FNAME		"/sysdb/shadow"
 
 
-typedef struct ucenumxx_head	ucenumsp ;
+typedef UCENUMXX		ucenumsp ;
 typedef ucentsp			ucenumsp_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumsp_open(ucenumsp *,cchar *) noex ;
 extern int ucenumsp_close(ucenumsp *) noex ;
 extern int ucenumsp_readent(ucenumsp *,ucenumsp_ent *,char *,int) noex ;
 extern int ucenumsp_reset(ucenumsp *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMSP_INCLUDE */

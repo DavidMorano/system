@@ -1,4 +1,4 @@
-/* ucenumua */
+/* ucenumua SUPPORT */
 /* lang=C++20 */
 
 /* enumerate system SYSDB-XX entries */

@@ -1,4 +1,4 @@
-/* sysusers */
+/* sysusers SUPPORT */
 /* lang=C++20 */
 
 /* system user-entry enumeration */
@@ -25,10 +25,10 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<getax.h>

@@ -1,4 +1,4 @@
-/* ucenumxx */
+/* ucenumxx SUPPORT */
 /* lang=C++20 */
 
 /* enumerate system XX entries */
@@ -24,8 +24,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -38,6 +38,14 @@
 /* local defines */
 
 
+/* local namespaces */
+
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -45,6 +53,32 @@
 
 
 /* forward references */
+
+static int ucenumxx_ctor(ucenumxx *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    if ((op->fmp = new(nothrow) filemap) != nullptr) {
+		rs = SR_OK ;
+	    } /* end if (new-filemap) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine ucenumxx_ctor) */
+
+static int ucenumxx_dtor(ucenumxx *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->fmp) {
+		delete op->fmp ;
+		op->fmp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine ucenumxx_dtor) */
 
 
 /* local variables */
@@ -54,12 +88,17 @@
 
 int ucenumxxbase::open(cchar *efname) noex {
 	int		rs ;
+	if ((rs = ucenumxx_ctor(op)) >= 0) {
 	    cint	of = O_RDONLY ;
 	    csize	max = INT_MAX ;
-	    memclear(op,sizeof(ucenumxx)) ;
-	    if ((rs = filemap_open(&b,efname,of,max)) >= 0) {
+	    memclear(op) ;
+	    if ((rs = filemap_open(fmp,efname,of,max)) >= 0) {
 	        magic = mxx ;
 	    }
+	    if (rs < 0) {
+		ucenumxx_dtor(op) ;
+	    }
+	} /* end if (ucenumxx_ctor) */
 	return rs ;
 }
 /* end if (ucenumxxbase::open) */
@@ -67,20 +106,27 @@ int ucenumxxbase::open(cchar *efname) noex {
 int ucenumxxbase::close() noex {
 	int		rs = SR_NOTOPEN ;
 	int		rs1 ;
-	    if (op->magic == mxx) {
-		rs1 = filemap_close(&op->b) ;
+	if (op->magic == mxx) {
+	    rs = SR_OK ;
+	    {
+		rs1 = filemap_close(op->fmp) ;
 		if (rs >= 0) rs = rs1 ;
-		op->magic = 0 ;
-	    } /* end if (open) */
+	    }
+	    {
+		rs1 = ucenumxx_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 } 
 /* end subroutine (ucenumxxbase::close) */
 
 int ucenumxxbase::reset() noex {
 	int		rs = SR_NOTOPEN ;
-	    if (op->magic == mxx) {
-		rs = filemap_rewind(&op->b) ;
-	    } /* end if (open) */
+	if (op->magic == mxx) {
+	    rs = filemap_rewind(op->fmp) ;
+	} /* end if (open) */
 	return rs ;
 }
 /* end subroutine (ucenumxxbase::reset) */

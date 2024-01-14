@@ -40,8 +40,8 @@
 #define	UCENUMUA_FNAME		"/sysdb/userattr"
 
 
-typedef UCENUMUA	ucenumua ;
-typedef ucentua		ucenumua_ent ;
+typedef UCENUMXX		ucenumua ;
+typedef ucentua			ucenumua_ent ;
 
 EXTERNC_begin
 

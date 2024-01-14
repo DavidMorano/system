@@ -1,4 +1,4 @@
-/* sysusers */
+/* sysusers HEADER */
 /* lang=C20 */
 
 /* system user-entry enumeration */
@@ -25,12 +25,12 @@
 
 
 struct sysusers_head {
-	uint		magic ;
 	filemap		b ;
+	uint		magic ;
 } ;
 
-typedef struct sysusers_head	sysusers ;
-typedef PASSWD			sysusers_ent ;
+typedef SYSUSERS	sysusers ;
+typedef PASSWD		sysusers_ent ;
 
 #ifdef	__cplusplus
 extern "C" {

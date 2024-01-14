@@ -40,21 +40,17 @@
 #define	UCENUMGR_FNAME		"/sysdb/group"
 
 
-typedef struct ucenumxx_head	ucenumgr ;
+typedef UCENUMXX		ucenumgr ;
 typedef ucentgr			ucenumgr_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumgr_open(ucenumgr *,cchar *) noex ;
 extern int ucenumgr_close(ucenumgr *) noex ;
 extern int ucenumgr_readent(ucenumgr *,ucenumgr_ent *,char *,int) noex ;
 extern int ucenumgr_reset(ucenumgr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMGR_INCLUDE */
