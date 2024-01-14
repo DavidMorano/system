@@ -1,4 +1,4 @@
-/* sysusershells */
+/* sysusershells HEADER */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */
@@ -24,8 +24,8 @@
 
 
 struct sysusershells_head {
-	uint		magic ;
 	filemap		b ;
+	uint		magic ;
 } ;
 
 typedef SYSUSERSHELLS	sysusershells ;
