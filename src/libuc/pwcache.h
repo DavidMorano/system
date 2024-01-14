@@ -39,8 +39,8 @@ struct pwcache_s {
 struct pwcache_head {
 	uint		magic ;
 	PWCACHE_STATS	s ;
-	hdb		db ;
-	pq		lru ;		/* least-recently-used */
+	hdb		*dbp ;
+	pq		*lrup ;		/* least-recently-used */
 	time_t		ti_check ;
 	uint		wcount ;	/* write-count */
 	int		ttl ;		/* time-to-live */

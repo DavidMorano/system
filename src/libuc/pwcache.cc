@@ -20,10 +20,11 @@
 
 *******************************************************************************/
 
-#include        <envstandards.h>
+#include        <envstandards.h>	/* place first to configure */
 #include        <sys/types.h>
 #include        <sys/param.h>
 #include        <cstdlib>
+#include        <cstring>		/* <- for |strlen(3c)| */
 #include        <ctime>
 #include        <usystem.h>
 #include        <usupport.h>
@@ -47,6 +48,8 @@
 
 
 /* local namespaces */
+
+using std::nothrow ;			/* type */
 
 
 /* local typedefs */
@@ -83,25 +86,53 @@ template<typename ... Args>
 static inline int pwcache_ctor(pwcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->s = {} ;
 	    op->ti_check = 0 ;
 	    op->wcount = 0 ;
 	    op->ttl = 0 ;
 	    op->max = 0 ;
-	}
+	    if ((op->dbp = new(nothrow) hdb) != nullptr) {
+	        if ((op->lrup = new(nothrow) pq) != nullptr) {
+		    rs = SR_OK ;
+		} /* end if (new-qq) */
+	        if (rs < 0) {
+		    delete op->dbp ;
+		    op->dbp = nullptr ;
+		}
+	    } /* end if (new-hdb) */
+	} /* end if (non-null) */
 	return rs ;
 }
+/* end method (pwcache_ctor) */
+
+static inline int pwcache_dtor(pwcache *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->lrup) {
+		delete op->lrup ;
+		op->lrup = nullptr ;
+	    }
+	    if (op->dbp) {
+		delete op->dbp ;
+		op->dbp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (pwcache_dtor) */
 
 template<typename ... Args>
-static inline int pwcache_magic(pwcache *op,Args ... args) noex {
+static int pwcache_magic(pwcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == PWCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
+/* end method (pwcache_magic) */
 
 static int      pwcache_mkrec(pwcache *,time_t,REC **,cchar *) noex ;
 static int      pwcache_newrec(pwcache *,time_t,REC **,cchar *) noex ;
@@ -129,16 +160,20 @@ int pwcache_start(pwcache *op,int max,int ttl) noex {
 	if ((rs = pwcache_ctor(op)) >= 0) {
             if (max < PWCACHE_DEFMAX) max = PWCACHE_DEFMAX ;
             if (ttl < PWCACHE_DEFTTL) ttl = PWCACHE_DEFTTL ;
-            if ((rs = hdb_start(&op->db,max,1,nullptr,nullptr)) >= 0) {
-                if ((rs = pq_start(&op->lru)) >= 0) {
+            if ((rs = hdb_start(op->dbp,max,1,nullptr,nullptr)) >= 0) {
+                if ((rs = pq_start(op->lrup)) >= 0) {
                     op->max = max ;
                     op->ttl = ttl ;
                     op->ti_check = time(nullptr) ;
                     op->magic = PWCACHE_MAGIC ;
                 }
-                if (rs < 0)
-                    hdb_finish(&op->db) ;
+                if (rs < 0) {
+                    hdb_finish(op->dbp) ;
+		}
             } /* end if (hdb-start) */
+	    if (rs < 0) {
+		pwcache_dtor(op) ;
+	    }
         } /* end if (non-null) */
         return rs ;
 }
@@ -148,19 +183,23 @@ int pwcache_finish(pwcache *op) noex {
         int             rs ;
         int             rs1 ;
 	if ((rs = pwcache_magic(op)) >= 0) {
-                {
-                    rs1 = pq_finish(&op->lru) ; /* finish up the LRU queue */
-                    if (rs >= 0) rs = rs1 ;
-                }
-                {
-                    rs1 = pwcache_recfins(op) ; /* freeing all cache entries */
-                    if (rs >= 0) rs = rs1 ;
-                }
-                {
-                    rs1 = hdb_finish(&op->db) ; /* free up everything else */
-                    if (rs >= 0) rs = rs1 ;
-                }
-                op->magic = 0 ;
+            {
+                rs1 = pq_finish(op->lrup) ; /* finish up the LRU queue */
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = pwcache_recfins(op) ; /* freeing all cache entries */
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = hdb_finish(op->dbp) ; /* free up everything else */
+                if (rs >= 0) rs = rs1 ;
+            }
+	    {
+		rs1 = pwcache_dtor(op) ;
+                if (rs >= 0) rs = rs1 ;
+	    }
+            op->magic = 0 ;
 	} /* end if (magic) */
         return rs ;
 }
@@ -178,7 +217,7 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
                     op->s.total += 1 ;
                     key.buf = un ;
                     key.len = strlen(un) ;
-                    if ((rs = hdb_fetch(&op->db,key,nullptr,&val)) >= 0) {
+                    if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
         		ep = (REC *) val.buf ;
                         ct = ct_hit ;
                         rs = pwcache_recaccess(op,dt,ep) ;
@@ -213,16 +252,16 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
                     hdb_datum   key{}, val{} ;
                     key.buf = un ;
                     key.len = strlen(un) ;
-                    if ((rs = hdb_fetch(&op->db,key,nullptr,&val)) >= 0) {
+                    if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
         		REC    	*ep = (REC *) val.buf ;
                         f_found = true ;
                         {
                             pq_ent      *pep = (pq_ent *) ep ;
-                            rs1 = pq_unlink(&op->lru,pep) ;
+                            rs1 = pq_unlink(op->lrup,pep) ;
                             if (rs >= 0) rs = rs1 ;
                         }
                         {
-                            rs1 = hdb_delkey(&op->db,key) ;
+                            rs1 = hdb_delkey(op->dbp,key) ;
                             if (rs >= 0) rs = rs1 ;
                         }
                         {
@@ -249,10 +288,10 @@ int pwcache_check(pwcache *op,time_t dt) noex {
 	if ((rs = pwcache_magic(op)) >= 0) {
                 hdb_cur         cur{} ;
                 hdb_datum       key{}, val{} ;
-                if ((rs = hdb_curbegin(&op->db,&cur)) >= 0) {
+                if ((rs = hdb_curbegin(op->dbp,&cur)) >= 0) {
                     if (dt == 0) dt = time(nullptr) ;
                     while (rs >= 0) {
-                        rs1 = hdb_enum(&op->db,&cur,&key,&val) ;
+                        rs1 = hdb_enum(op->dbp,&cur,&key,&val) ;
                         if (rs1 == SR_NOTFOUND) break ;
                         rs = rs1 ;
                         if (rs >= 0) {
@@ -261,13 +300,13 @@ int pwcache_check(pwcache *op,time_t dt) noex {
                                 f = true ;
                                 if ((rs = pwcache_recdel(op,ep)) >= 0) {
                                     pq_ent      *pep = (pq_ent *) ep ;
-                                    rs = pq_unlink(&op->lru,pep) ;
+                                    rs = pq_unlink(op->lrup,pep) ;
                                     uc_free(ep) ;
                                 }
                             } /* end if (entry-old) */
                         }
                     } /* end while */
-                    rs1 = hdb_curend(&op->db,&cur) ;
+                    rs1 = hdb_curend(op->dbp,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
                 } /* end if */
 	} /* end if (magic) */
@@ -278,7 +317,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
 int pwcache_getstats(pwcache *op,pwcache_stats *sp) noex {
         int             rs ;
 	if ((rs = pwcache_magic(op,sp)) >= 0) {
-                if ((rs = hdb_count(&op->db)) >= 0) {
+                if ((rs = hdb_count(op->dbp)) >= 0) {
                     *sp = op->s ;
                     sp->nentries = rs ;
                 }
@@ -296,16 +335,16 @@ static int pwcache_mkrec(pwcache *op,time_t dt,REC **epp,cchar *un) noex {
         int             rs1 ;
         int             pwl = 0 ;
         *epp = nullptr ;
-        if ((rs = hdb_count(&op->db)) >= 0) {
+        if ((rs = hdb_count(op->dbp)) >= 0) {
             cint		n = rs ;
             if (n >= op->max) {
-                if ((rs = pq_rem(&op->lru,&pep)) >= 0) {
+                if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
                     REC		*ep = (REC *) pep ;
                     if ((rs = pwcache_recdel(op,ep)) >= 0) {
                         rs = pwcache_recstart(op,dt,ep,un) ;
                         pwl = rs ;
                     }
-                    rs1 = pq_ins(&op->lru,pep) ;
+                    rs1 = pq_ins(op->lrup,pep) ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (removed entry) */
                 if (rs >= 0) *epp = (REC *) pep ;
@@ -314,7 +353,7 @@ static int pwcache_mkrec(pwcache *op,time_t dt,REC **epp,cchar *un) noex {
                     pwl = rs ;
                     if (*epp != nullptr) {
                         pep = (pq_ent *) *epp ;
-                        rs = pq_ins(&op->lru,pep) ;
+                        rs = pq_ins(op->lrup,pep) ;
                     }
                 } /* end if (new-entry) */
             } /* end if */
@@ -350,7 +389,7 @@ static int pwcache_recstart(pwcache *op,time_t dt,REC *ep,cchar *un) noex {
             key.len = strlen(ep->un) ;
             val.buf = ep ;
             val.len = size ;
-            rs = hdb_store(&op->db,key,val) ;
+            rs = hdb_store(op->dbp,key,val) ;
             if (rs < 0)
                 record_finish(ep) ;
         } /* end if (entry-start) */
@@ -377,11 +416,11 @@ static int pwcache_recrear(pwcache *op,REC *ep) noex {
         pq_ent          *pcp = (pq_ent *) ep ;
         pq_ent          *pep{} ;
         int             rs ;
-        if ((rs = pq_gettail(&op->lru,&pep)) >= 0) {
+        if ((rs = pq_gettail(op->lrup,&pep)) >= 0) {
             if (pcp != pep) {
                 pep = (pq_ent *) ep ;
-                if ((rs = pq_unlink(&op->lru,pep)) >= 0) {
-                    rs = pq_ins(&op->lru,pep) ;
+                if ((rs = pq_unlink(op->lrup,pep)) >= 0) {
+                    rs = pq_ins(op->lrup,pep) ;
                     if (rs < 0) {
                         REC     *ep = (REC *) pep ;
                         record_finish(ep) ;
@@ -401,7 +440,7 @@ static int pwcache_recdel(pwcache *op,REC *ep) noex {
             hdb_datum	key{} ;
             key.buf = ep->un ;
             key.len = strlen(ep->un) ;
-            rs1 = hdb_delkey(&op->db,key) ;
+            rs1 = hdb_delkey(op->dbp,key) ;
             if (rs >= 0) rs = rs1 ;
 	}
 	{
@@ -418,8 +457,8 @@ static int pwcache_recfins(pwcache *op) noex {
         REC             *ep ;
         int             rs = SR_OK ;
         int             rs1 ;
-        if ((rs1 = hdb_curbegin(&op->db,&cur)) >= 0) {
-            while (hdb_enum(&op->db,&cur,&key,&val) >= 0) {
+        if ((rs1 = hdb_curbegin(op->dbp,&cur)) >= 0) {
+            while (hdb_enum(op->dbp,&cur,&key,&val) >= 0) {
                 ep = (REC *) val.buf ;
                 {
                     rs1 = record_finish(ep) ;
@@ -430,7 +469,7 @@ static int pwcache_recfins(pwcache *op) noex {
                     if (rs >= 0) rs = rs1 ;
                 }
             } /* end while */
-            hdb_curend(&op->db,&cur) ;
+            hdb_curend(op->dbp,&cur) ;
         } /* end if */
         if (rs >= 0) rs = rs1 ;
         return rs ;
