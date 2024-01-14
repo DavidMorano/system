@@ -23,7 +23,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<stdlib.h>
-#include	<string.h>
+#include	<string.h>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>

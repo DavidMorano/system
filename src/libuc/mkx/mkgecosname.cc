@@ -152,8 +152,6 @@ using std::nullptr_t ;			/* type */
 
 /* external subroutines */
 
-int		getgecosname(cchar *,int,cchar **) noex ;
-
 
 /* local structures */
 

@@ -1,6 +1,6 @@
-# MAKEFILES (snx)
+# MAKEFILES (mktmp)
 
-T= snx
+T= mktmp
 
 ALL= $(T).o $(T).a
 
@@ -21,10 +21,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -51,22 +51,11 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= snx.h
+INCS= mktmp.h
 
 
-OBJ0_SNX= snabbr.o snaddw.o sncpyarray.o
-OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o snerrabbr.o
-OBJ2_SNX= snfilemode.o snflags.o snfsflags.o sninetaddr.o
-OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o
-OBJ4_SNX= snrealname.o snshellunder.o snsigabbr.o sntid.o
-OBJ5_SNX= sntmtime.o snuuid.o snxxx.o
-
-
-OBJA_SNX= obj0_sfx.o obj1_sfx.o
-OBJB_SNX= obj2_sfx.o obj3_sfx.o
-OBJC_SNX= obj4_sfx.o obj5_sfx.o
-
-OBJ_SNX= $(OBJA_SNX) $(OBJB_SNX) $(OBJC_SNX)
+#OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o mktmplock.o
+OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o 
 
 
 default:		$(T).o
@@ -89,10 +78,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SNX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SNX)
+$(T).o:			$(OBJ_MKTMP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MKTMP)
 
-$(T).a:			$(OBJ_SNX)
+$(T).a:			$(OBJ_MKTMP)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -113,27 +102,12 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_sfx.o:	$(OBJ0_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNX)
+# directories
+mktmpdir.o:		mktmpdir.cc $(INCS)
+mktmpuserdir.o:		mktmpuserdir.cc $(INCS)
 
-obj1_sfx.o:	$(OBJ1_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNX)
-
-obj2_sfx.o:	$(OBJ2_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNX)
-
-obj3_sfx.o:	$(OBJ3_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNX)
-
-obj4_sfx.o:	$(OBJ4_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNX)
-
-obj5_sfx.o:	$(OBJ5_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNX)
-
-
-snuuid.o:		snuuid.cc $(INCS)
-sntid.o:		sntid.cc $(INCS)
-snerrabbr.o:		snerrabbr.cc $(INCS)
+# files
+mktmpfile.o:		mktmpfile.cc $(INCS)
+mktmplock.o:		mktmplock.cc $(INCS)
 
 

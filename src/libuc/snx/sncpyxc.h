@@ -23,18 +23,14 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sncpybc(char *,int,cchar *) noex ;
 extern int sncpylc(char *,int,cchar *) noex ;
 extern int sncpyuc(char *,int,cchar *) noex ;
 extern int sncpyfc(char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SNCPYXC_INCLUDE */

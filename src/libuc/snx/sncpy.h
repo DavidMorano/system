@@ -26,15 +26,11 @@
 #include	<sncpyxc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	sncpyarray(char *,int,cchar **,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SNCPY_INCLUDE */

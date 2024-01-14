@@ -40,18 +40,14 @@ struct snflags_head {
 
 typedef SNFLAGS		snflags ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int snflags_start(snflags *,char *,int) noex ;
 extern int snflags_addstr(snflags *,cchar *) noex ;
 extern int snflags_addstrw(snflags *,cchar *,int) noex ;
 extern int snflags_finish(snflags *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SNFLAGS_INCLUDE */

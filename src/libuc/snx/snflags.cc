@@ -1,4 +1,4 @@
-/* snflags */
+/* snflags SUPPORT */
 /* lang=C++20 */
 
 /* make string version of some flags */

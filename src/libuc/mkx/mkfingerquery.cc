@@ -1,5 +1,5 @@
 /* mkfingerquery SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make argument string for FINGER query */
 /* version %I% last-modified %G% */
@@ -35,7 +35,7 @@
 	up		user-part
 	av		service arguments (if any)
 
-
+	Returns:
 	>=0		length of used destination buffer from conversion
 	<0		error (system-return)
 
@@ -43,15 +43,24 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 
+#include	"mkx.h"
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
-
-extern int	sbuf_addquoted(sbuf *,const char *,int) ;
 
 
 /* forward references */
@@ -62,29 +71,29 @@ extern int	sbuf_addquoted(sbuf *,const char *,int) ;
 
 /* exported subroutines */
 
-int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,cchar **av) noex {
+int mkfingerquery(char *qbuf,int qlen,int f_long,cchar *up,mainv av) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (qbuf && up) {
 	    rs = SR_INVALID ;
 	    if (qlen > 0) {
 	        sbuf	b ;
-	        if ((rs = sbuf_start(&b,qbuf,qlen)) >= 0) {
-	            rs = sbuf_strw(&b,up,-1) ;
+	        if ((rs = b.start(qbuf,qlen)) >= 0) {
+	            rs = b.strw(up,-1) ;
 	            if ((rs >= 0) && f_long) {
-		        sbuf_strw(&b," /W",3) ;
+		        b.strw(" /W",3) ;
 	            }
 	            if (av) {
 	                for (int i = 0 ; (rs >= 0) && av[i] ; i += 1) {
-	                    if ((rs = sbuf_char(&b,' ')) >= 0) {
-			        rs = sbuf_addquoted(&b,av[i],-1) ;
+	                    if ((rs = b.chr(' ')) >= 0) {
+			        rs = b.addquoted(av[i],-1) ;
 		            }
 	                } /* end for */
 	            } /* end if (argument-vector) */
 	            if (rs >= 0) {
-	                sbuf_strw(&b,"\n\r",2) ;
+	                b.strw("\n\r",2) ;
 	            }
-	            len = sbuf_finish(&b) ;
+	            len = b.finish ;
 	            if (rs >= 0) rs = len ;
 	        } /* end if (sbuf) */
 	    } /* end if (valid) */

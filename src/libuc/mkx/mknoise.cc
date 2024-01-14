@@ -63,7 +63,6 @@
 
 /* local defines */
 
-#define	PROCDNAME	"/proc"
 #define	NENTS		1000
 
 #define	NOISEDATA	struct noisedata

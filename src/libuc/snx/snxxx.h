@@ -24,9 +24,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int snsds(char *,int,cchar *,cchar *) noex ;
 extern int snscs(char *,int,cchar *,cchar *) noex ;
@@ -35,9 +33,7 @@ extern int snsdd(char *,int,cchar *,uint) noex ;
 extern int snddd(char *,int,uint,uint) noex ;
 extern int snsd(char *,int,cchar *,uint) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SNXXX_INCLUDE */

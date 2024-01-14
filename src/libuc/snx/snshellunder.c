@@ -1,4 +1,4 @@
-/* snshellunder */
+/* snshellunder SUPPORT */
 /* lang=C20 */
 
 /* make the shell-under information string */
@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		length of created string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

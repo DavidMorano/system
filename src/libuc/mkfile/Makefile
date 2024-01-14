@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mkfile.h
 
 
-OBJ_MKFILE= mktmpfile.o mkartfile.o mkdatefile.o mkjobfile.o
+OBJ_MKFILE= mkartfile.o mkdatefile.o mkjobfile.o
 
 
 default:		$(T).o
@@ -101,10 +101,10 @@ control:
 	(uname -n ; date) > Control
 
 
-mktmpfile.o:		mktmpfile.c $(INCS)
 mkdatefile.o:		mkdatefile.cc $(INCS)
 mkartfile.o:		mkartfile.cc $(INCS)
 mkjobfile.o:		mkjobfile.cc $(INCS)
 
+mktmpfile.o:		mktmpfile.c $(INCS)
 
 

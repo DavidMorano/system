@@ -1,4 +1,4 @@
-/* snkeyval */
+/* snkeyval SUPPORT */
 /* lang=C20 */
 
 /* string formatting (key-value pair) */
@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		length of created string
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

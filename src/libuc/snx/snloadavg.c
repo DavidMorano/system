@@ -1,4 +1,4 @@
-/* snloadavg */
+/* snloadavg SUPPORT */
 /* lang=C20 */
 
 /* make string version of a load-average */
@@ -26,7 +26,6 @@
 	fractional part.
 
 	Synopsis:
-
 	int snloadavg(char *dbuf,int dlen,uint *la,int w,int p,int fill) noex
 	
 	Arguments:
@@ -39,7 +38,7 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

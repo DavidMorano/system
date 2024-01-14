@@ -1,4 +1,4 @@
-/* sntid */
+/* sntid SUPPORT */
 /* lang=C++20 */
 
 /* create a string representation of a Pthread Thread-ID */
@@ -39,7 +39,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<stdint.h>
+#include	<stdint.h>		/* <- for |uintptr_t| */
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<localmisc.h>

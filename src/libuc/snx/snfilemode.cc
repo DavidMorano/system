@@ -1,4 +1,4 @@
-/* snfilemode */
+/* snfilemode SUPPORT */
 /* lang=C++20 */
 
 /* make string version of the file-mode flags */
@@ -42,7 +42,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ctoct.h>
 #include	<localmisc.h>

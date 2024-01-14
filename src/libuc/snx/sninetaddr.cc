@@ -1,4 +1,4 @@
-/* sninetaddr */
+/* sninetaddr SUPPORT */
 /* lang=C++20 */
 
 /* make string version of INET addresses */
@@ -86,7 +86,7 @@
 #endif
 
 #ifndef	CF_CTHEXUC
-#define	CF_CTHEXUC	0
+#define	CF_CTHEXUC		0
 #endif
 
 

@@ -22,9 +22,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern bool iswhite(int) noex ;
 extern bool isalnumlatin(int) noex ;
@@ -44,9 +42,7 @@ extern bool ismmclass_7bit(int) noex ;
 extern bool ismmclass_8bit(int) noex ;
 extern bool ismmclass_binary(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

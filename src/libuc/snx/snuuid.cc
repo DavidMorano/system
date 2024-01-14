@@ -1,5 +1,5 @@
-/* snuuid */
-/* lang=C20 */
+/* snuuid SUPPORT */
+/* lang=C++20 */
 
 /* string-UUID (String-UUID) */
 /* version %I% last-modified %G% */
@@ -24,7 +24,7 @@
 	from a UUID.
 
 	Synopsis:
-	int snmkuuid(char *rbuf,int rlen,MKUUID *up) noex
+	int snuuid(char *rbuf,int rlen,MKUUID *up) noex
 
 	Arguments:
 	rbuf		result buffer
@@ -39,13 +39,15 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<cthex.h>
 #include	<mkuuid.h>
 #include	<localmisc.h>
+
+#include	"snx.h"
 
 
 /* local defines */
@@ -55,7 +57,19 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -63,20 +77,23 @@
 static int sbuf_hexp(sbuf *,uint64_t,int) noex ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int snmkuuid(char *dbuf,int dlen,MKUUID *up) noex {
+int snuuid(char *dbuf,int dlen,MKUUID *up) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && up) {
 	    sbuf	b ;
-	    if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
+	    if ((rs = b.start(dbuf,dlen)) >= 0) {
 	        uint64_t	v = (up->time & UINT_MAX) ;
 	        if (rs >= 0) rs = sbuf_hexp(&b,v,4) ;
-	        if (rs >= 0) rs = sbuf_char(&b,'-') ;
+	        if (rs >= 0) rs = b.chr('-') ;
 	        v = ((up->time >> 32) & UINT_MAX) ;
 	        if (rs >= 0) rs = sbuf_hexp(&b,v,2) ;
-	        if (rs >= 0) rs = sbuf_char(&b,'-') ;
+	        if (rs >= 0) rs = b.chr('-') ;
 	        if (rs >= 0) {
 		    uint64_t	tv ;
 		    v = 0 ;
@@ -88,21 +105,21 @@ int snmkuuid(char *dbuf,int dlen,MKUUID *up) noex {
 		    v |= (tv << (8+4)) ;
 	            rs = sbuf_hexp(&b,v,2) ;
 	        } /* end if (ok) */
-	        if (rs >= 0) rs = sbuf_char(&b,'-') ;
+	        if (rs >= 0) rs = b.chr('-') ;
 	        v = (up->clk & UINT_MAX) ;
 	        v &= (~ (3 << 14)) ;
 	        v |= (2 << 14) ;		/* standardized variant */
 	        if (rs >= 0) rs = sbuf_hexp(&b,v,2) ;
-	        if (rs >= 0) rs = sbuf_char(&b,'-') ;
+	        if (rs >= 0) rs = b.chr('-') ;
 	        v = up->node ;
 	        if (rs >= 0) rs = sbuf_hexp(&b,v,6) ;
-	        len = sbuf_finish(&b) ;
+	        len = b.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (snmkuuid) */
+/* end subroutine (snuuid) */
 
 static int sbuf_hexp(sbuf *bp,uint64_t v,int n) noex {
 	uint		vi ;
@@ -128,7 +145,7 @@ static int sbuf_hexp(sbuf *bp,uint64_t v,int n) noex {
 	if (rs >= 0) {
 	    cchar	*dp = dbuf ;
 	    if (n == 6) dp += ((8-n)*2) ;
-	    rs = sbuf_strw(bp,dp,(n*2)) ;
+	    rs = bp->strw(dp,(n*2)) ;
 	} /* end if */
 	return rs ;
 }

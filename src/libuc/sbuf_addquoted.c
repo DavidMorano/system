@@ -20,7 +20,7 @@
 	sbuf_addquoted
 
 	Description:
-	Add a shell-quoted string to the SBUF object.
+	Add a shell-quoted string to the sbuf object.
 
 	Synopsis:
 	int sbuf_addquoted(sbuf *sbp,cchar *ap,int al) noex
@@ -64,7 +64,7 @@
 
 /* exported subroutines */
 
-int sbuf_addquoted(SBUF *sbp,cchar *ap,int al) noex {
+int sbuf_addquoted(sbuf *sbp,cchar *ap,int al) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;

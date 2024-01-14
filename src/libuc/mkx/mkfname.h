@@ -20,9 +20,7 @@
 
 #include	<envstandards.h>
 #include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin

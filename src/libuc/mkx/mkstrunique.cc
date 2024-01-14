@@ -71,11 +71,10 @@ static void	bool_init(bool *,int) noex ;
 int mkstrunique(char *bp,int bl) noex {
 	if (bl > 1) {
 	    bool	seen[256] ;
-	    int		ch ;
 	    int		tail = 1 ;
 	    bool_init(seen,256) ;
 	    while (bl-- && *bp) {
-	        ch = mkchar(*bp) ;
+	        cint	ch = mkchar(*bp) ;
 		if (!seen[ch]) {
 		    bp[tail++] = ch ;
 	            seen[ch] = true ;
@@ -83,7 +82,7 @@ int mkstrunique(char *bp,int bl) noex {
 	        bp += 1 ;
 	    } /* end while */
 	    bp[tail] = '\0' ;
-	}
+	} /* end if */
 	return bl ;
 }
 /* end subroutine (mkstrunique) */

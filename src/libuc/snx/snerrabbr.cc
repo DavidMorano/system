@@ -1,9 +1,8 @@
-/* snerrabbr */
+/* snerrabbr SUPPORT */
+/* lang=C++20 */
 
 /* make the string repreentation of a system-error return number */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,37 +16,36 @@
 
 /*******************************************************************************
 
-	We create the string repreentation of a system-error return number.
+	Name:
+	snerrabbr
+
+	Description:
+	We create the string repreentation of a system-error return
+	number.
 
 	Synopsis:
-
-	int snerrabbr(dbuf,dlen,n)
-	char		*dbuf ;
-	int		dlen ;
-	int		n ;
+	int snerrabbr(char *dbuf,int dlen,int n) noex
 	
 	Arguments:
-
 	dbuf		destination string buffer
 	dlen		destination string buffer length
 	n		signal number
 
 	Returns:
-
 	>=0		number of bytes in result
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
+#include	<sncpyx.h>
+#include	<ctdec.h>
 #include	<localmisc.h>
+
+#include	"snx.h"
 
 
 /* local defines */
@@ -55,12 +53,9 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	ctdeci(char *,int,int) ;
-extern int	ctdecpui(char *,int,int,uint) ;
-extern int	ctdecui(char *,int,uint) ;
-
-extern cchar	*strerrabbr(int) ;
+extern "C" {
+    extern cchar	*strerrabbr(int) noex ;
+}
 
 
 /* external variables */
@@ -77,21 +72,15 @@ extern cchar	*strerrabbr(int) ;
 
 /* exported subroutines */
 
-
-int snerrabbr(char *dbuf,int dlen,int n)
-{
-	int		rs ;
-	const char	*s ;
-
-	if (dbuf == NULL)
-	    return SR_FAULT ;
-
-	if ((s = strerrabbr(n)) != NULL) {
-	    rs = sncpy1(dbuf,dlen,s) ;
-	} else {
-	    rs = ctdeci(dbuf,dlen,n) ;
-	}
-
+int snerrabbr(char *dbuf,int dlen,int n) noex {
+	int		rs = SR_FAULT ;
+	if (dbuf) {
+	    if (cchar *s ; (s = strerrabbr(n)) != nullptr) {
+	        rs = sncpy1(dbuf,dlen,s) ;
+	    } else {
+	        rs = ctdeci(dbuf,dlen,n) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (snerrabbr) */

@@ -1,4 +1,4 @@
-/* sntmtime */
+/* sntmtime SUPPORT */
 /* lang=C20 */
 
 /* make string of time-component values */
@@ -40,7 +40,7 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 	Format codes:
 	- A		full weekday name (not yet coded)

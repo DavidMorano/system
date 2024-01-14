@@ -11,6 +11,11 @@
 #define	MKCEXSYNC_INCLUDE
 
 
+#include	<envstandards.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
+
 #define	MKCEXSYNC_MKLEN		10	/* length to create (in bytes) */
 #define	MKCEXSYNC_REQLEN	6	/* required length */
 #define	MKCEXSYNC_FINLEN	2	/* number of finishing bytes */

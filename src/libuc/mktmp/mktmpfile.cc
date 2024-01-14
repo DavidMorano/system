@@ -1,5 +1,5 @@
 /* mktmpfile SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make a temporary file */
 /* version %I% last-modified %G% */
@@ -46,8 +46,8 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -59,7 +59,9 @@
 
 /* external subroutines */
 
-extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
+extern "C" {
+    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
+}
 
 
 /* external variables */

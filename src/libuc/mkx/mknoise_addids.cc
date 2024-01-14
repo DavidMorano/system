@@ -1,3 +1,7 @@
+
+#define	PROCFNAME	"/proc"
+
+
 static int noisedata_addids(NOISEDATA *ndp,cchar *procdname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
