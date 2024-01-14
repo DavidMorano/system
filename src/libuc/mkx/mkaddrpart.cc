@@ -59,6 +59,8 @@
 
 /* local namespaces */
 
+using std::nullptr_t ;
+
 
 /* local typedefs */
 
@@ -83,24 +85,25 @@ int mkdisphdr(char *abuf,int alen,cchar *sp,int sl) noex {
 	if (abuf && sp) {
 	    sbuf	b ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((rs = sbuf_start(&b,abuf,alen)) >= 0) {
+	    if ((rs = b.start(abuf,alen)) >= 0) {
 	        field	fsb ;
 	        cint	flen = sl ;
 	        char	*fbuf ;
 	        if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	            if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	                cchar	*fp = fbuf ;
-	                int	fl ;
-	                int	c = 0 ;
-	                while ((fl = field_sharg(&fsb,NULL,fbuf,flen)) >= 0) {
+			nullptr_t	np{} ;
+	                cchar		*fp = fbuf ;
+	                int		fl ;
+	                int		c = 0 ;
+	                while ((fl = field_sharg(&fsb,np,fbuf,flen)) >= 0) {
 	                    if (fl > 0) {
 				if constexpr (f_nonstandard) {
 	                            if (c++ > 0) {
-	                                rs = sbuf_char(&b,' ') ;
+	                                rs = b.chr(' ') ;
 			            }
 			        } /* end if-constexpr (f_nonstandard) */
 	                        if (rs >= 0) {
-	                            rs = sbuf_strw(&b,fp,fl) ;
+	                            rs = b.strw(fp,fl) ;
 			        }
 			    } /* end if (non-zero positive) */
 	                    if (rs < 0) break ;
@@ -111,7 +114,7 @@ int mkdisphdr(char *abuf,int alen,cchar *sp,int sl) noex {
 	            rs1 = uc_free(fbuf) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory allocation) */
-	        len = sbuf_finish(&b) ;
+	        len = b.finish ;
 	        if (rs >= 0) rs = len ;
 	    } /* end if (sbuf) */
 	} /* end if (non-null) */

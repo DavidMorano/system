@@ -18,6 +18,11 @@
 #define	MKFNAMESUF_INCLUDE
 
 
+#include	<envstandards.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
+
 EXTERNC_begin
 
 extern int mkfnamesufx(char *,int,cc *,...) noex ;

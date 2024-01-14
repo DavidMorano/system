@@ -213,6 +213,7 @@ mkaddrbest.o:		mkaddrbest.cc  $(INCS)
 
 mkbasename.o:		mkbasename.c $(INCS)
 mkshlibname.o:		mkshlibname.cc $(INCS)
+mksofname.o:		mksofname.cc $(INCS)
 
 mkintfname.o:		mkintfname.cc $(INCS)
 mkonefrom.o:		mkonefrom.cc $(INCS)
@@ -223,5 +224,7 @@ mkaltext.o:		mkaltext.cc $(INCS)
 mkmaildirtest.o:	mkmaildirtest.cc $(INCS)
 mkstrunique.o:		mkstrunique.cc $(INCS)
 mkcleanline.o:		mkcleanline.cc $(INCS)
+mkfmtphone.o:		mkfmtphone.cc $(INCS)
+mkfingerquery.o:	mkfingerquery.cc $(INCS)
 
 

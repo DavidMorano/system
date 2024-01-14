@@ -1230,6 +1230,11 @@ mkx.o:			mkx.dir
 mkx.dir:
 	makesubdir $@
 
+# MKTMP
+mktmp.o:		mktmp.dir
+mktmp.dir:
+	makesubdir $@
+
 # MKFILE
 mkfile.o:		mkfile.dir
 mkfile.dir:

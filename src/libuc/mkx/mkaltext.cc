@@ -88,13 +88,13 @@ int mkaltext(char *dbuf,cchar *name,cchar *ext) noex {
 			if ((rs = maxpathlen) >= 0) {
 	                    sbuf	alt ;
 	                    cint	dlen = rs ;
-	                    if ((rs = sbuf_start(&alt,dbuf,dlen)) >= 0) {
+	                    if ((rs = alt.start(dbuf,dlen)) >= 0) {
 		                {
-	                            sbuf_strw(&alt,name,(tp - name)) ;
-	                            sbuf_char(&alt,'.') ;
-	                            sbuf_strw(&alt,ext,-1) ;
+	                            alt.strw(name,(tp - name)) ;
+	                            alt.chr('.') ;
+	                            alt.strw(ext,-1) ;
 		                }
-	                        len = sbuf_finish(&alt) ;
+	                        len = alt.finish ;
 	                        if (rs >= 0) rs = len ;
 	                    } /* end if (sbuf) */
 			} /* end if (maxpathlen) */

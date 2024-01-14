@@ -24,9 +24,7 @@
 #include	<char.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int isNotPresent(int rs) noex ;
 extern int isNotAccess(int rs) noex ;
@@ -37,9 +35,7 @@ static inline int isInvalid(int rs) noex {
 	return isNotValid(rs) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ISNOT_INCLUDE */

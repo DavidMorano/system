@@ -88,6 +88,7 @@ struct sbuf_co {
 } ; /* end struct (sbuf_co) */
 extern "C" {
    extern int sbuf_strw(sbuf *,cchar *,int) noex ;
+   extern int sbuf_addquoted(sbuf *,cchar *,int) noex ;
 }
 struct sbuf : sbuf_head {
 	sbuf_co		deci ;
@@ -116,6 +117,9 @@ struct sbuf : sbuf_head {
 	int nchr(int,int = 1) noex ;
 	int strw(cchar *sp,int sl = -1) noex {
 	    return sbuf_strw(this,sp,sl) ;
+	} ;
+	int addquoted(cchar *sp,int sl = -1) noex {
+	    return sbuf_addquoted(this,sp,sl) ;
 	} ;
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;

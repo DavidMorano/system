@@ -1,5 +1,5 @@
 /* mkfmtphone SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* similar to 'snwcpy(3dam)' but formatting a phone number */
 /* version %I% last-modified %G% */
@@ -22,19 +22,34 @@
 	Description:
 	We format a raw phone number to make it look more pretty.
 
+	Synopsis:
+	int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex
+
+	Arguments:
+	dbuf		result buffer pointer
+	dlen		result buffer length
+	pp		source c-string pointer
+	pl		source c-string length
+
+	Returns:
+	>=0		number of bytes in result
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<sbuf.h>
 #include	<strn.h>
+#include	<sfx.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
-#include	<sfx.h>
 #include	<localmisc.h>
+
+#include	"mkx.h"
 
 
 /* local defines */
@@ -66,32 +81,32 @@ int mkfmtphone(char *dbuf,int dlen,cchar *pp,int pl) noex {
 	        char	*tbuf ;
 	        if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 	            if ((rs = snwcpyopaque(tbuf,tlen,sp,sl)) >= 0) {
-			SBUF	b ;
+			sbuf	b ;
 		        cint	tl = rs ;
-			if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
+			if ((rs = b.start(dbuf,dlen)) >= 0) {
 			    if (tl > 10) {
-				rs = sbuf_strw(&b,tbuf,(tl-10)) ;
+				rs = b.strw(tbuf,(tl-10)) ;
 			    }
 		            if ((rs >= 0) && (tl >= 10)) {
 				cchar	*tp = (tbuf+tl-10) ;
-				sbuf_char(&b,CH_LPAREN) ;
-				sbuf_strw(&b,tp,3) ;
-				sbuf_char(&b,CH_RPAREN) ;
+				b.chr(CH_LPAREN) ;
+				b.strw(tp,3) ;
+				b.chr(CH_RPAREN) ;
 			    }
 			    if ((rs >= 0) && (tl >= 7)) {
 				cchar	*tp = (tbuf+tl-7) ;
-				sbuf_strw(&b,tp,3) ;
-				sbuf_char(&b,CH_MINUS) ;
+				b.strw(tp,3) ;
+				b.chr(CH_MINUS) ;
 			    }
 			    if (rs >= 0) {
  			        if (tl >= 4) {
 				    cchar	*tp = (tbuf+tl-4) ;
-				    sbuf_strw(&b,tp,4) ;
+				    b.strw(tp,4) ;
 			        } else {
-				    sbuf_strw(&b,tbuf,tl) ;
+				    b.strw(tbuf,tl) ;
 				}
 			    }
-			    dl = sbuf_finish(&b) ;
+			    dl = b.finish ;
 			    if (rs >= 0) rs = dl ;
 			} /* end if (sbuf) */
 	            } /* end if (sncpyopaque) */

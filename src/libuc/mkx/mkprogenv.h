@@ -12,10 +12,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<strpack.h>
+#include	<localmisc.h>		/* <- |USERNAMELEN| ? */
 
 
 #define	MKPROGENV	struct mkprogenv_head

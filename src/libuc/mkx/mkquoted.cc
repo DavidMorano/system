@@ -44,6 +44,14 @@
 	>=0		length of used destination buffer from conversion
 	<0		destination buffer was not big enough or other problem
 
+	Reminder:
+	Zero-length arguments are both allowed and common!  So to
+	any maintainers out there: do not check for a non-zero
+	positive source string to be quoted.  It could be and often
+	is, zero-length!  And no, I did not get caught out with
+	this.  Rather I am antisipating a problem if I had accidentally
+	messed up with this.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -147,26 +155,26 @@ int quoter::mkq() noex {
 	int		len = 0 ;
 	int		al = alen ;
 	cchar		*ap = abuf ;
-	if ((rs = sbuf_start(&b,qbuf,qlen)) >= 0) {
+	if ((rs = b.start(qbuf,qlen)) >= 0) {
 	    int		i ;
 	    if (f_white) {
-	        sbuf_char(&b,CH_DQUOTE) ;
+	        b.chr(CH_DQUOTE) ;
 	    }
 	    while ((i = siterm(ap,al,qterms)) >= 0) {
-	        sbuf_strw(&b,ap,i) ;
-	        sbuf_char(&b,CH_BSLASH) ;
-	        rs = sbuf_char(&b,ap[i]) ;
+	        b.strw(ap,i) ;
+	        b.chr(CH_BSLASH) ;
+	        rs = b.chr(ap[i]) ;
 	        ap += (i+1) ;
 	        al -= (i+1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
 	    if ((rs >= 0) && (al > 0)) {
-	        rs = sbuf_strw(&b,ap,al) ;
+	        rs = b.strw(ap,al) ;
 	    }
 	    if ((rs >= 0) && f_white) {
-	        rs = sbuf_char(&b,CH_DQUOTE) ;
+	        rs = b.chr(CH_DQUOTE) ;
 	    }
-	    len = sbuf_finish(&b) ;
+	    len = b.finish ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
 	return (rs >= 0) ? len : rs ;

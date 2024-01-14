@@ -25,7 +25,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
@@ -68,11 +68,11 @@ int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
 	if (shlibname && pnp) {
 	    rs = SR_INVALID ;
 	    if (pnp[0]) {
+	        cchar	*lc = "lib" ;
+		if (pnl < 0) pnl = strlen(pnp) ;
 		if ((rs = maxnamelen) >= 0) {
 		    cint	shliblen = rs ;
-	            bool	f ;
-	            cchar	*lc = "lib" ;
-	            f = ((pnl >= 3) && (strncmp(pnp,lc,3) == 0)) ;
+	            bool	f = ((pnl >= 3) && (strncmp(pnp,lc,3) == 0)) ;
 	            if (! f) {
 	                rs = storebuf_strw(shlibname,shliblen,i,lc,3) ;
 	                i += rs ;

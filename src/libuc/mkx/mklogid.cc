@@ -166,27 +166,27 @@ int loghelp::layout(cchar *dp,int dl,int maxstrlen,int ml) noex {
 	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
-        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+        if ((rs = b.start(rbuf,rlen)) >= 0) {
             if (ml == 0) {
-                sbuf_strw(&b,sp,sl) ;
-                sbuf_strw(&b,dp,dl) ;
+                b.strw(sp,sl) ;
+                b.strw(dp,dl) ;
             } else if (ml <= 2) {
-                sbuf_strw(&b,(sp + 2),(sl - 2)) ;
-                sbuf_strw(&b,dp,dl) ;
+                b.strw((sp + 2),(sl - 2)) ;
+                b.strw(dp,dl) ;
             } else {
                 sp += 2 ;
                 sl -= 2 ;
                 if (sl <= maxstrlen) {
-                    sbuf_strw(&b,sp,sl) ;
-                    sbuf_strw(&b,dp,dl) ;
+                    b.strw(sp,sl) ;
+                    b.strw(dp,dl) ;
                 } else {
                     cint        len = max(sl,maxstrlen) + dl ;
                     ml = (len <= rlen) ? len : (len - rlen) ;
-                    sbuf_strw(&b,sp,min(sl,maxstrlen)) ;
-                    sbuf_strw(&b,(dp + ml),(dl - ml)) ;
+                    b.strw(sp,min(sl,maxstrlen)) ;
+                    b.strw((dp + ml),(dl - ml)) ;
                 } /* end if */
             } /* end if */
-            rs1 = sbuf_finish(&b) ;
+            rs1 = b.finish ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (sbuf) */
 	return rs ;

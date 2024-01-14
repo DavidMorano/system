@@ -1,6 +1,6 @@
-# MAKEFILES (mkfile)
+# MAKEFILES (mktmp)
 
-T= mkfile
+T= mktmp
 
 ALL= $(T).o $(T).a
 
@@ -51,10 +51,11 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= mkfile.h
+INCS= mktmp.h
 
 
-OBJ_MKFILE= mkartfile.o mkdatefile.o mkjobfile.o
+#OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o mktmplock.o
+OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o 
 
 
 default:		$(T).o
@@ -77,10 +78,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_MKFILE)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MKFILE)
+$(T).o:			$(OBJ_MKTMP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MKTMP)
 
-$(T).a:			$(OBJ_MKFILE)
+$(T).a:			$(OBJ_MKTMP)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -101,10 +102,12 @@ control:
 	(uname -n ; date) > Control
 
 
-mkdatefile.o:		mkdatefile.cc $(INCS)
-mkartfile.o:		mkartfile.cc $(INCS)
-mkjobfile.o:		mkjobfile.cc $(INCS)
+# directories
+mktmpdir.o:		mktmpdir.cc $(INCS)
+mktmpuserdir.o:		mktmpuserdir.cc $(INCS)
 
-mktmpfile.o:		mktmpfile.c $(INCS)
+# files
+mktmpfile.o:		mktmpfile.cc $(INCS)
+mktmplock.o:		mktmplock.cc $(INCS)
 
 

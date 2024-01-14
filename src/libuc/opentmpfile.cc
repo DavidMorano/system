@@ -1,10 +1,8 @@
-/* opentmpfile */
+/* opentmpfile SUPPORT */
+/* lang=C++20 */
 
 /* make and open a temporary file */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,50 +16,45 @@
 
 /*******************************************************************************
 
+	Name:
+	opentmpfile
+
+	Description:
 	Make and open a temporary file.
 
 	Synopsis:
-
-	int opentmpfile(inname,of,om,obuf)
-	const char	inname[] ;
-	int		of ;
-	mode_t		om ;
-	char		obuf[] ;
+	int opentmpfile(cchar *inname,int of,mode_t om,char *obuf) noex
 
 	Arguments:
-
-	inname		input file name template string
+	inname		input directory template
 	of		open flags
 	om		file type and creation mode
 	obuf		output buffer to hold resultant file name
 
 	Returns:
-
 	>=0		file descriptor
-	<0		failure returning the error number
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
-#include	<sys/time.h>		/* for |gethetime(3c)| */
-#include	<unistd.h>
+#include	<sys/time.h>		/* for |gethrtime(3c)| */
+#include	<unistd.h>		/* for |gethostid(3c)| */
 #include	<fcntl.h>
-#include	<stdlib.h>
 #include	<netdb.h>
-#include	<time.h>
-
+#include	<cstdlib>
+#include	<ctime>
 #include	<usystem.h>
-#include	<cthex.h>
-#include	<ugetpid.h>
+#include	<ucgetpid.h>
 #include	<sigblocker.h>
 #include	<sockaddress.h>
+#include	<mkpathx.h>
+#include	<mkx.h>
+#include	<cthex.h>
 #include	<localmisc.h>
 
 
@@ -81,65 +74,65 @@
 #endif
 
 #undef	RANDBUFLEN
-#define	RANDBUFLEN	(sizeof(ULONG)*2)
+#define	RANDBUFLEN	(sizeof(ulong)*2)
+
+
+/* local namespæces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkexpandpath(char *,cchar *,int) ;
 
 
 /* external variables */
 
 
+/* local structures */
+
+
 /* forward reference */
 
-static int	opentmpx(const char *,int,mode_t,int,char *) ;
-static int	opentmpxer(const char *,int,mode_t,int,char *) ;
-static int	randload(ULONG *) ;
-static int	mktmpname(char *,ULONG,cchar *) ;
+static int	opentmpx(cchar *,int,mode_t,int,char *) noex ;
+static int	opentmpxer(cchar *,int,mode_t,int,char *) noex ;
+static int	randload(ulong *) noex ;
+static int	mktmpname(char *,ulong,cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int opentmpfile(cchar *inname,int of,mode_t om,char *rbuf)
-{
-	const int	otm = OTM_STREAM ;
+int opentmpfile(cchar *inname,int of,mode_t om,char *rbuf) noex {
+	cint		otm = OTM_STREAM ;
 	return opentmpx(inname,of,om,otm,rbuf) ;
 }
 /* end subroutine (opentmpfile) */
 
-
-int opentmpusd(cchar *inname,int of,mode_t om,char *rbuf)
-{
-	const int	otm = OTM_DGRAM ;
+int opentmpusd(cchar *inname,int of,mode_t om,char *rbuf) noex {
+	cint		otm = OTM_DGRAM ;
 	om |= (S_IFSOCK | 0600) ;
 	return opentmpx(inname,of,om,otm,rbuf) ;
 }
 /* end subroutine (opentmpusd) */
 
-
-int opentmpuss(cchar *inname,int of,mode_t om,char *rbuf)
-{
-	const int	otm = OTM_STREAM ;
+int opentmpuss(cchar *inname,int of,mode_t om,char *rbuf) noex {
+	cint		otm = OTM_STREAM ;
 	om |= (S_IFSOCK | 0600) ;
 	return opentmpx(inname,of,om,otm,rbuf) ;
 }
 /* end subroutine (opentmpuss) */
 
-
-int opentmp(cchar *dname,int of,mode_t om)
-{
+int opentmp(cchar *dname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	const char	*template = "otXXXXXXXXXXXX" ;
+	cchar		*platename = "otXXXXXXXXXXXX" ;
 	char		inname[MAXPATHLEN + 1] ;
 
 	of &= (~ O_ACCMODE) ;
@@ -149,19 +142,17 @@ int opentmp(cchar *dname,int of,mode_t om)
 	if (dname == NULL) dname = getenv(VARTMPDNAME) ;
 	if ((dname == NULL) || (dname[0] == '\0')) dname = TMPDNAME ;
 
-	if ((rs = mkpath2(inname,dname,template)) >= 0) {
-	    const int	olen = MAXPATHLEN ;
+	if ((rs = mkpath2(inname,dname,platename)) >= 0) {
+	    cint	olen = MAXPATHLEN ;
 	    char	*obuf ;
 	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
-	        SIGBLOCKER	blocker ;
+	        sigblocker	blocker ;
 	        if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
-		    const int	otm = OTM_STREAM ;
-
+		    cint		otm = OTM_STREAM ;
 	            if ((rs = opentmpx(inname,of,om,otm,obuf)) >= 0) {
 		        fd = rs ;
 	                if (obuf[0] != '\0') uc_unlink(obuf) ;
 	            }
-
 	            rs1 = sigblocker_finish(&blocker) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
@@ -170,7 +161,6 @@ int opentmp(cchar *dname,int of,mode_t om)
 	    } /* end if (m-a) */
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (mkpath) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opentmp) */
@@ -178,11 +168,10 @@ int opentmp(cchar *dname,int of,mode_t om)
 
 /* local subroutines */
 
-
-static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf)
-{
-	const int	plen = MAXPATHLEN ;
+static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
+	cint		plen = MAXPATHLEN ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 	char		*pbuf ;
 	if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
@@ -193,17 +182,16 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf)
 		rs = opentmpxer(inname,of,om,opt,obuf) ;
 		fd = rs ;
 	    }
-	    uc_free(pbuf) ;
+	    rs1 = uc_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opentmpx) */
 
-
-static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
-{
-	ULONG		rv ;
-	const mode_t	operm = (om & S_IAMB) ;
+static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
+	ulong		rv ;
+	cmode		operm = (om & S_IAMB) ;
 	int		rs = SR_OK ;
 	int		stype = 0 ;
 	int		loop = 0 ;
@@ -212,20 +200,10 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	int		f_abuf = FALSE ;
 	int		f ;
 
-#if	CF_DEBUGS
-	debugprintf("opentmpx: ent\n") ;
-#endif
-
 	if (inname == NULL) return SR_FAULT ;
 	if (obuf == NULL) return SR_FAULT ;
 
 	if (inname[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("opentmpx: infname=%s\n",inname) ;
-	debugprintf("opentmpx: of=\\x%06X\n",of) ;
-	debugprintf("opentmpx: operm=\\o%06o\n",operm) ;
-#endif
 
 	obuf[0] = '\0' ;
 
@@ -239,7 +217,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	}
 
 	if ((rs >= 0) && (obuf == NULL)) {
-	    const int	olen = MAXPATHLEN ;
+	    cint		olen = MAXPATHLEN ;
 	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
 		obuf[0] = '\0' ;
 		f_abuf = TRUE ;
@@ -252,10 +230,6 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 
 	while ((rs >= 0) && (loop < MAXLOOP) && (! f_exit)) {
 
-#if	CF_DEBUGS
-	    debugprintf("opentmpx: top of while, loop=%d\n",loop) ;
-#endif
-
 	    f_exit = TRUE ;
 
 /* put the file name together */
@@ -263,10 +237,6 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	    rv += loop ;
 	    rs = mktmpname(obuf,rv,inname) ;
 	    if (rs < 0) break ;
-
-#if	CF_DEBUGS
-	    debugprintf("opentmpx: onl=%d obuf=%s\n",rs,obuf) ;
-#endif
 
 /* go ahead and make the thing */
 
@@ -286,18 +256,9 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	    } else if (S_ISREG(om) || ((om & (~ S_IAMB)) == 0)) {
 	        int	ooflags = (of | O_CREAT | O_EXCL) ;
 
-#if	CF_DEBUGS
-	        debugprintf("opentmpx: REG fname=%s\n",obuf) ;
-#endif
-
 		f = ((ooflags & O_WRONLY) || (ooflags & O_RDWR)) ;
 		if (! f)
 		    ooflags |= O_WRONLY ;
-
-#if	CF_DEBUGS
-	        debugprintf("opentmpx: ooflags=\\x%06X\n",ooflags) ;
-	        debugprintf("opentmpx: operm=\\o%06o\n",operm) ;
-#endif
 
 	        rs = u_open(obuf,ooflags,operm) ;
 	        fd = rs ;
@@ -305,16 +266,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	            if ((rs == SR_EXIST) || (rs == SR_INTR)) f_exit = FALSE ;
 	        }
 
-#if	CF_DEBUGS
-	        debugprintf("opentmpx: u_open() rs=%d\n",
-	            rs) ;
-#endif
-
 	    } else if (S_ISFIFO(om)) {
-
-#if	CF_DEBUGS
-	        debugprintf("opentmpx: got a FIFO\n") ;
-#endif
 
 	        if ((rs = u_mknod(obuf,operm,0)) >= 0) {
 	            rs = u_open(obuf,of,operm) ;
@@ -333,7 +285,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	            fd = rs ;
 	            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
 		        struct sockaddr	*sap = (struct sockaddr *) &sa ;
-		        const int	sal = rs ;
+		        cint		sal = rs ;
 	                if ((rs = u_bind(fd,sap,sal)) >= 0) {
 			    rs = u_chmod(obuf,operm) ;
 			    if (rs < 0) {
@@ -352,14 +304,8 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 	            f_exit = FALSE ;
 		}
 	    } else {
-
-#if	CF_DEBUGS
-	        debugprintf("opentmpx: unknown mode=%08o\n",om) ;
-#endif
-
 		rs = SR_INVALID ;
 	        f_exit = TRUE ;
-
 	    } /* end if */
 
 	    loop += 1 ;
@@ -384,17 +330,15 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf)
 }
 /* end subroutine (opentmpxer) */
 
-
-static int randload(ULONG *rvp)
-{
-	const pid_t	pid = ugetpid() ;
-	const pid_t	sid = getsid(0) ;
-	const uid_t	uid = getuid() ;
-	ULONG		rv = 0 ;
-	ULONG		v ;
-
-	if (rvp == NULL) return SR_FAULT ;
-
+static int randload(ulong *rvp) noex {
+	int		rs = SR_FAULT ;
+	if (rvp) {
+	    const pid_t	pid = uc_getpid() ;
+	    const pid_t	sid = getsid(0) ;
+	    const uid_t	uid = getuid() ;
+	    ulong	rv = 0 ;
+	    ulong	v ;
+	    rs = SR_OK ;
 #ifdef	COMMENT
 	v = gethostid() ;
 	rv ^= (v << 32) ;
@@ -410,7 +354,7 @@ static int randload(ULONG *rvp)
 	rv += (v << 16) ;
 
 	{
-	    struct timeval	tod ;
+	    TIMEVAL	tod ;
 	    uc_gettimeofday(&tod,NULL) ; /* cannot fail?! */
 	        v = tod.tv_sec ;
 	        rv += (v << 32) ;
@@ -427,20 +371,17 @@ static int randload(ULONG *rvp)
 
 	*rvp = rv ;
 
-	return SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (randload) */
 
-
-static int mktmpname(char *obuf,ULONG rv,cchar *inname)
-{
-	const int	randlen = RANDBUFLEN ;
+/* load buffer w/ random HEX digits (16 bytes) from random variable (8 bytes) */
+static int mktmpname(char *obuf,ulong rv,cchar *inname) noex {
+	cint		randlen = RANDBUFLEN ;
 	int		rs ;
 	char		randbuf[RANDBUFLEN+1] ;
-
-/* load buffer w/ random HEX digits (16 bytes) from random variable (8 bytes) */
-
-	if ((rs = cthexull(randbuf,randlen,rv)) >= 0) {
+	if ((rs = cthex(randbuf,randlen,rv)) >= 0) {
 	    if ((rs = mkpath1(obuf,inname)) >= 0) {
 	        int	j = rs ;
 	        int	i = randlen ;
@@ -451,8 +392,7 @@ static int mktmpname(char *obuf,ULONG rv,cchar *inname)
 	            }
 	        } /* end while */
 	    } /* end if (mkpath) */
-	} /* end if (cthexull) */
-
+	} /* end if (cthexul) */
 	return rs ;
 }
 /* end subroutine (mktmpname) */
