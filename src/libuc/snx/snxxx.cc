@@ -1,4 +1,4 @@
-/* snxxx */
+/* snxxx SUPPORT */
 /* lang=C++20 */
 
 /* specialized x-string formatting */
@@ -35,8 +35,8 @@
 	x2		of type X2=|char *| or X2=|uint|
 
 	Returns:
-	<0		error
 	>=0		length of created string in destination
+	<0		error (system-return)
 
 *******************************************************************************/
 

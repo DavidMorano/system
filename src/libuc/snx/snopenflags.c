@@ -1,4 +1,4 @@
-/* snopenflags */
+/* snopenflags SUPPORT */
 /* lang=C20 */
 
 /* make string version of the open-call flags */
@@ -33,7 +33,7 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

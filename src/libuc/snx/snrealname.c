@@ -1,6 +1,8 @@
-/* snrealname */
+/* snrealname SUPPORT */
+/* lang=C20 */
 
 /* string-copy a real-name (consisting of parts) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,39 +16,32 @@
 
 /*******************************************************************************
 
-	This subroutine copies a real-name consisting of string parts to a
-	target buffer.
+	Name:
+	snrealname
+
+	Description:
+	This subroutine copies a real-name consisting of string
+	parts to a target buffer.
 
 	Synopsis:
-
-	int snrealname(rbuf,rlen,a,n)
-	char		rbuf[] ;
-	int		rlen ;
-	const char	*a[] ;
-	int		n ;
+	int snrealname(char *rbuf,int rlen,cchar **a,int n) noex
 
 	Arguments:
-
 	rbuf		result buffer
 	rlen		size of supplied result buffer
 	a		array of string parts
 	n		number of string parts
 
 	Returns:
-
 	>=0		resulting length
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<limits.h>		/* <- for |INT_MAX| */
 #include	<stdlib.h>
-
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -57,16 +52,12 @@
 
 /* exported subroutines */
 
-
-int snrealname(char *dbuf,int dlen,cchar *a[],int n)
-{
+int snrealname(char *dbuf,int dlen,cchar **a,int n) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		si = 0 ;
 	int		c = 0 ;
-
 	if (n < 0) n = INT_MAX ;
-
 	for (i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {
 	    if (a[i][0] != '\0') {
 		if (c++ > 0) {
@@ -79,7 +70,6 @@ int snrealname(char *dbuf,int dlen,cchar *a[],int n)
 	        }
 	    }
 	} /* end for */
-
 	return (rs >= 0) ? si : rs ;
 }
 /* end subroutine (snrealname) */

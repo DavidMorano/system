@@ -1,4 +1,4 @@
-/* snaddw */
+/* snaddw SUPPORT */
 /* lang=C++20 */
 
 /* append a counted c-string to a given counted c-string */

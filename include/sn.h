@@ -42,6 +42,7 @@ extern int snabbr(char *,int,cchar *,int) noex ;
 extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 extern int snfilemode(char *,int,mode_t) noex ;
 extern int sntid(char *,int,pthread_t) noex ;
+extern int snerrabbr(char *,int,int) noex ;
 
 EXTERNC_end
 

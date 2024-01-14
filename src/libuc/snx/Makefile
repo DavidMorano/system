@@ -134,5 +134,6 @@ obj5_sfx.o:	$(OBJ5_SNX) $(INCS)
 
 snuuid.o:		snuuid.cc $(INCS)
 sntid.o:		sntid.cc $(INCS)
+snerrabbr.o:		snerrabbr.cc $(INCS)
 
 

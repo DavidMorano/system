@@ -1,4 +1,4 @@
-/* sncpyarray */
+/* sncpyarray SUPPORT */
 /* lang=C++20 */
 
 /* string-copy-array-of-strings */

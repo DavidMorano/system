@@ -1,4 +1,4 @@
-/* snsigabbr */
+/* snsigabbr SUPPORT */
 /* lang=C20 */
 
 /* make the string repreentation of a signal number */
@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

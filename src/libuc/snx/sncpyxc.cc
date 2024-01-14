@@ -1,4 +1,4 @@
-/* sncpyxc */
+/* sncpyxc SUPPORT */
 /* lang=C++20 */
 
 /* copy a c-string to a given case */

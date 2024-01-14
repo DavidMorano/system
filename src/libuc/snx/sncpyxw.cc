@@ -1,4 +1,4 @@
-/* sncpyxw */
+/* sncpyxw SUPPORT */
 /* lang=C++20 */
 
 /* concatenate strings */

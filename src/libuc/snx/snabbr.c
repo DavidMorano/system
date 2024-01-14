@@ -1,4 +1,4 @@
-/* snabbr */
+/* snabbr SUPPORT */
 /* lang=C20 */
 
 /* copy an abbreviation of a groups of words */

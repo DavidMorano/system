@@ -1,4 +1,4 @@
-/* sncpyx */
+/* sncpyx SUPPORT */
 /* lang=C++20 */
 
 /* concatenate c-strings */
