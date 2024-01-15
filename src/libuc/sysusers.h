@@ -1,7 +1,7 @@
 /* sysusers HEADER */
 /* lang=C20 */
 
-/* thread-safe enumeration of a system data-base */
+/* system user-entry enumeration */
 /* version %I% last-modified %G% */
 
 
@@ -16,29 +16,33 @@
 #include	<usystem.h>
 #include	<filemap.h>
 #include	<localmisc.h>
-#include	<pwd.h>			/* <- money shot */
 
 
 #define	SYSUSERS		struct sysusers_head
 #define	SYSUSERS_MAGIC		0x88776217
-#define	SYSUSERS_FNAME		"/sysdb/users"
+#define	SYSUSERS_FNAME		"/sys/users"
 
 
 struct sysusers_head {
-	filemap		b ;
+	filemap		*fmp ;
 	uint		magic ;
 } ;
 
-typedef SYSUSRS		sysusers ;
+typedef SYSUSERS	sysusers ;
+typedef PASSWD		sysusers_ent ;
 
-EXTERNC_begin
+#ifdef	__cplusplus
+extern "C" {
+#endif
 
-extern int sysusers_open(SYSUSERS *,const char *) noex ;
-extern int sysusers_close(SYSUSERS *) noex ;
-extern int sysusers_readent(SYSUSERS *,PASSWD *,char *,int) noex ;
-extern int sysusers_reset(SYSUSERS *) noex ;
+extern int sysusers_open(sysusers *,cchar *) noex ;
+extern int sysusers_close(sysusers *) noex ;
+extern int sysusers_readent(sysusers *,sysusers_ent *,char *,int) noex ;
+extern int sysusers_reset(sysusers *) noex ;
 
-EXTERNC_end
+#ifdef	__cplusplus
+}
+#endif
 
 
 #endif /* SYSUSERS_INCLUDE */

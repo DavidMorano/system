@@ -130,6 +130,7 @@ ucenumnw.o:		ucenumnw.cc ucenumnw.h $(INCS)
 ucenumho.o:		ucenumho.cc ucenumho.h $(INCS)
 ucenumsv.o:		ucenumsv.cc ucenumsv.h $(INCS)
 
-sysusernames.o:		sysusernames.c sysusernames.h $(INCS)
+sysusernames.o:		sysusernames.cc sysusernames.h $(INCS)
+sysusershells.o:	sysusershells.cc sysusershells.h $(INCS)
 
 

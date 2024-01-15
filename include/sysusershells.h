@@ -24,7 +24,7 @@
 
 
 struct sysusershells_head {
-	filemap		b ;
+	filemap		*fmp ;
 	uint		magic ;
 } ;
 
@@ -32,10 +32,10 @@ typedef SYSUSERSHELLS	sysusershells ;
 
 EXTERNC_begin
 
-extern int sysusershells_open(SYSUSERSHELLS *,const char *) noex ;
-extern int sysusershells_close(SYSUSERSHELLS *) noex ;
-extern int sysusershells_readent(SYSUSERSHELLS *,char *,int) noex ;
-extern int sysusershells_reset(SYSUSERSHELLS *) noex ;
+extern int sysusershells_open(sysusershells *,const char *) noex ;
+extern int sysusershells_close(sysusershells *) noex ;
+extern int sysusershells_readent(sysusershells *,char *,int) noex ;
+extern int sysusershells_reset(sysusershells *) noex ;
 
 EXTERNC_end
 
