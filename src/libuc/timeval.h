@@ -13,6 +13,8 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<time.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
 #ifndef	TIMEVAL
@@ -20,17 +22,13 @@
 #endif
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int timeval_load(TIMEVAL *,time_t,int) ;
-extern int timeval_add(TIMEVAL *,TIMEVAL *,TIMEVAL *) ;
-extern int timeval_sub(TIMEVAL *,TIMEVAL *,TIMEVAL *) ;
+extern int timeval_load(TIMEVAL *,time_t,int) noex ;
+extern int timeval_add(TIMEVAL *,TIMEVAL *,TIMEVAL *) noex ;
+extern int timeval_sub(TIMEVAL *,TIMEVAL *,TIMEVAL *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TIMEVAL_INCLUDE */

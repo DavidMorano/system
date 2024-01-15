@@ -28,9 +28,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ctxxxi(char *,int,int,int) noex ;
 extern int ctxxxl(char *,int,int,long) noex ;
@@ -40,9 +38,7 @@ extern int ctxxxui(char *,int,int,uint) noex ;
 extern int ctxxxul(char *,int,int,ulong) noex ;
 extern int ctxxxull(char *,int,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

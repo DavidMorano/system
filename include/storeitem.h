@@ -37,9 +37,7 @@ struct storeitem_head {
 
 typedef STOREITEM	storeitem ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int storeitem_start(storeitem *,char *,int) noex ;
 extern int storeitem_strw(storeitem *,cchar *,int,cchar **) noex ;
@@ -52,9 +50,7 @@ extern int storeitem_block(storeitem *,int,int,void **) noex ;
 extern int storeitem_getlen(storeitem *) noex ;
 extern int storeitem_finish(storeitem *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* storeitem_INCLUDE */

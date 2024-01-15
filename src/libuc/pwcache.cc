@@ -49,7 +49,7 @@
 
 /* local namespaces */
 
-using std::nothrow ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -336,7 +336,7 @@ static int pwcache_mkrec(pwcache *op,time_t dt,REC **epp,cchar *un) noex {
         int             pwl = 0 ;
         *epp = nullptr ;
         if ((rs = hdb_count(op->dbp)) >= 0) {
-            cint		n = rs ;
+            cint	n = rs ;
             if (n >= op->max) {
                 if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
                     REC		*ep = (REC *) pep ;

@@ -46,9 +46,7 @@ struct aiq_head {
 typedef	AIQ		aiq ;
 typedef	AIQ_ENT		aiq_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int aiq_start(AIQ *,int) noex ;
 extern int aiq_finish(AIQ *) noex ;
@@ -58,9 +56,7 @@ extern int aiq_rem(AIQ *,AIQ_ENT **) noex ;
 extern int aiq_remtail(AIQ *,AIQ_ENT **) noex ;
 extern int aiq_count(AIQ *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* AIQ_INCLUDE */

@@ -1,7 +1,7 @@
-/* sysusernames */
+/* sysusernames HEADER */
 /* lang=C20 */
 
-/* system user-name enumeration */
+/* thread-safe enumeration of a system data-base */
 /* version %I% last-modified %G% */
 
 
@@ -13,11 +13,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<usystem.h>
 #include	<filemap.h>
 #include	<localmisc.h>
+#include	<pwd.h>			/* <- money shot */
 
 
 #define	SYSUSERNAMES		struct sysusernames_head
@@ -26,24 +25,20 @@
 
 
 struct sysusernames_head {
+	filemap		*fmp ;
 	uint		magic ;
-	filemap		b ;
 } ;
 
-typedef struct sysusernames_head	sysusernames ;
+typedef SYSUSERNAMES	sysusernames ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int sysusernames_open(sysusernames *,cchar *) noex ;
-extern int sysusernames_close(sysusernames *) noex ;
-extern int sysusernames_readent(sysusernames *,char *,int) noex ;
-extern int sysusernames_reset(sysusernames *) noex ;
+extern int sysusernames_open(SYSUSERNAMES *,const char *) noex ;
+extern int sysusernames_close(SYSUSERNAMES *) noex ;
+extern int sysusernames_readent(SYSUSERNAMES *,char *,int) noex ;
+extern int sysusernames_reset(SYSUSERNAMES *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSUSERNAMES_INCLUDE */

@@ -53,9 +53,7 @@ typedef RANDOMVAR	randomvar ;
 typedef RANDOMVAR_FL	randomvar_fl ;
 typedef RANDOMVAR_ST	randomvar_st ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int randomvar_start(randomvar *,int,uint) noex ;
 extern int randomvar_stateload(randomvar *,cchar *,int) noex ;
@@ -68,9 +66,7 @@ extern int randomvar_getint(randomvar *,int *) noex ;
 extern int randomvar_getuint(randomvar *,uint *) noex ;
 extern int randomvar_finish(randomvar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* RANDOMVAR_INCLUDE */

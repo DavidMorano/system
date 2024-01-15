@@ -43,28 +43,20 @@
 
 #else /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int __getloadavg(int *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ucgetloadavg(double *,int) noex ;
 extern int	u_getloadavg(uint *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UGETLOADAVG_INCLUDE */

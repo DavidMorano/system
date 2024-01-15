@@ -24,18 +24,14 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern char	* strwcpybc (char *,cchar *,int) noex ;
 extern char	* strwcpylc (char *,cchar *,int) noex ;
 extern char	* strwcpyuc (char *,cchar *,int) noex ;
 extern char	* strwcpyfc (char *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRWCPYXC_INCLUDE */

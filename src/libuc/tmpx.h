@@ -121,9 +121,7 @@ typedef tmpx_head	tmpx ;
 typedef tmpx_cursor	tmpx_cur ;
 typedef TMPX_ENT	tmpx_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int tmpx_open(tmpx *,cchar *,int) noex ;
 extern int tmpx_read(tmpx *,int,tmpx_ent *) noex ;
@@ -137,9 +135,7 @@ extern int tmpx_fetchpid(tmpx *,tmpx_ent *,pid_t) noex ;
 extern int tmpx_nusers(tmpx *) noex ;
 extern int tmpx_close(tmpx *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TMPX_INCLUDE */

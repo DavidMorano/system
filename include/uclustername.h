@@ -24,18 +24,14 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uclustername_init() noex ;
 extern int uclustername_set(cchar *,int,cchar *,int) noex ;
 extern int uclustername_get(char *,int,cchar *) noex ;
-extern void uclustername_fini() noex ;
+extern int uclustername_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCLUSTERNAME_INCLUDE */

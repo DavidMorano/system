@@ -24,9 +24,7 @@
 typedef PTMA		ptma ;
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ptma_create(ptma *) noex ;
 extern int	ptma_destroy(ptma *) noex ;
@@ -41,9 +39,7 @@ extern int	ptma_setrobustnp(ptma *,int) noex ;
 extern int	ptma_gettype(ptma *,int *) noex ;
 extern int	ptma_settype(ptma *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTMA_INCLUDE */

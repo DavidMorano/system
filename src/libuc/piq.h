@@ -46,9 +46,7 @@ struct piq_head {
 
 typedef	PIQ		piq ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int piq_start(PIQ *) noex ;
 extern int piq_ins(PIQ *,void *) noex ;
@@ -57,9 +55,7 @@ extern int piq_count(PIQ *) noex ;
 extern int piq_audit(PIQ *) noex ;
 extern int piq_finish(PIQ *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PIQ_INCLUDE */

@@ -22,10 +22,12 @@
 #include	<thrcomm.h>
 #include	<localmisc.h>
 
+
 #define	THRBASE		struct thrbase_head
 #define	THRBASE_SI	struct thrbase_startinfo
 #define	THRBASE_INFO	struct thrbase_i
 #define	THRBASE_MAGIC	0x88773423
+
 
 struct thrbase_i {
 	int		dummy ;
@@ -52,22 +54,22 @@ enum thrbasecmds {
 	thrbasecmd_overlast
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef THRBASE		thrbase ;
 
-extern int	thrbase_start(THRBASE *,int (*)(THRBASE *,void *),void *) ;
-extern int	thrbase_cmdsend(THRBASE *,int,int) ;
-extern int	thrbase_cmdexit(THRBASE *) ;
-extern int	thrbase_cmdrecv(THRBASE *,int) ;
-extern int	thrbase_exiting(THRBASE *) ;
-extern int	thrbase_waitexit(THRBASE *) ;
-extern int	thrbase_info(THRBASE *,THRBASE_INFO *) ;
-extern int	thrbase_finish(THRBASE *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+typedef int (*thrbase_sub)(thrbase *,void *) noex ;
+
+extern int	thrbase_start(THRBASE *,thrbase_sub,void *) noex ;
+extern int	thrbase_cmdsend(THRBASE *,int,int) noex ;
+extern int	thrbase_cmdexit(THRBASE *) noex ;
+extern int	thrbase_cmdrecv(THRBASE *,int) noex ;
+extern int	thrbase_exiting(THRBASE *) noex ;
+extern int	thrbase_waitexit(THRBASE *) noex ;
+extern int	thrbase_info(THRBASE *,THRBASE_INFO *) noex ;
+extern int	thrbase_finish(THRBASE *) noex ;
+
+EXTERNC_end
 
 
 #endif /* THRBASE_INCLUDE */

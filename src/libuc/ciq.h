@@ -41,9 +41,7 @@ struct ciq_head {
 
 typedef CIQ		ciq ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ciq_start(ciq *) noex ;
 extern int ciq_ins(ciq *,void *) noex ;
@@ -55,9 +53,7 @@ extern int ciq_count(ciq *) noex ;
 extern int ciq_audit(ciq *) noex ;
 extern int ciq_finish(ciq *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CIQ_INCLUDE */

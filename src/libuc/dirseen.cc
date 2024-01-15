@@ -28,7 +28,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<nulstr.h>
@@ -107,7 +107,7 @@ int dirseen_start(dirseen *op) noex {
 	        cint	esz = sizeof(dirseen_ent) ;
 	        if ((rs = vecobj_start(op->dlistp,esz,DIRSEEN_NDEF,vo)) >= 0) {
 	            op->magic = DIRSEEN_MAGIC ;
-	        }
+	        } /* end if  */
 		if (rs < 0) {
 		    delete op->dlistp ;
 		    op->dlistp = nullptr ;

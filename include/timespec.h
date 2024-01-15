@@ -34,15 +34,11 @@
 #define	TIMESPEC	struct timespec
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int timespec_load(TIMESPEC *,time_t,long) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TIMESPEC_INCLUDE */

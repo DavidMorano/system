@@ -30,9 +30,7 @@
 typedef SETSTR		setstr ;
 typedef SETSTR_CUR	setstr_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int setstr_start(setstr *,int) noex ;
 extern int setstr_already(setstr *,cchar *,int) noex ;
@@ -44,9 +42,7 @@ extern int setstr_enum(setstr *,setstr_cur *,cchar **) noex ;
 extern int setstr_curend(setstr *,setstr_cur *) noex ;
 extern int setstr_finish(setstr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SETSTR_INCLUDE */

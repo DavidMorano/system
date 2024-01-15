@@ -71,16 +71,12 @@ struct nulstr : nulstr_head {
 typedef NULSTR		nulstr ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	nulstr_start(nulstr *,cchar *,int,cchar **) noex ;
 extern int	nulstr_finish(nulstr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* NULSTR_INCLUDE */

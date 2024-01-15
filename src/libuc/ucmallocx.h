@@ -33,17 +33,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-int uc_mallocsys(int,char **) noex ;
-int uc_mallocbuf(cvoid *,int,cvoid **) noex ;
-int uc_mallocstrw(cchar *,int,cchar **) noex ;
+extern int uc_mallocsys(int,char **) noex ;
+extern int uc_mallocbuf(cvoid *,int,cvoid **) noex ;
+extern int uc_mallocstrw(cchar *,int,cchar **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCMALLOX_INCLUDE */

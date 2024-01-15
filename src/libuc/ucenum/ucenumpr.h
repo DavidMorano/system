@@ -40,21 +40,17 @@
 #define	UCENUMPR_FNAME		"/sysdb/protocol"
 
 
-typedef struct ucenumxx_head	ucenumpr ;
+typedef UCENUMXX		ucenumpr ;
 typedef ucentpr			ucenumpr_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumpr_open(ucenumpr *,cchar *) noex ;
 extern int ucenumpr_close(ucenumpr *) noex ;
 extern int ucenumpr_readent(ucenumpr *,ucenumpr_ent *,char *,int) noex ;
 extern int ucenumpr_reset(ucenumpr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMPR_INCLUDE */

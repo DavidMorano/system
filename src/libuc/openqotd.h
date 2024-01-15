@@ -1,4 +1,5 @@
-/* openqotd */
+/* openqotd HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,22 +12,15 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OPENQOTD_INCLUDE
-#define	OPENQOTD_INCLUDE	1
+#define	OPENQOTD_INCLUDE
 
 
-#if	(! defined(OPENQOTD_MASTER)) || (OPENQOTD_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int openqotd(cchar *,int,int,int) noex ;
 
-extern int openqotd(const char *,int,int,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* OPENQOTD_MASTER */
 
 #endif /* OPENQOTD_INCLUDE */
 

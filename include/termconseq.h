@@ -27,16 +27,12 @@
 #define	TERMCONSEQ_ARGS		struct termconseq_args
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int termconseqva(char *,int,int,cchar *,int,va_list) noex ;
 extern int termconseqa(char *,int,int,cchar *,int,...) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

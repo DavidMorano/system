@@ -35,9 +35,7 @@ struct serialbuf_head {
 
 typedef	SERIALBUF	serialbuf ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int serialbuf_start(serialbuf *,char *,int) noex ;
 extern int serialbuf_robj(serialbuf *,void *,int) noex ;
@@ -91,9 +89,7 @@ extern int serialbuf_adv(serialbuf *,int) noex ;
 extern int serialbuf_getlen(serialbuf *) noex ;
 extern int serialbuf_finish(serialbuf *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SERIALBUF_INCLUDE */

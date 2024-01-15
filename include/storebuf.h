@@ -17,9 +17,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int storebuf_buf(char *,int,int,cchar *,int) noex ;
 extern int storebuf_strw(char *,int,int,cchar *,int) noex ;
@@ -37,9 +35,7 @@ extern int storebuf_hexui(char *,int,int,uint) noex ;
 extern int storebuf_hexul(char *,int,int,ulong) noex ;
 extern int storebuf_hexull(char *,int,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* header file for the FORMAT subroutine */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,25 +15,23 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	FORMAT_INCLUDE
-#define	FORMAT_INCLUDE 1
+#define	FORMAT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
 #define	FORMAT_OCLEAN	(1<<0)		/* clean data */
 #define	FORMAT_ONOOVERR	(1<<1)		/* do *not* return error on overflow */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	format(char *,int,int,const char *,va_list) noex ;
+extern int	format(char *,int,int,cchar *,va_list) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FORMAT_INCLUDE */

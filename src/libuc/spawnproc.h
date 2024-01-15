@@ -64,15 +64,11 @@ struct spawnproc {
 	int		nice ;		/* input */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int spawnproc(SPAWNPROC *,cchar *,cchar **,cchar **) noex ;
+extern int spawnproc(SPAWNPROC *,cchar *,mainv,mainv) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SPAWNPROC_INCLUDE */

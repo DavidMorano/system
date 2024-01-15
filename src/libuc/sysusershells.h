@@ -1,4 +1,4 @@
-/* sysusershells */
+/* sysusershells HEADER */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */
@@ -24,24 +24,20 @@
 
 
 struct sysusershells_head {
+	filemap		*fmp ;
 	uint		magic ;
-	filemap		b ;
 } ;
 
-typedef struct sysusershells_head	sysusershells ;
+typedef SYSUSERSHELLS	sysusershells ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int sysusershells_open(SYSUSERSHELLS *,const char *) noex ;
-extern int sysusershells_close(SYSUSERSHELLS *) noex ;
-extern int sysusershells_readent(SYSUSERSHELLS *,char *,int) noex ;
-extern int sysusershells_reset(SYSUSERSHELLS *) noex ;
+extern int sysusershells_open(sysusershells *,const char *) noex ;
+extern int sysusershells_close(sysusershells *) noex ;
+extern int sysusershells_readent(sysusershells *,char *,int) noex ;
+extern int sysusershells_reset(sysusershells *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSUSERSHELLS_INCLUDE */

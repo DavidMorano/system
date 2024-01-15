@@ -53,9 +53,7 @@ struct field_head {
 
 typedef FIELD		field ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	fieldterms(char *,int,cchar *) noex ;
 extern int	fieldtermsx(char *,int,int,...) noex ;
@@ -67,9 +65,7 @@ extern int	field_sharg(field *,cchar *,char *,int) noex ;
 extern int	field_remaining(field *,cchar **) noex ;
 extern int	field_finish(field *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

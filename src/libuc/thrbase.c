@@ -1,7 +1,8 @@
-/* thrbase */
+/* thrbase SUPPORT */
 /* lang=C20 */
 
 /* this object implements a sort of base thread manager (THRBASE) */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 
@@ -16,12 +17,14 @@
 
 /*******************************************************************************
 
+	Name:
+	thrbase
+
 	Description:
 	This object manages a basic thread.
 
-	typedef int (*worker_f)(THRBASE *,void *) ;
-
 	Synopsis:
+	typedef int (*worker_f)(THRBASE *,void *) ;
 	int thrbase_start(THRBASE *op,worker_f,ap) noex
 
 	Arguments:
@@ -31,7 +34,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error code
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -60,24 +63,24 @@ typedef int (*worker_f)(THRBASE *,void *) ;
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	pathadd(char *,int,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */

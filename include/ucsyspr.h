@@ -45,9 +45,7 @@
 #define	CPROTOENT	const struct protoent
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern PROTOENT	*getprent() noex ;
 extern PROTOENT	*getprnam(cchar *) noex ;
@@ -57,9 +55,7 @@ extern int	getprent_rp(PROTOENT *,char *,int) noex ;
 extern int	getprnam_rp(PROTOENT *,char *,int,cchar *) noex ;
 extern int	getprnum_rp(PROTOENT *,char *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCSYSPR_INCLUDE */

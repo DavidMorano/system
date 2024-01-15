@@ -33,9 +33,7 @@ typedef	HDBSTR		hdbstr ;
 typedef	HDBSTR_CUR	hdbstr_cur ;
 typedef	HDBSTR_DAT	hdbstr_dat ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int hdbstr_start(hdbstr *,int) noex ;
 extern int hdbstr_add(hdbstr *,cchar *,int,cchar *,int) noex ;
@@ -53,9 +51,7 @@ extern int hdbstr_nextkey(hdbstr *,cchar *,int,hdbstr_cur *) noex ;
 extern int hdbstr_count(hdbstr *) noex ;
 extern int hdbstr_finish(hdbstr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* HDBSTR_INCLUDE */

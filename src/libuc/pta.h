@@ -34,9 +34,7 @@
 typedef PTA	pta ;
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	pta_create(pta *) noex ;
 extern int	pta_destroy(pta *) noex ;
@@ -58,9 +56,7 @@ extern int	pta_setschedparam(pta *,const SCHEDPARAM *) noex ;
 extern int	pta_getschedparam(pta *,SCHEDPARAM *) noex ;
 extern int	pta_setstack(pta *,void *,size_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTA_INCLUDE */

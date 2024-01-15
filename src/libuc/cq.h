@@ -45,9 +45,7 @@ struct cq_cursor {
 typedef CQ		cq ;
 typedef CQ_CUR		cq_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cq_start(cq *) noex ;
 extern int cq_finish(cq *) noex ;
@@ -59,9 +57,7 @@ extern int cq_curbegin(cq *,cq_cur *) noex ;
 extern int cq_curend(cq *,cq_cur *) noex ;
 extern int cq_enum(cq *,cq_cur *,void *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CQ_INCLUDE */

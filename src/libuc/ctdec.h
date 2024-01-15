@@ -29,9 +29,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ctdeci(char *,int,int) noex ;
 extern int ctdecl(char *,int,long) noex ;
@@ -41,9 +39,7 @@ extern int ctdecui(char *,int,uint) noex ;
 extern int ctdecul(char *,int,ulong) noex ;
 extern int ctdecull(char *,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

@@ -43,9 +43,7 @@
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
 #if	(! defined(LIBUT_MASTER)) || (LIBUT_MASTER == 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ut_alloc(int,int,int,void **) noex ;
 extern int	ut_open(cchar *,int,struct t_info *) noex ;
@@ -58,9 +56,7 @@ extern int	ut_sync(int) noex ;
 extern int	ut_close(int) noex ;
 extern int	ut_free(void *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* LIBUT_MASTER */
 #endif /* defined(SYSHAS_XTI) && (SYSHAS_XTI > 0) */

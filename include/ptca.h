@@ -23,18 +23,14 @@
 
 typedef PTCA		ptca ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ptca_create(ptca *) noex ;
 extern int	ptca_destroy(ptca *) noex ;
 extern int	ptca_setpshared(ptca *,int) noex ;
 extern int	ptca_getpshared(ptca *,int *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PTCA_INCLUDE */

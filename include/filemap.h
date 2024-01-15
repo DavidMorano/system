@@ -46,9 +46,7 @@ struct filemap_head {
 
 typedef	FILEMAP		filemap ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	filemap_open(filemap *,cchar *,int,size_t) noex ;
 extern int	filemap_stat(filemap *,USTAT *) noex ;
@@ -59,9 +57,7 @@ extern int	filemap_tell(filemap *,off_t *) noex ;
 extern int	filemap_rewind(filemap *) noex ;
 extern int	filemap_close(filemap *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FILEMAP_INCLUDE */

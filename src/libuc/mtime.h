@@ -11,18 +11,17 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<stdint.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
 
 typedef int64_t		mtime_t ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern mtime_t	mtime(void) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MTIME_INCLUDE */

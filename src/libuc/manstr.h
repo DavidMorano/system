@@ -27,9 +27,7 @@ struct manstr_head {
 
 typedef	MANSTR		manstr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	manstr_start(manstr *,cchar *,int) noex ;
 extern int	manstr_breakfield(manstr *,cchar *,cchar **) noex ;
@@ -38,9 +36,7 @@ extern int	manstr_whitedash(manstr *) noex ;
 extern int	manstr_whitecolon(manstr *) noex ;
 extern int	manstr_finish(manstr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MANSTR_INCLUDE */

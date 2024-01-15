@@ -23,15 +23,11 @@
 #include	<localmisc.h>		/* extra types */
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int attachso(cchar **,cchar *,cchar **,cchar **,int,void **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ATTACHSO_INCLUDE */

@@ -43,16 +43,12 @@ struct sigign_head {
 
 typedef	SIGIGN		sigign ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	sigign_start(SIGIGN *,cint *) noex ;
 extern int	sigign_finish(SIGIGN *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SIGIGN_INCLUDE */

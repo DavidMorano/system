@@ -24,16 +24,8 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
 extern cchar	*calstrs_months[] ;
 extern cchar	*calstrs_days[] ;
-
-#ifdef	__cplusplus
-}
-#endif
 
 
 #endif /* CALSTRS_INCLUDE */

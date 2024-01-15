@@ -22,18 +22,14 @@
 #define	CPROJECTENT	const struct project
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int projectent_load(PROJECT *,char *,int,CPROJECT *) noex ;
 extern int projectent_parse(PROJECT *,char *,int,cchar *,int) noex ;
 extern int projectent_size(CPROJECT *) noex ;
 extern int projectent_format(CPROJECT *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PROJECTENT_INCLUDE */

@@ -40,21 +40,17 @@
 #define	UCENUMHO_FNAME		"/sysdb/passwd"
 
 
-typedef struct ucenumxx_head	ucenumho ;
+typedef UCENUMXX		ucenumho ;
 typedef ucentho			ucenumho_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumho_open(ucenumho *,cchar *) noex ;
 extern int ucenumho_close(ucenumho *) noex ;
 extern int ucenumho_readent(ucenumho *,ucenumho_ent *,char *,int) noex ;
 extern int ucenumho_reset(ucenumho *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMHO_INCLUDE */

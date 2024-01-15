@@ -33,16 +33,13 @@ struct dupstr {
 
 typedef DUPSTR		dupstr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	dupstr_start(dupstr *,cchar *,int,char **) noex ;
 extern int	dupstr_finish(dupstr *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* DUPSTR_INCLUDE */
 

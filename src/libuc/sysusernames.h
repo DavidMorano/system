@@ -1,4 +1,4 @@
-/* sysusernames */
+/* sysusernames HEADER */
 /* lang=C20 */
 
 /* thread-safe enumeration of a system data-base */
@@ -25,24 +25,20 @@
 
 
 struct sysusernames_head {
+	filemap		*fmp ;
 	uint		magic ;
-	filemap		b ;
 } ;
 
-typedef struct sysusernames_head	sysusernames ;
+typedef SYSUSERNAMES	sysusernames ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sysusernames_open(SYSUSERNAMES *,const char *) noex ;
 extern int sysusernames_close(SYSUSERNAMES *) noex ;
 extern int sysusernames_readent(SYSUSERNAMES *,char *,int) noex ;
 extern int sysusernames_reset(SYSUSERNAMES *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SYSUSERNAMES_INCLUDE */

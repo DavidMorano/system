@@ -75,9 +75,7 @@
 #endif
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int u_mmapbegin(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_mmapend(void *,size_t) noex ;
@@ -97,9 +95,7 @@ extern int u_mapfile(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_mmap(void *,size_t,int,int,int,off_t,void *) noex ;
 extern int u_munmap(void *,size_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UM_INCLUDE */

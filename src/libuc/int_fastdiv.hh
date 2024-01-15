@@ -27,6 +27,7 @@
 
 #ifndef _INT_FASTDIV_KJGIUHFG
 #define _INT_FASTDIV_KJGIUHFG
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>
@@ -168,6 +169,7 @@ int operator%(const unsigned char n,const int_fastdiv& divisor) noex {
 }
 
 
+#endif /* __cplusplus */
 #endif /* _INT_FASTDIV_KJGIUHFG */
 
 

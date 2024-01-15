@@ -22,18 +22,14 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucproguser_init() noex ;
 extern int ucproguser_nameset(cchar *,int,uid_t,int) noex ;
 extern int ucproguser_nameget(char *,int,uid_t) noex ;
 extern int ucproguser_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCPROGUSER_INCLUDE */

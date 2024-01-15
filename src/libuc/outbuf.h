@@ -22,17 +22,13 @@ struct outbuf_head {
 
 typedef OUTBUF		outbuf ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	outbuf_start(outbuf *,char *,int) noex ;
 extern int	outbuf_get(outbuf *,char **) noex ;
 extern int	outbuf_finish(outbuf *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* OUTBUF_INCLUDE */

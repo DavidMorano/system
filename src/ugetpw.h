@@ -40,20 +40,16 @@ struct ugetpw_stats {
 	uint		pmis, nmis ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int ugetpw_init() ;
-extern int ugetpw_name(PASSWD *,char *,int,const char *) ;
-extern int ugetpw_uid(PASSWD *,char *,int,uid_t) ;
-extern int ugetpw_stats(struct ugetpw_stats *) ;
-extern int ugetpw_setparam(int,int) ;
-extern int ugetpw_fini() ;
+extern int ugetpw_init() noex ;
+extern int ugetpw_name(PASSWD *,char *,int,cchar *) noex ;
+extern int ugetpw_uid(PASSWD *,char *,int,uid_t) noex ;
+extern int ugetpw_stats(struct ugetpw_stats *) noex ;
+extern int ugetpw_setparam(int,int) noex ;
+extern int ugetpw_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UGETPW_INCLUDE */

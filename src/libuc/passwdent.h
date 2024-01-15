@@ -22,18 +22,14 @@
 #define	CPASSWDENT	const struct passwd
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int passwdent_load(PASSWD *,char *,int,CPASSWD *) noex ;
 extern int passwdent_parse(PASSWD *,char *,int,cchar *,int) noex ;
 extern int passwdent_size(CPASSWD *) noex ;
 extern int passwdent_format(CPASSWD *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* PASSWDENT_INCLUDE */

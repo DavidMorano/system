@@ -37,12 +37,7 @@ struct pcsnsmgr_stats {
 	uint		pmis, nmis ;
 } ;
 
-
-#if	(! defined(PCSNSMGR_MASTER)) || (PCSNSMGR_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pcsnsmgr_init() ;
 extern int pcsnsmgr_set(cchar *,int,cchar *,int,int) ;
@@ -51,11 +46,8 @@ extern int pcsnsmgr_invalidate(cchar *,int) ;
 extern int pcsnsmgr_stats(PCSNSMGR_STATS *) ;
 extern void pcsnsmgr_fini() ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* PCSNSMGR_MASTER */
 
 #endif /* PCSNSMGR_INCLUDE */
 

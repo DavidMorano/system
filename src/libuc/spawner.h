@@ -47,8 +47,8 @@ corresponding disposition is OPEN.
 ****/
 
 struct spawner_head {
-	const char	**argv ;
-	const char	*execfname ;
+	cchar		**argv ;
+	cchar		*execfname ;
 	vecobj		cmds ;
 	ENVHELP		env ;
 	pid_t		pid ;
@@ -56,34 +56,32 @@ struct spawner_head {
 	int		opts ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef S¶AWNER		spawner ;
 
-extern int spawner_start(SPAWNER *,cchar *,cchar **,cchar **) noex ;
-extern int spawner_setsid(SPAWNER *) noex ;
-extern int spawner_setpgrp(SPAWNER *,pid_t) noex ;
-extern int spawner_setctty(SPAWNER *,int,pid_t) noex ;
-extern int spawner_seteuid(SPAWNER *,uid_t) noex ;
-extern int spawner_setegid(SPAWNER *,gid_t) noex ;
-extern int spawner_sigignores(SPAWNER *) noex ;
-extern int spawner_sigignore(SPAWNER *,int) noex ;
-extern int spawner_sigdefault(SPAWNER *,int) noex ;
-extern int spawner_sighold(SPAWNER *,int) noex ;
-extern int spawner_sigrelease(SPAWNER *,int) noex ;
-extern int spawner_fdclose(SPAWNER *,int) noex ;
-extern int spawner_fdnull(SPAWNER *,int) noex ;
-extern int spawner_fddup(SPAWNER *,int) noex ;
-extern int spawner_fddup2(SPAWNER *,int,int) noex ;
-extern int spawner_fddupto(SPAWNER *,int,int) noex ;
-extern int spawner_envset(SPAWNER *,cchar *,cchar *,int) noex ;
-extern int spawner_run(SPAWNER *) noex ;
-extern int spawner_wait(SPAWNER *,int *,int) noex ;
-extern int spawner_finish(SPAWNER *) noex ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int spawner_start(spawner *,cchar *,mainv,mainv) noex ;
+extern int spawner_setsid(spawner *) noex ;
+extern int spawner_setpgrp(spawner *,pid_t) noex ;
+extern int spawner_setctty(spawner *,int,pid_t) noex ;
+extern int spawner_seteuid(spawner *,uid_t) noex ;
+extern int spawner_setegid(spawner *,gid_t) noex ;
+extern int spawner_sigignores(spawner *) noex ;
+extern int spawner_sigignore(spawner *,int) noex ;
+extern int spawner_sigdefault(spawner *,int) noex ;
+extern int spawner_sighold(spawner *,int) noex ;
+extern int spawner_sigrelease(spawner *,int) noex ;
+extern int spawner_fdclose(spawner *,int) noex ;
+extern int spawner_fdnull(spawner *,int) noex ;
+extern int spawner_fddup(spawner *,int) noex ;
+extern int spawner_fddup2(spawner *,int,int) noex ;
+extern int spawner_fddupto(spawner *,int,int) noex ;
+extern int spawner_envset(spawner *,cchar *,cchar *,int) noex ;
+extern int spawner_run(spawner *) noex ;
+extern int spawner_wait(spawner *,int *,int) noex ;
+extern int spawner_finish(spawner *) noex ;
+
+EXTERNC_end
 
 
 #endif /* SPAWNER_INCLUDE */

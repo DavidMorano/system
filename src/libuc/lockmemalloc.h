@@ -25,15 +25,11 @@ enum lockmemallocsets {
 } ;
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	lockmemalloc_set(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* LOCKMEMALLOC_INCLUDE */

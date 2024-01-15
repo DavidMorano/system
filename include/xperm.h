@@ -32,17 +32,13 @@
 #include	<ids.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sperm(IDS *,USTAT *,int) noex ;
 extern int perm(cchar *,uid_t,gid_t,gid_t *,int) noex ;
 extern int fperm(int,uid_t,gid_t,gid_t *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* XPERM_INCLUDE */

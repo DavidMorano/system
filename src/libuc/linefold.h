@@ -45,18 +45,14 @@ struct linefold_head {
 
 typedef LINEFOLD	linefold ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int linefold_start(LINEFOLD *,int,int,cchar *,int) noex ;
 extern int linefold_get(LINEFOLD *,int,cchar **) noex ;
 extern int linefold_getline(LINEFOLD *,int,cchar **) noex ;
 extern int linefold_finish(LINEFOLD *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* LINEFOLD_INCLUDE */

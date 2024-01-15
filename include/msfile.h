@@ -103,9 +103,7 @@ typedef MSFILE		msfile ;
 typedef MSFILE_CUR	msfile_cur ;
 typedef MSFILE_ENT	msfile_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int msfile_open(msfile *,cchar *,int,mode_t) noex ;
 extern int msfile_curbegin(msfile *,msfile_cur *) noex ;
@@ -118,9 +116,7 @@ extern int msfile_check(msfile *,time_t) noex ;
 extern int msfile_count(msfile *) noex ;
 extern int msfile_close(msfile *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MSFILE_INCLUDE */

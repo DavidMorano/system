@@ -98,9 +98,7 @@ inline constexpr int sxxtostr(char *endp,int b,UT,T v) noex {
 
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 char *itostr(int,char *) noex ;
 char *ltostr(long,char *) noex ;
@@ -110,9 +108,7 @@ char *uitostr(uint,char *) noex ;
 char *ultostr(ulong,char *) noex ;
 char *ulltostr(ulonglong,char *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* XXTOSTR_INCLUDE */

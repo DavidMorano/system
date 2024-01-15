@@ -33,17 +33,13 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uc_inetnetpton(void *,int,int,cchar *) noex ;
 extern int uc_inetpton(void *,int,cchar *) noex ;
 extern int uc_inetntop(char *,int,int,cvoid *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCINETCONV_INCLUDE */

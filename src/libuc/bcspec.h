@@ -22,22 +22,18 @@
 
 
 struct bcspec_head {
-	const char	*np ;
+	cchar		*np ;
 	int		nl ;
 	schar		b, c, v ;
 } ;
 
-typedef struct bcspec_head	bcspec ;
+typedef BCSPEC		bcspec ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int bcspec_load(bcspec *,const char *,int) noex ;
+extern int bcspec_load(bcspec *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* BCSPEC_INCLUDE */

@@ -69,7 +69,7 @@
 
 #ifndef	TYPEDEF_IDOP
 #define	TYPEDEF_IDOP
-typedef int			idop_t ;
+typedef int		idop_t ;
 #endif
 
 struct procset {
@@ -85,17 +85,13 @@ struct procset {
 typedef struct procset		procset_t ;
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sigsend(idtype_t,id_t,int) noex ;
 extern int sigsendset(procset_t *,int) noex ;
 extern int sigqueue(pid_t,int,const union sigval) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
 /* SIGSEND end */
@@ -104,18 +100,14 @@ extern int sigqueue(pid_t,int,const union sigval) noex ;
 /* SIGWAIT begin */
 #if	(!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sigwait(const sigset_t *,int *) noex ;
 extern int sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
 extern int sigtimedwait(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 extern int sigwaitinfoto(const sigset_t *,siginfo_t *,CTIMESPEC *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0) */
 /* SIGWAIT end */
@@ -146,9 +138,7 @@ typedef int	timer_t ;
 #define	TIMER_ABSTIME	0		/* hack! */
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int timer_create(clockid_t,SIGEVENT *,timer_t *) noex ;
 extern int timer_delete(timer_t) noex ;
@@ -156,9 +146,7 @@ extern int timer_settime(timer_t,int,ITIMERSPEC *,ITIMERSPEC *) noex ;
 extern int timer_gettime(timer_t,ITIMERSPEC *) noex ;
 extern int timer_getoverrun(timer_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0) */
 /* TIMER end */
@@ -175,15 +163,11 @@ extern int timer_getoverrun(timer_t) noex ;
 #define	PTC		pthread_cond_t
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pthread_cond_reltimedwait_np(PTC *,PTM *,CTIMESPEC *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
@@ -200,16 +184,12 @@ extern int pthread_cond_reltimedwait_np(PTC *,PTM *,CTIMESPEC *) noex ;
 
 #ifndef	SUBROUTINE_PTHREADMUTEXATTR
 #define	SUBROUTINE_PTHREADMUTEXATTR
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int pthread_mutexattr_setrobust_np(PTMA *,int) noex ;
 extern int pthread_mutexattr_getrobust_np(PTMA *,int *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_PTHREADMUTEXATTR */
 
 #endif /* (!defined(SYSHAS_MUTEXROBUST)) || (SYSHAS_MUTEXROBUST == 0) */
@@ -230,15 +210,11 @@ extern int pthread_mutexattr_getrobust_np(PTMA *,int *) noex ;
 
 #ifndef	SUBROUTINE_MEMCNTL
 #define	SUBROUTINE_MEMCNTL
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int memcntl(void *,size_t,int,void *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_MEMCNTL */
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
@@ -251,16 +227,12 @@ extern int memcntl(void *,size_t,int,void *,int,int) noex ;
 
 #ifndef	SUBROUTINE_SEMINIT
 #define	SUBROUTINE_SEMINIT
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int darwinsem_init(sem_t *,int,unsigned int) noex ;
 extern int darwinsem_destroy(sem_t *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_SEMINIT */
 
 #endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */

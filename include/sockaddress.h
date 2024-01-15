@@ -61,9 +61,7 @@ union sockaddress_head {
 typedef	SOCKADDRESS		sockaddress ;
 typedef	SOCKADDRESS_INET	sockaddress_inet ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int sockaddress_start(SOCKADDRESS *,int,cvoid *,int,int) noex ;
 extern int sockaddress_startaddr(SOCKADDRESS *,int,cvoid *,int,int,int) noex ;
@@ -81,9 +79,7 @@ extern int sockaddress_putport(SOCKADDRESS *,int) noex ;
 extern int sockaddress_putaddr(SOCKADDRESS *,cvoid *) noex ;
 extern int sockaddress_finish(SOCKADDRESS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SOCKADDRESS_INCLUDE */

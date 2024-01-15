@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ctromani(char *,int,int) noex ;
 extern int ctromanl(char *,int,long) noex ;
@@ -37,9 +35,7 @@ extern int ctromanui(char *,int,uint) noex ;
 extern int ctromanul(char *,int,ulong) noex ;
 extern int ctromanull(char *,int,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

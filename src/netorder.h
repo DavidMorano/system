@@ -22,9 +22,7 @@
 
 #define	NETORDER	char *
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int netorder_rc(char *,char *) noex ;
 extern int netorder_rs(char *,short *) noex ;
@@ -50,9 +48,7 @@ extern int netorder_wui(char *,uint) noex ;
 extern int netorder_wul(char *,ulong) noex ;
 extern int netorder_wull(char *,ulonglong) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* NETORDER_INCLUDE */

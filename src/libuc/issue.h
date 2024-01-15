@@ -52,9 +52,7 @@ struct issue_head {
 	int		nenv ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	issue_open(ISSUE *,cchar *) noex ;
 extern int	issue_check(ISSUE *,time_t) noex ;
@@ -62,9 +60,7 @@ extern int	issue_process(ISSUE *,cchar *,cchar **,int) noex ;
 extern int	issue_audit(ISSUE *) noex ;
 extern int	issue_close(ISSUE *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* ISSUE_INCLUDE */

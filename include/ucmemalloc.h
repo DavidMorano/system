@@ -43,9 +43,7 @@ struct ucmemalloc_stats {
 	int		err_rs ;
 } ; /* end structure (ucmemalloc_stats) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uc_malloc(int,void *) noex ;
 extern int uc_calloc(int,int,void *) noex ;
@@ -59,9 +57,7 @@ extern int uc_mallout(ulong *) noex ;
 extern int uc_mallstats(UCMEMALLOC_STATS *) noex ;
 extern int uc_mallpresent(cvoid *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCMEMALLOC_INCLUDE */

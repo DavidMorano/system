@@ -40,21 +40,17 @@
 #define	UCENUMPJ_FNAME		"/sysdb/project"
 
 
-typedef struct ucenumxx_head	ucenumpj ;
+typedef UCENUMXX		ucenumpj ;
 typedef ucentpj			ucenumpj_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucenumpj_open(ucenumpj *,cchar *) noex ;
 extern int ucenumpj_close(ucenumpj *) noex ;
 extern int ucenumpj_readent(ucenumpj *,ucenumpj_ent *,char *,int) noex ;
 extern int ucenumpj_reset(ucenumpj *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCENUMPJ_INCLUDE */

@@ -80,10 +80,14 @@ struct strpeek {
 	int		flags ;
 } ;
 
+EXTERNC_begin
+
 int getmsg(int,STRBUF *,STRBUF *,int *) noex ;
 int getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
 int putmsg(int,STRBUF *,STRBUF *,int *) noex ;
 int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+
+EXTERNC_end
 
 #endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 

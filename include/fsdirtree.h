@@ -72,11 +72,9 @@ struct fsdirtree_head {
 	FSDIRTREE_FL	f ;
 } ;
 
-typedef struct fsdirtree_head	fsdirtree ;
+typedef FSDIRTREE	fsdirtree ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int fsdirtree_open(fsdirtree *,cchar *,int) noex ;
 extern int fsdirtree_prune(fsdirtree *,cchar **) noex ;
@@ -85,9 +83,7 @@ extern int fsdirtree_close(fsdirtree *) noex ;
 
 extern int fsdirtreestat(cchar *,int,FSDIRTREESTAT *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FSDIRTREE_INCLUDE */

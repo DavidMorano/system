@@ -23,9 +23,7 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int vstrkeycmpo(cchar **,cchar **) noex ;
 extern int vstrkeycmpr(cchar **,cchar **) noex ;
@@ -35,9 +33,7 @@ static inline int vstrkeycmp(cchar **s1pp,cchar **s2pp) noex {
 	return vstrkeycmpo(s1pp,s2pp) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VSTRKEYCMPX_INCLUDE */

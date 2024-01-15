@@ -23,16 +23,12 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkpr(char *,int,cchar *,cchar *) noex ;
 extern int getrootdname(char *,int,cchar *,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKPR_INCLUDE */

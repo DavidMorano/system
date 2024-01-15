@@ -130,9 +130,7 @@ struct msfilee_stime {
 	uint	stime ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int msfilee_all(struct msfilee_all *,int,char *,int) noex ;
 extern int msfilee_atime(struct msfilee_atime *,int,char *,int) noex ;
@@ -141,9 +139,7 @@ extern int msfilee_dtime(struct msfilee_dtime *,int,char *,int) noex ;
 extern int msfilee_stime(struct msfilee_stime *,int,char *,int) noex ;
 extern int msfilee_la(struct msfilee_la *,int,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MSFILEE_INCLUDE */

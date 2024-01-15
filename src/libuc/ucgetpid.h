@@ -22,16 +22,13 @@
 #include	<sys/types.h>
 #include	<clanguage.h>
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+
+EXTERNC_begin
 
 extern int	uc_getpid() noex ;
 extern void	uc_setpid(pid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETPID_INCLUDE */

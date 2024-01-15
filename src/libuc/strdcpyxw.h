@@ -18,9 +18,7 @@
 #define	STRDCPYXW_INCLUDE
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern char *strdcpy1w(char *,int,cc *,int) noex ;
 extern char *strdcpy2w(char *,int,cc *,cc *,int) noex ;
@@ -29,9 +27,7 @@ extern char *strdcpy4w(char *,int,cc *,cc *,cc *,cc *,int) noex ;
 extern char *strdcpy5w(char *,int,cc *,cc *,cc *,cc *,cc *,int) noex ;
 extern char *strdcpy6w(char *,int,cc *,cc *,cc *,cc *,cc *,cc *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRDCPYXW_INCLUDE */

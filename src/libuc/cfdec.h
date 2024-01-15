@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cfdeci(cchar *,int,int *) noex ;
 extern int cfdecl(cchar *,int,long *) noex ;
@@ -37,9 +35,7 @@ extern int cfdecui(cchar *,int,uint *) noex ;
 extern int cfdecul(cchar *,int,ulong *) noex ;
 extern int cfdecull(cchar *,int,ulonglong *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CFDEC_INCLUDE */

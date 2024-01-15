@@ -32,9 +32,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int malloc_ma(char **) noex ;
 extern int malloc_mn(char **) noex ;
@@ -58,9 +56,7 @@ extern int malloc_zn(char **) noex ;
 
 extern int malloc_addr(char **) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MALLOCXX_INCLUDE */

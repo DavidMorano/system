@@ -33,9 +33,12 @@
 #include	<localmisc.h>
 
 
+#define	UCENUMXX	struct ucenumxx_head
+
+
 struct ucenumxx_head {
+	filemap		*fmp ;
 	uint		magic ;
-	filemap		b ;
 } ;
 
 #ifdef	__cplusplus
@@ -62,7 +65,7 @@ struct ucenumxxco : ucenumxxbase {
 	        rs = SR_NOTOPEN ;
 	        if (op->magic == mxx) {
 		    cchar	*lp ;
-		    while ((rs = filemap_getline(&op->b,&lp)) > 0) {
+		    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
 	    	        rs = ep->parse(bp,bl,lp,rs) ;
 	    	        len = rs ;
 	    	        if (len > 0) break ;

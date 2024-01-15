@@ -6,22 +6,11 @@
 #define	LIBUC_INCLUDE
 
 
-#ifndef	UCMALLOC_INCLUDE
-#define	UCMALLOC_INCLUDE
+#include	<envstandards.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int uc_malloc(int,void *) noex ;
-extern int uc_mallocstrw(const char *,int,const char **) noex ;
-extern int uc_mallocbuf(const void *,int,const void **) noex ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* UCMALLOC_INCLUDE */
+#include	<libmallocxx.h>
 
 
 #endif /* LIBUC_INCLUDE */

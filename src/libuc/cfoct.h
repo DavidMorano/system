@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cfocti(cchar *,int,int *) noex ;
 extern int cfoctl(cchar *,int,long *) noex ;
@@ -37,9 +35,7 @@ extern int cfoctui(cchar *,int,uint *) noex ;
 extern int cfoctul(cchar *,int,ulong *) noex ;
 extern int cfoctull(cchar *,int,ulonglong *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CFOCT_INCLUDE */

@@ -35,18 +35,14 @@
 #endif
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int userattrent_load(USERATTRENT *,char *,int,CUSERATTRENT *) noex ;
 extern int userattrent_parse(USERATTRENT *,char *,int,cchar *,int) noex ;
 extern int userattrent_size(CUSERATTRENT *) noex ;
 extern int userattrent_format(CUSERATTRENT *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* USERATTRENT_INCLUDE */

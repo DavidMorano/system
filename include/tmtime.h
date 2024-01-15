@@ -38,10 +38,7 @@ struct tmtime {
 	char	zname[TMTIME_ZNAMESIZE + 1] ;	/* TZ name abbreviation */
 } ;
 
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	tmtime_insert(TMTIME *,struct tm *) noex ;
 extern int	tmtime_ztime(TMTIME *,int,time_t) noex ;
@@ -52,14 +49,12 @@ extern int	tmtime_mktime(TMTIME *,time_t *) noex ;
 extern int	tmtime_adjtime(TMTIME *,time_t *) noex ;
 
 #ifdef	COMMENT
-extern int	tmtime_setznoe(TMTIME *,const char *,int) ;
-extern int	mktime_settimez(TMTIME *,const char *,const char *,time_t) ;
-extern int	mktime_gettime(TMTIME *,const char *,time_t *) ;
+extern int	tmtime_setznoe(TMTIME *,cchar *,int) noex ;
+extern int	mktime_settimez(TMTIME *,cchar *,cchar *,time_t) noex ;
+extern int	mktime_gettime(TMTIME *,cchar *,time_t *) noex ;
 #endif /* COMMENT */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TMTIME_INCLUDE */

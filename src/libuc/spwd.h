@@ -64,31 +64,23 @@ struct spwd {
 	long		sp_expire ;
 } ; /* end struct (spwd) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 void setspent() noex ;
 void endspent() noex ;
 extern SPWD	*getspent() noex ;
 extern SPWD	*getspnam(cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	getspent_rp(SPWD *,char *,int) noex ;
 extern int	getspnam_rp(SPWD *,char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SPWD_INCLUDE */

@@ -45,16 +45,12 @@ struct ucmemla_head {
 
 typedef UCMEMLA		ucmemla ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	ucmemla_acquire(ucmemla *,size_t,void *) noex ;
 extern int	ucmemla_release(ucmemla *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCMEMLA_INCLUDE */

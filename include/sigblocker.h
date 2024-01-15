@@ -66,16 +66,12 @@ struct sigblocker : sigblocker_head {
 typedef	SIGBLOCKER	sigblocker ;
 #endif /* __cplusplus */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	sigblocker_start(sigblocker *,cint *) noex ;
 extern int	sigblocker_finish(sigblocker *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SIGBLOCKERr_INCLUDE */

@@ -54,9 +54,7 @@ struct mkdirlist_ent {
 typedef MKDIRLIST	mkdirlist ;
 typedef MKDIRLIST_ENT	mkdirlist_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mkdirlist_start(MKDIRLIST *,cchar *,cchar *) noex ;
 extern int mkdirlist_link(MKDIRLIST *) noex ;
@@ -69,9 +67,7 @@ extern int mkdirlist_show(MKDIRLIST *,cchar *,int) noex ;
 extern int mkdirlist_audit(MKDIRLIST *) noex ;
 extern int mkdirlist_finish(MKDIRLIST *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MKDIRLIST_INCLUDE */

@@ -54,9 +54,7 @@ struct kvsfile_head {
 typedef KVSFILE		kvsfile ;
 typedef KVSFILE_CUR	kvsfile_cur ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int kvsfile_open(KVSFILE *,int,cchar *) noex ;
 extern int kvsfile_fileadd(KVSFILE *,cchar *) noex ;
@@ -68,9 +66,7 @@ extern int kvsfile_fetch(KVSFILE *,cchar *,KVSFILE_CUR *,char *,int) noex ;
 extern int kvsfile_check(KVSFILE *,time_t) noex ;
 extern int kvsfile_close(KVSFILE *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* KVSFILE_INCLUDE */

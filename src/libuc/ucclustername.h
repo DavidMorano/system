@@ -22,18 +22,14 @@
 #include	<usystem.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int ucclustername_init() noex ;
 extern int ucclustername_set(cchar *,int,cchar *,int) noex ;
 extern int ucclustername_get(char *,int,cchar *) noex ;
 extern int ucclustername_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCCLUSTERNAME_INCLUDE */

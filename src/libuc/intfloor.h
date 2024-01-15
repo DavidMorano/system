@@ -27,9 +27,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int		ifloor(int,int) noex ;
 extern long		lfloor(long,int) noex ;
@@ -43,9 +41,7 @@ extern ulonglong	ullfloor(ulonglong,int) noex ;
 extern size_t		szfloor(size_t,int) noex ;
 extern uintptr_t	uipfloor(uintptr_t,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* INTFLOOR_INCLUDE */

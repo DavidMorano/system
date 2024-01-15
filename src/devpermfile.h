@@ -64,7 +64,6 @@ struct devpermfile_c {
 	int		i ;
 } ;
 
-
 #ifdef	COMMENT
 
 typedef struct devpermfile_head	devpermfile ;
@@ -73,12 +72,7 @@ typedef struct devpermfile_c	devpermfile_cur ;
 
 #endif /* COMMENT */
 
-
-#if	(! defined(DEVPERMFILE_MASTER)) || (DEVPERMFILE_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int devpermfile_open(DEVPERMFILE *,const char *) ;
 extern int devpermfile_curbegin(DEVPERMFILE *,DEVPERMFILE_CUR *) ;
@@ -91,11 +85,8 @@ extern int devpermfile_checkint(DEVPERMFILE *,int) ;
 extern int devpermfile_check(DEVPERMFILE *,time_t) ;
 extern int devpermfile_close(DEVPERMFILE *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* DEVPERMFILE_MASTER */
 
 #endif /* DEVPERMFILE_INCLUDE */
 

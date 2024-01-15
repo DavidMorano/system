@@ -71,24 +71,18 @@ struct project {
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern projid_t getprojid() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* SUBROUTINE_GETPROJID */
 
 #ifndef	SUBROUTINE_GETPJ
 #define	SUBROUTINE_GETPJ
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern void	setprojent() noex ;
 extern void	endprojent() noex ;
@@ -97,26 +91,20 @@ extern PROJECT	*getpjnam(cchar *) noex ;
 extern PROJECT	*getpjpid(projid_t) noex ;
 extern PROJECT	*getpjdef(cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* SUBROUTINE_GETPJ */
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	getpjent_rp(PROJECT *,char *,int) noex ;
 extern int	getpjnam_rp(PROJECT *,char *,int,cchar *) noex ;
 extern int	getpjpid_rp(PROJECT *,char *,int,projid_t) noex ;
 extern int	getpjdef_rp(PROJECT *,char *,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCSYSPJ_INCLUDE */

@@ -25,15 +25,11 @@ struct shellunder {
 	pid_t		pid ;		/* parent (shell) PID */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	shellunder(SHELLUNDER *,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* SHELLUNDER_INCLUDE */

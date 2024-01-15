@@ -13,13 +13,14 @@
 	used for some of my PCS programs.
 
 	= 2017-09-11, David A­D­ Morano
-	Whew! Enhanced this module (subroutine |dirlist_add()| in
+	Whew!  Enhanced this module (subroutine |dirlist_add()| in
 	particular) to make it more robust in the face of a bug in
-	KSH. The KSH shell adds stuff to LD_LIBRARY_PATH to suit
-	what it thinks are its own needs. It adds stuff at the front
-	of that path variable.  But KSH is broken and adds an invalid
-	path to the front of LD_LIBRARY_PATH.  We now try to ignore
-	as much as possible invalid library-search paths. F*ck KSH!
+	KSH.  The KSH shell adds stuff to LD_LIBRARY_PATH to suit
+	what it thinks are its own needs.  It adds stuff at the
+	front of that path variable.  But KSH is broken and adds
+	an invalid path to the front of LD_LIBRARY_PATH.  We now
+	try to ignore as much as possible invalid library-search
+	paths.  F*ck KSH!
 
 */
 
@@ -38,7 +39,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
 #include	<usystem.h>
 #include	<mallocxx.h>
@@ -73,7 +74,9 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-int		dirlist_add(dirlist *,cchar *,int) noex ;
+extern "C" {
+    int		dirlist_add(dirlist *,cchar *,int) noex ;
+}
 
 
 /* local structures */
@@ -214,12 +217,11 @@ int dirlist_adds(dirlist *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = dirlist_magic(op,sp)) >= 0) {
-	    int		cl ;
-	    cchar	*tp, *cp ;
+	    cchar	*tp ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((tp = strnpbrk(sp,sl,":; \t,")) != nullptr) {
-	        cp = sp ;
-	        cl = (tp - sp) ;
+	        cchar	*cp = sp ;
+	        cint	cl = (tp - sp) ;
 	        if (rs >= 0) {
 	            rs = dirlist_add(op,cp,cl) ;
 	            c += rs ;
@@ -339,14 +341,14 @@ int dirlist_curend(dirlist *op,dirlist_cur *curp) noex {
 int dirlist_enum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = dirlist_magic(op,curp,rbuf)) >= 0) {
-	    int	i = (curp->i >= 0) ? (curp->i+1) : 0 ;
+	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
 	    void	*vp{} ;
 	    while ((rs = vecobj_get(op->dbp,i,&vp)) >= 0) {
 	        if (vp) break ;
 	        i += 1 ;
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
-	        ent		*ep = entp(vp) ;
+	        ent	*ep = entp(vp) ;
 	        if ((rs = sncpy1w(rbuf,rlen,ep->np,ep->nl)) >= 0) {
 	            curp->i = i ;
 	        }
@@ -366,11 +368,11 @@ int dirlist_get(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 	        i += 1 ;
 	    } /* end while */
 	    if (rpp) {
-	        ent		*ep = entp(vp) ;
+	        ent	*ep = entp(vp) ;
 	        *rpp = (rs >= 0) ? ep->np : nullptr ;
 	    }
 	    if ((rs >= 0) && vp) {
-	        ent		*ep = entp(vp) ;
+	        ent	*ep = entp(vp) ;
 	        curp->i = i ;
 	        rs = ep->nl ;
 	    }
@@ -441,15 +443,14 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 
 static int entry_start(ent *ep,cc *np,int nl,dev_t dev,ino_t ino) noex {
 	int		rs = SR_OK ;
+	cchar		*cp{} ;
 	memclear(ep) ;
 	ep->dev = dev ;
 	ep->ino = ino ;
 	ep->nl = nl ;
-	{
-	    cchar		*cp{} ;
-	    rs = uc_mallocstrw(np,nl,&cp) ;
-	    if (rs >= 0) ep->np = cp ;
-	} /* end block */
+	if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
+	    ep->np = cp ;
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (entry_start) */

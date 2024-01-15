@@ -46,18 +46,14 @@ struct uinfo_infoaux {
 typedef UINFO_NAMES	uinfo_names ;
 typedef UINFO_AUXS	uinfo_auxs ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int uinfo_init() noex ;
 extern int uinfo_name(uinfo_names *) noex ;
 extern int uinfo_aux(uinfo_auxs *) noex ;
 extern int uinfo_fini() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UINFO_INCLUDE */

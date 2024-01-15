@@ -25,17 +25,13 @@
 #include	<strdcpyxw.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern char	*strdcpycompact(char *,int,cc *,int) noex ;
 extern char	*strdcpyopaque(char *,int,cc *,int) noex ;
 extern char	*strdcpyclean(char *,int,cc *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #ifdef	__cplusplus
 

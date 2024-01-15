@@ -87,9 +87,7 @@ typedef	UTMPACC_SB	utmpacc_sb ;
 typedef	UTMPACC_CUR	utmpacc_cur ;
 typedef	UTMPACC_ENT	utmpacc_ent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int utmpacc_init() noex ;
 extern int utmpacc_boottime(time_t *) noex ;
@@ -105,9 +103,7 @@ extern int utmpacc_curbegin(utmpacc_cur *) noex ;
 extern int utmpacc_curenum(utmpacc_cur *,utmpacc_ent *,char *,int) noex ;
 extern int utmpacc_curend(utmpacc_cur *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UTMPACC_INCLUDE */

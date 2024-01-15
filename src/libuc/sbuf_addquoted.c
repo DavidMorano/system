@@ -1,4 +1,4 @@
-/* sbuf_addquoted */
+/* sbuf_addquoted SUPPORT */
 /* lang=C20 */
 
 /* storage buffer (SBuf) object */
@@ -33,7 +33,7 @@
 	Returns:
 	>=0		amount of new space used by the newly stored item
 			(not including any possible trailing NUL characters)
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 

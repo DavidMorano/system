@@ -51,21 +51,15 @@ struct timeout_entry {
 	int		id ; /* created by the system */
 } ;
 
-typedef struct timeout_entry	timeout ;
+typedef TIMEOUT		timeout ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-typedef int	(*timeout_met)(void *,uint,int) noex ;
-
+typedef int (*timeout_met)(void *,uint,int) noex ;
 extern int timeout_load(timeout *,time_t,void *,timeout_met,uint,int) noex ;
-
 extern int uc_timeout(int,timeout *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TIMEOUT_INCLUDE */

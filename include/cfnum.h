@@ -25,9 +25,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int cfnumi(cchar *,int,int *) noex ;
 extern int cfnuml(cchar *,int,long *) noex ;
@@ -37,9 +35,7 @@ extern int cfnumui(cchar *,int,uint *) noex ;
 extern int cfnumul(cchar *,int,ulong *) noex ;
 extern int cfnumull(cchar *,int,ulonglong *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* CFNUM_INCLUDE */

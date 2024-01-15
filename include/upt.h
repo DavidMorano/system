@@ -26,9 +26,7 @@
 #include	<localmisc.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 typedef int (*uptsub_f)(void *) noex ;
 
@@ -51,9 +49,7 @@ extern int uptself(pthread_t *) noex ;
 extern int uptatfork(void_f,void_f,void_f) noex ;
 extern int uptncpus(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UPT_INCLUDE */

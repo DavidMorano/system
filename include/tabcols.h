@@ -19,18 +19,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int tabcols(int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* TABCOLS_INCLUDE */

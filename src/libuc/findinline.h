@@ -50,15 +50,13 @@ struct findinline_head {
 	int		kl, vl ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef FINDINLINE	findinline ;
+
+EXTERNC_begin
 
 extern int	findinline(FINDINLINE *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FINDINLINE_INCLUDE */

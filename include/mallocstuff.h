@@ -23,18 +23,14 @@
 #include	<clanguage.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern char	*mallocbuf(void *,int) noex ;
 extern char	*mallocstr(cchar *) noex ;
 extern char	*mallocstrw(cchar *,int) noex ;
 extern char	*malloctest(int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MALLOCSTUFF_INCLUDE */

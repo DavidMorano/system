@@ -1,20 +1,20 @@
-/* mailmsgenv */
+/* mailmsgenv HEADER */
+/* lang=C20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MAILMSGENV_INCLUDE
-#define	MAILMSGENV_INCLUDE		1
+#define	MAILMSGENV_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
-#ifndef	UINT
-#define	UINT	unsigned int
-#endif
 
 /* object defines */
 
@@ -40,31 +40,22 @@ struct mailmsgenv_head {
 	int		alen ;
 } ;
 
+typedef MAILMSGENV	mailmsgenv ;
 
-typedef struct mailmsgenv_head	mailmsgenv ;
+EXTERNC_begin
 
+extern int mailmsgenv_start(MAILMSGENV *,cchar *,int) noex ;
+extern int mailmsgenv_isstart(MAILMSGENV *) noex ;
+extern int mailmsgenv_getaddress(MAILMSGENV *,cchar **) noex ;
+extern int mailmsgenv_getremote(MAILMSGENV *,cchar **) noex ;
+extern int mailmsgenv_gettzname(MAILMSGENV *,cchar **) noex ;
+extern int mailmsgenv_gettime(MAILMSGENV *,time_t *) noex ;
+extern int mailmsgenv_mkdatestr(MAILMSGENV *,char *,char *,int) noex ;
+extern int mailmsgenv_mkenv(MAILMSGENV *,char *,int) noex ;
+extern int mailmsgenv_finish(MAILMSGENV *) noex ;
 
-#if	(! defined(MAILMSGENV_MASTER)) || (MAILMSGENV_MASTER == 0)
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int mailmsgenv_start(MAILMSGENV *,cchar *,int) ;
-extern int mailmsgenv_isstart(MAILMSGENV *) ;
-extern int mailmsgenv_getaddress(MAILMSGENV *,cchar **) ;
-extern int mailmsgenv_getremote(MAILMSGENV *,cchar **) ;
-extern int mailmsgenv_gettzname(MAILMSGENV *,cchar **) ;
-extern int mailmsgenv_gettime(MAILMSGENV *,time_t *) ;
-extern int mailmsgenv_mkdatestr(MAILMSGENV *,char *,char *,int) ;
-extern int mailmsgenv_mkenv(MAILMSGENV *,char *,int) ;
-extern int mailmsgenv_finish(MAILMSGENV *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MAILMSGENV_MASTER */
 
 #endif /* MAILMSGENV_INCLUDE */
 
