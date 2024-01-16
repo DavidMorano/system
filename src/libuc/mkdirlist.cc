@@ -126,11 +126,11 @@ int mkdirlist_start(MKDIRLIST *op,cchar *pr,cchar *newsdname) noex {
 	if (pr[0] == '\0') return SR_INVALID ;
 	if (newsdname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(MKDIRLIST)) ;
+	memclear(op) ;
 
 	if ((rs = vechand_start(&op->dirs,20,0)) >= 0) {
 	    const mode_t	om = 0666 ;
-	    const int		of = O_RDONLY ;
+	    cint		of = O_RDONLY ;
 	    if ((rs = openpcsdircache(pr,newsdname,of,om,-1)) >= 0) {
 	        int	fd = rs ;
 	        rs = mkdirlist_procdircache(op,newsdname,fd) ;
@@ -485,12 +485,10 @@ int		dlen ;
 {
 	int		rs ;
 	int		c = 0 ;
-	cchar	*cp ;
-
-	memset(ep,0,sizeof(MKDIRLIST_ENT)) ;
-
+	cchar		*cp ;
+	memclear(ep) ;
 	if ((rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
-	    const int		nlen = (rs-1) ;
+	    cint	nlen = rs ;
 	    ep->name = cp ;
 	    c += 1 ;
 	    ep->nlen = nlen ;

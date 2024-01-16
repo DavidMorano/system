@@ -1,5 +1,5 @@
-/* pq */
-/* lang=C23 */
+/* pq SUPPORT */
+/* lang=C++23 */
 
 /* a regular (no-frills) pointer queue */
 /* version %I% last-modified %G% */

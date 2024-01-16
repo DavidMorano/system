@@ -1,4 +1,4 @@
-/* plainq */
+/* plainq SUPPORT */
 /* lang=C20 */
 
 /* plain self-relative double-linked queue */
@@ -46,8 +46,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdint>
 #include	<usystem.h>
 
 #include	"plainq.h"
@@ -75,6 +73,12 @@ static inline int plainq_magic(plainq *op,Args ... args) noex {
 	}
 	return rs ;
 }
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

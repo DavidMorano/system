@@ -55,7 +55,7 @@ extern int dirseen_havedevino(dirseen *,USTAT *) noex ;
 extern int dirseen_count(dirseen *) noex ;
 extern int dirseen_curbegin(dirseen *,dirseen_cur *) noex ;
 extern int dirseen_curend(dirseen *,dirseen_cur *) noex ;
-extern int dirseen_enum(dirseen *,dirseen_cur *,char *,int) noex ;
+extern int dirseen_curenum(dirseen *,dirseen_cur *,char *,int) noex ;
 extern int dirseen_finish(dirseen *) noex ;
 
 EXTERNC_end

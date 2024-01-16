@@ -296,16 +296,11 @@ int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 	    rs = perm(fname,-1,-1,NULL,X_OK) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("spawner: efname=%s\n",efname) ;
-#endif
-
 	if (rs >= 0) {
 	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(efname,-1,&cp)) >= 0) {
-	        const int	size = sizeof(SCMD) ;
+	        cint		size = sizeof(SCMD) ;
 	        op->execfname = cp ;
-
 	        if ((rs = vecobj_start(&op->cmds,size,2,0)) >= 0) {
 	            ENVHELP	*ehp = &op->env ;
 	            if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
@@ -313,10 +308,10 @@ int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 	                if (rs < 0)
 	                    envhelp_finish(ehp) ;
 	            } /* end if (envhelp_start) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                vecobj_finish(&op->cmds) ;
+		    }
 	        } /* end if (vecobj_start) */
-
 	        if (rs < 0) {
 	            uc_free(op->execfname) ;
 	            op->execfname = NULL ;
@@ -328,9 +323,7 @@ int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 }
 /* end subroutine (spawner_start) */
 
-
-int spawner_finish(SPAWNER *op)
-{
+int spawner_finish(SPAWNER *op) noex {
 	SCMD		**cv ;
 	int		rs = SR_OK ;
 	int		rs1 ;

@@ -1,4 +1,4 @@
-/* ciq */
+/* ciq HEADER */
 /* lang=C++20 */
 
 /* container interlocked queue */
@@ -33,9 +33,9 @@
 
 
 struct ciq_head {
-	ptm		m ;
-	pq		frees ;
-	pq		fifo ;
+	ptm		*mxp ;
+	pq		*fifop ;
+	pq		*freep ;
 	uint		magic ;
 } ;
 

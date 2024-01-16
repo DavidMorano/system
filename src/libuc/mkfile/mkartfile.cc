@@ -98,9 +98,7 @@ int mkartfile(char *rbuf,cc *dname,cc *prefix,int serial,mode_t om) noex {
 	                for (int ss = serial ; ss < nss ; ss += 1) {
 		            for (int es = 0 ; es < 4 ; es += 1) {
 			        rs = mktry(rbuf,rl,prefix,ts,ss,es,fm) ;
-		                if (rs > 0) break ;
-			        if (rs == SR_EXISTS) rs = SR_OK ;
-				if (rs < 0) break ;
+		                if (rs != 0) break ;
 		            } /* end for (end-stamp) */
 		            if (rs != 0) break ;
 	                } /* end for (serial-stamp) */
@@ -129,6 +127,9 @@ static int mktry(char *rp,int rl,cc *pre,ui ts,int ss,int es,mode_t om) noex {
 		    len = rs ;
 	            if ((rs = u_open(rp,of,om)) >= 0) {
 		        u_close(rs) ;
+		    } else if (rs == SR_EXISTS) {
+			rs = SR_OK ;
+			len = 0 ;
 		    }
 	        } /* end if (path-add) */
 	    } /* end if (made art-filename) */
@@ -139,12 +140,12 @@ static int mktry(char *rp,int rl,cc *pre,ui ts,int ss,int es,mode_t om) noex {
 }
 /* end subroutine (mktry) */
 
+/* load up to 7 prefix characters into output buffer */
+/* encode the 'bits' above into the output buffer using BASE-64 encoding */
 static int mkoutname(char *rfname,cchar *pre,uint ts,int ss,int es) noex {
 	uint		bits = mkbits(ts,ss,es) ;
 	char		*bp = rfname ;
-/* load up to 7 prefix characters into output buffer */
 	bp = strwcpy(bp,pre,7) ;
-/* encode the 'bits' above into the output buffer using BASE-64 encoding */
 	{
 	    cint	n = 7 ; /* number of chars (7x6=42 bits) */
 	    int		ch ;
@@ -171,12 +172,12 @@ static int mkoutname(char *rfname,cchar *pre,uint ts,int ss,int es) noex {
 static uint mkbits(uint ts,int ss,int es) noex {
 	uint	bits = ts ;
 	{
-	        bits <<= 8 ;
-	        bits |= (ss & 0xff) ;
+	    bits <<= 8 ;
+	    bits |= (ss & UCHAR_MAX) ;
 	}
 	{
-	        bits <<= 2 ;
-	        bits |= (es & 3) ;
+	    bits <<= 2 ;
+	    bits |= (es & 3) ;
 	}
 	return bits ;
 } 

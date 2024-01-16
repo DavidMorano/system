@@ -33,7 +33,7 @@
 
 	Arguments:
 	rbuf		result buffer pointer
-	template	file creation template string
+	fn		file-name
 	fm		file creation mode
 
 	Returns:
@@ -52,7 +52,7 @@
 #include	<strwcpy.h>
 #include	<mkpathx.h>
 #include	<strlibval.hh>
-#include	<isoneof.hh>
+#include	<isoneof.h>
 #include	<localmisc.h>
 
 #include	"mktmp.h"
@@ -124,7 +124,7 @@ int mktmplock(char *rbuf,cchar *fn,mode_t fm) noex {
 /* local subroutines */
 
 static int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkpath(rbuf,tmpdir,fn)) >= 0) {
 	    rs = lockable(rbuf,fm) ;

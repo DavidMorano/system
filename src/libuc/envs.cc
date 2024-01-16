@@ -402,7 +402,7 @@ static int entry_start(ENVS_ENT *ep,cc *kp,cc *vn,int vnlen,cc**rpp) noex {
 	        if ((rs = uc_mallocstrw(kp,-1,&cp)) >= 0) {
 	            cint	n = ENVS_DEFENTS ;
 	            int		vo = 0 ;
-	            ep->kl = (rs - 1) ;
+	            ep->kl = rs ;
 	            ep->kp = cp ;
 	            vo |= (VECSTR_OCOMPACT | VECSTR_OORDERED) ;
 	            vo |= VECSTR_OREUSE ;

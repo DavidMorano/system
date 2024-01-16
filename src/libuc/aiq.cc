@@ -1,5 +1,5 @@
-/* aiq */
-/* lang=C20 */
+/* aiq SUPPORT */
+/* lang=C++20 */
 
 /* Asynchronous Interrupt Queue - some sort of queue object for OS stuff! */
 /* version %I% last-modified %G% */
@@ -40,17 +40,19 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstddef>
-#include	<cstdint>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
-#include	<localmisc.h>
 
 #include	"aiq.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -59,6 +61,34 @@ typedef q_ent		*entp ;
 
 
 /* forward references */
+
+template<typename ... Args>
+static inline int aiq_ctor(aiq *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    if ((op->qp = new(nothrow) q) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-pq) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (aiq_ctor) */
+
+static int aiq_dtor(aiq *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->qp) {
+		delete op->qp ;
+		op->qp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (aiq_dtor) */
 
 template<typename ... Args>
 static inline int aiq_magic(aiq *op,Args ... args) noex {
@@ -70,40 +100,53 @@ static inline int aiq_magic(aiq *op,Args ... args) noex {
 }
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int aiq_start(aiq *qhp,int type) noex {
-	int		rs = SR_FAULT ;
-	if (qhp) {
-	    memclear(qhp) ;
-	    if ((rs = q_start(&qhp->qo,type)) >= 0) {
-		qhp->magic = AIQ_MAGIC ;
+int aiq_start(aiq *op,int type) noex {
+	int		rs ;
+	if ((rs = aiq_ctor(op)) >= 0) {
+	    if ((rs = q_start(op->qp,type)) >= 0) {
+		op->magic = AIQ_MAGIC ;
 	    } /* end if (q-start) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		aiq_dtor(op) ;
+	    }
+	} /* end if (aiq_ctor) */
 	return rs ;
 }
 /* end subroutine (aiq_start) */
 
-int aiq_finish(aiq *qhp) noex {
+int aiq_finish(aiq *op) noex {
 	int		rs ;
-	if ((rs = aiq_magic(qhp)) >= 0) {
-		rs = q_finish(&qhp->qo) ;
-		qhp->magic = 0 ;
+	int		rs1 ;
+	if ((rs = aiq_magic(op)) >= 0) {
+	    {
+		rs1 = q_finish(op->qp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = aiq_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (aiq_finish) */
 
-int aiq_ins(aiq *qhp,aiq_ent *ep) noex {
+int aiq_ins(aiq *op,aiq_ent *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(qhp,ep)) >= 0) {
+	if ((rs = aiq_magic(op,ep)) >= 0) {
 	        sigblocker	b ;
 	        if ((rs = b.start) >= 0) {
 		    {
 		        entp	qep = entp(ep) ;
-		        rs = q_ins(&qhp->qo,qep) ;
+		        rs = q_ins(op->qp,qep) ;
 		        rc = rs ;
 		    }
 	            rs1 = b.finish ;
@@ -114,16 +157,16 @@ int aiq_ins(aiq *qhp,aiq_ent *ep) noex {
 }
 /* end subroutine (aiq_ins) */
 
-int aiq_inshead(aiq *qhp,aiq_ent *ep) noex {
+int aiq_inshead(aiq *op,aiq_ent *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(qhp,ep)) >= 0) {
+	if ((rs = aiq_magic(op,ep)) >= 0) {
 	        sigblocker	b ;
 	        if ((rs = b.start) >= 0) {
 		    {
 		        entp	qep = entp(ep) ;
-		        rs = q_inshead(&qhp->qo,qep) ;
+		        rs = q_inshead(op->qp,qep) ;
 		        rc = rs ;
 		    }
 	            rs1 = b.finish ;
@@ -134,16 +177,16 @@ int aiq_inshead(aiq *qhp,aiq_ent *ep) noex {
 }
 /* end subroutine (aiq_inshead) */
 
-int aiq_rem(aiq *qhp,aiq_ent **epp) noex {
+int aiq_rem(aiq *op,aiq_ent **epp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(qhp)) >= 0) {
+	if ((rs = aiq_magic(op)) >= 0) {
 	        sigblocker	b ;
 	        if ((rs = b.start) >= 0) {
 		    {
 		        entp	*qepp = (entp *) epp ;
-		        rs = q_rem(&qhp->qo,qepp) ;
+		        rs = q_rem(op->qp,qepp) ;
 		        rc = rs ;
 		    }
 	            rs1 = b.finish ;
@@ -155,16 +198,16 @@ int aiq_rem(aiq *qhp,aiq_ent **epp) noex {
 }
 /* end subroutine (aiq_rem) */
 
-int aiq_remtail(aiq *qhp,aiq_ent **epp) noex {
+int aiq_remtail(aiq *op,aiq_ent **epp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if ((rs = aiq_magic(qhp)) >= 0) {
+	if ((rs = aiq_magic(op)) >= 0) {
 	        sigblocker	b ;
 	        if ((rs = b.start) >= 0) {
 		    {
 		        entp	*qepp = (entp *) epp ;
-		        rs = q_remtail(&qhp->qo,qepp) ;
+		        rs = q_remtail(op->qp,qepp) ;
 		        rc = rs ;
 		    }
 	            rs1 = b.finish ;
@@ -176,10 +219,10 @@ int aiq_remtail(aiq *qhp,aiq_ent **epp) noex {
 }
 /* end subroutine (aiq_remtail) */
 
-int aiq_count(aiq *qhp) noex {
+int aiq_count(aiq *op) noex {
 	int		rs ;
-	if ((rs = aiq_magic(qhp)) >= 0) {
-		rs = q_count(&qhp->qo) ;
+	if ((rs = aiq_magic(op)) >= 0) {
+	    rs = q_count(op->qp) ;
 	} /* end if (magic) */
 	return rs ;
 }

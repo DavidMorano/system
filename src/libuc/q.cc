@@ -1,4 +1,4 @@
-/* q */
+/* q SUPPORT */
 /* lang=C++20 */
 
 /* self-realtive double-linked queue */
@@ -42,18 +42,64 @@
 
 /* local namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
 typedef plainq_ent	*entp ;
 
 
+/* forward references */
+
+template<typename ... Args>
+static inline int q_ctor(q *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    if ((op->mxp = new(nothrow) ptm) != np) {
+	        if ((op->pqp = new(nothrow) plainq) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-plainq) */
+		if (rs < 0) {
+		    delete op->mxp ;
+		    op->mxp = nullptr ;
+	        }
+	    } /* end if (new-ptm) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (q_ctor) */
+
+static int q_dtor(q *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->pqp) {
+		delete op->pqp ;
+		op->pqp = nullptr ;
+	    }
+	    if (op->mxp) {
+		delete op->mxp ;
+		op->mxp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (q_dtor) */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int q_start(Q *qhp,int type) noex {
-	int		rs = SR_FAULT ;
+int q_start(Q *op,int type) noex {
+	int		rs ;
 	int		rs1 ;
-	if (qhp) {
+	if ((rs = q_ctor(op)) >= 0) {
 	    ptma	ma ;
 	    bool	f_mutex = false ;
 	    bool	f_plainq = false ;
@@ -61,9 +107,9 @@ int q_start(Q *qhp,int type) noex {
 	        int	matype = PTHREAD_PROCESS_PRIVATE ;
 	        if (type > 0) matype = PTHREAD_PROCESS_SHARED ;
 	        if ((rs = ptma_setpshared(&ma,matype)) >= 0) {
-	            if ((rs = qhp->m.create(&ma)) >= 0) {
+	            if ((rs = op->mxp->create(&ma)) >= 0) {
 			f_mutex = true ;
-			if ((rs = plainq_start(&qhp->pq)) >= 0) {
+			if ((rs = plainq_start(op->pqp)) >= 0) {
 			    f_plainq = true ;
 			}
 		    }
@@ -72,26 +118,34 @@ int q_start(Q *qhp,int type) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex-attributes) */
 	    if (rs < 0) {
-		if (f_plainq) plainq_finish(&qhp->pq) ;
-		if (f_mutex) qhp->m.destroy() ;
+		if (f_plainq) plainq_finish(op->pqp) ;
+		if (f_mutex) op->mxp->destroy() ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		q_dtor(op) ;
+	    }
+	} /* end if (q_ctor) */
 	return rs ;
 }
 /* end subroutine (q_start) */
 
-int q_finish(Q *qhp) noex {
+int q_finish(Q *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (qhp) {
+	if (op) {
+	    rs = SR_OK ;
 	    {
-	        rs1 = plainq_finish(&qhp->pq) ;
+	        rs1 = plainq_finish(op->pqp) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rc = rs1 ;
 	    }
 	    {
-	        rs1 = qhp->m.destroy ;
+	        rs1 = op->mxp->destroy ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = q_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -99,18 +153,18 @@ int q_finish(Q *qhp) noex {
 }
 /* end subroutine (q_finish) */
 
-int q_ins(Q *qhp,Q_ENT *ep) noex {
+int q_ins(Q *op,Q_ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (qhp && ep) {
-	    if ((rs = qhp->m.lockbegin) >= 0) {
+	if (op && ep) {
+	    if ((rs = op->mxp->lockbegin) >= 0) {
 		{
 		    entp	qep = entp(ep) ;
-		    rs = plainq_ins(&qhp->pq,qep) ;
+		    rs = plainq_ins(op->pqp,qep) ;
 		    rc = rs ;
 		}
-	        rs1 = qhp->m.lockend ;
+	        rs1 = op->mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
 	} /* end if (non-null) */
@@ -118,18 +172,18 @@ int q_ins(Q *qhp,Q_ENT *ep) noex {
 }
 /* end subroutine (q_ins) */
 
-int q_inshead(Q *qhp,Q_ENT *ep) noex {
+int q_inshead(Q *op,Q_ENT *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (qhp && ep) {
-	    if ((rs = qhp->m.lockbegin) >= 0) {
+	if (op && ep) {
+	    if ((rs = op->mxp->lockbegin) >= 0) {
 		{
 		    entp	qep = entp(ep) ;
-		    rs = plainq_inshead(&qhp->pq,qep) ;
+		    rs = plainq_inshead(op->pqp,qep) ;
 		    rc = rs ;
 		}
-	        rs1 = qhp->m.lockend ;
+	        rs1 = op->mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
 	} /* end if (non-null) */
@@ -137,18 +191,18 @@ int q_inshead(Q *qhp,Q_ENT *ep) noex {
 }
 /* end subroutine (q_inshead) */
 
-int q_rem(Q *qhp,Q_ENT **epp) noex {
+int q_rem(Q *op,Q_ENT **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (qhp) {
-	    if ((rs = qhp->m.lockbegin) >= 0) {
+	if (op) {
+	    if ((rs = op->mxp->lockbegin) >= 0) {
 		{
 		    entp	*qepp = (entp *) epp ;
-		    rs = plainq_rem(&qhp->pq,qepp) ;
+		    rs = plainq_rem(op->pqp,qepp) ;
 		    rc = rs ;
 		}
-	        rs1 = qhp->m.lockend ;
+	        rs1 = op->mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
 	    if (epp && (rs < 0)) *epp = nullptr ;
@@ -157,18 +211,18 @@ int q_rem(Q *qhp,Q_ENT **epp) noex {
 }
 /* end subroutine (q_rem) */
 
-int q_remtail(Q *qhp,Q_ENT **epp) noex {
+int q_remtail(Q *op,Q_ENT **epp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (qhp) {
-	    if ((rs = qhp->m.lockbegin) >= 0) {
+	if (op) {
+	    if ((rs = op->mxp->lockbegin) >= 0) {
 		{
 		    entp	*qepp = (entp *) epp ;
-		    rs = plainq_remtail(&qhp->pq,qepp) ;
+		    rs = plainq_remtail(op->pqp,qepp) ;
 		    rc = rs ;
 		}
-	        rs1 = qhp->m.lockend ;
+	        rs1 = op->mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
 	    if (epp && (rs < 0)) *epp = nullptr ;
@@ -177,17 +231,17 @@ int q_remtail(Q *qhp,Q_ENT **epp) noex {
 }
 /* end subroutine (q_remtail) */
 
-int q_count(Q *qhp) noex {
+int q_count(Q *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	if (qhp) {
-	    if ((rs = qhp->m.lockbegin) >= 0) {
+	if (op) {
+	    if ((rs = op->mxp->lockbegin) >= 0) {
 		{
-		    rs = plainq_count(&qhp->pq) ;
+		    rs = plainq_count(op->pqp) ;
 		    rc = rs ;
 		}
-	        rs1 = qhp->m.lockend ;
+	        rs1 = op->mxp->lockend ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex lock) */
 	} /* end if (non-null) */

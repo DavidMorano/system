@@ -1,4 +1,4 @@
-/* vstrcmpx */
+/* vstrcmpx SUPPORT */
 /* lang=C20 */
 
 /* vstring key comparison (obverse and reverse) */

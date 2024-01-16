@@ -1,4 +1,4 @@
-/* tmpx */
+/* tmpx SUPPORT */
 /* lang=C++20 */
 
 /* manage reading or writing of the [UW]TMP database */

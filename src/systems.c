@@ -1,4 +1,4 @@
-/* systems */
+/* systems SUPPORT */
 /* lang=C20 */
 
 /* get machine dialing information from UUCP "Systems" DB */
@@ -39,6 +39,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
@@ -611,15 +612,13 @@ static int systems_delfes(SYSTEMS *op,int fi)
 }
 /* end subroutine (systems_delfes) */
 
-
-static int file_start(SYSTEMS_FILE *fep,cchar fname[])
-{
+static int file_start(SYSTEMS_FILE *fep,cchar *fname) noex {
 	int		rs ;
 	cchar		*cp ;
 
 	if (fname == NULL) return SR_FAULT ;
 
-	memset(fep,0,sizeof(SYSTEMS_FILE)) ;
+	memclear(fep) ;
 
 	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	    fep->fname = cp ;
