@@ -41,8 +41,6 @@
 
 /* local defines */
 
-#define	DIRSEEN_ENT	struct dirseen_e
-
 
 /* local namespaces */
 
@@ -52,10 +50,6 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef DIRSEEN_ENT	dirseen_ent ;
-typedef DIRSEEN_ENT	ent ;
-typedef DIRSEEN_ENT	*entp ;
-typedef DIRSEEN_ENT	**entpp ;
 
 
 /* external subroutines */
@@ -63,13 +57,25 @@ typedef DIRSEEN_ENT	**entpp ;
 
 /* local structures */
 
-struct dirseen_e {
+namespace {
+    struct dirseen_ent {
 	cchar		*name ;
 	ino_t		ino ;
 	dev_t		dev ;
 	int		namelen ;
 	uint		f_stat:1 ;
-} ;
+	dirseen_ent() noex : name(nullptr), namelen(0), dev(0L), ino(0L) { } ;
+	dirseen_ent(cchar *sp,int sl = -1) noex : name(sp) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    namelen = sl ;
+	} ;
+	dirseen_ent(dev_t d,ino_t i) noex : dev(d), ino(i) { } ;
+    } ; /* end struct (dirseen_ent) */
+}
+
+typedef dirseen_ent	ent ;
+typedef dirseen_ent	*entp ;
+typedef dirseen_ent	**entpp ;
 
 
 /* forward references */
@@ -185,8 +191,7 @@ int dirseen_havename(dirseen *op,cchar *np,int nl) noex {
 	    cchar	*name = nullptr ;
 	    if ((rs = nulstr_start(&s,np,nl,&name)) >= 0) {
 	        {
-	            dirseen_ent	e ;
-	            e.name = name ;
+	            dirseen_ent		e(name) ;
 	            rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
 	        }
 	        rs1 = nulstr_finish(&s) ;
@@ -200,9 +205,7 @@ int dirseen_havename(dirseen *op,cchar *np,int nl) noex {
 int dirseen_havedevino(dirseen *op,USTAT *sbp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,sbp)) >= 0) {
-	    dirseen_ent	e ;
-	    e.dev = sbp->st_dev ;
-	    e.ino = sbp->st_ino ;
+	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
 	    rs = vecobj_search(op->dlistp,&e,vcmpdevino,nullptr) ;
 	} /* end if (magic) */
 	return rs ;
@@ -236,7 +239,7 @@ int dirseen_curend(dirseen *op,dirseen_cur *curp) noex {
 }
 /* end subroutine (dirseen_curend) */
 
-int dirseen_enum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
+int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,curp,rbuf)) >= 0) {
 	    cint	i = (curp->i >= 0) ? curp->i : 0 ;
@@ -253,20 +256,20 @@ int dirseen_enum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (dirseen_enum) */
+/* end subroutine (dirseen_curenum) */
 
 
 /* private subroutines */
 
 int entry_start(dirseen_ent *ep,cchar *np,int nl,dev_t dev,ino_t ino) noex {
 	int		rs ;
-	cchar	*cp ;
+	cchar		*cp ;
 	memclear(ep) ;
 	ep->dev = dev ;
 	ep->ino = ino ;
 	if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
 	    ep->name = cp ;
-	    ep->namelen = (rs-1) ;
+	    ep->namelen = rs ;
 	}
 	return rs ;
 }
@@ -324,17 +327,15 @@ static int vcmpdevino(cvoid **v1pp,cvoid **v2pp) noex {
 	        if (e1p) {
 		    rc = -1 ;
 	            if (e2p) {
-			ino_t	ino = (e1p->ino - e2p->ino) ;
+			dev_t	dev = (e1p->dev - e2p->dev) ;
 			rc = 0 ;
-			if (ino == 0) {
-			    dev_t	dev = (e1p->dev - e2p->dev) ;
-			    if (dev == 0) {
-				rc = 0 ;
-			    } else {
-			        rc = (dev > 0) ? +1 : -1 ;
+			if (dev == 0) {
+			    ino_t	ino = (e1p->ino - e2p->ino) ;
+			    if (ino) {
+			        rc = (ino > 0) ? +1 : -1 ;
 			    }
 			} else {
-			    rc = (ino > 0) ? +1 : -1 ;
+			    rc = (dev > 0) ? +1 : -1 ;
 			}
 		    }
 	        }

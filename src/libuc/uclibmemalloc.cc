@@ -79,6 +79,9 @@ namespace {
 /* local vaiables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
@@ -94,7 +97,7 @@ int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 		*rpp = nullptr ;
 	    } /* end if (uc_libmalloc) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (uc_libmallocstrw) */
 

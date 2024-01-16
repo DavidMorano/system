@@ -59,6 +59,9 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
 /* external variables */
 
 
@@ -70,6 +73,11 @@ static void	base64_eg(cchar *,char *) noex ;
 
 
 /* local variables */
+
+constexpr bool		f_comment = false ;
+
+
+/* exported variables */
 
 /* encode table */
 const uchar	base64_et[] = {
@@ -115,8 +123,6 @@ const uchar	base64_dt[] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 } ;
-
-constexpr bool		f_comment = false ;
 
 
 /* exported subroutines */

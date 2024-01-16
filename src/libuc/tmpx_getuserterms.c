@@ -200,12 +200,9 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username)
 
 /* local subroutines */
 
-
-static int entry_start(TERMENTRY *ep,char *fp,int fl,time_t t)
-{
+static int entry_start(TERMENTRY *ep,char *fp,int fl,time_t t) noex {
 	int		rs ;
-	const char	*cp ;
-
+	cchar		*cp ;
 	ep->atime = t ;
 	rs = uc_mallocstrw(fp,fl,&cp) ;
 	if (rs >= 0) ep->devpath = cp ;

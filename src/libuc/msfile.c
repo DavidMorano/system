@@ -143,6 +143,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<endian.h>
 #include	<mapstrint.h>
 #include	<stdorder.h>
@@ -274,7 +275,7 @@ int msfile_open(MSFILE *op,cchar *fname,int oflags,mode_t operm) noex {
 #endif
 	oflags &= (~ O_TRUNC) ;
 
-	memset(op,0,sizeof(MSFILE)) ;
+	memclear(op) ;
 	op->pagesize = getpagesize() ;
 	op->fd = -1 ;
 	op->oflags = oflags ;
@@ -1215,21 +1216,12 @@ static int msfile_filetopwrite(MSFILE *op) noex {
 	bl = bp - op->topbuf ;
 	op->fileversion = MSFILE_FILEVERSION ;
 	op->filetype = 0 ;
-	memset(&op->h,0,sizeof(struct msfile_h)) ;
-
-#if	CF_DEBUGS
-	debugprintf("msfile_filebegin: u_write() wlen=%d\n",bl) ;
-#endif
-
+	op->h = {} ;
 	if ((rs = u_pwrite(op->fd,op->topbuf,bl,poff)) >= 0) {
 	    op->filesize = rs ;
 	    op->topsize = rs ;
 	    op->f.fileinit = TRUE ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("msfile_filetopwrite: u_write() rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }

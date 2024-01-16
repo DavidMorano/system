@@ -41,12 +41,14 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>
+#include	<algorithm>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
 #include	<pathclean.h>
 #include	<strn.h>
+#include	<mkchar.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -55,7 +57,6 @@
 
 /* local defines */
 
-#define	DIRLIST_ENT	struct dirlist_e
 #define	DIRLIST_NDEF	10
 
 #ifndef	CF_NULPATH
@@ -65,11 +66,17 @@
 
 /* local namespaces */
 
+using std::min ;			/* subroutine-template */
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+struct dirlist_ent ;
+
+typedef dirlist_ent	ent ;
+typedef dirlist_ent	*entp ;
 
 
 /* external subroutines */
@@ -81,18 +88,12 @@ extern "C" {
 
 /* local structures */
 
-struct dirlist_e {
+struct dirlist_ent {
 	cchar		*np ;
 	ino_t		ino ;
 	dev_t		dev ;
 	int		nl ;
 } ;
-
-
-/* typedefs */
-
-typedef DIRLIST_ENT	ent ;
-typedef ent		*entp ;
 
 
 /* forward references */
@@ -197,7 +198,7 @@ int dirlist_finish(dirlist *op) noex {
 }
 /* end subroutine (dirlist_finish) */
 
-int dirlist_semi(dirlist *op) noex {
+int dirlist_semi(dirlist *op) noex { /* add a semicolon as an entry */
 	int		rs ;
 	if ((rs = dirlist_magic(op)) >= 0) {
 	    ent		e ;
@@ -338,7 +339,7 @@ int dirlist_curend(dirlist *op,dirlist_cur *curp) noex {
 }
 /* end subroutine (dirlist_curend) */
 
-int dirlist_enum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
+int dirlist_curenum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = dirlist_magic(op,curp,rbuf)) >= 0) {
 	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
@@ -356,9 +357,9 @@ int dirlist_enum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (dirlist_enum) */
+/* end subroutine (dirlist_curenum) */
 
-int dirlist_get(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
+int dirlist_curget(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = dirlist_magic(op,curp)) >= 0) {
 	    int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
@@ -379,7 +380,7 @@ int dirlist_get(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (dirlist_get) */
+/* end subroutine (dirlist_curget) */
 
 int dirlist_joinsize(dirlist *op) noex {
 	int		rs ;
@@ -442,13 +443,13 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 /* private subroutines */
 
 static int entry_start(ent *ep,cc *np,int nl,dev_t dev,ino_t ino) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	cchar		*cp{} ;
 	memclear(ep) ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	ep->nl = nl ;
 	if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
+	    ep->nl = rs ;
 	    ep->np = cp ;
 	} /* end if */
 	return rs ;
@@ -469,12 +470,25 @@ static int entry_finish(ent *ep) noex {
 /* end subroutine (entry_finish) */
 
 static int vcmpname(ent **e1pp,ent **e2pp) noex {
+	ent		*e1p = *e1pp ;
+	ent		*e2p = *e2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp == nullptr) rc = 1 ;
-	    else if (*e2pp == nullptr) rc = -1 ;
-	    if (rc == 0) {
-	        rc = strcmp((*e1pp)->np,(*e2pp)->np) ;
+	if (e1p || e2p) {
+	    rc = 1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+		    cint	ml = min(e1p->nl,e2p->nl) ;
+		    cchar	*s1 = e1p->np ;
+		    cchar	*s2 = e2p->np ;
+		    {
+                        cint        ch1 = mkchar(*s1) ;
+                        cint        ch2 = mkchar(*s2) ;
+                        if ((rc = (ch1 - ch2)) == 0) {
+	                    rc = strncmp(s1,s2,ml) ;
+		        }
+		    }
+		}
 	    }
 	}
 	return rc ;
@@ -482,13 +496,17 @@ static int vcmpname(ent **e1pp,ent **e2pp) noex {
 /* end subroutine (vcmpname) */
 
 static int vcmpdevino(ent **e1pp,ent **e2pp) noex {
+	ent		*e1p = *e1pp ;
+	ent		*e2p = *e2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp == nullptr) rc = 1 ;
-	    else if (*e2pp == nullptr) rc = -1 ;
-	    if (rc == 0) {
-	        if ((rc = ((*e1pp)->ino - (*e2pp)->ino)) == 0) {
-	            rc = (*e1pp)->dev - (*e2pp)->dev ;
+	if (e1p || e2p) {
+	    rc = 1 ;
+	    if (e1p) {
+		rc = -1 ;
+	        if (e2p) {
+	            if ((rc = (e1p->dev - e2p->dev)) == 0) {
+		        rc = (e1p->ino - e2p->ino) ;
+		    }
 	        }
 	    }
 	}

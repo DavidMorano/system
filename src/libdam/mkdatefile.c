@@ -120,6 +120,9 @@ static cchar		*defdname ;	/* <- thread-safe */
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkdatefile(char *rbuf,cchar *dname,cchar *fs,mode_t fm) noex {

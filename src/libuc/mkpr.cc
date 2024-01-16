@@ -1,4 +1,4 @@
-/* mkpr */
+/* mkpr SUPPORT */
 /* lang=C++20 */
 
 /* make program-root */
@@ -61,6 +61,7 @@
 #include	<ctime>
 #include	<pwd.h>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<varnames.hh>
 #include	<getbufsize.h>
 #include	<ids.h>
@@ -309,7 +310,7 @@ int mkpr(char *pbuf,int plen,cchar *prname,cchar *domain) noex {
 static int subinfo_start(SI *sip,cchar *prname,cchar *domain) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	memset(sip,0,sizeof(SI)) ;
+	memclear(sip) ;
 	sip->prname = prname ;
 	sip->domain = domain ;
 	sip->dname = prname ;

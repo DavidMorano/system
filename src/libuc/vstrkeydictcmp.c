@@ -1,4 +1,4 @@
-/* vstrkeydictcmp */
+/* vstrkeydictcmp SUPPORT */
 /* lang=C++20 */
 
 /* vector string key comparison */

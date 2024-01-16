@@ -139,15 +139,15 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	of |= O_RDWR ;
 
 	om |= 0600 ;
-	if (dname == NULL) dname = getenv(VARTMPDNAME) ;
-	if ((dname == NULL) || (dname[0] == '\0')) dname = TMPDNAME ;
+	if (dname == nullptr) dname = getenv(VARTMPDNAME) ;
+	if ((dname == nullptr) || (dname[0] == '\0')) dname = TMPDNAME ;
 
 	if ((rs = mkpath2(inname,dname,platename)) >= 0) {
 	    cint	olen = MAXPATHLEN ;
 	    char	*obuf ;
 	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
 	        sigblocker	blocker ;
-	        if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
+	        if ((rs = sigblocker_start(&blocker,nullptr)) >= 0) {
 		    cint		otm = OTM_STREAM ;
 	            if ((rs = opentmpx(inname,of,om,otm,obuf)) >= 0) {
 		        fd = rs ;
@@ -200,8 +200,8 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		f_abuf = FALSE ;
 	int		f ;
 
-	if (inname == NULL) return SR_FAULT ;
-	if (obuf == NULL) return SR_FAULT ;
+	if (inname == nullptr) return SR_FAULT ;
+	if (obuf == nullptr) return SR_FAULT ;
 
 	if (inname[0] == '\0') return SR_INVALID ;
 
@@ -216,7 +216,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 		rs = SR_INVALID ;
 	}
 
-	if ((rs >= 0) && (obuf == NULL)) {
+	if ((rs >= 0) && (obuf == nullptr)) {
 	    cint		olen = MAXPATHLEN ;
 	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
 		obuf[0] = '\0' ;
@@ -321,7 +321,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	    }
 	    uc_free(obuf) ;
 	} else if (rs < 0) {
-	    if (obuf != NULL) {
+	    if (obuf != nullptr) {
 		obuf[0] = '\0' ;
  	    }
 	}
@@ -355,7 +355,7 @@ static int randload(ulong *rvp) noex {
 
 	{
 	    TIMEVAL	tod ;
-	    uc_gettimeofday(&tod,NULL) ; /* cannot fail?! */
+	    uc_gettimeofday(&tod,nullptr) ; /* cannot fail?! */
 	        v = tod.tv_sec ;
 	        rv += (v << 32) ;
 	        rv += (v << 12) ;
