@@ -1,18 +1,18 @@
-/* main (liblkcmd) */
+/* main SUPPORT (liblkcmd) */
+/* lang=C20 */
 
 /* generic front-end for SHELL built-ins */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_UTIL		0		/* run the utility worker */
-
 
 /* revision history:
 
 	= 2001-11-01, David A­D­ Morano
-	This subroutine was written for use as a front-end for Korn Shell (KSH)
-	commands that are compiled as stand-alone programs.
+	This subroutine was written for use as a front-end for Korn
+	Shell (KSH) commands that are compiled as stand-alone
+	programs.
 
 */
 
@@ -20,15 +20,12 @@
 
 /*******************************************************************************
 
-	This is the front-end to make the various SHELL (KSH) built-in commands
-	into stand-alone programs.
-
+	This is the front-end to make the various SHELL (KSH)
+	built-in commands into stand-alone programs.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
@@ -38,7 +35,6 @@
 #include	<dlfcn.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<sighand.h>
@@ -63,12 +59,7 @@
 #define	NDF		"main.deb"
 
 
-/* typ-defs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
+/* local typedefs */
 
 
 /* external subroutines */
@@ -167,9 +158,7 @@ static const SIGCODE	sigcode_bus[] = {
 
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
+int main(int argc,mainv argv,mainv envv) {
 	const int	f_lockmemalloc = CF_LOCKMEMALLOC ;
 	const int	f_util = CF_UTIL ;
 	int		rs = SR_OK ;
@@ -185,35 +174,13 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    if ((rs = maininfo_start(mip,argc,argv)) >= 0) {
 		maininfohand_t	sh = main_sighand ;
 	        if ((rs = maininfo_sigbegin(mip,sh,sigcatches)) >= 0) {
-#if	CF_DEBUGN
-	            nprintf(NDF,"main: sig-begin\n") ;
-#endif
 	            if ((rs = lib_initmemalloc(f_lockmemalloc)) >= 0) {
 	                if ((rs = lib_mainbegin(envv,NULL)) >= 0) {
 	                    if ((rs = maininfo_utilbegin(mip,f_util)) >= 0) {
 	                        cchar	*srch ;
-
-#if	CF_DEBUGN
-	                        nprintf(NDF,"main: maininfo_srchname()\n") ;
-#endif
-
 	                        if ((rs = maininfo_srchname(mip,&srch)) >= 0) {
-#if	CF_DEBUGN
-	                            nprintf(NDF,"main: srch=%s\n",srch) ;
-#endif
 	                            ex = lib_callcmd(srch,argc,argv,envv,NULL) ;
-#if	CF_DEBUGN
-	                            nprintf(NDF,"main: lib_callcmd() ex=%u\n",
-	                                ex) ;
-#endif
 	                        } /* end if */
-
-#if	CF_DEBUGN
-	                        nprintf(NDF,
-				"main: maininfo_srchname-out rs=%d ex=%u\n",
-				rs,ex) ;
-#endif
-
 	                        rs1 = maininfo_utilend(mip) ;
 	                        if (rs >= 0) rs = rs1 ;
 	                    } /* end if (maininfo-util) */
@@ -221,9 +188,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (lib-main) */
 	            } /* end if (lib_initmemalloc) */
-#if	CF_DEBUGN
-	            nprintf(NDF,"main: sig-end\n") ;
-#endif
 	            rs1 = maininfo_sigend(&mi) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (maininfo-sig) */
@@ -240,10 +204,6 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    ex = mapex(mapexs,rs) ;
 	}
 
-#if	CF_DEBUGN
-	nprintf(NDF,"main: ret rs=%d ex=%u\n",rs,ex) ;
-#endif
-
 	return ex ;
 }
 /* end subroutine (main) */
@@ -251,14 +211,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 /* local subroutines */
 
-
 /* ARGSUSED */
-static void main_sighand(int sn,siginfo_t *sip,void *vcp)
-{
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: sn=%d(%s)\n",sn,strsigabbr(sn)) ;
-#endif
-
+static void main_sighand(int sn,siginfo_t *sip,void *vcp) noex {
 	if (vcp != NULL) {
 	    Dl_info	dl ;
 	    long	ra ;
@@ -285,8 +239,7 @@ static void main_sighand(int sn,siginfo_t *sip,void *vcp)
 }
 /* end subroutine (main_sighand) */
 
-
-static int main_sigdump(siginfo_t *sip)
+static int main_sigdump(siginfo_t *sip) noex {
 {
 	const int	wlen = LINEBUFLEN ;
 	const int	si_signo = sip->si_signo ;
@@ -298,9 +251,6 @@ static int main_sigdump(siginfo_t *sip)
 	const char	*fmt ;
 	char		wbuf[LINEBUFLEN+1] ;
 	char		abuf[16+1] ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: signo=%d\n",si_signo) ;
-#endif
 	switch (si_signo) {
 	case SIGILL:
 	    scs = strsigcode(sigcode_ill,si_code) ;
@@ -323,25 +273,16 @@ static int main_sigdump(siginfo_t *sip)
 	    break ;
 	} /* end switch */
 	fmt = "SIG=%s code=%d(%s) addr=%s\n" ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: bufprintf() sn=%s\n",sn) ;
-#endif
 	wl = bufprintf(wbuf,wlen,fmt,sn,si_code,scs,as) ;
-#if	CF_DEBUGN
-	nprintf(NDF,"main_sighand: bufprintf() rs=%d\n",wl) ;
-#endif
 	write(2,wbuf,wl) ;
 	return 0 ;
 }
 /* end subroutine (main_sigdump) */
 
-
-static cchar *strsigcode(const SIGCODE *scp,int code)
-{
-	int		i ;
+static cchar *strsigcode(const SIGCODE *scp,int code) noex {
 	int		f = FALSE ;
 	cchar		*sn = "UNKNOWN" ;
-	for (i = 0 ; scp[i].code != 0 ; i += 1) {
+	for (int i = 0 ; scp[i].code != 0 ; i += 1) {
 	    f = (scp[i].code == code) ;
 	    if (f) break ;
 	}

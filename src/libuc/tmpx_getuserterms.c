@@ -1,17 +1,17 @@
-/* tmpx_getuserterms */
+/* tmpx_getuserterms SUPPORT */
+/* lang=C20 */
 
 /* get all of the terminals where the given user is logged in */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
-        This subroutine was originally written. It was prompted by the failure
-        of other terminal message programs from finding the proper controlling
-        terminal.
+	This subroutine was originally written. It was prompted by
+	the failure of other terminal message programs from finding
+	the proper controlling terminal.
 
 */
 
@@ -19,66 +19,55 @@
 
 /*******************************************************************************
 
-        This subroutine will find and return the names of all of the controlling
-        terminals for the specified username, if there are any.
+	This subroutine will find and return the names of all of
+	the controlling terminals for the specified username, if
+	there are any.
 
 	Synopsis:
-
 	int tmpx_getuserterms(op,lp,username)
 	TMPX		*op ;
 	VECSTR		*lp ;
 	const char	username[] ;
 
 	Arguments:
-
 	op		pointer to TMPX object
 	lp		pointer to VECSTR to receive terminals
 	username	user to find controlling terminals for
 
 	Returns:
-
-	<0		error
 	>=0		number of entries returned
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<time.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<vecitem.h>
 #include	<tmpx.h>
 #include	<storebuf.h>
+#include	<mkpath.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 #define	DEVDNAME	"/dev/"
-
 #define	TERMENTRY	struct xtermentry
 
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* local structures */
 
 TERMENTRY {
-	const char	*devpath ;
+	cchar		*devpath ;
 	time_t		atime ;
 } ;
 
@@ -98,15 +87,13 @@ static int	revsortfunc(TERMENTRY **,TERMENTRY **) ;
 
 /* exported subroutines */
 
-
-int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username)
-{
+int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
 	VECITEM		el ;
 	int		rs ;
 	int		rs1 ;
 	int		ddnl ;
 	int		n = 0 ;
-	const char	*devdname = DEVDNAME ;
+	cchar		*devdname = DEVDNAME ;
 	char		termfname[MAXPATHLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -125,7 +112,7 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username)
 	    TERMENTRY		*ep ;
 	    TMPX_ENT		ue ;
 	    TMPX_CUR		cur ;
-	    const int		llen = TMPX_LLINE ;
+	    cint		llen = TMPX_LLINE ;
 	    int			i ;
 	    int			f ;
 
@@ -154,16 +141,14 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username)
 
 	            if ((rs1 = getatime(termfname,&ti_access)) >= 0) {
 	                TERMENTRY	te ;
-			const int	ti = ti_access ;
-
+			cint		ti = ti_access ;
 	                if ((rs = entry_start(&te,termfname,tlen,ti)) >= 0) {
-	                    const int	esize = sizeof(TERMENTRY) ;
+	                    cint	esize = sizeof(TERMENTRY) ;
 	                    n += 1 ;
 	                    rs = vecitem_add(&el,&te,esize) ;
 	                    if (rs < 0) 
 				entry_finish(&te) ;
 			}
-
 	            } /* end if (we had a better one) */
 
 	        } /* end while (looping through entries) */
@@ -211,9 +196,7 @@ static int entry_start(TERMENTRY *ep,char *fp,int fl,time_t t) noex {
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_finish(TERMENTRY *ep)
-{
+static int entry_finish(TERMENTRY *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -229,10 +212,8 @@ static int entry_finish(TERMENTRY *ep)
 }
 /* end subroutine (entry_finish) */
 
-
-static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl)
-{
-	const int	rlen = MAXPATHLEN ;
+static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
+	cint		rlen = MAXPATHLEN ;
 	int		rs ;
 	int		len = ddnl ;
 
@@ -243,13 +224,10 @@ static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl)
 }
 /* end subroutine (mktermfname) */
 
-
-static int getatime(cchar *termdev,time_t *rp)
-{
-	struct ustat	sb ;
+static int getatime(cchar *termdev,time_t *rp) noex {
+	USTAT		sb ;
 	int		rs ;
 	int		f = TRUE ;
-
 	*rp = 0 ;
 	if ((rs = u_stat(termdev,&sb)) >= 0) {
 	    *rp = sb.st_atime ;
@@ -257,14 +235,11 @@ static int getatime(cchar *termdev,time_t *rp)
 	        f = FALSE ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (getatime) */
 
-
-static int revsortfunc(TERMENTRY **f1pp,TERMENTRY **f2pp)
-{
+static int revsortfunc(TERMENTRY **f1pp,TERMENTRY **f2pp) noex {
 	int		rc = 0 ;
 	if ((f1pp != NULL) || (f2pp != NULL)) {
 	    if (f1pp != NULL) {
