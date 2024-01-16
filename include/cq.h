@@ -34,7 +34,7 @@
 
 
 struct cq_head {
-	vechand		q ;
+	vechand		*qp ;
 	uint		magic ;
 } ;
 
