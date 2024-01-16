@@ -29,6 +29,7 @@
 #include	<sys/stat.h>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
+#include	<algorithm>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<nulstr.h>
@@ -44,12 +45,12 @@
 
 /* local namespaces */
 
+using std::min ;			/* subroutine-template */
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
 
 
 /* external subroutines */
@@ -302,10 +303,11 @@ static int vcmpname(cvoid **v1pp,cvoid **v2pp) noex {
 	        if (e1p) {
 		    rc = -1 ;
 	            if (e2p) {
+		        cint	ml = min(e1p->namelen,e2p->namelen) ;
 			cint	ch1 = mkchar(e1p->name[0]) ;
 			cint	ch2 = mkchar(e2p->name[0]) ;
 			if ((rc = (ch1 - ch2)) == 0) {
-	                    rc = strcmp(e1p->name,e2p->name) ;
+	                    rc = strncmp(e1p->name,e2p->name,ml) ;
 			}
 		    }
 	        }

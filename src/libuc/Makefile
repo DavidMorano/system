@@ -1041,7 +1041,7 @@ nlsdialassist.o:	nlsdialassist.c nlsdialassist.h dialopts.h
 plainq.o:		plainq.cc plainq.h
 q.o:			q.cc q.h plainq.h
 aiq.o:			aiq.cc aiq.h q.h
-pq.o:			pq.c pq.h
+pq.o:			pq.cc pq.h
 ciq.o:			ciq.cc ciq.h pq.h
 piq.o:			piq.cc piq.h pq.h
 cq.o:			cq.cc cq.h

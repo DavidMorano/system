@@ -39,7 +39,7 @@ struct aiq_entry {
 } ;
 
 struct aiq_head {
-	q		qo ;
+	q		*qp ;
 	uint		magic ;
 } ;
 
