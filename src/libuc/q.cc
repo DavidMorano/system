@@ -73,7 +73,7 @@ static inline int q_ctor(q *op,Args ... args) noex {
 }
 /* end subroutine (q_ctor) */
 
-static int q_dtor(q *op) noex {
+static inline int q_dtor(q *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;

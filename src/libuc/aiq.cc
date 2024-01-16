@@ -77,7 +77,7 @@ static inline int aiq_ctor(aiq *op,Args ... args) noex {
 }
 /* end subroutine (aiq_ctor) */
 
-static int aiq_dtor(aiq *op) noex {
+static inline int aiq_dtor(aiq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -91,7 +91,7 @@ static int aiq_dtor(aiq *op) noex {
 /* end subroutine (aiq_dtor) */
 
 template<typename ... Args>
-static inline int aiq_magic(aiq *op,Args ... args) noex {
+static int aiq_magic(aiq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == AIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;

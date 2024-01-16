@@ -19,13 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<pq.h>
-#include	<localmisc.h>
 
 
 #define	PIQ		struct piq_head
@@ -39,8 +35,8 @@ struct piq_ent {
 } ;
 
 struct piq_head {
-	ptm		m ;
-	pq		frees ;
+	ptm		*mxp ;
+	pq		*freep ;
 	uint		magic ;
 } ;
 
@@ -48,12 +44,12 @@ typedef	PIQ		piq ;
 
 EXTERNC_begin
 
-extern int piq_start(PIQ *) noex ;
-extern int piq_ins(PIQ *,void *) noex ;
-extern int piq_rem(PIQ *,void *) noex ;
-extern int piq_count(PIQ *) noex ;
-extern int piq_audit(PIQ *) noex ;
-extern int piq_finish(PIQ *) noex ;
+extern int piq_start(piq *) noex ;
+extern int piq_ins(piq *,void *) noex ;
+extern int piq_rem(piq *,void *) noex ;
+extern int piq_count(piq *) noex ;
+extern int piq_audit(piq *) noex ;
+extern int piq_finish(piq *) noex ;
 
 EXTERNC_end
 

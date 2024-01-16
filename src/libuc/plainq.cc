@@ -66,7 +66,7 @@ typedef plainq_ent	*entp ;
 /* forward references */
 
 template<typename ... Args>
-static inline int plainq_magic(plainq *op,Args ... args) noex {
+static int plainq_magic(plainq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == PLAINQ_MAGIC) ? SR_OK : SR_NOTOPEN ;

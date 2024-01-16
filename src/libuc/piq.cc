@@ -1,4 +1,4 @@
-/* piq */
+/* piq SUPPORT */
 /* lang=C++20 */
 
 /* pointer interlocked queue */
@@ -23,16 +23,23 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<pq.h>
-#include	<localmisc.h>
 
 #include	"piq.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -46,7 +53,42 @@
 
 /* forward references */
 
-static int	pq_finishup(pq *) noex ;
+template<typename ... Args>
+static inline int piq_ctor(piq *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    if ((op->mxp = new(nothrow) ptm) != np) {
+	        if ((op->freep = new(nothrow) pq) != np) {
+		    rs = SR_OK ;
+	        } /* end if (new-pq) */
+		if (rs < 0) {
+		    delete op->mxp ;
+		    op->mxp = nullptr ;
+	        }
+	    } /* end if (new-ptm) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (piq_ctor) */
+
+static inline int piq_dtor(piq *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->freep) {
+		delete op->freep ;
+		op->freep = nullptr ;
+	    }
+	    if (op->mxp) {
+		delete op->mxp ;
+		op->mxp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (piq_dtor) */
 
 template<typename ... Args>
 static inline int piq_magic(piq *op,Args ... args) noex {
@@ -57,54 +99,66 @@ static inline int piq_magic(piq *op,Args ... args) noex {
 	return rs ;
 }
 
+static int	pq_finishup(pq *) noex ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-int piq_start(piq *qhp) noex {
+int piq_start(piq *op) noex {
 	int		rs = SR_FAULT ;
-	if (qhp) {
-	    if ((rs = ptm_create(&qhp->m,nullptr)) >= 0) {
-	        if ((rs = pq_start(&qhp->frees)) >= 0) {
-		    qhp->magic = PIQ_MAGIC ;
+	if ((rs = piq_ctor(op)) >= 0) {
+	    if ((rs = ptm_create(op->mxp,nullptr)) >= 0) {
+	        if ((rs = pq_start(op->freep)) >= 0) {
+		    op->magic = PIQ_MAGIC ;
 	        }
 	        if (rs < 0)
-		    ptm_destroy(&qhp->m) ;
+		    ptm_destroy(op->mxp) ;
 	    }
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		piq_dtor(op) ;
+	    }
+	} /* end if (piq_ctor) */
 	return rs ;
 }
 /* end subroutine (piq_start) */
 
-int piq_finish(piq *qhp) noex {
+int piq_finish(piq *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = piq_magic(qhp)) >= 0) {
-	        {
-	            rs1 = pq_finishup(&qhp->frees) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        {
-	            rs1 = ptm_destroy(&qhp->m) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        qhp->magic = 0 ;
+	if ((rs = piq_magic(op)) >= 0) {
+	    {
+	        rs1 = pq_finishup(op->freep) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ptm_destroy(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = piq_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (piq_finish) */
 
-int piq_ins(piq *qhp,void *vp) noex {
+int piq_ins(piq *op,void *vp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = piq_magic(qhp,vp)) >= 0) {
-	        if ((rs = ptm_lock(&qhp->m)) >= 0) {
+	if ((rs = piq_magic(op,vp)) >= 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
 	            {
 		        pq_ent	*pep = (pq_ent *) vp ;
-	                rs = pq_ins(&qhp->frees,pep) ;
+	                rs = pq_ins(op->freep,pep) ;
 	                c = rs ;
 	            }
-	            rs1 = ptm_unlock(&qhp->m) ;
+	            rs1 = ptm_unlock(op->mxp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
 	} /* end if (magic) */
@@ -112,19 +166,19 @@ int piq_ins(piq *qhp,void *vp) noex {
 }
 /* end subroutine (piq_ins) */
 
-int piq_rem(piq *qhp,void *vrp) noex {
+int piq_rem(piq *op,void *vrp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = piq_magic(qhp)) >= 0) {
+	if ((rs = piq_magic(op)) >= 0) {
 	    pq_ent	*pep{} ;
 	    void	**vpp = (void **) vrp ;
-	    if ((rs = ptm_lock(&qhp->m)) >= 0) {
-	            if ((rs = pq_remtail(&qhp->frees,&pep)) >= 0) {
+	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	            if ((rs = pq_remtail(op->freep,&pep)) >= 0) {
 	                c = rs ;
 	                if (vpp) *vpp = pep ;
 	            }
-	            rs1 = ptm_unlock(&qhp->m) ;
+	            rs1 = ptm_unlock(op->mxp) ;
 		    if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
 	} /* end if (magic) */
@@ -132,17 +186,17 @@ int piq_rem(piq *qhp,void *vrp) noex {
 }
 /* end subroutine (piq_rem) */
 
-int piq_count(piq *qhp) noex {
+int piq_count(piq *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = piq_magic(qhp)) >= 0) {
-	        if ((rs = ptm_lock(&qhp->m)) >= 0) {
+	if ((rs = piq_magic(op)) >= 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
 	            {
-	                rs = pq_count(&qhp->frees) ;
+	                rs = pq_count(op->freep) ;
 	                c = rs ;
 	            }
-	            rs1 = ptm_unlock(&qhp->m) ;
+	            rs1 = ptm_unlock(op->mxp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
 	} /* end if (magic) */
@@ -150,17 +204,17 @@ int piq_count(piq *qhp) noex {
 }
 /* end subroutine (piq_count) */
 
-int piq_audit(piq *qhp) noex {
+int piq_audit(piq *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = piq_magic(qhp)) >= 0) {
-	        if ((rs = ptm_lock(&qhp->m)) >= 0) {
+	if ((rs = piq_magic(op)) >= 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
 	            {
-	                rs = pq_audit(&qhp->frees) ;
+	                rs = pq_audit(op->freep) ;
 		        c = rs ;
     	            }
-	            rs1 = ptm_unlock(&qhp->m) ;
+	            rs1 = ptm_unlock(op->mxp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex) */
 	} /* end if (magic) */

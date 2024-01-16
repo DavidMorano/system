@@ -62,7 +62,7 @@ static inline int cq_ctor(cq *op,Args ... args) noex {
 }
 /* end subroutine (cq_ctor) */
 
-static int cq_dtor(cq *op) noex {
+static inline int cq_dtor(cq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -76,7 +76,7 @@ static int cq_dtor(cq *op) noex {
 /* end subroutine (cq_dtor) */
 
 template<typename ... Args>
-static inline int cq_magic(cq *op,Args ... args) noex {
+static int cq_magic(cq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == CQ_MAGIC) ? SR_OK : SR_NOTOPEN ;

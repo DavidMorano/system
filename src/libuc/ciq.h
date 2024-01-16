@@ -1,7 +1,7 @@
 /* ciq HEADER */
 /* lang=C++20 */
 
-/* container interlocked queue */
+/* circular (really doubly linked) interlocked queue */
 /* version %I% last-modified %G% */
 
 

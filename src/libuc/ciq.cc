@@ -1,7 +1,7 @@
 /* ciq SUPPORT */
 /* lang=C++20 */
 
-/* container interlocked queue */
+/* circular (really doubly linked) interlocked queue */
 /* version %I% last-modified %G% */
 
 
@@ -93,7 +93,7 @@ static inline int ciq_ctor(ciq *op,Args ... args) noex {
 }
 /* end subroutine (ciq_ctor) */
 
-static int ciq_dtor(ciq *op) noex {
+static inline int ciq_dtor(ciq *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -114,9 +114,8 @@ static int ciq_dtor(ciq *op) noex {
 }
 /* end subroutine (ciq_dtor) */
 
-
 template<typename ... Args>
-static inline int ciq_magic(ciq *op,Args ... args) noex {
+static int ciq_magic(ciq *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == CIQ_MAGIC) ? SR_OK : SR_NOTOPEN ;
