@@ -179,15 +179,15 @@ OBJ071= isnot.o iserror.o isoneof.o
 
 OBJ072= filebuf.o filebuf_writers.o filebuf_mailsupport.o
 OBJ073= inetpton.o xperm.o getprogpath.o findxfile.o xfile.o
-OBJ074= vecstr.o vecstr_adduniqs.o vecstr_addpath.o
-OBJ075= vecstr_env.o vecstr_envfile.o vecstr_loadfile.o
-OBJ076= vecpstr.o vecpstr_loadfile.o vecpstr_addpath.o
-OBJ077= vecpstr_envadd.o vecpstr_envfile.o
+OBJ074=
+OBJ075=
+OBJ076=
+OBJ077=
 OBJ078= pta.o ptm.o ptma.o ptc.o ptca.o psem.o lockrw.o envhelp.o
 OBJ079= storeitem.o storebuf.o buffer.o field.o char.o mkprogenv.o
 
 OBJ080= fsdir.o pmq.o sigblock.o userattr.o filemap.o uname.o 
-OBJ081= vechand.o vecsorthand.o vecobj.o vecelem.o recarr.o
+OBJ081=
 OBJ082= envlist.o hdb.o lookaside.o ids.o linefold.o nulstr.o 
 OBJ083= dirseen.o dirseen_not.o
 OBJ084= strpack.o strmgr.o strtab.o
@@ -667,22 +667,6 @@ character.o:	$(OBJ_CHAR)
 	$(LD) -r -o $@ $(OBJ_CHAR)
 
 
-# QUEUE
-OBJA_QUEUE= plainq.o q.o aiq.o
-OBJB_QUEUE= pq.o ciq.o piq.o cq.o
-
-OBJ_QUEUE= obja_queue.o objb_queue.o
-
-obja_queue.o:	$(OBJA_QUEUE)
-	$(LD) -r -o $@ $(OBJA_QUEUE)
-
-objb_queue.o:	$(OBJB_QUEUE)
-	$(LD) -r -o $@ $(OBJB_QUEUE)
-
-queue.o:	$(OBJ_QUEUE)
-	$(LD) -r -o $@ $(OBJ_QUEUE)
-
-
 # SYSMISC
 ucsysmisc.o:		ucsysmisc.cc
 ucnprocs.o:		ucnprocs.cc
@@ -835,34 +819,6 @@ filebuf_writers.o:	filebuf_writers.cc filebuf.h
 filebuf_mailsupport.o:	filebuf_mailsupport.c filebuf.h
 
 varray.o:		varray.cc varray.h
-
-recarr.o:		recarr.cc recarr.h
-raqhand.o:		raqhand.cc raqhand.h
-vechand.o:		vechand.cc vechand.h
-vecsorthand.o:		vecsorthand.cc vecsorthand.h
-
-vecstr.o:		vecstr.cc vecstr.h
-vecstr_env.o:		vecstr_env.cc vecstr.h
-vecstr_envfile.o:	vecstr_envfile.cc vecstr.h
-vecstr_adduniqs.o:	vecstr_adduniqs.c vecstr.h
-vecstr_addpath.o:	vecstr_addpath.cc vecstr.h
-vecstr_avmkstr.o:	vecstr_avmkstr.c vecstr.h
-vecstr_loadfile.o:	vecstr_loadfile.cc vecstr.h
-
-vecpstr.o:		vecpstr.cc vecpstr.h
-vecpstr_env.o:		vecpstr_env.cc vecpstr.h
-vecpstr_envfile.o:	vecpstr_envfile.cc vecpstr.h
-vecpstr_adduniqs.o:	vecpstr_adduniqs.c vecpstr.h
-vepcstr_addpath.o:	vecpstr_addpath.cc vecpstr.h
-vecpstr_avmkstr.o:	vecpstr_avmkstr.c vecpstr.h
-vecpstr_loadfile.o:	vecpstr_loadfile.cc vecpstr.h
-vecpstr_loadgrpusers.o:	vecpstr_loadgrusers.cc vecpstr.h
-vecpstr_loadpjusers.o:	vecpstr_loadpjusers.cc vecpstr.h
-vecpstr_addsubdirs.o:	vecpstr_addsubdirs.cc vecpstr.h
-
-vecobj.o:		vecobj.cc vecobj.h
-vecelem.o:		vecelem.cc vecelem.h
-vecitem.o:		vecitem.cc vecitem.h
 
 hdb.o:			hdb.cc hdb.h
 
@@ -1036,16 +992,6 @@ dialtcpmux.o:		dialtcpmux.c dialopts.h
 dialtcpnls.o:		dialtcpnls.c nlsdialassist.h dialopts.h
 dialfinger.o:		dialfinger.c dialopts.h
 nlsdialassist.o:	nlsdialassist.c nlsdialassist.h dialopts.h
-
-# QUEUE
-plainq.o:		plainq.cc plainq.h
-q.o:			q.cc q.h plainq.h
-aiq.o:			aiq.cc aiq.h q.h
-pq.o:			pq.cc pq.h
-ciq.o:			ciq.cc ciq.h pq.h
-piq.o:			piq.cc piq.h pq.h
-cq.o:			cq.cc cq.h
-
 
 opensysfs.o:		opensysfs.cc opensysfs.h
 
@@ -1243,6 +1189,11 @@ mkfile.dir:
 # EMA
 ema.o:		ema.dir
 ema.dir:
+	makesubdir $@
+
+# QUEUE
+queue.o:		queue.dir
+queue.dir:
 	makesubdir $@
 
 # UCINET

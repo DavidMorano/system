@@ -1,7 +1,7 @@
 /* dirseen SUPPORT */
 /* lang=C++20 */
 
-/* directory list manager */
+/* unique directory manager */
 /* version %I% last-modified %G% */
 
 
@@ -24,8 +24,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
@@ -64,7 +62,6 @@ namespace {
 	ino_t		ino ;
 	dev_t		dev ;
 	int		namelen ;
-	uint		f_stat:1 ;
 	dirseen_ent() noex : name(nullptr), namelen(0), dev(0L), ino(0L) { } ;
 	dirseen_ent(cchar *sp,int sl = -1) noex : name(sp) {
 	    if (sl < 0) sl = strlen(sp) ;
@@ -110,9 +107,10 @@ int dirseen_start(dirseen *op) noex {
 	    op->magic = 0 ;
 	    op->strsize = 0 ;
 	    if ((op->dlistp = new(nothrow) vecobj) != nullptr) {
+		cint	ne = DIRSEEN_NDEF ;
 	        cint	vo = 0 ;
 	        cint	esz = sizeof(dirseen_ent) ;
-	        if ((rs = vecobj_start(op->dlistp,esz,DIRSEEN_NDEF,vo)) >= 0) {
+	        if ((rs = vecobj_start(op->dlistp,esz,ne,vo)) >= 0) {
 	            op->magic = DIRSEEN_MAGIC ;
 	        } /* end if  */
 		if (rs < 0) {
@@ -151,53 +149,42 @@ int dirseen_finish(dirseen *op) noex {
 }
 /* end subroutine (dirseen_finish) */
 
-int dirseen_add(dirseen *op,cchar *dbuf,int dlen,USTAT *sbp) noex {
+int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 	int		rs ;
-	if ((rs = dirseen_magic(op,dbuf,sbp)) >= 0) {
-	    dirseen_ent	e ;
-	    dev_t	dev = 0 ;
-	    ino_t	ino = 0 ;
-	    int		pl ;
-	    cchar	*pp ;
-	    if (dlen < 0) dlen = strlen(dbuf) ;
+	if ((rs = dirseen_magic(op,sp,sbp)) >= 0) {
+	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
+	    nullptr_t		np{} ;
+	    cint		rsn = SR_NOTFOUND ;
+	    if ((rs = vecobj_search(op->dlistp,&e,vcmpdevino,np)) == rsn) {
+	        dev_t	dev = sbp->st_dev ;
+	        ino_t	ino = sbp->st_ino ;
+	        int	pl = sl ;
+	        cchar	*pp = sp ;
 /* any NUL (blank) paths need to be converted to "." */
-	    pp = dbuf ;
-	    pl = dlen ;
-	    if (pl == 0) {
-	        pp = "." ;
-	        pl = 1 ;
-	    }
-/* enter it */
-	    if (sbp != nullptr) {
-	        dev = sbp->st_dev ;
-	        ino = sbp->st_ino ;
-	    }
-	    if ((rs = entry_start(&e,pp,pl,dev,ino)) >= 0) {
-	        op->strsize += rs ;
-	        rs = vecobj_add(op->dlistp,&e) ;
-	        if (rs < 0) {
-		    entry_finish(&e) ;
-		}
-	    } /* end if (entry_start) */
+	        if (pl == 0) {
+	            pp = "." ;
+	            pl = 1 ;
+	        } else {
+	            if (pl < 0) pl = strlen(pp) ;
+	 	}
+	        if ((rs = entry_start(&e,pp,pl,dev,ino)) >= 0) {
+	            op->strsize += rs ;
+	            rs = vecobj_add(op->dlistp,&e) ;
+	            if (rs < 0) {
+		        entry_finish(&e) ;
+		    }
+	        } /* end if (entry_start) */
+	    } /* end if (vecobj_search) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dirseen_add) */
 
-int dirseen_havename(dirseen *op,cchar *np,int nl) noex {
+int dirseen_havename(dirseen *op,cchar *sp,int sl) noex {
 	int		rs ;
-	int		rs1 ;
-	if ((rs = dirseen_magic(op,np)) >= 0) {
-	    nulstr	s ;
-	    cchar	*name = nullptr ;
-	    if ((rs = nulstr_start(&s,np,nl,&name)) >= 0) {
-	        {
-	            dirseen_ent		e(name) ;
-	            rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
-	        }
-	        rs1 = nulstr_finish(&s) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (nulstr) */
+	if ((rs = dirseen_magic(op,sp)) >= 0) {
+	    dirseen_ent		e(sp,sl) ;
+	    rs = vecobj_search(op->dlistp,&e,vcmpname,nullptr) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -262,13 +249,12 @@ int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-int entry_start(dirseen_ent *ep,cchar *np,int nl,dev_t dev,ino_t ino) noex {
+int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
-	cchar		*cp ;
-	memclear(ep) ;
+	cchar		*cp{} ;
 	ep->dev = dev ;
 	ep->ino = ino ;
-	if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
+	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	    ep->name = cp ;
 	    ep->namelen = rs ;
 	}

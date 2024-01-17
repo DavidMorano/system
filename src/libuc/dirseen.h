@@ -1,7 +1,7 @@
 /* dirseen HEADER */
 /* lang=C20 */
 
-/* directory list manager */
+/* unique directory manager */
 /* version %I% last-modified %G% */
 
 
@@ -20,8 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<localmisc.h>

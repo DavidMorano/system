@@ -1,5 +1,5 @@
 /* vecstr_foilcmp SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* perform a foil comparison of two VECSTR lists */
 /* version %I% last-modified %G% */
@@ -22,7 +22,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -36,12 +37,12 @@
 
 int vecstr_foilcmp(vecstr *lnp,vecstr *rnp) noex {
 	int	rs = SR_FAULT ;
-	int	f_match = FALSE ;
+	int	f_match = false ;
 	if (lnp && rnp) {
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    for (int i = 0 ; (rs = vecstr_get(lnp,i,&cp)) >= 0 ; i += 1) {
 	        if (cp) {
-	            cchar	*np ;
+	            cchar	*np{} ;
 	            for (int j = 0 ; vecstr_get(rnp,j,&np) >= 0 ; j += 1) {
 		        if (np) {
 	        	    f_match = (cp[0] == np[0]) && (strcmp(cp,np) == 0) ;

@@ -1,7 +1,7 @@
-/* vecobj_stringsort SUPPORT */
-/* lang=C20 */
+/* vecobj_hsort SUPPORT */
+/* lang=C++20 */
 
-/* vector object list operations (stringsort) */
+/* vector object list operations (heapsort) */
 /* version %I% last-modified %G% */
 
 
@@ -28,8 +28,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -39,30 +39,43 @@
 /* local defines */
 
 
+/* external subroutines */
+
+extern "C" {
+   typedef int (*heapsort_cf)(cvoid *,cvoid *) noex ;
+}
+
+
 /* forward references */
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int vecobj_stringsort(vecobj *op,int (*cmpfunc)()) noex {
+int vecobj_hsort(vecobj *op,vecobj_vcmp cmpfunc) noex {
 	int		rs = SR_FAULT ;
 	if (op && cmpfunc) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
+		rs = SR_OK ;
 	        if (! op->f.issorted) {
 	            op->f.issorted = true ;
 	            if (op->c > 1) {
-	                stringsort(op->va,op->i,cmpfunc) ;
+			heapsort_cf	hcf = heapsort_cf(cmpfunc) ;
+			cint		esz = op->esize ;
+	                heapsort(op->va,op->i,esz,hcf) ;
 	            }
-	        }
-	        rs = op->c ;
+	        } /* end if (sorting needed) */
+		rs = op->c ;
 	    } /* end if (open) */
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (vecobj_stringsort) */
+/* end subroutine (vecobj_hsort) */
 
 
