@@ -57,23 +57,23 @@
 
 /* exported subroutines */
 
-int vecobj_recipadd(vecobj *op,cchar *np,int nl) noex {
+int vecobj_recipadd(vecobj *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	if (nl < 0) nl = strlen(np) ;
-	if (nl > 0) {
+	if (sl < 0) sl = strlen(sp) ;
+	if (sl > 0) {
 	    bool	f ;
 	    void	*vp{} ;
 	    for (int i = 0 ; (rs = vecobj_get(op,i,&vp)) >= 0 ; i += 1) {
 	        if (vp) {
 	            RECIP	*rp = (RECIP *) vp ;
-	            f = recip_match(rp,np,nl) ;
+	            f = recip_match(rp,sp,sl) ;
 	            if (f) break ;
 	        }
 	    } /* end for */
 	    if (rs == SR_NOTFOUND) {
 	        RECIP	re ;
-	        if ((rs = recip_start(&re,np,nl)) >= 0) {
+	        if ((rs = recip_start(&re,sp,sl)) >= 0) {
 		    c = 1 ;
 	            rs = vecobj_add(op,&re) ;
 	            if (rs < 0) {

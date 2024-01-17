@@ -57,12 +57,18 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+int		tmpx_close(tmpx *) noex ;
 
 
 /* forward references */
-
-int		tmpx_close(tmpx *) noex ;
 
 template<typename ... Args>
 static inline int tmpx_magic(tmpx *op,Args ... args) noex {

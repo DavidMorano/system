@@ -1,7 +1,8 @@
-/* b_makesafe */
+/* b_makesafe SPUPPORT */
+/* lang=C20 */
 
 /* generic short program front-end */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -13,16 +14,16 @@
 #define	CF_WRFILE	0		/* compile |wrfile()| */
 #define	CF_DISPABORT	0		/* compile |disp_abort()| */
 
-
 /* revision history:
 
 	= 2004-05-14, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did. It used pieces from other (similar in some ways)
-        programs. It is linted out and should be very clean -- we depend on this
-        everyday to do what we need. Pieces not used in their full like where
-        they originally were, are sort of hacked up to minimal code. Try not to
-        get your knickers in a bunch over that.
+	The program was written from scratch to do what the previous
+	program by the same name did. It used pieces from other
+	(similar in some ways) programs. It is linted out and should
+	be very clean -- we depend on this everyday to do what we
+	need. Pieces not used in their full like where they originally
+	were, are sort of hacked up to minimal code. Try not to get
+	your knickers in a bunch over that.
 
 */
 
@@ -30,15 +31,14 @@
 
 /*******************************************************************************
 
-        This is the main subroutine for MAKESAFE. This was a fairly generic
-        subroutine adpapted for this program. Note that parallel processing is
-        enabled by default. If you do not want parallel processing for some
-        reason use the '-o' invocation option to set the maximum parallelism to
-        '1'.
+	This is the main subroutine for MAKESAFE. This was a fairly
+	generic subroutine adpapted for this program. Note that
+	parallel processing is enabled by default. If you do not
+	want parallel processing for some reason use the '-o'
+	invocation option to set the maximum parallelism to '1'.
 
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -353,22 +353,6 @@ static int	wrfile(cchar *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"sn",
-	"af",
-	"ef",
-	"of",
-	"if",
-	"cpp",
-	"jd",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -383,6 +367,22 @@ enum argopts {
 	argopt_cpp,
 	argopt_jd,
 	argopt_overlast
+} ;
+
+static const char	*argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"sn",
+	"af",
+	"ef",
+	"of",
+	"if",
+	"cpp",
+	"jd",
+	NULL
 } ;
 
 static const PIVARS	initvars = {
@@ -407,16 +407,6 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*aknames[] = {
-	"cache",
-	"cpp",
-	"npar",
-	"parallel",
-	"debug",
-	"maint",
-	NULL
-} ;
-
 enum aknames {
 	akname_cache,
 	akname_cpp,
@@ -425,6 +415,16 @@ enum aknames {
 	akname_debug,
 	akname_maint,
 	akname_overlast
+} ;
+
+static const char	*aknames[] = {
+	"cache",
+	"cpp",
+	"npar",
+	"parallel",
+	"debug",
+	"maint",
+	NULL
 } ;
 
 static const char	*progcpps[] = {
@@ -448,11 +448,12 @@ static const char	*deps[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int b_makesafe(int argc,cchar *argv[],void *contextp)
-{
+int b_makesafe(int argc,cchar *argv[],void *contextp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ex = EX_OK ;
@@ -470,9 +471,7 @@ int b_makesafe(int argc,cchar *argv[],void *contextp)
 }
 /* end subroutine (b_makesafe) */
 
-
-int p_makesafe(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+int p_makesafe(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	return mainsub(argc,argv,envv,contextp) ;
 }
 /* end subroutine (p_makesafe) */
@@ -480,10 +479,8 @@ int p_makesafe(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* local subroutines */
 
-
 /* ARGSUSED */
-static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
-{
+static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	PROGINFO	pi, *pip = &pi ;
 	LOCINFO		li, *lip = &li ;
 	ARGINFO		ainfo ;

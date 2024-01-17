@@ -117,8 +117,8 @@ struct tmpx_head {
 	int		mapen ;		/* number of mapped entries */
 } ;
 
-typedef tmpx_head	tmpx ;
-typedef tmpx_cursor	tmpx_cur ;
+typedef TMPX		tmpx ;
+typedef TMPX_CUR	tmpx_cur ;
 typedef TMPX_ENT	tmpx_ent ;
 
 EXTERNC_begin

@@ -30,7 +30,7 @@
 #include	<sys/types.h>
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- |memcmp(3c)| */
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>
@@ -612,7 +612,6 @@ int vecobj_search(vecobj *op,void *ep,vecobj_vcmp vcf,void *vrp) noex {
 	if (op && ep && vcf) {
 	    rs = SR_NOTOPEN ;
 	    if (op->va) {
-	        rawc_f	raw = rawc_f(vcf) ;
 	        void	**rpp = (void **) vrp ;
 		rs = SR_OK ;
 	        if (op->f.osorted && (! op->f.issorted)) {
@@ -634,6 +633,7 @@ int vecobj_search(vecobj *op,void *ep,vecobj_vcmp vcf,void *vrp) noex {
 	                i = ((char **) rpp2) - ((char **) op->va) ;
 	            }
 	        } else {
+	            rawc_f	raw = rawc_f(vcf) ;
 	            for (i = 0 ; i < op->i ; i += 1) {
 	                if (op->va[i]) {
 	                    if (raw(&ep,(op->va + i)) == 0) break ;
