@@ -1,13 +1,10 @@
-/* openqotd */
+/* openqotd SUPPORT */
+/* lang=C20 */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUGN	0		/* special debugging */
 #define	CF_OPENMASK	0		/* use |openmask()| */
-
 
 /* revision history:
 
@@ -20,31 +17,26 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	openqotd
 
-	We open a QOTD quote-file and return a file-descriptor to it (which
-	must be eventually closed).  The quote-file is identified by its
-	Modified-Julian-Day (MJD).
+	Description:
+	We open a QOTD quote-file and return a file-descriptor to
+	it (which must be eventually closed).  The quote-file is
+	identified by its Modified-Julian-Day (MJD).
 
 	Synopsis:
-
-	int openqotd(pr,mjd,of,to)
-	cchar		*pr ;
-	int		mjd ;
-	int		of ;
-	int		to ;
+	int openqotd(cchar *pr,int mjd,int of,int to) noex
 
 	Arguments:
-
 	pr		program-root
 	mjd		modified-julian-day
 	of		open-flags
 	to		time-out
 
 	Returns:
-
-	<0		error
 	>=0		FD of QOTD
+	<0		error (system-return)
 
 	Notes:
 
@@ -100,29 +92,27 @@
 
 	Q. How did we create a mutual-exclusion lock around the
 	|lockfile()| subroutine?
-	A. We created our own mutual-exclusion lock with our implementation
-	consisting of |openqotd_capbegin()| and |openqotd_capend()|.
+	A. We created our own mutual-exclusion lock with our
+	implementation consisting of |openqotd_capbegin()| and
+	|openqotd_capend()|.
 
 	Q. Why didn't we just use |ptm_lock()| and |ptm_unloc()| as
 	our mutual-exclusion lock around |lockfile()|?
 	A. Because:
 	a. it is not a good idea to put POSIX® mutexes around a large
 	piece of code (that calls unknown subroutines)
-	b. the code inside the exclusion zone calls |uc_fork(3uc)| and
-	that would create a deadlock (because of the "fork"-related pre-lock
-	and post-unlock operations)
+	b. the code inside the exclusion zone calls |uc_fork(3uc)|
+	and that would create a deadlock (because of the "fork"-related
+	pre-lock and post-unlock operations)
 
 	Q. This is ridiculously complicated.  Were there not much easier
 	ways to do this?
-	A. Yes.  There are other mutual exlusion mechanisms available for
-	file-system operations.
-
+	A. Yes.  There are other mutual exlusion mechanisms available
+	for file-system operations.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -131,7 +121,6 @@
 #include	<string.h>
 #include	<netdb.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -171,54 +160,6 @@
 
 /* external subroutines */
 
-extern int	snopenflags(char *,int,int) ;
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	pathadd(char *,int,cchar *) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	getaf(cchar *,int) ;
-extern int	getmjd(int,int,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
-extern int	msleep(int) ;
-extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-
-extern int	maintqotd(cchar *,int,int,int) ;
-
-extern int	dialudp(cchar *,char *,int,int,int) ;
-extern int	dialtcp(cchar *,cchar *,int,int,int) ;
-extern int	dialtcpnls(cchar *,cchar *,int,cchar *,int,int) ;
-extern int	dialtcpmux(cchar *,cchar *,int,cchar *,cchar **,int,int) ;
-extern int	dialuss(cchar *,int,int) ;
-extern int	dialussnls(cchar *,cchar *,int,int) ;
-extern int	dialussmux(cchar *,cchar *,cchar **,int,int) ;
-extern int	dialticotsord(cchar *,int,int,int) ;
-extern int	dialticotsordnls(cchar *,int,cchar *,int,int) ;
-extern int	dialpass(cchar *,int,int) ;
-
-extern int	ofWritable(int) ;
-extern int	isprintlatin(int) ;
-extern int	hasNotDots(cchar *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strcpylc(char *,cchar *) ;
-extern char	*strcpyuc(char *,cchar *) ;
-extern char	*timestr_log(time_t,char *) ;
-
 
 /* external variables */
 
@@ -226,8 +167,8 @@ extern char	*timestr_log(time_t,char *) ;
 /* local structures */
 
 struct openqotd_head {
-	PTM		m ;		/* data mutex */
-	PTC		c ;		/* condition variable */
+	ptm		m ;		/* data mutex */
+	ptc		c ;		/* condition variable */
 	volatile int	waiters ;
 	volatile int	f_capture ;	/* capture flag */
 	volatile int	f_init ;	/* race-condition, blah, blah */
@@ -249,7 +190,7 @@ struct openqotd_sub {
 /* forward references */
 
 int		openqotd_init() ;
-void		openqotd_fini() ;
+intd		openqotd_fini() ;
 
 static int	openqotd_capbegin(int) ;
 static int	openqotd_capend() ;
@@ -277,14 +218,12 @@ static void	openqotd_atforkafter() ;
 
 /* local variables */
 
-static OPENQOTD		openqotd_data ; /* zero-initialized */
+static OPENQOTD		openqotd_data ;
 
 
 /* exported subroutines */
 
-
-int openqotd_init()
-{
+int openqotd_init() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs = 1 ;
 	if (! uip->f_init) {
@@ -314,9 +253,7 @@ int openqotd_init()
 }
 /* end subroutine (openqotd_init) */
 
-
-void openqotd_fini()
-{
+int openqotd_fini() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	if (uip->f_initdone) {
 	    uip->f_initdone = FALSE ;
@@ -332,9 +269,7 @@ void openqotd_fini()
 }
 /* end subroutine (openqotd_fini) */
 
-
-int openqotd(cchar *pr,int mjd,int of,int to)
-{
+int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	time_t		dt = 0 ;
 	mode_t		dm = 0777 ;
 	int		rs = SR_OK ;
@@ -345,26 +280,11 @@ int openqotd(cchar *pr,int mjd,int of,int to)
 
 	if (pr == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	{
-	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
-	    debugprintf("openqotd: of=%s\n",obuf) ;
-	}
-#endif /* CF_DEBUGS */
-
 	if (mjd <= 0) {
 	    if (dt == 0) dt = time(NULL) ;
 	    rs = getdefmjd(dt) ;
 	    mjd = rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("openqotd: mjd=%u\n",mjd) ;
-	debugprintf("openqotd: vtmpdname=%s\n",vtmpdname) ;
-	debugprintf("openqotd: qcname=%s\n",qcname) ;
-#endif /* CF_DEBUGS */
-
 
 	if (rs >= 0) {
 	    int		rnl ;
@@ -408,10 +328,6 @@ int openqotd(cchar *pr,int mjd,int of,int to)
 	        rs = SR_NOTDIR ;
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("openqotd: ret rs=%d fd=%u\n",rs,fd) ;
-#endif /* CF_DEBUGS */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (openqotd) */
@@ -419,9 +335,7 @@ int openqotd(cchar *pr,int mjd,int of,int to)
 
 /* local subroutines */
 
-
-static int openqotd_capbegin(int to)
-{
+static int openqotd_capbegin(int to) noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs ;
 	int		rs1 ;
@@ -446,55 +360,38 @@ static int openqotd_capbegin(int to)
 }
 /* end subroutine (openqotd_capbegin) */
 
-
-static int openqotd_capend()
-{
+static int openqotd_capend() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = ptm_lock(&uip->m)) >= 0) {
-
 	    uip->f_capture = FALSE ;
 	    if (uip->waiters > 0) {
 	        rs = ptc_signal(&uip->c) ;
 	    }
-
 	    rs1 = ptm_unlock(&uip->m) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
-
 	return rs ;
 }
 /* end subroutine (openqotd_capend) */
 
-
-static void openqotd_atforkbefore()
-{
+static void openqotd_atforkbefore() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	ptm_lock(&uip->m) ;
 }
 /* end subroutine (openqotd_atforkbefore) */
 
-
-static void openqotd_atforkafter()
-{
+static void openqotd_atforkafter() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	ptm_unlock(&uip->m) ;
 }
 /* end subroutine (openqotd_atforkafter) */
 
-
-static int openqotd_open(OPENQOTD_SUB *sip)
-{
+static int openqotd_open(OPENQOTD_SUB *sip) noex {
 	const mode_t	om = 0666 ;
 	int		rs ;
 	int		fd = -1 ;
-
-#if	CF_DEBUGS
-	debugprintf("openqotd_open: ent qfname=%s\n",sip->qfname) ;
-#endif /* CF_DEBUGS */
-
 	if ((rs = u_open(sip->qfname,sip->of,om)) >= 0) {
 	    fd = rs ;
 	} else if (rs == SR_NOENT) {
@@ -512,20 +409,11 @@ static int openqotd_open(OPENQOTD_SUB *sip)
 	        fd = rs ;
 	    }
 	} /* end if (NOENT) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (openqotd_open) */
 
-
-static int qotdexpire(vtd,rnp,rnl,cn,dt,to)
-cchar		*vtd ;
-cchar		*rnp ;
-int		rnl ;
-cchar		*cn ;
-time_t		dt ;
-int		to ;
-{
+static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -533,20 +421,8 @@ int		to ;
 
 	if (to <= 0) to = TTL_EXPIRE ;
 
-#if	CF_DEBUGS
-	{
-	    char	tbuf[TIMEBUFLEN+1] ;
-	    debugprintf("qotdexpire: ent to=%u\n",to) ;
-	    timestr_log(dt,tbuf) ;
-	    debugprintf("qotdexpire: et=%s\n",tbuf) ;
-	}
-#endif
-
 	if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) {
 	    struct ustat	sb ;
-#if	CF_DEBUGS
-	    debugprintf("qotdexpire: qd=%s\n",qdname) ;
-#endif
 	    if (u_stat(qdname,&sb) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
 	            const int	n = (sb.st_size / 10) ;
@@ -558,10 +434,6 @@ int		to ;
 	                    cchar	*fn ;
 	                    for (i = 0 ; vecpstr_get(&ds,i,&fn) >= 0 ; i += 1) {
 	                        if (fn == NULL) continue ;
-#if	CF_DEBUGS
-	                        debugprintf("qotdexpire: del=%s\n",
-	                            fn) ;
-#endif
 	                        rs1 = u_unlink(fn) ;
 	                        if (rs1 >= 0) c += 1 ;
 	                    } /* end for */
@@ -573,17 +445,11 @@ int		to ;
 	    } /* end if (stat) */
 	} /* end if (mkqdname) */
 
-#if	CF_DEBUGS
-	debugprintf("qotdexpire: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (qotdexpire) */
 
-
-static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to)
-{
+static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	FSDIR		d ;
 	FSDIR_ENT	de ;
 	int		rs ;
@@ -598,24 +464,10 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to)
 	        if (hasNotDots(ep,el)) {
 	            if ((rs = pathadd(qfname,dlen,ep)) >= 0) {
 	                const int	fl = rs ;
-#if	CF_DEBUGS
-	                debugprintf("qotdexpire: qf=%s\n",qfname) ;
-#endif
 	                if (u_stat(qfname,&sb) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
 
-#if	CF_DEBUGS
-	                        {
-	                            char	tbuf[TIMEBUFLEN+1] ;
-	                            timestr_log(sb.st_mtime,tbuf) ;
-	                            debugprintf("qotdexpire: mt=%s\n",tbuf) ;
-	                        }
-#endif
 	                        if ((dt-sb.st_mtime) >= to) {
-#if	CF_DEBUGS
-	                            debugprintf("qotdexpire: "
-	                                "adding=%s\n", de.name) ;
-#endif
 	                            c += 1 ;
 	                            rs = vecpstr_add(dsp,qfname,fl) ;
 	                        } /* end if (expired) */
@@ -633,24 +485,13 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to)
 }
 /* end subroutine (qotdexpireload) */
 
-
 /* ARGSUSED */
-static int qotdfetch(pr,mjd,of,ttl,qfname)
-cchar		*pr ;
-int		mjd ;
-int		of ;
-int		ttl ;
-cchar		*qfname ;
-{
+static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	const mode_t	om = 0664 ;
 	int		rs ;
 	int		rs1 ;
 	int		lof = of ;
 	int		fd = -1 ;
-
-#if	CF_DEBUGS
-	debugprintf("openqotd/qotdfetch: ent mjd=%u\n",mjd) ;
-#endif
 
 	lof &= (~ O_ACCMODE) ;
 	lof &= (~ O_TRUNC) ;
@@ -687,18 +528,12 @@ cchar		*qfname ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (open-) */
 
-#if	CF_DEBUGS
-	debugprintf("openqotd/qotdfetch: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (qotdfetch) */
 
-
 #if	CF_OPENMASK
-static int openmask(cchar *qfname,int of,mode_t om)
-{
+static int openmask(cchar *qfname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -715,26 +550,20 @@ static int openmask(cchar *qfname,int of,mode_t om)
 /* end if (openmask) */
 #endif /* CF_OPENMASK */
 
-
-static int loadchown(cchar *pr,int fd)
-{
-	struct ustat	sb ;
+static int loadchown(cchar *pr,int fd) noex {
+	USTAT		sb ;
 	int		rs ;
-
 	if ((rs = u_stat(pr,&sb)) >= 0) {
 	    uid_t	euid = geteuid() ;
 	    if (euid != sb.st_uid) {
 	        u_fchown(fd,sb.st_uid,sb.st_gid) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (loadchown) */
 
-
-static int getdefmjd(time_t dt)
-{
+static int getdefmjd(time_t dt) noex {
 	TMTIME		ct ;
 	int		rs ;
 	if (dt == 0) dt = time(NULL) ;
@@ -748,15 +577,8 @@ static int getdefmjd(time_t dt)
 }
 /* end subroutine (getdefmjd) */
 
-
-static int mkqdname(rbuf,vtmpdname,rnp,rnl,qcname)
-char		rbuf[] ;
-cchar		vtmpdname[] ;
-cchar		qcname[] ;
-cchar		rnp[] ;
-int		rnl ;
-{
-	const int	rlen = MAXPATHLEN ;
+static int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
+	cint		rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 
@@ -789,21 +611,13 @@ int		rnl ;
 }
 /* end subroutine (mkqdname) */
 
-
-static int mkqfname(rbuf,vtmpdname,rnp,rnl,qcname,mjd)
-char		rbuf[] ;
-cchar		vtmpdname[] ;
-cchar		qcname[] ;
-cchar		rnp[] ;
-int		rnl ;
-int		mjd ;
-{
-	const int	rlen = MAXPATHLEN ;
+static int mkqfname(char *rbuf,cc *vtdn,cc *rnp,int rnl,cc *qcn,int mjd) noex {
+	cint		rlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 
 	if (rs >= 0) {
-	    rs = mkqdname(rbuf,vtmpdname,rnp,rnl,qcname) ;
+	    rs = mkqdname(rbuf,vtdn,rnp,rnl,qcn) ;
 	    i += rs ;
 	}
 
@@ -826,10 +640,8 @@ int		mjd ;
 }
 /* end subroutine (mkqfname) */
 
-
 #ifdef	COMMENT
-extern int ofWritable(int of)
-{
+extern int ofWritable(int of) noex {
 	int	f = FALSE ;
 	f = f || ((of & O_ACCMODE) == O_WRONLY) ;
 	f = f || ((of & O_ACCMODE) == O_RDWR) ;

@@ -1,7 +1,7 @@
-/* mktmpuserdir SUPPORT */
+/* mktmpusers SUPPORT */
 /* lang=C++20 */
 
-/* make a directory in the TMP-USER area */
+/* make the USERS directory in TMP directory */
 /* version %I% last-modified %G% */
 
 
@@ -17,24 +17,18 @@
 /*******************************************************************************
 
 	Name:
-	mktmpuserdir
+	mktmpusers
 
 	Description:
-	This subroutine creates a directory that is specific to a
-	user reserved directory inside the TMP directory.  For
-	example, given a user named 'fred' and a directory name
-	'junker' to create, the directory:
-		/tmp/users/fred/junker/
-	will be created.
+	This subroutine creates the USERS directory in the TMP directory.
+	That is:
+		/tmp/users
 
 	Synopsis:
-	int mktmpuserdir(char *rbuf,cchar *un,cchar *dn,mode_t m) noex
+	int mktmpusers(char *rbuf) noex
 
 	Arguments:
 	rbuf		buffer to receive resulting created directory name
-	un		optional username
-	dn		basename of directory to create
-	m		directory creation mode
 
 	Returns:
 	>=0		length of resulting directory name
@@ -102,42 +96,36 @@ static strlibval	strtmpdir(strlibval_tmpdir) ;
 int mktmpusers(char *rbuf) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rl = 0 ;
 	if (rbuf) {
-
-
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (mktmpuser) */
-
-int mktmpuser(char *rbuf) noex {
-	int		rs = SR_FAULT ;
-	int		rs1 ;
-	if (rbuf) {
-	    char	*ubuf{} ;
-	    if ((rs = malloc_un(&ubuf)) >= 0) {
-		cint	ulen = rs ;
-	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
-		    cint	ul = rs ;
-		    rs = SR_NOMEM ;
-		    static cchar	*tmpdir = strtmpdir ;
-		    if (tmpdir != nullptr) {
-			cchar	*users = sysword.w_users ;
-			if ((rs = mkpathw(rbuf,tmpdir,users,ubuf,ul)) >= 0) {
-			    USTAT	sb ;
-			    if ((rs = uc_stat(
-
-
-			} /* end if (mkpath) */
-		    } /* end if (strtmpdir) */
-		} /* end if */
+	    char	*dbuf{} ;
+	    if ((rs = malloc_un(&dbuf)) >= 0) {
+		static cchar	*tmpdir = strtmpdir ;
+		cint		dlen = rs ;
+		rs = SR_NOMEM ;
+		if (tmpdir != nullptr) {
+		    cchar	*users = sysword.w_users ;
+		    if ((rs = mkpath(rbuf,tmpdir,users)) >= 0) {
+			USTAT	sb ;
+			rl = rs ;
+			if ((rs = uc_stat(rbuf,&sb)) >= 0) {
+			    if (! S_ISDIR(sb.st_mode)) {
+				if ((rs = rmdirs(rbuf)) >= 0) {
+			    	    rs = tmpusers(rbuf) ;
+				} /* end if (rmdirs) */
+			    } /* end if */
+			} else if isNotPresent(rs)) {
+			    rs = tmpusers(rbuf) ;
+			} /* end if 
+		    } /* end if (mkpath) */
+		} /* end if (strtmpdir) */
 		rs1 = uc_free(ubuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (mktmpuser) */
+/* end subroutine (mktmpusers) */
 
 int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t m) noex {
 	int		rs = SR_FAULT ;

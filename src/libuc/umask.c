@@ -1,4 +1,4 @@
-/* umask */
+/* umask SUPPORT */
 /* lang=C20 */
 
 /* UNIX® UMASK (file-creation-mask) management */
