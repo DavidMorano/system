@@ -72,10 +72,17 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<fsdir.h>
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<getxusername.h>
+#include	<sfx.h>
+#include	<mkpathx.h>
+#include	<hasx.h>
+#include	<cfdec.h>
+#include	<isnot.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 
@@ -101,6 +108,10 @@
 
 /* external subroutines */
 
+extern "C" {
+    int		getuserhome(char *,int,cchar *) noex ;
+}
+
 
 /* external variables */
 
@@ -113,17 +124,15 @@ struct subinfo_flags {
 
 struct subinfo {
 	cchar		*un ;
+	char		*pwbuf ;
 	PASSWD		pw ;
 	uid_t		uid ;
 	SUBINFO_FL	init ;
 	int		pwlen ;
-	char		*pwbuf ;
 } ;
 
 
 /* forward references */
-
-int		getuserhome(char *,int,cchar *) noex ;
 
 static int	subinfo_start(SUBINFO *,cchar *) noex ;
 static int	subinfo_getpw(SUBINFO *) noex ;
@@ -138,47 +147,47 @@ static int	dirsearch(cchar *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr char	*homednames[] = {
+static constexpr cchar	*homednames[] = {
 	"/home",
 	"/usr/add-on",
 	"/sysadm",
-	NULL
+	nullptr
 } ;
 
 static constexpr int	(*gethomes[])(SUBINFO *,char *,int) = {
 	subinfo_getvar,
 	subinfo_getdirsearch,
 	subinfo_getsysdb,
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int getuserhome(char *rbuf,int rlen,cchar *un) noex {
-	SUBINFO		si ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-
-	if (rbuf == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
-
-	if (un[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = subinfo_start(&si,un)) >= 0) {
-	    for (int i = 0 ; gethomes[i] ; i += 1) {
-	        rs = (*gethomes[i])(&si,rbuf,rlen) ;
-	        rl = rs ;
-		if (rs != 0) break ;
-	    } /* end for */
-	    rs1 = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
-	if ((rs >= 0) && (rl == 0)) rs = SR_NOTFOUND ;
-
+	if (rbuf && un) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (un[0]) {
+	        SUBINFO		si ;
+	        if ((rs = subinfo_start(&si,un)) >= 0) {
+	            for (int i = 0 ; gethomes[i] ; i += 1) {
+	                rs = (*gethomes[i])(&si,rbuf,rlen) ;
+	                rl = rs ;
+		        if (rs != 0) break ;
+	            } /* end for */
+	            rs1 = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	        if ((rs >= 0) && (rl == 0)) rs = SR_NOTFOUND ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (getuserhome) */
@@ -211,7 +220,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	    if (sip->pwbuf) {
 	        rs1 = uc_free(sip->pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        sip->pwbuf = NULL ;
+	        sip->pwbuf = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -251,9 +260,9 @@ static int subinfo_getvar(SUBINFO *sip,char *rbuf,int rlen) noex {
 	int		len = 0 ;
 	cchar		*un = sip->un ;
 	if (un[0] == '-') un = getenv(VARUSERNAME) ;
-	if ((un != NULL) && (un[0] != '\0')) {
+	if ((un != nullptr) && (un[0] != '\0')) {
 	    cchar	*hd = getenv(VARHOME) ;
-	    if ((hd != NULL) && (hd[0] != '\0')) {
+	    if ((hd != nullptr) && (hd[0] != '\0')) {
 	        cchar	*bp ;
 	        int	bl ;
 	        if ((bl = sfbasename(hd,-1,&bp)) > 0) {
@@ -315,27 +324,28 @@ static int subinfo_getsysdb(SUBINFO *sip,char *rbuf,int rlen) noex {
 /* end subroutine (subinfo_getsysdb) */
 
 static int dirsearch(cchar *basedname,cchar *un) noex {
-	fsdir		dir ;
-	fsdir_ent	ds ;
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-
-	if ((rs = fsdir_open(&dir,basedname)) >= 0) {
-	    cchar	*fnp ;
-	    while ((rs = fsdir_read(&dir,&ds)) > 0) {
-	        fnp = ds.name ;
-
-	        if (fnp[0] != '.') {
-	            f_found = (fnp[0] == un[0]) && (strcmp(fnp,un) == 0) ;
-	            if (f_found) break ;
-	        }
-
-	    } /* end while */
-	    rs1 = fsdir_close(&dir) ;
+	char		*nbuf{} ;
+	if ((rs = malloc_mn(&nbuf)) >= 0) {
+	    fsdir	dir ;
+	    fsdir_ent	ds ;
+	    cint	nlen = rs ;
+	    if ((rs = fsdir_open(&dir,basedname)) >= 0) {
+	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
+	            cchar	*fnp = ds.name ;
+	            if (fnp[0] != '.') {
+	                f_found = (fnp[0] == un[0]) && (strcmp(fnp,un) == 0) ;
+	                if (f_found) break ;
+	            }
+	        } /* end while */
+	        rs1 = fsdir_close(&dir) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (fsdir) */
+	    rs1 = uc_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (fsdir) */
-
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? f_found : rs ;
 }
 /* end subroutine (dirsearch) */
