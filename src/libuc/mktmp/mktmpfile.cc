@@ -51,7 +51,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"mkfile.h"
+#include	"mktmp.h"
 
 
 /* local defines */

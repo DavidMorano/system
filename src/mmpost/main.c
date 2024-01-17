@@ -1,18 +1,15 @@
-/* mmpost */
+/* mmpost SUPPORT */
+/* lang=C20 */
 
 /* post a mail-like message to the PCS bulletin board system */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
 	= 1996-04-10, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -20,15 +17,12 @@
 
 /**************************************************************************
 
-	This program will post meeting minutes onto the bulletin board
-	system.
-
+	This program will post meeting minutes onto the bulletin
+	board system.
 
 ***************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
@@ -38,12 +32,10 @@
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
-
-#include	"localmisc.h"
-
+#include	<mktmp.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -66,13 +58,8 @@ extern char	*strbasename() ;
 
 /* local variables */
 
-static char	*tmpdirs[] = {
-	"/tmp",
-	"/var/tmp",
-	"/var/spool/uucppublic",
-	".",
-	NULL
-} ;
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -256,7 +243,7 @@ int main(int argc,mainv argvi,mainv) {
 	    if (tmpfname == NULL) {
 		cchar	*pat = "acXXXXXXXXXXXX" ;
 	        tmpfname = tmpfnamebuf ;
-	        if ((rs = mktmplock(tmpdirs,pat,0600,tmpfname)) < 0)
+	        if ((rs = mktmplock(tmpfname,pat,0600)) < 0)
 	            goto badtmpmk ;
 	    }
 
