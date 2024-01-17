@@ -123,16 +123,20 @@ obj3_queue.o:	$(OBJ3_QUEUE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_QUEUE)
 
 
+# self-relaltive
 plainq.o:		plainq.cc plainq.h
 q.o:			q.cc q.h plainq.h
 aiq.o:			aiq.cc aiq.h q.h
 
+# pointer-based
 pq.o:			pq.cc pq.h
 ciq.o:			ciq.cc ciq.h pq.h
 piq.o:			piq.cc piq.h pq.h
 
+# character
 charq.o:		charq.cc charq.h
 
+# container
 cq.o:			cq.cc cq.h
 
 
