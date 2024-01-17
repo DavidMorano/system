@@ -108,7 +108,7 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*dirbuf ;
+	char		*dirbuf{} ;
 	if ((rs = malloc_mp(&dirbuf)) >= 0) {
             if ((rs = mkpath1(dirbuf,dname)) >= 0) {
                 cchar       *dp = dirbuf ;

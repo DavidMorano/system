@@ -27,6 +27,7 @@
 #include	<cstdlib>		/* for |getenv(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<timewatch.hh>
 #include	<varnames.hh>
 #include	<syswords.hh>
 #include	<bufsizevar.hh>
@@ -94,25 +95,45 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 strlibval::operator ccharp () noex {
-	cchar		*rp ;
-	if ((rp = strp) == nullptr) {
-	    if ((w >= 0) && (w < strlibval_overlast)) {
-		switch (w) {
-		case strlibval_tmpdir:
-		    rp = strtmpdir() ;
-		    break ;
-		case strlibval_maildir:
-		    rp = strmaildir() ;
-		    break ;
-		case strlibval_path:
-		    rp = strpath() ;
-		    break ;
-		default:
-		    rp = cook() ;
-		    break ;
-		} /* end switch */
-	    } /* end if (non-null) */
-	} /* end if (getting cached value) */
+	cint		to = utimeout[uto_busy] ;
+	cchar		*rp = nullptr ;
+	if (! fmx.testandset) {
+	    if ((rp = strp) == nullptr) {
+	        if ((w >= 0) && (w < strlibval_overlast)) {
+		    switch (w) {
+		    case strlibval_tmpdir:
+		        rp = strtmpdir() ;
+		        break ;
+		    case strlibval_maildir:
+		        rp = strmaildir() ;
+		        break ;
+		    case strlibval_path:
+		        rp = strpath() ;
+		        break ;
+		    default:
+		        rp = cook() ;
+		        break ;
+		    } /* end switch */
+		    if (rp) {
+			fready.notifyall(true) ;
+		    }
+	        } /* end if (non-null) */
+	    } /* end if (getting cached value) */
+        } else if (!fready) {
+            timewatch       tw(to) ;
+            auto lamb = [this] () -> int {
+                int         rs = SR_OK ;
+                if (!fmx) {
+                    rs = SR_LOCKLOST ;
+                } else if (fready) {
+                    rs = 1 ;
+                }
+                return rs ;
+            } ; /* end lambda */
+            if (int rs ; (rs = tw(lamb)) >= 0) { /* <- time-watching */
+		rp = strp ;
+	    } ;
+	} /* end if (atomic access) */
 	return rp ;
 }
 /* end method (strlibval::operator) */

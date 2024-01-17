@@ -30,6 +30,9 @@ enum aflagmems {
 	aflagmem_clear,
 	aflagmem_test,
 	aflagmem_testandset,
+	aflagmem_wait,
+	aflagmem_notify,
+	aflagmem_notifyall,
 	aflagmem_overlast
 } ;
 struct aflag ;
@@ -40,9 +43,10 @@ struct aflag_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	operator bool () noex ;
-	bool operator () () noex {
-	    return bool(*this) ;
+	bool operator () () noex ;
+	bool operator () (bool) noex ;
+	operator bool () noex {
+	    return operator () () ;
 	} ;
 } ;
 struct aflag {
@@ -51,11 +55,17 @@ struct aflag {
 	aflag_co	clear ;
 	aflag_co	test ;
 	aflag_co	testandset ;
+	aflag_co	wait ;
+	aflag_co	notify ;
+	aflag_co	notifyall ;
 	constexpr aflag() noex {
 	    set(this,aflagmem_set) ;
 	    clear(this,aflagmem_clear) ;
 	    test(this,aflagmem_test) ;
 	    testandset(this,aflagmem_testandset) ;
+	    wait(this,aflagmem_wait) ;
+	    notify(this,aflagmem_notify) ;
+	    notifyall(this,aflagmem_notifyall) ;
 	} ;
 	operator bool () noex {
 	    return af.test() ;

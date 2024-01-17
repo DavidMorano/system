@@ -31,9 +31,9 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<usystem.h>
-#include	<getbufsize.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 
@@ -51,6 +51,8 @@ enum strlivals {
 } ;
 
 class strlibval {
+	aflag		fmx ;
+	aflag		fready ;
 	cchar		*strp = nullptr ;
 	char		*a = nullptr ;
 	cint		w = -1 ;

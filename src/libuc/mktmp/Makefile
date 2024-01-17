@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mktmp.h
 
 
-OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o mktmplock.o
+OBJ_MKTMP= mktmpdir.o mktmpfile.o mktmplock.o
 
 
 default:		$(T).o

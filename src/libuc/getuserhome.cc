@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	getusername
+	getuserhome
 
 	Description:
 	We carry out some searches in order to find the home directory
