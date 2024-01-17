@@ -903,7 +903,6 @@ int vecstr::del(int i) noex {
 	return vecstr_del(this,i) ;
 }
 
-
 void vecstr::dtor() noex {
 	cint	rs = int(finish) ;
 	if (rs < 0) {
