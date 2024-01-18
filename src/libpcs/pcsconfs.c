@@ -2,15 +2,13 @@
 
 /* interface to query the PCS configuration-variable database */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 2008-10-07, David A­D­ Morano
-	This was created to allow for the main part of the PCSCONF facility to
-	be a loadable module.
+	This was created to allow for the main part of the PCSCONF
+	facility to be a loadable module.
 
 */
 
@@ -18,15 +16,12 @@
 
 /*******************************************************************************
 
-	This little object provides access to the PCSCONF database and index
-	(if any).
-
+	This little object provides access to the PCSCONF database
+	and index (if any).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -34,9 +29,9 @@
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<endianstr.h>
+#include	<mktmp.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<ids.h>
@@ -210,7 +205,6 @@ extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-extern int	mktmpuserdir(char *,cchar *,cchar *,mode_t) ;
 extern int	hasdots(cchar *,int) ;
 extern int	hasNotDots(cchar *,int) ;
 extern int	isNotPresent(int) ;

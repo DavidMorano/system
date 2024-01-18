@@ -60,8 +60,8 @@
 #include	<string.h>
 #include	<stdarg.h>
 #include	<time.h>
-
 #include	<usystem.h>
+#include	<mktmp.h>
 #include	<ascii.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -134,7 +134,6 @@ extern int	findfilepath(cchar *,char *,cchar *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	mktmpuserdir(char *,cchar *,cchar *,mode_t) ;
 extern int	getnprocessors(cchar **,int) ;
 extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;

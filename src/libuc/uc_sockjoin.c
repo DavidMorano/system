@@ -36,7 +36,6 @@
 
 extern int	mkpath1(char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	opentmpusd(const char *,int,mode_t,char *) ;
 
 extern char	*strwcpy(char *,const char *,int) ;

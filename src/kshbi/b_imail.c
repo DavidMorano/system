@@ -93,8 +93,9 @@
 #include	<string.h>
 #include	<utmpx.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<ucmallreg.h>
+#include	<mktmp.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -128,7 +129,6 @@
 #include	<linefold.h>
 #include	<mkuuid.h>
 #include	<pcsns.h>
-#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -261,7 +261,6 @@ extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	mktmpuserdir(char *,cchar *,cchar *,mode_t) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
 extern int	prsetfname(cchar *,char *,cchar *,int,int,
 			cchar *,cchar *,cchar *) ;

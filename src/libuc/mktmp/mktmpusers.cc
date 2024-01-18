@@ -22,7 +22,7 @@
 	Description:
 	This subroutine creates the USERS directory in the TMP directory.
 	That is:
-		/tmp/users
+		TMPDIR/users
 
 	Synopsis:
 	int mktmpusers(char *rbuf) noex

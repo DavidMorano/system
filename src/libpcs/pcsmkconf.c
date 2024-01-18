@@ -19,12 +19,9 @@
 
 	This subroutine makes the PCS CONF index file.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -32,8 +29,8 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<mktmp.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<paramfile.h>
@@ -75,7 +72,6 @@ extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_loadfile(vecstr *,int,const char *) ;
 
 extern int	prmktmpdir(const char *,char *,const char *,mode_t) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;

@@ -109,7 +109,6 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	getnprocessors(const char **,int) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	msleep(int) ;
 extern int	isasocket(int) ;
 

@@ -34,15 +34,9 @@
 	cached in our own DISPLAY object.  Mail-message viewing data is
 	cached in the MAILMSGFILE object.
 
-
 *******************************************************************************/
 
-
-#define	BBINTER_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -54,7 +48,6 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -64,6 +57,7 @@
 #include	<spawnproc.h>
 #include	<keysym.h>
 #include	<toxc.h>
+#include	<mktmp.h>
 #include	<localmisc.h>
 
 #include	"mailmsg.h"
@@ -146,7 +140,6 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	vbufprintf(char *,int,const char *,va_list) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;

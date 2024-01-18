@@ -1,20 +1,20 @@
-/* progcsreader */
+/* progcsreader SUPPORT */
+/* lang=C20 */
 
 /* subroutine to read the messages coming in */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debug print-outs */
 #define	CF_DISP		1		/* dispatch */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-	The program was written from scratch to do what the previous program by
-	the same name did.  It used pieces from other (similar in some ways)
-	programs.
+	The program was written from scratch to do what the previous
+	program by the same name did.  It used pieces from other
+	(similar in some ways) programs.
 
 */
 
@@ -22,15 +22,12 @@
 
 /*******************************************************************************
 
-        This subroutine reads in the COMAST messages and disposes of them
-        appropriately.
-
+	This subroutine reads in the COMAST messages and disposes
+	of them appropriately.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -41,8 +38,8 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -107,8 +104,6 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	getnprocessors(const char **,int) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
-extern int	msleep(int) ;
 extern int	isasocket(int) ;
 
 extern int	progcsmsg(PROGINFO *,const char *,int) ;

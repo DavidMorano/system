@@ -25,8 +25,8 @@
 
 /*******************************************************************************
 
-        This module implements an interface (a trivial one) that allows access
-        to the QUOTE datbase.
+	This module implements an interface (a trivial one) that
+	allows access to the QUOTE datbase.
 
 	Implementation notes:
 
@@ -41,12 +41,7 @@
 
 *******************************************************************************/
 
-
-#define	QUOTE_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -55,9 +50,9 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mktmp.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
 #include	<char.h>
@@ -171,7 +166,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
