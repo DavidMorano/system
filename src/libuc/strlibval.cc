@@ -95,10 +95,10 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 strlibval::operator ccharp () noex {
-	cint		to = utimeout[uto_busy] ;
-	cchar		*rp = nullptr ;
-	if (! fmx.testandset) {
-	    if ((rp = strp) == nullptr) {
+	cchar		*rp ;
+	if ((rp = strp) == nullptr) {
+	    cint	to = utimeout[uto_busy] ;
+	    if (! fmx.testandset) {
 	        if ((w >= 0) && (w < strlibval_overlast)) {
 		    switch (w) {
 		    case strlibval_tmpdir:
@@ -117,23 +117,25 @@ strlibval::operator ccharp () noex {
 		    if (rp) {
 			fready.notifyall(true) ;
 		    }
-	        } /* end if (non-null) */
-	    } /* end if (getting cached value) */
-        } else if (!fready) {
-            timewatch       tw(to) ;
-            auto lamb = [this] () -> int {
-                int         rs = SR_OK ;
-                if (!fmx) {
-                    rs = SR_LOCKLOST ;
-                } else if (fready) {
-                    rs = 1 ;
-                }
-                return rs ;
-            } ; /* end lambda */
-            if (int rs ; (rs = tw(lamb)) >= 0) { /* <- time-watching */
+	        } /* end if (type) */
+            } else if (!fready) {
+                timewatch       tw(to) ;
+                auto lamb = [this] () -> int {
+                    int         rs = SR_OK ;
+                    if (!fmx) {
+                        rs = SR_LOCKLOST ;
+                    } else if (fready) {
+                        rs = 1 ;
+                    }
+                    return rs ;
+                } ; /* end lambda */
+                if (int rs ; (rs = tw(lamb)) >= 0) { /* <- time-watching */
+		    rp = strp ;
+	        } ;
+	    } else {
 		rp = strp ;
-	    } ;
-	} /* end if (atomic access) */
+	    } /* end if (atomic access) */
+	} /* end if (need to create value) */
 	return rp ;
 }
 /* end method (strlibval::operator) */
