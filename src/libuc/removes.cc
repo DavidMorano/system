@@ -62,8 +62,16 @@
 #include	<hasx.h>
 #include	<localmisc.h>
 
+#include	"rmdirs.h"
+
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -84,6 +92,9 @@ static int	loadnames(vecpstr *,cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -145,11 +156,11 @@ static int removedir(char *pbuf,int plen) noex {
 	if ((rs = vecpstr_start(&names,0,0,0)) >= 0) {
 	    if ((rs = loadnames(&names,pbuf)) > 0) {
 	        USTAT	sb ;
-	        cchar	*np ;
-	        for (int i = 0 ; vecpstr_get(&names,i,&np) >= 0 ; i += 1) {
-	            if (np != NULL) {
-	                if ((rs = pathadd(pbuf,plen,np)) >= 0) {
-	                    const int	pl = rs ;
+	        cchar	*sp ;
+	        for (int i = 0 ; vecpstr_get(&names,i,&sp) >= 0 ; i += 1) {
+	            if (sp) {
+	                if ((rs = pathadd(pbuf,plen,sp)) >= 0) {
+	                    cint	pl = rs ;
 	                    if ((rs = uc_lstat(pbuf,&sb)) >= 0) {
 	                        if (S_ISDIR(sb.st_mode)) {
 	                            rs = removedir(pbuf,pl) ;

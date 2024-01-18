@@ -26,7 +26,8 @@
 
 	Description:
 	Remove files from a specified directory that are older than
-	a specified interval (in seconds).
+	a specified interval (in seconds), and which match a prefix
+	c-string.
 
 	Synopsis:
 	int rmdirfiles(cchar *dname,cchar *prefix,int to) noex
@@ -58,6 +59,8 @@
 #include	<hasx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"rmdirs.h"
 
 
 /* local defines */
@@ -184,10 +187,10 @@ static int vecstr_dirfilesdelete(vecstr *flp) noex {
 }
 /* end subroutine (vecstr_dirfilesdelete) */
 
-static int premat(cchar *prefix,int prelen,cchar *np,int nl) noex {
-	int		f = TRUE ;
+static int premat(cchar *prefix,int prelen,cchar *sp,int sl) noex {
+	int		f = true ;
 	if ((prefix != nullptr) && (prefix[0] != '\0')) {
-	    cint	m = nleadstr(prefix,np,nl) ;
+	    cint	m = nleadstr(prefix,sp,sl) ;
 	    f = (m == prelen) ;
 	}
 	return f ;

@@ -1,6 +1,9 @@
 /* openqotd HEADER */
 /* lang=C20 */
 
+/* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

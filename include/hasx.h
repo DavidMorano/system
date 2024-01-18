@@ -50,8 +50,8 @@ static inline bool hasValidMagic(cchar *sp,int sl) noex  {
 	return hasvalidmagic(sp,sl) ;
 }
 
-static inline bool hasNotDots(cchar *np,int nl) noex {
-	return hasnotdots(np,nl) ;
+static inline bool hasNotDots(cchar *sp,int sl) noex {
+	return hasnotdots(sp,sl) ;
 }
 
 EXTERNC_end

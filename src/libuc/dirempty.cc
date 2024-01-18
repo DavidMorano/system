@@ -1,11 +1,9 @@
 /* isdirempty SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* is the given directory empty? */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_DEBUGN	0		/* special debugging */
 
 /* revision history:
 
@@ -42,25 +40,29 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<fsdir.h>
 #include	<mkpathx.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
+#include	"dirs.h"
+
 
 /* local defines */
 
 
-/* external subroutines */
+/* local namespaces */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -78,31 +80,40 @@ extern int	strlinelen(cchar *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int isdirempty(cchar *dname) noex {
+int dirempty(cchar *dname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f = TRUE ;
+	int		f = true ;
 	if (dname) {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
-	         fsdir		d ;
-	         fsdir_ent	de ;
-	         if ((rs = fsdir_open(&d,dname)) >= 0) {
-	             while ((rs = fsdir_read(&d,&de)) > 0) {
-	                if (hasNotDots(de.name,rs) > 0) {
-		             f = FALSE ;
-		         } /* end (not dots) */
-		         if (!f) break ;
-	             } /* end while */
-	             rs1 = fsdir_close(&d) ;
-	             if (rs >= 0) rs = rs1 ;
-	         } /* end if (fsdir) */
+		char	*nbuf{} ;
+		if ((rs = malloc_mn(&nbuf)) >= 0) {
+	            fsdir	d ;
+	            fsdir_ent	de ;
+		    cint	nlen = rs ;
+	            if ((rs = fsdir_open(&d,dname)) >= 0) {
+	                while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
+			    if (hasNotDots(de.name,rs) > 0) {
+				f = false ;
+		            } /* end (not dots) */
+		            if (!f) break ;
+	                } /* end while */
+	                rs1 = fsdir_close(&d) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (fsdir) */
+		    rs1 = uc_free(nbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (isdirempty) */
+/* end subroutine (dirempty) */
 
 

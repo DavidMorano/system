@@ -1,5 +1,5 @@
 /* openqotd SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* open a channel (file-descriptor) to the quote-of-the-day (QOTD) */
 /* version %I% last-modified %G% */
@@ -117,11 +117,14 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
+#include	<usystem.h>
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<tmtime.h>
@@ -135,18 +138,6 @@
 
 /* local defines */
 
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 #define	VTMPDNAME	"/var/tmp"
 #define	QCNAME		"qotd"
 
@@ -158,7 +149,18 @@
 #define	NFNAME		"qotd.ndeb"
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    extern int	openqotd_init() noex ;
+    extern int	openqotd_fini() noex ;
+}
 
 
 /* external variables */
@@ -170,9 +172,9 @@ struct openqotd_head {
 	ptm		m ;		/* data mutex */
 	ptc		c ;		/* condition variable */
 	volatile int	waiters ;
-	volatile int	f_capture ;	/* capture flag */
-	volatile int	f_init ;	/* race-condition, blah, blah */
-	volatile int	f_initdone ;
+	vaflag		f_capture ;	/* capture flag */
+	vaflag		f_init ;	/* race-condition, blah, blah */
+	vaflag		f_initdone ;
 } ;
 
 struct openqotd_sub {
@@ -180,45 +182,46 @@ struct openqotd_sub {
 	cchar		*vtmpdname ;
 	cchar		*qcname ;
 	cchar		*qfname ;
-	mode_t		dm ;
 	int		of ;
 	int		ttl ;
 	int		mjd ;
+	mode_t		dm ;
 } ;
 
 
 /* forward references */
 
-int		openqotd_init() ;
-intd		openqotd_fini() ;
+static int	openqotd_capbegin(int) noex ;
+static int	openqotd_capend() noex ;
+static int	openqotd_open(OPENQOTD_SUB *) noex ;
 
-static int	openqotd_capbegin(int) ;
-static int	openqotd_capend() ;
-static int	openqotd_open(OPENQOTD_SUB *) ;
+static int	qotdexpire(cchar *,cchar *,int,cchar *,time_t,int) noex ;
+static int	qotdexpireload(vecpstr *,char *,time_t,int) noex ;
 
-static int	qotdexpire(cchar *,cchar *,int,cchar *,time_t,int) ;
-static int	qotdexpireload(vecpstr *,char *,time_t,int) ;
-
-static int	qotdfetch(cchar *,int,int,int,cchar *) ;
+static int	qotdfetch(cchar *,int,int,int,cchar *) noex ;
 
 #if	CF_OPENMASK
-static int	openmask(cchar *,int,mode_t) ;
+static int	openmask(cchar *,int,mode_t) noex ;
 #endif /* CF_OPENMASK */
 
-static int	loadchown(cchar *,int) ;
+static int	loadchown(cchar *,int) noex ;
 
-static int	getdefmjd(time_t) ;
+static int	getdefmjd(time_t) noex ;
 
-static int	mkqdname(char *,cchar *, cchar *,int,cchar *) ;
-static int	mkqfname(char *,cchar *, cchar *,int,cchar *,int) ;
+static int	mkqdname(char *,cchar *, cchar *,int,cchar *) noex ;
+static int	mkqfname(char *,cchar *, cchar *,int,cchar *,int) noex ;
 
-static void	openqotd_atforkbefore() ;
-static void	openqotd_atforkafter() ;
+static void	openqotd_atforkbefore() noex ;
+static void	openqotd_atforkafter() noex ;
 
 
 /* local variables */
 
 static OPENQOTD		openqotd_data ;
+static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -227,7 +230,7 @@ int openqotd_init() noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs = 1 ;
 	if (! uip->f_init) {
-	    uip->f_init = TRUE ;
+	    uip->f_init = true ;
 	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
 	        if ((rs = ptc_create(&uip->c,NULL)) >= 0) {
 	    	    void	(*b)() = openqotd_atforkbefore ;
@@ -235,16 +238,19 @@ int openqotd_init() noex {
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(openqotd_fini)) >= 0) {
 	                    rs = 0 ;
-	                    uip->f_initdone = TRUE ;
+	                    uip->f_initdone = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                ptc_destroy(&uip->c) ;
+		    }
 	        } /* end if (ptc_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            ptm_destroy(&uip->m) ;
+		}
 	    } /* end if (ptm_create) */
 	} else {
 	    while (! uip->f_initdone) msleep(1) ;
@@ -255,17 +261,28 @@ int openqotd_init() noex {
 
 int openqotd_fini() noex {
 	OPENQOTD	*uip = &openqotd_data ;
+	int		rs = SR_NXIO ;
+	int		rs1 ;
 	if (uip->f_initdone) {
-	    uip->f_initdone = FALSE ;
+	    uip->f_initdone = false ;
+	    rs = SR_OK ;
 	    {
-	        void	(*b)() = openqotd_atforkbefore ;
-	        void	(*a)() = openqotd_atforkafter ;
-	        uc_atforkexpunge(b,a,a) ;
+	        void_f	b = openqotd_atforkbefore ;
+	        void_f	a = openqotd_atforkafter ;
+	        rs1 = uc_atforkexpunge(b,a,a) ;
+		if (rs >= 0) rs = rs1 ;
 	    }
-	    ptc_destroy(&uip->c) ;
-	    ptm_destroy(&uip->m) ;
-	    memset(uip,0,sizeof(OPENQOTD)) ;
+	    {
+	        rs1 = ptc_destroy(&uip->c) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ptm_destroy(&uip->m) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    memclear(uip) ;
 	} /* end if (was initialized) */
+	return rs ;
 }
 /* end subroutine (openqotd_fini) */
 
@@ -300,10 +317,8 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 
 	        if (rs >= 0) {
 	            if ((rs = mkqfname(qfname,vtd,rnp,rnl,cn,mjd)) >= 0) {
-
 	                {
-	                    OPENQOTD_SUB	qs ;
-	                    memset(&qs,0,sizeof(OPENQOTD_SUB)) ;
+	                    OPENQOTD_SUB	qs{} ;
 	                    qs.pr = pr ;
 	                    qs.qfname = qfname ;
 	                    qs.vtmpdname = vtmpdname ;
@@ -316,16 +331,15 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	                        fd = rs ;
 	                    }
 	                }
-
 	                if ((rs >= 0) && (of & O_NOCTTY)) {
 	                    u_unlink(qfname) ;
 	                }
-
 	                if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	            } /* end if (mkqfname) */
 	        } /* end if */
-	    } else
+	    } else {
 	        rs = SR_NOTDIR ;
+	    }
 	} /* end if (ok) */
 
 	return (rs >= 0) ? fd : rs ;
@@ -339,23 +353,18 @@ static int openqotd_capbegin(int to) noex {
 	OPENQOTD	*uip = &openqotd_data ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = ptm_lockto(&uip->m,to)) >= 0) {
 	    uip->waiters += 1 ;
-
 	    while ((rs >= 0) && uip->f_capture) { /* busy */
 	        rs = ptc_waiter(&uip->c,&uip->m,to) ;
 	    } /* end while */
-
 	    if (rs >= 0) {
-	        uip->f_capture = TRUE ;
+	        uip->f_capture = true ;
 	    }
-
 	    uip->waiters -= 1 ;
 	    rs1 = ptm_unlock(&uip->m) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
-
 	return rs ;
 }
 /* end subroutine (openqotd_capbegin) */
@@ -365,7 +374,7 @@ static int openqotd_capend() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = ptm_lock(&uip->m)) >= 0) {
-	    uip->f_capture = FALSE ;
+	    uip->f_capture = false ;
 	    if (uip->waiters > 0) {
 	        rs = ptc_signal(&uip->c) ;
 	    }
@@ -389,25 +398,30 @@ static void openqotd_atforkafter() noex {
 /* end subroutine (openqotd_atforkafter) */
 
 static int openqotd_open(OPENQOTD_SUB *sip) noex {
-	const mode_t	om = 0666 ;
+	cmode		om = 0666 ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 	if ((rs = u_open(sip->qfname,sip->of,om)) >= 0) {
 	    fd = rs ;
 	} else if (rs == SR_NOENT) {
-	    const mode_t	dm = sip->dm ;
-	    cchar		*pr = sip->pr ;
-	    cchar		*qfname = sip->qfname ;
-	    cchar		*vtmpdname = sip->vtmpdname ;
-	    cchar		*qcname = sip->qcname ;
-	    char		qdname[MAXPATHLEN+1] ;
-	    if ((rs = prmktmpdir(pr,qdname,vtmpdname,qcname,dm)) >= 0) {
-	        int	mjd = sip->mjd ;
-	        int	of = sip->of ;
-	        int	ttl = sip->ttl ;
-	        rs = qotdfetch(pr,mjd,of,ttl,qfname) ;
-	        fd = rs ;
-	    }
+	    cmode	dm = sip->dm ;
+	    cchar	*pr = sip->pr ;
+	    cchar	*qfname = sip->qfname ;
+	    cchar	*vtmpdname = sip->vtmpdname ;
+	    cchar	*qcname = sip->qcname ;
+	    char	*qdname[MAXPATHLEN+1] ;
+	    if ((rs = malloc_mp(&qdname)) >= 0) {
+	        if ((rs = prmktmpdir(pr,qdname,vtmpdname,qcname,dm)) >= 0) {
+	            cint	mjd = sip->mjd ;
+	            cint	of = sip->of ;
+	            cint	ttl = sip->ttl ;
+	            rs = qotdfetch(pr,mjd,of,ttl,qfname) ;
+	            fd = rs ;
+	        } /* end if (prmktmpdir) */
+		rs1 = uc_free(qdname) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (NOENT) */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -418,21 +432,19 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	char		qdname[MAXPATHLEN+1] ;
-
 	if (to <= 0) to = TTL_EXPIRE ;
-
 	if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    if (u_stat(qdname,&sb) >= 0) {
 	        if (S_ISDIR(sb.st_mode)) {
-	            const int	n = (sb.st_size / 10) ;
-	            const int	cs = (sb.st_size / 4) ;
+	            cint	n = (sb.st_size / 10) ;
+	            cint	cs = (sb.st_size / 4) ;
 	            VECPSTR	ds ;
 	            if ((rs = vecpstr_start(&ds,n,cs,0)) >= 0) {
 	                if ((rs = qotdexpireload(&ds,qdname,dt,to)) > 0) {
-	                    int		i ;
+			    auto	vg = vecpstr_get ;
 	                    cchar	*fn ;
-	                    for (i = 0 ; vecpstr_get(&ds,i,&fn) >= 0 ; i += 1) {
+	                    for (int i = 0 ; vg(&ds,i,&fn) >= 0 ; i += 1) {
 	                        if (fn == NULL) continue ;
 	                        rs1 = u_unlink(fn) ;
 	                        if (rs1 >= 0) c += 1 ;
@@ -440,11 +452,11 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	                } /* end if (qotdexpireload) */
 	                vecpstr_finish(&ds) ;
 	            } /* end if (vecpstr) */
-	        } else
+	        } else {
 	            rs = SR_NOTDIR ;
+		}
 	    } /* end if (stat) */
 	} /* end if (mkqdname) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (qotdexpire) */
@@ -454,16 +466,15 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	FSDIR_ENT	de ;
 	int		rs ;
 	int		c = 0 ;
-
 	if ((rs = fsdir_open(&d,qfname)) >= 0) {
-	    struct ustat	sb ;
-	    const int		dlen = strlen(qfname) ;
+	    USTAT	sb ;
+	    cint	dlen = strlen(qfname) ;
 	    while ((rs = fsdir_read(&d,&de)) > 0) {
-	        const int	el = rs ;
-	        cchar		*ep = de.name ;
+	        cint	el = rs ;
+	        cchar	*ep = de.name ;
 	        if (hasNotDots(ep,el)) {
 	            if ((rs = pathadd(qfname,dlen,ep)) >= 0) {
-	                const int	fl = rs ;
+	                cint	fl = rs ;
 	                if (u_stat(qfname,&sb) >= 0) {
 	                    if (S_ISREG(sb.st_mode)) {
 
@@ -480,7 +491,6 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	    qfname[dlen] = '\0' ;
 	    fsdir_close(&d) ;
 	} /* end if (fsdir) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (qotdexpireload) */
@@ -492,23 +502,21 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	int		rs1 ;
 	int		lof = of ;
 	int		fd = -1 ;
-
 	lof &= (~ O_ACCMODE) ;
 	lof &= (~ O_TRUNC) ;
 	lof &= (~ O_EXCL) ;
 	lof |= (O_CREAT | O_RDWR) ;
-
 	if ((rs = u_open(qfname,lof,om)) >= 0) {
 	    fd = rs ;
 	    if ((rs = uc_fminmod(fd,om)) >= 0) {
 	        if ((rs = openqotd_init()) >= 0) {
-	            const int	to = (5*60) ;
+	            cint	to = (5*60) ;
 	            if ((rs = openqotd_capbegin(to)) >= 0) {
-	                const int	cmd = F_WLOCK ;
+	                cint	cmd = F_WLOCK ;
 	                if ((rs = lockfile(fd,cmd,0L,0L,to)) >= 0) {
 	                    if ((rs = uc_fsize(fd)) == 0) {
 	                        if ((rs = maintqotd(pr,mjd,of,to)) >= 0) {
-	                            const int	s = rs ;
+	                            cint	s = rs ;
 	                            if ((rs = uc_writedesc(fd,s,-1)) >= 0) {
 	                                if ((rs = u_rewind(fd)) >= 0) {
 	                                    rs = loadchown(pr,fd) ;
@@ -527,7 +535,6 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	    } /* end if (uc_fminmod) */
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (open-) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (qotdfetch) */
@@ -558,7 +565,7 @@ static int loadchown(cchar *pr,int fd) noex {
 	    if (euid != sb.st_uid) {
 	        u_fchown(fd,sb.st_uid,sb.st_gid) ;
 	    }
-	}
+	} /* end if (u_stat) */
 	return rs ;
 }
 /* end subroutine (loadchown) */
@@ -572,77 +579,70 @@ static int getdefmjd(time_t dt) noex {
 	    int	m = ct.mon ;
 	    int	d = ct.mday ;
 	    rs = getmjd(y,m,d) ;
-	}
+	} /* end if (tmtime_localtime) */
 	return rs ;
 }
 /* end subroutine (getdefmjd) */
 
 static int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
-	cint		rlen = MAXPATHLEN ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		i = 0 ;
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,vtmpdname,-1) ;
-	    i += rs ;
-	}
-
-	if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,rnp,rnl) ;
-	    i += rs ;
-	}
-
-	if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,qcname,-1) ;
-	    i += rs ;
-	}
-
+	if ((rs = maxpathlen) >= 0) {
+	    cint	rlen = rs ;
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,vtmpdname,-1) ;
+	        i += rs ;
+	    }
+	    if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
+	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,rnp,rnl) ;
+	        i += rs ;
+	    }
+	    if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
+	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,qcname,-1) ;
+	        i += rs ;
+	    }
+	} /* end if (maxpathlen) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkqdname) */
 
 static int mkqfname(char *rbuf,cc *vtdn,cc *rnp,int rnl,cc *qcn,int mjd) noex {
-	cint		rlen = MAXPATHLEN ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		i = 0 ;
-
-	if (rs >= 0) {
-	    rs = mkqdname(rbuf,vtdn,rnp,rnl,qcn) ;
-	    i += rs ;
-	}
-
-	if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,'q') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_deci(rbuf,rlen,i,mjd) ;
-	    i += rs ;
-	}
-
+	if ((rs = maxpathlen) >= 0) {
+	    cint	rlen = rs ;
+	    if (rs >= 0) {
+	        rs = mkqdname(rbuf,vtdn,rnp,rnl,qcn) ;
+	        i += rs ;
+	    }
+	    if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
+	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_char(rbuf,rlen,i,'q') ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_deci(rbuf,rlen,i,mjd) ;
+	        i += rs ;
+	    }
+	} /* end if (maxpathlen) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkqfname) */
 
 #ifdef	COMMENT
 extern int ofWritable(int of) noex {
-	int	f = FALSE ;
+	int	f = false ;
 	f = f || ((of & O_ACCMODE) == O_WRONLY) ;
 	f = f || ((of & O_ACCMODE) == O_RDWR) ;
 	return f ;
