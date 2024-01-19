@@ -1,4 +1,4 @@
-/* ucclustername */
+/* ucclustername SUPPORT */
 /* lang=C++20 */
 
 /* set or get a cluster name given a nodename */
@@ -72,16 +72,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<signal.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<ctime>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"ucclustername.h"
@@ -106,8 +107,6 @@ typedef volatile sig_atomic_t	vaflag ;
 
 
 /* external subroutines */
-
-extern int	isNotPresent(int) noex ;
 
 
 /* external variables */
@@ -147,12 +146,16 @@ struct subinfo {
 
 /* forward references */
 
-int		ucclustername_init() noex ;
-int		ucclustername_fini() noex ;
+extern "C" {
+    int		ucclustername_init() noex ;
+    int		ucclustername_fini() noex ;
+}
 
-static void	ucclustername_atforkbefore() noex ;
-static void	ucclustername_atforkafter() noex ;
-static void	ucclustername_exit() noex ;
+extern "C" {
+    static void	ucclustername_atforkbefore() noex ;
+    static void	ucclustername_atforkafter() noex ;
+    static void	ucclustername_exit() noex ;
+}
 
 static int	ucclustername_end(UCLUSTERNAME *) noex ;
 static int	ucclustername_allocbegin(UCLUSTERNAME *,time_t,int) noex ;
@@ -169,6 +172,9 @@ static int	subinfo_cacheset(SUBINFO *,UCLUSTERNAME *,int) noex ;
 static UCLUSTERNAME	ucclustername_data ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ucclustername_init() noex {
@@ -179,21 +185,24 @@ int ucclustername_init() noex {
 	    if (! uip->f_init) {
 	        uip->f_init = true ;
 	        if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
-	            void	(*b)() = ucclustername_atforkbefore ;
-	            void	(*a)() = ucclustername_atforkafter ;
+	            void_f	b = ucclustername_atforkbefore ;
+	            void_f	a = ucclustername_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(ucclustername_exit)) >= 0) {
 	                    uip->f_initdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                ptm_destroy(&uip->m) ;
+		    }
 	        } /* end if (ptm_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uip->f_init = false ;
+		}
 	    } else {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	            rs = msleep(1) ;
@@ -217,8 +226,8 @@ int ucclustername_fini() noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        void	(*b)() = ucclustername_atforkbefore ;
-	        void	(*a)() = ucclustername_atforkafter ;
+	        void_f	b = ucclustername_atforkbefore ;
+	        void_f	a = ucclustername_atforkafter ;
 	        rs1 = uc_atforkexpunge(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -240,7 +249,7 @@ int ucclustername_get(char *rbuf,int rlen,cchar *nn) noex {
 	if (rbuf && nn) {
 	    rs = SR_INVALID ;
 	    if (nn[0]) {
-	        SIGBLOCKER	b ;
+	        sigblocker	b ;
 	        rbuf[0] = '\0' ;
 	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
 	            if ((rs = ucclustername_init()) >= 0) {
@@ -271,7 +280,7 @@ int ucclustername_set(cchar *cbuf,int clen,cchar *nn,int to) noex {
 	if (cbuf && nn) {
 	    rs = SR_INVALID ;
 	    if (cbuf[0] && nn[0]) {
-	        SIGBLOCKER	b ;
+	        sigblocker	b ;
 	        if (clen < 0) clen = strlen(cbuf) ;
 	        if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
 	            if ((rs = ucclustername_init()) >= 0) {
