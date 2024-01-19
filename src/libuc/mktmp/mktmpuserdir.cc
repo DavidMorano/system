@@ -135,43 +135,30 @@ int mktmpuserx(char *rbuf,cchar *un) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (mktmpuser) */
+/* end subroutine (mktmpuserx) */
 
-#ifdef	COMMENT
-int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t m) noex {
+int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf && un && dname) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (un[0] && dname[0]) {
-	        char		unbuf[USERNAMELEN + 1] ;
-	        if ((un == NULL) || (un[0] == '\0') || (un[0] == '-')) {
-	            un = unbuf ;
-	            rs = getusername(unbuf,USERNAMELEN,-1) ;
-	        } /* end if */
-	        if (rs >= 0) {
-	            char	tmpuserdname[MAXPATHLEN + 1] ;
-	            if ((rs = mktmpuser(tmpuserdname,un)) >= 0) {
-	                if ((rs = mkpath2(rbuf,tmpuserdname,dname)) >= 0) {
-		            USTAT	sb ;
-	                    len = rs ;
-	                    if ((rs = u_stat(rbuf,&sb)) >= 0) {
-		                if (! S_ISDIR(sb.st_mode)) {
-		                    rs = SR_NOTDIR ;
-			        }
-	                    } else {
-	                        rs = u_mkdir(rbuf,m) ;
-			    }
-	                } /* end if (mkpath) */
-	            } /* end if (mktmpuser) */
-	        } /* end if (ok) */
+		char	*tbuf{} ;
+		if ((rs = malloc_mp(&tbuf)) >= 0) {
+		    if ((rs = mktmpuserx(tbuf,un)) >= 0) {
+		        rs = mktmpdir(rbuf,tbuf,dm) ;
+		        len = rs ;
+	            } /* end if (ok) */
+		    rs1 = uc_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mktmpuserdir) */
-#endif /* COMMENT */
 
 
 /* local subroutines */
@@ -184,36 +171,5 @@ static int mkourdir(cchar *rbuf,cmode dm) noex {
 	return rs ;
 }
 /* end subroutine (mkourdir) */
-
-#ifdef	COMMENT
-static int mktmpuser(char *rbuf,cchar *un) noex {
-	USTAT		sb ;
-	cmode		tmpuserdmode = TMPUSERDMODE ;
-	int		rs ;
-	cchar		*udname = TMPUSERDNAME ;
-	cchar		*tdname = getenv(VARTMPDNAME) ;
-	char		tmpuserdname[MAXPATHLEN + 1] ;
-
-	if (tdname == NULL) tdname = TMPDNAME ;
-
-	if ((rs = mkpath2(tmpuserdname,tdname,udname)) >= 0) {
-	    if ((rs = u_stat(tmpuserdname,&sb)) == SR_NOEXIST) {
-	        if ((rs = u_mkdir(tmpuserdname,tmpuserdmode)) >= 0) {
-	            rs = uc_minmod(tmpuserdname,tmpuserdmode) ;
-	        }
-	    }
-	    if (rs >= 0) {
-	        if ((rs = mkpath2(rbuf,tmpuserdname,un)) >= 0) {
-	            if ((rs = u_stat(rbuf,&sb)) == SR_NOEXIST) {
-	                rs = u_mkdir(rbuf,S_IAMB) ;
-	            }
-	        } /* end if (mkpath) */
-	    } /* end if (ok) */
-	} /* end if (ok) */
-
-	return rs ;
-}
-/* end subroutine (mktmpuser) */
-#endif /* COMMENT */
 
 
