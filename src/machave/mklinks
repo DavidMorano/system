@@ -1,8 +1,8 @@
 #!/usr/extra/bin/ksh
 # MKLINKS
 
-CMDS=" username userhome usershell gid groupname uid sid sessionid shells"
-LOCPROG=userhome.x
+CMDS=" haveprogram havefunction pathto fpathto pathenum "
+LOCPROG=macuser.x
 
 function linkdir {
   typeset TDIR=${1}

@@ -1,4 +1,4 @@
-HAVEPROGRAM
+MACHAVE
 
 There can be various implementations of the HAVEPROGRAM program
 (and the PATHTO program).  Some of these are:

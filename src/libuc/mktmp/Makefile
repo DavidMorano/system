@@ -58,7 +58,7 @@ OBJA_MKTMP= mktmpdir.o
 OBJB_MKTMP= mktmpusers.o mktmpuserdir.o
 OBJC_MKTMP= mktmpfile.o mktmplock.o
 
-OBJ_MKTMP= $(OBJA_MKTMP) $(OBJB_MKTMP) $(OBJC_MKTMP)
+OBJ_MKTMP= obja_mktmp.o objb_mktmp.o objc_mktmp.o
 
 
 default:		$(T).o
@@ -103,6 +103,16 @@ clean:
 
 control:
 	(uname -n ; date) > Control
+
+
+obja_mktmp.o:		$(OBJA_MKTMP) 
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MKTMP)
+
+objb_mktmp.o:		$(OBJB_MKTMP) 
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MKTMP)
+
+objc_mktmp.o:		$(OBJC_MKTMP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_MKTMP)
 
 
 # directories

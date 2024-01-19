@@ -1,6 +1,6 @@
-# MAKEFILE (haveprogram)
+# MAKEFILE (macuser)
 
-T= haveprogram
+T= macuser
 
 ALL= $(T).x
 

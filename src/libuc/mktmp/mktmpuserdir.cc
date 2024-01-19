@@ -97,6 +97,7 @@ int mktmpuser(char *rbuf) noex {
 	int		rl = 0 ;
 	if (rbuf) {
 	    char	*ubuf{} ;
+	    rbuf[0] = '\0' ;
 	    if ((rs = malloc_un(&ubuf)) >= 0) {
 		cint	ulen = rs ;
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
@@ -115,6 +116,7 @@ int mktmpuserx(char *rbuf,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rbuf) {
+	    rbuf[0] = '\0' ;
 	    if ((rs = mktmpusers(rbuf)) >= 0) {
 		cint	tl = rs ;
 		if ((rs = pathadd(rbuf,tl,un)) >= 0) {
@@ -139,21 +141,18 @@ int mktmpuserx(char *rbuf,cchar *un) noex {
 
 int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		len = 0 ;
 	if (rbuf && un && dname) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (un[0] && dname[0]) {
-		char	*tbuf{} ;
-		if ((rs = malloc_mp(&tbuf)) >= 0) {
-		    if ((rs = mktmpuserx(tbuf,un)) >= 0) {
-		        rs = mktmpdir(rbuf,tbuf,dm) ;
-		        len = rs ;
-	            } /* end if (ok) */
-		    rs1 = uc_free(tbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
+		if ((rs = mktmpuserx(rbuf,un)) >= 0) {
+		    cint	rl = rs ;
+		    if ((rs = pathadd(rbuf,rl,dname)) >= 0) {
+			len = rs ;
+		        rs = mkourdir(rbuf,dm) ;
+		    } /* end if (pathadd) */
+	        } /* end if (mktmpuserx) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -165,7 +164,7 @@ int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 
 static int mkourdir(cchar *rbuf,cmode dm) noex {
 	int		rs ;
-	if ((rs = mkdir(rbuf,dm)) >= 0) {
+	if ((rs = u_mkdir(rbuf,dm)) >= 0) {
 	    rs = uc_minmod(rbuf,dm) ;
 	}
 	return rs ;

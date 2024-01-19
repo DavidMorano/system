@@ -19,9 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<localmisc.h>
 
 
 #if	defined(OSNAME_SunOS) && (ISNAME_SunOS > 0)

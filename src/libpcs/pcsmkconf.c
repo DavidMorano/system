@@ -52,32 +52,32 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
 
-extern int	prmktmpdir(const char *,char *,const char *,mode_t) ;
+extern int	prmktmpdir(cchar *,char *,cchar *,mode_t) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -95,10 +95,10 @@ struct subinfo {
 	SUBINFO_FL	f ;
 	PARAMFILE	pf ;
 	VARMK		v ;
-	const char	**envv ;
-	const char	*prconf ;
-	const char	*pr ;
-	const char	*cfname ;
+	cchar	**envv ;
+	cchar	*prconf ;
+	cchar	*pr ;
+	cchar	*cfname ;
 } ;
 
 
@@ -117,7 +117,7 @@ static int	subinfo_proc(SUBINFO *) ;
 
 /* local variables */
 
-static const char	*schedconf[] = {
+static cchar	*schedconf[] = {
 	"%p/etc/%n.%f",
 	"%p/etc/%f",
 	"%p/%n.%f",
@@ -129,9 +129,9 @@ static const char	*schedconf[] = {
 
 
 int pcsmkconf(pr,envv,cfname)
-const char	pr[] ;
-const char	*envv[] ;
-const char	cfname[] ;
+cchar	pr[] ;
+cchar	*envv[] ;
+cchar	cfname[] ;
 {
 	SUBINFO		si ;
 	int		rs ;
@@ -173,19 +173,19 @@ const char	cfname[] ;
 
 static int subinfo_start(sip,pr,envv,cfname)
 SUBINFO		*sip ;
-const char	pr[] ;
-const char	*envv[] ;
-const char	cfname[] ;
+cchar	pr[] ;
+cchar	*envv[] ;
+cchar	cfname[] ;
 {
 	VECSTR		subs ;
 	const mode_t	vm = 0444 ;
-	const int	of = O_CREAT ;
-	const int	n = 20 ;
-	const int	f_global = (cfname == NULL) ;
+	cint	of = O_CREAT ;
+	cint	n = 20 ;
+	cint	f_global = (cfname == NULL) ;
 	int		rs = SR_OK ;
 	char		dbname[MAXPATHLEN+1] ;
 
-	if (envv == NULL) envv = (const char **) environ ;
+	if (envv == NULL) envv = (cchar **) environ ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
 	sip->envv = envv ;
@@ -255,7 +255,7 @@ static int subinfo_startsubs(SUBINFO *sip,VECSTR *slp)
 {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	cl = sfbasename(sip->pr,-1,&cp) ;
 	if (cl <= 0) rs = SR_INVALID ;
@@ -275,7 +275,7 @@ static int subinfo_confglobal(SUBINFO *sip,char *dbname)
 {
 	const mode_t	dm = 0777 ;
 	int		rs ;
-	const char	*cdname = "pcsconf" ;
+	cchar	*cdname = "pcsconf" ;
 	char		tmpdname[MAXPATHLEN+1] ;
 
 	if ((rs = prmktmpdir(sip->pr,tmpdname,cdname,dm)) >= 0) {
@@ -291,7 +291,7 @@ static int subinfo_conflocal(SUBINFO *sip,char *dbname)
 {
 	const mode_t	dm = 0775 ;
 	int		rs ;
-	const char	*cdname = "pcsconf" ;
+	cchar		*cdname = "pcsconf" ;
 	char		tmpdname[MAXPATHLEN+1] ;
 
 	if ((rs = mktmpuserdir(tmpdname,"-",cdname,dm)) >= 0) {
@@ -310,32 +310,24 @@ static int subinfo_proc(SUBINFO *sip)
 	PARAMFILE_ENT	pe ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = paramfile_open(pfp,sip->envv,sip->cfname)) >= 0) {
-
 	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-	        const int	plen = PARAMBUFLEN ;
-	        int		kl ;
-	        char		pbuf[PARAMBUFLEN+1] ;
-
+	        cint	plen = PARAMBUFLEN ;
+	        int	kl ;
+	        char	pbuf[PARAMBUFLEN+1] ;
 	        while (rs >= 0) {
 	            kl = paramfile_enum(pfp,&cur,&pe,pbuf,plen) ;
 	            if (kl == SR_NOTFOUND) break ;
 	            rs = kl ;
-
 		    if (rs >= 0) {
 	                rs = varmk_addvar(&sip->v,pe.key,pe.value,pe.vlen) ;
 		    }
-
 	        } /* end while (reading parameters) */
-
 	        paramfile_curend(pfp,&cur) ;
 	    } /* end if (cursor) */
-
 	    rs1 = paramfile_close(pfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (paramfile) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_proc) */

@@ -94,7 +94,7 @@ int hasnonpath(cchar *fp,int fl) noex {
 	if (f) {
 	    cchar	*tp = strnpbrk(fp,fl,nonpaths) ;
 	    f = false ;
-	    if ((tp != nullptr) && ((tp-fp) > 0) && (tp[1] != '\0')) {
+	    if ((tp != nullptr) && ((tp - fp) > 0) && (tp[1] != '\0')) {
 	        f = sichr(nonpaths,-1,*tp) ;
 	    }
 	}

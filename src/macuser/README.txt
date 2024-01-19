@@ -1,4 +1,4 @@
-USERHOME
+MACUSER
 
 This is an old version of this little program that will still compile
 on the oldest (brain-damaged) systems!

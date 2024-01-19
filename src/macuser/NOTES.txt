@@ -1,4 +1,4 @@
-MAXUSERHOME
+MACUSER
 
 Other ways to get various user values:
 

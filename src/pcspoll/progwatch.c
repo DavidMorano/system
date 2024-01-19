@@ -48,9 +48,8 @@
 	have been handed to us from the initialization code.
 
 	Returns:
-
 	OK	may not really matter in the current implementation!
-	<0	error
+	<0	error (syhstem-error)
 
 *****************************************************************************/
 
@@ -117,23 +116,23 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
 extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mksublogid(char *,int,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mksublogid(char *,int,cchar *,int) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 extern int	cfdeci(char *,int,int *) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-extern int	prmktmpdir(const char *,char *,const char *,const char *,
+extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
+extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,
 			mode_t) ;
 extern int	getpwd(char *,int) ;
 extern int	varsub_addvec(VARSUB *,VECSTR *) ;
@@ -142,14 +141,14 @@ extern int	isNotPresent(int) ;
 extern int	progpidbegin(struct proginfo *,int) ;
 extern int	progpidcheck(struct proginfo *) ;
 extern int	progpidend(struct proginfo *) ;
-extern int	progexec(struct proginfo *,const char *,vecstr *,vecstr *) ;
-extern int	proglogout(struct proginfo *,const char *,const char *) ;
+extern int	progexec(struct proginfo *,cchar *,vecstr *,vecstr *) ;
+extern int	proglogout(struct proginfo *,cchar *,cchar *) ;
 extern int	progsvccheck(struct proginfo *) ;
 extern int	progacccheck(struct proginfo *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*timestr_logz(time_t,char *) ;
@@ -186,7 +185,7 @@ struct subinfo {
 static int	procjobdname(struct proginfo *) ;
 static int	procloadnames(struct proginfo *,vecstr *) ;
 static int	procname(struct proginfo *,
-			SVCENTRY_ARGS *,const char *) ;
+			SVCENTRY_ARGS *,cchar *) ;
 static int	procservice(struct proginfo *,
 			SVCFILE_ENT *,SVCENTRY_ARGS *) ;
 static int	procnewprogentry(struct proginfo *,SVCENTRY **) ;
@@ -195,22 +194,22 @@ static int	procjobdel(struct proginfo *,int,SVCENTRY *) ;
 static int	procruncheck(struct proginfo *) ;
 static int	procjobfind(struct proginfo *,pid_t,SVCENTRY **) ;
 static int	procjobstart(struct proginfo *,SVCENTRY *) ;
-static int	procjobadd(struct proginfo *,SVCENTRY *,const char *) ;
+static int	procjobadd(struct proginfo *,SVCENTRY *,cchar *) ;
 static int	procmorecheck(struct proginfo *) ;
 static int	procjobactive(struct proginfo *,
-			const char *,SVCENTRY **) ;
+			cchar *,SVCENTRY **) ;
 static int	procaccess(struct proginfo *,
-			const char *) ;
+			cchar *) ;
 
 static int	procstampfile(struct proginfo *) ;
 #if	CF_PROCFINDPROG
-static int	procfindprog(struct proginfo *,const char *,char *,int *) ;
+static int	procfindprog(struct proginfo *,cchar *,char *,int *) ;
 #endif
 
 static int	procfreeall(struct proginfo *) ;
 static int	proclogjobs(struct proginfo *) ;
 static int	proclogjob(struct proginfo *,SVCENTRY *) ;
-static int	proclogsecurity(struct proginfo *,const char *) ;
+static int	proclogsecurity(struct proginfo *,cchar *) ;
 
 #if	CF_SVCFILEFREE || CF_ACCTABFREE
 static int	procdbdump(struct proginfo *) ;
@@ -220,7 +219,7 @@ static int	procdbdump(struct proginfo *) ;
 static int	loadexports(struct proginfo *,vecstr *) ;
 #endif
 
-static int	procxfile(struct proginfo *,const char *) ;
+static int	procxfile(struct proginfo *,cchar *) ;
 
 static void	int_all(int) ;
 
@@ -267,7 +266,7 @@ vecstr		*snp ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
 	    int	rs1 ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    debugprintf("progwatch: entered \n") ;
 	    debugprintf("progwatch: workdname=%s\n",pip->workdname) ;
 	    rs1 = expcook_findkey(&pip->cooks,VARHOMEDNAME,-1,&cp) ;
@@ -283,7 +282,7 @@ vecstr		*snp ;
 	    vecstr	*elp = &pip->exports ;
 	    int		i ;
 	    int		n = 0 ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    debugprintf("progwatch: elp={%p} exports¬\n",elp) ;
 	    if ((rs = vecstr_count(elp)) >= 0) {
 	        for (i = 0 ; vecstr_get(elp,i,&cp) >= 0 ; i += 1) {
@@ -303,7 +302,7 @@ vecstr		*snp ;
 /* before we go too far, are we the only one on this PID mutex? */
 
 	if (! pip->f.named) {
-	    const char	*pidmsg ;
+	    cchar	*pidmsg ;
 
 	    rs = progpidbegin(pip,TO_PIDLOCK) ;
 
@@ -426,7 +425,7 @@ vecstr		*snp ;
 	    VARSUB	*slp = &tabsubs ;
 	    VARSUB_CUR	c ;
 	    int		n = 0 ;
-	    const char	*kp, *vp ;
+	    cchar	*kp, *vp ;
 	    debugprintf("progwatch: varsubs¬\n") ;
 	    varsub_curbegin(slp,&c) ;
 	    while (varsub_enum(slp,&c,&kp,&vp) >= 0) {
@@ -578,7 +577,7 @@ vecstr		*snp ;
 	if (rs >= 0) {
 #if	CF_POLL
 	    {
-		const int	pto = (to_poll * POLLMULT) ;
+		cint	pto = (to_poll * POLLMULT) ;
 	        fds[0].fd = -1 ;
 	        rs1 = u_poll(fds,0,pto) ;
 	    }
@@ -657,8 +656,8 @@ vecstr		*snp ;
 
 	if (f) {
 
-	    const char	*fmt ;
-	    const char	*s = (pip->f.daemon) ? "server" : "single" ;
+	    cchar	*fmt ;
+	    cchar	*s = (pip->f.daemon) ? "server" : "single" ;
 
 	    pip->daytime = time(NULL) ;
 
@@ -742,10 +741,10 @@ static int procjobdname(struct proginfo *pip)
 
 	if (pip->jobdname == NULL) {
 	    mode_t	dm ;
-	    const char	*pr = pip->pr ;
-	    const char	*pn = pip->progname ;
-	    const char	*sn = pip->searchname ;
-	    const char	*tmpdname = pip->tmpdname ;
+	    cchar	*pr = pip->pr ;
+	    cchar	*pn = pip->progname ;
+	    cchar	*sn = pip->searchname ;
+	    cchar	*tmpdname = pip->tmpdname ;
 	    char	jobdname[MAXPATHLEN+1] ;
 	    switch (pip->tmptype) {
 	    defualt:
@@ -761,7 +760,7 @@ static int procjobdname(struct proginfo *pip)
 	    case 1:
 	        {
 		    dm = 0775 ;
-		    const char	*un = pip->username ;
+		    cchar	*un = pip->username ;
 	            rs = mktmpuserdir(jobdname,un,sn,dm) ;
 	        }
 	        break ;
@@ -769,7 +768,7 @@ static int procjobdname(struct proginfo *pip)
 	    if (rs >= 0)
 	        rs = proginfo_setentry(pip,&pip->jobdname,jobdname,rs) ;
 	    if (pip->debuglevel > 0) {
-		const int	ti = pip->tmptype ;
+		cint	ti = pip->tmptype ;
 		bprintf(pip->efp,"%s: jobdname(%u)=%s\n",pn,ti,jobdname) ;
 	    }
 	} else
@@ -798,7 +797,7 @@ vecstr		*snp ;
 	sfp = pcp->sfp ;
 	if (pip->f.named) {
 	    int		i ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    for (i = 0 ; vecstr_get(snp,i,&cp) >= 0 ; i += 1) {
 	        if (cp == NULL) continue ;
@@ -854,7 +853,7 @@ vecstr		*snp ;
 static int procname(pip,pap,name)
 struct proginfo	*pip ;
 SVCENTRY_ARGS	*pap ;
-const char	name[] ;
+cchar	name[] ;
 {
 	struct subinfo	*pcp = pip->sip ;
 	SVCFILE_ENT	ste ;
@@ -965,7 +964,7 @@ struct proginfo	*pip ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
 	                int	i ;
-	                const char	*cp ;
+	                cchar	*cp ;
 	                debugprintf("procruncheck: "
 	                    "dequeued rs=%d pep=%08lx\n",
 	                    rs1,pep) ;
@@ -1130,7 +1129,7 @@ struct proginfo	*pip ;
 /* maintenance the stamp-file (our own) */
 
 	if ((rs >= 0) && pip->f.stampfname) {
-	    const int	to = TO_STAMP ;
+	    cint	to = TO_STAMP ;
 
 	    if (pcp->ti_stampcheck == 0)
 	        pcp->ti_stampcheck = pip->daytime ;
@@ -1165,7 +1164,7 @@ SVCENTRY	*pep ;
 	pid_t		pid ;
 	int		rs ;
 	int		i ;
-	const char	*pfname ;
+	cchar	*pfname ;
 	char		progfname[MAXPATHLEN + 2] ;
 
 /* can we execute this service daemon? */
@@ -1256,7 +1255,7 @@ ret0:
 static int procjobadd(pip,pep,pfname)
 struct proginfo	*pip ;
 SVCENTRY	*pep ;
-const char	*pfname ;
+cchar	*pfname ;
 {
 	struct subinfo	*pcp = pip->sip ;
 	pid_t		pid = 0 ;
@@ -1265,17 +1264,17 @@ const char	*pfname ;
 	    VECSTR	*elp = &pip->exports ;
 	    SPAWNER	s ;
 	    int		ji = rs ;
-	    const char	*pf = pfname ;
-	    const char	*sfo = pep->ofname ;
-	    const char	*sfe = pep->efname ;
-	    const char	**av, **ev ;
+	    cchar	*pf = pfname ;
+	    cchar	*sfo = pep->ofname ;
+	    cchar	*sfe = pep->efname ;
+	    cchar	**av, **ev ;
 	    bflush(pip->efp) ;
 	    if ((rs = svcentry_getargs(pep,&av)) >= 0) {
 	        if (pip->open.logprog) {
 		    logfile_setid(&pip->lh,pep->jobid) ;
 		    if ((av != NULL) && (av[0] != NULL)) {
 		        int		al ;
-		        const char	*ap ;
+		        cchar	*ap ;
 		        if ((al = sfbasename(av[0],-1,&ap)) > 0)
 	                    logfile_printf(&pip->lh,"server=%t\n",ap,al) ;
 		    }
@@ -1445,15 +1444,12 @@ struct proginfo	*pip ;
 
 	    } else {
 	        int	interval ;
-
 	        if (svcentry_getinterval(pep,&interval) >= 0) {
-		    const int	to = pcp->to_minjob ;
-
-	            if ((interval < to) || (to < 0))
+		    cint	to = pcp->to_minjob ;
+	            if ((interval < to) || (to < 0)) {
 	                pcp->to_minjob = interval ;
-
+		    }
 	        }
-
 	    } /* end if */
 
 	} /* end while (looping through all services) */
@@ -1491,7 +1487,7 @@ SVCENTRY_ARGS	*pap ;
 	int		rs ;
 	int		interval ;
 	int		f_process = FALSE ;
-	const char	*access ;
+	cchar	*access ;
 	char		stampfname[MAXPATHLEN + 1] ;
 	char		jobid[SVCENTRY_IDLEN + 2] ;
 	char		timebuf[TIMEBUFLEN + 1] ;
@@ -1789,7 +1785,7 @@ bad0:
 /* is a named job active in the system already? */
 static int procjobactive(pip,name,pepp)
 struct proginfo	*pip ;
-const char	name[] ;
+cchar	name[] ;
 SVCENTRY	**pepp ;
 {
 	struct subinfo	*pcp = pip->sip ;
@@ -1839,7 +1835,7 @@ SVCENTRY	**pepp ;
 /* check if this connection is allowed based on the service access */
 static int procaccess(pip,access)
 struct proginfo	*pip ;
-const char	access[] ;
+cchar	access[] ;
 {
 	struct subinfo	*pcp = pip->sip ;
 	FIELD		af ;
@@ -1848,8 +1844,8 @@ const char	access[] ;
 	int		i, j ;
 	int		fl ;
 	int		cl ;
-	const char	*fp ;
-	const char	*cp ;
+	cchar	*fp ;
+	cchar	*cp ;
 	char		hostname[MAXHOSTNAMELEN + 2] ;
 
 #if	CF_DEBUG
@@ -1880,7 +1876,7 @@ const char	access[] ;
 
 	        if (fl > 0) {
 	            int		bl = fl ;
-	            const char	*bp = fp ;
+	            cchar	*bp = fp ;
 	            while ((rs >= 0) && ((cl = nextfield(bp,bl,&cp)) > 0)) {
 	                rs = vecstr_add(&netgroups,cp,cl) ;
 	                bl -= ((cp + cl) - bp) ;
@@ -1963,7 +1959,7 @@ const char	access[] ;
 /* try the system netgroups (UNIX does not have one simple call as above!) */
 
 	if ((! pip->open.accfname) || (rs < 0)) {
-	    const char	*ngp, *mnp ;
+	    cchar	*ngp, *mnp ;
 
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(2))
@@ -2046,7 +2042,7 @@ struct proginfo	*pip ;
 #if	CF_PROCFINDPROG
 static int procfindprog(pip,program,progpath,sp)
 struct proginfo	*pip ;
-const char	program[] ;
+cchar	program[] ;
 char		progpath[] ;
 int		*sp ;			/* secure path? */
 {
@@ -2054,7 +2050,7 @@ int		*sp ;			/* secure path? */
 	int		rs = SR_OK ;
 	int		i ;
 	int		sl = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (program[0] == '/') {
 
@@ -2095,7 +2091,7 @@ int		*sp ;			/* secure path? */
 
 	        *sp = pip->f.secure_path ;
 	        for (i = 0 ; vecstr_get(&pip->pathexec,i,&cp) >= 0 ; i += 1) {
-	            const char	*pp ;
+	            cchar	*pp ;
 
 	            if (cp == NULL) continue ;
 
@@ -2294,10 +2290,10 @@ SVCENTRY	*pep ;
 /* end subroutine (proclogjob) */
 
 
-static int proclogsecurity(struct proginfo *pip,const char *pfname)
+static int proclogsecurity(struct proginfo *pip,cchar *pfname)
 {
 	int		al ;
-	const char	*ap ;
+	cchar	*ap ;
 	if ((al = sfbasename(pfname,-1,&ap)) > 0) {
 
 	    if (pip->open.logprog) {
@@ -2365,7 +2361,7 @@ struct proginfo	*pip ;
 
 static int procxfile(pip,fname)
 struct proginfo	*pip ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	struct ustat	sb ;
 	int		rs ;

@@ -1,6 +1,6 @@
-# MAKEFILE (macuserhome)
+# MAKEFILE (machav)
 
-T= userhome
+T= machave
 
 ALL= $(T).x
 
