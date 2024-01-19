@@ -36,6 +36,14 @@ extern int snaddw(char *,int,int,cchar *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+static inline int snadd(char *rbuf,int rlen,int rl,cchar *sp) noex {
+	return snaddw(rbuf,rlen,rl,sp,-1) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* SNADDW_INCLUDE */
 
