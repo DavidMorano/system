@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int vecpstr_ctor(vecpstr *op,Args ... args) noex {
+static int vecpstr_ctor(clustername *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    nullptr_t	np{} ;
