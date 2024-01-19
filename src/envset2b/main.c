@@ -182,7 +182,6 @@ extern int	getuserorg(char *,int,cchar *) ;
 extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	inittimezone(char *,int,cchar *) ;
 extern int	mkdirs(cchar *,mode_t) ;
-extern int	mktmpuserdir(char *,cchar *,cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	readfileline(char *,int,cchar *) ;

@@ -44,6 +44,7 @@
 #include	<usystem.h>
 #include	<endianstr.h>
 #include	<getbufsize.h>
+#include	<mktmp.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
@@ -160,7 +161,6 @@ extern int	matpstr(const char **,int,const char *,int) ;
 extern int	matpcasestr(const char **,int,const char *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	prsetfname(cchar *,char *,cchar *,int,cchar *,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;

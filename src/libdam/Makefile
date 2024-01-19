@@ -302,7 +302,7 @@ OBJ137= isNotValid.o isNotAccess.o isNotLib.o
 OBJ138= isBadSend.o isBadRecv.o isBadMsg.o
 OBJ139= isasocket.o isinteractive.o isfsremote.o isproc.o
 OBJ140= fsdirtreestat.o statvfsdir.o
-OBJ141= removes.o rmdirfiles.o rmsesfiles.o dircount.o isdirempty.o
+OBJ141= rmsesfiles.o dircount.o isdirempty.o
 OBJ142= prgetprogpath.o prsetfname.o prmktmpdir.o
 OBJ143= intceil.o intfloor.o intsat.o
 

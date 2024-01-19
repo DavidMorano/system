@@ -22,12 +22,12 @@ for the values of \f2mode.\f1
 .SH EXAMPLES
 .EX
 /\(** create scratch directories \(**/
-if (mkdirs("/tmp/sub1/sub2/sub3", 0755) < 0) {
+const char	dname = "/tmp/sub1/sub2/sub3" ;
+if (mkdirs(dname,0755) >= 0) {
+	rs = chdir(dname) ;
+} else {
 	fprintf(stderr, "cannot create directory");
-	exit(1);
 }
-chdir("/tmp/sub1/sub2/sub3");
-\&\.
 \&\.
 \&\.
 .EE

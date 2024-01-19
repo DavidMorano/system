@@ -1,20 +1,17 @@
-/* invert */
+/* invert SUPPORT */
+/* lang=C20 */
 
 /* program to invert a line coded file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-tune debugging */
-
 
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-
-	This program was written from scratch but inspired by some 
+	This program was written from scratch but inspired by some
 	previous program that I wrote (and lost) by the same name.
-
 
 */
 
@@ -23,24 +20,20 @@
 /**************************************************************************
 
 	Synopsis:
-
 	$ invert [infile [outfile]]
-
 
 **************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
-#include	<ctype.h>
-
 #include	<bfile.h>
+#include	<mktmp.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -61,10 +54,7 @@
 
 /* external subroutines */
 
-extern int	mktmplock(const char **,const char *,mode_t,char *) ;
-extern int	isdigitlatin(int) ;
-
-extern char	*strbasename(char *) ;
+extern char	*strbasename(char *) noex ;
 
 
 /* external variables */
@@ -72,30 +62,18 @@ extern char	*strbasename(char *) ;
 
 /* local variables */
 
-static const char	*tmpdirs[] = {
-	"/tmp",
-	"/var/tmp",
-	"/var/spool/uucppublic",
-	"/usr/tmp",
-	".",
-	NULL
-} ;
-
 
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
-	struct ustat	ss ;
-
+int main(int argc,cchar **argv,cchar **envv) noex {
+	USTAT		ss ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		infile, *ifp = &infile ;
 	bfile		tmpfile, *tfp = &tmpfile ;
 	bfile		outfile, *ofp = &outfile ;
 
-	offset_t	boff ;
-	offset_t	offset ;
+	off_t	boff ;
+	off_t	offset ;
 
 	long		buflen ;
 
@@ -253,7 +231,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* create a temporary file */
 
-	    rs = mktmplock(tmpdirs,"invXXXXXXXXXXX",0600,tmpfname) ;
+	    rs = mktmpfile(tmpdname,"invXXXXXXXXXXX",0600) ;
 	    if (rs < 0)
 	        goto badtmpfile ;
 
@@ -273,9 +251,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* copy the entire input file over to the temporary file */
 
 	    while ((len = bread(ifp,buf,BUFLEN)) > 0) {
-
 	        bwrite(tfp,buf,len) ;
-
 	    }
 
 	    bclose(ifp) ;

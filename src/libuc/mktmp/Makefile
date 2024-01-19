@@ -54,8 +54,11 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mktmp.h
 
 
-#OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o mktmplock.o
-OBJ_MKTMP= mktmpdir.o mktmpuserdir.o mktmpfile.o 
+OBJA_MKTMP= mktmpdir.o 
+OBJB_MKTMP= mktmpusers.o mktmpuserdir.o
+OBJC_MKTMP= mktmpfile.o mktmplock.o
+
+OBJ_MKTMP= $(OBJA_MKTMP) $(OBJB_MKTMP) $(OBJC_MKTMP)
 
 
 default:		$(T).o
@@ -104,6 +107,7 @@ control:
 
 # directories
 mktmpdir.o:		mktmpdir.cc $(INCS)
+mktmpusers.o:		mktmpusers.cc $(INCS)
 mktmpuserdir.o:		mktmpuserdir.cc $(INCS)
 
 # files

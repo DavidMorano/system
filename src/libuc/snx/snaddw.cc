@@ -33,13 +33,15 @@
 	sp		new c-string pointer to be added
 	sl		new c-string length to be added
 
+	Returns:
+	>=0		the amount of additional string added to
+			the existing c-string buffer
+	<0		error (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 

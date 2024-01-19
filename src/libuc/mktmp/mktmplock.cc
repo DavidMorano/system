@@ -38,20 +38,18 @@
 
 	Returns:
 	>=0		length of created temporary file if successful
-	<0		error code (systerm-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<mkpathx.h>
-#include	<strlibval.hh>
+#include	<dirseen.h>
 #include	<isoneof.h>
 #include	<localmisc.h>
 
@@ -77,8 +75,6 @@ static int		lockable(cchar *,mode_t) noex ;
 
 
 /* local variables */
-
-static strlibval	strtmpdir(strlibval_path) ;
 
 static constexpr cchar	*tmpdirs[] = {
 	"/tmp",
@@ -108,12 +104,11 @@ int mktmplock(char *rbuf,cchar *fn,mode_t fm) noex {
 	if (rbuf && fn) {
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-		nullptr_t	np{} ;
-		rs = SR_AGAIN ; /* temp-fail */
-		if (cchar *tmpdir ; (tmpdir = strtmpdir) != np) {
+		for (int i = 0 ; (rs == 0) && tmpdirs[i] ; i += 1) {
+		    cchar	*tmpdir = tmpdirs[i] ;
 		    rs = mktmptry(rbuf,tmpdir,fn,fm) ;
 		    rl = rs ;
-		}
+		} /* end if (tmpdirs) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
@@ -127,10 +122,12 @@ static int mktmptry(char *rbuf,cchar *tmpdir,cchar *fn,mode_t fm) noex {
 	int		rs ;
 	int		rl = 0 ;
 	if ((rs = mkpath(rbuf,tmpdir,fn)) >= 0) {
-	    rs = lockable(rbuf,fm) ;
 	    rl = rs ;
+	    if ((rs = lockable(rbuf,fm)) == 0) {
+	        rl = 0 ;
+	    }
 	    u_unlink(rbuf) ;
-	}
+	} /* end if (mkpath) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mktmptry) */

@@ -52,12 +52,9 @@
 	OK	may not really matter in the current implementation!
 	<0	error
 
-
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -72,8 +69,8 @@
 #include	<netdb.h>
 #include	<time.h>
 #include	<errno.h>
-
 #include	<usystem.h>
+#include	<mktmp.h>
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<vechand.h>
@@ -138,7 +135,6 @@ extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
 extern int	prgetprogpath(const char *,char *,const char *,int) ;
 extern int	prmktmpdir(const char *,char *,const char *,const char *,
 			mode_t) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	getpwd(char *,int) ;
 extern int	varsub_addvec(VARSUB *,VECSTR *) ;
 extern int	isNotPresent(int) ;

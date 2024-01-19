@@ -19,22 +19,16 @@
 
 	This module manages the sending of messages (notes) to sessions.
 
-
 *******************************************************************************/
 
-
-#define	SESNOTES_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
+#include	<mktmp.h>
 #include	<sockaddress.h>
 #include	<fsdir.h>
 #include	<nulstr.h>
@@ -62,7 +56,6 @@ extern int	mkpath1(char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	pathadd(char *,int,const char *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	isproc(pid_t) ;
 extern int	isNotPresent(int) ;

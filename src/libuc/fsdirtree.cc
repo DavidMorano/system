@@ -64,6 +64,9 @@
 #include	<strwcpy.h>
 #include	<sncpyx.h>
 #include	<mknpathx.h>
+#include	<matxstr.h>
+#include	<hasnot.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"fsdirtree.h"
@@ -96,9 +99,6 @@ typedef uint32_t	ui ;
 /* external subroutines */
 
 extern "C" {
-    extern int	matstr(cchar **,cchar *,int) noex ;
-    extern int	hasNotDots(cchar *,int) noex ;
-    extern int	isNotPresent(int) noex ;
     extern int	isDotDir(const char *) noex ;
 }
 
@@ -139,7 +139,7 @@ static bool	interested(int,mode_t) noex ;
 int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 	int		rs ;
 	if (op == nullptr) return SR_FAULT ;
-	memset(op,0,sizeof(FSDIRTREE)) ;
+	memclear(op) ;
 	op->opts = opts ;
 	if ((rs = fifostr_start(&op->dirq)) >= 0) {
 	    const char	*bdp = dname ;
@@ -179,13 +179,15 @@ int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 	                    op->cdnlen = op->bdnlen ;
 	                    op->magic = FSDIRTREE_MAGIC ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    fsdir_close(&op->dir) ;
+			}
 	            } /* end if (fsdir) */
-	        }
+	        } /* end if (ok) */
 	    } /* end if (ok) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        fifostr_finish(&op->dirq) ;
+	    }
 	} /* end if (fifostr) */
 	return rs ;
 }

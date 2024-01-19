@@ -1,5 +1,5 @@
-/* umask */
-/* lang=C20 */
+/* umask SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® UMASK (file-creation-mask) management */
 /* version %I% last-modified %G% */
@@ -62,14 +62,19 @@ struct umask {
 
 /* forward references */
 
-static void	umask_atforkbefore() noex ;
-static void	umask_atforkafter() noex ;
-static void	umask_exit() noex ;
+extern "C" {
+    static void	umask_atforkbefore() noex ;
+    static void	umask_atforkafter() noex ;
+    static void	umask_exit() noex ;
+}
 
 
 /* local variables */
 
 static struct umask	umask_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -46,6 +46,7 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>
+#include	<mktmp.h>
 #include	<vecobj.h>
 #include	<sbuf.h>
 #include	<char.h>
@@ -133,7 +134,6 @@ extern int	nleadstr(const char *,const char *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	mktmpuserdir(char *,const char *,const char *,mode_t) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 extern int	isOneOf(const int *,int) ;

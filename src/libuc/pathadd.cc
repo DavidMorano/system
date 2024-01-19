@@ -1,4 +1,4 @@
-/* pathadd */
+/* pathadd SUPPORT */
 /* lang=C++20 */
 
 /* add a component to an existing path */
@@ -22,6 +22,7 @@
 
 	Description:
 	This subroutine adds a new component to an existing file-path.
+	These subroutines return the total length of the final path.
 
 	Synopsis:
 	int pathaddw(char *pbuf,int plen,cchar *sp,int sl) noex
@@ -34,14 +35,19 @@
 	sl		new-componment length
 
 	Returns:
-	>=0		new length of new path
-	<0		error
+	>=0		new length of new path; total length from beginning
+	<0		error (system-return)
+
+	Note:
+	These subroutines return the total length of the final path 
+	that resides in the given path-result-buffer.
+	If you want a subroutine that returns just the added part,
+	then check out the |storebuf(3uc)| facility or the |snadd(3uc)|
+	facility.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
@@ -65,6 +71,9 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

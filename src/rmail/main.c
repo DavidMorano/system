@@ -4449,7 +4449,7 @@ static int mkreport(PROGINFO *pip,int argc,cchar **argv,int rrs)
 			pip->nodename = onn ;
 		    } /* end if (getnodename) */
 		} /* end if (mkreportfile) */
-	    } /* end if (mktmpuserdir) */
+	    } /* end if (mktmpreportdir) */
 	    pip->username = oun ;
 	} /* end if (getusername) */
 

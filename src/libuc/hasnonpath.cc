@@ -1,7 +1,8 @@
-/* hasnonpath */
+/* hasnonpath SUPPORT */
 /* lang=C++20 */
 
 /* determine if the given string represent a non-path filename */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -29,40 +30,41 @@
 	- pl	length of given path string
 
 	Returns:
-	<0	error
-	==0	no
 	>0	yes and this is the index of the type of non-path
+	==0	no
+	<0	error (syhstem-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<six.h>
+#include	<strn.h>
 #include	<localmisc.h>
+
+#include	"hasnonpath.h"
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	sichr(const char *,int,int) ;
-
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
 
 
 /* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-static cchar		*nonpaths = "/ез~" ;
 
 enum nonpaths {
 	nonpath_not,
@@ -73,6 +75,17 @@ enum nonpaths {
 } ;
 
 
+/* forward references */
+
+
+/* local variables */
+
+static constexpr cchar		nonpaths[] = "/ез~" ;
+
+
+/* export variables */
+
+
 /* exported subroutines */
 
 int hasnonpath(cchar *fp,int fl) noex {
@@ -80,8 +93,8 @@ int hasnonpath(cchar *fp,int fl) noex {
 	if (fl < 0) fl = strlen(fp) ;
 	if (f) {
 	    cchar	*tp = strnpbrk(fp,fl,nonpaths) ;
-	    f = FALSE ;
-	    if ((tp != NULL) && ((tp-fp) > 0) && (tp[1] != '\0')) {
+	    f = false ;
+	    if ((tp != nullptr) && ((tp-fp) > 0) && (tp[1] != '\0')) {
 	        f = sichr(nonpaths,-1,*tp) ;
 	    }
 	}

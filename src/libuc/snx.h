@@ -28,6 +28,7 @@
 #include	<snwcpy.h>
 #include	<snxxx.h>
 #include	<snuuid.h>
+#include	<snaddw.h>
 
 
 EXTERNC_begin

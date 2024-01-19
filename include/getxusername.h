@@ -1,7 +1,7 @@
 /* getxusername HEADER */
 /* lang=C20 */
 
-/* get the best approximation of the user's username */
+/* get the best approximation of the username of the current user */
 /* version %I% last-modified %G% */
 
 

@@ -249,6 +249,34 @@ int dirseen_curenum(dirseen *op,dirseen_cur *curp,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
+int dirseen::add(cchar *sp,int sl,USTAT *sbp) noex {
+	return dirseen_add(this,sp,sl,sbp) ;
+}
+
+void dirseen::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("dirseen",rs,"fini-finish") ;
+	}
+}
+
+int dirseen_co::operator () () noex {
+	int	rs = SR_BUGCHECK ;
+	switch (w) {
+	case dirseenmem_start:
+	    rs = dirseen_start(op) ;
+	    break ;
+	case dirseenmem_count:
+	    rs = dirseen_count(op) ;
+	    break ;
+	case dirseenmem_finish:
+	    rs = dirseen_finish(op) ;
+	    break ;
+	} /* end switch */
+	return rs ;
+}
+/* end method (dirseen_co::operator) */
+
 int entry_start(dirseen_ent *ep,cchar *sp,int sl,dev_t dev,ino_t ino) noex {
 	int		rs ;
 	cchar		*cp{} ;
