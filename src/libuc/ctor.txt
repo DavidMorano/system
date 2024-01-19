@@ -1,5 +1,5 @@
 template<typename ... Args>
-static inline int vecpstr_ctor(vecpstr *op,Args ... args) noex {
+static int vecpstr_ctor(vecpstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    nullptr_t	np{} ;
@@ -8,13 +8,24 @@ static inline int vecpstr_ctor(vecpstr *op,Args ... args) noex {
 	}
 	return rs ;
 }
-/* end subroutine (memfile_ctor) */
+/* end subroutine (clusterdb_ctor) */
 
-static int memfile_dtor(memfile *op) noex {
-	return SR_OK ;
+static int clusterdb_dtor(clusterdb *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
-/* end subroutine (memfile_dtor) */
+/* end subroutine (clusterdb_dtor) */
 
-
-	if ((rs = vecpstr_ctor(op,sp)) >= 0) {
+template<typename ... Args>
+static int clusterdb_magic(clusterdb *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == CLUSTERDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (clusterdb_magic) */
 

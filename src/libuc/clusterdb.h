@@ -16,6 +16,9 @@
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<netdb.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<kvsfile.h>
 #include	<localmisc.h>
 
@@ -38,20 +41,20 @@ typedef CLUSTERDB_CUR	clusterdb_cur ;
 
 EXTERNC_begin
 
-extern int clusterdb_open(CLUSTERDB *,const char *) ;
-extern int clusterdb_fileadd(CLUSTERDB *,const char *) ;
-extern int clusterdb_curbegin(CLUSTERDB *,CLUSTERDB_CUR *) ;
-extern int clusterdb_curend(CLUSTERDB *,CLUSTERDB_CUR *) ;
-extern int clusterdb_enumcluster(CLUSTERDB *,CLUSTERDB_CUR *,
-		char *,int) ;
-extern int clusterdb_enum(CLUSTERDB *,CLUSTERDB_CUR *,
-		char *,int,char *,int) ;
-extern int clusterdb_fetch(CLUSTERDB *,const char *,CLUSTERDB_CUR *,
-		char *,int) ;
-extern int clusterdb_fetchrev(CLUSTERDB *,const char *,CLUSTERDB_CUR *,
-		char *,int) ;
-extern int clusterdb_check(CLUSTERDB *,time_t) ;
-extern int clusterdb_close(CLUSTERDB *) ;
+extern int clusterdb_open(clusterdb *,cchar *) noex ;
+extern int clusterdb_fileadd(clusterdb *,cchar *) noex ;
+extern int clusterdb_curbegin(clusterdb *,clusterdb_cur *) noex ;
+extern int clusterdb_curend(clusterdb *,clusterdb_cur *) noex ;
+extern int clusterdb_enumcluster(clusterdb *,clusterdb_cur *,
+		char *,int) noex ;
+extern int clusterdb_enum(clusterdb *,clusterdb_cur *,
+		char *,int,char *,int) noex ;
+extern int clusterdb_fetch(clusterdb *,cchar *,clusterdb_cur *,
+		char *,int) noex ;
+extern int clusterdb_fetchrev(clusterdb *,cchar *,clusterdb_cur *,
+		char *,int) noex ;
+extern int clusterdb_check(clusterdb *,time_t) noex ;
+extern int clusterdb_close(clusterdb *) noex ;
 
 EXTERNC_end
 

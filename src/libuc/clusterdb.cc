@@ -74,8 +74,13 @@
 
 #define	KEYALIGNMENT		sizeof(char *(*)[2])
 
+#define	CD			clusterdb
+#define	CD_CUR			clusterdb_cur
+
 
 /* local namespaces */
+
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -84,9 +89,9 @@
 /* external subroutines */
 
 extern "C" {
-    int		clusterdb_fileadd(CLUSTERDB *,cchar *) noex ;
-    int		clusterdb_curbegin(CLUSTERDB *,CLUSTERDB_CUR *) noex ;
-    int		clusterdb_curend(CLUSTERDB *,CLUSTERDB_CUR *) noex ;
+    int		clusterdb_fileadd(CD *,cchar *) noex ;
+    int		clusterdb_curbegin(CD *,CD_CUR *) noex ;
+    int		clusterdb_curend(CD *,CD_CUR *) noex ;
 }
 
 
@@ -116,26 +121,59 @@ struct clusterdb_ie {
 
 struct svcentry {
 	vecobj		keys ;
-	cchar	*svc ;
-	cchar	*clu ;
-	cchar	*sys ;
+	cchar		*svc ;
+	cchar		*clu ;
+	cchar		*sys ;
 } ;
 
 struct svcentry_key {
-	cchar	*kname ;
-	cchar	*args ;
+	cchar		*kname ;
+	cchar		*args ;
 	int		kl, al ;
 } ;
 
 
 /* forward references */
 
+template<typename ... Args>
+static int vecpstr_ctor(vecpstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_OK ;
+
+	}
+	return rs ;
+}
+/* end subroutine (clusterdb_ctor) */
+
+static int clusterdb_dtor(clusterdb *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (clusterdb_dtor) */
+
+template<typename ... Args>
+static int clusterdb_magic(clusterdb *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == CLUSTERDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (clusterdb_magic) */
+
 
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int clusterdb_open(clusterddb *atp,cchar *fname) noex {
 	USTAT		sb ;
@@ -195,118 +233,52 @@ int clusterdb_fileadd(clusterdb *atp,cchar *fname) noex {
 }
 /* end subroutine (clusterdb_fileadd) */
 
-
-/* cursor manipulations */
-int clusterdb_curbegin(atp,curp)
-CLUSTERDB	*atp ;
-CLUSTERDB_CUR	*curp ;
-{
-	int	rs ;
-
-
-	if (atp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	rs = kvsfile_curbegin(&atp->clutab,&curp->cur) ;
-
+int clusterdb_curbegin(CD *atp,CD_CUR *curp) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op,curp)) >= 0) {
+	    rs = kvsfile_curbegin(&atp->clutab,&curp->cur) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_curbegin) */
 
-
-int clusterdb_curend(atp,curp)
-CLUSTERDB	*atp ;
-CLUSTERDB_CUR	*curp ;
-{
-	int	rs ;
-
-
-	if (atp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	rs = kvsfile_curend(&atp->clutab,&curp->cur) ;
-
+int clusterdb_curend(CD *atp,CD_CUR *curp) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op,curp)) >= 0) {
+	    rs = kvsfile_curend(&atp->clutab,&curp->cur) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_curend) */
 
-
-/* enumerate the cluster names (keys) */
-int clusterdb_enumcluster(atp,curp,kbuf,klen)
-CLUSTERDB	*atp ;
-CLUSTERDB_CUR	*curp ;
-char		kbuf[] ;
-int		klen ;
-{
-	KVSFILE_CUR	*ccp ;
-
-	int	rs ;
-
-
-	if (atp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kbuf == NULL) return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	ccp = (curp != NULL) ? &curp->cur : NULL ;
-	rs = kvsfile_enumkey(&atp->clutab,ccp,kbuf,klen) ;
-
+int clusterdb_enumcluster(CD *atp,CD_CUR *curp,char *kbuf,int klen) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op,curp,kbuf)) >= 0) {
+	    KVSFILE_CUR	*ccp = (curp) ? &curp->cur : NULL ;
+	    rs = kvsfile_enumkey(&atp->clutab,ccp,kbuf,klen) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_enumcluster) */
 
-
-/* enumerate the entries */
-int clusterdb_enum(atp,curp,kbuf,klen,vbuf,vlen)
-CLUSTERDB	*atp ;
-CLUSTERDB_CUR	*curp ;
-char		kbuf[], vbuf[] ;
-int		klen, vlen ;
-{
-	KVSFILE_CUR	*ccp ;
-
-	int	rs ;
-
-
-	if (atp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if ((kbuf == NULL) || (vbuf == NULL)) return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	ccp = (curp != NULL) ? &curp->cur : NULL ;
-	rs = kvsfile_enum(&atp->clutab,ccp,kbuf,klen,vbuf,vlen) ;
-
+int clusterdb_enum(CD *atp,CD_CUR *curp,char *kbuf,int klen,
+		char *vbuf,int vlen) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) {
+	    KVSFILE_CUR	*ccp = (curp) ? &curp->cur : NULL ;
+	    rs = kvsfile_enum(&atp->clutab,ccp,kbuf,klen,vbuf,vlen) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_enum) */
 
-
-int clusterdb_fetch(atp,cluname,curp,vbuf,vlen)
-CLUSTERDB	*atp ;
-char		cluname[] ;
-CLUSTERDB_CUR	*curp ;
-char		vbuf[] ;
-int		vlen ;
-{
-	KVSFILE_CUR	*ccp ;
-
-	int	rs ;
-
-
-	if (atp == NULL) return SR_FAULT ;
-	if (cluname == NULL) return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	ccp = (curp != NULL) ? &curp->cur : NULL ;
-	rs = kvsfile_fetch(&atp->clutab,cluname,ccp,vbuf,vlen) ;
-
+int clusterdb_fetch(CD *atp,char *cluname,CD_CUR *curp,
+		char *vbuf,int vlen) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op,cluname,curp,vbuf)) >= 0) {
+	    KVSFILE_CUR	*ccp = (curp) ? &curp->cur : NULL ;
+	    rs = kvsfile_fetch(&atp->clutab,cluname,ccp,vbuf,vlen) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_fetch) */
@@ -341,48 +313,32 @@ int		klen ;
 	kop = &atp->clutab ;
 	if (curp != NULL) {
 	    KVSFILE_CUR	*ccp = &curp->cur ;
-
 	    while ((rs = kvsfile_enumkey(kop,ccp,kbuf,klen)) >= 0) {
-
 	        if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
-
 	            while (rs >= 0) {
-
 	                rs1 = kvsfile_fetch(kop,kbuf,&vcur,nbuf,nlen) ;
 	                if (rs1 == nrs) break ;
 	                rs = rs1 ;
-
 	                if (rs >= 0) {
 	                    f_match = (strcmp(nodename,nbuf) == 0) ;
 	                }
-
 	                if (f_match) break ;
 	            } /* end while (fetching) */
-
 	            rs1 = kvsfile_curend(kop,&vcur) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (kvsfile-cursor) */
-
 	        if (f_match) break ;
 	        if (rs < 0) break ;
 	    } /* end while (enumerating keys) */
-
 	} else {
-
 	    if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
-
 	        while (rs >= 0) {
-
 	            rs = kvsfile_enum(kop,&vcur,kbuf,klen,nbuf,nlen) ;
-
 	            if ((rs >= 0) && (strcmp(nodename,nbuf) == 0)) break ;
-
 	        } /* end while (enumerating) */
-
 	        rs1 = kvsfile_curend(kop,&vcur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (kvsfile-cursor) */
-
 	} /* end if */
 
 	return rs ;
