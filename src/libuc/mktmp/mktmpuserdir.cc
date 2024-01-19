@@ -97,6 +97,7 @@ int mktmpuser(char *rbuf) noex {
 	int		rl = 0 ;
 	if (rbuf) {
 	    char	*ubuf{} ;
+	    rbuf[0] = '\0' ;
 	    if ((rs = malloc_un(&ubuf)) >= 0) {
 		cint	ulen = rs ;
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
@@ -115,6 +116,7 @@ int mktmpuserx(char *rbuf,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (rbuf) {
+	    rbuf[0] = '\0' ;
 	    if ((rs = mktmpusers(rbuf)) >= 0) {
 		cint	tl = rs ;
 		if ((rs = pathadd(rbuf,tl,un)) >= 0) {
@@ -165,7 +167,7 @@ int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t dm) noex {
 
 static int mkourdir(cchar *rbuf,cmode dm) noex {
 	int		rs ;
-	if ((rs = mkdir(rbuf,dm)) >= 0) {
+	if ((rs = u_mkdir(rbuf,dm)) >= 0) {
 	    rs = uc_minmod(rbuf,dm) ;
 	}
 	return rs ;

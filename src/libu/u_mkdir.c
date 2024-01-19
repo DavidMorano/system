@@ -1,5 +1,5 @@
-/* u_mkdir */
-/* lang=C++23 */
+/* u_mkdir SUPPORT */
+/* lang=C20 */
 
 /* make a directory */
 /* version %I% last-modified %G% */
