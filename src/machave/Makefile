@@ -1,6 +1,6 @@
-# MAKEFILE (haveprogram)
+# MAKEFILE (machav)
 
-T= haveprogram
+T= machave
 
 ALL= $(T).x
 

@@ -1,6 +1,6 @@
-# MAKEFILE (macuserhome)
+# MAKEFILE (macuser)
 
-T= userhome
+T= macuser
 
 ALL= $(T).x
 

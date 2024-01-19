@@ -1,4 +1,4 @@
-PATHTO
+MACHAVE
 
 Names:
 haveprogram
