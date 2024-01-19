@@ -400,7 +400,7 @@ QUOTE_OBJ	quote = {
 
 /* local variables */
 
-static const int	termrs[] = {
+static cint	termrs[] = {
 	SR_FAULT,
 	SR_INVALID,
 	SR_NOMEM,
@@ -1681,7 +1681,7 @@ const char	dbdname[] ;
 {
 	struct ustat	sb ;
 
-	const int	dmode = QDIR_DBDIRMODE ;
+	cint	dmode = QDIR_DBDIRMODE ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -2827,7 +2827,7 @@ struct subinfo	*sip ;
 
 	if (sip->username[0] == '\0') {
 	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = getbufsize(getbufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
@@ -2849,27 +2849,23 @@ struct subinfo	*sip ;
 static int subinfo_tmpuserdir(sip)
 struct subinfo	*sip ;
 {
-	const int	dmode = 0775 ;
-
+	cint	dmode = 0775 ;
 	int	rs ;
 	int	dl ;
-
 	char	tmpdname[MAXPATHLEN + 1] ;
 	char	*dp ;
-
 
 	rs = subinfo_username(sip) ;
 
 	if ((rs >= 0) && (sip->tudname == NULL)) {
-
 	    rs = mktmpuserdir(tmpdname,sip->username,IDXDNAME,dmode) ;
 	    dl = rs ;
 	    if (rs >= 0) {
 	        rs = uc_mallocstrw(tmpdname,dl,&dp) ;
-		if (rs >= 0)
+		if (rs >= 0) {
 		    sip->tudname = dp ;
+		}
 	    }
-
 	} /* end if */
 
 	return rs ;

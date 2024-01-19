@@ -125,27 +125,27 @@
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	matocasestr(const char **,int,const char *,int) ;
-extern int	matpcasestr(const char **,int,const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	matocasestr(cchar **,int,cchar *,int) ;
+extern int	matpcasestr(cchar **,int,cchar *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
-extern int	isOneOf(const int *,int) ;
+extern int	isOneOf(cint *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -167,9 +167,9 @@ struct subinfo {
 	SUBINFO_FL	init, f ;
 	vecstr		dirs ;
 	CALYEARS	*op ;
-	const char	*tudname ;
-	const char	*userhome ;
-	const char	**dns ;
+	cchar	*tudname ;
+	cchar	*userhome ;
+	cchar	**dns ;
 	time_t		dt ;
 	int		year ;
 	int		isdst ;
@@ -195,7 +195,7 @@ static int	calyears_domerget(CALYEARS *,CALYEARS_DOMER *,DAYOFMONTH **) ;
 
 #ifdef	COMMENT
 static int	calyears_checkupdate(CALYEARS *,time_t) ;
-static int	calyears_mksysvarsi(CALYEARS *,const char *) ;
+static int	calyears_mksysvarsi(CALYEARS *,cchar *) ;
 #endif
 
 static int	calyears_resultfins(CALYEARS *,CALYEARS_CUR *) ;
@@ -217,7 +217,7 @@ static int	calyears_holidayer(CALYEARS *) ;
 #endif /* CF_TRANSHOL */
 
 #if	CF_DEBUGS && CF_DEBUGCUR
-static int	calyears_debugcur(CALYEARS *,vecobj *,const char *) ;
+static int	calyears_debugcur(CALYEARS *,vecobj *,cchar *) ;
 #endif
 
 static int	subinfo_start(SUBINFO *,CALYEARS *,time_t) ;
@@ -229,7 +229,7 @@ static int	subinfo_ids(SUBINFO *) ;
 static int	subinfo_username(SUBINFO *) ;
 static int	subinfo_mkdns(SUBINFO *) ;
 static int	subinfo_havedir(SUBINFO *,cchar *) ;
-static int	subinfo_loadnames(SUBINFO *,vecstr *,const char *) ;
+static int	subinfo_loadnames(SUBINFO *,vecstr *,cchar *) ;
 static int	subinfo_regacc(SUBINFO *,cchar *,int) ;
 
 #if	CF_CHECKDNAME
@@ -264,11 +264,11 @@ CALYEARS_OBJ	calyears = {
 
 /* local variables */
 
-static const char	*days[] = {
+static cchar	*days[] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", NULL
 } ;
 
-static const char	*daytypes[] = {
+static cchar	*daytypes[] = {
 	"First", "Second", "Third", "Fourth", "Fifth", "Last", NULL
 } ;
 
@@ -293,13 +293,13 @@ enum tdays {
 	tday_overlast
 } ;
 
-static const int	rsnotorils[] = {
+static cint	rsnotorils[] = {
 	SR_NOTFOUND,
 	SR_ILSEQ,
 	0
 } ;
 
-static const int	rsnothols[] = {
+static cint	rsnothols[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
@@ -331,7 +331,7 @@ int calyears_open(CALYEARS *op,cchar pr[],cchar *dns[],cchar *cns[])
 	if (op->tmpdname == NULL) op->tmpdname = TMPDNAME ;
 
 	if ((rs = calyears_argbegin(op,pr)) >= 0) {
-	    const int	vo = VECHAND_OSTATIONARY ;
+	    cint	vo = VECHAND_OSTATIONARY ;
 	    if ((rs = vechand_start(&op->cals,20,vo)) >= 0) {
 		if ((rs = vechand_start(&op->doms,1,0)) >= 0) {
 		    const time_t	dt = time(NULL) ;
@@ -539,7 +539,7 @@ int calyears_lookcite(CALYEARS *op,CALYEARS_CUR *curp,CALCITE *qp)
 
 	if (rs >= 0) {
 	    vecobj	res ;
-	    const int	size = sizeof(CALENT) ;
+	    cint	size = sizeof(CALENT) ;
 	    int 	vo = 0 ;
 #if	CF_DEBUGS
 	    debugprintf("calyears_lookcite: sizeof(CALENT)=%u\n",size) ;
@@ -611,7 +611,7 @@ int calyears_read(CALYEARS *op,CALYEARS_CUR *curp,CALYEARS_CITE *qp,
 #endif
 
 	if (curp->results != NULL) {
-	    const int	i = curp->i ;
+	    cint	i = curp->i ;
 #if	CF_DEBUGS
 	    debugprintf("calyears_read: c_i=%d\n",i) ;
 #endif
@@ -871,7 +871,7 @@ static int calyears_mkresults(CALYEARS *op,vecobj *rlp,CALYEARS_CUR *curp)
 	if ((n = vecobj_count(rlp)) > 0) {
 	    CALENT		*rp ;
 	    CALENT		*ep ;
-	    const int		size = (n * sizeof(CALENT)) ;
+	    cint		size = (n * sizeof(CALENT)) ;
 	    if ((rs = uc_malloc(size,&rp)) >= 0) {
 	        int	i ;
 		for (i = 0 ; vecobj_get(rlp,i,&ep) >= 0 ; i += 1) {
@@ -986,7 +986,7 @@ static int calyars_domyear(CALYEARS *op,int y,DAYOFMONTH **rpp)
 		}
 	    }
 	} else if (rs == SR_NOTFOUND) {
-	    const int	dsize = sizeof(CALYEARS_DOMER) ;
+	    cint	dsize = sizeof(CALYEARS_DOMER) ;
 #if	CF_DEBUGS
 	    debugprintf("calyears_mkday: sizeof(CALYEARS_DOMER)=%u\n",dsize) ;
 #endif
@@ -1092,7 +1092,7 @@ static int calyears_gethash(CALYEARS *op,CALENT *ep,uint *rp)
 	int		rs ;
 	if ((rs = calent_getci(ep)) >= 0) {
 	   CALMGR	*cmp ;
-	   const int	ci = rs ;
+	   cint	ci = rs ;
 	   if ((rs = calyears_getcm(op,ci,&cmp)) >= 0) {
 		rs = calmgr_gethash(cmp,ep,rp) ;
 	   }
@@ -1177,7 +1177,7 @@ static int calyears_loadbuf(CALYEARS *op,char *rbuf,int rlen,CALENT *ep)
 	if ((rs = calent_getci(ep)) >= 0) {
 	    CALMGR	*calp ;
 	    vechand	*ilp = &op->cals ;
-	    const int	cidx = rs ;
+	    cint	cidx = rs ;
 #if	CF_DEBUGS
 	    debugprintf("calyears_loadbuf: cidx=%d\n",cidx) ;
 #endif
@@ -1202,8 +1202,8 @@ static int calyears_transhol(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	int		nl ;
 	int		f_negative = FALSE ;
 	int		f_found = FALSE ;
-	const char	*tp ;
-	const char	*np ;
+	cchar	*tp ;
+	cchar	*np ;
 
 #if	CF_DEBUGS
 	debugprintf("calyears/subinfo_transhol: >%t<\n",sp,sl) ;
@@ -1285,7 +1285,7 @@ static int calyears_dayname(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 	    HOLIDAYER		*holp = &op->hols ;
 	    HOLIDAYER_CUR	hcur ;
 	    HOLIDAYER_CITE	hc ;
-	    const int		hlen = HOLBUFLEN ;
+	    cint		hlen = HOLBUFLEN ;
 	    char		hbuf[HOLBUFLEN + 1] ;
 
 #if	CF_DEBUGS
@@ -1293,7 +1293,7 @@ static int calyears_dayname(CALYEARS *op,CALCITE *qp,int y,cchar *sp,int sl)
 #endif
 
 	    if ((rs = holidayer_curbegin(holp,&hcur)) >= 0) {
-		const int	nrs = SR_NOTFOUND ;
+		cint	nrs = SR_NOTFOUND ;
 
 	        rs = holidayer_fetchname(holp,y,sp,sl,&hcur,&hc,hbuf,hlen) ;
 
@@ -1495,7 +1495,7 @@ static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	int		f_search = FALSE ;
-	const char	**names = NULL ;
+	cchar	**names = NULL ;
 
 #if	CF_DEBUGS
 	debugprintf("calyears_calscreater: dn=%s\n",dn) ;
@@ -1550,10 +1550,10 @@ static int subinfo_calscreater(SUBINFO *sip,cchar *dn,cchar *cns[])
 static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
 {
 	CALYEARS	*op = sip->op ;
-	const int	nlen = MAXNAMELEN ;
+	cint	nlen = MAXNAMELEN ;
 	int		rs ;
 	int		f = FALSE ;
-	const char	*suf = CALYEARS_DBSUF ;
+	cchar	*suf = CALYEARS_DBSUF ;
 	char		nbuf[MAXNAMELEN + 1] ;
 
 	if ((rs = snsds(nbuf,nlen,cn,suf)) >= 0) {
@@ -1561,7 +1561,7 @@ static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
 	    if ((rs = mkpath2(tbuf,dn,nbuf)) >= 0) {
 		if ((rs = subinfo_regacc(sip,tbuf,R_OK)) > 0) {
 		    CALMGR	*calp ;
-		    const int	size = sizeof(CALMGR) ;
+		    cint	size = sizeof(CALMGR) ;
 #if	CF_DEBUGS
 		    debugprintf("subinfo_calcreate: sizeof(CALMGR)=%u\n",size) ;
 #endif
@@ -1569,7 +1569,7 @@ static int subinfo_calcreate(SUBINFO *sip,cchar *dn,cchar *cn)
 	    	    if ((rs = uc_malloc(size,&calp)) >= 0) {
 			vechand	*clp = &op->cals ;
 	        	if ((rs = vechand_add(clp,calp)) >= 0) {
-	            	    const int	cidx = rs ;
+	            	    cint	cidx = rs ;
 	            	    if ((rs = calmgr_start(calp,op,cidx,dn,cn)) >= 0) {
 	                	f = TRUE ;
 	            	    }
@@ -1632,7 +1632,7 @@ static int subinfo_mkdns(SUBINFO *sip)
 	        if (rs >= 0) {
 	            cchar	**dap ;
 	            if ((rs = vecstr_getvec(dlp,&dap)) >= 0) {
-	                sip->dns = (const char **) dap ;
+	                sip->dns = (cchar **) dap ;
 		    }
 	        }
 
@@ -1696,9 +1696,9 @@ static int subinfo_loadnames(SUBINFO *sip,vecstr *nlp,cchar dirname[])
 	if ((rs = fsdir_open(&dir,dirname)) >= 0) {
 	    struct ustat	sb ;
 	    int			nl ;
-	    const char		*calsuf = CALYEARS_DBSUF ;
-	    const char		*tp ;
-	    const char		*np ;
+	    cchar		*calsuf = CALYEARS_DBSUF ;
+	    cchar		*tp ;
+	    cchar		*np ;
 	    char		tbuf[MAXPATHLEN + 1] ;
 
 	    while ((rs = fsdir_read(&dir,&ds)) > 0) {
@@ -1743,7 +1743,7 @@ static int subinfo_username(SUBINFO *sip)
 
 	if (sip->username[0] == '\0') {
 	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = getbufsize(getbufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
@@ -1771,11 +1771,11 @@ SUBINFO		*sip ;
 
 	if ((rs = subinfo_username(sip)) >= 0) {
 	    if (sip->tudname == NULL) {
-	        const char	*un = sip->username ;
-	        char		tmpdname[MAXPATHLEN + 1] ;
+	        cchar	*un = sip->username ;
+	        char	tmpdname[MAXPATHLEN + 1] ;
 	        if ((rs = mktmpuserdir(tmpdname,un,IDXDNAME,dmode)) >= 0) {
 	            int		dl = rs ;
-	            const char	*dp ;
+	            cchar	*dp ;
 	            if ((rs = uc_mallocstrw(tmpdname,dl,&dp)) >= 0) {
 	                sip->tudname = dp ;
 	            }
@@ -1891,7 +1891,7 @@ static int dayofmonth_mkday(DAYOFMONTH *dmp,uint m,cchar *cp,int cl)
 #if	CF_MKDNAME
 static int mkdname(cchar *dname,mode_t dm)
 {
-	const int	nrs = SR_NOENT ;
+	cint	nrs = SR_NOENT ;
 	int		rs ;
 	if ((rs = checkdname(dname)) == nrs) {
 	    rs = mkdirs(dname,dm) ;
