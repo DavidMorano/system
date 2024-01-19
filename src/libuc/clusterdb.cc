@@ -35,6 +35,7 @@
 #include	<algorithm>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<storeitem.h>
@@ -269,41 +270,39 @@ int clusterdb_enum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) {
-	    KVSFILE_CUR	*kcp = (curp) ? &curp->cur : nullptr ;
+	    KVSFILE_CUR		*kcp = (curp) ? &curp->cur : nullptr ;
 	    rs = kvsfile_enum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_enum) */
 
-int clusterdb_fetch(CD *op,char *cn,CD_CUR *curp,char *vbuf,int vlen) noex {
+int clusterdb_fetch(CD *op,cc *cn,CD_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,cn,curp,vbuf)) >= 0) {
-	    KVSFILE_CUR	*kcp = (curp) ? &curp->cur : nullptr ;
-	    rs = kvsfile_fetch(op->ctp,cn,kcp,vbuf,vlen) ;
+	    rs = SR_INVALID ;
+	    if (cn[0]) {
+	        KVSFILE_CUR	*kcp = (curp) ? &curp->cur : nullptr ;
+	        rs = kvsfile_fetch(op->ctp,cn,kcp,vbuf,vlen) ;
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_fetch) */
 
-int clusterdb_fetchrev(CD *op,char *nn,CD_CUR *curp,char *kbuf,int klen) noex {
+int clusterdb_fetchrev(CD *op,cc *nn,CD_CUR *curp,char *kbuf,int klen) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = clusterdb_magic(op,nn,kbuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (nn[0]) {
+		char	*nbuf{} ;
+		if ((rs = malloc_mn(&nbuf)) >= 0) {
+		    cint	nlen = rs ;
 	KVSFILE		*kop ;
 	KVSFILE_CUR	vcur ;
-	cint	nlen = NODENAMELEN ;
 	cint	nrs = SR_NOTFOUND ;
-	int	rs = SR_OK ;
-	int	rs1 ;
 	int	f_match = FALSE ;
-	char	nbuf[NODENAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (nn == nullptr) return SR_FAULT ;
-	if (kbuf == nullptr) return SR_FAULT ;
-
-	if (nn[0] == '\0') return SR_INVALID ;
-
-	if (op->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
 	kop = op->ctp ;
 	if (curp != nullptr) {
 	    KVSFILE_CUR	*kcp = &curp->cur ;
@@ -335,6 +334,11 @@ int clusterdb_fetchrev(CD *op,char *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 	    } /* end if (kvsfile-cursor) */
 	} /* end if */
 
+		rs1 = uc_free(nbuf) ;
+		if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_fetchrev) */
