@@ -28,11 +28,11 @@
 
 
 struct clusterdb_cursor {
-	KVSFILE_CUR	cur ;
+	kvsfile_cur	cur ;
 } ;
 
 struct clusterdb_head {
-	KVSFILE		clutab ;
+	kvsfile		*ctp ;
 	uint		magic ;
 } ;
 

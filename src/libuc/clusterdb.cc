@@ -32,6 +32,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
+#include	<algorithm>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<vecobj.h>
@@ -81,6 +82,8 @@
 /* local namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -136,13 +139,16 @@ struct svcentry_key {
 /* forward references */
 
 template<typename ... Args>
-static int vecpstr_ctor(vecpstr *op,Args ... args) noex {
+static int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    nullptr_t	np{} ;
-	    rs = SR_OK ;
-
-	}
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    if ((op->ctp = new(nothrow) kvsfile) != np) {
+		rs = SR_OK ;
+	    } /* end if (new_kvsfile) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (clusterdb_ctor) */
@@ -151,7 +157,11 @@ static int clusterdb_dtor(clusterdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	}
+	    if (op->ctp) {
+		delete op->ctp ;
+		op->ctp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (clusterdb_dtor) */
@@ -175,152 +185,136 @@ static int clusterdb_magic(clusterdb *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int clusterdb_open(clusterddb *atp,cchar *fname) noex {
-	USTAT		sb ;
+int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	int		rs ;
-
-	if (atp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	memset(atp,0,sizeof(CLUSTERDB)) ;
-
-	if ((rs = u_stat(fname,&sb)) >= 0) {
-	    int	n ;
-	    n = MAX((sb.st_size / 4),10) ;
-	    if ((rs = kvsfile_open(&atp->clutab,n,fname)) >= 0) {
-	        atp->magic = CLUSTERDB_MAGIC ;
+	if ((rs = clusterdb_ctor(op,fname)) >= 0) {
+	    rs = SR_INVALID ;
+	    memclear(op) ;
+	    if (fname[0]) {
+	         USTAT		sb ;
+	         if ((rs = u_stat(fname,&sb)) >= 0) {
+	             cint	n = MAX((sb.st_size / 4),10) ;
+	             if ((rs = kvsfile_open(op->ctp,n,fname)) >= 0) {
+	                 op->magic = CLUSTERDB_MAGIC ;
+	             }
+	         } /* end if (stat) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		clusterdb_dtor(op) ;
 	    }
-	} /* end if (stat) */
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (clusterdb_open) */
 
-int clusterdb_close(clusterdb *atp) noex {
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-
-	if (atp == NULL)
-	    return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC)
-	    return SR_NOTOPEN ;
-
-	rs1 = kvsfile_close(&atp->clutab) ;
-	if (rs >= 0) rs = rs1 ;
-
-	atp->magic = 0 ;
+int clusterdb_close(clusterdb *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = clusterdb_magic(op)) >= 0) {
+	    {
+		rs1 = kvsfile_close(op->ctp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = clusterdb_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_close) */
 
-int clusterdb_fileadd(clusterdb *atp,cchar *fname) noex {
-	int	rs ;
-
-	if (atp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	rs = kvsfile_fileadd(&atp->clutab,fname) ;
-
+int clusterdb_fileadd(clusterdb *op,cchar *fname) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op,fname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		rs = kvsfile_fileadd(op->ctp,fname) ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_fileadd) */
 
-int clusterdb_curbegin(CD *atp,CD_CUR *curp) noex {
+int clusterdb_curbegin(CD *op,CD_CUR *curp) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp)) >= 0) {
-	    rs = kvsfile_curbegin(&atp->clutab,&curp->cur) ;
+	    rs = kvsfile_curbegin(op->ctp,&curp->cur) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_curbegin) */
 
-int clusterdb_curend(CD *atp,CD_CUR *curp) noex {
+int clusterdb_curend(CD *op,CD_CUR *curp) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp)) >= 0) {
-	    rs = kvsfile_curend(&atp->clutab,&curp->cur) ;
+	    rs = kvsfile_curend(op->ctp,&curp->cur) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_curend) */
 
-int clusterdb_enumcluster(CD *atp,CD_CUR *curp,char *kbuf,int klen) noex {
+int clusterdb_enumcluster(CD *op,CD_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp,kbuf)) >= 0) {
-	    KVSFILE_CUR	*ccp = (curp) ? &curp->cur : NULL ;
-	    rs = kvsfile_enumkey(&atp->clutab,ccp,kbuf,klen) ;
+	    KVSFILE_CUR	*kcp = (curp) ? &curp->cur : nullptr ;
+	    rs = kvsfile_enumkey(op->ctp,kcp,kbuf,klen) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_enumcluster) */
 
-int clusterdb_enum(CD *atp,CD_CUR *curp,char *kbuf,int klen,
+int clusterdb_enum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) {
-	    KVSFILE_CUR	*ccp = (curp) ? &curp->cur : NULL ;
-	    rs = kvsfile_enum(&atp->clutab,ccp,kbuf,klen,vbuf,vlen) ;
+	    KVSFILE_CUR	*kcp = (curp) ? &curp->cur : nullptr ;
+	    rs = kvsfile_enum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_enum) */
 
-int clusterdb_fetch(CD *atp,char *cluname,CD_CUR *curp,
-		char *vbuf,int vlen) noex {
+int clusterdb_fetch(CD *op,char *cn,CD_CUR *curp,char *vbuf,int vlen) noex {
 	int		rs ;
-	if ((rs = clusterdb_magic(op,cluname,curp,vbuf)) >= 0) {
-	    KVSFILE_CUR	*ccp = (curp) ? &curp->cur : NULL ;
-	    rs = kvsfile_fetch(&atp->clutab,cluname,ccp,vbuf,vlen) ;
+	if ((rs = clusterdb_magic(op,cn,curp,vbuf)) >= 0) {
+	    KVSFILE_CUR	*kcp = (curp) ? &curp->cur : nullptr ;
+	    rs = kvsfile_fetch(op->ctp,cn,kcp,vbuf,vlen) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_fetch) */
 
-
-/* return cluster names given a node name */
-int clusterdb_fetchrev(atp,nodename,curp,kbuf,klen)
-CLUSTERDB	*atp ;
-char		nodename[] ;
-CLUSTERDB_CUR	*curp ;
-char		kbuf[] ;
-int		klen ;
-{
+int clusterdb_fetchrev(CD *op,char *nn,CD_CUR *curp,char *kbuf,int klen) noex {
 	KVSFILE		*kop ;
 	KVSFILE_CUR	vcur ;
-	const int	nlen = NODENAMELEN ;
-	const int	nrs = SR_NOTFOUND ;
+	cint	nlen = NODENAMELEN ;
+	cint	nrs = SR_NOTFOUND ;
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	f_match = FALSE ;
 	char	nbuf[NODENAMELEN + 1] ;
 
+	if (op == nullptr) return SR_FAULT ;
+	if (nn == nullptr) return SR_FAULT ;
+	if (kbuf == nullptr) return SR_FAULT ;
 
-	if (atp == NULL) return SR_FAULT ;
-	if (nodename == NULL) return SR_FAULT ;
-	if (kbuf == NULL) return SR_FAULT ;
+	if (nn[0] == '\0') return SR_INVALID ;
 
-	if (nodename[0] == '\0') return SR_INVALID ;
+	if (op->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
 
-	if (atp->magic != CLUSTERDB_MAGIC) return SR_NOTOPEN ;
-
-	kop = &atp->clutab ;
-	if (curp != NULL) {
-	    KVSFILE_CUR	*ccp = &curp->cur ;
-	    while ((rs = kvsfile_enumkey(kop,ccp,kbuf,klen)) >= 0) {
+	kop = op->ctp ;
+	if (curp != nullptr) {
+	    KVSFILE_CUR	*kcp = &curp->cur ;
+	    while ((rs = kvsfile_enumkey(kop,kcp,kbuf,klen)) >= 0) {
 	        if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	            while (rs >= 0) {
 	                rs1 = kvsfile_fetch(kop,kbuf,&vcur,nbuf,nlen) ;
 	                if (rs1 == nrs) break ;
 	                rs = rs1 ;
 	                if (rs >= 0) {
-	                    f_match = (strcmp(nodename,nbuf) == 0) ;
+	                    f_match = (strcmp(nn,nbuf) == 0) ;
 	                }
 	                if (f_match) break ;
 	            } /* end while (fetching) */
@@ -334,7 +328,7 @@ int		klen ;
 	    if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	        while (rs >= 0) {
 	            rs = kvsfile_enum(kop,&vcur,kbuf,klen,nbuf,nlen) ;
-	            if ((rs >= 0) && (strcmp(nodename,nbuf) == 0)) break ;
+	            if ((rs >= 0) && (strcmp(nn,nbuf) == 0)) break ;
 	        } /* end while (enumerating) */
 	        rs1 = kvsfile_curend(kop,&vcur) ;
 		if (rs >= 0) rs = rs1 ;
@@ -345,23 +339,11 @@ int		klen ;
 }
 /* end subroutine (clusterdb_fetchrev) */
 
-
-/* check if the access tables files have changed */
-int clusterdb_check(atp,daytime)
-CLUSTERDB	*atp ;
-time_t		daytime ;
-{
-	int	rs = SR_OK ;
-
-
-	if (atp == NULL)
-	    return SR_FAULT ;
-
-	if (atp->magic != CLUSTERDB_MAGIC)
-	    return SR_NOTOPEN ;
-
-	rs = kvsfile_check(&atp->clutab,daytime) ;
-
+int clusterdb_check(CD *op,time_t daytime) noex {
+	int		rs ;
+	if ((rs = clusterdb_magic(op)) >= 0) {
+	    rs = kvsfile_check(op->ctp,daytime) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (clusterdb_check) */
