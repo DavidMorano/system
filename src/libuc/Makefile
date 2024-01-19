@@ -1018,13 +1018,13 @@ mallocstuff.o:		mallocstuff.cc mallocstuff.h
 
 # special built-ins (user-space enumlated kernel calls)
 uinfo.o:		uinfo.cc uinfo.h
-umask.o:		umask.c umask.h
+umask.o:		umask.cc umask.h
 ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
 ucgetpid.o:		ucgetpid.cc ucgetpid.h
 ucproguser.o:		ucproguser.cc ucproguser.h
 ucprogdata.o:		ucprogdata.cc ucprogdata.h
-ucclustername.o:	ucclustername.c ucclustername.h
-ucpwcache.o:		ucpwcache.c ucpwcache.h recarr.h
+ucclustername.o:	ucclustername.cc ucclustername.h
+ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 utmpacc.o:		utmpacc.cc utmpacc.h
 utmpaccent.o:		utmpaccent.cc utmpaccent.h
 tmpx.o:			tmpx.cc tmpx.h
