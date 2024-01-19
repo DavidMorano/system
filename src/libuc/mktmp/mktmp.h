@@ -29,6 +29,7 @@ EXTERNC_begin
 extern int mktmpdir(char *,cchar *,mode_t) noex ;
 extern int mktmpusers(char *) noex ;
 extern int mktmpuser(char *) noex ;
+extern int mktmpuserx(char *,cchar *) noex ;
 extern int mktmpuserdir(char *,cchar *,cchar *,mode_t) noex ;
 extern int mktmpfile(char *,cchar *,mode_t) noex ;
 extern int mktmplock(char *,cchar *,mode_t) noex ;

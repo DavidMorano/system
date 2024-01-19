@@ -43,29 +43,24 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<strlibval.hh>
+#include	<mallocxx.h>
 #include	<getxusername.h>
-#include	<syswords.hh>
+#include	<dirs.h>
 #include	<mkpathx.h>
-#include	<strlibval.hh>
+#include	<pathadd.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"mktmp.h"
 
 
 /* local defines */
-
-#ifndef	TMPUSERDMODE
-#define	TMPUSERDMODE	(S_IAMB | S_ISVTX)
-#endif
 
 
 /* local namespaces */
@@ -85,12 +80,10 @@
 
 /* forward references */
 
-static int	mktmpuser(char *,cchar *) noex ;
+static int mkourdir(cchar *,mode_t) noex ;
 
 
 /* local variables */
-
-static strlibval	strtmpdir(strlibval_tmpdir) ;
 
 
 /* exported variables */
@@ -101,32 +94,50 @@ static strlibval	strtmpdir(strlibval_tmpdir) ;
 int mktmpuser(char *rbuf) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rl = 0 ;
 	if (rbuf) {
 	    char	*ubuf{} ;
 	    if ((rs = malloc_un(&ubuf)) >= 0) {
 		cint	ulen = rs ;
 	        if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
-		    cint	ul = rs ;
-		    rs = SR_NOMEM ;
-		    static cchar	*tmpdir = strtmpdir ;
-		    if (tmpdir != nullptr) {
-			cchar	*users = sysword.w_users ;
-			if ((rs = mkpathw(rbuf,tmpdir,users,ubuf,ul)) >= 0) {
-			    USTAT	sb ;
-			    if ((rs = uc_stat(rbuf,&sb)) >= 0) {
-				rs = 0 ;
-			    }
-			} /* end if (mkpath) */
-		    } /* end if (strtmpdir) */
-		} /* end if */
+		    rs = mktmpuserx(rbuf,ubuf) ;
+		    rl = rs ;
+		} /* end if (getusername) */
 		rs1 = uc_free(ubuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mktmpuser) */
 
+int mktmpuserx(char *rbuf,cchar *un) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	if (rbuf) {
+	    if ((rs = mktmpusers(rbuf)) >= 0) {
+		cint	tl = rs ;
+		if ((rs = pathadd(rbuf,tl,un)) >= 0) {
+		    USTAT	sb ;
+		    cmode	dm = 0775 ;
+		    rl = rs ;
+		    if ((rs = uc_stat(rbuf,&sb)) >= 0) {
+			if (! S_ISDIR(sb.st_mode)) {
+			    if ((rs = rmdirs(rbuf)) >= 0) {
+				rs = mkourdir(rbuf,dm) ;
+			    }
+			}
+		    } else if (isNotPresent(rs)) {
+			rs = mkourdir(rbuf,dm) ;
+		    } /* end if */
+		} /* end if (pathadd) */
+	    } /* end if (mktmpusers) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end subroutine (mktmpuser) */
+
+#ifdef	COMMENT
 int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t m) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -160,10 +171,21 @@ int mktmpuserdir(char *rbuf,cchar *un,cchar *dname,mode_t m) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mktmpuserdir) */
+#endif /* COMMENT */
 
 
 /* local subroutines */
 
+static int mkourdir(cchar *rbuf,cmode dm) noex {
+	int		rs ;
+	if ((rs = mkdir(rbuf,dm)) >= 0) {
+	    rs = uc_minmod(rbuf,dm) ;
+	}
+	return rs ;
+}
+/* end subroutine (mkourdir) */
+
+#ifdef	COMMENT
 static int mktmpuser(char *rbuf,cchar *un) noex {
 	USTAT		sb ;
 	cmode		tmpuserdmode = TMPUSERDMODE ;
@@ -192,5 +214,6 @@ static int mktmpuser(char *rbuf,cchar *un) noex {
 	return rs ;
 }
 /* end subroutine (mktmpuser) */
+#endif /* COMMENT */
 
 

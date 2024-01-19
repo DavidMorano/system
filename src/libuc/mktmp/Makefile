@@ -55,7 +55,7 @@ INCS= mktmp.h
 
 
 OBJA_MKTMP= mktmpdir.o 
-OBJB_MKTMP= mktmpusers.o
+OBJB_MKTMP= mktmpusers.o mktmpuserdir.o
 OBJC_MKTMP= mktmpfile.o mktmplock.o
 
 OBJ_MKTMP= $(OBJA_MKTMP) $(OBJB_MKTMP)$ $(OBBC_MKTMP)
