@@ -40,7 +40,7 @@ LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS= -luserhome
+LIBS= -lmacuser
 
 
 # flag setting

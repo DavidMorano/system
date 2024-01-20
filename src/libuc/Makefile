@@ -458,7 +458,7 @@ a:			$(T).a
 	$(CXX) -c $(CPPFLAGS) $(CCFLAGS) $<
 
 
-libuserhome.a:		$(UOBJ)
+libmacuser.a:		$(UOBJ)
 	$(AR) -rc $@ $?
 
 $(TT).a:		$(TOBJ)
