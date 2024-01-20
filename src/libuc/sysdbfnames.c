@@ -1,4 +1,4 @@
-/* sysdbfnames */
+/* sysdbfnames SUPPORT */
 /* lang=C20 */
 
 /* standard file-names */
@@ -9,9 +9,8 @@
 
 	= 2001-03-24, David A­D­ Morano
 	This code is newly written but modeled after some code that
-	was originally written to get some standardized variable
-	serialization for the Ethernet-Controller (ETHCON) development
-	work.
+	was originally written for the Ethernet-Controller (ETHCON)
+	development work.
 
 */
 
@@ -46,16 +45,16 @@
 /* exported variables */
 
 cchar	*sysdbfnames[] = {
-	[sysdbfile_passwd] 	= "passwd",
-	[sysdbfile_shadow] 	= "shadow",
-	[sysdbfile_userattr] 	= "userattr",
-	[sysdbfile_group] 	= "group",
-	[sysdbfile_project] 	= "project",
-	[sysdbfile_protocols] 	= "protocols",
-	[sysdbfile_networks] 	= "networks",
-	[sysdbfile_hosts] 	= "hosts",
-	[sysdbfile_services] 	= "services",
-	[sysdbfile_shells] 	= "shells",
+	[sysdbfile_pw] 		= "passwd",
+	[sysdbfile_sp] 		= "shadow",
+	[sysdbfile_ua] 		= "userattr",
+	[sysdbfile_gr] 		= "group",
+	[sysdbfile_pj] 		= "project",
+	[sysdbfile_pr] 		= "protocols",
+	[sysdbfile_nw] 		= "networks",
+	[sysdbfile_ho] 		= "hosts",
+	[sysdbfile_sv] 		= "services",
+	[sysdbfile_sh] 		= "shells",
 	nullptr
 } ;
 

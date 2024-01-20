@@ -24,26 +24,27 @@
 	This subroutine adds a new component to an existing file-path.
 	These subroutines return the total length of the final path.
 
-	Synopsis:
+	Synopses:
 	int pathaddw(char *pbuf,int plen,cchar *sp,int sl) noex
 	int pathadd(char *pbuf,int plen,cchar *sp) noex
 
 	Arguments:
-	pbuf		existing path
-	plen		length of existing path
-	sp		new-componment pointer
-	sl		new-componment length
+	pbuf		result buffer pointer
+	plen		result buffer length
+	sp		new-componment c-string pointer
+	sl		new-componment c-string length
 
 	Returns:
 	>=0		new length of new path; total length from beginning
 	<0		error (system-return)
 
 	Note:
-	These subroutines return the total length of the final path 
-	that resides in the given path-result-buffer.
-	If you want a subroutine that returns just the added part,
-	then check out the |storebuf(3uc)| facility or the |snadd(3uc)|
-	facility.
+	These subroutines return the total length of the final path
+	that resides in the given path-result-buffer.  If you want
+	a subroutine that returns just the added part, then check
+	out the |storebuf(3uc)| facility or the |snadd(3uc)| facility,
+	or simply create your own using the various |snx(3uc)| 
+	subroutines (and other methods also).
 
 *******************************************************************************/
 
@@ -57,6 +58,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -78,17 +85,17 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 /* exported subroutines */
 
-int pathaddw(char *pbuf,int pl,cchar *np,int nl) noex {
+int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (pbuf && np) {
+	if (pbuf && sp) {
 	    if ((rs = maxpathlen) >= 0) {
 		cint	plen = rs ;
-	        if ((rs >= 0) && (pl > 0) && (pbuf[pl-1] != '/')) {
+	        if ((pl > 0) && (pbuf[pl-1] != '/')) {
 	            rs = storebuf_char(pbuf,plen,pl,'/') ;
 	            pl += rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = storebuf_strw(pbuf,plen,pl,np,nl) ;
+	            rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
 	            pl += rs ;
 	        }
 	    } /* end if (maxpathlen) */
@@ -97,8 +104,8 @@ int pathaddw(char *pbuf,int pl,cchar *np,int nl) noex {
 }
 /* end subroutine (pathaddw) */
 
-int pathadd(char *pbuf,int pl,cchar *np) noex {
-	return pathaddw(pbuf,pl,np,-1) ;
+int pathadd(char *pbuf,int pl,cchar *sp) noex {
+	return pathaddw(pbuf,pl,sp,-1) ;
 }
 /* end subroutine (pathadd) */
 

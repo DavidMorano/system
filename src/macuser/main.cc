@@ -345,6 +345,7 @@ int userinfo::findenv(uid_t uid) noex {
 		    } /* end if (getpwnam) */
 		} /* end if (sfbasename) */
 	    } /* end if (getenv) */
+	    if (len > 0) break ;
 	} /* end for */
 	return (rs >= 0) ? len : rs ;
 }
