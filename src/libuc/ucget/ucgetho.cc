@@ -1,4 +1,4 @@
-/* ucgetho */
+/* ucgetho SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® C-language system database access (UCGET) */

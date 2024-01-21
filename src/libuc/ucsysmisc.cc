@@ -1,7 +1,8 @@
-/* ucsysmisc */
+/* ucsysmisc SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

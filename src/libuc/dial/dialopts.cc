@@ -1,4 +1,4 @@
-/* dialopts */
+/* dialopts SUPPORT */
 /* lang=C++20 */
 
 /* set options on dialer file-descriptor */

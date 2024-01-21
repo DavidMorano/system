@@ -1,10 +1,8 @@
-/* dialussnls */
+/* dialussnls SUPPORT */
+/* lang=C++20 */
 
 /* dial out to a server listening on UNIX®NLS */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -20,11 +18,9 @@
 
 	This is the NLS version of the TCP dialer.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -33,12 +29,12 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
+#include	<usupoort.h>
 #include	<buffer.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -60,9 +56,19 @@
 #define	RBUFLEN		MAXNAMELEN
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+typedef mainv		mv ;
+
+
 /* external subroutines */
 
-extern int	dialuss(const char *,int,int) ;
+extern "C" {
+    extern int	dialuss(cchar *,int,int) noex ;
+}
 
 
 /* external variables */
@@ -79,26 +85,16 @@ extern int	dialuss(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts)
-{
-	const int	nlslen = NLSBUFLEN ;
+int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts) noex {
+	cint	nlslen = NLSBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		svclen ;
 	int		fd = -1 ;
 	char		*nlsbuf ;
 
-#if	CF_DEBUGS
-	debugprintf("dialussnls: ent to=%d\n",to) ;
-#endif
-
 	if ((portspec == NULL) || (portspec[0] == '\0'))
 	    portspec = NULL ;
-
-#if	CF_DEBUGS
-	debugprintf("dialussnls: portspec=%s\n",portspec) ;
-#endif
 
 /* perform some cleanup on the service code specification */
 
@@ -116,10 +112,6 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts)
 	if (svclen <= 0)
 	    return SR_INVAL ;
 
-#if	CF_DEBUGS
-	debugprintf("dialussnls: final svcbuf=%t\n",svcbuf,svclen) ;
-#endif
-
 /* format the service string to be transmitted */
 
 	if ((rs = uc_malloc((nlslen+1),&nlsbuf)) >= 0) {
@@ -128,14 +120,9 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts)
 	        sigset_t		signalmask ;
 	        int			blen = rs ;
 
-#if	CF_DEBUGS
-	        debugprintf("dialtcpnls: nlsbuf len=%d\n",blen) ;
-	        debugprintf("dialtcpnls: nlsbuf >%t<\n",nlsbuf,(blen - 1)) ;
-#endif
-
 	        uc_sigsetempty(&signalmask) ;
 
-	        memset(&nsig,0,sizeof(struct sigaction)) ;
+	        memclear(&nsig) ;
 	        nsig.sa_handler = SIG_IGN ;
 	        nsig.sa_mask = signalmask ;
 	        nsig.sa_flags = 0 ;
@@ -144,15 +131,11 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts)
 	            if (portspec == NULL)
 	                portspec = "/tmp/unix" ;
 
-#if	CF_DEBUGS
-	            debugprintf("dialussnls: dialing the -listen- service\n") ;
-#endif
-
 	            if ((rs = dialuss(portspec,to,aopts)) >= 0) {
 	                fd = rs ;
 
 	                if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
-	                    const int	rlen = RBUFLEN ;
+	                    cint	rlen = RBUFLEN ;
 	                    char	rbuf[RBUFLEN+1] = { 0 } ;
 	                    rs = readnlsresp(fd,rbuf,rlen,to) ;
 	                } /* end if (read response) */
@@ -170,10 +153,6 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts)
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("dialussnls: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
 
 	return (rs >= 0) ? fd : rs ;
 }

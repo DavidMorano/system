@@ -1,4 +1,4 @@
-/* ucopenpt */
+/* ucopenpt SUPPORT */
 /* lang=C++20 */
 
 /* open a PTS-style pseudo-terminal */

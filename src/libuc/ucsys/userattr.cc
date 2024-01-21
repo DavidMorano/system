@@ -1,4 +1,4 @@
-/* userattr */
+/* userattr SUPPORT */
 /* lang=C++20 */
 
 /* USERATTR operating system data-base support */

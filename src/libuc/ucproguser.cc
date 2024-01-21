@@ -1,4 +1,4 @@
-/* ucproguser */
+/* ucproguser SUPPORT */
 /* lang=C20 */
 
 /* get or set a cached username given a UID */

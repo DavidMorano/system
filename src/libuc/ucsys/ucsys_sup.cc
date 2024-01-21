@@ -1,4 +1,4 @@
-/* ucsys_sup */
+/* ucsys_sup SUPPORT */
 /* lang=C++20 */
 
 /* USYS support */

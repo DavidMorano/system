@@ -1,10 +1,8 @@
-/* dialussmux */
+/* dialussmux SUPPORT */
+/* lang=C++20 */
 
 /* dial to the server listening on USSMUX */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 
 /* revision history:
@@ -18,15 +16,12 @@
 
 /*******************************************************************************
 
-	This object dials out to a UNIX®-Socket-Stream (USS) that implements
-	a multiplexor on the server side.
-
+	This object dials out to a UNIX®-Socket-Stream (USS) that
+	implements a multiplexor on the server side.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -35,11 +30,10 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<signal.h>
-#include	<string.h>
-
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<char.h>
@@ -56,10 +50,20 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+typedef mainv		mv ;
+
+
 /* external subroutines */
 
-extern int	dialuss(const char *,int,int) ;
-extern int	mkquoted(char *,int,const char *,int) ;
+extern "C" {
+    extern int	dialuss(cchar *,int,int) noex ;
+    extern int	mkquoted(char *,int,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -76,24 +80,13 @@ extern int	mkquoted(char *,int,const char *,int) ;
 
 /* exported subroutines */
 
-
-int dialussmux(portspec,svcspec,srvargv,to,opts)
-const char	portspec[] ;
-const char	svcspec[] ;
-const char	*srvargv[] ;
-int		to ;
-int		opts ;
-{
-	BUFFER		srvbuf ;
+int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
+	buffer		srvbuf ;
 	int		rs ;
 	int		rs1 ;
 	int		svclen ;
 	int		fd = -1 ;
-	const char	*bp ;
-
-#if	CF_DEBUGS
-	debugprintf("dialussmux: ent to=%d opts=%04x\n", to,opts) ;
-#endif
+	cchar	*bp ;
 
 	if (portspec == NULL) return SR_FAULT ;
 	if (svcspec == NULL) return SR_FAULT ;
@@ -111,10 +104,6 @@ int		opts ;
 
 	if (svclen <= 0)
 	    return SR_INVAL ;
-
-#if	CF_DEBUGS
-	debugprintf("dialussmux: final svcspec=%t\n",svcspec,svclen) ;
-#endif
 
 /* format the service string to be transmitted */
 
@@ -136,10 +125,6 @@ int		opts ;
 	        } /* end for */
 	    } /* end if */
 
-#if	CF_DEBUGS
-	    debugprintf("dialussmux: finishing service format\n") ;
-#endif
-
 	    if (rs >= 0) {
 	        buffer_char(&srvbuf,'\n') ;
 	        if ((rs = buffer_get(&srvbuf,&bp)) >= 0) {
@@ -153,22 +138,10 @@ int		opts ;
 	            sigs.sa_flags = 0 ;
 	            if ((rs = u_sigaction(SIGPIPE,&sigs,&osigs)) >= 0) {
 
-#if	CF_DEBUGS
-	            debugprintf("dialussmux: dialuss()\n") ;
-#endif
-
 	            if ((rs = dialuss(portspec,to,opts)) >= 0) {
 	                fd = rs ;
 
-#if	CF_DEBUGS
-	                debugprintf("dialussmux: dialuss() rs=%d\n",rs) ;
-#endif
-
 /* transmit the formatted service code and arguments */
-
-#if	CF_DEBUGS
-	                debugprintf("dialussmux: writing service format\n") ;
-#endif
 
 	                if ((rs = uc_writen(fd,bp,blen)) >= 0) {
 	                    const int	rlen = RBUFLEN ;
@@ -182,19 +155,11 @@ int		opts ;
 
 	                } /* end if (wrote service code) */
 
-#if	CF_DEBUGS
-	                debugprintf("dialussmux: response rs=%d\n",rs) ;
-#endif
-
 	                if (rs < 0) {
 	                    u_close(fd) ;
 			    fd = -1 ;
 			}
 	            } /* end if (dialuss) */
-
-#if	CF_DEBUGS
-	            debugprintf("dialussmux: dialuss()-out rs=%d\n",rs) ;
-#endif
 
 	            u_sigaction(SIGPIPE,&osigs,NULL) ;
 	        } /* end if (sigs) */
@@ -210,10 +175,6 @@ int		opts ;
 		fd = -1 ;
 	    }
 	} /* end if (buffer) */
-
-#if	CF_DEBUGS
-	debugprintf("dialussmux: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
 
 	return (rs >= 0) ? fd : rs ;
 }

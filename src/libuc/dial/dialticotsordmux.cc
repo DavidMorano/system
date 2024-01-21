@@ -1,10 +1,8 @@
-/* dialticotsordmux */
+/* dialticotsordmux SUPPORT */
+/* lang=C++20 */
 
 /* dial to the server listening on USSMUX */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 
 /* revision history:
@@ -18,24 +16,20 @@
 
 /******************************************************************************
 
-	This object dials out to a UNIX®-Socket-Stream (USS) that implements
-	a multiplexor on the server side.
-
+	This object dials out to a UNIX®-Socket-Stream (USS) that
+	implements a multiplexor on the server side.
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<sigblocker.h>
@@ -52,10 +46,20 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+typedef mainv		mv ;
+
+
 /* external subroutines */
 
-extern int	dialticotsord(const char *,int,int,int) ;
-extern int	mkquoted(char *,int,const char *,int) ;
+extern "C" {
+     extern int	dialticotsord(cchar *,int,int,int) noex ;
+     extern int	mkquoted(char *,int,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -66,12 +70,12 @@ extern int	mkquoted(char *,int,const char *,int) ;
 
 /* forward references */
 
-static int	dialer(BUFFER *,cchar *,int,char *,int,int,int) ;
+static int	dialer(buffer *,cchar *,int,char *,int,int,int) noex ;
 
 
 /* local variables */
 
-static const int	sigblocks[] = {
+static constexpr int	sigblocks[] = {
 	SIGPIPE,
 	0
 } ;
@@ -79,92 +83,62 @@ static const int	sigblocks[] = {
 
 /* exported subroutines */
 
-
-int dialticotsordmux(abuf,alen,svcspec,srvargv,to,opts)
-const char	abuf[] ;
-int		alen ;
-const char	svcspec[] ;
-const char	*srvargv[] ;
-int		to ;
-int		opts ;
-{
-	BUFFER		srvbuf ;
+int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,int to,int opts) noex {
+	buffer		srvbuf ;
 	int		rs ;
 	int		rs1 ;
 	int		svclen ;
 	int		fd = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("dialticotsordmux: ent to=%d opts=%04x\n",
-	    to,opts) ;
-#endif
-
 	if (abuf == NULL) return SR_FAULT ;
-	if (svcspec == NULL) return SR_FAULT ;
+	if (svc == NULL) return SR_FAULT ;
 
-	if (svcspec[0] == '\0') return SR_INVALID ;
+	if (svc[0] == '\0') return SR_INVALID ;
 
-	while (CHAR_ISWHITE(*svcspec)) {
-	    svcspec += 1 ;
+	while (CHAR_ISWHITE(*svc)) {
+	    svc += 1 ;
 	}
 
-	svclen = strlen(svcspec) ;
+	svclen = strlen(svc) ;
 
-	while (svclen && CHAR_ISWHITE(svcspec[svclen - 1])) {
+	while (svclen && CHAR_ISWHITE(svc[svclen - 1])) {
 	    svclen -= 1 ;
 	}
 
 	if (svclen <= 0)
 	    return SR_INVAL ;
 
-#if	CF_DEBUGS
-	debugprintf("dialticotsordmux: final svcspec=%t\n",svcspec,svclen) ;
-#endif
-
 /* format the service string to be transmitted */
 
 	if ((rs = buffer_start(&srvbuf,100)) >= 0) {
-	    const int	dlen = DBUFLEN ;
+	    cint	dlen = DBUFLEN ;
 	    char	*dbuf ;
 	    if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
-
 /* format the service code and arguments for transmission */
-
-	        buffer_strw(&srvbuf,svcspec,svclen) ;
-
-	        if (srvargv != NULL) {
+	        buffer_strw(&srvbuf,svc,svclen) ;
+	        if (sargv != NULL) {
 	            int		i ;
-	            for (i = 0 ; (rs >= 0) && (srvargv[i] != NULL) ; i += 1) {
-	                if ((rs = mkquoted(dbuf,dlen,srvargv[i],-1)) >= 0) {
+	            for (int i = 0 ; (rs >= 0) && sargv[i] ; i += 1) {
+	                if ((rs = mkquoted(dbuf,dlen,sargv[i],-1)) >= 0) {
 	                    buffer_char(&srvbuf,' ') ;
 	                    buffer_buf(&srvbuf,dbuf,rs) ;
 	                }
 	            } /* end for */
 	        } /* end if */
-
-#if	CF_DEBUGS
-	        debugprintf("dialticotsordmux: finishing service format\n") ;
-#endif
-
 	        if (rs >= 0) {
 	            buffer_char(&srvbuf,'\n') ;
 	        }
-
 	        if (rs >= 0) {
 	            rs = dialer(&srvbuf,abuf,alen,dbuf,dlen,to,opts) ;
 	            fd = rs ;
 	        } /* end if (positive) */
-
-	        uc_free(dbuf) ;
+	        rs1 = uc_free(dbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	    rs1 = buffer_finish(&srvbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
 	if ((rs >= 0) && (fd >= 0)) u_close(fd) ;
-
-#if	CF_DEBUGS
-	debugprintf("dialticotsordmux: ret rs=%d fd=%u\n",rs,fd) ;
-#endif
 
 	return (rs >= 0) ? fd : rs ;
 }
@@ -173,22 +147,18 @@ int		opts ;
 
 /* local subroutines */
 
-
-static int dialer(BUFFER *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
-int to,int opts)
-{
-	SIGBLOCKER	ss ;
+static int dialer(buffer *sbp,cchar *abuf,int alen,char *dbuf,int dlen,
+			int to,int opts) noex {
+	sigblocker	ss ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
 	cchar		*bp ;
 	if ((rs = buffer_get(sbp,&bp)) >= 0) {
-	    const int	blen = rs ;
+	    cint	blen = rs ;
 	    if ((rs = sigblocker_start(&ss,sigblocks)) >= 0) {
-
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
 	            fd = rs ;
-
 	            if ((rs = uc_writen(fd,bp,blen)) >= 0) {
 	                dbuf[0] = '\0' ;
 	                if ((rs = uc_readlinetimed(fd,dbuf,dlen,to)) >= 0) {
@@ -197,17 +167,11 @@ int to,int opts)
 	                    }
 	                }
 	            } /* end if (wrote service code) */
-
-#if	CF_DEBUGS
-	            debugprintf("dialticotsordmux: recv rs=%d\n",rs) ;
-#endif
-
 	            if (rs < 0) {
 	                u_close(fd) ;
 	                fd = -1 ;
 	            }
 	        } /* end if (opened) */
-
 	        rs1 = sigblocker_finish(&ss) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */

@@ -1,4 +1,4 @@
-/* ucsysnw */
+/* ucsysnw SUPPORT */
 /* lang=C++20 */
 
 /* additional operaring-system support for NETENT-DB access */

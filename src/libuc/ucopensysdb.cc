@@ -1,4 +1,4 @@
-/* ucopensysdb */
+/* ucopensysdb SUPPORT */
 /* lang=C20 */
 
 /* open a system-database (SYSBD) file */

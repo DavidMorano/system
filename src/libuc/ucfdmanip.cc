@@ -1,4 +1,4 @@
-/* ucfdmanip */
+/* ucfdmanip SUPPORT */
 /* lang=C++20 */
 
 /* manipulation of file-descriptors */
@@ -121,6 +121,9 @@
 /* forward references */
 
 static int	movethem(int,int,int) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

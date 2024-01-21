@@ -1,4 +1,4 @@
-/* ucnprocs */
+/* ucnprocs SUPPORT */
 /* lang=C++20 */
 
 /* get the number of processes on the system */

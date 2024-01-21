@@ -1,4 +1,4 @@
-/* ucsem */
+/* ucsem SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® Counting Semaphore (UCSEM) */

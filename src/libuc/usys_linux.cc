@@ -1,4 +1,4 @@
-/* usys_linux */
+/* usys_linux SUPPORT */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */

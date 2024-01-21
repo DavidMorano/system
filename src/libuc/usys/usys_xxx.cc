@@ -1,4 +1,4 @@
-/* usys_xxx */
+/* usys_xxx SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® system emulated support */
