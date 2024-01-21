@@ -1,4 +1,4 @@
-/* ucatfork */
+/* ucatfork SUPPORT */
 /* lang=C++20 */
 
 /* an enhanced UNIX®-like |pthread_atfork(3pthread)| subroutine */

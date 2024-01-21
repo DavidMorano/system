@@ -1,4 +1,4 @@
-/* ucsysho */
+/* ucsysho SUPPORT */
 /* lang=C++20 */
 
 /* additional operaring-system support for HOSTENT-DB access */

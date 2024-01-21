@@ -1,6 +1,8 @@
-/* dialcprogmsg */
+/* dialcprogmsg HEADER */
+/* lang=C20 */
 
 /* dial a program within the current machine cluster */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2003 David A­D­ Morano.  All rights reserved. */

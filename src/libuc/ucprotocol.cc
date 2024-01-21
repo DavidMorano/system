@@ -1,4 +1,4 @@
-/* ucsyspr */
+/* ucsyspr SUPPORT */
 /* lang=C++20 */
 
 /* additional operaring-system support for PROTOENT-DB access */

@@ -1,6 +1,9 @@
 /* hostent HEADER */
 /* lang=C20 */
 
+/* manipulate host entry structures */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
@@ -23,27 +26,27 @@
 
 
 #define	HOSTENT		struct hostent
-#define	HOSTENT_CUR	struct hostent_c
+#define	HOSTENT_CUR	struct hostent_cursor
 
 
-struct hostent_c {
+struct hostent_cursor {
 	int		i ;
 } ;
 
-typedef HSOTENT_CUR	hostent_cur ;
+typedef HOSTENT_CUR	hostent_cur ;
 
 EXTERNC_begin
 
-extern int hostent_getofficial(HOSTENT *,const char **) ;
-extern int hostent_getcanonical(HOSTENT *,const char **) ;
-extern int hostent_getaf(HOSTENT *) ;
-extern int hostent_getalen(HOSTENT *) ;
-extern int hostent_curbegin(HOSTENT *,HOSTENT_CUR *) ;
-extern int hostent_curend(HOSTENT *,HOSTENT_CUR *) ;
-extern int hostent_enumname(HOSTENT *,HOSTENT_CUR *,const char **) ;
-extern int hostent_enumaddr(HOSTENT *,HOSTENT_CUR *,const uchar **) ;
-extern int hostent_size(HOSTENT *) ;
-extern int hostent_load(HOSTENT *,char *,int,HOSTENT *) ;
+extern int hostent_getofficial(HOSTENT *,cchar **) noex ;
+extern int hostent_getcanonical(HOSTENT *,cchar **) noex ;
+extern int hostent_getaf(HOSTENT *) noex ;
+extern int hostent_getalen(HOSTENT *) noex ;
+extern int hostent_curbegin(HOSTENT *,hostent_cur *) noex ;
+extern int hostent_curend(HOSTENT *,hostent_cur *) noex ;
+extern int hostent_enumname(HOSTENT *,hostent_cur *,cchar **) noex ;
+extern int hostent_enumaddr(HOSTENT *,hostent_cur *,const uchar **) noex ;
+extern int hostent_size(HOSTENT *) noex ;
+extern int hostent_load(HOSTENT *,char *,int,HOSTENT *) noex ;
 
 EXTERNC_end
 

@@ -1,4 +1,4 @@
-/* usys_mqueue */
+/* usys_mqueue SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® system emulated support */

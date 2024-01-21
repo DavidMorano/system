@@ -4,7 +4,6 @@
 /* dial out to a machine server listening on TCPNLS */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -17,49 +16,39 @@
 
 /*******************************************************************************
 
+	Name:
+	dialtcpnls
+
+	Description:
 	This subroutine will dial out to an INET host using the
 	TCPMUX protocol and the optional TCP port and TCPMUX services
 	that is specified.
 
 	Synopsis:
-
-	int dialtcpnls(hostname,portspec,af,svcbuf,to,options)
-	const char	hostname[] ;
-	const char	portspec[] ;
-	int		af ;
-	const char	svcbuf[] ;
-	int		to, options ;
+	int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int dot) noex
 
 	Arguments:
-
-	hostname	host to dial to
-	portspec	port specification to use
+	hn		host to dial to
+	ps		port specification to use
 	af		address family
-	svcbuf		service specification
+	svc		service specification
 	to		to ('>0' means use one, '-1' means don't)
-	options		any dial options
+	dot		any dial options
 
 	Returns:
-
 	>=0		file descriptor
-	<0		error in dialing
+	<0		error in dialing (system-return)
 
 	What is up with the 'to' argument?
-
 	>0		use the to as it is
-
 	==0             asynchronously span the connect and do not wait
 			for it
-
 	<0              use the system default to (xx minutes --
 			whatever)
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -67,17 +56,19 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<sbuf.h>
 #include	<char.h>
+#include	<dialtcp.h>
 #include	<localmisc.h>
 
 #include	"nlsdialassist.h"
+#include	"dialtcpnls.h"
 
 
 /* local defines */
@@ -96,18 +87,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif /* CF_DEBUGS */
-
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -123,143 +102,79 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int dialtcpnls(hostname,portspec,af,svcbuf,to,opts)
-const char	hostname[] ;
-const char	portspec[] ;
-int		af ;
-const char	svcbuf[] ;
-int		to, opts ;
-{
-	struct sigaction	nsig, osig ;
-	sigset_t	signalmask ;
-	const int	nlslen = NLSBUFLEN ;
+int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
+	cint		nlslen = NLSBUFLEN ;
 	int		rs ;
+	int		rs1 ;
 	int		svclen ;
 	int		fd = -1 ;
 	char		*nlsbuf ;
 
-	if (hostname == NULL) return SR_FAULT ;
-	if (svcbuf == NULL) return SR_FAULT ;
+	if (hn == nullptr) return SR_FAULT ;
+	if (svc == nullptr) return SR_FAULT ;
 
-	if (hostname[0] == '\0') return SR_INVALID ;
-	if (svcbuf[0] == '\0') return SR_INVALID ;
+	if (hn[0] == '\0') return SR_INVALID ;
+	if (svc[0] == '\0') return SR_INVALID ;
 
-	if ((portspec == NULL) || (portspec[0] == '\0'))
-	    portspec = NULL ;
-
-#if	CF_DEBUGS
-	debugprintf("dialtcpnls: hostname=%s\n",hostname) ;
-	debugprintf("dialtcpnls: portspec=%s\n",portspec) ;
-	debugprintf("dialtcpnls: svcbuf=%s\n",svcbuf) ;
-	debugprintf("dialtcpnls: to=%d\n",to) ;
-#endif
+	if ((ps == nullptr) || (ps[0] == '\0'))
+	    ps = nullptr ;
 
 /* perform some cleanup on the service code specification */
 
-	while (CHAR_ISWHITE(*svcbuf)) {
-	    svcbuf += 1 ;
+	while (CHAR_ISWHITE(*svc)) {
+	    svc += 1 ;
 	}
-	svclen = strlen(svcbuf) ;
+	svclen = strlen(svc) ;
 
-	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1])) {
+	while (svclen && CHAR_ISWHITE(svc[svclen - 1])) {
 	    svclen -= 1 ;
 	}
 
 	if (svclen <= 0)
 	    return SR_INVAL ;
 
-#if	CF_DEBUGS
-	debugprintf("dialtcpnls: final svcbuf=%t\n",svcbuf,svclen) ;
-#endif
-
 	if ((rs = uc_malloc((nlslen+1),&nlsbuf)) >= 0) {
-	    if ((rs = mknlsreq(nlsbuf,nlslen,svcbuf,svclen)) >= 0) {
-	        int	blen = rs ;
-
-#if	CF_DEBUGS
-	        debugprintf("dialtcpnls: nlsbuf len=%d\n",blen) ;
-	        debugprintf("dialtcpnls: nlsbuf >%t<\n",nlsbuf,(blen - 1)) ;
-#endif
-
+	    if ((rs = mknlsreq(nlsbuf,nlslen,svc,svclen)) >= 0) {
+		SIGACTION	osig ;
+		SIGACTION	nsig{} ;
+		sigset_t	signalmask ;
+	        int		blen = rs ;
 	        uc_sigsetempty(&signalmask) ;
-
-	        memset(&nsig,0,sizeof(struct sigaction)) ;
 	        nsig.sa_handler = SIG_IGN ;
 	        nsig.sa_mask = signalmask ;
 	        nsig.sa_flags = 0 ;
 	        if ((rs = u_sigaction(SIGPIPE,&nsig,&osig)) >= 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("dialtcpnls: portspec=%s\n",
-	                portspec) ;
-#endif
-
-	            if (portspec == NULL) {
-
-#if	CF_DEBUGS
-	                debugprintf("dialtcpnls: -listen- service\n") ;
-#endif
-
-	                portspec = SVC_LISTEN ;
-	                rs = dialtcp(hostname,portspec,af,to,opts) ;
+	            if (ps == nullptr) {
+	                ps = SVC_LISTEN ;
+	                rs = dialtcp(hn,ps,af,to,opts) ;
 	                fd = rs ;
-
 	                if ((rs < 0) && (rs != SR_CONNREFUSED)) {
-
-#if	CF_DEBUGS
-	                    debugprintf("dialtcpnls: dialing \n") ;
-#endif
-
-	                    portspec = SVC_TCPNLS ;
-	                    rs = dialtcp(hostname,portspec,af,to,opts) ;
+	                    ps = SVC_TCPNLS ;
+	                    rs = dialtcp(hn,ps,af,to,opts) ;
 	                    fd = rs ;
-
-#if	CF_DEBUGS
-	                    debugprintf("dialtcpnls: dialtcp() rs=%d\n",rs) ;
-#endif
-
 	                } /* end if */
-
 	            } else {
-	                rs = dialtcp(hostname,portspec,af,to,opts) ;
+	                rs = dialtcp(hn,ps,af,to,opts) ;
 	                fd = rs ;
 	            }
-
-#if	CF_DEBUGS
-	            debugprintf("dialtcpnls: result rs=%d\n",rs) ;
-#endif
-
 	            if (rs >= 0) {
-
-/* transmit the formatted service code and arguments */
-
-#if	CF_DEBUGS
-	                debugprintf("dialtcpnls: writing service l=%u\n",
-	                    blen) ;
-#endif
-
 	                if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
-	                    const int	rlen = RBUFLEN ;
+	                    cint	rlen = RBUFLEN ;
 	                    char	rbuf[RBUFLEN+1] = { 0 } ;
 	                    rs = readnlsresp(fd,rbuf,rlen,to) ;
 	                } /* end if (read response) */
-
 	                if (rs < 0) u_close(fd) ;
 	            } /* end if (opened) */
-
-	            u_sigaction(SIGPIPE,&osig,NULL) ;
+	            rs1 = u_sigaction(SIGPIPE,&osig,nullptr) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigaction) */
-
-	    } else
+	    } else {
 	        rs = SR_TOOBIG ;
-	    uc_free(nlsbuf) ;
+	    }
+	    rs1 = uc_free(nlsbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("dialtcpnls: ret rs=%d s=%u\n",rs,fd) ;
-#endif
-
+	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialtcpnls) */

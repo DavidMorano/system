@@ -1,4 +1,4 @@
-/* uckvamatch */
+/* uckvamatch SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX®Â® library-3c */

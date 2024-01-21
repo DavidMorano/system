@@ -1,4 +1,4 @@
-/* ucygetpw */
+/* ucygetpw SUPPORT */
 /* lang=C++20 */
 
 /* get UNIX® password entries (w/ cache) */

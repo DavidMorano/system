@@ -21,8 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -40,6 +39,7 @@ const char syswords::w_infopath[] =	"infopath" ;
 
 const char syswords::w_tmpdir[] =	"/tmp" ;
 const char syswords::w_maildir[] =	"/var/mail" ;
+const char syswords::w_sysdbdir[] =	"/sysdb" ;
 const char syswords::w_usrlocaldir[] =	"/usr/local" ;
 const char syswords::w_users[] =	"users" ;
 

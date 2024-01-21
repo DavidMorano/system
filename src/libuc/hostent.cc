@@ -1,5 +1,5 @@
-/* hostent */
-/* lang=C20 */
+/* hostent SUPPORT */
+/* lang=C++20 */
 
 /* manipulate host entry structures */
 /* version %I% last-modified %G% */
@@ -39,7 +39,6 @@
 	#define	h_addr	h_addr_list[0]	
 	} ;
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -49,7 +48,7 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<storeitem.h>
 #include	<intceil.h>
@@ -64,16 +63,30 @@
 #define	HOSTENT		struct hostent
 #endif
 
+#define	SI		storeitem
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
 
 /* forward references */
 
-static int	si_copyaliases(STOREITEM *,HOSTENT *,HOSTENT *) noex ;
-static int	si_copyaddrs(STOREITEM *,HOSTENT *,HOSTENT *) noex ;
-static int	si_copystr(STOREITEM *,char **,cchar *) noex ;
-static int	si_copybuf(STOREITEM *,char **,cchar *,int) noex ;
+static int	si_copyaliases(SI *,HOSTENT *,HOSTENT *) noex ;
+static int	si_copyaddrs(SI *,HOSTENT *,HOSTENT *) noex ;
+static int	si_copystr(SI *,char **,cchar *) noex ;
+static int	si_copybuf(SI *,char **,cchar *,int) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -94,8 +107,9 @@ int hostent_getofficial(HOSTENT *hep,cchar **rpp) noex {
 
 	} /* end if */
 
-	if ((rs < 0) && (rpp != NULL))
+	if ((rs < 0) && (rpp != NULL)) {
 	    *rpp = NULL ;
+	}
 
 	return (rs >= 0) ? nlen : rs ;
 }
@@ -295,8 +309,7 @@ int hostent_getfqdn(HOSTENT *hep,cchar **rpp) noex {
 /* end subroutine (hostent_getfqdn) */
 
 int hostent_size(HOSTENT *hep) noex {
-{
-	int		i ;
+	int		i{} ;
 	int		size = 1 ;
 	if (hep->h_name) {
 	    size += (strlen(hep->h_name)+1) ;
@@ -343,7 +356,7 @@ int hostent_load(HOSTENT *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 
 /* private subroutines */
 
-static int si_copyaliases(STOREITEM *ibp,HOSTENT *hep,HOSTENT *lp) noex {
+static int si_copyaliases(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_aliases != NULL) {
 	    int		n ;
@@ -367,7 +380,7 @@ static int si_copyaliases(STOREITEM *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 }
 /* end subroutine (si_copyaliases) */
 
-static int si_copyaddrs(STOREITEM *ibp,HOSTENT *hep,HOSTENT *lp) noex {
+static int si_copyaddrs(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 	int		rs = SR_OK ;
 	if (lp->h_addr_list != NULL) {
 	    int		n ;
@@ -392,7 +405,7 @@ static int si_copyaddrs(STOREITEM *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 }
 /* end subroutine (si_copyaddrs) */
 
-static int si_copystr(STOREITEM *ibp,char **pp,cchar *s1) noex {
+static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 	int		rs = SR_OK ;
 	const char	**cpp = (const char **) pp ;
 	*cpp = NULL ;
@@ -403,7 +416,7 @@ static int si_copystr(STOREITEM *ibp,char **pp,cchar *s1) noex {
 }
 /* end subroutine (si_copystr) */
 
-static int si_copybuf(STOREITEM *ibp,char **pp,cchar *bp,int bl) noex {
+static int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = (cchar **) pp ;
 	*cpp = NULL ;

@@ -1,4 +1,4 @@
-/* ucprogdata */
+/* ucprogdata SUPPORT */
 /* lang=C++20 */
 
 /* set or get some program (process) data */

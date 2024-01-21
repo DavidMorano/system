@@ -1,4 +1,4 @@
-/* ucfstat */
+/* ucfstat SUPPORT */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */

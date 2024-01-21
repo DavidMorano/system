@@ -1,7 +1,6 @@
-/* ucfork */
+/* ucfork SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* special handling for |fork(2)| */
 /* version %I% last-modified %G% */
 

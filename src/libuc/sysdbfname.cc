@@ -1,4 +1,4 @@
-/* ucgetpid SUPPORT */
+/* sysdbfname SUPPORT */
 /* lang=C++20 */
 
 /* get the current process PID (quickly and fork-safely) */

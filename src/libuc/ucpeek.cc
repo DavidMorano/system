@@ -1,4 +1,4 @@
-/* ucpeek */
+/* ucpeek SUPPORT */
 /* lang=C++20 */
 
 /* "peek" at any waiting input */

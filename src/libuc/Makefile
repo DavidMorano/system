@@ -458,7 +458,7 @@ a:			$(T).a
 	$(CXX) -c $(CPPFLAGS) $(CCFLAGS) $<
 
 
-libuserhome.a:		$(UOBJ)
+libmacuser.a:		$(UOBJ)
 	$(AR) -rc $@ $?
 
 $(TT).a:		$(TOBJ)
@@ -790,7 +790,7 @@ sigign.o:		sigign.c sigign.h
 
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
-hostent.o:		hostent.c hostent.h
+hostent.o:		hostent.cc hostent.h
 inetaddr.o:		inetaddr.cc inetaddr.h
 sockaddress.o:		sockaddress.cc sockaddress.h
 

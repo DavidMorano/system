@@ -1,4 +1,4 @@
-/* spwd */
+/* spwd SUPPORT */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */

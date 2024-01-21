@@ -28,7 +28,7 @@
         This subroutine determines if a given string is empty or not.
 
 	Synopsis:
-	int hasempty(cchar *sp,int sl) noex
+	bool hasempty(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string pointer
@@ -50,7 +50,7 @@
 	<CR><NL>
 
 	Synopsis:
-	int haseoh(cchar *sp,int sl) noex
+	bool haseoh(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string to test
@@ -68,7 +68,7 @@
 	Determine if the given c-string has a non-white character.
 
 	Synopsis:
-	int hasnonwhite(cchar *sp,int sl) noex
+	bool hasnonwhite(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string pointer
@@ -105,7 +105,7 @@
 	Are all of the characters printable Latin characters?
 
 	Synopsis:
-	int hasprintlatin(cchar *sp,int sl) noex
+	bool hasprintlatin(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string to test
@@ -123,7 +123,7 @@
 	Does the given string have characters that are bad to print?
 
 	Synopsis:
-	int hasprintbad(ccha *sp,int sl) noex
+	bool hasprintbad(ccha *sp,int sl) noex
 
 	Arguments:
 	sp		string to test
@@ -141,7 +141,7 @@
 	Are all of the characters Alpha?
 
 	Synopsis:
-	int hasallalpha(cchar *sp,int sl) noex
+	bool hasallalpha(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string to test
@@ -159,7 +159,7 @@
 	Are all of the characters Alpha-Num?
 
 	Synopsis:
-	int hasallalnum(cchar *sp,int sl) noex
+	bool hasallalnum(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string to test
@@ -177,7 +177,7 @@
 	Are all of the characters in the given string digits?
 
 	Synopsis:
-	int hasalldig(cchar *sp,int sl) noex
+	bool hasalldig(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		string to test
@@ -196,7 +196,7 @@
 	consistent with the numeric base supplied.
 
 	Synopsis:
-	int hasallbase(cchar *sp,int sl,int base) noex
+	bool hasallbase(cchar *sp,int sl,int base) noex
 
 	Arguments:
 	sp		string to test
@@ -219,6 +219,9 @@
 	%<string>/<comething>/<...>
 	/%<string>/<something>/...
 
+	Synopsis:
+	bool hasvarpathprefix(cchar *,int) noex
+
 
 	Name:
 	hasValidMagic
@@ -228,7 +231,7 @@
 	contains the given valid magic string.
 
 	Synopsis:
-	int hasValidMagic(cchar *sp,int sl,cchar *ms) noex
+	bool hasValidMagic(cchar *sp,int sl,cchar *ms) noex
 
 	Arguments:
 	cchar	*sp		string buffer to test
@@ -250,7 +253,7 @@
 	+ two dot characters
 
 	Synopsis:
-	int hasNotDots(cchar *sp,int sl) noex
+	bool hasNotDots(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		pointer to given string
@@ -265,7 +268,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<ucvariables.hh>
 #include	<ascii.h>
 #include	<char.h>
@@ -647,7 +650,7 @@ bool hasmacro(cchar *lp,int ll) noex {
 }
 /* end subroutine (hasmacro) */
 
-bool hasvalidmagic(char *tbuf,int tlen,char *ms) noex {
+bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 	cint		ml = strlen(ms) ;
 	bool		f = false ;
 	if (tlen >= (ml+1)) {

@@ -47,7 +47,6 @@
 	<0              use the system default timeout (xx minutes --
 			whatever)
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>
@@ -79,6 +78,8 @@
 #include	<getprogpath.h>
 #include	<localmisc.h>
 
+#include	"dial.h"
+
 
 /* local defines */
 
@@ -103,10 +104,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int dialprog(cchar *,int,mainv,mainv,int *) noex ;
-}
 
 
 /* external variables */

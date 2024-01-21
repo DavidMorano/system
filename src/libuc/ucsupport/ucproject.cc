@@ -1,4 +1,4 @@
-/* ucsyspj */
+/* ucsyspj SUPPORT */
 /* lang=C++20 */
 
 /* additional operaring-system support for PEOJECT-DB access */

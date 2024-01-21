@@ -27,7 +27,6 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -43,6 +42,7 @@ struct syswords {
 	static const char w_infopath[] ;
 	static const char w_tmpdir[] ;
 	static const char w_maildir[] ;
+	static const char w_sysdbdir[] ;
 	static const char w_usrlocaldir[] ;
 	static const char w_users[] ;
 } ; /* end struct (syswords) */

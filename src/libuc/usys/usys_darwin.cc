@@ -1,4 +1,4 @@
-/* usys_darwin */
+/* usys_darwin SUPPORT */
 /* lang=C++20 */
 
 /* define various sytem (global) variables */

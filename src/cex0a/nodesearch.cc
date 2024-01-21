@@ -1,9 +1,8 @@
-/* nodesearch */
+/* nodesearch SUPPORT */
+/* lang=C++20 */
 
 /* support searching for a node name in the cluster */
-
-
-#define	CF_DEBUGS	0		/* debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,31 +16,29 @@
 
 /*******************************************************************************
 
-        This little object provides multiplexing of two ways to search the
-        cluster 'nodes' file. If the file is 'regular', the NODESFILE object is
-        used to process it (for speed). If the file is anything other than a
-        'regular' file, then a HDBSTR object is used to process it and the file
-        is read line-by-line not assuming that the file may be seekable
-        (suitable for pipes, FIFOs, sockets, and the like).
-
+	This little object provides multiplexing of two ways to
+	search the cluster 'nodes' file. If the file is 'regular',
+	the NODESFILE object is used to process it (for speed). If
+	the file is anything other than a 'regular' file, then a
+	HDBSTR object is used to process it and the file is read
+	line-by-line not assuming that the file may be seekable
+	(suitable for pipes, FIFOs, sockets, and the like).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<hdbstr.h>
 #include	<mallocstuff.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"nodesfile.h"
@@ -59,9 +56,9 @@
 
 /* external subroutines */
 
-extern int	hdbstr_loadfile1(HDBSTR *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+     extern int	hdbstr_loadfile1(HDBSTR *,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -78,7 +75,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 static int	nodesearch_filechanged(NODESEARCH *,time_t) ;
 
 #ifdef	COMMENT
-static int	hdbstr_search(HDBSTR *,const char *,int) ;
+static int	hdbstr_search(HDBSTR *,cchar *,int) ;
 #endif
 
 static int	hdbstr_release(HDBSTR *) ;
@@ -89,14 +86,8 @@ static int	hdbstr_release(HDBSTR *) ;
 
 /* exported subroutines */
 
-
-int nodesearch_open(nsp,fname,filesize,n)
-NODESEARCH	*nsp ;
-const char	fname[] ;
-int		filesize ;
-int		n ;
-{
-	struct ustat	sb ;
+int nodesearch_open(NODESEARCH *nspcc *fname,int filesize,int n) noex {
+	USTAT		sb ;
 	int		rs ;
 
 	if (nsp == NULL) return SR_FAULT ;
@@ -130,35 +121,18 @@ int		n ;
 	rs = nodesfile_open(&nsp->a,fname,filesize,O_RDONLY) ;
 
 	if ((rs == SR_PROTO) || (rs == SR_TOOBIG)) {
-
 	    nsp->f.sw = TRUE ;
-	    rs = hdbstr_start(&nsp->b,n) ;
-
-#if	CF_DEBUGS
-	    debugprintf("nodesearch_open: hdbstr_start() rs=%d\n",rs) ;
-#endif
-
-	    if (rs >= 0) {
-
-	        rs = hdbstr_loadfile1(&nsp->b,fname) ;
-
-#if	CF_DEBUGS
-	        debugprintf("nodesearch_open: hdbstr_loadfile1() rs=%d\n",rs) ;
-#endif
-
-	        if (rs >= 0) {
+	    if ((rs = hdbstr_start(&nsp->b,n)) >= 0) {
+	        if ((rs = hdbstr_loadfile1(&nsp->b,fname)) >= 0) {
 	            time_t	daytime = time(NULL) ;
-
 	            nsp->ti_load = daytime ;
 	            if ((rs = u_stat(fname,&sb)) >= 0) {
 	                nsp->fi.mtime = sb.st_mtime ;
 	                nsp->fi.ino = sb.st_ino ;
 	                nsp->fi.dev = sb.st_dev ;
 	            }
-
 	        }
 	    }
-
 	} /* end if (wrong type of file) */
 
 ret0:
@@ -177,15 +151,11 @@ bad0:
 /* end subroutine (nodesearch_open) */
 
 
-int nodesearch_close(nsp)
-NODESEARCH	*nsp ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
+int nodesearch_close(NODESEARCH *nsp) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
 
-
-	if (nsp == NULL)
-	    return SR_FAULT ;
+	if (nsp == NULL) return SR_FAULT ;
 
 	if (! nsp->f.sw) {
 	    rs1 = nodesfile_close(&nsp->a) ;
@@ -205,13 +175,8 @@ NODESEARCH	*nsp ;
 }
 /* end subroutine (nodesearch_close) */
 
-
-int nodesearch_check(nsp,daytime)
-NODESEARCH	*nsp ;
-time_t		daytime ;
-{
-	int	rs = SR_OK ;
-
+int nodesearch_check(NODESEARCH *nsp,time_t daytime) noex {
+	int		rs = SR_OK ;
 
 	if ((daytime - nsp->ti_check) < TO_CHECK)
 	    return SR_OK ;
@@ -230,11 +195,6 @@ time_t		daytime ;
 	        hdbstr_release(&nsp->b) ;
 
 	        rs = hdbstr_loadfile1(&nsp->b,nsp->fi.fname) ;
-
-#if	CF_DEBUGS
-	        debugprintf("nodesearch_open: hdbstr_loadfile1() rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0)
 	            nsp->ti_load = daytime ;
 
@@ -246,16 +206,11 @@ time_t		daytime ;
 }
 /* end subroutine (nodesearch_check) */
 
-
-int nodesearch_search(nsp,nodename,nl)
-NODESEARCH	*nsp ;
-const char	nodename[] ;
-int		nl ;
-{
+int nodesearch_search(NODESEARCH *nsp,cc *nodename,int nl) noex {
 	int		rs = SR_NOANODE ;
 	int		sw ;
 	int		f_found ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if (nsp == NULL) return SR_FAULT ;
 
@@ -278,11 +233,7 @@ int		nl ;
 }
 /* end subroutine (nodesearch_search) */
 
-
-int nodesearch_curbegin(nsp,curp)
-NODESEARCH	*nsp ;
-NODESEARCH_CUR	*curp ;
-{
+int nodesearch_curbegin(NODESEARCH *nsp,NODESEARCH_CUR *curp) noex {
 	int		rs = SR_NOANODE ;
 	int		sw ;
 
@@ -303,11 +254,7 @@ NODESEARCH_CUR	*curp ;
 }
 /* end subroutine (nodesearch_curbegin) */
 
-
-int nodesearch_curend(nsp,curp)
-NODESEARCH	*nsp ;
-NODESEARCH_CUR	*curp ;
-{
+int nodesearch_curend(NODESEARCH *nsp,NODESEARCH_CUR *curp) noex {
 	int		rs = SR_NOANODE ;
 	int		sw ;
 
@@ -328,21 +275,15 @@ NODESEARCH_CUR	*curp ;
 }
 /* end subroutine (nodesearch_curend) */
 
-
-int nodesearch_enum(nsp,curp,nodename,nl)
-NODESEARCH	*nsp ;
-NODESEARCH_CUR	*curp ;
-char		nodename[] ;
-int		nl ;
-{
+int nodesearch_enum(NODESEARCH *nsp,NODESEARCH_CUR *curp,char *np,int nl) noex {
 	int		rs = SR_NOANODE ;
 	int		sw ;
 	int		kl, vl ;
-	const char	*kp, *vp ;
+	cchar		*kp, *vp ;
 
 	if (nsp == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
-	if (nodename == NULL) return SR_FAULT ;
+	if (np == NULL) return SR_FAULT ;
 
 	if (nl < 0)
 	    nl = strlen(nodename) ;
@@ -350,13 +291,12 @@ int		nl ;
 	sw = nsp->f.sw ;
 	switch (sw) {
 	case 0:
-	    rs = nodesfile_enum(&nsp->a,&curp->c1,nodename,nl) ;
+	    rs = nodesfile_enum(&nsp->a,&curp->c1,np,nl) ;
 	    break ;
 	case 1:
-	    rs = hdbstr_enum(&nsp->b,&curp->c2,&kp,&vp,&vl) ;
-	    if (rs >= 0) {
+	    if ((rs = hdbstr_enum(&nsp->b,&curp->c2,&kp,&vp,&vl)) >= 0) {
 	        kl = (nl >= 0) ? MIN(rs,nl) : rs ;
-	        strwcpy(nodename,kp,kl) ;
+	        rs = snwcpy(np,nl,kp,kl) ;
 	    }
 	    break ;
 	} /* end switch */
@@ -368,52 +308,34 @@ int		nl ;
 
 /* private subroutines */
 
-
-static int nodesearch_filechanged(nsp,daytime)
-NODESEARCH	*nsp ;
-time_t		daytime ;
-{
-	struct ustat	sb ;
-
-	int	rs ;
-	int	f ;
-
-
-	rs = u_stat(nsp->fi.fname,&sb) ;
-	if (rs < 0) goto ret0 ;
-
-	f = (nsp->fi.mtime > sb.st_mtime) ;
-	f = f || (nsp->fi.ino != sb.st_ino) ;
-	f = f || (nsp->fi.dev != sb.st_dev) ;
-
-	if (f)
-	    f = f && ((daytime - nsp->fi.mtime) >= TO_HOLD) ;
-
-	if (f) {
-	    nsp->fi.mtime = sb.st_mtime ;
-	    nsp->fi.ino = sb.st_ino ;
-	    nsp->fi.dev = sb.st_dev ;
-	}
-
-ret0:
+static int nodesearch_filechanged(NODESEARCH *nsp,time_t daytime) noex {
+	USTAT		sb ;
+	int		rs ;
+	int		f = false ;
+	if ((rs = u_stat(nsp->fi.fname,&sb)) >= 0) {
+	    f = (nsp->fi.mtime > sb.st_mtime) ;
+	    f = f || (nsp->fi.ino != sb.st_ino) ;
+	    f = f || (nsp->fi.dev != sb.st_dev) ;
+	    if (f) {
+	        f = f && ((daytime - nsp->fi.mtime) >= TO_HOLD) ;
+	    }
+	    if (f) {
+	        nsp->fi.mtime = sb.st_mtime ;
+	        nsp->fi.ino = sb.st_ino ;
+	        nsp->fi.dev = sb.st_dev ;
+	    }
+	} /* end if (u_stat) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (nodesearch_filechanged) */
 
-
 #ifdef	COMMENT
 
-static int hdbstr_search(hsp,nodename,nl)
-HDBSTR		*hsp ;
-const char	nodename[] ;
-int		nl ;
-{
-	int	rs ;
-	int	f_found ;
+static int hdbstr_search(HDBSTR *hsp,cc *nodename,int nl) noex {
+	int		rs ;
+	int		f_found = false ;
 
-
-	if (hsp == NULL)
-	    return SR_FAULT ;
+	if (hsp == NULL) return SR_FAULT ;
 
 	if (nl < 0)
 	    nl = strlen(nodename) ;
@@ -421,38 +343,26 @@ int		nl ;
 	rs = hdbstr_fetch(hsp,(char *) nodename,nl,NULL,NULL) ;
 	f_found = (rs >= 0) ;
 
-#if	CF_DEBUGS
-	debugprintf("nodesfile_search: ret rs=%d \n",rs) ;
-#endif
-
 	return (rs >= 0) ? f_found : rs ;
 }
 /* end subroutine (hdbstr_search) */
 
 #endif /* COMMENT */
 
-
-static int hdbstr_release(hsp)
-HDBSTR		*hsp ;
-{
+static int hdbstr_release(HDBSTR *hsp) noex {
 	HDBSTR_CUR	cur ;
+	int		rs = SR_OK ;
 
-	int	rs = SR_OK ;
-
-
-	if (hsp == NULL)
-	    return SR_FAULT ;
+	if (hsp == NULL) return SR_FAULT ;
 
 	hdbstr_curbegin(hsp,&cur) ;
-
-	while (hdbstr_enum(hsp,&cur,NULL,NULL,NULL) >= 0)
+	while (hdbstr_enum(hsp,&cur,NULL,NULL,NULL) >= 0) {
 		hdbstr_delcur(hsp,&cur,0) ;
-
+	}
 	hdbstr_curend(hsp,&cur) ;
 
 	return rs ;
 }
 /* end subroutine (hdbstr_release) */
-
 
 

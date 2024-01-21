@@ -75,12 +75,16 @@ static int	procdir(ids *,cchar *,mode_t) noex ;
 /* local variables */
 
 
+/* external variables */
+
+
 /* external subroutines */
 
 int mkdirs(cchar *dname,mode_t dm) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
+	dm &= (~ S_IFMT) ;
 	if (dname) {
 	    rs = SR_INVALID ;
 	    if (dname[0]) {
@@ -115,14 +119,14 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
                 char        *bp ;
                 while ((bp = strchr(dp,'/')) != nullptr) {
                     bool    f = true ;
-                    *bp = '\0' ;
+                    *bp = '\0' ;	/* <- set temporary termination */
                     f = f && ((bp - dp) > 0) ;
                     f = f && (strcmp(dp,".") != 0) ;
                     if (f) {
                         rs = procdir(idp,dirbuf,dm) ;
                         c += rs ;
                     } /* end if */
-                    *bp = '/' ;
+                    *bp = '/' ;		/* <- remove temporary termination */
                     dp = (bp + 1) ;
                     if (rs < 0) break ;
                 } /* end while */

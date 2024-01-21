@@ -31,6 +31,8 @@
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 

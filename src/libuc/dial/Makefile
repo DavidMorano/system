@@ -54,17 +54,22 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h sysauxinfonames.h
 
 
-OBJ0_DIAL= dialopts.o dialhttp.o
-OBJ1_DIAL= dialpass.o dialprog.o dialtcp.o dialtcpmux.o dialfinger.o 
-OBJ2_DIAL= dialtcpnls.o dialticotsord.o dialticotsordmux.o dialticotsordnls.o
-OBJ3_DIAL= dialudp.o dialusd.o dialuss.o dialussmux.o dialussnls.o
-OBJ4_DIAL= dialcprog.o 
-
+OBJ0_DIAL= dialopts.o 
+OBJ1_DIAL= dialpass.o 
+OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o dialfinger.o dialhttp.o
+OBJ3_DIAL= dialudp.o 
+OBJ4_DIAL= dialusd.o 
+OBJ5_DIAL= dialuss.o dialussmux.o dialussnls.o
+#OBJ6_DIAL= dialprog.o dialcprog.o 
+OBJ6_DIAL= dialprog.o
+OBJ7_DIAL= dialticotsord.o dialticotsordmux.o dialticotsordnls.o
 
 OBJA_DIAL= obj0_dial.o obj1_dial.o
 OBJB_DIAL= obj2_dial.o obj3_dial.o
+OBJC_DIAL= obj4_dial.o obj5_dial.o
+OBJD_DIAL= obj6_dial.o
 
-OBJ_DIAL= $(OBJA_DIAL) $(OBJB_DIAL)
+OBJ_DIAL= $(OBJA_DIAL) $(OBJB_DIAL) $(OBJC_DIAL) $(OBJD_DIAL)
 
 
 default:		$(T).o
@@ -125,23 +130,38 @@ obj3_dial.o:	$(OBJ3_DIAL)
 obj4_dial.o:	$(OBJ4_DIAL)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_DIAL)
 
+obj5_dial.o:	$(OBJ5_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_DIAL)
 
-dialcprog.o:		dialcprog.cc dialopts.h
-dialfinger.o:		dialfinger.cc dialopts.h
-dialhttp.o:		dialhttp.cc dialopts.h
+obj6_dial.o:	$(OBJ6_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6_DIAL)
+
+obj7_dial.o:	$(OBJ7_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_DIAL)
+
+
 dialopts.o:		dialopts.cc dialopts.h
 dialpass.o:		dialpass.cc dialopts.h
-dialprog.o:		dialprog.cc dialopts.h
-dialtcp.o:		dialtcp.cc dialtcp.h dialopts.h
-dialtcpmux.o:		dialtcpmux.cc dialopts.h
-dialtcpnls.o:		dialtcpnls.cc dialopts.h
-dialticotsord.o:	dialticotsord.cc dialopts.h
-dialticotsordmux.o:	dialticotsordmux.cc dialopts.h
-dialticotsordnls.o:	dialticotsordnls.cc dialopts.h
-dialudp.o:		dialudp.cc dialudp.h dialopts.h
+
 dialusd.o:		dialusd.cc dialopts.h
+
 dialuss.o:		dialuss.cc dialopts.h
 dialussmux.o:		dialussmux.cc dialopts.h
 dialussnls.o:		dialussnls.cc dialopts.h
+
+dialprog.o:		dialprog.cc dialopts.h
+dialcprog.o:		dialcprog.cc dialopts.h
+
+dialudp.o:		dialudp.cc dialudp.h dialopts.h
+
+dialtcp.o:		dialtcp.cc dialtcp.h dialopts.h
+dialtcpmux.o:		dialtcpmux.cc dialopts.h
+dialtcpnls.o:		dialtcpnls.cc dialopts.h
+dialfinger.o:		dialfinger.cc dialopts.h
+dialhttp.o:		dialhttp.cc dialopts.h
+
+dialticotsord.o:	dialticotsord.cc dialopts.h
+dialticotsordmux.o:	dialticotsordmux.cc dialopts.h
+dialticotsordnls.o:	dialticotsordnls.cc dialopts.h
 
 

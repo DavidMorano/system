@@ -32,6 +32,9 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 typedef int (*toxc_f)(int) noex ;
@@ -45,7 +48,7 @@ typedef int (*toxc_f)(int) noex ;
 
 /* local subroutines */
 
-char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
+static char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
 	while (*sp) {
 	    *dp++ = toxc(*sp++) ;
 	} /* end while */
