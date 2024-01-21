@@ -39,6 +39,8 @@
 #include	<char.h>
 #include	<localmisc.h>
 
+#include	"dial.h"
+
 
 /* local defines */
 
@@ -61,7 +63,6 @@ typedef mainv		mv ;
 /* external subroutines */
 
 extern "C" {
-    extern int	dialuss(cchar *,int,int) noex ;
     extern int	mkquoted(char *,int,cchar *,int) noex ;
 }
 

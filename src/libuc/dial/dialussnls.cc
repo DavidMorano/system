@@ -34,12 +34,13 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupoort.h>
+#include	<usupport.h>
 #include	<buffer.h>
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"nlsdialassist.h"
+#include	"dial.h"
 
 
 /* local defines */
@@ -86,7 +87,7 @@ extern "C" {
 /* exported subroutines */
 
 int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts) noex {
-	cint	nlslen = NLSBUFLEN ;
+	cint		nlslen = NLSBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		svclen ;

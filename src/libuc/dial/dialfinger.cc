@@ -77,7 +77,7 @@
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"dialopts.h"
+#include	"dial.h"
 
 
 /* local defines */
@@ -101,7 +101,6 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	dialtcp(cchar *,cchar *,int,int,int) noex ;
     extern int	mkquoted(char *,int,cchar *,int) noex ;
 }
 

@@ -1,4 +1,4 @@
-/* dialtcp HEADER */
+/* dialudp HEADER */
 /* lang=C20 */
 
 /* dial out to a TCP port */
@@ -14,28 +14,24 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DIALTCP_INCLUDE
-#define	DIALTCP_INCLUDE
+#ifndef	DIALUDP_INCLUDE
+#define	DIALUDP_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-
 #include	<dialopts.h>
-#include	<dialtcpnls.h>
+
 
 EXTERNC_begin
 
-extern int dialtcp(cchar *,cchar *,int,int,int) noex ;
-extern int dialtcpmux(cc *,cc *,int,cc *,mainv,int,int) noex ;
-extern int dialfinger(cc *,cc *,int,cc *,mainv,int,int) noex ;
-extern int dialhttp(cc *,cc *,int,cc *,mainv,int,int) noex ;
+extern int dialudp(cchar *,cchar *,int,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* DIALTCP_INCLUDE */
+#endif /* DIALUDP_INCLUDE */
 
 
