@@ -1,7 +1,7 @@
-/* ucsysgr HEADER */
+/* ucsyssp HEADER */
 /* lang=C20 */
 
-/* additional operaring-system support for GROUP-DB access */
+/* additional operaring-system support for PASSWD-DB access */
 /* version %I% last-modified %G% */
 
 
@@ -38,38 +38,30 @@
 
 *******************************************************************************/
 
-#ifndef	UCSYSGR_INCLUDE
-#define	UCSYSGR_INCLUDE
+#ifndef	UCSYSSP_INCLUDE
+#define	UCSYSSP_INCLUDE
 
 
 #include	<envstandards.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<grp.h>
+#include	<spwd.h>		/* <- the money shot */
 
 
-/* GETGRXXXR begin */
-
-#ifndef	GROUP
-#define	GROUP	struct group
-#endif
-
-#ifndef	CGROUP
-#define	CGROUP	const struct group
-#endif
+/* GETSPXXXR begin */
 
 EXTERNC_begin
 
-extern int	getgrent_rp(GROUP *,char *,int) noex ;
-extern int	getgrnam_rp(GROUP *,char *,int,cchar *) noex ;
-extern int	getgrgid_rp(GROUP *,char *,int,gid_t) noex ;
+extern int	getspent_rp(PASSWD *,char *,int) noex ;
+extern int	getspnam_rp(PASSWD *,char *,int,cchar *) noex ;
+extern int	getspuid_rp(PASSWD *,char *,int,uid_t) noex ;
 
 EXTERNC_end
 
-/* GETGRXXXR end */
+/* GETSPXXXR end */
 
 
-#endif /* UCSYSGR_INCLUDE */
+#endif /* UCSYSSP_INCLUDE */
 
 

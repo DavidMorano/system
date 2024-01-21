@@ -85,7 +85,7 @@ bool aflag_co::operator () (bool a) noex {
 	case aflagmem_test:
 	case aflagmem_testandset:
 	case aflagmem_wait:
-	    rf = (*op) ;
+	    rf = (*this) ;
 	    break ;
 	case aflagmem_notify:
 	    rf = op->af.test(memord_relaxed) ;

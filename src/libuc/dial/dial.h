@@ -26,7 +26,6 @@
 #include	<dialopts.h>
 #include	<dialudp.h>
 #include	<dialtcp.h>
-#include	<dialtcpnls.h>
 #include	<dialcprog.h>
 
 

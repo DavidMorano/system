@@ -22,7 +22,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<ucproject.h>
+#include	<ucsyspj.h>		/* <- the money shot! */
 
 
 #ifdef	__cplusplus
