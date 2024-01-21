@@ -133,8 +133,6 @@
 
 #define	VALBOGUS	(250000 * 10)
 
-#define	STRENTRY	struct strentry
-
 
 /* local namespaces */
 
@@ -199,7 +197,7 @@ static inline int strtab_ctor(strtab *op,Args ... args) noex {
 }
 /* end subroutine (strtab_ctor) */
 
-static int strtab_dtor(strtab *op) noex {
+static inline int strtab_dtor(strtab *op) noex {
 	int		rs = SR_OK ;
 	if (op->lap) {
 	    delete op->lap ;
@@ -218,7 +216,7 @@ static int strtab_dtor(strtab *op) noex {
 /* end subroutine (strtab_dtor) */
 
 template<typename ... Args>
-static inline int strtab_magic(strtab *op,Args ... args) noex {
+static int strtab_magic(strtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == STRTAB_MAGIC) ? SR_OK : SR_NOTOPEN ;
@@ -459,7 +457,7 @@ int strtab_recmk(strtab *op,int *rec,int recsize) noex {
 	        cint	rsize = (n + 1) * sizeof(int) ;
 	        rs = SR_OVERFLOW ;
 	        if (recsize >= rsize) {
-	            HDB_CUR	cur{} ;
+	            hdb_cur	cur{} ;
 	            int		*ip ;
 	            rec[c++] = 0 ;	/* ZERO-entry is NUL-string */
 	            if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
@@ -512,13 +510,13 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 		if (itsize >= isize) {
 	            vecobj	ses ;
 		    cint	vo = VECOBJ_OCOMPACT ;
-		    cint	esize = sizeof(STRENTRY) ;
+		    cint	esize = sizeof(strentry) ;
 		    memclear(it,isize) ;
 		    if ((rs = vecobj_start(&ses,esize,op->count,vo)) >= 0) {
-	    	        STRENTRY	se ;
-	    	        HDB_CUR		cur ;
-	    	        hdb_dat	key{} ;
-	    	        hdb_dat	val{} ;
+	    	        strentry	se ;
+	    	        hdb_cur		cur ;
+	    	        hdb_dat		key{} ;
+	    	        hdb_dat		val{} ;
 	    	        uint		khash, chash, nhash ;
 	    	        int		lhi, nhi, hi, si ;
 	                if ((rs = hdb_curbegin(op->hlp,&cur)) >= 0) {
@@ -549,11 +547,11 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 	                    hdb_curend(op->hlp,&cur) ;
 	                } /* end if (cursor) */
 	                if (rs >= 0) {
-			    vog_f	v = vecobj_get ;
+			    vog_f	vg = vecobj_get ;
 			    int		c ;
 			    void	*vp{} ;
-	                    for (int i = 0 ; v(&ses,i,&vp) >= 0 ; i += 1) {
-	    	        	STRENTRY	*sep = (STRENTRY *) vp ;
+	                    for (int i = 0 ; vg(&ses,i,&vp) >= 0 ; i += 1) {
+	    	        	strentry *sep = static_cast<strentry *>(vp) ;
 	                        khash = sep->khash ;
 	                        si = sep->si ;
 	                        hi = sep->hi ;
