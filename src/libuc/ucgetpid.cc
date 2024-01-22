@@ -29,7 +29,8 @@
 	-
 
 	Returns:
-	-		the current process PID
+	>=0		the current process PID
+	<0		error (system-return)
 
 	Notes:
 	Q. Why all of the fuss?
@@ -112,6 +113,9 @@ extern "C" {
 static ucgetpid			ucgetpid_data ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_getpid(void) noex {
@@ -144,6 +148,7 @@ int ucgetpid::init() noex {
 	int		f = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = ucgetpid_atforkbefore ;
