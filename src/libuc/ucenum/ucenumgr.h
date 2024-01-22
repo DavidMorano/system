@@ -37,7 +37,6 @@
 
 #define	UCENUMGR		struct ucenumgr_head
 #define	UCENUMGR_MAGIC		0x88776281
-#define	UCENUMGR_FNAME		"/sysdb/group"
 
 
 typedef UCENUMXX		ucenumgr ;

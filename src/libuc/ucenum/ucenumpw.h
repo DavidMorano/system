@@ -37,7 +37,6 @@
 
 #define	UCENUMPW		struct ucenumpw_head
 #define	UCENUMPW_MAGIC		0x88776281
-#define	UCENUMPW_FNAME		"/sysdb/passwd"
 
 
 typedef UCENUMXX		ucenumpw ;

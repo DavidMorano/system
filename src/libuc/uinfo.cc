@@ -151,7 +151,7 @@ namespace {
 	    mx.lockend() ;
 	} ;
 	~uinfo() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 	        ulogerror("uinfo",rs,"dtor-fini") ;
 	    }

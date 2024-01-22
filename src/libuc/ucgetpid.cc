@@ -95,7 +95,7 @@ namespace {
 	    mx.lockend() ;
         }
 	~ucgetpid() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 		ulogerror("ucgetpid",rs,"fini") ;
 	    }

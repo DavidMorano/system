@@ -37,7 +37,6 @@
 
 #define	UCENUMSV		struct ucenumsv_head
 #define	UCENUMSV_MAGIC		0x88776281
-#define	UCENUMSV_FNAME		"/sysdb/passwd"
 
 
 typedef UCENUMXX		ucenumsv ;

@@ -37,7 +37,6 @@
 
 #define	UCENUMSP		struct ucenumsp_head
 #define	UCENUMSP_MAGIC		0x88776281
-#define	UCENUMSP_FNAME		"/sysdb/shadow"
 
 
 typedef UCENUMXX		ucenumsp ;

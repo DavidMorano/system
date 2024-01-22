@@ -37,7 +37,6 @@
 
 #define	UCENUMPJ		struct ucenumpj_head
 #define	UCENUMPJ_MAGIC		0x88776216
-#define	UCENUMPJ_FNAME		"/sysdb/project"
 
 
 typedef UCENUMXX		ucenumpj ;

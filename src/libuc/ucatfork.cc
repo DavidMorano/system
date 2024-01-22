@@ -114,7 +114,7 @@ namespace {
 	void		atforkparent() noex ;
 	void		atforkchild() noex ;
 	~ucatfork() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 		ulogerror("ucatfork",rs,"fini") ;
 	    }

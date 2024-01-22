@@ -93,7 +93,7 @@ namespace {
 	    mx.lockend() ;
         }
 	~sysdbmgr() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 		ulogerror("sysdbmgr",rs,"fini") ;
 	    }
