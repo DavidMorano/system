@@ -161,7 +161,7 @@ int sysdbmgr::init() noex {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = sysdbmgr_atforkbefore ;
 	            void_f	a = sysdbmgr_atforkafter ;
-	            if ((rs = uc_atfork(b,a,a)) >= 0) {
+	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
