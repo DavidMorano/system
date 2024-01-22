@@ -268,7 +268,10 @@ static void sysdbmgr_atforkafter() noex {
 /* end subroutine (sysdbmgr_atforkafter) */
 
 static void sysdbmgr_exit() noex {
-	sysdbmgr_data.fini() ;
+	cint	rs = sysdbmgr_data.fini() ;
+	if (rs < 0) {
+	    ulogerror("sysdbmgr",rs,"exit-fini") ;
+	}
 }
 /* end subroutine (sysdbmgr_exit) */
 

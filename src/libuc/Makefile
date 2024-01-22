@@ -1242,7 +1242,7 @@ vstrkeydictcmp.o:	vstrkeydictcmp.c vstrkeycmpx.h
 # string-constants
 stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
-syhsdbfname.o:		sysdbfname.cc sysdbfname.h
+sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
 # UTILITY
 base64.o:		base64.cc base64.h

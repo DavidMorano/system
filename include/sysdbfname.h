@@ -29,11 +29,11 @@
 
 EXTERNC_begin
 
-extern int sysdbfnameget(enum sysdbfiles,cchar *,cchar **) noex ;
+extern int sysdbfnameget(sysdbfiles,cchar *,cchar **) noex ;
 
 EXTERNC_end
 
 
-#endif /* SYSDBFNAMES_INCLUDE */
+#endif /* SYSDBFNAME_INCLUDE */
 
 
