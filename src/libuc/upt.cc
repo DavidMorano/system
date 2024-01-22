@@ -1,4 +1,4 @@
-/* upt */
+/* upt SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® POSIX Thread manipulation */

@@ -1,4 +1,4 @@
-/* usupport */
+/* usupport SUPPORT */
 /* lang=C++20 */
 
 /* UNIX-kernal support subroutines */
@@ -24,14 +24,14 @@
 	This subroutine sleeps for some number of milliseconds.
 
 	Synopsis:
-	int msleep(int msec) noex ;
+	int msleep(int msec) noex
 
 	Arguments:
 	msec		number of millisecond to sleep
 
 	Returns:
 	>=0		amount of data returned
-	<0		error
+	<0		error (system-return)
 
 
 	Name:
@@ -41,7 +41,6 @@
 	This is sort of like |time(2)| but returns milliseconds
 	rather than seconds.  Unlike |time(2)|, this subroutine
 	takes no arguments.
-
 
 *******************************************************************************/
 

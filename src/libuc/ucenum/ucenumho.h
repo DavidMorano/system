@@ -37,7 +37,6 @@
 
 #define	UCENUMHO		struct ucenumho_head
 #define	UCENUMHO_MAGIC		0x88776281
-#define	UCENUMHO_FNAME		"/sysdb/passwd"
 
 
 typedef UCENUMXX		ucenumho ;

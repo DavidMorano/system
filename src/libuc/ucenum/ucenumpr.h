@@ -37,7 +37,6 @@
 
 #define	UCENUMPR		struct ucentpr_head
 #define	UCENUMPR_MAGIC		0x88776281
-#define	UCENUMPR_FNAME		"/sysdb/protocol"
 
 
 typedef UCENUMXX		ucenumpr ;

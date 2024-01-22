@@ -1,4 +1,4 @@
-/* uptspawn */
+/* uptspawn SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® POSIX Thread manipulation */
@@ -36,8 +36,8 @@
 	arg		argument (arg2)
 
 	Returns:
-	<0		error
 	>=0		some value
+	<0		error (system-return)
 
 *******************************************************************************/
 

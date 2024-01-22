@@ -174,7 +174,7 @@ namespace {
 	int disphandle() noex ;
 	int dispjobdel(TIMEOUT *) noex ;
 	~uctimeout() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 		ulogerror("uctimeout",rs,"fini") ;
 	    }

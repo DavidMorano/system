@@ -1,4 +1,4 @@
-/* uinfo */
+/* uinfo SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® information (a cache for |uname(2)| and sisters) */
@@ -151,7 +151,7 @@ namespace {
 	    mx.lockend() ;
 	} ;
 	~uinfo() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 	        ulogerror("uinfo",rs,"dtor-fini") ;
 	    }

@@ -37,7 +37,6 @@
 
 #define	UCENUMNW		struct ucenumnw_head
 #define	UCENUMNW_MAGIC		0x88776281
-#define	UCENUMNW_FNAME		"/sysdb/network"
 
 
 typedef UCENUMXX		ucenumnw ;

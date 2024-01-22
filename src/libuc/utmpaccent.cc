@@ -1,4 +1,4 @@
-/* utmpaccent */
+/* utmpaccent SUPPORT */
 /* lang=C++20 */
 
 /* UTMPACCENT management */
@@ -33,6 +33,10 @@
 	uebuf		AENT receive buffer pointer
 	uelen		AENT receive buffer length
 	suep		CFENT to copy from (and translate fields)
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -77,6 +81,9 @@ constexpr int 	lid   = UTMPACCENT_LID ;
 constexpr int 	luser = UTMPACCENT_LUSER ;
 constexpr int 	lline = UTMPACCENT_LLINE ;
 constexpr int 	lhost = UTMPACCENT_LHOST ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

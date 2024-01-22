@@ -1,4 +1,4 @@
-/* utmpent */
+/* utmpent SUPPORT */
 /* lang=C++20 */
 
 /* methods for the utmpent object */

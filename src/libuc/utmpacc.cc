@@ -1,4 +1,4 @@
-/* utmpacc */
+/* utmpacc SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® UTMP access management */
@@ -45,7 +45,8 @@
 				2	init procs only
 
 	Returns:
-	-		count of requested user types
+	>=0		count of requested user types
+	<0		error (system-return)
 
 *******************************************************************************/
 

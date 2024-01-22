@@ -55,7 +55,7 @@ using std::nothrow ;			/* constant */
 /* forward references */
 
 template<typename ... Args>
-static int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
+static inline int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
@@ -68,7 +68,7 @@ static int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
 }
 /* end subroutine ucenumxx_ctor) */
 
-static int ucenumxx_dtor(ucenumxx *op) noex {
+static inline int ucenumxx_dtor(ucenumxx *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -85,6 +85,9 @@ static int ucenumxx_dtor(ucenumxx *op) noex {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ucenumxxbase::open(cchar *efname) noex {
@@ -92,7 +95,6 @@ int ucenumxxbase::open(cchar *efname) noex {
 	if ((rs = ucenumxx_ctor(op,efname)) >= 0) {
 	    cint	of = O_RDONLY ;
 	    csize	max = INT_MAX ;
-	    memclear(op) ;
 	    if ((rs = filemap_open(fmp,efname,of,max)) >= 0) {
 	        magic = mxx ;
 	    }

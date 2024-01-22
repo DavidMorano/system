@@ -1,4 +1,4 @@
-/* ugetloadavg */
+/* ugetloadavg SUPPORT */
 /* lang=C++20 */
 
 /* get the standard load averages maintained by the kernel */
@@ -49,7 +49,7 @@
 
 	Returns:
 	>=0	OK
-	<0	error
+	<0	error (system-return)
 
 	CAUTION:
 	This subroutine uses a secret and undocumented new system

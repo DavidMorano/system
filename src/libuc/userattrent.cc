@@ -1,4 +1,4 @@
-/* userattrent */
+/* userattrent SUPPORT */
 /* lang=C++20 */
 
 /* subroutines for simple userattr object (from UNIX® library-3c) management */

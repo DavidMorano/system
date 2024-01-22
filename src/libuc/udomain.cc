@@ -1,4 +1,4 @@
-/* udomain */
+/* udomain SUPPORT */
 /* lang=C++20 */
 
 /* get user domain */
@@ -43,8 +43,8 @@
 	username	specified username to lookup
 
 	Returns:
-	<0		error
 	>=0		length of returned domain-name
+	<0		error (system-return)
 
 	Notes:
 	Format of file entries:

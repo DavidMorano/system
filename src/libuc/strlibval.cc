@@ -43,6 +43,8 @@
 
 /* local defines */
 
+#define	PLMULT		2		/* path-length multiplier */
+
 
 /* local namespaces */
 
@@ -196,7 +198,7 @@ cchar *strlibval::strpath() noex {
 		int	rs ;
 		int	rs1 ;
 		if ((rs = maxpathlen) >= 0) {
-		    cint	tlen = (rs * 2) ;
+		    cint	tlen = (rs * PLMULT) ;
 		    char	*tbuf{} ;
 		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;

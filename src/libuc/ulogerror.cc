@@ -1,4 +1,4 @@
-/* ulogerror */
+/* ulogerror SUPPORT */
 /* lang=C++20 */
 
 /* log an error in the error buffer */
@@ -97,6 +97,9 @@ static constexpr int		wlen = (ULOGERRMGR_MSGLEN*2) ;
 static constexpr char		var[] = ULOGERRMGR_VARNAME ;
 
 static constinit ulogerrmgr	ulogerrmgr_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

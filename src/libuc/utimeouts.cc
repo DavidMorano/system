@@ -1,4 +1,4 @@
-/* utimeouts */
+/* utimeouts SUPPORT */
 /* lang=C++20 */
 
 /* some helper management for UNIX® kernal-call timeouts */

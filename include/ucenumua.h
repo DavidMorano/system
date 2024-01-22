@@ -37,7 +37,6 @@
 
 #define	UCENUMUA		struct ucenumua_head
 #define	UCENUMUA_MAGIC		0x88776217
-#define	UCENUMUA_FNAME		"/sysdb/userattr"
 
 
 typedef UCENUMXX		ucenumua ;

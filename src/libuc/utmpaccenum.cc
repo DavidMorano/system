@@ -1,4 +1,4 @@
-/* utmpaccenum */
+/* utmpaccenum SUPPORT */
 /* lang=C++20 */
 
 /* UTMPACC enumeration feature */

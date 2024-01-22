@@ -55,6 +55,14 @@
 
 /* external subroutines */
 
+extern "C" {
+    int		ucfork_init() noex ;
+    int		ucfork_fini() noex ;
+}
+
+
+/* external variables */
+
 
 /* local structures */
 
@@ -70,7 +78,7 @@ namespace {
 	int lockbegin(int) noex ;
 	int lockend() noex ;
 	~ucfork() noex {
-	    int		rs = fini() ;
+	    cint	rs = fini() ;
 	    if (rs < 0) {
 		ulogerror("ucfork",rs,"fini") ;
 	    }
@@ -82,19 +90,16 @@ namespace {
 /* forward references */
 
 extern "C" {
-    int		ucfork_init() noex ;
-    int		ucfork_fini() noex ;
-}
-
-extern "C" {
     static void	ucfork_exit() noex ;
 }
-
 
 
 /* local variables */
 
 static ucfork			ucfork_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
