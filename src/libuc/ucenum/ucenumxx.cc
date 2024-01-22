@@ -54,9 +54,10 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-static int ucenumxx_ctor(ucenumxx *op) noex {
+template<typename ... Args>
+static int ucenumxx_ctor(ucenumxx *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->fmp = new(nothrow) filemap) != nullptr) {
@@ -88,7 +89,7 @@ static int ucenumxx_dtor(ucenumxx *op) noex {
 
 int ucenumxxbase::open(cchar *efname) noex {
 	int		rs ;
-	if ((rs = ucenumxx_ctor(op)) >= 0) {
+	if ((rs = ucenumxx_ctor(op,efname)) >= 0) {
 	    cint	of = O_RDONLY ;
 	    csize	max = INT_MAX ;
 	    memclear(op) ;

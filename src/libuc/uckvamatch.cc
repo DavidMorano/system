@@ -40,8 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */

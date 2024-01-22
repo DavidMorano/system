@@ -21,7 +21,6 @@
 
 	We defines some system (global) variables in this module.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>

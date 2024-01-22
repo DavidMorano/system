@@ -23,19 +23,16 @@
 	We get (and possibly set) our PID.
 
 	Symopsis:
-	int uc_getpid(void) noex
+	int sysdbfnameget(int n,cc *fn,cc **rpp) noex
 
 	Arguments:
-	-
+	n		name to retrieve
+	fn		given file-name (or NULL if want the default)
+	rpp		pointer to the result c-string
 
 	Returns:
-	-		the current process PID
-
-	Notes:
-	Q. Why all of the fuss?
-	A. We need to know when a |fork(2)| occurs so that the PID can
-	be updated on the next read-access of it. That feature comes with
-	the associated baggage (below).
+	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -43,15 +40,23 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<csignal>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<syswords.hh>
+#include	<libmallocxx.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
+#include	<mkpathx.h>
+#include	<localmisc.h>
 
-#include	"ucgetpid.h"
+#include	"sysdbfname.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
 
 
 /* local typedefs */
@@ -59,103 +64,110 @@
 
 /* external subroutines */
 
+extern "C" {
+    int		sysdbmgr_init() noex ;
+    int		sysdbmgr_fini() noex ;
+}
+
+
+/* external variables */
+
 
 /* local structures */
 
 namespace {
-    struct ucgetpid {
+    struct sysdbmgr {
 	ptm		mx ;		/* data mutex */
 	pid_t		pid ;
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
+	cchar		*strs[sysdbfile_overlast] ;
 	int init() noex ;
 	int fini() noex ;
-	int igetpid() noex ;
+	int get(int,cchar **) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
         }
-        void atforkparent() noex {
+        void atforkafter() noex {
 	    mx.lockend() ;
         }
-        void atforkchild() noex {
-	    pid = 0 ;
-	    mx.lockend() ;
-        }
-	~ucgetpid() noex {
+	~sysdbmgr() noex {
 	    int		rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("ucgetpid",rs,"fini") ;
+		ulogerror("sysdbmgr",rs,"fini") ;
 	    }
-	} ; /* end dtor (ucgetpid) */
-    } ; /* end structure (ucgetpid) */
+	} ; /* end dtor (sysdbmgr) */
+    } ; /* end structure (sysdbmgr) */
 }
 
 
 /* forward references */
 
 extern "C" {
-    int		ucgetpid_init() noex ;
-    int		ucgetpid_fini() noex ;
-}
-
-extern "C" {
-    static void	ucgetpid_atforkbefore() noex ;
-    static void	ucgetpid_atforkparent() noex ;
-    static void	ucgetpid_atforkchild() noex ;
-    static void	ucgetpid_exit() noex ;
+    static void	sysdbmgr_atforkbefore() noex ;
+    static void	sysdbmgr_atforkafter() noex ;
+    static void	sysdbmgr_exit() noex ;
 }
 
 
 /* lcoal variables */
 
-static ucgetpid			ucgetpid_data ;
+static sysdbmgr		sysdbmgr_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int uc_getpid(void) noex {
-	int		rs ;
-	if ((rs = ucgetpid_data.igetpid()) == SR_NXIO) {
-	    rs = ucgetpid_data.pid ;
-	}
+int sysdbmgr_init() noex {
+	return sysdbmgr_data.init() ;
+}
+
+int sysdbmgr_fini() noex {
+	return sysdbmgr_data.fini() ;
+}
+
+int sysdbfnameget(enum sysdbfiles w,cchar *fname,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (rpp) {
+	    rs = SR_INVALID ;
+	    if ((w >= 0) && (w < sysdbfile_overlast)) {
+		if (fname) {
+		    if (fname[0]) {
+			rs = SR_OK ;
+			*rpp = fname ;
+		    } /* end if (valid) */
+		} else {
+		    rs = sysdbmgr_data.get(w,rpp) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
-
-void uc_setpid(pid_t pid) noex {
-	if (pid < 0) pid = getpid() ;
-	ucgetpid_data.pid = pid ;
-}
-/* end subroutine (uc_setpid) */
-
-int ucgetpid_init() noex {
-	return ucgetpid_data.init() ;
-}
-
-int ucgetpid_fini() noex {
-	return ucgetpid_data.fini() ;
-}
+/* end subroutine (sysdbfnameget) */
 
 
 /* local subroutines */
 
-int ucgetpid::init() noex {
+int sysdbmgr::init() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
-	            void_f	b = ucgetpid_atforkbefore ;
-	            void_f	ap = ucgetpid_atforkparent ;
-	            void_f	ac = ucgetpid_atforkchild ;
-	            if ((rs = uc_atfork(b,ap,ac)) >= 0) {
-	                if ((rs = uc_atexit(ucgetpid_exit)) >= 0) {
+	            void_f	b = sysdbmgr_atforkbefore ;
+	            void_f	a = sysdbmgr_atforkafter ;
+	            if ((rs = uc_atforkrecord(b,a,a)) >= 0) {
+	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,ap,ac) ;
+	                    uc_atforkexpunge(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -181,17 +193,25 @@ int ucgetpid::init() noex {
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end method (ucgetpid::init) */
+/* end method (sysdbmgr::init) */
 
-int ucgetpid::fini() noex {
+int sysdbmgr::fini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
-	        void_f	b = ucgetpid_atforkbefore ;
-	        void_f	ap = ucgetpid_atforkparent ;
-	        void_f	ac = ucgetpid_atforkchild ;
-	        rs1 = uc_atforkexpunge(b,ap,ac) ;
+		for (int i = 0 ; i < sysdbfile_overlast ; i += 1) {
+		    if (cchar *str ; (str = strs[i]) != nullptr) {
+			rs1 = uc_libfree(str) ;
+			if (rs >= 0) rs = rs1 ;
+			strs[i] = nullptr ;
+		    }
+		} /* end for */
+	    }
+	    {
+	        void_f	b = sysdbmgr_atforkbefore ;
+	        void_f	a = sysdbmgr_atforkafter ;
+	        rs1 = uc_atforkexpunge(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -203,37 +223,53 @@ int ucgetpid::fini() noex {
 	} /* end if (was initialized) */
 	return rs ;
 }
-/* end method (ucgetpid::fini) */
+/* end method (sysdbmgr::fini) */
 
-int ucgetpid::igetpid() noex {
+int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		rs = SR_OK ;
-	if (!finit) rs = init() ;
-	if (rs >= 0) {
-	    if (pid == 0) pid = getpid() ;
-	    rs = pid ;
-	}
+	int		rs1 ;
+	if ((*rpp = strs[w]) == nullptr) {
+	    if ((rs = init()) >= 0) {
+		if ((rs = mx.lockbegin) >= 0) {
+		    if ((*rpp = strs[w]) == nullptr) {
+		        char	*pbuf{} ;
+		        if ((rs = libmalloc_mp(&pbuf)) >= 0) {
+		            cchar	*sysdbdir = sysword.w_sysdbdir ;
+			    cchar	*fn = sysdbfnames[w] ;
+		            if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) {
+				auto	alloc = uc_libmallocstrw ;
+	                        cchar	*rp{} ;
+		                if ((rs = alloc(pbuf,rs,&rp)) >= 0) {
+			            strs[w] = rp ;
+			            *rpp = rp ;
+			        } /* end if (memory-allocation) */
+		            } /* end if (mkpath) */
+		            rs1 = uc_libfree(pbuf) ;
+		            if (rs >= 0) rs = rs1 ;
+		        } /* end if (m-a-f) */
+		    } /* end if (string-check) */
+		    rs1 = mx.lockend ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (mutex) */
+	    } /* end if (sysdbmgr::init) */
+	} /* end if (value needed to be calculated) */
 	return rs ;
 }
-/* end subroutine (ucgetpid::igetpid) */
+/* end subroutine (sysdbmgr::get) */
 
-static void ucgetpid_atforkbefore() noex {
-	ucgetpid_data.atforkbefore() ;
+static void sysdbmgr_atforkbefore() noex {
+	sysdbmgr_data.atforkbefore() ;
 }
-/* end subroutine (ucgetpid_atforkbefore) */
+/* end subroutine (sysdbmgr_atforkbefore) */
 
-static void ucgetpid_atforkparent() noex {
-	ucgetpid_data.atforkparent() ;
+static void sysdbmgr_atforkafter() noex {
+	sysdbmgr_data.atforkafter() ;
 }
-/* end subroutine (ucgetpid_atforkparent) */
+/* end subroutine (sysdbmgr_atforkafter) */
 
-static void ucgetpid_atforkchild() noex {
-	ucgetpid_data.atforkchild() ;
+static void sysdbmgr_exit() noex {
+	sysdbmgr_data.fini() ;
 }
-/* end subroutine (ucgetpid_atforkchild) */
-
-static void ucgetpid_exit() noex {
-	ucgetpid_data.fini() ;
-}
-/* end subroutine (ucgetpid_exit) */
+/* end subroutine (sysdbmgr_exit) */
 
 

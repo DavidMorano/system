@@ -22,7 +22,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<spwd.h>
+#include	<spwd.h>		/* <- the money shot! */
 
 
 #ifdef	__cplusplus

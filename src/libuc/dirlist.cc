@@ -178,7 +178,7 @@ int dirlist_finish(dirlist *op) noex {
 	        void	*vp{} ;
 	        for (int i = 0 ; vecobj_get(op->dbp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
-		        ent	*ep = entp(vp) ;
+		        ent	*ep = static_cast<entp>(vp) ;
 	                rs1 = entry_finish(ep) ;
 	                if (rs >= 0) rs = rs1 ;
 	            }
@@ -349,7 +349,7 @@ int dirlist_curenum(dirlist *op,dirlist_cur *curp,char *rbuf,int rlen) noex {
 	        i += 1 ;
 	    } /* end while */
 	    if ((rs >= 0) && vp) {
-	        ent	*ep = entp(vp) ;
+		ent	*ep = static_cast<entp>(vp) ;
 	        if ((rs = sncpy1w(rbuf,rlen,ep->np,ep->nl)) >= 0) {
 	            curp->i = i ;
 	        }
@@ -369,7 +369,7 @@ int dirlist_curget(dirlist *op,dirlist_cur *curp,cchar **rpp) noex {
 	        i += 1 ;
 	    } /* end while */
 	    if (rpp) {
-	        ent	*ep = entp(vp) ;
+		ent	*ep = static_cast<entp>(vp) ;
 	        *rpp = (rs >= 0) ? ep->np : nullptr ;
 	    }
 	    if ((rs >= 0) && vp) {
@@ -403,7 +403,7 @@ int dirlist_joinmk(dirlist *op,char *jbuf,int jlen) noex {
 	        bool	f_semi = false ;
 	        void	*vp{} ;
 	        for (int i = 0 ; vecobj_get(op->dbp,i,&vp) >= 0 ; i += 1) {
-	            ent	*ep = entp(vp) ;
+		    ent	*ep = static_cast<entp>(vp) ;
 	            if (vp == nullptr) break ;
 	            dp = ep->np ;
 	            dl = ep->nl ;

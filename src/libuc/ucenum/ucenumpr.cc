@@ -29,6 +29,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<sysdbfname.h>
 #include	<localmisc.h>
 
 #include	"ucenumxx.h"
@@ -50,8 +51,7 @@
 /* local variables */
 
 constexpr uint		mxx = UCENUMPR_MAGIC ;
-
-constexpr cchar		dfname[] = UCENUMPR_FNAME ;
+constexpr sysdbfiles	w = sysdbfile_pr ;
 
 
 /* local subroutines */
@@ -61,8 +61,11 @@ constexpr cchar		dfname[] = UCENUMPR_FNAME ;
 
 int ucenumpr_open(ucenumpr *op,cchar *efname) noex {
 	ucenumxxco<ucenumpr_ent>	ueo(op,mxx) ;
-	if (efname == nullptr) efname = dfname ;
-	return ueo.open(efname) ;
+	int		rs ;
+	if (cchar *rp ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
+	    rs = ueo.open(rp) ;
+	} /* end if (sysdbfnameget) */
+	return rs ;
 }
 /* end if (ucenumpr_open) */
 

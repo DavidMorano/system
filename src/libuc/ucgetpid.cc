@@ -29,7 +29,8 @@
 	-
 
 	Returns:
-	-		the current process PID
+	>=0		the current process PID
+	<0		error (system-return)
 
 	Notes:
 	Q. Why all of the fuss?
@@ -54,10 +55,21 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 
 /* external subroutines */
+
+extern "C" {
+    int		ucgetpid_init() noex ;
+    int		ucgetpid_fini() noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
@@ -95,11 +107,6 @@ namespace {
 /* forward references */
 
 extern "C" {
-    int		ucgetpid_init() noex ;
-    int		ucgetpid_fini() noex ;
-}
-
-extern "C" {
     static void	ucgetpid_atforkbefore() noex ;
     static void	ucgetpid_atforkparent() noex ;
     static void	ucgetpid_atforkchild() noex ;
@@ -110,6 +117,9 @@ extern "C" {
 /* lcoal variables */
 
 static ucgetpid			ucgetpid_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -144,12 +154,13 @@ int ucgetpid::init() noex {
 	int		f = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = ucgetpid_atforkbefore ;
 	            void_f	ap = ucgetpid_atforkparent ;
 	            void_f	ac = ucgetpid_atforkchild ;
-	            if ((rs = uc_atfork(b,ap,ac)) >= 0) {
+	            if ((rs = uc_atforkrecord(b,ap,ac)) >= 0) {
 	                if ((rs = uc_atexit(ucgetpid_exit)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;

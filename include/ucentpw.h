@@ -19,11 +19,10 @@
 
 
 #include	<envstandards.h>
-#include	<string.h>		/* <- |memcpy(3c)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<pwd.h>
+#include	<ucsyspw.h>		/* <- the money shot */
 
 
 #ifdef	__cplusplus

@@ -57,8 +57,9 @@ INCS= usystem.h localmisc.h ucenumxx.h
 OBJ0_UCENUM= ucenumpw.o ucenumsp.o ucenumgr.o ucenumpj.o
 OBJ1_UCENUM= ucenumua.o 
 OBJ2_UCENUM= ucenumpr.o ucenumnw.o ucenumho.o ucenumsv.o
+OBJ3_UCENUM= ucenumxx.o
 
-OBJ_UCENUM= obj0_ucenum.o obj1_ucenum.o obj2_ucenum.o 
+OBJ_UCENUM= obj0_ucenum.o obj1_ucenum.o obj2_ucenum.o obj3_ucenum.o
 
 
 default:		$(T).o
@@ -129,6 +130,8 @@ ucenumpr.o:		ucenumpr.cc ucenumpr.h $(INCS)
 ucenumnw.o:		ucenumnw.cc ucenumnw.h $(INCS)
 ucenumho.o:		ucenumho.cc ucenumho.h $(INCS)
 ucenumsv.o:		ucenumsv.cc ucenumsv.h $(INCS)
+
+ucenumxx.o:		ucenumxx.cc ucenumxx.h
 
 sysusernames.o:		sysusernames.cc sysusernames.h $(INCS)
 sysusershells.o:	sysusershells.cc sysusershells.h $(INCS)
