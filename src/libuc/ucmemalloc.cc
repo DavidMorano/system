@@ -170,7 +170,7 @@ namespace {
 	~ucmemalloc() noex {
 	    int		rs = ifini() ;
 	    if (rs < 0) {
-		ulogerror("ucmenalloc",rs,"fini") ;
+		ulogerror("ucmenalloc",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor */
 	void rserr(int rs) noex {

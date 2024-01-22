@@ -151,7 +151,7 @@ void strlibval::dtor() noex {
 	    cint	rs = uc_free(a) ;
 	    a = nullptr ;
 	    if (rs < 0) {
-		 ulogerror("strlibpath::dtor",rs,"uc_free") ;
+		 ulogerror("strlibpath::dtor",rs,"dtor-uc_free") ;
 	    }
 	}
 }

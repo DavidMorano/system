@@ -80,7 +80,7 @@ namespace {
 	~ucfork() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("ucfork",rs,"fini") ;
+		ulogerror("ucfork",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (ucfork) */
     } ; /* end struct (ucfork) */
@@ -132,6 +132,7 @@ int ucfork::init() noex {
 	int		f = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = lock.create) >= 0) {
 	            if ((rs = uc_atexit(ucfork_exit)) >= 0) {
@@ -142,8 +143,9 @@ int ucfork::init() noex {
 	                lock.destroy() ;
 	            }
 	        } /* end if (lockrw-create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            bool(finit.clear) ;
+		}
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {

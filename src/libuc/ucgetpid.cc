@@ -97,9 +97,9 @@ namespace {
 	~ucgetpid() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("ucgetpid",rs,"fini") ;
+		ulogerror("ucgetpid",rs,"dtor-fini") ;
 	    }
-	} ; /* end dtor (ucgetpid) */
+	} ; /* end dtor */
     } ; /* end structure (ucgetpid) */
 }
 

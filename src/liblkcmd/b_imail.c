@@ -148,28 +148,8 @@
 #define	MSGDATA		struct msgdata
 #define	MSGDATA_FL	struct msgdata_flags
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	MAX((MAXPATHLEN + 2),2048)
-#endif
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100
-#endif
-
-#ifndef	ZNAMELEN
-#define	ZNAMELEN	8
-#endif
-
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	8
-#endif
-
 #ifndef	BUFLEN
 #define	BUFLEN		(8 * 1024)
-#endif
-
-#ifndef	PATHBUFLEN
-#define	PATHBUFLEN	(8 * MAXPATHLEN)
 #endif
 
 #ifndef	PBUFLEN
@@ -8217,9 +8197,9 @@ static int locinfo_cvtdate(LOCINFO *lip,char tbuf[],cchar *hp,int hl)
 #endif
 
 	    if (! lip->f.dater) {
-	        struct timeb	now ;
-	        const int	zlen = ZNAMELEN ;
-	        char		zbuf[ZNAMELEN + 1] ;
+	        TIMEB	now ;
+	        cint	zlen = TZABBRLEN ;
+	        char	zbuf[TZABBRLEN + 1] ;
 	        if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
 	            rs = dater_start(dp,&now,zbuf,rs) ;
 	            lip->f.dater = (rs >= 0) ;

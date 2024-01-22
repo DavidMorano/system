@@ -252,7 +252,7 @@ int ccfile::irewind() noex {
 void ccfile::dtor() noex {
 	cint		rs = iclose() ;
 	if (rs < 0) {
-	    ulogerror("ccfile",rs,"fini-close") ;
+	    ulogerror("ccfile",rs,"dtor-close") ;
 	}
 }
 /* end method (ccfile::dtor) */
