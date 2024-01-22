@@ -40,13 +40,17 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<csignal>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<syswords.hh>
+#include	<libmallocxx.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
+#include	<mkpathx.h>
+#include	<localmisc.h>
 
-#include	"sysdbfnames.hh"
-#include	"sysdbmgr.h"
+#include	"sysdbfname.h"
 
 
 /* local defines */
@@ -59,6 +63,11 @@
 
 
 /* external subroutines */
+
+extern "C" {
+    int		sysdbmgr_init() noex ;
+    int		sysdbmgr_fini() noex ;
+}
 
 
 /* external variables */
@@ -73,17 +82,14 @@ namespace {
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
+	cchar		*strs[sysdbfile_overlast] ;
 	int init() noex ;
 	int fini() noex ;
-	int igetpid() noex ;
+	int get(int,cchar **) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
         }
-        void atforkparent() noex {
-	    mx.lockend() ;
-        }
-        void atforkchild() noex {
-	    pid = 0 ;
+        void atforkafter() noex {
 	    mx.lockend() ;
         }
 	~sysdbmgr() noex {
@@ -99,38 +105,21 @@ namespace {
 /* forward references */
 
 extern "C" {
-    int		sysdbmgr_init() noex ;
-    int		sysdbmgr_fini() noex ;
-}
-
-extern "C" {
     static void	sysdbmgr_atforkbefore() noex ;
-    static void	sysdbmgr_atforkparent() noex ;
-    static void	sysdbmgr_atforkchild() noex ;
+    static void	sysdbmgr_atforkafter() noex ;
     static void	sysdbmgr_exit() noex ;
 }
 
 
 /* lcoal variables */
 
-static sysdbmgr			sysdbmgr_data ;
+static sysdbmgr		sysdbmgr_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
-int uc_getpid(void) noex {
-	int		rs ;
-	if ((rs = sysdbmgr_data.igetpid()) == SR_NXIO) {
-	    rs = sysdbmgr_data.pid ;
-	}
-	return rs ;
-}
-
-void uc_setpid(pid_t pid) noex {
-	if (pid < 0) pid = getpid() ;
-	sysdbmgr_data.pid = pid ;
-}
-/* end subroutine (uc_setpid) */
 
 int sysdbmgr_init() noex {
 	return sysdbmgr_data.init() ;
@@ -140,6 +129,25 @@ int sysdbmgr_fini() noex {
 	return sysdbmgr_data.fini() ;
 }
 
+int sysdbfnameget(enum sysdbfiles w,cchar *fname,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (rpp) {
+	    rs = SR_INVALID ;
+	    if ((w >= 0) && (w < sysdbfile_overlast)) {
+		if (fname) {
+		    if (fname[0]) {
+			rs = SR_OK ;
+			*rpp = fname ;
+		    } /* end if (valid) */
+		} else {
+		    rs = sysdbmgr_data.get(w,rpp) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (sysdbfnameget) */
+
 
 /* local subroutines */
 
@@ -148,18 +156,18 @@ int sysdbmgr::init() noex {
 	int		f = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = sysdbmgr_atforkbefore ;
-	            void_f	ap = sysdbmgr_atforkparent ;
-	            void_f	ac = sysdbmgr_atforkchild ;
-	            if ((rs = uc_atfork(b,ap,ac)) >= 0) {
+	            void_f	a = sysdbmgr_atforkafter ;
+	            if ((rs = uc_atfork(b,a,a)) >= 0) {
 	                if ((rs = uc_atexit(sysdbmgr_exit)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
 	                if (rs < 0) {
-	                    uc_atforkexpunge(b,ap,ac) ;
+	                    uc_atforkexpunge(b,a,a) ;
 			}
 	            } /* end if (uc_atfork) */
 	 	    if (rs < 0) {
@@ -192,10 +200,18 @@ int sysdbmgr::fini() noex {
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    {
+		for (int i = 0 ; i < sysdbfile_overlast ; i += 1) {
+		    if (cchar *str ; (str = strs[i]) != nullptr) {
+			rs1 = uc_libfree(str) ;
+			if (rs >= 0) rs = rs1 ;
+			strs[i] = nullptr ;
+		    }
+		} /* end for */
+	    }
+	    {
 	        void_f	b = sysdbmgr_atforkbefore ;
-	        void_f	ap = sysdbmgr_atforkparent ;
-	        void_f	ac = sysdbmgr_atforkchild ;
-	        rs1 = uc_atforkexpunge(b,ap,ac) ;
+	        void_f	a = sysdbmgr_atforkafter ;
+	        rs1 = uc_atforkexpunge(b,a,a) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -209,31 +225,39 @@ int sysdbmgr::fini() noex {
 }
 /* end method (sysdbmgr::fini) */
 
-int sysdbmgr::igetpid() noex {
+int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		rs = SR_OK ;
-	if (!finit) rs = init() ;
-	if (rs >= 0) {
-	    if (pid == 0) pid = getpid() ;
-	    rs = pid ;
-	}
+	int		rs1 ;
+	if ((*rpp = strs[w]) == nullptr) {
+	    if ((rs = init()) >= 0) {
+		char	*pbuf{} ;
+		if ((rs = libmalloc_mp(&pbuf)) >= 0) {
+		    cchar	*sysdbdir = sysword.w_sysdbdir ;
+		    if ((rs = mkpath(pbuf,sysdbdir,sysdbfnames[w])) >= 0) {
+	                cchar	*rp{} ;
+		        if ((rs = uc_libmallocstrw(pbuf,rs,&rp)) >= 0) {
+			    strs[w] = rp ;
+			    *rpp = rp ;
+			} /* end if (memory-allocation) */
+		    } /* end if (mkpath) */
+		    rs1 = uc_libfree(pbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (sysdbmgr::init) */
+	} /* end if (value needed to be calculated) */
 	return rs ;
 }
-/* end subroutine (sysdbmgr::igetpid) */
+/* end subroutine (sysdbmgr::get) */
 
 static void sysdbmgr_atforkbefore() noex {
 	sysdbmgr_data.atforkbefore() ;
 }
 /* end subroutine (sysdbmgr_atforkbefore) */
 
-static void sysdbmgr_atforkparent() noex {
-	sysdbmgr_data.atforkparent() ;
+static void sysdbmgr_atforkafter() noex {
+	sysdbmgr_data.atforkafter() ;
 }
-/* end subroutine (sysdbmgr_atforkparent) */
-
-static void sysdbmgr_atforkchild() noex {
-	sysdbmgr_data.atforkchild() ;
-}
-/* end subroutine (sysdbmgr_atforkchild) */
+/* end subroutine (sysdbmgr_atforkafter) */
 
 static void sysdbmgr_exit() noex {
 	sysdbmgr_data.fini() ;
