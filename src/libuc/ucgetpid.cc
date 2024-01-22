@@ -55,10 +55,21 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 
 /* external subroutines */
+
+extern "C" {
+    int		ucgetpid_init() noex ;
+    int		ucgetpid_fini() noex ;
+}
+
+
+/* external variables */
 
 
 /* local structures */
@@ -94,11 +105,6 @@ namespace {
 
 
 /* forward references */
-
-extern "C" {
-    int		ucgetpid_init() noex ;
-    int		ucgetpid_fini() noex ;
-}
 
 extern "C" {
     static void	ucgetpid_atforkbefore() noex ;
@@ -154,7 +160,7 @@ int ucgetpid::init() noex {
 	            void_f	b = ucgetpid_atforkbefore ;
 	            void_f	ap = ucgetpid_atforkparent ;
 	            void_f	ac = ucgetpid_atforkchild ;
-	            if ((rs = uc_atfork(b,ap,ac)) >= 0) {
+	            if ((rs = uc_atforkrecord(b,ap,ac)) >= 0) {
 	                if ((rs = uc_atexit(ucgetpid_exit)) >= 0) {
 	                    finitdone = true ;
 	                    f = true ;
