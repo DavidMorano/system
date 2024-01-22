@@ -230,19 +230,27 @@ int sysdbmgr::get(int w,cchar **rpp) noex {
 	int		rs1 ;
 	if ((*rpp = strs[w]) == nullptr) {
 	    if ((rs = init()) >= 0) {
-		char	*pbuf{} ;
-		if ((rs = libmalloc_mp(&pbuf)) >= 0) {
-		    cchar	*sysdbdir = sysword.w_sysdbdir ;
-		    if ((rs = mkpath(pbuf,sysdbdir,sysdbfnames[w])) >= 0) {
-	                cchar	*rp{} ;
-		        if ((rs = uc_libmallocstrw(pbuf,rs,&rp)) >= 0) {
-			    strs[w] = rp ;
-			    *rpp = rp ;
-			} /* end if (memory-allocation) */
-		    } /* end if (mkpath) */
-		    rs1 = uc_libfree(pbuf) ;
+		if ((rs = mx.lockbegin) >= 0) {
+		    if ((*rpp = strs[w]) == nullptr) {
+		        char	*pbuf{} ;
+		        if ((rs = libmalloc_mp(&pbuf)) >= 0) {
+		            cchar	*sysdbdir = sysword.w_sysdbdir ;
+			    cchar	*fn = sysdbfnames[w] ;
+		            if ((rs = mkpath(pbuf,sysdbdir,fn)) >= 0) {
+				auto	alloc = uc_libmallocstrw ;
+	                        cchar	*rp{} ;
+		                if ((rs = alloc(pbuf,rs,&rp)) >= 0) {
+			            strs[w] = rp ;
+			            *rpp = rp ;
+			        } /* end if (memory-allocation) */
+		            } /* end if (mkpath) */
+		            rs1 = uc_libfree(pbuf) ;
+		            if (rs >= 0) rs = rs1 ;
+		        } /* end if (m-a-f) */
+		    } /* end if (string-check) */
+		    rs1 = mx.lockend ;
 		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
+		} /* end if (mutex) */
 	    } /* end if (sysdbmgr::init) */
 	} /* end if (value needed to be calculated) */
 	return rs ;
