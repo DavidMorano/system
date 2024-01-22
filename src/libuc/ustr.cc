@@ -1,4 +1,4 @@
-/* ustr (UNIX® Streams) */
+/* ustr SUPPORT (UNIX® Streams) */
 /* lang=C++23 */
 
 /* UNIX® STREAMS management system-call subroutines */

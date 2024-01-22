@@ -1,4 +1,4 @@
-/* uinfo */
+/* uinfo SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® information (a cache for |uname(2)| and sisters) */
