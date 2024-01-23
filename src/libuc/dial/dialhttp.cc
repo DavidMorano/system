@@ -92,10 +92,6 @@
 
 #define	TOBUFLEN	20
 
-#ifndef	PGRBUFLEN
-#define	PGRBUFLEN	MAXPATHLEN
-#endif
-
 #define	VS		vecstr
 
 
@@ -154,10 +150,10 @@ int dialhttp(cc *hn,cc *ps,int af,cc *svc,mainv sargv,int to,int) noex {
 	    rs = SR_INVALID ;
 	    if (hn[0]) {
 		if ((rs = afvalid(af)) >= 0) {
-		    cint	rsv = mkvars() ;
+		    static cint		rsv = mkvars() ;
 		    if ((rs = rsv) >= 0) {
-			    rs = dialhttper(hn,ps,af,svc,sargv,to,0) ;
-			    fd = rs ;
+			rs = dialhttper(hn,ps,af,svc,sargv,to,0) ;
+			fd = rs ;
 		    } /* end if (mkvars) */
 	        } /* end if (af-valid) */
 	    } /* end if (valid) */
@@ -313,7 +309,7 @@ static int runprog(cchar *efname,cchar *ubuf,cchar *tobuf,cchar *pn) noex {
 	    rs = dialprog(efname,of,av,nullptr,nullptr) ;
 	    fd = rs ;
 	    u_sigaction(sig,&osh,nullptr) ;
-	} /* end if (signals) */
+	} /* end if (sigaction) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (runprog) */

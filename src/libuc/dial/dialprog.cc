@@ -63,6 +63,12 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -77,6 +83,9 @@ extern "C" {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

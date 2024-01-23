@@ -87,10 +87,14 @@ static int	waitready(int,int) noex ;
 constexpr bool	f_streams = SYSHAS_STREAMS ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dialpass(cchar *fname,int timeout,int) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		fd = -1 ;
 	if (fname) {
 	    rs = SR_INVALID ;
@@ -123,8 +127,10 @@ int dialpass(cchar *fname,int timeout,int) noex {
 	                        } /* end if (ok) */
 			    } /* end if (type of file) */
 	                } /* end if (stat) */
-	                u_close(fd_pass) ;
+	                rs1 = u_close(fd_pass) ;
+			if (rs >= 0) rs = rs1 ;
 	            } /* end if (u_open) */
+		    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 		} /* end if-constexpr (f_streams) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
