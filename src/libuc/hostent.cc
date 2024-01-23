@@ -48,8 +48,9 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<storeitem.h>
 #include	<intceil.h>
 #include	<localmisc.h>
@@ -92,212 +93,169 @@ static int	si_copybuf(SI *,char **,cchar *,int) noex ;
 /* exported subroutines */
 
 int hostent_getofficial(HOSTENT *hep,cchar **rpp) noex {
-	int		rs = SR_NOTFOUND ;
+	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
-
-	if (hep == NULL) return SR_FAULT ;
-
-	if (hep->h_name != NULL) {
-
-	    rs = SR_OK ;
-	    nlen = strlen(hep->h_name) ;
-
-	    if (rpp != NULL)
-	        *rpp = hep->h_name ;
-
-	} /* end if */
-
-	if ((rs < 0) && (rpp != NULL)) {
-	    *rpp = NULL ;
-	}
-
+	if (hep) {
+	    rs = SR_NOTFOUND ;
+	    if (hep->h_name) {
+	        rs = SR_OK ;
+	        nlen = strlen(hep->h_name) ;
+	        if (rpp) {
+	            *rpp = hep->h_name ;
+	        }
+	    } /* end if */
+	    if ((rs < 0) && rpp) {
+	        *rpp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
 }
 /* end subroutine (hostent_getofficial) */
 
 /* get address family type (assume it is in host byte order) */
 int hostent_getaf(HOSTENT *hep) noex {
-	int		type ;
-
-	if (hep == NULL) return SR_FAULT ;
-
-	type = (hep->h_addrtype) ;
-	return type ;
+	int		rs = SR_FAULT ;
+	if (hep) {
+	    rs = (hep->h_addrtype) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (hostent_getaf) */
 
 int hostent_getalen(HOSTENT *hep) noex {
-	if (hep == NULL) return SR_FAULT ;
-	return hep->h_length ;
+	int		rs = SR_FAULT ;
+	if (hep) {
+	    rs = hep->h_length ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (hostent_getalen) */
 
-int hostent_curbegin(HOSTENT *hep,HOSTENT_CUR *curp) noex {
-	if (hep == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	curp->i = -1 ;
-	return SR_OK ;
+int hostent_curbegin(HOSTENT *hep,hostent_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (hep && curp) {
+	    curp->i = -1 ;
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (hostent_curbegin) */
 
-int hostent_curend(HOSTENT *hep,HOSTENT_CUR *curp) noex {
-	if (hep == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	curp->i = -1 ;
-	return SR_OK ;
+int hostent_curend(HOSTENT *hep,hostent_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (hep && curp) {
+	    curp->i = -1 ;
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (hostent_curend) */
 
 /* enumerate the next hostname */
-int hostent_enumname(HOSTENT *hep,HOSTENT_CUR *curp,cchar **rpp) noex {
-	int		rs = SR_NOTFOUND ;
+int hostent_enumname(HOSTENT *hep,hostent_cur *curp,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
-
-	if (hep == NULL) return SR_FAULT ;
-
-	if (curp == NULL) {
-
-	    if (hep->h_name != NULL) {
-
-		rs = SR_OK ;
-	        nlen = strlen(hep->h_name) ;
-
-	        if (rpp != NULL)
-	            *rpp = hep->h_name ;
-
-	    }
-
-	} else {
-
-	    if (curp->i < 0) {
-
-	        if (hep->h_name != NULL) {
-
+	if (hep && curp) {
+	    rs = SR_NOTFOUND ;
+	    if (curp == nullptr) {
+	        if (hep->h_name) {
 		    rs = SR_OK ;
 	            nlen = strlen(hep->h_name) ;
-
-	            if (rpp != NULL)
+	            if (rpp) {
 	                *rpp = hep->h_name ;
-
-	            curp->i = 0 ;
+		    }
 	        }
-
 	    } else {
-
-	        if ((hep->h_aliases != NULL) &&
-	            (hep->h_aliases[curp->i] != NULL)) {
-
-		    rs = SR_OK ;
-	            nlen = strlen(hep->h_aliases[curp->i]) ;
-
-	            if (rpp != NULL)
-	                *rpp = hep->h_aliases[curp->i] ;
-
-	            curp->i += 1 ;
-	        }
-
+	        if (curp->i < 0) {
+	            if (hep->h_name) {
+		        rs = SR_OK ;
+	                nlen = strlen(hep->h_name) ;
+	                if (rpp) {
+	                    *rpp = hep->h_name ;
+		        }
+	                curp->i = 0 ;
+	            }
+	        } else {
+	            if (hep->h_aliases && hep->h_aliases[curp->i]) {
+		        rs = SR_OK ;
+	                nlen = strlen(hep->h_aliases[curp->i]) ;
+	                if (rpp) {
+	                    *rpp = hep->h_aliases[curp->i] ;
+		        }
+	                curp->i += 1 ;
+	            }
+	        } /* end if */
 	    } /* end if */
-
-	} /* end if */
-
-	if ((rs < 0) && (rpp != NULL))
-	    *rpp = NULL ;
-
+	    if ((rs < 0) && rpp) {
+	        *rpp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
 }
 /* end subroutine (hostent_enumname) */
 
 /* enumerate the next host address */
-int hostent_enumaddr(HOSTENT *hep,HOSTENT_CUR *curp,const uchar **rpp) noex {
-	int		rs = SR_NOTFOUND ;
-	int		alen ;
-	int		ci ;
-
-	if (hep == NULL) return SR_FAULT ;
-
-	alen = hep->h_length ;
-	if (hep->h_addr_list != NULL) {
-
-	    if (curp == NULL) {
-
-	        if (hep->h_addr_list[0] != NULL) {
-
-	            rs = SR_OK ;
-	            if (rpp != NULL)
-	                *rpp = (uchar *) hep->h_addr_list[0] ;
-
-	        }
-
-	    } else {
-
-	        ci = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-		if (hep->h_addr_list[ci] != NULL) {
-
-	            rs = SR_OK ;
-	            if (rpp != NULL)
-	                *rpp = (uchar *) hep->h_addr_list[ci] ;
-
-	        }
-
-	        if (rs >= 0)
-		    curp->i = ci ;
-
+int hostent_enumaddr(HOSTENT *hep,hostent_cur *curp,cuchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		alen = 0 ;
+	if (hep && curp) {
+	    rs = SR_NOTFOUND ;
+	    alen = hep->h_length ;
+	    if (hep->h_addr_list != nullptr) {
+	        if (curp == nullptr) {
+	            if (hep->h_addr_list[0] != nullptr) {
+	                rs = SR_OK ;
+	                if (rpp) {
+	                    *rpp = (uchar *) hep->h_addr_list[0] ;
+		        }
+	            }
+	        } else {
+	            cint	ci = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+		    if (hep->h_addr_list[ci] != nullptr) {
+	                rs = SR_OK ;
+	                if (rpp) {
+	                    *rpp = (uchar *) hep->h_addr_list[ci] ;
+		        }
+	            }
+	            if (rs >= 0) {
+		        curp->i = ci ;
+		    }
+	        } /* end if */
 	    } /* end if */
-
-	} /* end if */
-
-	if ((rs < 0) && (rpp != NULL))
-	    *rpp = NULL ;
-
+	    if ((rs < 0) && rpp) {
+	        *rpp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? alen : rs ;
 }
 /* end subroutine (hostent_enumaddr) */
 
 int hostent_getcanonical(HOSTENT *hep,cchar **rpp) noex {
-	int		rs = SR_NOTFOUND ;
+	int		rs = SR_FAULT ;
 	int		nlen = 0 ;
-
-	if (hep == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
-
-	if ((hep->h_name != NULL) &&
-	    (strchr(hep->h_name,'.') != NULL)) {
-
-	    rs = SR_OK ;
-	    nlen = strlen(hep->h_name) ;
-
-	    *rpp = hep->h_name ;
-
-	} /* end if */
-
-	if ((rs == SR_NOTFOUND) && (hep->h_aliases != NULL)) {
-
-	    for (int i = 0 ; hep->h_aliases[i] != NULL ; i += 1) {
-
-	        if (strchr(hep->h_aliases[i],'.') != NULL) {
-
-		    rs = SR_OK ;
-	    	    nlen = strlen(hep->h_aliases[i]) ;
-
-	            *rpp = hep->h_aliases[i] ;
-	            break ;
-
-	        } /* end if */
-
-	     } /* end for */
-
-	} /* end if */
-
-	if ((rs == SR_NOTFOUND) && (hep->h_name != NULL)) {
-
-	    rs = SR_OK ;
-	    nlen = strlen(hep->h_name) ;
-
-	    *rpp = hep->h_name ;
-
-	} /* end if */
-
+	if (hep && rpp) {
+	    rs = SR_NOTFOUND ;
+	    if (hep->h_name && (strchr(hep->h_name,'.') != nullptr)) {
+	        rs = SR_OK ;
+	        nlen = strlen(hep->h_name) ;
+	        *rpp = hep->h_name ;
+	    } /* end if */
+	    if ((rs == SR_NOTFOUND) && (hep->h_aliases != nullptr)) {
+	        for (int i = 0 ; hep->h_aliases[i] != nullptr ; i += 1) {
+	            if (strchr(hep->h_aliases[i],'.') != nullptr) {
+		        rs = SR_OK ;
+	    	        nlen = strlen(hep->h_aliases[i]) ;
+	                *rpp = hep->h_aliases[i] ;
+	                break ;
+	            } /* end if */
+	         } /* end for */
+	    } /* end if */
+	    if ((rs == SR_NOTFOUND) && (hep->h_name != nullptr)) {
+	        rs = SR_OK ;
+	        nlen = strlen(hep->h_name) ;
+	        *rpp = hep->h_name ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return (rs >= 0) ? nlen : rs ;
 }
 /* end subroutine (hostent_getcanonical) */
@@ -309,46 +267,45 @@ int hostent_getfqdn(HOSTENT *hep,cchar **rpp) noex {
 /* end subroutine (hostent_getfqdn) */
 
 int hostent_size(HOSTENT *hep) noex {
-	int		i{} ;
+	int		rs = SR_FAULT ;
 	int		size = 1 ;
-	if (hep->h_name) {
-	    size += (strlen(hep->h_name)+1) ;
-	}
-	if (hep->h_aliases) {
-	    for (i = 0 ; hep->h_aliases[i] != NULL ; i += 1) {
-		size += (strlen(hep->h_aliases[i])+1) ;
+	if (hep) {
+	    int		i{} ;
+	    rs = SR_OK ;
+	    if (hep->h_name) {
+	        size += (strlen(hep->h_name)+1) ;
 	    }
-	    size += (i*sizeof(const char *)) ;
-	}
-	if (hep->h_addr_list) {
-	    for (i = 0 ; hep->h_addr_list[i] != NULL ; i += 1) {
-		size += (hep->h_length+1) ;
+	    if (hep->h_aliases) {
+	        for (i = 0 ; hep->h_aliases[i] != nullptr ; i += 1) {
+		    size += (strlen(hep->h_aliases[i])+1) ;
+	        }
+	        size += (i*sizeof(cchar *)) ;
 	    }
-	}
-	size = iceil(size,sizeof(const char *)) ;
-	return size ;
+	    if (hep->h_addr_list) {
+	        for (i = 0 ; hep->h_addr_list[i] != nullptr ; i += 1) {
+		    size += (hep->h_length+1) ;
+	        }
+	    }
+	    size = iceil(size,sizeof(cchar *)) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? size : rs ;
 }
 /* end subroutine (hostent_size) */
 
 int hostent_load(HOSTENT *hep,char *hebuf,int helen,HOSTENT *lp) noex {
-	STOREITEM	ib ;
-	int		rs ;
-
-	memcpy(hep,lp,sizeof(HOSTENT)) ;
-
-	if ((rs = storeitem_start(&ib,hebuf,helen)) >= 0) {
-	    int	len ;
-
-	    if (rs >= 0) rs = si_copyaliases(&ib,hep,lp) ;
-
-	    if (rs >= 0) rs = si_copyaddrs(&ib,hep,lp) ;
-
-	    if (rs >= 0) rs = si_copystr(&ib,&hep->h_name,lp->h_name) ;
-
-	    len = storeitem_finish(&ib) ;
-	    if (rs >= 0) rs = len ;
-	} /* end if (storeitem) */
-
+	int		rs = SR_FAULT ;
+	if (hep && hebuf && lp) {
+	    storeitem	ib ;
+	    memcpy(hep,lp,sizeof(HOSTENT)) ;
+	    if ((rs = storeitem_start(&ib,hebuf,helen)) >= 0) {
+	        int	len ;
+	        if (rs >= 0) rs = si_copyaliases(&ib,hep,lp) ;
+	        if (rs >= 0) rs = si_copyaddrs(&ib,hep,lp) ;
+	        if (rs >= 0) rs = si_copystr(&ib,&hep->h_name,lp->h_name) ;
+	        len = storeitem_finish(&ib) ;
+	        if (rs >= 0) rs = len ;
+	    } /* end if (storeitem) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (hostent_load) */
@@ -358,23 +315,24 @@ int hostent_load(HOSTENT *hep,char *hebuf,int helen,HOSTENT *lp) noex {
 
 static int si_copyaliases(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 	int		rs = SR_OK ;
-	if (lp->h_aliases != NULL) {
-	    int		n ;
+	if (lp->h_aliases != nullptr) {
+	    int		n{} ;
 	    void	**vpp ;
-	    for (n = 0 ; lp->h_aliases[n] != NULL ; n += 1) ;
+	    for (n = 0 ; lp->h_aliases[n] != nullptr ; n += 1) ;
 	    if ((rs = storeitem_ptab(ibp,n,&vpp)) >= 0) {
-	        int	i ;
+	        int	i{} ;
 	        char	**cpp ;
 		cpp = (char **) vpp ;
 		hep->h_aliases = cpp ;
-		for (i = 0 ; lp->h_aliases[i] != NULL ; i += 1) {
-		    rs = si_copystr(ibp,(hep->h_aliases + i),lp->h_aliases[i]) ;
+		for (i = 0 ; lp->h_aliases[i] ; i += 1) {
+		    cchar	*ap = lp->h_aliases[i] ;
+		    rs = si_copystr(ibp,(hep->h_aliases + i),ap) ;
 		    if (rs < 0) break ;
 		} /* end for */
-		hep->h_aliases[i] = NULL ;
+		hep->h_aliases[i] = nullptr ;
 	    } /* end if ( storeitem_ptab) */
 	} else {
-	    hep->h_aliases = NULL ;
+	    hep->h_aliases = nullptr ;
 	}
 	return rs ;
 }
@@ -382,24 +340,25 @@ static int si_copyaliases(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 
 static int si_copyaddrs(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 	int		rs = SR_OK ;
-	if (lp->h_addr_list != NULL) {
-	    int		n ;
+	if (lp->h_addr_list != nullptr) {
+	    int		n{} ;
 	    void	**vpp ;
-	    for (n = 0 ; lp->h_addr_list[n] != NULL ; n += 1) ;
+	    for (n = 0 ; lp->h_addr_list[n] != nullptr ; n += 1) ;
 	    if ((rs = storeitem_ptab(ibp,n,&vpp)) >= 0) {
-	        int	i ;
+	        int	i{} ;
 	        char	**cpp ;
 		cpp = (char **) vpp ;
 	        hep->h_addr_list = cpp ;
-	        for (i = 0 ; lp->h_addr_list[i] != NULL ; i += 1) {
-		    rs = si_copybuf(ibp,(hep->h_addr_list + i),
-				lp->h_addr_list[i],lp->h_length) ;
+	        for (i = 0 ; lp->h_addr_list[i] ; i += 1) {
+		    cchar	*ap = lp->h_addr_list[i] ;
+		    cint	al = lp->h_length ;
+		    rs = si_copybuf(ibp,(hep->h_addr_list + i),ap,al) ;
 		    if (rs < 0) break ;
 	        } /* end for */
-		hep->h_addr_list[i] = NULL ;
+		hep->h_addr_list[i] = nullptr ;
 	    } /* end if */
 	} else {
-	    hep->h_addr_list = NULL ;
+	    hep->h_addr_list = nullptr ;
 	}
 	return rs ;
 }
@@ -407,9 +366,9 @@ static int si_copyaddrs(SI *ibp,HOSTENT *hep,HOSTENT *lp) noex {
 
 static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 	int		rs = SR_OK ;
-	const char	**cpp = (const char **) pp ;
-	*cpp = NULL ;
-	if (s1 != NULL) {
+	cchar		**cpp = (cchar **) pp ;
+	*cpp = nullptr ;
+	if (s1 != nullptr) {
 	    rs = storeitem_strw(ibp,s1,-1,cpp) ;
 	}
 	return rs ;
@@ -419,8 +378,8 @@ static int si_copystr(SI *ibp,char **pp,cchar *s1) noex {
 static int si_copybuf(SI *ibp,char **pp,cchar *bp,int bl) noex {
 	int		rs = SR_OK ;
 	cchar		**cpp = (cchar **) pp ;
-	*cpp = NULL ;
-	if (bp != NULL) {
+	*cpp = nullptr ;
+	if (bp != nullptr) {
 	    rs = storeitem_buf(ibp,bp,bl,cpp) ;
 	}
 	return rs ;
