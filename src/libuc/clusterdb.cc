@@ -84,12 +84,6 @@ using std::nothrow ;			/* constant */
 
 /* external subroutines */
 
-extern "C" {
-    int		clusterdb_fileadd(CD *,cchar *) noex ;
-    int		clusterdb_curbegin(CD *,CD_CUR *) noex ;
-    int		clusterdb_curend(CD *,CD_CUR *) noex ;
-}
-
 
 /* external variables */
 
@@ -368,7 +362,7 @@ fetcher::operator int () noex {
 	cint		nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_match = FALSE ;
+	int		f_match = false ;
 	kop = op->ctp ;
 	if (curp != nullptr) {
 	    KVSFILE_CUR	*kcp = curp->kcurp ;
