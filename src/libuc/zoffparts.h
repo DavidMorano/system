@@ -1,8 +1,9 @@
 /* zoffparts HEADER */
 /* lang=C20 */
 
+/* manage time-zone offsets */
+/* version %I% last-modified %G% */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /* revision history:
 
@@ -22,6 +23,7 @@
 
 #ifndef	ZOFFPATHS_INCLUDE
 #define	ZOFFPARTS_INCLUDE
+
 
 #include	<envstandards.h>
 #include	<sys/types.h>
