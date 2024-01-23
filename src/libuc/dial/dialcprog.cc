@@ -79,10 +79,10 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<estrings.h>
