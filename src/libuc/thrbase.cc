@@ -41,8 +41,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -54,6 +54,11 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;
 
 
 /* local typedefs */
@@ -95,6 +100,7 @@ int thrbase_start(THRBASE *tip,thrbase_sub worker,void *ap) noex {
 	        if ((rs = uc_sigsetfill(&nsm)) >= 0) {
 		    if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	                THRBASE_SI	*sip ;
+			nullptr_t	np{} ;
 	                cint		size = sizeof(THRBASE_SI) ;
 	                if ((rs = uc_malloc(size,&sip)) >= 0) {
 	                    uptsub_f	thrsub = uptsub_f(startworker) ;
@@ -104,14 +110,14 @@ int thrbase_start(THRBASE *tip,thrbase_sub worker,void *ap) noex {
 		                sip->worker = worker ;
 		                sip->tip = tip ;
 		            }
-	                    if ((rs = uptcreate(&tid,NULL,thrsub,sip)) >= 0) {
+	                    if ((rs = uptcreate(&tid,np,thrsub,sip)) >= 0) {
 	                        tip->tid = tid ;
 			    }
 		            if (rs < 0) {
 		                uc_free(sip) ;
 			    }
 	                } /* end if (memory-allocation) */
-		        rs1 = pt_sigmask(SIG_SETMASK,&osm,NULL) ;
+		        rs1 = pt_sigmask(SIG_SETMASK,&osm,np) ;
 		        if (rs >= 0) rs = rs1 ;
 		    } /* end if (sigmask) */
 	        } /* end if (signal handling) */

@@ -22,9 +22,9 @@
 
 
 struct thrcomm_head {
+	ptm		m ;
+	ptc		c ;
 	uint		magic ;
-	PTM		m ;
-	PTC		c ;
 	volatile int	cmd ;
 	volatile int	rrs ;
 	volatile int	f_cmd ;
@@ -35,13 +35,13 @@ typedef THRCOMM		thrcomm ;
 
 EXTERNC_begin
 
-extern int	thrcomm_start(THRCOMM *,int) noex ;
-extern int	thrcomm_cmdsend(THRCOMM *,int,int) noex ;
-extern int	thrcomm_cmdrecv(THRCOMM *,int) noex ;
-extern int	thrcomm_rspsend(THRCOMM *,int,int) noex ;
-extern int	thrcomm_rsprecv(THRCOMM *,int) noex ;
-extern int	thrcomm_exiting(THRCOMM *) noex ;
-extern int	thrcomm_finish(THRCOMM *) noex ;
+extern int	thrcomm_start(thrcomm *,int) noex ;
+extern int	thrcomm_cmdsend(thrcomm *,int,int) noex ;
+extern int	thrcomm_cmdrecv(thrcomm *,int) noex ;
+extern int	thrcomm_rspsend(thrcomm *,int,int) noex ;
+extern int	thrcomm_rsprecv(thrcomm *,int) noex ;
+extern int	thrcomm_exiting(thrcomm *) noex ;
+extern int	thrcomm_finish(thrcomm *) noex ;
 
 EXTERNC_end
 
