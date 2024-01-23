@@ -521,7 +521,7 @@ int sbuf::nchr(int ch,int nc) noex {
 void sbuf::dtor() noex {
 	cint	rs = sbuf_finish(this) ;
 	if (rs < 0) {
-	   ulogerror("sbuf",rs,"fini-finish") ;
+	   ulogerror("sbuf",rs,"dtor-finish") ;
 	}
 }
 /* end subroutine (sbuf::dtor) */

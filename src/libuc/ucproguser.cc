@@ -121,7 +121,7 @@ namespace {
 	~ucproguser() {
 	    cint	rs = ucproguser_fini() ;
 	    if (rs < 0) {
-		ulogerror("ucproguser",rs,"fini-fini") ;
+		ulogerror("ucproguser",rs,"dtor-fini") ;
 	    }
 	} ;
     } ; /* end struct (ucproguser) */

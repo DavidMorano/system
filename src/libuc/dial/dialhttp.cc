@@ -62,6 +62,7 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<varnames.hh>
 #include	<estrings.h>
@@ -87,12 +88,9 @@
 
 #define	BINDNAME	"bin"
 
-#define	URLBUFLEN	(4 * MAXHOSTNAMELEN)
-#define	TOBUFLEN	20
+#define	URLMULT		4		/* URL-buflen multiplier */
 
-#ifndef	PGRBUFLEN
-#define	PGRBUFLEN	MAXPATHLEN
-#endif
+#define	TOBUFLEN	20
 
 #define	VS		vecstr
 
@@ -101,6 +99,8 @@
 
 
 /* local typedefs */
+
+typedef mainv		mv ;
 
 
 /* external subroutines */
@@ -114,12 +114,15 @@
 
 /* forward references */
 
+static int	dialhttper(cc *,cc *,int,cc *,mainv,int,int) noex ;
 static int	findprog(char *,cchar *) noex ;
 static int	loadpath(vecstr *) noex ;
 static int	findprprog(ids *,vecstr *,char *,cchar *) noex ;
 static int	runprog(cchar *,cchar *,cchar *,cchar *) noex ;
 static int	mkurl(char *,int,cchar *,cchar *,cchar *,mainv) noex ;
+static int	mkvars() noex ;
 static int	afvalid(int) noex ;
+
 
 /* local variables */
 
@@ -131,38 +134,27 @@ static constexpr cpcchar	prnames[] = {
 	nullptr
 } ;
 
+static bufsizevar		maxpathlen(getbufsize_mp) ;
+static int			urlbuflen ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
 int dialhttp(cc *hn,cc *ps,int af,cc *svc,mainv sargv,int to,int) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		fd = -1 ;
 	if (hn) {
 	    rs = SR_INVALID ;
 	    if (hn[0]) {
 		if ((rs = afvalid(af)) >= 0) {
-	            char	tobuf[TOBUFLEN + 1] = { 0 } ;
-	            if (to >= 0) {
-	                if (to == 0) to = 1 ;
-	                rs = ctdeci(tobuf,TOBUFLEN,to) ;
-	            }
-	            if (rs >= 0) {
-	                cint	ulen = URLBUFLEN ;
-	                char	ubuf[URLBUFLEN + 1] ;
-	                if ((rs = mkurl(ubuf,ulen,hn,ps,svc,sargv)) >= 0) {
-	                    cchar	*pn = PROG_WGET ;
-	                    char	*ebuf{} ;
-		            if ((rs = malloc_mp(&ebuf)) >= 0) {
-	                        if ((rs = findprog(ebuf,pn)) >= 0) {
-	                            rs = runprog(ebuf,ubuf,tobuf,pn) ;
-	                            fd = rs ;
-	                        } /* end if (findprog) */
-			        rs1 = uc_free(ebuf) ;
-			        if (rs >= 0) rs = rs1 ;
-		            } /* end if (m-a-f) */
-	                } /* end if (mkurl) */
-	            } /* end if (ok) */
+		    static cint		rsv = mkvars() ;
+		    if ((rs = rsv) >= 0) {
+			rs = dialhttper(hn,ps,af,svc,sargv,to,0) ;
+			fd = rs ;
+		    } /* end if (mkvars) */
 	        } /* end if (af-valid) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -172,6 +164,40 @@ int dialhttp(cc *hn,cc *ps,int af,cc *svc,mainv sargv,int to,int) noex {
 
 
 /* local subroutines */
+
+static int dialhttper(cc *hn,cc *ps,int,cc *svc,mv sargv,int to,int) noex {
+	cint		ulen = urlbuflen ;
+	int		rs ;
+	int		rs1 ;
+	int		fd = -1 ;
+	char		*ubuf{} ;
+	if ((rs = uc_malloc((ulen+1),&ubuf)) >= 0) {
+	    if ((rs = mkurl(ubuf,ulen,hn,ps,svc,sargv)) >= 0) {
+		cchar	*pn = PROG_WGET ;
+		char	*ebuf{} ;
+		if ((rs = malloc_mp(&ebuf)) >= 0) {
+		    if ((rs = findprog(ebuf,pn)) >= 0) {
+			char	tobuf[TOBUFLEN + 1] = {} ;
+	                if (to >= 0) {
+	                    if (to == 0) to = 1 ;
+	                    rs = ctdeci(tobuf,TOBUFLEN,to) ;
+	                }
+	                if (rs >= 0) {
+	                    rs = runprog(ebuf,ubuf,tobuf,pn) ;
+	                    fd = rs ;
+			} /* end if (ok) */
+		    } /* end if (findprog) */
+		    rs1 = uc_free(ebuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (mkurl) */
+	    rs1 = uc_free(ubuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	return (rs >= 0) ? fd : rs ;
+}
+/* end subroutine (dialhttper) */
 
 static int findprog(char *execfname,cchar *pn) noex {
 	ids		id ;
@@ -201,46 +227,56 @@ static int findprog(char *execfname,cchar *pn) noex {
 /* end subroutine (findprog) */
 
 static int findprprog(ids *idp,vecstr *plp,char *rbuf,cchar *pn) noex {
-	int		rs ;
-	int		rl = 0 ;
 	cint		perms = (R_OK | X_OK) ;
-	char		dn[MAXHOSTNAMELEN + 1] ;
+	int		rs ;
+	int		rs1 ;
+	int		rl = 0 ;
+	char		*dn{} ;
 	rbuf[0] = '\0' ;
-	if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	    cint	rsn = SR_NOTFOUND ;
-	    cint	prlen = PGRBUFLEN ;
-	    cchar	*bdname = BINDNAME ;
-	    char	prbuf[PGRBUFLEN + 1] ;
-	    char	dbuf[MAXPATHLEN+1] ;
-	    for (int i = 0 ; prnames[i] ; i += 1) {
-	        rbuf[0] = '\0' ;
-	        if ((rs = mkpr(prbuf,prlen,prnames[i],dn)) >= 0) {
-	            if ((rs = mkpath2(dbuf,prbuf,bdname)) >= 0) {
-	                if ((rs = vecstr_find(plp,dbuf)) == rsn) {
-	                    if ((rs = mkpath2(rbuf,dbuf,pn)) >= 0) {
-	    			USTAT	sb ;
-	                        rl = rs ;
-	                        if ((rs = u_stat(rbuf,&sb)) >= 0) {
-	                            if (S_ISREG(sb.st_mode)) {
-	                                rs = sperm(idp,&sb,perms) ;
-	                                if (isNotAccess(rs)) {
+	if ((rs = malloc_hn(&dn)) >= 0) {
+	    if ((rs = getnodedomain(nullptr,dn)) >= 0) {
+	        cint	rsn = SR_NOTFOUND ;
+	        cint	sz = ((maxpathlen + 1) * 2) ;
+	        cchar	*bdname = BINDNAME ;
+	        char	*prbuf{} ;
+	        if ((rs = uc_malloc((sz+1),&prbuf)) >= 0) {
+		    cint	prlen = maxpathlen ;
+	            char	*dbuf = (prbuf + (maxpathlen+1)) ;
+	            for (int i = 0 ; prnames[i] ; i += 1) {
+	                rbuf[0] = '\0' ;
+	                if ((rs = mkpr(prbuf,prlen,prnames[i],dn)) >= 0) {
+	                    if ((rs = mkpath2(dbuf,prbuf,bdname)) >= 0) {
+	                        if ((rs = vecstr_find(plp,dbuf)) == rsn) {
+	                            if ((rs = mkpath2(rbuf,dbuf,pn)) >= 0) {
+	    			        USTAT	sb ;
+	                                rl = rs ;
+	                                if ((rs = u_stat(rbuf,&sb)) >= 0) {
+	                                    if (S_ISREG(sb.st_mode)) {
+	                                        rs = sperm(idp,&sb,perms) ;
+	                                        if (isNotAccess(rs)) {
+	                                            rl = 0 ;
+	                                        }
+	                                    } else {
+	                                        rs = SR_ISDIR ;
+	                                    }
+	                                } else if (isNotPresent(rs)) {
 	                                    rl = 0 ;
+	                                    rs = SR_OK ;
 	                                }
-	                            } else {
-	                                rs = SR_ISDIR ;
-	                            }
-	                        } else if (isNotPresent(rs)) {
-	                            rl = 0 ;
-	                            rs = SR_OK ;
-	                        }
+	                            } /* end if (mkpath) */
+	                        } /* end if (not-found) */
 	                    } /* end if (mkpath) */
-	                } /* end if (not-found) */
-	            } /* end if (mkpath) */
-	        } /* end if (mkpr) */
-	        if (rl > 0) break ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	} /* end if (getnodedomain) */
+	                } /* end if (mkpr) */
+	                if (rl > 0) break ;
+	                if (rs < 0) break ;
+	            } /* end for */
+		    rs1 = uc_free(prbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (getnodedomain) */
+	    rs1 = uc_free(dn) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (findprprog) */
@@ -273,7 +309,7 @@ static int runprog(cchar *efname,cchar *ubuf,cchar *tobuf,cchar *pn) noex {
 	    rs = dialprog(efname,of,av,nullptr,nullptr) ;
 	    fd = rs ;
 	    u_sigaction(sig,&osh,nullptr) ;
-	} /* end if (signals) */
+	} /* end if (sigaction) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (runprog) */
@@ -338,6 +374,15 @@ static int mkurl(char *ubuf,int ulen,cc *hn,cc *ps,cc *svc,mainv sargv) noex {
 	return rs ;
 }
 /* end subroutine (mkurl) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = maxpathlen) >= 0) {
+	    urlbuflen = (rs * URLMULT) ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 static int afvalid(int af) noex {
 	bool	f = false ;

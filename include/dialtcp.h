@@ -26,6 +26,7 @@
 #include	<dialopts.h>
 #include	<dialtcpnls.h>
 
+
 EXTERNC_begin
 
 extern int dialtcp(cchar *,cchar *,int,int,int) noex ;

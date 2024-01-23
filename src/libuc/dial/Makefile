@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h sysauxinfonames.h
+INCS= dial.h dialopts.h
 
 
 OBJ0_DIAL= dialopts.o 
@@ -140,28 +140,28 @@ obj7_dial.o:	$(OBJ7_DIAL)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_DIAL)
 
 
-dialopts.o:		dialopts.cc dialopts.h
-dialpass.o:		dialpass.cc dialopts.h
+dialopts.o:		dialopts.cc $(INCS)
+dialpass.o:		dialpass.cc $(INCS)
 
-dialusd.o:		dialusd.cc dialopts.h
+dialusd.o:		dialusd.cc $(INCS)
 
-dialuss.o:		dialuss.cc dialopts.h
-dialussmux.o:		dialussmux.cc dialopts.h
-dialussnls.o:		dialussnls.cc dialopts.h
+dialuss.o:		dialuss.cc $(INCS)
+dialussmux.o:		dialussmux.cc $(INCS)
+dialussnls.o:		dialussnls.cc $(INCS)
 
-dialprog.o:		dialprog.cc dialopts.h
-dialcprog.o:		dialcprog.cc dialopts.h
+dialprog.o:		dialprog.cc $(INCS)
+dialcprog.o:		dialcprog.cc $(INCS)
 
-dialudp.o:		dialudp.cc dialudp.h dialopts.h
+dialudp.o:		dialudp.cc dialudp.h $(INCS)
 
-dialtcp.o:		dialtcp.cc dialtcp.h dialopts.h
-dialtcpmux.o:		dialtcpmux.cc dialopts.h
-dialtcpnls.o:		dialtcpnls.cc dialopts.h
-dialfinger.o:		dialfinger.cc dialopts.h
-dialhttp.o:		dialhttp.cc dialopts.h
+dialtcp.o:		dialtcp.cc dialtcp.h $(INCS)
+dialtcpmux.o:		dialtcpmux.cc dialtcp.h $(INCS)
+dialtcpnls.o:		dialtcpnls.cc dialtcp.h $(INCS)
+dialfinger.o:		dialfinger.cc dialtcp.h $(INCS)
+dialhttp.o:		dialhttp.cc dialtcp.h $(INCS)
 
-dialticotsord.o:	dialticotsord.cc dialopts.h
-dialticotsordmux.o:	dialticotsordmux.cc dialopts.h
-dialticotsordnls.o:	dialticotsordnls.cc dialopts.h
+dialticotsord.o:	dialticotsord.cc $(INCS)
+dialticotsordmux.o:	dialticotsordmux.cc $(INCS)
+dialticotsordnls.o:	dialticotsordnls.cc $(INCS)
 
 

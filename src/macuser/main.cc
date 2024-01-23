@@ -327,7 +327,7 @@ int userinfo::find(uid_t uid) noex {
 int userinfo::findenv(uid_t uid) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	for (int i = 0 ; (rs == 0) && envs[i] ; i += 1) {
+	for (int i = 0 ; envs[i] ; i += 1) {
 	    cchar	*rp ;
 	    if ((rp = getenv(envs[i])) != nullptr) {
 		int	cl ;
@@ -345,13 +345,13 @@ int userinfo::findenv(uid_t uid) noex {
 		    } /* end if (getpwnam) */
 		} /* end if (sfbasename) */
 	    } /* end if (getenv) */
-	    if (len > 0) break ;
+	    if ((rs < 0) || (len > 0)) break ;
 	} /* end for */
 	return (rs >= 0) ? len : rs ;
 }
 /* end method (userinfo::findenv) */
 
-int userinfo::findutmp(uid_t) noex {
+int userinfo::findutmp(uid_t uid) noex {
 	const pid_t	sid = getsid(0) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -361,24 +361,24 @@ int userinfo::findutmp(uid_t) noex {
 	while ((up = getutxent()) != nullptr) {
 	    if ((up->ut_pid == sid) && isourtype(up)) {
 		unp = up->ut_user ;
-		rs = strnlen(unp,sizeof(up->ut_user)) ;
+		if ((rs = strnlen(unp,sizeof(up->ut_user))) > 0) {
+	            PASSWD	*pwp ;
+	            char	ubuf[rs+1] ;
+	            strwcpy(ubuf,unp,rs) ;
+	            if ((pwp = getpwnam(ubuf)) != nullptr) {
+			if (pwp->pw_uid == uid) {
+		            un = pwp->pw_name ;
+		            uh = pwp->pw_dir ;
+		            us = pwp->pw_shell ;
+	  	            gid = pwp->pw_gid ;
+		            len = un.length() ;
+			} /* end if (uid match) */
+	            } /* end if (getpwnam) */
+		} /* end if (non-zero positive) */
 	    } /* end if (match) */
-	    if (rs != 0) break ;
+	    if ((rs < 0) || (len > 0)) break ;
 	} /* end while */
-	if ((rs > 0) && unp) {
-	    PASSWD	*pwp ;
-	    char	ubuf[rs+1] ;
-	    strwcpy(ubuf,unp,rs) ;
-	    if ((pwp = getpwnam(ubuf)) != nullptr) {
-		un = pwp->pw_name ;
-		uh = pwp->pw_dir ;
-		us = pwp->pw_shell ;
-	  	gid = pwp->pw_gid ;
-		len = un.length() ;
-	    } else {
-		rs = 0 ;
-	    }
-	} /* end if (got one) */
+	endutxent() ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end method (userinfo::findutmp) */

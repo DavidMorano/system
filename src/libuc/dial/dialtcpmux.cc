@@ -92,6 +92,12 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typenames */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -146,6 +152,9 @@ static int	mkmuxreq(char *,int,cchar *,int,mainv) noex ;
 /* local variables */
 
 constexpr bool	f_cr = CF_CR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -212,6 +221,7 @@ int muxhelp::blocker() noex {
 	SIGACTION	osighand ;
 	sigset_t	signalmask ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 	uc_sigsetempty(&signalmask) ;
 	sighand.sa_handler = SIG_IGN ;
@@ -221,13 +231,11 @@ int muxhelp::blocker() noex {
 	    if ((rs = dialtcp(hn,ps,af,to,dot)) >= 0) {
 		fd = rs ;
 		rs = reqsvc(fd) ;
-	        if (rs < 0) {
-		    u_close(fd) ;
-		    fd = -1 ;
-		}
 	    } /* end if (opened) */
-	    u_sigaction(SIGPIPE,&osighand,NULL) ;
+	    rs1 = u_sigaction(SIGPIPE,&osighand,nullptr) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigaction) */
+	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end method (muxhelp::blocker) */

@@ -19,10 +19,7 @@
 
 
 #include	<envstandards.h>
-#include	<clanguage.h>
-#include	<utypedefs.h>
-#include	<utypealiases.h>
-#include	<usupport.h>
+#include	<usystem.h>
 
 
 EXTERNC_begin
@@ -30,7 +27,7 @@ EXTERNC_begin
 typedef int (*shtr_sub)(void *) noex ;
 typedef void (*shtr_keyf)(void *) noex ;
 
-extern int uc_sthrcreate(caddr_t,size_t,sthr_sun,cvoid *,long) noex ;
+extern int uc_sthrcreate(caddr_t,size_t,sthr_sub,cvoid *,long) noex ;
 extern int uc_sthrexit(intex) noex ;
 extern int uc_sthrjoin(thread_t,int *) noex ;
 extern int uc_sthrsuspend(thread_t) noex ;

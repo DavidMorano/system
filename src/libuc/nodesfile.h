@@ -1,6 +1,8 @@
-/* nodesfile */
+/* nodesfile SUPPORT */
+/* lang=C20 */
 
 /* UNIX "nodes" file support */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,35 +21,31 @@
 
 *******************************************************************************/
 
-
 #ifndef	NODESFILE_INCLUDE
-#define	NODESFILE_INCLUDE		1
+#define	NODESFILE_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-
-#include	<usystem.h>		/* for 'uino_t' */
+#include	<climits>
+#include	<usystem.h>
 #include	<hdb.h>
 #include	<localmisc.h>
 
 
-/* local defines */
-
 #define	NODESFILE	struct nodesfile_head
-#define	NODESFILE_CUR	struct nodesfile_c
+#define	nodesfile_cur	struct nodesfile_cursor
+#define	NODESFILE_FINFO	struct nodesfile_finfo
 
 
-struct nodesfile_c {
-	HDB_CUR		cur ;
+struct nodesfile_cursor {
+	hdb_cur		cur ;
 } ;
 
 struct nodesfile_finfo {
-	const char	*fname ;
+	cchar		*fname ;
 	time_t		mtime ;
 	uino_t		ino ;
 	dev_t		dev ;
@@ -56,10 +54,10 @@ struct nodesfile_finfo {
 
 struct nodesfile_head {
 	char		*mapbuf ;
-	struct nodesfile_finfo	fi ;
-	HDB		nodes ;
+	hdb		nodes ;
 	time_t		ti_check ;
 	time_t		ti_load ;
+	NODESFILE_FINFO	fi ;
 	uint		pagesize ;
 	uint		mapsize ;
 	uint		filesize ;
@@ -67,26 +65,18 @@ struct nodesfile_head {
 	uint		len ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(NODESFILE_MASTER)) || (NODESFILE_MASTER == 0)
+extern int	nodesfile_open(nodesfile *,cchar *,int,int) noex ;
+extern int	nodesfile_search(nodesfile *,cchar *,int) noex ;
+extern int	nodesfile_curbegin(nodesfile *,nodesfile_cur *) noex ;
+extern int	nodesfile_curend(nodesfile *,nodesfile_cur *) noex ;
+extern int	nodesfile_enum(nodesfile *,nodesfile_cur *,char *,int) noex ;
+extern int	nodesfile_check(nodesfile *,time_t) noex ;
+extern int	nodesfile_close(nodesfile *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	nodesfile_open(NODESFILE *,const char *,int,int) ;
-extern int	nodesfile_search(NODESFILE *,const char *,int) ;
-extern int	nodesfile_curbegin(NODESFILE *,NODESFILE_CUR *) ;
-extern int	nodesfile_curend(NODESFILE *,NODESFILE_CUR *) ;
-extern int	nodesfile_enum(NODESFILE *,NODESFILE_CUR *,char *,int) ;
-extern int	nodesfile_check(NODESFILE *,time_t) ;
-extern int	nodesfile_close(NODESFILE *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* NODESFILE_MASTER */
 
 #endif /* NODESFILE_INCLUDE */
 

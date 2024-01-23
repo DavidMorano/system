@@ -188,11 +188,11 @@ int memtrack::icount() noex {
 /* end method (memtrack::icount) */
 
 void memtrack::dtor() noex {
-	ulogerror("memtrack",SR_BUGCHECK,"fini-dtor called") ;
+	ulogerror("memtrack",SR_BUGCHECK,"dtor called") ;
 	if (magic) {
 	    cint	rs = ifinish() ;
 	    if (rs < 0) {
-		ulogerror("memtrack",rs,"fini-dtor error") ;
+		ulogerror("memtrack",rs,"dtor-finish") ;
 	    }
 	}
 }

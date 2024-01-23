@@ -28,7 +28,7 @@
 
 
 struct clusterdb_cursor {
-	kvsfile_cur	cur ;
+	kvsfile_cur	*kcurp ;
 } ;
 
 struct clusterdb_head {
@@ -45,13 +45,13 @@ extern int clusterdb_open(clusterdb *,cchar *) noex ;
 extern int clusterdb_fileadd(clusterdb *,cchar *) noex ;
 extern int clusterdb_curbegin(clusterdb *,clusterdb_cur *) noex ;
 extern int clusterdb_curend(clusterdb *,clusterdb_cur *) noex ;
-extern int clusterdb_enumcluster(clusterdb *,clusterdb_cur *,
+extern int clusterdb_curenumcluster(clusterdb *,clusterdb_cur *,
 		char *,int) noex ;
-extern int clusterdb_enum(clusterdb *,clusterdb_cur *,
+extern int clusterdb_curenum(clusterdb *,clusterdb_cur *,
 		char *,int,char *,int) noex ;
-extern int clusterdb_fetch(clusterdb *,cchar *,clusterdb_cur *,
+extern int clusterdb_curfetch(clusterdb *,cchar *,clusterdb_cur *,
 		char *,int) noex ;
-extern int clusterdb_fetchrev(clusterdb *,cchar *,clusterdb_cur *,
+extern int clusterdb_curfetchrev(clusterdb *,cchar *,clusterdb_cur *,
 		char *,int) noex ;
 extern int clusterdb_check(clusterdb *,time_t) noex ;
 extern int clusterdb_close(clusterdb *) noex ;

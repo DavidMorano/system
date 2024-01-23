@@ -73,7 +73,10 @@
 #define	UCATFORK_LIST	struct ucatfork_list
 
 
-/* typedefs */
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -116,7 +119,7 @@ namespace {
 	~ucatfork() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("ucatfork",rs,"fini") ;
+		ulogerror("ucatfork",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (ucatfork) */
     } ; /* end struct (ucatfork) */
@@ -142,6 +145,9 @@ static int	entry_match(UCATFORK_ENT *,void_f,void_f,void_f) noex ;
 /* local variables */
 
 static ucatfork		ucatfork_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -178,6 +184,7 @@ int ucatfork::init() noex {
 	int		f = false ;
 	if (!fvoid) {
 	    cint		to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = m.create) >= 0) {
 	            void_f	sb = ucatfork_atforkbefore ;
@@ -193,8 +200,9 @@ int ucatfork::init() noex {
 		        m.destroy() ;
 		    }
 	        } /* end if (ptm-create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            finit = false ;
+		}
 	    } else if (! finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {

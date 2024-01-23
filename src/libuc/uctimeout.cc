@@ -176,7 +176,7 @@ namespace {
 	~uctimeout() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("uctimeout",rs,"fini") ;
+		ulogerror("uctimeout",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (uctimeout) */
     } ; /* end struct (uctimeout) */
@@ -270,6 +270,7 @@ int uctimeout::init() noex {
 	int		f = false ;
 	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
 	            if ((rs = cv.create) >= 0) {

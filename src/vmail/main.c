@@ -1174,7 +1174,7 @@ int mainsub(int argc,cchar **argv,cchar **envv)
 	}
 
 	if (rs >= 0) {
-	    rs = initnow(&pip->now,pip->zname,ZNAMELEN) ;
+	    rs = initnow(&pip->now,pip->zname,TZABBRLEN) ;
 	    pip->daytime = pip->now.time ;
 	    pip->ti_start = pip->now.time ;
 	}

@@ -1,7 +1,7 @@
 /* dialussnls SUPPORT */
 /* lang=C++20 */
 
-/* dial out to a server listening on UNIX®NLS */
+/* dial out to a server listening on UNIX® LISTEN */
 /* version %I% last-modified %G% */
 
 
@@ -102,13 +102,14 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts) noex {
 	if (svcbuf == NULL)
 	    return SR_INVAL ;
 
-	while (CHAR_ISWHITE(*svcbuf))
-	    svcbuf += 1 ;
-
+	while (CHAR_ISWHITE(*svcbuf)) {
+	    svcbuf += 1 ;S
+	}
 	svclen = strlen(svcbuf) ;
 
-	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1]))
+	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1])) {
 	    svclen -= 1 ;
+	}
 
 	if (svclen <= 0)
 	    return SR_INVAL ;
@@ -117,36 +118,30 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts) noex {
 
 	if ((rs = uc_malloc((nlslen+1),&nlsbuf)) >= 0) {
 	    if ((rs = mknlsreq(nlsbuf,nlslen,svcbuf,svclen)) >= 0) {
-	        struct sigaction	osig, nsig ;
-	        sigset_t		signalmask ;
-	        int			blen = rs ;
-
+	        SIGACTION	osig ;
+	        SIGACTION	nsig{} ;
+	        sigset_t	signalmask ;
+	        int		blen = rs ;
 	        uc_sigsetempty(&signalmask) ;
-
-	        memclear(&nsig) ;
 	        nsig.sa_handler = SIG_IGN ;
 	        nsig.sa_mask = signalmask ;
 	        nsig.sa_flags = 0 ;
 	        if ((rs = u_sigaction(SIGPIPE,&nsig,&osig)) >= 0) {
-
-	            if (portspec == NULL)
+	            if (portspec == NULL) {
 	                portspec = "/tmp/unix" ;
-
+		    }
 	            if ((rs = dialuss(portspec,to,aopts)) >= 0) {
 	                fd = rs ;
-
 	                if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
 	                    cint	rlen = RBUFLEN ;
 	                    char	rbuf[RBUFLEN+1] = { 0 } ;
 	                    rs = readnlsresp(fd,rbuf,rlen,to) ;
 	                } /* end if (read response) */
-
 	                if (rs < 0) u_close(fd) ;
 	            } /* end if (opened) */
-
-	            u_sigaction(SIGPIPE,&osig,NULL) ;
+	            rs1 = u_sigaction(SIGPIPE,&osig,NULL) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigaction) */
-
 	    } else {
 	        rs = SR_TOOBIG ;
 	    }

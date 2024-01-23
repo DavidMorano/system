@@ -113,6 +113,10 @@
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
 
+#ifndef	CF_PROTO
+#define	CF_PROTO	0		/* need dynamic protocol number */
+#endif
+
 
 /* external subroutines */
 
@@ -173,6 +177,11 @@ static int	subinfo_makeconn(SUBINFO *,int,SOCKADDR *) noex ;
 
 /* local variables */
 
+constexpr bool		f_proto = CF_PROTO ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
@@ -202,10 +211,10 @@ int dialtcp(cchar *hostname,cchar *portspec,int af,int to,int opts) noex {
 	            } /* end if (subinfo_proto) */
 	            rs1 = subinfo_finish(sip) ;
 	            if (rs >= 0) rs = rs1 ;
-	            if ((rs < 0) && (fd >= 0)) {
-		        uc_close(fd) ;
-	            }
 	        } /* end if (subinfo) */
+	        if ((rs < 0) && (fd >= 0)) {
+		    uc_close(fd) ;
+	        }
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
@@ -218,6 +227,7 @@ int dialtcp(cchar *hostname,cchar *portspec,int af,int to,int opts) noex {
 static int subinfo_start(SUBINFO *sip,cchar *hn,cchar *ps,int to) noex {
 	int		rs = SR_FAULT ;
 	if (sip) {
+	    rs = SR_OK ;
 	    memclear(sip) ;
 	    sip->hostname = hn ;
 	    sip->portspec = ps ;
@@ -240,17 +250,15 @@ static int subinfo_finish(SUBINFO *sip) noex {
 
 static int subinfo_proto(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-#if	CF_PROTO
-	{
+	if constexpr (f_proto) {
 	    int		rs ;
 	    cchar	*pn = sip->protoname ;
 	    if ((rs = getproto_name(pn,-1)) >= 0) {
 	        sip->proto = rs ;
 	    }
+	} else {
+	    sip->proto = IPPROTO_TCP ;
 	}
-#else
-	sip->proto = IPPROTO_TCP ;
-#endif /* CF_PROTO */
 	return rs ;
 }
 /* end subroutine (subinfo_proto) */
@@ -430,14 +438,16 @@ static int try_addr(SUBINFO *sip) noex {
 	    cint		port = sip->port ;
 	    uchar		*ap = (uchar *) sip->addrbuf ;
 	    if ((rs = sockaddress_start(&server,sip->af,ap,port,0)) >= 0) {
-	        SOCKADDR	*sap ;
-	        sip->count += 1 ;
-	        sap = (SOCKADDR *) &server ;
-	        rs = subinfo_makeconn(sip,pf,sap) ;
-	        fd = rs ;
+	        SOCKADDR	*sap = (SOCKADDR *) &server ;
+		{
+	            sip->count += 1 ;
+	            rs = subinfo_makeconn(sip,pf,sap) ;
+	            fd = rs ;
+		}
 	        rs1 = sockaddress_finish(&server) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (sockaddress) */
+	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} /* end if (getprotofamily) */
 	return (rs >= 0) ? fd : rs ;
 }

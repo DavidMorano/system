@@ -95,7 +95,7 @@ namespace {
 	~sysdbmgr() noex {
 	    cint	rs = fini() ;
 	    if (rs < 0) {
-		ulogerror("sysdbmgr",rs,"fini") ;
+		ulogerror("sysdbmgr",rs,"dtor-fini") ;
 	    }
 	} ; /* end dtor (sysdbmgr) */
     } ; /* end structure (sysdbmgr) */

@@ -67,7 +67,7 @@ int dialcprogmsg_end(char *mbuf,int mlen,bool f,DMSG_END *sp) noex {
 	        serialbuf_ri(&msgbuf,&sp->opts) ;
 	    } else { /* write */
 	        sp->type = dialcprogmsgtype_end ;
-	        serialbuf_wc(&msgbuf,sp->type) ;
+	        serialbuf_wuc(&msgbuf,sp->type) ;
 	        serialbuf_wus(&msgbuf,4) ;
 	        serialbuf_wus(&msgbuf,sp->flags) ;
 	        serialbuf_wi(&msgbuf,sp->opts) ;
@@ -94,7 +94,7 @@ int dialcprogmsg_light(char *mbuf,int mlen,bool f,DMSG_LIGHT *sp) noex {
 	        serialbuf_robj(&msgbuf,&sp->saerr,int(sp->salen2)) ;
 	    } else { /* write */
 	        sp->type = dialcprogmsgtype_light ;
-	        serialbuf_wc(&msgbuf,sp->type) ;
+	        serialbuf_wuc(&msgbuf,sp->type) ;
 	        usw = sp->salen1 + sp->salen2 + (2 * sizeof(ushort)) ;
 	        serialbuf_wus(&msgbuf,usw) ;
 	        serialbuf_wus(&msgbuf,sp->salen1) ;

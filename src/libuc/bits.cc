@@ -313,7 +313,7 @@ static int bits_alloc(bits *op,int nn) noex {
 void bits::dtor() noex {
 	cint	rs = finish ;
 	if (rs < 0) {
-	    ulogerror("bits",rs,"fini-finish") ;
+	    ulogerror("bits",rs,"dtor-finish") ;
 	}
 }
 /* end subroutine (bits::dtor) */

@@ -128,56 +128,49 @@ constexpr bool	f_cr = CF_CR ;
 
 int dialfinger(cc *hn,cc *ps,int af,cc *svc,
 		mainv sargs,int to,int dot) noex {
-	int		rs ;
-	int		svclen ;
-	int		mlen ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		fd = -1 ;
-	char		*mbuf ;
-
-	if (hn == nullptr) return SR_FAULT ;
-	if (svc == nullptr) return SR_FAULT ;
-
-	if ((hn[0] == '\0') || (svc[0] == '\0'))
-	    return SR_INVALID ;
-
-/* perform some cleanup on the service code specification */
-
-	while (CHAR_ISWHITE(*svc)) {
-	    svc += 1 ;
-	}
-
-	svclen = getsvclen(svc) ;
-
-	mlen = getmlen(svclen,sargs) ;
-
-/* format the service string to be transmitted */
-
-	if ((rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
-	    if ((rs = mkmuxreq(mbuf,mlen,svc,svclen,sargs,dot)) >= 0) {
-	        SIGACTION	sighand{} ;
-	        SIGACTION	osighand ;
-	        sigset_t	sigmask ;
-	        int		ml = rs ;
-	        uc_sigsetempty(&sigmask) ;
-	        sighand.sa_handler = SIG_IGN ;
-	        sighand.sa_mask = sigmask ;
-	        sighand.sa_flags = 0 ;
-	        if ((rs = u_sigaction(SIGPIPE,&sighand,&osighand)) >= 0) {
-	            if ((rs = dialourtcp(hn,ps,af,to,dot)) >= 0) {
-	                fd = rs ;
-	                if ((rs = uc_writen(fd,mbuf,ml)) >= 0) {
-	                    rs = u_shutdown(fd,SHUT_WR) ;
-	                }
-	                if (rs < 0) u_close(fd) ;
-	            } /* end if (opened) */
-	            u_sigaction(SIGPIPE,&osighand,nullptr) ;
-	        } /* end if (signal) */
-	    } else {
-	        rs = SR_TOOBIG ;
-	    }
-	    uc_free(mbuf) ;
-	} /* end if (memory-allocation-free) */
-
+	if (hn && svc) {
+	    rs = SR_INVALID ;
+	    if (hn[0] || svc[0]) {
+	        int	svclen ;
+	        int	mlen ;
+	        char	*mbuf ;
+	        while (CHAR_ISWHITE(*svc)) {
+	            svc += 1 ;
+	        }
+	        svclen = getsvclen(svc) ;
+	        mlen = getmlen(svclen,sargs) ;
+	        if ((rs = uc_malloc((mlen+1),&mbuf)) >= 0) {
+	            if ((rs = mkmuxreq(mbuf,mlen,svc,svclen,sargs,dot)) >= 0) {
+	                SIGACTION	nhand{} ;
+	                SIGACTION	ohand ;
+	                sigset_t	sigmask ;
+	                int		ml = rs ;
+	                uc_sigsetempty(&sigmask) ;
+	                nhand.sa_handler = SIG_IGN ;
+	                nhand.sa_mask = sigmask ;
+	                nhand.sa_flags = 0 ;
+	                if ((rs = u_sigaction(SIGPIPE,&nhand,&ohand)) >= 0) {
+	                    if ((rs = dialourtcp(hn,ps,af,to,dot)) >= 0) {
+	                        fd = rs ;
+	                        if ((rs = uc_writen(fd,mbuf,ml)) >= 0) {
+	                            rs = u_shutdown(fd,SHUT_WR) ;
+	                        }
+	                    } /* end if (opened) */
+	                    rs1 = u_sigaction(SIGPIPE,&ohand,nullptr) ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (signal) */
+	            } else {
+	                rs = SR_TOOBIG ;
+	            }
+	            rs1 = uc_free(mbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory-allocation-free) */
+	        if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialfinger) */

@@ -256,7 +256,7 @@ int dirseen::add(cchar *sp,int sl,USTAT *sbp) noex {
 void dirseen::dtor() noex {
 	cint	rs = int(finish) ;
 	if (rs < 0) {
-	    ulogerror("dirseen",rs,"fini-finish") ;
+	    ulogerror("dirseen",rs,"dtor-finish") ;
 	}
 }
 

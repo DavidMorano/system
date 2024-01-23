@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	Dialopts
+
+	Description:
 	Set some options on a socket.
 
 	Synopsis:
@@ -27,8 +31,8 @@
 	opts		options
 
 	Returns:
-	<0		error in dialing
 	>=0		file descriptor
+	<0		error in dialing (system-return)
 
 *******************************************************************************/
 
@@ -52,6 +56,12 @@
 #ifndef	CF_LINGER
 #define CF_LINGER	1
 #endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -78,21 +88,23 @@ extern "C" {
 constexpr bool		f_linger = CF_LINGER ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dialopts(int fd,int opts) noex {
 	int		rs = SR_BADF ;
 	if (fd >= 0) {
+	    int	one = 1 ;
 	    rs = SR_INVALID ;
 	    if (opts & DIALOPT_KEEPALIVE) {
-	        cint	size = sizeof(int) ;
+	        cint	osz = sizeof(int) ;
 	        cint	sol = SOL_SOCKET ;
 	        cint	cmd = SO_KEEPALIVE ;
-	        int	one = 1 ;
-	        int	*onep ;
-	        onep = &one ;
-	        rs = u_setsockopt(fd,sol,cmd,onep,size) ;
-	    }
+	        int	*const onep = &one ;
+	        rs = u_setsockopt(fd,sol,cmd,onep,osz) ;
+	    } /* end if (keep-alive) */
 	    if constexpr (f_linger) {
 	        if (rs >= 0) {
 	            cint	to = (opts & DIALOPT_LINGER) ? LINGERTIME : 30 ;

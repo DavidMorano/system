@@ -20,8 +20,7 @@
 
 EXTERNC_begin
 
-extern int dialcprog(cchar *pr,cchar *node,cchar *fname,mainv av,mainv ev,
-		int to,int opts,int *fd2p) noex ;
+extern int dialcprog(cchar *,cchar *,cchar *,mainv,mainv,int,int,int *) noex ;
 
 EXTERNC_end
 
