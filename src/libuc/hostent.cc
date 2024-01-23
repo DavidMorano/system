@@ -116,7 +116,7 @@ int hostent_getofficial(HOSTENT *hep,cchar **rpp) noex {
 int hostent_getaf(HOSTENT *hep) noex {
 	int		rs = SR_FAULT ;
 	if (hep) {
-	    rs = (hep->h_addrtype) ;
+	    rs = hep->h_addrtype ;
 	} /* end if (non-null) */
 	return rs ;
 }
