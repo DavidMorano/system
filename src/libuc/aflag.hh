@@ -16,7 +16,7 @@
 
 #ifndef	AFLAG_INCLUDE
 #define	AFLAG_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus			/* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */

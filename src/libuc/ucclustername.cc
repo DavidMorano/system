@@ -108,6 +108,11 @@ typedef volatile sig_atomic_t	vaflag ;
 
 /* external subroutines */
 
+extern "C" {
+    int		ucclustername_init() noex ;
+    int		ucclustername_fini() noex ;
+}
+
 
 /* external variables */
 
@@ -145,11 +150,6 @@ struct subinfo {
 
 
 /* forward references */
-
-extern "C" {
-    int		ucclustername_init() noex ;
-    int		ucclustername_fini() noex ;
-}
 
 extern "C" {
     static void	ucclustername_atforkbefore() noex ;

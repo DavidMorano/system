@@ -99,7 +99,15 @@
 typedef volatile sig_atomic_t	vaflag ;
 
 
+/* external namespaces */
+
+
 /* external subroutines */
+
+extern "C" {
+    int		ucproguser_init() noex ;
+    int		ucproguser_fini() noex ;
+}
 
 
 /* external variables */
@@ -130,8 +138,6 @@ namespace {
 
 /* forward references */
 
-int		ucproguser_init() noex ;
-int		ucproguser_fini() noex ;
 
 extern "C" {
     static void	ucproguser_atforkbefore() noex ;
@@ -168,14 +174,17 @@ int ucproguser_init() noex {
 	                    uip->f_initdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                ptm_destroy(&uip->m) ;
+		    }
 	        } /* end if (ptm_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uip->f_init = false ;
+		}
 	    } else if (! uip->f_initdone) {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	            rs = msleep(1) ;

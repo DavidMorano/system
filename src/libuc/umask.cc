@@ -95,14 +95,17 @@ int umask_init() noex {
 	    	            uip->f_initdone = true ;
 		            f = true ;
 		        }
-		        if (rs < 0)
+		        if (rs < 0) {
 		            uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	 	    if (rs < 0)
+	 	    if (rs < 0) {
 		        ptm_destroy(&uip->m) ;
+		    }
 	        } /* end if (ptm_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uip->f_init = false ;
+		}
 	    } else {
 	        while ((rs >= 0) && uip->f_init && (! uip->f_initdone)) {
 	            rs = msleep(1) ;
