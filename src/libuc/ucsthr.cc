@@ -56,8 +56,8 @@
 	tfl		flags to manage thread creation
 
 	Returns:
-	<0		error
 	>=0		thread ID
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -77,15 +77,18 @@
 
 /* local defines */
 
-#ifndef	TYPEDEF_CVOID
-#define	TYPEDEF_CVOID
-typedef const void	cvoid ;
-#endif
+
+/* local namespaces */
 
 
-/* typedefs */
+/* local typedefs */
 
-typedef int (*thr_f)(void *) ;
+extern "C" {
+    typedef int (*thr_f)(void *) noex ;
+}
+
+
+/* local variables */
 
 
 /* external subroutines */
