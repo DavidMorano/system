@@ -1,9 +1,8 @@
-/* thrcomm */
+/* thrcomm SUPPORT */
+/* lang=C++20 */
 
 /* Thread-Communication (THRCOMM) */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,24 +16,17 @@
 
 /*******************************************************************************
 
-	This object provides some minimal communication between a controller
-	thread and a separate parallel thread.
-
+	This object provides some minimal communication between a
+	controller thread and a separate parallel thread.
 
 *******************************************************************************/
 
-
-#define	THRCOMM_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -50,10 +42,6 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
 
 /* forward references */
 
@@ -66,11 +54,8 @@ static int	thrcomm_ptcinit(THRCOMM *,int) ;
 
 /* exported subroutines */
 
-
-int thrcomm_start(THRCOMM *psp,int f_shared)
-{
+int thrcomm_start(THRCOMM *psp,int f_shared) noex {
 	int		rs ;
-
 	if (psp != NULL) {
 	    memset(psp,0,sizeof(THRCOMM)) ;
 	    if ((rs = thrcomm_ptminit(psp,f_shared)) >= 0) {
@@ -88,9 +73,7 @@ int thrcomm_start(THRCOMM *psp,int f_shared)
 }
 /* end subroutine (thrcomm_start) */
 
-
-int thrcomm_finish(THRCOMM *psp)
-{
+int thrcomm_finish(THRCOMM *psp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -109,10 +92,8 @@ int thrcomm_finish(THRCOMM *psp)
 }
 /* end subroutine (thrcomm_finish) */
 
-
-int thrcomm_cmdsend(THRCOMM *psp,int cmd,int to)
-{
-	struct timespec	ts ;
+int thrcomm_cmdsend(THRCOMM *psp,int cmd,int to) noex {
+	TIMESPEC	ts ;
 	int		rs ;
 	int		rs1 ;
 
@@ -154,10 +135,8 @@ int thrcomm_cmdsend(THRCOMM *psp,int cmd,int to)
 }
 /* end subroutine (thrcomm_cmdsend) */
 
-
-int thrcomm_cmdrecv(THRCOMM *psp,int to)
-{
-	struct timespec	ts ;
+int thrcomm_cmdrecv(THRCOMM *psp,int to) noex {
+	TIMESPEC	ts ;
 	int		rs ;
 	int		rs1 ;
 	int		cmd = 0 ;
@@ -194,10 +173,8 @@ int thrcomm_cmdrecv(THRCOMM *psp,int to)
 }
 /* end subroutine (thrcomm_cmdrecv) */
 
-
-int thrcomm_rspsend(THRCOMM *psp,int rrs,int to)
-{
-	struct timespec	ts ;
+int thrcomm_rspsend(THRCOMM *psp,int rrs,int to) noex {
+	TIMESPEC	ts ;
 	int		rs ;
 	int		rs1 ;
 
@@ -233,10 +210,8 @@ int thrcomm_rspsend(THRCOMM *psp,int rrs,int to)
 }
 /* end subroutine (thrcomm_rspsend) */
 
-
-int thrcomm_rsprecv(THRCOMM *psp,int to)
-{
-	struct timespec	ts ;
+int thrcomm_rsprecv(THRCOMM *psp,int to) noex {
+	TIMESPEC	ts ;
 	int		rs ;
 	int		rs1 ;
 	int		rrs = 0 ;
@@ -273,9 +248,7 @@ int thrcomm_rsprecv(THRCOMM *psp,int to)
 }
 /* end subroutine (thrcomm_rsprecv) */
 
-
-int thrcomm_exiting(THRCOMM *psp)
-{
+int thrcomm_exiting(THRCOMM *psp) noex {
 	int		rs = SR_OK ;
 	psp->f_exiting = TRUE ;
 	psp->cmd = 0 ;
@@ -289,10 +262,8 @@ int thrcomm_exiting(THRCOMM *psp)
 
 /* private subroutines */
 
-
-static int thrcomm_ptminit(THRCOMM *psp,int f_shared)
-{	
-	PTMA		a ;
+static int thrcomm_ptminit(THRCOMM *psp,int f_shared) noex {
+	ptma		a ;
 	int		rs ;
 	int		rs1 ;
 	int		f_ptm = FALSE ;
@@ -300,7 +271,7 @@ static int thrcomm_ptminit(THRCOMM *psp,int f_shared)
 	if ((rs = ptma_create(&a)) >= 0) {
 
 	    if (f_shared) {
-		const int	v = PTHREAD_PROCESS_SHARED ;
+		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptma_setpshared(&a,v) ;
 	    }
 
@@ -318,10 +289,8 @@ static int thrcomm_ptminit(THRCOMM *psp,int f_shared)
 }
 /* end subroutine (thrcomm_ptminit) */
 
-
-static int thrcomm_ptcinit(THRCOMM *psp,int f_shared)
-{	
-	PTCA		a ;
+static int thrcomm_ptcinit(THRCOMM *psp,int f_shared) noex {
+	ptca		a ;
 	int		rs ;
 	int		rs1 ;
 	int		f_ptc = FALSE ;
@@ -329,7 +298,7 @@ static int thrcomm_ptcinit(THRCOMM *psp,int f_shared)
 	if ((rs = ptca_create(&a)) >= 0) {
 
 	    if (f_shared) {
-		const int	v = PTHREAD_PROCESS_SHARED ;
+		cint	v = PTHREAD_PROCESS_SHARED ;
 		rs = ptca_setpshared(&a,v) ;
 	    }
 
