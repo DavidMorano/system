@@ -34,25 +34,25 @@
 
 EXTERNC_begin
 
-extern int malloc_ma(char **) noex ;
-extern int malloc_mn(char **) noex ;
-extern int malloc_mp(char **) noex ;
-extern int malloc_ml(char **) noex ;
-extern int malloc_nn(char **) noex ;
-extern int malloc_hn(char **) noex ;
-extern int malloc_un(char **) noex ;
-extern int malloc_gn(char **) noex ;
-extern int malloc_pn(char **) noex ;
-extern int malloc_pw(char **) noex ;
-extern int malloc_sp(char **) noex ;
-extern int malloc_ua(char **) noex ;
-extern int malloc_gr(char **) noex ;
-extern int malloc_pj(char **) noex ;
-extern int malloc_pr(char **) noex ;
-extern int malloc_nw(char **) noex ;
-extern int malloc_ho(char **) noex ;
-extern int malloc_sv(char **) noex ;
-extern int malloc_zn(char **) noex ;
+extern int malloc_ma(char **) noex ;	/* max-args */
+extern int malloc_mn(char **) noex ;	/* max-name */
+extern int malloc_mp(char **) noex ;	/* max-path */
+extern int malloc_ml(char **) noex ;	/* max-line */
+extern int malloc_nn(char **) noex ;	/* node-name */
+extern int malloc_hn(char **) noex ;	/* host-name */
+extern int malloc_un(char **) noex ;	/* user-name */
+extern int malloc_gn(char **) noex ;	/* group-name */
+extern int malloc_pn(char **) noex ;	/* project-name */
+extern int malloc_pw(char **) noex ;	/* PW object */
+extern int malloc_sp(char **) noex ;	/* SP object */
+extern int malloc_ua(char **) noex ;	/* UA object */
+extern int malloc_gr(char **) noex ;	/* GR object */
+extern int malloc_pj(char **) noex ;	/* PJ object */
+extern int malloc_pr(char **) noex ;	/* PR object */
+extern int malloc_nw(char **) noex ;	/* NW object */
+extern int malloc_ho(char **) noex ;	/* HO object */
+extern int malloc_sv(char **) noex ;	/* SV object */
+extern int malloc_zn(char **) noex ;	/* TZ name */
 
 extern int malloc_addr(char **) noex ;
 
