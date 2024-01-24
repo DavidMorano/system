@@ -56,18 +56,19 @@ INCS= dial.h dialopts.h
 
 OBJ0_DIAL= dialopts.o 
 OBJ1_DIAL= dialpass.o 
-OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o dialfinger.o dialhttp.o
-OBJ3_DIAL= dialudp.o 
-OBJ4_DIAL= dialusd.o 
-OBJ5_DIAL= dialuss.o dialussmux.o dialussnls.o
-#OBJ6_DIAL= dialprog.o dialcprog.o 
-OBJ6_DIAL= dialprog.o
-OBJ7_DIAL= dialticotsord.o dialticotsordmux.o dialticotsordnls.o
+OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o 
+OBJ3_DIAL= dialfinger.o dialhttp.o
+OBJ4_DIAL= dialudp.o 
+OBJ5_DIAL= dialusd.o 
+OBJ6_DIAL= dialuss.o dialussmux.o dialussnls.o
+OBJ7_DIAL= dialprog.o
+OBJ8_DIAL= dialticotsord.o dialticotsordmux.o dialticotsordnls.o
 
 OBJA_DIAL= obj0_dial.o obj1_dial.o
 OBJB_DIAL= obj2_dial.o obj3_dial.o
 OBJC_DIAL= obj4_dial.o obj5_dial.o
-OBJD_DIAL= obj6_dial.o
+OBJD_DIAL= obj6_dial.o obj7_dial.o
+OBJE_DIAL= obj8_dial.o
 
 OBJ_DIAL= $(OBJA_DIAL) $(OBJB_DIAL) $(OBJC_DIAL) $(OBJD_DIAL)
 
@@ -138,6 +139,9 @@ obj6_dial.o:	$(OBJ6_DIAL)
 
 obj7_dial.o:	$(OBJ7_DIAL)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_DIAL)
+
+obj8_dial.o:	$(OBJ8_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8_DIAL)
 
 
 dialopts.o:		dialopts.cc $(INCS)

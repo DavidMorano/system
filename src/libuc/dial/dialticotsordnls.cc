@@ -24,23 +24,29 @@
 	has the NLS listener on it.
 
 	Synopsis:
-	int dialticotsordnls(abuf,alen,svcbuf,to,opts)
-	const char	abuf[] ;
-	const char	svcbuf[] ;
-	int		alen ;
-	int		to ;
-	int		opts ;
+	int dialticotsordnls(cc *abuf,int alen,cc *svc,int to,int dot) noex
 
 	Arguments:
 	abuf		XTI address
 	alen		address of XTI address
 	svcbuf		service specification
 	to		to ('>=0' mean use one, '-1' means don't)
-	opts		any dial opts
+	dot
 
 	Returns:
 	>=0		file descriptor
-	<0		error in dialing
+	<0		error in dialing (system-return)
+
+	Origin:
+	-Dial
+	-Transport
+	-Interface
+	-Connection
+	-Oriented
+	-Transport
+	-Service
+	-Orderly
+	-Release
 
 *******************************************************************************/
 
@@ -59,9 +65,11 @@
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sigblock.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 #include	"nlsdialassist.h"
+#include	"dialtocotsord.h"
 
 
 /* local defines */
@@ -84,12 +92,6 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	dialticotsord(const char *,int,int,int) ;
-
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -105,17 +107,8 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int dialticotsordnls(abuf,alen,svcbuf,to,opts)
-const char	abuf[] ;
-const char	svcbuf[] ;
-int		alen ;
-int		to ;
-int		opts ;
-{
-	SIGACTION	sigs, oldsigs ;
-	sigset_t	signalmask ;
-	cint	nlslen = NLSBUFLEN ;
+int dialticotsordnls(cc *abuf,int alen,cc *svcbuf,int to,int opts) noex {
+	cint		nlslen = NLSBUFLEN ;
 	int		rs = SR_OK ;
 	int		svclen ;
 	int		fd = -1 ;
@@ -145,34 +138,27 @@ int		opts ;
 	} /* end if (default UNIX® address!) */
 
 	if ((rs = mknlsreq(nlsbuf,nlslen,svcbuf,svclen)) >= 0) {
+	    SIGACTION	osigs ;
+	    SIGACTION	nsigs{} ;
+	    nsigset_t	sigmask ;
 	    cint	blen = rs ;
-
-	    uc_sigsetempty(&signalmask) ;
-
-	    memclear(&sigs) ;
-	    sigs.sa_handler = SIG_IGN ;
-	    sigs.sa_mask = signalmask ;
-	    sigs.sa_flags = 0 ;
-	    if ((rs = u_sigaction(SIGPIPE,&sigs,&oldsigs)) >= 0) {
-
+	    uc_nsigsetempty(&sigmask) ;
+	    nsigs.sa_handler = SIG_IGN ;
+	    nsigs.sa_mask = sigmask ;
+	    nsigs.sa_flags = 0 ;
+	    if ((rs = u_sigaction(SIGPIPE,&nsigs,&osigs)) >= 0) {
 	        if ((rs = dialticotsord(abuf,alen,to,opts)) >= 0) {
 	            fd = rs ;
-
-/* transmit the formatted service code and arguments */
-
 	            rs = uc_writen(fd,nlsbuf,blen) ;
 	            if (rs >= 0) {
 	                cint	tlen = TBUFLEN ;
 	                char	tbuf[TBUFLEN+1] ;
 	                rs = readnlsresp(fd,tbuf,tlen,to) ;
 	            } /* end if (reading response) */
-
-	            if (rs < 0) u_close(fd) ;
 	        } /* end if (opened) */
-
-	        u_sigaction(SIGPIPE,&oldsigs,NULL) ;
+	        u_sigaction(SIGPIPE,&osigs,NULL) ;
 	    } /* end if (sig-action) */
-
+	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
 	} else {
 	    rs = SR_TOOBIG ;
 	}

@@ -1263,7 +1263,8 @@ iserror.o:		iserror.cc iserror.h isoneof.h
 readln.o:		readln.cc readln.hh
 ccfile.o:		ccfile.cc ccfile.hh
 strlibval.o:		strlibval.cc strlibval.hh
-
+thrcomm.o:		thrcomm.cc thrcomm.h
+thrbase.o:		thrbase.cc thrbase.h thrcomm.h
 
 
 userattrdb.o:		userattrdb.cc	userattrdb.h

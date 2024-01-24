@@ -104,10 +104,6 @@
 #define	ADDRBUFLEN	64
 #endif
 
-#ifndef	HEXBUFLEN
-#define	HEXBUFLEN	100
-#endif
-
 #define	RETRIES		1		/* Sun-Solaris problem */
 
 #define	SUBINFO		struct subinfo
@@ -337,14 +333,14 @@ static int subinfo_tryone(SUBINFO *sip) noex {
 /* end subroutine (subinfo_tryone) */
 
 static int try_inet4(SUBINFO *sip) noex {
-	HOSTINFO	hi ;
-	HOSTINFO_CUR	hc ;
+	hostinfo	hi ;
+	hostinfo_cur	hc ;
 	cint		af = AF_INET4 ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
 	if ((rs = hostinfo_start(&hi,af,sip->hostname)) >= 0) {
-	    SOCKADDRESS	server ;
+	    sockaddress	server ;
 	    cint	pf = PF_INET4 ;
 	    uchar	da[2] = {} ; /* dummy address */
 	    if ((rs = sockaddress_start(&server,af,da,sip->port,0)) >= 0) {
@@ -391,7 +387,7 @@ static int try_inet6(SUBINFO *sip) noex {
 	int		fd = -1 ;
 	flags = AI_ADDRCONFIG ;
 	if ((rs = uc_getipnodebyname(&hep,sip->hostname,af,flags)) >= 0) {
-	    SOCKADDRESS	server ;
+	    sockaddress	server ;
 	    cint	pf = PF_INET6 ;
 	    uchar	dummy[2] = {} ;
 	    if ((rs = sockaddress_start(&server,af,dummy,sip->port,0)) >= 0) {
@@ -433,7 +429,7 @@ static int try_addr(SUBINFO *sip) noex {
 	int		rs1 ;
 	int		fd = 0 ;
 	if ((rs = getprotofamily(sip->af)) >= 0) {
-	    SOCKADDRESS		server ;
+	    sockaddress		server ;
 	    cint		pf = rs ;
 	    cint		port = sip->port ;
 	    uchar		*ap = (uchar *) sip->addrbuf ;

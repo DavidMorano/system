@@ -36,6 +36,7 @@
 #include	<ctime>
 #include	<usystem.h>
 #include	<buffer.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
