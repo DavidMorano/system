@@ -18,10 +18,7 @@
 #define	PQ_INCLUDE
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
-#include	<usysrets.h>
-#include	<clanguage.h>
+#include	<usystem.h>
 
 
 #define	PQ		struct pq_head

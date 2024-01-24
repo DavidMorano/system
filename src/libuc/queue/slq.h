@@ -20,7 +20,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<utypedefs.h>
+#include	<usysdefs.h>
+#include	<usysrets.h>
 #include	<clanguage.h>
 
 

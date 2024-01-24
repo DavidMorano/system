@@ -122,6 +122,7 @@ static int	mkvars() noex ;
 /* local variables */
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 static char		fterms[termsize] ;
 static vars		var ;

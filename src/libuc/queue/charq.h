@@ -18,6 +18,9 @@
 #define	CHARQ_INCLUDE
 
 
+#include	<usystem.h>
+
+
 #define	CHARQ		struct charq_head
 
 

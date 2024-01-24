@@ -53,6 +53,7 @@
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<mallocxx.h>
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sfx.h>
@@ -69,13 +70,6 @@
 #define	SVC_LISTEN	"listen"
 #define	SVC_TCPNLS	"tcpnls"
 
-#ifndef	SVCLEN
-#define	SVCLEN		MAXNAMELEN
-#endif
-
-#define	NLSBUFLEN	(SVCLEN + 30)
-#define	RBUFLEN		MAXNAMELEN
-
 
 /* external subroutines */
 
@@ -88,8 +82,13 @@
 
 /* forward references */
 
+static int	dialconn(int,cchar *,int,int) noex ;
+
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -104,17 +103,17 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	        int		sl ;
 	        cchar		*sp{} ;
 	        if ((sl = sfshrink(svc,-1,&sp)) > 0) {
-	            cint	nlslen = NLSBUFLEN ;
 	            char	*nlsbuf{} ;
-	            if ((rs = uc_malloc((nlslen+1),&nlsbuf)) >= 0) {
+	            if ((rs = malloc_mn(&nlsbuf)) >= 0) {
+	                cint	nlslen = rs ;
 	                if ((rs = mknlsreq(nlsbuf,nlslen,sp,sl)) >= 0) {
 		            SIGACTION	osig ;
 		            SIGACTION	nsig{} ;
-		            sigset_t	signalmask ;
+		            sigset_t	sigmask ;
 	                    cint	blen = rs ;
-	                    uc_sigsetempty(&signalmask) ;
+	                    uc_sigsetempty(&sigmask) ;
 	                    nsig.sa_handler = SIG_IGN ;
-	                    nsig.sa_mask = signalmask ;
+	                    nsig.sa_mask = sigmask ;
 	                    nsig.sa_flags = 0 ;
 	                    if ((rs = u_sigaction(SIGPIPE,&nsig,&osig)) >= 0) {
 	                        if (ps == nullptr) {
@@ -131,11 +130,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	                            fd = rs ;
 	                        }
 	                        if (rs >= 0) {
-	                            if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
-	                                cint	rlen = RBUFLEN ;
-	                                char	rbuf[RBUFLEN+1] = { 0 } ;
-	                                rs = readnlsresp(fd,rbuf,rlen,to) ;
-	                            } /* end if (read response) */
+				    rs = dialconn(fd,nlsbuf,blen,to) ;
 	                        } /* end if (opened) */
 	                        rs1 = u_sigaction(SIGPIPE,&osig,nullptr) ;
 		                if (rs >= 0) rs = rs1 ;
@@ -153,5 +148,24 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialtcpnls) */
+
+
+/* local subroutines */
+
+static int dialconn(int fd,cc *nbuf,int nlen,int to) noex {
+	int		rs ;
+	int		rs1 ;
+	char		*rbuf{} ;
+	if ((rs = malloc_mn(&rbuf)) >= 0) {
+	    cint	rlen = rs ;
+	    if ((rs = uc_writen(fd,nbuf,nlen)) >= 0) {
+		rs = readnlsresp(fd,rbuf,rlen,to) ;
+	    } /* end if (read response) */
+	    rs1 = uc_free(rbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return rs ;
+}
+/* end subroutine (dialconn) */
 
 
