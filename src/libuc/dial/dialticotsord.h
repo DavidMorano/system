@@ -47,10 +47,9 @@
 
 EXTERNC_begin
 
-extern int dialtcp(cchar *,cchar *,int,int,int) noex ;
-extern int dialtcpmux(cc *,cc *,int,cc *,mainv,int,int) noex ;
-extern int dialfinger(cc *,cc *,int,cc *,mainv,int,int) noex ;
-extern int dialhttp(cc *,cc *,int,cc *,mainv,int,int) noex ;
+extern int dialticotsord(cchar,int,int,int) noex ;
+extern int dialticotsordnls(cc *,int,cc *,int,int) noex ;
+extern int dialticotsordmux(cc *,int,cc *,mainv,int,int) noex ;
 
 EXTERNC_end
 

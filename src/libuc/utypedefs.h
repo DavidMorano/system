@@ -232,6 +232,16 @@ typedef const unsigned long	culong ;
 typedef const char		cc ;
 #endif
 
+#ifndef	TYPEDEF_VOIDP
+#define	TYPEDEF_VOIDP
+typedef void *			voidp ;
+#endif
+
+#ifndef	TYPEDEF_CVOIDP
+#define	TYPEDEF_CVOIDP
+typedef const void *		cvoidp ;
+#endif
+
 #ifndef	TYPEDEF_CCP
 #define	TYPEDEF_CCP
 typedef const char		*ccp ;

@@ -126,7 +126,7 @@ constexpr bool	f_pushmod = CF_PUSHMOD ;
 
 /* exported subroutines */
 
-int dialticotsord(cchar abuf[],int alen,int to,int opts) noex {
+int dialticotsord(cchar *abuf,int alen,int to,int opts) noex {
 	SUBINFO		g ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
@@ -225,15 +225,14 @@ static int pushmod(int fd,cchar *mods) noex {
 	        if (strcmp(mbuf,timod) == 0) {
 	            rs = u_ioctl(fd,I_POP,0) ;
 	        }
-	    } else if (rs == SR_INVALID)
+	    } else if (rs == SR_INVALID) {
 	        rs = SR_OK ;
-
+	    }
 	    if (rs >= 0) {
 	        int	cl ;
 	        cchar	*sp = mods ;
-	        cchar	*cp ;
+	        cchar	*cp{} ;
 	        cchar	*tp ;
-
 	        while ((tp = strchr(sp,',')) != NULL) {
 	            if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
 	                strnwcpy(mbuf,MAXNAMELEN,cp,cl) ;

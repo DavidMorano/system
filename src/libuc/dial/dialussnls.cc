@@ -36,6 +36,7 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<buffer.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -103,7 +104,7 @@ int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts) noex {
 	    return SR_INVAL ;
 
 	while (CHAR_ISWHITE(*svcbuf)) {
-	    svcbuf += 1 ;S
+	    svcbuf += 1 ;
 	}
 	svclen = strlen(svcbuf) ;
 

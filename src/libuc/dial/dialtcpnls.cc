@@ -111,7 +111,7 @@ int dialtcpnls(cc *hn,cc *ps,int af,cc *svc,int to,int opts) noex {
 	    rs = SR_INVALID ;
 	    if (hn[0] && svc[0]) {
 	        int		sl ;
-	        cchar		*sp ;
+	        cchar		*sp{} ;
 	        if ((sl = sfshrink(svc,-1,&sp)) > 0) {
 	            cint	nlslen = NLSBUFLEN ;
 	            char	*nlsbuf{} ;

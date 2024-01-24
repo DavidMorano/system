@@ -50,7 +50,7 @@
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
-#include	"dialopts.h"
+#include	"dial.h"
 
 
 /* local defines */
@@ -60,11 +60,6 @@
 
 
 /* local typedefs */
-
-#ifndef	TYPEDEF_VOIDP
-#define	TYPEDEF_VOIDP
-typedef void	*voidp ;
-#endif
 
 
 /* external subroutines */
