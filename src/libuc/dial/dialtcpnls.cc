@@ -66,10 +66,10 @@
 #include	<char.h>
 #include	<sfx.h>
 #include	<dialtcp.h>
+#include	<nlsdialassist.h>
 #include	<localmisc.h>
 
-#include	"nlsdialassist.h"
-#include	"dialtcpnls.h"
+#include	"dialtcp.h"
 
 
 /* local defines */

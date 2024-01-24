@@ -18,6 +18,12 @@
 #define	DIALOPTS_INCLUDE
 
 
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
 #define	DIALOPT_NONE		0x00
 #define	DIALOPT_KEEPALIVE	(1<<0)
 #define	DIALOPT_LINGER		(1<<1)

@@ -50,7 +50,7 @@
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialuss.h"
 
 
 /* local defines */

@@ -24,12 +24,12 @@
 #include	<clanguage.h>
 
 #include	<dialopts.h>
-#include	<dialtcpnls.h>
 
 
 EXTERNC_begin
 
 extern int dialtcp(cchar *,cchar *,int,int,int) noex ;
+extern int dialtcpnls(cc *,cc *,int,cc *,int,int) noex ;
 extern int dialtcpmux(cc *,cc *,int,cc *,mainv,int,int) noex ;
 extern int dialfinger(cc *,cc *,int,cc *,mainv,int,int) noex ;
 extern int dialhttp(cc *,cc *,int,cc *,mainv,int,int) noex ;

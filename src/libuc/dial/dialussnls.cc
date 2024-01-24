@@ -21,41 +21,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
-#include	<buffer.h>
+#include	<mallocxx.h>
 #include	<sfx.h>
-#include	<char.h>
+#include	<nlsdialassist.h>
 #include	<localmisc.h>
 
-#include	"nlsdialassist.h"
-#include	"dial.h"
+#include	"dialuss.h"
 
 
 /* local defines */
 
-#define	SRV_TCPMUX	"tcpmux"
-#define	SRV_LISTEN	"listen"
-#define	SRV_TCPNLS	"tcpnls"
-
-#ifndef	SVCLEN
-#define	SVCLEN		MAXNAMELEN
+#ifndef	PORTSPEC_USSNLS
+#define	PORTSPEC_USSNLS	"/tmp/ussnls"
 #endif
-
-#define	NLSBUFLEN	(SVCLEN + 30)
-#define	RBUFLEN		MAXNAMELEN
 
 
 /* local namespaces */
@@ -87,70 +68,53 @@ extern "C" {
 
 /* exported subroutines */
 
-int dialussnls(cchar *portspec,cchar *svcbuf,int to,int aopts) noex {
-	cint		nlslen = NLSBUFLEN ;
-	int		rs = SR_OK ;
+int dialussnls(cchar *portspec,cchar *svc,int to,int aopts) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		svclen ;
 	int		fd = -1 ;
-	char		*nlsbuf ;
-
-	if ((portspec == NULL) || (portspec[0] == '\0'))
-	    portspec = NULL ;
-
-/* perform some cleanup on the service code specification */
-
-	if (svcbuf == NULL)
-	    return SR_INVAL ;
-
-	while (CHAR_ISWHITE(*svcbuf)) {
-	    svcbuf += 1 ;
-	}
-	svclen = strlen(svcbuf) ;
-
-	while (svclen && CHAR_ISWHITE(svcbuf[svclen - 1])) {
-	    svclen -= 1 ;
-	}
-
-	if (svclen <= 0)
-	    return SR_INVAL ;
-
-/* format the service string to be transmitted */
-
-	if ((rs = uc_malloc((nlslen+1),&nlsbuf)) >= 0) {
-	    if ((rs = mknlsreq(nlsbuf,nlslen,svcbuf,svclen)) >= 0) {
-	        SIGACTION	osig ;
-	        SIGACTION	nsig{} ;
-	        sigset_t	signalmask ;
-	        int		blen = rs ;
-	        uc_sigsetempty(&signalmask) ;
-	        nsig.sa_handler = SIG_IGN ;
-	        nsig.sa_mask = signalmask ;
-	        nsig.sa_flags = 0 ;
-	        if ((rs = u_sigaction(SIGPIPE,&nsig,&osig)) >= 0) {
-	            if (portspec == NULL) {
-	                portspec = "/tmp/unix" ;
-		    }
-	            if ((rs = dialuss(portspec,to,aopts)) >= 0) {
-	                fd = rs ;
-	                if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
-	                    cint	rlen = RBUFLEN ;
-	                    char	rbuf[RBUFLEN+1] = { 0 } ;
-	                    rs = readnlsresp(fd,rbuf,rlen,to) ;
-	                } /* end if (read response) */
-	                if (rs < 0) u_close(fd) ;
-	            } /* end if (opened) */
-	            rs1 = u_sigaction(SIGPIPE,&osig,NULL) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigaction) */
-	    } else {
-	        rs = SR_TOOBIG ;
-	    }
-	    rs1 = uc_free(nlsbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	} /* end if (memory-allocation) */
-
+	if (portspec == nullptr) portspec = PORTSPEC_USSNLS ;
+	if (svc) {
+	    rs = SR_INVALID ;
+	    if (portspec[0] && svc[0]) {
+		int	sl ;
+		cchar	*sp{} ;
+	        if ((sl = sfshrink(svc,-1,&sp)) > 0) {
+	            char	*nlsbuf{} ;
+	            if ((rs = malloc_mn(&nlsbuf)) >= 0) {
+	                cint	nlslen = rs ;
+	                if ((rs = mknlsreq(nlsbuf,nlslen,sp,sl)) >= 0) {
+	                    SIGACTION	osig ;
+	                    SIGACTION	nsig{} ;
+	                    sigset_t	sigmask ;
+	                    cint	blen = rs ;
+	                    uc_sigsetempty(&sigmask) ;
+	                    nsig.sa_handler = SIG_IGN ;
+	                    nsig.sa_mask = sigmask ;
+	                    nsig.sa_flags = 0 ;
+	                    if ((rs = u_sigaction(SIGPIPE,&nsig,&osig)) >= 0) {
+	                        if ((rs = dialuss(portspec,to,aopts)) >= 0) {
+	                            fd = rs ;
+	                            if ((rs = uc_writen(fd,nlsbuf,blen)) >= 0) {
+	                                char	*rbuf{} ;
+					if ((rs = malloc_mn(&rbuf)) >= 0) {
+	                                    cint	rlen = rs ;
+	                                    rs = readnlsresp(fd,rbuf,rlen,to) ;
+					}
+	                            } /* end if (read response) */
+	                        } /* end if (opened) */
+	                        rs1 = u_sigaction(SIGPIPE,&osig,nullptr) ;
+		                if (rs >= 0) rs = rs1 ;
+	                    } /* end if (sigaction) */
+	                } else {
+	                    rs = SR_TOOBIG ;
+	                }
+	                rs1 = uc_free(nlsbuf) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (m-a-f) */
+		    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	        } /* end if (sfshrink) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (dialussnls) */

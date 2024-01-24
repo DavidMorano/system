@@ -22,25 +22,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialuss.h"
 
 
 /* local defines */
@@ -82,7 +73,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
+int dialussmux(cc *portspec,cc *svcspec,mv sargv,int to,int opts) noex {
 	buffer		srvbuf ;
 	int		rs ;
 	int		rs1 ;
@@ -112,11 +103,11 @@ int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
 
 	if ((rs = buffer_start(&srvbuf,100)) >= 0) {
 	    buffer_strw(&srvbuf,svcspec,svclen) ;
-	    if (srvargv != nullptr) {
+	    if (sargv != nullptr) {
 	        cint	qlen = QBUFLEN ;
 	        char	qbuf[QBUFLEN+1] ;
-	        for (int i = 0 ; srvargv[i] ; i += 1) {
-	            rs = mkquoted(qbuf,qlen,srvargv[i],-1) ;
+	        for (int i = 0 ; sargv[i] ; i += 1) {
+	            rs = mkquoted(qbuf,qlen,sargv[i],-1) ;
 	            if (rs < 0) break ;
 	            buffer_char(&srvbuf,' ') ;
 	            buffer_buf(&srvbuf,qbuf,rs) ;
@@ -162,7 +153,6 @@ int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && (fd >= 0)) {
 		u_close(fd) ;
-		fd = -1 ;
 	    }
 	} /* end if (buffer) */
 
