@@ -18,7 +18,18 @@
 /*******************************************************************************
 
 	Name:
-	dialticotsord
+	dialticotsord 
+
+	Origin:
+	-Dial
+	-Transport
+	-Interface
+	-Connection
+	-Oriented
+	-Transport
+	-Service
+	-Orderly
+	-Release
 
 	Description:
 	This subroutine will dial out to the TICOTSORD transport.
@@ -73,9 +84,17 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	snxtilook(char *,int,int) ;
+extern "C" {
+    extern int	snxtilook(char *,int,int) noex ;
+}
 
 
 /* external variables */
@@ -99,10 +118,14 @@ static int	pushmod(int,cchar *) noex ;
 
 /* local variables */
 
+constexpr bool	f_pushmod = CF_PUSHMOD ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-/* ARGSUSED */
 int dialticotsord(cchar abuf[],int alen,int to,int opts) noex {
 	SUBINFO		g ;
 	int		rs = SR_OK ;
@@ -142,54 +165,44 @@ int dialticotsord(cchar abuf[],int alen,int to,int opts) noex {
 /* local subroutines */
 
 static int makeconn(SUBINFO *gp,cchar addr[],int alen,int to) noex {
-	struct t_info	info{} ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		fd = -1 ;
-
-	if (gp == NULL) return SR_FAULT ;
-	if ((rs = ut_open(TPIDEV,O_RDWR,&info)) >= 0) {
-	    fd = rs ;
-
-	    if ((rs = ut_bind(fd,NULL,NULL)) >= 0) {
-	        struct t_call	*sndcall ;
-	        if ((rs = ut_alloc(fd,T_CALL,0,(void **) &sndcall)) >= 0) {
-	            sndcall->addr.maxlen = alen ;
-	            sndcall->addr.buf = (char *) addr ;
-	            sndcall->addr.len = alen ;
-
-	            rs = ut_connect(fd,sndcall,NULL) ;
-
-	            sndcall->addr.maxlen = 0 ;
-	            sndcall->addr.buf = NULL ;
-	            sndcall->addr.len = 0 ;
-	            ut_free(sndcall,T_CALL) ;
-	        } /* end if (alloc) */
-
-/* was this "busy" at all, requiring a TLOOK operation? */
-
-	        if ((rs == SR_BUSY) || (rs == SR_LOOK)) {
-	            rs = ut_look(fd) ;
+	if (gp) {
+	    struct t_info	info{} ;
+	    if ((rs = ut_open(TPIDEV,O_RDWR,&info)) >= 0) {
+	        fd = rs ;
+	        if ((rs = ut_bind(fd,NULL,NULL)) >= 0) {
+	            struct t_call	*sndcall ;
+	            if ((rs = ut_alloc(fd,T_CALL,0,(void **) &sndcall)) >= 0) {
+	                sndcall->addr.maxlen = alen ;
+	                sndcall->addr.buf = (char *) addr ;
+	                sndcall->addr.len = alen ;
+		        {
+	                    rs = ut_connect(fd,sndcall,NULL) ;
+		        }
+	                sndcall->addr.maxlen = 0 ;
+	                sndcall->addr.buf = NULL ;
+	                sndcall->addr.len = 0 ;
+	                ut_free(sndcall,T_CALL) ;
+	            } /* end if (alloc) */
+    /* was this "busy" at all, requiring a TLOOK operation? */
+	            if ((rs == SR_BUSY) || (rs == SR_LOOK)) {
+	                rs = ut_look(fd) ;
+	            }
+	            if constexpr (f_pushmod) {
+	                if (rs >= 0) {
+	                    rs = pushmod(fd,"tirdwr") ;
+	                }
+		    } /* end if-constexpr */
+	        } /* end if (bind) */
+	        if ((rs < 0) && (fd >= 0)) {
+	            u_close(fd) ;
 	        }
-
-#if	CF_PUSHMOD
-	        if (rs >= 0) {
-	            rs = pushmod(fd,"tirdwr") ;
-	        }
-#endif /* CF_PUSHMOD */
-
-	    } /* end if (bind) */
-
-	    if (rs < 0) {
-	        u_close(fd) ;
-	    }
-	} /* end if (open) */
-
+	    } /* end if (open) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (makeconn) */
-
-
-/* local subroutines */
 
 #if	CF_PUSHMOD
 static int pushmod(int fd,cchar *mods) noex {

@@ -23,8 +23,8 @@
 	This object manages a basic thread.
 
 	Synopsis:
-	typedef int (*worker_f)(THRBASE *,void *) ;
-	int thrbase_start(THRBASE *op,worker_f,ap) noex
+	typedef int (*worker_f)(thrbase *,void *) ;
+	int thrbase_start(thrbase *op,worker_f,ap) noex
 
 	Arguments:
 	op		object pointer
@@ -58,7 +58,8 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -75,6 +76,37 @@ using std::nullptr_t ;
 
 /* forward references */
 
+template<typename ... Args>
+static int thrbase_ctor(thrbase *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    op->ap = np ;
+	    op->sip = np ;
+	    op->tcp = np ;
+	    op->tid = 0 ;
+	    op->trs = 0 ;
+	    op->f_exiting = {} ;
+	    op->f_exited = {} ;
+	    rs = SR_NOMEM ;
+	    if ((op->tcp = new(nothrow) thrcomm) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-thrcomm) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (thrbase_ctor) */
+
+static int thrbase_dtor(thrbase *op) noex {
+	int		rs = SR_OK ;
+	if (op->tcp) {
+	    delete op->tcp ;
+	    op->tcp = nullptr ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (thrbase_dtor) */
+
 extern "C" {
     static int	startworker(THRBASE_SI *) noex ;
 }
@@ -88,13 +120,12 @@ extern "C" {
 
 /* exported subroutines */
 
-int thrbase_start(THRBASE *tip,thrbase_sub worker,void *ap) noex {
+int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (tip && worker) {
-	    memclear(tip) ;
-	    tip->ap = ap ;
-	    if ((rs = thrcomm_start(&tip->tc,0)) >= 0) {
+	if ((rs = thrbase_ctor(op,worker)) >= 0) {
+	    op->ap = ap ;
+	    if ((rs = thrcomm_start(op->tcp,0)) >= 0) {
 	        sigset_t	osm{} ;
 	        sigset_t	nsm{} ;
 	        if ((rs = uc_sigsetfill(&nsm)) >= 0) {
@@ -108,10 +139,10 @@ int thrbase_start(THRBASE *tip,thrbase_sub worker,void *ap) noex {
 		            {
 		                memclear(sip) ;
 		                sip->worker = worker ;
-		                sip->tip = tip ;
+		                sip->op = op ;
 		            }
 	                    if ((rs = uptcreate(&tid,np,thrsub,sip)) >= 0) {
-	                        tip->tid = tid ;
+	                        op->tid = tid ;
 			    }
 		            if (rs < 0) {
 		                uc_free(sip) ;
@@ -122,21 +153,28 @@ int thrbase_start(THRBASE *tip,thrbase_sub worker,void *ap) noex {
 		    } /* end if (sigmask) */
 	        } /* end if (signal handling) */
 	    } /* end if (thrcomm-start) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		thrbase_dtor(op) ;
+	    }
+	} /* end if (thrbase_ctor) */
 	return rs ;
 }
 /* end subroutine (thrbase_start) */
 
-int thrbase_finish(THRBASE *tip) noex {
+int thrbase_finish(thrbase *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (tip) {
-	    if ((rs = thrbase_cmdexit(tip)) >= 0) {
-	        rs = thrbase_waitexit(tip) ;
-	        if (rs >= 0) rs = tip->trs ;
+	if (op) {
+	    if ((rs = thrbase_cmdexit(op)) >= 0) {
+	        rs = thrbase_waitexit(op) ;
+	        if (rs >= 0) rs = op->trs ;
 	    }
 	    {
-	        rs1 = thrcomm_finish(&tip->tc) ;
+	        rs1 = thrcomm_finish(op->tcp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = thrbase_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -144,25 +182,25 @@ int thrbase_finish(THRBASE *tip) noex {
 }
 /* end subroutine (thrbase_finish) */
 
-int thrbase_cmdsend(THRBASE *tip,int cmd,int to) noex {
+int thrbase_cmdsend(thrbase *op,int cmd,int to) noex {
 	int		rs = SR_FAULT ;
-	if (tip) {
+	if (op) {
 	    rs = SR_OK ;
-	    if (! tip->f_exiting) {
-	        rs = thrcomm_cmdsend(&tip->tc,cmd,to) ;
+	    if (! op->f_exiting) {
+	        rs = thrcomm_cmdsend(op->tcp,cmd,to) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (thrbase_cmdsend) */
 
-int thrbase_cmdexit(THRBASE *tip) noex {
+int thrbase_cmdexit(thrbase *op) noex {
 	int		rs = SR_FAULT ;
-	if (tip) {
+	if (op) {
 	    cint	cmd = thrbasecmd_exit ;
 	    rs = SR_OK ;
-	    if (! tip->f_exiting) {
-	        rs = thrbase_cmdsend(tip,cmd,-1) ;
+	    if (! op->f_exiting) {
+	        rs = thrbase_cmdsend(op,cmd,-1) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -170,11 +208,11 @@ int thrbase_cmdexit(THRBASE *tip) noex {
 /* end subroutine (thrbase_cmdexit) */
 
 /* called by child-thread */
-int thrbase_cmdrecv(THRBASE *tip,int to) noex {
+int thrbase_cmdrecv(thrbase *op,int to) noex {
 	int		rs = SR_FAULT ;
 	int		cmd = 0 ;
-	if (tip) {
-	    if ((rs = thrcomm_cmdrecv(&tip->tc,to)) >= 0) {
+	if (op) {
+	    if ((rs = thrcomm_cmdrecv(op->tcp,to)) >= 0) {
 	        cmd = rs ;
 	    } else if (rs == SR_TIMEDOUT) {
 	        rs = SR_OK ;
@@ -185,26 +223,26 @@ int thrbase_cmdrecv(THRBASE *tip,int to) noex {
 /* end subroutine (thrbase_cmdrecv) */
 
 /* called by child-thread */
-int thrbase_exiting(THRBASE *tip) noex {
+int thrbase_exiting(thrbase *op) noex {
 	int		rs = SR_FAULT ;
-	if (tip) {
-	    tip->f_exiting = true ;
-	    rs = thrcomm_exiting(&tip->tc) ;
+	if (op) {
+	    op->f_exiting = true ;
+	    rs = thrcomm_exiting(op->tcp) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (thrbase_exiting) */
 
-int thrbase_waitexit(THRBASE *tip) noex {
+int thrbase_waitexit(thrbase *op) noex {
 	int		rs = SR_FAULT ;
 	int		f_exited = false ;
-	if (tip) {
+	if (op) {
 	    rs = SR_OK ;
-	    if (! tip->f_exited) {
+	    if (! op->f_exited) {
 	        int	trs = SR_INPROGRESS ;
-	        if ((rs = uptjoin(tip->tid,&trs)) >= 0) {
-	            tip->trs = trs ;
-	            tip->f_exited = true ;
+	        if ((rs = uptjoin(op->tid,&trs)) >= 0) {
+	            op->trs = trs ;
+	            op->f_exited = true ;
 		    f_exited = true ;
 	        }
 	    }
@@ -214,11 +252,11 @@ int thrbase_waitexit(THRBASE *tip) noex {
 /* end subroutine (thrbase_waitexit) */
 
 #ifdef	COMMENT
-static int thrbase_cmddone(THRBASE *tip) noex {
+static int thrbase_cmddone(thrbase *op) noex {
 	int		rs = SR_FAULT ;
 	if (yip) {
 	    cint	rrs = 1 ;
-	    rs = thrcomm_rspsend(&tip->tc,rrs,-1) ;
+	    rs = thrcomm_rspsend(op->tcp,rrs,-1) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -229,17 +267,17 @@ static int thrbase_cmddone(THRBASE *tip) noex {
 /* private subroutines */
 
 static int startworker(THRBASE_SI *sip) noex {
-	THRBASE		*tip = sip->tip ;
-	int		(*worker)(THRBASE *,void *) = sip->worker ;
+	thrbase		*op = sip->op ;
+	int		(*worker)(thrbase *,void *) = sip->worker ;
 	int		rs ;
 	int		rs1 ;
 	int		rsw = 0 ;
 	if ((rs = uc_free(sip)) >= 0) {
 	    {
-	        rs = (*worker)(tip,tip->ap) ;
+	        rs = (*worker)(op,op->ap) ;
 		rsw = rs ;
 	    }
-	    rs1 = thrbase_exiting(tip) ;
+	    rs1 = thrbase_exiting(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 	return (rs >= 0) ? rsw : rs ;

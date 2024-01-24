@@ -1,0 +1,18 @@
+DIALTICOTSORD
+
+
+	Name:
+	dialticotsord 
+
+	Origin:
+	-Dial
+	-Transport
+	-Interface
+	-Connection
+	-Oriented
+	-Transport
+	-Service
+	-Orderly
+	-Release
+
+

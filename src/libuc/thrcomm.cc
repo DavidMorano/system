@@ -58,6 +58,10 @@ static int thrcomm_ctor(thrcomm *op,Args ... args) noex {
 	    nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
+	    op->cmd = 0 ;
+	    op->rrs = 0 ;
+	    op->f_cmd = {} ;
+	    op->f_exiting = {} ;
 	    if ((op->mxp = new(nothrow) ptm) != np) {
 	        if ((op->cvp = new(nothrow) ptc) != np) {
 		    rs = SR_OK ;

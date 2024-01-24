@@ -40,7 +40,18 @@
 
 	Returns:
 	>=0		file descriptor
-	<0		error in dialing
+	<0		error in dialing (system-return)
+
+	Origin:
+	-Dial
+	-Transport
+	-Interface
+	-Connection
+	-Oriented
+	-Transport
+	-Service
+	-Orderly
+	-Release
 
 *******************************************************************************/
 
@@ -104,7 +115,6 @@ extern char	*strnchr(const char *,int,int) ;
 
 
 /* exported subroutines */
-
 
 int dialticotsordnls(abuf,alen,svcbuf,to,opts)
 const char	abuf[] ;

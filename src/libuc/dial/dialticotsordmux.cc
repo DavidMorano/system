@@ -16,8 +16,27 @@
 
 /******************************************************************************
 
+	Name:
+	dialticotsordmux
+
+	Description:
 	This object dials out to a UNIX®-Socket-Stream (USS) that
 	implements a multiplexor on the server side.
+
+	Synopsis:
+	int dialticotsordmux(cc *abuf,int alen,cc *svc,mv sargv,
+			int to,int opts) noex
+
+	Origin:
+	-Dial
+	-Transport
+	-Interface
+	-Connection
+	-Oriented
+	-Transport
+	-Service
+	-Orderly
+	-Release
 
 ******************************************************************************/
 
