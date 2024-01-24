@@ -62,6 +62,9 @@ typedef mainv		mv ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dialussnls(cchar *portspec,cchar *svc,int to,int aopts) noex {
