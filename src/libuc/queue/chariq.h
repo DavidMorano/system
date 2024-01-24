@@ -1,4 +1,5 @@
-/* chariq */
+/* chariq HEADER */
+/* lang=C20 */
 
 /* Character-Interlocked Queue */
 /* version %I% last-modified %G% */
@@ -17,53 +18,37 @@
 
 	Manage interlocked FIFO-character operations.
 
-
 *******************************************************************************/
 
-
 #ifndef	CHARIQ_INCLUDE
-#define	CHARIQ_INCLUDE	1
+#define	CHARIQ_INCLUDE
 
 
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<charq.h>
 #include	<ptm.h>
-#include	<localmisc.h>
 
-
-/* local defines */
 
 #define	CHARIQ		struct chariq
 
 
 struct chariq {
-	CHARQ		q ;
-	PTM		m ;
+	charq		q ;
+	ptm		m ;
 } ;
 
+EXTERNC_begin
 
-#if	(! defined(CHARIQ_MASTER)) || (CHARIQ_MASTER == 0)
+extern int	chariq_start(chariq *,int) noex ;
+extern int	chariq_ins(chariq *,int) noex ;
+extern int	chariq_rem(chariq *,char *) noex ;
+extern int	chariq_size(chariq *) noex ;
+extern int	chariq_count(chariq *) noex ;
+extern int	chariq_finish(chariq *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int	chariq_start(CHARIQ *,int) ;
-extern int	chariq_ins(CHARIQ *,int) ;
-extern int	chariq_rem(CHARIQ *,char *) ;
-extern int	chariq_size(CHARIQ *) ;
-extern int	chariq_count(CHARIQ *) ;
-extern int	chariq_finish(CHARIQ *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CHARIQ_MASTER */
 
 #endif /* CHARIQ_INCLUDE */
 

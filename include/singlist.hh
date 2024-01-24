@@ -41,12 +41,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
 #include	<new>
 #include	<initializer_list>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 template <typename T>
@@ -58,7 +55,6 @@ class singlist_iter ;
 template <typename T>
 class singlist_node {
 	singlist_node<T>	*next = nullptr ;
-	singlist_node<T>	*prev = nullptr ;
 	T			val ;
 	singlist_node(const singlist_node<T> &other) = delete ;
 	singlist_node &operator = (const singlist_node<T> &other) = delete ;

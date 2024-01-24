@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= dial.h dialopts.h
 
 
-OBJ0_DIAL= dialopts.o 
+OBJ0_DIAL= dialopts.o nlsdialassist.o
 OBJ1_DIAL= dialpass.o 
 OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o 
 OBJ3_DIAL= dialfinger.o dialhttp.o
@@ -167,5 +167,7 @@ dialhttp.o:		dialhttp.cc dialtcp.h $(INCS)
 dialticotsord.o:	dialticotsord.cc $(INCS)
 dialticotsordmux.o:	dialticotsordmux.cc $(INCS)
 dialticotsordnls.o:	dialticotsordnls.cc $(INCS)
+
+nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h
 
 

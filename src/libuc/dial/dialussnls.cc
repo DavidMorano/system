@@ -49,10 +49,6 @@ typedef mainv		mv ;
 
 /* external subroutines */
 
-extern "C" {
-    extern int	dialuss(cchar *,int,int) noex ;
-}
-
 
 /* external variables */
 

@@ -68,14 +68,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstring>
-#include	<netdb.h>
+#include	<csignal>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<hostinfo.h>
@@ -93,10 +87,6 @@
 
 
 /* local defines */
-
-#ifndef	ADDRINFO
-#define	ADDRINFO	struct addrinfo
-#endif
 
 #define	PROTONAME	"tcp"
 

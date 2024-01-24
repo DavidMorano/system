@@ -49,17 +49,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<sbuf.h>
