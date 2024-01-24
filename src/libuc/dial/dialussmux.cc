@@ -22,31 +22,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctime>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<buffer.h>
 #include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"dial.h"
+#include	"dialuss.h"
 
 
 /* local defines */
-
-#define	QBUFLEN		(MAXNAMELEN +20)
-#define	RBUFLEN		LINEBUFLEN
 
 #ifndef	PORTSPEC_USSMUX
 #define	PORTSPEC_USSMUX	"/tmp/ussmux"
@@ -76,53 +65,49 @@ extern "C" {
 
 /* forward references */
 
+static int	dialer(cc *,cc *,int,mv,int,int) noex ;
+static int	loadargs(buffer *,mainv) noex ;
+static int	badreq(int,cchar *) noex ;
+
 
 /* local subroutines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
+int dialussmux(cc *ps,cc *svc,mv sargv,int to,int dot) noex {
+	int		rs = SR_FAULT ;
+	int		fd = -1 ;
+	if (ps && svc) {
+	    rs = SR_INVALID ;
+	    if (ps[0] && svc[0]) {
+		int	sl ;
+		cchar	*sp{} ;
+		if ((sl = sfshrink(svc,-1,&sp)) > 0) {
+		    rs = dialer(ps,sp,sl,sargv,to,dot) ;
+		    fd = rs ;
+		} /* end if (sfshrink) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fd : rs ;
+}
+/* end subroutine (dialussmux) */
+
+
+/* local subroutines */
+
+static int dialer(cc *ps,cc *sp,int sl,mv sargv,int to,int dot) noex {
 	buffer		srvbuf ;
 	int		rs ;
 	int		rs1 ;
-	int		svclen ;
 	int		fd = -1 ;
-	cchar	*bp ;
-
-	if (portspec == nullptr) return SR_FAULT ;
-	if (svcspec == nullptr) return SR_FAULT ;
-
-	if (portspec[0] == '\0') return SR_INVALID ;
-	if (svcspec[0] == '\0') return SR_INVALID ;
-
-	while (CHAR_ISWHITE(*svcspec)) {
-	    svcspec += 1 ;
-	}
-	svclen = strlen(svcspec) ;
-
-	while (svclen && CHAR_ISWHITE(svcspec[svclen - 1])) {
-	    svclen -= 1 ;
-	}
-
-	if (svclen <= 0)
-	    return SR_INVAL ;
-
-/* format the service string to be transmitted */
-
 	if ((rs = buffer_start(&srvbuf,100)) >= 0) {
-	    buffer_strw(&srvbuf,svcspec,svclen) ;
-	    if (srvargv != nullptr) {
-	        cint	qlen = QBUFLEN ;
-	        char	qbuf[QBUFLEN+1] ;
-	        for (int i = 0 ; srvargv[i] ; i += 1) {
-	            rs = mkquoted(qbuf,qlen,srvargv[i],-1) ;
-	            if (rs < 0) break ;
-	            buffer_char(&srvbuf,' ') ;
-	            buffer_buf(&srvbuf,qbuf,rs) ;
-	        } /* end for */
-	    } /* end if */
-	    if (rs >= 0) {
+	    buffer_strw(&srvbuf,sp,sl) ;
+	    if ((rs = loadargs(&srvbuf,sargv)) >= 0) {
+		cchar	*bp{} ;
 	        buffer_char(&srvbuf,'\n') ;
 	        if ((rs = buffer_get(&srvbuf,&bp)) >= 0) {
 		    SIGACTION	osigs ;
@@ -134,22 +119,20 @@ int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
 	            sigs.sa_mask = signalmask ;
 	            sigs.sa_flags = 0 ;
 	            if ((rs = u_sigaction(SIGPIPE,&sigs,&osigs)) >= 0) {
-	                if ((rs = dialuss(portspec,to,opts)) >= 0) {
+	                if ((rs = dialuss(ps,to,dot)) >= 0) {
 	                    fd = rs ;
 	                    if ((rs = uc_writen(fd,bp,blen)) >= 0) {
 	                        auto	rln = uc_readlinetimed ;
-	                        cint	rlen = RBUFLEN ;
-	                        char	rbuf[RBUFLEN+1] = { 0 } ;
-	                        if ((rs = rln(fd,rbuf,rlen,to)) >= 0) {
-	                            if ((rs == 0) || (rbuf[0] != '+')) {
-	                                rs = SR_BADREQUEST ;
-				    }
-	                        }
+	                        char	*rbuf{} ;
+				if ((rs = malloc_mn(&rbuf)) >= 0) {
+	                            cint	rlen = rs ;
+	                            if ((rs = rln(fd,rbuf,rlen,to)) >= 0) {
+					rs = badreq(rs,rbuf) ;
+	                            } /* end if (rln) */
+				    rs1 = uc_free(rbuf) ;
+				    if (rs >= 0) rs = rs1 ;
+				} /* end if (m-a-f) */
 	                    } /* end if (wrote service code) */
-	                    if (rs < 0) {
-	                        u_close(fd) ;
-			        fd = -1 ;
-			    }
 	                } /* end if (dialuss) */
 	                rs1 = u_sigaction(SIGPIPE,&osigs,nullptr) ;
 		        if (rs >= 0) rs = rs1 ;
@@ -162,12 +145,39 @@ int dialussmux(cc *portspec,cc *svcspec,mv srvargv,int to,int opts) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && (fd >= 0)) {
 		u_close(fd) ;
-		fd = -1 ;
 	    }
 	} /* end if (buffer) */
-
 	return (rs >= 0) ? fd : rs ;
 }
-/* end subroutine (dialussmux) */
+/* end subroutine (dialer) */
+
+static int loadargs(buffer *bp,mainv sargv) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (sargv != nullptr) {
+	    char	*qbuf{} ;
+	    if ((rs = malloc_ml(&qbuf)) >= 0) {
+	        cint	qlen = rs ;
+	        for (int i = 0 ; sargv[i] ; i += 1) {
+	            rs = mkquoted(qbuf,qlen,sargv[i],-1) ;
+	            if (rs < 0) break ;
+	            buffer_char(bp,' ') ;
+	            buffer_buf(bp,qbuf,rs) ;
+	        } /* end for */
+		rs1 = uc_free(qbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (loadargs) */
+
+static int badreq(int rs,cchar *rbuf) noex {
+	if ((rs == 0) || (rbuf[0] != '+')) {
+	    rs = SR_BADREQUEST ;
+	}
+	return rs ;
+}
+/* end subroutine (badreq) */
 
 

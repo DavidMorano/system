@@ -52,8 +52,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -77,6 +75,9 @@ extern "C" {
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward reference */

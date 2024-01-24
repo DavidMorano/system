@@ -225,7 +225,7 @@ OBJ111= vstrcmpx.o vstrkeycmpx.o vstrkeydictcmp.o
 OBJ112= strcpyxc.o
 OBJ113= strwcpy.o strwcpyx.o strwcpyxc.o strwcpyxx.o
 OBJ114=
-OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o nlsdialassist.o
+OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o
 OBJ116= mkcleanline.o tabcols.o checkbase.o ncol.o
 OBJ117= mapex.o calstrs.o
 OBJ118=
@@ -982,16 +982,6 @@ ctdecf.o:		ctdecf.cc ctdecf.h convertx.h
 ctchars.o:		ctchars.cc ctchars.h
 xxtostr.o:		xxtostr.cc xxtostr.h
 convertx.o:		convertx.cc convertx.h
-
-# DIAL
-dialopts.o:		dialopts.cc dialopts.h
-dialprog.o:		dialprog.cc dialopts.h
-dialudp.o:		dialudp.cc dialopts.h
-dialtcp.o:		dialtcp.cc dialopts.h
-dialtcpmux.o:		dialtcpmux.c dialopts.h
-dialtcpnls.o:		dialtcpnls.c nlsdialassist.h dialopts.h
-dialfinger.o:		dialfinger.c dialopts.h
-nlsdialassist.o:	nlsdialassist.c nlsdialassist.h dialopts.h
 
 opensysfs.o:		opensysfs.cc opensysfs.h
 

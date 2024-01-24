@@ -1,4 +1,4 @@
-/* utimeout */
+/* utimeout SUPPORT */
 /* lang=C20 */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */
@@ -62,7 +62,16 @@
 /* external variables */
 
 
-/* global variables */
+/* local strutures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 int utimeout[uto_overlast] = {
 	[uto_again] = UTO_AGAIN,
@@ -82,17 +91,8 @@ int utimeout[uto_overlast] = {
 	[uto_nosr] = UTO_NOSR,
 	[uto_poll] = UTO_POLL,
 	[uto_nolck] = UTO_NOLCK,
-	[uto_capure] = UTO_NOLCK,
+	[uto_capture] = UTO_NOLCK,
 } ; /* end array (utimeout) */
-
-
-/* local strutures */
-
-
-/* forward references */
-
-
-/* local variables */
 
 
 /* exported subroutines */

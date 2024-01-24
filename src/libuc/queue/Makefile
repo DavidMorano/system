@@ -57,13 +57,13 @@ INCS= queue.h
 OBJ0_QUEUE= plainq.o q.o aiq.o
 OBJ1_QUEUE= pq.o ciq.o piq.o
 OBJ2_QUEUE= cq.o
-OBJ3_QUEUE= charq.o
+OBJ3_QUEUE= charq.o chariq.o
+OBJ4_QUEUE= slq.o
 
+OBJA_QUEUE= obj0_queue.o obj1_queue.o obj2_queue.o 
+OBJB_QUEUE= obj3_queue.o obj4_queue.o
 
-OBJA_QUEUE= obj0_queue.o obj1_queue.o
-OBJB_QUEUE= obj2_queue.o obj3_queue.o
-
-OBJ_QUEUE= $(OBJA_QUEUE) $(OBJB_QUEUE)
+OBJ_QUEUE= obja_queue.o objb_queue.o
 
 
 default:		$(T).o
@@ -110,6 +110,13 @@ control:
 	(uname -n ; date) > Control
 
 
+obja_queue.o:	$(OBJA_QUEUE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_QUEUE)
+
+objb_queue.o:	$(OBJB_QUEUE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_QUEUE)
+
+
 obj0_queue.o:	$(OBJ0_QUEUE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_QUEUE)
 
@@ -122,6 +129,12 @@ obj2_queue.o:	$(OBJ2_QUEUE)
 obj3_queue.o:	$(OBJ3_QUEUE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_QUEUE)
 
+obj4_queue.o:	$(OBJ4_QUEUE)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_QUEUE)
+
+
+# single-link forward list-queue */
+slq.o:			slq.cc slq.h
 
 # self-relaltive
 plainq.o:		plainq.cc plainq.h
@@ -135,6 +148,7 @@ piq.o:			piq.cc piq.h pq.h
 
 # character
 charq.o:		charq.cc charq.h
+chariq.o:		chariq.cc chariq.h charq.h
 
 # container
 cq.o:			cq.cc cq.h

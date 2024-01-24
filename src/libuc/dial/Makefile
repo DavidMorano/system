@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= dial.h dialopts.h
 
 
-OBJ0_DIAL= dialopts.o 
+OBJ0_DIAL= dialopts.o nlsdialassist.o
 OBJ1_DIAL= dialpass.o 
 OBJ2_DIAL= dialtcp.o dialtcpmux.o dialtcpnls.o 
 OBJ3_DIAL= dialfinger.o dialhttp.o
@@ -70,7 +70,7 @@ OBJC_DIAL= obj4_dial.o obj5_dial.o
 OBJD_DIAL= obj6_dial.o obj7_dial.o
 OBJE_DIAL= obj8_dial.o
 
-OBJ_DIAL= $(OBJA_DIAL) $(OBJB_DIAL) $(OBJC_DIAL) $(OBJD_DIAL)
+OBJ_DIAL= obja_dial.o objb_dial.o objc_dial.o objd_dial.o
 
 
 default:		$(T).o
@@ -116,6 +116,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_dial.o:	$(OBJ0_DIAL)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DIAL)
 
@@ -144,6 +145,22 @@ obj8_dial.o:	$(OBJ8_DIAL)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ8_DIAL)
 
 
+obja_dial.o:	$(OBJA_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_DIAL)
+
+objb_dial.o:	$(OBJB_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_DIAL)
+
+objc_dial.o:	$(OBJC_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_DIAL)
+
+objd_dial.o:	$(OBJD_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJD_DIAL)
+
+obje_dial.o:	$(OBJE_DIAL)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJE_DIAL)
+
+
 dialopts.o:		dialopts.cc $(INCS)
 dialpass.o:		dialpass.cc $(INCS)
 
@@ -167,5 +184,7 @@ dialhttp.o:		dialhttp.cc dialtcp.h $(INCS)
 dialticotsord.o:	dialticotsord.cc $(INCS)
 dialticotsordmux.o:	dialticotsordmux.cc $(INCS)
 dialticotsordnls.o:	dialticotsordnls.cc $(INCS)
+
+nlsdialassist.o:	nlsdialassist.cc nlsdialassist.h
 
 

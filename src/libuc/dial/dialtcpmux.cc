@@ -60,17 +60,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<sbuf.h>
@@ -163,11 +154,9 @@ int dialtcpmux(cc *hn,cc *ps,int af,cc *svc,mainv sargs,int to,int dot) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
+	if ((ps == nullptr) || (ps[0] == '\0')) ps = PORTSPEC_TCPMUX ;
 	if (hn && svc) {
 	    rs = SR_INVALID ;
-	    if ((ps == nullptr) || (ps[0] == '\0')) {
-		ps = PORTSPEC_TCPMUX ;
-	    }
 	    if (hn[0] && ps[0] && svc[0]) {
 		muxhelp		mo(hn,ps,af,svc,sargs,to,dot) ;
 		if ((rs = mo.start()) >= 0) {

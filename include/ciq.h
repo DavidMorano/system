@@ -19,13 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<pq.h>
-#include	<localmisc.h>
 
 
 #define	CIQ_MAGIC	0x9635230

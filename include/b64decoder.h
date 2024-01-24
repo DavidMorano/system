@@ -18,11 +18,7 @@
 #define	B64DECODER_INCLUDE
 
 
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<utypedefs.h>
-#include	<clanguage.h>
-#include	<localmisc.h>
+#include	<usysem.h>
 
 
 #define	B64DECODER_MAGIC	0x13f3c204

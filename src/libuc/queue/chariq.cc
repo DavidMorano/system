@@ -1,10 +1,8 @@
-/* chariq */
+/* chariq SUPPORT */
+/* lang=C++20 */
 
 /* Character-Interlocked Queue management */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -20,14 +18,9 @@
 
 	This object manages interlocked FIFO-character operations.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -54,9 +47,7 @@
 
 /* exported subroutines */
 
-
-int chariq_start(CHARIQ *op,int size)
-{
+int chariq_start(chariq *op,int size) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -73,9 +64,7 @@ int chariq_start(CHARIQ *op,int size)
 }
 /* end subroutine (chariq_start) */
 
-
-int chariq_finish(CHARIQ *op)
-{
+int chariq_finish(chariq *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -91,9 +80,7 @@ int chariq_finish(CHARIQ *op)
 }
 /* end subroutine (chariq_finish) */
 
-
-int chariq_ins(CHARIQ *op,int ch)
-{
+int chariq_ins(chariq *op,int ch) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -113,9 +100,7 @@ int chariq_ins(CHARIQ *op,int ch)
 }
 /* end subroutine (chariq_ins) */
 
-
-int chariq_rem(CHARIQ *op,char *chp)
-{
+int chariq_rem(chariq *op,char *chp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -135,9 +120,7 @@ int chariq_rem(CHARIQ *op,char *chp)
 }
 /* end subroutine (chariq_rem) */
 
-
-int chariq_size(CHARIQ *op)
-{
+int chariq_size(chariq *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
@@ -157,9 +140,7 @@ int chariq_size(CHARIQ *op)
 }
 /* end subroutine (chariq_size) */
 
-
-int chariq_count(CHARIQ *op)
-{
+int chariq_count(chariq *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
