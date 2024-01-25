@@ -75,11 +75,12 @@ struct utmpaccent_s {
 } ; /* end struct (utmpaccent) */
 
 typedef UTMPACCENT	utmpaccent ;
+typedef CUTMPACCENT	cutmpaccent ;
 
 EXTERNC_begin
 
-extern int utmpaccent_load(UTMPACCENT *,char *,int,CUTMPFENT *) noex ;
-extern int utmpaccent_size(CUTMPACCENT *) noex ;
+extern int utmpaccent_load(utmpaccent *,char *,int,CUTMPFENT *) noex ;
+extern int utmpaccent_size(cutmpaccent *) noex ;
 
 EXTERNC_end
 

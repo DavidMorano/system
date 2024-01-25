@@ -301,6 +301,7 @@ int utmpacc::iinit() noex {
 	int		f = false ;
 	if (! fvoid) {
 	    cint	to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {
 	        if ((rs = mx.create) >= 0) {
 	            if ((rs = cv.create) >= 0) {
@@ -311,17 +312,21 @@ int utmpacc::iinit() noex {
 	                        f = true ;
 	                        finitdone = true ;
 	                    }
-	                    if (rs < 0)
+	                    if (rs < 0) {
 	                        uc_atforkexpunge(b,a,a) ;
+			    }
 	                } /* end if (uc_atfork) */
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    cv.destroy() ;
+			}
 	            } /* end if (ptc_create) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                mx.destroy() ;
+		    }
 	        } /* end if (ptm_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            finit = false ;
+		}
 	    } else if (!finitdone) {
 	        timewatch	tw(to) ;
 	        auto lamb = [this] () -> int {
