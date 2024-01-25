@@ -1,8 +1,12 @@
 #!/usr/extra/bin/ksh
 # MKLINKS
 
-CMDS=" username userhome usershell uid gid sid groupname sessionid shells"
+CMDS=" username userhome usershell "
+CMDS+=" uid gid sid "
+CMDS+=" groupname sessionid shells"
+
 LOCPROG=macuser.x
+TDIRS=" /usr/local /opt/local "
 
 function linkdir {
   typeset TDIR=${1}
@@ -12,7 +16,7 @@ function linkdir {
 }
 
 if [[ -x "${LOCPROG}" ]] ; then
-  for D in /usr/local /opt/local ; do
+  for D in ${TDIRS} ; do
     if [[ -d "${D}" ]] ; then
       linkdir $D
     else
