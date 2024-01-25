@@ -22,10 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3uc)| */
 #include	<strpack.h>
 #include	<strn.h>
 #include	<strwcpy.h>
@@ -113,7 +111,6 @@ static int	envlist_storer(envlist *) noex ;
 int envlist_start(envlist *op,int ne) noex {
 	int		rs = SR_FAULT ;
 	if ((rs = envlist_ctor(op)) >= 0) {
-	    memclear(op) ;
 	    rs = ENVLIST_DBINIT(op->elp,ne,0,nullptr,nullptr) ;
 	    if (rs < 0) {
 		envlist_dtor(op) ;

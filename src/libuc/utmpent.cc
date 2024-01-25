@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-        This code provides the methods for the utmpent object.
+        This code provides the methods for the UTMPENT object.
 
 *******************************************************************************/
 

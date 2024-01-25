@@ -14,6 +14,21 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/*******************************************************************************
+
+	This module serves as a per-process cache for UNIX® UTMP
+	information.
+
+	Since we are basically dealing with global data, we need
+	to make the establishment of it multi-thread safe.  We also
+	want fork safety.  Yes, we want everything, including cleanup
+	on module unloading (since, yes, we could all be inside a
+	loadable and unloadble module!).  For these purposes we
+	employ the basic (and not so basic) means of accomplishing
+	this.  See the code for our various machinations.
+
+*******************************************************************************/
+
 #ifndef	UTMPACC_INCLUDE
 #define	UTMPACC_INCLUDE
 
