@@ -662,23 +662,23 @@ bool hasvalidmagic(cchar *tbuf,int tlen,cchar *ms) noex {
 }
 /* end subroutine (hasvalidmagic) */
 
-bool hasnotdots(cchar *np,int nl) noex {
+bool hasnotdots(cchar *sp,int sl) noex {
 	bool		f = true ;
-	if (np[0] == '.') {
-	    if (nl < 0) nl = strlen(np) ;
+	if (sp[0] == '.') {
+	    if (sl < 0) sl = strlen(sp) ;
 	    if constexpr (f_hasnotdotswitch) {
-	        switch (nl) {
+	        switch (sl) {
 	        case 1:
 	            f = false ;
 	            break ;
 	        case 2:
-	            f = (np[1] != '.') ;
+	            f = (sp[1] != '.') ;
 	            break ;
 	        }  /* end switch */
 	    } else {
-	        if (nl <= 2) {
-	            f = (nl != 1) ;
-	            if ((!f) && (nl == 2)) f = (np[1] != '.') ;
+	        if (sl <= 2) {
+	            f = (sl != 1) ;
+	            if ((!f) && (sl == 2)) f = (sp[1] != '.') ;
 	        }
 	    } /* end if constexpr) */
 	} /* end if (had a leading dot) */
