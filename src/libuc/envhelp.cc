@@ -4,7 +4,6 @@
 /* help w/ environment */
 /* version %I% last-modified %G% */
 
-#define	CF_SETEXECS	0		/* compile |setexecs| */
 
 /* revision history:
 
@@ -68,21 +67,14 @@
 
 /* local defines */
 
-#ifndef	ENVBUFLEN
-#define	ENVBUFLEN	(MAXHOSTNAMELEN + 40)
-#endif
-
-#ifndef	VBUFLEN
-#define	VBUFLEN		(MAXHOSTNAMELEN + 40)
-#endif
-
-#define	NENVS		150
+#define	NENVS		80		/* default (start) number entries */
 #define	DEFENVSTORESIZE	120
 
 
 /* local namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
@@ -94,6 +86,43 @@ extern cchar	**environ ; /* what is should be  */
 
 
 /* forward reference */
+
+template<typename ... Args>
+static int envhelp_ctor(envhelp *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    if ((op->elp = new(nothrow) vechand) != np) {
+	        if ((op->spp = new(nothrow) strpack) != np) {
+		    rs = SR_OK ;
+		} /* end if (new-strpack) */
+	        if (rs < 0) {
+		    delete op->elp ;
+		    op->elp = nullptr ;
+		}
+	    } /* end if (new_vechand) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envhelp_ctor) */
+
+static int envhelp_dtor(envhelp *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->spp) {
+		delete op->spp ;
+		op->spp = nullptr ;
+	    }
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envhelp_dtor) */
 
 static int	envhelp_copy(envhelp *,mainv,mainv) noex ;
 
@@ -116,22 +145,26 @@ int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
 	cint		vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
 	int		rs = SR_FAULT ;
 	if (envv == nullptr) envv = environ ;
-	if (op) {
-	    if ((rs = vechand_start(&op->env,NENVS,vo)) >= 0) {
+	if ((rs = envhelp_ctor(op)) >= 0) {
+	    cint	ne = NENVS ;
+	    if ((rs = vechand_start(op->elp,ne,vo)) >= 0) {
 	        cint	size = DEFENVSTORESIZE ;
-	        if ((rs = strpack_start(&op->stores,size)) >= 0) {
+	        if ((rs = strpack_start(op->spp,size)) >= 0) {
 		    if (envv != nullptr) {
 	    	        rs = envhelp_copy(op,envbads,envv) ;
 		    }
 	            if (rs < 0) {
-		        strpack_finish(&op->stores) ;
+		        strpack_finish(op->spp) ;
 		    }
 	        } /* end if (strpack_start) */
 	        if (rs < 0) {
-		    vechand_finish(&op->env) ;
+		    vechand_finish(op->elp) ;
 	        }
 	    } /* end if (vechand_start) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		envhelp_dtor(op) ;
+	    }
+	} /* end if (envhelp_ctor) */
 	return rs ;
 }
 /* end subroutine (envhelp_start) */
@@ -142,11 +175,15 @@ int envhelp_finish(envhelp *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    {
-	        rs1 = strpack_finish(&op->stores) ;
+	        rs1 = strpack_finish(op->spp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vechand_finish(&op->env) ;
+	        rs1 = vechand_finish(op->elp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = envhelp_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -159,7 +196,7 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs1 ;
 	int		i = INT_MAX ;
 	if (op && kp) {
-	    vechand	*elp = &op->env ;
+	    vechand	*elp = op->elp ;
 	    int		size = 0 ;
 	    char	*p{} ;		/* 'char' for pointer arithmentic */
 	    size += strlen(kp) ;
@@ -175,7 +212,7 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	        bp = strwcpy(bp,kp,-1) ;
 	        *bp++ = '=' ;
 	        if (vp) bp = strwcpy(bp,vp,vl) ;
-	        if ((rs = strpack_store(&op->stores,p,(bp-p),&ep)) >= 0) {
+	        if ((rs = strpack_store(op->spp,p,(bp-p),&ep)) >= 0) {
 		    rs = vechand_addover(elp,ep) ;
 		    i = rs ;
 	        } /* end if */
@@ -187,14 +224,6 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 }
 /* end subroutine (envhelp_envset) */
 
-#if	CF_SETEXECS
-int envhelp_setexecs(envhelp *op,cchar *pfn,cchar *argz) noex {
-	int		rs = SR_NOSYS ;
-	return rs ;
-}
-/* end subroutine (envhelp_setexecs) */
-#endif /* CF_SETEXECS */
-
 int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 	nulstr		ks ;
 	int		rs ;
@@ -202,7 +231,7 @@ int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
 	int		i = 0 ;
 	cchar		*cp ;
 	if ((rs = nulstr_start(&ks,kp,kl,&cp)) >= 0) {
-	    vechand	*elp = &op->env ;
+	    vechand	*elp = op->elp ;
 	    {
 		vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
 		void		*vp{} ;
@@ -222,7 +251,7 @@ int envhelp_sort(envhelp *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-	    rs = vechand_sort(&op->env,vcf) ;
+	    rs = vechand_sort(op->elp,vcf) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -230,7 +259,7 @@ int envhelp_sort(envhelp *op) noex {
 
 int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
 	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-	vechand		*elp = &op->env ;
+	vechand		*elp = op->elp ;
 	int		rs ;
 	if ((rs = vechand_sort(elp,vcf)) >= 0) {
 	    if (eppp != nullptr) {
@@ -247,7 +276,7 @@ int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
 /* private subroutines */
 
 static int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
-	vechand		*elp = &op->env ;
+	vechand		*elp = op->elp ;
 	int		rs = SR_OK ;
 	int		n = 0 ;
 	if (envv != nullptr) {
