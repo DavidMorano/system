@@ -18,6 +18,12 @@
 #define	DIALCPROG_INCLUDE
 
 
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
 EXTERNC_begin
 
 extern int dialcprog(cchar *,cchar *,cchar *,mainv,mainv,int,int,int *) noex ;
