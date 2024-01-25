@@ -828,11 +828,11 @@ pwcache.o:		pwcache.cc pwcache.h
 
 linefold.o:		linefold.c linefold.h
 
-envlist.o:		envlist.c envlist.h
-envhelp.o:		envhelp.c envhelp.h
+envlist.o:		envlist.cc envlist.h
+envhelp.o:		envhelp.cc envhelp.h
 
 mkpr.o:			mkpr.cc
-mkprogenv.o:		mkprogenv.c mkprogenv.h
+mkprogenv.o:		mkprogenv.cc mkprogenv.h
 
 spawner.o:		spawner.c spawner.h
 

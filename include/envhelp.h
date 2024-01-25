@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<strpack.h>
@@ -29,21 +28,20 @@
 
 
 struct envhelp_head {
-	vechand		env ;
-	strpack		stores ;
+	vechand		*elp ;		/* Environment-List-Pointer */
+	strpack		*spp ;		/* String-Pack-Pointer */
 } ;
 
 typedef ENVHELP		envhelp ;
 
 EXTERNC_begin
 
-extern int envhelp_start(ENVHELP *,cchar **,cchar **) noex ;
-extern int envhelp_present(ENVHELP *,cchar *,int,cchar **) noex ;
-extern int envhelp_envset(ENVHELP *,cchar *,cchar *,int) noex ;
-extern int envhelp_setexecs(ENVHELP *,cchar *,cchar *) noex ;
-extern int envhelp_sort(ENVHELP *) noex ;
-extern int envhelp_getvec(ENVHELP *,cchar ***) noex ;
-extern int envhelp_finish(ENVHELP *) noex ;
+extern int envhelp_start(envhelp *,mainv,mainv) noex ;
+extern int envhelp_present(envhelp *,cchar *,int,cchar **) noex ;
+extern int envhelp_envset(envhelp *,cchar *,cchar *,int) noex ;
+extern int envhelp_sort(envhelp *) noex ;
+extern int envhelp_getvec(envhelp *,cchar ***) noex ;
+extern int envhelp_finish(envhelp *) noex ;
 
 EXTERNC_end
 

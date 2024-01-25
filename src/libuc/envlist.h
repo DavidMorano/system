@@ -12,7 +12,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<localmisc.h>
@@ -23,20 +22,20 @@
 
 
 struct envlist_head {
-	HDB		list ;
-	void		*store ;
+	hdb		*elp ;
+	void		*store ;	/* <- this is a STRPACK object */
 } ;
 
 typedef ENVLIST		envlist ;
 
 EXTERNC_begin
 
-extern int envlist_start(ENVLIST *,int) noex ;
-extern int envlist_addkeyval(ENVLIST *,cchar *,cchar *,int) noex ;
-extern int envlist_add(ENVLIST *,cchar *,int) noex ;
-extern int envlist_present(ENVLIST *,cchar *,int,cchar **) noex ;
-extern int envlist_count(ENVLIST *) noex ;
-extern int envlist_finish(ENVLIST *) noex ;
+extern int envlist_start(envlist *,int) noex ;
+extern int envlist_addkeyval(envlist *,cchar *,cchar *,int) noex ;
+extern int envlist_add(envlist *,cchar *,int) noex ;
+extern int envlist_present(envlist *,cchar *,int,cchar **) noex ;
+extern int envlist_count(envlist *) noex ;
+extern int envlist_finish(envlist *) noex ;
 
 EXTERNC_end
 

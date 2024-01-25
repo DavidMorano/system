@@ -1,5 +1,5 @@
 /* utimeout SUPPORT */
-/* lang=C20 */
+/* lang=C20 (MUST be C-lang) */
 
 /* manage UNIX® kernal-call (and std-c library) timeouts */
 /* version %I% last-modified %G% */
