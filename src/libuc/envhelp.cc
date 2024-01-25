@@ -1,0 +1,292 @@
+/* envhelp SUPPORT */
+/* lang=C++20 */
+
+/* help w/ environment */
+/* version %I% last-modified %G% */
+
+#define	CF_SETEXECS	0		/* compile |setexecs| */
+
+/* revision history:
+
+	= 1998-07-10, David A­D­ Morano
+	This subroutine was originally written.
+
+*/
+
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	Names:
+	envhelp_start
+	envhelp_finish
+
+	Description:
+	This little honey helps daddy management the environment
+	list for launching new programs.
+
+	Synopsis:
+	int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex
+
+	Arguments:
+	op		object pointer
+	envbads		list of environment variables that are not included
+	envv		environment array
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
+	Synopsis:
+	int envhelp_finish(envhelp *op) noex
+
+	Arguments:
+	op		object pointer
+
+	Returns:
+	>=0		OK
+	<0		error (system-return)
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
+#include	<sys/param.h>
+#include	<unistd.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<usystem.h>
+#include	<nulstr.h>
+#include	<strwcpy.h>
+#include	<matkeystr.h>
+#include	<vstrkeycmpx.h>
+#include	<isnot.h>
+#include	<localmisc.h>
+
+#include	"envhelp.h"
+
+
+/* local defines */
+
+#ifndef	ENVBUFLEN
+#define	ENVBUFLEN	(MAXHOSTNAMELEN + 40)
+#endif
+
+#ifndef	VBUFLEN
+#define	VBUFLEN		(MAXHOSTNAMELEN + 40)
+#endif
+
+#define	NENVS		150
+#define	DEFENVSTORESIZE	120
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+extern cchar	**environ ; /* what is should be  */
+
+
+/* forward reference */
+
+static int	envhelp_copy(envhelp *,mainv,mainv) noex ;
+
+static int	vechand_addover(vechand *,cchar *) noex ;
+
+#ifdef	COMMENT
+static int	envhelp_envadd(envhelp *,cchar *,cchar *,int) noex ;
+#endif /* COMMENT */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
+	cint		vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
+	int		rs = SR_FAULT ;
+	if (envv == nullptr) envv = environ ;
+	if (op) {
+	    if ((rs = vechand_start(&op->env,NENVS,vo)) >= 0) {
+	        cint	size = DEFENVSTORESIZE ;
+	        if ((rs = strpack_start(&op->stores,size)) >= 0) {
+		    if (envv != nullptr) {
+	    	        rs = envhelp_copy(op,envbads,envv) ;
+		    }
+	            if (rs < 0) {
+		        strpack_finish(&op->stores) ;
+		    }
+	        } /* end if (strpack_start) */
+	        if (rs < 0) {
+		    vechand_finish(&op->env) ;
+	        }
+	    } /* end if (vechand_start) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envhelp_start) */
+
+int envhelp_finish(envhelp *op) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (op) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = strpack_finish(&op->stores) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vechand_finish(&op->env) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envhelp_finish) */
+
+int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		i = INT_MAX ;
+	if (op && kp) {
+	    vechand	*elp = &op->env ;
+	    int		size = 0 ;
+	    char	*p{} ;		/* 'char' for pointer arithmentic */
+	    size += strlen(kp) ;
+	    size += 1 ;			/* for the equals sign character */
+	    if (vp != nullptr) {
+	        if (vl < 0) vl = strlen(vp) ;
+	        size += strnlen(vp,vl) ;
+	    }
+	    size += 1 ;			/* terminating NUL */
+	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	        cchar		*ep{} ;
+	        char		*bp = p ;
+	        bp = strwcpy(bp,kp,-1) ;
+	        *bp++ = '=' ;
+	        if (vp) bp = strwcpy(bp,vp,vl) ;
+	        if ((rs = strpack_store(&op->stores,p,(bp-p),&ep)) >= 0) {
+		    rs = vechand_addover(elp,ep) ;
+		    i = rs ;
+	        } /* end if */
+	        rs1 = uc_free(p) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (memory-allocation) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (envhelp_envset) */
+
+#if	CF_SETEXECS
+int envhelp_setexecs(envhelp *op,cchar *pfn,cchar *argz) noex {
+	int		rs = SR_NOSYS ;
+	return rs ;
+}
+/* end subroutine (envhelp_setexecs) */
+#endif /* CF_SETEXECS */
+
+int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
+	nulstr		ks ;
+	int		rs ;
+	int		rs1 ;
+	int		i = 0 ;
+	cchar		*cp ;
+	if ((rs = nulstr_start(&ks,kp,kl,&cp)) >= 0) {
+	    vechand	*elp = &op->env ;
+	    {
+		vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+		void		*vp{} ;
+	        if ((rs = vechand_search(elp,cp,vcf,&vp)) >= 0) {
+		    *rpp = charp(vp) ;
+	            i = rs ;
+		}
+	    }
+	    rs1 = nulstr_finish(&ks) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (nulstr) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (envhelp_present) */
+
+int envhelp_sort(envhelp *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	    rs = vechand_sort(&op->env,vcf) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envhelp_sort) */
+
+int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
+	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	vechand		*elp = &op->env ;
+	int		rs ;
+	if ((rs = vechand_sort(elp,vcf)) >= 0) {
+	    if (eppp != nullptr) {
+	        rs = vechand_getvec(elp,eppp) ;
+	    } else {
+	        rs = vechand_count(elp) ;
+	    }
+	} /* end if (vechand_sort) */
+	return rs ;
+}
+/* end subroutine (envhelp_getvec) */
+
+
+/* private subroutines */
+
+static int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
+	vechand		*elp = &op->env ;
+	int		rs = SR_OK ;
+	int		n = 0 ;
+	if (envv != nullptr) {
+	    cchar	*ep ;
+	    if (envbads != nullptr) {
+	        for (int i = 0 ; (rs >= 0) && envv[i] ; i += 1) {
+	            ep = envv[i] ;
+	            if (matkeystr(envbads,ep,-1) < 0) {
+	                n += 1 ;
+	                rs = vechand_add(elp,ep) ;
+	            } /* end if (was not bad) */
+	        } /* end for (copy ENVs) */
+	    } else {
+	        for (int i = 0 ; (rs >= 0) && envv[i] ; i += 1) {
+	            ep = envv[i] ;
+	            n += 1 ;
+	            rs = vechand_add(elp,ep) ;
+	        } /* end for (copy ENVs) */
+	    } /* end if (envbads) */
+	} /* end if (envv) */
+	return (rs >= 0) ? n : rs ;
+}
+/* end subroutine (envhelp_copy) */
+
+static int vechand_addover(vechand *elp,cchar *ep) noex {
+	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	nullptr_t	np{} ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
+	if ((rs = vechand_search(elp,ep,vcf,np)) >= 0) {
+	    rs = vechand_del(elp,rs) ;
+	} else if (rs == rsn) {
+	    rs = SR_OK ;
+	}
+	if (rs >= 0) {
+	    rs = vechand_add(elp,ep) ;
+	}
+	return rs ;
+}
+/* end subroutine (vechand_addover) */
+
+

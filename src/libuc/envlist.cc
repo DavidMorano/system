@@ -1,9 +1,8 @@
-/* envlist */
+/* envlist SUPPORT */
+/* lang=C++20 */
 
 /* environment variable management */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,24 +16,19 @@
 
 /*******************************************************************************
 
-        This object just provides a hash list of environment-like (with a key
-        and an associated value) variables.
-
+	This object just provides a hash list of environment-like
+	(with a key and an associated value) variables.
 
 *******************************************************************************/
 
-
-#define	ENVLIST_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<strpack.h>
+#include	<strn.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"envlist.h"
@@ -54,15 +48,15 @@
 #define	ENVLIST_DBDATA			HDB_DATUM
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+typedef strpack	*	strpackp ;
+
+
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -73,63 +67,56 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	envlist_store(ENVLIST *,cchar *,int) ;
-static int	envlist_storer(ENVLIST *) ;
+static int	envlist_store(envlist *,cchar *,int) noex ;
+static int	envlist_storer(envlist *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int envlist_start(ENVLIST *op,int n)
-{
+int envlist_start(envlist *op,int n) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("envlist_start: ent op=%p\n",op) ;
-	debugprintf("envlist_start: n=%d\n",n) ;
-#endif
-
-	memset(op,0,sizeof(ENVLIST)) ;
-
+	memclear(op) ;
 	rs = ENVLIST_DBINIT(&op->list,n,0,NULL,NULL) ;
 
 	return rs ;
 }
 /* end subroutine (envlist_start) */
 
-
-/* free up the entire list object structure */
-int envlist_finish(ENVLIST *op)
-{
-	int		rs = SR_OK ;
+int envlist_finish(envlist *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->store != NULL) {
-	    STRPACK	*spp = op->store ;
-	    rs1 = strpack_finish(spp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->store) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->store = NULL ;
-	}
-
-	rs1 = ENVLIST_DBFREE(&op->list) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->store) {
+		{
+	            strpack	*spp = static_cast<strpackp>(op->store) ;
+	            rs1 = strpack_finish(spp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(op->store) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+	        op->store = NULL ;
+	    }
+	    {
+	        rs1 = ENVLIST_DBFREE(&op->list) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (envlist_finish) */
 
-
-int envlist_addkeyval(ENVLIST *op,cchar *kp,cchar *vp,int vl)
-{
+int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	int		rs ;
 	int		kl ;
 	int		size = 1 ;
@@ -161,13 +148,11 @@ int envlist_addkeyval(ENVLIST *op,cchar *kp,cchar *vp,int vl)
 }
 /* end subroutine (envlist_addkeyval) */
 
-
-int envlist_add(ENVLIST *op,cchar *sp,int sl)
-{
+int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	ENVLIST_DBDATA	key, val ;
 	int		rs ;
 	int		kl ;
-	const char	*tp ;
+	cchar		*tp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -176,10 +161,6 @@ int envlist_add(ENVLIST *op,cchar *sp,int sl)
 
 	kl = sl ;
 	if ((tp = strnchr(sp,sl,'=')) != NULL) kl = (tp-sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("envlist_add: k=>%t<\n",sp,kl) ;
-#endif
 
 	key.buf = sp ;
 	key.len = kl ;
@@ -188,35 +169,26 @@ int envlist_add(ENVLIST *op,cchar *sp,int sl)
 
 	rs = ENVLIST_DBSTORE(&op->list,key,val) ;
 
-#if	CF_DEBUGS
-	debugprintf("envlist_add: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (envlist_add) */
 
-
-/* return the count of the number of items in this list */
-int envlist_count(ENVLIST *op)
-{
-	int		rs ;
-
-	rs = ENVLIST_DBCOUNT(&op->list) ;
-
+int envlist_count(envlist *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = ENVLIST_DBCOUNT(&op->list) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (envlist_count) */
 
-
-/* search for an entry in the list */
-int envlist_present(ENVLIST *op,cchar *sp,int sl,cchar **rpp)
-{
-	ENVLIST_DBDATA	key, val ;
+int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
+	ENVLIST_DBDATA	key ;
+	ENVLIST_DBDATA	val ;
 	int		rs ;
 	int		kl ;
 	int		vl = 0 ;
-	const char	*tp ;
+	cchar		*tp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -225,10 +197,6 @@ int envlist_present(ENVLIST *op,cchar *sp,int sl,cchar **rpp)
 
 	kl = sl ;
 	if ((tp = strnchr(sp,sl,'=')) != NULL) kl = (tp-sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("envlist_present: k=>%t<\n",sp,kl) ;
-#endif
 
 	key.buf = sp ;
 	key.len = kl ;
@@ -240,16 +208,6 @@ int envlist_present(ENVLIST *op,cchar *sp,int sl,cchar **rpp)
 	    *rpp = (rs >= 0) ? (cchar *) val.buf : NULL ;
 	}
 
-#if	CF_DEBUGS
-	if (rs >= 0) {
-	    sp = (const char *) val.buf ;
-	    sl = val.len ;
-	    debugprintf("envlist_present: v=>%t<\n",
-		sp,strlinelen(sp,sl,50)) ;
-	}
-	debugprintf("envlist_present: ret rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
-
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (envlist_present) */
@@ -257,41 +215,35 @@ int envlist_present(ENVLIST *op,cchar *sp,int sl,cchar **rpp)
 
 /* private subroutines */
 
-
-static int envlist_store(ENVLIST *op,cchar *sp,int sl)
-{
+static int envlist_store(envlist *op,cchar *sp,int sl) noex {
 	int		rs ;
-
 	if ((rs = envlist_storer(op)) >= 0) {
-	    STRPACK	*spp = op->store ;
+	    strpack	*spp = static_cast<strpackp>(op->store) ;
 	    cchar	*ep ;
 	    if ((rs = strpack_store(spp,sp,sl,&ep)) >= 0) {
 		rs = envlist_add(op,ep,rs) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (envlist_store) */
 
-
-static int envlist_storer(ENVLIST *op)
-{
+static int envlist_storer(envlist *op) noex {
 	int		rs = SR_OK ;
 	if (op->store == NULL) {
-	    const int	osize = sizeof(STRPACK) ;
-	    void	*p ;
-	    if ((rs = uc_malloc(osize,&p)) >= 0) {
-		STRPACK		*spp = p ;
-	        const int	csize = ENVLIST_CHUNKSIZE ;
-		op->store = p ;
-	        rs = strpack_start(spp,csize) ;
+	    cint	osize = sizeof(strpack) ;
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(osize,&vp)) >= 0) {
+	        strpack		*spp = static_cast<strpackp>(vp) ;
+	        cint		csz = ENVLIST_CHUNKSIZE ;
+		op->store = vp ;
+	        rs = strpack_start(spp,csz) ;
 		if (rs < 0) {
 		    uc_free(op->store) ;
 		    op->store = NULL ;
 		}
 	    } /* end if (m-a) */
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (envlist_storer) */

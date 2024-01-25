@@ -130,50 +130,50 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
+extern int	snsd(char *,int,cchar *,uint) ;
 extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy3w(char *,int,const char *,const char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(const char **,const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	sncpy3w(char *,int,cchar *,cchar *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	matkeystr(cchar **,cchar *,int) ;
 extern int	ctdecl(char *,int,long) ;
 extern int	ctdecul(char *,int,ulong) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	nisdomainname(char *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	gethz(int) ;
-extern int	vecstr_envfile(vecstr *,const char *) ;
-extern int	hasvarpathprefix(const char *,int) ;
-extern int	mkvarpath(char *,const char *,int) ;
+extern int	vecstr_envfile(vecstr *,cchar *) ;
+extern int	hasvarpathprefix(cchar *,int) ;
+extern int	mkvarpath(char *,cchar *,int) ;
 extern int	vstrkeycmp(const void **,const void **) ;
-extern int	strkeycmp(const char *,const char *) ;
+extern int	strkeycmp(cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS || CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern cchar	*getourenv(const char **,const char *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strdcpy3w(char *,int,cchar *,cchar *,cchar *,int) ;
 
 
 /* external variables */
 
-extern const char	**environ ; /* secretly it's 'char **' */
+extern cchar	**environ ; /* secretly it's 'char **' */
 
 
 /* forward reference */
 
 static int	mkprogenv_mkenv(MKPROGENV *,cchar **) ;
-static int	mkprogenv_mkenvdef(MKPROGENV *,ENVLIST *,const char **) ;
-static int	mkprogenv_mkenvsys(MKPROGENV *,ENVLIST *,const char **) ;
-static int	mkprogenv_mkenvextras(MKPROGENV *,ENVLIST *,const char **) ;
+static int	mkprogenv_mkenvdef(MKPROGENV *,ENVLIST *,cchar **) ;
+static int	mkprogenv_mkenvsys(MKPROGENV *,ENVLIST *,cchar **) ;
+static int	mkprogenv_mkenvextras(MKPROGENV *,ENVLIST *,cchar **) ;
 static int	mkprogenv_envadd(MKPROGENV *,ENVLIST *,cchar *,cchar *,int) ;
 static int	mkprogenv_userinfo(MKPROGENV *) ;
 
@@ -265,7 +265,7 @@ int mkprogenv_start(MKPROGENV *op,cchar **envv) noex {
 
 	opts = VECHAND_OCOMPACT ;
 	if ((rs = vechand_start(&op->env,NENVS,opts)) >= 0) {
-	    const int	size = 256 ;
+	    cint	size = 256 ;
 	    if ((rs = strpack_start(&op->stores,size)) >= 0) {
 	        rs = mkprogenv_mkenv(op,envv) ;
 	        if (rs < 0)
@@ -329,7 +329,7 @@ int mkprogenv_envset(MKPROGENV *op,cchar *kp,cchar *vp,int vl) noex {
 	if (vp != NULL) size += strnlen(vp,vl) ;
 
 	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    const char	*ep ;
+	    cchar	*ep ;
 	    char	*bp = p ;
 	    bp = strwcpy(bp,kp,-1) ;
 	    *bp++ = '=' ;
@@ -370,9 +370,9 @@ static int mkprogenv_mkenv(MKPROGENV *op,cchar **envv) noex {
 	if ((rs = envlist_start(etp,NENVS)) >= 0) {
 	    vechand	*elp = &op->env ;
 	    int		f_path = FALSE ;
-	    const char	*varpath = VARPATH ;
-	    const char	*varpwd = VARPWD ;
-	    const char	*kp ;
+	    cchar	*varpath = VARPATH ;
+	    cchar	*varpwd = VARPWD ;
+	    cchar	*kp ;
 
 	    if ((rs >= 0) && (envv != NULL)) {
 	        int	i ;
@@ -431,7 +431,7 @@ static int mkprogenv_mkenv(MKPROGENV *op,cchar **envv) noex {
 /* PWD */
 
 	    if (rs >= 0) {
-	        const int	rsn = SR_NOTFOUND ;
+	        cint	rsn = SR_NOTFOUND ;
 	        if ((rs = envlist_present(etp,varpwd,-1,NULL)) == rsn) {
 	            char	pwd[MAXPATHLEN + 1] ;
 	            if ((rs = getpwd(pwd,MAXPATHLEN)) > 0) {
@@ -454,12 +454,12 @@ static int mkprogenv_mkenv(MKPROGENV *op,cchar **envv) noex {
 /* end subroutine (mkprogenv_mkenv) */
 
 static int mkprogenv_mkenvdef(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
-	const int	rsn = SR_NOTFOUND ;
+	cint	rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
-	const char	*kp ;
-	const char	*cp ;
+	cchar	*kp ;
+	cchar	*cp ;
 
 	for (i = 0 ; (rs >= 0) && (envs[i] != NULL) ; i += 1) {
 	    kp = envs[i] ;
@@ -481,7 +481,7 @@ static int mkprogenv_mkenvdef(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 /* end subroutine (mkprogenv_mkenvdef) */
 
 static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
-	const int	vlen = VBUFLEN ;
+	cint	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -492,9 +492,9 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 #else
 	struct utsname	un ;
 #endif
-	const char	*tp ;
-	const char	*kp ;
-	const char	*vp ;
+	cchar	*tp ;
+	cchar	*kp ;
+	cchar	*vp ;
 	char		vbuf[VBUFLEN+1] = { 0 } ;
 
 #if	CF_UINFO
@@ -510,7 +510,7 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	    debugprintf("mkprogenv_mkenvsys: k=%s\n",kp) ;
 #endif
 	    if ((rs = envlist_present(etp,kp,-1,NULL)) == SR_NOTFOUND) {
-	        const int	sc = MKCHAR(kp[0]) ;
+	        cint	sc = MKCHAR(kp[0]) ;
 
 	        rs = SR_OK ;
 	        vp = NULL ;
@@ -630,14 +630,14 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 /* end subroutine (mkprogenv_mkenvsys) */
 
 static int mkprogenv_mkenvextras(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
-	const int	nrs = SR_NOTFOUND ;
+	cint	nrs = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
 	int		f_home = FALSE ;
 	int		f_username = FALSE ;
-	const char	*var ;
-	const char	*kp ;
+	cchar	*var ;
+	cchar	*kp ;
 
 	for (i = 0 ; (rs >= 0) && (envs[i] != NULL) ; i += 1) {
 	    kp = envs[i] ;
@@ -703,7 +703,7 @@ static int mkprogenv_envadd(MKPROGENV *op,ENVLIST *etp,cchar *kp,
 	if (vp != NULL) bl += ((vl >= 0) ? vl : strlen(vp)) ;
 
 	if ((rs = uc_malloc((bl+1),&bp)) >= 0) {
-	    const char	*ep ;
+	    cchar	*ep ;
 
 	    strdcpy3w(bp,bl,kp,"=",vp,vl) ;
 
@@ -731,8 +731,8 @@ cchar *varpath,cchar *defpath) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	const char	*tp = DEFLOGFNAME ;
-	const char	*cp ;
+	cchar	*tp = DEFLOGFNAME ;
+	cchar	*cp ;
 
 	if ((rs = vecstr_start(&deflogin,10,0)) >= 0) {
 
@@ -770,7 +770,7 @@ cchar *varpath,cchar *defpath) noex {
 #else /* CF_DEFPATH */
 static int mkprogenv_cspath(MKPROGENV *op,ENVLIST *etp)
 {
-	const int	plen = (2*MAXPATHLEN) ;
+	cint	plen = (2*MAXPATHLEN) ;
 	int		rs ;
 	int		n = 0 ;
 	cchar		*varpath = VARPATH ;
@@ -792,9 +792,9 @@ static int mkprogenv_userinfo(MKPROGENV *op) noex {
 	int		rs1 ;
 	if (op->un[0] == '\0') {
 	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	        struct passwd	pw ;
-	        const int	pwlen = rs ;
-	        char		*pwbuf ;
+	        PASSWD	pw ;
+	        cint	pwlen = rs ;
+	        char	*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
 	                cchar	*cp ;
