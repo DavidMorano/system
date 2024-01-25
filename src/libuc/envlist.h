@@ -22,8 +22,8 @@
 
 
 struct envlist_head {
-	hdb		list ;
-	void		*store ;
+	hdb		*elp ;
+	void		*store ;	/* <- this is a STRPACK object */
 } ;
 
 typedef ENVLIST		envlist ;

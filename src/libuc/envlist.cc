@@ -50,6 +50,9 @@
 
 /* local namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
@@ -67,6 +70,34 @@ typedef strpack	*	strpackp ;
 
 /* forward references */
 
+template<typename ... Args>
+static int envlist_ctor(envlist *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->store = nullptr ;
+	    if ((op->elp = new(nothrow) hdb) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (envlist_ctor) */
+
+static int envlist_dtor(envlist *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (clusterdb_dtor) */
+
 static int	envlist_store(envlist *,cchar *,int) noex ;
 static int	envlist_storer(envlist *) noex ;
 
@@ -81,9 +112,12 @@ static int	envlist_storer(envlist *) noex ;
 
 int envlist_start(envlist *op,int ne) noex {
 	int		rs = SR_FAULT ;
-	if (op) {
+	if ((rs = envlist_ctor(op)) >= 0) {
 	    memclear(op) ;
-	    rs = ENVLIST_DBINIT(&op->list,ne,0,nullptr,nullptr) ;
+	    rs = ENVLIST_DBINIT(op->elp,ne,0,nullptr,nullptr) ;
+	    if (rs < 0) {
+		envlist_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -105,9 +139,13 @@ int envlist_finish(envlist *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 	        op->store = nullptr ;
+	    } /* end if (store) */
+	    {
+	        rs1 = ENVLIST_DBFREE(op->elp) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = ENVLIST_DBFREE(&op->list) ;
+		rs1 = envlist_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -164,7 +202,7 @@ int envlist_add(envlist *op,cchar *sp,int sl) noex {
 	    key.len = kl ;
 	    val.buf = sp ;
 	    val.len = sl ;
-	    rs = ENVLIST_DBSTORE(&op->list,key,val) ;
+	    rs = ENVLIST_DBSTORE(op->elp,key,val) ;
 	    ridx = rs ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? ridx : rs ;
@@ -174,7 +212,7 @@ int envlist_add(envlist *op,cchar *sp,int sl) noex {
 int envlist_count(envlist *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = ENVLIST_DBCOUNT(&op->list) ;
+	    rs = ENVLIST_DBCOUNT(op->elp) ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -195,7 +233,7 @@ int envlist_present(envlist *op,cchar *sp,int sl,cchar **rpp) noex {
 	    }
 	    key.buf = sp ;
 	    key.len = kl ;
-	    if ((rs = ENVLIST_DBFETCH(&op->list,key,nullptr,&val)) >= 0) {
+	    if ((rs = ENVLIST_DBFETCH(op->elp,key,nullptr,&val)) >= 0) {
 		vl = val.len ;
 	    }
 	    if (rpp) {
