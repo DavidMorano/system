@@ -592,13 +592,13 @@ int vecstr_findaddr(vecstr *op,cchar *addr) noex {
 }
 /* end subroutine (vecstr_findaddr) */
 
-int vecstr_getvec(vecstr *op,cchar ***rppp) noex {
+int vecstr_getvec(vecstr *op,mainv *rppp) noex {
 	int	rs = SR_FAULT ;
 	if (op && rppp) {
 	    if ((rs = vecstr_extvec(op)) >= 0) {
 	        if (op->va) {
 		    rs = op->c ;
-		    *rppp = op->va ;
+		    *rppp = mainv(op->va) ;
 		}
 	    }
 	} /* end if (non-null) */
