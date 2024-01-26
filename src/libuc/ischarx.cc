@@ -311,7 +311,7 @@ bool isupperlatin(int ch) noex {
 }
 /* end subroutine (isupperlatin) */
 
-extern bool isnumsign(int ch) noex {
+bool isnumsign(int ch) noex {
 	return ((ch == '+') || (ch == '-')) ;
 }
 
