@@ -736,14 +736,14 @@ int vecpstr_indsize(vecpstr *op) noex {
 }
 /* end subroutine (vecpstr_indsize) */
 
-int vecpstr_getvec(vecpstr *op,cchar ***rppp) noex {
+int vecpstr_getvec(vecpstr *op,mainv *rppp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = vecpstr_magic(op,rppp)) >= 0) {
-	        if ((rs = vecpstr_extvec(op,1)) >= 0) {
-	            *rppp = op->va ;
-		    i = op->i ;
-	        }
+	    if ((rs = vecpstr_extvec(op,1)) >= 0) {
+	        *rppp = mainv(op->va) ;
+		i = op->i ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }

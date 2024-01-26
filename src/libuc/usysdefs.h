@@ -255,6 +255,11 @@
 #define	SVCNAMELEN	32
 #endif
 
+/* maximum SHM name (as per POSIX®) */
+#ifndef	SHMNAME_MAX
+#define	SHMNAME_MAX	14		/* historic value (in decimal) */
+#endif
+
 /* maximum PID on the system (could be wrong) */
 #ifndef	PID_MAX
 #define	PID_MAX		99999		/* historic value (in decimal) */

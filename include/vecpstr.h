@@ -116,7 +116,7 @@ extern int vecpstr_indlen(vecpstr *) noex ;
 extern int vecpstr_indsize(vecpstr *) noex ;
 extern int vecpstr_indmk(vecpstr *,int (*)[3],int,int) noex ;
 extern int vecpstr_audit(vecpstr *) noex ;
-extern int vecpstr_getvec(vecpstr *,cchar ***) noex ;
+extern int vecpstr_getvec(vecpstr *,mainv *) noex ;
 extern int vecpstr_finish(vecpstr *) noex ;
 
 extern int vecpstr_addsubdirs(vecpstr *,cchar *) noex ;

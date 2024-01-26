@@ -74,6 +74,7 @@
 #include	<ucfdmanip.h>
 #include	<ucuserattr.h>
 #include	<uctimer.h>
+#include	<ucgetpid.h>
 
 
 EXTERNC_begin

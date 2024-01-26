@@ -167,6 +167,9 @@ constexpr gid_t		gidend = gid_t(-1) ;
 constexpr cchar		fnshells[] = FNSHELLS ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int main(int argc,mainv argv,mainv) noex {
@@ -281,7 +284,7 @@ static int printgroup(const userinfo *uip) noex {
 static int printshells() noex {
 	cint		llen = MAXLINE ;
 	char		*lbuf ;
-	int		rs = SR_FAULT ;
+	int		rs = SR_NOMEM ;
 	int		rs1 ;
 	if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
 	    try {
