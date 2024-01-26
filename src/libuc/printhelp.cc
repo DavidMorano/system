@@ -43,22 +43,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#if	defined(SFIO) && (SFIO > 0)
-#define	CF_SFIO	1
-#else
-#define	CF_SFIO	0
-#endif
-
-#if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
-#include	<shell.h>
-#endif
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<ostream>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<vecstr.h>
@@ -72,9 +59,10 @@
 #include	<isnot.h>
 #include	<xperm.h>
 #include	<getnodename.h>
+#include	<rmx.h>
 #include	<localmisc.h>
 
-#include	"printhelp.h"
+#include	"printhelp.hh"
 
 
 /* local defines */
@@ -106,6 +94,8 @@
 
 /* local namespaces */
 
+using std::ostream ;			/* type */
+
 
 /* local typedefs */
 
@@ -113,9 +103,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) noex ;
     extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
-    extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) noex ;
     extern int	vecstr_loadfile(vecstr *,int,cchar *) noex ;
 }
 
@@ -128,11 +116,14 @@ extern "C" {
 
 /* forward references */
 
+static int	printhelper(ostream *,cc *,cc *,cc *) noex ;
+static int	printproc(ostream *,cchar *,cchar *,cchar *) noex ;
+static int	printout(ostream *,expcook *,cc *) noex ;
+
 static int	findhelp(cchar *,cchar *,char *,cchar *) noex ;
 static int	loadscheds(vecstr *,cchar *,cchar *) noex ;
-static int	procprint(cchar *,cchar *,void *,char *,int,cchar *) noex ;
-static int	procexpload(cchar *,expcook *,cchar *) noex ;
-static int	procout(expcook *,void *,char *,int,cchar *) noex ;
+
+static int	expcook_load(expcook *,cc *,cc *) noex ;
 
 
 /* local variables */
@@ -174,60 +165,63 @@ static constexpr cchar	*expkeys[] = {
 
 /* export subroutines */
 
-int printhelp(void *fp,cchar *pr,cchar *sn,cchar *hfname) noex {
-	cint	tlen = MAXPATHLEN ;
-	int		rs = SR_OK ;
-	cchar	*fname ;
-	char		tbuf[MAXPATHLEN + 1] ;
-
-	if ((hfname == nullptr) || (hfname[0] == '\0'))
-	    hfname = HELPFNAME ;
-
-#if	CF_SFIO
-	if (fp == nullptr) {
-	    rs = SR_INVALID ;
+int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if ((fn == nullptr) || (fn[0] == '\0')) {
+	    fn = HELPFNAME ;
 	}
-#endif /* CF_SFIO */
-
-	if (rs >= 0) {
-
-	    fname = hfname ;
-	    if ((pr != nullptr) && (hfname[0] != '/')) {
-
-	        rs = SR_NOTFOUND ;
-	        if (strchr(hfname,'/') != nullptr) {
-	            fname = tbuf ;
-	            if ((rs = mkpath2(tbuf,pr,hfname)) >= 0) {
-	                rs = u_access(tbuf,R_OK) ;
-		    }
-	        } /* end if */
-
-	        if ((rs < 0) && isNotPresent(rs)) {
-	            fname = tbuf ;
-	            rs = findhelp(pr,sn,tbuf,hfname) ;
-	        }
-
-	    } /* end if (searching for file) */
-
-	    if (rs >= 0) {
-	        rs = procprint(pr,sn,fp,tbuf,tlen,fname) ;
-	    }
-
-	} /* end if (ok) */
-
-	return rs ;
+	if (osp && pr && sn) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && sn[0]) {
+	        if (fn[0] != '/') {
+		    rs = printhelper(osp,pr,sn,fn) ;
+		    len = rs ;
+		} else {
+		    rs = printproc(osp,pr,sn,fn) ;
+		    len = rs ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (printhelp) */
 
 
 /* local subroutines */
 
+static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if (strchr(fn,'/') != nullptr) {
+	        if ((rs = mkpath(tbuf,pr,fn)) >= 0) {
+	            if ((rs = u_access(tbuf,R_OK)) >= 0) {
+		        rs = printproc(osp,pr,sn,tbuf) ;
+			len = rs ;
+		    }
+	        } /* end if */
+	    } else {
+		if ((rs = findhelp(pr,sn,tbuf,fn)) >= 0) {
+		        rs = printproc(osp,pr,sn,tbuf) ;
+			len = rs ;
+	        }
+	    } /* end if (searching for file) */
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (printhelper) */
+
 static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *hfname) noex {
 	vecstr		hs ;
 	cint	tlen = MAXPATHLEN ;
 	int		rs ;
-	int		f_hs = FALSE ;
-	cchar	**spp = schedule ;
+	int		f_hs = false ;
+	mainv		spp = schedule ;
 
 /* first see if there is a "help schedule" in the ETC directory */
 
@@ -235,9 +229,12 @@ static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *hfname) noex {
 	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
 		cint	vo = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
-	            f_hs = TRUE ;
-	            if ((rs = vecstr_loadfile(&hs,FALSE,tbuf)) >= 0) {
-	                vecstr_getvec(&hs,&spp) ;
+	            f_hs = true ;
+	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
+			mainv	rp{} ;
+	                if ((rs = vecstr_getvec(&hs,&rp)) >= 0) {
+			    spp = rp ;
+			}
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 		    }
@@ -286,38 +283,70 @@ static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 }
 /* end subroutine (loadscheds) */
 
-static int procprint(cc *pr,cc *sn,void *fp,char *rp,int rl,cc *fn) noex {
-	expcook		c ;
+static int printproc(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
+	expcook		ck ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = expcook_start(&c)) >= 0) {
-	    if ((rs = procexpload(pr,&c,sn)) >= 0) {
-	        rs = procout(&c,fp,rp,rl,fn) ;
+	if ((rs = expcook_start(&ck)) >= 0) {
+	    if ((rs = expcook_load(&ck,pr,sn)) >= 0) {
+	        rs = printout(osp,&ck,fn) ;
 	        wlen += rs ;
-	    } /* end if (procexpload) */
-	    rs1 = expcook_finish(&c) ;
+	    } /* end if (expcook_load) */
+	    rs1 = expcook_finish(&ck) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (expcook) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (procprint) */
+/* end subroutine (printproc) */
 
-static int procexpload(cchar *pr,expcook *ecp,cchar *sn) noex {
+static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	char		*lbuf{} ;
+	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    char	*ebuf{} ;
+	    cint	llen = rs ;
+	    cint	elen = (2 * rs) ;
+	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
+	        bfile	helpfile, *hfp = &helpfile ;
+	        if ((rs = bopen(hfp,fn,"r",0666)) >= 0) {
+	            while ((rs = breadln(hfp,lbuf,llen)) > 0) {
+	                cint	len = rmeol(lbuf,rs) ;
+		        if ((rs = expcook_exp(ecp,0,ebuf,elen,lbuf,len)) > 0) {
+			    (*osp) << ebuf << eol ;
+	                    wlen += (rs + 1) ;
+		        } /* end if (expansion) */
+	                if (rs < 0) break ;
+	            } /* end while */
+	            rs1 = bclose(hfp) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (opened helpfile) */
+		rs1 = uc_free(ebuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	    rs1 = uc_free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (printout) */
+
+static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 	int		rs ;
 	char		nn[NODENAMELEN+1] ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 
 	if ((rs = getnodedomain(nn,dn)) >= 0) {
 	    cint	hlen = MAXHOSTNAMELEN ;
-	    int		i ;
 	    int		vl ;
 	    cchar	*vp ;
 	    cchar	*ks = "SNDHPR" ;
 	    char	hbuf[MAXHOSTNAMELEN + 1] ;
 	    char	kbuf[KBUFLEN+1] ;
 	    kbuf[1] = '\0' ;
-	    for (i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
 	        cint	kch = mkchar(ks[i]) ;
 		vl = -1 ;
 		vp = nullptr ;
@@ -350,7 +379,7 @@ static int procexpload(cchar *pr,expcook *ecp,cchar *sn) noex {
 	        }
 	    } /* end for */
 	    if (rs >= 0) {
-		for (i = 0 ; (rs >= 0) && (i < expkey_overlast) ; i += 1) {
+		for (int i = 0 ; (rs >= 0) && (i < expkey_overlast) ; i += 1) {
 		    vl = -1 ;
 		    vp = nullptr ;
 		    switch (i) {
@@ -376,70 +405,6 @@ static int procexpload(cchar *pr,expcook *ecp,cchar *sn) noex {
 	} /* end if (getnodedomain) */
 	return rs ;
 }
-/* end subroutine (procexpload) */
-
-static int procout(expcook *ecp,void *fp,char *lbuf,int llen,cc *fname) noex {
-#if	CF_SFIO
-#else
-	bfile		outfile ;
-#endif /* CF_SFIO */
-	bfile		helpfile, *hfp = &helpfile ;
-	int		rs = SR_OK ;
-	int		wlen = 0 ;
-
-#if	CF_SFIO
-#else
-	int		f_open = FALSE ;
-#endif /* CF_SFIO */
-
-	if (lbuf == nullptr) return SR_FAULT ;
-
-#if	CF_SFIO
-	if (fp == nullptr) return SR_FAULT ;
-#else /* CF_SFIO */
-	if (fp == nullptr) {
-	    fp = &outfile ;
-	    rs = bopen(fp,BFILE_STDOUT,"w",0666) ;
-	    f_open = (rs >= 0) ;
-	}
-#endif /* CF_SFIO */
-
-	if ((rs >= 0) && ((rs = bopen(hfp,fname,"r",0666)) >= 0)) {
-	    cint	elen = EBUFLEN ;
-	    char	*ebuf ;
-	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
-	        int	len ;
-
-	        while ((rs = breadln(hfp,lbuf,llen)) > 0) {
-	            len = rs ;
-
-		    if ((rs = expcook_exp(ecp,0,ebuf,elen,lbuf,len)) > 0) {
-#if	CF_SFIO
-	                rs = sfwrite(fp,ebuf,rs) ;
-	                wlen += rs ;
-#else /* CF_SFIO */
-	                rs = bwrite(fp,ebuf,rs) ;
-	                wlen += rs ;
-#endif /* CF_SFIO */
-		    } /* end if (expansion) */
-
-	            if (rs < 0) break ;
-	        } /* end while */
-
-		uc_free(ebuf) ;
-	    } /* end if (memory-allocation) */
-	    bclose(hfp) ;
-	} /* end if (opened helpfile) */
-
-#if	CF_SFIO
-	sfsync(fp) ;
-#else
-	if (f_open)
-	    bclose(fp) ;
-#endif /* CF_SFIO */
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procout) */
+/* end subroutine (expcook_load) */
 
 
