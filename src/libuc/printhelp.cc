@@ -47,6 +47,7 @@
 #include	<cstring>
 #include	<ostream>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -159,6 +160,8 @@ static constexpr cchar	*expkeys[] = {
 	nullptr
 } ;
 
+static bufsizevar	maxpathlen(getbufsize_mp) ;
+
 
 /* exported variables */
 
@@ -216,20 +219,15 @@ static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 }
 /* end subroutine (printhelper) */
 
-static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *hfname) noex {
-	vecstr		hs ;
-	cint	tlen = MAXPATHLEN ;
+static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
 	int		rs ;
-	int		f_hs = false ;
+	int		rs1 ;
 	mainv		spp = schedule ;
-
-/* first see if there is a "help schedule" in the ETC directory */
-
 	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
 	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
+		vecstr	hs ;
 		cint	vo = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
-	            f_hs = true ;
 	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
 			mainv	rp{} ;
 	                if ((rs = vecstr_getvec(&hs,&rp)) >= 0) {
@@ -238,32 +236,29 @@ static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *hfname) noex {
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
 		    }
-	        }
+	    	    rs1 = vecstr_finish(&hs) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (vecstr) */
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
 	} /* end if (mkpath) */
-
-/* create the values for the file schedule searching and find the file */
-
 	if (rs >= 0) {
-	    vecstr	svars ;
-	    if ((rs = vecstr_start(&svars,6,0)) >= 0) {
-	        rs = loadscheds(&svars,pr,sn) ;
-	        if (rs >= 0) {
-	            rs = permsched(spp,&svars,tbuf,tlen,hfname,R_OK) ;
-		}
-	        if (isNotPresent(rs) && (spp != schedule)) {
-	            rs = permsched(schedule,&svars,tbuf,tlen,hfname,R_OK) ;
-		}
-	        vecstr_finish(&svars) ;
-	    } /* end if (schedule variables) */
+	    if ((rs = maxpathlen) >= 0) {
+		cint	tlen = rs ;
+	        vecstr	svars ;
+	        if ((rs = vecstr_start(&svars,6,0)) >= 0) {
+	            rs = loadscheds(&svars,pr,sn) ;
+	            if (rs >= 0) {
+	                rs = permsched(spp,&svars,tbuf,tlen,fn,R_OK) ;
+		    }
+	            if (isNotPresent(rs) && (spp != schedule)) {
+	                rs = permsched(schedule,&svars,tbuf,tlen,fn,R_OK) ;
+		    }
+	            vecstr_finish(&svars) ;
+	        } /* end if (schedule variables) */
+	    } /* end if (maxpathlen) */
 	} /* end if (ok) */
-
-	if (f_hs) {
-	    vecstr_finish(&hs) ;
-	}
-
 	return rs ;
 }
 /* end subroutine (findhelp) */
