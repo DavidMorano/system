@@ -114,6 +114,12 @@ extern "C" {
 
 /* local structures */
 
+struct vars {
+	int		maxnodelen ;
+	int		maxhostlen ;
+	int		maxcombolen ;
+} ;
+
 
 /* forward references */
 
@@ -125,6 +131,8 @@ static int	findhelp(cchar *,cchar *,char *,cchar *) noex ;
 static int	loadscheds(vecstr *,cchar *,cchar *) noex ;
 
 static int	expcook_load(expcook *,cc *,cc *) noex ;
+
+static int	mkvars() noex ;
 
 
 /* local variables */
@@ -161,6 +169,7 @@ static constexpr cchar	*expkeys[] = {
 } ;
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+static vars		var ;
 
 
 /* exported variables */
@@ -177,13 +186,16 @@ int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
 	if (osp && pr && sn) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && sn[0]) {
-	        if (fn[0] != '/') {
-		    rs = printhelper(osp,pr,sn,fn) ;
-		    len = rs ;
-		} else {
-		    rs = printproc(osp,pr,sn,fn) ;
-		    len = rs ;
-		}
+		static int	rsv = mkvars() ;
+		if ((rs = rsv) >= 0) {
+	            if (fn[0] != '/') {
+		        rs = printhelper(osp,pr,sn,fn) ;
+		        len = rs ;
+		    } else {
+		        rs = printproc(osp,pr,sn,fn) ;
+		        len = rs ;
+		    }
+		} /* end if (mkvars) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -255,7 +267,8 @@ static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
 	            if (isNotPresent(rs) && (spp != schedule)) {
 	                rs = permsched(schedule,&svars,tbuf,tlen,fn,R_OK) ;
 		    }
-	            vecstr_finish(&svars) ;
+	            rs1 = vecstr_finish(&svars) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (schedule variables) */
 	    } /* end if (maxpathlen) */
 	} /* end if (ok) */
@@ -330,76 +343,96 @@ static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 
 static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 	int		rs ;
-	char		nn[NODENAMELEN+1] ;
-	char		dn[MAXHOSTNAMELEN+1] ;
-
-	if ((rs = getnodedomain(nn,dn)) >= 0) {
-	    cint	hlen = MAXHOSTNAMELEN ;
-	    int		vl ;
-	    cchar	*vp ;
-	    cchar	*ks = "SNDHPR" ;
-	    char	hbuf[MAXHOSTNAMELEN + 1] ;
-	    char	kbuf[KBUFLEN+1] ;
-	    kbuf[1] = '\0' ;
-	    for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
-	        cint	kch = mkchar(ks[i]) ;
-		vl = -1 ;
-		vp = nullptr ;
-		switch (kch) {
-	        case 'S':
-		    vp = sn ;
-		    break ;
-	        case 'N':
-		    vp = nn ;
-		    break ;
-	        case 'D':
-		    vp = dn ;
-		    break ;
-	        case 'H':
-		    if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
-			vl = rs ;
-		        vp = hbuf ;
-		    }
-		    break ;
-	        case 'P':
-		    vp = pr ;
-		    break ;
-	        case 'R':
-		    vl = sfbasename(pr,-1,&vp) ;
-		    break ;
-	        } /* end switch */
-	        if ((rs >= 0) && (vp != nullptr)) {
-		    kbuf[0] = kch ;
-		    rs = expcook_add(ecp,kbuf,vp,vl) ;
-	        }
-	    } /* end for */
-	    if (rs >= 0) {
-		for (int i = 0 ; (rs >= 0) && (i < expkey_overlast) ; i += 1) {
-		    vl = -1 ;
-		    vp = nullptr ;
-		    switch (i) {
-		    case expkey_sn:
-			vp = sn ;
-			break ;
-		    case expkey_ss:
-			vp = hbuf ;
-			vl = strwcpyuc(hbuf,sn,-1) - hbuf ;
-			break ;
-		    case expkey_pr:
-			vp = pr ;
-			break ;
-		    case expkey_rn:
-		        vl = sfbasename(pr,-1,&vp) ;
-			break ;
-		    } /* end switch */
-	            if ((rs >= 0) && (vp != nullptr)) {
-		        rs = expcook_add(ecp,expkeys[i],vp,vl) ;
-	            }
-		} /* end for */
-	    } /* end if (ok) */
-	} /* end if (getnodedomain) */
+	int		rs1 ;
+	char		*nn{} ;
+	if ((rs = uc_malloc(var.maxcombolen,&nn)) >= 0) {
+	    char	*dn = (nn + (var.maxnodelen + 1)) ;
+	    if ((rs = getnodedomain(nn,dn)) >= 0) {
+	        char	*hbuf{} ;
+	        if ((rs = malloc_hn(&hbuf)) >= 0) {
+		    cint	hlen = rs ;
+	            cchar	*ks = "SNDHPR" ;
+	            char	kbuf[KBUFLEN+1] ;
+	            kbuf[1] = '\0' ;
+	            for (int i = 0 ; (rs >= 0) && (ks[i] != '\0') ; i += 1) {
+	                cint	kch = mkchar(ks[i]) ;
+		        int	vl = -1 ;
+		        cchar	*vp = nullptr ;
+		        switch (kch) {
+	                case 'S':
+		            vp = sn ;
+		            break ;
+	                case 'N':
+		            vp = nn ;
+		            break ;
+	                case 'D':
+		            vp = dn ;
+		            break ;
+	                case 'H':
+		            if ((rs = snsds(hbuf,hlen,nn,dn)) >= 0) {
+			        vl = rs ;
+		                vp = hbuf ;
+		            }
+		            break ;
+	                case 'P':
+		            vp = pr ;
+		            break ;
+	                case 'R':
+		            vl = sfbasename(pr,-1,&vp) ;
+		            break ;
+	                } /* end switch */
+	                if ((rs >= 0) && vp) {
+		            kbuf[0] = kch ;
+		            rs = expcook_add(ecp,kbuf,vp,vl) ;
+	                }
+	            } /* end for */
+	            if (rs >= 0) {
+		        cint	n = expkey_overlast ;
+		        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+		            int		vl = -1 ;
+		            cchar	*vp = nullptr ;
+		            switch (i) {
+		            case expkey_sn:
+			        vp = sn ;
+			        break ;
+		            case expkey_ss:
+			        vp = hbuf ;
+			        vl = strwcpyuc(hbuf,sn,-1) - hbuf ;
+			        break ;
+		            case expkey_pr:
+			        vp = pr ;
+			        break ;
+		            case expkey_rn:
+		                vl = sfbasename(pr,-1,&vp) ;
+			        break ;
+		            } /* end switch */
+	                    if ((rs >= 0) && vp) {
+		                rs = expcook_add(ecp,expkeys[i],vp,vl) ;
+	                    }
+		        } /* end for */
+	            } /* end if (ok) */
+		    rs1 = uc_free(hbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (getnodedomain) */
+	    rs1 = uc_free(nn) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (expcook_load) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	    var.maxhostlen = rs ;
+	    if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	        var.maxnodelen = rs ;
+		var.maxcombolen = ((var.maxhostlen+1) + rs) ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
