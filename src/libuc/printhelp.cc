@@ -47,6 +47,7 @@
 #include	<cstring>
 #include	<ostream>
 #include	<usystem.h>
+#include	<syswords.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<vecstr.h>
@@ -72,24 +73,14 @@
 #define	KBUFLEN		40
 #endif
 
-#ifndef	EBUFLEN
-#define	EBUFLEN		(2*LINEBUFLEN)
-#endif
+#define	ELENMULT	2		/* multiply factor cookie expands */
 
 #ifndef	HELPSCHEDFNAME
 #define	HELPSCHEDFNAME	"etc/printhelp.filesched"
 #endif
 
-#ifndef	HELPFNAME
-#define	HELPFNAME	"help"
-#endif
-
 #ifndef	LIBCNAME
 #define	LIBCNAME	"lib"
-#endif
-
-#ifndef	NDF
-#define	NDF		"printhelp.deb"
 #endif
 
 
@@ -181,7 +172,7 @@ int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if ((fn == nullptr) || (fn[0] == '\0')) {
-	    fn = HELPFNAME ;
+	    fn = sysword.w_help ;
 	}
 	if (osp && pr && sn) {
 	    rs = SR_INVALID ;
@@ -282,7 +273,8 @@ static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	    rs = vecstr_envadd(slp,"r",pr,-1) ;
 	}
 	if (rs >= 0) {
-	    rs = vecstr_envadd(slp,"l",LIBCNAME,-1) ;
+	    cchar	*w_lib = sysword.w_lib ;
+	    rs = vecstr_envadd(slp,"l",w_lib,-1) ;
 	}
 	if ((rs >= 0) && (sn != nullptr)) {
 	    rs = vecstr_envadd(slp,"n",sn,-1) ;
@@ -316,7 +308,7 @@ static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
 	    char	*ebuf{} ;
 	    cint	llen = rs ;
-	    cint	elen = (2 * rs) ;
+	    cint	elen = (ELENMULT * rs) ;
 	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 	        bfile	helpfile, *hfp = &helpfile ;
 	        if ((rs = bopen(hfp,fn,"r",0666)) >= 0) {
