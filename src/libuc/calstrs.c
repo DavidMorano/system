@@ -1,4 +1,4 @@
-/* calstrs */
+/* calstrs SUPPORT */
 /* lang=C20 */
 
 /* calendar strings */
@@ -26,7 +26,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 /* local defines */
@@ -48,12 +47,12 @@
 
 cchar	*calstrs_months[] = {
 	"January", "February", "March", "April", "May", "June", "July", 
-	"August", "September", "October", "November", "December", NULL
+	"August", "September", "October", "November", "December", nullptr
 } ;
 
 cchar	*calstrs_days[] = {
 	"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
-	"Friday", "Saturday", NULL
+	"Friday", "Saturday", nullptr
 } ;
 
 
