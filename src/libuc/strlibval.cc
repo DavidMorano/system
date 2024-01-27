@@ -77,6 +77,9 @@ constexpr strenv::strenv() noex {
 	name[strlibval_cdpath] = varname.cdpath ;
 	name[strlibval_tmpdir] = varname.tmpdir ;
 	name[strlibval_maildir] = varname.maildir ;
+	name[strlibval_node] = varname.node ;
+	name[strlibval_domain] = varname.domain ;
+	name[strlibval_localdomain] = varname.localdomain ;
 }
 /* end method (strenv::ctor) */
 

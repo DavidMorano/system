@@ -46,6 +46,9 @@ enum strlibvals {
 	strlibval_cdpath,
 	strlibval_tmpdir,
 	strlibval_maildir,
+	strlibval_node,
+	strlibval_domain,
+	strlibval_localdomain,
 	strlibval_overlast
 } ;
 
