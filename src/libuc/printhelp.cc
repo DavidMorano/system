@@ -218,67 +218,6 @@ static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 }
 /* end subroutine (printhelper) */
 
-static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
-	int		rs ;
-	int		rs1 ;
-	mainv		spp = schedule ;
-	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
-	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
-		vecstr	hs ;
-		cint	vo = VECSTR_OCOMPACT ;
-	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
-	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
-			mainv	rp{} ;
-	                if ((rs = vecstr_getvec(&hs,&rp)) >= 0) {
-			    spp = rp ;
-			}
-		    } else if (isNotPresent(rs)) {
-			rs = SR_OK ;
-		    }
-	    	    rs1 = vecstr_finish(&hs) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (vecstr) */
-	    } else if (isNotPresent(rs)) {
-	        rs = SR_OK ;
-	    }
-	} /* end if (mkpath) */
-	if (rs >= 0) {
-	    if ((rs = maxpathlen) >= 0) {
-		cint	tlen = rs ;
-	        vecstr	svars ;
-	        if ((rs = vecstr_start(&svars,6,0)) >= 0) {
-	            rs = loadscheds(&svars,pr,sn) ;
-	            if (rs >= 0) {
-	                rs = permsched(spp,&svars,tbuf,tlen,fn,R_OK) ;
-		    }
-	            if (isNotPresent(rs) && (spp != schedule)) {
-	                rs = permsched(schedule,&svars,tbuf,tlen,fn,R_OK) ;
-		    }
-	            rs1 = vecstr_finish(&svars) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (schedule variables) */
-	    } /* end if (maxpathlen) */
-	} /* end if (ok) */
-	return rs ;
-}
-/* end subroutine (findhelp) */
-
-static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
-	int		rs = SR_OK ;
-	if (pr != nullptr) {
-	    rs = vecstr_envadd(slp,"r",pr,-1) ;
-	}
-	if (rs >= 0) {
-	    cchar	*w_lib = sysword.w_lib ;
-	    rs = vecstr_envadd(slp,"l",w_lib,-1) ;
-	}
-	if ((rs >= 0) && (sn != nullptr)) {
-	    rs = vecstr_envadd(slp,"n",sn,-1) ;
-	}
-	return rs ;
-}
-/* end subroutine (loadscheds) */
-
 static int printproc(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 	expcook		ck ;
 	int		rs ;
@@ -328,6 +267,74 @@ static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (printout) */
+
+static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	mainv		spp = schedule ;
+	    if ((rs = maxpathlen) >= 0) {
+		cint	tlen = rs ;
+	        vecstr	svars ;
+	        if ((rs = vecstr_start(&svars,6,0)) >= 0) {
+	            rs = loadscheds(&svars,pr,sn) ;
+	            if (rs >= 0) {
+	                rs = permsched(spp,&svars,tbuf,tlen,fn,R_OK) ;
+		    }
+	            if (isNotPresent(rs) && (spp != schedule)) {
+	                rs = permsched(schedule,&svars,tbuf,tlen,fn,R_OK) ;
+		    }
+	            rs1 = vecstr_finish(&svars) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (schedule variables) */
+	    } /* end if (maxpathlen) */
+	return rs ;
+}
+/* end subroutine (findhelp) */
+
+#ifdef	COMMENT
+static int havealtsched(char *tbuf,cchar *pr,mainv *asp) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
+	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
+		vecstr	hs ;
+		cint	vo = VECSTR_OCOMPACT ;
+	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
+	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
+			mainv	rp{} ;
+	                if ((rs = vecstr_getvec(&hs,&rp)) >= 0) {
+			    *asp = rp ;
+			}
+		    } else if (isNotPresent(rs)) {
+			rs = SR_OK ;
+		    }
+	    	    rs1 = vecstr_finish(&hs) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (vecstr) */
+	    } else if (isNotPresent(rs)) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (mkpath) */
+	return rs ;
+}
+/* end subroutine (havealtsched) */
+#endif /* COMMENT */
+
+static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
+	int		rs = SR_OK ;
+	if (pr != nullptr) {
+	    rs = vecstr_envadd(slp,"r",pr,-1) ;
+	}
+	if (rs >= 0) {
+	    cchar	*w_lib = sysword.w_lib ;
+	    rs = vecstr_envadd(slp,"l",w_lib,-1) ;
+	}
+	if ((rs >= 0) && (sn != nullptr)) {
+	    rs = vecstr_envadd(slp,"n",sn,-1) ;
+	}
+	return rs ;
+}
+/* end subroutine (loadscheds) */
 
 static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
 	int		rs ;
