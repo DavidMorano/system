@@ -26,10 +26,10 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 struct varnames {
@@ -61,6 +61,7 @@ struct varnames {
 	static const char node[] ;
 	static const char cluster[] ;
 	static const char domain[] ;
+	static const char localdomain[] ;
 	static const char lang[] ;
 	static const char shell[] ;
 	static const char shlvl[] ;
