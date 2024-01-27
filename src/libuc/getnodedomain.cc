@@ -4,7 +4,7 @@
 /* get the local node name and INET domain name */
 /* version %I% last-modified %G% */
 
-#define	CF_GUESS	1	/* try to guess domain names? */
+#define	CF_GUESS	0	/* try to guess domain names? */
 
 /* revision history:
 
@@ -107,6 +107,10 @@
 #define	TRY		struct tryer
 #define	TRY_FL		struct tryer_flags
 
+#ifndef	CF_GUESS
+#define	CF_GUESS	0
+#endif
+
 
 /* local namespaces */
 
@@ -158,9 +162,9 @@ extern "C" {
 }
 
 static int	try_start(TRY *,char *,char *) noex ;
-static int	try_startvarnode(TRY *) noex ;
-static int	try_startuname(TRY *) noex ;
-static int	try_startnode(TRY *) noex ;
+static int	try_initvarnode(TRY *) noex ;
+static int	try_inituname(TRY *) noex ;
+static int	try_initnode(TRY *) noex ;
 static int	try_vardomain(TRY *) noex ;
 static int	try_varlocaldomain(TRY *) noex ;
 static int	try_varnode(TRY *) noex ;
@@ -220,6 +224,8 @@ static constexpr struct guess	ga[] = {
 static bufsizevar	maxnodelen(getbufsize_nn) ;
 static bufsizevar	maxhostlen(getbufsize_hn) ;
 
+constexpr bool		f_guess = CF_GUESS ;
+
 
 /* exported variables */
 
@@ -234,7 +240,7 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 /* do we need a nodename? */
 	    if (nbuf != nullptr) {
 	        nbuf[0] = '\0' ;
-	        if (! ti.f.initnode) rs = try_startnode(&ti) ;
+	        if (! ti.f.initnode) rs = try_initnode(&ti) ;
 	    } /* end if (trying to get a nodename) */
 /* do we need a domainname? */
 	    if ((rs >= 0) && (dbuf != nullptr)) {
@@ -347,7 +353,7 @@ static int try_finish(TRY *tip) noex {
 }
 /* end subroutine (try_finish) */
 
-static int try_startvarnode(TRY *tip) noex {
+static int try_initvarnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
 	if (tip) {
 	    rs = SR_OK ;
@@ -362,9 +368,9 @@ static int try_startvarnode(TRY *tip) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (try_startvarnode) */
+/* end subroutine (try_initvarnode) */
 
-static int try_startuname(TRY *tip) noex {
+static int try_inituname(TRY *tip) noex {
 	int		rs = SR_OK ;
 	if (! tip->f.inituname) {
 	    UTSNAME	un ;
@@ -382,9 +388,9 @@ static int try_startuname(TRY *tip) noex {
 	} /* end if (needed initialization) */
 	return rs ;
 }
-/* end subroutine (try_startuname) */
+/* end subroutine (try_inituname) */
 
-static int try_startnode(TRY *tip) noex {
+static int try_initnode(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
 	int		cl ;
@@ -395,7 +401,7 @@ static int try_startnode(TRY *tip) noex {
 	    if ((rs = maxnodelen) >= 0) {
 	    if ((rs >= 0) && (sp == nullptr)) {
 	        if (! tip->f.initvarnode) {
-		    rs = try_startvarnode(tip) ;
+		    rs = try_initvarnode(tip) ;
 		}
 	        cp = tip->varnode ;
 	        if (tip->f.varnode && (cp) && (cp[0] != '\0')) {
@@ -403,7 +409,7 @@ static int try_startnode(TRY *tip) noex {
 		}
 	    }
 	    if ((rs >= 0) && (sp == nullptr)) {
-	        if (! tip->f.inituname) rs = try_startuname(tip) ;
+	        if (! tip->f.inituname) rs = try_inituname(tip) ;
 	        if (rs >= 0) {
 	            cp = tip->sysnodename ;
 	            if (tip->f.inituname && cp && (cp[0] != '\0')) {
@@ -425,14 +431,14 @@ static int try_startnode(TRY *tip) noex {
 	} /* end if (needed initialization) */
 	return (rs >= 0) ? 0 : rs ;
 }
-/* end subroutine (try_startnode) */
+/* end subroutine (try_initnode) */
 
 static int try_vardomain(TRY *tip) noex {
 	static cchar	*val = getenv(varname.domain) ;
 	int		rs = SR_OK ;
 	if (val != nullptr) {
 	    int		cl ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    if ((cl = sfshrink(val,-1,&cp)) > 0) {
 	        rs = snwcpy(tip->domainname,maxhostlen,cp,cl) ;
 	    }
@@ -467,13 +473,12 @@ static int try_varlocaldomain(TRY *tip) noex {
 static int try_varnode(TRY *tip) noex {
 	int		rs = SR_OK ;
 	if (! tip->f.initvarnode) {
-	    rs = try_startvarnode(tip) ;
+	    rs = try_initvarnode(tip) ;
 	}
 	if ((rs >= 0) && tip->f.varnode) {
-	    cchar	*tp, *cp ;
 	    cchar	*sp = tip->varnode ;
-	    if ((tp = strchr(sp,'.')) != nullptr) {
-	        cp = (tp + 1) ;
+	    if (cchar *tp ; (tp = strchr(sp,'.')) != nullptr) {
+	        cchar	*cp = (tp + 1) ;
 	        if (cp[0] != '\0') {
 	            rs = sncpy1(tip->domainname,maxhostlen,cp) ;
 		}
@@ -486,15 +491,15 @@ static int try_varnode(TRY *tip) noex {
 static int try_uname(TRY *tip) noex {
 	int		rs = SR_OK ;
 	if (! tip->f.inituname) {
-	    rs = try_startuname(tip) ;
+	    rs = try_inituname(tip) ;
 	}
 	if ((rs >= 0) && tip->f.uname) {
-	    cchar	*tp, *sp, *cp ;
-	    sp = tip->sysnodename ;
-	    if ((tp = strchr(sp,'.')) != nullptr) {
-	        cp = (tp + 1) ;
-	        if (cp[0] != '\0')
+	    cchar	*sp = tip->sysnodename ;
+	    if (cchar *tp ; (tp = strchr(sp,'.')) != nullptr) {
+	        cchar	*cp = (tp + 1) ;
+	        if (cp[0] != '\0') {
 	            rs = sncpy1(tip->domainname,maxhostlen,cp) ;
+		}
 	    }
 	} /* end if */
 	return rs ;
@@ -505,7 +510,7 @@ static int try_gethost(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (! tip->f.initnode) {
-	    rs = try_startnode(tip) ;
+	    rs = try_initnode(tip) ;
 	}
 	if ((rs >= 0) && tip->f.node) {
 	    char	*hbuf{} ;
@@ -513,7 +518,7 @@ static int try_gethost(TRY *tip) noex {
 	        HOSTENT	he, *hep = &he ;
 	        cint	hlen = rs ;
 	        cchar	*nn = tip->nodename ;
-	        cchar	*tp ;
+	        cchar	*tp{} ;
 	        if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
 		    nullptr_t	np{} ;
 		    cint	dlen = maxhostlen ;
@@ -622,35 +627,33 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 
 static int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
-
-#if	CF_GUESS
-	if (! tip->f.initnode) {
-	    rs = try_startnode(tip) ;
-	}
-	if ((rs >= 0) && tip->f.node) {
-	    int		si = -1 ;
-	    int		m ;
-	    int		m_max = 0 ;
-	    int		gnl ;
-	    cchar	*nn = tip->nodename ;
-	    cchar	*gnp ;
-	    rs = 0 ;
-	    for (int i = 0 ; ga[i].name ; i += 1) {
-	        gnp = ga[i].name ;
-		gnl = strlen(gnp) ;
-	        if ((m = nleadstr(gnp,nn,-1)) >= gnl) {
-	            if (m > m_max) {
-	                m_max = m ;
-	                si = i ;
-	            }
-	        } /* end if */
-	    } /* end for */
-	    if (si >= 0) {
-	        rs = sncpy1(tip->domainname,maxhostlen,ga[si].domain) ;
+	if constexpr (f_guess) {
+	    if (! tip->f.initnode) {
+	        rs = try_initnode(tip) ;
 	    }
-	} /* end if (have node) */
-#endif /* CF_GUESS */
-
+	    if ((rs >= 0) && tip->f.node) {
+	        int	si = -1 ;
+	        int	m ;
+	        int	m_max = 0 ;
+	        int	gnl ;
+	        cchar	*nn = tip->nodename ;
+	        cchar	*gnp ;
+	        rs = 0 ;
+	        for (int i = 0 ; ga[i].name ; i += 1) {
+	            gnp = ga[i].name ;
+		    gnl = strlen(gnp) ;
+	            if ((m = nleadstr(gnp,nn,-1)) >= gnl) {
+	                if (m > m_max) {
+	                    m_max = m ;
+	                    si = i ;
+	                }
+	            } /* end if */
+	        } /* end for */
+	        if (si >= 0) {
+	            rs = sncpy1(tip->domainname,maxhostlen,ga[si].domain) ;
+	        }
+	    } /* end if (have node) */
+	} /* end if-constexpr (f_guess) */
 	return rs ;
 }
 /* end subroutine (try_guess) */
