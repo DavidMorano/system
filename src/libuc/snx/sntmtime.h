@@ -19,10 +19,10 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<tmtime.h>		/* <- the money shot! */
 
 
 EXTERNC_begin

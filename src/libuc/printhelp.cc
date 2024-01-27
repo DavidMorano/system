@@ -79,10 +79,6 @@
 #define	HELPSCHEDFNAME	"etc/printhelp.filesched"
 #endif
 
-#ifndef	LIBCNAME
-#define	LIBCNAME	"lib"
-#endif
-
 
 /* local namespaces */
 

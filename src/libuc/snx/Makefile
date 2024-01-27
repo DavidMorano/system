@@ -61,7 +61,6 @@ OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o
 OBJ4_SNX= snrealname.o snshellunder.o snsigabbr.o sntid.o
 OBJ5_SNX= sntmtime.o snuuid.o snxxx.o
 
-
 OBJA_SNX= obj0_sfx.o obj1_sfx.o
 OBJB_SNX= obj2_sfx.o obj3_sfx.o
 OBJC_SNX= obj4_sfx.o obj5_sfx.o
@@ -135,5 +134,6 @@ obj5_sfx.o:	$(OBJ5_SNX) $(INCS)
 snuuid.o:		snuuid.cc $(INCS)
 sntid.o:		sntid.cc $(INCS)
 snerrabbr.o:		snerrabbr.cc $(INCS)
+sntmtime.o:		sntmtime.cc sntmtime.h $(INCS)
 
 

@@ -128,7 +128,7 @@ int nodeinfo::env() noex {
 	cchar		*vn = varname.node ;
 	if (vn) {
 	    if (vn[0]) {
-		cchar	*vp = getenv(vn) ;
+		static cchar	*vp = getenv(vn) ;
 	 	if (vp) {
 		    if (vp[0]) {
 			rs = sncpy1(nbuf,nlen,vp) ;
