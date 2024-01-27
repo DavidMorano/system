@@ -22,9 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 #include	"varnames.hh"
 
@@ -57,6 +56,7 @@ const char varnames::mail[] =		"MAIL" ;
 const char varnames::node[] =		"NODE" ;
 const char varnames::cluster[] =	"CLUSTER" ;
 const char varnames::domain[] =		"DOMAIN" ;
+const char varnames::localdomain[] =	"LOCALDOMAIN" ;	/* what is this? */
 const char varnames::lang[] =		"LANG" ;
 const char varnames::shell[] =		"SHELL" ;
 const char varnames::shlvl[] =		"SHLVL" ;
