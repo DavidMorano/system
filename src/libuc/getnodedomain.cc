@@ -366,10 +366,11 @@ static int try_startvarnode(TRY *tip) noex {
 	if (tip) {
 	    rs = SR_OK ;
 	    if (! tip->f.initvarnode) {
+	        static cchar	*val = getenv(varname.node) ;
 	        tip->f.initvarnode = true ;
-	        if (cchar *cp ; (cp = getenv(VARNODE)) != nullptr) {
+		if (val != nullptr) {
 	            tip->f.varnode = true ;
-	            tip->varnode = cp ;
+	            tip->varnode = val ;
 	        }
 	    }
 	} /* end if (non-null) */
@@ -441,11 +442,12 @@ static int try_startnode(TRY *tip) noex {
 /* end subroutine (try_startnode) */
 
 static int try_vardomain(TRY *tip) noex {
+	static cchar	*val = getenv(varname.domain) ;
 	int		rs = SR_OK ;
-	if (cchar *sp ; (sp = getenv(VARDOMAIN)) != nullptr) {
+	if (val != nullptr) {
 	    int		cl ;
 	    cchar	*cp ;
-	    if ((cl = sfshrink(sp,-1,&cp)) > 0) {
+	    if ((cl = sfshrink(val,-1,&cp)) > 0) {
 	        rs = snwcpy(tip->domainname,maxhostlen,cp,cl) ;
 	    }
 	} /* end if */
@@ -454,10 +456,12 @@ static int try_vardomain(TRY *tip) noex {
 /* end subroutine (try_vardomain) */
 
 static int try_varlocaldomain(TRY *tip) noex {
+	static cchar	*val = getenv(varname.localdomain) ;
 	int		rs = SR_OK ;
-	int		cl ;
-	cchar		*sp, *cp ;
-	if ((sp = getenv(VARLOCALDOMAIN)) != nullptr) {
+	if (val != nullptr) {
+	    int		cl ;
+	    cchar	*sp = val ;
+	    cchar	*cp ;
 	    while (CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	    }
