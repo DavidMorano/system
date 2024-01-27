@@ -43,7 +43,7 @@ extern long	altzone ;
 
 #elif	(defined(OSNAME_Darwin) && (OSNAME_Darwin > 0))
 
-extern long	altzone ;
+extern long	altzone ;		/* reminder: does not actually exist */
 
 #endif /* (defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)) */
 
