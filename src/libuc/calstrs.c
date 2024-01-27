@@ -27,6 +27,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+#include	"calstrs.h"
+
 
 /* local defines */
 
