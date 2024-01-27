@@ -4,7 +4,6 @@
 /* find a file according to rules */
 /* version %I% last-modified %G% */
 
-#define	CF_BADNOFILE	0		/* is it bad if there was no file? */
 
 /* revision history:
 
@@ -95,6 +94,17 @@
 #define	KBUF(c)	(keybuf[0] = (c),keybuf[1] = '\0',keybuf)
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
+
+typedef mainv		mv ;
+typedef mode_t		pm ;
+
+
 /* external subroutines */
 
 
@@ -112,39 +122,37 @@ static int	schedexpand(cchar *,vecstr *,char *,int,cchar *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int permsched(mainv sched,vecstr *nsp,char *rbuf,int rlen,
-		cc *fn,mode_t am) noex {
-	ids		id ;
-	int		rs ;
+int permsched(mv sched,vecstr *nsp,char *rbuf,int rlen,cc *fn,pm am) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		sl = 0 ;
-
-	if (sched == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (nsp == NULL) return SR_FAULT ;
-
-#if	CF_BADNOFILE
-	if ((fn == NULL) || (fn[0] == '\0'))
-	    return SR_NOEXIST ;
-#endif
-
-	if ((rs = ids_load(&id)) >= 0) {
-	    rs = SR_NOEXIST ;
-	    for (int i = 0 ; sched[i] ; i += 1) {
-	        if ((rs = schedexpand(sched[i],nsp,rbuf,rlen,fname)) >= 0) {
-	            USTAT	sb ;
-	            sl = rs ;
-	            if ((rs = uc_stat(rbuf,&sb)) >= 0) {
-	                rs = sperm(&id,&sb,am) ;
-	            }
-	        } /* end if (schedexpand) */
-	        if (rs >= 0) break ;
-	    } /* end for */
-
-	    ids_release(&id) ;
-	} /* end if (ids) */
-
+	if (sched && nsp && rbuf && fn) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+	        ids	id ;
+	        if ((rs = ids_load(&id)) >= 0) {
+	            rs = SR_NOEXIST ;
+	            for (int i = 0 ; sched[i] ; i += 1) {
+		        cchar	*sch = sched[i] ;
+	                if ((rs = schedexpand(sch,nsp,rbuf,rlen,fn)) >= 0) {
+	                    USTAT	sb ;
+	                    sl = rs ;
+	                    if ((rs = uc_stat(rbuf,&sb)) >= 0) {
+	                        rs = sperm(&id,&sb,am) ;
+	                    }
+	                } /* end if (schedexpand) */
+	                if (rs >= 0) break ;
+	            } /* end for */
+	            rs1 = ids_release(&id) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (ids) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (permsched) */
@@ -156,35 +164,25 @@ static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 	sbuf		b ;
 	int		rs ;
 	int		len = 0 ;
-	char		keybuf[2] ;
-
 	rbuf[0] = '\0' ;
-	if (rlen <= 0)
-	    return SR_TOOBIG ;
-
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    int		(*vs)(cchar **,cchar **) = vstrkeycmp ;
-	    cchar	*fp ;
-	    cchar	*tp, *cp ;
-
-	    for (fp = fmt ; *fp && (rs >= 0) ; fp += 1) {
-
+	    nullptr_t	np{} ;
+	    auto	vf = vecstr_finder ;
+	    auto	vs = vstrkeycmp ;
+	    char	keybuf[2] ;
+	    for (cchar *fp = fmt ; *fp && (rs >= 0) ; fp += 1) {
 	        if (*fp == '%') {
-
 	            fp += 1 ;
 	            if (! *fp) break ;
 	            if (*fp == '%') {
 	                rs = sbuf_char(&b,'%') ;
 	            } else {
-	                if ((rs = vecstr_finder(nsp,KBUF(*fp),vs,&cp)) >= 0) {
-	                    if ((tp = strchr(cp,'=')) != NULL) {
+	                if (cc *cp{} ; (rs = vf(nsp,KBUF(*fp),vs,&cp)) >= 0) {
+	                    if (cc *tp ; (tp = strchr(cp,'=')) != np) {
 	                        rs = sbuf_strw(&b,(tp + 1),-1) ;
 	                    } /* end if (it had a value) */
 	                } else if (*fp == 'f') {
-	                    rs = SR_FAULT ;
-	                    if (fn != NULL) {
-	                        rs = sbuf_strw(&b,fn,-1) ;
-			    }
+	                    rs = sbuf_strw(&b,fn,-1) ;
 	                } else {
 	                    rs = SR_NOTFOUND ;
 			}
@@ -192,13 +190,10 @@ static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 	        } else {
 	            rs = sbuf_char(&b,*fp) ;
 	        } /* end if (escape or regular character) */
-
 	    } /* end for */
-
 	    len = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = len ;
 	} /* end if (sbuf) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (schedexpand) */
