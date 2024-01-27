@@ -71,19 +71,20 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/systeminfo.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<usystem.h>
+#include	<varnames.hh>
+#include	<bufsizevar.hh>
 #include	<estrings.h>
 #include	<filebuf.h>
 #include	<strn.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
-#include	<strdcyx.h>
+#include	<strdcpyx.h>
 #include	<nleadstr.h>
 #include	<char.h>
 #include	<isnot.h>
@@ -117,8 +118,8 @@
 #define	TO_READ		30		/* time-out for read */
 
 #undef	TRY
-#define	TRY		struct try
-#define	TRY_FL		struct try_flags
+#define	TRY		struct tryer
+#define	TRY_FL		struct tryer_flags
 
 
 /* external subroutines */
@@ -129,19 +130,17 @@
 
 /* local structures */
 
-struct try_flags {
+struct tryer_flags {
 	uint		initvarnode:1 ;
-	uint		initsysinfo:1 ;
 	uint		inituname:1 ;
 	uint		initnode:1 ;
 	uint		varnode:1 ;
 	uint		uname:1 ;
-	uint		sysinfo:1 ;
 	uint		node:1 ;
-} ; /* end struct (try_flags) */
+} ; /* end struct (tryer_flags) */
 
 namespace {
-    struct try {
+    struct tryer {
 	char		*nodename ;	/* passed caller argument (returned) */
 	char		*domainname ;	/* passed caller argument (returned) */
 	cchar		*varnode ;
@@ -166,13 +165,11 @@ extern "C" {
 
 static int	try_start(TRY *,char *,char *) noex ;
 static int	try_startvarnode(TRY *) noex ;
-static int	try_startsysinfo(TRY *) noex ;
 static int	try_startuname(TRY *) noex ;
 static int	try_startnode(TRY *) noex ;
 static int	try_vardomain(TRY *) noex ;
 static int	try_varlocaldomain(TRY *) noex ;
 static int	try_varnode(TRY *) noex ;
-static int	try_sysinfo(TRY *) noex ;
 static int	try_uname(TRY *) noex ;
 static int	try_gethost(TRY *) noex ;
 static int	try_resolve(TRY *) noex ;
@@ -189,7 +186,6 @@ static constexpr int	(*tries[])(TRY *) = {
 	try_vardomain,
 	try_varlocaldomain,
 	try_varnode,
-	try_sysinfo,
 	try_uname,
 	try_gethost,
 	try_resolve,
@@ -198,7 +194,6 @@ static constexpr int	(*tries[])(TRY *) = {
 } ;
 
 static constexpr int	(*systries[])(TRY *) = {
-	try_sysinfo,
 	try_uname,
 	try_gethost,
 	try_resolve,
@@ -362,7 +357,7 @@ static int try_startvarnode(TRY *tip) noex {
 static int try_startuname(TRY *tip) noex {
 	int		rs = SR_OK ;
 	if (! tip->f.inituname) {
-	    YTSNAME	un ;
+	    UTSNAME	un ;
 	    tip->f.inituname = true ;
 	    if ((rs = u_uname(&un)) >= 0) {
 	        cchar	*cp ;
@@ -379,25 +374,6 @@ static int try_startuname(TRY *tip) noex {
 }
 /* end subroutine (try_startuname) */
 
-static int try_startsysinfo(TRY *tip) noex {
-	int		rs = SR_OK ;
-	if (! tip->f.initsysinfo) {
-	    int	rs1 ;
-	    tip->f.initsysinfo = true ;
-#ifdef	SI_HOSTNAME
-	    rs1 = u_sysinfo(SI_HOSTNAME,tip->sibuf,NODENAMELEN) ;
-#else
-	    rs1 = SR_NOSYS ;
-#endif /* SI_HOSTNAME */
-	    if (rs1 >= 0) {
-	        tip->f.sysinfo = true ;
-	        rs = 0 ;
-	    }
-	}
-	return rs ;
-}
-/* end subroutine (try_startsysinfo) */
-
 static int try_startnode(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
@@ -411,20 +387,14 @@ static int try_startnode(TRY *tip) noex {
 	    if ((rs >= 0) && (sp == nullptr)) {
 	        if (! tip->f.initvarnode) rs = try_startvarnode(tip) ;
 	        cp = tip->varnode ;
-	        if (tip->f.varnode && (cp != nullptr) && (cp[0] != '\0')) sp = cp ;
-	    }
-
-	    if ((rs >= 0) && (sp == nullptr)) {
-	        if (! tip->f.initsysinfo) rs = try_startsysinfo(tip) ;
-	        cp = tip->sibuf ;
-	        if (tip->f.initsysinfo && (cp[0] != '\0')) sp = cp ;
+	        if (tip->f.varnode && (cp) && (cp[0] != '\0')) sp = cp ;
 	    }
 
 	    if ((rs >= 0) && (sp == nullptr)) {
 	        if (! tip->f.inituname) rs = try_startuname(tip) ;
 	        if (rs >= 0) {
 	            cp = tip->sysnodename ;
-	            if (tip->f.inituname && (cp[0] != '\0')) sp = cp ;
+	            if (tip->f.inituname && cp && (cp[0] != '\0')) sp = cp ;
 	        }
 	    }
 
@@ -497,26 +467,6 @@ static int try_varnode(TRY *tip) noex {
 }
 /* end subroutine (try_varnode) */
 
-static int try_sysinfo(TRY *tip) noex {
-	int		rs = SR_OK ;
-	if (! tip->f.initsysinfo) {
-	    rs = try_startsysinfo(tip) ;
-	}
-	if ((rs >= 0) && tip->f.sysinfo) {
-	    cchar	*tp, *sp, *cp ;
-	    sp = tip->sibuf ;
-	    rs = 0 ;
-	    if ((tp = strchr(sp,'.')) != nullptr) {
-	        cp = (tp + 1) ;
-	        if (cp[0] != '\0') {
-	            rs = sncpy1(tip->domainname,MAXHOSTNAMELEN,cp) ;
-		}
-	    }
-	}
-	return rs ;
-}
-/* end subroutine (try_sysinfo) */
-
 static int try_uname(TRY *tip) noex {
 	int		rs = SR_OK ;
 	if (! tip->f.inituname) {
@@ -543,9 +493,10 @@ static int try_gethost(TRY *tip) noex {
 	if ((rs >= 0) && tip->f.node) {
 	    HOSTENT	he, *hep = &he ;
 	    cint	hlen = HOSTBUFLEN ;
+	    cchar	*nn = tip->nodename ;
 	    cchar	*tp ;
 	    char	hbuf[HOSTBUFLEN + 1] ;
-	    if ((rs = uc_gethostbyname(tip->nodename,&he,hbuf,hlen)) >= 0) {
+	    if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
 		cint	dlen = MAXHOSTNAMELEN ;
 
 		rs = 0 ;
@@ -589,7 +540,7 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	int		f_found = false ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    FILEBUF	b ;
+	    filebuf	b ;
 	    cint	fd = rs ;
 
 	    if ((rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0)) >= 0) {
@@ -599,7 +550,7 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 		cchar	*tp, *sp, *cp ;
 		char		lbuf[LINEBUFLEN + 1] ;
 
-	        while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
