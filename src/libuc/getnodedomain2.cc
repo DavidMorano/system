@@ -95,6 +95,8 @@
 
 /* local defines */
 
+#define	BUFLEN		(MAXPATHLEN + (8 * 1024))
+
 #undef	HOSTBUFLEN
 #define	HOSTBUFLEN	(MAXPATHLEN + (8 * MAXHOSTNAMELEN))
 
@@ -124,7 +126,6 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 
 
@@ -231,8 +232,6 @@ static constexpr struct guess	ga[] = {
 	{ nullptr, nullptr }
 } ;
 
-static bufsizevar	maxhostlen(getbufsize_hn) ;
-
 
 /* exported variables */
 
@@ -321,22 +320,21 @@ int getuserdomain(char *dbuf,int dlen) noex {
 static int try_start(TRY *tip,char *nodename,char *domainname) noex {
 	int		rs = SR_FAULT ;
 	if (tip) {
+	    rs = SR_OK ;
 	    memclear(tip) ;
-	    if ((rs = maxhostlen) >= 0) {
-	        tip->f = {} ;
-	        tip->domainname = domainname ;
-	        tip->varnode = nullptr ;
-	        tip->sysnodename = nullptr ;
-	        tip->nodename = nodename ;
-	        if (nodename == nullptr) {
-		    char	*cp{} ;
-	            if ((rs = malloc_mn(&cp)) >= 0) {
-		       tip->nbuf = cp ;
-	    	       tip->nodename = cp ;
-		    }
-	        } /* end if (memory-allocation) */
-	        if (rs >= 0) tip->nodename[0] = '\0' ;
-	    } /* end if (maxhostlen) */
+	    tip->f = {} ;
+	    tip->domainname = domainname ;
+	    tip->varnode = nullptr ;
+	    tip->sysnodename = nullptr ;
+	    tip->nodename = nodename ;
+	    if (nodename == nullptr) {
+		char	*cp{} ;
+	        if ((rs = malloc_mn(&cp)) >= 0) {
+		   tip->nbuf = cp ;
+	    	   tip->nodename = cp ;
+		}
+	    } /* end if (memory-allocation) */
+	    if (rs >= 0) tip->nodename[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -442,7 +440,7 @@ static int try_vardomain(TRY *tip) noex {
 	    int		cl ;
 	    cchar	*cp ;
 	    if ((cl = sfshrink(sp,-1,&cp)) > 0) {
-	        rs = snwcpy(tip->domainname,maxhostlen,cp,cl) ;
+	        rs = snwcpy(tip->domainname,MAXHOSTNAMELEN,cp,cl) ;
 	    }
 	} /* end if */
 	return rs ;
@@ -463,7 +461,7 @@ static int try_varlocaldomain(TRY *tip) noex {
 	    }
 	    cl = (sp - cp) ;
 	    if (cl > 0) {
-	        rs = snwcpy(tip->domainname,maxhostlen,cp,cl) ;
+	        rs = snwcpy(tip->domainname,MAXHOSTNAMELEN,cp,cl) ;
 	    }
 	} /* end if (localdomain) */
 	return rs ;
@@ -481,7 +479,7 @@ static int try_varnode(TRY *tip) noex {
 	    if ((tp = strchr(sp,'.')) != nullptr) {
 	        cp = (tp + 1) ;
 	        if (cp[0] != '\0') {
-	            rs = sncpy1(tip->domainname,maxhostlen,cp) ;
+	            rs = sncpy1(tip->domainname,MAXHOSTNAMELEN,cp) ;
 		}
 	    }
 	}
@@ -500,7 +498,7 @@ static int try_uname(TRY *tip) noex {
 	    if ((tp = strchr(sp,'.')) != nullptr) {
 	        cp = (tp + 1) ;
 	        if (cp[0] != '\0')
-	            rs = sncpy1(tip->domainname,maxhostlen,cp) ;
+	            rs = sncpy1(tip->domainname,MAXHOSTNAMELEN,cp) ;
 	    }
 	} /* end if */
 	return rs ;
@@ -509,43 +507,39 @@ static int try_uname(TRY *tip) noex {
 
 static int try_gethost(TRY *tip) noex {
 	int		rs = SR_OK ;
-	int		rs1 ;
 	if (! tip->f.initnode) {
 	    rs = try_startnode(tip) ;
 	}
 	if ((rs >= 0) && tip->f.node) {
-	    char	*hbuf{} ;
-	    if ((rs = malloc_ho(&hbuf)) >= 0) {
-	        HOSTENT	he, *hep = &he ;
-	        cint	hlen = rs ;
-	        cchar	*nn = tip->nodename ;
-	        cchar	*tp ;
-	        if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
-		    nullptr_t	np{} ;
-		    cint	dlen = maxhostlen ;
-		    bool	f = true ;
-		    rs = 0 ;
-	            f = f && (hep->h_name != np) ;
-		    f = f && ((tp = strchr(hep->h_name,'.')) != np) ;
-		    if (f) {
-	                rs = sncpy1(tip->domainname,dlen,(tp + 1)) ;
-	            } /* end if (official name) */
-	            if ((rs == 0) && (hep->h_aliases != nullptr)) {
-	                for (int i = 0 ; hep->h_aliases[i] ; i += 1) {
-			    cchar	*ap = hep->h_aliases[i] ;
-	                    if ((tp = strchr(ap,'.')) != nullptr) {
-	                        rs = sncpy1(tip->domainname,dlen,(tp+1)) ;
-	                    } /* end if */
-			    if (rs > 0) break ;
-	                } /* end for */
-	            } /* end if (alias names) */
-		    rs1 = uc_free(hbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (m-a-f) */
-	    } else if (isNotPresent(rs)) {
+	    HOSTENT	he, *hep = &he ;
+	    cint	hlen = HOSTBUFLEN ;
+	    cchar	*nn = tip->nodename ;
+	    cchar	*tp ;
+	    char	hbuf[HOSTBUFLEN + 1] ;
+	    if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
+		cint	dlen = MAXHOSTNAMELEN ;
+
+		rs = 0 ;
+	        if ((hep->h_name != nullptr) &&
+	            ((tp = strchr(hep->h_name,'.')) != nullptr)) {
+
+	            rs = sncpy1(tip->domainname,dlen,(tp + 1)) ;
+
+	        } /* end if (official name) */
+
+	        if ((rs == 0) && (hep->h_aliases != nullptr)) {
+	            for (int i = 0 ; hep->h_aliases[i] ; i += 1) {
+	                if ((tp = strchr(hep->h_aliases[i],'.')) != nullptr) {
+	                    rs = sncpy1(tip->domainname,dlen,(tp+1)) ;
+	                } /* end if */
+			if (rs > 0) break ;
+	            } /* end for */
+	        } /* end if (alias names) */
+
+	    } else if (isNotPresent(rs))
 	        rs = SR_OK ;
-	    }
 	} /* end if (have node) */
+
 	return rs ;
 }
 /* end subroutine (try_gethost) */
@@ -561,67 +555,68 @@ static int try_resolve(TRY *tip) noex {
 /* end subroutine (try_resolve) */
 
 static int try_resolvefile(TRY *tip,cchar *fname) noex {
-	cint		dlen = maxhostlen ;
-	cint		to = TO_READ ;
+	cint	dlen = MAXHOSTNAMELEN ;
+	cint	to = TO_READ ;
 	int		rs ;
-	int		rs1 ;
 	int		f_found = false ;
-	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    cint	llen = rs ;
-	    if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	        filebuf	b ;
-	        cint	fd = rs ;
-	        if ((rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0)) >= 0) {
-		    int		len ;
-		    int		sl, cl ;
-		    cchar	*tp, *sp, *cp ;
-	            while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
-	                len = rs ;
-	                if (lbuf[len - 1] == '\n') len -= 1 ;
-	                lbuf[len] = '\0' ;
 
-	                sp = lbuf ;
-	                sl = len ;
-	                if ((sl == 0) || (sp[0] == '#')) continue ;
+	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
+	    filebuf	b ;
+	    cint	fd = rs ;
 
-	                cl = nextfield(sp,sl,&cp) ;
+	    if ((rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0)) >= 0) {
+		cint	llen = LINEBUFLEN ;
+		int		len ;
+		int		sl, cl ;
+		cchar	*tp, *sp, *cp ;
+		char		lbuf[LINEBUFLEN + 1] ;
 
-	                if (cl < 6) continue ;
+	        while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	            len = rs ;
 
-	                if ((strncasecmp(cp,"domain",6) != 0) ||
-	                    (! CHAR_ISWHITE(cp[6])))
-	                        continue ;
+	            if (lbuf[len - 1] == '\n') len -= 1 ;
+	            lbuf[len] = '\0' ;
 
-	                sp += 6 ;
-	                sl -= 6 ;
-	                cl = nextfield(sp,sl,&cp) ;
+	            sp = lbuf ;
+	            sl = len ;
+	            if ((sl == 0) || (sp[0] == '#')) continue ;
 
-	                if ((cp[0] == '#') ||
-	                    (strncmp(cp,"..",2) == 0)) continue ;
+	            cl = nextfield(sp,sl,&cp) ;
 
-	                if ((tp = strnchr(cp,cl,'#')) != nullptr) {
-	                    cl = (tp - cp) ;
-			}
-	                if (cl > 0) {
-	                    f_found = true ;
-	                    break ;
-	                }
-	            } /* end while (reading lines) */
-		    if ((rs >= 0) && f_found) {
-	    	        rs = snwcpy(tip->domainname,dlen,cp,cl) ;
-		    }
-	            rs1 = filebuf_finish(&b) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
-	        rs1 = u_close(fd) ;
-		if (rs >= 0) rs = rs1 ;
-	    } else if (isNotPresent(rs)) {
-	        rs = SR_OK ;
-	    }
-	    rs1 = uc_free(lbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
+	            if (cl < 6) continue ;
+
+	            if ((strncasecmp(cp,"domain",6) != 0) ||
+	                (! CHAR_ISWHITE(cp[6])))
+	                continue ;
+
+	            sp += 6 ;
+	            sl -= 6 ;
+	            cl = nextfield(sp,sl,&cp) ;
+
+	            if ((cp[0] == '#') ||
+	                (strncmp(cp,"..",2) == 0)) continue ;
+
+	            if ((tp = strnchr(cp,cl,'#')) != nullptr)
+	                cl = (tp - cp) ;
+
+	            if (cl > 0) {
+	                f_found = true ;
+	                break ;
+	            }
+
+	        } /* end while (reading lines) */
+
+		if ((rs >= 0) && f_found) {
+	    	    rs = snwcpy(tip->domainname,dlen,cp,cl) ;
+		}
+
+	        filebuf_finish(&b) ;
+	    } /* end if (filebuf) */
+
+	    u_close(fd) ;
+	} else if (isNotPresent(rs))
+	    rs = SR_OK ;
+
 	return rs ;
 }
 /* end subroutine (try_resolvefile) */
@@ -630,9 +625,8 @@ static int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
 
 #if	CF_GUESS
-	if (! tip->f.initnode) {
-	    rs = try_startnode(tip) ;
-	}
+	if (! tip->f.initnode) rs = try_startnode(tip) ;
+
 	if ((rs >= 0) && tip->f.node) {
 	    int		si = -1 ;
 	    int		m ;
@@ -652,7 +646,7 @@ static int try_guess(TRY *tip) noex {
 	        } /* end if */
 	    } /* end for */
 	    if (si >= 0) {
-	        rs = sncpy1(tip->domainname,maxhostlen,ga[si].domain) ;
+	        rs = sncpy1(tip->domainname,MAXHOSTNAMELEN,ga[si].domain) ;
 	    }
 	} /* end if (have node) */
 #endif /* CF_GUESS */
