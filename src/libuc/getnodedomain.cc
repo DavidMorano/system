@@ -92,29 +92,15 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"getnodename.h"
+
 
 /* local defines */
-
-#undef	HOSTBUFLEN
-#define	HOSTBUFLEN	(MAXPATHLEN + (8 * MAXHOSTNAMELEN))
 
 #define	RESOLVFNAME	"/etc/resolv.conf"
 #define	LOCALHOSTNAME	"localhost"
 
-#ifndef	VARNODE
-#define	VARNODE		"NODE"
-#endif
-
-#ifndef	VARDOMAIN
-#define	VARDOMAIN	"DOMAIN"
-#endif
-
-#ifndef	VARLOCALDOMAIN
-#define	VARLOCALDOMAIN	"LOCALDOMAIN"
-#endif
-
-#define	FILEBUFLEN	1024
-#define	TO_OPEN		10		/* time-out for open */
+#define	FILEBUFLEN	1024		/* initial size for FILEBUF */
 #define	TO_READ		30		/* time-out for read */
 
 #undef	TRY

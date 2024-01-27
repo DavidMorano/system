@@ -30,7 +30,7 @@ extern int getnodedomain(char *,char *) noex ;
 extern int getuserdomain(char *,int) noex ;
 extern int getsysdomain(char *,int) noex ;
 
-static inline getdomainname(char *rp,int rl) noex {
+static inline int getdomainnamex(char *rp,int rl) noex {
 	return getsysdomain(rp,rl) ;
 }
 
