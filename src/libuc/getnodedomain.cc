@@ -72,7 +72,9 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* for |INT_MAX| */
 #include	<cstdlib>
+#include	<algorithm>		/* for |min(3c++)| */
 #include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<usupport.h>
@@ -120,6 +122,14 @@
 #undef	TRY
 #define	TRY		struct tryer
 #define	TRY_FL		struct tryer_flags
+
+
+/* local namespaces */
+
+using std::min ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -232,89 +242,75 @@ int getnodedomain(char *nbuf,char *dbuf) noex {
 	TRY		ti ;
 	int		rs ;
 	int		rs1 ;
-	int		i = 0 ;
-
 	if ((rs = try_start(&ti,nbuf,dbuf)) >= 0) {
-
 /* do we need a nodename? */
-
 	    if (nbuf != nullptr) {
 	        nbuf[0] = '\0' ;
 	        if (! ti.f.initnode) rs = try_startnode(&ti) ;
 	    } /* end if (trying to get a nodename) */
-
 /* do we need a domainname? */
-
 	    if ((rs >= 0) && (dbuf != nullptr)) {
-
 	        dbuf[0] = '\0' ;
-	        for (i = 0 ; tries[i] != nullptr ; i += 1) {
-	            if ((rs = (*tries[i])(&ti)) != 0) break ;
+		rs = SR_OK ;
+	        for (int i = 0 ; (rs == SR_OK) && tries[i] ; i += 1) {
+	            rs = (*tries[i])(&ti) ;
 	        } /* end for */
-
 /* remove any stupid trailing dots from the domain name if any */
-
 	        if ((rs >= 0) && (dbuf[0] != '\0')) {
 	            rs = rmwhitedot(dbuf,rs) ;
 		}
-
 	    } /* end if (trying to get a domainname) */
-
 	    rs1 = try_finish(&ti) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (try) */
-
-	return (rs >= 0) ? i : rs ;
+	return rs ;
 }
 /* end subroutine (getnodedomain) */
 
 int getsysdomain(char *dbuf,int dlen) noex {
-	TRY		ti ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-
-	if (dbuf == nullptr) return SR_FAULT ;
-
-	if (dlen < 0) dlen = MAXHOSTNAMELEN ;
-
-	dbuf[0] = '\0' ;
-	if ((rs = try_start(&ti,nullptr,dbuf)) >= 0) {
-	    int	i ;
-
+	if (dlen < 0) dlen = INT_MAX ;
+	if (dbuf) {
+	    TRY		ti ;
+	    dbuf[0] = '\0' ;
+	    if ((rs = try_start(&ti,nullptr,dbuf)) >= 0) {
 /* do we need a domainname? */
-
-	    for (i = 0 ; systries[i] != nullptr ; i += 1) {
-	        if ((rs = (*systries[i])(&ti)) != 0) break ;
-	    } /* end for */
-
+		rs = SR_OK ;
+	        for (int i = 0 ; (rs == SR_OK) && systries[i] ; i += 1) {
+	            rs = (*systries[i])(&ti) ;
+	        } /* end for */
 /* remove any stupid trailing dots from the domain name if any */
-
-	    if ((rs >= 0) && (dbuf[0] != '\0')) {
-	        int	dl = MIN(dlen,rs) ;
-	        rs = rmwhitedot(dbuf,dl) ;
-		len = rs ;
-	    }
-
-	    rs1 = try_finish(&ti) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (try) */
-
+	        if ((rs >= 0) && (dbuf[0] != '\0')) {
+	            cint	dl = min(dlen,rs) ;
+	            rs = rmwhitedot(dbuf,dl) ;
+		    len = rs ;
+	        }
+	        rs1 = try_finish(&ti) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (try) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getsysdomain) */
 
 int getuserdomain(char *dbuf,int dlen) noex {
-	int		rs ;
-	char		dn[MAXHOSTNAMELEN+1] ;
-
-	if (dbuf == nullptr) return SR_FAULT ;
-
-	if ((rs = getnodedomain(nullptr,dn)) >= 0) {
-	    rs = sncpy1(dbuf,dlen,dn) ;
-	}
-
-	return rs ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (dbuf) {
+	    char	*dn{} ;
+	    if ((rs = malloc_hn(&dn)) >= 0) {
+	        if ((rs = getnodedomain(nullptr,dn)) >= 0) {
+	            rs = sncpy1(dbuf,dlen,dn) ;
+		    len = rs ;
+	        }
+	        rs1 = uc_free(dn) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getuserdomain) */
 
@@ -550,8 +546,9 @@ static int try_gethost(TRY *tip) noex {
 
 static int try_resolve(TRY *tip) noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; resolvefnames[i] ; i += 1) {
-	    if ((rs = try_resolvefile(tip,resolvefnames[i])) != 0) break ;
+	for (int i = 0 ; (rs == SR_OK) && resolvefnames[i] ; i += 1) {
+	    cchar	*fn = resolvefnames[i] ;
+	    rs = try_resolvefile(tip,fn) ;
 	} /* end for */
 	return rs ;
 }
