@@ -45,6 +45,8 @@ struct syswords {
 	static const char w_sysdbdir[] ;
 	static const char w_usrlocaldir[] ;
 	static const char w_users[] ;
+	static const char w_help[] ;
+	static const char w_lib[] ;
 } ; /* end struct (syswords) */
 
 

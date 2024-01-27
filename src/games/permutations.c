@@ -1,9 +1,8 @@
-/* permutations */
+/* permutations SUPPORT */
+/* lang=C20 */
 
 /* n-P-k function */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,10 +16,15 @@
 
 /*******************************************************************************
 
-	We calculate the permutations of the given number (without repititions).
+	Name:
+	permutations
+
+	Description:
+	We calculate the permutations of the given number (without
+	repititions).
 
 	Synopsis:
-	LONG permutations(int n,int k)
+	long permutations(int n,int k)
 
 	Arguments:
 	n	number of items to choose from
@@ -43,23 +47,20 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
 #include	<limits.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* external subroutines */
 
-extern LONG	factorial(int) ;
+extern long	factorial(int) noex ;
 
 
 /* forward references */
@@ -70,17 +71,14 @@ extern LONG	factorial(int) ;
 
 /* exported subroutines */
 
-
-LONG permutations(int n,int k)
-{
-	LONG		ans = -1 ;
+long permutations(int n,int k) noex {
+	long		ans = -1 ;
 	if ((n >= k) && (k >= 0)) {
 	    ans = 1 ;
 	    if (k == n) {
 		ans = factorial(n) ;
 	    } else if (k > 0) {
-		int	i ;
-		for (i = 0 ; i < k ; i += 1) {
+		for (int i = 0 ; i < k ; i += 1) {
 		    ans *= n-- ;
 		}
 	    }

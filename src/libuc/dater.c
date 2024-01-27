@@ -1003,7 +1003,7 @@ int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen)
 	t -= (zoff * 60) ;
 	if ((rs = tmtime_gmtime(&tmt,t)) >= 0) {
 	    tmt.gmtoff = (zoff * 60) ;
-	    strwcpyuc(tmt.zname,znp,TMTIME_ZNAMESIZE) ;
+	    strwcpyuc(tmt.zname,znp,TMTIME_ZNAMELEN) ;
 
 #if	CF_DEBUGS
 	    {

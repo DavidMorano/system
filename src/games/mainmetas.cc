@@ -1,9 +1,8 @@
-/* main (METAS) */
+/* main SUPPORT (METAS) */
+/* lang=C++20 */
 
 /* meta strings */
-
-
-#define	CF_DEBUGS	1		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -54,8 +53,6 @@
 #define	DIGBUFLEN	45
 #endif
 
-#define	VARDEBUGFNAME	"METAS_DEBUGFILE"
-
 
 /* name spaces */
 
@@ -66,13 +63,6 @@ using namespace	std ;
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugopen(cchar *) ;
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	debugclose() ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
 
 extern "C" cchar	*getourenv(cchar **,cchar *) ;
 
@@ -105,23 +95,10 @@ static vector<int>	cases[] = {
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv,mainv) {
 	const int	algos[] = { 1 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	{
-	    cchar	*cp ;
-	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	        rs = debugopen(cp) ;
-	        debugprintf("main: starting DFD=%d\n",rs) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	for (auto &a : cases) {
 	    cout << "a=" << strvec(a) << endl ;
@@ -142,11 +119,6 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if (rs < 0) break ;
 	} /* end for (cases) */
 
-#if	CF_DEBUGS
-	debugprintf("main: ret rs=%d\n",rs) ;
-	debugclose() ;
-#endif
-
 	if (rs < 0) ex = 1 ;
 	return ex ;
 }
@@ -155,9 +127,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* local subroutines */
 
-
-static int metas1(vector<int> &a)
-{
+static int metas1(vector<int> &a) {
 	const int	n = a.size() ;
 	int		f = FALSE ;
 	int		p = 0 ;
@@ -173,9 +143,7 @@ static int metas1(vector<int> &a)
 }
 /* end subroutine (metas1) */
 
-
-static int metas2(vector<int> &a)
-{
+static int metas2(vector<int> &a) {
 	const int	n = a.size() ;
 	int		f = FALSE ;
 	{
@@ -196,9 +164,7 @@ static int metas2(vector<int> &a)
 }
 /* end subroutine (metas2) */
 
-
-static string strvec(vector<int> a) 
-{
+static string strvec(vector<int> a) {
 	string		res ;
 	const int	dlen = DIGBUFLEN ;
 	int		c = 0 ;
@@ -214,9 +180,7 @@ static string strvec(vector<int> a)
 }
 /* end subroutine (strvec) */
 
-
-static void printres(vector<int> &a,int f)
-{
+static void printres(vector<int> &a,int f) {
 	const char	*s = (f) ? "true " : "false" ;
 	cout << s << " " << strvec(a) << endl ;
 }

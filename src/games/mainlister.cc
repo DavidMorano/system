@@ -188,10 +188,7 @@ static int	printlist(slist<int> &,cchar *) ;
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv,mainv envv) {
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint		mo_start ;
@@ -202,6 +199,8 @@ int main(int argc,const char **argv,const char **envv)
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
+#else
+	(void) envv ;
 #endif /* CF_DEBUGS */
 
 #if	CF_DEBUGS && CF_DEBUGMALL

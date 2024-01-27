@@ -42,5 +42,7 @@ const char syswords::w_maildir[] =	"/var/mail" ;
 const char syswords::w_sysdbdir[] =	"/sysdb" ;
 const char syswords::w_usrlocaldir[] =	"/usr/local" ;
 const char syswords::w_users[] =	"users" ;
+const char syswords::w_help[] =		"help" ;
+const char syswords::w_lib[] =		"lib" ;
 
 

@@ -1,5 +1,5 @@
-/* fifostr */
-/* FIFO string structures (FIFO String) */
+/* fifostr HEADER */
+/* lang=C20 */
 
 /* FIFO string operations */
 /* version %I% last-modified %G% */

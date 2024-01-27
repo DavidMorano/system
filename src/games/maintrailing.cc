@@ -76,10 +76,7 @@ static int trailing(longlong_t) ;
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int,mainv,mainv) {
 	const int	nmax = 30 ;
 	string		w ;
 	int		n ;
@@ -97,9 +94,7 @@ int main(int argc,const char **argv,const char **envv)
 
 /* local subroutines */
 
-
-static int trailing(longlong_t n)
-{
+static int trailing(longlong_t n) {
 	longlong_t	v = n ;
 	int		c = 0 ;
 	

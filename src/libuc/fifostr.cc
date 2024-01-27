@@ -1,5 +1,5 @@
-/* fifostr */
-/* lang=C20 */
+/* fifostr SUPPORT */
+/* lang=C++20 */
 
 /* FIFO string operations */
 /* version %I% last-modified %G% */
@@ -25,8 +25,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
@@ -41,16 +41,25 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
 
-int		fifostr_curbegin(FIFOSTR *,FIFOSTR_CUR *) noex ;
-int		fifostr_curend(FIFOSTR *,FIFOSTR_CUR *) noex ;
-int		fifostr_del(FIFOSTR *,FIFOSTR_CUR *) noex ;
+template<typename ... Args>
+static inline int fifostr_magic(fifostr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == FIFOSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (fifostr_magic) */
 
-static int	fifostr_mat(FIFOSTR *,FIFOSTR_ENT *) noex ;
+static int	fifostr_mat(fifostr *,fifostr_ent *) noex ;
 
 #ifdef	COMMENT
 static int	cmpdefault() ;
@@ -59,11 +68,12 @@ static int	cmpdefault() ;
 
 /* exported subroutines */
 
-int fifostr_start(FIFOSTR *op) noex {
+int fifostr_start(fifostr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	    op->head = op->tail = nullptr ;
+	    op->head = nullptr ;
+	    op->tail = nullptr ;
 	    op->ic = 0 ;
 	    op->cc = 0 ;
 	    op->magic = FIFOSTR_MAGIC ;
@@ -72,34 +82,29 @@ int fifostr_start(FIFOSTR *op) noex {
 }
 /* end subroutine (fifostr_start) */
 
-int fifostr_finish(FIFOSTR *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+int fifostr_finish(fifostr *op) noex {
+	int		rs ;
+	if ((rs = fifostr_magic(op)) >= 0) {
 		while ((rs = fifostr_del(op,nullptr)) >= 0) ;
 		if (rs == SR_NOTFOUND) rs = SR_OK ;
 		op->magic = 0 ;
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifostr_finish) */
 
-int fifostr_add(FIFOSTR *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
+int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
+	int		rs ;
 	int		c = 0 ;
-	if (op && sp) {
-	    rs = SR_NOTOPEN ;
+	if ((rs = fifostr_magic(op,sp)) >= 0) {
+	        fifostr_ent	*ep = nullptr ;
+	        cint		size = sizeof(fifostr_ent) + (sl + 1) ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if (op->magic == FIFOSTR_MAGIC) {
-	        FIFOSTR_ENT	*ep = nullptr ;
-	        cint		size = sizeof(FIFOSTR_ENT) + (sl + 1) ;
 	        if ((rs = uc_libmalloc(size,&ep)) >= 0) {
 	            ep->slen = sl ;
 	            {
 	                char	*bp = (char *) ep ;
-	                bp += sizeof(FIFOSTR_ENT) ;
+	                bp += sizeof(fifostr_ent) ;
 	                strwcpy(bp,sp,sl) ;
 	            }
 	            ep->next = nullptr ;
@@ -115,61 +120,52 @@ int fifostr_add(FIFOSTR *op,cchar *sp,int sl) noex {
 	            c = ++op->ic ;
 	            op->cc += sl ;
 	        } /* end if (memory-allocation) */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (fifostr_add) */
 
-int fifostr_headread(FIFOSTR *op,char *rbuf,int rlen) noex {
-	int		rs = SR_OK ;
+int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
+	int		rs ;
 	int		sl = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+	if ((rs = fifostr_magic(op)) >= 0) {
 		rs = SR_NOTFOUND ;
 	        if (op->head) {
-	            FIFOSTR_ENT	*ep = op->head ;
+	            fifostr_ent	*ep = op->head ;
 	            sl = ep->slen ;
 	            if (rbuf) {
 	                cchar	*sp = (cchar *) ep ;
-	                sp += sizeof(FIFOSTR_ENT) ;
+	                sp += sizeof(fifostr_ent) ;
 	                rs = snwcpy(rbuf,rlen,sp,sl) ;
 	            }
 	        }
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (fifostr_headread) */
 
-int fifostr_headlen(FIFOSTR *op) noex {
-	int		rs = SR_OK ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+int fifostr_headlen(fifostr *op) noex {
+	int		rs ;
+	if ((rs = fifostr_magic(op)) >= 0) {
 		rs = SR_NOTFOUND ;
 	        if (op->head) {
-	            FIFOSTR_ENT		*ep = op->head ;
+	            fifostr_ent		*ep = op->head ;
 	            rs = ep->slen ;
 	        }
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifostr_headlen) */
 
-int fifostr_entread(FIFOSTR *op,char *rbuf,int rlen,int n) noex {
-	int		rs = SR_OK ;
+int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
+	int		rs ;
 	int		sl = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+	if ((rs = fifostr_magic(op)) >= 0) {
 		rs = SR_INVALID ;
 	        if (n >= 0) {
 		    rs = SR_NOTFOUND ;
 		    if (op->head) {
-	                FIFOSTR_ENT	*ep = op->head ;
+	                fifostr_ent	*ep = op->head ;
 	                for (int i = 0 ; (i < n) && ep ; i += 1) {
 	                    ep = ep->next ;
 	                }
@@ -177,7 +173,7 @@ int fifostr_entread(FIFOSTR *op,char *rbuf,int rlen,int n) noex {
 	                    sl = ep->slen ;
 	                    if (rbuf) {
 	                        cchar	*sp = (cchar *) ep ;
-	                        sp += sizeof(FIFOSTR_ENT) ;
+	                        sp += sizeof(fifostr_ent) ;
 	                        rs = snwcpy(rbuf,rlen,sp,sl) ;
 			    } else {
 				rs = SR_OK ;
@@ -185,23 +181,20 @@ int fifostr_entread(FIFOSTR *op,char *rbuf,int rlen,int n) noex {
 	                }
 	            } /* end if (possible) */
 	        } /* end if (valid) */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (fifostr_entread) */
 
-int fifostr_entlen(FIFOSTR *op,int n) noex {
-	int		rs = SR_FAULT ;
+int fifostr_entlen(fifostr *op,int n) noex {
+	int		rs ;
 	int		sl = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+	if ((rs = fifostr_magic(op)) >= 0) {
 		rs = SR_INVALID ;
 		if (n >= 0) {
 		    rs = SR_NOTFOUND ;
 	            if (op->head) {
-	                FIFOSTR_ENT	*ep = op->head ;
+	                fifostr_ent	*ep = op->head ;
 			for (int i = 0 ; (i < n) && ep ; i += 1) {
 	    		    ep = ep->next ;
 			}
@@ -211,25 +204,21 @@ int fifostr_entlen(FIFOSTR *op,int n) noex {
 			}
 	            } /* end if (possible) */
 	        } /* end if (valid) */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (fifostr_entlen) */
 
-int fifostr_remove(FIFOSTR *op,char *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
+int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
+	int		rs ;
 	int		sl = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
-		rs = SR_OK ;
+	if ((rs = fifostr_magic(op)) >= 0) {
 	        if (op->head != nullptr) {
-	            FIFOSTR_ENT	*ep = op->head ;
+	            fifostr_ent	*ep = op->head ;
 	            sl = ep->slen ;
-	            if (rbuf != nullptr) {
+	            if (rbuf) {
 	                cchar	*sp = (cchar *) ep ;
-	                sp += sizeof(FIFOSTR_ENT) ;
+	                sp += sizeof(fifostr_ent) ;
 	                rs = snwcpy(rbuf,rlen,sp,sl) ;
 	            }
 	            if (rs >= 0) {
@@ -246,43 +235,34 @@ int fifostr_remove(FIFOSTR *op,char *rbuf,int rlen) noex {
 	        } else {
 	            rs = SR_NOTFOUND ;
 	        }
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (fifostr_remove) */
 
-int fifostr_curbegin(FIFOSTR *op,FIFOSTR_CUR *curp) noex {
-	int		rs = SR_FAULT ;
-	if (op && curp) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
+	int		rs ;
+	if ((rs = fifostr_magic(op,curp)) >= 0) {
 		curp->current = nullptr ;
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifostr_curbegin) */
 
-int fifostr_curend(FIFOSTR *op,FIFOSTR_CUR *curp) noex {
-	int		rs = SR_FAULT ;
-	if (op && curp) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
+	int		rs ;
+	if ((rs = fifostr_magic(op,curp)) >= 0) {
 		curp->current = nullptr ;
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifostr_curend) */
 
-int fifostr_enum(FIFOSTR *op,FIFOSTR_CUR *curp,char *rbuf,int rlen) noex {
-	int		rs = SR_FAULT ;
+int fifostr_enum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
+	int		rs ;
 	int		sl = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
-	        FIFOSTR_ENT	*ep ;
+	if ((rs = fifostr_magic(op,curp)) >= 0) {
+	        fifostr_ent	*ep ;
 	        if ((curp == nullptr) || (curp->current == nullptr)) {
 	            ep = op->head ;
 	        } else {
@@ -297,28 +277,24 @@ int fifostr_enum(FIFOSTR *op,FIFOSTR_CUR *curp,char *rbuf,int rlen) noex {
 	                sl = ep->slen ;
 	                if (rbuf != nullptr) {
 	                    sp = (cchar *) ep ;
-	                    sp += sizeof(FIFOSTR_ENT) ;
+	                    sp += sizeof(fifostr_ent) ;
 	                    rs = snwcpy(rbuf,rlen,sp,sl) ;
 	                }
 	            } else {
 	                rs = SR_NOTFOUND ;
 	            }
 	        } /* end if (ok) */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
 /* end subroutine (fifostr_enum) */
 
-int fifostr_del(FIFOSTR *op,FIFOSTR_CUR *curp) noex {
-	int		rs = SR_FAULT ;
+int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
+	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
-	        FIFOSTR_ENT	*ep ;
-		rs = SR_OK ;
+	if ((rs = fifostr_magic(op,curp)) >= 0) {
+	        fifostr_ent	*ep ;
 	        if ((curp == nullptr) || (curp->current == nullptr)) {
 	            ep = op->head ;
 	        } else {
@@ -353,32 +329,26 @@ int fifostr_del(FIFOSTR *op,FIFOSTR_CUR *curp) noex {
 	        } else {
 	            rs = SR_NOTFOUND ;
 	        }
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (fifostr_del) */
 
-int fifostr_count(FIFOSTR *op) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+int fifostr_count(fifostr *op) noex {
+	int		rs ;
+	if ((rs = fifostr_magic(op)) >= 0) {
 		rs = op->ic ;
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifostr_count) */
 
 #ifdef	COMMENT
 /* search for a string in the FIFO string object */
-int fifostr_finder(FIFOSTR *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
-	int		rs = SR_FAULT ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    [if (cmpfunc == nullptr) cmpfunc = cmpdefault ;
-	    if (op->magic == FIFOSTR_MAGIC) {
+int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
+	int		rs ;
+	if (cmpfunc == nullptr) cmpfunc = cmpdefault ;
+	if ((rs = fifostr_magic(op)) >= 0) {
 	        fifostr_cur	cur ;
 	        if ((rs = fifostr_curbegin(op,&cur)) >= 0) {
 	            cchar	*rp ;
@@ -388,8 +358,7 @@ int fifostr_finder(FIFOSTR *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 	            if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
 	            fifostr_curend(op,&cur) ;
 	        } /* end if (fifostr-cur) */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (fifostr_finder) */
@@ -398,8 +367,8 @@ int fifostr_finder(FIFOSTR *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 
 /* private subroutines */
 
-static int fifostr_mat(FIFOSTR *op,FIFOSTR_ENT *mep) noex {
-	FIFOSTR_ENT	*ep = op->head ;
+static int fifostr_mat(fifostr *op,fifostr_ent *mep) noex {
+	fifostr_ent	*ep = op->head ;
 	int		rs = SR_NOTFOUND ;
 	while (ep != nullptr) {
 	    if (ep == mep) {

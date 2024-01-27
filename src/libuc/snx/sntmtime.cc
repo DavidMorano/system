@@ -1,5 +1,5 @@
 /* sntmtime SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string of time-component values */
 /* version %I% last-modified %G% */
@@ -91,16 +91,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<stddef.h>
-#include	<stdlib.h>		/* for |abs(3c)| */
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>
+#include	<cstdlib>		/* for |abs(3c)| */
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<calstrs.h>
 #include	<sbuf.h>
-#include	<tmtime.h>
 #include	<zoffparts.h>
 #include	<mkchar.h>
 #include	<ctdec.h>
@@ -141,7 +139,10 @@ static int	sbuf_datex(sbuf *,TMTIME *) noex ;
 
 /* local variables */
 
-static cchar	blinker[] = "\033[5m:\033[0m" ;
+static constexpr cchar	blinker[] = "\033[5m:\033[0m" ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -206,7 +207,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'I':
 	                {
-	                    int	h = (tmp->hour%12) ;
+	                    int		h = (tmp->hour%12) ;
 	                    if (h == 0) h = 12 ;
 	                    rs = sbuf_twodig(ssp,h) ;
 	                }
@@ -219,7 +220,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'l':
 	                {
-	                    int	h = (tmp->hour%12) ;
+	                    int		h = (tmp->hour%12) ;
 	                    if (h == 0) h = 12 ;
 	                    rs = sbuf_digs(ssp,h,2,1) ;
 	                }
@@ -238,7 +239,8 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'r': /* this is what Free-BSD does */
 	                rs = sbuf_fmtstrs(ssp,tmp,"%I:%M:%S ") ;
-    /* FALLTHROUGH */
+			fallthrough ;
+    			/* FALLTHROUGH */
 	            case 'p':
 	                if (rs >= 0) {
 	                    cchar	*cp = (tmp->hour < 12) ? "am" : "pm" ;
@@ -250,20 +252,20 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'U':
 	                {
-	                    int	w = ((tmp->yday + 7 - tmp->wday) / 7) ;
+	                    int		w = ((tmp->yday + 7 - tmp->wday) / 7) ;
 	                    rs = sbuf_twodig(ssp,w) ;
 	                }
 	                break ;
 	            case 'u':
 	                {
-	                    int	d = tmp->wday ;
+	                    int		d = tmp->wday ;
 	                    if (d == 0) d = 7 ;
 	                    rs = sbuf_digs(ssp,d,1,0) ;
 	                }
 	                break ;
 	            case 'V':
 	                {
-	                    int	w ;
+	                    int		w ;
 	                    w = (tmp->yday+10-(tmp->wday?(tmp->wday-1):6))/7 ;
 	                    if (w == 0) w = 53 ;
 	                    rs = sbuf_twodig(ssp,w) ;
@@ -271,7 +273,7 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'W':
 	                {
-	                    int	w ;
+	                    int		w ;
 	                    w = (tmp->yday+7-(tmp->wday?(tmp->wday-1):6))/7 ;
 	                    rs = sbuf_twodig(ssp,w) ;
 	                }
@@ -329,14 +331,10 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 /* end subroutine (sbuf_fmtstrs) */
 
 static int sbuf_twodig(sbuf *ssp,int v) noex {
-	int		rs ;
 	char		dbuf[2+1] ;
-
 	dbuf[0] = (v/10) + '0' ;
 	dbuf[1] = (v%10) + '0' ;
-	rs = sbuf_strw(ssp,dbuf,2) ;
-
-	return rs ;
+	return sbuf_strw(ssp,dbuf,2) ;
 }
 /* end subroutine (sbuf_twodig) */
 
@@ -344,7 +342,6 @@ static int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	int		rs = SR_OK ;
 	int		ch ;
 	char		dbuf[3+1] ;
-
 	switch (n) {
 	case 1:
 	    dbuf[0] = (v%10) + '0' ;
@@ -368,11 +365,9 @@ static int sbuf_digs(sbuf *ssp,int v,int n,int f_space) noex {
 	    } /* end if (space) */
 	    break ;
 	} /* end switch */
-
 	if (rs >= 0) {
 	    rs = sbuf_strw(ssp,dbuf,n) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (sbuf_digs) */
@@ -381,18 +376,15 @@ static int sbuf_year(sbuf *ssp,TMTIME *tmp) noex {
 	cint		y = ((tmp->year + TM_YEAR_BASE)%10000) ;
 	int		rs ;
 	char		dbuf[4+1] ;
-
 	if ((rs = ctdecpi(dbuf,4,4,y)) >= 0) { /* leading zeros to 4 digits */
 	    rs = sbuf_strw(ssp,dbuf,4) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (sbuf_year) */
 
 static int sbuf_coder(sbuf *ssp,TMTIME *tmp,int f_sec) noex {
 	int		rs ;
-
 	if ((rs = sbuf_twodig(ssp,tmp->hour)) >= 0) {
 	    if ((rs = sbuf_char(ssp,':')) >= 0) {
 	        if ((rs = sbuf_twodig(ssp,tmp->min)) >= 0) {
@@ -404,7 +396,6 @@ static int sbuf_coder(sbuf *ssp,TMTIME *tmp,int f_sec) noex {
 		}
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (sbuf_coder) */

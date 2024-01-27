@@ -156,18 +156,18 @@ long lmax(long a,long b)
 /* end subroutine (lmax) */
 
 
-LONG llmin(LONG a,LONG b)
+longlong llmin(longlong a,longlong b)
 {
-	LONG	v = a ;
+	longlong	v = a ;
 	if (b < v) v = b ;
 	return v ;
 }
 /* end subroutine (llmin) */
 
 
-LONG llmax(LONG a,LONG b)
+longlong llmax(longlong a,longlong b)
 {
-	LONG	v = a ;
+	longlong	v = a ;
 	if (b > v) v = b ;
 	return v ;
 }

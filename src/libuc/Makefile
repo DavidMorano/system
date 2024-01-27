@@ -924,20 +924,6 @@ sncpyxc.o:		sncpyxc.cc sncpyxc.h
 sncpyx.o:		sncpyx.cc sncpyx.h
 sncpyxw.o:		sncpyxw.cc sncpyxw.h
 
-snxxx.o:		snxxx.cc sn.h
-snfsflags.o:		snfsflags.c sn.h snflags.h
-snfilemode.o:		snfilemode.c sn.h snflags.h
-snopenflags.o:		snopenflags.c sn.h snflags.h
-snfsflags.o:		snfsflags.c sn.h snflags.h
-snpollflags.o:		snpollflags.c sn.h snflags.h
-sntmtime.o:		sntmtime.c sn.h tmtime.h
-snflags.o:		snflags.c snflags.h
-snabbr.o:		snabbr.c sn.h
-snshellunder.o:		snshellunder.c sn.h
-snsigabbr.o:		snsigabbr.c sn.h
-snxtilook.o:		snxtilook.c sn.h
-snxtierr.o:		snxtierr.c sn.h
-
 mkpathx.o:		mkpathx.c mkpathx.h
 mkpathxw.o:		mkpathxw.cc mkpathxw.h
 
@@ -989,9 +975,7 @@ quoteshellarg.o:	quoteshellarg.c
 mkquoted.o:		mkquoted.cc mkquoted.h
 termconseq.o:		termconseq.cc termconseq.h
 
-tmtime.o:		tmtime.c tmtime.h
-
-getnodedomain.o:	getnodedomain.c
+tmtime.o:		tmtime.cc tmtime.h
 
 format.o:		format.cc format.h
 
@@ -1242,6 +1226,7 @@ intceil.o:		intceil.cc intceil.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
+getnodedomain.o:	getnodedomain.cc getnodename.h
 getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h

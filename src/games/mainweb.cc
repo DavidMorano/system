@@ -1,4 +1,5 @@
-/* main (web traffic) */
+/* main SUPPORT (web traffic) */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -36,30 +37,30 @@ using namespace	std ;
 
 /* forward references */
 
-static void printa(const int *,int) ;
-static void web1(int *,const int *,int) ;
-static void web2(int *,const int *,int) ;
-static void web3(int *,const int *,int) ;
-static void web4(int *,const int *,int) ;
-static void web5(int *,const int *,int) ;
-static void web6(int *,const int *,int) ;
+static void printa(cint *,int) ;
+static void web1(int *,cint *,int) ;
+static void web2(int *,cint *,int) ;
+static void web3(int *,cint *,int) ;
+static void web4(int *,cint *,int) ;
+static void web5(int *,cint *,int) ;
+static void web6(int *,cint *,int) ;
 
-static int findinc(int *,const int *,int,int) ;
-static int findincer(int *,const int *,int,int) ;
+static int findinc(int *,cint *,int,int) ;
+static int findincer(int *,cint *,int,int) ;
 
-static int web3_recurse(int *,const int *,int) ;
-static int web4_recurse(int *,const int *,int) ;
-static int web4_proc(int *,const int *,int) ;
+static int web3_recurse(int *,cint *,int) ;
+static int web4_recurse(int *,cint *,int) ;
+static int web4_proc(int *,cint *,int) ;
 
-static int web6_recurse(int *,const int *,int) ;
+static int web6_recurse(int *,cint *,int) ;
 
 
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
-	const int	algos[] = { 1, 2, 3, 4, 5, 6 } ;
-	const int	a[] = { 8, 6, 9, 4, 8, 8, 3, 10, 2, 1 } ;
-	const int	n = nelem(a) ;
+/* external subroutines */
+
+int main(int,mainv,mainv) {
+	cint	algos[] = { 1, 2, 3, 4, 5, 6 } ;
+	cint	a[] = { 8, 6, 9, 4, 8, 8, 3, 10, 2, 1 } ;
+	cint	n = nelem(a) ;
 
 	for (auto al : algos) {
 	    int	out[n+1] ;
@@ -95,9 +96,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* local subroutines */
 
-
-static void web1(int *out,const int *data,int n)
-{
+static void web1(int *out,cint *data,int n) {
 	if (n > 0) {
 	    int	i ;
 	    out[n-1] = -1 ;
@@ -105,7 +104,7 @@ static void web1(int *out,const int *data,int n)
 	        int	j ;
 	        out[i] = -1 ;
 	        for (j = (i+1) ; j < n ; j += 1) {
-		    const int	v = data[i] ;
+		    cint	v = data[i] ;
 	            if (v < data[j]) {
 	                out[i] = (j-i) ;
 	                break ;
@@ -116,23 +115,19 @@ static void web1(int *out,const int *data,int n)
 }
 /* end subroutine (web1) */
 
-
-static void web2(int *out,const int *data,int n)
-{
+static void web2(int *out,cint *data,int n) {
 	if (n > 0) {
 	    int 	i ;
 	    out[n-1] = -1 ;
 	    for (i = (n-1) ; i >= 0 ; i -= 1) {
-	        const int	v = data[i] ;
+	        cint	v = data[i] ;
 	        out[i] = findinc(out+i+1,data+i+1,n-i-1,v) ;
 	    }
 	}
 }
 /* end subroutine (web2) */
 
-
-static int findinc(int *out,const int *data,int n,int v)
-{
+static int findinc(int *out,cint *data,int n,int v) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    if (v < data[0]) {
@@ -151,9 +146,7 @@ static int findinc(int *out,const int *data,int n,int v)
 }
 /* end subroutine (findinc) */
 
-
-static int findincer(int *out,const int *data,int n,int v)
-{
+static int findincer(int *out,cint *data,int n,int v) {
 	int		ans = -1 ;
 	int		j ;
 	for (j = 0 ; j < n ; j += 1) {
@@ -177,25 +170,21 @@ static int findincer(int *out,const int *data,int n,int v)
 }
 /* end subroutine (findincer) */
 
-
-static void web3(int *out,const int *data,int n)
-{
+static void web3(int *out,cint *data,int n) {
 	if (n > 0) {
 	    web3_recurse(out,data,n) ;
 	}
 }
 /* end subroutine (web3) */
 
-
-static int web3_recurse(int *out,const int *data,int n)
-{
+static int web3_recurse(int *out,cint *data,int n) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    out[n-1] = -1 ;
 	    if (n > 1) {
 	        web3_recurse(out+1,data+1,n-1) ;
 	        {
-	            const int	v = data[0] ;
+	            cint	v = data[0] ;
 	            if (v < data[1]) {
 	                ans = 1 ;
 	            } else if (v == data[1]) {
@@ -215,18 +204,14 @@ static int web3_recurse(int *out,const int *data,int n)
 }
 /* end subroutine (web3_recurse) */
 
-
-static void web4(int *out,const int *data,int n)
-{
+static void web4(int *out,cint *data,int n) {
 	if (n > 0) {
 	    web4_recurse(out,data,n) ;
 	}
 }
 /* end subroutine (web4) */
 
-
-static int web4_recurse(int *out,const int *data,int n)
-{
+static int web4_recurse(int *out,cint *data,int n) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    out[n-1] = -1 ;
@@ -239,10 +224,8 @@ static int web4_recurse(int *out,const int *data,int n)
 }
 /* end subroutine (web4_recurse) */
 
-
-static int web4_proc(int *out,const int *data,int n)
-{
-	const int	v = data[0] ;
+static int web4_proc(int *out,cint *data,int n) {
+	cint	v = data[0] ;
 	int		ans = -1 ;
 	if (v < data[1]) {
 	    ans = 1 ;
@@ -260,16 +243,14 @@ static int web4_proc(int *out,const int *data,int n)
 }
 /* end subroutine (web4_proc) */
 
-
-static void web5(int *out,const int *data,int n)
-{
+static void web5(int *out,cint *data,int n) {
 	if (n > 0) {
 	    out[n-1] = -1 ;
 	    if (n > 1) {
 	        int	max = data[n-1] ;
 	        int 	i ;
 	        for (i = (n-2) ; i >= 0 ; i -= 1) {
-	            const int	v = data[i] ;
+	            cint	v = data[i] ;
 		    out[i] = -1 ;
 		    if (v < max) {
 	                out[i] = findincer(out+i+1,data+i+1,n-i-1,v) ;
@@ -281,23 +262,19 @@ static void web5(int *out,const int *data,int n)
 }
 /* end subroutine (web5) */
 
-
-static void web6(int *out,const int *data,int n)
-{
+static void web6(int *out,cint *data,int n) {
 	if (n > 0) {
 	    web6_recurse(out,data,n) ;
 	}
 }
 /* end subroutine (web6) */
 
-
-static int web6_recurse(int *out,const int *data,int n)
-{
+static int web6_recurse(int *out,cint *data,int n) {
 	int		ans = -1 ;
 	if (n > 0) {
 	    out[n-1] = -1 ;
 	    if (n > 1) {
-		const int	v = data[0] ;
+		cint	v = data[0] ;
 	        web6_recurse(out+1,data+1,n-1) ;
 	        ans = findincer(out+1,data+1,n-1,v) ;
 	    }
@@ -307,9 +284,7 @@ static int web6_recurse(int *out,const int *data,int n)
 }
 /* end subroutine (web6_recurse) */
 
-
-static void printa(const int *a,int n)
-{
+static void printa(cint *a,int n) {
 	int	i ;
 	for (i = 0 ; i < n ; i += 1) {
 	    cout << " " << setw(2) << a[i] ;
