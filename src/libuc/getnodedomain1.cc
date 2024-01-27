@@ -69,16 +69,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/types.h>
 #include	<sys/param.h>
+#include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<varnames.hh>
 #include	<bufsizevar.hh>
-#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<filebuf.h>
 #include	<strn.h>
@@ -143,10 +143,11 @@ namespace {
     struct tryer {
 	char		*nodename ;	/* passed caller argument (returned) */
 	char		*domainname ;	/* passed caller argument (returned) */
-	char		*nbuf ;
 	cchar		*varnode ;
 	cchar		*sysnodename ;
 	TRY_FL		f ;
+	char		nodenamebuf[NODENAMELEN + 1] ;
+	char		sibuf[NODENAMELEN + 1] ;
     } ; /* end struct (try) */
 }
 
@@ -324,43 +325,18 @@ int getuserdomain(char *dbuf,int dlen) noex {
 static int try_start(TRY *tip,char *nodename,char *domainname) noex {
 	int		rs = SR_FAULT ;
 	if (tip) {
+	tip->f = {} ;
+	tip->nodename = (nodename) ? nodename : tip->nodenamebuf ;
+	tip->domainname = domainname ;
+	tip->varnode = nullptr ;
+	tip->sysnodename = nullptr ;
+	tip->nodename[0] = '\0' ;
+	tip->sibuf[0] = '\0' ;
 	    rs = SR_OK ;
-	    memclear(tip) ;
-	    tip->f = {} ;
-	    tip->domainname = domainname ;
-	    tip->varnode = nullptr ;
-	    tip->sysnodename = nullptr ;
-	    tip->nodename = nodename ;
-	    if (nodename == nullptr) {
-		char	*cp{} ;
-	        if ((rs = malloc_mn(&cp)) >= 0) {
-		   tip->nbuf = cp ;
-	    	   tip->nodename = cp ;
-		}
-	    } /* end if (memory-allocation) */
-	    if (rs >= 0) tip->nodename[0] = '\0' ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (try_start) */
-
-static int try_finish(TRY *tip) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	if (tip->sysnodename) {
-	    rs1 = uc_free(tip->sysnodename) ;
-	    if (rs >= 0) rs = rs1 ;
-	    tip->sysnodename = nullptr ;
-	}
-	if (tip->nbuf) {
-	    rs1 = uc_free(tip->nbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    tip->nbuf = nullptr ;
-	}
-	tip->varnode = nullptr ;
-	return rs ;
-}
-/* end subroutine (try_finish) */
 
 static int try_startvarnode(TRY *tip) noex {
 	int		rs = SR_FAULT ;
@@ -657,6 +633,19 @@ static int try_guess(TRY *tip) noex {
 	return rs ;
 }
 /* end subroutine (try_guess) */
+
+static int try_finish(TRY *tip) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (tip->sysnodename != nullptr) {
+	    rs1 = uc_free(tip->sysnodename) ;
+	    if (rs >= 0) rs = rs1 ;
+	    tip->sysnodename = nullptr ;
+	}
+	tip->varnode = nullptr ;
+	return rs ;
+}
+/* end subroutine (try_finish) */
 
 /* remove trailing whitespace and dots */
 static int rmwhitedot(char *bp,int bl) noex {
