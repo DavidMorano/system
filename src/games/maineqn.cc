@@ -1,8 +1,5 @@
-/* maineqn */
+/* maineqn SUPPORT */
 /* lang=C++11 */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -30,6 +27,8 @@
 #include	<iostream>
 #include	<iomanip>
 #include	<usystem.h>
+#include	<strwcpy.h>
+#include	<six.h>
 #include	<localmisc.h>
 
 
@@ -39,10 +38,6 @@ using namespace std ;
 
 
 /* external subroutines */
-
-extern "C" int	sisub(cchar *,int,cchar *) ;
-
-extern "C" char	*strwcpy(char *,cchar *,int) ;
 
 
 /* global variables */
@@ -61,16 +56,11 @@ static int around(double e,double v) ;
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv,mainv) {
 	const double	ext = 6.0 ;
-	double		x, y ;
 	double		inc = 0.001 ;
-
-	for (x = 3.0 ; x < +ext ; x += inc) {
-	    for (y = 4.0 ; y < +ext ; y += inc) {
+	for (double x = 3.0 ; x < +ext ; x += inc) {
+	    for (double y = 4.0 ; y < +ext ; y += inc) {
 	        double	e1 = (y*y - x*x) ;
 	        if (around(e1,10.0)) {
 	            double	xy = (x*y) ;
@@ -79,7 +69,6 @@ int main(int argc,const char **argv,const char **envv)
 	        }
 	    } /* end for */
 	} /* end for */
-
 	return 0 ;
 }
 /* end subroutine (main) */
@@ -87,9 +76,7 @@ int main(int argc,const char **argv,const char **envv)
 
 /* local subroutines */
 
-
-static int around(double e,double v)
-{
+static int around(double e,double v) {
 	double	epsilon = 0.1 ;
 	return ((e >= (v-epsilon)) && (e < (v+epsilon))) ;
 }

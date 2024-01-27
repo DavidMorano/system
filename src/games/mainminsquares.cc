@@ -1,7 +1,8 @@
-/* main (MINSQUARES) */
+/* main SUPPORT (MINSQUARES) */
+/* lang=C++20 */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* the find minimum value of squares */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,8 +16,8 @@
 
 /*******************************************************************************
 
-        Given a length and width of a piece of paper, we calculate the minimum
-        number of squares that can be cut from it.
+	Given a length and width of a piece of paper, we calculate
+	the minimum number of squares that can be cut from it.
 
 
 *******************************************************************************/
@@ -49,8 +50,6 @@
 
 #define	MAXTRY		200
 
-#define	VARDEBUGFNAME	"MINSQUARES_DEBUGFILE"
-
 
 /* name spaces */
 
@@ -60,13 +59,6 @@ using namespace	std ;
 /* external subroutines */
 
 extern "C" int	igcd(int,int) ;
-
-#if	CF_DEBUGS
-extern "C" int	debugopen(cchar *) ;
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	debugclose() ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
 
 extern "C" cchar	*getourenv(cchar **,cchar *) ;
 
@@ -156,23 +148,10 @@ static const papercase	pcases[] = {
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int,mainv,mainv) {
 	const int	algos[] = { 1, 2, 3 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS || CF_DEBUG
-	{
-	    cchar	*cp ;
-	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	        rs = debugopen(cp) ;
-	        debugprintf("main: starting DFD=%d\n",rs) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	for (auto pc : pcases) {
 	    if (pc.h > 0) {
@@ -195,11 +174,6 @@ int main(int argc,cchar **argv,cchar **envv)
 	        cout << endl ;
 	    } /* end if */
 	} /* end for (pcases) */
-
-#if	CF_DEBUGS
-	debugprintf("main: ret rs=%d\n",rs) ;
-	debugclose() ;
-#endif
 
 	if (rs < 0) ex = 1 ;
 	return ex ;

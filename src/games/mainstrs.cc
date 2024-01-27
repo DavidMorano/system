@@ -84,10 +84,7 @@ static set<string> strs2(int) ;
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int,mainv,mainv) {
 	const int	algos[] = { 1, 2 } ;
 	const int	lengths[] = { 1, 2, 3, 4 } ;
 	int		ex = 0 ;
@@ -131,7 +128,6 @@ int main(int argc,cchar **argv,cchar **envv)
 
 
 /* local subroutines */
-
 
 #define	STRS1_NUM	3
 
@@ -256,8 +252,7 @@ struct strs2_item {
 	} ;
 } ;
 
-static void strs2_push(stack<strs2_item> &s,struct strs2_item wi,int i)
-{
+static void strs2_push(stack<strs2_item> &s,struct strs2_item wi,int i) {
 	wi.setindex(i) ;
 	for (int w = 0 ; w < 3 ; w += 1) {
 	    wi.setwhich(w) ;
@@ -298,9 +293,7 @@ static res_t strs2(const int N) {
 }
 /* end subroutine (strs2) */
 
-
-static void printres(const set<string> &res)
-{
+static void printres(const set<string> &res) {
 	for (auto &s : res) {
 	    cout << s << endl ;
 	}

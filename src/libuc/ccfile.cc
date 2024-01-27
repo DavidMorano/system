@@ -198,6 +198,7 @@ int ccfile::seek(off_t o,int w) noex {
 	int		rs = SR_OK ;
 	seekdir		sv = beg ;
 	switch (w) {
+	case -1:
 	case SEEK_SET:
 	    sv = beg ;
 	    break ;
@@ -207,7 +208,11 @@ int ccfile::seek(off_t o,int w) noex {
 	case SEEK_END:
 	    sv = end ;
 	    break ;
+	default:
+	    rs = SR_INVALID ;
+	    break ;
 	} /* end switch */
+	if (rs >= 0) {
 	    try {
 	        if (freading) {
 		    seekg(o,sv) ;	
@@ -227,6 +232,7 @@ int ccfile::seek(off_t o,int w) noex {
 	    } catch (...) {
 		rs = SR_BADFMT ;
 	    }
+	} /* end if (ok) */
 	return rs ;
 }
 /* end method (ccfile::seek) */

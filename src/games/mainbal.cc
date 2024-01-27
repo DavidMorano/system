@@ -147,10 +147,7 @@ bool IsBalanced2(const std::string &input) {
 } 
 /* end subroutine (IsBalanced2) */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv,mainv) {
 	const int	algos[] = { 1, 2, 3 } ;
 	const int	lengths[] = { 0, 1, 2, 4, 6, 8 } ;
 

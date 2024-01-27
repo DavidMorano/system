@@ -1,9 +1,8 @@
 /* main (ANAS) */
+/* lang=C++20 */
 
 /* string anagrams */
-
-
-#define	CF_DEBUGS	1		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -25,7 +24,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<climits>
-#include	<cstring>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
@@ -48,29 +47,20 @@
 
 /* local defines */
 
-#define	VARDEBUGFNAME	"ANAS_DEBUGFILE"
 
-
-/* name spaces */
+/* local namespaces */
 
 using namespace	std ;
 
 
-/* typedefs */
+/* local typedefs */
 
 typedef set<string>	res_t ;
 
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern "C" int	debugopen(cchar *) ;
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	debugclose() ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
+extern "C" cchar	*getourenv(cchar **,cchar *)  noex ;
 
 
 /* local structures */
@@ -78,16 +68,16 @@ extern "C" cchar	*getourenv(cchar **,cchar *) ;
 
 /* forward references */
 
-static int	anas1(res_t *,cchar *) ;
-static int	anas2(res_t *,cchar *) ;
-static int	anas3(res_t *,cchar *) ;
+static int	anas1(res_t *,cchar *)  ;
+static int	anas2(res_t *,cchar *)  ;
+static int	anas3(res_t *,cchar *)  ;
 
 static void	printres(res_t *) ;
 
 
 /* local variables */
 
-static cchar	*cases[] = {
+static constexpr cchar	*cases[] = {
 	"ab",
 	"abc",
 	"aab",
@@ -98,33 +88,23 @@ static cchar	*cases[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv,mainv)  {
 	res_t		res ;
-	const int	algos[] = { 1, 2, 3 } ;
+	cint		algos[] = { 1, 2, 3 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	{
-	    cchar	*cp ;
-	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	        rs = debugopen(cp) ;
-	        debugprintf("main: starting DFD=%d\n",rs) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	for (auto sc : cases) {
 	    if (sc != NULL) {
 	        for (auto al : algos) {
 	            rs = 0 ;
 		    res.clear() ;
-	            cout << "algo=" << al << " sc=" << sc << endl ;
+	            cout << "algo=" << al << " sc=" << sc << eol ;
 	            switch (al) {
 	            case 1:
 	                rs = anas1(&res,sc) ;
@@ -144,11 +124,6 @@ int main(int argc,cchar **argv,cchar **envv)
 	    if (rs < 0) break ;
 	} /* end for (cases) */
 
-#if	CF_DEBUGS
-	debugprintf("main: ret rs=%d\n",rs) ;
-	debugclose() ;
-#endif
-
 	if (rs < 0) ex = 1 ;
 	return ex ;
 }
@@ -157,13 +132,11 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* local subroutines */
 
-
 struct anas1_char {
 	int		ch ;
 	int		max = 1 ;
 	vector<int>	counts ;
-	anas1_char(char _ch,int n) : ch(_ch), counts(n,0) { 
-	} ;
+	anas1_char(char _ch,int n)  : ch(_ch), counts(n,0) { } ;
 } ;
 
 typedef vector<anas1_char>	anas1map_t ;
@@ -176,17 +149,17 @@ struct anas1_head {
 	int		total = 0 ;
 	int		n = 0 ;
 	anas1_head() = default ;
-	anas1_head(res_t *_rp,cchar *sp) : src(sp), resp(_rp) {
+	anas1_head(res_t *_rp,cchar *sp)  : src(sp), resp(_rp) {
 	    n = src.length() ;
 	    tmp.resize(n,'-') ;
 	    for (auto ch : src) {
 		loadchar(ch) ;
 	    } /* end for */
 	} ;
-	void loadchar(char ch) {
-	    const int	wn = m.size() ;
+	void loadchar(char ch)  {
+	    cint	wn = m.size() ;
 	    bool	f = false ;
-	    int		w ;
+	    int		w{} ;
 	    for (w = 0 ; w < wn ; w += 1) {
 		f = (m[w].ch == ch) ;
 		if (f) break ;
@@ -198,15 +171,15 @@ struct anas1_head {
 		m.push_back(item) ;
 	    }
 	} ;
-	bool canadd(int i,int w) {
+	bool canadd(int i,int w)  {
 	    bool	f = (m[w].counts[i] < m[w].max) ;
 	    return f ;
 	} ;
-	void inc(int i,int w) {
+	void inc(int i,int w)  {
 	    m[w].counts[i] += 1 ;
 	} ;
-	void enter(int i) {
-	    const int	n = m.size() ;
+	void enter(int i)  {
+	    cint	n = m.size() ;
 	    if (i > 0) {
 		for (int w = 0 ; w < n ; w += 1) {
 		    m[w].counts[i] = m[w].counts[i-1] ;
@@ -217,7 +190,7 @@ struct anas1_head {
 		}
 	    }
 	} ;
-	bool mkstr(int i,int w) {
+	bool mkstr(int i,int w)  {
 	    bool	f = false ;
 	    if (i < n) {
 	        enter(i) ;
@@ -226,10 +199,6 @@ struct anas1_head {
 		        inc(i,w) ;
 			f = true ;
 		        if ((i+1) == n) {
-#if	CF_DEBUGS
-			    debugprintf("mainanas/anas1::mkstr: es=%s\n",
-				tmp.c_str()) ;
-#endif
 	    	            resp->insert(tmp) ;
 			    total += 1 ;
 		        } else {
@@ -239,20 +208,19 @@ struct anas1_head {
 	    } /* end if (possible) */
 	    return f ;
 	} ; /* end method (mkstr) */
-	int num() const {
+	int num() const  {
 	    return total ;
 	} ;
-	void recurse(int d) {
-	    const int	n = m.size() ;
+	void recurse(int d)  {
+	    cint	n = m.size() ;
 	    for (int j = 0 ; j < n ; j += 1) {
     	        mkstr(d,j) ;
 	    }
 	} ;
-} ;
+} ; /* end struct (anas1_head) */
 
-static int anas1(res_t *resp,cchar *sc)
-{
-	const int	n = strlen(sc) ;
+static int anas1(res_t *resp,cchar *sc)  {
+	cint		n = strlen(sc) ;
 	int		rs = SR_OK ;
 	if (n > 0) {
 	    anas1_head	worker(resp,sc) ;
@@ -264,19 +232,17 @@ static int anas1(res_t *resp,cchar *sc)
 }
 /* end subroutine (anas1) */
 
-
 struct anas2_item {
-	int	i = 0 ; /* index */
-	int	w = 0 ; /* which-type */
-	anas2_item() { } ;
-	anas2_item(int _i,int _w) : i(_i), w(_w) { 
-	} ;
+	int		i = 0 ; /* index */
+	int		w = 0 ; /* which-type */
+	anas2_item()  { } ;
+	anas2_item(int _i,int _w)  : i(_i), w(_w) { } ;
 	anas2_item &operator = (const anas2_item &wi) = default ;
 	/* do not need 'move' constructor or assignment (too simple) */
-	void setindex(int ai) {
+	void setindex(int ai)  {
 	    i = ai ;
 	} ;
-	void setwhich(int aw) {
+	void setwhich(int aw)  {
 	    w = aw ;
 	} ;
 } ;
@@ -285,8 +251,7 @@ struct anas2_char {
 	int		ch ;
 	int		max = 1 ;
 	vector<int>	counts ;
-	anas2_char(char _ch,int n) : ch(_ch), counts(n,0) { 
-	} ;
+	anas2_char(char _ch,int n)  : ch(_ch), counts(n,0) { } ;
 } ;
 
 typedef vector<anas2_char>	anas2map_t ;
@@ -310,9 +275,9 @@ struct anas2_head {
 	    } /* end for */
 	} ;
 	void loadchar(char ch) {
-	    const int	wn = m.size() ;
+	    cint	wn = m.size() ;
 	    bool	f = false ;
-	    int		w ;
+	    int		w{} ;
 	    for (w = 0 ; w < wn ; w += 1) {
 		f = (m[w].ch == ch) ;
 		if (f) break ;
@@ -332,7 +297,7 @@ struct anas2_head {
 	    m[w].counts[i] += 1 ;
 	} ;
 	void enter(int i) {
-	    const int	n = m.size() ;
+	    cint	n = m.size() ;
 	    if (i > 0) {
 		for (int w = 0 ; w < n ; w += 1) {
 		    m[w].counts[i] = m[w].counts[i-1] ;
@@ -357,10 +322,6 @@ struct anas2_head {
 		        tmp[i] = m[w].ch ;
 		        inc(i,w) ;
 		        if ((i+1) == n) {
-#if	CF_DEBUGS
-			    debugprintf("mainanas/anas2::mkstr: es=%s\n",
-				tmp.c_str()) ;
-#endif
 	    	            resp->insert(tmp) ;
 			    total += 1 ;
 		        } else {
@@ -379,7 +340,7 @@ struct anas2_head {
 	    work.push(wi) ;
 	} ;
 	void pushall(int i) {
-	    const int	n = m.size() ;
+	    cint	n = m.size() ;
 	    for (int w = 0 ; w < n ; w += 1) {
     	        push(i,w) ;
 	    }
@@ -388,11 +349,10 @@ struct anas2_head {
 	    pushall(0) ;
 	    return mkstr() ;
 	} ;
-} ;
+} ; /* end struct (anas2_head) */
 
-static int anas2(res_t *resp,cchar *sc)
-{
-	const int	n = strlen(sc) ;
+static int anas2(res_t *resp,cchar *sc)  {
+	cint		n = strlen(sc) ;
 	int		rs = SR_OK ;
 	if (n > 0) {
 	    anas2_head	worker(resp,sc) ;
@@ -403,10 +363,8 @@ static int anas2(res_t *resp,cchar *sc)
 }
 /* end subroutine (anas2) */
 
-
-static int anas3(res_t *resp,cchar *sc)
-{
-	const int	n = strlen(sc) ;
+static int anas3(res_t *resp,cchar *sc)  {
+	cint		n = strlen(sc) ;
 	int		rs = SR_OK ;
 	if (n > 0) {
 	    string	s(sc) ;
@@ -414,9 +372,6 @@ static int anas3(res_t *resp,cchar *sc)
 		string::iterator	end = s.end() ;
 		string::iterator	it = s.begin() ;
 		int			c = 1 ;
-#if	CF_DEBUGS
-		    debugprintf("anas3: n=%s\n",s.c_str()) ;
-#endif
 	        resp->insert(s) ;
 		while (prev_permutation(it,end)) {
 	            resp->insert(s) ;
@@ -424,15 +379,9 @@ static int anas3(res_t *resp,cchar *sc)
 		}
 		s = sc ; end = s.end() ; it = s.begin() ;
 	        while (next_permutation(it,end)) {
-#if	CF_DEBUGS
-		    debugprintf("anas3: n=%s\n",s.c_str()) ;
-#endif
 	            resp->insert(s) ;
 		    c += 1 ;
 		}
-#if	CF_DEBUGS
-		    debugprintf("anas3: o=%s\n",s.c_str()) ;
-#endif
 	        cout << "num=" << c << endl ;
 		rs = c ;
 	    }
@@ -441,9 +390,7 @@ static int anas3(res_t *resp,cchar *sc)
 }
 /* end subroutine (anas3) */
 
-
-static void printres(res_t *rp)
-{
+static void printres(res_t *rp)  {
 	res_t::iterator	end = rp->end() ;
 	res_t::iterator	it = rp->begin() ;
 	while (it != end) {

@@ -1,10 +1,8 @@
-/* mainchoose */
+/* mainchoose SUPPOER */
 /* lang=C++11 */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_CONT		1		/* continue */
-
 
 /* revision history:
 
@@ -73,10 +71,7 @@ static int printcoms(vector<int> &,int) ;
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv,mainv) {
 	vector<int>	k10s = { 3, 1, 2, 7, 9, 10, 8, 6 } ;
 	vector<int>	k3s = { 3, 1, 2, 0 } ;
 	vector<int>	k2s = { 1, 2, 0 } ;

@@ -1,9 +1,8 @@
-/* main (CIR) */
+/* main SUPPORT (CIR) */
+/* lang=C++20 */
 
 /* relative circular array */
-
-
-#define	CF_DEBUGS	1		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,11 +16,12 @@
 
 /*******************************************************************************
 
-        Given am array of numbers (positive or negative), we determine if
-        traversing through the array by taking the value of an element as a
-        relative addition to the current index in the array to advance to the
-        next element, if the total of advancements return to the original
-	or beginning element.  We start off considering the first element.
+	Given am array of numbers (positive or negative), we determine
+	if traversing through the array by taking the value of an
+	element as a relative addition to the current index in the
+	array to advance to the next element, if the total of
+	advancements return to the original or beginning element.
+	We start off considering the first element.
 
 	Example arrays:
 	true	{ 2, 2, 2 },
@@ -31,7 +31,6 @@
 	false	{ 2, 0, 2, 0, 3 },
 	false	{ 2, 1, 0, 10, 11, 12, 13 },
 	true	{ 2, 3, 5, 2, -1, 1, 3 }
-
 
 *******************************************************************************/
 
@@ -67,8 +66,6 @@
 #define	DIGBUFLEN	45
 #endif
 
-#define	VARDEBUGFNAME	"CIR_DEBUGFILE"
-
 
 /* name spaces */
 
@@ -80,14 +77,7 @@ using namespace	std ;
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern "C" int	debugopen(cchar *) ;
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	debugclose() ;
-extern "C" int	strlinelen(cchar *,cchar *,int) ;
-#endif
-
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
+extern "C" cchar	*getourenv(mainv,cchar *) noex ;
 
 
 /* local structures */
@@ -118,23 +108,10 @@ static vector<int>	cases[] = {
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv,mainv) {
 	const int	algos[] = { 1, 2 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	{
-	    cchar	*cp ;
-	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	        rs = debugopen(cp) ;
-	        debugprintf("main: starting DFD=%d\n",rs) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	for (auto &a : cases) {
 	    cout << "a=" << strvec(a) << endl ;
@@ -154,11 +131,6 @@ int main(int argc,cchar **argv,cchar **envv)
 	        cout << endl ;
 	    if (rs < 0) break ;
 	} /* end for (cases) */
-
-#if	CF_DEBUGS
-	debugprintf("main: ret rs=%d\n",rs) ;
-	debugclose() ;
-#endif
 
 	if (rs < 0) ex = 1 ;
 	return ex ;
@@ -227,9 +199,7 @@ static string strvec(vector<int> a)
 }
 /* end subroutine (strvec) */
 
-
-static void printres(vector<int> &a,int f)
-{
+static void printres(vector<int> &a,int f) {
 	const char	*s = (f) ? "true " : "false" ;
 	cout << s << " " << strvec(a) << endl ;
 }

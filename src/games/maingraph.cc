@@ -1,8 +1,5 @@
-/* maingraph */
+/* maingraph SUPPORT */
 /* lang=C++11 */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -34,9 +31,7 @@
 	Returns:
 	-		?
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>
 #include	<sys/types.h>
@@ -100,20 +95,16 @@ static int printresult(res1_t *,int) ;
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv,mainv) {
 	const int	algos[] = { 1, 2, 3 } ;
-	edges_t		es ;
 	const int	nv = 6 ;
-
+	edges_t		es ;
 
 	edgesload(es) ;
 
 	{
 	    int	n = edgesvertices(es) ;
-	    cout << "nv=" << n << endl ;
+	    cout << "nv=" << n << eol ;
 	}
 
 	printgraph(es) ;
@@ -125,7 +116,7 @@ int main(int argc,const char **argv,const char **envv)
 	    if ((rp = new(nothrow) res1_t[n+1]) != NULL) {
 
 	        for (auto al : algos) {
-	            cout << "algo=" << al << " n=" << n << endl ;
+	            cout << "algo=" << al << " n=" << n << eol ;
 	            switch (al) {
 	            case 1:
 	                dijkstra1(rp,es,n,0) ;
@@ -151,9 +142,7 @@ int main(int argc,const char **argv,const char **envv)
 
 /* local subroutines */
 
-
-static int edgesadd(edges_t &e,int u,int v,int w)
-{
+static int edgesadd(edges_t &e,int u,int v,int w) {
 	edge1_t		tmp(v,w) ;
 	const size_t	vsize = (uint) (u+1) ;
 	if (e.size() < vsize) {
@@ -164,9 +153,7 @@ static int edgesadd(edges_t &e,int u,int v,int w)
 }
 /* end subroutine (edgesadd) */
 
-
-static int edgesvertices(edges_t &e)
-{
+static int edgesvertices(edges_t &e) {
 	int		vmax = 0 ;
 	for (auto &v : e) {
 	    edgeit_t	end = v.end() ;
@@ -182,9 +169,7 @@ static int edgesvertices(edges_t &e)
 }
 /* end subroutine (edgesadd) */
 
-
-static int printgraph(edges_t &es)
-{
+static int printgraph(edges_t &es) {
 	const int	n = es.size() ;
 	int		i ;
 	for (i = 0 ; i < n ; i += 1) {
@@ -194,24 +179,19 @@ static int printgraph(edges_t &es)
 }
 /* end subroutine (printgraph) */
 
-
-static int printlist(int v,list<edge1_t> &ev)
-{
+static int printlist(int v,list<edge1_t> &ev) {
 	cout << v ;
 	for (auto v : ev) {
 	   cout << " " << v.dst << ":" << v.weight ;
 	}
-	cout << endl ;
+	cout << eol ;
 	return 0 ;
 }
 /* end subroutine (printgraph) */
 
-
-static int printresult(res1_t *rp,int nr)
-{
-	int	i ;
+static int printresult(res1_t *rp,int nr) {
 	cout << "result\n" ;
-	for (i = 0 ; i < nr ; i += 1) {
+	for (int i = 0 ; i < nr ; i += 1) {
 	    cout << setw(2) << i << " " << setw(2) << rp[i].dist ;
 	    cout << " " << setw(2) << rp[i].prev << "\n" ;
 	}
@@ -219,9 +199,7 @@ static int printresult(res1_t *rp,int nr)
 }
 /* end subroutine (printresult) */
 
-
-static int edgesload(edges_t &es)
-{
+static int edgesload(edges_t &es) {
 
 	edgesadd(es,0,1,5) ;
 	edgesadd(es,0,2,7) ;
