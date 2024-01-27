@@ -1,5 +1,5 @@
-/* kvsfile */
-/* lang=C20 */
+/* kvsfile SUPPORT */
+/* lang=C++20 */
 
 /* perform access table file related functions */
 /* version %I% last-modified %G% */
@@ -46,9 +46,9 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<bfile.h>
@@ -56,11 +56,11 @@
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<char.h>
-#include	<localmisc.h>
 #include	<hash.h>
 #include	<sncpy.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
+#include	<localmisc.h>
 
 #include	"kvsfile.h"
 
