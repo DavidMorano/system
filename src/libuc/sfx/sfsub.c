@@ -21,17 +21,17 @@
 
 	Description:
 	This subroutine determines if the parameter string (argument
-	's2') is or is not in the buffer specified by the first two
+	'ss') is or is not in the buffer specified by the first two
 	arguments.  This subroutine either returns (-1) or it returns
 	the length of the found substring.
 
 	Synopsis:
-	int sfsub(cchar *sbuf,int slen,cchar *s2,cchar **rpp) noex
+	int sfsub(cchar *sbuf,int slen,cchar *ss,cchar **rpp) noex
 
 	Arguments:
 	sbuf	string to be examined
 	slen	length of string to be examined
-	s2	null terminated substring to search for
+	ss	null terminated substring to search for
 	rpp	result pointer of beginning of found string
 
 	Returns:
@@ -41,12 +41,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strnxcmp.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -54,22 +52,25 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sfsub(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
-	int		s2len = 0 ;
+int sfsub(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
+	int		sslen = 0 ;
 	int		f = false ;
-	if (sp && s2) {
+	if (sp && ss) {
 	    int		i = 0 ;
 	    f = true ;
-	    s2len = strlen(s2) ;
-	    if (s2len > 0) {
+	    sslen = strlen(ss) ;
+	    if (sslen > 0) {
 		f = false ;
 	        if (sl < 0) sl = strlen(sp) ;
-	        if (s2len <= sl) {
-	            for (i = 0 ; i <= (sl-s2len) ; i += 1) {
-		        f = ((s2len == 0) || (sp[i] == s2[0])) ;
-	                f = f && (strncmp((sp+i),s2,s2len) == 0) ;
+	        if (sslen <= sl) {
+	            for (i = 0 ; i <= (sl-sslen) ; i += 1) {
+		        f = ((sslen == 0) || (sp[i] == ss[0])) ;
+	                f = f && (strncmp((sp+i),ss,sslen) == 0) ;
 	                if (f) break ;
 	            } /* end for */
 	        } /* end if (possible) */
@@ -78,7 +79,7 @@ int sfsub(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	        *rpp = ((f) ? (sp+i) : nullptr) ;
 	    }
 	} /* end if (non-null) */
-	return (f) ? s2len : -1 ;
+	return (f) ? sslen : -1 ;
 }
 /* end subroutine (sfsub) */
 

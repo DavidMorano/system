@@ -38,13 +38,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

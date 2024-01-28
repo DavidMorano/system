@@ -23,23 +23,36 @@
 
 EXTERNC_begin
 
-extern int sfshrink(cchar *,int,cchar **) noex ;
 extern int sfbasename(cchar *,int,cchar **) noex ;
-extern int sfdirname(cchar *,int,cchar **) noex ;
+extern int sfbaselib(cchar *,int,cchar **) noex ;
+extern int sfbracketval(cchar *,int,cchar **) noex ;
 extern int sfbreak(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcasesub(cchar *,int,cchar *,cchar **) noex ;
+extern int sfcontent(cchar *,int,cchar **) noex ;
+extern int sfcookkey(cchar *,int,cchar **) noex ;
+extern int sfchr(cchar *,int,int,cchar **) noex ;
 extern int sfdequote(cchar *,int,cchar **) noex ;
+extern int sfdirname(cchar *,int,cchar **) noex ;
 extern int sfkey(cchar *,int,cchar **) noex ;
+extern int sfkeyval(cchar *,int,cchar *,cchar **) noex ;
+extern int sflast(cchar *,int,int,cchar **) noex ;
+extern int sfnamecomp(cchar *,int,cchar **) noex ;
+extern int sfnext(cchar *,int,cchar **) noex ;
+extern int sfnextterm(cchar *,int,cchar *,cchar **) noex ;
 extern int sfprogroot(cchar *,int,cchar **) noex ;
 extern int sfprogname(cchar *,int,cchar **) noex ;
+extern int sfrootname(cchar *,int,cchar **) noex ;
+extern int sfshrink(cchar *,int,cchar **) noex ;
 extern int sfskipwhite(cchar *,int,cchar **) noex ;
 extern int sfsub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfsubstance(cchar *,int,cchar **) noex ;
 extern int sfthing(cchar *,int,cchar *,cchar **) noex ;
 extern int sfwhitedot(cchar *,int,cchar **) noex ;
 extern int sfword(cchar *,int,cchar **) noex ;
-extern int sfnext(cchar *,int,cchar **) noex ;
-extern int sfnextterm(cchar *,int,cchar *,cchar **) noex ;
+
+static inline int sfbrk(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
+	return sfbreak(sp,sl,s2,rpp) ;
+}
 
 EXTERNC_end
 

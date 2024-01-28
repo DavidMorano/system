@@ -40,18 +40,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
+#include	<string.h>		/* <- not needed */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
+
+
+/* local defines */
 
 
 /* external subroutines */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

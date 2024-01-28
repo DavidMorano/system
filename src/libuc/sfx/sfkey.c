@@ -42,13 +42,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
 #include	<char.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -71,6 +69,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sfkey(cchar *sp,int sl,cchar **rpp) noex {
@@ -78,7 +79,7 @@ int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	if (sp) {
 	    cchar	*tp ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    if ((tp = strnchr(sp,sl,'=')) != NULL) {
+	    if ((tp = strnchr(sp,sl,'=')) != nullptr) {
 	        kl = (tp - sp) ;
 	        while ((kl > 0) && CHAR_ISWHITE(sp[kl - 1])) {
 	            kl -= 1 ;
@@ -86,7 +87,7 @@ int sfkey(cchar *sp,int sl,cchar **rpp) noex {
 	    } /* end if */
 	} /* end if (non-null) */
 	if (rpp) {
-	    *rpp = (kl >= 0) ? sp : NULL ;
+	    *rpp = (kl >= 0) ? sp : nullptr ;
 	}
 	return kl ;
 }

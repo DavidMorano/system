@@ -88,7 +88,6 @@
 #include	<clanguage.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -106,6 +105,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

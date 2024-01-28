@@ -8,10 +8,11 @@
 /* revision history:
 
 	= 1998-10-01, David A­D­ Morano
-        I made up this idea for supporting multiple domains on the same machine
-        so that each user could have a different domain name. This idea of
-        multiplexing a single machine to appear to be multiple different
-        machines is becoming very important in the Internet age!
+	I made up this idea for supporting multiple domains on the
+	same machine so that each user could have a different domain
+	name. This idea of multiplexing a single machine to appear
+	to be multiple different machines is becoming very important
+	in the Internet age!
 
 */
 
@@ -89,6 +90,10 @@
 
 /* external subroutines */
 
+extern "C" {
+    int udomain(cchar *,char *,int,cchar *) noex ;
+}
+
 
 /* external variables */
 
@@ -107,7 +112,7 @@ struct uargs {
 	        ul = strlen(un) ;
  	    }
 	    maxfilesize = mf ;
-	} ;
+	} ; /* end ctor */
 	int udomainer(cchar *) noex ;
 	int udomainerm(cchar *) noex ;
 	int udomainerf(cchar *) noex ;
@@ -116,10 +121,6 @@ struct uargs {
 
 
 /* forward references */
-
-extern "C" {
-    int udomain(cchar *,char *,int,cchar *) noex ;
-}
 
 
 /* local variables */
@@ -141,7 +142,7 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	        uargs	a(dbuf,dlen,username,MAXFILESIZE) ;
 	        cchar	*fname = UDOMASTDFNIN ;
 	        if (pr && (pr[0] != '\0') && (strcmp(pr,"/") != 0)) {
-		     char	*udfname ;
+		     char	*udfname{} ;
 		     if ((rs = malloc_mp(&udfname)) >= 0) {
 	    	         if ((rs = mkpath2(udfname,pr,fname)) >= 0) {
 	             	    rs = a.udomainer(udfname) ;

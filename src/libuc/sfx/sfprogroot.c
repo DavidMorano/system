@@ -54,12 +54,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strnxcmp.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -77,6 +75,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

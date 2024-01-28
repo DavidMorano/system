@@ -41,12 +41,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -57,6 +55,9 @@
 /* external subroutines */
 
 extern int	nleadcasestr(cchar *,cchar *,int) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

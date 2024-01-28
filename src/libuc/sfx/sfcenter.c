@@ -39,13 +39,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -68,27 +66,30 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sfcenter(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = -1 ;
-	cchar		*cp = NULL ;
+	cchar		*cp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl >= 2) {
 	    int		sch = mkchar(ss[0]) ;
 	    cchar	*tp ;
-	    if ((tp = strnchr(sp,sl,sch)) != NULL) {
+	    if ((tp = strnchr(sp,sl,sch)) != nullptr) {
 	        sch = mkchar(ss[1]) ;
 		cp = (tp+1) ;
 	        sl -= ((tp+1)-sp) ;
 	        sp = (tp+1) ;
-	        if ((tp = strnchr(sp,sl,sch)) != NULL) {
+	        if ((tp = strnchr(sp,sl,sch)) != nullptr) {
 	            cl = (tp-sp) ;
 	        }
 	    }
 	} /* end if */
 	if (rpp) {
-	    *rpp = (cl >= 0) ? cp : NULL ;
+	    *rpp = (cl >= 0) ? cp : nullptr ;
 	}
 	return cl ;
 }

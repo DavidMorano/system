@@ -35,18 +35,22 @@
 
 	Returns:
 	>=0	length of the break-string
-	-1	no characters from string 'sb' were present in 'sp'
+	<0	(will be '-1') no characters from string 'sb' present in 'sp'
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -69,10 +73,5 @@ int sfbreak(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 	return (f) ? sl : -1 ;
 }
 /* end subroutine (sfbreak) */
-
-int sfbrk(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
-	return sfbreak(sp,sl,s2,rpp) ;
-}
-/* end subroutine (sfbrk) */
 
 

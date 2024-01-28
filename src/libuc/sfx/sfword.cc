@@ -1,5 +1,5 @@
 /* sfword SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find an English word within the given string */
 /* version %I% last-modified %G% */
@@ -54,18 +54,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<string.h>
+#include	<string.h>		/* <- for |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
 #include	<char.h>
 #include	<strn.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
 
 /* local defines */
+
+#ifndef	CF_ALLOWSMODE
+#define	CF_ALLOWSMODE	0
+#endif
 
 
 /* external subroutines */
@@ -82,7 +85,7 @@ static int	iswhitemore(int) noex ;
 
 /* local variables */
 
-static cchar	*allows[] = {
+static constexpr cchar	*allows[] = {
 	"'s",
 	"'t",
 	"s'",
@@ -91,8 +94,13 @@ static cchar	*allows[] = {
 	"'T",
 	"S'",
 #endif /* CF_ALLOWSMODE */
-	NULL
+	nullptr
 } ;
+
+constexpr bool	f_allows = CF_ALLOWSMODE ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -101,40 +109,36 @@ int sfword(cchar *sp,int sl,cchar **rpp) noex {
 	int		cl ;
 	cchar		*cp = nullptr ;
 	if ((cl = sfshrinkmore(sp,sl,&cp)) > 0) {
-	    bool	f = FALSE ;
+	    bool	f = false ;
 	    if (cp[0] == CH_SQUOTE) {
 		cp += 1 ;
 		cl -= 1 ;
 	    }
 	    if (cl > 2) {
 	        cchar	*tp ;
-		if ((tp = strnrchr(cp,cl,CH_SQUOTE)) != NULL) {
+		if ((tp = strnrchr(cp,cl,CH_SQUOTE)) != nullptr) {
 		    f = ((cl - ((tp + 1) - cp)) > 1) ;
 		}
 		if (! f) {
-	    	    int	i = (cl - 2) ;
-#if	CF_ALLOWSMORE
-		    {
-			cchar	*cc = (cp+i) ;
-	                for (int j = 0 ; allows[j] != NULL ; j += 1) {
-			    f = (allows[j][0] == cc[0]) ;
-	                    f = f && (strncmp(allows[j],cc,2) == 0) ;
+	    	    int		i = (cl - 2) ;
+		    if constexpr (f_allows) {
+			cchar	*cs = (cp+i) ;
+	                for (int j = 0 ; allows[j] ; j += 1) {
+			    f = (allows[j][0] == cs[0]) ;
+	                    f = f && (strncmp(allows[j],cs,2) == 0) ;
 			    if (f) break ;
 	                } /* end for */
-		    }
-#else /* CF_ALLOWSMORE */
-		    {
+		    } else {
 			char	lowbuf[4] ;
-			cchar	*cc = lowbuf ;
+			cchar	*cs = lowbuf ;
 			lowbuf[0] = CHAR_TOLC((cp+i)[0]) ;
 			lowbuf[1] = CHAR_TOLC((cp+i)[1]) ;
-	                for (int j = 0 ; allows[j] != NULL ; j += 1) {
-			    f = (allows[j][0] == cc[0]) ;
-	                    f = f && (strncmp(allows[j],cc,2) == 0) ;
+	                for (int j = 0 ; allows[j] ; j += 1) {
+			    f = (allows[j][0] == cs[0]) ;
+	                    f = f && (strncmp(allows[j],cs,2) == 0) ;
 			    if (f) break ;
 	                } /* end for */
-		    }
-#endif /* CF_ALLOWSMORE */
+		    } /* end if-constexpr (f_allows) */
 		} /* end if */
 	    } /* end if (more than one character) */
 	    if ((! f) && (cp[cl - 1] == CH_SQUOTE)) {

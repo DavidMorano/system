@@ -38,13 +38,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>
 #include	<ascii.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -66,6 +64,9 @@ static int	isours(int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
@@ -75,7 +76,7 @@ int sfdequote(cchar *sp,int sl,cchar **rpp) noex {
 	    sl -= 1 ;
 	}
 	if (sp[0] == '\0') sl = 0 ;
-	if (rpp != NULL) *rpp = sp ;
+	if (rpp) *rpp = sp ;
 	while (sl && isours(sp[sl-1])) {
 	    sl -= 1 ;
 	}
