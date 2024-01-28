@@ -203,8 +203,8 @@ static constexpr int	(*systries[])(TRY *) = {
 } ;
 
 static constexpr cchar	*resolvefnames[] = {
-	RESOLVFNAME,
-	"/var/run/resolv.conf",
+	RESOLVFNAME,			/* most operating systems */
+	"/var/run/resolv.conf",		/* for example: MacOS */
 	nullptr
 } ;
 
@@ -607,6 +607,7 @@ static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
 	    cint		dlen = maxhostlen ;
             rs = snwcpy(tip->domainname,dlen,dp,len) ;
         }
+	if (len < 0) len = 0 ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (try_resolvefd) */
