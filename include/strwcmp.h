@@ -25,7 +25,11 @@
 
 EXTERNC_begin
 
-extern int strwcmpx(cchar *,cchar *,int len) noex ;
+extern int strwcmpx(cchar *,cchar *,int) noex ;
+
+static inline int strwcmp(cchar *bs,cchar *sp,int sl) noex {
+	return strwcmpx(bs,sp,sl) ;
+}
 
 EXTERNC_end
 
@@ -48,14 +52,6 @@ inline int strwcmpr(cchar *s1,cchar *s2,int len) noex {
 }
 
 #endif /* __cplusplus */
-
-EXTERNC_begin
-
-static inline int strwcmp(cchar *s1,cchar *s2,int len) noex {
-	return strwcmpx(s1,s2,len) ;
-}
-
-EXTERNC_end
 
 
 #endif /* STRWCMP_INCLUDE */
