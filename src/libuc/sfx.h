@@ -30,7 +30,7 @@ extern int sfbreak(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcasesub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcontent(cchar *,int,cchar **) noex ;
 extern int sfcookkey(cchar *,int,cchar **) noex ;
-extern int sfchr(cchar *,int,int,cchar **) noex ;
+extern int sfchr(cchar *,int,int,cchar **) noex ; /* string following char */
 extern int sfdequote(cchar *,int,cchar **) noex ;
 extern int sfdirname(cchar *,int,cchar **) noex ;
 extern int sfkey(cchar *,int,cchar **) noex ;

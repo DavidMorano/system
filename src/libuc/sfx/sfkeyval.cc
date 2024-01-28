@@ -40,23 +40,21 @@
 	sfkeyval
 
 	Description:
-	This subroutine will extract the key part of a compound string.
-	For example, consider the following compound string:
-		A=the_dog_house
-	The 'A' would be the key, and the part 'the_dog_house' is
-	the value.  Important: If there is no key (there is no '='
-	character), then we return an error!
+	This subroutine will search for key-value pairs in the
+	given string and return the value if a key is found and
+	matches the key given in the call.
 
 	Synopsis:
-	int sfkeyval(cchar *s,int slen,cchar **rpp) noex
+	int sfkeyval(cchar *spint sl,cchar *key,cchar **rpp) noex
 
 	Arguments:
-	s		pointer to string to test
-	slen		length of string to test
-	rpp		pointer to result pointer to store found key
+	sp		base string pointer
+	sl		base string length
+	key		c-string key to search for
+	rpp		pointer to result pointer to store found value
 
 	Returns:
-	>=0		length of found key string
+	>=0		length of found value c-string
 	<0		no key was found
 
 *******************************************************************************/
