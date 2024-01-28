@@ -84,6 +84,7 @@
 #include	<estrings.h>
 #include	<filebuf.h>
 #include	<strn.h>
+#include	<sfx.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<strdcpyx.h>
@@ -162,6 +163,9 @@ extern "C" {
 }
 
 static int	try_start(TRY *,char *,char *) noex ;
+static int	try_finish(TRY *) noex ;
+static int	try_resolvefd(TRY *,char *,int,int) noex ;
+
 static int	try_initvarnode(TRY *) noex ;
 static int	try_inituname(TRY *) noex ;
 static int	try_initnode(TRY *) noex ;
@@ -173,7 +177,6 @@ static int	try_gethost(TRY *) noex ;
 static int	try_resolve(TRY *) noex ;
 static int	try_resolvefile(TRY *,cchar *) noex ;
 static int	try_guess(TRY *) noex ;
-static int	try_finish(TRY *) noex ;
 
 static int	rmwhitedot(char *,int) noex ;
 
@@ -200,8 +203,8 @@ static constexpr int	(*systries[])(TRY *) = {
 } ;
 
 static constexpr cchar	*resolvefnames[] = {
-	RESOLVFNAME,
-	"/var/run/resolv.conf",
+	RESOLVFNAME,			/* most operating systems */
+	"/var/run/resolv.conf",		/* for example: MacOS */
 	nullptr
 } ;
 
@@ -560,59 +563,18 @@ static int try_resolve(TRY *tip) noex {
 /* end subroutine (try_resolve) */
 
 static int try_resolvefile(TRY *tip,cchar *fname) noex {
-	cint		dlen = maxhostlen ;
-	cint		to = TO_READ ;
 	int		rs ;
 	int		rs1 ;
-	int		f_found = false ;
+	int		len = 0 ;
 	char		*lbuf{} ;
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	        filebuf	b ;
-	        cint	fd = rs ;
-	        if ((rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0)) >= 0) {
-		    int		len ;
-		    int		sl, cl ;
-		    cchar	*tp, *sp, *cp ;
-	            while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
-	                len = rs ;
-	                if (lbuf[len - 1] == '\n') len -= 1 ;
-	                lbuf[len] = '\0' ;
-
-	                sp = lbuf ;
-	                sl = len ;
-	                if ((sl == 0) || (sp[0] == '#')) continue ;
-
-	                cl = nextfield(sp,sl,&cp) ;
-
-	                if (cl < 6) continue ;
-
-	                if ((strncasecmp(cp,"domain",6) != 0) ||
-	                    (! CHAR_ISWHITE(cp[6])))
-	                        continue ;
-
-	                sp += 6 ;
-	                sl -= 6 ;
-	                cl = nextfield(sp,sl,&cp) ;
-
-	                if ((cp[0] == '#') ||
-	                    (strncmp(cp,"..",2) == 0)) continue ;
-
-	                if ((tp = strnchr(cp,cl,'#')) != nullptr) {
-	                    cl = (tp - cp) ;
-			}
-	                if (cl > 0) {
-	                    f_found = true ;
-	                    break ;
-	                }
-	            } /* end while (reading lines) */
-		    if ((rs >= 0) && f_found) {
-	    	        rs = snwcpy(tip->domainname,dlen,cp,cl) ;
-		    }
-	            rs1 = filebuf_finish(&b) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+		cint	fd = rs ;
+		{
+		    rs = try_resolvefd(tip,lbuf,llen,fd) ;
+		    len = rs ;
+		}
 	        rs1 = u_close(fd) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else if (isNotPresent(rs)) {
@@ -621,28 +583,51 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs;
 	return rs ;
 }
 /* end subroutine (try_resolvefile) */
 
+static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
+	filebuf		b ;
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	cchar		*dp = nullptr ;
+        if ((rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0)) >= 0) {
+	    cint	to = TO_READ ;
+	    cchar	*key = "domain" ;
+            while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+                if ((len = sfkeyval(lbuf,rs,key,&dp)) > 0) break ;
+            } /* end while (reading lines) */
+            rs1 = filebuf_finish(&b) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (filebuf) */
+        if ((rs >= 0) && (len > 0)) {
+	    cint		dlen = maxhostlen ;
+            rs = snwcpy(tip->domainname,dlen,dp,len) ;
+        }
+	if (len < 0) len = 0 ;
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (try_resolvefd) */
+
 static int try_guess(TRY *tip) noex {
 	int		rs = SR_OK ;
+	int		len = 0 ;
 	if constexpr (f_guess) {
 	    if (! tip->f.initnode) {
 	        rs = try_initnode(tip) ;
 	    }
 	    if ((rs >= 0) && tip->f.node) {
 	        int	si = -1 ;
-	        int	m ;
 	        int	m_max = 0 ;
-	        int	gnl ;
 	        cchar	*nn = tip->nodename ;
-	        cchar	*gnp ;
 	        rs = 0 ;
 	        for (int i = 0 ; ga[i].name ; i += 1) {
-	            gnp = ga[i].name ;
-		    gnl = strlen(gnp) ;
-	            if ((m = nleadstr(gnp,nn,-1)) >= gnl) {
+	            cchar	*gnp = ga[i].name ;
+		    cint	gnl = strlen(ga[i].name) ;
+	            if (int m ; (m = nleadstr(gnp,nn,-1)) >= gnl) {
 	                if (m > m_max) {
 	                    m_max = m ;
 	                    si = i ;
@@ -651,10 +636,11 @@ static int try_guess(TRY *tip) noex {
 	        } /* end for */
 	        if (si >= 0) {
 	            rs = sncpy1(tip->domainname,maxhostlen,ga[si].domain) ;
+		    len = rs ;
 	        }
 	    } /* end if (have node) */
 	} /* end if-constexpr (f_guess) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (try_guess) */
 

@@ -43,13 +43,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
 #include	<strn.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -77,12 +75,15 @@ static int	getkey(cchar *,int,cchar *,cchar **) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
-	const int	sch = CH_COOK ;
+	cint		sch = CH_COOK ;
 	int		cl = -1 ;
-	cchar	*cp = nullptr ;
+	cchar		*cp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl >= 1) {
 	    cchar	*ss = "{}" ;
@@ -112,7 +113,7 @@ int sfcookkey(cchar *sp,int sl,cchar **rpp) noex {
 
 static int getkey(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = -1 ;
-	cchar	*cp = nullptr ;
+	cchar		*cp = nullptr ;
 	if (sl > 0) {
 	    if (sp[0] == ss[0]) {
 	        cchar	*tp ;

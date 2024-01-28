@@ -59,7 +59,7 @@ OBJ1_SFX= sfcenter.o sfcookkey.o sfdequote.o sfdirname.o
 OBJ2_SFX= sfkey.o sflast.o sfnamecomp.o sfprogroot.o 
 OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o sfcasesub.o
 OBJ4_SFX= sfsubstance.o sfthing.o sfwhitedot.o sfword.o sfprogname.o
-OBJ5_SFX= sfnext.o
+OBJ5_SFX= sfnext.o sfkeyval.o
 
 
 OBJA_SFX= obj0_sfx.o obj1_sfx.o

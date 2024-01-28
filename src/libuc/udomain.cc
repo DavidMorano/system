@@ -8,10 +8,11 @@
 /* revision history:
 
 	= 1998-10-01, David A­D­ Morano
-        I made up this idea for supporting multiple domains on the same machine
-        so that each user could have a different domain name. This idea of
-        multiplexing a single machine to appear to be multiple different
-        machines is becoming very important in the Internet age!
+	I made up this idea for supporting multiple domains on the
+	same machine so that each user could have a different domain
+	name. This idea of multiplexing a single machine to appear
+	to be multiple different machines is becoming very important
+	in the Internet age!
 
 */
 
@@ -56,20 +57,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
 #include	<filemap.h>
 #include	<filebuf.h>
-#include	<mallocxx.h>
 #include	<localmisc.h>
 
 #include	"udomain.h"
@@ -83,13 +81,17 @@
 
 #define	MAXFILESIZE	(2 * 1024 * 1024)
 
-#define	UARGS		struct uargs
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 extern "C" {
-    extern char	*strnchr(cchar *,int,int) noex ;
+    int udomain(cchar *,char *,int,cchar *) noex ;
 }
 
 
@@ -110,7 +112,7 @@ struct uargs {
 	        ul = strlen(un) ;
  	    }
 	    maxfilesize = mf ;
-	} ;
+	} ; /* end ctor */
 	int udomainer(cchar *) noex ;
 	int udomainerm(cchar *) noex ;
 	int udomainerf(cchar *) noex ;
@@ -120,12 +122,11 @@ struct uargs {
 
 /* forward references */
 
-extern "C" {
-    int udomain(cchar *,char *,int,cchar *) noex ;
-}
-
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -141,7 +142,7 @@ int udomain(cchar *pr,char *dbuf,int dlen,cchar *username) noex {
 	        uargs	a(dbuf,dlen,username,MAXFILESIZE) ;
 	        cchar	*fname = UDOMASTDFNIN ;
 	        if (pr && (pr[0] != '\0') && (strcmp(pr,"/") != 0)) {
-		     char	*udfname ;
+		     char	*udfname{} ;
 		     if ((rs = malloc_mp(&udfname)) >= 0) {
 	    	         if ((rs = mkpath2(udfname,pr,fname)) >= 0) {
 	             	    rs = a.udomainer(udfname) ;
@@ -209,18 +210,16 @@ int uargs::udomainerf(cchar *fname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*lbuf ;
+	char		*lbuf{} ;
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
 	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
 	        filebuf		b ;
 	        cint		fd = rs ;
 	        if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
-	            while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
-	                cint	ll = rs ;
-	                cchar	*lp = lbuf ;
+	            while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 			{
-	                    rs = parseline(lp,ll) ;
+	                    rs = parseline(lbuf,rs) ;
 	                    len = rs ;
 			}
 	                if (len > 0) break ;
@@ -253,16 +252,16 @@ int uargs::parseline(cchar *lbuf,int llen) noex {
 	if ((tp = strnchr(sp,sl,'#')) != nullptr) {
 	    sl = (tp - sp) ;
 	}
-	if ((cl = nextfield(sp,sl,&cp)) > 0) {
+	if ((cl = sfnext(sp,sl,&cp)) > 0) {
 	    if ((cl == ul) && (strncmp(un,cp,cl) == 0)) {
 	        sl -= ((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
-	        if ((cl = nextfield(sp,sl,&cp)) > 0) {
+	        if ((cl = sfnext(sp,sl,&cp)) > 0) {
 	            rs = snwcpy(dbuf,dlen,cp,cl) ;
 		    len = rs ;
 	        }
 	    } /* end if (username match) */
-	} /* end if (nextfield) */
+	} /* end if (sfnext) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uargs::parseline) */

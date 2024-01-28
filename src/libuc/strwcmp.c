@@ -1,4 +1,4 @@
-/* strwcmp */
+/* strwcmp SUPPORT */
 /* lang=C20 */
 
 /* compare the minimum common characters of two strings */
@@ -39,14 +39,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
 #include	<nleadstr.h>
-#include	<localmisc.h>
 
 #include	"strwcmp.h"
 

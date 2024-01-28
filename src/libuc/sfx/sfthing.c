@@ -36,19 +36,17 @@
 
 	Returns:
 	>=0	length of result "thing" 
-	<0	error
+	<0	error (will be '-1')
 
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
 #include	<strn.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -78,6 +76,9 @@ static int	isour(int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

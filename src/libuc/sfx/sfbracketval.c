@@ -22,14 +22,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
 #include	<char.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -52,28 +48,33 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sfbracketval(cchar *cp,int rs1,cchar **rpp) noex {
-	cchar		*cp2, *cp3 ;
-	if ((cp2 = strnchr(cp,rs1,'<')) != NULL) {
+int sfbracketval(cchar *sp,int sl,cchar **rpp) noex {
+	cchar		*cp2 ;
+	cchar		*cp3 ;
+	if ((cp2 = strnchr(sp,sl,'<')) != nullptr) {
 	    cp2 += 1 ;
-	    rs1 = (cp + rs1) - cp2 ;
-	    if ((cp3 = strnchr(cp2,rs1,'>')) != NULL)
-	        rs1 = cp3 - cp2 ;
-	    cp = cp2 ;
+	    sl = (sp + sl) - cp2 ;
+	    if ((cp3 = strnchr(cp2,sl,'>')) != nullptr) {
+	        sl = cp3 - cp2 ;
+	    }
+	    sp = cp2 ;
 	} /* end if */
-	while ((rs1 > 0) && CHAR_ISWHITE(*cp)) {
-	    cp += 1 ;
-	    rs1 -= 1 ;
+	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	    sp += 1 ;
+	    sl -= 1 ;
 	} /* end while */
-	while ((rs1 > 0) && CHAR_ISWHITE(cp[rs1 - 1])) {
-	    rs1 -= 1 ;
+	while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
+	    sl -= 1 ;
 	}
 	if (rpp) {
-	    *rpp = cp ;
+	    *rpp = sp ;
 	}
-	return rs1 ;
+	return sl ;
 }
 /* end subroutine (sfbracketval) */
 

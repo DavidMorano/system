@@ -38,13 +38,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* <- not-needed */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<six.h>
 
 #include	"sfx.h"
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

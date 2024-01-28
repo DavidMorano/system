@@ -37,13 +37,11 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<string.h>		/* <- for |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<estrings.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -66,17 +64,20 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sfbaselib(cchar *pnp,int pnl,cchar **rpp) noex {
 	int		cl ;
-	cchar		*tp ;
 	cchar		*cp ;
+	cchar		*tp ;
 	if ((cl = sfbasename(pnp,pnl,&cp)) > 0) {
 	    pnp = cp ;
 	    pnl = cl ;
 	}
-	if ((tp = strnrchr(pnp,pnl,'.')) != NULL) {
+	if ((tp = strnrchr(pnp,pnl,'.')) != nullptr) {
 	    pnl = (tp-pnp) ;
 	}
 	if ((pnl > 3) && (strncmp(pnp,"lib",3) == 0)) {

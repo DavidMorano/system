@@ -84,7 +84,7 @@
 #define	EX_INFO		125		/* information only */
 
 /* SHELL favorites */
-#define	EX_NOEXEC	126		/* could not 'exec(2)' */
+#define	EX_NOEXEC	126		/* could not |exec(2)| */
 #define	EX_NOPROG	127		/* program not found */
 #define	EX_TERM		128		/* program terminated */
 

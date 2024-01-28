@@ -33,19 +33,17 @@
 	rpp		pointer to hold result pointer
 
 	Returns:
-	<0		error
 	>=0		length of retrieved nodename
+	<0		error
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<string.h>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>
 #include	<strn.h>
-#include	<localmisc.h>
 
 #include	"sfx.h"
 
@@ -65,6 +63,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
@@ -74,7 +75,7 @@ int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-	if ((tp = strnchr(sp,sl,'.')) != NULL) {
+	if ((tp = strnchr(sp,sl,'.')) != nullptr) {
 	    sl = (tp - sp) ;
 	}
 	while (sl && CHAR_ISWHITE(sp[sl - 1])) {
