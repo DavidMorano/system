@@ -57,7 +57,7 @@
 #include	<hdb.h>
 #include	<char.h>
 #include	<hash.h>
-#include	<sncpy.h>
+#include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
 #include	<localmisc.h>
