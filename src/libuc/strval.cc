@@ -40,10 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* for |INT_MAX| */
-#include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>
@@ -83,11 +80,10 @@
 
 cchar *strval(char *rbuf,cint val) noex {
 	cint		rlen = DIGBUFLEN ;
-	int		rs1 ;
 	if ((val >= 0) && (val < INT_MAX)) {
-	    rs1 = ctdec(rbuf,rlen,val) ;
-	    if (rs1 < 0)
+	    if (ctdec(rbuf,rlen,val) < 0) {
 	        sncpy(rbuf,rlen,"bad") ;
+	    }
 	} else {
 	    sncpy(rbuf,rlen,"max") ;
 	}
