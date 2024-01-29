@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 2011-01-25, David A­D­ Morano
-	This code was seperated out for for more modularity. This
+	This code was seperated out for for more modularity.  This
 	was in turn needed to fix the AST-code sockets library
 	definition problems (see notes elsewhere).
 
