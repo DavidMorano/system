@@ -27,12 +27,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
+#include	<clanguage.h>
 
-
-#ifndef	TIMESPEC
-#define	TIMESPEC	struct timespec
-#endif
 
 EXTERNC_begin
 

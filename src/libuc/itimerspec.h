@@ -2,6 +2,7 @@
 /* lang=C99 */
 
 /* interval-timer object methods */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -24,19 +25,16 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<time.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<timespec.h>
-#include	<localmisc.h>
 
-
-#ifndef	ITIMERSPEC
-#define	ITIMERSPEC	struct itimerspec
-#endif
 
 EXTERNC_begin
 
-extern int itimerspec_load(ITIMERSPEC *,TIMESPEC *,TIMESPEC *) ;
+extern int itimerspec_load(ITIMERSPEC *,TIMESPEC *,TIMESPEC *) noex ;
 
 EXTERNC_end
 

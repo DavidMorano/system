@@ -1,4 +1,4 @@
-/* timecount */
+/* timecount SUPPORT */
 /* lang=C++20 */
 
 /* count-down timer */

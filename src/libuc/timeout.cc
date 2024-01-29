@@ -1,5 +1,5 @@
-/* timeout */
-/* lang=C99 */
+/* timeout SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® signal event initialization */
 /* version %I% last-modified %G% */
@@ -31,15 +31,13 @@
 	nsec		nanoseconds
 
 	Returns:
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -71,10 +69,11 @@ typedef timeout_met	t_m ;
 int timeout_load(timeout *top,time_t v,void *o,t_m m,uint tag,int arg) noex {
 	int		rs = SR_FAULT ;
 	if (top) {
+	    rs = SR_OK ;
 	    top->id = -1 ;
 	    top->val = v ;
 	    top->objp = o ;
-	    top->metp = m ;
+	    top->metf = m ;
 	    top->tag = tag ;
 	    top->arg = arg ;
 	} /* end if (non-null) */
