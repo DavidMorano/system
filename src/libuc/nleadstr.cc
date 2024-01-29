@@ -1,4 +1,4 @@
-/* nleadstr */
+/* nleadstr SUPPORT */
 /* lang=C++20 */
 
 /* match on the leading part of a string */
@@ -44,7 +44,7 @@
 
 	Returns:
 	>=0		match found and it matched up to this length
-	<0		no match
+	<0		no match (system-return)
 
 	Notes:
 	1. Rationale for using templates rather than passing a 
@@ -61,15 +61,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* <- for |INT_MAX| */
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<char.h>
 #include	<toxc.h>
-#include	<localmisc.h>
 
 #include	"nleadstr.h"
 
