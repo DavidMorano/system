@@ -70,7 +70,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
@@ -106,14 +106,14 @@
 
 /* forward references */
 
-static int	tmz_timeparts(TMZ *,cchar *,int) noex ;
-static int	tmz_stdtrailing(TMZ *,cchar *,int) noex ;
-static int	tmz_procday(TMZ *,cchar *,int) noex ;
-static int	tmz_procmonth(TMZ *,cchar *,int) noex ;
-static int	tmz_procyear(TMZ *,cchar *,int) noex ;
-static int	tmz_proczoff(TMZ *,cchar *,int) noex ;
-static int	tmz_proczname(TMZ *,cchar *,int) noex ;
-static int	tmz_yearadj(TMZ *,int) noex ;
+static int	tmz_timeparts(tmz *,cchar *,int) noex ;
+static int	tmz_stdtrailing(tmz *,cchar *,int) noex ;
+static int	tmz_procday(tmz *,cchar *,int) noex ;
+static int	tmz_procmonth(tmz *,cchar *,int) noex ;
+static int	tmz_procyear(tmz *,cchar *,int) noex ;
+static int	tmz_proczoff(tmz *,cchar *,int) noex ;
+static int	tmz_proczname(tmz *,cchar *,int) noex ;
+static int	tmz_yearadj(tmz *,int) noex ;
 
 static int	getzoff(int *,cchar *,int) noex ;
 static int	val(cchar *) noex ;
@@ -147,7 +147,7 @@ static constexpr cchar	tpterms[] = {
 
 /* exported subroutines */
 
-int tmz_init(TMZ *op) noex {
+int tmz_init(tmz *op) noex {
 	if (op == NULL) return SR_FAULT ;
 	memclear(op) ;
 	op->zoff = SHORT_MIN ;
@@ -156,7 +156,7 @@ int tmz_init(TMZ *op) noex {
 /* end subroutine (tmz_init) */
 
 /* format> [Wed] Nov 14 19:24[:04] [EST] [[19]99] [±0400] */
-int tmz_std(TMZ *op,cchar *sp,int sl) noex {
+int tmz_std(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
 	    rs = SR_OK ;
@@ -193,7 +193,7 @@ int tmz_std(TMZ *op,cchar *sp,int sl) noex {
 /* end subroutine (tmz_std) */
 
 /* format> [Weekday,] DD MMM [CC]YY hh:mm[:ss] [±hhmm] [zname] */
-int tmz_msg(TMZ *op,cchar *sp,int sl) noex {
+int tmz_msg(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	int		zl = 0 ;
@@ -264,7 +264,7 @@ int tmz_msg(TMZ *op,cchar *sp,int sl) noex {
 /* end subroutine (tmz_msg) */
 
 /* convert from a TOUCH (original) format> MMDDhhmm[YY] */
-int tmz_touch(TMZ *op,cchar *sp,int sl) noex {
+int tmz_touch(tmz *op,cchar *sp,int sl) noex {
 	TM		*stp ;
 	cint		n = 5 ;
 	int		rs = SR_OK ;
@@ -336,7 +336,7 @@ int tmz_touch(TMZ *op,cchar *sp,int sl) noex {
 /* end subroutine (tmz_touch) */
 
 /* convert from a TOUCH-t (new '-t') format> [[CC]YY]MMDDhhmm[.SS] */
-int tmz_toucht(TMZ *op,cchar *sp,int sl) noex {
+int tmz_toucht(tmz *op,cchar *sp,int sl) noex {
 	TM		*stp ;
 	cint	n = 4 ;
 	int		rs = SR_OK ;
@@ -436,7 +436,7 @@ int tmz_toucht(TMZ *op,cchar *sp,int sl) noex {
 
 
 /* format> [[CC]]YYMMDDhhmm[ss][±hhmm][zname] */
-int tmz_strdig(TMZ *op,cchar *sp,int sl)
+int tmz_strdig(tmz *op,cchar *sp,int sl)
 {
 	TM		*stp ;
 	cint	n = 6 ;
@@ -553,7 +553,7 @@ int tmz_strdig(TMZ *op,cchar *sp,int sl)
 
 
 /* format> [CC]YYMMDD_hhmm[:ss][_][zname] */
-int tmz_logz(TMZ *op,cchar *sp,int sl)
+int tmz_logz(tmz *op,cchar *sp,int sl)
 {
 	TM		*stp ;
 	int		rs = SR_OK ;
@@ -657,7 +657,7 @@ int tmz_logz(TMZ *op,cchar *sp,int sl)
 
 
 /* format> [CC]YYMMDD */
-int tmz_day(TMZ *op,cchar *sp,int sl)
+int tmz_day(tmz *op,cchar *sp,int sl)
 {
 	TM		*stp ;
 	int		rs = SR_OK ;
@@ -726,7 +726,7 @@ int tmz_day(TMZ *op,cchar *sp,int sl)
 /* end subroutine (tmz_day) */
 
 
-int tmz_isset(TMZ *op)
+int tmz_isset(tmz *op)
 {
 	if (op == NULL) return SR_FAULT ;
 	return (op->st.tm_mday) ;
@@ -734,7 +734,7 @@ int tmz_isset(TMZ *op)
 /* end subroutine (tmz_isset) */
 
 
-int tmz_hasyear(TMZ *op)
+int tmz_hasyear(tmz *op)
 {
 	if (op == NULL) return SR_FAULT ;
 	return (op->f.year) ;
@@ -742,7 +742,7 @@ int tmz_hasyear(TMZ *op)
 /* end subroutine (tmz_hasyear) */
 
 
-int tmz_haszoff(TMZ *op)
+int tmz_haszoff(tmz *op)
 {
 	if (op == NULL) return SR_FAULT ;
 	return op->f.zoff ;
@@ -750,7 +750,7 @@ int tmz_haszoff(TMZ *op)
 /* end subroutine (tmz_haszoff) */
 
 
-int tmz_haszone(TMZ *op)
+int tmz_haszone(tmz *op)
 {
 	if (op == NULL) return SR_FAULT ;
 	return (op->zname[0] != '\0') ;
@@ -758,7 +758,7 @@ int tmz_haszone(TMZ *op)
 /* end subroutine (tmz_haszone) */
 
 
-int tmz_setday(TMZ *op,int y,int m,int d)
+int tmz_setday(tmz *op,int y,int m,int d)
 {
 	TM		*stp ;
 	cint	cc = -1 ;
@@ -776,7 +776,7 @@ int tmz_setday(TMZ *op,int y,int m,int d)
 /* end subroutine (tmz_setday) */
 
 
-int tmz_setyear(TMZ *op,int year)
+int tmz_setyear(tmz *op,int year)
 {
 	if (op == NULL) return SR_FAULT ;
 	op->st.tm_year = year ;
@@ -786,7 +786,7 @@ int tmz_setyear(TMZ *op,int year)
 /* end subroutine (tmz_setyear) */
 
 
-int tmz_setzone(TMZ *op,cchar *zp,int zl)
+int tmz_setzone(tmz *op,cchar *zp,int zl)
 {
 	if (op == NULL) return SR_FAULT ;
 	return (strnwcpy(op->zname,TMZ_ZNAMESIZE,zp,zl) - op->zname) ;
@@ -794,7 +794,7 @@ int tmz_setzone(TMZ *op,cchar *zp,int zl)
 /* end subroutine (tmz_setzone) */
 
 
-int tmz_gettm(TMZ *op,TM	 *tmp)
+int tmz_gettm(tmz *op,TM	 *tmp)
 {
 	*tmp = op->st ;
 	return SR_OK ;
@@ -802,14 +802,14 @@ int tmz_gettm(TMZ *op,TM	 *tmp)
 /* end subroutine (tmz_gettm) */
 
 
-int tmz_getdst(TMZ *op)
+int tmz_getdst(tmz *op)
 {
 	return op->st.tm_isdst ;
 }
 /* end subroutine (tmz_getdst) */
 
 
-int tmz_getzoff(TMZ *op)
+int tmz_getzoff(tmz *op)
 {
 	return op->zoff ;
 }
@@ -820,7 +820,7 @@ int tmz_getzoff(TMZ *op)
 
 
 /* format> hh:mm[:ss] */
-static int tmz_timeparts(TMZ *op,cchar *sp,int sl)
+static int tmz_timeparts(tmz *op,cchar *sp,int sl)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -874,7 +874,7 @@ static int tmz_timeparts(TMZ *op,cchar *sp,int sl)
 /* end subroutine (tmz_timeparts) */
 
 
-static int tmz_stdtrailing(TMZ *op,cchar *sp,int sl)
+static int tmz_stdtrailing(tmz *op,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		si = 0 ;
@@ -904,7 +904,7 @@ static int tmz_stdtrailing(TMZ *op,cchar *sp,int sl)
 /* end subroutine (tmz_stdtrailing) */
 
 /* parse out> dd */
-static int tmz_procday(TMZ *op,cchar *sp,int sl) noex {
+static int tmz_procday(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		cl ;
@@ -932,7 +932,7 @@ static int tmz_procday(TMZ *op,cchar *sp,int sl) noex {
 /* end subroutine (tmz_procday) */
 
 /* parse out> [DDD] MMM */
-static int tmz_procmonth(TMZ *op,cchar *sp,int sl) noex {
+static int tmz_procmonth(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		cl ;
@@ -969,7 +969,7 @@ static int tmz_procmonth(TMZ *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_procmonth) */
 
-static int tmz_procyear(TMZ *op,cchar *sp,int sl) noex {
+static int tmz_procyear(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		cl ;
@@ -987,7 +987,7 @@ static int tmz_procyear(TMZ *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_procyear) */
 
-static int tmz_proczoff(TMZ *op,cchar *sp,int sl) noex {
+static int tmz_proczoff(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		cl ;
@@ -1009,7 +1009,7 @@ static int tmz_proczoff(TMZ *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_proczoff) */
 
-static int tmz_proczname(TMZ *op,cchar *sp,int sl) noex {
+static int tmz_proczname(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		cl ;
@@ -1027,7 +1027,7 @@ static int tmz_proczname(TMZ *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (tmz_proczname) */
 
-static int tmz_yearadj(TMZ *op,int cc) noex {
+static int tmz_yearadj(tmz *op,int cc) noex {
 	TM		*stp = &op->st ;
 	if (stp->tm_year >= 0) {
 	    op->f.year = true ;

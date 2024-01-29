@@ -40,26 +40,28 @@ TMz_head {
 	char		zname[TMZ_ZNAMESIZE] ;
 } ;
 
+typedef TMZ		tmz ;
+
 EXTERNC_begin
 
-extern int	tmz_init(TMZ *) noex ;
-extern int	tmz_std(TMZ *,cchar *,int) noex ;
-extern int	tmz_msg(TMZ *,cchar *,int) noex ;
-extern int	tmz_touch(TMZ *,cchar *,int) noex ;
-extern int	tmz_toucht(TMZ *,cchar *,int) noex ;
-extern int	tmz_strdig(TMZ *,cchar *,int) noex ;
-extern int	tmz_logz(TMZ *,cchar *,int) noex ;
-extern int	tmz_day(TMZ *,cchar *,int) noex ;
-extern int	tmz_isset(TMZ *) noex ;
-extern int	tmz_hasyear(TMZ *) noex ;
-extern int	tmz_haszoff(TMZ *) noex ;
-extern int	tmz_haszone(TMZ *) noex ;
-extern int	tmz_setday(TMZ *,int,int,int) noex ;
-extern int	tmz_setyear(TMZ *,int) noex ;
-extern int	tmz_setzone(TMZ *,cchar *,int) noex ;
-extern int	tmz_gettm(TMZ *,TM *) noex ;
-extern int	tmz_getdst(TMZ *) noex ;
-extern int	tmz_getzoff(TMZ *) noex ;
+extern int	tmz_init(tmz *) noex ;
+extern int	tmz_std(tmz *,cchar *,int) noex ;
+extern int	tmz_msg(tmz *,cchar *,int) noex ;
+extern int	tmz_touch(tmz *,cchar *,int) noex ;
+extern int	tmz_toucht(tmz *,cchar *,int) noex ;
+extern int	tmz_strdig(tmz *,cchar *,int) noex ;
+extern int	tmz_logz(tmz *,cchar *,int) noex ;
+extern int	tmz_day(tmz *,cchar *,int) noex ;
+extern int	tmz_isset(tmz *) noex ;
+extern int	tmz_hasyear(tmz *) noex ;
+extern int	tmz_haszoff(tmz *) noex ;
+extern int	tmz_haszone(tmz *) noex ;
+extern int	tmz_setday(tmz *,int,int,int) noex ;
+extern int	tmz_setyear(tmz *,int) noex ;
+extern int	tmz_setzone(tmz *,cchar *,int) noex ;
+extern int	tmz_gettm(tmz *,TM *) noex ;
+extern int	tmz_getdst(tmz *) noex ;
+extern int	tmz_getzoff(tmz *) noex ;
 
 EXTERNC_end
 
