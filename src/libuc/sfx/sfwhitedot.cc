@@ -1,5 +1,5 @@
 /* sfwhitedot SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a substring present before the first dot */
 /* version %I% last-modified %G% */
@@ -69,22 +69,25 @@
 /* exported subroutines */
 
 int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
-	cchar		*tp ;
+	int		rl = -1 ;
+	cchar		*rp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
-	while (sl && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	if ((tp = strnchr(sp,sl,'.')) != nullptr) {
-	    sl = (tp - sp) ;
-	}
-	while (sl && CHAR_ISWHITE(sp[sl - 1])) {
-	    sl -= 1 ;
-	}
-	if (rpp) {
-	    *rpp = sp ;
-	}
-	return sl ;
+	if (sl > 0) {
+	    while (sl && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
+	        sl = (tp - sp) ;
+		rp = sp ;
+	    }
+	    while (sl && CHAR_ISWHITE(sp[sl - 1])) {
+	        sl -= 1 ;
+	    }
+	    if (rp) rl = sl ;
+	} /* end if (non-zero positive) */
+	if (rpp) *rpp = rp ;
+	return rl ;
 }
 /* end subroutine (sfwhitedot) */
 

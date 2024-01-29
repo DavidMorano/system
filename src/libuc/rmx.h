@@ -32,8 +32,8 @@ extern int	rmext(cchar *,int) noex ;
 extern int	rmtrailchr(cchar *,int,int) noex ;
 extern int	rmcomment(cchar *,int) noex ;
 
-static inline int rmchr(cchar *sp,int sl,int ch) noex {
-	return rmochr(sp,sl,ch) ;
+static inline int rmchr(cchar *sp,int sl,int sch) noex {
+	return rmochr(sp,sl,sch) ;
 }
 
 EXTERNC_end

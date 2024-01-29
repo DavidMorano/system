@@ -1,6 +1,8 @@
-/* dater */
+/* dater HEADER */
+/* lang=C20 */
 
 /* dater manipulation object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,14 +15,12 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DATER_INCLUDE
-#define	DATER_INCLUDE	1
+#define	DATER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/timeb.h>		/* for 'struct timeb' */
-
 #include	<usystem.h>
 #include	<date.h>
 #include	<localmisc.h>
@@ -72,68 +72,59 @@ struct dater_flags {
 } ;
 
 struct dater_head {
-	uint		magic ;
-	struct timeb	cb ;		/* current */
-	struct timeb	b ;
+	TIMEB		cb ;		/* current */
+	TIMEB		b ;
 	DATER_FL	f ;
+	uint		magic ;
 	short		cyear ;		/* current */
 	char		cname[DATER_ZNAMESIZE] ;
 	char		zname[DATER_ZNAMESIZE] ;
 } ;
 
-
 #ifdef	COMMENT
 typedef struct dater_head	dater ;
 #endif
 
+EXTERNC_begin
 
-#if	(! defined(DATER_MASTER)) || (DATER_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int dater_start(DATER *,struct timeb *,cchar *,int) ;
-extern int dater_startcopy(DATER *,DATER *) ;
-extern int dater_setcopy(DATER *,DATER *) ;
-extern int dater_setstd(DATER *,cchar *,int) ;
-extern int dater_setmsg(DATER *,cchar *,int) ;
-extern int dater_setstrdig(DATER *,cchar *,int) ;
-extern int dater_setlogz(DATER *,cchar *,int) ;
-extern int dater_settouch(DATER *,cchar *,int) ;
-extern int dater_settoucht(DATER *,cchar *,int) ;
-extern int dater_settmzon(DATER *,struct tm *,int,cchar *,int) ;
-extern int dater_settmzo(DATER *,struct tm *,int) ;
-extern int dater_settmzn(DATER *,struct tm *,cchar *,int) ;
-extern int dater_settimezn(DATER *,time_t,cchar *,int) ;
-extern int dater_settimezon(DATER *,time_t,int,cchar *,int) ;
-extern int dater_setzinfo(DATER *,DATER_ZINFO *) ;
-extern int dater_tzinfo(DATER *,DATER_ZINFO *) ;
-extern int dater_mkdatestr(DATER *,int,char *,int) ;
-extern int dater_mkstd(DATER *,char *,int) ;
-extern int dater_mkenv(DATER *,char *,int) ;
-extern int dater_mkmsg(DATER *,char *,int) ;
-extern int dater_mkhdr(DATER *,char *,int) ;
-extern int dater_mkstrdig(DATER *,char *,int) ;
-extern int dater_mklogz(DATER *,char *,int) ;
-extern int dater_gettime(DATER *,time_t *) ;
-extern int dater_getzoneoff(DATER *,int *) ;
-extern int dater_getzonename(DATER *,char *,int) ;
-extern int dater_getzinfo(DATER *,DATER_ZINFO *) ;
-extern int dater_getdate(DATER *,DATE *) ;
-extern int dater_diff(DATER *,DATER *,time_t *) ;
-extern int dater_finish(DATER *) ;
+extern int dater_start(DATER *,TIMEB *,cchar *,int) noex ;
+extern int dater_startcopy(DATER *,DATER *) noex ;
+extern int dater_setcopy(DATER *,DATER *) noex ;
+extern int dater_setstd(DATER *,cchar *,int) noex ;
+extern int dater_setmsg(DATER *,cchar *,int) noex ;
+extern int dater_setstrdig(DATER *,cchar *,int) noex ;
+extern int dater_setlogz(DATER *,cchar *,int) noex ;
+extern int dater_settouch(DATER *,cchar *,int) noex ;
+extern int dater_settoucht(DATER *,cchar *,int) noex ;
+extern int dater_settmzon(DATER *,TM *,int,cchar *,int) noex ;
+extern int dater_settmzo(DATER *,TM *,int) noex ;
+extern int dater_settmzn(DATER *,TM *,cchar *,int) noex ;
+extern int dater_settimezn(DATER *,time_t,cchar *,int) noex ;
+extern int dater_settimezon(DATER *,time_t,int,cchar *,int) noex ;
+extern int dater_setzinfo(DATER *,DATER_ZINFO *) noex ;
+extern int dater_tzinfo(DATER *,DATER_ZINFO *) noex ;
+extern int dater_mkdatestr(DATER *,int,char *,int) noex ;
+extern int dater_mkstd(DATER *,char *,int) noex ;
+extern int dater_mkenv(DATER *,char *,int) noex ;
+extern int dater_mkmsg(DATER *,char *,int) noex ;
+extern int dater_mkhdr(DATER *,char *,int) noex ;
+extern int dater_mkstrdig(DATER *,char *,int) noex ;
+extern int dater_mklogz(DATER *,char *,int) noex ;
+extern int dater_gettime(DATER *,time_t *) noex ;
+extern int dater_getzoneoff(DATER *,int *) noex ;
+extern int dater_getzonename(DATER *,char *,int) noex ;
+extern int dater_getzinfo(DATER *,DATER_ZINFO *) noex ;
+extern int dater_getdate(DATER *,DATE *) noex ;
+extern int dater_diff(DATER *,DATER *,time_t *) noex ;
+extern int dater_finish(DATER *) noex ;
 
 #ifdef	COMMENT
-extern int dater_nzones(DATER *) ;
-extern int dater_zinfo(DATER *,DATER_ZINFO *,int) ;
+extern int dater_nzones(DATER *) noex ;
+extern int dater_zinfo(DATER *,DATER_ZINFO *,int) noex ;
 #endif /* COMMENT */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* DATER_MASTER */
 
 #endif /* DATER_INCLUDE */
 

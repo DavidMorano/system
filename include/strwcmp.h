@@ -44,10 +44,10 @@ inline int strwcmpr(cchar *s1,cchar *s2,int len) noex {
 
 #else /* __cplusplus */
 
-inline int strwcmpo(cchar *s1,cchar *s2,int len) noex {
+static inline int strwcmpo(cchar *s1,cchar *s2,int len) noex {
 	return strwcmpx(s1,s2,len) ;
 }
-inline int strwcmpr(cchar *s1,cchar *s2,int len) noex {
+static inline int strwcmpr(cchar *s1,cchar *s2,int len) noex {
 	return strwcmpx(s2,s1,len) ;
 }
 

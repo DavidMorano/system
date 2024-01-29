@@ -29,7 +29,7 @@
 
 
 #include	<envstandards.h>
-#include	<ctime>
+#include	<time.h>
 
 
 #if	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0))
