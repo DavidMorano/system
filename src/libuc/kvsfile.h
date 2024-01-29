@@ -29,7 +29,7 @@
 
 
 #define	KVSFILE			struct kvsfile_head
-#define	KVSFILE_CUR		struct kvsfile_c
+#define	kvsfile_cur		struct kvsfile_c
 
 #define	KVSFILE_MAGIC		0x31415926
 #define	KVSFILE_KEYLEN		MAXHOSTNAMELEN
@@ -52,19 +52,19 @@ struct kvsfile_head {
 } ;
 
 typedef KVSFILE		kvsfile ;
-typedef KVSFILE_CUR	kvsfile_cur ;
+typedef kvsfile_cur	kvsfile_cur ;
 
 EXTERNC_begin
 
-extern int kvsfile_open(KVSFILE *,int,cchar *) noex ;
-extern int kvsfile_fileadd(KVSFILE *,cchar *) noex ;
-extern int kvsfile_curbegin(KVSFILE *,KVSFILE_CUR *) noex ;
-extern int kvsfile_curend(KVSFILE *,KVSFILE_CUR *) noex ;
-extern int kvsfile_enumkey(KVSFILE *,KVSFILE_CUR *,char *,int) noex ;
-extern int kvsfile_enum(KVSFILE *,KVSFILE_CUR *,char *,int,char *,int) noex ;
-extern int kvsfile_fetch(KVSFILE *,cchar *,KVSFILE_CUR *,char *,int) noex ;
-extern int kvsfile_check(KVSFILE *,time_t) noex ;
-extern int kvsfile_close(KVSFILE *) noex ;
+extern int kvsfile_open(kvsfile *,int,cchar *) noex ;
+extern int kvsfile_fileadd(kvsfile *,cchar *) noex ;
+extern int kvsfile_curbegin(kvsfile *,kvsfile_cur *) noex ;
+extern int kvsfile_curend(kvsfile *,kvsfile_cur *) noex ;
+extern int kvsfile_enumkey(kvsfile *,kvsfile_cur *,char *,int) noex ;
+extern int kvsfile_enum(kvsfile *,kvsfile_cur *,char *,int,char *,int) noex ;
+extern int kvsfile_fetch(kvsfile *,cchar *,kvsfile_cur *,char *,int) noex ;
+extern int kvsfile_check(kvsfile *,time_t) noex ;
+extern int kvsfile_close(kvsfile *) noex ;
 
 EXTERNC_end
 

@@ -19,7 +19,8 @@
 	This object was originally written.
 
 	- 2004-05-25, David A­D­ Morano
-        This subroutine was adopted for use as a general key-value file reader.
+	This subroutine was adopted for use as a general key-value
+	file reader.
 
 */
 
@@ -102,7 +103,7 @@
 extern int	getpwd(char *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 
@@ -112,7 +113,7 @@ extern int	debugprintf(const char *,...) ;
 /* local structures */
 
 struct kvsfile_file {
-	const char	*fname ;
+	cchar	*fname ;
 	time_t		mtime ;
 	uino_t		ino ;
 	dev_t		dev ;
@@ -120,13 +121,13 @@ struct kvsfile_file {
 } ;
 
 struct kvsfile_key {
-	const char	*kname ;
+	cchar	*kname ;
 	int		count ;
 } ;
 
 struct kvsfile_e {
 	KVSFILE_KEY	*kep ;
-	const char	*vname ;
+	cchar	*vname ;
 	int		vlen ;
 	int		fi ;		/* file index */
 	int		ki ;		/* key index */
@@ -135,16 +136,16 @@ struct kvsfile_e {
 
 /* forward references */
 
-static unsigned int	hashkeyval(KVSFILE_ENT *,int) ;
+static unsigned int	hashkeyval(KVSFILE_ENT *,int) noex ;
 
-int		kvsfile_fileadd(KVSFILE *,const char *) ;
+int		kvsfile_fileadd(KVSFILE *,cchar *) noex ;
 
 static int	kvsfile_filefins(KVSFILE *) ;
 static int	kvsfile_keyfins(KVSFILE *) ;
 static int	kvsfile_fh(KVSFILE *,dev_t,uino_t) ;
 static int	kvsfile_fileparse(KVSFILE *,int) ;
 static int	kvsfile_fileparser(KVSFILE *,int,bfile *) ;
-static int	kvsfile_getkeyp(KVSFILE *,const char *,KVSFILE_KEY **) ;
+static int	kvsfile_getkeyp(KVSFILE *,cchar *,KVSFILE_KEY **) ;
 static int	kvsfile_filedump(KVSFILE *,int) ;
 static int	kvsfile_addentry(KVSFILE *,KVSFILE_ENT *) ;
 static int	kvsfile_already(KVSFILE *,KVSFILE_ENT *) ;
@@ -154,10 +155,10 @@ static int	kvsfile_checkfiles(KVSFILE *,time_t) ;
 static int	kvsfile_filedel(KVSFILE *,int) ;
 #endif
 
-static int	file_start(struct kvsfile_file *,const char *) ;
+static int	file_start(struct kvsfile_file *,cchar *) ;
 static int	file_finish(struct kvsfile_file *) ;
 
-static int	key_start(KVSFILE_KEY *,const char *) ;
+static int	key_start(KVSFILE_KEY *,cchar *) ;
 static int	key_increment(KVSFILE_KEY *) ;
 static int	key_decrement(KVSFILE_KEY *) ;
 static int	key_finish(KVSFILE_KEY *) ;
@@ -290,7 +291,7 @@ int kvsfile_fileadd(KVSFILE *op,cchar atfname[])
 {
 	int		rs = SR_OK ;
 	int		fi = 0 ;
-	const char	*np ;
+	cchar	*np ;
 	char		abuf[MAXPATHLEN + 1] ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -493,7 +494,7 @@ int		vallen ;
 	    KVSFILE_ENT	*ep ;
 	    cchar	*kp, *vp ;
 
-	    kp = (const char *) key.buf ;
+	    kp = (cchar *) key.buf ;
 	    kl = key.len ;
 	    rs = snwcpy(keybuf,keylen,kp,kl) ;
 
@@ -524,7 +525,7 @@ int		vallen ;
 
 int kvsfile_fetch(op,keybuf,curp,valbuf,vallen)
 KVSFILE		*op ;
-const char	keybuf[] ;
+cchar	keybuf[] ;
 KVSFILE_CUR	*curp ;
 char		valbuf[] ;
 int		vallen ;
@@ -535,7 +536,7 @@ int		vallen ;
 	int		rs ;
 	int		kl ;
 	int		vl = 0 ;
-	const char	*kp, *vp ;
+	cchar	*kp, *vp ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
@@ -802,8 +803,8 @@ static int kvsfile_fileparser(KVSFILE *op,int fi,bfile *lfp)
 	int		c_added = 0 ;
 	int		c = 0 ;
 	int		f_eol ;
-	const char	*fp ;
-	const char	*cp ;
+	cchar	*fp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 	char		keybuf[KEYBUFLEN + 1] ;
 
@@ -1170,7 +1171,7 @@ static int kvsfile_filedel(KVSFILE *op,int fi)
 static int file_start(KVSFILE_FILE *fep,cchar fname[])
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (fname == nullptr) return SR_FAULT ;
 
@@ -1210,7 +1211,7 @@ static int key_start(KVSFILE_KEY *kep,cchar kname[])
 
 	if (kname != nullptr) {
 	    const int	klen = KEYBUFLEN ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    rs = uc_mallocstrw(kname,klen,&cp) ;
 	    if (rs >= 0) kep->kname = cp ;
 	}
@@ -1261,11 +1262,11 @@ static int entry_start(ep,fi,ki,kep,vp,vl)
 KVSFILE_ENT	*ep ;
 int		fi, ki ;
 KVSFILE_KEY	*kep ;
-const char	*vp ;
+cchar	*vp ;
 int		vl ;
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	memset(ep,0,sizeof(KVSFILE_ENT)) ;
 	ep->fi = fi ;
