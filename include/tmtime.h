@@ -22,10 +22,11 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
 #define	TMTIME			struct tmtime_head
-#define	TMTIME_ZNAMELEN		8
+#define	TMTIME_ZNAMELEN		TZABBRLEN
 #define	TMTIME_BASEYEAR		1900
 
 

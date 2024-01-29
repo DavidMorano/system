@@ -34,7 +34,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cerrno>
 #include	<ctime>
 #include	<cstring>		/* <- for |memcpy(3c)| */
@@ -70,6 +69,9 @@
 /* local variables */
 
 constexpr bool		f_reentrant = F_REENTRANT ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -112,7 +114,7 @@ int uc_gmtime(const time_t *tp,TM *tsp) noex {
 	        if (rs >= 0) {
 	            memcpy(tsp,rp,sizeof(TM)) ;
 		}
-	    } /* end if-constexpr */
+	    } /* end if-constexpr (f_reentrant) */
 	} /* end if (non-null) */
 	return rs ;
 }

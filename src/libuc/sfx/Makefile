@@ -54,19 +54,25 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= sfx.h
 
 
-OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o sfbreak.o
+OBJ0_SFX= sfbaselib.o sfbasename.o sfbracketval.o
 OBJ1_SFX= sfcenter.o sfcookkey.o sfdequote.o sfdirname.o
 OBJ2_SFX= sfkey.o sflast.o sfnamecomp.o sfprogroot.o 
-OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o sfcasesub.o
-OBJ4_SFX= sfsubstance.o sfthing.o sfwhitedot.o sfword.o sfprogname.o
-OBJ5_SFX= sfnext.o sfkeyval.o
+OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o 
+OBJ4_SFX= sfcasesub.o sfsubstance.o sfthing.o 
+OBJ5_SFX= sfwhitedot.o sfword.o sfprogname.o
+OBJ6_SFX= sfnext.o sfkeyval.o
+OBJ7_SFX= sfbreak.o
 
 
 OBJA_SFX= obj0_sfx.o obj1_sfx.o
 OBJB_SFX= obj2_sfx.o obj3_sfx.o
 OBJC_SFX= obj4_sfx.o obj5_sfx.o
+OBJD_SFX= obj6_sfx.o obj7_sfx.o
 
-OBJ_SFX= $(OBJA_SFX) $(OBJB_SFX) $(OBJC_SFX)
+OBJG0_SFX= obja_sfx.o objb_sfx.o
+OBJG1_SFX= objc_sfx.o objd_sfx.o
+
+OBJ_SFX= $(OBJG0_SFX) $(OBJG1_SFX)
 
 
 default:		$(T).o
@@ -112,6 +118,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_sfx.o:	$(OBJ0_SFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SFX)
 
@@ -129,5 +136,31 @@ obj4_sfx.o:	$(OBJ4_SFX)
 
 obj5_sfx.o:	$(OBJ5_SFX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SFX)
+
+obj6_sfx.o:	$(OBJ6_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ6_SFX)
+
+obj7_sfx.o:	$(OBJ7_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ7_SFX)
+
+
+obja_sfx.o:	$(OBJA_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_SFX)
+
+objb_sfx.o:	$(OBJB_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_SFX)
+
+objc_sfx.o:	$(OBJC_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_SFX)
+
+objd_sfx.o:	$(OBJD_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJD_SFX)
+
+
+objg0_sfx.o:	$(OBJG0_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJG0_SFX)
+
+objg1_sfx.o:	$(OBJG1_SFX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJG1_SFX)
 
 

@@ -1,18 +1,18 @@
-/* dater */
+/* dater SUPPORT */
+/* lang=C++20 */
 
 /* general dater object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_ASSUMEZN	0		/* assume a zone-name */
 #define	CF_SNTMTIME	1		/* use 'sntmtime(3dam)' */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        Originally created due to frustration with various other "fuzzy" date
-        conversion subroutines.
+	Originally created due to frustration with various other
+	"fuzzy" date conversion subroutines.
 
 */
 
@@ -20,56 +20,51 @@
 
 /*******************************************************************************
  
-	This object can be used to create daters from various input data
-	including strings.
+	This object can be used to create daters from various input
+	data including strings.
 
 	Note:
-
-        The timezone offset value in 'struct timeb' is the minutes west of GMT.
-        This is a positive value for timezones that are west of Greenwich. It is
-        negative for timezones east of Greenwich. This is opposite from what you
-        will see in email headers (for example). Our number here must be
-        subtracted from GMT in order to get the local time.
+	The timezone offset value in 'struct timeb' is the minutes
+	west of GMT.  This is a positive value for timezones that
+	are west of Greenwich. It is negative for timezones east
+	of Greenwich. This is opposite from what you will see in
+	email headers (for example). Our number here must be
+	subtracted from GMT in order to get the local time.
 
 	Frustration note:
-
-	What an incredible pain this time-dater handling stuff all is?  This
-	file doesn't even do justice to a small fraction of the real problems
-	associated with date management!  The problem is that the dater changes
-	as time progresses.  Changes are due to timezone differences and year
-	leaps and leap seconds.  The fact that timezone data is not a part of
-	many daters only complicates matters worse as we then have to try and
-	figure out a reasonable timezone when they are not supplied.
+	What an incredible pain this time-dater handling stuff all
+	is?  This file doesn't even do justice to a small fraction
+	of the real problems associated with date management!  The
+	problem is that the dater changes as time progresses.
+	Changes are due to timezone differences and year leaps and
+	leap seconds.  The fact that timezone data is not a part
+	of many daters only complicates matters worse as we then
+	have to try and figure out a reasonable timezone when they
+	are not supplied.
 
 	Comment parseing for RFC-822 dates:
+	Note that dates given to us for MSG (RFC-822) processing,
+	might have comments in them.  These comments are those
+	specified in RFC-822.  Note that the TMZ object does some
+	comment processing on MSG dates but only in the same way
+	that NetNews does ; namely, only for a comment at the end
+	of the string and which contains a time-zone-name.
 
-	Note that dates given to us for MSG (RFC-822) processing, might have
-	comments in them.  These comments are those specified in RFC-822.  Note
-	that the TMZ object does some comment processing on MSG dates but only
-	in the same way that NetNews does ; namely, only for a comment at the
-	end of the string and which contains a time-zone-name.
-
-        Full comment parsing is done on MSG dates using a COMPARSE object. With
-        COMPARSE processing, we still try to divine a time-zone-name from the
-        leading part of the resulting comment.
-
+	Full comment parsing is done on MSG dates using a COMPARSE
+	object. With COMPARSE processing, we still try to divine a
+	time-zone-name from the leading part of the resulting
+	comment.
 
 *******************************************************************************/
 
-
-#define	DATER_MASTER	0
-
-
 #include	<envstandards.h>
-
-#include	<sys/types.h>
 #include	<sys/timeb.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
 #include	<usystem.h>
+#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<estrings.h>
 #include	<calstrs.h>
 #include	<sbuf.h>
@@ -79,7 +74,7 @@
 
 #include	"dater.h"
 #include	"zos.h"
-#include	"comparse.h"	/* arguably should be handled elsewhere */
+#include	"comparse.h"		/* should be handled elsewhere? */
 #include	"tmz.h"
 #include	"zdb.h"
 
@@ -109,41 +104,20 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_SNTMTIME
-extern int	sntmtime(char *,int,TMTIME *,cchar *) ;
-#endif
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strcpylc(char *,cchar *) ;
-extern char	*strcpyuc(char *,cchar *) ;
-extern char	*strncpylc(char *,cchar *,int) ;
-extern char	*strncpyuc(char *,cchar *,int) ;
-extern char	*strnwcpy(char *,int,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
-
-#if	CF_DEBUGS
-extern char	*timestr_gmlog(time_t,char *) ;
-extern char	*timestr_gmlogz(time_t,char *) ;
-extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
-#endif
+extern "C" {
+    int		dater_settmzon(DATER *,TM *,int,cchar *,int) noex ;
+    int		dater_settmzo(DATER *,TM *,int) noex ;
+    int		dater_settmzn(DATER *,TM *,cchar *,int) noex ;
+    int		dater_mkdatestr(DATER *,int,char *,int) noex ;
+}
 
 
 /* external variables */
@@ -160,29 +134,24 @@ struct knownzone {
 
 /* forward references */
 
-int 		dater_settmzon(DATER *,struct tm *,int,cchar *,int) ;
-int 		dater_settmzo(DATER *,struct tm *,int) ;
-int 		dater_settmzn(DATER *,struct tm *,cchar *,int) ;
-int		dater_mkdatestr(DATER *,int,char *,int) ;
+static int	dater_initcur(DATER *) noex ;
+static int	dater_ldname(DATER *,cchar *,int) noex ;
+static int	dater_pname(DATER *) noex ;
+static int	dater_pnum(DATER *) noex ;
+static int	dater_findzname(DATER *) noex ;
+static int	dater_findzoff(DATER *,TM *) noex ;
+static int	dater_mkptime(DATER *,TM *,int) noex ;
+static int	dater_mktime(DATER *,TM *) noex ;
+static int	dater_mkpzoff(DATER *,TM *,int) noex ;
 
-static int	dater_initcur(DATER *) ;
-static int	dater_ldname(DATER *,cchar *,int) ;
-static int	dater_pname(DATER *) ;
-static int	dater_pnum(DATER *) ;
-static int	dater_findzname(DATER *) ;
-static int	dater_findzoff(DATER *,struct tm *) ;
-static int	dater_mkptime(DATER *,struct tm *,int) ;
-static int	dater_mktime(DATER *,struct tm *) ;
-static int	dater_mkpzoff(DATER *,struct tm *,int) ;
-
-static int	dater_initbase(DATER *) ;
-static int	dater_ldtmz(DATER *,TMZ *) ;
-static int	dater_ldcomzone(DATER *,COMPARSE *) ;
-static int	dater_ldzname(DATER *,cchar *,int) ;
-static int	dater_defs(DATER *,TMZ *) ;
+static int	dater_initbase(DATER *) noex ;
+static int	dater_ldtmz(DATER *,TMZ *) noex ;
+static int	dater_ldcomzone(DATER *,COMPARSE *) noex ;
+static int	dater_ldzname(DATER *,cchar *,int) noex ;
+static int	dater_defs(DATER *,TMZ *) noex ;
 
 #ifdef	COMMENT
-static int	findtzcomment(char *,int,cchar *) ;
+static int	findtzcomment(char *,int,cchar *) noex ;
 #endif
 
 
@@ -202,25 +171,21 @@ static cchar	*types[] = {
 
 /* exported subroutines */
 
-
-int dater_start(DATER *dp,struct timeb *nowp,cchar *znp,int znl)
-{
+int dater_start(DATER *dp,struct timeb *nowp,cchar *znp,int znl) noex {
 
 	if (dp == NULL) return SR_FAULT ;
 
-	memset(dp,0,sizeof(DATER)) ;
+	memclear(dp) ;
 	dp->b.timezone = TZO_EMPTY ;
 	dp->b.dstflag = -1 ;
 
-/* continue */
-
 	if (nowp != NULL) {
-	    dp->f.cb = TRUE ;
+	    dp->f.cb = true ;
 	    dp->cb = *nowp ;
 	} /* end if (time-offset) */
 
 	if ((znp != NULL) && (znl != 0)) {
-	    dp->f.czn = TRUE ;
+	    dp->f.czn = true ;
 	    strnwcpy(dp->cname,DATER_ZNAMESIZE,znp,znl) ;
 	}
 
@@ -229,10 +194,7 @@ int dater_start(DATER *dp,struct timeb *nowp,cchar *znp,int znl)
 }
 /* end subroutine (dater_start) */
 
-
-/* initialize a DATER object from another */
-int dater_startcopy(DATER *dp,DATER *d2p)
-{
+int dater_startcopy(DATER *dp,DATER *d2p) noex {
 
 	if (dp == NULL) return SR_FAULT ;
 	if (d2p == NULL) return SR_FAULT ;
@@ -253,11 +215,7 @@ int dater_startcopy(DATER *dp,DATER *d2p)
 }
 /* end subroutine (dater_startcopy) */
 
-
-/* deconstruct up a DATER object */
-int dater_finish(DATER *dp)
-{
-
+int dater_finish(DATER *dp) noex {
 	if (dp == NULL) return SR_FAULT ;
 
 	if (dp->magic != DATER_MAGIC) return SR_NOTOPEN ;
@@ -268,12 +226,8 @@ int dater_finish(DATER *dp)
 }
 /* end subroutine (dater_finish) */
 
-
 #ifdef	COMMENT
-/* copy a DATER object */
-int dater_copy(DATER *dp,DATER *d2p)
-{
-
+int dater_copy(DATER *dp,DATER *d2p) noex {
 	if (dp == NULL) return SR_FAULT ;
 	if (d2p == NULL) return SR_FAULT ;
 
@@ -286,11 +240,8 @@ int dater_copy(DATER *dp,DATER *d2p)
 /* end subroutine (dater_copy) */
 #endif /* COMMENT */
 
-
 /* copy one dater to another */
-int dater_setcopy(DATER *dp,DATER *d2p)
-{
-
+int dater_setcopy(DATER *dp,DATER *d2p) noex {
 	if (dp == NULL) return SR_FAULT ;
 	if (d2p == NULL) return SR_FAULT ;
 
@@ -314,10 +265,7 @@ int dater_setcopy(DATER *dp,DATER *d2p)
 }
 /* end subroutine (dater_setcopy) */
 
-
-/* set from a standard time string (like UNIX®) */
-int dater_setstd(DATER *dp,cchar *sp,int sl)
-{
+int dater_setstd(DATER *dp,cchar *sp,int sl) noex {
 	TMZ		stz ;
 	int		rs ;
 
@@ -336,7 +284,7 @@ int dater_setstd(DATER *dp,cchar *sp,int sl)
 	    sl = strlen(sp) ;
 
 	if ((rs = tmz_std(&stz,sp,sl)) >= 0) {
-	    struct tm	dst = stz.st ;
+	    TM	dst = stz.st ;
 	    dater_ldtmz(dp,&stz) ;
 	    if ((rs = dater_defs(dp,&stz)) >= 0) {
 	        rs = dater_mktime(dp,&dst) ;
@@ -353,10 +301,8 @@ int dater_setstd(DATER *dp,cchar *sp,int sl)
 }
 /* end subroutine (dater_setstd) */
 
-
 /* set the dater from a message-type string */
-int dater_setmsg(DATER *dp,cchar *sp,int sl)
-{
+int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
 	COMPARSE	vc ;
 	int		rs ;
 	int		rs1 ;
@@ -384,7 +330,7 @@ int dater_setmsg(DATER *dp,cchar *sp,int sl)
 #endif
 
 	        if ((rs = tmz_msg(&stz,vp,vl)) >= 0) {
-	            struct tm	dst = stz.st ;
+	            TM	dst = stz.st ;
 	            dater_ldtmz(dp,&stz) ;
 	            dater_ldcomzone(dp,&vc) ;
 	            if ((rs = dater_defs(dp,&stz)) >= 0) {
@@ -412,11 +358,9 @@ int dater_setmsg(DATER *dp,cchar *sp,int sl)
 }
 /* end subroutine (dater_setmsg) */
 
-
 /* set from a dater-like or decimal digit time string */
 /* format> [CC]YYMMDDhhmm[ss][±<zoff>][<zname>] */
-int dater_setstrdig(DATER *dp,cchar *sp,int sl)
-{
+int dater_setstrdig(DATER *dp,cchar *sp,int sl) noex {
 	TMZ		stz ;
 	int		rs ;
 #if	CF_DEBUGS
@@ -435,7 +379,7 @@ int dater_setstrdig(DATER *dp,cchar *sp,int sl)
 	    sl = strlen(sp) ;
 
 	if ((rs = tmz_strdig(&stz,sp,sl)) >= 0) {
-	    struct tm	dst = stz.st ;
+	    TM		dst = stz.st ;
 	    dater_ldtmz(dp,&stz) ;
 	    if ((rs = dater_defs(dp,&stz)) >= 0) {
 	        rs = dater_mktime(dp,&dst) ;
@@ -467,8 +411,7 @@ This amounts to a conversion from the string:
 to the DATER object.
 */
 
-int dater_setlogz(DATER *dp,cchar *sp,int sl)
-{
+int dater_setlogz(DATER *dp,cchar *sp,int sl) noex {
 	TMZ		stz ;
 	int		rs ;
 
@@ -484,7 +427,7 @@ int dater_setlogz(DATER *dp,cchar *sp,int sl)
 	    sl = strlen(sp) ;
 
 	if ((rs = tmz_logz(&stz,sp,sl)) >= 0) {
-	    struct tm	dst = stz.st ;
+	    TM	dst = stz.st ;
 	    dater_ldtmz(dp,&stz) ;
 	    if ((rs = dater_defs(dp,&stz)) >= 0) {
 	        rs = dater_mktime(dp,&dst) ;
@@ -499,10 +442,8 @@ int dater_setlogz(DATER *dp,cchar *sp,int sl)
 }
 /* end subroutine (dater_setlogz) */
 
-
 /* set from TOUCH (original) time string */
-int dater_settouch(DATER *dp,cchar *sp,int sl)
-{
+int dater_settouch(DATER *dp,cchar *sp,int sl) noex {
 	TMZ		stz ;
 	int		rs ;
 
@@ -517,7 +458,7 @@ int dater_settouch(DATER *dp,cchar *sp,int sl)
 	    sl = strlen(sp) ;
 
 	if ((rs = tmz_touch(&stz,sp,sl)) >= 0) {
-	    struct tm	dst = stz.st ;
+	    TM	dst = stz.st ;
 	    dater_ldtmz(dp,&stz) ;
 	    if ((rs = dater_defs(dp,&stz)) >= 0) {
 	        rs = dater_mktime(dp,&dst) ;
@@ -536,10 +477,8 @@ int dater_settouch(DATER *dp,cchar *sp,int sl)
 }
 /* end subroutine (dater_settouch) */
 
-
 /* set from TOUCH-t (new '-t' version) time string */
-int dater_settoucht(DATER *dp,cchar *sp,int sl)
-{
+int dater_settoucht(DATER *dp,cchar *sp,int sl) noex {
 	TMZ		stz ;
 	int		rs ;
 
@@ -554,7 +493,7 @@ int dater_settoucht(DATER *dp,cchar *sp,int sl)
 	    sl = strlen(sp) ;
 
 	if ((rs = tmz_toucht(&stz,sp,sl)) >= 0) {
-	    struct tm	dst = stz.st ;
+	    TM	dst = stz.st ;
 	    dater_ldtmz(dp,&stz) ;
 	    if ((rs = dater_defs(dp,&stz)) >= 0) {
 	        rs = dater_mktime(dp,&dst) ;
@@ -573,10 +512,8 @@ int dater_settoucht(DATER *dp,cchar *sp,int sl)
 }
 /* end subroutine (dater_settoucht) */
 
-
 /* set from a split-out time, zone offset, and zone-name */
-int dater_settmzon(DATER *dp,struct tm *stp,int zoff,cchar *zstr,int zlen)
-{
+int dater_settmzon(DATER *dp,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
@@ -607,7 +544,7 @@ int dater_settmzon(DATER *dp,struct tm *stp,int zoff,cchar *zstr,int zlen)
 /* load the zone-offset (authoritative) */
 
 	if ((rs >= 0) && (zoff != TZO_EMPTY)) {
-	    dp->f.zoff = TRUE ;
+	    dp->f.zoff = true ;
 	    dp->b.timezone = zoff ;
 	}
 
@@ -616,7 +553,7 @@ int dater_settmzon(DATER *dp,struct tm *stp,int zoff,cchar *zstr,int zlen)
 	if ((rs >= 0) && (zstr != NULL) && (zstr[0] != '\0')) {
 	    ZDB		zr ;
 
-	    dp->f.zname = TRUE ;
+	    dp->f.zname = true ;
 	    strnwcpy(dp->zname,DATER_ZNAMESIZE,zstr,zlen) ;
 
 #if	CF_DEBUGS
@@ -657,10 +594,8 @@ int dater_settmzon(DATER *dp,struct tm *stp,int zoff,cchar *zstr,int zlen)
 }
 /* end subroutine (dater_settmzon) */
 
-
 /* set from split-out time and zone offset only (minutes west of GMT) */
-int dater_settmzo(DATER *dp,struct tm *stp,int zoff)
-{
+int dater_settmzo(DATER *dp,TM *stp,int zoff) noex {
 	int		rs = SR_OK ;
 #if	CF_DEBUGS
 	char		timebuf[TIMEBUFLEN + 1] ;
@@ -710,10 +645,8 @@ int dater_settmzo(DATER *dp,struct tm *stp,int zoff)
 }
 /* end subroutine (dater_settmzo) */
 
-
 /* set from a split-out time and zone-name only */
-int dater_settmzn(DATER *dp,struct tm *stp,cchar *zstr,int zlen)
-{
+int dater_settmzn(DATER *dp,TM *stp,cchar *zstr,int zlen) noex {
 	int		rs = SR_OK ;
 	int		zoff = TZO_EMPTY ;
 
@@ -738,7 +671,7 @@ int dater_settmzn(DATER *dp,struct tm *stp,cchar *zstr,int zlen)
 	if ((rs >= 0) && (zstr != NULL) && (zstr[0] != '\0')) {
 	    ZDB		zr ;
 
-	    dp->f.zname = TRUE ;
+	    dp->f.zname = true ;
 	    strnwcpy(dp->zname,DATER_ZNAMESIZE,zstr,zlen) ;
 
 	    if ((rs = zdb_name(&zr,zstr,zlen)) >= 0) {
@@ -770,10 +703,8 @@ int dater_settmzn(DATER *dp,struct tm *stp,cchar *zstr,int zlen)
 }
 /* end subroutine (dater_settmzn) */
 
-
 /* set from ( time, timezone_name, DST_indication ) */
-int dater_settimezn(DATER *dp,time_t t,cchar *zname,int isdst)
-{
+int dater_settimezn(DATER *dp,time_t t,cchar *zname,int isdst) noex {
 	TMTIME		tmt ;
 	int		rs = SR_OK ;
 #if	CF_DEBUGS
@@ -805,16 +736,16 @@ int dater_settimezn(DATER *dp,time_t t,cchar *zname,int isdst)
 	    rs = dater_ldname(dp,zname,-1) ;
 	} else {
 
-	    dp->f.tzset = TRUE ;
+	    dp->f.tzset = true ;
 	    if ((rs = tmtime_localtime(&tmt,t)) >= 0) {
 	        zname = tmt.zname ;
-	        dp->f.zname = TRUE ;
+	        dp->f.zname = true ;
 	        strncpylc(dp->zname,zname,DATER_ZNAMESIZE) ;
 	        if (isdst < 0) isdst = tmt.isdst ;
 	    } /* end if */
 
 	    dp->b.dstflag = isdst ;
-	    dp->f.zoff = TRUE ;
+	    dp->f.zoff = true ;
 	    dp->b.timezone = 0 ;
 	    if (isdst >= 0) {
 	        dp->b.timezone = (short) (tmt.gmtoff / 60) ;
@@ -851,10 +782,8 @@ int dater_settimezn(DATER *dp,time_t t,cchar *zname,int isdst)
 }
 /* end subroutine (dater_settimezn) */
 
-
 /* set from ( time, tz-offset, tz-name, tz-DST_indication ) */
-int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst)
-{
+int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst) noex {
 	TMTIME		tmt ;
 	int		rs = SR_OK ;
 #if	CF_DEBUGS
@@ -877,8 +806,8 @@ int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst)
 	dp->b.dstflag = isdst ;
 	dp->zname[0] = '\0' ;
 
-	dp->f.zname = TRUE ;
-	dp->f.zoff = TRUE ;
+	dp->f.zname = true ;
+	dp->f.zoff = true ;
 
 /* continue */
 
@@ -895,16 +824,16 @@ int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst)
 	    debugprintf("dater_settimezn: no zone given\n") ;
 #endif
 
-	    dp->f.tzset = TRUE ;
+	    dp->f.tzset = true ;
 	    if ((rs = tmtime_localtime(&tmt,t)) >= 0) {
 	        zname = tmt.zname ;
-	        dp->f.zname = TRUE ;
+	        dp->f.zname = true ;
 	        strncpylc(dp->zname,zname,DATER_ZNAMESIZE) ;
 	        if (isdst < 0) isdst = tmt.isdst ;
 	    } /* end if */
 
 	    dp->b.dstflag = isdst ;
-	    dp->f.zoff = TRUE ;
+	    dp->f.zoff = true ;
 	    dp->b.timezone = 0 ;
 	    if (isdst >= 0) {
 	        dp->b.timezone = (short) (tmt.gmtoff / 60) ;
@@ -927,9 +856,7 @@ int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst)
 }
 /* end subroutine (dater_settimezon) */
 
-
-int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen)
-{
+int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen) noex {
 	TMTIME		tmt ;
 	time_t		t ;
 	int		rs = SR_OK ;
@@ -1149,72 +1076,49 @@ int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen)
 }
 /* end subroutine (dater_mkdatestr) */
 
-
 /* make a mail envelope-type dater string */
-int dater_mkstd(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mkstd(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSENV,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkstd) */
 
-
 /* make a mail envelope-type dater string */
-int dater_mkenv(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mkenv(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSENV,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkenv) */
 
-
 /* make a mail envelope-type dater string */
-int dater_mkmsg(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mkmsg(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSMSG,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkmsg) */
 
-
 /* make a mail header dater string */
-int dater_mkhdr(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mkhdr(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSHDR,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkhdr) */
 
-
 /* make the old STRDIG type of dater string */
-int dater_mkstrdig(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mkstrdig(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSSTRDIG,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkstrdig) */
 
-
 /* make the familiar LOGZ-type dater string */
-int dater_mklogz(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mklogz(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSLOGZ,dbuf,dlen) ;
 }
 /* end subroutine (dater_mklogz) */
 
-
 /* make the familiar LOGZ-type dater string */
-int dater_mkgmtlogz(DATER *dp,char *dbuf,int dlen)
-{
-
+int dater_mkgmtlogz(DATER *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSGMLOGZ,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkgmlogz) */
 
-
-int dater_setzinfo(DATER *dp,DATER_ZINFO *zip)
-{
+int dater_setzinfo(DATER *dp,DATER_ZINFO *zip) noex {
 	int		rs ;
 
 	if (dp == NULL) return SR_FAULT ;
@@ -1230,11 +1134,8 @@ int dater_setzinfo(DATER *dp,DATER_ZINFO *zip)
 }
 /* end subroutine (dater_setzinfo) */
 
-
 /* return the UNIX® time out of DATER object */
-int dater_gettime(DATER *dp,time_t *tp)
-{
-
+int dater_gettime(DATER *dp,time_t *tp) noex {
 	if (dp == NULL) return SR_FAULT ;
 
 	if (dp->magic != DATER_MAGIC) return SR_NOTOPEN ;
@@ -1246,11 +1147,8 @@ int dater_gettime(DATER *dp,time_t *tp)
 }
 /* end subroutine (dater_gettime) */
 
-
 /* return the timezone in minutes west of GMT */
-int dater_getzoneoff(DATER *dp,int *zp)
-{
-
+int dater_getzoneoff(DATER *dp,int *zp) noex {
 	if (dp == NULL) return SR_FAULT ;
 
 	if (dp->magic != DATER_MAGIC) return SR_NOTOPEN ;
@@ -1264,10 +1162,8 @@ int dater_getzoneoff(DATER *dp,int *zp)
 }
 /* end subroutine (dater_getzoneoff) */
 
-
 /* return the timezone in minutes west of GMT */
-int dater_getzonename(DATER *dp,char *rbuf,int rlen)
-{
+int dater_getzonename(DATER *dp,char *rbuf,int rlen) noex {
 	int		rs ;
 
 	if (dp == NULL) return SR_FAULT ;
@@ -1286,9 +1182,7 @@ int dater_getzonename(DATER *dp,char *rbuf,int rlen)
 }
 /* end subroutine (dater_getzonename) */
 
-
-int dater_getzinfo(DATER *dp,DATER_ZINFO *zip)
-{
+int dater_getzinfo(DATER *dp,DATER_ZINFO *zip) noex {
 	int		rs ;
 
 	if (dp == NULL) return SR_FAULT ;
@@ -1306,11 +1200,8 @@ int dater_getzinfo(DATER *dp,DATER_ZINFO *zip)
 }
 /* end subroutine (dater_getzinfo) */
 
-
 /* get the difference in seconds between two daters */
-int dater_diff(DATER *dp,DATER *d2p,time_t *rp)
-{
-
+int dater_diff(DATER *dp,DATER *d2p,time_t *rp) noex {
 	if (dp == NULL) return SR_FAULT ;
 	if (d2p == NULL) return SR_FAULT ;
 
@@ -1328,27 +1219,23 @@ int dater_diff(DATER *dp,DATER *d2p,time_t *rp)
 #ifdef	COMMENT
 
 /* return the number of time zones that we have */
-int dater_nzones(dp)
-DATER		*dp ;
-{
-	ZDB		zr ;
+int dater_nzones(DATER *dp) noex {
+	ZDB		rs ;
 	int		i ;
 
 	if (dp == NULL) return SR_FAULT ;
 
 	if (dp->magic != DATER_MAGIC) return SR_NOTOPEN ;
 
-	i = zdb_count(&zr) ;
+	rs  = zdb_count(&zr) ;
 
-	return i ;
+	return rs ;
 }
 /* end subroutine (dater_nzones) */
 
-
-int dater_zinfo(DATER *dp,DATER_ZINFO *zip,int ei)
-{
-	const int	n = DATER_NZONES ;
-	const int	znsize = DATER_ZNAMESIZE ;
+int dater_zinfo(DATER *dp,DATER_ZINFO *zip,int ei) noex {
+	cint		n = DATER_NZONES ;
+	cint		znsize = DATER_ZNAMESIZE ;
 	int		znl ;
 
 	if (dp == NULL) return SR_FAULT ;
@@ -1374,9 +1261,7 @@ int dater_zinfo(DATER *dp,DATER_ZINFO *zip,int ei)
 
 /* private subroutines */
 
-
-static int dater_initcur(DATER *dp)
-{
+static int dater_initcur(DATER *dp) noex {
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS
@@ -1390,7 +1275,7 @@ static int dater_initcur(DATER *dp)
 	    if (! dp->f.cb)
 	        dp->cb.time = time(NULL) ;
 
-	    dp->f.tzset = TRUE ;
+	    dp->f.tzset = true ;
 	    rs = tmtime_localtime(&tmt,dp->cb.time) ;
 
 #if	CF_DEBUGS
@@ -1405,9 +1290,9 @@ static int dater_initcur(DATER *dp)
 	    dp->cb.dstflag = tmt.isdst ;
 	    strncpylc(dp->cname,tmt.zname,DATER_ZNAMESIZE) ;
 
-	    dp->f.cb = TRUE ;
-	    dp->f.czn = TRUE ;
-	    dp->f.cyear = TRUE ;
+	    dp->f.cb = true ;
+	    dp->f.czn = true ;
+	    dp->f.cyear = true ;
 
 	} /* end if (need current time) */
 
@@ -1415,10 +1300,8 @@ static int dater_initcur(DATER *dp)
 }
 /* end subroutine (dater_initcur) */
 
-
 /* get any possible zone-name information from the zone offset */
-static int dater_mkpzoff(DATER *dp,struct tm *stp,int zoff)
-{
+static int dater_mkpzoff(DATER *dp,TM *stp,int zoff) noex {
 	ZDB		zr ;
 	int		rs ;
 
@@ -1442,8 +1325,7 @@ static int dater_mkpzoff(DATER *dp,struct tm *stp,int zoff)
 }
 /* end subroutine (dater_mkpzoff) */
 
-
-static int dater_ldtmz(DATER *dp,TMZ *tp)
+static int dater_ldtmz(DATER *dp,TMZ *tp) noex {
 {
 	dp->b.dstflag = tmz_getdst(tp) ;
 	dp->b.timezone = tmz_getzoff(tp) ;
@@ -1456,10 +1338,8 @@ static int dater_ldtmz(DATER *dp,TMZ *tp)
 }
 /* end subroutine (dater_ldtmz) */
 
-
-static int dater_ldzname(DATER *dp,cchar *sp,int sl)
-{
-	const int	znsize = DATER_ZNAMESIZE ;
+static int dater_ldzname(DATER *dp,cchar *sp,int sl) noex {
+	cint	znsize = DATER_ZNAMESIZE ;
 	int		len ;
 	cchar		*tp ;
 	if ((tp = strnpbrk(sp,sl," \t")) != NULL) {
@@ -1470,9 +1350,7 @@ static int dater_ldzname(DATER *dp,cchar *sp,int sl)
 }
 /* end subroutine (dater_ldzname) */
 
-
-static int dater_ldcomzone(DATER *dp,COMPARSE *cpp)
-{
+static int dater_ldcomzone(DATER *dp,COMPARSE *cpp) {
 	int		rs = SR_OK ;
 	if (dp->zname[0] == '\0') {
 	    int		cl ;
@@ -1485,14 +1363,12 @@ static int dater_ldcomzone(DATER *dp,COMPARSE *cpp)
 }
 /* end subroutine (dater_ldcomzone) */
 
-
-static int dater_defs(DATER *dp,TMZ *tp)
-{
-	const int	f_year = tmz_hasyear(tp) ;
-	const int	f_zoff = tmz_haszoff(tp) ;
-	const int	f_zone = tmz_haszone(tp) ;
+static int dater_defs(DATER *dp,TMZ *tp) noex {
+	cint		f_year = tmz_hasyear(tp) ;
+	cint		f_zoff = tmz_haszoff(tp) ;
+	cint		f_zone = tmz_haszone(tp) ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 	f = f || (! f_year) ;
 	f = f || (! f_zoff) ;
 	f = f || (! f_zone) ;
@@ -1504,9 +1380,9 @@ static int dater_defs(DATER *dp,TMZ *tp)
 	    if ((! f_zoff) && (! f_zone) && (dp->zname[0] == '\0')) {
 	        dp->b.dstflag = dp->cb.dstflag ;
 	        dp->b.timezone = dp->cb.timezone ;
-	        dp->f.zoff = TRUE ;
+	        dp->f.zoff = true ;
 	        dater_ldzname(dp,dp->cname,-1) ;
-	        dp->f.zname = TRUE ;
+	        dp->f.zname = true ;
 	    } else if (! f_zoff) {
 	        rs = dater_findzoff(dp,&tp->st) ;
 	    }
@@ -1515,10 +1391,8 @@ static int dater_defs(DATER *dp,TMZ *tp)
 }
 /* end subroutine (dater_defs) */
 
-
 /* store a time zone-name into the object */
-static int dater_ldname(DATER *dp,cchar *znp,int znl)
-{
+static int dater_ldname(DATER *dp,cchar *znp,int znl) noex {
 	int		rs = SR_OK ;
 	char		*dnp = dp->zname ;
 
@@ -1531,7 +1405,7 @@ static int dater_ldname(DATER *dp,cchar *znp,int znl)
 	if ((znl < 0) || (znl > DATER_ZNAMESIZE))
 	    znl = DATER_ZNAMESIZE ;
 
-	dp->f.zname = TRUE ;
+	dp->f.zname = true ;
 	strnwcpy(dnp,DATER_ZNAMESIZE,znp,znl) ;
 
 #if	CF_DEBUGS
@@ -1539,7 +1413,7 @@ static int dater_ldname(DATER *dp,cchar *znp,int znl)
 #endif
 
 	if ((! dp->f.zoff) || (dp->b.dstflag < 0)) {
-	    const int	ch = MKCHAR(dnp[0]) ;
+	    cint	ch = MKCHAR(dnp[0]) ;
 
 	    if (ISSIGN(ch) || isdigitlatin(ch)) {
 	        rs = dater_pnum(dp) ;
@@ -1561,7 +1435,6 @@ static int dater_ldname(DATER *dp,cchar *znp,int znl)
 }
 /* end subroutine (dater_ldname) */
 
-
 /* parse a time zone-name */
 
 #ifdef	COMMENT
@@ -1573,8 +1446,7 @@ struct timeb {
 } ;
 #endif /* COMMENT */
 
-static int dater_pname(DATER *dp)
-{
+static int dater_pname(DATER *dp) noex {
 	ZDB		zr ;
 	int		rs ;
 	int		zl = -1 ;
@@ -1597,8 +1469,8 @@ static int dater_pname(DATER *dp)
 	    if (dp->b.dstflag < 0)
 	        dp->b.dstflag = zr.isdst ;
 
-	    dp->f.zname = TRUE ;
-	    dp->f.zoff = TRUE ;
+	    dp->f.zname = true ;
+	    dp->f.zoff = true ;
 
 	} /* end if (zdb_name) */
 
@@ -1610,10 +1482,8 @@ static int dater_pname(DATER *dp)
 }
 /* end subroutine (dater_pname) */
 
-
 /* get the timezone information out of an RFC822-type number string */
-static int dater_pnum(DATER *dp)
-{
+static int dater_pnum(DATER *dp) noex {
 	int		rs = SR_OK ;
 	int		hours, mins ;
 	int		i ;
@@ -1623,7 +1493,7 @@ static int dater_pnum(DATER *dp)
 	if (dp->f.zoff)
 	    return SR_OK ;
 
-	dp->f.zname = FALSE ;
+	dp->f.zname = false ;
 
 	dp->b.timezone = 0 ;
 	sign = -1 ;
@@ -1638,7 +1508,7 @@ static int dater_pnum(DATER *dp)
 #endif
 
 	for (i = 0 ; i < 4 ; i += 1) {
-	    const int	ch = MKCHAR(bp[i]) ;
+	    cint	ch = MKCHAR(bp[i]) ;
 	    if (! isdigitlatin(ch)) {
 	        rs = SR_INVALID ;
 	        break ;
@@ -1656,7 +1526,7 @@ static int dater_pnum(DATER *dp)
 	    dp->b.timezone = (hours * 60) + mins ;
 	    dp->b.timezone *= sign ;
 
-	    dp->f.zoff = TRUE ;
+	    dp->f.zoff = true ;
 
 	} /* end if */
 
@@ -1664,9 +1534,7 @@ static int dater_pnum(DATER *dp)
 }
 /* end subroutine (dater_pnum) */
 
-
-static int dater_findzname(DATER *dp)
-{
+static int dater_findzname(DATER *dp) noex {
 	int		rs = SR_OK ;
 
 	if (dp->zname[0] == '\0') {
@@ -1676,7 +1544,7 @@ static int dater_findzname(DATER *dp)
 	        dp->b.dstflag = dp->cb.dstflag ;
 	        lp = strnwcpy(dp->zname,DATER_ZNAMESIZE,dp->cname,-1) ;
 	        rs = (lp - dp->zname) ;
-	        dp->f.zname = TRUE ;
+	        dp->f.zname = true ;
 	    }
 	} /* end if */
 
@@ -1684,9 +1552,7 @@ static int dater_findzname(DATER *dp)
 }
 /* end subroutine (dater_findzname) */
 
-
-static int dater_findzoff(DATER *dp,struct tm *stp)
-{
+static int dater_findzoff(DATER *dp,TM *stp) noex {
 	int		rs = SR_OK ;
 
 	if (stp == NULL) return SR_FAULT ;
@@ -1694,12 +1560,12 @@ static int dater_findzoff(DATER *dp,struct tm *stp)
 	if (! dp->f.zoff) {
 	    if (! dp->f.cyear) rs = dater_initcur(dp) ;
 	    if (dp->zname[0] != '\0') {
-	        ZDB		d ;
-	        const int	znl = DATER_ZNAMESIZE ;
+	        ZDB	d ;
+	        cint	znl = DATER_ZNAMESIZE ;
 	        if ((rs = zdb_name(&d,dp->zname,znl)) >= 0) {
 	            dp->b.timezone = d.off ;
 	            dp->b.dstflag = d.isdst ;
-	            dp->f.zoff = TRUE ;
+	            dp->f.zoff = true ;
 	        } else if (rs == SR_NOTFOUND) {
 	            rs = SR_OK ;
 	        }
@@ -1710,10 +1576,8 @@ static int dater_findzoff(DATER *dp,struct tm *stp)
 }
 /* end subroutine (dater_findzoff) */
 
-
 /* try to make a time for the given date */
-static int dater_mkptime(DATER *dp,struct tm *stp,int zoff)
-{
+static int dater_mkptime(DATER *dp,TM *stp,int zoff) noex {
 	TMTIME		tmt ;
 	int		rs = SR_OK ;
 #if	CF_DEBUGS
@@ -1745,11 +1609,11 @@ static int dater_mkptime(DATER *dp,struct tm *stp,int zoff)
 
 	if (rs >= 0) {
 	    time_t	t ;
-	    dp->f.tzset = TRUE ;		/* mktime() calls it! */
+	    dp->f.tzset = true ;		/* mktime() calls it! */
 	    rs = tmtime_mktime(&tmt,&t) ;
 	    dp->b.time = t ;
 	    dp->b.timezone = (short) zoff ;
-	    dp->f.zoff = TRUE ;
+	    dp->f.zoff = true ;
 
 #if	CF_DEBUGS
 	    debugprintf("dater_mkptime: tmtime_mktime() rs=%d\n",rs) ;
@@ -1772,10 +1636,8 @@ static int dater_mkptime(DATER *dp,struct tm *stp,int zoff)
 }
 /* end subroutine (dater_mkptime) */
 
-
 /* try to make a time for the given date */
-static int dater_mktime(DATER *dp,struct tm *stp)
-{
+static int dater_mktime(DATER *dp,TM *stp) noex {
 	TMTIME		tmt ;
 	time_t		t ;
 	int		rs = SR_OK ;
@@ -1783,22 +1645,22 @@ static int dater_mktime(DATER *dp,struct tm *stp)
 	if (dp->f.zoff) {
 	    if ((rs = tmtime_insert(&tmt,stp)) >= 0) {
 	        tmt.gmtoff = (dp->b.timezone*60) ; /* insert time-zone-offet */
-	        dp->f.tzset = TRUE ;		/* mktime() calls it! */
+	        dp->f.tzset = true ;		/* mktime() calls it! */
 	        rs = tmtime_mktime(&tmt,&t) ;
 	        dp->b.time = t ;
 	    }
 	} else { /* must be local */
-	    dp->f.tzset = TRUE ;		/* mktime() calls it! */
+	    dp->f.tzset = true ;		/* mktime() calls it! */
 	    if ((rs = uc_mktime(stp,&t)) >= 0) {
 	        GETDEFZINFO	zi ;
 	        dp->b.time = t ;
 	        if ((rs = getdefzinfo(&zi,stp->tm_isdst)) >= 0) {
-	            const int	znl = GETDEFZINFO_ZNAMESIZE ;
+	            cint	znl = GETDEFZINFO_ZNAMESIZE ;
 	            strnwcpy(dp->zname,DATER_ZNAMESIZE,zi.zname,znl) ;
 	            dp->b.timezone = zi.zoff ;
 	            dp->b.dstflag = stp->tm_isdst ;
-	            dp->f.zoff = TRUE ;
-	            dp->f.zname = TRUE ;
+	            dp->f.zoff = true ;
+	            dp->f.zname = true ;
 	        }
 	    } /* end if (uc_mktime) */
 	} /* end if (something or local) */
@@ -1822,15 +1684,17 @@ static int dater_mktime(DATER *dp,struct tm *stp)
 }
 /* end subroutine (dater_mktime) */
 
-
-static int dater_initbase(DATER *dp)
-{
-	dp->zname[0] = '\0' ;
-	dp->b.timezone = TZO_EMPTY ;
-	dp->b.dstflag = -1 ;
-	dp->f.zname = FALSE ;
-	dp->f.zoff = FALSE ;
-	return SR_OK ;
+static int dater_initbase(DATER *dp) noex {
+	iknt		rs = SR_FAULT ;
+	if (dp) {
+	    rs = SR_OK ;
+	    dp->zname[0] = '\0' ;
+	    dp->b.timezone = TZO_EMPTY ;
+	    dp->b.dstflag = -1 ;
+	    dp->f.zname = false ;
+	    dp->f.zoff = false ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (dater_initbase) */
 

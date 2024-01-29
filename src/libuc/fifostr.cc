@@ -24,7 +24,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -66,6 +65,12 @@ static int	cmpdefault() ;
 #endif
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int fifostr_start(fifostr *op) noex {
@@ -85,9 +90,9 @@ int fifostr_start(fifostr *op) noex {
 int fifostr_finish(fifostr *op) noex {
 	int		rs ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-		while ((rs = fifostr_del(op,nullptr)) >= 0) ;
-		if (rs == SR_NOTFOUND) rs = SR_OK ;
-		op->magic = 0 ;
+	    while ((rs = fifostr_del(op,nullptr)) >= 0) ;
+	    if (rs == SR_NOTFOUND) rs = SR_OK ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -97,15 +102,16 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = fifostr_magic(op,sp)) >= 0) {
-	        fifostr_ent	*ep = nullptr ;
-	        cint		size = sizeof(fifostr_ent) + (sl + 1) ;
+	    fifostr_ent	*ep = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
+	    {
+	        cint	size = sizeof(fifostr_ent) + (sl + 1) ;
 	        if ((rs = uc_libmalloc(size,&ep)) >= 0) {
 	            ep->slen = sl ;
 	            {
-	                char	*bp = (char *) ep ;
+	                char	*bp = reinterpret_cast<charp>(ep) ;
 	                bp += sizeof(fifostr_ent) ;
-	                strwcpy(bp,sp,sl) ;
+	                strwcpy(bp,sp,sl) ;	/* <- ok: see 'size' above */
 	            }
 	            ep->next = nullptr ;
 	            ep->prev = nullptr ;
@@ -120,6 +126,7 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	            c = ++op->ic ;
 	            op->cc += sl ;
 	        } /* end if (memory-allocation) */
+	    } /* end block */
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -134,7 +141,7 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 	            fifostr_ent	*ep = op->head ;
 	            sl = ep->slen ;
 	            if (rbuf) {
-	                cchar	*sp = (cchar *) ep ;
+	                cchar	*sp = reinterpret_cast<charp>(ep) ;
 	                sp += sizeof(fifostr_ent) ;
 	                rs = snwcpy(rbuf,rlen,sp,sl) ;
 	            }
@@ -172,7 +179,7 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
 	                if (ep) {
 	                    sl = ep->slen ;
 	                    if (rbuf) {
-	                        cchar	*sp = (cchar *) ep ;
+	                	cchar	*sp = reinterpret_cast<charp>(ep) ;
 	                        sp += sizeof(fifostr_ent) ;
 	                        rs = snwcpy(rbuf,rlen,sp,sl) ;
 			    } else {
@@ -217,7 +224,7 @@ int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
 	            fifostr_ent	*ep = op->head ;
 	            sl = ep->slen ;
 	            if (rbuf) {
-	                cchar	*sp = (cchar *) ep ;
+	                cchar	*sp = reinterpret_cast<charp>(ep) ;
 	                sp += sizeof(fifostr_ent) ;
 	                rs = snwcpy(rbuf,rlen,sp,sl) ;
 	            }
@@ -271,11 +278,11 @@ int fifostr_enum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	            }
 	        } /* end if */
 	        if (rs >= 0) {
-	            cchar	*sp = nullptr ;
 	            if (curp != nullptr) curp->current = ep ;
 	            if (ep != nullptr) {
 	                sl = ep->slen ;
 	                if (rbuf != nullptr) {
+	                    cchar	*sp = reinterpret_cast<charp>(ep) ;
 	                    sp = (cchar *) ep ;
 	                    sp += sizeof(fifostr_ent) ;
 	                    rs = snwcpy(rbuf,rlen,sp,sl) ;
@@ -337,7 +344,7 @@ int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
 int fifostr_count(fifostr *op) noex {
 	int		rs ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-		rs = op->ic ;
+	    rs = op->ic ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -349,9 +356,9 @@ int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 	int		rs ;
 	if (cmpfunc == nullptr) cmpfunc = cmpdefault ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-	        fifostr_cur	cur ;
+	        fifostr_cur	cur{} ;
 	        if ((rs = fifostr_curbegin(op,&cur)) >= 0) {
-	            cchar	*rp ;
+	            cchar	*rp{} ;
 	            while ((rs = fifostr_enum(op,&cur,&rp)) >= 0) {
 	                if ((*cmpfunc)(s,rp) == 0) break ;
 	            } /* end while */

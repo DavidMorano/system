@@ -45,16 +45,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
 #include	<varnames.hh>
 #include	<uinfo.h>
 #include	<sncpyx.h>
+#include	<snwcpy.h>
+#include	<rmx.h>			/* <- for |rmchr(3uc)| */
 #include	<localmisc.h>
 
 
@@ -68,6 +65,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -98,6 +98,9 @@ static constexpr nodeinfo_f	nodes[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getnodename(char *nbuf,int nlen) noex {
@@ -115,7 +118,7 @@ int getnodename(char *nbuf,int nlen) noex {
 
 nodeinfo::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs == 0) && nodes[i] ; i += 1) {
+	for (int i = 0 ; (rs == SR_OK) && nodes[i] ; i += 1) {
 	    nodeinfo_f	m = nodes[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
@@ -144,7 +147,8 @@ int nodeinfo::uinfo() noex {
 	uinfo_names	uin ;
 	int		rs ;
 	if ((rs = uinfo_name(&uin)) >= 0) {
-	    rs = sncpy1(nbuf,nlen,uin.nodename) ;
+	    cint	nl = rmchr(uin.nodename,-1,'.') ;
+	    rs = snwcpy(nbuf,nlen,uin.nodename,nl) ;
 	} /* end if (uinfo_name) */
 	return rs ;
 }

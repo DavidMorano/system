@@ -163,6 +163,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
+#include	<stdfnames.h>
+#include	<matstr.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -257,6 +259,9 @@ constexpr void ischarinfo::mkishex() noex {
 /* local variables */
 
 static constexpr ischarinfo	ischarx_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -403,6 +408,11 @@ bool ismmclass_binary(int ch) noex {
 	return f ;
 }
 /* end subroutine (ismmclass_binary) */
+
+bool isfnamespecial(cchar *fp,int fl) noex {
+	return (matstr(stdfnames,fp,fl) >= 0) ;
+}
+/* end subroutine (isfnamespecial) */
 
 bool iscmdstart(int ch) noex {
 	bool		f = false ;
