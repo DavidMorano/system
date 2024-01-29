@@ -43,7 +43,7 @@
 
 	Returns:
 	>=0	length of returned string in user buffer
-	<0	error
+	<0	error (system-return)
 
 
 	Name:
@@ -64,16 +64,13 @@
 
 	Returns:
 	>=0	length of returned string in user buffer
-	<0	error
+	<0	error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstdlib>
+#include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<varnames.hh>
@@ -85,6 +82,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typenames */
 
 
 /* external subroutines */
@@ -99,6 +102,9 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -116,10 +122,10 @@ int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
 	    cchar	*vn = varname.pwd ;
 	    pwbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
-		cchar	*pwd ;
+		static cchar	*pwd = getenv(vn) ;
 	        if (pwlen < 0) pwlen = rs ;
 		rs = SR_NOENT ;
-	        if ((pwd = getenv(vn)) != nullptr) {
+	        if (pwd != nullptr) {
 	            USTAT	*ssbp, sb1, sb2 ;
 	            if ((rs1 = u_stat(pwd,&sb1)) >= 0) {
 		        ssbp = (sbp) ? sbp : &sb2 ;
