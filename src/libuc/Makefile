@@ -876,13 +876,10 @@ calstrs.o:		calstrs.c calstrs.h
 
 sigevent.o:		sigevent.c sigevent.h
 
-timeval.o:		timeval.c timeval.h
-
-timespec.o:		timespec.c timespec.h
-
-itimerspec.o:		itimerspec.c itimerspec.h
-
-timeout.o:		timeout.c timeout.h
+timeval.o:		timeval.cc timeval.h
+timespec.o:		timespec.cc timespec.h
+itimerspec.o:		itimerspec.cc itimerspec.h
+timeout.o:		timeout.cc timeout.h
 
 upt.o:			upt.cc upt.h
 

@@ -1,5 +1,5 @@
-/* hexval */
-/* lang=C20 */
+/* digval SUPPORT */
+/* lang=C++20 */
 
 /* get the value of a single hexadecimal digit */
 /* version %I% last-modified %G% */
@@ -32,13 +32,12 @@
 	ch		character to evaluate
 
 	Outputs:
-	<0		error
 	>=0		value of symbolic hexadecimal digit
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -67,5 +66,14 @@ int hexval(int ch) noex {
 	return v ;
 }
 /* end subroutine (hexval) */
+
+int decval(int ch) noex {
+	int		v = SR_DOM ;
+	if ((ch >= '0') && (ch <= '9')) {
+	    v = (ch - '0') ;
+	}
+	return v ;
+}
+/* end subroutine (decval) */
 
 

@@ -49,13 +49,11 @@
 	programroot/fname
 
 	if (programroot != PWD) {
-
 		etc/name/name.fname
 		etc/name/fname
 		etc/name.fname
 		name.fname
 		fname
-
 	}
 
 	%p/%e/%n/%n.%f
@@ -90,8 +88,6 @@
 
 
 /* local defines */
-
-#define	KBUF(c)	(keybuf[0] = (c),keybuf[1] = '\0',keybuf)
 
 
 /* local namespaces */
@@ -169,7 +165,7 @@ static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 	    nullptr_t	np{} ;
 	    auto	vf = vecstr_finder ;
 	    auto	vs = vstrkeycmp ;
-	    char	keybuf[2] ;
+	    char	kb[2] = {} ;
 	    for (cchar *fp = fmt ; *fp && (rs >= 0) ; fp += 1) {
 	        if (*fp == '%') {
 	            fp += 1 ;
@@ -177,7 +173,8 @@ static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
 	            if (*fp == '%') {
 	                rs = sbuf_char(&b,'%') ;
 	            } else {
-	                if (cc *cp{} ; (rs = vf(nsp,KBUF(*fp),vs,&cp)) >= 0) {
+			kb[0] = *fp ;
+	                if (cc *cp{} ; (rs = vf(nsp,kb,vs,&cp)) >= 0) {
 	                    if (cc *tp ; (tp = strchr(cp,'=')) != np) {
 	                        rs = sbuf_strw(&b,(tp + 1),-1) ;
 	                    } /* end if (it had a value) */

@@ -2,6 +2,7 @@
 /* lang=C20 */
 
 /* time-value object methods */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998,2014 David A­D­ Morano.  All rights reserved. */
@@ -10,16 +11,10 @@
 #define	TIMEVAL_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<time.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
-
-
-#ifndef	TIMEVAL
-#define	TIMEVAL		struct timeval
-#endif
 
 
 EXTERNC_begin

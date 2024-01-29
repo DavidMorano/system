@@ -36,6 +36,10 @@
 #define	TIMEOUT		struct timeout_entry
 
 
+EXTERNC_begin
+typedef int (*timeout_met)(void *,uint,int) noex ;
+EXTERNC_end
+
 enum timeoutcmds {
 	timeoutcmd_set,
 	timeoutcmd_cancel,
@@ -43,22 +47,19 @@ enum timeoutcmds {
 } ;
 
 struct timeout_entry {
-	void		*objp ;
-	void		*metp ;
+	timeout_met	metf ;		/* nmethod function (C-linkage) */
+	void		*objp ;		/* object pointer */
 	time_t		val ;
 	uint		tag ;
 	int		arg ;
-	int		id ; /* created by the system */
+	int		id ;		/* created by the system */
 } ;
 
 typedef TIMEOUT		timeout ;
 
 EXTERNC_begin
-
-typedef int (*timeout_met)(void *,uint,int) noex ;
 extern int timeout_load(timeout *,time_t,void *,timeout_met,uint,int) noex ;
 extern int uc_timeout(int,timeout *) noex ;
-
 EXTERNC_end
 
 

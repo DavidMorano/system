@@ -1,10 +1,8 @@
-/* itimerspec */
-/* lang=C99 */
+/* itimerspec SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® ITIMERSPEC object initialization */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,55 +16,44 @@
 
 /*******************************************************************************
 
+	Name:
+	itimerspec_load
+
+	Description:
 	These subroutines manipulate ITIMERSPEC objects.
 
 	Synopsis:
-
-	int itimerspec_load(ITIMERSPEC *tsp,time_t sec,long nsec)
+	int itimerspec_load(ITIMERSPEC *tsp,time_t sec,long nsec) noex
 
 	Arguments:
-
 	tsp		pointer to ITIMERSPEC
 	sec		seconds
 	nsec		nanoseconds
 
 	Returns:
-
-	<0		error
 	>=0		OK
+	<0		error (system-return)
 
 	Comments:
-
 	typedef struct itimerspec {		
 		struct timespec	it_interval;	
 		struct timespec	it_value;	
 	} itimerspec_t ;
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<localmisc.h>
 
 #include	"itimerspec.h"
 
 
 /* local defines */
-
-#ifndef	INTBILLION
-#define	INTBILLION	1000000000
-#endif
-
-#ifndef	ITIMERSPEC
-#define	ITIMERSPEC	struct itimerspec
-#endif
 
 
 /* external subroutines */
@@ -83,17 +70,18 @@
 
 /* exported subroutines */
 
-
-int itimerspec_load(ITIMERSPEC *tsp,TIMESPEC *valp,TIMESPEC *intp)
-{
-	memset(tsp,0,sizeof(ITIMERSPEC)) ;
-	if (valp != NULL) {
-	    tsp->it_value = *valp ;
-	}
-	if (intp != NULL) {
-	    tsp->it_interval = *intp ;
-	}
-	return SR_OK ;
+int itimerspec_load(ITIMERSPEC *tsp,TIMESPEC *valp,TIMESPEC *intp) noex {
+	int		rs = SR_FAULT ;
+	if (tsp) {
+	    memclear(tsp) ;
+	    if (valp) {
+	        tsp->it_value = *valp ;
+	    }
+	    if (intp) {
+	        tsp->it_interval = *intp ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (itimerspec_load) */
 
