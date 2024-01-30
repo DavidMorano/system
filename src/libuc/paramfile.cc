@@ -391,7 +391,7 @@ int paramfile_fetch(PF *op,cchar *ks,PF_C *curp,char *vbuf,int vlen) noex {
 	        ke.key = ks ;
 	        if (curp == nullptr) {
 	            void	*vp{} ;
-	            vecobj_vcmp	vcf = vecobj_vcmp(vcmpentry) ;
+	            vecobj_vcf	vcf = vecobj_vcf(vcmpentry) ;
 	            rs = vecobj_search(slp,&ke,vcf,&vp) ;
 	            pep = entp(vp) ;
 	        } else {

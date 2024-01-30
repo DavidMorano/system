@@ -77,23 +77,23 @@ typedef struct vecobj_cursor	vecobj_cur ;
 
 EXTERNC_begin
 
-typedef int (*vecobj_vcmp)(cvoid **,cvoid **) noex ;
+typedef int (*vecobj_vcf)(cvoid **,cvoid **) noex ;
 
 extern int vecobj_start(vecobj *,int,int,int) noex ;
 extern int vecobj_add(vecobj *,cvoid *) noex ;
 extern int vecobj_adduniq(vecobj *,cvoid *) noex ;
-extern int vecobj_inorder(vecobj *,cvoid *,vecobj_vcmp,int) noex ;
+extern int vecobj_inorder(vecobj *,cvoid *,vecobj_vcf,int) noex ;
 extern int vecobj_del(vecobj *,int) noex ;
 extern int vecobj_delall(vecobj *) noex ;
 extern int vecobj_count(vecobj *) noex ;
-extern int vecobj_sort(vecobj *,vecobj_vcmp) noex ;
+extern int vecobj_sort(vecobj *,vecobj_vcf) noex ;
 extern int vecobj_setsorted(vecobj *) noex ;
 extern int vecobj_find(vecobj *,cvoid *) noex ;
 extern int vecobj_curbegin(vecobj *,vecobj_cur *) noex ;
-extern int vecobj_fetch(vecobj *,cvoid *,vecobj_cur *,vecobj_vcmp,
+extern int vecobj_fetch(vecobj *,cvoid *,vecobj_cur *,vecobj_vcf,
 		void **) noex ;
 extern int vecobj_curend(vecobj *,vecobj_cur *) noex ;
-extern int vecobj_search(vecobj *,cvoid *,vecobj_vcmp,void **) noex ;
+extern int vecobj_search(vecobj *,cvoid *,vecobj_vcf,void **) noex ;
 extern int vecobj_get(vecobj *,int,void **) noex ;
 extern int vecobj_store(vecobj *,cvoid *,cvoid **) noex ;
 extern int vecobj_getvec(vecobj *,void ***) noex ;

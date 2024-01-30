@@ -880,7 +880,7 @@ static int hostinfo_addname(hostinfo *op,cchar *np,int nl,int af) noex {
 	    if (nl != 0) {
 	        HOSTINFO_N	ne{} ;
 	        vecobj		*nlp = &op->names ;
-	        vecobj_vcmp	vc = vmatname ;
+	        vecobj_vcf	vc = vmatname ;
 	        cint		nrs = SR_NOTFOUND ;
 	        ne.af = af ;
 	        ne.namelen = nl ;

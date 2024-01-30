@@ -57,7 +57,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int vecobj_hsort(vecobj *op,vecobj_vcmp cmpfunc) noex {
+int vecobj_hsort(vecobj *op,vecobj_vcf cmpfunc) noex {
 	int		rs = SR_FAULT ;
 	if (op && cmpfunc) {
 	    rs = SR_NOTOPEN ;

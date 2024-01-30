@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} TMTIME_ZNAMESIZE "
+NAMES="${NAMES} vecobj_vcmp "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/TMTIME_ZNAMESIZE/s//TMTIME_ZNAMELEN/g
+g/vecobj_vcmp/s//vecobj_vcf/g
 	w
 	q
 EOF

@@ -61,7 +61,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int vecobj_stringsort(vecobj *op,vecobj_vcmp vcmp) noex {
+int vecobj_stringsort(vecobj *op,vecobj_vcf vcmp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vcmp) {
 	    rs = SR_NOTOPEN ;
