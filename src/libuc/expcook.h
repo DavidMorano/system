@@ -1,4 +1,4 @@
-/* expcook */
+/* expcook HEADER */
 /* lang=C20 */
 
 /* Expand-Cookie - creates the substitution variables for cookie escapes */
@@ -38,8 +38,8 @@ struct expcook_cursor {
 } ;
 
 struct expcook_head {
-	uint		magic ;
 	hdbstr		*hlp ;
+	uint		magic ;
 } ;
 
 typedef EXPCOOK		expcook ;
