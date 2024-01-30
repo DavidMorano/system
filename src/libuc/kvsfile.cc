@@ -48,17 +48,19 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<mallocxx.h>
 #include	<getpwd.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<char.h>
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
+#include	<sfx.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"kvsfile.h"
@@ -178,8 +180,9 @@ static int kvsfile_magic(kvsfile *op,Args ... args) noex {
 static int	kvsfile_filefins(kvsfile *) noex ;
 static int	kvsfile_keyfins(kvsfile *) noex ;
 static int	kvsfile_fh(kvsfile *,dev_t,uino_t) noex ;
-static int	kvsfile_fileparse(kvsfile *,int) noex ;
-static int	kvsfile_fileparser(kvsfile *,int,bfile *) noex ;
+static int	kvsfile_fparse(kvsfile *,int) noex ;
+static int	kvsfile_fparser(kvsfile *,int,bfile *) noex ;
+static int	kvsfile_fparsel(kvsfile *,int,cc *,int) noex ;
 static int	kvsfile_getkeyp(kvsfile *,cchar *,kf_key **) noex ;
 static int	kvsfile_filedump(kvsfile *,int) noex ;
 static int	kvsfile_addentry(kvsfile *,kf_ent *) noex ;
@@ -343,7 +346,7 @@ int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	                if ((rs = vecobj_search(flp,&fe,vcf,nullptr)) == nrs) {
 	                    if ((rs = vecobj_add(&op->files,&fe)) >= 0) {
 	                        fi = rs ;
-	                        rs = kvsfile_fileparse(op,fi) ;
+	                        rs = kvsfile_fparse(op,fi) ;
 	                        if (rs < 0) {
 	                            vecobj_del(&op->files,fi) ;
 				}
@@ -363,161 +366,118 @@ int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 }
 /* end subroutine (kvsfile_fileadd) */
 
-int kvsfile_curbegin(kvsfile *op,KVSFILE_CUR *curp) noex {
+int kvsfile_curbegin(kvsfile *op,kf_cur *curp) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != KVSFILE_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	rs = hdb_curbegin(&op->entries,&curp->ec) ;
-
+	if ((rs = kvsfile_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	    rs = hdb_curbegin(&op->entries,&curp->ec) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (kvsfile_curbegin) */
 
-int kvsfile_curend(kvsfile *op,KVSFILE_CUR *curp) noex {
+int kvsfile_curend(kvsfile *op,kf_cur *curp) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != KVSFILE_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	rs = hdb_curend(&op->entries,&curp->ec) ;
-
+	if ((rs = kvsfile_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	    rs = hdb_curend(&op->entries,&curp->ec) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (kvsfile_curend) */
 
-int kvsfile_curenumkey(kvsfile *op,KVSFILE_CUR *curp,char *kbuf,int klen) noex {
-	int		rs = SR_OK ;
-	int		oi ;
+int kvsfile_curenumkey(kvsfile *op,kf_cur *curp,char *kbuf,int klen) noex {
+	int		rs ;
 	int		kl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != KVSFILE_MAGIC) return SR_NOTOPEN ;
-
-	oi = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-
-	void	*vp{} ;
-	forever {
-	    rs = vecobj_get(&op->keys,oi,&vp) ;
-	    if (rs < 0) break ;
-	    if (vp) break ;
-	    oi += 1 ;
-	} /* end forever */
-	if ((rs >= 0) && vp) {
-	    kf_key	*kep = static_cast<keyp>(vp) ;
-	    rs = sncpy1(kbuf,klen,kep->kname) ;
-	    kl = rs ;
-	    curp->i = oi ;
-	}
-
+	if ((rs = kvsfile_magic(op,curp,kbuf)) >= 0) {
+	    int		oi = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    void	*vp{} ;
+	    forever {
+	        rs = vecobj_get(&op->keys,oi,&vp) ;
+	        if (rs < 0) break ;
+	        if (vp) break ;
+	        oi += 1 ;
+	    } /* end forever */
+	    if ((rs >= 0) && vp) {
+	        kf_key	*kep = static_cast<keyp>(vp) ;
+	        rs = sncpy1(kbuf,klen,kep->kname) ;
+	        kl = rs ;
+	        curp->i = oi ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (kvsfile_curenumkey) */
 
-int kvsfile_curenum(kvsfile *op,KVSFILE_CUR *curp,
+int kvsfile_curenum(kvsfile *op,kf_cur *curp,
 		char *kbuf,int klen,char *vbuf,int vlen) noex {
-	hdb_datum	key ;
-	hdb_datum	val ;
-	hdb_cur		cur ;
 	int		rs ;
-	int		vl ;
 	int		kl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != KVSFILE_MAGIC) return SR_NOTOPEN ;
-
-	cur = curp->ec ;
-	if ((rs = hdb_enum(&op->entries,&cur,&key,&val)) >= 0) {
-	    kf_ent	*ep ;
-	    cchar	*kp = (cchar *) key.buf ;
-	    cchar	*vp ;
-	    kl = key.len ;
-	    rs = snwcpy(kbuf,klen,kp,kl) ;
-	    if ((rs >= 0) && (vbuf != nullptr)) {
-	        ep = (kf_ent *) val.buf ;
-	        vp = ep->vname ;
-	        vl = ep->vlen ;
-	        rs = snwcpy(vbuf,vlen,vp,vl) ;
-	    } /* end if (wanted the value also) */
-	    if (rs >= 0) {
-	        curp->ec = cur ;
-	    }
-	} /* end if (had an entry) */
-
+	if ((rs = kvsfile_magic(op,curp,kbuf)) >= 0) {
+	    hdb_datum	key ;
+	    hdb_datum	val ;
+	    hdb_cur	cur = curp->ec ;
+	    int		vl ;
+	    if ((rs = hdb_enum(&op->entries,&cur,&key,&val)) >= 0) {
+	        cchar	*kp = (cchar *) key.buf ;
+	        cchar	*vp ;
+	        kl = key.len ;
+	        rs = snwcpy(kbuf,klen,kp,kl) ;
+	        if ((rs >= 0) && (vbuf != nullptr)) {
+	            kf_ent	*ep = (kf_ent *) val.buf ;
+	            vp = ep->vname ;
+	            vl = ep->vlen ;
+	            rs = snwcpy(vbuf,vlen,vp,vl) ;
+	        } /* end if (wanted the value also) */
+	        if (rs >= 0) {
+	            curp->ec = cur ;
+	        }
+	    } /* end if (had an entry) */
+	} /* end if (magic) */
 	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (kvsfile_curenum) */
 
 int kvsfile_fetch(kf *op,cc *kbuf,kf_cur *curp,char *vbuf,int vlen) noex {
-	kf_ent	*ep ;
-	hdb_datum	key ;
-	hdb_datum	val{} ;
-	hdb_cur		cur ;
 	int		rs ;
-	int		kl ;
 	int		vl = 0 ;
-	cchar		*kp, *vp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (kbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != KVSFILE_MAGIC) return SR_NOTOPEN ;
-
-	kp = (cchar *) kbuf ;
-	if (kbuf[0] == '\0') kp = "default" ;
-
-	kl = strlen(kp) ;
-
-	key.buf = kp ;
-	key.len = kl ;
-	cur = curp->ec ;
-	if ((rs = hdb_fetch(&op->entries,key,&cur,&val)) >= 0) {
-	    ep = (kf_ent *) val.buf ;
-	    vp = ep->vname ;
-	    vl = ep->vlen ;
-	    if (vbuf) {
-	        rs = snwcpy(vbuf,vlen,vp,vl) ;
-	    }
-	    if (rs >= 0) {
-	        curp->ec = cur ;
-	    }
-	} /* end if (had an entry) */
-
+	if ((rs = kvsfile_magic(op,curp,kbuf)) >= 0) {
+	    hdb_datum	key ;
+	    hdb_datum	val{} ;
+	    hdb_cur	cur = curp->ec ;
+	    int		kl ;
+	    cchar	*kp = (cchar *) kbuf ;
+	    cchar	*vp ;
+	    if (kbuf[0] == '\0') kp = "default" ;
+	    kl = strlen(kp) ;
+	    key.buf = kp ;
+	    key.len = kl ;
+	    if ((rs = hdb_fetch(&op->entries,key,&cur,&val)) >= 0) {
+	        kf_ent	*ep = (kf_ent *) val.buf ;
+	        vp = ep->vname ;
+	        vl = ep->vlen ;
+	        if (vbuf) {
+	            rs = snwcpy(vbuf,vlen,vp,vl) ;
+	        }
+	        if (rs >= 0) {
+	            curp->ec = cur ;
+	        }
+	    } /* end if (had an entry) */
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (kvsfile_fetch) */
 
-int kvsfile_check(kvsfile *op,time_t daytime) noex {
-	int		rs = SR_OK ;
+int kvsfile_check(kvsfile *op,time_t dt) noex {
+	int		rs ;
 	int		f = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != KVSFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (daytime == 0) daytime = time(nullptr) ;
-
-/* should we even check? */
-
-	if ((daytime - op->ti_check) > KVSFILE_CHECKTIME) {
-	    f = true ;
-	    rs = kvsfile_checkfiles(op,daytime) ;
-	}
-
+	if ((rs = kvsfile_magic(op)) >= 0) {
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((dt - op->ti_check) > KVSFILE_CHECKTIME) {
+	        f = true ;
+	        rs = kvsfile_checkfiles(op,dt) ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (kvsfile_check) */
@@ -557,7 +517,7 @@ static int kvsfile_filefins(kvsfile *op) noex {
 }
 /* end subroutine (kvsfile_filefins) */
 
-static int kvsfile_checkfiles(kvsfile *op,time_t daytime) noex {
+static int kvsfile_checkfiles(kvsfile *op,time_t dt) noex {
 	vecobj		*flp = &op->files ;
 	USTAT		sb ;
 	int		rs = SR_OK ;
@@ -565,20 +525,20 @@ static int kvsfile_checkfiles(kvsfile *op,time_t daytime) noex {
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(flp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
-	    kf_file	*fep = static_cast<filep>(vp) ;
-	    if ((u_stat(fep->fname,&sb) >= 0) && (sb.st_mtime > fep->mtime)) {
-
-	        kvsfile_filedump(op,i) ;
-
-	        rs = kvsfile_fileparse(op,i) ;
-	        if (rs >= 0) {
-	            c_changed += 1 ;
-		}
-	    } /* end if */
+	        kf_file	*fep = static_cast<filep>(vp) ;
+		bool	f = true ;
+	        f = f && (u_stat(fep->fname,&sb) >= 0) ;
+		f = f && (sb.st_mtime > fep->mtime) ;
+		if (f) {
+	            kvsfile_filedump(op,i) ;
+	            if ((rs = kvsfile_fparse(op,i)) >= 0) {
+	                c_changed += 1 ;
+		    }
+	        } /* end if */
 	    } /* end if */
 	    if (rs < 0) break ;
 	} /* end for */
-	op->ti_check = daytime ;
+	op->ti_check = dt ;
 	return (rs >= 0) ? c_changed : rs ;
 }
 /* end subroutine (kvsfile_checkfiles) */
@@ -597,14 +557,15 @@ static int kvsfile_fh(kvsfile *op,dev_t dev,uino_t ino) noex {
 }
 /* end subroutine (kvsfile_fh) */
 
-static int kvsfile_fileparse(kvsfile *op,int fi) noex {
+static int kvsfile_fparse(kvsfile *op,int fi) noex {
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
 	void		*vp{} ;
 	if ((rs = vecobj_get(&op->files,fi,&vp)) >= 0) {
 	    if (vp) {
-		kf_file	*fep = static_cast<filep>(vp) ;
-	        bfile		kvsfile, *lfp = &kvsfile ;
+		kf_file		*fep = static_cast<filep>(vp) ;
+	        bfile		kfile, *lfp = &kfile ;
 	        if ((rs = bopen(lfp,fep->fname,"r",0664)) >= 0) {
 	            USTAT	sb ;
 	            if ((rs = bstat(lfp,&sb)) >= 0) {
@@ -618,7 +579,7 @@ static int kvsfile_fileparse(kvsfile *op,int fi) noex {
 	                            fep->ino = ino ;
 	                            fep->mtime = sb.st_mtime ;
 	                            fep->size = sb.st_size ;
-	                            rs = kvsfile_fileparser(op,fi,lfp) ;
+	                            rs = kvsfile_fparser(op,fi,lfp) ;
 	                            c = rs ;
 	                            if (rs < 0) {
 	                                kvsfile_filedump(op,fi) ;
@@ -629,7 +590,8 @@ static int kvsfile_fileparse(kvsfile *op,int fi) noex {
 	                    rs = SR_ISDIR ;
 			}
 	            } /* end if (bstat) */
-	            bclose(lfp) ;
+	            rs1 = bclose(lfp) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (file) */
 	    } else {
 	        rs = SR_NOTFOUND ;
@@ -637,50 +599,45 @@ static int kvsfile_fileparse(kvsfile *op,int fi) noex {
 	} /* end if (vec-get) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (kvsfile_fileparse) */
+/* end subroutine (kvsfile_fparse) */
 
-static int kvsfile_fileparser(kvsfile *op,int fi,bfile *lfp) noex {
-	kf_key	*kep = nullptr ;
-	kf_ent	ve ;
-	FIELD		fsb ;
-	cint	llen = LINEBUFLEN ;
-	int		rs = SR_OK ;
-	int		c_field ;
-	int		ki, len ;
-	int		fl, cl ;
-	int		c_added = 0 ;
+static int kvsfile_fparser(kvsfile *op,int fi,bfile *lfp) noex {
+	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	int		f_eol ;
-	cchar	*fp ;
-	cchar	*cp ;
-	char		lbuf[LINEBUFLEN + 1] ;
-	char		keybuf[KEYBUFLEN + 1] ;
+	char		*lbuf{} ;
+	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    while ((rs = breadln(lfp,lbuf,llen)) > 0) {
+		cchar	*lp{} ;
+		if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {
+		    rs = kvsfile_fparsel(op,fi,lp,ll) ;
+		    c += rs ;
+		}
+		if (rs < 0) break ;
+	    } /* end while (reading lines) */
+	    rs1 = uc_free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (kvsfile_fparser) */
 
-	keybuf[0] = '\0' ;
-
-/* loop, reading all records and figuring things out */
-
-	while ((rs = breadln(lfp,lbuf,llen)) > 0) {
-	    len = rs ;
-
-	    f_eol = (lbuf[len - 1] == '\n') ;
-	    if (f_eol) len -= 1 ;
-	    lbuf[len] = '\0' ;
-
-	    cp = lbuf ;
-	    cl = len ;
-	    while (CHAR_ISWHITE(*cp)) {
-	        cp += 1 ;
-	        cl -= 1 ;
-	    }
-
-	    if ((*cp == '\0') || (*cp == '#'))
-	        continue ;
-
-	    c_field = 0 ;
-	    if ((rs = field_start(&fsb,cp,cl)) >= 0) {
-
-	        while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
+static int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
+	field		fsb ;
+	int		rs ;
+	int		rs1 ;
+	int		c_added = 0 ;
+	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
+	    kf_key	*kep = nullptr ;
+	    kf_ent	ve ;
+	    int		ki ;
+	    int		fl ;
+	    int		c_field = 0 ;
+	    int		c = 0 ;
+	    cchar	*fp{} ;
+	    char	keybuf[KEYBUFLEN + 1] = {} ;
+	    while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
 
 	            if ((c_field++ == 0) && (fsb.term == ':')) {
 
@@ -720,21 +677,17 @@ static int kvsfile_fileparser(kvsfile *op,int fi,bfile *lfp) noex {
 
 	            if (fsb.term == '#') break ;
 	            if (rs < 0) break ;
-	        } /* end while (fields) */
-
-	        field_finish(&fsb) ;
-	    } /* end if (field) */
-
-	    if (rs < 0) break ;
-	} /* end while (reading lines) */
-
+	    } /* end while (fields) */
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (field) */
 	return (rs >= 0) ? c_added : rs ;
 }
-/* end subroutine (kvsfile_fileparser) */
+/* end subroutine (kvsfile_fparsel) */
 
 static int kvsfile_getkeyp(kvsfile *op,cchar *kbuf,kf_key **kpp) noex {
-	kf_key	ke ;
-	kf_key	*kep = nullptr ;
+	kf_key		ke ;
+	kf_key		*kep = nullptr ;
 	int		rs ;
 	int		ki = 0 ;
 	if ((rs = key_start(&ke,kbuf)) >= 0) {
@@ -752,7 +705,7 @@ static int kvsfile_getkeyp(kvsfile *op,cchar *kbuf,kf_key **kpp) noex {
 			kep = static_cast<keyp>(vp) ;
 		    }
 	        } /* end if */
-	    } else {
+	    } else if (rs >= 0) {
 		kep = static_cast<keyp>(vp) ;
 	        ki = rs ;
 	    }
@@ -793,8 +746,8 @@ static int kvsfile_already(kvsfile *op,kf_ent *nep) noex {
 /* end subroutine (kvsfile_already) */
 
 static int kvsfile_addentry(kvsfile *op,kf_ent *nep) noex {
-	kf_key	*kep ;
-	kf_ent	*ep ;
+	kf_key		*kep ;
+	kf_ent		*ep{} ;
 	cint		esz = sizeof(kf_ent) ;
 	int		rs ;
 	if ((rs = uc_malloc(esz,&ep)) >= 0) {
@@ -825,10 +778,10 @@ static int kvsfile_addentry(kvsfile *op,kf_ent *nep) noex {
 	            hdb_curend(&op->keyvals,&cur) ;
 	        } /* end if (bad) */
 	    } /* end if (keyvals-store) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uc_free(ep) ;
+	    }
 	} /* end if (memory-allocation) */
-
 	return rs ;
 }
 /* end subroutine (kvsfile_addentry) */
@@ -840,50 +793,40 @@ static int kvsfile_filedump(kvsfile *op,int fi) noex {
 	hdb_datum	val{} ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = hdb_curbegin(&op->keyvals,&cur)) >= 0) {
-
 	    while (hdb_enum(&op->keyvals,&cur,&key,&val) >= 0) {
 	        ep = (kf_ent *) val.buf ;
-
 	        if ((ep->fi == fi) || (fi < 0)) {
 	            hdb_delcur(&op->keyvals,&cur,0) ;
 	        } /* end if (found matching entry) */
-
 	    } /* end while (looping through entries) */
-
 	    rs1 = hdb_curend(&op->keyvals,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
-
 /* delete all entries w/ this kf_file */
-
 	if (rs >= 0) {
 	    if ((rs = hdb_curbegin(&op->entries,&cur)) >= 0) {
-
 	        while (hdb_enum(&op->entries,&cur,&key,&val) >= 0) {
 	            ep = (kf_ent *) val.buf ;
-
 	            if ((ep->fi == fi) || (fi < 0)) {
-
-	                rs1 = hdb_delcur(&op->entries,&cur,0) ;
-	                if (rs >= 0) rs = rs1 ;
-
-	                rs1 = entry_finish(ep) ;
-	                if (rs >= 0) rs = rs1 ;
-
-	                rs1 = uc_free(ep) ;
-	                if (rs >= 0) rs = rs1 ;
-
+			{
+	                    rs1 = hdb_delcur(&op->entries,&cur,0) ;
+	                    if (rs >= 0) rs = rs1 ;
+			}
+			{
+	                    rs1 = entry_finish(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+			}
+			{
+	                    rs1 = uc_free(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+			}
 	            } /* end if (found matching entry) */
-
 	        } /* end while (looping through entries) */
-
 	        rs1 = hdb_curend(&op->entries,&cur) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 	} /* end if (ok) */
-
 	return rs ;
 }
 /* end subroutine (kvsfile_filedump) */
@@ -907,59 +850,58 @@ static int kvsfile_filedel(kvsfile *op,int fi) noex {
 
 static int file_start(kf_file *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-	memset(fep,0,sizeof(kf_file)) ;
-	cchar		*cp ;
-	rs = uc_mallocstrw(fname,-1,&cp) ;
-	if (rs >= 0) fep->fname = cp ;
-
+	if (fname) {
+	    memclear(fep) ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        fep->fname = cp ;
+	    } /* end if (m-a) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_start) */
 
 static int file_finish(kf_file *fep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (fep == nullptr) return SR_FAULT ;
-
-	if (fep->fname != nullptr) {
-	    rs1 = uc_free(fep->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    fep->fname = nullptr ;
-	}
-
+	if (fep) {
+	    rs = SR_OK ;
+	    if (fep->fname) {
+	        rs1 = uc_free(fep->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        fep->fname = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (file_finish) */
 
 static int key_start(kf_key *kep,cchar *kname) noex {
-	int		rs = SR_OK ;
-
-	memset(kep,0,sizeof(kf_key)) ;
-
-	if (kname != nullptr) {
-	    cint	klen = KEYBUFLEN ;
-	    cchar	*cp ;
-	    rs = uc_mallocstrw(kname,klen,&cp) ;
-	    if (rs >= 0) kep->kname = cp ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (kep) {
+	    rs = memclear(kep) ;
+	    if (kname) {
+	        cint	klen = KEYBUFLEN ;
+	        if (cchar *cp{} ; (rs = uc_mallocstrw(kname,klen,&cp)) >= 0) {
+	            kep->kname = cp ;
+	        }
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (key_start) */
 
 static int key_finish(kf_key *kep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (kep->kname != nullptr) {
-	    rs1 = uc_free(kep->kname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    kep->kname = nullptr ;
-	}
-
-	kep->count = 0 ;
+	if (kep) {
+	    rs = SR_OK ;
+	    if (kep->kname) {
+	        rs1 = uc_free(kep->kname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        kep->kname = nullptr ;
+	    }
+	    kep->count = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (key_finish) */
@@ -986,20 +928,19 @@ static int key_decrement(kf_key *kep) noex {
 /* end subroutine (key_decrement) */
 
 static int entry_start(kf_ent *ep,int fi,int ki,
-	kf_key *kep,cchar *vp,int vl) noex {
-	int		rs ;
-	cchar		*cp ;
-
-	memset(ep,0,sizeof(kf_ent)) ;
-	ep->fi = fi ;
-	ep->ki = ki ;
-	ep->kep = kep ;
-	ep->vlen = vl ;
-	if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
-	    ep->vname = cp ;
-	    key_increment(kep) ;
-	}
-
+		kf_key *kep,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
+	if (ep && kep && vp) {
+	    memclear(ep) ;
+	    ep->fi = fi ;
+	    ep->ki = ki ;
+	    ep->kep = kep ;
+	    ep->vlen = vl ;
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
+	        ep->vname = cp ;
+	        key_increment(kep) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
