@@ -37,23 +37,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<ctime>
+#include	<algorithm>		/* <- for |min(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<mallocxx.h>
 #include	<getpwd.h>
 #include	<bfile.h>
-#include	<field.h>
 #include	<vecobj.h>
 #include	<hdb.h>
+#include	<field.h>
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
@@ -77,14 +76,6 @@
 #define	KVSFILE_KEY		struct kvsfile_key
 #define	KVSFILE_ENT		struct kvsfile_ent
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN		MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN		2048
-#endif
-#endif
-
 #ifdef	KVSFILE_KEYLEN
 #define	KEYBUFLEN		KVSFILE_KEYLEN
 #else
@@ -95,6 +86,7 @@
 /* local namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -638,43 +630,29 @@ static int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
 	    cchar	*fp{} ;
 	    char	keybuf[KEYBUFLEN + 1] = {} ;
 	    while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
-
 	            if ((c_field++ == 0) && (fsb.term == ':')) {
-
 	                c = 0 ;
-	                strwcpy(keybuf,fp,MIN(fl,KEYBUFLEN)) ;
-
+	                strwcpy(keybuf,fp,min(fl,KEYBUFLEN)) ;
 	            } else if ((fl > 0) && (keybuf[0] != '\0')) {
-
 /* enter key into string table (if first time) */
-
 	                if (c++ == 0) {
 	                    rs = kvsfile_getkeyp(op,keybuf,&kep) ;
 	                    ki = rs ;
 	                } /* end if (entering key) */
-
 	                if ((rs >= 0) && (kep != nullptr)) {
-	                    int	f = true ;
-
+	                    bool	f = true ;
 	                    if ((rs = entry_start(&ve,fi,ki,kep,fp,fl)) >= 0) {
 	                        cint	nrs = SR_NOTFOUND ;
-
 	                        if ((rs = kvsfile_already(op,&ve)) == nrs) {
-
 	                            if ((rs = kvsfile_addentry(op,&ve)) >= 0) {
 	                                f = false ;
 	                                c_added += 1 ;
 	                            }
-
 	                        } /* end if (new entry) */
-
 	                        if (f) entry_finish(&ve) ;
 	                    } /* end if (entry initialized) */
-
 	                } /* end if */
-
 	            } /* end if (handling record) */
-
 	            if (fsb.term == '#') break ;
 	            if (rs < 0) break ;
 	    } /* end while (fields) */

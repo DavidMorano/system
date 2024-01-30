@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		length of retrieved nodename
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
