@@ -1,11 +1,10 @@
-/* tmstrs */
+/* tmstrs SUPPORT */
+/* lang=C++20 */
 
 /* TM structure strings processing */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */	
 #define	CF_THREEYEAR	1		/* use RFC2822 3-digit years */
-
 
 /* revision history:
 
@@ -18,40 +17,37 @@
 
 /*******************************************************************************
 
-        These subroutines provide support for converting various date strings to
-        their TM-structure equivalents.
+	These subroutines provide support for converting various
+	date strings to their TM-structure equivalents.
 
 	Note on year calculations for MSG-type year strings:
 
-        RFC2822 says that all three digit years should be interpreted as being
-        added to 2000 to get the actual year. This would seem to be an
-        unfortunate choice since the only way that three digit years were ever
-        used was due to buggy software from the Y2K problem (the year 2000 was
-        represented as 100 in some time-date software). Therefore a better
-        interpretation of three digit years would have been to add it to 1900 in
-        order to get the actual year, but who are we, just dumb software
-        designers that make the world work! See the compile-time switch
-        CF_THREEYEAR for our options on this.
+	RFC2822 says that all three digit years should be interpreted
+	as being added to 2000 to get the actual year. This would
+	seem to be an unfortunate choice since the only way that
+	three digit years were ever used was due to buggy software
+	from the Y2K problem (the year 2000 was represented as 100
+	in some time-date software). Therefore a better interpretation
+	of three digit years would have been to add it to 1900 in
+	order to get the actual year, but who are we, just dumb
+	software designers that make the world work! See the
+	compile-time switch CF_THREEYEAR for our options on this.
 
-        Also, RFC2822 says that two digit years less than (whatever) about 50
-        should be interpreted as being added to 2000 to get the actual year,
-        while two digit years greater than about that should be added to 1900 to
-        get the actual year. Prior practice in UNIX® was to use the year 69 or
-        70 for this purpose. Better compatibility is probably achieved using 69,
-        but we go with 70 for avant-gauard reasons!
-
+	Also, RFC2822 says that two digit years less than (whatever)
+	about 50 should be interpreted as being added to 2000 to
+	get the actual year, while two digit years greater than
+	about that should be added to 1900 to get the actual year.
+	Prior practice in UNIX® was to use the year 69 or 70 for
+	this purpose. Better compatibility is probably achieved
+	using 69, but we go with 70 for avant-gauard reasons!
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
+#include	<cfdec.h>
 #include	<localmisc.h>
 
 
@@ -74,10 +70,18 @@
 #define	TOLOWER(c)		((c) | 0x20)
 #endif
 
+#ifndef	CF_THREEYEAR
+#define	CF_THREEYEAR	1		/* use RFC2822 3-digit years */
+#endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
-
-extern int	cfdeci(const char *,int,int *) ;
 
 
 /* local structures */
@@ -88,17 +92,17 @@ extern int	cfdeci(const char *,int,int *) ;
 
 /* local variables */
 
+constexpr bool		f_threeyear = CF_THREEYEAR ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-/* day-of-week */
-int tmstrsday(cchar *sp,int sl)
-{
+int tmstrsday(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
-
 	if (sl < 0) sl = strlen(sp) ;
-
 	if ((sl >= 1) && (sl <= 9)) {
 	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	    case TWOCHARS('S', 'u'):
@@ -127,18 +131,13 @@ int tmstrsday(cchar *sp,int sl)
 	        break ;
 	    } /* end switch */
 	} /* end if (possible) */
-
 	return rs ;
 }
 /* end subroutine (tmstrsday) */
 
-
-int tmstrsmonth(cchar *sp,int sl)
-{
+int tmstrsmonth(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
-
 	if (sl < 0) sl = strlen(sp) ;
-
 	if (sl >= 3) {
 	    switch (TWOCHARS(TOUPPER(sp[0]),TOLOWER(sp[1]))) {
 	    case TWOCHARS('J', 'a'):
@@ -176,20 +175,15 @@ int tmstrsmonth(cchar *sp,int sl)
 	        break ;
 	    } /* end switch */
 	} /* end if (possible) */
-
 	return rs ;
 }
 /* end subroutine (tmstrsmonth) */
 
-
 /* calclate the year based on the number of digits given */
-int tmstrsyear(cchar *sp,int sl)
-{
+int tmstrsyear(cchar *sp,int sl) noex {
 	int		rs = SR_INVALID ;
 	int		year = 0 ;
-
 	if (sl < 0) sl = strlen(sp) ;
-
 	if ((sl >= 1) && (sl <= 5)) {
 	    if ((rs = cfdeci(sp,sl,&year)) >= 0) {
 	        switch (sl) {
@@ -200,12 +194,11 @@ int tmstrsyear(cchar *sp,int sl)
 	            if (year < 70) year += 100 ;
 	            break ;
 	        case 3:
-#if	CF_THREEYEAR
-	            year += 100 ;
-#else
-	            if (year < 70)
+		    if constexpr (f_threeyear) {
 	                year += 100 ;
-#endif
+		    } else {
+	                if (year < 70) year += 100 ;
+		    }
 	            break ;
 	        case 4:
 	        case 5:
@@ -214,11 +207,6 @@ int tmstrsyear(cchar *sp,int sl)
 	        } /* end switch */
 	    } /* end if (cfdec) */
 	} /* end if (possible) */
-
-#if	CF_DEBUGS
-	debugprintf("tmz/tmstrsyear: ret rs=%d year=%d\n",rs,year) ;
-#endif
-
 	return (rs >= 0) ? year : rs ;
 }
 /* end subroutine (tmstrsyear) */

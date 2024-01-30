@@ -272,14 +272,14 @@ int dirlist_add(dirlist *op,cchar *sp,int sl) noex {
 /* now see if it is already in the list by NAME */
 	            e.np = pbuf ;
 	            e.nl = pl ;
-	            vecobj_vcmp	vcf = vecobj_vcmp(vcmpname) ;
+	            vecobj_vcf	vcf = vecobj_vcf(vcmpname) ;
 	            void	*vp{} ;
 	            if ((rs = vecobj_search(op->dbp,&e,vcf,&vp)) == rsn) {
 	                USTAT	sb ;
 /* now see if it is already in the list by DEV-INO */
 	                if ((rs = u_stat(pbuf,&sb)) >= 0) {
 	                    if (S_ISDIR(sb.st_mode)) {
-	                        vecobj_vcmp	vcf = vecobj_vcmp(vcmpdevino) ;
+	                        vecobj_vcf	vcf = vecobj_vcf(vcmpdevino) ;
 				auto		vs = vecobj_search ;
 	                        e.dev = sb.st_dev ;
 	                        e.ino = sb.st_ino ;

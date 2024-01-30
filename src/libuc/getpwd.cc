@@ -43,7 +43,7 @@
 
 	Returns:
 	>=0	length of returned string in user buffer
-	<0	error
+	<0	error (system-return)
 
 
 	Name:
@@ -64,27 +64,30 @@
 
 	Returns:
 	>=0	length of returned string in user buffer
-	<0	error
+	<0	error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstdlib>
+#include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<varnames.hh>
 #include	<bufsizevar.hh>
 #include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<isnot.h>
 
 #include	"getpwd.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typenames */
 
 
 /* external subroutines */
@@ -101,6 +104,9 @@
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getpwd(char *pwbuf,int pwlen) noex {
@@ -110,18 +116,17 @@ int getpwd(char *pwbuf,int pwlen) noex {
 
 int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		pl = 0 ;
 	if (pwbuf) {
 	    cchar	*vn = varname.pwd ;
 	    pwbuf[0] = '\0' ;
 	    if ((rs = maxpathlen) >= 0) {
-		cchar	*pwd ;
+		static cchar	*pwd = getenv(vn) ;
 	        if (pwlen < 0) pwlen = rs ;
 		rs = SR_NOENT ;
-	        if ((pwd = getenv(vn)) != nullptr) {
+	        if (pwd != nullptr) {
 	            USTAT	*ssbp, sb1, sb2 ;
-	            if ((rs1 = u_stat(pwd,&sb1)) >= 0) {
+	            if ((rs = u_stat(pwd,&sb1)) >= 0) {
 		        ssbp = (sbp) ? sbp : &sb2 ;
 	                if ((rs = u_stat(".",ssbp)) >= 0) {
 			    bool	f = true ;
@@ -133,9 +138,11 @@ int getpwds(USTAT *sbp,char *pwbuf,int pwlen) noex {
 			        pl = rs ;
 		            }
 	                } /* end if (stat) */
+		    } else if (isNotPresent(rs)) {
+			rs = SR_OK ;
 	            } /* end if (stat) */
 	        } /* end if (quickie) */
-	        if (rs == SR_NOENT) {
+	        if ((rs == SR_NOENT) || (pl == 0)) {
 	            if ((rs = uc_getcwd(pwbuf,pwlen)) >= 0) {
 	                pl = rs ;
 	                if (sbp) {

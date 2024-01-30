@@ -35,16 +35,12 @@
 #define HDB_ENT		struct hdb_entry
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-typedef unsigned int	(*hdbhash_f)(cvoid *,int) noex ;
+typedef uint		(*hdbhash_f)(cvoid *,int) noex ;
 typedef int		(*hdbcmp_f)(cvoid *,cvoid *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 struct hdb_datum {
 	cvoid		*buf ;

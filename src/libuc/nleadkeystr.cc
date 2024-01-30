@@ -1,5 +1,5 @@
-/* nleadkeystr */
-/* lang=C20 */
+/* nleadkeystr SUPPORT */
+/* lang=C++20 */
 
 /* match on the leading part of a string */
 /* version %I% last-modified %G% */
@@ -35,15 +35,16 @@
 
 	Returns:
 	>=0		match found and it matched up to this length
-	<0		no match
+	<0		no match (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
-#include	<localmisc.h>
+#include	<climits>		/* <- for |INT_MAX| */
+#include	<cstring>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 #include	"nleadkeystr.h"
 
@@ -66,7 +67,7 @@
 /* exported subroutines */
 
 int nleadkeystr(cchar *bs,cchar *sp,int sl) noex {
-	int		i ;
+	int		i{} ;
 	if (sl < 0) sl = INT_MAX ;
 	for (i = 0 ; (i < sl) && bs[i] && sp[i] ; i += 1) {
 	    if (bs[i] != sp[i]) break ;

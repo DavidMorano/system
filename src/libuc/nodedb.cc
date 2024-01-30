@@ -470,7 +470,7 @@ static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = file_start(&fe,fname)) >= 0) {
 	    vecobj	*flp = op->filep ;
-	    vecobj_vcmp	vcf = vecobj_vcmp(vcmpfname) ;
+	    vecobj_vcf	vcf = vecobj_vcf(vcmpfname) ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if ((rs = vecobj_search(flp,&fe,vcf,nullptr)) == rsn) {
 	        if ((rs = vecobj_add(flp,&fe)) >= 0) {

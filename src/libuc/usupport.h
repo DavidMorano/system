@@ -35,7 +35,7 @@
 #ifndef	SUBROUTINE_MEMCLEAR
 #define	SUBROUTINE_MEMCLEAR
 EXTERNC_begin
-int memclear(void *,size_t) noex ;
+extern int memclear(void *,size_t) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_MEMCLEAR */
 
@@ -73,7 +73,7 @@ typedef int	projid_t ;
 #ifndef	SUBROUTINE_GETPROJID
 #define	SUBROUTINE_GETPROJID
 EXTERNC_begin
-    extern projid_t getprojid() noex ;
+extern projid_t getprojid() noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_GETPROJID */
 

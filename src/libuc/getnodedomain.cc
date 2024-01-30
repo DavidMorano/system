@@ -398,12 +398,12 @@ static int try_inituname(TRY *tip) noex {
 
 static int try_initnode(TRY *tip) noex {
 	int		rs = SR_OK ;
-	cchar		*cp ;
 	if (! tip->f.initnode) {
 	    tip->f.initnode = true ;
 	    if ((rs = maxnodelen) >= 0) {
 	        int	sl = -1 ;
 	        cchar	*sp = nullptr ;
+	        cchar	*cp ;
 	        if ((rs >= 0) && (sp == nullptr)) {
 	            if (! tip->f.initvarnode) {
 		        rs = try_initvarnode(tip) ;
@@ -445,9 +445,8 @@ static int try_vardomain(TRY *tip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (val != nullptr) {
-	    int		cl ;
 	    cchar	*cp{} ;
-	    if ((cl = sfshrink(val,-1,&cp)) > 0) {
+	    if (int cl ; (cl = sfshrink(val,-1,&cp)) > 0) {
 		cint	dlen = tip->dlen ;
 	        rs = snwcpy(tip->domainname,dlen,cp,cl) ;
 		len = rs ;
@@ -506,6 +505,7 @@ static int try_varnode(TRY *tip) noex {
 
 static int try_uname(TRY *tip) noex {
 	int		rs = SR_OK ;
+	int		len = 0 ;
 	if (! tip->f.inituname) {
 	    rs = try_inituname(tip) ;
 	}
@@ -516,10 +516,11 @@ static int try_uname(TRY *tip) noex {
 	        if (cp[0] != '\0') {
 		    cint	dlen = tip->dlen ;
 	            rs = sncpy1(tip->domainname,dlen,cp) ;
+		    len = rs ;
 		}
 	    }
 	} /* end if */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (try_uname) */
 
@@ -536,10 +537,10 @@ static int try_gethost(TRY *tip) noex {
 	        HOSTENT	he, *hep = &he ;
 	        cint	hlen = rs ;
 	        cchar	*nn = tip->nodename ;
-	        cchar	*tp{} ;
 	        if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
 		    nullptr_t	np{} ;
 		    cint	dlen = tip->dlen ;
+	            cchar	*tp{} ;
 		    bool	f = true ;
 		    rs = 0 ;
 	            f = f && (hep->h_name != np) ;
@@ -586,13 +587,13 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 	char		*lbuf{} ;
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
 	    cint	llen = rs ;
-	    if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
+	    if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
 		cint	fd = rs ;
 		{
 		    rs = try_resolvefd(tip,lbuf,llen,fd) ;
 		    len = rs ;
 		}
-	        rs1 = u_close(fd) ;
+	        rs1 = uc_close(fd) ;
 		if (rs >= 0) rs = rs1 ;
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;

@@ -52,7 +52,7 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef vecobj_vcmp	c_f ;
+typedef vecobj_vcf	c_f ;
 
 extern "C" {
     typedef int (*qsort_f)(cvoid *,cvoid *) noex ;
@@ -238,7 +238,7 @@ int vecobj_addnew(vecobj *op,void **epp) noex {
 }
 /* end subroutine (vecobj_addnew) */
 
-int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcmp vcf,int cn) noex {
+int vecobj_inorder(vecobj *op,cvoid *cep,vecobj_vcf vcf,int cn) noex {
 	int		rs = SR_FAULT ;
 	int		ei = 0 ;
 	if (op && cep && vcf) {
@@ -444,7 +444,7 @@ int vecobj_count(vecobj *op) noex {
 }
 /* end subroutine (vecobj_count) */
 
-int vecobj_sort(vecobj *op,vecobj_vcmp vcf) noex {
+int vecobj_sort(vecobj *op,vecobj_vcf vcf) noex {
 	int		rs = SR_FAULT ;
 	if (op && vcf) {
 	    rs = SR_NOTOPEN ;
@@ -606,7 +606,7 @@ int vecobj_fetch(vecobj *op,void *ep,vecobj_cur *curp,c_f vcf,void *rp) noex {
 }
 /* end subroutine (vecobj_fetch) */
 
-int vecobj_search(vecobj *op,void *ep,vecobj_vcmp vcf,void *vrp) noex {
+int vecobj_search(vecobj *op,void *ep,vecobj_vcf vcf,void *vrp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (op && ep && vcf) {

@@ -19,25 +19,25 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
 #define	TMZ_MAGIC	0x26292511
-#define	TMZ		TMz_head
-#define	TMZ_FLAGS	TMz_flags
-#define	TMZ_ZNAMESIZE	8
+#define	TMZ		struct tmz_head
+#define	TMZ_FLAGS	struct tmz_flags
+#define	TMZ_ZNAMELEN	TZABBRLEN
 
 
-TMz_flags {
-	uint		zoff:1 ;		/* zone offset is present */
-	uint		year:1 ;		/* year is present */
+struct tmz_flags {
+	uint		zoff:1 ;	/* zone offset is present */
+	uint		year:1 ;	/* year is present */
 } ;
 
-TMz_head {
+struct tmz_head {
 	TM		st ;
 	TMZ_FLAGS	f ;
-	short		zoff ;			/* minutes west of GMT */
-	char		zname[TMZ_ZNAMESIZE] ;
+	short		zoff ;		/* minutes west of GMT */
+	char		zname[TMZ_ZNAMELEN] ;
 } ;
 
 typedef TMZ		tmz ;
