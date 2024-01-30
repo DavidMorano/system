@@ -41,15 +41,17 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<strn.h>
 #include	<matkeystr.h>
-#include	<localmisc.h>
 
 #include	"getenver.h"
+
+
+/* local defines */
 
 
 /* external variables */
@@ -65,16 +67,14 @@ extern mainv	environ ;
 
 /* exported subroutines */
 
-cchar *getenver(cchar *np,int nl) noex {
+cchar *getenver(cchar *kp,int kl) noex {
 	cchar		*vp = nullptr ;
-	if (np != nullptr) {
-	    int		ei ;
-	    cchar	*tp ;
-	    if (nl < 0) nl = strlen(np) ;
-	    if ((tp = strnchr(np,nl,'=')) != nullptr) {
-		nl = (tp-np) ;
+	if (kp) {
+	    if (kl < 0) kl = strlen(kp) ;
+	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
+		kl = (tp-kp) ;
 	    }
-	    if ((ei = matkeystr(environ,np,nl)) >= 0) {
+	    if (int ei ; (ei = matkeystr(environ,kp,kl)) >= 0) {
 	        if ((vp = strchr(environ[ei],'=')) != nullptr) {
 	            vp += 1 ;
 		}

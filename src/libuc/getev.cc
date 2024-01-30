@@ -42,9 +42,10 @@
 
 #include	<envstandards.h>	/* first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<matkeystr.h>
-#include	<localmisc.h>
 
 #include	"getev.h"
 
