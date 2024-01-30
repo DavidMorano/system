@@ -26,7 +26,7 @@
 
 EXTERNC_begin
 
-extern int defproc(vecstr *dlp,cchar **envv,EXPCOOK *,cchar *) noex ;
+extern int defproc(vecstr *dlp,mainv envv,expcook *,cchar *) noex ;
 
 EXTERNC_end
 

@@ -19,21 +19,21 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<netdb.h>
+#include	<time.h>		/* <- for |time_t| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vecobj.h>
 #include	<hdb.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- REALNAMELEN */
 
 
 #define	KVSFILE			struct kvsfile_head
 #define	KVSFILE_CUR		struct kvsfile_cursor
 
 #define	KVSFILE_MAGIC		0x31415926
-#define	KVSFILE_KEYLEN		MAXHOSTNAMELEN
-#define	KVSFILE_DEFENTS	100
+#define	KVSFILE_KEYLEN		REALNAMELEN
+#define	KVSFILE_DEFENTS		100
 #define	KVSFILE_DEFFILES	10
 
 

@@ -1,5 +1,5 @@
 /* getev SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get an environment variable by name */
 /* version %I% last-modified %G% */
@@ -40,8 +40,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<matkeystr.h>
@@ -67,15 +66,15 @@
 
 /* exported subroutines */
 
-int getev(mainv envv,cchar *np,int nl,cchar **rpp) noex {
+int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		vl = 0 ;
 	cchar		*vp = nullptr ;
-	if (envv && np) {
+	if (envv && kp) {
 	    rs = SR_INVALID ;
-	    if (np[0]) {
-	        int	ei ;
-	        if ((ei = matkeystr(envv,np,nl)) >= 0) {
+	    if (kp[0]) {
+		rs = SR_OK ;
+	        if (int ei ; (ei = matkeystr(envv,kp,kl)) >= 0) {
 	            if ((vp = strchr(envv[ei],'=')) != nullptr) {
 	                vp += 1 ;
 	                vl = strlen(vp) ;

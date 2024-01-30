@@ -27,7 +27,7 @@
 	are deleted with a new definition is encountered.
 
 	Synopsis:
-	int defproc(vecstr *dlp,cchar **envv,EXPCOOK *clp,cchar *fname) noex
+	int defproc(vecstr *dlp,cchar **envv,expcook *clp,cchar *fname) noex
 
 	Arguments:
 	dlp		defines list pointer
@@ -37,7 +37,7 @@
 
 	Returns:
 	>=0		count of environment variables
-	<0		bad
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -53,9 +53,12 @@
 #include	<bfile.h>
 #include	<field.h>
 #include	<ascii.h>
-#include	<char.h>
 #include	<buffer.h>
 #include	<expcook.h>
+#include	<strn.h>
+#include	<sfx.h>
+#include	<snwcpy.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"defproc.h"
@@ -63,33 +66,27 @@
 
 /* local defines */
 
-#ifndef	FBUFLEN
-#define	FBUFLEN		(4 * MAXPATHLEN)
-#endif
-
 #define	ENVNAMELEN	100		/* should be sufficient? */
 
-#define	BUFLEN		(4 * MAXPATHLEN)
-
 #define	SUBINFO		struct subinfo
+#define	SI		struct subinfo
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	vstrkeycmp(cchar **,cchar **) ;
-extern int	vecstr_envadd(VECSTR *,cchar *,cchar *,int) ;
-extern int	isprintlatin(int) ;
-
-extern int	getev(cchar **,cchar *,int,cchar **) ;
-extern int	sfthing(cchar *,int,cchar *,cchar **) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern "C" {
+    extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
+    extern int	getev(mainv,cchar *,int,cchar **) noex ;
+    extern int	sfthing(cchar *,int,cchar *,cchar **) noex ;
+}
 
 
 /* external variables */
@@ -98,24 +95,24 @@ extern char	*strnpbrk(cchar *,int,cchar *) ;
 /* local structures */
 
 struct subinfo {
-	cchar		**envv ;
-	EXPCOOK		*clp ;
+	mainv		envv ;
+	expcook		*clp ;
 	vecstr		*dlp ;
 } ;
 
 
 /* forward references */
 
-static int	procline(SUBINFO *,cchar *,int) ;
-static int	checkdeps(SUBINFO *,cchar *,int) ;
-static int	procvalues(SUBINFO *,BUFFER *,cchar *,cchar *,int) ;
-static int	procvalue(SUBINFO *,BUFFER *,cchar *,cchar *,int) ;
-static int	procsubenv(SUBINFO *,BUFFER *,cchar *,int) ;
+static int	procline(SI *,cchar *,int) noex ;
+static int	checkdeps(SI *,cchar *,int) noex ;
+static int	procvalues(SI *,buffer *,cchar *,cchar *,int) noex ;
+static int	procvalue(SI *,buffer *,cchar *,cchar *,int) noex ;
+static int	procsubenv(SI *,buffer *,cchar *,int) noex ;
 
 
 /* local variables */
 
-static const uchar	fterms[32] = {
+static constexpr cchar	fterms[32] = {
 	0x00, 0x1A, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x04,
 	0x00, 0x00, 0x00, 0x00,
@@ -126,7 +123,7 @@ static const uchar	fterms[32] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-static const uchar	dterms[32] = {
+static constexpr cchar	dterms[32] = {
 	0x00, 0x02, 0x00, 0x00,
 	0x01, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -148,50 +145,44 @@ static cchar	ssp[] = {
 #endif /* COMMENT */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int defproc(vecstr *dlp,cchar **envv,EXPCOOK *clp,cchar *fname) noex {
-	SUBINFO		li, *lip = &li ;
-	bfile		loadfile, *lfp = &loadfile ;
-	int		rs ;
+int defproc(vecstr *dlp,mainv envv,expcook *clp,cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	lip->envv = envv ;
-	lip->clp = clp ;
-	lip->dlp = dlp ;
-
-	if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
-	    int		len ;
-	    int		cl ;
-	    cchar	*cp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-	    while ((rs = breadlns(lfp,lbuf,llen,-1,NULL)) > 0) {
-	        len = rs ;
-
-	        if (lbuf[len - 1] == '\n') len -= 1 ;
-	        lbuf[len] = '\0' ;
-
-	        cp = lbuf ;
-	        cl = len ;
-	        while (cl && CHAR_ISWHITE(*cp)) {
-	            cp += 1 ;
-	            cl -= 1 ;
-	        }
-
-	        if ((cp[0] == '\0') || (cp[0] == '#'))
-	            continue ;
-
-	        rs = procline(lip,cp,cl) ;
-		c += rs ;
-
-	        if (rs < 0) break ;
-	    } /* end while (reading lines) */
-
-	    bclose(lfp) ;
-	} /* end if (file) */
-
+	if (dlp && clp && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		SUBINFO	li, *lip = &li ;
+		char	*lbuf{} ;
+		lip->envv = envv ;
+		lip->clp = clp ;
+		lip->dlp = dlp ;
+		if ((rs = malloc_ml(&lbuf)) >= 0) {
+		    cint	llen = rs ;
+		    bfile	loadfile, *lfp = &loadfile ;
+		    if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
+			nullptr_t	np{} ;
+	    		while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
+			    cchar	*lp{} ;
+			    if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {
+	        		rs = procline(lip,lp,ll) ;
+				c += rs ;
+	        		if (rs < 0) break ;
+			    } /* end if (sfcontent) */
+	    		} /* end while (reading lines) */
+	    		rs1 = bclose(lfp) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (file) */
+		    rs1 = uc_free(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (defproc) */
@@ -199,29 +190,24 @@ int defproc(vecstr *dlp,cchar **envv,EXPCOOK *clp,cchar *fname) noex {
 
 /* local subroutines */
 
-
-static int procline(SUBINFO *lip,cchar *lbuf,int llen)
-{
+static int procline(SI *lip,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl = llen ;
 	int		cl ;
 	int		len = 0 ;
-	int		f_done = FALSE ;
-	cchar	*tp, *cp ;
-	cchar	*sp = lbuf ;
-	cchar	*enp ;
-
+	int		f_done = false ;
+	cchar		*tp ;
+	cchar		*cp ;
+	cchar		*sp = lbuf ;
+	cchar		*enp ;
 	while (sl && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-
 /* extract any dependencies (if we have any) */
-
 	tp = strnpbrk(sp,sl," \t?+=#") ;
-
-	if ((tp != NULL) && (*tp == '?')) {
+	if ((tp != nullptr) && (*tp == '?')) {
 	    if ((rs1 = checkdeps(lip,sp,(tp - sp))) > 0) {
 	        sl -= ((tp + 1) - sp) ;
 	        sp = (tp + 1) ;
@@ -231,187 +217,143 @@ static int procline(SUBINFO *lip,cchar *lbuf,int llen)
 	        }
 	        tp = strnpbrk(sp,sl," \t+=#") ;
 	    } else {
-		f_done = TRUE ;
+		f_done = true ;
 	    }
 	} /* end if (getting dependencies) */
-
 	if (! f_done) {
-
-	cl = 0 ;
-	if ((tp != NULL) && ((*tp == '=') || CHAR_ISWHITE(*tp))) {
-
-	    cl = sfshrink(sp,(tp - sp),&cp) ;
-
-	    sl -= ((tp + 1) - sp) ;
-	    sp = (tp + 1) ;
-
-	} /* end if (delimiter) */
-
-	if (cl > 0) {
-	    const int	nrs = SR_NOTFOUND ;
-	    if ((rs = vecstr_findn(lip->dlp,cp,cl)) == nrs) {
-	        BUFFER	b ;
-	        char	envname[ENVNAMELEN + 1] ;
-
-	        enp = envname ;
-	        snwcpy(envname,ENVNAMELEN,cp,cl) ;
-
-/* loop processing the values */
-
-	        if ((sl >= 0) && ((rs = buffer_start(&b,sl)) >= 0)) {
-
-	            if ((rs = procvalues(lip,&b,ssb,sp,sl)) >= 0) {
-	                if ((cl = buffer_get(&b,&cp)) > 0) {
-	                    rs = vecstr_envadd(lip->dlp,enp,cp,cl) ;
+	    cl = 0 ;
+	    if ((tp != nullptr) && ((*tp == '=') || CHAR_ISWHITE(*tp))) {
+	        cl = sfshrink(sp,(tp - sp),&cp) ;
+	        sl -= ((tp + 1) - sp) ;
+	        sp = (tp + 1) ;
+	    } /* end if (delimiter) */
+	    if (cl > 0) {
+	        cint	nrs = SR_NOTFOUND ;
+	        if ((rs = vecstr_findn(lip->dlp,cp,cl)) == nrs) {
+	            buffer	b ;
+	            char	envname[ENVNAMELEN + 1] ;
+	            enp = envname ;
+	            snwcpy(envname,ENVNAMELEN,cp,cl) ;
+	            if ((sl >= 0) && ((rs = buffer_start(&b,sl)) >= 0)) {
+	                if ((rs = procvalues(lip,&b,ssb,sp,sl)) >= 0) {
+	                    if ((cl = buffer_get(&b,&cp)) > 0) {
+	                        rs = vecstr_envadd(lip->dlp,enp,cp,cl) ;
+	                    }
 	                }
-	            }
-
-	            len = buffer_finish(&b) ;
-	            if (rs >= 0) rs = len ;
-	        } /* end if (buffer) */
-	    } /* end if (not-already-present) */
-	} /* end if (non-zero) */
-
+	                len = buffer_finish(&b) ;
+	                if (rs >= 0) rs = len ;
+	            } /* end if (buffer) */
+	        } /* end if (not-already-present) */
+	    } /* end if (non-zero) */
 	} /* end if (not-done) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (procline) */
 
-
-static int checkdeps(SUBINFO *lip,cchar *sp,int sl)
-{
-	FIELD		fsb ;
+static int checkdeps(SI *lip,cchar *sp,int sl) noex {
+	field		fsb ;
 	int		rs ;
 	int		rs1 = 0 ;
-
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
-	    cchar	*fp ;
-
+	    cchar	*fp{} ;
 	    while ((fl = field_get(&fsb,dterms,&fp)) >= 0) {
 	        if (fl > 0) {
-	            rs1 = getev(lip->envv,fp,fl,NULL) ;
+	            rs1 = getev(lip->envv,fp,fl,nullptr) ;
 		}
 	        if (rs1 < 0) break ;
 	    } /* end while */
-
-	    field_finish(&fsb) ;
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (field) */
-
 	return (rs >= 0) ? (rs1 >= 0) : rs ;
 }
 /* end subroutine (checkdeps) */
 
-
-/* process definition values */
-static int procvalues(SUBINFO *lip,BUFFER *bp,cchar *ss,cchar *sp,int sl)
-{
-	FIELD		fsb ;
+static int procvalues(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-
-	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	    const int	flen = FBUFLEN ;
-	    int		fl ;
-	    int		c = 0 ;
-	    cchar	*fp ;
-	    char	fbuf[FBUFLEN + 1] ;
-
-	    fp = fbuf ;
-	    while ((fl = field_sharg(&fsb,fterms,fbuf,flen)) >= 0) {
-	        if (fl > 0) {
-
-	            if (c++ > 0) {
-	                rs = buffer_char(bp,' ') ;
-	                len += rs ;
-	            }
-
-	            if (rs >= 0) {
-	                rs = procvalue(lip,bp,ss,fp,fl) ;
-	                len += rs ;
-	            }
-
-	        } /* end if (had a value) */
-	        if (fsb.term == '#') break ;
-	        if (rs < 0) break ;
-	    } /* end while (looping over values) */
-
-	    field_finish(&fsb) ;
-	} /* end if (fields) */
-
+	char		*fbuf{} ;
+	if ((rs = malloc_mp(&fbuf)) >= 0) {
+	    cint	flen = rs ;
+	    field	fsb ;
+	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
+	        int	fl ;
+	        int	c = 0 ;
+	        cchar	*fp = fbuf ;
+	        while ((fl = field_sharg(&fsb,fterms,fbuf,flen)) >= 0) {
+	            if (fl > 0) {
+	                if (c++ > 0) {
+	                    rs = buffer_char(bp,' ') ;
+	                    len += rs ;
+	                }
+	                if (rs >= 0) {
+	                    rs = procvalue(lip,bp,ss,fp,fl) ;
+	                    len += rs ;
+	                }
+	            } /* end if (had a value) */
+	            if (fsb.term == '#') break ;
+	            if (rs < 0) break ;
+	        } /* end while (looping over values) */
+	        rs1 = field_finish(&fsb) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (fields) */
+	    rs1 = uc_free(fbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (procvalues) */
 
-
-static int procvalue(SUBINFO *lip,BUFFER *bp,cchar *ss,cchar *sp,int sl)
-{
+static int procvalue(SI *lip,buffer *bp,cchar *ss,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		kl, cl ;
 	int		len = 0 ;
-	cchar	*kp, *cp ;
-
+	cchar		*kp, *cp ;
 	while ((kl = sfthing(sp,sl,ss,&kp)) >= 0) {
-
 	    cp = sp ;
 	    cl = ((kp - 2) - sp) ;
-
 	    if (cl > 0) {
 	        rs = buffer_strw(bp,cp,cl) ;
 	        len += rs ;
 	    }
-
 	    if ((rs >= 0) && (kl > 0)) {
 	        rs = procsubenv(lip,bp,kp,kl) ;
 	        len += rs ;
 	    }
-
 	    sl -= ((kp + kl + 1) - sp) ;
 	    sp = (kp + kl + 1) ;
-
 	    if (rs < 0) break ;
 	} /* end while */
-
 	if ((rs >= 0) && (sl > 0)) {
 	    rs = buffer_strw(bp,sp,sl) ;
 	    len += rs ;
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (procvalue) */
 
-
-static int procsubenv(SUBINFO *lip,BUFFER *bp,cchar *kp,int kl)
-{
+static int procsubenv(SI *lip,buffer *bp,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-
 	if (kl >= 0) {
 	    int		al = 0 ;
-	    int		cl ;
-	    cchar	*ap = NULL ;
-	    cchar	*tp, *cp ;
-
-	    if ((tp = strnchr(kp,kl,'=')) != NULL) {
+	    cchar	*ap = nullptr ;
+	    cchar	*cp{} ;
+	    if (cchar *tp ; (tp = strnchr(kp,kl,'=')) != nullptr) {
 	        ap = (tp + 1) ;
 	        al = (kp + kl) - (tp + 1) ;
 	        kl = (tp - kp) ;
 	    }
-
-/* lookup the environment key-name that we have */
-
-	    if ((cl = getev(lip->envv,kp,kl,&cp)) > 0) {
+	    if (int cl ; (cl = getev(lip->envv,kp,kl,&cp)) > 0) {
 	        rs = buffer_strw(bp,cp,cl) ;
 	        len += rs ;
 	    } else if (al > 0) {
 	        rs = buffer_strw(bp,ap,al) ;
 	        len += rs ;
 	    }
-
 	} /* end if (non-zero) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (procsubenv) */

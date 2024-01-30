@@ -17,13 +17,13 @@
 /*******************************************************************************
 
 	Name:
-	sfrchr
+	sfchr
 
 	Description:
 	Find a substring following a given search character.
 
 	Synopsis:
-	int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex
+	int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex
 
 	Arguments:
 	sp		string to search pointer
@@ -40,9 +40,9 @@
 	sfkeyval
 
 	Description:
-	This subroutine will search for key-value pairs in the
-	given string and return the value if a key is found and
-	matches the key given in the call.
+	This subroutine will search for key-value pairs in the given
+	string and return the value associate with the given key
+	specified in the call.
 
 	Synopsis:
 	int sfkeyval(cchar *spint sl,cchar *key,cchar **rpp) noex
