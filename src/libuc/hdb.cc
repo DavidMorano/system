@@ -120,7 +120,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
@@ -156,8 +155,10 @@
 
 /* local namespaces */
 
-using std::min ;
-using std::max ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -171,19 +172,25 @@ extern "C" {
     extern int	strnnlen(cchar *,int,int) noex ;
 }
 
+extern "C" {
+    int		hdb_delall(hdb *) noex ;
+    int		hdb_fetchrec(hdb *,DAT,CUR *,DAT *,DAT *) noex ;
+    int		hdb_enum(hdb *,CUR *,DAT *,DAT *) noex ;
+}
+
 
 /* local structures */
 
 #ifdef	COMMENT
 
 struct hdb_ke {
-	struct hdb_ke	*next ;		/* next in hash chain */
-	struct hdb_ve	*same ;		/* next w/ same key */
+	HDB_KE		*next ;		/* next in hash chain */
+	HDB_VE		*same ;		/* next w/ same key */
 	uint		hv ;		/* hash-value of key */
 } ;
 
 struct hdb_ve {
-	struct hdb_ve	*same ;		/* next w/ same key */
+	HDB_VE		*same ;		/* next w/ same key */
 	DAT		key ;
 	DAT		val ;
 } ;
@@ -210,23 +217,20 @@ struct entryinfo {
 
 /* forward references */
 
-static uint	defhashfun(cvoid *,int) noex ;
-
-int		hdb_delall(hdb *) noex ;
-int		hdb_fetchrec(hdb *,DAT,CUR *,DAT *,DAT *) noex ;
-int		hdb_enum(hdb *,CUR *,DAT *,DAT *) noex ;
-
 template<typename ... Args>
 static inline int hdb_ctor(hdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->htaddr = nullptr ;
 	    op->htlen = 0 ;
 	    op->count = 0 ;
 	    op->at = 0 ;
-	}
+	    if ((op->esp = new(nothrow) lookaside) != nullptr) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 
@@ -234,7 +238,11 @@ static inline int hdb_dtor(hdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	}
+	    if (op->esp) {
+		delete op->esp ;
+		op->esp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 
@@ -289,6 +297,8 @@ consteval DAT mkdatnull() noex {
 	return d ;
 }
 
+static uint	defhashfun(cvoid *,int) noex ;
+
 
 /* local variables */
 
@@ -309,7 +319,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	    op->at = at ;
 	    if (op->at > 0) {
 	        cint	lan = max((n/6),6) ;
-	        rs = lookaside_start(&op->es,esize,lan) ;
+	        rs = lookaside_start(op->esp,esize,lan) ;
 	    }
 	    if (rs >= 0) {
 		cint	tsize = (n * esize) ;
@@ -325,7 +335,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	            op->magic = HDB_MAGIC ;
 	        } /* end if (memory-allocation) */
 	        if (rs < 0) {
-	            if (op->at > 0) lookaside_finish(&op->es) ;
+	            if (op->at > 0) lookaside_finish(op->esp) ;
 	        }
 	    } /* end if (ok) */
 	    if (rs < 0) {
@@ -350,7 +360,7 @@ int hdb_finish(hdb *op) noex {
 	            op->htaddr = NULL ;
 		}
 	        if (op->at > 0) {
-	            rs1 = lookaside_finish(&op->es) ;
+	            rs1 = lookaside_finish(op->esp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    {
@@ -822,7 +832,7 @@ static int hdb_entnew(hdb *op,ENT **epp) noex {
 	    cint	esize = sizeof(ENT) ;
 	    rs = uc_malloc(esize,epp) ;
 	} else {
-	     rs = lookaside_get(&op->es,epp) ;
+	     rs = lookaside_get(op->esp,epp) ;
 	}
 	return rs ;
 }
@@ -833,7 +843,7 @@ static int hdb_entdel(hdb *op,ENT *ep) noex {
 	if (op->at == 0) {
 	    rs = uc_free(ep) ;
 	} else {
-	    rs = lookaside_release(&op->es,ep) ;
+	    rs = lookaside_release(op->esp,ep) ;
 	}
 	return rs ;
 }
