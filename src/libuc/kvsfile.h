@@ -29,7 +29,7 @@
 
 
 #define	KVSFILE			struct kvsfile_head
-#define	kvsfile_cur		struct kvsfile_c
+#define	KVSFILE_CUR		struct kvsfile_cursor
 
 #define	KVSFILE_MAGIC		0x31415926
 #define	KVSFILE_KEYLEN		MAXHOSTNAMELEN
@@ -37,7 +37,7 @@
 #define	KVSFILE_DEFFILES	10
 
 
-struct kvsfile_c {
+struct kvsfile_cursor {
 	hdb_cur		ec ;
 	int		i ;
 } ;
@@ -52,7 +52,7 @@ struct kvsfile_head {
 } ;
 
 typedef KVSFILE		kvsfile ;
-typedef kvsfile_cur	kvsfile_cur ;
+typedef KVSFILE_CUR	kvsfile_cur ;
 
 EXTERNC_begin
 
@@ -60,8 +60,8 @@ extern int kvsfile_open(kvsfile *,int,cchar *) noex ;
 extern int kvsfile_fileadd(kvsfile *,cchar *) noex ;
 extern int kvsfile_curbegin(kvsfile *,kvsfile_cur *) noex ;
 extern int kvsfile_curend(kvsfile *,kvsfile_cur *) noex ;
-extern int kvsfile_enumkey(kvsfile *,kvsfile_cur *,char *,int) noex ;
-extern int kvsfile_enum(kvsfile *,kvsfile_cur *,char *,int,char *,int) noex ;
+extern int kvsfile_curenumkey(kvsfile *,kvsfile_cur *,char *,int) noex ;
+extern int kvsfile_curenum(kvsfile *,kvsfile_cur *,char *,int,char *,int) noex ;
 extern int kvsfile_fetch(kvsfile *,cchar *,kvsfile_cur *,char *,int) noex ;
 extern int kvsfile_check(kvsfile *,time_t) noex ;
 extern int kvsfile_close(kvsfile *) noex ;
