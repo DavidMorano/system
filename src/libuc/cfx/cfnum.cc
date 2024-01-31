@@ -80,7 +80,7 @@ using std::unsigned_integral ;		/* concept */
 
 static int sfsign(bool *bp,cchar *sp,int sl,cchar **rpp) noex {
 	bool		fn = false ;
-	sl = strnlen(sp,sl) ;
+	if (sl < 0) sl = strlen(sp) ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
@@ -99,23 +99,13 @@ static int sfsign(bool *bp,cchar *sp,int sl,cchar **rpp) noex {
 
 /* subroutine-templates */
 
-template<integral T>
-int cfnumx(cchar *bp,int bl,T *rp) noex {
+template<unsigned_integral T>
+int cfnumx(cchar *sp,int sl,T *rp) noex {
 	int		rs = SR_DOM ;
-	bool		f_negative = false ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && isplusminus(*bp)) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
+	cchar		*bp{} ;
+	bool		fneg = false ;
+	if (int bl ; (bl = sfsign(&fneg,sp,sl,&bp)) > 0) {
 	    int		ch ;
-	    rs = SR_OK ;
 	    if (*bp == '\\') {
 	        bp += 1 ;
 	        bl -= 1 ;
@@ -175,8 +165,8 @@ int cfnumx(cchar *bp,int bl,T *rp) noex {
 	            rs = cfdec(bp,bl,rp) ;
 		}
 	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
+	    if (fneg) *rp = (- *rp) ;
+	} /* end if (sfsign) */
 	return rs ;
 }
 /* end subroutine-template (cfnumx) */
@@ -185,7 +175,7 @@ template<unsigned_integral UT,signed_integral T>
 int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*sp{} ;
-	bool		fneg ;
+	bool		fneg{} ;
 	if (int sl ; (sl = sfsign(&fneg,bp,bl,&sp)) > 0) {
 	    UT		uval{} ;
 	    if ((rs = cfnumx(sp,sl,&uval)) >= 0) {
