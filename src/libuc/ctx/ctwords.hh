@@ -1,7 +1,8 @@
-/* ctwords */
+/* ctwords HEADER */
 /* lang=C++11 */
 
-/* converted to Number Words */
+/* convert to Number Words */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,19 +15,20 @@
 /* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CTWORDS_INCLUDE
-#define	CTWORDS_INCLUDE	1
+#define	CTWORDS_INCLUDE
+#ifdef	__cplusplus
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<string>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
-#if	(! defined(CTWORDS_MASTER)) || (CTWORDS_MASTER == 0)
+extern int ctwords(std::string *,int) noex ;
 
-extern int ctwords(std::string *,int) ;
 
-#endif /* CTWORDS_MASTER */
-
+#endif /* __cplusplus */
 #endif /* CTWORDS_INCLUDE */
 
 

@@ -42,7 +42,7 @@ int cfcharsx(cchar *sp,int sl,int b,T *rp) noex {
 	if (sp && rp) {
 	    std::from_chars_result	r ;
 	    constexpr std::errc	ec_ok = errc() ;
-	    T		v ;
+	    T		v{} ;
 	    rs = SR_OK ;
 	    if (r = from_chars(sp,(sp+sl),v,b) ; (r.ec == ec_ok)) {
 		if (rp) {

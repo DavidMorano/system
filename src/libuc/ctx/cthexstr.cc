@@ -1,5 +1,5 @@
 /* cthexstr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to convert a value (as a counted string) to a HEX string */
 /* version %I% last-modified %G% */
@@ -11,7 +11,7 @@
 	This subroutine was originally written.
 
 	= 2017-08-15, David A­D­ Morano
-	Rewrote to use the SBUF object.
+	Rewrote to use the sbuf object.
 
 */
 
@@ -49,6 +49,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -79,7 +80,7 @@ int cthexstring(char *dbuf,int dlen,int f,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dbuf && sp) {
-	    SBUF	b ;
+	    sbuf	b ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = sbuf_start(&b,dbuf,dlen)) >= 0) {
 	        const uchar	*vp = (const uchar *) sp ;

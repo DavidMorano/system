@@ -1,6 +1,8 @@
-/* cfjulian */
+/* cfjulian SUPPORT */
+/* lang=C++20 */
 
 /* convert a digit string (possibly a Julian date) to its UNIX time value */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,16 +19,14 @@
 
 	This is ___ ?
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<cstring>
+#include	<ctime>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -36,12 +36,13 @@
 #define	CENTURY_BASE	19
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cfjulian(cchar *s,int slen,time_t *rp)
-{
-	struct tm	ts ;
+int cfjulian(cchar *s,int slen,time_t *rp) noex {
+	TM		ts ;
 	int		i ;
 	int		century, year, month, day, hour, min, sec ;
 	int		lr = slen ;

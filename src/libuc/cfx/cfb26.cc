@@ -26,6 +26,7 @@
 #include	<usystem.h>
 #include	<ucvariables.hh>
 #include	<stdintx.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -72,7 +73,7 @@ namespace {
 /* forward references */
 
 static int	icfb26(info *,cchar *,int) noex ;
-static int	isbad(int,int) noex ;
+static bool	isbad(bool,int) noex ;
 
 
 /* local variables */
@@ -170,102 +171,73 @@ int cfb26ull(cchar *sp,int sl,ulonglong *rp) noex {
 
 /* local subroutines */
 
-static int icfb26(info *ip,cchar *sp,int sl) noex {
-	ulonglong	val = 0 ;
-	ulonglong	weight = 1 ;
-	int		rs = SR_OK ;
-	int		ch ;
-	int		n ;
-	int		i{} ;
-	int		cb ;
-	int		f_cc ;
-
+static int icfb26(info *ip,cchar *asp,int asl) noex {
+	int		rs = SR_INVALID ;
+	cchar		*sp{} ;
 	ip->result = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
-
-/* remove white space from the rear of the string */
-
-	while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
-	    sl -= 1 ;
-	}
-
-	if (sl == 0)
-	    return SR_INVALID ;
-
-/* convert possible digits */
-
-	f_cc = CHAR_ISUC(sp[sl-1]) ;
-	cb = (f_cc) ? 'A' : 'a' ;
-
-	n = 0 ;
-	for (i = (sl - 1) ; (rs >= 0) && (i >= 0) ; i -= 1) {
-
-	    ch = sp[i] ;
-	    if ((ch == '-') || (ch == '+') || CHAR_ISWHITE(ch))
-	        break ;
-
-/* bad digits? */
-
-	    if (isbad(f_cc,ch)) {
-	        rs = SR_INVALID ;
-	    }
-
-	    if (rs >= 0) {
-
-		n += 1 ;
-	        if ((n > ip->maxdigs) && (ch != cb)) {
-	            rs = SR_OVERFLOW ;
-		}
-
-	        if (rs >= 0) {
-
-	            if (n == ip->maxdigs) {
-	                ulonglong	adder ;
-	                int		f_msb1, f_msb2, f_msbr ;
-
-	                adder = ((ch - cb) * weight) ;
-	                f_msb1 = (val & ip->imask) ? 1 : 0 ;
-	                f_msb2 = (adder & ip->imask) ? 1 : 0 ;
-	                val += adder ;
-	                f_msbr = (val & ip->imask) ? 1 : 0 ;
-
-			if (ip->st) {
-	                if (f_msb1 || f_msb2 || f_msbr)
-	                    rs = SR_OVERFLOW ;
-			} else {
-	                if ((f_msb1 && f_msb2) ||
-	                    ((f_msb1 || f_msb2) && (! f_msbr)))
-	                    rs = SR_OVERFLOW ;
-			}
-
-	            } else {
-	                val += ((ch - cb) * weight) ;
-		    }
-
-	            weight *= CFB26_WEIGHT ;
-
-	        } /* end if */
-
-	    } /* end if */
-
-	} /* end for */
-
-	if (rs >= 0) {
-	    while ((i > 0) && CHAR_ISWHITE(sp[i])) {
-	        i -= 1 ;
-	    }
-	    if ((i >= 0) && (sp[i] == '-')) {
-	        val = (- val) ;
-	    }
-	    ip->result = val ;
-	} /* end if */
-
+	if (int sl ; (sl = sfshrink(asp,asl,&sp)) > 0) {
+            ulonglong       val = 0 ;
+            ulonglong       weight = 1 ;
+            int             n = 0 ;
+            int		    cb ;
+            int             i{} ;
+            bool            f_cc = CHAR_ISUC(sp[sl-1]) ;
+    /* convert possible digits */
+            cb = (f_cc) ? 'A' : 'a' ;
+            for (i = (sl - 1) ; (rs >= 0) && (i >= 0) ; i -= 1) {
+                cint	ch = sp[i] ;
+                if ((ch == '-') || (ch == '+') || CHAR_ISWHITE(ch)) break ;
+    /* bad digits? */
+                if (isbad(f_cc,ch)) {
+                    rs = SR_INVALID ;
+                }
+                if (rs >= 0) {
+                    n += 1 ;
+                    if ((n > ip->maxdigs) && (ch != cb)) {
+                        rs = SR_OVERFLOW ;
+                    }
+                    if (rs >= 0) {
+			const ulonglong	im = ip->imask ;
+                        if (n == ip->maxdigs) {
+                            ulonglong       adder = ((ch - cb) * weight) ;
+                            bool	    f_msb1 = (val & im) ? 1 : 0 ;
+                            bool	    f_msb2 = (adder & im) ? 1 : 0 ;
+                            bool	    f_msbr ;
+                            val += adder ;
+                            f_msbr = (val & im) ;
+                            if (ip->st) {
+                                if (f_msb1 || f_msb2 || f_msbr) {
+                                    rs = SR_OVERFLOW ;
+			        }
+                            } else {
+				bool	f = false ;
+                                f = f || (f_msb1 && f_msb2) ;
+                                f = f || ((f_msb1 || f_msb2) && (! f_msbr)) ;
+                                if (f) rs = SR_OVERFLOW ;
+                            }
+                        } else {
+                            val += ((ch - cb) * weight) ;
+                        }
+                        weight *= CFB26_WEIGHT ;
+                    } /* end if */
+                } /* end if */
+            } /* end for */
+            if (rs >= 0) {
+                while ((i > 0) && CHAR_ISWHITE(sp[i])) {
+                    i -= 1 ;
+                }
+                if ((i >= 0) && (sp[i] == '-')) {
+                    val = (- val) ;
+                }
+                ip->result = val ;
+            } /* end if */
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (icfb26) */
 
-static int isbad(int f_cc,int ch) noex {
-	int		f ;
+static bool isbad(bool f_cc,int ch) noex {
+	bool		f ;
 	if (f_cc) {
 	    f = (ch < 'A') || (ch > 'Z') ;
 	} else {
