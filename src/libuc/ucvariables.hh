@@ -31,9 +31,9 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<varnames.hh>
+#include	<syswords.hh>
 #include	<valuelimits.hh>
 #include	<digbufsizes.hh>
-#include	<localmisc.h>
 
 
 extern const varnames		varname ;

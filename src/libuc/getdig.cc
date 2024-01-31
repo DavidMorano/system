@@ -39,13 +39,15 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ucvariables.hh>
-#include	<varnames.hh>
 #include	<localmisc.h>
 
 #include	"getdig.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
 
 
 /* local typedefs */

@@ -32,7 +32,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"ucvariables.hh"
 
@@ -64,6 +63,7 @@
 /* exported (global) variables */
 
 constinit const varnames	varname ;
+constinit const syswords	sysword ;
 constinit const valuelimits	valuelimit ;
 constinit const digbufsizes	digbufsize ;
 
