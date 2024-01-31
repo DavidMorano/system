@@ -1,5 +1,5 @@
 /* hash_elf SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* perform the hash done in processing ELF files */
 /* version %I% last-modified %G% */
@@ -45,18 +45,31 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<envstandards.h>	/* first to configure */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -67,7 +80,7 @@ uint hash_elf(cchar *sp,int sl) noex {
 	unsigned	v ;
 	if (sl < 0) sl = strlen(sp) ;
 	while (sl-- > 0) {
-	    v = (uchar) *sp++ ;
+	    v = uchar(*sp++) ;
 	    h <<= 4 ;
 	    h += v ;
 	    g = (h & 0xF0000000) ;

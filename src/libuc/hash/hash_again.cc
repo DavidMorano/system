@@ -1,10 +1,10 @@
 /* hash_again SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* create a hash from an exiting hash */
 /* version %I% last-modified %G% */
 
-#define	CF_RANDLC	1		/* use 'randlc(3dam)' */
+#define	CF_RANDLC	1		/* use |randlc(3dam)| */
 
 /* revision history:
 
@@ -37,9 +37,8 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -49,15 +48,34 @@
 
 #define	NROT	-5			/* rotation amount (in bits) */
 
+#ifndef	CF_RANDLC
+#define	CF_RANDLC	1
+#endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
-extern uint	urotate(uint,int) noex ;
-
-extern int	randlc(int) noex ;
+extern "C" {
+    extern uint	urotate(uint,int) noex ;
+    extern int	randlc(int) noex ;
+}
 
 
 /* forward references */
+
+
+/* local variables */
+
+constexpr bool		f_randlc = CF_RANDLC ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -65,13 +83,11 @@ extern int	randlc(int) noex ;
 uint hash_again(uint ohash,int c,int nskip) noex {
 	uint		nhash = ohash ;
 	if (c < nskip) {
-
-#if	CF_RANDLC
-	    nhash = randlc(ohash + c) ;
-#else
-	    nhash = urotate(ohash,NROT) + c ;
-#endif /* CF_RANDLC */
-
+	    if constexpr (f_randlc) {
+	        nhash = randlc(ohash + c) ;
+	    } else {
+	        nhash = urotate(ohash,NROT) + c ;
+	    }
 	    if (ohash == nhash) {
 		nhash = (ohash + 1) ;
 	    }

@@ -1,5 +1,5 @@
-/* hasMeAlone */
-/* lang=C20 */
+/* hasMeAlone SUPPORT */
+/* lang=C++20 */
 
 /* test whether a string has only certain chacters */
 /* version %I% last-modified %G% */
@@ -36,10 +36,12 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<cstring>		/* <- |strlen(3c)| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<mkchar.h>
 
 
 /* local defines */
@@ -64,9 +66,9 @@
 
 int hasMeAlone(cchar *sp,int sl) noex {
 	bool		f = false ;
-	if (sl < 0) strlen(sp) ;
+	if (sl < 0) sl = strlen(sp) ;
 	if (sl == 1) {
-	    const int	ch = MKCHAR(*sp) ;
+	    cint	ch = mkchar(*sp) ;
 	    switch (ch) {
 	    case '+':
 	    case '-':

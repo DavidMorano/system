@@ -1,5 +1,5 @@
-/* strdcpyopaque */
-/* lang=C20 */
+/* strdcpyopaque SUPPORT */
+/* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
 /* version %I% last-modified %G% */
@@ -44,11 +44,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"strdcpy.h"
 
@@ -61,13 +61,12 @@
 
 /* exported subroutines */
 
-char *strdcpyopaque(char *dp,int dl,const char *sp,int sl) noex {
-	int		ch ;
+char *strdcpyopaque(char *dp,int dl,cchar *sp,int sl) noex {
 	while (sl && *sp)  {
-	    ch = mkchar(*sp) ;
+	    cint	ch = mkchar(*sp) ;
 	    if (! CHAR_ISWHITE(ch)) {
 	        if (dl-- == 0) break ;
-	        *dp++ = (char) ch ;
+	        *dp++ = char(ch) ;
 	    } /* end if */
 	    sp += 1 ;
 	    sl -= 1 ;

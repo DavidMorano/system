@@ -18,7 +18,7 @@
 #define	STRDCPY_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strdcpyx.h>
@@ -29,7 +29,7 @@ EXTERNC_begin
 
 extern char	*strdcpycompact(char *,int,cc *,int) noex ;
 extern char	*strdcpyopaque(char *,int,cc *,int) noex ;
-extern char	*strdcpyclean(char *,int,cc *,int) noex ;
+extern char	*strdcpyclean(char *,int,int,cchar *,int) noex ;
 
 EXTERNC_end
 

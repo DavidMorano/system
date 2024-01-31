@@ -1,6 +1,6 @@
-# MAKEFILES (hash)
+# MAKEFILES (strdcpy)
 
-T= hash
+T= strdcpy
 
 ALL= $(T).o $(T).a
 
@@ -51,10 +51,19 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= hash.h
+INCS= strdcpy.h
 
 
-OBJ_HASH= hash_again.o hash_elf.o hash_hsieh.o
+OBJ0_DTRDCPY= strdcpyx.o strdcpyxw.o
+OBJ1_STRDCPY= strdcpyclean.o
+OBJ2_STRDCPY= strdcpycompact.o
+OBJ3_STRDCPY= strdcpyopaque.o
+
+
+OBJA_STRDCPY= obj0_strd.o obj1_strd.o
+OBJB_STRDCPY= obj2_strd.o obj3_strd.o
+
+OBJ_STRDCPY= $(OBJA_STRDCPY) $(OBJB_STRDCPY)
 
 
 default:		$(T).o
@@ -77,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_HASH)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_HASH)
+$(T).o:			$(OBJ_STRDCPY)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRDCPY)
 
-$(T).a:			$(OBJ_HASH)
+$(T).a:			$(OBJ_STRDCPY)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -101,8 +110,24 @@ control:
 	(uname -n ; date) > Control
 
 
-hash_again.o:		hash_again.cc $(INCS)
-hash_elf.o:		hash_elf.cc $(INCS)
-hash_hsieh.o:		hash_hsieh.cc $(INCS)
+obj0_strd.o:	$(OBJ0_DTRDCPY)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DTRDCPY)
+
+obj1_strd.o:	$(OBJ1_STRDCPY)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRDCPY)
+
+obj2_strd.o:	$(OBJ2_STRDCPY)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRDCPY)
+
+obj3_strd.o:	$(OBJ3_STRDCPY)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRDCPY)
+
+
+strdcpyx.o:		strdcpyx.cc strdcpyx.h $(INCS)
+strdcpyxw.o:		strdcpyxw.cc strdcpyxw.h $(INCS)
+
+strdcpyclean.o:		strdcpyclean.cc $(INCS)
+strdcpycompact.o:	strdcpycompact.cc $(INCS)
+strdcpyopaque.o:	strdcpyopaque.cc $(INCS)
 
 

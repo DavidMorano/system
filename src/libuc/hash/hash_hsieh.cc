@@ -4,8 +4,7 @@
 /* this is the "super-fast" hash function by Paul Hsieh (2004-2008) */
 /* version %I% last-modified %G% */
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
 #include	<stdint.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -25,7 +24,19 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
 /* local varaibles */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

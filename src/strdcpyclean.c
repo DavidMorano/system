@@ -1,5 +1,5 @@
-/* strdcpyclean */
-/* lang=C20 */
+/* strdcpyclean SUPPORT */
+/* lang=C++20 */
 
 /* copy a source string to a destination while cleaning it up */
 /* version %I% last-modified %G% */
@@ -44,19 +44,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
-#include	<usystem.h>
+#include	<cstring>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<ascii.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
+#include	<ischarx.h>
 
 #include	"strdcpy.h"
 
 
-/* external subroutines */
+/* local defines */
 
-extern int	isprintlatin(int) noex ;
+/* external subroutines */
 
 
 /* external variables */
@@ -73,11 +74,11 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	int		ch ;
 	int		dl = 0 ;
 	while (dlen-- && sl-- && *sp) {
-	    ch = MKCHAR(*sp) ;
+	    ch = mkchar(*sp) ;
 	    if (isour(ch)) {
-		dbuf[dl++] = (char) ch ;
+		dbuf[dl++] = char(ch) ;
 	    } else if (sch != 0) {
-		dbuf[dl++] = (char) sch ;
+		dbuf[dl++] = char(sch) ;
 	    }
 	    sp += 1 ;
 	} /* end while */
@@ -90,7 +91,7 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 /* local subroutines */
 
 static int isour(int ch) noex {
-	int		f = FALSE ;
+	int		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == CH_NL) ;
 	f = f || (ch == CH_BS) ;

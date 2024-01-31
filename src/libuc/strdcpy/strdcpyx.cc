@@ -1,5 +1,5 @@
-/* strdcpyx */
-/* lang=C20 */
+/* strdcpyx SUPPORT */
+/* lang=C++20 */
 
 /* concatenate strings */
 /* version %I% last-modified %G% */
@@ -11,17 +11,19 @@
 	This subroutine was originally written.
 
 	= 1999-12-03, David A­D­ Morano
-	This was updated to use |strlcpy(3c)| when it was rumored to be coming
-	as a new standard.  We are currently using our own implementation of
-	that, but when it is supported by vendors this will all seemlessly
-	transistion to using the vendor version.
+	This was updated to use |strlcpy(3c)| when it was rumored
+	to be coming as a new standard.  We are currently using our
+	own implementation of that, but when it is supported by
+	vendors this will all seemlessly transistion to using the
+	vendor version.
 
 	= 2011-12-09, David A­D­ Morano
-	I got rid of the |strlcpy(3c)| usage.  It was never really needed
-	anyway.  The code is certainly cleaner without it.  And I don't really
-	think it is a whole lot slower either since the various string lengths
-	used are usually fairly small.  Other subroutines have gotten rid of
-	|strlcpy(3c)| also without any complaints.
+	I got rid of the |strlcpy(3c)| usage.  It was never really
+	needed anyway.  The code is certainly cleaner without it.
+	And I do not really think it is a whole lot slower either
+	since the various string lengths used are usually fairly
+	small.  Other subroutines have gotten rid of |strlcpy(3c)|
+	also without any complaints.
 
 */
 
@@ -34,12 +36,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<stdarg.h>
-#include	<string.h>
-#include	<usystem.h>
+#include	<climits>		/* for |INT_MAX| */
+#include	<cstdarg>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 #include	"strdcpyx.h"
 
