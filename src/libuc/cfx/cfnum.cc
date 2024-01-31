@@ -62,6 +62,8 @@
 
 /* local namespaces */
 
+using std::integral ;			/* concept */
+
 
 /* local typedefs */
 
@@ -74,11 +76,11 @@
 
 /* subroutine-templaces */
 
-template<typename T>
+template<integral T>
 int cfnumx(cchar *bp,int bl,T *rp) noex {
 	int		rs = SR_DOM ;
 	int		ch ;
-	int		f_negative = FALSE ;
+	int		f_negative = false ;
 	bl = strnlen(bp,bl) ;
 	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
 	    bp += 1 ;
@@ -141,7 +143,7 @@ int cfnumx(cchar *bp,int bl,T *rp) noex {
 	                    break ;
 	                } /* end switch */
 	            } else if (bp[0] == '0') {
-	                rs = cfocti((bp+1),(bl-1),rp) ;
+	                rs = cfoct((bp+1),(bl-1),rp) ;
 	            } else {
 	                rs = cfdec(bp,bl,rp) ;
 		    }
@@ -168,485 +170,32 @@ int cfnumx(cchar *bp,int bl,T *rp) noex {
 /* exported subroutines */
 
 int cfnumi(cchar *bp,int bl,int *rp) noex {
-	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = FALSE ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
-	    if (*bp == '\\') {
-	        bp += 1 ;
-	        bl -= 1 ;
-	        if (bl > 1) {
-	            ch = tolc(bp[0]) ;
-	            bp += 1 ;
-	            bl -= 1 ;
-	            switch (ch) {
-	            case 'd':
-	                rs = cfdeci(bp,bl,rp) ;
-	                break ;
-	            case 'x':
-	                rs = cfhexi(bp,bl,rp) ;
-	                break ;
-	            case 'o':
-	                rs = cfocti(bp,bl,rp) ;
-	                break ;
-	            case 'b':
-	                rs = cfbini(bp,bl,rp) ;
-	                break ;
-	            default:
-	                rs = SR_INVALID ;
-	                break ;
-	            } /* end switch */
-	        } else {
-	            rs = SR_INVALID ;
-		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
-	        if (bl > 1) {
-	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
-	                bp += 2 ;
-	                bl -= 2 ;
-	                switch (ch) {
-	                case 'd':
-	                    rs = cfdeci(bp,bl,rp) ;
-	                    break ;
-	                case 'x':
-	                    rs = cfhexi(bp,bl,rp) ;
-	                    break ;
-	                case 'o':
-	                    rs = cfocti(bp,bl,rp) ;
-	                    break ;
-	                case 'b':
-	                    rs = cfbini(bp,bl,rp) ;
-	                    break ;
-	                default:
-	                    rs = SR_INVALID ;
-	                    break ;
-	                } /* end switch */
-	            } else if (bp[0] == '0') {
-	                rs = cfocti((bp+1),(bl-1),rp) ;
-	            } else {
-	                rs = cfdeci(bp,bl,rp) ;
-		    }
-	        } else {
-	            rs = cfdeci(bp,bl,rp) ;
-		}
-	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
-	return rs ;
+	return cfnumx(bp,bl,rp) ;
 }
 /* end subroutine (cfnumi) */
 
-int cfnumui(cchar *bp,int bl,uint *rp) noex {
-	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = FALSE ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
-	    if (*bp == '\\') {
-	        bp += 1 ;
-	        bl -= 1 ;
-	        if (bl > 0) {
-	            ch = tolc(bp[0]) ;
-	            bp += 1 ;
-	            bl -= 1 ;
-	            switch (ch) {
-	            case 'd':
-	                rs = cfdecui(bp,bl,rp) ;
-	                break ;
-	            case 'x':
-	                rs = cfhexui(bp,bl,rp) ;
-	                break ;
-	            case 'o':
-	                rs = cfoctui(bp,bl,rp) ;
-	                break ;
-	            case 'b':
-	                rs = cfbinui(bp,bl,rp) ;
-	                break ;
-	            default:
-	                rs = SR_INVALID ;
-	                break ;
-	            } /* end switch */
-	        } else {
-	            rs = SR_INVALID ;
-		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
-	        if (bl > 1) {
-	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
-	                bp += 2 ;
-	                bl -= 2 ;
-	                switch (ch) {
-	                case 'd':
-	                    rs = cfdecui(bp,bl,rp) ;
-	                    break ;
-	                case 'x':
-	                    rs = cfhexui(bp,bl,rp) ;
-	                    break ;
-	                case 'o':
-	                    rs = cfoctui(bp,bl,rp) ;
-	                    break ;
-	                case 'b':
-	                    rs = cfbinui(bp,bl,rp) ;
-	                    break ;
-	                default:
-	                    rs = SR_INVALID ;
-	                    break ;
-	                } /* end switch */
-
-	            } else if (bp[0] == '0') {
-	                rs = cfoctui((bp+1),(bl-1),rp) ;
-	            } else {
-	                rs = cfdecui(bp,bl,rp) ;
-		    }
-	        } else {
-	            rs = cfdecui(bp,bl,rp) ;
-		}
-	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
-	return rs ;
-}
-/* end subroutine (cfnumui) */
-
 int cfnuml(cchar *bp,int bl,long *rp) noex {
-	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = FALSE ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
-	    if (*bp == '\\') {
-	        bp += 1 ;
-	        bl -= 1 ;
-	        if (bl > 1) {
-	            ch = tolc(bp[0]) ;
-	            bp += 1 ;
-	            bl -= 1 ;
-	            switch (ch) {
-	            case 'd':
-	                rs = cfdecl(bp,bl,rp) ;
-	                break ;
-	            case 'x':
-	                rs = cfhexl(bp,bl,rp) ;
-	                break ;
-
-	            case 'o':
-	                rs = cfoctl(bp,bl,rp) ;
-	                break ;
-
-	            case 'b':
-	                rs = cfbinl(bp,bl,rp) ;
-	                break ;
-	            default:
-	                rs = SR_INVALID ;
-	                break ;
-	            } /* end switch */
-	        } else {
-	            rs = SR_INVALID ;
-		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
-	        if (bl > 1) {
-	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
-	                bp += 2 ;
-	                bl -= 2 ;
-	                switch (ch) {
-	                case 'd':
-	                    rs = cfdecl(bp,bl,rp) ;
-	                    break ;
-	                case 'x':
-	                    rs = cfhexl(bp,bl,rp) ;
-	                    break ;
-	                case 'o':
-	                    rs = cfoctl(bp,bl,rp) ;
-	                    break ;
-	                case 'b':
-	                    rs = cfbinl(bp,bl,rp) ;
-	                    break ;
-	                default:
-	                    rs = SR_INVALID ;
-	                    break ;
-	                } /* end switch */
-	            } else if (bp[0] == '0') {
-	                rs = cfoctl((bp+1),(bl-1),rp) ;
-	            } else {
-	                rs = cfdecl(bp,bl,rp) ;
-		    }
-	        } else {
-	            rs = cfdecl(bp,bl,rp) ;
-		}
-	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
-	return rs ;
+	return cfnumx(bp,bl,rp) ;
 }
 /* end subroutine (cfnuml) */
 
-int cfnumul(cchar *bp,int bl,ulong *rp) noex {
-	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = FALSE ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
-	    if (*bp == '\\') {
-	        bp += 1 ;
-	        bl -= 1 ;
-	        if (bl > 0) {
-	            ch = tolc(bp[0]) ;
-	            bp += 1 ;
-	            bl -= 1 ;
-	            switch (ch) {
-	            case 'd':
-	                rs = cfdecul(bp,bl,rp) ;
-	                break ;
-	            case 'x':
-	                rs = cfhexul(bp,bl,rp) ;
-	                break ;
-	            case 'o':
-	                rs = cfoctul(bp,bl,rp) ;
-	                break ;
-	            case 'b':
-	                rs = cfbinul(bp,bl,rp) ;
-	                break ;
-	            default:
-	                rs = SR_INVALID ;
-	                break ;
-	            } /* end switch */
-	        } else {
-	            rs = SR_INVALID ;
-		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
-	        if (bl > 1) {
-	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
-	                bp += 2 ;
-	                bl -= 2 ;
-	                switch (ch) {
-	                case 'd':
-	                    rs = cfdecul(bp,bl,rp) ;
-	                    break ;
-	                case 'x':
-	                    rs = cfhexul(bp,bl,rp) ;
-	                    break ;
-	                case 'o':
-	                    rs = cfoctul(bp,bl,rp) ;
-	                    break ;
-	                case 'b':
-	                    rs = cfbinul(bp,bl,rp) ;
-	                    break ;
-	                default:
-	                    rs = SR_INVALID ;
-	                    break ;
-	                } /* end switch */
-	            } else if (bp[0] == '0') {
-	                rs = cfoctul((bp+1),(bl-1),rp) ;
-	            } else {
-	                rs = cfdecul(bp,bl,rp) ;
-		    }
-	        } else {
-	            rs = cfdecul(bp,bl,rp) ;
-		}
-	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
-	return rs ;
-}
-/* end subroutine (cfnumul) */
-
 int cfnumll(cchar *bp,int bl,longlong *rp) noex {
-	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = FALSE ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
-	    if (*bp == '\\') {
-	        bp += 1 ;
-	        bl -= 1 ;
-	        if (bl > 1) {
-	            ch = tolc(bp[0]) ;
-	            bp += 1 ;
-	            bl -= 1 ;
-	            switch (ch) {
-	            case 'd':
-	                rs = cfdecll(bp,bl,rp) ;
-	                break ;
-	            case 'x':
-	                rs = cfhexll(bp,bl,rp) ;
-	                break ;
-	            case 'o':
-	                rs = cfoctll(bp,bl,rp) ;
-	                break ;
-	            case 'b':
-	                rs = cfbinll(bp,bl,rp) ;
-	                break ;
-	            default:
-	                rs = SR_INVALID ;
-	                break ;
-	            } /* end switch */
-	        } else {
-	            rs = SR_INVALID ;
-		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
-	        if (bl > 1) {
-	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
-	                bp += 2 ;
-	                bl -= 2 ;
-	                switch (ch) {
-	                case 'd':
-	                    rs = cfdecll(bp,bl,rp) ;
-	                    break ;
-	                case 'x':
-	                    rs = cfhexll(bp,bl,rp) ;
-	                    break ;
-	                case 'o':
-	                    rs = cfoctll(bp,bl,rp) ;
-	                    break ;
-	                case 'b':
-	                    rs = cfbinll(bp,bl,rp) ;
-	                    break ;
-	                default:
-	                    rs = SR_INVALID ;
-	                    break ;
-	                } /* end switch */
-	            } else if (bp[0] == '0') {
-	                rs = cfoctll((bp+1),(bl-1),rp) ;
-	            } else {
-	                rs = cfdecll(bp,bl,rp) ;
-		    }
-	        } else {
-	            rs = cfdecll(bp,bl,rp) ;
-		}
-	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
-	return rs ;
+	return cfnumx(bp,bl,rp) ;
 }
 /* end subroutine (cfnumll) */
 
+int cfnumui(cchar *bp,int bl,uint *rp) noex {
+	return cfnumx(bp,bl,rp) ;
+}
+/* end subroutine (cfnumui) */
+
+int cfnumul(cchar *bp,int bl,ulong *rp) noex {
+	return cfnumx(bp,bl,rp) ;
+}
+/* end subroutine (cfnumul) */
+
 int cfnumull(cchar *bp,int bl,ulonglong *rp) noex {
-	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = FALSE ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
-	    if (*bp == '\\') {
-	        bp += 1 ;
-	        bl -= 1 ;
-	        if (bl > 0) {
-	            ch = tolc(bp[0]) ;
-	            bp += 1 ;
-	            bl -= 1 ;
-	            switch (ch) {
-	            case 'd':
-	                rs = cfdecull(bp,bl,rp) ;
-	                break ;
-	            case 'x':
-	                rs = cfhexull(bp,bl,rp) ;
-	                break ;
-	            case 'o':
-	                rs = cfoctull(bp,bl,rp) ;
-	                break ;
-	            case 'b':
-	                rs = cfbinull(bp,bl,rp) ;
-	                break ;
-	            default:
-	                rs = SR_INVALID ;
-	                break ;
-	            } /* end switch */
-	        } else {
-	            rs = SR_INVALID ;
-		}
-	    } else if (isdigitlatin(mkchar(*bp))) {
-	        if (bl > 1) {
-	            ch = tolc(bp[1]) ;
-	            if (isalphalatin(ch)) {
-	                bp += 2 ;
-	                bl -= 2 ;
-	                switch (ch) {
-	                case 'd':
-	                    rs = cfdecull(bp,bl,rp) ;
-	                    break ;
-	                case 'x':
-	                    rs = cfhexull(bp,bl,rp) ;
-	                    break ;
-	                case 'o':
-	                    rs = cfoctull(bp,bl,rp) ;
-	                    break ;
-	                case 'b':
-	                    rs = cfbinull(bp,bl,rp) ;
-	                    break ;
-	                default:
-	                    rs = SR_INVALID ;
-	                    break ;
-	                } /* end switch */
-	            } else if (bp[0] == '0') {
-	                rs = cfoctull((bp+1),(bl-1),rp) ;
-	            } else {
-	                rs = cfdecull(bp,bl,rp) ;
-		    }
-	        } else {
-	            rs = cfdecull(bp,bl,rp) ;
-		}
-	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
-	return rs ;
+	return cfnumx(bp,bl,rp) ;
 }
 /* end subroutine (cfnumull) */
 
