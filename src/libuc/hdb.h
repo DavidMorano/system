@@ -63,7 +63,7 @@ struct hdb_head {
 	HDB_ENT		**htaddr ;	/* array HDB_ENT pointers */
 	hdbhash_f	hashfunc ;
 	hdbcmp_f	cmpfunc ;
-	lookaside	es ;		/* key-entries */
+	lookaside	*esp ;		/* key-entries */
 	uint		magic ;
 	int		htlen ;
 	int		count ;

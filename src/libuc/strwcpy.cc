@@ -1,4 +1,4 @@
-/* strwcpy */
+/* strwcpy SUPPORT */
 /* lang=C++20 */
 
 /* copy a counted string to a maximum extent */
@@ -21,7 +21,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 #include	"strwcpy.h"
 

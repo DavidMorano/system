@@ -26,9 +26,7 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
 
 

@@ -21,12 +21,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<bit>
-#include	<cstdio>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<valuelimits.hh>
-#include	<localmisc.h>
 
 
 extern const valuelimits	valuelimit ;

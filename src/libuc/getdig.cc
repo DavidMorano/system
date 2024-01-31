@@ -35,18 +35,19 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ucvariables.hh>
-#include	<varnames.hh>
 #include	<localmisc.h>
 
 #include	"getdig.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
 
 
 /* local typedefs */
@@ -64,6 +65,9 @@
 /* local variables */
 
 static const int	maxbase = strlen(varname.digtab) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

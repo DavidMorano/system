@@ -1,4 +1,4 @@
-/* strwcpyx */
+/* strwcpyx SUPPORT */
 /* lang=C++20 */
 
 /* copy a counted string to a maximum extent */
@@ -18,9 +18,7 @@
 
 	This provides come counted-string functions.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>

@@ -1,4 +1,4 @@
-/* strwcpyxc */
+/* strwcpyxc SUPPORT */
 /* lang=C++20 */
 
 /* copy a c-string to "x" case */
@@ -47,9 +47,17 @@
 #include	"strwcpyxc.h"
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
 /* local typedefs */
 
-typedef int (*toxc_f)(int) noex ;
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+}
 
 
 /* local subroutine-templates */

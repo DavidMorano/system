@@ -40,11 +40,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* <- |strchr(3c)| */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<matkeystr.h>
-#include	<localmisc.h>
 
 #include	"getourenv.h"
 
@@ -71,9 +70,9 @@
 
 cchar *getourenv(mainv envv,cchar *key) noex {
 	cchar		*vp = nullptr ;
-	if (envv && (key[0] != '\0')) {
-	    if (int i ; (i = matkeystr(envv,key,-1)) >= 0) {
-		if ((vp = strchr(envv[i],'=')) != nullptr) {
+	if (envv && key && (key[0] != '\0')) {
+	    if (int ei ; (ei = matkeystr(envv,key,-1)) >= 0) {
+		if ((vp = strchr(envv[ei],'=')) != nullptr) {
 		    vp += 1 ;
 		}
 	    }

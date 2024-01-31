@@ -251,10 +251,10 @@ OBJ135= getrootdname.o getdig.o randlc.o
 
 OBJ136= ctxxx.o ctbin.o ctoct.o ctdec.o cthex.o ctdecp.o ctdecf.o cvtdig.o
 OBJ137= cfxxx.o cfbin.o cfoct.o cfhex.o cfdec.o cfdecmf.o cfdect.o cfxxxx.o 
-OBJ138= cfnum.o cfhexs.o hexval.o
-OBJ139= isalphalatin.o isalnumlatin.o isdigitlatin.o ishexlatin.o
-OBJ140= isdict.o isprintlatin.o isprintbad.o
-OBJ141= hasxc.o
+OBJ138= cfnum.o cfhexs.o
+OBJ139= digval.o
+OBJ140=
+OBJ141=
 OBJ142=
 OBJ143=
 
@@ -406,6 +406,7 @@ UOBJ00= matxstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= snwcpyx.o strcpyxc.o
 UOBJ03= varnames.o syswords.o rmx.o
+
 UOBJ04= ischarx.o ulogerror.o strdcpyx.o
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
@@ -597,13 +598,6 @@ ct.o:		$(OBJ_CT)
 	$(LD) -r -o $@ $(OBJ_CT)
 
 
-# convert-from (CF)
-OBJ_CF= cfxxx.o cfbin.o cfoct.o cfhex.o cfdec.o cfchars.o cfxxxx.o
-
-cf.o:		$(OBJ_CF)
-	$(LD) -r -o $@ $(OBJ_CF)
-
-
 # string-to-x
 strtox.o:	strtoxlonglong.o
 
@@ -652,7 +646,7 @@ uctimeout.o:	uctimeout.cc
 
 
 # CHARACTER
-OBJA_CHAR= mkchar.o toxc.o char.o rmeol.o
+OBJA_CHAR= toxc.o char.o rmeol.o
 OBJB_CHAR= ischarx.o hasx.o
 
 OBJ_CHAR= obja_char.o objb_char.o
@@ -1059,7 +1053,6 @@ usys.dir:
 # misc-character
 toxc.o:			toxc.c toxc.h
 char.o:			char.cc char.h
-mkchar.o:		mkchar.c mkchar.h
 ischarx.o:		ischarx.cc ischarx.h
 hasx.o:			hasx.cc hasx.h char.h ischarx.h
 
@@ -1166,6 +1159,17 @@ ema.dir:
 queue.o:		queue.dir
 queue.dir:
 	makesubdir $@
+
+# CFX
+cfx.o:			cfx.dir
+cfx.dir:
+	makesubdir $@
+
+# CTX
+ctx.o:			ctx.dir
+ctx.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h

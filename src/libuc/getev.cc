@@ -20,7 +20,7 @@
 	getev
 
 	Description:
-	This subroutine is similar to 'getenv(3c)' except that the
+	This subroutine is similar to |getenv(3c)| except that the
 	variable array (an array of pointers to strings) is explicitly
 	passed by the caller.
 
@@ -42,9 +42,10 @@
 
 #include	<envstandards.h>	/* first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<usysrets.h>
+#include	<clanguage.h>
 #include	<matkeystr.h>
-#include	<localmisc.h>
 
 #include	"getev.h"
 
