@@ -1,4 +1,4 @@
-/* hash_hsieh */
+/* hash_hsieh SUPPORT */
 /* lang=C20 */
 
 /* this is the "super-fast" hash function by Paul Hsieh (2004-2008) */

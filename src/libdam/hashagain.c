@@ -1,4 +1,4 @@
-/* hash_again */
+/* hash_again SUPPORT */
 /* lang=C20 */
 
 /* create a hash from an exiting hash */

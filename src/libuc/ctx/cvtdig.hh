@@ -24,6 +24,9 @@
 
 /*******************************************************************************
 
+	Name:
+	cvtdig
+
 	Description:
 	This subroutine converts a value (and a base) into its
 	string representation. It only works for bases that are a

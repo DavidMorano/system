@@ -1,4 +1,4 @@
-/* hash_elf */
+/* hash_elf SUPPORT */
 /* lang=C20 */
 
 /* perform the hash done in processing ELF files */
