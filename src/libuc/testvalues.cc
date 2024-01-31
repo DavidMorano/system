@@ -1,5 +1,8 @@
-/* testvalues */
+/* testvalues SUPPORT */
 /* lang=C++20 */
+
+/* test the |valuelimits| and |digbufsizes| objects */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -50,7 +53,7 @@ int main(int,cchar **,cchar **) {
 	}
 
 	{
-	    cint	bases[] = { 2, 10, 16 } ;
+	    cint	bases[] = { 2, 10, 16, 26, 32 } ;
 	    {
 		int	n = nelem(bases) ;
 	        for (int i = 0 ; i < n ; i += 1) {

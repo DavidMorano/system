@@ -3,8 +3,7 @@
 
 CAN=digithandling
 FILEGLOB=
-FILEGLOB+=" cvtdig.[ch]* ct*.[ch]* "
-FILEGLOB+=" cf*.[ch]* xxtostr.[ch]* *strto*.[ch]* "
+FILEGLOB+=" cfx ctx "
 FILEGLOB+=" digbufsizes.[ch]* "
 
 CADIR=${HOME}/store/src

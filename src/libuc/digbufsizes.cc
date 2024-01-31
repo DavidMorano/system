@@ -1,4 +1,4 @@
-/* digbufsizes */
+/* digbufsizes SUPPORT */
 /* lang=C++20 */
 
 /* digit buffer sizes */
@@ -20,8 +20,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"digbufsizes.hh"
 

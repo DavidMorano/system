@@ -65,9 +65,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<bit>
-#include	<usysrets.h>
-#include	<utypedefs.h>
-#include	<clanguage.h>
+#include	<usystem.h>		/* <- memory-allocation */
 #include	<stdintx.h>
 #include	<ucvariables.hh>
 #include	<varnames.hh>

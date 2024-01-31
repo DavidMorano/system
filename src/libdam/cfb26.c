@@ -38,8 +38,8 @@
 #define MAXB26DIG_UI	7		/* decimal digits in 'uint' */
 #define MAXB26DIG_L	14		/* decimal digits in 'long' */
 #define MAXB26DIG_UL	14		/* decimal digits in 'ulong' */
-#define MAXB26DIG_LL	14		/* decimal digits in 'longlong ' */
-#define MAXB26DIG_ULL	14		/* decimal digits in 'ulonglong ' */
+#define MAXB26DIG_LL	28		/* decimal digits in 'longlong ' */
+#define MAXB26DIG_ULL	28		/* decimal digits in 'ulonglong ' */
 
 #undef	CFB26_WEIGHT
 #define	CFB26_WEIGHT	26
@@ -52,10 +52,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    int		cfb26i(cchar *,int,int *) noex ;
-}
 
 
 /* external variables */

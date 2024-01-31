@@ -598,13 +598,6 @@ ct.o:		$(OBJ_CT)
 	$(LD) -r -o $@ $(OBJ_CT)
 
 
-# convert-from (CF)
-OBJ_CF= cfxxx.o cfbin.o cfoct.o cfhex.o cfdec.o cfchars.o cfxxxx.o
-
-cf.o:		$(OBJ_CF)
-	$(LD) -r -o $@ $(OBJ_CF)
-
-
 # string-to-x
 strtox.o:	strtoxlonglong.o
 
@@ -1166,6 +1159,17 @@ ema.dir:
 queue.o:		queue.dir
 queue.dir:
 	makesubdir $@
+
+# CFX
+cfx.o:			cfx.dir
+cfx.dir:
+	makesubdir $@
+
+# CTX
+ctx.o:			ctx.dir
+ctx.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
