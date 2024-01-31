@@ -202,7 +202,7 @@ OBJ091=
 OBJ092=
 OBJ093=
 OBJ094= strnxcmp.o
-OBJ095= strdcpyx.o strdcpyxw.o
+OBJ095=
 
 OBJ096=
 OBJ097=
@@ -407,7 +407,7 @@ UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= snwcpyx.o strcpyxc.o
 UOBJ03= varnames.o syswords.o rmx.o
 
-UOBJ04= ischarx.o ulogerror.o strdcpyx.o
+UOBJ04= ischarx.o ulogerror.o strdcpy.o
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
@@ -574,72 +574,9 @@ base.o:		$(OBJ_BASE)
 	$(LD) -r -o $@ $(OBJ_BASE)
 
 
-# convert-to (CT)
-OBJ0_CT= ctxxx.o ctbin.o ctoct.o cthex.o ctdec.o ctchars.o 
-OBJ1_CT= ctdecp.o ctdecf.o ctroman.o
-OBJ2_CT= cvtdig.o
-OBJ3_CT= xxtostr.o convertx.o digbufsizes.o
-
-OBJ_CT= obj0_ct.o obj1_ct.o obj2_ct.o obj3_ct.o
-
-obj0_ct.o:	$(OBJ0_CT)
-	$(LD) -r -o $@ $(OBJ0_CT)
-
-obj1_ct.o:	$(OBJ1_CT)
-	$(LD) -r -o $@ $(OBJ1_CT)
-
-obj2_ct.o:	$(OBJ2_CT)
-	$(LD) -r -o $@ $(OBJ2_CT)
-
-obj3_ct.o:	$(OBJ3_CT)
-	$(LD) -r -o $@ $(OBJ3_CT)
-
-ct.o:		$(OBJ_CT)
-	$(LD) -r -o $@ $(OBJ_CT)
-
-
-# string-to-x
-strtox.o:	strtoxlonglong.o
-
 # string-to-x
 ucstr.o:	ucstrtox.o ucstrtod.o
 ucsysconf.o:	ucsysconf.cc
-
-# string-find
-OBJ0_SF= sfbaselib.o sfbasename.o sfbracketval.o sfbreak.o 
-OBJ1_SF= sfcasesub.o sfcenter.o sfcookkey.o sfdequote.o 
-OBJ2_SF= sfdirname.o sfkey.o sflast.o
-OBJ3_SF= sfnamecomp.o sfprogroot.o
-OBJ4_SF= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o
-OBJ5_SF= sfsubstance.o sfthing.o sfwhitedot.o sfword.o
-OBJ6_SF=
-
-obj0_sf.o:	$(OBJ0_SF)
-	$(LD) -r -o $@ $(OBJ0_SF)
-
-obj1_sf.o:	$(OBJ1_SF)
-	$(LD) -r -o $@ $(OBJ1_SF)
-
-obj2_sf.o:	$(OBJ2_SF)
-	$(LD) -r -o $@ $(OBJ2_SF)
-
-obj3_sf.o:	$(OBJ3_SF)
-	$(LD) -r -o $@ $(OBJ3_SF)
-
-obj4_sf.o:	$(OBJ4_SF)
-	$(LD) -r -o $@ $(OBJ4_SF)
-
-obj5_sf.o:	$(OBJ5_SF)
-	$(LD) -r -o $@ $(OBJ5_SF)
-
-obj6_sf.o:	$(OBJ6_SF)
-	$(LD) -r -o $@ $(OBJ6_SF)
-
-OBJA_SF= obj0_sf.o obj1_sf.o obj2_sf.o
-OBJB_SF= obj3_sf.o obj4_sf.o obj5_sf.o
-
-sf.o:		$(OBJA_SF) $(OBJB_SF)
-	$(LD) -r -o $@ $(OBJA_SF) $(OBJB_SF)
 
 # uctimeout (time-out call-backs)
 uctimeout.o:	uctimeout.cc
@@ -932,34 +869,6 @@ strwcpyx.o:		strwcpyx.cc strwcpyx.h
 strwcpyxc.o:		strwcpyxc.cc strwcpyxc.h
 strwcpyxx.o:		strwcpyxx.cc strwcpyxx.h
 
-strdcpyx.o:		strdcpyx.c strdcpyx.h
-strdcpyxw.o:		strdcpyxw.c strdcpyxw.h
-
-# CF
-cfxxxx.o:		cfxxxx.cc cfxxxx.hh
-cfxxx.o:		cfxxx.cc cfxxx.h cfxxxx.hh
-cfbin.o:		cfbin.cc cfbin.h cfxxxx.hh
-cfoct.o:		cfoct.cc cfoct.h cfxxxx.hh
-cfhex.o:		cfhex.cc cfhex.h cfxxxx.hh
-cfdec.o:		cfdec.cc cfdec.h cfxxxx.hh
-cfdecmf.o:		cfdecmf.cc cfdecmf.h
-cfdect.o:		cfdect.cc cfdect.h
-cfdecf.o:		cfdecf.cc cfdecf.h
-cfchars.o:		cfchars.cc cfchars.h
-
-# CT
-cvtdig.o:		cvtdig.cc cvtdig.hh
-ctxxx.o:		ctxxx.cc ctxxx.h
-ctbin.o:		ctbin.cc ctbin.h cvtdig.hh
-ctoct.o:		ctoct.cc ctoct.h cvtdig.hh
-cthex.o:		cthex.cc cthex.h cvtdig.hh
-ctdec.o:		ctdec.cc ctdec.h cvtdig.hh
-ctdecp.o:		ctdecp.cc ctdecp.h ctdec.h
-ctdecf.o:		ctdecf.cc ctdecf.h convertx.h
-ctchars.o:		ctchars.cc ctchars.h
-xxtostr.o:		xxtostr.cc xxtostr.h
-convertx.o:		convertx.cc convertx.h
-
 opensysfs.o:		opensysfs.cc opensysfs.h
 
 quoteshellarg.o:	quoteshellarg.c
@@ -1064,6 +973,11 @@ OBJ_STRW= strwcpyxc.o strwcpyxx.o
 
 strw.o:			$(OBJ_STRW)
 	$(LD) -r -o $@ $(OBJ_STRW)
+
+# STRDCPY
+strdcpy.o:		strdcpy.dir
+strdcpy.dir:
+	makesubdir $@
 
 # system-auxillary-information
 ucsysauxinfo.o:		ucsysauxinfo.dir

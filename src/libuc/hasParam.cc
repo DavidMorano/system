@@ -1,5 +1,5 @@
-/* hasParam */
-/* lang=C20 */
+/* hasParam SUPPORT */
+/* lang=C++20 */
 
 /* does the parameter array have a given value? */
 /* version %I% last-modified %G% */
@@ -24,9 +24,8 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<limits.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<climits>		/* <- for |SHORT_MIN| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>

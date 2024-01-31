@@ -18,7 +18,7 @@
 #define	STRDCPYX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to congigure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strdcpyxw.h>

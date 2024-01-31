@@ -1,5 +1,5 @@
 /* hasfext SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* determine if file-name (just a string) has an approved file-extension */
 /* version %I% last-modified %G% */
@@ -39,8 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<matstr.h>

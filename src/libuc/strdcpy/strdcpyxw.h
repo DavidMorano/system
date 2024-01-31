@@ -18,6 +18,11 @@
 #define	STRDCPYXW_INCLUDE
 
 
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
+
 EXTERNC_begin
 
 extern char *strdcpy1w(char *,int,cc *,int) noex ;

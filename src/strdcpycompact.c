@@ -1,5 +1,5 @@
-/* strdcpycompact */
-/* lang=C20 */
+/* strdcpycompact SUPPORT */
+/* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
 /* version %I% last-modified %G% */
@@ -57,13 +57,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
-#include	<usystem.h>
+#include	<cstring>		/* <- |strlen(3c)| */
+#include	<algorithm>		/* <- |min(3c++)| */
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<ascii.h>
 #include	<sfx.h>
 #include	<strmgr.h>
-#include	<localmisc.h>
+#include	<nleadstr.h>
 
 #include	"strdcpy.h"
 
@@ -71,9 +74,12 @@
 /* local defines */
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern int	nleadstr(cchar *,cchar *,int) ;
+using std::min ;			/* subroutine-template */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -91,45 +97,46 @@ extern int	nleadstr(cchar *,cchar *,int) ;
 /* exported subroutines */
 
 char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	STRMGR		m ;
-	int		rs ;
-	int		dl = 0 ;
-
-	if (dbuf == NULL) return NULL ;
-
-	if (dlen < 0) dlen = INT_MAX ;
-	if (sl < 0) sl = strlen(sp) ;
-
-	if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
-	    int		cl ;
-	    cchar	*cp ;
-	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
-		if (dl > 0) {
-	            if ((rs = strmgr_char(&m,CH_SP)) >= 0) {
-		        dl += 1 ;
+	char		*rp = nullptr ;
+	if (dbuf && sp) {
+	    strmgr	m ;
+	    int		rs ;
+	    int		rs1 ;
+	    int		dl = 0 ;
+	    if (dlen < 0) dlen = INT_MAX ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
+		int	cl ;
+	        cchar	*cp{} ;
+	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
+		    if (dl > 0) {
+	                if ((rs = strmgr_char(&m,CH_SP)) >= 0) {
+		            dl += 1 ;
+		        }
 		    }
-		}
-		if (rs >= 0) {
-	            if ((rs = strmgr_str(&m,cp,cl)) >= 0) {
-		        dl += cl ;
-		    } else if (rs == SR_OVERFLOW) {
-			if ((rs = strmgr_rem(&m)) > 0) {
-			    const int	ml = MIN(rs,cl) ;
-	            	    if ((rs = strmgr_str(&m,cp,ml)) >= 0) {
-				dl += ml ;
+		    if (rs >= 0) {
+	                if ((rs = strmgr_str(&m,cp,cl)) >= 0) {
+		            dl += cl ;
+		        } else if (rs == SR_OVERFLOW) {
+			    if ((rs = strmgr_rem(&m)) > 0) {
+			        cint	ml = min(rs,cl) ;
+	            	        if ((rs = strmgr_str(&m,cp,ml)) >= 0) {
+				    dl += ml ;
+			        }
 			    }
-			}
-		    }
-	        }
-	        sl -= ((cp+cl) - sp) ;
-	        sp = (cp+cl) ;
-	        if (rs < 0) break ;
-	    } /* end while (looping through string pieces) */
-	    strmgr_finish(&m) ;
-	} /* end if (strmgr) */
-
-	dbuf[dl] = '\0' ;
-	return (dbuf+dl) ;
+		        }
+	            }
+	            sl -= ((cp+cl) - sp) ;
+	            sp = (cp+cl) ;
+	            if (rs < 0) break ;
+	        } /* end while (looping through string pieces) */
+	        rs1 = strmgr_finish(&m) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (strmgr) */
+	    dbuf[dl] = '\0' ;
+	    rp = (rs >= 0) ? (dbuf+dl) : nullptr ;
+	} /* end if (non-null) */
+	return rp ;
 }
 /* end subroutine (strdcpycompact) */
 
