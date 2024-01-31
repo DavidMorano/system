@@ -4,10 +4,6 @@
 /* find number of users (logged-in) on system */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_TMPX		1		/* try TMPX */
-#define	CF_UTMPX	0		/* try UTMPX */
-
 
 /* revision history:
 
@@ -44,29 +40,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#if	CF_UTMPX && defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0)
-#include	<utmpx.h>
-#endif
-
 #include	<usystem.h>
-
-#if	CF_TMPX || CF_UTMPX
-#include	<tmpx.h>
-#endif
-
+#include	<utmpacc.h>
 #include	<localmisc.h>
 
 
 /* local defines */
-
-#ifndef	UTMPXFNAME
-#define	UTMPXFNAME	"/var/adm/utmpx"
-#endif
-
-#ifndef	UTMPFNAME
-#define	UTMPFNAME	"/var/adm/utmp"
-#endif
 
 
 /* external subroutines */
@@ -86,133 +65,9 @@
 
 /* exported subroutines */
 
-
-#if	CF_TMPX
-
-int nusers(cchar *utmpfname)
-{
-	TMPX		ut ;
-	int		rs ;
-	int		rs1 ;
-	int		n = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("nusers-tmpx: utmpfname=%s\n",utmpfname) ;
-#endif
-
-	if ((rs = tmpx_open(&ut,utmpfname,O_RDONLY)) >= 0) {
-
-	    rs = tmpx_nusers(&ut) ;
-	    n = rs ;
-
-	    rs1 = tmpx_close(&ut) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (tmpx) */
-
-#if	CF_DEBUGS
-	debugprintf("nusers-tmpx: ret rs=%d n=%u\n",rs,n) ;
-#endif
-
-	return (rs >= 0) ? n : rs ;
+int nusers() noex {
+	return utmpacc_nusers() ;
 }
 /* end subroutine (nusers) */
-
-#else /* CF_TMPX */
-
-#if	CF_UTMPX && defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0)
-
-int nusers(cchar *utmpfname)
-{
-	struct utmpx	*up ;
-	int		rs = SR_OK ;
-	int		rc ;
-	int		n ;
-	int		f_utf = FALSE ;
-
-	if ((utmpfname != NULL) && (utmpfname[0] != '\0')) {
-
-#if	defined(SYSHAS_UTMPXNAME) && (SYSHAS_UTMPXNAME > 0)
-	    f_utf = TRUE ;
-	    rc = utmpxname(utmpfname) ;
-
-	    rs = (rc == 1) ? SR_OK : SR_INVALID ;
-#else
-	    rs = SR_NOSYS ;
-#endif
-
-	} /* end if */
-
-	n = 0 ;
-	if (rs >= 0) {
-	    int	f ;
-
-	    setutxent() ;
-	    while ((up = getutxent()) != NULL) {
-	        f = (up->ut_type == UTMPX_TUSERPROC) ;
-	        f = f && (up->ut_user[0] != '.') ;
-		if (f) n += 1 ;
-	    } /* end while */
-	    endutxent() ;
-
-#if	defined(SYSHAS_UTMPXNAME) && (SYSHAS_UTMPXNAME > 0)
-	    if (f_utf)
-	        utmpxname(UTMPXFNAME) ;
-#endif
-
-	} /* end if (ok) */
-
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (nusers) */
-
-#else /* CF_UTMPX */
-
-int nusers(cchar *utmpfname)
-{
-	struct utmp	*up ;
-	int		rs = SR_OK ;
-	int		rc ;
-	int		n ;
-	int		f_utf = FALSE ;
-
-	if ((utmpfname != NULL) && (utmpfname[0] != '\0')) {
-
-#if	defined(SYSHAS_UTMPNAME) && (SYSHAS_UTMPNAME > 0)
-	    f_utf = TRUE ;
-	    rc = utmpname(utmpfname) ;
-
-	    rs = (rc == 1) ? SR_OK : SR_INVALID ;
-#else
-	    rs = SR_NOSYS ;
-#endif
-
-	} /* end if */
-
-	n = 0 ;
-	if (rs >= 0) {
-	    int	f ;
-
-	    setutent() ;
-	    while ((up = getutent()) != NULL) {
-	        f = (up->ut_type == UTMP_TUSERPROC) ;
-	        f = f && (up->ut_user[0] != '.') ;
-		if (f) n += 1 ;
-	    } /* end while */
-	    endutent() ;
-
-#if	defined(SYSHAS_UTMPNAME) && (SYSHAS_UTMPNAME > 0)
-	    if (f_utf)
-	        utmpname(UTMPFNAME) ;
-#endif
-
-	} /* end if (ok) */
-
-	return (rs >= 0) ? n : rs ;
-}
-/* end subroutine (nusers) */
-
-#endif /* CF_UTMPX */
-
-#endif /* CF_TMPX */
 
 
