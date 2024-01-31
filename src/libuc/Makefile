@@ -223,7 +223,7 @@ OBJ110= strkeycmp.o strwcmp.o
 OBJ111= vstrcmpx.o vstrkeycmpx.o vstrkeydictcmp.o
 
 OBJ112= strcpyxc.o
-OBJ113= strwcpy.o strwcpyx.o strwcpyxc.o strwcpyxx.o
+OBJ113=
 OBJ114=
 OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o
 OBJ116= mkcleanline.o tabcols.o checkbase.o ncol.o
@@ -415,7 +415,7 @@ UOBJ07= getourenv.o
 UOBJ08= strkeycmp.o
 UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
-UOBJ11= strwcpy.o strwcpyxc.o strwcpyxx.o
+UOBJ11= strwcpy.o
 
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
@@ -864,11 +864,6 @@ mkcdpath.o:		mkcdpath.cc
 
 strcpyxc.o:		strcpyxc.cc strcpyxc.h
 
-strwcpy.o:		strwcpy.cc strwcpy.h
-strwcpyx.o:		strwcpyx.cc strwcpyx.h
-strwcpyxc.o:		strwcpyxc.cc strwcpyxc.h
-strwcpyxx.o:		strwcpyxx.cc strwcpyxx.h
-
 opensysfs.o:		opensysfs.cc opensysfs.h
 
 quoteshellarg.o:	quoteshellarg.c
@@ -968,11 +963,10 @@ hasx.o:			hasx.cc hasx.h char.h ischarx.h
 # RMX
 rmx.o:			rmx.cc rmx.h
 
-# STRW
-OBJ_STRW= strwcpyxc.o strwcpyxx.o
-
-strw.o:			$(OBJ_STRW)
-	$(LD) -r -o $@ $(OBJ_STRW)
+# STRWCPY
+strwcpy.o:		strwcpy.dir
+strwcpy.dir:
+	makesubdir $@
 
 # STRDCPY
 strdcpy.o:		strdcpy.dir

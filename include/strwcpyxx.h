@@ -19,19 +19,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stddef.h>
+#include	<stddef.h>		/* <- for |wchar_t| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin
 
-extern char *strwcpyblanks(char *dp,int w) noex ;
-extern char *strwcpycompact(char *dp,cchar *sp,int sl) noex ;
-extern char *strwcpyopaque(char *dp,cchar *sp,int sl) noex ;
-extern char *strwcpyrev(char *dp,cchar *sp,int sl) noex ;
-extern char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex ;
+extern char *strwcpyblanks(char *,int) noex ;
+extern char *strwcpycompact(char *,cchar *,int) noex ;
+extern char *strwcpyopaque(char *,cchar *,int) noex ;
+extern char *strwcpyrev(char *,cchar *,int) noex ;
+extern char *strwcpywide(char *,const wchar_t *,int) noex ;
 
 EXTERNC_end
 

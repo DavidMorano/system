@@ -1,4 +1,4 @@
-/* strwcpyx HEADER */
+/* strwcpy HEADER */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -14,18 +14,33 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRWCPYX_INCLUDE
-#define	STRWCPYX_INCLUDE
+#ifndef	STRWCPY_INCLUDE
+#define	STRWCPY_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<strwcpyx.h>
 #include	<strwcpyxc.h>
 #include	<strwcpyxx.h>
 
 
-#endif /* STRWCPYX_INCLUDE */
+#ifdef	__cplusplus
+
+inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
+	return strwcpybc(dp,sp,sl) ;
+}
+
+#else /* __cplusplus */
+
+static inline char *strwcpy(char *dp,cchar *sp,int sl) noex {
+	return strwcpybc(dp,sp,sl) ;
+}
+
+#endif /* __cplusplus */
+
+
+#endif /* STRWCPY_INCLUDE */
 
 

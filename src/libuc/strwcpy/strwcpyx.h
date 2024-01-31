@@ -1,4 +1,4 @@
-/* strwcpyxc HEADER */
+/* strwcpyx HEADER */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -14,26 +14,18 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRWCPYXC_INCLUDE
-#define	STRWCPYXC_INCLUDE
+#ifndef	STRWCPYX_INCLUDE
+#define	STRWCPYX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+#include	<strwcpyxc.h>
+#include	<strwcpyxx.h>
 
 
-EXTERNC_begin
-
-extern char	* strwcpybc (char *,cchar *,int) noex ;
-extern char	* strwcpylc (char *,cchar *,int) noex ;
-extern char	* strwcpyuc (char *,cchar *,int) noex ;
-extern char	* strwcpyfc (char *,cchar *,int) noex ;
-
-EXTERNC_end
-
-
-#endif /* STRWCPYXC_INCLUDE */
+#endif /* STRWCPYX_INCLUDE */
 
 
