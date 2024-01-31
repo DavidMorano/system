@@ -18,7 +18,6 @@
 #include	<envstandards.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin
@@ -49,6 +48,7 @@ extern int sfsubstance(cchar *,int,cchar **) noex ;
 extern int sfthing(cchar *,int,cchar *,cchar **) noex ;
 extern int sfwhitedot(cchar *,int,cchar **) noex ;
 extern int sfword(cchar *,int,cchar **) noex ;
+extern int sfsign(bool *,cchar *,int,cchar **) noex ;
 
 static inline int sfbrk(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	return sfbreak(sp,sl,s2,rpp) ;

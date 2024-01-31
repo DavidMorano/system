@@ -1,7 +1,7 @@
 /* sfkeyval SUPPORT */
 /* lang=C++20 */
 
-/* get the key part of a compound string */
+/* get the value part of a key-value pair in a c-string */
 /* version %I% last-modified %G% */
 
 
@@ -55,12 +55,12 @@
 
 	Returns:
 	>=0		length of found value c-string
-	<0		no key was found
+	<0		no key was found (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
