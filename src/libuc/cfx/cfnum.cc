@@ -50,6 +50,7 @@
 #include	<cfoct.h>
 #include	<cfdec.h>
 #include	<cfhex.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<toxc.h>
@@ -77,24 +78,6 @@ using std::unsigned_integral ;		/* concept */
 
 
 /* forward references */
-
-static int sfsign(bool *bp,cchar *sp,int sl,cchar **rpp) noex {
-	bool		fn = false ;
-	if (sl < 0) sl = strlen(sp) ;
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	if ((sl > 0) && isplusminus(*sp)) {
-	    fn = (*sp == '-') ;
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-	*rpp = sp ;
-	*bp = fn ;
-	return sl ;
-}
-/* end subroutine (sfsign) */
 
 
 /* subroutine-templates */
