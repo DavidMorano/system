@@ -74,9 +74,6 @@
 constexpr int	b = OURBASE ;
 
 
-/* local subroutines */
-
-
 /* template-subroutines */
 
 
@@ -105,5 +102,9 @@ int cfdecul(cchar *sp,int sl,ulong *rp) noex {
 int cfdecull(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfxxxx(uc_strtoull,sp,sl,b,rp) ;
 }
+
+
+/* local subroutines */
+
 
 

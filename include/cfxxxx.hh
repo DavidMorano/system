@@ -53,12 +53,12 @@
 #include	<usystem.h>
 #include	<ucvariables.hh>
 #include	<stdintx.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
-#include	<ischarx.h>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<checkbase.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 
@@ -99,7 +99,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
 		                if (rp) {
 		                    if (rs > 0) nsp = dbuf ;
-		                    rs = cvtf(nsp,NULL,b,rp) ;
+		                    rs = cvtf(nsp,nullptr,b,rp) ;
 		                }
 	                    } /* end if (loading) */
 		        } else {
@@ -109,7 +109,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
 		                    if (rp) {
 		                        if (rs > 0) nsp = dbuf ;
-		                        rs = cvtf(nsp,NULL,b,rp) ;
+		                        rs = cvtf(nsp,nullptr,b,rp) ;
 		                    }
 	                        } /* end if (loading) */
 			        rs1 = uc_free(dbuf) ;
@@ -117,7 +117,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 		            } /* end if (memory-allocation) */
 	                } /* end if */
 		    } else {
-			rs = cvtf(nsp,NULL,b,rp) ;
+			rs = cvtf(nsp,nullptr,b,rp) ;
 		    } /* end if */
 		} /* end if (checkbase) */
 	    } /* end if (non-zero c-string) */
