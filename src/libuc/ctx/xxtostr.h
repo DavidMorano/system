@@ -1,6 +1,9 @@
 /* xxtostr HEADER */
 /* lang=C20,C++20 */
 
+/* subroutines to convert an integer to a sring (base-10) */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

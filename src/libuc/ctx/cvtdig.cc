@@ -1,7 +1,8 @@
-/* cvtdig */
+/* cvtdig SUPPORT */
 /* lang=C++20 */
 
 /* convert an integer value into a c-string, given a value and base */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,6 +18,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+	Name:
+	cvtdig
 
 	Description:
 	This subroutine converts a value (and a base) into its

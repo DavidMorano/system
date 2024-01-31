@@ -1,4 +1,4 @@
-/* xxtostr */
+/* xxtostr SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a sring (base-10) */
