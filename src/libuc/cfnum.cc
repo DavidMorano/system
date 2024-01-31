@@ -1,7 +1,8 @@
-/* cfnum */
+/* cfnum SUPPORT */
 /* lang=C++20 */
 
 /* convert from a number to an integer */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,15 +16,19 @@
 
 /*******************************************************************************
 
-	Description:
-	These subroutines convert numeric strings in a variety of formats or
-	bases into the integer-binary form.  These subroutines handle some
-	cases that the 'atox(3c)' family do not.  Also, we handle Latin-1
-	characters correctly: specifically with our use of:
+	Name:
+	cfnum
 
-		CHAR_TOLC(3dam)
-		isdigitlatin(3dam)
-		isalphalatin(3dam)
+	Description:
+	These subroutines convert numeric strings in a variety of
+	formats or bases into the integer-binary form.  These
+	subroutines handle some cases that the |atox(3c)| family
+	do not.  Also, we handle Latin-1 characters correctly;
+	specifically with our use of:
+
+		tolc(3uc)
+		isdigitlatin(3uc)
+		isalphalatin(3uc)
 
 	instead of:
 
@@ -37,31 +42,127 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<char.h>
+#include	<cstring>		/* for |strnlen(3c)| */
+#include	<concepts>
+#include	<usysrets.h>
+#include	<stdintx.h>
 #include	<cfbin.h>
 #include	<cfoct.h>
 #include	<cfdec.h>
 #include	<cfhex.h>
-#include	<localmisc.h>
+#include	<ischarx.h>
+#include	<char.h>
+#include	<mkchar.h>
+#include	<toxc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 /* local defines */
 
-#define	TOLC(ch)	CHAR_TOLC(ch)
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern int	isdigitlatin(int) noex ;
-extern int	isalphalatin(int) noex ;
+
+/* local structures */
+
+
+/* subroutine-templaces */
+
+template<typename T>
+int cfnumx(cchar *bp,int bl,T *rp) noex {
+	int		rs = SR_DOM ;
+	int		ch ;
+	int		f_negative = FALSE ;
+	bl = strnlen(bp,bl) ;
+	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
+	    bp += 1 ;
+	    bl -= 1 ;
+	}
+	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
+	    f_negative = (*bp == '-') ;
+	    bp += 1 ;
+	    bl -= 1 ;
+	}
+	if (bl > 0) {
+	    if (*bp == '\\') {
+	        bp += 1 ;
+	        bl -= 1 ;
+	        if (bl > 1) {
+	            ch = tolc(bp[0]) ;
+	            bp += 1 ;
+	            bl -= 1 ;
+	            switch (ch) {
+	            case 'd':
+	                rs = cfdec(bp,bl,rp) ;
+	                break ;
+	            case 'x':
+	                rs = cfhex(bp,bl,rp) ;
+	                break ;
+	            case 'o':
+	                rs = cfoct(bp,bl,rp) ;
+	                break ;
+	            case 'b':
+	                rs = cfbin(bp,bl,rp) ;
+	                break ;
+	            default:
+	                rs = SR_INVALID ;
+	                break ;
+	            } /* end switch */
+	        } else {
+	            rs = SR_INVALID ;
+		}
+	    } else if (isdigitlatin(mkchar(*bp))) {
+	        if (bl > 1) {
+	            ch = tolc(bp[1]) ;
+	            if (isalphalatin(ch)) {
+	                bp += 2 ;
+	                bl -= 2 ;
+	                switch (ch) {
+	                case 'd':
+	                    rs = cfdec(bp,bl,rp) ;
+	                    break ;
+	                case 'x':
+	                    rs = cfhex(bp,bl,rp) ;
+	                    break ;
+	                case 'o':
+	                    rs = cfoct(bp,bl,rp) ;
+	                    break ;
+	                case 'b':
+	                    rs = cfbin(bp,bl,rp) ;
+	                    break ;
+	                default:
+	                    rs = SR_INVALID ;
+	                    break ;
+	                } /* end switch */
+	            } else if (bp[0] == '0') {
+	                rs = cfocti((bp+1),(bl-1),rp) ;
+	            } else {
+	                rs = cfdec(bp,bl,rp) ;
+		    }
+	        } else {
+	            rs = cfdec(bp,bl,rp) ;
+		}
+	    } /* end if */
+	    if (f_negative) *rp = (- *rp) ;
+	} /* end if */
+	return rs ;
+}
+/* end subroutine (cfnumx) */
 
 
 /* forward references */
 
-int		cfnumi(cchar *,int,int *) noex ;
-
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -85,7 +186,7 @@ int cfnumi(cchar *bp,int bl,int *rp) noex {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 1) {
-	            ch = TOLC(bp[0]) ;
+	            ch = tolc(bp[0]) ;
 	            bp += 1 ;
 	            bl -= 1 ;
 	            switch (ch) {
@@ -108,9 +209,9 @@ int cfnumi(cchar *bp,int bl,int *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(MKCHAR(*bp))) {
+	    } else if (isdigitlatin(mkchar(*bp))) {
 	        if (bl > 1) {
-	            ch = TOLC(bp[1]) ;
+	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;
@@ -165,7 +266,7 @@ int cfnumui(cchar *bp,int bl,uint *rp) noex {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 0) {
-	            ch = TOLC(bp[0]) ;
+	            ch = tolc(bp[0]) ;
 	            bp += 1 ;
 	            bl -= 1 ;
 	            switch (ch) {
@@ -188,9 +289,9 @@ int cfnumui(cchar *bp,int bl,uint *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(MKCHAR(*bp))) {
+	    } else if (isdigitlatin(mkchar(*bp))) {
 	        if (bl > 1) {
-	            ch = TOLC(bp[1]) ;
+	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;
@@ -246,7 +347,7 @@ int cfnuml(cchar *bp,int bl,long *rp) noex {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 1) {
-	            ch = TOLC(bp[0]) ;
+	            ch = tolc(bp[0]) ;
 	            bp += 1 ;
 	            bl -= 1 ;
 	            switch (ch) {
@@ -271,9 +372,9 @@ int cfnuml(cchar *bp,int bl,long *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(MKCHAR(*bp))) {
+	    } else if (isdigitlatin(mkchar(*bp))) {
 	        if (bl > 1) {
-	            ch = TOLC(bp[1]) ;
+	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;
@@ -328,7 +429,7 @@ int cfnumul(cchar *bp,int bl,ulong *rp) noex {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 0) {
-	            ch = TOLC(bp[0]) ;
+	            ch = tolc(bp[0]) ;
 	            bp += 1 ;
 	            bl -= 1 ;
 	            switch (ch) {
@@ -351,9 +452,9 @@ int cfnumul(cchar *bp,int bl,ulong *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(MKCHAR(*bp))) {
+	    } else if (isdigitlatin(mkchar(*bp))) {
 	        if (bl > 1) {
-	            ch = TOLC(bp[1]) ;
+	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;
@@ -408,7 +509,7 @@ int cfnumll(cchar *bp,int bl,longlong *rp) noex {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 1) {
-	            ch = TOLC(bp[0]) ;
+	            ch = tolc(bp[0]) ;
 	            bp += 1 ;
 	            bl -= 1 ;
 	            switch (ch) {
@@ -431,9 +532,9 @@ int cfnumll(cchar *bp,int bl,longlong *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(MKCHAR(*bp))) {
+	    } else if (isdigitlatin(mkchar(*bp))) {
 	        if (bl > 1) {
-	            ch = TOLC(bp[1]) ;
+	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;
@@ -488,7 +589,7 @@ int cfnumull(cchar *bp,int bl,ulonglong *rp) noex {
 	        bp += 1 ;
 	        bl -= 1 ;
 	        if (bl > 0) {
-	            ch = TOLC(bp[0]) ;
+	            ch = tolc(bp[0]) ;
 	            bp += 1 ;
 	            bl -= 1 ;
 	            switch (ch) {
@@ -511,9 +612,9 @@ int cfnumull(cchar *bp,int bl,ulonglong *rp) noex {
 	        } else {
 	            rs = SR_INVALID ;
 		}
-	    } else if (isdigitlatin(MKCHAR(*bp))) {
+	    } else if (isdigitlatin(mkchar(*bp))) {
 	        if (bl > 1) {
-	            ch = TOLC(bp[1]) ;
+	            ch = tolc(bp[1]) ;
 	            if (isalphalatin(ch)) {
 	                bp += 2 ;
 	                bl -= 2 ;

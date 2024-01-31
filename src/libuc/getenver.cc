@@ -23,7 +23,7 @@
 	getenver
 
 	Description:
-	This subroutine is like 'getenv(3c)' except that it also
+	This subroutine is like |getenv(3c)| except that it also
 	takes an additional argument that specifies the length of
 	the environment variable string to look up in the environment
 	array.

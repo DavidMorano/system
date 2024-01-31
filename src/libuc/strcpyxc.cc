@@ -1,4 +1,4 @@
-/* strcpyxc */
+/* strcpyxc SUPPORT */
 /* lang=C++20 */
 
 /* copy a c-string to given case */
@@ -21,7 +21,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<toxc.h>
 #include	<localmisc.h>
@@ -37,7 +37,9 @@
 
 /* local typedefs */
 
-typedef int (*toxc_f)(int) noex ;
+extern "C" {
+    typedef int (*toxc_f)(int) noex ;
+}
 
 
 /* external subroutines */

@@ -18,11 +18,12 @@
 #define	CFXXX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 EXTERNC_begin
@@ -36,6 +37,30 @@ extern int cfxxxul(cchar *,int,ulong *) noex ;
 extern int cfxxxull(cchar *,int,ulonglong *) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+
+static inline int cfxxx(cchar *sp,int sl,int *rp) noex {
+	return cfxxxi(sp,sl,rp) ;
+}
+static inline int cfxxx(cchar *sp,int sl,long *rp) noex {
+	return cfxxxl(sp,sl,rp) ;
+}
+static inline int cfxxx(cchar *sp,int sl,longlong *rp) noex {
+	return cfxxxll(sp,sl,rp) ;
+}
+
+static inline int cfxxx(cchar *sp,int sl,uint *rp) noex {
+	return cfxxxui(sp,sl,rp) ;
+}
+static inline int cfxxx(cchar *sp,int sl,ulong *rp) noex {
+	return cfxxxul(sp,sl,rp) ;
+}
+static inline int cfxxx(cchar *sp,int sl,ulonglong *rp) noex {
+	return cfxxxull(sp,sl,rp) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* CFXXX_INCLUDE */

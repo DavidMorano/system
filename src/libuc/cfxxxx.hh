@@ -47,7 +47,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>

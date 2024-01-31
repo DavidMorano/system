@@ -1,9 +1,8 @@
-/* isproc */
+/* isproc SUPPORT */
+/* lang=C++20 */
 
 /* is a process (specified by PID) currently in the system? */
-
-
-#define	CF_DEBUGS	0		/* debug prints */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,31 +16,29 @@
 
 /*******************************************************************************
 
-        This subroutine checks to see if the specific process identified by its
-        PID, is still on the system. Note that even zombie processes can satisfy
-        the search requirement on some systems!
+	Name:
+	isproc
+
+	Description:
+	This subroutine checks to see if the specific process
+	identified by its PID, is still on the system. Note that
+	even zombie processes can satisfy the search requirement
+	on some systems!
 
 	Synopsis:
-
-	int isproc(pid)
-	pid_t	pid ;
+	int isproc(pid_t pid) noex
 
 	Arguments:
-
 	pid			PID of process to search for
 
 	Returns:
-
-	TRUE			process was found on system
-	FALSE			process was not found on system
-	<0			error
-
+	true			process was found on system
+	false			process was not found on system
+	<0			error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -63,15 +60,13 @@
 
 /* exported subroutines */
 
-
-int isproc(pid_t pid)
-{
+int isproc(pid_t pid) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = u_kill(pid,0)) >= 0) {
-	    f = TRUE ;
+	    f = true ;
 	} else if (rs == SR_PERM) {
-	    f = TRUE ;
+	    f = true ;
 	    rs = SR_OK ;
 	} else if (rs == SR_SRCH) {
 	    rs = SR_OK ;

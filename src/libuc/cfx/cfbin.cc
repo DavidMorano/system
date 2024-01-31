@@ -1,4 +1,4 @@
-/* cfoct SUPPORT */
+/* cfbin SUPPORT */
 /* lang=C++20 */
 
 /* convert a digit c-string to its integer value */
@@ -8,16 +8,17 @@
 /* revision history:
 
 	= 1998-10-01, David A­D­ Morano
-	This subroutine was written by being adapted from a previous version of
-	the same, which itself was adapted from an original asembly-language
-	version.
+	This subroutine was written by being adapted from a previous
+	version of the same, which itself was adapted from an
+	original asembly-language version.
 
 	= 2013-04-30, David A­D­ Morano
 	I took the plunge and rewrote this using the LIBC subroutines
-	'strtoXX(3c)'.  It is no longer stand-alone, like in the old days, but
-	we have been mostly on UNIX®i for some time now (decades) and use in
-	non-UNIX®i environments is now quite rare.  I hope that this is not a
-	problem.  We will see.
+	'strtoXX(3c)'.  It is no longer stand-alone, like in the
+	old days, but we have been mostly on UNIX®i for some time
+	now (decades) and use in non-UNIX®i environments is now
+	quite rare.  I hope that this is not a problem.  We will
+	see.
 
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
@@ -31,6 +32,7 @@
 
 /* Copyright © 1998,2013,2023 David A­D­ Morano.  All rights reserved. */
 
+
 /*******************************************************************************
 
 	Subroutines to convert digit c-strings to integers.
@@ -39,16 +41,15 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<stdintx.h>
 #include	<cfxxxx.hh>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+#include	<localmisc.h>
 
-#include	"cfoct.h"
+#include	"cfbin.h"
 
 
 /* local defines */
 
-#define	OURBASE		8
+#define	OURBASE		2
 
 
 /* external subroutines */
@@ -70,27 +71,27 @@ constexpr int	b = OURBASE ;
 
 /* exported subroutines */
 
-int cfocti(cchar *sp,int sl,int *rp) noex {
+int cfbini(cchar *sp,int sl,int *rp) noex {
 	return cfxxxx(uc_strtoi,sp,sl,b,rp) ;
 }
 
-int cfoctl(cchar *sp,int sl,long *rp) noex {
+int cfbinl(cchar *sp,int sl,long *rp) noex {
 	return cfxxxx(uc_strtol,sp,sl,b,rp) ;
 }
 
-int cfoctll(cchar *sp,int sl,longlong *rp) noex {
+int cfbinll(cchar *sp,int sl,longlong *rp) noex {
 	return cfxxxx(uc_strtoll,sp,sl,b,rp) ;
 }
 
-int cfoctui(cchar *sp,int sl,uint *rp) noex {
+int cfbinui(cchar *sp,int sl,uint *rp) noex {
 	return cfxxxx(uc_strtoui,sp,sl,b,rp) ;
 }
 
-int cfoctul(cchar *sp,int sl,ulong *rp) noex {
+int cfbinul(cchar *sp,int sl,ulong *rp) noex {
 	return cfxxxx(uc_strtoul,sp,sl,b,rp) ;
 }
 
-int cfoctull(cchar *sp,int sl,ulonglong *rp) noex {
+int cfbinull(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfxxxx(uc_strtoull,sp,sl,b,rp) ;
 }
 

@@ -14,6 +14,13 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
+/******************************************************************************* 
+	This object provides various value limits on various integer
+	types.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* MUST be first to configure */
 #ifndef	VALUELIMITS_INCLUDE
 #define	VALUELIMITS_INCLUDE
 #ifdef	__cplusplus

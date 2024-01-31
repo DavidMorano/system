@@ -1,4 +1,4 @@
-/* uc_context SUPPORT */
+/* uccontext SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */

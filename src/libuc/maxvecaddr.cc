@@ -1,6 +1,8 @@
-/* maxvecaddr */
+/* maxvecaddr SUPPORT */
+/* lang=C++20 */
 
 /* maximum core-address determination for a vector-array of strings */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,22 +14,29 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
-#include	<string.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
-const char *maxvecaddr(const char **va)
-{
-	const char	*maxp = NULL ;
-	if (va != NULL) {
+
+/* local defines */
+
+
+/* exported subroutines */
+
+cchar *maxvecaddr(mainv va) noex {
+	cchar	*maxp = nullptr ;
+	if (va != nullptr) {
 	    cchar	*lp ;
 	    int		n ;
-	    for (n = 0 ; va[n] != NULL ; n += 1) ;
-	    lp = (const char *) (va+n+2) ;
+	    for (n = 0 ; va[n] != nullptr ; n += 1) ;
+	    lp = ccharp(va +n + 2) ;
 	    if (lp > maxp) maxp = lp ;
 	    {
-		int	i ;
 		cchar	*sp = va[0] ;
-	        for (i = 1 ; i < n ; i += 1) {
+	        for (int i = 1 ; i < n ; i += 1) {
 		    if (va[n] > sp) sp = va[n] ;
 	        } /* end for */
 		lp = (strlen(sp) + 1) ;

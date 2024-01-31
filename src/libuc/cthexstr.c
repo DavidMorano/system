@@ -49,9 +49,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<sbuf.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cthexstr.h"
 

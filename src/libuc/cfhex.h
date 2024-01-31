@@ -18,11 +18,12 @@
 #define	CFHEX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 EXTERNC_begin
@@ -36,6 +37,30 @@ extern int cfhexul(cchar *,int,ulong *) noex ;
 extern int cfhexull(cchar *,int,ulonglong *) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+
+static inline int cfhex(cchar *sp,int sl,int *rp) noex {
+	return cfhexi(sp,sl,rp) ;
+}
+static inline int cfhex(cchar *sp,int sl,long *rp) noex {
+	return cfhexl(sp,sl,rp) ;
+}
+static inline int cfhex(cchar *sp,int sl,longlong *rp) noex {
+	return cfhexll(sp,sl,rp) ;
+}
+
+static inline int cfhex(cchar *sp,int sl,uint *rp) noex {
+	return cfhexui(sp,sl,rp) ;
+}
+static inline int cfhex(cchar *sp,int sl,ulong *rp) noex {
+	return cfhexul(sp,sl,rp) ;
+}
+static inline int cfhex(cchar *sp,int sl,ulonglong *rp) noex {
+	return cfhexull(sp,sl,rp) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* CFHEX_INCLUDE */

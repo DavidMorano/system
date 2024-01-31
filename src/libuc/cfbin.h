@@ -18,11 +18,12 @@
 #define	CFBIN_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 EXTERNC_begin
@@ -36,6 +37,30 @@ extern int cfbinul(cchar *,int,ulong *) noex ;
 extern int cfbinull(cchar *,int,ulonglong *) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+
+static inline int cfbin(cchar *sp,int sl,int *rp) noex {
+	return cfbini(sp,sl,rp) ;
+}
+static inline int cfbin(cchar *sp,int sl,long *rp) noex {
+	return cfbinl(sp,sl,rp) ;
+}
+static inline int cfbin(cchar *sp,int sl,longlong *rp) noex {
+	return cfbinll(sp,sl,rp) ;
+}
+
+static inline int cfbin(cchar *sp,int sl,uint *rp) noex {
+	return cfbinui(sp,sl,rp) ;
+}
+static inline int cfbin(cchar *sp,int sl,ulong *rp) noex {
+	return cfbinul(sp,sl,rp) ;
+}
+static inline int cfbin(cchar *sp,int sl,ulonglong *rp) noex {
+	return cfbinull(sp,sl,rp) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* CFBIN_INCLUDE */

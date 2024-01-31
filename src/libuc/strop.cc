@@ -1,4 +1,4 @@
-/* strop */
+/* strop SUPPORT */
 /* lang=C++20 */
 
 /* string-operations */

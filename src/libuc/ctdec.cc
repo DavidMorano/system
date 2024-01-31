@@ -63,10 +63,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<bit>
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<ucvariables.hh>
 #include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctdec.h"
 

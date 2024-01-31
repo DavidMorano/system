@@ -26,9 +26,10 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<usystem.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<varnames.hh>
 #include	<valuelimits.hh>
 #include	<digbufsizes.hh>

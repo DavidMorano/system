@@ -55,14 +55,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstring>
 #include	<charconv>
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<ucvariables.hh>
 #include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctchars.h"
 

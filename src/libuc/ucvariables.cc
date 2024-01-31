@@ -28,12 +28,10 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<climits>
-#include	<cstring>
-#include	<usystem.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"ucvariables.hh"

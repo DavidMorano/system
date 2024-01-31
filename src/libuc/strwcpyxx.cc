@@ -1,4 +1,4 @@
-/* strwcpyxx */
+/* strwcpyxx SUPPORT */
 /* lang=C++20 */
 
 /* copy a c-string to a maximum extent */
@@ -126,18 +126,21 @@
 #include	<cstddef>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<utypedefs.h>
+#include	<sfx.h>
+#include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
 
 #include	"strwcpyxx.h"
 
 
-/* external subroutines */
+/* local defines */
 
-extern "C" {
-    extern int	sfnext(cchar *,int,cchar **) noex ;
-    extern char	*strwcpy(char *,cchar *,int) noex ;
-}
+
+/* local namespaces */
+
+
+/* external subroutines */
 
 
 /* exported subroutines */

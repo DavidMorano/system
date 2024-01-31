@@ -19,22 +19,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
 
 
-#ifdef	__cplusplus
+EXTERNC_begin
 
-extern "C" {
-    extern longlong strtolonglong(const char *,char **,int) noex ;
-    extern ulonglong strtoulonglong(const char *,char **,int) noex ;
-}
+extern longlong strtolonglong(cchar *,char **,int) noex ;
+extern ulonglong strtoulonglong(cchar *,char **,int) noex ;
 
-#else /* __cplusplus */
-
-extern longlong strtolonglong(const char *,char **,int) noex ;
-extern ulonglong strtoulonglong(const char *,char **,int) noex ;
-
-#endif /* __cplusplus */
+EXTERNC_end
 
 
 #endif /* STRTOXLONGLONG_INCLUDE */

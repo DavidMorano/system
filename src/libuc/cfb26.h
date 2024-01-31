@@ -18,11 +18,12 @@
 #define	CFB26_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 EXTERNC_begin
@@ -36,6 +37,30 @@ extern int cfb26ul(cchar *,int,ulong *) noex ;
 extern int cfb26ull(cchar *,int,ulonglong *) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+
+int cfb26(cchar *sp,int sl,int *rp) noex {
+	return cfb26i(sp,sl,rp) ;
+}
+int cfb26(cchar *sp,int sl,long *rp) noex {
+	return cfb26l(sp,sl,rp) ;
+}
+int cfb26(cchar *sp,int sl,longlong *rp) noex {
+	return cfb26ll(sp,sl,rp) ;
+}
+
+int cfb26(cchar *sp,int sl,uint *rp) noex {
+	return cfb26ui(sp,sl,rp) ;
+}
+int cfb26(cchar *sp,int sl,ulong *rp) noex {
+	return cfb26ul(sp,sl,rp) ;
+}
+int cfb26(cchar *sp,int sl,ulonglong *rp) noex {
+	return cfb26ull(sp,sl,rp) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* CFB26_INCLUDE */

@@ -63,14 +63,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<bit>
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
 #include	<ucvariables.hh>
 #include	<varnames.hh>
 #include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctxxx.h"
 

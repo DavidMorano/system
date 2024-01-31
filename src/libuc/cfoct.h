@@ -18,11 +18,12 @@
 #define	CFOCT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 EXTERNC_begin
@@ -36,6 +37,30 @@ extern int cfoctul(cchar *,int,ulong *) noex ;
 extern int cfoctull(cchar *,int,ulonglong *) noex ;
 
 EXTERNC_end
+
+#if	__cplusplus
+
+static inline int cfoct(cchar *sp,int sl,int *rp) noex {
+	return cfocti(sp,sl,rp) ;
+}
+static inline int cfoct(cchar *sp,int sl,long *rp) noex {
+	return cfoctl(sp,sl,rp) ;
+}
+static inline int cfoct(cchar *sp,int sl,longlong *rp) noex {
+	return cfoctll(sp,sl,rp) ;
+}
+
+static inline int cfoct(cchar *sp,int sl,uint *rp) noex {
+	return cfoctui(sp,sl,rp) ;
+}
+static inline int cfoct(cchar *sp,int sl,ulong *rp) noex {
+	return cfoctul(sp,sl,rp) ;
+}
+static inline int cfoct(cchar *sp,int sl,ulonglong *rp) noex {
+	return cfoctull(sp,sl,rp) ;
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* CFOCT_INCLUDE */

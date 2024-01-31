@@ -20,7 +20,7 @@
 	getev
 
 	Description:
-	This subroutine is similar to 'getenv(3c)' except that the
+	This subroutine is similar to |getenv(3c)| except that the
 	variable array (an array of pointers to strings) is explicitly
 	passed by the caller.
 

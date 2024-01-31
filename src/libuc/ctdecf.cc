@@ -43,13 +43,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<algorithm>		/* for |min(3c++)| */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<convertx.h>		/* <- the money shot! */
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 /* local defines */

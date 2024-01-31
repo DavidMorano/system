@@ -40,16 +40,19 @@
 
 	Returns:
 	>=0		length of result string
-	<0		error
+	<0		error (syhstem-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
 #include	<ctdec.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+
+#include	"ctdecp.h"
 
 
 /* local defines */

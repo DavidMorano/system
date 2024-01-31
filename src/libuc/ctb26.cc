@@ -37,18 +37,15 @@
 
 	Returns:
 	>=0		length of buffer used by the conversion
-	<0		error in the conversion
-
+	<0		error in the conversion (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstring>
-#include	<usystem.h>
+#include	<usysrets.h>
 #include	<stdintx.h>
 #include	<sncpyx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctb26.h"
 
@@ -64,11 +61,14 @@
 
 /* external subroutines */
 
+extern "C" {
+    int		ctb26ll(char *,int,int,int,longlong) noex ;
+    int		ctb26ull(char *,int,int,int,ulonglong) noex ;
+}
+
 
 /* forward references */
 
-int		ctb26ll(char *,int,int,int,longlong) noex ;
-int		ctb26ull(char *,int,int,int,ulonglong) noex ;
 
 static int	ictb26(char *,int,int,int,ulonglong) noex ;
 
@@ -76,6 +76,9 @@ static int	ictb26(char *,int,int,int,ulonglong) noex ;
 /* local variables */
 
 constexpr bool	f_remainder = CF_REMAINDER ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -94,7 +97,7 @@ int ctb26l(char *rbuf,int rlen,int type,int prec,long v) noex {
 
 int ctb26ll(char *rbuf,int rlen,int type,int prec,longlong v) noex {
 	ulonglong 	ulv = ulonglong(v) ;
-	const int	diglen = DIGBUFLEN ;
+	cint		diglen = DIGBUFLEN ;
 	int		len ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	if (v < 0) ulv = (- ulv) ;
@@ -118,7 +121,7 @@ int ctb26ul(char *rbuf,int rlen,int type,int prec,ulong v) noex {
 
 int ctb26ull(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	ulonglong 	ulv = ulonglong(v) ;
-	const int	diglen = DIGBUFLEN ;
+	cint		diglen = DIGBUFLEN ;
 	int		len ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	len = ictb26(digbuf,diglen,type,prec,ulv) ;
@@ -148,8 +151,8 @@ static int ictb26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	    *--rp = type ;
 	}
 	{
-		int	n = ((rbuf + rlen) - rp) ;
-		while (n++ < prec) *--rp = type ;
+	    int		n = ((rbuf + rlen) - rp) ;
+	    while (n++ < prec) *--rp = type ;
 	}
 	return (rbuf + rlen - rp) ;
 }

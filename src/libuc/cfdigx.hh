@@ -46,7 +46,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
@@ -87,7 +86,7 @@ int cfdigux(cc *sp,int sl,int b,T *rp) noex {
 		    nsl = r ;
 		} /* end if */
 	    	if ((rs = checkbase(nsp,nsl,b)) >= 0) {
-			rs = cvtfx(nsp,nsl,b,rp) ;
+		    rs = cvtfx(nsp,nsl,b,rp) ;
 		} /* end if (checkbase) */
 	    } /* end if (non-zero c-string) */
 	} /* end if (non-null) */
