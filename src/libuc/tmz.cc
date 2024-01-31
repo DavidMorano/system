@@ -121,8 +121,6 @@ static int	getzoff(int *,cchar *,int) noex ;
 static int	val(cchar *) noex ;
 static int	silogend(cchar *,int) noex ;
 
-static int	isplusminus(int) noex ;
-
 #if	defined(CF_MULTIZONE) && (CF_MULTIZONE == 0)
 static int	isgoodname(cchar *,int) ;
 #endif
@@ -1031,11 +1029,6 @@ static int silogend(cchar *sp,int sl) noex {
 	return i ;
 }
 /* end subroutine (silogend) */
-
-static int isplusminus(int ch) noex {
-	return ((ch == '+') || (ch == '-')) ;
-}
-/* end subroutine (isplusminus) */
 
 static cchar *strnzone(cchar *sp,int sl) noex {
 	int		f = false ;

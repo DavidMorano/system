@@ -1,17 +1,17 @@
-/* prog */
+/* sdprog SUPPORT */
+/* lang=C++20 */
 
 /* SYSDIALER "prog" dialer */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This code was started by taking the corresponding code from the
-        TCP-family module. In retrospect, that was a mistake. Rather I should
-        have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -19,36 +19,27 @@
 
 /*******************************************************************************
 
+	Description:
 	This is a dialer module.
 
 	Synopsis:
-
 	prog <execfile>
 
 	Arguments:
-
 	+ dialer arguments
 	+ hostname
 	+ service
 	+ service arguments
 
-
 *******************************************************************************/
 
-
-#define	PROG_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<ids.h>
@@ -120,9 +111,6 @@
 #define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
-#undef	DEBUGFNAME
-#define	DEBUGFNAME	"/tmp/lsh.nd"
-
 #define	ARGBUFLEN	(MAXPATHLEN + 35)
 #define	PATHBUFLEN	((4 * MAXPATHLEN) + 3)
 
@@ -168,60 +156,62 @@
 #define	SUBINFO_ALLOCS	struct subinfo_allocs
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	snsds(char *,int,cchar	 *,cchar	 *) ;
+extern int	sncpy1(char *,int,cchar	 *) ;
+extern int	sncpy2(char *,int,cchar	 *,cchar	 *) ;
+extern int	mkpath1w(char *,cchar	 *,int) ;
+extern int	mkpath1(char *,cchar	 *) ;
+extern int	mkpath2(char *,cchar	 *,cchar	 *) ;
+extern int	mkpath3(char *,cchar	 *,cchar	 *,cchar	 *) ;
+extern int	sfdirname(cchar	 *,int,cchar	 **) ;
+extern int	sfbasename(cchar	 *,int,cchar	 **) ;
+extern int	vstrkeycmp(cchar	 **,cchar	 **) ;
+extern int	matstr(cchar	 **,cchar	 *,int) ;
+extern int	matostr(cchar	 **,int,cchar	 *,int) ;
+extern int	pathclean(char *,cchar	 *,int) ;
+extern int	vstrkeycmp(cchar	 **,cchar	 **) ;
+extern int	cfdeci(cchar	 *,int,int *) ;
+extern int	cfdecui(cchar	 *,int,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecl(char *,int,long) ;
-extern int	optbool(const char *,int) ;
+extern int	optbool(cchar	 *,int) ;
 extern int	gethz(int) ;
 extern int	getpwd(char *,int) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_loadfile(vecstr *,int,const char *) ;
-extern int	vecstr_envset(VECSTR *,const char *,const char *,int) ;
-extern int	vecstr_envadd(VECSTR *,const char *,const char *,int) ;
-extern int	vecstr_envadds(VECSTR *,const char *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar	 *,int) ;
+extern int	vecstr_loadfile(vecstr *,int,cchar	 *) ;
+extern int	vecstr_envset(VECSTR *,cchar	 *,cchar	 *,int) ;
+extern int	vecstr_envadd(VECSTR *,cchar	 *,cchar	 *,int) ;
+extern int	vecstr_envadds(VECSTR *,cchar	 *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
+extern int	permsched(cchar	 **,vecstr *,char *,int,cchar	 *,int) ;
+extern int	getprogpath(IDS *,VECSTR *,char *,cchar	 *,int) ;
 extern int	msleep(uint) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
+extern int	mkpr(char *,int,cchar	 *,cchar	 *) ;
 extern int	logfile_userinfo(LOGFILE *,USERINFO *,time_t,cchar *,cchar *) ;
-extern int	hasalldig(const char *,int) ;
+extern int	hasalldig(cchar	 *,int) ;
 
-extern int	envs_procxe(ENVS *,EXPCOOK *,const char **,vecstr *,cchar *) ;
+extern int	envs_procxe(ENVS *,EXPCOOK *,cchar	 **,vecstr *,cchar *) ;
 extern int	envs_subs(vecstr *,EXPCOOK *,VECSTR *,ENVS *) ;
-extern int	getnprocessors(const char **,int) ;
-extern int	defproc(vecstr *,const char **,EXPCOOK *,const char *) ;
+extern int	getnprocessors(cchar	 **,int) ;
+extern int	defproc(vecstr *,cchar	 **,EXPCOOK *,cchar	 *) ;
 
-#if	CF_DEBUGS
-extern int	nprintf(const char *,const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar	 *,int) ;
 
 
 /* external variables */
 
-extern const char	**environ ;
+extern cchar		**environ ;
 
 
 /* local structures */
@@ -236,48 +226,48 @@ struct subinfo_flags {
 } ;
 
 struct subinfo_allocs {
-	const char	*node ;
-	const char	*svc ;
-	const char	*pr ;
+	cchar		*node ;
+	cchar		*svc ;
+	cchar		*pr ;
 } ;
 
 struct subinfo {
-	const char	**argv ;
-	const char	**envv ;
-	const char	*pr ;
-	const char	*prn ;
-	const char	*searchname ;
-	const char	*hostname ;
-	const char	*svcname ;
-	const char	*program ;
-	const char	*pvfname ;
-	const char	*dfname ;
-	const char	*xfname ;
-	const char	*efname ;
-	const char	*architecture ;		/* machine architecture */
-	const char	*umachine ;		/* UNAME machine name */
-	const char	*usysname ;		/* UNAME OS system-name */
-	const char	*urelease ;		/* UNAME OS release */
-	const char	*uversion ;		/* UNAME OS version */
-	const char	*hz ;			/* OS HZ */
-	const char	*nodename ;		/* USERINFO */
-	const char	*domainname ;		/* USERINFO */
-	const char	*username ;		/* USERINFO */
-	const char	*homedname ;		/* USERINFO */
-	const char	*shell ;		/* USERINFO */
-	const char	*organization ;		/* USERINFO */
-	const char	*gecosname ; 		/* USERINFO */
-	const char	*realname ;		/* USERINFO */
-	const char	*name ;			/* USERINFO */
-	const char	*tz ;			/* USERINFO */
-	const char	*groupname ;
-	const char	*tmpdname ;
-	const char	*maildname ;
-	const char	*helpfname ;
-	const char	*logfname ;
-	const char	*paramfname ;
-	const char	*logid ;
-	const char	*defprog ;
+	cchar		**argv ;
+	cchar		**envv ;
+	cchar		*pr ;
+	cchar		*prn ;
+	cchar		*searchname ;
+	cchar		*hostname ;
+	cchar		*svcname ;
+	cchar		*program ;
+	cchar		*pvfname ;
+	cchar		*dfname ;
+	cchar		*xfname ;
+	cchar		*efname ;
+	cchar		*architecture ;		/* machine architecture */
+	cchar		*umachine ;		/* UNAME machine name */
+	cchar		*usysname ;		/* UNAME OS system-name */
+	cchar		*urelease ;		/* UNAME OS release */
+	cchar		*uversion ;		/* UNAME OS version */
+	cchar		*hz ;			/* OS HZ */
+	cchar		*nodename ;		/* USERINFO */
+	cchar		*domainname ;		/* USERINFO */
+	cchar		*username ;		/* USERINFO */
+	cchar		*homedname ;		/* USERINFO */
+	cchar		*shell ;		/* USERINFO */
+	cchar		*organization ;		/* USERINFO */
+	cchar		*gecosname ; 		/* USERINFO */
+	cchar		*realname ;		/* USERINFO */
+	cchar		*name ;			/* USERINFO */
+	cchar		*tz ;			/* USERINFO */
+	cchar		*groupname ;
+	cchar		*tmpdname ;
+	cchar		*maildname ;
+	cchar		*helpfname ;
+	cchar		*logfname ;
+	cchar		*paramfname ;
+	cchar		*logid ;
+	cchar		*defprog ;
 	PROG		*op ;
 	SYSDIALER_ARGS	*ap ;
 	IDS		id ;
@@ -314,13 +304,13 @@ static int	subinfo_procopts(SUBINFO *,KEYOPT *) ;
 static int	subinfo_defaults(SUBINFO *) ;
 static int	subinfo_userinfo(SUBINFO *) ;
 static int	subinfo_findprog(SUBINFO *,char *) ;
-static int	subinfo_search(SUBINFO *,VECSTR *,char *,const char *) ;
+static int	subinfo_search(SUBINFO *,VECSTR *,char *,cchar	 *) ;
 static int	subinfo_envdialer(SUBINFO *) ;
 static int	subinfo_sasize(SUBINFO *) ;
 static int	subinfo_sabuild(SUBINFO *,char *) ;
 static int	subinfo_exec(SUBINFO *,cchar *,cchar **) ;
 static int	subinfo_logfile(SUBINFO *) ;
-static int	subinfo_dirok(SUBINFO *,const char *,int) ;
+static int	subinfo_dirok(SUBINFO *,cchar	 *,int) ;
 static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 static int	subinfo_finish(SUBINFO *) ;
 
@@ -330,16 +320,16 @@ static int	loadhz(SUBINFO *) ;
 static int	loadcooks(SUBINFO *) ;
 
 static int	loadpathlist(SUBINFO *,VECSTR *,VECSTR *) ;
-static int	loadpathcomp(SUBINFO *,VECSTR *,const char *) ;
+static int	loadpathcomp(SUBINFO *,VECSTR *,cchar	 *) ;
 
-static int	loaddefsfile(SUBINFO *,const char *) ;
-static int	loaddefs(SUBINFO *,const char **) ;
-static int	loadxfile(SUBINFO *,const char *) ;
-static int	loadxsched(SUBINFO *,const char **) ;
+static int	loaddefsfile(SUBINFO *,cchar	 *) ;
+static int	loaddefs(SUBINFO *,cchar	 **) ;
+static int	loadxfile(SUBINFO *,cchar	 *) ;
+static int	loadxsched(SUBINFO *,cchar	 **) ;
 static int	loadpvars(SUBINFO *,cchar **,cchar *) ;
-static int	loadpvarsdef(SUBINFO *,const char **) ;
+static int	loadpvarsdef(SUBINFO *,cchar	 **) ;
 
-static int	pvars_begin(SUBINFO *,const char **,const char *) ;
+static int	pvars_begin(SUBINFO *,cchar	 **,cchar	 *) ;
 static int	pvars_end(SUBINFO *) ;
 
 static int	sched_begin(SUBINFO *) ;
@@ -347,25 +337,25 @@ static int	sched_end(SUBINFO *) ;
 
 static int	procenvextra(SUBINFO *) ;
 static int	procenvdef(SUBINFO *) ;
-static int	procenvsys(SUBINFO *,const char *) ;
-static int	procdefprog(SUBINFO *,const char **) ;
+static int	procenvsys(SUBINFO *,cchar *) ;
+static int	procdefprog(SUBINFO *,cchar **) ;
 
-static int	xfile(IDS *,const char *) ;
+static int	xfile(IDS *,cchar *) ;
 
 #ifdef	COMMENT
-static int	loadpath(vecstr *,const char *) ;
-static int	intprog(struct intprog *,const char *) ;
-static int	xfile(IDS *,const char *) ;
-static int	setdefpath(vecstr *,const char *) ;
-static int	createsearchpath(VECSTR *,const char *) ;
+static int	loadpath(vecstr *,cchar *) ;
+static int	intprog(struct intprog *,cchar *) ;
+static int	xfile(IDS *,cchar *) ;
+static int	setdefpath(vecstr *,cchar *) ;
+static int	createsearchpath(VECSTR *,cchar *) ;
 #endif /* COMMENT */
 
 #ifdef	COMMENT
-static int	mkpathvar(SUBINFO *,vecstr *,const char *,char **) ;
+static int	mkpathvar(SUBINFO *,vecstr *,cchar *,char **) ;
 #endif
 
-static int	isplusminus(const char *) ;
-static int	isminus(const char *) ;
+static bool	haspmz(cchar *) noex ;
+static bool	hasmz(cchar *) noex ;
 
 
 /* global variables (module information) */
@@ -381,19 +371,6 @@ SYSDIALER_INFO	prog = {
 
 /* local variables */
 
-static const char *argopts[] = {
-	"ROOT",
-	"RN",
-	"sn",
-	"pvf",
-	"pf",
-	"df",
-	"xf",
-	"ef",
-	"lf",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_rn,
@@ -407,8 +384,16 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char *procopts[] = {
-	"log",
+static constexpr cchar	 *argopts[] = {
+	"ROOT",
+	"RN",
+	"sn",
+	"pvf",
+	"pf",
+	"df",
+	"xf",
+	"ef",
+	"lf",
 	NULL
 } ;
 
@@ -417,8 +402,8 @@ enum procopts {
 	procopt_overlast
 } ;
 
-static const char	*cparams[] = {
-	"defprog",
+static constexpr cchar	 *procopts[] = {
+	"log",
 	NULL
 } ;
 
@@ -427,28 +412,8 @@ enum cparams {
 	cparam_overlast
 } ;
 
-static const char	*cooks[] = {
-	"MACHINE",	/* machine-name */
-	"ARCHITECTURE",	/* machine-architecture */
-	"NCPU",		/* number of machine CPUs */
-	"SYSNAME",	/* OS system-name */
-	"RELEASE",	/* OS system-release */
-	"VERSION",	/* OS system-version */
-	"HZ",		/* OS clock tics */
-	"U",		/* current user username */
-	"G",		/* current user groupname */
-	"HOME",		/* current user home directory */
-	"SHELL",	/* current user shell */
-	"ORGANIZATION",	/* current user organization name */
-	"GECOSNAME",	/* current user gecos-name */
-	"REALNAME",	/* current user real-name */
-	"NAME",		/* current user name */
-	"TZ",		/* current user time-zone */
-	"N",		/* nodename */
-	"D",		/* INET domainname (for current user) */
-	"H",		/* INET hostname */
-	"R",		/* program-root */
-	"RN",		/* program root-name */
+static constexpr cchar	*cparams[] = {
+	"defprog",
 	NULL
 } ;
 
@@ -477,21 +442,46 @@ enum cooks {
 	cook_overlast
 } ;
 
-static const char	*schedhconf[] = {
+static constexpr cchar	*cooks[] = {
+	"MACHINE",	/* machine-name */
+	"ARCHITECTURE",	/* machine-architecture */
+	"NCPU",		/* number of machine CPUs */
+	"SYSNAME",	/* OS system-name */
+	"RELEASE",	/* OS system-release */
+	"VERSION",	/* OS system-version */
+	"HZ",		/* OS clock tics */
+	"U",		/* current user username */
+	"G",		/* current user groupname */
+	"HOME",		/* current user home directory */
+	"SHELL",	/* current user shell */
+	"ORGANIZATION",	/* current user organization name */
+	"GECOSNAME",	/* current user gecos-name */
+	"REALNAME",	/* current user real-name */
+	"NAME",		/* current user name */
+	"TZ",		/* current user time-zone */
+	"N",		/* nodename */
+	"D",		/* INET domainname (for current user) */
+	"H",		/* INET hostname */
+	"R",		/* program-root */
+	"RN",		/* program root-name */
+	NULL
+} ;
+
+static constexpr cchar	*schedhconf[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	NULL
 } ;
 
-static const char	*schedpconf[] = {
+static constexpr cchar	*schedpconf[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
 	NULL
 } ;
 
-static const char	*schedpfile[] = {
+static constexpr cchar	*schedpfile[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -499,7 +489,7 @@ static const char	*schedpfile[] = {
 	NULL
 } ;
 
-static const char	*schedhfile[] = {
+static constexpr cchar	*schedhfile[] = {
 	"%h/%e/%n/%n.%f",
 	"%h/%e/%n/%f",
 	"%h/%e/%n.%f",
@@ -507,7 +497,7 @@ static const char	*schedhfile[] = {
 	NULL
 } ;
 
-static const char	*pathvars[] = {
+static constexpr cchar	*pathvars[] = {
 	"PATH",
 	"LD_LIBRARY_PATH",
 	"MANPATH",
@@ -520,7 +510,7 @@ static const char	*pathvars[] = {
 	NULL
 } ;
 
-static const char	*envbad[] = {
+static constexpr cchar	*envbad[] = {
 	"_",
 	"_A0",
 	"_EF",
@@ -530,7 +520,7 @@ static const char	*envbad[] = {
 	NULL
 } ;
 
-static const char	*envsys[] = {
+static constexpr cchar	*envsys[] = {
 	"SYSNAME",
 	"RELEASE",
 	"VERSION",
@@ -545,14 +535,6 @@ static const char	*envsys[] = {
 	NULL
 } ;
 
-static const char	*envdialers[] = {
-	"SYSDIALER_ROOT",
-	"SYSDIALER_HOST",
-	"SYSDIALER_SVC",
-	"SYSDIALER_SVCARGS",
-	NULL
-} ;
-
 enum envdialers {
 	envdialer_root,
 	envdialer_host,
@@ -561,16 +543,26 @@ enum envdialers {
 	envdialer_overlast
 } ;
 
+static constexpr cchar	*envdialers[] = {
+	"SYSDIALER_ROOT",
+	"SYSDIALER_HOST",
+	"SYSDIALER_SVC",
+	"SYSDIALER_SVCARGS",
+	NULL
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
-
 
 int prog_open(op,ap,hostname,svcname,av)
 PROG		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
+cchar		hostname[] ;
+cchar		svcname[] ;
+cchar		*av[] ;
 {
 	SUBINFO		si, *sip = &si ;
 	int		rs = SR_OK ;
@@ -587,17 +579,6 @@ const char	*av[] ;
 
 	memset(op,0,sizeof(PROG)) ;
 
-#if	CF_DEBUGS
-	debugprintf("prog_open: ent hostname=%s svcname=%s\n",
-	    hostname,svcname) ;
-	if (ap->argv != NULL) {
-		int	i ;
-	    for (i = 0 ; ap->argv[i] != NULL ; i += 1) {
-		debugprintf("prog_open: a%u=>%s<\n",i,ap->argv[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
 	rs = subinfo_start(sip,op,ap,hostname,svcname) ;
 	if (rs < 0)
 	    goto bad0 ;
@@ -613,36 +594,16 @@ const char	*av[] ;
 	if (rs >= 0)
 	    rs = loadhz(sip) ;
 
-#if	CF_DEBUGS
-	debugprintf("prog_open: various loads completed rs=%d\n",rs) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
-
 	if (rs < 0)
 	    goto baduser ;
 
-#if	CF_DEBUGS
-	debugprintf("prog_open: subinfo_defaults()\n") ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
-
 	if (rs >= 0)
 	    rs = subinfo_defaults(sip) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: subinfo_logfile()\n") ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	if (rs >= 0)
 	    rs = subinfo_logfile(sip) ;
 
 /* initialize and load up the cookies */
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: cookies\n") ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	rs = expcook_start(&sip->cooks) ;
 	if (rs < 0)
@@ -652,25 +613,9 @@ const char	*av[] ;
 	if (rs < 0)
 	    goto badcookload ;
 
-#if	CF_DEBUGS
-	debugprintf("prog_open: sched_begin\n") ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
-
 	rs = sched_begin(sip) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: sched_begin() rs=%d\n",rs) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
-
 	if (rs < 0)
 	    goto badsched_begin ;
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: init defs\n") ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	rs = vecstr_start(&sip->defs,DEFNDEFS,0) ;
 	if (rs < 0)
@@ -689,11 +634,6 @@ const char	*av[] ;
 	    goto baddefsload ;
 
 	vecstr_sort(&sip->defs,vstrkeycmp) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: envs_start\n") ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	rs = envs_start(&sip->xenvs,DEFNXENVS) ;
 	if (rs < 0)
@@ -718,19 +658,9 @@ const char	*av[] ;
 	if (rs < 0)
 	    goto badxinit ;
 
-#if	CF_DEBUGS
-	debugprintf("prog_open: pvars_begin() rs=%d\n",rs) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
-
 	rs = pvars_begin(sip,pathvars,sip->pvfname) ;
 	if (rs < 0)
 	    goto badpvars_begin ;
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: envs_subs() rs=%d\n",rs) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	rs = envs_subs(&sip->exports,&sip->cooks,&sip->pvars,&sip->xenvs) ;
 	if (rs < 0)
@@ -750,35 +680,18 @@ const char	*av[] ;
 
 /* find the program */
 
-#if	CF_DEBUGS
-	debugprintf("prog_open: program=%s\n",sip->program) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
-
 	progfname = progfnamebuf ;
 	rs = subinfo_findprog(sip,progfnamebuf) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: subinfo_findprog() rs=%d\n",rs) ;
-	debugprintf("prog_open: progfname=%s\n",progfname) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	if (rs < 0)
 	    goto badfindprog ;
 
 	if (rs >= 0) {
 	    rs = subinfo_envdialer(sip) ;
-#if	CF_DEBUGS
-	debugprintf("prog_open: subinfo_envdialer() rs=%d\n",rs) ;
-#endif
 	}
 
 	if (rs >= 0) {
 	    rs = subinfo_exec(sip,progfname,av) ;
-#if	CF_DEBUGS
-	debugprintf("prog_open: subinfo_exec() rs=%d\n",rs) ;
-#endif
 	}
 
 	if (rs >= 0)
@@ -832,11 +745,6 @@ ret1:
 
 ret0:
 bad0:
-
-#if	CF_DEBUGS
-	debugprintf("prog_open: ret rs=%d fd=%d\n",rs,op->fd) ;
-	debugprintf("prog_open: f_log=%u\n",op->f.log) ;
-#endif
 
 	return (rs >= 0) ? op->fd : rs ;
 }
@@ -937,7 +845,7 @@ int		to, opts ;
 
 int prog_write(op,buf,buflen)
 PROG		*op ;
-const char	buf[] ;
+cchar		buf[] ;
 int		buflen ;
 {
 	int		rs ;
@@ -958,7 +866,7 @@ int		buflen ;
 
 int prog_send(op,buf,buflen,flags)
 PROG		*op ;
-const char	buf[] ;
+cchar		buf[] ;
 int		buflen ;
 int		flags ;
 {
@@ -980,7 +888,7 @@ int		flags ;
 
 int prog_sendto(op,buf,buflen,flags,sap,salen)
 PROG		*op ;
-const char	buf[] ;
+cchar		buf[] ;
 int		buflen ;
 int		flags ;
 void		*sap ;
@@ -1050,10 +958,6 @@ int prog_close(PROG *op)
 
 	if (op->magic != PROG_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("prog_close: ent f_log=%u\n", op->f.log) ;
-#endif
-
 	if (op->fd >= 0) {
 	    rs1 = u_close(op->fd) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1094,14 +998,14 @@ static int subinfo_start(sip,op,ap,hostname,svcname)
 SUBINFO		*sip ;
 PROG		*op ;
 SYSDIALER_ARGS	*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
+cchar		hostname[] ;
+cchar		svcname[] ;
 {
 	int		rs ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
 
-	sip->envv = (const char **) environ ;
+	sip->envv = (cchar	 **) environ ;
 	sip->op = op ;
 	sip->ap = ap ;
 	sip->pr = ap->pr ;
@@ -1123,10 +1027,6 @@ const char	svcname[] ;
 		    vecstr_finish(&sip->stores) ;
 	    } /* end if (stores) */
 	} /* end if (getnprocessors) */
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_start: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1184,26 +1084,13 @@ static int subinfo_procargs(SUBINFO *sip)
 	int		f_optminus, f_optplus, f_optequal ;
 	int		f_doubledash = FALSE ;
 	cchar		*argval = NULL ;
-	const char	**argv ;
-	const char	*argp, *aop, *akp, *avp ;
+	cchar		**argv ;
+	cchar		*argp, *aop, *akp, *avp ;
 	char		argpresent[NARGPRESENT] ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_procargs: arguments\n") ;
-#endif
 
 	argv = ap->argv ;
 
 	for (argc = 0 ; argv[argc] != NULL ; argc += 1) ;
-
-#if	CF_DEBUGS
-	{
-	    debugprintf("prog/subinfo_procargs: argc=%u\n",argc) ;
-	    for (ai = 0 ; argv[ai] != NULL ; ai += 1)
-	        debugprintf("prog/subinfo_procargs: argv[%u]=%s\n",
-		ai,argv[ai]) ;
-	}
-#endif /* CF_DEBUGS */
 
 	sip->argc = argc ;
 	sip->argv = argv ;
@@ -1462,7 +1349,7 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	    } else {
 
-	        sip->program = (const char *) argp ;
+	        sip->program = (cchar	 *) argp ;
 
 	    } /* end if (key letter-word or positional) */
 
@@ -1472,11 +1359,6 @@ static int subinfo_procargs(SUBINFO *sip)
 
 	sip->argi = (argc > 0) ? (ai + 1) : 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_procargs: program=%s\n",sip->program) ;
-	debugprintf("prog/subinfo_procargs: argi=%u\n",sip->argi) ;
-#endif
-
 	if (rs >= 0) {
 	    rs = subinfo_procopts(sip,&akopts) ;
 	}
@@ -1485,10 +1367,6 @@ ret1:
 	keyopt_finish(&akopts) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_procargs: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1540,7 +1418,7 @@ static int subinfo_setentry(SUBINFO *sip,cchar **epp,cchar v[],int vlen)
 	int		rs ;
 	int		oi, i ;
 	int		vnlen = 0 ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if (sip == NULL) return SR_FAULT ;
 
@@ -1588,7 +1466,7 @@ static int subinfo_defaults(SUBINFO *sip)
 	SYSDIALER_ARGS	*ap = sip->ap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*vp ;
+	cchar		*vp ;
 
 /* program-root */
 
@@ -1657,13 +1535,6 @@ static int subinfo_defaults(SUBINFO *sip)
 		sip->logfname = PROG_LOGFNAME ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_defaults: pr=%s\n",sip->pr) ;
-	debugprintf("prog/subinfo_defaults: logfname=%s\n",sip->logfname) ;
-#endif
-
-/* out of here */
-
 	return rs ;
 }
 /* end subroutine (subinfo_defaults) */
@@ -1711,28 +1582,13 @@ static int subinfo_findprog(SUBINFO *sip,char progfname[])
 {
 	vecstr		*elp ;
 	int		rs = SR_OK ;
-	const char	*pnp = sip->program ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_findprog: pn=>%s<\n",pnp) ;
-#endif
+	cchar		*pnp = sip->program ;
 
 	elp = &sip->exports ;
 	progfname[0] = '\0' ;
 	if (pnp == NULL) {
-
 	    rs = procdefprog(sip,&pnp) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/subinfo_findprog: procdefprog() rs=%d\n",rs) ;
-#endif
-
 	} /* end if */
-
-#if	CF_DEBUGS
-	if (rs >= 0)
-	    debugprintf("prog/subinfo_findprog: pnp=%s\n",pnp) ;
-#endif
 
 	if ((rs >= 0) && ((pnp == NULL) || (pnp[0] == '\0')))
 	    rs = SR_NOENT ;
@@ -1745,11 +1601,6 @@ static int subinfo_findprog(SUBINFO *sip,char progfname[])
 	} /* end if (ok) */
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_findprog: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (subinfo_findprog) */
@@ -1760,28 +1611,11 @@ static int subinfo_search(SUBINFO *sip,VECSTR *elp,char progfname[],cchar pn[])
 	VECSTR		pathlist ;
 	int		rs ;
 
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_search: pn=>%s<\n",pn) ;
-#endif
-
 	if ((rs = vecstr_start(&pathlist,10,0)) >= 0) {
 
 	    if ((rs = loadpathlist(sip,&pathlist,elp)) >= 0) {
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    char	*cp ;
-	    for (i = 0 ; vecstr_get(&pathlist,i,&cp) >= 0 ; i += 1)
-	        debugprintf("prog/subinfo_search: pc=%s\n",cp) ;
-	}
-#endif /* CF_DEBUGS */
-
 	rs = getprogpath(&sip->id,&pathlist,progfname,pn,-1) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_search: getprogpath() rs=%d\n",rs) ;
-#endif
 
 	if (rs == SR_NOENT) {
 	    if ((rs = xfile(&sip->id,pn)) >= 0) {
@@ -1805,7 +1639,7 @@ static int subinfo_envdialer(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		i ;
 	int		size ;
-	const char	*vp ;
+	cchar		*vp ;
 	char		*sabuf = NULL ;
 
 	for (i = 0 ; envdialers[i] != NULL ; i += 1) {
@@ -1822,9 +1656,6 @@ static int subinfo_envdialer(SUBINFO *sip)
 		break ;
 	    case envdialer_svcargs:
 		size = subinfo_sasize(sip) ;
-#if	CF_DEBUGS
-		debugprintf("subinfo_envdialer: size=%d\n",size) ;
-#endif
 		if ((rs = uc_malloc(size,&sabuf)) >= 0) {
 		    rs = subinfo_sabuild(sip,sabuf) ;
 		}
@@ -1835,10 +1666,6 @@ static int subinfo_envdialer(SUBINFO *sip)
 	    if ((rs >= 0) && (vp != NULL)) {
 
 	        rs = vecstr_envadd(elp,envdialers[i],vp,-1) ;
-
-#if	CF_DEBUGS
-		debugprintf("subinfo_envdialer: vecstr_envadd() rs=%d\n",rs) ;
-#endif
 
 	        if (rs < 0) break ;
 	    } /* end if */
@@ -1860,10 +1687,10 @@ static int subinfo_sasize(SUBINFO *sip)
 	int		i ;
 	int		argr ;
 	int		size = 1 ;
-	const char	**argv ;
+	cchar		**argv ;
 
 	argr = (sip->argc - sip->argi) ;
-	argv = (const char **) (sip->argv + sip->argi) ;
+	argv = (cchar	 **) (sip->argv + sip->argi) ;
 	for (i = 0 ; (i < argr) && (argv[i] != NULL) ; i += 1) {
 	    if (i >= 1) {
 		size += (strlen(argv[i]) + 1) ;
@@ -1880,11 +1707,11 @@ static int subinfo_sabuild(SUBINFO *sip,char sabuf[])
 	int		rs = SR_OK ;
 	int		i ;
 	int		argr ;
-	const char	**argv ;
+	cchar		**argv ;
 	char		*bp = sabuf ;
 
 	argr = (sip->argc - sip->argi) ;
-	argv = (const char **) (sip->argv + sip->argi) ;
+	argv = (cchar	 **) (sip->argv + sip->argi) ;
 	for (i = 0 ; (i < argr) && (argv[i] != NULL) ; i += 1) {
 	    if (i >= 1) {
 		bp = strwcpy(bp,argv[i],-1) ;
@@ -1915,11 +1742,11 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	int		f_m = FALSE ;
 	int		f_sa = FALSE ;
 
-	const char	**av ;
-	const char	**ev ;
-	const char	**argv ;
-	const char	*azp = NULL ;
-	const char	*abuf = NULL ;
+	cchar		**av ;
+	cchar		**ev ;
+	cchar		**argv ;
+	cchar		*azp = NULL ;
+	cchar		*abuf = NULL ;
 
 	if (op->f.log) {
 	    logfile_printf(&op->lh,"prog=%s",progfname) ;
@@ -1928,36 +1755,18 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	argr = (sip->argc - sip->argi) ;
 	argv = (sip->argv + sip->argi) ;
 
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: progfname=%s\n",progfname) ;
-	debugprintf("prog/subinfo_subexec: argc=%d \n",sip->argc) ;
-	for (i = 0 ; (i < sip->argc) && (sip->argv[i] != NULL) ; i += 1) {
-	    debugprintf("prog/subinfo_subexec: argv%u=%s\n",
-		i,sip->argv[i]) ;
-	}
-	debugprintf("prog/subinfo_subexec: argr=%d \n",argr) ;
-	if ((argv != NULL) && (argv[0] != NULL))
-	    debugprintf("prog/subinfo_subexec: argz=%s\n",argv[0]) ;
-#endif /* CF_DEBUGS */
-
 	elp = &sip->exports ;
 	rs = vecstr_envadd(elp,"_",progfname,-1) ;
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: vecstr_envadd() rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 	if (rs < 0)
 	    goto ret0 ;
 
 	opts = VECHAND_OCOMPACT ;
 	rs = vechand_start(&avs,10,opts) ;
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: vechand_start() rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 	if (rs < 0)
 	    goto ret0 ;
 
 	f_sa = ((argv == NULL) || (argv[0] == NULL)) ;
-	f_sa = f_sa || ((argr >= 0) && isplusminus(argv[0])) ;
+	f_sa = f_sa || ((argr >= 0) && haspmz(argv[0])) ;
 #ifdef	COMMENT
 	f_sa = f_sa || (sip->progmode == 1) ;
 #endif
@@ -1975,21 +1784,14 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	}
 
 	rs = buffer_start(&b,start) ;
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: buffer_start() rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 	if (rs < 0)
 	    goto ret1 ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: azl=%d azp=%s\n",azl,azp) ;
-#endif
 
 /* setup the zeroth argument */
 
 	f_m = ((argv == NULL) || (argv[0] == NULL)) && sip->f.progdash ;
 	f_m = f_m || 
-	    ((argv != NULL) && (argv[0] != NULL) && isminus(argv[0])) ;
+	    ((argv != NULL) && (argv[0] != NULL) && hasmz(argv[0])) ;
 	if (f_m) {
 	    rs = buffer_char(&b,'-') ;
 	}
@@ -2000,17 +1802,8 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	if (rs >= 0) {
 
 	    rs = buffer_get(&b,&abuf) ;
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: buffer_get() rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
-
 	    if (rs >= 0)
 	    rs = vechand_add(&avs,abuf) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: abuf=%s\n",abuf) ;
-	debugprintf("prog/subinfo_subexec: vechand_add() rs=%d\n",rs) ;
-#endif
 
 	} /* end if */
 
@@ -2037,21 +1830,10 @@ static int subinfo_exec(SUBINFO *sip,cchar *progfname,cchar **dav)
 	if (rs < 0)
 	    goto ret2 ;
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; av[i] != NULL ; i += 1)
-	        debugprintf("prog/subinfo_subexec: av[%u]=>%s<\n",i,av[i]) ;
-	}
-#endif /* CF_DEBUGS */
-
-	vecstr_getvec(elp,(const char ***) &ev) ;
+	vecstr_getvec(elp,(cchar	 ***) &ev) ;
 
 	rs = uc_openprog(progfname,oflags,av,ev) ;
 	op->fd = rs ;
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_subexec: uc_openprog() rs=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 
 ret2:
 	buffer_finish(&b) ;
@@ -2070,8 +1852,8 @@ static int subinfo_logfile(SUBINFO *sip)
 	PROG		*op = sip->op ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*lnp ;
-	const char	*lidp = NULL ;
+	cchar		*lnp ;
+	cchar		*lidp = NULL ;
 	char		logfname[MAXPATHLEN + 1] ;
 
 	if (! sip->f.log)
@@ -2084,19 +1866,11 @@ static int subinfo_logfile(SUBINFO *sip)
 	    lnp = logfname ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_logfile: lnp=%s\n",lnp) ;
-#endif
-
 	if (rs < 0)
 	    goto ret0 ;
 
 	    rs1 = logfile_open(&op->lh,lnp,0,0666,lidp) ;
 	    op->f.log = (rs1 >= 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/subinfo_logfile: logfile_open() rs=%d\n",rs1) ;
-#endif
 
 	    if (rs1 >= 0) {
 		USERINFO	*uip = &sip->u ;
@@ -2130,7 +1904,7 @@ static int subinfo_dirok(SUBINFO *sip,cchar d[],int dlen)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
-	const char	*dnp ;
+	cchar		*dnp ;
 
 	if (! sip->f.ids) {
 	    sip->f.ids = TRUE ;
@@ -2179,10 +1953,6 @@ static int loadarchitecture(SUBINFO *sip)
 	int		cl = -1 ;
 	cchar		*cp = getenv(VARARCHITECTURE) ;
 
-#if	CF_DEBUGS
-	debugprintf("prog/loadarchitecture: cp=%s\n",cp) ;
-#endif
-
 #ifdef	SI_ARCHITECTURE
 	if (cp == NULL) {
 	    char	archbuf[ARCHBUFLEN + 1] ;
@@ -2194,17 +1964,9 @@ static int loadarchitecture(SUBINFO *sip)
 	}
 #endif /* SI_ARCHITECTURE */
 
-#if	CF_DEBUGS
-	debugprintf("prog/loadarchitecture: cp=%s\n",cp) ;
-#endif
-
 	if (cp != NULL) {
 	    rs = subinfo_setentry(sip,&sip->architecture,cp,cl) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("prog/loadarchitecture: ret=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -2234,7 +1996,7 @@ static int loadcooks(SUBINFO *sip)
 	int		rs1 ;
 	int		i ;
 	int		vl = 0 ;
-	const char	*vp ;
+	cchar		*vp ;
 
 	for (i = 0 ; cooks[i] != NULL ; i += 1) {
 	    vp = NULL ;
@@ -2305,8 +2067,8 @@ static int loadcooks(SUBINFO *sip)
 	        break ;
 	    case cook_h:
 	        {
-		    const char	*nn = sip->nodename ;
-		    const char	*dn = sip->domainname ;
+		    cchar		*nn = sip->nodename ;
+		    cchar		*dn = sip->domainname ;
 	            char	hnbuf[MAXHOSTNAMELEN + 1] ;
 	            rs1 = snsds(hnbuf,MAXHOSTNAMELEN,nn,dn) ;
 	            if (rs1 >= 0)
@@ -2387,8 +2149,8 @@ static int loadparams(SUBINFO *sip)
 	int		rs1 ;
 	int		vl ;
 	int		i ;
-	const char	**ev = (const char **) sip->envv ;
-	const char	*cp ;
+	cchar		**ev = (cchar	 **) sip->envv ;
+	cchar		*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 	char		vbuf[VBUFLEN + 1] ;
 
@@ -2424,11 +2186,6 @@ static int loadparams(SUBINFO *sip)
 
 	}
 
-#if	CF_DEBUGS
-	debugprintf("prog/loadparams: permsched() rs=%d\n",rs1) ;
-	debugprintf("prog/loadparams: tmpfname=%s\n",tmpfname) ;
-#endif
-
 	if ((rs1 >= 0) && (paramfile_open(&pf,ev,tmpfname) >= 0)) {
 	    const int	vlen = VBUFLEN ;
 
@@ -2449,7 +2206,7 @@ static int loadparams(SUBINFO *sip)
 	                    mkpath1w(tmpfname,vbuf,vl) ;
 	                    rs1 = xfile(&sip->id,tmpfname) ;
 	                    if (rs1 >= 0) {
-				const char	**vpp = &sip->defprog ;
+				cchar		**vpp = &sip->defprog ;
 	                        rs = subinfo_setentry(sip,vpp,vbuf,vl) ;
 	                    }
 	                } /* end if */
@@ -2476,10 +2233,6 @@ static int loadparams(SUBINFO *sip)
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("prog/loadparams: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (loadparams) */
@@ -2490,7 +2243,7 @@ static int loaddefsfile(SUBINFO *sip,cchar *dfname)
 	struct ustat	sb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	**envv = (const char **) sip->envv ;
+	cchar		**envv = (cchar	 **) sip->envv ;
 
 	if ((rs1 = u_stat(dfname,&sb)) >= 0) {
 	    rs1 = SR_NOENT ;
@@ -2513,24 +2266,14 @@ static int loaddefs(SUBINFO *sip,cchar **sched)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	**envv = (const char **) sip->envv ;
+	cchar		**envv = (cchar	 **) sip->envv ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	rs1 = permsched(sched,&sip->svars,
 	    tmpfname,MAXPATHLEN, DEFSFNAME,R_OK) ;
 
 	if (rs1 >= 0) {
-
-#if	CF_DEBUGS
-	    debugprintf("prog/loaddefs: dfname=%s\n",tmpfname) ;
-#endif
-
 	    rs = defproc(&sip->defs,envv,&sip->cooks,tmpfname) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/loaddefs: defproc() rs=%d\n",rs) ;
-#endif
-
 	}
 
 	return rs ;
@@ -2544,11 +2287,7 @@ static int loadxfile(SUBINFO *sip,cchar *xfname)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f ;
-	const char	**envv = (const char **) sip->envv ;
-
-#if	CF_DEBUGS
-	debugprintf("envset/loadxfile: fname=%s\n",xfname) ;
-#endif
+	cchar		**envv = (cchar	 **) sip->envv ;
 
 	rs1 = u_stat(xfname,&sb) ;
 
@@ -2558,19 +2297,11 @@ static int loadxfile(SUBINFO *sip,cchar *xfname)
 	if (rs1 >= 0)
 	    rs1 = sperm(&sip->id,&sb,R_OK) ;
 
-#if	CF_DEBUGS
-	debugprintf("envset/loadxfile: sperm() rs=%d\n",rs1) ;
-#endif
-
 	f = (rs1 >= 0) ;
 	if (rs1 >= 0) {
 	    EXPCOOK	*ckp = &sip->cooks ;
 	    rs = envs_procxe(&sip->xenvs,ckp,envv,&sip->defs,xfname) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("envset/loadxfile: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -2579,12 +2310,12 @@ static int loadxfile(SUBINFO *sip,cchar *xfname)
 
 static int loadxsched(sip,sched)
 SUBINFO		*sip ;
-const char	*sched[] ;
+cchar		*sched[] ;
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f ;
-	const char	**envv = (const char **) sip->envv ;
+	cchar		**envv = (cchar	 **) sip->envv ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	rs1 = permsched(sched,&sip->svars,tmpfname,MAXPATHLEN,XEFNAME,R_OK) ;
@@ -2593,15 +2324,7 @@ const char	*sched[] ;
 	if (rs1 >= 0) {
 	    EXPCOOK	*ckp = &sip->cooks ;
 
-#if	CF_DEBUGS
-	    debugprintf("prog/loadxsched: xfname=%s\n",tmpfname) ;
-#endif
-
 	    rs = envs_procxe(&sip->xenvs,ckp,envv,&sip->defs,tmpfname) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/loadxsched: envs_procxe() rs=%d\n",rs) ;
-#endif
 
 	}
 
@@ -2612,8 +2335,8 @@ const char	*sched[] ;
 
 static int pvars_begin(sip,pathvars,fname)
 SUBINFO		*sip ;
-const char	**pathvars ;
-const char	fname[] ;
+cchar		**pathvars ;
+cchar		fname[] ;
 {
 	vecstr		*pvp ;
 	int		rs ;
@@ -2662,8 +2385,8 @@ SUBINFO		*sip ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		kl, vl ;
-	const char	*tp, *kp, *vp ;
-	const char	*kname ;
+	cchar		*tp, *kp, *vp ;
+	cchar		*kname ;
 
 	for (i = 0 ; sip->envv[i] != NULL ; i += 1) {
 
@@ -2703,8 +2426,8 @@ SUBINFO		*sip ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		n = 0 ;
-	const char	*ename ;
-	const char	*tp ;
+	cchar		*ename ;
+	cchar		*tp ;
 
 	for (i = 0 ; envsys[i] != NULL ; i += 1) {
 
@@ -2764,7 +2487,7 @@ SUBINFO		*sip ;
 
 static int procenvsys(sip,sysvardb)
 SUBINFO		*sip ;
-const char	sysvardb[] ;
+cchar		sysvardb[] ;
 {
 	SYSVAR		sv ;
 	SYSVAR_CUR	cur ;
@@ -2794,10 +2517,6 @@ const char	sysvardb[] ;
 	    sysvar_close(&sv) ;
 	} /* end if (sysvar) */
 
-#if	CF_DEBUGS
-	debugprintf("prog/procenvsys: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procenvsys) */
@@ -2805,24 +2524,16 @@ const char	sysvardb[] ;
 
 int procdefprog(sip,rpp)
 SUBINFO		*sip ;
-const char	**rpp ;
+cchar		**rpp ;
 {
 	int		rs = SR_OK ;
 
 	if (rpp == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("prog/procdefprog: defprog=%s\n",sip->defprog) ;
-#endif
-
 	*rpp = NULL ;
 	if (sip->defprog == NULL) {
 
 	    rs = loadparams(sip) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/procdefprog: loadparams() rs=%d\n",rs) ;
-#endif
 
 	} /* end if */
 
@@ -2837,8 +2548,8 @@ const char	**rpp ;
 
 static int loadpvars(sip,sched,fname)
 SUBINFO		*sip ;
-const char	*sched[] ;
-const char	fname[] ;
+cchar		*sched[] ;
+cchar		fname[] ;
 {
 	VECSTR		*pvp ;
 	int		rs = SR_OK ;
@@ -2849,21 +2560,9 @@ const char	fname[] ;
 	rs1 = permsched(sched,&sip->svars,
 	    tmpfname,MAXPATHLEN, fname,R_OK) ;
 
-#if	CF_DEBUGS
-	debugprintf("prog/loadpvars: permsched() rs=%d\n",rs) ;
-#endif
-
 	if (rs1 >= 0) {
 
-#if	CF_DEBUGS
-	    debugprintf("prog/loadpvars: pvarfname=%s\n",tmpfname) ;
-#endif
-
 	    rs = vecstr_loadfile(pvp,1,tmpfname) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/loadpvars: vecstr_loadfile() rs=%d\n",rs) ;
-#endif
 
 	} /* end if */
 
@@ -2874,7 +2573,7 @@ const char	fname[] ;
 
 static int loadpvarsdef(sip,pnames)
 SUBINFO		*sip ;
-const char	*pnames[] ;
+cchar		*pnames[] ;
 {
 	vecstr		*pvp = &sip->pvars ;
 	int		rs = SR_OK ;
@@ -2901,8 +2600,8 @@ VECSTR		*plp ;
 VECSTR		*elp ;
 {
 	int		rs = SR_OK ;
-	const char	*varpath = VARPATH ;
-	const char	*pp ;
+	cchar		*varpath = VARPATH ;
+	cchar		*pp ;
 
 	if ((rs = vecstr_search(elp,varpath,vstrkeycmp,&pp)) >= 0) {
 	    cchar	*tp ;
@@ -2922,12 +2621,12 @@ VECSTR		*elp ;
 static int loadpathcomp(sip,lp,pp)
 SUBINFO		*sip ;
 vecstr		*lp ;
-const char	*pp ;
+cchar		*pp ;
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c, cl ;
-	const char	*cp ;
+	cchar		*cp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if (sip == NULL)
@@ -2969,7 +2668,7 @@ const char	*pp ;
 
 static int createsearchpath(lp,pr)
 VECSTR		*lp ;
-const char	pr[] ;
+cchar		pr[] ;
 {
 	int		rs ;
 	int		f_bin = FALSE ;
@@ -3004,20 +2703,12 @@ static int loadpath(vecstr *lp,cchar *pp)
 	int		rs1 ;
 	int		pl ;
 	int		c = 0 ;
-	const char	*tp ;
+	cchar		*tp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("prog/loadpath: ent\n") ;
-#endif
 
 	while ((tp = strchr(pp,':')) != NULL) {
 
 	    pl = pathclean(tmpfname,pp,(tp - pp)) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/loadpath: pathname=%t\n",tmpfname,pl) ;
-#endif
 
 	    rs1 = vecstr_findn(lp,tmpfname,pl) ;
 
@@ -3033,10 +2724,6 @@ static int loadpath(vecstr *lp,cchar *pp)
 	if ((rs >= 0) && (pp[0] != '\0')) {
 
 	    pl = pathclean(tmpfname,pp,-1) ;
-
-#if	CF_DEBUGS
-	    debugprintf("prog/loadpath: pathname=%t\n",tmpfname,pl) ;
-#endif
 
 	    rs1 = vecstr_findn(lp,tmpfname,pl) ;
 
@@ -3086,24 +2773,20 @@ static int xfile(IDS *idp,cchar *fname)
 }
 /* end subroutine (xfile) */
 
-
-static int isplusminus(cchar *s)
-{
-	int	f ;
+static bool haspmz(cchar *s) noex {
+	bool	f ;
 	f = (s[0] == '+') || (s[0] == '-') ;
 	f = f && (s[1] == '\0') ;
 	return f ;
 }
-/* end subroutine (isplusminus) */
+/* end subroutine (haspmz) */
 
-
-static int isminus(cchar *s)
-{
-	int	f ;
+static bool hasmz(cchar *s) noex {
+	bool f ;
 	f = (s[0] == '-') ;
 	f = f && (s[1] == '\0') ;
 	return f ;
 }
-/* end subroutine (isminus) */
+/* end subroutine (hasmz) */
 
 

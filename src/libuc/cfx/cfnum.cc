@@ -50,10 +50,10 @@
 #include	<cfoct.h>
 #include	<cfdec.h>
 #include	<cfhex.h>
-#include	<ischarx.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<toxc.h>
+#include	<ischarx.h>
 #include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
@@ -86,7 +86,7 @@ int cfnumx(cchar *bp,int bl,T *rp) noex {
 	    bp += 1 ;
 	    bl -= 1 ;
 	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
+	if ((bl > 0) && isplusminus(*bp)) {
 	    f_negative = (*bp == '-') ;
 	    bp += 1 ;
 	    bl -= 1 ;

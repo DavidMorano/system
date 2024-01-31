@@ -52,6 +52,9 @@ inline int iseol(int ch) noex {
 inline bool iszero(int ch) noex {
 	return (ch == '0') ;
 }
+inline bool isplusminus(int ch) noex {
+	return ((ch == '+') || (ch == '-')) ;
+}
 
 #else /* __cplusplus */
 
@@ -60,6 +63,9 @@ static inline int iseol(int ch) noex {
 }
 static inline bool iszero(int ch) noex {
 	return (ch == '0') ;
+}
+static inline bool isplusminus(int ch) noex {
+	return ((ch == '+') || (ch == '-')) ;
 }
 
 #endif /* __cplusplus */
