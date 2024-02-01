@@ -1,4 +1,5 @@
-/* progexec */
+/* envprogexec SUPPORT */
+/* lang=C++20 */
 
 /* progexec the execution request */
 /* version %I% last-modified %G% */
@@ -16,8 +17,8 @@
 	This subroutine was originally written.
 
 	= 2001-04-11, David A­D­ Morano
-	This old dog program has been enhanced to serve as the environment
-	wiper for executing MIPS programs.
+	This old dog program has been enhanced to serve as the
+	environment wiper for executing MIPS programs.
 
 */
 
@@ -25,24 +26,21 @@
 
 /*******************************************************************************
 
-        This subroutine performs an 'exec(2)' on the given program with its
-        environment and arguments.
-
+	This subroutine performs an |exec(2)| on the given program
+	with its environment and arguments.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<buffer.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -78,8 +76,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecl(char *,int,long) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	hasallplusminus(const char *,int) ;
-extern int	hasallminus(const char *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
@@ -108,12 +104,10 @@ struct intprog {
 
 /* exported subroutines */
 
-
-int progexec(PROGINFO *pip,cchar *progfname,cchar **argv,int argr)
-{
+int envprogexec(PROGINFO *pip,cchar *progfname,mainv argv,int argr) noex {
 	BUFFER		b ;
 	vecstr		*elp = &pip->exports ;
-	const int	f_shell = pip->f.shell ;
+	cint	f_shell = pip->f.shell ;
 	int		rs = SR_OK ;
 	int		si = 0 ;
 	int		ai = 0 ;
@@ -148,7 +142,7 @@ int progexec(PROGINFO *pip,cchar *progfname,cchar **argv,int argr)
 
 #if	CF_FANCYSHUN
 	{
-	    const int	slen = SHUNLEN ;
+	    cint	slen = SHUNLEN ;
 	    char	sbuf[SHUNLEN+1] ;
 	    if ((rs = snshellunder(sbuf,slen,pip->pid,progfname)) >= 0) {
 	        rs = vecstr_envadd(elp,"_",sbuf,rs) ;
@@ -181,9 +175,9 @@ int progexec(PROGINFO *pip,cchar *progfname,cchar **argv,int argr)
 	                si = 1 ;
 	                argr -= 1 ;
 	                if (cp[0] != '\0') {
-	                    if (hasallplusminus(cp,-1)) {
+	                    if (hasonlyplusminus(cp,-1)) {
 	                        f_sa = TRUE ;
-	                        f_m = f_m || hasallminus(cp,cl) ;
+	                        f_m = f_m || hasonlyminus(cp,cl) ;
 	                    }
 	                } else
 	                    f_sa = TRUE ;

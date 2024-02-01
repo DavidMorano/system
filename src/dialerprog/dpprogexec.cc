@@ -1,58 +1,48 @@
-/* progexec */
+/* dpprogexec SUPPORT */
+/* lang=C++20 */
 
 /* progexec the execution request */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
-
 
 /* revision history:
 
 	= 1990-11-01, David A­D­ Morano
-
 	This subroutine was originally written.
 
-
 	= 2001-04-11, David A­D­ Morano
-
 	This old dog program has been enhanced to serve as the
 	environment wiper for executing MIPS programs.
 
-
 */
-
 
 /**************************************************************************
 
-	This subroutine performs an 'exec(2)' on the given program with
-	its environment and arguments.
-
+	This subroutine performs an |exec(2)| on the given program
+	with its environment and arguments.
 
 **************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<buffer.h>
+#include	<hasx.h>
 #include	<exitcodes.h>
+#include	<localmisc.h>
 
-#include	"localmisc.h"
 #include	"config.h"
 #include	"defs.h"
 #include	"envs.h"
@@ -94,8 +84,6 @@ extern int	ctdeci(char *,int,int) ;
 extern int	ctdecl(char *,int,long) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	hasallplusminus(const char *,int) ;
-extern int	hasallminus(const char *,int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 
@@ -184,7 +172,7 @@ int		argr ;
 	cp = argv[0] ;
 	cl = -1 ;
 	f_sa = (argv[0] == NULL) ;
-	f_sa = f_sa || ((argv[0] != NULL) && hasallplusminus(argv[0],-1)) ;
+	f_sa = f_sa || ((argv[0] != NULL) && hasonlyplusminus(argv[0],-1)) ;
 	f_sa = f_sa || pip->f.shell ;
 	if (f_sa) {
 	    si = pip->f.shell ? 0 : 1 ;
@@ -200,7 +188,7 @@ int		argr ;
 	f_m = FALSE ;
 	f_m = f_m || ((argv[0] == NULL) && pip->f.progminus) ;
 	f_m = f_m || ((argv[0] == NULL) && pip->f.progdash) ;
-	f_m = f_m || ((argv[0] != NULL) && hasallminus(argv[0],-1)) ;
+	f_m = f_m || ((argv[0] != NULL) && hasonlyminus(argv[0],-1)) ;
 
 	rs = buffer_start(&b,start) ;
 	if (rs < 0)

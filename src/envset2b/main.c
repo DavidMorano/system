@@ -74,6 +74,8 @@
 #include	<expcook.h>
 #include	<nulstr.h>
 #include	<tmtime.h>		/* is NOT thread-safe */
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -185,10 +187,6 @@ extern int	mkdirs(cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	readfileline(char *,int,cchar *) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	hasallplusminus(cchar *,int) ;
-extern int	hasallminus(cchar *,int) ;
-extern int	hasallwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotValid(int) ;
@@ -2429,8 +2427,8 @@ static int processor(PROGINFO *pip,ARGINFO *aip,cchar *prog)
 {
 	int		rs ;
 	char		pbuf[MAXPATHLEN+1] ;
-	if ((prog != NULL) && hasallplusminus(prog,-1)) {
-	    if ((! pip->f.progdash) && (hasallminus(prog,-1))) {
+	if ((prog != NULL) && hasonlyplusminus(prog,-1)) {
+	    if ((! pip->f.progdash) && (hasonlyminus(prog,-1))) {
 	        pip->f.progdash = TRUE ;
 	    }
 	    prog = NULL ;

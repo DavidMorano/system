@@ -561,26 +561,6 @@ bool hasalldig(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasalldig) */
 
-bool hasallminus(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (*sp != '\0') {
-	    f = (sp[0] == '-') ;
-	    f = f && ((sl == 1) || (sp[1] == '\0')) ;
-	}
-	return f ;
-}
-/* end subroutine (hasallminus) */
-
-bool hasallplusminus(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (*sp != '\0') {
-	    f = (sp[0] == '+') || (sp[0] == '-') ;
-	    f = f && ((sl == 1) || (sp[1] == '\0')) ;
-	}
-	return f ;
-}
-/* end subroutine (hasallplusminus) */
-
 bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
 	if ((b >= 2) && (b <= maxbase)) {
@@ -610,6 +590,26 @@ bool hasallchr(cchar *sp,int sl,int sch) noex {
 	return f ;
 }
 /* end subroutine (hasallchr) */
+
+bool hasonlyminus(cchar *sp,int sl) noex {
+        bool            f = false ;
+        if (*sp != '\0') {
+            f = (sp[0] == '-') ;
+            f = f && ((sl == 1) || (sp[1] == '\0')) ;
+        }
+        return f ;
+}
+/* end subroutine (hasonlyminus) */
+
+bool hasonlyplusminus(cchar *sp,int sl) noex {
+        bool            f = false ;
+        if (*sp != '\0') {
+            f = (sp[0] == '+') || (sp[0] == '-') ;
+            f = f && ((sl == 1) || (sp[1] == '\0')) ;
+        }
+        return f ;
+}
+/* end subroutine (hasonlyplusminus) */
 
 bool hasvarpathprefix(cchar *sp,int sl) noex {
 	bool		f = false ;

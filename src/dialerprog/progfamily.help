@@ -1,8 +1,6 @@
 PROGRAM
 
 Synopsis:
-
-program filepath [-e key=value] [-ef xenv] [-pf xpath] [-lpf xlibpath]
-
+$ program filepath [-e key=value] [-ef xenv] [-pf xpath] [-lpf xlibpath]
 
 

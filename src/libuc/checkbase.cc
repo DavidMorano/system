@@ -1,4 +1,4 @@
-/* checkbase */
+/* checkbase SUPPORT */
 /* lang=C++20 */
 
 /* test whether a string is composed of all characters of a given base */
