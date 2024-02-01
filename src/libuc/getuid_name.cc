@@ -1,5 +1,5 @@
 /* getuid_name SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a UID by looking up the given name */
 /* version %I% last-modified %G% */
@@ -81,19 +81,20 @@
 
 /* exported subroutines */
 
-int getuid_name(cchar *np,int nl) noex {
-	nulstr		n ;
-	int		rs ;
+int getuid_name(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		uid = 0 ;
-	cchar		*name ;
-	if (np == NULL) return SR_FAULT ;
-	if (np[0] == '\0') return SR_INVALID ;
+	if (sp) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	nulstr		n ;
+	cchar		*name{} ;
 	if ((rs = nulstr_start(&n,np,nl,&name)) >= 0) {
 	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	        struct passwd	pw ;
-	        const int	pwlen = rs ;
-	        char		*pwbuf ;
+	        PASSWD		pw ;
+	        cint		pwlen = rs ;
+	        char		*pwbuf{} ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		    {
 		        rs = GETPW_NAME(&pw,pwbuf,pwlen,name) ;
@@ -106,22 +107,26 @@ int getuid_name(cchar *np,int nl) noex {
 	    rs1 = nulstr_finish(&n) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? uid : rs ;
 }
 /* end subroutine (getuid_name) */
 
-int getuid_user(cchar *np,int nl) noex {
-	int		rs ;
-	if (np == NULL) return SR_FAULT ;
-	if (np[0] == '\0') return SR_INVALID ;
-	if (hasalldig(np,nl)) {
-	    int	v ;
-	    if ((rs = cfdeci(np,nl,&v)) >= 0) {
-		rs = v ;
-	    }
-	} else {
-	    rs = getuid_name(np,nl) ;
-	}
+int getuid_user(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (sp) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	        if (hasalldig(np,nl)) {
+	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
+		        rs = v ;
+	            }
+	        } else {
+	            rs = getuid_name(sp,sl) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getuid_user) */

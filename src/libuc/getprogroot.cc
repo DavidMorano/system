@@ -38,9 +38,9 @@
 	name		program to find
 
 	Returns:
-	<0		program was not found
-	0		program was found in present working directory
 	>0		found the program path and this is the returned length
+	0		program was found in present working directory
+	<0		program was not found (system return)
 
 *******************************************************************************/
 
@@ -123,6 +123,9 @@ static int	mkdfname(char *,cchar *,int,cchar *,int) noex ;
 constexpr cchar		*varpath = varname.path ;
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

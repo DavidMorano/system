@@ -16,9 +16,9 @@
 
 /*******************************************************************************
 
-        These subroutines manage some simple tasks for the GROUP object,
-        referenced as 'struct group'. This object is defined by UNIX® standards.
-
+	These subroutines manage some simple tasks for the GROUP
+	object, referenced as 'struct group'. This object is defined
+	by UNIX® standards.
 
 *******************************************************************************/
 
@@ -69,6 +69,9 @@ static int storeitem_loaduser(SI *,vechand *,cchar *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -136,7 +139,7 @@ int groupent_load(GROUP *grp,char *grbuf,int grlen,CGROUP *sgrp) noex {
 	    if ((rs = storeitem_start(&ib,grbuf,grlen)) >= 0) {
 	        if (sgrp->gr_mem != nullptr) {
 	            int		n ;
-	            void	**ptab ;
+	            void	**ptab{} ;
 	            for (n = 0 ; sgrp->gr_mem[n] != nullptr ; n += 1) ;
 	            if ((rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {
 	                int	i = 0 ;
@@ -230,10 +233,10 @@ static int groupent_parseusers(GROUP *grp,SI *ibp,cchar *sp,int sl) noex {
 	if ((rs = vechand_start(&u,8,0)) >= 0) {
 	    if ((rs = storeitem_loadusers(ibp,&u,sp,sl)) > 0) {
 	        int	n = rs ;
-	        void	**ptab ;
+	        void	**ptab{} ;
 	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
-		    int		i ;
-	            void	*vp ;
+		    int		i{} ;
+	            void	*vp{} ;
 	            grp->gr_mem = (char **) ptab ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
 	                grp->gr_mem[i] = (char *) vp ;
@@ -289,7 +292,7 @@ static int storeitem_loadusers(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
 
 static int storeitem_loaduser(SI *ibp,vechand *ulp,cchar *sp,int sl) noex {
 	int		rs ;
-	cchar		*cp ;
+	cchar		*cp{} ;
 	if ((rs = storeitem_strw(ibp,sp,sl,&cp)) >= 0) {
 	    rs = vechand_add(ulp,cp) ;
 	}

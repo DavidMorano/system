@@ -40,7 +40,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<usysrets.h>

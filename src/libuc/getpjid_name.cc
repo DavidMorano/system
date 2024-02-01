@@ -36,67 +36,77 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<nulstr.h>
 #include	<getax.h>
 #include	<cfdec.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* external subroutines */
 
-extern int	hasalldig(cchar *,int) noex ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int getpjid_name(cchar *np,int nl) noex {
-	nulstr		n ;
-	int		rs ;
+int getpjid_name(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		pjid = 0 ;
-	cchar		*name ;
-	if (np == NULL) return SR_FAULT ;
-	if (np[0] == '\0') return SR_INVALID ;
-	if ((rs = nulstr_start(&n,np,nl,&name)) >= 0) {
-	    if ((rs = getbufsize(getbufsize_pj)) >= 0) {
-	        struct project	pj ;
-	        const int	pjlen = rs ;
-	        char		*pjbuf ;
-	        if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
-		    {
-	                rs = getpj_name(&pj,pjbuf,pjlen,name) ;
-	                pjid = pj.pj_projid ;
-		    }
-	            rs1 = uc_free(pjbuf) ;
+	if (sp) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	        nulstr		n ;
+	        cchar		*name{} ;
+	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
+	            if ((rs = getbufsize(getbufsize_pj)) >= 0) {
+	                PROJECT	pj ;
+	                cint	pjlen = rs ;
+	                char	*pjbuf{} ;
+	                if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
+		            {
+	                        rs = getpj_name(&pj,pjbuf,pjlen,name) ;
+	                        pjid = pj.pj_projid ;
+		            }
+	                    rs1 = uc_free(pjbuf) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (memory-allocation) */
+	            } /* end if (getbufsize) */
+	            rs1 = nulstr_finish(&n) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
-	    } /* end if (getbufsize) */
-	    rs1 = nulstr_finish(&n) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (nulstr) */
+	        } /* end if (nulstr) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? pjid : rs ;
 }
 /* end subroutine (getpjid_name) */
 
-int getpjid_proj(cchar *np,int nl) noex {
-	int		rs ;
-	if (np == NULL) return SR_FAULT ;
-	if (np[0] == '\0') return SR_INVALID ;
-	if (hasalldig(np,nl)) {
-	    int	v ;
-	    if ((rs = cfdeci(np,nl,&v)) >= 0) {
-		rs = v ;
-	    }
-	} else {
-	    rs = getpjid_name(np,nl) ;
-	}
+int getpjid_proj(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (sp) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	        if (hasalldig(sp,sl)) {
+	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
+		        rs = v ;
+	            }
+	        } else {
+	            rs = getpjid_name(sp,sl) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getpjid_proj) */

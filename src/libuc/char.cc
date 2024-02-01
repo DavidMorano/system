@@ -1,4 +1,4 @@
-/* char */
+/* char SUPPORT */
 /* lang=C++20 */
 
 /* character test and conversion support */
@@ -34,11 +34,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<bitset>
+#include	<bitset>		/* <- the money shot! */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ucvariables.hh>
-#include	<localmisc.h>
 
 #include	"mkchar.h"
 #include	"char.h"
@@ -82,7 +81,8 @@ namespace {
 
 /* local variables */
 
-constexpr bool	f_varname = CF_VARNAME ;
+constexpr bool		f_varname = CF_VARNAME ;
+static const charinfo	char_data ;
 
 
 /* exported variables */
@@ -233,11 +233,6 @@ const short	char_dictorder[] = {
 	0x042d, 0x0431, 0x043a, 0x0439, 0x043b, 0x043d, 0x043c, 0x0000,
 	0x043f, 0x0451, 0x0450, 0x0452, 0x0453, 0x045d, 0x0462, 0x045e
 } ;
-
-
-/* local variables */
-
-static const charinfo		char_data ;
 
 
 /* external subroutines */

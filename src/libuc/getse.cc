@@ -1,9 +1,8 @@
-/* getse */
+/* getse SUPPORT */
+/* lang=C++20 */
 
 /* get service entry */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,28 +16,22 @@
 
 /*******************************************************************************
 
-        These subroutines were was written so that we could use a single
-        interface to access the 'servent' database on all UNIX® platforms. This
-        code module provides a platform independent implementation of UNIX®
-        'servent' database access subroutines.
+	These subroutines were was written so that we could use a
+	single interface to access the 'servent' database on all
+	UNIX® platforms. This code module provides a platform
+	independent implementation of UNIX® 'servent' database
+	access subroutines.
 
 	These are the preferred interfaces:
 
 	preferred interfaces: getse_name(), getse_port() ;
 
-
 *******************************************************************************/
 
-
-#define	GETPE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -65,39 +58,32 @@
 
 /* exported subroutines */
 
-
-int getse_begin(int sf)
-{
+int getse_begin(int sf) noex {
 	return uc_setservent(sf) ;
 }
 /* end subroutine (getse_begin) */
 
-
-int getse_end()
-{
+int getse_end() noex {
 	return uc_endservent() ;
 }
 /* end subroutine (getse_end) */
 
-
-int getse_ent(struct servent *sep,char rbuf[],int rlen)
-{
+int getse_ent(SERVENT *sep,char rbuf[],int rlen) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = uc_getservent(sep,rbuf,rlen)) == SR_NOTFOUND) rs = SR_OK ;
+	if ((rs = uc_getservent(sep,rbuf,rlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (getse_ent) */
 
-
-int getse_name(struct servent *sep,char rbuf[],int rlen,cchar pn[],cchar *svc)
-{
+int getse_name(SERVENT *sep,char *rbuf,int rlen,cchar *pn,cchar *svc) noex {
 	return uc_getservbyname(svc,pn,sep,rbuf,rlen) ;
 }
 /* end subroutine (getse_name) */
 
-
-int getse_port(struct servent *sep,char rbuf[],int rlen,cchar pn[],int num)
-{
+int getse_port(SERVENT *sep,char *rbuf,int rlen,cchar *pn,int num) noex {
 	return uc_getservbyport(num,pn,sep,rbuf,rlen) ;
 }
 /* end subroutine (getse_port) */

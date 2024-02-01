@@ -1,4 +1,4 @@
-/* filemap */
+/* filemap SUPPORT */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */
@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>

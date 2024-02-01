@@ -20,7 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>
 #include	<ctime>			/* <- for |time(2)| */
 #include	<usystem.h>

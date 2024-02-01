@@ -1,4 +1,4 @@
-/* groupids */
+/* groupids SUPPORT */
 /* lang=C++20 */
 
 /* group-ID fetch (UNIX® group-IDs) */

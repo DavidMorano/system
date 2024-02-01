@@ -1,10 +1,9 @@
 /* getportnum SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get an INET port number */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -89,7 +88,7 @@ int getportnum(cchar *pn,cchar *ps) noex {
 	        if (hasalldig(ps,pl)) {
 	            rs = cfdeci(ps,pl,&port) ;
 	        } /* end if */
-	        if ((rs >= 0) && (port < 0) && (pn != NULL)) {
+	        if ((rs >= 0) && (port < 0) && (pn != nullptr)) {
 	            if ((rs = getserv_name(pn,ps)) >= 0) {
 	                port = rs ;
 	            } /* end if (getserv_name) */

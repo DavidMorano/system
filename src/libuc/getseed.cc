@@ -32,7 +32,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>

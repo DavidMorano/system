@@ -35,20 +35,18 @@
 
 	Returns:
 	>=0		OK
-	<0		bad
+	<0		bad (system-return)
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<usystem.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<ucvariables.hh>
-#include	<varnames.hh>
-#include	<localmisc.h>
+#include	<hasx.h>
 
 
 /* local defines */
@@ -57,7 +55,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	hasallbase(const char *,int,int) ;
+    extern int	checkbase(cchar *,int,int) noex ;
 }
 
 
@@ -69,14 +67,10 @@ extern "C" {
 
 /* forward references */
 
-extern "C" {
-    extern int checkbase(cchar *,int,int) noex ;
-}
-
 
 /* local variables */
 
-static const int	maxbase = strlen(varname.digtab) ;
+static cint	maxbase = strlen(varname.digtab) ;
 
 
 /* exported subroutines */

@@ -1,4 +1,4 @@
-/* filelines */
+/* filelines SUPPORT */
 /* lang=C++20 */
 
 /* calculate the number of lines in a file */
@@ -14,7 +14,7 @@
 
 /* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>

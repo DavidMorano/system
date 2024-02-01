@@ -35,7 +35,7 @@
 	Returns:
 	>0		found the program path and this is the length
 	==0		program was found w/o a path prefix
-	<0		program was not found
+	<0		program was not found (system-return)
 
 *******************************************************************************/
 
@@ -91,6 +91,9 @@ static int getprogpathrel(ids *,vs *,char *,cc *,int) noex ;
 /* local variables */
 
 static bufsizevar		maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

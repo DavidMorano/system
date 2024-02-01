@@ -1,5 +1,5 @@
 /* getrunlevel SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* return the run-level of the system */
 /* version %I% last-modified %G% */

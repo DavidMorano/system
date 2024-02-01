@@ -267,14 +267,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<ucvariables.hh>
 #include	<ascii.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 #include	"hasx.h"
 
@@ -286,16 +284,25 @@
 #endif
 
 
-/* local variables */
+/* local namespaces */
 
-constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
 
-static const int	maxbase = strlen(varname.digtab) ;
+/* local typedefs */
 
 
 /* forward references */
 
 static int twochars(char *,cchar *,int) noex ;
+
+
+/* local variables */
+
+constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
+
+static cint		maxbase = strlen(varname.digtab) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

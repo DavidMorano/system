@@ -71,8 +71,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<climits>
 #include	<cstring>

@@ -1,5 +1,5 @@
 /* getproto SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a protocol number given a protocol name */
 /* version %I% last-modified %G% */

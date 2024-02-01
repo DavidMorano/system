@@ -1,5 +1,5 @@
 /* getuserhome SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get the home directory of the specified user */
 /* version %I% last-modified %G% */
@@ -84,6 +84,8 @@
 #include	<isnot.h>
 #include	<strwcmp.h>
 #include	<localmisc.h>
+
+#include	"getuserhome.h"
 
 
 /* local defines */

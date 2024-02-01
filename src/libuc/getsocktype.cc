@@ -1,10 +1,8 @@
-/* getsocktype */
+/* getsocktype SUPPORT */
+/* lang=C++20 */
 
 /* get a socket type given a protocol number */
-/* open a protocol */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,31 +16,26 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	getsocktype
 
+	Description:
 	We retrieve a socket type (second argument to |socket(3xnet)|)
 	given a protocol.
 
 	Synopsis:
-
-	int getsocktype(proto)
-	int		proto ;
+	int getsocktype(int proto) noex
 
 	Arguments:
-
 	proto		protocol number
 
 	Returns:
-
 	>=0		socket type number
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -61,11 +54,6 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 
 /* local structures */
 
@@ -80,7 +68,7 @@ struct socktype {
 
 /* local variables */
 
-static const struct socktype	socktypes[] = {
+static constexpr struct socktype	socktypes[] = {
 	{ IPPROTO_TCP, SOCK_STREAM },
 	{ IPPROTO_UDP, SOCK_DGRAM },
 	{ IPPROTO_ICMP, SOCK_DGRAM },
@@ -90,14 +78,15 @@ static const struct socktype	socktypes[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int getsocktype(int proto)
-{
+int getsocktype(int proto) noex {
 	int		rs = SR_NOTFOUND ;
-	int		i ;
-	int		f = false ;
+	int		i{} ;
+	bool		f = false ;
 	for (i = 0 ; socktypes[i].proto != 0 ; i += 1) {
 	    f = (proto == socktypes[i].proto) ;
 	    if (f) break ;

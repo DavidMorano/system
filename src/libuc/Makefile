@@ -816,7 +816,8 @@ upt.o:			upt.cc upt.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
-getxusername.o:		getxusername.c getxusername.h
+getuserhome.o:		getuserhome.cc getuserhome.h
+getxusername.o:		getxusername.cc getxusername.h
 
 getutmpent.o:		getutmpent.cc getutmpent.h
 mkutmpid.o:		mkutmpid.cc mkutmpid.h

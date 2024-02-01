@@ -1,5 +1,5 @@
 /* getnodeinfo SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a cluster name given a nodename */
 /* version %I% last-modified %G% */

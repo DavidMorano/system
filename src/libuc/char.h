@@ -40,8 +40,8 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 /* support tables; not accessed directly by callers  */

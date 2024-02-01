@@ -1,4 +1,4 @@
-/* factorial */
+/* factorial SUPPORT */
 /* lang=C++20 */
 
 /* factorial function */
@@ -51,7 +51,7 @@
 	
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<utypedefs.h>
 #include	<clanguage.h>

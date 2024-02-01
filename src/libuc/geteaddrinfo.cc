@@ -1,4 +1,4 @@
-/* geteaddrinfo */
+/* geteaddrinfo SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to get a canonical hostname */

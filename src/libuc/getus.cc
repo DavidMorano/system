@@ -1,5 +1,5 @@
 /* getus SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get user-shell entries */
 /* version %I% last-modified %G% */

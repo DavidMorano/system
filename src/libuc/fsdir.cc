@@ -1,4 +1,4 @@
-/* fsdir */
+/* fsdir SUPPORT */
 /* lang=C++20 */
 
 /* File-System-Direcroy (FSDIR) */
@@ -20,8 +20,7 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 
 #if	defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0)
