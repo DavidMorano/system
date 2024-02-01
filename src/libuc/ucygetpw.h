@@ -20,21 +20,20 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<pwd.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
 #include	<localmisc.h>
-#include	<pwd.h>			/* <- the money shot */
 
 
-#define	UCYGETPW_STATS	struct ucygetpw_stats
+#define	UCYGETPW_STATS	struct ugetpw_stats
 
 #define	UCYGETPW_MAX	120		/* max cache entries */
 #define	UCYGETPW_TTL	(20*60)		/* entry time-out in seconds */
 #define	UCYGETPW_TOLOCK	5
 
 
-struct ucygetpw_stats {
+struct ugetpw_stats {
 	uint		max ;
 	uint		ttl ;
 	uint		nent ;
@@ -45,12 +44,12 @@ struct ucygetpw_stats {
 
 EXTERNC_begin
 
-extern int ucygetpw_init() noex ;
-extern int ucygetpw_name(PASSWD *,char *,int,cchar *) noex ;
-extern int ucygetpw_uid(PASSWD *,char *,int,uid_t) noex ;
-extern int ucygetpw_stats(UCYGETPW_STATS *) noex ;
-extern int ucygetpw_setparam(int,int) noex ;
-extern void ucygetpw_fini() noex ;
+extern int ugetpw_init() noex ;
+extern int ugetpw_name(PASSWD *,char *,int,cchar *) noex ;
+extern int ugetpw_uid(PASSWD *,char *,int,uid_t) noex ;
+extern int ugetpw_stats(UCYGETPW *) noex ;
+extern int ugetpw_setparam(int,int) noex ;
+extern int ugetpw_fini() noex ;
 
 EXTERNC_end
 

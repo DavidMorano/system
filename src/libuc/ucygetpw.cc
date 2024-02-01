@@ -52,7 +52,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<pwd.h>
@@ -111,6 +111,9 @@ static void	ucygetpw_atforkafter() noex ;
 static ucygetpw		ucygetpw_data ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ucygetpw_init() noex {
@@ -127,17 +130,21 @@ int ucygetpw_init() noex {
 	                    uip->finitdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                ptc_destroy(&uip->c) ;
+		    }
 	        } /* end if (ptc_create) */
-	        if (rs < 0)
+	        if (rs < 0) {
 	            ptm_destroy(&uip->m) ;
+		}
 	    } /* end if (ptm_create) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uip->finit = false ;
+	    }
 	} else {
 	    while ((rs >= 0) && uip->finit && (! uip->finitdone)) {
 	        rs = msleep(1) ;

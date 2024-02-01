@@ -805,7 +805,7 @@ mapex.o:		mapex.c mapex.h
 
 calstrs.o:		calstrs.c calstrs.h
 
-sigevent.o:		sigevent.c sigevent.h
+sigevent.o:		sigevent.cc sigevent.h
 
 timeval.o:		timeval.cc timeval.h
 timespec.o:		timespec.cc timespec.h

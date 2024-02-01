@@ -1,5 +1,5 @@
-/* sigevent */
-/* lang=C99 */
+/* sigevent SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® signal-event initialization */
 /* version %I% last-modified %G% */
@@ -32,21 +32,25 @@
 	val		user defined value
 
 	Returns:
-	<0		error
 	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<signal.h>
-#include	<time.h>
-#include	<string.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<csignal>
+#include	<cstring>		/* <- for |memset(3c)| */
+#include	<ctime>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<usupport.h>
+
+#include	"sigevent.h"
 
 
 /* local defines */
+
+
+/* local namespaces */
 
 
 /* external subroutines */
@@ -66,13 +70,13 @@
 int sigevent_load(SIGEVENT *sep,int notify,int signo,int val) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
-	    memset(sep,0,sizeof(SIGEVENT)) ;
+	    rs = memclear(sep) ;
 	    sep->sigev_notify = notify ;
 	    sep->sigev_signo = signo ;
 	    sep->sigev_value.sival_int = val ;
 	}
 	return rs ;
 }
-/* end subroutine (sigevent_init) */
+/* end subroutine (sigevent_load) */
 
 
