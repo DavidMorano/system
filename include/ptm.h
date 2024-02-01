@@ -18,7 +18,7 @@
 #define	PTM_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<pthread.h>
@@ -26,8 +26,8 @@
 #include	<usupport.h>
 #include	<clanguage.h>
 
-
 #include	"ptma.h"
+
 
 #define	PTM	pthread_mutex_t
 

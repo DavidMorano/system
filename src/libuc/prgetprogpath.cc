@@ -1,4 +1,4 @@
-/* prgetprogpath */
+/* prgetprogpath SUPPORT */
 /* lang=C++20 */
 
 /* get the path to a program that is used within the PCS system */

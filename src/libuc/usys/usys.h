@@ -19,7 +19,7 @@
 
 /*******************************************************************************
 
-	This file contains the UNIX system types that the brain-damaged
+	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
@@ -31,7 +31,7 @@
 #define	USYS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */

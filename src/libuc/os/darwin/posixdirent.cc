@@ -1,4 +1,4 @@
-/* posixdirent */
+/* posixdirent SUPPORT */
 /* lang=C++20 */
 
 /* helper interface to POSIX |dirent(3c)| facility */

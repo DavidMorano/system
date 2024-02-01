@@ -70,7 +70,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */

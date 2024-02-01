@@ -28,7 +28,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>

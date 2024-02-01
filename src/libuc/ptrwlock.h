@@ -12,7 +12,7 @@
 #define	PTRWLOCK_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<pthread.h>
@@ -20,8 +20,10 @@
 
 #include	"ptrwa.h"
 
+
 #define	PTRWLOCK		pthread_rwlock_t
 #define	PTRWLOCK_NAMELEN	(MAXNAMELEN+1)
+
 
 EXTERNC_begin
 

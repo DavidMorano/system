@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	No, we are not the same as UNIX® all of the time!  We return
-	PFNOSUPPORT is a protocol-family (PF) is not supported!
+	PFNOSUPPORT if a protocol-family (PF) is not supported!
 
 *******************************************************************************/
 
@@ -60,7 +60,7 @@ int u_socket(int pf,int pt,int proto) noex {
 	if ((pf >= 0) && (pt >= 0) && (proto >= 0)) {
 	    int		to_nomem = utimeout[uto_nomem] ;
 	    int		to_nosr = utimeout[uto_nosr] ;
-	    bool	f_exit = FALSE ;
+	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = socket(pf,pt,proto)) < 0) rs = (- errno) ;
 	        if (rs < 0) {
@@ -69,20 +69,20 @@ int u_socket(int pf,int pt,int proto) noex {
 	                if (to_nomem-- > 0) {
 			    msleep(1000) ;
 		        } else {
-			    f_exit = TRUE ;
+			    f_exit = true ;
 		        }
 	                break ;
 	            case SR_NOSR:
 	                if (to_nosr-- > 0) {
 			    msleep(1000) ;
 		        } else {
-			    f_exit = TRUE ;
+			    f_exit = true ;
 		        }
 	                break ;
 	            case SR_INTR:
 	                break ;
 		    default:
-		        f_exit = TRUE ;
+		        f_exit = true ;
 		        break ;
 	            } /* end switch */
 	        } /* end if */
@@ -91,6 +91,6 @@ int u_socket(int pf,int pt,int proto) noex {
 	} /* end if (valid) */
 	return rs ;
 }
-/* end subroutine (uc_socket) */
+/* end subroutine (u_socket) */
 
 

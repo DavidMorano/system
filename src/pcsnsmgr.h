@@ -1,6 +1,8 @@
-/* pcsnsmgr */
+/* pcsnsmgr HEADER */
+/* lang=C20 */
 
 /* PCS Name-Server Cache */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,12 +15,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSNSMGR_INCLUDE
-#define	PCSNSMGR_INCLUDE	1
+#define	PCSNSMGR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>		/* extra types */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	PCSNSMGR_STATS		struct pcsnsmgr_stats
@@ -39,12 +42,12 @@ struct pcsnsmgr_stats {
 
 EXTERNC_begin
 
-extern int pcsnsmgr_init() ;
-extern int pcsnsmgr_set(cchar *,int,cchar *,int,int) ;
-extern int pcsnsmgr_get(char *,int,cchar *,int) ;
-extern int pcsnsmgr_invalidate(cchar *,int) ;
-extern int pcsnsmgr_stats(PCSNSMGR_STATS *) ;
-extern void pcsnsmgr_fini() ;
+extern int pcsnsmgr_init() noex ;
+extern int pcsnsmgr_set(cchar *,int,cchar *,int,int) noex ;
+extern int pcsnsmgr_get(char *,int,cchar *,int) noex ;
+extern int pcsnsmgr_invalidate(cchar *,int) noex ;
+extern int pcsnsmgr_stats(PCSNSMGR_STATS *) noex ;
+extern void pcsnsmgr_fini() noex ;
 
 EXTERNC_end
 
