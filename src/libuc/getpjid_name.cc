@@ -1,5 +1,5 @@
 /* getpjid_name SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get the project-ID for a given project-name */
 /* version %I% last-modified %G% */

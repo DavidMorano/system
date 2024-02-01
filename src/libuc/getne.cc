@@ -1,10 +1,9 @@
 /* getne SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get protocol entry */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -60,40 +59,33 @@
 
 /* exported subroutines */
 
-
-int getne_begin(int sf)
-{
+int getne_begin(int sf) noex {
 	return uc_setnetent(sf) ;
 }
 /* end subroutine (getne_begin) */
 
-
-int getne_end()
-{
+int getne_end() noex {
 	return uc_endnetent() ;
 }
 /* end subroutine (getne_end) */
 
-
-int getne_ent(struct netent *pp,char *rbuf,int rlen)
-{
+int getne_ent(NETENT *nep,char *rbuf,int rlen) noex {
+	cint		rsn = SR_NOTFOUND :
 	int		rs ;
-	if ((rs = uc_getnetent(pp,rbuf,rlen)) == SR_NOTFOUND) rs = SR_OK ;
+	if ((rs = uc_getnetent(nep,rbuf,rlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (getne_ent) */
 
-
-int getne_name(struct netent *pp,char *rbuf,int rlen,cchar *name)
-{
-	return uc_getnetbyname(name,pp,rbuf,rlen) ;
+int getne_name(NETENT *nep,char *rbuf,int rlen,cchar *name) noex {
+	return uc_getnetbyname(nep,rbuf,rlen,name) ;
 }
 /* end subroutine (getne_name) */
 
-
-int getne_addr(struct netent *pp,char *rbuf,int rlen,int type,int num)
-{
-	return uc_getnetbyaddr(num,type,pp,rbuf,rlen) ;
+int getne_addr(NETENT *nep,char *rbuf,int rlen,int type,int num) noex {
+	return uc_getnetbyaddr(nep,rbuf,rlen,num,type,) ;
 }
 /* end subroutine (getne_addr) */
 

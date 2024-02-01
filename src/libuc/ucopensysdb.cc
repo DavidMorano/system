@@ -1,5 +1,5 @@
 /* ucopensysdb SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* open a system-database (SYSBD) file */
 /* version %I% last-modified %G% */
@@ -20,14 +20,14 @@
 /*******************************************************************************
 
 	Name:
-	uc_opensydb
+	uc_opensysdb
 
 	Description:
 	This subroutine opens a system-database (SYSDB) type of file
 	given its enumeration constant value.
 
 	Synopsis:
-	int uc_opensb(int id,int oflags,int operms) noex
+	int uc_opensysdb(int id,int oflags,int operms) noex
 
 	Arguments:
 	id		SYSDB file ID
