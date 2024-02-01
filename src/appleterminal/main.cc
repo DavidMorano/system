@@ -33,7 +33,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -89,7 +89,6 @@ static constexpr cchar	*prognames[] = {
 	nullptr
 } ;
 
-
 namespace {
     struct proginfo {
 	mainv		argv ;
@@ -121,6 +120,9 @@ static bool	isnotbadchar(int) noex ;
 
 static constexpr char		badchars[] = R"xx(%:\'"&)xx" ;
 static constexpr char		appleterminal[] = "Apple_Terminal" ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -165,9 +167,8 @@ int proginfo::getpn(mainv names) noex {
 	if (argv) {
 	    rs = SR_INVALID ;
 	    if ((argc > 0) && (argv[0] != nullptr)) {
-	        int	bl ;
 	        cchar	*bp{} ;
-	        if ((bl = sfbasename(argv[0],-1,&bp)) > 0) {
+	        if (int bl ; (bl = sfbasename(argv[0],-1,&bp)) > 0) {
 		    int		pl = rmchr(bp,bl,'.') ;
 		    cchar	*pp = bp ;
 		    if (pl > 0) {
@@ -185,9 +186,8 @@ int proginfo::getpn(mainv names) noex {
 
 int proginfo::termout() noex {
 	cchar		*vn = varname.termprogram ;
-	cchar		*tn ;
 	int		rs = SR_OK ;
-	if ((tn = getourenv(envv,vn)) != nullptr) {
+	if (cchar *tn ; (tn = getourenv(envv,vn)) != nullptr) {
             if ((strcmp(tn,appleterminal) == 0) && (argc >= 2)) {
                 string	s ;
                 cint	fd = FD_STDIN ;
@@ -196,8 +196,9 @@ int proginfo::termout() noex {
 		rs = SR_INVALID ;
                 if (ps >= 0) {
                     cint        ilen = ENCBUFLEN ;
+		    cchar	*fmt = "\033]%u;" ;
                     char        ibuf[ENCBUFLEN+1] ;
-                    if ((rs = snprintf(ibuf,ilen,"\033]%u;",ps)) >= ilen) {
+                    if ((rs = snprintf(ibuf,ilen,fmt,ps)) >= ilen) {
                         rs = SR_OVERFLOW ;
                     } else {
                         s += ibuf ;
@@ -242,15 +243,15 @@ int proginfo::termout() noex {
 /* end method (proginfo::termout) */
 
 static int getps(int pm) noex {
-                int         ps = -1 ;       /* <- what Apple calls this */
-                switch (pm) {
-                case progmode_apptermdoc:
-                    ps = 6 ;                /* <- Apple specified for 'doc' */
-                    break ;
-                case progmode_apptermpwd:
-                    ps = 7 ;                /* <- Apple specified for 'pwd' */
-                    break ;
-                } /* end switch */
+	int         ps = -1 ;       /* <- what Apple calls this */
+	switch (pm) {
+	case progmode_apptermdoc:
+	    ps = 6 ;                /* <- Apple specified for 'doc' */
+	    break ;
+	case progmode_apptermpwd:
+	    ps = 7 ;                /* <- Apple specified for 'pwd' */
+	    break ;
+	} /* end switch */
 	return ps ;
 }
 /* end subroutine (getps) */

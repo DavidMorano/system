@@ -405,14 +405,14 @@ TOBJ= $(TOBJG0) $(TOBJG1)
 UOBJ00= matxstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= snwcpyx.o strcpyxc.o
-UOBJ03= varnames.o syswords.o rmx.o
+UOBJ03= varnames.o syswords.o stdfnames.o
 
 UOBJ04= ischarx.o ulogerror.o strdcpy.o
 UOBJ05= nleadstr.o nleadkeystr.o
-UOBJ06= mapex.o strnul.o
+UOBJ06= mapex.o strnul.o rmx.o
 UOBJ07= getourenv.o
 
-UOBJ08= strkeycmp.o
+UOBJ08= strkeycmp.o strwcmp.o
 UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
 UOBJ11= strwcpy.o
@@ -1146,8 +1146,10 @@ isoneof.o:		isoneof.c isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
 readln.o:		readln.cc readln.hh
-ccfile.o:		ccfile.cc ccfile.hh
 strlibval.o:		strlibval.cc strlibval.hh
+strwcpy.o:		strwcmp.cc strwcmp.h
+
+ccfile.o:		ccfile.cc ccfile.hh
 thrcomm.o:		thrcomm.cc thrcomm.h
 thrbase.o:		thrbase.cc thrbase.h thrcomm.h
 
