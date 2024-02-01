@@ -30,7 +30,7 @@
 #define	USERATTR_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -65,9 +65,7 @@ typedef userattr_t		userattr ;
 	} userattr ;			/* -> typedef USERATTR */
 #endif /* STRUCT_USERATTR */
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern void setuserattr() noex ;
 extern void enduserattr() noex ;
@@ -76,9 +74,7 @@ extern userattr *getuserattr() noex ;
 extern userattr *getusernam(cchar *) noex ;
 extern userattr *getuseruid(uid_t) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
 /* USERATTR end */

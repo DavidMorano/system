@@ -1,6 +1,6 @@
-# MAKEFILE (ucsys)
+# MAKEFILES (ucsupport)
 
-T= ucsys
+T= ucsupport
 
 ALL= $(T).o $(T).a
 
@@ -51,14 +51,19 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h
+INCS= ucsupport.h
 
 
-OBJ0_UCSYS= ucsys_sup.o userattr.o spwd.o
-OBJ1_UCSYS= ucsyspw.o ucsysgr.o ucsyspj.o
-OBJ2_UCSYS= ucsyspr.o ucsysnw.o ucsysho.o ucsyssv.o
+OBJ0_UCSUPPORT= 
+OBJ1_UCSUPPORT= 
+OBJ2_UCSUPPORT= 
+OBJ3_UCSUPPORT= 
 
-OBJ_UCSYS= obj0_ucget.o obj1_ucget.o obj2_ucget.o
+
+OBJA_UCSUPPORT= obj0_ucsupport.o obj1_ucsupport.o
+OBJB_UCSUPPORT= obj2_ucsupport.o obj3_ucsupport.o
+
+OBJ_UCSUPPORT= $(OBJA_UCSUPPORT) $(OBJB_UCSUPPORT)
 
 
 default:		$(T).o
@@ -75,16 +80,16 @@ all:			$(ALL)
 	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .c.o:
-	$(CC) $(CPPFLAGS) -c $(CFLAGS) $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
 .cc.o:
-	$(CXX) $(CPPFLAGS) -c $(CCFLAGS) $<
+	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSYS)
+$(T).o:			$(OBJ_UCSUPPORT)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UCSUPPORT)
 
-$(T).a:			$(OBJ_UCSYS)
+$(T).a:			$(OBJ_UCSUPPORT)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -105,28 +110,16 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_ucget.o:	$(OBJ0_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYS)
+obj0_ucsupport.o:	$(OBJ0_UCSUPPORT)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSUPPORT)
 
-obj1_ucget.o:	$(OBJ1_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSYS)
+obj1_ucsupport.o:	$(OBJ1_UCSUPPORT)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSUPPORT)
 
-obj2_ucget.o:	$(OBJ2_UCSYS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSYS)
+obj2_ucsupport.o:	$(OBJ2_UCSUPPORT)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSUPPORT)
 
-
-ucsys_sup.o:	ucsys_sup.cc ucsys.h $(INCS)
-
-spwd.o:		spwd.cc spwd.h $(INCS)
-userattr.o:	userattr.cc userattr.h $(INCS)
-
-ucsyspw.o:	ucsyspw.cc ucsyspw.h $(INCS)
-ucsysgr.o:	ucsysgr.cc ucsysgr.h $(INCS)
-ucsyspj.o:	ucsyspj.cc ucsyspj.h $(INCS)
-
-ucsyspr.o:	ucsyspr.cc ucsyspr.h $(INCS)
-ucsysnw.o:	ucsysnw.cc ucsysnw.h $(INCS)
-ucsysho.o:	ucsysho.cc ucsysho.h $(INCS)
-ucsyssv.o:	ucsyssv.cc ucsyssv.h $(INCS)
+obj3_ucsupport.o:	$(OBJ3_UCSUPPORT)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSUPPORT)
 
 

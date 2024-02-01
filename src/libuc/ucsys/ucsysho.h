@@ -30,7 +30,7 @@
 #define	UCSYSHO_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -45,9 +45,7 @@
 #define	CHOSTENT	const struct hostent
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern HOSTENT	*gethoent() noex ;
 extern HOSTENT	*gethonam(cchar *) noex ;
@@ -57,9 +55,7 @@ extern int	gethoent_rp(HOSTENT *,char *,int) noex ;
 extern int	gethonam_rp(HOSTENT *,char *,int,cchar *) noex ;
 extern int	gethoadd_rp(HOSTENT *,char *,int,cvoid *,int,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCSYSHO_INCLUDE */

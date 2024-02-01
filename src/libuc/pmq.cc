@@ -205,6 +205,9 @@ static constexpr mqd_t mkmqdbad() noex {
 static constexpr mqd_t		mqdbad = mkmqdbad() ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int pmq_open(pmq *op,cchar *name,int of,mode_t om,const pmq_attr *attr) noex {

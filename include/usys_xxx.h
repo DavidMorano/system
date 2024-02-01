@@ -41,6 +41,7 @@
 #include	<clanguage.h>
 
 
+/*----------------------------------------------------------------------------*/
 /* SECDB begin */
 #if	(!defined(SYSHAS_SECDB)) || (SYSHAS_SECDB == 0)
 
@@ -48,8 +49,10 @@
 
 #endif /* (!defined(SYSHAS_SECDB)) || (SYSHAS_SECDB == 0) */
 /* SECDB end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* USERATTR begin */
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
@@ -81,8 +84,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* PROJECT begin */
 #if	defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0)
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
@@ -105,8 +110,10 @@ extern "C" {
 
 #endif /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 /* PROJECT end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* SYSV-MSG begin */
 
 #ifndef	TYPEDEF_SYSVMSGTYPE
@@ -119,8 +126,10 @@ typedef long		sysvmsgtype ;
 #endif
 
 /* SYSV-MSG end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
 #if	(!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 
@@ -135,8 +144,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
 
@@ -175,6 +186,7 @@ EXTERNC_end
 
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */
+/*----------------------------------------------------------------------------*/
 
 
 #endif /* USYS_XXX_INCLUDE */

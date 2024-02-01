@@ -27,7 +27,7 @@
 #define	ULIMITS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<utypedefs.h>
@@ -36,15 +36,15 @@
 
 
 #ifndef	LONG64_MIN
-#define	LONG64_MIN	(-9223372036854775807LL-1LL)
+#define	LONG64_MIN	(-9223372036854775807L-1L)
 #endif
 
 #ifndef	LONG64_MAX
-#define	LONG64_MAX	9223372036854775807LL
+#define	LONG64_MAX	9223372036854775807L
 #endif
 
 #ifndef	ULONG64_MAX
-#define	ULONG64_MAX	18446744073709551615ULL
+#define	ULONG64_MAX	18446744073709551615UL
 #endif
 
 #ifndef	SHORT_MIN

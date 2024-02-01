@@ -43,6 +43,7 @@
 #include	<clanguage.h>
 
 
+/*----------------------------------------------------------------------------*/
 /* UCTIMEOUT begin */
 
 #ifndef	SIGTIMEOUT
@@ -50,6 +51,7 @@
 #endif
 
 /* UCTIMEOUT end */
+/*----------------------------------------------------------------------------*/
 
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0)*/

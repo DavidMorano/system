@@ -30,7 +30,7 @@
 #define	UCSYSNW_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<stdint.h>
 #include	<utypedefs.h>
@@ -47,9 +47,7 @@
 #define	CNETENT		const struct netent
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern NETENT	*getnwent() noex ;
 extern NETENT	*getnwnam(cchar *) noex ;
@@ -59,9 +57,7 @@ extern int	getnwent_rp(NETENT *,char *,int) noex ;
 extern int	getnwnam_rp(NETENT *,char *,int,cchar *) noex ;
 extern int	getnwnum_rp(NETENT *,char *,int,uint32_t,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCSYSNW_INCLUDE */

@@ -64,6 +64,7 @@
 #endif
 
 
+/*----------------------------------------------------------------------------*/
 /* SIGSEND begin */
 #if	(!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0)
 
@@ -95,8 +96,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_SIGSEND)) || (SYSHAS_SIGSEND == 0) */
 /* SIGSEND end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* SIGWAIT begin */
 #if	(!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0)
 
@@ -111,8 +114,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_SIGWAIT)) || (SYSHAS_SIGWAIT == 0) */
 /* SIGWAIT end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* TIMER begin (POSIX real-time) */
 #if	(!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0)
 
@@ -150,8 +155,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0) */
 /* TIMER end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
 
@@ -171,8 +178,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* MUTEXROBUST start */
 #if	(!defined(SYSHAS_MUTEXROBUST)) || (SYSHAS_MUTEXROBUST == 0)
 
@@ -194,8 +203,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_MUTEXROBUST)) || (SYSHAS_MUTEXROBUST == 0) */
 /* MUTEXROBUST end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* UCTIMEOUT begin */
 
 #ifndef	SIGTIMEOUT
@@ -203,8 +214,10 @@ EXTERNC_end
 #endif
 
 /* UCTIMEOUT begin */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
 #if	(!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 
@@ -219,8 +232,10 @@ EXTERNC_end
 
 #endif /* (!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0) */
 /* MEMCNTL end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* PSEM begin (unnamed POSIX® semaphores) */
 #if	CF_PSEMADAPT
 #if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
@@ -238,6 +253,7 @@ EXTERNC_end
 #endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
 #endif /* CF_PSEMADAPT */
 /* PSEM end */
+/*----------------------------------------------------------------------------*/
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */

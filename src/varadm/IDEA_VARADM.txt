@@ -1,13 +1,11 @@
-IDEA
+VARADM
 
 Synopsis:
+$ varadm <varname(s)> [{-infok|-i}] [{-a|-d}] [-V]
 
-$ varadm <varname(s)> {-info] [{-a|-d}] [-V]
-
-where:
-
+Arguments:
 <varname(s)>	variable(s) to operate on
--info		print information on variable
+-info|-i	print information on variable
 -a		activate variable (default action)
 -d		deactivate variable
 -V		print command version to standard-error and then exit
