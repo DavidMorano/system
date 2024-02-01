@@ -35,14 +35,23 @@
 	>=0		value of symbolic hexadecimal digit
 	<0		error (system-return)
 
+	Notes:
+	subroutine	domain
+	----------------------------------
+	digval		base-64 (original + checked)
+	hexval		base-16 (checked)
+	decval		base-10 (checked)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<char.h>
-#include	<localmisc.h>
 
-#include	"hexval.h"
+#include	"digval.h"
 
 
 /* external subroutines */
@@ -52,6 +61,13 @@
 
 
 /* exported subroutines */
+
+int digval(int ch) noex {
+	int		v = char_toval(ch) ;
+	if (v == UCHAR_MAX) v = SR_DOM ;
+	return v ;
+}
+/* end subroutine (hexval) */
 
 int hexval(int ch) noex {
 	int		v = SR_DOM ;

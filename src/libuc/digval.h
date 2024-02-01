@@ -25,8 +25,9 @@
 
 EXTERNC_begin
 
-extern int digval(int) noex ;
+extern int hexval(int) noex ;
 extern int decval(int) noex ;
+extern int digval(int) noex ;
 
 EXTERNC_end
 
