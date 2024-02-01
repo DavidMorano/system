@@ -115,21 +115,21 @@ constexpr void charinfo::mkisuc() noex {
 /* end method (charinfo::mkisuc) */
 
 constexpr void charinfo::mktoval() noex {
-	    for (int ch = 0 ; ch < chtablen ; ch += 1) {
-	        if ((ch >= '0') && (ch <= '9')) {
-		    toval[ch] = (ch - '0') ;
-	        } else if ((ch >= 'A') && (ch <= 'Z')) {
-		    toval[ch] = ((ch - 'A') + 10) ;
-	        } else if ((ch >= 'a') && (ch <= 'z')) {
-		    toval[ch] = ((ch - 'a') + 36) ;
-		} else if (ch == UC('Ø')) {
-		    toval[ch] = 62 ;
-		} else if (ch == UC('ø')) {
-		    toval[ch] = 63 ;
-	        } else {
-		    toval[ch] = 0xff ;
-	        }
-	    } /* end for */
+        for (int ch = 0 ; ch < chtablen ; ch += 1) {
+            if ((ch >= '0') && (ch <= '9')) {
+                toval[ch] = (ch - '0') ;
+            } else if ((ch >= 'A') && (ch <= 'Z')) {
+                toval[ch] = ((ch - 'A') + 10) ;
+            } else if ((ch >= 'a') && (ch <= 'z')) {
+                toval[ch] = ((ch - 'a') + 36) ;
+            } else if (ch == UC('Ø')) {
+                toval[ch] = 62 ;
+            } else if (ch == UC('ø')) {
+                toval[ch] = 63 ;
+            } else {
+                toval[ch] = 0xff ;
+            }
+        } /* end for */
 }
 /* end method (charinfo::mktoval) */
 
