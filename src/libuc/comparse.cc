@@ -49,10 +49,6 @@
 #define	COMPARSE_SCOMMENT	1
 #define	COMPARSE_SOVERLAST	2
 
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
 
 /* external subroutines */
 
@@ -150,11 +146,7 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	cint		defsize = COMPARSE_DEFSIZE ;
 	int		rs ;
 	int		rs1 ;
-	int		cl ;
-	int		pc ;
-	int		ch ;
 	int		vl = 0 ;
-	int		f_quote = FALSE ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
@@ -162,11 +154,12 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	if ((rs = buffer_start(&as[0],defsize)) >= 0) {
 	    if ((rs = buffer_start(&as[1],defsize)) >= 0) {
 	        int	pstate = COMPARSE_SVALUE ;
-	        int	state ;
+	        int	state = COMPARSE_SVALUE ;
+		int	pc ;
 	        int	c_comment = 0 ;
-	        state = COMPARSE_SVALUE ;
+		bool	f_quote = false ;
 	        while ((sl != 0) && (*sp != '\0')) {
-	            ch = mkchar(*sp) ;
+	            cint	ch = mkchar(*sp) ;
 	            switch (ch) {
 	            case '\\':
 	                if (f_quote) {
@@ -190,13 +183,15 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	                if (! f_quote) {
 	                    if (c_comment == 0) {
 	                        pc = buffer_getprev(as + state) ;
-	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc)))
+	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc))) {
 	                            buffer_char((as + state),' ') ;
+				}
 	                        pstate = state ;
 	                        state = COMPARSE_SCOMMENT ;
 	                        pc = buffer_getprev(as + state) ;
-	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc)))
+	                        if ((pc >= 0) && (! CHAR_ISWHITE(pc))) {
 	                            buffer_char((as + state),' ') ;
+				}
 	                        sp += 1 ;
 	                        sl -= 1 ;
 	                    } else {
@@ -228,7 +223,7 @@ int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
 	            case ' ':
 	            case '\t':
 	                if (! f_quote) {
-	                    cl = buffer_get((as+state),nullptr) ;
+	                    cint	cl = buffer_get((as+state),nullptr) ;
 	                    pc = buffer_getprev(as+state) ;
 	                    if ((cl == 0) || ((pc >= 0) && CHAR_ISWHITE(pc))) {
 	                        sp += 1 ;
