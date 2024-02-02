@@ -1,5 +1,5 @@
 /* ucsthr SUPPORT (Solaris® Threads)*/
-/* lang=C20 */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* Solaris® threads */

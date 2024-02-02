@@ -1,4 +1,4 @@
-/* obuf */
+/* obuf SUPPORT */
 /* lang=C++98 */
 
 /* Output Buffer (object) */
@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<new>
 #include	<utypedefs.h>
 #include	<clanguage.h>

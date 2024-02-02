@@ -21,10 +21,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -59,7 +59,6 @@ OBJ1_UCSYS= ucsyspw.o ucsysgr.o ucsyspj.o
 OBJ2_UCSYS= ucsyspr.o ucsysnw.o ucsysho.o ucsyssv.o
 
 OBJ_UCSYS= obj0_ucget.o obj1_ucget.o obj2_ucget.o
-
 
 
 default:		$(T).o
@@ -105,6 +104,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 obj0_ucget.o:	$(OBJ0_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYS)
 
@@ -115,16 +115,18 @@ obj2_ucget.o:	$(OBJ2_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSYS)
 
 
-ucsys_sup.o:	ucsys_sup.cc ucsys.h
+ucsys_sup.o:	ucsys_sup.cc ucsys.h $(INCS)
 
-spwd.o:		spwd.cc spwd.h
-userattr.o:	userattr.cc userattr.h
+spwd.o:		spwd.cc spwd.h $(INCS)
+userattr.o:	userattr.cc userattr.h $(INCS)
 
-ucsyspw.o:	ucsyspw.cc ucsyspw.h
-ucsysgr.o:	ucsysgr.cc ucsysgr.h
-ucsyspj.o:	ucsyspj.cc ucsyspj.h
+ucsyspw.o:	ucsyspw.cc ucsyspw.h $(INCS)
+ucsysgr.o:	ucsysgr.cc ucsysgr.h $(INCS)
+ucsyspj.o:	ucsyspj.cc ucsyspj.h $(INCS)
 
-ucsyspr.o:	ucsyspr.cc ucsyspr.h
-ucsysnw.o:	ucsysnw.cc ucsysnw.h
+ucsyspr.o:	ucsyspr.cc ucsyspr.h $(INCS)
+ucsysnw.o:	ucsysnw.cc ucsysnw.h $(INCS)
+ucsysho.o:	ucsysho.cc ucsysho.h $(INCS)
+ucsyssv.o:	ucsyssv.cc ucsyssv.h $(INCS)
 
 

@@ -1,4 +1,4 @@
-/* ptm */
+/* ptm SUPPORT */
 /* lang=C++20 */
 
 /* POSIX® Thread (Pthread) Mutex manipulation */
@@ -20,7 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<climits>

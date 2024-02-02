@@ -1,10 +1,9 @@
-/* geteaddrinfo */
+/* geteaddrinfo SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to get a canonical hostname */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -34,18 +33,13 @@
 	translated given the existing host information.
 
 	Synopsis:
-	int geteaddrinfo(hostname,svcname,hintp,ehostname,rpp)
-	const char	hostname[] ;
-	const char	svcname[] ;
-	struct addrinfo	*hintp ;
-	char		ehostname[] ;
-	struct addrinfo	**rpp ;
+	int geteaddrinfo(cc *hn,cc *svc,AI *hintp,char *ehbuf,cc **rpp) noex
 
 	Arguments:
-	hostname	name of host to lookup
-	svcname		name of service to lookup
+	hn		name of host to lookup
+	svc		name of service to lookup
 	hintp		pointer to 'addrinfo' structure
-	ehostname	caller-supplied buffer to received "effective" name
+	ehbuf		caller-supplied buffer to received "effective" name
 	rpp		pointer to pointer to 'addrinfo' result
 
 	Returns:
@@ -63,10 +57,21 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<usupport.h>		/* for |memclear(3i)| */
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
+#include	<getnodename.h>		/* <- for |getnodedomain(2uc)| */
+#include	<snx.h>
+#include	<snwcpy.h>
+#include	<isnot.h>
+#include	<isinetaddr.h>
+#include	<isindomain.h>
 #include	<localmisc.h>
+
+#include	"geteaddrinfo.h"
 
 
 /* local defines */
@@ -83,42 +88,31 @@
 #define	LOCALDOMAINNAME	"local"
 #endif
 
-#ifndef	ADDRINFO
-#define	ADDRINFO	struct addrinfo
-#endif
-
 #define	ARGINFO		struct arginfo
+#define	AI		ADDRINFO
 
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
 
 
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	tolc(int) ;
-extern int	isinetaddr(const char *) ;
-extern int	isindomain(const char *,const char *) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* local structures */
 
 struct arginfo {
-	const char	*hostname ;
-	const char	*svcname ;
-	struct addrinfo	*hintp ;
-	struct addrinfo	**rpp ;
+	cchar		*hostname ;
+	cchar		*svcname ;
+	ADDRINFO	*hintp ;
+	ADDRINFO	**rpp ;
 } ;
 
 struct subinfo_flags {
@@ -129,7 +123,7 @@ struct subinfo_flags {
 struct subinfo {
 	ARGINFO		*aip ;		/* user argument (hint) */
 	char		*ehostname ;	/* user argument (writable) */
-	const char	*domainname ;	/* dynamically determined */
+	cchar		*domainname ;	/* dynamically determined */
 	SUBINFO_FL	f ;
 	int		rs_last ;
 } ;
@@ -137,17 +131,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	arginfo_load(ARGINFO *,cchar *,cchar *,
-			struct addrinfo *,struct addrinfo **) ;
+static int	arginfo_load(ARGINFO *,cc *,cc *,AI *,AI **) noex ;
 
-static int	subinfo_start(SUBINFO *,char *,ARGINFO *) ;
-static int	subinfo_domain(SUBINFO *) ;
-static int	subinfo_finish(SUBINFO *) ;
+static int	subinfo_start(SUBINFO *,char *,ARGINFO *) noex ;
+static int	subinfo_domain(SUBINFO *) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
 
-static int	try_straight(SUBINFO *) ;
-static int	try_add(SUBINFO *) ;
-static int	try_rem(SUBINFO *) ;
-static int	try_remlocal(SUBINFO *) ;
+static int	try_straight(SUBINFO *) noex ;
+static int	try_add(SUBINFO *) noex ;
+static int	try_rem(SUBINFO *) noex ;
+static int	try_remlocal(SUBINFO *) noex ;
 
 
 /* external variables */
@@ -155,69 +148,44 @@ static int	try_remlocal(SUBINFO *) ;
 
 /* local variables */
 
-static int	(*tries[])(SUBINFO *) = {
+static constexpr int	(*tries[])(SUBINFO *) = {
 	try_straight,
 	try_add,
 	try_rem,
 	try_remlocal,
-	NULL
+	nullptr
 } ;
+
+static bufsizevar		maxhostlen(getbufsize_hn) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int geteaddrinfo(hostname,svcname,hintp,ehostname,rpp)
-const char	hostname[] ;
-const char	svcname[] ;
-struct addrinfo	*hintp ;
-char		ehostname[] ;
-struct addrinfo	**rpp ;
-{
-	SUBINFO		mi ;
-	ARGINFO		ai ;
-	int		rs ;
+int geteaddrinfo(cc *hn,cc *svc,AI *hintp,char *ehostname,AI **rpp) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rs_last = SR_NOTFOUND ;
 	int		c = 0 ;
-
-	if (hostname == NULL) return SR_FAULT ;
-	if (svcname == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("geteaddrinfo: ent hn=%s svc=%s\n",hostname,svcname) ;
-#endif
-
-	arginfo_load(&ai,hostname,svcname,hintp,rpp) ;
-
-	if ((rs = subinfo_start(&mi,ehostname,&ai)) >= 0) {
-	    int		i ;
-
-	    for (i = 0 ; tries[i] != NULL ; i += 1) {
-	        rs = (*tries[i])(&mi) ;
-		c = rs ;
-	        if (rs != 0) break ;
-	    } /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("geteaddrinfo: fin1 rs=%d c=%u\n",rs,c) ;
-#endif
-
-	    rs_last = mi.rs_last ;
-	    rs1 = subinfo_finish(&mi) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
-#if	CF_DEBUGS
-	debugprintf("geteaddrinfo: fin2 rs=%d c=%u\n",rs,c) ;
-#endif
-
-	if ((rs >= 0) && (c == 0)) rs = rs_last ;
-
-#if	CF_DEBUGS
-	debugprintf("geteaddrinfo: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	if (hn && svc) {
+	    ARGINFO	argi ;
+	    if ((rs = arginfo_load(&argi,hn,svc,hintp,rpp)) >= 0) {
+	        SUBINFO		mi ;
+	        if ((rs = subinfo_start(&mi,ehostname,&argi)) >= 0) {
+	            for (int i = 0 ; tries[i] ; i += 1) {
+	                rs = (*tries[i])(&mi) ;
+		        c = rs ;
+	                if (rs != 0) break ;
+	            } /* end for */
+	            rs_last = mi.rs_last ;
+	            rs1 = subinfo_finish(&mi) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	        if ((rs >= 0) && (c == 0)) rs = rs_last ;
+	    } /* end if (arginfo_load) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end if (geteaddrinfo) */
@@ -225,140 +193,103 @@ struct addrinfo	**rpp ;
 
 /* local subroutines */
 
-
-static int subinfo_start(SUBINFO *mip,char *ehostname,ARGINFO *aip)
-{
-
-	memset(mip,0,sizeof(SUBINFO)) ;
-	mip->domainname = NULL ;
-	mip->aip = aip ;
-	mip->ehostname = ehostname ;
-	mip->rs_last = SR_NOTFOUND ;
-
-	return SR_OK ;
+static int subinfo_start(SUBINFO *mip,char *ehostname,ARGINFO *aip) noex {
+	int		rs = SR_FAULT ;
+	if (mip && aip) {
+	    rs = memclear(mip) ;
+	    mip->domainname = nullptr ;
+	    mip->aip = aip ;
+	    mip->ehostname = ehostname ;
+	    mip->rs_last = SR_NOTFOUND ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *mip)
-{
+static int subinfo_finish(SUBINFO *mip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (mip->domainname != NULL) {
+	if (mip->domainname) {
 	    rs1 = uc_free(mip->domainname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mip->domainname = NULL ;
+	    mip->domainname = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_domain(SUBINFO *mip)
-{
+static int subinfo_domain(SUBINFO *mip) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		len = 0 ;
-
-	if (mip->domainname == NULL) {
-	    char	dbuf[MAXHOSTNAMELEN + 1] ;
-	    if ((rs = getnodedomain(NULL,dbuf)) >= 0) {
-	        cchar	*dp ;
-	        len = strlen(dbuf) ;
-	        if ((rs = uc_mallocstrw(dbuf,len,&dp)) >= 0) {
-	            mip->domainname = dp ;
-		}
-	    }
+	if (mip->domainname == nullptr) {
+	    char	*dbuf{} ;
+	    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	        if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
+	            cchar	*dp{} ;
+	            len = strlen(dbuf) ;
+	            if ((rs = uc_mallocstrw(dbuf,len,&dp)) >= 0) {
+	                mip->domainname = dp ;
+		    }
+	        }
+		rs1 = uc_free(dbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	    len = strlen(mip->domainname) ;
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_domain) */
 
-
-static int try_straight(SUBINFO *mip)
-{
+static int try_straight(SUBINFO *mip) noex {
 	ARGINFO		*aip = mip->aip ;
 	int		rs ;
 	int		c = 0 ;
-	const char	*hn = aip->hostname ;
-
-	if (hn != NULL) {
+	cchar		*hn = aip->hostname ;
+	if (hn != nullptr) {
 	    int f = false ;
 	    f = f || ((hn[0] == 'a') && (strcmp(hn,ANYHOST) == 0)) ;
 	    f = f || (hn[0] == '*') ;
 	    f = f || (hn[0] == '\0') ;
-	    if (f)
-	        hn = NULL ;
-	}
-
-#if	CF_DEBUGS
-	if (aip->hintp != NULL) {
-	    debugprintf("geteaddrinfo/try_straight: hint ai_family=%d\n",
-	        aip->hintp->ai_family) ;
-	    debugprintf("geteaddrinfo/try_straight: hint ai_protocol=%d\n",
-	        aip->hintp->ai_protocol) ;
-	}
-#endif
-
-	if ((rs = uc_getaddrinfo(hn,aip->svcname,aip->hintp,aip->rpp)) >= 0) {
-
-#if	CF_DEBUGS
-	debugprintf("geteaddrinfo/try_straight: rs=%d\n",rs) ;
-	if (rs >= 0) {
-	    debugprintf("geteaddrinfo/try_straight: hostname=%s\n",
-	        aip->hostname) ;
-	    if (aip->rpp != NULL) {
-	        struct addrinfo	*ap = *(aip->rpp) ;
-	        debugprintf("geteaddrinfo/try_straight: ai_family=%d\n",
-	            ap->ai_family) ;
-	        debugprintf("geteaddrinfo/try_straight: ai_socktype=%d\n",
-	            ap->ai_socktype) ;
-	        debugprintf("geteaddrinfo/try_straight: ai_protocol=%d\n",
-	            ap->ai_protocol) ;
+	    if (f) {
+	        hn = nullptr ;
 	    }
 	}
-#endif /* CF_DEBUGS */
-
-	    if (mip->ehostname != NULL) {
-		const int	hlen = MAXHOSTNAMELEN ;
+	if ((rs = uc_getaddrinfo(hn,aip->svcname,aip->hintp,aip->rpp)) >= 0) {
+	    if (mip->ehostname != nullptr) {
 	        mip->ehostname[0] = '\0' ;
-	        if (aip->hostname != NULL) {
-		    c = 1 ;
-	            rs = sncpy1(mip->ehostname,hlen,aip->hostname) ;
+	        if (aip->hostname != nullptr) {
+		    if ((rs = maxhostlen) >= 0) {
+			cint	hlen = rs ;
+		        c = 1 ;
+	                rs = sncpy1(mip->ehostname,hlen,aip->hostname) ;
+		    } /* end if (maxhostlen) */
 	        }
 	    }
 	} else if (isNotPresent(rs)) {
 	    mip->rs_last = rs ;
 	    rs = SR_OK ;
 	}
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (try_straight) */
 
-
-/* try adding our own domain on the end if it does not already have one */
-static int try_add(SUBINFO *mip)
-{
+static int try_add(SUBINFO *mip) noex {
 	ARGINFO		*aip = mip->aip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-
-	if (aip->hostname != NULL) {
-	    if (strchr(aip->hostname,'.') == NULL) {
+	if (aip->hostname != nullptr) {
+	    if (strchr(aip->hostname,'.') == nullptr) {
 	        if (! isinetaddr(aip->hostname)) {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
-	                const int	hlen = MAXHOSTNAMELEN ;
-			cchar		*dn = mip->domainname ;
-			cchar		*hn = aip->hostname ;
-	                char		ehostname[MAXHOSTNAMELEN + 1] ;
-	                char		*bp ;
+	                cint	hlen = MAXHOSTNAMELEN ;
+			cchar	*dn = mip->domainname ;
+			cchar	*hn = aip->hostname ;
+	                char	ehostname[MAXHOSTNAMELEN + 1] ;
+	                char	*bp ;
 			bp = ehostname ;
-	                if (mip->ehostname != NULL) {
+	                if (mip->ehostname != nullptr) {
 			    bp = mip->ehostname ;
 			}
 	                if ((rs = snsds(bp,hlen,hn,dn)) >= 0) {
@@ -376,111 +307,106 @@ static int try_add(SUBINFO *mip)
 	        }
 	    }
 	}
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (try_add) */
 
-
-/* try removing our own domain from the end if it is the same as us */
-static int try_rem(SUBINFO *mip)
-{
+static int try_rem(SUBINFO *mip) noex {
 	ARGINFO		*aip = mip->aip ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	if (aip->hostname != NULL) {
+	if (aip->hostname != nullptr) {
 	    if (! isinetaddr(aip->hostname)) {
-		cchar	*tp ;
-	        if ((tp = strchr(aip->hostname,'.')) != NULL) {
+		const nullptr_t		np{} ;
+	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != np) {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
 	                rs = SR_NOTFOUND ;
 	                if (isindomain(aip->hostname,mip->domainname)) {
-			    const int	hlen = MAXHOSTNAMELEN ;
 	                    int		hl = (tp - aip->hostname) ;
 			    cchar	*hn = aip->hostname ;
-	                    char	ehostname[MAXHOSTNAMELEN + 1] ;
-	                    char	*bp ;
-	    		    bp = ehostname ;
-			    if (mip->ehostname != NULL) {
-	                        bp = mip->ehostname ;
-	                    }
+	                    char	*hbuf{} ;
+			    if ((rs = malloc_hn(&hbuf)) >= 0) {
+				cint	hlen = rs ;
+	    		        char	*bp = hbuf ;
+			        if (mip->ehostname != nullptr) {
+	                            bp = mip->ehostname ;
+	                        }
+	    		        if ((rs = snwcpy(bp,hlen,hn,hl)) >= 0) {
+				    ADDRINFO	*hp = aip->hintp ;
+				    ADDRINFO	**rpp = aip->rpp ;
+				    cchar	*sn = aip->svcname ;
+				    auto	gai = uc_getaddrinfo ;
+	        		    if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
+				        c = 1 ;
+			            } else if (isNotPresent(rs)) {
+	    			        mip->rs_last = rs ;
+				        rs = SR_OK ;
+			            }
+			        } /* end if (snwcpy) */
+				rs1 = uc_free(&hbuf) ;
+				if (rs >= 0) rs = rs1 ;
+			    } /* end if (malloc_hn) */
+			} /* end if (isindomain) */
+		    } /* end if (subinfo_domain) */
+	        }
+	    }
+	}
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (try_rem) */
+
+static int try_remlocal(SUBINFO *mip) noex {
+	ARGINFO		*aip = mip->aip ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (aip->hostname != nullptr) {
+	    if (! isinetaddr(aip->hostname)) {
+		const nullptr_t		np{} ;
+	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != np) {
+	            if (isindomain(aip->hostname,LOCALDOMAINNAME)) {
+	                int	hl = (tp - aip->hostname) ;
+			cchar	*hn = aip->hostname ;
+	                char	*hbuf{} ;
+			if ((rs = malloc_hn(&hbuf)) >= 0) {
+			    cint	hlen = rs ;
+			    char	*bp = hbuf ;
+	    		    if (mip->ehostname != nullptr) {
+			        bp = mip->ehostname ;
+	    		    }
 	    		    if ((rs = snwcpy(bp,hlen,hn,hl)) >= 0) {
-				ADDRINFO	*hp = aip->hintp ;
-				ADDRINFO	**rpp = aip->rpp ;
-				cchar		*sn = aip->svcname ;
-	        		if ((rs = uc_getaddrinfo(bp,sn,hp,rpp)) >= 0) {
+			        ADDRINFO	*hp = aip->hintp ;
+			        ADDRINFO	**rpp = aip->rpp ;
+			        cchar		*sn = aip->svcname ;
+			        auto		gai = uc_getaddrinfo ;
+	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				    c = 1 ;
 			        } else if (isNotPresent(rs)) {
 	    			    mip->rs_last = rs ;
 				    rs = SR_OK ;
 			        }
-			    }
-			} /* end if (subinfo_domain) */
-		    } /* end if (subinfo_domain) */
-	        }
+	                    } /* end if (snwcpy) */
+			    rs1 = uc_free(&hbuf) ;
+			    if (rs >= 0) rs = rs1 ;
+			} /* end if (malloc_hn) */
+	            } /* end if (isindomain) */
+	        } /* end if (strchr) */
 	    }
 	}
-
-	return (rs >= 0) ? c : rs ;
-}
-/* end subroutine (try_rem) */
-
-
-/* try removing our a LOCAL domain */
-static int try_remlocal(SUBINFO *mip)
-{
-	ARGINFO		*aip = mip->aip ;
-	int		rs = SR_OK ;
-	int		c = 0 ;
-
-	if (aip->hostname != NULL) {
-	    if (! isinetaddr(aip->hostname)) {
-		cchar	*tp ;
-	        if ((tp = strchr(aip->hostname,'.')) != NULL) {
-	            if (isindomain(aip->hostname,LOCALDOMAINNAME)) {
-		        const int	hlen = MAXHOSTNAMELEN ;
-	                int		hl = (tp - aip->hostname) ;
-	                char		ehostname[MAXHOSTNAMELEN + 1] ;
-	                char		*bp ;
-	    		bp = ehostname ;
-	    		if (mip->ehostname != NULL) {
-			    bp = mip->ehostname ;
-	    		}
-	    		if ((rs = snwcpy(bp,hlen,aip->hostname,hl)) >= 0) {
-			    ADDRINFO	*hp = aip->hintp ;
-			    ADDRINFO	**rpp = aip->rpp ;
-			    cchar	*sn = aip->svcname ;
-	                    if ((rs = uc_getaddrinfo(bp,sn,hp,rpp)) >= 0) {
-				c = 1 ;
-			    } else if (isNotPresent(rs)) {
-	    			mip->rs_last = rs ;
-				rs = SR_OK ;
-			    }
-	                }
-	            } /* end if */
-	        }
-	    }
-	}
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (try_remlocal) */
 
-
-static int arginfo_load(aip,hostname,svcname,hintp,rpp)
-ARGINFO		*aip ;
-const char	hostname[] ;
-const char	svcname[] ;
-struct addrinfo	*hintp ;
-struct addrinfo	**rpp ;
-{
-
-	aip->hostname = hostname ;
-	aip->svcname = svcname ;
-	aip->hintp = hintp ;
-	aip->rpp = rpp ;
-	return SR_OK ;
+static int arginfo_load(ARGINFO *aip,cc *hn,cc *svc,AI *hintp,AI **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (aip) {
+	    aip->hostname = hn ;
+	    aip->svcname = svc ;
+	    aip->hintp = hintp ;
+	    aip->rpp = rpp ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (arginfo_load) */
 

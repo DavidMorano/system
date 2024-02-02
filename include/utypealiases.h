@@ -138,6 +138,10 @@
 #define	TIMEVAL		struct timeval
 #endif
 
+#ifndef	ITIMERVAL
+#define	ITIMERVAL	struct itimerval
+#endif
+
 #ifndef	TIMESPEC
 #define	TIMESPEC	struct timespec
 #endif
@@ -206,6 +210,14 @@
 
 #ifndef	CAIOCB
 #define	CAIOCB		const AIOCB
+#endif
+
+#ifndef	CTIMEVAL
+#define	CTIMEVAL	const TIMEVAL
+#endif
+
+#ifndef	CITIMERVAL
+#define	CITIMERVAL	const ITIMERVAL
 #endif
 
 #ifndef	CTIMESPEC

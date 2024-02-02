@@ -88,7 +88,7 @@ template<typename ... Args>
 static int strpack_ctor(strpack *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->ccp = nullptr ;
 	    op->magic = 0 ;

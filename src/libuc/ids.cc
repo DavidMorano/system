@@ -84,7 +84,7 @@ int ids_load(ids *op) noex {
 	int		rs ;
 	int		ng = 0 ;
 	if ((rs = ids_ctor(op)) >= 0) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    if ((rs = u_getgroups(0,np)) >= 0) {
 	        cint	size = ((rs+1)*sizeof(gid_t)) ;
 	        void	*vp{} ;

@@ -1,4 +1,4 @@
-/* fsdir */
+/* fsdir SUPPORT */
 /* lang=C++20 */
 
 /* object to read directory entries in the UNIX® file system */

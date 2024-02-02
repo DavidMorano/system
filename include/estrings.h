@@ -1,5 +1,5 @@
 /* estrings HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* almost all c-string related operations */
 /* version %I% last-modified %G% */

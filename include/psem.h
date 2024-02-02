@@ -14,7 +14,7 @@
 
 /*******************************************************************************
 
-	These are unnamed POSIX semaphores.
+	These are unnamed POSIX® semaphores.
 
 	Sss the corresponding main C-language source file for more
 	information on what is going on here.

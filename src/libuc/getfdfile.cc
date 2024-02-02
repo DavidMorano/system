@@ -1,5 +1,5 @@
 /* getfdfile SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get an FD out of an FD-File name (if there is one) */
 /* version %I% last-modified %G% */
@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
 #include	<stdfnames.h>
 #include	<cfdec.h>
+#include	<matstr.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"getfdfile.h"
@@ -59,10 +59,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	matstr(cchar **,cchar *,int) noex ;
-}
 
 
 /* external variables */

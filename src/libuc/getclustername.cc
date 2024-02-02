@@ -283,9 +283,9 @@ static int subinfo_cdb(SI *sip) noex {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,CLUSTERFNAME)) >= 0) {
 	        CLUSTERDB	cdb ;
-		nullptr_t	np{} ;
+		const nullptr_t	np{} ;
 	        if ((rs = clusterdb_open(&cdb,tbuf)) >= 0) {
-	            auto	cf = clusterdb_fetchrev ;
+	            auto	cf = clusterdb_curfetchrev ;
 	            cint	rsn = SR_NOTFOUND ;
 	            char	*cbuf ;
     		    if ((rs = malloc_nn(&cbuf)) >= 0) {

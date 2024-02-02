@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>

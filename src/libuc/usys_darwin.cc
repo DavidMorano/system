@@ -23,7 +23,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 /* USYS_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -64,6 +64,7 @@
 
 /* exported subroutines */
 
+/*----------------------------------------------------------------------------*/
 /* TIMER begin */
 #if	(!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0)
 
@@ -105,8 +106,10 @@ int timer_getoverrun(timer_t) noex {
 
 #endif /* (!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0) */
 /* TIMER end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* RELTIMEDWAIT begin */
 #if	(!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0)
 
@@ -120,8 +123,10 @@ int pthread_cond_reltimedwait_np(PTC *op,PTM *mp,CTIMESPEC *) noex {
 
 #endif /* (!defined(SYSHAS_RELTIMEDWAIT)) || (SYSHAS_RELTIMEDWAIT == 0) */
 /* RELTIMEDWAIT end */
+/*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
 /* MEMCNTL begin */
 int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 	int	ec = EFAULT ;
@@ -134,6 +139,7 @@ int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 	return ec ;
 }
 /* MEMCNTL end */
+/*----------------------------------------------------------------------------*/
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */

@@ -1,4 +1,4 @@
-/* field_srvarg */
+/* field_srvarg SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to field out (parse) the next "server" argument */
@@ -63,7 +63,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<usystem.h>
 #include	<ascii.h>

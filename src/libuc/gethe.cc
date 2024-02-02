@@ -1,5 +1,5 @@
 /* gethe SUPPORT (Get Host Entry) */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get a host entry from the system database */
 /* version %I% last-modified %G% */

@@ -69,8 +69,8 @@
 
 /* local namespaces */
 
-using std::max ;			/* actor */
 using std::nullptr_t ;			/* type */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -108,7 +108,7 @@ template<typename ... Args>
 static inline int strstore_ctor(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ccp = nullptr ;
@@ -221,9 +221,9 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	        if ((rs = vechand_start(op->nlp,n,vo)) >= 0) {
 		    cint	isize = sizeof(int) ;
 	            if ((rs = lookaside_start(op->lap,isize,n)) >= 0) {
+		        const nullptr_t	np{} ;
 		        cint		hn = ((n*3)/2) ;
-		        nullptr_t	n = 0 ;
-	                if ((rs = hdb_start(op->hlp,hn,true,n,n)) >= 0) {
+	                if ((rs = hdb_start(op->hlp,hn,true,np,np)) >= 0) {
 	                    op->magic = STRSTORE_MAGIC ;
 			    if constexpr (f_prealloc) {
 	                        rs = strstore_chunknew(op,0) ;

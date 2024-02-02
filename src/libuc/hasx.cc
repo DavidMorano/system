@@ -267,14 +267,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<ucvariables.hh>
 #include	<ascii.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 #include	"hasx.h"
 
@@ -286,16 +284,25 @@
 #endif
 
 
-/* local variables */
+/* local namespaces */
 
-constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
 
-static const int	maxbase = strlen(varname.digtab) ;
+/* local typedefs */
 
 
 /* forward references */
 
 static int twochars(char *,cchar *,int) noex ;
+
+
+/* local variables */
+
+constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
+
+static cint		maxbase = strlen(varname.digtab) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -561,26 +568,6 @@ bool hasalldig(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasalldig) */
 
-bool hasallminus(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (*sp != '\0') {
-	    f = (sp[0] == '-') ;
-	    f = f && ((sl == 1) || (sp[1] == '\0')) ;
-	}
-	return f ;
-}
-/* end subroutine (hasallminus) */
-
-bool hasallplusminus(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (*sp != '\0') {
-	    f = (sp[0] == '+') || (sp[0] == '-') ;
-	    f = f && ((sl == 1) || (sp[1] == '\0')) ;
-	}
-	return f ;
-}
-/* end subroutine (hasallplusminus) */
-
 bool hasallbase(cchar *sp,int sl,int b) noex {
 	bool		f = false ;
 	if ((b >= 2) && (b <= maxbase)) {
@@ -610,6 +597,26 @@ bool hasallchr(cchar *sp,int sl,int sch) noex {
 	return f ;
 }
 /* end subroutine (hasallchr) */
+
+bool hasonlyminus(cchar *sp,int sl) noex {
+        bool            f = false ;
+        if (*sp != '\0') {
+            f = (sp[0] == '-') ;
+            f = f && ((sl == 1) || (sp[1] == '\0')) ;
+        }
+        return f ;
+}
+/* end subroutine (hasonlyminus) */
+
+bool hasonlyplusminus(cchar *sp,int sl) noex {
+        bool            f = false ;
+        if (*sp != '\0') {
+            f = (sp[0] == '+') || (sp[0] == '-') ;
+            f = f && ((sl == 1) || (sp[1] == '\0')) ;
+        }
+        return f ;
+}
+/* end subroutine (hasonlyplusminus) */
 
 bool hasvarpathprefix(cchar *sp,int sl) noex {
 	bool		f = false ;

@@ -1,4 +1,4 @@
-/* ptc */
+/* ptc SUPPORT */
 /* lang=C++20 */
 
 /* POSIX® Thread Condition manipulation */
@@ -19,10 +19,9 @@
 	This is a cleaned up version of the p-threads condition-variable
 	locking facility.
 
-
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<ctime>			/* for |TIMESPEC| */

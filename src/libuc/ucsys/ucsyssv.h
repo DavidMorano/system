@@ -30,7 +30,7 @@
 #define	UCSYSSV_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -45,9 +45,7 @@
 #define	CSERVENT	const struct servent
 #endif
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern SERVENT	*getsvent() noex ;
 extern SERVENT	*getsvnam(cchar *,cchar *) noex ;
@@ -57,9 +55,7 @@ extern int	getsvent_rp(SERVENT *,char *,int) noex ;
 extern int	getsvnam_rp(SERVENT *,char *,int,cchar *,cchar *) noex ;
 extern int	getsvpor_rp(SERVENT *,char *,int,int,cchar *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCSYSSV_INCLUDE */

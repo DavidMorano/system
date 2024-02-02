@@ -1,4 +1,4 @@
-/* fibonacci */
+/* fibonacci SUPPORT */
 /* lang=C++20 */
 
 /* Fibonacci function */
@@ -57,7 +57,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<utypedefs.h>
 #include	<clanguage.h>

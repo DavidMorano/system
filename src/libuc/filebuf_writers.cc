@@ -1,4 +1,4 @@
-/* filebuf_writers */
+/* filebuf_writers SUPPORT */
 /* lang=C++20 */
 
 /* extra write methods for the FILEBUF object */

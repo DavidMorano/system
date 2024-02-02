@@ -223,7 +223,7 @@ OBJ110= strkeycmp.o strwcmp.o
 OBJ111= vstrcmpx.o vstrkeycmpx.o vstrkeydictcmp.o
 
 OBJ112= strcpyxc.o
-OBJ113= strwcpy.o strwcpyx.o strwcpyxc.o strwcpyxx.o
+OBJ113=
 OBJ114=
 OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o
 OBJ116= mkcleanline.o tabcols.o checkbase.o ncol.o
@@ -405,17 +405,17 @@ TOBJ= $(TOBJG0) $(TOBJG1)
 UOBJ00= matxstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
 UOBJ02= snwcpyx.o strcpyxc.o
-UOBJ03= varnames.o syswords.o rmx.o
+UOBJ03= varnames.o syswords.o stdfnames.o
 
 UOBJ04= ischarx.o ulogerror.o strdcpy.o
 UOBJ05= nleadstr.o nleadkeystr.o
-UOBJ06= mapex.o strnul.o
+UOBJ06= mapex.o strnul.o rmx.o
 UOBJ07= getourenv.o
 
-UOBJ08= strkeycmp.o
+UOBJ08= strkeycmp.o strwcmp.o
 UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
-UOBJ11= strwcpy.o strwcpyxc.o strwcpyxx.o
+UOBJ11= strwcpy.o
 
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
@@ -715,7 +715,7 @@ ptrwa.o:		ptrwa.c ptrwa.h
 # POSIX Message Queue
 pmq.o:			pmq.cc pmq.h
 
-sighand.o:		sighand.c sighand.h
+sighand.o:		sighand.cc sighand.h
 sigblock.o:		sigblock.cc sigblock.h
 sigign.o:		sigign.c sigign.h
 
@@ -805,7 +805,7 @@ mapex.o:		mapex.c mapex.h
 
 calstrs.o:		calstrs.c calstrs.h
 
-sigevent.o:		sigevent.c sigevent.h
+sigevent.o:		sigevent.cc sigevent.h
 
 timeval.o:		timeval.cc timeval.h
 timespec.o:		timespec.cc timespec.h
@@ -816,7 +816,8 @@ upt.o:			upt.cc upt.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
-getxusername.o:		getxusername.c getxusername.h
+getuserhome.o:		getuserhome.cc getuserhome.h
+getxusername.o:		getxusername.cc getxusername.h
 
 getutmpent.o:		getutmpent.cc getutmpent.h
 mkutmpid.o:		mkutmpid.cc mkutmpid.h
@@ -863,11 +864,6 @@ mkuserpath.o:		mkuserpath.cc
 mkcdpath.o:		mkcdpath.cc
 
 strcpyxc.o:		strcpyxc.cc strcpyxc.h
-
-strwcpy.o:		strwcpy.cc strwcpy.h
-strwcpyx.o:		strwcpyx.cc strwcpyx.h
-strwcpyxc.o:		strwcpyxc.cc strwcpyxc.h
-strwcpyxx.o:		strwcpyxx.cc strwcpyxx.h
 
 opensysfs.o:		opensysfs.cc opensysfs.h
 
@@ -968,11 +964,10 @@ hasx.o:			hasx.cc hasx.h char.h ischarx.h
 # RMX
 rmx.o:			rmx.cc rmx.h
 
-# STRW
-OBJ_STRW= strwcpyxc.o strwcpyxx.o
-
-strw.o:			$(OBJ_STRW)
-	$(LD) -r -o $@ $(OBJ_STRW)
+# STRWCPY
+strwcpy.o:		strwcpy.dir
+strwcpy.dir:
+	makesubdir $@
 
 # STRDCPY
 strdcpy.o:		strdcpy.dir
@@ -1138,6 +1133,7 @@ base64.o:		base64.cc base64.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
+digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.c willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
@@ -1151,8 +1147,10 @@ isoneof.o:		isoneof.c isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
 readln.o:		readln.cc readln.hh
-ccfile.o:		ccfile.cc ccfile.hh
 strlibval.o:		strlibval.cc strlibval.hh
+strwcpy.o:		strwcmp.cc strwcmp.h
+
+ccfile.o:		ccfile.cc ccfile.hh
 thrcomm.o:		thrcomm.cc thrcomm.h
 thrbase.o:		thrbase.cc thrbase.h thrcomm.h
 

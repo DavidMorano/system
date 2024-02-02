@@ -1,4 +1,5 @@
-/* progsig */
+/* progsig HEADER */
+/* lang=C20 */
 
 /* program signal handling */
 /* version %I% last-modified %G% */
@@ -14,11 +15,13 @@
 /* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PROGSIG_INCLUDE
-#define	PROGSIG_INCLUDE	1
+#define	PROGSIG_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	PROGSIG_NENTS	30
@@ -41,24 +44,24 @@ struct progsig_note {
 
 EXTERNC_begin
 
-extern int	progsig_init(void) ;
-extern void	progsig_fini(void) ;
+extern int	progsig_init(void) noex ;
+extern int	progsig_fini(void) noex ;
 
-extern int	progsig_mainbegin(const char **) ;
-extern int	progsig_mainend(void) ;
+extern int	progsig_mainbegin(mainv) noex ;
+extern int	progsig_mainend(void) noex ;
 
-extern int	progsig_runmode(void) ;
-extern int	progsig_serial(void) ;
+extern int	progsig_runmode(void) noex ;
+extern int	progsig_serial(void) noex ;
 
-extern int	progsig_adm(int) ;
+extern int	progsig_adm(int) noex ;
 
-extern int	progsig_sigquit(void) ;
-extern int	progsig_sigterm(void) ;
-extern int	progsig_sigintr(void) ;
-extern int	progsig_issig(int) ;
+extern int	progsig_sigquit(void) noex ;
+extern int	progsig_sigterm(void) noex ;
+extern int	progsig_sigintr(void) noex ;
+extern int	progsig_issig(int) noex ;
 
-extern int	progsig_noteread(PROGSIG_NOTE *,int) ;
-extern int	progsig_notedel(int) ;
+extern int	progsig_noteread(PROGSIG_NOTE *,int) noex ;
+extern int	progsig_notedel(int) noex ;
 
 EXTERNC_end
 

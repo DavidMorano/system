@@ -1,4 +1,4 @@
-/* gettmpdname */
+/* gettmpdname SUPPORT */
 /* lang=C++20 */
 
 /* get the name of the TMPDIR (however one can get it) */
@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
 #include	<varnames.hh>

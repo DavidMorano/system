@@ -80,7 +80,7 @@ template<typename ... Args>
 static int thrbase_ctor(thrbase *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    op->ap = np ;
 	    op->sip = np ;
 	    op->tcp = np ;
@@ -131,7 +131,7 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 	        if ((rs = uc_sigsetfill(&nsm)) >= 0) {
 		    if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	                THRBASE_SI	*sip ;
-			nullptr_t	np{} ;
+			const nullptr_t	np{} ;
 	                cint		size = sizeof(THRBASE_SI) ;
 	                if ((rs = uc_malloc(size,&sip)) >= 0) {
 	                    uptsub_f	thrsub = uptsub_f(startworker) ;

@@ -73,7 +73,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -174,18 +174,18 @@ int u_mlockend(void *ma,size_t ms) noex {
 /* end subroutine (u_mlockend) */
 
 int u_mlockallbegin(int flags) noex {
-	nullptr_t	n{} ;
+	const nullptr_t	np{} ;
 	um		umo(flags) ;
 	umo.m = &um::lockallbegin ;
-	return umo(n,0z) ;
+	return umo(np,0z) ;
 }
 /* end subroutine (u_mlockallbegin) */
 
 int u_mlockallend() noex {
-	nullptr_t	n{} ;
+	const nullptr_t	np{} ;
 	um		umo ;
 	umo.m = &um::lockallend ;
-	return umo(n,0z) ;
+	return umo(np,0z) ;
 }
 /* end subroutine (u_mlockallend) */
 
@@ -225,10 +225,10 @@ int u_msync(void *ma,size_t ms,int cmd) noex {
 /* end subroutine (u_msync) */
 
 int u_mlockp(int cmd) noex {
+	const nullptr_t	np{} ;
 	um		umo(cmd) ;
-	nullptr_t	n{} ;
 	umo.m = &um::lockp ;
-	return umo(n,0z) ;
+	return umo(np,0z) ;
 }
 /* end subroutine (u_mlockp) */
 

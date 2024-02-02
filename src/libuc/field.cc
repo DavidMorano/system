@@ -1,4 +1,4 @@
-/* field */
+/* field SUPPORT */
 /* lang=C++20 */
 
 /* routine to parse a line into fields */
@@ -86,7 +86,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstdarg>

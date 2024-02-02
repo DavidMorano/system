@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/msg.h>
 #include	<unistd.h>
@@ -38,7 +38,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -83,17 +83,17 @@ namespace {
 /* exported subroutines */
 
 int u_msgget(key_t key,int msgflag) noex {
+	const nullptr_t	np{} ;
 	umsg		umo(key) ;
-	nullptr_t	n{} ;
 	umo.m = &umsg::get ;
-	return umo(0,n,0,msgflag) ;
+	return umo(0,np,0,msgflag) ;
 }
 
 int u_msgctl(int msqid,int cmd,MSQIDDS *buf) noex {
+	const nullptr_t	np{} ;
 	umsg		umo(cmd,buf) ;
-	nullptr_t	n{} ;
 	umo.m = &umsg::ctl ;
-	return umo(msqid,n,0,0) ;
+	return umo(msqid,np,0,0) ;
 }
 
 int u_msgrcv(int msqid,void *msgp,int msgl,sysvmsgtype mt,int msgflag) noex {

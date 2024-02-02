@@ -1,4 +1,4 @@
-/* fsdirtree */
+/* fsdirtree SUPPORT */
 /* lang=C++20 */
 
 /* file-system directory tree (traversing) */

@@ -24,13 +24,7 @@
 
 #include	<mkdirs.h>
 #include	<rmdirs.h>
-
-
-EXTERNC_begin
-
-extern int dirempty(cchar *) noex ;
-
-EXTERNC_end
+#include	<dirempty.h>
 
 
 #endif /* DIRS_INCLUDE */

@@ -236,8 +236,8 @@ int kvsfile_open(kvsfile *op,int ndef,cchar *atfname) noex {
 		    hdbcmp_f	cf = hdbcmp_f(cmpkeyval) ;
 		    hdbhash_f	hf = hdbhash_f(hashkeyval) ;
 	            if ((rs = hdb_start(&op->keyvals,ndef,0,hf,cf)) >= 0) {
+		        const nullptr_t	np{} ;
 		        hdb		*elp = &op->entries ;
-		        nullptr_t	np{} ;
 	                if ((rs = hdb_start(elp,ndef,0,np,np)) >= 0) {
 	                    op->magic = KVSFILE_MAGIC ;
 	                    op->ti_check = time(nullptr) ;

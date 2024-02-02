@@ -1,4 +1,4 @@
-/* psem */
+/* psem SUPPORT */
 /* lang=C++20 */
 
 /* POSIX© unnamed Semaphore (PSEM) */

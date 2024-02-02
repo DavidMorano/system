@@ -1,4 +1,4 @@
-/* isdirempty SUPPORT */
+/* dirempty SUPPORT */
 /* lang=C++20 */
 
 /* is the given directory empty? */
@@ -17,13 +17,13 @@
 /*******************************************************************************
 
 	Name:
-	isdirempty
+	dirempty
 
 	Description:
 	We test if the given directory is empty.
 
 	Synopsis:
-	int isdirempty(cchar *dname)
+	int dirempty(cchar *dname)
 
 	Arguments:
 	dname		directory name (as a string)
@@ -35,13 +35,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -50,7 +44,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"dirs.h"
+#include	"dirempty.h"
 
 
 /* local defines */

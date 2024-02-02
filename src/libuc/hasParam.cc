@@ -24,7 +24,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |SHORT_MIN| */
 #include	<utypedefs.h>
 #include	<clanguage.h>

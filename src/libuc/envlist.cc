@@ -72,7 +72,7 @@ template<typename ... Args>
 static int envlist_ctor(envlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->store = nullptr ;
 	    if ((op->elp = new(nothrow) hdb) != np) {

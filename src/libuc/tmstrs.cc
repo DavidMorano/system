@@ -43,7 +43,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>

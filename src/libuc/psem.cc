@@ -1,4 +1,4 @@
-/* psem */
+/* psem SUPPORT */
 /* lang=C++20 */
 
 /* POSIX® unnamed-Semaphore (PSEM) */
@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-	This module provides the POSIX standard (unnamed) semaphore
+	This module provides the POSIX® standard (unnamed) semaphore
 	facility one way or another.  On normal operating systems,
 	the whole POSIX semaphore facility (both named and unnamed)
 	is readily available. But on the Apple Darwin operating
@@ -34,7 +34,6 @@
 	already had a version of counting semaphores that supported
 	arbitrary count values on each operation, so we just adjust
 	that to emulate the normal POSIX unnamed semaphore interface.
-
 
 *******************************************************************************/
 

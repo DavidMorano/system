@@ -1,5 +1,5 @@
 /* ucproguser SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get or set a cached username given a UID */
 /* version %I% last-modified %G% */
@@ -92,6 +92,9 @@
 #define	UPROGUSER	struct ucproguser
 
 #define	TO_TTL		(2*3600) /* two hours */
+
+
+/* local namespaces */
 
 
 /* local typedefs */

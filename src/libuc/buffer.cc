@@ -47,8 +47,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<cstdlib>
 #include	<cstdarg>

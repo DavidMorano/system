@@ -1,10 +1,9 @@
-/* char */
+/* char SUPPORT */
 /* lang=C++20 */
 
 /* character test and conversion support */
 /* version %I% last-modified %G% */
 
-#define	CF_VARNAME	1		/* use |varname| */
 
 /* revision history:
 
@@ -33,18 +32,18 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
-#include	<cstring>		/* <- for |strlen(3c)| */
-#include	<bitset>
-#include	<utypedefs.h>
+#include	<bitset>		/* <- the money shot! */
+#include	<utypedefs.h>		/* <- for |uint| */
 #include	<clanguage.h>
-#include	<ucvariables.hh>
-#include	<localmisc.h>
 
-#include	"mkchar.h"
 #include	"char.h"
 
 
 /* local defines */
+
+#ifndef	UC
+#define	UC(ch)		uchar(ch)
+#endif
 
 
 /* local namespaces */
@@ -58,6 +57,9 @@ using std::bitset ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
@@ -66,11 +68,12 @@ namespace {
 	bitset<chtablen>	iswhite{} ;
 	bitset<chtablen>	islc{} ;
 	bitset<chtablen>	isuc{} ;
+	uchar			toval[chtablen] ;
 	constexpr void mkiswhite() noex ;
 	constexpr void mkislc() noex ;
 	constexpr void mkisuc() noex ;
-	void mktoval() noex ;
-	charinfo() noex {
+	constexpr void mktoval() noex ;
+	constexpr charinfo() noex {
 	     mkiswhite() ;
 	     mkislc() ;
 	     mkisuc() ;
@@ -79,10 +82,61 @@ namespace {
     } ; /* end struct (charinfo) */
 }
 
+constexpr void charinfo::mkiswhite() noex {
+	constexpr char	w[] = " \t\f\v\r" ;
+	for (int i = 0 ; w[i] ; i += 1) {
+	    iswhite.set(i,true) ;
+	}
+}
+/* end method (charinfo::mkiswhite) */
+
+constexpr void charinfo::mkislc() noex {
+	for (int ch = 'a' ; ch <= 'z' ; ch += 1) {
+	    islc.set(ch,true) ;
+	}
+	for (int ch = UC('à') ; ch <= UC('ÿ') ; ch += 1) {
+	    islc.set(ch,true) ;
+	}
+	islc.set(UC('÷'),false) ;
+	islc.set(UC('ß'),true) ; 	/* <- this is 'ss' in German */
+}
+/* end method (charinfo::mkislc) */
+
+constexpr void charinfo::mkisuc() noex {
+	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
+	    isuc.set(ch,true) ;
+	}
+	for (int ch = UC('À') ; ch <= UC('Þ') ; ch += 1) {
+	    isuc.set(ch,true) ;
+	}
+	isuc.set(UC('×'),false) ;
+	islc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
+}
+/* end method (charinfo::mkisuc) */
+
+constexpr void charinfo::mktoval() noex {
+        for (int ch = 0 ; ch < chtablen ; ch += 1) {
+            if ((ch >= '0') && (ch <= '9')) {
+                toval[ch] = (ch - '0') ;
+            } else if ((ch >= 'A') && (ch <= 'Z')) {
+                toval[ch] = ((ch - 'A') + 10) ;
+            } else if ((ch >= 'a') && (ch <= 'z')) {
+                toval[ch] = ((ch - 'a') + 36) ;
+            } else if (ch == UC('Ø')) {
+                toval[ch] = 62 ;
+            } else if (ch == UC('ø')) {
+                toval[ch] = 63 ;
+            } else {
+                toval[ch] = 0xff ;
+            }
+        } /* end for */
+}
+/* end method (charinfo::mktoval) */
+
 
 /* local variables */
 
-constexpr bool	f_varname = CF_VARNAME ;
+constexpr charinfo	char_data ;
 
 
 /* exported variables */
@@ -195,9 +249,6 @@ const unsigned char char_tofc[] = {
 	0xd8, 0x55, 0x55, 0x55, 0x55, 0x59, 0xde, 0x59
 } ;
 
-/* convert characters to their base value (up to base-64) */
-unsigned char char_toval[chtablen] ;
-
 /* dictionary-collating-ordinal */
 const short	char_dictorder[] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -235,12 +286,7 @@ const short	char_dictorder[] = {
 } ;
 
 
-/* local variables */
-
-static const charinfo		char_data ;
-
-
-/* external subroutines */
+/* exported subroutines */
 
 bool char_iswhite(int ch) noex {
 	return char_data.iswhite[ch & 0xff] ;
@@ -254,69 +300,11 @@ bool char_isuc(int ch) noex {
 	return char_data.isuc[ch & 0xff] ;
 }
 
+int char_toval(int ch) noex {
+	return char_data.toval[ch & 0xff] ;
+}
+
 
 /* local subroutines */
-
-constexpr void charinfo::mkiswhite() noex {
-	constexpr char	w[] = " \t\f\v\r" ;
-	for (int i = 0 ; w[i] ; i += 1) {
-	    iswhite.set(i,true) ;
-	}
-}
-/* end method (charinfo::mkiswhite) */
-
-constexpr void charinfo::mkislc() noex {
-	for (int ch = 'a' ; ch <= 'z' ; ch += 1) {
-	    islc.set(ch,true) ;
-	}
-	for (int ch = UC('à') ; ch <= UC('ÿ') ; ch += 1) {
-	    islc.set(ch,true) ;
-	}
-	islc.set(UC('÷'),false) ;
-	islc.set(UC('ß'),true) ; 	/* <- this is 'ss' in German */
-}
-/* end method (charinfo::mkislc) */
-
-constexpr void charinfo::mkisuc() noex {
-	for (int ch = 'A' ; ch <= 'Z' ; ch += 1) {
-	    isuc.set(ch,true) ;
-	}
-	for (int ch = UC('À') ; ch <= UC('Þ') ; ch += 1) {
-	    isuc.set(ch,true) ;
-	}
-	isuc.set(UC('×'),false) ;
-	islc.set(UC('ß'),false) ; 	/* <- this is 'ss' in German */
-}
-/* end method (charinfo::mkisuc) */
-
-void charinfo::mktoval() noex {
-	if constexpr (f_varname) {
-	    cchar	*dt = varname.digtab ;
-	    for (int ch = 0 ; ch < chtablen ; ch += 1) {
-		char_toval[ch] = 0xff ;
-	    }
-	    for (int i = 0 ; dt[i] ; i += 1) {
-		cint	ch = dt[i] ;
-	        char_toval[ch] = i ;
-	    }
-	} else {
-	    for (int ch = 0 ; ch < chtablen ; ch += 1) {
-	        if ((ch >= '0') && (ch <= '9')) {
-		    char_toval[ch] = (ch - '0') ;
-	        } else if ((ch >= 'A') && (ch <= 'Z')) {
-		    char_toval[ch] = ((ch - 'A') + 10) ;
-	        } else if ((ch >= 'a') && (ch <= 'z')) {
-		    char_toval[ch] = ((ch - 'a') + 36) ;
-		} else if (ch == UC('Ø')) {
-		    char_toval[ch] = 62 ;
-		} else if (ch == UC('ø')) {
-		    char_toval[ch] = 63 ;
-	        } else {
-		    char_toval[ch] = 0xff ;
-	        }
-	    } /* end for */
-	} /* end if constexpr (f_varname) */
-}
-/* end method (charinfo::mktoval) */
 
 

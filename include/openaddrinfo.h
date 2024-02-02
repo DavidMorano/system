@@ -28,9 +28,6 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>

@@ -61,7 +61,7 @@ OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o
 OBJ4_SFX= sfcasesub.o sfsubstance.o sfthing.o 
 OBJ5_SFX= sfwhitedot.o sfword.o sfprogname.o
 OBJ6_SFX= sfnext.o sfkeyval.o
-OBJ7_SFX= sfbreak.o
+OBJ7_SFX= sfbreak.o sfsign.o
 
 
 OBJA_SFX= obj0_sfx.o obj1_sfx.o

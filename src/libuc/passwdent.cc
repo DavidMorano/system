@@ -1,4 +1,4 @@
-/* passwdent */
+/* passwdent SUPPORT */
 /* lang=C++20 */
 
 /* PASSWD structure management */

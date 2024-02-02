@@ -47,6 +47,7 @@
 #include	<user_attr.h>		/* <- money shot (one of) */
 
 
+/*----------------------------------------------------------------------------*/
 /* USERATTR begin */
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
@@ -57,7 +58,10 @@ typedef userattr_t	userattr ;
 
 #endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
+/*----------------------------------------------------------------------------*/
 
+
+/*----------------------------------------------------------------------------*/
 /* UCTIMEOUT begin */
 
 #ifndef	SIGTIMEOUT
@@ -65,6 +69,7 @@ typedef userattr_t	userattr ;
 #endif
 
 /* UCTIMEOUT end */
+/*----------------------------------------------------------------------------*/
 
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */

@@ -1,4 +1,4 @@
-/* dayspec */
+/* dayspec SUPPORT */
 /* lang=C++20 */
 
 /* load a day-specification */

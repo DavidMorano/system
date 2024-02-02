@@ -49,13 +49,13 @@ extern bool hasnotdots(cchar *,int) noex ;
 extern bool hasallwhite(cchar *,int) noex ;
 extern bool hasallalpha(cchar *,int) noex ;
 extern bool hasallalnum(cchar *,int) noex ;
-extern bool hasallminus(cchar *,int) noex ;
-extern bool hasallplusminus(cchar *,int) noex ;
 extern bool hasalllc(cchar *,int) noex ;
 extern bool hasalluc(cchar *,int) noex ;
 extern bool hasalldig(cchar *,int) noex ;
 extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
+extern bool hasonlyminus(cchar *,int) noex ;
+extern bool hasonlyplusminus(cchar *,int) noex ;
 
 static inline bool hasValidMagic(cchar *sp,int sl,cchar *ms) noex  {
 	return hasvalidmagic(sp,sl,ms) ;

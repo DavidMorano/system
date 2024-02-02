@@ -18,8 +18,8 @@
 /* revision history:
 
 	= 2001-04-11, David A­D­ Morano
-        This old dog program has been enhanced to serve as the environment wiper
-        for executing MIPS programs.
+	This old dog program has been enhanced to serve as the
+	environment wiper for executing MIPS programs.
 
 */
 
@@ -35,23 +35,21 @@
 
 	= NCPU
 
-        We get the number of CPUs from the kernel. On Sun-Solaris, this is
-        (gag!) not thread-safe. This is not a problem with the present code
-        since this "program" is (so far) never embedded within other
-        (multi-threaded) software. But it is something to note if this software
-        ever does get embeeded into some multi-threaded code. Unlikely you say?
-        More and more "programs" in the old sense (separate independent
-        processes) are increasingly becoming embedded within larger
-        multi-threaded programs that create the illusion of programs being
-        separate processes (but which really are not). So just keep this in
-        mind.
-
+	We get the number of CPUs from the kernel. On Sun-Solaris,
+	this is (gag!) not thread-safe. This is not a problem with
+	the present code since this "program" is (so far) never
+	embedded within other (multi-threaded) software. But it is
+	something to note if this software ever does get embeeded
+	into some multi-threaded code. Unlikely you say?  More and
+	more "programs" in the old sense (separate independent
+	processes) are increasingly becoming embedded within larger
+	multi-threaded programs that create the illusion of programs
+	being separate processes (but which really are not). So
+	just keep this in mind.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -74,6 +72,8 @@
 #include	<expcook.h>
 #include	<nulstr.h>
 #include	<tmtime.h>		/* is NOT thread-safe */
+#include	<hasx.h>
+#include	<ischarx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -185,13 +185,6 @@ extern int	mkdirs(cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	readfileline(char *,int,cchar *) ;
-extern int	hasalldig(cchar *,int) ;
-extern int	hasallplusminus(cchar *,int) ;
-extern int	hasallminus(cchar *,int) ;
-extern int	hasallwhite(cchar *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
@@ -2429,8 +2422,8 @@ static int processor(PROGINFO *pip,ARGINFO *aip,cchar *prog)
 {
 	int		rs ;
 	char		pbuf[MAXPATHLEN+1] ;
-	if ((prog != NULL) && hasallplusminus(prog,-1)) {
-	    if ((! pip->f.progdash) && (hasallminus(prog,-1))) {
+	if ((prog != NULL) && hasonlyplusminus(prog,-1)) {
+	    if ((! pip->f.progdash) && (hasonlyminus(prog,-1))) {
 	        pip->f.progdash = TRUE ;
 	    }
 	    prog = NULL ;

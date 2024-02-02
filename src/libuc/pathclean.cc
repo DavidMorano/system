@@ -1,4 +1,4 @@
-/* pathclean */
+/* pathclean SUPPORT */
 /* lang=C++20 */
 
 /* cleanup a path */

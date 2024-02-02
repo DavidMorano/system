@@ -42,12 +42,9 @@
 		x**31 + x**3 + 1
 		x**63 + x**1 + 1
 
-
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/time.h>		/* |gettimeofday(3c)| */
 #include	<unistd.h>
 #include	<climits>
@@ -103,6 +100,9 @@ static int	wrulong(char *,int,ulong) noex ;
 constexpr int	digsize = sizeof(RANDOMVAR_DIGIT) ;
 constexpr int	ndeg = sizeof(RANDOMVAR_DEGREE) ;
 constexpr int	slen = RANDOMVAR_STATELEN ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

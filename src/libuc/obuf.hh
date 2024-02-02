@@ -27,7 +27,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<string>		/* <- C++ |string| */

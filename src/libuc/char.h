@@ -40,15 +40,14 @@
 
 
 #include	<envstandards.h>
+#include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 /* support tables; not accessed directly by callers  */
 extern const unsigned char	char_tolc[] ;
 extern const unsigned char	char_touc[] ;
 extern const unsigned char	char_tofc[] ;
-extern unsigned char		char_toval[] ;
 extern const short		char_dictorder[] ;
 
 /* test routines */
@@ -63,7 +62,7 @@ extern const short		char_dictorder[] ;
 #define	CHAR_TOLC(c)		(char_tolc[(c) & 0xff])
 #define	CHAR_TOUC(c)		(char_touc[(c) & 0xff])
 #define	CHAR_TOFC(c)		(char_tofc[(c) & 0xff])
-#define	CHAR_TOVAL(c)		(char_toval[(c) & 0xff])
+#define	CHAR_TOVAL(c)		char_toval(c) ;
 
 /* dictionary-collating-ordinal */
 #define	CHAR_DICTORDER(c)	(char_dictorder[(c) & 0xff])
@@ -77,6 +76,8 @@ extern bool char_isuc(int) noex ;
 static inline bool char_isspacetab(int ch) noex {
 	return CHAR_ISSPACETAB(ch) ;
 }
+
+extern int char_toval(int) noex ;
 
 EXTERNC_end
 

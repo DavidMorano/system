@@ -24,7 +24,7 @@
 
 /* revision history:
 
-	= 1998-03-01, David A­D­ Morano
+	= 1998-03-01, David A�D� Morano
         Of course, this subroutine was inspired by the UNIX® equivalent, but
         this is my own version for a. when I don't have the UNIX® libraries
         around, and b. to customize it to what I want!

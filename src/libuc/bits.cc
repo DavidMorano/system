@@ -32,8 +32,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>

@@ -1,7 +1,8 @@
 /* getpe SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get protocol entry */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -61,19 +62,19 @@ int getpe_end() noex {
 }
 /* end subroutine (getpe_end) */
 
-int getpe_ent(struct protoent *pp,char rbuf[],int rlen) noex {
+int getpe_ent(PROTOENT *pp,char rbuf[],int rlen) noex {
 	int		rs ;
 	if ((rs = uc_getprotoent(pp,rbuf,rlen)) == SR_NOTFOUND) rs = SR_OK ;
 	return rs ;
 }
 /* end subroutine (getpe_ent) */
 
-int getpe_name(struct protoent *pp,char rbuf[],int rlen,cchar name[]) noex {
+int getpe_name(PROTOENT *pp,char rbuf[],int rlen,cchar name[]) noex {
 	return uc_getprotobyname(name,pp,rbuf,rlen) ;
 }
 /* end subroutine (getpe_name) */
 
-int getpe_num(struct protoent *pp,char rbuf[],int rlen,int num) noex {
+int getpe_num(PROTOENT *pp,char rbuf[],int rlen,int num) noex {
 	return uc_getprotobynumber(num,pp,rbuf,rlen) ;
 }
 /* end subroutine (getpe_num) */

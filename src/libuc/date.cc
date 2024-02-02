@@ -41,7 +41,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be first (to configure) */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>
 #include	<cstdlib>
 #include	<cstring>

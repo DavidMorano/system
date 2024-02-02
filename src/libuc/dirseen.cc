@@ -43,8 +43,8 @@
 
 /* local namespaces */
 
-using std::min ;			/* subroutine-template */
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -153,7 +153,7 @@ int dirseen_add(dirseen *op,cchar *sp,int sl,USTAT *sbp) noex {
 	int		rs ;
 	if ((rs = dirseen_magic(op,sp,sbp)) >= 0) {
 	    dirseen_ent		e(sbp->st_dev,sbp->st_ino) ;
-	    nullptr_t		np{} ;
+	    const nullptr_t	np{} ;
 	    cint		rsn = SR_NOTFOUND ;
 	    if ((rs = vecobj_search(op->dlistp,&e,vcmpdevino,np)) == rsn) {
 	        dev_t	dev = sbp->st_dev ;

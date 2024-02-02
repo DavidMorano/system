@@ -59,7 +59,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local variables */
@@ -77,9 +77,9 @@ int uc_kvamatch(kva_t *kva,cchar *keyname,cchar **rpp) noex {
 	    if (keyname[0]) {
 		rs = SR_OK ;
 	        if constexpr (f_userattr) {
-		    nullptr_t	n{} ;
+		    const nullptr_t	np{} ;
 		    char	*kp = (char *) keyname ;
-	            if ((rp = kva_match(kva,kp)) != n) {
+	            if ((rp = kva_match(kva,kp)) != np) {
 	                rs = strlen(rp) ;
 	            } else {
 	                rs = SR_NOTFOUND ;

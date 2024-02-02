@@ -129,7 +129,7 @@ template<typename ... Args>
 static int clusterdb_ctor(clusterdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->ctp = new(nothrow) kvsfile) != np) {
@@ -268,7 +268,7 @@ int clusterdb_curenumcluster(CD *op,CD_CUR *curp,char *kbuf,int klen) noex {
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp,kbuf)) >= 0) {
 	    kvsfile_cur	*kcp = (curp) ? curp->kcurp : nullptr ;
-	    rs = kvsfile_enumkey(op->ctp,kcp,kbuf,klen) ;
+	    rs = kvsfile_curenumkey(op->ctp,kcp,kbuf,klen) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -279,7 +279,7 @@ int clusterdb_curenum(CD *op,CD_CUR *curp,char *kbuf,int klen,
 	int		rs ;
 	if ((rs = clusterdb_magic(op,curp,kbuf,vbuf)) >= 0) {
 	    kvsfile_cur		*kcp = (curp) ? curp->kcurp : nullptr ;
-	    rs = kvsfile_enum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
+	    rs = kvsfile_curenum(op->ctp,kcp,kbuf,klen,vbuf,vlen) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -366,7 +366,7 @@ fetcher::operator int () noex {
 	kop = op->ctp ;
 	if (curp != nullptr) {
 	    kvsfile_cur	*kcp = curp->kcurp ;
-	    while ((rs = kvsfile_enumkey(kop,kcp,kbuf,klen)) >= 0) {
+	    while ((rs = kvsfile_curenumkey(kop,kcp,kbuf,klen)) >= 0) {
 	        if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	            while (rs >= 0) {
 	                rs1 = kvsfile_fetch(kop,kbuf,&vcur,nbuf,nlen) ;
@@ -386,7 +386,7 @@ fetcher::operator int () noex {
 	} else {
 	    if ((rs = kvsfile_curbegin(kop,&vcur)) >= 0) {
 	        while (rs >= 0) {
-	            rs = kvsfile_enum(kop,&vcur,kbuf,klen,nbuf,nlen) ;
+	            rs = kvsfile_curenum(kop,&vcur,kbuf,klen,nbuf,nlen) ;
 	            if ((rs >= 0) && (strcmp(nn,nbuf) == 0)) break ;
 	        } /* end while (enumerating) */
 	        rs1 = kvsfile_curend(kop,&vcur) ;

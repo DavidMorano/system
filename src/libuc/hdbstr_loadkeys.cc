@@ -56,7 +56,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -121,7 +121,7 @@ int hdbstr_loadkeys(hdbstr *op,cchar *fname) noex {
 /* local subroutines */
 
 static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
-	nullptr_t	n{} ;
+	const nullptr_t	np{} ;
 	bfile		loadfile, *lfp = &loadfile ;
 	int		rs ;
 	int		rs1 ;
@@ -136,7 +136,7 @@ static int hdbstr_load(hdbstr *op,char *lbuf,int llen,cchar *fn) noex {
 		    int		fl ;
 	            while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
 	                if (fl > 0) {
-	                    if ((rs = hdbstr_add(op,fp,fl,n,0)) >= 0) {
+	                    if ((rs = hdbstr_add(op,fp,fl,np,0)) >= 0) {
 			        c += 1 ;
 			    }
 	                } /* end if (got one) */

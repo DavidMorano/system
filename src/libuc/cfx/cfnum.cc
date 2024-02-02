@@ -50,10 +50,11 @@
 #include	<cfoct.h>
 #include	<cfdec.h>
 #include	<cfhex.h>
-#include	<ischarx.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<toxc.h>
+#include	<ischarx.h>
 #include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
@@ -63,6 +64,8 @@
 /* local namespaces */
 
 using std::integral ;			/* concept */
+using std::signed_integral ;		/* concept */
+using std::unsigned_integral ;		/* concept */
 
 
 /* local typedefs */
@@ -74,24 +77,18 @@ using std::integral ;			/* concept */
 /* local structures */
 
 
-/* subroutine-templaces */
+/* forward references */
 
-template<integral T>
-int cfnumx(cchar *bp,int bl,T *rp) noex {
+
+/* subroutine-templates */
+
+template<unsigned_integral T>
+int cfnumx(cchar *sp,int sl,T *rp) noex {
 	int		rs = SR_DOM ;
-	int		ch ;
-	int		f_negative = false ;
-	bl = strnlen(bp,bl) ;
-	while ((bl > 0) && CHAR_ISWHITE(*bp)) {
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if ((bl > 0) && ((*bp == '+') || (*bp == '-'))) {
-	    f_negative = (*bp == '-') ;
-	    bp += 1 ;
-	    bl -= 1 ;
-	}
-	if (bl > 0) {
+	cchar		*bp{} ;
+	bool		fneg = false ;
+	if (int bl ; (bl = sfsign(&fneg,sp,sl,&bp)) > 0) {
+	    int		ch ;
 	    if (*bp == '\\') {
 	        bp += 1 ;
 	        bl -= 1 ;
@@ -151,14 +148,27 @@ int cfnumx(cchar *bp,int bl,T *rp) noex {
 	            rs = cfdec(bp,bl,rp) ;
 		}
 	    } /* end if */
-	    if (f_negative) *rp = (- *rp) ;
-	} /* end if */
+	    if (fneg) *rp = (- *rp) ;
+	} /* end if (sfsign) */
 	return rs ;
 }
-/* end subroutine (cfnumx) */
+/* end subroutine-template (cfnumx) */
 
-
-/* forward references */
+template<unsigned_integral UT,signed_integral T>
+int cfnumsx(cchar *bp,int bl,T *rp) noex {
+	int		rs = SR_DOM ;
+	cchar		*sp{} ;
+	bool		fneg{} ;
+	if (int sl ; (sl = sfsign(&fneg,bp,bl,&sp)) > 0) {
+	    UT		uval{} ;
+	    if ((rs = cfnumx(sp,sl,&uval)) >= 0) {
+		if (fneg) uval = (- uval) ;
+		*rp = static_cast<T>(uval) ;
+	    } /* end if (cfnumx) */
+	} /* end if (sfsign) */
+	return rs ;
+}
+/* end subroutine-template (cfnumsx) */
 
 
 /* local variables */
@@ -170,17 +180,17 @@ int cfnumx(cchar *bp,int bl,T *rp) noex {
 /* exported subroutines */
 
 int cfnumi(cchar *bp,int bl,int *rp) noex {
-	return cfnumx(bp,bl,rp) ;
+	return cfnumsx<uint>(bp,bl,rp) ;
 }
 /* end subroutine (cfnumi) */
 
 int cfnuml(cchar *bp,int bl,long *rp) noex {
-	return cfnumx(bp,bl,rp) ;
+	return cfnumsx<ulong>(bp,bl,rp) ;
 }
 /* end subroutine (cfnuml) */
 
 int cfnumll(cchar *bp,int bl,longlong *rp) noex {
-	return cfnumx(bp,bl,rp) ;
+	return cfnumsx<ulonglong>(bp,bl,rp) ;
 }
 /* end subroutine (cfnumll) */
 

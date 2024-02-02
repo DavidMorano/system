@@ -23,7 +23,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cerrno>
@@ -59,6 +59,7 @@
 
 /* exported subroutines */
 
+/*----------------------------------------------------------------------------*/
 /* USERATTR begin */
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
@@ -103,7 +104,10 @@ userattr *getuseruid(uid_t) noex {
 
 #endif /* (!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0) */
 /* USERATTR end */
+/*----------------------------------------------------------------------------*/
 
+
+/*----------------------------------------------------------------------------*/
 /* MEMPLOCK begin */
 #if	(! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0)
 
@@ -122,5 +126,6 @@ int plock(int) noex {
 
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */
+/*----------------------------------------------------------------------------*/
 
 

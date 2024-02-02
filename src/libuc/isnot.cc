@@ -1,4 +1,4 @@
-/* isnot */
+/* isnot SUPPORT */
 /* lang=C++20 */
 
 /* determine if a file is not present from its return-status */
@@ -38,8 +38,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -1,5 +1,5 @@
 /* getxusername SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get the best approximation of the user's username */
 /* version %I% last-modified %G% */
@@ -126,7 +126,7 @@
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<usupport.h>
-#include	<ugetpid.h>
+#include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>
 #include	<getax.h>
@@ -238,7 +238,7 @@ static int	getxusername_lookup(GETXUSERNAME *,cchar *) noex ;
 
 /* local variables */
 
-static int	(*getxusernames[])(GETXUSERNAME *) = {
+static constexpr int	(*getxusernames[])(GETXUSERNAME *) = {
 	getxusername_self,
 	getxusername_varusername,
 	getxusername_varuser,
@@ -251,13 +251,16 @@ static int	(*getxusernames[])(GETXUSERNAME *) = {
 	nullptr
 } ;
 
-static const struct mapent	mapents[] = {
+static constexpr struct mapent	mapents[] = {
 	{ 0, "root" },
 	{ 60001, "nobody" },
 	{ 60002, "noaccess" },
 	{ 65534, "nobody4" },
 	{ -1, nullptr }
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -457,7 +460,6 @@ static int getxusername_utmp(GETXUSERNAME *xup) noex {
 	return rs ;
 }
 /* end subroutine (getxusername_utmp) */
-
 
 static int getxusername_map(GETXUSERNAME *xup) noex {
 	uid_t		uid = xup->uid ;

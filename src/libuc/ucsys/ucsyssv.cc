@@ -53,7 +53,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<errno.h>
 #include	<limits.h>
 #include	<unistd.h>

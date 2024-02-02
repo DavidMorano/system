@@ -1,4 +1,4 @@
-/* prgetprogpath */
+/* prgetprogpath SUPPORT */
 /* lang=C++20 */
 
 /* get the path to a program that is used within the PCS system */
@@ -65,6 +65,7 @@
 #include	<storebuf.h>
 #include	<strn.h>
 #include	<xperm.h>
+#include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
