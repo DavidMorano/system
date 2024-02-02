@@ -534,11 +534,11 @@ static int try_gethost(TRY *tip) noex {
 	if ((rs >= 0) && tip->f.node) {
 	    char	*hbuf{} ;
 	    if ((rs = malloc_ho(&hbuf)) >= 0) {
-	        HOSTENT	he, *hep = &he ;
-	        cint	hlen = rs ;
-	        cchar	*nn = tip->nodename ;
+		const nullptr_t	np{} ;
+	        HOSTENT		he, *hep = &he ;
+	        cint		hlen = rs ;
+	        cchar		*nn = tip->nodename ;
 	        if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
-		    nullptr_t	np{} ;
 		    cint	dlen = tip->dlen ;
 	            cchar	*tp{} ;
 		    bool	f = true ;

@@ -42,8 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -52,6 +51,11 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
 
 
 /* external subroutines */
@@ -73,12 +77,12 @@ int field_svcargs(field *fbp,vecstr *sap) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (fbp && sap) {
-	    nullptr_t	n = 0 ;
-	    if ((rs = field_remaining(fbp,n)) >= 0) {
+	    const nullptr_t	np{} ;
+	    if ((rs = field_remaining(fbp,np)) >= 0) {
 	        cint	alen = rs ;
 	        char	*abuf ;
 	        if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
-		    int	al ;
+		    int		al ;
 	            while ((al = field_sharg(fbp,n,abuf,alen)) >= 0) {
 	                c += 1 ;
 	                rs = vecstr_add(sap,abuf,al) ;

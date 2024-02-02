@@ -81,7 +81,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -816,11 +816,11 @@ static int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	    a.addrlen = alen ;
 	    if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
 	        vecobj		*alp = &op->addrs ;
-		nullptr_t	n{} ;
+		const nullptr_t	np{} ;
 	        while ((rs1 = hostent_enumaddr(hep,&hc,&ap)) >= 0) {
 	            a.addrlen = rs1 ;
 	            memcpy(&a.addr,ap,rs1) ;
-	            if ((rs = vecobj_search(alp,&a,vmataddr,n)) == nrs) {
+	            if ((rs = vecobj_search(alp,&a,vmataddr,np)) == nrs) {
 	                c += 1 ;
 	                a.af = af ;
 	                rs = vecobj_add(alp,&a) ;

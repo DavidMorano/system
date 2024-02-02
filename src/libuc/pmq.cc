@@ -43,7 +43,6 @@
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<libmallocxx.h>
-#include	<ugetpw.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>

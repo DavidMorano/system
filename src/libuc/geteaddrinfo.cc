@@ -57,10 +57,12 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<usupport.h>		/* for |memclear(3i)| */
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<getnodename.h>		/* <- for |getnodedomain(2uc)| */
 #include	<snx.h>
 #include	<snwcpy.h>
@@ -68,6 +70,8 @@
 #include	<isinetaddr.h>
 #include	<isindomain.h>
 #include	<localmisc.h>
+
+#include	"geteaddrinfo.h"
 
 
 /* local defines */
@@ -89,6 +93,14 @@
 
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
+
+
+/* local namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -143,6 +155,8 @@ static constexpr int	(*tries[])(SUBINFO *) = {
 	try_remlocal,
 	nullptr
 } ;
+
+static bufsizevar		maxhostlen(getbufsize_hn) ;
 
 
 /* exported variables */
@@ -206,16 +220,21 @@ static int subinfo_finish(SUBINFO *mip) noex {
 
 static int subinfo_domain(SUBINFO *mip) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		len = 0 ;
 	if (mip->domainname == nullptr) {
-	    char	dbuf[MAXHOSTNAMELEN + 1] ;
-	    if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
-	        cchar	*dp ;
-	        len = strlen(dbuf) ;
-	        if ((rs = uc_mallocstrw(dbuf,len,&dp)) >= 0) {
-	            mip->domainname = dp ;
-		}
-	    }
+	    char	*dbuf{} ;
+	    if ((rs = malloc_hn(&dbuf)) >= 0) {
+	        if ((rs = getnodedomain(nullptr,dbuf)) >= 0) {
+	            cchar	*dp{} ;
+	            len = strlen(dbuf) ;
+	            if ((rs = uc_mallocstrw(dbuf,len,&dp)) >= 0) {
+	                mip->domainname = dp ;
+		    }
+	        }
+		rs1 = uc_free(dbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	    len = strlen(mip->domainname) ;
 	}
@@ -239,11 +258,13 @@ static int try_straight(SUBINFO *mip) noex {
 	}
 	if ((rs = uc_getaddrinfo(hn,aip->svcname,aip->hintp,aip->rpp)) >= 0) {
 	    if (mip->ehostname != nullptr) {
-		cint	hlen = MAXHOSTNAMELEN ;
 	        mip->ehostname[0] = '\0' ;
 	        if (aip->hostname != nullptr) {
-		    c = 1 ;
-	            rs = sncpy1(mip->ehostname,hlen,aip->hostname) ;
+		    if ((rs = maxhostlen) >= 0) {
+			cint	hlen = rs ;
+		        c = 1 ;
+	                rs = sncpy1(mip->ehostname,hlen,aip->hostname) ;
+		    } /* end if (maxhostlen) */
 	        }
 	    }
 	} else if (isNotPresent(rs)) {
@@ -293,34 +314,40 @@ static int try_add(SUBINFO *mip) noex {
 static int try_rem(SUBINFO *mip) noex {
 	ARGINFO		*aip = mip->aip ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	if (aip->hostname != nullptr) {
 	    if (! isinetaddr(aip->hostname)) {
-	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != nullptr) {
+		const nullptr_t		np{} ;
+	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != np) {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
 	                rs = SR_NOTFOUND ;
 	                if (isindomain(aip->hostname,mip->domainname)) {
-			    cint	hlen = MAXHOSTNAMELEN ;
 	                    int		hl = (tp - aip->hostname) ;
 			    cchar	*hn = aip->hostname ;
-	                    char	ehostname[MAXHOSTNAMELEN + 1] ;
-	                    char	*bp ;
-	    		    bp = ehostname ;
-			    if (mip->ehostname != nullptr) {
-	                        bp = mip->ehostname ;
-	                    }
-	    		    if ((rs = snwcpy(bp,hlen,hn,hl)) >= 0) {
-				ADDRINFO	*hp = aip->hintp ;
-				ADDRINFO	**rpp = aip->rpp ;
-				cchar		*sn = aip->svcname ;
-	        		if ((rs = uc_getaddrinfo(bp,sn,hp,rpp)) >= 0) {
-				    c = 1 ;
-			        } else if (isNotPresent(rs)) {
-	    			    mip->rs_last = rs ;
-				    rs = SR_OK ;
-			        }
-			    }
-			} /* end if (subinfo_domain) */
+	                    char	*hbuf{} ;
+			    if ((rs = malloc_hn(&hbuf)) >= 0) {
+				cint	hlen = rs ;
+	    		        char	*bp = hbuf ;
+			        if (mip->ehostname != nullptr) {
+	                            bp = mip->ehostname ;
+	                        }
+	    		        if ((rs = snwcpy(bp,hlen,hn,hl)) >= 0) {
+				    ADDRINFO	*hp = aip->hintp ;
+				    ADDRINFO	**rpp = aip->rpp ;
+				    cchar	*sn = aip->svcname ;
+				    auto	gai = uc_getaddrinfo ;
+	        		    if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
+				        c = 1 ;
+			            } else if (isNotPresent(rs)) {
+	    			        mip->rs_last = rs ;
+				        rs = SR_OK ;
+			            }
+			        } /* end if (snwcpy) */
+				rs1 = uc_free(&hbuf) ;
+				if (rs >= 0) rs = rs1 ;
+			    } /* end if (malloc_hn) */
+			} /* end if (isindomain) */
 		    } /* end if (subinfo_domain) */
 	        }
 	    }
@@ -332,33 +359,39 @@ static int try_rem(SUBINFO *mip) noex {
 static int try_remlocal(SUBINFO *mip) noex {
 	ARGINFO		*aip = mip->aip ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	if (aip->hostname != nullptr) {
 	    if (! isinetaddr(aip->hostname)) {
-		cchar	*tp ;
-	        if ((tp = strchr(aip->hostname,'.')) != nullptr) {
+		const nullptr_t		np{} ;
+	        if (cchar *tp ; (tp = strchr(aip->hostname,'.')) != np) {
 	            if (isindomain(aip->hostname,LOCALDOMAINNAME)) {
-		        cint	hlen = MAXHOSTNAMELEN ;
 	                int	hl = (tp - aip->hostname) ;
-	                char	ehostname[MAXHOSTNAMELEN + 1] ;
-	                char	*bp ;
-	    		bp = ehostname ;
-	    		if (mip->ehostname != nullptr) {
-			    bp = mip->ehostname ;
-	    		}
-	    		if ((rs = snwcpy(bp,hlen,aip->hostname,hl)) >= 0) {
-			    ADDRINFO	*hp = aip->hintp ;
-			    ADDRINFO	**rpp = aip->rpp ;
-			    cchar	*sn = aip->svcname ;
-	                    if ((rs = uc_getaddrinfo(bp,sn,hp,rpp)) >= 0) {
-				c = 1 ;
-			    } else if (isNotPresent(rs)) {
-	    			mip->rs_last = rs ;
-				rs = SR_OK ;
-			    }
-	                }
-	            } /* end if */
-	        }
+			cchar	*hn = aip->hostname ;
+	                char	*hbuf{} ;
+			if ((rs = malloc_hn(&hbuf)) >= 0) {
+			    cint	hlen = rs ;
+			    char	*bp = hbuf ;
+	    		    if (mip->ehostname != nullptr) {
+			        bp = mip->ehostname ;
+	    		    }
+	    		    if ((rs = snwcpy(bp,hlen,hn,hl)) >= 0) {
+			        ADDRINFO	*hp = aip->hintp ;
+			        ADDRINFO	**rpp = aip->rpp ;
+			        cchar		*sn = aip->svcname ;
+			        auto		gai = uc_getaddrinfo ;
+	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
+				    c = 1 ;
+			        } else if (isNotPresent(rs)) {
+	    			    mip->rs_last = rs ;
+				    rs = SR_OK ;
+			        }
+	                    } /* end if (snwcpy) */
+			    rs1 = uc_free(&hbuf) ;
+			    if (rs >= 0) rs = rs1 ;
+			} /* end if (malloc_hn) */
+	            } /* end if (isindomain) */
+	        } /* end if (strchr) */
 	    }
 	}
 	return (rs >= 0) ? c : rs ;

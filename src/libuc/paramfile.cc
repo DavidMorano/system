@@ -110,7 +110,7 @@ template<typename ... Args>
 static inline int paramfile_ctor(paramfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->envv = nullptr ;
 	    op->a = nullptr ;

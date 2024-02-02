@@ -715,7 +715,7 @@ ptrwa.o:		ptrwa.c ptrwa.h
 # POSIX Message Queue
 pmq.o:			pmq.cc pmq.h
 
-sighand.o:		sighand.c sighand.h
+sighand.o:		sighand.cc sighand.h
 sigblock.o:		sigblock.cc sigblock.h
 sigign.o:		sigign.c sigign.h
 

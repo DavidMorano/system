@@ -59,7 +59,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* external subroutines */
@@ -128,17 +128,17 @@ int ucmemla_release(ucmemla *op) noex {
 /* local subroutines */
 
 static int ucmemla_map(ucmemla *op,size_t us,void **rpp) noex {
+	const nullptr_t	np{} ;
 	size_t		ms ;
 	int		rs ;
 	if ((rs = pagesize) >= 0) {
-	    nullptr_t	n{} ;
 	    cint	ps = rs ;
 	    cint	fd = -1 ;
 	    cint	mp = (PROT_READ | PROT_WRITE) ;
 	    cint	mf = (MAP_ANON | MAP_PRIVATE) ;
 	    void	*md ;
 	    ms = szceil(us,ps) ;
-	    if ((rs = u_mmapbegin(n,ms,mp,mf,fd,0L,&md)) >= 0) {
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 		op->ma = md ;
 		op->ms = ms ;
 		*rpp = md ;

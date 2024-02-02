@@ -186,7 +186,7 @@ template<typename ... Args>
 static inline int nodedb_ctor(nodedb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->checktime = 0 ;
 	    op->magic = 0 ;
@@ -286,9 +286,9 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 	            cint	fsize = sizeof(NODEDB_FILE) ;
 	            cint	vo = VECOBJ_OREUSE ;
 	            if ((rs = vecobj_start(flp,fsize,nf,vo)) >= 0) {
+	                const nullptr_t	np{} ;
 		        hdb		*elp = op->entsp ;
-	                nullptr_t	n{} ;
-	                if ((rs = hdb_start(elp,defents,0,n,n)) >= 0) {
+	                if ((rs = hdb_start(elp,defents,0,np,np)) >= 0) {
 	                    op->checktime = time(nullptr) ;
 	                    op->magic = NODEDB_MAGIC ;
 	                    if (fname && fname[0]) {
@@ -566,12 +566,12 @@ static int nodedb_fileparser(nodedb *op,NODEDB_FILE *fep,int fi) noex {
 	        if ((rs = bcontrol(lfp,BC_STAT,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
 	                if (fep->mtime < sb.st_mtime) {
-			    nullptr_t	n{} ;
+			    const nullptr_t	np{} ;
 	                    fep->dev = sb.st_dev ;
 	                    fep->ino = sb.st_ino ;
 	                    fep->mtime = sb.st_mtime ;
 	                    fep->size = sb.st_size ;
-	                    while ((rs = breadlns(lfp,lbuf,llen,-1,n)) > 0) {
+	                    while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
 	                        int	len = rs ;
 	                        int	cl ;
 	                        cchar	*cp ;

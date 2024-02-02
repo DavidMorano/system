@@ -27,18 +27,18 @@ static int magic(Args ... args) noex {
 
 template<typename ... Args>
 static int thingw(char *dp,int dl,Args ... args,int other) noex {
-	nullptr_t	n{} ;
+	const nullptr_t	np{} ;
 	cint		na = npack(Args) ;
 	int		rs = SR_OK ;
 	switch (na) {
 	case 0:
-	    rs = thingx(dp,dl,na,args ...,n,n,n,other) ;
+	    rs = thingx(dp,dl,na,args ...,np,np,np,other) ;
 	    break ;
 	case 1:
-	    rs = thingx(dp,dl,na,args ...,n,n,other) ;
+	    rs = thingx(dp,dl,na,args ...,np,np,other) ;
 	    break ;
 	case 2:
-	    rs = thingx(dp,dl,na,args ...,n,other) ;
+	    rs = thingx(dp,dl,na,args ...,np,other) ;
 	    break ;
 	case 3:
 	    rs = thingx(dp,dl,na,args ...,other) ;
@@ -47,6 +47,7 @@ static int thingw(char *dp,int dl,Args ... args,int other) noex {
 	return rs ;
 }
 
+/* exported subroutines */
 
 int main(int,cchar **,cchar **) {
 	int	ex = 0 ;

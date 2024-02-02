@@ -166,7 +166,7 @@ int defproc(vecstr *dlp,mainv envv,expcook *clp,cchar *fname) noex {
 		    cint	llen = rs ;
 		    bfile	loadfile, *lfp = &loadfile ;
 		    if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
-			nullptr_t	np{} ;
+			const nullptr_t		np{} ;
 	    		while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
 			    cchar	*lp{} ;
 			    if (int ll ; (ll = sfcontent(lbuf,rs,&lp)) > 0) {

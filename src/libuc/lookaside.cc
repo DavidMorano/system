@@ -78,7 +78,7 @@ template<typename ... Args>
 static int lookaside_ctor(lookaside *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->eap = nullptr ;
 	    op->nchunks = 0 ;

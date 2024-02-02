@@ -157,12 +157,12 @@ int permsched(mv sched,vecstr *nsp,char *rbuf,int rlen,cc *fn,pm am) noex {
 /* local subroutines */
 
 static int schedexpand(cc *fmt,vecstr *nsp,char *rbuf,int rlen,cc *fn) noex {
+	const nullptr_t	np{} ;
 	sbuf		b ;
 	int		rs ;
 	int		len = 0 ;
 	rbuf[0] = '\0' ;
 	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    nullptr_t	np{} ;
 	    auto	vf = vecstr_finder ;
 	    auto	vs = vstrkeycmp ;
 	    char	kb[2] = {} ;

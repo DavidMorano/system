@@ -98,7 +98,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -201,6 +201,7 @@ int envs_procxe(envs *op,EC *clp,cchar **ev,VS *dlp,cchar *fn) noex {
 /* local subroutines */
 
 int subinfo::procer(cchar *fn) noex {
+	const nullptr_t	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -211,11 +212,10 @@ int subinfo::procer(cchar *fn) noex {
 		cint	llen = sz ;
 	        bfile	xefile, *xfp = &xefile ;
 	        if ((rs = bopen(xfp,fn,"r",0666)) >= 0) {
-		    nullptr_t	n{} ;
 	            int		cl ;
 	            int		len ;
 	            cchar	*cp ;
-	            while ((rs = breadlns(xfp,lbuf,llen,-1,n)) > 0) {
+	            while ((rs = breadlns(xfp,lbuf,llen,-1,np)) > 0) {
 	        	len = rs ;
 	        	if (lbuf[len - 1] == '\n') len -= 1 ;
 	        	lbuf[len] = '\0' ;
@@ -279,7 +279,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	int		el ;
 	int		enl = 0 ;
 	int		len = 0 ;
-	nullptr_t	n{} ;
+	nullptr_t	np{} ;
 	cchar		*scl = "?+:;¶µ­=#\t " ;
 	cchar		*tp, *ep ;
 	cchar		*enp = nullptr ;
@@ -289,7 +289,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	    sl -= 1 ;
 	}
 /* extract any dependencies (if we have any) */
-	if (((tp = strnpbrk(sp,sl,scl)) != n) && (*tp == '?')) {
+	if (((tp = strnpbrk(sp,sl,scl)) != np) && (*tp == '?')) {
 	    if ((rs = deps(sp,(tp - sp))) > 0) {
 	        sl -= ((tp+1) - sp) ;
 	        sp = (tp+1) ;

@@ -55,7 +55,7 @@ template<typename ... Args>
 static int thrcomm_ctor(thrcomm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->cmd = 0 ;

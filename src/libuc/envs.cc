@@ -121,8 +121,8 @@ static int	entry_finish(ENVS_ENT *) noex ;
 int envs_start(envs *op,int ne) noex {
 	int		rs ;
 	if ((rs = envs_enter(op)) >= 0) {
-	    nullptr_t	n{} ;
-	    if ((rs = ENVS_DBSTART(op->varp,ne,n,n)) >= 0) {
+	    const nullptr_t	np{} ;
+	    if ((rs = ENVS_DBSTART(op->varp,ne,np,np)) >= 0) {
 		op->magic = ENVS_MAGIC ;
 	    }
 	}

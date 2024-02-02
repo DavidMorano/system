@@ -73,6 +73,9 @@ using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -87,7 +90,7 @@ template<typename ... Args>
 static int envhelp_ctor(envhelp *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((op->elp = new(nothrow) vechand) != np) {
 	        if ((op->spp = new(nothrow) strpack) != np) {
@@ -299,7 +302,7 @@ static int envhelp_copy(envhelp *op,mainv envbads,mainv envv) noex {
 
 static int vechand_addover(vechand *elp,cchar *ep) noex {
 	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-	nullptr_t	np{} ;
+	const nullptr_t	np{} ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = vechand_search(elp,ep,vcf,np)) >= 0) {

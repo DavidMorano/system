@@ -170,7 +170,7 @@ template<typename ... Args>
 static inline int strtab_ctor(strtab *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ccp = nullptr ;
@@ -272,8 +272,8 @@ int strtab_start(strtab *op,int startsz) noex {
 		int	opts = 0 ;
 	        op->chsize = iceil(startsz,pagesize) ;
 	        if ((rs = vechand_start(op->clp,ne,opts)) >= 0) {
-		    nullptr_t	n{} ;
-	            if ((rs = hdb_start(op->hlp,ne,true,n,n)) >= 0) {
+		    const nullptr_t	np{} ;
+	            if ((rs = hdb_start(op->hlp,ne,true,np,np)) >= 0) {
 	                cint	size = sizeof(int) ;
 	                if ((rs = STRTAB_AOSTART(op->lap,size,ne)) >= 0) {
 	                    op->count = 0 ;

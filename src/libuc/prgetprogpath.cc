@@ -65,6 +65,7 @@
 #include	<storebuf.h>
 #include	<strn.h>
 #include	<xperm.h>
+#include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 

@@ -57,7 +57,7 @@ INCS= strn.h
 OBJ0_STRN= strnxsub.o
 OBJ1_STRN= strnnlen.o
 OBJ2_STRN= strnxchr.o strnxpbrk.o 
-OBJ3_STRN= strnset.o strnwcpy.o strncpyxc.o 
+OBJ3_STRN= strnset.o strnwcpy.o strnncpy.o strncpyxc.o 
 
 OBJA_STRN= obj0_strn.o obj1_strn.o
 OBJB_STRN= obj2_strn.o obj3_strn.o
@@ -126,6 +126,7 @@ strnnlen.o:		strnnlen.c $(INCS)
 strnxchr.o:		strnxchr.cc $(INCS)
 strnxpbrk.o:		strnxpbrk.cc $(INCS)
 strnwcpy.o:		strnwcpy.cc $(INCS)
+strnncpy.o:		strnncpy.cc $(INCS)
 strncpyxc.o:		strncpyxc.cc $(INCS)
 strnset.o:		strnset.c $(INCS)
 

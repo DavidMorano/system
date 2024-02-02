@@ -106,7 +106,7 @@ int groupids::get(gid_t **gpp) noex {
 
 int groupids::istart(gid_t **gpp) noex {
 	int		rs ;
-	nullptr_t	np{} ;
+	const nullptr_t	np{} ;
 	if ((rs = u_getgroups(0,np)) >= 0) {
 	        cint	size = ((rs+1)*sizeof(gid_t)) ;
 	        void	*vp{} ;

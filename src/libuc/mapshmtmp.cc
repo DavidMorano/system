@@ -104,13 +104,13 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp) noex {
                     }
                 } /* end if (not user-supplied buffer) */
                 if (rs >= 0) {
+		    const nullptr_t	np{} ;
                     if ((rs = openshmtmp(rbuf,rlen,operm)) >= 0) {
-                        cint        fd = rs ;
+                        cint        	fd = rs ;
                         if (f_bufalloc) {
                             uc_unlinkshm(rbuf) ;
                         }
                         if ((rs = shmalloc(fd,shmlen)) >= 0) {
-			    nullptr_t	np{} ;
                             size_t  ms = shmlen ;
                             int     mp = (PROT_READ | PROT_WRITE) ;
                             int     mo = MAP_SHARED ;

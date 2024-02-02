@@ -78,7 +78,7 @@ int		expcook_expbuf(EX *,int,buffer *,cchar *,int) noex ;
 static inline int expcook_ctor(EX *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->hlp = new(nothrow) hdbstr) != np) {
@@ -159,12 +159,12 @@ int expcook_finish(EX *op) noex {
 /* end subroutine (expcook_finish) */
 
 int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
+	const nullptr_t	np{} ;
 	int		rs ;
 	if ((rs = expcook_magic(op,kbuf)) >= 0) {
-	    nullptr_t	n{} ;
 	    hdbstr	*slp = op->hlp ;
 	    int		kl = strlen(kbuf) ;
-	    if ((rs = hdbstr_fetch(slp,kbuf,kl,n,n)) >= 0) {
+	    if ((rs = hdbstr_fetch(slp,kbuf,kl,np,np)) >= 0) {
 	        rs = hdbstr_delkey(slp,kbuf,kl) ;
 	    } else if (rs == SR_NOTFOUND) {
 	        rs = SR_OK ;
@@ -180,7 +180,7 @@ int expcook_add(EX *op,cchar *kbuf,cchar *vbuf,int vlen) noex {
 int expcook_curbegin(EX *op,expcook_cur *curp) noex {
 	int		rs ;
 	if ((rs = expcook_magic(op,curp)) >= 0) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    if ((curp->clp = new(nothrow) hdbstr_cur) != np) {
 	        hdbstr	*slp = op->hlp ;

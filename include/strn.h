@@ -40,6 +40,7 @@ extern char *strncasesub(cchar *,int,cchar *) noex ;
 
 /* copy-set */
 extern char *strnset(char *,int,int) noex ;
+extern char *strnncpy(char *,cchar *,int,int) noex ;
 extern char *strnwcpy(char *,int,cchar *,int) noex ;
 
 static inline char *strnsetblanks(char *dp,int dl) noex {

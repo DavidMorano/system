@@ -266,10 +266,10 @@ static int filemap_opener(filemap *op,cchar *fn,int of) noex {
 /* end subroutine (filemap_opener) */
 
 static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
+	const nullptr_t	np{} ;
 	size_t		ms ;
 	int		rs ;
 	if ((rs = pagesize) >= 0) {
-	    nullptr_t	np{} ;
 	    csize	ps = size_t(rs) ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;

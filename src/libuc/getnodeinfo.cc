@@ -132,13 +132,13 @@ int getnodeinfo(cc *pr,char *cbuf,char *sbuf,vecstr *klp,cc *nn) noex {
 		char	*tbuf{} ;
 		if ((rs = malloc_mp(&tbuf)) >= 0) {
 	            if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
+			const nullptr_t	np{} ;
 	                nodedb		st ;
 	                nodedb_ent	ste{} ;
 	                cint		elen = NODEDB_ENTLEN ;
 	                char		ebuf[NODEDB_ENTLEN + 1] ;
 	                if ((rs = nodedb_open(&st,tbuf)) >= 0) {
 			    auto	nf = nodedb_fetch ;
-			    nullptr_t	np{} ;
 	                    if ((rs = nf(&st,nn,np,&ste,ebuf,elen)) >= 0) {
 	                        if (cbuf != nullptr) {
 	                            rs = sncpy1(cbuf,clen,ste.clu) ;
