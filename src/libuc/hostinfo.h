@@ -51,8 +51,6 @@ struct hostinfo_args {
 } ;
 
 struct hostinfo_head {
-	uint		magic ;
-	HOSTINFO_FL	init, f ;
 	HOSTINFO_ARGS	arg ;
 	HOSTINFO_ADDR	addr ;
 	vecobj		names ;
@@ -61,6 +59,8 @@ struct hostinfo_head {
 	void		*a ;		/* holds allocation for host-bufs */
 	char		*ehostname ;	/* allocated on start */
 	char		*chostname ;	/* allocated on start */
+	HOSTINFO_FL	init, f ;
+	uint		magic ;
 } ;
 
 struct hostinfo_cursor {

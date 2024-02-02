@@ -1,5 +1,5 @@
-/* isindomain */
-/* lang=C20 */
+/* isindomain SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to determine if the name is in the given domain */
 /* version %I% last-modified %G% */
@@ -24,7 +24,6 @@
 	specified domain or not.
 
 	Synopsis:
-
 	int isindomain(cchar *nodename,cchar *domainname) noex
 
 	Arguments:
@@ -38,9 +37,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<strings.h>		/* for |strcasecmp(3c)| */
+#include	<strings.h>		/* BSD-header for |strcasecmp(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"isindomain.h"
 
 
 /* local defines */
