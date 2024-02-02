@@ -37,14 +37,15 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>
 #include	<algorithm>
 #include	<string>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 #include	"ctwords.hh"
 

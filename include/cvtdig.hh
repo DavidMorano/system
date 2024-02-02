@@ -60,23 +60,19 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<bit>
+#include	<bit>			/* <- for |countr_zero(3c++)| */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<varnames.hh>
 #include	<stdintx.h>
-#include	<localmisc.h>
 
 
 static constexpr int	cvtdig_maxbase = 64 ;	/* largest pow-of-two */
 
 static inline constexpr int cvtdig_ffbsi(int b) noex {
-	cuint	n = uint(b) ;
-	int	bn = 0 ;
-	if (n) {
-	    bn = std::countr_zero(n) ;
-	}
-	return bn ;
+	cuint		ub = uint(b) ;
+	return std::countr_zero(ub) ;
 }
 /* end subroutine (cvtdig_ffbsi) */
 

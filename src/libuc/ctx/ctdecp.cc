@@ -40,7 +40,7 @@
 
 	Returns:
 	>=0		length of result string
-	<0		error (syhstem-return)
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -50,7 +50,6 @@
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<ctdec.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctdecp.h"
 

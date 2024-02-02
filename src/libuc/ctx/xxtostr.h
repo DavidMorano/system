@@ -19,13 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<limits.h>
 #include	<usystem.h>
 #include	<ucvariables.hh>
 #include	<varnames.hh>
 #include	<stdintx.h>
-#include	<localmisc.h>
 
 
 #ifdef	__cplusplus

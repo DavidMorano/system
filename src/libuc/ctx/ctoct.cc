@@ -28,7 +28,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<cvtdig.hh>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctoct.h"
 

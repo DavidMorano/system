@@ -96,7 +96,7 @@ int sfsubstance(cchar *sp,int sl,cchar **cpp) noex {
 /* local subroutines */
 
 static int isnotours(int ch) noex {
-	int	f = FALSE ;
+	int	f = false ;
 	f = f || CHAR_ISWHITE(ch) ;
 	f = f || (ch == CH_DQUOTE) ;
 	f = f || (ch == CH_SQUOTE) ;

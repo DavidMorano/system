@@ -70,7 +70,6 @@
 #include	<ucvariables.hh>
 #include	<varnames.hh>
 #include	<sncpyx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctxxx.h"
 
