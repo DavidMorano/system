@@ -44,7 +44,7 @@
 
 	Returns:
 	>=0		<name> had a valid INET address
-	<0		<name> did not have a valid address
+	<0		<name> did not have a valid address (system-return)
 
 *******************************************************************************/
 
@@ -57,10 +57,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<cstring>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- |strlen(3c)| + |strcmp(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* for |memclear(3i)| */
+#include	<usupport.h>		/* for |memclear(3u)| */
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<getnodename.h>		/* <- for |getnodedomain(2uc)| */
@@ -248,7 +248,7 @@ static int try_straight(SUBINFO *mip) noex {
 	int		c = 0 ;
 	cchar		*hn = aip->hostname ;
 	if (hn != nullptr) {
-	    int f = false ;
+	    bool	f = false ;
 	    f = f || ((hn[0] == 'a') && (strcmp(hn,ANYHOST) == 0)) ;
 	    f = f || (hn[0] == '*') ;
 	    f = f || (hn[0] == '\0') ;
@@ -278,33 +278,38 @@ static int try_straight(SUBINFO *mip) noex {
 static int try_add(SUBINFO *mip) noex {
 	ARGINFO		*aip = mip->aip ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	if (aip->hostname != nullptr) {
 	    if (strchr(aip->hostname,'.') == nullptr) {
 	        if (! isinetaddr(aip->hostname)) {
 	            if ((rs = subinfo_domain(mip)) >= 0) {
-	                cint	hlen = MAXHOSTNAMELEN ;
 			cchar	*dn = mip->domainname ;
 			cchar	*hn = aip->hostname ;
-	                char	ehostname[MAXHOSTNAMELEN + 1] ;
-	                char	*bp ;
-			bp = ehostname ;
-	                if (mip->ehostname != nullptr) {
-			    bp = mip->ehostname ;
-			}
-	                if ((rs = snsds(bp,hlen,hn,dn)) >= 0) {
-			    ADDRINFO	*hp = aip->hintp ;
-			    ADDRINFO	**rpp = aip->rpp ;
-	                    cchar	*sn = aip->svcname ;
-	                    if ((rs = uc_getaddrinfo(bp,sn,hp,rpp)) >= 0) {
-				c = 1 ;
-			    } else if (isNotPresent(rs)) {
-	    			mip->rs_last = rs ;
-				rs = SR_OK ;
+	                char	*hbuf{} ;
+			if ((rs = malloc_hn(&hbuf)) >= 0) {
+			    cint	hlen = rs ;
+	                    char	*bp = hbuf ;
+	                    if (mip->ehostname != nullptr) {
+			        bp = mip->ehostname ;
 			    }
-	                }
+	                    if ((rs = snsds(bp,hlen,hn,dn)) >= 0) {
+			        ADDRINFO	*hp = aip->hintp ;
+			        ADDRINFO	**rpp = aip->rpp ;
+	                        cchar	*sn = aip->svcname ;
+				auto	gai = uc_getaddrinfo ;
+	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
+				    c = 1 ;
+			        } else if (isNotPresent(rs)) {
+	    			    mip->rs_last = rs ;
+				    rs = SR_OK ;
+			        }
+	                    } /* end if (snsds) */
+			    rs1 = uc_free(hbuf) ;
+			    if (rs >= 0) rs = rs1 ;
+			} /* end if (m-a-f) */
 	            } /* end if (subinfo_domain) */
-	        }
+	        } /* end if (isinetaddr) */
 	    }
 	}
 	return (rs >= 0) ? c : rs ;
