@@ -1,16 +1,15 @@
-/* comparse */
+/* comparse SUPPORT */
+/* lang=C++20 */
 
 /* comment-separate (parse) a mail header field value */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2004-05-29, David A­D­ Morano
-	This code was adapted from the EMA (E-Mail Address) code (which has
-	code that does a similar function).
+	This code was adapted from the EMA (E-Mail Address) code
+	(which has code that does a similar function).
 
 */
 
@@ -18,28 +17,26 @@
 
 /*******************************************************************************
 
-	This subroutine separates comment characters from the value characters
-	in a mail message header field value.  This is not meant for use with
-	mail addresses (although they certainly need to be comment-separated)
-	but rather with shorter fixed-length header field values.  This
-	subroutine was especially created to separate out the comments from the
+	This subroutine separates comment characters from the value
+	characters in a mail message header field value.  This is
+	not meant for use with mail addresses (although they certainly
+	need to be comment-separated) but rather with shorter
+	fixed-length header field values.  This subroutine was
+	especially created to separate out the comments from the
 	DATE header field value!
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
+#include	<usupport.h>		/* <- for |memclear(3u)| */
+#include	<ascii.h>
 #include	<buffer.h>
 #include	<char.h>
-#include	<ascii.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"comparse.h"
@@ -52,133 +49,95 @@
 #define	COMPARSE_SCOMMENT	1
 #define	COMPARSE_SOVERLAST	2
 
+#ifndef	MAILADDRLEN
+#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
+#endif
+
 
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forward references */
 
-int	comparse_bake(COMPARSE *,const char *,int) ;
+template<typename ... Args>
+static inline int comparse_magic(comparse *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == COMPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (comparse_magic) */
+
+static int	comparse_bake(comparse *,cchar *,int) noex ;
 
 
 /* local variables */
 
-#if	CF_DEBUGS
-static const char	*statename[] = {
-	"V",
-	"C",
-	NULL
-} ;
-#endif /* CF_DEBUGS */
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int comparse_start(COMPARSE *cpp,cchar *sp,int sl)
-{
-	int		rs ;
+int comparse_start(comparse *cpp,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-
-	if (cpp == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
+	if (cpp && sp) {
 	if (sl < 0) sl = strlen(sp) ;
-
-	memset(cpp,0,sizeof(COMPARSE)) ;
-
-#if	CF_DEBUGS
-	debugprintf("comparse_start: ent s=>%t<\n",sp,sl) ;
-#endif /* CF_DEBUGS */
-
-/* skip over any leading white space */
-
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-
-/* initialize for this entry */
-
-	if ((rs = comparse_bake(cpp,sp,sl)) >= 0) {
-	    vl = rs ;
-	    cpp->magic = COMPARSE_MAGIC ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("comparse_start: val=>%s<\n",cpp->val) ;
-	debugprintf("comparse_start: com=>%s<\n",cpp->com) ;
-	debugprintf("comparse_start: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
-
+	    memclear(cpp) ;		/* dangerous */
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
+	    }
+	    if ((rs = comparse_bake(cpp,sp,sl)) >= 0) {
+	        vl = rs ;
+	        cpp->magic = COMPARSE_MAGIC ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (comparse_start) */
 
-
-int comparse_finish(COMPARSE *cpp)
-{
-	int		rs = SR_OK ;
+int comparse_finish(comparse *cpp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (cpp == NULL) return SR_FAULT ;
-	if (cpp->magic != COMPARSE_MAGIC) return SR_NOTOPEN ;
-
-	if (cpp->val.sp != NULL) {
-	    rs1 = uc_free(cpp->val.sp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    cpp->val.sp = NULL ;
-	}
-
-	if (cpp->com.sp != NULL) {
-	    rs1 = uc_free(cpp->com.sp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    cpp->com.sp = NULL ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("comparse_finish: ret\n") ;
-#endif
-
-	cpp->magic = 0 ;
+	if ((rs = comparse_magic(cpp)) >= 0) {
+	    if (cpp->val.sp) {
+	        rs1 = uc_free(cpp->val.sp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        cpp->val.sp = nullptr ;
+	    }
+	    if (cpp->com.sp) {
+	        rs1 = uc_free(cpp->com.sp) ;
+	        if (rs >= 0) rs = rs1 ;
+	        cpp->com.sp = nullptr ;
+	    }
+	    cpp->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (comparse_finish) */
 
-
-int comparse_getval(COMPARSE *cpp,cchar **rpp)
-{
-	int		rs = 0 ;
-
-	if (cpp == NULL) return SR_FAULT ;
-	if (cpp->magic != COMPARSE_MAGIC) return SR_NOTOPEN ;
-
-	if (rpp != NULL)
-	    *rpp = cpp->val.sp ;
-
-	if (cpp->val.sp != NULL) rs = cpp->val.sl ;
-
-#if	CF_DEBUGS
-	debugprintf("comparse_getval: ret rs=%d\n",rs) ;
-#endif
-
+int comparse_getval(comparse *cpp,cchar **rpp) noex {
+	int		rs ;
+	if ((rs = comparse_magic(cpp)) >= 0) {
+	    if (rpp) *rpp = cpp->val.sp ;
+	    if (cpp->val.sp) rs = cpp->val.sl ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (comparse_getval) */
 
-
-int comparse_getcom(COMPARSE *cpp,cchar **rpp)
-{
-	int		rs = 0 ;
-
-	if (cpp == NULL) return SR_FAULT ;
-	if (cpp->magic != COMPARSE_MAGIC) return SR_NOTOPEN ;
-
-	if (rpp != NULL)
-	    *rpp = cpp->com.sp ;
-
-	if (cpp->com.sp != NULL) rs = cpp->com.sl ;
-
+int comparse_getcom(comparse *cpp,cchar **rpp) noex {
+	int		rs ;
+	if ((rs = comparse_magic(cpp)) >= 0) {
+	    if (rpp) *rpp = cpp->com.sp ;
+	    if (cpp->com.sp) rs = cpp->com.sl ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (comparse_getcom) */
@@ -186,11 +145,9 @@ int comparse_getcom(COMPARSE *cpp,cchar **rpp)
 
 /* private subroutines */
 
-
-int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
-{
-	BUFFER		as[COMPARSE_SOVERLAST] ;
-	const int	defsize = COMPARSE_DEFSIZE ;
+int comparse_bake(comparse *cpp,cchar *sp,int sl) noex {
+	buffer		as[COMPARSE_SOVERLAST] ;
+	cint		defsize = COMPARSE_DEFSIZE ;
 	int		rs ;
 	int		rs1 ;
 	int		cl ;
@@ -198,41 +155,19 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 	int		ch ;
 	int		vl = 0 ;
 	int		f_quote = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("comparse_bake: ent s=>%t<\n",sp,sl) ;
-#endif /* CF_DEBUGS */
-
-/* skip over any leading white space */
-
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-
-/* initialize for this entry */
-
 	if ((rs = buffer_start(&as[0],defsize)) >= 0) {
-
 	    if ((rs = buffer_start(&as[1],defsize)) >= 0) {
 	        int	pstate = COMPARSE_SVALUE ;
 	        int	state ;
 	        int	c_comment = 0 ;
-
-/* start scanning */
-
 	        state = COMPARSE_SVALUE ;
 	        while ((sl != 0) && (*sp != '\0')) {
-
-#if	CF_DEBUGS
-	            debugprintf("comparse_start: C='%c' S=%s P=%s cl=%d q=%d\n",
-	                sp[0],statename[state],
-	                statename[pstate],c_comment,f_quote) ;
-#endif
-
-	            ch = (*sp & 0xff) ;
+	            ch = mkchar(*sp) ;
 	            switch (ch) {
-
 	            case '\\':
 	                if (f_quote) {
 	                    sp += 1 ;
@@ -246,13 +181,11 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 	                    sl -= 1 ;
 	                }
 	                break ;
-
 	            case CH_DQUOTE:
 	                f_quote = (! f_quote) ;
 	                sp += 1 ;
 	                sl -= 1 ;
 	                break ;
-
 	            case CH_LPAREN:
 	                if (! f_quote) {
 	                    if (c_comment == 0) {
@@ -276,7 +209,6 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 	                    sl -= 1 ;
 	                }
 	                break ;
-
 	            case CH_RPAREN:
 	                if ((! f_quote) && (c_comment > 0)) {
 	                    c_comment -= 1 ;
@@ -293,11 +225,10 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 	                    sl -= 1 ;
 	                }
 	                break ;
-
 	            case ' ':
 	            case '\t':
 	                if (! f_quote) {
-	                    cl = buffer_get((as+state),NULL) ;
+	                    cl = buffer_get((as+state),nullptr) ;
 	                    pc = buffer_getprev(as+state) ;
 	                    if ((cl == 0) || ((pc >= 0) && CHAR_ISWHITE(pc))) {
 	                        sp += 1 ;
@@ -305,8 +236,8 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 	                        break ;
 	                    }
 	                } /* end if (not in a quote) */
-
-/* FALLTHROUGH */
+			fallthrough ;
+			/* FALLTHROUGH */
 	            default:
 	                if (c_comment > 0) {
 	                    buffer_char((as + COMPARSE_SCOMMENT),*sp++) ;
@@ -315,18 +246,11 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 			}
 	                sl -= 1 ;
 	                break ;
-
 	            } /* end switch */
-
 	        } /* end while (scanning characters) */
-
-#if	CF_DEBUGS
-	        debugprintf("comparse_start: finishing\n") ;
-#endif
-
 	        if (rs >= 0) {
-	            const char	*cp ;
-	            const char	*bp ;
+	            cchar	*cp ;
+	            cchar	*bp ;
 	            int		bl ;
 	            int		w = COMPARSE_SCOMMENT ;
 	            if ((rs = buffer_get((as+w),&bp)) >= 0) {
@@ -346,26 +270,17 @@ int comparse_bake(COMPARSE *cpp,cchar *sp,int sl)
 	                    }
 	                    if (rs < 0) {
 	                        uc_free(cpp->com.sp) ;
-	                        cpp->com.sp = NULL ;
+	                        cpp->com.sp = nullptr ;
 	                    }
 	                } /* end if (memory-allocation) */
 	            } /* end if (buffer_get) */
 	        } /* end if (finishing-up) */
-
 	        rs1 = buffer_finish(&as[1]) ;	/* comment */
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (buffer) */
-
 	    vl = buffer_finish(&as[0]) ;	/* value */
 	    if (rs >= 0) rs = vl ;
 	} /* end if (buffer) */
-
-#if	CF_DEBUGS
-	debugprintf("comparse_start: value=>%s<\n",cpp->val) ;
-	debugprintf("comparse_start: comment=>%s<\n",cpp->com) ;
-	debugprintf("comparse_start: ret rs=%d vl=%u\n",rs,vl) ;
-#endif
-
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (comparse_bake) */
