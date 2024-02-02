@@ -16,7 +16,7 @@
 
 /*******************************************************************************
  
-	This two small subroutine manipulate zone-offsets for use
+	These two small subroutines manipulate zone-offsets for use
 	in time strings.
 
 *******************************************************************************/
@@ -26,26 +26,28 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
 
 
-#define	ZOFFPARTS	struct zoffparts
+#define	ZOFFPARTS	struct zoffparts_head
 
 
-struct zoffparts {
+struct zoffparts_head {
 	uint	hours ;
 	uint	mins ;
 	int	zoff ;		/* value */
 } ;
 
+typedef ZOFFPARTS	zoffparts ;
+
 EXTERNC_begin
 
-extern int	zoffparts_set(ZOFFPARTS *,int) noex ;
-extern int	zoffparts_get(ZOFFPARTS *,int *) noex ;
-extern int	zoffparts_mkstr(ZOFFPARTS *,char *,int) noex ;
+extern int	zoffparts_set(zoffparts *,int) noex ;
+extern int	zoffparts_get(zoffparts *,int *) noex ;
+extern int	zoffparts_mkstr(zoffparts *,char *,int) noex ;
 
 EXTERNC_end
 

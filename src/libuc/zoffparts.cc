@@ -20,7 +20,7 @@
 	zoffparts_set
 
 	Description:
-	These two small subroutine manipulate zone-offsets for use
+	These two small subroutines manipulate zone-offsets for use
 	in time strings.  Set the value of the object from the
 	number of seconds the current timezone is west of GMT.
 
@@ -85,7 +85,7 @@ static int	storebuf_twodig(char *,int,int,int) noex ;
 
 /* exported subroutines */
 
-int zoffparts_set(ZOFFPARTS *zop,int v) noex {
+int zoffparts_set(zoffparts *zop,int v) noex {
 	int		rs = SR_FAULT ;
 	if (zop) {
 	    rs = SR_OK ;
@@ -98,7 +98,7 @@ int zoffparts_set(ZOFFPARTS *zop,int v) noex {
 }
 /* end subroutine (zoffparts_set) */
 
-int zoffparts_get(ZOFFPARTS *zop,int *vp) noex {
+int zoffparts_get(zoffparts *zop,int *vp) noex {
 	int		rs = SR_FAULT ;
 	int		v = 0 ;
 	if (zop) {
@@ -112,7 +112,7 @@ int zoffparts_get(ZOFFPARTS *zop,int *vp) noex {
 }
 /* end subroutine (zoffparts_get) */
 
-int zoffparts_mkstr(ZOFFPARTS *zop,char *rbuf,int rlen) noex {
+int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (zop) {

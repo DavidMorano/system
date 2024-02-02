@@ -1134,7 +1134,7 @@ intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
 digval.o:		digval.cc digval.h
-willaddover.o:		willaddover.c willaddover.h
+willaddover.o:		willaddover.cc willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h
