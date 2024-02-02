@@ -66,7 +66,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cerrno>
 #include	<climits>
 #include	<cstdlib>

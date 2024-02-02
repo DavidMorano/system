@@ -1,4 +1,4 @@
-/* ctb26 HEADER */
+/* cta26 HEADER */
 /* lang=C20 */
 
 /* subroutines to convert an integer to a base-26 string */
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CTB26_INCLUDE
-#define	CTB26_INCLUDE
+#ifndef	CTA26_INCLUDE
+#define	CTA26_INCLUDE
 
 
 #include	<envstandards.h>
@@ -27,17 +27,17 @@
 
 EXTERNC_begin
 
-extern int ctb26i(char *,int,int,int,int) noex ;
-extern int ctb26l(char *,int,int,int,long) noex ;
-extern int ctb26ll(char *,int,int,int,longlong) noex ;
+extern int cta26i(char *,int,int,int,int) noex ;
+extern int cta26l(char *,int,int,int,long) noex ;
+extern int cta26ll(char *,int,int,int,longlong) noex ;
 
-extern int ctb26ui(char *,int,int,int,uint) noex ;
-extern int ctb26ul(char *,int,int,int,ulong) noex ;
-extern int ctb26ull(char *,int,int,int,ulonglong) noex ;
+extern int cta26ui(char *,int,int,int,uint) noex ;
+extern int cta26ul(char *,int,int,int,ulong) noex ;
+extern int cta26ull(char *,int,int,int,ulonglong) noex ;
 
 EXTERNC_end
 
 
-#endif /* CTB26_INCLUDE */
+#endif /* CTA26_INCLUDE */
 
 

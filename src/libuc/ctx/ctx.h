@@ -1,4 +1,4 @@
-/* cfx HEADER */
+/* ctx HEADER */
 /* lang=C20 */
 
 /* convert a digit c-string to its integer value */
@@ -14,30 +14,30 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	CFX_INCLUDE
-#define	CFX_INCLUDE
+#ifndef	CTX_INCLUDE
+#define	CTX_INCLUDE
 
 
-#include	<envstandards.h>	/* ordered first to configure */
+#include	<envstandards.h>	/* first to configure */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 
-#include	<cfbin.h>
-#include	<cfoct.h>
-#include	<cfdec.h>
-#include	<cfhex.h>
-#include	<cfchars.h>
-#include	<cfa26.h>
-#include	<cfxxx.h>
+#include	<ctbin.h>
+#include	<ctoct.h>
+#include	<ctdec.h>
+#include	<cthex.h>
+#include	<ctchars.h>
+#include	<cta26.h>
+#include	<ctxxx.h>
 
-#include	<cfdect.h>
-#include	<cfdecf.h>
-#include	<cfdecmf.h>
-#include	<cfnum.h>
+#include	<ctdect.h>
+#include	<ctdect.h>
+#include	<ctdecmf.h>
+#include	<ctnum.h>
 
 
-#endif /* CFX_INCLUDE */
+#endif /* CTX_INCLUDE */
 
 

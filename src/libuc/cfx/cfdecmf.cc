@@ -48,7 +48,7 @@
 #include	<ascii.h>
 #include	<cfdec.h>
 #include	<char.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+#include	<toxc.h>
 
 #include	"cfdecmf.h"
 

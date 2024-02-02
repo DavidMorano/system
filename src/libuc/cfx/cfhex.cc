@@ -41,7 +41,6 @@
 #include	<usystem.h>
 #include	<stdintx.h>
 #include	<cfxxxx.hh>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cfdec.h"
 

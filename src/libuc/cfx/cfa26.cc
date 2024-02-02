@@ -1,7 +1,7 @@
-/* cfb26 SUPPORT */
+/* cfa26 SUPPORT */
 /* lang=C++20 */
 
-/* convert a base-26 digit string to its binary integer value */
+/* convert from Alpha (a base-26 numeric representation) */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,31 @@
 
 /*******************************************************************************
 
-	Subroutines to convert base-26 strings to binary integers.
+	Names:
+	cfa26i			(integer)
+	cfa26l			(long-integer)
+	cfa26ll			(longlong-integer)
+	cfa26ui			(unsigned-integer)
+	cfa26ul			(unsigned-long-integer)
+	cfa26ull		(unsigned-longlong-integer)
+
+	Description:
+	These subroutines convert numbers represented in a special
+	alphameric c-string scheme to their binary integer format.
+
+	Example:
+	alpha-representation	value-in-base-10
+	----------------------------------------
+	a			0
+	b			1
+	z			25
+	A			0
+	Z			25
+
+	Questions:
+	Q. What was this ever used for?
+	A. This represetnation was used for file-names that had a large
+	amount of information in its alphæmeric name.
 
 *******************************************************************************/
 
@@ -33,7 +57,7 @@
 #include	<ischarx.h>
 #include	<localmisc.h>
 
-#include	"cfb26.h"
+#include	"cfa26.h"
 
 
 /* local defines */
@@ -75,7 +99,7 @@ namespace {
 
 /* forward references */
 
-static int	icfb26(info *,cchar *,int) noex ;
+static int	icfa26(info *,cchar *,int) noex ;
 static bool	isbad(bool,int) noex ;
 
 
@@ -87,94 +111,94 @@ static bool	isbad(bool,int) noex ;
 
 /* exported subroutines */
 
-int cfb26i(cchar *sp,int sl,int *rp) noex {
+int cfa26i(cchar *sp,int sl,int *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    info	is ;
 	    is.maxdigs = MAXB26DIG_I ;
 	    is.st = true ;
 	    is.imask = (~ valuelimit.imax) ;
-	    rs = icfb26(&is,sp,sl) ;
+	    rs = icfa26(&is,sp,sl) ;
 	    *rp = int(is.result) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cfb26i) */
+/* end subroutine (cfa26i) */
 
-int cfb26l(cchar *sp,int sl,long *rp) noex {
+int cfa26l(cchar *sp,int sl,long *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    info	is ;
 	    is.maxdigs = MAXB26DIG_L ;
 	    is.st = true ;
 	    is.imask = (~ valuelimit.lmax) ;
-	    rs = icfb26(&is,sp,sl) ;
+	    rs = icfa26(&is,sp,sl) ;
 	    *rp = long(is.result) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cfb26l) */
+/* end subroutine (cfa26l) */
 
-int cfb26ll(cchar *sp,int sl,longlong *rp) noex {
+int cfa26ll(cchar *sp,int sl,longlong *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    info	is ;
 	    is.maxdigs = MAXB26DIG_LL ;
 	    is.st = true ;
 	    is.imask = (~ valuelimit.llmax) ;
-	    rs = icfb26(&is,sp,sl) ;
+	    rs = icfa26(&is,sp,sl) ;
 	    *rp = longlong(is.result) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cfb26ll) */
+/* end subroutine (cfa26ll) */
 
-int cfb26ui(cchar *sp,int sl,uint *rp) noex {
+int cfa26ui(cchar *sp,int sl,uint *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    info	is ;
 	    is.maxdigs = MAXB26DIG_UI ;
 	    is.st = false ;
 	    is.imask = (~ valuelimit.imax) ;
-	    rs = icfb26(&is,sp,sl) ;
+	    rs = icfa26(&is,sp,sl) ;
 	    *rp = uint(is.result) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cfb26ui) */
+/* end subroutine (cfa26ui) */
 
-int cfb26ul(cchar *sp,int sl,ulong *rp) noex {
+int cfa26ul(cchar *sp,int sl,ulong *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    info	is ;
 	    is.maxdigs = MAXB26DIG_UL ;
 	    is.st = false ;
 	    is.imask = (~ valuelimit.lmax) ;
-	    rs = icfb26(&is,sp,sl) ;
+	    rs = icfa26(&is,sp,sl) ;
 	    *rp = ulong(is.result) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cfb26ul) */
+/* end subroutine (cfa26ul) */
 
-int cfb26ull(cchar *sp,int sl,ulonglong *rp) noex {
+int cfa26ull(cchar *sp,int sl,ulonglong *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    info	is ;
 	    is.maxdigs = MAXB26DIG_ULL ;
 	    is.st = false ;
 	    is.imask = (~ valuelimit.llmax) ;
-	    rs = icfb26(&is,sp,sl) ;
+	    rs = icfa26(&is,sp,sl) ;
 	    *rp = ulonglong(is.result) ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cfb26ull) */
+/* end subroutine (cfa26ull) */
 
 
 /* local subroutines */
 
-static int icfb26(info *ip,cchar *asp,int asl) noex {
+static int icfa26(info *ip,cchar *asp,int asl) noex {
 	int		rs = SR_INVALID ;
 	cchar		*sp{} ;
 	ip->result = 0 ;
@@ -238,7 +262,7 @@ static int icfb26(info *ip,cchar *asp,int asl) noex {
 	} /* end if (valid) */
 	return rs ;
 }
-/* end subroutine (icfb26) */
+/* end subroutine (icfa26) */
 
 static bool isbad(bool fuc,int ch) noex {
 	bool		f ;

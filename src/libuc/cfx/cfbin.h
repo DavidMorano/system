@@ -18,7 +18,7 @@
 #define	CFBIN_INCLUDE
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>

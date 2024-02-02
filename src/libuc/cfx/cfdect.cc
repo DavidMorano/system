@@ -28,9 +28,8 @@
 #include	<strn.h>
 #include	<sfx.h>
 #include	<cfdec.h>
-#include	<mkchar.h>
 #include	<char.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+#include	<mkchar.h>
 
 
 /* local defines */

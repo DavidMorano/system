@@ -55,7 +55,6 @@
 #include	<mkchar.h>
 #include	<toxc.h>
 #include	<ischarx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 /* local defines */

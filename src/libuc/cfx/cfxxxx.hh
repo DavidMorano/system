@@ -47,19 +47,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<ucvariables.hh>
 #include	<stdintx.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<char.h>
-#include	<mkchar.h>
 #include	<checkbase.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 
 extern "C" {
