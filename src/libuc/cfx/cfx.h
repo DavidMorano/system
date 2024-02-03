@@ -18,7 +18,7 @@
 #define	CFX_INCLUDE
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -29,7 +29,7 @@
 #include	<cfdec.h>
 #include	<cfhex.h>
 #include	<cfchars.h>
-#include	<cfb26.h>
+#include	<cfa26.h>
 #include	<cfxxx.h>
 
 #include	<cfdect.h>

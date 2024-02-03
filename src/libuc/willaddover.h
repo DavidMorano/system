@@ -1,97 +1,52 @@
-/* willaddover */
+/* willaddover HEADER */
 /* lang=C20 */
 
-/* will an addition (generic) overflow? */
+/* convert a single character to a given case */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2012-11-21, David AÂ­DÂ­ Morano
-	I took this from some of my previous code.
+	= 1998-04-10, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2012 David A-D- Morano.  All rights reserved. */
-
-/******************************************************************************
-
-	Name:
-	willAddOver
-
-	Description:
-	This generic subroutine will determine if an addition will
-	overflow.
-
-	Synopsis:
-	int willAddOver(T n1, T n2)
-
-	Arguments:
-	n1		first number to add
-	n2		second number to add
-
-	Returns:
-	0 (false)	will not overflow
-	1 (true)	will overflow
-
-******************************************************************************/
+/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	WILLADDOVER_INCLUDE
 #define	WILLADDOVER_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<limits.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<valuelimits.hh>
-#include	<localmisc.h>
+#include	<stdintx.h>
 
 
 EXTERNC_begin
 
-extern int willAddOver(long n1,long n2) noex ;
+extern bool willaddoveri(int,int) noex ;
+extern bool willaddoverl(long,long) noex ;
+extern bool willaddoverll(longlong,longlong) noex ;
+
+static inline bool willAddOver(int n1,int n2) noex {
+	return willaddoveri(n1,n2) ;
+}
 
 EXTERNC_end
 
 #ifdef	__cplusplus
 
-template<T>
-int willAddOver(T n1,T n2) noex {
-	cint		s = sizeof(T) ;
-	T		min = 0 ;
-	T		max = 0 ;
-	int		f = FALSE ;
-	switch (s) {
-	case 1:
-	    min = SCHAR_MIN ;
-	    max = SCHAR_MAX ;
-	    break ;
-	case 2:
-	    min = SHRT_MIN ;
-	    max = SHRT_MAX ;
-	    break ;
-	case 4:
-	    min = INT_MIN ;
-	    max = INT_MAX ;
-	    break ;
-	case 8:
-	    min = LONG_MIN ;
-	    max = LONG_MAX ;
-	    break ;
-	case 16:
-	    min = valuelimit.llmin ;
-	    max = valuelimit.llmax ;
-	    break ;
-	} /* end switch */
-	if (max != 0) {
-	    f = f || (n1 > 0) && (n2 > 0) && (n1 > (max - n2)) ;
-	    f = f || (n1 < 0) && (n2 < 0) && (n1 < (min - n2)) ;
-	}
-	return f ;
+extern bool willaddover(int n1,int n2) noex {
+	return willaddoveri(n1,n2) ;
 }
-/* end subroutine (willAddOver) */
+extern bool willaddover(long n1,long n2) noex {
+	return willaddoverl(n1,n2) ;
+}
+extern bool willaddover(longlong n1,longlong n2) noex {
+	return willaddoverll(n1,n2) ;
+}
 
 #endif /* __cplusplus */
 

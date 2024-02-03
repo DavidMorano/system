@@ -41,7 +41,6 @@ extern bool hasvalidmagic(cchar *,int,cchar *) noex ;
 
 extern bool hasdoublewhite(cchar *,int) noex ;
 extern bool hasnonwhite(cchar *,int) noex ;
-extern bool hascontent(cchar *,int) noex ;
 extern bool hasempty(cchar *,int) noex ;
 extern bool hasnotempty(cchar *,int) noex ;
 extern bool hasnotdots(cchar *,int) noex ;
@@ -56,6 +55,10 @@ extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
 extern bool hasonlyminus(cchar *,int) noex ;
 extern bool hasonlyplusminus(cchar *,int) noex ;
+
+static inline bool hascontent(cchar *sp,int sl) noex {
+	return hasnotempty(sp,sl) ;
+}
 
 static inline bool hasValidMagic(cchar *sp,int sl,cchar *ms) noex  {
 	return hasvalidmagic(sp,sl,ms) ;

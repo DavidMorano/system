@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		length of buffer used by the conversion
-	<0		error in the conversion
+	<0		error in the conversion (system-return)
 
 *******************************************************************************/
 
@@ -50,7 +50,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<convertx.h>		/* <- the money shot! */
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 /* local defines */
@@ -66,7 +65,7 @@
 #define	TMPBUFLEN	(310+MAXPREC+2)	/* must be this large for floats */
 
 #define	DOFLOAT_STAGELEN	(310+MAXPREC+2)
-#define	DOFLOAT_DEFPREC		MIN(4,MAXPREC)
+#define	DOFLOAT_DEFPREC		min(4,MAXPREC)	/* <- uses |min(3c++)| */
 
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
@@ -74,7 +73,7 @@
 
 /* local namespaces */
 
-using std::min ;
+using std::min ;			/* subroutine-template */
 
 
 /* local typedefs */

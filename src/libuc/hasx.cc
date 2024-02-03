@@ -449,11 +449,6 @@ bool hasnonwhite(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasnonwhite) */
 
-bool hascontent(cchar *sp,int sl) noex {
-	return hasnotempty(sp,sl) ;
-}
-/* end subroutine (hascontent) */
-
 bool hasleadcolon(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while (sl && *sp) {

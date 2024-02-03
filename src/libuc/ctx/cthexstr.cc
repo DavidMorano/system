@@ -54,7 +54,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<sbuf.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cthexstr.h"
 

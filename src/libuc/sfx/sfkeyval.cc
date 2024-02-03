@@ -55,7 +55,7 @@
 
 	Returns:
 	>=0		length of found value c-string
-	<0		no key was found (system-return)
+	<0		no key was found
 
 *******************************************************************************/
 

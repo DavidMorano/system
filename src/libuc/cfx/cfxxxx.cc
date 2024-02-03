@@ -41,9 +41,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cfxxxx.hh"
 

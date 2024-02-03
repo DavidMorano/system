@@ -48,15 +48,16 @@
 #include	<ucvariables.hh>
 #include	<hasx.h>
 
+#include	"checkbase.h"
+
 
 /* local defines */
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern "C" {
-    extern int	checkbase(cchar *,int,int) noex ;
-}
+
+/* external subroutines */
 
 
 /* external variables */
@@ -71,6 +72,9 @@ extern "C" {
 /* local variables */
 
 static cint	maxbase = strlen(varname.digtab) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

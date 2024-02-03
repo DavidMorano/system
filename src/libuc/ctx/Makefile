@@ -60,7 +60,7 @@ OBJ2_CTX= ctoct.o
 OBJ3_CTX= ctdec.o ctdecp.o ctdecf.o
 
 OBJ4_CTX= cthex.o
-OBJ5_CTX= ctb26.o
+OBJ5_CTX= cta26.o
 OBJ6_CTX= ctroman.o ctwords.o
 OBJ7_CTX= xxtostr.o cvtdig.o
 
@@ -156,7 +156,7 @@ ctdecp.o:			ctdecp.cc ctdecp.h $(INCS)
 ctdecf.o:			ctdecf.cc ctdecf.h $(INCS)
 cthex.o:			cthex.cc cthex.h $(INCS)
 cthexstr.o:			cthexstr.cc cthexstr.h $(INCS)
-ctb26.o:			ctb26.cc ctb26.h $(INCS)
+cta26.o:			cta26.cc cta26.h $(INCS)
 ctxxx.o:			ctxxx.cc ctxxx.h $(INCS)
 ctroman.o:			ctroman.cc ctroman.h $(INCS)
 ctwords.o:			ctwords.cc ctwords.hh

@@ -50,7 +50,6 @@
 #include	<bit>
 #include	<usystem.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
 
 #include	"cvtdig.hh"
 

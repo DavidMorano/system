@@ -38,10 +38,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
 #include	<cfxxxx.hh>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cfoct.h"
 
@@ -66,6 +65,9 @@
 /* local variables */
 
 constexpr int	b = OURBASE ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

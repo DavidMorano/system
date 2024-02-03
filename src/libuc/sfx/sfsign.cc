@@ -34,8 +34,7 @@
 	rpp		pointer to result pointer to store found value
 
 	Returns:
-	>=0		length of found value c-string
-	<0		no key was found (system-return)
+	>=0		length of c-string after any found sign character
 
 *******************************************************************************/
 

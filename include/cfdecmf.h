@@ -18,12 +18,11 @@
 #define	CFDECMF_INCLUDE
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 
 EXTERNC_begin
@@ -61,7 +60,6 @@ static inline int cfdecmf(cchar *sp,int sl,ulonglong *rp) noex {
 }
 
 #endif /* __cplusplus */
-
 
 
 #endif /* CFDECMF_INCLUDE */

@@ -39,12 +39,13 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<cstring>
-#include	<usystem.h>
+#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<snwcpy.h>
 #include	<sfx.h>
-#include	<ischarx.h>
 #include	<char.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+#include	<mkchar.h>
+#include	<ischarx.h>
+#include	<localmisc.h>		/* <- for |DIGBUFLEN| below */
 
 #include	"cfdecf.h"
 
@@ -59,6 +60,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -82,7 +86,7 @@ int cfdecf(cchar *snp,int snl,double *rp) noex {
 	            bl = rs ;
 	        }
 	        if ((rs >= 0) && bl) {
-	            cint	ch = MKCHAR(*bp) ;
+	            cint	ch = mkchar(*bp) ;
 	            if ((! isdigitlatin(ch)) && (ch != '.')) {
 	                rs = SR_INVALID ;
 	            }

@@ -63,7 +63,6 @@
 #include	<clanguage.h>
 #include	<ucvariables.hh>
 #include	<sncpyx.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"ctchars.h"
 

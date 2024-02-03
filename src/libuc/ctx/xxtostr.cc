@@ -56,11 +56,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cerrno>
+#include	<cerrno>		/* <- for |errno| */
 #include	<climits>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 #include	"xxtostr.h"
 

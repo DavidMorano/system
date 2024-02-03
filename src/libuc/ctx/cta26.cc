@@ -1,4 +1,4 @@
-/* ctb26 SUPPORT */
+/* cta26 SUPPORT */
 /* lang=C++20 */
 
 /* subroutines to convert an integer to a base-26 string */
@@ -18,7 +18,7 @@
 /*******************************************************************************
 
 	Name:
-	ctb26x
+	cta26x
 
 	Description:
 	These subroutines convert an integer (signed or unsigned)
@@ -26,7 +26,7 @@
 	buffer (of specified length).
 
 	Synopsis:
-	int ctb26XX(char *rbuf,int rlen,int type,int prec,XX v) noex
+	int cta26XX(char *rbuf,int rlen,int type,int prec,XX v) noex
 
 	Arguments:
 	buf		caller supplied buffer
@@ -47,7 +47,7 @@
 #include	<sncpyx.h>
 #include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
-#include	"ctb26.h"
+#include	"cta26.h"
 
 
 /* local defines */
@@ -62,15 +62,15 @@
 /* external subroutines */
 
 extern "C" {
-    int		ctb26ll(char *,int,int,int,longlong) noex ;
-    int		ctb26ull(char *,int,int,int,ulonglong) noex ;
+    int		cta26ll(char *,int,int,int,longlong) noex ;
+    int		cta26ull(char *,int,int,int,ulonglong) noex ;
 }
 
 
 /* forward references */
 
 
-static int	ictb26(char *,int,int,int,ulonglong) noex ;
+static int	icta26(char *,int,int,int,ulonglong) noex ;
 
 
 /* local variables */
@@ -83,56 +83,56 @@ constexpr bool	f_remainder = CF_REMAINDER ;
 
 /* exported subroutines */
 
-int ctb26i(char *rbuf,int rlen,int type,int prec,int v) noex {
+int cta26i(char *rbuf,int rlen,int type,int prec,int v) noex {
 	ulonglong	ulv = ulonglong(v) ;
-	return ctb26ll(rbuf,rlen,type,prec,ulv) ;
+	return cta26ll(rbuf,rlen,type,prec,ulv) ;
 }
-/* end subroutine (ctb26i) */
+/* end subroutine (cta26i) */
 
-int ctb26l(char *rbuf,int rlen,int type,int prec,long v) noex {
+int cta26l(char *rbuf,int rlen,int type,int prec,long v) noex {
 	ulonglong	ulv = ulonglong(v) ;
-	return ctb26ll(rbuf,rlen,type,prec,ulv) ;
+	return cta26ll(rbuf,rlen,type,prec,ulv) ;
 }
-/* end subroutine (ctb26l) */
+/* end subroutine (cta26l) */
 
-int ctb26ll(char *rbuf,int rlen,int type,int prec,longlong v) noex {
+int cta26ll(char *rbuf,int rlen,int type,int prec,longlong v) noex {
 	ulonglong 	ulv = ulonglong(v) ;
 	cint		diglen = DIGBUFLEN ;
 	int		len ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	if (v < 0) ulv = (- ulv) ;
-	len = ictb26(digbuf,diglen,type,prec,ulv) ;
+	len = icta26(digbuf,diglen,type,prec,ulv) ;
 	if (v < 0) digbuf[diglen-(++len)] = '-' ;
 	return sncpy1(rbuf,rlen,(digbuf + diglen - len)) ;
 }
-/* end subroutine (ctb26ll) */
+/* end subroutine (cta26ll) */
 
-int ctb26ui(char *rbuf,int rlen,int type,int prec,uint v) noex {
+int cta26ui(char *rbuf,int rlen,int type,int prec,uint v) noex {
 	ulonglong 	ulv = ulonglong(v) ;
-	return ctb26ull(rbuf,rlen,type,prec,ulv) ;
+	return cta26ull(rbuf,rlen,type,prec,ulv) ;
 }
-/* end subroutine (ctb26ui) */
+/* end subroutine (cta26ui) */
 
-int ctb26ul(char *rbuf,int rlen,int type,int prec,ulong v) noex {
+int cta26ul(char *rbuf,int rlen,int type,int prec,ulong v) noex {
 	ulonglong 	ulv = ulonglong(v) ;
-	return ctb26ull(rbuf,rlen,type,prec,ulv) ;
+	return cta26ull(rbuf,rlen,type,prec,ulv) ;
 }
-/* end subroutine (ctb26ul) */
+/* end subroutine (cta26ul) */
 
-int ctb26ull(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
+int cta26ull(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	ulonglong 	ulv = ulonglong(v) ;
 	cint		diglen = DIGBUFLEN ;
 	int		len ;
 	char		digbuf[DIGBUFLEN + 1] ;
-	len = ictb26(digbuf,diglen,type,prec,ulv) ;
+	len = icta26(digbuf,diglen,type,prec,ulv) ;
 	return sncpy1(rbuf,rlen,(digbuf + diglen - len)) ;
 }
-/* end subroutine (ctb26ull) */
+/* end subroutine (cta26ull) */
 
 
 /* local subroutines */
 
-static int ictb26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
+static int icta26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	constexpr uint	base = DIGBASE ;
 	char		*rp = (rbuf + rlen) ;
 	*rp = '\0' ;
@@ -156,6 +156,6 @@ static int ictb26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	}
 	return (rbuf + rlen - rp) ;
 }
-/* end subroutine (ictb26) */
+/* end subroutine (icta26) */
 
 

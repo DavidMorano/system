@@ -20,7 +20,6 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
 #ifndef	VALUELIMITS_INCLUDE
 #define	VALUELIMITS_INCLUDE
 #ifdef	__cplusplus

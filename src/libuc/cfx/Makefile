@@ -61,7 +61,7 @@ OBJ3_CFX= cfdec.o cfdecf.o cfdecmf.o cfdect.o
 
 OBJ4_CFX= cfhex.o
 OBJ5_CFX= cfnum.o
-OBJ6_CFX= cfb26.o
+OBJ6_CFX= cfa26.o
 OBJ7_CFX= strtoxlonglong.o
 
 
@@ -149,7 +149,7 @@ objb_cfx.o:	$(OBJB_CFX)
 
 
 cfchars.o:			cfchars.cc cfchars.h cfcharsx.hh $(INCS)
-cfb26.o:			cfb26.cc cfb26.h $(INCS)
+cfa26.o:			cfa26.cc cfa26.h $(INCS)
 cfbin.o:			cfbin.cc cfbin.h $(INCS)
 cfoct.o:			cfoct.cc cfoct.h $(INCS)
 cfdec.o:			cfdec.cc cfdec.h $(INCS)

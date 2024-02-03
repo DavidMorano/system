@@ -41,10 +41,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
 #include	<cfxxxx.hh>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cfxxx.h"
 
@@ -74,6 +73,9 @@
 
 
 /* template-subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

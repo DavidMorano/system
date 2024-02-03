@@ -34,8 +34,8 @@
 	rpp		pointer to hold pointer to result (if found)
 
 	Returns:
-	<0		program-root not found
 	>=		program-root found and this is its length
+	<0		program-root not found
 
 	Example:
 	{

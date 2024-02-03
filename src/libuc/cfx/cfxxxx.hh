@@ -38,7 +38,6 @@
 
 	Subroutines to convert digit strings to binary integers.
 
-
 *******************************************************************************/
 
 #ifndef	CFXXXX_INCLUDE
@@ -47,19 +46,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<ucvariables.hh>
 #include	<stdintx.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
 #include	<char.h>
-#include	<mkchar.h>
 #include	<checkbase.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 
 extern "C" {
@@ -81,10 +74,9 @@ template<typename T>
 int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
-	    cchar	*nsp ;
-	    int		nsl ;
+	    cchar	*nsp{} ;
 	    rs = SR_DOM ;
-	    if ((nsl = sfshrink(sp,sl,&nsp)) > 0) {
+	    if (int nsl ; (nsl = sfshrink(sp,sl,&nsp)) > 0) {
 	        if (nsl > 1) {
 		    cint	r = rmleadzero(nsp,nsl) ;
 		    nsp += (nsl - r) ;

@@ -44,11 +44,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<cstring>		/* <- for |strnlen(3c)| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<stdintx.h>
 #include	<ascii.h>
 #include	<cfdec.h>
 #include	<char.h>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
+#include	<toxc.h>
 
 #include	"cfdecmf.h"
 
@@ -96,6 +100,9 @@ int cfdecmfx(int (*cfdecx)(cchar *,int,T *),cchar *sp,int sl,T *rp) noex {
 	return rs ;
 }
 /* end subroutine-template (cfdecmfx) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
