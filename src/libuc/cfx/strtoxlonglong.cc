@@ -219,7 +219,7 @@ longlong strtolonglong(cchar *nptr,char **endptr,int base) noex {
 				acc += c;
 			}
 		}
-	}
+	} /* end for */
 	if (endptr != nullptr) {
 	    *endptr = (char *) (any ? (s - 1) : nptr) ;
 	}
@@ -305,7 +305,7 @@ ulonglong strtoulonglong(cchar *nptr, char **endptr, int base) noex {
 			acc *= base ;
 			acc += c ;
 		}
-	}
+	} /* end for */
 	if (neg && any > 0) {
 	    acc = (-acc) ;
 	}

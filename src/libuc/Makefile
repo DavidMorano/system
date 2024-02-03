@@ -843,8 +843,6 @@ groupent.o:		groupent.cc groupent.h
 projectent.o:		projectent.cc projectent.h
 userattrent.o:		userattrent.cc userattrent.h
 
-findbit.o:		findbit.c findbit.h
-
 matstr.o:		matstr.cc matstr.h
 matostr.o:		matostr.cc matostr.h
 
@@ -1108,14 +1106,16 @@ ucmemla.o:		ucmemla.cc ucmemla.h
 pathadd.o:		pathadd.cc pathadd.h
 pathclean.o:		pathclean.cc pathclean.h
 
-
 nodedb.o:		nodedb.cc nodedb.h
-bits.o:			bits.cc bits.h
+
 envs.o:			envs.cc envs.h
 envs_procxe.o:		envs_procxe.cc envs.h
 envs_subs.o:		envs_subs.cc envs.h
 expcook.o:		expcook.cc expcook.h
 keyopt.o:		keyopt.cc keyopt.h
+
+findbit.o:		findbit.cc findbit.h
+bits.o:			bits.cc bits.h
 
 
 # sring-comparisons

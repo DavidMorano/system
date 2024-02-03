@@ -62,7 +62,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<bit>			/* <- for |countr_one(3c++)| */
+#include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -74,6 +74,14 @@
 
 /* local defines */
 
+using std::countr_zero ;		/* subroutine-template */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -82,7 +90,7 @@
 
 static inline constexpr int ffbsi(int b) noex {
 	cuint	n = uint(b) ;
-	return std::countr_zero(n) ;	/* <- first bit set */
+	return countr_zero(n) ;	/* <- first bit set */
 }
 
 

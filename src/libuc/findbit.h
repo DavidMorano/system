@@ -11,9 +11,11 @@
 #define FINDBIT_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<stdintx.h>
 
 
 EXTERNC_begin
