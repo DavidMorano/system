@@ -71,6 +71,8 @@
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cctype>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 

@@ -41,10 +41,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>
+#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
 #include	<cfxxxx.hh>
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cfdec.h"
 
@@ -77,6 +76,9 @@ constexpr int	b = OURBASE ;
 /* template-subroutines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int cfdeci(cchar *sp,int sl,int *rp) noex {
@@ -105,6 +107,5 @@ int cfdecull(cchar *sp,int sl,ulonglong *rp) noex {
 
 
 /* local subroutines */
-
 
 

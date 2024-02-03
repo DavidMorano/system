@@ -22,9 +22,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<cfdec.h>
@@ -47,6 +48,9 @@ static int	convert(cchar *,int,int,int *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

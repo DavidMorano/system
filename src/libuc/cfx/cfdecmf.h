@@ -62,7 +62,6 @@ static inline int cfdecmf(cchar *sp,int sl,ulonglong *rp) noex {
 #endif /* __cplusplus */
 
 
-
 #endif /* CFDECMF_INCLUDE */
 
 

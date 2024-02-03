@@ -45,6 +45,8 @@
 #include	<cstring>		/* for |strnlen(3c)| */
 #include	<concepts>
 #include	<usysrets.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
 #include	<cfbin.h>
 #include	<cfoct.h>

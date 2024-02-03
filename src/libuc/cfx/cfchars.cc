@@ -43,10 +43,12 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<charconv>
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
 #include	<cfcharsx.hh>		/* <- the money shot! */
-#include	<localmisc.h>		/* <- for |DIGBUFLEN| */
 
 #include	"cfchars.h"
 

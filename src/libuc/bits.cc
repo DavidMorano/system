@@ -36,7 +36,7 @@
 #include	<climits>		/* <- for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<bit>
+#include	<bit>			/* <- |countr_zero(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<stdintx.h>

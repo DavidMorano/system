@@ -14,7 +14,7 @@
 	myself back in the old days.
 
 	= 2020-04-23, David A-D- Morano
-	I updated the |ffbs| subroutine below to use the new C++20
+	I updated the |ffbsi| subroutine below to use the new C++20
 	find-first-bit-set intrinsic (often a single machine
 	instruction).
 
@@ -80,9 +80,9 @@
 
 /* forward references */
 
-static inline constexpr int ffbs(int b) noex {
+static inline constexpr int ffbsi(int b) noex {
 	cuint	n = uint(b) ;
-	return std::countr_one(n) ;
+	return std::countr_zero(n) ;	/* <- first bit set */
 }
 
 
@@ -98,7 +98,7 @@ static int ctdecx(char *dbuf,int dlen,UT &v) noex {
 	char		*rp = (dbuf + dlen) ;
 	*rp = '\0' ;
 	if (v != 0) {
-	    constexpr uint	ub = 10 ;
+	    constexpr uint	ub = base ;
 	    if constexpr (sizeof(UT) > sizeof(ulong)) {
 	        const UT	vmask(~ULONG_MAX) ;
 	        UT		nv ;
@@ -139,7 +139,7 @@ int sctdecx(char *dp,int dl,UT,T &v) noex {
 	int		rs = SR_FAULT ;
 	if (v < 0) ulv = (- ulv) ;
 	if (dp) {
-	    cint	t = ffbs(n) ;
+	    cint	t = ffbsi(n) ;
 	    {
 	        cint	dlen = digbufsize.bufsize[t][base] ;
 		{
@@ -160,7 +160,7 @@ int uctdecx(char *dp,int dl,UT &uv) noex {
 	cint		n = sizeof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
-	    cint	t = ffbs(n) ;
+	    cint	t = ffbsi(n) ;
 	    {
 	        cint	dlen = digbufsize.bufsize[t][base] ;
 		{
@@ -174,6 +174,9 @@ int uctdecx(char *dp,int dl,UT &uv) noex {
 	return rs ;
 }
 /* end subroutine-template (uctdecx) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

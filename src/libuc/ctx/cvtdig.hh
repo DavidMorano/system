@@ -30,7 +30,7 @@
 	Description:
 	This subroutine converts a value (and a base) into its
 	string representation. It only works for bases that are a
-	power-of-two, and also only for bases up to thirty two (32).
+	power-of-two, and also only for bases up to sixty four (64).
 
 	Synopsis:
 	template<typename UT>
@@ -47,6 +47,7 @@
 				8=octal
 				16=hexadecimal
 				32=
+				64=
 
 	Returns:
 	-		length of result characters

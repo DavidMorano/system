@@ -55,7 +55,6 @@
 #include	<sfx.h>
 #include	<char.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 #include	"cfa26.h"
 
