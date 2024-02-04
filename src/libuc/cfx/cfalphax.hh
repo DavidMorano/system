@@ -30,7 +30,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cerrno>
 #include	<climits>		/* for |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -63,7 +62,7 @@ struct cfashelp {
 	} ; /* end ctor */
 	void prepare() noex {
 	    cutoff = fneg ? tmin : tmax ;
-	    cutlim = (cutoff % base) ;
+	    cutlim = int(cutoff % base) ;
 	    cutoff /= base ;
 	    if (fneg) {
 		if (cutlim > 0) {

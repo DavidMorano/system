@@ -59,80 +59,24 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern "C" {
-    int		cta26ll(char *,int,int,int,longlong) noex ;
-    int		cta26ull(char *,int,int,int,ulonglong) noex ;
-}
+
+/* external variables */
 
 
-/* forward references */
-
-
-static int	icta26(char *,int,int,int,ulonglong) noex ;
-
-
-/* local variables */
+/* local subroutine-templates */
 
 constexpr bool	f_remainder = CF_REMAINDER ;
 
-
-/* exported variables */
-
-
-/* exported subroutines */
-
-int cta26i(char *rbuf,int rlen,int type,int prec,int v) noex {
-	ulonglong	ulv = ulonglong(v) ;
-	return cta26ll(rbuf,rlen,type,prec,ulv) ;
-}
-/* end subroutine (cta26i) */
-
-int cta26l(char *rbuf,int rlen,int type,int prec,long v) noex {
-	ulonglong	ulv = ulonglong(v) ;
-	return cta26ll(rbuf,rlen,type,prec,ulv) ;
-}
-/* end subroutine (cta26l) */
-
-int cta26ll(char *rbuf,int rlen,int type,int prec,longlong v) noex {
-	ulonglong 	ulv = ulonglong(v) ;
-	cint		diglen = DIGBUFLEN ;
-	int		len ;
-	char		digbuf[DIGBUFLEN + 1] ;
-	if (v < 0) ulv = (- ulv) ;
-	len = icta26(digbuf,diglen,type,prec,ulv) ;
-	if (v < 0) digbuf[diglen-(++len)] = '-' ;
-	return sncpy1(rbuf,rlen,(digbuf + diglen - len)) ;
-}
-/* end subroutine (cta26ll) */
-
-int cta26ui(char *rbuf,int rlen,int type,int prec,uint v) noex {
-	ulonglong 	ulv = ulonglong(v) ;
-	return cta26ull(rbuf,rlen,type,prec,ulv) ;
-}
-/* end subroutine (cta26ui) */
-
-int cta26ul(char *rbuf,int rlen,int type,int prec,ulong v) noex {
-	ulonglong 	ulv = ulonglong(v) ;
-	return cta26ull(rbuf,rlen,type,prec,ulv) ;
-}
-/* end subroutine (cta26ul) */
-
-int cta26ull(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
-	ulonglong 	ulv = ulonglong(v) ;
-	cint		diglen = DIGBUFLEN ;
-	int		len ;
-	char		digbuf[DIGBUFLEN + 1] ;
-	len = icta26(digbuf,diglen,type,prec,ulv) ;
-	return sncpy1(rbuf,rlen,(digbuf + diglen - len)) ;
-}
-/* end subroutine (cta26ull) */
-
-
-/* local subroutines */
-
-static int icta26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
+template<stdintx UT>
+static int icta26x(char *rbuf,int rlen,int type,int prec,UT v) noex {
 	constexpr uint	base = DIGBASE ;
 	char		*rp = (rbuf + rlen) ;
 	*rp = '\0' ;
@@ -142,7 +86,7 @@ static int icta26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	            *--rp = (char) ((v % base) + type) ;
 	            v = (v / base) ;
 		} else {
-		    const ulonglong	nv = (v / base) ;
+		    const UT	nv = (v / base) ;
 	            *--rp = (char) ((v - (nv * base)) + type) ;
 	            v = nv ;
 		} /* end if (f_remainder) */
@@ -156,6 +100,71 @@ static int icta26(char *rbuf,int rlen,int type,int prec,ulonglong v) noex {
 	}
 	return (rbuf + rlen - rp) ;
 }
-/* end subroutine (icta26) */
+/* end subroutine-template (icta26x) */
+
+template<stdintx UT,stdintx ST>
+int cta26sx(char *rbuf,int rlen,int type,int prec,ST v) noex {
+	UT		uv = (UT)(v) ;
+	cint		diglen = DIGBUFLEN ;
+	int		len ;
+	char		digbuf[DIGBUFLEN + 1] ;
+	if (v < 0) uv = (- uv) ;
+	len = icta26x(digbuf,diglen,type,prec,uv) ;
+	if (v < 0) digbuf[diglen-(++len)] = '-' ;
+	return sncpy1(rbuf,rlen,(digbuf + diglen - len)) ;
+}
+/* end subroutine (cta26sx) */
+
+template<stdintx T>
+int cta26ux(char *rbuf,int rlen,int type,int prec,T uv) noex {
+	cint		diglen = DIGBUFLEN ;
+	int		len ;
+	char		digbuf[DIGBUFLEN + 1] ;
+	len = icta26x(digbuf,diglen,type,prec,uv) ;
+	return sncpy1(rbuf,rlen,(digbuf + diglen - len)) ;
+}
+/* end subroutine (cta26ux) */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* exported subroutines */
+
+int cta26i(char *rbuf,int rlen,int type,int prec,int v) noex {
+	return cta26sx<uint>(rbuf,rlen,type,prec,v) ;
+}
+/* end subroutine (cta26i) */
+
+int cta26l(char *rbuf,int rlen,int type,int prec,long v) noex {
+	return cta26sx<ulong>(rbuf,rlen,type,prec,v) ;
+}
+/* end subroutine (cta26l) */
+
+int cta26ll(char *rbuf,int rlen,int type,int prec,longlong v) noex {
+	return cta26sx<ulonglong>(rbuf,rlen,type,prec,v) ;
+}
+/* end subroutine (cta26ll) */
+
+int cta26ui(char *rbuf,int rlen,int type,int prec,uint uv) noex {
+	return cta26ux(rbuf,rlen,type,prec,uv) ;
+}
+/* end subroutine (cta26ui) */
+
+int cta26ul(char *rbuf,int rlen,int type,int prec,ulong uv) noex {
+	return cta26ux(rbuf,rlen,type,prec,uv) ;
+}
+/* end subroutine (cta26ul) */
+
+int cta26ull(char *rbuf,int rlen,int type,int prec,ulonglong uv) noex {
+	return cta26ux(rbuf,rlen,type,prec,uv) ;
+}
+/* end subroutine (cta26ull) */
 
 

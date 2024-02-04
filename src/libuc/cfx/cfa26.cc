@@ -41,17 +41,16 @@
 	Q. What was this ever used for?
 	A. This represetnation was used for file-names that had a large
 	amount of information in its alphæmeric name.
+	Q. When was this invented?
+	A. Somewhere in the early to middle 1990s (back at AT&T).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
-#include	<cstring>		/* for |strlen(3c)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<ischarx.h>
 
 #include	"cfalphax.hh"		/* <- the money shot! */
 #include	"cfa26.h"
