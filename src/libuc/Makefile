@@ -404,7 +404,7 @@ TOBJ= $(TOBJG0) $(TOBJG1)
 
 UOBJ00= matxstr.o toxc.o char.o
 UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
-UOBJ02= snwcpyx.o strcpyxc.o
+UOBJ02= snwcpy.o strcpyxc.o
 UOBJ03= varnames.o syswords.o stdfnames.o
 
 UOBJ04= ischarx.o ulogerror.o strdcpy.o
@@ -993,8 +993,8 @@ snx.o:			snx.dir
 snx.dir:
 	makesubdir $@
 
-snwcpyx.o:		snwcpyx.dir
-snwcpyx.dir:
+snwcpy.o:		snwcpy.dir
+snwcpy.dir:
 	makesubdir $@
 
 # MATXSTR

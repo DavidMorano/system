@@ -1,6 +1,6 @@
-# MAKEFILES (snwcpyx)
+# MAKEFILES (snwcpy)
 
-T= snwcpyx
+T= snwcpy
 
 ALL= $(T).o $(T).a
 
@@ -57,7 +57,7 @@ INCS= snwcpy.h snwcpyx.h snwcpyxc.h
 OBJ0_SNWCPYX= snwcpyxc.o snwcpyopaque.o
 OBJ1_SNWCPYX= snwcpyclean.o snwcpylatin.o
 OBJ2_SNWCPYX= snwcpyshrink.o snwcpycompact.o
-OBJ3_SNWCPYX= snwcpy.o snwcpyrev.o
+OBJ3_SNWCPYX= snwcpyer.o snwcpyrev.o
 OBJ4_SNWCPYX= snwcpyhyphen.o snwcpywidehdr.o
 
 OBJA_SNWCPYX= obj0_snwcpyx.o obj1_snwcpyx.o
