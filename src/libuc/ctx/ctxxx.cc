@@ -44,7 +44,7 @@
 
 	Returns:
 	>=0		length of buffer used by the conversion
-	<0		error in the conversion
+	<0		error in the conversion (system-return)
 
 	Notes:
 	As it stands now, these subroutines do not perform any funny
@@ -75,6 +75,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
