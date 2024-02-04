@@ -1,10 +1,8 @@
-/* gecos */
+/* gecos SUPPORT */
+/* lang=C++20 */
 
 /* parse a GECOS field located in a buffer */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -18,22 +16,22 @@
 
 /*******************************************************************************
 
-        This module parses out the various GOCOS information as it is given in
-        its encoded form in a specified buffer.
+	This module parses out the various GOCOS information as it
+	is given in its encoded form in a specified buffer.
 
 	Extra Notes:
 
-        The GECOS field of the 'passwd' database should be formatted in one of
-        the following ways:
+	The GECOS field of the 'passwd' database should be formatted
+	in one of the following ways:
 
 	    name,office,workphone,homephone
 	    organization-name(account,bin)office,workphone,homephone,printer
 	    name(account)office,workphone,homephone,printer
 	    name
 
-        Note also that an ampersand character ('&') that appears anywhere in the
-        GCOS field is to be logically replaced by the corresponding username of
-        the entry.
+	Note also that an ampersand character ('&') that appears
+	anywhere in the GCOS field is to be logically replaced by
+	the corresponding username of the entry.
 
 	The original AT&T GECOS field contained:
 
@@ -46,13 +44,14 @@
 	    c_acct
 	    c_bin
 
-        If a real-name 'name' contains a hyphen character naturally (it is part
-        of the actual real-name) then it should be entered into the GECOS field
-        with an underscore substituted for where original hyphen charaters
-        appear. These are converted back to hyphen characters when read out to
-        callers by various "read-out" subroutine interfaces. This object does
-        not do this "hyphen" conversion itself and so a higher level interface
-        must perform that function.
+	If a real-name 'name' contains a hyphen character naturally
+	(it is part of the actual real-name) then it should be
+	entered into the GECOS field with an underscore substituted
+	for where original hyphen charaters appear. These are
+	converted back to hyphen characters when read out to callers
+	by various "read-out" subroutine interfaces. This object
+	does not do this "hyphen" conversion itself and so a higher
+	level interface must perform that function.
 
 	Some suggestions for the GECOS field are:
 
@@ -64,23 +63,17 @@
 	    XNR64430-d.a.morano(126483,BIN8221)
 	    rockwell-d.a.morano(126283,BIN8221)4B-411,5336,6175679484,hp0
 
-
 *******************************************************************************/
 
-
-#define	GECOS_MASTER	1
-
-
 #include	<envstandards.h>
-
-#include	<sys/types.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<ascii.h>
+#include	<strn.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"gecos.h"
@@ -97,11 +90,13 @@
 #endif
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -112,31 +107,32 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-static int	gecos_storeit(GECOS *,SBUF *,int) ;
-static int	gecos_storename(GECOS *,SBUF *,const char *) ;
+static int	gecos_storeit(GECOS *,sbuf *,int) noex ;
+static int	gecos_storename(GECOS *,sbuf *,cchar *) noex ;
 
 
 /* local variables */
 
-static const char	brkleft[] = {
+static cchar	brkleft[] = {
 	CH_COMMA, CH_LPAREN, '\0',
 } ;
 
-static const char	brkright[] = {
+static cchar	brkright[] = {
 	CH_COMMA, CH_RPAREN, '\0',
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int gecos_start(GECOS *op,cchar *sbuf,int slen)
-{
+int gecos_start(GECOS *op,cchar *sbuf,int slen) noex {
 	int		n ;
 	int		bl = slen ;
 	int		f_paren = FALSE ;
-	const char	*tp ;
-	const char	*bp ;
+	cchar	*tp ;
+	cchar	*bp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (sbuf == NULL) return SR_FAULT ;
@@ -148,10 +144,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 	n = 0 ;
 	bp = sbuf ;
 	bl = slen ;
-
-#if	CF_DEBUGS
-	debugprintf("gecos_start: start bl=%u\n",bl) ;
-#endif
 
 /* do we have the AT&T standard leading department/organization? */
 
@@ -172,10 +164,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 	} /* end if (organization) */
 
 /* OK, everybody has the real user name! */
-
-#if	CF_DEBUGS
-	debugprintf("gecos_start: realname bl=%u\n",bl) ;
-#endif
 
 	if (bl > 0) {
 
@@ -204,10 +192,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 
 /* do we have the standard AT&T account-bin information? */
 
-#if	CF_DEBUGS
-	debugprintf("gecos_start: account-bin bl=%u\n",bl) ;
-#endif
-
 	if (bl > 0) {
 
 	    if (f_paren &&
@@ -235,10 +219,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 	    } /* end if */
 
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("gecos_start: bin bl=%u\n",bl) ;
-#endif
 
 	if ((bl > 0) && f_paren) {
 
@@ -269,10 +249,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 
 /* what about the finger information stuff? */
 
-#if	CF_DEBUGS
-	debugprintf("gecos_start: office bl=%u\n",bl) ;
-#endif
-
 	if (bl > 0) {
 
 	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
@@ -296,10 +272,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 	    } /* end if */
 
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("gecos_start: wphone bl=%u\n",bl) ;
-#endif
 
 	if (bl > 0) {
 
@@ -325,10 +297,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("gecos_start: hphone bl=%u\n",bl) ;
-#endif
-
 	if (bl > 0) {
 
 	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
@@ -352,10 +320,6 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 	    } /* end if */
 
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("gecos_start: printer bl=%u\n",bl) ;
-#endif
 
 	if (bl > 0) {
 
@@ -385,14 +349,10 @@ int gecos_start(GECOS *op,cchar *sbuf,int slen)
 }
 /* end subroutine (gecos_start) */
 
-
-int gecos_finish(GECOS *op)
-{
-	int		i ;
-
+int gecos_finish(GECOS *op) noex {
 	if (op == NULL) return SR_FAULT ;
 
-	for (i = 0 ; i < gecosval_overlast ; i += 1) {
+	for (int i = 0 ; i < gecosval_overlast ; i += 1) {
 	    op->vals[i].vp = NULL ;
 	    op->vals[i].vl = 0 ;
 	}
@@ -401,10 +361,7 @@ int gecos_finish(GECOS *op)
 }
 /* end subroutine (gecos_finish) */
 
-
-int gecos_getval(GECOS *op,int i,cchar **rpp)
-{
-
+int gecos_getval(GECOS *op,int i,cchar **rpp) noex {
 	if (op == NULL) return SR_FAULT ;
 
 	if (i >= gecosval_overlast) return SR_INVALID ;
@@ -417,11 +374,8 @@ int gecos_getval(GECOS *op,int i,cchar **rpp)
 }
 /* end subroutine (gecos_getval) */
 
-
-/* create a GECOS field from the object values, put into a buffer */
-int gecos_compose(GECOS *op,char rbuf[],int rlen)
-{
-	SBUF		b ;
+int gecos_compose(GECOS *op,char rbuf[],int rlen) noex {
+	sbuf		b ;
 	int		rs ;
 	int		rs1 ;
 
@@ -437,7 +391,7 @@ int gecos_compose(GECOS *op,char rbuf[],int rlen)
 
 	    if (op->vals[gecosval_realname].vp != NULL) {
 	        int		vi = gecosval_realname ;
-	        const char	*tp ;
+	        cchar	*tp ;
 	        tp = strnchr(op->vals[vi].vp,op->vals[vi].vl,'-') ;
 	        if (tp != NULL) {
 	            gecos_storename(op,&b,tp) ;
@@ -500,23 +454,17 @@ int gecos_compose(GECOS *op,char rbuf[],int rlen)
 
 /* private subroutines */
 
-
-static int gecos_storeit(GECOS *op,SBUF *bp,int vi)
-{
+static int gecos_storeit(GECOS *op,sbuf *bp,int vi) noex {
 	int		rs ;
-
 	rs = sbuf_strw(bp,op->vals[vi].vp,op->vals[vi].vl) ;
-
 	return rs ;
 }
 /* end subroutine (gecos_storeit) */
 
-
-static int gecos_storename(GECOS *op,SBUF *bp,cchar *tp)
-{
+static int gecos_storename(GECOS *op,sbuf *bp,cchar *tp) noex {
 	int		vi = gecosval_realname ;
 	int		sl ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	sp = op->vals[vi].vp ;
 	sl = op->vals[vi].vl ;
