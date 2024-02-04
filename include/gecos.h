@@ -48,7 +48,7 @@ struct gecos_value {
 } ;
 
 struct gecos_head {
-	struct gecos_value	vals[gecosval_overlast] ;
+	GECOS_VAL	vals[gecosval_overlast] ;
 } ;
 
 typedef GECOS		gecos ;
@@ -56,10 +56,10 @@ typedef GECOS_VAL	gecos_val ;
 
 EXTERNC_begin
 
-extern int	gecos_start(GECOS *,cchar *,int) noex ;
-extern int	gecos_compose(GECOS *,char *,int) noex ;
-extern int	gecos_getval(GECOS *,int,cchar **) noex ;
-extern int	gecos_finish(GECOS *) noex ;
+extern int	gecos_start(gecos *,cchar *,int) noex ;
+extern int	gecos_compose(gecos *,char *,int) noex ;
+extern int	gecos_getval(gecos *,int,cchar **) noex ;
+extern int	gecos_finish(gecos *) noex ;
 
 EXTERNC_end
 

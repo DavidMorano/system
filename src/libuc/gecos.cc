@@ -1,7 +1,7 @@
 /* gecos SUPPORT */
 /* lang=C++20 */
 
-/* parse a GECOS field located in a buffer */
+/* parse a gecos field located in a buffer */
 /* version %I% last-modified %G% */
 
 
@@ -19,9 +19,9 @@
 	This module parses out the various GOCOS information as it
 	is given in its encoded form in a specified buffer.
 
-	Extra Notes:
+	Extra npotes:
 
-	The GECOS field of the 'passwd' database should be formatted
+	The gecos field of the 'passwd' database should be formatted
 	in one of the following ways:
 
 	    name,office,workphone,homephone
@@ -31,9 +31,10 @@
 
 	Note also that an ampersand character ('&') that appears
 	anywhere in the GCOS field is to be logically replaced by
-	the corresponding username of the entry.
+	the corresponding username of the entry.  This substitution is
+	not done in this module.
 
-	The original AT&T GECOS field contained:
+	The original AT&T gecos field contained:
 
 	    department-name(account,bin)
 
@@ -46,14 +47,14 @@
 
 	If a real-name 'name' contains a hyphen character naturally
 	(it is part of the actual real-name) then it should be
-	entered into the GECOS field with an underscore substituted
-	for where original hyphen charaters appear. These are
+	entered into the gecos field with an underscore substituted
+	for where original hyphen charaters appear.  These are
 	converted back to hyphen characters when read out to callers
-	by various "read-out" subroutine interfaces. This object
+	by various "read-out" subroutine interfaces.  This object
 	does not do this "hyphen" conversion itself and so a higher
 	level interface must perform that function.
 
-	Some suggestions for the GECOS field are:
+	Some alternatives for the gecos field are:
 
 	    orgdept-name(account,bin)office,workphone,homephone
 	    orgdept-name(account,bin)office,workphone,homephone,printer
@@ -65,11 +66,11 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<unistd.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>		/* <- for |memclear(3c++)| */
 #include	<sbuf.h>
 #include	<ascii.h>
 #include	<strn.h>
@@ -81,16 +82,10 @@
 
 /* local defines */
 
-#undef	N
-#define	N		NULL
-
-#ifndef	CH_LPAREN
-#define	CH_LPAREN	0x28
-#define	CH_RPAREN	0x29
-#endif
-
 
 /* local namespaces */
+
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -104,21 +99,67 @@
 
 /* local structures */
 
+namespace {
+    struct gecoshelp ;
+    typedef void (gecoshelp::*gecoshelp_f)() noex ;
+    struct gecoshelp {
+	const nullptr_t	np{} ;
+	gecos		*op ;
+	cchar		*sp ;
+	cchar		*bp{} ;
+	int		sl ;
+	int		bl{} ;
+	int		n = 0 ;		/* num fields retrieved */
+	bool		fparen = false ;
+	gecoshelp(gecos *aop,cchar *asp,int asl) noex {
+	    op = aop ;
+	    if (asl < 0) asl = strlen(asp) ;
+	    sp = asp ;
+	    sl = asl ;
+	    bp = asp ;
+	    bl = asl ;
+	} ; /* end ctor */
+	int start() noex ;
+	int finish() noex ;
+	void organization() noex ;
+	void realname() noex ;
+	void account() noex ;
+	void bin() noex ;
+	void office() noex ;
+	void wphone() noex ;
+	void hphone() noex ;
+	void printer() noex ;
+	void proc() noex ;
+    } ; /* end struct (gecoshelp) */
+}
+
 
 /* forward references */
 
-static int	gecos_storeit(GECOS *,sbuf *,int) noex ;
-static int	gecos_storename(GECOS *,sbuf *,cchar *) noex ;
+static int	gecos_storeit(gecos *,sbuf *,int) noex ;
+static int	gecos_storename(gecos *,sbuf *,cchar *) noex ;
 
 
 /* local variables */
 
-static cchar	brkleft[] = {
-	CH_COMMA, CH_LPAREN, '\0',
+static constexpr cchar	brkleft[] = {
+	CH_COMMA, CH_LPAREN, '\0'
 } ;
 
-static cchar	brkright[] = {
-	CH_COMMA, CH_RPAREN, '\0',
+static constexpr cchar	brkright[] = {
+	CH_COMMA, CH_RPAREN, '\0'
+} ;
+
+static const gecoshelp_f	gmems[] = {
+	&gecoshelp::organization,
+	&gecoshelp::realname,
+	&gecoshelp::account,
+	&gecoshelp::bin,
+	&gecoshelp::office,
+	&gecoshelp::wphone,
+	&gecoshelp::hphone,
+	&gecoshelp::printer,
+	nullptr
 } ;
 
 
@@ -127,326 +168,110 @@ static cchar	brkright[] = {
 
 /* exported subroutines */
 
-int gecos_start(GECOS *op,cchar *sbuf,int slen) noex {
-	int		n ;
-	int		bl = slen ;
-	int		f_paren = FALSE ;
-	cchar	*tp ;
-	cchar	*bp ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (sbuf == NULL) return SR_FAULT ;
-
-	memset(op,0,sizeof(GECOS)) ;
-
-	if (slen < 0) slen = strlen(sbuf) ;
-
-	n = 0 ;
-	bp = sbuf ;
-	bl = slen ;
-
-/* do we have the AT&T standard leading department/organization? */
-
-	if ((tp = strnchr(bp,bl,'-')) != N) {
-
-	    if ((strnpbrk(tp,(bl - (tp - bp)),brkleft) != NULL) ||
-	        (strnpbrk(bp,(tp - bp),brkleft) == NULL)) {
-
-	        n += 1 ;
-	        op->vals[gecosval_organization].vp = bp ;
-	        op->vals[gecosval_organization].vl = (tp - bp) ;
-
-	        bp = (tp + 1) ;
-	        bl = ((sbuf + slen) - (tp + 1)) ;
-
-	    } /* end if */
-
-	} /* end if (organization) */
-
-/* OK, everybody has the real user name! */
-
-	if (bl > 0) {
-
-	    if ((tp = strnpbrk(bp,bl,brkleft)) != N) {
-
-	        if (tp[0] == CH_LPAREN)
-	            f_paren = TRUE ;
-
-	        n += 1 ;
-	        op->vals[gecosval_realname].vp = bp ;
-	        op->vals[gecosval_realname].vl = (tp - bp) ;
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else {
-
-	        n += 1 ;
-	        op->vals[gecosval_realname].vp = bp ;
-	        op->vals[gecosval_realname].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if */
-
-/* do we have the standard AT&T account-bin information? */
-
-	if (bl > 0) {
-
-	    if (f_paren &&
-	        ((tp = strnpbrk(bp,bl,brkright)) != N)) {
-
-	        if (tp[0] == CH_RPAREN)
-	            f_paren = FALSE ;
-
-	        if (tp - bp) {
-	            n += 1 ;
-	            op->vals[gecosval_account].vp = bp ;
-	            op->vals[gecosval_account].vl = (tp - bp) ;
-	        }
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else {
-
-	        n += 1 ;
-	        op->vals[gecosval_bin].vp = bp ;
-	        op->vals[gecosval_bin].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if */
-
-	if ((bl > 0) && f_paren) {
-
-	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
-
-	        if (tp[0] == CH_RPAREN)
-	            f_paren = FALSE ;
-
-	        if ((tp - bp) && (op->vals[gecosval_bin].vp == NULL)) {
-	            n += 1 ;
-	            op->vals[gecosval_bin].vp = bp ;
-	            op->vals[gecosval_bin].vl = (tp - bp) ;
-	        }
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else if (op->vals[gecosval_bin].vp == NULL) {
-
-	        n += 1 ;
-	        op->vals[gecosval_bin].vp = bp ;
-	        op->vals[gecosval_bin].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if (possible printer-bin item) */
-
-/* what about the finger information stuff? */
-
-	if (bl > 0) {
-
-	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
-
-	        if (tp - bp) {
-	            n += 1 ;
-	            op->vals[gecosval_office].vp = bp ;
-	            op->vals[gecosval_office].vl = (tp - bp) ;
-	        }
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else {
-
-	        n += 1 ;
-	        op->vals[gecosval_office].vp = bp ;
-	        op->vals[gecosval_office].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if */
-
-	if (bl > 0) {
-
-	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
-
-	        if (tp - bp) {
-	            n += 1 ;
-	            op->vals[gecosval_wphone].vp = bp ;
-	            op->vals[gecosval_wphone].vl = (tp - bp) ;
-	        }
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else if (op->vals[gecosval_office].vp == NULL) {
-
-	        n += 1 ;
-	        op->vals[gecosval_office].vp = bp ;
-	        op->vals[gecosval_office].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if */
-
-	if (bl > 0) {
-
-	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
-
-	        if (tp - bp) {
-	            n += 1 ;
-	            op->vals[gecosval_hphone].vp = bp ;
-	            op->vals[gecosval_hphone].vl = (tp - bp) ;
-	        }
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else {
-
-	        n += 1 ;
-	        op->vals[gecosval_hphone].vp = bp ;
-	        op->vals[gecosval_hphone].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if */
-
-	if (bl > 0) {
-
-	    if ((tp = strnpbrk(bp,bl,brkright)) != N) {
-
-	        if (tp - bp) {
-	            n += 1 ;
-	            op->vals[gecosval_printer].vp = bp ;
-	            op->vals[gecosval_printer].vl = (tp - bp) ;
-	        }
-
-	        bp = (tp + 1) ;
-	        bl = (sbuf + slen) - (tp + 1) ;
-
-	    } else {
-
-	        n += 1 ;
-	        op->vals[gecosval_printer].vp = bp ;
-	        op->vals[gecosval_printer].vl = bl ;
-	        bl = 0 ;
-
-	    } /* end if */
-
-	} /* end if */
-
-	return n ;
+int gecos_start(gecos *op,cchar *sbuf,int slen) noex {
+	int		rs = SR_FAULT ;
+	int		n = 0 ;
+	if (op && sbuf) {
+	    gecoshelp	ho(op,sbuf,slen) ;
+	    memclear(op) ;
+	    if ((rs = ho.start()) >= 0) {
+		{
+		    ho.proc() ;
+		}
+	        n = ho.finish() ;
+	        if (rs >= 0) rs = n ;
+	    } /* end if (ho) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (gecos_start) */
 
-int gecos_finish(GECOS *op) noex {
-	if (op == NULL) return SR_FAULT ;
-
-	for (int i = 0 ; i < gecosval_overlast ; i += 1) {
-	    op->vals[i].vp = NULL ;
-	    op->vals[i].vl = 0 ;
-	}
-
-	return SR_OK ;
+int gecos_finish(gecos *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    for (int i = 0 ; i < gecosval_overlast ; i += 1) {
+	        op->vals[i].vp = nullptr ;
+	        op->vals[i].vl = 0 ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (gecos_finish) */
 
-int gecos_getval(GECOS *op,int i,cchar **rpp) noex {
-	if (op == NULL) return SR_FAULT ;
-
-	if (i >= gecosval_overlast) return SR_INVALID ;
-
-	if (rpp != NULL) {
-	    *rpp = op->vals[i].vp ;
-	}
-
-	return op->vals[i].vl ;
+int gecos_getval(gecos *op,int i,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_INVALID ;
+	    if (i < gecosval_overlast) {
+	        rs = op->vals[i].vl ;
+	        if (rpp) {
+	            *rpp = op->vals[i].vp ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (gecos_getval) */
 
-int gecos_compose(GECOS *op,char rbuf[],int rlen) noex {
-	sbuf		b ;
-	int		rs ;
+int gecos_compose(gecos *op,char *rbuf,int rlen) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	    int	f_paren = FALSE ;
-
-	    if (op->vals[gecosval_organization].vp != NULL) {
-	        gecos_storeit(op,&b,gecosval_organization) ;
-	        sbuf_strw(&b,"-",1) ;
-	    }
-
-	    if (op->vals[gecosval_realname].vp != NULL) {
-	        int		vi = gecosval_realname ;
-	        cchar	*tp ;
-	        tp = strnchr(op->vals[vi].vp,op->vals[vi].vl,'-') ;
-	        if (tp != NULL) {
-	            gecos_storename(op,&b,tp) ;
-	        } else {
-	            gecos_storeit(op,&b,gecosval_realname) ;
-		}
-	    } /* end if (realname) */
-
-/* do we have account and printer-bin information? */
-
-	    if ((op->vals[gecosval_account].vp != NULL) || 
-	        (op->vals[gecosval_bin].vp != NULL)) {
-	        f_paren = TRUE ;
-	        sbuf_char(&b,CH_LPAREN) ;
-	    }
-
-	    if (op->vals[gecosval_account].vp != NULL) {
-	        gecos_storeit(op,&b,gecosval_account) ;
-	    }
-
-	    if (op->vals[gecosval_bin].vp != NULL) {
-	        sbuf_strw(&b,",",1) ;
-	        gecos_storeit(op,&b,gecosval_bin) ;
-	    }
-
-	    if (f_paren) {
-	        sbuf_char(&b,CH_RPAREN) ;
-	    }
-
-/* do we have the old finger stuff */
-
-	    if (op->vals[gecosval_office].vp != NULL) {
-	        if (! f_paren) sbuf_strw(&b,",",1) ;
-	        gecos_storeit(op,&b,gecosval_office) ;
-	    }
-
-	    if (op->vals[gecosval_wphone].vp != NULL) {
-	        sbuf_strw(&b,",",1) ;
-	        gecos_storeit(op,&b,gecosval_wphone) ;
-	    }
-
-	    if (op->vals[gecosval_hphone].vp != NULL) {
-	        sbuf_strw(&b,",",1) ;
-	        gecos_storeit(op,&b,gecosval_hphone) ;
-	    }
-
-	    if (op->vals[gecosval_printer].vp != NULL) {
-	        sbuf_strw(&b,",",1) ;
-	        gecos_storeit(op,&b,gecosval_printer) ;
-	    }
-
-	    rs1 = sbuf_finish(&b) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (sbuf) */
-
+	if (op && rbuf) {
+            sbuf            b ;
+            if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+                bool        fparen = false ;
+                if (op->vals[gecosval_organization].vp != nullptr) {
+                    gecos_storeit(op,&b,gecosval_organization) ;
+                    sbuf_strw(&b,"-",1) ;
+                }
+                if (op->vals[gecosval_realname].vp != nullptr) {
+                    int     vi = gecosval_realname ;
+                    cchar   *tp ;
+                    tp = strnchr(op->vals[vi].vp,op->vals[vi].vl,'-') ;
+                    if (tp != nullptr) {
+                        gecos_storename(op,&b,tp) ;
+                    } else {
+                        gecos_storeit(op,&b,gecosval_realname) ;
+                    }
+                } /* end if (realname) */
+    /* do we have account and printer-bin information? */
+                if ((op->vals[gecosval_account].vp != nullptr) || 
+                    (op->vals[gecosval_bin].vp != nullptr)) {
+                    fparen = true ;
+                    sbuf_char(&b,CH_LPAREN) ;
+                }
+                if (op->vals[gecosval_account].vp != nullptr) {
+                    gecos_storeit(op,&b,gecosval_account) ;
+                }
+                if (op->vals[gecosval_bin].vp != nullptr) {
+                    sbuf_strw(&b,",",1) ;
+                    gecos_storeit(op,&b,gecosval_bin) ;
+                }
+                if (fparen) {
+                    sbuf_char(&b,CH_RPAREN) ;
+                }
+    /* do we have the old finger stuff */
+                if (op->vals[gecosval_office].vp != nullptr) {
+                    if (! fparen) sbuf_strw(&b,",",1) ;
+                    gecos_storeit(op,&b,gecosval_office) ;
+                }
+                if (op->vals[gecosval_wphone].vp != nullptr) {
+                    sbuf_strw(&b,",",1) ;
+                    gecos_storeit(op,&b,gecosval_wphone) ;
+                }
+                if (op->vals[gecosval_hphone].vp != nullptr) {
+                    sbuf_strw(&b,",",1) ;
+                    gecos_storeit(op,&b,gecosval_hphone) ;
+                }
+                if (op->vals[gecosval_printer].vp != nullptr) {
+                    sbuf_strw(&b,",",1) ;
+                    gecos_storeit(op,&b,gecosval_printer) ;
+                }
+                rs1 = sbuf_finish(&b) ;
+                if (rs >= 0) rs = rs1 ;
+            } /* end if (sbuf) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (gecos_compose) */
@@ -454,51 +279,205 @@ int gecos_compose(GECOS *op,char rbuf[],int rlen) noex {
 
 /* private subroutines */
 
-static int gecos_storeit(GECOS *op,sbuf *bp,int vi) noex {
+static int gecos_storeit(gecos *op,sbuf *bp,int vi) noex {
 	int		rs ;
 	rs = sbuf_strw(bp,op->vals[vi].vp,op->vals[vi].vl) ;
 	return rs ;
 }
 /* end subroutine (gecos_storeit) */
 
-static int gecos_storename(GECOS *op,sbuf *bp,cchar *tp) noex {
+static int gecos_storename(gecos *op,sbuf *bp,cchar *tp) noex {
+	int		rs = SR_OK ;
 	int		vi = gecosval_realname ;
 	int		sl ;
-	cchar	*sp ;
-
+	cchar		*sp ;
 	sp = op->vals[vi].vp ;
 	sl = op->vals[vi].vl ;
-
 /* store the initial segment of the name */
-
 	if ((tp - sp) > 0) {
 	    sbuf_strw(bp,sp,(tp - sp)) ;
 	    sl -= (tp - sp) ;
 	    sp = tp ;
 	}
-
 /* make the substitution */
-
 	{
 	    sbuf_char(bp,'_') ;
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-
 /* loop searching for other segments */
-
-	while ((tp = strnchr(sp,sl,'-')) != NULL) {
+	while ((tp = strnchr(sp,sl,'-')) != nullptr) {
 	    sbuf_strw(bp,sp,(tp - sp)) ;
 	    sl -= (tp - sp) ;
 	    sp = tp ;
 	} /* end while */
-
 	if (sl > 0) {
-	    sbuf_strw(bp,sp,sl) ;
+	    rs = sbuf_strw(bp,sp,sl) ;
 	}
-
-	return 0 ;
+	return rs ;
 }
 /* end subroutine (gecos_storename) */
+
+void gecoshelp::organization() noex {
+	if (cchar *tp ; (tp = strnchr(bp,bl,'-')) != np) {
+	    bool	f = false ;
+	    f = f || (strnpbrk(tp,(bl - (tp - bp)),brkleft) != nullptr) ;
+	    f = f || (strnpbrk(bp,(tp - bp),brkleft) == nullptr) ;
+	    if (f) {
+	        n += 1 ;
+	        op->vals[gecosval_organization].vp = bp ;
+	        op->vals[gecosval_organization].vl = (tp - bp) ;
+	        bp = (tp + 1) ;
+	        bl = ((sp + sl) - (tp + 1)) ;
+	    } /* end if */
+	} /* end if (organization) */
+}
+/* end method (gecoshelp::organization) */
+
+int gecoshelp::start() noex {
+	return sl ;
+}
+
+int gecoshelp::finish() noex {
+	return n ;
+}
+
+void gecoshelp::realname() noex {
+	    if (cchar *tp ; (tp = strnpbrk(bp,bl,brkleft)) != np) {
+	        if (tp[0] == CH_LPAREN) fparen = true ;
+	        n += 1 ;
+	        op->vals[gecosval_realname].vp = bp ;
+	        op->vals[gecosval_realname].vl = (tp - bp) ;
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else {
+	        n += 1 ;
+	        op->vals[gecosval_realname].vp = bp ;
+	        op->vals[gecosval_realname].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+}
+/* end method (gecoshelp::realname) */
+
+void gecoshelp::account() noex {
+	cchar		*tp ;
+	if (fparen && ((tp = strnpbrk(bp,bl,brkright)) != np)) {
+	    if (tp[0] == CH_RPAREN) fparen = false ;
+	        if (tp - bp) {
+	            n += 1 ;
+	            op->vals[gecosval_account].vp = bp ;
+	            op->vals[gecosval_account].vl = (tp - bp) ;
+	        }
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else {
+	        n += 1 ;
+	        op->vals[gecosval_bin].vp = bp ;
+	        op->vals[gecosval_bin].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+}
+/* end method (gecoshelp::account) */
+
+void gecoshelp::bin() noex {
+	if (fparen) {
+	    if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	        if (tp[0] == CH_RPAREN) fparen = false ;
+	        if ((tp - bp) && (op->vals[gecosval_bin].vp == nullptr)) {
+	            n += 1 ;
+	            op->vals[gecosval_bin].vp = bp ;
+	            op->vals[gecosval_bin].vl = (tp - bp) ;
+	        }
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else if (op->vals[gecosval_bin].vp == nullptr) {
+	        n += 1 ;
+	        op->vals[gecosval_bin].vp = bp ;
+	        op->vals[gecosval_bin].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+	} /* end if (possible printer-bin item) */
+}
+/* end method (gecoshelp::bin) */
+
+void gecoshelp::office() noex {
+	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	        if (tp - bp) {
+	            n += 1 ;
+	            op->vals[gecosval_office].vp = bp ;
+	            op->vals[gecosval_office].vl = (tp - bp) ;
+	        }
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else {
+	        n += 1 ;
+	        op->vals[gecosval_office].vp = bp ;
+	        op->vals[gecosval_office].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+}
+/* end method (gecoshelp::office) */
+
+void gecoshelp::wphone() noex {
+	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	        if (tp - bp) {
+	            n += 1 ;
+	            op->vals[gecosval_wphone].vp = bp ;
+	            op->vals[gecosval_wphone].vl = (tp - bp) ;
+	        }
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else if (op->vals[gecosval_office].vp == nullptr) {
+	        n += 1 ;
+	        op->vals[gecosval_office].vp = bp ;
+	        op->vals[gecosval_office].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+}
+/* end method (gecoshelp::wphone) */
+
+void gecoshelp::hphone() noex {
+	if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	        if (tp - bp) {
+	            n += 1 ;
+	            op->vals[gecosval_hphone].vp = bp ;
+	            op->vals[gecosval_hphone].vl = (tp - bp) ;
+	        }
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else {
+	        n += 1 ;
+	        op->vals[gecosval_hphone].vp = bp ;
+	        op->vals[gecosval_hphone].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+}
+/* end method (gecoshelp::hphone) */
+
+void gecoshelp::printer() noex {
+	    if (cchar *tp ; (tp = strnpbrk(bp,bl,brkright)) != np) {
+	        if (tp - bp) {
+	            n += 1 ;
+	            op->vals[gecosval_printer].vp = bp ;
+	            op->vals[gecosval_printer].vl = (tp - bp) ;
+	        }
+	        bp = (tp + 1) ;
+	        bl = (sp + sl) - (tp + 1) ;
+	    } else {
+	        n += 1 ;
+	        op->vals[gecosval_printer].vp = bp ;
+	        op->vals[gecosval_printer].vl = bl ;
+	        bl = 0 ;
+	    } /* end if */
+}
+/* end method (gecoshelp::printer) */
+
+void gecoshelp::proc() noex {
+	for (int i = 0 ; gmems[i] && (bl > 0) ; i += 1) {
+	    gecoshelp_f		m = gmems[i] ;
+	    (this->*m)() ;
+	} /* end for */
+}
+/* end method (gecoshelp::proc) */
 
 
