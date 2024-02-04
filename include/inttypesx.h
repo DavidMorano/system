@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdint.h>
@@ -58,6 +57,52 @@ typedef const longlong		clonglong ;
 #define	TYPEDEF_CULONGLONG
 typedef const ulonglong		culonglong ;
 #endif
+
+#ifdef	__cplusplus
+
+#include	<type_traits>
+#include	<concepts>
+
+template<typename T>
+struct is_stdintx : std::false_type {} ;
+
+template<>
+struct is_stdintx<signed char> : std::true_type {} ;
+
+template<>
+struct is_stdintx<signed short> : std::true_type {} ;
+
+template<>
+struct is_stdintx<signed int> : std::true_type {} ;
+
+template<>
+struct is_stdintx<signed long> : std::true_type {} ;
+
+template<>
+struct is_stdintx<signed longlong> : std::true_type {} ;
+
+template<>
+struct is_stdintx<unsigned char> : std::true_type {} ;
+
+template<>
+struct is_stdintx<unsigned short> : std::true_type {} ;
+
+template<>
+struct is_stdintx<unsigned int> : std::true_type {} ;
+
+template<>
+struct is_stdintx<unsigned long> : std::true_type {} ;
+
+template<>
+struct is_stdintx<unsigned longlong> : std::true_type {} ;
+
+template<typename T>
+inline constexpr bool is_stdintx_v = is_stdintx<T>::value ;
+
+template<typename T>
+concept stdintx = is_stdintx<T>::value ;
+
+#endif /* __cplusplus */
 
 
 #endif /* STDINTX_INCLUDE */

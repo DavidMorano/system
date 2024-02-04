@@ -64,10 +64,6 @@
 
 /* local namespaces */
 
-using std::integral ;			/* concept */
-using std::signed_integral ;		/* concept */
-using std::unsigned_integral ;		/* concept */
-
 
 /* local typedefs */
 
@@ -83,7 +79,7 @@ using std::unsigned_integral ;		/* concept */
 
 /* subroutine-templates */
 
-template<unsigned_integral T>
+template<typename T>
 int cfnumx(cchar *sp,int sl,T *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*bp{} ;
@@ -155,7 +151,7 @@ int cfnumx(cchar *sp,int sl,T *rp) noex {
 }
 /* end subroutine-template (cfnumx) */
 
-template<unsigned_integral UT,signed_integral T>
+template<typename UT,typename T>
 int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*sp{} ;

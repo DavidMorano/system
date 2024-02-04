@@ -19,7 +19,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<inttypes.h>
 #include	<stdintx.h>
 

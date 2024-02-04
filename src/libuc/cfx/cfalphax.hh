@@ -35,15 +35,14 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<char.h>
 #include	<ischarx.h>
 
 
-template<typename T>
-struct cfpowshelp {
+template<stdintx T>
+struct cfashelp {
 	cint		nb = (CHAR_BIT * sizeof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
@@ -55,7 +54,7 @@ struct cfpowshelp {
 	int		base ;
 	bool		fneg = false ;
 	cchar		*sp ;
-	cfpowshelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
+	cfashelp(cchar *asp,int asl,int b,T *arp) noex : sp(asp), sl(asl) {
 	    const T	one = 1 ;
 	    tmin = (one << (nb - 1)) ;
 	    tmax = (~ tmax) & (~ tmin) ;
@@ -109,35 +108,43 @@ struct cfpowshelp {
 	} ; /* end if (getsign) */
 	int proc() noex {
 	    int		rs = SR_INVALID ;
-	    while (sl && *sp && ((rs = getval(*sp)) >= 0)) {
-		cint	nv = rs ;
-		if (fneg) {
+	    if (fneg) {
+	        while (sl && ((rs = getval(*sp)) >= 0)) {
+		    cint	nv = rs ;
 		    if ((val < cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 		        val *= base ;
 		        val -= nv ;
 		    }
-		} else {
+		    sp += 1 ;
+		    sl -= 1 ;
+		    if (rs < 0) break ;
+	        } /* end while */
+	    } else {
+	    	while (sl && ((rs = getval(*sp)) >= 0)) {
+		    cint	nv = rs ;
 		    if ((val > cutoff) || (val == cutoff && nv > cutlim)) {
 			rs = SR_RANGE ;
 		    } else {
 			val *= base ;
 			val += nv ;
 		    }
-		}
-		if (rs < 0) break ;
-	    } /* end while */
+		    sp += 1 ;
+		    sl -= 1 ;
+		    if (rs < 0) break ;
+	        } /* end while */
+	    } /* end if (sign) */
 	    *rp = (rs >= 0) ? val : 0 ;
 	    return rs ;
 	} ; /* end method (proc) */
-} ; /* end struct (cfpowshelp) */
+} ; /* end struct (cfashelp) */
 
 template<typename T>
 int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    cfpowshelp	cfo(sp,sl,b,rp) ;
+	    cfashelp	cfo(sp,sl,b,rp) ;
 	    if ((rs = cfo.getsign()) >= 0) {
 		cfo.prepare() ;
 		rs = cfo.proc() ;
