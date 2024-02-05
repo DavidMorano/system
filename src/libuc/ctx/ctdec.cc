@@ -102,11 +102,11 @@ static constexpr int	base = 10 ;
 /* local subroutine-templates */
 
 template<typename UT>
-static int ctdecx(char *dbuf,int dlen,UT &v) noex {
+static int ctdecx(char *dbuf,int dlen,UT v) noex {
 	char		*rp = (dbuf + dlen) ;
 	*rp = '\0' ;
 	if (v != 0) {
-	    constexpr uint	ub = base ;
+	    constexpr uint	ub = uint(base) ;
 	    if constexpr (sizeof(UT) > sizeof(ulong)) {
 	        const UT	vmask(~ULONG_MAX) ;
 	        UT		nv ;
@@ -140,10 +140,10 @@ static int ctdecx(char *dbuf,int dlen,UT &v) noex {
 }
 /* end subroutine (ctdecx) */
 
-template<typename UT,typename T>
-int sctdecx(char *dp,int dl,UT,T &v) noex {
+template<typename UT,typename ST>
+int sctdecx(char *dp,int dl,const ST &v) noex {
 	UT		ulv = (UT) v ;
-	cint		n = sizeof(T) ;
+	cint		n = sizeof(ST) ;
 	int		rs = SR_FAULT ;
 	if (v < 0) ulv = (- ulv) ;
 	if (dp) {
@@ -164,7 +164,7 @@ int sctdecx(char *dp,int dl,UT,T &v) noex {
 /* end subroutine-template (sctdecx) */
 
 template<typename UT>
-int uctdecx(char *dp,int dl,UT &uv) noex {
+int uctdecx(char *dp,int dl,const UT &uv) noex {
 	cint		n = sizeof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
@@ -190,18 +190,15 @@ int uctdecx(char *dp,int dl,UT &uv) noex {
 /* exported subroutines */
 
 int ctdeci(char *dp,int dl,int v) noex {
-	const uint		uv = 0 ;
-	return sctdecx(dp,dl,uv,v) ;
+	return sctdecx<uint>(dp,dl,v) ;
 }
 
 int ctdecl(char *dp,int dl,long v) noex {
-	const ulong		uv = 0 ;
-	return sctdecx(dp,dl,uv,v) ;
+	return sctdecx<ulong>(dp,dl,v) ;
 }
 
 int ctdecll(char *dp,int dl,longlong v) noex {
-	const ulonglong		uv = 0 ;
-	return sctdecx(dp,dl,uv,v) ;
+	return sctdecx<ulonglong>(dp,dl,v) ;
 }
 
 int ctdecui(char *dp,int dl,uint v) noex {

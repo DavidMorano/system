@@ -62,7 +62,7 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	                } /* end block (faster) */
 	            } else {
 		        UT		nv ;
-	                while (v != 0L) {
+	                while (v != 0) {
 	                    nv = v / b ;
                             di = int(v - (nv * b)) ;
                             *--rp = varname.digtab[di] ;

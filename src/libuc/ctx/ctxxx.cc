@@ -64,7 +64,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
-#include	<bit>
+#include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<usystem.h>		/* <- memory-allocation */
 #include	<stdintx.h>
 #include	<ucvariables.hh>
@@ -96,14 +96,15 @@ static inline constexpr int ffbsi(int b) noex {
 
 /* local variables */
 
-static const int	maxbase = strlen(varname.digtab) ;
+static cint		maxbase = strlen(varname.digtab) ;
+
 constexpr int		maxstack = (1024+1) ;
 
 
 /* local subroutine-templates */
 
 template<typename UT>
-static int ctxxxx(char *dbuf,int dlen,int b,UT &v) noex {
+static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	cuint		ub(b) ;
 	char		*rp = (dbuf + dlen) ;
 	*rp = '\0' ;
@@ -137,7 +138,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT &v) noex {
 		    *--rp = varname.digtab[di] ;
 	            v = nv ;
 	        } /* end while (regular) */
-	    } /* end if (constexpr) */
+	    } /* end if-constexpr (size-of-operand) */
 	} else {
 	    *--rp = '0' ;
 	}
@@ -145,10 +146,10 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT &v) noex {
 }
 /* end subroutine (ctxxxx) */
 
-template<typename UT,typename T>
-int sctxxxx(char *dp,int dl,int b,UT,T &v) noex {
+template<typename UT,typename ST>
+int sctxxxx(char *dp,int dl,int b,const ST &v) noex {
 	UT		ulv = (UT) v ;
-	cint		n = sizeof(T) ;
+	cint		n = sizeof(ST) ;
 	int		rs = SR_FAULT ;
 	if (v < 0) ulv = (- ulv) ;
 	if (dp) {
@@ -159,7 +160,7 @@ int sctxxxx(char *dp,int dl,int b,UT,T &v) noex {
 		int	len ;
 		if (dlen > maxstack) {
 		    int		rs1 ;
-		    char	*dbuf ;
+		    char	*dbuf{} ;
 		    if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 			{
 		            len = ctxxxx(dbuf,dlen,b,ulv) ;
@@ -182,7 +183,7 @@ int sctxxxx(char *dp,int dl,int b,UT,T &v) noex {
 /* end subroutine-template (sctxxxx) */
 
 template<typename UT>
-int uctxxxx(char *dp,int dl,int b,UT &uv) noex {
+int uctxxxx(char *dp,int dl,int b,const UT &uv) noex {
 	cint		n = sizeof(UT) ;
 	int		rs = SR_FAULT ;
 	if (dp) {
@@ -209,18 +210,15 @@ int uctxxxx(char *dp,int dl,int b,UT &uv) noex {
 /* exported subroutines */
 
 int ctxxxi(char *dp,int dl,int b,int v) noex {
-	const uint		uv = 0 ;
-	return sctxxxx(dp,dl,b,uv,v) ;
+	return sctxxxx<uint>(dp,dl,b,v) ;
 }
 
 int ctxxxl(char *dp,int dl,int b,long v) noex {
-	const ulong		uv = 0 ;
-	return sctxxxx(dp,dl,b,uv,v) ;
+	return sctxxxx<ulong>(dp,dl,b,v) ;
 }
 
 int ctxxxll(char *dp,int dl,int b,longlong v) noex {
-	const ulonglong		uv = 0 ;
-	return sctxxxx(dp,dl,b,uv,v) ;
+	return sctxxxx<ulonglong>(dp,dl,b,v) ;
 }
 
 int ctxxxui(char *dp,int dl,int b,uint v) noex {

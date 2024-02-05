@@ -8,7 +8,11 @@
 /* revision history:
 
 	= 2023-05-14, David A­D­ Morano
-	Conver numeric digit c-strings into integers.
+	Convert numeric digit c-strings into integers.  This code
+	replaces a previous algorithm that used to be used for this
+	function.  I think that I was on drugs when I wrote that
+	previous version (but people might say the same about this
+	version also).
 
 */
 
@@ -20,8 +24,6 @@
 	base) into the normal integer types: these being |int|,
 	|long|, and |longlong| and their associated unsigned
 	variations.
-
-
 		-- David A.D. Morano, 2023-10-10
 
 	Notes:
@@ -40,14 +42,13 @@
 #include	<ischarx.h>
 
 
-template<stdintx T>
-struct cfashelp {
+template<stdintx T> struct cfashelp {
 	cint		nb = (CHAR_BIT * sizeof(T)) ;
 	T		*rp = nullptr ;
 	T		val = 0 ;	/* value to create */
 	T		cutoff{} ;
-	T		tmax = 0 ;
-	T		tmin{} ;
+	T		tmax = 0 ;	/* type-maximum value */
+	T		tmin{} ;	/* type-minimum value */
 	int		cutlim ;
 	int		sl ;
 	int		base ;
@@ -69,7 +70,7 @@ struct cfashelp {
 		    cutlim -= base ;
 		    cutoff += 1 ;
 		}
-		cutlim = (-cutlim) ;
+		cutlim = (- cutlim) ;
 	    }
 	} ; /* end method (prepare) */
 	int getval(int ch) noex {
@@ -139,8 +140,7 @@ struct cfashelp {
 	} ; /* end method (proc) */
 } ; /* end struct (cfashelp) */
 
-template<typename T>
-int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
+template<typename T> int cfalphax(cchar *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
 	    cfashelp	cfo(sp,sl,b,rp) ;

@@ -96,14 +96,14 @@ constexpr int	maxbase = 36 ;		/* must be classic value */
 /* local structures */
 
 struct llhelper {
-	const longlong	one = 1 ;
 	longlong	llmin = 0 ;
 	longlong	llmax = 0 ;
 	ulonglong	ullmax = 0 ;
 	ulonglong	cutoff[maxbase+1] = {} ;
 	int		cutlim[maxbase+1] = {} ;
 	constexpr llhelper() noex {
-	    const int	n = (CHAR_BIT * sizeof(longlong)) ;
+	    const longlong	one = 1 ;
+	    const int		n = (CHAR_BIT * sizeof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n-1)) ;
 	    llmax = longlong(ullmax >> 1) ;

@@ -17,9 +17,9 @@
 
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>
+#include	<cstdlib>
 #include	<cstdio>
 #include	<usystem.h>
 #include	<valuelimits.hh>
@@ -45,8 +45,8 @@ int main(int,cchar **,cchar **) {
 
 	if (valuelimit.llmax) ex = 1 ;
 
+	fprintf(ofp,"smin=%04hX\n",SHORT_MIN) ;
 	fprintf(ofp,"imax=%d\n",valuelimit.imax) ;
-
 	{
 	    void	*v = ((void *) -1) ;
 	    fprintf(ofp,"v=%p\n",v) ;
