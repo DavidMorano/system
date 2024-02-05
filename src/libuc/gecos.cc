@@ -360,8 +360,7 @@ void gecoshelp::realname() noex {
 /* end method (gecoshelp::realname) */
 
 void gecoshelp::account() noex {
-	cchar		*tp ;
-	if (fparen && ((tp = strnpbrk(bp,bl,brkright)) != np)) {
+	if (cchar *tp ; fparen && ((tp = strnpbrk(bp,bl,brkright)) != np)) {
 	    if (tp[0] == CH_RPAREN) fparen = false ;
 	    if (tp - bp) {
 	        n += 1 ;

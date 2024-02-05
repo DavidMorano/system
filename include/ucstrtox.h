@@ -35,6 +35,29 @@ extern int uc_strtoull(cchar *,cchar **,int,ulonglong *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int uc_strto(cchar *sp,cchar **endpp,int b,int *rp) noex {
+	return uc_strtoi(sp,endpp,b,rp) ;
+}
+inline int uc_strto(cchar *sp,cchar **endpp,int b,long *rp) noex {
+	return uc_strtol(sp,endpp,b,rp) ;
+}
+inline int uc_strto(cchar *sp,cchar **endpp,int b,longlong *rp) noex {
+	return uc_strtoll(sp,endpp,b,rp) ;
+}
+inline int uc_strto(cchar *sp,cchar **endpp,int b,uint *rp) noex {
+	return uc_strtoui(sp,endpp,b,rp) ;
+}
+inline int uc_strto(cchar *sp,cchar **endpp,int b,ulong *rp) noex {
+	return uc_strtoul(sp,endpp,b,rp) ;
+}
+inline int uc_strto(cchar *sp,cchar **endpp,int b,ulonglong *rp) noex {
+	return uc_strtoull(sp,endpp,b,rp) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* STRTOX_INCLUDE */
 

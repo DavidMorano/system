@@ -33,7 +33,7 @@
 #include	<ctxxx.h>
 
 #include	<ctdect.h>
-#include	<ctdect.h>
+#include	<ctdecp.h>
 #include	<ctdecmf.h>
 #include	<ctnum.h>
 

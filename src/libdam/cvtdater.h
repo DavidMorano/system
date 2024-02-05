@@ -1,42 +1,36 @@
-/* cvtdater */
+/* cvtdater HEADER */
+/* lang=C20 */
+
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CVTDATER_INCLUDE
-#define	CVTDATER_INCLUDE	1
+#define	CVTDATER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
-#define	CVTDATER	struct cvtdater
+#define	CVTDATER	struct cvtdater_head
 
 
-struct cvtdater {
+struct cvtdater_head {
 	time_t		daytime ;
 } ;
 
+typedef CVTFATER	cvtdater ;
 
-#if	(! defined(CVTDATER_MASTER)) || (CVTDATER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	cvtdater_start(CVTDATER *,time_t) noex ;
+extern int	cvtdater_load(CVTDATER *,time_t *,cchar *,int) noex ;
+extern int	cvtdater_finish(CVTDATER *) noex ;
 
-extern int	cvtdater_start(CVTDATER *,time_t) ;
-extern int	cvtdater_load(CVTDATER *,time_t *,cchar *,int) ;
-extern int	cvtdater_finish(CVTDATER *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CVTDATER_MASTER */
+EXTERNC_end
+#
 
 #endif /* CVTDATER_INCLUDE */
 

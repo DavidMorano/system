@@ -1,7 +1,7 @@
 /* xxtostr SUPPORT */
 /* lang=C++20 */
 
-/* subroutines to convert an integer to a sring (base-10) */
+/* subroutines to convert an integer to a c-string */
 /* version %I% last-modified %G% */
 
 
@@ -17,16 +17,17 @@
 /*******************************************************************************
 
 	Name:
-	ctdecxx
+	uxxtostr
 
 	Description:
-	These subroutines convert an integer (signed or unsigned)
-	into a decimal string that is placed into the caller supplied
-	buffer (of specified length).
+	These subroutines convert an integer (signed or unsigned
+	of various sized types) into a c-string representation that
+	is placed into the caller supplied buffer (of specified
+	length).
 
 	Synopsis:
-	template<typename T,typename UT>
-	char *uxxtostr(char **epp,int b,UT,T v) noex
+	template<typename UT,typename ST>
+	char *uxxtostr(char **epp,int b,ST v) noex
 
 	Arguments:
 	endp		pointer to one past the end of the supplied buffer
@@ -40,18 +41,17 @@
 
 	Notes:
 	As it stands now, these subroutines do not perform any funny
-	business in trying to make this process faster! These
+	business in trying to make this process faster!  These
 	subroutines are, therefore, probably the slowest such
-	conversions routinely available. To really move (execute)
+	conversions routinely available.  To really move (execute)
 	quickly through the division-related aspects of the require
 	algorithm, one would have to use assembly language where
 	both the quotient and the reminder of a division are produced
-	simultaneously (since each are needed to continue). This,
+	simultaneously (since each are needed to continue).  This,
 	of course, assumes that the underlying machine architecture
-	has such instructions. But short of assembly (and and the
+	has such instructions.  But short of assembly (and and the
 	required machine instructions) this present implemtnation
 	is adequate.
-
 
 *******************************************************************************/
 
@@ -60,6 +60,7 @@
 #include	<climits>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<stdintx.h>
 
 #include	"xxtostr.h"
 
@@ -84,10 +85,9 @@ constexpr int		b = 10 ;
 /* exported subroutines */
 
 char *itostr(int v,char *endp) noex {
-	const uint	uv = 0 ;
 	int		rs ;
 	char		*rp = nullptr ;
-	if ((rs = sxxtostr(endp,b,uv,v)) >= 0) {
+	if ((rs = sxxtostr<uint>(endp,b,v)) >= 0) {
 	    rp = (endp-rs) ;
 	} else {
 	    errno = (-rs) ;
@@ -96,10 +96,9 @@ char *itostr(int v,char *endp) noex {
 }
 
 char *ltostr(long v,char *endp) noex {
-	const ulong	uv = 0 ;
 	int		rs ;
 	char		*rp = nullptr ;
-	if ((rs = sxxtostr(endp,b,uv,v)) >= 0) {
+	if ((rs = sxxtostr<ulong>(endp,b,v)) >= 0) {
 	    rp = (endp-rs) ;
 	} else {
 	    errno = (-rs) ;
@@ -108,10 +107,9 @@ char *ltostr(long v,char *endp) noex {
 }
 
 char *lltostr(longlong v,char *endp) noex {
-	const ulonglong	uv = 0 ;
 	int		rs ;
 	char		*rp = nullptr ;
-	if ((rs = sxxtostr(endp,b,uv,v)) >= 0) {
+	if ((rs = sxxtostr<ulonglong>(endp,b,v)) >= 0) {
 	    rp = (endp-rs) ;
 	} else {
 	    errno = (-rs) ;

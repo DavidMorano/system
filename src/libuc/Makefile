@@ -133,9 +133,9 @@ OBJ028= uc_sigwaitinfo.o uc_sigpause.o
 OBJ029= uc_sigdefault.o uc_sigignore.o uc_sighold.o uc_sigrelease.o
 OBJ030= uc_settimeofday.o uc_gettimeofday.o
 
-OBJ031= ucgetpw.o ucgetsp.o ucgetgr.o 
-OBJ032= ucgetpj.o ucgetdefaultproj.o ucinproj.o 
-OBJ033= ucgetus.o ucgetuserattr.o uckvamatch.o
+OBJ031=
+OBJ032= ucgetdefaultproj.o ucinproj.o 
+OBJ033= ucgetuserattr.o uckvamatch.o
 
 OBJ034= ucnprocs.o ucinetconv.o
 OBJ035= uc_cfsetispeed.o uc_cfsetospeed.o
@@ -675,7 +675,6 @@ uc_safesleep.o:		uc_safesleep.c
 ucgetpuid.o:		ucgetpuid.cc
 
 uc_openinfo.o:		uc_openinfo.c opensysfs.h
-
 uc_openuser.o:		uc_openuser.c opensysfs.h
 
 uc_timeout.o:		uc_timeout.cc timeout.h
@@ -902,18 +901,7 @@ strtoxlonglong.o:	strtoxlonglong.cc strtoxlonglong.h
 
 # UNIX C-language system library string-to-integer interface
 ucstrtox.o:		ucstrtox.cc ucstrtox.h strtoxlonglong.h
-ucstrtod.o:		ucstrtod.c ucstrtod.h
-
-# UNIX C-language system library data-base interface
-ucgetpw.o:		ucgetpw.cc ucgetpw.h
-ucgetsp.o:		ucgetsp.cc ucgetsp.h
-ucgetgr.o:		ucgetgr.cc ucgetgr.h
-ucgetpj.o:		ucgetpj.cc ucgetpj.h
-ucgetus.o:		ucgetus.cc ucgetus.h
-ucgetpr.o:		ucgetpr.cc ucgetpr.h
-ucgetnw.o:		ucgetnw.cc ucgetnw.h
-ucgetho.o:		ucgetho.cc ucgetho.h
-ucgetsv.o:		ucgetsv.cc ucgetsv.h
+ucstrtod.o:		ucstrtod.cc ucstrtod.h
 
 # UNIX C-language system library data-base interface (support)
 spwd.o:			spwd.cc spwd.h

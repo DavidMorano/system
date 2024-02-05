@@ -53,14 +53,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<string>
 #include	<istream>
 #include	<usystem.h>
 #include	<storebuf.h>		/* <- not used! */
 #include	<sncpyx.h>		/* <- not used! */
 #include	<snwcpy.h>
-#include	<localmisc.h>
 
 #include	"readln.hh"
 
