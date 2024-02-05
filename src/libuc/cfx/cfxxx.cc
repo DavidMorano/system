@@ -81,27 +81,27 @@
 /* exported subroutines */
 
 int cfxxxi(cchar *sp,int sl,int b,int *rp) noex {
-	return cfxxxx(uc_strtoi,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfxxxl(cchar *sp,int sl,int b,long *rp) noex {
-	return cfxxxx(uc_strtol,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfxxxll(cchar *sp,int sl,int b,longlong *rp) noex {
-	return cfxxxx(uc_strtoll,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfxxxui(cchar *sp,int sl,int b,uint *rp) noex {
-	return cfxxxx(uc_strtoui,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfxxxul(cchar *sp,int sl,int b,ulong *rp) noex {
-	return cfxxxx(uc_strtoul,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfxxxull(cchar *sp,int sl,int b,ulonglong *rp) noex {
-	return cfxxxx(uc_strtoull,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 

@@ -41,6 +41,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
+#include	<stdintx.h>
 #include	<cfxxxx.hh>
 
 #include	"cfbin.h"
@@ -71,27 +72,27 @@ constexpr int	b = OURBASE ;
 /* exported subroutines */
 
 int cfbini(cchar *sp,int sl,int *rp) noex {
-	return cfxxxx(uc_strtoi,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfbinl(cchar *sp,int sl,long *rp) noex {
-	return cfxxxx(uc_strtol,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfbinll(cchar *sp,int sl,longlong *rp) noex {
-	return cfxxxx(uc_strtoll,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfbinui(cchar *sp,int sl,uint *rp) noex {
-	return cfxxxx(uc_strtoui,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfbinul(cchar *sp,int sl,ulong *rp) noex {
-	return cfxxxx(uc_strtoul,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfbinull(cchar *sp,int sl,ulonglong *rp) noex {
-	return cfxxxx(uc_strtoull,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 
