@@ -1,23 +1,26 @@
-/* findbit */
+/* findbit SUPPORT */
 /* lang=C++20 */
 
 /* find bits (meeting certain criteria) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-03-09, David A­D­ Morano
-        This group of subroutines was originally written here in C language but
-        were inspired by single instructions on the VAX (Digital Equipment 1979)
-        that did roughly the same functions.
+	This group of subroutines was originally written here in C
+	language but were inspired by single instructions on the
+	VAX (Digital Equipment 1979) that did roughly the same
+	functions.
 
 	= 2001-02-11, David A­D­ Morano
-        I removed the long (32k-byte) look-up table and instead I am now using
-        an algorithm that uses a 128-byte look-up table. I felt that wasting 32k
-        bytes for something so relatively unused was not the best use of in-core
-        memory. And yes, these things invariably end up in in-core memory due to
-        use in shared objects or something else that indirectly calls one or
-        more of the subroutines in here.
+	I removed the long (32k-byte) look-up table and instead I
+	am now using an algorithm that uses a 128-byte look-up
+	table. I felt that wasting 32k bytes for something so
+	relatively unused was not the best use of in-core memory.
+	And yes, these things invariably end up in in-core memory
+	due to use in shared objects or something else that indirectly
+	calls one or more of the subroutines in here.
 
 */
 
@@ -35,26 +38,38 @@
 
 	Notes:
 
-        There are (obviously) a lot of ways to implement these sorts of
-        functions. Doing these functions in hardware used to be the norm in the
-        olden days. But the reach for the modern RISC (we no longer count
-        machines like the CDC [67]600 variations) screwed that pooch! For the
-        |ffbsx()| functions we have traditionally done a bit more work since
-        they are more commonly used than the others. We used to use a relatively
-        larger look-up table for it, but we have now scaled back to using only a
-        128 byte look-up table. We now do the same for the |flbsx()| functions
-        since they are also rather commonly used (eg: finding higher powers of
-        two). We feel that we are fast enough for our present needs. If you need
-        faster performance, you are welcome to do your own!
-
+	There are (obviously) a lot of ways to implement these sorts
+	of functions. Doing these functions in hardware used to be
+	the norm in the olden days. But the reach for the modern
+	RISC (we no longer count machines like the CDC [67]600
+	variations) screwed that pooch! For the |ffbsx()| functions
+	we have traditionally done a bit more work since they are
+	more commonly used than the others. We used to use a
+	relatively larger look-up table for it, but we have now
+	scaled back to using only a 128 byte look-up table. We now
+	do the same for the |flbsx()| functions since they are also
+	rather commonly used (eg: finding higher powers of two).
+	We feel that we are fast enough for our present needs. If
+	you need faster performance, you are welcome to do your
+	own!
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<localmisc.h>
+#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<stdintx.h>
+
+
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* local variables */
@@ -98,16 +113,18 @@ const unsigned char	flbstab[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ffbsi(uint v) noex {
 	uint		ti, tr ;
-	const int	nb = sizeof(uint) ;
+	cint		nb = sizeof(uint) ;
 	int		i = -1 ;
-	int		b ;
 	int		s ;
 	int		n ;
-	for (b = 0 ; b < nb ; b += 1) {
+	for (int b = 0 ; b < nb ; b += 1) {
 	    s = (b<<3) ;
 	    ti = ((v>>s) & UCHAR_MAX) ;
 	    if (ti) {
@@ -123,12 +140,11 @@ int ffbsi(uint v) noex {
 
 int ffbsl(ulong v) noex {
 	ulong		ti, tr ;
-	const int	nb = sizeof(ulong) ;
+	cint		nb = sizeof(ulong) ;
 	int		i = -1 ;
-	int		b ;
 	int		s ;
 	int		n ;
-	for (b = 0 ; b < nb ; b += 1) {
+	for (int b = 0 ; b < nb ; b += 1) {
 	    s = (b<<3) ;
 	    ti = ((v>>s) & UCHAR_MAX) ;
 	    if (ti) {
@@ -144,12 +160,11 @@ int ffbsl(ulong v) noex {
 
 int ffbsll(ulonglong v) noex {
 	ulonglong	ti, tr ;
-	const int	nb = sizeof(ulonglong) ;
+	cint		nb = sizeof(ulonglong) ;
 	int		i = -1 ;
-	int		b ;
 	int		s ;
 	int		n ;
-	for (b = 0 ; b < nb ; b += 1) {
+	for (int b = 0 ; b < nb ; b += 1) {
 	    s = (b<<3) ;
 	    ti = ((v>>s) & UCHAR_MAX) ;
 	    if (ti) {
@@ -164,7 +179,7 @@ int ffbsll(ulonglong v) noex {
 /* end subroutine (ffbsll) */
 
 int ffbci(uint v) noex {
-	const int	n = (8*sizeof(uint)) ;
+	cint		n = (8*sizeof(uint)) ;
 	int		i ;
 	for (i = 0 ; i < n ; i += 1) {
 	    if (! (v & 1)) break ;
@@ -175,7 +190,7 @@ int ffbci(uint v) noex {
 /* end subroutine (ffbci) */
 
 int ffbcl(ulong v) noex {
-	const int	n = (8*sizeof(ulong)) ;
+	cint		n = (8*sizeof(ulong)) ;
 	int		i ;
 	for (i = 0 ; i < n ; i += 1) {
 	    if (! (v & 1)) break ;
@@ -186,7 +201,7 @@ int ffbcl(ulong v) noex {
 /* end subroutine (ffbcl) */
 
 int ffbcll(ulonglong v) noex {
-	const int	n = (8*sizeof(ulonglong)) ;
+	cint		n = (8*sizeof(ulonglong)) ;
 	int		i ;
 	for (i = 0 ; i < n ; i += 1) {
 	    if (! (v & 1)) break ;
@@ -198,12 +213,11 @@ int ffbcll(ulonglong v) noex {
 
 int flbsi(uint v) noex {
 	uint		ti, tr ;
-	const int	nb = sizeof(uint) ;
+	cint		nb = sizeof(uint) ;
 	int		i = -1 ;
-	int		b ;
 	int		s ;
 	int		n ;
-	for (b = (nb-1) ; b >= 0 ; b -= 1) {
+	for (int b = (nb-1) ; b >= 0 ; b -= 1) {
 	    s = (b<<3) ;
 	    ti = ((v>>s) & UCHAR_MAX) ;
 	    if (ti) {
@@ -219,12 +233,11 @@ int flbsi(uint v) noex {
 
 int flbsl(ulong v) noex {
 	ulong		ti, tr ;
-	const int	nb = sizeof(ulong) ;
+	cint		nb = sizeof(ulong) ;
 	int		i = -1 ;
-	int		b ;
 	int		s ;
 	int		n ;
-	for (b = (nb-1) ; b >= 0 ; b -= 1) {
+	for (int b = (nb-1) ; b >= 0 ; b -= 1) {
 	    s = (b<<3) ;
 	    ti = ((v>>s) & UCHAR_MAX) ;
 	    if (ti) {
@@ -240,12 +253,11 @@ int flbsl(ulong v) noex {
 
 int flbsll(ulonglong v) noex {
 	ulonglong	ti, tr ;
-	const int	nb = sizeof(ulonglong) ;
+	cint		nb = sizeof(ulonglong) ;
 	int		i = -1 ;
-	int		b ;
 	int		s ;
 	int		n ;
-	for (b = (nb-1) ; b >= 0 ; b -= 1) {
+	for (int b = (nb-1) ; b >= 0 ; b -= 1) {
 	    s = (b<<3) ;
 	    ti = ((v>>s) & UCHAR_MAX) ;
 	    if (ti) {
@@ -260,7 +272,7 @@ int flbsll(ulonglong v) noex {
 /* end subroutine (flbsll) */
 
 int flbci(uint v) noex {
-	const int	n = (8*sizeof(uint)) ;
+	cint		n = (8*sizeof(uint)) ;
 	int		i ;
 	for (i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if (! ((v >> i) & 1)) break ;
@@ -270,7 +282,7 @@ int flbci(uint v) noex {
 /* end subroutine (flbci) */
 
 int flbcl(ulong v) noex {
-	const int	n = (8*sizeof(ulong)) ;
+	cint		n = (8*sizeof(ulong)) ;
 	int		i ;
 	for (i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if (! ((v >> i) & 1)) break ;
@@ -280,7 +292,7 @@ int flbcl(ulong v) noex {
 /* end subroutine (flbcl) */
 
 int flbcll(ulonglong v) noex {
-	const int	n = (8*sizeof(ulonglong)) ;
+	cint		n = (8*sizeof(ulonglong)) ;
 	int		i ;
 	for (i = (n - 1) ; i >= 0 ; i -= 1) {
 	    if (! ((v >> i) & 1)) break ;
@@ -290,10 +302,9 @@ int flbcll(ulonglong v) noex {
 /* end subroutine (flbcll) */
 
 int fbscounti(uint v) noex {
-	const int	n = (8*sizeof(uint)) ;
-	int		i ;
+	cint		n = (8*sizeof(uint)) ;
 	int		c = 0 ;
-	for (i = 0 ; i < n ; i += 1) {
+	for (int i = 0 ; i < n ; i += 1) {
 	    if (v & 1) c += 1 ;
 	    v = v >> 1 ;
 	} /* end for */
@@ -302,10 +313,9 @@ int fbscounti(uint v) noex {
 /* end subroutine (fbscounti) */
 
 int fbscountl(ulong v) noex {
-	const int	n = (8*sizeof(ulong)) ;
-	int		i ;
+	cint		n = (8*sizeof(ulong)) ;
 	int		c = 0 ;
-	for (i = 0 ; i < n ; i += 1) {
+	for (int i = 0 ; i < n ; i += 1) {
 	    if (v & 1) c += 1 ;
 	    v = v >> 1 ;
 	} /* end for */
@@ -314,10 +324,9 @@ int fbscountl(ulong v) noex {
 /* end subroutine (fbscountl) */
 
 int fbscountll(ulonglong v) noex {
-	const int	n = (8*sizeof(ulonglong)) ;
-	int		i ;
+	cint		n = (8*sizeof(ulonglong)) ;
 	int		c = 0 ;
-	for (i = 0 ; i < n ; i += 1) {
+	for (int i = 0 ; i < n ; i += 1) {
 	    if (v & 1) c += 1 ;
 	    v = v >> 1 ;
 	} /* end for */

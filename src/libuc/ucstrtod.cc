@@ -1,4 +1,4 @@
-/* ucstrtod */
+/* ucstrtod SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -15,11 +15,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<errno.h>
+#include	<cerrno>
+#include	<cstdlib>
 #include	<usystem.h>
 
 #include	"ucstrtod.h"

@@ -23,7 +23,6 @@
 #include	<istream>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 extern int readln(std::istream &,char *,int,int = eol) noex ;

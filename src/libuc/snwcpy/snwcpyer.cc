@@ -1,5 +1,5 @@
-/* snwcpy SUPPORT */
-/* lang=C20 */
+/* snwcpyer SUPPORT */
+/* lang=C++20 */
 
 /* special (excellent) string-copy type of subroutine! */
 /* version %I% last-modified %G% */
@@ -36,7 +36,7 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 	Notes:
 	This subroutine just calls either the |sncpy1(3uc)| or the

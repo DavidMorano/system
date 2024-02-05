@@ -1,7 +1,7 @@
-/* inttypesx HEADER */
+/* strtoxlonglong HEADER */
 /* lang=C20 */
 
-/* extended integer types */
+/* numeric-character conversion */
 /* version %I% last-modified %G% */
 
 
@@ -14,17 +14,25 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	INTTYPESX_INCLUDE
-#define	INTTYPESX_INCLUDE
+#ifndef	STRTOXLONGLONG_INCLUDE
+#define	STRTOXLONGLONG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<inttypes.h>
 #include	<stdintx.h>
 
 
-#endif /* INTTYPESX_INCLUDE */
+EXTERNC_begin
+
+extern longlong strtolonglong(cchar *,char **,int) noex ;
+extern ulonglong strtoulonglong(cchar *,char **,int) noex ;
+
+EXTERNC_end
+
+
+#endif /* STRTOXLONGLONG_INCLUDE */
 
 

@@ -18,7 +18,7 @@
 
 	These subroutines that perform conversions which also have
 	an integral power-of-two base are much faster than anything
-	that uses 'lltostr(3c)' (or friends) because there are no
+	that uses |lltostr(3c)| (or friends) because there are no
 	division operations needed in the algorithm used.
 
 *******************************************************************************/
@@ -27,6 +27,7 @@
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<stdintx.h>
 #include	<cvtdig.hh>
 
 #include	"ctoct.h"

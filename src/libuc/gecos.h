@@ -1,4 +1,9 @@
-/* gecos */
+/* gecos HEADER */
+/* lang=C20 */
+
+/* parse a GECOS field located in a buffer */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -10,25 +15,17 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GECOS_INCLUDE
-#define	GECOS_INCLUDE		1
+#define	GECOS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
-#ifndef	UINT
-#define	UINT	unsigned int
-#endif
-
-
-/* object defines */
-
 #define	GECOS		struct gecos_head
-#define	GECOS_VALUE	struct gecos_value
+#define	GECOS_VAL	struct gecos_value
 
 #define	GECOS_ITEMLEN	256
 
@@ -46,31 +43,26 @@ enum gecosvals {
 } ;
 
 struct gecos_value {
-	const char	*vp ;
+	cchar		*vp ;
 	int		vl ;
 } ;
 
 struct gecos_head {
-	struct gecos_value	vals[gecosval_overlast] ;
+	GECOS_VAL	vals[gecosval_overlast] ;
 } ;
 
+typedef GECOS		gecos ;
+typedef GECOS_VAL	gecos_val ;
 
-#if	(! defined(GECOS_MASTER)) || (GECOS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	gecos_start(gecos *,cchar *,int) noex ;
+extern int	gecos_compose(gecos *,char *,int) noex ;
+extern int	gecos_getval(gecos *,int,cchar **) noex ;
+extern int	gecos_finish(gecos *) noex ;
 
-extern int	gecos_start(GECOS *,const char *,int) ;
-extern int	gecos_compose(GECOS *,char *,int) ;
-extern int	gecos_getval(GECOS *,int,const char **) ;
-extern int	gecos_finish(GECOS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* GECOS_MASTER */
 
 #endif /* GECOS_INCLUDE */
 

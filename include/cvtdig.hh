@@ -52,7 +52,6 @@
 	Returns:
 	-		length of result characters
 
-
 *******************************************************************************/
 
 #ifndef	CVTDIG_INCLUDE
@@ -78,7 +77,7 @@ static inline constexpr int cvtdig_ffbsi(int b) noex {
 /* end subroutine (cvtdig_ffbsi) */
 
 template<typename UT>
-constexpr int cvtdig(char *rbuf,int rlen,UT &val,int n,int b) noex {
+constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	cint		nshift = cvtdig_ffbsi(b) ;
 	int		rs = SR_INVALID ;
 	int		ndig = 0 ;

@@ -73,27 +73,27 @@ constexpr int	b = OURBASE ;
 /* exported subroutines */
 
 int cfhexi(cchar *sp,int sl,int *rp) noex {
-	return cfxxxx(uc_strtoi,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfhexl(cchar *sp,int sl,long *rp) noex {
-	return cfxxxx(uc_strtol,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfhexll(cchar *sp,int sl,longlong *rp) noex {
-	return cfxxxx(uc_strtoll,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfhexui(cchar *sp,int sl,uint *rp) noex {
-	return cfxxxx(uc_strtoui,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfhexul(cchar *sp,int sl,ulong *rp) noex {
-	return cfxxxx(uc_strtoul,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfhexull(cchar *sp,int sl,ulonglong *rp) noex {
-	return cfxxxx(uc_strtoull,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 

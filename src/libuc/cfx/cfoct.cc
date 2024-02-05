@@ -73,27 +73,27 @@ constexpr int	b = OURBASE ;
 /* exported subroutines */
 
 int cfocti(cchar *sp,int sl,int *rp) noex {
-	return cfxxxx(uc_strtoi,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfoctl(cchar *sp,int sl,long *rp) noex {
-	return cfxxxx(uc_strtol,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfoctll(cchar *sp,int sl,longlong *rp) noex {
-	return cfxxxx(uc_strtoll,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfoctui(cchar *sp,int sl,uint *rp) noex {
-	return cfxxxx(uc_strtoui,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfoctul(cchar *sp,int sl,ulong *rp) noex {
-	return cfxxxx(uc_strtoul,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 int cfoctull(cchar *sp,int sl,ulonglong *rp) noex {
-	return cfxxxx(uc_strtoull,sp,sl,b,rp) ;
+	return cfxxxx(sp,sl,b,rp) ;
 }
 
 

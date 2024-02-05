@@ -1,7 +1,7 @@
 /* xxtostr HEADER */
 /* lang=C20,C++20 */
 
-/* subroutines to convert an integer to a sring (base-10) */
+/* subroutines to convert an integer to a c-string */
 /* version %I% last-modified %G% */
 
 
@@ -13,6 +13,41 @@
 */
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+
+/*******************************************************************************
+
+	These subroutines convert integers (either signed or unsigned
+	of various sized types) into their c-string digit
+	representations.
+
+	The following subroutines are provoided for base-20 conversions
+	of the various types:
+
+	name		signed	size
+	itostr		yes	32-bit
+	ltostr		yes	64-bit
+	lltostr		yes	128-bit
+	uitostr		no	32-bit
+	ultostr		no	64-bit
+	ulltostr	no	128-bit
+
+	The two subroutine-templates (below) can convert for any
+	number base.  The subroutine-templates are:
+
+	name		signed	size	base
+	sxxtostr	yes	any	any up to base-64
+	uxxtostr	no	any	any up to base-64
+
+	Rnjoy.
+
+	Notes:
+	As you may know, aside from the more recent standardization
+	of the "convert-to-string" numeric conversion subroutine-templates
+	in C++, there has never been a standardized implementation
+	of these kinds of conversion functions.
+		-- 2024-01-15, David A.D. Morano
+
+*******************************************************************************/
 
 #ifndef	XXTOSTR_INCLUDE
 #define	XXTOSTR_INCLUDE
@@ -28,10 +63,11 @@
 
 #ifdef	__cplusplus
 
-static const int	xxtostr_maxbase = strlen(varname.digtab) ;
+static cint		xxtostr_maxbase = strlen(varname.digtab) ;
 
 template<typename UT>
 inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
+	uint		ub = uint(b) ;
 	int		rs = SR_FAULT ;
 	char		*rp = endp ;
 	if (endp) {
@@ -44,8 +80,8 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	                const UT	vmask(~LONG_MAX) ;
 		        UT		nv ;
 	                while ((v & vmask) != 0L) {
-	                    nv = v / b ;
-                            di = int(v - (nv * b)) ;
+	                    nv = v / ub ;
+                            di = int(v - (nv * ub)) ;
                             *--rp = varname.digtab[di] ;
 	                    v = nv ;
 	                } /* end while (slower) */
@@ -53,8 +89,8 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 		            ulong	lv = ulong(v) ;
 		            ulong	nv ;
 		            while (lv != 0) {
-	                        nv = lv / b ;
-                                di = int(lv - (nv * b)) ;
+	                        nv = lv / ub ;
+                                di = int(lv - (nv * ub)) ;
                                 *--rp = varname.digtab[di] ;
 	                        lv = nv ;
 		            } /* end while */
@@ -62,13 +98,13 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	                } /* end block (faster) */
 	            } else {
 		        UT		nv ;
-	                while (v != 0L) {
-	                    nv = v / b ;
-                            di = int(v - (nv * b)) ;
+	                while (v != 0) {
+	                    nv = v / ub ;
+                            di = int(v - (nv * ub)) ;
                             *--rp = varname.digtab[di] ;
 	                    v = nv ;
 	                } /* end while (regular) */
-		    } /* end if (constexpr) */
+		    } /* end if-constexpr (size-of-operand) */
 	            rs = SR_OK ;
 	        } else {
 	            rs = SR_OK ;
@@ -80,8 +116,8 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 }
 /* end subroutine-template (uxxtostr) */
 
-template<typename T,typename UT>
-inline constexpr int sxxtostr(char *endp,int b,UT,T v) noex {
+template<typename UT,typename ST>
+inline constexpr int sxxtostr(char *endp,int b,ST v) noex {
 	UT		ulv = (UT) v ;
 	int		rs = SR_FAULT ;
 	char		*rp = nullptr ;

@@ -1,4 +1,4 @@
-/* umsg SUPPORT (UNIX® System-C IPC Messaging) */
+/* umsg SUPPORT (UNIX® System-V IPC Messaging) */
 /* lang=C++23 */
 
 /* UNIX® System V IPC Messaging (MSG) subroutine interface */

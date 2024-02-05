@@ -149,7 +149,6 @@ objb_cfx.o:	$(OBJB_CFX)
 
 
 cfchars.o:			cfchars.cc cfchars.h cfcharsx.hh $(INCS)
-cfa26.o:			cfa26.cc cfa26.h $(INCS)
 cfbin.o:			cfbin.cc cfbin.h $(INCS)
 cfoct.o:			cfoct.cc cfoct.h $(INCS)
 cfdec.o:			cfdec.cc cfdec.h $(INCS)
@@ -160,6 +159,7 @@ cfhex.o:			cfhex.cc cfhex.h $(INCS)
 cfnum.o:			cfnum.cc cfnum.h $(INCS)
 cfxxx.o:			cfxxx.cc cfxxx.h $(INCS)
 cfxxxx.o:			cfxxxx.cc cfxxxx.hh $(INCS)
+cfa26.o:			cfa26.cc cfa26.h cfalphax.hh $(INCS)
 strtoxlonglong.o:		strtoxlonglong.cc strtoxlonglong.h $(INCS)
 
 

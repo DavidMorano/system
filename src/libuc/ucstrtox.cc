@@ -40,6 +40,9 @@
 #include	<strtoxlonglong.h>
 
 
+/* local defines */
+
+
 /* local namespaces */
 
 

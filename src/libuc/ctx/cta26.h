@@ -36,6 +36,30 @@ extern int cta26ull(char *,int,int,int,ulonglong) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+inline int cta26(char *bp,int bl,int t,int p,int v) noex {
+	return cta26i(bp,bl,t,p,v) ;
+}
+inline int cta26(char *bp,int bl,int t,int p,long v) noex {
+	return cta26l(bp,bl,t,p,v) ;
+}
+inline int cta26(char *bp,int bl,int t,int p,longlong v) noex {
+	return cta26ll(bp,bl,t,p,v) ;
+}
+
+inline int cta26(char *bp,int bl,int t,int p,uint uv) noex {
+	return cta26ui(bp,bl,t,p,uv) ;
+}
+inline int cta26(char *bp,int bl,int t,int p,ulong uv) noex {
+	return cta26ul(bp,bl,t,p,uv) ;
+}
+inline int cta26(char *bp,int bl,int t,int p,ulonglong uv) noex {
+	return cta26ull(bp,bl,t,p,uv) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* CTA26_INCLUDE */
 

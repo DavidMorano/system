@@ -65,6 +65,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getev(mainv envv,cchar *kp,int kl,cchar **rpp) noex {

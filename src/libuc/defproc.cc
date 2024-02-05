@@ -23,7 +23,7 @@
 	This subroutine will read (process) an "def" (define) file
 	and put all of the define-variables into an VECSTR
 	object (supplied). New define-variables just get added
-	to the list. Old define-variables already on the list
+	to the list.  Old define-variables already on the list
 	are deleted with a new definition is encountered.
 
 	Synopsis:
@@ -42,7 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
@@ -59,14 +58,15 @@
 #include	<sfx.h>
 #include	<snwcpy.h>
 #include	<char.h>
-#include	<localmisc.h>
+#include	<getev.h>
+#include	<localmisc.h>		/* <- for |REALNAMELEN| */
 
 #include	"defproc.h"
 
 
 /* local defines */
 
-#define	ENVNAMELEN	100		/* should be sufficient? */
+#define	ENVNAMELEN	REALNAMELEN	/* should be sufficient? */
 
 #define	SUBINFO		struct subinfo
 #define	SI		struct subinfo
@@ -85,7 +85,6 @@ using std::nullptr_t ;			/* type */
 extern "C" {
     extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) noex ;
     extern int	getev(mainv,cchar *,int,cchar **) noex ;
-    extern int	sfthing(cchar *,int,cchar *,cchar **) noex ;
 }
 
 

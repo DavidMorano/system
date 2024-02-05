@@ -71,7 +71,42 @@ static inline int rmleadzero(cchar *sp,int sl) noex {
 }
 
 template<typename T>
-int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
+inline int cfstrtox(cc *,int,T *) noex {
+	return SR_BUGCHECK ;
+}
+
+template<>
+inline int cfstrtox(cc *sp,int b,int *rp) noex {
+	return uc_strtoi(sp,nullptr,b,rp) ;
+}
+
+template<>
+inline int cfstrtox(cc *sp,int b,long *rp) noex {
+	return uc_strtol(sp,nullptr,b,rp) ;
+}
+
+template<>
+inline int cfstrtox(cc *sp,int b,longlong *rp) noex {
+	return uc_strtoll(sp,nullptr,b,rp) ;
+}
+
+template<>
+inline int cfstrtox(cc *sp,int b,uint *rp) noex {
+	return uc_strtoui(sp,nullptr,b,rp) ;
+}
+
+template<>
+inline int cfstrtox(cc *sp,int b,ulong *rp) noex {
+	return uc_strtoul(sp,nullptr,b,rp) ;
+}
+
+template<>
+inline int cfstrtox(cc *sp,int b,ulonglong *rp) noex {
+	return uc_strtoull(sp,nullptr,b,rp) ;
+}
+
+template<typename T>
+inline int cfxxxx(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    cchar	*nsp{} ;
@@ -91,7 +126,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
 		                if (rp) {
 		                    if (rs > 0) nsp = dbuf ;
-		                    rs = cvtf(nsp,nullptr,b,rp) ;
+		                    rs = cfstrtox(nsp,b,rp) ;
 		                }
 	                    } /* end if (loading) */
 		        } else {
@@ -101,7 +136,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
 		                    if (rp) {
 		                        if (rs > 0) nsp = dbuf ;
-		                        rs = cvtf(nsp,nullptr,b,rp) ;
+		                        rs = cfstrtox(nsp,b,rp) ;
 		                    }
 	                        } /* end if (loading) */
 			        rs1 = uc_free(dbuf) ;
@@ -109,7 +144,7 @@ int cfxxxx(int (*cvtf)(cc *sp,cc **,int,T *),cc *sp,int sl,int b,T *rp) noex {
 		            } /* end if (memory-allocation) */
 	                } /* end if */
 		    } else {
-			rs = cvtf(nsp,nullptr,b,rp) ;
+			rs = cfstrtox(nsp,b,rp) ;
 		    } /* end if */
 		} /* end if (checkbase) */
 	    } /* end if (non-zero c-string) */
