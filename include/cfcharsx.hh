@@ -45,9 +45,7 @@ int cfcharsx(cchar *sp,int sl,int b,T *rp) noex {
 	    T		v{} ;
 	    rs = SR_OK ;
 	    if (r = from_chars(sp,(sp+sl),v,b) ; (r.ec == ec_ok)) {
-		if (rp) {
-		    *rp = v ;
-		}
+		*rp = v ;
 	    } else {
 		using enum	std::errc ;
 		switch (r.ec) {

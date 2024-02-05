@@ -45,7 +45,6 @@
 #include	<charconv>
 #include	<usysrets.h>
 #include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
 #include	<cfcharsx.hh>		/* <- the money shot! */
@@ -57,10 +56,6 @@
 
 
 /* local namespaces */
-
-using std::from_chars ;
-using std::from_chars_result ;
-using std::errc ;
 
 
 /* local typedefs */
