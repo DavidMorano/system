@@ -1117,6 +1117,7 @@ static int getinet_rem(hostinfo *op,int af) noex {
 /* try removing a "LOCAL" domain from the end */
 static int getinet_remlocal(hostinfo *op,int af) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
 	bool		f_continue = false ;
 	if constexpr (f_fastaddr) {
@@ -1127,20 +1128,25 @@ static int getinet_remlocal(hostinfo *op,int af) noex {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
 	}
 	if ((rs >= 0) && f_continue) {
-	    cchar	*tp ;
-	    if ((tp = strchr(op->arg.hostname,'.')) != nullptr) {
+	    const nullptr_t	np{} ;
+	    if (cchar *tp ; (tp = strchr(op->arg.hostname,'.')) != np) {
 	        if (isindomain(op->arg.hostname,LOCALDOMAINNAME)) {
-	            cint	hlen = MAXHOSTNAMELEN ;
 	            int		hl = (tp - op->arg.hostname) ;
-	            char	hbuf[MAXHOSTNAMELEN + 1] ;
-	            if ((rs = snwcpy(hbuf,hlen,op->arg.hostname,hl)) >= 0) {
-	                if ((rs = hostinfo_getname(op,af,hbuf)) > 0) {
-	                    if (op->ehostname[0] == '\0') {
-	                        c = 1 ;
-	                        rs = sncpy1(op->ehostname,hlen,hbuf) ;
+		    cchar	*hn = op->arg.hostname ;
+	            char	*hbuf{} ;
+		    if ((rs = malloc_hn(&hbuf)) >= 0) {
+			cint	hlen = rs ;
+	                if ((rs = snwcpy(hbuf,hlen,hn,hl)) >= 0) {
+	                    if ((rs = hostinfo_getname(op,af,hbuf)) > 0) {
+	                        if (op->ehostname[0] == '\0') {
+	                            c = 1 ;
+	                            rs = sncpy1(op->ehostname,hlen,hbuf) ;
+	                        }
 	                    }
-	                }
-	            }
+	                } /* end if (snwcpy) */
+			rs1 = uc_free(hbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 	        } /* end if (the requested hostname is in our domain) */
 	    } /* end if */
 	} /* end if (continue) */
@@ -1187,10 +1193,11 @@ static int getinet_knowner(hostinfo *op,int af) noex {
                 sl -= 1 ;
             }
             if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != np) {
+		cint	mhlen = maxhostlen ;
                 cint        cl = ((sp + sl) - (tp + 1)) ;
                 cchar       *cp = (tp+1) ;
                 bool        f = false ;
-                strwcpy(hbuf,sp,min(sl,NODENAMELEN)) ;
+                strwcpy(hbuf,sp,min(sl,mhlen)) ;
                 f = f || isindomain(hbuf,op->domainname) ;
                 f = f || (strncmp(local,cp,cl) == 0) ;
                 if (f) {
