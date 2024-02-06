@@ -36,7 +36,8 @@
 
 /*******************************************************************************
 
-	Subroutines to convert digit strings to binary integers.
+	Subroutines to convert digit strings intto binary integers
+	(of various types and sizes).
 
 *******************************************************************************/
 
@@ -108,7 +109,7 @@ inline int cfstrtox(cc *sp,int b,ulonglong *rp) noex {
 template<typename T>
 inline int cfxxxx(cc *sp,int sl,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
-	if (sp) {
+	if (sp && rp) {
 	    cchar	*nsp{} ;
 	    rs = SR_DOM ;
 	    if (int nsl ; (nsl = sfshrink(sp,sl,&nsp)) > 0) {
@@ -124,20 +125,16 @@ inline int cfxxxx(cc *sp,int sl,int b,T *rp) noex {
 	                if (nsl <= cfxxxx_maxstack) {
 	                    char	dbuf[dlen+1] ;
 	    	            if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
-		                if (rp) {
-		                    if (rs > 0) nsp = dbuf ;
-		                    rs = cfstrtox(nsp,b,rp) ;
-		                }
+		                if (rs > 0) nsp = dbuf ;
+		                rs = cfstrtox(nsp,b,rp) ;
 	                    } /* end if (loading) */
 		        } else {
 		            int		rs1 ;
-		            char	*dbuf ;
+		            char	*dbuf{} ;
 		            if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 	    	                if ((rs = load(dbuf,dlen,nsp,nsl)) >= 0) {
-		                    if (rp) {
-		                        if (rs > 0) nsp = dbuf ;
-		                        rs = cfstrtox(nsp,b,rp) ;
-		                    }
+		                    if (rs > 0) nsp = dbuf ;
+		                    rs = cfstrtox(nsp,b,rp) ;
 	                        } /* end if (loading) */
 			        rs1 = uc_free(dbuf) ;
 			        if (rs >= 0) rs = rs1 ;

@@ -53,8 +53,8 @@ struct hostinfo_args {
 struct hostinfo_head {
 	HOSTINFO_ARGS	arg ;
 	HOSTINFO_ADDR	addr ;
-	vecobj		names ;
-	vecobj		addrs ;
+	vecobj		*nlp ;
+	vecobj		*alp ;
 	cchar		*domainname ;	/* dynamically allocated */
 	void		*a ;		/* holds allocation for host-bufs */
 	char		*ehostname ;	/* allocated on start */

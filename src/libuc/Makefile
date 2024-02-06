@@ -269,7 +269,7 @@ OBJ151= dialprog.o dialhttp.o dialfinger.o
 
 OBJ152= openshmtmp.o
 OBJ153= mallocxx.o
-OBJ154= strtoxlonglong.o xxtostr.o
+OBJ154= strtoxlonglong.o
 OBJ155=
 OBJ156=
 OBJ157=
@@ -897,10 +897,10 @@ utmpaccent.o:		utmpaccent.cc utmpaccent.h
 tmpx.o:			tmpx.cc tmpx.h
 
 # part of string-to-integer interface
-strtoxlonglong.o:	strtoxlonglong.cc strtoxlonglong.h
+strtox.o:		strtox.cc strtox.h
 
 # UNIX C-language system library string-to-integer interface
-ucstrtox.o:		ucstrtox.cc ucstrtox.h strtoxlonglong.h
+ucstrtox.o:		ucstrtox.cc ucstrtox.h strtox.h
 ucstrtod.o:		ucstrtod.cc ucstrtod.h
 
 # UNIX C-language system library data-base interface (support)

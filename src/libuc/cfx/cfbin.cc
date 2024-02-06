@@ -42,8 +42,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
 #include	<stdintx.h>
-#include	<cfxxxx.hh>
 
+#include	"cfsysx.hh"
 #include	"cfbin.h"
 
 

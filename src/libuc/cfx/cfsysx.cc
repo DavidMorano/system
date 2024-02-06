@@ -1,7 +1,7 @@
-/* cfxxx SUPPORT */
+/* cfxxxx SUPPORT */
 /* lang=C++20 */
 
-/* convert a decimal digit string to its binary integer value */
+/* convert a digit c-string to its integer value */
 /* version %I% last-modified %G% */
 
 
@@ -41,11 +41,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<usystem.h>		/* <- for |uc_str{xx}(3uc)| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<stdintx.h>
 
 #include	"cfsysx.hh"
-#include	"cfxxx.h"
 
 
 /* local defines */
@@ -75,33 +76,6 @@
 /* template-subroutines */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
-
-int cfxxxi(cchar *sp,int sl,int b,int *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
-}
-
-int cfxxxl(cchar *sp,int sl,int b,long *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
-}
-
-int cfxxxll(cchar *sp,int sl,int b,longlong *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
-}
-
-int cfxxxui(cchar *sp,int sl,int b,uint *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
-}
-
-int cfxxxul(cchar *sp,int sl,int b,ulong *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
-}
-
-int cfxxxull(cchar *sp,int sl,int b,ulonglong *rp) noex {
-	return cfxxxx(sp,sl,b,rp) ;
-}
 
 

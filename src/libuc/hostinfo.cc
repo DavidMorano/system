@@ -38,6 +38,7 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<cstring>		/* <- for |strlen(4c)| */
+#include	<new>
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<usupport.h>
@@ -55,7 +56,10 @@
 #include	<nleadstr.h>
 #include	<inetconv.h>
 #include	<isinetaddr.h>
+#include	<getnodename.h>
 #include	<getaf.h>
+#include	<isindomain.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"hostinfo.h"
@@ -82,6 +86,7 @@
 /* local namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -92,12 +97,6 @@ extern "C" {
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getnodedomain(char *,char *) noex ;
-    extern int	isindomain(cchar *,cchar *) noex ;
-    extern int	isNotPresent(int) noex ;
-}
 
 
 /* external variables */
@@ -129,7 +128,7 @@ template<typename ... Args>
 static inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->init = {} ;
 	    op->f = {} ;
@@ -137,7 +136,16 @@ static inline int hostinfo_ctor(hostinfo *op,Args ... args) noex {
 	    op->addr = {} ;
 	    op->domainname = nullptr ;
 	    op->a = nullptr ;
-	}
+	    if ((op->nlp = new(nothrow) vecobj) != nullptr) {
+	        if ((op->alp = new(nothrow) vecobj) != nullptr) {
+		    rs = SR_OK ;
+		} /* end if (new-vecobj) */
+		if (rs < 0) {
+		    delete op->nlp ;
+		    op->nlp = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
 	return rs ;
 }
 
@@ -145,7 +153,15 @@ static inline int hostinfo_dtor(hostinfo *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-	}
+	    if (op->alp) {
+		delete op->alp ;
+		op->alp = nullptr ;
+	    }
+	    if (op->nlp) {
+		delete op->nlp ;
+		op->nlp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 
@@ -191,7 +207,7 @@ extern "C" {
 
 /* local variables */
 
-static int	(*getinets[])(hostinfo *,int) = {
+static constexpr int	(*getinets[])(hostinfo *,int) = {
 	getinet_rem,
 	getinet_remlocal,
 	getinet_straight,
@@ -200,7 +216,7 @@ static int	(*getinets[])(hostinfo *,int) = {
 	nullptr
 } ;
 
-static constexpr const struct known	knowns[] = {
+static constexpr struct known	knowns[] = {
 	{ "localhost", 0x7F000001 },
 	{ "anyhost",   0x00000000 },
 	{ "allhost",   0xFFFFFFFF },
@@ -228,6 +244,9 @@ static inline bool isaf6(int a) noex {
 }
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
@@ -237,11 +256,11 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 	    if (hn[0] && (af >= 0)) {
 		if ((rs = hostinfo_bufbegin(op)) >= 0) {
 	            if ((rs = hostinfo_argsbegin(op,af,hn)) >= 0) {
-		        vecobj	*nlp = &op->names ;
+		        vecobj	*nlp = op->nlp ;
 	                cint	vo = VECOBJ_OCOMPACT ;
 	                int	osz = sizeof(HOSTINFO_N) ;
 	                if ((rs = vecobj_start(nlp,osz,10,vo)) >= 0) {
-			    vecobj	*alp = &op->addrs ;
+			    vecobj	*alp = op->alp ;
 	                    osz = sizeof(HOSTINFO_A) ;
 	                    if ((rs = vecobj_start(alp,osz,10,vo)) >= 0) {
 	                        rs = 0 ;
@@ -261,12 +280,12 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 	                                op->domainname = nullptr ;
 	                            }
 	                            hostinfo_addrend(op) ;
-	                            vecobj_finish(&op->addrs) ;
+	                            vecobj_finish(op->alp) ;
 	                        }
 	                    } /* end if (vecobj-addrs) */
 	                    if (rs < 0) {
 	                        hostinfo_finishnames(op) ;
-	                        vecobj_finish(&op->names) ;
+	                        vecobj_finish(op->nlp) ;
 	                    }
 	                } /* end if (vecobj-names) */
 	                if (rs < 0) {
@@ -304,11 +323,11 @@ int hostinfo_finish(hostinfo *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
-		    rs1 = vecobj_finish(&op->addrs) ;
+		    rs1 = vecobj_finish(op->alp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
-		    rs1 = vecobj_finish(&op->names) ;
+		    rs1 = vecobj_finish(op->nlp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
@@ -420,7 +439,7 @@ int hostinfo_enumname(hostinfo *op,hostinfo_cur *curp,cchar **rpp) noex {
 	            rs = hostinfo_curbegin(op,&dcur) ;
 	        } /* end if (user supplied no cursor) */
 	        if (rs >= 0) {
-	            vecobj	*nlp = &op->names ;
+	            vecobj	*nlp = op->nlp ;
 	            HOSTINFO_N	*nep = nullptr ;
 	            cint	rsn = SR_NOTFOUND ;
 	            int		ci = (curp->i >= 0) ? (curp->i + 1) : 0 ;
@@ -483,7 +502,7 @@ int hostinfo_enumaddr(hostinfo *op,hostinfo_cur *curp,cuchar **rpp) noex {
 	            rs = hostinfo_curbegin(op,&dcur) ;
 	        } /* end if (user supplied no cursor) */
 	        if (rs >= 0) {
-	            vecobj	*alp = &op->addrs ;
+	            vecobj	*alp = op->alp ;
 	            HOSTINFO_A	*aep = nullptr ;
 	            cint	rsn = SR_NOTFOUND ;
 	            int		ci = (curp->i >= 0) ? (curp->i + 1) : 0 ;
@@ -634,7 +653,7 @@ static int hostinfo_domain(hostinfo *op) noex {
 static int hostinfo_findcanonical(hostinfo *op) noex {
 	int		rs = SR_OK ;
 	if (op->chostname[0] == '\0') {
-	    vecobj	*nlp = &op->names ;
+	    vecobj	*nlp = op->nlp ;
 	    HOSTINFO_N	*nep = nullptr ;
 	    cint	hlen = MAXHOSTNAMELEN ;
 	    cint	rsn = SR_NOTFOUND ;
@@ -674,7 +693,7 @@ static int hostinfo_findcanonical(hostinfo *op) noex {
 	        } /* end if */
 	    } /* end while */
 	    if ((rs == 0) && (matknown(op->ehostname,-1) >= 0)) {
-	        rs = vecobj_count(&op->addrs) ;
+	        rs = vecobj_count(op->alp) ;
 	    }
 	    if (rs > 0) { /* found */
 	        rs = 0 ;
@@ -815,7 +834,7 @@ static int hostinfo_loadaddrs(hostinfo *op,int af,HOSTENT *hep) noex {
 	    a.af = af ;
 	    a.addrlen = alen ;
 	    if ((rs = hostent_curbegin(hep,&hc)) >= 0) {
-	        vecobj		*alp = &op->addrs ;
+	        vecobj		*alp = op->alp ;
 		const nullptr_t	np{} ;
 	        while ((rs1 = hostent_enumaddr(hep,&hc,&ap)) >= 0) {
 	            a.addrlen = rs1 ;
@@ -879,7 +898,7 @@ static int hostinfo_addname(hostinfo *op,cchar *np,int nl,int af) noex {
 	    rs = SR_OK ;
 	    if (nl != 0) {
 	        HOSTINFO_N	ne{} ;
-	        vecobj		*nlp = &op->names ;
+	        vecobj		*nlp = op->nlp ;
 	        vecobj_vcf	vc = vmatname ;
 	        cint		nrs = SR_NOTFOUND ;
 	        ne.af = af ;
@@ -890,7 +909,7 @@ static int hostinfo_addname(hostinfo *op,cchar *np,int nl,int af) noex {
 	            if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
 	                ne.name = cp ;
 	                c += 1 ;
-	                rs = vecobj_add(&op->names,&ne) ;
+	                rs = vecobj_add(op->nlp,&ne) ;
 	            } /* end if (allocated) */
 	        } /* end if (entry not found) */
 	    } /* end if (non-zero) */
@@ -900,7 +919,7 @@ static int hostinfo_addname(hostinfo *op,cchar *np,int nl,int af) noex {
 /* end subroutine (hostinfo_addname) */
 
 static int hostinfo_finishnames(hostinfo *op) noex {
-	vecobj		*vlp = &op->names ;
+	vecobj		*vlp = op->nlp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
@@ -966,9 +985,9 @@ static int hostinfo_loadknownaddr(hostinfo *op,int af,uint ka) noex {
 	a.af = af ;
 	a.addrlen = addrlen ;
 	memcpy(&a.addr,&na,addrlen) ;
-	if ((rs = vecobj_search(&op->addrs,&a,vmataddr,nullptr)) == nrs) {
+	if ((rs = vecobj_search(op->alp,&a,vmataddr,nullptr)) == nrs) {
 	    c += 1 ;
-	    rs = vecobj_add(&op->addrs,&a) ;
+	    rs = vecobj_add(op->alp,&a) ;
 	} /* end if (entry not found) */
 	return (rs >= 0) ? c : rs ;
 }

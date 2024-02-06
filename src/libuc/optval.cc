@@ -1,4 +1,4 @@
-/* optval */
+/* optval SUPPORT */
 /* lang=C++20 */
 
 /* Option-Value (including boolean) */
@@ -31,7 +31,7 @@
 
 	Returns:
 	>=0		value
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -66,6 +66,9 @@ static constexpr cchar	*hits[] = {
 	"+",
 	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -53,18 +52,19 @@
 struct fsdirtree_flags {
 	uint		eof:1 ;
 	uint		dir:1 ;
-	uint		dirids:1 ;		/* dir-id tracking */
+	uint		dirids:1 ;	/* dir-id tracking */
 } ;
 
 struct fsdirtree_head {
-	uint		magic ;
-	int		opts ;
 	cchar		**prune ;
 	char		*bnbuf ;
 	char		*nbuf ;
+	void		*bsp ;		/* Bit-Set-Pointer */
 	fifostr		dirq ;
-	FSDIR		dir ;
+	fsdir		dir ;
 	hdb		dirids ;
+	uint		magic ;
+	int		opts ;
 	int		bndlen ;
 	int		cdnlen ;
 	int		bnlen ;

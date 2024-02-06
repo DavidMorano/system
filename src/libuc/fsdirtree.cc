@@ -34,7 +34,7 @@
 	object should be "closed".
 
 	Synopsis:
-	int fsdirtree_open(fsdirtree *op,cchar *dname,int) noex
+	int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex
 
 	Arguments:
 	op		object pointer
@@ -43,7 +43,7 @@
 
 	Returns:
 	>=0		good
-	<0		bad in some way!
+	<0		bad in some way! (system-return)
 
 *******************************************************************************/
 
@@ -65,7 +65,7 @@
 #include	<sncpyx.h>
 #include	<mknpathx.h>
 #include	<matxstr.h>
-#include	<hasnot.h>
+#include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -99,7 +99,7 @@ typedef uint32_t	ui ;
 /* external subroutines */
 
 extern "C" {
-    extern int	isDotDir(const char *) noex ;
+    extern int	isDotDir(cchar *) noex ;
 }
 
 
@@ -109,7 +109,7 @@ extern "C" {
 /* local structures */
 
 struct fsdirtree_dirid {
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
@@ -119,11 +119,11 @@ struct fsdirtree_dirid {
 static uint	diridhash(const void *,int) noex ;
 
 static int	fsdirtree_dirbegin(fsdirtree *) noex ;
-static int	fsdirtree_diradd(fsdirtree *,dev_t,uino_t) noex ;
-static int	fsdirtree_dirhave(fsdirtree *,dev_t,uino_t,DIRID **) noex ;
+static int	fsdirtree_diradd(fsdirtree *,dev_t,ino_t) noex ;
+static int	fsdirtree_dirhave(fsdirtree *,dev_t,ino_t,DIRID **) noex ;
 static int	fsdirtree_dirend(fsdirtree *) noex ;
 
-static int	dirid_start(DIRID *,dev_t,uino_t) noex ;
+static int	dirid_start(DIRID *,dev_t,ino_t) noex ;
 static int	dirid_finish(DIRID *) noex ;
 
 static int	diridcmp(DIRID *,DIRID *,int) noex ;
@@ -142,41 +142,42 @@ int fsdirtree_open(fsdirtree *op,cchar *dname,int opts) noex {
 	memclear(op) ;
 	op->opts = opts ;
 	if ((rs = fifostr_start(&op->dirq)) >= 0) {
-	    const char	*bdp = dname ;
+	    cchar	*bdp = dname ;
 	    if ((bdp == nullptr) || (strcmp(bdp,".") == 0)) bdp = "" ;
 	    if (bdp[0] != '/') {
 	        if ((rs = uc_getcwd(op->bnbuf,MAXPATHLEN)) >= 0) {
-	            op->bdnlen = rs ;
+	            op->bndlen = rs ;
 	            if (bdp[0] != '\0')
-	                op->bnbuf[op->bdnlen++] = '/' ;
+	                op->bnbuf[op->bndlen++] = '/' ;
 	        }
 	    }
 	    if (rs >= 0) {
 	        if (bdp[0] != '\0') {
-	            int		cl = MAXPATHLEN - op->bdnlen ;
-	            rs = sncpy1((op->bnbuf + op->bdnlen),cl,bdp) ;
-	            op->bdnlen += rs ;
+	            int		cl = MAXPATHLEN - op->bndlen ;
+	            rs = sncpy1((op->bnbuf + op->bndlen),cl,bdp) ;
+	            op->bndlen += rs ;
 	        }
 	        if (rs >= 0) {
 	            if ((rs = fsdir_open(&op->dir,op->bnbuf)) >= 0) {
 	                op->f.dir = true ;
-	                if (op->bnbuf[op->bdnlen - 1] != '/') {
-	                    op->bnbuf[op->bdnlen++] = '/' ;
+	                if (op->bnbuf[op->bndlen - 1] != '/') {
+	                    op->bnbuf[op->bndlen++] = '/' ;
 			}
 	                if (opts & FSDIRTREE_MUNIQ) {
 	                    if ((rs = fsdirtree_dirbegin(op)) >= 0) {
 	                        USTAT	sb ;
 	                        if ((rs = uc_stat(op->bnbuf,&sb)) >= 0) {
 	                            dev_t	dev = sb.st_dev ;
-	                            uino_t	ino = sb.st_ino ;
+	                            ino_t	ino = sb.st_ino ;
 	                            rs = fsdirtree_diradd(op,dev,ino) ;
 	                        } /* end if (stat) */
-	                        if (rs < 0)
+	                        if (rs < 0) {
 	                            fsdirtree_dirend(op) ;
+				}
 	                    } /* end if (dir-tracking) */
 	                } /* end if (uniq traversal requested) */
 	                if (rs >= 0) {
-	                    op->cdnlen = op->bdnlen ;
+	                    op->cdnlen = op->bndlen ;
 	                    op->magic = FSDIRTREE_MAGIC ;
 	                }
 	                if (rs < 0) {
@@ -219,7 +220,7 @@ int fsdirtree_close(fsdirtree *op) noex {
 	            if (rs >= 0) rs = rs1 ;
 		}
 	        op->magic = 0 ;
-	    /* end if (was open) */
+	    } /* end if (was open) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -233,7 +234,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	int		clen, flen ;
 	int		ndir = 0 ;
 	int		len = 0 ;
-	const char	*enp ;
+	cchar		*enp ;
 	char		*fnp ;
 	char		*cdnp = nullptr ;
 
@@ -289,7 +290,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 		    cbool	f_uniq = (op->opts & FSDIRTREE_MUNIQ) ;
 	            if (S_ISDIR(sbp->st_mode) && f_uniq) {
 	                dev_t	dev = sbp->st_dev ;
-	                uino_t	ino = sbp->st_ino ;
+	                ino_t	ino = sbp->st_ino ;
 	                int	rs1 = fsdirtree_dirhave(op,dev,ino,nullptr) ;
 	                if (rs1 >= 0) {
 	                    f_proc = false ;
@@ -301,8 +302,8 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	            } /* end if (directory-uniqueness check) */
 	        } /* end if (directory-uniqueness check) */
 	        if ((rs >= 0) && f_proc) {
-	            cdnp = op->bnbuf + op->bdnlen ;
-	            clen = op->cdnlen - op->bdnlen + flen ;
+	            cdnp = op->bnbuf + op->bndlen ;
+	            clen = op->cdnlen - op->bndlen + flen ;
 	            if (S_ISDIR(sbp->st_mode)) {
 	                ndir += 1 ;
 	                rs = fifostr_add(&op->dirq,cdnp,clen) ;
@@ -318,13 +319,14 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	        len = 0 ;
 	        op->f.dir = false ;
 	        rs = fsdir_close(&op->dir) ;
-	        if ((op->bdnlen > 0) && 
-	            (op->bnbuf[op->bdnlen - 1] != '/'))
-	            op->bnbuf[op->bdnlen++] = '/' ;
+	        if ((op->bndlen > 0) && 
+	            (op->bnbuf[op->bndlen - 1] != '/')) {
+	            op->bnbuf[op->bndlen++] = '/' ;
+		}
 
 	        while (rs >= 0) {
-	            cdnp = op->bnbuf + op->bdnlen ;
-	            mlen = MAXPATHLEN - op->bdnlen ;
+	            cdnp = op->bnbuf + op->bndlen ;
+	            mlen = MAXPATHLEN - op->bndlen ;
 	            rs = fifostr_remove(&op->dirq,cdnp,mlen) ;
 	            len = rs ;
 	            if ((rs < 0) && (rs != SR_NOTFOUND)) break ;
@@ -336,7 +338,7 @@ int fsdirtree_read(fsdirtree *op,FSDIRTREE_STAT *sbp,char *rbuf,int rlen) noex {
 	                break ;
 	            }
 	            cdnp[len] = '\0' ; /* not needed? */
-	            op->cdnlen = op->bdnlen + len ;
+	            op->cdnlen = op->bndlen + len ;
 	            if ((rs = fsdir_open(&op->dir,op->bnbuf)) >= 0) {
 	                op->f.dir = true ;
 	                break ;
@@ -408,7 +410,7 @@ static int fsdirtree_dirend(fsdirtree *pip) noex {
 }
 /* end subroutine (fsdirtree_dirend) */
 
-static int fsdirtree_diradd(fsdirtree *pip,dev_t dev,uino_t ino) noex {
+static int fsdirtree_diradd(fsdirtree *pip,dev_t dev,ino_t ino) noex {
 	HDB		*dbp = &pip->dirids ;
 	HDB_DATUM	key, val ;
 	DIRID		*dip ;
@@ -417,7 +419,7 @@ static int fsdirtree_diradd(fsdirtree *pip,dev_t dev,uino_t ino) noex {
 	if ((rs = uc_malloc(size,&dip)) >= 0) {
 	    if ((rs = dirid_start(dip,dev,ino)) >= 0) {
 	        key.buf = dip ;
-	        key.len = sizeof(uino_t) + sizeof(dev_t) ;
+	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	        val.buf = dip ;
 	        val.len = size ;
 	        rs = hdb_store(dbp,key,val) ;
@@ -439,7 +441,7 @@ static int fsdirtree_dirhave(fsdirtree *pip,dev_t d,ui ino,DIRID **rpp) noex {
 	did.ino = ino ;
 	did.dev = d ;
 	key.buf = &did ;
-	key.len = sizeof(uino_t) + sizeof(dev_t) ;
+	key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	if ((rs = hdb_fetch(dbp,key,nullptr,&val)) >= 0) {
 	    if (rpp) *rpp = (DIRID *) val.buf ;
 	}
@@ -447,7 +449,7 @@ static int fsdirtree_dirhave(fsdirtree *pip,dev_t d,ui ino,DIRID **rpp) noex {
 }
 /* end subroutine (fsdirtree_dirhave) */
 
-static int dirid_start(DIRID *dip,dev_t dev,uino_t ino) noex {
+static int dirid_start(DIRID *dip,dev_t dev,ino_t ino) noex {
 	int		rs = SR_OK ;
 	dip->dev = dev ;
 	dip->ino = ino ;

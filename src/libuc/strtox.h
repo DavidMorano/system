@@ -1,4 +1,4 @@
-/* strtoxlonglong HEADER */
+/* strtox HEADER */
 /* lang=C20 */
 
 /* numeric-character conversion */
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRTOXLONGLONG_INCLUDE
-#define	STRTOXLONGLONG_INCLUDE
+#ifndef	STRTOX_INCLUDE
+#define	STRTOX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,12 +27,17 @@
 
 EXTERNC_begin
 
-extern longlong strtolonglong(cchar *,char **,int) noex ;
-extern ulonglong strtoulonglong(cchar *,char **,int) noex ;
+extern longlong		strtoxll(cchar *,char **,int) noex ;
+extern ulonglong	strtoxull(cchar *,char **,int) noex ;
+
+#ifdef	COMMENT
+extern intmax		strtoxim(cchar *,char **,int) noex ;
+extern uintmax		strtoxuim(cchar *,char **,int) noex ;
+#endif /* COMMENT */
 
 EXTERNC_end
 
 
-#endif /* STRTOXLONGLONG_INCLUDE */
+#endif /* STRTOX_INCLUDE */
 
 

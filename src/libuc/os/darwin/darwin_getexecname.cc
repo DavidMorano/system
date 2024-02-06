@@ -1,4 +1,4 @@
-/* getexecname */
+/* getexecname SUPPORT */
 /* lang=C++20 */
 
 /* get the file-name (file-path) that was used to 'exec' this program */

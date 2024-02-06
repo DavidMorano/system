@@ -1,4 +1,4 @@
-/* strtoxlonglong SUPPORT */
+/* strtox SUPPORT */
 /* lang=C++20 */
 
 /* conversion of a decimal c-sting to the type |longlong| */
@@ -76,7 +76,7 @@
 #include	<clanguage.h>
 #include	<stdintx.h>
 
-#include	"strtoxlonglong.h"
+#include	"strtox.h"
 
 
 /* local defines */
@@ -129,7 +129,7 @@ constexpr llhelper	llhelp ;
  * alphabets and digits are each contiguous.
  */
 
-longlong strtolonglong(cchar *nptr,char **endptr,int base) noex {
+longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	longlong acc, cutoff;
 	const char *s;
 	int c;
@@ -225,7 +225,7 @@ longlong strtolonglong(cchar *nptr,char **endptr,int base) noex {
 	}
 	return (acc);
 }
-/* end subroutine (strtolonglong) */
+/* end subroutine (strtoxll) */
 
 /*
  * Convert a string to a |ulonglong|.
@@ -234,7 +234,7 @@ longlong strtolonglong(cchar *nptr,char **endptr,int base) noex {
  * alphabets and digits are each contiguous.
  */
 
-ulonglong strtoulonglong(cchar *nptr, char **endptr, int base) noex {
+ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 	ulonglong	acc, cutoff;
 	const char *s;
 	int c;
@@ -314,6 +314,6 @@ ulonglong strtoulonglong(cchar *nptr, char **endptr, int base) noex {
 	}
 	return (acc);
 }
-/* end subroutine (strtoulonglong) */
+/* end subroutine (strtoxull) */
 
 

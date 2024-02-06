@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRTOX_INCLUDE
-#define	STRTOX_INCLUDE
+#ifndef	UCSTRTOX_INCLUDE
+#define	UCSTRTOX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -59,6 +59,6 @@ inline int uc_strto(cchar *sp,cchar **endpp,int b,ulonglong *rp) noex {
 #endif /* __cplusplus */
 
 
-#endif /* STRTOX_INCLUDE */
+#endif /* UCSTRTOX_INCLUDE */
 
 

@@ -82,6 +82,9 @@ constexpr int		b = 10 ;
 /* local subroutine-templates */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 char *itostr(int v,char *endp) noex {
