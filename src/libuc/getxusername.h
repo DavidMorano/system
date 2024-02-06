@@ -12,24 +12,24 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* <- for |uid_t| */
 #include	<pwd.h>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
 
-#ifndef	GETXUSERNAME
-#define	GETXUSERNAME		struct getxusername
+#ifndef	GETXUSER
+#define	GETXUSER	struct getxuser_head
 #endif
-#define	GETXUSERNAME_TTL	(2*3600)	/* for cache */
+#define	GETXUSER_TTL	(2*3600)	/* for cache */
 
 
-struct getxusername {
+struct getxuser_head {
 	PASSWD		*pwp ;		/* caller supplied */
 	char		*pwbuf ;	/* caller supplied */
 	char		*ubuf ;		/* caller supplied */
-	vecstr		names ;		/* temporary storage */
+	vecstr		*nlp ;		/* temporary storage */
 	uid_t		uid ;		/* caller supplied */
 	int		pwlen ;		/* caller supplied */
 	int		ulen ;		/* caller supplied */
@@ -39,10 +39,11 @@ struct getxusername {
 	uint		f_tried:1 ;	/* tried cache already */
 } ;
 
+typedef GETXUSER	getxuser ;
 
 EXTERNC_begin
 
-extern int getxusername(GETXUSERNAME *) noex ;
+extern int getxusername(getxuser *) noex ;
 extern int getusername(char *,int,uid_t) noex ;
 extern int getpwusername(PASSWD *,char *,int,uid_t) noex ;
 

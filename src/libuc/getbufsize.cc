@@ -43,9 +43,9 @@
 	w		which buffer-type to return information on
 
 	Returns:
-	<0		error
-	==0		no value was found
 	>0		buffer size
+	==0		no value was found
+	<0		error (system-return)
 
 	Notes:
 	1. Like many of these system-service related facilities, they
@@ -204,11 +204,10 @@ int ubufsize::load() noex {
 	    if ((rs = vecstr_start(&cv,1,0)) >= 0) {
 	        cchar	*fn = GETBUFSIZE_CONF ;
 	        if ((rs = vecstr_envfile(&cv,fn)) >= 0) {
-	            int		i ;
 	            int		kl, vl ;
 	            cchar	*tp ;
 	            cchar	*kp, *vp ;
-	            for (i = 0 ; vecstr_get(&cv,i,&kp) >= 0 ; i += 1) {
+	            for (int i = 0 ; vecstr_get(&cv,i,&kp) >= 0 ; i += 1) {
 	                if (kp) {
 	                    vp = nullptr ;
 	                    kl = -1 ;

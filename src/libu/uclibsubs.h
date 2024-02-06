@@ -367,6 +367,9 @@ extern int	uc_getusbegin() noex ;
 extern int	uc_getusent(char *,int) noex ;
 extern int	uc_getusend() noex ;
 
+/* why was this missing? */
+extern int	uc_getlogin(char *,int) noex ;
+
 /* miscellaneous */
 extern int	uc_ztime(struct tm *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;

@@ -49,6 +49,11 @@ enum strlibvals {
 	strlibval_node,
 	strlibval_domain,
 	strlibval_localdomain,
+	strlibval_username,
+	strlibval_user,
+	strlibval_logname,
+	strlibval_home,
+	strlibval_mail,
 	strlibval_overlast
 } ;
 

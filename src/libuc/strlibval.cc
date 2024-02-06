@@ -80,6 +80,11 @@ constexpr strenv::strenv() noex {
 	name[strlibval_node] = varname.node ;
 	name[strlibval_domain] = varname.domain ;
 	name[strlibval_localdomain] = varname.localdomain ;
+	name[strlibval_username] = varname.username ;
+	name[strlibval_user] = varname.user ;
+	name[strlibval_logname] = varname.logname ;
+	name[strlibval_home] = varname.home ;
+	name[strlibval_mail] = varname.mail ;
 }
 /* end method (strenv::ctor) */
 
