@@ -39,6 +39,7 @@
 #include	<netinet/in.h>
 #include	<cstring>		/* <- for |strlen(4c)| */
 #include	<new>
+#include	<algorithm>		/* <- for |min(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<usupport.h>
@@ -86,6 +87,7 @@
 /* local namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -196,6 +198,7 @@ static int	getinet_add(hostinfo *,int) noex ;
 static int	getinet_rem(hostinfo *,int) noex ;
 static int	getinet_remlocal(hostinfo *,int) noex ;
 static int	getinet_known(hostinfo *,int) noex ;
+static int	getinet_knowner(hostinfo *,int) noex ;
 
 static int	matknown(cchar *,int) noex ;
 
@@ -222,7 +225,7 @@ static constexpr struct known	knowns[] = {
 	{ "allhost",   0xFFFFFFFF },
 	{ "broadcast", 0xFFFFFFFF },
 	{ "testhost",  0x7F0000FF },
-	{ "local1",    0x7F000001 },
+	{ "local",     0x7F000001 },
 	{ nullptr,     0x00000000 }
 } ;
 
@@ -1155,61 +1158,76 @@ static int getinet_known(hostinfo *op,int af) noex {
 	    }
 	} else {
 	    f_continue = (! isinetaddr(op->arg.hostname)) ;
-	}
+	} /* end if-constexpr (f_fastaddr) */
 	if ((rs >= 0) && f_continue) {
 	    if ((af == af0) || (af == af4)) {
 	        if ((rs = hostinfo_domain(op)) >= 0) {
-	            cint	hlen = MAXHOSTNAMELEN ;
-	            int		nl ;
-	            int		i = -1 ;
-	            cchar	*local = LOCALDOMAINNAME ;
-	            cchar	*tp ;
-	            cchar	*np = op->arg.hostname ;
-	            char	hbuf[MAXHOSTNAMELEN + 1] ;
-	            nl = strlen(np) ;
-	            while ((nl > 0) && (np[nl - 1] == '.')) {
-	                nl -= 1 ;
-	            }
-	            if ((tp = strnchr(np,nl,'.')) != nullptr) {
-	                cint	cl = ((np + nl) - (tp + 1)) ;
-	                cchar	*cp = (tp+1) ;
-			bool	f = false ;
-	                strwcpy(hbuf,np,MIN(nl,NODENAMELEN)) ;
-	                f = f || isindomain(hbuf,op->domainname) ;
-			f = f || (strncmp(local,cp,cl) == 0) ;
-			if (f) {
-	                    nl = (tp - np) ;
-	                    if ((i = matknown(np,nl)) >= 0) {
-	                        if (op->ehostname[0] == '\0') {
-				    c = 1 ;
-	                            rs = snwcpy(op->ehostname,hlen,np,nl) ;
-	                        }
-	                        if ((rs >= 0) && (op->chostname[0] == '\0')) {
-	                            rs = sncpy1(op->chostname,hlen,hbuf) ;
-	                        }
-	                    }
-	                } /* end if (hit) */
-	            } else {
-	                if ((i = matknown(np,nl)) >= 0) {
-	                    if (op->ehostname[0] == '\0') {
-				c = 1 ;
-	                        rs = sncpy1(op->ehostname,hlen,np) ;
-	                    }
-	                    if ((rs >= 0) && (op->chostname[0] == '\0')) {
-	                        cchar	*dn = op->domainname ;
-	                        rs = snsds(op->chostname,hlen,np,dn) ;
-	                    }
-	                }
-	            } /* end if */
-	            if ((rs >= 0) && (i >= 0)) {
-	                rs = hostinfo_loadknownaddr(op,af,knowns[i].a) ;
-	            } /* end if (loading known address) */
+		    rs = getinet_knowner(op,af) ;
+		    c = rs ;
 	        } /* end if (hostinfo_domain) */
 	    } /* end if (address space ours) */
 	} /* end if (continue) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (getinet_known) */
+
+static int getinet_knowner(hostinfo *op,int af) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	int		i = -1 ;
+	cchar		*local = LOCALDOMAINNAME ;
+	cchar		*sp = op->arg.hostname ;
+	char		*hbuf{} ;
+	if ((rs = malloc_hn(&hbuf)) >= 0) {
+	    const nullptr_t	np{} ;
+            cint    hlen = rs ;
+            int     sl = strlen(sp) ;
+            while ((sl > 0) && (sp[sl - 1] == '.')) {
+                sl -= 1 ;
+            }
+            if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != np) {
+                cint        cl = ((sp + sl) - (tp + 1)) ;
+                cchar       *cp = (tp+1) ;
+                bool        f = false ;
+                strwcpy(hbuf,sp,min(sl,NODENAMELEN)) ;
+                f = f || isindomain(hbuf,op->domainname) ;
+                f = f || (strncmp(local,cp,cl) == 0) ;
+                if (f) {
+                    sl = (tp - sp) ;
+                    if ((i = matknown(sp,sl)) >= 0) {
+                        char        *chn = op->chostname ;
+                        char        *ehn = op->ehostname ;
+                        if (op->ehostname[0] == '\0') {
+                            c = 1 ;
+                            rs = snwcpy(ehn,hlen,sp,sl) ;
+                        }
+                        if ((rs >= 0) && (chn[0] == '\0')) {
+                            rs = sncpy1(chn,hlen,hbuf) ;
+                        }
+                    }
+                } /* end if (hit) */
+            } else {
+                if ((i = matknown(sp,sl)) >= 0) {
+                    if (op->ehostname[0] == '\0') {
+                        c = 1 ;
+                        rs = sncpy1(op->ehostname,hlen,sp) ;
+                    }
+                    if ((rs >= 0) && (op->chostname[0] == '\0')) {
+                        cchar       *dn = op->domainname ;
+                        rs = snsds(op->chostname,hlen,sp,dn) ;
+                    }
+                }
+            } /* end if */
+            rs1 = uc_free(hbuf) ;
+            if (rs >= 0) rs = rs1 ;
+        } /* end if (m-a-f) */
+        if ((rs >= 0) && (i >= 0)) {
+            rs = hostinfo_loadknownaddr(op,af,knowns[i].a) ;
+        } /* end if (loading known address) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (getinet_knowner) */
 
 static int matknown(cchar *name,int nl) noex {
 	int		i = 0 ;
@@ -1249,7 +1267,7 @@ static int vmataddr(cvoid **e1pp,cvoid **e2pp) noex {
 /* end subroutine (vmataddr) */
 
 #if	defined(COMMENT) && defined(CF_DEBUGS) && (CF_DEBUGS > 0)
-static int debugprintaliases(cchar *s,struct hostent *hep) noex {
+static int debugprintaliases(cchar *s,HOSTENT *hep) noex {
 	int		i = 0 ;
 	debugprintf("%s: aliases>\n",s) ;
 	if (hep->h_aliases != nullptr) {
