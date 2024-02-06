@@ -30,14 +30,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cerrno>
 #include	<climits>
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<stdintx.h>
 #include	<localmisc.h>
-#include	<strtoxlonglong.h>
+
+#include	"strtox.h"		/* <- the money shot */
 
 
 /* local defines */
@@ -64,7 +64,7 @@ void strtox(cchar *,char **,int,T *rp) noex {
 template<>
 void strtox(cchar *sp,char **epp,int b,int *rp) noex {
 	clong	v = strtol(sp,epp,b) ;
-	*rp = v ;
+	*rp = int(v) ;
 	if (errno == 0) {
 	    cint	n = sizeof(ulong) ;
 	    ulong	uv = ulong(v) ;
@@ -85,13 +85,13 @@ void strtox(cchar *sp,char **epp,int b,long *rp) noex {
 
 template<>
 void strtox(cchar *sp,char **epp,int b,longlong *rp) noex {
-	*rp = strtolonglong(sp,epp,b) ;
+	*rp = strtoxll(sp,epp,b) ;
 }
 
 template<>
 void strtox(cchar *sp,char **epp,int b,uint *rp) noex {
 	ulong	uv = strtoul(sp,epp,b) ;
-	*rp = uv ;
+	*rp = uint(uv) ;
 	if (errno == 0) {
 	    cint	n = sizeof(ulong) ;
 	    uv >>= (n/2) ;
@@ -106,14 +106,14 @@ void strtox(cchar *sp,char **epp,int b,ulong *rp) noex {
 
 template<>
 void strtox(cchar *sp,char **epp,int b,ulonglong *rp) noex {
-	*rp = strtoulonglong(sp,epp,b) ;
+	*rp = strtoxull(sp,epp,b) ;
 }
 
 template<typename T>
 int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rp) {
-	    char	*endp = NULL ;
+	    char	*endp = nullptr ;
 	    errno = 0 ;
 	    strtox(sp,&endp,b,rp) ;
 	    if (epp) *epp = (cchar *) endp ;
@@ -122,6 +122,9 @@ int ucstrtox(cchar *sp,cchar **epp,int b,T *rp) noex {
 	return rs ;
 }
 /* end subroutine-template (ucstrtox) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

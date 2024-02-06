@@ -36,7 +36,8 @@
 
 /*******************************************************************************
 
-	Subroutines to convert digit strings to binary integers.
+	Subroutines to convert digit strings intto binary integers
+	(of various types and sizes).
 
 *******************************************************************************/
 

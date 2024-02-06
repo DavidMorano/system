@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} vecobj_vcmp "
+NAMES="${NAMES} cfxxxx.hh"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/vecobj_vcmp/s//vecobj_vcf/g
+g/cfxxxx.hh/s//cfsysx.hh/g
 	w
 	q
 EOF

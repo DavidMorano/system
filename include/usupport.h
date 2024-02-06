@@ -1,6 +1,9 @@
 /* usupport HEADER */
 /* lang=C20 */
 
+/* UNIX-kernal support subroutines */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (truncate)
 
 T= truncate
 
@@ -161,7 +161,5 @@ main.o:			main.c config.h defs.h
 whatinfo.o:		whatinfo.c config.h
 
 process.o:		process.c $(INCS)
-
-
 
 

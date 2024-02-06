@@ -1,19 +1,17 @@
-/* main */
+/* main SUPPORT */
+/* lang=C++20 */
 
 /* MACTRUNC program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-
 	The program was written from scratch to do what the previous
 	program by the same name did.
-
 
 */
 
@@ -23,21 +21,16 @@
 
 	This is a fairly generic front-end subroutine for a program.
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -61,7 +54,7 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	cfdecmfui(const char *,int,int *) ;
-extern int	cfdecmfull(const char *,int,ULONG *) ;
+extern int	cfdecmfull(const char *,int,ulong *) ;
 extern int	isdigitlatin(int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
@@ -76,22 +69,6 @@ static int	usage(struct proginfo *) ;
 
 
 /* local variables */
-
-static const char	*argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	"sn",
-	"pm",
-	"option",
-	"set",
-	"follow",
-	"af",
-	"of",
-	NULL
-} ;
 
 enum argopts {
 	argopt_root,
@@ -109,18 +86,32 @@ enum argopts {
 	argopt_overlast
 } ;
 
+static constexpr cchar	*argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	"sn",
+	"pm",
+	"option",
+	"set",
+	"follow",
+	"af",
+	"of",
+	NULL
+} ;
+
 
 /* exported subroutines */
 
 
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
+/* exported subroutines */
+
+int main(int argc,mainv argv,mainv envv) {
 	struct proginfo	pi, *pip = &pi ;
 
-	ULONG	argvalue = -1 ;
+	ulong	argvalue = -1 ;
 
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
@@ -559,11 +550,11 @@ struct proginfo	*pip ;
 int procfile(pip,namespec,trunclen)
 struct proginfo	*pip ;
 char		namespec[] ;
-ULONG		trunclen ;
+ulong		trunclen ;
 {
 	struct stat64	sb ;
 
-	ULONG	flen ;
+	ulong	flen ;
 
 	int	rs ;
 	int	fd ;

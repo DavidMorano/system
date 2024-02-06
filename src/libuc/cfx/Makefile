@@ -51,18 +51,18 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= cfxxxx.hh
+# these are really algorithms
+INCS= cfxxxx.hh cfsysx.hh
 
 
-OBJ0_CFX= cfchars.o cfxxx.o cfxxxx.o
+OBJ0_CFX= cfchars.o 
 OBJ1_CFX= cfbin.o 
 OBJ2_CFX= cfoct.o
 OBJ3_CFX= cfdec.o cfdecf.o cfdecmf.o cfdect.o
-
 OBJ4_CFX= cfhex.o
-OBJ5_CFX= cfnum.o
+OBJ5_CFX= cfxxx.o
 OBJ6_CFX= cfa26.o
-OBJ7_CFX= strtoxlonglong.o
+OBJ7_CFX= cfnum.o
 
 
 OBJA_CFX= obj0cfx.o obj1cfx.o obj2cfx.o obj3cfx.o
@@ -156,10 +156,12 @@ cfdecf.o:			cfdecf.cc cfdecf.h $(INCS)
 cfdecmf.o:			cfdecmf.cc cfdecmf.h $(INCS)
 cfdect.o:			cfdect.cc cfdect.h $(INCS)
 cfhex.o:			cfhex.cc cfhex.h $(INCS)
-cfnum.o:			cfnum.cc cfnum.h $(INCS)
 cfxxx.o:			cfxxx.cc cfxxx.h $(INCS)
-cfxxxx.o:			cfxxxx.cc cfxxxx.hh $(INCS)
 cfa26.o:			cfa26.cc cfa26.h cfalphax.hh $(INCS)
-strtoxlonglong.o:		strtoxlonglong.cc strtoxlonglong.h $(INCS)
+cfnum.o:			cfnum.cc cfnum.h $(INCS)
+
+# algorithms
+cfxxxx.o:			cfxxxx.cc cfxxxx.hh $(INCS)
+cfsysx.o:			cfsysx.cc cfsysx.hh $(INCS)
 
 

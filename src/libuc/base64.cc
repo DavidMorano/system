@@ -34,18 +34,16 @@
 	outbuf		result buffer (must be at least 3/4 times input length)
 
 	Returns:
-	-		length of result in bytes
+	>=0		length of result in bytes
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<usysrets.h>		/* we have one SR below */
 #include	<utypedefs.h>
-#include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"base64.h"
 
@@ -53,7 +51,7 @@
 /* local defines */
 
 
-/* local namespacies */
+/* local namespaces */
 
 
 /* local typedefs */
@@ -182,8 +180,8 @@ int base64_d(cchar *inbuf,int len,char *outbuf) noex {
 
 /* encode a group */
 static void base64_eg(cchar *inbuf,char *outbuf) noex {
-	ulong	hold = 0 ;
-	int		i ;
+	ulong		hold = 0 ;
+	int		i{} ;
 	for (i = 0 ; i < 3 ; i += 1) {
 	    hold = (hold << 8) ;
 	    hold |= mkchar(inbuf[i]) ;
@@ -201,15 +199,14 @@ static int base64_dg(cchar *inbuf,char *outbuf) noex {
 	int		rs = 0 ;
 	for (int i = 0 ; i < 4 ; i += 1) {
 	    cint	ich = mkchar(inbuf[i]) ;
-	    int		ch ;
-	    if ((ch = mkchar(base64_dt[ich])) != 0xff) {
+	    if (int ch ; (ch = mkchar(base64_dt[ich])) != 0xff) {
 	        hold = (hold << 6) ;
 	        if (ch != 0xFE) {
 	            hold |= ch ;
 	            dlen += 1 ;
 	        }
 	    } else {
-	        rs = BAD ;
+	        rs = SR_INVALID ;
 	    }
 	    if (rs < 0) break ;
 	} /* end for */

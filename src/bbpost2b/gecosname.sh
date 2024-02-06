@@ -1,6 +1,8 @@
+# GECOSNAME (KoernShell function)
 
-gecosname() {
-  U=${LOGNAME}
+
+function gecosname {
+  typeset U=${LOGNAME}
   if [ $# -gt 0 ] ; then U=${1} ; fi
 
   L=`grep "^${U}:" /etc/passwd `
@@ -25,4 +27,5 @@ gecosname() {
   ${ECHO} $N
   return 0
 }
+
 

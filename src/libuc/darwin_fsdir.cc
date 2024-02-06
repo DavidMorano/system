@@ -21,7 +21,7 @@
 	This code module provides a platform independent implementation
 	of UNIX® file system directory access.
 
-	This module uses the system call 'getdent(2)' to read the
+	This module uses the system call |getdent(2)| to read the
 	directories and to format them into entries. This is on
 	Solaris® and perhaps some others (even some more but in
 	slightly different forms), but it is not generally portable.

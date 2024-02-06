@@ -21,7 +21,7 @@
 
 	Extra npotes:
 
-	The gecos field of the 'passwd' database should be formatted
+	The GECOS field of the 'passwd' database should be formatted
 	in one of the following ways:
 
 	    name,office,workphone,homephone
@@ -63,6 +63,10 @@
 
 	    XNR64430-d.a.morano(126483,BIN8221)
 	    rockwell-d.a.morano(126283,BIN8221)4B-411,5336,6175679484,hp0
+
+	Note that phone number have no minus sign characters or
+	parentheses character in them.  They are just straing decimal
+	digits.
 
 *******************************************************************************/
 
