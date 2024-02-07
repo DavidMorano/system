@@ -211,7 +211,7 @@ cchar *strlibval::strpath() noex {
 		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
-			    int	tl = rs ;
+			    int		tl = rs ;
 			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
 		                cint	cmd = _CS_PATH ;
 			        cint	clen = (tlen - (tl+rs)) ;
