@@ -237,7 +237,7 @@ struct proginfo {
 	int		nbl_system, nbl_local ;
 	int		c_processed, c_delivered ;
 	int		port_comsat ;
-	char		zname[DATER_ZNAMESIZE + 1] ;
+	char		zname[DATER_ZNAMELEN + 1] ;
 	char		stamp[TIMEBUFLEN + 1] ;
 } ;
 

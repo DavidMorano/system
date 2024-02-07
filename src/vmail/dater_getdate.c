@@ -118,7 +118,7 @@ DATE		*dop ;
 	    time_t	t = dp->b.time ;
 	    int		zoff = dp->b.timezone ;
 	    int		isdst = dp->b.dstflag ;
-	    int		zl = DATER_ZNAMESIZE ;
+	    int		zl = DATER_ZNAMELEN ;
 	    const char	*zp = dp->zname ;
 	    rs = date_start(dop,t,zoff,isdst,zp,zl) ;
 	}

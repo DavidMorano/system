@@ -465,7 +465,7 @@ int mbcache_check(MBCACHE *op,struct timeb *nowp,cchar *zname)
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	op->now = *nowp ;
-	strncpy(op->zname,zname,DATER_ZNAMESIZE) ;
+	strncpy(op->zname,zname,DATER_ZNAMELEN) ;
 
 	op->f.now = TRUE ;
 
@@ -476,7 +476,7 @@ int mbcache_check(MBCACHE *op,struct timeb *nowp,cchar *zname)
 	    rs = dater_start(&op->tmpdate,&op->now,op->zname,-1) ;
 	} else {
 	    op->tmpdate.cb = *nowp ;
-	    strncpy(op->tmpdate.cname,zname,DATER_ZNAMESIZE) ;
+	    strncpy(op->tmpdate.cname,zname,DATER_ZNAMELEN) ;
 	} /* end if */
 
 	return rs ;
@@ -1105,7 +1105,7 @@ static int mbcache_setnow(MBCACHE *op)
 	        if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
 	            tbp->timezone = (tmt.gmtoff / 60) ;
 	            tbp->dstflag = tmt.isdst ;
-	            strncpy(op->zname,tmt.zname,DATER_ZNAMESIZE) ;
+	            strncpy(op->zname,tmt.zname,DATER_ZNAMELEN) ;
 	            op->f.now = TRUE ;
 	        } /* end if */
 	    } /* end if (uc_ftime) */

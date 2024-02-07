@@ -33,7 +33,7 @@
 #define	DATER		struct dater_head
 #define	DATER_FL	struct dater_flags
 #define	DATER_ZINFO	struct dater_zinfo
-#define	DATER_ZNAMESIZE	TZABBRLEN		/* maximum TZ name length */
+#define	DATER_ZNAMELEN	TZABBRLEN		/* maximum TZ name length */
 
 /* dater-type-strings (DTSes) */
 
@@ -51,7 +51,7 @@
 #ifdef	COMMENT
 struct timeb {
 	time_t		time ; 		/* time, seconds since the epoch */
-	unsigned short 	millitm ;	/* 1000 msec of additional accuracy */
+	ushort 		millitm ;	/* 1000 msec of additional accuracy */
 	short		timezone ;	/* timezone, minutes west of GMT */
 	short		dstflag ;	/* DST flag */
 } ;
@@ -60,7 +60,7 @@ struct timeb {
 struct dater_zinfo {
 	int		zoff ;		/* minutes west of GMT */
 	int		isdst ;
-	char		zname[DATER_ZNAMESIZE + 1] ;
+	char		zname[DATER_ZNAMELEN + 1] ;
 } ;
 
 struct dater_flags {
@@ -78,8 +78,8 @@ struct dater_head {
 	DATER_FL	f ;
 	uint		magic ;
 	short		cyear ;		/* current */
-	char		cname[DATER_ZNAMESIZE] ;
-	char		zname[DATER_ZNAMESIZE] ;
+	char		cname[DATER_ZNAMELEN+1] ;
+	char		zname[DATER_ZNAMELEN+1] ;
 } ;
 
 typedef DATER		dater ;

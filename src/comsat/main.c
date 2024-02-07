@@ -1399,7 +1399,7 @@ static int procuserinfo_logid(PROGINFO *pip)
 static int process(PROGINFO *pip)
 {
 	struct timeb	now ;
-	const int	zlen = DATER_ZNAMESIZE ;
+	const int	zlen = DATER_ZNAMELEN ;
 	int		rs ;
 	char		*zbuf = pip->zname ;
 #if	CF_DEBUG

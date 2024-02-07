@@ -2012,8 +2012,8 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 		        }
 
 	                if (pip->open.logzone) {
-	                    cint	zlen = DATER_ZNAMESIZE ;
-	                    char	zbuf[DATER_ZNAMESIZE + 1] ;
+	                    cint	zlen = DATER_ZNAMELEN ;
+	                    char	zbuf[DATER_ZNAMELEN + 1] ;
     
 	                    if ((rs1 = dater_getzonename(tdp,zbuf,zlen)) >= 0) {
 			        LOGZONES	*lzp = &pip->lz ;

@@ -56,7 +56,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<cstdlib>		/* for |abs(3c)| */
 #include	<usystem.h>
@@ -143,7 +143,7 @@ static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
 	if ((i+2) <= rlen) {
 	    rbuf[i++] = (v / 10) + '0' ;
 	    rbuf[i++] = (v % 10) + '0' ;
-	    rs = SR_OK ;
+	    rs = 2 ;
 	}
 	return rs ;
 }

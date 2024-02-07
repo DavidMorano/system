@@ -21,6 +21,10 @@
 	creating (set) and extracting (get) time-zone strings from
 	a time-zone offset value.
 
+
+	Name:
+	zos_set
+
 	Description:
 	This subroutine creates a zone-offset string from a zone-offset
 	integer value.
@@ -38,9 +42,12 @@
 	<0		error (system-return)
 
 
+	Name:
+	zos_get
+
 	Description:
-	This subroutine extract a zone-offset integer value from a zone-offset
-	string.
+	This subroutine extracts a zone-offset integer value from
+	a zone-offset string.
 
 	Synopsis:
 	int zos_get(char *zbuf,int zlen,int *zop) noex
@@ -57,8 +64,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -82,37 +87,38 @@
 
 /* 'zo' in minutes west of GMT */
 int zos_set(char *rbuf,int rlen,int zo) noex {
-	int		rs = SR_OK ;
-	int		hours, mins ;
-	char		*bp = rbuf ;
-
-	if (rlen < 5)
-	    return SR_OVERFLOW ;
-
-	hours = abs(zo / 60) % 100 ;
-	mins = abs(zo % 60) ;
-
-	*bp++ = ((zo >= 0) ? '-' : '+') ;
-	*bp++ = (hours / 10) + '0' ;
-	*bp++ = (hours % 10) + '0' ;
-	*bp++ = (mins / 10) + '0' ;
-	*bp++ = (mins % 10) + '0' ;
-	*bp = '\0' ;
-
-	return (rs >= 0) ? (bp-rbuf) : rs ;
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	if (rbuf) {
+	    rs = SR_OVERFLOW ;
+	    if (rlen <= 0) {
+	        int	hours, mins ;
+	        char	*bp = rbuf ;
+	        hours = abs(zo / 60) % 100 ;
+	        mins = abs(zo % 60) ;
+	        *bp++ = ((zo >= 0) ? '-' : '+') ;
+	        *bp++ = (hours / 10) + '0' ;
+	        *bp++ = (hours % 10) + '0' ;
+	        *bp++ = (mins / 10) + '0' ;
+	        *bp++ = (mins % 10) + '0' ;
+	        *bp = '\0' ;
+	        rl = (bp - rbuf) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (zos_set) */
 
 int zos_get(cchar *sp,int sl,int *zop) noex {
-	int		rs = SR_INVALID ;
+	int		rs = SR_FAULT ;
+	if (sp && zop) {
 	int		cl ;
 	int		zoff ;
 	int		ch = 0 ; /* ¥ GCC false complaint */
 	cchar		*cp ;
-
+	    rs = SR_INVALID ;
 	if (sl < 0) sl = strlen(sp) ;
-
-	if (sl) ch = MKCHAR(*sp) ;
+	if (sl) ch = mkchar(*sp) ;
 	if ((sl >= 2) && ((ch == '-') || (ch == '+') || isdigitlatin(ch))) {
 	    int		i, sign ;
 	    int		hours, mins ;
@@ -131,8 +137,7 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 	        (i < cl) && cp[i] && 
 	        (! CHAR_ISWHITE(cp[i])) && (cp[i] != ',') ; 
 	        i += 1) {
-		const int	ch = MKCHAR(cp[i]) ;
-
+		cint	ch = mkchar(cp[i]) ;
 	        if (! isdigitlatin(ch)) {
 	            rs = SR_INVALID ;
 		    break ;
@@ -168,14 +173,17 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 #endif
 
 	    zoff *= sign ;
-	    if (zop != NULL)
+	    if (zop) {
 		*zop = zoff ;
+	}
 
-	    if (rs >= 0)
+	    if (rs >= 0) {
 		rs = (cp - sp) ;
+	    }
 
 	} /* end if (getting timezone offset) */
 
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (zos_get) */

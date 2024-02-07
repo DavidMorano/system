@@ -308,7 +308,7 @@ char	*envv[] ;
 /* get the current time-of-day */
 
 	{
-	    initnow(&pip->now,pip->zname,DATER_ZNAMESIZE) ;
+	    initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
 
 	    dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
 
