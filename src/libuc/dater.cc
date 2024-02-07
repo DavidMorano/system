@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_ASSUMEZN	0		/* assume a zone-name */
-#define	CF_SNTMTIME	1		/* use 'sntmtime(3dam)' */
+#define	CF_SNTMTIME	1		/* use |sntmtime(3dam)| */
 
 /* revision history:
 
@@ -58,9 +58,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>
-#include	<time.h>
 #include	<cstdlib>
 #include	<cstring>
+#include	<ctime>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<usupport.h>		/* <- for |memclear(3u)| */
@@ -130,6 +130,16 @@ struct knownzone {
 
 /* forward references */
 
+template<typename ... Args>
+static inline int dater_magic(dater *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DATER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (dater_magic) */
+
 static int	dater_initcur(DATER *) noex ;
 static int	dater_ldname(DATER *,cchar *,int) noex ;
 static int	dater_pname(DATER *) noex ;
@@ -160,114 +170,76 @@ static int	findtzcomment(char *,int,cchar *) noex ;
 /* exported subroutines */
 
 int dater_start(DATER *dp,TIMEB *nowp,cchar *znp,int znl) noex {
-
-	if (dp == nullptr) return SR_FAULT ;
-
-	memclear(dp) ;
-	dp->b.timezone = TZO_EMPTY ;
-	dp->b.dstflag = -1 ;
-
-	if (nowp != nullptr) {
-	    dp->f.cb = true ;
-	    dp->cb = *nowp ;
-	} /* end if (time-offset) */
-
-	if ((znp != nullptr) && (znl != 0)) {
-	    dp->f.czn = true ;
-	    strnwcpy(dp->cname,DATER_ZNAMESIZE,znp,znl) ;
-	}
-
-	dp->magic = DATER_MAGIC ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    rs = memclear(dp) ;
+	    dp->b.timezone = TZO_EMPTY ;
+	    dp->b.dstflag = -1 ;
+	    if (nowp != nullptr) {
+	        dp->f.cb = true ;
+	        dp->cb = *nowp ;
+	    } /* end if (time-offset) */
+	    if ((znp != nullptr) && (znl != 0)) {
+	        dp->f.czn = true ;
+	        strnwcpy(dp->cname,DATER_ZNAMESIZE,znp,znl) ;
+	    }
+	    dp->magic = DATER_MAGIC ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (dater_start) */
 
 int dater_startcopy(DATER *dp,DATER *d2p) noex {
-
-	if (dp == nullptr) return SR_FAULT ;
-	if (d2p == nullptr) return SR_FAULT ;
-
-	if (d2p->magic != DATER_MAGIC) return SR_NOTOPEN ;
-
-	memcpy(dp,d2p,sizeof(DATER)) ;
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = dater_magic(d2p,dp)) >= 0) {
+	    memcpy(dp,d2p,sizeof(DATER)) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (dater_startcopy) */
 
 int dater_finish(DATER *dp) noex {
-	if (dp == nullptr) return SR_FAULT ;
-
-	if (dp->magic != DATER_MAGIC) return SR_NOTOPEN ;
-
-	dp->b.time = 0 ;
-	dp->magic = 0 ;
-	return SR_OK ;
+	int		rs ;
+	if ((rs = dater_magic(dp)) >= 0) {
+	    dp->b.time = 0 ;
+	    dp->magic = 0 ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (dater_finish) */
 
-#ifdef	COMMENT
-int dater_copy(DATER *dp,DATER *d2p) noex {
-	if (dp == nullptr) return SR_FAULT ;
-	if (d2p == nullptr) return SR_FAULT ;
-
-	if (dp->magic != DATER_MAGIC) return SR_NOTOPEN ;
-
-	memcpy(dp,d2p,sizeof(DATER)) ;
-
-	return SR_OK ;
-}
-/* end subroutine (dater_copy) */
-#endif /* COMMENT */
-
 /* copy one dater to another */
 int dater_setcopy(DATER *dp,DATER *d2p) noex {
-	if (dp == nullptr) return SR_FAULT ;
-	if (d2p == nullptr) return SR_FAULT ;
-
-	if (d2p->magic != DATER_MAGIC) return SR_NOTOPEN ;
-
-#ifdef	COMMENT
-	memcpy(&dp->b,&d2p->b,sizeof(TIMEB)) ;
-	strncpy(dp->zname,d2p->zname,DATER_ZNAMESIZE) ;
-	dp->f.zname = d2p->f.zname ;
-	dp->f.zoff = d2p->f.zoff ;
-	dp->f.tzset = d2p->f.tzset ;
-#else /* COMMENT */
-	memcpy(dp,d2p,sizeof(DATER)) ;
-#endif /* COMMENT */
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = dater_magic(d2p,dp)) >= 0) {
+	    memcpy(dp,d2p,sizeof(DATER)) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (dater_setcopy) */
 
 int dater_setstd(DATER *dp,cchar *sp,int sl) noex {
-	TMZ		stz ;
 	int		rs ;
-
-	if (dp == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (sl < 0)
-	    sl = strlen(sp) ;
-
-	if ((rs = tmz_std(&stz,sp,sl)) >= 0) {
-	    TM	dst = stz.st ;
-	    dater_ldtmz(dp,&stz) ;
-	    if ((rs = dater_defs(dp,&stz)) >= 0) {
-	        rs = dater_mktime(dp,&dst) ;
-	    }
-	} /* end if (tmz_std) */
-
+	if ((rs = dater_magic(dp,sp)) >= 0) {
+	    TMZ		stz ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = tmz_std(&stz,sp,sl)) >= 0) {
+	        TM	dst = stz.st ;
+	        dater_ldtmz(dp,&stz) ;
+	        if ((rs = dater_defs(dp,&stz)) >= 0) {
+	            rs = dater_mktime(dp,&dst) ;
+	        }
+	    } /* end if (tmz_std) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_setstd) */
 
 /* set the dater from a message-type string */
 int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
-	if (dp && sp) {
+	if ((rs = dater_magic(dp,sp)) >= 0) {
 	    comparse	vc ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = comparse_start(&vc,sp,sl)) >= 0) {
@@ -288,7 +260,7 @@ int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
 	        rs1 = comparse_finish(&vc) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (comparse) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_setmsg) */
@@ -296,8 +268,8 @@ int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
 /* set from a dater-like or decimal digit time string */
 /* format> [CC]YYMMDDhhmm[ss][±<zoff>][<zname>] */
 int dater_setstrdig(DATER *dp,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (dp && sp) {
+	int		rs ;
+	if ((rs = dater_magic(dp,sp)) >= 0) {
 	    TMZ		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_strdig(&stz,sp,sl)) >= 0) {
@@ -307,7 +279,7 @@ int dater_setstrdig(DATER *dp,cchar *sp,int sl) noex {
 	            rs = dater_mktime(dp,&dst) ;
 	        }
 	    } /* end if tmz_strdig) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_setstrdig) */
@@ -322,8 +294,8 @@ to the DATER object.
 */
 
 int dater_setlogz(DATER *dp,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (dp && sp) {
+	int		rs ;
+	if ((rs = dater_magic(dp,sp)) >= 0) {
 	    TMZ		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_logz(&stz,sp,sl)) >= 0) {
@@ -333,15 +305,15 @@ int dater_setlogz(DATER *dp,cchar *sp,int sl) noex {
 	            rs = dater_mktime(dp,&dst) ;
 	        }
 	    } /* end if (tmz_logz) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_setlogz) */
 
 /* set from TOUCH (original) time string */
 int dater_settouch(DATER *dp,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (dp) {
+	int		rs ;
+	if ((rs = dater_magic(dp,sp)) >= 0) {
 	    TMZ		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_touch(&stz,sp,sl)) >= 0) {
@@ -351,90 +323,64 @@ int dater_settouch(DATER *dp,cchar *sp,int sl) noex {
 	            rs = dater_mktime(dp,&dst) ;
 	        }
 	    } /* end if (tmz_touch) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_settouch) */
 
 /* set from TOUCH-t (new '-t' version) time string */
 int dater_settoucht(DATER *dp,cchar *sp,int sl) noex {
-	TMZ		stz ;
 	int		rs ;
-
-	if (dp == nullptr) return SR_FAULT ;
-
-	if (sl < 0)
-	    sl = strlen(sp) ;
-
-	if ((rs = tmz_toucht(&stz,sp,sl)) >= 0) {
-	    TM	dst = stz.st ;
-	    dater_ldtmz(dp,&stz) ;
-	    if ((rs = dater_defs(dp,&stz)) >= 0) {
-	        rs = dater_mktime(dp,&dst) ;
-	    }
-	} /* end if (tmz_toucht) */
-
-/* go for it */
-
+	if ((rs = dater_magic(dp,sp)) >= 0) {
+	    TMZ		stz ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = tmz_toucht(&stz,sp,sl)) >= 0) {
+	        TM	dst = stz.st ;
+	        dater_ldtmz(dp,&stz) ;
+	        if ((rs = dater_defs(dp,&stz)) >= 0) {
+	            rs = dater_mktime(dp,&dst) ;
+	        }
+	    } /* end if (tmz_toucht) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_settoucht) */
 
 /* set from a split-out time, zone offset, and zone-name */
 int dater_settmzon(DATER *dp,TM *stp,int zoff,cchar *zstr,int zlen) noex {
-	int		rs = SR_OK ;
-
-	if (dp == nullptr) return SR_FAULT ;
-	if (stp == nullptr) return SR_FAULT ;
-
-/* reportedly there are zones up to 14 hours away from GMT! */
-
-	if ((zoff != TZO_EMPTY) && (abs(zoff) > TZO_MAXZOFF))
-	    return SR_INVALID ;
-
-/* initialize */
-
-	dater_initbase(dp) ;
-
+	int		rs ;
+	if ((rs = dater_magic(dp,stp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if ((zoff == TZO_EMPTY) || (abs(zoff) <= TZO_MAXZOFF)) {
+	        dater_initbase(dp) ;
 /* load the zone-offset (authoritative) */
-
-	if ((rs >= 0) && (zoff != TZO_EMPTY)) {
-	    dp->f.zoff = true ;
-	    dp->b.timezone = zoff ;
-	}
-
+	        if ((rs >= 0) && (zoff != TZO_EMPTY)) {
+	            dp->f.zoff = true ;
+	            dp->b.timezone = zoff ;
+	        }
 /* lookup the zone-name */
-
-	if ((rs >= 0) && (zstr != nullptr) && (zstr[0] != '\0')) {
-	    ZDB		zr ;
-
-	    dp->f.zname = true ;
-	    strnwcpy(dp->zname,DATER_ZNAMESIZE,zstr,zlen) ;
-
-	    if ((rs = zdb_nameoff(&zr,zstr,zlen,zoff)) >= 0) {
-	        if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
-	        if (zoff == TZO_EMPTY) zoff = zr.off ;
-	    } else if (rs == SR_NOTFOUND) {
-	        rs = SR_OK ;
-	    } /* end if (got a match) */
-
-	} /* end if (name lookup) */
-
+	        if ((rs >= 0) && (zstr != nullptr) && (zstr[0] != '\0')) {
+	            ZDB		zr ;
+	            dp->f.zname = true ;
+	            strnwcpy(dp->zname,DATER_ZNAMESIZE,zstr,zlen) ;
+	            if ((rs = zdb_nameoff(&zr,zstr,zlen,zoff)) >= 0) {
+	                if (stp->tm_isdst < 0) stp->tm_isdst = zr.isdst ;
+	                if (zoff == TZO_EMPTY) zoff = zr.off ;
+	            } else if (rs == SR_NOTFOUND) {
+	                rs = SR_OK ;
+	            } /* end if (got a match) */
+	        } /* end if (name lookup) */
 /* calculate the time */
-
-	if (rs >= 0) {
-	    rs = dater_mkptime(dp,stp,zoff) ;
-	}
-
+	        if (rs >= 0) {
+	            rs = dater_mkptime(dp,stp,zoff) ;
+	        }
 /* now do something with the name */
-
-	if ((rs >= 0) && (dp->zname[0] == '\0')) {
-	    rs = dater_mkpzoff(dp,stp,zoff) ;
-	}
-
-	if (rs >= 0)
-	    dp->magic = DATER_MAGIC ;
-
+	        if ((rs >= 0) && (dp->zname[0] == '\0')) {
+	            rs = dater_mkpzoff(dp,stp,zoff) ;
+	        }
+	        if (rs >= 0) dp->magic = DATER_MAGIC ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_settmzon) */
