@@ -3508,9 +3508,9 @@ int		vl ;
 	                proglog_printf(pip,"  date=%s",dbuf) ;
 
 	            if (pip->open.logzone) {
-	                const int	zlen = DATER_ZNAMESIZE ;
+	                const int	zlen = DATER_ZNAMELEN ;
 	                int		zoff ;
-	                char		zbuf[DATER_ZNAMESIZE + 1] ;
+	                char		zbuf[DATER_ZNAMELEN + 1] ;
 
 	                if ((rs1 = dater_getzonename(tdp,zbuf,zlen)) >= 0) {
 

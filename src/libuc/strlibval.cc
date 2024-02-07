@@ -80,6 +80,11 @@ constexpr strenv::strenv() noex {
 	name[strlibval_node] = varname.node ;
 	name[strlibval_domain] = varname.domain ;
 	name[strlibval_localdomain] = varname.localdomain ;
+	name[strlibval_username] = varname.username ;
+	name[strlibval_user] = varname.user ;
+	name[strlibval_logname] = varname.logname ;
+	name[strlibval_home] = varname.home ;
+	name[strlibval_mail] = varname.mail ;
 }
 /* end method (strenv::ctor) */
 
@@ -206,7 +211,7 @@ cchar *strlibval::strpath() noex {
 		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        cchar	*usrlocal = sysword.w_usrlocaldir ;
 		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
-			    int	tl = rs ;
+			    int		tl = rs ;
 			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
 		                cint	cmd = _CS_PATH ;
 			        cint	clen = (tlen - (tl+rs)) ;

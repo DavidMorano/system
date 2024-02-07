@@ -559,7 +559,7 @@ const char	*envv[] ;
 /* get the current time-of-day */
 
 	{
-	    rs = initnow(&pip->now,pip->zname,DATER_ZNAMESIZE) ;
+	    rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
 
 #if	CF_DEBUG
 	    {

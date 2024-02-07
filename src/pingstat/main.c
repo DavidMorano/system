@@ -367,7 +367,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	pip->f.logprog = OPT_LOGPROG ;
 
-	rs = initnow(&pip->now,pip->zname,DATER_ZNAMESIZE) ;
+	rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
 	if (rs < 0) goto badinitnow ;
 
 	if (rs >= 0)

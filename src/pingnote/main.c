@@ -741,7 +741,7 @@ char	*envv[] ;
 	if (count < 0)
 	    count = 0 ;
 
-	initnow(&pip->now,pip->zname,DATER_ZNAMESIZE) ;
+	initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
 
 	rs = dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
 	if (rs < 0)

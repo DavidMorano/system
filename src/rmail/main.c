@@ -575,7 +575,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	{
 	    struct timeb	*nowp = &pip->now ;
-	    const int		zlen = DATER_ZNAMESIZE ;
+	    const int		zlen = DATER_ZNAMELEN ;
 	    if ((rs = initnow(nowp,pip->zname,zlen)) >= 0) {
 	        pip->daytime = nowp->time ;
 	        rs = dater_start(&pip->tmpdate,nowp,pip->zname,-1) ;

@@ -23,7 +23,6 @@
 			* do something w/ string-value pointer 'strpath' *
 		}
 
-
 *******************************************************************************/
 
 #ifndef	STRLIBVAL_INCLUDE
@@ -37,7 +36,7 @@
 #include	<localmisc.h>
 
 
-enum strlivals {
+enum strlibvals {
 	strlibval_path,
 	strlibval_fpath,
 	strlibval_incpath,
@@ -47,6 +46,14 @@ enum strlivals {
 	strlibval_cdpath,
 	strlibval_tmpdir,
 	strlibval_maildir,
+	strlibval_node,
+	strlibval_domain,
+	strlibval_localdomain,
+	strlibval_username,
+	strlibval_user,
+	strlibval_logname,
+	strlibval_home,
+	strlibval_mail,
 	strlibval_overlast
 } ;
 

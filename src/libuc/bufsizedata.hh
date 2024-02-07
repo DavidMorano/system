@@ -99,8 +99,8 @@ constexpr bufsizedata::bufsizedata() noex {
 	        ip->defval = HNBUFLEN ;
 	        break ;
 	    case getbufsize_un:		/* user-name */
-#ifdef	_SC_LOHIN_NAME_MAX
-		ip->name = _SC_LOHIN_NAME_MAX ;
+#ifdef	_SC_LOGIN_NAME_MAX
+		ip->name = _SC_LOGIN_NAME_MAX ;
 #endif
 	        ip->defval = UNBUFLEN ;
 	        break ;

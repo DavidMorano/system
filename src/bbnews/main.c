@@ -1291,7 +1291,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 #endif
 
 	if (rs >= 0) {
-	    if ((rs = initnow(&pip->now,pip->zname,DATER_ZNAMESIZE)) >= 0) {
+	    if ((rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN)) >= 0) {
 	        if (( rs = procopts(pip,&akopts)) >= 0) {
 #if	CF_CHECKONC
 		    rs = checkonc(pip->pr,NULL,NULL,NULL) ;

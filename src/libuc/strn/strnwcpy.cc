@@ -20,7 +20,7 @@
 	strnwcpy
 
 	Description:
-	Ths subroutine is similar to 'strncpy(3c)' (in that it
+	Ths subroutine is similar to |strncpy(3c)| (in that it
 	zero-fills out any remainder of the destiation string buffer
 	which is not otherwise filled up by characters from the
 	source string) but it takes a counted string for the source
@@ -48,7 +48,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strwcpy.h>
@@ -62,7 +62,7 @@
 
 /* local namespaces */
 
-using std::min ;
+using std::min ;			/* subroutine-template */
 
 
 /* local typedefs */

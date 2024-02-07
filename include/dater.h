@@ -22,8 +22,9 @@
 #include	<sys/types.h>
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<usystem.h>
-#include	<date.h>
-#include	<localmisc.h>
+#include	<snx.h>
+#include	<strwcpy.h>
+#include	<localmisc.h>		/* |TZABBRLEN| */
 
 
 /* object defines */
@@ -32,7 +33,7 @@
 #define	DATER		struct dater_head
 #define	DATER_FL	struct dater_flags
 #define	DATER_ZINFO	struct dater_zinfo
-#define	DATER_ZNAMESIZE	8		/* maximum TZ name length */
+#define	DATER_ZNAMELEN	TZABBRLEN		/* maximum TZ name length */
 
 /* dater-type-strings (DTSes) */
 
@@ -50,7 +51,7 @@
 #ifdef	COMMENT
 struct timeb {
 	time_t		time ; 		/* time, seconds since the epoch */
-	unsigned short 	millitm ;	/* 1000 msec of additional accuracy */
+	ushort 		millitm ;	/* 1000 msec of additional accuracy */
 	short		timezone ;	/* timezone, minutes west of GMT */
 	short		dstflag ;	/* DST flag */
 } ;
@@ -59,7 +60,7 @@ struct timeb {
 struct dater_zinfo {
 	int		zoff ;		/* minutes west of GMT */
 	int		isdst ;
-	char		zname[DATER_ZNAMESIZE + 1] ;
+	char		zname[DATER_ZNAMELEN + 1] ;
 } ;
 
 struct dater_flags {
@@ -77,50 +78,47 @@ struct dater_head {
 	DATER_FL	f ;
 	uint		magic ;
 	short		cyear ;		/* current */
-	char		cname[DATER_ZNAMESIZE] ;
-	char		zname[DATER_ZNAMESIZE] ;
+	char		cname[DATER_ZNAMELEN+1] ;
+	char		zname[DATER_ZNAMELEN+1] ;
 } ;
 
-#ifdef	COMMENT
-typedef struct dater_head	dater ;
-#endif
+typedef DATER		dater ;
 
 EXTERNC_begin
 
-extern int dater_start(DATER *,TIMEB *,cchar *,int) noex ;
-extern int dater_startcopy(DATER *,DATER *) noex ;
-extern int dater_setcopy(DATER *,DATER *) noex ;
-extern int dater_setstd(DATER *,cchar *,int) noex ;
-extern int dater_setmsg(DATER *,cchar *,int) noex ;
-extern int dater_setstrdig(DATER *,cchar *,int) noex ;
-extern int dater_setlogz(DATER *,cchar *,int) noex ;
-extern int dater_settouch(DATER *,cchar *,int) noex ;
-extern int dater_settoucht(DATER *,cchar *,int) noex ;
-extern int dater_settmzon(DATER *,TM *,int,cchar *,int) noex ;
-extern int dater_settmzo(DATER *,TM *,int) noex ;
-extern int dater_settmzn(DATER *,TM *,cchar *,int) noex ;
-extern int dater_settimezn(DATER *,time_t,cchar *,int) noex ;
-extern int dater_settimezon(DATER *,time_t,int,cchar *,int) noex ;
-extern int dater_setzinfo(DATER *,DATER_ZINFO *) noex ;
-extern int dater_tzinfo(DATER *,DATER_ZINFO *) noex ;
-extern int dater_mkdatestr(DATER *,int,char *,int) noex ;
-extern int dater_mkstd(DATER *,char *,int) noex ;
-extern int dater_mkenv(DATER *,char *,int) noex ;
-extern int dater_mkmsg(DATER *,char *,int) noex ;
-extern int dater_mkhdr(DATER *,char *,int) noex ;
-extern int dater_mkstrdig(DATER *,char *,int) noex ;
-extern int dater_mklogz(DATER *,char *,int) noex ;
-extern int dater_gettime(DATER *,time_t *) noex ;
-extern int dater_getzoneoff(DATER *,int *) noex ;
-extern int dater_getzonename(DATER *,char *,int) noex ;
-extern int dater_getzinfo(DATER *,DATER_ZINFO *) noex ;
-extern int dater_getdate(DATER *,DATE *) noex ;
-extern int dater_diff(DATER *,DATER *,time_t *) noex ;
-extern int dater_finish(DATER *) noex ;
+extern int dater_start(dater *,TIMEB *,cchar *,int) noex ;
+extern int dater_startcopy(dater *,DATER *) noex ;
+extern int dater_setcopy(dater *,DATER *) noex ;
+extern int dater_setstd(dater *,cchar *,int) noex ;
+extern int dater_setmsg(dater *,cchar *,int) noex ;
+extern int dater_setstrdig(dater *,cchar *,int) noex ;
+extern int dater_setlogz(dater *,cchar *,int) noex ;
+extern int dater_settouch(dater *,cchar *,int) noex ;
+extern int dater_settoucht(dater *,cchar *,int) noex ;
+extern int dater_settmzon(dater *,TM *,int,cchar *,int) noex ;
+extern int dater_settmzo(dater *,TM *,int) noex ;
+extern int dater_settmzn(dater *,TM *,cchar *,int) noex ;
+extern int dater_settimezn(dater *,time_t,cchar *,int) noex ;
+extern int dater_settimezon(dater *,time_t,int,cchar *,int) noex ;
+extern int dater_setzinfo(dater *,DATER_ZINFO *) noex ;
+extern int dater_tzinfo(dater *,DATER_ZINFO *) noex ;
+extern int dater_mkdatestr(dater *,int,char *,int) noex ;
+extern int dater_mkstd(dater *,char *,int) noex ;
+extern int dater_mkenv(dater *,char *,int) noex ;
+extern int dater_mkmsg(dater *,char *,int) noex ;
+extern int dater_mkhdr(dater *,char *,int) noex ;
+extern int dater_mkstrdig(dater *,char *,int) noex ;
+extern int dater_mklogz(dater *,char *,int) noex ;
+extern int dater_gettime(dater *,time_t *) noex ;
+extern int dater_getzoneoff(dater *,int *) noex ;
+extern int dater_getzonename(dater *,char *,int) noex ;
+extern int dater_getzinfo(dater *,DATER_ZINFO *) noex ;
+extern int dater_diff(dater *,DATER *,time_t *) noex ;
+extern int dater_finish(dater *) noex ;
 
 #ifdef	COMMENT
-extern int dater_nzones(DATER *) noex ;
-extern int dater_zinfo(DATER *,DATER_ZINFO *,int) noex ;
+extern int dater_nzones(dater *) noex ;
+extern int dater_zinfo(dater *,DATER_ZINFO *,int) noex ;
 #endif /* COMMENT */
 
 EXTERNC_end

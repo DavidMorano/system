@@ -489,7 +489,7 @@ static int procmsg(PROGINFO *pip,PROCDATA *pdp,int f_eoh)
 {
 	BFLINER		*blp = &pdp->bline ;
 	MAILMSG		amsg, *msgp = &amsg ;
-	const int	llen = MSGLINELEN ;
+	cint	llen = MSGLINELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -615,7 +615,7 @@ static int procmsger(PROGINFO *pip,PROCDATA *pdp)
 static int procmsgenv(PROGINFO *pip,PROCDATA *pdp)
 {
 	MSGINFO		*mip = pdp->mip ;
-	const int	salen = STACKADDRLEN ;
+	cint		salen = STACKADDRLEN ;
 	int		rs ;
 	char		sabuf[STACKADDRLEN+1] ;
 
@@ -625,40 +625,27 @@ static int procmsgenv(PROGINFO *pip,PROCDATA *pdp)
 #endif
 
 	if ((rs = procmsgenver(pip,pdp,sabuf,salen)) >= 0) {
-	    struct timeb	*nowp = &pip->now ;
-	    const int		malen = MAILADDRLEN ;
-
+	    TIMEB	*nowp = &pip->now ;
+	    cint	malen = MAILADDRLEN ;
 	    if ((mip->e_from[0] == '\0') || (! pip->f.trusted)) {
 	        const time_t	t = nowp->time ;
 		cchar		*envfrom = pip->envfrom ;
-
 	        if ((rs = sncpy1(pdp->efrom,malen,envfrom)) >= 0) {
-	            const int	isdst = nowp->dstflag ;
-	            const int	zoff = nowp->timezone ;
+	            cint	isdst = nowp->dstflag ;
+	            cint	zoff = nowp->timezone ;
 	            cchar	*zname = pip->zname ;
 	            rs = dater_settimezon(&pdp->edate,t,zoff,zname,isdst) ;
 		}
-
 	    } else {
-
 	        strwcpy(pdp->efrom,mip->e_from,malen) ;
-
 	        rs = dater_setcopy(&pdp->edate,&mip->edate) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("progmsgs/procmsgenv: dater_setcopy() rs=%d\n",rs) ;
-#endif
-
 	    } /* end if */
-
 	    if (pip->open.logprog && pip->f.logmsg) {
 		int	cl ;
 	        cchar	*cp = pdp->efrom ;
 		cl = strnlen(cp,(LOGLINELEN - 4)) ;
 	        proglog_printf(pip,"  F %t",cp,cl) ;
 	    }
-
 	} /* end if */
 
 #if	CF_DEBUG
@@ -701,7 +688,7 @@ static int procmsgenver(PROGINFO *pip,PROCDATA *pdp,char *addrbuf,int addrlen)
 	sal = 0 ;
 	for (i = 0 ; mailmsg_enver(msgp,i,mep) >= 0 ; i += 1) {
 	    EMAINFO	ai ;
-	    const int	dlen = DATEBUFLEN ;
+	    cint	dlen = DATEBUFLEN ;
 	    int		atype ;
 	    int		froml = -1 ;
 	    cchar	*fromp = NULL ;
@@ -904,7 +891,7 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    vl = rs ;
 	    if ((rs = vecstr_add(hlp,hdr,HL_MESSAGEID)) >= 0) {
-		const int	mlen = MAILADDRLEN ;
+		cint	mlen = MAILADDRLEN ;
 		char		*mbuf = mip->h_messageid ;
 	        if ((rs = hdrextid(mbuf,mlen,vp,vl)) == 0) {
 	            sp = mip->h_messageid ;
@@ -926,7 +913,7 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 	if (rs >= 0) {
 	    f_messageid = TRUE ;
 	    if (mip->h_messageid[0] == '\0') {
-		const int	mlen = MAILADDRLEN ;
+		cint	mlen = MAILADDRLEN ;
 		char		*mbuf = mip->h_messageid ;
 	        f_messageid = FALSE ;
 	        sp = mip->h_messageid ;
@@ -1098,8 +1085,8 @@ static int procmsghdr_xmailer(PROGINFO *pip,PROCDATA *pdp)
 static int procmsghdr_received(PROGINFO *pip,PROCDATA *pdp)
 {
 	MAILMSG		*msgp = pdp->msgp ;
-	const int	salen = STACKADDRLEN ;
-	const int	dlen = DATEBUFLEN ;
+	cint	salen = STACKADDRLEN ;
+	cint	dlen = DATEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		vl ;
@@ -1394,8 +1381,8 @@ static int procmsghdr_xpriority(PROGINFO *pip,PROCDATA *pdp)
 	debugprintf("progmsgs/procmsghdr_xpriority: v=%t\n",vp,vl) ;
 #endif
 	                if ((rs = comparse_getcom(&com,&cp)) >= 0) {
-		            const int	plen = 20 ;
-		            const int	hlen = HDRNAMELEN ;
+		            cint	plen = 20 ;
+		            cint	hlen = HDRNAMELEN ;
 		            int		cl = rs ;
 			    int		hnl ;
 		            cchar	*hnp = hdr ;
@@ -1497,7 +1484,7 @@ static int procmsgout(PROGINFO *pip,PROCDATA *pdp)
 /* write out our own (new) envelope */
 static int procmsgoutenv(PROGINFO *pip,PROCDATA *pdp)
 {
-	const int	dlen = DATEBUFLEN ;
+	cint	dlen = DATEBUFLEN ;
 	int		rs ;
 	int		tlen = 0 ;
 	char		dbuf[DATEBUFLEN+1] ;
@@ -1716,7 +1703,7 @@ static int procmsgouthdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 	if (mip->h_messageid != NULL) {
 	    cchar	*sp = mip->h_messageid ;
 	    bfile	*tfp = pdp->tfp ;
-	    const int	sl = strlen(mip->h_messageid) ;
+	    cint	sl = strlen(mip->h_messageid) ;
 	    int		mlen ;
 	    cchar	*hdr = HN_MESSAGEID ;
 	    char	*mbuf ;
@@ -1743,7 +1730,7 @@ static int procmsgouthdr_remaining(PROGINFO *pip,PROCDATA *pdp)
 {
 	MAILMSG		*msgp = pdp->msgp ;
 	VECSTR		*hlp = &pdp->wh ;
-	const int	hdrlen = HDRNAMELEN ;
+	cint	hdrlen = HDRNAMELEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -1801,7 +1788,7 @@ static int procmsgouthdr_remaining(PROGINFO *pip,PROCDATA *pdp)
 static int procmsgouthdr_status(PROGINFO *pip,PROCDATA *pdp)
 {
 	MAILMSG		*msgp = pdp->msgp ;
-	const int	slen = 10 ; /* status bytes available */
+	cint	slen = 10 ; /* status bytes available */
 	int		rs ;
 	int		vl ;
 	cchar		*hdr = HN_STATUS ;
@@ -1996,7 +1983,7 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 	            vl = rs ;
 
 	            if ((rs = dater_setmsg(&pip->tmpdate,vp,vl)) >= 0) {
-		        const int	dlen = DATEBUFLEN ;
+		        cint	dlen = DATEBUFLEN ;
 	                int		zoff ;
 		        char		dbuf[DATEBUFLEN+1] ;
 	                time_t		t ;
@@ -2009,7 +1996,7 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 	                dater_mkstrdig(tdp,dbuf,dlen) ;
 
 	                if (pip->f.logmsg) {
-			    const int	czoff = pip->now.timezone ;
+			    cint	czoff = pip->now.timezone ;
 			    cchar	*fmt = "  date=%s" ;
 			    char	tbuf[TIMEBUFLEN+1] = { 0 } ;
 #if	CF_DEBUG
@@ -2025,8 +2012,8 @@ static int procmsgouthdr_date(PROGINFO *pip,PROCDATA *pdp)
 		        }
 
 	                if (pip->open.logzone) {
-	                    const int	zlen = DATER_ZNAMESIZE ;
-	                    char	zbuf[DATER_ZNAMESIZE + 1] ;
+	                    cint	zlen = DATER_ZNAMELEN ;
+	                    char	zbuf[DATER_ZNAMELEN + 1] ;
     
 	                    if ((rs1 = dater_getzonename(tdp,zbuf,zlen)) >= 0) {
 			        LOGZONES	*lzp = &pip->lz ;
@@ -2202,9 +2189,9 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 	if (mailmsg_hdrval(msgp,hdr,NULL) == SR_NOTFOUND) {
 	    VECOBJ	*rlp = pdp->rlp ;
 	    RECIP	*rp ;
-	    const int	hlen = strlen(hdr) ;
-	    const int	mlen = MAXMSGLINELEN ;
-	    const int	elen = MAXMSGLINELEN ;
+	    cint	hlen = strlen(hdr) ;
+	    cint	mlen = MAXMSGLINELEN ;
+	    cint	elen = MAXMSGLINELEN ;
 	    int		i ;
 	    char	ebuf[MAXMSGLINELEN+1] ;
 
@@ -2262,7 +2249,7 @@ static int procmsgouthdr_deliveredto(PROGINFO *pip,PROCDATA *pdp)
 	                if ((rs = progprinthdr(pip,tfp,hdr,cp,cl)) >= 0) {
 	                    pdp->tlen += rs ;
 	                    if (pip->f.logmsg) {
-		                const int	ml = MIN(cl,50) ;
+		                cint	ml = MIN(cl,50) ;
 	                        proglog_printf(pip,"  %s»%t",hdr,cp,ml) ;
 		            }
 			} /* end if (print-hdr) */
@@ -2312,7 +2299,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 {
 	MSGINFO		*mip = pdp->mip ;
 	BFLINER		*blp = &pdp->bline ;
-	const int	llen = MSGLINELEN ;
+	cint	llen = MSGLINELEN ;
 	int		rs = SR_OK ;
 	int		ll ;
 	int		lenr ;
@@ -2770,7 +2757,7 @@ int		al ;
 {
 	EMA		a ;
 	EMA_ENT		*ep ;
-	const int	hlen = HDRNAMELEN ;
+	cint	hlen = HDRNAMELEN ;
 	int		rs = SR_OK ;
 	int		j ;
 	int		hnl = -1 ;

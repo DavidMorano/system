@@ -770,8 +770,8 @@ static int useraccdb_datethis(USERACCDB *op,time_t *timep,cchar *tsp,int tsl)
 
 	if (! op->f.dater) {
 	    struct timeb	now ;
-	    const int		zlen = DATER_ZNAMESIZE ;
-	    char		zbuf[DATER_ZNAMESIZE+1] ;
+	    const int		zlen = DATER_ZNAMELEN ;
+	    char		zbuf[DATER_ZNAMELEN+1] ;
 	    if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
 	        rs = dater_start(&op->dm,&now,zbuf,zlen) ;
 	        op->f.dater = (rs >= 0) ;

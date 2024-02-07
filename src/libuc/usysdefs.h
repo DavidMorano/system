@@ -125,18 +125,18 @@
 #ifdef	_POSIX_LOGIN_NAME_MAX
 #define	UNBUFLEN	_POSIX_LOGIN_NAME_MAX
 #else
-#define	UNBUFLEN	32
+#define	UNBUFLEN	255		/* picked value from MacOS! */
 #endif
 #endif
 
 /* group-name */
 #ifndef	GNBUFLEN
-#define	GNBUFLEN	32
+#define	GNBUFLEN	255		/* picked value from MacOS! */
 #endif
 
 /* project-name */
 #ifndef	PNBUFLEN
-#define	PNBUFLEN	32
+#define	PNBUFLEN	255		/* picked value from MacOS! */
 #endif
 
 /* password entry */

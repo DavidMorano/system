@@ -219,7 +219,7 @@ int pingstatdb_open(PINGSTATDB *psp,cchar *fname,mode_t omode,int fperm)
 #endif
 	        if ((rs = bcontrol(&psp->pfile,cmd,TRUE)) >= 0) {
 	            if ((rs = vecitem_start(&psp->entries,0,0)) >= 0) {
-	                const int	zsize = DATER_ZNAMESIZE ;
+	                const int	zsize = DATER_ZNAMELEN ;
 	                if ((rs = initnow(&psp->now,psp->zname,zsize)) >= 0) {
 	                    psp->magic = PINGSTATDB_MAGIC ;
 	                }

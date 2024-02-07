@@ -237,7 +237,7 @@ struct proginfo {
 	int		intspeed ;		/* speed-check interval */
 	char		cmd[LOGIDLEN + 1] ;	/* for MSU */
 	char		speedname[MAXNAMELEN + 1] ; /* really for MSU */
-	char		zname[DATER_ZNAMESIZE + 1] ;
+	char		zname[DATER_ZNAMELEN + 1] ;
 } ;
 
 struct pivars {

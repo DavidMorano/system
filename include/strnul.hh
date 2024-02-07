@@ -38,7 +38,7 @@ struct strnul {
 	typedef const char	*charp ;
 	cchar		*rp = nullptr ;
 	cchar		*sp = nullptr ;
-	char		*as = nullptr ;
+	char		*as = nullptr ;	/* allocated memory */
 	int		sl = 0 ;
 	char		buf[STRNUL_SHORTLEN+1] ;
 	strnul(cchar *ap,int al = -1) noex : sp(ap), sl(al) { 

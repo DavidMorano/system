@@ -985,7 +985,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
 
 	if (rs >= 0) {
-	    rs = initnow(&pip->now,pip->zname,DATER_ZNAMESIZE) ;
+	    rs = initnow(&pip->now,pip->zname,DATER_ZNAMELEN) ;
 	    pip->daytime = pip->now.time ;
 	}
 

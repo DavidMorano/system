@@ -46,7 +46,7 @@ struct pingstatdb_head {
 	struct timeb	now ;
 	time_t		mtime ;
 	PINGSTATDB_FL	f ;
-	char		zname[DATER_ZNAMESIZE] ;
+	char		zname[DATER_ZNAMELEN] ;
 } ;
 
 struct pingstatdb_c {

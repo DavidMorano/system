@@ -45,12 +45,11 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<strlibval.hh>
 #include	<getxusername.h>
 #include	<syswords.hh>
+#include	<strlibval.hh>
 #include	<mkpathx.h>
 #include	<dirs.h>
-#include	<strlibval.hh>
 #include	<isnot.h>
 #include	<localmisc.h>
 
