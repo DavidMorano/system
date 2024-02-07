@@ -229,7 +229,7 @@ static constexpr struct mapent	mapents[] = {
 	{ nullptr,	uidend }
 } ;
 
-static strlibvals	strusers[] = {
+constexpr strlibvals	strusers[] = {
 	strlibval_username,
 	strlibval_user,
 	strlibval_logname,
@@ -272,7 +272,7 @@ int getpwusername(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	if (pwp && pwbuf) {
 	    rs = SR_INVALID ;
-	    if (pwlen < 0) {
+	    if (pwlen > 0) {
 	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
 		    getxuser	xu{} ;
 		    cint	ulen = rs ;
@@ -341,7 +341,7 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	    PASSWD	pw ;
 	    cint	pwlen = rs ;
-	    char	*pwbuf ;
+	    char	*pwbuf{} ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        getxuser	xu{} ;
 	        xu.pwp = &pw ;
