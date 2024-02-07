@@ -19,8 +19,6 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<pthread.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
@@ -29,6 +27,7 @@
 #include	<snxxx.h>
 #include	<snuuid.h>
 #include	<snaddw.h>
+#include	<sntmtime.h>
 
 
 EXTERNC_begin

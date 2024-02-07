@@ -12,26 +12,27 @@
 
 
 #include	<envstandards.h>	/* first to configure */
-#include	<time.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<localmisc.h>		/* <- |TZABBRLEN| */
 
 
-#define	GETDEFZINFO		struct getdefzinfo
-#define	GETDEFZINFO_ZNAMELEN	TZABBRLEN
+#define	DEFZINFO		struct defzinfo_head
+#define	DEFZINFO_ZNAMELEN	TZABBRLEN
 
 
-struct getdefzinfo {
+struct defzinfo_head {
 	int	zoff  ;		/* minutes west of GMT */
 	int	isdst ;		/* is-dst flag */
-	char	zname[GETDEFZINFO_ZNAMELEN + 1] ;
+	char	zname[DEFZINFO_ZNAMELEN + 1] ;
 } ;
+
+typedef DEFZINFO	defzinfo ;
 
 EXTERNC_begin
 
-extern int	getdefzinfo(GETDEFZINFO *,int) noex ;
+extern int	getdefzinfo(defzinfo *,int) noex ;
 
 EXTERNC_end
 

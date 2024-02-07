@@ -51,7 +51,7 @@ constexpr bool		f_darwin = F_DARWIN ;
 
 /* exported subroutines */
 
-int getdefzinfo(GETDEFZINFO *zip,int isdst) noex {
+int getdefzinfo(DEFZINFO *zip,int isdst) noex {
 	int		rs = SR_FAULT ;
 	if (zip) {
 	    cchar	*zp ;
@@ -63,7 +63,7 @@ int getdefzinfo(GETDEFZINFO *zip,int isdst) noex {
 	            zp = tmo.tm_zone ;
 		}
 	    } else {
-	        int	f_daylight ;
+	        bool	f_daylight ;
 		rs = SR_OK ;
 	        tzset() ;
 	        f_daylight = (isdst >= 0) ? isdst : daylight ;
@@ -71,7 +71,7 @@ int getdefzinfo(GETDEFZINFO *zip,int isdst) noex {
 	        zp = (f_daylight) ? tzname[1] : tzname[0] ;
 	    } /* end if-constexpr (f_darwin) */
 	    if (rs >= 0) {
-		cint	znamelen = GETDEFZINFO_ZNAMELEN ;
+		cint	znamelen = DEFZINFO_ZNAMELEN ;
 	        rs = strwcpy(zip->zname,zp,znamelen) - zip->zname ;
 	    }
 	} /* end if (non-null) */

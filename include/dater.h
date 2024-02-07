@@ -22,6 +22,8 @@
 #include	<sys/types.h>
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<usystem.h>
+#include	<snx.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>		/* |TZABBRLEN| */
 
 
@@ -111,7 +113,6 @@ extern int dater_gettime(dater *,time_t *) noex ;
 extern int dater_getzoneoff(dater *,int *) noex ;
 extern int dater_getzonename(dater *,char *,int) noex ;
 extern int dater_getzinfo(dater *,DATER_ZINFO *) noex ;
-extern int dater_getdate(dater *,DATE *) noex ;
 extern int dater_diff(dater *,DATER *,time_t *) noex ;
 extern int dater_finish(dater *) noex ;
 
