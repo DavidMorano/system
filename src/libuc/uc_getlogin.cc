@@ -23,8 +23,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |getlogin(3c)| */
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>		/* |strlen(3c)| */
@@ -51,7 +50,7 @@
 
 /* local variables */
 
-constexpr bool	f_pthread = _POSIX_PTHREAD_SEMANTICS ;
+constexpr bool		f_pthread = _POSIX_PTHREAD_SEMANTICS ;
 
 
 /* exported variables */
@@ -62,7 +61,7 @@ constexpr bool	f_pthread = _POSIX_PTHREAD_SEMANTICS ;
 int uc_getlogin(char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	   if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
 		cint	ulen = rs ;
 		rs = SR_OVERFLOW ;
 	        if ((rlen >= 0) && (rlen < ulen)) {
@@ -71,7 +70,7 @@ int uc_getlogin(char *rbuf,int rlen) noex {
 	                if (rs >= 0) rs = strlen(rbuf) ;
 	            } else {
 	                cchar	*rp = getlogin() ;
-	                rs = (rp != NULL) ? 0 : (- errno) ;
+	                rs = (rp != nullptr) ? 0 : (- errno) ;
 	                if (rs >= 0) rs = sncpy1(rbuf,rlen,rp) ;
 	            } /* end if-constexpr (f_pthread) */
 	        } /* end if (valid) */

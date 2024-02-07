@@ -134,6 +134,7 @@
 #include	<ucproguser.h>
 #include	<utmpacc.h>
 #include	<getutmpent.h>		/* <- for |getutmpent(3uc)| */
+#include	<strlibval.hh>
 #include	<sfx.h>
 #include	<snx.h>
 #include	<sncpyx.h>
@@ -153,26 +154,6 @@
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
 #endif /* CF_UGETPW */
-
-#ifndef	VARHOME
-#define	VARHOME		"HOME"
-#endif
-
-#ifndef	VARMAIL
-#define	VARMAIL		"MAIL"
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARUSER
-#define	VARUSER		"USER"
-#endif
-
-#ifndef	VARLOGNAME
-#define	VARLOGNAME	"LOGNAME"
-#endif
 
 #define	GETXSTATE	struct getxusername_state
 
@@ -218,16 +199,11 @@ struct mapent {
 static int	getusernamer(char *,int,uid_t) noex ;
 
 static int	getxusername_self(getxuser *) noex ;
-static int	getxusername_varusername(getxuser *) noex ;
-static int	getxusername_varuser(getxuser *) noex ;
-static int	getxusername_home(getxuser *) noex ;
-static int	getxusername_mail(getxuser *) noex ;
-static int	getxusername_varlogname(getxuser *) noex ;
+static int	getxusername_varenv(getxuser *) noex ;
 static int	getxusername_utmp(getxuser *) noex ;
 static int	getxusername_map(getxuser *) noex ;
 static int	getxusername_uid(getxuser *) noex ;
 
-static int	getxusername_var(getxuser *,cchar *) noex ;
 static int	getxusername_varbase(getxuser *,cchar *) noex ;
 static int	getxusername_lookup(getxuser *,cchar *) noex ;
 
@@ -238,11 +214,7 @@ constexpr uid_t		uidend = -1 ;
 
 static constexpr int	(*getxusernames[])(getxuser *) = {
 	getxusername_self,
-	getxusername_varusername,
-	getxusername_varuser,
-	getxusername_home,
-	getxusername_mail,
-	getxusername_varlogname,
+	getxusername_varenv,
 	getxusername_utmp,
 	getxusername_map,
 	getxusername_uid,
@@ -257,17 +229,23 @@ static constexpr struct mapent	mapents[] = {
 	{ nullptr,	uidend }
 } ;
 
-static constexpr cchar	*uservars[] = {
-	varname.username,
-	varname.user,
-	varname.logname,
-	varname.home,
-	varname.mail,
-	nullptr
+static strlibvals	strusers[] = {
+	strlibval_username,
+	strlibval_user,
+	strlibval_logname,
+	strlibval_home,
+	strlibval_mail,
+	strlibval_overlast
 } ;
 
-constexpr bool	f_utmpacc = CF_UTMPACC ;
-constexpr bool	f_getutmpname = CF_GETUTMPNAME ;
+static strlibval	varusername(strlibval_username) ;
+static strlibval	varuser(strlibval_user) ;
+static strlibval	varlogname(strlibval_logname) ;
+static strlibval	varhome(strlibval_home) ;
+static strlibval	varmail(strlibval_mail) ;
+
+constexpr bool		f_utmpacc = CF_UTMPACC ;
+constexpr bool		f_getutmpname = CF_GETUTMPNAME ;
 
 
 /* exported variables */
@@ -293,18 +271,21 @@ int getusername(char *ubuf,int ulen,uid_t uid) noex {
 int getpwusername(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	if (pwp && pwbuf) {
-	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
-		getxuser	xu{} ;
-		cint		ulen = rs ;
-		char		ubuf[rs + 1] ;	/* <- on the stack; love it */
-	        xu.pwp = pwp ;
-	        xu.pwbuf = pwbuf ;
-	        xu.pwlen = pwlen ;
-	        xu.ubuf = ubuf ;
-	        xu.ulen = ulen ;
-	        xu.uid = uid ;
-	        rs = getxusername(&xu) ;
-	    } /* end if (getbufsize) */
+	    rs = SR_INVALID ;
+	    if (pwlen < 0) {
+	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+		    getxuser	xu{} ;
+		    cint	ulen = rs ;
+		    char	ubuf[rs + 1] ;	/* <- on the stack */
+	            xu.pwp = pwp ;
+	            xu.pwbuf = pwbuf ;
+	            xu.pwlen = pwlen ;
+	            xu.ubuf = ubuf ;
+	            xu.ulen = ulen ;
+	            xu.uid = uid ;
+	            rs = getxusername(&xu) ;
+	        } /* end if (getbufsize) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -400,35 +381,44 @@ static int getxusername_self(getxuser *xup) noex {
 }
 /* end subroutine (getxusername_self) */
 
-static int getxusername_varusername(getxuser *xup) noex {
-	return getxusername_var(xup,VARUSERNAME) ;
+static int getxusername_varenv(getxuser *xup) noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; strusers[i] < strlibval_overlast ; i += 1) {
+	    strlibvals	sv = strusers[i] ;
+	    cchar	*vv = nullptr ;
+	    switch (sv) {
+	    case strlibval_username:
+		vv = varusername ;
+		break ;
+	    case strlibval_user:
+		vv = varuser ;
+		break ;
+	    case strlibval_logname:
+		vv = varlogname ;
+		break ;
+	    case strlibval_home:
+		vv = varhome ;
+		break ;
+	    case strlibval_mail:
+		vv = varmail ;
+		break ;
+	    default:
+		rs = SR_BUGCHECK ;
+		break ;
+	    } /* end switch */
+	    if ((rs >= 0) && vv) {
+		rs = getxusername_varbase(xup,vv) ;
+	    }
+	    if (rs != 0) break ;
+	} /* end for */
+	return rs ;
 }
-/* end subroutine (getxusername_varusername) */
-
-static int getxusername_varuser(getxuser *xup) noex {
-	return getxusername_var(xup,VARUSER) ;
-}
-/* end subroutine (getxusername_varuser) */
-
-static int getxusername_varlogname(getxuser *xup) noex {
-	return getxusername_var(xup,VARLOGNAME) ;
-}
-/* end subroutine (getxusername_varlogname) */
-
-static int getxusername_home(getxuser *xup) noex {
-	return getxusername_varbase(xup,VARHOME) ;
-}
-/* end subroutine (getxusername_home) */
-
-static int getxusername_mail(getxuser *xup) noex {
-	return getxusername_varbase(xup,VARMAIL) ;
-}
-/* end subroutine (getxusername_mail) */
+/* end subroutine (getxusername_varenv) */
 
 static int getxusername_utmp(getxuser *xup) noex {
 	int		rs = SR_OK ;
 	if constexpr (f_utmpacc) {
-	    UTMPACC_ENT	ue ;
+	    UTMPACC_ENT	ue{} ;
 	    cint	uelen = UTMPACC_BUFLEN ;
 	    char	uebuf[UTMPACC_BUFLEN+1] ;
 	    if ((rs = utmpacc_entsid(&ue,uebuf,uelen,0)) >= 0) {
@@ -495,23 +485,11 @@ static int getxusername_uid(getxuser *xup) noex {
 }
 /* end subroutine (getxusername_uid) */
 
-static int getxusername_var(getxuser *xup,cchar *varname) noex {
+static int getxusername_varbase(getxuser *xup,cchar *vv) noex {
 	int		rs = SR_OK ;
-	cchar		*vp = getenv(varname) ;
-	if (vp != nullptr) {
-	    xup->unl = 0 ;
-	    rs = getxusername_lookup(xup,vp) ;
-	}
-	return rs ;
-}
-/* end subroutine (getxusername_var) */
-
-static int getxusername_varbase(getxuser *xup,cchar *varname) noex {
-	int		rs = SR_OK ;
-	cchar		*vp = getenv(varname) ;
-	if (vp != nullptr) {
+	if (vv) {
 	    cchar	*sp{} ;
-	    if (int sl ; (sl = sfbasename(vp,-1,&sp)) > 0) {
+	    if (int sl ; (sl = sfbasename(vv,-1,&sp)) > 0) {
 	        while ((sl > 0) && (sp[sl - 1] == '/')) {
 	            sl -= 1 ;
 	        }
