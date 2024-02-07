@@ -1,11 +1,10 @@
-/* zdb */
+/* zdb SUPPORT */
+/* lang=C++20 */
 
 /* time-zone database management */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_BSEARCH	0		/* use |bsearch(3c)| */
-
 
 /* revision history:
 
@@ -21,23 +20,20 @@
  
 	This object deals with the mangement of the time-zone database.
 
-
 *******************************************************************************/
 
-
-#define	ZDB_MASTER	0
-
-
 #include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
 #include	<usystem.h>
+#include	<usupport.h>		/* |memclear(3uc)| */
 #include	<estrings.h>
 #include	<nulstr.h>
+#include	<strwcpy.h>
+#include	<strwcmp.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"zdb.h"
@@ -53,26 +49,15 @@
 #endif
 
 
+/* local namespaces */
+
+using std::min ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	strnncmp(const char *,int,const char *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	strnlen(const char *,int) ;
-extern int	hasuc(const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 
 /* external variables */
@@ -83,16 +68,16 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 /* forward references */
 
-static int	findname(const char *,int) ;
+static int	findname(cchar *,int) noex ;
 
 #if	CF_BSEARCH
-static int reccmp(const void *,const void *) ;
+static int reccmp(cvoid *,cvoid *) noex ;
 #endif
 
 
 /* local variables */
 
-static const struct zdb_e	zones[] = {
+static constexpr ZDB	zones[] = {
 	{ "acsst", -630, 1 },	/* Cent. Australia */
 	{ "acst", -570, 0 },	/* Cent. Australia */
 	{ "adt", 3*60, 1 },	/* Atlantic */
@@ -204,244 +189,213 @@ static const struct zdb_e	zones[] = {
 
 	{ "z", 0, 0 },		/* Zulu */
 
-	{ NULL, 0, 0 }
+	{ nullptr, 0, 0 }
 } ;
 
-#define	ZDB_NZONES	((sizeof(zones) / sizeof(ZDB_E)) - 1)
+#define	ZDB_NZONES	((sizeof(zones) / sizeof(ZDB)) - 1)
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
 /* set from 'name' and 'offset' */
-int zdb_nameoff(ZDB *zrp,cchar *np,int nl,int zoff)
-{
-	const int	zlen = ZDB_ZNAMESIZE ;
-	int		i ;
-	int		zi = -1 ;
-	int		f = FALSE ;
-	char		namebuf[ZDB_ZNAMESIZE + 1] ;
-
-	memset(zrp,0,sizeof(ZDB)) ;
-
-	if (nl < 0) nl = strnlen(np,zlen) ;
-
-	if (hasuc(np,nl)) {
-	    int	ml = (nl >= 0) ? MIN(nl,zlen) : zlen ;
-	    nl = strwcpylc(namebuf,np,ml) - namebuf ;
-	    np = namebuf ;
-	}
-
-/* lookup by name and offset (if we have an offset) */
-
-	if (zoff != TZO_EMPTY) {
-	    for (i = 0 ; zones[i].name != NULL ; i += 1) {
-	        f = (strwcmp(zones[i].name,np,nl) == 0) ;
-		if (f && (zi < 0)) zi = i ;
-	        f = f && (zones[i].off == zoff) ;
-		if (f) break ;
-	    } /* end for */
-	} /* end if */
-
-/* if not match yet => lookup by name only */
-
-	if ((! f) && (zi >= 0)) {
-	    i = zi ;
-	    f = TRUE ;
-	} /* end if (looking up name only) */
-
-	if (f) {
-	    zrp->name = zones[i].name ;
-	    zrp->off = zones[i].off ;
-	    zrp->isdst = zones[i].isdst ;
-	}
-
-	return (f) ? i : SR_NOTFOUND ;
+int zdb_nameoff(zdb *zrp,cchar *sp,int sl,int zoff) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (zrp && sp) {
+	    int		zi = -1 ;
+	    cint	zlen = ZDB_ZNAMESIZE ;
+	    char	zbuf[ZDB_ZNAMESIZE + 1] ;
+	    bool	f = false ;
+	    rs = SR_NOTFOUND ;
+	    memclear(zrp) ;
+	    if (sl < 0) sl = strnlen(sp,zlen) ;
+	    if (hasuc(sp,sl)) {
+	        cint	ml = (sl >= 0) ? min(sl,zlen) : zlen ;
+	        sl = strwcpylc(zbuf,sp,ml) - zbuf ;
+	        sp = zbuf ;
+	    }
+    /* lookup by name and offset (if we have an offset) */
+	    if (zoff != TZO_EMPTY) {
+	        for (i = 0 ; zones[i].name != nullptr ; i += 1) {
+	            f = (strwcmp(zones[i].name,sp,sl) == 0) ;
+		    if (f && (zi < 0)) zi = i ;
+	            f = f && (zones[i].off == zoff) ;
+		    if (f) break ;
+	        } /* end for */
+	    } /* end if */
+    /* if not match yet => lookup by name only */
+	    if ((! f) && (zi >= 0)) {
+	        i = zi ;
+	        f = true ;
+	    } /* end if (looking up name only) */
+	    if (f) {
+		rs = SR_OK ;
+	        zrp->name = zones[i].name ;
+	        zrp->off = zones[i].off ;
+	        zrp->isdst = zones[i].isdst ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (zdb_nameoff) */
 
-
 /* set from 'name' only */
-int zdb_name(ZDB *zrp,cchar *np,int nl)
-{
-	const int	zlen = ZDB_ZNAMESIZE ;
-	int		i ;
-	char		namebuf[ZDB_ZNAMESIZE + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("zdb_name: name=%t\n",np,nl) ;
-#endif
-
-	memset(zrp,0,sizeof(ZDB)) ;
-
-	if (nl < 0) nl = strnlen(np,zlen) ;
-
-	if (hasuc(np,nl)) {
-	    int	ml = (nl >= 0) ? MIN(nl,zlen) : zlen ;
-	    nl = strwcpylc(namebuf,np,ml) - namebuf ;
-	    np = namebuf ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("zdb_name: 1 name=%t\n",np,nl) ;
-#endif
-
-	if ((i = findname(np,nl)) >= 0) {
-	    zrp->name = zones[i].name ;
-	    zrp->off = zones[i].off ;
-	    zrp->isdst = zones[i].isdst ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("zdb_name: ret i=%d\n",i) ;
-#endif
-
-	return (i >= 0) ? i : SR_NOTFOUND ;
+int zdb_name(zdb *zrp,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (zrp && sp) {
+	    cint	zlen = ZDB_ZNAMESIZE ;
+	    char	zbuf[ZDB_ZNAMESIZE + 1] ;
+	    rs = SR_NOTFOUND ;
+	    memclear(zrp) ;
+	    if (sl < 0) sl = strnlen(sp,zlen) ;
+	    if (hasuc(sp,sl)) {
+	        cint	ml = (sl >= 0) ? min(sl,zlen) : zlen ;
+	        sl = strwcpylc(zbuf,sp,ml) - zbuf ;
+	        sp = zbuf ;
+	    }
+	    if ((i = findname(sp,sl)) >= 0) {
+		rs = SR_OK ;
+	        zrp->name = zones[i].name ;
+	        zrp->off = zones[i].off ;
+	        zrp->isdst = zones[i].isdst ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (zdb_name) */
 
-
 /* set from 'offset' only */
-int zdb_off(ZDB *zrp,int zoff)
-{
-	int		i ;
-	int		f = FALSE ;
-
-	memset(zrp,0,sizeof(ZDB)) ;
-
-	for (i = 0 ; zones[i].name != NULL ; i += 1) {
-	    f = (zones[i].off == zoff) ;
-	    if (f) break ;
-	} /* end for */
-
-	if (f) {
-	    zrp->name = zones[i].name ;
-	    zrp->off = zones[i].off ;
-	    zrp->isdst = zones[i].isdst ;
-	}
-
-	return (f) ? i : SR_NOTFOUND ;
+int zdb_off(zdb *zrp,int zoff) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (zrp) {
+	    bool	f = false ;
+	    rs = SR_NOTFOUND ;
+	    memclear(zrp) ;
+	    for (i = 0 ; zones[i].name != nullptr ; i += 1) {
+	        f = (zones[i].off == zoff) ;
+	        if (f) break ;
+	    } /* end for */
+	    if (f) {
+	 	rs = SR_OK ;
+	        zrp->name = zones[i].name ;
+	        zrp->off = zones[i].off ;
+	        zrp->isdst = zones[i].isdst ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (zdb_off) */
-
 
 /* set from 'offset' and 'isdst' */
-int zdb_offisdst(ZDB *zrp,int zoff,int isdst)
-{
-	int		i ;
-	int		f = FALSE ;
-
-	memset(zrp,0,sizeof(ZDB)) ;
-
-	if (isdst >= 0) {
-	    for (i = 0 ; zones[i].name != NULL ; i += 1) {
-	        f = (zones[i].off == zoff) ;
-		f = f && (zones[i].isdst == isdst) ;
-	        if (f) break ;
-	    } /* end for */
-	} else {
-	    for (i = 0 ; zones[i].name != NULL ; i += 1) {
-	        f = (zones[i].off == zoff) ;
-	        if (f) break ;
-	    } /* end for */
-	} /* end if */
-
-	if (f) {
-	    zrp->name = zones[i].name ;
-	    zrp->off = zones[i].off ;
-	    zrp->isdst = zones[i].isdst ;
-	}
-
-	return (f) ? i : SR_NOTFOUND ;
+int zdb_offisdst(zdb *zrp,int zoff,int isdst) noex {
+	int		rs = SR_FAULT ;
+	int		i = 0 ;
+	if (zrp) {
+	    bool	f = false ;
+	    rs = SR_NOTFOUND ;
+	    memclear(zrp) ;
+	    if (isdst >= 0) {
+	        for (i = 0 ; zones[i].name != nullptr ; i += 1) {
+	            f = (zones[i].off == zoff) ;
+		    f = f && (zones[i].isdst == isdst) ;
+	            if (f) break ;
+	        } /* end for */
+	    } else {
+	        for (i = 0 ; zones[i].name != nullptr ; i += 1) {
+	            f = (zones[i].off == zoff) ;
+	            if (f) break ;
+	        } /* end for */
+	    } /* end if */
+	    if (f) {
+	 	rs = SR_OK ;
+	        zrp->name = zones[i].name ;
+	        zrp->off = zones[i].off ;
+	        zrp->isdst = zones[i].isdst ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (zdb_off) */
 
-
-int zdb_count(ZDB *zrp)
-{
-	const int	n = ZDB_NZONES ;
-
-	if (zrp == NULL) return SR_FAULT ;
-
-	return n ;
+int zdb_count(zdb *zrp) noex {
+	int		rs = SR_FAULT ;
+	cint		n = ZDB_NZONES ;
+	if (zrp) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (zdb_count) */
 
 
 /* local subroutines */
 
-
 #if	CF_BSEARCH
 
-/*
+/****
 struct zdb_e {
-	const char	*name ;
+	cchar		*name ;
 	short		off ;
 	short		isdst ;
 } ;
-*/
+****/
 
-static int findname(cchar *np,int nl)
-{
-	struct zdb_e	ke, *rp ;
-	NULSTR		s ;
-	const int	n = ZDB_NZONES ;
-	const int	size = sizeof(struct zdb_e) ;
+static int findname(cchar *sp,int sl) noex {
+	ZDB		ke, *rp ;
+	nulstr		s ;
+	cint		n = ZDB_NZONES ;
+	cint		size = sizeof(struct zdb_e) ;
 	int		rs ;
+	int		rs1 ;
 	int		i = 0 ;
-	const char	*kp ;
-
-	if ((rs = nulstr_start(&s,np,nl,&kp)) >= 0) {
-
-	    ke.name = kp ;
-	    rp = bsearch(&ke,zones,n,size,reccmp) ;
-
-	    i = (rp != NULL) ? (rp - zones) : -1 ;
-
-	    nulstr_finish(&s) ;
+	cchar		*kp{} ;
+	if ((rs = nulstr_start(&s,sp,sl,&kp)) >= 0) {
+	    {
+	        ke.name = kp ;
+	        rp = bsearch(&ke,zones,n,size,reccmp) ;
+	        i = (rp != nullptr) ? (rp - zones) : -1 ;
+	    }
+	    rs1 = nulstr_finish(&s) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (findname) */
 
-
-static int reccmp(const void *v1p,const void *v2p)
-{
+static int reccmp(cvoid *v1p,cvoid *v2p) noex {
 	struct zdb_e	*e1p = (struct zdb_e *) v1p ;
 	struct zdb_e	*e2p = (struct zdb_e *) v2p ;
-	int		rc ;
-
-	rc = strcmp(e1p->name,e2p->name) ;
-
-	return rc ;
+	return strcmp(e1p->name,e2p->name) ;
 }
 /* end subroutine (reccmp) */
 
 #else /* CF_BSEARCH */
 
 /* do a little binary search to find the zone-name (if we have it) */
-static int findname(cchar *np,int nl)
-{
+static int findname(cchar *sp,int sl) noex {
 	int		i = 0 ;
 	int		rc = 1 ;
 	int		first = 0 ;
 	int		last = (ZDB_NZONES - 1) ;
-	const char	*znp ;
-
+	cchar		*znp ;
 	while (last >= first) {
 	    i = first + ((last - first) >> 1) ;
 	    znp = zones[i].name ;
-	    if ((rc = (np[0] - znp[0])) == 0) {
-	        rc = -strwcmp(znp,np,nl) ;
+	    if ((rc = (sp[0] - znp[0])) == 0) {
+	        rc = -strwcmp(znp,sp,sl) ;
 	        if (rc == 0) break ;
 	    } /* end if (equality comparison) */
 	    if (rc < 0) {
 	        last = i - 1 ;
-	    } else
+	    } else {
 	        first = i + 1 ;
+	    }
 	} /* end while */
-
 	return (rc == 0) ? i : -1 ;
 }
 /* end subroutine (findname) */
