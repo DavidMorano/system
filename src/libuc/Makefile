@@ -1065,6 +1065,11 @@ ctx.o:			ctx.dir
 ctx.dir:
 	makesubdir $@
 
+# CHRONO
+chrono.o:		chrono.dir
+chrono.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
