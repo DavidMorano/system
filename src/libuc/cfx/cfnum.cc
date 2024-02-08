@@ -84,7 +84,7 @@ int cfnumx(cchar *sp,int sl,T *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*bp{} ;
 	bool		fneg = false ;
-	if (int bl ; (bl = sfsign(&fneg,sp,sl,&bp)) > 0) {
+	if (int bl ; (bl = sfsign(sp,sl,&bp,&fneg)) > 0) {
 	    int		ch ;
 	    if (*bp == '\\') {
 	        bp += 1 ;
@@ -156,7 +156,7 @@ int cfnumsx(cchar *bp,int bl,T *rp) noex {
 	int		rs = SR_DOM ;
 	cchar		*sp{} ;
 	bool		fneg{} ;
-	if (int sl ; (sl = sfsign(&fneg,bp,bl,&sp)) > 0) {
+	if (int sl ; (sl = sfsign(bp,bl,&sp,&fneg)) > 0) {
 	    UT		uval{} ;
 	    if ((rs = cfnumx(sp,sl,&uval)) >= 0) {
 		if (fneg) uval = (- uval) ;

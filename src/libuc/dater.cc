@@ -4,8 +4,6 @@
 /* general dater object */
 /* version %I% last-modified %G% */
 
-#define	CF_ASSUMEZN	0		/* assume a zone-name */
-#define	CF_SNTMTIME	1		/* use |sntmtime(3dam)| */
 
 /* revision history:
 
@@ -58,6 +56,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/timeb.h>
+#include	<climits>		/* |SHORT_MIN| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
@@ -82,14 +81,6 @@
 
 
 /* local defines */
-
-#ifndef	NYEARS_CENTURY
-#define	NYEARS_CENTURY	100
-#endif
-
-#ifndef	CENTURY_BASE
-#define	CENTURY_BASE	19
-#endif
 
 #ifndef	TZO_EMPTY
 #define	TZO_EMPTY	SHORT_MIN
@@ -155,10 +146,6 @@ static int	dater_ldtmz(DATER *,TMZ *) noex ;
 static int	dater_ldcomzone(DATER *,comparse *) noex ;
 static int	dater_ldzname(DATER *,cchar *,int) noex ;
 static int	dater_defs(DATER *,TMZ *) noex ;
-
-#ifdef	COMMENT
-static int	findtzcomment(char *,int,cchar *) noex ;
-#endif
 
 
 /* local variables */
@@ -541,110 +528,32 @@ int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen) noex {
 	        if ((rs = tmtime_gmtime(&tmt,t)) >= 0) {
 	            tmt.gmtoff = (zoff * 60) ;
 	            strwcpyuc(tmt.zname,znp,TMTIME_ZNAMELEN) ;
-/* format */
-#if	CF_SNTMTIME
-#else /* CF_SNTMTIME */
-	            char	zobuf[10] ;
-#endif /* CF_SNTMTIME */
 	            switch (type) {
 /* UNIX® envelope */
 	            case DATER_DTSENV:
-#if	CF_SNTMTIME
 	                fmt = "%a %b %d %T %Z %Y %O" ;
 	                rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
 	                sl = rs ;
-#else /* CF_SNTMTIME */
-	                zobuf[0] = '\0' ;
-	                if ((zoff != TZO_EMPTY) && dp->f.zoff) {
-	                    zos_set(zobuf,10,zoff) ;
-	                }
-	                sl = bufprintf(dbuf,dlen,
-	                    "%3s %3s %02u %02u:%02u:%02u %s %04u %s",
-	                    calstrs_days[tmt.wday],
-	                    calstrs_months[tmt.mon],
-	                    tmt.mday,
-	                    tmt.hour,
-	                    tmt.min,
-	                    tmt.sec,
-	                    tmt.zname,
-	                    (tmt.year + TM_YEAR_BASE),
-	                    zobuf) ;
-#endif /* CF_SNTMTIME */
 	                break ;
 /* message header */
 	            case DATER_DTSHDR:
-#if	CF_SNTMTIME
 	                fmt = "%d %b %Y %T %O (%Z)" ;
 	                if (tmt.zname[0] == '\0') fmt = "%d %b %Y %T %O" ;
 	                rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
 	                sl = rs ;
-#else /* CF_SNTMTIME */
-	                zobuf[0] = '\0' ;
-	                if ((zoff != TZO_EMPTY) && dp->f.zoff) {
-	                    zos_set(zobuf,10,zoff) ;
-	                }
-	                fmt = "%2u %3s %4u %02u:%02u:%02u %s" ;
-	                if (tz[0] != '\0') {
-	                    fmt = "%2u %3s %4u %02u:%02u:%02u %s (%s)" ;
-	                }
-	                sl = bufprintf(dbuf,dlen,fmt,
-	                    tmt.mday,
-	                    calstrs_months[tmt.mon],
-	                    (tmt.year + TM_YEAR_BASE),
-	                    tmt.hour,
-	                    tmt.min,
-	                    tmt.sec,
-	                    zobuf,
-	                    tmt.zname) ;
-#endif /* CF_SNTMTIME */
 	                break ;
 	            case DATER_DTSSTRDIG:
-#if	CF_SNTMTIME
 	                fmt = "%y%m%d%H%M%S%O%Z" ;
 	                if (tmt.zname[0] == '\0') fmt = "%y%m%d%H%M%S%O" ;
 	                rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
 	                sl = rs ;
-#else /* CF_SNTMTIME */
-	                zobuf[0] = '\0' ;
-	                if ((zoff != TZO_EMPTY) && dp->f.zoff) {
-	                    zos_set(zobuf,10,zoff) ;
-	                }
-	                fmt = "%04u%02u%02u%02u%02u%02u%s" ;
-	                if (dp->f.zname) {
-	                    fmt = "%04u%02u%02u%02u%02u%02u%s%s" ;
-	                }
-	                sl = bufprintf(dbuf,dlen,fmt,
-	                    (tmt.year + TM_YEAR_BASE),
-	                    (tmt.mon + 1),
-	                    tmt.mday,
-	                    tmt.hour,
-	                    tmt.min,
-	                    tmt.sec,
-	                    zobuf,
-	                    tmt.zname) ;
-#endif /* CF_SNTMTIME */
 	                break ;
 	            case DATER_DTSLOGZ:
 	            case DATER_DTSGMLOGZ:
-#if	CF_SNTMTIME
 	                fmt = "%y%m%d_%H%M:%S_%Z" ;
 	                if (tmt.zname[0] == '\0') fmt = "%y%m%d_%H%M:%S" ;
 	                rs = sntmtime(dbuf,dlen,&tmt,fmt) ;
 	                sl = rs ;
-#else /* CF_SNTMTIME */
-	                fmt = "%02u%02u%02u_%02u%02u:%02u" ;
-	                if (dp->f.zname) {
-	                    fmt = "%02u%02u%02u_%02u%02u:%02u_%s" ;
-	                }
-	                sl = bufprintf(dbuf,dlen,fmt,
-	                    (tmt.year % NYEARS_CENTURY),
-	                    (tmt.mon + 1),
-	                    tmt.mday,
-	                    tmt.hour,
-	                    tmt.min,
-	                    tmt.sec,
-	                    tmt.zname) ;
-#endif /* CF_SNTMTIME */
 	                break ;
 	            default:
 	                sl = -1 ;
@@ -884,11 +793,11 @@ static int dater_ldcomzone(DATER *dp,comparse *cpp) noex {
 /* end subroutine (dater_ldcomzone) */
 
 static int dater_defs(DATER *dp,TMZ *tp) noex {
-	cint		f_year = tmz_hasyear(tp) ;
-	cint		f_zoff = tmz_haszoff(tp) ;
-	cint		f_zone = tmz_haszone(tp) ;
+	cbool		f_year = tmz_hasyear(tp) ;
+	cbool		f_zoff = tmz_haszoff(tp) ;
+	cbool		f_zone = tmz_haszone(tp) ;
 	int		rs = SR_OK ;
-	int		f = false ;
+	bool		f = false ;
 	f = f || (! f_year) ;
 	f = f || (! f_zoff) ;
 	f = f || (! f_zone) ;
@@ -936,10 +845,10 @@ static int dater_ldname(DATER *dp,cchar *znp,int znl) noex {
 
 #ifdef	COMMENT
 TIMEB {
-	time_t	time;		/* time, seconds since the epoch */
-	unsigned short millitm;	/* 1000 msec of additional accuracy */
-	short	timezone;	/* timezone, minutes west of GMT */
-	short	dstflag;	/* daylight savings when appropriate? */
+	time_t	time ;		/* time, seconds since the epoch */
+	ushort	millitm ;	/* 1000 msec of additional accuracy */
+	short	timezone ;	/* timezone, minutes west of GMT */
+	short	dstflag ;	/* daylight savings when appropriate? */
 } ;
 #endif /* COMMENT */
 

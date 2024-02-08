@@ -1,11 +1,10 @@
-/* main */
+/* main SUPPORT */
+/* lang=C++20 */
 
 /* process MOSFET width specifications within ADVICE connectivity */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0
-
 
 /* revision history:
 
@@ -21,25 +20,22 @@
 	Synopsis:
 	$ moswidth [infile] [-i infile] [-o outfile]
 
-	This program will process width specifications
-	for MOSFETs.  Specifically, we will look for
-	MOSFET width specifications that have an "X" in them
-	and we will convert these to straight microns.
-
+	This program will process width specifications for MOSFETs.
+	Specifically, we will look for MOSFET width specifications
+	that have an "X" in them and we will convert these to
+	straight microns.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<errno.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<cerrno>
+#include	<cstring>
+#include	<ctime>
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<char.h>

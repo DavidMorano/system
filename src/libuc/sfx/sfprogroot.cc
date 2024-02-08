@@ -1,5 +1,5 @@
 /* sfprogroot SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* try to find a program-root in a given c-string */
 /* version %I% last-modified %G% */
@@ -54,7 +54,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strncmp(3c)| */
+#include	<cstring>		/* <- for |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strnxcmp.h>
@@ -106,10 +106,5 @@ int sfprogroot(cchar *pp,int pl,cchar **rpp) noex {
 	return sl ;
 }
 /* end subroutine (sfprogroot) */
-
-int getpr(cchar *pp,int pl,cchar **rpp) noex {
-	return sfprogroot(pp,pl,rpp) ;
-}
-/* end subroutine (getpr) */
 
 

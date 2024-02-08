@@ -1,5 +1,5 @@
 /* sfbaselib SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* string-find a base-library name */
 /* version %I% last-modified %G% */
@@ -37,8 +37,8 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* first to configure */
-#include	<string.h>		/* <- for |strncmp(3c)| */
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>		/* <- for |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<estrings.h>

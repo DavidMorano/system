@@ -25,13 +25,13 @@
 	before the sign character.
 
 	Synopsis:
-	int sfsign(bool *bp,cchar *sp,int sl,cchar **rpp) noex
+	int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex
 
 	Arguments:
-	bp		pointer to boolen to hold sign-result
 	sp		base string pointer
 	sl		base string length
 	rpp		pointer to result pointer to store found value
+	bp		pointer to boolen to hold sign-result
 
 	Returns:
 	>=0		length of c-string after any found sign character
@@ -71,7 +71,7 @@
 
 /* exported subroutines */
 
-int sfsign(bool *bp,cchar *sp,int sl,cchar **rpp) noex {
+int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex {
 	bool		fn = false ;
 	if (sl < 0) sl = strlen(sp) ;
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
@@ -84,7 +84,7 @@ int sfsign(bool *bp,cchar *sp,int sl,cchar **rpp) noex {
 	    sl -= 1 ;
 	}
 	*rpp = sp ;
-	*bp = fn ;
+	if (bp) *bp = fn ;
 	return sl ;
 }
 /* end subroutine (sfsign) */

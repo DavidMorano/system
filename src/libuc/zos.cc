@@ -67,6 +67,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -76,8 +77,20 @@
 
 /* local defines */
 
+#define	ISPM(ch)	isplusminus(ch)
+#define	ISNOTWC(ch)	((ch) && (! CHAR_ISWHITE(ch)) && (ch != ','))
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
+
+
+/* forward references */
 
 
 /* external variables */
@@ -112,77 +125,33 @@ int zos_set(char *rbuf,int rlen,int zo) noex {
 int zos_get(cchar *sp,int sl,int *zop) noex {
 	int		rs = SR_FAULT ;
 	if (sp && zop) {
-	int		cl ;
-	int		zoff ;
-	int		ch = 0 ; /* ¥ GCC false complaint */
-	cchar		*cp ;
 	    rs = SR_INVALID ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (sl) ch = mkchar(*sp) ;
-	if ((sl >= 2) && ((ch == '-') || (ch == '+') || isdigitlatin(ch))) {
-	    int		i, sign ;
-	    int		hours, mins ;
-
-	    rs = SR_OK ;
-	    sign = ((ch == '+') || isdigitlatin(ch)) ? -1 : 1 ;
-
-	    cp = sp ;
-	    cl = sl ;
-	    if ((*sp == '-') || (*sp == '+')) {
-	        cp += 1 ;
-	        cl -= 1 ;
-	    }
-
-	    for (i = 0 ; 
-	        (i < cl) && cp[i] && 
-	        (! CHAR_ISWHITE(cp[i])) && (cp[i] != ',') ; 
-	        i += 1) {
-		cint	ch = mkchar(cp[i]) ;
-	        if (! isdigitlatin(ch)) {
-	            rs = SR_INVALID ;
-		    break ;
-	        }
-
-	    } /* end for (extra sanity check) */
-
-/* skip over extra leading digits (usually '0' but whatever) */
-
-	    if (i > 4) {
-	        cp += (i - 4) ;
-	        cl -= (i - 4) ;
-	    }
-
-/* extract hours and minutes from remaining 4 digits */
-
-	    hours = (*cp++ - '0') ;
-	    if (cl > 3) {
-	        hours *= 10 ;
-	        hours += (*cp++ - '0') ;
-	    }
-
-	    mins = (*cp++ - '0') * 10 ;
-	    mins += (*cp++ - '0') ;
-
-	    zoff = (hours * 60) + mins ;
-
-/* reportedly, there are time zones at up to 14 hours off of GMT! */
-
-#ifdef	COMMENT
-	    if (zoff > (14 * 60))
-		rs = SR_INVALID ;
-#endif
-
-	    zoff *= sign ;
-	    if (zop) {
-		*zop = zoff ;
-	}
-
-	    if (rs >= 0) {
-		rs = (cp - sp) ;
-	    }
-
-	} /* end if (getting timezone offset) */
-
+	    if (sp[0]) {
+		cchar	*cp{} ;
+		bool	fneg = false ;
+		if (int cl ; (cl = sfsign(sp,sl,&cp,&fneg)) > 0) {
+		    cchar	*zp{} ;
+		    if (int zl ; (zl = sfbrk(cp,cl," ,",&zp)) >= 3) {
+	                int	zoff ;
+	                int	sign = (fneg) ? 1 : -1 ; /* reverse */
+	                int	hours ;
+	                int	mins ;
+	                hours = (*zp++ - '0') ;
+	                if (zl > 3) {
+	                    hours *= 10 ;
+	                    hours += (*cp++ - '0') ;
+	                }
+	                mins = (*zp++ - '0') * 10 ;
+	                mins += (*zp++ - '0') ;
+	                zoff = (hours * 60) + mins ;
+	                zoff *= sign ;
+	                if (zop) {
+		            *zop = zoff ;
+	                }
+		        rs = (zp - sp) ;
+		    } /* end if (sfbrk) */
+	        } /* end if (sfsign) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
