@@ -968,39 +968,14 @@ static int dater_pname(DATER *dp) noex {
 /* get the timezone information out of an RFC822-type number string */
 static int dater_pnum(DATER *dp) noex {
 	int		rs = SR_OK ;
-	int		hours, mins ;
-	int		sign ;
-	char		*bp = dp->zname ;
-
-	if (dp->f.zoff)
-	    return SR_OK ;
-
-	dp->f.zname = false ;
-
-	dp->b.timezone = 0 ;
-	sign = -1 ;
-	if ((*bp == '-') || (*bp == '+')) {
-	    sign = (*bp == '-') ? 1 : -1 ;
-	    bp += 1 ;
-	}
-
-#ifdef	OPTIONAL
-	if (strlen(bp) < 4)
-	    return SR_INVALID ;
-#endif
-
-	if (hasalldig(bp,4)) {
-	    hours = (((int) *bp++) - '0') * 10 ;
-	    hours += (((int) *bp++) - '0') ;
-	    mins = (((int) *bp++) - '0') * 10 ;
-	    mins += (((int) *bp++) - '0') ;
-	    dp->b.timezone = (hours * 60) + mins ;
-	    dp->b.timezone *= sign ;
-	    dp->f.zoff = true ;
-	} else {
-	    rs = SR_INVALID ;
-	} /* end if */
-
+	if (!dp->f.zoff) {
+	    int		zo{} ;
+	    if ((rs = zos_get(dp->zname,-1,&zo)) >= 0) {
+		dp->f.zname = false ;	/* XXX why is this? */
+	        dp->b.timezone = zo ;
+	        dp->f.zoff = true ;
+	    }
+	} /* end if (already extracted) */
 	return rs ;
 }
 /* end subroutine (dater_pnum) */
