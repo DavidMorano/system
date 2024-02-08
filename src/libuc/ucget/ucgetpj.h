@@ -18,16 +18,14 @@
 #define	UCGETPJ_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentpj.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_getpjbegin() noex ;
 extern int	uc_getpjent(ucentpj *,char *,int) noex ;
@@ -36,9 +34,7 @@ extern int	uc_getpjpid(ucentpj *,char *,int,projid_t) noex ;
 extern int	uc_getpjdef(ucentpj *,char *,int,cchar *) noex ;
 extern int	uc_getpjend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETPJ_INCLUDE */

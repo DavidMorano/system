@@ -18,16 +18,14 @@
 #define	UCGETPR_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentpr.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_getprbegin(int) noex ;
 extern int	uc_getprent(ucentpr *,char *,int) noex ;
@@ -35,9 +33,7 @@ extern int	uc_getprnam(ucentpr *,char *,int,cchar *) noex ;
 extern int	uc_getprnum(ucentpr *,char *,int,int) noex ;
 extern int	uc_getprend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETPR_INCLUDE */

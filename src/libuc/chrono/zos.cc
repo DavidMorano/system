@@ -64,21 +64,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdlib>
-#include	<cstring>
+#include	<cstdlib>		/* |abs(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
+#include	<hasx.h>
 
 #include	"zos.h"
 
 
 /* local defines */
-
-#define	ISPM(ch)	isplusminus(ch)
-#define	ISNOTWC(ch)	((ch) && (! CHAR_ISWHITE(ch)) && (ch != ','))
 
 
 /* local namespaces */
@@ -132,23 +126,25 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 		if (int cl ; (cl = sfsign(sp,sl,&cp,&fneg)) > 0) {
 		    cchar	*zp{} ;
 		    if (int zl ; (zl = sfbrk(cp,cl," ,",&zp)) >= 3) {
-	                int	zoff ;
-	                int	sign = (fneg) ? 1 : -1 ; /* reverse */
-	                int	hours ;
-	                int	mins ;
-	                hours = (*zp++ - '0') ;
-	                if (zl > 3) {
-	                    hours *= 10 ;
-	                    hours += (*cp++ - '0') ;
-	                }
-	                mins = (*zp++ - '0') * 10 ;
-	                mins += (*zp++ - '0') ;
-	                zoff = (hours * 60) + mins ;
-	                zoff *= sign ;
-	                if (zop) {
-		            *zop = zoff ;
-	                }
-		        rs = (zp - sp) ;
+			if (hasalldig(zp,zl)) {
+	                    int	zoff ;
+	                    int	sign = (fneg) ? 1 : -1 ; /* reverse */
+	                    int	hours ;
+	                    int	mins ;
+	                    hours = (*zp++ - '0') ;
+	                    if (zl > 3) {
+	                        hours *= 10 ;
+	                        hours += (*cp++ - '0') ;
+	                    }
+	                    mins = (*zp++ - '0') * 10 ;
+	                    mins += (*zp++ - '0') ;
+	                    zoff = (hours * 60) + mins ;
+	                    zoff *= sign ;
+	                    if (zop) {
+		                *zop = zoff ;
+	                    }
+		            rs = (zp - sp) ;
+			} /* end if (hasalldig) */
 		    } /* end if (sfbrk) */
 	        } /* end if (sfsign) */
 	    } /* end if (valid) */

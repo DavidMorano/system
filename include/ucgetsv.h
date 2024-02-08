@@ -18,16 +18,14 @@
 #define	UCGETSV_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentsv.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_getsvbegin(int) noex ;
 extern int	uc_getsvent(ucentsv *,char *,int) noex ;
@@ -35,9 +33,7 @@ extern int	uc_getsvnam(ucentsv *,char *,int,cchar *,cchar *) noex ;
 extern int	uc_getsvnum(ucentsv *,char *,int,int,cchar *) noex ;
 extern int	uc_getsvend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETSV_INCLUDE */

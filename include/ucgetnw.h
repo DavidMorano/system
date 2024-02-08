@@ -18,16 +18,14 @@
 #define	UCGETNW_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentnw.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_getnwbegin(int) noex ;
 extern int	uc_getnwent(ucentnw *,char *,int) noex ;
@@ -35,9 +33,7 @@ extern int	uc_getnwnam(ucentnw *,char *,int,cchar *) noex ;
 extern int	uc_getnwnum(ucentnw *,char *,int,uint32_t,int) noex ;
 extern int	uc_getnwend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETNW_INCLUDE */

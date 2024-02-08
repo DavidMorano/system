@@ -18,16 +18,14 @@
 #define	UCGETHO_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentho.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_gethobegin(int) noex ;
 extern int	uc_gethoent(ucentho *,char *,int) noex ;
@@ -35,9 +33,7 @@ extern int	uc_gethonam(ucentho *,char *,int,cchar *) noex ;
 extern int	uc_gethoadd(ucentho *,char *,int,cvoid *,int,int) noex ;
 extern int	uc_gethoend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETHO_INCLUDE */

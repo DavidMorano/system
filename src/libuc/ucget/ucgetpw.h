@@ -18,16 +18,14 @@
 #define	UCGETPW_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentpw.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_getpwbegin() noex ;
 extern int	uc_getpwent(ucentpw *,char *,int) noex ;
@@ -35,9 +33,7 @@ extern int	uc_getpwnam(ucentpw *,char *,int,cchar *) noex ;
 extern int	uc_getpwuid(ucentpw *,char *,int,uid_t) noex ;
 extern int	uc_getpwend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETPW_INCLUDE */
