@@ -18,25 +18,21 @@
 #define	UCGETSP_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucentsp.h>
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	uc_getspbegin() noex ;
 extern int	uc_getspent(ucentsp *,char *,int) noex ;
 extern int	uc_getspnam(ucentsp *,char *,int,cchar *) noex ;
 extern int	uc_getspend() noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* UCGETSP_INCLUDE */
