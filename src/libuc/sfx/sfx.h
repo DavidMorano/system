@@ -25,7 +25,7 @@ EXTERNC_begin
 extern int sfbasename(cchar *,int,cchar **) noex ;
 extern int sfbaselib(cchar *,int,cchar **) noex ;
 extern int sfbracketval(cchar *,int,cchar **) noex ;
-extern int sfbreak(cchar *,int,cchar *,cchar **) noex ;
+extern int sfbrk(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcasesub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcontent(cchar *,int,cchar **) noex ;
 extern int sfcookkey(cchar *,int,cchar **) noex ;
@@ -48,10 +48,10 @@ extern int sfsubstance(cchar *,int,cchar **) noex ;
 extern int sfthing(cchar *,int,cchar *,cchar **) noex ;
 extern int sfwhitedot(cchar *,int,cchar **) noex ;
 extern int sfword(cchar *,int,cchar **) noex ;
-extern int sfsign(bool *,cchar *,int,cchar **) noex ;
+extern int sfsign(cchar *,int,cchar **,bool *) noex ;
 
-static inline int sfbrk(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
-	return sfbreak(sp,sl,s2,rpp) ;
+static inline int sfbreak(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
+	return sfbrk(sp,sl,s2,rpp) ;
 }
 
 static inline int getpr(cchar *pp,int pl,cchar **rpp) noex {

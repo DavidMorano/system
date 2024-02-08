@@ -92,8 +92,6 @@
 
 /* forward references */
 
-static int	getsign(int) noex ;
-
 
 /* external variables */
 
@@ -130,61 +128,33 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
 		cchar	*cp{} ;
-		if (int cl ; (cl = sfskipwhite(sp,sl,&cp)) > 0) {
-	            int		zoff ;
-	            int		ch = mkchar(*cp) ;
-	            if ((cl >= 2) && (ISPM(ch) || isdigitlatin(ch))) {
-	                int	i{} ;
-	                int	sign = -1 ;
+		bool	fneg = false ;
+		if (int cl ; (cl = sfsign(sp,sl,&cp,&fneg)) > 0) {
+		    cchar	*zp{} ;
+		    if (int zl ; (zl = sfbrk(cp,cl," ,",&zp)) >= 3) {
+	                int	zoff ;
+	                int	sign = (fneg) ? 1 : -1 ; /* reverse */
 	                int	hours ;
 	                int	mins ;
-	                rs = SR_OK ;
-	                if (ISPM(*cp)) {
-		            sign = getsign(*cp) ;
-	                    cp += 1 ;
-	                    cl -= 1 ;
-	                }
-	                for (i = 0 ; (i < cl) && ISNOTWC(cp[i]) ; i += 1) {
-		            cint	ch = mkchar(cp[i]) ;
-	                    if (! isdigitlatin(ch)) {
-	                        rs = SR_INVALID ;
-		                break ;
-	                    }
-	                } /* end for (extra sanity check) */
-	                if (i > 4) {
-	                    cp += (i - 4) ;
-	                    cl -= (i - 4) ;
-	                }
-	                hours = (*cp++ - '0') ;
-	                if (cl > 3) {
+	                hours = (*zp++ - '0') ;
+	                if (zl > 3) {
 	                    hours *= 10 ;
 	                    hours += (*cp++ - '0') ;
 	                }
-	                mins = (*cp++ - '0') * 10 ;
-	                mins += (*cp++ - '0') ;
+	                mins = (*zp++ - '0') * 10 ;
+	                mins += (*zp++ - '0') ;
 	                zoff = (hours * 60) + mins ;
 	                zoff *= sign ;
 	                if (zop) {
 		            *zop = zoff ;
 	                }
-	                if (rs >= 0) {
-		            rs = (cp - sp) ;
-	                }
-	            } /* end if (getting timezone offset) */
-	        } /* end if (sfskipwhite) */
+		        rs = (zp - sp) ;
+		    } /* end if (sfbrk) */
+	        } /* end if (sfsign) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (zos_get) */
-
-
-/* local subroutines */
-
-static int getsign(int ch) noex {
-	int	sign = -1 ;
-	if (ch == '-') sign = 1 ;
-	return sign ;
-}
 
 

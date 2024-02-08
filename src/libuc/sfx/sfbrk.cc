@@ -1,4 +1,4 @@
-/* sfbreak SUPPORT */
+/* sfbrk SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to find a sub-string in a given string */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	sfbreak
+	sfbrk
 
 	Description:
 	This subroutine determines if any of the characters from
@@ -25,7 +25,7 @@
 	string buffer specified.
 
 	Synopsis:
-	int sfbreak(cchar *sp,int sl,cchar *ss,cchar **rpp) noex
+	int sfbrk(cchar *sp,int sl,cchar *ss,cchar **rpp) noex
 
 	Arguments:
 	sp	string to be examined
@@ -55,7 +55,7 @@
 
 /* exported subroutines */
 
-int sfbreak(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
+int sfbrk(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 	int		f = false ;
 	if (sl < 0) sl = strlen(sp) ;
 	while (sl && *sp) {
@@ -72,6 +72,6 @@ int sfbreak(cchar *sp,int sl,cchar *sb,cchar **rpp) noex {
 	}
 	return (f) ? sl : -1 ;
 }
-/* end subroutine (sfbreak) */
+/* end subroutine (sfbrk) */
 
 
