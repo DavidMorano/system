@@ -41,7 +41,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdint>
 #include	<usysdefs.h>
 #include	<clanguage.h>

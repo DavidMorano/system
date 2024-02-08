@@ -36,9 +36,8 @@
 #ifdef	__cplusplus /* everything is C++ only */
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<unistd.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<unistd.h>		/* |_SC_xx| */
 #include	<climits>
 #include	<usystem.h>
 #include	<localmisc.h>

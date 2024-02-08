@@ -28,7 +28,7 @@
 #ifdef	__cplusplus
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<usysrets.h>
 #include	<clanguage.h>
