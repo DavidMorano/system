@@ -1,5 +1,5 @@
 /* sfthing SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* string-find a thing */
 /* version %I% last-modified %G% */
@@ -40,12 +40,13 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
 #include	<strn.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 
 #include	"sfx.h"
@@ -53,7 +54,7 @@
 
 /* local defines */
 
-#define	DEBLEN(slen,max)	(((slen) >= 0) ? MIN((slen),(max)) : (max))
+#define	DEBLEN(slen,m)	(((slen) >= 0) ? MIN((slen),(m)) : (m))
 
 #undef	CH_THING
 #define	CH_THING	'$'
@@ -71,8 +72,8 @@
 /* forward references */
 
 static int	getthing(cchar *,int,cchar *,cchar **) noex ;
-static int	hasgood(cchar *,int) noex ;
-static int	isour(int) noex ;
+static bool	hasgood(cchar *,int) noex ;
+static bool	isour(int) noex ;
 
 
 /* local variables */
@@ -110,16 +111,15 @@ int sfthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 
 static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 	int		cl = 0 ;
-	int		f = false ;
+	bool		f = false ;
 	cchar		*cp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (sl > 0) {
-	    cchar	*tp ;
 	    char	buf[3] ;
 	    buf[0] = '$' ;
 	    buf[1] = ss[0] ;
 	    buf[2] = '\0' ;
-	    if ((tp = strnsub(sp,sl,buf)) != nullptr) {
+	    if (cchar *tp ; (tp = strnsub(sp,sl,buf)) != nullptr) {
 	        cl = sl - ((tp + 2) - sp) ;
 	        cp = (tp + 2) ;
 	        if ((tp = strnchr(cp,cl,ss[1])) != nullptr) {
@@ -135,11 +135,10 @@ static int getthing(cchar *sp,int sl,cchar *ss,cchar **rpp) noex {
 }
 /* end subroutine (getthing) */
 
-static int hasgood(cchar *sp,int sl) noex {
-	int		ch ;
-	int		f = true ;
+static bool hasgood(cchar *sp,int sl) noex {
+	bool		f = true ;
 	for (int i = 0 ; i < sl ; i += 1) {
-	    ch = (sp[i] & 0xff) ;
+	    cint	ch = mkchar(sp[i]) ;
 	    if (ch == '=') break ;
 	    f = isour(ch) ;
 	    if (! f) break ;
@@ -148,8 +147,8 @@ static int hasgood(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasgood) */
 
-static int isour(int ch) noex {
-	int		f = isalnumlatin(ch) ;
+static bool isour(int ch) noex {
+	bool		f = isalnumlatin(ch) ;
 	f = f || (ch == '_') || (ch == '-') || (ch == '=') || (ch == '/') ;
 	return f ;
 }

@@ -1,13 +1,13 @@
-/* sfshrink SUPPORT */
-/* lang=C20 */
+/* sfskipwhite SUPPORT */
+/* lang=C++20 */
 
-/* remove leading and trailing white space */
+/* remove leading white space */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-05-01, David A­D­ Morano
+	= 1998-03-23, David A­D­ Morano
 	This subroutine was originally written.
 
 */
@@ -17,29 +17,28 @@
 /*******************************************************************************
 
 	Name:
-	sfshrink
+	sfskipwhite
 
 	Description:
 	This subroutine will identify the non-white-space portion
-	of the buffer by ignoring white space at the beginning and
-	at the end of the given buffer.  No modifications to the
-	buffer are made.
+	of the buffer by ignoring white space at the beginning of
+	the given buffer.  No modifications to the buffer are made.
 
 	Synopsis:
-	int sfshrink(cchar *sp,int sl,cchar **rpp) noex ;
+	int sfskipwhite(cchar *sp,int sl,cchar **rpp) noex
 
 	Arguments:
-	sp	buffer
-	sl	buffer length
-	rpp	pointer to prointer to resulting string
+	sp		given string to test
+	sl		length of string to test
+	rpp		pointer to receive
 
 	Returns:
-	+ non-white-space string length (if OK), otherwise 0
+	>=0		non-white-space string length
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>
@@ -50,30 +49,30 @@
 /* local defines */
 
 
+/* forward references */
+
+
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
-int sfshrink(cchar *sp,int sl,cchar **rpp) noex {
+int sfskipwhite(cchar *sp,int sl,cchar **rpp) noex {
 	if (sl < 0) {
-	    while (CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	    }
+	    while (CHAR_ISWHITE(*sp)) sp += 1 ;
 	    sl = strlen(sp) ;
 	} else {
-	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
-	    } /* end while */
-	    if (sp[0] == '\0') sl = 0 ;
+	    }
 	} /* end if */
-	while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
-	    sl -= 1 ;
-	}
 	if (rpp) *rpp = sp ;
 	return sl ;
 }
-/* end subroutine (sfshrink) */
+/* end subroutine (sfskipwhite) */
 
 

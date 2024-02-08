@@ -54,6 +54,10 @@ static inline int sfbrk(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	return sfbreak(sp,sl,s2,rpp) ;
 }
 
+static inline int getpr(cchar *pp,int pl,cchar **rpp) noex {
+	return sfprogroot(pp,pl,rpp) ;
+}
+
 EXTERNC_end
 
 #ifdef	__cplusplus

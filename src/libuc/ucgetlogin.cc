@@ -1,4 +1,4 @@
-/* uc_getlogin SUPPORT */
+/* ucgetlogin SUPPORT */
 /* lang=C++20 */
 
 /* get the username of this login session */
@@ -16,9 +16,8 @@
 
 /*******************************************************************************
 
-	This is just the wrapper for the system's own |getlogin(3c)|,
+	This is just the wrapper for the standard system |getlogin(3c)|,
 	but it is reentrant where available.
-
 
 *******************************************************************************/
 
@@ -38,6 +37,10 @@
 #define	BUFLEN		_POSIX_LOGIN_NAME_MAX
 #endif
 
+#ifndef	SYSHAS_GETLOGINR
+#define	SYSHAS_GETLOGINR	0
+#endif
+
 
 /* local namespaces */
 
@@ -50,7 +53,7 @@
 
 /* local variables */
 
-constexpr bool		f_pthread = _POSIX_PTHREAD_SEMANTICS ;
+constexpr bool		f_getloginr = SYSHAS_GETLOGINR ;
 
 
 /* exported variables */
@@ -65,14 +68,14 @@ int uc_getlogin(char *rbuf,int rlen) noex {
 		cint	ulen = rs ;
 		rs = SR_OVERFLOW ;
 	        if ((rlen >= 0) && (rlen < ulen)) {
-	            if constexpr (f_pthread) {
+	            if constexpr (f_getloginr) {
 	                if ((rs = getlogin_r(rbuf,rlen)) != 0) rs = (- errno) ;
 	                if (rs >= 0) rs = strlen(rbuf) ;
 	            } else {
 	                cchar	*rp = getlogin() ;
 	                rs = (rp != nullptr) ? 0 : (- errno) ;
 	                if (rs >= 0) rs = sncpy1(rbuf,rlen,rp) ;
-	            } /* end if-constexpr (f_pthread) */
+	            } /* end if-constexpr (f_getloginr) */
 	        } /* end if (valid) */
 	    } /* end if (getbufsize) */
 	} /* end if (non-null) */

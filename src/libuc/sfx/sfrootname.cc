@@ -1,5 +1,5 @@
 /* sfrootname SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* string-find root-name */
 /* version %I% last-modified %G% */
@@ -39,8 +39,8 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<string.h>		/* <- not needed */
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>		/* <- not needed */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 

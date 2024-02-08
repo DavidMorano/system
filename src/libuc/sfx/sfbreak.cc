@@ -1,5 +1,5 @@
 /* sfbreak SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find a sub-string in a given string */
 /* version %I% last-modified %G% */
@@ -40,7 +40,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 

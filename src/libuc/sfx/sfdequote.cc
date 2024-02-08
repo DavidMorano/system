@@ -1,5 +1,5 @@
 /* sfdequote SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find the dequoted sub-string of the given string */
 /* version %I% last-modified %G% */
@@ -38,7 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>

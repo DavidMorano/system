@@ -1,5 +1,5 @@
 /* sfbracketval SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find the string-value within brackets */
 /* version %I% last-modified %G% */
@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strn.h>
