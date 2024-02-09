@@ -29,8 +29,8 @@
 	gpp		pointer to hold pointer-to-gid array
 
 	Returns:
-	<0		error
 	>=0		number of group IDs returned
+	<0		error (system-return)
 
 	Notes:
 	We eschew the use of NGROUPS_MAX and rather allocate
@@ -54,7 +54,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |gid_t| */
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstring>
 #include	<usystem.h>
@@ -69,7 +69,10 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -87,6 +90,9 @@ using std::nullptr_t ;
 /* local variables */
 
 static constexpr gid_t	gidend = gid_t(-1) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -108,22 +114,22 @@ int groupids::istart(gid_t **gpp) noex {
 	int		rs ;
 	const nullptr_t	np{} ;
 	if ((rs = u_getgroups(0,np)) >= 0) {
-	        cint	size = ((rs+1)*sizeof(gid_t)) ;
-	        void	*vp{} ;
-	        ng = rs ;
-	        if ((rs = uc_libmalloc(size,&vp)) >= 0) {
-		    gids = (gid_t *) vp ;
-		    if ((rs = u_getgroups(ng,gids)) >= 0) {
-		        gids[ng] = gidend ;
-			if (gpp) {
-			    *gpp = gids ;
-			}
+	    cint	size = ((rs+1)*sizeof(gid_t)) ;
+	    void	*vp{} ;
+	    ng = rs ;
+	    if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+		gids = (gid_t *) vp ;
+		if ((rs = u_getgroups(ng,gids)) >= 0) {
+		    gids[ng] = gidend ;
+		    if (gpp) {
+			*gpp = gids ;
 		    }
-		    if (rs < 0) {
-		        uc_libfree(gids) ;
-		        gids = nullptr ;
-		    }
-	        } /* end if (m-a) */
+		}
+		if (rs < 0) {
+		    uc_libfree(gids) ;
+		    gids = nullptr ;
+		}
+	    } /* end if (m-a) */
 	} /* end if (u_getgroups) */
 	return (rs >= 0) ? ng : rs ;
 }
