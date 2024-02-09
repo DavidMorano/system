@@ -204,7 +204,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    pip->now.dstflag = daylight ;
 
 	    tznp = (stp->tm_isdst <= 0) ? tzname[0] : tzname[1] ;
-	    strncpy(pip->zname,tznp,DATE_ZNAMESIZE) ;
+	    strncpy(pip->zname,tznp,DATE_ZNAMELEN) ;
 
 	    dater_start(&pip->tmpdate,&pip->now,pip->zname,-1) ;
 

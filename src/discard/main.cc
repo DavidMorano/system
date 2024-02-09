@@ -381,7 +381,7 @@ char	*envv[] ;
 	    pip->now.dstflag = daylight ;
 
 	    tznp = (stp->tm_isdst <= 0) ? tzname[0] : tzname[1] ;
-	    strncpy(pip->zname,tznp,DATE_ZNAMESIZE) ;
+	    strncpy(pip->zname,tznp,DATE_ZNAMELEN) ;
 
 	} /* end block (getting some current time stuff) */
 
