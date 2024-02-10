@@ -30,7 +30,7 @@
 #ifdef	__cplusplus
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<algorithm>
 #include	<utypedefs.h>
 #include	<clanguage.h>

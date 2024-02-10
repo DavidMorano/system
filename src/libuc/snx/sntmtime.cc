@@ -103,16 +103,12 @@
 #include	<mkchar.h>
 #include	<ctdec.h>
 #include	<ctdecp.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NYEARS_CENTURY| */
 
 #include	"sntmtime.h"
 
 
 /* local defines */
-
-#ifndef	NYEARS_CENTURY
-#define	NYEARS_CENTURY	100
-#endif
 
 
 /* external subroutines */
@@ -140,6 +136,8 @@ static int	sbuf_datex(sbuf *,TMTIME *) noex ;
 /* local variables */
 
 static constexpr cchar	blinker[] = "\033[5m:\033[0m" ;
+
+constexpr int		nyears = NYEARS_CENTURY ;
 
 
 /* exported variables */
@@ -190,7 +188,6 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'C':
 	                {
-			    cint	nyears = NYEARS_CENTURY ;
 	                    int		y ;
 	                    y = ((tmp->year+TM_YEAR_BASE)/nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
@@ -283,9 +280,8 @@ static int sbuf_fmtstrs(sbuf *ssp,TMTIME *tmp,cchar *fmt) noex {
 	                break ;
 	            case 'y':
 	                {
-	                    cint	mod = NYEARS_CENTURY ;
 	                    int		y ;
-	                    y = ((tmp->year+TM_YEAR_BASE)%mod) ;
+	                    y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	                    rs = sbuf_twodig(ssp,y) ;
 	                }
 	                break ;
@@ -423,9 +419,8 @@ static int sbuf_dated(sbuf *ssp,TMTIME *tmp) noex {
 	    if ((rs = sbuf_char(ssp,'/')) >= 0) {
 	        if ((rs = sbuf_twodig(ssp,tmp->mday)) >= 0) {
 	    	    if ((rs = sbuf_char(ssp,'/')) >= 0) {
-			cint	mod = NYEARS_CENTURY ;
 	        	int	y ;
-	        	y = ((tmp->year+TM_YEAR_BASE)%mod) ;
+	        	y = ((tmp->year+TM_YEAR_BASE)%nyears) ;
 	        	rs = sbuf_twodig(ssp,y) ;
 		    }
 		}

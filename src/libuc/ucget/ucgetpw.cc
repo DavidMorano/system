@@ -104,12 +104,17 @@ namespace {
 
 /* local variables */
 
-constexpr bool f_sunos = F_SUNOS ;
-constexpr bool f_darwin = F_DARWIN ;
-constexpr bool f_linux = F_LINUX ;
-constexpr bool f_getpwentr = F_GETPWENTR ;
-constexpr bool f_getpwnamr = F_GETPWNAMR ;
-constexpr bool f_getpwuidr = F_GETPWUIDR ;
+constexpr bool		f_sunos = F_SUNOS ;
+constexpr bool		f_darwin = F_DARWIN ;
+constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_getpwentr = F_GETPWENTR ;
+constexpr bool		f_getpwnamr = F_GETPWNAMR ;
+constexpr bool		f_getpwuidr = F_GETPWUIDR ;
+
+constexpr uid_t		uidend = uid_t(-1) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -278,7 +283,7 @@ int ucgetpw::getpw_nam(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 int ucgetpw::getpw_uid(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs = SR_INVALID ;
 	if (bit(uid,31)) uid = getuid() ;
-	if (uid != uid_t(-1)) {
+	if (uid != uidend) {
 	    errno = 0 ;
 	    if constexpr (f_getpwuidr) {
 	        cint	ec = getpwuid_rp(pwp,pwbuf,pwlen,uid) ;

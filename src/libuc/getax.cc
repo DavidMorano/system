@@ -30,7 +30,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -58,6 +57,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -123,19 +125,19 @@ int getgr_end() noex {
 }
 /* end subroutine (getgr_end) */
 
-int getgr_ent(struct group *grp,char *grbuf,int grlen) noex {
+int getgr_ent(GROUP *grp,char *grbuf,int grlen) noex {
 	int		rs ;
 	if ((rs = uc_getgrent(grp,grbuf,grlen)) == SR_NOTFOUND) rs = SR_OK ;
 	return rs ;
 }
 /* end subroutine (getgr_ent) */
 
-int getgr_name(struct group *grp,char *rbuf,int rlen,cchar *name) noex {
+int getgr_name(GROUP *grp,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getgrnam(grp,rbuf,rlen,name) ;
 }
 /* end subroutine (getgr_name) */
 
-int getgr_gid(struct group *grp,char *rbuf,int rlen,gid_t gid) noex {
+int getgr_gid(GROUP *grp,char *rbuf,int rlen,gid_t gid) noex {
 	return uc_getgrgid(grp,rbuf,rlen,gid) ;
 }
 /* end subroutine (getgr_gid) */

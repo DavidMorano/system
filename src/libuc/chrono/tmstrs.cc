@@ -44,7 +44,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<cfdec.h>
@@ -52,14 +52,6 @@
 
 
 /* local defines */
-
-#ifndef	NYEARS_CENTURY
-#define	NYEARS_CENTURY	100
-#endif
-
-#ifndef	CENTURY_BASE
-#define	CENTURY_BASE	19
-#endif
 
 #define	TWOCHARS(a,b)		(((a) << 8) + (b))
 

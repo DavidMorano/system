@@ -64,9 +64,18 @@
 #endif /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* local variables */
 
 constexpr bool		f_userattr = F_USERATTR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

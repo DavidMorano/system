@@ -62,20 +62,20 @@ int getpe_end() noex {
 }
 /* end subroutine (getpe_end) */
 
-int getpe_ent(PROTOENT *pp,char rbuf[],int rlen) noex {
+int getpe_ent(PROTOENT *pp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = uc_getprotoent(pp,rbuf,rlen)) == SR_NOTFOUND) rs = SR_OK ;
 	return rs ;
 }
 /* end subroutine (getpe_ent) */
 
-int getpe_name(PROTOENT *pp,char rbuf[],int rlen,cchar name[]) noex {
-	return uc_getprotobyname(name,pp,rbuf,rlen) ;
+int getpe_name(PROTOENT *pp,char *rbuf,int rlen,cchar name[]) noex {
+	return uc_getprotobyname(pp,rbuf,rlen,name) ;
 }
 /* end subroutine (getpe_name) */
 
-int getpe_num(PROTOENT *pp,char rbuf[],int rlen,int num) noex {
-	return uc_getprotobynumber(num,pp,rbuf,rlen) ;
+int getpe_num(PROTOENT *pp,char *rbuf,int rlen,int num) noex {
+	return uc_getprotobynumber(pp,rbuf,rlen,num) ;
 }
 /* end subroutine (getpe_num) */
 

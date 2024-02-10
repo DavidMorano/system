@@ -110,13 +110,18 @@ namespace {
 
 /* local variables */
 
-constexpr bool f_sunos = F_SUNOS ;
-constexpr bool f_darwin = F_DARWIN ;
-constexpr bool f_linux = F_LINUX ;
-constexpr bool f_getpjentr = F_GETPJENTR ;
-constexpr bool f_getpjnamr = F_GETPJNAMR ;
-constexpr bool f_getpjpidr = F_GETPJPIDR ;
-constexpr bool f_getpjdefr = F_GETPJDEFR ;
+constexpr bool		f_sunos = F_SUNOS ;
+constexpr bool		f_darwin = F_DARWIN ;
+constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_getpjentr = F_GETPJENTR ;
+constexpr bool		f_getpjnamr = F_GETPJNAMR ;
+constexpr bool		f_getpjpidr = F_GETPJPIDR ;
+constexpr bool		f_getpjdefr = F_GETPJDEFR ;
+
+constexpr projid_t	pjidend = projid_t(-1) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -12,21 +12,20 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/timeb.h>
-#include	<time.h>
+#include	<time.h>		/* |time_t| */
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TZABBRLEN| */
 
 
 #define	DATE		struct date_head
-#define	DATE_ZNAMESIZE	8		/* maximum TZ name length */
+#define	DATE_ZNAMELEN	TZABBRLEN		/* maximum TZ name length */
 
 
 struct date_head {
 	time_t		time ;			/* UNIX® time */
 	short		zoff ;			/* minutes west of GMT */
 	short		isdst ;			/* is-daylight-savings time */
-	char		zname[DATE_ZNAMESIZE] ;	/* time-zone abbreviation */
+	char		zname[DATE_ZNAMELEN+1] ; /* time-zone abbreviation */
 } ;
 
 typedef DATE		date ;

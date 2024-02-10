@@ -73,7 +73,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<usystem.h>
 #include	<usupport.h>		/* for |memclear(3u)| */
 #include	<estrings.h>
@@ -84,20 +84,18 @@
 #include	<char.h>
 #include	<hasx.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NYEARS_CENTURY| */
 
 #include	"tmz.h"
 
 
 /* local defines */
 
-#ifndef	NYEARS_CENTURY
-#define	NYEARS_CENTURY	100
-#endif
 
-#ifndef	CENTURY_BASE
-#define	CENTURY_BASE	19
-#endif
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -122,7 +120,7 @@ static int	val(cchar *) noex ;
 static int	silogend(cchar *,int) noex ;
 
 #if	defined(CF_MULTIZONE) && (CF_MULTIZONE == 0)
-static int	isgoodname(cchar *,int) ;
+static bool	isgoodname(cchar *,int) ;
 #endif
 
 static cchar	*strnzone(cchar *,int) noex ;
@@ -140,6 +138,8 @@ static constexpr cchar	tpterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
 } ;
+
+constexpr int		nyears = NYEARS_CENTURY ;
 
 
 /* exported variables */
@@ -292,7 +292,7 @@ int tmz_touch(tmz *op,cchar *sp,int sl) noex {
 	        if (i >= n) {
 	            op->f.year = true ;
 	            if ((stp->tm_year >= 0) && (stp->tm_year <= 38)) {
-	                stp->tm_year += NYEARS_CENTURY ;
+	                stp->tm_year += nyears ;
 	            }
 	        } else if (i < (n-1)) {
 	            rs = SR_INVALID ;
@@ -390,7 +390,7 @@ int tmz_strdig(tmz *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		zl = 0 ;
 	if (op && sp) {
-	    TM	*stp = &op->st ;
+	    TM		*stp = &op->st ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    rs = memclear(op) ;
 	    op->zoff = SHORT_MIN ;
@@ -913,11 +913,11 @@ static int tmz_yearadj(tmz *op,int sc) noex {
 	if (stp->tm_year >= 0) {
 	    op->f.year = true ;
 	    if (sc >= 0) {
-	        cint	yy = ((sc*NYEARS_CENTURY)-TM_YEAR_BASE) ;
+	        cint	yy = ((sc*nyears)-TM_YEAR_BASE) ;
 	        stp->tm_year += yy ;
 	    } else {
 	        if ((stp->tm_year >= 0) && (stp->tm_year <= 38)) {
-	            stp->tm_year += NYEARS_CENTURY ;
+	            stp->tm_year += nyears ;
 	        } else if (stp->tm_year >= TM_YEAR_BASE) {
 	            stp->tm_year -= TM_YEAR_BASE ;
 		}
@@ -930,8 +930,8 @@ static int tmz_yearadj(tmz *op,int sc) noex {
 #if	defined(CF_MULTIZONE) && (CF_MULTIZONE == 0)
 
 /* do we have a valid time-zone name */
-static int isgoodname(cchar *sp,int sl) noex {
-	int		f = false ;
+static bool isgoodname(cchar *sp,int sl) noex {
+	bool		f = false ;
 	while ((sl != 0) && (sp[0] != '\0')) {
 	    cint	ch = mkchar(*sp) ;
 	    f = isalnumlatin(ch) ;
@@ -951,7 +951,7 @@ static int getzoff(int *zop,cchar *sp,int sl) noex {
 	int		cl ;
 	int		zoff ;
 	int		ch = mkchar(*sp) ;
-	int		f = false ;
+	bool		f = false ;
 	cchar		*cp ;
 	f = f || isplusminus(ch) ;
 	f = f || isdigitlatin(ch) ;
@@ -1031,7 +1031,7 @@ static int silogend(cchar *sp,int sl) noex {
 /* end subroutine (silogend) */
 
 static cchar *strnzone(cchar *sp,int sl) noex {
-	int		f = false ;
+	bool		f = false ;
 	while (sl && *sp) {
 	    cint	ch = mkchar(*sp) ;
 	    f = f || isplusminus(ch) ;

@@ -43,7 +43,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<new>
 #include	<utility>
 #include	<unordered_map>

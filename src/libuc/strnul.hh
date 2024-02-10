@@ -20,7 +20,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<string>
 #include	<string_view>
 #include	<iostream>

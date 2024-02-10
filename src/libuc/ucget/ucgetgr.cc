@@ -104,12 +104,17 @@ namespace {
 
 /* local variables */
 
-constexpr bool f_sunos = F_SUNOS ;
-constexpr bool f_darwin = F_DARWIN ;
-constexpr bool f_linux = F_LINUX ;
-constexpr bool f_getgrentr = F_GETGRENTR ;
-constexpr bool f_getgrnamr = F_GETGRNAMR ;
-constexpr bool f_getgrgidr = F_GETGRGIDR ;
+constexpr bool		f_sunos = F_SUNOS ;
+constexpr bool		f_darwin = F_DARWIN ;
+constexpr bool		f_linux = F_LINUX ;
+constexpr bool		f_getgrentr = F_GETGRENTR ;
+constexpr bool		f_getgrnamr = F_GETGRNAMR ;
+constexpr bool		f_getgrgidr = F_GETGRGIDR ;
+
+constexpr gid_t		gidend = gid_t(-1) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -278,7 +283,7 @@ int ucgetgr::getgr_nam(ucentgr *grp,char *grbuf,int grlen) noex {
 int ucgetgr::getgr_gid(ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs = SR_INVALID ;
 	if (bit(gid,31)) gid = getgid() ;
-	if (gid != gid_t(-1)) {
+	if (gid != gidend) {
 	    errno = 0 ;
 	    if constexpr (f_getgrgidr) {
 	        cint	ec = getgrgid_rp(grp,grbuf,grlen,gid) ;
