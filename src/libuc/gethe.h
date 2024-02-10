@@ -12,8 +12,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<netinet/in.h>
 #include	<netdb.h>
 #include	<usyhstem.h>
 
@@ -23,7 +21,7 @@ EXTERNC_begin
 extern int gethe_begin(int) noex ;
 extern int gethe_ent(HOSTENT *,char *,int) noex ;
 extern int gethe_name(HOSTENT *,char *,int,cchar *) noex ;
-extern int gethe_addr(HOSTENT *,char *,int,in_addr_t) noex ;
+extern int gethe_addr(HOSTENT *,char *,int,int,in_addr_t) noex ;
 extern int gethe_end() noex ;
 
 EXTERNC_end

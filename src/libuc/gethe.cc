@@ -56,6 +56,7 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<getnodename.h>
 #include	<localmisc.h>
 
 
@@ -98,20 +99,20 @@ int gethe_ent(HOSTENT *hep,char *hebuf,int helen) noex {
 /* end subroutine (gethe_ent) */
 
 int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
-	const int	nlen = NODENAMELEN ;
+	cint		nlen = NODENAMELEN ;
 	int		rs = SR_OK ;
 	char		nbuf[NODENAMELEN+1] ;
 	if ((name == NULL) || (name[0] == '\0')) {
 	    rs = getnodename(nbuf,nlen) ;
 	    name = nbuf ;
 	}
-	if (rs >= 0) rs = uc_gethostbyname(name,hep,hebuf,helen) ;
+	if (rs >= 0) rs = uc_gethostbyname(hep,hebuf,helen,name) ;
 	return rs ;
 }
 /* end subroutine (gethe_name) */
 
-int gethe_addr(HOSTENT *hep,char *hb,int hl,int type,cvoid *ap,int al) noex {
-	return uc_gethostbyaddr(ap,al,type,hep,hb,hl) ;
+int gethe_addr(HOSTENT *hep,char *hb,int hl,int af,in_addr_t *ap) noex {
+	return uc_gethostbyaddr(hep,hb,hl,ap,al,type) ;
 }
 /* end subroutine (gethe_addr) */
 

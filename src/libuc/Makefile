@@ -830,11 +830,11 @@ numsign.o:		numsign.cc numsign.h
 
 
 # GETXX
-getax.o:		getax.c getax.h
-getpe.o:		getpe.c getpe.h
-getse.o:		getse.c getse.h
-getne.o:		getne.c getne.h
-gethe.o:		gethe.c gethe.h
+getax.o:		getax.cc getax.h
+getpe.o:		getpe.cc getpe.h
+getne.o:		getne.cc getne.h
+gethe.o:		gethe.cc gethe.h
+getse.o:		getse.cc getse.h
 
 passwdent.o:		passwdent.cc passwdent.h
 spwdent.o:		spwdent.cc spwdent.h
