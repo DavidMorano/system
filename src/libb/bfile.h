@@ -110,8 +110,8 @@ struct bfile_mapflags {
 } ;
 
 struct bfile_map {
-	size_t		offset ;	/* file offset for page */
 	char		*buf ;
+	size_t		offset ;	/* file offset for page */
 	BFILE_MAPFLAGS	f ;
 } ;
 
@@ -120,9 +120,9 @@ struct bfile_bdflags {
 } ;
 
 struct bfile_bd {
+	char		*bdata ;	/* base of buffer */
 	size_t		boff ;		/* base of buffer */
 	BFILE_BDFLAGS	f ;
-	char		*bdata ;	/* base of buffer */
 	int		bsize ;		/* size of buffer */
 	int		blen ;		/* length of data (buffer index) */
 } ;
@@ -142,18 +142,18 @@ struct bfile_flags {
 } ;
 
 struct bfile_head {
-	uint		magic ;
-	BFILE_FLAGS	f ;
-	size_t		offset ; 	/* user view */
 	BFILE_MAP	*maps ;		/* array of map pages */
 	BFILE_BD	*bds ;		/* buffer descriptors */
 	char		*bdata ;	/* allocated buffer space */
 	char		*bbp ;		/* base buffer pointer */
 	char		*bp ;		/* current pointer into buffer */
-	size_t		fsize ;		/* current? file size */
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
+	size_t		offset ; 	/* user view */
+	size_t		fsize ;		/* current? file size */
 	mode_t		mode ;
+	uint		magic ;
+	BFILE_FLAGS	f ;
 	int		fd ;
 	int		pagesize ;	/* system page size */
 	int		bsize ;		/* allocated buffer size */
@@ -162,11 +162,9 @@ struct bfile_head {
 	int		bm ;		/* buffer mode */
 } ;
 
-typedef struct bfile_head	bfile ;
+typedef BFILE		bfile ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	bopen(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopene(bfile *,cchar *,cchar *,mode_t,int) noex ;
@@ -215,9 +213,7 @@ static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* BFILE_INCLUDE */

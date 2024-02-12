@@ -1,13 +1,12 @@
-/* bopencmd */
+/* bopencmd SUPPORT */
+/* lang=C++20 */
 
 /* BASIC INPUT OUTPUT package */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_READWRITE	1		/* pipes are O_RDWR */
 #define	CF_BFD		0		/* really optional (leave out) */
-
 
 /* revision history:
 
@@ -22,34 +21,30 @@
 
 	Notes:  
 
-	Remember that the 'pipe(2)' system call creates two pipe file
-	descriptors.  Both of these file descriptors are open for reading and
-	writing on System V UNIX.  On BSD systems, or older BSD systems
-	assuming that they have not yet upgraded to the System V behavior, the
-	first file descriptor, the one in the zeroth array element, is open for
-	reading.  The second file descriptor, the one in the oneth array
-	element, is open for writing.
-
+	Remember that the |pipe(2)| system call creates two pipe
+	file descriptors.  Both of these file descriptors are open
+	for reading and writing on System V UNIX.  On BSD systems,
+	or older BSD systems assuming that they have not yet upgraded
+	to the System V behavior, the first file descriptor, the
+	one in the zeroth array element, is open for reading.  The
+	second file descriptor, the one in the oneth array element,
+	is open for writing.
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<char.h>
+#include	<strwcpy.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
-
 #include	"bfile.h"
 
 
@@ -69,8 +64,6 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,cchar *,int) ;
-
 
 /* external variables */
 
@@ -83,10 +76,7 @@ extern char	*environ[] ;
 /* exported subroutines */
 
 
-int bopencmd(fpa,cmd)
-bfile		*fpa[3] ;
-const char	cmd[] ;
-{
+int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 	pid_t		pid_child ;
 	int		rs = SR_OK ;
 	int		cmdlen ;

@@ -1,10 +1,10 @@
-/* bcopyfile */
+/* bcopyfile SUPPORT */
+/* lang=C++20 */
 
 /* copy a file to another file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,44 +17,30 @@
 
 /*******************************************************************************
 
-        This subroutine copies the remainder of the input file to the output
-        file.
+	This subroutine copies the remainder of the input file to
+	the output file.
 
 	Synospsis:
-
-	int bcopyfile(ifp,ofp,ubuf,ulen)
-	bfile		*ifp ;
-	bfile		*ofp ;
-	char		ubuf[] ;
-	int		ulen ;
+	int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex
 
 	Arguments:
-
 	+ ifp		input file pointer to copy from
 	+ ofp		output file pointer to copy to
 	+ buf		buffer to use for the operation
 	+ len		length of supplied buffer
 
 	Returns:
-
 	>=0		length of data copied or error return
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#define	BFILE_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -64,11 +50,12 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen)
-{
+int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
 	int		rs = SR_OK ;
 	int		i, bl ;
 	int		len ;

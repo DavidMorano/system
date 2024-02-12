@@ -1,11 +1,11 @@
-/* bopenmod */
+/* bminmod SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
+#define	CF_MEMCPY	1		/* use 'memcpy(3c)' */
 
 /* revision history:
 
@@ -18,22 +18,14 @@
 
 /*******************************************************************************
 
-        We open with a minimum mode equal to the mode passed to the open call.
-        Otherwise everything is identical to |bopen(3b)|.
-
+	Sset a minimum mode on the opened file.
 
 *******************************************************************************/
 
-
-#define	BFILE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -44,8 +36,6 @@
 
 
 /* external subroutines */
-
-extern int	hasallof(const char *,int,const char *) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
@@ -64,33 +54,19 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* exported subroutines */
 
+int bminmod(bfile *fp,mode_t om) noex {
+	int		rs = SR_OK ;
 
-int bopenmod(bfile *fp,const char *fname,const char *of,mode_t om)
-{
-	int		rs ;
+	if (fp == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("bopenmod: fname=%s\n",fname) ;
-	debugprintf("bopenmod: of=%s\n",of) ;
-#endif
+	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = bopen(fp,fname,of,om)) >= 0) {
-	    if (strchr(of,'M') == NULL) { /* not already done! */
-	        if ((rs = hasallof(of,-1,"wc")) > 0) {
-	            fp->oflags |= O_MINMODE ;
-	            rs = uc_fminmod(fp->fd,om) ;
-	        }
-	    }
-	    if (rs < 0)
-	        bclose(fp) ;
-	} /* end if (bopen) */
-
-#if	CF_DEBUGS
-	debugprintf("bopenmod: ret rs=%d\n",rs) ;
-#endif
+	if (fp->fd >= 0) {
+	    rs = uc_fminmod(fp->fd,om) ;
+	}
 
 	return rs ;
 }
-/* end routine (bopenmod) */
+/* end routine (bminmod) */
 
 

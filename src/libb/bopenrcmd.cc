@@ -1,12 +1,11 @@
-/* bopenrcmd */
+/* bopenrcmd SUPPORT */
+/* lang=C++20 */
 
 /* BASIC INPUT OUTPUT package */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DANGERHACK	1
-
 
 /* revision history:
 
@@ -19,23 +18,18 @@
 
 /*******************************************************************************
 
-        This subroutine spawns a shell and gives it a command to execute. Input
-        and output is connected back to the caller.
-
+	This subroutine spawns a shell and gives it a command to
+	execute. Input and output is connected back to the caller.
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
 #include	<envstandards.h>
-
 #include	<sys/param.h>
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -68,11 +62,12 @@ extern char	*environ[] ;
 /* forward reference */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd)
-{
+int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 	pid_t		child_pid = 0 ;
 	int		rs ;
 	int		fd = -1 ;

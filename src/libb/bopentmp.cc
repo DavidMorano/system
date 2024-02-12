@@ -1,11 +1,10 @@
-/* bopentmp */
+/* bopentmp SUPPORT */
+/* lang=C++20 */
 
 /* open a tempory file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,8 +17,8 @@
 
 /*******************************************************************************
 
-	This subroutine will open up a temporary file.  If successful, the file
-	is deleted before this subroutine returns.
+	This subroutine will open up a temporary file.  If successful,
+	the file is deleted before this subroutine returns.
 
 	Synopsis:
 
@@ -39,24 +38,22 @@
 	Returns:
 
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sigblock.h>
+#include	<mkpathx.h>
+#include	<mkdirs.h>
+#include	<mkfile.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -79,10 +76,6 @@
 
 /* external subroutines */
 
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkdirs(const char *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 extern int	sfdirname(const char *,int,const char **) ;
 

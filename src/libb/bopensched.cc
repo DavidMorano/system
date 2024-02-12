@@ -1,11 +1,10 @@
-/* bopensched */
+/* bopensched SUPPORT */
+/* lang=C++20 */
 
 /* open a file name according to rules */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -50,24 +49,21 @@
 	%n.%f
 	%f
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<vecstr.h>
 #include	<outbuf.h>
+#include	<xperm.h>
+#include	<vstrkeycmp.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -81,9 +77,6 @@
 
 /* external subroutines */
 
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	vstrkeycmp(char **,char **) ;
-
 
 /* external variables */
 
@@ -93,7 +86,7 @@ extern int	vstrkeycmp(char **,char **) ;
 
 /* forward references */
 
-static int	schedexpand(const char *,VECSTR *,const char *,char *,int) ;
+static int	schedexpand(cchar *,VECSTR *,cchar *,char *,int) noex ;
 
 
 /* local global variabes */
@@ -107,11 +100,11 @@ static int	schedexpand(const char *,VECSTR *,const char *,char *,int) ;
 
 int bopensched(fp,sched,nsp,fname,outname,mode,permission)
 bfile		*fp ;
-const char	*sched[] ;
+cchar	*sched[] ;
 VECSTR		*nsp ;
-const char	fname[] ;
+cchar	fname[] ;
 char		outname[] ;
-const char	mode[] ;
+cchar	mode[] ;
 int		permission ;
 {
 	OUTBUF		ob ;
@@ -119,7 +112,7 @@ int		permission ;
 	int		i, sl ;
 	int		imode ;
 	int		f_create = FALSE ;
-	const char	*mp ;
+	cchar	*mp ;
 	char		openmode[MODELEN + 1], *omp = openmode ;
 	char		*tmpfname ;
 
@@ -227,17 +220,17 @@ ret0:
 
 
 static int schedexpand(fmt,nsp,fname,buf,buflen)
-const char	*fmt ;
+cchar	*fmt ;
 VECSTR		*nsp ;
-const char	fname[] ;
+cchar	fname[] ;
 char		buf[] ;
 int		buflen ;
 {
 	SBUF		buffer ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*fp ;
-	const char	*tp, *cp ;
+	cchar	*fp ;
+	cchar	*tp, *cp ;
 	char		keybuf[2] ;
 
 #if	CF_DEBUGS

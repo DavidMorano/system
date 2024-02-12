@@ -1,12 +1,11 @@
-/* bopenshell */
+/* bopenshell SUPPORT */
+/* lang=C++20 */
 
 /* BASIC INPUT OUTPUT package */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_READWRITE	1		/* pipes are O_RDWR */
-
 
 /* revision history:
 
@@ -19,34 +18,30 @@
 
 /*******************************************************************************
 
-        This subroutine opens a SHELL and then passes to it the command string
-        supplied by the user.
+	This subroutine opens a SHELL and then passes to it the
+	command string supplied by the user.
 
 	Notes:  
 
-        Remember that the 'pipe(2)' system call creates two pipe file
-        descriptors. Both of these file descriptors are open for reading and
-        writing on System V UNIX. On BSD systems, or older BSD systems assuming
-        that they have not yet upgraded to the System V behavior, the first file
-        descriptor, the one in the zeroth array element, is open for reading.
-        The second file descriptor, the one in the oneth array element, is open
-        for writing.
-
+	Remember that the |pipe(2)| system call creates two pipe
+	file descriptors. Both of these file descriptors are open
+	for reading and writing on System V UNIX. On BSD systems,
+	or older BSD systems assuming that they have not yet upgraded
+	to the System V behavior, the first file descriptor, the
+	one in the zeroth array element, is open for reading.  The
+	second file descriptor, the one in the oneth array element,
+	is open for writing.
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<char.h>
 #include	<exitcodes.h>

@@ -1,10 +1,10 @@
-/* bopenrcmde */
+/* bopenremote SUPPORT */
+/* lang=C++20 */
 
 /* execute a command remotely */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,29 +17,22 @@
 
 /*******************************************************************************
 
-        This is supposed to be the same as the 'bopenrcmd(3b)' subroutine except
-        that environment can be passed to the remote command.
-
+	Open (within the BFILE framework) something.
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>	/* MUST be first to configure */
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<strings.h>		/* for |strcasecmp(3c)| */
-
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
+#include	<mkfile.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -47,65 +40,72 @@
 
 /* local defines */
 
-#define	LINELEN		200
+#ifndef	LINEBUFLEN
+#ifdef	LINE_MAX
+#define	LINEBUFLEN	MAX(LINE_MAX,2048)
+#else
+#define	LINEBUFLEN	2048
+#endif
+#endif
+
 #define	BUFLEN		(MAXPATHLEN + (LINELEN * 2))
 #define	DISBUFLEN	300
 
 
 /* external subroutines */
 
-extern int	getnodedomain(char *,char *) ;
-extern int	mkjobfile(const char *,mode_t,char *) ;
-
-extern char	*strbasename(char *) ;
+extern "C" {
+    extern char	*strbasename(char *) knoex ;
+}
 
 
 /* forward references */
 
-static int	quotevalue() ;
-static int	newbuf() ;
+static int	quotevalue(cchar *,char *,int,cchar **) noex ;
+static int	newbuf(char *,int,int,char **) noex ;
 
 
-/* local data structures */
+/* global data */
 
 
-/* local module data */
+/* local structures */
 
 
 /* exported subroutines */
 
 
-int bopenrcmde(fpa,environ,remotehost,cmd)
-bfile		*fpa[] ;
-char		*environ[] ;
-const char	remotehost[] ;
-const char	cmd[] ;
+int bopenremote(fpa,environ,remotehost,cmd)
+bfile	*fpa[] ;
+char	*environ[] ;
+char	remotehost[] ;
+char	cmd[] ;
 {
 	struct utsname	uts ;
 	bfile		jobfile, *jfp = &jobfile ;
 	pid_t		pid ;
-	int		rs = SR_NOTOPEN ;
-	int		i, len ;
-	int		f_freecwd = FALSE ;
-	int		f_ksh = FALSE ;
+	int		rs = SR_BAD ;
+	int		i ;
 	int		klen ;
-	int		vlen ;
+	int		f_cwd = FALSE ;
+	int		f_ksh = FALSE ;
+	cchar	*vp, *nvp ;
 	char		remotecmd[(MAXPATHLEN * 2) + 1] ;
 	char		jobfname[MAXPATHLEN + 1] ;
-	char		nodename[256 + 1], domainname[2048 + 1] ;
-	char		valuebuf[MAXPATHLEN + 1] ;
-	char		displaybuf[DISBUFLEN + 1] ;
 	char		*cwd = NULL ;
 	char		**ep ;
+	char		*nodename, *domainname ;
+	char		valuebuf[MAXPATHLEN + 1] ;
+	char		displaybuf[DISBUFLEN + 1] ;
 	char		*cp ;
 	char		*cmd_shell = NULL ;
 	char		*cmd_rcp, *cmd_rsh ;
-	char		*vp, *nvp ;
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: ent host=%s cmd>\n%s\n",
+	debugprintf("bopenremote: entered host=%s cmd>\n%s\n",
 	    remotehost,cmd) ;
 #endif
+
+	if (fpa == NULL) return SR_FAULT ;
 
 	jobfname[0] = '\0' ;
 	if ((remotehost == NULL) || (remotehost[0] == '\0'))
@@ -119,28 +119,48 @@ const char	cmd[] ;
 	cmd_rsh = "/bin/rsh" ;
 	if (u_access(cmd_rsh,X_OK) != 0) {
 
-	    cmd_rsh = "/bin/remsh" ;
-	    if (u_access(cmd_rsh,X_OK) != 0) {
+	    cmd_rsh = "/usr/ucb/rsh" ;
+	    if (u_access(cmd_rsh,X_OK) != 0) 
+		return SR_BAD ;
 
-	        cmd_rsh = "/usr/ucb/rsh" ;
-	        if (u_access(cmd_rsh,X_OK) != 0)
-		    return SR_NOTSUP ;
-
-	    }
 	}
 
 	cmd_rcp = "/bin/rcp" ;
-	if (access(cmd_rcp,X_OK) != 0) {
+	if (u_access(cmd_rcp,X_OK) != 0) {
 
 	    cmd_rcp = "/usr/ucb/rcp" ;
-	    if (u_access(cmd_rcp,X_OK) != 0)
-		return SR_NOTSUP ;
+	    if (u_access(cmd_rcp,X_OK) != 0) 
+		return SR_BAD ;
 
 	}
 
 /* get our host (nodename) and domain name */
 
-	getnodedomain(nodename,domainname) ;
+	u_uname(&uts) ;
+
+	nodename = uts.nodename ;
+	domainname = NULL ;
+	if ((cp = strchr(uts.nodename,'.')) != NULL) {
+
+	    *cp++ = '\0' ;
+	    domainname = cp ;
+	}
+
+	if (domainname == NULL) {
+
+	    if (strncmp(nodename,"ho",2) == 0) {
+	        domainname = "info.att.com" ;
+
+	    } else if (strncmp(nodename,"mt",2) == 0) {
+	        domainname = "mt.att.com" ;
+
+	    } else if (strncmp(nodename,"dr",2) == 0) {
+	        domainname = "dr.att.com" ;
+
+	    } else if (strncmp(nodename,"lz",2) == 0)
+	        domainname = "lz.att.com" ;
+
+	} /* end if */
 
 /* get what SHELL we will be using */
 
@@ -152,29 +172,29 @@ const char	cmd[] ;
 
 #if	CF_DEBUGS
 	cmd_shell = "/home/dam/src/runadvice_1/ksh2" ;
-	debugprintf("bopenrcmde: SHELL=%s\n",cmd_shell) ;
+	debugprintf("bopenremote: SHELL=%s\n",cmd_shell) ;
 #endif
 
-/* what SHELL to use on the remote side? */
+/* what SHELL to use on the remote side ? */
 
 	if ((! f_ksh) || (strcmp(strbasename(cmd_shell),"ksh") == 0))
 	    f_ksh = TRUE ;
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: f_ksh=%d\n",f_ksh) ;
+	debugprintf("bopenremote: f_ksh=%d\n",f_ksh) ;
 #endif
 
 /* put together the remote command file */
 
 	jobfname[0] = '\0' ;
-	if ((rs = mkjobfile("/tmp",0740,jobfname)) < 0)
+	if ((rs = mkjobfile("/tmp",0740,jobfname)) < 0) 
 		goto badjobfile ;
 
-	if ((rs = bopen(jfp,jobfname,"wct",0744)) < 0)
+	if ((rs = bopen(jfp,jobfname,"wct",0744)) < 0) 
 		goto badjobopen ;
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: jobfname=%s\n",jobfname) ;
+	debugprintf("bopenremote: jobfname=%s\n",jobfname) ;
 #endif
 
 /* write out our environment to the remote command */
@@ -186,11 +206,11 @@ const char	cmd[] ;
 
 
 #if	CF_DEBUGS
-	    debugprintf("bopenrcmde: top environment loop\n") ;
+	    debugprintf("bopenremote: top environment loop\n") ;
 #endif
 
-	    if ((ep[i][0] == '_') || (ep[i][0] < 32)) 
-		continue ;
+	    if ((ep[i][0] == '_') ||
+	        (ep[i][0] < 32)) continue ;
 
 /* break it up into the two pieces */
 
@@ -201,7 +221,7 @@ const char	cmd[] ;
 	        klen = cp - ep[i] ;	/* length of variable name */
 
 #if	CF_DEBUGS
-	        debugprintf("bopenrcmde: environment name=%W\n",ep[i],klen) ;
+	        debugprintf("bopenremote: environment name=%W\n",ep[i],klen) ;
 #endif
 
 /* process the value part */
@@ -215,7 +235,7 @@ const char	cmd[] ;
 	            if (*vp == ':') {
 
 #if	CF_DEBUGS
-	                debugprintf("bopenrcmde: special DISPLAY\n") ;
+	                debugprintf("bopenremote: special DISPLAY\n") ;
 #endif
 
 	                sprintf(displaybuf,"%s%s%s%s", nodename,
@@ -231,13 +251,13 @@ const char	cmd[] ;
 /* perform general character escape processing */
 
 #if	CF_DEBUGS
-	        debugprintf("bopenrcmde: about to call quote\n") ;
+	        debugprintf("bopenremote: about to call quote\n") ;
 #endif
 
 	        if ((rs = quotevalue(vp,valuebuf,MAXPATHLEN,&nvp)) < 0) {
 
 #if	CF_DEBUGS
-	            debugprintf("bopenrcmde: return bad alloc rs=%d\n",rs) ;
+	            debugprintf("bopenremote: return bad alloc rs=%d\n",rs) ;
 #endif
 
 	            goto badalloc ;
@@ -245,7 +265,7 @@ const char	cmd[] ;
 	        }
 
 #if	CF_DEBUGS
-	        debugprintf("bopenrcmde: returned w/ rs=%d\n",rs) ;
+	        debugprintf("bopenremote: returned w/ rs=%d\n",rs) ;
 #endif
 
 	        f_alloc = rs ;
@@ -279,7 +299,7 @@ const char	cmd[] ;
 	} /* end for (sending over environment) */
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: sent over the environment\n") ;
+	debugprintf("bopenremote: sent over the environment\n") ;
 #endif
 
 	bprintf(jfp,"RUNMODE=rcmd\nexport RUNMODE\n") ;
@@ -288,13 +308,13 @@ const char	cmd[] ;
 
 	if ((cwd = getenv("PWD")) == NULL) {
 
-	    f_freecwd = TRUE ;
-	    cwd = getcwd(NULL,0) ;
+	    f_cwd = TRUE ;
+	    cwd = (char *) getcwd(NULL,0) ;
 
 	}
 
 	if (cwd != NULL)
-	    bprintf(jfp,"cd %s 2> /dev/null\n",cwd) ;
+	    bprintf(jfp,"cd %s\n",cwd) ;
 
 	bprintf(jfp,"rm -f %s\n",jobfname) ;
 
@@ -306,7 +326,7 @@ const char	cmd[] ;
 
 	bprintf(jfp,"exec %s\n",cmd) ;
 
-	if ((rs = bclose(jfp)) < 0)
+	if ((rs = bclose(jfp)) < 0) 
 		goto badhost2 ;
 
 /* put the job command file on the remote host */
@@ -314,7 +334,7 @@ const char	cmd[] ;
 	sprintf(remotecmd,"%s %s %s:%s",
 	    cmd_rcp,jobfname,remotehost,jobfname) ;
 
-	if ((rs = system(remotecmd)) != 0)
+	if ((rs = system(remotecmd)) != 0) 
 		goto badhost2 ;
 
 /* execute the job command file on the remote host */
@@ -323,30 +343,31 @@ const char	cmd[] ;
 	    cmd_rsh,remotehost,cmd_shell,jobfname) ;
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: remotecmd>\n%s\n",remotecmd) ;
+	debugprintf("bopenremote: remotecmd>\n%s\n",remotecmd) ;
 #endif
 
 	pid = (pid_t) bopencmd(fpa,remotecmd) ;
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: spawned pid=%d\n",pid) ;
+	debugprintf("bopenremote: spawned pid=%d\n",pid) ;
 #endif
 
 /* clean up */
 
-	if ((f_freecwd) && (cwd != NULL))
-	    uc_free(cwd) ;
+	if (f_cwd) 
+		uc_free(cwd) ;
 
 	if (strcmp(nodename,remotehost) != 0)
 	    u_unlink(jobfname) ;
 
-ret0:
 	return ((int) pid) ;
 
 /* bad returns */
 badhost2:
-	if (f_freecwd) 
-		uc_free(cwd) ;
+	if (f_cwd && (cwd != NULL)) {
+	    uc_free(cwd) ;
+	    cwd = NULL ;
+	}
 
 badalloc:
 badjobopen:
@@ -356,18 +377,16 @@ badjobfile:
 badret:
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: one of the error returns rs=%d\n",rs) ;
+	debugprintf("bopenremote: ret rs=%d\n",rs) ;
 #endif
 
-	goto ret0 ;
+	return rs ;
 
-/* extra bad things come here */
 badhost:
-badcmd:
 	rs = SR_INVALID ;
 	goto badret ;
 }
-/* end subroutine (bopenrcmde) */
+/* end subroutine (bopenremote) */
 
 
 /* local subroutines */
@@ -375,31 +394,27 @@ badcmd:
 
 #ifdef	COMMENT
 
-/* fix up a DISPLAY environment variable content for domain name changes */
-void fixdisplay(remotehost)
-char	remotehost[] ;
+static void fixdisplay(host)
+char	host[] ;
 {
-	struct utsname		uts ;
-
-	int	rs1 ;
-	int	len, dlen ;
-	int	size ;
-
-	char	*hp ;
-	char	*cp, *cp2 ;
-
+	struct utsname	uts ;
+	int		rs1 ;
+	int		size ;
+	int		len, dlen ;
+	char		*hp ;
+	char		*cp, *cp2 ;
 
 /* fix up the environment variable DISPLAY, if found */
 
 	if ((cp = getenv("DISPLAY")) == NULL) 
 		return ;
 
-/* is an adjustment needed? */
+/* is an adjustment needed ? */
 
 	if (cp[0] == ':') {
 
-	    hp = remotehost ;
-	    if ((remotehost == NULL) || (remotehost[0] == '\0')) {
+	    hp = host ;
+	    if ((host == NULL) || (host[0] == '\0')) {
 
 	        uname(&uts) ;
 
@@ -418,12 +433,14 @@ char	remotehost[] ;
 
 	    if (rs1 >= 0) {
 
-	        bufprintf(cp2,dlen,"DISPLAY=%s%s",hp,cp) ;
+	    bufprintf(cp2,dlen,"DISPLAY=%s%s",hp,cp) ;
 
-	        putenv(cp2) ;
+	    putenv(cp2) ;
 
-	   }
+	    }
+
 	}
+
 }
 /* end subroutine (fixdisplay) */
 
@@ -431,36 +448,37 @@ char	remotehost[] ;
 
 
 static int quotevalue(vs,buf,buflen,nvpp)
-char		vs[] ;
+cchar	vs[] ;
 char		buf[] ;
 int		buflen ;
-char		**nvpp ;
+cchar	**nvpp ;
 {
-	int		rs ;
-	int		mlen, rlen = 0 ;
+	int		rs = SR_OK ;
+	int		mlen ;
 	int		curbuflen = buflen ;
 	int		newbuflen ;
 	int		blen ;
+	int		rlen = 0 ;
 	int		f_got = FALSE ;
 	int		f_malloc = FALSE ;
-	char		*cp, *cp1 ;
+	cchar	*tp, *cp ;
 	char		*curbuf = buf ;
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: ent value=%s\n",vs) ;
+	debugprintf("bopenremote: entered value=%s\n",vs) ;
 #endif
 
 	cp = vs ;
 	rlen = buflen ;
 	blen = 0 ;
-	while ((cp1 = strpbrk(cp,"\\\"")) != NULL) {
+	while ((tp = strpbrk(cp,"\\\"")) != NULL) {
 
 #if	CF_DEBUGS
-	    debugprintf("bopenrcmde: got one\n") ;
+	    debugprintf("bopenremote: got one\n") ;
 #endif
 
 	    f_got = TRUE ;
-	    mlen = cp1 - cp ;
+	    mlen = tp - cp ;
 	    if (mlen > rlen) {
 
 	        if ((newbuflen = 
@@ -476,12 +494,12 @@ char		**nvpp ;
 
 	    blen += mlen ;
 	    curbuf[blen++] = '\\' ;
-	    curbuf[blen++] = *cp1++ ;
+	    curbuf[blen++] = *tp++ ;
 	    rlen -= (mlen + 2) ;
-	    cp = cp1 ;
+	    cp = tp ;
 
 #if	CF_DEBUGS
-	    debugprintf("bopenrcmde: bottom of got one\n") ;
+	    debugprintf("bopenremote: bottom of got one\n") ;
 #endif
 
 	} /* end while */
@@ -489,7 +507,7 @@ char		**nvpp ;
 	if (f_got) {
 
 #if	CF_DEBUGS
-	    debugprintf("bopenrcmde: after got one\n") ;
+	    debugprintf("bopenremote: after got one\n") ;
 #endif
 
 	    mlen = strlen(cp) ;
@@ -505,45 +523,42 @@ char		**nvpp ;
 	        curbuflen = newbuflen ;
 	    }
 
-	    memcpy(curbuf + blen,cp,mlen) ;
-
+	    memcpy(curbuf,cp,mlen) ;
 	    blen += mlen ;
 	    rlen -= mlen ;
 	    curbuf[blen] = '\0' ;
 
 #if	CF_DEBUGS
-	    debugprintf("bopenrcmde: bottom after got one\n") ;
+	    debugprintf("bopenremote: bottom after got one\n") ;
 #endif
 
 	} /* end if (we got something) */
 
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: exiting f_got=%d\n",f_got) ;
+	debugprintf("bopenremote: exiting f_got=%d\n",f_got) ;
 #endif
 
 	*nvpp = (f_got) ? curbuf : vs ;
 
+ret0:
+
 #if	CF_DEBUGS
-	debugprintf("bopenrcmde: exiting for real, blen=%d\n",blen) ;
+	debugprintf("bopenremote: exiting for real, blen=%d\n",blen) ;
 #endif
 
-	return blen ;
+	return (rs >= 0) ? blen : rs ;
 
 badalloc:
 	if (f_malloc) 
-		uc_free(curbuf) ;
+	    uc_free(curbuf) ;
 
-	return BAD ;
+	rs = SR_NOMEM ;
+	goto ret0 ;
 }
 /* end subroutine (quotevalue) */
 
-
-static int newbuf(curbuf,curbuflen,f,nbpp)
-int	curbuflen, f ;
-char	*curbuf ;
-char	**nbpp ;
-{
-	int		rs = SR_OK ;
+static int newbuf(char *curbuf,int curbuflen,int f,char **nbpp) noex {
+	int		rs ;
 	int		newbuflen = 0 ;
 	caddr_t		p ;
 
@@ -565,55 +580,5 @@ char	**nbpp ;
 	return (rs >= 0) ? newbuflen : rs ;
 }
 /* end subroutine (newbuf) */
-
-
-/* compare host names */
-static int hostequiv(h1,h2,localdomain)
-const char	h1[], h2[] ;
-const char	localdomain[] ;
-{
-	int		len1, len2 ;
-	int		f_h1 = FALSE ;
-	int		f_h2 = FALSE ;
-	char		*cp, *cp1, *cp2 ;
-
-	if ((cp1 = strchr(h1,'.')) != NULL) 
-		f_h1 = TRUE ;
-
-	if ((cp2 = strchr(h2,'.')) != NULL) 
-		f_h2 = TRUE ;
-
-	if (LEQUIV(f_h1,f_h2))
-	    return (! strcasecmp(h1,h2)) ;
-
-	if (f_h1) {
-
-	    len1 = cp1 - h1 ;
-	    len2 = strlen(h2) ;
-
-	    if (len1 != len2) 
-		return FALSE ;
-
-	    cp1 += 1 ;
-	    if (strcasecmp(cp1,localdomain) != 0) 
-		return FALSE ;
-
-	    return (strncasecmp(h1,h2,len1) == 0) ;
-
-	}
-
-	len1 = strlen(h1) ;
-
-	len2 = cp2 - h2 ;
-	if (len1 != len2) 
-		return FALSE ;
-
-	cp2 += 1 ;
-	if (strcasecmp(cp2,localdomain) != 0) 
-		return FALSE ;
-
-	return (strncasecmp(h1,h2,len2) == 0) ;
-}
-/* end subroutine (hostequiv) */
 
 

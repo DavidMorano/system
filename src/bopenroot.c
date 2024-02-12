@@ -1,11 +1,10 @@
-/* bopenroot */
+/* bopenroot SUPPORT */
+/* lang=C++20 */
 
 /* open a file name according to rules */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -38,7 +37,6 @@
 	mode_t		operms ;
 
 	Arguments:
-
 	fp		pointer to 'bfile' object
 	pr		path of program root directory
 	fname		fname to find and open
@@ -47,27 +45,22 @@
 	operms		file opermss to use in the open 
 
 	Returns:
-
 	>=0		success (same as 'bopen()')
 	<0		error (same as 'bopen()')
 
 	outfname	1. zero length string if no new name was needed
 			2. will contain the path of the file that was opened
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<outbuf.h>

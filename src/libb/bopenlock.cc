@@ -1,4 +1,4 @@
-/* bopenlock */
+/* bopenlock SUPPORT */
 /* lang=C++20 */
 
 /* program to catpure a lock based on whether a file exists or not */
@@ -24,13 +24,13 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -55,12 +55,7 @@
 
 /* exported subroutines */
 
-int bopenlock(lfp,filename,timeout,oldtime)
-bfile		*lfp ;
-const char	filename[] ;
-int		timeout ;
-int		oldtime ;
-{
+int bopenlock(bfile *lfp,cc *filename,int timeout,int oldtime) noex {
 	USTAT		sb ;
 	time_t		checktime = 0 ;
 	int		rs = SR_OK ;
