@@ -19,8 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdarg.h>
@@ -214,6 +212,20 @@ static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 }
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int bmagic(bfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == BFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (bmagic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* BFILE_INCLUDE */

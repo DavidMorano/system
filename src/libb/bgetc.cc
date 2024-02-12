@@ -4,7 +4,6 @@
 /* "Basic I/O" package similiar to "stdio" */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -23,9 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -40,17 +38,20 @@
 /* external variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bgetc(bfile *fp) noex {
 	int		rs ;
-	int		ch ;
+	int		ch = 0 ;
 	char		buf[2] ;
-
-	rs = bread(fp,buf,1) ;
-	if (rs == 0) rs = SR_EOF ;
-
-	ch = (buf[0] & 0xff) ;
+	if ((rs = bread(fp,buf,1)) > 0) {
+	    ch = mkchar(buf[0]) ;
+	} else if (rs == 0) {
+	    rs = SR_EOF ;
+	}
 	return (rs > 0) ? ch : rs ;
 }
 /* end subroutine (bgetc) */

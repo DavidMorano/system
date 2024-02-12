@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |off_t| */
 #include	<usystem.h>
 
 

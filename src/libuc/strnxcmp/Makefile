@@ -21,10 +21,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h strnxcmp.h
+INCS= strnxcmp.h
 
 
 OBJ_STRNXCMP= strnkeycmp.o strnleadcmp.o strnncmp.o strnndictcmp.o
@@ -62,7 +62,7 @@ default:		$(T).o
 all:			$(ALL)
 
 .c.ln:
-	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
+	$(LINT) .cc $(LINTFLAGS) $(CPPFLAGS) $<
 
 .c.ls:
 	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
@@ -81,7 +81,7 @@ $(T).o:			$(OBJ_STRNXCMP)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRNXCMP)
 
 $(T).a:			$(OBJ_STRNXCMP)
-	$(AR) $(ARFLAGS) -rc $@ $?
+	$(AR) $(ARFLAGS) -cr $@ $?
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -101,9 +101,9 @@ control:
 	(uname -n ; date) > Control
 
 
-strnkeycmp.o:		strnkeycmp.c $(INCS)
-strnleadcmp.o:		strnleadcmp.c $(INCS)
+strnkeycmp.o:		strnkeycmp.cc $(INCS)
+strnleadcmp.o:		strnleadcmp.cc $(INCS)
 strnncmp.o:		strnncmp.cc $(INCS)
-strnndictcmp.o:		strnndictcmp.c $(INCS)
+strnndictcmp.o:		strnndictcmp.cc $(INCS)
 
 

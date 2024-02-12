@@ -21,10 +21,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h bfile.h
+INCS= bfile.h
 
 
 OBJ00= bopen.o bopentmp.o bopencmd.o bopenrcmd.o bopenlock.o 

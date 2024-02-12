@@ -1,4 +1,4 @@
-/* timewatch */
+/* timewatch SUPPORT */
 /* lang=C++20 */
 
 /* watch time and variables simultaneously */
@@ -20,7 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 

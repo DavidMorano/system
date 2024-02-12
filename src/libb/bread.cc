@@ -1,11 +1,10 @@
-/* bread */
+/* bread SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_MEMCPY	1		/* use 'memcpy(3c)' */
+#define	CF_MEMCPY	1		/* use |memcpy(3c)| */
 
 /* revision history:
 
@@ -32,8 +31,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -55,12 +52,7 @@
 
 /* external subroutines */
 
-extern int	bfile_pagein(bfile *,offset_t,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern int	bfile_pagein(bfile *,off_t,int) noex ;
 
 
 /* external variables */
@@ -68,8 +60,8 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int bfile_readmapped(bfile *,void *,int,int,int) ;
-static int bfile_readreg(bfile *,void *,int,int,int) ;
+static int bfile_readmapped(bfile *,void *,int,int,int) noex ;
+static int bfile_readreg(bfile *,void *,int,int,int) noex ;
 
 
 /* local variables */
@@ -86,13 +78,6 @@ int		to ;
 int		opts ;
 {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("bread: entered ulen=%d\n",ulen) ;
-	debugprintf("bread: to=%d opts=%04x\n",to,opts) ;
-	debugprintf("bread: FM_TIMED=%u\n",
-		((opts & FM_TIMED) ? 1 : 0)) ;
-#endif
 
 	if (fp == NULL) return SR_FAULT ;
 
@@ -121,10 +106,6 @@ int		opts ;
 	} /* end if */
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("bread: ret rs=%d \n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -158,10 +139,6 @@ int		opts ;
 	int		pagemask = fp->pagesize - 1 ;
 	int		i, mlen ;
 	int		f_already ;
-
-#if	CF_DEBUGS
-	debugprintf("bread: mapped\n") ;
-#endif
 
 	f_already = FALSE ;
 	while (tlen < ulen) {
@@ -237,10 +214,6 @@ int		opts ;
 	int		f_already = FALSE ;
 	char		*dbp ;
 
-#if	CF_DEBUGS
-	debugprintf("bread: regular (unmapped)\n") ;
-#endif
-
 	maxeof = (fp->f.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
 	dbp = ubuf ;
 	while ((rs >= 0) && (ulen > 0) && (neof < maxeof)) {
@@ -258,21 +231,17 @@ int		opts ;
 	            len = rs ;
 		}
 
-#if	CF_DEBUGS
-	        debugprintf("bread: uc_reade() rs=%d\n",rs) ;
-#endif
-
 	        if (rs < 0)
 	            break ;
 
 		    if (len == 0) {
 			neof += 1 ;
-		    } else
+		    } else {
 		        neof = 0 ;
-
-	        if (fp->len < fp->bsize)
+		    }
+	        if (fp->len < fp->bsize) {
 	            f_already = TRUE ;
-
+		}
 	        fp->bp = fp->bdata ;
 		fp->len = len ;
 

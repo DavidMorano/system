@@ -1,4 +1,4 @@
-/* xperm */
+/* xperm SUPPORT */
 /* lang=C++20 */
 
 /* test the permissions on a file -- similar to |access(2)| */
@@ -42,7 +42,7 @@
 
 	Returns:
 	0	access if allowed
-	<0	access if denied for specified error code
+	<0	access if denied for specified error code (system-return)
 
 *******************************************************************************/
 

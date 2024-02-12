@@ -1,6 +1,7 @@
-/* main */
+/* testlambda SUPPORT */
 /* C++20 */
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<iostream>
 
 

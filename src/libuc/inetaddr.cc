@@ -1,4 +1,4 @@
-/* inetaddr */
+/* inetaddr SUPPORT */
 /* lang=C++20 */
 
 /* object to manipulate INET adresses */

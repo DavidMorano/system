@@ -1,4 +1,4 @@
-/* storeitem */
+/* storeitem SUPPORT */
 /* lang=C++23 */
 
 /* storage object */
@@ -39,12 +39,11 @@
 
 	Returns:
 	>=0		length of the newly stored item
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdint>
 #include	<cstring>
 #include	<bit>
@@ -61,7 +60,7 @@
 
 /* local namespaces */
 
-using std::has_single_bit ;
+using std::has_single_bit ;		/* subroutine-template */
 
 
 /* local typedefs */

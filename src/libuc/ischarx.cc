@@ -1,4 +1,4 @@
-/* ischarx */
+/* ischarx SUPPORT */
 /* lang=C++20 */
 
 /* test a character for a property */
@@ -156,7 +156,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<bitset>

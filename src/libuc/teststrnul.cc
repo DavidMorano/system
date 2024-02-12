@@ -1,4 +1,4 @@
-/* teststrnul */
+/* teststrnul SUPPORT */
 /* lang=C++98 */
 
 /* revision history:

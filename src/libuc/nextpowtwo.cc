@@ -1,4 +1,4 @@
-/* nextpowtwo */
+/* nextpowtwo SUPPORT */
 /* lang=C++20 */
 
 /* calculate the next higher power of two for a given number */

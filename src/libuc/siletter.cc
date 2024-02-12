@@ -1,4 +1,4 @@
-/* siletter */
+/* siletter SUPPORT */
 /* lang=C++20 */
 
 /* is the ... something ... a "leader" (whatever that is)? */
@@ -23,7 +23,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
+#include	<usupport.h>		/* |memclear(3u)| */
 #include	<mkchar.h>
 #include	<sfx.h>
 #include	<strn.h>

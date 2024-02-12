@@ -1,4 +1,4 @@
-/* rmleadzero */
+/* rmleadzero SUPPORT */
 /* lang=C++20 */
 
 /* remove leading white-space and zero characters */
@@ -34,7 +34,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<utypedefs.h>
 #include	<ischarx.h>
 #include	<localmisc.h>

@@ -28,9 +28,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/stat.h>
 #include	<limits.h>
 #include	<unistd.h>
@@ -433,19 +431,12 @@ int bstat(bfile *fp,USTAT *sbp) noex {
 
 static int bcontrol_lock(bfile *fp,FLOCK *fsp,int fcmd,int f_tc,int to) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	if (to < 0)
-	    to = INT_MAX ;
-
-	for (i = 0 ; i < to ; i += 1) {
-
-	    if ((i > 0) && f_tc)
+	if (to < 0) to = INT_MAX ;
+	for (int i = 0 ; i < to ; i += 1) {
+	    if ((i > 0) && f_tc) {
 	        sleep(1) ;
-
-	    rs = u_fcntl(fp->fd,fcmd,fsp) ;
-
-	    if (rs < 0) {
+	    }
+	    if ((rs = u_fcntl(fp->fd,fcmd,fsp)) > 0) {
 	        switch (rs) {
 	        case SR_ACCES:
 	        case SR_AGAIN:
@@ -459,10 +450,8 @@ static int bcontrol_lock(bfile *fp,FLOCK *fsp,int fcmd,int f_tc,int to) noex {
 		    break ;
 	        } /* end switch */
 	    } /* end if */
-
 	    if ((! f_tc) || (rs != SR_LOCKED)) break ;
 	} /* end for (looping-timing on fcntl) */
-
 	return rs ;
 }
 /* end subroutine (bcontrol_lock) */

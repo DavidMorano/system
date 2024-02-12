@@ -1,4 +1,4 @@
-/* strnncmp */
+/* strnncmp SUPPORT */
 /* lang=C++20 */
 
 /* compare the minimum common characters of two strings */
@@ -43,10 +43,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- |strlen(3c)| + |strncmp(3c)| */
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"strnxcmp.h"
 
@@ -56,10 +55,13 @@
 
 /* local namespaces */
 
-using std::min ;
+using std::min ;			/* type */
 
 
 /* local typedefs */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

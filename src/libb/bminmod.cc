@@ -4,7 +4,6 @@
 /* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_MEMCPY	1		/* use 'memcpy(3c)' */
 
 /* revision history:
@@ -25,7 +24,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -36,11 +35,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* external variables */

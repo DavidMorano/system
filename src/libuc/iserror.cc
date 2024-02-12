@@ -1,4 +1,4 @@
-/* iserror */
+/* iserror SUPPORT */
 /* lang=C++20 */
 
 /* determine if a return-status value is some kind of error */
@@ -46,8 +46,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 

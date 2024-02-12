@@ -38,9 +38,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<sysval.hh>
 #include	<localmisc.h>
 
 #include	"mallocxx.h"
@@ -57,6 +57,8 @@ extern "C" {
 
 
 /* local variables */
+
+static sysval	pagesize(sysval_ps) ;
 
 
 /* local subroutines */
@@ -139,6 +141,21 @@ int malloc_sv(char **rpp) noex {
 int malloc_zn(char **rpp) noex {
 	cint	w = getbufsize_zn ;
 	return uc_mallocsys(w,rpp) ;
+}
+
+int malloc_ps(char **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		sz = 0 ;
+	if (rpp) {
+	    if ((rs = pagesize) > 0) {
+		sz = pagesize ;
+	        rs = uc_valloc((sz+1),rpp) ;
+	    } else if (rs <= 0) {
+		*rpp = nullptr ;
+		if (rs >= 0) rs = SR_NOSYS ;
+	    } /* end if (pagesize) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? sz : rs ;
 }
 
 int malloc_addr(char **rpp) noex {

@@ -1,4 +1,4 @@
-/* testconstdiv */
+/* testconstdiv SUPPORT */
 /* lang=C++20 */
 
 
@@ -14,7 +14,7 @@
 
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstdio>

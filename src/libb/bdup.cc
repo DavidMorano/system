@@ -26,9 +26,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>
@@ -60,7 +58,7 @@ int bdup(bfile *fp,bfile *fnewp) noex {
 	int		rs = SR_FAULT ;
 	if (fp && fnewp) {
 	    rs = SR_NOTOPEN ;
-	    memcpy(fnewp,fp,sizeof(bfile)) ;
+	    memcpy(fnewp,fp,sizeof(bfile)) ;	/* <- copy */
 	    if (fp->magic == BFILE_MAGIC) {
 	        if ((rs = bfile_flush(fp)) >= 0) {
 	            if ((rs = u_dup(fp->fd)) >= 0) {

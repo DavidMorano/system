@@ -4,7 +4,6 @@
 /* copy a file to another file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -36,12 +35,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<sysval.hh>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -53,75 +51,52 @@
 /* exported variables */
 
 
+/* local variables */
+
+static sysval		pagesize(sysval_ps) ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
-	int		rs = SR_OK ;
-	int		i, bl ;
-	int		len ;
-	int		blen ;
+	int		rs ;
+	int		rs1 ;
 	int		tlen = 0 ;
-	int		f_alloc = FALSE ;
-	char		*buf = NULL ;
-
-#if	CF_DEBUGS
-	debugprintf("bcopyfile: ent blen=%d\n",ulen) ;
-#endif
-
-	if ((ifp == NULL) || (ofp == NULL))
-	    return SR_FAULT ;
-
-	blen = ulen ;
-	if ((ubuf == NULL) || (ulen < 0)) {
-
-#if	CF_DEBUGS
-	    debugprintf("bcopyfile: alternate buffer\n") ;
-#endif
-
-	    blen = getpagesize() ;
-
-	    if ((rs = uc_valloc(blen,&buf)) >= 0) {
-	        f_alloc = TRUE ;
+	if ((rs = bmagic(ifp,ofp,ubuf)) >= 0) {
+	    int		blen = ulen ;
+	    char	*bbuf = ubuf ;
+	    bool	falloc = false ;
+	    if ((ubuf == nullptr) || (ulen < 0)) {
+	        if ((rs = malloc_ps(&bbuf)) >= 0) {
+		    falloc = true ;
+	            ulen = rs ;
+		}
 	    }
-
-	} else
-	    buf = ubuf ;
-
-/* do it ! */
-
-#if	CF_DEBUGS
-	debugprintf("bcopyfile: before loop\n") ;
-#endif
-
-	if (rs >= 0) {
-	while ((rs = bread(ifp,buf,blen)) > 0) {
-	    len = rs ;
-
-	    i = 0 ;
-	    bl = len ;
-	    while ((bl > 0) && ((rs = bwrite(ofp,(buf + i),bl)) < bl)) {
-	        i += rs ;
-	        bl -= rs ;
-	        if (rs < 0) break ;
-	    } /* end while */
-
-	    tlen += len ;
-	    if (rs < 0) break ;
-	} /* end while */
-	} /* end if (ok) */
-
-	if (f_alloc && (buf != NULL)) {
-	    int	rs1 ;
-	    rs1 = uc_free(buf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    buf = NULL ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("bcopyfile: ret rs=%d tlen=%d\n",
-	    rs,tlen) ;
-#endif
-
+	    if (rs >= 0) {
+		auto	bw = bwrite ;
+	        int	i{} ;
+	        int	bl ;
+	        while ((rs = bread(ifp,bbuf,blen)) > 0) {
+	            cint	len = rs ;
+	            i = 0 ;
+	            bl = len ;
+	            while ((bl > 0) && ((rs = bw(ofp,(bbuf + i),bl)) < bl)) {
+	                i += rs ;
+	                bl -= rs ;
+	                if (rs < 0) break ;
+	            } /* end while */
+	            tlen += len ;
+	            if (rs < 0) break ;
+	        } /* end while */
+	    } /* end if (ok) */
+	    if (falloc && bbuf) {
+	        rs1 = uc_free(bbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (bcopyfile) */
