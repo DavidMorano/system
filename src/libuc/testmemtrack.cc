@@ -1,7 +1,7 @@
-/* testlambda */
+/* testmemtrack SUPPORT */
 /* C++20 */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<iostream>
 #include	<usysrets.h>
 #include	<utypedefs.h>

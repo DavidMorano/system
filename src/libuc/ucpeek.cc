@@ -31,8 +31,8 @@
 	dlen		data buffer size provided
 
 	Return:
-	<0		error
 	>=0		length of characters peeked at
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -44,6 +44,7 @@
 #include	<cstring>
 #include	<ustropts.h>
 #include	<usystem.h>
+#include	<libmallocxx.h>
 #include	<localmisc.h>
 
 #include	"ucpeek.h"
@@ -67,6 +68,12 @@
 static int	peek_socket(int,void *,int) noex ;
 static int	peek_stream(int,void *,int) noex ;
 static int	peek_regular(int,void *,int) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -107,12 +114,12 @@ static int peek_socket(int fd,void *dbuf,int dlen) noex {
 /* end subroutine (peek_socket) */
 
 static int peek_stream(int fd,void *dbuf,int dlen) noex {
-	cint		clen = CBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	char		*cbuf{} ;
-	if ((rs = uc_libmalloc((clen+1),&cbuf)) >= 0) {
+	if ((rs = libmalloc_ml(&cbuf)) >= 0) {
+	    cint	clen = rs ;
 	    cbuf[0] = '\0' ;
 	    {
 	        STRPEEK		pd{} ;

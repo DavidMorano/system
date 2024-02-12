@@ -1,10 +1,9 @@
-/* hdbstr_loadfile2 */
+/* hdbstr_loadpairs SUPPORT */
 /* lang=C++20 */
 
 /* load strings from a file */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -30,12 +29,11 @@
 *****************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<field.h>
 #include	<hdbstr.h>
@@ -43,17 +41,6 @@
 
 
 /* local defines */
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#undef	ITEMLEN
-#define	ITEMLEN		MAX(LINEBUFLEN,(2 * MAXPATHLEN))
 
 
 /* external subroutines */
@@ -67,10 +54,12 @@
 
 /* forward references */
 
+static int	loadline(hdbstr *,cchar *,int) noex ;
+
 
 /* local variables */
 
-static const uchar	fterms[32] = {
+static constexpr char	fterms[32] = {
 	0x00, 0x04, 0x00, 0x00,
 	0x08, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -82,87 +71,66 @@ static const uchar	fterms[32] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int hdbstr_loadfile2(hsp,fname)
-HDBSTR	*hsp ;
-char	fname[] ;
-{
-	bfile	loadfile, *lfp = &loadfile ;
-
-	FIELD	fsb ;
-
-	int	rs ;
-	int	len ;
-	int	kl, vl ;
-	int	n = 0 ;
-
-	const char	*kp, *vp ;
-
-	char	linebuf[ITEMLEN + 1] ;
-
-
-#if	CF_DEBUGS
-	debugprintf("hdbstr_loadfile2: ent=%s\n",fname) ;
-#endif
-
-	if (fname == NULL)
-	    return SR_FAULT ;
-
-	if (fname[0] == '\0')
-	    return SR_INVALID ;
-
-/* try to open it */
-
-	rs = bopen(lfp,fname,"r",0666) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-#if	CF_DEBUGS
-	debugprintf("hdbstr_loadfile2: opened\n") ;
-#endif
-
-	while ((rs = breadln(lfp,linebuf,ITEMLEN)) > 0) {
-	    len = rs ;
-
-	    if (linebuf[len - 1] == '\n') len -= 1 ;
-
-#if	CF_DEBUGS
-	    debugprintf("hdbstr_loadfile2: line> %t\n",linebuf,len) ;
-#endif
-
-	    if ((rs = field_start(&fsb,linebuf,len)) >= 0) {
-
-	        if ((kl = field_get(&fsb,fterms,&kp)) > 0) {
-
-	            vp = NULL ;
-	            vl = 0 ;
-	            if ((fsb.term != '#') && 
-	                ((vl = field_get(&fsb,fterms,&vp)) >= 0))
-
-	            n += 1 ;
-	            rs = hdbstr_add(hsp,kp,kl,vp,vl) ;
-
-	        } /* end if (got one) */
-
-	        field_finish(&fsb) ;
-	    } /* end if (fields) */
-
-	            if (rs < 0) break ;
-	} /* end while (reading lines) */
-
-	bclose(lfp) ;
-
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("hdbstr_loadfile2: ret rs=%d n=%d\n",rs,n) ;
-#endif
-
-	return (rs >= 0) ? n : rs ;
+int hdbstr_loadpairs(hdbstr *hsp,cchar *fname) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		c = 0 ;
+	if (hsp && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		char	*lbuf{} ;
+	        if ((rs = malloc_ml(&lbuf)) >= 0) {
+	            bfile	loadfile, *lfp = &loadfile ;
+	            cint	llen = rs ;
+	            if ((rs = bopen(lfp,fname,"r",0666)) >= 0) {
+	                while ((rs = breadln(lfp,lbuf,llen)) > 0) {
+			    rs = loadline(hsp,lbuf,rs) ;
+			    c += rs ;
+	                    if (rs < 0) break ;
+	                } /* end while (reading lines) */
+	                rs1 = bclose(lfp) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (file opened) */
+		    rs1 = uc_free(lbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (hdbstr_loadfile2) */
+/* end subroutine (hdbstr_loadpairs) */
 
+
+/* local subroutines */
+
+static int loadline(hdbstr *hsp,cchar *lbuf,int ll) noex {
+	field		fsb ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if ((rs = field_start(&fsb,lbuf,ll)) >= 0) {
+	    cchar	*kp{} ;
+	    if (int kl ; (kl = field_get(&fsb,fterms,&kp)) > 0) {
+		int	vl = 0 ;
+		cchar	*vp{} ;
+		bool	f = true ;
+		f = f && (fsb.term != '#') ;
+		f = f && ((vl = field_get(&fsb,fterms,&vp)) >= 0) ;
+		if (f) {
+		    c += 1 ;
+		    rs = hdbstr_add(hsp,kp,kl,vp,vl) ;
+		}
+	    } /* end if (got one) */
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (fields) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (loadline) */
 
 

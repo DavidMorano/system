@@ -1,4 +1,4 @@
-/* inetaddrparse */
+/* inetaddrparse SUPPORT */
 /* lang=C++20 */
 
 /* this little thing parses an INET address into parts */
@@ -41,8 +41,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>

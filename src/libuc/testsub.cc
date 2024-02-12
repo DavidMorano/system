@@ -1,8 +1,8 @@
-/* testsub */
+/* testsub SUPPORT */
 /* lang=C++20 */
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<dlfcn.h>

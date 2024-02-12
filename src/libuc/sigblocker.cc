@@ -1,4 +1,4 @@
-/* sigblocker */
+/* sigblocker SUPPORT */
 /* lang=C++20 */
 
 /* block process signals */

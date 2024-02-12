@@ -2,109 +2,56 @@
 
 T= libdebug
 
-ALL= $(T).a $(T).so
-#ALL= $(T).a
-
-SRCROOT= $(LOCAL)
+ALL= $(T).o $(T).a
 
 
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-MANDIR= $(SRCROOT)/man/man1
+BINDIR= $(REPOROOT)/bin
+INCDIR= $(REPOROOT)/include
+LIBDIR= $(REPOROOT)/lib
+MANDIR= $(REPOROOT)/man
+INFODIR= $(REPOROOT)/info
+HELPDIR= $(REPOROOT)/share/help
 
+
+CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-
-
-CC= $(CGS_CC)
-GPP= $(CGS_GPP)
-
-
-GPPFLAGS= $(CGS_CCFLAGS)
-
-CCOPTS_GCCOPTSGPP= $(CGS_CCFLAGS)
-CCOPTS= $(CCOPTS_GCCOPT) $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= -g -Wstrict-aliasing $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB) 
-
-
-DEF0= -DOSNAME_$(OSNAME)=$(OSNUM)
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
-
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
-
-
-INCDIRS= -I$(INCDIR)
-
-CPPFLAGS= $(DEFS) $(INCDIRS)
-
-CFLAGS= $(CCOPTS) $(LF_CFLAGS)
-
-#LD= $(CC)
-
-
-LDRPATH=
-
-LDFLAGS= $(LF_LDFLAGS) -R$(LIBDIR):$(CGS_RPATH)
-
-
-SLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-SLIB0=
-SLIB1=
-SLIB2=
-SLIB3= -luc -lu
-SLIB4= $(CGS_LIBS)
-SLIB5=
-SLIB6=
-SLIB7=
-
-SLIBS= $(SLIB0) $(SLIB1) $(SLIB2) $(SLIB3) $(SLIB4) $(SLIB5) $(SLIB6) $(SLIB7)
-
-SLIBINFO= $(SLIBDIRS) $(SLIBS)
-
-
-XLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-XLIB0=
-XLIB1= -ldam -lb
-XLIB2= -ldebug
-XLIB3= -luc -lu
-XLIB4= $(CGS_LIBS)
-XLIB5= 
-XLIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
-XLIB7= -ldl
-
-XLIBS= $(XLIB0) $(XLIB1) $(XLIB2) $(XLIB3) $(XLIB4) $(XLIB5) $(XLIB6) $(XLIB7)
-
-XLIBINFO= $(XLIBDIRS) $(XLIBS)
-
-
-RANLIB= ranlib
-
-LINT= lint
-LINTFLAGS= -uxn -Dlint
-
-NM= nm
-NMFLAGS= -xs -v
-
-CXREF= cxref
-CXREFFLAGS= -R -s
+LIBDIR= $(CGS_LIBDIR)
 
 CPP= cpp
+CC= gcc
+CXX= gpp
+LD= gld
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
-
+LINT= lint
 RM= rm -f
+TOUCH= touch
+LINT= lint
 
 
-INCS=
+DEFS=
+
+LDRPATH= $(EXTRA)/lib
+
+LIBDIRS= -L$(LIBDIR)
+
+LIBS=
+
+
+# flag setting
+CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS= $(MAKECFLAGS)
+CCFLAGS= $(MAKECCFLAGS)
+ARFLAGS= $(MAKEARFLAGS)
+LDFLAGS= $(MAKELDFLAGS)
+
+
+INCS= debug.h
 
 
 OBJ00= debugprintf.o debug.o 
@@ -228,7 +175,7 @@ safe:
 	makesafe -v=3 -I $(INCDIR) $(OBJ)
 
 clean:			again
-	rm -f $(T).a *.o
+	makeclean $(T).a
 
 again:
 	rm -f $(T).a
@@ -265,7 +212,7 @@ $(T).a(debugprintf.o):	debugprintf.o
 nprintf_r.o:		nprintf.map Makefile nprintf.o lockfile.o format.o
 	$(LD) -r -o $@ -B reduce -M nprintf.map nprintf.o lockfile.o format.o
 
-nprintf.o:		Makefile nprintf.c
+nprintf.o:		nprintf.cc nprintf.h Makefile
 
 
 # special (very special) processing for DEBPRINTF

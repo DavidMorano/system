@@ -1,5 +1,6 @@
-/* mainshowfield */
+/* mainshowfield SUPPORT */
 /* lang=C++20 */
+
 
 #include	<envstandards.h>	/* <- configure for syhstem */
 #include	<climits>		/* <- for |UCHAR_MAX| */

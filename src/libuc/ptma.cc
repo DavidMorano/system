@@ -1,4 +1,4 @@
-/* ptma HEADER */
+/* ptma SUPPORT */
 /* lang=C++20 */
 
 /* POSIX® Thread Mutex Attribute manipulation */

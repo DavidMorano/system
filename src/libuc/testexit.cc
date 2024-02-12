@@ -1,4 +1,5 @@
-/* testexit */
+/* testexit SUPPORT */
+/* lang=C++20 */
 
 /****
 
@@ -8,7 +9,7 @@ $ gpp -p testexit.x testexot.cc testsub.cc
 ****/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<dlfcn.h>

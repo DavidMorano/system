@@ -1,4 +1,4 @@
-/* isinetaddr */
+/* isinetaddr SUPPORT */
 /* lang=C++20 */
 
 /* subroutine to determine if the name is an INET address a */

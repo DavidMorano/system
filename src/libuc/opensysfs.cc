@@ -1,4 +1,4 @@
-/* opensysfs */
+/* opensysfs SUPPORT */
 /* lang=C++20 */
 
 /* open a channel (file-descriptor) to some system file or directory */

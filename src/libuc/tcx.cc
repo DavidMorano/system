@@ -1,6 +1,8 @@
-/* tcsetown */
+/* tcsetown SUPPORT */
+/* lang=C++20 */
 
 /* set ownership of a terminal */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -39,8 +41,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<termios.h>

@@ -1,9 +1,8 @@
-/* getserv */
+/* getserv SUPPORT */
+/* lang=C++20 */
 
 /* get a network service number (port) given protocol and service name */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

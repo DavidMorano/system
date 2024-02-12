@@ -1,9 +1,9 @@
-/* testpack */
+/* testpack SUPPORT */
+/* lang=C++20 */
 
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<iostream>
-
-#include	<envstandards.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<usysrets.h>

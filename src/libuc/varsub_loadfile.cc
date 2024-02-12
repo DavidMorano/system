@@ -1,4 +1,4 @@
-/* varsub_loadfile */
+/* varsub_loadfile SUPPORT */
 /* lang=C++20 */
 
 /* process a file with variable substitutions */
@@ -37,8 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstdlib>

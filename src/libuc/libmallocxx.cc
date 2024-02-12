@@ -1,4 +1,4 @@
-/* libmallocxx */
+/* libmallocxx SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -43,7 +43,6 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<localmisc.h>
 
 #include	"libmallocxx.h"
 

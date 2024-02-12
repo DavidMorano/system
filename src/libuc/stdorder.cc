@@ -1,4 +1,4 @@
-/* stdorder */
+/* stdorder SUPPORT */
 /* lang=C++20 */
 
 /* standard byte-order serializations */

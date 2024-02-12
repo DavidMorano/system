@@ -1,4 +1,4 @@
-/* groupent HEADER */
+/* groupent SUPPORT */
 /* lang=C++20 */
 
 /* subroutines for simple GROUP object (from UNIX® library-3c) management */

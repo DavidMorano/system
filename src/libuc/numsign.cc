@@ -1,4 +1,4 @@
-/* numsign */
+/* numsign SUPPORT */
 /* lang=C++20 */
 
 /* number sign access */

@@ -1,4 +1,4 @@
-/* spwdent */
+/* spwdent SUPPORT */
 /* lang=C++20 */
 
 /* SPWD structure management */

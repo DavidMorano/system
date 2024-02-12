@@ -1,6 +1,18 @@
-/* libtest */
+/* libtest SUPPORT */
+/* lang=C++20 */
 
-#include	<envstandards.h>
+/* test library */
+/* version %I% last-modified %G% */
+
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<utility>
@@ -9,7 +21,16 @@
 #include	<clanguage.h>
 #include	<iostream>
 
+
+/* local defines */
+
+
+/* local namespaces */
+
 using namespace std ;
+
+
+/* external subroutines */
 
 extern "C" {
     extern void sub() noex ;

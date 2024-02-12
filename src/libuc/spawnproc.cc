@@ -1,4 +1,5 @@
-/* spawnproc */
+/* spawnproc SUPPORT */
+/* lang=C++20 */
 
 /* spawn a local program */
 /* version %I% last-modified %G% */

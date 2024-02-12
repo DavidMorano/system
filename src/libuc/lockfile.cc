@@ -1,5 +1,5 @@
-/* lockfile(3dam) */
-/* lang=C20 */
+/* lockfile(3dam) SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® System V file-record locking */
 /* version %I% last-modified %G% */
@@ -39,7 +39,6 @@
 	A 'timeout' of zero is zero!
 
 	Synopsis:
-
 	int lockfile(int fd,int cmd,off_t start,off_t size,int timeout) noex
 
 	Arguments:
@@ -89,8 +88,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
+
+#include	"lockfile.h"
 
 
 /* local defines */

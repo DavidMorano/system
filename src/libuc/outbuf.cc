@@ -1,4 +1,4 @@
-/* outbuf */
+/* outbuf SUPPORT */
 /* lang=C++20 */
 
 /* output buffer management (really?) */
@@ -27,8 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<usystem.h>
@@ -50,6 +48,9 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

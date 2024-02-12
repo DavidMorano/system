@@ -1,4 +1,4 @@
-/* slist */
+/* slist SUPPORT */
 /* lang=C++20 */
 
 /* a regular (no-frills) single-linked pointer queue */
@@ -25,7 +25,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<usystem.h>
 

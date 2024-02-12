@@ -1,4 +1,4 @@
-/* isort */
+/* isort SUPPORT */
 /* lang=C++98 */
 
 
@@ -14,8 +14,8 @@
 /*******************************************************************************
 
 	Description:
-	Our version of Quick Sort (sort of the daddy of all sorts, mostly).
-	Everyone has their own, right?
+	Our version of Quick Sort (sort of the daddy of all sorts,
+	mostly).  Everyone has their own, right?
 
 	Synopsis:
 	typedef int	(*sortcmp_t)(const void *,const void *) ;
@@ -30,12 +30,9 @@
 	Returns:
 	-		nothing (sorted array in place)
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<new>
 #include	<cstring>
 #include	<usystem.h>

@@ -1,4 +1,4 @@
-/* storebuf */
+/* storebuf SUPPORT */
 /* lang=C++20 */
 
 /* storage buffer manipulation subroutines */
@@ -120,6 +120,9 @@ int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,cthex,v) ;
 }
 /* end subroutine-template (storebuf_hexx) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

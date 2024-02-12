@@ -1,4 +1,4 @@
-/* hdbstr_loadkeys */
+/* hdbstr_loadkeys SUPPORT */
 /* lang=C++20 */
 
 /* load key c-strings from a file */

@@ -1,4 +1,4 @@
-/* testinit */
+/* testinit SUPPORT */
 /* lang=C++98 */
 
 /* revision history:
@@ -10,9 +10,12 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
 #include	<cstdio>
 #include	<iostream>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
 using std::cout ;

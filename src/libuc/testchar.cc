@@ -1,4 +1,5 @@
-/* testchar */
+/* testchar SUPPORT */
+/* lang=C++20 */
 
 #include	<iostream>
 
