@@ -1,4 +1,4 @@
-/* breadlns */
+/* breadlns SUPPORT */
 /* lang=C20 */
 
 /* get a line with possible continuation */
@@ -36,13 +36,11 @@
 
 	Returns:
 	>=0		number bytes returned to caller (not bytes read)
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"

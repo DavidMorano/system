@@ -1,4 +1,4 @@
-/* bsupport */
+/* bsupport SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package (BFILE) */
@@ -20,9 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>

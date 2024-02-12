@@ -1,10 +1,8 @@
-/* bwasteline */
+/* bwasteline SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package similiar to "stdio" */
 /* last modifed %G% version %I% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -13,9 +11,9 @@
 	This subroutine was originally written.
 
 	= 1999-01-10, David A­D­ Morano
-        I added the little extra code to allow for memory mapped I/O. It is all
-        a waste because it is way slower than without it! This should teach me
-        to leave old programs alone!
+	I added the little extra code to allow for memory mapped
+	I/O. It is all a waste because it is way slower than without
+	it! This should teach me to leave old programs alone!
 
 */
 
@@ -23,20 +21,12 @@
 
 /******************************************************************************
 
-        This subroutine reads and throws away a single line from the file.
-
+	This subroutine reads and throws away a single line from
+	the file.
 
 ******************************************************************************/
 
-
-#define	BFILE_MASTER	0
-
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -52,23 +42,19 @@
 /* external variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bwasteline(fp,linebuf,linelen)
-bfile	*fp ;
-char	linebuf[] ;
-int	linelen ;
-{
+int bwasteline(bfile *fp,char *linebuf,int linelen) noex {
 	int		rs ;
 	int		tlen = 0 ;
-
 	while ((rs = breadln(fp,linebuf,linelen)) > 0) {
 	    int	len = rs ;
 	    tlen += len ;
 	    if (linebuf[len - 1] == '\n') break ;
 	} /* end while */
-
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (bwasteline) */

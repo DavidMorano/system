@@ -1,4 +1,4 @@
-/* breadln */
+/* breadln SUPPORT */
 /* lang=C++11 */
 
 /* "Basic I/O" package similiar to "stdio" */
@@ -29,8 +29,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>

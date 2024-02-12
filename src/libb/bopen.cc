@@ -89,21 +89,24 @@ extern "C" {
 
 /* forward references */
 
-static int	bfile_bufbegin(bfile *,int) ;
-static int	bfile_bufend(bfile *) ;
+static int	bfile_bufbegin(bfile *,int) noex ;
+static int	bfile_bufend(bfile *) noex ;
 
-static int	bfile_opts(bfile *,int,mode_t) ;
+static int	bfile_opts(bfile *,int,mode_t) noex ;
 
 #if	CF_MAPABLE
-static int	bfile_mapbegin(bfile *) ;
-static int	bfile_mapend(bfile *) ;
+static int	bfile_mapbegin(bfile *) noex ;
+static int	bfile_mapend(bfile *) noex ;
 #endif /* CF_MAPABLE */
 
-static int	mkoflags(cchar *,int *) ;
-static int	extfd(cchar *) ;
+static int	mkoflags(cchar *,int *) noex ;
+static int	extfd(cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

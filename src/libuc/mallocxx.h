@@ -54,6 +54,7 @@ extern int malloc_ho(char **) noex ;	/* HO object */
 extern int malloc_sv(char **) noex ;	/* SV object */
 extern int malloc_zn(char **) noex ;	/* TZ name */
 
+extern int malloc_ps(char **) noex ;	/* pagesize */
 extern int malloc_addr(char **) noex ;	/* mail address */
 
 EXTERNC_end

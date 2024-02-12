@@ -1,5 +1,5 @@
-/* main (testbfile) */
-/* lang=C89 */
+/* main SUPPORT (testbfile) */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debugging memory-allocations */
@@ -11,11 +11,11 @@
 /* revision history:
 
 	= 1988-02-01, David A­D­ Morano
-        This subroutine was originally written to do some testing on the BIO
-        package.
+	This subroutine was originally written to do some testing
+	on the BIO package.
 
 	= 2015-02-22, David A­D­ Morano
-	I'm thinking about making some changes to this test.
+	I am thinking about making some changes to this test.
 
 */
 
@@ -26,22 +26,17 @@
 	This is a test program for the BFILE package.
 
 	Synopsis for running:
-
 	$ testbfile.x <file> > outfile
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<stdarg.h>
 #include	<stdlib.h>
 #include	<stdio.h>
-
 #include	<usystem.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -72,16 +67,16 @@
 
 /* external subroutines */
 
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char 	*getourenv(const char **,const char *) ;
+extern cchar 	*getourenv(cchar **,cchar *) ;
 
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -89,14 +84,12 @@ extern char	*timestr_logz(time_t,char *) ;
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int		argc ;
-const char	*argv[] ;
-const char	*envv[] ;
-{
+int main(int argc,mainv argv,mainv envv) {
 	bfile	ofile, *ofp = &ofile ;
 	bfile	ifile, *ifp = &ifile ;
 
@@ -115,18 +108,18 @@ const char	*envv[] ;
 	int	lines ;
 	int	f_usage = FALSE ;
 
-	const char	*progname ;
-	const char	*argp, *aop ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*cp ;
+	cchar	*progname ;
+	cchar	*argp, *aop ;
+	cchar	*ofname = NULL ;
+	cchar	*ifname = NULL ;
+	cchar	*cp ;
 
 	char		lbuf[LINEBUFLEN + 1] ;
 
 
 #if	CF_DEBUGS
 	{
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL)
 	        debugopen(cp) ;
 	    debugprintf("main: starting\n") ;
@@ -160,7 +153,7 @@ const char	*envv[] ;
 	    if ((rs = bopen(ifp,ifname,"r",0666)) >= 0) {
 		offset_t	loff = 0 ;
 	        int		ll ;
-		const char	*lp = lbuf ;
+		cchar	*lp = lbuf ;
 
 	        while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	            len = rs ;

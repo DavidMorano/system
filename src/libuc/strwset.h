@@ -1,4 +1,4 @@
-/* strncpyxc HEADER */
+/* strwset HEADER */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	STRNCPYXC_INCLUDE
-#define	STRNCPYXC_INCLUDE
+#ifndef	STRWSET_INCLUDE
+#define	STRWSET_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,14 +25,11 @@
 
 EXTERNC_begin
 
-extern char	* strncpybc (char *,cchar *,int) noex ;
-extern char	* strncpylc (char *,cchar *,int) noex ;
-extern char	* strncpyuc (char *,cchar *,int) noex ;
-extern char	* strncpyfc (char *,cchar *,int) noex ;
+extern char	*strwset(char *,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* STRNCPYXC_INCLUDE */
+#endif /* STRWSET_INCLUDE */
 
 

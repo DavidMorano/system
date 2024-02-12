@@ -54,7 +54,7 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= strwcpy.h
 
 
-OBJ_STRWCPY= strwcpyx.o strwcpyxc.o strwcpyxx.o
+OBJ_STRWCPY= strwcpyx.o strwcpyxc.o strwcpyxx.o strwset.o
 
 
 default:		$(T).o
@@ -104,5 +104,7 @@ control:
 strwcpyx.o:		strwcpyx.cc	strwcpyx.h	$(INCS)
 strwcpyxc.o:		strwcpyxc.cc	strwcpyxc.h	$(INCS)
 strwcpyxx.o:		strwcpyxx.cc	strwcpyxx.h	$(INCS)
+
+strwset.o:		strwset.cc strwset.h $(INCS)
 
 
