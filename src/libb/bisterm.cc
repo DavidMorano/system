@@ -1,11 +1,10 @@
-/* bisterm */
+/* bisterm SUPPORT */
+/* lang=C++20 */
 
 /* determine is the current I-O stream is a terminal */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -21,32 +20,24 @@
 	Determine is the current I-O stream refers to a terminal.
 
 	Synopsis:
-
 	int bisterm(bfile *fp)
 
 	Arguments:
-
 	fp		pointer to BFILE object
 
 	Returns:
-
 	==0		NO (not a terminal)
 	>0		YES (a terminal)
-	<		error
-
+	<		error (system-return)
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -73,10 +64,7 @@
 
 /* exported subroutines */
 
-
-int bisterm(bfile *fp)
-{
-
+int bisterm(bfile *fp) noex {
 	return bcontrol(fp,BC_ISTERMINAL,0) ;
 }
 /* end subroutine (bisterm) */

@@ -1,4 +1,4 @@
-/* bdup */
+/* bdup SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package */

@@ -1,4 +1,4 @@
-/* bopen */
+/* bopen SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package */
@@ -47,7 +47,11 @@
 #include	<usystem.h>
 #include	<stdfnames.h>
 #include	<getfdfile.h>
+#include	<snx.h>
+#include	<mkchar.h>
+#include	<cfdec.h>
 #include	<intceil.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -63,31 +67,18 @@
 #undef	FLBUFLEN
 #define	FLBUFLEN	100
 
-#ifndef	MKCHAR
-#define	MKCHAR(c)	((c) & 0xff)
-#endif
-
 
 /* local namespaces */
 
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 
 /* external subroutines */
 
-extern int	snopenflags(char *,int,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	findfilepath(cchar *,char *,cchar *,int) ;
-extern int	isdigitlatin(int) ;
+extern "C" {
+    extern int	findfilepath(cchar *,char *,cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -239,8 +230,9 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 
 #endif /* CF_UNIXAPPEND */
 
-	    if ((rs >= 0) && f_setflags)
+	    if ((rs >= 0) && f_setflags) {
 		rs = u_fcntl(fp->fd,F_SETFL,ooflags) ;
+	    }
 
 	    oflags = ooflags ;
 
@@ -431,7 +423,7 @@ int bopenprog(bfile *fp,cc *pname,cc *os,cc **argv,cc **envv) noex {
 }
 /* end subroutine (bopenprog) */
 
-int bclose(bfile *fp) noes {
+int bclose(bfile *fp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -624,7 +616,7 @@ static int mkoflags(cchar *os,int *bfp) noex {
 }
 /* end subroutine (mkoflags) */
 
-static int extfd(cchar *s) {
+static int extfd(cchar *s) noex {
 	int	rs = SR_INVALID ;
 	int	fd = -1 ;
 	if (*s++ == BFILE_FDCH) {

@@ -1,4 +1,4 @@
-/* bflush */
+/* bflush SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package */
@@ -20,7 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -36,7 +36,9 @@
 
 /* external subroutines */
 
-extern int	bfile_flushn(bfile *,int) noex ;
+extern "C" {
+    extern int	bfile_flushn(bfile *,int) noex ;
+}
 
 
 /* external variables */

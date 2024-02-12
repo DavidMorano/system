@@ -1,4 +1,4 @@
-/* bcontrol */
+/* bcontrol SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package similiar to the standard UNIX® "stdio" package */

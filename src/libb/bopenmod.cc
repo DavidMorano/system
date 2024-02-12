@@ -1,12 +1,10 @@
-/* bminmod */
+/* bopenmod SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_MEMCPY	1		/* use 'memcpy(3c)' */
-
 
 /* revision history:
 
@@ -19,20 +17,18 @@
 
 /*******************************************************************************
 
-	Sset a minimum mode on the opened file.
-
+	We open with a minimum mode equal to the mode passed to the
+	open call.  Otherwise everything is identical to |bopen(3b)|.
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -44,8 +40,8 @@
 /* external subroutines */
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -60,21 +56,31 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* exported subroutines */
 
+int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
+	int		rs ;
 
-int bminmod(bfile *fp,mode_t om)
-{
-	int		rs = SR_OK ;
+#if	CF_DEBUGS
+	debugprintf("bopenmod: fname=%s\n",fname) ;
+	debugprintf("bopenmod: of=%s\n",of) ;
+#endif
 
-	if (fp == NULL) return SR_FAULT ;
+	if ((rs = bopen(fp,fname,of,om)) >= 0) {
+	    if (strchr(of,'M') == NULL) { /* not already done! */
+	        if ((rs = hasallof(of,-1,"wc")) > 0) {
+	            fp->oflags |= O_MINMODE ;
+	            rs = uc_fminmod(fp->fd,om) ;
+	        }
+	    }
+	    if (rs < 0)
+	        bclose(fp) ;
+	} /* end if (bopen) */
 
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->fd >= 0) {
-	    rs = uc_fminmod(fp->fd,om) ;
-	}
+#if	CF_DEBUGS
+	debugprintf("bopenmod: ret rs=%d\n",rs) ;
+#endif
 
 	return rs ;
 }
-/* end routine (bminmod) */
+/* end routine (bopenmod) */
 
 
