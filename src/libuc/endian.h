@@ -8,6 +8,13 @@
 #define ENDIAN_H
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<unistd.h>
+#include	<stdlib.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
+
 #ifndef	SHA_BYTE_ORDER
 #define SHA_BYTE_ORDER 4321
 #endif

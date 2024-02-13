@@ -27,9 +27,8 @@
 #define	MALLOCXX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin

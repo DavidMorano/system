@@ -11,6 +11,11 @@
 #define	DSTR_INCLUDE
 
 
+#include	<envstandards.h>	/* first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
+
 #define	DSTR		struct dstr_head
 
 
@@ -23,9 +28,9 @@ typedef DSTR		dstr ;
 
 EXTERNC_begin
 
-extern int dstr_start(DSTR *,cchar *,int) noex ;
-extern int dstr_assign(DSTR *,DSTR *) noex ;
-extern int dstr_finish(DSTR *) noex ;
+extern int dstr_start(dstr *,cchar *,int) noex ;
+extern int dstr_assign(dstr *,dstr *) noex ;
+extern int dstr_finish(dstr *) noex ;
 
 EXTERNC_end
 

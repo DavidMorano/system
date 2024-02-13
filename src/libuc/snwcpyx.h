@@ -18,7 +18,7 @@
 #define	SNWCPYX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<stddef.h>		/* <- for |wchar_t| */
 #include	<utypedefs.h>
 #include	<clanguage.h>

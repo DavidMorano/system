@@ -25,14 +25,13 @@
 #define	NODESFILE_INCLUDE
 
 
-#include	<envstandards.h>	/* first to configure */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/mman.h>
 #include	<climits>
 #include	<usystem.h>
 #include	<hdb.h>
-#include	<localmisc.h>
 
 
 #define	NODESFILE	struct nodesfile_head
@@ -46,9 +45,9 @@ struct nodesfile_cursor {
 
 struct nodesfile_finfo {
 	cchar		*fname ;
-	time_t		mtime ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
+	time_t		mtime ;
 	int		oflags ;
 } ;
 

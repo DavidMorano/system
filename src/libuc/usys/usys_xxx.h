@@ -31,7 +31,7 @@
 #define	USYS_XXX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */

@@ -21,6 +21,12 @@
 #define	FIFOSTR_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
 #define	FIFOSTR_MAGIC	0x12345678
 #define	FIFOSTR		struct fifostr_head
 #define	FIFOSTR_CUR	struct fifostr_cursor

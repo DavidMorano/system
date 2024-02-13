@@ -26,7 +26,7 @@
 #define	USYSFLAG_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 # if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 #define	F_SUNOS		1

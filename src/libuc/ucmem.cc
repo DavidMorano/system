@@ -33,7 +33,7 @@
 
 	Return:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -58,17 +58,29 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* local structures */
 
-static int		pagesize(sysval_ps) ;
-
 
 /* forward references */
 
 static size_t		getnpages(int ps,void *ca,size_t cs) noex ;
+
+
+/* local variables */
+
+static int		pagesize(sysval_ps) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -101,7 +113,7 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uc_mincore) */
+/* end subroutine (uc_mincoreset) */
 
 
 /* local subroutines */

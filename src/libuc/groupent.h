@@ -18,15 +18,10 @@
 #define	GROUPENT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<grp.h>
-
-
-#define	GROUPENT	struct group
-#define	CGROUPENT	const struct group
 
 
 EXTERNC_begin

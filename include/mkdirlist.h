@@ -8,12 +8,11 @@
 #define	MKDIRLIST_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<usystem.h>
 #include	<vechand.h>
-#include	<localmisc.h>
 
 
 #define	MKDIRLIST_MAGIC		0x8987372A
@@ -23,7 +22,7 @@
 
 
 struct mkdirlist_head {
-	VECHAND		dirs ;
+	vechand		dirs ;
 	uint		magic ;
 } ;
 
@@ -40,15 +39,15 @@ struct mkdirlist_eflags {
 struct mkdirlist_ent {
 	cchar		*name ;
 	MKDIRLIST_ENT	*link ;
-	MKDIRLIST_OFL	f ;
-	int		nlen ;
-	mode_t		mode ;
-	time_t		mtime ;
-	time_t		utime ;
 	uino_t		ino ;
 	dev_t		dev ;
+	time_t		mtime ;
+	time_t		utime ;
+	int		nlen ;
 	int		narticles ;
 	int		order ;
+	MKDIRLIST_OFL	f ;
+	mode_t		mode ;
 } ;
 
 typedef MKDIRLIST	mkdirlist ;

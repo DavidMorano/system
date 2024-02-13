@@ -1,4 +1,4 @@
-/* outbuf */
+/* outbuf HEADER */
 /* lang=C20 */
 
 /* output buffer management (really?) */
@@ -9,6 +9,12 @@
 
 #ifndef	OUTBUF_INCLUDE
 #define	OUTBUF_INCLUDE
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	OUTBUF		struct outbuf_head

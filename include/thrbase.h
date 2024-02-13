@@ -18,10 +18,9 @@
 #define	THRBASE_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<thrcomm.h>
-#include	<localmisc.h>
 
 
 #define	THRBASE		struct thrbase_head

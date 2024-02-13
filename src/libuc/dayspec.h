@@ -11,11 +11,10 @@
 #define	DAYSPEC_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 #define	DAYSPEC		struct dayspec_head
@@ -30,9 +29,9 @@ typedef DAYSPEC		dayspec ;
 
 EXTERNC_begin
 
-extern int dayspec_default(DAYSPEC *) noex ;
-extern int dayspec_load(DAYSPEC *,cchar *,int) noex ;
-extern int dayspec_yday(DAYSPEC *) noex ;
+extern int dayspec_default(dayspec *) noex ;
+extern int dayspec_load(dayspec *,cchar *,int) noex ;
+extern int dayspec_yday(dayspec *) noex ;
 
 EXTERNC_end
 

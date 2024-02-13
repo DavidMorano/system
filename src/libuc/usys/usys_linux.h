@@ -29,7 +29,7 @@
 #define	USYS_LINUX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 /* USYS_LINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)

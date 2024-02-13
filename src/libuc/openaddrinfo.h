@@ -27,12 +27,11 @@
 #define	OPENADDRINFO_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucopen.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin

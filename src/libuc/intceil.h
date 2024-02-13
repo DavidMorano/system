@@ -18,13 +18,12 @@
 #define	INTCEIL_INCLUDE 
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<stdint.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin

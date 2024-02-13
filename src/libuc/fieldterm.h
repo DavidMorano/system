@@ -29,7 +29,7 @@
 #define	FIELDTERM_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<utypedefs.h>
 #include	<clanguage.h>

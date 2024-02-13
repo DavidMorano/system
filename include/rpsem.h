@@ -24,13 +24,15 @@
 #define	PSEM_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<semaphore.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+
 #define	PSEM		sem_t
+
 
 #ifndef	TYPEDEF_PSEM
 #define	TYPEDEF_PSEM

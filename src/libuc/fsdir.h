@@ -21,7 +21,7 @@
 *******************************************************************************/
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 
 #if	defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0)
