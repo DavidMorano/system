@@ -157,7 +157,7 @@ extern char	*timestr_log(time_t,char *) ;
 
 struct mxalias_file {
 	const char	*fname ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	time_t		mtime ;
 	int		size ;
@@ -197,7 +197,7 @@ static int	mxalias_fileparseline_unalias(MXALIAS *,int,BUFDESC *,FIELD *) ;
 static int	mxalias_fileparseline_source(MXALIAS *,int,BUFDESC *,FIELD *) ;
 
 #ifdef	COMMENT
-static int	mxalias_filealready(MXALIAS *,dev_t,uino_t) ;
+static int	mxalias_filealready(MXALIAS *,dev_t,ino_t) ;
 #endif
 
 #if	CF_FILECHECK
@@ -833,7 +833,7 @@ static int mxalias_filechecks(MXALIAS *op,time_t daytime)
 
 #ifdef	COMMENT
 
-static int mxalias_filealready(MXALIAS *op,dev_t dev,uino_t ino)
+static int mxalias_filealready(MXALIAS *op,dev_t dev,ino_t ino)
 {
 	MXALIAS_FILE	*fep ;
 	int		rs = SR_OK ;

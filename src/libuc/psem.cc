@@ -37,6 +37,7 @@
 
 *******************************************************************************/
 
+#include	<envstandards.h>	/* ordered first to configure */
 
 /* are POSIX unnamed semaphores supported on this platform or not? */
 #if	defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0)

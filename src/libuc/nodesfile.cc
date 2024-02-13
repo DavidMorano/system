@@ -1,4 +1,4 @@
-/* nodesfile SUPPORT */
+/* NF SUPPORT */
 /* lang=C++20 */
 
 /* read (process) a standard UNIX® "nodes" file */
@@ -24,16 +24,16 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstring>
-#include	<cctype>
+#include	<climits>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<hdb.h>
@@ -50,6 +50,16 @@
 #define	TO_CHECK		4
 #define	TO_HOLD			2
 
+#define	NF		nodesfile
+
+
+/* local namespaces */
+
+using std::min ;			/* subroutine-template */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -65,37 +75,30 @@
 
 /* forward references */
 
-static int	nodesfile_parse(NODESFILE *) ;
-static int	nodesfile_filechanged(NODESFILE *,time_t) ;
-static int	nodesfile_filemap(NODESFILE *) ;
-static int	nodesfile_fileunmap(NODESFILE *) ;
+static int	nodesfile_parse(NF *) noex ;
+static int	nodesfile_filechanged(NF *,time_t) noex ;
+static int	nodesfile_filemap(NF *) noex ;
+static int	nodesfile_fileunmap(NF *) noex ;
 
-static int	hdb_release(HDB *) ;
+static int	hdb_release(hdb *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int nodesfile_open(nfp,fname,maxsize,oflags)
-NODESFILE	*nfp ;
-const char	fname[] ;
-int		maxsize ;
-int		oflags ;
-{
-	struct ustat	sb ;
-
-	size_t	msize ;
-
+int nodesfile_open(NF *nfp,cchar *fname,int maxsize,int oflags) noex {
+	USTAT		sb ;
+	size_t		msize ;
 	int	rs ;
 	int	fd ;
 	int	mflags ;
 	int	mprot ;
-
-	const char	*cp ;
-
+	cchar	*cp ;
 
 	if (nfp == nullptr) return SR_FAULT ;
 	if (fname == nullptr) return SR_FAULT ;
@@ -196,13 +199,9 @@ bad0:
 }
 /* end subroutine (nodesfile_open) */
 
-
-int nodesfile_close(nfp)
-NODESFILE	*nfp ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
+int nodesfile_close(NF *nfp) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -229,14 +228,9 @@ NODESFILE	*nfp ;
 }
 /* end subroutine (nodesfile_close) */
 
-
-int nodesfile_check(nfp,daytime)
-NODESFILE	*nfp ;
-time_t		daytime ;
-{
-	int	rs = SR_OK ;
-	int	f_changed = FALSE ;
-
+int nodesfile_check(NF *nfp,time_t daytime) noex {
+	int		rs = SR_OK ;
+	int		f_changed = false ;
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -247,7 +241,7 @@ time_t		daytime ;
 	    nfp->ti_check = daytime ;
 	    if ((rs = nodesfile_filechanged(nfp,daytime)) >= 0) {
 
-	        f_changed = TRUE ;
+	        f_changed = true ;
 	        hdb_release(&nfp->nodes) ;
 
 	        rs = nodesfile_parse(nfp) ;
@@ -262,16 +256,9 @@ time_t		daytime ;
 }
 /* end subroutine (nodesfile_check) */
 
-
-int nodesfile_search(nfp,nodename,nl)
-NODESFILE	*nfp ;
-const char	nodename[] ;
-int		nl ;
-{
-	HDB_DATUM	key, value ;
-
-	int	rs = SR_OK ;
-
+int nodesfile_search(NF *nfp,cchar *nodename,int nl) noex {
+	hdb_datum	key, value ;
+	int		rs = SR_OK ;
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -294,13 +281,8 @@ int		nl ;
 }
 /* end subroutine (nodesfile_search) */
 
-
-int nodesfile_curbegin(nfp,curp)
-NODESFILE	*nfp ;
-NODESFILE_CUR	*curp ;
-{
+int nodesfile_curbegin(NF *nfp,nodesfile_cur *curp) noex {
 	int	rs = SR_OK ;
-
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -314,13 +296,8 @@ NODESFILE_CUR	*curp ;
 }
 /* end subroutine (nodesfile_curbegin) */
 
-
-int nodesfile_curend(nfp,curp)
-NODESFILE	*nfp ;
-NODESFILE_CUR	*curp ;
-{
-	int	rs ;
-
+int nodesfile_curend(NF *nfp,nodesfile_cur *curp) noex {
+	int		rs ;
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -334,20 +311,11 @@ NODESFILE_CUR	*curp ;
 }
 /* end subroutine (nodesfile_curend) */
 
-
-int nodesfile_enum(nfp,curp,nodename,nl)
-NODESFILE	*nfp ;
-NODESFILE_CUR	*curp ;
-char		nodename[] ;
-int		nl ;
-{
-	HDB_DATUM	key, val ;
-
+int nodesfile_enum(NF *nfp,nodesfile_cur *curp,char *nbuf,int nlen) noex {
+	hdb_datum	key, val ;
 	int	rs ;
 	int	cl = 0 ;
-
-	const char	*cp ;
-
+	cchar	*cp ;
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -356,7 +324,7 @@ int		nl ;
 	    return SR_FAULT ;
 
 	if ((rs = hdb_enum(&nfp->nodes,&curp->cur,&key,&val)) >= 0) {
-	    cp = (const char *) key.buf ;
+	    cp = (cchar *) key.buf ;
 	    cl = (nl >= 0) ? MIN(key.len,nl) : key.len ;
 	    strwcpy(nodename,cp,cl) ;
 	}
@@ -368,20 +336,14 @@ int		nl ;
 
 /* private subroutines */
 
-
-static int nodesfile_parse(nfp)
-NODESFILE	*nfp ;
-{
-	HDB_DATUM	key, value ;
-
-	int	rs = SR_OK ;
-	int	i ;
-	int	sl, cl ;
-	int	n = 0 ;
-
-	const char	*sp, *cp ;
-	const char	*ep ;
-
+static int nodesfile_parse(NF *nfp) noex {
+	hdb_datum	key, value ;
+	int		rs = SR_OK ;
+	int		i ;
+	int		sl, cl ;
+	int		n = 0 ;
+	cchar	*sp, *cp ;
+	cchar	*ep ;
 
 	value.buf = nullptr ;
 	value.len = 0 ;
@@ -456,16 +418,10 @@ NODESFILE	*nfp ;
 }
 /* end subroutine (nodesfile_parse) */
 
-
-static int nodesfile_filechanged(nfp,daytime)
-NODESFILE	*nfp ;
-time_t		daytime ;
-{
-	struct ustat	sb ;
-
+static int nodesfile_filechanged(NF *nfp,time_t daytime) noex {
+	USTAT		sb ;
 	int	rs ;
-	int	f = FALSE ;
-
+	int	f = false ;
 
 	rs = u_stat(nfp->fi.fname,&sb) ;
 	if (rs < 0)
@@ -504,8 +460,7 @@ ret0:
 }
 /* end subroutine (nodesfile_filechanged) */
 
-
-static int nodesfile_filemap(NODESFILE *nfp) noex {
+static int nodesfile_filemap(NF *nfp) noex {
 	int		rs ;
 	if ((rs = uc_open(nfp->fi.fname,nfp->fi.oflags,0666)) >= 0) {
 	    int	fd = rs ;
@@ -531,7 +486,7 @@ static int nodesfile_filemap(NODESFILE *nfp) noex {
 }
 /* end subroutine (nodesfile_filemap) */
 
-static int nodesfile_fileunmap(NODESFILE *nfp) noex {
+static int nodesfile_fileunmap(NF *nfp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (nfp->mapbuf != nullptr) {
@@ -546,7 +501,7 @@ static int nodesfile_fileunmap(NODESFILE *nfp) noex {
 }
 /* end subroutine (nodesfile_fileunmap) */
 
-static int hdb_release(HDB *hsp) noex {
+static int hdb_release(hdb *hsp) noex {
 	int		rs = SR_FAULT ;
 	if (hsp) {
 	    hdb_cur	cur ;

@@ -27,15 +27,12 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/mman.h>
-#include	<climits>
 #include	<usystem.h>
 #include	<hdb.h>
 
 
 #define	NODESFILE	struct nodesfile_head
-#define	nodesfile_cur	struct nodesfile_cursor
+#define	NODESFILE_CUR	struct nodesfile_cursor
 #define	NODESFILE_FINFO	struct nodesfile_finfo
 
 
@@ -63,6 +60,9 @@ struct nodesfile_head {
 	uint		maxsize ;
 	uint		len ;
 } ;
+
+typedef NODESFILE	nodesfile ;
+typedef NODESFILE_CUR	nodesfile_cur ;
 
 EXTERNC_begin
 

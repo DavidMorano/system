@@ -7,12 +7,12 @@
 
 /* revision history:
 
-	= 2014-04-04, David AÂ­DÂ­ Morano
+	= 2014-04-04, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
-/* Copyright Â© 2014 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2014 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -37,7 +37,9 @@
 
 
 EXTERNC_begin
+
 typedef int (*timeout_met)(void *,uint,int) noex ;
+
 EXTERNC_end
 
 enum timeoutcmds {
@@ -58,8 +60,10 @@ struct timeout_entry {
 typedef TIMEOUT		timeout ;
 
 EXTERNC_begin
+
 extern int timeout_load(timeout *,time_t,void *,timeout_met,uint,int) noex ;
 extern int uc_timeout(int,timeout *) noex ;
+
 EXTERNC_end
 
 

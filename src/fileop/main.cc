@@ -148,23 +148,23 @@ struct fileinfo {
 } ;
 
 struct dirid {
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
 struct fileid {
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
 struct tardir { /* placed for best packing */
-	uino_t		ino ;
+	ino_t		ino ;
 	cchar		*dname ;
 	dev_t		dev ;
 } ;
 
 struct linkinfo { /* placed for best packing */
-	uino_t		ino ;
+	ino_t		ino ;
 	cchar		*fname ;
 	dev_t		dev ;
 	mode_t		mode ;
@@ -218,16 +218,16 @@ static int	proclines_begin(PROGINFO *) ;
 static int	proclines_end(PROGINFO *) ;
 
 static int	procdir_begin(PROGINFO *) ;
-static int	procdir_have(PROGINFO *,dev_t,uino_t,cchar *,int) ;
-static int	procdir_addid(PROGINFO *,dev_t,uino_t) ;
+static int	procdir_have(PROGINFO *,dev_t,ino_t,cchar *,int) ;
+static int	procdir_addid(PROGINFO *,dev_t,ino_t) ;
 static int	procdir_haveprefix(PROGINFO *,cchar *,int) ;
 static int	procdir_addprefix(PROGINFO *,cchar *,int) ;
 static int	procdir_end(PROGINFO *) ;
 
 static int	procuniq_begin(PROGINFO *) ;
 static int	procuniq_end(PROGINFO *) ;
-static int	procuniq_have(PROGINFO *,dev_t,uino_t) ;
-static int	procuniq_addid(PROGINFO *,dev_t,uino_t) ;
+static int	procuniq_have(PROGINFO *,dev_t,ino_t) ;
+static int	procuniq_addid(PROGINFO *,dev_t,ino_t) ;
 
 static int	procprune_begin(PROGINFO *,cchar *) ;
 static int	procprune_end(PROGINFO *) ;
@@ -235,8 +235,8 @@ static int	procprune_loadfile(PROGINFO *,cchar *) ;
 static int	procprune_size(PROGINFO *,int *) ;
 
 static int	proclink_begin(PROGINFO *) ;
-static int	proclink_add(PROGINFO *,dev_t,uino_t,mode_t,cchar *) ;
-static int	proclink_have(PROGINFO *,dev_t,uino_t,LINKINFO **) ;
+static int	proclink_add(PROGINFO *,dev_t,ino_t,mode_t,cchar *) ;
+static int	proclink_have(PROGINFO *,dev_t,ino_t,LINKINFO **) ;
 static int	proclink_end(PROGINFO *) ;
 static int	proclink_fins(PROGINFO *) ;
 
@@ -261,13 +261,13 @@ static int	tardir_match(TARDIR *,USTAT *) ;
 
 static int	fileinfo_loadfts(FILEINFO *,USTAT *) ;
 
-static int	linkinfo_start(LINKINFO *,dev_t,uino_t,mode_t,cchar *) ;
+static int	linkinfo_start(LINKINFO *,dev_t,ino_t,mode_t,cchar *) ;
 static int	linkinfo_finish(LINKINFO *) ;
 
-static int	dirid_start(DIRID *,dev_t,uino_t) ;
+static int	dirid_start(DIRID *,dev_t,ino_t) ;
 static int	dirid_finish(DIRID *) ;
 
-static int	fileid_start(FILEID *,dev_t,uino_t) ;
+static int	fileid_start(FILEID *,dev_t,ino_t) ;
 static int	fileid_finish(FILEID *) ;
 
 static int	mkpdirs(cchar *,mode_t) ;
@@ -2725,7 +2725,7 @@ static int procdir(PROGINFO *pip,cchar *np,USTAT *sbp)
 	if (f_cont) {
 	    if (pip->f.follow || pip->f.f_uniq) {
 	        const dev_t	dev = sbp->st_dev ;
-	        const uino_t	ino = sbp->st_ino ;
+	        const ino_t	ino = sbp->st_ino ;
 	        int		f = TRUE ;
 	        if ((rs = procdir_have(pip,dev,ino,np,nl)) == 0) {
 	            f = FALSE ;
@@ -2965,7 +2965,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 
 	if ((rs >= 0) && f_process && pip->f.f_uniq) {
 	    dev_t	dev = sbp->st_dev ;
-	    uino_t	ino = sbp->st_ino ;
+	    ino_t	ino = sbp->st_ino ;
 	    if ((rs = procuniq_have(pip,dev,ino)) > 0) {
 	        f_process = FALSE ;
 	    }
@@ -2979,7 +2979,7 @@ static int procother(PROGINFO *pip,cchar *name,USTAT *sbp)
 	        f = (rs > 0) ;
 	        if (S_ISDIR(sbp->st_mode)) {
 	            dev_t	dev = sbp->st_dev ;
-	            uino_t	ino = sbp->st_ino ;
+	            ino_t	ino = sbp->st_ino ;
 	            if ((rs = procdir_have(pip,dev,ino,name,nl)) > 0) {
 	                f = TRUE ;
 	            }
@@ -4148,7 +4148,7 @@ static int procdir_end(PROGINFO *pip)
 /* end subroutine (procdir_end) */
 
 
-static int procdir_have(PROGINFO *pip,dev_t dev,uino_t ino,cchar *np,int nl)
+static int procdir_have(PROGINFO *pip,dev_t dev,ino_t ino,cchar *np,int nl)
 {
 	HDB		*dbp = &pip->dirs ;
 	HDB_DATUM	key, val ;
@@ -4159,7 +4159,7 @@ static int procdir_have(PROGINFO *pip,dev_t dev,uino_t ino,cchar *np,int nl)
 	did.dev = dev ;
 
 	key.buf = &did ;
-	key.len = sizeof(uino_t) + sizeof(dev_t) ;
+	key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	if ((rs = hdb_fetch(dbp,key,NULL,&val)) >= 0) {
 	    if ((rs = hdbstr_add(&pip->dirnames,np,nl,NULL,0)) >= 0) {
 	        rs = 1 ;
@@ -4175,7 +4175,7 @@ static int procdir_have(PROGINFO *pip,dev_t dev,uino_t ino,cchar *np,int nl)
 /* end subroutine (procdir_have) */
 
 
-static int procdir_addid(PROGINFO *pip,dev_t dev,uino_t ino)
+static int procdir_addid(PROGINFO *pip,dev_t dev,ino_t ino)
 {
 	DIRID		*dip ;
 	const int	size = sizeof(DIRID) ;
@@ -4186,7 +4186,7 @@ static int procdir_addid(PROGINFO *pip,dev_t dev,uino_t ino)
 	        HDB		*dbp = &pip->dirs ;
 	        HDB_DATUM	key, val ;
 	        key.buf = dip ;
-	        key.len = sizeof(uino_t) + sizeof(dev_t) ;
+	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	        val.buf = dip ;
 	        val.len = size ;
 	        rs = hdb_store(dbp,key,val) ;
@@ -4309,7 +4309,7 @@ static int procuniq_end(PROGINFO *pip)
 /* end subroutine (procuniq_end) */
 
 
-static int procuniq_have(PROGINFO *pip,dev_t dev,uino_t ino)
+static int procuniq_have(PROGINFO *pip,dev_t dev,ino_t ino)
 {
 	HDB		*dbp = &pip->files ;
 	HDB_DATUM	key, val ;
@@ -4320,7 +4320,7 @@ static int procuniq_have(PROGINFO *pip,dev_t dev,uino_t ino)
 	fid.dev = dev ;
 
 	key.buf = &fid ;
-	key.len = sizeof(uino_t) + sizeof(dev_t) ;
+	key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	if ((rs = hdb_fetch(dbp,key,NULL,&val)) >= 0) {
 	    rs = 1 ;
 	} else if (rs == SR_NOTFOUND) {
@@ -4334,7 +4334,7 @@ static int procuniq_have(PROGINFO *pip,dev_t dev,uino_t ino)
 /* end subroutine (procuniq_have) */
 
 
-static int procuniq_addid(PROGINFO *pip,dev_t dev,uino_t ino)
+static int procuniq_addid(PROGINFO *pip,dev_t dev,ino_t ino)
 {
 	FILEID		*dip ;
 	const int	size = sizeof(FILEID) ;
@@ -4345,7 +4345,7 @@ static int procuniq_addid(PROGINFO *pip,dev_t dev,uino_t ino)
 	        HDB		*dbp = &pip->files ;
 	        HDB_DATUM	key, val ;
 	        key.buf = dip ;
-	        key.len = sizeof(uino_t) + sizeof(dev_t) ;
+	        key.len = sizeof(ino_t) + sizeof(dev_t) ;
 	        val.buf = dip ;
 	        val.len = size ;
 	        rs = hdb_store(dbp,key,val) ;
@@ -4559,7 +4559,7 @@ static int proclink_fins(PROGINFO *pip)
 /* end subroutine (proclink_fins) */
 
 
-static int proclink_add(PROGINFO *pip,dev_t dev,uino_t ino,mode_t m,cchar *fp)
+static int proclink_add(PROGINFO *pip,dev_t dev,ino_t ino,mode_t m,cchar *fp)
 {
 	int		rs ;
 	int		f = FALSE ;
@@ -4592,7 +4592,7 @@ static int proclink_add(PROGINFO *pip,dev_t dev,uino_t ino,mode_t m,cchar *fp)
 /* end subroutine (proclink_add) */
 
 
-static int proclink_have(PROGINFO *pip,dev_t dev,uino_t ino,LINKINFO **rpp)
+static int proclink_have(PROGINFO *pip,dev_t dev,ino_t ino,LINKINFO **rpp)
 {
 	LINKINFO	li ;
 	HDB		*dbp = &pip->links ;
@@ -4761,7 +4761,7 @@ static int procsync(PROGINFO *pip,cchar *name,USTAT *sbp,FILEINFO *ckp)
 {
 	LINKINFO	*lip ;
 	dev_t		dev = sbp->st_dev ;
-	uino_t		ino = sbp->st_ino ;
+	ino_t		ino = sbp->st_ino ;
 	int		rs ;
 
 #if	CF_DEBUG
@@ -4826,7 +4826,7 @@ static int procsynclink(PROGINFO *pip,cchar *name,USTAT *sbp,LINKINFO *lip)
 	    USTAT	psb ;
 	    if ((rs = uc_lstat(pbuf,&psb)) >= 0) {
 	        const dev_t	dev = psb.st_dev ;
-	        const uino_t	ino = psb.st_ino ;
+	        const ino_t	ino = psb.st_ino ;
 	        if (dev == pip->tardev) {
 	            char	dstfname[MAXPATHLEN + 1] ;
 	            if ((rs = mkpath2(dstfname,pip->tardname,name)) >= 0) {
@@ -4915,7 +4915,7 @@ static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
 
 	if ((! S_ISDIR(sbp->st_mode)) && (sbp->st_nlink > 1)) {
 	    dev_t	dev = sbp->st_dev ;
-	    uino_t	ino = sbp->st_ino ;
+	    ino_t	ino = sbp->st_ino ;
 	    mode_t	m = sbp->st_mode ;
 
 #if	CF_DEBUG
@@ -5591,7 +5591,7 @@ static int tardir_match(TARDIR *tdp,USTAT *sbp)
 /* end subroutine (tardir_match) */
 
 
-static int dirid_start(DIRID *dip,dev_t dev,uino_t ino)
+static int dirid_start(DIRID *dip,dev_t dev,ino_t ino)
 {
 	int		rs = SR_OK ;
 	dip->dev = dev ;
@@ -5609,7 +5609,7 @@ static int dirid_finish(DIRID *dip)
 /* end subroutine (dirid_finish) */
 
 
-static int fileid_start(FILEID *dip,dev_t dev,uino_t ino)
+static int fileid_start(FILEID *dip,dev_t dev,ino_t ino)
 {
 	int		rs = SR_OK ;
 	dip->dev = dev ;
@@ -5667,7 +5667,7 @@ static int fileinfo_loadfts(FILEINFO *ckp,USTAT *sbp)
 /* end subroutine (fileinfo_loadfts) */
 
 
-static int linkinfo_start(LINKINFO *lip,dev_t dev,uino_t ino,mode_t m,cchar *fp)
+static int linkinfo_start(LINKINFO *lip,dev_t dev,ino_t ino,mode_t m,cchar *fp)
 {
 	int		rs ;
 	cchar		*cp ;
@@ -5734,7 +5734,7 @@ static uint linkhash(const void *vp,int vl)
 	    h = h ^ ((sa[0] << 16) | sa[1]) ;
 	}
 	{
-	    const int	isize = sizeof(uino_t) ;
+	    const int	isize = sizeof(ino_t) ;
 	    sa = (ushort *) &lip->ino ;
 	    h = h ^ ((sa[1] << 16) | sa[0]) ;
 	    h = h ^ ((sa[0] << 16) | sa[1]) ;

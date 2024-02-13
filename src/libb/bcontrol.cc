@@ -110,25 +110,24 @@ int bcontrol(bfile *fp,int cmd,...) noex {
 	    break ;
 	case BC_STAT:
 	    {
-	    	struct ustat *ssp = (struct ustat *) va_arg(ap,void *) ;
-
+	    	USTAT	*ssp = (USTAT *) va_arg(ap,void *) ;
 		if (ssp != NULL) {
 #if	BFILE_LARGEFILE
 		    {
-		        struct ustat	lsb ;
+		        USTAT	lsb ;
 	                rs = u_fstat(fp->fd,&lsb) ;
 	    		memset(ssp,0,sizeof(struct ustat)) ;
-	    		ssp->st_dev = (dev_t) lsb.st_dev ;
-	    		ssp->st_ino = (uino_t) lsb.st_ino ;
-	    		ssp->st_mode = (mode_t) lsb.st_mode ;
-	    		ssp->st_nlink = (int) lsb.st_nlink ;
-	    		ssp->st_uid = (int) lsb.st_uid ;
-	    		ssp->st_gid = (int) lsb.st_gid ;
-	    		ssp->st_rdev = (dev_t) lsb.st_rdev ;
-	    		ssp->st_size = (int) lsb.st_size ;
-	    		ssp->st_atime = (time_t) lsb.st_atime ;
-	    		ssp->st_mtime = (time_t) lsb.st_mtime ;
-	    		ssp->st_ctime = (time_t) lsb.st_ctime ;
+	    		ssp->st_dev = lsb.st_dev ;
+	    		ssp->st_ino = lsb.st_ino ;
+	    		ssp->st_mode = lsb.st_mode ;
+	    		ssp->st_nlink = lsb.st_nlink ;
+	    		ssp->st_uid = lsb.st_uid ;
+	    		ssp->st_gid = lsb.st_gid ;
+	    		ssp->st_rdev = lsb.st_rdev ;
+	    		ssp->st_size = lsb.st_size ;
+	    		ssp->st_atime = lsb.st_atime ;
+	    		ssp->st_mtime = lsb.st_mtime ;
+	    		ssp->st_ctime = lsb.st_ctime ;
 	    		ssp->st_blksize = (blksize_t) lsb.st_blksize ;
 	    		ssp->st_blocks = (blkcnt_t) lsb.st_blocks ;
 	    		memcpy(ssp->st_fstype,lsb.st_fstype,_ST_FSTYPSZ) ;

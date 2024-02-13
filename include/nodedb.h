@@ -16,7 +16,7 @@
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<netdb.h>
-#include	<usystem.h>		/* for |uino_t| */
+#include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<localmisc.h>

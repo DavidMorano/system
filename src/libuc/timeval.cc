@@ -23,7 +23,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>

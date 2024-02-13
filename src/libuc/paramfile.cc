@@ -23,7 +23,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* <- system configuration */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -97,7 +97,7 @@ struct paramfile_file {
 	cchar		*fname ;
 	time_t		mtime ;
 	dev_t		dev ;
-	uino_t		ino ;
+	ino_t		ino ;
 	int		size ;
 } ;
 

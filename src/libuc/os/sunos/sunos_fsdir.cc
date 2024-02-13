@@ -175,7 +175,7 @@ int fsdir_close(fsdir *op) noex {
 
 #ifdef	COMMENT
 typedef struct dirent {
-	uino_t		d_ino;		/* "inode number" of entry */
+	ino_t		d_ino;		/* "inode number" of entry */
 	off_t		d_off;		/* offset of disk directory entry */
 	unsigned short	d_reclen;	/* length of this record */
 	char		d_name[1];	/* name of file */
@@ -198,7 +198,7 @@ int fsdir_read(fsdir *op,fsdir_ent *dep,char *nbuf,int nlen) noex {
 	            DIRENT	*dp = (DIRENT *) (op->bdata + op->ei) ;
 	            int		ml ;
 	            ml = (dp->d_reclen-18) ;
-	            dep->ino = (uino_t) dp->d_ino ;
+	            dep->ino = (ino_t) dp->d_ino ;
 	            dep->nlen = (ushort) dp->d_namlen ;
 	            dep->type = 0 ;
 	            if ((rs = snwcpy(nbuf,nlen,dp->d_name,ml)) >= 0) {

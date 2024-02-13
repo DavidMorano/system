@@ -12,7 +12,7 @@
 #include	<sys/types.h>
 #include	<sys/socket.h>
 
-#include	<usystem.h>		/* for 'uino_t' */
+#include	<usystem.h>		/* for 'ino_t' */
 #include	<vecobj.h>
 #include	<vecpstr.h>
 #include	<localmisc.h>
@@ -41,7 +41,7 @@ struct userports_flags {
 } ;
 
 struct userports_file {
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	time_t		mtime ;
 } ;

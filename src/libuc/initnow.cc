@@ -49,7 +49,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* <- Apple says this is necessary! */
 #include	<sys/param.h>
 #include	<sys/timeb.h>		/* <- the money shot! */

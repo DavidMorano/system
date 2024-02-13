@@ -125,7 +125,7 @@ struct svcfile_svcname {
 struct xsvcfile_file {
 	const char	*fname ;
 	time_t		mtime ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	int		size ;
 } ;
@@ -183,7 +183,7 @@ static int	svcfile_already(SVCFILE *,const char *) ;
 #endif
 
 #if	CF_DEVINO
-static int	svcfile_filealready(SVCFILE *,dev_t,uino_t) ;
+static int	svcfile_filealready(SVCFILE *,dev_t,ino_t) ;
 #endif
 
 static int	svcentry_start(SVCENTRY *,cchar *) ;
@@ -1013,7 +1013,7 @@ static int svcfile_fileparser(SVCFILE *op,int fi,cchar *fname)
 
 
 #if	CF_DEVINO
-static int svcfile_filealready(SVCFILE *op,dev_t dev,uino_t ino)
+static int svcfile_filealready(SVCFILE *op,dev_t dev,ino_t ino)
 {
 	SVCFILE_FILE	*fep ;
 	int		rs = SR_OK ;

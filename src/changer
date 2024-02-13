@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} DATER_ZNAMESIZE "
+NAMES="${NAMES} uino_t "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/DATER_ZNAMESIZE/s//DATER_ZNAMELEN/g
+g/uino_t/s//ino_t/g
 	w
 	q
 EOF

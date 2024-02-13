@@ -25,7 +25,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<ucontext.h>
 #include	<usystem.h>
 #include	<usysflag.h>

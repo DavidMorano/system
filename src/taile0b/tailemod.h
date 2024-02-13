@@ -58,7 +58,7 @@ struct tailemod_calls {
 
 struct tailemod_module {
 	void		*dhp ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	int		count ;
 } ;

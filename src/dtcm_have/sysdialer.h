@@ -18,7 +18,7 @@
 
 #include	<sys/types.h>
 
-#include	<usystem.h>		/* for 'uino_t' */
+#include	<usystem.h>		/* for 'ino_t' */
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -100,7 +100,7 @@ struct sysdialer_calls {
 struct sysdialer_module {
 	void		*dhp ;		/* SO-dlopen handle */
 	dev_t		dev ;
-	uino_t		ino ;
+	ino_t		ino ;
 	int		count ;
 } ;
 

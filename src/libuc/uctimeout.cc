@@ -39,12 +39,12 @@
 	val		pointer to 'timeout' value
 
 	Returns:
-	<0		error
 	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<ucontext.h>
@@ -88,6 +88,9 @@
 #define	NDF		"uctimeout.deb"
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 extern "C" {
@@ -120,13 +123,13 @@ namespace {
 	ptc		cv ;		/* condition variable */
 	vechand		ents ;
 	ciq		pass ;
-	UCTIMEOUT_FL	fl ;
 	vecsorthand	*pqp ;
 	sigset_t	savemask ;
 	pid_t		pid ;
 	pthread_t	tid_siger ;
 	pthread_t	tid_disper ;
 	timer_t		timerid ;
+	UCTIMEOUT_FL	fl ;
 	volatile int	waiters ;	/* n-waiters for general capture */
 	aflag		fvoid ;
 	aflag		finit ;
@@ -220,6 +223,9 @@ static uctimeout	uctimeout_data ;
 constexpr int		voents = uctimeout_voents() ;
 
 constexpr bool		f_childthrs = CF_CHILDTHRS ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -350,7 +356,7 @@ int uctimeout::fini() noex {
 int uctimeout::cmdset(TIMEOUT *valp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (valp->metp) {
+	if (valp->metf) {
 	    TIMEOUT	*ep ;
 	    cint	esize = sizeof(TIMEOUT) ;
 	    if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
@@ -990,7 +996,7 @@ int uctimeout::disphandle() noex {
 	int		rs1 ;
 	while ((rs1 = ciq_rem(&pass,&tep)) >= 0) {
 	    if ((rs = dispjobdel(tep)) > 0) {
-	        timeout_met	met = (timeout_met) tep->metp ;
+	        timeout_met	met = (timeout_met) tep->metf ;
 	        rs = (*met)(tep->objp,tep->tag,tep->arg) ;
 	        uc_libfree(tep) ;
 	    } /* end if (still had job) */

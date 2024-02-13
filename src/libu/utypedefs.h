@@ -98,11 +98,6 @@
 #endif
 #endif
 
-#ifndef	TYPEDEF_UINO
-#define	TYPEDEF_UINO
-typedef ino_t		uino_t ;
-#endif
-
 /* offset_t */
 #ifndef	TYPEDEF_OFFSET
 #define	TYPEDEF_OFFSET

@@ -37,7 +37,7 @@
 
 
 struct fsdir_entry {
-	uino_t		ino ;		/* UNIX® "inode number" of entry */
+	ino_t		ino ;		/* UNIX® "inode number" of entry */
 	char		*name ;		/* name of file */
 	ushort		nlen ;		/* length of this record */
 	ushort		type ;		/* some systems support this */

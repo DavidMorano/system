@@ -64,7 +64,7 @@ struct filewatch_head {
 	time_t		lastcheck ;
 	time_t		lastchange ;
 	time_t		opentime ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	uint		offset ;
 	int		interval ;

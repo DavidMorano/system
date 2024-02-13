@@ -110,7 +110,7 @@ extern "C" {
 struct kvsfile_file {
 	cchar		*fname ;
 	time_t		mtime ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	int		size ;
 } ;
@@ -171,7 +171,7 @@ static int kvsfile_magic(kvsfile *op,Args ... args) noex {
 
 static int	kvsfile_filefins(kvsfile *) noex ;
 static int	kvsfile_keyfins(kvsfile *) noex ;
-static int	kvsfile_fh(kvsfile *,dev_t,uino_t) noex ;
+static int	kvsfile_fh(kvsfile *,dev_t,ino_t) noex ;
 static int	kvsfile_fparse(kvsfile *,int) noex ;
 static int	kvsfile_fparser(kvsfile *,int,bfile *) noex ;
 static int	kvsfile_fparsel(kvsfile *,int,cc *,int) noex ;
@@ -535,7 +535,7 @@ static int kvsfile_checkfiles(kvsfile *op,time_t dt) noex {
 }
 /* end subroutine (kvsfile_checkfiles) */
 
-static int kvsfile_fh(kvsfile *op,dev_t dev,uino_t ino) noex {
+static int kvsfile_fh(kvsfile *op,dev_t dev,ino_t ino) noex {
 	vecobj		*flp = &op->files ;
 	int		rs ;
 	void		*vp{} ;
@@ -565,7 +565,7 @@ static int kvsfile_fparse(kvsfile *op,int fi) noex {
 	                    if (sb.st_mtime > fep->mtime) {
 	                        cint		nrs = SR_NOTFOUND ;
 	                        const dev_t	dev = sb.st_dev ;
-	                        const uino_t	ino = sb.st_ino ;
+	                        const ino_t	ino = sb.st_ino ;
 	                        if ((rs = kvsfile_fh(op,dev,ino)) == nrs) {
 	                            fep->dev = dev ;
 	                            fep->ino = ino ;
