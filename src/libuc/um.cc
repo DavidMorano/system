@@ -142,6 +142,9 @@ namespace {
 static cvoid		*mapfailed = MAP_FAILED ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd,
