@@ -21,7 +21,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<usystem.h>		/* for 'uino_t' */
+#include	<usystem.h>		/* for 'ino_t' */
 #include	<vecstr.h>
 #include	<ids.h>
 #include	<localmisc.h>
@@ -63,7 +63,7 @@ struct mailalias_i {
 } ;
 
 struct mailalias_fi {
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	time_t		mtime ;
 	size_t		size ;

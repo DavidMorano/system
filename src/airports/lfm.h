@@ -22,7 +22,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 
-#include	<usystem.h>		/* for 'uino_t' */
+#include	<usystem.h>		/* for 'ino_t' */
 #include	<localmisc.h>		/* for types */
 
 #ifndef	ULONG
@@ -52,7 +52,7 @@
 
 struct lfm_i {
 	dev_t		dev ;
-	uino_t		ino ;
+	ino_t		ino ;
 	int		tocheck ;	/* check interval */
 } ;
 

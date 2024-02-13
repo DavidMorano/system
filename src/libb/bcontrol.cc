@@ -119,7 +119,7 @@ int bcontrol(bfile *fp,int cmd,...) noex {
 	                rs = u_fstat(fp->fd,&lsb) ;
 	    		memset(ssp,0,sizeof(struct ustat)) ;
 	    		ssp->st_dev = (dev_t) lsb.st_dev ;
-	    		ssp->st_ino = (uino_t) lsb.st_ino ;
+	    		ssp->st_ino = (ino_t) lsb.st_ino ;
 	    		ssp->st_mode = (mode_t) lsb.st_mode ;
 	    		ssp->st_nlink = (int) lsb.st_nlink ;
 	    		ssp->st_uid = (int) lsb.st_uid ;

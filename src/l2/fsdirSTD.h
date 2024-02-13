@@ -42,7 +42,7 @@
 
 
 struct fsdir_e {
-	uino_t		ino ;		/* "inode number" of entry */
+	ino_t		ino ;		/* "inode number" of entry */
 	offset_t	off ;		/* offset of disk directory entry */
 	ushort		reclen ;	/* length of this record */
 	char		name[FSDIR_MAXNAMELEN + 1] ;	/* name of file */

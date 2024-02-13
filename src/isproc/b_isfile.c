@@ -163,7 +163,7 @@ struct locinfo {
 	KEYOPT		akopts ;
 	PARAMOPT	aparams ;
 	dev_t		same_d ;
-	uino_t		same_i ;
+	ino_t		same_i ;
 	IDS		id ;
 	gid_t		gid_tar ;
 	const char	*group_tar ;

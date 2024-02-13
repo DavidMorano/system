@@ -13,7 +13,7 @@
 
 #include	<sys/types.h>
 
-#include	<usystem.h>		/* for 'uino_t' */
+#include	<usystem.h>		/* for 'ino_t' */
 #include	<filebuf.h>
 #include	<dater.h>
 #include	<localmisc.h>
@@ -50,7 +50,7 @@ struct useraccdb_head {
 	offset_t	eo ;
 	time_t		ti_check ;
 	time_t		ti_mod ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	int		fd ;
 } ;

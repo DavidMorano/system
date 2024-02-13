@@ -97,7 +97,7 @@ struct paramfile_file {
 	cchar		*fname ;
 	time_t		mtime ;
 	dev_t		dev ;
-	uino_t		ino ;
+	ino_t		ino ;
 	int		size ;
 } ;
 

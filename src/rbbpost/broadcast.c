@@ -109,7 +109,7 @@ BBHOSTS		*bhp, *bnp ;
 
 	dev_t	device ;
 
-	uino_t	inode ;
+	ino_t	inode ;
 
 	int	rs = SR_OK ;
 	int	i, j ;

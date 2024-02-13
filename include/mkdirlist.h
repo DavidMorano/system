@@ -39,7 +39,7 @@ struct mkdirlist_eflags {
 struct mkdirlist_ent {
 	cchar		*name ;
 	MKDIRLIST_ENT	*link ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 	time_t		mtime ;
 	time_t		utime ;

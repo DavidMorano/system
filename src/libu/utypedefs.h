@@ -100,7 +100,7 @@
 
 #ifndef	TYPEDEF_UINO
 #define	TYPEDEF_UINO
-typedef ino_t		uino_t ;
+typedef ino_t		ino_t ;
 #endif
 
 /* offset_t */

@@ -88,7 +88,7 @@ struct systems_file {
 /* forward references */
 
 static int systems_fileparse(SYSTEMS *,int,SYSTEMS_FILE *) ;
-static int systems_filealready(SYSTEMS *,dev_t,uino_t) ;
+static int systems_filealready(SYSTEMS *,dev_t,ino_t) ;
 static int systems_procline(SYSTEMS *,int,FIELD *) ;
 static int systems_delfes(SYSTEMS *,int) ;
 
@@ -435,7 +435,7 @@ static int systems_fileparse(SYSTEMS *op,int fi,SYSTEMS_FILE *fep)
 	    USTAT	sb ;
 	    if ((rs = bcontrol(sfp,BC_STAT,&sb)) >= 0) {
 		const dev_t	dev = sb.st_dev ;
-		const uino_t	ino = sb.st_ino ;
+		const ino_t	ino = sb.st_ino ;
 #if	CF_DEBUGS
 		debugprintf("systems_fileparse: dev=\\x%08x ino=%llu\n",
 			dev,ino) ;
@@ -497,7 +497,7 @@ static int systems_fileparse(SYSTEMS *op,int fi,SYSTEMS_FILE *fep)
 /* end subroutine (systems_fileparse) */
 
 
-static int systems_filealready(SYSTEMS *op,dev_t dev,uino_t ino)
+static int systems_filealready(SYSTEMS *op,dev_t dev,ino_t ino)
 {
 	SYSTEMS_FILE	*fep ;
 	vecobj		*flp = &op->files ;

@@ -26,7 +26,7 @@
 
 
 struct dirdb_fid {
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 } ;
 

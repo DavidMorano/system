@@ -57,7 +57,7 @@ struct nodesearch_cursor {
 struct nodesearch_file {
 	cchar		*fname ;
 	time_t		mtime ;
-	uino_t		ino ;
+	ino_t		ino ;
 	dev_t		dev ;
 } ;
 
