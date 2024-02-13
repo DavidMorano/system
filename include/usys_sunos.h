@@ -29,7 +29,7 @@
 #define	USYS_SUNOS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 /* USYS_SUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)

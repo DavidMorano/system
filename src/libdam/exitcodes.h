@@ -8,6 +8,9 @@
 #define	EXITCODES_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<sysexits.h>
 
 

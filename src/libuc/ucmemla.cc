@@ -34,7 +34,7 @@
 
 	Return:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -46,7 +46,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sysval.hh>
 #include	<intceil.h>
 #include	<localmisc.h>
@@ -78,6 +77,9 @@ static sysval		pagesize(sysval_ps) ;
 /* forward references */
 
 static int	ucmemla_map(ucmemla *,size_t,void **) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

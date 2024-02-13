@@ -28,7 +28,7 @@
 #define	USTR_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

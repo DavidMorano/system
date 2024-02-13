@@ -11,11 +11,13 @@
 #define	UCSEM_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<semaphore.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	UCSEM_MAGIC	0x31419877
@@ -23,9 +25,9 @@
 
 
 struct ucsem_head {
-	uint		magic ;
 	sem_t		*sp ;
 	cchar		*name ;
+	uint		magic ;
 } ;
 
 typedef UCSEM		ucsem ;

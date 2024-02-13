@@ -33,10 +33,12 @@
 #define	USTROPTS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
 #include	<time.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 
 

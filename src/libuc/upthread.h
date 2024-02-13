@@ -27,7 +27,7 @@
 #define	UPTHREAD_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<signal.h>
 #include	<unistd.h>

@@ -18,6 +18,12 @@
 #define	OPENQOTD_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
 EXTERNC_begin
 
 extern int openqotd(cchar *,int,int,int) noex ;

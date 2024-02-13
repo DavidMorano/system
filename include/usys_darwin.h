@@ -32,7 +32,7 @@
 #define	USYS_DARWIN_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 /* USYS_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)

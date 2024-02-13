@@ -18,7 +18,7 @@
 #define	USERATTRENT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

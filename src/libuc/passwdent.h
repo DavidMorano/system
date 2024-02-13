@@ -11,15 +11,10 @@
 #define	PASSWDENT_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<pwd.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-
-
-#define	PASSWDENT	struct passwd
-#define	CPASSWDENT	const struct passwd
 
 
 EXTERNC_begin

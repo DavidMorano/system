@@ -18,6 +18,12 @@
 #define	GETFNAME_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
 #ifndef	GETFNAME_TYPELOCAL
 #define	GETFNAME_TYPEUNKNOWN	-1
 #define	GETFNAME_TYPELOCAL	0

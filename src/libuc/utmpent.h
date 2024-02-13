@@ -24,11 +24,10 @@
 #define	UTMPENT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utmpx.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<localmisc.h>
 
 
 #ifndef	UTMPENT

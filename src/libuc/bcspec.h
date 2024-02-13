@@ -11,11 +11,10 @@
 #define	BCSPEC_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 #define	BCSPEC		struct bcspec

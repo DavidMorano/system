@@ -27,7 +27,7 @@
 #define	UCOPENINFO_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -39,11 +39,11 @@
 struct ucopeninfo {
 	cchar		**envv ;
 	cchar		*fname ;
-	mode_t		operms ;
 	int		clinks ;
 	int		oflags ;
 	int		to ;
 	int		opts ;
+	mode_t		operms ;
 } ;
 
 

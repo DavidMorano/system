@@ -16,7 +16,7 @@
 #define SHA1_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 

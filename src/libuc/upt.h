@@ -18,12 +18,11 @@
 #define	UPT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<usystem.h>
 #include	<pta.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin

@@ -18,10 +18,8 @@
 #define	KEYOPT_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
-#include	<localmisc.h>
 
 
 #define	KEYOPT_MAGIC	0x84634270

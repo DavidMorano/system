@@ -321,15 +321,16 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	            cint	clen = CBUFLEN ;
 	            char	*cbuf{} ;
 	            if ((rs = uc_libmalloc((clen+1),&cbuf)) >= 0) {
-	                STRPEEK		pd ;
-	                memclear(&pd) ;
-	                pd.flags = 0 ;
-	                pd.ctlbuf.buf = cbuf ;
-	                pd.ctlbuf.maxlen = clen ;
-	                pd.databuf.buf = dbuf ;
-	                pd.databuf.maxlen = dlen ;
-	                rs = u_ioctl(fd,I_PEEK,&pd) ;
-	                len = pd.databuf.len ;
+			{
+	                    STRPEEK	pd{} ;
+	                    pd.flags = 0 ;
+	                    pd.ctlbuf.buf = cbuf ;
+	                    pd.ctlbuf.maxlen = clen ;
+	                    pd.databuf.buf = dbuf ;
+	                    pd.databuf.maxlen = dlen ;
+	                    rs = u_ioctl(fd,I_PEEK,&pd) ;
+	                    len = pd.databuf.len ;
+			}
 		        rs1 = uc_libfree(cbuf) ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */

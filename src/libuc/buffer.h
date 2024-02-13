@@ -18,7 +18,7 @@
 #define	BUFFER_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<stdarg.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

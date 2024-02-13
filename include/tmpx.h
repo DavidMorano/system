@@ -18,7 +18,7 @@
 #define	TMPX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<utmpx.h>
 #include	<usystem.h>

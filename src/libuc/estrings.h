@@ -18,6 +18,10 @@
 #define	ESTRINGS_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<strcpyx.h>

@@ -45,11 +45,10 @@
 #define	BAOPS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<stdintx.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 /* on char(acter) (byte) organized bit arrays */

@@ -11,15 +11,11 @@
 #define	SPWDENT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<spwd.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-
-
-#define	SPWDENT		struct spwd
-#define	CSPWDENT	const struct spwd
 
 
 EXTERNC_begin

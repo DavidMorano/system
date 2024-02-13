@@ -29,13 +29,12 @@
 #define	TERMENT_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* |pid_t| */
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"terment.h"
 

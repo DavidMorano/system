@@ -11,15 +11,11 @@
 #define	PROJECTENT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucproject.h>
-
-
-#define	PROJECTENT	struct project
-#define	CPROJECTENT	const struct project
 
 
 EXTERNC_begin

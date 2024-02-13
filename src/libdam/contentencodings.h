@@ -15,6 +15,11 @@
 #define	CONTENTENCODINGS
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
+
+
 #define	CF_NONE		0
 #define	CE_7BIT		1
 #define	CE_8BIT		2
