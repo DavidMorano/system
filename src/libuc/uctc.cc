@@ -23,7 +23,7 @@
 #include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>		/* |msleep(3u)| */
-#include	<usupport.h>
+#include	<usupport.h>		/* |utimeout| */
 #include	<localmisc.h>
 
 
@@ -41,6 +41,36 @@
 /* external subroutines */
 
 
+/* local structures */
+
+namespace {
+    struct uctc ;
+    typedef int (uctc::*mem_f)(int) noex ;
+    struct uctc {
+	mem_f		m ;
+	WINSIZE		*wsp ;
+	TERMIOS		*tip ;
+	int		cmd ;
+	uctc() noex { } ;
+	uctc(int a) noex : cmd(a) { } ;
+	uctc(WINSIZE *p) noex : wsp(p) { } ;
+	uctc(TERMIOS *p,int c = 0) noex : tip(p), cmd(c) { } ;
+	int operator () (int) noex ;
+	int drain(int) noex ;
+	int flow(int) noex ;
+	int flush(int) noex ;
+	int getattr(int) noex ;
+	int getpgrp(int) noex ;
+	int getsid(int) noex ;
+	int setattr(int) noex ;
+	int setpgrp(int) noex ;
+    } ; /* end struct (uctc) */
+}
+
+
+/* forward references */
+
+
 /* local variables */
 
 
@@ -50,12 +80,70 @@
 /* exported subroutines */
 
 int uc_tcdrain(int fd) noex {
+	uctc		to ;
+	to.m = &uctc::drain ;
+	return to(fd) ;
+}
+
+int uc_tcflow(int fd,int cmd) noex {
+	uctc		to(cmd) ;
+	to.m = &uctc::flow ;
+	return to(fd) ;
+}
+
+int uc_tcflush(int fd,int cmd) noex {
+	uctc		to(cmd) ;
+	to.m = &uctc::flush ;
+	return to(fd) ;
+}
+
+int uc_tcgetattr(int fd,TERMIOS *tip) noex {
+	int		rs = SR_FAULT ;
+	if (tip) {
+	    uctc	to(tip) ;
+	    to.m = &uctc::getattr ;
+	    rs = to(fd) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int uc_tcgetpgrp(int fd) noex {
+	uctc		to ;
+	to.m = &uctc::getpgrp ;
+	return to(fd) ;
+}
+
+int uc_tcgetsid(int fd) noex {
+	uctc		to ;
+	to.m = &uctc::getsid ;
+	return to(fd) ;
+}
+
+int uc_tcsetattr(int fd,int cmd,TERMIOS *tip) noex {
+	int		rs = SR_FAULT ;
+	if (tip) {
+	    uctc	to(tip,cmd) ;
+	    to.m = &uctc::setattr ;
+	    rs = to(fd) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+
+int uc_tcsetpgrp(int fd,pid_t pgrp) noex {
+	uctc		to(pgrp) ;
+	to.m = &uctc::setpgrp ;
+	return to(fd) ;
+}
+
+
+/* local subroutines */
+
+int uctc::operator () (int fd) noex {
+	int		to_nomem = utimeout[uto_nomem] ;
 	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
-	    if ((rs = tcdrain(fd)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
+	    if ((rs = (this->*m)(fd)) < 0) {
 	        switch (rs) {
 	        case SR_NOMEM:
 		    if (to_nomem-- > 0) {
@@ -74,14 +162,76 @@ int uc_tcdrain(int fd) noex {
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
 }
-/* end subroutine (uc_tcdrain) */
+/* end method (tcuc::operator) */
+
+int uctc::drain(int fd) noex {
+	int		rs ;
+	if ((rs = tcdrain(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+
+int uctc::flow(int fd) noex {
+	int		rs ;
+	if ((rs = tcflow(fd,cmd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::flow) */
+
+int uctc::flush(int fd) noex {
+	int		rs ;
+	if ((rs = tcflush(fd,cmd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+
+int uctc::getattr(int fd) noex {
+	int		rs ;
+	if ((rs = tcgetattr(fd,tip)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::getattr) */
+
+int uctc::getpgrp(int fd) noex {
+	int		rs ;
+	if ((rs = tcgetpgrp(fd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::getpgrp) */
+
+int uctc::getsid(int fd) noex {
+	int		rs ;
+	if ((rs = tcgetsid(fd)) < 0) {
+	     rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::getsid) */
+
+int uctc::setattr(int fd) noex {
+	int		rs ;
+	if ((rs = tcsetattr(fd,cmd,tip)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::setattr) */
+
+int uctc::setpgrp(int fd) noex {
+	int		rs ;
+	if ((rs = tcsetpgrp(fd,cmd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::setpgrp) */
 
 
-uc_tcdrain.c
-uc_tcflow.c
-uc_tcflush.c
-uc_tcgetattr.c
-uc_tcgetpgrp.c
-uc_tcgetsid.c
-uc_tcsetattr.c
-uc_tcsetpgrp.c
