@@ -1,7 +1,7 @@
 /* rmdirfiles SUPPORT */
 /* lang=C++20 */
 
-/* remove directory files (as specified with a time-out) */
+/* remove directory files (as specified with an age interval) */
 /* version %I% last-modified %G% */
 
 
@@ -176,7 +176,7 @@ static int vecstr_dirfilesload(vecstr *flp,cchar *dn,cchar *pre,int to) noex {
 
 static int vecstr_dirfilesdelete(vecstr *flp) noex {
 	int		c = 0 ;
-	cchar		*fp ;
+	cchar		*fp{} ;
 	for (int i = 0 ; vecstr_get(flp,i,&fp) >= 0 ; i += 1) {
 	    if ((fp != nullptr) && (fp[0] != '\0')) {
 	        c += 1 ;

@@ -10,7 +10,7 @@
 
 using namespace std ;
 
-int main(int,const char **,const char **) {
+int main(int,mainv,mainv) {
 	int	ch = 'À' ;
 	printf("%c\n",ch) ;
 }
