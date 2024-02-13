@@ -20,7 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* operating-system configuration */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<ctime>

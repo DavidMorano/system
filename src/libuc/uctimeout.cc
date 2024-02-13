@@ -39,12 +39,12 @@
 	val		pointer to 'timeout' value
 
 	Returns:
-	<0		error
 	>=0		OK
+	<0		error (system-return)
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<ucontext.h>

@@ -23,7 +23,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* <- system configuration */
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>

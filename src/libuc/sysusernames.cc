@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
@@ -42,7 +42,7 @@
 
 /* local namespaces */
 
-using std::nothrow ;
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */

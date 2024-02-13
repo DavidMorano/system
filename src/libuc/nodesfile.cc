@@ -1,4 +1,4 @@
-/* nodesfile SUPPORT */
+/* NF SUPPORT */
 /* lang=C++20 */
 
 /* read (process) a standard UNIX® "nodes" file */
@@ -29,11 +29,11 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstring>
-#include	<cctype>
+#include	<climits>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<hdb.h>
@@ -50,6 +50,16 @@
 #define	TO_CHECK		4
 #define	TO_HOLD			2
 
+#define	NF		nodesfile
+
+
+/* local namespaces */
+
+using std::min ;			/* subroutine-template */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -65,10 +75,10 @@
 
 /* forward references */
 
-static int	nodesfile_parse(nodesfile *) noex ;
-static int	nodesfile_filechanged(nodesfile *,time_t) noex ;
-static int	nodesfile_filemap(nodesfile *) noex ;
-static int	nodesfile_fileunmap(nodesfile *) noex ;
+static int	nodesfile_parse(NF *) noex ;
+static int	nodesfile_filechanged(NF *,time_t) noex ;
+static int	nodesfile_filemap(NF *) noex ;
+static int	nodesfile_fileunmap(NF *) noex ;
 
 static int	hdb_release(hdb *) noex ;
 
@@ -81,7 +91,7 @@ static int	hdb_release(hdb *) noex ;
 
 /* exported subroutines */
 
-int nodesfile_open(NODESFILE *nfp,cchar *fname,int maxsize,int oflags) noex {
+int nodesfile_open(NF *nfp,cchar *fname,int maxsize,int oflags) noex {
 	USTAT		sb ;
 	size_t		msize ;
 	int	rs ;
@@ -189,7 +199,7 @@ bad0:
 }
 /* end subroutine (nodesfile_open) */
 
-int nodesfile_close(nodesfile *nfp) noex {
+int nodesfile_close(NF *nfp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -218,7 +228,7 @@ int nodesfile_close(nodesfile *nfp) noex {
 }
 /* end subroutine (nodesfile_close) */
 
-int nodesfile_check(NODESFILE *nfp,time_t daytime) noex {
+int nodesfile_check(NF *nfp,time_t daytime) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 
@@ -246,7 +256,7 @@ int nodesfile_check(NODESFILE *nfp,time_t daytime) noex {
 }
 /* end subroutine (nodesfile_check) */
 
-int nodesfile_search(NODESFILE *nfp,cchar *nodename,int nl) noex {
+int nodesfile_search(NF *nfp,cchar *nodename,int nl) noex {
 	hdb_datum	key, value ;
 	int		rs = SR_OK ;
 
@@ -271,7 +281,7 @@ int nodesfile_search(NODESFILE *nfp,cchar *nodename,int nl) noex {
 }
 /* end subroutine (nodesfile_search) */
 
-int nodesfile_curbegin(NODESFILE *nfp,NODESFILE_CUR *curp) noex {
+int nodesfile_curbegin(NF *nfp,nodesfile_cur *curp) noex {
 	int	rs = SR_OK ;
 
 	if (nfp == nullptr)
@@ -286,12 +296,8 @@ int nodesfile_curbegin(NODESFILE *nfp,NODESFILE_CUR *curp) noex {
 }
 /* end subroutine (nodesfile_curbegin) */
 
-int nodesfile_curend(nfp,curp)
-NODESFILE	*nfp ;
-NODESFILE_CUR	*curp ;
-{
-	int	rs ;
-
+int nodesfile_curend(NF *nfp,nodesfile_cur *curp) noex {
+	int		rs ;
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -305,19 +311,11 @@ NODESFILE_CUR	*curp ;
 }
 /* end subroutine (nodesfile_curend) */
 
-int nodesfile_enum(nfp,curp,nodename,nl)
-NODESFILE	*nfp ;
-NODESFILE_CUR	*curp ;
-char		nodename[] ;
-int		nl ;
-{
+int nodesfile_enum(NF *nfp,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 	hdb_datum	key, val ;
-
 	int	rs ;
 	int	cl = 0 ;
-
 	cchar	*cp ;
-
 
 	if (nfp == nullptr)
 	    return SR_FAULT ;
@@ -338,7 +336,7 @@ int		nl ;
 
 /* private subroutines */
 
-static int nodesfile_parse(nodesfile *nfp) noex {
+static int nodesfile_parse(NF *nfp) noex {
 	hdb_datum	key, value ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -420,7 +418,7 @@ static int nodesfile_parse(nodesfile *nfp) noex {
 }
 /* end subroutine (nodesfile_parse) */
 
-static int nodesfile_filechanged(nodesfile *nfp,time_t daytime) noex {
+static int nodesfile_filechanged(NF *nfp,time_t daytime) noex {
 	USTAT		sb ;
 	int	rs ;
 	int	f = false ;
@@ -462,7 +460,7 @@ ret0:
 }
 /* end subroutine (nodesfile_filechanged) */
 
-static int nodesfile_filemap(nodesfile *nfp) noex {
+static int nodesfile_filemap(NF *nfp) noex {
 	int		rs ;
 	if ((rs = uc_open(nfp->fi.fname,nfp->fi.oflags,0666)) >= 0) {
 	    int	fd = rs ;
@@ -488,7 +486,7 @@ static int nodesfile_filemap(nodesfile *nfp) noex {
 }
 /* end subroutine (nodesfile_filemap) */
 
-static int nodesfile_fileunmap(nodesfile *nfp) noex {
+static int nodesfile_fileunmap(NF *nfp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (nfp->mapbuf != nullptr) {
