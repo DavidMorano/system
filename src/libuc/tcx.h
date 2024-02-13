@@ -22,6 +22,7 @@
 #include	<sys/types.h>		/* |uid_t| + |gid_t| */
 #include	<termios.h>		/* |WINSIZE| */
 #include	<utypedefs.h>
+#include	<utypealiases.h>	/* |WINSIZE| */
 #include	<clanguage.h>
 
 

@@ -26,10 +26,10 @@
 #include	<usupport.h>		/* |utimeout| */
 #include	<localmisc.h>
 
+#include	"uctc.h"
+
 
 /* local defines */
-
-#define	TO_NOMEM	(5*60)
 
 
 /* local namespaces */

@@ -71,6 +71,7 @@
 #include	<ucmallocx.h>
 #include	<ucstrtox.h>
 #include	<ucopeninfo.h>
+#include	<uctc.h>		/* terminal interface */
 #include	<ucfdmanip.h>
 #include	<ucuserattr.h>
 #include	<uctimer.h>
