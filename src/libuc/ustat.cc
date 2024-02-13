@@ -24,6 +24,12 @@
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int u_stat(cchar *fname,USTAT *sbp) noex {

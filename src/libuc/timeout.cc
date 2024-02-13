@@ -47,6 +47,9 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 typedef timeout_met	t_m ;
