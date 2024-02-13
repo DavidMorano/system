@@ -178,6 +178,10 @@
 #define	STRBUF		struct strbuf
 #endif
 
+#ifndef	STRPEEK
+#define	STRPEEK		struct strpeek
+#endif
+
 #ifndef	STRRECVFD
 #define	STRRECVFD	struct strrecvfd
 #endif
