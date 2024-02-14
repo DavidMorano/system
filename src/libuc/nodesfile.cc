@@ -195,107 +195,95 @@ int nodesfile_close(NF *op) noex {
 }
 /* end subroutine (nodesfile_close) */
 
-int nodesfile_check(NF *op,time_t daytime) noex {
-	int		rs = SR_OK ;
+int nodesfile_check(NF *op,time_t dt) noex {
+	int		rs = SR_FAULT ;
 	int		f_changed = false ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (daytime == 0) daytime = time(nullptr) ;
-
-	if ((daytime - op->ti_check) >= TO_CHECK) {
-	    op->ti_check = daytime ;
-	    if ((rs = nodesfile_filechanged(op,daytime)) >= 0) {
-
-	        f_changed = true ;
-	        hdb_release(op->nlp) ;
-
-	        rs = nodesfile_parse(op) ;
-
-	        if (rs >= 0)
-	            op->ti_load = daytime ;
-
-	    } /* end if */
-	} /* end if (timeout) */
-
+	if (op) {
+	    rs = SR_OK ;
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((dt - op->ti_check) >= TO_CHECK) {
+	        op->ti_check = dt ;
+	        if ((rs = nodesfile_filechanged(op,dt)) >= 0) {
+	            f_changed = true ;
+	            hdb_release(op->nlp) ;
+	            if ((rs = nodesfile_parse(op)) >= 0) {
+	                op->ti_load = dt ;
+		    }
+	        } /* end if */
+	    } /* end if (timeout) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (nodesfile_check) */
 
-int nodesfile_search(NF *op,cchar *nodename,int nl) noex {
-	hdb_datum	key, value ;
-	int		rs = SR_OK ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->mapbuf == nullptr)
-	    return SR_NOTOPEN ;
-
-	if (nl < 0)
-	    nl = strlen(nodename) ;
-
-	key.buf = (void *) nodename ;
-	key.len = nl ;
-	rs = hdb_fetch(op->nlp,key,nullptr,&value) ;
-
-#if	CF_DEBUGS
-	debugprintf("nodesfile_search: ret rs=%d \n",rs) ;
-#endif
-
+int nodesfile_search(NF *op,cchar *nodep,int nodel) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->mapbuf) {
+	        hdb_datum	key ;
+	        hdb_datum	val{} ;
+	        if (nodel < 0) nodel = strlen(nodep) ;
+	        key.buf = (void *) nodep ;
+	        key.len = nodel ;
+	        rs = hdb_fetch(op->nlp,key,nullptr,&val) ;
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (nodesfile_search) */
 
 int nodesfile_curbegin(NF *op,nodesfile_cur *curp) noex {
-	int	rs = SR_OK ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (curp == nullptr)
-	    return SR_FAULT ;
-
-	rs = hdb_curbegin(op->nlp,curp->hcp) ;
-
+	int		rs = SR_FAULT ;
+	if (op && curp) {
+	    cint	sz = sizeof(hdb_cur) ;
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+		curp->hcp = (hdb_cur *) vp ;
+	        rs = hdb_curbegin(op->nlp,curp->hcp) ;
+		if (rs < 0) {
+		    uc_free(curp->hcp) ;
+		    curp->hcp = nullptr ;
+		}
+	    } /* end if (m-a) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (nodesfile_curbegin) */
 
 int nodesfile_curend(NF *op,nodesfile_cur *curp) noex {
-	int		rs ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (curp == nullptr)
-	    return SR_FAULT ;
-
-	rs = hdb_curend(op->nlp,curp->hcp) ;
-
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (op && curp) {
+	    rs = SR_OK ;
+	    if (curp->hcp) {
+		{
+	            rs1 = hdb_curend(op->nlp,curp->hcp) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+		    rs1 = uc_free(curp->hcp) ;
+		    if (rs >= 0) rs = rs1 ;
+		    curp->hcp = nullptr ;
+	        }
+	    } /* end if (non-null cursor) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (nodesfile_curend) */
 
 int nodesfile_enum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
-	hdb_datum	key, val ;
-	int	rs ;
-	int	cl = 0 ;
-	cchar	*cp ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (curp == nullptr)
-	    return SR_FAULT ;
-
-	if ((rs = hdb_enum(op->nlp,curp->hcp,&key,&val)) >= 0) {
-	    cp = (cchar *) key.buf ;
-	    cl = (nlen >= 0) ? min(key.len,nlen) : key.len ;
-	    strwcpy(nbuf,cp,cl) ;
-	}
-
+	int		rs = SR_FAULT ;
+	int		cl = 0 ;
+	if (op && curp) {
+	    hdb_datum	key{} ;
+	    hdb_datum	val{} ;
+	    if ((rs = hdb_enum(op->nlp,curp->hcp,&key,&val)) >= 0) {
+	        cchar	*cp = ccharp(key.buf) ;
+	        cl = (nlen >= 0) ? min(key.len,nlen) : key.len ;
+	        strwcpy(nbuf,cp,cl) ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? cl : rs ;
 }
 /* end subroutine (nodesfile_enum) */
@@ -350,10 +338,6 @@ static int nodesfile_parse(NF *op) noex {
 	while (sp < ep) {
 
 	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("nodesfile_parse: cp=%t\n",cp,cl) ;
-#endif
 
 	        if (cp[0] == '#') {
 
