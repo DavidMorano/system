@@ -51,7 +51,7 @@ extern int	msleep(int) ;
 /* exported subroutines */
 
 
-int uc_truncate(cchar *fn,offset_t len)
+int uc_truncate(cchar *fn,off_t len)
 {
 	int		rs ;
 	int		to_again = TO_AGAIN ;

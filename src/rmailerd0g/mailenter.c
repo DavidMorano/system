@@ -121,7 +121,7 @@ int mailenter(gp,pp,nr,mode,offset,mlen,ifp,ifd, ofd, efd)
 struct proginfo		*gp ;
 struct prog_params	*pp ;
 int		nr, mode ;
-offset_t		offset ;
+off_t		offset ;
 int		mlen ;
 bfile		*ifp ;
 int		ifd, ofd, efd ;
@@ -324,7 +324,7 @@ int		ifd, ofd, efd ;
 #if	CF_DEBUG && 0
 	    if (gp->debuglevel > 1) {
 	        int	rs1, rs2 ;
-	        offset_t	offset2 ;
+	        off_t	offset2 ;
 	        rs = u_tell(ifd,&offset2) ;
 	        debugprintf("mailenter: 1 SEEK preview, rs=%d offset=%lld\n",
 	            rs,offset2) ;
@@ -416,7 +416,7 @@ int		ifd, ofd, efd ;
 
 #if	CF_DEBUG && 0
 	    if (gp->debuglevel > 1) {
-	        offset_t	offset2 ;
+	        off_t	offset2 ;
 	        rs = u_tell(0,&offset2) ;
 	        debugprintf("mailenter: 2 SEEK preview, rs=%d offset=%lld\n",
 	            rs,offset2) ;

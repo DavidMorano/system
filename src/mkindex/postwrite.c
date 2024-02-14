@@ -135,7 +135,7 @@ const char	indexname[] ;
 {
 	struct postentry	*posta ;
 
-	offset_t	hoff ;
+	off_t	hoff ;
 
 	bfile	pfile ;
 
@@ -219,7 +219,7 @@ const char	indexname[] ;
 	btell(&pfile,&hoff) ;
 
 	size = nhash * sizeof(uint) ;
-	rs = bseek(&pfile,(offset_t) size,SEEK_CUR) ;
+	rs = bseek(&pfile,(off_t) size,SEEK_CUR) ;
 
 /* write out the link data */
 

@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} uino_t "
+NAMES="${NAMES} offset_t "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/uino_t/s//ino_t/g
+g/offset_t/s//off_t/g
 	w
 	q
 EOF

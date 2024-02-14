@@ -78,7 +78,7 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 int bfliner_start(lsp,ifp,foff,to)
 BFLINER		*lsp ;
 bfile		*ifp ;
-offset_t	foff ;
+off_t	foff ;
 int		to ;
 {
 	const int	lsize = (LINEBUFLEN+1) ;
@@ -185,7 +185,7 @@ BFLINER		*lsp ;
 
 int bfliner_getpoff(lsp,rp)
 BFLINER		*lsp ;
-offset_t	*rp ;
+off_t	*rp ;
 {
 	int		rs = SR_OK ;
 

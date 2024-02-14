@@ -78,10 +78,10 @@ extern "C" {
 #endif
 
 extern int lineindex_open(LINEINDEX *,const char *,int,mode_t,const char *) ;
-extern int lineindex_lookup(LINEINDEX *,uint,offset_t *) ;
+extern int lineindex_lookup(LINEINDEX *,uint,off_t *) ;
 extern int lineindex_curbegin(LINEINDEX *,LINEINDEX_CUR *) ;
 extern int lineindex_curend(LINEINDEX *,LINEINDEX_CUR *) ;
-extern int lineindex_enum(LINEINDEX *,LINEINDEX_CUR *,offset_t *) ;
+extern int lineindex_enum(LINEINDEX *,LINEINDEX_CUR *,off_t *) ;
 extern int lineindex_check(LINEINDEX *,time_t) ;
 extern int lineindex_count(LINEINDEX *) ;
 extern int lineindex_close(LINEINDEX *) ;

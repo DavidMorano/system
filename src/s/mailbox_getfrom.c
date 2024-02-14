@@ -144,7 +144,7 @@ int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi)
 	    if ((rs = mailbox_msginfo(mbp,mi,&msginfo)) >= 0) {
 		bfile		mf ;
 	        if ((rs = bopen(&mf,fn,"r",0666)) >= 0) {
-		    offset_t	moff = msginfo.moff ;
+		    off_t	moff = msginfo.moff ;
 	            if ((rs = bseek(&mf,moff,SEEK_SET)) >= 0) {
 			MAILMSG		m ;
 	                if ((rs = mailmsg_start(&m)) >= 0) {

@@ -111,7 +111,7 @@ struct vecelem	*aqp ;
 
 	time_t	subtime ;
 
-	offset_t	offset, off_clen, off_start, off_finish ;
+	off_t	offset, off_clen, off_start, off_finish ;
 
 	int	i, j, len, l ;
 	int	narticles = 0 ;
@@ -475,7 +475,7 @@ struct vecelem	*aqp ;
 
 	            bprintf(afp,"%s: ",HN_CLEN) ;
 
-	            off_clen = (offset_t) bseek(afp,0L,SEEK_CUR) ;
+	            off_clen = (off_t) bseek(afp,0L,SEEK_CUR) ;
 
 	            bprintf(afp,"                \n") ;
 

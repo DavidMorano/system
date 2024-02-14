@@ -286,7 +286,7 @@ transfer_job(const char *printer, const char *host, FILE *ifp,
 			    if ((tmp = mmap((caddr_t)0, (size_t)size,
 					PROT_READ|PROT_WRITE,
 					(MAP_SHARED | MAP_NORESERVE),
-					fd, (offset_t)0)) == (char *)MAP_FAILED)) {
+					fd, (off_t)0)) == (char *)MAP_FAILED)) {
 				syslog(LOG_ERR, "mmap(%d, %d): %m", size, fd);
 				NACK(ofp);
 				break;

@@ -107,7 +107,7 @@ char	*argv[] ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		errfile, *efp = &errfile ;
 
-	offset_t	off ;
+	off_t	off ;
 
 	int	len ;
 	int	c ;
@@ -117,7 +117,7 @@ char	*argv[] ;
 
 	if (bopen(&infile,BIO_STDIN,"dr",0666) < 0) goto badopen ;
 
-	off = (offset_t) 0020630 ;
+	off = (off_t) 0020630 ;
 	bseek(&infile,(off_t) off,SEEK_SET) ;
 
 	bopen(ofp,BIO_STDOUT,"wctd",0666) ;

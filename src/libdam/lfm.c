@@ -799,7 +799,7 @@ static int lfm_lockwrite(LFM *op,LFM_LOCKINFO *lip,int lfd)
 	int		rs ;
 
 	if ((rs = lfm_lockwriter(op,lip,lfd)) >= 0) {
-	    offset_t	woff = rs ;
+	    off_t	woff = rs ;
 	    if ((rs = uc_ftruncate(lfd,woff)) >= 0) {
 	        op->owrite = woff ;
 	        op->orewind = woff ;

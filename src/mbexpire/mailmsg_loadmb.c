@@ -96,7 +96,7 @@ extern char	*strnchr(const char *,int,int) ;
 /* exported subroutines */
 
 
-int mailmsg_loadmb(MAILMSG *mmp,MAILBOX *mbp,offset_t fbo)
+int mailmsg_loadmb(MAILMSG *mmp,MAILBOX *mbp,off_t fbo)
 {
 	MAILBOX_READ	cur ;
 	const int	bsize = MAILMSG_BSIZE ;

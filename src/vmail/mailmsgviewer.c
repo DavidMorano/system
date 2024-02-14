@@ -213,7 +213,7 @@ int mailmsgviewer_getline(MAILMSGVIEWER *op,int ln,cchar **lpp)
 
 int mailmsgviewer_seek(op,off,w)
 MAILMSGVIEWER	*op ;
-offset_t	off ;
+off_t	off ;
 int		w ;
 {
 	int		rs = SR_OK ;
@@ -252,7 +252,7 @@ int		w ;
 /* end subroutine (mailmsgviewer_seek) */
 
 
-int mailmsgviewer_tell(MAILMSGVIEWER *op,offset_t *offp)
+int mailmsgviewer_tell(MAILMSGVIEWER *op,off_t *offp)
 {
 
 #if	CF_SAFE

@@ -78,7 +78,7 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	lockend(int,int,int,int) ;
 
 #if	CF_DEBUGS
@@ -169,7 +169,7 @@ static int mailboxappender(cchar *mbfname,int sfd,int slen,int to)
 	    const int	tfd = rs ;
 	    if ((rs = mblock(tfd,TRUE,to)) >= 0) {
 		SIGBLOCK	blocker ;
-		offset_t	offend = 0 ;
+		off_t	offend = 0 ;
 		int		cmd ;
 
 	        u_seeko(tfd,0L,SEEK_END,&offend) ;

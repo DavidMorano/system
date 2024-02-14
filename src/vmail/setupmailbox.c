@@ -379,7 +379,7 @@ struct proginfo	*pip ;
 
 	time_t		daytime ;
 
-	offset_t		offset ;
+	off_t		offset ;
 
 	pid_t	pid ;
 

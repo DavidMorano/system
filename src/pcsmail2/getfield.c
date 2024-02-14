@@ -111,7 +111,7 @@ int	buflen ;
 	logfile_printf(&g.eh,"getfield: OK 3\n") ;
 #endif
 
-	if (mm_getfield(fp,(offset_t) 0,stat_f.st_size,field,data,buflen) < 0)
+	if (mm_getfield(fp,(off_t) 0,stat_f.st_size,field,data,buflen) < 0)
 		goto badret ;
 
 #if	DEBUG

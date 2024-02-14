@@ -104,7 +104,7 @@ extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	cfnumui(const char *,int,int *) ;
 extern int	ctdeci(char *,int,uint) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotValid(int) ;
 
@@ -249,7 +249,7 @@ static int getserial_write(int fd,char *dbuf,int dlen,int serial)
 	    if ((rs = ctdeci(dbuf,dlen,nserial)) >= 0) {
 	        dbuf[rs++] = '\n' ;
 	        if ((rs = u_write(fd,dbuf,rs)) >= 0) {
-	            offset_t	uoff = rs ;
+	            off_t	uoff = rs ;
 	            rs = uc_ftruncate(fd,uoff) ;
 	        }
 	    } /* end if (ctdeci) */

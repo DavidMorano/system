@@ -1321,7 +1321,7 @@ static int procmaintbake(PROGINFO *pip,void *md,size_t ms,int fs)
 	} /* end while */
 
 	if ((rs >= 0) && (lup != NULL)) {
-	    offset_t	feo ;
+	    off_t	feo ;
 	    cchar	*mlp = (cchar *) (lup+1) ;
 	    feo = (mlp-mp) ;
 	    if (feo < fs) {

@@ -193,7 +193,7 @@ int bcontrol(bfile *fp,int cmd,...)
 
 	case BC_TRUNCATE:
 	    {
-	        offset_t toff = (offset_t) va_arg(ap,offset_t) ;
+	        off_t toff = (off_t) va_arg(ap,off_t) ;
 	        rs = uc_ftruncate(fp->fd,toff) ;
 	    }
 	    break ;

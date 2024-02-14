@@ -2259,7 +2259,7 @@ ex(struct event *e)
 				(void) fclose(fptr);
 				exit(1);
 			}
-			if (fseek(fptr, (offset_t)0, SEEK_SET) != -1) {
+			if (fseek(fptr, (off_t)0, SEEK_SET) != -1) {
 				if (fd != 0) {
 					(void) dup2(fd, 0);
 					(void) close(fd);

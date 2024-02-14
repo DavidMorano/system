@@ -101,8 +101,8 @@ char		filename[] ;
 	bfile	infile, *ifp = &infile ;
 	bfile	tmpfile, *tfp = &tmpfile ;
 
-	offset_t	off_clen ;
-	offset_t	offset ;
+	off_t	off_clen ;
+	off_t	offset ;
 
 	time_t	daytime ;
 	time_t	filedate ;

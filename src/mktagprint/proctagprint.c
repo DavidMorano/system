@@ -148,7 +148,7 @@ const char	tag[] ;
 
 	bfile		itagfile, *tfp = &itagfile ;
 
-	offset_t	boff ;
+	off_t	boff ;
 
 	int	rs = SR_OK ;
 	int	len ;

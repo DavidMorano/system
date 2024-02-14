@@ -276,9 +276,9 @@ static int fileneed(PROGINFO *pip,bfile *ifp)
 static int filefix(PROGINFO *pip,bfile *ifp)
 {
 	bfile		tmpfile ;
-	offset_t	boff ;
-	offset_t	off ;
-	offset_t	off_seek = -1 ;
+	off_t	boff ;
+	off_t	off ;
+	off_t	off_seek = -1 ;
 	const int	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;

@@ -188,7 +188,7 @@ int filebuf_writefill(filebuf *bp,cchar *sp,int sl) noex {
 /* end subroutine (filebuf_writefill) */
 
 int filebuf_writealign(filebuf *bp,int asize) noex {
-	offset_t	foff ;
+	off_t	foff ;
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = filebuf_tell(bp,&foff)) >= 0) {

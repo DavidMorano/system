@@ -1618,7 +1618,7 @@ static int txtindexes_printeigens(TXTINDEXES *op)
 /* index the beginning-of-line offsets in the TAG file */
 static int offindex_tags(OFFINDEX *oip,cchar *fp,int fl)
 {
-	offset_t	lineoff = 0 ;
+	off_t	lineoff = 0 ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		ll ;

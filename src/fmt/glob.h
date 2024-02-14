@@ -57,7 +57,7 @@ extern int		loading;	/* Loading user definitions */
 extern char		*lockname;	/* named used for locking in /var/mail */
 extern char		*maildir;	/* directory for mail files */
 extern char		mailname[];	/* Name of /var/mail system mailbox */
-extern offset_t		mailsize;	/* Size of system mailbox */
+extern off_t		mailsize;	/* Size of system mailbox */
 extern int		maxfiles;	/* Maximum number of open files */
 extern struct message	*message;	/* The actual message structure */
 extern char		*metanet;	/* ???? */

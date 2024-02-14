@@ -1,6 +1,16 @@
 /* testchar SUPPORT */
 /* lang=C++20 */
 
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
+
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -10,7 +20,7 @@
 
 using namespace std ;
 
-int main(int,const char **,const char **) {
+int main(int,mainv,mainv) {
 	int	ch = 'À' ;
 	printf("%c\n",ch) ;
 }

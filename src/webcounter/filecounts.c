@@ -119,7 +119,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	iaddsat(int,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	strlinelen(const char *,int,int) ;
 extern int	isNotPresent(int) ;
 
@@ -667,7 +667,7 @@ static int filecounts_updateone(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 #endif
 
 	if (rs >= 0) {
-	    offset_t	uoff = wep->eoff ;
+	    off_t	uoff = wep->eoff ;
 	    rs = u_pwrite(op->fd,ubuf,wlen,uoff) ;
 	}
 
@@ -682,7 +682,7 @@ static int filecounts_updateone(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 
 static int filecounts_append(FILECOUNTS *op,cchar *tbuf,WORKER_ENT *wep)
 {
-	offset_t	eoff ;
+	off_t	eoff ;
 	uint		nv ;
 	const int	nvsize = FILECOUNTS_NUMDIGITS ;
 	const int	tsize = FILECOUNTS_LOGZLEN ;

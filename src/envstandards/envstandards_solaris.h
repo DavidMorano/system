@@ -62,7 +62,7 @@
 #define	_LARGEFILE_SOURCE		1
 #endif
 
-#ifndef	_FILE_OFFSET_BITS /* 64-bit sized file-offsets ('offset_t' ?) */
+#ifndef	_FILE_OFFSET_BITS /* 64-bit sized file-offsets ('off_t' ?) */
 #define	_FILE_OFFSET_BITS		64
 #endif
 

@@ -323,7 +323,7 @@ static int offindex_tags(oip,tfp)
 OFFINDEX	*oip ;
 bfile		*tfp ;
 {
-	offset_t	lineoff ;
+	off_t	lineoff ;
 
 	int	rs ;
 	int	len ;

@@ -37,7 +37,7 @@
 
 
 struct nodesfile_cursor {
-	hdb_cur		cur ;
+	hdb_cur		*hcp ;
 } ;
 
 struct nodesfile_finfo {
@@ -50,7 +50,7 @@ struct nodesfile_finfo {
 
 struct nodesfile_head {
 	char		*mapbuf ;
-	hdb		nodes ;
+	hdb		*nlp ;
 	time_t		ti_check ;
 	time_t		ti_load ;
 	NODESFILE_FINFO	fi ;

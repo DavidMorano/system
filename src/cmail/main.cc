@@ -125,7 +125,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	struct tm	*timep ;
 	struct passwd	*pp ;
 	struct group	*gp ;
-	offset_t	clen ;
+	off_t	clen ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		jobfile, *jfp = &jobfile ;

@@ -908,7 +908,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 
 	    if ((rs = shio_isseekable(ofp)) > 0) {
 	        if (lip->start >= 0) {
-	            offset_t	o = lip->start ;
+	            off_t	o = lip->start ;
 	            rs = shio_seek(ofp,o,SEEK_SET) ;
 	        } else
 	            rs = shio_seek(ofp,0L,SEEK_END) ;

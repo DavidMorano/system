@@ -115,7 +115,7 @@ int mkhashfile(PI *pip,vecint *table,int tablen,KI *kip,cc *fname) noex {
 	pip->daytime = time(NULL) ;
 
 	if ((rs = bopen(&hashfile,fname,"rwct",0664)) >= 0) {
-	    offset_t	boff, uoff ;
+	    off_t	boff, uoff ;
 	    uint	header[header_overlast] ;
 	    uint	fto ;
 	    uint	*ptab = NULL ;
@@ -339,13 +339,13 @@ uint		taboff ;
 int		tablen ;
 {
 	const int	size = tablen * sizeof(uint) ;
-	offset_t	uoff ;
+	off_t	uoff ;
 	uint		*ptab ;
 	int		rs ;
 	if ((rs = uc_malloc(size,&ptab)) >= 0) {
 	    if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
 	        const int	hfd = rs ;
-	        offset_t	uoff = taboff ;
+	        off_t	uoff = taboff ;
 		int		i ;
 	        u_seek(hfd,uoff,SEEK_SET) ;
 	        u_read(hfd,ptab,size) ;

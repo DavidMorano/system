@@ -110,7 +110,7 @@ extern char	*d_procmode() ;
 /* external variables */
 
 extern int	mailenter(struct proginfo *,struct prog_params *,
-			int,int,offset_t,int,bfile *,int,int,int) ;
+			int,int,off_t,int,bfile *,int,int,int) ;
 
 
 /* local structures */
@@ -138,7 +138,7 @@ vecstr		*elp ;
 int		pn ;
 char		th[] ;
 int		f_seekable ;
-offset_t	fsize ;
+off_t	fsize ;
 int		ofd, efd ;
 {
 	struct prog_params	p ;
@@ -152,7 +152,7 @@ int		ofd, efd ;
 #endif
 
 	CKSUM		cs ;
-	offset_t	offset ;
+	off_t	offset ;
 	time_t		daytime ;
 	uint	cksum, cksum2 ;
 
@@ -522,7 +522,7 @@ int		ofd, efd ;
 	    struct ustat	sb ;
 
 #if	CF_DEBUG
-	    offset_t	offset2 ;
+	    off_t	offset2 ;
 #endif
 
 

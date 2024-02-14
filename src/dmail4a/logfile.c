@@ -116,7 +116,7 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	mklogid(char *,int,const char *,int,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	opentmp(const char *,int,mode_t) ;
 extern int	getnodename(char *,int) ;
@@ -751,8 +751,8 @@ static int logfile_copylock(LOGFILE *op,int logsize)
 	    if ((rs = lockfile(op->lfd,F_WLOCK,0L,0L,TO_LOCK)) >= 0) {
 
 	        if ((rs = opentmp(NULL,0,0644)) >= 0) {
-		    offset_t	uoff = (- logsize) ;
-		    offset_t	foff ;
+		    off_t	uoff = (- logsize) ;
+		    off_t	foff ;
 		    const int	llen = LINEBUFLEN ;
 	            int		fd = rs ;
 		    int		ll ;

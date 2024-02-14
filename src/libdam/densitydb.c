@@ -432,7 +432,7 @@ bad0:
 int densitydb_update(DENSITYDB *op,time_t dt,int index,DENSITYDB_ENT *ep)
 {
 	DENSITYDBE_ALL	m0 ;
-	offset_t	uoff ;
+	off_t	uoff ;
 	uint		eoff ;
 	int		rs ;
 	int		ei ;
@@ -1186,7 +1186,7 @@ static int densitydb_bufend(DENSITYDB *op)
 /* try to buffer up some of the file */
 static int densitydb_buf(DENSITYDB *op,uint roff,int rlen,char **rpp)
 {
-	offset_t	foff ;
+	off_t	foff ;
 	uint		bext, bend, fext, fend ;
 	uint		rext = (roff + rlen), ext ;
 	int		rs = SR_OK ;
@@ -1330,7 +1330,7 @@ static int densitydb_writehead(DENSITYDB *op)
 	char		fbuf[DENSITYDB_FBUFLEN + 1] ;
 
 	if ((rs = filehead(fbuf,0,&op->h)) >= 0) {
-	    const offset_t	uoff = DENSITYDB_FOHEAD ;
+	    const off_t	uoff = DENSITYDB_FOHEAD ;
 	    const int		bl = rs ;
 	    rs = u_pwrite(op->fd,fbuf,bl,uoff) ;
 	}

@@ -575,7 +575,7 @@ char		fname[] ;
 {
 	bfile	cfile ;
 
-	offset_t	off ;
+	off_t	off ;
 
 	uint	*rectab ;
 	uint	(*recind)[2] ;

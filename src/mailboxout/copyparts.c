@@ -81,7 +81,7 @@ int		tfd, sfd ;
 {
 	struct md	*mop ;
 
-	offset_t	uoff ;
+	off_t	uoff ;
 
 	uint	off ;
 

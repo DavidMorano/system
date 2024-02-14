@@ -93,7 +93,7 @@
 /* external subroutines */
 
 extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	isfsremote(int) ;
 extern int	isNotPresent(int) ;
 
@@ -647,7 +647,7 @@ int msgid_match(MSGID *op,time_t dt,MSGID_KEY *kp,MSGID_ENT *ep)
 /* update a (recipient,message-id) tuple entry match */
 int msgid_update(MSGID *op,time_t dt,MSGID_KEY *kp,MSGID_ENT *ep)
 {
-	offset_t	uoff ;
+	off_t	uoff ;
 	uint		khash ;
 	int		eoff ;
 	int		rs ;
@@ -1713,7 +1713,7 @@ static int msgid_bufend(MSGID *op)
 /* try to buffer up some of the file */
 static int msgid_buf(MSGID *op,int roff,int rlen,char **rpp)
 {
-	offset_t	poff ;
+	off_t	poff ;
 	uint		bend, fext ;
 	uint		foff ;
 	uint		rext = (roff + rlen), ext ;
@@ -1874,7 +1874,7 @@ static int msgid_bufupdate(MSGID *op,int roff,int rbuflen,cchar *rbuf)
 /* write out the file header */
 static int msgid_writehead(MSGID *op)
 {
-	offset_t	uoff = MSGID_FOHEAD ;
+	off_t	uoff = MSGID_FOHEAD ;
 	int		rs ;
 	int		bl ;
 	char		fbuf[MSGID_FBUFLEN + 1] ;

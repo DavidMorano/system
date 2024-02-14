@@ -490,7 +490,7 @@ static int dictfiles_closefile(op,c)
 DICTFILES	*op ;
 int		c ;
 {
-	offset_t	boff ;
+	off_t	boff ;
 
 	bfile	*fp ;
 

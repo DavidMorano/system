@@ -150,7 +150,7 @@ int lastlogfile_close(LASTLOGFILE *llp)
 int lastlogfile_readentry(LASTLOGFILE *llp,uid_t uid,LASTLOGFILE_ENT *ep)
 {
 	LASTLOGFILE_ENT	e ;
-	offset_t	loc ;
+	off_t	loc ;
 	int		rs = SR_OK ;
 
 	if (llp == NULL) return SR_FAULT ;
@@ -188,7 +188,7 @@ int lastlogfile_readentry(LASTLOGFILE *llp,uid_t uid,LASTLOGFILE_ENT *ep)
 /* write an entry */
 int lastlogfile_writeentry(LASTLOGFILE *llp,uid_t uid,LASTLOGFILE_ENT *ep)
 {
-	offset_t	loc ;
+	off_t	loc ;
 	int		rs = SR_OK ;
 
 	if (llp == NULL) return SR_FAULT ;
@@ -222,7 +222,7 @@ int lastlogfile_readinfo(LASTLOGFILE *llp,uid_t uid,time_t *tp,char *line,
 		char *hostname)
 {
 	LASTLOGFILE_ENT	e ;
-	offset_t	loc ;
+	off_t	loc ;
 	const int	of = llp->oflags ;
 	const int	esize = LASTLOGFILE_ENTSIZE ;
 	int		rs = SR_OK ;
@@ -284,7 +284,7 @@ int lastlogfile_writeinfo(LASTLOGFILE *llp,uid_t uid,time_t t,cchar *line,
 		cchar *hostname)
 {
 	LASTLOGFILE_ENT	e ;
-	offset_t	loc ;
+	off_t	loc ;
 	int		rs = SR_OK ;
 
 	if (llp == NULL) return SR_FAULT ;

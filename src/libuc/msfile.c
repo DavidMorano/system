@@ -185,7 +185,7 @@
 /* external subroutines */
 
 extern int	mkmagic(char *,int,cchar *) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	getfstype(char *,int,int) ;
 extern int	iceil(int,int) ;
 extern int	islocalfs(cchar *,int) ;
@@ -1192,7 +1192,7 @@ static int msfile_filecheck(MSFILE *op) noex {
 /* end subroutine (msfile_filecheck) */
 
 static int msfile_filetopwrite(MSFILE *op) noex {
-	offset_t	poff = 0L ;
+	off_t	poff = 0L ;
 	int		ml ;
 	int		rs = SR_OK ;
 	int		bl ;
@@ -1228,7 +1228,7 @@ static int msfile_filetopwrite(MSFILE *op) noex {
 /* end subroutine (msfile_filetopwrite) */
 
 static int msfile_filetopread(MSFILE *op) noex {
-	offset_t	poff = 0L ;
+	off_t	poff = 0L ;
 	int		rs ;
 
 	rs = u_pread(op->fd,op->topbuf,MSFILE_TOPLEN,poff) ;
@@ -1367,7 +1367,7 @@ static int msfile_lockget(MSFILE *op,time_t dt,int f_read) noex {
 	        rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
 #else
 	        {
-	            offset_t	fs = op->filesize ;
+	            off_t	fs = op->filesize ;
 	            rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
 	        }
 #endif /* CF_SOLARISBUF */
@@ -1432,7 +1432,7 @@ static int msfile_lockrelease(MSFILE *op) noex {
 	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 #else
 	        {
-	            offset_t	fs = op->filesize ;
+	            off_t	fs = op->filesize ;
 	            rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
 	        }
 #endif /* CF_SOLARISBUF */
@@ -1653,7 +1653,7 @@ static int msfile_headwrite(MSFILE *op) noex {
 	int		rs ;
 
 	if ((rs = msfile_headtab(op,0)) >= 0) {
-	    offset_t	poff ;
+	    off_t	poff ;
 	    cint	toff = MSFILE_TABOFF ;
 	    cint	htoff = MSFILE_HEADTABOFF ;
 	    int		bl ;

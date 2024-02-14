@@ -124,7 +124,7 @@ struct procdata {
 	vecobj	*tip ;
 	MAILMSGMATENV	ei ;
 	DATER	edate ;
-	offset_t	offset, off_start, off_clen, off_body, off_finish ;
+	off_t	offset, off_start, off_clen, off_body, off_finish ;
 	int	mlen ;
 	int	clen ;
 	char	efrom[ADDRLEN + 1] ;
@@ -344,7 +344,7 @@ int		len ;
 
 	vecstr			wh ;
 
-	offset_t			fileoff ;
+	off_t			fileoff ;
 
 	int	rs, rs1, sl, cl, i, j ;
 	int	f_bol, f_eol, f_eom = FALSE ;
@@ -1213,7 +1213,7 @@ int		len ;
 
 	if (rs >= 0) {
 
-	    offset_t	off_current ;
+	    off_t	off_current ;
 
 	    int		blen = mdp->off_finish - mdp->off_body ;
 

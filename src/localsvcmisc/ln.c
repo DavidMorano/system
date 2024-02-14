@@ -440,7 +440,7 @@ int		rlen ;
 	    if ((rs = mailbox_msginfo(mbp,mi,&msginfo)) >= 0) {
 		bfile		mf ;
 	        if ((rs1 = bopen(&mf,fname,"r",0666)) >= 0) {
-		    offset_t	moff = msginfo.moff ;
+		    off_t	moff = msginfo.moff ;
 	            if ((rs1 = bseek(&mf,moff,SEEK_SET)) >= 0) {
 
 #if	CF_DEBUGS

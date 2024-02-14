@@ -354,9 +354,9 @@ bfile		*ifp ;
 {
 	bfile	tmpfile ;
 
-	offset_t	uoff ;
-	offset_t	off ;
-	offset_t	off_seek = -1 ;
+	off_t	uoff ;
+	off_t	off ;
+	off_t	off_seek = -1 ;
 
 	int	rs ;
 	int	len, hi ;

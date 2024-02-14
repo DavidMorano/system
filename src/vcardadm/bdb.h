@@ -45,7 +45,7 @@ struct bdb_ent {
 
 struct bdb_key {
 	char		*citekey ;
-	offset_t		offset ;
+	off_t		offset ;
 	int		len ;
 	int		fi ;		/* file index */
 } ;

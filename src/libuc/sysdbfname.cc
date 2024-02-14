@@ -1,7 +1,7 @@
 /* sysdbfname SUPPORT */
 /* lang=C++20 */
 
-/* get the current process PID (quickly and fork-safely) */
+/* special function to retrieve system-database (SYSDB) filenames */
 /* version %I% last-modified %G% */
 
 
@@ -17,13 +17,32 @@
 /*******************************************************************************
 
 	Name:
-	uc_getpid
+	sysdbfnameget
 
 	Description:
-	We get (and possibly set) our PID.
+	This is a specially created subroutine to pretty much fulfill
+	one purpose.  This subroutine is called by the various
+	subroutines that open the system-database (SYSDB) special
+	files.  These special files (SYSDB files) are located at a
+	certain location in the system filesystem.  The location
+	itself is not so important, as long as we have a convenient
+	subroutine (like this present one) that will return that
+	location for us.  That is one of the purposes for this
+	present subroutine, to return the location in the syhstem
+	filesystem for each of the special SYSDB files.  But
+	additioanlly, and this is a pure hack specialization for
+	our particular callers, if we are called with a filename
+	(presumably the filename of a SYSDB files), we honor that
+	and simply return it.  This is a bone to the fact that we
+	are pretty called by one (or one type) of caller, and we
+	may as well provide any additioanl small service that they
+	(the callers) may like.  We are thread and fork safe, et
+	cetera. We are not (like almost everybody else) not
+	async-signal-safe (it is just not needed in the current
+	world).
 
 	Symopsis:
-	int sysdbfnameget(int n,cc *fn,cc **rpp) noex
+	int sysdbfnameget(sysdbfiles n,cc *fn,cc **rpp) noex
 
 	Arguments:
 	n		name to retrieve
@@ -77,12 +96,12 @@ extern "C" {
 
 namespace {
     struct sysdbmgr {
+	cchar		*strs[sysdbfile_overlast] ;
 	ptm		mx ;		/* data mutex */
 	pid_t		pid ;
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
-	cchar		*strs[sysdbfile_overlast] ;
 	int init() noex ;
 	int fini() noex ;
 	int get(int,cchar **) noex ;
@@ -188,7 +207,7 @@ int sysdbmgr::init() noex {
 	            }
 	            return rs ;
 	        } ; /* end lambda */
-	        rs = tw(lamb) ;
+	        rs = tw(lamb) ;		/* <- time watching */
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;

@@ -55,7 +55,7 @@
 extern int	cfdecmfui(const char *,int,int *) ;
 extern int	cfdecmfull(const char *,int,ULONG *) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	uc_ftruncate(int,offset_t) ;
+extern int	uc_ftruncate(int,off_t) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 
@@ -190,7 +190,7 @@ ULONG		trunclen ;
 	    debugprintf("process: truncating to len=%llu\n",flen) ;
 #endif
 
-	    rs = uc_ftruncate(fd,(offset_t) flen) ;
+	    rs = uc_ftruncate(fd,(off_t) flen) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))

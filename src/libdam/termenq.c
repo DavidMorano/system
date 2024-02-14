@@ -211,9 +211,9 @@ int termenq_write(TERMENQ *op,int ei,TERMENT *ep)
 	        rs = termenq_fileopen(op,0L) ;
 	    }
 	    if (rs >= 0) {
-	        offset_t	poff ;
+	        off_t	poff ;
 	        const int	esize = sizeof(TERMENT) ;
-	        poff = (offset_t) (ei * esize) ;
+	        poff = (off_t) (ei * esize) ;
 	        rs = u_pwrite(op->fd,ep,esize,poff) ;
 	    }
 	} else {
@@ -741,7 +741,7 @@ static int termenq_mapents(TERMENQ *op,int ei,TERMENT **rpp)
 
 static int termenq_mapper(TERMENQ *op,int ei,uint woff,uint wsize)
 {
-	offset_t	mo ;
+	off_t	mo ;
 	size_t		ms ;
 	uint		eoff ;
 	uint		eext ;

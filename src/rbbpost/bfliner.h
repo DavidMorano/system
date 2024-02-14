@@ -30,8 +30,8 @@
 #define	BFLINER		struct bfliner
 
 struct bfliner {
-	offset_t	poff ;		/* file-offset previous */
-	offset_t	foff ;		/* file-offset current */
+	off_t	poff ;		/* file-offset previous */
+	off_t	foff ;		/* file-offset current */
 	bfile		*ifp ;
 	char		*lbuf ;
 	int		to ;		/* read time-out */
@@ -45,11 +45,11 @@ struct bfliner {
 extern "C" {
 #endif
 
-extern int bfliner_start(BFLINER *,bfile *,offset_t,int) ;
+extern int bfliner_start(BFLINER *,bfile *,off_t,int) ;
 extern int bfliner_readpending(BFLINER *) ;
 extern int bfliner_readline(BFLINER *,int,const char **) ;
 extern int bfliner_readover(BFLINER *) ;
-extern int bfliner_getpoff(BFLINER *,offset_t *) ;
+extern int bfliner_getpoff(BFLINER *,off_t *) ;
 extern int bfliner_finish(BFLINER *) ;
 
 #ifdef	__cplusplus

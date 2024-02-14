@@ -109,7 +109,7 @@
 extern uint	uceil(uint,int) ;
 
 extern int	matstr(const char **,const char *,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	isfsremote(int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
@@ -730,7 +730,7 @@ SRVREG_ENT	*ep ;
 {
 	time_t	daytime = 0 ;
 
-	offset_t	uoff ;
+	off_t	uoff ;
 
 	uint	eoff, ebs = SRVREG_EBS ;
 	uint	len ;
@@ -1524,7 +1524,7 @@ SRVREG		*op ;
 uint		roff, rlen ;
 char		**rpp ;
 {
-	offset_t	foff ;
+	off_t	foff ;
 
 	uint	bend, fext ;
 	uint	rext = (roff + rlen), ext ;
@@ -1688,7 +1688,7 @@ const char	rbuf[] ;
 static int srvreg_writehead(op)
 SRVREG		*op ;
 {
-	offset_t	uoff ;
+	off_t	uoff ;
 
 	int	rs ;
 	int	bl ;

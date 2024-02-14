@@ -195,9 +195,9 @@ struct procdata {
 	PROCDATA_FL	f ;
 	MAILMSGMATENV	me ;
 	DATER		edate ;
-	offset_t	offset ;
-	offset_t	off_start, off_clen, off_body, off_finish ;
-	offset_t	off_clines ;
+	off_t	offset ;
+	off_t	off_start, off_clen, off_body, off_finish ;
+	off_t	off_clines ;
 	int		tlen ;		/* message length (calculated) */
 	int		clen ;		/* content-length (calculated) */
 	int		clines ;	/* content-lines (calculated) */
@@ -330,7 +330,7 @@ static cchar	*hdrspecials[] = {
 int progmsgs(PROGINFO *pip,bfile *ifp,bfile *tfp,vecobj *fip,vecobj *rlp) noex {
 	PROCDATA	pd, *pdp = &pd ;
 	BFLINER		*blp ;
-	offset_t	boff ;
+	off_t	boff ;
 	cint		llen = MSGLINELEN ;
 	int		rs ;
 	int		vi ;
@@ -1424,7 +1424,7 @@ static int procmsghdr_xpriority(PROGINFO *pip,PROCDATA *pdp)
 /* start writing the output file */
 static int procmsgout(PROGINFO *pip,PROCDATA *pdp)
 {
-	offset_t	moff ;
+	off_t	moff ;
 	int		rs ;
 	int		tlen = 0 ;
 
@@ -1635,7 +1635,7 @@ static int procmsgouthdr_clen(PROGINFO *pip,PROCDATA *pdp)
 	}
 
 	if (rs >= 0) {
-	    offset_t	coff ;
+	    off_t	coff ;
 	    btell(pdp->tfp,&coff) ;
 	    pdp->off_clen = coff ;
 	    rs = bprintf(pdp->tfp,"%t\n",blanks,NBLANKS) ;
@@ -1672,7 +1672,7 @@ static int procmsgouthdr_clines(PROGINFO *pip,PROCDATA *pdp)
 	    }
 
 	    if (rs >= 0) {
-	        offset_t	coff ;
+	        off_t	coff ;
 	        btell(pdp->tfp,&coff) ;
 	        pdp->off_clines = coff ;
 	        rs = bprintf(pdp->tfp,"%t\n",blanks,NBLANKS) ;
@@ -2471,7 +2471,7 @@ static int procmsgoutbody(PROGINFO *pip,PROCDATA *pdp)
 static int procmsgoutback(PROGINFO *pip,PROCDATA *pdp)
 {
 	MSGINFO		*mip = pdp->mip ;
-	offset_t	coff ;
+	off_t	coff ;
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG

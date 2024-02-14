@@ -391,9 +391,9 @@ static int procfixer(PROGINFO *pip,cchar *fname,bfile *ifp)
 	if (pip == NULL) return SR_FAULT ;
 
 	if ((rs = bopen(tfp,fname,"rw",0664)) >= 0) {
-	    offset_t	boff ;
-	    offset_t	off ;
-	    offset_t	off_seek = -1 ;
+	    off_t	boff ;
+	    off_t	off ;
+	    off_t	off_seek = -1 ;
 	    const int	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		f_bol, f_eol ;

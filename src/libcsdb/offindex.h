@@ -38,8 +38,8 @@ extern "C" {
 #endif
 
 extern int	offindex_start(OFFINDEX *,int) ;
-extern int	offindex_add(OFFINDEX *,offset_t,int) ;
-extern int	offindex_lookup(OFFINDEX *,offset_t) ;
+extern int	offindex_add(OFFINDEX *,off_t,int) ;
+extern int	offindex_lookup(OFFINDEX *,off_t) ;
 extern int	offindex_finish(OFFINDEX *) ;
 
 #ifdef	__cplusplus

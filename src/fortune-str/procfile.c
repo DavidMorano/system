@@ -109,7 +109,7 @@ struct global	*gp ;
 bfile		*ifp, *dfp ;
 STRFILE		*tbl ;
 {
-	offset_t	boff ;
+	off_t	boff ;
 
 	long	pos ;
 

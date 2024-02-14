@@ -905,7 +905,7 @@ int		nl ;
 				pip->progname,flen,fname) ;
 		    }
 		    if (sb.st_size > flen) {
-			offset_t	foff = flen ;
+			off_t	foff = flen ;
 			if ((rs = uc_ftruncate(fd,foff)) >= 0) {
 	    		    f = TRUE ;
 			}

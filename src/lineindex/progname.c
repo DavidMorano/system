@@ -138,7 +138,7 @@ const char	name[] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
 		LINEINDEX_CUR	cur ;
-		offset_t		off ;
+		off_t		off ;
 			debugprintf("progname: fname=%s\n",fname) ;
 		lineindex_curbegin(&li,&cur) ;
 		line = 0 ;

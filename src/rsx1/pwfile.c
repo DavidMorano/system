@@ -79,7 +79,7 @@
 extern int	snwcpyhyphen(char *,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecl(const char *,int,long *) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;

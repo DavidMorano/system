@@ -98,7 +98,7 @@ int inter()
 
 	struct group	*gp ;
 
-	offset_t		offset ;
+	off_t		offset ;
 
 	int		len, rs, status ;
 	int		wstatus ;

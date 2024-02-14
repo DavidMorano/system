@@ -257,10 +257,10 @@ static int	bbinter_cmddelnum(BBINTER *,int,int) ;
 static int	bbinter_cmdsubject(BBINTER *,int) ;
 static int	bbinter_cmdshell(BBINTER *) ;
 
-static int	bbinter_msgoutfile(BBINTER *,const char *,int,offset_t,int) ;
-static int	bbinter_msgoutpipe(BBINTER *,const char *,offset_t,int) ;
+static int	bbinter_msgoutfile(BBINTER *,const char *,int,off_t,int) ;
+static int	bbinter_msgoutpipe(BBINTER *,const char *,off_t,int) ;
 static int	bbinter_msgoutview(BBINTER *,const char *,const char *) ;
-static int	bbinter_msgmove(BBINTER *,const char *,offset_t,int) ;
+static int	bbinter_msgmove(BBINTER *,const char *,off_t,int) ;
 static int	bbinter_msgdel(BBINTER *,int,int) ;
 static int	bbinter_msgdelnum(BBINTER *,int,int,int) ;
 
@@ -2983,7 +2983,7 @@ int		argnum ;
 
 	MBCACHE_SCAN	*msp ;
 
-	offset_t	outoff ;
+	off_t	outoff ;
 
 	int	rs = SR_OK ;
 	int	rl ;
@@ -3053,7 +3053,7 @@ int		argnum ;
 
 	MBCACHE_SCAN	*msp ;
 
-	offset_t	outoff ;
+	off_t	outoff ;
 
 	int	rs = SR_OK ;
 	int	cl ;
@@ -3289,7 +3289,7 @@ int		argnum ;
 	        rs = bbinter_mbviewopen(iap) ;
 
 	    if (rs >= 0) {
-		const offset_t	bo = msp->boff ;
+		const off_t	bo = msp->boff ;
 		const int	bl = msp->blen ;
 		rs = mailmsgfile_new(&iap->msgfiles,mt,midp,iap->mfd,bo,bl) ;
 	        nlines = rs ;
@@ -3350,7 +3350,7 @@ int		argnum ;
 
 	MBCACHE_SCAN	*msp ;
 
-	offset_t	moff ;
+	off_t	moff ;
 
 	int	rs = SR_OK ;
 	int	rs1 ;
@@ -3621,7 +3621,7 @@ static int bbinter_msgoutfile(iap,cp,cl,moff,mlen)
 BBINTER		*iap ;
 const char	cp[] ;
 int		cl ;
-offset_t	moff ;
+off_t	moff ;
 int		mlen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -3690,7 +3690,7 @@ ret0:
 static int bbinter_msgoutpipe(iap,cmd,outoff,outlen)
 BBINTER		*iap ;
 const char	cmd[] ;
-offset_t		outoff ;
+off_t		outoff ;
 int		outlen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -3935,7 +3935,7 @@ const char	dstfname[] ;
 static int bbinter_msgmove(iap,mbname,moff,mlen)
 BBINTER		*iap ;
 const char	mbname[] ;
-offset_t	moff ;
+off_t	moff ;
 int		mlen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -3953,7 +3953,7 @@ int		mlen ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	rs = u_seek(iap->mfd,(offset_t) moff,SEEK_SET) ;
+	rs = u_seek(iap->mfd,(off_t) moff,SEEK_SET) ;
 	if (rs < 0)
 	    goto ret0 ;
 

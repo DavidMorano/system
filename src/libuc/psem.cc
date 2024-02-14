@@ -39,14 +39,18 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 
+
+#define	PSEM_REDIRECT	1
+
+
 /* are POSIX unnamed semaphores supported on this platform or not? */
 #if	defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0)
 
-#include	"rpsem.cc"
+#include	"rpsem.cc"		/* "real" POSIX® semaphores */
 
 #else /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 
-#include	"epsem.cc"
+#include	"epsem.cc"		/* "emulated" POSIX® semaphores */
 
 #endif /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 

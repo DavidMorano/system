@@ -64,7 +64,7 @@ extern int	htm_printline(HTM *,const char *,int) ;
 extern int	htm_vprintf(HTM *,const char *,va_list) ;
 extern int	htm_printf(HTM *,const char *,...) ;
 extern int	htm_putc(HTM *,int) ;
-extern int	htm_seek(HTM *,offset_t,int) ;
+extern int	htm_seek(HTM *,off_t,int) ;
 extern int	htm_flush(HTM *) ;
 extern int	htm_reserve(HTM *,int) ;
 

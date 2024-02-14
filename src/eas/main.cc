@@ -80,7 +80,7 @@ extern char	*strbasename(char *) ;
 
 struct circuit		*mkcircuit() ;
 
-offset_t		gotcircuit() ;
+off_t		gotcircuit() ;
 
 int			addblock() ;
 int			writecir() ;
@@ -146,7 +146,7 @@ int main(int argc,cchar **argv,cchar **argv)
 	struct global	*gdp = &g ;
 	struct circuit	*e_cirp, *cirp ;
 	struct type	*tp, *headp = NULL ;
-	offset_t	blockstart, offset ;
+	off_t	blockstart, offset ;
 	bfile		infile, *ifp = &infile ;
 	bfile		tmpfile, *tfp = &tmpfile ;
 	bfile		outfile ;
@@ -980,12 +980,12 @@ badwritecir:
 
 /* process a subcircuit */
 
-offset_t gotcircuit(gdp,blockstart,linebuf,linelen,index,type,sl)
+off_t gotcircuit(gdp,blockstart,linebuf,linelen,index,type,sl)
 struct global	*gdp ;
 char		linebuf[] ;
 int	linelen ;
 int	index ;
-offset_t	blockstart ;
+off_t	blockstart ;
 int	type ;
 int	sl ;
 {
@@ -993,7 +993,7 @@ int	sl ;
 
 	struct circuit	*cirp ;
 
-	offset_t		offset = blockstart ;
+	off_t		offset = blockstart ;
 
 	int	l, len, blen = linelen ;
 	int	f_bol, f_eol ;
@@ -1308,7 +1308,7 @@ int	sl ;
 
 int addblock(cirp,offset,len)
 struct circuit	*cirp ;
-offset_t	offset ;
+off_t	offset ;
 long	len ;
 {
 	struct block	*hbp, *bp ;

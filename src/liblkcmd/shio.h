@@ -95,7 +95,7 @@ extern int	shio_printline(SHIO *,cchar *,int) ;
 extern int	shio_vprintf(SHIO *,cchar *,va_list) ;
 extern int	shio_printf(SHIO *,cchar *,...) ;
 extern int	shio_putc(SHIO *,int) ;
-extern int	shio_seek(SHIO *,offset_t,int) ;
+extern int	shio_seek(SHIO *,off_t,int) ;
 extern int	shio_flush(SHIO *) ;
 extern int	shio_control(SHIO *,int,...) ;
 extern int	shio_getfd(SHIO *) ;

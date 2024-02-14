@@ -1,7 +1,7 @@
 /* sysdbfname HEADER */
 /* lang=C20 */
 
-/* standard byte-order serializations */
+/* special function to retrieve system-database (SYSDB) filenames */
 /* version %I% last-modified %G% */
 
 
@@ -24,7 +24,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<sysdbfnames.h>
+#include	<sysdbfnames.h>		/* <- the money shot */
 
 
 EXTERNC_begin

@@ -700,7 +700,7 @@ static int debugprinters(cchar *sbuf,int slen)
 		    if ((rs = u_fstat(ef.fd,&sb)) >= 0) {
 
 	                if (S_ISREG(sb.st_mode) && (sb.st_size != ef.size)) {
-	                    offset_t	uoff = sb.st_size ;
+	                    off_t	uoff = sb.st_size ;
 	                    ef.size = sb.st_size ;
 	                    u_seek(ef.fd,uoff,SEEK_SET) ;
 	                }

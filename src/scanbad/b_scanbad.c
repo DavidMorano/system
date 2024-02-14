@@ -140,8 +140,8 @@ struct locinfo {
 	vecstr		stores ;
 	PROGINFO	*pip ;
 	char		*rdata ;
-	offset_t	scanoff ;
-	offset_t	scanlen ;
+	off_t	scanoff ;
+	off_t	scanlen ;
 	size_t		rsize ;
 	uint		blocksize ;
 	int		pagesize ;
@@ -1141,10 +1141,10 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 static int procfile(PROGINFO *pip,PROCDATA *pdp,void *ofp,cchar *ifname)
 {
 	LOCINFO		*lip = pip->lip ;
-	offset_t	scanoff, scanlen ;
-	offset_t	scanmax = LONG64_MAX ;
-	offset_t	roff = 0 ;
-	offset_t	tlen = 0 ;
+	off_t	scanoff, scanlen ;
+	off_t	scanmax = LONG64_MAX ;
+	off_t	roff = 0 ;
+	off_t	tlen = 0 ;
 	int		rs ;
 	int		blocklen = pdp->blocklen ;
 	int		nblocks = 0 ;
@@ -1410,7 +1410,7 @@ static int locinfo_scanspec(LOCINFO *lip,cchar *sp,int sl)
 	if (sl < 0) sl = strlen(sp) ;
 
 	if (sl > 0) {
-	    offset_t	scanoff, scanlen ;
+	    off_t	scanoff, scanlen ;
 	    int		cl ;
 	    cchar	*cp ;
 	    cchar	*tp ;

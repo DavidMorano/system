@@ -27,7 +27,7 @@ pam_sm_open_session(
 	char	buffer[2048];
 	int	i;
 	int	debug = 0;
-	offset_t	offset;
+	off_t	offset;
 	time_t	cur_time;
 
 	for (i = 0; i < argc; i++) {
@@ -57,8 +57,8 @@ pam_sm_open_session(
 		 * account management module
 		 */
 
-		offset = (offset_t) pwd.pw_uid *
-					(offset_t) sizeof (struct lastlog);
+		offset = (off_t) pwd.pw_uid *
+					(off_t) sizeof (struct lastlog);
 
 		if (llseek(fdl, offset, SEEK_SET) != offset) {
 			/*

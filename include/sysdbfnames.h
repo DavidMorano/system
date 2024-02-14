@@ -26,16 +26,16 @@
 
 
 enum sysdbfiles {
-	sysdbfile_pw,
-	sysdbfile_sp,
-	sysdbfile_ua,
-	sysdbfile_gr,
-	sysdbfile_pj,
-	sysdbfile_pr,
-	sysdbfile_nw,
-	sysdbfile_ho,
-	sysdbfile_sv,
-	sysdbfile_sh,
+	sysdbfile_pw,			/* passwd */
+	sysdbfile_sp,			/* shadow */
+	sysdbfile_ua,			/* userattr */
+	sysdbfile_gr,			/* group */
+	sysdbfile_pj,			/* project */
+	sysdbfile_pr,			/* protocols */
+	sysdbfile_nw,			/* networks */
+	sysdbfile_ho,			/* hosts */
+	sysdbfile_sv,			/* services */
+	sysdbfile_sh,			/* shells */
 	sysdbfile_overlast
 } ;
 

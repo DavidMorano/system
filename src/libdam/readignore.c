@@ -51,7 +51,7 @@
 /* exported subroutines */
 
 
-int readignore(int fd,offset_t amount)
+int readignore(int fd,off_t amount)
 {
 	const int	rlen = getpagesize() ;
 	int		rs ;

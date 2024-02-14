@@ -277,10 +277,10 @@ static int	inter_cmdshell(INTER *) ;
 static int	inter_cmdmarkspam(INTER *,int) ;
 static int	inter_cmdmarkspamer(INTER *,int,const char *,const char *) ;
 
-static int	inter_msgoutfile(INTER *,const char *,int,offset_t,int) ;
-static int	inter_msgoutpipe(INTER *,const char *,offset_t,int) ;
-static int	inter_msgoutprog(INTER *,const char *,offset_t,int) ;
-static int	inter_msgoutproger(INTER *,cchar *,offset_t,int) ;
+static int	inter_msgoutfile(INTER *,const char *,int,off_t,int) ;
+static int	inter_msgoutpipe(INTER *,const char *,off_t,int) ;
+static int	inter_msgoutprog(INTER *,const char *,off_t,int) ;
+static int	inter_msgoutproger(INTER *,cchar *,off_t,int) ;
 static int	inter_msgoutview(INTER *,const char *,const char *) ;
 static int	inter_msgappend(INTER *,int,const char *) ;
 static int	inter_msgdel(INTER *,int,int) ;
@@ -3185,7 +3185,7 @@ int		argnum ;
 {
 	PROGINFO	*pip = iap->pip ;
 	MBCACHE_SCAN	*msp ;
-	offset_t	outoff ;
+	off_t	outoff ;
 	const int	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rl ;
@@ -3260,7 +3260,7 @@ int		argnum ;
 {
 	PROGINFO	*pip = iap->pip ;
 	MBCACHE_SCAN	*msp ;
-	offset_t	outoff ;
+	off_t	outoff ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		mi ;
@@ -3385,7 +3385,7 @@ static int inter_cmdmarkspam(INTER *iap,int argnum)
 static int inter_cmdmarkspamer(INTER *iap,int mi,cchar *mbname,cchar *cmd)
 {
 	PROGINFO	*pip = iap->pip ;
-	offset_t	moff ;
+	off_t	moff ;
 	int		rs ;
 
 	if ((rs = mbcache_msgoff(&iap->mc,mi,&moff)) >= 0) {
@@ -3557,7 +3557,7 @@ const char	**rpp ;
 	    rs = SR_OK ;
 	    if (iap->mfd < 0) rs = inter_mbviewopen(iap) ;
 	    if (rs >= 0) {
-	  	const offset_t	boff = msp->boff ;
+	  	const off_t	boff = msp->boff ;
 		const int	mfd = iap->mfd ;
 		const int	blen = msp->blen ;
 	 	rs = mailmsgfile_new(mmfp,mt,mid,mfd,boff,blen) ;
@@ -3881,7 +3881,7 @@ static int inter_msgoutfile(iap,cp,cl,moff,mlen)
 INTER		*iap ;
 const char	cp[] ;
 int		cl ;
-offset_t	moff ;
+off_t	moff ;
 int		mlen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -3947,7 +3947,7 @@ int		mlen ;
 static int inter_msgoutpipe(iap,cmd,outoff,outlen)
 INTER		*iap ;
 const char	cmd[] ;
-offset_t	outoff ;
+off_t	outoff ;
 int		outlen ;
 {
 	PROGINFO	*pip = iap->pip ;
@@ -4078,7 +4078,7 @@ ret0:
 /* end subroutine (inter_msgoutpipe) */
 
 
-static int inter_msgoutprog(INTER *iap,cchar cmd[],offset_t ooff,int olen)
+static int inter_msgoutprog(INTER *iap,cchar cmd[],off_t ooff,int olen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -4128,7 +4128,7 @@ static int inter_msgoutprog(INTER *iap,cchar cmd[],offset_t ooff,int olen)
 /* end subroutine (inter_msgoutprog) */
 
 
-static int inter_msgoutproger(INTER *iap,cchar cmd[],offset_t off,int olen)
+static int inter_msgoutproger(INTER *iap,cchar cmd[],off_t off,int olen)
 {
 	PROGINFO	*pip = iap->pip ;
 	int		rs ;
@@ -4313,7 +4313,7 @@ int		mi ;
 const char	mbname[] ;
 {
 	PROGINFO	*pip = iap->pip ;
-	offset_t	moff ;
+	off_t	moff ;
 	int		rs ;
 	int		rs1 ;
 	int		mlen ;

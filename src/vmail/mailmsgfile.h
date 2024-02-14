@@ -74,7 +74,7 @@ extern "C" {
 #endif
 
 extern int mailmsgfile_start(MAILMSGFILE *,const char *,int,int) ;
-extern int mailmsgfile_new(MAILMSGFILE *,int,const char *,int,offset_t,int) ;
+extern int mailmsgfile_new(MAILMSGFILE *,int,const char *,int,off_t,int) ;
 extern int mailmsgfile_get(MAILMSGFILE *,const char *,const char **) ;
 extern int mailmsgfile_msginfo(MAILMSGFILE *,MAILMSGFILE_MI **,const char *) ;
 extern int mailmsgfile_finish(MAILMSGFILE *) ;

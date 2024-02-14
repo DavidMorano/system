@@ -858,9 +858,9 @@ static int textlook_havekeyer(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
 static int textlook_havekeyers(TEXTLOOK *op,TXTINDEX_TAG *tagp,int qo,
 		SEARCHKEYS *skp,int fd,SEARCHKEYS_POP *pkp)
 {
-	offset_t	recoff = tagp->recoff ;
-	offset_t	recext ;
-	offset_t	mo ;
+	off_t	recoff = tagp->recoff ;
+	off_t	recext ;
+	off_t	mo ;
 	size_t		ms ;
 	uint		reclen = tagp->reclen ;
 	const int	maxreclen = TEXTLOOK_MAXRECLEN ;

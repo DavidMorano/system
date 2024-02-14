@@ -35,7 +35,7 @@
 
 
 struct ebuf_way {
-	offset_t	woff ;		/* "way" offset to file entries */
+	off_t	woff ;		/* "way" offset to file entries */
 	char		*wbuf ;		/* buffer */
 	uint		utime ;		/* usage time */
 	int		wlen ;

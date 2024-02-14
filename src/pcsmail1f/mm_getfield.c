@@ -74,7 +74,7 @@ int	hmatch() ;
 
 int mm_getfield(mfp,offset,mlen,h,fvalue,buflen)
 bfile	*mfp ;
-offset_t	offset ;
+off_t	offset ;
 int	mlen ;
 char	h[] ;
 char	fvalue[] ;

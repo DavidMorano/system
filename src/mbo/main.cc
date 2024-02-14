@@ -104,7 +104,7 @@ extern int	getfname(const char *,const char *,int,char *) ;
 extern int	getserial(const char *) ;
 extern int	pcsuserfile(const char *,const char *,
 			const char *,const char *, char *) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	initnow(struct timeb *,char *,int) ;
 extern int	isdigitlatin(int) ;
 

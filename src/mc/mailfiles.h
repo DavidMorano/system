@@ -24,7 +24,7 @@
 struct mailfiles_ent {
 	char	*mailfname ;
 	time_t	lasttime ;
-	offset_t	lastsize ;
+	off_t	lastsize ;
 	int	f_changed ;
 } ;
 

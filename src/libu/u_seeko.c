@@ -35,11 +35,11 @@
 
 int u_seeko(fd,wo,w,offp)
 int		fd ;
-offset_t	wo ;
+off_t	wo ;
 int		w ;
-offset_t	*offp ;
+off_t	*offp ;
 {
-	offset_t	ro ;
+	off_t	ro ;
 	int		rs ;
 
 	repeat {
@@ -59,9 +59,9 @@ offset_t	*offp ;
 
 int u_seekoff(fd,wo,w,offp)
 int		fd ;
-offset_t	wo ;
+off_t	wo ;
 int		w ;
-offset_t	*offp ;
+off_t	*offp ;
 {
 	return u_seeko(fd,wo,w,offp) ;
 }
@@ -70,9 +70,9 @@ offset_t	*offp ;
 
 int u_oseek(fd,wo,w,offp)
 int		fd ;
-offset_t	wo ;
+off_t	wo ;
 int		w ;
-offset_t	*offp ;
+off_t	*offp ;
 {
 	return u_seeko(fd,wo,w,offp) ;
 }

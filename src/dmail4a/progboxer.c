@@ -324,7 +324,7 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 /* do the copy atomically */
 
 	            if ((rs = sigblock_start(&blocks,oursigs)) >= 0) {
-			offset_t	soff ;
+			off_t	soff ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_TESTSLEEP
 	                sleep(20) ;

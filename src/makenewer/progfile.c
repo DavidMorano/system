@@ -195,7 +195,7 @@ const char	fname[] ;
 
 	struct ustat	dsb ;
 
-	offset_t	uoff ;
+	off_t	uoff ;
 
 	int	rs = SR_OK ;
 	int	bfnamelen ;

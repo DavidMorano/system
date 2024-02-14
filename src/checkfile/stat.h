@@ -13,7 +13,7 @@ struct	stat
 	unsigned short 	st_uid;
 	unsigned short 	st_gid;
 	dev_t	st_rdev;
-	offset_t	st_size;
+	off_t	st_size;
 	time_t	st_atime;
 	time_t	st_mtime;
 	time_t	st_ctime;

@@ -125,10 +125,10 @@ extern char	*strnchr(const char *,int,int) ;
 
 static int	readline_socket(int,char *,int,int) ;
 static int	readline_stream(int,char *,int,int) ;
-static int	readline_seekable(int,char *,int,int,offset_t) ;
+static int	readline_seekable(int,char *,int,int,off_t) ;
 static int	readline_default(int,char *,int,int) ;
 
-static int 	isseekable(int,offset_t *) ;
+static int 	isseekable(int,off_t *) ;
 
 
 /* local variables */
@@ -173,7 +173,7 @@ int uc_readlinetimed(int fd,char *lbuf,int llen,int to)
 	if (llen < 0) return SR_INVALID ;
 
 	if (llen > 0) {
-	    offset_t	fo ;
+	    off_t	fo ;
 	    if (isasocket(fd)) {
 	       rs = readline_socket(fd,lbuf,llen,to) ;
 	    } else if (isastream(fd)) {
@@ -338,7 +338,7 @@ static int readline_stream(int fd,char *lbuf,int llen,int to)
 
 
 /* ARGSUSED */
-static int readline_seekable(int fd,char *lbuf,int llen,int to,offset_t fo)
+static int readline_seekable(int fd,char *lbuf,int llen,int to,off_t fo)
 {
 	int		rs ;
 
@@ -386,7 +386,7 @@ static int readline_default(int fd,char *lbuf,int llen,int to)
 /* end subroutine (readline_default) */
 
 
-static int isseekable(int fd,offset_t *fop)
+static int isseekable(int fd,off_t *fop)
 {
 	int		rs ;
 	int		f = FALSE ;

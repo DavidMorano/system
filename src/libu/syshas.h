@@ -63,7 +63,7 @@
 /* Solaris®: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		1
 
-/* Solaris®: system has a 'offset_t' data type (assumed to be 64 bits) */
+/* Solaris®: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
 /* Solaris®: getcwd(3c) */
@@ -257,7 +257,7 @@
 /* Darwin: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		0
 
-/* Darwin: system has a 'offset_t' data type (assumed to be 64 bits) */
+/* Darwin: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		0
 
 /* Darwin: getcwd(3c) */
@@ -454,7 +454,7 @@
 /* Linux: system information header for 'sysinfo(2)' */
 #define	SYSHAS_SYSINFO		1
 
-/* Linux: system has a 'offset_t' data type (assumed to be 64 bits) */
+/* Linux: system has a 'off_t' data type (assumed to be 64 bits) */
 #define	SYSHAS_OFFSET		1
 
 /* Linux: getcwd(3c) */

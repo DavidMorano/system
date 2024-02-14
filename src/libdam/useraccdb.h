@@ -34,7 +34,7 @@ struct useraccdb_e {
 
 struct useraccdb_c {
 	FILEBUF		b ;
-	offset_t	eo ;		/* enumeration offset */
+	off_t	eo ;		/* enumeration offset */
 } ;
 
 struct useraccdb_flags {
@@ -47,7 +47,7 @@ struct useraccdb_head {
 	USERACCDB_FL	f ;
 	DATER		dm ;		/* dater-manager */
 	const char	*fname ;
-	offset_t	eo ;
+	off_t	eo ;
 	time_t		ti_check ;
 	time_t		ti_mod ;
 	ino_t		ino ;

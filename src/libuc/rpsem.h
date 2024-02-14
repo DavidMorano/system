@@ -12,20 +12,19 @@
 
 */
 
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+
 /*******************************************************************************
 
 	These are "unnamed" POSIX® semaphores.
 
 *******************************************************************************/
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
-
 #ifndef	PSEM_INCLUDE
 #define	PSEM_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<semaphore.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>

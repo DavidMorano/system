@@ -663,7 +663,7 @@ ulong		trunclen ;
 	    debugprintf("process: truncating to len=%llu\n",flen) ;
 #endif
 
-	    rs = uc_ftruncate64(fd,(offset_t) flen) ;
+	    rs = uc_ftruncate64(fd,(off_t) flen) ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel >= 3)

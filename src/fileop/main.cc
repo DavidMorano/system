@@ -4957,7 +4957,7 @@ static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
 static int procsyncer_reg(PROGINFO *pip,cchar *name,USTAT *sbp)
 {
 	USTAT		dsb ;
-	offset_t	dfsize = 0 ;
+	off_t	dfsize = 0 ;
 	const mode_t	dm = DMODE ;
 	const mode_t	nm = (sbp->st_mode & (~ S_IFMT)) | 0600 ;
 	uid_t		duid = -1 ;
@@ -4995,7 +4995,7 @@ static int procsyncer_reg(PROGINFO *pip,cchar *name,USTAT *sbp)
 	    if (S_ISREG(dsb.st_mode)) {
 	        int	f = FALSE ;
 	        duid = dsb.st_uid ;
-	        dfsize = (offset_t) dsb.st_size ;
+	        dfsize = (off_t) dsb.st_size ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
 	    debugprintf("main/procsyncer_reg: dfsize=%ull\n",dfsize) ;
@@ -5188,7 +5188,7 @@ static int procsyncer_reg(PROGINFO *pip,cchar *name,USTAT *sbp)
 		        }
 #endif
 	                if (len < dfsize) {
-	                    offset_t	uoff = len ;
+	                    off_t	uoff = len ;
 	                    rs = uc_ftruncate(dfd,uoff) ;
 	                }
 	            } /* end if (uc_copy) */

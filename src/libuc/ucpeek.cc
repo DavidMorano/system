@@ -139,7 +139,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 /* end subroutine (peek_stream) */
 
 static int peek_regular(int fd,void *dbuf,int dlen) noex {
-	offset_t	fo ;
+	off_t	fo ;
 	int		rs ;
 	if ((rs = u_tell(fd,&fo)) >= 0) {
 	    rs = u_pread(fd,dbuf,dlen,fo) ;

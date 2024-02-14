@@ -128,7 +128,7 @@ extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
 extern int	randlc(int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getfstype(char *,int,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	islocalfs(cchar *,int) ;
 extern int	isValidMagic(cchar *,int,cchar *) ;
 

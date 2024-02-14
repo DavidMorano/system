@@ -55,7 +55,7 @@
 #define fclose(s)	my_fclose(s)	/* delete closed file from the list*/
 
 struct message {
-	offset_t	m_offset;		/* offset in block of message */
+	off_t	m_offset;		/* offset in block of message */
 	long	m_size;			/* Bytes in the message */
 	long	m_lines;		/* Lines in the message */
 	long	m_clen;			/* Content-Length of the mesg   */
@@ -427,7 +427,7 @@ extern void		flush(void);
 extern int		folders(char **arglist);
 extern int		followup(int *msgvec);
 extern int		from(int *msgvec);
-extern offset_t		fsize(FILE *iob);
+extern off_t		fsize(FILE *iob);
 extern int		getfold(char *name);
 extern int		gethfield(register FILE *f, char linebuf[], register long rem);
 extern int		getline(char *line, int size, FILE *f, int *hasnulls);

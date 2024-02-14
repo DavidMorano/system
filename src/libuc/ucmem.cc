@@ -20,8 +20,8 @@
 	uc_mincoreset
 
 	Description:
-	Set bits in the supplied byte-array corresponding
-	to the resident pages in memory for the present process.
+	Set bits in the supplied byte-array corresponding to the
+	resident pages in memory for the present process.
 
 	Synosis:
 	int uc_mincoreset(void *ca,size_t cs,char *bits) noex ;
@@ -94,10 +94,12 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 		if ((rs = pagesize) >= 0) {
 		    csize	npages = getnpages(rs,ca,cs) ;
 		    size_t	nbytes ;
-		    char	*ba ;
+		    int		asz ;
+		    char	*ba{} ;
 		    nbytes = (npages / CHAR_BIT) ;
 		    memclear(bits,nbytes) ;
-		    if ((rs = uc_libmalloc(npages,&ba)) >= 0) {
+		    asz = int(npages) ;
+		    if ((rs = uc_libmalloc(asz,&ba)) >= 0) {
 			if ((rs = u_mincore(ca,cs,ba)) >= 0) {
 			    for (size_t bi = 0z ; bi < npages ; bi += 1) {
 			        if (ba[bi]) {
@@ -120,7 +122,7 @@ int uc_mincoreset(void *ca,size_t cs,char *bits) noex {
 
 static size_t getnpages(int ps,void *ma,size_t ms) noex {
 	uintptr_t	ua = uintptr_t(ma) ;
-	uintptr_t	fa, ea, ca ; ;
+	uintptr_t	fa, ea, ca ;
 	fa = uipfloor(ua,ps) ;
 	ea = (ua + ms) ;
 	ca = uipceil(ea,ps) ;

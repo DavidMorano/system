@@ -98,7 +98,7 @@ EVENT		*op ;
 
 int event_offset(op,offp)
 EVENT		*op ;
-offset_t		*offp ;
+off_t		*offp ;
 {
 
 

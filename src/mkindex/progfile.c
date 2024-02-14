@@ -153,7 +153,7 @@ const char	fname[] ;
 
 	bfile		ifile, *ifp = &ifile ;
 
-	offset_t	offset, noff, poff ;
+	off_t	offset, noff, poff ;
 
 	uint	hi, himask ;
 	uint	pi ;

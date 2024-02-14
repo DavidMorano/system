@@ -51,7 +51,7 @@
 /* local structures */
 
 struct offindex_e {
-	offset_t	lineoff ;
+	off_t	lineoff ;
 	int		linelen ;
 } ;
 
@@ -106,7 +106,7 @@ int offindex_finish(OFFINDEX *op)
 /* end subroutine (offindex_finish) */
 
 
-int offindex_add(OFFINDEX *op,offset_t off,int len)
+int offindex_add(OFFINDEX *op,off_t off,int len)
 {
 	OFFINDEX_E	e ;
 	int		rs ;
@@ -124,7 +124,7 @@ int offindex_add(OFFINDEX *op,offset_t off,int len)
 /* end subroutine (offindex_add) */
 
 
-int offindex_lookup(OFFINDEX *op,offset_t off)
+int offindex_lookup(OFFINDEX *op,off_t off)
 {
 	OFFINDEX_E	*oep ;
 	OFFINDEX_E	key ;

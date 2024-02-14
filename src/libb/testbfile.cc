@@ -151,7 +151,7 @@ int main(int argc,mainv argv,mainv envv) {
 	        ifname = BFILE_STDIN ;
 
 	    if ((rs = bopen(ifp,ifname,"r",0666)) >= 0) {
-		offset_t	loff = 0 ;
+		off_t	loff = 0 ;
 	        int		ll ;
 		cchar	*lp = lbuf ;
 

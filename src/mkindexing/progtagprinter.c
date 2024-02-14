@@ -134,7 +134,7 @@ const char	tag[] ;
 	BIBLECITE	bc ;
 	TAGINFO		ti ;
 	bfile		itagfile, *tfp = &itagfile ;
-	offset_t	boff ;
+	off_t	boff ;
 	const int	llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		len ;

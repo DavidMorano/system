@@ -40,7 +40,7 @@ extern int	msleep(int) ;
 /* exported subroutines */
 
 
-int u_pread(int fd,void *buf,int len,offset_t offset)
+int u_pread(int fd,void *buf,int len,off_t offset)
 {
 	int		rs ;
 	int		to_nolck = TO_NOLCK ;

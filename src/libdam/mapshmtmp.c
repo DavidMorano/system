@@ -142,7 +142,7 @@ int mapshmtmp(char *rbuf,int rlen,mode_t operm,int shmlen,char **rpp)
 
 static int shmalloc(int fd,int shmlen)
 {
-	offset_t	off = 0 ;
+	off_t	off = 0 ;
 	const int	wlen = sizeof(int) ;
 	const int	ps = getpagesize() ;
 	int		rs = SR_OK ;

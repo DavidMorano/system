@@ -922,7 +922,7 @@ struct bdb_key	*bkp ;
 #endif
 
 	    if ((rs = bopen(bfp,bfep->fname,"r",0666)) >= 0) {
-		offset_t	boff = (offset_t) bkp->coff ;
+		off_t	boff = (off_t) bkp->coff ;
 	        const int	llen = LINEBUFLEN ;
 		int		ll, cl ;
 		int		len ;

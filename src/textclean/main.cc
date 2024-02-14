@@ -1242,7 +1242,7 @@ static int procout_post(PROGINFO *pip,OPTIONS *optp,bfile *ofp,bfile *ifp)
 	    if ((rs = brewind(ofp)) >= 0) {
 		if ((rs = brewind(ifp)) >= 0) {
 		    if ((rs = bwriteblock(ifp,ofp,-1)) >= 0) {
-			offset_t	toff = rs ;
+			off_t	toff = rs ;
 			clen = rs ;
 			if ((rs = btruncate(ifp,toff)) >= 0) {
 	    		    rs = brewind(ofp) ;

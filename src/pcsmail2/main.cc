@@ -153,7 +153,7 @@ char	*argv[] ;
 
 	vecstr	rl ;
 
-	offset_t		offset ;
+	off_t		offset ;
 
 	int	argr, argl, aol, akl, avl, npa, maxai, kwi ;
 	int		len, rs, status ;

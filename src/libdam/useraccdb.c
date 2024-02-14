@@ -143,7 +143,7 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct upinfo_rec {
-	offset_t	ro ;		/* record offset */
+	off_t	ro ;		/* record offset */
 	uint		count ;
 	uint		found:1 ;
 } ;
@@ -183,7 +183,7 @@ static int	useraccdb_recproc(USERACCDB *,USERACCDB_REC *) ;
 static int	useraccdb_datethis(USERACCDB *,time_t *,const char *,int) ;
 
 static int	upinfo_start(UPINFO *,USERACCDB *,const char *,const char *) ;
-static int	upinfo_match(UPINFO *,offset_t,USERACCDB_REC *) ;
+static int	upinfo_match(UPINFO *,off_t,USERACCDB_REC *) ;
 static int	upinfo_update(UPINFO *) ;
 static int	upinfo_finish(UPINFO *) ;
 static int	upinfo_upone(UPINFO *,UPINFO_REC *,int) ;
@@ -363,7 +363,7 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 #endif
 	        if ((rs = filebuf_start(&b,op->fd,0L,0,0)) >= 0) {
 	            USERACCDB_REC	rec ;
-	            offset_t	ro = 0L ;
+	            off_t	ro = 0L ;
 	            const int	llen = LINEBUFLEN ;
 		    int		ll ;
 	            char	lbuf[LINEBUFLEN+1] ;
@@ -508,7 +508,7 @@ int		elen ;
 	if (rs >= 0) {
 	    const int	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    offset_t	eo = curp->eo ;
+	    off_t	eo = curp->eo ;
 	    if ((rs = filebuf_readline(&curp->b,lbuf,llen,-1)) >= 0) {
 		ll = rs ;
 	        if (ll > 0) {
@@ -823,7 +823,7 @@ static int upinfo_finish(UPINFO *uip)
 
 static int upinfo_match(uip,ro,recp)
 UPINFO		*uip ;
-offset_t	ro ;
+off_t	ro ;
 USERACCDB_REC	*recp ;
 {
 	UPINFO_REC	*urp = NULL ;

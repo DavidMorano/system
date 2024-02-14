@@ -42,13 +42,13 @@ extern int	msleep(int) ;
 
 /* forward references */
 
-static int	uc_ftruncater(int,offset_t) ;
+static int	uc_ftruncater(int,off_t) ;
 
 
 /* exported subroutines */
 
 
-int uc_ftruncate(int fd,offset_t len)
+int uc_ftruncate(int fd,off_t len)
 {
 	int		rs = SR_OK ;
 	if (len < 0) {
@@ -65,7 +65,7 @@ int uc_ftruncate(int fd,offset_t len)
 /* local subroutines */
 
 
-static int uc_ftruncater(int fd,offset_t len)
+static int uc_ftruncater(int fd,off_t len)
 {
 	int		rs ;
 	int		to_again = TO_AGAIN ;
