@@ -2131,7 +2131,7 @@ static int procfiler(PROGINFO *pip,void *ofp,struct ustat *ssbp,cchar *fname)
 	                    f_updated = TRUE ;
 	                    len = rs ;
 	                    if (len < fsize) {
-	                        offset_t	uoff = len ;
+	                        off_t	uoff = len ;
 	                        rs = uc_ftruncate(dfd,uoff) ;
 			    }
 	                }

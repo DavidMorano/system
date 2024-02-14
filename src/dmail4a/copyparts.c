@@ -130,7 +130,7 @@ int recipcopyparts(RECIP *rp,int tfd,int sfd)
 	        if (mlen > 0) {
 
 	            if (moff != off) {
-			offset_t	uoff = moff ;
+			off_t	uoff = moff ;
 	                rs = u_seek(tfd,uoff,SEEK_SET) ;
 
 #if	CF_DEBUGS

@@ -56,7 +56,7 @@ int u_pwrite(fd,buf,len,off)
 int		fd ;
 const void	*buf ;
 int		len ;
-offset_t	off ;
+off_t	off ;
 {
 	struct pollfd	fds[2] ;
 	nfds_t		nfds ;

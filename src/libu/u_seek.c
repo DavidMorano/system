@@ -32,9 +32,9 @@
 /* exported subroutines */
 
 
-int u_seek(int fd,offset_t o,int w)
+int u_seek(int fd,off_t o,int w)
 {
-	offset_t	ro ;
+	off_t	ro ;
 	int		rs ;
 
 	repeat {

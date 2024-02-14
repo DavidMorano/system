@@ -141,7 +141,7 @@ void		*uarg ;
 	bfile		namefile, *nfp = &namefile ;
 	bfile		nnfile, *nnfp = &nnfile ;
 
-	offset_t	offset ;
+	off_t	offset ;
 
 	int	rs ;
 	int	rs_stat ;

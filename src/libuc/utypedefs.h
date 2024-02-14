@@ -98,17 +98,17 @@
 #endif
 #endif
 
-/* offset_t */
+/* off_t */
 #ifndef	TYPEDEF_OFFSET
 #define	TYPEDEF_OFFSET
 #if	defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64)
 #if	defined(__LP64__) || defined(__LP64__)
-typedef off_t		offset_t ;
+typedef off_t		off_t ;
 #else
-typedef long long	offset_t ;
+typedef long long	off_t ;
 #endif /* defined(__LP64__) || defined(__LP64__) */
 #else
-typedef off_t		offset_t ;
+typedef off_t		off_t ;
 #endif /* defined(_FILE_OFFSET_BITS) && (_FILE_OFFSET_BITS == 64) */
 #endif /* TYPEDEF_OFFSET */
 

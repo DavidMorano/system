@@ -128,8 +128,8 @@ int		oflag ;
 
 	bfile	ifile, *ifp = &ifile ;
 
-	offset_t	maillen ;
-	offset_t	offset ;	/* keeps track of location in file */
+	off_t	maillen ;
+	off_t	offset ;	/* keeps track of location in file */
 
 	int	rs, i ;
 	int	iclen, clen, clines ;
@@ -491,7 +491,7 @@ checkindex:
 
 	                baseline = - clines ;
 	                offset += clen ;
-	                bseek(mbp->mfp,(offset_t) clen,SEEK_CUR) ;
+	                bseek(mbp->mfp,(off_t) clen,SEEK_CUR) ;
 
 #if	DEBUG
 	                if (BATST(UOV_DEBUG,g.uo)) debugprintf(
@@ -503,7 +503,7 @@ checkindex:
 
 	                baseline = 0 ;
 	                offset += clen ;
-	                bseek(mbp->mfp,(offset_t) clen,SEEK_CUR) ;
+	                bseek(mbp->mfp,(off_t) clen,SEEK_CUR) ;
 
 #if	DEBUG
 	                if (BATST(UOV_DEBUG,g.uo)) debugprintf(
@@ -694,7 +694,7 @@ struct mailbox	*mbp ;
 
 	sigset_t	oldsigmask, newsigmask ;
 
-	offset_t	offset ;
+	off_t	offset ;
 
 	long	mlen ;
 
@@ -917,9 +917,9 @@ struct mailbox	*mbp ;
 	    chmod(mbp->mailfile,permit) ;
 
 #ifdef	COMMENT
-	    lseek(tfd,(offset_t) 0,SEEK_SET) ;
+	    lseek(tfd,(off_t) 0,SEEK_SET) ;
 
-	    lseek(mfd,(offset_t) 0,SEEK_SET) ;
+	    lseek(mfd,(off_t) 0,SEEK_SET) ;
 
 	    rs = FALSE ;
 	    while ((len = read(tfd,buf,COPYLEN)) > 0) {

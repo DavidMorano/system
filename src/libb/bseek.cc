@@ -24,7 +24,7 @@
 
 	int bseek(fp,wo,whence)
 	bfile		*fp ;
-	offset_t	wo ;
+	off_t	wo ;
 	int		whence ;
 
 	Arguments:
@@ -95,10 +95,10 @@ static struct trans	t[] = {
 /* exported subroutines */
 
 
-int bseek(bfile *fp,offset_t wo,int whence)
+int bseek(bfile *fp,off_t wo,int whence)
 {
-	offset_t	co ;
-	offset_t	soff, ao ;
+	off_t	co ;
+	off_t	soff, ao ;
 	int		rs = SR_OK ;
 
 	if (fp == NULL) return SR_FAULT ;

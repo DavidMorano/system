@@ -173,8 +173,8 @@ extern int	bopenlock(bfile *,cchar *,int,int) noex ;
 extern int	bcontrol(bfile *,int,...) noex ;
 extern int	bstat(bfile *,USTAT *) noex ;
 extern int	bsize(bfile *) noex ;
-extern int	bseek(bfile *,offset_t,int) noex ;
-extern int	btell(bfile *,offset_t *) noex ;
+extern int	bseek(bfile *,off_t,int) noex ;
+extern int	btell(bfile *,off_t *) noex ;
 extern int	brewind(bfile *) noex ;
 extern int	breade(bfile *,void *,int,int,int) noex ;
 extern int	bread(bfile *,void *,int) noex ;
@@ -192,7 +192,7 @@ extern int	bprint(bfile *,cchar *,int) noex ;
 extern int	bprintline(bfile *,cchar *,int) noex ;
 extern int	bcopyblock(bfile *,bfile *,int) noex ;
 extern int	bcopyfile(bfile *,bfile *,char *,int) noex ;
-extern int	btruncate(bfile *,offset_t) noex ;
+extern int	btruncate(bfile *,off_t) noex ;
 extern int	breserve(bfile *,int) noex ;
 extern int	bisterm(bfile *) noex ;
 extern int	bminmod(bfile *,mode_t) noex ;
@@ -202,7 +202,7 @@ extern int	bclose(bfile *) noex ;
 
 extern int	bfile_flush(bfile *) noex ;
 extern int	bfile_flushn(bfile *,int) noex ;
-extern int	bfile_pagein(bfile *,offset_t,int) noex ;
+extern int	bfile_pagein(bfile *,off_t,int) noex ;
 
 extern int	bfilestat(cchar *,int,USTAT *) noex ;
 extern int	bfilefstat(int,USTAT *) noex ;

@@ -32,7 +32,7 @@
 /* exported subroutines */
 
 
-int u_truncate(cchar *path,offset_t fo)
+int u_truncate(cchar *path,off_t fo)
 {
 	int		rs ;
 

@@ -66,7 +66,7 @@ int	pageno ;
 
 	bfile	hfile, *hfp = &hfile ;
 
-	offset_t	offset ;
+	off_t	offset ;
 
 	int	rs ;
 	int	ml, len, nextpage ;
@@ -153,7 +153,7 @@ int	pageno ;
 		pages[0] = 0 ;
 
 	} else 
-	    offset = (offset_t) bseek(hfp, pages[pageno], SEEK_SET) ;
+	    offset = (off_t) bseek(hfp, pages[pageno], SEEK_SET) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))

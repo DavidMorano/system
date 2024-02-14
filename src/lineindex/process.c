@@ -138,7 +138,7 @@ char		name[] ;
 
 		LINEINDEX_CURSOR	cur ;
 
-		offset_t		off ;
+		off_t		off ;
 
 
 			debugprintf("process: fname=%s\n",fname) ;

@@ -146,7 +146,7 @@ struct vecelem	*slp ;
 	bfile		infile, *ifp = &infile ;
 	sigset_t	signalmask ;
 	time_t		daytime ;
-	offset_t	offset ;
+	off_t	offset ;
 	int		rs ;
 	int		i ;
 	int		len, l ;
@@ -235,7 +235,7 @@ struct jobentry	*jep ;
 struct ustat	*sbp ;
 struct vecelem	*slp ;
 bfile		*ifp ;
-offset_t		offset ;
+off_t		offset ;
 char	linebuf[] ;
 int	linelen ;
 {

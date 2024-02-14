@@ -102,10 +102,10 @@ struct mailbox_msg {
 	vecstr		hdradds ;	/* HDRs to be added */
 	MAILBOX_MFLAGS	hdr, hdrval, hdradd, f, cmd ;
 	uint		hash[8] ;	/* ?? */
-	offset_t	moff ;		/* offset to start of message */
-	offset_t	hoff ;		/* offset to top of headers */
-	offset_t	soff ;		/* offset to semaphore */
-	offset_t	boff ;		/* offset to message body */
+	off_t	moff ;		/* offset to start of message */
+	off_t	hoff ;		/* offset to top of headers */
+	off_t	soff ;		/* offset to semaphore */
+	off_t	boff ;		/* offset to message body */
 	int		mlen ;		/* total "message" length */
 	int		hlen ;		/* total header-area length */
 	int		blen ;		/* total "body" length */
@@ -121,8 +121,8 @@ struct mailbox_read {
 	char		*rbp ;
 	int		rsize ;
 	int		rlen ;
-	offset_t	foff ;		/* file offset */
-	offset_t	roff ;		/* read offset */
+	off_t	foff ;		/* file offset */
+	off_t	roff ;		/* read offset */
 } ;
 
 #ifdef	COMMENT
@@ -160,12 +160,12 @@ extern int mailbox_info(MAILBOX *,MAILBOX_INFO *) noex ;
 extern int mailbox_count(MAILBOX *) noex ;
 extern int mailbox_mbfile(MAILBOX *,char *,int) noex ;
 extern int mailbox_check(MAILBOX *,time_t) noex ;
-extern int mailbox_msgoff(MAILBOX *,int,offset_t *) noex ;
+extern int mailbox_msgoff(MAILBOX *,int,off_t *) noex ;
 extern int mailbox_msginfo(MAILBOX *,int,MAILBOX_MSGINFO *) noex ;
 extern int mailbox_msgdel(MAILBOX *,int,int) noex ;
 extern int mailbox_msghdradd(MAILBOX *,int,cchar *,cchar *,int) noex ;
 extern int mailbox_countdel(MAILBOX *) noex ;
-extern int mailbox_readbegin(MAILBOX *,MAILBOX_READ *,offset_t,int) noex ;
+extern int mailbox_readbegin(MAILBOX *,MAILBOX_READ *,off_t,int) noex ;
 extern int mailbox_readline(MAILBOX *,MAILBOX_READ *,char *,int) noex ;
 extern int mailbox_readend(MAILBOX *,MAILBOX_READ *) noex ;
 extern int mailbox_close(MAILBOX *) noex ;

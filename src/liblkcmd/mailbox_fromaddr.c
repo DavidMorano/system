@@ -177,7 +177,7 @@ static int mailbox_proc(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = mailbox_msginfo(mbp,mi,&msginfo)) >= 0) {
-	    const offset_t	moff = msginfo.moff ;
+	    const off_t	moff = msginfo.moff ;
 	    if ((rs = bseek(mfp,moff,SEEK_SET)) >= 0) {
 		MAILMSG		m ;
 		if ((rs = mailmsg_start(&m)) >= 0) {

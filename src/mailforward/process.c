@@ -129,7 +129,7 @@ struct recip	*rp ;
 	time_t		daytime ;
 	time_t		starttime ;
 
-	offset_t	startoff ;
+	off_t	startoff ;
 
 	uid_t		uid_recip ;
 

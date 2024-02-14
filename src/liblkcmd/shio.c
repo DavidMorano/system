@@ -931,7 +931,7 @@ ret0:
 /* end subroutine (shio_putc) */
 
 
-int shio_seek(SHIO *op,offset_t o,int w)
+int shio_seek(SHIO *op,off_t o,int w)
 {
 	int		rs = SR_OK ;
 
@@ -1405,7 +1405,7 @@ static int shio_bopene(SHIO *op,int fni,cchar *fname,cchar *ms,mode_t om,int to)
 #if	CF_DEBUGS
 	debugprintf("shio_bopene: stat-size=%u\n",sizeof(struct ustat)) ;
 	debugprintf("shio_bopene: ustat-size=%u\n",sizeof(struct ustat)) ;
-	debugprintf("shio_bopene: offset-size=%u\n",sizeof(offset_t)) ;
+	debugprintf("shio_bopene: offset-size=%u\n",sizeof(off_t)) ;
 	debugprintf("shio_bopene: ino-size=%u\n",sizeof(ino_t)) ;
 	debugprintf("shio_bopene: dev-size=%u\n",sizeof(dev_t)) ;
 	debugprintf("shio_bopene: mode-size=%u\n",sizeof(mode_t)) ;

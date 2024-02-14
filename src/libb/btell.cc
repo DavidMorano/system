@@ -53,9 +53,9 @@ extern int	bfile_flush(bfile *) ;
 /* exported subroutines */
 
 
-int btell(bfile *fp,offset_t *rp)
+int btell(bfile *fp,off_t *rp)
 {
-	offset_t	telloff = 0 ;
+	off_t	telloff = 0 ;
 	int		rs = SR_OK ;
 
 	if (fp == NULL) return SR_FAULT ;

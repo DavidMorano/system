@@ -115,7 +115,7 @@ extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	lockend(int,int,int,int) ;
 extern int	pcsgetprog(const char *,char *,const char *) ;
 extern int	isNotPresent(int) ;
@@ -506,7 +506,7 @@ static int procmailgeterux(PROGINFO *pip,vechand *mlp,cchar *ifn,cchar *pfn)
 	        if (S_ISREG(sb.st_mode)) {
 		    const int	to = TO_LOCK ;
 	            if ((rs = lockend(mfd,TRUE,0,to)) >= 0) {
-		        offset_t	offstart, offend ;
+		        off_t	offstart, offend ;
 			int		cmd ;
 
 	                if ((rs = u_seeko(mfd,0L,SEEK_END,&offstart)) >= 0) {

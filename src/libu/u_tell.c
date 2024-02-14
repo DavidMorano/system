@@ -31,9 +31,9 @@
 /* exported subroutines */
 
 
-int u_tell(int fd,offset_t *rp)
+int u_tell(int fd,off_t *rp)
 {
-	offset_t	ro ;
+	off_t	ro ;
 	int		rs ;
 
 #if	CF_DEBUGS

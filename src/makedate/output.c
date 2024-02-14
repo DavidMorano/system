@@ -102,7 +102,7 @@ int output(PROGINFO *pip,cchar *ofname)
 	    ofname = BFILE_STDOUT ;
 
 	if ((rs = bopen(ofp,ofname,"wct",0666)) >= 0) {
-	    offset_t	offset ;
+	    off_t	offset ;
 
 	    if ((module != NULL) && (module[0] != '\0')) {
 	        rs = bprintf(ofp,"const char %s_makedate[] =\n\"",module) ;

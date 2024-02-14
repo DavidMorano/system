@@ -3276,7 +3276,7 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 
 	if (rs >= 0) {
 	    FILEBUF	fb ;
-	    offset_t	fboff = 0 ;
+	    off_t	fboff = 0 ;
 	    const int	bsize = lip->pagesize ;
 
 	    if ((rs = filebuf_start(&fb,sfd,fboff,bsize,0)) >= 0) {
@@ -4524,7 +4524,7 @@ static int procmsgbody(PROGINFO *pip,FILEBUF *fbp,int mi)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
-	offset_t	boff = 0 ;
+	off_t	boff = 0 ;
 	const int	xlen = 0x10000 ;
 	int		rs = SR_OK ;
 	int		bl ;
@@ -10013,7 +10013,7 @@ static int isHup(int rs)
 #if	CF_DEBUGOFF && (CF_DEBUG || CF_DEBUGS)
 static int debugfilebuf_printoff(FILEBUF *fbp,cchar *n,cchar *s,int wlen)
 {
-	offset_t	coff ;
+	off_t	coff ;
 	filebuf_tell(fbp,&coff) ;
 	debugprintf("%s: s=%s coff=%llu wlen=%u\n",n,s,coff,wlen) ;
 	return SR_OK ;

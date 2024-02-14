@@ -214,7 +214,7 @@ time_t		daytime ;
 bfile		*ofp ;
 {
 	struct ustat	sb ;
-	offset_t	boff ;
+	off_t	boff ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len ;
@@ -372,7 +372,7 @@ char		linebuf[] ;
 int		linelen ;
 {
 	struct ustat	sb ;
-	offset_t	boff ;
+	off_t	boff ;
 	int		rs = SR_OK ;
 	int		len, ml ;
 	int		wlen = 0 ;
@@ -539,8 +539,8 @@ const char	fname[] ;
 int		off ;
 {
 	struct ustat	sb ;
-	offset_t	boff ;
-	offset_t	offset ;
+	off_t	boff ;
+	off_t	offset ;
 	int		rs = SR_OK ;
 
 	if (op->f.open)

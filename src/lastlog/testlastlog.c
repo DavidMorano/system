@@ -50,7 +50,7 @@ int main(int argc,const char **argv,const char **envv)
 #endif
 
 	if ((rs = u_open(llfname,O_WRONLY,0666)) >= 0) {
-	    offset_t	eoff ;
+	    off_t	eoff ;
 	    const int	llsize = sizeof(struct lastlog) ;
 	    int		fd = rs ;
 	    char	lbuf[sizeof(struct lastlog)] ;

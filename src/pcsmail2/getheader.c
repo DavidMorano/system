@@ -124,7 +124,7 @@ char	*file, *from ;
 	for (i = 0 ; hinfo[i].type >= 0 ; i += 1) {
 
 	    if ((*hinfo[i].buf == '\0') &&
-	        ((l = mm_getfield(fp,(offset_t) 0,stat_mm.st_size,
+	        ((l = mm_getfield(fp,(off_t) 0,stat_mm.st_size,
 	        headers[hinfo[i].type],hinfo[i].buf,hinfo[i].blen)) >= 0)) {
 
 #if	CF_DEBUG

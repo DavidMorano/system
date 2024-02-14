@@ -31,9 +31,9 @@ check_for_login_inactivity(
 	int		fdl;
 	struct lastlog	ll;
 	int		retval;
-	offset_t	offset;
+	off_t	offset;
 
-	offset = (offset_t) pwd->pw_uid * (offset_t) sizeof (struct lastlog);
+	offset = (off_t) pwd->pw_uid * (off_t) sizeof (struct lastlog);
 
 	if ((fdl = open(LASTLOG, O_RDWR|O_CREAT, 0444)) >= 0) {
 		/*

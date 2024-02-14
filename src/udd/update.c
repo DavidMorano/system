@@ -59,7 +59,7 @@ int update()
 
 	struct tm	*timep, ts ;
 
-	offset_t	uflen ;
+	off_t	uflen ;
 
 	int	outcount ;
 	int	i, fd, len, l, rs ;

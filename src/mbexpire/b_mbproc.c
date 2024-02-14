@@ -275,14 +275,14 @@ static int	procmailbox(PROGINFO *,SHIO *,const char *,int) ;
 static int	procmailmsg(PROGINFO *,SHIO *,MBCACHE *,int,int,char *) ;
 
 static int	procout(PROGINFO *,SHIO *,int,char *,
-			MBCACHE_SCAN *,offset_t,int) ;
-static int	procouter(PROGINFO *,int,SHIO *,char *,offset_t,int) ;
+			MBCACHE_SCAN *,off_t,int) ;
+static int	procouter(PROGINFO *,int,SHIO *,char *,off_t,int) ;
 static int	procouthdrs(PROGINFO *,SHIO *,MBCACHE_SCAN *) ;
 static int	procouthdrstatus(PROGINFO *,SHIO *,MBCACHE_SCAN *) ;
 static int	procouthdrmid(PROGINFO *,SHIO *,MBCACHE_SCAN *) ;
 
-static int	procbase(PROGINFO *,int,char *,MBCACHE_SCAN *,offset_t,int) ;
-static int	procbaser(PROGINFO *,int,bfile *,char *,offset_t,int) ;
+static int	procbase(PROGINFO *,int,char *,MBCACHE_SCAN *,off_t,int) ;
+static int	procbaser(PROGINFO *,int,bfile *,char *,off_t,int) ;
 static int	procbasehdrs(PROGINFO *,bfile *,MBCACHE_SCAN *) ;
 static int	procbasehdrstatus(PROGINFO *,bfile *,MBCACHE_SCAN *) ;
 static int	procbasehdrmid(PROGINFO *,bfile *,MBCACHE_SCAN *) ;
@@ -1671,7 +1671,7 @@ char		*mbuf ;
 	if ((rs = mbcache_msginfo(mcp,mi,&msp)) >= 0) {
 	    const char	*mid = msp->vs[mbcachemf_hdrmid] ;
 	    if ((rs = locinfo_midseen(lip,mid,-1)) == 0) {
-	        offset_t	mo ;
+	        off_t	mo ;
 
 	        if ((rs = mbcache_msgoff(mcp,mi,&mo)) >= 0) {
 	            const int	ml = rs ;
@@ -1711,7 +1711,7 @@ SHIO		*ofp ;
 int		mfd ;
 char		mbuf[] ;
 MBCACHE_SCAN	*msp ;
-offset_t	mo ;
+off_t	mo ;
 int		ml ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1732,8 +1732,8 @@ int		ml ;
 #endif
 
 	    if ((stap == NULL) || (midp == NULL)) {
-	        const offset_t	ho = msp->hoff ;
-	        const offset_t	bo = msp->boff ;
+	        const off_t	ho = msp->hoff ;
+	        const off_t	bo = msp->boff ;
 	        const int	hl = msp->hlen ;
 	        const int	bl = msp->blen ;
 	        int		wl = ((ho+hl)-mo) ;
@@ -1774,7 +1774,7 @@ PROGINFO	*pip ;
 int		mfd ;
 SHIO		*ofp ;
 char		mbuf[] ;
-offset_t	mo ;
+off_t	mo ;
 int		ml ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1886,7 +1886,7 @@ PROGINFO	*pip ;
 int		mfd ;
 char		mbuf[] ;
 MBCACHE_SCAN	*msp ;
-offset_t	mo ;
+off_t	mo ;
 int		ml ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -1920,8 +1920,8 @@ int		ml ;
 #endif
 
 	    if ((stap == NULL) || (midp == NULL)) {
-	        const offset_t	ho = msp->hoff ;
-	        const offset_t	bo = msp->boff ;
+	        const off_t	ho = msp->hoff ;
+	        const off_t	bo = msp->boff ;
 	        const int	hl = msp->hlen ;
 	        const int	bl = msp->blen ;
 	        int		wl ;
@@ -1957,7 +1957,7 @@ PROGINFO	*pip ;
 int		mfd ;
 bfile		*yfp ;
 char		mbuf[] ;
-offset_t	mo ;
+off_t	mo ;
 int		ml ;
 {
 	LOCINFO		*lip = pip->lip ;

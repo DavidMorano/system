@@ -270,7 +270,7 @@ again:
 #endif
 
 	    dirslotp->ino = (ino_t) rdep->d_ino ;
-	    dirslotp->off = (offset_t) rdep->d_off ;
+	    dirslotp->off = (off_t) rdep->d_off ;
 	    dirslotp->reclen = (ushort) rdep->d_reclen ;
 	    rs = sncpy1(dirslotp->name,FSDIR_MAXNAMELEN,rdep->d_name) ;
 

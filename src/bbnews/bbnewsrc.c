@@ -183,7 +183,7 @@ int bbnewsrc_close(BBNEWSRC *ungp)
 /* if we were writing, write the trailer stuff */
 
 	if (ungp->f.wroteheader) {
-	    offset_t	off ;
+	    off_t	off ;
 	    bprintf(&ungp->nf,"\n\n") ;
 	    btell(&ungp->nf,&off) ;
 	    bcontrol(&ungp->nf,BC_TRUNCATE,off) ;

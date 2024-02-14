@@ -127,7 +127,7 @@ extern int	mkaddrname(char *,int,cchar *,int) ;
 extern int	mkdisphdr(char *,int,cchar *,int) ;
 extern int	mkbestfrom(char *,int,cchar *,int) ;
 extern int	mkcleanline(char *,int,int) ;
-extern int	mailmsg_loadfd(MAILMSG *,int,offset_t) ;
+extern int	mailmsg_loadfd(MAILMSG *,int,off_t) ;
 extern int	isOneOf(const int *,int) ;
 extern int	isNotPresent(int) ;
 
@@ -179,10 +179,10 @@ struct outinfo {
 
 /* forward references */
 
-static int	progcsmsger(PROGINFO *,int,offset_t,cchar *) ;
+static int	progcsmsger(PROGINFO *,int,off_t,cchar *) ;
 static int	proclogmsg(PROGINFO *,COMSATMSG_MO *) ;
 static int	procmsginfo(PROGINFO *,MAILMSG *,const char *) ;
-static int	procmsgbad(PROGINFO *,cchar *,offset_t,int) ;
+static int	procmsgbad(PROGINFO *,cchar *,off_t,int) ;
 static int	getdateinfo(PROGINFO *,char *,int,const char *,int,int) ;
 
 #if	CF_OUTINFO
@@ -308,7 +308,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 #endif /* CF_DEBUG */
 
 	            if ((rs = uc_open(mailfname,O_RDONLY,0666)) >= 0) {
-	                offset_t	fo = (offset_t) m0.offset ;
+	                off_t	fo = (off_t) m0.offset ;
 	                const int	mfd = rs ;
 	                const char	*un = m0.username ;
 
@@ -362,7 +362,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 /* local subroutines */
 
 
-static int progcsmsger(PROGINFO *pip,int mfd,offset_t fo,cchar *un)
+static int progcsmsger(PROGINFO *pip,int mfd,off_t fo,cchar *un)
 {
 	MAILMSG		mm ;
 	int		rs ;
@@ -584,7 +584,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 #endif /* CF_OUTINFO */
 
 
-static int procmsgbad(PROGINFO *pip,cchar *un,offset_t fo,int rsl)
+static int procmsgbad(PROGINFO *pip,cchar *un,off_t fo,int rsl)
 {
 	int		rs = SR_OK ;
 	cchar		*pn = pip->progname ;

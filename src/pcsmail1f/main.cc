@@ -131,7 +131,7 @@ char	*argv[] ;
 	struct address	*as_cc = NULL ;
 	struct address	*as_bcc = NULL ;
 
-	offset_t		offset ;
+	off_t		offset ;
 
 	int		len, rs, status ;
 	int		wstatus ;

@@ -55,7 +55,7 @@ extern int	bfile_flush(bfile *) ;
 /* exported subroutines */
 
 
-int btruncate(bfile *fp,offset_t off)
+int btruncate(bfile *fp,off_t off)
 {
 	int		rs = SR_OK ;
 

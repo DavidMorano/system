@@ -245,9 +245,9 @@ struct procdata {
 	PROCDATA_FL	f ;
 	MAILMSGMATENV	me ;
 	DATER		edate ;
-	offset_t	offset ;
-	offset_t	off_start, off_clen, off_body, off_finish ;
-	offset_t	off_clines ;
+	off_t	offset ;
+	off_t	off_start, off_clen, off_body, off_finish ;
+	off_t	off_clines ;
 	int		moff ;
 	int		mlen ;		/* message length (calculated) */
 	int		tlen ;		/* message length (calculated) */
@@ -419,7 +419,7 @@ vecstr		*nlp ;
 {
 	PROCDATA	pd, *pdp = &pd ;
 	BFLINER		*blp ;
-	offset_t	boff ;
+	off_t	boff ;
 	const int	llen = MSGLINELEN ;
 	int		rs ;
 	int		vi ;
@@ -1951,7 +1951,7 @@ PROCDATA	*pdp ;
 	}
 
 	if (rs >= 0) {
-	    offset_t	coff ;
+	    off_t	coff ;
 	    btell(pdp->tfp,&coff) ;
 	    pdp->off_clen = coff ;
 	    rs = bprintf(pdp->tfp,"%t\n",blanks,NBLANKS) ;
@@ -1991,7 +1991,7 @@ PROCDATA	*pdp ;
 	    }
 
 	    if (rs >= 0) {
-	        offset_t	coff ;
+	        off_t	coff ;
 	        btell(pdp->tfp,&coff) ;
 	        pdp->off_clines = coff ;
 	        rs = bprintf(pdp->tfp,"%t\n",blanks,NBLANKS) ;
@@ -2960,7 +2960,7 @@ PROCDATA	*pdp ;
 {
 	ARTICLE		*aip = pdp->aip ;
 	MAILMSG		*msgp = pdp->msgp ;
-	offset_t	coff ;
+	off_t	coff ;
 	int		rs = SR_OK ;
 
 #if	CF_DEBUG

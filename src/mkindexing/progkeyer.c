@@ -172,8 +172,8 @@ cchar		*fname ;
 	if ((rs = bopen(ifp,fname,"r",0666)) >= 0) {
 	    FIELD	fsb ;
 	    HDB		keydb ;
-	    offset_t	offset = 0 ;
-	    offset_t	recoff = 0 ;
+	    off_t	offset = 0 ;
+	    off_t	recoff = 0 ;
 	    uint	reclen = 0 ;
 	    const int	llen = LINEBUFLEN ;
 	    int		len ;

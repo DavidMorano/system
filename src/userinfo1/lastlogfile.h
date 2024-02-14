@@ -46,7 +46,7 @@ struct lastlogfile_c {
 struct lastlogfile_head {
 	uint		magic ;
 	const char	*fname ;	/* stored file name */
-	offset_t	fsize ;		/* file size */
+	off_t	fsize ;		/* file size */
 	time_t		otime ;		/* open time (for FD caching) */
 	time_t		mtime ;		/* last modification time */
 	int		pagesize ;

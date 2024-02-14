@@ -166,8 +166,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 struct liner {
 	FILEBUF		mfb ;
-	offset_t	poff ;		/* file-offset previous */
-	offset_t	foff ;		/* file-offset current */
+	off_t	poff ;		/* file-offset previous */
+	off_t	foff ;		/* file-offset current */
 	int		to ;		/* read time-out */
 	int		f_net ;		/* regular file */
 	int		llen ;
@@ -188,7 +188,7 @@ struct msgentry_flags {
 struct msgentry {
 	MSGENTRY_FL	f, hdr ;
 	MAILMSG		m ;
-	offset_t	boff ;		/* w/ tmpfile */
+	off_t	boff ;		/* w/ tmpfile */
 	int		blen ;		/* w/ tmpfile */
 	int		clen ;		/* supplied or calculated */
 	int		clines ;	/* supplied or calculated */
@@ -221,11 +221,11 @@ static int	msgentry_getclines(MSGENTRY *) ;
 static int	msgentry_setclines(MSGENTRY *,int) ;
 static int	msgentry_getclen(MSGENTRY *) ;
 static int	msgentry_setclen(MSGENTRY *,int) ;
-static int	msgentry_setoff(MSGENTRY *,offset_t) ;
+static int	msgentry_setoff(MSGENTRY *,off_t) ;
 static int	msgentry_setlen(MSGENTRY *,int) ;
 static int	mailentry_gethdrnum(MSGENTRY *,const char *) ;
 
-static int liner_start(LINER *,int,offset_t,int) ;
+static int liner_start(LINER *,int,off_t,int) ;
 static int liner_finish(LINER *) ;
 static int liner_readline(LINER *,cchar **) ;
 static int liner_done(LINER *) ;
@@ -641,7 +641,7 @@ int mailmsgstage_flags(MAILMSGSTAGE *op,int mi)
 /* end subroutine (mailmsgstage_flags) */
 
 
-int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,offset_t boff,cchar **bpp)
+int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,off_t boff,cchar **bpp)
 {
 	int		rs = SR_OK ;
 	int		ml = 0 ;
@@ -669,7 +669,7 @@ int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,offset_t boff,cchar **bpp)
 	    MSGENTRY	*mep ;
 	    if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
 	        if (boff < mep->blen) {
-	            offset_t	moff = (mep->boff + boff) ;
+	            off_t	moff = (mep->boff + boff) ;
 	            ml = (mep->blen - boff) ;
 	            if (bpp != NULL)
 	                *bpp = (op->mapdata + moff) ;
@@ -686,7 +686,7 @@ int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,offset_t boff,cchar **bpp)
 /* end subroutine (mailmsgstage_bodyget) */
 
 
-int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,offset_t boff,
+int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,off_t boff,
 		char *bbuf,int blen)
 {
 	int		rs ;
@@ -716,7 +716,7 @@ int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,offset_t boff,
 static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 {
 	FILEBUF		tfb ;
-	const offset_t	ostart = 0L ;
+	const off_t	ostart = 0L ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
@@ -1275,7 +1275,7 @@ static int msgentry_setclines(MSGENTRY *mep,int clines)
 /* end subroutine (msgentry_setclines) */
 
 
-static int msgentry_setoff(MSGENTRY *mep,offset_t boff)
+static int msgentry_setoff(MSGENTRY *mep,off_t boff)
 {
 
 	mep->boff = boff ;
@@ -1322,7 +1322,7 @@ static int mailentry_gethdrnum(MSGENTRY *mep,cchar *kn)
 /* end subroutine (msgentry_gethdrnum) */
 
 
-static int liner_start(LINER *lsp,int mfd,offset_t foff,int to)
+static int liner_start(LINER *lsp,int mfd,off_t foff,int to)
 {
 	struct ustat	sb ;
 	int		rs ;

@@ -129,7 +129,7 @@ extern int	snwcpy(char *,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,uint,uint *) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	mailmsg_loadmb(MAILMSG *,MAILBOX *,offset_t) ;
+extern int	mailmsg_loadmb(MAILMSG *,MAILBOX *,off_t) ;
 extern int	hdrextid(char *,int,const char *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	mkaddrname(char *,int,cchar *,int) ;
@@ -730,7 +730,7 @@ int mbcache_msgsetlines(MBCACHE *op,int mi,int vlines)
 
 
 /* get the file offset to the start-envelope of a message */
-int mbcache_msgoff(MBCACHE *op,int mi,offset_t *rp)
+int mbcache_msgoff(MBCACHE *op,int mi,off_t *rp)
 {
 	MBCACHE_SCAN	*mep ;
 	int		rs = SR_OK ;
@@ -1213,7 +1213,7 @@ static int msgentry_load(MSGENTRY *mep,MBCACHE *op)
 	    mep->f.info = TRUE ;
 	    if ((rs = mailmsg_start(&m)) >= 0) {
 	        MAILBOX		*mbp = op->mbp ;
-	        offset_t	mbo = mep->moff ;
+	        off_t	mbo = mep->moff ;
 #if	CF_DEBUGS
 	        debugprintf("mbcache_load: mbo=%llu\n",mbo) ;
 #endif

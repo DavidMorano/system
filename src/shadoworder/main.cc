@@ -105,7 +105,7 @@ struct userword {
 	const char	*up ;
 	int		ul ;
 	int		line ;
-	offset_t	uo ;
+	off_t	uo ;
 } ;
 
 enum pwfields {

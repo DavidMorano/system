@@ -74,7 +74,7 @@ extern int	opentmpfile(const char *,int,mode_t,char *) ;
 /* local structures */
 
 struct fblock {
-	offset_t	start ;
+	off_t	start ;
 	int		len ;
 } ;
 
@@ -99,7 +99,7 @@ const char	fname[] ;
 {
 	struct ustat	sb ;
 
-	offset_t	moff ;
+	off_t	moff ;
 
 	bfile	tmpfile ;
 

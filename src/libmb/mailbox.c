@@ -111,7 +111,7 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,uint,uint *) ;
 extern int	mailmsgmathdr(const char *,int,int *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	tmpmailboxes(char *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	lockend(int,int,int,int) ;
@@ -140,8 +140,8 @@ extern char	*strnchr(const char *,int,int) ;
 
 struct liner {
 	FILEBUF		*fbp ;
-	offset_t	poff ;			/* file-offset previous */
-	offset_t	foff ;			/* file-offset current */
+	off_t	poff ;			/* file-offset previous */
+	off_t	foff ;			/* file-offset current */
 	int		to ;			/* read time-out */
 	int		llen ;
 	char		lbuf[LINEBUFLEN + 1] ;
@@ -154,7 +154,7 @@ struct sigstate {
 
 struct msgcopy {
 	FILEBUF		*fbp ;
-	offset_t	moff ;
+	off_t	moff ;
 	char		*bp ;
 	int		bl ;
 } ;
@@ -187,11 +187,11 @@ static int mailbox_rewriter(MAILBOX *,int) ;
 static int mailbox_msgcopy(MAILBOX *,MSGCOPY *,MAILBOX_MSGINFO *) ;
 static int mailbox_msgcopyadd(MAILBOX *,MSGCOPY *,MAILBOX_MSGINFO *) ;
 
-static int msginfo_start(MAILBOX_MSGINFO *,offset_t,int) ;
+static int msginfo_start(MAILBOX_MSGINFO *,off_t,int) ;
 static int msginfo_finish(MAILBOX_MSGINFO *) ;
 static int msginfo_setenv(MAILBOX_MSGINFO *,MAILMSGMATENV *) ;
 
-static int liner_start(LINER *,FILEBUF *,offset_t,int) ;
+static int liner_start(LINER *,FILEBUF *,off_t,int) ;
 static int liner_finish(LINER *) ;
 static int liner_read(LINER *,cchar **) ;
 static int liner_done(LINER *) ;
@@ -290,7 +290,7 @@ int mailbox_open(MAILBOX *mbp,cchar *mbfname,int mflags) noex {
 	                if ((rs = vecobj_start(&mbp->msgs,es,10,vo)) >= 0) {
 	                    const int	to = mbp->to_lock ;
 	                    if ((rs = lockend(mbp->mfd,TRUE,1,to)) >= 0) {
-	                        offset_t	loff ;
+	                        off_t	loff ;
 	                        if ((rs = mailbox_parse(mbp)) >= 0) {
 	                            nmsgs = mbp->msgs_total ;
 	                            mbp->magic = MAILBOX_MAGIC ;
@@ -526,7 +526,7 @@ int mailbox_countdel(MAILBOX *mbp)
 
 
 /* get the file offset to the start-envelope of a message */
-int mailbox_msgoff(MAILBOX *mbp,int mi,offset_t *offp)
+int mailbox_msgoff(MAILBOX *mbp,int mi,off_t *offp)
 {
 	MAILBOX_MSGINFO	*mp ;
 	int		rs ;
@@ -624,7 +624,7 @@ int mailbox_msghdradd(MAILBOX *mbp,int mi,cchar *k,cchar *vp,int vl)
 /* end subroutine (mailbox_msghdradd) */
 
 
-int mailbox_readbegin(MAILBOX *mbp,MAILBOX_READ *curp,offset_t foff,int rsize)
+int mailbox_readbegin(MAILBOX *mbp,MAILBOX_READ *curp,off_t foff,int rsize)
 {
 	int		rs ;
 	char		*p ;
@@ -698,7 +698,7 @@ int mailbox_readline(MAILBOX *mbp,MAILBOX_READ *curp,char *lbuf,int llen)
 #endif
 
 	    if (curp->rlen == 0) {
-	        offset_t	po = (curp->roff+tlen) ;
+	        off_t	po = (curp->roff+tlen) ;
 	        curp->rbp = curp->rbuf ;
 	        rs = u_pread(mfd,curp->rbuf,curp->rsize,po) ;
 	        if (rs >= 0) {
@@ -764,7 +764,7 @@ static int mailbox_parse(MAILBOX *mbp)
 {
 	LINER		ls, *lsp = &ls ;
 	FILEBUF		fb ;
-	const offset_t	soff = 0L ;
+	const off_t	soff = 0L ;
 	const int	bsize = (32 * mbp->pagesize) ;
 	int		rs ;
 	int		rs1 ;
@@ -1349,7 +1349,7 @@ static int mailbox_rewriter(MAILBOX *mbp,int tfd)
 	MSGCOPY		mc ;
 	MAILBOX_MSGINFO	*mip ;
 	FILEBUF		fb, *fbp = &fb ;
-	offset_t	mbchange = -1 ;
+	off_t	mbchange = -1 ;
 	const int	pagesize = mbp->pagesize ;
 	int		rs ;
 	int		bsize ;
@@ -1534,7 +1534,7 @@ static int mailbox_msgcopyadd(MAILBOX *mbp,MSGCOPY *mcp,MAILBOX_MSGINFO *mip)
 /* end subroutine (mailbox_msgcopyadd) */
 
 
-static int msginfo_start(MAILBOX_MSGINFO *mp,offset_t off,int mi)
+static int msginfo_start(MAILBOX_MSGINFO *mp,off_t off,int mi)
 {
 
 	memset(mp,0,sizeof(MAILBOX_MSGINFO)) ;
@@ -1589,7 +1589,7 @@ static int msginfo_setenv(MAILBOX_MSGINFO *msgp,MAILMSGMATENV *mep)
 /* end subroutine (msginfo_setenv) */
 
 
-static int liner_start(LINER *lsp,FILEBUF *fbp,offset_t foff,int to)
+static int liner_start(LINER *lsp,FILEBUF *fbp,off_t foff,int to)
 {
 
 	lsp->poff = 0 ;

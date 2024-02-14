@@ -88,7 +88,7 @@ extern uint	uceil(uint,uint) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	msleep(uint) ;
 extern int	isfsremote(int) ;
 
@@ -646,7 +646,7 @@ static int fmq_isend(FMQ *op,const void *buf,int buflen,int opts)
 {
 	struct iovec	v[3] ;
 	sigset_t	oldsigmask ;
-	offset_t	uoff ;
+	off_t	uoff ;
 	time_t		dt = time(NULL) ;
 	uint		eoff ;
 	uint		llen, dlen, len ;
@@ -807,7 +807,7 @@ static int fmq_irecv(FMQ *op,void *buf,int buflen,int opts)
 	struct iovec	v[3] ;
 	struct ustat	sb ;
 	sigset_t	oldsigmask ;
-	offset_t	uoff ;
+	off_t	uoff ;
 	time_t		dt = 0 ;
 	uint		eoff ;
 	uint		llen, dlen, mlen, len ;
@@ -1492,7 +1492,7 @@ static int fmq_lockget(FMQ *op,time_t dt,int f_read)
 #endif
 
 	{
-	    offset_t	fs = op->filesize ;
+	    off_t	fs = op->filesize ;
 	    rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
 	}
 
@@ -1530,7 +1530,7 @@ static int fmq_lockrelease(FMQ *op)
 
 	if ((op->f.readlocked || op->f.writelocked)) {
 	    if (op->fd >= 0) {
-		offset_t	fs = op->filesize ;
+		off_t	fs = op->filesize ;
 	        rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
 	    }
 	    op->f.readlocked = FALSE ;
@@ -1586,7 +1586,7 @@ int fmq_fileclose(FMQ *op)
 /* write out the file header */
 static int fmq_headwrite(FMQ *op)
 {
-	offset_t	uoff ;
+	off_t	uoff ;
 	int		rs ;
 	int		bl ;
 	char		fbuf[FBUFLEN + 1] ;

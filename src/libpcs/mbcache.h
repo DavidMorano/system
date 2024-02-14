@@ -93,9 +93,9 @@ struct mbcache_scan {
 	MBCACHE_SFLAGS	hdr, hdrval, proc, f ;
 	DATE		edate ;		/* date-envelope */
 	DATE		hdate ;		/* date-header */
-	offset_t	moff ;		/* offset message start (envelope) */
-	offset_t	hoff ;		/* offset message headers */
-	offset_t	boff ;		/* offset message body */
+	off_t	moff ;		/* offset message start (envelope) */
+	off_t	hoff ;		/* offset message headers */
+	off_t	boff ;		/* offset message body */
 	time_t		etime ;		/* time-envelope */
 	time_t		htime ;		/* time-header */
 	int		vl[mbcachemf_overlast] ;
@@ -135,7 +135,7 @@ extern int mbcache_mbinfo(MBCACHE *,MBCACHE_INFO *) ;
 extern int mbcache_count(MBCACHE *) ;
 extern int mbcache_countdel(MBCACHE *) ;
 extern int mbcache_sort(MBCACHE *) ;
-extern int mbcache_msgoff(MBCACHE *,int,offset_t *) ;
+extern int mbcache_msgoff(MBCACHE *,int,off_t *) ;
 extern int mbcache_msglines(MBCACHE *,int,int *) ;
 extern int mbcache_msginfo(MBCACHE *,int,MBCACHE_SCAN **) ;
 extern int mbcache_msgscan(MBCACHE *,int,MBCACHE_SCAN **) ;

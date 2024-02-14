@@ -95,7 +95,7 @@ extern struct proginfo	g ;
 
 int mm_getfield(mfp,moff,mlen,h,fvalue,buflen)
 bfile		*mfp ;
-offset_t	moff ;
+off_t	moff ;
 int		mlen ;
 const char	h[] ;
 char		fvalue[] ;

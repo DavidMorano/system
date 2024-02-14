@@ -138,9 +138,9 @@ struct dargs {
 /* forward references */
 
 static int mailmsgfile_mk(MAILMSGFILE *,const char *,const char *,int,
-			offset_t,int) ;
+			off_t,int) ;
 static int mailmsgfile_mkdis(MAILMSGFILE *,MAILMSGFILE_MI *,
-			int,int,offset_t) ;
+			int,int,off_t) ;
 static int mailmsgfile_proclines(MAILMSGFILE *,MAILMSGFILE_MI *,
 			FILEBUF *,const char *,int) ;
 
@@ -263,7 +263,7 @@ MAILMSGFILE	*op ;
 int		type ;
 const char	msgid[] ;
 int		mfd ;
-offset_t	boff ;
+off_t	boff ;
 int		blen ;
 {
 	HDB_DATUM	key, val ;
@@ -376,7 +376,7 @@ MAILMSGFILE	*op ;
 const char	msgid[] ;
 const char	infname[] ;
 int		mfd ;
-offset_t	boff ;
+off_t	boff ;
 int		blen ;
 {
 	MAILMSGFILE_MI	mi ;
@@ -451,7 +451,7 @@ MAILMSGFILE	*op ;
 static int mailmsgfile_mkdis(op,mip,tfd,mfd,boff)
 MAILMSGFILE	*op ;
 MAILMSGFILE_MI	*mip ;
-offset_t	boff ;
+off_t	boff ;
 int		tfd ;
 int		mfd ;
 {

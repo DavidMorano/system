@@ -129,7 +129,7 @@ const char	mailbox[] ;
 	struct ustat	sb ;
 	bfile		afile, *afp = &afile ;
 	bfile		mfile, *mfp = &mfile ;
-	offset_t	offset ;
+	off_t	offset ;
 	time_t		t ;
 	long		flen ;
 	const int	llen = LINEBUFLEN ;

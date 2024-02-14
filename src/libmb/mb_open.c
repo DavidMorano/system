@@ -122,8 +122,8 @@ int		oflag ;
 
 	bfile	ifile, *ifp = &ifile ;
 
-	offset_t	maillen ;
-	offset_t	offset ;	/* keeps track of location in file */
+	off_t	maillen ;
+	off_t	offset ;	/* keeps track of location in file */
 
 	int	rs, i ;
 	int	iclen, clen, clines ;
@@ -484,7 +484,7 @@ checkindex:
 
 	                baseline = - clines ;
 	                offset += clen ;
-	                bseek(mbp->mfp,(offset_t) clen,SEEK_CUR) ;
+	                bseek(mbp->mfp,(off_t) clen,SEEK_CUR) ;
 
 #if	CF_DEBUG
 	                if (BATST(UOV_CF_DEBUG,g.uo)) debugprintf(
@@ -496,7 +496,7 @@ checkindex:
 
 	                baseline = 0 ;
 	                offset += clen ;
-	                bseek(mbp->mfp,(offset_t) clen,SEEK_CUR) ;
+	                bseek(mbp->mfp,(off_t) clen,SEEK_CUR) ;
 
 #if	CF_DEBUG
 	                if (BATST(UOV_CF_DEBUG,g.uo)) debugprintf(

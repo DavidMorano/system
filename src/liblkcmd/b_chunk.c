@@ -97,7 +97,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	readignore(int,offset_t) ;
+extern int	readignore(int,off_t) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -140,15 +140,15 @@ struct locinfo {
 	PROGINFO	*pip ;
 	cchar		*prefix ;
 	cchar		*suffix ;
-	offset_t	chunklen ;
-	offset_t	off_begin ;
-	offset_t	off_end ;
+	off_t	chunklen ;
+	off_t	off_begin ;
+	off_t	off_end ;
 	int		ps ;
 	int		acount ;
 } ;
 
 struct procout {
-	offset_t	lenrem ;
+	off_t	lenrem ;
 	int		ofd ;
 } ;
 
@@ -1041,11 +1041,11 @@ static int procdata(PROGINFO *pip,PROCOUT *pop,int ifd)
 	        rlen = BCEIL(msize,lip->ps) ;
 	    }
 	    if ((rs = uc_valloc(rlen,&rbuf)) >= 0) {
-	        offset_t	inoff = 0 ;
-	        offset_t	eoff = lip->off_end ;
+	        off_t	inoff = 0 ;
+	        off_t	eoff = lip->off_end ;
 
 	        if (lip->off_begin > 0) {
-	            offset_t	soff = lip->off_begin ;
+	            off_t	soff = lip->off_begin ;
 	            if (S_ISREG(sb.st_mode)) {
 	                rs = u_seek(ifd,soff,SEEK_SET) ;
 	            } else {

@@ -372,7 +372,7 @@ int		ifd, ofd ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {
-	    offset_t	offset ;
+	    off_t	offset ;
 	    u_tell(ofd,&offset) ;
 	    debugprintf("encode: writing key offset=%lld\n",offset) ;
 	}

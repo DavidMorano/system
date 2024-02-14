@@ -176,7 +176,7 @@ const char	mailuser[] ;
 	struct modinfo	mi, *mip = &mi ;
 	struct ustat	sf ;
 	time_t		starttime ;
-	offset_t	offset ;
+	off_t	offset ;
 	const int	pm = (R_OK|W_OK) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -673,8 +673,8 @@ int		mfd ;
 
 	if ((rs = bopen(&mfile,mailfname,"rw",0666)) >= 0) {
 	    if ((rs = bcontrol(&mfile,BC_LOCK,to)) >= 0) {
-		offset_t	off = 0 ;
-		offset_t	off_mail = 0 ;
+		off_t	off = 0 ;
+		off_t	off_mail = 0 ;
 		const int	llen = LINEBUFLEN ;
 	        const int	fl = MAILSPOOL_FORWARDEDLEN ;
 		int		cl ;

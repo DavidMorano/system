@@ -131,7 +131,7 @@ vecstr		*elp ;
 {
 	bfile	infile, *ifp = &infile ;
 
-	offset_t	fsize ;
+	off_t	fsize ;
 
 	time_t	daytime = 0 ;
 

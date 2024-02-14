@@ -130,7 +130,7 @@ struct mailbox	*mbp ;
 
 	sigset_t	oldsigmask, newsigmask ;
 
-	offset_t	offset ;
+	off_t	offset ;
 
 	long	mlen ;
 
@@ -353,9 +353,9 @@ struct mailbox	*mbp ;
 	    chmod(mbp->mailfile,permit) ;
 
 #ifdef	COMMENT
-	    lseek(tfd,(offset_t) 0,SEEK_SET) ;
+	    lseek(tfd,(off_t) 0,SEEK_SET) ;
 
-	    lseek(mfd,(offset_t) 0,SEEK_SET) ;
+	    lseek(mfd,(off_t) 0,SEEK_SET) ;
 
 	    rs = FALSE ;
 	    while ((len = read(tfd,buf,MB_COPYLEN)) > 0) {

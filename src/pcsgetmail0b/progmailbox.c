@@ -77,7 +77,7 @@
 
 /* external subroutines */
 
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	lockend(int,int,int,int) ;
 extern int	progspool(PROGINFO *,int,vecstr *,cchar *,cchar *) ;
 
@@ -112,7 +112,7 @@ int		f_lock ;
 #endif
 
 	if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
-	    offset_t	moff ;
+	    off_t	moff ;
 
 /* lock the user's mailbox file */
 

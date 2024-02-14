@@ -150,7 +150,7 @@ struct vecelem	*slp ;
 
 	time_t		daytime ;
 
-	offset_t		offset ;
+	off_t		offset ;
 
 	int	rs, i ;
 	int	len, l ;
@@ -240,7 +240,7 @@ struct jobentry	*jep ;
 struct ustat	*sbp ;
 struct vecelem	*slp ;
 bfile		*ifp ;
-offset_t		offset ;
+off_t		offset ;
 char	linebuf[] ;
 int	linelen ;
 {

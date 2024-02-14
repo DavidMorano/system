@@ -60,7 +60,7 @@
 
 /* external subroutines */
 
-extern int	bfile_pagein(bfile *,offset_t,int) ;
+extern int	bfile_pagein(bfile *,off_t,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;

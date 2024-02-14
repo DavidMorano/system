@@ -1651,7 +1651,7 @@ static int babycalcs_shmaddwrite(op,fd)
 BABYCALCS	*op ;
 int		fd ;
 {
-	offset_t	tbloff ;
+	off_t	tbloff ;
 
 	uint	*hwp ;
 

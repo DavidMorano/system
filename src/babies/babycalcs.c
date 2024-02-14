@@ -1431,7 +1431,7 @@ static int babycalcs_shmupdate(BABYCALCS *op,time_t dt,USTAT *sbp,int fd)
 
 static int babycalcs_shmaddwrite(BABYCALCS *op,int fd)
 {
-	offset_t	tbloff ;
+	off_t	tbloff ;
 	uint		*hwp ;
 	const int	es = sizeof(BABYCALCS_ENT) ;
 	int		rs ;

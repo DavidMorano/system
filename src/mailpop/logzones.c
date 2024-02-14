@@ -124,7 +124,7 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	isfsremote(int) ;
 extern int	isdigitlatin(int) ;
 
@@ -683,7 +683,7 @@ static int logzones_lockget(LOGZONES *op,time_t dt,int f_read)
 #endif
 
 	if (rs >= 0) {
-	    offset_t	fs = op->filesize ;
+	    off_t	fs = op->filesize ;
 	    const int	to = TO_LOCK ;
 	    int		cmd ;
 

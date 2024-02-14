@@ -33,7 +33,7 @@ typedef int             cnt_t;
 typedef	long		time_t;
 typedef int             label_t[14];
 typedef unsigned short          dev_t;
-typedef	long		offset_t;
+typedef	long		off_t;
 typedef	long		paddr_t;
 typedef	long		key_t;
 typedef longlong_t     cpu_t;         /* cpu time as stored by STPT */

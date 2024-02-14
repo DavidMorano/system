@@ -3586,7 +3586,7 @@ FSDIRTREE_STAT	*sbp ;
 	                    fsize,rs) ;
 #endif
 	            if ((rs >= 0) && (len != INT_MAX) && (len < fsize)) {
-	                offset_t	uoff = len ;
+	                off_t	uoff = len ;
 	                rs = uc_ftruncate(dfd,uoff) ;
 	            }
 	            u_close(sfd) ;

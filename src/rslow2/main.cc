@@ -161,7 +161,7 @@ char	*argv[] ;
 
 	struct netrc	*mp ;
 
-	offset_t	clen ;
+	off_t	clen ;
 
 	pid_t	cpid ;
 

@@ -22,7 +22,7 @@ extern "C" {
 
 extern int keys_begin(PROGINFO *,HDB *,int) ;
 extern int keys_add(PROGINFO *,HDB *,const char *,int) ;
-extern int keys_end(PROGINFO *,HDB *,bfile *,PTM *,cchar *,offset_t,int) ;
+extern int keys_end(PROGINFO *,HDB *,bfile *,PTM *,cchar *,off_t,int) ;
 
 #ifdef	__cplusplus
 }

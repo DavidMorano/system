@@ -50,7 +50,7 @@ extern int	cgi_printline(CGI *,cchar *,int) noex ;
 extern int	cgi_vprintf(CGI *,cchar *,va_list) noex ;
 extern int	cgi_printf(CGI *,cchar *,...) noex ;
 extern int	cgi_putc(CGI *,int) noex ;
-extern int	cgi_seek(CGI *,offset_t,int) noex ;
+extern int	cgi_seek(CGI *,off_t,int) noex ;
 extern int	cgi_flush(CGI *) noex ;
 extern int	cgi_reserve(CGI *,int) noex ;
 

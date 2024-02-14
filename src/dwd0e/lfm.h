@@ -56,9 +56,9 @@ struct lfm_c {
 struct lfm_head {
 	uint		magic ;
 	const char	*lockfname ;	/* file name (processed) */
-	offset_t	odate ;		/* offset to date */
-	offset_t	orewind ;	/* offset to start of write area */
-	offset_t	owrite ;	/* offset past last write */
+	off_t	odate ;		/* offset to date */
+	off_t	orewind ;	/* offset to start of write area */
+	off_t	owrite ;	/* offset past last write */
 	ino64_t		ino ;
 	dev_t		dev ;
 	time_t		ti_check ;	/* last check on lock */

@@ -63,7 +63,7 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 
 /* forward references */
 
-int	keys_ender(PROGINFO *,HDB *,bfile *,PTM *,cchar *,offset_t,int) ;
+int	keys_ender(PROGINFO *,HDB *,bfile *,PTM *,cchar *,off_t,int) ;
 
 
 /* local variables */
@@ -141,7 +141,7 @@ HDB		*dbp ;
 bfile		*ofp ;
 PTM		*omp ;
 const char	fname[] ;
-offset_t	recoff ;
+off_t	recoff ;
 int		reclen ;
 {
 	int		rs ;
@@ -180,7 +180,7 @@ HDB		*dbp ;
 bfile		*ofp ;
 PTM		*omp ;
 const char	fname[] ;
-offset_t	recoff ;
+off_t	recoff ;
 int		reclen ;
 {
 	int		rs = SR_OK ;

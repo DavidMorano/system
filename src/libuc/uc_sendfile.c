@@ -48,7 +48,7 @@
 /* exported subroutines */
 
 
-int uc_sendfile(int ofd,int ifd,offset_t *offp,int wlen)
+int uc_sendfile(int ofd,int ifd,off_t *offp,int wlen)
 {
 	off_t		fo ;
 	int		rs = SR_OK ;
@@ -64,7 +64,7 @@ int uc_sendfile(int ofd,int ifd,offset_t *offp,int wlen)
 	    len = (ss & INT_MAX) ;
 	} until (rs != SR_INTR) ;
 
-	*offp = (offset_t) fo ;
+	*offp = (off_t) fo ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uc_sendfile) */

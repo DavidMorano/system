@@ -55,7 +55,7 @@
 
 /* external subroutines */
 
-extern int	uc_ftruncate64(int,offset_t) ;
+extern int	uc_ftruncate64(int,off_t) ;
 
 extern int	cfdecmfui(const char *,int,int *) ;
 
@@ -196,7 +196,7 @@ ULONG		trunclen ;
 	    debugprintf("process: truncating to len=%llu\n",flen) ;
 #endif
 
-	    rs = uc_ftruncate64(fd,(offset_t) flen) ;
+	    rs = uc_ftruncate64(fd,(off_t) flen) ;
 
 #if	CF_DEBUG
 	if (pip->debuglevel >= 3)

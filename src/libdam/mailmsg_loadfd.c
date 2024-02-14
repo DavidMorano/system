@@ -89,7 +89,7 @@ extern char	*strnchr(const char *,int,int) ;
 /* exported subroutines */
 
 
-int mailmsg_loadfd(MAILMSG *mmp,int mfd,offset_t fbo)
+int mailmsg_loadfd(MAILMSG *mmp,int mfd,off_t fbo)
 {
 	FILEBUF		b ;
 	const int	bsize = 2048 ;

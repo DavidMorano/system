@@ -523,7 +523,7 @@ int pingstatdb_uptime(PINGSTATDB *psp,cchar *hostname,PINGSTATDB_UP *up)
 {
 	PINGSTATDB_REC	e, *rp ;
 	DATER		cd, ud, *cdp ;
-	offset_t	boff ;
+	off_t	boff ;
 	const time_t	daytime = time(NULL) ;
 	time_t		ptime = 0 ;
 	uint		timestamp ;
@@ -933,7 +933,7 @@ int		f_up ;
 time_t		timestamp ;
 {
 	PINGSTATDB_REC	*rp ;
-	offset_t	boff ;
+	off_t	boff ;
 	int		rs ;
 	int		f_changed = FALSE ;
 

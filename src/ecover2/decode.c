@@ -130,7 +130,7 @@ int		ifd, ofd ;
 	CKSUM		filesum, msgsum ;
 #endif
 
-	offset_t	offset ;
+	off_t	offset ;
 	time_t		filetime ;
 	time_t		msgtime ;
 	uint		val ;
@@ -264,7 +264,7 @@ int		ifd, ofd ;
 #endif
 
 	if ((! S_ISREG(sb.st_mode)) || 
-	    (u_seek(ofd,(offset_t) 0,SEEK_SET) < 0) ||
+	    (u_seek(ofd,(off_t) 0,SEEK_SET) < 0) ||
 	    (! (oflags & O_RDWR))) {
 
 	    char	infname[MAXPATHLEN + 2] ;
@@ -357,7 +357,7 @@ int		ifd, ofd ;
 
 /* don't bother writing anything for the first block yet, just skip */
 
-	    u_seek(sfd,(offset_t) BLOCKLEN,SEEK_SET) ;
+	    u_seek(sfd,(off_t) BLOCKLEN,SEEK_SET) ;
 
 /* process the rest of the input file */
 
@@ -528,7 +528,7 @@ int		ifd, ofd ;
 
 #if	CF_UNIFIED
 
-	    u_seek(ofd,(offset_t) 0,SEEK_SET) ;
+	    u_seek(ofd,(off_t) 0,SEEK_SET) ;
 
 	    decode_proc(pip,&ms,(char *) first,BLOCKLEN) ;
 
@@ -562,7 +562,7 @@ int		ifd, ofd ;
 	    cksum_accum(&filesum,first,len) ;
 
 	    tlen += rlen ;
-	    u_seek(ofd,(offset_t) 0,SEEK_SET) ;
+	    u_seek(ofd,(off_t) 0,SEEK_SET) ;
 
 	    if (rs >= 0)
 	        rs = u_write(ofd,first,len) ;
@@ -572,7 +572,7 @@ int		ifd, ofd ;
 #if	CF_UNIFIED
 
 	    if (sfd != ofd) {
-	        u_seek(sfd,(offset_t) BLOCKLEN,SEEK_SET) ;
+	        u_seek(sfd,(off_t) BLOCKLEN,SEEK_SET) ;
 	    }
 
 	    while ((ms.main.tlen < ms.main.msglen) ||
@@ -628,7 +628,7 @@ int		ifd, ofd ;
 	                rs) ;
 #endif
 
-	        u_seek(sfd,(offset_t) 0,SEEK_SET) ;
+	        u_seek(sfd,(off_t) 0,SEEK_SET) ;
 
 	        for (i = 0 ; i < datablocks ; i += 1) {
 
@@ -651,7 +651,7 @@ int		ifd, ofd ;
 	    } /* end if (needed a "stage" file) */
 
 	    if (sfd == ofd) {
-	        uc_ftruncate(ofd,(offset_t) filelen) ;
+	        uc_ftruncate(ofd,(off_t) filelen) ;
 	    }
 
 #else /* CF_UNIFIED */
@@ -728,7 +728,7 @@ int		ifd, ofd ;
 	            debugprintf("decode: truncating output file\n") ;
 #endif
 
-	        uc_ftruncate(ofd,(offset_t) filelen) ;
+	        uc_ftruncate(ofd,(off_t) filelen) ;
 
 	    } else {
 
@@ -740,7 +740,7 @@ int		ifd, ofd ;
 	        }
 #endif
 
-	        u_seek(sfd,(offset_t) BLOCKLEN,SEEK_SET) ;
+	        u_seek(sfd,(off_t) BLOCKLEN,SEEK_SET) ;
 
 	        rs = SR_OK ;
 	        while (tlen < filelen) {
@@ -818,7 +818,7 @@ int		ifd, ofd ;
 	            debugprintf("decode: wiping output stage file \n") ;
 #endif
 
-	        u_seek(sfd,(offset_t) 0,SEEK_SET) ;
+	        u_seek(sfd,(off_t) 0,SEEK_SET) ;
 
 	        for (i = 0 ; i < datablocks ; i += 1) {
 	            for (j = 0 ; j < n ; j += 1) {

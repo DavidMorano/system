@@ -363,7 +363,7 @@ LINEINDEX_CUR	*cp ;
 int lineindex_enum(op,cup,rp)
 LINEINDEX	*op ;
 LINEINDEX_CUR	*cup ;
-offset_t	*rp ;
+off_t	*rp ;
 {
 	int		rs = SR_OK ;
 	int		ri ;
@@ -432,7 +432,7 @@ ret0:
 int lineindex_lookup(op,ri,rp)
 LINEINDEX	*op ;
 uint		ri ;
-offset_t	*rp ;
+off_t	*rp ;
 {
 	int		rs = SR_OK ;
 
@@ -851,7 +851,7 @@ LINEINDEX	*op ;
 {
 	FILEMAP		lmap ;
 	bfile		ifile ;
-	offset_t	headoff ;
+	off_t	headoff ;
 	uint		recoff, lineoff ;
 	uint		table[header_overlast + 1] ;
 	uint		recs[NRECS + 1] ;
@@ -1071,7 +1071,7 @@ LINEINDEX	*op ;
 
 #if	CF_DEBUGS
 	{
-	    offset_t	off ;
+	    off_t	off ;
 	    bseek(&ifile,0L,SEEK_END) ;
 	    btell(&ifile,&off) ;
 	    debugprintf("lineindex_mkindex: index filesize=%lu\n",off) ;

@@ -184,7 +184,7 @@
 
 /* external subroutines */
 
-extern int	lockfile(int,int,offset_t,offset_t,int) ;
+extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	getfstype(char *,int,int) ;
 extern int	islocalfs(const char *,int) ;
 extern int	isNotPresent(int) ;
@@ -1298,7 +1298,7 @@ static int ts_filetopwrite(op,dt)
 TS		*op ;
 time_t		dt ;
 {
-	offset_t	poff ;
+	off_t	poff ;
 
 	int	rs = SR_OK ;
 	int	bl ;
@@ -1355,7 +1355,7 @@ ret0:
 static int ts_filetopread(op)
 TS		*op ;
 {
-	offset_t	poff ;
+	off_t	poff ;
 
 	int	rs ;
 
@@ -1549,7 +1549,7 @@ time_t		dt ;
 	rs = lockfile(op->fd,lockcmd,0L,0L,TO_LOCK) ;
 #else
 	{
-	    offset_t	fs = op->filesize ;
+	    off_t	fs = op->filesize ;
 	    rs = lockfile(op->fd,lockcmd,0L,fs,TO_LOCK) ;
 	}
 #endif /* CF_SOLARISBUF */
@@ -1611,7 +1611,7 @@ bad2:
 	lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 #else
 	{
-	    offset_t	fs = op->filesize ;
+	    off_t	fs = op->filesize ;
 	    lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
 	}
 #endif /* CF_SOLARISBUF */
@@ -1652,7 +1652,7 @@ TS		*op ;
 	        rs = lockfile(op->fd,F_ULOCK,0L,0L,TO_LOCK) ;
 #else
 		{
-		    offset_t	fs = op->filesize ;
+		    off_t	fs = op->filesize ;
 	            rs = lockfile(op->fd,F_ULOCK,0L,fs,TO_LOCK) ;
 		}
 #endif /* CF_SOLARISBUF */
@@ -1985,7 +1985,7 @@ int		ei ;
 static int ts_headwrite(op)
 TS		*op ;
 {
-	offset_t	poff ;
+	off_t	poff ;
 
 	int	rs ;
 	int	toff = TS_TABOFF ;

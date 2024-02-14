@@ -156,14 +156,14 @@ struct bibentry {
 
 static int bdb_scan(BDB *,HDB_DATUM,struct bdb_key *) ;
 static int bdb_fileindex(BDB *,int) ;
-static int bdb_keyinsert(BDB *,int,offset_t,offset_t,const char *) ;
+static int bdb_keyinsert(BDB *,int,off_t,off_t,const char *) ;
 static int bdb_readentry(BDB *,struct bdb_key *,BDB_ENT *,char *,int) ;
 
 static int bdbfile_init(struct bdb_file *,const char *) ;
 static int bdbfile_free(struct bdb_file *) ;
 static int bdbfile_indexed(struct bdb_file *) ;
 
-static int bdbkey_init(struct bdb_key *,int,const char *,offset_t,int) ;
+static int bdbkey_init(struct bdb_key *,int,const char *,off_t,int) ;
 static int bdbkey_free(struct bdb_key *) ;
 
 static int bibentry_init(struct bibentry *,int) ;
@@ -807,7 +807,7 @@ int		n ;
 
 	    bfile	bibfile ;
 
-	    offset_t	offset, citeoff ;
+	    off_t	offset, citeoff ;
 
 	    int		len ;
 	    int		state ;
@@ -977,7 +977,7 @@ int		n ;
 static int bdb_keyinsert(op,fi, citeoff, offset, citebuf)
 BDB		*op ;
 int		fi ;
-offset_t		offset, citeoff ;
+off_t		offset, citeoff ;
 const char	citebuf[] ;
 {
 	struct bdb_key		*bkp ;
@@ -1187,7 +1187,7 @@ static int bdbkey_init(bkp,fi,citekey,offset,len)
 struct bdb_key	*bkp ;
 int		fi ;
 const char	citekey[] ;
-offset_t		offset ;
+off_t		offset ;
 int		len ;
 {
 	int	rs ;

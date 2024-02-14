@@ -48,8 +48,8 @@ struct mailbox		mb ;
 
 /*  structure for random access into current mailbox */
 
-offset_t	messbeg[MAXMESS+1] ;	/* byte ptrs to beginnings of messages */
-offset_t	messend[MAXMESS+1] ;	/* byte ptrs to endings of messages */
+off_t	messbeg[MAXMESS+1] ;	/* byte ptrs to beginnings of messages */
+off_t	messend[MAXMESS+1] ;	/* byte ptrs to endings of messages */
 
 int   messord [MAXMESS+1] ;	/* message ordering (presort may reorder) */
 int   messlen [MAXMESS+1] ;	/* message length in lines */

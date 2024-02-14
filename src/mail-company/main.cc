@@ -134,7 +134,7 @@ char	*argv[] ;
 
 	struct group	*gp ;
 
-	offset_t	clen ;
+	off_t	clen ;
 
 	pid_t	cpid ;
 

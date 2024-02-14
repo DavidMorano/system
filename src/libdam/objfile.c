@@ -101,7 +101,7 @@ static int	findhighsection(Elf32_Shdr *,int,char *,char *,int) ;
 int objfile_open(OBJFILE *op,cchar fname[])
 {
 	Elf32_Ehdr	ehead ;
-	offset_t	uoff ;
+	off_t	uoff ;
 	uint		size ;
 	uint		mapalign ;
 	const int	pagesize = getpagesize() ;
@@ -996,7 +996,7 @@ int		n ;
 {
 	OBJFILE_SYMTAB	st ;
 	Elf32_Shdr	*sheads = op->sheads ;
-	offset_t	fbase ;
+	off_t	fbase ;
 	ulong		fextent ;
 	ulong		leadgap ;
 	ulong		mapalign = op->mapalign ;

@@ -20,7 +20,7 @@ typedef struct midb_struct {
 	struct midb_index	*mkey_struct[] ;
 	long	magic ;
 	long	bufoffset ;
-	offset_t	offset ;
+	off_t	offset ;
 	int	fd ;
 	int	skey_len ;
 	int	mkey_len ;

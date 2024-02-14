@@ -38,8 +38,8 @@ extern int ffprintf(FILE *,const char *,...) ;
 extern int ffputc(FILE *,int) ;
 extern int ffread(FILE *,void *,int) ;
 extern int ffreadline(FILE *,char *,int) ;
-extern int ffseek(FILE *,offset_t,int) ;
-extern int fftell(FILE *,offset_t *) ;
+extern int ffseek(FILE *,off_t,int) ;
+extern int fftell(FILE *,off_t *) ;
 extern int ffwrite(FILE *,const void *,int) ;
 
 #ifdef	__cplusplus

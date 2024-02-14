@@ -67,7 +67,7 @@ int main(int argc,mainv argv,mainv envv) {
 	bfile		infile, *ifp = &infile ;
 	bfile		sumfile, *sfp = &sumfile ;
 	bfile		tempfile, *tfp = &tempfile ;
-	offset_t	sumoff, emptyoff ;
+	off_t	sumoff, emptyoff ;
 	long	hold[NROW][NCOL] ;
 	long	xoracc, sumrow, sumcol ;
 	long	clock ;

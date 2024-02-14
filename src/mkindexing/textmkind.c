@@ -157,7 +157,7 @@ static int	procword(PROGINFO *,HDB *,
 extern int	keysstart(PROGINFO *,HDB *,int) ;
 extern int	keysadd(PROGINFO *,HDB *,const char *,int) ;
 extern int	keysfinish(PROGINFO *,HDB *,bfile *,PTM *,const char *,
-			offset_t,int) ;
+			off_t,int) ;
 
 
 /* local variables */
@@ -956,7 +956,7 @@ char		fname[] ;
 
 	bfile	infile, *ifp = &infile ;
 
-	offset_t	offset, recoff ;
+	off_t	offset, recoff ;
 
 	int	rs ;
 	int	rs1 ;

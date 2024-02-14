@@ -2006,7 +2006,7 @@ int	v ;
 int linecnt(f)
 FILE	*f ;
 {
-	offset_t	oldpos ;
+	off_t	oldpos ;
 
 	int	l = 0 ;
 
@@ -2050,7 +2050,7 @@ char	*prompt ;
 
 	bfile	helpfile, *hfp = &helpfile ;
 
-	offset_t	oldpos ;
+	off_t	oldpos ;
 
 	int	len ;
 	int	c_inch ;
