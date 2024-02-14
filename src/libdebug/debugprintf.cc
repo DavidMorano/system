@@ -1,4 +1,4 @@
-/* debugprintf */
+/* debugprintf SUPPORT */
 /* lang=C++20 */
 
 /* special debug printing */
@@ -84,7 +84,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<signal.h>
@@ -102,6 +102,7 @@
 #include	<cfdec.h>
 #include	<strwcpy.h>
 #include	<format.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 
@@ -131,12 +132,16 @@ typedef volatile sig_atomic_t	vaflag ;
 
 /* external subroutines */
 
-extern int	isprintlatin(int) ;
-extern int	strlinelen(const char *,int,int) ;
+extern "C" {
+    extern int	strlinelen(cchar *,int,int) noex ;
+}
 
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
+extern "C" {
+    int debugprint_init() noex ;
+    int debugprint_fini() noex ;
+    int	debugprint(cchar *,int) noex ;
+    int	debugclose() noex ;
+}
 
 
 /* external variables */
@@ -156,46 +161,43 @@ struct debugprint_head {
 
 /* forward references */
 
-static int	debugprinters(cchar *,int) ;
+static int	debugprinters(cchar *,int) noex ;
 
-int		debugprint_init() ;
-void		debugprint_fini() ;
+extern "C" {
+    static void	debugprint_atforkbefore() noex ;
+    static void	debugprint_atforkafter() noex ;
+}
 
-static void	debugprint_atforkbefore() ;
-static void	debugprint_atforkafter() ;
+static int	debugprinter(cchar *,int) noex ;
+static int	cthexi(char *,int) noex ;
+static int	snwcpyprintclean(char *,int,cchar *,int) noex ;
+static int	hasprintbad(cchar *,int) noex ;
+static int	isprintbad(int) noex ;
 
-int		debugprint(const char *,int) ;
-int		debugclose() ;
-
-static int	debugprinter(cchar *,int) ;
-static int	cthexi(char *,int) ;
-static int	snwcpyprintclean(char *,int,cchar *,int) ;
-static int	hasprintbad(cchar *,int) ;
-static int	isprintbad(int) ;
-
-static char	*convdeci(LONG,char *) ;
+static char	*convdeci(LONG,char *) noex ;
 
 
 /* local variables */
 
 static DEBUGPRINT	ef ; /* zero-initialized */
 
-static const char	cthextable[] = {
+static constexpr cchar	cthextable[] = {
 	'0', '1', '2', '3', '4', '5', '6', '7',
 	'8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 0
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int debugprint_init()
-{
+int debugprint_init() noex {
 	DEBUGPRINT	*uip = &ef ;
 	int		rs = 1 ;
 	if (! uip->f_init) {
 	    uip->f_init = TRUE ;
-	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
+	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
 	        void	(*b)() = debugprint_atforkbefore ;
 	        void	(*a)() = debugprint_atforkafter ;
 	        if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -221,9 +223,7 @@ int debugprint_init()
 }
 /* end subroutine (debugprint_init) */
 
-
-void debugprint_fini()
-{
+void debugprint_fini() noex {
 	DEBUGPRINT	*uip = &ef ;
 	if (uip->f_initdone) {
 	    uip->f_initdone = FALSE ;
@@ -242,9 +242,7 @@ void debugprint_fini()
 }
 /* end subroutine (debugprint_fini) */
 
-
-int debugprintf(const char fmt[],...)
-{
+int debugprintf(cchar *fmt,...) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -252,11 +250,11 @@ int debugprintf(const char fmt[],...)
 	nprintf(NDF,"debugprintf: ent\n") ;
 #endif
 
-	if (fmt == NULL) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 
 	if (ef.fd >= 0) {
-	    const int	fm = FORMAT_ONOOVERR ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	fm = FORMAT_ONOOVERR ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 	    {
@@ -282,17 +280,15 @@ int debugprintf(const char fmt[],...)
 }
 /* end subroutine (debugprintf) */
 
-
-int debugvprintf(const char fmt[],va_list ap)
-{
-	const int	fm = (FORMAT_OCLEAN | FORMAT_ONOOVERR) ;
+int debugvprintf(cchar *fmt,va_list ap) noex {
+	cint	fm = (FORMAT_OCLEAN | FORMAT_ONOOVERR) ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (fmt == NULL) return SR_FAULT ;
+	if (fmt == nullptr) return SR_FAULT ;
 
 	if (ef.fd >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 	    if ((len = format(lbuf,llen,fm,fmt,ap)) >= 0) {
@@ -309,15 +305,13 @@ int debugvprintf(const char fmt[],va_list ap)
 }
 /* end subroutine (debugvprintf) */
 
-
-int debugprintdeci(cchar *s,int v)
-{
+int debugprintdeci(cchar *s,int v) noex {
 	int		rs = SR_OK ;
 	int		llen = LINEBUFLEN ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	if (s != NULL) {
-	    const int	diglen = DIGBUFLEN ;
+	if (s != nullptr) {
+	    cint	diglen = DIGBUFLEN ;
 	    int		ll = llen ;
 	    int		sl ;
 	    cchar	*sp ;
@@ -367,18 +361,16 @@ int debugprintdeci(cchar *s,int v)
 }
 /* end subroutine (debugprintdeci) */
 
-
-int debugprinthexi(cchar *s,int v)
-{
+int debugprinthexi(cchar *s,int v) noex {
 	int		rs = SR_OK ;
 	int		ll ;
 	int		sl ;
-	const char	*sp ;
+	cchar	*sp ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	char		lbuf[LINEBUFLEN + 1] ;
 	char		*lp ;
 
-	if (s == NULL) goto ret0 ;
+	if (s == nullptr) goto ret0 ;
 
 	ll = LINEBUFLEN ;
 	lp = lbuf ;
@@ -423,17 +415,12 @@ ret0:
 }
 /* end subroutine (debugprinthexi) */
 
-
-int debugprintnum(cchar *s,int v)
-{
-
+int debugprintnum(cchar *s,int v) noex {
 	return debugprintdeci(s,v) ;
 }
 /* end subroutine (debugprintnum) */
 
-
-int debugsetfd(int fd)
-{
+int debugsetfd(int fd) noex {
 	int		rs = SR_NOTOPEN ;
 
 	ef.fd = 0 ; /* special case (use zero) */
@@ -453,13 +440,11 @@ int debugsetfd(int fd)
 }
 /* end subroutine (debugsetfd) */
 
-
-int debugopen(const char *fname)
-{
+int debugopen(cchar *fname) noex {
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
@@ -494,9 +479,7 @@ int debugopen(const char *fname)
 }
 /* end subroutine (debugopen) */
 
-
-int debugclose()
-{
+int debugclose() noex {
 	if (ef.fd > 0) {
 	    u_close(ef.fd) ;
 	    ef.fd = 0 ; /* special case (use zero) */
@@ -506,35 +489,28 @@ int debugclose()
 }
 /* end subroutine (debugclose) */
 
-
-int debuggetfd()
-{
-
+int debuggetfd() noex {
 	return ef.fd ;
 }
 /* end subroutine (debuggetfd) */
 
-
 /* low level debug-print function */
-int debugprint(cchar *sbuf,int slen)
-{
+int debugprint(cchar *sbuf,int slen) noex {
 	int		rs ;
-	if (sbuf == NULL) return SR_FAULT ;
+	if (sbuf == nullptr) return SR_FAULT ;
 	if (ef.fd <= 0) return SR_NOTOPEN ;
 	rs = debugprinter(sbuf,slen) ;
 	return rs ;
 }
 /* end subroutine (debugprint) */
 
-
 #if	CF_USEMALLOC
 
-int debugprinter(cchar *sbuf,int slen)
-{
+int debugprinter(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		f_needeol = FALSE ;
-	char		*abuf = NULL ;
+	char		*abuf = nullptr ;
 
 #if	CF_LINELEN
 	slen = strlinelen(sbuf,slen,LINEBUFLEN) ; /* some protection */
@@ -554,7 +530,7 @@ int debugprinter(cchar *sbuf,int slen)
 /* scan for bad characters */
 
 	if (f_needeol || hasprintbad(sbuf,slen)) {
-	    const int	alen = (slen+2) ; /* additional room for added EOL */
+	    cint	alen = (slen+2) ; /* additional room for added EOL */
 	    if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
 	        if ((rs = snwcpyprintclean(abuf,(alen-2),sbuf,slen)) >= 0) {
 		    sbuf = abuf ;
@@ -563,7 +539,7 @@ int debugprinter(cchar *sbuf,int slen)
 	        }
 		if (rs < 0) {
 		    uc_free(abuf) ;
-		    abuf = NULL ;
+		    abuf = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
 	} else
@@ -576,7 +552,7 @@ int debugprinter(cchar *sbuf,int slen)
 	    wlen = rs ;
 	} /* end if (ok) */
 
-	if (abuf != NULL) uc_free(abuf) ;
+	if (abuf != nullptr) uc_free(abuf) ;
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -585,9 +561,8 @@ int debugprinter(cchar *sbuf,int slen)
 #else /* CF_USEMALLOC */
 
 #ifdef	lint
-int debugprinter(cchar *sbuf,int slen)
-{
-	const int	alen = (LINEBUFLEN+2) ; /* room for added EOL */
+int debugprinter(cchar *sbuf,int slen) noex {
+	cint		alen = (LINEBUFLEN+2) ; /* room for added EOL */
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	int		f_needeol = FALSE ;
@@ -630,8 +605,7 @@ int debugprinter(cchar *sbuf,int slen)
 }
 /* end subroutine (debugprinter) */
 #else /* lint */
-int debugprinter(cchar *sbuf,int slen)
-{
+int debugprinter(cchar *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		alen ;
 	int		wlen = 0 ;
@@ -686,9 +660,7 @@ int debugprinter(cchar *sbuf,int slen)
 
 /* local subroutines */
 
-
-static int debugprinters(cchar *sbuf,int slen)
-{
+static int debugprinters(cchar *sbuf,int slen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = debugprint_init()) >= 0) {
@@ -721,24 +693,19 @@ static int debugprinters(cchar *sbuf,int slen)
 }
 /* end subroutine (debugprinters) */
 
-
-static void debugprint_atforkbefore()
-{
+static void debugprint_atforkbefore() noex {
 	DEBUGPRINT	*uip = &ef ;
 	ptm_lock(&uip->m) ;
 }
 /* end subroutine (debugprint_atforkbefore) */
 
-
-static void debugprint_atforkafter()
-{
+static void debugprint_atforkafter() noex {
 	DEBUGPRINT	*uip = &ef ;
 	ptm_unlock(&uip->m) ;
 }
 /* end subroutine (debugprint_atforkafter) */
 
-
-static char *convdeci(LONG num,char *endptr)
+static char *convdeci(LONG num,char *endptr) noex {
 {
 	ULONG		unum = (ULONG) num ;
 	char		*bp ;
@@ -749,12 +716,9 @@ static char *convdeci(LONG num,char *endptr)
 }
 /* end subroutine (convdeci) */
 
-
-static int cthexi(char *buf,int val)
-{
-	const int	n = (2 * sizeof(int)) ;
-	int		i  ;
-	for (i = (n - 1) ; i >= 0 ; i -= 1) {
+static int cthexi(char *buf,int val) noex {
+	cint		n = (2 * sizeof(int)) ;
+	for (int i = (n - 1) ; i >= 0 ; i -= 1) {
 	    buf[i] = cthextable[val & 0x0F] ;
 	    val >>= 4 ;
 	} /* end for */
@@ -763,9 +727,7 @@ static int cthexi(char *buf,int val)
 }
 /* end subroutine (cthexi) */
 
-
-static int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl)
-{
+static int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		ch ;
 	int		dl = 0 ;
@@ -788,9 +750,7 @@ static int snwcpyprintclean(char *dbuf,int dlen,cchar *sp,int sl)
 }
 /* end subroutine (snwcpyprintclean) */
 
-
-static int hasprintbad(cchar *sp,int sl)
-{
+static int hasprintbad(cchar *sp,int sl) noex {
 	int		f = FALSE ;
 	while (sl && *sp) {
 	    f = isprintbad(sp[0] & 0xff) ;
@@ -802,9 +762,7 @@ static int hasprintbad(cchar *sp,int sl)
 }
 /* end subroutine (hasprintbad) */
 
-
-static int isprintbad(int ch)
-{
+static int isprintbad(int ch) noex {
 	return (! isprintlatin(ch)) ;
 }
 /* end subroutine (isprintbad) */

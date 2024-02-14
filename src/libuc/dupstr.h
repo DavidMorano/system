@@ -1,5 +1,8 @@
-/* dupstr */
+/* dupstr HEADER */
 /* lang=C20 */
+
+/* create a (writable) duplicate of a string */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
