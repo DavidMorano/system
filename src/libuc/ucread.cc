@@ -1,31 +1,31 @@
-/* uc_readline */
+/* ucread SUPPORT */
+/* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* read a line from a file descriptor but time it */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_STREAM	1		/* optimization for STREAM */
-
 
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was first written to give a little bit to UNIX® what we have in our
-        own circuit pack OSes! Note that this subroutine depends on another
-        little subroutine ('uc_reade()') that is used to provide an underlying
-        extended 'read(2)' like capability.
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit pack OSes! Note that this
+	subroutine depends on another little subroutine (|uc_reade(3uc)|)
+	that is used to provide an underlying extended |read(2)|
+	like capability.
 
 	= 2003-11-25, David A­D­ Morano
-        I have to laugh at how long some of these subroutines go before
-        maintenance (looking at the date above)! I am adding the "peeking" type
-        method of grabbing a line. This is superior to the old method in
-        performance. In fairness, this subroutine was never used very much in
-        performance-critical places but at least now I won't have to be
-        embarassed about reading one character at a time (like many Internet
-        daemons already do -- see the Berkeley remote-type protocols). For
-        consistency with other similar subroutines, the option of FM_TIMED is
-        assumed (check the name of this subroutine!).
+	I have to laugh at how long some of these subroutines go
+	before maintenance (looking at the date above)! I am adding
+	the "peeking" type method of grabbing a line. This is
+	superior to the old method in performance. In fairness,
+	this subroutine was never used very much in performance-critical
+	places but at least now I won't have to be embarassed about
+	reading one character at a time (like many Internet daemons
+	already do -- see the Berkeley remote-type protocols). For
+	consistency with other similar subroutines, the option of
+	FM_TIMED is assumed (check the name of this subroutine!).
 
 */
 
@@ -33,43 +33,37 @@
 
 /*******************************************************************************
 
-        Get a line code amount of data (data ending in an NL) and time it also
-        so that we can abort if it times out.
+	Name:
+	uc-readlnto
+
+	Description:
+	Get a line code amount of data (data ending in an NL) and
+	time it also so that we can abort if it times out.
 
 	Synopsis:
-
-	int uc_readlinetimed(fd,lbuf,llen,to)
-	int	fd ;
-	char	lbuf[] ;
-	int	llen ;
-	int	to ;
+	int uc_readlnto(kint fd,char *lbuf,int llen,int to) noex
 
 	Arguments:
-
 	fd		file descriptor
 	lbuf		user buffer to receive daa
 	llen		maximum amount of data the user wants
 	to		time in seconds to wait
 
 	Returns:
-
 	>=0		amount of data returned
-	<0		error
+	<0		error (system-return)
 
 	Note 2003-11-25, David A­D­ Morano
-
-        I am going to try to use one or more peeking techniques to speed this
-        up. If it is a socket, then we are good to go and we will use 'recv(3n)'
-        with the "PEEK" option. If it is a STREAM (who knows what is and what
-        isn't now-a-days) we will try to use 'ioctl(2) with "I_PEEK". Else, we
-        punt back to reading a character at a time.
-
-        This subroutine performs like other subroutines, that can time the
-        operation, with the option FM_TIMED set.
-
+	I am going to try to use one or more peeking techniques to
+	speed this up. If it is a socket, then we are good to go
+	and we will use |recv(3n)| with the "PEEK" option. If it
+	is a STREAM (who knows what is and what isn't now-a-days)
+	we will try to use |ioctl(2)| with "I_PEEK".  Else, we punt
+	back to reading a character at a time.  This subroutine
+	performs like other subroutines, that can time the operation,
+	with the option FM_TIMED set.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
