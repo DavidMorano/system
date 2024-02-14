@@ -47,7 +47,6 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/conf.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>

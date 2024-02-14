@@ -72,7 +72,6 @@
 
 #include	<um.h>		/* UNIX® memory-management */
 #include	<ustr.h>	/* UNIX® STREAMS */
-#include	<ustropts.h>	/* system adaptation */
 #include	<udup.h>
 
 

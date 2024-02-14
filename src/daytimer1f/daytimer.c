@@ -48,7 +48,6 @@
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<sys/wait.h>
-#include	<stropts.h>
 #include	<signal.h>
 #include	<poll.h>
 #include	<time.h>

@@ -39,7 +39,6 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>

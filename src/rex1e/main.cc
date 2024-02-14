@@ -45,7 +45,6 @@
 #include	<stdlib.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<pwd.h>

@@ -34,7 +34,6 @@
 #include	<sys/log.h>		/* for LOG_MAXPS */
 #include	<sys/strlog.h>		/* interface definitions */
 #include	<sys/syslog.h>		/* for all other 'LOG_xxx' */
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>

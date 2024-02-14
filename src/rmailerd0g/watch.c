@@ -49,7 +49,6 @@
 #include	<unistd.h>
 #include	<limits.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<signal.h>
 #include	<time.h>

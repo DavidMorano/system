@@ -33,7 +33,6 @@
 #include <sys/mkdev.h>
 #include <sys/ipc.h>
 #include <sys/poll.h>
-#include <sys/stropts.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>

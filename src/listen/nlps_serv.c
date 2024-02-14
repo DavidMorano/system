@@ -30,7 +30,6 @@
 #include <sys/stat.h>
 #include <sys/mkdev.h>
 #include <sys/poll.h>
-#include <sys/stropts.h>
 #include <values.h>
 #include <fcntl.h>
 #include <signal.h>

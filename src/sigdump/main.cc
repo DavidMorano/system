@@ -34,7 +34,6 @@
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<sys/conf.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<termios.h>

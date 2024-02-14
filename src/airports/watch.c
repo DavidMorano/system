@@ -71,7 +71,6 @@
 #include	<netinet/in.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<signal.h>
 #include	<time.h>

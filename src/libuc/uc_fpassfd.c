@@ -43,7 +43,6 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>

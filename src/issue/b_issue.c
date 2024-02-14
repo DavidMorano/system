@@ -51,7 +51,6 @@
 #include	<sys/param.h>
 #include	<sys/wait.h>
 #include	<sys/stat.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<signal.h>
 #include	<fcntl.h>

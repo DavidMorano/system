@@ -42,7 +42,6 @@
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ustropts.h>
 #include	<usystem.h>
 #include	<libmallocxx.h>
 #include	<localmisc.h>

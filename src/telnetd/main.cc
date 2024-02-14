@@ -73,7 +73,6 @@
 #include <sys/telioctl.h>
 
 #ifdef SYSV
-#include <sys/stropts.h>
 #include <sys/stream.h>
 #include <sys/tihdr.h>
 #endif /* SYSV */

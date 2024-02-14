@@ -46,7 +46,6 @@
 #include	<grp.h>
 #include	<string.h>
 #include	<time.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<errno.h>
 #include	<usystem.h>

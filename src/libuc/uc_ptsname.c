@@ -46,7 +46,6 @@
 #include	<sys/param.h>
 #include	<sys/mkdev.h>
 #include	<sys/stream.h>
-#include	<sys/stropts.h>
 #include	<sys/stat.h>
 #include	<sys/ptms.h>
 #include	<unistd.h>

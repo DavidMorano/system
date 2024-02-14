@@ -32,7 +32,6 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>
-#include	<ustropts.h>			/* <- money shot */
 
 #include	"ustr.h"
 

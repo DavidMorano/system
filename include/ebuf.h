@@ -24,7 +24,6 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 #define	EBUF_MAGIC	1092847456
@@ -35,8 +34,8 @@
 
 
 struct ebuf_way {
-	off_t	woff ;		/* "way" offset to file entries */
 	char		*wbuf ;		/* buffer */
+	off_t		woff ;		/* "way" offset to file entries */
 	uint		utime ;		/* usage time */
 	int		wlen ;
 	int		nvalid ;	/* number of valid entries */
@@ -47,9 +46,9 @@ struct ebuf_flags {
 } ;
 
 struct ebuf_head {
-	uint		magic ;
-	EBUF_FL		f ;
 	EBUF_WAY	*ways ;
+	EBUF_FL		f ;
+	uint		magic ;
 	uint		utimer ;	/* usage timer (fake time) */
 	uint		soff ;		/* starting offset */
 	int		esize ;		/* entry size */

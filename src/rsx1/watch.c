@@ -57,7 +57,6 @@
 #include	<dirent.h>
 #include	<limits.h>
 #include	<string.h>
-#include	<stropts.h>
 #include	<poll.h>
 
 #include	<bfile.h>
