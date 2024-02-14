@@ -1,5 +1,5 @@
-/* dupstr */
-/* lang=C20 */
+/* dupstr SUPPORT */
+/* lang=C++20 */
 
 /* create a (writable) duplicate of a string */
 /* version %I% last-modified %G% */
@@ -51,7 +51,7 @@ int dupstr_start(dupstr *ssp,cchar *sp,int sl,char **rpp) noex {
 	int		cl = 0 ;
 	if (ssp && sp && rpp) {
 	    rs = SR_OK ;
-	    ssp->as = NULL ;
+	    ssp->as = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (sl > DUPSTR_SHORTLEN) {
 	        cint	ssize = (sl+1) ;
@@ -78,7 +78,7 @@ int dupstr_finish(dupstr *ssp) noex {
 	    if (ssp->as) {
 	        rs1 = uc_free(ssp->as) ;
 	        if (rs >= 0) rs = rs1 ;
-	        ssp->as = NULL ;
+	        ssp->as = nullptr ;
 	    }
 	    ssp->buf[0] = '\0' ;
 	}

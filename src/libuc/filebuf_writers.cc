@@ -159,6 +159,9 @@ static cchar	blanks[] = "        " ;
 static cchar	zerobuf[zsize] = { } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int filebuf_writeblanks(filebuf *fbp,int n) noex {

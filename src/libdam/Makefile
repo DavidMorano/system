@@ -293,7 +293,7 @@ OBJ129= buffer_stropaque.o buffer_strcompact.o buffer_strquote.o
 OBJ130= sbuf_termconseq.o sbuf_blanks.o
 OBJ131= paramopt.o paramopt_loadone.o
 OBJ132= serialbuf.o srvreg.o srvrege.o wordfill.o linefold.o storeitem.o dstr.o 
-OBJ133= bufstr.o stackaddr.o outstore.o dupstr.o 
+OBJ133= bufstr.o stackaddr.o outstore.o
 OBJ134= hdbstr.o mapstrint.o keyopt.o keyvals.o
 OBJ135= envs.o envs_procxe.o envs_subs.o
 
@@ -840,8 +840,6 @@ realname.o:		realname.c realname.h
 gecos.o:		gecos.c gecos.h
 
 kinfo.o:		kinfo.c kinfo.h
-
-dupstr.o:		dupstr.c dupstr.h
 
 msfile.o:		msfile.c msfile.h msfilee.h
 

@@ -1,5 +1,5 @@
-/* filebuf_mailsupport */
-/* lang=C20 */
+/* filebuf_mailsup SUPPORT*/
+/* lang=C++20 */
 
 /* mail supprt from the FILEBUF object */
 /* version %I% last-modified %G% */
@@ -27,6 +27,7 @@
 #include	<usystem.h>
 #include	<char.h>
 #include	<mailmsghdrfold.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"filebuf.h"
@@ -39,9 +40,13 @@
 #endif
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern char	*strnchr(cchar *,int,int) noex ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* local structures */
@@ -81,7 +86,7 @@ int filebuf_writehdr(filebuf *fbp,cchar *sp,int sl) noex {
 	                    rs = filebuf_writehdrval(fbp,vp,vl) ;
 	                    wlen += rs ;
 	                } else {
-	                    rs = filebuf_print(fbp,sp,0) ;
+	                    rs = filebuf_println(fbp,sp,0) ;
 	                    wlen += rs ;
 	                }
 	            } /* end if (write) */
@@ -109,7 +114,7 @@ int filebuf_writehdrkey(filebuf *fbp,cchar *kn) noex {
 }
 /* end subroutine (filebuf_writehdrkey) */
 
-int filebuf_printcont(filebuf *fbp,int leader,cchar *sp,int sl) noex {
+int filebuf_printlncont(filebuf *fbp,int leader,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (fbp && sp) {
@@ -137,7 +142,7 @@ int filebuf_printcont(filebuf *fbp,int leader,cchar *sp,int sl) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_printcont) */
+/* end subroutine (filebuf_printlncont) */
 
 
 /* private subroutines */
@@ -169,7 +174,7 @@ static int filebuf_writehdrval(filebuf *fbp,cchar *vp,int vl) noex {
 	                wlen += rs ;
 	            }
 	            if (rs >= 0) {
-	                rs = filebuf_print(fbp,lp,ll) ;
+	                rs = filebuf_println(fbp,lp,ll) ;
 	                wlen += rs ;
 	            }
 	            indent = 1 ;

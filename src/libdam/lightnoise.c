@@ -1,4 +1,4 @@
-/* lightnoise */
+/* lightnoise SUPPORT */
 /* lang=C20 */
 
 /* gather light noise */
