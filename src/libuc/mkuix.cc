@@ -1,7 +1,7 @@
-/* uibang SUPPORT */
+/* mkuix SUPPORT */
 /* lang=C++20 */
 
-/* make a "bang" name from USERINFO data */
+/* try to divine the best real name from a USERINFO object */
 /* version %I% last-modified %G% */
 
 #define	CF_FULLNAME	0		/* use full-name */
@@ -17,6 +17,27 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+	Name:
+	mkuiname
+
+	Description:
+	We try to divine the best name that we can for the current
+	user.  We do this simply by looking through some options
+	contained in the USERINFO object.
+
+	Synopsis:
+	int uiname(char *rbuf,int rlen,usernfo *uip) noex
+
+	Arguments:
+	rbuf		supplied result buffer
+	rlen		supplied result buffer length
+	uip		pointer to USERINFO object
+
+	Returns:
+	>=0		length of resulting name
+	<0		error (system-return)
+
 
 	Name:
 	uibang
@@ -39,15 +60,13 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
-#include	<varnames.hh>
 #include	<userinfo.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
+
+#include	"mkuix.h"
 
 
 /* local defines */
@@ -84,45 +103,71 @@ constexpr bool	f_mailname  = CF_MAILNAME ;
 
 /* exported subroutines */
 
-int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
+int mkuiname(char *rbuf,int rlen,userinfo *uip) noex {
+	int		rs = SR_OK ;
+	if (rbuf && uip) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (rlen >= 0) {
+		cchar	*ns = nullptr ;
+		rs = SR_NOTFOUND ;
+	        if (uip->fullname && (uip->fullname[0] != '\0')) {
+	            ns = uip->fullname ;
+	        } else if (uip->name && (uip->name[0] != '\0')) {
+	            ns = uip->name ;
+	        } else if (uip->mailname && (uip->mailname[0] != '\0')) {
+	            ns = uip->mailname ;
+	        } else if (uip->username && (uip->username[0] != '\0')) {
+	            ns = uip->username ;
+	        }
+	        if (ns) {
+	            rs = sncpy1(rbuf,rlen,ns) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mkuiname) */
+
+int mkuibang(char *rbuf,int rlen,userinfo *uip) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && uip) {
 	    rbuf[0] = '\0' ;
 	    rs = SR_INVALID ;
 	    if (rlen >= 0) {
-	        cchar	*np = nullptr ;
+	        cchar	*ns = nullptr ;
 	        if constexpr (f_fullname) {
-	            if (np == NULL) {
+	            if (ns == nullptr) {
 	                if (uip->fullname && (uip->fullname[0] != '\0')) {
-	                    np = uip->fullname ;
+	                    ns = uip->fullname ;
 	                }
 	            }
 	        } /* end if-constexpr (f_fullname) */
-	        if (np == NULL) {
+	        if (ns == nullptr) {
 	            if (uip->name && (uip->name[0] != '\0')) {
-	                np = uip->name ;
+	                ns = uip->name ;
 	            }
 	        }
 	        if constexpr (f_mailname) {
-	            if (np == NULL) {
+	            if (ns == nullptr) {
 	                if (uip->mailname && (uip->mailname[0] != '\0')) {
-	                    np = uip->mailname ;
+	                    ns = uip->mailname ;
 	                }
 	            }
 	        } /* end if-constexpr (f_mailname) */
-	        if (np == NULL) {
+	        if (ns == nullptr) {
 	            if (uip->fullname && (uip->fullname[0] != '\0')) {
-	                np = uip->fullname ;
+	                ns = uip->fullname ;
 	            }
 	        }
 	        {
 	            cchar	*nn = uip->nodename ;
 	            cchar	*un = uip->username ;
 	            rs = SR_NOTFOUND ;
-	            if (np != NULL) {
-	               rs = sncpy6(rbuf,rlen,nn,"!",un," (",np,")") ;
+	            if (ns) {
+	               rs = sncpy6(rbuf,rlen,nn,"!",un," (",ns,")") ;
 	            }
-	            if ((rs == SR_OVERFLOW) || np) {
+	            if ((rs == SR_OVERFLOW) || ns) {
 	               rs = sncpy3(rbuf,rlen,nn,"!",un) ;
 	            }
 	        } /* end block */
@@ -130,6 +175,6 @@ int uibang(USERINFO *uip,char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uibang) */
+/* end subroutine (mkuibang) */
 
 

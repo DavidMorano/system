@@ -14,10 +14,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<usystem.h>
-#include	<netdb.h>
+#include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 
 
-#define	USERINFO		struct userinfo
+#define	USERINFO		struct userinfo_head
 #define	USERINFO_FL		struct userinfo_flags
 #define	USERINFO_MAGIC		0x33216271
 #define	USERINFO_LEN		((3 * 2048) + MAXHOSTNAMELEN)
@@ -29,8 +29,7 @@ struct userinfo_flags {
 	unsigned int	sysv_ct:1 ;
 } ;
 
-struct userinfo {
-	uint		magic ;
+struct userinfo_head {
 	cchar		*sysname ;	/* UNAME OS system-name */
 	cchar		*release ;	/* UNAME OS release */
 	cchar		*version ;	/* UNAME OS version */
@@ -61,17 +60,20 @@ struct userinfo {
 	cchar		*wstation ;	/* user weather-station */
 	cchar		*logid ;	/* suggested ID for logging */
 	cchar		*a ;		/* memory allocation */
-	USERINFO_FL	f ;
 	pid_t		pid ;
 	uid_t		uid, euid ;
 	gid_t		gid, egid ;
+	uint		magic ;
+	USERINFO_FL	f ;
 } ;
+
+typedef USERINFO	userinfo ;
 
 EXTERNC_begin
 
-extern int userinfo_start(USERINFO *,cchar *) noex ;
-extern int userinfo_finish(USERINFO *) noex ;
-extern int userinfo(USERINFO *,char *,int,cchar *) noex ;
+extern int userinfo_start(userinfo *,cchar *) noex ;
+extern int userinfo_finish(userinfo *) noex ;
+extern int userinfo_data(userinfo *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 
