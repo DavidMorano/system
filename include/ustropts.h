@@ -34,21 +34,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<time.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-
-
-#ifndef	CBUFLEN
-#define	CBUFLEN		(2*1024)
-#endif
-
-#ifndef	DBUFLEN
-#define	DBUFLEN		(2*1024)
-#endif
 
 
 #ifndef	STRBUF

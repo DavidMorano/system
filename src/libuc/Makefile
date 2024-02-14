@@ -1090,6 +1090,7 @@ inetconv.o:		inetconv.cc inetconv.h
 um.o:			um.cc um.h
 ustr.o:			ustr.cc ustr.h
 umsg.o:			umsg.cc umsg.h
+ustropts.o:		ustropts.cc ustropts.h
 
 # LIBUC
 ucmemla.o:		ucmemla.cc ucmemla.h

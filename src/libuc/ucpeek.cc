@@ -44,16 +44,13 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<libmallocxx.h>
+#include	<ustropts.h>		/* <- important money shot */
 #include	<localmisc.h>
 
 #include	"ucpeek.h"
 
 
 /* local defines */
-
-#ifndef	CBUFLEN
-#define	CBUFLEN		LINEBUFLEN
-#endif
 
 
 /* external subroutines */
@@ -81,7 +78,7 @@ int uc_peek(int fd,void *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
-	    char	*tbuf = (char *) dbuf ;
+	    char	*tbuf = charp(dbuf) ;
 	    tbuf[0] = '\0' ;
 	    if (dlen > 0) {
 		rs = SR_BADFD ;
@@ -107,7 +104,7 @@ int uc_peek(int fd,void *dbuf,int dlen) noex {
 /* local subroutines */
 
 static int peek_socket(int fd,void *dbuf,int dlen) noex {
-	cint	mopts = MSG_PEEK ;
+	cint		mopts = MSG_PEEK ;
 	return u_recv(fd,dbuf,dlen,mopts) ;
 }
 /* end subroutine (peek_socket) */
@@ -138,7 +135,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 /* end subroutine (peek_stream) */
 
 static int peek_regular(int fd,void *dbuf,int dlen) noex {
-	off_t	fo ;
+	off_t		fo ;
 	int		rs ;
 	if ((rs = u_tell(fd,&fo)) >= 0) {
 	    rs = u_pread(fd,dbuf,dlen,fo) ;
