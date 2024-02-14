@@ -130,6 +130,9 @@ static int	csem_ptcinit(csem *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int csem_create(csem *op,int f_shared,int count) noex {
@@ -180,32 +183,32 @@ int csem_decr(csem *op,int c,int to) noex {
 	int		rs1 ;
 	int		ocount = 0 ;
 	if ((rs = csem_magic(op)) >= 0) {
-		if (c > 0) {
-		    timespec	ts ;
-	            if (to >= 0) {
-	                clock_gettime(CLOCK_REALTIME,&ts) ;
-	                ts.tv_sec += to ;
-	            }
-	            if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
-	                op->waiters += 1 ;
-	                while ((rs >= 0) && (op->count < c)) {
-		            if (to >= 0) {
-	                        rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
-		            } else {
-	                        rs = ptc_wait(op->cvp,op->mxp) ;
-		            }
-	                } /* end while */
-	                if (rs >= 0) {
-		            ocount = op->count ;
-		            op->count -= c ;
-	                }
-	                op->waiters -= 1 ;
-	                rs1 = ptm_unlock(op->mxp) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (ptm) */
-		} else if (c == 0) {
-		    rs = SR_OK ;
-		} /* end if (valid decrement count) */
+            if (c > 0) {
+                timespec    ts ;
+                if (to >= 0) {
+                    clock_gettime(CLOCK_REALTIME,&ts) ;
+                    ts.tv_sec += to ;
+                }
+                if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
+                    op->waiters += 1 ;
+                    while ((rs >= 0) && (op->count < c)) {
+                        if (to >= 0) {
+                            rs = ptc_timedwait(op->cvp,op->mxp,&ts) ;
+                        } else {
+                            rs = ptc_wait(op->cvp,op->mxp) ;
+                        }
+                    } /* end while */
+                    if (rs >= 0) {
+                        ocount = op->count ;
+                        op->count -= c ;
+                    }
+                    op->waiters -= 1 ;
+                    rs1 = ptm_unlock(op->mxp) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (ptm) */
+            } else if (c == 0) {
+                rs = SR_OK ;
+            } /* end if (valid decrement count) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ocount : rs ;
 }
@@ -216,20 +219,20 @@ int csem_incr(csem *op,int c) noex {
 	int		rs1 ;
 	int		ocount = 0 ;
 	if ((rs = csem_magic(op)) >= 0) {
-		rs = SR_INVALID ;
-		if (c > 0) {
-	            if ((rs = ptm_lock(op->mxp)) >= 0) {
-	                ocount = op->count ;
-	                op->count += c ;
-		        if ((ocount == 0) && (op->waiters > 0)) {
-	                    rs = ptc_signal(op->cvp) ;
-	                }
-	                rs1 = ptm_unlock(op->mxp) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (mutex-lock) */
-		} else if (c == 0) {
-		    rs = SR_OK ;
-		}
+	    rs = SR_INVALID ;
+	    if (c > 0) {
+	        if ((rs = ptm_lock(op->mxp)) >= 0) {
+	            ocount = op->count ;
+	            op->count += c ;
+		    if ((ocount == 0) && (op->waiters > 0)) {
+	                rs = ptc_signal(op->cvp) ;
+	            }
+	            rs1 = ptm_unlock(op->mxp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (mutex-lock) */
+	    } else if (c == 0) {
+		rs = SR_OK ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? ocount : rs ;
 }
@@ -240,13 +243,13 @@ int csem_count(csem *op) noex {
 	int		rs1 ;
 	int		ocount = 0 ;
 	if ((rs = csem_magic(op)) >= 0) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
-	            {
-	                ocount = op->count ;
-	            }
-	            rs1 = ptm_unlock(op->mxp) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mutex-lock) */
+	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	        {
+	            ocount = op->count ;
+	        }
+	        rs1 = ptm_unlock(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? ocount : rs ;
 }
@@ -257,13 +260,13 @@ int csem_waiters(csem *op) noex {
 	int		rs1 ;
 	int		waiters = 0 ;
 	if ((rs = csem_magic(op)) >= 0) {
-	        if ((rs = ptm_lock(op->mxp)) >= 0) {
-	            {
-	                waiters = op->waiters ;
-	            }
-	            rs1 = ptm_unlock(op->mxp) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mutex-lock) */
+	    if ((rs = ptm_lock(op->mxp)) >= 0) {
+	        {
+	            waiters = op->waiters ;
+	        }
+	        rs1 = ptm_unlock(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex-lock) */
 	} /* end if (magic) */
 	return (rs >= 0) ? waiters : rs ;
 }

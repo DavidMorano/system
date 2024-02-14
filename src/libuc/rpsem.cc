@@ -4,7 +4,6 @@
 /* POSIX© unnamed Semaphore (PSEM) */
 /* version %I% last-modified %G% */
 
-#define	CF_TESTNATIVE	0		/* test-only using native facility */
 
 /* revision history:
 
@@ -43,25 +42,24 @@
 
 *******************************************************************************/
 
-#ifndef	CF_TESTNATIVE
-#define	CF_TESTNATIVE	0
-#endif
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<semaphore.h>
 #include	<cerrno>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<usupport.h>
+#include	<localmisc.h>
 
-#if	CF_TESTNATIVE
+#if	defined(PSEM_REDIRECT) && (PSEM_REDIRECT > 0)
 #include	"rpsem.h"
-#else /* CF_TESTNATIVE */
+#else /* redirect */
 #include	"psem.h"
-#endif /* CF_TESTNATIVE */
+#endif /* redirect */
+
+
+/* local defines */
 
 #if	(!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0)
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -70,11 +68,14 @@
 #endif
 #endif /* (!defined(SYSHAS_PSEM)) || (SYSHAS_PSEM == 0) */
 
-
-/* local defines */
-
 #undef	NLPS
 #define	NLPS		5	/* number of polls per second */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -86,12 +87,15 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int psem_create(psem *psp,int pshared,int count) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
-	    cint	ic = int(count & INT_MAX) ;
+	    cint	ic = (count & INT_MAX) ;
 	    repeat {
 	        if ((rs = sem_init(psp,pshared,ic)) < 0) {
 		    rs = (- errno) ;
@@ -136,7 +140,7 @@ int psem_getvalue(psem *psp) noex {
 int psem_waiti(psem *psp) noex {
 	int		rs = SR_FAULT ;
 	if (psp) {
-	        repeat {
+	    repeat {
 	        if ((rs = sem_wait(psp)) < 0) {
 		    rs = (- errno) ;
 	        }
@@ -178,8 +182,8 @@ int psem_waiter(psem *psp,int to) noex {
 	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
 	if (psp) {
 	    cint	mint = (1000/NLPS) ;
-	    int		cto = (to*NLPS) ;
-	    bool		f_exit = false ;
+	    cint	cto = (to*NLPS) ;
+	    bool	f_exit = false ;
 	    repeat {
 	        if ((rs = sem_trywait(psp)) < 0) rs = (- errno) ;
 	        if (rs < 0) {

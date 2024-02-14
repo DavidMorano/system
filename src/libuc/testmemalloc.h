@@ -1,5 +1,15 @@
 /* config (testmemalloc) */
+/* lang=C20 */
 
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)testmemalloc "

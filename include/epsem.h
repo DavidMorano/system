@@ -32,12 +32,13 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<csem.h>		/* <- couting semaphore (DAM) */
 
+
 #define	PSEM		csem		/* <- the "money" shot */
+
 
 #ifndef	TYPEDEF_PSEM
 #define	TYPEDEF_PSEM

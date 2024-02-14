@@ -28,11 +28,11 @@
 
 #if	defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0)
 
-#include	<rpsem.h>
+#include	<rpsem.h>		/* "real" POSIX® semaphores */
 
 #else /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 
-#include	<epsem.h>
+#include	<epsem.h>		/* "emulated" POSIX® semaphores */
 
 #endif /* defined(SYSHAS_PSEM) && (SYSHAS_PSEM > 0) */
 

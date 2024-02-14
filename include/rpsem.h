@@ -25,7 +25,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<semaphore.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>

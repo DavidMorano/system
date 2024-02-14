@@ -33,10 +33,20 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#if	defined(PSEM_REDIRECT) && (PSEM_REDIRECT > 0)
+#include	"epsem.h"
+#else /* redirect */
 #include	"psem.h"
+#endif /* redirect */
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -66,10 +76,10 @@ int psem_wait(psem *psp) noex {
 /* end subroutine (psem_wait) */
 
 int psem_trywait(psem *psp) noex {
-	cint	rsto = SR_TIMEDOUT ;
-	int	rs ;
+	cint		rsto = SR_TIMEDOUT ;
+	int		rs ;
 	if ((rs = csem_decr(psp,1,0)) == rsto) {
-	    rs = SR_AGAIN ;		/* <- required by |psem(ec)| */
+	    rs = SR_AGAIN ;		/* <- required by |psem(3uc)| */
 	}
 	return rs ;
 }

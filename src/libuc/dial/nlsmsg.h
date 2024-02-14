@@ -1,5 +1,5 @@
 /* nlsmsg HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* information to create and read an NLS-connect message */
 /* version %I% last-modified %G% */
@@ -11,6 +11,9 @@
 	Originally written for Rightcore Network Services.
 
 */
+
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /*******************************************************************************
 
