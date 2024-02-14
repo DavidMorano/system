@@ -25,12 +25,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<poll.h>
 #include	<cerrno>
 #include	<usystem.h>
 #include	<usupport.h>
+#include	<ustropts.h>
 #include	<localmisc.h>
 
 #include	"ustr.h"
@@ -73,6 +73,9 @@ namespace {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

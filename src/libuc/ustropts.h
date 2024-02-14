@@ -62,6 +62,7 @@
 
 #if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
 
+/* we have it: do nothing for now */
 
 #else /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 
@@ -83,10 +84,10 @@ struct strpeek {
 
 EXTERNC_begin
 
-int getmsg(int,STRBUF *,STRBUF *,int *) noex ;
-int getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
-int putmsg(int,STRBUF *,STRBUF *,int *) noex ;
-int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern int getmsg(int,STRBUF *,STRBUF *,int *) noex ;
+extern int getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern int putmsg(int,STRBUF *,STRBUF *,int *) noex ;
+extern int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
 
 EXTERNC_end
 
