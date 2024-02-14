@@ -75,6 +75,9 @@ static int	checkbasebounds(cchar *,int,void *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 #if	CF_DEBUGS
@@ -169,10 +172,8 @@ int mkhexnstr(char *hbuf,int hlen,int maxcols,cchar *sbuf,int slen) noex {
 }
 /* end subroutine (mkhexnstr) */
 
-
-int debugprinthex(cchar *ids,int maxcols,cchar *sp,int sl)
-{
-	const int	plen = PRINTBUFLEN ;
+int debugprinthex(cchar *ids,int maxcols,cchar *sp,int sl) noex {
+	cint		plen = PRINTBUFLEN ;
 	int		rs ;
 	int		idlen = 0 ;
 	int		wlen = 0 ;
@@ -230,7 +231,7 @@ int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 	    }
 
 	    if (rs >= 0) {
-	        const int	n = (cols / 3) ;
+	        cint	n = (cols / 3) ;
 		int		cslen ;
 	        cslen = MIN(n,sl) ;
 	        if ((rs = mkhexstr(pbp,pbl,sp,cslen)) >= 0) {
@@ -248,9 +249,8 @@ int debugprinthexblock(cchar *ids,int maxcols,cvoid *vp,int vl) noex {
 /* end subroutine (debugprinthexblock) */
 
 
-int hexblock(cchar *ids,cchar *ap,int n)
-{
-	const int	hexlen = HEXBUFLEN ;
+int hexblock(cchar *ids,cchar *ap,int n) noex {
+	cint		hexlen = HEXBUFLEN ;
 	int		i, sl ;
 	char		hexbuf[HEXBUFLEN + 3] ;
 
