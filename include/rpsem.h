@@ -12,13 +12,13 @@
 
 */
 
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+
 /*******************************************************************************
 
 	These are "unnamed" POSIX® semaphores.
 
 *******************************************************************************/
-
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PSEM_INCLUDE
 #define	PSEM_INCLUDE

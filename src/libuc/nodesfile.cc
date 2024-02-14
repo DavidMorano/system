@@ -1,4 +1,4 @@
-/* NF SUPPORT */
+/* nodesfile SUPPORT */
 /* lang=C++20 */
 
 /* read (process) a standard UNIX® "nodes" file */
@@ -128,7 +128,7 @@ int nodesfile_open(NF *op,cchar *fname,int maxsize,int of) noex {
 		if ((rs = uc_open(fname,of,0666)) >= 0) {
 		    USTAT	sb ;
 		    cint	fd = rs ;
-		    if ((rs = u_fstat(fd,&sb)) >= 0) {
+		    if ((rs = uc_fstat(fd,&sb)) >= 0) {
 			rs = SR_PROTO ;
 			if (S_ISREG(sb.st_mode)) {
 	    		    rs = SR_TOOBIG ;
@@ -152,7 +152,7 @@ int nodesfile_open(NF *op,cchar *fname,int maxsize,int of) noex {
 			    } /* end if (size OK) */
 			} /* end if (type-of-file) */
 		    } /* end if (stat-file) */
-		    rs1 = u_close(fd) ;
+		    rs1 = uc_close(fd) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (open-file) */
 	    } /* end if (valid) */

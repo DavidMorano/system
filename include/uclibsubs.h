@@ -91,7 +91,7 @@ extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
 extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 extern int	uc_gethostid(unsigned int *) noex ;
 extern int	uc_gethostname(char *,int) noex ;
-extern int	uc_gettimeofday(struct timeval *,void *) noex ;
+extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocessors(int) noex ;
 extern int	uc_syspages(int) noex ;
@@ -128,7 +128,7 @@ extern int	uc_procpid(cchar *,uid_t) noex ;
 extern int	uc_createfile(cchar *,mode_t) noex ;
 extern int	uc_openpt(int) noex ;
 extern int	uc_realpath(cchar *,char *) noex ;
-extern int	uc_truncate(cchar *,offset_t) noex ;
+extern int	uc_truncate(cchar *,off_t) noex ;
 extern int	uc_open(cchar *,int,mode_t) noex ;
 extern int	uc_opene(cchar *,int,mode_t,int) noex ;
 extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
@@ -136,7 +136,7 @@ extern int	uc_openenv(cchar *,int,mode_t,cchar **,int) noex ;
 extern int	uc_openinfo(struct ucopeninfo *) noex ;
 extern int	uc_create(cchar *,mode_t) noex ;
 extern int	uc_fpassfd(int,int) noex ;
-extern int	uc_ftruncate(int,offset_t) noex ;
+extern int	uc_ftruncate(int,off_t) noex ;
 extern int	uc_fstat(int,USTAT *) noex ;
 extern int	uc_stat(cchar *,USTAT *) noex ;
 extern int	uc_lstat(cchar *,USTAT *) noex ;
@@ -145,7 +145,7 @@ extern int	uc_pipe2(int *,int) noex ;
 extern int	uc_chmod(cchar *,mode_t) noex ;
 extern int	uc_chown(cchar *,uid_t,gid_t) noex ;
 extern int	uc_rename(cchar *,cchar *) noex ;
-extern int	uc_utime(cchar *,const struct utimbuf *) noex ;
+extern int	uc_utime(cchar *,const UTIMBUF *) noex ;
 
 extern int	uc_isatty(int) noex ;
 extern int	uc_fsync(int) noex ;
@@ -194,15 +194,15 @@ extern int	uc_writefile(int,cchar *) noex ;
 extern int	uc_reade(int,void *,int,int,int) noex ;
 extern int	uc_recve(int,void *,int,int,int,int) noex ;
 extern int	uc_recvfrome(int,void *,int,int,void *,int *,int,int) noex ;
-extern int	uc_recvmsge(int,struct msghdr *,int,int,int) noex ;
+extern int	uc_recvmsge(int,MSGHDR *,int,int,int) noex ;
 extern int	uc_sockatmark(int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
 extern int	uc_getsocktype(int) noex ;
 
-extern int	uc_lockf(int,int,offset_t) noex ;
-extern int	uc_lockfile(int,int,offset_t,offset_t,int) noex ;
-extern int	uc_tcsetattr(int,int,struct termios *) noex ;
-extern int	uc_tcgetattr(int,struct termios *) noex ;
+extern int	uc_lockf(int,int,off_t) noex ;
+extern int	uc_lockfile(int,int,off_t,off_t,int) noex ;
+extern int	uc_tcsetattr(int,int,TERMIOS *) noex ;
+extern int	uc_tcgetattr(int,TERMIOS *) noex ;
 extern int	uc_tcgetsid(int) noex ;
 extern int	uc_tcsetpgrp(int,pid_t) noex ;
 extern int	uc_tcgetpgrp(int) noex ;
@@ -239,7 +239,7 @@ extern int	uc_sigsetdel(sigset_t *,int) noex ;
 extern int	uc_sigsetismem(sigset_t *,int) noex ;
 
 /* special */
-extern int	uc_sigqueue(pid_t,int,const union sigval) noex ;
+extern int	uc_sigqueue(pid_t,int,const SIGVAL) noex ;
 extern int	uc_sigwaitinfo(const sigset_t *,siginfo_t *) noex ;
 extern int	uc_sigtimedwait(const sigset_t *,siginfo_t *,
 			const TIMESPEC *) noex ;
@@ -248,9 +248,9 @@ extern int	uc_sigwaitinfoto(const sigset_t *,siginfo_t *,
 /* special */
 
 extern int	uc_safesleep(int) noex ;
-extern int	uc_mktime(struct tm *,time_t *) noex ;
-extern int	uc_gmtime(const time_t *,struct tm *) noex ;
-extern int	uc_localtime(const time_t *,struct tm *) noex ;
+extern int	uc_mktime(TM *,time_t *) noex ;
+extern int	uc_gmtime(const time_t *,TM *) noex ;
+extern int	uc_localtime(const time_t *,TM *) noex ;
 extern int	uc_ttyname(int,char *,int) noex ;
 extern int	uc_mkfifo(cchar *,mode_t) noex ;
 extern int	uc_piper(int *,int) noex ;
@@ -372,7 +372,7 @@ extern int	uc_getusend() noex ;
 extern int	uc_getlogin(char *,int) noex ;
 
 /* miscellaneous */
-extern int	uc_ztime(struct tm *,const time_t *,int) noex ;
+extern int	uc_ztime(TM *,const time_t *,int) noex ;
 extern int	uc_kvamatch(kva_t *,cchar *,cchar **) noex ;
 
 EXTERNC_end

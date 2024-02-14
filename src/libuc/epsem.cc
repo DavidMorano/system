@@ -58,6 +58,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int psem_create(psem *psp,int pshared,int count) noex {
