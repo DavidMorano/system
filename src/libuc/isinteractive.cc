@@ -1,9 +1,8 @@
-/* isinteractive */
+/* isinteractive SUPPORT */
+/* lang=C++20 */
 
 /* test if we have a controlling terminal or not */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,24 +16,21 @@
 
 /*******************************************************************************
 
-        This subroutine tests if the calling program has a controlling terminal
-        attached. This means that the program is usually being run
-        interactively.
+	Name:
+	isinteractive
 
+	Description:
+	This subroutine tests if the calling program has a controlling
+	terminal attached. This means that the program is usually
+	being run interactively.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/socket.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
-
 #include	<usystem.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 
@@ -47,21 +43,20 @@
 
 /* external subroutines */
 
-extern int	isNotPresent(int) ;
-
 
 /* external variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int isinteractive()
-{
+int isinteractive() noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = u_open(TTYFNAME,O_RDONLY,0666)) >= 0) {
-	    f = TRUE ;
+	    f = true ;
 	    u_close(rs) ;
 	} else if (isNotPresent(rs)) {
 	    rs = SR_OK ;
