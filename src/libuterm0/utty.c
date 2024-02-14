@@ -32,7 +32,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>

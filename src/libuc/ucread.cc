@@ -78,16 +78,17 @@
 #include	<sys/socket.h>
 #include	<limits.h>
 #include	<unistd.h>
-#include	<stropts.h>
 #include	<fcntl.h>
 #include	<time.h>
 #include	<string.h>
 
 #if	CF_STREAM
-#include	<stropts.h>
 #endif
 
 #include	<usystem.h>
+#include	<six.h>
+#include	<strn.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 
@@ -101,15 +102,12 @@
 
 #define	POLLEVENTS	(POLLIN | POLLPRI)
 
-#define	MAXEOF		3
-
 
 /* external subroutines */
 
-extern int	sichr(const char *,int,int) ;
-extern int	isasocket(int) ;
-
-extern char	*strnchr(const char *,int,int) ;
+extern "C" {
+    extern int	isasocket(int) noex ;
+}
 
 
 /* local structures */
@@ -117,90 +115,55 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	readline_socket(int,char *,int,int) ;
-static int	readline_stream(int,char *,int,int) ;
-static int	readline_seekable(int,char *,int,int,off_t) ;
-static int	readline_default(int,char *,int,int) ;
+static int	readline_socket(int,char *,int,int) noex ;
+static int	readline_stream(int,char *,int,int) noex ;
+static int	readline_seekable(int,char *,int,int,off_t) noex ;
+static int	readline_default(int,char *,int,int) noex ;
 
-static int 	isseekable(int,off_t *) ;
+static int 	isseekable(int,off_t *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_readlinetimed(int fd,char *lbuf,int llen,int to)
-{
-	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	{
-	    struct ustat	sb ;
-	    debugprintf("uc_readlinetimed: fd=%d llen=%d to=%d\n",fd,llen,to) ;
-	    rs = u_fstat(fd,&sb) ;
-	    debugprintf("uc_readlinetimed: mode=%08o rdev=%08x\n",
-	        sb.st_mode,sb.st_rdev) ;
-	    debugprintf("uc_readlinetimed: ino=%llu dev=%08x\n",
-	        sb.st_ino,sb.st_dev) ;
-	    debugprintf("uc_readlinetimed: issock=%u isfifo=%u\n",
-	        S_ISSOCK(sb.st_mode),S_ISFIFO(sb.st_mode)) ;
-	}
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	{
-	    int	rs1 ;
-	    rs1 = u_fcntl(fd,F_GETFL,0) ;
-	    debugprintf("uc_readlinetimed: rs=%d flags=%08x\n",
-	        rs1,(rs1 & O_ACCMODE)) ;
-	    debugprintf("uc_readlinetimed: ndelay=%u nonblock=%u\n",
-	        (rs1 & O_NDELAY),(rs1 & O_NONBLOCK)) ;
-	}
-#endif /* CF_DEBUGS */
-
-	if (lbuf == NULL) return SR_FAULT ;
-
-	if (fd < 0) return SR_BADF ;
-
-	if (llen < 0) return SR_INVALID ;
-
-	if (llen > 0) {
-	    off_t	fo ;
-	    if (isasocket(fd)) {
-	       rs = readline_socket(fd,lbuf,llen,to) ;
-	    } else if (isastream(fd)) {
-	        rs = readline_stream(fd,lbuf,llen,to) ;
-	    } else if (isseekable(fd,&fo)) {
-	        rs = readline_seekable(fd,lbuf,llen,to,fo) ;
-	    } else {
-	        rs = readline_default(fd,lbuf,llen,to) ;
-	    }
-	} /* end if (positive) */
-
-#if	CF_DEBUGS
-	debugprintf("uc_readlinetimed: ret rs=%d \n",rs) ;
-#endif
-
+int uc_readlnto(int fd,char *lbuf,int llen,int to) noex {
+	int		rs = SR_FAULT ;
+	if (lbuf) {
+	    rs = SR_BADF ;
+	    if (fd >= 0) {
+	        rs = SR_INVALID ;
+	        if (llen > 0) {
+	            off_t	fo{} ;
+	            if (isasocket(fd)) {
+	               rs = readline_socket(fd,lbuf,llen,to) ;
+	            } else if (isastream(fd)) {
+	                rs = readline_stream(fd,lbuf,llen,to) ;
+	            } else if (isseekable(fd,&fo)) {
+	                rs = readline_seekable(fd,lbuf,llen,to,fo) ;
+	            } else {
+	                rs = readline_default(fd,lbuf,llen,to) ;
+	            }
+	        } /* end if (positive) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uc_readlinetimed) */
+/* end subroutine (uc_readlnto) */
 
-
-int uc_readline(int fd,char *lbuf,int llen)
-{
-
+int uc_readln(int fd,char *lbuf,int llen) noex {
 	return uc_readlinetimed(fd,lbuf,llen,-1) ;
 }
-/* end subroutine (uc_readline) */
+/* end subroutine (uc_readln) */
 
 
 /* private subroutines */
 
-
-static int readline_socket(int fd,char *lbuf,int llen,int to)
-{
+static int readline_socket(int fd,char *lbuf,int llen,int to) noex {
 	int		rs = SR_OK ;
 	int		mopts = MSG_PEEK ;
 	int		opts = (FM_TIMED | FM_EXACT) ;
@@ -209,13 +172,8 @@ static int readline_socket(int fd,char *lbuf,int llen,int to)
 	int		ch ;
 	int		lbl ;
 	int		tlen = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 	char		*lbp ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_readlinetimed: method=SOCKET\n") ;
-	debugprintf("uc_readlinetimed: llen=%u to=%d\n",llen,to) ;
-#endif
 
 	while ((rs >= 0) && (tlen < llen)) {
 	    lbp = (lbuf + tlen) ;
@@ -228,7 +186,7 @@ static int readline_socket(int fd,char *lbuf,int llen,int to)
 	    	    if ((rs = u_read(fd,lbp,rlen)) > 0) {
 	    		len = rs ;
 	    		tlen += len ;
-	    		ch = MKCHAR(lbuf[tlen-1]) ;
+	    		ch = mkchar(lbuf[tlen-1]) ;
 	    		if ((ch == '\n') || (ch == '\0')) break ;
 		    } else if (rs == 0) {
 			break ;
@@ -239,18 +197,14 @@ static int readline_socket(int fd,char *lbuf,int llen,int to)
 	    } /* end if (uc_recve) */
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("uc_readlinetimed/socket: ret rs=%d wlen=%u\n",rs,tlen) ;
-#endif
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (readline_socket) */
 
 
-static int readline_stream(int fd,char *lbuf,int llen,int to)
-{
-	struct pollfd	fds[2] ;
-	struct strpeek	pd ;
+static int readline_stream(int fd,char *lbuf,int llen,int to) noex {
+	POLLFD		fds[2] ;
+	STRPEEK		pd ;
 	time_t		ti_now = time(NULL) ;
 	time_t		ti_start ;
 	int		rs = SR_OK ;
@@ -259,15 +213,10 @@ static int readline_stream(int fd,char *lbuf,int llen,int to)
 	int		len ;
 	int		ch ;
 	int		tlen = 0 ;
-	int		f_eof = FALSE ;
-	int		f_to = FALSE ;
-	const char	*tp ;
+	int		f_eof = false ;
+	int		f_to = false ;
+	cchar		*tp ;
 	char		cbuf[BUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_readlinetimed: method=STREAM\n") ;
-	debugprintf("uc_readlinetimed: to=%d\n",to) ;
-#endif
 
 	if (to < 0) to = INT_MAX ;
 
@@ -284,14 +233,12 @@ static int readline_stream(int fd,char *lbuf,int llen,int to)
 	fds[1].fd = -1 ;
 	fds[1].events = 0 ;
 
-	memset(&pd,0,sizeof(struct strpeek)) ;
+	memset(&pd,0,sizeof(STRPEEK)) ;
 	pd.flags = 0 ;
 	pd.ctlbuf.buf = cbuf ;
 	pd.ctlbuf.maxlen = BUFLEN ;
-
 	ti_start = ti_now ;
 	while ((rs >= 0) && (tlen < llen) && (to >= 0)) {
-
 	    pd.databuf.buf = (lbuf + tlen) ;
 	    pd.databuf.maxlen = (llen - tlen) ;
 	    if ((rs = u_poll(fds,1,POLLINTMULT)) > 0) {
@@ -305,7 +252,7 @@ static int readline_stream(int fd,char *lbuf,int llen,int to)
 	                f_eof = (len == 0) ;
 			if (len > 0) {
 	                    tlen += len ;
-	                    ch = MKCHAR(lbuf[tlen-1]) ;
+	                    ch = mkchar(lbuf[tlen-1]) ;
 	                    if ((ch == '\n') || (ch == '\0')) break ;
 			} else {
 			    break ;
@@ -319,23 +266,16 @@ static int readline_stream(int fd,char *lbuf,int llen,int to)
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
 	    }
-
 	} /* end while */
-
 	if ((rs >= 0) && (tlen == 0) && f_to && (! f_eof) && (llen > 0)) {
 	    rs = SR_TIMEDOUT ;
 	} /* end if */
-
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (readline_stream) */
 
-
-/* ARGSUSED */
-static int readline_seekable(int fd,char *lbuf,int llen,int to,off_t fo)
-{
+static int readline_seekable(int fd,char *lbuf,int llen,int to,off_t fo) noex {
 	int		rs ;
-
 	if ((rs = u_pread(fd,lbuf,llen,fo)) > 0) {
 	    int	rlen = rs ;
 	    int	si ;
@@ -344,53 +284,40 @@ static int readline_seekable(int fd,char *lbuf,int llen,int to,off_t fo)
 	    }
 	    rs = u_read(fd,lbuf,rlen) ;
 	} /* end if (u_pread) */
-
 	return rs ;
 }
 /* end subroutine (readline_seekable) */
 
-
-static int readline_default(int fd,char *lbuf,int llen,int to)
-{
+static int readline_default(int fd,char *lbuf,int llen,int to) noex {
 	int		rs = SR_OK ;
 	int		opts = (FM_TIMED | FM_EXACT) ;
 	int		len ;
 	int		ch ;
 	int		tlen = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_readlinetimed: method=DEFAULT\n") ;
-#endif
-
 	while ((rs >= 0) && (tlen < llen)) {
 	    if ((rs = uc_reade(fd,(lbuf + tlen),1,to,opts)) >= 0) {
 	        len = rs ;
 	        if (len > 0) {
 	            tlen += len ;
-	            ch = MKCHAR(lbuf[tlen-1]) ;
+	            ch = mkchar(lbuf[tlen-1]) ;
 	            if ((ch == '\n') || (ch == '\0')) break ;
 	        } else {
 		    break ;
 	        }
 	    } /* end if (uc_reade) */
 	} /* end while */
-
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (readline_default) */
 
-
-static int isseekable(int fd,off_t *fop)
-{
+static int isseekable(int fd,off_t *fop) noex {
 	int		rs ;
-	int		f = FALSE ;
-
+	int		f = false ;
 	if ((rs = u_seeko(fd,0L,SEEK_CUR,fop)) >= 0) {
-	    f = TRUE ;
+	    f = true ;
 	} else if (rs == SR_SPIPE) {
 	    rs = SR_OK ;
 	}
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (isseekable) */

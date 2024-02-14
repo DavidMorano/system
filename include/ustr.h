@@ -34,7 +34,6 @@
 #include	<clanguage.h>
 
 #include	<usys.h>
-#include	<ustropts.h>
 
 
 EXTERNC_begin

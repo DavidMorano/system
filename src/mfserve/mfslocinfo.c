@@ -43,7 +43,6 @@
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>

@@ -49,7 +49,6 @@
 
 #include	<sys/types.h>
 #include	<sys/conf.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<signal.h>

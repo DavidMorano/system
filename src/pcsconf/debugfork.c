@@ -31,7 +31,6 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<signal.h>
-#include	<stropts.h>
 #include	<stdlib.h>
 #include	<string.h>
 

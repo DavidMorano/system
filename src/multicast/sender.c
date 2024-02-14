@@ -22,7 +22,6 @@
 #include	<ctype.h>
 #include	<string.h>
 #include	<time.h>
-#include	<stropts.h>
 #include	<poll.h>
 
 #include 	"localmisc.h"

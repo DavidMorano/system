@@ -35,7 +35,6 @@
 #include	<sys/time.h>
 #include	<netinet/in.h>
 #include	<unistd.h>
-#include	<stropts.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>

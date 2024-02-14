@@ -32,7 +32,6 @@
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 
 #include	<usystem.h>
 #include	<localmisc.h>

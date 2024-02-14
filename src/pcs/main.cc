@@ -82,7 +82,6 @@
 #include	<unistd.h>
 #include	<signal.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<limits.h>
 #include	<stdlib.h>

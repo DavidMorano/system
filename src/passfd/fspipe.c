@@ -33,7 +33,6 @@
 #include	<sys/conf.h>
 #include	<sys/socket.h>
 #include	<sys/utsname.h>
-#include	<stropts.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>

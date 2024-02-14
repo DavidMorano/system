@@ -47,7 +47,6 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stropts.h>
 #include	<stdlib.h>
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<netdb.h>

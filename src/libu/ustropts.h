@@ -62,7 +62,6 @@
 
 #if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
 
-#include	<stropts.h>
 
 #else /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 

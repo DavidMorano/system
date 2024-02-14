@@ -81,7 +81,6 @@
 #include <limits.h>
 #include <pthread.h>
 #include <fcntl.h>
-#include <stropts.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>

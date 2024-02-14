@@ -33,7 +33,6 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>

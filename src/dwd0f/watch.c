@@ -56,7 +56,6 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<signal.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<dirent.h>
 #include	<stdlib.h>

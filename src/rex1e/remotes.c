@@ -40,7 +40,6 @@
 #include	<string.h>
 #include	<time.h>
 #include	<netdb.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<errno.h>
 

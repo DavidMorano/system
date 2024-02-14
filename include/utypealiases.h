@@ -55,7 +55,6 @@
 #include	<grp.h>
 
 #if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-#include	<stropts.h>
 #endif
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)

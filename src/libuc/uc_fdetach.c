@@ -20,7 +20,6 @@
 
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<poll.h>
 #include	<errno.h>

@@ -62,7 +62,6 @@
 #include <sys/types.h>
 #include <sys/types32.h>
 #include <sys/mman.h>
-#include <sys/stropts.h>
 #include <sys/strlog.h>
 #include <sys/log.h>		/* for LOG_MAXPS */
 #include <stdlib.h>
@@ -81,7 +80,6 @@
 #include <synch.h>
 #include <sys/door.h>
 #include <sys/stat.h>
-#include <stropts.h>
 #include <sys/wait.h>
 
 #define	MAXLINE		1024		/* max message size (but see below) */

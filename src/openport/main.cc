@@ -51,7 +51,6 @@
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<limits.h>
-#include	<stropts.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>

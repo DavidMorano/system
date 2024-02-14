@@ -25,7 +25,6 @@
 
 #include <sys/param.h>
 #include <sys/types.h>
-#include <sys/stropts.h>
 #include <fcntl.h>
 #include <xti.h>
 #include <stdlib.h>

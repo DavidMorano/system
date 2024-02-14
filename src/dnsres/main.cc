@@ -43,7 +43,6 @@
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<unistd.h>
-#include	<stropts.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>

@@ -48,7 +48,6 @@
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<time.h>
 #include	<netdb.h>
-#include	<stropts.h>
 #include	<poll.h>
 #include	<errno.h>
 #include	<usystem.h>
