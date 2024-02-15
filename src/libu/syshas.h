@@ -35,10 +35,10 @@
 /* Solaris®: projects */
 #define	SYSHAS_PROJECT		1
 
-/* Solaris®: system has 'statvfs(2)' call and friends */
+/* Solaris®: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
 
-/* Solaris®: system has 'poll(2)' call and friends */
+/* Solaris®: system has |poll(2)| call and friends */
 #define	SYSHAS_POLL		1
 
 /* Solaris®: system has STREAMS framework */
@@ -221,14 +221,14 @@
 /* Darwin: projects */
 #define	SYSHAS_PROJECT		0
 
-/* Darwin: system has 'statvfs(2)' call and friends */
+/* Darwin: system has |statvfs(2)| call and friends */
 #if	defined(OSNUM) && (OSNUM >= 8)
 #define	SYSHAS_STATVFS		1
 #else
 #define	SYSHAS_STATVFS		0
 #endif
 
-/* Darwin: system has 'poll(2)' call and friends */
+/* Darwin: system has |poll(2)| call and friends */
 #if	defined(OSNUM) && (OSNUM >= 8)
 #define	SYSHAS_POLL		1
 #else
@@ -426,10 +426,10 @@
 /* Linux: projects */
 #define	SYSHAS_PROJECT		0
 
-/* Linux: system has 'statvfs(2)' call and friends */
+/* Linux: system has |statvfs(2)| call and friends */
 #define	SYSHAS_STATVFS		1
 
-/* Linux: system has 'poll(2)' call and friends */
+/* Linux: system has |poll(2)| call and friends */
 #define	SYSHAS_POLL		1
 
 /* Linux: system has STREAMS framework */

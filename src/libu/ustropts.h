@@ -66,6 +66,10 @@
 #define	I_PEEK		0
 #endif
 
+#ifndef	I_STR
+#define	I_STR		1
+#endif
+
 #ifndef	ISPTM
 #define	ISPTM		0
 #endif
