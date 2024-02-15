@@ -1,10 +1,14 @@
-/* pcsnsrecs */
+/* pcsnsrecs HEADER */
+/* lang=C20 */
+
+/* PCS Name-Server Records */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSNSRECS_INCLUDE
-#define	PCSNSRECS_INCLUDE	1
+#define	PCSNSRECS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -31,36 +35,30 @@ struct pcsnsrecs_s {
 } ;
 
 struct pcsnsrecs_head {
-	uint		magic ;
 	void		*recs ;		/* linear array (of recs) */
 	PCSNSRECS_ST	s ;
-	PQ		lru ;		/* least-recently-used */
+	pq		lru ;		/* least-recently-used */
 	time_t		ti_check ;
 	uint		wcount ;	/* write-count */
+	uint		magic ;
 	int		ttl ;		/* time-to-live */
 	int		max ;		/* maximum entries */
 } ;
 
+typedef PCSNSRECS	pcsnsrecs ;
 
-#if	(! defined(PCSNSRECS_MASTER)) || (PCSNSRECS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int pcsnsrecs_start(PCSNSRECS *,int,int) noex ;
+extern int pcsnsrecs_store(PCSNSRECS *,cchar *,int,cchar *,int,int) noex ;
+extern int pcsnsrecs_lookup(PCSNSRECS *,char *,int,cchar *,int) noex ;
+extern int pcsnsrecs_invalidate(PCSNSRECS *,cchar *,int) noex ;
+extern int pcsnsrecs_check(PCSNSRECS *,time_t) noex ;
+extern int pcsnsrecs_stats(PCSNSRECS *,PCSNSRECS_ST *) noex ;
+extern int pcsnsrecs_finish(PCSNSRECS *) noex ;
 
-extern int pcsnsrecs_start(PCSNSRECS *,int,int) ;
-extern int pcsnsrecs_store(PCSNSRECS *,cchar *,int,cchar *,int,int) ;
-extern int pcsnsrecs_lookup(PCSNSRECS *,char *,int,cchar *,int) ;
-extern int pcsnsrecs_invalidate(PCSNSRECS *,cchar *,int) ;
-extern int pcsnsrecs_check(PCSNSRECS *,time_t) ;
-extern int pcsnsrecs_stats(PCSNSRECS *,PCSNSRECS_ST *) ;
-extern int pcsnsrecs_finish(PCSNSRECS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSNSRECS_MASTER */
 
 #endif /* PCSNSRECS_INCLUDE */
 
