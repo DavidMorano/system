@@ -1,4 +1,5 @@
 /* bal2 */
+/* lang=C++20 */
 
 #include	<sys/types.h>
 #include	<climits>
@@ -11,20 +12,10 @@
 #include	<iomanip>
 
 
-#ifndef	LANGUAGE_NELEM
-#define	LANGUAGE_NELEM	1
-#ifndef	nelem
-#define	nelem(n)	(sizeof(n) / sizeof((n)[0]))
-#endif
-#endif /* LANGUAGE_NELEM */
-
-
-
 using namespace	std ;
 
 
-static char compchar(int w)
-{
+static char compchar(int w) noex {
 	char	rch = '\0' ;
 	switch (w) {
 	case 0: 
@@ -40,18 +31,17 @@ static char compchar(int w)
 	return rch ;
 }
 
-class Solution {
-public:
+struct Solution {
 	bool isValid(string s) {
 	    stack<char>	hist ;
-	    const int	n = s.length() ;
+	    cint	n = s.length() ;
 	    int		c[3] = { 0, 0, 0 } ;
-	    int		w ;
 	    int		ct = 0 ;
 	    bool	f = true ;
 	    bool	f_open ;
 	    for (int i = 0 ; i < n ; i += 1) {
-	        int	ch = (s[i] & UCHAR_MAX) ;
+	        cint	ch = (s[i] & UCHAR_MAX) ;
+		int	w = 0 ;
 	        f_open = false ;
 	        switch (ch) {
 	        case '(':
@@ -88,14 +78,14 @@ public:
 	            }
 	        } else { /* close */
 	            if (c[w] > 0) {
-	            int	pch = (hist.top() & UCHAR_MAX) ;
+	                int	pch = (hist.top() & UCHAR_MAX) ;
 		        if (ch == pch) {
-	                c[w] -= 1 ;
-	                ct -= 1 ;
-	                hist.pop() ;
+	                    c[w] -= 1 ;
+	                    ct -= 1 ;
+	                    hist.pop() ;
 			} else {
-	                f = false ;
-	                break ;
+	                    f = false ;
+	                    break ;
 			}
 	            } else {
 	                f = false ;
@@ -105,7 +95,7 @@ public:
 	        if (!f) break ;
 	    } /* end for */
 	    if (f) {
- 		for (w = 0 ; w < 3 ; w += 1) {
+ 		for (int w = 0 ; w < 3 ; w += 1) {
 		    f = (c[w] == 0) ;
 		    if (!f) break ;
 		}
@@ -114,8 +104,7 @@ public:
 	} /* end method (isValid) */
 } ; /* end structure */
 
-int main()
-{
+int main() {
 	Solution	sol ;
 	string		s = "(){[[{}]]()}{}" ;
 	bool		f ;

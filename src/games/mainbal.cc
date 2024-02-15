@@ -15,10 +15,9 @@
 
 	I: Garret (2017-08-25)
 
-
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
@@ -30,7 +29,6 @@
 #include	<stack>
 #include	<deque>
 #include	<string>
-#include	<fstream>
 #include	<iostream>
 #include	<iomanip>
 #include	<usystem.h>
@@ -40,7 +38,7 @@
 /* local defines */
 
 
-/* name spaces */
+/* local namespaces */
 
 using namespace	std ;
 
@@ -60,10 +58,8 @@ struct StrRecurse {
 	bool mkstr(set<string> &,string &,int,int,int) ;
 } ;
 
-
-bool StrRecurse::mkstr(res_t &res,string &s,int c,int i,int w)
-{
-	bool	f = false ;
+bool StrRecurse::mkstr(res_t &res,string &s,int c,int i,int w) noex {
+	bool		f = false ;
 	if (i == N) {
 	    res.insert(s) ;
 	    f = true ;
@@ -93,17 +89,16 @@ bool StrRecurse::mkstr(res_t &res,string &s,int c,int i,int w)
 
 /* forward references */
 
-static void	printres(const res_t &res) ;
+static void	printres(const res_t &res) noex ;
 
-static res_t	bal1(int) ;
-static res_t	bal2(int) ;
-static res_t	bal3(int) ;
+static res_t	bal1(int) noex ;
+static res_t	bal2(int) noex ;
+static res_t	bal3(int) noex ;
 
 
 /* exported subroutines */
 
-
-bool IsBalanced1(const std::string &input) {
+bool IsBalanced1(const std::string &input) noex {
   bool		f = true ;
   int		count = 0 ;
   for (auto ch:input) {
@@ -122,13 +117,12 @@ bool IsBalanced1(const std::string &input) {
 } 
 /* end subroutine (IsBalanced1) */
 
-
-bool IsBalanced2(const std::string &input) {
+bool IsBalanced2(const std::string &input) noex {
   bool		f = true ;
-  const int	n = input.length() ;
+  cint	n = input.length() ;
   int		count = 0 ;
   for (int i = 0 ; i < n ; i += 1) {
-    const int	ch = input[i] ;
+    cint	ch = input[i] ;
     if (ch == '(') { 
       count += 1 ;
       if (count > (n-i)) {
@@ -147,10 +141,10 @@ bool IsBalanced2(const std::string &input) {
 } 
 /* end subroutine (IsBalanced2) */
 
-int main(int argc,mainv,mainv) {
-	const int	algos[] = { 1, 2, 3 } ;
-	const int	lengths[] = { 0, 1, 2, 4, 6, 8 } ;
-
+/* ARGSUSED */
+int main(int argc,cchar **argv,cchar **envv) {
+	cint	algos[] = { 1, 2, 3 } ;
+	cint	lengths[] = { 0, 1, 2, 4, 6, 8 } ;
 	for (auto n : lengths) {
 	    for (auto al : algos) {
 	        set<string>	res ;
@@ -177,8 +171,7 @@ int main(int argc,mainv,mainv) {
 
 /* local subroutines */
 
-
-static res_t bal1(const int N) {
+static res_t bal1(cint N) noex {
   res_t		res ;
   StrRecurse	mk(N) ;
   string	s ;
@@ -192,7 +185,6 @@ static res_t bal1(const int N) {
   return res ;
 }
 /* end subroutine (bal1) */
-
 
 struct bal2_item {
 	int	c = 0 ; /* count */
@@ -240,13 +232,12 @@ struct bal2_item {
 	/* do not need 'move' constructor or assignment (too simple) */
 } ;
 
-static void bal2_push(stack<bal2_item> &s,int c,int i,int w)
-{
+static void bal2_push(stack<bal2_item> &s,int c,int i,int w) noex {
    bal2_item	wi(c,i,w) ;
    s.push(wi) ;
 }
 
-static res_t bal2(const int N) {
+static res_t bal2(cint N) noex {
   res_t		res ;
   string	s ;
   if (N == 0) {
@@ -296,7 +287,6 @@ static res_t bal2(const int N) {
 }
 /* end subroutine (bal2) */
 
-
 struct bal3_item {
 	int	c = 0 ; /* count */
 	int	i = 0 ; /* index */
@@ -309,9 +299,8 @@ struct bal3_item {
 	/* do not need 'move' constructor or assignment (too simple) */
 } ;
 
-static void bal3_push(stack<bal3_item> &work,int c,int i)
-{
-	const int	n = 2 ;
+static void bal3_push(stack<bal3_item> &work,int c,int i) noex {
+	cint	n = 2 ;
 	for (int w = 0 ; w < n ; w += 1) {
 	    bal3_item	wi(c,i,w) ;
 	    work.push(wi) ;
@@ -319,7 +308,7 @@ static void bal3_push(stack<bal3_item> &work,int c,int i)
 }
 /* end subroutine (bal3_push) */
 
-static res_t bal3(const int N) {
+static res_t bal3(cint N) noex {
 	res_t		res ;
 	string		s ;
 	if (N == 0) {
@@ -371,9 +360,7 @@ static res_t bal3(const int N) {
 }
 /* end subroutine (bal3) */
 
-
-static void printres(const res_t &res)
-{
+static void printres(const res_t &res) noex {
 	for (auto &s : res) {
 	    cout << s << endl ;
 	}
