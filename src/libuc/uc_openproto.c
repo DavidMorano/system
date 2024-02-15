@@ -1208,7 +1208,7 @@ int cols,int ind,int to)
 	    cchar	*lp, *sp ;
 	    cchar	*cp ;
 
-	    while ((rs = filebuf_readline(ifp,lbuf,llen,to)) > 0) {
+	    while ((rs = filebuf_readln(ifp,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 	        clen = mkcleanline(lbuf,len,0) ;
 #if	CF_DEBUGS
@@ -1388,7 +1388,7 @@ static int fingerclean(const int fd)
 	        if ((rs = uc_libmalloc(size,&bp)) >= 0) {
 	            lbuf = bp ;
 	            cbuf = (bp+(llen+1)) ;
-	            while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
+	            while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 	                int	len = rs ;
 	                if (hasmseol(lbuf,len)) {
 	                    len -= 1 ;

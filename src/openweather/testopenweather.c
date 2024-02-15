@@ -163,7 +163,7 @@ static int procweather(int fd,int of)
 	    const int	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
+	    while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 #if	CF_DEBUGS
 	        debugprintf("main/dumpfile: readline() len=%d\n",len) ;

@@ -1384,11 +1384,11 @@ static int liner_readline(LINER *lsp,cchar **lpp)
 	if (lsp->llen < 0) {
 
 	    lsp->poff = lsp->foff ;
-	    rs = filebuf_readline(fbp,lsp->lbuf,LINEBUFLEN,lsp->to) ;
+	    rs = filebuf_readln(fbp,lsp->lbuf,LINEBUFLEN,lsp->to) ;
 	    lsp->llen = rs ;
 
 #if	CF_DEBUGS
-	    debugprintf("liner_readline: filebuf_readline() rs=%d\n",rs) ;
+	    debugprintf("liner_readline: filebuf_readln() rs=%d\n",rs) ;
 	    debugprintf("liner_readline: l=>%t<\n",
 	        lsp->lbuf,strlinelen(lsp->lbuf,rs,40)) ;
 #endif

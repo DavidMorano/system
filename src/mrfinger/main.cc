@@ -775,7 +775,7 @@ const char	query[] ;
 
 	        while (rs >= 0) {
 
-	            rs = filebuf_readline(&rd,linebuf,LINEBUFLEN,to) ;
+	            rs = filebuf_readln(&rd,linebuf,LINEBUFLEN,to) ;
 	            len = rs ;
 	            if (rs <= 0)
 	                break ;

@@ -300,7 +300,7 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 	        cchar		*sp ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs1 = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs1 = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 	            ll = rs ;
 	            rs = useraccdb_recparse(op,&rec,lbuf,ll) ;
 	            if (rs >= 0) {
@@ -371,7 +371,7 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 #if	CF_DEBUGS
 	debugprintf("useraccdb_update: filebuf_start() rs=%d\n",rs) ;
 #endif
-	            while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	            while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 	                ll = rs ;
 #if	CF_DEBUGS
 	                debugprintf("useraccdb_update: ll=%u\n",ll) ;
@@ -509,7 +509,7 @@ int		elen ;
 	    const int	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    off_t	eo = curp->eo ;
-	    if ((rs = filebuf_readline(&curp->b,lbuf,llen,-1)) >= 0) {
+	    if ((rs = filebuf_readln(&curp->b,lbuf,llen,-1)) >= 0) {
 		ll = rs ;
 	        if (ll > 0) {
 	            USERACCDB_REC	rec ;
@@ -523,7 +523,7 @@ int		elen ;
 		}
 	        if (rs >= 0)
 	            curp->eo = (eo + ll) ;
-	    } /* end if (filebuf_readline) */
+	    } /* end if (filebuf_readln) */
 	} /* end if (ok) */
 
 	return rs ;

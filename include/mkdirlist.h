@@ -33,7 +33,7 @@
 
 
 struct mkdirlist_head {
-	vechand		dirs ;
+	vechand		*dlp ;		/* Directory-List-Pointer */
 	uint		magic ;
 } ;
 

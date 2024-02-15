@@ -1303,7 +1303,7 @@ static int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 	            if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
 	                const int	llen = LINEBUFLEN ;
 	                char		lbuf[LINEBUFLEN+1] ;
-	                while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	                while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 	                    int		len = rs ;
 	                    if (lbuf[len-1] == '\n') len -= 1 ;
 #if	CF_DEBUG

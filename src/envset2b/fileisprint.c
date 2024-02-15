@@ -127,7 +127,7 @@ const char	fname[] ;
 	        int		ll ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 	            ll = rs ;
 
 	            if (lbuf[ll - 1] == '\n') ll -= 1 ;

@@ -214,7 +214,7 @@ int subpcs_af(SUBPCS *sip,FILEBUF *ofp,cchar *afn)
 		    cchar	*cp ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            while ((rs = filebuf_readline(afp,lbuf,llen,to)) > 0) {
+	            while ((rs = filebuf_readln(afp,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	                if (lbuf[len - 1] == '\n') len -= 1 ;

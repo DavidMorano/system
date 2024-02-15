@@ -477,7 +477,7 @@ int		mfd ;
 	        char		lbuf[INBUFLEN + 1] ;
 
 	        while ((rs >= 0) && (rlen > 0)) {
-	            rs = filebuf_readline(&in,lbuf,llen,0) ;
+	            rs = filebuf_readln(&in,lbuf,llen,0) ;
 	            inlen = rs ;
 	            if (rs <= 0) break ;
 

@@ -384,7 +384,7 @@ const char	nodename[] ;
 	    rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0) ;
 	    if (rs >= 0) {
 
-	        while ((rs = filebuf_readline(&b,buf,BUFLEN,TO_READ)) > 0) {
+	        while ((rs = filebuf_readln(&b,buf,BUFLEN,TO_READ)) > 0) {
 
 	            len = rs ;
 		    if (buf[len - 1] == '\n')

@@ -508,7 +508,7 @@ static int filecounts_scan(FILECOUNTS *op,WORKER *wp,FILEBUF *fbp)
 	int		rn = 1 ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	while ((rs = filebuf_readline(fbp,lbuf,llen,to)) > 0) {
+	while ((rs = filebuf_readln(fbp,lbuf,llen,to)) > 0) {
 	    len = rs ;
 
 #if	CF_DEBUGS
@@ -770,7 +770,7 @@ static int filecounts_snaper(FILECOUNTS *op,VECOBJ *ilp)
 	        const int	to = -1 ;
 	        const int	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
-	        while ((rs = filebuf_readline(&fb,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(&fb,lbuf,llen,to)) > 0) {
 	            rs = filecounts_snaperline(op,&dm,ilp,lbuf,rs) ;
 	            if (rs < 0) break ;
 	        } /* end while */

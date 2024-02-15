@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} stropts.h"
+NAMES="${NAMES} filebuf_readline"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/stropts.h/d
+g/filebuf_readline/s//filebuf_readln/g
 	w
 	q
 EOF
