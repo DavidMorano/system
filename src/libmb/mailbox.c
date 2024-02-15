@@ -1621,7 +1621,7 @@ static int liner_read(LINER *lsp,cchar **lpp)
 	if (lsp->llen < 0) {
 	    const int	llen = LINEBUFLEN ;
 	    lsp->poff = lsp->foff ;
-	    if ((rs = filebuf_readline(fbp,lsp->lbuf,llen,lsp->to)) >= 0) {
+	    if ((rs = filebuf_readln(fbp,lsp->lbuf,llen,lsp->to)) >= 0) {
 	        lsp->llen = rs ;
 	        lsp->foff += lsp->llen ;
 	    }

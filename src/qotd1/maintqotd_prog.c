@@ -591,7 +591,7 @@ static int debugoutput(cchar *ids,int fd)
 	    if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
 	        const int	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN+1] ;
-	        while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 	            debugprintf("o> %t\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;
 	        } /* end while */

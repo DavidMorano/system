@@ -2199,7 +2199,7 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    memset(&ls,0,sizeof(struct lstate)) ;
-	    while ((rs = filebuf_readline(&buf,lbuf,llen,to)) > 0) {
+	    while ((rs = filebuf_readln(&buf,lbuf,llen,to)) > 0) {
 	        tlen += rs ;
 	        len = rs ;
 
@@ -2336,7 +2336,7 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 #endif
 
 	        while (rs >= 0) {
-	            rs = filebuf_readline(&buf,lbuf,llen,to) ;
+	            rs = filebuf_readln(&buf,lbuf,llen,to) ;
 	            len = rs ;
 	            if (rs <= 0) break ;
 

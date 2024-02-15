@@ -375,7 +375,7 @@ static int readpass(int fd,char *outbuf,int outlen)
 	if (rs < 0)
 	    goto ret0 ;
 
-	rs = filebuf_readline(&b,rdbuf,RDBUFLEN,TO_READ) ;
+	rs = filebuf_readln(&b,rdbuf,RDBUFLEN,TO_READ) ;
 	len = rs ;
 	if (rs >= 0) {
 

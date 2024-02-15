@@ -29,10 +29,11 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |getpagesize(3c)| */
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstring>		/* |strlen(3c)| */
+#include	<ctime>			/* |time(2)| */
 #include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
 #include	<estrings.h>
@@ -102,11 +103,11 @@ static int nodesfile_dtor(nodesfile *op) noex {
 }
 /* end subroutine (nodesfile_dtor) */
 
-static int	nodesfile_opener(nodesfile *,int) noex ;
+static int	nodesfile_opener(nodesfile *) noex ;
 static int	nodesfile_parse(NF *) noex ;
 static int	nodesfile_filechanged(NF *,time_t) noex ;
-static int	nodesfile_filemap(NF *) noex ;
-static int	nodesfile_fileunmap(NF *) noex ;
+static int	nodesfile_filemapbegin(NF *) noex ;
+static int	nodesfile_filemapend(NF *) noex ;
 
 static int	hdb_release(hdb *) noex ;
 
@@ -143,7 +144,7 @@ int nodesfile_open(NF *op,cchar *fname,int maxsize,int of) noex {
 				    op->fi.ino = sb.st_ino ;
 				    op->fi.dev = sb.st_dev ;
 				    op->filesize = sb.st_size ;
-				    rs = nodesfile_opener(op,fd) ;
+				    rs = nodesfile_opener(op) ;
 				    if (rs < 0) {
 	    				uc_free(op->fi.fname) ;
 	    				op->fi.fname = nullptr ;
@@ -174,12 +175,8 @@ int nodesfile_close(NF *op) noex {
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->mapbuf) {
-	        caddr_t		ma = caddr_t(op->mapbuf) ;
-	        csize		ms = op->mapsize ;
-	        rs1 = u_mmapend(ma,ms) ;
+		rs1 = nodesfile_filemapend(op) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->mapbuf = nullptr ;
-	        op->mapsize = 0 ;
 	    }
 	    if (op->fi.fname) {
 	        rs1 = uc_free(op->fi.fname) ;
@@ -291,17 +288,11 @@ int nodesfile_enum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 
 /* private subroutines */
 
-static int nodesfile_opener(nodesfile *op,int fd) noex {
+static int nodesfile_opener(nodesfile *op) noex {
 	const nullptr_t	np{} ;
-	csize		ms = szceil((op->filesize+1),op->pagesize) ;
-	cint		mf = MAP_SHARED ;
-	cint		mp = PROT_READ ;
 	int		rs ;
-	void		*ma{} ;
-	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&ma)) >= 0) {
+	if ((rs = nodesfile_filemapbegin(op)) >= 0) {
 	    cint	ne = NODESFILE_DEFNODES ;
-	    op->mapbuf = charp(ma) ;
-	    op->mapsize = ms ;
 	    if ((rs = hdb_start(op->nlp,ne,0,np,np)) >= 0) {
 		rs = nodesfile_parse(op) ;
 		if (rs < 0) {
@@ -309,9 +300,7 @@ static int nodesfile_opener(nodesfile *op,int fd) noex {
 		}
 	    } /* end if (hdb) */
 	    if (rs < 0) {
-		u_mmapend(ma,ms) ;
-		op->mapbuf = nullptr ;
-		op->mapsize = 0 ;
+		nodesfile_filemapend(op) ;
 	    }
 	} /* end if (map-file) */
 	return rs ;
@@ -321,124 +310,84 @@ static int nodesfile_opener(nodesfile *op,int fd) noex {
 static int nodesfile_parse(NF *op) noex {
 	hdb_datum	key, value ;
 	int		rs = SR_OK ;
-	int		i ;
-	int		sl, cl ;
 	int		n = 0 ;
-	cchar	*sp, *cp ;
-	cchar	*ep ;
-
+	int		sl = op->filesize ;
+	int		cl ;
+	cchar		*sp = op->mapbuf ;
+	cchar		*cp ;
+	cchar		*ep ;
 	value.buf = nullptr ;
 	value.len = 0 ;
-
-	n = 0 ;
-	sp = op->mapbuf ;
-	sl = op->filesize ;
-
-	ep = sp + sl ;
+	ep = (sp + sl) ;
 	while (sp < ep) {
-
-	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
-
+	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	        if (cp[0] == '#') {
-
-	            while ((cp < ep) && (*cp != '\n'))
+	            while ((cp < ep) && (*cp != '\n')) {
 	                cp += 1 ;
-
+		    }
 	            sl -= (cp - sp) ;
 	            sp = cp ;
-
 	        } else {
-
 	            sl -= ((cp + cl) - sp) ;
 	            sp = (cp + cl) ;
-
 /* remove trailing comments */
-
-		    for (i = 0 ; i < cl ; i += 1) {
+		    for (int i = 0 ; i < cl ; i += 1) {
 			if (cp[i] == '#') {
 				cl = i ;
 				break ;
 			}
 		    } /* end for */
-
 /* store it */
-
 	            key.buf = (void *) cp ;
 	            key.len = cl ;
 	            rs = hdb_store(op->nlp,key,value) ;
-
 	            n += 1 ;
-
 	        } /* end if */
-
-	            if (rs < 0) break ;
+	        if (rs < 0) break ;
 	    } /* end while (fields) */
-
-#ifdef	COMMENT /* old semantics of 'nextfield(3dam)' */
-	    if ((cp < ep) && (*cp == '\n'))
-	        cp += 1 ;
-#else /* safer semantics */
 	    cp = sp ;
-	    while ((cp < ep) && (*cp != '\n'))
+	    while ((cp < ep) && (*cp != '\n')) {
 	        cp += 1 ;
-
-	    if ((cp < ep) && (*cp == '\n'))
+	    }
+	    if ((cp < ep) && (*cp == '\n')) {
 	        cp += 1 ;
-#endif
-
+	    }
 	    sl -= (cp - sp) ;
 	    sp = cp ;
-
 	    if (rs < 0) break ;
 	} /* end while (reading lines) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (nodesfile_parse) */
 
 static int nodesfile_filechanged(NF *op,time_t daytime) noex {
 	USTAT		sb ;
-	int	rs ;
-	int	f = false ;
-
-	rs = u_stat(op->fi.fname,&sb) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	f = (op->fi.mtime > sb.st_mtime) ;
-	f = f || (op->fi.ino != sb.st_ino) ;
-	f = f || (op->fi.dev != sb.st_dev) ;
-
-	if (f)
-	    f = f && ((daytime - op->fi.mtime) >= TO_HOLD) ;
-
-	if (f) {
-
-	    op->filesize = sb.st_size ;
-
-	    op->fi.mtime = sb.st_mtime ;
-	    op->fi.ino = sb.st_ino ;
-	    op->fi.dev = sb.st_dev ;
-
-/* if the file SIZE grew, do a complete remap */
-
-	    if (sb.st_size > op->mapsize) {
-
-	        u_munmap(op->mapbuf,(size_t) op->mapsize) ;
-
-	        op->mapbuf = nullptr ;
-	        rs = nodesfile_filemap(op) ;
-
+	int		rs ;
+	int		f = false ;
+	if ((rs = uc_stat(op->fi.fname,&sb)) >= 0) {
+	    f = (op->fi.mtime > sb.st_mtime) ;
+	    f = f || (op->fi.ino != sb.st_ino) ;
+	    f = f || (op->fi.dev != sb.st_dev) ;
+	    if (f) {
+	        f = f && ((daytime - op->fi.mtime) >= TO_HOLD) ;
 	    }
-
-	} /* end if (file changed) */
-
-ret0:
+	    if (f) {
+	        op->filesize = sb.st_size ;
+	        op->fi.mtime = sb.st_mtime ;
+	        op->fi.ino = sb.st_ino ;
+	        op->fi.dev = sb.st_dev ;
+	        if (sb.st_size > op->mapsize) {
+	            if ((rs = nodesfile_filemapend(op)) >= 0) {
+	                rs = nodesfile_filemapbegin(op) ;
+		    }
+	        }
+	    } /* end if (file changed) */
+	} /* end if (uc_stat) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (nodesfile_filechanged) */
 
-static int nodesfile_filemap(NF *op) noex {
+static int nodesfile_filemapbegin(NF *op) noex {
 	const nullptr_t	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -448,36 +397,36 @@ static int nodesfile_filemap(NF *op) noex {
 	    cint	fd = rs ;
 	    rs = SR_TOOBIG ;
 	    if (op->filesize <= op->maxsize) {
-	        size_t	ms = szceil((op->filesize+1),op->pagesize) ;
+	        csize	ms = szceil((op->filesize+1),op->pagesize) ;
 	        cint	mp = PROT_READ ;
 	        cint	mf = MAP_SHARED ;
 	        void	*ma{} ;
-	        if ((rs = u_mmap(np,ms,mp,mf,fd,0L,&ma)) >= 0) {
+	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&ma)) >= 0) {
 		    op->mapbuf = charp(ma) ;
 		    op->mapsize = ms ;
 	        }
 	    } /* end if (file-size) */
-	    rs1 = u_close(fd) ;
+	    rs1 = uc_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file-open) */
 	return rs ;
 }
-/* end subroutine (nodesfile_filemap) */
+/* end subroutine (nodesfile_filemapbegin) */
 
-static int nodesfile_fileunmap(NF *op) noex {
+static int nodesfile_filemapend(NF *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapbuf) {
 	    caddr_t	ma = caddr_t(op->mapbuf) ;
 	    csize	ms = op->mapsize ;
-	    rs1 = u_munmap(ma,ms) ;
+	    rs1 = u_mmapend(ma,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->mapbuf = nullptr ;
 	    op->mapsize = 0 ;
 	}
 	return rs ;
 }
-/* end subroutine (nodesfile_fileunmap) */
+/* end subroutine (nodesfile_filemapend) */
 
 static int hdb_release(hdb *hsp) noex {
 	int		rs = SR_FAULT ;

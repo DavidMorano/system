@@ -1548,7 +1548,7 @@ static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp)
 	    const int	to = pip->to_read ;
 	    const int	llen = lbp->llen ;
 	    char	*lbuf = lbp->lbuf ;
-	    while ((rs = filebuf_readlines(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 		cchar	*lp = lbuf ;
 		int	ll = rs ;
 
@@ -1834,7 +1834,7 @@ static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp)
 	    const int	llen = lbp->llen ;
 	    const int	to = pip->to_read ;
 	    char	*lbuf = lbp->lbuf ;
-	    while ((rs = filebuf_readlines(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        cchar	*lp = lbuf ;
 	        int	ll = rs ;
 

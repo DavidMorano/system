@@ -202,7 +202,7 @@ static int dumpfile(FILE *ofp,int fd,int of)
 	    const int	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
+	    while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 		fbwrite(ofp,lbuf,len) ;
 #if	CF_DEBUGS

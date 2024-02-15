@@ -144,7 +144,7 @@ const char	*fname ;
 	        int		ll ;
 		const char	*lp ;
 
-	        while ((rs = filebuf_readline(&f,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(&f,lbuf,llen,to)) > 0) {
 	            ll = rs ;
 
 	            if (lbuf[ll - 1] == '\n') ll -= 1 ;

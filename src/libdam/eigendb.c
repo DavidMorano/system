@@ -386,7 +386,7 @@ static int eigendb_fileparseread(EIGENDB *op,int fd,int fsize)
 /* read the file */
 
 	    f_bol = TRUE ;
-	    while ((rs = filebuf_readline(&fb,lbuf,llen,to)) > 0) {
+	    while ((rs = filebuf_readln(&fb,lbuf,llen,to)) > 0) {
 	        len = rs ;
 
 	        f_eol = (lbuf[len - 1] == '\n') ;

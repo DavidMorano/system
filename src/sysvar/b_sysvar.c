@@ -1950,7 +1950,7 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl)
 
 	    if ((rs = filebuf_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
 
-	        while ((rs = filebuf_readline(dfp,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(dfp,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;

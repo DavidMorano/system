@@ -200,7 +200,7 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd)
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            while ((rs = filebuf_readline(lfp,lbuf,llen,to)) > 0) {
+	            while ((rs = filebuf_readln(lfp,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	                if (lbuf[len - 1] == '\n') len -= 1 ;

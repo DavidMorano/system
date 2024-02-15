@@ -934,7 +934,7 @@ const char	query[] ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            while ((rs = filebuf_readline(&rd,lbuf,llen,to)) > 0) {
+	            while ((rs = filebuf_readln(&rd,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	                while ((len > 0) && CHAR_ISWHITE(lbuf[len - 1])) {

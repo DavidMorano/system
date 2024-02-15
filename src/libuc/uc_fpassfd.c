@@ -1,11 +1,8 @@
-/* uc_fpassfd */
+/* uc_fpassfd SUPPORT */
+/* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* pass a file-descriptor to a file-descriptor */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -19,36 +16,32 @@
 
 /*******************************************************************************
 
+	Name:
+	uc_fpassfd
+
+	Description:
 	We pass a file-descriptor to another file-descriptor.
 
 	Synopsis:
-
-	int uc_fpassfd(int pfd,int fd)
+	int uc_fpassfd(int pfd,int fd) noex
 
 	Arguments:
-
 	pfd		pass-file-descriptor
 	fd		file-descriptor to pass
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error (shystem-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<ustropts.h>
 #include	<localmisc.h>
 
 
@@ -56,12 +49,6 @@
 
 
 /* external subroutines */
-
-extern int	msleep(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
 
 
 /* external variables */
@@ -73,11 +60,12 @@ extern int	debugprintf(cchar *,...) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_fpassfd(int fd_pass,int fd)
-{
+int uc_fpassfd(int fd_pass,int fd) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_fstat(fd_pass,&sb)) >= 0) {

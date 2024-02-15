@@ -104,7 +104,7 @@ int mailmsg_loadfd(MAILMSG *mmp,int mfd,off_t fbo)
 	    if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
 	        int	ll ;
 
-	        while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 	            ll = rs ;
 
 	            tlen += ll ;

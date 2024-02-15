@@ -203,7 +203,7 @@ static int procfile(FILEBUF *wfp,int of,mode_t om,const char *ds,int f_top)
 	            int		line = 0 ;
 	            int		len ;
 
-	            while ((rs = filebuf_readline(sfp,lbuf,llen,to)) > 0) {
+	            while ((rs = filebuf_readln(sfp,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	        	if (lbuf[len-1] == '\n') len -= 1 ;

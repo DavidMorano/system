@@ -2437,7 +2437,7 @@ static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
 	    const int	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    while ((rs = filebuf_readlines(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        len = rs ;
 	        if (rs >= 0) rs = lib_sigterm() ;
 	        if (rs >= 0) rs = lib_sigintr() ;

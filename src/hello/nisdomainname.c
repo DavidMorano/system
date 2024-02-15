@@ -186,7 +186,7 @@ static int nisfile(char rbuf[],int rlen,cchar *fname)
 		cchar		*cp ;
 		char		lbuf[LINEBUFLEN + 1] ;
 
-	        while ((rs = filebuf_readline(&fb,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(&fb,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 		    if (lbuf[len-1] == '\n') len -= 1 ;

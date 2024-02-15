@@ -436,7 +436,7 @@ static int worker(int rfd,int fac,int pri)
 	   	const int	llen = LINEBUFLEN ;
 		char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 		    int	ll = rs ;
 
 		    if (lbuf[ll-1] == '\n') ll -= 1 ;

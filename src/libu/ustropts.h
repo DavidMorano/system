@@ -1,8 +1,8 @@
 /* ustropts HEADER */
 /* lang=C20 */
 
-/* version %I% last-modified %G% */
 /* auxillary operating system support */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -34,21 +34,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<time.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-
-
-#ifndef	CBUFLEN
-#define	CBUFLEN		(2*1024)
-#endif
-
-#ifndef	DBUFLEN
-#define	DBUFLEN		(2*1024)
-#endif
 
 
 #ifndef	STRBUF
@@ -59,14 +47,39 @@
 #define	STRPEEK		struct strpeek
 #endif
 
+#ifndef	STRRECVFD
+#define	STRRECVFD	struct strrecvfd
+#endif
+
+#ifndef	STRIOCTL	
+#define	STRIOCTL	struct strioctl
+#endif
+
 
 #if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
 
+/* we have it: do nothing for now */
 
 #else /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 
 #ifndef	I_PEEK
 #define	I_PEEK		0
+#endif
+
+#ifndef	I_STR
+#define	I_STR		1
+#endif
+
+#ifndef	I_SENDFD
+#define	I_SENDFD	2
+#endif
+
+#ifndef	I_RECVFD
+#define	I_RECVFD	3
+#endif
+
+#ifndef	ISPTM
+#define	ISPTM		0		/* ask if FD is a pseudo-terminal */
 #endif
 
 struct strbuf {
@@ -78,15 +91,29 @@ struct strbuf {
 struct strpeek {
 	STRBUF		ctlbuf ;
 	STRBUF		databuf ;
-	int		flags ;
+	uint		flags ;
+} ;
+
+struct strrecvfd {      
+        int		fd ;
+        uid_t		uid ;
+        gid_t		gid ;
+        char		fill[8] ;
+} ;
+
+struct strioctl {
+	char		*ic_dp ;	/* data pointer */
+	int		ic_len ;	/* data length */
+	int		ic_cmd ;	/* command */
+	int		ic_timout ;	/* timeout */
 } ;
 
 EXTERNC_begin
 
-int getmsg(int,STRBUF *,STRBUF *,int *) noex ;
-int getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
-int putmsg(int,STRBUF *,STRBUF *,int *) noex ;
-int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern int getmsg(int,STRBUF *,STRBUF *,int *) noex ;
+extern int getpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
+extern int putmsg(int,STRBUF *,STRBUF *,int *) noex ;
+extern int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex ;
 
 EXTERNC_end
 

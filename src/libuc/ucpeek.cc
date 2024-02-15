@@ -44,16 +44,13 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<libmallocxx.h>
+#include	<ustropts.h>		/* <- important money shot */
 #include	<localmisc.h>
 
 #include	"ucpeek.h"
 
 
 /* local defines */
-
-#ifndef	CBUFLEN
-#define	CBUFLEN		LINEBUFLEN
-#endif
 
 
 /* external subroutines */
@@ -81,7 +78,7 @@ int uc_peek(int fd,void *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
 	    rs = SR_INVALID ;
-	    char	*tbuf = (char *) dbuf ;
+	    char	*tbuf = charp(dbuf) ;
 	    tbuf[0] = '\0' ;
 	    if (dlen > 0) {
 		rs = SR_BADFD ;
@@ -107,7 +104,7 @@ int uc_peek(int fd,void *dbuf,int dlen) noex {
 /* local subroutines */
 
 static int peek_socket(int fd,void *dbuf,int dlen) noex {
-	cint	mopts = MSG_PEEK ;
+	cint		mopts = MSG_PEEK ;
 	return u_recv(fd,dbuf,dlen,mopts) ;
 }
 /* end subroutine (peek_socket) */
@@ -122,12 +119,13 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	    cbuf[0] = '\0' ;
 	    {
 	        STRPEEK		pd{} ;
+		cint		req = I_PEEK ;
 	        pd.flags = 0 ;
 	        pd.ctlbuf.buf = cbuf ;
 	        pd.ctlbuf.maxlen = clen ;
 	        pd.databuf.buf = (char *) dbuf ;
 	        pd.databuf.maxlen = dlen ;
-	        rs = u_ioctl(fd,I_PEEK,&pd) ;
+	        rs = u_ioctl(fd,req,&pd) ;
 	        len = pd.databuf.len ;
 	    }
 	    rs1 = uc_libfree(cbuf) ;
@@ -138,7 +136,7 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 /* end subroutine (peek_stream) */
 
 static int peek_regular(int fd,void *dbuf,int dlen) noex {
-	off_t	fo ;
+	off_t		fo ;
 	int		rs ;
 	if ((rs = u_tell(fd,&fo)) >= 0) {
 	    rs = u_pread(fd,dbuf,dlen,fo) ;

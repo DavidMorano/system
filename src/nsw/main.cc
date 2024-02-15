@@ -1196,7 +1196,7 @@ static int procsearch(PROGINFO *pip,VECSTR *nlp)
 	        int		f_eol ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = filebuf_readline(&b,lbuf,llen,to)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 	            int	len = rs ;
 
 #if	CF_DEBUG

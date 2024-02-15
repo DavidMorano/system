@@ -66,14 +66,15 @@
 #include	<ucsys.h>
 #include	<ucent.h>
 #include	<ucget.h>
+#include	<ucuserattr.h>
 #include	<uclibmemalloc.h>
 #include	<ucmemalloc.h>
 #include	<ucmallocx.h>
 #include	<ucstrtox.h>
 #include	<ucopeninfo.h>
 #include	<uctc.h>		/* terminal interface */
+#include	<ucpts.h>		/* pseudo-terminal management */
 #include	<ucfdmanip.h>
-#include	<ucuserattr.h>
 #include	<uctimer.h>
 #include	<ucgetpid.h>
 

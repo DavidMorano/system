@@ -170,19 +170,23 @@
 #endif
 
 #ifndef	POLLFD
-#define	POLLFD		struct pollfd
+#define	POLLFD		struct pollfd		/* UNIX® Sys-V (STREAMS) */
 #endif
 
 #ifndef	STRBUF
-#define	STRBUF		struct strbuf
+#define	STRBUF		struct strbuf		/* UNIX® Sys-V STREAMS */
 #endif
 
 #ifndef	STRPEEK
-#define	STRPEEK		struct strpeek
+#define	STRPEEK		struct strpeek		/* UNIX® Sys-V STREAMS */
 #endif
 
 #ifndef	STRRECVFD
-#define	STRRECVFD	struct strrecvfd
+#define	STRRECVFD	struct strrecvfd	/* UNIX® Sys-V STREAMS */
+#endif
+
+#ifndef	STRIOCTL
+#define	STRIOCTL	struct strioctl		/* UNIX® Sys-V STREAMS */
 #endif
 
 #ifndef	MQATTR

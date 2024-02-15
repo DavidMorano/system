@@ -1166,7 +1166,7 @@ static int procerrout(PROGINFO *pip,int cols,cchar s[],int ofd)
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        rs1 = SR_OK ;
-	        while ((rs = filebuf_readline(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
 	            int	len = rs ;
 
 	            if (lbuf[len - 1] == '\n') lbuf[--len] = '\0' ;

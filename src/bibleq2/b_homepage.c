@@ -4604,7 +4604,7 @@ static int filer_workreadterm(FILER *fep,int fd)
 	            int		len ;
 	            void	*n = NULL ;
 	            char	*dp = fep->dbuf ;
-	            while ((rs = filebuf_readlines(&b,lbuf,llen,to,n)) > 0) {
+	            while ((rs = filebuf_readlns(&b,lbuf,llen,to,n)) > 0) {
 	                len = rs ;
 #if	CF_DEBUGS
 	                debugprintf("filer_workreadterm: len=%u\n",len) ;

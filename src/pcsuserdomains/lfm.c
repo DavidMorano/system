@@ -668,7 +668,7 @@ static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            if ((rs = filebuf_readline(&b,lbuf,llen,0)) > 0) {
+	            if ((rs = filebuf_readln(&b,lbuf,llen,0)) > 0) {
 	                len = rs ;
 
 	                if ((len > 0) && (lbuf[len - 1] == '\n'))
@@ -730,7 +730,7 @@ static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILEBUF *fp)
 	    const char	*tp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
-	    if ((rs = filebuf_readline(fp,lbuf,llen,0)) > 0) {
+	    if ((rs = filebuf_readln(fp,lbuf,llen,0)) > 0) {
 	        len = rs ;
 
 	        if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -765,7 +765,7 @@ static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILEBUF *fp)
 
 	    if ((rs >= 0) && (len > 0)) {
 
-	        if ((rs = filebuf_readline(fp,lbuf,llen,0)) > 0) {
+	        if ((rs = filebuf_readln(fp,lbuf,llen,0)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
