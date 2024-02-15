@@ -119,12 +119,13 @@ static int peek_stream(int fd,void *dbuf,int dlen) noex {
 	    cbuf[0] = '\0' ;
 	    {
 	        STRPEEK		pd{} ;
+		cint		req = I_PEEK ;
 	        pd.flags = 0 ;
 	        pd.ctlbuf.buf = cbuf ;
 	        pd.ctlbuf.maxlen = clen ;
 	        pd.databuf.buf = (char *) dbuf ;
 	        pd.databuf.maxlen = dlen ;
-	        rs = u_ioctl(fd,I_PEEK,&pd) ;
+	        rs = u_ioctl(fd,req,&pd) ;
 	        len = pd.databuf.len ;
 	    }
 	    rs1 = uc_libfree(cbuf) ;

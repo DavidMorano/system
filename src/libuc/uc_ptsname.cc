@@ -77,14 +77,14 @@ int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (nbuf) {
-	    struct strioctl istr{} ;
+	    STRIOCTL	istr{} ;
 	    istr.ic_cmd = ISPTM ;
 	    istr.ic_len = 0 ;
 	    istr.ic_timout = 0 ;
-	    istr.ic_dp = NULL ;
+	    istr.ic_dp = nullptr ;
 	    if ((rs = u_ioctl(fd,I_STR,&istr)) >= 0) {
 	        USTAT	sb ;
-	        if ((rs = u_fstat(fd, &sb)) >= 0) {
+	        if ((rs = u_fstat(fd,&sb)) >= 0) {
 		    uint	minordev = minor(sb.st_rdev) ;
 		    if (minordev < PTSMAXDEVS) {
 		        if ((rs = snsd(nbuf,nlen,PTSPREFIX,minordev)) >= 0) {

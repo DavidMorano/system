@@ -47,6 +47,14 @@
 #define	STRPEEK		struct strpeek
 #endif
 
+#ifndef	STRRECVFD
+#define	STRRECVFD	struct strrecvfd
+#endif
+
+#ifndef	STRIOCTL	
+#define	STRIOCTL	struct strioctl
+#endif
+
 
 #if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
 
@@ -58,6 +66,10 @@
 #define	I_PEEK		0
 #endif
 
+#ifndef	ISPTM
+#define	ISPTM		0
+#endif
+
 struct strbuf {
 	char		*buf ;
 	int		len ;
@@ -67,7 +79,21 @@ struct strbuf {
 struct strpeek {
 	STRBUF		ctlbuf ;
 	STRBUF		databuf ;
-	int		flags ;
+	uint		flags ;
+} ;
+
+struct strrecvfd {      
+        int		fd ;
+        uid_t		uid ;
+        gid_t		gid ;
+        char		fill[8] ;
+} ;
+
+struct strioctl {
+	char		*ic_dp ;	/* data pointer */
+	int		ic_len ;	/* data length */
+	int		ic_cmd ;	/* command */
+	int		ic_timout ;	/* timeout */
 } ;
 
 EXTERNC_begin

@@ -45,6 +45,12 @@
 
 /* exported subroutines */
 
+#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
+
+/* we have it: do nothing for now */
+
+#else /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
+
 int getmsg(int,STRBUF *,STRBUF *,int *) noex {
 	return SR_NOSYS ;
 }
@@ -60,5 +66,7 @@ int putmsg(int,STRBUF *,STRBUF *,int *) noex {
 int putpmsg(int,STRBUF *,STRBUF *,int *,int *) noex {
 	return SR_NOSYS ;
 }
+
+#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
 
 
