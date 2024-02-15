@@ -1,4 +1,4 @@
-/* msgid */
+/* msgid HEADER */
 /* lang=C20 */
 
 /* manage message-id storage */
@@ -19,7 +19,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"msgide.h"
@@ -74,8 +76,7 @@ struct msgid_flags {
 } ;
 
 struct msgid_head {
-	uint		magic ;
-	const char	*fname ;
+	cchar		*fname ;
 	MSGID_FL	f ;
 	MSGID_FH	h ;
 	MSGID_BUF	b ;		/* file buffer */
@@ -83,6 +84,7 @@ struct msgid_head {
 	time_t		accesstime ;	/* file access time */
 	time_t		mtime ;		/* file modification time */
 	mode_t		operm ;
+	uint		magic ;
 	int		oflags ;
 	int		maxentry ;
 	int		pagesize ;
@@ -97,41 +99,39 @@ struct msgid_c {
 } ;
 
 struct msgid_k {
-	const char	*recip ;
-	const char	*from ;
-	const char	*mid ;
+	cchar		*recip ;
+	cchar		*from ;
+	cchar		*mid ;
 	time_t		mtime ;
 	int		reciplen ;
 	int		midlen ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef MSGID		msgid ;
 
-extern int msgid_open(MSGID *,const char *,int,mode_t,int) ;
-extern int msgid_check(MSGID *,time_t) ;
-extern int msgid_close(MSGID *) ;
-extern int msgid_curbegin(MSGID *,MSGID_CUR *) ;
-extern int msgid_curend(MSGID *,MSGID_CUR *) ;
-extern int msgid_enum(MSGID *,MSGID_CUR *,MSGID_ENT *) ;
-extern int msgid_match(MSGID *,time_t,MSGID_KEY *,MSGID_ENT *) ;
-extern int msgid_update(MSGID *,time_t,MSGID_KEY *,MSGID_ENT *) ;
-extern int msgid_matchid(MSGID *,time_t,cchar *,int,MSGID_ENT *) ;
-extern int msgid_write(MSGID *,int,MSGID_ENT *) ;
+EXTERNC_begin
+
+extern int msgid_open(MSGID *,cchar *,int,mode_t,int) noex ;
+extern int msgid_check(MSGID *,time_t) noex ;
+extern int msgid_close(MSGID *) noex ;
+extern int msgid_curbegin(MSGID *,MSGID_CUR *) noex ;
+extern int msgid_curend(MSGID *,MSGID_CUR *) noex ;
+extern int msgid_enum(MSGID *,MSGID_CUR *,MSGID_ENT *) noex ;
+extern int msgid_match(MSGID *,time_t,MSGID_KEY *,MSGID_ENT *) noex ;
+extern int msgid_update(MSGID *,time_t,MSGID_KEY *,MSGID_ENT *) noex ;
+extern int msgid_matchid(MSGID *,time_t,cchar *,int,MSGID_ENT *) noex ;
+extern int msgid_write(MSGID *,int,MSGID_ENT *) noex ;
 
 #ifdef	COMMENT
-extern int msgid_txbegin(MSGID *) ;
-extern int msgid_txabort(MSGID *,int) ;
-extern int msgid_txcommit(MSGID *,int) ;
-extern int msgid_fetchsvc(MSGID *,cchar *,MSGID_CUR *,MSGID_ENT *) ;
-extern int msgid_fetchhostsvc(MSGID *,uint,cchar *,MSGID_CUR *,MSGID_ENT *) ;
-extern int msgid_fetchhostpid(MSGID *,uint,int,MSGID_CUR *,MSGID_ENT *) ;
+extern int msgid_txbegin(MSGID *) noex ;
+extern int msgid_txabort(MSGID *,int) noex ;
+extern int msgid_txcommit(MSGID *,int) noex ;
+extern int msgid_fetchsvc(MSGID *,cchar *,MSGID_CUR *,MSGID_ENT *) noex ;
+extern int msgid_fetchhostsvc(MSGID *,uint,cc *,MSGID_CUR *,MSGID_ENT *) noex ;
+extern int msgid_fetchhostpid(MSGID *,uint,int,MSGID_CUR *,MSGID_ENT *) noex ;
 #endif /* COMMENT */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MSGID_INCLUDE */
