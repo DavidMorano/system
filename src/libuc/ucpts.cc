@@ -26,22 +26,22 @@
 
 	Description:
 	This code only has meaning on the newer System V UNIX®
-	releases with the PTS dirver. This is now needed to get the
-	filename of the slave side device of the new pseudo-terminal
-	clone multiplexor driver. A new slave-side filename looks
-	something like '/dev/pts/26'.
-	Unlike other versions of this sort of function, this is
-	thread-safe!
+	releases with the PTS dirver.  This is now needed to get
+	the filename of the slave side device of the new pseudo-terminal
+	clone multiplexor driver.  A new slave-side filename looks
+	something like '/dev/pts/26'.  Unlike other versions of
+	this sort of function, this is thread-safe!
 
 	The algorithm (from SVR3 docs) is:
 
 	Check that the FD argument is a file descriptor of an opened
-	master.  Do this by sending an ISPTM ioctl message down
-	stream.  Ioctl() will fail if: (1) FD is not a valid file
-	descriptor, (2) the file represented by FD does not understand
-	ISPTM (not a master device). If we have a valid master, get
-	its minor number via |fstat(2)|.  Concatenate it to PTSPREFIX
-	and return it as the name of the slave device.
+	master.  Do this by sending an 'ISPTM' |ioctl(2)| message
+	down stream.  The |ioctl(2)| call will fail if: (1) FD is
+	not a valid file descriptor, (2) the file represented by
+	FD does not understand 'ISPTM' (not a master device).  If we
+	have a valid master, get its minor number via |fstat(2)|.
+	Concatenate it to PTSPREFIX and return it as the name of
+	the slave device.
 
 
 	Name:
@@ -59,6 +59,28 @@
 	This subroutine unlocks a PTS-type pseudo-terminal on System
 	V Release 3 (SVR3) UNIX® OS systems for use.
 
+
+	Notes:
+	Q. What operating systems support what?
+	A. The question is really about what operating systems
+	support the |ptsname_r(3c)| subroutine.  The following
+	operating systems are known to support the |ptsname_r(3c)|
+	subroutine:
+	+ Darwin (macOS)
+	+ Linux
+	+ HPUX
+	+ OSF1
+	+ Tru64
+	Q. What are the return values?
+	A. On all operating systems that support the |ptsname_r(3c)|
+	subroutine except for Linux, on error a '-1' is returned
+	and 'errno' is set to the error code.  But on Linux, on
+	error the subroutine returns 'not-zero' and sets the 'errno'
+	variable to the error code.  Linux sucks cock meat.
+	Q. What operating systems DO-NOT support the |ptsname_r(3c)|
+	subroutine?
+	A. SunOS Solaris!
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -71,6 +93,8 @@
 #include	<usysflag.h>
 #include	<ustropts.h>
 #include	<snx.h>
+
+#include	"ucpts.h"
 
 
 /* local defines */

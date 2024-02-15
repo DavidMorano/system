@@ -1,8 +1,8 @@
 /* ustropts HEADER */
 /* lang=C20 */
 
-/* version %I% last-modified %G% */
 /* auxillary operating system support */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -70,8 +70,16 @@
 #define	I_STR		1
 #endif
 
+#ifndef	I_SENDFD
+#define	I_SENDFD	2
+#endif
+
+#ifndef	I_RECVFD
+#define	I_RECVFD	3
+#endif
+
 #ifndef	ISPTM
-#define	ISPTM		0
+#define	ISPTM		0		/* ask if FD is a pseudo-terminal */
 #endif
 
 struct strbuf {

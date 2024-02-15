@@ -1094,6 +1094,7 @@ ustropts.o:		ustropts.cc ustropts.h
 
 # LIBUC
 ucmemla.o:		ucmemla.cc ucmemla.h
+ucpts.o:		ucpts.cc ucpts.h
 
 
 # PATH

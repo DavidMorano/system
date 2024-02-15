@@ -31,7 +31,7 @@
 
 	Returns:
 	>=0		file-descriptor
-	<0		errror
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -56,12 +56,21 @@
 #endif
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* forward references */
+
+
 /* local variables */
 
 constexpr bool		f_openpt = F_OPENPT ;
 
 
-/* forward references */
+/* exported variables */
 
 
 /* exported subroutines */
@@ -77,7 +86,7 @@ int uc_openpt(int oflags) noex {
 	    }
 	} else {
 	    rs = u_open(PTMXFNAME,oflags,0662) ;
-	}
+	} /* end if-constexpr (f_openpt) */
 	return rs ;
 }
 /* end subroutine (uc_openpt) */
