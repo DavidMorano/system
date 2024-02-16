@@ -1,7 +1,7 @@
 /* filereadln SUPPORT */
 /* lang=C++20 */
 
-/* we read one line from a file! */
+/* read a single line from a file! */
 /* version %I% last-modified %G% */
 
 
@@ -24,7 +24,7 @@
 	of which means something to someone).
 
 	Synopsis:
-	int filereadln(cc *fname,char *rbuf,int rlen) noex
+	int filereadln(cchar *fname,char *rbuf,int rlen) noex
 
 	Arguments:
 	fname		file to read

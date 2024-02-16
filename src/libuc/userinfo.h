@@ -25,8 +25,8 @@
 
 
 struct userinfo_flags {
-	unsigned int	sysv_rt:1 ;
-	unsigned int	sysv_ct:1 ;
+	uint		sysv_rt:1 ;
+	uint		sysv_ct:1 ;
 } ;
 
 struct userinfo_head {
@@ -54,7 +54,7 @@ struct userinfo_head {
 	cchar		*fullname ;	/* best fullname */
 	cchar		*name ;		/* best compacted name */
 	cchar		*groupname ;	/* login groupname */
-	cchar		*project ;	/* user project name */
+	cchar		*projname ;	/* user project name */
 	cchar		*tz ;		/* user time-zone */
 	cchar		*md ;		/* mail-spool directory */
 	cchar		*wstation ;	/* user weather-station */

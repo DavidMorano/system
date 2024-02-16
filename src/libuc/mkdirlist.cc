@@ -172,7 +172,6 @@ static int ordercmp(ENT **,ENT **) noex ;
 
 int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndname) noex {
 	int		rs ;
-	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = mkdirlist_ctor(op,pr,ndname)) >= 0) {
 	    rs = SR_INVALID ;
@@ -232,7 +231,10 @@ int mkdirlist_finish(mkdirlist *op) noex {
 int mkdirlist_get(mkdirlist *op,int i,ENT **epp) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op,epp)) >= 0) {
-	    rs = vechand_get(op->dlp,i,epp) ;
+	    void	*vp{} ;
+	    if ((rs = vechand_get(op->dlp,i,&vp)) >= 0) {
+		*epp = entp(vp) ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -241,31 +243,29 @@ int mkdirlist_get(mkdirlist *op,int i,ENT **epp) noex {
 int mkdirlist_link(mkdirlist *op) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
-	    vechand		*dlp = op->dlp ;
-	    mkdirlist_ent	*ep ;
-	    for (int i = 0 ; vechand_get(dlp,i,&ep) >= 0 ; i += 1) {
-	        if (ep == nullptr) continue ;
-
-	    if (! ep->f.link) {
-		auto	vg = vechand_get ;
-		mkdirlist_ent	*pep = ep ;
-	        for (int j = (i+1) ; vg(dlp,j,&ep) >= 0 ; j += 1) {
-	            if (ep == nullptr) continue ;
-
-	            if ((! ep->f.link) && (bbcmp(pep->name,ep->name) == 0)) {
-
-	                pep->link = ep ;
-	                ep->f.link = true ;
-
-	                pep = ep ;
-	            } /* end if (board match) */
-
-	        } /* end for (inner) */
-
-	    } /* end if (entry not linked) */
-
+	    vechand	*dlp = op->dlp ;
+	    void	*vp{} ;
+	    for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	        if (vp) {
+	    	    mkdirlist_ent	*ep = entp(vp) ;
+	            if (! ep->f.link) {
+	    	        mkdirlist_ent	*pep = ep ;
+		        auto		vg = vechand_get ;
+	                for (int j = (i+1) ; vg(dlp,j,&vp) >= 0 ; j += 1) {
+	                    if (vp) {
+	    	    	        mkdirlist_ent	*ep = entp(vp) ;
+				cchar		*n1 = pep->name ;
+				cchar		*n2 = ep->name ;
+	                        if ((! ep->f.link) && (bbcmp(n1,n2) == 0)) {
+	                            pep->link = ep ;
+	                            ep->f.link = true ;
+	                            pep = ep ;
+	                        } /* end if (board match) */
+        		    } /* end if (non-null entry) */
+	                } /* end for (inner) */
+	            } /* end if (entry not linked) */
+		} /* end if (non-null entry) */
 	    } /* end for (linking like entries) */
-
 	} /* end if (magic) */
 	return rs ;
 }
@@ -275,12 +275,13 @@ int mkdirlist_showdef(mkdirlist *op) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
-	    mkdirlist_ent	*ep ;
-	    for (int i = 0 ; vechand_get(op->dlp,i,&ep) >= 0 ; i += 1) {
-	        if (ep != nullptr) {
+	    void	*vp{} ;
+	    for (int i = 0 ; vechand_get(op->dlp,i,&vp) >= 0 ; i += 1) {
+	        if (vp) {
+	            mkdirlist_ent	*ep = entp(vp) ;
 	            rs = entry_showdef(ep) ;
 	            c += rs ;
-	        }
+	        } /* end if (non-null entry) */
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (magic) */
@@ -294,11 +295,14 @@ int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 	if ((rs = mkdirlist_magic(op,ng)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (ng[0]) {
-	        mkdirlist_ent	*ep ;
-	        for (int i = 0 ; vechand_get(op->dlp,i,&ep) >= 0 ; i += 1) {
-	            if (ep == nullptr) continue ;
-	            rs = entry_show(ep,ng,order) ;
-	            c += rs ;
+		vechand		*dlp = op->dlp ;
+		void		*vp{} ;
+	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	                mkdirlist_ent	*ep = entp(vp) ;
+	                rs = entry_show(ep,ng,order) ;
+	                c += rs ;
+		    } /* end if (non-null entry) */
 	            if (rs < 0) break ;
 	        } /* end for */
 	    } /* end if (valid) */
@@ -314,11 +318,13 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 	    rs = SR_INVALID ;
 	    if (ung[0]) {
 	        vechand		*dlp = op->dlp ;
-	        mkdirlist_ent	*ep ;
-	        for (int i = 0 ; vechand_get(dlp,i,&ep) >= 0 ; i += 1) {
-	            if (ep == nullptr) continue ;
-	            rs = entry_matung(ep,ung,utime,f_sub,order) ;
-	            c += rs ;
+		void		*vp{} ;
+	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	                mkdirlist_ent	*ep = entp(vp) ;
+	                rs = entry_matung(ep,ung,utime,f_sub,order) ;
+	                c += rs ;
+		    } /* end if (non-null entry) */
 	            if (rs < 0) break ;
 	        } /* end for (looping through entrires) */
 	    } /* end if (valid) */
@@ -389,7 +395,8 @@ static int mkdirlist_procdircache(mkdirlist *op,cchar *ndname,int fd) noex {
 	            f_bol = f_eol ;
 	            if (rs < 0) break ;
 	        } /* end while */
-	        filebuf_finish(&b) ;
+	        rs1 = filebuf_finish(&b) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 
 	} /* end if (mkpath) */
@@ -427,7 +434,7 @@ static int mkdirlist_procnewsdir(MKDIRLIST *op,cchar *ndname) noex {
 }
 /* end subroutine (mkdirlist_procnewsdir) */
 
-static int mkdirlist_newent(mkdirlist *op,USTAT *sbp,char *nbuf,int nlen) noex {
+static int mkdirlist_newent(mkdirlist *op,USTAT *sbp,cc *nbuf,int nlen) noex {
 	cint		esize = sizeof(mkdirlist_ent) ;
 	int		rs ;
 	int		c = 0 ;
@@ -465,7 +472,7 @@ static int mkdirlist_entfins(mkdirlist *op) noex {
 	    	    rs1 = uc_free(ep) ;
 	    	    if (rs >= 0) rs = rs1 ;
 		}
-	    }
+	    } /* end if (non-null entry) */
 	} /* end for */
 	return rs ;
 }

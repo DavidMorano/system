@@ -1,5 +1,5 @@
 /* mkdirlist SUPPORT */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* create a list of the newsgroup directories */
 /* version %I% last-modified %G% */
@@ -20,8 +20,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |mode_t| */
 #include	<limits.h>
+#include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 #include	<vechand.h>
 
@@ -39,7 +40,6 @@ struct mkdirlist_head {
 
 struct mkdirlist_eflags {
 	uint		excl:3 ;	/* ??? */
-	uint		new:1 ;		/* new newsgroup */
 	uint		options:1 ;	/* directory has options file */
 	uint		subscribe:1 ;	/* subscribed in user file? */
 	uint		seen:1 ;	/* already written out to user file */
