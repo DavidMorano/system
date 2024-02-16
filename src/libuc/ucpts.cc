@@ -100,8 +100,6 @@
 /* local defines */
 
 #define	PTSPREFIX	"/dev/pts/"	/* slave name */
-#define	PTSPREFIXLEN	9		/* length of above string */
-#define	PTSMAXLEN	32		/* slave name length */
 #define	PTSMAXDEVS	1000000000	/* rather arbitrary */
 
 
@@ -144,15 +142,14 @@ int uc_ptsname(int fd,char *nbuf,int nlen) noex {
 	            USTAT	sb ;
 	            if ((rs = u_fstat(fd,&sb)) >= 0) {
 		        cint	mdev = minor(sb.st_rdev) ;
+	    	        rs = SR_INVALID ;
 		        if (mdev < PTSMAXDEVS) {
 			    cchar	*prefix = PTSPREFIX ;
 		            if ((rs = snsd(nbuf,nlen,prefix,mdev)) >= 0) {
 			        len = rs ;
 		                rs = u_access(nbuf,0) ;
 		            }
-		        } else {
-	    	            rs = SR_INVALID ;
-		        }
+		        } /* end if (valid) */
 	            } /* end if (u_fstat) */
 	        } /* end if (u_ioctl) */
 	    } else if constexpr (f_darwin || f_linux) {
