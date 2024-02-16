@@ -25,12 +25,11 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>		/* |memclear(3u)| */
 #include	<snwcpy.h>
 #include	<localmisc.h>
 
@@ -54,7 +53,7 @@
 int terment_start(TERMENT *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    memset(op,0,sizeof(TERMENT)) ;
+	    memclear(op) ;		/* dangerous */
 	    rs = SR_OK ;
 	}
 	return rs ;

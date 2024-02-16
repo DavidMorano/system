@@ -1,5 +1,5 @@
-/* mkmailbox SUPPORT */
-/* lang=C20 */
+/* pimkmailbox SUPPORT */
+/* lang=C++20 */
 
 /* make a mailbox file */
 /* version %I% last-modified %G% */
@@ -102,9 +102,12 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int mkmailbox(PROGINFO *pip,cchar *mbname) noex {
+int pimkmailbox(PROGINFO *pip,cchar *mbname) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
@@ -139,6 +142,6 @@ int mkmailbox(PROGINFO *pip,cchar *mbname) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (mkmailbox) */
+/* end subroutine (pimkmailbox) */
 
 

@@ -31,40 +31,34 @@
 
 /*******************************************************************************
 
-	This subroutine copies the mail data out of the spool file and into the
-	user specified mailbox file (or whatever if it wasn't specified).
+	This subroutine copies the mail data out of the spool file
+	and into the user specified mailbox file (or whatever if
+	it wasn't specified).
 
 	Synopsis:
-
 	int progmailbox(pip,mfd,f_lock)
 	PROGINFO	*pip ;
 	int		mfd ;
 	int		f_lock ;
 
 	Arguments:
-
 	pip		pointer to program information
 	mfd		mailbox file descriptor
 	f_lock		flag indicating if the mailbox file needs to be locked
 
 	Returns:
-
 	>=0 		if successful
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<signal.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<vecstr.h>

@@ -42,14 +42,12 @@
 #define	TERMENT		struct terment
 
 /* entry type values */
-
 #define	TERMENT_TEMPTY		0	/* entry is unused */
 #define	TERMENT_TLOGINPROC	1	/* a "getty" waiting for login */
 #define	TERMENT_TUSERPROC	2	/* a regular user process */
 #define	TERMENT_TDEADPROC	3	/* dead process (moved to WTERMENT) */
 
 /* entry lengths */
-
 #define	TERMENT_LID		4
 #define	TERMENT_LLINE		32
 #define	TERMENT_LTERMTYPE	32
