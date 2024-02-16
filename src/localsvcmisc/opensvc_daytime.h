@@ -1,12 +1,14 @@
-/* config */
+/* opensvc_daytime HEADER */
+/* lang=C20 */
+
+/* Open-Service for DAYTIMR serive */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
-
 	Originally written for Rightcore Network Services.
-
 
 */
 
