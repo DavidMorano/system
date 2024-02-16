@@ -1,4 +1,0 @@
-SNIPS
-
-Code snippets
-
