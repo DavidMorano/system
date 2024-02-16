@@ -330,7 +330,8 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 int mkdirlist_sort(mkdirlist *op) noex {
 	int		rs ;
 	if ((rs = mkdirlist_magic(op)) >= 0) {
-	    rs = vechand_sort(op->dlp,ordercmp) ;
+	    vechand_vcmp	vcf = vechand_vcmp(ordercmp) ;
+	    rs = vechand_sort(op->dlp,vcf) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -398,7 +399,7 @@ static int mkdirlist_procdircache(mkdirlist *op,cchar *ndname,int fd) noex {
 /* end subroutine (mkdirlist_procdircache) */
 
 static int mkdirlist_procnewsdir(MKDIRLIST *op,cchar *ndname) noex {
-	cint		dot = (fsdirtree_MFOLLOW | fsdirtree_MDIR) ;
+	cint		dot = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -474,7 +475,7 @@ static int entry_start(ENT *ep,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*cp ;
-	memclear(ep) ;
+	memclear(ep) ;			/* dangerous */
 	if ((rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
 	    cint	nlen = rs ;
 	    ep->name = cp ;
@@ -545,13 +546,13 @@ static int ordercmp(ENT **e1pp,ENT **e2pp) noex {
 	mkdirlist_ent	*e2p = *e2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
+	    rc = 1 ;
 	    if (e1p) {
+		rc = -1 ;
 	        if (e2p) {
 		    rc = (e1p->order - e2p->order) ;
-		} else
-		    rc = -1 ;
-	    } else
-		rc = 1 ;
+		}
+	    }
 	}
 	return rc ;
 }

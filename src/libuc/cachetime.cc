@@ -1,5 +1,5 @@
-/* cachetime */
-/* lang=C20 */
+/* cachetime SUPPORT */
+/* lang=C++20 */
 
 /* cache-time manager */
 /* version %I% last-modified %G% */
@@ -9,8 +9,8 @@
 /* revision history:
 
 	= 2004-09-10, David A­D­ Morano
-	I created this from hacking something that was similar that was
-	originally created for a PCS program.
+	I created this from hacking something that was similar that
+	was originally created for a PCS program.
 
 */
 
@@ -31,11 +31,12 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<usupport.h>		/* |memclear(3u)| */
 #include	<sncpyx.h>
+#include	<localmisc.h>
 
 #include	"cachetime.h"
 
@@ -60,8 +61,8 @@ static int	entry_start(CACHETIME_ENT *,cchar *,int) ;
 static int	entry_finish(CACHETIME_ENT *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
@@ -75,15 +76,15 @@ extern cchar	*getourenv(cchar **,cchar *) ;
 
 int cachetime_start(CACHETIME *op)
 {
-	const int	n = CACHETIME_NENTRY ;
+	cint	n = CACHETIME_NENTRY ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	memset(op,0,sizeof(CACHETIME)) ;
 
-	if ((rs = hdb_start(&op->db,n,1,NULL,NULL)) >= 0) {
-	    if ((rs = ptm_create(&op->m,NULL)) >= 0) {
+	if ((rs = hdb_start(&op->db,n,1,nullptr,nullptr)) >= 0) {
+	    if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
 		op->magic = CACHETIME_MAGIC ;
 	    }
 	    if (rs < 0)
@@ -107,7 +108,7 @@ int cachetime_finish(CACHETIME *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
@@ -152,8 +153,8 @@ int cachetime_lookup(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 	debugprintf("cachetime_lookup: ent\n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
@@ -177,8 +178,8 @@ int cachetime_curbegin(CACHETIME *op,CACHETIME_CUR *curp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
@@ -200,8 +201,8 @@ int cachetime_curend(CACHETIME *op,CACHETIME_CUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
@@ -225,15 +226,15 @@ int cachetime_enum(CACHETIME *op,CACHETIME_CUR *curp,
 	HDB_DATUM	key, val ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = hdb_enum(&op->db,&curp->cur,&key,&val)) >= 0) {
 	    ep = (CACHETIME_ENT *) val.buf ;
 	    if ((rs = sncpy1(pbuf,plen,ep->name)) >= 0) {
-	        if (timep != NULL) {
+	        if (timep != nullptr) {
 	            *timep = ep->mtime ;
 		}
 	    }
@@ -248,8 +249,8 @@ int cachetime_stats(CACHETIME *op,CACHETIME_STATS *statp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (statp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (statp == nullptr) return SR_FAULT ;
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
@@ -285,13 +286,13 @@ static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 /* now see if it is already in the list by NAME */
 
 	op->c_req += 1 ;
-	if ((rs = hdb_fetch(&op->db,key,NULL,&val)) >= 0) {
+	if ((rs = hdb_fetch(&op->db,key,nullptr,&val)) >= 0) {
 	    op->c_hit += 1 ;
 	    ep = (CACHETIME_ENT *) val.buf ;
-	    if (timep != NULL) *timep = ep->mtime ;
+	    if (timep != nullptr) *timep = ep->mtime ;
 	    f_hit = TRUE ;
 	} else if (rs == SR_NOTFOUND) {
-	    const int	size = sizeof(CACHETIME_ENT) ;
+	    cint	size = sizeof(CACHETIME_ENT) ;
 	    if ((rs = uc_malloc(size,&ep)) >= 0) {
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 	    	    key.buf = ep->name ;
@@ -300,7 +301,7 @@ static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 	    	    val.len = size ;
 	    	    if ((rs = hdb_store(&op->db,key,val)) >= 0) {
 	    		op->c_miss += 1 ;
-	    		if (timep != NULL) *timep = ep->mtime ;
+	    		if (timep != nullptr) *timep = ep->mtime ;
 		    }
 		    if (rs < 0) {
 			entry_finish(ep) ;
@@ -320,16 +321,12 @@ static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 }
 /* end subroutine (cachetime_lookup) */
 
-
-static int entry_start(CACHETIME_ENT *ep,cchar np[],int nl)
-{
+static int entry_start(CACHETIME_ENT *ep,cchar *sp,int sl) noex {
 	int		rs ;
-	const char	*cp ;
-
-	memset(ep,0,sizeof(CACHETIME_ENT)) ;
-
-	if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
-	    struct ustat	sb ;
+	cchar		*cp ;
+	memclear(ep) ;			/* dangerous */
+	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
+	    USTAT	sb ;
 	    if ((rs = u_stat(cp,&sb)) >= 0) {
 		ep->name = cp ;
 	        ep->mtime = sb.st_mtime ;
@@ -343,18 +340,14 @@ static int entry_start(CACHETIME_ENT *ep,cchar np[],int nl)
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_finish(CACHETIME_ENT *ep)
-{
+static int entry_finish(CACHETIME_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (ep->name != NULL) {
+	if (ep->name != nullptr) {
 	    rs1 = uc_free(ep->name) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->name = NULL ;
+	    ep->name = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (entry_finish) */

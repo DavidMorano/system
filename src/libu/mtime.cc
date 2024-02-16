@@ -1,6 +1,8 @@
-/* mtime */
+/* mtime SUPPORT */
+/* lang=C++20 */
 
 /* Millisecond Time */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,22 +16,27 @@
 
 /*******************************************************************************
 
-	Sort of like |time(2)| but returns milliseconds rather than seconds.
-	Unlike |time(2)|, this subroutine takes no arguments.
-
+	Sort of like |time(2)| but returns milliseconds rather than
+	seconds.  Unlike |time(2)|, this subroutine takes no
+	arguments.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 #include	"mtime.h"
 
 
-mtime_t mtime(void)
-{
-	struct timeval	tv ;
+/* exported varaibles */
+
+
+/* exported subroutines */
+
+mtime_t mtime(void) {
+	TIMEVAL		tv ;
 	mtime_t		t ;
 	mtime_t		m = 0 ;
 	if (gettimeofday(&tv,NULL) >= 0) {
