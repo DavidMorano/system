@@ -1,6 +1,8 @@
-/* mailmsgattent */
+/* mailmsgattent HEADER */
+/* lang=C20 */
 
 /* mail-message attachment entry object */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
@@ -9,7 +11,10 @@
 #define	MAILMSGATTENT_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<contypevals.h>		/* content-type values */
 #include	<mimetypes.h>
 #include	<localmisc.h>
@@ -20,25 +25,23 @@
 
 
 struct mailmsgattent {
+	cchar		*type ;		/* content-type */
+	cchar		*subtype ;
+	cchar		*attfname ;	/* attachment-filename */
+	cchar		*auxfname ;	/* auxiliary-filename */
+	cchar		*ext ;
+	cchar		*encoding ;	/* content-encoding */
+	cchar		*description ;
 	uint		magic ;
-	const char	*type ;		/* content-type */
-	const char	*subtype ;
-	const char	*attfname ;	/* attachment-filename */
-	const char	*auxfname ;	/* auxiliary-filename */
-	const char	*ext ;
-	const char	*encoding ;	/* content-encoding */
-	const char	*description ;
 	int		clen ;		/* content-length */
 	int		clines ;	/* content-lines */
 	int		cte ;		/* content-transfer-encoding */
 	int		f_plaintext ;
 } ;
 
-#if	(! defined(MAILMSGATTENT_MASTER)) || (MAILMSGATTENT_MASTER == 0)
+typedef MAILMSGATTENT	mailmsgattent ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int mailmsgattent_start(MAILMSGATTENT *,cchar *,cchar *,cchar *,int) ;
 extern int mailmsgattent_type(MAILMSGATTENT *,MIMETYPES *) ;
@@ -49,11 +52,8 @@ extern int mailmsgattent_code(MAILMSGATTENT *,cchar *) ;
 extern int mailmsgattent_setcode(MAILMSGATTENT *,int) ;
 extern int mailmsgattent_analyze(MAILMSGATTENT *,cchar *) ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* MAILMSGATTENT_MASTER */
 
 #endif /* MAILMSGATTENT_INCLUDE */
 

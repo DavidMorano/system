@@ -1,6 +1,9 @@
 /* mtime HEADER */
 /* lang=C20 */
 
+/* Millisecond Time */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -8,24 +11,19 @@
 #define	MTIME_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<inttypes.h>
-#include	<localmisc.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<stdint.h>
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
-typedef int64_t	mtime_t ;
+typedef int64_t		mtime_t ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern mtime_t	mtime(void) ;
 
-extern mtime_t	mtime(void) noex ;
-
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MTIME_INCLUDE */

@@ -1,6 +1,8 @@
 /* recipient HEADER */
+/* lang=C20 */
 
 /* recipient processing structures */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,13 +15,11 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	RECIPIENT_INCLUDE
-#define	RECIPIENT_INCLUDE	1
+#define	RECIPIENT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-
 #include	<hdb.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -30,7 +30,6 @@
 #define	RECIPIENT_HCUR		int
 #define	RECIPIENT_VCUR		HDB_CUR
 
-
 #define	RECIPIENT_NOHOST	"*nohost*"
 
 
@@ -40,39 +39,33 @@ struct recipient_head {
 } ;
 
 struct recipient_value {
-	const char	*a ;		/* memory-allocation */
-	const char	*hostpart ;
-	const char	*localpart ;
+	cchar		*a ;		/* memory-allocation */
+	cchar		*hostpart ;
+	cchar		*localpart ;
 	int		type ;
 } ;
 
+typedef RECIPIENT	recipient ;
 
-#if	(! defined(RECIPIENT_MASTER)) || (RECIPIENT_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int recipient_start(RECIPIENT *,int) ;
-extern int recipient_finish(RECIPIENT *) ;
-extern int recipient_add(RECIPIENT *,const char *,const char *,int) ;
-extern int recipient_counthosts(RECIPIENT *) ;
-extern int recipient_count(RECIPIENT *) ;
-extern int recipient_hcurbegin(RECIPIENT *,RECIPIENT_HCUR *) ;
-extern int recipient_hcurend(RECIPIENT *,RECIPIENT_HCUR *) ;
+extern int recipient_start(RECIPIENT *,int) noex ;
+extern int recipient_finish(RECIPIENT *) noex ;
+extern int recipient_add(RECIPIENT *,cchar *,cchar *,int) noex ;
+extern int recipient_counthosts(RECIPIENT *) noex ;
+extern int recipient_count(RECIPIENT *) noex ;
+extern int recipient_hcurbegin(RECIPIENT *,RECIPIENT_HCUR *) noex ;
+extern int recipient_hcurend(RECIPIENT *,RECIPIENT_HCUR *) noex ;
 extern int recipient_enumhost(RECIPIENT *,RECIPIENT_HCUR *,
-			const char **) ;
-extern int recipient_vcurbegin(RECIPIENT *,RECIPIENT_VCUR *) ;
-extern int recipient_vcurend(RECIPIENT *,RECIPIENT_VCUR *) ;
-extern int recipient_fetchvalue(RECIPIENT *,const char *,
-		RECIPIENT_VCUR *, RECIPIENT_VAL **) ;
-extern int recipient_already(RECIPIENT *,const char *,const char *,int) ;
+			cchar **) noex ;
+extern int recipient_vcurbegin(RECIPIENT *,RECIPIENT_VCUR *) noex ;
+extern int recipient_vcurend(RECIPIENT *,RECIPIENT_VCUR *) noex ;
+extern int recipient_fetchvalue(RECIPIENT *,cchar *,
+		RECIPIENT_VCUR *, RECIPIENT_VAL **) noex ;
+extern int recipient_already(RECIPIENT *,cchar *,cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* RECIPIENT_MASTER */
 
 #endif /* RECIPIENT_INCLUDE */
 

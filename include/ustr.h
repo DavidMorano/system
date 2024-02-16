@@ -32,6 +32,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<ustropts.h>		/* <- the money shot */
 
 #include	<usys.h>
 

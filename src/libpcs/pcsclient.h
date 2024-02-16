@@ -1,4 +1,5 @@
-/* pcsclient */
+/* pcsclient HEADER */
+/* lang=C20 */
 
 /* version %I% last-modified %G% */
 
@@ -13,13 +14,13 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSCLIENT_INCLUDE
-#define	PCSCLIENT_INCLUDE	1
+#define	PCSCLIENT_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -49,38 +50,33 @@ struct pcsclient_flags {
 } ;
 
 struct pcsclient_head {
-	ulong		magic ;
 	cchar		*pr ;
 	cchar		*shmname ;
 	char		*mapdata ;
 	uint		*shmtable ;
-	PCSCLIENT_FL	f ;
 	time_t		dt ;
 	time_t		ti_shm ;		/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
+	PCSCLIENT_FL	f ;
+	uint		magic ;
 	int		nodenamelen ;
 	int		pagesize ;
 	int		mapsize ;
 	int		shmsize ;
 } ;
 
+typedef PCSCLIENT	pcsclient ;
+typedef PCSCLIENT_DATA	pcsclient_data ;
 
-#if	(! defined(PCSCLIENT_MASTER)) || (PCSCLIENT_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	pcsclient_open(PCSCLIENT *,cchar *) noex ;
+extern int	pcsclient_get(PCSCLIENT *,time_t,int,PCSCLIENT_DATA *) noex ;
+extern int	pcsclient_close(PCSCLIENT *) noex ;
 
-extern int	pcsclient_open(PCSCLIENT *,const char *) ;
-extern int	pcsclient_get(PCSCLIENT *,time_t,int,PCSCLIENT_DATA *) ;
-extern int	pcsclient_close(PCSCLIENT *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSCLIENT_MASTER */
 
 #endif /* PCSCLIENT_INCLUDE */
 

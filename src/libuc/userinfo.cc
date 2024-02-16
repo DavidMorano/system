@@ -8,7 +8,7 @@
 #define	CF_UINFO	1		/* include |uinfo(3uc)| */
 #define	CF_UNAME	0		/* include |u_uname(3u)| */
 #define	CF_OLDUSERINFO	1		/* compile-in old |userinfo(3dam)| */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UGETPW	0		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -69,11 +69,9 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-#include	<user_attr.h>
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<getbufsize.h>
-#include	<char.h>
 #include	<bits.h>
 #include	<strstore.h>
 #include	<getax.h>
@@ -85,6 +83,7 @@
 #include	<storeitem.h>
 #include	<passwdent.h>
 #include	<filereadln.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"userinfo.h"
@@ -666,12 +665,9 @@ static int userinfo_load(USERINFO *uip,STRSTORE *stp,int *sis)
 	                    vpp = &uip->groupname ;
 	                    break ;
 	                case uit_project:
-	                    vpp = &uip->project ;
+	                    vpp = &uip->projname ;
 	                    break ;
 	                case uit_tz:
-#if	CF_DEBUGS
-	                    debugprintf("userinfo_load: uip->tz=%s\n",uip->tz) ;
-#endif
 	                    vpp = &uip->tz ;
 	                    break ;
 	                case uit_md:
@@ -687,7 +683,9 @@ static int userinfo_load(USERINFO *uip,STRSTORE *stp,int *sis)
 	                    rs = SR_BADFMT ;
 	                    break ;
 	                } /* end switch */
-	                if ((rs >= 0) && (*vpp == nullptr)) *vpp = (a + sis[i]) ;
+	                if ((rs >= 0) && (*vpp == nullptr)) {
+			    *vpp = (a + sis[i]) ;
+			}
 	            } /* end for */
 
 	        } /* end if */
@@ -738,7 +736,7 @@ cchar	*emptyp ;
 	checknul(emptyp,&uep->name) ;
 	checknul(emptyp,&uep->groupname) ;
 	checknul(emptyp,&uep->logid) ;
-	checknul(emptyp,&uep->project) ;
+	checknul(emptyp,&uep->projname) ;
 	checknul(emptyp,&uep->tz) ;
 	checknul(emptyp,&uep->wstation) ;
 
@@ -1713,7 +1711,7 @@ static int procinfo_project(PROCINFO *pip)
 	    PROJNAMELEN) ;
 #endif
 
-	if ((pip->sis[uit] == 0) && (uip->project == nullptr)) {
+	if ((pip->sis[uit] == 0) && (uip->projname == nullptr)) {
 	    const int	dlen = PROJNAMELEN ;
 	    int		dl = -1 ;
 	    char	dbuf[PROJNAMELEN+1] = { 0 } ;
@@ -2235,8 +2233,8 @@ int userinfo_data(USERINFO *oup,char *ubuf,int ulen,cchar *un) noex {
 	                sp = u.groupname ;
 	                break ;
 	            case uit_project:
-	                rpp = &oup->project ;
-	                sp = u.project ;
+	                rpp = &oup->projname ;
+	                sp = u.projname ;
 	                break ;
 	            case uit_tz:
 	                rpp = &oup->tz ;
