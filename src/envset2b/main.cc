@@ -1,8 +1,8 @@
-/* main (envset) */
+/* main SUPPORT (envset) */
+/* lang=C++20 */
 
 /* set environment for a user (usually at login) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
@@ -14,12 +14,11 @@
 #define	CF_SYSVAR	0		/* use 'sysvar' */
 #define	CF_LOGID	0		/* use |procuserinfo_logid()| */
 
-
 /* revision history:
 
 	= 2001-04-11, David A­D­ Morano
-        This old dog program has been enhanced to serve as the environment wiper
-        for executing MIPS programs.
+	This old dog program has been enhanced to serve as the
+	environment wiper for executing MIPS programs.
 
 */
 
@@ -28,30 +27,27 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ envset [-V] <prog> <arg0> <arg1> ...
 
 	Implementation notes:
 
 	= NCPU
 
-        We get the number of CPUs from the kernel. On Sun-Solaris, this is
-        (gag!) not thread-safe. This is not a problem with the present code
-        since this "program" is (so far) never embedded within other
-        (multi-threaded) software. But it is something to note if this software
-        ever does get embeeded into some multi-threaded code. Unlikely you say?
-        More and more "programs" in the old sense (separate independent
-        processes) are increasingly becoming embedded within larger
-        multi-threaded programs that create the illusion of programs being
-        separate processes (but which really are not). So just keep this in
-        mind.
-
+	We get the number of CPUs from the kernel. On Sun-Solaris,
+	this is (gag!) not thread-safe. This is not a problem with
+	the present code since this "program" is (so far) never
+	embedded within other (multi-threaded) software. But it is
+	something to note if this software ever does get embeeded
+	into some multi-threaded code. Unlikely you say?  More and
+	more "programs" in the old sense (separate independent
+	processes) are increasingly becoming embedded within larger
+	multi-threaded programs that create the illusion of programs
+	being separate processes (but which really are not). So
+	just keep this in mind.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -60,7 +56,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -74,6 +69,7 @@
 #include	<expcook.h>
 #include	<nulstr.h>
 #include	<tmtime.h>		/* is NOT thread-safe */
+#include	<filereadln.h>
 #include	<hasx.h>
 #include	<ischarx.h>
 #include	<exitcodes.h>
@@ -186,7 +182,6 @@ extern int	inittimezone(char *,int,cchar *) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
-extern int	readfileline(char *,int,cchar *) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotValid(int) ;
@@ -1936,11 +1931,11 @@ cchar		*prename ;
 	        char		nbuf[REALNAMELEN+1] ;
 	        char		nfname[MAXPATHLEN+1] ;
 	        if ((rs = mkpath2(nfname,pip->homedname,fname)) >= 0) {
-	            rs = readfileline(nbuf,nlen,nfname) ;
+	            rs = filereadln(nfname,nbuf,nlen) ;
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
 	                debugprintf("main/procenvname: nfname=%s\n",nfname) ;
-	                debugprintf("main/procenvname: readfileline() rs=%d\n",
+	                debugprintf("main/procenvname: filereadln() rs=%d\n",
 	                    rs) ;
 	            }
 #endif

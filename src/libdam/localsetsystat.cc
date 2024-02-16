@@ -78,7 +78,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 
 

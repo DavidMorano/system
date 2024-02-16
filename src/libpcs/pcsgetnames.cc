@@ -82,6 +82,7 @@
 #include	<fsdir.h>
 #include	<getax.h>
 #include	<ugetpw.h>
+#include	<filereadln.h>
 #include	<getxusername.h>
 #include	<localmisc.h>
 
@@ -486,7 +487,7 @@ static int getname_userhome(SUBINFO *sip ,int nt) noex {
 	    cchar	*fn = pcsnametypes[nt].fname ;
 	    char	tbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
-	        rs = readfileline(sip->rbuf,sip->rlen,tbuf) ;
+	        rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
 		if (isNotPresent(rs)) rs = SR_OK ;
 	    }
 	} /* end if (getuserhome) */
@@ -565,7 +566,7 @@ static int getprojinfo_userhome(SUBINFO *sip) noex {
 	    if ((rs = mkpath2(tbuf,hbuf,fname)) >= 0) {
 		cint	rlen = sip->rlen ;
 		char		*rbuf = sip->rbuf ;
-	        if ((rs = readfileline(rbuf,rlen,tbuf)) >= 0) {
+	        if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
 		    len = rs ;
 		} else if (isNotPresent(rs)) 
 		    rs = SR_OK ;
@@ -618,7 +619,7 @@ static int getprojinfo_pcsdef(SUBINFO *sip) noex {
 	        if ((rs = mkpath2(tbuf,sip->pr,fname)) >= 0) {
 		    cint	rlen = sip->rlen ;
 		    char	*rbuf = sip->rbuf ;
-	            if ((rs = readfileline(rbuf,rlen,tbuf)) >= 0) {
+	            if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
 	                len = rs ;
 		    } else if (isNotPresent(rs)) 
 			rs = SR_OK ;

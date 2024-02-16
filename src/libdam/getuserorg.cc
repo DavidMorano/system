@@ -1,13 +1,12 @@
-/* getuserorg */
+/* getuserorg SUPPORT */
+/* lang=C++20 */
 
 /* get the organization name (string) for a specified user-name */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_ORGSYS	0		/* get from system? */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -15,9 +14,10 @@
 	This subroutine was originally written.
 
 	= 2018-10-19, David A.D. Morano
-	Did some cleanup and error robustness, to bring it up to this century.
-	I do not even know if this subroutine is even used much any more, but
-	whatever. This was not actually as bad as it could have been!
+	Did some cleanup and error robustness, to bring it up to
+	this century.  I do not even know if this subroutine is
+	even used much any more, but whatever. This was not actually
+	as bad as it could have been!
 
 */
 
@@ -25,40 +25,34 @@
 
 /*******************************************************************************
 
-        This subroutine retrieves the organization name (string) for a specified
-        user-name.
+	Name:
+	getuserorg
+
+	Descriptor:
+	This subroutine retrieves the organization name (string)
+	for a specified user-name.
 
 	Synopsis:
-
-	int getuserorg(rbuf,rlen,username)
-	char		rbuf[] ;
-	int		rlen ;
-	const char	*username ;
+	int getuserorg(char *rbuf,int rlen,cchar *username) noex
 
 	Arguments:
-
 	rbuf		user supplied buffer to hold result
 	rlen		length of user supplied buffer
 	username	username to look up
 
 	Returns:
-
 	>=0		length of return organization string
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<char.h>
@@ -66,6 +60,7 @@
 #include	<ugetpw.h>
 #include	<getxusername.h>
 #include	<gecos.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -107,7 +102,6 @@ extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	sncpy1w(char *,int,const char *,int) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	getuserhome(char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 extern int	isOneOf(const int *,int) ;
 
@@ -229,7 +223,7 @@ int gethomeorg(char *rbuf,int rlen,cchar *homedname)
 	if ((rs = sncpy2(cname,MAXNAMELEN,".",orgcname)) >= 0) {
 	    char	orgfname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath2(orgfname,homedname,cname)) >= 0) {
-	        if ((rs = readfileline(rbuf,rlen,orgfname)) >= 0) {
+	        if ((rs = filereadln(orgfname,rbuf,rlen)) >= 0) {
 	            len = rs ;
 		} else if (isNoAcc(rs)) {
 		    rs = SR_OK ;
@@ -363,7 +357,7 @@ static int getuserorg_sys(SUBINFO *sip)
 	char		orgfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath2(orgfname,ETCDNAME,sip->ofp)) >= 0) {
-	    rs = readfileline(sip->rbuf,sip->rlen,orgfname) ;
+	    rs = filereadln(orgfname,sip->rbuf,sip->rlen) ;
 	    len = rs ;
 	}
 
@@ -373,9 +367,7 @@ static int getuserorg_sys(SUBINFO *sip)
 
 #endif /* CF_ORGSYS */
 
-
-static int isNoAcc(int rs)
-{
+static int isNoAcc(int rs) noex {
 	return isOneOf(rsnoacc,rs) ;
 }
 /* end subroutine (isNoAcc) */

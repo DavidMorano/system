@@ -56,6 +56,7 @@
 #include	<string.h>
 #include	<usystem.h>
 #include	<uprogdata.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -79,7 +80,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 
 
@@ -143,7 +143,7 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen)
 	    cchar	*systatname = SYSTATFNAME ;
 	    char	tfname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath3(tfname,pr,vardname,systatname)) >= 0) {
-	        if ((rs = readfileline(rbuf,rlen,tfname)) > 0) {
+	        if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
 	            len = rs ;
 #if	CF_UPROGDATA
 	            rs = uprogdata_set(di,rbuf,len,ttl) ;

@@ -58,6 +58,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -85,7 +86,6 @@ extern int	nextfield(const char *,int,const char **) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	getuserorg(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	touc(int) ;
 extern int	isNotPresent(int) ;
 
@@ -138,7 +138,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un)
 	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 		if ((rs = mkpath3(tfname,hbuf,etcdname,ocfname)) >= 0) {
-		    rs = readfileline(rbuf,rlen,tfname) ;
+		    rs = filereadln(tfname,rbuf,rlen) ;
 		    len = rs ;
 		}
 	    } /* end if (getuserhome) */
@@ -148,7 +148,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un)
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
 	    if ((rs = mkpath3(tfname,pr,etcdname,ocfname)) >= 0) {
-	        rs = readfileline(rbuf,rlen,tfname) ;
+	        rs = filereadln(tfname,rbuf,rlen) ;
 	        len = rs ;
 	    }
 	}
@@ -157,7 +157,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un)
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
 	    if ((rs = mkpath3(tfname,"/",etcdname,ocfname)) >= 0) {
-	        rs = readfileline(rbuf,rlen,tfname) ;
+	        rs = filereadln(tfname,rbuf,rlen) ;
 	        len = rs ;
 	    }
 	}

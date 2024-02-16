@@ -1,10 +1,14 @@
-/* pcsnso */
+/* pcsnso HEADER */
+/* lang=C20 */
+
+/* PCS-NAME-SERVER query database manager */
+/* version %I% last-modified %G% */
 
 
-/* Copyright Â© 2008 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSNSO_INCLUDE
-#define	PCSNSO_INCLUDE	1
+#define	PCSNSO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -24,7 +28,6 @@
 #define	PCSNSO_TO	7
 
 /* query options */
-
 #define	PCSNSO_ONOSERV	(1<<0)		/* do not call the server */
 #define	PCSNSO_OPREFIX	(1<<1)		/* prefix match */
 

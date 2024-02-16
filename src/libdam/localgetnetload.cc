@@ -56,6 +56,7 @@
 #include	<string.h>
 #include	<usystem.h>
 #include	<uprogdata.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -132,7 +133,7 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	    cchar	*netloadname = NETLOADFNAME ;
 	    char	tfname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath3(tfname,pr,vardname,netloadname)) >= 0) {
-	        if ((rs = readfileline(rbuf,rlen,tfname)) > 0) {
+	        if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
 	            len = rs ;
 #if	CF_UPROGDATA
 		    rs = uprogdata_set(di,rbuf,len,ttl) ;

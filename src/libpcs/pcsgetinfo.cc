@@ -1,12 +1,12 @@
-/* pcsgetnames */
+/* pcsgetnames SUPPORT */
+/* lang=C++20 */
 
 /* get various information elements related to the PCS environment */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEFPCS	1		/* try a default PCS program-root */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -19,57 +19,53 @@
 
 /*******************************************************************************
 
-	This subroutine retrieves the real name of a user according to what the
-	PCS thinks it might be.  This subroutine is generally called by PCS
-	programs.
+	Name:
+	pcsname
+
+	Description:
+	This subroutine retrieves the real name of a user according
+	to what the PCS thinks it might be.  This subroutine is
+	generally called by PCS programs.
 
 	Synopsis:
-
-	int pcsname(pr,rbuf,rlen,username)
-	const char	pr[] ;
-	char		rbuf[] ;
-	int		rlen ;
-	const char	username[] ;
+	int pcsname(cchar *pr,char *rbuf,int rlen,cchar *username) noex
 
 	Arguments:
-
 	pr		PCS system program root (if available)
 	rbuf		buffer to hold result
 	rlen		length of supplied result buffer
 	username	username to check
 
 	Returns:
-
 	>=0		OK
-	<0		some error
+	<0		some error (system-return)
 
 
 	Implementation note:
 
-	Is "home-searching" faster than just asking the system for the home
-	directory of a user?  It probably is not!  In reality, it is a matter
-	of interacting with the Automount server probably much more than what
-	would have happened if we just first interacted with the
-	Name-Server-Cache and then the Automount server once after that.
+	Is "home-searching" faster than just asking the system for
+	the home directory of a user?  It probably is not!  In
+	reality, it is a matter of interacting with the Automount
+	server probably much more than what would have happened if
+	we just first interacted with the Name-Server-Cache and
+	then the Automount server once after that.
 
-	Note that we NEVER 'stat(2)' a file directly within any of the possible
-	base directories for home-directories.  This is done to avoid those
-	stupid SYSLOG entries saying that a file could not be found within an
-	indirect auto-mount point -- what the base directories usually are
-	now-a-days!
+	Note that we NEVER |stat(2)| a file directly within any of
+	the possible base directories for home-directories.  This
+	is done to avoid those stupid SYSLOG entries saying that a
+	file could not be found within an indirect auto-mount point
+	-- what the base directories usually are now-a-days!
 
-	On second thought, avoiding asking the "system" may be a good course of
-	action since even though we are going through the name-server cache, it
-	more often than not has to go out to some wirdo-only-knows network NIS+
-	(whatever) server to get the PASSWD information.  This is not unusual
-	in a large organization.
-
+	On second thought, avoiding asking the "system" may be a
+	good course of action since even though we are going through
+	the name-server cache, it more often than not has to go out
+	to some wirdo-only-knows network NIS+ (whatever) server to
+	get the PASSWD information.  This is not unusual in a large
+	organization.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -80,7 +76,6 @@
 #include	<pwd.h>
 #include	<project.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<char.h>
@@ -90,6 +85,7 @@
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<getxusername.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -180,7 +176,6 @@ extern int	getuserhome(char *,int,cchar *) ;
 extern int	getgecosname(const char *,int,const char **) ;
 extern int	mkgecosname(char *,int,const char *) ;
 extern int	mkrealname(char *,int,const char *,int) ;
-extern int	readfileline(char *,int,cchar *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	hasalldig(const char *,int) ;
 extern int	isdigitlatin(int) ;
@@ -657,7 +652,7 @@ static int getname_userhome(SUBINFO *sip ,int nt)
 	    const char	*fn = pcsnametypes[nt].fname ;
 	    char	tbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
-	        rs = readfileline(sip->rbuf,sip->rlen,tbuf) ;
+	        rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
 		if (isNotPresent(rs)) rs = SR_OK ;
 	    }
 	} /* end if (getuserhome) */
@@ -764,7 +759,7 @@ static int getprojinfo_userhome(SUBINFO *sip)
 	    if ((rs = mkpath2(tbuf,hbuf,fname)) >= 0) {
 		const int	rlen = sip->rlen ;
 		char		*rbuf = sip->rbuf ;
-	        if ((rs = readfileline(rbuf,rlen,tbuf)) >= 0) {
+	        if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
 		    len = rs ;
 		} else if (isNotPresent(rs)) 
 		    rs = SR_OK ;
@@ -829,7 +824,7 @@ static int getprojinfo_pcsdef(SUBINFO *sip)
 	        if ((rs = mkpath2(tbuf,sip->pr,fname)) >= 0) {
 		    const int	rlen = sip->rlen ;
 		    char	*rbuf = sip->rbuf ;
-	            if ((rs = readfileline(rbuf,rlen,tbuf)) >= 0) {
+	            if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
 	                len = rs ;
 		    } else if (isNotPresent(rs)) 
 			rs = SR_OK ;

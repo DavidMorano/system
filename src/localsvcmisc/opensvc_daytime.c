@@ -1,18 +1,19 @@
-/* opensvc_daytime */
+/* opensvc_daytime SUPPORT */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (daytime) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_GETORGCODE	1		/* use 'localgetorgcode(3dam)' */
-
+#define	CF_GETORGCODE	1		/* use |localgetorgcode(3dam)| */
 
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This code was started by taking the corresponding code from the
-        TCP-family module. In retrospect, that was a mistake. Rather I should
-        have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module. In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -20,10 +21,13 @@
 
 /*******************************************************************************
 
+	Name:
+	opensvc_daytime
+
+	Description:
 	This is an open-facility-service module.
 
 	Synopsis:
-
 	int opensvc_daytime(pr,prn,of,om,argv,envv,to)
 	const char	*pr ;
 	const char	*prn ;
@@ -34,7 +38,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -44,16 +47,12 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -61,11 +60,11 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<nulstr.h>
 #include	<nistinfo.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 #include	"opensvc_daytime.h"
@@ -91,7 +90,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	opentmp(const char *,int,mode_t) ;
 extern int	localgetorgcode(const char *,char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 
 extern cchar	*getourenv(const char **,const char *) ;
@@ -159,7 +157,7 @@ int		to ;
 	    char	ocfname[MAXPATHLEN+1] ;
 	    rs = mkpath2(ocfname,pr,OCFNAME) ;
 	    if (rs >= 0) {
-	        rs1 = readfileline(ocbuf,OCBUFLEN,ocfname) ;
+	        rs1 = filereadln(ocfname,ocbuf,OCBUFLEN) ;
 	        if (rs1 >= 0) orgcode = ocbuf ;
 	        if ((rs1 < 0) && (! isNotPresent(rs1))) rs = rs1 ;
 	    }
