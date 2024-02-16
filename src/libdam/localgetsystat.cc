@@ -1,11 +1,11 @@
-/* localgetsystat */
+/* localgetsystat SUPPORT */
+/* lang=C++20 */
 
 /* get the LOCAL system-status (SYSTAT) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
-
 
 /* revision history:
 
@@ -18,49 +18,42 @@
 
 /*******************************************************************************
 
+	Name:
+	localgetsystat
+
+	Description:
 	This subroutine retrieves the LOCAL system-status (SYSTAT).
 
 	Synopsis:
-
-	int localgetsystat(pr,rbuf,rlen)
-	const char	pr[] ;
-	char		rbuf[] ;
-	char		rlen ;
+	int localgetsystat(cchar *pr,char *rbuf,int rlen) noex
 
 	Arguments:
-
 	pr		program root
 	rbuf		caller supplied buffer to place result in
 	rlen		length of caller supplied buffer
 
 	Returns:
-
 	>=0		length of returned value
-	<0		error
-
+	<0		error (system-return)
 
 	Notes:
 
 	Q. Why the program-cache?
-	A. Because this subroutine, and a couple others like it, get called
-	   everytime certain pseudo-"files" are read out.  We want some of
-	   those files to read out very quickly, so caching away an extra
-	   real-file read in this routine (and others like it) really speeds
-	   things up.
-
+	A. Because this subroutine, and a couple others like it,
+	get called everytime certain pseudo-"files" are read out.
+	We want some of those files to read out very quickly, so
+	caching away an extra real-file read in this routine (and
+	others like it) really speeds things up.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<uprogdata.h>
 #include	<localmisc.h>

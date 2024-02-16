@@ -1,11 +1,11 @@
-/* localgetnetload */
+/* localgetnetload SUPPORT */
+/* lang=C++20 */
 
 /* get the LOCAL network-load (NETLOAD) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
-
 
 /* revision history:
 
@@ -18,49 +18,42 @@
 
 /*******************************************************************************
 
+	Name:
+	localgetnetload
+
+	Description:
 	This subroutine retrieves the LOCAL system network-load.
 
 	Synopsis:
-
-	int localgetnetload(pr,rbuf,rlen)
-	const char	pr[] ;
-	char		rbuf[] ;
-	char		rlen ;
+	int localgetnetload(cchar *pr,char *rbuf,int rlen) noex
 
 	Arguments:
-
 	pr		program root
 	rbuf		caller supplied buffer to place result in
 	rlen		length of caller supplied buffer
 
 	Returns:
-
 	>=0		length of returned value
-	<0		error
-
+	<0		error (system-return)
 
 	Notes:
 
 	Q. Why the program-cache?
-	A. Because this subroutine, and a couple others like it, get called
-	   everytime certain pseudo-"files" are read out.  We want some of
-	   those files to read out very quickly, so caching away an extra
-	   real-file read in this routine (and others like it) really speeds
-	   things up.
-
+	A. Because this subroutine, and a couple others like it,
+	get called everytime certain pseudo-"files" are read out.
+	We want some of those files to read out very quickly, so
+	caching away an extra real-file read in this routine (and
+	others like it) really speeds things up.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<uprogdata.h>
 #include	<localmisc.h>
@@ -80,15 +73,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
-extern int	isNotPresent(int) ;
-
 
 /* external variables */
 
@@ -104,11 +88,9 @@ extern int	isNotPresent(int) ;
 
 /* exported subroutines */
 
-
-int localgetnetload(cchar *pr,char *rbuf,int rlen)
-{
-	const int	di = UPROGDATA_DNETLOAD ;
-	const int	ttl = TO_TTL ;
+int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
+	cint		di = UPROGDATA_DNETLOAD ;
+	cint		ttl = TO_TTL ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
