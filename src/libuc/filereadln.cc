@@ -47,7 +47,6 @@
 #include	<filebuf.h>
 #include	<sfx.h>
 #include	<sncpyxw.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"filereadln.h"
@@ -71,6 +70,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int filereadln(cchar *fn,char *rbuf,int rlen) noex {
@@ -82,14 +84,13 @@ int filereadln(cchar *fn,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (fn[0]) {
-		char	*lbuf{} ;
-		if ((rs = malloc_ml(&lbuf)) >= 0) {
+		if (char *lbuf{} ; (rs = malloc_ml(&lbuf)) >= 0) {
 		    cint	llen = rs ;
 		    cint	of = O_RDONLY ;
 		    cmode	om = 0666 ;
 	            if ((rs = uc_open(fn,of,om)) >= 0) {
 	                filebuf		b ;
-	                int		fd = rs ;
+	                cint		fd = rs ;
 	                if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
 	                    while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
 				int	cl ;
@@ -104,7 +105,7 @@ int filereadln(cchar *fn,char *rbuf,int rlen) noex {
 	                    rs1 = filebuf_finish(&b) ;
 		            if (rs >= 0) rs = rs1 ;
 	                } /* end if (filebuf) */
-	                rs1 = u_close(fd) ;
+	                rs1 = uc_close(fd) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (uc_open) */
 	            rs1 = uc_free(lbuf) ;
