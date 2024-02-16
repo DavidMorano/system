@@ -1,12 +1,11 @@
-/* nisdomainname */
+/* nisdomainname SUPPORT */
+/* lang=C++20 */
 
 /* get the NIS domain name for the current host */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGFILE	0		/* test the file-reading code */
-
 
 /* revision history:
 
@@ -19,23 +18,22 @@
 
 /*******************************************************************************
 
+	Name:
+	nisdomainname
+
+	Description:
 	Get the NIS domain name for the local host.
 
 	Synopsis:
-
-	int nisdomainname(dbuf,dlen)
-	char	dbuf[] ;
-	int	dlen ;
+	int nisdomainname(char *dbuf,int dlen) noex
 
 	Arguments:
-
 	dbuf		buffer to place name in
 	dlen		length of user-supplied buffer
 
 	Returns:
-
 	>=0		length of NIS domain name
-	<0		error
+	<0		error (system-return)
 
 	Implementation:
 
@@ -44,12 +42,9 @@
 	2. from the kernel (using |sysinfo(2)|)
 	3. from reading the file '/etc/defaultdomain'
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
@@ -61,12 +56,17 @@
 
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<filebuf.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
+#include	<sfx.h>
+#include	<strn.h>
 #include	<localmisc.h>
+
+#include	"nisdomainname.h"
 
 
 /* local defines */
@@ -84,14 +84,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sfshrink(char *,int,const char **) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
 
 /* external variables */
 
@@ -101,17 +93,18 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-static int	nisfile(char *,int,cchar *) ;
+static int	nisfile(char *,int,cchar *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int nisdomainname(char *rbuf,int rlen)
-{
+int nisdomainname(char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 
 	if (rbuf == NULL) return SR_FAULT ;
@@ -148,7 +141,9 @@ int nisdomainname(char *rbuf,int rlen)
 	    rs = nisfile(rbuf,rlen,NISDOMAINNAME) ;
 	}
 
-	if ((rs >= 0) && (rbuf[0] == '\0')) rs = SR_NOTAVAIL ;
+	if ((rs >= 0) && (rbuf[0] == '\0')) {
+	    rs = SR_NOTAVAIL ;
+	}
 
 	return rs ;
 }
@@ -157,10 +152,8 @@ int nisdomainname(char *rbuf,int rlen)
 
 /* local subroutines */
 
-
-static int nisfile(char rbuf[],int rlen,cchar *fname)
-{
-	const int	to = TO_NISFILE ;
+static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
+	cint		to = TO_NISFILE ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
@@ -170,12 +163,12 @@ static int nisfile(char rbuf[],int rlen,cchar *fname)
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    FILEBUF	fb ;
-	    const int	fd = rs ;
+	if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
+	    filebuf	fb ;
+	    cint	fd = rs ;
 
 	    if ((rs = filebuf_start(&fb,fd,0L,256,0)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint		llen = LINEBUFLEN ;
 		int		len ;
 		int		cl ;
 		cchar		*tp ;
@@ -207,7 +200,7 @@ static int nisfile(char rbuf[],int rlen,cchar *fname)
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (reading file) */
 
-	    u_close(fd) ;
+	    rs1 = uc_close(fd) ;
 	} /* end if (open) */
 
 	return (rs >= 0) ? rl : rs ;

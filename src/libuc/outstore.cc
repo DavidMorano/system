@@ -1,6 +1,8 @@
-/* outstore */
+/* outstore SUPPORT */
+/* lang=C++20 */
 
 /* manage some dynamic output storage (mostly for SHIO use) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,31 +16,27 @@
 
 /*******************************************************************************
 
-	This object manages a small buffer for output storage purposes.  This
-	is mostly (or perhaps only) used as a helper object for the SHIO object
-	when it is:
+	This object manages a small buffer for output storage
+	purposes.  This is mostly (or perhaps only) used as a helper
+	object for the SHIO object when it is:
 
 	1. in SFIO mode
 	2. the output is a terminal
 
 	Othersize, SHIO just outputs data using the regular calls.
 
-
 *******************************************************************************/
 
-
-#define	OUTSTORE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |max(3c++)| */
 #include	<usystem.h>
+#include	<usupport.h>		/* |memclear(3u)| */
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"outstore.h"
@@ -47,33 +45,38 @@
 /* local defines */
 
 
+/* local namespaces */
+
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern char	*strwcpy(char *,cchar *,int) ;
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int outstore_start(OUTSTORE *op)
-{
-	if (op == NULL) return SR_FAULT ;
-	memset(op,0,sizeof(OUTSTORE)) ;
+int outstore_start(OUTSTORE *op) noex {
+	if (op == nullptr) return SR_FAULT ;
+	memclear(op) ;			/* dangerous */
 	return SR_OK ;
 }
 /* end subroutine (outstore_start) */
 
-
-int outstore_finish(OUTSTORE *op)
-{
+int outstore_finish(OUTSTORE *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->dbuf != NULL) {
+	if (op == nullptr) return SR_FAULT ;
+	if (op->dbuf != nullptr) {
 	    op->dbuf[0] = '\0' ; /* cute safety trick */
 	    rs1 = uc_free(op->dbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbuf = NULL ;
+	    op->dbuf = nullptr ;
 	}
 	op->sbuf[0] = '\0' ;
 	op->len = 0 ;
@@ -81,41 +84,35 @@ int outstore_finish(OUTSTORE *op)
 }
 /* end subroutine (outstore_finish) */
 
-
-int outstore_get(OUTSTORE *op,cchar **rpp)
-{
+int outstore_get(OUTSTORE *op,cchar **rpp) noex {
 	int		rs ;
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	rs = op->len ;
-	if (rpp != NULL) {
-	    *rpp = (op->dbuf != NULL) ? op->dbuf : op->sbuf ;
+	if (rpp != nullptr) {
+	    *rpp = (op->dbuf != nullptr) ? op->dbuf : op->sbuf ;
 	}
 	return rs ;
 }
 /* end subroutine (outstore_get) */
 
-
-int outstore_clear(OUTSTORE *op)
-{
-	if (op == NULL) return SR_FAULT ;
+int outstore_clear(OUTSTORE *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 	op->len = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (outstore_clear) */
 
-
-int outstore_strw(OUTSTORE *op,cchar *sp,int sl)
-{
-	const int	slen = OUTSTORE_SLEN ;
+int outstore_strw(OUTSTORE *op,cchar *sp,int sl) noex {
+	cint		slen = OUTSTORE_SLEN ;
 	int		rs = SR_OK ;
 	int		rlen ;
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (sl < 0) sl = strlen(sp) ;
-	if (op->dbuf != NULL) {
+	if (op->dbuf != nullptr) {
 	    rlen = (op->dlen-op->len) ;
 	    if (sl > rlen) {
-		const int	dlen = (op->dlen+sl+slen) ;
+		cint	dlen = (op->dlen+sl+slen) ;
 		char		*dp ;
 		if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
 		    char	*rp = (dp+op->len) ;
@@ -132,8 +129,8 @@ int outstore_strw(OUTSTORE *op,cchar *sp,int sl)
 	} else {
 	    rlen = (slen-op->len) ;
 	    if (sl > rlen) {
-		const int	dlen = MAX((sl+slen),(2*slen)) ;
-		char		*dp ;
+		cint	dlen = MAX((sl+slen),(2*slen)) ;
+		char	*dp ;
 		if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
 		    op->dlen = dlen ;
 		    op->dbuf = dp ;
