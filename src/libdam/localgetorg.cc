@@ -1,13 +1,12 @@
-/* localgetorg */
+/* localgetorg SUPPORT */
+/* version %I% last-modified %G% */
 
 /* get the organization name (string) for a specified user-name */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_USERORG	0		/* try to access "user" org also */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -20,35 +19,29 @@
 
 /*******************************************************************************
 
-        This subroutine retrieves the organization name (string) for a specified
-        user-name.
+	Name:
+	localgetorg
+
+	Description:
+	This subroutine retrieves the organization name (string)
+	for a specified user-name.
 
 	Synopsis:
-
-	int localgetorg(pr,rbuf,rlen,username)
-	const char	*pr ;
-	char		rbuf[] ;
-	int		rlen ;
-	const char	*username ;
+	int localgetorg(cc *pr,char *rbuf,int rlen,cc* username) noex
 
 	Arguments:
-
 	pr		program-root
 	rbuf		user supplied buffer to hold result
 	rlen		length of user supplied buffer
 	username	username to look up
 
 	Returns:
-
 	>=0		length of return organization string
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -56,7 +49,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<char.h>

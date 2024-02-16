@@ -1,21 +1,23 @@
-/* localgetorgcode */
+/* localgetorgcode SUPPORT */
+/* lang=C++20 */
 
 /* get the LOCAL organization-code (ORGCODE) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        This subroutine is originally written. This is a minimal implementation.
+	This subroutine is originally written. This is a minimal
+	implementation.
 
 	= 2018-09-14, David A.D. Morano
-	I modified this to use |snabbr(3dam)| instead of a local custom thing
-	which did the same thing, only not as well. So we go with the library
-	solution instead of the local custom one. Note for future: might want to
-	refactor a bit to get a loop of attempts to find the ORGCODE rather than
+	I modified this to use |snabbr(3dam)| instead of a local
+	custom thing which did the same thing, only not as well.
+	So we go with the library solution instead of the local
+	custom one. Note for future: might want to refactor a bit
+	to get a loop of attempts to find the ORGCODE rather than
 	the current (older) list-like code pattern.
 
 */
@@ -24,44 +26,37 @@
 
 /*******************************************************************************
 
-        This subroutine is used to (try to) get the LOCAL software distribution
-        organization-code (ORGCODE). An (so-called) ORGCODE is normally an
-	abbreviation of an organiztion name (itself normally multiple words)
-	consisting of the first letter of each word, but capitalized.
+	Name:
+	localgetorgcode
 
+	Description:
+	This subroutine is used to (try to) get the LOCAL software
+	distribution organization-code (ORGCODE). An (so-called)
+	ORGCODE is normally an abbreviation of an organiztion name
+	(itself normally multiple words) consisting of the first
+	letter of each word, but capitalized.
 
 	Synopsis:
-
-	int localgetorgcode(pr,rbuf,rlen,un)
-	const char	pr[] ;
-	char		rbuf[] ;
-	char		rlen ;
-	const char	*un ;
+	int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex
 
 	Arguments:
-
 	pr		program root
 	rbuf		caller supplied buffer to place result in
 	rlen		length of caller supplied buffer
 	un		username
 
 	Returns:
-
 	>=0		length of returned ID
-	<0		error in process of creating ID
-
+	<0		error in process of creating ID (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

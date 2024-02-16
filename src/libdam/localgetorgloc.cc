@@ -1,20 +1,22 @@
-/* localgetorgloc */
+/* localgetorgloc SUPPORT */
+/* lang=C++20 */
 
 /* get the LOCAL organization location (ORGLOC) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        This subroutine is originally written. This is a minimal implementation,
-        but at least there is something here. ORGLOCs are not currently a part
-        of the system-user-database system ('passwd', 'user_attr', et cetera) so
-        currently this subroutine does not look anywhere in those places for an
-        ORGLOC. I guess that an ORGLOC should be added to the 'user_attr'
-        database but this practice has not yet begun, if it ever will be.
+	This subroutine is originally written. This is a minimal
+	implementation, but at least there is something here. ORGLOCs
+	are not currently a part of the system-user-database system
+	('passwd', 'user_attr', et cetera) so currently this
+	subroutine does not look anywhere in those places for an
+	ORGLOC. I guess that an ORGLOC should be added to the
+	'user_attr' database but this practice has not yet begun,
+	if it ever will be.
 
 */
 
@@ -22,46 +24,41 @@
 
 /*******************************************************************************
 
-        This subroutine is used to (try to) get the LOCAL software distribution
-        organization location (ORGLOC). This particular value is not often set
-        in the LOCAL software distribution and also this subroutine does not
-        look hard in other places to find a possible location. So an ORGLOC is
-        not often returned. But nonetheless there are places (pieces of code,
-        middleware et cetera) that still call this subroutine rather regularly.
+	Name:
+	localgetorgloc
+
+	Descrption:
+	This subroutine is used to (try to) get the LOCAL software
+	distribution organization location (ORGLOC). This particular
+	value is not often set in the LOCAL software distribution
+	and also this subroutine does not look hard in other places
+	to find a possible location. So an ORGLOC is not often
+	returned. But nonetheless there are places (pieces of code,
+	middleware et cetera) that still call this subroutine rather
+	regularly.
 
 	Synopsis:
-
-	int localgetorgloc(pr,rbuf,rlen,un)
-	const char	pr[] ;
-	char		rbuf[] ;
-	char		rlen ;
-	const char	*un ;
+	int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex
 
 	Arguments:
-
 	pr		program root
 	rbuf		caller supplied buffer to place result in
 	rlen		length of caller supplied buffer
 	un		username
 
 	Returns:
-
 	>=0		length of returned ID
-	<0		error in process of creating ID
-
+	<0		error in process of creating ID (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -102,13 +99,7 @@ extern int	isNotPresent(int) ;
 
 /* exported subroutines */
 
-
-int localgetorgloc(pr,rbuf,rlen,un)
-const char	pr[] ;
-char		rbuf[] ;
-int		rlen ;
-const char	*un ;
-{
+int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	const char	*etcdname = ETCCNAME ;

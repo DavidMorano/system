@@ -1,11 +1,11 @@
-/* localsetsystat */
+/* localsetnetload SUPPORT */
+/* lang=C++20 */
 
-/* set the LOCAL system-status (SYSTAT) */
-
+/* set the LOCAL network-load (NETLOAD) */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
-
 
 /* revision history:
 
@@ -18,25 +18,23 @@
 
 /*******************************************************************************
 
-	This subroutine sets the LOCAL system-status (SYSTAT).
+	Name:
+	localsetnetload
+
+	Description:
+	This subroutine sets the LOCAL system network-load.
 
 	Synopsis:
-
-	int localsetsystat(pr,sbuf,slen)
-	const char	pr[] ;
-	const char	sbuf[] ;
-	char		slen ;
+	int localsetnetload(cchar *pr,cchar *sbuf,int slen) noex
 
 	Arguments:
-
 	pr		program root
-	sbuf		caller supplied buffer w/ value to set
-	slen		length of caller supplied buffer
+	sbuf		c-string value to set pointer
+	slen		c-string value to set length
 
 	Returns:
-
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 
 	Notes:
@@ -44,19 +42,15 @@
 	Q. Why the program-cache?
 	A. It serves as a short-cut for future "gets."
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<uprogdata.h>
@@ -65,13 +59,13 @@
 
 /* local defines */
 
-#ifndef	VARSYSTAT
-#define	VARSYSTAT	"SYSTAT"
+#ifndef	VARNETLOAD
+#define	VARNETLOAD	"NETLOAD"
 #endif
 
 #define	ETCDNAME	"etc"
 #define	VARDNAME	"var"
-#define	SYSTATFNAME	"systat"
+#define	NETLOADFNAME	"netload"
 #define	TO_TTL		(5*60)
 
 
@@ -101,16 +95,14 @@ extern int	isNotPresent(int) ;
 
 /* exported subroutines */
 
-
-int localsetsystat(cchar *pr,cchar *sbuf,int slen)
-{
-	const int	di = UPROGDATA_DSYSTAT ;
+int localsetnetload(cchar *pr,cchar *sbuf,int slen) noex {
+	const int	di = UPROGDATA_DNETLOAD ;
 	const int	ttl = TO_TTL ;
 	int		rs ;
 	int		rs1 ;
 	int		rc = 0 ;
 	const char	*vardname = VARDNAME ;
-	const char	*name = SYSTATFNAME ;
+	const char	*netloadname = NETLOADFNAME ;
 	char		tfname[MAXPATHLEN+1] ;
 
 	if (pr == NULL) return SR_FAULT ;
@@ -118,11 +110,11 @@ int localsetsystat(cchar *pr,cchar *sbuf,int slen)
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	if ((rs = mkpath3(tfname,pr,vardname,name)) >= 0) {
+	if ((rs = mkpath3(tfname,pr,vardname,netloadname)) >= 0) {
 	    bfile		dfile, *dfp = &dfile ;
 	    const mode_t	om = 0664 ;
 	    if ((rs = bopen(dfp,tfname,"wct",om)) >= 0) {
-		cchar	*fmt = "# SYSTAT (Machine System-Status)" ;
+		cchar	*fmt = "# NETLOAD (Machine Network-Load)" ;
 		if ((rs = bprintln(dfp,fmt,-1)) >= 0) {
 	            if ((rs = bprintln(dfp,sbuf,slen)) >= 0) {
 		        rs = uprogdata_set(di,sbuf,slen,ttl) ;
@@ -135,11 +127,11 @@ int localsetsystat(cchar *pr,cchar *sbuf,int slen)
 	} /* end if (mkpath) */
 
 #if	CF_DEBUGS
-	debugprintf("localsetsystat: ret rs=%d rc=%u\n",rs,rc) ;
+	debugprintf("localsetnetload: ret rs=%d rc=%u\n",rs,rc) ;
 #endif
 
 	return (rs >= 0) ? rc : rs ;
 }
-/* end subroutine (localsetsystat) */
+/* end subroutine (localsetnetload) */
 
 
