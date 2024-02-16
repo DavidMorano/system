@@ -1835,7 +1835,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	            rs = bufprintf(cbuf,clen,fmt,nbuf,nlen,c,v,ndays) ;
 	            cl = rs ;
 	            if (rs >= 0) {
-	                rs = filebuf_print(sip->ofp,cbuf,cl) ;
+	                rs = filebuf_println(sip->ofp,cbuf,cl) ;
 	                wlen += rs ;
 	            }
 	        } /* end if (nin-nul) */
@@ -1846,7 +1846,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	        rs = bufprintf(cbuf,clen,fmt,b,c,v,ndays) ;
 	        cl = rs ;
 	        if (rs >= 0) {
-	            rs = filebuf_print(sip->ofp,cbuf,cl) ;
+	            rs = filebuf_println(sip->ofp,cbuf,cl) ;
 	            wlen += rs ;
 	        }
 	    } /* end if (type of book-name display) */
@@ -1911,7 +1911,7 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,ndays) ;
 	            cl = rs ;
 	            if (rs >= 0) {
-	                rs = filebuf_print(sip->ofp,cbuf,cl) ;
+	                rs = filebuf_println(sip->ofp,cbuf,cl) ;
 	                wlen += rs ;
 	            }
 
@@ -1925,7 +1925,7 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 	        rs = bufprintf(cbuf,clen,fmt,b,c,v,ndays) ;
 	        cl = rs ;
 	        if (rs >= 0) {
-	            rs = filebuf_print(sip->ofp,cbuf,cl) ;
+	            rs = filebuf_println(sip->ofp,cbuf,cl) ;
 	            wlen += rs ;
 	        }
 

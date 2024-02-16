@@ -1,4 +1,4 @@
-/* opensvc_imail */
+/* opensvc_imail SUPPORT */
 /* lang=C20 */
 
 /* LOCAL facility open-service (imail) */
@@ -632,7 +632,7 @@ static int writeargs(int afd,BITS *blp,int ai_pos,int argc,cchar **argv)
 	            ap = argv[ai] ;
 	            if (ap[0] != '-') {
 	                n += 1 ;
-	                rs = filebuf_print(&b,ap,-1) ;
+	                rs = filebuf_println(&b,ap,-1) ;
 	            }
 	        }
 	    } /* end for */

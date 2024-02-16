@@ -1,4 +1,4 @@
-/* strfilemks */
+/* strfilemks SUPPORT */
 /* lang=C20 */
 
 /* make a STRFILE database */
@@ -185,7 +185,7 @@ struct idx {
 	const char	*ai ;
 	STRLISTHDR	hdr ;
 	IDX_FL		f ;
-	FILEBUF		fb ;
+	filebuf		fb ;
 	int		fd ;
 	uint		fo ;
 } ;
@@ -245,7 +245,7 @@ static int	rectab_count(RECTAB *) ;
 static int	mapfile_start(MAPFILE *,int,const char *,int) ;
 static int	mapfile_end(MAPFILE *) ;
 
-static int	filebuf_writefill(FILEBUF *,const char *,int) ;
+static int	filebuf_writefill(filebuf *,const char *,int) ;
 
 static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct strentry *) ;
 static int	hashindex(uint,int) ;
@@ -941,25 +941,19 @@ static int idx_bufhdr(IDX *ixp)
 
 static int idx_bufstr(IDX *ixp,const char *lp,int ll)
 {
-	FILEBUF	*fbp = &ixp->fb ;
+	filebuf	*fbp = &ixp->fb ;
 	int	rs ;
-	rs = filebuf_print(fbp,lp,ll) ;
+	rs = filebuf_println(fbp,lp,ll) ;
 	return rs ;
 }
 /* end subroutine (idx_bufstr) */
 
 
-
-static int strfilemks_filesbegin(op)
-STRFILEMKS	*op ;
-{
-	int	rs = SR_INVALID ;
-	int	dnl ;
-
-	const char	*dnp ;
-
-	char	tmpdname[MAXPATHLEN + 1] ;
-
+static int strfilemks_filesbegin(STRFILEMKS *op) noex {
+	int		rs = SR_INVALID ;
+	int		dnl ;
+	cchar		*dnp ;
+	char		tmpdname[MAXPATHLEN + 1] ;
 
 	if ((dnl = sfdirname(op->dbname,-1,&dnp)) >= 0) {
 	    const char	*cp ;
@@ -1299,7 +1293,7 @@ STRFILEMKS	*op ;
 {
 	STRLISTGDR	hf ;
 
-	FILEBUF	varfile ;
+	filebuf	varfile ;
 
 	STRTAB	*ksp = &op->strs ;
 
@@ -1784,36 +1778,28 @@ static int mapfile_start(MAPFILE *mfp,int max,const char *sp,int sl)
 }
 /* end subroutine (mapfile_begin) */
 
-
-static int mapfile_end(MAPFILE *mfp)
-{
-	int	rs = SR_OK ;
-
+static int mapfile_end(MAPFILE *mfp) noex {
+	int		rs = SR_OK ;
 	if (mfp->mapdata != NULL) {
-	    size_t	ms = fmp->mapsize ;
-	    const void	*md = fmp->mapdata ;
+	    csize	ms = fmp->mapsize ;
+	    cvoid	*md = fmp->mapdata ;
 	    rs = u_munmap(md,ms) ;
 	    mfp->mapdata = NULL ;
 	    mfp->mapsize = 0 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (mapfile_end) */
 
 
-static int filebuf_writefill(bp,wbuf,wlen)
-FILEBUF		*bp ;
-const char	wbuf[] ;
-int		wlen ;
-{
-	int	rs ;
-	int	r, nzero ;
-	int	len ;
+static int filebuf_writefill(filebuf *bp,cchar *wbuf,iknt elen) noex {
+	int		rs ;
+	int		r, nzero ;
+	int		len ;
 
-
-	if (wlen < 0)
+	if (wlen < 0) {
 	    wlen = (strlen(wbuf) + 1) ;
+	}
 
 	rs = filebuf_write(bp,wbuf,wlen) ;
 	len = rs ;

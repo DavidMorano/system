@@ -2462,7 +2462,7 @@ int		edays ;
 	        rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,(edays+1)) ;
 	        cl = rs ;
 	        if (rs >= 0) {
-	            rs = filebuf_print(sip->ofp,cbuf,cl) ;
+	            rs = filebuf_println(sip->ofp,cbuf,cl) ;
 	            wlen += rs ;
 	        }
 
@@ -2476,7 +2476,7 @@ int		edays ;
 	    rs = bufprintf(cbuf,clen,fmt,b,c,v,(edays+1)) ;
 	    cl = rs ;
 	    if (rs >= 0) {
-	        rs = filebuf_print(sip->ofp,cbuf,cl) ;
+	        rs = filebuf_println(sip->ofp,cbuf,cl) ;
 	        wlen += rs ;
 	    }
 

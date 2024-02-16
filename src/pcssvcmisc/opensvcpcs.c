@@ -293,7 +293,7 @@ int subpcs_user(SUBPCS *sip,FILEBUF *ofp,cchar *sp,int sl)
 	    const int	rlen = REALNAMELEN ;
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((rs = pcsns_get(&sip->ns,rbuf,rlen,un,w)) >= 0) {
-	        rs = filebuf_print(ofp,rbuf,rs) ;
+	        rs = filebuf_println(ofp,rbuf,rs) ;
 	        wlen += rs ;
 	    }
 	    rs1 = nulstr_finish(&n) ;

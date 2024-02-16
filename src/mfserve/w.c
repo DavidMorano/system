@@ -1987,7 +1987,7 @@ static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 	            const int	rsn = SR_NOTFOUND ;
 	            cchar	*sp ;
 	            while ((rs1 = sreq_snenum(jep,&cur,&sp)) >= 0) {
-	                rs = filebuf_print(&b,sp,-1) ;
+	                rs = filebuf_println(&b,sp,-1) ;
 	                wlen += rs ;
 	                if (rs < 0) break ;
 	            } /* end while */

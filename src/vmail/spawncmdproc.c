@@ -247,7 +247,7 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 			    } /* end switch */
 			    cl = rs ;
 			    if ((rs >= 0) && (cl > 0)) {
-	            	        rs = filebuf_print(&b,cmdbuf,cl) ;
+	            	        rs = filebuf_println(&b,cmdbuf,cl) ;
 	        	    }
 			} /* end for */
 

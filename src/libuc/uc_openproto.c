@@ -1,7 +1,6 @@
-/* uc_openproto */
+/* uc_openproto SUPPORT */
 /* lang=C20 */
 
-/* interface component for UNIX® library-3c */
 /* open a protocol */
 /* version %I% last-modified %G% */
 
@@ -1253,7 +1252,7 @@ int cols,int ind,int to)
 	            debugprintf("uc_openproto: if-end rs=%d\n",rs) ;
 #endif
 	        } else {
-	            rs = filebuf_print(ofp,lbuf,0) ;
+	            rs = filebuf_println(ofp,lbuf,0) ;
 	            wlen += rs ;
 	        } /* end if (clen) */
 
@@ -1340,7 +1339,7 @@ int		sl ;
 	        }
 
 	        if (rs >= 0) {
-	            rs = filebuf_print(ofp,cp,cl) ;
+	            rs = filebuf_println(ofp,cp,cl) ;
 	            wlen += rs ;
 	        }
 

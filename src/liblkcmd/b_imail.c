@@ -252,8 +252,8 @@ extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_addcspath(vecstr *) ;
 extern int	ema_first(EMA *,cchar **) ;
-extern int	filebuf_writehdrkey(FILEBUF *,cchar *) ;
-extern int	filebuf_printcont(FILEBUF *,int,cchar *,int) ;
+extern int	filebuf_writehdrkey(filebuf *,cchar *) ;
+extern int	filebuf_printcont(filebuf *,int,cchar *,int) ;
 extern int	stremacmp(cchar *,cchar *) ;
 extern int	ncolstr(int,int,cchar *,int) ;
 extern int	hasalluc(cchar *,int) ;
@@ -583,53 +583,53 @@ static int	procwaitbad(PROGINFO *,pid_t,int) ;
 static int	procsave(PROGINFO *) ;
 static int	procuserbox(PROGINFO *,int,MSGOPTS *) ;
 static int	procextract(PROGINFO *,int,MSGOPTS *) ;
-static int	procextracter(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
+static int	procextracter(PROGINFO *,filebuf *,int,MSGOPTS *) ;
 static int	procdisposefile(PROGINFO *,char *,int to,MSGOPTS *) ;
 
-static int	procmsg(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsgenv(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdrs(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_specials(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsgbody(PROGINFO *,FILEBUF *,int) ;
+static int	procmsg(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsgenv(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdrs(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_specials(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsgbody(PROGINFO *,filebuf *,int) ;
 
-static int	procmsghdr_path(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_recv(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_org(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_mid(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_xpri(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_clines(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_clen(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_singles(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_rto(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_eto(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_sender(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_vsenders(PROGINFO *,FILEBUF *,MSGDATA *,MSGOPTS *) ;
-static int	procmsghdr_from(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_addrs(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_addrsbcc(PROGINFO *,FILEBUF *,int) ;
-static int	procmsghdr_date(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_subj(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_xuuid(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_xmcdate(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_xuti(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_xm(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr_all(PROGINFO *,FILEBUF *,int,MSGOPTS *) ;
-static int	procmsghdr(PROGINFO *,FILEBUF *,int,cchar *,int) ;
+static int	procmsghdr_path(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_recv(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_org(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_mid(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_xpri(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_clines(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_clen(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_singles(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_rto(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_eto(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_sender(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_vsenders(PROGINFO *,filebuf *,MSGDATA *,MSGOPTS *) ;
+static int	procmsghdr_from(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_addrs(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_addrsbcc(PROGINFO *,filebuf *,int) ;
+static int	procmsghdr_date(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_subj(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_xuuid(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_xmcdate(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_xuti(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_xm(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr_all(PROGINFO *,filebuf *,int,MSGOPTS *) ;
+static int	procmsghdr(PROGINFO *,filebuf *,int,cchar *,int) ;
 
-static int	procmsginsthdr(PROGINFO *,FILEBUF *,int,cchar *,int,int) ;
+static int	procmsginsthdr(PROGINFO *,filebuf *,int,cchar *,int,int) ;
 
-static int procprinthdr(PROGINFO *,FILEBUF *,cchar *,cchar *,int) ;
-static int procprinthdr_mid(PROGINFO *,FILEBUF *,cchar *,int) ;
-static int procprinthdr_addrsome(PROGINFO *,FILEBUF *,cchar *,cchar *,int,int) ;
-static int procprinthdr_line(PROGINFO *,FILEBUF *,int,int,int,cchar *,int) ;
-static int procprinthdr_addrs(PROGINFO *,FILEBUF *,MAILMSGSTAGE *,int,cchar *) ;
-static int procprinthdr_ema(PROGINFO *,FILEBUF *,cchar *,EMA *,int) ;
-static int procprinthdr_bcc(PROGINFO *,FILEBUF *,vechand *) ;
-static int procprinthdr_xpri(PROGINFO *,FILEBUF *) ;
-static int procprinthdr_mailnote(PROGINFO *,FILEBUF *,cchar *,cchar *,int) ;
+static int procprinthdr(PROGINFO *,filebuf *,cchar *,cchar *,int) ;
+static int procprinthdr_mid(PROGINFO *,filebuf *,cchar *,int) ;
+static int procprinthdr_addrsome(PROGINFO *,filebuf *,cchar *,cchar *,int,int) ;
+static int procprinthdr_line(PROGINFO *,filebuf *,int,int,int,cchar *,int) ;
+static int procprinthdr_addrs(PROGINFO *,filebuf *,MAILMSGSTAGE *,int,cchar *) ;
+static int procprinthdr_ema(PROGINFO *,filebuf *,cchar *,EMA *,int) ;
+static int procprinthdr_bcc(PROGINFO *,filebuf *,vechand *) ;
+static int procprinthdr_xpri(PROGINFO *,filebuf *) ;
+static int procprinthdr_mailnote(PROGINFO *,filebuf *,cchar *,cchar *,int) ;
 
 #if	CF_VSENDERS
-static int	procprinthdr_emaone(PROGINFO *,FILEBUF *,cchar *,EMA_ENT *) ;
+static int	procprinthdr_emaone(PROGINFO *,filebuf *,cchar *,EMA_ENT *) ;
 #endif
 
 static int	procreciploads(PROGINFO *,vechand *,int,const int *) ;
@@ -786,7 +786,7 @@ static int	isHdrEmpty(int) ;
 static int	isHup(int) ;
 
 #if	CF_DEBUGOFF && (CF_DEBUG || CF_DEBUGS)
-static int	debugfilebuf_printoff(FILEBUF *,cchar *,cchar *,int) ;
+static int	debugfilebuf_printoff(filebuf *,cchar *,cchar *,int) ;
 #endif
 
 
@@ -3275,7 +3275,7 @@ static int procdelivery(PROGINFO *pip,int mi,int sfd,MSGOPTS *optp)
 	}
 
 	if (rs >= 0) {
-	    FILEBUF	fb ;
+	    filebuf	fb ;
 	    off_t	fboff = 0 ;
 	    const int	bsize = lip->pagesize ;
 
@@ -4015,7 +4015,7 @@ static int procdisposefile(PROGINFO *pip,char *mbuf,int to,MSGOPTS *mop)
 static int procextract(PROGINFO *pip,int sfd,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
-	FILEBUF		fb ;
+	filebuf		fb ;
 	int		rs ;
 	int		rs1 ;
 	int		ps ;
@@ -4044,7 +4044,7 @@ static int procextract(PROGINFO *pip,int sfd,MSGOPTS *mop)
 /* end subroutine (procextract) */
 
 
-static int procextracter(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *mop)
+static int procextracter(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
 	MSGDATA		*mdp ;
@@ -4080,7 +4080,7 @@ static int procextracter(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *mop)
 /* end subroutine (procextracter) */
 
 
-static int procmsg(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsg(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -4135,7 +4135,7 @@ static int procmsg(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 	    MSGDATA	*mdp ;
 	    if ((rs = locinfo_msgdataget(lip,mi,&mdp)) >= 0) {
 	        if ((rs = msgdata_sethlen(mdp,wlen)) >= 0) {
-	            if ((rs = filebuf_print(fbp,NULL,0)) >= 0) { /* EOH */
+	            if ((rs = filebuf_println(fbp,NULL,0)) >= 0) { /* EOH */
 	                wlen += rs ;
 	                rs = procmsgbody(pip,fbp,mi) ;
 	                wlen += rs ;
@@ -4162,7 +4162,7 @@ static int procmsg(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 static int procmsgenv(pip,fbp,mi,optp)
 PROGINFO	*pip ;
 MSGOPTS		*optp ;
-FILEBUF		*fbp ;
+filebuf		*fbp ;
 int		mi ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -4323,7 +4323,7 @@ int		mi ;
 
 #else /* CF_MSGENV */
 
-static int procmsgenv(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsgenv(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -4347,7 +4347,7 @@ static int procmsgenv(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 #endif /* CF_MSGENV */
 
 
-static int procmsghdrs(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdrs(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -4499,7 +4499,7 @@ static int procmsghdrs(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdrs) */
 
 
-static int procmsghdr_specials(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_specials(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
@@ -4520,7 +4520,7 @@ static int procmsghdr_specials(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_specials) */
 
 
-static int procmsgbody(PROGINFO *pip,FILEBUF *fbp,int mi)
+static int procmsgbody(PROGINFO *pip,filebuf *fbp,int mi)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -4538,12 +4538,6 @@ static int procmsgbody(PROGINFO *pip,FILEBUF *fbp,int mi)
 #endif
 
 	msp = &lip->ms ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_imail/procmsgbody: filebuf_print() rs=%d\n",rs) ;
-#endif
-
 	while ((rs = mailmsgstage_bodyget(msp,mi,boff,&bp)) > 0) {
 	    bl = rs ;
 
@@ -4597,7 +4591,7 @@ static int procmsgbody(PROGINFO *pip,FILEBUF *fbp,int mi)
 
 
 /* we always add a MSGID if there is not one already */
-static int procmsghdr_mid(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_mid(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MSGDATA		*mdp = NULL ;
@@ -4662,7 +4656,7 @@ static int procmsghdr_mid(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_mid) */
 
 
-static int procmsghdr_xpri(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_xpri(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -4686,7 +4680,7 @@ static int procmsghdr_xpri(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 
 /* only a final delivery agent adds the return-path */
 /* ARGSUSED */
-static int procmsghdr_path(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_path(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -4710,7 +4704,7 @@ static int procmsghdr_path(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_path) */
 
 
-static int procmsghdr_recv(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_recv(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -4724,7 +4718,7 @@ static int procmsghdr_recv(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_recv) */
 
 
-static int procmsghdr_org(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_org(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -4762,7 +4756,7 @@ static int procmsghdr_org(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_org) */
 
 
-static int procmsghdr_all(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_all(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -4812,7 +4806,7 @@ static int procmsghdr_all(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_all) */
 
 
-static int procmsghdr_clines(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_clines(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -4849,7 +4843,7 @@ static int procmsghdr_clines(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_clines) */
 
 
-static int procmsghdr_clen(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_clen(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -4877,7 +4871,7 @@ static int procmsghdr_clen(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_clen) */
 
 
-static int procmsghdr_singles(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_singles(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -4919,7 +4913,7 @@ static int procmsghdr_singles(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 
 
 /* reply-to */
-static int procmsghdr_rto(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
+static int procmsghdr_rto(PROGINFO *pip,filebuf *ofp,int mi,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -4968,7 +4962,7 @@ static int procmsghdr_rto(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
 
 
 /* errors-to */
-static int procmsghdr_eto(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
+static int procmsghdr_eto(PROGINFO *pip,filebuf *ofp,int mi,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -5012,7 +5006,7 @@ static int procmsghdr_eto(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
 /* end subroutine (procmsghdr_eto) */
 
 
-static int procmsghdr_sender(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
+static int procmsghdr_sender(PROGINFO *pip,filebuf *ofp,int mi,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
 	MSGDATA		*mdp ;
@@ -5046,7 +5040,7 @@ static int procmsghdr_sender(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
 
 
 #if	CF_VSENDERS
-static int procmsghdr_vsenders(PROGINFO *pip,FILEBUF *ofp,MSGDATA *mdp,
+static int procmsghdr_vsenders(PROGINFO *pip,filebuf *ofp,MSGDATA *mdp,
 	MSGOPTS *mop)
 {
 	int		rs ;
@@ -5069,7 +5063,7 @@ static int procmsghdr_vsenders(PROGINFO *pip,FILEBUF *ofp,MSGDATA *mdp,
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procmsghdr_vsenders) */
-static int procprinthdr_emaone(PROGINFO *pip,FILEBUF *ofp,cchar *kn,EMA_ENT *ep)
+static int procprinthdr_emaone(PROGINFO *pip,filebuf *ofp,cchar *kn,EMA_ENT *ep)
 {
 	LOCINFO		*pip = lip->pip ;
 	OUTEMA		ld ;
@@ -5089,7 +5083,7 @@ static int procprinthdr_emaone(PROGINFO *pip,FILEBUF *ofp,cchar *kn,EMA_ENT *ep)
 }
 /* end subroutine (procprinthdr_emaone) */
 #else /* CF_VSENDERS */
-static int procmsghdr_vsenders(PROGINFO *pip,FILEBUF *ofp,MSGDATA *mdp,
+static int procmsghdr_vsenders(PROGINFO *pip,filebuf *ofp,MSGDATA *mdp,
 	MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -5131,7 +5125,7 @@ static int procmsghdr_vsenders(PROGINFO *pip,FILEBUF *ofp,MSGDATA *mdp,
 #endif /* CF_VSENDERS */
 
 
-static int procmsghdr_from(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
+static int procmsghdr_from(PROGINFO *pip,filebuf *ofp,int mi,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5171,7 +5165,7 @@ static int procmsghdr_from(PROGINFO *pip,FILEBUF *ofp,int mi,MSGOPTS *mop)
 /* end subroutine (procmsghdr_from) */
 
 
-static int procmsghdr_addrs(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_addrs(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5216,7 +5210,7 @@ static int procmsghdr_addrs(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_addrs) */
 
 
-static int procmsghdr_addrsbcc(PROGINFO *pip,FILEBUF *fbp,int mi)
+static int procmsghdr_addrsbcc(PROGINFO *pip,filebuf *fbp,int mi)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5376,7 +5370,7 @@ static int procreciploadema(PROGINFO *pip,vechand *ehp,EMA_ENT *ep)
 static int procmsghdr_date(pip,fbp,mi,optp)
 PROGINFO	*pip ;
 MSGOPTS		*optp ;
-FILEBUF		*fbp ;
+filebuf		*fbp ;
 int		mi ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -5429,7 +5423,7 @@ int		mi ;
 static int procmsghdr_subj(pip,ofp,mi,mop)
 PROGINFO	*pip ;
 MSGOPTS		*mop ;
-FILEBUF		*ofp ;
+filebuf		*ofp ;
 int		mi ;
 {
 	LOCINFO		*lip = pip->lip ;
@@ -5513,7 +5507,7 @@ int		mi ;
 /* end subroutine (procmsghdr_subj) */
 
 
-static int procmsghdr_xuuid(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_xuuid(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5544,7 +5538,7 @@ static int procmsghdr_xuuid(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_xuuid) */
 
 
-static int procmsghdr_xmcdate(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_xmcdate(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5575,7 +5569,7 @@ static int procmsghdr_xmcdate(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 /* end subroutine (procmsghdr_xmcdate) */
 
 
-static int procmsghdr_xuti(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
+static int procmsghdr_xuti(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *optp)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5604,7 +5598,7 @@ static int procmsghdr_xuti(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *optp)
 
 /* "x-mailer" */
 /* ARGSUSED */
-static int procmsghdr_xm(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *mop)
+static int procmsghdr_xm(PROGINFO *pip,filebuf *fbp,int mi,MSGOPTS *mop)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5634,7 +5628,7 @@ static int procmsghdr_xm(PROGINFO *pip,FILEBUF *fbp,int mi,MSGOPTS *mop)
 /* end subroutine (procmsghdr_xm) */
 
 
-static int procmsghdr(PROGINFO *pip,FILEBUF *fbp,int mi,cchar kn[],int f_nz)
+static int procmsghdr(PROGINFO *pip,filebuf *fbp,int mi,cchar kn[],int f_nz)
 {
 	LOCINFO		*lip = pip->lip ;
 	MAILMSGSTAGE	*msp ;
@@ -5730,7 +5724,7 @@ static int procmsghdr(PROGINFO *pip,FILEBUF *fbp,int mi,cchar kn[],int f_nz)
 	        } /* end for (lines within a header instance) */
 
 	        if ((rs >= 0) && (! f_nz) && (c == 0)) {
-	            rs = filebuf_print(fbp,kn,0) ;
+	            rs = filebuf_println(fbp,kn,0) ;
 	            wlen += rs ;
 	            ln += 1 ;
 	        }
@@ -5750,7 +5744,7 @@ static int procmsghdr(PROGINFO *pip,FILEBUF *fbp,int mi,cchar kn[],int f_nz)
 
 static int procmsginsthdr(pip,fbp,mi,kn,hi,f_nz)
 PROGINFO	*pip ;
-FILEBUF		*fbp ;
+filebuf		*fbp ;
 int		mi ;
 cchar		kn[] ;
 int		hi ;
@@ -5829,7 +5823,7 @@ int		f_nz ;
 	} /* end for (lines within a header instance) */
 
 	if ((rs >= 0) && (! f_nz) && (c == 0)) {
-	    rs = filebuf_print(fbp,kn,0) ;
+	    rs = filebuf_println(fbp,kn,0) ;
 	    wlen += rs ;
 	    ln += 1 ;
 	}
@@ -5847,7 +5841,7 @@ int		f_nz ;
 /* "indent" is initial indent only! */
 static int procprinthdr_line(pip,fbp,mcols,ln,ind,lp,ll)
 PROGINFO	*pip ;
-FILEBUF		*fbp ;
+filebuf		*fbp ;
 int		mcols ;
 int		ln ;
 int		ind ;
@@ -5898,7 +5892,7 @@ int		ll ;
 	    } /* end while */
 
 	    if ((rs >= 0) && (i == 0)) {
-	        rs = filebuf_print(fbp,lp,0) ;
+	        rs = filebuf_println(fbp,lp,0) ;
 	        wlen += rs ;
 	    }
 
@@ -5951,7 +5945,7 @@ static int procextid(PROGINFO *pip,char id[],cchar hp[],int hl)
 #endif /* CF_PROCEXTID */
 
 
-static int procprinthdr(PROGINFO *pip,FILEBUF *fbp,cchar *kn,cchar *hp,int hl)
+static int procprinthdr(PROGINFO *pip,filebuf *fbp,cchar *kn,cchar *hp,int hl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
@@ -5980,7 +5974,7 @@ static int procprinthdr(PROGINFO *pip,FILEBUF *fbp,cchar *kn,cchar *hp,int hl)
 /* end subroutine (procprinthdr) */
 
 
-static int procprinthdr_mid(PROGINFO *pip,FILEBUF *fbp,cchar *mid,int ml)
+static int procprinthdr_mid(PROGINFO *pip,filebuf *fbp,cchar *mid,int ml)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -6025,7 +6019,7 @@ static int procprinthdr_mid(PROGINFO *pip,FILEBUF *fbp,cchar *mid,int ml)
 /* end subroutine (procprinthdr_mid) */
 
 
-static int procprinthdr_addrsome(PROGINFO *pip,FILEBUF *ofp,cchar *kn,
+static int procprinthdr_addrsome(PROGINFO *pip,filebuf *ofp,cchar *kn,
 cchar *hp,int hl,int n)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -6073,7 +6067,7 @@ cchar *hp,int hl,int n)
 /* output all EMA-type header instances of a given keyname */
 static int procprinthdr_addrs(pip,ofp,mp,mi,kn)
 PROGINFO	*pip ;
-FILEBUF		*ofp ;
+filebuf		*ofp ;
 MAILMSGSTAGE	*mp ;
 int		mi ;
 cchar		kn[] ;
@@ -6124,7 +6118,7 @@ cchar		kn[] ;
 
 
 /* output a header that comtains one or more EMAs */
-static int procprinthdr_ema(PROGINFO *pip,FILEBUF *ofp,cchar *kn,EMA *ap,
+static int procprinthdr_ema(PROGINFO *pip,filebuf *ofp,cchar *kn,EMA *ap,
 int m)
 {
 	LOCINFO		*lip = pip->lip ;
@@ -6182,7 +6176,7 @@ int m)
 /* end subroutine (procprinthdr_ema) */
 
 
-static int procprinthdr_bcc(PROGINFO *pip,FILEBUF *fbp,vechand *tlp)
+static int procprinthdr_bcc(PROGINFO *pip,filebuf *fbp,vechand *tlp)
 {
 	LOCINFO		*lip = pip->lip ;
 	OUTEMA		out ;
@@ -6227,7 +6221,7 @@ static int procprinthdr_bcc(PROGINFO *pip,FILEBUF *fbp,vechand *tlp)
 /* end subroutine (procprinthdr_bcc) */
 
 
-static int procprinthdr_xpri(PROGINFO *pip,FILEBUF *fbp)
+static int procprinthdr_xpri(PROGINFO *pip,filebuf *fbp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -6248,7 +6242,7 @@ static int procprinthdr_xpri(PROGINFO *pip,FILEBUF *fbp)
 /* end subroutine (procprinthdr_xpri) */
 
 
-static int procprinthdr_mailnote(PROGINFO *pip,FILEBUF *ofp,cchar *kn,
+static int procprinthdr_mailnote(PROGINFO *pip,filebuf *ofp,cchar *kn,
 cchar *hp,int hl)
 {
 	OUTSTORE	m ;
@@ -6275,7 +6269,7 @@ cchar *hp,int hl)
 static int procmsgfilebcc(PROGINFO *pip,int tfd,int sfd,int hlen,cchar *ap)
 {
 	LOCINFO		*lip = pip->lip ;
-	FILEBUF		mfile ;
+	filebuf		mfile ;
 	int		rs ;
 	int		rs1 ;
 	int		bsize ;
@@ -6310,7 +6304,7 @@ static int procmsgfilebcc(PROGINFO *pip,int tfd,int sfd,int hlen,cchar *ap)
 #ifdef	COMMENT /* use enhancement below? */
 	        hl = bufprintf(buf,BUFLEN,"%s: %s\n",kn,ap) ;
 	        if (hl > 0) {
-	            rs = filebuf_print(&mfile,buf,hl) ;
+	            rs = filebuf_println(&mfile,buf,hl) ;
 	            wlen += rs ;
 	        }
 #else
@@ -10011,7 +10005,7 @@ static int isHup(int rs)
 
 
 #if	CF_DEBUGOFF && (CF_DEBUG || CF_DEBUGS)
-static int debugfilebuf_printoff(FILEBUF *fbp,cchar *n,cchar *s,int wlen)
+static int debugfilebuf_printoff(filebuf *fbp,cchar *n,cchar *s,int wlen)
 {
 	off_t	coff ;
 	filebuf_tell(fbp,&coff) ;
