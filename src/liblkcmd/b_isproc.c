@@ -1,13 +1,12 @@
-/* b_isproc */
+/* b_isproc SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in: determine if a file has certain attributes */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,18 +19,15 @@
 
 /*******************************************************************************
 
-	This is sort of a replacement for the 'test(1)' program (or the various
-	SHELL built-in versions).  Except that this version does not
-	discriminate against a file if it is a symbolic link and the link is
-	dangling.
+	This is sort of a replacement for the |test(1)| program (or
+	the various SHELL built-in versions).  Except that this
+	version does not discriminate against a file if it is a
+	symbolic link and the link is dangling.
 
 	Synopsis:
-
 	$ isproc <pidfile>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -54,7 +50,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -62,6 +57,7 @@
 #include	<vecobj.h>
 #include	<ids.h>
 #include	<getax.h>
+#include	<filereadln.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -95,7 +91,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	readfileline(char *,int,cchar *) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isFailOpen(int) ;
@@ -1169,7 +1164,7 @@ static int procfile(PROGINFO *pip,cchar *fname)
 	    if ((rs = locinfo_procage(lip,&usb)) > 0) {
 		const int	rlen = LINEBUFLEN ;
 		char		rbuf[LINEBUFLEN+1] ;
-		if ((rs = readfileline(rbuf,rlen,fname)) >= 0) {
+		if ((rs = filereadln(fname,rbuf,rlen)) >= 0) {
 		    rs = procpid(pip,rbuf) ;
 		    f_ok = rs ;
 		} else if (isNotPresent(rs)) {

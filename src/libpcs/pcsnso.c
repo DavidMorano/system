@@ -1,12 +1,12 @@
-/* pcsnso */
+/* pcsnso SUPPORT */
+/* lang=C++20 */
 
 /* PCS-NAME-SERVER query database manager */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_PCSNSC	1		/* use PCSNSC facility */
-
 
 /* revision history:
 
@@ -21,12 +21,9 @@
 
 	This is the main interface to the PCS Name-Server.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -37,7 +34,6 @@
 #include	<pwd.h>
 #include	<project.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<endianstr.h>
 #include	<getbufsize.h>
@@ -53,6 +49,7 @@
 #include	<ugetpw.h>
 #include	<getxusername.h>
 #include	<gecos.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 #include	"pcsnso.h"
@@ -191,7 +188,6 @@ extern int	getuserhome(char *,int,cchar *) ;
 extern int	getgecosname(const char *,int,const char **) ;
 extern int	mkgecosname(char *,int,const char *) ;
 extern int	mkrealname(char *,int,const char *,int) ;
-extern int	readfileline(char *,int,cchar *) ;
 extern int	hasuc(const char *,int) ;
 extern int	hasalldig(const char *,int) ;
 extern int	isalnumlatin(int) ;
@@ -732,7 +728,7 @@ static int subinfo_prfile(SUBINFO *sip,cchar *fn)
 	if ((rs = mkpath2(tbuf,sip->pr,fn)) >= 0) {
 	    const int	rlen = sip->rlen ;
 	    char	*rbuf = sip->rbuf ;
-	    if ((rs = readfileline(rbuf,rlen,tbuf)) >= 0) {
+	    if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
 	        len = rs ;
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
@@ -930,7 +926,7 @@ static int getname_userhome(SUBINFO *sip)
 	            debugprintf("pcsgetnames/getname_userhome: tbuf=%s\n",
 	                tbuf) ;
 #endif
-	            rs = readfileline(sip->rbuf,sip->rlen,tbuf) ;
+	            rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
 	            if (isNotPresent(rs)) rs = SR_OK ;
 	        }
 	    } /* end if (getuserhome) */

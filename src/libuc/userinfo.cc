@@ -5,9 +5,9 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_UINFO	1		/* include 'uinfo(3uc)' */
-#define	CF_UNAME	0		/* include 'u_uname(3u)' */
-#define	CF_OLDUSERINFO	1		/* compile-in old 'userinfo(3dam)' */
+#define	CF_UINFO	1		/* include |uinfo(3uc)| */
+#define	CF_UNAME	0		/* include |u_uname(3u)| */
+#define	CF_OLDUSERINFO	1		/* compile-in old |userinfo(3dam)| */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
@@ -84,6 +84,7 @@
 #include	<uinfo.h>
 #include	<storeitem.h>
 #include	<passwdent.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 #include	"userinfo.h"
@@ -257,7 +258,6 @@ extern int	mkmailname(char *,int,cchar *,int) ;
 extern int	mklogid(char *,int,cchar *,int,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	readfileline(char *,int,cchar *) ;
 extern int	getprojname(char *,int,cchar *) ;
 extern int	getnodename(char *,int) ;
 extern int	getdomainname(char *,int,cchar *) ;
@@ -1152,7 +1152,7 @@ static int procinfo_org(PROCINFO *pip)
 	            rs = mkpath2(orgfname,hd,cname) ;
 	        }
 	        if (rs >= 0) {
-	            rs = readfileline(rbuf,rlen,orgfname) ;
+	            rs = filereadln(orgfname,rbuf,rlen) ;
 	            vl = rs ;
 	            if (rs > 0) vp = rbuf ;
 	            if (isNotPresent(rs)) rs = SR_OK ;

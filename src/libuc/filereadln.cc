@@ -1,4 +1,4 @@
-/* readfileline SUPPORT */
+/* filereadln SUPPORT */
 /* lang=C++20 */
 
 /* we read one line from a file! */
@@ -17,14 +17,14 @@
 /*******************************************************************************
 
 	Name:
-	readfileline
+	filereadln
 
 	Description:
 	This subroutine reads a single line from a file (the string
 	of which means something to someone).
 
 	Synopsis:
-	int readfileline(cc *fname,char *rbuf,int rlen) noex
+	int filereadln(cc *fname,char *rbuf,int rlen) noex
 
 	Arguments:
 	fname		file to read
@@ -37,7 +37,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
@@ -50,7 +50,7 @@
 #include	<char.h>
 #include	<localmisc.h>
 
-#include	"readfileline.h"
+#include	"filereadln.h"
 
 
 /* local defines */
@@ -73,7 +73,7 @@
 
 /* exported subroutines */
 
-int readfileline(cchar *fn,char *rbuf,int rlen) noex {
+int filereadln(cchar *fn,char *rbuf,int rlen) noex {
 	cint		to = -1 ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
@@ -114,6 +114,6 @@ int readfileline(cchar *fn,char *rbuf,int rlen) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (readfileline) */
+/* end subroutine (filereadln) */
 
 

@@ -1,4 +1,4 @@
-/* readfileline HEADER */
+/* filereadln HEADER */
 /* lang=C20 */
 
 /* read a single line from a file */
@@ -14,8 +14,8 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	READFILELINE_INCLUDE
-#define	READFILELINE_INCLUDE
+#ifndef	FILEREADLN_INCLUDE
+#define	FILEREADLN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,11 +25,11 @@
 
 EXTERNC_begin
 
-extern int	readfileline(cchar *,char *,int) noex ;
+extern int	filereadln(cchar *,char *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* READFILELINE_INCLUDE */
+#endif /* FILEREADLN_INCLUDE */
 
 

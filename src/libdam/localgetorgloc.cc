@@ -60,6 +60,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -81,7 +82,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 
 
@@ -135,7 +135,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	        if ((rs = mkpath3(tfname,hbuf,etcdname,orglocname)) >= 0) {
-	            rs = readfileline(rbuf,rlen,tfname) ;
+	            rs = filereadln(tfname,rbuf,rlen) ;
 	            len = rs ;
 	        }
 	    }
@@ -149,7 +149,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
 	    if ((rs = mkpath3(tfname,pr,etcdname,orglocname)) >= 0) {
-	        rs = readfileline(rbuf,rlen,tfname) ;
+	        rs = filereadln(tfname,rbuf,rlen) ;
 	        len = rs ;
 	    }
 	}
@@ -162,7 +162,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
 	    if ((rs = mkpath3(tfname,"/",etcdname,orglocname)) >= 0) {
-	        rs = readfileline(rbuf,rlen,tfname) ;
+	        rs = filereadln(tfname,rbuf,rlen) ;
 	        len = rs ;
 	    }
 	}

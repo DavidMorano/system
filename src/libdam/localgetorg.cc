@@ -57,6 +57,7 @@
 #include	<ugetpw.h>
 #include	<getxusername.h>
 #include	<gecos.h>
+#include	<filereadln.h>
 #include	<localmisc.h>
 
 
@@ -100,7 +101,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	getuserhome(char *,int,const char *) ;
-extern int	readfileline(char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -367,7 +367,7 @@ static int localgetorg_pretc(SUBINFO *sip)
 #endif
 
 	if ((rs = mkpath3(orgfname,sip->pr,ETCDNAME,sip->ofn)) >= 0) {
-	    if ((rs = readfileline(sip->rbuf,sip->rlen,orgfname)) >= 0) {
+	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
 	        len = rs ;
 	    } else if (isNotPresent(rs))
 		rs = SR_OK ;
@@ -389,7 +389,7 @@ static int localgetorg_sys(SUBINFO *sip)
 #endif
 
 	if ((rs = mkpath2(orgfname,ETCDNAME,sip->ofn)) >= 0) {
-	    if ((rs = readfileline(sip->rbuf,sip->rlen,orgfname)) >= 0) {
+	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
 	        len = rs ;
 	    } else if (isNotPresent(rs))
 		rs = SR_OK ;
@@ -418,9 +418,9 @@ static int subinfo_homer(SUBINFO *sip,const char *homeuser)
 	    if ((rs = sncpy2(orgname,MAXNAMELEN,"/.",sip->ofn)) >= 0) {
 		char	orgfname[MAXPATHLEN+1] ;
 	        if ((rs = mkpath2(orgfname,homedname,orgname)) >= 0) {
-		    const int	rlen = sip->rlen ;
+		    cint	rlen = sip->rlen ;
 		    char	*rbuf = sip->rbuf ;
-	            if ((rs = readfileline(rbuf,rlen,orgfname)) >= 0) {
+	            if ((rs = filereadln(orgfname,rbuf,rlen)) >= 0) {
 	                len = rs ;
 	            } else if (isNotPresent(rs))
 		        rs = SR_OK ;
@@ -439,8 +439,8 @@ static int subinfo_homer(SUBINFO *sip,const char *homeuser)
 
 static int subinfo_passwder(SUBINFO *sip,const char *homeuser)
 {
-	struct passwd	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	PASSWD		pw ;
+	cint	pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
 	int		len = 0 ;
 	char		*pwbuf ;
@@ -451,7 +451,7 @@ static int subinfo_passwder(SUBINFO *sip,const char *homeuser)
 		GECOS	g ;
 	        if ((rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
 		    int		vl ;
-		    const int	gi = gecosval_organization ;
+		    cint	gi = gecosval_organization ;
 		    const char	*vp ;
 	            if ((vl = gecos_getval(&g,gi,&vp)) > 0) {
 	    	        rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
