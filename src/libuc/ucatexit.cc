@@ -59,7 +59,7 @@ int uc_atexit(atexit_f f) noex {
 	aeo.m = &ucatexit::stdatexit ;
 	return aeo() ;
 }
-/* end subroutine (uc_getpwent) */
+/* end subroutine (uc_atexit) */
 
 
 /* local subroutines */

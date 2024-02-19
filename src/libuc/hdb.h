@@ -70,10 +70,10 @@ struct hdb_head {
 	int		at ;		/* allocation-type */
 } ; /* end struct (hdb_head) */
 
-typedef struct hdb_head		hdb ;
-typedef struct hdb_datum	hdb_dat ;
-typedef struct hdb_entry	hdb_ent ;
-typedef struct hdb_cursor	hdb_cur ;
+typedef HDB		hdb ;
+typedef HDB_DAT		hdb_dat ;
+typedef HDB_ENT		hdb_ent ;
+typedef HDB_CUR		hdb_cur ;
 
 EXTERNC_begin
 

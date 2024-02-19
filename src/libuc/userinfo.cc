@@ -47,7 +47,7 @@
 	Get user information from PASSWD database.
 
 	Synopsis:
-	int userinfo_start(USERINFO *uip,cchar *username) noex
+	int userinfo_start(UI *uip,cchar *username) noex
 
 	Arguments:
 	uip		address of 'userinfo' structure
@@ -70,7 +70,7 @@
 #include	<grp.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<ugetpid.h>
+#include	<ucgetpid.h>
 #include	<getbufsize.h>
 #include	<bits.h>
 #include	<strstore.h>
@@ -81,7 +81,7 @@
 #include	<userattr.h>
 #include	<uinfo.h>
 #include	<storeitem.h>
-#include	<passwdent.h>
+#include	<ucentpw.h>
 #include	<filereadln.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -239,39 +239,17 @@
 #define	UA_WS		"ws"		/* weather station */
 #endif
 
+#define	UI		userinfo
+
 #define	NDF		"/tmp/userinfo.nd"
 
 
 /* external subroutines */
 
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	sncpyuc(char *,int,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	snwcpyhyphen(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkgecosname(char *,int,cchar *) ;
-extern int	mkrealname(char *,int,cchar *,int) ;
-extern int	mkmailname(char *,int,cchar *,int) ;
-extern int	mklogid(char *,int,cchar *,int,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	getprojname(char *,int,cchar *) ;
-extern int	getnodename(char *,int) ;
-extern int	getdomainname(char *,int,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,cchar *,cchar *) ;
-extern int	isNotPresent(const int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strdcpy1(char *,int,cchar *) ;
 
 
 /* external variables */
@@ -321,23 +299,23 @@ struct procinfo_flags {
 } ;
 
 struct procinfo_tmps {
-	cchar	*gecosname ;
-	cchar	*realname ;
+	cchar		*gecosname ;
+	cchar		*realname ;
 } ;
 
 struct procinfo {
 	PROCINFO_FL	f ;
 	PROCINFO_TMPS	tstrs ;
-	PASSWD	pw ;
+	PASSWD		pw ;
 	BITS		have ;
 	UINFO_NAME	unixinfo ;
 	USERINFO	*uip ;		/* supplied argument */
 	STRSTORE	*stp ;		/* supplied argument */
 	int		*sis ;		/* supplied argument */
-	cchar	*username ;	/* supplied argument */
-	cchar	*a ;		/* the memory allocation */
+	cchar		*username ;	/* supplied argument */
+	cchar		*a ;		/* the memory allocation */
 	USERATTR	*uap ;
-	cchar	*pwbuf ;	/* specially allocated */
+	cchar		*pwbuf ;	/* specially allocated */
 	char		*nodename ;	/* allocated */
 	char		*domainname ;	/* allocated */
 	char		*pr ;		/* allocated */
@@ -349,67 +327,67 @@ struct procinfo {
 
 /* forward references */
 
-static int	userinfo_process(USERINFO *,STRSTORE *,int *,cchar *) ;
-static int	userinfo_id(USERINFO *uip) ;
-static int	userinfo_load(USERINFO *,STRSTORE *,int *) ;
+static int	userinfo_process(UI *,STRSTORE *,int *,cchar *) noex ;
+static int	userinfo_id(UI *uip) noex ;
+static int	userinfo_load(UI *,STRSTORE *,int *) noex ;
 
 #ifdef	COMMENT
-static int	userinfo_setnuls(USERINFO *,cchar *) ;
+static int	userinfo_setnuls(UI *,cchar *) noex ;
 #endif
 
-static int	procinfo_start(PROCINFO *,USERINFO *,STRSTORE *,int *) ;
-static int	procinfo_finish(PROCINFO *) ;
-static int 	procinfo_find(PROCINFO *,cchar *) ;
-static int	procinfo_pwentry(PROCINFO *,cchar *) ;
+static int	procinfo_start(PROCINFO *,UI *,STRSTORE *,int *) noex ;
+static int	procinfo_finish(PROCINFO *) noex ;
+static int 	procinfo_find(PROCINFO *,cchar *) noex ;
+static int	procinfo_pwentry(PROCINFO *,cchar *) noex ;
 static int	procinfo_getpwuser(PROCINFO *,PASSWD *,char *,int,
-			cchar *) ;
-static int	procinfo_store(PROCINFO *,int,cchar *,int,cchar **) ;
-static int	procinfo_uabegin(PROCINFO *) ;
-static int	procinfo_uaend(PROCINFO *) ;
-static int	procinfo_ualookup(PROCINFO *,char *,int,cchar *) ;
+			cchar *) noex ;
+static int	procinfo_store(PROCINFO *,int,cchar *,int,cchar **) noex ;
+static int	procinfo_uabegin(PROCINFO *) noex ;
+static int	procinfo_uaend(PROCINFO *) noex ;
+static int	procinfo_ualookup(PROCINFO *,char *,int,cchar *) noex ;
 
 /* components */
-static int	procinfo_homedname(PROCINFO *) ;
-static int	procinfo_shell(PROCINFO *) ;
-static int	procinfo_org(PROCINFO *) ;
-static int	procinfo_bin(PROCINFO *) ;
-static int	procinfo_office(PROCINFO *) ;
-static int	procinfo_printer(PROCINFO *) ;
-static int	procinfo_gecos(PROCINFO *) ;
-static int	procinfo_gecosname(PROCINFO *) ;
-static int	procinfo_realname(PROCINFO *) ;
-static int	procinfo_mailname(PROCINFO *) ;
-static int	procinfo_name(PROCINFO *) ;
-static int	procinfo_fullname(PROCINFO *) ;
+static int	procinfo_homedname(PROCINFO *) noex ;
+static int	procinfo_shell(PROCINFO *) noex ;
+static int	procinfo_org(PROCINFO *) noex ;
+static int	procinfo_bin(PROCINFO *) noex ;
+static int	procinfo_office(PROCINFO *) noex ;
+static int	procinfo_printer(PROCINFO *) noex ;
+static int	procinfo_gecos(PROCINFO *) noex ;
+static int	procinfo_gecosname(PROCINFO *) noex ;
+static int	procinfo_realname(PROCINFO *) noex ;
+static int	procinfo_mailname(PROCINFO *) noex ;
+static int	procinfo_name(PROCINFO *) noex ;
+static int	procinfo_fullname(PROCINFO *) noex ;
 #if	CF_UINFO
-static int	procinfo_uinfo(PROCINFO *) ;
+static int	procinfo_uinfo(PROCINFO *) noex ;
 #endif
 #if	CF_UNAME
-static int	procinfo_uname(PROCINFO *) ;
+static int	procinfo_uname(PROCINFO *) noex ;
 #endif
-static int	procinfo_nodename(PROCINFO *) ;
-static int	procinfo_domainname(PROCINFO *) ;
-static int	procinfo_project(PROCINFO *) ;
-static int	procinfo_tz(PROCINFO *) ;
-static int	procinfo_md(PROCINFO *) ;
-static int	procinfo_wstation(PROCINFO *) ;
-static int	procinfo_logid(PROCINFO *) ;
+static int	procinfo_nodename(PROCINFO *) noex ;
+static int	procinfo_domainname(PROCINFO *) noex ;
+static int	procinfo_project(PROCINFO *) noex ;
+static int	procinfo_tz(PROCINFO *) noex ;
+static int	procinfo_md(PROCINFO *) noex ;
+static int	procinfo_wstation(PROCINFO *) noex ;
+static int	procinfo_logid(PROCINFO *) noex ;
 
 #ifdef	COMMENT
-static int	checknul(cchar *,cchar **) ;
-static int	empty(cchar *) ;
+static int	checknul(cchar *,cchar **) noex ;
+static int	empty(cchar *) noex ;
 #endif
 
 #if	USERINFO_SYSV
 #else
-static int	getostype() ;
+static int	getostype() noex ;
 #endif
 
 
 /* local variables */
 
 /* order here is generally (quite) important */
-static int	(*components[])(PROCINFO *) = {
+static constexpr int	(*components[])(PROCINFO *) = {
 	procinfo_homedname,
 	procinfo_shell,
 	procinfo_org,
@@ -439,12 +417,13 @@ static int	(*components[])(PROCINFO *) = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int userinfo_start(USERINFO *uip,cchar *username)
-{
-	const int	startsize = (USERINFO_LEN/4) ;
+int userinfo_start(UI *uip,cchar *username) noex {
+	cint		startsize = (USERINFO_LEN/4) ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -455,7 +434,7 @@ int userinfo_start(USERINFO *uip,cchar *username)
 	uip->nodename = getenv(VARNODE) ;
 
 	if ((rs = userinfo_id(uip)) >= 0) {
-	    const int	size = (uit_overlast * sizeof(cchar *)) ;
+	    cint	size = (uit_overlast * sizeof(cchar *)) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        STRSTORE	st ;
@@ -487,9 +466,7 @@ int userinfo_start(USERINFO *uip,cchar *username)
 }
 /* end subroutine (userinfo_start) */
 
-
-int userinfo_finish(USERINFO *uip)
-{
+int userinfo_finish(UI *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -519,9 +496,7 @@ int userinfo_finish(USERINFO *uip)
 
 /* local subroutines */
 
-
-static int userinfo_process(USERINFO *uip,STRSTORE *stp,int *sis,cchar *un)
-{
+static int userinfo_process(UI *uip,STRSTORE *stp,int *sis,cchar *un) noex {
 	PROCINFO	pi ;
 	int		rs ;
 	int		rs1 ;
@@ -543,7 +518,7 @@ static int userinfo_process(USERINFO *uip,STRSTORE *stp,int *sis,cchar *un)
 /* end subroutine (userinfo_process) */
 
 
-static int userinfo_id(USERINFO *uip)
+static int userinfo_id(UI *uip)
 {
 
 	uip->pid = ugetpid() ;
@@ -567,7 +542,7 @@ static int userinfo_id(USERINFO *uip)
 /* end subroutine (userinfo_id) */
 
 
-static int userinfo_load(USERINFO *uip,STRSTORE *stp,int *sis)
+static int userinfo_load(UI *uip,STRSTORE *stp,int *sis)
 {
 	int		rs ;
 	int		size = 0 ;
@@ -746,7 +721,7 @@ cchar	*emptyp ;
 #endif /* COMMENT */
 
 
-static int procinfo_start(PROCINFO *pip,USERINFO *uip,STRSTORE *stp,int *sis)
+static int procinfo_start(PROCINFO *pip,UI *uip,STRSTORE *stp,int *sis)
 {
 	const int	pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
@@ -2098,17 +2073,17 @@ static int getostype()
 
 /* finally (if necessary) 'stat(2)' the i-node (slow disk access) */
 
-	if (rc < 0)
+	if (rc < 0) {
 	    rc = (u_access(SBINDNAME,X_OK) >= 0) ;
+	}
 
 	return (rc >= 0) ? rc : FALSE ;
 }
 /* end subroutine (getostype) */
 #endif /* USERINFO_SYSV */
 
-
 #if	CF_OLDUSERINFO
-int userinfo_data(USERINFO *oup,char *ubuf,int ulen,cchar *un) noex {
+int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	USERINFO	u ;
 	int		rs ;
 	int		rs1 ;
@@ -2271,6 +2246,7 @@ int userinfo_data(USERINFO *oup,char *ubuf,int ulen,cchar *un) noex {
 
 	return (rs >= 0) ? size : rs ;
 }
-#endif /* CF_OLDUSERINFO */
+/* end subroutine (userinfo_data) */
+#endif /* CF_OLDUI */
 
 

@@ -112,7 +112,7 @@
 
 	A "value" structure MUST always be passed to this subroutine
 	from the caller. But the buffer address of a "value" can
-	be NULL.
+	be nullptr.
 
 	Also, zero length values can be stored by specifying a value
 	length of zero (buffer address of anything).
@@ -357,7 +357,7 @@ int hdb_finish(hdb *op) noex {
 	        if (op->htaddr) {
 	            rs1 = uc_free(op->htaddr) ;
 	            if (rs >= 0) rs = rs1 ;
-	            op->htaddr = NULL ;
+	            op->htaddr = nullptr ;
 		}
 	        if (op->at > 0) {
 	            rs1 = lookaside_finish(op->esp) ;
@@ -380,9 +380,9 @@ int hdb_delall(hdb *op) noex {
 	        for (int idx = 0 ; idx < op->htlen ; idx += 1) {
 	            ENT	*hp, *next, *nhp, *nnhp ;
 	            for (hp = hepp[idx] ; hp ; hp = next) {
-	                if (hp->same != NULL) {
+	                if (hp->same != nullptr) {
 	                    nhp = hp->same ;
-	                    while (nhp->same != NULL) {
+	                    while (nhp->same != nullptr) {
 	                        nnhp = nhp->same ;
 	                        hdb_entdel(op,nhp) ;
 	                        nhp = nnhp ;
@@ -393,7 +393,7 @@ int hdb_delall(hdb *op) noex {
 	                hp->next = nullptr ;	/* optional */
 	                hdb_entdel(op,hp) ;
 	            } /* end for */
-	            hepp[idx] = NULL ;
+	            hepp[idx] = nullptr ;
 	        } /* end for */
 	        op->count = 0 ;
 	} /* end if (magic) */
@@ -463,15 +463,15 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 /* get the point of deletion (if there is one) */
 	        nextp = getpoint(op,hv,&key) ;
 	        hp = *nextp ;
-	        if (hp != NULL) {
+	        if (hp != nullptr) {
 	            int	ocount = op->count ;
 /* unlink this entry from the chain */
 	            *nextp = hp->next ;			/* skip this entry */
 #ifdef	OPTIONAL
-	            hp->next = NULL ;			/* optional */
+	            hp->next = nullptr ;			/* optional */
 #endif
 /* OK, we are isolated now from the chain */
-	            while (hp->same != NULL) {
+	            while (hp->same != nullptr) {
 	        	ENT	*nhp = hp->same ;
 	                op->count -= 1 ;
 	                hdb_entdel(op,hp) ;
@@ -514,13 +514,13 @@ int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
 	            int		i, j ;
         /* determine any necessary cursor adjustment */
 	            if (f_adv) {
-	                if (ep->same == NULL) { /* code-reviewed */
+	                if (ep->same == nullptr) { /* code-reviewed */
 	                    ncur.k = 0 ;
-	                    if (ep->next == NULL) {
+	                    if (ep->next == nullptr) {
 				cint	htlen = op->htlen ;
 	                        ncur.j = 0 ;
 	                        for (i = (ncur.i + 1) ; i < htlen ; i += 1) {
-	                            if (hepp[i] != NULL) break ;
+	                            if (hepp[i] != nullptr) break ;
 	                        }
 	                        ncur.i = i ;
 	                    } else {
@@ -535,7 +535,7 @@ int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
 	                        ncur.j = 0 ;
 	                        ncur.k = 0 ;
 	                        for (i = (curp->i - 1) ; i >= 0 ; i -= 1) {
-	                            if (hepp[i] != NULL) break ;
+	                            if (hepp[i] != nullptr) break ;
 	                        }
 	                        if (i >= 0) {
 	                            pep = hepp[i] ;
@@ -565,14 +565,14 @@ int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
 	            if (curp->k == 0) { /* code-reviewed */
 	                i = curp->i ;
 	                if (curp->j == 0) {
-	                    if (ep->same != NULL) {
+	                    if (ep->same != nullptr) {
 	                        (ep->same)->next = ep->next ;
 	                        hepp[i] = ep->same ;
 	                    } else {
 	                        hepp[i] = ep->next ;
 	                    }
 	                } else {
-	                    if (ep->same != NULL) {
+	                    if (ep->same != nullptr) {
 	                        (ep->same)->next = ep->next ;
 	                        pjep->next = ep->same ;
 	                    } else {
@@ -595,13 +595,13 @@ int hdb_delcur(hdb *op,CUR *curp,int f_adv) noex {
 
 /* advance the cursor to the next entry matching the key-cursor pair */
 int hdb_nextrec(hdb *op,HDB_D key,CUR *curp) noex {
-	return hdb_fetchrec(op,key,curp,NULL,NULL) ;
+	return hdb_fetchrec(op,key,curp,nullptr,nullptr) ;
 }
 /* end subroutine (hdb_nextrec) */
 
 /* subroutine to fetch the next data corresponding to a key */
 int hdb_fetch(hdb *op,HDB_D key,CUR *curp,DAT *valp) noex {
-	return hdb_fetchrec(op,key,curp,NULL,valp) ;
+	return hdb_fetchrec(op,key,curp,nullptr,valp) ;
 }
 /* end subroutine (hdb_fetch) */
 
@@ -628,7 +628,7 @@ int hdb_fetchrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	                rs = hdb_findkeye(op,&fc,&key,&ep) ;
 	            }
 	            if (rs >= 0) {
-	                if (curp != NULL) *curp = ncur ;
+	                if (curp != nullptr) *curp = ncur ;
 	                if (ep) {
 	                    if (keyp) *keyp = ep->key ;
 	                    if (valp) *valp = ep->val ;
@@ -658,7 +658,7 @@ int hdb_getkeyrec(hdb *op,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 
 /* advance the cursor to the next entry regardless of key */
 int hdb_next(hdb *op,CUR *curp) noex {
-	return hdb_enum(op,curp,NULL,NULL) ;
+	return hdb_enum(op,curp,nullptr,nullptr) ;
 }
 /* end subroutine (hdb_next) */
 
@@ -669,7 +669,8 @@ int hdb_next(hdb *op,CUR *curp) noex {
 	given cursor to sequence through it all.  Specifically, it
 	differs from |hdb_getrec()| in that it "fetches" the NEXT
 	entry after the one under the current cursor!  It then
-	updates the cursor to the returned entry.
+	updates the cursor to the returned entry.  This returns
+	'SR_NOTFOUND' on exhausting all entries.
 
 ****/
 
@@ -677,10 +678,10 @@ int hdb_enum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 	int		rs ;
 	if ((rs = hdb_magic(op,curp)) >= 0) {
 	        CUR	ncur ;
-	        ENT	*ep = NULL ;
+	        ENT	*ep = nullptr ;
                 ENT	**hepp = op->htaddr ;
 		rs = SR_NOTFOUND ;
-	        if (curp != NULL) {
+	        if (curp != nullptr) {
 	            ncur = *curp ;
 	        } else {
 	            ncur = icur ;
@@ -688,18 +689,18 @@ int hdb_enum(hdb *op,CUR *curp,HDB_D *keyp,DAT *valp) noex {
 	        cursor_inc(&ncur) ;
 	        while (ncur.i < op->htlen) {
 	            ENT		*jep ;
-	            if ((jep = hepp[ncur.i]) != NULL) {
+	            if ((jep = hepp[ncur.i]) != nullptr) {
 		        int	j = 0 ; /* <- used afterwards */
 	                for (j = 0 ; j < ncur.j ; j += 1) {
-	                    if (jep->next == NULL) break ;
+	                    if (jep->next == nullptr) break ;
 	                    jep = jep->next ;
 	                } /* end for */
 	                if (j == ncur.j) {
-	                    while (jep != NULL) {
+	                    while (jep != nullptr) {
 			        int	k = 0 ;	/* <- used afterwards */
 	                        ep = jep ;
 	                        for (k = 0 ; k < ncur.k ; k += 1) {
-	                            if (ep->same == NULL) break ;
+	                            if (ep->same == nullptr) break ;
 	                            ep = ep->same ;
 	                        } /* end for */
 	                        if (k == ncur.k) {
@@ -854,15 +855,15 @@ static int hdb_findkeye(hdb *op,FETCUR *fcp,HDB_D *kp,ENT **epp) noex {
 	ENT		*jep ;
 	int		rs = SR_NOTFOUND ;
 	int		rs1 ;
-	if ((jep = op->htaddr[curp->i]) != NULL) {
+	if ((jep = op->htaddr[curp->i]) != nullptr) {
 	    int		i = 0 ;	/* used afterwards */
 	    fcp->f_ikeyed = true ;
 	    for (i = 0 ; i < curp->j ; i += 1) {
-	        if (jep->next == NULL) break ;
+	        if (jep->next == nullptr) break ;
 	        jep = jep->next ;
 	    } /* end for */
 	    if (i == curp->j) {
-	        for ( ; jep != NULL ; jep = jep->next) {
+	        for ( ; jep != nullptr ; jep = jep->next) {
 	            rs1 = entry_match(jep,op->cmpfunc,fcp->hv,kp) ;
 	            if (rs1 > 0) {
 	                rs = SR_OK ;
@@ -875,7 +876,7 @@ static int hdb_findkeye(hdb *op,FETCUR *fcp,HDB_D *kp,ENT **epp) noex {
 	        ENT	*ep = jep ;
 	        fcp->f_jkeyed = true ;
 	        for (i = 0 ; i < curp->k ; i += 1) {
-	            if (ep->same == NULL) break ;
+	            if (ep->same == nullptr) break ;
 	            ep = ep->same ;
 	        } /* end for */
 	        if (i < curp->k) {
@@ -901,7 +902,7 @@ static int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	            cursor_stabilize(curp) ;
 	            if ((rs = hdb_getentry(op,&ei,curp)) >= 0) {
 	                ENT	*ep = ei.ep ;
-	                if (f && (key.buf != NULL)) {
+	                if (f && (key.buf != nullptr)) {
 	                    int 	rc = 1 ;
 	                    if (key.len == ep->key.len) {
 			        cvoid	*v1 = key.buf ;
@@ -911,13 +912,13 @@ static int hdb_get(hdb *op,int f,DAT key,CUR *curp,DAT *keyp,DAT *valp) noex {
 	                    if (rc != 0) rs = SR_NOTFOUND ;
 	                } /* end if (key comparison) */
 	                if (rs >= 0) {
-	                    if (keyp != NULL) *keyp = ep->key ;
-	                    if (valp != NULL) *valp = ep->val ;
+	                    if (keyp != nullptr) *keyp = ep->key ;
+	                    if (valp != nullptr) *valp = ep->val ;
 	                }
 	            } /* end if (entry found) */
 	            if (rs < 0) {
-	                if (keyp != NULL) *keyp = nulldatum ;
-	                if (valp != NULL) *valp = nulldatum ;
+	                if (keyp != nullptr) *keyp = nulldatum ;
+	                if (valp != nullptr) *valp = nulldatum ;
 	            }
 	        } /* end if (valid) */
 	    } /* end if (open) */
@@ -940,7 +941,7 @@ static int hdb_ext(hdb *op) noex {
 	    ENT		**nhtaddr = (ENT **) vp ;
 	    memclear(nhtaddr,size) ;
 	    for (i = 0 ; i < op->htlen ; i += 1) {
-	        if (htaddr[i] != NULL) {
+	        if (htaddr[i] != nullptr) {
 	            for (hep = htaddr[i] ; hep ; hep = nhep) {
 	                nhep = hep->next ;
 	                rs = hdb_extinsert(op,nhtaddr,nhtlen,hep) ;
@@ -962,7 +963,7 @@ static int hdb_ext(hdb *op) noex {
 	    } else {
 	        cint	n = min(i,nhtlen) ;
 	        for (i = 0 ; i < n ; i += 1) {
-	            if (nhtaddr[i] != NULL) {
+	            if (nhtaddr[i] != nullptr) {
 	                for (hep = nhtaddr[i] ; hep ; hep = nhep) {
 	                    nhep = hep->next ;
 	                    hdb_extkeyfree(op,hep) ;
@@ -978,17 +979,17 @@ static int hdb_ext(hdb *op) noex {
 /* end subroutine (hdb_extend) */
 
 static int hdb_extinsert(hdb *op,ENT **htaddr,int htlen,ENT *hep) noex {
-	ENT		*nhep = NULL ;
+	ENT		*nhep = nullptr ;
 	int		rs ;
 	if ((rs = hdb_entnew(op,&nhep)) >= 0) {
 	    hdbhv	hv = hep->hv ;
 	    int		hi ;
 /* copy existing to new */
 	    *nhep = *hep ;		/* memberwise copy */
-	    nhep->next = NULL ;		/* this is newly determined */
+	    nhep->next = nullptr ;		/* this is newly determined */
 /* determine how to insert the new entry */
 	    hi = (hv % htlen) ;
-	    if (htaddr[hi] != NULL) {
+	    if (htaddr[hi] != nullptr) {
 		ENT	*ep = htaddr[hi] ;
 	        htaddr[hi] = nhep ;
 	        nhep->next = ep ;
@@ -1016,11 +1017,11 @@ static int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 	int		i = curp->i ;
 	if ((i >= 0) && (i < op->htlen)) {
 	    ENT		**hepp = op->htaddr ;
-	    ENT		*pjep = NULL ;
-	    ENT		*pkep = NULL ;
+	    ENT		*pjep = nullptr ;
+	    ENT		*pkep = nullptr ;
 	    ENT		*ep = hepp[i] ;
 	    bool	f_notdone = true ;
-	    while ((i < op->htlen) && ((ep = hepp[i]) == NULL)) {
+	    while ((i < op->htlen) && ((ep = hepp[i]) == nullptr)) {
 	        i += 1 ;
 	    }
 	    if (curp->i != i) {
@@ -1030,10 +1031,10 @@ static int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 	        if (ep) f_notdone = false ;
 	    }
 	    if (f_notdone) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 		    int	j ; /* find pointers to this cursor entry */
 	            for (j = 0 ; j < curp->j ; j += 1) { /* code-reviewed */
-	                if (ep->next == NULL) break ;
+	                if (ep->next == nullptr) break ;
 	                pjep = ep ;
 	                ep = ep->next ;
 	            } /* end for */
@@ -1046,7 +1047,7 @@ static int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 	            if (rs >= 0) { 
 			int	k ; /* code-reviewed */
 	                for (k = 0 ; k < curp->k ; k += 1) {
-	                    if (ep->same == NULL) break ;
+	                    if (ep->same == nullptr) break ;
 	                    pkep = ep ;
 	                    ep = ep->same ;
 	                } /* end for */
@@ -1077,8 +1078,8 @@ static int entry_load(ENT *ep,hdbhv hv,DAT *keyp,DAT *valp) noex {
 	if (ep && keyp && valp) {
 	    rs = SR_OK ;
 	    memclear(ep,sizeof(ENT)) ;
-	    ep->next = NULL ;
-	    ep->same = NULL ;
+	    ep->next = nullptr ;
+	    ep->same = nullptr ;
 	    ep->hv = hv ;
 	    ep->key = *keyp ;
 	    ep->val = *valp ;
@@ -1219,7 +1220,7 @@ static uint defhashfun(cvoid *dbuf,int dlen) noex {
 
 /****
 	The returned value is the address of the pointer that refers
-	to the found object.  The pointer may be NULL if the object
+	to the found object.  The pointer may be nullptr if the object
 	was not found.  If so, this pointer should be updated with
 	the address of the object to be inserted, if insertion is
 	desired.
