@@ -74,6 +74,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 /* GETGRENTR begin */

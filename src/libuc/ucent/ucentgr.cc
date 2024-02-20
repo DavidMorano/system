@@ -1,4 +1,4 @@
-/* ucentgr */
+/* ucentgr SUPPORT */
 /* lang=C++20 */
 
 /* UCENTGR object management */
@@ -50,6 +50,12 @@
 #define	SI	storeitem
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -69,6 +75,9 @@ static int si_copystr(SI *,char **,cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

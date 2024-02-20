@@ -1,4 +1,4 @@
-/* ucentnw */
+/* ucentnw SUPPORT */
 /* lang=C++20 */
 
 /* UCENTNW object management */
@@ -74,8 +74,8 @@
 
 /* local namespaces */
 
-using std::min ;
-using std::max ;
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -108,6 +108,9 @@ constexpr int			inet4addrlen = int(INET4ADDRLEN) ;
 constexpr int			inet6addrlen = int(INET6ADDRLEN) ;
 constexpr int			inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
 constexpr int			astrlen = int(ASTRLEN) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

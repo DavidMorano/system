@@ -58,6 +58,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 #if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)

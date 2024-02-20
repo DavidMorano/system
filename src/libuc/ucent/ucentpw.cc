@@ -1,4 +1,4 @@
-/* ucentpw */
+/* ucentpw SUPPORT */
 /* lang=C++20 */
 
 /* UCENTPW object management */
@@ -47,12 +47,10 @@
 #define	SI		storeitem
 
 
-/* local typedefs */
+/* local namespaces */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -73,6 +71,9 @@ static int si_copystr(SI *,char **,cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
