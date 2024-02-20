@@ -79,6 +79,15 @@ struct pwcache_record : pq_ent {
         int             pwl ;
 } ;
 
+namespace {
+    struct ureq {
+	cchar		*un = nullptr ;
+	uid_t		uid = 0 ;
+	ureq(cchar *p) noex : un(p) { } ;
+	ureq(uid_t u) noex : uid(u) { } ;
+    } ; /* end if (ureq) */
+}
+
 
 /* forward references */
 
@@ -134,13 +143,10 @@ static int pwcache_magic(pwcache *op,Args ... args) noex {
 }
 /* end method (pwcache_magic) */
 
-static int      pwcache_mkrec(pwcache *,time_t,rec **,cchar *) noex ;
-static int	pwcache_mkrecuid(pwcache *,time_t,rec **,uid_t) noex ;
-static int      pwcache_newrec(pwcache *,time_t,rec **,cchar *) noex ;
-static int      pwcache_newrec(pwcache *,time_t,rec **,uid_t) noex ;
+static int      pwcache_mkrec(pwcache *,time_t,rec **,ureq *) noex ;
+static int      pwcache_newrec(pwcache *,time_t,rec **,ureq *) noex ;
 static int      pwcache_oldrec(pwcache *,rec *) noex ;
-static int      pwcache_recstart(pwcache *,time_t,rec *,cchar *) noex ;
-static int      pwcache_recstart(pwcache *,time_t,rec *,uid_t) noex ;
+static int      pwcache_recstart(pwcache *,time_t,rec *,ureq *) noex ;
 static int      pwcache_recdel(pwcache *,rec *) noex ;
 static int      pwcache_recaccess(pwcache *,time_t,rec *) noex ;
 static int      pwcache_recrear(pwcache *,rec *) noex ;
@@ -148,15 +154,15 @@ static int      pwcache_recfins(pwcache *) noex ;
 static int      pwcache_record(pwcache *,int,int) noex ;
 static int	pwcache_finduid(pwcache *,rec **,uid_t) noex ;
 
-static int record_start(rec *,time_t,int,cchar *) noex ;
-static int record_start(rec *,time_t,int,uid_t) noex ;
+static int record_start(rec *,time_t,int,ureq *) noex ;
+static int record_startun(rec *,PASSWD *) noex ;
 static int record_access(rec *,time_t) noex ;
 static int record_refresh(rec *,time_t,int) noex ;
 static int record_old(rec *,time_t,int) noex ;
 static int record_finish(rec *) noex ;
 
+static int getpw(PASSWD *,char *,int,ureq *) noex ;
 static int getpw_name(PASSWD *,char *,int,cchar *) noex ;
-static int getpw_uid(PASSWD *,char *,int,uid_t) noex ;
 
 
 /* local variables */
@@ -232,8 +238,9 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
                     ct = ct_hit ;
                     rs = pwcache_recaccess(op,dt,ep) ;
                 } else if (rs == SR_NOTFOUND) {
+		    ureq	ro(un) ;
                     ct = ct_miss ;
-                    rs = pwcache_mkrec(op,dt,&ep,un) ;
+                    rs = pwcache_mkrec(op,dt,&ep,&ro) ;
                 } /* end if (hit or miss) */
                 pwcache_record(op,ct,rs) ;
                 if (rs > 0) { /* not '>=' */
@@ -263,8 +270,9 @@ int pwcache_uid(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
                     ct = ct_hit ;
                     rs = pwcache_recaccess(op,dt,ep) ;
                 } else if (rs == SR_NOTFOUND) {
+		    ureq	ro(uid) ;
                     ct = ct_miss ;
-                    rs = pwcache_mkrecuid(op,dt,&ep,uid) ;
+                    rs = pwcache_mkrec(op,dt,&ep,&ro) ;
                 } /* end if (hit or miss) */
                 pwcache_record(op,ct,rs) ;
                 if (rs > 0) { /* not '>=' */
@@ -369,7 +377,7 @@ int pwcache_stats(pwcache *op,pwcache_st *sp) noex {
 
 /* private subroutines */
 
-static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,cchar *un) noex {
+static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
         int             rs ;
         int             rs1 ;
         int             pwl = 0 ;
@@ -381,7 +389,7 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,cchar *un) noex {
                 if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
                     rec		*ep = recp(pep) ;
                     if ((rs = pwcache_recdel(op,ep)) >= 0) {
-                        rs = pwcache_recstart(op,dt,ep,un) ;
+                        rs = pwcache_recstart(op,dt,ep,rp) ;
                         pwl = rs ;
                     }
                     rs1 = pq_ins(op->lrup,pep) ;
@@ -389,7 +397,7 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,cchar *un) noex {
                 } /* end if (removed entry) */
                 if (rs >= 0) *epp = (rec *) pep ;
             } else {
-                if ((rs = pwcache_newrec(op,dt,epp,un)) >= 0) {
+                if ((rs = pwcache_newrec(op,dt,epp,rp)) >= 0) {
                     pwl = rs ;
                     if (*epp != nullptr) {
                         pep = (pq_ent *) *epp ;
@@ -405,66 +413,17 @@ static int pwcache_mkrec(pwcache *op,time_t dt,rec **epp,cchar *un) noex {
 }
 /* end subroutine (pwcache_mkrec) */
 
-static int pwcache_mkrecuid(pwcache *op,time_t dt,rec **epp,uid_t uid) noex {
-        int             rs ;
-        int             rs1 ;
-        int             pwl = 0 ;
-        *epp = nullptr ;
-        if ((rs = hdb_count(op->dbp)) >= 0) {
-            pq_ent	*pep{} ;
-            cint	n = rs ;
-            if (n >= op->nmax) {
-                if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
-                    rec		*ep = recp(pep) ;
-                    if ((rs = pwcache_recdel(op,ep)) >= 0) {
-                        rs = pwcache_recstart(op,dt,ep,uid) ;
-                        pwl = rs ;
-                    }
-                    rs1 = pq_ins(op->lrup,pep) ;
-                    if (rs >= 0) rs = rs1 ;
-                } /* end if (removed entry) */
-                if (rs >= 0) *epp = (rec *) pep ;
-            } else {
-                if ((rs = pwcache_newrec(op,dt,epp,uid)) >= 0) {
-                    pwl = rs ;
-                    if (*epp != nullptr) {
-                        pep = (pq_ent *) *epp ;
-                        rs = pq_ins(op->lrup,pep) ;
-                    }
-		    if ((rs < 0) && *epp) {
-			pwcache_oldrec(op,*epp) ;
-		    }
-                } /* end if (new-entry) */
-            } /* end if */
-        } /* end if (hdb_count) */
-        return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (pwcache_mkrecuid) */
-
-static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,cchar *un) noex {
+static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,ureq *rp) noex {
         int             rs = SR_BUGCHECK ;
         if (epp) {
             cint	rsz = sizeof(rec) ;
             rec		*ep{} ;
             if ((rs = uc_malloc(rsz,&ep)) >= 0) {
-                rs = pwcache_recstart(op,dt,ep,un) ;
-                if (rs < 0) uc_free(ep) ;
-            }
-            *epp = (rs >= 0) ? ep : nullptr ;
-	} /* end if (non-null) */
-        return rs ;
-}
-/* end subroutine (pwcache_newrec) */
-
-static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,uid_t uid) noex {
-        int             rs = SR_BUGCHECK ;
-        if (epp) {
-            cint	rsz = sizeof(rec) ;
-            rec		*ep{} ;
-            if ((rs = uc_malloc(rsz,&ep)) >= 0) {
-                rs = pwcache_recstart(op,dt,ep,uid) ;
-                if (rs < 0) uc_free(ep) ;
-            }
+                rs = pwcache_recstart(op,dt,ep,rp) ;
+                if (rs < 0) {
+		    uc_free(ep) ;
+		}
+            } /* end if (memory-allocation) */
             *epp = (rs >= 0) ? ep : nullptr ;
 	} /* end if (non-null) */
         return rs ;
@@ -474,45 +433,25 @@ static int pwcache_newrec(pwcache *op,time_t dt,rec **epp,uid_t uid) noex {
 static int pwcache_oldrec(pwcache *op,rec *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	{
-	    rs1 = pwcache_recfinish(op,ep) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-	{
-	    rs1 = uc_free(ep) ;
-	    if (rs >= 0) rs = rs1 ;
+	if (op && ep) {
+	    {
+                rs1 = record_finish(ep) ;
+                if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = uc_free(ep) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	}
 	return rs ;
 }
 /* end subroutine (pwcache_newrec) */
 
-static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,cchar *un) noex {
+static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
         cint		wc = op->wcount++ ;
         int             rs ;
         int             pwl = 0 ;
-        if ((rs = record_start(ep,dt,wc,un)) >= 0) {
-            hdb_datum   key{} ;
-            hdb_datum   val{} ;
-            cint   	rsz = sizeof(rec) ;
-            pwl = rs ;
-            key.buf = ep->un ;
-            key.len = strlen(ep->un) ;
-            val.buf = ep ;
-            val.len = rsz ;
-            rs = hdb_store(op->dbp,key,val) ;
-            if (rs < 0) {
-                record_finish(ep) ;
-	    }
-        } /* end if (entry-start) */
-        return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (pwcache_recstart) */
-
-static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,uid_t uid) noex {
-        cint		wc = op->wcount++ ;
-        int             rs ;
-        int             pwl = 0 ;
-        if ((rs = record_start(ep,dt,wc,uid)) >= 0) {
+        if ((rs = record_start(ep,dt,wc,rp)) >= 0) {
             hdb_datum   key{} ;
             hdb_datum   val{} ;
             cint   	rsz = sizeof(rec) ;
@@ -593,14 +532,8 @@ static int pwcache_recfins(pwcache *op) noex {
             hdb_datum	val{} ;
             while (hdb_enum(op->dbp,&cur,&key,&val) >= 0) {
         	rec	*ep = recp(val.buf) ;
-                {
-                    rs1 = record_finish(ep) ;
-                    if (rs >= 0) rs = rs1 ;
-                }
-                {
-                    rs1 = uc_free(ep) ;
-                    if (rs >= 0) rs = rs1 ;
-                }
+		rs1 = pwcache_oldrec(op,ep) ;
+                if (rs >= 0) rs = rs1 ;
             } /* end while */
             rs1 = hdb_curend(op->dbp,&cur) ;
             if (rs >= 0) rs = rs1 ;
@@ -657,95 +590,38 @@ static int pwcache_finduid(pwcache *op,rec **rpp,uid_t uid) noex {
 }
 /* end subroutine (pwcache_finduid) */
 
-static int record_start(rec *ep,time_t dt,int wc,cchar *un) noex {
+static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
         int             rs = SR_FAULT ;
         int             rs1 ;
         int             pwl = 0 ;
-        if (ep && un) {
-	    rs = SR_INVALID ;
-            memclear(ep) ;		/* dangerous */
-            if (un[0]) {
-		cchar	*cp{} ;
-		if ((rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
-                    char        *pwbuf{} ;
-		    ep->un = const_cast<charp>(cp) ;
-                    if ((rs = malloc_pw(&pwbuf)) >= 0) {
-                        PASSWD      pw{} ;
-                        cint        pwlen = rs ;
-                        if ((rs = getpw_name(&pw,pwbuf,pwlen,un)) >= 0) {
-                            void	*vp{} ;
-                            pwl = rs ;
-                            if ((rs = uc_malloc((pwl+1),&vp)) >= 0) {
-				ucentpw	*pwp = pwentp(&ep->pw) ;
-				ucentpw	*opwp = pwentp(&pw) ;
-                                char    *pwb = charp(vp) ;
-                                if ((rs = pwp->load(pwb,pwl,opwp)) >= 0) {
-                                    ep->pwbuf = pwb ;
-                                    ep->pwl = pwl ;
-                                }
-                                if (rs < 0) uc_free(vp) ;
-                            } /* end if (memory-allocation) */
-                        } else if (rs == SR_NOTFOUND) {
-                            ep->pwl = 0 ; /* optional */
-                            pwl = 0 ; /* indicates a not-found entry */
-                        } /* end if (getpw_name) */
-                        rs1 = uc_free(pwbuf) ;
-                        if (rs >= 0) rs = rs1 ;
-                    } /* end if (m-a-f) */
-		    if (rs < 0) {
-			uc_free(ep->un) ;
-			ep->un = nullptr ;
-		    }
-		} /* end if (memory-allocation) */
-                if (rs >= 0) {
-                    ep->ti_create = dt ;
-                    ep->ti_access = dt ;
-                    ep->wcount = wc ;
-                }
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-        return (rs >= 0) ? pwl : rs ;
-}
-/* end subroutine (record_start) */
-
-static int record_start(rec *ep,time_t dt,int wc,uid_t uid) noex {
-        int             rs = SR_FAULT ;
-        int             rs1 ;
-        int             pwl = 0 ;
-        if (ep) {
+        if (ep && rp) {
             char        *pwbuf{} ;
 	    rs = SR_INVALID ;
             memclear(ep) ;		/* dangerous */
             if ((rs = malloc_pw(&pwbuf)) >= 0) {
                 PASSWD      pw{} ;
                 cint        pwlen = rs ;
-                if ((rs = getpw_uid(&pw,pwbuf,pwlen,uid)) >= 0) {
-                    void	*vp{} ;
-                    pwl = rs ;
-                    if ((rs = uc_malloc((pwl+1),&vp)) >= 0) {
-			ucentpw	*pwp = pwentp(&ep->pw) ;
-			ucentpw	*opwp = pwentp(&pw) ;
-                        char    *pwb = charp(vp) ;
-	    		cchar	*cp{} ;
-			if ((rs = uc_mallocstrw(pw.pw_name,-1,&cp)) >= 0) {
-	    		    ep->un = const_cast<charp>(cp) ;
+                if ((rs = getpw(&pw,pwbuf,pwlen,rp)) >= 0) {
+		    if ((rs = record_startun(ep,&pw)) >= 0) {
+                        void	*vp{} ;
+                        pwl = rs ;
+                        if ((rs = uc_malloc((pwl+1),&vp)) >= 0) {
+			    ucentpw	*pwp = pwentp(&ep->pw) ;
+			    ucentpw	*opwp = pwentp(&pw) ;
+                            char    *pwb = charp(vp) ;
                             if ((rs = pwp->load(pwb,pwl,opwp)) >= 0) {
                                 ep->pwbuf = pwb ;
                                 ep->pwl = pwl ;
                             }
-			    if (rs < 0) {
-				uc_free(ep->un) ;
-				ep->un = nullptr ;
+                            if (rs < 0) {
+				uc_free(vp) ;
 			    }
-			} /* end if (m-a) */
-                        if (rs < 0) {
-			    uc_free(vp) ;
-			}
-                    } /* end if (memory-allocation) */
+                        } /* end if (memory-allocation - pwbuf) */
+	    	    } /* end if (memory-allocation - un) */
                 } else if (rs == SR_NOTFOUND) {
                     ep->pwl = 0 ; /* optional */
                     pwl = 0 ; /* indicates a not-found entry */
-                } /* end if (getpw_name) */
+                } /* end if (getpw) */
                 rs1 = uc_free(pwbuf) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (m-a-f) */
@@ -754,10 +630,24 @@ static int record_start(rec *ep,time_t dt,int wc,uid_t uid) noex {
                 ep->ti_access = dt ;
                 ep->wcount = wc ;
             }
+	    if (rs < 0) {
+		record_finish(ep) ;
+	    }
 	} /* end if (non-null) */
         return (rs >= 0) ? pwl : rs ;
 }
 /* end subroutine (record_start) */
+
+static int record_startun(rec *ep,PASSWD *pwp) noex {
+	int		rs ;
+	cchar		*cp{} ;
+	cchar		*un = pwp->pw_name ;
+	if ((rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
+	    ep->un = const_cast<charp>(cp) ;
+	}
+	return rs ;
+}
+/* end subroutine (record_startun) */
 
 static int record_finish(rec *ep) noex {
         int             rs = SR_FAULT ;
@@ -796,38 +686,38 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
         int             rs1 ;
         int             pwl = 0 ;
         if (ep) {
-                char	*pwbuf{} ;
-                if ((rs = malloc_pw(&pwbuf)) >= 0) {
-                    PASSWD 	pw{} ;
-                    cint	pwlen = rs ;
-                    if ((rs = getpw_name(&pw,pwbuf,pwlen,ep->un)) >= 0) {
-                        void	*vp{} ;
-                        pwl = rs ;
-                        ep->pwl = pwl ;
-                        if (ep->pwbuf) {
-                            rs = uc_realloc(ep->pwbuf,(pwl+1),&vp) ;
-                        } else {
-                            rs = uc_malloc((pwl+1),&vp) ;
-                        }
-                        if (rs >= 0) {
-			    ucentpw	*pwp = pwentp(&ep->pw) ;
-			    ucentpw	*opwp = pwentp(&pw) ;
-                            char	*pwbuf = charp(vp) ;
-                            ep->pwbuf = charp(vp) ;
-                            rs = pwp->load(pwbuf,pwl,opwp) ;
-                            if (rs < 0) uc_free(vp) ;
-                        }
-                    } else if (rs == SR_NOTFOUND) {
-                        if (ep->pwbuf != nullptr) {
-                            uc_free(ep->pwbuf) ;
-                            ep->pwbuf = nullptr ;
-                        }
-                        ep->pwl = 0 ;
-                        pwl = 0 ; /* indicates an empty (not-found) entry */
-                    } /* end if (getpw_name) */
-                    rs1 = uc_free(pwbuf) ;
-                    if (rs >= 0) rs = rs1 ;
-                } /* end if (m-a) */
+            char    *pwbuf{} ;
+            if ((rs = malloc_pw(&pwbuf)) >= 0) {
+                PASSWD      pw{} ;
+                cint        pwlen = rs ;
+                if ((rs = getpw_name(&pw,pwbuf,pwlen,ep->un)) >= 0) {
+                    void    *vp{} ;
+                    pwl = rs ;
+                    ep->pwl = pwl ;
+                    if (ep->pwbuf) {
+                        rs = uc_realloc(ep->pwbuf,(pwl+1),&vp) ;
+                    } else {
+                        rs = uc_malloc((pwl+1),&vp) ;
+                    }
+                    if (rs >= 0) {
+                        ucentpw     *pwp = pwentp(&ep->pw) ;
+                        ucentpw     *opwp = pwentp(&pw) ;
+                        char        *pwbuf = charp(vp) ;
+                        ep->pwbuf = charp(vp) ;
+                        rs = pwp->load(pwbuf,pwl,opwp) ;
+                        if (rs < 0) uc_free(vp) ;
+                    } /* end if (ok) */
+                } else if (rs == SR_NOTFOUND) {
+                    if (ep->pwbuf != nullptr) {
+                        uc_free(ep->pwbuf) ;
+                        ep->pwbuf = nullptr ;
+                    }
+                    ep->pwl = 0 ;
+                    pwl = 0 ; /* indicates an empty (not-found) entry */
+                } /* end if (getpw_name) */
+                rs1 = uc_free(pwbuf) ;
+                if (rs >= 0) rs = rs1 ;
+            } /* end if (m-a) */
             if (rs >= 0) {
                 ep->ti_create = dt ;
                 ep->ti_access = dt ;
@@ -848,14 +738,20 @@ static int record_old(rec *ep,time_t dt,int ttl) noex {
 }
 /* end subroutine (record_old) */
 
+static int getpw(PASSWD *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
+	ucentpw		*pp = pwentp(pwp) ;
+	int		rs ;
+	if (rp->un) {
+	    rs = uc_getpwnam(pp,pwbuf,pwlen,rp->un) ;
+	} else {
+	    rs = uc_getpwuid(pp,pwbuf,pwlen,rp->uid) ;
+	}
+	return rs ;
+}
+
 static int getpw_name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	ucentpw		*ep = pwentp(pwp) ;
 	return uc_getpwnam(ep,pwbuf,pwlen,un) ;
-}
-
-static int getpw_uid(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
-	ucentpw		*ep = pwentp(pwp) ;
-	return uc_getpwuid(ep,pwbuf,pwlen,uid) ;
 }
 
 
