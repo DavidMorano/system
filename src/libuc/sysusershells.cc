@@ -98,6 +98,9 @@ static int sysusershells_magic(sysusershells *op,Args ... args) noex {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int SYSUSERSHELLS_open(sysusershells *op,cchar *sufname) noex {
