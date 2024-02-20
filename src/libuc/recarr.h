@@ -1,5 +1,5 @@
 /* recarr HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* record-array management */
 /* version %I% last-modified %G% */
@@ -24,13 +24,11 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
-/* object defines */
 
 #define	RECARR		struct recarr_head
 #define	RECARR_FL	struct recarr_flags
 
 /* options */
-
 #define	RECARR_ODEFAULT		0
 #define	RECARR_OREUSE		(1 << 0)	/* reuse empty slots */
 #define	RECARR_OCOMPACT		(1 << 1)	/* means NOHOLES */
@@ -61,7 +59,7 @@ struct recarr_head {
 	RECARR_FL	f ;
 } ;
 
-typedef	struct recarr_head	recarr ;
+typedef	RECARR		recarr ;
 
 EXTERNC_begin
 

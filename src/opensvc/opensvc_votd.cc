@@ -1,5 +1,5 @@
-/* opensvc_votd */
-/* lang=C20 */
+/* opensvc_votd SUPPORT */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (votd) */
 /* version %I% last-modified %G% */
@@ -12,9 +12,10 @@
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -22,15 +23,17 @@
 
 /*******************************************************************************
 
+	Name:
+	votd
+
+	Description:
 	This is a facility-open-service module.
 
 	File-name:
-
 	votd[­-sn][­-af][­-ndb][­-pdb][­-vdb][­-sdb][­-bookname][­-lang]
 		[­o­<option(s)>]
 
 	File-name options:
-
 	audit		perform a recursive audit
 	linelen=<v>	number of columns		
 	indent=<v>	number of columns to indent
@@ -68,7 +71,7 @@
 
 	Returns:
 	>=0		file-descriptor
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -172,7 +175,9 @@
 
 /* external subroutines */
 
-extern cchar	*getenv(cchar *) noex ;
+extern "C" {
+    extern cchar	*getenv(cchar *) noex ;
+}
 
 
 /* external variables */
@@ -341,7 +346,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static cchar	*argopts[] = {
+static constexpr cchar	*argopts[] = {
 	"ROOT",
 	"HELP",
 	"sn",
@@ -373,7 +378,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static cchar	*akonames[] = {
+static constexpr cchar	*akonames[] = {
 	"audit",
 	"linelen",
 	"indent",
@@ -391,7 +396,7 @@ static cchar	*akonames[] = {
 	NULL
 } ;
 
-static cchar	aterms[] = {
+static constexpr cchar	aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -409,26 +414,29 @@ enum qtypes {
 	qtype_overlast
 } ;
 
-static cchar	*qtypes[] = {
+static constexpr cchar	*qtypes[] = {
 	"verses",
 	"days",
 	"mjds",
 	NULL
 } ;
 
-static cchar	*langs[] = {
+static constexpr cchar	*langs[] = {
 	"english",
 	"spanish",
 	NULL
 } ;
 
-static cchar	*vers[] = {
+static constexpr cchar	*vers[] = {
 	"av",
 	"rvv",
 	NULL
 } ;
 
-static cchar	blanks[NBLANKS+1] = "                    " ;
+static constexpr cchar	blanks[NBLANKS+1] = "                    " ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
