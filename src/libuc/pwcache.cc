@@ -61,6 +61,9 @@ typedef ucentpw *	pwentp ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 enum cts {
@@ -154,15 +157,15 @@ static int      pwcache_recfins(pwcache *) noex ;
 static int      pwcache_record(pwcache *,int,int) noex ;
 static int	pwcache_finduid(pwcache *,rec **,uid_t) noex ;
 
-static int record_start(rec *,time_t,int,ureq *) noex ;
-static int record_startun(rec *,PASSWD *) noex ;
-static int record_access(rec *,time_t) noex ;
-static int record_refresh(rec *,time_t,int) noex ;
-static int record_old(rec *,time_t,int) noex ;
-static int record_finish(rec *) noex ;
+static int	record_start(rec *,time_t,int,ureq *) noex ;
+static int	record_loadun(rec *,PASSWD *) noex ;
+static int	record_access(rec *,time_t) noex ;
+static int	record_refresh(rec *,time_t,int) noex ;
+static int	record_old(rec *,time_t,int) noex ;
+static int	record_finish(rec *) noex ;
 
-static int getpw(PASSWD *,char *,int,ureq *) noex ;
-static int getpw_name(PASSWD *,char *,int,cchar *) noex ;
+static int	getpw(PASSWD *,char *,int,ureq *) noex ;
+static int	getpw_name(PASSWD *,char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -229,10 +232,10 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	if ((rs = pwcache_magic(op,pwp,pwbuf,un)) >= 0) {
             rs = SR_INVALID ;
             if (un[0]) {
-                hdb_dat   key{} ;
-                hdb_dat   val{} ;
-                rec         *ep = nullptr ;
-                int         ct = 0 ;
+                hdb_dat		key ;
+                hdb_dat		val{} ;
+                rec		*ep = nullptr ;
+                int		ct = 0 ;
                 op->s.total += 1 ;
                 key.buf = un ;
                 key.len = strlen(un) ;
@@ -300,7 +303,7 @@ int pwcache_invalidate(pwcache *op,cchar *un) noex {
 	if ((rs = pwcache_magic(op,un)) >= 0) {
             rs = SR_INVALID ;
             if (un[0]) {
-                hdb_dat   key{} ;
+                hdb_dat   key ;
                 hdb_dat   val{} ;
                 key.buf = un ;
                 key.len = strlen(un) ;
@@ -457,9 +460,9 @@ static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
         int             rs ;
         int             pwl = 0 ;
         if ((rs = record_start(ep,dt,wc,rp)) >= 0) {
-            hdb_dat   key{} ;
-            hdb_dat   val{} ;
-            cint   	rsz = sizeof(rec) ;
+            hdb_dat	key ;
+            hdb_dat	val{} ;
+            cint	rsz = sizeof(rec) ;
             pwl = rs ;
             key.buf = ep->un ;
             key.len = strlen(ep->un) ;
@@ -478,7 +481,7 @@ static int pwcache_recaccess(pwcache *op,time_t dt,rec *ep) noex {
         int             rs ;
         if ((rs = pwcache_recrear(op,ep)) >= 0) {
             if ((rs = record_old(ep,dt,op->ttl)) > 0) {
-                int     wc = op->wcount++ ;
+                cint     wc = op->wcount++ ;
                 op->s.refreshes += 1 ;
                 rs = record_refresh(ep,dt,wc) ;
             } else {
@@ -514,7 +517,7 @@ static int pwcache_recdel(pwcache *op,rec *ep) noex {
         int             rs = SR_OK ;
         int             rs1 ;
 	{
-            hdb_dat	key{} ;
+            hdb_dat	key ;
             key.buf = ep->un ;
             key.len = strlen(ep->un) ;
             rs1 = hdb_delkey(op->dbp,key) ;
@@ -607,13 +610,13 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
                 PASSWD      pw{} ;
                 cint        pwlen = rs ;
                 if ((rs = getpw(&pw,pwbuf,pwlen,rp)) >= 0) {
-		    if ((rs = record_startun(ep,&pw)) >= 0) {
+		    if ((rs = record_loadun(ep,&pw)) >= 0) {
                         void	*vp{} ;
                         pwl = rs ;
                         if ((rs = uc_malloc((pwl+1),&vp)) >= 0) {
 			    ucentpw	*pwp = pwentp(&ep->pw) ;
 			    ucentpw	*opwp = pwentp(&pw) ;
-                            char    *pwb = charp(vp) ;
+                            char	*pwb = charp(vp) ;
                             if ((rs = pwp->load(pwb,pwl,opwp)) >= 0) {
                                 ep->pwbuf = pwb ;
                                 ep->pwl = pwl ;
@@ -643,7 +646,7 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
 }
 /* end subroutine (record_start) */
 
-static int record_startun(rec *ep,PASSWD *pwp) noex {
+static int record_loadun(rec *ep,PASSWD *pwp) noex {
 	int		rs ;
 	cchar		*cp{} ;
 	cchar		*un = pwp->pw_name ;
@@ -652,7 +655,7 @@ static int record_startun(rec *ep,PASSWD *pwp) noex {
 	}
 	return rs ;
 }
-/* end subroutine (record_startun) */
+/* end subroutine (record_loadun) */
 
 static int record_finish(rec *ep) noex {
         int             rs = SR_FAULT ;
