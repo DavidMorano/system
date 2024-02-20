@@ -125,6 +125,9 @@ constexpr bool		f_linux = F_LINUX ;
 constexpr bool		f_gethoxxxr = F_GETHOXXXR ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_gethobegin(int stayopen) noex {

@@ -39,6 +39,12 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -55,6 +61,9 @@ constexpr sysdbfiles	w = sysdbfile_sv ;
 
 
 /* local subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

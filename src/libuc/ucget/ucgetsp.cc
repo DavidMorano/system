@@ -70,6 +70,12 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -102,6 +108,9 @@ constexpr bool f_darwin = F_DARWIN ;
 constexpr bool f_linux = F_LINUX ;
 constexpr bool f_getspentr = F_GETSPENTR ;
 constexpr bool f_getspnamr = F_GETSPNAMR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

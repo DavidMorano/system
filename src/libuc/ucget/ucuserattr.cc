@@ -70,6 +70,15 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* forward references */
+
+
 /* local variables */
 
 constexpr bool		f_userattr = F_USERATTR ;

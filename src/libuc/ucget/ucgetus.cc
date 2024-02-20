@@ -64,6 +64,9 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 
@@ -115,6 +118,9 @@ extern "C" {
 /* local variables */
 
 static ucgetus		ucgetus_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
