@@ -64,7 +64,7 @@
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<pwd.h>
 #include	<grp.h>

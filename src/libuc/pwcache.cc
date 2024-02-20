@@ -168,6 +168,9 @@ static int getpw_name(PASSWD *,char *,int,cchar *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int pwcache_start(pwcache *op,int nmax,int ttl) noex {
@@ -707,7 +710,9 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
                         char        *pwbuf = charp(vp) ;
                         ep->pwbuf = charp(vp) ;
                         rs = pwp->load(pwbuf,pwl,opwp) ;
-                        if (rs < 0) uc_free(vp) ;
+                        if (rs < 0) {
+			    uc_free(vp) ;
+			}
                     } /* end if (ok) */
                 } else if (rs == SR_NOTFOUND) {
                     if (ep->pwbuf != nullptr) {

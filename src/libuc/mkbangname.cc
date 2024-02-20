@@ -1,5 +1,5 @@
 /* mkbangname SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	0		/* compile-time switchable debugging */
 #define	CF_FULLNAME	0		/* use full-name */
@@ -33,20 +33,15 @@
 	uip		pointer to USERINFO object
 
 	Returns:
-
 	>=0		OK
-	<0		bad
-
+	<0		bad (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<userinfo.h>
 #include	<localmisc.h>
@@ -63,8 +58,8 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	sncpy6(char *,int,cchar *,cchar *,cchar *,cchar *,
 			cchar *,cchar *) ;
 
@@ -78,7 +73,7 @@ extern int	sncpy6(char *,int,cchar *,cchar *,cchar *,cchar *,
 int mkuibang(char rbuf[],int rlen,USERINFO *uip)
 {
 	int		rs = SR_OK ;
-	const char	*np = NULL ;
+	cchar	*np = NULL ;
 
 	if (rbuf == NULL) return SR_FAULT ;
 	if (uip == NULL) return SR_FAULT ;
@@ -98,7 +93,7 @@ int mkuibang(char rbuf[],int rlen,USERINFO *uip)
 
 #ifdef	COMMENT
 	{
-	    const char	*vnp ;
+	    cchar	*vnp ;
 	    if (np == NULL) {
 	        if (((vnp = getenv(VARNAME)) != NULL) && (vnp[0] != '\0')) {
 	            np = vnp ;
@@ -134,8 +129,8 @@ int mkuibang(char rbuf[],int rlen,USERINFO *uip)
 	}
 
 	{
-	    const char	*nn = uip->nodename ;
-	    const char	*un = uip->username ;
+	    cchar	*nn = uip->nodename ;
+	    cchar	*un = uip->username ;
 
 	    rs = SR_NOTFOUND ;
 	    if (np != NULL) {

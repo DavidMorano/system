@@ -50,7 +50,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
