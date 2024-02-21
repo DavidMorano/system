@@ -276,10 +276,10 @@ int grmems_finish(grmems *op) noex {
 }
 /* end subroutine (grmems_finish) */
 
-int grmems_curbegin(grmems *op,GRMEMS_CUR *curp) noex {
+int grmems_curbegin(grmems *op,grmems_cur *curp) noex {
 	int		rs ;
 	if ((rs = grmems_magic(op,curp)) >= 0) {
-	    memclear(curp) ;
+	    rs = memclear(curp) ;	/* dangerous */
 	    curp->ri = -1 ;
 	    curp->i = -1 ;
 	    op->cursors += 1 ;
@@ -289,206 +289,178 @@ int grmems_curbegin(grmems *op,GRMEMS_CUR *curp) noex {
 }
 /* end subroutine (grmems_curbegin) */
 
-int grmems_curend(grmems *op,GRMEMS_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != GRMEMS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != GRMEMS_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->cursors > 0)
-	    op->cursors -= 1 ;
-
-	curp->ri = -1 ;
-	curp->i = -1 ;
-	curp->magic = 0 ;
-
+int grmems_curend(grmems *op,grmems_cur *curp) noex {
+	int		rs ;
+	if ((rs = grmems_magic(op,curp)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == GRMEMS_CURMAGIC) {
+		rs = SR_OK ;
+	        if (op->cursors > 0) op->cursors -= 1 ;
+	        curp->ri = -1 ;
+	        curp->i = -1 ;
+	        curp->magic = 0 ;
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (grmems_curend) */
 
-int grmems_lookup(grmems *op,GRMEMS_CUR *curp,cchar *gnp,int gnl) noex {
-	int		rs = SR_OK ;
+int grmems_lookup(grmems *op,grmems_cur *curp,cchar *gnp,int gnl) noex {
+	int		rs ;
 	int		ri = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (gnp == nullptr) return SR_FAULT ;
-
-	if (op->magic != GRMEMS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != GRMEMS_CURMAGIC) return SR_NOTOPEN ;
-
-	if (gnp[0] == '\0') return SR_INVALID ;
-
-	if (op->recs == nullptr) {
-	    rs = grmems_starter(op) ;
-	}
-
-	if (rs >= 0) {
-	    grmems_rec	*ep = nullptr ;
-	    time_t	dt = time(nullptr) ;
-	    int		ct{} ;
-	    op->s.total += 1 ;
-	    if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
-	        ri = rs ;
-	        ct = ct_hit ;
-	        rs = grmems_recaccess(op,dt,ep) ;
-	    } else if (rs == SR_NOTFOUND) {
-	        ct = ct_miss ;
-	        rs = grmems_mkrec(op,dt,&ep,gnp,gnl) ;
-	        ri = rs ;
-	    } /* end if (hit or miss) */
-	    grmems_upstats(op,ct,rs) ;
-	    if (rs >= 0) {
-	        curp->ri = ri ;
-	        curp->i = -1 ;
-	    }
-	} /* end if */
-
+	if ((rs = grmems_magic(op,curp,gnp)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == GRMEMS_CURMAGIC) {
+		rs = SR_INVALID ;
+	        if (gnp[0]) {
+		    rs = SR_OK ;
+	            if (op->recs == nullptr) {
+	                rs = grmems_starter(op) ;
+	            }
+	            if (rs >= 0) {
+	                grmems_rec	*ep = nullptr ;
+	                time_t		dt = time(nullptr) ;
+	                int		ct{} ;
+	                op->s.total += 1 ;
+	                if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
+	                    ri = rs ;
+	                    ct = ct_hit ;
+	                    rs = grmems_recaccess(op,dt,ep) ;
+	                } else if (rs == SR_NOTFOUND) {
+	                    ct = ct_miss ;
+	                    rs = grmems_mkrec(op,dt,&ep,gnp,gnl) ;
+	                    ri = rs ;
+	                } /* end if (hit or miss) */
+	                grmems_upstats(op,ct,rs) ;
+	                if (rs >= 0) {
+	                    curp->ri = ri ;
+	                    curp->i = -1 ;
+	                }
+	            } /* end if (ok) */
+	        } /* end if (valid) */
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return (rs >= 0) ? ri : rs ;
 }
 /* end subroutine (grmems_lookup) */
 
-int grmems_lookread(grmems *op,GRMEMS_CUR *curp,char *rbuf,int rlen) noex {
-	int		rs = SR_OK ;
-	int		ri ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != GRMEMS_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != GRMEMS_CURMAGIC) return SR_NOTOPEN ;
-
-	if (op->recs == nullptr) {
-	    rs = grmems_starter(op) ;
-	}
-
-	if (rs >= 0) {
-	    ri = curp->ri ;
-	    if (ri >= 0) {
-	        recarr		*rlp = (recarr *) op->recs ;
-	        grmems_rec	*ep ;
-	        int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
-
-	        if ((rs = recarr_get(rlp,ri,&ep)) >= 0) {
-	            if (i < ep->nmems) {
-	                if ((rs = sncpy1(rbuf,rlen,ep->mems[i])) >= 0) {
-	                    curp->i = i ;
-	                }
+int grmems_lookread(grmems *op,grmems_cur *curp,char *rbuf,int rlen) noex {
+	int		rs ;
+	if ((rs = grmems_magic(op,curp,rbuf)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == GRMEMS_CURMAGIC) {
+		rs = SR_OK ;
+	        if (op->recs == nullptr) {
+	            rs = grmems_starter(op) ;
+	        }
+	        if (rs >= 0) {
+	            cint	ri = curp->ri ;
+	            if (ri >= 0) {
+	                recarr		*rlp = (recarr *) op->recs ;
+	                grmems_rec	*ep ;
+	                int		i = (curp->i >= 0) ? (curp->i+1) : 0 ;
+	                if ((rs = recarr_get(rlp,ri,&ep)) >= 0) {
+	                    if (i < ep->nmems) {
+				cchar	*mem = ep->mems[i] ;
+	                        if ((rs = sncpy1(rbuf,rlen,mem)) >= 0) {
+	                            curp->i = i ;
+	                        }
+	                    } else {
+	                        rs = SR_NOTFOUND ;
+		            }
+	                } /* end if */
 	            } else {
 	                rs = SR_NOTFOUND ;
-		    }
-	        } /* end if */
-
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    }
-
-	} /* end if (ok) */
-
+	            }
+	        } /* end if (ok) */
+	    } /* end if (magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (grmems_lookread) */
 
 int grmems_invalidate(grmems *op,cchar *gnp,int gnl) noex {
-	grmems_rec	*ep ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (gnp == nullptr) return SR_FAULT ;
-
-	if (op->magic != GRMEMS_MAGIC) return SR_NOTOPEN ;
-
-	if (gnp[0] == '\0') return SR_INVALID ;
-
-	if (op->recs == nullptr) {
-	    rs = grmems_starter(op) ;
-	}
-
-	if (rs >= 0) {
-	    if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
-	        cint	ri = rs ;
-	        PQ_ENT		*pep = (PQ_ENT *) ep ;
-
-	        f_found = true ;
-
-	        rs1 = pq_unlink(op->lrup,pep) ;
-	        if (rs >= 0) rs = rs1 ;
-
-	        rs1 = recarr_del(op->recs,ri) ;
-	        if (rs >= 0) rs = rs1 ;
-
-	        rs1 = record_finish(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-
-	        rs1 = uc_free(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-
-	    } else if (rs == SR_NOTFOUND) {
-	        rs = SR_OK ;
-	    }
-	} /* end if (ok) */
-
+	if ((rs = grmems_magic(op,gnp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (gnp[0]) {
+		rs = SR_OK ;
+	        if (op->recs == nullptr) {
+	            rs = grmems_starter(op) ;
+	        }
+	        if (rs >= 0) {
+	            grmems_rec	*ep{} ;
+	            if ((rs = grmems_fetch(op,&ep,gnp,gnl)) >= 0) {
+	                cint	ri = rs ;
+	                pq_ent	*pep = (pq_ent *) ep ;
+	                f_found = true ;
+		        {
+	                    rs1 = pq_unlink(op->lrup,pep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+		        {
+	                    rs1 = recarr_del(op->recs,ri) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+		        {
+	                    rs1 = record_finish(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+		        {
+	                    rs1 = uc_free(ep) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	            } else if (rs == SR_NOTFOUND) {
+	                rs = SR_OK ;
+	            }
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f_found : rs ;
 }
 /* end subroutine (grmems_invalidate) */
 
 int grmems_check(grmems *op,time_t dt) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != GRMEMS_MAGIC) return SR_NOTOPEN ;
-
-/* loop checking all cache entries */
-
-	if (op->recs != nullptr) {
-	    grmems_rec	*ep ;
-	    recarr	*rlp = op->recs ;
-	    int		i ;
-	    for (i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
-	        if (ep != nullptr) {
-	            if (dt == 0) dt = time(nullptr) ;
-	            if ((rs = record_isold(ep,dt,op->ttl)) > 0) {
-	                f = true ;
-	                if ((rs = grmems_recdel(op,ep)) >= 0) {
-	                    PQ_ENT	*pep = (PQ_ENT *) ep ;
-	                    rs = pq_unlink(op->lrup,pep) ;
-	                    uc_free(ep) ;
-	                }
-	            } /* end if (entry-old) */
-		} /* end if (non-null) */
-	        if (rs < 0) break ;
-	    } /* end for */
-	} /* end if (non-null) */
-
+	if ((rs = grmems_magic(op)) >= 0) {
+	    if (op->recs != nullptr) {
+	        recarr		*rlp = op->recs ;
+	        grmems_rec	*ep{} ;
+	        for (int i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
+	            if (ep) {
+	                if (dt == 0) dt = time(nullptr) ;
+	                if ((rs = record_isold(ep,dt,op->ttl)) > 0) {
+	                    f = true ;
+	                    if ((rs = grmems_recdel(op,ep)) >= 0) {
+	                        pq_ent	*pep = (pq_ent *) ep ;
+	                        rs = pq_unlink(op->lrup,pep) ;
+	                        uc_free(ep) ;
+	                    }
+	                } /* end if (entry-old) */
+		    } /* end if (non-null) */
+	            if (rs < 0) break ;
+	        } /* end for */
+	    } /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (grmems_check) */
 
 int grmems_stats(grmems *op,GRMEMS_STATS *sp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (op->magic != GRMEMS_MAGIC) return SR_NOTOPEN ;
-
-	if (op->recs != nullptr) {
-	    if ((rs = recarr_count(op->recs)) >= 0) {
-	        *sp = op->s ;
-	        sp->nentries = rs ;
+	int		rs ;
+	if ((rs = grmems_magic(op,sp)) >= 0) {
+	    if (op->recs) {
+	        if ((rs = recarr_count(op->recs)) >= 0) {
+	            *sp = op->s ;
+	            sp->nentries = rs ;
+	        }
+	    } else {
+	        memclear(sp) ;
 	    }
-	} else {
-	    memset(sp,0,sizeof(GRMEMS_STATS)) ;
-	}
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (grmems_stats) */
@@ -498,7 +470,6 @@ int grmems_stats(grmems *op,GRMEMS_STATS *sp) noex {
 
 static int grmems_starter(grmems *op) noex {
 	int		rs = SR_OK ;
-
 	if (op->recs == nullptr) {
 	    cint	size = sizeof(recarr) ;
 	    void	*vp{} ;
@@ -517,29 +488,25 @@ static int grmems_starter(grmems *op) noex {
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
-
 	return rs ;
 }
 /* end subroutine (grmems_starter) */
 
 static int grmems_fetch(grmems *op,grmems_rec **epp,cchar *gnp,int gnl) noex {
 	recarr		*rlp = op->recs ;
-	grmems_rec	*ep ;
+	grmems_rec	*ep{} ;
 	int		rs ;
-	int		i ;
-
+	int		i = 0 ; /* used afterwards */
 	for (i = 0 ; (rs = recarr_get(rlp,i,&ep)) >= 0 ; i += 1) {
-	    if (ep != nullptr) {
+	    if (ep) {
 	        if (gnp[0] == ep->gn[0]) {
 	            if (strwcmp(ep->gn,gnp,gnl) == 0) break ;
 		}
 	    }
 	} /* end for */
-
-	if (epp != nullptr) {
+	if (epp) {
 	    *epp = (rs >= 0) ? ep : nullptr ;
 	}
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (grmems_fetch) */
@@ -549,61 +516,51 @@ static int grmems_mkrec(grmems *op,time_t dt,grmems_rec **epp,
 	int		rs ;
 	int		rs1 ;
 	int		ri = 0 ;
-
 	*epp = nullptr ;
 	if ((rs = recarr_count(op->recs)) >= 0) {
-	    PQ_ENT	*pep ;
+	    pq_ent	*pep ;
 	    cint	n = rs ;
-
 	    if (n >= op->nmax) {
-
 	        if ((rs = pq_rem(op->lrup,&pep)) >= 0) {
 	            grmems_rec	*ep = (grmems_rec *) pep ;
-
 	            if ((rs = grmems_recdel(op,ep)) >= 0) {
 	                rs = grmems_recstart(op,dt,ep,gnp,gnl) ;
 	                ri = rs ;
 	            }
-
 	            rs1 = pq_ins(op->lrup,pep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (removed entry) */
-
-	        if (rs >= 0) *epp = (grmems_rec *) pep ;
-
+	        if (rs >= 0) {
+		    *epp = (grmems_rec *) pep ;
+		}
 	    } else {
-
 	        if ((rs = grmems_newrec(op,dt,epp,gnp,gnl)) >= 0) {
 	            ri = rs ;
-	            if (*epp != nullptr) {
-	                pep = (PQ_ENT *) *epp ;
+	            if (*epp) {
+	                pep = (pq_ent *) *epp ;
 	                rs = pq_ins(op->lrup,pep) ;
 	            }
 	        } /* end if (new-entry) */
-
 	    } /* end if (at max entries or not) */
-
 	} /* end if (recarr_count) */
-
 	return (rs >= 0) ? ri : rs ;
 }
 /* end subroutine (grmems_mkrec) */
 
 static int grmems_newrec(grmems *op,time_t dt,grmems_rec **epp,
 		cchar *gnp,int gnl) noex {
-	grmems_rec	*ep ;
-	cint	rsize = sizeof(grmems_rec) ;
-	int		rs ;
-
-	if (epp == nullptr) return SR_NOANODE ;
-
-	if ((rs = uc_malloc(rsize,&ep)) >= 0) {
-	    rs = grmems_recstart(op,dt,ep,gnp,gnl) ;
-	    if (rs < 0) 
-		uc_free(ep) ;
-	} /* end if (memory-allocation) */
-
-	*epp = (rs >= 0) ? ep : nullptr ;
+	int		rs = SR_BUGCHECK ;
+	if (epp) {
+	    grmems_rec	*ep{} ;
+	    cint	rsize = sizeof(grmems_rec) ;
+	    if ((rs = uc_malloc(rsize,&ep)) >= 0) {
+	        rs = grmems_recstart(op,dt,ep,gnp,gnl) ;
+	        if (rs < 0) {
+		    uc_free(ep) ;
+		}
+	    } /* end if (memory-allocation) */
+	    *epp = (rs >= 0) ? ep : nullptr ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (grmems_newrec) */
@@ -618,9 +575,7 @@ static int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	int		ri = 0 ;
 	char		*grbuf ;
 	char		gn[GROUPNAMELEN+1] ;
-
 	strdcpy1w(gn,GROUPNAMELEN,gnp,gnl) ;
-
 	if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
 	    if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
 	        vecelem		u ;
@@ -641,9 +596,9 @@ static int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (vecelem-user) */
 	    } /* end if (getgr-name) */
-	    uc_free(grbuf) ;
+	    rs1 = uc_free(grbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
-
 	return (rs >= 0) ? ri : rs ;
 }
 /* end subroutine (grmems_recstart) */
@@ -653,7 +608,6 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*gnp{} ;
-
 	if ((rs = record_getgnp(ep,&gnp)) >= 0) {
 	    GROUP	gr ;
 	    cint	grlen = getbufsize(getbufsize_gr) ;
@@ -675,7 +629,6 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if (record_getgnp) */
-
 	return (rs >= 0) ? wc : rs ;
 }
 /* end subroutine (grmems_recrefresh) */
@@ -684,7 +637,6 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 static int grmems_recusers(grmems *op,time_t dt,vecelem *ulp,gid_t gid) noex {
 	int		rs ;
 	int		c = 0 ;
-
 	if ((rs = grmems_mkug(op,dt)) >= 0) {
 	    GRMEMS_USERGID	k, *ugp ;
 	    GRMEMS_USERGID	*ugs = (GRMEMS_USERGID *) op->usergids ;
@@ -709,17 +661,15 @@ static int grmems_recusers(grmems *op,time_t dt,vecelem *ulp,gid_t gid) noex {
 	            if (rs < 0) break ;
 	        } /* end while */
 	    } /* end if (had some hits) */
-
 	} /* end if (grmems-mkug) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (grmems_recusers) */
 
 static int grmems_mkug(grmems *op,time_t dt) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		c = 0 ;
-
 	if (op->usergids == nullptr) {
 	    vecelem	ug ;
 	    cint	esize = sizeof(GRMEMS_USERGID) ;
@@ -731,10 +681,10 @@ static int grmems_mkug(grmems *op,time_t dt) noex {
 	                rs = grmems_mkugstore(op,dt,&ug) ;
 		    }
 	        } /* end if (grmems-mkugload) */
-	        vecelem_finish(&ug) ;
+	        rs1 = vecelem_finish(&ug) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (vecelem) */
 	} /* end if (usergids) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (grmems_mkug) */
@@ -743,7 +693,6 @@ static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
 	if ((rs = grmems_pwmapbegin(op,dt)) >= 0) {
 	    int		ml = op->fsize ;
 	    cchar	*mp = charp(op->mapdata) ;
@@ -768,7 +717,6 @@ static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
 	    rs1 = grmems_pwmapend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (grmems-pwmap) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (grmems_mkugload) */
@@ -815,12 +763,12 @@ static int grmems_recaccess(grmems *op,time_t dt,grmems_rec *ep) noex {
 /* end subroutine (grmems_recaccess) */
 
 static int grmems_recrear(grmems *op,grmems_rec *ep) noex {
-	PQ_ENT		*pcp = (PQ_ENT *) ep ;
-	PQ_ENT		*pep ;
+	pq_ent		*pcp = (pq_ent *) ep ;
+	pq_ent		*pep ;
 	int		rs ;
 	if ((rs = pq_gettail(op->lrup,&pep)) >= 0) {
 	    if (pcp != pep) {
-	        pep = (PQ_ENT *) ep ;
+	        pep = (pq_ent *) ep ;
 	        if ((rs = pq_unlink(op->lrup,pep)) >= 0) {
 	            rs = pq_ins(op->lrup,pep) ;
 	            if (rs < 0) {
@@ -838,15 +786,14 @@ static int grmems_recrear(grmems *op,grmems_rec *ep) noex {
 static int grmems_recdel(grmems *op,grmems_rec *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if ((rs1 = recarr_ent(op->recs,ep)) >= 0) {
 	    rs1 = recarr_del(op->recs,rs1) ;
 	}
 	if (rs >= 0) rs = rs1 ;
-
-	rs1 = record_finish(ep) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = record_finish(ep) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (grmems_recdel) */
@@ -854,20 +801,22 @@ static int grmems_recdel(grmems *op,grmems_rec *ep) noex {
 static int grmems_recfins(grmems *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->recs != nullptr) {
-	    grmems_rec	*ep ;
 	    recarr	*rlp = op->recs ;
+	    grmems_rec	*ep{} ;
 	    for (int i = 0 ; recarr_get(rlp,i,&ep) >= 0 ; i += 1) {
-	        if (ep != nullptr) {
-	            rs1 = record_finish(ep) ;
-	            if (rs >= 0) rs = rs1 ;
-	            rs1 = uc_free(ep) ;
-	            if (rs >= 0) rs = rs1 ;
+	        if (ep) {
+		    {
+	                rs1 = record_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+	                rs1 = uc_free(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
 		}
 	    } /* end for */
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (grmems_recfins) */
@@ -944,59 +893,50 @@ static int grmems_pwmapend(grmems *op) noex {
 
 static int record_start(grmems_rec *ep,time_t dt,int wc,
 		vecelem *ulp,GROUP *grp) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		n = 0 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-	if (ulp == nullptr) return SR_FAULT ;
-	if (grp == nullptr) return SR_FAULT ;
-
-	memclear(ep) ;			/* dangerous */
-
-	strwcpy(ep->gn,grp->gr_name,GROUPNAMELEN) ;
-
-	rs = record_mems(ep,dt,wc,ulp,grp) ;
-	n = rs ;
-
+	if (ep && ulp && grp) {
+	    memclear(ep) ;		/* dangerous */
+	    strwcpy(ep->gn,grp->gr_name,GROUPNAMELEN) ;
+	    rs = record_mems(ep,dt,wc,ulp,grp) ;
+	    n = rs ;
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (record_start) */
 
 static int record_finish(grmems_rec *ep) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->mems != nullptr) {
-	    rs1 = uc_free(ep->mems) ;
-	    if (rs >= 0) rs = rs1 ;
-	    ep->mems = nullptr ;
-	}
-
-	ep->gn[0] = '\0' ;
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->mems != nullptr) {
+	        rs1 = uc_free(ep->mems) ;
+	        if (rs >= 0) rs = rs1 ;
+	        ep->mems = nullptr ;
+	    }
+	    ep->gn[0] = '\0' ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (record_finish) */
 
 static int record_refresh(grmems_rec *ep,time_t dt,int wc,
 		vecelem *ulp,GROUP *grp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		n = 0 ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (ep->mems != nullptr) {
-	    rs = uc_free(ep->mems) ;
-	    ep->mems = nullptr ;
-	    ep->nmems = 0 ;
-	}
-
-	if (rs >= 0) {
-	    rs = record_mems(ep,dt,wc,ulp,grp) ;
-	    n = rs ;
-	} /* end if */
-
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->mems != nullptr) {
+	        rs = uc_free(ep->mems) ;
+	        ep->mems = nullptr ;
+	        ep->nmems = 0 ;
+	    }
+	    if (rs >= 0) {
+	        rs = record_mems(ep,dt,wc,ulp,grp) ;
+	        n = rs ;
+	    } /* end if */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (record_refresh) */
@@ -1005,7 +945,6 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 		vecelem *ulp,GROUP *grp) noex {
 	int		rs ;
 	int		n = 0 ;
-
 	if ((rs = record_loadgruns(ep,ulp,grp)) >= 0) {
 	    if ((rs = vecelem_count(ulp)) >= 0) {
 	        GRMEMS_USER	*up ;
@@ -1046,61 +985,63 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 	        } /* end if (memory-allocation) */
 	    } /* end if (vecelem-count) */
 	} /* end if (load user members) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (record_mems) */
 
 static int record_loadgruns(grmems_rec *op,vecelem *ulp,GROUP *grp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ; /* lint */
-
-	if (grp->gr_mem != nullptr) {
-	    cchar	**mems = (cchar **) grp->gr_mem ;
-	    for (int i = 0 ; mems[i] != nullptr ; i += 1) {
-	        GRMEMS_USER	u ;
-	        u.up = mems[i] ;
-	        u.ul = -1 ;
-	        rs = vecelem_addouruniq(ulp,&u) ;
-	        if (rs < INT_MAX) c += 1 ;
-	        if (rs < 0) break ;
-	    } /* end for */
-	} /* end if (had members) */
-
+	if (op) {
+	    rs = SR_OK ;
+	    if (grp->gr_mem != nullptr) {
+	        cchar	**mems = (cchar **) grp->gr_mem ;
+	        for (int i = 0 ; mems[i] != nullptr ; i += 1) {
+	            GRMEMS_USER	u ;
+	            u.up = mems[i] ;
+	            u.ul = -1 ;
+	            rs = vecelem_addouruniq(ulp,&u) ;
+	            if (rs < INT_MAX) c += 1 ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	    } /* end if (had members) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (record_loadgruns) */
 
 static int record_access(grmems_rec *ep,time_t dt) noex {
-	int		rs = SR_OK ;
-	int		wc ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	ep->ti_access = dt ;
-	wc = ep->wcount ;
+	int		rs = SR_FAULT ;
+	int		wc = 0 ;
+	if (ep) {
+	    rs = SR_OK ;
+	    ep->ti_access = dt ;
+	    wc = ep->wcount ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? wc : rs ;
 }
 /* end subroutine (record_access) */
 
 static int record_isold(grmems_rec *ep,time_t dt,int ttl) noex {
+	int		rs = SR_FAULT ;
 	int		f_old = false ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	f_old = ((dt - ep->ti_create) >= ttl) ;
-	return f_old ;
+	if (ep) {
+	    rs = SR_OK ;
+	    f_old = ((dt - ep->ti_create) >= ttl) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? f_old : rs ;
 }
 /* end subroutine (record_isold) */
 
 static int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
-	int		rs = SR_OK ;
-	if (ep == nullptr) return SR_FAULT ;
-	if (rpp == nullptr) return SR_FAULT ;
-	if (ep->gn[0] == '\0') rs = SR_NOTOPEN ;
-	*rpp = (rs >= 0) ? ep->gn : nullptr ;
+	int		rs = SR_FAULT ;
+	if (ep && rpp) {
+	    rs = SR_NOTOPEN ;
+	    if (ep->gn[0]) {
+		rs = SR_OK ;
+	        *rpp = (rs >= 0) ? ep->gn : nullptr ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (record_getgnp) */
