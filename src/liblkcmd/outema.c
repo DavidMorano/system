@@ -1,10 +1,10 @@
-/* outema */
-
+/* outema SUPPORT */
+/* lang=C++20 */
+ 
 /* manage printing lines */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -12,8 +12,9 @@
 	This subroutine was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-	I added a little code to "post" articles that do not have a valid
-	newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -23,12 +24,9 @@
 
 	This object deals with printing lines.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -36,7 +34,6 @@
 #include	<string.h>
 #include	<stdarg.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<buffer.h>
@@ -154,7 +151,7 @@ int outema_finish(OUTEMA *ldp)
 	if (ldp->ofp == NULL) return SR_FAULT ;
 
 	if (ldp->llen > 0) {
-	    rs = filebuf_print(ldp->ofp,NULL,0) ;
+	    rs = filebuf_println(ldp->ofp,NULL,0) ;
 	    ldp->wlen += rs ;
 	    ldp->rlen = ldp->maxlen ;
 	    ldp->llen = 0 ;
@@ -423,7 +420,7 @@ int outema_hdrkey(OUTEMA *ldp,cchar kname[])
 	if (kname[0] == '\0') return SR_INVALID ;
 
 	if ((rs >= 0) && (ldp->llen > 0)) {
-	    rs = filebuf_print(ldp->ofp,kname,0) ;
+	    rs = filebuf_println(ldp->ofp,kname,0) ;
 	    wlen += rs ;
 	    ldp->llen = 0 ;
 	    ldp->rlen = ldp->maxlen ;

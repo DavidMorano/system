@@ -45,7 +45,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>
@@ -73,6 +73,12 @@
 #else
 #define	F_GETGRGIDR	0
 #endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

@@ -175,7 +175,7 @@ int		ll ;
 	    } /* end while */
 
 	    if ((rs >= 0) && (i == 0)) {
-	        rs = filebuf_print(fbp,lp,0) ;
+	        rs = filebuf_println(fbp,lp,0) ;
 	        wlen += rs ;
 	    }
 
@@ -186,12 +186,7 @@ int		ll ;
 }
 /* end subroutine (procprinthdrline) */
 
-
-/* there is no 'filebuf_print(3dam)' subroutine! */
-static int filebuf_hdrkey(fbp,kname)
-FILEBUF		*fbp ;
-const char	kname[] ;
-{
+static int filebuf_hdrkey(filebuf *fbp,cchar *kname) noex {
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
 

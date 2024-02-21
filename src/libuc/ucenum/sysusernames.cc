@@ -54,6 +54,9 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 
+/* exported variables */
+
+
 /* forward references */
 
 static inline int sysusernames_ctor(sysusernames *op) noex {

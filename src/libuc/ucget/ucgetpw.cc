@@ -45,8 +45,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
-#include	<stdlib.h>
+#include	<cerrno>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<localmisc.h>
@@ -73,6 +73,12 @@
 #else
 #define	F_GETPWUIDR	0
 #endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

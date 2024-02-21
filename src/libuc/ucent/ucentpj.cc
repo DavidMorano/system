@@ -1,4 +1,4 @@
-/* ucentpj */
+/* ucentpj SUPPORT */
 /* lang=C++20 */
 
 /* UCENTPJ object management */
@@ -48,10 +48,11 @@
 #define	CPJE	const ucentpj
 #define	SI	storeitem
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -73,6 +74,9 @@ static int si_copystr(SI *,char **,cchar *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
@@ -88,7 +92,7 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	        cchar		**vpp ;
 	        while ((tp = strnchr(sp,sl,':')) != nullptr) {
 	            int		v = -1 ;
-	            char	**sv ;
+	            char	**sv{} ;
 	            vpp = nullptr ;
 	            switch (fi++) {
 	            case 0:
@@ -115,7 +119,7 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	            } /* end switch */
 	            if ((rs >= 0) && vpp) {
 	                int	cl ;
-	                cchar	*cp ;
+	                cchar	*cp{} ;
 	                if ((cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
 	                    rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	                }
@@ -126,7 +130,7 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	        } /* end while */
 	        if ((rs >= 0) && (fi == 5) && sl && sp[0]) {
 	            int		cl ;
-	            cchar	*cp ;
+	            cchar	*cp{} ;
 		    vpp = (cchar **) &pj_attr ;
 		    fi += 1 ;
 	            if ((cl = sfshrink(sp,sl,&cp)) >= 0) {
@@ -149,7 +153,7 @@ int ucentpj::load(char *pjbuf,int pjlen,CPJE *spjp) noex {
 	    memcpy(this,spjp,sizeof(PJE)) ;
 	    if ((rs = storeitem_start(&ib,pjbuf,pjlen)) >= 0) {
 	        int	n ;
-	        void	**ptab ;
+	        void	**ptab{} ;
 	        if (spjp->pj_users) {
 	            for (n = 0 ; spjp->pj_users[n] ; n += 1) ;
 	            if ((rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {

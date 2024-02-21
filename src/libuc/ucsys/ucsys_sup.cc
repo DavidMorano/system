@@ -55,6 +55,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ucsys_getec(int herr) noex {

@@ -53,6 +53,9 @@ using std::nothrow ;			/* constant */
 /* local structures */
 
 
+/* exported variables */
+
+
 /* forward references */
 
 static inline int sysusershells_ctor(sysusershells *op) noex {
@@ -93,6 +96,9 @@ static int sysusershells_magic(sysusershells *op,Args ... args) noex {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

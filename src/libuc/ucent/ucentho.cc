@@ -1,4 +1,4 @@
-/* ucentho */
+/* ucentho SUPPORT */
 /* lang=C++20 */
 
 /* UCENTHO object management */
@@ -72,7 +72,7 @@
 
 /* local namespaces */
 
-using std::max ;
+using std::max ;			/* type */
 
 
 /* local typedefs */
@@ -107,6 +107,12 @@ static int si_loadname(SI *,vechand *,cchar *,int) noex ;
 static int si_copystr(SI *,char **,cchar *) noex ;
 
 static inline int getaflen(int) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

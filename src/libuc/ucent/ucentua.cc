@@ -1,4 +1,4 @@
-/* ucentua */
+/* ucentua SUPPORT */
 /* lang=C++20 */
 
 /* UCENTUA object management */
@@ -51,12 +51,10 @@
 #define	CUA		const ucentua
 
 
-/* local typedefs */
+/* local namespaces */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -80,6 +78,9 @@ static int sbuf_fmtattrs(sbuf *,kva_t *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

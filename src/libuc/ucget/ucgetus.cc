@@ -48,7 +48,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<usupport.h>
@@ -62,6 +62,9 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
 
 
 /* local typedefs */
@@ -115,6 +118,9 @@ extern "C" {
 /* local variables */
 
 static ucgetus		ucgetus_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

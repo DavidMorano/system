@@ -160,7 +160,9 @@ int pq_gettail(pq *qhp,PQ_ENT **epp) noex {
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not empty) */
-	    if (epp) *epp = (rs >= 0) ? ep : nullptr ;
+	    if (epp) {
+		*epp = (rs >= 0) ? ep : nullptr ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -195,7 +197,9 @@ int pq_rem(pq *qhp,PQ_ENT **epp) noex {
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not-empty) */
-	    if (epp != nullptr) *epp = (rs >= 0) ? ep : nullptr ;
+	    if (epp) {
+		 *epp = (rs >= 0) ? ep : nullptr ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -232,7 +236,9 @@ int pq_remtail(pq *qhp,PQ_ENT **epp) noex {
 	    } else {
 	        if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    } /* end if (not empty) */
-	    if (epp) *epp = (rs >= 0) ? ep : nullptr ;
+	    if (epp) {
+		*epp = (rs >= 0) ? ep : nullptr ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 }
@@ -370,7 +376,9 @@ int pq_enum(pq *qhp,pq_cur *curp,PQ_ENT **rpp) noex {
 	        }
 	        if (nep != nullptr) rs = SR_OK ;
 	        curp->entp = nep ;
-		if (rpp) *rpp = (rs >= 0) ? nep : nullptr ;
+		if (rpp) {
+		    *rpp = (rs >= 0) ? nep : nullptr ;
+		}
 	    } else {
 		if (qhp->head || qhp->tail) rs = SR_BADFMT ;
 	    }

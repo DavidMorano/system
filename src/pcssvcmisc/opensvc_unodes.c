@@ -169,7 +169,7 @@ static int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen)
 	    PCSUNODES_CUR	cur ;
 	    if ((rs = pcsunodes_curbegin(unp,&cur)) >= 0) {
 		while ((rs = pcsunodes_enum(unp,&cur,nbuf,nlen)) >= 0) {
-		    rs = filebuf_print(&fb,nbuf,rs) ;
+		    rs = filebuf_println(&fb,nbuf,rs) ;
 		    if (rs < 0) break ;
 		} /* end while */
 		if (rs == SR_NOTFOUND) rs = SR_OK ;

@@ -1,4 +1,4 @@
-/* ucentsv */
+/* ucentsv SUPPORT */
 /* lang=C++20 */
 
 /* UCENTSV object management */
@@ -78,6 +78,9 @@ static int si_copystr(SI *,char **,cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

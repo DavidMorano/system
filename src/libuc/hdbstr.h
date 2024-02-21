@@ -1,4 +1,4 @@
-/* hdbstr */
+/* hdbstr HEADER */
 /* lang=C20 */
 
 /* Key-Value Hash DataBase for Strings */
@@ -20,6 +20,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<hdb.h>
 #include	<localmisc.h>
 

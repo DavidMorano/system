@@ -50,7 +50,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
@@ -69,6 +69,12 @@
 #else
 #define	F_GETSVXXXR	0
 #endif
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -107,6 +113,9 @@ constexpr bool		f_darwin = F_DARWIN ;
 constexpr bool		f_linux = F_LINUX ;
 
 constexpr bool		f_getsvxxxr = F_GETSVXXXR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

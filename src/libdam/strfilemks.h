@@ -1,4 +1,4 @@
-/* strfilemks */
+/* strfilemks HEADER */
 /* lang=C20 */
 
 /* make a STRFILE database */
@@ -11,8 +11,10 @@
 #define	STRFILEMKS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -46,34 +48,30 @@ struct strfilemks_imap {
 } ;
 
 struct strfilemks_head {
-	uint		magic ;
-	const char 	*dbname ;
-	const char	*idname ;
+	cchar 		*dbname ;
+	cchar		*idname ;
 	char		*nfname ;
 	void		*recorder ;
 	void		*idx ;
 	STRFILEMKS_IMAP	imap ;
 	STRFILEMKS_FL	f ;
-	mode_t		om ;
 	gid_t		gid ;
+	uint		magic ;
 	int		pagesize ;
 	int		nstrs ;
 	int		nfd ;
+	mode_t		om ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	strfilemks_open(STRFILEMKS *,const char *,int,mode_t,int) ;
-extern int	strfilemks_addfile(STRFILEMKS *,const char *,int) ;
-extern int	strfilemks_abort(STRFILEMKS *) ;
-extern int	strfilemks_chgrp(STRFILEMKS *,gid_t) ;
-extern int	strfilemks_close(STRFILEMKS *) ;
+extern int	strfilemks_open(STRFILEMKS *,cchar *,int,mode_t,int) noex ;
+extern int	strfilemks_addfile(STRFILEMKS *,cchar *,int) noex ;
+extern int	strfilemks_abort(STRFILEMKS *) noex ;
+extern int	strfilemks_chgrp(STRFILEMKS *,gid_t) noex ;
+extern int	strfilemks_close(STRFILEMKS *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRFILEMKS_INCLUDE */

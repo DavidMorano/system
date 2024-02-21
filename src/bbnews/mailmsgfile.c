@@ -633,7 +633,7 @@ int		f_cont ;
 
 	        } else {
 	            f_eol = TRUE ;
-	            rs = filebuf_print(fbp,outbuf,olen) ;
+	            rs = filebuf_println(fbp,outbuf,olen) ;
 	            wlen += rs ;
 	        }
 

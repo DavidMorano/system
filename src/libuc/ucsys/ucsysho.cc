@@ -68,6 +68,9 @@
 #define	HO	HOSTENT
 
 
+/* local namespaces */
+
+
 /* local typedefs */
 
 
@@ -84,6 +87,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

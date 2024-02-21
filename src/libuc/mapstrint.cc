@@ -73,7 +73,7 @@ static int	cmpentry(cchar *,cchar *,int) noex ;
 int mapstrint_start(MSI *dbp,int nitems) noex {
 	int		rs ;
 
-	rs = hdb_start(dbp,nitems,0,NULL,NULL) ;
+	rs = hdb_start(dbp,nitems,0,nullptr,nullptr) ;
 
 	return rs ;
 }
@@ -123,7 +123,7 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 	int		size ;
 	int		*ip ;
 
-	if ((klen > 0) && (kstr == NULL))
+	if ((klen > 0) && (kstr == nullptr))
 	    return SR_INVALID ;
 
 #if	CF_STRNLEN
@@ -157,7 +157,7 @@ int mapstrint_add(MSI *dbp,cchar *kstr,int klen,int ival) noex {
 int mapstrint_already(MSI *op,cchar *kstr,int klen) noex {
 	int		rs ;
 	int		v ;
-	if ((rs = mapstrint_fetch(op,kstr,klen,NULL,&v)) >= 0) {
+	if ((rs = mapstrint_fetch(op,kstr,klen,nullptr,&v)) >= 0) {
 	    rs = (v & INT_MAX) ;
 	}
 	return rs ;
@@ -169,20 +169,17 @@ int mapstrint_enum(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	hdb_dat		val ;
 	int		rs ;
 	int		klen = 0 ;
-
-	if (kpp != NULL)
-	    *kpp = NULL ;
-
+	if (kpp) *kpp = nullptr ;
 	if ((rs = hdb_enum(dbp,curp,&key,&val)) >= 0) {
 	    klen = key.len ;
-	    if (kpp != NULL)
+	    if (kpp) {
 	        *kpp = (char *) key.buf ;
-	    if (vp != NULL) {
+	    }
+	    if (vp) {
 	        int	*ip = (int *) val.buf ;
 	        *vp = *ip ;
 	    }
 	} /* end if (hdb_enum) */
-
 	return (rs >= 0) ? klen : rs ;
 }
 /* end subroutine (mapstrint_enum) */
@@ -202,7 +199,7 @@ int mapstrint_fetch(MSI *dbp,cchar *kstr,int klen,cur *curp,int *vp) noex {
 	key.buf = kstr ;
 	key.len = klen ;
 	if ((rs = hdb_fetch(dbp,key,curp,&val)) >= 0) {
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        int	*ip = (int *) val.buf ;
 	        *vp = *ip ;
 	    }
@@ -229,14 +226,14 @@ int mapstrint_fetchrec(MSI *dbp,cc *kstr,int klen,cur *curp,
 	key.buf = kstr ;
 	key.len = klen ;
 
-	if (kpp != NULL)
-	    *kpp = NULL ;
+	if (kpp != nullptr)
+	    *kpp = nullptr ;
 
 	if ((rs = hdb_fetchrec(dbp,key,curp,&rkey,&val)) >= 0) {
-	    if (kpp != NULL) {
+	    if (kpp != nullptr) {
 	        *kpp = (char *) rkey.buf ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        int	*ip = (int *) val.buf ;
 	        *vp = *ip ;
 	    }
@@ -252,15 +249,15 @@ int mapstrint_getrec(MSI *dbp,cur *curp,cchar **kpp,int *vp) noex {
 	int		rs ;
 	int		klen = 0 ;
 
-	if (kpp != NULL)
-	    *kpp = NULL ;
+	if (kpp != nullptr)
+	    *kpp = nullptr ;
 
 	if ((rs = hdb_getrec(dbp,curp,&key,&val)) >= 0) {
 	    klen = key.len ;
-	    if (kpp != NULL) {
+	    if (kpp != nullptr) {
 	        *kpp = (char *) key.buf ;
 	    }
-	    if (vp != NULL) {
+	    if (vp != nullptr) {
 	        int	*ip = (int *) val.buf ;
 	        *vp = *ip ;
 	    }
@@ -284,7 +281,7 @@ int mapstrint_nextkey(MSI *dbp,cchar *kstr,int klen,mapstrint_cur *curp) noex {
 	hdb_dat		key ;
 	int		rs ;
 
-	if (kstr == NULL) return SR_FAULT ;
+	if (kstr == nullptr) return SR_FAULT ;
 
 #if	CF_STRNLEN
 	klen = strnlen(kstr,klen) ;
@@ -362,7 +359,7 @@ int mapstrint_delcur(MSI *dbp,mapstrint_cur *curp,int f_adv) noex {
 	if ((rs = hdb_getrec(dbp,curp,&key,&val)) >= 0) {
 	    char	*ep = (char *) val.buf ;
 	    rs = hdb_delcur(dbp,curp,f_adv)  ;
-	    if ((rs >= 0) && (ep != NULL)) {
+	    if ((rs >= 0) && (ep != nullptr)) {
 	        uc_free(ep) ;
 	    }
 	} /* end if */
@@ -387,7 +384,7 @@ int mapstrint_setval(MSI *dbp,mapstrint_cur *curp,int ival) noex {
 	int		rs ;
 	int		kl = 0 ;
 
-	if (curp == NULL) return SR_INVALID ;
+	if (curp == nullptr) return SR_INVALID ;
 
 	if ((rs = hdb_getrec(dbp,curp,&key,&val)) >= 0) {
 	    int	*ip = (int *) val.buf ;

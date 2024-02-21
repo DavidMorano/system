@@ -154,7 +154,7 @@ int outema_finish(OUTEMA *ldp)
 	if (ldp->ofp == NULL) return SR_FAULT ;
 
 	if (ldp->llen > 0) {
-	    rs = filebuf_print(ldp->ofp,NULL,0) ;
+	    rs = filebuf_println(ldp->ofp,NULL,0) ;
 	    ldp->wlen += rs ;
 	    ldp->rlen = ldp->maxlen ;
 	    ldp->llen = 0 ;
@@ -423,7 +423,7 @@ int outema_hdrkey(OUTEMA *ldp,cchar kname[])
 	if (kname[0] == '\0') return SR_INVALID ;
 
 	if ((rs >= 0) && (ldp->llen > 0)) {
-	    rs = filebuf_print(ldp->ofp,kname,0) ;
+	    rs = filebuf_println(ldp->ofp,kname,0) ;
 	    wlen += rs ;
 	    ldp->llen = 0 ;
 	    ldp->rlen = ldp->maxlen ;

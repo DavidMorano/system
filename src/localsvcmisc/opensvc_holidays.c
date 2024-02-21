@@ -203,7 +203,7 @@ const char	*query ;
 		        if (vl == SR_NOTFOUND) break ;
 			rs = vl ;
 			if (rs >= 0) {
-			    rs = filebuf_print(fbp,vbuf,vl) ;
+			    rs = filebuf_println(fbp,vbuf,vl) ;
 			    wlen += rs ;
 			}
 		    } /* end while */

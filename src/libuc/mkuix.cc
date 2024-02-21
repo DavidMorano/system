@@ -27,7 +27,7 @@
 	contained in the USERINFO object.
 
 	Synopsis:
-	int uiname(char *rbuf,int rlen,usernfo *uip) noex
+	int mkuiname(char *rbuf,int rlen,usernfo *uip) noex
 
 	Arguments:
 	rbuf		supplied result buffer
@@ -40,14 +40,14 @@
 
 
 	Name:
-	uibang
+	mkuibang
 
 	Description:
 	This subroutine create a name that combines the nodename
 	and the username into a "bangname."
 
 	Synopsis:
-	int uibang(char *nbuf,int nlen,USERINFO *uip) noex
+	int mkuibang(char *nbuf,int nlen,USERINFO *uip) noex
 
 	Arguments:
 	nbuf		buffer to receive resulting name

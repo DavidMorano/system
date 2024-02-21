@@ -53,7 +53,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
@@ -123,6 +123,9 @@ constexpr bool		f_darwin = F_DARWIN ;
 constexpr bool		f_linux = F_LINUX ;
 
 constexpr bool		f_gethoxxxr = F_GETHOXXXR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
