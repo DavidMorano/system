@@ -216,7 +216,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	                        rs = mkpath1(rbuf,dir) ;
 			        rl = rs ;
 	                    }
-	                }
+	                } /* end if (ok) */
 	                rs1 = uc_libfree(pwbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */

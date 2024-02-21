@@ -204,7 +204,7 @@ static int subinfo_start(SUBINFO *sip,cchar *un) noex {
 	sip->uid = -1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	    cint	pwlen = rs ;
-	    char	*pwbuf ;
+	    char	*pwbuf{} ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
