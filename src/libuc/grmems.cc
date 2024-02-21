@@ -36,7 +36,6 @@
 	be hacked in later (as indeed it turns out that object is
 	appropriate) if you want to make the code look cleaner.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -75,7 +74,6 @@
 
 #define	GRMEMS_DEFMAX		20	/* default maximum entries */
 #define	GRMEMS_DEFTTL		(10*60)	/* default time-to-live */
-#define	GRMEMS_SYSPASSWD	"/sys/passwd"
 
 #define	GRMEMS_REC		struct grmems_r
 #define	GRMEMS_USER		struct grmems_u
@@ -198,7 +196,7 @@ static int	grmems_mkugstore(grmems *,time_t,vecelem *) noex ;
 
 static int	grmems_recusers(grmems *,time_t,vecelem *,gid_t) noex ;
 
-static int	grmems_pwmapbegin(grmems *,time_t) noex ;
+static int	grmems_pwmapbegin(grmems *,time_t,cchar *) noex ;
 static int	grmems_pwmapend(grmems *) noex ;
 
 static int record_start(grmems_rec *,time_t,int,vecelem *,GROUP *) noex ;
@@ -710,43 +708,46 @@ static int grmems_mkug(grmems *op,time_t dt) noex {
 /* end subroutine (grmems_mkug) */
 
 static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
+	const nullptr_t	np{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = grmems_pwmapbegin(op,dt)) >= 0) {
-	    int		ml = op->fsize ;
-	    cchar	*mp = charp(op->mapdata) ;
-	    cchar	*tp ;
-	    op->ti_access = dt ;
-	    while ((tp = strnchr(mp,ml,CH_NL)) != nullptr) {
-	        gid_t	gid{} ;
-	        int	len = (tp-mp) ;
-	        if ((rs = pwentparse(mp,len,&gid)) > 0) {
-	            GRMEMS_USERGID	ug ;
-		    cint		ul = rs ;
-	            if (usergid_load(&ug,mp,ul,gid) > 0) {
-	                c += 1 ;
-	                rs = vecelem_add(ulp,&ug) ;
-	            }
-	        } /* end if (pwentparse) */
-	        ml -= ((tp+1)-mp) ;
-	        mp = (tp+1) ;
-	        if (rs < 0) break ;
-	    } /* end while (reading lines) */
-	    rs1 = grmems_pwmapend(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (grmems-pwmap) */
+	if (cchar *fn{} ; (rs = sysdbfnameget(sysdbfile_pw,np,&fn)) >= 0) {
+	    if ((rs = grmems_pwmapbegin(op,dt,fn)) >= 0) {
+	        int	ml = op->fsize ;
+	        cchar	*mp = charp(op->mapdata) ;
+	        cchar	*tp ;
+	        op->ti_access = dt ;
+	        while ((tp = strnchr(mp,ml,CH_NL)) != np) {
+	            gid_t	gid{} ;
+	            cint	len = (tp-mp) ;
+	            if ((rs = pwentparse(mp,len,&gid)) > 0) {
+	                GRMEMS_USERGID	ug ;
+		        cint		ul = rs ;
+	                if (usergid_load(&ug,mp,ul,gid) > 0) {
+	                    c += 1 ;
+	                    rs = vecelem_add(ulp,&ug) ;
+	                }
+	            } /* end if (pwentparse) */
+	            ml -= ((tp+1)-mp) ;
+	            mp = (tp+1) ;
+	            if (rs < 0) break ;
+	        } /* end while (reading lines) */
+	        rs1 = grmems_pwmapend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (grmems-pwmap) */
+	} /* end if (sysdbfname_pw) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (grmems_mkugload) */
 
 static int grmems_mkugstore(grmems *op,time_t dt,vecelem *ulp) noex {
 	int		rs ;
+	int		sz ;
 	int		c = 0 ;
 	if ((rs = vecelem_count(ulp)) >= 0) {
 	    cint	esize = sizeof(GRMEMS_USERGID) ;
 	    cint	n = rs ;
-	    int		sz ;
 	    void	*vp{} ;
 	    sz = ((n+1) * esize) ;
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
@@ -856,14 +857,13 @@ static int grmems_upstats(grmems *op,int ct,int rs) noex {
 }
 /* end subroutine (grmems_upstats) */
 
-static int grmems_pwmapbegin(grmems *op,time_t dt) noex {
+static int grmems_pwmapbegin(grmems *op,time_t dt,cchar *fn) noex {
 	const nullptr_t	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata == nullptr) {
 	    cint		of = O_RDONLY ;
 	    cmode		om = 0666 ;
-	    cchar		*fn = GRMEMS_SYSPASSWD ;
 	    if ((rs = uc_open(fn,of,om)) >= 0) {
 	        op->fd = rs ;
 	        op->ti_open = dt ;
@@ -874,7 +874,7 @@ static int grmems_pwmapbegin(grmems *op,time_t dt) noex {
 	            int		fd = op->fd ;
 	            void	*md{} ;
 	            op->fsize = rs ;
-	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                cint		madv = MADV_SEQUENTIAL ;
 			const caddr_t	ma = caddr_t(md) ;
 	                if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
@@ -882,7 +882,7 @@ static int grmems_pwmapbegin(grmems *op,time_t dt) noex {
 	                    op->mapsize = ms ;
 	                } /* end if (advise) */
 	                if (rs < 0) {
-	                    u_munmap(md,ms) ;
+	                    u_mmapend(md,ms) ;
 	                }
 	            } /* end if (mmap) */
 	        } /* end if (file-size) */
@@ -901,7 +901,7 @@ static int grmems_pwmapend(grmems *op) noex {
 	if (op->mapdata != nullptr) {
 	    csize	ms = op->mapsize ;
 	    void	*md = op->mapdata ;
-	    rs1 = u_munmap(md,ms) ;
+	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
