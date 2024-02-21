@@ -59,7 +59,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -91,7 +91,7 @@ int mkdisphdr(char *abuf,int alen,cchar *sp,int sl) noex {
 	        char	*fbuf ;
 	        if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	            if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-			nullptr_t	np{} ;
+			const nullptr_t	np{} ;
 	                cchar		*fp = fbuf ;
 	                int		fl ;
 	                int		c = 0 ;

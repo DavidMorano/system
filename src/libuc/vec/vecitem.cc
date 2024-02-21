@@ -42,7 +42,7 @@
 
 /* local namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -367,6 +367,7 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (op && cep && cf) {
+	    const nullptr_t	np{} ;
 	    rs = SR_OK ;
 	    if (op->f.osorted && (! op->f.issorted)) {
 	        op->f.issorted = true ;
@@ -377,7 +378,6 @@ int vecitem_search(vecitem *op,cvoid *cep,cmpf cf,void *vrp) noex {
 	        }
 	    } /* end if (sorting) */
 	    if (op->f.issorted) {
-		nullptr_t	np{} ;
 	        qsort_f	scf = qsort_f(cf) ;
 	        cint	ssz = sizeof(void *) ;
 	        void	**spp ;

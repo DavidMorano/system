@@ -1,22 +1,22 @@
-/* issue */
+/* issue SUPPORT */
+/* lang=C++20 */
 
 /* object to help and manage "issue" messages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_WRITETO	1		/* time out writes */
 #define	CF_ISSUEAUDIT	0		/* call 'issue_audit()' */
 #define	CF_MAPPERAUDIT	0		/* call 'mapper_audit()' */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
+#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
 	= 2003-10-01, David A­D­ Morano
-        This is a hack from numerous previous hacks (not enumerated here). This
-        is a new version of this hack that is entirely different (much simpler).
+	This is a hack from numerous previous hacks (not enumerated
+	here). This is a new version of this hack that is entirely
+	different (much simpler).
 
 */
 
@@ -24,35 +24,32 @@
 
 /*******************************************************************************
 
-        This object module writes the contents of various ISSUEs (as specified
-        by the caller) to an open file descriptor (also specified by the
-        caller).
+	This object module writes the contents of various ISSUEs
+	(as specified by the caller) to an open file descriptor
+	(also specified by the caller).
 
 	Implementation notes:
 
-        When processing, we time-out writes to the caller-supplied
-        file-descriptor because we don't know if it is a non-regular file that
-        might be flow-controlled. We don't wait forever for those sorts of
-        outputs. So let's say that the output is a terminal that is currently
-        flow-controlled. We will time-out on our writes and the user will not
-        get this whole ISSUE text!
-
+	When processing, we time-out writes to the caller-supplied
+	file-descriptor because we don't know if it is a non-regular
+	file that might be flow-controlled. We don't wait forever
+	for those sorts of outputs. So let's say that the output
+	is a terminal that is currently flow-controlled. We will
+	time-out on our writes and the user will not get this whole
+	ISSUE text!
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>
@@ -60,7 +57,7 @@
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getxusername.h>
 #include	<ptm.h>
 #include	<lockrw.h>
@@ -86,11 +83,11 @@
 #define	ISSUE_DIRSFNAME		"dirs"
 #define	ISSUE_MAPPERMAGIC	0x21367425
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #define	NDEBFNAME	"issue.deb"
 

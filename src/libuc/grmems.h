@@ -34,7 +34,6 @@
 #define	GRMEMS			struct grmems_head
 #define	GRMEMS_STATS		struct grmems_s
 #define	GRMEMS_CUR		struct grmems_c
-#define	GRMEMS_SYSPASSWD	"/sys/passwd"
 
 
 struct grmems_c {
@@ -56,12 +55,12 @@ struct grmems_head {
 	pq		*lrup ;		/* least-recently-used */
 	cvoid		*usergids ;
 	void		*mapdata ;
-	GRMEMS_STATS	s ;
 	size_t		mapsize ;
 	time_t		ti_check ;
 	time_t		ti_open ;
 	time_t		ti_access ;
 	time_t		ti_usergids ;
+	GRMEMS_STATS	s ;
 	uint		magic ;
 	uint		wcount ;	/* write-count */
 	int		pagesize ;

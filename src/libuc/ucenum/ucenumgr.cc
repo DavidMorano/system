@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
@@ -48,6 +48,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -71,7 +74,7 @@ constexpr sysdbfiles	w = sysdbfile_gr ;
 int ucenumgr_open(ucenumgr *op,cchar *efname) noex {
 	ucenumxxco<ucenumgr_ent>	ueo(op,mxx) ;
 	int		rs ;
-	if (cchar *rp ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
+	if (cchar *rp{} ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfnameget) */
 	return rs ;

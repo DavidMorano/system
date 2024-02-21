@@ -58,11 +58,11 @@ enum strlibvals {
 } ;
 
 class strlibval {
-	aflag		fmx ;
-	aflag		fready ;
 	cchar		*strp = nullptr ;
 	char		*a = nullptr ;
 	cint		w = -1 ;
+	aflag		fmx ;
+	aflag		fready ;
 	ccharp cook() noex ;
 	ccharp strtmpdir() noex ;
 	ccharp strmaildir() noex ;

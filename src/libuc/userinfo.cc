@@ -8,7 +8,7 @@
 #define	CF_UINFO	1		/* include |uinfo(3uc)| */
 #define	CF_UNAME	0		/* include |u_uname(3u)| */
 #define	CF_OLDUSERINFO	1		/* compile-in old |userinfo(3dam)| */
-#define	CF_UGETPW	0		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	0		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -75,13 +75,12 @@
 #include	<bits.h>
 #include	<strstore.h>
 #include	<getax.h>
-#include	<ugetpw.h>
 #include	<getxusername.h>
 #include	<gecos.h>
 #include	<userattr.h>
 #include	<uinfo.h>
 #include	<storeitem.h>
-#include	<ucentpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<filereadln.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -95,11 +94,11 @@
 #define	USERINFO_SYSV defined(SYSV)||(defined(OSTYPE_SYSV)&&(OSTYPE_SYSV>0))\
 	    ||defined(OSNAME_SunOS)&&(OSNAME_SunOS==1)
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #define	PROCINFO	struct procinfo
 #define	PROCINFO_FL	struct procinfo_flags

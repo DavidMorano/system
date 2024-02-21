@@ -64,6 +64,7 @@
 #include	<strdcpy.h>
 #include	<cfdec.h>
 #include	<strwcmp.h>
+#include	<sysdbfname.h>		/* |sysdbfnameget(3uc)| */
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -74,6 +75,7 @@
 
 #define	GRMEMS_DEFMAX		20	/* default maximum entries */
 #define	GRMEMS_DEFTTL		(10*60)	/* default time-to-live */
+#define	GRMEMS_SYSPASSWD	"/sys/passwd"
 
 #define	GRMEMS_REC		struct grmems_r
 #define	GRMEMS_USER		struct grmems_u
@@ -82,6 +84,7 @@
 
 /* local namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -143,7 +146,7 @@ template<typename ... Args>
 static int grmems_ctor(grmems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    memclear(op) ;		/* dangerous */
 	    rs = SR_NOMEM ;
 	    if ((op->lrup = new(nothrow) pq) != np) {
@@ -718,10 +721,9 @@ static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
 	    while ((tp = strnchr(mp,ml,CH_NL)) != nullptr) {
 	        gid_t	gid{} ;
 	        int	len = (tp-mp) ;
-	        int	ul ;
 	        if ((rs = pwentparse(mp,len,&gid)) > 0) {
 	            GRMEMS_USERGID	ug ;
-		    ul = rs ;
+		    cint		ul = rs ;
 	            if (usergid_load(&ug,mp,ul,gid) > 0) {
 	                c += 1 ;
 	                rs = vecelem_add(ulp,&ug) ;
@@ -855,6 +857,7 @@ static int grmems_upstats(grmems *op,int ct,int rs) noex {
 /* end subroutine (grmems_upstats) */
 
 static int grmems_pwmapbegin(grmems *op,time_t dt) noex {
+	const nullptr_t	np{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata == nullptr) {

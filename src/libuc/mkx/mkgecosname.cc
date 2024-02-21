@@ -114,7 +114,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -187,11 +187,11 @@ int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 /* end subroutine (mkgecosname) */
 
 int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
+	const nullptr_t	np{} ;
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
 	cchar		*cp = nullptr ;
 	if (gbuf) {
-	    nullptr_t	np{} ;
 	    cint	sch = CH_LPAREN ;
 	    cchar	*tp ;
 	    bool	f = true ;

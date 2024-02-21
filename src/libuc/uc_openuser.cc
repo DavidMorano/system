@@ -1,12 +1,11 @@
-/* uc_openuser */
+/* uc_openuser SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open a user file */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -19,24 +18,20 @@
 
 /*******************************************************************************
 
-        This subroutine opens a user file. This is a file that is relative
-        (under) a user-home directory.
-
+	This subroutine opens a user file. This is a file that is
+	relative (under) a user-home directory.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getxusername.h>
 #include	<opensysfs.h>
 #include	<localmisc.h>
@@ -45,7 +40,7 @@
 /* local defines */
 
 #if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UGETPW */
@@ -56,14 +51,16 @@
 extern int	snwcpy(char *,int,const char *,int) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 
+extern "C" {
+    int	uc_openuserbase(struct ucopeninfo *oip) noex ;
+    int	uc_openuserpath(struct ucopeninfo *oip) noex ;
+}
+
 
 /* local structures */
 
 
 /* forward references */
-
-int	uc_openuserbase(struct ucopeninfo *oip) ;
-int	uc_openuserpath(struct ucopeninfo *oip) ;
 
 
 /* local variables */
@@ -71,9 +68,7 @@ int	uc_openuserpath(struct ucopeninfo *oip) ;
 
 /* exported subroutines */
 
-
-int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to)
-{
+int uc_openuser(cchar *un,cchar *upath,int oflags,mode_t operms,int to) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;

@@ -1,5 +1,5 @@
-/* testugetpw */
-/* lang=C89 */
+/* testugetpw SUPPORT */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debugging memory-allocations */
@@ -13,11 +13,11 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<stdio.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 
 #define	VARDEBUGFNAME	"TESTUGETPW_DEBUGFILE"
 
@@ -28,11 +28,12 @@ extern int	debugclose() ;
 extern int	strlinelen(const char *,int,int) ;
 #endif
 
-extern cchar 	*getourenv(const char **,const char *) ;
+extern "C" {
+    extern cchar 	*getourenv(const char **,const char *) ;
+}
 
 
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 
 #if	CF_DEBUGS && CF_DEBUGMALL
 	uint		mo_start = 0 ;
@@ -40,7 +41,6 @@ int main(int argc,const char **argv,const char **envv)
 
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 
 #if	CF_DEBUGS
 	{
