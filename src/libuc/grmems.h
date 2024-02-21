@@ -1,26 +1,30 @@
-/* grmems */
+/* grmems HEADER */
+/* lang=C++20 */
+
+/* UNIX® group membership access and cache */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2004-08-27, David A­D­ Morano
-
 	Originally written for Rightcore Network Services.
-
 
 */
 
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GRMEMS_INCLUDE
-#define	GRMEMS_INCLUDE	1
+#define	GRMEMS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<pwd.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<recarr.h>
 #include	<pq.h>
 #include	<localmisc.h>		/* extra types */
 
@@ -48,49 +52,44 @@ struct grmems_s {
 } ;
 
 struct grmems_head {
-	uint		magic ;
-	void		*recs ;		/* linear array (of recs) */
+	recarr		*recs ;		/* linear array (of recs) */
+	pq		*lrup ;		/* least-recently-used */
+	cvoid		*usergids ;
+	void		*mapdata ;
 	GRMEMS_STATS	s ;
-	PQ		lru ;		/* least-recently-used */
-	const void	*usergids ;
-	const void	*mapdata ;
 	size_t		mapsize ;
 	time_t		ti_check ;
 	time_t		ti_open ;
 	time_t		ti_access ;
 	time_t		ti_usergids ;
+	uint		magic ;
 	uint		wcount ;	/* write-count */
 	int		pagesize ;
 	int		ttl ;		/* time-to-live */
-	int		max ;		/* maximum entries */
+	int		nmax ;		/* maximum entries */
 	int		cursors ;	/* cursors outstanding */
 	int		fd ;
 	int		fsize ;
 	int		nusergids ;
 } ;
 
+typedef GRMEMS		grmems ;
+typedef GRMEMS_CUR	grmems_cur ;
 
-#if	(! defined(GRMEMS_MASTER)) || (GRMEMS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int grmems_start(grmems *,int,int) noex ;
+extern int grmems_curbegin(grmems *,grmems_cur *) noex ;
+extern int grmems_lookup(grmems *,grmems_cur *,cchar *,int) noex ;
+extern int grmems_lookread(grmems *,grmems_cur *,char *,int) noex ;
+extern int grmems_curend(grmems *,grmems_cur *) noex ;
+extern int grmems_invalidate(grmems *,cchar *,int) noex ;
+extern int grmems_check(grmems *,time_t) noex ;
+extern int grmems_stats(grmems *,GRMEMS_STATS *) noex ;
+extern int grmems_finish(grmems *) noex ;
 
-extern int grmems_start(GRMEMS *,int,int) ;
-extern int grmems_curbegin(GRMEMS *,GRMEMS_CUR *) ;
-extern int grmems_lookup(GRMEMS *,GRMEMS_CUR *,const char *,int) ;
-extern int grmems_lookread(GRMEMS *,GRMEMS_CUR *,char *,int) ;
-extern int grmems_curend(GRMEMS *,GRMEMS_CUR *) ;
-extern int grmems_invalidate(GRMEMS *,const char *,int) ;
-extern int grmems_check(GRMEMS *,time_t) ;
-extern int grmems_stats(GRMEMS *,GRMEMS_STATS *) ;
-extern int grmems_finish(GRMEMS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* GRMEMS_MASTER */
 
 #endif /* GRMEMS_INCLUDE */
 
