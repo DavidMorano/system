@@ -286,10 +286,9 @@ int ucpwcache::name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		len = 0 ;
 	if (pwp && pwbuf && un) {
 	    memclear(pwp) ;		/* <- noted */
-	    if ((rs = init()) >= 0) {
-	        if ((rs = capbegin(-1)) >= 0) {
-	            if (pwc == nullptr) rs = opbegin() ;
-	            if (rs >= 0) {
+	    if ((rs = init) >= 0) {
+	        if ((rs = capbegin) >= 0) {
+	            if ((rs = opcheck) >= 0) {
 	                pwcache		*pwcp = (pwcache *) pwc ;
 	                rs = pwcache_lookup(pwcp,pwp,pwbuf,pwlen,un) ;
 	                len = rs ;
@@ -310,9 +309,8 @@ int ucpwcache::uid(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	if (pwp && pwbuf) {
 	    memclear(pwp) ;		/* <- noted */
 	    if ((rs = init()) >= 0) {
-	        if ((rs = capbegin(-1)) >= 0) {
-	            if (pwc == nullptr) rs = opbegin() ;
-	            if (rs >= 0) {
+	        if ((rs = capbegin) >= 0) {
+	            if ((rs = opcheck) >= 0) {
 	                pwcache		*pwcp = (pwcache *) pwc ;
 	                rs = pwcache_uid(pwcp,pwp,pwbuf,pwlen,uid) ;
 	                len = rs ;
@@ -333,9 +331,8 @@ int ucpwcache::stats(ucpwcache_st *usp) noex {
 	if (usp) {
 	    memclear(usp) ;		/* dangerous */
 	    if ((rs = init()) >= 0) {
-	        if ((rs = capbegin(-1)) >= 0) {
-	            if (pwc == nullptr) rs = opbegin() ;
-	            if (rs >= 0) {
+	        if ((rs = capbegin) >= 0) {
+	            if ((rs = opcheck) >= 0) {
 	                pwcache_st	s{} ;
 	                if ((rs = pwcache_stats(pwc,&s)) >= 0) {
 	                    usp->nmax = nmax ;
@@ -394,7 +391,7 @@ int ucpwcache::icapend() noex {
 
 int ucpwcache::iopcheck() noex {
 	int		rs = SR_OK ;
-	if (pwc) {
+	if (!pwc) {
 	    rs = iopbegin() ;
 	}
 	return rs ;
