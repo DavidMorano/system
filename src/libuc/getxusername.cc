@@ -6,7 +6,7 @@
 
 #define	CF_UTMPACC	1		/* use |utmpacc(3uc)| */
 #define	CF_GETUTMPNAME	1		/* use |getutmpname(3dam)| */
-#define	CF_UGETPW	0		/* use |ucgetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ucgetpw(3uc)| */
 
 /* revision history:
 
@@ -80,7 +80,7 @@
 
 	Returns:
 	>=0		length of resulting username
-	<0		error
+	<0		error (system-return)
 
 	Notes:
 
@@ -127,8 +127,9 @@
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<varnames.hh>
-#include	<ucgetpid.h>
 #include	<getbufsize.h>
+#include	<ucgetpid.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<vecstr.h>
 #include	<getax.h>
 #include	<ucproguser.h>
@@ -147,13 +148,13 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ucgetpw_name
-#define	GETPW_UID	ucgetpw_uid
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
+#define	GETPW_UID	ucpwcache_uid
 #else
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #define	GETXSTATE	struct getxusername_state
 
