@@ -1,4 +1,4 @@
-/* MSI SUPPORT */
+/* mapstrint SUPPORT */
 /* lang=C++20 */
 
 /* Map (database) for String-Integer pairs */
@@ -24,7 +24,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<climits>		/* |INT_MAX}| */
+#include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
