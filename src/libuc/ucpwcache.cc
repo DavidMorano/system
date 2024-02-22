@@ -57,6 +57,7 @@
 #include	<sys/param.h>
 #include	<csignal>
 #include	<cstring>
+#include	<atomic>		/* |atomic_int(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>		/* |memclear(3u)| */
 #include	<timewatch.hh>
@@ -72,6 +73,8 @@
 
 
 /* local namespaces */
+
+using std::atomic_int ;			/* type */
 
 
 /* local typedefs */
@@ -93,7 +96,7 @@ enum ucpwcachecos {
 	ucpwcacheco_opcheck,
 	ucpwcacheco_opbegin,
 	ucpwcacheco_opend,
-	ucpwcacheco_overlast,
+	ucpwcacheco_overlast
 } ;
 
 namespace {
@@ -105,32 +108,45 @@ namespace {
 	    op = p ;
 	    w = aw ;
 	}
-	operator int () noex ;
-	operator () (int = -1) noex ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return (*this)() ;
+	} ;
     } ;
     struct ucpwcache {
 	ptm		mx ;		/* data mutex */
 	ptc		cv ;		/* condition variable */
 	pwcache		*pwc ;		/* PW cache (allocated) */
-	pcpwcache_co	check ;
+	ucpwcache_co	init ;
+	ucpwcache_co	fini ;
+	ucpwcache_co	opcheck ;
+	ucpwcache_co	opbegin ;
+	ucpwcache_co	opend ;
+	ucpwcache_co	capbegin ;
+	ucpwcache_co	capend ;
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
 	aflag		fcapture ;	/* capture flag */
-	aflag		waiters ;
+	atomic_int	waiters ;
 	int		nmax ;		/* max entries */
 	int		ttl ;
 	ucpwcache() noex {
-	    opcheck(this,ucpwcacheco_check) ;
+	    init(this,ucpwcacheco_init) ;
+	    fini(this,ucpwcacheco_fini) ;
+	    opcheck(this,ucpwcacheco_opcheck) ;
+	    opbegin(this,ucpwcacheco_opbegin) ;
+	    opend(this,ucpwcacheco_opend) ;
+	    capbegin(this,ucpwcacheco_capbegin) ;
+	    capend(this,ucpwcacheco_capend) ;
 	} ;
-	int	init() noex ;
-	int	fini() noex ;
-	int	capbegin(int) noex ;
-	int	capend() noex ;
-	int	begin() noex ;
-	int	end() noex ;
-	int	capbegin(int) noex ;
-	int	capend() noex ;
+	int	iinit() noex ;
+	int	ifini() noex ;
+	int	icapbegin(int) noex ;
+	int	icapend() noex ;
+	int	iopcheck() noex ;
+	int	iopbegin() noex ;
+	int	iopend() noex ;
 	int	name(PASSWD *,char *,int,cchar *) noex ;
 	int	uid(PASSWD *,char *,int,uid_t) noex ;
 	int	stats(ucpwcache_st *) noex ;
@@ -186,7 +202,7 @@ int ucpwcache_stats(ucpwcache_st *usp) noex {
 
 /* local subroutines */
 
-int ucpwcache::init() noex {
+int ucpwcache::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! fvoid) {
@@ -233,14 +249,14 @@ int ucpwcache::init() noex {
 	} /* end if (not voided) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end method (ucpwcache::init) */
+/* end method (ucpwcache::iinit) */
 
-int ucpwcache::fini() noex {
+int ucpwcache::ifini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
 	    if (pwc) {
-	        rs1 = end() ;
+	        rs1 = opend() ;
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    {
@@ -262,17 +278,17 @@ int ucpwcache::fini() noex {
 	} /* end if (was initialized) */
 	return rs ;
 }
-/* end method (ucpwcache::fini) */
+/* end method (ucpwcache::ifini) */
 
 int ucpwcache::name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
 	if (pwp && pwbuf && un) {
-	    memclear(pwp) ;
+	    memclear(pwp) ;		/* <- noted */
 	    if ((rs = init()) >= 0) {
 	        if ((rs = capbegin(-1)) >= 0) {
-	            if (pwc == nullptr) rs = begin() ;
+	            if (pwc == nullptr) rs = opbegin() ;
 	            if (rs >= 0) {
 	                pwcache		*pwcp = (pwcache *) pwc ;
 	                rs = pwcache_lookup(pwcp,pwp,pwbuf,pwlen,un) ;
@@ -292,10 +308,10 @@ int ucpwcache::uid(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (pwp && pwbuf) {
-	    memclear(pwp) ;
+	    memclear(pwp) ;		/* <- noted */
 	    if ((rs = init()) >= 0) {
 	        if ((rs = capbegin(-1)) >= 0) {
-	            if (pwc == nullptr) rs = begin() ;
+	            if (pwc == nullptr) rs = opbegin() ;
 	            if (rs >= 0) {
 	                pwcache		*pwcp = (pwcache *) pwc ;
 	                rs = pwcache_uid(pwcp,pwp,pwbuf,pwlen,uid) ;
@@ -318,11 +334,10 @@ int ucpwcache::stats(ucpwcache_st *usp) noex {
 	    memclear(usp) ;		/* dangerous */
 	    if ((rs = init()) >= 0) {
 	        if ((rs = capbegin(-1)) >= 0) {
-	            if (pwc == nullptr) rs = begin() ;
+	            if (pwc == nullptr) rs = opbegin() ;
 	            if (rs >= 0) {
-	                pwcache		*pwcp = (ucpwcache *) pwc ;
-	                ucpwcache_st	s{} ;
-	                if ((rs = pwcache_stats(pwcp,&s)) >= 0) {
+	                pwcache_st	s{} ;
+	                if ((rs = pwcache_stats(pwc,&s)) >= 0) {
 	                    usp->nmax = nmax ;
 	                    usp->ttl = ttl ;
 	                    usp->nent = s.nentries ;
@@ -343,13 +358,13 @@ int ucpwcache::stats(ucpwcache_st *usp) noex {
 }
 /* end subroutine (ucpwcache_stats) */
 
-int ucpwcache::capbegin(int to) noex {
+int ucpwcache::icapbegin(int to) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin(to)) >= 0) {
 	    waiters += 1 ;
 	    while ((rs >= 0) && fcapture) { /* busy */
-	        rs = cv.waiter(&mx,to) ;
+	        rs = cv.wait(&mx,to) ;
 	    } /* end while */
 	    if (rs >= 0) {
 	        fcapture = true ;
@@ -360,9 +375,9 @@ int ucpwcache::capbegin(int to) noex {
 	} /* end if (ptm) */
 	return rs ;
 }
-/* end method (ucpwcache::capbegin) */
+/* end method (ucpwcache::icapbegin) */
 
-int ucpwcache::capend() noex {
+int ucpwcache::icapend() noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = mx.lockbegin) >= 0) {
@@ -375,21 +390,30 @@ int ucpwcache::capend() noex {
 	} /* end if (ptm) */
 	return rs ;
 }
-/* end method (ucpwcache::capend) */
+/* end method (ucpwcache::icapend) */
 
-int ucpwcache::begin() noex {
+int ucpwcache::iopcheck() noex {
+	int		rs = SR_OK ;
+	if (pwc) {
+	    rs = iopbegin() ;
+	}
+	return rs ;
+}
+/* end method (ucpwcache::iopcheck) */
+
+int ucpwcache::iopbegin() noex {
 	int		rs = SR_OK ;
 	if (pwc == nullptr) {
 	    cint	esz = sizeof(ucpwcache) ;
 	    void	*vp{} ;
 	    if ((rs = uc_libmalloc(esz,&vp)) >= 0) {
-	        cint		nmax = UCPWCACHE_MAX ;
-	        cint		ttl = UCPWCACHE_TTL ;
-	        ucpwcache	*pwcp = (ucpwcache *) vp ;
-	        if ((rs = ucpwcache_start(pwcp,nmax,ttl)) >= 0) {
+	        cint		amax = UCPWCACHE_MAX ;
+	        cint		attl = UCPWCACHE_TTL ;
+	        pwcache		*pwcp = (pwcache *) vp ;
+	        if ((rs = pwcache_start(pwcp,amax,attl)) >= 0) {
 	            pwc = pwcp ;
-	            nmax = nmax ;
-	            ttl = ttl ;
+	            nmax = amax ;
+	            ttl = attl ;
 		}
 	        if (rs < 0) {
 	            uc_libfree(vp) ;
@@ -398,9 +422,9 @@ int ucpwcache::begin() noex {
 	} /* end if (needed initialization) */
 	return rs ;
 }
-/* end method (ucpwcache::begin) */
+/* end method (ucpwcache::iopbegin) */
 
-int ucpwcache::end() noex {
+int ucpwcache::iopend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (pwc != nullptr) {
@@ -417,7 +441,7 @@ int ucpwcache::end() noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ucpwcache_end) */
+/* end method (ucpwcache::iopend) */
 
 static void ucpwcache_atforkbefore() noex {
 	ucpwcache_data.capbegin(-1) ;
@@ -436,5 +460,36 @@ static void ucpwcache_exit() noex {
 	}
 }
 /* end subroutine (ucpwcache_exit) */
+
+int ucpwcache_co::operator () (int a) noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case ucpwcacheco_init:
+		rs = op->iinit() ;
+		break ;
+	    case ucpwcacheco_fini:
+		rs = op->ifini() ;
+		break ;
+	    case ucpwcacheco_capbegin:
+		rs = op->icapbegin(a) ;
+		break ;
+	    case ucpwcacheco_capend:
+		rs = op->icapend() ;
+		break ;
+	    case ucpwcacheco_opcheck:
+		rs = op->iopcheck() ;
+		break ;
+	    case ucpwcacheco_opbegin:
+		rs = op->iopbegin() ;
+		break ;
+	    case ucpwcacheco_opend:
+		rs = op->iopend() ;
+		break ;
+	    } /* end switch */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (ucpwcache::operator) */
 
 
