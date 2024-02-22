@@ -66,7 +66,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<cstdlib>
@@ -95,9 +95,9 @@
 
 /* namespaces */
 
-using std::sort ;			/* actor */
-using std::min ;			/* actor */
 using std::nullptr_t ;			/* type */
+using std::sort ;			/* subroutine-template */
+using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -755,7 +755,7 @@ int vecpstr_getvec(vecpstr *op,mainv *rppp) noex {
 static int vecpstr_ctor(vecpstr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->c = 0 ;

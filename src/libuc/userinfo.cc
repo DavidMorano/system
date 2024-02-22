@@ -4,11 +4,10 @@
 /* get user information from various databases */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_UINFO	1		/* include |uinfo(3uc)| */
 #define	CF_UNAME	0		/* include |u_uname(3u)| */
 #define	CF_OLDUSERINFO	1		/* compile-in old |userinfo(3dam)| */
-#define	CF_UGETPW	0		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	0		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -75,13 +74,12 @@
 #include	<bits.h>
 #include	<strstore.h>
 #include	<getax.h>
-#include	<ugetpw.h>
 #include	<getxusername.h>
 #include	<gecos.h>
 #include	<userattr.h>
 #include	<uinfo.h>
 #include	<storeitem.h>
-#include	<ucentpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<filereadln.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -95,11 +93,11 @@
 #define	USERINFO_SYSV defined(SYSV)||(defined(OSTYPE_SYSV)&&(OSTYPE_SYSV>0))\
 	    ||defined(OSNAME_SunOS)&&(OSNAME_SunOS==1)
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #define	PROCINFO	struct procinfo
 #define	PROCINFO_FL	struct procinfo_flags
@@ -246,11 +244,6 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -310,7 +303,7 @@ struct procinfo {
 	BITS		have ;
 	UINFO_NAME	unixinfo ;
 	USERINFO	*uip ;		/* supplied argument */
-	STRSTORE	*stp ;		/* supplied argument */
+	strstore	*stp ;		/* supplied argument */
 	int		*sis ;		/* supplied argument */
 	cchar		*username ;	/* supplied argument */
 	cchar		*a ;		/* the memory allocation */
@@ -327,15 +320,15 @@ struct procinfo {
 
 /* forward references */
 
-static int	userinfo_process(UI *,STRSTORE *,int *,cchar *) noex ;
+static int	userinfo_process(UI *,strstore *,int *,cchar *) noex ;
 static int	userinfo_id(UI *uip) noex ;
-static int	userinfo_load(UI *,STRSTORE *,int *) noex ;
+static int	userinfo_load(UI *,strstore *,int *) noex ;
 
 #ifdef	COMMENT
 static int	userinfo_setnuls(UI *,cchar *) noex ;
 #endif
 
-static int	procinfo_start(PROCINFO *,UI *,STRSTORE *,int *) noex ;
+static int	procinfo_start(PROCINFO *,UI *,strstore *,int *) noex ;
 static int	procinfo_finish(PROCINFO *) noex ;
 static int 	procinfo_find(PROCINFO *,cchar *) noex ;
 static int	procinfo_pwentry(PROCINFO *,cchar *) noex ;
@@ -437,7 +430,7 @@ int userinfo_start(UI *uip,cchar *username) noex {
 	    cint	size = (uit_overlast * sizeof(cchar *)) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        STRSTORE	st ;
+	        strstore	st ;
 	        int		*sis = (int *) p ;
 
 	        memset(p,0,size) ;
@@ -458,10 +451,6 @@ int userinfo_start(UI *uip,cchar *username) noex {
 	    if (rs >= 0) uip->magic = USERINFO_MAGIC ;
 	} /* end if (userinfo_id) */
 
-#if	CF_DEBUGS
-	debugprintf("userinfo_start: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (userinfo_start) */
@@ -469,10 +458,6 @@ int userinfo_start(UI *uip,cchar *username) noex {
 int userinfo_finish(UI *uip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("userinfo_finish: ent\n") ;
-#endif
 
 	if (uip == nullptr) return SR_FAULT ;
 
@@ -484,10 +469,6 @@ int userinfo_finish(UI *uip) noex {
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("userinfo_finish: ret rs=%d\n",rs) ;
-#endif
-
 	uip->magic = 0 ;
 	return rs ;
 }
@@ -496,7 +477,7 @@ int userinfo_finish(UI *uip) noex {
 
 /* local subroutines */
 
-static int userinfo_process(UI *uip,STRSTORE *stp,int *sis,cchar *un) noex {
+static int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	PROCINFO	pi ;
 	int		rs ;
 	int		rs1 ;
@@ -509,10 +490,6 @@ static int userinfo_process(UI *uip,STRSTORE *stp,int *sis,cchar *un) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (procinfo) */
 
-#if	CF_DEBUGS
-	debugprintf("userinfo_process: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (userinfo_process) */
@@ -524,10 +501,10 @@ static int userinfo_id(UI *uip)
 	uip->pid = ugetpid() ;
 
 #if	USERINFO_SYSV
-	uip->f.sysv_ct = TRUE ;
-	uip->f.sysv_rt = TRUE ;
+	uip->f.sysv_ct = true ;
+	uip->f.sysv_rt = true ;
 #else
-	uip->f.sysv_ct = FALSE ;
+	uip->f.sysv_ct = false ;
 	uip->f.sysv_rt = getostype() ;
 #endif
 
@@ -542,29 +519,19 @@ static int userinfo_id(UI *uip)
 /* end subroutine (userinfo_id) */
 
 
-static int userinfo_load(UI *uip,STRSTORE *stp,int *sis)
+static int userinfo_load(UI *uip,strstore *stp,int *sis)
 {
 	int		rs ;
 	int		size = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("userinfo_load: ent\n") ;
-#endif
-
 	if ((rs = strstore_strsize(stp)) >= 0) {
 	    char	*a ;
 	    size = rs ;
-#if	CF_DEBUGS
-	    debugprintf("userinfo_load: size=%u\n",size) ;
-#endif
 	    if ((rs = uc_malloc(size,&a)) >= 0) {
 	        if ((rs = strstore_strmk(stp,a,size)) >= 0) {
 	            int		i ;
 	            cchar	**vpp ;
 
-#if	CF_DEBUGS
-	            debugprintf("userinfo_load: strmk() rs=%d\n",rs) ;
-#endif
 	            for (i = 0 ; i < uit_overlast ; i += 1) {
 	                switch (i) {
 	                case uit_machine:
@@ -671,21 +638,13 @@ static int userinfo_load(UI *uip,STRSTORE *stp,int *sis)
 	    } /* end if (memory-allocation) */
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("userinfo_load: ret rs=%d size=%u\n",rs,size) ;
-#endif
-
 	return (rs >= 0) ? size : rs ;
 }
 /* end subroutine (userinfo_load) */
 
 
 #ifdef	COMMENT
-static int userinfo_setnuls(uep,emptyp)
-USERINFO	*uep ;
-cchar	*emptyp ;
-{
-
+static int userinfo_setnuls(USERINFO *uep,cchar *emptyp) noex {
 	checknul(emptyp,&uep->sysname) ;
 	checknul(emptyp,&uep->release) ;
 	checknul(emptyp,&uep->version) ;
@@ -721,9 +680,9 @@ cchar	*emptyp ;
 #endif /* COMMENT */
 
 
-static int procinfo_start(PROCINFO *pip,UI *uip,STRSTORE *stp,int *sis)
+static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis)
 {
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	cint	pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
 	int		size ;
 	char		*bp ;
@@ -800,7 +759,7 @@ static int procinfo_finish(PROCINFO *pip)
 
 static int procinfo_store(PROCINFO *pip,int uit,cchar *vp,int vl,cchar **rpp)
 {
-	STRSTORE	*stp = pip->stp ;
+	strstore	*stp = pip->stp ;
 	int		rs = SR_OK ;
 
 	if (uit >= 0) {
@@ -824,49 +783,33 @@ static int procinfo_uabegin(PROCINFO *pip)
 {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("userinfo/procinfo_uabegin: f_pw=%u\n",
-	    pip->f.pw) ;
-	debugprintf("userinfo/procinfo_uabegin: f_ua=%u f_uainit=%u\n",
-	    pip->f.ua,pip->f.uainit) ;
-#endif
-
 	if ((! pip->f.ua) && pip->f.pw && (! pip->f.uainit)) {
-	    pip->f.uainit = TRUE ;
+	    pip->f.uainit = true ;
 
 	    if (pip->uap == nullptr) {
-	        const int	size = sizeof(USERATTR) ;
+	        cint	size = sizeof(USERATTR) ;
 	        char		*p ;
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
 	            pip->uap = (USERATTR *) p ;
-	            pip->f.allocua = TRUE ;
+	            pip->f.allocua = true ;
 	        }
 	    }
 
 	    if (rs >= 0) {
 	        cchar	*un = pip->pw.pw_name ;
-#if	CF_DEBUGS
-	        debugprintf("userinfo/procinfo_uabegin: dn=%s\n",dn) ;
-#endif
 	        if ((rs = userattr_open(pip->uap,un)) >= 0) {
-	            pip->f.ua = TRUE ;
+	            pip->f.ua = true ;
 		} else {
 		    {
 	                uc_free(pip->uap) ;
 	                pip->uap = nullptr ;
-	                pip->f.allocua = FALSE ;
+	                pip->f.allocua = false ;
 		    }
 		    if (isNotPresent(rs)) rs = SR_OK ;
 		}
 	    } /* end if (ok) */
 
 	} /* end if (f.ua) */
-
-#if	CF_DEBUGS
-	debugprintf("userinfo/procinfo_uabegin: ret rs=%d\n",rs) ;
-	debugprintf("userinfo/procinfo_uabegin: f_ua=%u f_uainit=%u\n",
-	    pip->f.ua,pip->f.uainit) ;
-#endif
 
 	return rs ;
 }
@@ -879,7 +822,7 @@ static int procinfo_uaend(PROCINFO *pip)
 	int		rs1 ;
 
 	if (pip->f.ua) {
-	    pip->f.ua = FALSE ;
+	    pip->f.ua = false ;
 	    rs1 = userattr_close(pip->uap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -887,7 +830,7 @@ static int procinfo_uaend(PROCINFO *pip)
 	if (pip->f.allocua && (pip->uap != nullptr)) {
 	    rs1 = uc_free(pip->uap) ;
 	    pip->uap = nullptr ;
-	    pip->f.allocua = FALSE ;
+	    pip->f.allocua = false ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
@@ -911,10 +854,6 @@ static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cchar *kn)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("userinfo/procinfo_ualookup: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_ualookup) */
@@ -926,7 +865,7 @@ static int procinfo_find(PROCINFO *pip,cchar *un)
 	int		rs ;
 
 	if ((rs = procinfo_pwentry(pip,un)) >= 0) {
-	    const int	dlen = DIGBUFLEN ;
+	    cint	dlen = DIGBUFLEN ;
 	    int		cl = -1 ;
 	    int		uit ;
 	    cchar	*cp ;
@@ -973,61 +912,44 @@ static int procinfo_find(PROCINFO *pip,cchar *un)
 
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_find: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_find) */
 
 
-static int procinfo_pwentry(PROCINFO *pip,cchar *un)
-{
-	PASSWD	pw ;
+static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
+	PASSWD		pw ;
 	int		rs ;
 	int		pwlen = pip->tlen ;
-	int		f = FALSE ;
+	int		f = false ;
 	char		*pwbuf = pip->tbuf ;
-
 	if ((rs = procinfo_getpwuser(pip,&pw,pwbuf,pwlen,un)) >= 0) {
-	    pip->f.pw = TRUE ;
-
-#if	CF_DEBUGS
-	    debugprintf("procinfo_pwentry: getpwusername() rs=%d\n",rs) ;
-#endif
-
+	    pip->f.pw = true ;
 	    if ((rs = passwdent_size(&pw)) >= 0) {
 	        int	size = rs ;
 	        char	*p ;
-#if	CF_DEBUGS
-	        debugprintf("procinfo_pwentry: size=%d\n",size) ;
-#endif
 	        if ((rs = uc_malloc((size+1),&p)) >= 0) {
 	            PASSWD	*pwp = &pip->pw ;
 	            if ((rs = passwdent_load(pwp,p,size,&pw)) >= 0) {
 	                pip->pwbuf = p ;
 	                pip->pwlen = size ;
-	                f = TRUE ;
+	                f = true ;
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                uc_free(p) ;
+		    }
 	        } /* end if (memory-allocation) */
 	    } /* end if (passwdent_size) */
-
 	} /* end if (procinfo_getpwuser) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (procinfo_pwentry) */
 
 
 static int procinfo_getpwuser(PROCINFO *pip,PASSWD *pwp,
-		char pwbuf[],int pwlen,cchar *un)
-{
+		char *pwbuf,int pwlen,cchar *un) noex {
 	USERINFO	*uip = pip->uip ;
 	int		rs ;
-
 	if ((un != nullptr) && (un[0] != '-') && (un[0] != '\0')) {
 	    if ((rs = GETPW_NAME(pwp,pwbuf,pwlen,un)) >= 0) {
 	        pip->f.altuser = (pwp->pw_uid != uip->uid) ;
@@ -1039,18 +961,14 @@ static int procinfo_getpwuser(PROCINFO *pip,PASSWD *pwp,
 	} else {
 	    rs = getpwusername(pwp,pwbuf,pwlen,uip->uid) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_getpwuser) */
 
-
-static int procinfo_homedname(PROCINFO *pip)
-{
+static int procinfo_homedname(PROCINFO *pip) noex {
 	USERINFO	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_homedname ;
-
 	if ((pip->sis[uit] == 0) && (uip->homedname == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
@@ -1066,18 +984,14 @@ static int procinfo_homedname(PROCINFO *pip)
 	    }
 	    uip->homedname = vp ;
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_homedname) */
 
-
-static int procinfo_shell(PROCINFO *pip)
-{
+static int procinfo_shell(PROCINFO *pip) noex {
 	USERINFO	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_shell ;
-
 	if ((pip->sis[uit] == 0) && (uip->shell == nullptr)) {
 	    cchar	*vp = nullptr ;
 	    if ((vp == nullptr) || (vp[0] == '\0')) {
@@ -1089,20 +1003,17 @@ static int procinfo_shell(PROCINFO *pip)
 	        uip->shell = vp ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_shell) */
 
-
-static int procinfo_org(PROCINFO *pip)
-{
+static int procinfo_org(PROCINFO *pip) noex {
 	USERINFO	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_organization ;
 
 	if ((pip->sis[uit] == 0) && (uip->organization == nullptr)) {
-	    const int	rlen = MAXNAMELEN ;
+	    cint	rlen = MAXNAMELEN ;
 	    int		vl = -1 ;
 	    cchar	*orgcname = ORGCNAME ;
 	    cchar	*vp = nullptr ;
@@ -1257,7 +1168,7 @@ static int procinfo_gecos(PROCINFO *pip)
 	                            }
 	                            if (rs >= 0) {
 	                                if (pip->sis[uit] == 0) {
-	                                    STRSTORE	*stp = pip->stp ;
+	                                    strstore	*stp = pip->stp ;
 	                                    cchar	*cp ;
 	                                    rs = strstore_store(stp,vp,vl,&cp) ;
 	                                    pip->sis[uit] = rs ;
@@ -1347,7 +1258,7 @@ static int procinfo_gecosname(PROCINFO *pip)
 	if ((pip->sis[uit] == 0) && (uip->gecosname == nullptr)) {
 	    cchar	*gstr = pip->pw.pw_gecos ;
 	    if ((gstr != nullptr) && (gstr[0] != '\0')) {
-	        const int	nlen = REALNAMELEN ;
+	        cint	nlen = REALNAMELEN ;
 	        int		vl ;
 	        cchar	*vp ;
 	        char		nbuf[REALNAMELEN+1] ;
@@ -1369,15 +1280,8 @@ static int procinfo_realname(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_realname ;
 
-#if	CF_DEBUGS
-	debugprintf("userinfo/procinfo_realname: sis[%u]=%u\n",
-	    uit,pip->sis[uit]) ;
-	debugprintf("userinfo/procinfo_realname: realname=%s\n",
-	    uip->realname) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->realname == nullptr)) {
-	    const int	nlen = REALNAMELEN ;
+	    cint	nlen = REALNAMELEN ;
 	    cchar	*np = pip->tstrs.gecosname ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    if ((np == nullptr) || (np[0] == '\0')) {
@@ -1385,31 +1289,15 @@ static int procinfo_realname(PROCINFO *pip)
 	            np = getenv(VARNAME) ;
 	        }
 	    }
-#if	CF_DEBUGS
-	    debugprintf("userinfo/procinfo_realname: n=%s\n",np) ;
-#endif
 	    if ((np != nullptr) && (np[0] != '\0')) {
 	        int		vl ;
 	        cchar	*vp = nbuf ;
 	        if ((vl = mkrealname(nbuf,nlen,np,-1)) > 0) {
-	            STRSTORE	*stp = pip->stp ;
+	            strstore	*stp = pip->stp ;
 	            cchar	*cp ;
-#if	CF_DEBUGS
-	            debugprintf("userinfo/procinfo_realname: realname=%t\n",
-	                vp,vl) ;
-#endif
 	            rs = strstore_store(stp,vp,vl,&cp) ;
 	            pip->sis[uit] = rs ;
 	            pip->tstrs.realname = cp ;
-#if	CF_DEBUGS 
-	            {
-	                debugprintf("userinfo/procinfo_realname: "
-	                    "strstore_store() rs=%d\n",rs) ;
-	                debugprintf("userinfo/procinfo_realname: "
-	                    "tstrs.realname=%s\n",
-	                    cp) ;
-	            }
-#endif
 	        }
 	    }
 	} /* end if (needed) */
@@ -1425,15 +1313,9 @@ static int procinfo_mailname(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_mailname ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_mailname: tstrs.realname¬\n") ;
-	debugprintf("procinfo_mailname: tstrs.realname=%s\n",
-	    pip->tstrs.realname) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->mailname == nullptr)) {
-	    const int	nlen = REALNAMELEN ;
-	    const int	mlen = REALNAMELEN ;
+	    cint	nlen = REALNAMELEN ;
+	    cint	mlen = REALNAMELEN ;
 	    int		vl ;
 	    int		nl = -1 ;
 	    cchar	*vp ;
@@ -1445,9 +1327,6 @@ static int procinfo_mailname(PROCINFO *pip)
 	            np = getenv(VARMAILNAME) ;
 	        }
 	    }
-#if	CF_DEBUGS
-	    debugprintf("procinfo_mailname: np=%s\n",np) ;
-#endif
 	    if ((np == nullptr) || (np[0] == '\0')) {
 	        np = pip->tstrs.gecosname ;
 	    }
@@ -1458,37 +1337,21 @@ static int procinfo_mailname(PROCINFO *pip)
 	            nl = mkgecosname(nbuf,nlen,gn) ;
 	        }
 	    }
-#if	CF_DEBUGS
-	    debugprintf("procinfo_mailname: np=%s\n",np) ;
-#endif
 	    if ((np == nullptr) || (np[0] == '\0')) {
 	        if (! pip->f.altuser) {
 	            np = getenv(VARNAME) ;
 	        }
 	    }
-#if	CF_DEBUGS
-	    debugprintf("procinfo_mailname: np=%s\n",np) ;
-#endif
 	    if ((np == nullptr) || (np[0] == '\0')) {
 	        if (pip->f.pw) np = pip->pw.pw_name ;
 	    }
-#if	CF_DEBUGS
-	    debugprintf("procinfo_mailname: np=%s\n",np) ;
-#endif
 	    if ((np != nullptr) && (np[0] != '\0')) {
 	        vp = mbuf ;
-	        if ((vl = mkmailname(mbuf,mlen,np,nl)) > 0)
+	        if ((vl = mkmailname(mbuf,mlen,np,nl)) > 0) {
 	            rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
-#if	CF_DEBUGS
-	        debugprintf("procinfo_mailname: rs=%d vl=%u mn=%s\n",
-	            rs,vl,mbuf) ;
-#endif
+		}
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("procinfo_mailname: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1501,13 +1364,9 @@ static int procinfo_name(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_name ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_name: ent\n") ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->name == nullptr)) {
-	    const int	glen = REALNAMELEN ;
-	    const int	rlen = REALNAMELEN ;
+	    cint	glen = REALNAMELEN ;
+	    cint	rlen = REALNAMELEN ;
 	    int		nl = -1 ;
 	    cchar	*np = nullptr ;
 	    char	gbuf[REALNAMELEN+1] ;
@@ -1539,10 +1398,6 @@ static int procinfo_name(PROCINFO *pip)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_name: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_name) */
@@ -1553,10 +1408,6 @@ static int procinfo_fullname(PROCINFO *pip)
 	USERINFO	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_fullname ;
-
-#if	CF_DEBUGS
-	debugprintf("procinfo_fullname: ent\n") ;
-#endif
 
 	if ((pip->sis[uit] == 0) && (uip->fullname == nullptr)) {
 	    cchar	*np = nullptr ;
@@ -1570,10 +1421,6 @@ static int procinfo_fullname(PROCINFO *pip)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_fullname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_fullname) */
@@ -1585,14 +1432,8 @@ static int procinfo_nodename(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_nodename ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_nodename: ent\n") ;
-	debugprintf("procinfo_nodename: uip->nodename=%s\n",
-	    uip->nodename) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->nodename == nullptr)) {
-	    const int	nlen = NODENAMELEN ;
+	    cint	nlen = NODENAMELEN ;
 	    int		nl = -1 ;
 	    char	*nbuf = pip->nodename ;
 	    if (nbuf[0] == '\0') {
@@ -1601,17 +1442,8 @@ static int procinfo_nodename(PROCINFO *pip)
 	    }
 	    if (rs >= 0) {
 	        rs = procinfo_store(pip,uit,nbuf,nl,nullptr) ;
-#if	CF_DEBUGS
-	        debugprintf("procinfo_nodename: nbuf=%s\n",nbuf) ;
-#endif
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("procinfo_nodename: pip->nodename=%s\n",
-	    pip->nodename) ;
-	debugprintf("procinfo_nodename: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1624,11 +1456,6 @@ static int procinfo_domainname(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_domainname ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_domainname: ent sis=%u dn=%s\n",
-	    pip->sis[uit], uip->domainname) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->domainname == nullptr)) {
 	    uip->domainname = nullptr ;
 	    if (uip->domainname == nullptr) {
@@ -1637,7 +1464,7 @@ static int procinfo_domainname(PROCINFO *pip)
 	        }
 	    }
 	    if (uip->domainname == nullptr) {
-	        const int	dlen = MAXHOSTNAMELEN ;
+	        cint	dlen = MAXHOSTNAMELEN ;
 	        int		dl = -1 ;
 	        cchar	*nn = uip->nodename ;
 	        char		*dbuf = pip->domainname ;
@@ -1666,10 +1493,6 @@ static int procinfo_domainname(PROCINFO *pip)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_domainname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_domainename) */
@@ -1681,22 +1504,14 @@ static int procinfo_project(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_project ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_project: ent projnamelen=%u\n",
-	    PROJNAMELEN) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->projname == nullptr)) {
-	    const int	dlen = PROJNAMELEN ;
+	    cint	dlen = PROJNAMELEN ;
 	    int		dl = -1 ;
 	    char	dbuf[PROJNAMELEN+1] = { 0 } ;
 	    if ((rs >= 0) && (dbuf[0] == '\0')) {
 	        if (pip->f.pw) {
 	            cchar	*kn = UA_PROJECT ;
 	            rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
-#if	CF_DEBUGS
-	            debugprintf("procinfo_project: mid1 rs=%d\n",rs) ;
-#endif
 	            dl = rs ;
 	            if (isNotPresent(rs)) {
 	                dbuf[0] = '\0' ;
@@ -1708,9 +1523,6 @@ static int procinfo_project(PROCINFO *pip)
 	        if (pip->f.pw) {
 	            cchar	*un = pip->pw.pw_name ;
 	            rs = getprojname(dbuf,dlen,un) ;
-#if	CF_DEBUGS
-	            debugprintf("procinfo_project: mid2 rs=%d\n",rs) ;
-#endif
 	            dl = rs ;
 	            if (isNotPresent(rs) || (rs == SR_NOSYS)) {
 	                dbuf[0] = '\0' ;
@@ -1723,10 +1535,6 @@ static int procinfo_project(PROCINFO *pip)
 	    }
 	} /* end if (project) */
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_project: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_project) */
@@ -1738,12 +1546,6 @@ static int procinfo_tz(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_tz ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_tz: ent\n") ;
-	debugprintf("procinfo_tz: pip->sis[uit]=%u\n",pip->sis[uit]) ;
-	debugprintf("procinfo_tz: uip->tz=%s\n",uip->tz) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->tz == nullptr)) {
 	    uip->tz = nullptr ;
 	    if (uip->tz == nullptr) {
@@ -1751,26 +1553,15 @@ static int procinfo_tz(PROCINFO *pip)
 	            uip->tz = getenv(VARTZ) ;
 	        }
 	    }
-#if	CF_DEBUGS
-	    debugprintf("procinfo_tz: 2 uip->tz=%s\n",uip->tz) ;
-#endif
 	    if (uip->tz == nullptr) {
-	        const int	dlen = TZLEN ;
+	        cint	dlen = TZLEN ;
 	        int		dl = -1 ;
 	        char		dbuf[TZLEN+1] = { 0 } ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-#if	CF_DEBUGS
-	            debugprintf("procinfo_tz: f_pw=%u f_ua=%u\n",
-	                pip->f.pw,pip->f.ua) ;
-#endif
 	            if (pip->f.pw) {
 	                cchar	*kn = UA_TZ ;
 	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
 	                dl = rs ;
-#if	CF_DEBUGS
-	                debugprintf("procinfo_tz: procinfo_ualookup() rs=%d\n",
-	                    rs) ;
-#endif
 	                if (isNotPresent(rs)) {
 	                    dbuf[0] = '\0' ;
 	                    rs = SR_OK ;
@@ -1783,10 +1574,6 @@ static int procinfo_tz(PROCINFO *pip)
 	    }
 	} /* end if (tz) */
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_tz: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_tz) */
@@ -1798,10 +1585,6 @@ static int procinfo_md(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_md ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_md: ent\n") ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->md == nullptr)) {
 	    uip->md = nullptr ;
 	    if (uip->md == nullptr) {
@@ -1810,7 +1593,7 @@ static int procinfo_md(PROCINFO *pip)
 	        }
 	    }
 	    if (uip->md == nullptr) {
-	        const int	dlen = MAXHOSTNAMELEN ;
+	        cint	dlen = MAXHOSTNAMELEN ;
 	        int		dl = -1 ;
 	        char		dbuf[MAXHOSTNAMELEN+1] = { 0 } ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
@@ -1830,10 +1613,6 @@ static int procinfo_md(PROCINFO *pip)
 	    }
 	} /* end if (md) */
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_md: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_md) */
@@ -1845,10 +1624,6 @@ static int procinfo_wstation(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_wstation ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_wstation: ent\n") ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->wstation == nullptr)) {
 	    uip->wstation = nullptr ;
 	    if (uip->wstation == nullptr) {
@@ -1857,7 +1632,7 @@ static int procinfo_wstation(PROCINFO *pip)
 	        }
 	    }
 	    if (uip->wstation == nullptr) {
-	        const int	dlen = WSLEN ;
+	        cint	dlen = WSLEN ;
 	        int		dl = -1 ;
 	        char		dbuf[WSLEN+1] = { 0 } ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
@@ -1877,10 +1652,6 @@ static int procinfo_wstation(PROCINFO *pip)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_wstation: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_wstation) */
@@ -1892,25 +1663,14 @@ static int procinfo_logid(PROCINFO *pip)
 	int		rs = SR_OK ;
 	int		uit = uit_logid ;
 
-#if	CF_DEBUGS
-	debugprintf("procinfo_logid: ent sis[%u]=%u\n",
-	    uit,pip->sis[uit]) ;
-	debugprintf("procinfo_logid: pip->nodename=%s\n",
-	    pip->nodename) ;
-#endif
-
 	if ((pip->sis[uit] == 0) && (uip->logid == nullptr)) {
 	    int		v = uip->pid ;
 	    cchar	*nn = uip->nodename ;
-#if	CF_DEBUGS
-	    debugprintf("procinfo_logid: unn=%s\n",nn) ;
-#endif
-	    if ((nn == nullptr) || (nn[0] == '\0')) nn = pip->nodename ;
-#if	CF_DEBUGS
-	    debugprintf("procinfo_logid: snn=%s\n",nn) ;
-#endif
+	    if ((nn == nullptr) || (nn[0] == '\0')) {
+		nn = pip->nodename ;
+	    }
 	    if ((nn != nullptr) && (nn[0] != '\0')) {
-	        const int	llen = LOGIDLEN ;
+	        cint	llen = LOGIDLEN ;
 	        int		vl ;
 	        cchar	*vp ;
 	        char		lbuf[LOGIDLEN+1] ;
@@ -1920,10 +1680,6 @@ static int procinfo_logid(PROCINFO *pip)
 	        }
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("procinfo_logid: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1938,7 +1694,7 @@ static int procinfo_uinfo(PROCINFO *pip)
 	if ((rs = uinfo_name(&pip->unixinfo)) >= 0) {
 	    USERINFO	*uip = pip->uip ;
 	    UINFO_NAME	*xip = &pip->unixinfo ;
-	    const int	uit = uit_nodename ;
+	    cint	uit = uit_nodename ;
 	    uip->sysname = xip->sysname ;
 	    uip->release = xip->release ;
 	    uip->version = xip->version ;
@@ -1953,25 +1709,15 @@ static int procinfo_uinfo(PROCINFO *pip)
 /* end subroutine (procinfo_uinfo) */
 #endif /* CF_UINFO */
 
-
 #if	CF_UNAME
-static int procinfo_uname(PROCINFO *pip)
-{
-	struct utsname	un ;
+static int procinfo_uname(PROCINFO *pip) noex {
+	UTSNAME		un ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("procinfo_uname: ent\n") ;
-#endif
-
 	if ((rs = u_uname(&un)) >= 0) {
 	    USERINFO	*uip = pip->uip ;
-	    int		i ;
-	    int		uit ;
-	    cchar	*vp ;
-	    for (i = 0 ; i < 5 ; i += 1) {
-	        uit = -1 ;
-	        vp = nullptr ;
+	    for (int i = 0 ; i < 5 ; i += 1) {
+	        int	uit = -1 ;
+	        cchar	*vp = nullptr ;
 	        switch (i) {
 	        case 0:
 	            uit = uit_sysname ;
@@ -1982,7 +1728,7 @@ static int procinfo_uname(PROCINFO *pip)
 	            if (uip->nodename == nullptr) {
 	                vp = un.nodename ;
 	                if (pip->nodename[0] == '\0') {
-	                    const int	nlen = NODENAMELEN ;
+	                    cint	nlen = NODENAMELEN ;
 	                    char	*nbuf = pip->nodename ;
 	                    strwcpy(nbuf,vp,nlen) ;
 	                }
@@ -2007,77 +1753,51 @@ static int procinfo_uname(PROCINFO *pip)
 	        if (rs < 0) break ;
 	    } /* end for */
 	} /* end if (uname) */
-
-#if	CF_DEBUGS
-	debugprintf("procinfo_uname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procinfo_uname) */
 #endif /* CF_UNAME */
 
-
 #ifdef	COMMENT
-static int checknul(emptyp,epp)
-cchar	*emptyp ;
-cchar	**epp ;
-{
-
-	if (*epp == nullptr)
+static int checknul(cchar *emptyp,cchar **epp) noex {
+	if (*epp == nullptr) {
 	    *epp = emptyp ;
-
+	}
 	return 0 ;
 }
 /* end subroutine (checknul) */
 
-
-static int empty(cp)
-cchar	*cp ;
-{
-
+static int empty(cchar *cp) noex {
 	return ((cp == nullptr) || (cp[0] == '\0')) ;
 }
 /* end subroutine (empty) */
 #endif /* COMMENT */
 
-
 #if	USERINFO_SYSV
 #else /* USERINFO_SYSV */
-static int getostype()
-{
+static int getostype() noex {
 	int		rc = -1 ;
-	cchar	*cp ;
-
+	cchar		*cp ;
 /* first try straight-out (fastest) */
-
 	if ((cp = getenv(VAROSTYPE)) != nullptr) {
 	    rc = (strcasecmp(cp,"SYSV") == 0) ;
 	}
-
 /* next try checking if the OS name and number mean something (pretty fast) */
-
 	if ((rc < 0) && ((cp = getenv(VAROSNAME)) != nullptr)) {
-	    int	v ;
-
+	    int		v ;
 	    if ((strcmp(cp,"SunOS") == 0) &&
 	        ((cp = getenv(VAROSNUM)) != nullptr)) {
 
 	        if (cfdeci(cp,-1,&v) >= 0) {
 	            rc = (v >= 5) ;
 		}
-
 	    } /* end if */
-
 	} /* end if (check for "SunOS") */
-
 /* finally (if necessary) 'stat(2)' the i-node (slow disk access) */
-
 	if (rc < 0) {
 	    rc = (u_access(SBINDNAME,X_OK) >= 0) ;
 	}
-
-	return (rc >= 0) ? rc : FALSE ;
+	return (rc >= 0) ? rc : false ;
 }
 /* end subroutine (getostype) */
 #endif /* USERINFO_SYSV */

@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
@@ -71,7 +71,7 @@ constexpr sysdbfiles	w = sysdbfile_pw ;
 int ucenumpw_open(ucenumpw *op,cchar *efname) noex {
 	ucenumxxco<ucenumpw_ent>	ueo(op,mxx) ;
 	int		rs ;
-	if (cchar *rp ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
+	if (cchar *rp{} ; (rs = sysdbfnameget(w,efname,&rp)) >= 0) {
 	    rs = ueo.open(rp) ;
 	} /* end if (sysdbfnameget) */
 	return rs ;

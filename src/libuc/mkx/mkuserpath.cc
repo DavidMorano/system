@@ -4,7 +4,7 @@
 /* make a user-path */
 /* version %I% last-modified %G% */
 
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -34,9 +34,9 @@
 	pl		source path length
 
 	Returns:
-	<0		error
-	==0		no expansion
 	>0		expansion
+	==0		no expansion
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -51,7 +51,7 @@
 #include	<clanguage.h>
 #include	<getbufsize.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getxusername.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
@@ -61,16 +61,17 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 
 /* local namespaces */
 
-using std::min ;
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -81,6 +82,9 @@ using std::min ;
 extern "C" {
     int mkuserpath(char *,cchar *,cchar *,int) noex ;
 }
+
+
+/* external variables */
 
 
 /* local structures */
@@ -94,6 +98,9 @@ static int	mkpathusername(char *,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -128,10 +135,9 @@ int mkuserpath(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 	int		rs ;
 	int		ul = pl ;
-	cchar		*tp ;
 	cchar		*up = pp ;
 	if (pl < 0) pl = strlen(pp) ;
-	if ((tp = strnchr(pp,pl,'/')) != nullptr) {
+	if (cchar *tp{} ; (tp = strnchr(pp,pl,'/')) != nullptr) {
 	    ul = (tp-pp) ;
 	    pl -= ((tp+1)-pp) ;
 	    pp = (tp+1) ;
@@ -149,6 +155,7 @@ static int mkpathsquiggle(char *rbuf,cchar *un,cchar *pp,int pl) noex {
 /* end subroutine (mkpathsqiggle) */
 
 static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
+	const nullptr_t	np{} ;
 	int		rs = SR_OK ;
 	if ((pl >= 2) && (strncmp("u/",pp,2) == 0)) {
 	    pp += 2 ;
@@ -159,10 +166,9 @@ static int mkpathuserfs(char *rbuf,cchar *pp,int pl) noex {
 	            pl -= 1 ;
 	        }
 	        if (pl > 0) {
-	            cchar	*tp ;
 	            cchar	*up = pp ;
 	            int		ul = pl ;
-	            if ((tp = strnchr(pp,pl,'/')) != nullptr) {
+	            if (cchar *tp{} ; (tp = strnchr(pp,pl,'/')) != np) {
 	                ul = (tp - pp) ;
 	                pl -= ((tp+1)-pp) ;
 	                pp = (tp+1) ;
@@ -210,7 +216,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	                        rs = mkpath1(rbuf,dir) ;
 			        rl = rs ;
 	                    }
-	                }
+	                } /* end if (ok) */
 	                rs1 = uc_libfree(pwbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */

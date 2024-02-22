@@ -1,12 +1,11 @@
-/* uc_openinfo */
+/* uc_openinfo SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX®Â® library-3c */
 /* higher-level "open" /w timeout */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_ISMORE	0		/* compile in |isMorePossible()| */
-
 
 /* revision history:
 
@@ -79,12 +78,9 @@
 	Notes: Whew! Is this a "smelly" code module?  I hope not. But am I in a
 	good position to judge that?
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
@@ -95,11 +91,10 @@
 #include	<string.h>
 #include	<pwd.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<localmisc.h>
 
 

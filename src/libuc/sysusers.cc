@@ -4,7 +4,7 @@
 /* system user-entry enumeration */
 /* version %I% last-modified %G% */
 
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -33,7 +33,7 @@
 #include	<usupport.h>
 #include	<getbufsize.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<strdcpyx.h>
 #include	<localmisc.h>
 
@@ -42,11 +42,11 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 #undef	COMMENT
 
 
@@ -116,10 +116,10 @@ constexpr cchar		*defufname = SYSUSERS_FNAME ;
 int sysusers_open(sysusers *op,cchar *sufname) noex {
 	int		rs ;
 	if ((rs = sysusers_ctor(op)) >= 0) {
-	    csize	max = INT_MAX ;
+	    csize	nmax = INT_MAX ;
 	    cint	of = O_RDONLY ;
 	    if (sufname == nullptr) sufname = defufname ;
-	    if ((rs = filemap_open(op->fmp,sufname,of,max)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,of,nmax)) >= 0) {
 	        op->magic = SYSUSERS_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -156,7 +156,7 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 		    cint	ulen = rs ;
 		    char	*ubuf ;
 		    if ((rs = uc_libmalloc((ulen+1),&ubuf)) >= 0) {
-		        cchar	*lp ;
+		        cchar	*lp{} ;
 		        while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
 	    	            int		ll = rs ;
 	    	            if (lp[ll-1] == '\n') ll -= 1 ;

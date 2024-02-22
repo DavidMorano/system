@@ -4,7 +4,7 @@
 /* get the home directory of the specified user */
 /* version %I% last-modified %G% */
 
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -75,7 +75,7 @@
 #include	<mallocxx.h>
 #include	<fsdir.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getxusername.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
@@ -90,11 +90,11 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #ifndef	VARHOME
 #define	VARHOME		"HOME"
@@ -199,12 +199,12 @@ int getuserhome(char *rbuf,int rlen,cchar *un) noex {
 
 static int subinfo_start(SUBINFO *sip,cchar *un) noex {
 	int		rs ;
-	memclear(sip) ;
+	memclear(sip) ;			/* <- noted */
 	sip->un = un ;
 	sip->uid = -1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	    cint	pwlen = rs ;
-	    char	*pwbuf ;
+	    char	*pwbuf{} ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        sip->pwbuf = pwbuf ;
 	        sip->pwlen = pwlen ;
@@ -238,8 +238,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	    sip->init.pw = true ;
 	    if (un[0] != '-') {
 	        if (hasalldig(un,-1)) {
-	            uint	uv ;
-	            if ((rs = cfdecui(un,-1,&uv)) >= 0) {
+	            if (uint uv{} ; (rs = cfdecui(un,-1,&uv)) >= 0) {
 	                const uid_t	uid = uv ;
 	                rs = getpwusername(pwp,sip->pwbuf,pwlen,uid) ;
 	            }
@@ -261,12 +260,14 @@ static int subinfo_getvar(SUBINFO *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar		*un = sip->un ;
-	if (un[0] == '-') un = getenv(VARUSERNAME) ;
+	if (un[0] == '-') {
+	    un = getenv(VARUSERNAME) ;
+	}
 	if ((un != nullptr) && (un[0] != '\0')) {
 	    cchar	*hd = getenv(VARHOME) ;
 	    if ((hd != nullptr) && (hd[0] != '\0')) {
-	        cchar	*bp ;
 	        int	bl ;
+	        cchar	*bp{} ;
 	        if ((bl = sfbasename(hd,-1,&bp)) > 0) {
 	            if (strwcmp(un,bp,bl) == 0) {
 	                rs = mknpath1(rbuf,rlen,hd) ;

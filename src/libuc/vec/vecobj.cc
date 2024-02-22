@@ -45,8 +45,8 @@
 
 /* local namespaces */
 
-using std::min ;			/* actor */
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -714,7 +714,7 @@ int vecobj_audit(vecobj *op) noex {
 static int vecobj_ctor(vecobj *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->va = nullptr ;
 	    op->c = 0 ;

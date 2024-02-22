@@ -279,7 +279,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	int		el ;
 	int		enl = 0 ;
 	int		len = 0 ;
-	nullptr_t	np{} ;
+	const nullptr_t	np{} ;
 	cchar		*scl = "?+:;¶µ­=#\t " ;
 	cchar		*tp, *ep ;
 	cchar		*enp = nullptr ;
@@ -450,18 +450,18 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 /* end method (subinfo::lner) */
 
 int subinfo::deps(cchar *sp,int sl) noex {
+	const nullptr_t	np{} ;
 	field		fsb ;
 	int		rs ;
 	int		rs1 = 0 ;
 	int		f = true ;
 	if ((rs = field_start(&fsb,sp,sl)) >= 0) {
 	    int		fl ;
-	    cchar	*fp ;
+	    cchar	*fp{} ;
 	    while ((fl = field_get(&fsb,dterms,&fp)) >= 0) {
 	        if (fl > 0) {
-		    nullptr_t	n{} ;
 		    auto	vs = vstrkeycmp ;
-	            if ((rs = vecstr_searchl(dlp,fp,fl,vs,n)) >= 0) {
+	            if ((rs = vecstr_searchl(dlp,fp,fl,vs,np)) >= 0) {
 			f = true ;
 		    } else if (rs == rsn) {
 			rs = SR_OK ;

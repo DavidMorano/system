@@ -9,7 +9,7 @@
 #define	CF_WRITETO	1		/* time out writes */
 #define	CF_TESTPROC	0		/* test using 'uc_openfsvc(3uc)' */
 #define	CF_FINDUID	1		/* use 'finduid(3c)' */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -85,7 +85,7 @@
 #include	<vecstr.h>
 #include	<vechand.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getxusername.h>
 #include	<ptma.h>
 #include	<ptm.h>
@@ -109,11 +109,11 @@
 
 #define	MOTD_MAPPERMAGIC	0x21367425
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #define	NDF		"motd.deb"
 

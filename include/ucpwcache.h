@@ -49,7 +49,7 @@ EXTERNC_begin
 extern int ucpwcache_init() noex ;
 extern int ucpwcache_name(PASSWD *,char *,int,cchar *) noex ;
 extern int ucpwcache_uid(PASSWD *,char *,int,uid_t) noex ;
-extern int ucpwcache_stats(UCPWCACHE_ST *) noex ;
+extern int ucpwcache_stats(ucpwcache_st *) noex ;
 extern int ucpwcache_setparam(int,int) noex ;
 extern int ucpwcache_fini() noex ;
 

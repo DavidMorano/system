@@ -4,7 +4,7 @@
 /* make program-root */
 /* version %I% last-modified %G% */
 
-#define	CF_UGETPW	0		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	0		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -64,9 +64,11 @@
 #include	<usupport.h>
 #include	<varnames.hh>
 #include	<getbufsize.h>
+#include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<ids.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getxusername.h>
 #include	<fsdir.h>
 #include	<localmisc.h>
@@ -74,22 +76,20 @@
 #include	<sncpyxc.h>
 #include	<snwcpyxc.h>
 #include	<nleadstr.h>
-#include	<hasx.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
-#include	<mallocxx.h>
-#include	<bufsizevar.hh>
+#include	<hasx.h>
 
 
 /* local defines */
 
 #define	STACKBUFLEN	64
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 #ifndef	VARHOME
 #define	VARHOME		"HOME"
@@ -122,11 +122,6 @@
 
 /* local typedefs */
 
-#ifndef	TYPEDEF_CC
-#define	TYPEDEF_CC
-typedef const char	cc ;
-#endif
-
 
 /* external subroutines */
 
@@ -148,7 +143,7 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	IDS		id ;
+	ids		id ;
 	cchar		*prname ;	/* program-root-name */
 	cchar		*domain ;	/* domain */
 	cchar		*dname ;	/* directory-name */
@@ -156,13 +151,13 @@ struct subinfo {
 } ;
 
 struct prmap {
-	const char	*prname ;
-	const char	*dname ;
+	cchar		*prname ;
+	cchar		*dname ;
 } ;
 
 struct domainbase {
-	const char	*domain ;
-	const char	*basedname ;
+	cchar		*domain ;
+	cchar		*basedname ;
 } ;
 
 
@@ -191,9 +186,10 @@ static int	subinfo_bases(SI *,char *,int) noex ;
 
 static int	dirsearch(const char *,const char *) noex ;
 
+
 /* local variables */
 
-static int	(*gettries[])(SI *,char *,int) = {
+static constexpr int	(*gettries[])(SI *,char *,int) = {
 	subinfo_domain,
 	subinfo_user,
 	subinfo_prmap,
@@ -201,7 +197,7 @@ static int	(*gettries[])(SI *,char *,int) = {
 	nullptr
 } ;
 
-static int	(*mktries[])(SI *,char *,int) = {
+static constexpr int	(*mktries[])(SI *,char *,int) = {
 	subinfo_env,
 	subinfo_domain,
 	subinfo_user,
@@ -211,7 +207,7 @@ static int	(*mktries[])(SI *,char *,int) = {
 	nullptr
 } ;
 
-static const struct prmap	prmaps[] = {
+static constexpr struct prmap	prmaps[] = {
 	{ "root", "/" },
 	{ "usr", "/usr" },
 	{ "xpg4", "/usr/xpg4" },
@@ -227,7 +223,7 @@ static const struct prmap	prmaps[] = {
 	{ nullptr, nullptr }
 } ;
 
-static const struct domainbase	domains[] = {
+static constexpr struct domainbase	domains[] = {
 	{ "rightcore.com", "/usr/add-on" },
 	{ "rightcore.org", "/usr/add-on" },
 	{ "ece.neu.edu", "/home/student/dmorano/add-on" },
@@ -239,7 +235,7 @@ static const struct domainbase	domains[] = {
 	{ nullptr, nullptr }
 } ;
 
-static const char		*basednames[] = {
+static constexpr cchar		*basednames[] = {
 	"/usr/add-on",
 	"/usr",
 	"/opt",
@@ -247,6 +243,9 @@ static const char		*basednames[] = {
 } ;
 
 static bufsizevar		maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -310,16 +309,16 @@ int mkpr(char *pbuf,int plen,cchar *prname,cchar *domain) noex {
 static int subinfo_start(SI *sip,cchar *prname,cchar *domain) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	memclear(sip) ;
+	memclear(sip) ;			/* <- noted */
 	sip->prname = prname ;
 	sip->domain = domain ;
 	sip->dname = prname ;
         if (hasuc(prname,-1)) { /* while keeping stack mostly shallow */
-	    char	*dbuf ;
+	    char	*dbuf{} ;
 	    if ((rs = malloc_mp(&dbuf)) >= 0) {
-                cint   dlen = rs ;
+                cint	dlen = rs ;
                 if ((rs = sncpylc(dbuf,dlen,prname)) >= 0) {
-                    cchar   *cp ;
+		    cchar	*cp{} ; 
                     if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) {
                         sip->open.dname = true ;
                         sip->dname = cp ;
@@ -384,7 +383,7 @@ static int subinfo_env(SI *sip,char *rbuf,int rlen) noex {
 	int		len = 0 ;
 	cchar		*envp = sip->prname ;
 	if (haslc(envp,-1)) {
-	    char	*ebuf ;
+	    char	*ebuf{} ;
 	    if ((rs = malloc_mp(&ebuf)) >= 0) {
 		cint	elen = rs ;
 	        if ((rs = sncpyuc(ebuf,elen,envp)) >= 0) {
@@ -406,8 +405,7 @@ static int subinfo_enver(SI *sip,char *rbuf,int rlen,cc *envp) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (envp[0] != '\0') {
-	    cchar	*cp ;
-	    if ((cp = getenv(envp)) != nullptr) {
+	    if (cchar *cp ; (cp = getenv(envp)) != nullptr) {
 		if ((rs = sncpy1(rbuf,rlen,cp)) >= 0) {
 		    len = rs ;
 		    rs = subinfo_dirok(sip,rbuf,DMODE) ;
@@ -439,7 +437,7 @@ static int subinfo_domain(SI *sip,char *rbuf,int rlen) noex {
 		            rs = subinfo_domainer(sip,rbuf,rlen,dbuf,rs) ;
 	                }
 		    } else {
-		        char	*dbuf ;
+		        char	*dbuf{} ;
 		        if ((rs = malloc_hn(&dbuf)) >= 0) {
 		            cint	dlen = rs ;
 	                    if ((rs = snwcpylc(dbuf,dlen,dnp,dnl)) > 0) {
@@ -487,12 +485,12 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*pwbuf ;
+	char		*pwbuf{} ;
 	if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	    PASSWD	pw ;
 	    cint	pwlen = rs ;
 	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->dname)) >= 0) {
-	        char	*tbuf ;
+	        char	*tbuf{} ;
 		if ((rs = malloc_mp(&tbuf)) >= 0) {
 		    cchar	*d = pw.pw_dir ;
 		    cchar	*swd = SWDFNAME ;
@@ -526,7 +524,7 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
                         rs = mknpath1(rbuf,rlen,d) ;
                         len = rs ;
                     } else if ((bl > 0) && (rbuf[0] != '/')) {
-                        char        *tmore ;
+                        char        *tmore{} ;
 			if ((rs = malloc_mp(&tmore)) >= 0) {
                             if ((rs = mkpath1(tmore,rbuf)) >= 0) {
                                 rs = mknpath2(rbuf,rlen,d,tmore) ;
@@ -550,7 +548,7 @@ static int subinfo_users(SI *sip,char *rbuf,int rlen,cc *sym,cc *d) noex {
 
 static int subinfo_prmap(SI *sip,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
-	int		i ;
+	int		i = 0 ;		/* used afterwards */
 	int		m ;
 	int		len = 0 ;
 	for (i = 0 ; prmaps[i].prname ; i += 1) {
@@ -580,7 +578,7 @@ static int subinfo_home(SI *sip,char *rbuf,int rlen) noex {
 	    rs = subinfo_homer(sip,rbuf,rlen,hn) ;
 	    len = rs ;
 	} else {
-	    char	*hbuf ;
+	    char	*hbuf{} ;
 	    if ((rs = malloc_mp(&hbuf)) >= 0) {
 		cint	hlen = rs ;
 	        if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
@@ -614,7 +612,7 @@ static int subinfo_bases(SI *sip,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	char		*tmpfname ;
+	char		*tmpfname{} ;
 	if ((rs = malloc_mp(&tmpfname)) >= 0) {
 	    for (int i = 0 ; basednames[i] ; i += 1) {
 	        cchar	*bn = basednames[i] ;
@@ -642,15 +640,14 @@ static int dirsearch(cchar *basedname,cchar *username) noex {
 	int		rs ;
 	int		rs1 ;
 	int		f_found = false ;
-	char		*nbuf ;
+	char		*nbuf{} ;
 	if ((rs = malloc_mn(&nbuf)) >= 0) {
-	    FSDIR	dir ;
-	    FSDIR_ENT	ds ;
+	    fsdir	dir ;
+	    fsdir_ent	ds ;
 	    cint	nlen = rs ;
 	    if ((rs = fsdir_open(&dir,basedname)) >= 0) {
-	        cchar	*fnp ;
 	        while ((rs = fsdir_read(&dir,&ds,nbuf,nlen)) > 0) {
-		    fnp = ds.name ;
+		    cchar	*fnp = ds.name ;
 		    if (fnp[0] != '.') {
 		        f_found = (strcmp(fnp,username) == 0) ;
 		        if (f_found) break ;

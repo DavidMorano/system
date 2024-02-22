@@ -249,14 +249,14 @@ int pwcache_lookup(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,cchar *un) noex {
                     rs = pwcache_mkrec(op,dt,&ep,&ro) ;
                 } /* end if (hit or miss) */
                 pwcache_record(op,ct,rs) ;
-                if (rs > 0) { /* not '>=' */
+                if ((rs > 0) && ep) { /* not '>=' */
                     ucentpw         *entp = pwentp(pwp) ;
                     ucentpw         *opwp = pwentp(&ep->pw) ;
                     rs = entp->load(pwbuf,pwlen,opwp) ;
                 } else if (rs == 0) {
                     rs = SR_NOTFOUND ;
                 }
-                if (rs <= 0) {
+                if (rs <= 0) {		/* note '<=' */
                     memclear(pwp) ;
                 }
             } /* end if (valid) */
@@ -281,14 +281,14 @@ int pwcache_uid(pwcache *op,PWE *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
                 rs = pwcache_mkrec(op,dt,&ep,&ro) ;
             } /* end if (hit or miss) */
             pwcache_record(op,ct,rs) ;
-            if (rs > 0) { /* not '>=' */
+            if ((rs > 0) && ep) { /* not '>=' */
                 ucentpw         *entp = pwentp(pwp) ;
                 ucentpw         *opwp = pwentp(&ep->pw) ;
                 rs = entp->load(pwbuf,pwlen,opwp) ;
             } else if (rs == 0) {
                 rs = SR_NOTFOUND ;
             }
-            if (rs <= 0) {
+            if (rs <= 0) {		/* note '<=' */
                 memclear(pwp) ;
             }
 	} /* end if (magic) */
@@ -360,7 +360,7 @@ int pwcache_check(pwcache *op,time_t dt) noex {
                                 uc_free(ep) ;
                             }
                         } /* end if (entry-old) */
-                    }
+                    } /* end if (ok) */
                 } /* end while */
                 rs1 = hdb_curend(op->dbp,&cur) ;
                 if (rs >= 0) rs = rs1 ;
@@ -461,7 +461,7 @@ static int pwcache_recstart(pwcache *op,time_t dt,rec *ep,ureq *rp) noex {
         int             pwl = 0 ;
         if ((rs = record_start(ep,dt,wc,rp)) >= 0) {
             hdb_dat	key ;
-            hdb_dat	val{} ;
+            hdb_dat	val ;
             cint	rsz = sizeof(rec) ;
             pwl = rs ;
             key.buf = ep->un ;

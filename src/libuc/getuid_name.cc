@@ -4,8 +4,7 @@
 /* get a UID by looking up the given name */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debugging */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 #define	CF_GETUSER	0		/* compile in |getuser_uid()| */
 
 /* revision history:
@@ -47,9 +46,10 @@
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<nulstr.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>
 #include	<cfdec.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -57,11 +57,11 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
 
 /* external subroutines */
@@ -88,25 +88,23 @@ int getuid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	nulstr		n ;
-	cchar		*name{} ;
-	if ((rs = nulstr_start(&n,np,nl,&name)) >= 0) {
-	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	        PASSWD		pw ;
-	        cint		pwlen = rs ;
-	        char		*pwbuf{} ;
-	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-		    {
-		        rs = GETPW_NAME(&pw,pwbuf,pwlen,name) ;
-	                uid = pw.pw_uid ;
-		    }
-	            rs1 = uc_free(pwbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
-	    } /* end if (getbufsize) */
-	    rs1 = nulstr_finish(&n) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (nulstr) */
+	        nulstr	n ;
+	        cchar	*name{} ;
+	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
+	            char	*pwbuf{} ;
+	            if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	                cint	pwlen = rs ;
+	                PASSWD	pw ;
+		        {
+		            rs = GETPW_NAME(&pw,pwbuf,pwlen,name) ;
+	                    uid = pw.pw_uid ;
+		        }
+	                rs1 = uc_free(pwbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+	            } /* end if (memory-allocation) */
+	            rs1 = nulstr_finish(&n) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (nulstr) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? uid : rs ;
@@ -118,7 +116,7 @@ int getuid_user(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        if (hasalldig(np,nl)) {
+	        if (hasalldig(sp,sl)) {
 	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
 	            }
@@ -132,8 +130,8 @@ int getuid_user(cchar *sp,int sl) noex {
 /* end subroutine (getuid_user) */
 
 #if	CF_GETUSER
-int getuser_uid(cchar *np,int nl) noex {
-	return getuid_user(np,nl) ;
+int getuser_uid(cchar *sp,int sl) noex {
+	return getuid_user(sp,sl) ;
 }
 #endif /* CF_GETUSER */
 

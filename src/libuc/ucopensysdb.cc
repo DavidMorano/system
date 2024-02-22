@@ -60,6 +60,12 @@
 /* local subroutine-templates */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local variables */
 
 static constexpr cchar	prefix[] = "/sysdb" ;

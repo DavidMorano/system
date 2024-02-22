@@ -41,7 +41,7 @@ extern int mapstrint_already(mapstrint *,cchar *,int) noex ;
 extern int mapstrint_fetch(mapstrint *,cchar *,int,
 		mapstrint_cur *,int *) noex ;
 extern int mapstrint_fetchrec(mapstrint *,cchar *,int,
-		mapstrint_cur *, char **,int *) noex ;
+		mapstrint_cur *,cchar **,int *) noex ;
 extern int mapstrint_getrec(mapstrint *,mapstrint_cur *,
 		cchar **,int *) noex ;
 extern int mapstrint_enum(mapstrint *,mapstrint_cur *,
