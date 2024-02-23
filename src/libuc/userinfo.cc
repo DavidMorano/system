@@ -431,63 +431,61 @@ static constexpr int	(*components[])(PROCINFO *) = {
 	nullptr
 } ;
 
+constexpr bool		f_sysv = USERINFO_SYSV ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int userinfo_start(UI *uip,cchar *username) noex {
+int userinfo_start(UI *uip,cchar *un) noex {
 	cint		startsize = (USERINFO_LEN/4) ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-
-	if (uip == nullptr) return SR_FAULT ;
-
-	memclear(uip) ;			/* dangerous */
-	uip->nodename = getenv(VARNODE) ;
-
-	if ((rs = userinfo_id(uip)) >= 0) {
-	    cint	size = (uit_overlast * sizeof(cchar *)) ;
-	    void	*p ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        strstore	st ;
-	        int		*sis = (int *) p ;
-	        memset(p,0,size) ;
-	        if ((rs = strstore_start(&st,10,startsize)) >= 0) {
-	            if ((rs = userinfo_process(uip,&st,sis,username)) >= 0) {
-	                rs = userinfo_load(uip,&st,sis) ;
-	                len = rs ;
-	            } /* end if */
-	            rs1 = strstore_finish(&st) ;
+	if (uip) {
+	    memclear(uip) ;			/* dangerous */
+	    uip->nodename = getenv(VARNODE) ;
+	    if ((rs = userinfo_id(uip)) >= 0) {
+	        cint	sz = (uit_overlast * sizeof(cchar *)) ;
+	        void	*vp{} ;
+	        if ((rs = uc_calloc(1,sz,&vp)) >= 0) {
+	            strstore	st ;
+	            int		*sis = reinterpret_cast<int *>(vp) ;
+	            if ((rs = strstore_start(&st,10,startsize)) >= 0) {
+	                if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
+	                    rs = userinfo_load(uip,&st,sis) ;
+	                    len = rs ;
+	                } /* end if */
+	                rs1 = strstore_finish(&st) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (strstore) */
+	            rs1 = uc_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (strstore) */
-	        rs1 = uc_free(p) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory_allocation) */
-	    if (rs >= 0) uip->magic = USERINFO_MAGIC ;
-	} /* end if (userinfo_id) */
-
+	        } /* end if (memory_allocation) */
+	        if (rs >= 0) uip->magic = USERINFO_MAGIC ;
+	    } /* end if (userinfo_id) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (userinfo_start) */
 
 int userinfo_finish(UI *uip) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (uip == nullptr) return SR_FAULT ;
-
-	if (uip->magic != USERINFO_MAGIC) return SR_NOTOPEN ;
-
-	if (uip->a != nullptr) {
-	    rs1 = uc_free(uip->a) ;
-	    uip->a = nullptr ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	uip->magic = 0 ;
+	if (uip) {
+	    rs = SR_NOTOPEN ;
+	    if (uip->magic == USERINFO_MAGIC) {
+		rs = SR_OK ;
+	        if (uip->a) {
+	            rs1 = uc_free(uip->a) ;
+	            if (rs >= 0) rs = rs1 ;
+	            uip->a = nullptr ;
+	        }
+	        uip->magic = 0 ;
+	    } /* end if (magic) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (userinfo_finish) */
@@ -499,49 +497,47 @@ static int userinfo_process(UI *uip,strstore *stp,int *sis,cchar *un) noex {
 	PROCINFO	pi ;
 	int		rs ;
 	int		rs1 ;
-
+	int		rv = 0 ;
 	if ((rs = procinfo_start(&pi,uip,stp,sis)) >= 0) {
 	    {
 	        rs = procinfo_find(&pi,un) ;
+		rv = rs ;
 	    }
 	    rs1 = procinfo_finish(&pi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (procinfo) */
-
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (userinfo_process) */
 
 static int userinfo_id(UI *uip) noex {
-	uip->pid = uc_getpid() ;
-
-#if	USERINFO_SYSV
-	uip->f.sysv_ct = true ;
-	uip->f.sysv_rt = true ;
-#else
-	uip->f.sysv_ct = false ;
-	uip->f.sysv_rt = getostype() ;
-#endif
-
-	uip->uid = getuid() ;
-	uip->euid = geteuid() ;
-
-	uip->gid = getgid() ;
-	uip->egid = getegid() ;
-
-	return SR_OK ;
+	int		rs ;
+	if ((rs = uc_getpid()) >= 0) {
+	    uip->pid = rs ;
+	    if constexpr (f_sysv) {
+	        uip->f.sysv_ct = true ;
+	        uip->f.sysv_rt = true ;
+	    } else {
+	        uip->f.sysv_ct = false ;
+	        uip->f.sysv_rt = getostype() ;
+	    }
+	    uip->uid = getuid() ;
+	    uip->euid = geteuid() ;
+	    uip->gid = getgid() ;
+	    uip->egid = getegid() ;
+	} /* end if (uc_getpid) */
+	return rs ;
 }
 /* end subroutine (userinfo_id) */
 
 static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 	int		rs ;
-	int		size = 0 ;
-
+	int		sz = 0 ;
 	if ((rs = strstore_strsize(stp)) >= 0) {
 	    char	*a{} ;
-	    size = rs ;
-	    if ((rs = uc_malloc(size,&a)) >= 0) {
-	        if ((rs = strstore_strmk(stp,a,size)) >= 0) {
+	    sz = rs ;
+	    if ((rs = uc_malloc(sz,&a)) >= 0) {
+	        if ((rs = strstore_strmk(stp,a,sz)) >= 0) {
 		    for (int i = 0 ; i < uit_overlast ; i += 1) {
 	                cchar	**vpp = nullptr ;
 	                switch (i) {
@@ -648,8 +644,7 @@ static int userinfo_load(UI *uip,strstore *stp,int *sis) noex {
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if */
-
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (userinfo_load) */
 
@@ -784,10 +779,10 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 	if ((! pip->f.ua) && pip->f.pw && (! pip->f.uainit)) {
 	    pip->f.uainit = true ;
 	    if (pip->uap == nullptr) {
-	        cint	size = sizeof(USERATTR) ;
-	        char	*p{} ;
-	        if ((rs = uc_malloc(size,&p)) >= 0) {
-	            pip->uap = (userattrdb *) p ;
+	        cint	sz = sizeof(userattrdb) ;
+	        void	*vp{} ;
+	        if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	            pip->uap = (userattrdb *) vp ;
 	            pip->f.allocua = true ;
 	        }
 	    }
@@ -812,38 +807,32 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 static int procinfo_uaend(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (pip->f.ua) {
 	    pip->f.ua = false ;
 	    rs1 = userattrdb_close(pip->uap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	if (pip->f.allocua && (pip->uap != nullptr)) {
 	    rs1 = uc_free(pip->uap) ;
 	    pip->uap = nullptr ;
 	    pip->f.allocua = false ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_uaend) */
 
 static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
-	int		rs = SR_OK ;
-
-	if (rbuf == nullptr) return SR_FAULT ;
-	if (kn == nullptr) return SR_FAULT ;
-
-	rbuf[0] = '\0' ;
-	if (pip->f.pw) {
-	    if (! pip->f.ua) rs = procinfo_uabegin(pip) ;
-	    if (rs >= 0) {
-	        rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
+	int		rs = SR_FAULT ;
+	if (pip && rbuf && kn) {
+	    rbuf[0] = '\0' ;
+	    if (pip->f.pw) {
+	        if (! pip->f.ua) rs = procinfo_uabegin(pip) ;
+	        if (rs >= 0) {
+	            rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
+	        }
 	    }
-	}
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (procinfo_ualookup) */
@@ -855,10 +844,10 @@ static int procinfo_find(PROCINFO *pip,cchar *un) noex {
 	    cint	dlen = DIGBUFLEN ;
 	    int		cl = -1 ;
 	    int		uit ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    char	dbuf[DIGBUFLEN+1] ;
 	    if (rs > 0) {
-	        cchar	*vp ;
+	        cchar	*vp{} ;
 	        uip->gid = pip->pw.pw_gid ;
 	        cp = pip->pw.pw_name ;
 	        if (rs >= 0) {
@@ -887,8 +876,7 @@ static int procinfo_find(PROCINFO *pip,cchar *un) noex {
 	        rs = procinfo_store(pip,uit,cp,cl,nullptr) ;
 	    }
 	    if (rs >= 0) {
-	        int	i ;
-	        for (i = 0 ; components[i] != nullptr ; i += 1) {
+	        for (int i = 0 ; components[i] ; i += 1) {
 	            rs = (*components[i])(pip) ;
 	            if (rs < 0) break ;
 	        } /* end if */
@@ -1094,22 +1082,16 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	cchar		*gstr = pip->pw.pw_gecos ;
-
 	if (pip->f.pw && (gstr != nullptr) && (gstr[0] != '\0')) {
-	    GECOS	g ;
+	    gecos	g ;
 	    if ((rs = gecos_start(&g,gstr,-1)) >= 0) {
 	        userinfo	*uip = pip->uip ;
 	        bits		*bip = &pip->have ;
-	        int		vl ;
-	        int		i ;
-	        int		uit ;
-	        cchar	*vp ;
-	        cchar	*up ;
-
-	        for (i = 0 ; i < gecosval_overlast ; i += 1) {
-	            if ((vl = gecos_getval(&g,i,&vp)) >= 0) {
-	                uit = -1 ;
-	                up = nullptr ;
+	        for (int i = 0 ; i < gecosval_overlast ; i += 1) {
+	            cchar	*vp{} ;
+	            if (int vl ; (vl = gecos_getval(&g,i,&vp)) >= 0) {
+	                int	uit = -1 ;
+	                cchar	*up = nullptr ;
 	                switch (i) {
 	                case gecosval_organization:
 	                    uit = uit_organization ;
@@ -1122,9 +1104,8 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	                    uit = uit_gecosname ;
 	                    up = uip->gecosname ;
 	                    if ((bits_test(bip,uit) == 0) && (up == nullptr)) {
-	                        void	*p{} ;
-	                        if ((rs = uc_malloc((vl+1),&p)) >= 0) {
-	                            char	*nbuf = charp(p) ;
+	                        char	*nbuf{} ;
+	                        if ((rs = uc_malloc((vl+1),&nbuf)) >= 0) {
 	                            if (strnchr(vp,vl,'_') != nullptr) {
 	                                rs = snwcpyhyphen(nbuf,-1,vp,vl) ;
 	                                vp = nbuf ;
@@ -1132,14 +1113,15 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	                            if (rs >= 0) {
 	                                if (pip->sis[uit] == 0) {
 	                                    strstore	*stp = pip->stp ;
-	                                    cchar	*cp ;
+	                                    cchar	*cp{} ;
 	                                    rs = strstore_store(stp,vp,vl,&cp) ;
 	                                    pip->sis[uit] = rs ;
 	                                    pip->tstrs.gecosname = cp ;
 	                                }
 	                                vp = nullptr ;
-	                            }
-	                            uc_free(p) ;
+	                            } /* end if (ok) */
+	                            rs1 = uc_free(nbuf) ;
+				    if (rs >= 0) rs = rs1 ;
 	                        } /* end if (memory-allocation) */
 	                    } else {
 	                        vp = nullptr ;
@@ -1201,7 +1183,6 @@ static int procinfo_gecos(PROCINFO *pip) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (gecos) */
 	} /* end if (non-empty) */
-
 	return rs ;
 }
 /* end subroutine (procinfo_gecos) */
