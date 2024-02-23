@@ -234,13 +234,13 @@ int uc_malloc(int size,void *vp) noex {
 }
 /* end subroutine (uc_malloc) */
 
-int uc_valloc(int size,void *vp) noex {
+int uc_valloc(int sz,void *vp) noex {
 	ucmemalloc	*uip = &ucmemalloc_data ;
 	int		rs ;
 	if (uip->ftrack) {
-	    rs = uip->trackmalloc(size,vp) ; /* |valloc| tracked as |malloc| */
+	    rs = uip->trackmalloc(sz,vp) ; /* |valloc| tracked as |malloc| */
 	} else {
-	    rs = uc_libvalloc(size,vp) ;
+	    rs = uc_libvalloc(sz,vp) ;
 	}
 	if (rs >= 0) {
 	    uip->st.num_allocs += 1 ;
@@ -248,37 +248,37 @@ int uc_valloc(int size,void *vp) noex {
 	    uip->numoutmax() ;
 	}
 	uip->rserr(rs) ;
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_valloc) */
 
 int uc_calloc(int nelem,int esize,void *vp) noex {
 	ucmemalloc	*uip = &ucmemalloc_data ;
-	cint		size = (nelem*esize) ;
+	cint		sz = (nelem*esize) ;
 	int		rs ;
-	if ((rs = uc_malloc(size,vp)) >= 0) {
-	    memset(vp,0,size) ;
+	if ((rs = uc_malloc(sz,vp)) >= 0) {
+	    memset(vp,0,sz) ;
 	    uip->st.num_malloc -= 1 ;
 	    uip->st.num_calloc += 1 ;
 	}
-	return rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_calloc) */
 
-int uc_realloc(cvoid *cp,int size,void *vp) noex {
+int uc_realloc(cvoid *cp,int sz,void *vp) noex {
 	ucmemalloc	*uip = &ucmemalloc_data ;
 	int		rs ;
 	if (uip->ftrack) {
-	    rs = uip->trackrealloc(cp,size,vp) ;
+	    rs = uip->trackrealloc(cp,sz,vp) ;
 	} else {
-	    rs = uc_librealloc(cp,size,vp) ;
+	    rs = uc_librealloc(cp,sz,vp) ;
 	}
 	if (rs >= 0) {
 	    uip->st.num_frees += 1 ;
 	    uip->st.num_realloc += 1 ;
 	}
 	uip->rserr(rs) ;
-	return (rs >= 0) ? size : rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_realloc) */
 
