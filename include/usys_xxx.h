@@ -28,7 +28,7 @@
 *******************************************************************************/
 
 #ifndef	USYS_XXX_INCLUDE
-#define	USYS_XXX_INCLUDE
+#define	USYS_XXX_INCLUDE	1
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -57,7 +57,7 @@
 #if	(!defined(SYSHAS_USERATTR)) || (SYSHAS_USERATTR == 0)
 
 #ifndef	STRUCT_USERATTR
-#define	STRUCT_USERATTR
+#define	STRUCT_USERATTR		1
 #define	TYPEDEF_USERATTR
 	typedef struct userattr_s {
 		char   *name;
@@ -69,7 +69,7 @@
 #endif /* STRUCT_USERATTR */
 
 #ifndef	SUBROUTINE_USERATTR
-#define	SUBROUTINE_USERATTR
+#define	SUBROUTINE_USERATTR	1
 EXTERNC_begin
 
 extern void setuserattr() noex ;
@@ -93,12 +93,12 @@ EXTERNC_end
 #else /* defined(SYSHAS_PROJECT) && (SYSHAS_PROJECT > 0) */
 
 #ifndef	TYPEDEF_PROJID
-#define	TYPEDEF_PROJID
+#define	TYPEDEF_PROJID		1
 typedef int	projid_t ;
 #endif
 
 #ifndef	SUBROUTINE_GETPROJID
-#define	SUBROUTINE_GETPROJID
+#define	SUBROUTINE_GETPROJID	1
 #ifdef	__cplusplus
 extern "C" {
     extern projid_t getprojid() noex ;
@@ -117,7 +117,7 @@ extern "C" {
 /* SYSV-MSG begin */
 
 #ifndef	TYPEDEF_SYSVMSGTYPE
-#define	TYPEDEF_SYSVMSGTYPE
+#define	TYPEDEF_SYSVMSGTYPE	1
 typedef long		sysvmsgtype ;
 #endif
 
@@ -134,7 +134,7 @@ typedef long		sysvmsgtype ;
 #if	(!defined(SYSHAS_MEMCNTL)) || (SYSHAS_MEMCNTL == 0)
 
 #ifndef	SUBROUTINE_MEMCNTL
-#define	SUBROUTINE_MEMCNTL
+#define	SUBROUTINE_MEMCNTL	1
 EXTERNC_begin
 
 extern int memcntl(void *,size_t,int,void *,int,int) noex ;
@@ -176,7 +176,7 @@ enum syshasmemplock {
 #endif
 
 #ifndef	SUBROUTINE_MEMPLOCK
-#define	SUBROUTINE_MEMPLOCK
+#define	SUBROUTINE_MEMPLOCK	1
 EXTERNC_begin
 
 extern int plock(int) noex ;

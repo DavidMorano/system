@@ -308,7 +308,7 @@ extern int	uc_getpjbegin() noex ;
 extern int	uc_getpjent(ucentpj *,char *,int) noex ;
 extern int	uc_getpjbyid(ucentpj *,char *,int,projid_t) noex ;
 extern int	uc_getpjbyname(ucentpj *,char *,int,cchar *) noex ;
-extern int	uc_getdefaultproj(ucentpj *,char *,int,cchar ) noex ;
+extern int	uc_getdefaultproj(ucentpj *,char *,int,cchar *) noex ;
 extern int	uc_getpjend() noex ;
 extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 
