@@ -19,7 +19,6 @@
 	These subroutines perform some PASSWD-structure management
 	functions.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -83,7 +82,7 @@ int ucentpw::parse(char *pwbuf,int pwlen,cc *sp,int sl) noex {
 	int		rs1 ;
 	if (this && pwbuf && sp) {
 	    rs = SR_INVALID ;
-	    memclear(this,sizeof(ucentpw)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    if (pwlen > 0) {
 	        storeitem	ib, *ibp = &ib ;
 	        if (sl < 0) sl = strlen(sp) ;
@@ -144,10 +143,10 @@ int ucentpw::format(char *rbuf,int rlen) noex {
 	    if (rlen > 0) {
 	        sbuf	b ;
 	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	            int	v ;
 	            for (int i = 0 ; i < 7 ; i += 1) {
 	                if (i > 0) rs = sbuf_char(&b,':') ;
 	                if (rs >= 0) {
+	                    int		v ;
 	                    switch (i) {
 	                    case 0:
 	                        rs = sbuf_strw(&b,pw_name,-1) ;
@@ -244,7 +243,7 @@ static int ucentpw_parseone(ucentpw *pwp,SI *ibp,int fi,cc *vp,int vl) noex {
 	} /* end switch */
 	if ((rs >= 0) && vpp) {
 	    int		cl ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    if ((cl = sfshrink(vp,vl,&cp)) >= 0) {
 	        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    }
@@ -257,9 +256,9 @@ static int ucentpw_parsedefs(ucentpw *pwp,storeitem *ibp,int sfi) noex {
 	int		rs = SR_OK ;
 	if (sfi == 6) {
 	    cchar	**vpp = (cchar **) &pwp->pw_shell ;
-	    cchar	*np = pwp->pw_name ;
+	    cchar	*sp = pwp->pw_name ;
 	    cchar	*vp ;
-	    vp = (np + strlen(np)) ;
+	    vp = (sp + strlen(sp)) ;
 	    sfi += 1 ;
 	    rs = storeitem_strw(ibp,vp,0,vpp) ;
 	}

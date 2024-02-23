@@ -121,7 +121,7 @@ int ucentnw::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	if (this && ebuf && sp) {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this,sizeof(ucentnw)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    n_addrtype = AF_INET4 ;		/* <- mandatory */
 	    if ((rs = storeitem_start(ibp,ebuf,elen)) >= 0) {
 	        int	fi = 0 ;
@@ -166,7 +166,7 @@ int ucentnw::load(char *rbuf,int rlen,const ucentnw *cprp) noex {
 	    if ((rs = storeitem_start(&ib,rbuf,rlen)) >= 0) {
 	        if (cprp->n_aliases) {
 	            int		n = 0 ;
-	            void	**tab ;
+	            void	**tab{} ;
 	            for (n = 0 ; cprp->n_aliases[n] ; n += 1) ;
 	            if ((rs = storeitem_ptab(&ib,n,&tab)) >= 0) {
 		        cchar	**aliases = (cchar **) cprp->n_aliases ;
@@ -274,7 +274,7 @@ static int ucentnw_parsestrs(ucentnw *prp,SI *ibp,cchar *sp,int sl) noex {
 	        void	**ptab ;
 	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
 		    int		i = 0 ;
-	            void	*vp ;
+	            void	*vp{} ;
 	            prp->n_aliases = (char **) ptab ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
 	                prp->n_aliases[i] = (char *) vp ;

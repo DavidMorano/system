@@ -28,7 +28,7 @@
 
 	Arguments:
 	rbuf		buffer to receive the nodename 
-	rlen		length of supplied buffer (should be NODENAMELEN)
+	rlen		length of supplied buffer (should be PROJNAMELEN)
 	un		username to lookup
 
 	Returns:

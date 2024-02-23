@@ -73,16 +73,17 @@
 #include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
-#include	<bits.h>
-#include	<strstore.h>
+#include	<getnodename.h>
 #include	<getax.h>
 #include	<getxusername.h>
+#include	<getprojname.h>		/* |getprojname(3uc)| */
 #include	<gecos.h>
 #include	<userattr.h>
 #include	<uinfo.h>
+#include	<bits.h>
+#include	<strstore.h>
 #include	<storeitem.h>
 #include	<filereadln.h>
-#include	<getnodename.h>
 #include	<strn.h>
 #include	<sncpyx.h>
 #include	<snwcpyx.h>
@@ -792,7 +793,7 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 	    }
 	    if (rs >= 0) {
 	        cchar	*un = pip->pw.pw_name ;
-	        if ((rs = userattr_open(pip->uap,un)) >= 0) {
+	        if ((rs = userattrdb_open(pip->uap,un)) >= 0) {
 	            pip->f.ua = true ;
 		} else {
 		    {
@@ -814,7 +815,7 @@ static int procinfo_uaend(PROCINFO *pip) noex {
 
 	if (pip->f.ua) {
 	    pip->f.ua = false ;
-	    rs1 = userattr_close(pip->uap) ;
+	    rs1 = userattrdb_close(pip->uap) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
@@ -839,7 +840,7 @@ static int procinfo_ualookup(PROCINFO *pip,char *rbuf,int rlen,cc *kn) noex {
 	if (pip->f.pw) {
 	    if (! pip->f.ua) rs = procinfo_uabegin(pip) ;
 	    if (rs >= 0) {
-	        rs = userattr_lookup(pip->uap,rbuf,rlen,kn) ;
+	        rs = userattrdb_lookup(pip->uap,rbuf,rlen,kn) ;
 	    }
 	}
 
@@ -904,15 +905,16 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 	int		f = false ;
 	char		*pwbuf = pip->tbuf ;
 	if ((rs = procinfo_getpwuser(pip,&pw,pwbuf,pwlen,un)) >= 0) {
+	    ucentpw	*pwp = reinterpret_cast<ucentpw *>(&pw) ;
 	    pip->f.pw = true ;
-	    if ((rs = passwdent_size(&pw)) >= 0) {
-	        int	size = rs ;
-	        char	*p ;
-	        if ((rs = uc_malloc((size+1),&p)) >= 0) {
-	            PASSWD	*pwp = &pip->pw ;
-	            if ((rs = passwdent_load(pwp,p,size,&pw)) >= 0) {
+	    if ((rs = pwp->size()) >= 0) {
+	        int	pwsz = rs ;
+	        char	*p{} ;
+	        if ((rs = uc_malloc((pwsz+1),&p)) >= 0) {
+	            ucentpw	*tpwp = reinterpret_cast<ucentpw *>(&pip->pw) ;
+	            if ((rs = tpwp->load(p,pwsz,pwp)) >= 0) {
 	                pip->pwbuf = p ;
-	                pip->pwlen = size ;
+	                pip->pwlen = pwsz ;
 	                f = true ;
 	            }
 	            if (rs < 0) {

@@ -592,13 +592,13 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	                rs = mkprogenv_userinfo(op) ;
 	            }
 	            if (rs >= 0) {
-	                USERATTR	a ;
-	                if ((rs = userattr_open(&a,op->un)) >= 0) {
+	                USERATTR	ua ;
+	                if ((rs = userattrdb_open(&ua,op->un)) >= 0) {
 	                    {
-	                        rs1 = userattr_lookup(&a,vbuf,vlen,"tz") ;
+	                        rs1 = userattrdb_lookup(&ua,vbuf,vlen,"tz") ;
 	                        if (rs1 >= 0) vp = vbuf ;
 	                    }
-	                    rs1 = userattr_close(&a) ;
+	                    rs1 = userattrdb_close(&ua) ;
 	                    if (rs1 >= 0) rs = rs1 ;
 	                } /* end if (userattr) */
 	                if (isNotPresent(rs) || (rs == SR_NOSYS)) {

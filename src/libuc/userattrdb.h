@@ -46,11 +46,11 @@ struct userattrdb_flags {
 } ;
 
 struct userattrdb_head {
-	uint		magic ;
-	USERATTRDB_FL	init, have ;
 	cchar		*username ;	/* passed argument */
 	cchar		*domain ;	/* cached */
 	userattr	*uap ;		/* returned (allocated) */
+	uint		magic ;
+	USERATTRDB_FL	init, have ;
 } ;
 
 typedef USERATTRDB	userattrdb ;

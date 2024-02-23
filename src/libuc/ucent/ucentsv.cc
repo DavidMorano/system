@@ -91,12 +91,12 @@ int ucentsv::parse(char *ebuf,int elen,cchar *sp,int sl) noex {
 	if (this && ebuf && sp) {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this,sizeof(ucentsv)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    if ((rs = storeitem_start(ibp,ebuf,elen)) >= 0) {
 	        int	fi = 0 ;
 		int	si ;
 		int	cl ;
-	        cchar	*cp ;
+	        cchar	*cp{} ;
 		if ((si = sichr(sp,sl,'#')) >= 0) sl = si ;
 	        while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	            cchar	**vpp = nullptr ;
@@ -135,7 +135,7 @@ int ucentsv::load(char *rbuf,int rlen,const ucentsv *cprp) noex {
 	    if ((rs = storeitem_start(&ib,rbuf,rlen)) >= 0) {
 	        if (cprp->s_aliases) {
 	            int		n = 0 ;
-	            void	**tab ;
+	            void	**tab{} ;
 	            for (n = 0 ; cprp->s_aliases[n] ; n += 1) ;
 	            if ((rs = storeitem_ptab(&ib,n,&tab)) >= 0) {
 		        cchar	**aliases = (cchar **) cprp->s_aliases ;
@@ -239,10 +239,10 @@ static int ucentsv_parsestrs(ucentsv *prp,SI *ibp,cchar *sp,int sl) noex {
 	if ((rs = vechand_start(&u,8,0)) >= 0) {
 	    if ((rs = si_loadnames(ibp,&u,sp,sl)) > 0) {
 	        cint	n = rs ;
-	        void	**ptab ;
+	        void	**ptab{} ;
 	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
 		    int		i = 0 ;
-	            void	*vp ;
+	            void	*vp{} ;
 	            prp->s_aliases = (char **) ptab ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
 	                prp->s_aliases[i] = (char *) vp ;
