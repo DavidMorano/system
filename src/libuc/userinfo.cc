@@ -73,13 +73,13 @@
 #include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
+#include	<uinfo.h>
 #include	<getnodename.h>
-#include	<getax.h>
 #include	<getxusername.h>
 #include	<getprojname.h>		/* |getprojname(3uc)| */
+#include	<userattrdb.h>
+#include	<getax.h>
 #include	<gecos.h>
-#include	<userattr.h>
-#include	<uinfo.h>
 #include	<bits.h>
 #include	<strstore.h>
 #include	<storeitem.h>
@@ -329,7 +329,7 @@ struct procinfo {
 	int		*sis ;		/* supplied argument */
 	cchar		*username ;	/* supplied argument */
 	cchar		*a ;		/* the memory allocation */
-	USERATTR	*uap ;
+	userattrdb	*uap ;
 	cchar		*pwbuf ;	/* specially allocated */
 	char		*nodename ;	/* allocated */
 	char		*domainname ;	/* allocated */
@@ -701,7 +701,7 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	pip->tlen = MAX(pwlen,MAXPATHLEN) ;
 
 	size = 0 ;
-	size += sizeof(USERATTR) ;
+	size += sizeof(userattrdb) ;
 	size += NODENAMELEN ;
 	size += MAXHOSTNAMELEN ;
 	size += MAXPATHLEN ;
@@ -709,8 +709,8 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
 	    int	bl = 0 ;
 	    pip->a = bp ;
-	    pip->uap = (USERATTR *) (bp+bl) ;
-	    bl += sizeof(USERATTR) ;
+	    pip->uap = (userattrdb *) (bp+bl) ;
+	    bl += sizeof(userattrdb) ;
 	    pip->nodename = (bp+bl) ;
 	    bl += NODENAMELEN ;
 	    pip->domainname = (bp+bl) ;
@@ -787,7 +787,7 @@ static int procinfo_uabegin(PROCINFO *pip) noex {
 	        cint	size = sizeof(USERATTR) ;
 	        char	*p{} ;
 	        if ((rs = uc_malloc(size,&p)) >= 0) {
-	            pip->uap = (USERATTR *) p ;
+	            pip->uap = (userattrdb *) p ;
 	            pip->f.allocua = true ;
 	        }
 	    }
