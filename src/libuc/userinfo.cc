@@ -6,7 +6,7 @@
 
 #define	CF_UINFO	1		/* include |uinfo(3uc)| */
 #define	CF_UNAME	0		/* include |u_uname(3u)| */
-#define	CF_OLDuserinfo	1		/* compile-in old |userinfo(3dam)| */
+#define	CF_OLDUSERINFO	1		/* compile-in old |userinfo(3dam)| */
 #define	CF_UCPWCACHE	0		/* use |ugetpw(3uc)| */
 
 /* revision history:
@@ -1601,7 +1601,6 @@ static int procinfo_logid(PROCINFO *pip) noex {
 #if	CF_UINFO
 static int procinfo_uinfo(PROCINFO *pip) noex {
 	int		rs ;
-
 	if ((rs = uinfo_name(&pip->unixinfo)) >= 0) {
 	    userinfo	*uip = pip->uip ;
 	    uinfo_names	*xip = &pip->unixinfo ;
@@ -1614,7 +1613,6 @@ static int procinfo_uinfo(PROCINFO *pip) noex {
 	        uip->nodename = xip->nodename ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_uinfo) */
@@ -1704,7 +1702,7 @@ static int getostype() noex {
 		}
 	    } /* end if */
 	} /* end if (check for "SunOS") */
-/* finally (if necessary) 'stat(2)' the i-node (slow disk access) */
+/* finally (if necessary) |stat(2)| the i-node (slow disk access) */
 	if (rc < 0) {
 	    rc = (u_access(SBINDNAME,X_OK) >= 0) ;
 	}
@@ -1715,169 +1713,165 @@ static int getostype() noex {
 
 #if	CF_OLDUSERINFO
 int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
-	userinfo	u ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		size = 0 ;
-
-	if (oup == nullptr) return SR_FAULT ;
-	if (ubuf == nullptr) return SR_FAULT ;
-	if (ulen < NODENAMELEN) return SR_TOOBIG ;
-
-	memset(ubuf,0,ulen) ;
-
-	if ((rs = userinfo_start(&u,un)) >= 0) {
-	    STOREITEM	si ;
-	    if ((rs = storeitem_start(&si,ubuf,ulen)) >= 0) {
-	        cchar	*sp ;
-	        cchar	**rpp ;
-
-	        oup->f = u.f ;
-	        oup->pid = u.pid ;
-	        oup->uid = u.uid ;
-	        oup->euid = u.euid ;
-	        oup->gid = u.gid ;
-	        oup->egid = u.egid ;
-
-	        for (int i = 0 ; i < uit_overlast ; i += 1) {
-	            sp = nullptr ;
-	            switch (i) {
-	            case uit_sysname:
-	                rpp = &oup->sysname ;
-	                sp = u.sysname ;
-	                break ;
-	            case uit_release:
-	                rpp = &oup->release ;
-	                sp = u.release ;
-	                break ;
-	            case uit_version:
-	                rpp = &oup->version ;
-	                sp = u.version ;
-	                break ;
-	            case uit_machine:
-	                rpp = &oup->machine ;
-	                sp = u.machine ;
-	                break ;
-	            case uit_nodename:
-	                rpp = &oup->nodename ;
-	                sp = u.nodename ;
-	                break ;
-	            case uit_domainname:
-	                rpp = &oup->domainname ;
-	                sp = u.domainname ;
-	                break ;
-	            case uit_username:
-	                rpp = &oup->username ;
-	                sp = u.username ;
-	                break ;
-	            case uit_password:
-	                rpp = &oup->password ;
-	                sp = u.password ;
-	                break ;
-	            case uit_gecos:
-	                rpp = &oup->gecos ;
-	                sp = u.gecos ;
-	                break ;
-	            case uit_homedname:
-	                rpp = &oup->homedname ;
-	                sp = u.homedname ;
-	                break ;
-	            case uit_shell:
-	                rpp = &oup->shell ;
-	                sp = u.shell ;
-	                break ;
-	            case uit_organization:
-	                rpp = &oup->organization ;
-	                sp = u.organization ;
-	                break ;
-	            case uit_gecosname:
-	                rpp = &oup->gecosname ;
-	                sp = u.gecosname ;
-	                break ;
-	            case uit_account:
-	                rpp = &oup->account ;
-	                sp = u.account ;
-	                break ;
-	            case uit_bin:
-	                rpp = &oup->bin ;
-	                sp = u.bin ;
-	                break ;
-	            case uit_office:
-	                rpp = &oup->office ;
-	                sp = u.office ;
-	                break ;
-	            case uit_wphone:
-	                rpp = &oup->wphone ;
-	                sp = u.wphone ;
-	                break ;
-	            case uit_hphone:
-	                rpp = &oup->hphone ;
-	                sp = u.hphone ;
-	                break ;
-	            case uit_printer:
-	                rpp = &oup->printer ;
-	                sp = u.printer ;
-	                break ;
-	            case uit_realname:
-	                rpp = &oup->realname ;
-	                sp = u.realname ;
-	                break ;
-	            case uit_mailname:
-	                rpp = &oup->mailname ;
-	                sp = u.mailname ;
-	                break ;
-	            case uit_fullname:
-	                rpp = &oup->fullname ;
-	                sp = u.fullname ;
-	                break ;
-	            case uit_name:
-	                rpp = &oup->name ;
-	                sp = u.name ;
-	                break ;
-	            case uit_groupname:
-	                rpp = &oup->groupname ;
-	                sp = u.groupname ;
-	                break ;
-	            case uit_project:
-	                rpp = &oup->projname ;
-	                sp = u.projname ;
-	                break ;
-	            case uit_tz:
-	                rpp = &oup->tz ;
-	                sp = u.tz ;
-	                break ;
-	            case uit_md:
-	                rpp = &oup->md ;
-	                sp = u.md ;
-	                break ;
-	            case uit_wstation:
-	                rpp = &oup->wstation ;
-	                sp = u.wstation ;
-	                break ;
-	            case uit_logid:
-	                rpp = &oup->logid ;
-	                sp = u.logid ;
-	                break ;
-	            } /* end switch */
-	            if (sp) {
-			rs = storeitem_strw(&si,sp,-1,rpp) ;
-		    }
-	            if (rs < 0) break ;
-	        } /* end for */
-	        if (rs >= 0) {
-		    oup->magic = USERINFO_MAGIC ;
-		}
-	        size = storeitem_finish(&si) ;
-	        if (rs >= 0) rs = size ;
-	    } /* end if (storeitem) */
-	    rs1 = userinfo_finish(&u) ;
-	    if (rs >= 0) rs = rs1 ;
-	    if (rs < 0) oup->magic = 0 ;
-	} /* end if (userinfo) */
-
-	return (rs >= 0) ? size : rs ;
+	int		sz = 0 ;
+	if (oup && ubuf) {
+	    rs = SR_TOOBIG ;
+	    if (ulen >= NODENAMELEN) {
+	        userinfo	u ;
+	        memset(ubuf,0,ulen) ;
+	        if ((rs = userinfo_start(&u,un)) >= 0) {
+	            storeitem	si ;
+	            if ((rs = storeitem_start(&si,ubuf,ulen)) >= 0) {
+	                cchar	*sp ;
+	                cchar	**rpp ;
+	                oup->f = u.f ;
+	                oup->pid = u.pid ;
+	                oup->uid = u.uid ;
+	                oup->euid = u.euid ;
+	                oup->gid = u.gid ;
+	                oup->egid = u.egid ;
+	                for (int i = 0 ; i < uit_overlast ; i += 1) {
+	                    sp = nullptr ;
+	                    switch (i) {
+	                    case uit_sysname:
+	                        rpp = &oup->sysname ;
+	                        sp = u.sysname ;
+	                        break ;
+	                    case uit_release:
+	                        rpp = &oup->release ;
+	                        sp = u.release ;
+	                        break ;
+	                    case uit_version:
+	                        rpp = &oup->version ;
+	                        sp = u.version ;
+	                        break ;
+	                    case uit_machine:
+	                        rpp = &oup->machine ;
+	                        sp = u.machine ;
+	                        break ;
+	                    case uit_nodename:
+	                        rpp = &oup->nodename ;
+	                        sp = u.nodename ;
+	                        break ;
+	                    case uit_domainname:
+	                        rpp = &oup->domainname ;
+	                        sp = u.domainname ;
+	                        break ;
+	                    case uit_username:
+	                        rpp = &oup->username ;
+	                        sp = u.username ;
+	                        break ;
+	                    case uit_password:
+	                        rpp = &oup->password ;
+	                        sp = u.password ;
+	                        break ;
+	                    case uit_gecos:
+	                        rpp = &oup->gecos ;
+	                        sp = u.gecos ;
+	                        break ;
+	                    case uit_homedname:
+	                        rpp = &oup->homedname ;
+	                        sp = u.homedname ;
+	                        break ;
+	                    case uit_shell:
+	                        rpp = &oup->shell ;
+	                        sp = u.shell ;
+	                        break ;
+	                    case uit_organization:
+	                        rpp = &oup->organization ;
+	                        sp = u.organization ;
+	                        break ;
+	                    case uit_gecosname:
+	                        rpp = &oup->gecosname ;
+	                        sp = u.gecosname ;
+	                        break ;
+	                    case uit_account:
+	                        rpp = &oup->account ;
+	                        sp = u.account ;
+	                        break ;
+	                    case uit_bin:
+	                        rpp = &oup->bin ;
+	                        sp = u.bin ;
+	                        break ;
+	                    case uit_office:
+	                        rpp = &oup->office ;
+	                        sp = u.office ;
+	                        break ;
+	                    case uit_wphone:
+	                        rpp = &oup->wphone ;
+	                        sp = u.wphone ;
+	                        break ;
+	                    case uit_hphone:
+	                        rpp = &oup->hphone ;
+	                        sp = u.hphone ;
+	                        break ;
+	                    case uit_printer:
+	                        rpp = &oup->printer ;
+	                        sp = u.printer ;
+	                        break ;
+	                    case uit_realname:
+	                        rpp = &oup->realname ;
+	                        sp = u.realname ;
+	                        break ;
+	                    case uit_mailname:
+	                        rpp = &oup->mailname ;
+	                        sp = u.mailname ;
+	                        break ;
+	                    case uit_fullname:
+	                        rpp = &oup->fullname ;
+	                        sp = u.fullname ;
+	                        break ;
+	                    case uit_name:
+	                        rpp = &oup->name ;
+	                        sp = u.name ;
+	                        break ;
+	                    case uit_groupname:
+	                        rpp = &oup->groupname ;
+	                        sp = u.groupname ;
+	                        break ;
+	                    case uit_project:
+	                        rpp = &oup->projname ;
+	                        sp = u.projname ;
+	                        break ;
+	                    case uit_tz:
+	                        rpp = &oup->tz ;
+	                        sp = u.tz ;
+	                        break ;
+	                    case uit_md:
+	                        rpp = &oup->md ;
+	                        sp = u.md ;
+	                        break ;
+	                    case uit_wstation:
+	                        rpp = &oup->wstation ;
+	                        sp = u.wstation ;
+	                        break ;
+	                    case uit_logid:
+	                        rpp = &oup->logid ;
+	                        sp = u.logid ;
+	                        break ;
+	                    } /* end switch */
+	                    if (sp) {
+			        rs = storeitem_strw(&si,sp,-1,rpp) ;
+		            }
+	                    if (rs < 0) break ;
+	                } /* end for */
+	                if (rs >= 0) {
+		            oup->magic = USERINFO_MAGIC ;
+		        }
+	                sz = storeitem_finish(&si) ;
+	                if (rs >= 0) rs = sz ;
+	            } /* end if (storeitem) */
+	            rs1 = userinfo_finish(&u) ;
+	            if (rs >= 0) rs = rs1 ;
+	            if (rs < 0) oup->magic = 0 ;
+	        } /* end if (userinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (userinfo_data) */
-#endif /* CF_OLDUI */
+#endif /* CF_OLDUSERINFO */
 
 
