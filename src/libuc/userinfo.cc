@@ -73,6 +73,7 @@
 #include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<uinfo.h>
 #include	<getnodename.h>
 #include	<getxusername.h>
@@ -339,6 +340,14 @@ struct procinfo {
 	int		tlen ;
 } ;
 
+struct vars {
+	int		maxnamelen ;
+	int		maxpathlen ;
+	int		nodenamelen ;
+	int		hostnamelen ;
+	int		projnamelen ;
+} ;
+
 
 /* forward references */
 
@@ -398,6 +407,8 @@ static int	empty(cchar *) noex ;
 static int	getostype() noex ;
 #endif
 
+static int	mkvars() noex ;
+
 
 /* local variables */
 
@@ -433,6 +444,8 @@ static constexpr int	(*components[])(PROCINFO *) = {
 
 constexpr bool		f_sysv = USERINFO_SYSV ;
 
+static vars		var ;
+
 
 /* exported variables */
 
@@ -445,27 +458,30 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	int		rs1 ;
 	int		len = 0 ;
 	if (uip) {
-	    memclear(uip) ;			/* dangerous */
-	    uip->nodename = getenv(VARNODE) ;
-	    if ((rs = userinfo_id(uip)) >= 0) {
-	        cint	sz = (uit_overlast * sizeof(cchar *)) ;
-	        void	*vp{} ;
-	        if ((rs = uc_calloc(1,sz,&vp)) >= 0) {
-	            strstore	st ;
-	            int		*sis = reinterpret_cast<int *>(vp) ;
-	            if ((rs = strstore_start(&st,10,startsize)) >= 0) {
-	                if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
-	                    rs = userinfo_load(uip,&st,sis) ;
-	                    len = rs ;
-	                } /* end if */
-	                rs1 = strstore_finish(&st) ;
+	    memclear(uip) ;		/* dangerous */
+	    static int	rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	        uip->nodename = getenv(VARNODE) ;
+	        if ((rs = userinfo_id(uip)) >= 0) {
+	            cint	sz = (uit_overlast * sizeof(cchar *)) ;
+	            void	*vp{} ;
+	            if ((rs = uc_calloc(1,sz,&vp)) >= 0) {
+	                strstore	st ;
+	                int		*sis = reinterpret_cast<int *>(vp) ;
+	                if ((rs = strstore_start(&st,10,startsize)) >= 0) {
+	                    if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
+	                        rs = userinfo_load(uip,&st,sis) ;
+	                        len = rs ;
+	                    } /* end if */
+	                    rs1 = strstore_finish(&st) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (strstore) */
+	                rs1 = uc_free(vp) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (strstore) */
-	            rs1 = uc_free(vp) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory_allocation) */
-	        if (rs >= 0) uip->magic = USERINFO_MAGIC ;
-	    } /* end if (userinfo_id) */
+	            } /* end if (memory_allocation) */
+	            if (rs >= 0) uip->magic = USERINFO_MAGIC ;
+	        } /* end if (userinfo_id) */
+	    } /* end if (mkvars) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -1191,7 +1207,6 @@ static int procinfo_gecosname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_gecosname ;
-
 	if ((pip->sis[uit] == 0) && (uip->gecosname == nullptr)) {
 	    cchar	*gstr = pip->pw.pw_gecos ;
 	    if ((gstr != nullptr) && (gstr[0] != '\0')) {
@@ -1205,7 +1220,6 @@ static int procinfo_gecosname(PROCINFO *pip) noex {
 	        }
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_gecosname) */
@@ -1214,20 +1228,19 @@ static int procinfo_realname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_realname ;
-
 	if ((pip->sis[uit] == 0) && (uip->realname == nullptr)) {
 	    cint	nlen = REALNAMELEN ;
-	    cchar	*np = pip->tstrs.gecosname ;
+	    cchar	*sp = pip->tstrs.gecosname ;
 	    char	nbuf[REALNAMELEN+1] ;
-	    if ((np == nullptr) || (np[0] == '\0')) {
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->f.altuser) {
-	            np = getenv(VARNAME) ;
+	            sp = getenv(VARNAME) ;
 	        }
 	    }
-	    if ((np != nullptr) && (np[0] != '\0')) {
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        int	vl ;
 	        cchar	*vp = nbuf ;
-	        if ((vl = mkrealname(nbuf,nlen,np,-1)) > 0) {
+	        if ((vl = mkrealname(nbuf,nlen,sp,-1)) > 0) {
 	            strstore	*stp = pip->stp ;
 	            cchar	*cp ;
 	            rs = strstore_store(stp,vp,vl,&cp) ;
@@ -1236,7 +1249,6 @@ static int procinfo_realname(PROCINFO *pip) noex {
 	        }
 	    }
 	} /* end if (needed) */
-
 	return rs ;
 }
 /* end subroutine (procinfo_realname) */
@@ -1245,47 +1257,49 @@ static int procinfo_mailname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_mailname ;
-
 	if ((pip->sis[uit] == 0) && (uip->mailname == nullptr)) {
 	    cint	nlen = REALNAMELEN ;
 	    cint	mlen = REALNAMELEN ;
 	    int		vl ;
-	    int		nl = -1 ;
+	    int		sl = -1 ;
 	    cchar	*vp ;
-	    cchar	*np = nullptr ;
+	    cchar	*sp = nullptr ;
 	    char	nbuf[REALNAMELEN+1] ;
 	    char	mbuf[REALNAMELEN+1] ;
-	    if ((np == nullptr) || (np[0] == '\0')) {
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->f.altuser) {
-	            np = getenv(VARMAILNAME) ;
+	            sp = getenv(VARMAILNAME) ;
 	        }
 	    }
-	    if ((np == nullptr) || (np[0] == '\0')) {
-	        np = pip->tstrs.gecosname ;
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
+	        sp = pip->tstrs.gecosname ;
 	    }
-	    if ((np == nullptr) || (np[0] == '\0')) {
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (pip->f.pw) {
 	            cchar	*gn = pip->pw.pw_gecos ;
-	            np = nbuf ;
-	            nl = mkgecosname(nbuf,nlen,gn) ;
+	            sp = nbuf ;
+	            sl = mkgecosname(nbuf,nlen,gn) ;
 	        }
 	    }
-	    if ((np == nullptr) || (np[0] == '\0')) {
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->f.altuser) {
-	            np = getenv(VARNAME) ;
+	            sp = getenv(VARNAME) ;
+		    sl = -1 ;
 	        }
 	    }
-	    if ((np == nullptr) || (np[0] == '\0')) {
-	        if (pip->f.pw) np = pip->pw.pw_name ;
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
+	        if (pip->f.pw) {
+		    sp = pip->pw.pw_name ;
+		    sl = -1 ;
+		}
 	    }
-	    if ((np != nullptr) && (np[0] != '\0')) {
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        vp = mbuf ;
-	        if ((vl = mkmailname(mbuf,mlen,np,nl)) > 0) {
+	        if ((vl = mkmailname(mbuf,mlen,sp,sl)) > 0) {
 	            rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
 		}
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_mailname) */
@@ -1294,22 +1308,21 @@ static int procinfo_name(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_name ;
-
 	if ((pip->sis[uit] == 0) && (uip->name == nullptr)) {
 	    cint	glen = REALNAMELEN ;
 	    cint	rlen = REALNAMELEN ;
-	    int		nl = -1 ;
-	    cchar	*np = nullptr ;
+	    int		sl = -1 ;
+	    cchar	*sp = nullptr ;
 	    char	gbuf[REALNAMELEN+1] ;
 	    char	rbuf[REALNAMELEN+1] ;
-	    if ((np == nullptr) || (np[0] == '\0')) {
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
 	        if (! pip->f.altuser) {
-	            np = getenv(VARNAME) ;
+	            sp = getenv(VARNAME) ;
 	        }
 	    }
-	    if ((np == nullptr) || (np[0] == '\0')) {
-	        np = pip->tstrs.realname ;
-	        if (np == nullptr) {
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
+	        sp = pip->tstrs.realname ;
+	        if (sp == nullptr) {
 	            cchar	*gp = pip->tstrs.gecosname ;
 	            int		gl = -1 ;
 	            if (gp == nullptr) {
@@ -1317,18 +1330,20 @@ static int procinfo_name(PROCINFO *pip) noex {
 	                gp = gbuf ;
 	                gl = mkgecosname(gbuf,glen,gn) ;
 	            }
-	            np = rbuf ;
-	            nl = mkrealname(rbuf,rlen,gp,gl) ;
+	            sp = rbuf ;
+	            sl = mkrealname(rbuf,rlen,gp,gl) ;
 	        }
 	    }
-	    if ((np == nullptr) || (np[0] == '\0')) {
-	        if (pip->f.pw) np = pip->pw.pw_name ;
+	    if ((sp == nullptr) || (sp[0] == '\0')) {
+	        if (pip->f.pw) {
+		    sp = pip->pw.pw_name ;
+		    sl = -1 ;
+		}
 	    }
-	    if ((np != nullptr) && (np[0] != '\0')) {
-	        rs = procinfo_store(pip,uit,np,nl,nullptr) ;
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
+	        rs = procinfo_store(pip,uit,sp,sl,nullptr) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_name) */
@@ -1337,19 +1352,15 @@ static int procinfo_fullname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_fullname ;
-
 	if ((pip->sis[uit] == 0) && (uip->fullname == nullptr)) {
-	    cchar	*np = nullptr ;
-	    if ((np == nullptr) || (np[0] == '\0')) {
+	    cchar	*sp = nullptr ;
 	        if (! pip->f.altuser) {
-	            np = getenv(VARFULLNAME) ;
+	            sp = getenv(VARFULLNAME) ;
 	        }
-	    }
-	    if ((np != nullptr) && (np[0] != '\0')) {
-	        uip->fullname = np ;
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
+	        uip->fullname = sp ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_fullname) */
@@ -1358,9 +1369,8 @@ static int procinfo_nodename(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_nodename ;
-
 	if ((pip->sis[uit] == 0) && (uip->nodename == nullptr)) {
-	    cint	nlen = NODENAMELEN ;
+	    cint	nlen = var.nodenamelen ;
 	    int		nl = -1 ;
 	    char	*nbuf = pip->nodename ;
 	    if (nbuf[0] == '\0') {
@@ -1371,7 +1381,6 @@ static int procinfo_nodename(PROCINFO *pip) noex {
 	        rs = procinfo_store(pip,uit,nbuf,nl,nullptr) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_nodename) */
@@ -1380,7 +1389,6 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_domainname ;
-
 	if ((pip->sis[uit] == 0) && (uip->domainname == nullptr)) {
 	    uip->domainname = nullptr ;
 	    if (uip->domainname == nullptr) {
@@ -1389,9 +1397,9 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	        }
 	    }
 	    if (uip->domainname == nullptr) {
-	        cint	dlen = MAXHOSTNAMELEN ;
-	        int		dl = -1 ;
-	        char		*dbuf = pip->domainname ;
+	        cint	dlen = var.hostnamelen ;
+	        int	dl = -1 ;
+	        char	*dbuf = pip->domainname ;
 	        if ((rs >= 0) && (dbuf[0] == '\0')) {
 	            if (pip->f.pw) {
 	                cchar	*kn = UA_DN ;
@@ -1415,7 +1423,6 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 	        }
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_domainename) */
@@ -1424,7 +1431,6 @@ static int procinfo_project(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_project ;
-
 	if ((pip->sis[uit] == 0) && (uip->projname == nullptr)) {
 	    cint	dlen = PROJNAMELEN ;
 	    int		dl = -1 ;
@@ -1455,7 +1461,6 @@ static int procinfo_project(PROCINFO *pip) noex {
 	        rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
 	    }
 	} /* end if (project) */
-
 	return rs ;
 }
 /* end subroutine (procinfo_project) */
@@ -1464,7 +1469,6 @@ static int procinfo_tz(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_tz ;
-
 	if ((pip->sis[uit] == 0) && (uip->tz == nullptr)) {
 	    uip->tz = nullptr ;
 	    if (uip->tz == nullptr) {
@@ -1492,7 +1496,6 @@ static int procinfo_tz(PROCINFO *pip) noex {
 	        }
 	    }
 	} /* end if (tz) */
-
 	return rs ;
 }
 /* end subroutine (procinfo_tz) */
@@ -1500,8 +1503,8 @@ static int procinfo_tz(PROCINFO *pip) noex {
 static int procinfo_md(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		uit = uit_md ;
-
 	if ((pip->sis[uit] == 0) && (uip->md == nullptr)) {
 	    uip->md = nullptr ;
 	    if (uip->md == nullptr) {
@@ -1510,26 +1513,29 @@ static int procinfo_md(PROCINFO *pip) noex {
 	        }
 	    }
 	    if (uip->md == nullptr) {
-	        cint	dlen = MAXHOSTNAMELEN ;
 	        int	dl = -1 ;
-	        char	dbuf[MAXHOSTNAMELEN+1] = { 0 } ;
-	        if ((rs >= 0) && (dbuf[0] == '\0')) {
-	            if (pip->f.pw) {
-	                cchar	*kn = UA_MD ;
-	                rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
-	                dl = rs ;
-	                if (isNotPresent(rs)) {
-	                    dbuf[0] = '\0' ;
-	                    rs = SR_OK ;
+	        char	*dbuf{} ;
+		if ((rs = malloc_hn(&dbuf)) >= 0) {
+		    cint	dlen = rs ;
+	            if ((rs >= 0) && (dbuf[0] == '\0')) {
+	                if (pip->f.pw) {
+	                    cchar	*kn = UA_MD ;
+	                    rs = procinfo_ualookup(pip,dbuf,dlen,kn) ;
+	                    dl = rs ;
+	                    if (isNotPresent(rs)) {
+	                        dbuf[0] = '\0' ;
+	                        rs = SR_OK ;
+	                    }
 	                }
+	            } /* end if */
+	            if ((rs >= 0) && (dbuf[0] != '\0')) {
+	                rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
 	            }
-	        }
-	        if ((rs >= 0) && (dbuf[0] != '\0')) {
-	            rs = procinfo_store(pip,uit,dbuf,dl,nullptr) ;
-	        }
+		    rs1 = uc_free(dbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    }
 	} /* end if (md) */
-
 	return rs ;
 }
 /* end subroutine (procinfo_md) */
@@ -1538,7 +1544,6 @@ static int procinfo_wstation(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_wstation ;
-
 	if ((pip->sis[uit] == 0) && (uip->wstation == nullptr)) {
 	    uip->wstation = nullptr ;
 	    if (uip->wstation == nullptr) {
@@ -1566,7 +1571,6 @@ static int procinfo_wstation(PROCINFO *pip) noex {
 	        }
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_wstation) */
@@ -1575,7 +1579,6 @@ static int procinfo_logid(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs = SR_OK ;
 	int		uit = uit_logid ;
-
 	if ((pip->sis[uit] == 0) && (uip->logid == nullptr)) {
 	    int		v = uip->pid ;
 	    cchar	*nn = uip->nodename ;
@@ -1593,7 +1596,6 @@ static int procinfo_logid(PROCINFO *pip) noex {
 	        }
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (procinfo_logid) */
@@ -1637,7 +1639,7 @@ static int procinfo_uname(PROCINFO *pip) noex {
 	            if (uip->nodename == nullptr) {
 	                vp = un.nodename ;
 	                if (pip->nodename[0] == '\0') {
-	                    cint	nlen = NODENAMELEN ;
+	                    cint	nlen = var.nodenamelen ;
 	                    char	*nbuf = pip->nodename ;
 	                    strwcpy(nbuf,vp,nlen) ;
 	                }
@@ -1718,7 +1720,7 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 	int		sz = 0 ;
 	if (oup && ubuf) {
 	    rs = SR_TOOBIG ;
-	    if (ulen >= NODENAMELEN) {
+	    if (ulen >= var.nodenamelen) {
 	        userinfo	u ;
 	        memset(ubuf,0,ulen) ;
 	        if ((rs = userinfo_start(&u,un)) >= 0) {
@@ -1873,5 +1875,26 @@ int userinfo_data(UI *oup,char *ubuf,int ulen,cchar *un) noex {
 }
 /* end subroutine (userinfo_data) */
 #endif /* CF_OLDUSERINFO */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	    var.maxnamelen = rs ;
+	    if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	        var.maxpathlen = rs ;
+	        if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	            var.nodenamelen = rs ;
+	            if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	                var.hostnamelen = rs ;
+	                if ((rs = getbufsize(getbufsize_pn)) >= 0) {
+	                    var.projnamelen = rs ;
+			}
+		    }
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
