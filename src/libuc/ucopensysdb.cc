@@ -42,6 +42,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
+#include	<syswords.hh>
 #include	<sysdbfnames.h>
 #include	<libmallocxx.h>
 #include	<mknpathx.h>
@@ -68,7 +69,7 @@
 
 /* local variables */
 
-static constexpr cchar	prefix[] = "/sysdb" ;
+static cchar	*prefix = sysword.w_sysdbdir ;
 
 
 /* exported variables */

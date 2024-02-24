@@ -55,9 +55,15 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<varnames.hh>
 #include	<storebuf.h>
+#include	<mkpathx.h>
 #include	<ids.h>
+#include	<getpwd.h>
+#include	<xperm.h>
 #include	<localmisc.h>
+
+#include	"findfilepath.h"
 
 
 /* local defines */
@@ -68,14 +74,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getpwd(char *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -91,20 +89,23 @@ struct ffp_data {
 
 /* forward references */
 
-static int	checkone(IDS *,struct ffp_data *,char *,cchar *,int,
+static int	checkone(ids *,struct ffp_data *,char *,cchar *,int,
 			cchar *,int) ;
-static int	checkit(IDS *,char *,cchar *,int,cchar *,int) ;
-static int	fileperm(IDS *,cchar *,int) ;
+static int	checkit(ids *,char *,cchar *,int,cchar *,int) ;
+static int	fileperm(ids *,cchar *,int) ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int findfilepath(char *fpath,cchar *path,cchar *fname,int am) noex {
 	struct ffp_data	d ;
-	IDS		ids ;
+	ids		ids ;
 	int		rs ;
 	int		len = 0 ;
 	int		dirlen ;
@@ -198,7 +199,7 @@ int findfilepath(char *fpath,cchar *path,cchar *fname,int am) noex {
 
 
 static int checkone(idp,dp,fpath,dirpath,dirlen,fname,am)
-IDS		*idp ;
+ids		*idp ;
 struct ffp_data	*dp ;
 char		fpath[] ;
 cchar	dirpath[] ;
@@ -236,7 +237,7 @@ int		am ;
 
 
 static int checkit(idp,pbuf,dname,dnamelen,fname,am)
-IDS		*idp ;
+ids		*idp ;
 char		pbuf[] ;
 cchar	dname[] ;
 int		dnamelen ;

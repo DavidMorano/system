@@ -17,8 +17,10 @@
 
 /*******************************************************************************
 
-	Name:
+	Names:
+	digval
 	hexval
+	decval
 
 	Description:
 	We examine a single character, supposedly a hexadecimal
@@ -54,6 +56,15 @@
 #include	"digval.h"
 
 
+/* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -67,7 +78,7 @@ int digval(int ch) noex {
 	if (v == UCHAR_MAX) v = SR_DOM ;
 	return v ;
 }
-/* end subroutine (hexval) */
+/* end subroutine (digval) */
 
 int hexval(int ch) noex {
 	int		v = SR_DOM ;

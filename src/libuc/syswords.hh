@@ -41,13 +41,15 @@ struct syswords {
 	static const char w_manpath[] ;
 	static const char w_incpath[] ;
 	static const char w_infopath[] ;
-	static const char w_tmpdir[] ;
-	static const char w_maildir[] ;
-	static const char w_sysdbdir[] ;
-	static const char w_usrlocaldir[] ;
 	static const char w_users[] ;
 	static const char w_help[] ;
 	static const char w_lib[] ;
+	static const char w_tmpdir[] ;
+	static const char w_devdir[] ;
+	static const char w_vardir[] ;
+	static const char w_maildir[] ;
+	static const char w_sysdbdir[] ;
+	static const char w_usrlocaldir[] ;
 } ; /* end struct (syswords) */
 
 

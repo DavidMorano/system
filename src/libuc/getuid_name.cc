@@ -43,7 +43,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -77,6 +76,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
