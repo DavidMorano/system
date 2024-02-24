@@ -258,6 +258,7 @@
 
 /* local namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
@@ -346,6 +347,7 @@ struct vars {
 	int		nodenamelen ;
 	int		hostnamelen ;
 	int		projnamelen ;
+	int		pwlen ;
 } ;
 
 
@@ -700,22 +702,19 @@ static int userinfo_setnuls(USERINFO *uep,cchar *emptyp) noex {
 #endif /* COMMENT */
 
 static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
-	cint		pwlen = getbufsize(getbufsize_pw) ;
+	cint		pwlen = var.pwlen ;
 	int		rs ;
-	int		size ;
-	char		*bp ;
-
+	int		size = 0 ;
+	char		*bp{} ;
 	memclear(pip) ;			/* <- noted */
 	pip->uip = uip ;
 	pip->stp = stp ;
 	pip->sis = sis ;
-	pip->tlen = MAX(pwlen,MAXPATHLEN) ;
-
-	size = 0 ;
+	pip->tlen = max(pwlen,var.maxpathlen) ;
 	size += sizeof(userattrdb) ;
-	size += NODENAMELEN ;
-	size += MAXHOSTNAMELEN ;
-	size += MAXPATHLEN ;
+	size += var.nodenamelen ;
+	size += var.hostnamelen ;
+	size += var.maxpathlen ;
 	size += pip->tlen ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
 	    int	bl = 0 ;
@@ -723,11 +722,11 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	    pip->uap = (userattrdb *) (bp+bl) ;
 	    bl += sizeof(userattrdb) ;
 	    pip->nodename = (bp+bl) ;
-	    bl += NODENAMELEN ;
+	    bl += var.nodenamelen ;
 	    pip->domainname = (bp+bl) ;
-	    bl += MAXHOSTNAMELEN ;
+	    bl += var.hostnamelen ;
 	    pip->pr = (bp+bl) ;
-	    bl += MAXPATHLEN ;
+	    bl += var.maxpathlen ;
 	    pip->tbuf = (bp+bl) ;
 	    bl += pip->tlen ;
 	    if ((rs = bits_start(&pip->have,uit_overlast)) >= 0) {
@@ -740,7 +739,6 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	        pip->a = nullptr ;
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (procinfo_start) */
@@ -994,43 +992,49 @@ static int procinfo_shell(PROCINFO *pip) noex {
 
 static int procinfo_org(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cint		orglen = var.maxnamelen ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		uit = uit_organization ;
 	if ((pip->sis[uit] == 0) && (uip->organization == nullptr)) {
-	    cint	rlen = MAXNAMELEN ;
+	    cint	rlen = orglen ;
 	    int		vl = -1 ;
 	    cchar	*orgcname = ORGCNAME ;
 	    cchar	*vp = nullptr ;
-	    char	rbuf[MAXNAMELEN+1] ;
-	    char	orgfname[MAXPATHLEN+1] ;
-	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        if (! pip->f.altuser) {
-	            vp = getenv(VARORGANIZATION) ;
+	    char	rbuf[orglen+1] ;
+	    char	*orgfname{} ;
+	    if ((rs = malloc_mp(&orgfname)) >= 0) {
+	        if ((vp == nullptr) || (vp[0] == '\0')) {
+	            if (! pip->f.altuser) {
+	                vp = getenv(VARORGANIZATION) ;
+	            }
 	        }
-	    }
-	    if ((vp == nullptr) || (vp[0] == '\0')) {
-	        char	cname[MAXNAMELEN+1] ;
-	        rs = sncpy2(cname,MAXNAMELEN,".",orgcname) ;
+	        if ((vp == nullptr) || (vp[0] == '\0')) {
+	            char	cname[orglen+1] ;
+	            rs = sncpy2(cname,orglen,".",orgcname) ;
+	            if (rs >= 0) {
+	                cchar	*hd = uip->homedname ;
+	                if ((hd == nullptr) && pip->f.pw) {
+	                    hd = pip->pw.pw_dir ;
+		        }
+	                if (hd == nullptr) hd = DEFHOMEDNAME ;
+	                rs = mkpath2(orgfname,hd,cname) ;
+	            }
+	            if (rs >= 0) {
+	                rs = filereadln(orgfname,rbuf,rlen) ;
+	                vl = rs ;
+	                if (rs > 0) vp = rbuf ;
+	                if (isNotPresent(rs)) rs = SR_OK ;
+	            }
+	        } /* end if */
 	        if (rs >= 0) {
-	            cchar	*hd = uip->homedname ;
-	            if ((hd == nullptr) && pip->f.pw) {
-	                hd = pip->pw.pw_dir ;
+	            if ((vp != nullptr) && (vp[0] != '\0')) {
+	                rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
 		    }
-	            if (hd == nullptr) hd = DEFHOMEDNAME ;
-	            rs = mkpath2(orgfname,hd,cname) ;
-	        }
-	        if (rs >= 0) {
-	            rs = filereadln(orgfname,rbuf,rlen) ;
-	            vl = rs ;
-	            if (rs > 0) vp = rbuf ;
-	            if (isNotPresent(rs)) rs = SR_OK ;
-	        }
-	    }
-	    if (rs >= 0) {
-	        if ((vp != nullptr) && (vp[0] != '\0')) {
-	            rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
-		}
-	    }
+	        } /* end if (ok) */
+		rs1 = uc_free(orgfname) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if */
 	return rs ;
 }
@@ -1429,12 +1433,12 @@ static int procinfo_domainname(PROCINFO *pip) noex {
 
 static int procinfo_project(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
+	cint		dlen = var.projnamelen ;
 	int		rs = SR_OK ;
 	int		uit = uit_project ;
 	if ((pip->sis[uit] == 0) && (uip->projname == nullptr)) {
-	    cint	dlen = PROJNAMELEN ;
 	    int		dl = -1 ;
-	    char	dbuf[PROJNAMELEN+1] = { 0 } ;
+	    char	dbuf[dlen+1] = { 0 } ;
 	    if ((rs >= 0) && (dbuf[0] == '\0')) {
 	        if (pip->f.pw) {
 	            cchar	*kn = UA_PROJECT ;
@@ -1577,6 +1581,7 @@ static int procinfo_wstation(PROCINFO *pip) noex {
 
 static int procinfo_logid(PROCINFO *pip) noex {
 	userinfo	*uip = pip->uip ;
+	const nullptr_t	np{} ;
 	int		rs = SR_OK ;
 	int		uit = uit_logid ;
 	if ((pip->sis[uit] == 0) && (uip->logid == nullptr)) {
@@ -1587,12 +1592,9 @@ static int procinfo_logid(PROCINFO *pip) noex {
 	    }
 	    if ((nn != nullptr) && (nn[0] != '\0')) {
 	        cint	llen = LOGIDLEN ;
-	        int		vl ;
-	        cchar	*vp ;
-	        char		lbuf[LOGIDLEN+1] ;
-	        vp = lbuf ;
-	        if ((vl = mklogid(lbuf,llen,nn,-1,v)) >= 0) {
-	            rs = procinfo_store(pip,uit,vp,vl,nullptr) ;
+	        char	lbuf[LOGIDLEN+1] ;
+	        if ((rs = mklogid(lbuf,llen,nn,-1,v)) >= 0) {
+	            rs = procinfo_store(pip,uit,lbuf,rs,np) ;
 	        }
 	    }
 	}
@@ -1888,6 +1890,9 @@ static int mkvars() noex {
 	                var.hostnamelen = rs ;
 	                if ((rs = getbufsize(getbufsize_pn)) >= 0) {
 	                    var.projnamelen = rs ;
+	                    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+				var.pwlen = rs ;
+			    }
 			}
 		    }
 		}
