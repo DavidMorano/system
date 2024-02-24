@@ -7,7 +7,6 @@
 #define	CF_PREPENDPWD	0	/* prepend PWD when encountered? */
 #define	CF_FILEPATH	1	/* always return a file path */
 #define	CF_FILEPATHLEN	0	/* always return a file path length */
-#define	CF_SPERM	1	/* use 'sperm(3dam)' */
 
 /* revision history:
 
@@ -72,6 +71,14 @@
 #define	VARPATH		"PATH"
 #endif
 
+#define	FD		struct fdata
+
+
+/* local namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
@@ -81,7 +88,7 @@
 
 /* local structures */
 
-struct ffp_data {
+struct fdata {
 	int		pwdlen ;
 	char		pwd[MAXPATHLEN + 1] ;
 } ;
@@ -89,10 +96,9 @@ struct ffp_data {
 
 /* forward references */
 
-static int	checkone(ids *,struct ffp_data *,char *,cchar *,int,
-			cchar *,int) ;
-static int	checkit(ids *,char *,cchar *,int,cchar *,int) ;
-static int	fileperm(ids *,cchar *,int) ;
+static int	checkone(ids *,FD *,char *,cchar *,int,cchar *,int) noex ;
+static int	checkit(ids *,char *,cchar *,int,cchar *,int) noex ;
+static int	fileperm(ids *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -104,9 +110,10 @@ static int	fileperm(ids *,cchar *,int) ;
 /* exported subroutines */
 
 int findfilepath(char *fpath,cchar *path,cchar *fname,int am) noex {
-	struct ffp_data	d ;
+	FD		d ;
 	ids		ids ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
 	int		dirlen ;
 	int		f_fpath = TRUE ;
@@ -187,7 +194,8 @@ int findfilepath(char *fpath,cchar *path,cchar *fname,int am) noex {
 
 	    } /* end if */
 
-	    ids_release(&ids) ;
+	    rs1 = ids_release(&ids) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ids) */
 
 	return (rs >= 0) ? len : rs ;
@@ -197,17 +205,10 @@ int findfilepath(char *fpath,cchar *path,cchar *fname,int am) noex {
 
 /* local subroutines */
 
-
-static int checkone(idp,dp,fpath,dirpath,dirlen,fname,am)
-ids		*idp ;
-struct ffp_data	*dp ;
-char		fpath[] ;
-cchar	dirpath[] ;
-int		dirlen ;
-cchar	fname[] ;
-int		am ;
-{
+static int checkone(ids *idp,FD *dp,char *fpath,cc *dirpath,int dirlen,
+		cc *fname,int am) noex {
 	int		rs = SR_OK ;
+	(void) dp ;
 
 	if (dirlen == 0) {
 
@@ -235,23 +236,14 @@ int		am ;
 }
 /* end subroutine (checkone) */
 
-
-static int checkit(idp,pbuf,dname,dnamelen,fname,am)
-ids		*idp ;
-char		pbuf[] ;
-cchar	dname[] ;
-int		dnamelen ;
-cchar	fname[] ;
-int		am ;
-{
-	const int	plen = MAXPATHLEN ;
+static int checkit(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
+	cint		plen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	int		len = 0 ;
-
-	if (dnamelen != 0) {
+	if (dnl != 0) {
 	    if (rs >= 0) {
-	        rs = storebuf_strw(pbuf,plen,i,dname,dnamelen) ;
+	        rs = storebuf_strw(pbuf,plen,i,dnp,dnl) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -259,7 +251,7 @@ int		am ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = storebuf_strw(pbuf,plen,i,fname,-1) ;
+	        rs = storebuf_strw(pbuf,plen,i,fn,-1) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -269,13 +261,11 @@ int		am ;
 	    if (rs >= 0) {
 	        rs = fileperm(idp,pbuf,am) ;
 	    }
-
 	} else {
-	    if ((rs = fileperm(idp,fname,am)) >= 0) {
+	    if ((rs = fileperm(idp,fn,am)) >= 0) {
 	        len = 0 ; /* <- WTF? */
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (checkit) */
@@ -287,11 +277,7 @@ static int fileperm(ids *idp,cchar *fname,int am) noex {
 	if ((rs = u_stat(fname,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode))  {
-#if	CF_SPERM
 	        rs = sperm(idp,&sb,am) ;
-#else
-	        rs = perm(fname,-1,-1,NULL,am) ;
-#endif
 	    }
 	} /* end if */
 	return rs ;
