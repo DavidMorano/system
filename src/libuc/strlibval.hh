@@ -18,7 +18,7 @@
 
 	Recommended usage within source code:
 		#include	<strlibval.hh>
-		strlibval	strpath(trlibvar_path) ;
+		strlibval	strpath(strlibval_path) ;
 		if (strpath != nullptr) {
 			* do something w/ string-value pointer 'strpath' *
 		}
