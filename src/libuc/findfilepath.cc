@@ -28,12 +28,12 @@
 	variable 'PATH') is used.
 
 	Synopsis:
-	int findfilepath(char *fpath,cchar *path,cchar *fname,int am) noex
+	int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex
 
 	Arguments:
-	fpath		resulting path to the file
+	rbuf		resulting path to the file
 	path		execution path or nullptr to use default 'PATH'
-	fname		file to be searched for
+	fn		file to be searched for
 	am		file mode like w/ u_open(2) and u_access(2)
 
 	Returns:
@@ -41,7 +41,7 @@
 	0		program was found in present working directory (PWD)
 	<0		program was not found or error (system-return)
 
-	fpath		resulting path if different than input
+	rbuf		resulting path if different than input
 
 *******************************************************************************/
 
@@ -108,75 +108,70 @@ static strlibval	pathval(strlibval_path) ;
 
 /* exported subroutines */
 
-int findfilepath(char *rbuf,cchar *path,cchar *fname,int am) noex {
+int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	if (rbuf && fname) {
+	if (rbuf && fn) {
 	    rs = SR_INVALID ;
-	    if (fname[0]) {
-	ids		ids ;
-	int		dirlen ;
-	cchar	*tp ;
-	cchar	*pp ;
-	bool		f_fpath = true ;
-	if ((rs = ids_load(&ids)) >= 0) {
 	    rbuf[0] = '\0' ;
-	    if (fname[0] == '/') {
-	        if ((rs = fileperm(&ids,fname,am)) >= 0) {
-	            if (f_fpath) {
-	                len = mkpath1(rbuf,fname) ;
+	    if (fn[0]) {
+	        ids	ids ;
+	        if ((rs = ids_load(&ids)) >= 0) {
+	            bool	f_fpath = true ;
+	            if (fn[0] == '/') {
+	                if ((rs = fileperm(&ids,fn,am)) >= 0) {
+	                    if (f_fpath) {
+	                        len = mkpath1(rbuf,fn) ;
+	                    } else {
+	                        len = strlen(fn) ;
+		            }
+	                }
 	            } else {
-	                len = strlen(fname) ;
-		    }
-	        }
-	    } else {
-	        if (path == nullptr) path = pathval ;
-	        rs = SR_NOTFOUND ;
-	        if (path != nullptr) {
-	            pp = path ;
-	            while ((tp = strchr(pp,':')) != nullptr) {
-			{
-	                    dirlen = (tp - pp) ;
-	                    rs = checkone(&ids,rbuf,pp,dirlen,fname,am) ;
-	                    len = rs ;
-			}
-	                pp = tp + 1 ;
-	                if (rs >= 0) break ;
-	            } /* end while */
-	            if (rs < 0) {
-	                dirlen = strlen(pp) ;
-	                rs = checkone(&ids,rbuf,pp,dirlen,fname,am) ;
-	                len = rs ;
-	            }
+	                if (path == nullptr) path = pathval ;
+	                rs = SR_NOTFOUND ;
+	                if (path != nullptr) {
+	                    int		dnl = -1 ;
+	            	    cchar	*tp ;
+	                    cchar	*dnp = path ;
+	                    while ((tp = strchr(dnp,':')) != nullptr) {
+			        {
+	                            dnl = (tp - dnp) ;
+	                            rs = checkone(&ids,rbuf,dnp,dnl,fn,am) ;
+	                            len = rs ;
+			        }
+	                        dnp = (tp + 1) ;
+	                        if (rs >= 0) break ;
+	                    } /* end while */
+	                    if (rs < 0) {
+	                        dnl = strlen(dnp) ;
+	                        rs = checkone(&ids,rbuf,dnp,dnl,fn,am) ;
+	                        len = rs ;
+	                    }
 
 #if	CF_FILEPATH
-	            if ((rs <= 0) && f_fpath) {
-
-	                if (rs == 0) {
-
+	                    if ((rs <= 0) && f_fpath) {
+	                        if (rs == 0) {
 #if	CF_FILEPATHLEN
-	                    rs = mkpath1(rbuf,fname) ;
-	                    len = rs ;
+	                            rs = mkpath1(rbuf,fn) ;
+	                            len = rs ;
 #else
-	                    rs = mkpath1(rbuf,fname) ;
+	                            rs = mkpath1(rbuf,fn) ;
 #endif /* CF_FILEPATHLEN */
-
-	                } else {
-	                    rbuf[0] = '\0' ;
-			}
-
-	            } /* end if */
+	                        } else {
+	                            rbuf[0] = '\0' ;
+			        }
+	                    } /* end if */
 #else
-	            if ((rs <= 0) && f_fpath) {
-	                fpath[0] = '\0' ;
-		    }
+	                    if ((rs <= 0) && f_fpath) {
+	                        rbuf[0] = '\0' ;
+		            }
 #endif /* CF_FILEPATH */
-	        } /* end if (non-nullptr path) */
-	    } /* end if */
-	    rs1 = ids_release(&ids) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (ids) */
+	                } /* end if (non-nullptr path) */
+	            } /* end if */
+	            rs1 = ids_release(&ids) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (ids) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -186,14 +181,14 @@ int findfilepath(char *rbuf,cchar *path,cchar *fname,int am) noex {
 
 /* local subroutines */
 
-static int checkone(ids *idp,char *fpath,cc *dnp,int dnl,cc *fn,int am) noex {
+static int checkone(ids *idp,char *rbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 	int		rs = SR_OK ;
 	if (dnl == 0) {
 	    if ((rs = fileperm(idp,fn,am)) >= 0) {
 	        rs = 0 ;
 	    }
 	} else {
-	    rs = checkit(idp,fpath,dnp,dnl,fn,am) ;
+	    rs = checkit(idp,rbuf,dnp,dnl,fn,am) ;
 	}
 	return rs ;
 }
@@ -231,10 +226,10 @@ static int checkit(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 /* end subroutine (checkit) */
 
 /* is it a file and are the permissions what we want? */
-static int fileperm(ids *idp,cchar *fname,int am) noex {
+static int fileperm(ids *idp,cchar *fn,int am) noex {
 	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_stat(fname,&sb)) >= 0) {
+	if ((rs = u_stat(fn,&sb)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode))  {
 	        rs = sperm(idp,&sb,am) ;
