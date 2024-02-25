@@ -26,12 +26,12 @@
 
 EXTERNC_begin
 
-extern int isNotPresent(int rs) noex ;
-extern int isNotAccess(int rs) noex ;
-extern int isNotValid(int rs) noex ;
-extern int isNotLib(int rs) noex ;
+extern bool isNotPresent(int rs) noex ;
+extern bool isNotAccess(int rs) noex ;
+extern bool isNotValid(int rs) noex ;
+extern bool isNotLib(int rs) noex ;
 
-static inline int isInvalid(int rs) noex {
+static inline bool isInvalid(int rs) noex {
 	return isNotValid(rs) ;
 }
 
