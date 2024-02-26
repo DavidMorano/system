@@ -39,14 +39,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstdlib>
-#include	<strings.h>		/* |strncasecmp(3c)| */
-#include	<netdb.h>
-#include	<usystem.h>
+#include	<strings.h>		/* |strncasecmp(3c)| + |strlen(3c)| */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 #include	<localmisc.h>		/* |LEQUIV(3dam)| */
 
 #include	"ismisc.h"
@@ -65,10 +60,6 @@
 
 
 /* forward subroutines */
-
-extern "C" {
-    int samehost(cchar *,cchar *,cchar *) noex ;
-}
 
 
 /* local variables */
@@ -122,18 +113,6 @@ bool issamehostname(cchar *h1,cchar *h2,cchar *localdomain) noex {
 
 	return (strncasecmp(h1,h2,len2) == 0) ;
 }
-/* end subroutine (samehost) */
-
-#if	CF_SAMEHOST
-
-int samehostname(cchar *h1,cchar *h2,cchar *localdomain) noex {
-	return issamehostname(h1,h2,localdomain) ;
-}
-
-int samehost(cchar *h1,cchar *h2,cchar *localdomain) noex {
-	return issamehostname(h1,h2,localdomain) ;
-}
-
-#endif /* CF_SAMEHOST */
+/* end subroutine (issamehostname) */
 
 

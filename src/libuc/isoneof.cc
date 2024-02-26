@@ -32,8 +32,8 @@
 	rs		return-status from a file access
 
 	Returns:
-	1		TRUE - matched
-	0		FALSE - did not match
+	TRUE		matched
+	FALSE		did not match
 
 *******************************************************************************/
 
@@ -68,7 +68,7 @@
 /* exported subroutines */
 
 bool isOneOf(cint *a,int rs) noex {
-	int		f = false ;
+	bool		f = false ;
 	for (int i = 0 ; a[i] != 0 ; i += 1) {
 	    f = (rs == a[i]) ;
 	    if (f) break ;
