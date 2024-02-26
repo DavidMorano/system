@@ -1,5 +1,5 @@
-/* isOneOf */
-/* lang=C20 */
+/* isoneof SUPPORT */
+/* lang=C++20 */
 
 /* test is an integer is one of a group of integers */
 /* version %I% last-modified %G% */
@@ -32,8 +32,8 @@
 	rs		return-status from a file access
 
 	Returns:
-	1		matched (TRUE)
-	0		did not match (false)
+	1		TRUE - matched
+	0		FALSE - did not match
 
 *******************************************************************************/
 
@@ -67,7 +67,7 @@
 
 /* exported subroutines */
 
-int isOneOf(cint *a,int rs) noex {
+bool isOneOf(cint *a,int rs) noex {
 	int		f = false ;
 	for (int i = 0 ; a[i] != 0 ; i += 1) {
 	    f = (rs == a[i]) ;

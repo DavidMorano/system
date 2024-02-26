@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int isOneOf(cint *,int) noex ;
+extern bool isOneOf(cint *,int) noex ;
 
 EXTERNC_end
 

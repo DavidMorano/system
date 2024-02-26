@@ -42,6 +42,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"isproc.h"
+
 
 /* local defines */
 

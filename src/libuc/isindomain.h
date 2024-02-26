@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int	isindomain(cchar *,cchar *) noex ;
+extern bool isindomain(cchar *,cchar *) noex ;
 
 EXTERNC_end
 

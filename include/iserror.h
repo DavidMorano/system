@@ -25,12 +25,12 @@
 
 EXTERNC_begin
 
-extern int isFailOpen(int) noex ;
-extern int isFailConn(int) noex ;
-extern int isBadSend(int) noex ;
-extern int isBadRecv(int) noex ;
-extern int isBadMsg(int) noex ;
-extern int isIOError(int) noex ;
+extern bool isFailOpen(int) noex ;
+extern bool isFailConn(int) noex ;
+extern bool isBadSend(int) noex ;
+extern bool isBadRecv(int) noex ;
+extern bool isBadMsg(int) noex ;
+extern bool isIOError(int) noex ;
 
 EXTERNC_end
 

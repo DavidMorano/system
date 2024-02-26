@@ -33,6 +33,8 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"isfiledesc.h"
+
 
 /* local defines */
 

@@ -1,5 +1,5 @@
-/* isprime */
-/* lang=C20 */
+/* isprime SUPPORT */
+/* lang=C++20 */
 
 /* determine if a number is prime or not */
 /* version %I% last-modified %G% */
@@ -22,25 +22,29 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<math.h>
+#include	<math.h>		/* math functions */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int isprime(uint n) noex {
-	int		f = true ;
+bool isprime(uint n) noex {
+	bool		f = true ;
 	if (n != 2) {
 	    f = false ;
 	    if ((n != 1) && ((n & 1) == 1)) {
 	        double	fn = n ;
 	        double	fr ;
 	        uint	root ;
-	        fn = n ;
 	        fr = sqrt(fn) ;
 	        root = (uint) ceil(fr) ; /* safety due to floating errors */
 	        for (uint i = 3 ; i <= root ; i += 1) {

@@ -15,8 +15,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vecobj.h>
 #include	<strpack.h>
 #include	<localmisc.h>
@@ -30,19 +32,19 @@
 
 
 struct mailmsg_env {
-	VECOBJ		insts ;
+	vecobj		insts ;
 } ;
 
 struct mailmsg_hdr {
-	VECOBJ		names ;
+	vecobj		names ;
 	int		lastname ;	/* index of last HDR-name */
 } ;
 
 struct mailmsg_head {
-	uint		magic ;
-	STRPACK		stores ;
+	strpack		stores ;
 	MAILMSG_ENV	envs ;
 	MAILMSG_HDR	hdrs ;
+	uint		magic ;
 	int		msgstate ;
 } ;
 

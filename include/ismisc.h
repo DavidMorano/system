@@ -1,21 +1,21 @@
-/* isindomain HEADER */
+/* ismisc HEADER */
 /* lang=C20 */
 
-/* is a given c-string a valid INET address (either 4 or 6)? */
+/* convert a single character to a given case */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	ISINDOMAIN_INCLUDE
-#define	ISINDOMAIN_INCLUDE
+#ifndef	ISMISC_INCLUDE
+#define	ISMISC_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,11 +25,16 @@
 
 EXTERNC_begin
 
-extern bool isindomain(cchar *,cchar *) noex ;
+extern bool	isprime(uint) noex ;
+extern bool	isdotdir(cchar *) noex ;
+
+static inline bool isDotDir(cchar *dp) noex {
+	return isdotdir(dp) ;
+}
 
 EXTERNC_end
 
 
-#endif /* ISINDOMAIN_INCLUDE */
+#endif /* ISMISC_INCLUDE */
 
 

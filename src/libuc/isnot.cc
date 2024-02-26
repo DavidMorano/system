@@ -33,14 +33,16 @@
 	rs		return-status from a file access
 
 	Returns:
-	1		file is *not* present (true)
-	0		file is present (false)
+	TRUE		file is *not* present (true)
+	FALSE		file is present (false)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<usysrets.h>
 
 #include	"isoneof.h"
 #include	"isnot.h"

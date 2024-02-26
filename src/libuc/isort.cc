@@ -1,6 +1,9 @@
 /* isort SUPPORT */
 /* lang=C++98 */
 
+/* looks like an Insertion-Sort implementation */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -13,13 +16,15 @@
 
 /*******************************************************************************
 
+	Name:
+	isort
+
 	Description:
-	Our version of Quick Sort (sort of the daddy of all sorts,
-	mostly).  Everyone has their own, right?
+	This looks like an Insertion-Sort implementation.
 
 	Synopsis:
-	typedef int	(*sortcmp_t)(const void *,const void *) ;
-	void isort(void *base,int nelem,int esize,sortcmp_t *cmp)
+	typedef int	(*sortcmp_f)(cvoid *,cvoid *) ;
+	void isort(void *base,int nelem,int esize,sortcmp_f *cmp)
 
 	Arguments:
 	base		pointer to base of array to sort
@@ -38,25 +43,30 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"isort.h"
+
 
 /* local defines */
 
 
-/* type defs */
+/* local name-spaces */
+
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 extern "C" {
-    typedef int	(*sortcmp_t)(const void *,const void *) noex ;
+    typedef int	(*sortcmp_f)(cvoid *,cvoid *) noex ;
 }
-
-
-/* name-spaces */
-
-using namespace	std ;
 
 
 /* external subroutines */
 
-extern "C" int	isort(void *,int,int,sortcmp_t) noex ;
+extern "C" int	isort(void *,int,int,sortcmp_f) noex ;
+
+
+/* external variables */
 
 
 /* local structures */
@@ -65,13 +75,15 @@ extern "C" int	isort(void *,int,int,sortcmp_t) noex ;
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int isort(void *base,int nelem,int esize,sortcmp_t cmp) noex {
+int isort(void *base,int nelem,int esize,sortcmp_f cmp) noex {
 	int		rs = SR_NOMEM ;
 	char		*arr = (char *) base ;
-	char		*key ;
-	if ((key = new(nothrow) char[esize]) != nullptr) {
+	if (char *key ; (key = new(nothrow) char[esize]) != nullptr) {
 	    rs = SR_OK ;
    	    for (int i = 1 ; i < nelem ; i += 1) {
 		int	j = (i-1) ;

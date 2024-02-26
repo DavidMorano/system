@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int	isinetaddr(cchar *) noex ;
+extern bool	isinetaddr(cchar *) noex ;
 
 EXTERNC_end
 
