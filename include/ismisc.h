@@ -1,7 +1,7 @@
 /* ismisc HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* is something something? */
 /* version %I% last-modified %G% */
 
 
@@ -26,10 +26,17 @@
 EXTERNC_begin
 
 extern bool	isprime(uint) noex ;
+extern bool	isleapyear(int) noex ;
 extern bool	isdotdir(cchar *) noex ;
+extern bool	issamehostname(cchar *,cchar *,cchar *) noex ;
+extern bool	isobjspecial(void *) noex ;
 
 static inline bool isDotDir(cchar *dp) noex {
 	return isdotdir(dp) ;
+}
+
+static inline bool isSpecialObject(void *op) noex {
+	return isobjspecial(op) ;
 }
 
 EXTERNC_end

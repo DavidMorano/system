@@ -1,7 +1,7 @@
 /* iserror HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* is an error code (per an integer) a part of a class of errors? */
 /* version %I% last-modified %G% */
 
 

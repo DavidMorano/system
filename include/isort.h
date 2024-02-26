@@ -1,7 +1,7 @@
 /* isort HEADER */
 /* lang=C20 */
 
-/* look like Insertion-Sort */
+/* looks like an Insertion-Sort */
 /* version %I% last-modified %G% */
 
 

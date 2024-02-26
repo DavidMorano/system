@@ -1,7 +1,7 @@
 /* isnot HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* is an error code (per an integer) not part of a class of something? */
 /* version %I% last-modified %G% */
 
 

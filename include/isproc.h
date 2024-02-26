@@ -1,7 +1,7 @@
 /* isproc HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* is a proceess (given by a PID) in the system? */
 /* version %I% last-modified %G% */
 
 

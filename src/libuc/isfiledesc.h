@@ -1,7 +1,7 @@
 /* isfiledesc HEADER */
 /* lang=C20 */
 
-/* is a file-descriptor associated with a terminal */
+/* is a file-descriptor associated with a someting? */
 /* version %I% last-modified %G% */
 
 
@@ -27,6 +27,8 @@ EXTERNC_begin
 
 extern int	isinteractive(int) noex ;
 extern int	isasocket(int) noex ;
+extern int	isfsremote(int) noex ;
+extern int	islocalfs(cchar *,int) noex ;
 
 static inline int isterminal(int fd) noex {
 	return isinteractive(fd) ;

@@ -1,7 +1,7 @@
 /* ismmclass HEADER */
 /* lang=C20 */
 
-/* character classes for mail content purposes */
+/* is a character int a mail-message class? */
 /* version %I% last-modified %G% */
 
 
