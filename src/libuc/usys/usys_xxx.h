@@ -28,7 +28,7 @@
 *******************************************************************************/
 
 #ifndef	USYS_XXX_INCLUDE
-#define	USYS_XXX_INCLUDE	1
+#define	USYS_XXX_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */

@@ -1,5 +1,5 @@
 /* sha1 SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* NIST Secure Hash Algorithm (SHA) */
 /* version %I% last-modified %G% */
@@ -84,9 +84,9 @@
 
 /* forward references */
 
-static void sha_final(unsigned char digest[20], SHA1_INFO *sha_info) ;
+static void sha_final(unsigned char digest[20],SHA1_INFO *sha_info) noex ;
 
-static void sha_transform(SHA1_INFO *sha_info) ;
+static void sha_transform(SHA1_INFO *sha_info) noex ;
 
 
 /* exported subroutines */
@@ -230,7 +230,7 @@ void sha_final(unsigned char digest[20], SHA1_INFO *sha_info) noex {
 /* private subroutines */
 
 /* do SHA transformation */
-static void sha_transform(SHA1_INFO *sha_info) {
+static void sha_transform(SHA1_INFO *sha_info) noex {
     int i;
     SHA1_BYTE *dp;
     SHA1_LONG T, A, B, C, D, E, W[80], *WP;
@@ -345,10 +345,7 @@ nether regions of the anatomy ...
 /* end subroutine (transformation) */
 
 
-
 /* TEST STUFF */
-
-
 
 #ifdef SHA_FOR_C
 
@@ -356,8 +353,7 @@ nether regions of the anatomy ...
 
 #define BLOCK_SIZE	8192
 
-void sha1_stream(unsigned char digest[20], SHA1_INFO *sha_info, FILE *fin)
-{
+void sha1_stream(unsigned char digest[20],SHA1_INFO *sha_info, FILE *fin) noex {
     int i;
     SHA1_BYTE data[BLOCK_SIZE];
 
@@ -372,8 +368,7 @@ void sha1_stream(unsigned char digest[20], SHA1_INFO *sha_info, FILE *fin)
 
 /* print a SHA digest */
 
-void sha_print(unsigned char digest[20])
-{
+void sha_print(unsigned char digest[20]) noex {
     int i, j;
 
     for (j = 0; j < 5; ++j) {
@@ -384,8 +379,7 @@ void sha_print(unsigned char digest[20])
     }
 }
 
-char *sha_version(void)
-{
+char *sha_version(void) noex {
 #if (SHA_VERSION == 1)
     static char *version = "SHA-1";
 #else
