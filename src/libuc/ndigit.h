@@ -26,7 +26,6 @@
 
 EXTERNC_begin
 
-extern int ndigits(int,int) noex ;
 
 extern int ndigiti(int,int) noex ;
 extern int ndigitl(long,int) noex ;
@@ -35,6 +34,10 @@ extern int ndigitll(longlong,int) noex ;
 extern int ndigitui(uint,int) noex ;
 extern int ndigitul(ulong,int) noex ;
 extern int ndigitull(ulonglong,int) noex ;
+
+static inline int ndigits(int v,int b) noex {
+	return ndigiti(v,b) ;
+}
 
 EXTERNC_end
 

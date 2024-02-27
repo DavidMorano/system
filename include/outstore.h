@@ -1,4 +1,8 @@
-/* outstore */
+/* outstore HEADER */
+/* lang=C20 */
+
+/* manage some dynamic output storage (mostly for SHIO use) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,13 +15,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OUTSTORE_INCLUDE
-#define	OUTSTORE_INCLUDE	1
+#define	OUTSTORE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	OUTSTORE	struct outstore_head

@@ -139,11 +139,12 @@ int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 /* private subroutines */
 
 static int storebuf_twodig(char *rbuf,int rlen,int i,int v) noex {
+	cint		n = 2 ;
 	int		rs = SR_OVERFLOW ;
-	if ((i+2) <= rlen) {
+	if ((i+n) <= rlen) {
 	    rbuf[i++] = (v / 10) + '0' ;
 	    rbuf[i++] = (v % 10) + '0' ;
-	    rs = 2 ;
+	    rs = n ;
 	}
 	return rs ;
 }

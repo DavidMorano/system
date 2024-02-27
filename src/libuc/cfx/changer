@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} filebuf_readline"
+NAMES="${NAMES} userattr_ "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/filebuf_readline/s//filebuf_readln/g
+g/userattr_/s//userattrdb_/g
 	w
 	q
 EOF

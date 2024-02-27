@@ -2676,12 +2676,12 @@ static int loadtz(PROGINFO *pip)
 	    int		al = 0 ;
 	    char	abuf[TZLEN+1] = { 0 } ;
 
-	    if ((rs = userattr_open(&ua,pip->username)) >= 0) {
-	        if ((rs = userattr_lookup(&ua,abuf,alen,UA_TZ)) >= 0) {
+	    if ((rs = userattrdb_open(&ua,pip->username)) >= 0) {
+	        if ((rs = userattrdb_lookup(&ua,abuf,alen,UA_TZ)) >= 0) {
 	            al = rs ;
 	        } else if (isNotPresent(rs))
 	            rs = SR_OK ;
-	        userattr_close(&ua) ;
+	        userattrdb_close(&ua) ;
 	    } /* end if (userattr) */
 
 #if	CF_DEBUG

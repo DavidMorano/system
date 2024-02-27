@@ -1,10 +1,8 @@
-/* isSpecialObject */
+/* isobjspecial SUPPORT */
+/* lang=C++20 */
 
 /* determine if a shared-object handle is special or not */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 
 /* revision history:
@@ -18,38 +16,46 @@
 
 /*******************************************************************************
 
-	This subroutine determines if a library file is a special object or not.
+	Name:
+	isobjspecial
+
+	Description:
+	This subroutine determines if a library file is a special
+	object or not.
 
 	Synopsis:
-
-	int isSpecialObject(void *sop)
+	int isobjspecial(void *sop) noex
 
 	Arguments:
-
 	sop		shared-object handle
 
 	Returns:
+	TRUE		shared-object is special
+	FALSE		shared-object is regular
 
-	1		shared-object is special
-	0		shared-object is regular
-
+	Notes:
+	MacOS (Darwin) and possibly other OSes do not have the handle
+	of RTLD_PROBE.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"ismisc.h"
+
 
 /* local defines */
+
+#ifndef	RTLD_PROBE
+#define	RTLD_PROBE		voidp(1)	/* real vals are neg */
+#endif
 
 
 /* external subroutines */
@@ -71,25 +77,20 @@ static const void	*objs[] = {
 	RTLD_NEXT,
 	RTLD_SELF,
 	RTLD_PROBE,
-	NULL
+	nullptr
 } ;
 
 
 /* exported subroutines */
 
-
-int isSpecialObject(void *sop)
-{
-	int		i ;
-	int		f = FALSE ;
-
-	for (i = 0 ; objs[i] != NULL ; i += 1) {
+bool isobjspecial(void *sop) noex {
+	bool		f = false ;
+	for (int i = 0 ; objs[i] ; i += 1) {
 	    f = (sop == objs[i]) ;
 	    if (f) break ;
 	} /* end if */
-
 	return f ;
 }
-/* end subroutine (isSpecialObject) */
+/* end subroutine (isobjspecial) */
 
 

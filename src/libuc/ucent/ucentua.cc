@@ -91,7 +91,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	int		wlen = 0 ;
 	if (this && uabuf && sp) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this,sizeof(userattr)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    if ((sl > 0) && (sp[0] != '#')) {
 	        storeitem	ib, *ibp = &ib ;
 	        if ((rs = storeitem_start(ibp,uabuf,ualen)) >= 0) {
@@ -118,7 +118,7 @@ int ucentua::parse(char *uabuf,int ualen,cc *sp,int sl) noex {
 	                } /* end switch */
 	                if ((rs >= 0) && vpp) {
 	                    int		cl ;
-	                    cchar	*cp ;
+	                    cchar	*cp{} ;
 	                    if ((cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
 	                        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	                    }
@@ -152,7 +152,7 @@ int ucentua::load(char *uabuf,int ualen,CUA *suap) noex {
 	            cint	ksize = sizeof(kva_t) ;
 	            cint	al = sizeof(void *) ;
 	            cint	n = suap->attr->length ;
-	            void	*p ;
+	            void	*p{} ;
 	            if ((rs = storeitem_block(ibp,ksize,al,&p)) >= 0) {
 	                kva_t	*kvap = (kva_t *) p ;
 	                int	dsize = (n*sizeof(kv_t)) ;
@@ -307,7 +307,7 @@ static int userattrent_parseattrload(UA *uap,SI *ibp,vecstr *alp,int n) noex {
 	    uap->attr = kvap ;
 	    if ((rs = storeitem_block(ibp,dsize,al,&p)) >= 0) {
 	        kv_t	*kvp = (kv_t *) p ;
-	        cchar	*ep ;
+	        cchar	*ep{} ;
 	        uap->attr->length = n ;
 	        uap->attr->data = kvp ;
 	        for (int i = 0 ; vecstr_get(alp,i,&ep) >= 0 ; i += 1) {
@@ -334,9 +334,9 @@ static int si_attrload(SI *ibp,kv_t *kvp,int i,cchar *ep) noex {
 	    vp = (ep+strlen(ep)) ;
 	}
 	{
-	    cchar	*crp ;
+	    cchar	*crp{} ;
 	    if ((rs = storeitem_strw(ibp,ep,el,&crp)) >= 0) {
-		char	*rp = (char *) crp ;
+		char	*rp = const_cast<charp>(crp) ;
 	        kvp[i].key = rp ;
 	        if ((rs = si_copystr(ibp,&rp,vp)) >= 0) {
 	            kvp[i].value = rp ;

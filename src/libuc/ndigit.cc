@@ -87,9 +87,4 @@ int ndigitull(ulonglong v,int b) noex {
 	return ndigit(v,b) ;
 }
 
-int ndigits(int v,int b) noex {
-	return ndigit(v,b) ;
-}
-/* end subroutine (ndigits) */
-
 

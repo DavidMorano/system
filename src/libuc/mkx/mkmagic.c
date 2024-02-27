@@ -41,7 +41,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<string.h>		/* <- for |strlen(3c)| */
 #include	<usystem.h>

@@ -1141,13 +1141,11 @@ xperm.o:		xperm.cc xperm.h ids.h
 isoneof.o:		isoneof.c isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
+isprime.o:		isprime.cc isprime.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
 strwcpy.o:		strwcmp.cc strwcmp.h
-
-ccfile.o:		ccfile.cc ccfile.hh
-thrcomm.o:		thrcomm.cc thrcomm.h
-thrbase.o:		thrbase.cc thrbase.h thrcomm.h
+isort.o:		isort.cc isort.h
 
 
 userattrdb.o:		userattrdb.cc	userattrdb.h
@@ -1175,7 +1173,10 @@ lockrw.o:		lockrw.cc	lockrw.h
 filebuf.o:		filebuf.cc	filebuf.h
 nodedb.o:		nodedb.cc	nodedb.h
 buffer.o:		buffer.cc	buffer.h
-
+mailmsg.o:		mailmsg.cc	mailmsg.h
+ccfile.o:		ccfile.cc ccfile.hh
+thrcomm.o:		thrcomm.cc thrcomm.h
+thrbase.o:		thrbase.cc thrbase.h thrcomm.h
 
 
 

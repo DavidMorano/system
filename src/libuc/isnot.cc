@@ -33,14 +33,16 @@
 	rs		return-status from a file access
 
 	Returns:
-	1		file is *not* present (true)
-	0		file is present (false)
+	TRUE		file is *not* present (true)
+	FALSE		file is present (false)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<usysrets.h>
 
 #include	"isoneof.h"
 #include	"isnot.h"
@@ -72,6 +74,7 @@ static constexpr int	npresent[] = {
 	SR_TIMEDOUT,
 	SR_CONNREFUSED,
 	SR_LIBACC,			/* libs can be "files" also! */
+	SR_STALE,
 	0	
 } ;
 
@@ -100,14 +103,17 @@ static constexpr int	nlib[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int isNotPresent(int rs) noex {
+bool isNotPresent(int rs) noex {
 	return isOneOf(npresent,rs) ;
 }
 /* end subroutine (isNotPresent) */
 
-int isNotAccess(int rs) noex {
+bool isNotAccess(int rs) noex {
 	int		f = false ;
 	f = f || isOneOf(naccess,rs) ;
 	f = f || isOneOf(npresent,rs) ;
@@ -115,12 +121,12 @@ int isNotAccess(int rs) noex {
 }
 /* end subroutine (isNotAccess) */
 
-int isNotValid(int rs) noex {
+bool isNotValid(int rs) noex {
 	return isOneOf(nvalid,rs) ;
 }
 /* end subroutine (isNotValid) */
 
-int isNotLib(int rs) noex {
+bool isNotLib(int rs) noex {
 	return isOneOf(nlib,rs) ;
 }
 /* end subroutine (isNotLib) */

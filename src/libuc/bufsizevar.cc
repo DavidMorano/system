@@ -34,6 +34,12 @@
 /* local defines */
 
 
+/* external namespaces */
+
+
+/* external typedefs */
+
+
 /* external subroutines */
 
 
@@ -47,6 +53,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

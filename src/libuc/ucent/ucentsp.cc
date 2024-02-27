@@ -81,7 +81,7 @@ int ucentsp::parse(char *spbuf,int splen,cchar *sp,int sl) noex {
 	int		rs1 ;
 	if (spbuf && sp) {
 	    rs = SR_INVALID ;
-	    memclear(this,sizeof(ucentsp)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    if (splen > 0) {
 	        storeitem	ib, *ibp = &ib ;
 	        if (sl < 0) sl = strlen(sp) ;
@@ -262,7 +262,7 @@ static int ucentsp_parseone(ucentsp *spp,SI *ibp,int fi,cc *vp,int vl) noex {
 	    break ;
 	case 8:
 	    if (vl > 0) {
-	        ulong	uv ;
+	        ulong	uv{} ;
 	        rs = cfdecul(vp,vl,&uv) ;
 	        spp->sp_flag = uv ;
 	    }
@@ -270,7 +270,7 @@ static int ucentsp_parseone(ucentsp *spp,SI *ibp,int fi,cc *vp,int vl) noex {
 	} /* end switch */
 	if ((rs >= 0) && vpp) {
 	    int		cl ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    if ((cl = sfshrink(vp,vl,&cp)) >= 0) {
 	        rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    }
@@ -283,9 +283,9 @@ static int ucentsp_parsedefs(ucentsp *spp,SI *ibp,int sfi) noex {
 	int		rs = SR_OK ;
 	if (sfi == 1) {
 	    cchar	**vpp = (cchar **) &spp->sp_pwdp ;
-	    cchar	*np = spp->sp_namp ;
+	    cchar	*sp = spp->sp_namp ;
 	    cchar	*vp ;
-	    vp = (np + strlen(np)) ;
+	    vp = (sp + strlen(sp)) ;
 	    sfi += 1 ;
 	    rs = storeitem_strw(ibp,vp,0,vpp) ;
 	}

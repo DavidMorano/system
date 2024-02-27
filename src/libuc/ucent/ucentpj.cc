@@ -85,7 +85,7 @@ int ucentpj::parse(char *pjbuf,int pjlen,cchar *sp,int sl) noex {
 	if (this && pjbuf && sp) {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this,sizeof(ucentpj)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    if ((rs = storeitem_start(ibp,pjbuf,pjlen)) >= 0) {
 	        int		fi = 0 ;
 	        cchar		*tp ;
@@ -200,7 +200,7 @@ int ucentpj::format(char *rbuf,int rlen) noex {
 	        for (int i = 0 ; i < 6 ; i += 1) {
 	            if (i > 0) rs = sbuf_char(&b,':') ;
 	            if (rs >= 0) {
-	                int	v = -1 ;
+	                int	v ;
 	                switch (i) {
 	                case 0:
 	                    rs = sbuf_strw(&b,pj_name,-1) ;
@@ -281,10 +281,10 @@ static int si_storestrs(SI *ibp,int sch,cc *sp,int sl,char ***svp) noex {
 	if ((rs = vechand_start(&u,8,0)) >= 0) {
 	    if ((rs = si_loadstrs(ibp,&u,sch,sp,sl)) > 0) {
 	        cint	n = rs ;
-	        void	**ptab ;
+	        void	**ptab{} ;
 	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
 		    int		i = 0 ;
-	            void	*vp ;
+	            void	*vp{} ;
 	            *svp = (char **) ptab ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
 	                (*svp)[i] = (char *) vp ;
@@ -305,13 +305,12 @@ static int si_loadstrs(SI *ibp,vechand *ulp,int sch,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	cchar		*tp ;
-	cchar		*cp ;
+	cchar		*cp{} ;
 	while ((tp = strnchr(sp,sl,sch)) != nullptr) {
 	    if ((tp-sp) > 0) {
-		int	nl ;
-		cchar	*np ;
-		if ((nl = sfshrink(sp,(tp-sp),&np)) > 0) {
-	            if ((rs = storeitem_strw(ibp,np,nl,&cp)) >= 0) {
+		cchar	*zp{} ;
+		if (int zl ; (zl = sfshrink(sp,(tp-sp),&zp)) > 0) {
+	            if ((rs = storeitem_strw(ibp,zp,zl,&cp)) >= 0) {
 		        c += 1 ;
 		        rs = vechand_add(ulp,cp) ;
 	            }

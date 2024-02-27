@@ -3741,16 +3741,16 @@ static int procrecip_mailspool(PROGINFO *pip,RECIP *rp)
 	if (pip->progmode == progmode_dmail) {
 	    USERATTR	ua ;
 	    cchar	*un = rp->recipient ;
-	    if ((rs = userattr_open(&ua,un)) >= 0) {
+	    if ((rs = userattrdb_open(&ua,un)) >= 0) {
 	        const int	vlen = MAXPATHLEN ;
 	        int		vl ;
 	        cchar		*ak = "md" ;
 	        char		vbuf[MAXPATHLEN+1] ;
-	        if ((vl = userattr_lookup(&ua,vbuf,vlen,ak)) >= 0) {
+	        if ((vl = userattrdb_lookup(&ua,vbuf,vlen,ak)) >= 0) {
 	            rs = recip_setmailspool(rp,vbuf,vl) ;
 	            pl = rs ;
 	        }
-	        rs1 = userattr_close(&ua) ;
+	        rs1 = userattrdb_close(&ua) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (userattr) */
 	} /* end if (progmode-dmail) */

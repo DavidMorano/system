@@ -126,8 +126,8 @@ extern int	uc_setpriority(int,id_t,int) noex ;
 extern int	uc_getpuid(pid_t) noex ;
 extern int	uc_procpid(cchar *,uid_t) noex ;
 
+extern int	uc_create(cchar *,mode_t) noex ;
 extern int	uc_createfile(cchar *,mode_t) noex ;
-extern int	uc_openpt(int) noex ;
 extern int	uc_realpath(cchar *,char *) noex ;
 extern int	uc_truncate(cchar *,off_t) noex ;
 extern int	uc_open(cchar *,int,mode_t) noex ;
@@ -135,7 +135,8 @@ extern int	uc_opene(cchar *,int,mode_t,int) noex ;
 extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
 extern int	uc_openenv(cchar *,int,mode_t,cchar **,int) noex ;
 extern int	uc_openinfo(struct ucopeninfo *) noex ;
-extern int	uc_create(cchar *,mode_t) noex ;
+extern int	uc_opensysdb(int,int,mode_t) noex ;
+extern int	uc_openpt(int) noex ;
 extern int	uc_fpassfd(int,int) noex ;
 extern int	uc_ftruncate(int,off_t) noex ;
 extern int	uc_fstat(int,USTAT *) noex ;
@@ -308,7 +309,7 @@ extern int	uc_getpjbegin() noex ;
 extern int	uc_getpjent(ucentpj *,char *,int) noex ;
 extern int	uc_getpjbyid(ucentpj *,char *,int,projid_t) noex ;
 extern int	uc_getpjbyname(ucentpj *,char *,int,cchar *) noex ;
-extern int	uc_getdefaultproj(ucentpj *,char *,int,cchar ) noex ;
+extern int	uc_getdefaultproj(ucentpj *,char *,int,cchar *) noex ;
 extern int	uc_getpjend() noex ;
 extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 

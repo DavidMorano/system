@@ -1,4 +1,4 @@
-/* strtox HEADER */
+/* ucstrtox HEADER */
 /* lang=C20 */
 
 /* interface component for UNIX® library-3c */

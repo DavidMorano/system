@@ -21,9 +21,9 @@
 	ndigmax
 
 	Description:
-	These subroutines provide some special digit (decimal) processing
-	for special floating point uses (without having to link in the math
-	library).
+	These subroutines provide some special digit (decimal)
+	processing for special floating point uses (without having
+	to link in the math library).
 
 	Synopsis:
 	int ndig(double *la,int n) noex
@@ -63,9 +63,18 @@
 /* local defines */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* forward references */
 
 static int	digs(double) noex ;
+
+
+/* local variables */
 
 
 /* external variables */

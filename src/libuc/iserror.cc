@@ -40,15 +40,15 @@
 	rs		value to check
 
 	Returns:
-	>0		present (condition found)
-	==0		no (condition not present)
-	<0		should not happen
+	-		TRUE or FALSE
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<usysrets.h>
 
 #include	"isoneof.h"
 #include	"isnot.h"
@@ -124,7 +124,7 @@ static constexpr int	rioerror[] = {
 
 /* exported subroutines */
 
-int isFailOpen(int rs) noex {
+bool isFailOpen(int rs) noex {
 	int		f = false ;
 	if (rs < 0) {
 	    f = f || isNotPresent(rs) ;
@@ -134,7 +134,7 @@ int isFailOpen(int rs) noex {
 }
 /* end subroutine (isFailOpen) */
 
-int isFailConn(int rs) noex {
+bool isFailConn(int rs) noex {
 	int		f = false ;
 	if (rs < 0) {
 	    f = isOneOf(rfailconn,rs) ;
@@ -143,22 +143,22 @@ int isFailConn(int rs) noex {
 }
 /* end subroutine (isFailConn) */
 
-int isBadSend(int rs) noex {
+bool isBadSend(int rs) noex {
 	return isOneOf(rbadsend,rs) ;
 }
 /* end subroutine (isBadSend) */
 
-int isBadRecv(int rs) noex {
+bool isBadRecv(int rs) noex {
 	return isOneOf(rbadrecv,rs) ;
 }
 /* end subroutine (isBadRecv) */
 
-int isBadMsg(int rs) noex {
+bool isBadMsg(int rs) noex {
 	return isOneOf(rbadmsg,rs) ;
 }
 /* end subroutine (isBadMsg) */
 
-int isIOError(int rs) noex {
+bool isIOError(int rs) noex {
 	return isOneOf(rioerror,rs) ;
 }
 /* end subroutine (isIOError) */

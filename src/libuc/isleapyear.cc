@@ -1,9 +1,8 @@
-/* isleapyear */
+/* isleapyear SUPPORT */
+/* lang=C++20 */
 
 /* is the given year a leap year? */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,40 +16,34 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	isleapyear
 
-	This subroutine determines if the supplied given year is a leap year.
+	Description:
+	This subroutine determines if the supplied given year is a
+	leap year.
 
 	Synopsis:
-
-	int isleapyear(yr)
-	int 	yr ;
+	bool isleapyear(int) noex
 
 	Arguments:
-
 	yr		current year (ex: 1998)
 
 	Returns:
-
-	==0		no
-	>0		yes
+	-		TRUE or FALSE
 
 	Notes:
-
 	= Remember to account for leap-year:
 
 define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
-#include	<sys/types.h>
-
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	"ismisc.h"
 
 
 /* local defines */
@@ -70,10 +63,8 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 
 /* exported subroutines */
 
-
-int isleapyear(int y)
-{
-	int		f = ((y % 4) == 0) ;
+bool isleapyear(int y) noex {
+	bool	f = ((y % 4) == 0) ;
 	f = f && (((y % 100) != 0) || ((y % 400) == 0)) ;
 	return f ;
 }

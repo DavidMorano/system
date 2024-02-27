@@ -1,4 +1,4 @@
-
+/* issamehostname SUPPORT */
 /* lang=C++20 */
 
 /* rough equivalent host name check */
@@ -49,6 +49,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>		/* |LEQUIV(3dam)| */
 
+#include	"ismisc.h"
+
 
 /* local defines */
 
@@ -77,11 +79,11 @@ extern "C" {
 
 /* exported subroutines */
 
-int issamehostname(cchar *h1,cchar *h2,cchar *localdomain) noex {
+bool issamehostname(cchar *h1,cchar *h2,cchar *localdomain) noex {
 	int		len1, len2 ;
 	int		f_h1 = false ;
 	int		f_h2 = false ;
-	cchar		*cp, *cp1, *cp2 ;
+	cchar		*cp1, *cp2 ;
 
 	if (((cp1 = strchr(h1,'.')) != NULL) && (cp1[1] != '\0'))
 		f_h1 = true ;

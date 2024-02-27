@@ -1,15 +1,15 @@
 /* ismmclass HEADER */
 /* lang=C20 */
 
-/* character classes for mail content purposes */
+/* is a character int a mail-message class? */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-        The subroutine set was written from scratch to do what the previous
-        program by the same name did.
+	The subroutine set was written from scratch to do what the
+	previous program by the same name did.
 
 */
 
@@ -17,8 +17,8 @@
 
 /*******************************************************************************
 
-        These subroutines check a character to see if it is part of a special
-        character class. See the code for details!
+	These subroutines check a character to see if it is part
+	of a special character class. See the code for details!
 
 *******************************************************************************/
 
@@ -33,9 +33,9 @@
 
 EXTERNC_begin
 
-extern int ismmclass_7bit(int) noex ;
-extern int ismmclass_8bit(int) noex ;
-extern int ismmclass_binary(int) noex ;
+extern bool	 ismmclass_7bit(int) noex ;
+extern bool	 ismmclass_8bit(int) noex ;
+extern bool	 ismmclass_binary(int) noex ;
 
 EXTERNC_end
 

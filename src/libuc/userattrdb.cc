@@ -144,6 +144,9 @@ static cpcchar	specials[] = {
 constexpr bool	f_udomain = CF_UDOMAIN ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int userattrdb_open(uad *op,cchar *username) noex {
@@ -192,10 +195,10 @@ int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 	if ((rs = userattrdb_magic(op,keyname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (keyname[0]) {
-		[[maybe_unused]] cint	rsn = SR_NOTOPEN ;
 	        rbuf[0] = '\0' ;
 	        rs = userattrdb_sysdb(op,rbuf,rlen,keyname) ;
 		if constexpr (f_udomain) {
+		    cint	rsn = SR_NOTOPEN ;
 	            if ((rs == rsn) && (matstr(specials,keyname,-1) >= 0)) {
 	                rs = userattrdb_ud(op,rbuf,rlen) ;
 	            }

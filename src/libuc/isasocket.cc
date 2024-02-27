@@ -1,21 +1,20 @@
-/* isasocket */
+/* isasocket SUPPORT */
+/* lang=C++20 */
 
 /* test if a given file descriptor is a socket */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revistion history:
 
 	= 1998-11-06, David A­D­ Morano
-	Here is a little ditty to see if the FD that we have is a socket or
-	not.
+	Here is a little ditty to see if the FD that we have is a
+	socket or not.
 
 	= 2017-01-14, David A­D­ Morano
-        I greatly simplified this by only using |getsockopt(3socket)| as the
-        test. This still should properly work on systems that do not support
-        S_ISSOCK for sockets (older Solaris®).
+	I greatly simplified this by only using |getsockopt(3socket)|
+	as the test.  This still should properly work on systems
+	that do not support S_ISSOCK for sockets (older Solaris®).
 
 */
 
@@ -23,32 +22,30 @@
 
 /*******************************************************************************
 
-        This is my own hack attempt at figuring out if the given FD is a socket
-        or not. Wouldn't it be nice if a 'stat(2)' returned a file mode for
-        sockets so that 'S_ISSOCK(mode)' was true? Oh, but
-        NOOOOOOOOOOOOOOOOOOOOOO!!!
+	This is my own hack attempt at figuring out if the given
+	FD is a socket or not. Would it not be nice if a |stat(2)|
+	returned a file mode for sockets so that |S_ISSOCK(mode)|
+	was true? Oh, but NOOOOOOOOOOOOOOOOOOOOOO!!!
 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/conf.h>
 #include	<unistd.h>
-
 #include	<usystem.h>
+#include	<isoneof.h>
 #include	<localmisc.h>
+
+#include	"isfiledesc.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	isOneOf(const int *,int) ;
 
 
 /* external variables */
@@ -59,13 +56,12 @@ extern int	isOneOf(const int *,int) ;
 
 /* forward references */
 
-
-static int isNotSock(int) ;
+static bool	isNotSock(int) noex ;
 
 
 /* local variables */
 
-static const int	rsock[] = {
+static constexpr int	rsock[] = {
 	SR_NOTSOCK,
 	SR_OPNOTSUPP,
 	SR_NOTSUP,
@@ -75,17 +71,15 @@ static const int	rsock[] = {
 
 /* exported subroutines */
 
-
-int isasocket(int fd)
-{
-	const int	slev = SOL_SOCKET ;
-	const int	scmd = SO_TYPE ;
+int isasocket(int fd) noex {
+	cint		slev = SOL_SOCKET ;
+	cint		scmd = SO_TYPE ;
 	int		rs ;
 	int		len = sizeof(int) ;
 	int		val = 0 ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = u_getsockopt(fd,slev,scmd,&val,&len)) >= 0) {
-	    f = TRUE ;
+	    f = true ;
 	} else if (isNotSock(rs)) {
 	    rs = SR_OK ;
 	}
@@ -96,9 +90,7 @@ int isasocket(int fd)
 
 /* local subroutines */
 
-
-static int isNotSock(int rs)
-{
+static bool isNotSock(int rs) noex {
 	return isOneOf(rsock,rs) ;
 }
 /* end subroutine (isNotSock) */

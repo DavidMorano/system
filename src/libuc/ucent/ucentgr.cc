@@ -88,7 +88,7 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	if (this && grbuf && sp) {
 	    storeitem	ib, *ibp = &ib ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(this,sizeof(ucentgr)) ;
+	    memclear(this) ;		/* potentially dangerous */
 	    if ((rs = storeitem_start(ibp,grbuf,grlen)) >= 0) {
 	        int	fi = 0 ;
 	        cchar	*tp ;
@@ -112,7 +112,7 @@ int ucentgr::parse(char *grbuf,int grlen,cchar *sp,int sl) noex {
 	            } /* end switch */
 		    if ((rs >= 0) && vpp) {
 	    	        int	cl ;
-	    	        cchar	*cp ;
+	    	        cchar	*cp{} ;
 	    	        if ((cl = sfshrink(sp,(tp-sp),&cp)) >= 0) {
 	        	    rs = storeitem_strw(ibp,cp,cl,vpp) ;
 	    	        }
@@ -145,7 +145,7 @@ int ucentgr::load(char *grbuf,int grlen,CGRE *sgrp) noex {
 	    if ((rs = storeitem_start(&ib,grbuf,grlen)) >= 0) {
 	        if (sgrp->gr_mem) {
 	            int		n ;
-	            void	**ptab ;
+	            void	**ptab{} ;
 	            for (n = 0 ; sgrp->gr_mem[n] ; n += 1) ;
 	            if ((rs = storeitem_ptab(&ib,n,&ptab)) >= 0) {
 	                int	i = 0 ;
@@ -177,9 +177,9 @@ int ucentgr::format(char *rbuf,int rlen) noex {
 	    sbuf	b ;
 	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	        for (int i = 0 ; i < 4 ; i += 1) {
-		    int		v ;
 	            if (i > 0) rs = sbuf_char(&b,':') ;
 	            if (rs >= 0) {
+		        int	v ;
 	                switch (i) {
 	                case 0:
 	                    rs = sbuf_strw(&b,gr_name,-1) ;
@@ -242,10 +242,10 @@ static int ucentgr_parseusers(ucentgr *grp,SI *ibp,cchar *sp,int sl) noex {
 	if ((rs = vechand_start(&u,8,0)) >= 0) {
 	    if ((rs = si_loadnames(ibp,&u,sp,sl)) > 0) {
 	        cint	n = rs ;
-	        void	**ptab ;
+	        void	**ptab{} ;
 	        if ((rs = storeitem_ptab(ibp,n,&ptab)) >= 0) {
-		    int		i = 0 ;
-	            void	*vp ;
+		    int		i = 0 ; /* used afterwards */
+	            void	*vp{} ;
 	            grp->gr_mem = (char **) ptab ;
 		    for (i = 0 ; vechand_get(&u,i,&vp) >= 0 ; i += 1) {
 	                grp->gr_mem[i] = (char *) vp ;

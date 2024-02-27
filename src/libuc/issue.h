@@ -1,6 +1,9 @@
 /* issue HEADER */
 /* lang=C++20 */
 
+/* object to help and manage "issue" messages */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
