@@ -38,8 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -67,7 +65,7 @@
 
 /* exported subroutines */
 
-bool isOneOf(cint *a,int rs) noex {
+bool isoneof(cint *a,int rs) noex {
 	bool		f = false ;
 	for (int i = 0 ; a[i] != 0 ; i += 1) {
 	    f = (rs == a[i]) ;
@@ -75,6 +73,6 @@ bool isOneOf(cint *a,int rs) noex {
 	} /* end if */
 	return f ;
 }
-/* end subroutine (isOneOf) */
+/* end subroutine (isoneof) */
 
 

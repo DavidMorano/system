@@ -47,9 +47,10 @@ struct syswords {
 	static const char w_tmpdir[] ;
 	static const char w_devdir[] ;
 	static const char w_vardir[] ;
-	static const char w_maildir[] ;
 	static const char w_sysdbdir[] ;
+	static const char w_maildir[] ;
 	static const char w_usrlocaldir[] ;
+	static const char w_digtab[] ;
 } ; /* end struct (syswords) */
 
 

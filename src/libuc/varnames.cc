@@ -78,10 +78,5 @@ const char varnames::organization[] =	"ORGANIZATION" ;
 const char varnames::tmout[] =		"TMOUT" ;
 const char varnames::editor[] =		"EDITOR" ;
 const char varnames::visual[] =		"VISUAL" ;
-const char varnames::tmpdname[] =	"/tmp" ;
-const char varnames::vardname[] =	"/var" ;
-const char varnames::devdname[] =	"/dev" ;
-const char varnames::digtab[] = "0123456789ABCDEFGHIJKLMNOPQRSTUV"
-		"abcdefghijklmnopqrstuvwxyz" "Øø" ;
 
 

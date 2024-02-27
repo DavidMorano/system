@@ -19,7 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
 #include	<clanguage.h>
+
+#include	<ismmclass.h>
 
 
 EXTERNC_begin
@@ -38,9 +41,12 @@ extern bool isprintbad(int) noex ;
 extern bool isprintlatin(int) noex ;
 extern bool isprintterm(int) noex ;
 extern bool iscmdstart(int) noex ;
+
+#ifdef	COMMENT
 extern bool ismmclass_7bit(int) noex ;
 extern bool ismmclass_8bit(int) noex ;
 extern bool ismmclass_binary(int) noex ;
+#endif /* COMMENT */
 
 EXTERNC_end
 

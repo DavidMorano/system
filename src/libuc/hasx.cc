@@ -299,7 +299,7 @@ static int twochars(char *,cchar *,int) noex ;
 
 constexpr bool		f_hasnotdotswitch = CF_HASNOTDOTSWITCH ;
 
-static cint		maxbase = strlen(varname.digtab) ;
+static cint		maxbase = strlen(sysword.w_digtab) ;
 
 
 /* exported variables */

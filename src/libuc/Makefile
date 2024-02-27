@@ -1139,6 +1139,13 @@ strlibval.o:		strlibval.cc strlibval.hh
 strwcpy.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
+#
+isproc.o:		isproc.cc isproc.h
+#
+isasocket.o:		isasocket.cc isfiledesc.h
+isinteractive.o:	isinteractive.cc isfiledesc.h
+isfsremote.o:		isfsremote.cc isfiledesc.h
+#
 isinetaddr.o:		isinetaddr.cc isinetaddr.h
 isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
@@ -1148,7 +1155,7 @@ iserror.o:		iserror.cc iserror.h isoneof.h
 isprime.o:		isprime.cc ismisc.h
 isleapyear.o:		isleapyear.cc ismisc.h
 isdotdir.o:		isdotdir.cc ismisc.h
-issamehostname.o:	issamehostname.cc ismisc.h
+issamehostname.o:	issamehostname.cc issamehostname.h ismisc.h
 isobjspecial.o:		isobjspecial.cc ismisc.h
 
 

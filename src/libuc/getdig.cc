@@ -64,7 +64,7 @@
 
 /* local variables */
 
-static const int	maxbase = strlen(varname.digtab) ;
+static const int	maxbase = strlen(sysword.w_digtab) ;
 
 
 /* exported variables */
@@ -75,7 +75,7 @@ static const int	maxbase = strlen(varname.digtab) ;
 int getdig(int v) noex {
 	int		dig = -1 ;
 	if ((v >= 0) && (v < maxbase)) {
-	    dig = varname.digtab[v] ;
+	    dig = sysword.w_digtab[v] ;
 	}
 	return dig ;
 }

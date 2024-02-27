@@ -61,89 +61,97 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int outstore_start(OUTSTORE *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	memclear(op) ;			/* dangerous */
-	return SR_OK ;
+int outstore_start(outstore *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = memclear(op) ;		/* dangerous */
+	}
+	return rs ;
 }
 /* end subroutine (outstore_start) */
 
-int outstore_finish(OUTSTORE *op) noex {
-	int		rs = SR_OK ;
+int outstore_finish(outstore *op) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op == nullptr) return SR_FAULT ;
-	if (op->dbuf != nullptr) {
-	    op->dbuf[0] = '\0' ; /* cute safety trick */
-	    rs1 = uc_free(op->dbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbuf = nullptr ;
-	}
-	op->sbuf[0] = '\0' ;
-	op->len = 0 ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->dbuf) {
+	        op->dbuf[0] = '\0' ; /* cute safety trick */
+	        rs1 = uc_free(op->dbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbuf = nullptr ;
+	    }
+	    op->sbuf[0] = '\0' ;
+	    op->len = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (outstore_finish) */
 
-int outstore_get(OUTSTORE *op,cchar **rpp) noex {
-	int		rs ;
-	if (op == nullptr) return SR_FAULT ;
-	rs = op->len ;
-	if (rpp != nullptr) {
-	    *rpp = (op->dbuf != nullptr) ? op->dbuf : op->sbuf ;
-	}
+int outstore_get(outstore *op,cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = op->len ;
+	    if (rpp) {
+	        *rpp = (op->dbuf) ? op->dbuf : op->sbuf ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (outstore_get) */
 
-int outstore_clear(OUTSTORE *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	op->len = 0 ;
-	return SR_OK ;
+int outstore_clear(outstore *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    op->len = 0 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (outstore_clear) */
 
-int outstore_strw(OUTSTORE *op,cchar *sp,int sl) noex {
-	cint		slen = OUTSTORE_SLEN ;
-	int		rs = SR_OK ;
-	int		rlen ;
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (op->dbuf != nullptr) {
-	    rlen = (op->dlen-op->len) ;
-	    if (sl > rlen) {
-		cint	dlen = (op->dlen+sl+slen) ;
-		char		*dp ;
-		if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
-		    char	*rp = (dp+op->len) ;
-		    op->dbuf = dp ;
-		    op->dlen = dlen ;
+int outstore_strw(outstore *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (op && sp) {
+	    cint	slen = OUTSTORE_SLEN ;
+	    int		rlen ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (op->dbuf) {
+	        rlen = (op->dlen-op->len) ;
+	        if (sl > rlen) {
+		    cint	dlen = (op->dlen+sl+slen) ;
+		    char	*dp{} ;
+		    if ((rs = uc_realloc(op->dbuf,(dlen+1),&dp)) >= 0) {
+		        char	*rp = (dp+op->len) ;
+		        op->dbuf = dp ;
+		        op->dlen = dlen ;
+		        rs = (strwcpy(rp,sp,sl) - rp) ;
+		        op->len += rs ;
+		    }
+	        } else {
+		    char	*rp = (op->dbuf+op->len) ;
 		    rs = (strwcpy(rp,sp,sl) - rp) ;
 		    op->len += rs ;
-		}
+	        }
 	    } else {
-		char	*rp = (op->dbuf+op->len) ;
-		rs = (strwcpy(rp,sp,sl) - rp) ;
-		op->len += rs ;
-	    }
-	} else {
-	    rlen = (slen-op->len) ;
-	    if (sl > rlen) {
-		cint	dlen = MAX((sl+slen),(2*slen)) ;
-		char	*dp ;
-		if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
-		    op->dlen = dlen ;
-		    op->dbuf = dp ;
-		    dp = strwcpy(dp,op->sbuf,op->len) ;
-		    rs = (strwcpy(dp,sp,sl) - dp) ;
+	        rlen = (slen-op->len) ;
+	        if (sl > rlen) {
+		    cint	dlen = max((sl+slen),(2*slen)) ;
+		    char	*dp{} ;
+		    if ((rs = uc_malloc((dlen+1),&dp)) >= 0) {
+		        op->dlen = dlen ;
+		        op->dbuf = dp ;
+		        dp = strwcpy(dp,op->sbuf,op->len) ;
+		        rs = (strwcpy(dp,sp,sl) - dp) ;
+		        op->len += rs ;
+		    } /* end if (memory-allocation) */
+	        } else {
+		    char	*rp = (op->sbuf+op->len) ;
+		    rs = (strwcpy(rp,sp,sl) - rp) ;
 		    op->len += rs ;
-		}
-	    } else {
-		char	*rp = (op->sbuf+op->len) ;
-		rs = (strwcpy(rp,sp,sl) - rp) ;
-		op->len += rs ;
-	    }
-	} /* end if (current mode) */
+	        }
+	    } /* end if (current mode) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (outstore_strw) */
