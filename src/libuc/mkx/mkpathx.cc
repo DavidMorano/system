@@ -1,5 +1,5 @@
 /* mkpathx SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make a file-path from multiple component c-strings */
 /* version %I% last-modified %G% */
@@ -29,9 +29,14 @@
 #include	"mkpathx.h"
 
 
+/* local defiknes */
+
+
 /* external subroutines */
 
-extern int mknpathx(char *,int,int,...) noex ;
+extern "C" {
+    extern int	mknpathx(char *,int,int,...) noex ;
+}
 
 
 /* external variables */
@@ -44,6 +49,9 @@ extern int mknpathx(char *,int,int,...) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

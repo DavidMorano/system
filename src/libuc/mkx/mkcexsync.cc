@@ -1,5 +1,5 @@
 /* mkcexsync SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make the synchronization string used for CEX */
 /* version %I% last-modified %G% */
@@ -37,20 +37,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<ascii.h>
-#include	<localmisc.h>
 
 #include	"mkcexsync.h"
 
@@ -76,14 +64,17 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkcexsync(char *rbuf,int rlen) noex {
 	cint		leaderlen = (rlen - MKCEXSYNC_FINLEN) ;
-	int		rs = SR_OK ;
+	int		rs = SR_OVERFLOW ;
 	int		i = 0 ;
 	if (rlen >= MKCEXSYNC_REQLEN) {
-	    int		j ;
+	    int		j{} ;
 	    for (j = (leaderlen-1) ; j >= 0 ; j -= 1) {
 	        rbuf[i] = (i & 1) ;
 	        i += 1 ;
@@ -91,9 +82,8 @@ int mkcexsync(char *rbuf,int rlen) noex {
 	    for (j = 0 ; j < MKCEXSYNC_FINLEN ; j += 1) {
 	        rbuf[i++] = CH_SYNC ;
 	    }
-	} else {
-	    rs = SR_OVERFLOW ;
-	}
+	    rs = SR_OK ;
+	} /* end if (valid) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkcexsync) */

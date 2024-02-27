@@ -1,5 +1,5 @@
 /* mkbasename SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make the filename for a shared library (shared object) */
 /* version %I% last-modified %G% */
@@ -22,14 +22,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<mkpathxw.h>
 #include	<sfx.h>
-#include	<localmisc.h>
 
 #include	"mkx.h"
 
@@ -49,15 +44,17 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkbasename(char *rbuf,cchar *pnp,int pnl) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf && pnp) {
-	    int		cl ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    rs = SR_INVALID ;
-	    if ((cl = sfbasename(pnp,pnl,&cp)) > 0) {
+	    if (int cl ; (cl = sfbasename(pnp,pnl,&cp)) > 0) {
 	        rs = mkpath1w(rbuf,cp,(cp - pnp)) ;
 	    }
 	} /* end if (non-null) */

@@ -1,5 +1,5 @@
 /* mkcaselower SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* change the character case in a c-string to lower-case inplace */
 /* version %I% last-modified %G% */
@@ -37,14 +37,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
 #include	<char.h>
-#include	<localmisc.h>
 
 
 /* local defines */
+
+
+/* external subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

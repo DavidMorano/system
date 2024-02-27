@@ -1,5 +1,5 @@
 /* mkrevstr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* reverse the characters in a string in place */
 /* version %I% last-modified %G% */
@@ -21,12 +21,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>		/* for |strlen(3c)| */
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
-#include	<localmisc.h>
 
 
 /* local defines */
@@ -44,10 +41,10 @@
 /* forward references */
 
 
-/* module global variables */
-
-
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

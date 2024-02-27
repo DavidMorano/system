@@ -1,5 +1,5 @@
 /* mkmailname SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* fix a name to make it like a mail-name */
 /* version %I% last-modified %G% */
@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		length of extracted mailname string
-	<0		error (syhstem-return)
+	<0		error (system-return)
 
 *	SUBROUTINES CALLED:						
 *		Only system routines are called.
@@ -46,11 +46,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<realname.h>
-#include	<localmisc.h>
 
 
 /* local defines */

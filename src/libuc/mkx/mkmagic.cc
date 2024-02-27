@@ -1,5 +1,5 @@
 /* mkmagic SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* create a string with a (pretty much) standard magic string  */
 /* version %I% last-modified %G% */
@@ -42,19 +42,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- |strlen(3c)| + |memset(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
-#include	<localmisc.h>
 
 #include	"mkx.h"
+
+
+/* local defines */
 
 
 /* external subroutines */
 
 
-/* local subroutines */
+/* local structures */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

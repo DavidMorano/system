@@ -1,5 +1,5 @@
 /* mktagfname SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make a tag filename */
 /* version %I% last-modified %G% */
@@ -39,14 +39,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<mkpathxw.h>
-#include	<localmisc.h>
 
 #include	"mkx.h"
 
