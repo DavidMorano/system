@@ -1,5 +1,5 @@
-/* keyvals */
-/* lang=C20 */
+/* keyvals SUPPORT */
+/* lang=C++20 */
 
 /* key-values file operations */
 /* version %I% last-modified %G% */
@@ -46,6 +46,8 @@
 #define	KEYVALS_KEY	struct keyvals_key
 #define	KEYVALS_ENT	struct keyvals_e
 
+#define	KEY		KRYVALS_KEY
+
 
 /* external subroutines */
 
@@ -56,14 +58,14 @@
 /* local structures */
 
 struct keyvals_key {
-	const char	*kp ;
+	cchar		*kp ;
 	int		kl ;
 	int		count ;
 } ;
 
 struct keyvals_e {
 	KEYVALS_KEY	*kep ;
-	const char	*vname ;
+	cchar		*vname ;
 	int		vlen ;
 	int		fi ;		/* file index */
 	int		ki ;		/* key index */
@@ -72,40 +74,39 @@ struct keyvals_e {
 
 /* forward references */
 
-static unsigned int	hashkeyval(KEYVALS_ENT *,int) ;
+static int	keyvals_keyadd(KEYVALS *,KEY *,KEY **) noex ;
+static int	keyvals_keyfins(KEYVALS *) noex ;
+static int	keyvals_keyget(KEYVALS *,cchar *,KEY **) noex ;
+static int	keyvals_keydel(KEYVALS *,int) noex ;
+static int	keyvals_already(KEYVALS *,KEYVALS_ENT *) noex ;
+static int	keyvals_addentry(KEYVALS *,KEYVALS_ENT *) noex ;
+static int	keyvals_entfins(KEYVALS *) noex ;
 
-static int	keyvals_keyadd(KEYVALS *,KEYVALS_KEY *,KEYVALS_KEY **) ;
-static int	keyvals_keyfins(KEYVALS *) ;
-static int	keyvals_keyget(KEYVALS *,const char *,KEYVALS_KEY **) ;
-static int	keyvals_keydel(KEYVALS *,int) ;
-static int	keyvals_already(KEYVALS *,KEYVALS_ENT *) ;
-static int	keyvals_addentry(KEYVALS *,KEYVALS_ENT *) ;
-static int	keyvals_entfins(KEYVALS *) ;
+static int	key_start(KEY *,cchar *) noex ;
+static int	key_increment(KEY *) noex ;
+static int	key_decrement(KEY *) noex ;
+static int	key_finish(KEY *) noex ;
+static int	key_mat(KEY *,cchar *,int) noex ;
 
-static int	key_start(KEYVALS_KEY *,const char *) ;
-static int	key_increment(KEYVALS_KEY *) ;
-static int	key_decrement(KEYVALS_KEY *) ;
-static int	key_finish(KEYVALS_KEY *) ;
-static int	key_mat(KEYVALS_KEY *,const char *,int) ;
+static int	entry_start(KEYVALS_ENT *,int,int,KEY *,cchar *,int) noex ;
+static int	entry_matkey(KEYVALS_ENT *,cchar *,int) noex ;
+static int	entry_finish(KEYVALS_ENT *) noex ;
 
-static int	entry_start(KEYVALS_ENT *,int,int,KEYVALS_KEY *,cchar *,int) ;
-static int	entry_matkey(KEYVALS_ENT *,const char *,int) ;
-static int	entry_finish(KEYVALS_ENT *) ;
+static uint	hashkeyval(KEYVALS_ENT *,int) noex ;
 
-static int	vcmpkey() ;
-static int	vcmpentry(KEYVALS_ENT *,KEYVALS_ENT *,int) ;
+static int	vcmpkey() noex ;
+static int	vcmpentry(KEYVALS_ENT *,KEYVALS_ENT *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int keyvals_start(op,ndef)
-KEYVALS		*op ;
-int		ndef ;
-{
+int keyvals_start(KEYVALS *op,int ndef) noex {
 	int		rs ;
 	int		n ;
 	int		opts ;
@@ -143,11 +144,7 @@ int		ndef ;
 }
 /* end subroutine (keyvals_start) */
 
-
-/* free up the resources occupied by an KEYVALS list object */
-int keyvals_finish(op)
-KEYVALS		*op ;
-{
+int keyvals_finish(KEYVALS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -184,8 +181,8 @@ KEYVALS		*op ;
 int keyvals_add(op,fi,kp,vp,vl)
 KEYVALS		*op ;
 int		fi ;
-const char	*kp ;
-const char	*vp ;
+cchar		*kp ;
+cchar		*vp ;
 int		vl ;
 {
 	KEYVALS_KEY	*kep = NULL ;
@@ -314,13 +311,13 @@ KEYVALS_CUR	*curp ;
 int keyvals_enumkey(op,curp,kpp)
 KEYVALS		*op ;
 KEYVALS_CUR	*curp ;
-const char	**kpp ;
+cchar		**kpp ;
 {
 	KEYVALS_KEY	*kep = NULL ;
 	int		rs = SR_OK ;
 	int		oi ;
 	int		kl = 0 ;
-	const char	*kp = NULL ;
+	cchar		*kp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -360,16 +357,16 @@ const char	**kpp ;
 int keyvals_enum(op,curp,kpp,vpp)
 KEYVALS		*op ;
 KEYVALS_CUR	*curp ;
-const char	**kpp ;
-const char	**vpp ;
+cchar		**kpp ;
+cchar		**vpp ;
 {
 	KEYVALS_ENT	*ep ;
 	HDB_DATUM	key, val ;
 	HDB_CUR		cur ;
 	int		rs ;
 	int		kl = 0 ;
-	const char	*kp = NULL ;
-	const char	*vp = NULL ;
+	cchar		*kp = NULL ;
+	cchar		*vp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -379,7 +376,7 @@ const char	**vpp ;
 	cur = curp->ec ;
 	if ((rs = hdb_enum(&op->bykey,&cur,&key,&val)) >= 0) {
 
-	    kp = (const char *) key.buf ;
+	    kp = (cchar	 *) key.buf ;
 	    kl = key.len ;
 
 	    ep = (KEYVALS_ENT *) val.buf ;
@@ -407,9 +404,9 @@ const char	**vpp ;
 
 int keyvals_fetch(op,keybuf,curp,vpp)
 KEYVALS		*op ;
-const char	keybuf[] ;
+cchar		keybuf[] ;
 KEYVALS_CUR	*curp ;
-const char	**vpp ;
+cchar		**vpp ;
 {
 	KEYVALS_ENT	*ep ;
 	HDB_DATUM	key, val ;
@@ -417,8 +414,8 @@ const char	**vpp ;
 	int		rs ;
 	int		kl ;
 	int		vl = 0 ;
-	const char	*kp ;
-	const char	*vp = NULL ;
+	cchar		*kp ;
+	cchar		*vp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -426,7 +423,7 @@ const char	**vpp ;
 
 	if (op->magic != KEYVALS_MAGIC) return SR_NOTOPEN ;
 
-	kp = (const char *) keybuf ;
+	kp = (cchar	 *) keybuf ;
 	if (keybuf[0] == '\0') kp = "default" ;
 	kl = strlen(kp) ;
 
@@ -515,7 +512,7 @@ int		fi ;
 
 int keyvals_delkey(op,kp,kl)
 KEYVALS		*op ;
-const char	*kp ;
+cchar		*kp ;
 int		kl ;
 {
 	HDB_CUR		cur ;
@@ -616,7 +613,7 @@ KEYVALS		*op ;
 /* get a pointer to the current key (make it as necessary) */
 static int keyvals_keyget(op,keybuf,kpp)
 KEYVALS		*op ;
-const char	keybuf[] ;
+cchar		keybuf[] ;
 KEYVALS_KEY	**kpp ;
 {
 	KEYVALS_KEY	ke ;
@@ -771,7 +768,7 @@ static int keyvals_entfins(KEYVALS *op)
 
 static int key_start(kep,kname)
 KEYVALS_KEY	*kep ;
-const char	kname[] ;
+cchar		kname[] ;
 {
 	int		rs = SR_OK ;
 	int		kl = 0 ;
@@ -779,7 +776,7 @@ const char	kname[] ;
 	memset(kep,0,sizeof(KEYVALS_KEY)) ;
 
 	if (kname != NULL) {
-	    const char	*kp ;
+	    cchar		*kp ;
 	    kl = strlen(kname) ;
 	    if ((rs = uc_mallocstrw(kname,kl,&kp)) >= 0) {
 		kep->kp = kp ;
@@ -852,7 +849,7 @@ KEYVALS_KEY	*kep ;
 
 static int key_mat(kep,kp,kl)
 KEYVALS_KEY	*kep ;
-const char	*kp ;
+cchar		*kp ;
 int		kl ;
 {
 	int		f = FALSE ;
@@ -875,12 +872,12 @@ static int entry_start(ep,fi,ki,kep,vp,vl)
 KEYVALS_ENT	*ep ;
 int		fi, ki ;
 KEYVALS_KEY	*kep ;
-const char	*vp ;
+cchar		*vp ;
 int		vl ;
 {
 	const int	kl = kep->kl ;
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
 #if	CF_DEBUGS
 	debugprintf("entry_start: ent k=%s\n",kep->kp) ;
@@ -936,7 +933,7 @@ KEYVALS_ENT	*ep ;
 
 static int entry_matkey(ep,kp,kl)
 KEYVALS_ENT	*ep ;
-const char	*kp ;
+cchar		*kp ;
 int		kl ;
 {
 	int		rs ;
@@ -1004,24 +1001,15 @@ KEYVALS_KEY	**e1pp, **e2pp ;
 }
 /* end subroutine (vcmpkey) */
 
-
-/* ARGSUSED */
-static int vcmpentry(e1p,e2p,len)
-KEYVALS_ENT	*e1p ;
-KEYVALS_ENT	*e2p ;
-int		len ;
-{
-	int	rc = (e1p->fi - e2p->fi) ;
-
-	if (rc == 0)
-	    rc = strcmp(e1p->kep->kp,e2p->kep->kp) ;
-
-	if (rc == 0)
-	    rc = strcmp(e1p->vname,e2p->vname) ;
-
+static int vcmpentry(KEYVALS_ENT *e1p,KEYVALS_ENT *e2p,int) noex {
+	int		rc = (e1p->fi - e2p->fi) ;
+	if (rc == 0) {
+	    if ((rc = strcmp(e1p->kep->kp,e2p->kep->kp)) == 0) {
+	        rc = strcmp(e1p->vname,e2p->vname) ;
+	    }
+	}
 	return rc ;
 }
 /* end subroutine (vcmpentry) */
-
 
 
