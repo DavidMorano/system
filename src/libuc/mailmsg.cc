@@ -142,7 +142,7 @@ struct msghdrval {
 
 struct msghdrinst {
 	cchar		*vp ;
-	VECOBJ		vals ;
+	vecobj		vals ;
 	int		vl ;
 	int		f_alloc ;
 } ;
@@ -150,7 +150,7 @@ struct msghdrinst {
 struct msghdrname {
 	cchar		*name ;
 	cchar		*vp ;
-	VECOBJ		insts ;
+	vecobj		insts ;
 	int		vl ;
 	int		f_alloc ;
 	int		namelen ;
@@ -661,7 +661,7 @@ static int mailmsg_hdraddnew(MAILMSG *op,cc *hp,int hl,cc *vp,int vl) noex {
 	            ohp->lastname = rs1 ;
 	            rs = msghdrname_addnew(hnp,cp,cl) ;
 	        } else {
-		    VECOBJ	*nlp = &ohp->names ;
+		    vecobj	*nlp = &ohp->names ;
 	            void	*p ;
 	            if ((rs = vecobj_addnew(nlp,&p)) >= 0) {
 	                MMHNAME	*hnp = (MMHNAME *) p ;
@@ -733,7 +733,7 @@ static int mailmsg_hdrmatch(MAILMSG *op,MMHNAME **hnpp,
 
 static int msghdrname_start(MMHNAME *hnp,cchar *hp,int hl,
 		cchar *vp,int vl) noex {
-	VECOBJ		*ilp = &hnp->insts ;
+	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		size ;
 
@@ -820,7 +820,7 @@ static int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
 /* end subroutine (msghdrname_match) */
 
 static int msghdrname_addnew(MMHNAME *hnp,cchar *vp,int vl) noex {
-	VECOBJ		*ilp = &hnp->insts ;
+	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
 	int		f = false ;
 	void		*p ;
@@ -894,7 +894,7 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		vl = hnp->vl ;
 	if (hnp->vp == nullptr) {
-	    VECOBJ	*ilp = &hnp->insts ;
+	    vecobj	*ilp = &hnp->insts ;
 	    MMHINST	*hip ;
 	    int		size = 1 ;
 	    cchar	*hivp = nullptr ;
@@ -967,7 +967,7 @@ static int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
 static int msghdrinst_add(MMHINST *hip,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	if (vl > 0) {
-	    VECOBJ	*vlp = &hip->vals ;
+	    vecobj	*vlp = &hip->vals ;
 	    void	*p ;
 	    if ((rs = vecobj_addnew(vlp,&p)) >= 0) {
 	        MMHVAL	*valp = (MMHVAL *) p ;
