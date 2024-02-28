@@ -57,11 +57,13 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<filereadln.h>
 #include	<localmisc.h>
+
+#include	"localget.h"
 
 
 /* local defines */
@@ -76,12 +78,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
+extern int	getuserhome(char *,int,cchar *) ;
+extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	isNotPresent(int) ;
 
 
@@ -97,14 +99,17 @@ extern int	isNotPresent(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	const char	*etcdname = ETCCNAME ;
-	const char	*orglocname = ORGLOCFNAME ;
-	const char	*orgloc = getenv(VARORGLOC) ;
+	cchar		*etcdname = ETCCNAME ;
+	cchar		*orglocname = ORGLOCFNAME ;
+	cchar		*orgloc = getenv(VARORGLOC) ;
 	char		tfname[MAXPATHLEN+1] ;
 
 	if (pr == NULL) return SR_FAULT ;
@@ -130,7 +135,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 /* user configuration */
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {

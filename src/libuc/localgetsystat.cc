@@ -52,12 +52,14 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<uprogdata.h>
 #include	<filereadln.h>
 #include	<localmisc.h>
+
+#include	"localget.h"
 
 
 /* local defines */
@@ -74,12 +76,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
+extern int	getuserhome(char *,int,cchar *) ;
+extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	isNotPresent(int) ;
 
 
@@ -95,13 +97,14 @@ extern int	isNotPresent(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int localgetsystat(cchar *pr,char *rbuf,int rlen)
-{
-	const int	di = UPROGDATA_DSYSTAT ;
-	const int	ttl = TO_TTL ;
+int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
+	cint		di = UPROGDATA_DSYSTAT ;
+	cint		ttl = TO_TTL ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 

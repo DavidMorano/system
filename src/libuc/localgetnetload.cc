@@ -52,12 +52,17 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<uprogdata.h>
 #include	<filereadln.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"localget.h"
 
 
 /* local defines */
@@ -85,6 +90,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

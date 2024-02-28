@@ -55,11 +55,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<filereadln.h>
 #include	<localmisc.h>
+
+#include	"localget.h"
 
 
 /* local defines */
@@ -80,12 +82,12 @@
 
 extern int	sncpy1(char *,int,cchar *) ;
 extern int	snabbr(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	getuserorg(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	getuserhome(char *,int,cchar *) ;
+extern int	getuserorg(char *,int,cchar *) ;
+extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	touc(int) ;
 extern int	isNotPresent(int) ;
 
@@ -102,16 +104,17 @@ extern int	isNotPresent(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un)
-{
+int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	const char	*etcdname = ETCDNAME ;
-	const char	*ocfname = ORGCODEFNAME ;
-	const char	*orgcode = getenv(VARORGCODE) ;
+	cchar		*etcdname = ETCDNAME ;
+	cchar		*ocfname = ORGCODEFNAME ;
+	cchar		*orgcode = getenv(VARORGCODE) ;
 	char		tfname[MAXPATHLEN+1] ;
 
 	if (pr == NULL) return SR_FAULT ;
@@ -133,7 +136,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un)
 /* user configuration */
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
@@ -165,7 +168,7 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un)
 /* create it out of the abbreviation of the organization name */
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    const int	orglen = ORGLEN ;
+	    cint	orglen = ORGLEN ;
 	    char	orgbuf[ORGLEN+1] ;
 	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
 	    rs = getuserorg(orgbuf,orglen,un) ;

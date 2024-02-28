@@ -1,12 +1,12 @@
 /* localgetorg SUPPORT */
-/* version %I% last-modified %G% */
+/* lang=C++20 */
 
 /* get the organization name (string) for a specified user-name */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_USERORG	0		/* try to access "user" org also */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
 /* revision history:
 
@@ -41,30 +41,32 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<char.h>
 #include	<filebuf.h>
 #include	<getax.h>
-#include	<ugetpw.h>
 #include	<getxusername.h>
 #include	<gecos.h>
 #include	<filereadln.h>
 #include	<localmisc.h>
 
+#include	"localget.h"
+
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
 #endif /* CF_UGETPW */
@@ -93,22 +95,22 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	getuserhome(char *,int,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	getuserhome(char *,int,cchar *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -117,10 +119,10 @@ extern char	*strnchr(const char *,int,int) ;
 /* local structures */
 
 struct subinfo {
-	const char	*pr ;
-	const char	*prn ;		/* program-root name */
-	const char	*ofn ;		/* organization file-name */
-	const char	*un ;
+	cchar	*pr ;
+	cchar	*prn ;		/* program-root name */
+	cchar	*ofn ;		/* organization file-name */
+	cchar	*un ;
 	char		*rbuf ;		/* user-supplied buffer */
 	int		rlen ;
 } ;
@@ -129,8 +131,8 @@ struct subinfo {
 /* forward references */
 
 static int	subinfo_start(SUBINFO *,cchar *,cchar *,cchar *,char *,int) ;
-static int	subinfo_homer(SUBINFO *,const char *) ;
-static int	subinfo_passwder(SUBINFO *,const char *) ;
+static int	subinfo_homer(SUBINFO *,cchar *) ;
+static int	subinfo_passwder(SUBINFO *,cchar *) ;
 static int	subinfo_finish(SUBINFO *) ;
 
 #if	CF_USERORG
@@ -148,16 +150,17 @@ static int	localgetorg_sys(SUBINFO *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username)
-{
+int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 	SUBINFO		si, *sip = &si ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	const char	*ofn = ORGCNAME ;
+	cchar	*ofn = ORGCNAME ;
 
 	if ((pr == NULL) || (rbuf == NULL) || (username == NULL))
 	    return SR_FAULT ;
@@ -230,16 +233,16 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username)
 
 static int subinfo_start(sip,pr,ofn,un,rbuf,rlen)
 SUBINFO		*sip ;
-const char	*pr ;
-const char	*ofn ;
-const char	*un ;
+cchar	*pr ;
+cchar	*ofn ;
+cchar	*un ;
 char		*rbuf ;
 int		rlen ;
 {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*cp ;
-	const char	*ccp ;
+	cchar	*cp ;
+	cchar	*ccp ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
 	sip->pr = pr ;
@@ -290,16 +293,16 @@ static int localgetorg_var(SUBINFO *sip)
 	int		rs = SR_OK ;
 	int		f ;
 	int		len = 0 ;
-	const char	*un = sip->un ;
+	cchar	*un = sip->un ;
 
 	f = (un[0] == '-') ;
 	if (! f) {
-	    const char	*vun = getenv(VARUSERNAME) ;
+	    cchar	*vun = getenv(VARUSERNAME) ;
 	    if ((vun != NULL) && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
-	    const char	*orgp = getenv(VARORGANIZATION) ;
+	    cchar	*orgp = getenv(VARORGANIZATION) ;
 	    if (orgp != NULL) {
 		rs = sncpy1(sip->rbuf,sip->rlen,orgp) ;
 		len = rs ;
@@ -400,7 +403,7 @@ static int localgetorg_sys(SUBINFO *sip)
 /* end subroutine (localgetorg_sys) */
 
 
-static int subinfo_homer(SUBINFO *sip,const char *homeuser)
+static int subinfo_homer(SUBINFO *sip,cchar *homeuser)
 {
 	int		rs ;
 	int		len = 0 ;
@@ -437,7 +440,7 @@ static int subinfo_homer(SUBINFO *sip,const char *homeuser)
 /* end subroutine (subinfo_homer) */
 
 
-static int subinfo_passwder(SUBINFO *sip,const char *homeuser)
+static int subinfo_passwder(SUBINFO *sip,cchar *homeuser)
 {
 	PASSWD		pw ;
 	cint	pwlen = getbufsize(getbufsize_pw) ;
@@ -452,7 +455,7 @@ static int subinfo_passwder(SUBINFO *sip,const char *homeuser)
 	        if ((rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
 		    int		vl ;
 		    cint	gi = gecosval_organization ;
-		    const char	*vp ;
+		    cchar	*vp ;
 	            if ((vl = gecos_getval(&g,gi,&vp)) > 0) {
 	    	        rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
 		        len = rs ;
