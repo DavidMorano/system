@@ -211,7 +211,7 @@ mkaddrname.o:		mkaddrname.cc  $(INCS)
 mkaddrpart.o:		mkaddrpart.cc  $(INCS)
 mkaddrbest.o:		mkaddrbest.cc  $(INCS)
 
-mkbasename.o:		mkbasename.c $(INCS)
+mkbasename.o:		mkbasename.cc $(INCS)
 mkshlibname.o:		mkshlibname.cc $(INCS)
 mksofname.o:		mksofname.cc $(INCS)
 

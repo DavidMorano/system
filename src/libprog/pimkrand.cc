@@ -19,32 +19,29 @@
 
 /*******************************************************************************
 
-	This subroutine creates a unique (?) string no more than MSGBOUND
-	characters.
+	Name:
+	pimkrand
+
+	Description:
+	This subroutine creates a unique (?) string no more than
+	MSGBOUND characters.
 
 	Synopsis:
-
-	int mkrand(pip)
-	PROGINFO	*pip ;
+	int pimkrand(PROGINFO *pip)
 
 	Arguments:
-
 	pip		pointer to program information
 
 	Returns:
-
 	>=0		length of result
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/time.h>		/* for 'gethrtime(3c)' */
+#include	<sys/time.h>		/* for |gethrtime(3c)| */
 #include	<unistd.h>
 #include	<string.h>
 
@@ -153,13 +150,6 @@ static int mkrand_light(PROGINFO *pip)
 	    rv ^= (v << 32) ;
 	}
 
-#if	SYSHAS_HRTIME
-	{
-	    hrtime_t	ht = gethrtime() ;
-	    rv ^= ht ;
-	}
-#endif /* SYSHAS_GRTIME */
-
 	v = pip->serial ;
 	rv += v ;
 
@@ -181,8 +171,8 @@ static int mkrand_heavy(PROGINFO *pip,struct timeval *todp)
 	if ((rs = buffer_start(&hb,RVBUFLEN)) >= 0) {
 	    int		i ;
 	    int		bl ;
-	    const char	*cp ;
-	    const char	*bp ;
+	    cchar	*cp ;
+	    cchar	*bp ;
 	    char	*buf ;
 
 /* get some miscellaneous stuff */

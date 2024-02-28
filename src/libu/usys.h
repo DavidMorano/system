@@ -32,12 +32,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<signal.h>
-#include	<pthread.h>
-#include	<time.h>
 #include	<clanguage.h>
 
 #include	<usys_xxx.h>
@@ -45,6 +41,8 @@
 #include	<usys_darwin.h>
 #include	<usys_linux.h>
 #include	<usys_mqueue.h>
+#include	<usys_gethrtime.h>
+#include	<usys_getrandom.h>
 
 
 #endif /* USYS_INCLUDE */

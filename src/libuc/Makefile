@@ -1080,9 +1080,6 @@ b64decover.o:		b64decoder.cc b64decoder.h
 # tab handling
 ncol.o:			ncol.c ncol.h
 
-# other IS
-isinetaddr.o:		isinetaddr.cc isinetaddr.h
-
 # INET
 inetconv.o:		inetconv.cc inetconv.h
 
@@ -1137,15 +1134,30 @@ getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
 groupids.o:		groupids.cc groupids.hh
-xperm.o:		xperm.cc xperm.h ids.h
-isoneof.o:		isoneof.c isoneof.h
-isnot.o:		isnot.cc isnot.h isoneof.h
-iserror.o:		iserror.cc iserror.h isoneof.h
-isprime.o:		isprime.cc isprime.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
 strwcpy.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
+xperm.o:		xperm.cc xperm.h ids.h
+sysnoise.o:		sysnoise.cc sysnoise.h
+#
+isproc.o:		isproc.cc isproc.h
+#
+isasocket.o:		isasocket.cc isfiledesc.h
+isinteractive.o:	isinteractive.cc isfiledesc.h
+isfsremote.o:		isfsremote.cc isfiledesc.h
+#
+isinetaddr.o:		isinetaddr.cc isinetaddr.h
+isindomain.o:		isindomain.cc isindomain.h
+isoneof.o:		isoneof.cc isoneof.h
+isnot.o:		isnot.cc isnot.h isoneof.h
+iserror.o:		iserror.cc iserror.h isoneof.h
+#
+isprime.o:		isprime.cc ismisc.h
+isleapyear.o:		isleapyear.cc ismisc.h
+isdotdir.o:		isdotdir.cc ismisc.h
+issamehostname.o:	issamehostname.cc issamehostname.h ismisc.h
+isobjspecial.o:		isobjspecial.cc ismisc.h
 
 
 userattrdb.o:		userattrdb.cc	userattrdb.h

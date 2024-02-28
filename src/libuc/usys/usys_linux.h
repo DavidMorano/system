@@ -19,9 +19,8 @@
 
 /*******************************************************************************
 
-	This file contains the UNIX system types and preprocessor symbols
+	This file contains the UNIX® system types and preprocessor symbols
 	that may not be provided.
-
 
 *******************************************************************************/
 

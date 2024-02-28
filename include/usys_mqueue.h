@@ -16,11 +16,10 @@
 
 /*******************************************************************************
 
-	This file contains the UNIX system types that the brain-damaged
+	This file contains the UNIX® system types that the brain-damaged
 	MacOS operating system does NOT have.  We are trying in a very
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
-
 
 *******************************************************************************/
 
@@ -28,7 +27,7 @@
 #define	USYS_MQUEUE_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>		/* <- |mode_t| */
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
@@ -64,9 +63,7 @@ typedef uintptr_t	mqd_t ;
 
 #ifndef	SUBROUTINE_PMQ
 #define	SUBROUTINE_PMQ
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern mqd_t mq_open(const char *,int,mode_t,const MQATTR *) noex ;
 extern int mq_close(mqd_t) noex ;
@@ -77,9 +74,7 @@ extern int mq_getattr(mqd_t,MQATTR *) noex ;
 extern int mq_notify(mqd_t,struct sigevent *) noex ;
 extern int mq_unlink(const char *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 #endif /* SUBROUTINE_PMQ */
 
 #else /* (!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0) */

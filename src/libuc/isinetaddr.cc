@@ -88,12 +88,15 @@ constexpr bool			f_inet6 = CF_INET6 ;
 static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int isinetaddr(cchar *name) noex {
-	int		f = false ;
+bool isinetaddr(cchar *name) noex {
+	bool		f = false ;
 	if constexpr (f_inet6) {
-	    constexpr int	af = AF_UNSPEC ;
+	    cint	af = AF_UNSPEC ;
 	    int		rs1 ;
 	    char	addrbuf[ADDRBUFLEN + 1] ;
 	    rs1 = inetpton(addrbuf,ADDRBUFLEN,af,name,-1) ;

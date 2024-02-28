@@ -29,9 +29,9 @@
 
 
 struct outstore_head {
+	char		*dbuf ;	/* dynamically sized (allocated) */
 	int		dlen ;
 	int		len ;
-	char		*dbuf ;	/* dynamically sized (allocated) */
 	char		sbuf[OUTSTORE_SLEN+1] ; /* "static" or "stack" */
 } ;
 

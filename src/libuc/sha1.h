@@ -1,4 +1,4 @@
-/* sha HEADER */
+/* sha1 HEADER */
 /* lang=C20 */
 
 /* NIST Secure Hash Algorithm (SHA) */

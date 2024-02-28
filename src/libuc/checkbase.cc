@@ -46,6 +46,7 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<ucvariables.hh>
+#include	<syswords.hh>
 #include	<hasx.h>
 
 #include	"checkbase.h"
@@ -71,7 +72,7 @@
 
 /* local variables */
 
-static cint	maxbase = strlen(varname.digtab) ;
+static cint	maxbase = strlen(sysword.w_digtab) ;
 
 
 /* exported variables */

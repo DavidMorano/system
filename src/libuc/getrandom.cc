@@ -7,35 +7,22 @@
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 2010-08-28, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2010 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This is a version of |getrandom(2)| that is preloaded to over-ride the
-        standard UNIX® system version.
+	This is a version of |getrandom(2)| that is preloaded to
+	over-ride the standard UNIX® system version.
 
 	Q. Is this multi-thread safe?
 	A. Since it is a knock-off of an existing UNIX® system LIBC (3c)
 	   subroutine that is already multi-thread safe -- then of course
 	   it is!
-
-	Q. Is this much slower than the default system version?
-	A. No, not really.
-
-	Q. How are we smarter than the default system version?
-	A. Let me count the ways:
-		+ value is cached!
-
-	Q. Why did you not also interpose something for |sysconf(3c)|?
-	A. Because we did not want to.
-
-	Q. Why are you so smart?
-	A. I do not know.
 
 *******************************************************************************/
 
@@ -56,6 +43,7 @@
 #include	<randomvar.h>
 #include	<stdintx.h>
 #include	<mkchar.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getrandom.h"
@@ -84,10 +72,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	isNotPresent(int) noex ;
-}
 
 
 /* local structures */
@@ -141,6 +125,9 @@ static constexpr cchar	*devs[] = {
 	"/dev/random",
 	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

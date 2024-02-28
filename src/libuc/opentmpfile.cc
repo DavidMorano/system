@@ -362,13 +362,6 @@ static int randload(ulong *rvp) noex {
 	        rv += tod.tv_usec ;
 	} /* end block */
 
-#if	SYSHAS_HRTIME
-	{
-	    hrtime_t	ht = gethrtime() ;
-	    rv += ht ;
-	}
-#endif /* SYSHAS_GRTIME */
-
 	*rvp = rv ;
 
 	} /* end if (non-null) */

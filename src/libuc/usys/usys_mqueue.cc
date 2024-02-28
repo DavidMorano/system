@@ -18,14 +18,13 @@
 
 	We defines some system (global) variables in this module.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<errno.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<cerrno>
+#include	<climits>
 #include	<cstring>
 #include	<usysrets.h>
 #include	<clanguage.h>
@@ -68,10 +67,6 @@ static constexpr mqd_t	mqdbad = mkmqdbad() ;
 
 #ifndef	MQATTR
 #define	MQATTR		struct mq_attr
-#endif
-
-#ifdef	__cplusplus
-extern "C" {
 #endif
 
 mqd_t mq_open(const char *n,int,mode_t,const MQATTR *) noex {
@@ -159,10 +154,6 @@ int mq_unlink(const char *n) noex {
 	errno = ec ;
 	return -1 ;
 }
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* (!defined(SYSHAS_PMQ)) || (SYSHAS_PMQ == 0) */
 /* PMQ end */

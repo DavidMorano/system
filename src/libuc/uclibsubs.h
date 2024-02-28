@@ -77,6 +77,7 @@
 #include	<ucfdmanip.h>
 #include	<uctimer.h>
 #include	<ucgetpid.h>
+#include	<ucgetrandom.h>
 
 
 EXTERNC_begin
@@ -263,9 +264,6 @@ extern int	uc_munlock(cvoid *,size_t) noex ;
 extern int	uc_mlockall(int) noex ;
 extern int	uc_munlockall() noex ;
 extern int	uc_madvise(cvoid *,size_t,int) noex ;
-
-extern int	uc_getrandom(void *,int,int) noex ;
-extern int	uc_getentropy(void *,int) noex ;
 
 /* memory allocation (user-space) */
 

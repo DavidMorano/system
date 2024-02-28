@@ -83,10 +83,6 @@ struct varnames {
 	static const char tmout[] ;
 	static const char editor[] ;
 	static const char visual[] ;
-	static const char tmpdname[] ;
-	static const char vardname[] ;
-	static const char devdname[] ;
-	static const char digtab[] ;
 } ; /* end struct (varnames) */
 
 

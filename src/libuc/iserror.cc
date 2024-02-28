@@ -74,6 +74,23 @@
 
 static constexpr int	rfailopen[] = {
 	SR_BADF,
+	SR_ILSEQ,
+	SR_NOTDIR,
+	SR_TXTBSY,
+	SR_ROFS,
+	SR_OVERFLOW,
+	SR_OPNOTSUPP,
+	SR_NXIO,
+	SR_NOSPC,
+	SR_LOOP,
+	SR_NFILE,
+	SR_NAMETOOLONG,
+	SR_ISDIR,
+	SR_IO,
+	SR_INVALID,
+	SR_FAULT,
+	SR_EXIST,
+	SR_DQUOT,
 	0	
 } ;
 

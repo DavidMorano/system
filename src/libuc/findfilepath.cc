@@ -185,7 +185,7 @@ static int checkone(ids *idp,char *rbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 	int		rs = SR_OK ;
 	if (dnl == 0) {
 	    if ((rs = fileperm(idp,fn,am)) >= 0) {
-	        rs = 0 ;
+	        rs = 0 ;		/* <- found in PWD */
 	    }
 	} else {
 	    rs = checkit(idp,rbuf,dnp,dnl,fn,am) ;
@@ -240,6 +240,7 @@ static int fileperm(ids *idp,cchar *fn,int am) noex {
 /* end subroutine (fileperm) */
 
 static bool isendslash(cc *dp,int dl) noex {
+	if (dl < 0) dl = strlen(dp) ;
 	return ((dl > 0) && (dp[dl-1] == '/')) ;
 }
 

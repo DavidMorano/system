@@ -1,4 +1,4 @@
-/* nss_parse */
+/* nss_parse SUPPORT */
 /* lang=C20 */
 
 /* Name-Server-Switch (NSS) database parsing support */

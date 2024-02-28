@@ -30,12 +30,13 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<varnames.hh>
 #include	<syswords.hh>
+#include	<varnames.hh>
 #include	<valuelimits.hh>
 #include	<digbufsizes.hh>
 
 
+extern const syswords		sysword ;
 extern const varnames		varname ;
 extern const valuelimits	valuelimit ;
 extern const digbufsizes	digbufsize ;

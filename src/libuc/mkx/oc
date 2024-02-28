@@ -1,0 +1,9 @@
+mkbasename.cc
+mkcaselower.cc
+mkcexsync.cc
+mkexpandpath.cc
+mkmagic.cc
+mkmailname.cc
+mkpathx.cc
+mkrevstr.cc
+mktagfname.cc
