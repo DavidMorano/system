@@ -1,6 +1,9 @@
 /* modload HEADER */
 /* lang=C20 */
 
+/* module-load management */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -34,18 +37,18 @@
 
 
 struct modload_mid {
-	const char	*name ;
+	cchar		*name ;
 	int		mv[1] ;
 } ;
 
 struct modload_head {
-	uint		magic ;
 	void		*sop ;		/* shared-object (SO) pointer */
-	const char	*modname ;
+	cchar		*modname ;
 	MODLOAD_MID	*midp ;
+	uint		magic ;
 } ;
 
-typdef MODLOAD		modload ;
+typedef MODLOAD		modload ;
 
 EXTERNC_begin
 
