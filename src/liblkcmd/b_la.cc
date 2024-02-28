@@ -1,17 +1,13 @@
-/* b_sysval */
+/* b_la SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGMALL	1		/* debug memory-allocations */
-#define	CF_DEBUGN	0		/* special */
-#define	CF_UTYPES	0		/* define UTMP-UTMPX state names */
+#define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_PERCACHE	1		/* use persistent cache */
-#define	CF_SNLOADAVG	0		/* use |snloadavg(3dam)| */
-
 
 /* revision history:
 
@@ -25,57 +21,61 @@
 /*******************************************************************************
 
 	Synopsis:
-
-	$ sysval <spec(s)>
+	$ la <spec(s)>
 
 	Special note:
 
-	Just so an observer (like myself later on) won't go too crazy trying to
-	understand what is going on with the PERCACHE local data, it
-	is a persistent data structure.  This program can operate as both a
-	regular program (is flushed from system memory when it exits) or it can
-	be operated as sort of a terminate-stay-resident (TSR) program (its
-	data is not flushed when it exists).  We detect which it is (which mode
-	we are executing in) dynamically.  We do this by simply looking at the
-	persistent data and seeing if elements of it are non-zero.  Any
-	non-zero data indicates that we have already been executed in the
-	past.  This data is allocated in the BSS section of our process memory
-	map so it is initialized to all-zero on program-load (a UNIX® standard
+	Just so an observer (like myself later on) won't go too
+	crazy trying to understand what is going on with the PERCAHE
+	local data, it is a persistent data structure.  This program
+	can operate as both a regular program (is flushed from
+	system memory when it exits) or it can be operated as sort
+	of a terminate-stay-resident (TSR) program (its data is not
+	flushed when it exists).  We detect which it is (which mode
+	we are executing in) dynamically.  We do this by simply
+	looking at the persistent data and seeing if elements of
+	it are non-zero.  Any non-zero data indicates that we have
+	already been executed in the past.  This data is allocated
+	in the BSS section of our process memory map so it is
+	initialized to all-zero on program-load (a UNIX® standard
 	now for? over twenty years!).
 
-	Hopefully, everything else now makes sense upon inspection with this
-	understanding.
+	Hopefully, everything else now makes sense upon inspection
+	with this understanding.
 
-	Why do this?  Because it speeds things up.  Everything in this program
-	is already quite fast, but we have the chance of reducing some
-	file-access work with the introduction of a persistent data cache.  It
-	is hard to get faster than a single file-access (like a shared-memory
-	cache), so anything worth doing has to be a good bit faster than that.
-	Hence, pretty much only TSR behavior can beat a single file access.
+	Why do this?  Because it speeds things up.  Everything in
+	this program is already quite fast, but we have the chance
+	of reducing some file-access work with the introduction of
+	a persistent data cache.  It is hard to get faster than a
+	single file-access (like a shared-memory cache), so anything
+	worth doing has to be a good bit faster than that.  Hence,
+	pretty much only TSR behavior can beat a single file access.
 
-	Parallelism?  There isn't any, so we don't have to worry about using
-	mutexes or semaphores.  Maybe someday we will have to think about
-	parallelism, but probably not any time soon!
+	Parallelism?  There is not any, so we don't have to worry
+	about using mutexes or semaphores.  Maybe someday we will
+	have to think about parallelism, but probably not any time
+	soon!
 
-	OK, now for some of the unpleasantness.  We have to release persistent
-	data that was dynamically allocated with the PERCACHE facility.  We do
-	this by calling |percache_fini()| on our particular data handle.  But
-	this should be done at module unload time, so we need to register a
-	subroutine to do this that is called at module-unload time.  That
-	subroutine will be |ourfini()|.  The registration is only done when we
-	are *exiting* this command.  This is done so that we do not perform the
-	registration if the PERCACHE facility was never used.  The cache
-	facility keeps track within itself whether it was used or not (among
-	all possible simultaneous users also).  We ask its opinion on that and
-	act accordingly.  Only one "user" (command) within the same module will
-	be given notice to perform a registration.  However if multiple users
-	(commands) do register a |fini()| (needlessly) it is dealt with without
-	problems (extras are ignored as expected).  Welcome to TSR management
-	when in a very dynamic execution environment!
-
+	OK, now for some of the unpleasantness.  We have to release
+	persistent data that was dynamically allocated with the
+	PERCACHE facility.  We do this by calling |percache_fini()|
+	on our particular data handle.  But this should be done at
+	module unload time, so we need to register a subroutine to
+	do this that is called at module-unload time.  That subroutine
+	will be |ourfini()|.  The registration is only done when
+	we are *exiting* this command.  This is done so that we do
+	not perform the registration if the PERCACHE facility was
+	never used.  The cache facility keeps track within itself
+	whether it was used or not (among all possible simultaneous
+	users also).  We ask its opinion on that and act accordingly.
+	Only one "user" (command) within the same module will be
+	given notice to perform a registration.  However if multiple
+	users (commands) do register a |fini()| (needlessly) it is
+	dealt with without problems (extras are ignored as expected).
+	Welcome to TSR management when in a very dynamic execution
+	environment!
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -97,35 +97,29 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<utmpx.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<netdb.h>
 
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<bits.h>
 #include	<keyopt.h>
+#include	<vecstr.h>
+#include	<utmpacc.h>
 #include	<ctdec.h>
 #include	<ctdecf.h>
 #include	<cthex.h>
-#include	<vecstr.h>
-#include	<tmpx.h>
-#include	<utmpacc.h>
 #include	<field.h>
-#include	<tmtime.h>
 #include	<uinfo.h>
 #include	<nulstr.h>
-#include	<getbufsize.h>
 #include	<sysmemutil.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
 #include	"kshlib.h"
-#include	"b_sysval.h"
+#include	"b_la.h"
 #include	"defs.h"
 #include	"percache.h"
 
@@ -135,13 +129,11 @@
 #define	LOCINFO		struct locinfo
 #define	LOCINFO_FL	struct locinfo_flags
 
-#define	CVTBUFLEN	MIN(100,NODENAMELEN)
-#define	NDEBFNAME	"sysval.deb"
+#define	CVTBUFLEN	100
 
 
 /* external subroutines */
 
-extern int	snloadavg(char *,int,uint *,int,int,int) ;
 extern int	snfsflags(char *,int,ulong) ;
 extern int	snwcpy(char *,int,cchar *,int) ;
 extern int	sncpy1(char *,int,cchar *) ;
@@ -154,42 +146,14 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecti(cchar *,int,int *) ;
-extern int	cfdecl(cchar *,int,long *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	statvfsdir(cchar *,struct statvfs *) ;
-extern int	getproviderid(cchar *,int) ;
-extern int	getvendor(char *,int) ;
 extern int	getnprocessors(cchar **,int) ;
-extern int	getrunlevel(cchar *) ;
-extern int	getmjd(int,int,int) ;
-extern int	getnodename(char *,int) ;
-extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	getclustername(cchar *,char *,int,cchar *) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	gethomeorg(char *,int,cchar *) ;
-extern int	getsystypenum(char *,char *,cchar *,cchar *) ;
-extern int	getstacksize(int) ;
-extern int	gethz(int) ;
-extern int	getngroups(void) ;
-extern int	getmaxpid(int) ;
 extern int	getsysdomain(char *,int) ;
-extern int	getnfile(int) ;
-extern int	localsetsystat(cchar *,cchar *,int) ;
-extern int	localsetnetload(cchar *,cchar *,int) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
-extern int	localgetorgcode(cchar *,char *,int,cchar *) ;
-extern int	localgetorgloc(cchar *,char *,int,cchar *) ;
-extern int	localgetnetload(cchar *,char *,int) ;
-extern int	localgetsystat(cchar *,char *,int) ;
-extern int	inittimezone(char *,int,cchar *) ;
+extern int	getuserhome(char *,int,cchar *) ;
 extern int	nusers(cchar *) ;
-extern int	tolc(int) ;
-extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
-extern int	isNotAccess(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
 
@@ -200,17 +164,14 @@ extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	nprintf(cchar *,cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
-#endif /* CF_DEBUGS */
+#endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strnchr(cchar *,int,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
 extern char	*timestr_log(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
 extern char	*timestr_elapsed(time_t,char *) ;
 
 
@@ -230,92 +191,68 @@ struct locinfo_flags {
 	uint		percache:1 ;
 	uint		init:1 ;
 	uint		nocache:1 ;
-	uint		set:1 ;
 	uint		utfname:1 ;
-	uint		fla:1 ;
-	uint		rnum:1 ;
-	uint		ncpus:1 ;
-	uint		hostid:1 ;
-	uint		nusers:1 ;
-	uint		nprocs:1 ;
-	uint		runlevel:1 ;
-	uint		btime:1 ;
-	uint		hz:1 ;
-	uint		mem:1 ;
-	uint		to:1 ;
-	uint		gmtime:1 ;
 	uint		uname:1 ;
 	uint		uaux:1 ;
+	uint		fla:1 ;
+	uint		ncpus:1 ;
+	uint		nprocs:1 ;
+	uint		btime:1 ;
+	uint		runlevel:1 ;
+	uint		nusers:1 ;
+	uint		rnum:1 ;
+	uint		mem:1 ;
+	uint		to:1 ;
+	uint		hostid:1 ;
 	uint		allocfname:1 ;
-	uint		ttl:1 ;
-	uint		hextime:1 ;
-	uint		timeform:1 ;
 } ;
 
 struct locinfo {
 	LOCINFO_FL	have, f, changed, final ;
 	LOCINFO_FL	init, open ;
 	vecstr		stores ;
-	TMTIME		gmtime ;
-	UINFO_NAME	uname ;		/* from UINFO */
-	UINFO_AUX	uaux ;		/* from UINFO */
 	PROGINFO	*pip ;
 	cchar		*utfname ;
-	cchar		*fname ;	/* ? */
-	cchar		*nodename ;
-	cchar		*clustername ;
-	cchar		*systemname ;
+	cchar		*fname ;
 	cchar		*sysdomain ;
+	UINFO_NAME	uname ;
+	UINFO_AUX	uaux ;
 	double		fla[3] ;	/* floating load-averages */
 	time_t		btime ;		/* machine boot-time */
-	time_t		wtime ;		/* UTMPX boot-time */
 	time_t		ti_mem ;
 	time_t		ti_la ;
-	time_t		ti_tz ;
 	time_t		ti_ncpus ;
 	time_t		ti_nprocs[4] ;
-	time_t		ti_nusers ;
-	time_t		ti_hostid ;
 	time_t		ti_btime ;
 	time_t		ti_runlevel ;
+	time_t		ti_nusers ;
+	time_t		ti_hostid ;
+	uint		nprocs[4] ;
+	uint		ncpus ;
+	uint		nusers ;
 	uint		rnum ;
-	uint		hostid ;
 	uint		pmt ;		/* physical-memory-total */
 	uint		pma ;		/* physical-memory-avail */
 	uint		pmu ;		/* physical-memory-usage */
+	uint		hostid ;
+	int		to ;		/* time-out */
 	int		pagesize ;
 	int		runlevel ;
-	int		hz ;
-	int		ncpus ;
-	int		nprocs[4] ;
-	int		nusers ;
-	int		to ;		/* time-out */
-	int		ttl ;
-	int		timeform ;
-	char		username[USERNAMELEN+1] ;
-	char		tz[TZLEN+1] ;
-	char		stype[USERNAMELEN+1] ;
-	char		snum[USERNAMELEN+1] ;
 } ;
 
 
 /* forward references */
 
-static int	mainsub(int,const char **,const char **,void *) ;
+static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procqueries(PROGINFO *,void *,cchar *,int) ;
-static int	procquery(PROGINFO *,void *, cchar *,int) ;
-static int	procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *,int) ;
+static int	procspecs(PROGINFO *,void *,cchar *,int) ;
+static int	procspec(PROGINFO *,void *, cchar *,int) ;
 static int	procfs(PROGINFO *,char *,int,int,cchar *,int) ;
-static int	procacc(PROGINFO *,char *,int,cchar *,int) ;
-static int	procsystat(PROGINFO *,char *,int,cchar *,int) ;
 static int	procla(PROGINFO *,SHIO *,char *,int,int) ;
-static int	procnfile(PROGINFO *,cchar *,int) ;
-static int	procmaxpid(PROGINFO *,cchar *,int) ;
 static int	procout(PROGINFO *,SHIO *,cchar *,int) ;
 
 static int	getla(PROGINFO *) ;
@@ -328,8 +265,6 @@ static int	getbtime(PROGINFO *) ;
 static int	getrnum(PROGINFO *) ;
 static int	getmem(PROGINFO *) ;
 
-static int	cftime(PROGINFO *,char *,int,ulong) ;
-
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
@@ -337,31 +272,16 @@ static int	locinfo_utfname(LOCINFO *,cchar *) ;
 static int	locinfo_flags(LOCINFO *,int,int) ;
 static int	locinfo_to(LOCINFO *,int) ;
 static int	locinfo_defaults(LOCINFO *) ;
-static int	locinfo_gmtime(LOCINFO *) ;
-static int	locinfo_wtime(LOCINFO *) ;
-static int	locinfo_rtime(LOCINFO *,ulong *) ;
-static int	locinfo_username(LOCINFO *) ;
-static int	locinfo_hz(LOCINFO *) ;
 static int	locinfo_uname(LOCINFO *) ;
 static int	locinfo_uaux(LOCINFO *) ;
-static int	locinfo_hostid(LOCINFO *) ;
-static int	locinfo_systypenum(LOCINFO *) ;
-static int	locinfo_runlevel(LOCINFO *) ;
-static int	locinfo_tz(LOCINFO *) ;
 static int	locinfo_sysdomain(LOCINFO *) ;
-static int	locinfo_systemname(LOCINFO *) ;
-static int	locinfo_clustername(LOCINFO *) ;
-static int	locinfo_nodename(LOCINFO *) ;
 static int	locinfo_fsdir(LOCINFO *) ;
-static int	locinfo_netload(LOCINFO *,char *,int,cchar *,int) ;
+static int	locinfo_hostid(LOCINFO *) ;
 static int	locinfo_pagesize(LOCINFO *) ;
-static int	locinfo_timeform(LOCINFO *,cchar *,int) ;
 
 #if	CF_PERCACHE
 static void	ourfini() ;
 #endif /* CF_PERCACHE */
-
-static int	getam(cchar *,int) ;
 
 
 /* local variables */
@@ -375,7 +295,6 @@ static const char	*argopts[] = {
 	"af",
 	"ef",
 	"of",
-	"if",
 	"utf",
 	"db",
 	"nocache",
@@ -391,7 +310,6 @@ enum argopts {
 	argopt_af,
 	argopt_ef,
 	argopt_of,
-	argopt_if,
 	argopt_utf,
 	argopt_db,
 	argopt_nocache,
@@ -423,35 +341,13 @@ static const MAPEX	mapexs[] = {
 static const char	*akonames[] = {
 	"utf",
 	"db",
-	"ttl",
-	"hextime",
-	"time",
-	"date",
 	NULL
 } ;
 
 enum akonames {
 	akoname_utf,
 	akoname_db,
-	akoname_ttl,
-	akoname_hextime,
-	akoname_time,
-	akoname_date,
 	akoname_overlast
-} ;
-
-static const char	*timeforms[] = {
-	"decimal",
-	"hexadecimal",
-	"wall",
-	NULL
-} ;
-
-enum timeforms {
-	timeform_decimal,
-	timeform_hexadecimal,
-	timeform_wall,
-	timeform_overlast
 } ;
 
 /* define the configuration keywords */
@@ -467,8 +363,6 @@ static const char	*qopts[] = {
 	"hwserial",
 	"nisdomain",
 	"domainname",
-	"systemname",
-	"clustername",
 	"la1min",
 	"la5min",
 	"la15min",
@@ -479,13 +373,9 @@ static const char	*qopts[] = {
 	"nuprocs",
 	"ntprocs",
 	"ncpus",
-	"hz",
 	"btime",
 	"ctime",
 	"utime",
-	"wtime",
-	"rtime",
-	"uts",
 	"rnum",
 	"pmtotal",
 	"pmavail",
@@ -505,42 +395,8 @@ static const char	*qopts[] = {
 	"fsstr",
 	"fsid",
 	"fsflags",
-	"access",
-	"mjd",
-	"netload",
-	"systat",
-	"organization",
-	"orgcode",
-	"orgloc",
 	"hostid",
 	"romserial",
-	"systype",
-	"sysnum",
-	"ostype",
-	"osnum",
-	"runlevel",
-	"tz",
-	"testnode",
-	"cspath",
-	"pagesize",
-	"stacksizemin",
-	"argmax",
-	"pwbufsize",
-	"spbufsize",
-	"uabufsize",
-	"grbufsize",
-	"pjbufsize",
-	"pebufsize",
-	"sebufsize",
-	"nebufsize",
-	"hebufsize",
-	"ngroups",
-	"maxpid",
-	"maxtzname",
-	"kserial",
-	"nofiles",
-	"providerid",
-	"vendor",
 	NULL
 } ;
 
@@ -556,8 +412,6 @@ enum qopts {
 	qopt_hwserial,
 	qopt_nisdomain,
 	qopt_domainname,
-	qopt_systemname,
-	qopt_clustername,
 	qopt_la1min,
 	qopt_la5min,
 	qopt_la15min,
@@ -568,13 +422,9 @@ enum qopts {
 	qopt_nuprocs,
 	qopt_ntprocs,
 	qopt_ncpus,
-	qopt_hz,
 	qopt_btime,
 	qopt_ctime,
 	qopt_utime,
-	qopt_wtime,
-	qopt_rtime,
-	qopt_uts,
 	qopt_rnum,
 	qopt_pmtotal,
 	qopt_pmavail,
@@ -594,42 +444,8 @@ enum qopts {
 	qopt_fsstr,
 	qopt_fsid,
 	qopt_fsflags,
-	qopt_access,
-	qopt_mjd,
-	qopt_netload,
-	qopt_systat,
-	qopt_org,
-	qopt_orgcode,
-	qopt_orgloc,
 	qopt_hostid,
 	qopt_romserial,
-	qopt_systype,
-	qopt_sysnum,
-	qopt_ostype,
-	qopt_osnum,
-	qopt_runlevel,
-	qopt_tz,
-	qopt_testnode,
-	qopt_cspath,
-	qopt_pagesize,
-	qopt_stacksizemin,
-	qopt_argmax,
-	qopt_pwbufsize,
-	qopt_spbufsize,
-	qopt_uabufsize,
-	qopt_grbufsize,
-	qopt_pjbufsize,
-	qopt_pebufsize,
-	qopt_sebufsize,
-	qopt_nebufsize,
-	qopt_hebufsize,
-	qopt_ngroups,
-	qopt_maxpid,
-	qopt_maxtzname,
-	qopt_kserial,
-	qopt_nofiles,
-	qopt_providerid,
-	qopt_vendor,
 	qopt_overlast
 } ;
 
@@ -644,28 +460,11 @@ static const uchar	aterms[] = {
 	0x00, 0x00, 0x00, 0x00
 } ;
 
-#if	(CF_DEBUGS || CF_DEBUG) && CF_UTYPES
-static const char	*utypes[] = {
-	"empty",
-	"runlevel",
-	"boottime",
-	"oldtime",
-	"newtime",
-	"initproc",
-	"loginproc",
-	"userproc",
-	"deadproc",
-	"account",
-	"signature",
-	NULL
-} ;
-#endif /* CF_DEBUG */
-
 
 /* exported subroutines */
 
 
-int b_sysval(int argc,cchar *argv[],void *contextp)
+int b_la(int argc,cchar *argv[],void *contextp)
 {
 	int		rs ;
 	int		rs1 ;
@@ -682,14 +481,14 @@ int b_sysval(int argc,cchar *argv[],void *contextp)
 
 	return ex ;
 }
-/* end subroutine (b_sysval) */
+/* end subroutine (b_la) */
 
 
-int p_sysval(int argc,cchar *argv[],cchar *envv[],void *contextp)
+int p_la(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 	return mainsub(argc,argv,envv,contextp) ;
 }
-/* end subroutine (p_sysval) */
+/* end subroutine (p_la) */
 
 
 /* local subroutines */
@@ -736,7 +535,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
-	    debugprintf("b_sysval: starting DFD=%d\n",rs) ;
+	    debugprintf("b_la: starting DFD=%d\n",rs) ;
 	}
 #endif /* CF_DEBUGS */
 
@@ -816,8 +615,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                avl = 0 ;
 	                akl = aol ;
 	            }
-
-/* keyword match or only key letters? */
 
 	            if ((kwi = matostr(argopts,2,akp,akl)) >= 0) {
 
@@ -926,23 +723,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            if (argl)
 	                                ofname = argp ;
 	                        } else
-	                            rs = SR_INVALID ;
-	                    }
-	                    break ;
-
-	                case argopt_if:
-	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
-	                        if (avl)
-	                            cp = avp ;
-	                    } else {
-	                        if (argr > 0) {
-	                            argp = argv[++ai] ;
-	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
-	                            if (argl)
-	                                cp = argp ;
-				} else
 	                            rs = SR_INVALID ;
 	                    }
 	                    break ;
@@ -1060,18 +840,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        pip->verboselevel = 0 ;
 	                        break ;
 
-/* set-mode */
-	                    case 's':
-	                        lip->f.set = TRUE ;
-	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
-	                            if (avl) {
-	                                rs = optbool(avp,avl) ;
-	                                lip->f.set = (rs > 0) ;
-	                            }
-	                        }
-	                        break ;
-
 /* time-out */
 	                    case 't':
 	                        if (argr > 0) {
@@ -1079,23 +847,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argr -= 1 ;
 	                            argl = strlen(argp) ;
 	                            if (argl) {
-	                                rs = cfdecti(argp,argl,&v) ;
+	                                rs = cfdecti(avp,avl,&v) ;
 	                                to = v ;
-	                            }
-	                        } else
-	                            rs = SR_INVALID ;
-	                        break ;
-
-/* optional username */
-	                    case 'u':
-	                        if (argr > 0) {
-	                            argp = argv[++ai] ;
-	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
-	                            if (argl) {
-	                                char	*un = lip->username ;
-	                                const int	ul = USERNAMELEN ;
-	                                strwcpy(un,avp,MIN(ul,avl)) ;
 	                            }
 	                        } else
 	                            rs = SR_INVALID ;
@@ -1157,11 +910,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_sysval: debuglevel=%u\n",pip->debuglevel) ;
+	    debugprintf("b_la: debuglevel=%u\n",pip->debuglevel) ;
 #endif
 
 	if (f_version) {
-	    shio_printf(pip->efp,"%s: version %s\n",pip->progname,VERSION) ;
+	    shio_printf(pip->efp,"%s: version %s\n",
+	        pip->progname,VERSION) ;
 	}
 
 /* get the program root */
@@ -1189,9 +943,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (f_help) {
 #if	CF_SFIO
-	    printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(sfstdout,pip->pr,pip->searchname,HELPFNAME) ;
 #else
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    rs = printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
 #endif
 	} /* end if */
 
@@ -1210,8 +964,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
 
-	if (ofname == NULL) ofname = getourenv(envv,VAROFNAME) ;
-
 	if (rs >= 0) {
 	    if ((rs = locinfo_utfname(lip,utfname)) >= 0) {
 	        if ((rs = locinfo_flags(lip,f_init,f_nocache)) >= 0) {
@@ -1222,7 +974,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 		    }
 		}
 	    }
-	}
+	} /* end if (ok) */
 
 /* OK, we finally do our thing */
 
@@ -1245,7 +997,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    usage(pip) ;
 	}
 
-/* finish */
+/* done */
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
 	    case SR_INVALID:
@@ -1305,7 +1057,7 @@ badprogstart:
 	{
 	    uint	mo ;
 	    uc_mallout(&mo) ;
-	    debugprintf("b_sysval: final mallout=%u\n",(mo-mo_start)) ;
+	    debugprintf("b_la: final mallout=%u\n",(mo-mo_start)) ;
 	    uc_mallset(0) ;
 	}
 #endif /* CF_DEBUGMALL */
@@ -1353,7 +1105,7 @@ static int usage(PROGINFO *pip)
 	}
 
 	if (rs >= 0) {
-	    fmt = "%s:  [-utf <utmpx>] [-s[=<b>]]\n" ;
+	    fmt = "%s:  [-utf <utmpx>]\n" ;
 	    rs = shio_printf(pip->efp,fmt,pn) ;
 	    wlen += rs ;
 	}
@@ -1365,7 +1117,7 @@ static int usage(PROGINFO *pip)
 	}
 
 	if (rs >= 0) {
-	    fmt = "%s:   possible specifications are:\n" ;
+	    fmt = "%s:   possible specifications are: \n",
 	    rs = shio_printf(pip->efp,fmt,pn) ;
 	    wlen += rs ;
 	}
@@ -1425,6 +1177,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
 	                switch (oi) {
+
 	                case akoname_utf:
 	                case akoname_db:
 	                    if (! lip->final.utfname) {
@@ -1436,42 +1189,12 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                        }
 	                    }
 	                    break ;
-	                case akoname_ttl:
-	                    if (! lip->final.ttl) {
-	                        lip->have.ttl = TRUE ;
-	                        lip->final.ttl = TRUE ;
-	                        if (vl > 0) {
-	                            int	v ;
-	                            rs = cfdecti(vp,vl,&v) ;
-	                            lip->ttl = v ;
-	                        }
-	                    }
-	                    break ;
-	                case akoname_hextime:
-	                    if (! lip->final.hextime) {
-	                        lip->have.hextime = TRUE ;
-	                        lip->final.hextime = TRUE ;
-	                        lip->f.hextime = TRUE ;
-	                        if (vl > 0) {
-	                            rs = optbool(vp,vl) ;
-	                            lip->f.hextime = (rs > 0) ;
-	                        }
-	                    }
-	                    break ;
-	                case akoname_time:
-	                case akoname_date:
-	                    if (! lip->final.timeform) {
-	                        if (vl > 0) {
-	                            lip->final.timeform = TRUE ;
-	                            rs = locinfo_timeform(lip,vp,vl) ;
-	                        }
-			    }
-	                    break ;
+
 	                } /* end switch */
 
 	                c += 1 ;
 	            } else
-	                rs = SR_INVALID ;
+			rs = SR_INVALID ;
 
 	            if (rs < 0) break ;
 	        } /* end while (looping through key options) */
@@ -1513,7 +1236,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	                cp = aip->argv[ai] ;
 	                if (cp[0] != '\0') {
 	                    pan += 1 ;
-	                    rs = procquery(pip,ofp,cp,-1) ;
+	                    rs = procspec(pip,ofp,cp,-1) ;
 	                    wlen += rs ;
 	                }
 	            }
@@ -1522,6 +1245,13 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            if (rs >= 0) rs = lib_sigintr() ;
 	            if (rs < 0) break ;
 	        } /* end for (handling positional arguments) */
+
+	        if ((pip->verboselevel > 0) && (pan > 0)) {
+	            rs1 = shio_putc(ofp,'\n') ;
+	            if (rs >= 0) rs = rs1 ;
+	            wlen += rs1 ;
+	        }
+
 	    } /* end if (ok) */
 
 	    if ((rs >= 0) && (afn != NULL) && (afn[0] != '\0')) {
@@ -1544,8 +1274,11 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	                if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
 	                    if (cp[0] != '#') {
 	                        pan += 1 ;
-	                        rs = procqueries(pip,ofp,cp,cl) ;
-	                        wlen += rs ;
+	                        if ((rs = procspecs(pip,ofp,cp,cl)) >= 0) {
+	                            wlen += rs ;
+	            	    	    rs = shio_putc(ofp,'\n') ;
+	            	    	    wlen += rs ;
+				}
 	                    }
 	                }
 
@@ -1583,17 +1316,17 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 /* end subroutine (procargs) */
 
 
-static int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
+static int procspecs(PROGINFO *pip,void *ofp,cchar *lbuf,int len)
 {
 	FIELD		fsb ;
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
+	if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
 	    int		fl ;
 	    cchar	*fp ;
 	    while ((fl = field_get(&fsb,aterms,&fp)) >= 0) {
 	        if (fl > 0) {
-	            rs = procquery(pip,ofp,fp,fl) ;
+	            rs = procspec(pip,ofp,fp,fl) ;
 	            wlen += rs ;
 	        }
 	        if (fsb.term == '#') break ;
@@ -1603,24 +1336,35 @@ static int procqueries(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 	} /* end if (field) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (procqueries) */
+/* end subroutine (procspecs) */
 
 
 /* process a specification name */
-static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
+static int procspec(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 {
+	LOCINFO		*lip = pip->lip ;
+	const int	vlen = CVTBUFLEN ;
 	int		rs = SR_OK ;
-	int		vl = 0 ;
+	int		rs1 ;
 	int		ri ;
+	int		vl = 0 ;
+	int		cbl = -1 ;
 	int		wlen = 0 ;
 	cchar		*tp ;
 	cchar		*vp = NULL ;
+	cchar		*cbp = NULL ;
+	char		vbuf[CVTBUFLEN + 1] ;
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2))
+	    debugprintf("b_la/procspec: req=>%s<\n",req) ;
+#endif
 
 	if (rl < 0) rl = strlen(rp) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/procquery: req=>%t<\n",rp,rl) ;
+	    debugprintf("b_sysval/procspec: req=>%t<\n",rp,rl) ;
 #endif
 
 	if ((tp = strnchr(rp,rl,'=')) != NULL) {
@@ -1630,54 +1374,22 @@ static int procquery(PROGINFO *pip,void *ofp,cchar rp[],int rl)
 	}
 
 #if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    debugprintf("b_sysval/procquery: rk=%t\n",rp,rl) ;
+	if (DEBUGLEVEL(2)) {
+	    debugprintf("b_la/procspec: rk=%t\n",rp,rl) ;
 	    if (vp != NULL)
-	        debugprintf("b_sysval/procquery: rv=%t\n",vp,vl) ;
+	        debugprintf("b_la/procspec: rv=%t\n",vp,vl) ;
 	}
 #endif
 
+	vbuf[0] = '\0' ;
+	wlen = 0 ;
 	ri = matostr(qopts,2,rp,rl) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/procquery: matostr()=%d\n",ri) ;
-#endif
 
 	if (pip->debuglevel > 0) {
 	    shio_printf(pip->efp,"%s: spec=%t (%d)\n",
 	        pip->progname,rp,rl,ri) ;
 	}
 
-	if (ri >= 0) {
-	    rs = procqueryer(pip,ofp,ri,vp,vl) ;
-	    wlen += rs ;
-	} else {
-	    rs = shio_print(ofp,"*",-1) ;
-	    wlen += rs ;
-	}
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procquery) */
-
-
-static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
-{
-	LOCINFO		*lip = pip->lip ;
-	const int	cvtlen = CVTBUFLEN ;
-	int		rs = SR_OK ;
-	int		cbl = -1 ;
-	int		wlen = 0 ;
-	cchar		*cbp = NULL ;
-	char		cvtbuf[CVTBUFLEN + 1] ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/procqueryer: ent ri=%d\n",ri) ;
-#endif
-
-	cvtbuf[0] = '\0' ;
 	switch (ri) {
 	case qopt_sysname:
 	case qopt_nodename:
@@ -1705,7 +1417,7 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	    } /* end if (uname) */
 #if	CF_DEBUG
 	    if (DEBUGLEVEL(3))
-	        debugprintf("b_sysval/procquery: locinfo_uname() rs=%d\n",rs) ;
+	        debugprintf("b_sysval/procspec: locinfo_uname() rs=%d\n",rs) ;
 #endif
 	    break ;
 	case qopt_architecture:
@@ -1732,6 +1444,10 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	            break ;
 	        } /* end switch */
 	    } /* end if (uaux) */
+#if	CF_DEBUG
+	    if (DEBUGLEVEL(3))
+	        debugprintf("b_sysval/procspec: locinfo_uaux() rs=%d\n",rs) ;
+#endif
 	    break ;
 	case qopt_domainname:
 	    if ((rs = locinfo_sysdomain(lip)) >= 0) {
@@ -1739,141 +1455,83 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	        cbl = rs ;
 	    }
 	    break ;
-	case qopt_systemname:
-	    if ((rs = locinfo_systemname(lip)) >= 0) {
-	        cbp = lip->systemname ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_clustername:
-	    if ((rs = locinfo_clustername(lip)) >= 0) {
-	        cbp = lip->clustername ;
-	        cbl = rs ;
-	    }
-	    break ;
 	case qopt_la1min:
 	case qopt_la5min:
 	case qopt_la15min:
-	    rs = procla(pip,ofp,cvtbuf,cvtlen,ri) ;
+	    cbp = vbuf ;
+	    rs = procla(pip,ofp,vbuf,vlen,ri) ;
 	    wlen += rs ;
-	    cbl = 0 ;
+	    vbuf[0] = '\0' ;
 	    break ;
 	case qopt_lax:
-	    if ((rs = getla(pip)) >= 0) {
-		int	blen = cvtlen ;
+	    cbp = vbuf ;
+	    {
 	        int	i ;
-		char	*bp = cvtbuf ;
-		for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
-	            const double	v = lip->fla[i] ;
-		    if (i > 0) {
-			*bp++ = ' ' ;
-			blen -= 1 ;
-		    }
-	            rs = ctdecf(bp,blen,v,'f',7,3,-1) ;
-		    bp += rs ;
-		    blen -= rs ;
+	        int	ris[3] = { qopt_la1min, qopt_la5min, qopt_la15min } ; 
+		for (i = 0 ; i < 3 ; i += 1) {
+	            ri = ris[i] ;
+	            rs = procla(pip,ofp,vbuf,vlen,ri) ;
+	            wlen += rs ;
 	        } /* end for */
-		cbp = cvtbuf ;
-		cbl = (bp-cvtbuf) ;
-	    } /* end if (getla) */
+	    }
+	    vbuf[0] = '\0' ;
 	    break ;
 	case qopt_nusers:
 	    if ((rs = getnusers(pip)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
+	        rs = ctdecui(vbuf,vlen,(uint) rs) ;
+	        cbp = vbuf ;
 	    }
 	    break ;
 	case qopt_nprocs:
 	case qopt_naprocs:
+	    if ((rs = getnprocs(pip,0)) >= 0) {
+	        uint	v = rs ;
+	        rs = ctdecui(vbuf,vlen,v) ;
+	        cbp = vbuf ;
+	    }
+	    break ;
 	case qopt_nsprocs:
+	    if ((rs = getnprocs(pip,1)) >= 0) {
+	        uint	v = rs ;
+	        rs = ctdecui(vbuf,vlen,v) ;
+	        cbp = vbuf ;
+	    }
+	    break ;
 	case qopt_nuprocs:
+	    if ((rs = getnprocs(pip,2)) >= 0) {
+	        uint	v = rs ;
+	        rs = ctdecui(vbuf,vlen,v) ;
+	        cbp = vbuf ;
+	    }
+	    break ;
 	case qopt_ntprocs:
-	    {
-		int	w = 0 ;
-		switch (ri) {
-		case qopt_nprocs:
-		case qopt_naprocs: /* all */
-		    break ;
-		case qopt_nsprocs: /* system */
-		    w = 1 ;
-		    break ;
-		case qopt_nuprocs: /* user */
-		    w = 2 ;
-		    break ;
-		case qopt_ntprocs: /* session */
-		    w = 3 ;
-		    break ;
-		} /* end switch */
-	        if ((rs = getnprocs(pip,w)) >= 0) {
-	            rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-	        }
-	    } /* end block */
+	    if ((rs = getnprocs(pip,3)) >= 0) {
+	        uint	v = rs ;
+	        rs = ctdecui(vbuf,vlen,v) ;
+	        cbp = vbuf ;
+	    }
 	    break ;
 	case qopt_ncpus:
 	    if ((rs = getncpus(pip)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_hz:
-	    if ((rs = locinfo_hz(lip)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
+	        rs = ctdecui(vbuf,vlen,(uint) lip->ncpus) ;
+	        cbp = vbuf ;
 	    }
 	    break ;
 	case qopt_btime:
+	    if ((rs = getbtime(pip)) >= 0) {
+	        rs = ctdecul(vbuf,vlen,(ulong) lip->btime) ;
+	        cbp = vbuf ;
+	    }
+	    break ;
 	case qopt_ctime:
 	case qopt_utime:
-	case qopt_wtime:
-	case qopt_rtime:
-	    {
-	        ulong	lv = pip->daytime ;
-	        switch (ri) {
-	        case qopt_btime:
-	            if ((rs = getbtime(pip)) >= 0) {
-	                lv = lip->btime ;
-		    }
-		    break ;
-	        case qopt_ctime:
-	        case qopt_utime:
-		    break ;
-	        case qopt_wtime:
-	            if ((rs = locinfo_wtime(lip)) >= 0) {
-	        	lv = lip->wtime ;
-		    }
-		    break ;
-		case qopt_rtime:
-	            rs = locinfo_rtime(lip,&lv) ;
-		    break ;
-		} /* end switch */
-		if (rs >= 0) {
-	            rs = cftime(pip,cvtbuf,cvtlen,lv) ;
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-		} /* end if (ok) */
-	    } /* end block */
-	    break ;
-	case qopt_uts:
-	    {
-	        struct timespec	ts ;
-		if ((rs = uc_clockget(CLOCK_REALTIME,&ts)) >= 0) {
-		    cchar	*fmt = "%08lx:%08lx" ;
-		    rs = bufprintf(cvtbuf,cvtlen,fmt,ts.tv_sec,ts.tv_nsec) ;
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-	        }
-	    }
+	    rs = ctdecul(vbuf,vlen,(ulong) pip->daytime) ;
+	    cbp = vbuf ;
 	    break ;
 	case qopt_rnum:
 	    if ((rs = getrnum(pip)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
+	        rs = ctdecul(vbuf,vlen,(ulong) lip->rnum) ;
+	        cbp = vbuf ;
 	    }
 	    break ;
 	case qopt_pmtotal:
@@ -1884,7 +1542,7 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	case qopt_mu:
 	    if ((rs = getmem(pip)) >= 0) {
 	        int	v = -1 ;
-	        cbp = cvtbuf ;
+	        cbp = vbuf ;
 	        switch (ri) {
 	        case qopt_pmtotal:
 	        case qopt_mtotal:
@@ -1896,20 +1554,19 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	            break ;
 	        case qopt_pmu:
 	        case qopt_mu:
-	            v = lip->pmu ;
-	            if ((rs = ctdeci(cvtbuf,cvtlen,v)) >= 0) {
+	            if ((rs = ctdecui(vbuf,vlen,lip->pmu)) >= 0) {
 	                cbl = rs ;
-	                cvtbuf[cbl++] = '%' ;
-	                cvtbuf[cbl] = '\0' ;
+	                vbuf[cbl++] = '%' ;
+	                vbuf[cbl] = '\0' ;
 			v = -1 ;
 	            }
 	            break ;
 	        } /* end switch */
 	        if ((rs >= 0) && (v >= 0)) {
-	            rs = ctdeci(cvtbuf,cvtlen,v) ;
-	            cbl = rs ;
-	        }
-	    } /* end if (getmem) */
+	            rs = ctdeci(vbuf,vlen,v) ;
+		    cbl = rs ;
+		}
+	    } /* end if */
 	    break ;
 	case qopt_fsbs:
 	case qopt_fspbs:
@@ -1922,301 +1579,60 @@ static int procqueryer(PROGINFO *pip,void *ofp,int ri,cchar *vp,int vl)
 	case qopt_fsstr:
 	case qopt_fsid:
 	case qopt_fsflags:
-	    rs = procfs(pip,cvtbuf,cvtlen,ri,vp,vl) ;
-	    cbp = cvtbuf ;
+	    rs = procfs(pip,vbuf,vlen,ri,vp,vl) ;
+	    cbp = vbuf ;
 	    cbl = rs ;
-	    break ;
-	case qopt_access:
-	    rs = procacc(pip,cvtbuf,cvtlen,vp,vl) ;
-	    cbp = cvtbuf ;
-	    cbl = rs ;
-	    break ;
-	case qopt_mjd:
-	    if ((rs = locinfo_gmtime(lip)) >= 0) {
-	        TMTIME	*tmp = &lip->gmtime ;
-	        int	yr ;
-	        yr = (tmp->year + TM_YEAR_BASE) ;
-	        if ((rs = getmjd(yr,tmp->mon,tmp->mday)) >= 0) {
-	            rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-	        }
-	    } /* end if (gmtime) */
-	    break ;
-	case qopt_netload:
-	    if ((rs = locinfo_netload(lip,cvtbuf,cvtlen,vp,vl)) >= 0) {
-	        cbl = rs ;
-	        cbp = cvtbuf ;
-	    }
-	    break ;
-	case qopt_systat:
-	    if ((rs = procsystat(pip,cvtbuf,cvtlen,vp,vl)) >= 0) {
-	        cbl = rs ;
-	        cbp = cvtbuf ;
-	    }
-	    break ;
-	case qopt_org:
-	case qopt_orgcode:
-	case qopt_orgloc:
-	    if ((rs = locinfo_username(lip)) >= 0) {
-	        cchar	*un = lip->username ;
-	        cbp = cvtbuf ;
-	        switch (ri) {
-	        case qopt_org:
-	            rs = localgetorg(pip->pr,cvtbuf,cvtlen,un) ;
-	            break ;
-	        case qopt_orgcode:
-	            rs = localgetorgcode(pip->pr,cvtbuf,cvtlen,un) ;
-	            break ;
-	        case qopt_orgloc:
-	            rs = localgetorgloc(pip->pr,cvtbuf,cvtlen,un) ;
-	            break ;
-	        } /* end switch */
-	        cbl = rs ;
-	    } /* end if */
 	    break ;
 	case qopt_hostid:
 	case qopt_romserial:
 	    if ((rs = locinfo_hostid(lip)) >= 0) {
 	        uint	id = lip->hostid ;
-	        cbp = cvtbuf ;
+	        cbp = vbuf ;
 	        if (ri == qopt_romserial) {
 	            id &= 0x00FFFFFF ;
-	            rs = ctdecui(cvtbuf,cvtlen,id) ;
+	            rs = ctdecui(vbuf,vlen,id) ;
 	        } else {
-	            rs = cthexui(cvtbuf,cvtlen,id) ;
+	            rs = cthexui(vbuf,vlen,id) ;
 	        }
-	        cbl = rs ;
 	    } /* end if */
-	    break ;
-	case qopt_systype:
-	case qopt_ostype:
-	    if ((rs = locinfo_systypenum(lip)) >= 0) {
-		cbp = lip->stype ;
-	    }
-	    break ;
-	case qopt_sysnum:
-	case qopt_osnum:
-	    if ((rs = locinfo_systypenum(lip)) >= 0) {
-		cbp = lip->snum ;
-	    }
-	    break ;
-	case qopt_runlevel:
-	    if ((rs = locinfo_runlevel(lip)) >= 0) {
-	        cvtbuf[0] = lip->runlevel ;
-	        cvtbuf[1] = '\0' ;
-	        cbp = cvtbuf ;
-		cbl = 1 ;
-	    }
-	    break ;
-	case qopt_tz:
-	    if ((rs = locinfo_tz(lip)) >= 0) {
-	        cbp = lip->tz ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_testnode:
-	    if ((rs = getnodename(cvtbuf,cvtlen)) >= 0) {
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_cspath:
-	    {
-	        const int	name = _CS_PATH ;
-	        if ((rs = uc_confstr(name,cvtbuf,cvtlen)) > 0) {
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-	        }
-	    }
-	    break ;
-	case qopt_pagesize:
-	    if ((rs = locinfo_pagesize(lip)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_stacksizemin:
-	    if ((rs = getstacksize(0)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_argmax:
-	    if ((rs = getbufsize(getbufsize_args)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_pwbufsize:
-	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_spbufsize:
-	    if ((rs = getbufsize(getbufsize_sp)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_uabufsize:
-	    if ((rs = getbufsize(getbufsize_ua)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_grbufsize:
-	    if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_pjbufsize:
-	    if ((rs = getbufsize(getbufsize_pj)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_pebufsize:
-	    if ((rs = getbufsize(getbufsize_pe)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_sebufsize:
-	    if ((rs = getbufsize(getbufsize_se)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_nebufsize:
-	    if ((rs = getbufsize(getbufsize_ne)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_hebufsize:
-	    if ((rs = getbufsize(getbufsize_he)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_ngroups:
-	    if ((rs = getngroups()) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_maxpid:
-	    if ((rs = procmaxpid(pip,vp,vl)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_maxtzname:
-	    {
-		const int	cmd = _SC_TZNAME_MAX ;
-	        if ((rs = uc_sysconf(cmd,NULL)) >= 0) {
-	            rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-		} else if (rs == SR_NOTSUP) {
-	            rs = sncpy1(cvtbuf,cvtlen,"undefined") ;
-	            cbp = cvtbuf ;
-	            cbl = rs ;
-		}
-	    }
-	    break ;
-	case qopt_kserial:
-	    if ((rs = lib_serial()) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_nofiles:
-	    if ((rs = procnfile(pip,vp,vl)) >= 0) {
-	        rs = ctdeci(cvtbuf,cvtlen,rs) ;
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
-	    break ;
-	case qopt_providerid:
-	    if ((rs = locinfo_uaux(lip)) >= 0) {
-		cchar	*s = lip->uaux.provider ;
-		if ((rs = getproviderid(s,-1)) >= 0) {
-		    const int	id = rs ;
-		    const int	vlen = MAXNAMELEN ;
-		    char	vbuf[MAXNAMELEN+1] ;
-		    if ((rs = getvendor(vbuf,vlen)) >= 0) {
-		        rs = bufprintf(cvtbuf,cvtlen,"%2u %t",id,vbuf,rs) ;
-	                cbp = cvtbuf ;
-	                cbl = rs ;
-		    }
-		}
-	    }
-	    break ;
-	case qopt_vendor:
-	    if ((rs = getvendor(cvtbuf,cvtlen)) >= 0) {
-	        cbp = cvtbuf ;
-	        cbl = rs ;
-	    }
 	    break ;
 	default:
 	    rs = SR_INVALID ;
 	    break ;
 	} /* end switch */
 
-	if (rs >= 0) {
-	    rs = procout(pip,ofp,cbp,cbl) ;
-	    wlen += rs ;
+	if ((rs >= 0) && (pip->verboselevel > 0)) {
+	    rs1 = procout(pip,ofp,cbp,cbl) ;
+	    wlen += rs1 ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
 
 #if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/procqueryer: ret rs=%d wlen=%u\n",rs,wlen) ;
+	if (DEBUGLEVEL(2))
+	    debugprintf("b_la/procspec: ret rs=%d wlen=%u\n",rs,wlen) ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (procqueryer) */
+/* end subroutine (procspec) */
 
 
-static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
+static int procfs(PROGINFO *pip,char vbuf[],int vlen,int ri,cchar *sp,int sl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cbl = 0 ;
-	if ((vp == NULL) || (vl == 0)) {
+	if ((sp == NULL) || (sl == 0)) {
 	    rs = locinfo_fsdir(lip) ;
-	    vl = rs ;
-	    vp = lip->fname ;
+	    sl = rs ;
+	    sp = lip->fname ;
 	}
 	if (rs >= 0) {
 	    NULSTR	vs ;
 	    cchar	*vname ;
-	    if ((rs = nulstr_start(&vs,vp,vl,&vname)) >= 0) {
+	    if ((rs = nulstr_start(&vs,sp,sl,&vname)) >= 0) {
 	        struct statvfs	fi ;
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("b_sysval/procfs: ri=%u vname=%s\n",ri,vname) ;
-#endif
 	        if ((rs1 = statvfsdir(vname,&fi)) >= 0) {
 	            LONG	vt ;
 	            LONG	v = -1 ;
@@ -2248,46 +1664,37 @@ static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 	                    LONG	f_bused = fi.f_blocks - fi.f_bavail ;
 	                    if (fi.f_blocks != 0) {
 	                        int per = +(f_bused * 100) / fi.f_blocks ;
-	                        int	cvl = clen ;
-	                        char	*cvp = cbuf ;
+	                        int	cvl = vlen ;
+	                        char	*cvp = vbuf ;
 	                        if ((rs = ctdecui(cvp,cvl,per)) >= 0) {
 	                            cbl = rs ;
-	                            cbuf[cbl++] = '%' ;
+	                            vbuf[cbl++] = '%' ;
 	                        }
 	                    } else {
-	                        rs = sncpy1(cbuf,clen,"na") ;
+	                        rs = sncpy1(vbuf,vlen,"na") ;
 	                        cbl = rs ;
 	                    }
 	                }
 	                break ;
 	            case qopt_fstype:
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("b_sysval/procfs: basetype=%t\n",
-	                        fi.f_basetype,FSTYPSZ) ;
-#endif
-	                rs = snwcpy(cbuf,clen,fi.f_basetype,FSTYPSZ) ;
+	                rs = snwcpy(vbuf,vlen,fi.f_basetype,FSTYPSZ) ;
 	                cbl = rs ;
 	                break ;
 	            case qopt_fsstr:
-	                rs = snwcpy(cbuf,clen,fi.f_fstr,32) ;
+	                rs = snwcpy(vbuf,vlen,fi.f_fstr,32) ;
 	                cbl = rs ;
 	                break ;
 	            case qopt_fsid:
-	                rs = ctdecul(cbuf,clen,fi.f_fsid) ;
+	                rs = ctdecul(vbuf,vlen,fi.f_fsid) ;
 	                cbl = rs ;
 	                break ;
 	            case qopt_fsflags:
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("b_sysval/procfs: f=\\x%08x\n",fi.f_flag) ;
-#endif
-	                rs = snfsflags(cbuf,clen,fi.f_flag) ;
+	                rs = snfsflags(vbuf,vlen,fi.f_flag) ;
 	                cbl = rs ;
 	                break ;
 	            } /* end switch */
 	            if ((rs >= 0) && (v >= 0)) {
-	                rs = ctdecull(cbuf,clen,v) ;
+	                rs = ctdecull(vbuf,vlen,v) ;
 	                cbl = rs ;
 	            }
 	        } /* end if (statvfsdir) */
@@ -2300,71 +1707,13 @@ static int procfs(PROGINFO *pip,char *cbuf,int clen,int ri,cchar *vp,int vl)
 /* end subroutine (procfs) */
 
 
-static int procacc(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
-{
-	LOCINFO		*lip = pip->lip ;
-	int		rs ;
-	int		cbl = 0 ;
-	if ((rs = locinfo_fsdir(lip)) >= 0) {
-	    int		am = R_OK ;
-	    cchar	*ans = NULL ;
-	    if (vl < 0) vl = strlen(vp) ;
-	    if ((vp != NULL) && (vl > 0)) am = getam(vp,vl) ;
-	    if ((rs = u_access(lip->fname,am)) >= 0) {
-		ans = "YES" ;
-	    } else if (isNotAccess(rs)) {
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("b_sysval/procacc: u_access() rs=%d\n",rs) ;
-#endif
-		rs = SR_OK ;
-		ans = "NO" ;
-	    }
-	    if ((rs >= 0) && (ans != NULL)) {
-		rs = sncpy1(cbuf,clen,ans) ;
-		cbl = rs ;
-	    }
-	} /* end if (locinfo_fsdir) */
-	return (rs >= 0) ? cbl : rs ;
-}
-/* end subroutine (procacc) */
-
-
-/* ARGSUSED */
-static int procsystat(PROGINFO *pip,char *cbuf,int clen,cchar *vp,int vl)
-{
-	LOCINFO		*lip = pip->lip ;
-	int		rs = SR_OK ;
-	if (lip->f.set) {
-	    rs = localsetsystat(pip->pr,vp,vl) ;
-	} else {
-	    cbuf[0] = '\0' ;
-#if	CF_PERCACHE
-	    if (lip->f.percache) {
-		const time_t	dt = pip->daytime ;
-		cchar		*pr = pip->pr ;
-		cchar		*cp ;
-		if ((rs = percache_systat(&pc,dt,pr,&cp)) > 0) {
-	            rs = sncpy1(cbuf,clen,cp) ;
-	        }
-	    }
-#endif /* CF_PERCACHE */
-	    if ((rs >= 0) && (cbuf[0] == '\0')) {
-	        rs = localgetsystat(pip->pr,cbuf,clen) ;
-	    }
-	}
-	return rs ;
-}
-/* end subroutine (procsystat) */
-
-
-static int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri)
+static int procla(PROGINFO *pip,SHIO *ofp,char vbuf[],int vlen,int ri)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		wlen = 0 ;
 
-	rbuf[0] = '\0' ;
+	vbuf[0] = '\0' ;
 	if ((rs = getla(pip)) >= 0) {
 	    double	v = -1.0 ;
 
@@ -2381,11 +1730,14 @@ static int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri)
 	    } /* end switch */
 
 	    if (v > -0.5) {
-	        if ((rs = ctdecf(rbuf,rlen,v,'f',7,3,-1)) >= 0) {
-	            rs = procout(pip,ofp,rbuf,rs) ;
-	            wlen += rs ;
+	        if ((rs = ctdecf(vbuf,vlen,v,'f',7,3,-1)) >= 0) {
+		    const int	vl = rs ;
+		    if (pip->verboselevel > 0) {
+	    		rs = procout(pip,ofp,vbuf,vl) ;
+	    		wlen += rs ;
+		    }
 		}
-	    } /* end if */
+	    }
 
 	} /* end if (getla) */
 
@@ -2394,51 +1746,18 @@ static int procla(PROGINFO *pip,SHIO *ofp,char *rbuf,int rlen,int ri)
 /* end subroutine (procla) */
 
 
-static int procnfile(PROGINFO *pip,cchar *vp,int vl) 
-{
-	int		rs = SR_OK ;
-	int		w = 0 ;
-	if ((vp != NULL) && (vl != 0)) {
-	    if (vp[0] != '\0') {
-	        rs = cfdeci(vp,vl,&w) ;
-	    }
-	}
-	if (rs >= 0) {
-	    rs = getnfile(w) ;
-	}
-	return rs ;
-}
-/* end subroutine (procnfile) */
-
-
-static int procmaxpid(PROGINFO *pip,cchar *vp,int vl)
-{
-	int		rs = SR_OK ;
-	int		w = 0 ;
-	if ((vp != NULL) && (vl != 0)) {
-	    rs = optbool(vp,vl) ;
-	    w = rs ;
-	}
-	if (rs >= 0) {
-	    rs = getmaxpid(w) ;
-	}
-	return rs ;
-}
-/* end subroutine (procmaxpid) */
-
-
 static int procout(PROGINFO *pip,SHIO *ofp,cchar *sp,int sl)
 {
-	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if ((pip->verboselevel > 0) && (! lip->f.set)) {
-	    if ((sp == NULL) && (sl < 0)) sp = "*" ;
-	    if (sp != NULL) {
-	        rs = shio_print(ofp,sp,sl) ;
-	        wlen += rs ;
+	if (pip->verboselevel > 0) {
+	    if (sp == NULL) {
+	        sp = "*" ;
+	        sl = 1 ;
 	    }
+	    rs = shio_printf(ofp," %t",sp,sl) ;
+	    wlen += rs ;
 	} /* end if */
 
 	return (rs >= 0) ? wlen : rs ;
@@ -2454,7 +1773,6 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 
 	memset(lip,0,sizeof(LOCINFO)) ;
 	lip->pip = pip ;
-	lip->ttl = DEFTTL ;
 	lip->to = -1 ;
 
 	lip->f.percache = TRUE ;
@@ -2485,6 +1803,12 @@ static int locinfo_finish(LOCINFO *lip)
 	    if (rs >= 0) rs = rs1 ;
 	    lip->fname = NULL ;
 	    lip->f.allocfname = FALSE ;
+	}
+
+	if (lip->sysdomain != NULL) {
+	    rs1 = uc_free(lip->sysdomain) ;
+	    if (rs >= 0) rs = rs1 ;
+	    lip->sysdomain = NULL ;
 	}
 
 	if (lip->open.stores) {
@@ -2574,9 +1898,7 @@ static int locinfo_flags(LOCINFO *lip,int f_init,int f_nocache)
 
 static int locinfo_to(LOCINFO *lip,int to)
 {
-
 	if (to < 0) to = TO_CACHE ;
-
 	lip->to = to ;
 	return SR_OK ;
 }
@@ -2590,149 +1912,17 @@ static int locinfo_defaults(LOCINFO *lip)
 
 	if (lip == NULL) return SR_FAULT ;
 
-	if ((lip->utfname == NULL) && (! lip->final.utfname)) {
+	if ((rs >= 0) && (lip->utfname == NULL) && (! lip->final.utfname)) {
 	    cchar	*cp = getourenv(pip->envv,VARUTFNAME) ;
 	    if (cp != NULL) {
-	        rs = locinfo_setentry(lip,&lip->utfname,cp,-1) ;
+	        cchar	**vpp = &lip->utfname ;
+	        rs = locinfo_setentry(lip,vpp,cp,-1) ;
 	    }
 	}
 
 	return rs ;
 }
 /* end subroutine (locinfo_defaults) */
-
-
-static int locinfo_gmtime(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs ;
-
-	rs = tmtime_gmtime(&lip->gmtime,pip->daytime) ;
-
-	return rs ;
-}
-/* end subroutine (locinfo_gmtime) */
-
-
-static int locinfo_wtime(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	int		rs1 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/locinfo_wtime: ent\n") ;
-#endif
-
-	if (pip == NULL) return SR_FAULT ;
-
-	if (lip->wtime == 0) {
-	    TMPX	ut ;
-	    TMPX_CUR	uc ;
-	    TMPX_ENT	ue ;
-	    if ((rs = tmpx_open(&ut,NULL,0)) >= 0) {
-	        if ((rs = tmpx_curbegin(&ut,&uc)) >= 0) {
-	            int	utype ;
-	            while (rs >= 0) {
-	                rs1 = tmpx_enum(&ut,&uc,&ue) ;
-	                if (rs1 == SR_NOTFOUND) break ;
-	                rs = rs1 ;
-	                if (rs < 0) break ;
-	                utype = ue.ut_type ;
-	                if (utype == TMPX_TBOOTTIME) {
-	                    lip->wtime = ue.ut_tv.tv_sec ;
-	                    break ;
-	                }
-	            } /* end while */
-	            rs1 = tmpx_curend(&ut,&uc) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (cursor) */
-	        rs1 = tmpx_close(&ut) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (TMPX) */
-	} /* end if (needed) */
-
-	return rs ;
-}
-/* end subroutine (locinfo_wtime) */
-
-
-static int locinfo_rtime(LOCINFO *lip,ulong *tp)
-{
-	PROGINFO	*pip = lip->pip ;
-	struct timespec	ts ;
-	int		rs ;
-	if (pip == NULL) return SR_FAULT ;
-	if ((rs = uc_clockget(CLOCK_REALTIME,&ts)) >= 0) {
-	    *tp = ts.tv_sec ;
-	}
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_sysval/locinfo_rtime: ret rs=%d\n",rs) ;
-#endif
-	return rs ;
-}
-/* end subroutine (locinfo_rtime) */
-
-
-static int locinfo_username(LOCINFO *lip)
-{
-	int		rs = SR_OK ;
-	cchar		*un = lip->username ;
-
-	if ((un[0] == '\0') || (un[0] == '-')) {
-	    rs = getusername(lip->username,USERNAMELEN,-1) ;
-	} else {
-	    rs = strlen(lip->username) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (locinfo_username) */
-
-
-static int locinfo_hz(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	int		hz = lip->hz ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("b_sysval/locinfo_hz: 0 hz=%d\n",lip->hz) ;
-#endif
-
-	if (lip->hz == 0) {
-	    int		cl ;
-	    cchar	*cp ;
-
-	    if ((cp = getourenv(pip->envv,VARHZ)) != NULL) {
-	        cl = strlen(cp) ;
-	        if (hasalldig(cp,cl)) {
-	            int	rs1 = optvalue(cp,cl) ;
-	            if (rs1 >= 0) hz = rs1 ;
-	        } else {
-	            cp = NULL ;
-		}
-	    }
-
-	    if ((cp == NULL) || (hz == 0)) {
-	        rs = gethz(0) ;
-	        hz = rs ;
-	    } /* end if */
-
-	    lip->hz = hz ;
-	} /* end if (needed) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_sysval/locinfo_hz: ret rs=%d hz=%u\n",rs,hz) ;
-#endif
-
-	return (rs >= 0) ? hz : rs ;
-}
-/* end subroutine (locinfo_hz) */
 
 
 static int locinfo_uname(LOCINFO *lip)
@@ -2761,6 +1951,69 @@ static int locinfo_uaux(LOCINFO *lip)
 	return rs ;
 }
 /* end subroutine (locinfo_uaux) */
+
+
+static int locinfo_sysdomain(LOCINFO *lip)
+{
+	PROGINFO	*pip = lip->pip ;
+	int		rs = SR_OK ;
+	int		len = 0 ;
+
+	if (pip == NULL) return SR_FAULT ;
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(5))
+	    debugprintf("sysval/locinfo_sysdomain: ent dn=%s\n",
+	        lip->sysdomain) ;
+#endif
+
+	if (lip->sysdomain == NULL) {
+	    const int	dlen = MAXHOSTNAMELEN ;
+	    char	dbuf[MAXHOSTNAMELEN+1] ;
+	    if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
+	        cchar	*cp ;
+	        if ((rs = uc_mallocstrw(dbuf,rs,&cp)) >= 0) {
+	            lip->sysdomain = cp ;
+	            len = (rs-1) ;
+	        }
+	    } /* end if (getsysdomain) */
+	} else {
+	    len = strlen(lip->sysdomain) ;
+	}
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(5)) {
+	    debugprintf("sysval/locinfo_sysdomain: ret dn=%s\n",
+	        lip->sysdomain) ;
+	    debugprintf("sysval/locinfo_sysdomain: ret rs=%d l=%u\n",rs,len) ;
+	}
+#endif
+
+	return (rs >= 0) ? len : rs ;
+}
+/* end subroutine (locinfo_sysdomain) */
+
+
+static int locinfo_fsdir(LOCINFO *lip)
+{
+	int		rs = SR_OK ;
+
+	if (lip->fname == NULL) {
+	    const int	hlen = MAXPATHLEN ;
+	    char	hbuf[MAXPATHLEN+1] ;
+	    if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
+	        cchar	**vpp = &lip->fname ;
+	        if ((rs = locinfo_setentry(lip,vpp,hbuf,rs)) >= 0) {
+	            lip->f.allocfname = TRUE ;
+	        }
+	    }
+	} else {
+	    rs = strlen(lip->fname) ;
+	}
+
+	return rs ;
+}
+/* end subroutine (locinfo_fsdir) */
 
 
 static int locinfo_hostid(LOCINFO *lip)
@@ -2798,282 +2051,28 @@ static int locinfo_hostid(LOCINFO *lip)
 	    }
 	    lip->hostid = uv ;
 
-	} /* end if */
+	} /* end if (needed) */
 
 	return rs ;
 }
 /* end subroutine (locinfo_hostid) */
 
 
-static int locinfo_systypenum(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	if (pip == NULL) return SR_FAULT ;
-	if (lip->stype[0] == '\0') {
-	    if ((rs = locinfo_uname(lip)) >= 0) {
-	        cchar	*sn = lip->uname.sysname ;
-	        cchar	*rn = lip->uname.release ;
-	        rs = getsystypenum(lip->stype,lip->snum,sn,rn) ;
-	    } /* end if (locinfo_uname) */
-	} /* end if (needed) */
-	return rs ;
-}
-/* end subroutine (locinfo_systypenum) */
-
-
-static int locinfo_runlevel(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	int		to = lip->to ;
-	int		rl = 0 ;
-	int		f_runlevel = lip->init.runlevel ;
-
-	if ((! f_runlevel) || ((pip->daytime - lip->ti_hostid) >= to)) {
-	    lip->init.runlevel = TRUE ;
-	    lip->ti_runlevel = pip->daytime ;
-
-#if	CF_PERCACHE
-	    if (lip->f.percache) {
-	        rs = percache_getrunlevel(&pc,pip->daytime) ;
-	        rl = rs ;
-	    }
-#endif /* CF_PERCACHE */
-
-	    if ((rs >= 0) && (rl == 0)) {
-	        rs = getrunlevel(NULL) ;
-	        rl = rs ;
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("locinfo_runlevel: "
-	                "getrunlevel() rs=%d (\\x%02x)\n",rs,rs) ;
-#endif
-	    }
-	    lip->runlevel = rl ;
-
-	} else {
-	    rl = lip->runlevel ;
-	}
-
-	return (rs >= 0) ? rl : rs ;
-}
-/* end subroutine (locinfo_runlevel) */
-
-
-static int locinfo_tz(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	const int	to = TO_TZ ;
-	int		rs = SR_OK ;
-
-	if ((lip->tz[0] == '\0') || ((pip->daytime - lip->ti_tz) >= to)) {
-	    lip->ti_tz = pip->daytime ;
-	    rs = inittimezone(lip->tz,TZLEN,NULL) ;
-	} else {
-	    rs = strlen(lip->tz) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (locinfo_tz) */
-
-
-static int locinfo_nodename(LOCINFO *lip)
-{
-	int		rs = SR_OK ;
-	int		len = 0 ;
-
-	if (lip->nodename == NULL) {
-	    const int	dlen = NODENAMELEN ;
-	    char	dbuf[NODENAMELEN+1] ;
-	    if ((rs = getnodename(dbuf,dlen)) >= 0) {
-	        cchar	**vpp = &lip->nodename ;
-	        len = rs ;
-	        rs = locinfo_setentry(lip,vpp,dbuf,rs) ;
-	    } /* end if (getnodename) */
-	} else {
-	    len = strlen(lip->nodename) ;
-	}
-
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_nodename) */
-
-
-static int locinfo_clustername(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	int		len = 0 ;
-
-	if (lip->clustername == NULL) {
-	    if ((rs = locinfo_nodename(lip)) >= 0) {
-	        const int	dlen = NODENAMELEN ;
-	        cchar		*pr = pip->pr ;
-	        cchar		*nn = lip->nodename ;
-	        char		dbuf[NODENAMELEN+1] ;
-	        if ((rs = getclustername(pr,dbuf,dlen,nn)) >= 0) {
-	            cchar	**vpp = &lip->clustername ;
-	            len = rs ;
-	            rs = locinfo_setentry(lip,vpp,dbuf,rs) ;
-	        } /* end if (getclustername) */
-	    } /* end if (locinfo_nodename) */
-	} else {
-	    len = strlen(lip->clustername) ;
-	}
-
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_clustername) */
-
-
-static int locinfo_systemname(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	int		len = 0 ;
-
-	if (lip->systemname == NULL) {
-	    if ((rs = locinfo_nodename(lip)) >= 0) {
-	        cchar	*pr = pip->pr ;
-	        cchar	*nn = lip->nodename ;
-	        char	cbuf[NODENAMELEN+1] ;
-	        char	sbuf[NODENAMELEN+1] ;
-	        if ((rs = getnodeinfo(pr,cbuf,sbuf,NULL,nn)) >= 0) {
-	            cchar	**vpp = &lip->systemname ;
-	            if ((rs = locinfo_setentry(lip,vpp,sbuf,-1)) >= 0) {
-	                len = rs ;
-	                if ((lip->clustername == NULL) && (cbuf[0] != '\0')) {
-	                    cchar	**vpp = &lip->clustername ;
-	                    rs = locinfo_setentry(lip,vpp,cbuf,-1) ;
-	                }
-	            }
-	        } /* end if (getnodeinfo) */
-	    } /* end if (locinfo_nodename) */
-	} else {
-	    len = strlen(lip->systemname) ;
-	}
-
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_systemname) */
-
-
-static int locinfo_sysdomain(LOCINFO *lip)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	int		len = 0 ;
-
-	if (pip == NULL) return SR_FAULT ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("sysval/locinfo_sysdomain: ent dn=%s\n",
-	        lip->sysdomain) ;
-#endif
-
-	if (lip->sysdomain == NULL) {
-	    const int	dlen = MAXHOSTNAMELEN ;
-	    char	dbuf[MAXHOSTNAMELEN+1] ;
-	    if ((rs = getsysdomain(dbuf,dlen)) >= 0) {
-	        cchar	**vpp = &lip->sysdomain ;
-	        len = rs ;
-	        rs = locinfo_setentry(lip,vpp,dbuf,rs) ;
-	    } /* end if (getsysdomain) */
-	} else {
-	    len = strlen(lip->sysdomain) ;
-	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5)) {
-	    debugprintf("sysval/locinfo_sysdomain: ret dn=%s\n",
-	        lip->sysdomain) ;
-	    debugprintf("sysval/locinfo_sysdomain: ret rs=%d l=%u\n",rs,len) ;
-	}
-#endif
-
-	return (rs >= 0) ? len : rs ;
-}
-/* end subroutine (locinfo_sysdomain) */
-
-
-static int locinfo_fsdir(LOCINFO *lip)
-{
-	int		rs = SR_OK ;
-
-	if (lip->fname == NULL) {
-	    const int	hlen = MAXPATHLEN ;
-	    char	hbuf[MAXPATHLEN+1] ;
-	    if ((rs = getuserhome(hbuf,hlen,"-")) >= 0) {
-	        cchar	**vpp = &lip->fname ;
-	        rs = locinfo_setentry(lip,vpp,hbuf,rs) ;
-	    }
-	} else {
-	    rs = strlen(lip->fname) ;
-	}
-
-	return rs ;
-}
-/* end subroutine (locinfo_fsdir) */
-
-
-static int locinfo_netload(LOCINFO *lip,char *cbuf,int clen,cchar *vp,int vl)
-{
-	PROGINFO	*pip = lip->pip ;
-	int		rs = SR_OK ;
-	if (lip->f.set) {
-	    rs = localsetnetload(pip->pr,vp,vl) ;
-	} else {
-	    cbuf[0] = '\0' ;
-#if	CF_PERCACHE
-	    if (lip->f.percache) {
-		const time_t	dt = pip->daytime ;
-		cchar		*pr = pip->pr ;
-		cchar		*cp ;
-		if ((rs = percache_netload(&pc,dt,pr,&cp)) > 0) {
-	            rs = sncpy1(cbuf,clen,cp) ;
-	        }
-	    }
-#endif /* CF_PERCACHE */
-	    if ((rs >= 0) && (cbuf[0] == '\0')) {
-	        rs = localgetnetload(pip->pr,cbuf,clen) ;
-	    }
-	}
-	return rs ;
-}
-/* end subroutine (locinfo_netload) */
-
-
 static int locinfo_pagesize(LOCINFO *lip)
 {
-	int		rs = lip->pagesize ;
 	if (lip->pagesize == 0) {
-	    rs = getpagesize() ;
-	    lip->pagesize = rs ;
+	    lip->pagesize = getpagesize() ;
 	}
-	return rs ;
+	return lip->pagesize ;
 }
 /* end subroutine (locinfo_pagesize) */
-
-
-static int locinfo_timeform(LOCINFO *lip,cchar *vp,int vl)
-{
-	int		rs = SR_OK ;
-	if ((lip->timeform = matostr(timeforms,2,vp,vl)) < 0) {
-	    rs = SR_INVALID ;
-	}
-	return rs ;
-}
-/* end subroutine (locinfo_timeform) */
 
 
 static int getla(PROGINFO *pip)
 {
 	LOCINFO		*lip = pip->lip ;
+	const int	to = TO_LOADAVG ;
 	int		rs = SR_OK ;
-	int		to = 1 ;
 
 	if ((! lip->init.fla) || ((pip->daytime - lip->ti_la) >= to)) {
 	    lip->init.fla = TRUE ;
@@ -3106,33 +2105,20 @@ static int getncpus(PROGINFO *pip)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		to ;
-	int		n = 0 ;
 	int		f_to ;
 
 	to = lip->to ;
 	f_to = ((pip->daytime - lip->ti_ncpus) >= to) ;
 	if ((! lip->init.ncpus) || f_to) {
 	    lip->init.ncpus = TRUE ;
-
-#if	CF_PERCACHE && 0 /* note: this PERCACHE call does not exist! */
-	    if ((rs >= 0) && (n == 0) && lip->f.percache) {
-	        rs = percache_getncpus(&pc,pip->daytime) ;
-	        n = rs ;
-	    }
-#endif /* CF_PERCACHE */
-
-	    if ((rs >= 0) && (n == 0)) {
-	        rs = getnprocessors(pip->envv,0) ;
-	        n = rs ;
-	    }
-
-	    lip->ncpus = n ;
 	    lip->ti_ncpus = pip->daytime ;
-	} else {
-	    n = lip->ncpus ;
+
+	    rs = getnprocessors(pip->envv,0) ;
+	    lip->ncpus = rs ;
+
 	} /* end if (needed to get some stuff) */
 
-	return (rs >= 0) ? n : rs ;
+	return (rs >= 0) ? lip->ncpus : rs ;
 }
 /* end subroutine (getncpus) */
 
@@ -3156,7 +2142,6 @@ static int getnprocs(PROGINFO *pip,int w)
 	if ((! lip->init.nprocs) || f_to) {
 	    lip->init.nprocs = TRUE ;
 	    lip->ti_nprocs[w] = pip->daytime ;
-
 	    switch (w) {
 	    case 0:
 	        rs = getnprocs_all(pip) ;
@@ -3250,7 +2235,7 @@ static int getnusers(PROGINFO *pip)
 
 	to = lip->to ;
 	if ((! lip->init.nusers) || ((pip->daytime - lip->ti_nusers) >= to)) {
-	    int	nu = 0 ;
+	    int		nu = 0 ;
 	    lip->init.nusers = TRUE ;
 	    lip->ti_nusers = pip->daytime ;
 
@@ -3277,15 +2262,17 @@ static int getnusers(PROGINFO *pip)
 /* make a random number (is this already more than is ever needed?) */
 static int getrnum(PROGINFO *pip)
 {
-	struct timeval	tod ;
 	LOCINFO		*lip = pip->lip ;
+	struct timeval	tod ;
+	uid_t		uid ;
+	pid_t		pid ;
 	uint		rv ;
+	uint		v ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 
 	if (! lip->init.rnum) {
-	    uid_t	uid ;
-	    pid_t	pid ;
-	    uint	v ;
+
 	    lip->init.rnum = TRUE ;
 	    rv = 0 ;
 
@@ -3313,24 +2300,20 @@ static int getrnum(PROGINFO *pip)
 /* these do shake things up a bit */
 
 	rv = lip->rnum ;
-	if ((rs = getsysmisc(pip)) >= 0) {
-	    rv += rs ;
+	if ((rs1 = getsysmisc(pip)) >= 0) {
+	    rv += rs1 ;
 	    rv += lip->ncpus ;
 	    rv += lip->btime ;
-	    if ((rs = uc_gettimeofday(&tod,NULL)) >= 0) {
-	        rv ^= tod.tv_sec ;
-	        rv += tod.tv_usec ;
-	    }
 	}
 
-#if	defined(SYSHAS_HRTIME) && (SYSHAS_HRTIME > 0)
-	{
-	    hrtime_t	hrt = gethrtime() ;
-	    rv ^= hrt ;
-	}
-#endif /* SYSHAS_HRTIME */
+/* these are somewhat cyclical at the low end */
+
+	uc_gettimeofday(&tod,NULL) ; /* cannot fail? */
+	rv ^= tod.tv_sec ;
+	rv += tod.tv_usec ;
 
 	lip->rnum = (rv & INT_MAX) ;
+
 	return (rs >= 0) ? lip->rnum : rs ;
 }
 /* end subroutine (getrnum) */
@@ -3365,58 +2348,5 @@ static int getmem(PROGINFO *pip)
 	return rs ;
 }
 /* end subroutine (getmem) */
-
-
-static int cftime(PROGINFO *pip,char *cvtbuf,int cvtlen,ulong lv)
-{
-	LOCINFO		*lip = pip->lip ;
-	int		rs = SR_INVALID ;
-	switch (lip->timeform) {
-	case timeform_decimal:
-	default:
-	    if (lip->f.hextime) {
-	        rs = cthexul(cvtbuf,cvtlen,lv) ;
-	    } else {
-	        rs = ctdecul(cvtbuf,cvtlen,lv) ;
-	    }
-	    break ;
-	case timeform_hexadecimal:
-	    rs = cthexul(cvtbuf,cvtlen,lv) ;
-	    break ;
-	case timeform_wall:
-	    {
-		const time_t	t = lv ;
-		char		tbuf[TIMEBUFLEN+1] ;
-		timestr_logz(t,tbuf) ;
-	        rs = sncpy1(cvtbuf,cvtlen,tbuf) ;
-	    }
-	    break ;
-	} /* end switch */
-	return rs ;
-}
-/* end subroutine (cftime) */
-
-
-static int getam(cchar *vp,int vl)
-{
-	int		am = 0 ;
-	int		i ;
-	for (i = 0 ; *vp && (i < vl) ; i += 1) {
-	   const int	ach = tolc(MKCHAR(vp[i])) ;
-	   switch (ach) {
-	   case 'r':
-		am |= R_OK ;
-		break ;
-	    case 'w':
-		am |= W_OK ;
-		break ;
-	    case 'x':
-		am |= X_OK ;
-		break ;
-	    } /* end switch */
-	} /* end for */
-	return am ;
-}
-/* end subroutine (getam) */
 
 

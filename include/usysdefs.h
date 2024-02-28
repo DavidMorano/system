@@ -34,7 +34,7 @@
 #define	USYSDEFS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
@@ -125,18 +125,18 @@
 #ifdef	_POSIX_LOGIN_NAME_MAX
 #define	UNBUFLEN	_POSIX_LOGIN_NAME_MAX
 #else
-#define	UNBUFLEN	32
+#define	UNBUFLEN	255		/* picked value from MacOS! */
 #endif
 #endif
 
 /* group-name */
 #ifndef	GNBUFLEN
-#define	GNBUFLEN	32
+#define	GNBUFLEN	255		/* picked value from MacOS! */
 #endif
 
 /* project-name */
 #ifndef	PNBUFLEN
-#define	PNBUFLEN	32
+#define	PNBUFLEN	255		/* picked value from MacOS! */
 #endif
 
 /* password entry */
@@ -253,6 +253,11 @@
 /* service name */
 #ifndef	SVCNAMELEN
 #define	SVCNAMELEN	32
+#endif
+
+/* maximum SHM name (as per POSIX®) */
+#ifndef	SHMNAME_MAX
+#define	SHMNAME_MAX	14		/* historic value (in decimal) */
 #endif
 
 /* maximum PID on the system (could be wrong) */

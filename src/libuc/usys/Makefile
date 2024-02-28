@@ -56,7 +56,7 @@ INCS= usystem.h localmisc.h
 
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
-OBJ2_USYS= usys_mqueue.o
+OBJ2_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
 
 OBJ_USYS= obj0_ucent.o obj1_ucent.o obj2_ucent.o
 
@@ -120,5 +120,7 @@ usys_darwin.o:		usys_darwin.cc usys_darwin.h
 usys_linux.o:		usys_linux.cc usys_linux.h
 
 usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h
+usys_gethrtime.o:	usys_gethrtime.cc usys_gethrtime.h
+usys_getrandom.o:	usys_getrandom.cc usys_getrandom.h
 
 

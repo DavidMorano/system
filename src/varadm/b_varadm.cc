@@ -1,8 +1,8 @@
-/* b_varadm */
+/* b_varadm SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -11,13 +11,10 @@
 #define	CF_PERCACHE	1		/* use persistent cache */
 #define	CF_GETSYSMISC	1		/* use 'getsysmisc()' */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-
 	This subroutine was originally written.  
-
 
 */
 
@@ -26,43 +23,41 @@
 /**************************************************************************
 
 	Synopsis:
-
-	$ la <spec(s)>
+	$ varadm <spec(s)>
 
 	Special note:
 
-	Just so an observer (like myself later on) won't go too
+	Just so an observer (like myself later on) will not go too
 	crazy trying to understand what is going on with the 'struct
 	percache' local data, it is a persistent data structure.
-	This program can operate as both a regular program (is flushed
-	from system memory when it exits) or it can be operated as sort
-	of a terminate-stay-resident (TSR) program (its data is not
-	flushed when it exists).  We detect which it is (which mode we
-	are executing in) dynamically.	We do this by simply looking at
-	the persistent data and seeing if elements of it are non-zero.
-	Any non-zero data indicates that we have already been executed
-	in the past.  This data is allocated in the BSS section of
-	our process memory map so it is initialized to all-zero on
-	program-load (a UNIX standard now for ? over twenty years!).
+	This program can operate as both a regular program (is
+	flushed from system memory when it exits) or it can be
+	operated as sort of a terminate-stay-resident (TSR) program
+	(its data is not flushed when it exists).  We detect which
+	it is (which mode we are executing in) dynamically.  We do
+	this by simply looking at the persistent data and seeing
+	if elements of it are non-zero.  Any non-zero data indicates
+	that we have already been executed in the past.  This data
+	is allocated in the BSS section of our process memory map
+	so it is initialized to all-zero on program-load (a UNIX
+	standard now for ? over twenty years!).
 
-	Hopefully, everything else now makes sense upon inspection with
-	this understanding.
+	Hopefully, everything else now makes sense upon inspection
+	with this understanding.
 
-	Why do this?  Because it speeds things up.  Everything in this
-	program is already quite fast, but we have the chance of reducing
-	some file-access work with the introduction of a persistent
-	data cache.  It is hard to get faster than a single file-access
-	(like a shared-memory cache), so anything worth doing has to
-	be a good bit faster than that.  Hence, pretty much only TSR
-	behavior can beat a single file access.
+	Why do this?  Because it speeds things up.  Everything in
+	this program is already quite fast, but we have the chance
+	of reducing some file-access work with the introduction of
+	a persistent data cache.  It is hard to get faster than a
+	single file-access (like a shared-memory cache), so anything
+	worth doing has to be a good bit faster than that.  Hence,
+	pretty much only TSR behavior can beat a single file access.
 
 	Parallelism?  There isn't any, so we don't have to worry about
 	using mutexes or semaphores.  Maybe someday we will have to
 	think about parallelism, but probably not any time soon!
 
-
 *****************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -2150,13 +2145,6 @@ struct proginfo	*pip ;
 	    rv ^= pip->daytime ;
 	}
 
-#if	defined(SYSHAS_HRTIME) && (SYSHAS_HRTIME > 0)
-	{
-	    hrtime_t	hrt = gethrtime() ;
-	    rv ^= hrt ;
-	}
-#endif /* SYSHAS_HRTIME */
-
 	lip->rnum = (rv & INT_MAX) ;
 
 ret0:
@@ -2165,9 +2153,7 @@ ret0:
 /* end subroutine (getrnum) */
 
 
-static int getmem(pip)
-struct proginfo	*pip ;
-{
+static int getmem(PROGIKNFO *pip) noex {
 	struct locinfo	*lip = pip->lip ;
 
 	long	ppm ;

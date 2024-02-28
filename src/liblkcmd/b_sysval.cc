@@ -1,8 +1,8 @@
-/* b_sysval */
+/* b_sysval SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -11,7 +11,6 @@
 #define	CF_UTYPES	0		/* define UTMP-UTMPX state names */
 #define	CF_PERCACHE	1		/* use persistent cache */
 #define	CF_SNLOADAVG	0		/* use |snloadavg(3dam)| */
-
 
 /* revision history:
 
@@ -25,57 +24,61 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ sysval <spec(s)>
 
 	Special note:
 
-	Just so an observer (like myself later on) won't go too crazy trying to
-	understand what is going on with the PERCACHE local data, it
-	is a persistent data structure.  This program can operate as both a
-	regular program (is flushed from system memory when it exits) or it can
-	be operated as sort of a terminate-stay-resident (TSR) program (its
-	data is not flushed when it exists).  We detect which it is (which mode
-	we are executing in) dynamically.  We do this by simply looking at the
-	persistent data and seeing if elements of it are non-zero.  Any
-	non-zero data indicates that we have already been executed in the
-	past.  This data is allocated in the BSS section of our process memory
-	map so it is initialized to all-zero on program-load (a UNIX® standard
+	Just so an observer (like myself later on) will not go too
+	crazy trying to understand what is going on with the PERCACHE
+	local data, it is a persistent data structure.  This program
+	can operate as both a regular program (is flushed from
+	system memory when it exits) or it can be operated as sort
+	of a terminate-stay-resident (TSR) program (its data is not
+	flushed when it exists).  We detect which it is (which mode
+	we are executing in) dynamically.  We do this by simply
+	looking at the persistent data and seeing if elements of
+	it are non-zero.  Any non-zero data indicates that we have
+	already been executed in the past.  This data is allocated
+	in the BSS section of our process memory map so it is
+	initialized to all-zero on program-load (a UNIX® standard
 	now for? over twenty years!).
 
-	Hopefully, everything else now makes sense upon inspection with this
-	understanding.
+	Hopefully, everything else now makes sense upon inspection
+	with this understanding.
 
-	Why do this?  Because it speeds things up.  Everything in this program
-	is already quite fast, but we have the chance of reducing some
-	file-access work with the introduction of a persistent data cache.  It
-	is hard to get faster than a single file-access (like a shared-memory
-	cache), so anything worth doing has to be a good bit faster than that.
-	Hence, pretty much only TSR behavior can beat a single file access.
+	Why do this?  Because it speeds things up.  Everything in
+	this program is already quite fast, but we have the chance
+	of reducing some file-access work with the introduction of
+	a persistent data cache.  It is hard to get faster than a
+	single file-access (like a shared-memory cache), so anything
+	worth doing has to be a good bit faster than that.  Hence,
+	pretty much only TSR behavior can beat a single file access.
 
-	Parallelism?  There isn't any, so we don't have to worry about using
-	mutexes or semaphores.  Maybe someday we will have to think about
-	parallelism, but probably not any time soon!
+	Parallelism?  There is not any, so we don't have to worry
+	about using mutexes or semaphores.  Maybe someday we will
+	have to think about parallelism, but probably not any time
+	soon!
 
-	OK, now for some of the unpleasantness.  We have to release persistent
-	data that was dynamically allocated with the PERCACHE facility.  We do
-	this by calling |percache_fini()| on our particular data handle.  But
-	this should be done at module unload time, so we need to register a
-	subroutine to do this that is called at module-unload time.  That
-	subroutine will be |ourfini()|.  The registration is only done when we
-	are *exiting* this command.  This is done so that we do not perform the
-	registration if the PERCACHE facility was never used.  The cache
-	facility keeps track within itself whether it was used or not (among
-	all possible simultaneous users also).  We ask its opinion on that and
-	act accordingly.  Only one "user" (command) within the same module will
-	be given notice to perform a registration.  However if multiple users
-	(commands) do register a |fini()| (needlessly) it is dealt with without
-	problems (extras are ignored as expected).  Welcome to TSR management
-	when in a very dynamic execution environment!
-
+	OK, now for some of the unpleasantness.  We have to release
+	persistent data that was dynamically allocated with the
+	PERCACHE facility.  We do this by calling |percache_fini()|
+	on our particular data handle.  But this should be done at
+	module unload time, so we need to register a subroutine to
+	do this that is called at module-unload time.  That subroutine
+	will be |ourfini()|.  The registration is only done when
+	we are *exiting* this command.  This is done so that we do
+	not perform the registration if the PERCACHE facility was
+	never used.  The cache facility keeps track within itself
+	whether it was used or not (among all possible simultaneous
+	users also).  We ask its opinion on that and act accordingly.
+	Only one "user" (command) within the same module will be
+	given notice to perform a registration.  However if multiple
+	users (commands) do register a |fini()| (needlessly) it is
+	dealt with without problems (extras are ignored as expected).
+	Welcome to TSR management when in a very dynamic execution
+	environment!
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -3322,13 +3325,6 @@ static int getrnum(PROGINFO *pip)
 	        rv += tod.tv_usec ;
 	    }
 	}
-
-#if	defined(SYSHAS_HRTIME) && (SYSHAS_HRTIME > 0)
-	{
-	    hrtime_t	hrt = gethrtime() ;
-	    rv ^= hrt ;
-	}
-#endif /* SYSHAS_HRTIME */
 
 	lip->rnum = (rv & INT_MAX) ;
 	return (rs >= 0) ? lip->rnum : rs ;

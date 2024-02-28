@@ -25,7 +25,6 @@
 	small way to make up for some of the immense brain-damage within
 	the Apple Darwin operating system.
 
-
 *******************************************************************************/
 
 #ifndef	USYS_DARWIN_INCLUDE

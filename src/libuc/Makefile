@@ -1139,6 +1139,7 @@ strlibval.o:		strlibval.cc strlibval.hh
 strwcpy.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
+sysnoise.o:		sysnoise.cc sysnoise.h
 #
 isproc.o:		isproc.cc isproc.h
 #

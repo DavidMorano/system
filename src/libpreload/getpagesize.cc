@@ -1,5 +1,5 @@
-/* getpagesize */
-/* lang=C20 */
+/* getpagesize SUPPORT */
+/* lang=C++20 */
 
 /* Get-Page-Size UNIX® System interposer */
 /* version %I% last-modified %G% */
@@ -26,19 +26,6 @@
 	   subroutine that is already multi-thread safe -- then of course
 	   it is!
 
-	Q. Is this much slower than the default system version?
-	A. No, not really.
-
-	Q. How are we smarter than the default system version?
-	A. Let me count the ways:
-		+ value is cached!
-
-	Q. Why did you not also interpose something for |sysconf(3c)|?
-	A. Because we did not want to.
-
-	Q. Why are you so smart?
-	A. I do not know.
-
 	Additional notes:
 
         + We do not really allow this subroutine to fail under any
@@ -55,7 +42,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<usystem.h>
@@ -84,6 +71,9 @@ struct getpagesize_head {
 /* local variables */
 
 static GETPAGESIZE	getpagesize_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
