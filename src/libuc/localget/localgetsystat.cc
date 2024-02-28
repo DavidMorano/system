@@ -4,7 +4,6 @@
 /* get the LOCAL system-status (SYSTAT) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
 
 /* revision history:
@@ -57,6 +56,8 @@
 #include	<usystem.h>
 #include	<uprogdata.h>
 #include	<filereadln.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -76,12 +77,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getuserhome(char *,int,cchar *) ;
 
 
 /* external variables */
@@ -124,10 +119,6 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (needed) */
 
-#if	CF_DEBUGS
-	debugprintf("localgetsystat: 0 rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
-
 /* program cache */
 
 #if	CF_UPROGDATA
@@ -155,10 +146,6 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 		}
 	    }
 	} /* end if (needed) */
-
-#if	CF_DEBUGS
-	debugprintf("localgetsystat: ret rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }

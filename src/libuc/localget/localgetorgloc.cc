@@ -4,7 +4,6 @@
 /* get the LOCAL organization location (ORGLOC) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -60,7 +59,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<getuserhome.h>
 #include	<filereadln.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -77,13 +79,13 @@
 #define	ORGLOCFNAME	"orgloc"
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getuserhome(char *,int,cchar *) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -127,10 +129,6 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("localgetorgloc: 0 rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
-
 /* user configuration */
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
@@ -145,10 +143,6 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("localgetorgloc: 1 rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
-
 /* software facility (LOCAL) configuration */
 
 	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
@@ -157,10 +151,6 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	        len = rs ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("localgetorgloc: 2 rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
 
 /* any operating system configuration (in '/etc') */
 
@@ -171,20 +161,12 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("localgetorgloc: 3 rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
-
 /* get out (nicely as possible in our case) */
 
 	if ((rs < 0) && isNotPresent(rs)) {
 	    rs = SR_OK ;
 	    len = 0 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("localgetorgloc: ret rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }

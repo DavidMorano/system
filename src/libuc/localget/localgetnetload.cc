@@ -4,7 +4,6 @@
 /* get the LOCAL network-load (NETLOAD) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
 
 /* revision history:
@@ -120,10 +119,6 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	    }
 	} /* end if (needed) */
 
-#if	CF_DEBUGS
-	debugprintf("localgetnetload: 0 rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
-
 /* program cache */
 
 #if	CF_UPROGDATA
@@ -151,10 +146,6 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 		}
 	    }
 	} /* end if (needed) */
-
-#if	CF_DEBUGS
-	debugprintf("localgetnetload: ret rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }
