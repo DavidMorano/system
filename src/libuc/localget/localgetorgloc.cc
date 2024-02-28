@@ -61,6 +61,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<filereadln.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"localget.h"
@@ -83,8 +84,6 @@ extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,cchar *) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
-extern int	isNotPresent(int) ;
 
 
 /* external variables */

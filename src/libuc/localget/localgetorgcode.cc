@@ -8,11 +8,11 @@
 
 /* revision history:
 
-	= 1998-05-01, David AÂ­DÂ­ Morano
+	= 1998-05-01, David A­D­ Morano
 	This subroutine is originally written. This is a minimal
 	implementation.
 
-	= 2018-09-14, David A.D. Morano
+	= 2018-09-14, David A-D- Morano
 	I modified this to use |snabbr(3dam)| instead of a local
 	custom thing which did the same thing, only not as well.
 	So we go with the library solution instead of the local
@@ -22,7 +22,7 @@
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -87,7 +87,6 @@ extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
 extern int	nextfield(cchar *,int,cchar **) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	getuserorg(char *,int,cchar *) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
 extern int	touc(int) ;
 extern int	isNotPresent(int) ;
 

@@ -4,7 +4,6 @@
 /* get the organization name (string) for a specified user-name */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_USERORG	0		/* try to access "user" org also */
 #define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
 
@@ -50,14 +49,21 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<char.h>
 #include	<filebuf.h>
 #include	<getax.h>
 #include	<getxusername.h>
+#include	<getuserhome.h>
 #include	<gecos.h>
 #include	<filereadln.h>
+#include	<sfx.h>
+#include	<sncpyx.h>
+#include	<sncpyxw.h>
+#include	<mkpathx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"localget.h"
@@ -72,6 +78,8 @@
 #endif /* CF_UGETPW */
 
 #define	SUBINFO		struct subinfo
+
+#define	SI		SUBINFO
 
 #ifndef	LOCALUSERNAME
 #define	LOCALUSERNAME	"local"
@@ -93,24 +101,13 @@
 #endif
 
 
+/* external namespaces */
+
+
+/* external variables */
+
+
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -119,10 +116,10 @@ extern char	*strnchr(cchar *,int,int) ;
 /* local structures */
 
 struct subinfo {
-	cchar	*pr ;
-	cchar	*prn ;		/* program-root name */
-	cchar	*ofn ;		/* organization file-name */
-	cchar	*un ;
+	cchar		*pr ;
+	cchar		*prn ;		/* program-root name */
+	cchar		*ofn ;		/* organization file-name */
+	cchar		*un ;
 	char		*rbuf ;		/* user-supplied buffer */
 	int		rlen ;
 } ;
@@ -130,21 +127,21 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,cchar *,cchar *,char *,int) ;
-static int	subinfo_homer(SUBINFO *,cchar *) ;
-static int	subinfo_passwder(SUBINFO *,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
+static int subinfo_start(SI *,cchar *,cchar *,cchar *,char *,int) noex ;
+static int subinfo_homer(SI *,cchar *) noex ;
+static int subinfo_passwder(SI *,cchar *) noex ;
+static int subinfo_finish(SI *) noex ;
 
 #if	CF_USERORG
-static int	localgetorg_var(SUBINFO *) ;
-static int	localgetorg_home(SUBINFO *) ;
-static int	localgetorg_passwd(SUBINFO *) ;
+static int	localgetorg_var(SI *) noex ;
+static int	localgetorg_home(SI *) noex ;
+static int	localgetorg_passwd(SI *) noex ;
 #endif /* CF_USERORG */
 
-static int	localgetorg_prhome(SUBINFO *) ;
-static int	localgetorg_pretc(SUBINFO *) ;
-static int	localgetorg_prpasswd(SUBINFO *) ;
-static int	localgetorg_sys(SUBINFO *) ;
+static int	localgetorg_prhome(SI *) noex ;
+static int	localgetorg_pretc(SI *) noex ;
+static int	localgetorg_prpasswd(SI *) noex ;
+static int	localgetorg_sys(SI *) noex ;
 
 
 /* local variables */
@@ -169,15 +166,8 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 	if (username[0] == '\0')
 	    return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("localgetorg: pr=%s\n",pr) ;
-	debugprintf("localgetorg: u=%s\n",username) ;
-#endif
-
 	if ((rs = subinfo_start(&si,pr,ofn,username,rbuf,rlen)) >= 0) {
-	    int	i ;
-
-	    for (i = 0 ; i < 7 ; i += 1) {
+	    for (int i = 0 ; i < 7 ; i += 1) {
 		rs = 0 ;
 		switch (i) {
 #if	CF_USERORG
@@ -206,10 +196,6 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 		} /* end switch */
 		len = rs ;
 
-#if	CF_DEBUGS
-	debugprintf("localgetorg: localgetorg_%u() rs=%d\n",i,rs) ;
-#endif
-
 		if ((rs < 0) && (! isNotPresent(rs))) break ;
 		if (len > 0) break ;
 	    } /* end for */
@@ -218,11 +204,6 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
 
-#if	CF_DEBUGS
-	debugprintf("localgetorg: ret rs=%d len=%u\n",rs,len) ;
-	debugprintf("localgetorg: org=>%s<\n",rbuf) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg) */
@@ -230,15 +211,8 @@ int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
 
 /* local subroutines */
 
-
-static int subinfo_start(sip,pr,ofn,un,rbuf,rlen)
-SUBINFO		*sip ;
-cchar	*pr ;
-cchar	*ofn ;
-cchar	*un ;
-char		*rbuf ;
-int		rlen ;
-{
+static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
+		char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar	*cp ;
@@ -266,35 +240,28 @@ int		rlen ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
-	int		rs = SR_OK ;
+static int subinfo_finish(SI *sip) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (sip == NULL)
-	    return SR_FAULT ;
-
-	if (sip->prn != NULL) {
-	    rs1 = uc_free(sip->prn) ;
-	    if (rs >= 0) rs = rs1 ;
-	    sip->prn = NULL ;
-	}
-
+	if (sip) {
+	    rs = SR_OK ;
+	    if (sip->prn) {
+	        rs1 = uc_free(sip->prn) ;
+	        if (rs >= 0) rs = rs1 ;
+	        sip->prn = NULL ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
 #if	CF_USERORG
 
-static int localgetorg_var(SUBINFO *sip)
-{
+static int localgetorg_var(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		f ;
 	int		len = 0 ;
-	cchar	*un = sip->un ;
-
+	cchar		*un = sip->un ;
 	f = (un[0] == '-') ;
 	if (! f) {
 	    cchar	*vun = getenv(VARUSERNAME) ;
@@ -308,116 +275,68 @@ static int localgetorg_var(SUBINFO *sip)
 		len = rs ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg_var) */
 
-
-static int localgetorg_home(SUBINFO *sip)
-{
-	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("localgetorg_home: un=%s\n",sip->un) ;
-#endif
-
-	rs = subinfo_homer(sip,sip->un) ;
-
-#if	CF_DEBUGS
-	debugprintf("localgetorg_home: ret rs=%d\n",rs) ;
-#endif
-
-	return rs ;
+static int localgetorg_home(SI *sip) noex {
+	return subinfo_homer(sip,sip->un) ;
 }
 /* end subroutine (localgetorg_home) */
 
-
-static int localgetorg_passwd(SUBINFO *sip)
-{
-
+static int localgetorg_passwd(SI *sip) noex {
 	return subinfo_passwder(sip,sip->un) ;
 }
 /* end subroutine (localgetorg_passwd) */
 
 #endif /* CF_USERORG */
 
-
-static int localgetorg_prhome(SUBINFO *sip)
-{
-
+static int localgetorg_prhome(SI *sip) noex {
 	return subinfo_homer(sip,sip->prn) ;
 }
 /* end subroutine (localgetorg_prhome) */
 
-
-static int localgetorg_prpasswd(SUBINFO *sip)
-{
-
+static int localgetorg_prpasswd(SI *sip) noex {
 	return subinfo_passwder(sip,sip->prn) ;
 }
 /* end subroutine (localgetorg_prpasswd) */
 
-
-static int localgetorg_pretc(SUBINFO *sip)
-{
+static int localgetorg_pretc(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		orgfname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUGS
-	debugprintf("localgetorg_pretc: pr=%s\n",sip->pr) ;
-#endif
-
 	if ((rs = mkpath3(orgfname,sip->pr,ETCDNAME,sip->ofn)) >= 0) {
 	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
 	        len = rs ;
-	    } else if (isNotPresent(rs))
+	    } else if (isNotPresent(rs)) {
 		rs = SR_OK ;
+	    }
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg_pretc) */
 
-
-static int localgetorg_sys(SUBINFO *sip)
-{
+static int localgetorg_sys(SI *sip) noex {
 	int		rs ;
 	int		len = 0 ;
 	char		orgfname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUGS
-	debugprintf("localgetorg_sys: pr=%s\n",sip->pr) ;
-#endif
-
 	if ((rs = mkpath2(orgfname,ETCDNAME,sip->ofn)) >= 0) {
 	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
 	        len = rs ;
-	    } else if (isNotPresent(rs))
+	    } else if (isNotPresent(rs)) {
 		rs = SR_OK ;
+	    }
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg_sys) */
 
-
-static int subinfo_homer(SUBINFO *sip,cchar *homeuser)
-{
+static int subinfo_homer(SI *sip,cchar *homeuser) noex {
 	int		rs ;
 	int		len = 0 ;
 	char		homedname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUGS
-	debugprintf("subinfo_homer: un=%s\n",homeuser) ;
-#endif
-
 	if ((rs = getuserhome(homedname,MAXPATHLEN,homeuser)) >= 0) {
 	    char	orgname[MAXNAMELEN+1] ;
-#if	CF_DEBUGS
-	    debugprintf("subinfo_homer: userhome=%s\n",homedname) ;
-#endif
 	    if ((rs = sncpy2(orgname,MAXNAMELEN,"/.",sip->ofn)) >= 0) {
 		char	orgfname[MAXPATHLEN+1] ;
 	        if ((rs = mkpath2(orgfname,homedname,orgname)) >= 0) {
@@ -430,47 +349,36 @@ static int subinfo_homer(SUBINFO *sip,cchar *homeuser)
 		} /* end if (mkpath) */
 	    } /* end if (sncpy) */
 	} /* end if (getuserhome) */
-
-#if	CF_DEBUGS
-	debugprintf("subinfo_homer: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_homer) */
 
-
-static int subinfo_passwder(SUBINFO *sip,cchar *homeuser)
-{
+static int subinfo_passwder(SI *sip,cchar *homeuser) noex {
 	PASSWD		pw ;
-	cint	pwlen = getbufsize(getbufsize_pw) ;
+	cint		pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	char		*pwbuf ;
-
+	char		*pwbuf{} ;
 	sip->rbuf[0] = '\0' ;
 	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,homeuser)) >= 0) {
-		GECOS	g ;
+		gecos	g ;
 	        if ((rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
 		    int		vl ;
 		    cint	gi = gecosval_organization ;
-		    cchar	*vp ;
+		    cchar	*vp{} ;
 	            if ((vl = gecos_getval(&g,gi,&vp)) > 0) {
 	    	        rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
 		        len = rs ;
 		    }
-	            gecos_finish(&g) ;
-	        } /* end if (GECOS) */
+	            rs1 = gecos_finish(&g) ;
+	    	    if (rs >= 0) rs = rs1 ;
+	        } /* end if (gecos) */
 	    } /* end if (get PW entry) */
-	    uc_free(pwbuf) ;
+	    rs1 = uc_free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
-
-#if	CF_DEBUGS
-	debugprintf("subinfo_passwder: ret rs=%d len=%u\n",rs,len) ;
-	debugprintf("subinfo_passwder: rbuf=>%t<\n",sip->rbuf,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_passwder) */

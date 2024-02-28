@@ -1070,6 +1070,11 @@ chrono.o:		chrono.dir
 chrono.dir:
 	makesubdir $@
 
+# LOCALGET
+localget.o:		localget.dir
+localget.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
