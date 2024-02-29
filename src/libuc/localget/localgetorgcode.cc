@@ -4,7 +4,6 @@
 /* get the LOCAL organization-code (ORGCODE) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -186,10 +185,6 @@ int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	    rs = SR_OK ;
 	    len = 0 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("localgetorgcode: ret rs=%d org=>%s<\n",rs,rbuf) ;
-#endif
 
 	return (rs >= 0) ? len : rs ;
 }

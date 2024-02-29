@@ -75,6 +75,10 @@
 #define	SYSTATFNAME	"systat"
 #define	TO_TTL		(5*60)
 
+#ifndef	CF_UPROGDATA
+#define	CF_UPROGDATA	1
+#endif
+
 
 /* external subroutines */
 
@@ -90,6 +94,8 @@
 
 /* local variables */
 
+constexpr bool		f_uprogdata = CF_UPROGDATA ;
+
 
 /* exported variables */
 
@@ -97,56 +103,49 @@
 /* exported subroutines */
 
 int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
-	cint		di = UPROGDATA_DSYSTAT ;
-	cint		ttl = TO_TTL ;
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	        cint		di = UPROGDATA_DSYSTAT ;
+	        cint		ttl = TO_TTL ;
+		rs = SR_OK ;
+	        rbuf[0] = '\0' ;
 /* user environment */
-
-	if ((rs >= 0) && (len == 0)) {
-	    cchar	*systat = getenv(VARSYSTAT) ;
-	    if ((systat != NULL) && (systat[0] != '\0')) {
-	        rs = sncpy1(rbuf,rlen,systat) ;
-	        len = rs ;
-	    }
-	} /* end if (needed) */
-
+	        if ((rs >= 0) && (len == 0)) {
+	            cchar	*systat = getenv(VARSYSTAT) ;
+	            if (systat && (systat[0] != '\0')) {
+	                rs = sncpy1(rbuf,rlen,systat) ;
+	                len = rs ;
+	            }
+	        } /* end if (needed) */
 /* program cache */
-
-#if	CF_UPROGDATA
-	if ((rs >= 0) && (len == 0)) {
-	    if ((rs = uprogdata_get(di,rbuf,rlen)) > 0) {
-	        len = rs ;
-	    }
-	}
-#endif /* CF_UPROGDATA */
-
+	        if constexpr (f_uprogdata) {
+	            if ((rs >= 0) && (len == 0)) {
+	                if ((rs = uprogdata_get(di,rbuf,rlen)) > 0) {
+	                    len = rs ;
+	                }
+	            }
+	        } /* end if-constexpr (f_uprogdata) */
 /* software facility (LOCAL) configuration */
-
-	if ((rs >= 0) && (len == 0)) {
-	    cchar	*vardname = VARDNAME ;
-	    cchar	*systatname = SYSTATFNAME ;
-	    char	tfname[MAXPATHLEN+1] ;
-	    if ((rs = mkpath3(tfname,pr,vardname,systatname)) >= 0) {
-	        if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
-	            len = rs ;
-#if	CF_UPROGDATA
-	            rs = uprogdata_set(di,rbuf,len,ttl) ;
-#endif /* CF_UPROGDATA */
-		} else if (isNotPresent(rs)) {
-		    rs = SR_OK ;
-		}
-	    }
-	} /* end if (needed) */
-
+	        if ((rs >= 0) && (len == 0)) {
+	            cchar	*vardname = VARDNAME ;
+	            cchar	*systatname = SYSTATFNAME ;
+	            char	tfname[MAXPATHLEN+1] ;
+	            if ((rs = mkpath3(tfname,pr,vardname,systatname)) >= 0) {
+	                if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
+	                    len = rs ;
+		            if constexpr (f_uprogdata) {
+	                        rs = uprogdata_set(di,rbuf,len,ttl) ;
+		            }
+		        } else if (isNotPresent(rs)) {
+		            rs = SR_OK ;
+		        }
+	            }
+	        } /* end if (needed) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetsystat) */

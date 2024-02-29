@@ -80,6 +80,7 @@ struct varnames {
 	static const char printer[] ;
 	static const char pager[] ;
 	static const char organization[] ;
+	static const char orgloc[] ;
 	static const char tmout[] ;
 	static const char editor[] ;
 	static const char visual[] ;

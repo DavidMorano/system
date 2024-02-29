@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_USERORG	0		/* try to access "user" org also */
-#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -52,7 +52,6 @@
 #include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<char.h>
 #include	<filebuf.h>
 #include	<getax.h>
 #include	<getxusername.h>
@@ -63,6 +62,7 @@
 #include	<sncpyx.h>
 #include	<sncpyxw.h>
 #include	<mkpathx.h>
+#include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -101,7 +101,10 @@
 #endif
 
 
-/* external namespaces */
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external variables */
@@ -153,57 +156,52 @@ static int	localgetorg_sys(SI *) noex ;
 /* exported subroutines */
 
 int localgetorg(cchar *pr,char *rbuf,int rlen,cchar *username) noex {
-	SUBINFO		si, *sip = &si ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
-	cchar	*ofn = ORGCNAME ;
-
-	if ((pr == NULL) || (rbuf == NULL) || (username == NULL))
-	    return SR_FAULT ;
-
-	rbuf[0] = '\0' ;
-	if (username[0] == '\0')
-	    return SR_INVALID ;
-
-	if ((rs = subinfo_start(&si,pr,ofn,username,rbuf,rlen)) >= 0) {
-	    for (int i = 0 ; i < 7 ; i += 1) {
-		rs = 0 ;
-		switch (i) {
+	if (pr && rbuf && username) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (username[0]) {
+	        SUBINFO		si, *sip = &si ;
+	        cchar		*ofn = ORGCNAME ;
+	        if ((rs = subinfo_start(&si,pr,ofn,username,rbuf,rlen)) >= 0) {
+	            for (int i = 0 ; i < 7 ; i += 1) {
+		        rs = 0 ;
+		        switch (i) {
 #if	CF_USERORG
-		case 0:
-		     rs = localgetorg_var(sip) ;
-		     break ;
-		case 1:
-		     rs = localgetorg_home(sip) ;
-		     break ;
-		case 2:
-		     rs = localgetorg_passwd(sip) ;
-		     break ;
+		        case 0:
+		             rs = localgetorg_var(sip) ;
+		             break ;
+		        case 1:
+		             rs = localgetorg_home(sip) ;
+		             break ;
+		        case 2:
+		             rs = localgetorg_passwd(sip) ;
+		             break ;
 #endif /* CF_USERORG */
-		case 3:
-		     rs = localgetorg_prhome(sip) ;
-		     break ;
-		case 4:
-		     rs = localgetorg_pretc(sip) ;
-		     break ;
-		case 5:
-		     rs = localgetorg_prpasswd(sip) ;
-		     break ;
-		case 6:
-		     rs = localgetorg_sys(sip) ;
-		     break ;
-		} /* end switch */
-		len = rs ;
-
-		if ((rs < 0) && (! isNotPresent(rs))) break ;
-		if (len > 0) break ;
-	    } /* end for */
-
-	    rs1 = subinfo_finish(&si) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (subinfo) */
-
+		        case 3:
+		             rs = localgetorg_prhome(sip) ;
+		             break ;
+		        case 4:
+		             rs = localgetorg_pretc(sip) ;
+		             break ;
+		        case 5:
+		             rs = localgetorg_prpasswd(sip) ;
+		             break ;
+		        case 6:
+		             rs = localgetorg_sys(sip) ;
+		             break ;
+		        } /* end switch */
+		        len = rs ;
+		        if ((rs < 0) && (! isNotPresent(rs))) break ;
+		        if (len > 0) break ;
+	            } /* end for */
+	            rs1 = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg) */
@@ -217,25 +215,22 @@ static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 	int		cl ;
 	cchar	*cp ;
 	cchar	*ccp ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	memclear(sip) ;
 	sip->pr = pr ;
 	sip->un = un ;
 	sip->ofn = ofn ;
 	sip->rbuf = rbuf ;
 	sip->rlen = rlen ;
-	cl = sfbasename(sip->pr,-1,&cp) ;
-
-	if (cl > 0) {
+	if ((cl = sfbasename(sip->pr,-1,&cp)) > 0) {
 	    while ((cl > 0) && (cp[cl-1] == '/')) cl -= 1 ;
 	}
 	if (cl <= 0) {
 	    cp = LOCALUSERNAME ;
 	    cl = -1 ;
 	}
-	rs = uc_mallocstrw(cp,cl,&ccp) ;
-	if (rs >= 0) sip->prn = ccp ;
-
+	if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
+	    sip->prn = ccp ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_start) */

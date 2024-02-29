@@ -1,4 +1,4 @@
-/* localgetorgloc SUPPORT */
+/* localgetorglocer SUPPORT */
 /* lang=C++20 */
 
 /* get the LOCAL organization location (ORGLOC) */
@@ -24,7 +24,7 @@
 /*******************************************************************************
 
 	Name:
-	localgetorgloc
+	localgetorglocer
 
 	Descrption:
 	This subroutine is used to (try to) get the LOCAL software
@@ -37,7 +37,7 @@
 	regularly.
 
 	Synopsis:
-	int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex
+	int localgetorglocer(cchar *pr,char *rbuf,int rlen,cchar *un) noex
 
 	Arguments:
 	pr		program root
@@ -59,8 +59,11 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<syswords.hh>
+#include	<mallocxx.h>
 #include	<getuserhome.h>
 #include	<filereadln.h>
+#include	<strlibval.hh>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
 #include	<isnot.h>
@@ -70,10 +73,6 @@
 
 
 /* local defines */
-
-#ifndef	VARORGLOC
-#define	VARORGLOC	"ORGLOC"
-#endif
 
 #define	ETCCNAME	"etc"
 #define	ORGLOCFNAME	"orgloc"
@@ -93,11 +92,71 @@
 
 /* local structures */
 
+enum orgloccos {
+	orglocerco_finish,
+	orglocerco_overlast
+} ;
+
+namespace {
+    struct orglocer ;
+    struct orglocer_co {
+	orglocer	*op ;
+	int		w ;
+	void operator () (orglocer *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+        operator int () noex ;
+    } ; /* end struct (orglocer_co) */
+    struct orglocer {
+	cchar		*pr ;
+	cchar		*un ;
+	char		*rbuf ;
+	char		*tfname = nullptr ;
+	int		rlen ;
+	orglocer_co	finish ;
+	orglocer(cc *p,cc *u,char *b,int l) noex : pr(p), un(u) {
+	    rbuf = b ;
+	    rlen = l ;
+	    finish(this,orglocerco_finish) ;
+	} ;
+	int start(char *tb) noex {
+	    tfname = tb ;
+	    return SR_OK ;
+	} ;
+	operator int () noex ;
+	int userenv() noex ;
+	int userconf() noex ;
+	int localconf() noex ;
+	int sysconf() noex ;
+	int ifinish() noex ;
+	~orglocer() {
+	    (void) ifinish() ;
+	} ;
+    } ; /* end struct (orglocer) */
+}
+
+typedef int (orglocer::*orglocer_m)() noex ;
+
 
 /* forward references */
 
 
 /* local variables */
+
+static strlibval	orgloc(strlibval_orgloc) ;
+
+static cchar		*etcdname = sysword.w_etcdir ;
+
+constexpr cchar		oln[] = ORGLOCFNAME ;
+
+constexpr orglocer_m	mems[] = {
+	&orglocer::userenv,
+	&orglocer::userconf,
+	&orglocer::localconf,
+	&orglocer::sysconf,
+	nullptr
+} ;
 
 
 /* exported variables */
@@ -106,70 +165,118 @@
 /* exported subroutines */
 
 int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-	cchar		*etcdname = ETCCNAME ;
-	cchar		*orglocname = ORGLOCFNAME ;
-	cchar		*orgloc = getenv(VARORGLOC) ;
-	char		tfname[MAXPATHLEN+1] ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-
-/* user environment */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    if ((orgloc != NULL) && (orgloc[0] != '\0')) {
-	        rs = sncpy1(rbuf,rlen,orgloc) ;
-	        len = rs ;
-	    }
-	}
-
-/* user configuration */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    cint	hlen = MAXPATHLEN ;
-	    char	hbuf[MAXPATHLEN+1] ;
-	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
-	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-	        if ((rs = mkpath3(tfname,hbuf,etcdname,orglocname)) >= 0) {
-	            rs = filereadln(tfname,rbuf,rlen) ;
-	            len = rs ;
-	        }
-	    }
-	}
-
-/* software facility (LOCAL) configuration */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    if ((rs = mkpath3(tfname,pr,etcdname,orglocname)) >= 0) {
-	        rs = filereadln(tfname,rbuf,rlen) ;
-	        len = rs ;
-	    }
-	}
-
-/* any operating system configuration (in '/etc') */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    if ((rs = mkpath3(tfname,"/",etcdname,orglocname)) >= 0) {
-	        rs = filereadln(tfname,rbuf,rlen) ;
-	        len = rs ;
-	    }
-	}
-
-/* get out (nicely as possible in our case) */
-
-	if ((rs < 0) && isNotPresent(rs)) {
-	    rs = SR_OK ;
-	    len = 0 ;
-	}
-
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (pr[0]) {
+	        char	*tfname{} ;
+	        if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
+	        if ((rs = malloc_mp(&tfname)) >= 0) {
+		    orglocer	oo(pr,un,rbuf,rlen) ;
+		    if ((rs = oo.start(tfname)) >= 0) {
+			{
+			    rs = oo ;
+			    len = rs ;
+			}
+			rs1 = oo.finish ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (orglocer) */
+		    rs1 = uc_free(tfname) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (localgetorgloc) */
+/* end subroutine (localgetorglocer) */
+
+
+/* local subroutines */
+
+int orglocer::userenv() noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	if (orgloc && (orgloc[0] != '\0')) {
+	    rs = sncpy1(rbuf,rlen,orgloc) ;
+	    len = rs ;
+	}
+	return (rs >= 0) ? len : rs ;
+}
+
+int orglocer::userconf() noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	char		*hbuf{} ;
+	if ((rs = malloc_mp(&hbuf)) >= 0) {
+	    cint	hlen = rs ;
+	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
+		if ((rs = mkpath3(tfname,hbuf,etcdname,oln)) >= 0) {
+		     if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
+		         len = rs ;
+		     } else if (isNotPresent(rs)) {
+			 rs = SR_OK ;
+		     }
+	         }
+	    } /* end if (getuserhome) */
+	    rs1 = uc_free(hbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int orglocer::localconf() noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = mkpath3(tfname,pr,etcdname,oln)) >= 0) {
+	    if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
+		len = rs ;
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+}
+	
+int orglocer::sysconf() noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = mkpath(tfname,etcdname,oln)) >= 0) {
+	    if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
+		len = rs ;
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+}
+
+int orglocer::ifinish() noex {
+	return SR_OK ;
+}
+
+orglocer::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs != 0) && mems[i] ; i += 1) {
+	    orglocer_m	m = mems[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+
+orglocer_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case orglocerco_finish:
+		rs = op->ifinish() ;
+		break ;
+	    } /* end switch */
+	}
+	return rs ;
+}
 
 

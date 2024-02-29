@@ -92,6 +92,8 @@ constexpr strenv::strenv() noex {
 	name[strlibval_logname] = varname.logname ;
 	name[strlibval_home] = varname.home ;
 	name[strlibval_mail] = varname.mail ;
+	name[strlibval_organization] = varname.organization ;
+	name[strlibval_orgloc] = varname.orgloc ;
 }
 /* end method (strenv::ctor) */
 
