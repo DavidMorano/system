@@ -1,5 +1,5 @@
-/* calmgr */
-/* lang=C20 */
+/* calmgr SUPPORT */
+/* lang=C++20 */
 
 /* calendar manager object */
 /* version %I% last-modified %G% */

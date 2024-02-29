@@ -1,4 +1,4 @@
-/* calmgr */
+/* calmgr HEADER */
 /* lang=C20 */
 
 /* calendar manager object */
@@ -58,22 +58,20 @@ struct calmgr_head {
 	int		cidx ;			/* parent index (ordinal) */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef CALMGR		calmgr ;
 
-extern int calmgr_start(CALMGR *,CALYEARS *,int,cchar *,cchar *) ;
-extern int calmgr_finish(CALMGR *) ;
-extern int calmgr_lookup(CALMGR *,vecobj *,CALCITE *) ;
-extern int calmgr_gethash(CALMGR *,CALENT *,uint *) ;
-extern int calmgr_getci(CALMGR *) ;
-extern int calmgr_getbase(CALMGR *,cchar **) ;
-extern int calmgr_loadbuf(CALMGR *,char *,int,CALENT *) ;
-extern int calmgr_audit(CALMGR *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int calmgr_start(calmgr *,CALYEARS *,int,cchar *,cchar *) noex ;
+extern int calmgr_finish(calmgr *) noex ;
+extern int calmgr_lookup(calmgr *,vecobj *,CALCITE *) noex ;
+extern int calmgr_gethash(calmgr *,CALENT *,uint *) noex ;
+extern int calmgr_getci(calmgr *) noex ;
+extern int calmgr_getbase(calmgr *,cchar **) noex ;
+extern int calmgr_loadbuf(calmgr *,char *,int,CALENT *) noex ;
+extern int calmgr_audit(calmgr *) noex ;
+
+EXTERNC_end
 
 
 #endif /* CALMGR_INCLUDE */
