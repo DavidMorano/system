@@ -72,7 +72,6 @@
 #define	VARSYSTAT	"SYSTAT"
 #endif
 
-#define	ETCDNAME	"etc"
 #define	VARDNAME	"var"
 #define	SYSTATFNAME	"systat"
 #define	TO_TTL		(5*60)

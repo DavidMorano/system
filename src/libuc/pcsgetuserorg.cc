@@ -1,12 +1,10 @@
-/* pcsgetuserorg */
+/* pcsgetuserorg SUPPORT */
+/* lang=C++20 */
 
 /* get the organization name (string) for a specified user-name */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_ORGSYS	0		/* get from system? */
-
 
 /* revision history:
 
@@ -19,50 +17,46 @@
 
 /*******************************************************************************
 
+	Name:
+	pcsgetuserorg
+
+	Description:
 	This subroutine retrieves the organization name (string) for a
 	specified user-name.
 
 	Synopsis:
-
-	int pcsgetuserorg(pr,rbuf,rlen,username)
-	const char	*pr ;
-	char		rbuf[] ;
-	int		rlen ;
-	const char	*username ;
+	int pcsgetuserorg(cc *pr,char *rbuf,int rlen,cc *un) noex
 
 	Arguments:
-
 	pr		program-root
 	rbuf		user supplied buffer to hold result
 	rlen		length of user supplied buffer
-	username	username to look up
+	un		username to look up
 
 	Returns:
-
 	>=0		length of return organization string
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<char.h>
 #include	<filebuf.h>
 #include	<getax.h>
 #include	<getxusername.h>
 #include	<gecos.h>
+#include	<char.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"pcsgetuserorg.h"
 
 
 /* local defines */
@@ -91,23 +85,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	getuserorg(char *,int,const char *) ;
-extern int	pcsgetorg(const char *,char *,int,const char *) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -121,35 +98,23 @@ extern char	*strnchr(const char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pcsgetuserorg(cchar *pr,char rbuf[],int rlen,cchar *un)
-{
-	int		rs ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if ((rbuf == NULL) || (un == NULL)) return SR_FAULT ;
-
-	rbuf[0] = '\0' ;
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (un[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("pcsgetuserorg: u=%s\n",un) ;
-#endif
-
-	rs = getuserorg(rbuf,rlen,un) ;
-
-	if (isNotPresent(rs) || (rs == 0)) {
-	    rs = pcsgetorg(pr,rbuf,rlen,un) ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("pcsgetuserorg: ret rs=%d\n",rs) ;
-	debugprintf("pcsgetuserorg: org=>%s<\n",rbuf) ;
-#endif
-
+int pcsgetuserorg(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
+	int		rs = SR_FAULT ;
+	if (pr && rbuf && un) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (pr[0] && un[0]) {
+	        rs = getuserorg(rbuf,rlen,un) ;
+	        if (isNotPresent(rs) || (rs == 0)) {
+	            rs = pcsgetorg(pr,rbuf,rlen,un) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pcsgetuserorg) */

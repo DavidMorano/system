@@ -57,7 +57,12 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<strlibval.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<getuserhome.h>
 #include	<filereadln.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"localget.h"

@@ -71,7 +71,6 @@
 #define	VARNETLOAD	"NETLOAD"
 #endif
 
-#define	ETCDNAME	"etc"
 #define	VARDNAME	"var"
 #define	NETLOADFNAME	"netload"
 #define	TO_TTL		(5*60)

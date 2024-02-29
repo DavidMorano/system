@@ -19,7 +19,7 @@
 
 EXTERNC_begin
 
-extern int getuserhome(char *,int,cchar *) noex ;
+extern int	getuserhome(char *,int,cchar *) noex ;
 
 EXTERNC_end
 

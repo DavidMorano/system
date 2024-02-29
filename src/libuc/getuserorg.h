@@ -1,4 +1,4 @@
-/* getuserhome HEADER */
+/* getuserorg HEADER */
 /* lang=C20 */
 
 /* get the best approximation of the username of the current user */
@@ -7,8 +7,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETUSERHOME_INCLUDE
-#define	GETUSERHOME_INCLUDE
+#ifndef	GETUSERORG_INCLUDE
+#define	GETUSERORG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -19,11 +19,11 @@
 
 EXTERNC_begin
 
-extern int	getuserhome(char *,int,cchar *) noex ;
+extern int	getuserorg(cchar *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETUSERHOME_INCLUDE */
+#endif /* GETUSERORG_INCLUDE */
 
 

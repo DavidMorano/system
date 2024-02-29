@@ -207,7 +207,7 @@ static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 		char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar	*cp{} ;
+	cchar		*cp{} ;
 	memclear(sip) ;
 	sip->pr = pr ;
 	sip->un = un ;
@@ -236,7 +236,7 @@ static int subinfo_finish(SI *sip) noex {
 	    if (sip->prn) {
 	        rs1 = uc_free(sip->prn) ;
 	        if (rs >= 0) rs = rs1 ;
-	        sip->prn = NULL ;
+	        sip->prn = nullptr ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
@@ -247,20 +247,19 @@ static int subinfo_finish(SI *sip) noex {
 
 static int localgetorg_var(SI *sip) noex {
 	int		rs = SR_OK ;
-	int		f ;
 	int		len = 0 ;
 	cchar		*vun = varname.username ;
 	cchar		*vorg = varname.organization ;
 	cchar		*un = sip->un ;
-	f = (un[0] == '-') ;
+	bool		f = (un[0] == '-') ;
 	if (! f) {
 	    static cchar	*vun = getenv(vun) ;
-	    if ((vun != NULL) && (vun[0] != '\0'))
+	    if (vun && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
 	    static cchar	*orgp = getenv(vorg) ;
-	    if (orgp != NULL) {
+	    if (orgp) {
 		rs = sncpy1(sip->rbuf,sip->rlen,orgp) ;
 		len = rs ;
 	    }
@@ -292,73 +291,98 @@ static int localgetorg_prpasswd(SI *sip) noex {
 /* end subroutine (localgetorg_prpasswd) */
 
 static int localgetorg_pretc(SI *sip) noex {
-	int		rs = SR_OK ;
+	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	char		orgfname[MAXPATHLEN+1] ;
-	if ((rs = mkpath3(orgfname,sip->pr,etcdir,sip->ofn)) >= 0) {
-	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
-	        len = rs ;
-	    } else if (isNotPresent(rs)) {
-		rs = SR_OK ;
+	char		*ofname{} ;
+	if ((rs = malloc_mp(&ofname)) >= 0) {
+	    if ((rs = mkpath3(ofname,sip->pr,etcdir,sip->ofn)) >= 0) {
+	        if ((rs = filereadln(ofname,sip->rbuf,sip->rlen)) >= 0) {
+	            len = rs ;
+	        } else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
+	        }
 	    }
-	}
+	    rs1 = uc_free(ofname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg_pretc) */
 
 static int localgetorg_sys(SI *sip) noex {
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	char		orgfname[MAXPATHLEN+1] ;
-	if ((rs = mkpath2(orgfname,etcdir,sip->ofn)) >= 0) {
-	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
-	        len = rs ;
-	    } else if (isNotPresent(rs)) {
-		rs = SR_OK ;
+	char		*ofname{} ;
+	if ((rs = malloc_mp(&ofname)) >= 0) {
+	    if ((rs = mkpath2(ofname,etcdir,sip->ofn)) >= 0) {
+	        if ((rs = filereadln(ofname,sip->rbuf,sip->rlen)) >= 0) {
+	            len = rs ;
+	        } else if (isNotPresent(rs)) {
+		    rs = SR_OK ;
+	        }
 	    }
-	}
+	    rs1 = uc_free(ofname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorg_sys) */
 
-static int subinfo_homer(SI *sip,cchar *homeuser) noex {
+static int subinfo_homer(SI *sip,cchar *un) noex {
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	char		homedname[MAXPATHLEN+1] ;
-	if ((rs = getuserhome(homedname,MAXPATHLEN,homeuser)) >= 0) {
-	    char	orgname[MAXNAMELEN+1] ;
-	    if ((rs = sncpy2(orgname,MAXNAMELEN,"/.",sip->ofn)) >= 0) {
-		char	orgfname[MAXPATHLEN+1] ;
-	        if ((rs = mkpath2(orgfname,homedname,orgname)) >= 0) {
-		    cint	rlen = sip->rlen ;
-		    char	*rbuf = sip->rbuf ;
-	            if ((rs = filereadln(orgfname,rbuf,rlen)) >= 0) {
-	                len = rs ;
-	            } else if (isNotPresent(rs))
-		        rs = SR_OK ;
-		} /* end if (mkpath) */
-	    } /* end if (sncpy) */
-	} /* end if (getuserhome) */
+	char		*hbuf{} ;
+	if ((rs = malloc_mp(&hbuf)) >= 0) {
+	    cint	hlen = rs ;
+	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
+	        char	*obuf{} ;
+		if ((rs = malloc_mn(&obuf)) >= 0) {
+		    cint	olen = rs ;
+	            if ((rs = sncpy2(obuf,olen,"/.",sip->ofn)) >= 0) {
+		        char	*ofname{} ;
+		        if ((rs = malloc_mp(&ofname)) >= 0) {
+	                    if ((rs = mkpath2(ofname,hbuf,obuf)) >= 0) {
+		                cint	rlen = sip->rlen ;
+		                char	*rbuf = sip->rbuf ;
+	                        if ((rs = filereadln(ofname,rbuf,rlen)) >= 0) {
+	                            len = rs ;
+	                        } else if (isNotPresent(rs)) {
+		                    rs = SR_OK ;
+				}
+		            } /* end if (mkpath) */
+	                    rs1 = uc_free(ofname) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (m-a-f) */
+		    } /* end if (sncpy) */
+	            rs1 = uc_free(obuf) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (getuserhome) */
+	    rs1 = uc_free(hbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (subinfo_homer) */
 
-static int subinfo_passwder(SI *sip,cchar *homeuser) noex {
-	PASSWD		pw ;
-	cint		pwlen = getbufsize(getbufsize_pw) ;
+static int subinfo_passwder(SI *sip,cchar *un) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	char		*pwbuf{} ;
 	sip->rbuf[0] = '\0' ;
-	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,homeuser)) >= 0) {
+	if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	    PASSWD	pw ;
+	    cint	pwlen = rs ;
+	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
 		gecos	g ;
 	        if ((rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
-		    int		vl ;
 		    cint	gi = gecosval_organization ;
 		    cchar	*vp{} ;
-	            if ((vl = gecos_getval(&g,gi,&vp)) > 0) {
+	            if (int vl ; (vl = gecos_getval(&g,gi,&vp)) > 0) {
 	    	        rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
 		        len = rs ;
 		    }
