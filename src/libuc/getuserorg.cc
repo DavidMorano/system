@@ -183,29 +183,36 @@ int getuserorg(char *rbuf,int rlen,cchar *un) noex {
 }
 /* end subroutine (getuserorg) */
 
-int gethomeorg(char *rbuf,int rlen,cchar *homedname) noex {
-	int		rs ;
+int gethomeorg(char *rbuf,int rlen,cchar *hd) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-	cchar		*orgcname = ORGCNAME ;
-	char		cname[MAXNAMELEN+1] ;
-
-	if (rbuf == NULL) return SR_FAULT ;
-	if (homedname == NULL) return SR_FAULT ;
-
-	rbuf[0] = '\0' ;
-	if (homedname[0] == '\0') return SR_INVALID ;
-
-	if ((rs = sncpy2(cname,MAXNAMELEN,".",orgcname)) >= 0) {
-	    char	orgfname[MAXPATHLEN+1] ;
-	    if ((rs = mkpath2(orgfname,homedname,cname)) >= 0) {
-	        if ((rs = filereadln(orgfname,rbuf,rlen)) >= 0) {
-	            len = rs ;
-		} else if (isNotAccess(rs)) {
-		    rs = SR_OK ;
-		}
-	    }
-	}
-
+	if (rbuf && hd) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (hd[0]) {
+	        char	*cbuf{} ;
+		if ((rs = malloc_mn(&cbuf)) >= 0) {
+		    cint	clen = rs ;
+	            if ((rs = sncpy2(cbuf,clen,".",orgname)) >= 0) {
+	                char	*ofname{} ;
+			if ((rs = malloc_mp(&ofname)) >= 0) {
+	                    if ((rs = mkpath2(ofname,hd,cbuf)) >= 0) {
+	                        if ((rs = filereadln(ofname,rbuf,rlen)) >= 0) {
+	                            len = rs ;
+		                } else if (isNotAccess(rs)) {
+		                    rs = SR_OK ;
+		                }
+	                    }
+		            rs1 = uc_free(ofname) ;
+		            if (rs >= 0) rs = rs1 ;
+		        } /* end if (m-a-f) */
+	            } /* end if (sncpy) */
+		    rs1 = uc_free(cbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (gethomeorg) */
@@ -283,33 +290,31 @@ static int getuserorg_passwd(SI *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
+	char		*pwbuf{} ;
+	if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	    PASSWD	pw ;
 	    cint	pwlen = rs ;
-	    char	*pwbuf{} ;
-	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	        if (sip->un[0] == '-') {
-	            rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
-	        } else {
-	            rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->un) ;
-	        }
-	        if (rs >= 0) {
-	            gecos	g ;
-	            if ((rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
-	                cint	gi = gecosval_organization ;
-	                cchar	*vp{} ;
-	                if (int vl ; (vl = gecos_getval(&g,gi,&vp)) > 0) {
-	                    rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
-	                    len = rs ;
-	                }
-	                rs1 = gecos_finish(&g) ;
-			if (rs >= 0) rs = rs1 ;
-	            } /* end if (gecos) */
-	        } /* end if (get PW entry) */
-	        rs1 = uc_free(pwbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
-	} /* end if (getbufsize) */
+	    if (sip->un[0] == '-') {
+	        rs = getpwusername(&pw,pwbuf,pwlen,-1) ;
+	    } else {
+	        rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->un) ;
+	    }
+	    if (rs >= 0) {
+	        gecos	g ;
+	        if ((rs = gecos_start(&g,pw.pw_gecos,-1)) >= 0) {
+	            cint	gi = gecosval_organization ;
+	            cchar	*vp{} ;
+	            if (int vl ; (vl = gecos_getval(&g,gi,&vp)) > 0) {
+	                rs = sncpy1w(sip->rbuf,sip->rlen,vp,vl) ;
+	                len = rs ;
+	            }
+	            rs1 = gecos_finish(&g) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (gecos) */
+	    } /* end if (get PW entry) */
+	    rs1 = uc_free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getuserorg_passwd) */

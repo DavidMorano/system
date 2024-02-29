@@ -1135,6 +1135,7 @@ willaddover.o:		willaddover.cc willaddover.h
 getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h
+getuserorg.o:		getuserorg.cc getuserorg.h
 getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h

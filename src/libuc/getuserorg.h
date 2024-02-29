@@ -19,7 +19,8 @@
 
 EXTERNC_begin
 
-extern int	getuserorg(cchar *,char *,int,cchar *) noex ;
+extern int	getuserorg(char *,int,cchar *) noex ;
+extern int	gethomeorg(char *,int,cchar *) noex ;
 
 EXTERNC_end
 
