@@ -73,7 +73,7 @@
 #include	<getbufsize.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<issue.h>

@@ -95,7 +95,7 @@
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<ids.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<filebuf.h>
 #include	<localmisc.h>
 

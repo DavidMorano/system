@@ -100,7 +100,7 @@
 #include	<userinfo.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ascii.h>
 #include	<toxc.h>
 #include	<spawner.h>

@@ -50,7 +50,7 @@
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<field.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

@@ -50,7 +50,7 @@
 #include	<usystem.h>
 #include	<filebuf.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getuserorg.h>
 #include	<char.h>
 #include	<isnot.h>

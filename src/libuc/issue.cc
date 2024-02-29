@@ -58,7 +58,7 @@
 #include	<vechand.h>
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>

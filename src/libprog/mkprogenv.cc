@@ -91,7 +91,7 @@
 #include	<envlist.h>
 #include	<uinfo.h>
 #include	<userattr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"mkprogenv.h"

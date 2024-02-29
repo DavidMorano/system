@@ -80,7 +80,7 @@
 #include	<filebuf.h>
 #include	<expcook.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ugetpw.h>
 #include	<ascii.h>
 #include	<getsysmisc.h>

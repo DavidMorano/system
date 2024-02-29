@@ -57,7 +57,7 @@
 
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<localmisc.h>

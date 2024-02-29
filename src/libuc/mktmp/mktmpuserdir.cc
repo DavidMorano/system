@@ -50,7 +50,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<dirs.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>

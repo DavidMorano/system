@@ -58,7 +58,7 @@
 #include	<char.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<nulstr.h>
 #include	<localmisc.h>
 

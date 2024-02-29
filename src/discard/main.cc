@@ -70,7 +70,7 @@
 #include	<hostent.h>
 #include	<storebuf.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<exitcodes.h>
 #include	<mallocstuff.h>
 #include	<localmisc.h>

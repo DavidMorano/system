@@ -76,7 +76,7 @@
 #include	<mallocxx.h>
 #include	<uinfo.h>
 #include	<getnodename.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getprojname.h>		/* |getprojname(3uc)| */
 #include	<userattrdb.h>
 #include	<getax.h>

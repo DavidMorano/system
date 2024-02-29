@@ -69,7 +69,7 @@
 #include	<varsub.h>
 #include	<storebuf.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<mallocstuff.h>
 #include	<exitcodes.h>

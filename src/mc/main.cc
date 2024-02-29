@@ -68,7 +68,7 @@
 #include	<mallocstuff.h>
 #include	<pcsconf.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

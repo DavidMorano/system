@@ -52,7 +52,7 @@
 #include	<getbufsize.h>
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<mkpathx.h>
 #include	<strwcpy.h>
 #include	<strn.h>

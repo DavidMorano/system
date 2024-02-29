@@ -55,7 +55,7 @@
 #include	<msfile.h>
 #include	<kinfo.h>
 #include	<lfm.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getutmpent.h>
 #include	<sockaddress.h>
 #include	<exitcodes.h>

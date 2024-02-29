@@ -59,7 +59,7 @@
 #include	<osetstr.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<field.h>
 #include	<pcsns.h>
 #include	<grmems.h>

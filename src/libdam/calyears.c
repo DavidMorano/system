@@ -54,7 +54,7 @@
 #include	<vecstr.h>
 #include	<dayofmonth.h>
 #include	<tmtime.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<fsdir.h>
 #include	<endianstr.h>
 #include	<localmisc.h>

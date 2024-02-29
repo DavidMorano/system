@@ -169,7 +169,7 @@ OBJ062= bufsizevar.o
 OBJ063=
 
 OBJ064= getprotofamily.o geteaddrinfo.o getaf.o getaflen.o getpwd.o
-OBJ065= getnodedomain.o getutmpent.o getax.o getuserhome.o getxusername.o
+OBJ065= getnodedomain.o getutmpent.o getax.o getuserhome.o getusername.o
 OBJ066= getbufsize.o getbufsizenames.o gethz.o getngroups.o getproto.o getserv.o
 OBJ067= digbfsizes.o
 OBJ068= getportnum.o getenver.o getourenv.o
@@ -815,8 +815,8 @@ upt.o:			upt.cc upt.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
+getusername.o:		getusername.cc getusername.h
 getuserhome.o:		getuserhome.cc getuserhome.h
-getxusername.o:		getxusername.cc getxusername.h
 
 getutmpent.o:		getutmpent.cc getutmpent.h
 mkutmpid.o:		mkutmpid.cc mkutmpid.h

@@ -40,7 +40,7 @@
 #include	<errno.h>
 
 #include	<usystem.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"ftpsession.h"

@@ -60,7 +60,7 @@
 #include	<varnames.hh>
 #include	<syswords.hh>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getuserhome.h>
 #include	<gecos.h>
 #include	<filereadln.h>

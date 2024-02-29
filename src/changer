@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} userattr_ "
+NAMES="${NAMES} getxusername.h"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/userattr_/s//userattrdb_/g
+g/getxusername.h/s//getusername.h/g
 	w
 	q
 EOF

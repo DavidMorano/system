@@ -54,7 +54,7 @@
 #include	<vechand.h>
 #include	<tmtime.h>
 #include	<holidays.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<fsdir.h>
 #include	<paramfile.h>
 #include	<ascii.h>

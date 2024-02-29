@@ -58,7 +58,7 @@
 #include	<estrings.h>
 #include	<ascii.h>
 #include	<hdbstr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

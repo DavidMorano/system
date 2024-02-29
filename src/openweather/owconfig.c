@@ -48,7 +48,7 @@
 #include	<expcook.h>
 #include	<logfile.h>
 #include	<lfm.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getutmpent.h>
 #include	<localmisc.h>
 

@@ -62,7 +62,7 @@
 #include	<passwdent.h>
 #include	<pwfile.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"config.h"

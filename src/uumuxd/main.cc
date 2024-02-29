@@ -66,7 +66,7 @@
 #include	<vecstr.h>
 #include	<varsub.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<mallocstuff.h>
 #include	<srvtab.h>

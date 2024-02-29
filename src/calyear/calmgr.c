@@ -44,7 +44,7 @@
 #include	<ids.h>
 #include	<vecstr.h>
 #include	<tmtime.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<fsdir.h>
 #include	<ucmallreg.h>
 #include	<endianstr.h>

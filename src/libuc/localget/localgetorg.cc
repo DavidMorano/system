@@ -55,7 +55,7 @@
 #include	<syswords.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getuserhome.h>
 #include	<getax.h>
 #include	<gecos.h>

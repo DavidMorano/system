@@ -69,7 +69,7 @@
 #include	<ids.h>
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<fsdir.h>
 #include	<localmisc.h>
 #include	<sncpyx.h>

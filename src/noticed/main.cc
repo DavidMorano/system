@@ -62,7 +62,7 @@
 #include	<varsub.h>
 #include	<storebuf.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<pwfile.h>
 #include	<userinfo.h>
 #include	<mallocstuff.h>

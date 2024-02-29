@@ -45,7 +45,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<syswords.hh>
 #include	<strlibval.hh>
 #include	<mkpathx.h>

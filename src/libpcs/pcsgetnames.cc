@@ -83,7 +83,7 @@
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<filereadln.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"pcsgetnames.h"

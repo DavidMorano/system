@@ -44,7 +44,7 @@
 #include	<bfile.h>
 #include	<baops.h>
 #include	<realname.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<pwfile.h>
 #include	<mallocstuff.h>
 #include	<exitcodes.h>

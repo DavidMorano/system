@@ -76,7 +76,7 @@
 #include	<fsdir.h>
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<sfx.h>
 #include	<mkpathx.h>
 #include	<hasx.h>

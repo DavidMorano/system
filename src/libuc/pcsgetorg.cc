@@ -4,7 +4,6 @@
 /* get the PCS organization */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 

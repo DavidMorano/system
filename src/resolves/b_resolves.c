@@ -115,7 +115,7 @@
 #include	<vecobj.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<lfm.h>
 #include	<getutmpent.h>
 #include	<fsdir.h>

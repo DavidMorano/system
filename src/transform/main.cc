@@ -56,7 +56,7 @@
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<baops.h>
 #include	<varsub.h>

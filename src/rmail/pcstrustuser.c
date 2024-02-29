@@ -67,7 +67,7 @@
 #include	<vecstr.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 

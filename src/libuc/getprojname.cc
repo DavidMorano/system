@@ -41,7 +41,7 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 

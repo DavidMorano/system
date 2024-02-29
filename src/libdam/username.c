@@ -48,7 +48,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 

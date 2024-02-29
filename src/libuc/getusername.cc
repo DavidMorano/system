@@ -1,4 +1,4 @@
-/* getxusername SUPPORT */
+/* getusername SUPPORT */
 /* lang=C++20 */
 
 /* get the best approximation of the user's username */
@@ -143,7 +143,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-#include	"getxusername.h"
+#include	"getusername.h"
 
 
 /* local defines */

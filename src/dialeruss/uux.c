@@ -56,7 +56,7 @@
 #include	<ids.h>
 #include	<keyopt.h>
 #include	<logfile.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<localmisc.h>
 

@@ -47,7 +47,7 @@
 #include	<sbuf.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<gecos.h>
 #include	<filereadln.h>
 #include	<localmisc.h>

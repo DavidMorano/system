@@ -44,7 +44,7 @@
 #include	<estrings.h>
 #include	<bits.h>
 #include	<bfile.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<netfile.h>
 #include	<vecstr.h>
 #include	<ucmallreg.h>

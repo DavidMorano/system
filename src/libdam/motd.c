@@ -81,7 +81,7 @@
 #include	<vechand.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ptma.h>
 #include	<ptm.h>
 #include	<lockrw.h>
