@@ -1,4 +1,4 @@
-/* buffer SUPPORT */
+/* buffer_main SUPPORT */
 /* lang=C++20 */
 
 /* string buffer object */
@@ -95,8 +95,6 @@ using std::max ;
 
 
 /* forward references */
-
-int		buffer_getbuf(buffer *,cchar **) ;
 
 template<typename ... Args>
 static inline int buffer_ctor(buffer *op,Args ... args) noex {

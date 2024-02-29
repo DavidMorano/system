@@ -731,7 +731,6 @@ sbuf.o:			sbuf.cc sbuf.h
 sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
 sbuf_termconseq.o:	sbuf_termconseq.c sbuf.h
 
-buffer.o:		buffer.cc buffer.h
 obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
@@ -1075,6 +1074,11 @@ localget.o:		localget.dir
 localget.dir:
 	makesubdir $@
 
+# BUFFER
+buffer.o:		buffer.dir
+buffer.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1190,7 +1194,6 @@ pwcache.o:		pwcache.cc	pwcache.h
 lockrw.o:		lockrw.cc	lockrw.h
 filebuf.o:		filebuf.cc	filebuf.h
 nodedb.o:		nodedb.cc	nodedb.h
-buffer.o:		buffer.cc	buffer.h
 mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc ccfile.hh
 thrcomm.o:		thrcomm.cc thrcomm.h
