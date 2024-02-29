@@ -85,24 +85,8 @@
 
 #define	SI		SUBINFO
 
-#ifndef	ETCDNAME
-#define	ETCDNAME	"/etc"
-#endif
-
 #undef	ORGCNAME
 #define	ORGCNAME	"organization"
-
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARORGANIZATION
-#define	VARORGANIZATION	"ORGANIZATION"
-#endif
 
 
 /* external subroutines */
