@@ -51,16 +51,20 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<strlibval.h>
+#include	<varnames.hh>
+#include	<syswords.hh>
+#include	<mallocxx.h>
+#include	<strlibval.hh>
 #include	<sncpyx.h>
+#include	<snx.h>
 #include	<mkpathx.h>
 #include	<getuserhome.h>
+#include	<getuserorg.h>
 #include	<filereadln.h>
 #include	<isnot.h>
 #include	<localmisc.h>
@@ -69,10 +73,6 @@
 
 
 /* local defines */
-
-#ifndef	VARORGCODE
-#define	VARORGCODE	"ORGCODE"
-#endif
 
 #ifndef	ORGLEN
 #define	ORGLEN		MAXNAMELEN
@@ -84,27 +84,79 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	snabbr(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	nextfield(cchar *,int,cchar **) ;
-extern int	getuserhome(char *,int,cchar *) ;
-extern int	getuserorg(char *,int,cchar *) ;
-extern int	touc(int) ;
-extern int	isNotPresent(int) ;
-
 
 /* external variables */
 
 
 /* local structures */
 
+enum orgcodercos {
+	orgcoderco_finish,
+	orgcoderco_overlast
+} ;
+
+namespace {
+    struct orgcoder ;
+    struct orgcoder_co {
+	orgcoder	*op ;
+	int		w ;
+	void operator () (orgcoder *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+        operator int () noex ;
+    } ; /* end struct (orgcoder_co) */
+    struct orgcoder {
+	cchar		*pr ;
+	cchar		*un ;
+	char		*rbuf ;
+	char		*tfname = nullptr ;
+	int		rlen ;
+	orgcoder_co	finish ;
+	orgcoder(cc *p,cc *u,char *b,int l) noex : pr(p), un(u) {
+	    rbuf = b ;
+	    rlen = l ;
+	    finish(this,orgcoderco_finish) ;
+	} ;
+	int start(char *tb) noex {
+	    tfname = tb ;
+	    return SR_OK ;
+	} ;
+	operator int () noex ;
+	int userenv() noex ;
+	int userconf() noex ;
+	int localconf() noex ;
+	int sysconf() noex ;
+	int orgabbr() noex ;
+	int ifinish() noex ;
+	~orgcoder() {
+	    (void) ifinish() ;
+	} ;
+    } ; /* end struct (orgcoder) */
+}
+
+typedef int (orgcoder::*orgcoder_m)() noex ;
+
 
 /* forward references */
 
 
 /* local variables */
+
+static strlibval	orgcode(strlibval_orgcode) ;
+
+static cchar		*etcdname = sysword.w_etcdir ;
+
+constexpr cchar		ocfname[] = ORGCODEFNAME ;
+
+constexpr orgcoder_m	mems[] = {
+	&orgcoder::userenv,
+	&orgcoder::userconf,
+	&orgcoder::localconf,
+	&orgcoder::sysconf,
+	&orgcoder::orgabbr,
+	nullptr
+} ;
 
 
 /* exported variables */
@@ -113,88 +165,142 @@ extern int	isNotPresent(int) ;
 /* exported subroutines */
 
 int localgetorgcode(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-	cchar		*etcdname = ETCDNAME ;
-	cchar		*ocfname = ORGCODEFNAME ;
-	cchar		*orgcode = getenv(VARORGCODE) ;
-	char		tfname[MAXPATHLEN+1] ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-
-/* user environment */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    if ((orgcode != NULL) && (orgcode[0] != '\0')) {
-	        rs = sncpy1(rbuf,rlen,orgcode) ;
-	        len = rs ;
-	    }
-	}
-
-/* user configuration */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    cint	hlen = MAXPATHLEN ;
-	    char	hbuf[MAXPATHLEN+1] ;
-	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
-	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-		if ((rs = mkpath3(tfname,hbuf,etcdname,ocfname)) >= 0) {
-		    rs = filereadln(tfname,rbuf,rlen) ;
-		    len = rs ;
-		}
-	    } /* end if (getuserhome) */
-	}
-
-/* software facility (LOCAL) configuration */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    if ((rs = mkpath3(tfname,pr,etcdname,ocfname)) >= 0) {
-	        rs = filereadln(tfname,rbuf,rlen) ;
-	        len = rs ;
-	    }
-	}
-
-/* any operating system configuration (in '/etc') */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    if ((rs = mkpath3(tfname,"/",etcdname,ocfname)) >= 0) {
-	        rs = filereadln(tfname,rbuf,rlen) ;
-	        len = rs ;
-	    }
-	}
-
-/* create it out of the abbreviation of the organization name */
-
-	if ((len <= 0) && ((rs >= 0) || isNotPresent(rs))) {
-	    cint	orglen = ORGLEN ;
-	    char	orgbuf[ORGLEN+1] ;
-	    if ((un == NULL) || (un[0] == '\0')) un = "-" ;
-	    rs = getuserorg(orgbuf,orglen,un) ;
-	    if ((rs == SR_NOENT) || (rs == 0)) {
-	        rs = localgetorg(pr,orgbuf,orglen,un) ;
-	    }
-	    if (rs > 0) {
-		rs = snabbr(rbuf,rlen,orgbuf,rs) ;
-		len = rs ;
-	    }
-	}
-
-/* get out (nicely as possible in our case) */
-
-	if ((rs < 0) && isNotPresent(rs)) {
-	    rs = SR_OK ;
-	    len = 0 ;
-	}
-
+	if (pr && rbuf) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
+	    if (pr[0]) {
+	        char	*tfname{} ;
+		if ((rs = malloc_mp(&tfname)) >= 0) {
+		    orgcoder	oo(pr,un,rbuf,rlen) ;
+		    if ((rs = oo.start(tfname)) >= 0) {
+			{
+			    rs = oo ;
+			    len = rs ;
+			}
+			rs1 = oo.finish ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (orgcoder) */
+		    rs1 = uc_free(tfname) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (localgetorgcode) */
 
 
 /* local subroutines */
+
+int orgcoder::userenv() noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	if (orgcode && (orgcode[0] != '\0')) {
+	    rs = sncpy1(rbuf,rlen,orgcode) ;
+	    len = rs ;
+	}
+	return (rs >= 0) ? len : rs ;
+}
+
+int orgcoder::userconf() noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	char		*hbuf{} ;
+	if ((rs = malloc_mp(&hbuf)) >= 0) {
+	    cint	hlen = rs ;
+	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
+		if ((rs = mkpath3(tfname,hbuf,etcdname,ocfname)) >= 0) {
+		     if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
+		         len = rs ;
+		     } else if (isNotPresent(rs)) {
+			 rs = SR_OK ;
+		     }
+	         }
+	    } /* end if (getuserhome) */
+	    rs1 = uc_free(hbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int orgcoder::localconf() noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = mkpath3(tfname,pr,etcdname,ocfname)) >= 0) {
+	    if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
+		len = rs ;
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+}
+	
+int orgcoder::sysconf() noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = mkpath(tfname,etcdname,ocfname)) >= 0) {
+	    if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
+		len = rs ;
+	    } else if (isNotPresent(rs)) {
+		rs = SR_OK ;
+	    }
+	}
+	return (rs >= 0) ? len : rs ;
+}
+
+int orgcoder::orgabbr() noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	char		*obuf{} ;
+	if ((rs = malloc_mn(&obuf)) >= 0) {
+	    cint	olen = rs ;
+	    rs = getuserorg(obuf,olen,un) ;
+	    if ((rs == SR_NOENT) || (rs == 0)) {
+	        rs = localgetorg(pr,obuf,olen,un) ;
+	    }
+	    if (rs > 0) {
+		rs = snabbr(rbuf,rlen,obuf,rs) ;
+		len = rs ;
+	    }
+	    rs1 = uc_free(obuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int orgcoder::ifinish() noex {
+	return SR_OK ;
+}
+
+orgcoder::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs != 0) && mems[i] ; i += 1) {
+	    orgcoder_m	m = mems[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+
+orgcoder_co::operator int () noex {
+	int		rs = SR_BUGCHECK ;
+	if (op) {
+	    switch (w) {
+	    case orgcoderco_finish:
+		rs = op->ifinish() ;
+		break ;
+	    } /* end switch */
+	}
+	return rs ;
+}
+
+
+
+
 

@@ -1,5 +1,5 @@
 /* snfsflags SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of the file-system flags */
 /* version %I% last-modified %G% */
@@ -39,9 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/statvfs.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -50,6 +48,12 @@
 
 
 /* local defines */
+
+
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -71,7 +75,7 @@ struct flagstrs {
 
 /* local variables */
 
-static const struct flagstrs	fs_vstat[] = {
+static constexpr struct flagstrs	fs_vstat[] = {
 	{ ST_RDONLY, "RDONLY" },
 	{ ST_NOSUID, "NOSUID" },
 #ifdef	ST_NOTRUNC
@@ -81,13 +85,16 @@ static const struct flagstrs	fs_vstat[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snfsflags(char *dbuf,int dlen,ulong flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    SNFLAGS	ss ;
+	    snflags	ss ;
 	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
 	        for (int i = 0 ; (rs >= 0) && fs_vstat[i].f ; i += 1) {
 	            if (flags & fs_vstat[i].f) {

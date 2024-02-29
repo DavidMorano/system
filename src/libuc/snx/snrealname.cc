@@ -1,5 +1,5 @@
 /* snrealname SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* string-copy a real-name (consisting of parts) */
 /* version %I% last-modified %G% */
@@ -39,9 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>		/* <- for |INT_MAX| */
-#include	<stdlib.h>
+#include	<climits>		/* <- for |INT_MAX| */
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -54,11 +52,10 @@
 
 int snrealname(char *dbuf,int dlen,cchar **a,int n) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		si = 0 ;
 	int		c = 0 ;
 	if (n < 0) n = INT_MAX ;
-	for (i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {
 	    if (a[i][0] != '\0') {
 		if (c++ > 0) {
 		    rs = storebuf_char(dbuf,dlen,si,'.') ;

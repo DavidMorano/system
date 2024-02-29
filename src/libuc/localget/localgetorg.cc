@@ -41,7 +41,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -248,19 +247,19 @@ static int subinfo_finish(SI *sip) noex {
 static int localgetorg_var(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	cchar		*vun = varname.username ;
-	cchar		*vorg = varname.organization ;
+	cchar		*vnun = varname.username ;
+	cchar		*vnorg = varname.organization ;
 	cchar		*un = sip->un ;
 	bool		f = (un[0] == '-') ;
 	if (! f) {
-	    static cchar	*vun = getenv(vun) ;
+	    static cchar	*vun = getenv(vnun) ;
 	    if (vun && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
-	    static cchar	*orgp = getenv(vorg) ;
-	    if (orgp) {
-		rs = sncpy1(sip->rbuf,sip->rlen,orgp) ;
+	    static cchar	*vorg = getenv(vnorg) ;
+	    if (vorg) {
+		rs = sncpy1(sip->rbuf,sip->rlen,vorg) ;
 		len = rs ;
 	    }
 	} /* end if */

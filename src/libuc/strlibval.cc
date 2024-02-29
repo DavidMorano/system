@@ -94,6 +94,7 @@ constexpr strenv::strenv() noex {
 	name[strlibval_mail] = varname.mail ;
 	name[strlibval_organization] = varname.organization ;
 	name[strlibval_orgloc] = varname.orgloc ;
+	name[strlibval_orgcode] = varname.orgcode ;
 }
 /* end method (strenv::ctor) */
 

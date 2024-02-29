@@ -207,16 +207,16 @@
 #define	VARTZ		"TZ"
 #endif
 
-#ifndef	VARMD
-#define	VARMD		"MAILDIR"
-#endif
-
 #ifndef	VARWSTATION
 #define	VARWSTATION	"WSTATION"
 #endif
 
 #ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
+#endif
+
+#ifndef	VARMAILDIR
+#define	VARMAILDIR	"MAILDIR"
 #endif
 
 #ifndef	VAROSTYPE
@@ -463,7 +463,8 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	    memclear(uip) ;		/* dangerous */
 	    static int	rsv = mkvars() ;
 	    if ((rs = rsv) >= 0) {
-	        uip->nodename = getenv(VARNODE) ;
+		static cchar	*nn = getenv(VARNODE) ;
+	        uip->nodename = nn ;
 	        if ((rs = userinfo_id(uip)) >= 0) {
 	            cint	sz = (uit_overlast * sizeof(cchar *)) ;
 	            void	*vp{} ;
@@ -717,7 +718,7 @@ static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	size += var.maxpathlen ;
 	size += pip->tlen ;
 	if ((rs = uc_malloc(size,&bp)) >= 0) {
-	    int	bl = 0 ;
+	    int		bl = 0 ;
 	    pip->a = bp ;
 	    pip->uap = (userattrdb *) (bp+bl) ;
 	    bl += sizeof(userattrdb) ;
@@ -982,7 +983,7 @@ static int procinfo_shell(PROCINFO *pip) noex {
 	            vp = getenv(VARSHELL) ;
 	        }
 	    }
-	    if ((vp != nullptr) && (vp[0] != '\0')) {
+	    if (vp && (vp[0] != '\0')) {
 	        uip->shell = vp ;
 	    }
 	}
@@ -1513,7 +1514,7 @@ static int procinfo_md(PROCINFO *pip) noex {
 	    uip->md = nullptr ;
 	    if (uip->md == nullptr) {
 	        if (! pip->f.altuser) {
-	            uip->md = getenv(VARMD) ;
+	            uip->md = getenv(VARMAILDIR) ;
 	        }
 	    }
 	    if (uip->md == nullptr) {

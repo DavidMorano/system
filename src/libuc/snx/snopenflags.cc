@@ -1,5 +1,5 @@
 /* snopenflags SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of the open-call flags */
 /* version %I% last-modified %G% */
@@ -38,9 +38,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -48,6 +47,8 @@
 
 
 /* local defines */
+
+#define	FLAGSTRS	struct flagstrs
 
 
 /* external subroutines */
@@ -69,7 +70,7 @@ struct flagstrs {
 
 /* local variables */
 
-static const struct flagstrs	fs_open[] = {
+static constexpr struct flagstrs	fs_open[] = {
 	{ O_APPEND, "APPEND" },
 	{ O_CREAT, "CREAT" },
 	{ O_EXCL, "EXCL" },
@@ -97,8 +98,11 @@ static const struct flagstrs	fs_open[] = {
 #ifdef	O_NETWORK
 	{ O_NETWORK, "NETWORK" },
 #endif
-	{ 0, NULL }
-} ;
+	{ 0, nullptr }
+} ; /* end struct (flagstrs) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -107,10 +111,10 @@ int snopenflags(char *dbuf,int dlen,int flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    SNFLAGS	ss ;
+	    snflags	ss ;
 	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
 	        cint	am = (flags & O_ACCMODE) ;
-	        cchar	*ms = NULL ;
+	        cchar	*ms = nullptr ;
 	        switch (am) {
 	        case O_RDONLY:
 		    ms = "RDONLY" ;

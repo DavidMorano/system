@@ -1,5 +1,5 @@
 /* snloadavg SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of a load-average */
 /* version %I% last-modified %G% */
@@ -43,16 +43,17 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<string.h>
+#include	<sys/param.h>		/* |FSCALE| + |FSHIFT| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<ctdec.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 
 /* local defines */
+
+#define	PARTS		struct parts
 
 
 /* external subroutines */
@@ -71,11 +72,14 @@ struct parts {
 
 /* forward references */
 
-static int	parts_load(struct parts *,uint) noex ;
-static int	parts_round(struct parts *,int) noex ;
+static int	parts_load(PARTS *,uint) noex ;
+static int	parts_round(PARTS *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -84,65 +88,53 @@ int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (dbuf) {
-	struct parts	partla, *pp = &partla ;
-	cint		diglen = DIGBUFLEN ;
-	int		zfprec ;
-	int		dl ;
-	int		prec = -1 ;
-	cchar	*dp ;
-	char		digbuf[DIGBUFLEN+1] ;
+	    PARTS	partla, *pp = &partla ;
+	    cint	diglen = DIGBUFLEN ;
+	    int		zfprec ;
+	    int		dl ;
+	    int		prec = -1 ;
+	    cchar	*dp ;
+	    char	digbuf[DIGBUFLEN+1] ;
 	    rs = SR_OK ;
-	if (p > 3) p = 3 ;
-
+	    if (p > 3) p = 3 ;
 /* calculate parts */
-
-	parts_load(pp,la) ;
-
+	    parts_load(pp,la) ;
 /* round out the value according to the specified precision */
-
-	parts_round(pp,p) ;
-
+	    parts_round(pp,p) ;
 /* calculate some parameters */
-
-	if (w >= 0) {
-	    if (p > 0) {
-	        prec = (w - 1 - p) ;
-	    } else {
-	        prec = w ;
-	    }
-	    if (prec < 0) prec = 0 ;
-	}
-
-/* put the resulting string together */
-
-	zfprec = (fill == 0) ? prec : 0 ;
-	dp = digbuf ;
-	if ((rs = ctdecpui(digbuf,diglen,zfprec,pp->parti)) >= 0) {
-	    dl = rs ;
-	    if ((prec >= 0) && (prec < dl)) {
-	        dp += (dl-prec) ;
-	        dl = prec ;
-	    }
-	    rs = storebuf_strw(dbuf,dlen,i,dp,dl) ;
-	    i += rs ;
-	}
-
-	if ((rs >= 0) && (p >= 0)) {
-
-	    rs = storebuf_char(dbuf,dlen,i,'.') ;
-	    i += rs ;
-
-	    if ((rs >= 0) && (p > 0)) {
-	        if ((rs = ctdecpui(digbuf,diglen,p,pp->partf)) >= 0) {
-	            dl = rs ;
-	            if (dl > p) dl = p ;
-	            rs = storebuf_strw(dbuf,dlen,i,digbuf,dl) ;
-	            i += rs ;
+	    if (w >= 0) {
+	        if (p > 0) {
+	            prec = (w - 1 - p) ;
+	        } else {
+	            prec = w ;
 	        }
-	    }
-
-	} /* end if */
-
+	        if (prec < 0) prec = 0 ;
+	    } /* end if */
+/* put the resulting string together */
+	    zfprec = (fill == 0) ? prec : 0 ;
+	    dp = digbuf ;
+	    if ((rs = ctdecpui(digbuf,diglen,zfprec,pp->parti)) >= 0) {
+	        dl = rs ;
+	        if ((prec >= 0) && (prec < dl)) {
+	            dp += (dl-prec) ;
+	            dl = prec ;
+	        }
+	        rs = storebuf_strw(dbuf,dlen,i,dp,dl) ;
+	        i += rs ;
+	    } /* end if (ctdec) */
+	    if ((rs >= 0) && (p >= 0)) {
+	        if ((rs = storebuf_char(dbuf,dlen,i,'.')) >= 0) {
+	            i += rs ;
+	            if (p > 0) {
+	                if ((rs = ctdecpui(digbuf,diglen,p,pp->partf)) >= 0) {
+	                    dl = rs ;
+	                    if (dl > p) dl = p ;
+	                    rs = storebuf_strw(dbuf,dlen,i,digbuf,dl) ;
+	                    i += rs ;
+	                } /* end if (ctdec) */
+		    } /* end if (p positive) */
+	        } /* end if (storebuf_char) */
+	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
@@ -151,7 +143,7 @@ int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
 
 /* local subroutines */
 
-static int parts_load(struct parts *pp,uint la) noex {
+static int parts_load(PARTS *pp,uint la) noex {
 	uint		partf = (la & (FSCALE-1)) ;
 	partf = (partf * 1000) ;
 	partf = (partf / FSCALE) ;
@@ -161,7 +153,7 @@ static int parts_load(struct parts *pp,uint la) noex {
 }
 /* end subroutine (parts_load) */
 
-static int parts_round(struct parts *pp,int prec) noex {
+static int parts_round(PARTS *pp,int prec) noex {
 	int		r ;
 	switch (prec) {
 	case 3: /* no change needed */

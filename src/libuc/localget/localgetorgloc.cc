@@ -52,7 +52,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -171,9 +170,9 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	if (pr && rbuf) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
+	    if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
 	    if (pr[0]) {
 	        char	*tfname{} ;
-	        if ((un == nullptr) || (un[0] == '\0')) un = "-" ;
 	        if ((rs = malloc_mp(&tfname)) >= 0) {
 		    orglocer	oo(pr,un,rbuf,rlen) ;
 		    if ((rs = oo.start(tfname)) >= 0) {

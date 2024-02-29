@@ -81,6 +81,7 @@ struct varnames {
 	static const char pager[] ;
 	static const char organization[] ;
 	static const char orgloc[] ;
+	static const char orgcode[] ;
 	static const char tmout[] ;
 	static const char editor[] ;
 	static const char visual[] ;

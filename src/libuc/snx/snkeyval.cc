@@ -1,5 +1,5 @@
 /* snkeyval SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* string formatting (key-value pair) */
 /* version %I% last-modified %G% */
@@ -43,7 +43,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<sncpyx.h>
@@ -56,6 +55,12 @@
 
 
 /* external subroutines */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

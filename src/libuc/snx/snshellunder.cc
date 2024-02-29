@@ -1,5 +1,5 @@
 /* snshellunder SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make the shell-under information string */
 /* version %I% last-modified %G% */
@@ -43,7 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |pid_t| */
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -55,6 +55,12 @@
 
 
 /* external subroutines */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

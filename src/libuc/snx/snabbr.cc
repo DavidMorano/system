@@ -1,5 +1,5 @@
 /* snabbr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* copy an abbreviation of a groups of words */
 /* version %I% last-modified %G% */
@@ -49,9 +49,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>
 #include	<toxc.h>
@@ -70,7 +69,7 @@ int snabbr(char *dp,int dl,cchar *sp,int sl) noex {
 	int		i = 0 ;
 	if (dp && sp) {
 	    int		cl ;
-	    cchar	*cp ;
+	    cchar	*cp{} ;
 	    rs = SR_OK ;
 	    if (dl < 0) dl = INT_MAX ;
 	    if (sl < 0) sl = strlen(sp) ;

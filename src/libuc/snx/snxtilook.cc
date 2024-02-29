@@ -1,5 +1,5 @@
 /* snxtilook SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of the XTI |t_look(3nsl)| codes */
 /* version %I% last-modified %G% */
@@ -38,9 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<xti.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<sncpy.h>
 #include	<localmisc.h>
@@ -82,17 +80,19 @@ static const struct val	vals[] = {
 	{ T_GODATA, "GODATA", "sending normal data is again possible" },
 	{ T_GOEXDATA, "GOEXDATA", "sending expedited data is again possible" },
 	{ -1, NULL }
-} ;
+} ; /* end struct (val) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int snxtilook(char *dbuf,int dlen,int v) noex {
+	cint		i = findent(v) ;
 	int		rs = SR_FAULT ;
 	if (dbuf) {
-	    int		i = findent(v) ;
-	    cchar	*n ;
-	    n = (i >= 0) ? vals[i].n : "UNKNOWN" ;
+	    ccha	*n = (i >= 0) ? vals[i].n : "UNKNOWN" ;
 	    rs = sncpy1(dbuf,dlen,n) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -103,7 +103,7 @@ int snxtilook(char *dbuf,int dlen,int v) noex {
 /* local subroutines */
 
 static int findent(int v) noex {
-	int		i ;
+	int		i ; /* <- used afterwards */
 	bool		f = false ;
 	for (i = 0 ; vals[i].v >= 0 ; i += 1) {
 	    f = (v == vals[i].v) ;

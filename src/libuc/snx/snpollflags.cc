@@ -1,5 +1,5 @@
 /* snpollflags SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of the poll-event flags */
 /* version %I% last-modified %G% */
@@ -38,10 +38,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -99,13 +98,16 @@ static const struct flagstrs	fs_poll[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snpollflags(char *dbuf,int dlen,int flags) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (dbuf) {
-	    SNFLAGS	ss ;
+	    snflags	ss ;
 	    if ((rs = snflags_start(&ss,dbuf,dlen)) >= 0) {
 	        for (int i = 0 ; (rs >= 0) && fs_poll[i].f ; i += 1) {
 	            if (flags & fs_poll[i].f) {

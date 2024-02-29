@@ -1,5 +1,5 @@
 /* snxtierr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make string version of the XTI t-error codes */
 /* version %I% last-modified %G% */
@@ -38,9 +38,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<xti.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -71,7 +69,7 @@ static int	findent(int) noex ;
 
 /* local variables */
 
-static const struct val	vals[] = {
+static constexpr struct val	vals[] = {
 	{ TBADADDR, "BADADDR", "incorrect address format" },
  	{ TBADOPT, "BADOPT", "incorrect options format" },
 	{ TACCES, "ACCESS", "illegal permissions" },
@@ -106,8 +104,11 @@ static const struct val	vals[] = {
 	"same but required by transport" },
 	{ TQFULL, "QFULL", "incoming connection queue is full" },
 	{ TPROTO, "PROTO", "protocol error on transport primitive" },
-	{ -1, NULL }
-} ;
+	{ -1, nullptr }
+} ; /* end struct (val) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -128,7 +129,7 @@ int snxtierr(char *dbuf,int dlen,int v) noex {
 /* local subroutines */
 
 static int findent(int v) noex {
-	int		i ;
+	int		i ; /* <- used afterwards */
 	bool		f = false ;
 	for (i = 0 ; vals[i].v >= 0 ; i += 1) {
 	    f = (v == vals[i].v) ;

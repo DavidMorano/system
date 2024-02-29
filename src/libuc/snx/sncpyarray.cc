@@ -39,9 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>

@@ -56,6 +56,7 @@ enum strlibvals {
 	strlibval_mail,
 	strlibval_organization,
 	strlibval_orgloc,
+	strlibval_orgcode,
 	strlibval_overlast
 } ;
 

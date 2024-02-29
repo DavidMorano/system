@@ -1,5 +1,5 @@
 /* snsigabbr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* make the string repreentation of a signal number */
 /* version %I% last-modified %G% */
@@ -37,9 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<string.h>
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<sncpyx.h>
@@ -51,7 +48,9 @@
 
 /* external subroutines */
 
-extern cchar	*strsigabbr(int) noex ;
+extern "C" {
+    extern cchar	*strsigabbr(int) noex ;
+}
 
 
 /* external variables */
@@ -66,13 +65,15 @@ extern cchar	*strsigabbr(int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snsigabbr(char *dbuf,int dlen,uint n) noex {
 	int		rs = SR_FAULT ;
 	if (dbuf) {
-	    cchar	*s ;
-	    if ((s = strsigabbr(n)) != nullptr) {
+	    if (cchar *s ; (s = strsigabbr(n)) != nullptr) {
 	        rs = sncpy1(dbuf,dlen,s) ;
 	    } else {
 	        rs = ctdecui(dbuf,dlen,n) ;
