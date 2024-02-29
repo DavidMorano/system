@@ -191,7 +191,7 @@ int localgetorgloc(cchar *pr,char *rbuf,int rlen,cchar *un) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (localgetorglocer) */
+/* end subroutine (localgetorgloc) */
 
 
 /* local subroutines */

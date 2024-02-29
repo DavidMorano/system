@@ -55,6 +55,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<uprogdata.h>
+#include	<mallocxx.h>
+#include	<strlibval.hh>
 #include	<filereadln.h>
 #include	<sncpyx.h>
 #include	<mkpathx.h>
@@ -96,6 +98,8 @@
 
 constexpr bool		f_uprogdata = CF_UPROGDATA ;
 
+constexpr cchar		ssn[] = SYSTATFNAME ;
+
 
 /* exported variables */
 
@@ -104,6 +108,7 @@ constexpr bool		f_uprogdata = CF_UPROGDATA ;
 
 int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
 	if (pr && rbuf) {
 	    rs = SR_INVALID ;
@@ -114,7 +119,7 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	        rbuf[0] = '\0' ;
 /* user environment */
 	        if ((rs >= 0) && (len == 0)) {
-	            cchar	*systat = getenv(VARSYSTAT) ;
+	            static cchar	*systat = getenv(VARSYSTAT) ;
 	            if (systat && (systat[0] != '\0')) {
 	                rs = sncpy1(rbuf,rlen,systat) ;
 	                len = rs ;
@@ -131,18 +136,21 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 /* software facility (LOCAL) configuration */
 	        if ((rs >= 0) && (len == 0)) {
 	            cchar	*vardname = VARDNAME ;
-	            cchar	*systatname = SYSTATFNAME ;
-	            char	tfname[MAXPATHLEN+1] ;
-	            if ((rs = mkpath3(tfname,pr,vardname,systatname)) >= 0) {
-	                if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
-	                    len = rs ;
-		            if constexpr (f_uprogdata) {
-	                        rs = uprogdata_set(di,rbuf,len,ttl) ;
+	            char	*tfname{} ;
+		    if ((rs = malloc_mp(&tfname)) >= 0) {
+	                if ((rs = mkpath3(tfname,pr,vardname,ssn)) >= 0) {
+	                    if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
+	                        len = rs ;
+		                if constexpr (f_uprogdata) {
+	                            rs = uprogdata_set(di,rbuf,len,ttl) ;
+		                }
+		            } else if (isNotPresent(rs)) {
+		                rs = SR_OK ;
 		            }
-		        } else if (isNotPresent(rs)) {
-		            rs = SR_OK ;
-		        }
-	            }
+	                } /* end if (mkpath) */
+			rs1 = uc_free(tfname) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 	        } /* end if (needed) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */

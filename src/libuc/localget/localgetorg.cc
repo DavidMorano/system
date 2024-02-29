@@ -51,18 +51,22 @@
 #include	<usystem.h>
 #include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>
+#include	<varnames.hh>
+#include	<syswords.hh>
 #include	<getbufsize.h>
-#include	<filebuf.h>
-#include	<getax.h>
+#include	<mallocxx.h>
 #include	<getxusername.h>
 #include	<getuserhome.h>
+#include	<getax.h>
 #include	<gecos.h>
+#include	<filebuf.h>
 #include	<filereadln.h>
 #include	<sfx.h>
 #include	<sncpyx.h>
 #include	<sncpyxw.h>
 #include	<mkpathx.h>
 #include	<char.h>
+#include	<strlibval.hh>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -85,20 +89,8 @@
 #define	LOCALUSERNAME	"local"
 #endif
 
-#ifndef	ETCDNAME
-#define	ETCDNAME	"/etc"
-#endif
-
 #undef	ORGCNAME
 #define	ORGCNAME	"organization"
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
-#endif
-
-#ifndef	VARORGANIZATION
-#define	VARORGANIZATION	"ORGANIZATION"
-#endif
 
 
 /* local namespaces */
@@ -148,6 +140,8 @@ static int	localgetorg_sys(SI *) noex ;
 
 
 /* local variables */
+
+static cchar		*etcdir = sysword.w_etcdir ;
 
 
 /* exported variables */
@@ -213,8 +207,7 @@ static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 		char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar	*cp ;
-	cchar	*ccp ;
+	cchar	*cp{} ;
 	memclear(sip) ;
 	sip->pr = pr ;
 	sip->un = un ;
@@ -228,8 +221,8 @@ static int subinfo_start(SI *sip,cc *pr,cc *ofn,cc *un,
 	    cp = LOCALUSERNAME ;
 	    cl = -1 ;
 	}
-	if ((rs = uc_mallocstrw(cp,cl,&ccp)) >= 0) {
-	    sip->prn = ccp ;
+	if (cchar *zp{} ; (rs = uc_mallocstrw(cp,cl,&zp)) >= 0) {
+	    sip->prn = zp ;
 	}
 	return rs ;
 }
@@ -256,15 +249,17 @@ static int localgetorg_var(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		f ;
 	int		len = 0 ;
+	cchar		*vun = varname.username ;
+	cchar		*vorg = varname.organization ;
 	cchar		*un = sip->un ;
 	f = (un[0] == '-') ;
 	if (! f) {
-	    cchar	*vun = getenv(VARUSERNAME) ;
+	    static cchar	*vun = getenv(vun) ;
 	    if ((vun != NULL) && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
-	    cchar	*orgp = getenv(VARORGANIZATION) ;
+	    static cchar	*orgp = getenv(vorg) ;
 	    if (orgp != NULL) {
 		rs = sncpy1(sip->rbuf,sip->rlen,orgp) ;
 		len = rs ;
@@ -300,7 +295,7 @@ static int localgetorg_pretc(SI *sip) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	char		orgfname[MAXPATHLEN+1] ;
-	if ((rs = mkpath3(orgfname,sip->pr,ETCDNAME,sip->ofn)) >= 0) {
+	if ((rs = mkpath3(orgfname,sip->pr,etcdir,sip->ofn)) >= 0) {
 	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
 	        len = rs ;
 	    } else if (isNotPresent(rs)) {
@@ -315,7 +310,7 @@ static int localgetorg_sys(SI *sip) noex {
 	int		rs ;
 	int		len = 0 ;
 	char		orgfname[MAXPATHLEN+1] ;
-	if ((rs = mkpath2(orgfname,ETCDNAME,sip->ofn)) >= 0) {
+	if ((rs = mkpath2(orgfname,etcdir,sip->ofn)) >= 0) {
 	    if ((rs = filereadln(orgfname,sip->rbuf,sip->rlen)) >= 0) {
 	        len = rs ;
 	    } else if (isNotPresent(rs)) {

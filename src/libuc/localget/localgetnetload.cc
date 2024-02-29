@@ -97,6 +97,8 @@
 
 constexpr bool		f_uprogdata = CF_UPROGDATA ;
 
+constexpr cchar		nlname[] = NETLOADFNAME ;
+
 
 /* exported variables */
 
@@ -116,7 +118,7 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 		rs = SR_OK ;
 /* user environment */
 	        if ((rs >= 0) && (len == 0)) {
-	            cchar	*netload = getenv(VARNETLOAD) ;
+	            static cchar	*netload = getenv(VARNETLOAD) ;
 	            if (netload && (netload[0] != '\0')) {
 	                rs = sncpy1(rbuf,rlen,netload) ;
 	                len = rs ;
@@ -133,7 +135,6 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 /* software facility (LOCAL) configuration */
 	        if ((rs >= 0) && (len == 0)) {
 	            cchar	*vardname = VARDNAME ;
-	            cchar	*nlname = NETLOADFNAME ;
 	            char	*tfname{} ;
 		    if ((rs = malloc_mp(&tfname)) >= 0) {
 	                if ((rs = mkpath3(tfname,pr,vardname,nlname)) >= 0) {
