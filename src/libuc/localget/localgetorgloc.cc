@@ -52,8 +52,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
@@ -73,7 +71,6 @@
 
 /* local defines */
 
-#define	ETCCNAME	"etc"
 #define	ORGLOCFNAME	"orgloc"
 
 

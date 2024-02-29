@@ -51,7 +51,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
@@ -74,11 +73,6 @@
 
 /* local defines */
 
-#ifndef	ORGLEN
-#define	ORGLEN		MAXNAMELEN
-#endif
-
-#define	ETCDNAME	"etc"
 #define	ORGCODEFNAME	"orgcode"
 
 
