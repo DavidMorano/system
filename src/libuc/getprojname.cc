@@ -103,7 +103,7 @@ int getprojname(char *rbuf,int rlen,cchar *un) noex {
 		            }
 		            rs1 = uc_free(pjbuf) ;
 		            if (rs >= 0) rs = rs1 ;
-	                } /* end if (memory-allocation) */
+	                } /* end if (m-a-f) */
 	            } /* end if (ok) */
 	        } /* end if (getbufsize) */
 	    } /* end if (valid) */

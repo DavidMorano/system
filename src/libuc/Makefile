@@ -236,7 +236,7 @@ OBJ121= nisdomainname.o
 OBJ122= opentmpfile.o opensysfs.o opensys_banner.o
 OBJ123= opensockaddr.o openaddrinfo.o
 OBJ124=
-OBJ125= getuid_name.o getgid_name.o getpjid_name.o
+OBJ125= getxid.o
 OBJ126= passwdent.o shadowent.o groupent.o projectent.o userattrent.o
 OBJ127= utmpaccent.o
 
@@ -1138,6 +1138,7 @@ intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
+getxid.o:		getxid.cc getxid.h
 getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h

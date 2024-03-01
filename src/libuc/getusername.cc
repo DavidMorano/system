@@ -363,7 +363,7 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	        }
 	        rs1 = uc_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
+	    } /* end if (m-a-f) */
 	} /* end if (getbufsize) */
 	return rs ;
 }
