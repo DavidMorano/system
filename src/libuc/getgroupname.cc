@@ -46,7 +46,7 @@
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
-#include	<varnames.hh>
+#include	<ucvariables.hh>	/* |varname| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getax.h>
@@ -61,7 +61,16 @@
 /* local defines */
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
