@@ -42,7 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |gid_t| */
 #include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
@@ -66,6 +66,30 @@
 
 /* local structures */
 
+namespace {
+    struct helper ;
+    typedef int (helper::*helper_m)() noex ;
+    struct helper {
+	cchar		*vgn = nullptr ;
+	char		*grbuf = nullptr ;
+	char		*rbuf ;
+	GROUP		gr ;
+	int		grlen ;
+	int		rlen ;
+	gid_t		gid ;
+	gid_t		ourgid ;
+	helper(char *b,int l,gid_t g) noex : rbuf(b), rlen(l), gid(g) { 
+	    ourgid = getgid() ;
+	} ;
+	int start(cchar *) noex ;
+	int finish() noex ;
+	operator int () noex ;
+	int isus() noex ;
+	int getgid() noex ;
+	int def() noex ;
+    } ; /* end struct (helper) */
+}
+
 
 /* forward references */
 
@@ -80,6 +104,13 @@ constexpr int	rsnotours[] = {
 	0
 } ;
 
+constexpr helper_m	mems[] = {
+	&helper::isus,
+	&helper::getgid,
+	&helper::def,
+	nullptr
+} ;
+
 constexpr gid_t		gidend = -1 ;
 
 
@@ -89,46 +120,23 @@ constexpr gid_t		gidend = -1 ;
 /* exported subroutines */
 
 int getgroupname(char *gbuf,int glen,gid_t gid) noex {
-	const gid_t	ourgid = getgid() ;
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*vn = varname.groupname ;
 	if (gbuf) {
 	    rs = SR_OVERFLOW ;
-	    if (gid == gidend) gid = ourgid ;
 	    if (glen > 0) {
-	        char		*grbuf{} ;
+		helper		ho(gbuf,glen,gid) ;
 	        static cchar	*vgn = getenv(vn) ;
-	        if ((rs = malloc_gr(&grbuf)) >= 0) {
-	            GROUP	gr ;
-	            cint	grlen = rs ;
-		    cchar	*gn = nullptr ;
-	            if ((gid == ourgid) && vgn) {
-	                if ((rs = getgr_name(&gr,grbuf,grlen,vgn)) >= 0) {
-	                    if (gr.gr_gid == gid) {
-				gn = vgn ;
-			    } else {
-			        rs = SR_SEARCH ;
-		            }
-		        }
-	            } else {
-	                rs = SR_NOTFOUND ;
-	            }
-	            if (isNotOurs(rs)) {
-	                rs = getgr_gid(&gr,grbuf,grlen,gid) ;
-		        gn = gr.gr_name ;
-	            }
-	            if ((rs >= 0) && gn) {
-	                rs = sncpy1(gbuf,glen,gn) ;
+		if ((rs = ho.start(vgn)) >= 0) {
+		    {
+			rs = ho ;
 			len = rs ;
-	            } else if (isNotOurs(rs)) {
-	                rs = snsd(gbuf,glen,"G",gid) ;
-			len = rs ;
-	            }
-	            rs1 = uc_free(grbuf) ;
+		    }
+		    rs1 = ho.finish() ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (m-a-f) */
+		} /* end if (helper) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
@@ -137,6 +145,70 @@ int getgroupname(char *gbuf,int glen,gid_t gid) noex {
 
 
 /* local subroutines */
+
+int helper::start(cchar *vgp) noex {
+	int		rs = SR_OK ;
+	if (gid == gidend) gid = ourgid ;
+	vgn = vgp ;
+	if ((rs = malloc_gr(&grbuf)) >= 0) {
+	    grlen = rs ;
+	}
+	return rs ;
+}
+
+int helper::finish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (grbuf) {
+	    rs1 = uc_free(grbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    grbuf = nullptr ;
+	    grlen = 0 ;
+	}
+	return rs ;
+}
+
+helper::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
+	    helper_m	m = mems[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+
+int helper::isus() noex {
+	int		rs = SR_OK ;
+	int		len = 0 ;
+	if ((gid == ourgid) && vgn) {
+	    if ((rs = getgr_name(&gr,grbuf,grlen,vgn)) >= 0) {
+		if (gr.gr_gid == gid) {
+	            rs = sncpy(rbuf,rlen,vgn) ;
+		    len = rs ;
+		}
+	    } else if (isNotOurs(rs)) {
+		rs = SR_OK ;
+	    }
+	} /* end if (is us) */
+	return (rs >= 0) ? len : rs ;
+}
+
+int helper::getgid() noex {
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = getgr_gid(&gr,grbuf,grlen,gid)) >= 0) {
+	    cchar	*gn = gr.gr_name ;
+	    rs = sncpy(rbuf,rlen,gn) ;
+	    len = rs ;
+	} else if (isNotOurs(rs)) {
+	    rs = SR_OK ;
+	}
+	return (rs >= 0) ? len : rs ;
+}
+
+int helper::def() noex {
+	return snsd(rbuf,rlen,"G",gid) ;
+}
 
 static int isNotOurs(int rs) noex {
 	return isOneOf(rsnotours,rs) ;

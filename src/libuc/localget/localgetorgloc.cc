@@ -256,7 +256,7 @@ int orglocer::ifinish() noex {
 
 orglocer::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs != 0) && mems[i] ; i += 1) {
+	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
 	    orglocer_m	m = mems[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */

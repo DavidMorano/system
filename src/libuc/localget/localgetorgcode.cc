@@ -275,7 +275,7 @@ int orgcoder::ifinish() noex {
 
 orgcoder::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs != 0) && mems[i] ; i += 1) {
+	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
 	    orgcoder_m	m = mems[i] ;
 	    rs = (this->*m)() ;
 	} /* end for */
@@ -293,8 +293,5 @@ orgcoder_co::operator int () noex {
 	}
 	return rs ;
 }
-
-
-
 
 

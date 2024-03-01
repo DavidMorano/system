@@ -258,8 +258,8 @@ int getusername(char *ubuf,int ulen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	if (ubuf) {
 	    rs = SR_INVALID ;
+	    ubuf[0] = '\0' ;
 	    if (ulen > 0) {
-	        ubuf[0] = '\0' ;
 	        if ((rs = ucproguser_nameget(ubuf,ulen,uid)) == 0) {
 	            rs = getusernamer(ubuf,ulen,uid) ;
 	        } /* end if (ucproguser_nameget) */
