@@ -147,7 +147,7 @@ int getgroupname(char *gbuf,int glen,gid_t gid) noex {
 /* local subroutines */
 
 int helper::start(cchar *vgp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if (gid == gidend) gid = ourgid ;
 	vgn = vgp ;
 	if ((rs = malloc_gr(&grbuf)) >= 0) {
