@@ -73,7 +73,7 @@
 #include	<getsysmisc.h>
 #include	<ascii.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

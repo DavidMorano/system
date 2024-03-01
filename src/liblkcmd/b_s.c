@@ -86,7 +86,7 @@
 #include	<sntmtime.h>
 #include	<sbuf.h>
 #include	<termstr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

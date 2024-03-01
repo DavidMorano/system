@@ -165,13 +165,13 @@ OBJ058=
 OBJ059= pt_sigmask.o pt_atfork.o
 OBJ060=
 OBJ061= getrandom.o
-OBJ062= bufsizevar.o
+OBJ062= bufsizevar.o digbfsizes.o
 OBJ063=
 
 OBJ064= getprotofamily.o geteaddrinfo.o getaf.o getaflen.o getpwd.o
-OBJ065= getnodedomain.o getutmpent.o getax.o getuserhome.o getxusername.o
+OBJ065= getnodedomain.o getutmpent.o getax.o 
 OBJ066= getbufsize.o getbufsizenames.o gethz.o getngroups.o getproto.o getserv.o
-OBJ067= digbfsizes.o
+OBJ067= getusername.o getuserhome.o getgroupname.o getprojname.o
 OBJ068= getportnum.o getenver.o getourenv.o
 OBJ069= nextpowtwo.o ndigits.o ipow.o llpow.o findbit.o
 OBJ070= isFailOpen.o isFailConn.o
@@ -236,7 +236,7 @@ OBJ121= nisdomainname.o
 OBJ122= opentmpfile.o opensysfs.o opensys_banner.o
 OBJ123= opensockaddr.o openaddrinfo.o
 OBJ124=
-OBJ125= getuid_name.o getgid_name.o getpjid_name.o
+OBJ125= getxid.o
 OBJ126= passwdent.o shadowent.o groupent.o projectent.o userattrent.o
 OBJ127= utmpaccent.o
 
@@ -731,7 +731,6 @@ sbuf.o:			sbuf.cc sbuf.h
 sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
 sbuf_termconseq.o:	sbuf_termconseq.c sbuf.h
 
-buffer.o:		buffer.cc buffer.h
 obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
@@ -815,8 +814,10 @@ upt.o:			upt.cc upt.h
 
 spawnproc.o:		spawnproc.cc spawnproc.h
 
+getusername.o:		getusername.cc getusername.h
 getuserhome.o:		getuserhome.cc getuserhome.h
-getxusername.o:		getxusername.cc getxusername.h
+getgroupname.o:		getgroupname.cc getgroupname.h
+getprojname.o:		getprojname.cc getprojname.h
 
 getutmpent.o:		getutmpent.cc getutmpent.h
 mkutmpid.o:		mkutmpid.cc mkutmpid.h
@@ -1070,6 +1071,16 @@ chrono.o:		chrono.dir
 chrono.dir:
 	makesubdir $@
 
+# LOCALGET
+localget.o:		localget.dir
+localget.dir:
+	makesubdir $@
+
+# BUFFER
+buffer.o:		buffer.dir
+buffer.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1127,9 +1138,11 @@ intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
 digval.o:		digval.cc digval.h
 willaddover.o:		willaddover.cc willaddover.h
+getxid.o:		getxid.cc getxid.h
 getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h
+getuserorg.o:		getuserorg.cc getuserorg.h
 getourenv.o:		getourenv.cc getourenv.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 ids.o:			ids.cc ids.h
@@ -1140,6 +1153,7 @@ strwcpy.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
+findfilepath.o:		findfilepath.cc findfilepath.h
 #
 isproc.o:		isproc.cc isproc.h
 #
@@ -1184,7 +1198,6 @@ pwcache.o:		pwcache.cc	pwcache.h
 lockrw.o:		lockrw.cc	lockrw.h
 filebuf.o:		filebuf.cc	filebuf.h
 nodedb.o:		nodedb.cc	nodedb.h
-buffer.o:		buffer.cc	buffer.h
 mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc ccfile.hh
 thrcomm.o:		thrcomm.cc thrcomm.h

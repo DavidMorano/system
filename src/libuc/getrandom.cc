@@ -335,8 +335,9 @@ int rander::begin() noex {
 	        if ((rs = randomvar_start(rvp,0,0)) >= 0) {
 	            rv = vp ;
 		}
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uc_libfree(vp) ;
+		}
 	    } /* end if (memory-allocation) */
 	} /* end if (needed initialization) */
 	return rs ;

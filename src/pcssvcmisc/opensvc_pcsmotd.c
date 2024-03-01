@@ -63,7 +63,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<motd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

@@ -44,7 +44,7 @@
 #include	<field.h>
 #include	<sbuf.h>
 #include	<buffer.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"cm.h"

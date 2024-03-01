@@ -70,7 +70,7 @@
 #include	<bits.h>
 #include	<char.h>
 #include	<vecstr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<dayspec.h>

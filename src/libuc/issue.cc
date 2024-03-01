@@ -58,7 +58,7 @@
 #include	<vechand.h>
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
@@ -223,27 +223,27 @@ static int	isBaseMatch(cchar *,cchar *,cchar *) ;
 
 /* local variables */
 
-static cchar	*schedmaps[] = {
+static constexpr cchar	*schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
 	"%n.%f",
-	NULL
+	nullptr
 } ;
 
-static cchar	*envbad[] = {
+static constexpr cchar	*envbad[] = {
 	"TMOUT",
 	"A__z",
-	NULL
+	nullptr
 
 } ;
 
-static cchar	*envstrs[] = {
+static constexpr cchar	*envstrs[] = {
 	"KEYNAME",
 	"ADMIN",
 	"ADMINDIR",
-	NULL
+	nullptr
 } ;
 
 enum envstrs {
@@ -253,18 +253,21 @@ enum envstrs {
 	envstr_overlast
 } ;
 
-static cchar	*envpre = "ISSUE_" ;	/* environment prefix */
+static constexpr cchar	envpre[] = "ISSUE_" ;	/* environment prefix */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int issue_open(ISSUE *op,cchar pr[]) noex {
-	const time_t	dt = time(NULL) ;
+int issue_open(ISSUE *op,cchar *pr) noex {
+	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	cchar		*cp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -273,7 +276,7 @@ int issue_open(ISSUE *op,cchar pr[]) noex {
 
 	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
-	    if ((rs = ptm_create(&op->m,NULL)) >= 0) {
+	    if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
 	        if ((rs = issue_mapfind(op,dt)) >= 0) {
 	            if ((rs = issue_envbegin(op)) >= 0) {
 	                op->ti_lastcheck = dt ;
@@ -287,7 +290,7 @@ int issue_open(ISSUE *op,cchar pr[]) noex {
 	    } /* end if (ptm_create) */
 	    if (rs < 0) {
 	        uc_free(op->pr) ;
-	        op->pr = NULL ;
+	        op->pr = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 
@@ -299,7 +302,7 @@ int issue_close(ISSUE *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != ISSUE_MAGIC) return SR_NOTOPEN ;
 
@@ -316,10 +319,10 @@ int issue_close(ISSUE *op) noex {
 	rs1 = ptm_destroy(&op->m) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->pr != NULL) {
+	if (op->pr != nullptr) {
 	    rs1 = uc_free(op->pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->pr = NULL ;
+	    op->pr = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -334,7 +337,7 @@ int issue_close(ISSUE *op) noex {
 int issue_check(ISSUE *op,time_t dt) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != ISSUE_MAGIC) return SR_NOTOPEN ;
 
@@ -351,8 +354,8 @@ int issue_process(ISSUE *op,cchar *groupname,cchar **adms,int fd) noex {
 	int		wlen = 0 ;
 	void		*p ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (groupname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (groupname == nullptr) return SR_FAULT ;
 
 	if (op->magic != ISSUE_MAGIC) return SR_NOTOPEN ;
 
@@ -370,9 +373,9 @@ int issue_process(ISSUE *op,cchar *groupname,cchar **adms,int fd) noex {
 #if	CF_DEBUGS
 	{
 	    debugprintf("issue_process: tar groupname=%s\n",groupname) ;
-	    if (adms != NULL) {
+	    if (adms != nullptr) {
 	        int	i ;
-	        for (i = 0 ; adms[i] != NULL ; i += 1) {
+	        for (i = 0 ; adms[i] != nullptr ; i += 1) {
 	            debugprintf("issue_process: a[%u]=%s\n",i,adms[i]) ;
 		}
 	    }
@@ -511,7 +514,7 @@ static int issue_schedload(ISSUE *op,vecstr *slp) noex {
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
 	    const int	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
-	    cchar	*vp = NULL ;
+	    cchar	*vp = nullptr ;
 	    switch (kch) {
 	    case 'p':
 	        vp = op->pr ;
@@ -523,7 +526,7 @@ static int issue_schedload(ISSUE *op,vecstr *slp) noex {
 	        vp = name ;
 	        break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 	        char	kbuf[2] = { 
 	            0, 0 			} ;
 	        kbuf[0] = kch ;
@@ -540,7 +543,7 @@ static int issue_checker(ISSUE *op,time_t dt) noex {
 	int		nchanged = 0 ;
 	if (op->nmaps > 0) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
-	        if (dt == 0) dt = time(NULL) ;
+	        if (dt == 0) dt = time(nullptr) ;
 	        if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	            rs = mapper_check(&op->mapper,dt) ;
 	            nchanged = rs ;
@@ -563,14 +566,14 @@ static int issue_envbegin(ISSUE *op) noex {
 	int		f ;
 	void		*p ;
 
-	for (i = 0 ; environ[i] != NULL ; i += 1) ;
+	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
 
 	size = (i + 1) * sizeof(cchar *) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    cchar	*ep ;
 	    cchar	**va = (cchar **) p ;
 	    op->envv = va ;
-	    for (i = 0 ; environ[i] != NULL ; i += 1) {
+	    for (i = 0 ; environ[i] != nullptr ; i += 1) {
 	        ep = environ[i] ;
 	        f = TRUE ;
 	        f = f && (ep[0] != '_') ;
@@ -582,7 +585,7 @@ static int issue_envbegin(ISSUE *op) noex {
 	            va[c++] = ep ;
 		}
 	    } /* end for */
-	    va[c] = NULL ;
+	    va[c] = nullptr ;
 	    op->nenv = c ;
 	} /* end if (memory-allocation) */
 
@@ -594,10 +597,10 @@ static int issue_envend(ISSUE *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->envv != NULL) {
+	if (op->envv != nullptr) {
 	    rs1 = uc_free(op->envv) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->envv = NULL ;
+	    op->envv = nullptr ;
 	}
 
 	return rs ;
@@ -618,13 +621,13 @@ static int issue_envadds(ISSUE *op,STRPACK *spp,cchar **ev,
 	    ev[n] = envv[n] ;
 	}
 
-	for (i = 0 ; (rs >= 0) && (envstrs[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (envstrs[i] != nullptr) ; i += 1) {
 	    envbuf[0] = '\0' ;
 	    el = -1 ;
 	    switch (i) {
 	    case envstr_keyname:
 	        cp = keyname ;
-	        if ((cp != NULL) && (cp[0] != '\0')) {
+	        if ((cp != nullptr) && (cp[0] != '\0')) {
 	            rs = sncpy4(envbuf,envlen,envpre,envstrs[i],"=",cp) ;
 	            el = rs ;
 	        }
@@ -635,7 +638,7 @@ static int issue_envadds(ISSUE *op,STRPACK *spp,cchar **ev,
 	        if (rs > 0) n += 1 ;
 	    }
 	} /* end for */
-	ev[n] = NULL ; /* very important! */
+	ev[n] = nullptr ; /* very important! */
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -646,9 +649,9 @@ static int issue_envstore(ISSUE *op,STRPACK *spp,cchar *ev[],int n,
 	int		rs = SR_OK ;
 	cchar		*cp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (ep != NULL) {
+	if (ep != nullptr) {
 	    rs = strpack_store(spp,ep,el,&cp) ;
 	    if (rs >= 0) {
 	        ev[n++] = cp ;
@@ -744,7 +747,7 @@ static int mapper_start(ISSUE_MAPPER *mmp,time_t dt,cchar fname[]) noex {
 	        } /* end if (vechand_start) */
 	        if (rs < 0) {
 	            uc_free(mmp->fname) ;
-	            mmp->fname = NULL ;
+	            mmp->fname = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
 	    if (rs < 0)
@@ -763,7 +766,7 @@ static int mapper_finish(ISSUE_MAPPER *mmp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -788,10 +791,10 @@ static int mapper_finish(ISSUE_MAPPER *mmp) noex {
 	debugprintf("issue/mapper_finish: 3 rs=%d\n",rs) ;
 #endif
 
-	if (mmp->fname != NULL) {
+	if (mmp->fname != nullptr) {
 	    rs1 = uc_free(mmp->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mmp->fname = NULL ;
+	    mmp->fname = nullptr ;
 	}
 
 #if	CF_DEBUGS
@@ -816,14 +819,14 @@ static int mapper_check(ISSUE_MAPPER *mmp,time_t dt) noex {
 	int		rs ;
 	int		nchanged = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
 	if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
 	    const int	to = TO_MAPCHECK ;
 
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 
 	    if ((dt - mmp->ti_check) >= to) {
 
@@ -859,7 +862,7 @@ static int mapper_process(ISSUE_MAPPER *mmp,cchar **ev,cchar **adms,
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -880,9 +883,9 @@ static int mapper_process(ISSUE_MAPPER *mmp,cchar **ev,cchar **adms,
 
 #if	CF_DEBUGS
 	    debugprintf("issue/mapper_process: gn=%s\n",gn) ;
-	    if (adms != NULL) {
+	    if (adms != nullptr) {
 	        int	i ;
-	        for (i = 0 ; adms[i] != NULL ; i += 1) {
+	        for (i = 0 ; adms[i] != nullptr ; i += 1) {
 	            debugprintf("issue/mapper_process: a%u=%s\n",i,adms[i]) ;
 		}
 	    }
@@ -917,7 +920,7 @@ static int mapper_processor(ISSUE_MAPPER *mmp,cchar **ev,cchar **adms,
 	int		i ;
 	int		wlen = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -926,7 +929,7 @@ static int mapper_processor(ISSUE_MAPPER *mmp,cchar **ev,cchar **adms,
 #endif
 
 	for (i = 0 ; vechand_get(&mmp->mapdirs,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	    if (ep != nullptr) {
 	        rs = mapdir_process(ep,ev,adms,gn,fd) ;
 	        wlen += rs ;
 	    }
@@ -946,7 +949,7 @@ static int mapper_mapload(ISSUE_MAPPER *mmp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1003,7 +1006,7 @@ static int mapper_mapadd(ISSUE_MAPPER *mmp,cchar *kp,int kl,
 	const int	size = sizeof(ISSUE_MAPDIR) ;
 	int		rs ;
 
-	if ((kp == NULL) || (vp == NULL)) return SR_FAULT ;
+	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
 	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
 
 	if ((rs = uc_malloc(size,&ep)) >= 0) {
@@ -1025,7 +1028,7 @@ static int mapper_mapfins(ISSUE_MAPPER *mmp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1036,7 +1039,7 @@ static int mapper_mapfins(ISSUE_MAPPER *mmp) noex {
 	    debugprintf("mapper_mapfins: n=%d\n",rs1) ;
 #endif
 	    for (i = 0 ; (rs1 = vechand_get(mlp,i,&ep)) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 	            rs1 = mapdir_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	            rs1 = vechand_del(mlp,i--) ;
@@ -1061,7 +1064,7 @@ static int mapper_audit(ISSUE_MAPPER *mmp) noex {
 	vechand		*mlp = &mmp->mapdirs ;
 	int		rs ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != ISSUE_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1080,8 +1083,8 @@ static int mapdir_start(ISSUE_MAPDIR *ep,cchar *kp,int kl,
 		cchar *vp,int vl) noex {
 	int		rs ;
 
-	if (ep == NULL) return SR_FAULT ;
-	if ((kp == NULL) || (vp == NULL)) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
 
 	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
 
@@ -1105,7 +1108,7 @@ static int mapdir_start(ISSUE_MAPDIR *ep,cchar *kp,int kl,
 	        rs = lockrw_create(&ep->rwm,0) ;
 	        if (rs < 0) {
 	            uc_free(ep->admin) ;
-	            ep->admin = NULL ;
+	            ep->admin = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end block */
@@ -1118,22 +1121,22 @@ static int mapdir_finish(ISSUE_MAPDIR *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
-	if (ep->dname != NULL) {
+	if (ep->dname != nullptr) {
 	    rs1 = uc_free(ep->dname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->dname = NULL ;
+	    ep->dname = nullptr ;
 	}
 
 	rs1 = lockrw_destroy(&ep->rwm) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (ep->admin != NULL) {
+	if (ep->admin != nullptr) {
 	    rs1 = uc_free(ep->admin) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->admin = NULL ;
-	    ep->dirname = NULL ;
+	    ep->admin = nullptr ;
+	    ep->dirname = nullptr ;
 	}
 
 	return rs ;
@@ -1151,8 +1154,8 @@ static int mapdir_process(ISSUE_MAPDIR *ep,cchar **ev,cchar **adms,
 	    int	i ;
 	    debugprintf("issue/mapdir_process: ent gn=%s\n",gn) ;
 	    debugprintf("issue/mapdir_process: dirname=%s\n",ep->dirname) ;
-	    if (adms != NULL) {
-	        for (i = 0 ; adms[i] != NULL ; i += 1) {
+	    if (adms != nullptr) {
+	        for (i = 0 ; adms[i] != nullptr ; i += 1) {
 	            debugprintf("issue/mapdir_process: a[%u]=%s\n",
 	                i,adms[i]) ;
 	        }
@@ -1162,18 +1165,18 @@ static int mapdir_process(ISSUE_MAPDIR *ep,cchar **ev,cchar **adms,
 
 	if (ep->dirname[0] != '\0') {
 	    int	f_continue = TRUE ;
-	    if ((adms != NULL) && (adms[0] != NULL)) {
+	    if ((adms != nullptr) && (adms[0] != nullptr)) {
 	        f_continue = (matstr(adms,ep->admin,-1) >= 0) ;
 	    } /* end if (adms) */
 	    if (f_continue) {
-	        if ((ep->dirname[0] == '~') && (ep->dname == NULL)) {
+	        if ((ep->dirname[0] == '~') && (ep->dname == nullptr)) {
 	            rs = mapdir_expand(ep) ;
 	        }
 	        if (rs >= 0) {
-	            if ((ep->dirname[0] != '~') || (ep->dname != NULL)) {
+	            if ((ep->dirname[0] != '~') || (ep->dname != nullptr)) {
 	                if ((rs = lockrw_rdlock(&ep->rwm,to_lock)) >= 0) {
 			    cchar	*dn = ep->dirname ;
-	                    if ((dn[0] != '~') || (ep->dname != NULL)) {
+	                    if ((dn[0] != '~') || (ep->dname != nullptr)) {
 	                        rs = mapdir_processor(ep,ev,gn,fd) ;
 	        		wlen += rs ;
 	    		    } /* end if */
@@ -1203,7 +1206,7 @@ static int mapdir_expand(ISSUE_MAPDIR *ep) noex {
 
 	if ((rs = lockrw_wrlock(&ep->rwm,to_lock)) >= 0) {
 
-	    if ((ep->dirname[0] == '~') && (ep->dname == NULL)) {
+	    if ((ep->dirname[0] == '~') && (ep->dname == nullptr)) {
 	        rs = mapdir_expander(ep) ;
 
 #if	CF_DEBUGS
@@ -1230,13 +1233,13 @@ static int mapdir_expander(ISSUE_MAPDIR *ep) noex {
 	debugprintf("issue/mapdir_expander: dirname=%s\n",ep->dirname) ;
 #endif
 
-	if ((ep->dirname != NULL) && (ep->dirname[0] == '~')) {
+	if ((ep->dirname != nullptr) && (ep->dirname[0] == '~')) {
 	    int		unl = -1 ;
 	    cchar	*un = (ep->dirname+1) ;
 	    cchar	*tp ;
-	    cchar	*pp = NULL ;
+	    cchar	*pp = nullptr ;
 	    char	ubuf[USERNAMELEN + 1] ;
-	    if ((tp = strchr(un,'/')) != NULL) {
+	    if ((tp = strchr(un,'/')) != nullptr) {
 	        unl = (tp - un) ;
 	        pp = tp ;
 	    }
@@ -1256,7 +1259,7 @@ static int mapdir_expander(ISSUE_MAPDIR *ep) noex {
 		    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
 		        cchar	*uh = pw.pw_dir ;
 	    	        char	hbuf[MAXPATHLEN + 1] ;
-	                if (pp != NULL) {
+	                if (pp != nullptr) {
 	                    rs = mkpath2(hbuf,uh,pp) ;
 	                    fl = rs ;
 	                } else {
@@ -1305,7 +1308,7 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 	dn = ep->dirname ;
 	if (dn[0] == '~') {
 	    dn = ep->dname ;
-	    f_continue = ((dn != NULL) && (dn[0] != '\0')) ;
+	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
 	    struct ustat	sb ;
@@ -1317,10 +1320,10 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 	        strdcpy4(env_admin,envlen,envpre,post,"=",ep->admin) ;
 	        post = envstrs[envstr_admindir] ;
 	        strdcpy4(env_admindir,envlen,envpre,post,"=",dn) ;
-	        for (n = 0 ; ev[n] != NULL ; n += 1) ;
+	        for (n = 0 ; ev[n] != nullptr ; n += 1) ;
 	        ev[n+0] = env_admin ;
 	        ev[n+1] = env_admindir ;
-	        ev[n+2] = NULL ;
+	        ev[n+2] = nullptr ;
 	        if ((rs = vecstr_start(&nums,0,0)) >= 0) {
 		    FSDIR	d ;
 		    FSDIR_ENT	de ;
@@ -1332,12 +1335,12 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 	                while ((rs = fsdir_read(&d,&de)) > 0) {
 	                    cchar	*den = de.name ;
 	                    if (den[0] != '.') {
-	                        if ((tp = strchr(den,'.')) != NULL) {
+	                        if ((tp = strchr(den,'.')) != nullptr) {
 	                            if (strcmp((tp+1),name) == 0) {
 	                	    int		f = TRUE ;
 	                	    cchar	*digp ;
 	                	    digp = strnpbrk(den,(tp-den),"0123456789") ;
-	                	    if (digp != NULL) {
+	                	    if (digp != nullptr) {
 	                    	        f = hasalldig(digp,(tp-digp)) ;
 				    }
 	                	    if (f) {
@@ -1358,14 +1361,14 @@ static int mapdir_processor(ISSUE_MAPDIR *ep,cchar **ev,
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (fsdir) */
 	            if (rs >= 0) {
-	                vecstr_sort(&nums,NULL) ;
+	                vecstr_sort(&nums,nullptr) ;
 	                rs = mapdir_processorthem(ep,ev,dn,&nums,strs,fd) ;
 	                wlen += rs ;
 	            } /* end if */
 	            vecstr_finish(&nums) ;
 	        } /* end if (nums) */
 	        {
-	            ev[n] = NULL ;
+	            ev[n] = nullptr ;
 	        }
 	    } /* end if (u_stat) */
 	} /* end if (continued) */
@@ -1420,7 +1423,7 @@ static int mapdir_processorone(ISSUE_MAPDIR *ep,cchar **ev,cchar *dn,
 #endif
 
 	for (i = 0 ; vecstr_get(blp,i,&bep) >= 0 ; i += 1) {
-	    if (bep != NULL) {
+	    if (bep != nullptr) {
 	        if (strncmp(bep,kn,kl) == 0) {
 	            c += 1 ;
 	            if ((rs = mapdir_procout(ep,ev,dn,bep,fd)) >= 0) {
@@ -1483,7 +1486,7 @@ static int mapdir_procouter(ISSUE_MAPDIR *ep,cchar **ev,cchar *fname,
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("issue/mapdir_procouter: ent fname=%s\n",fname) ;
@@ -1526,7 +1529,7 @@ static int mapdir_procouter(ISSUE_MAPDIR *ep,cchar **ev,cchar *fname,
 #if	CF_WRITETO
 static int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
 	struct pollfd	fds[2] ;
-	time_t		dt = time(NULL) ;
+	time_t		dt = time(nullptr) ;
 	time_t		ti_write ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -1534,7 +1537,7 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
 	int		pto ;
 	int		tlen = 0 ;
 
-	if (wbuf == NULL) return SR_FAULT ;
+	if (wbuf == nullptr) return SR_FAULT ;
 
 	if (wfd < 0) return SR_BADF ;
 
@@ -1557,7 +1560,7 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
 
 	    rs = u_poll(fds,1,pto) ;
 
-	    dt = time(NULL) ;
+	    dt = time(nullptr) ;
 	    if (rs > 0) {
 	        const int	re = fds[0].revents ;
 
@@ -1619,7 +1622,7 @@ static int loadstrs(cchar **strs,cchar *gn,cchar *def,cchar *all,
 	strs[i++] = all ;
 	strs[i++] = n ;
 #endif /* COMMENT */
-	strs[i] = NULL ;
+	strs[i] = nullptr ;
 
 	return SR_OK ;
 }
@@ -1628,7 +1631,7 @@ static int loadstrs(cchar **strs,cchar *gn,cchar *def,cchar *all,
 static int isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
 	int		f = FALSE ;
 
-	if (digp == NULL) {
+	if (digp == nullptr) {
 	    int	bl = strlen(bname) ;
 	    int	m = nleadstr(den,bname,bl) ;
 	    f = (m == bl) && (den[m] == '.') ;

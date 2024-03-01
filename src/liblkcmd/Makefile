@@ -1124,11 +1124,7 @@ proglog.o:		proglog.c defs.h config.h
 
 perdata.o:		perdata.c percache.h
 
-percache.o:		percache.c percache.h
-
-getbufsize.o:		getbufsize.c getbufsize.h
-
-getxusername.o:		getxusername.c getxusername.h
+percache.o:		percache.cc percache.h
 
 spawnproc.o:		spawnproc.c spawnproc.h
 

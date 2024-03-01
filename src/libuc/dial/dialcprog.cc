@@ -95,8 +95,9 @@
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<ids.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<filebuf.h>
+#include	<findfilepath.h>
 #include	<localmisc.h>
 
 #include	"streamsync.h"
@@ -196,7 +197,6 @@ extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sperm(IDS *,USTAT	 *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	findfilepath(cchar *,char *,cchar *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	getnodename(char *,int) ;
 extern int	dialprog(cchar *,int,cchar **,cchar **,int *) ;

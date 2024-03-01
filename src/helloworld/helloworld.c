@@ -54,7 +54,7 @@
 
 #include	<usystem.h>
 #include	<baops.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getax.h>
 #include	<field.h>
 #include	<exitcodes.h>

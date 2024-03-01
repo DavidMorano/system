@@ -77,7 +77,7 @@
 #include	<keyopt.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<sbuf.h>
 #include	<tmtime.h>
 #include	<localmisc.h>

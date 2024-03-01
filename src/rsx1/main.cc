@@ -65,7 +65,7 @@
 #include	<baops.h>
 #include	<varsub.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<srvtab.h>
 #include	<srvpe.h>

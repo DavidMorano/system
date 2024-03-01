@@ -21,10 +21,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear(3u)| */
-#include	<usupport.h>
+#include	<usupport.h>		/* |memclear(3u)| */
 #include	<storebuf.h>
 #include	<localmisc.h>
 
@@ -49,13 +48,15 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snflags_start(snflags *op,char *bp,int bl) noex {
 	int		rs = SR_FAULT ;
 	if (op && bp) {
-	    rs = SR_OK ;
-	    memclear(op) ;
+	    rs = memclear(op) ;
 	    op->bp = bp ;
 	    op->bl = bl ;
 	    *bp = '\0' ;

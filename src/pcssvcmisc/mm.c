@@ -72,7 +72,7 @@
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

@@ -92,7 +92,7 @@
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<bufstr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<mallocstuff.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

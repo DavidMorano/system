@@ -7,15 +7,16 @@
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_WRITETO	1		/* time out writes */
-#define	CF_TESTPROC	0		/* test using 'uc_openfsvc(3uc)' */
-#define	CF_FINDUID	1		/* use 'finduid(3c)' */
-#define	CF_UCPWCACHE	1		/* use |ugetpw(3uc)| */
+#define	CF_TESTPROC	0		/* test using |uc_openfsvc(3uc)| */
+#define	CF_FINDUID	1		/* use |finduid(3c)| */
+#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
 	= 2003-10-01, David A­D­ Morano
-        This is a hack from numerous previous hacks (not enumerated here). This
-        is a new version of this hack that is entirely different (much simpler).
+	This is a hack from numerous previous hacks (not enumerated
+	here). This is a new version of this hack that is entirely
+	different (much simpler).
 
 */
 
@@ -86,7 +87,7 @@
 #include	<vechand.h>
 #include	<getax.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ptma.h>
 #include	<ptm.h>
 #include	<lockrw.h>
@@ -258,7 +259,7 @@ static int	writeto(int,cchar *,int,int) ;
 
 /* local variables */
 
-static cchar	*schedmaps[] = {
+static constexpr cchar	*schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -267,14 +268,14 @@ static cchar	*schedmaps[] = {
 	NULL
 } ;
 
-static cchar	*envbad[] = {
+static constexpr cchar	*envbad[] = {
 	"TMOUT",
 	"A__z",
 	NULL
 
 } ;
 
-static cchar	*envstrs[] = {
+static constexpr cchar	*envstrs[] = {
 	"USERNAME",
 	"GROUPNAME",
 	"UID",
@@ -294,14 +295,15 @@ enum envstrs {
 	envstr_overlast
 } ;
 
-static cchar	*envpre = "MOTD_" ;	/* environment prefix */
+static constexpt cchar	envpre[] = "MOTD_" ;	/* environment prefix */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int motd_open(MOTD *op,cchar pr[])
-{
+int motd_open(MOTD *op,cchar *pr) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	cchar		*cp ;

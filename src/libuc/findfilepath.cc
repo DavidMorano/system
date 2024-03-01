@@ -4,8 +4,6 @@
 /* subroutine to try to find a file in the specified directory path */
 /* version %I% last-modified %G% */
 
-#define	CF_FILEPATH	1	/* always return a file path */
-#define	CF_FILEPATHLEN	0	/* always return a file path length */
 
 /* revision history:
 
@@ -24,7 +22,7 @@
 	the supplied directory path.  If the given file with the
 	given mode is found in a directory then the path to this
 	file is returned.  If the directory path is specified as
-	nullptr, then the current execution path (given by environment
+	NUL:, then the current execution path (given by environment
 	variable 'PATH') is used.
 
 	Synopsis:
@@ -34,12 +32,12 @@
 	rbuf		resulting path to the file
 	path		execution path or nullptr to use default 'PATH'
 	fn		file to be searched for
-	am		file mode like w/ u_open(2) and u_access(2)
+	am		file mode like w/ |u_open(3u)| and |u_access(3u)|
 
 	Returns:
 	>0		program was found elsewhere and this is the path length
-	0		program was found in present working directory (PWD)
-	<0		program was not found or error (system-return)
+	==0		program not found
+	<0		error (system-return)
 
 	rbuf		resulting path if different than input
 
@@ -61,16 +59,13 @@
 #include	<ids.h>
 #include	<getpwd.h>
 #include	<xperm.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"findfilepath.h"
 
 
 /* local defines */
-
-#ifndef	VARPATH
-#define	VARPATH		"PATH"
-#endif
 
 
 /* local namespaces */
@@ -91,8 +86,9 @@
 /* forward references */
 
 static int	checkone(ids *,char *,cchar *,int,cchar *,int) noex ;
-static int	checkit(ids *,char *,cchar *,int,cchar *,int) noex ;
 static int	fileperm(ids *,cchar *,int) noex ;
+static int	mkourpath(char *,cc *,int,cc *) noex ;
+
 static bool	isendslash(cc *,int) noex ;
 
 
@@ -118,22 +114,18 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	    if (fn[0]) {
 	        ids	ids ;
 	        if ((rs = ids_load(&ids)) >= 0) {
-	            bool	f_fpath = true ;
 	            if (fn[0] == '/') {
-	                if ((rs = fileperm(&ids,fn,am)) >= 0) {
-	                    if (f_fpath) {
-	                        len = mkpath1(rbuf,fn) ;
-	                    } else {
-	                        len = strlen(fn) ;
-		            }
+	                if ((rs = fileperm(&ids,fn,am)) > 0) {
+			    rs = mkpath1(rbuf,fn) ;
+	                    len = rs ;
 	                }
 	            } else {
 	                if (path == nullptr) path = pathval ;
-	                rs = SR_NOTFOUND ;
-	                if (path != nullptr) {
+	                if (path && (path[0] != '\0')) {
 	                    int		dnl = -1 ;
 	            	    cchar	*tp ;
 	                    cchar	*dnp = path ;
+			    rs = SR_OK ;
 	                    while ((tp = strchr(dnp,':')) != nullptr) {
 			        {
 	                            dnl = (tp - dnp) ;
@@ -141,38 +133,15 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 	                            len = rs ;
 			        }
 	                        dnp = (tp + 1) ;
-	                        if (rs >= 0) break ;
+	                        if (rs != SR_OK) break ;
 	                    } /* end while */
-	                    if (rs < 0) {
-	                        dnl = strlen(dnp) ;
-	                        rs = checkone(&ids,rbuf,dnp,dnl,fn,am) ;
-	                        len = rs ;
-	                    }
-
-#if	CF_FILEPATH
-	                    if ((rs <= 0) && f_fpath) {
-	                        if (rs == 0) {
-#if	CF_FILEPATHLEN
-	                            rs = mkpath1(rbuf,fn) ;
-	                            len = rs ;
-#else
-	                            rs = mkpath1(rbuf,fn) ;
-#endif /* CF_FILEPATHLEN */
-	                        } else {
-	                            rbuf[0] = '\0' ;
-			        }
-	                    } /* end if */
-#else
-	                    if ((rs <= 0) && f_fpath) {
-	                        rbuf[0] = '\0' ;
-		            }
-#endif /* CF_FILEPATH */
 	                } /* end if (non-nullptr path) */
 	            } /* end if */
 	            rs1 = ids_release(&ids) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (ids) */
 	    } /* end if (valid) */
+	    if ((rs < 0) || (len == 0)) rbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -181,63 +150,66 @@ int findfilepath(char *rbuf,cchar *path,cchar *fn,int am) noex {
 
 /* local subroutines */
 
-static int checkone(ids *idp,char *rbuf,cc *dnp,int dnl,cc *fn,int am) noex {
+static int checkone(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
 	int		rs = SR_OK ;
-	if (dnl == 0) {
-	    if ((rs = fileperm(idp,fn,am)) >= 0) {
-	        rs = 0 ;		/* <- found in PWD */
-	    }
+	int		rl = 0 ;
+	if (dnl != 0) {
+	    if ((rs = mkourpath(pbuf,dnp,dnl,fn)) >= 0) {
+		cint	tl = rs ;
+	        if ((rs = fileperm(idp,pbuf,am)) > 0) {
+		    rl = tl ;
+	        } /* end if (fileperm) */
+	    } /* end if (mkourpath) */
 	} else {
-	    rs = checkit(idp,rbuf,dnp,dnl,fn,am) ;
-	}
-	return rs ;
+	    if ((rs = fileperm(idp,fn,am)) > 0) {
+	        rl = strlen(fn) ;
+	    } /* end if (fileperm) */
+	} /* end if */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (checkone) */
-
-static int checkit(ids *idp,char *pbuf,cc *dnp,int dnl,cc *fn,int am) noex {
-	int		rs ;
-	int		i = 0 ;
-	if ((rs = maxpathlen) >= 0) {
-	    cint	plen = rs ;
-	    if (dnl != 0) {
-	        if (rs >= 0) {
-	            rs = storebuf_strw(pbuf,plen,i,dnp,dnl) ;
-	            i += rs ;
-	        }
-	        if ((rs >= 0) && (! isendslash(dnp,dnl))) {
-	            rs = storebuf_char(pbuf,plen,i,'/') ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(pbuf,plen,i,fn,-1) ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = fileperm(idp,pbuf,am) ;
-	        }
-	    } else {
-	        if ((rs = fileperm(idp,fn,am)) >= 0) {
-	            i = 0 ; /* <- ? */
-	        }
-	    } /* end if */
-	} /* end if (maxpathlen) */
-	return (rs >= 0) ? i : rs ;
-}
-/* end subroutine (checkit) */
 
 /* is it a file and are the permissions what we want? */
 static int fileperm(ids *idp,cchar *fn,int am) noex {
 	USTAT		sb ;
 	int		rs ;
+	int		f = false ;
 	if ((rs = u_stat(fn,&sb)) >= 0) {
-	    rs = SR_NOTFOUND ;
 	    if (S_ISREG(sb.st_mode))  {
-	        rs = sperm(idp,&sb,am) ;
-	    }
+	        if ((rs = sperm(idp,&sb,am)) >= 0) {
+		    f = true ;
+		} else if (isNotAccess(rs)) {
+		    rs = SR_OK ;
+		}
+	    } /* end if (regular file) */
+	} else if (isNotPresent(rs)) {
+	    rs = SR_OK ;
 	} /* end if */
-	return rs ;
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (fileperm) */
+
+static int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
+	int		rs = SR_OK ;
+	int		i = 0 ;
+	if ((rs = maxpathlen) >= 0) {
+	    cint	plen = rs ;
+	    if (rs >= 0) {
+	        rs = storebuf_strw(pbuf,plen,i,dnp,dnl) ;
+	        i += rs ;
+	    }
+	    if ((rs >= 0) && (! isendslash(dnp,dnl))) {
+	        rs = storebuf_char(pbuf,plen,i,'/') ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_strw(pbuf,plen,i,fn,-1) ;
+	        i += rs ;
+	    }
+	} /* end if (maxpathlen) */
+	return (rs >= 0) ? i : rs ;
+}
+/* end subroutine (mkourpath) */
 
 static bool isendslash(cc *dp,int dl) noex {
 	if (dl < 0) dl = strlen(dp) ;

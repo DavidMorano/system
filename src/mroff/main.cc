@@ -55,7 +55,7 @@
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<varsub.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<mallocstuff.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

@@ -4,8 +4,6 @@
 /* program signal handling */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time */
-#define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_SIGTSTP	1		/* Solaris® bug in |sigpending(2)| */
 
 /* revision history:
@@ -82,43 +80,24 @@
 #define	STORENOTE	struct storenote
 
 
-/* local pragmas */
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy2w(char *,int,cchar *,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(cchar *,mode_t) ;
-extern int	listenusd(cchar *,mode_t,int) ;
-extern int	msleep(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-
+extern "C" {
+    int		progsig_init(void) noex ;
+    int		progsig_fini(void) noex ;
+    int		progsig_initenviron(void *) noex ;
+    int		progsig_callcmd(cchar *,int,cchar **,cchar **,void *) noex ;
+    int 	progsig_callfunc(subcmd_t,int,cchar **,cchar **,void *) noex ;
+}
+extern "C" {
+    int		progsig_initmemalloc(int) noex ;
+}
 
 /* external variables */
 
@@ -132,7 +111,7 @@ extern "C" {
 }
 
 #ifndef	TYPEDEF_TWORKER
-#define	TYPEDEF_TWORKER	1
+#define	TYPEDEF_TWORKER
 extern "C" {
     typedef	int (*tworker)(void *) noex ;
 }
@@ -148,9 +127,9 @@ struct progsig_flags {
 } ;
 
 struct progsig {
-	PTM		m ;		/* mutex data */
-	PTM		menv ;		/* mutex environment */
-	PTC		c ;		/* condition variable */
+	ptm		m ;		/* mutex data */
+	ptm		menv ;		/* mutex environment */
+	ptc		c ;		/* condition variable */
 	SIGHAND		sm ;
 	SOCKADDRESS	servaddr ;	/* server address */
 	RAQHAND		mq ;		/* message queue */
@@ -196,62 +175,49 @@ enum cmds {
 
 /* forward references */
 
-int		progsig_initenviron(void *) ;
-int		progsig_callcmd(cchar *,int,cchar **,cchar **,void *) ;
-int 		progsig_callfunc(subcmd_t,int,cchar **,cchar **,void *) ;
-
-int		progsig_init(void) ;
-int		progsig_fini(void) ;
-
 extern "C" {
-    static void	progsig_atforkbefore() ;
-    static void	progsig_atforkafter() ;
-    static void	progsig_sighand(int,siginfo_t *,void *) ;
+    static void	progsig_atforkbefore() noex ;
+    static void	progsig_atforkafter() noex ;
+    static void	progsig_sighand(int,siginfo_t *,void *) noex ;
 }
 
-static int	progsig_mainstuff(PROGSIG *) ;
+static int	progsig_mainstuff(PROGSIG *) noex ;
 
-static int	progsig_begin(PROGSIG *) ;
-static int	progsig_end(PROGSIG *) ;
-static int	progsig_runbegin(PROGSIG *) ;
-static int	progsig_runner(PROGSIG *) ;
-static int	progsig_runend(PROGSIG *) ;
-static int	progsig_entfins(PROGSIG *) ;
-static int	progsig_mq(PROGSIG *) ;
-static int	progsig_mkreqfname(PROGSIG *,char *,cchar *) ;
-static int	progsig_worker(PROGSIG *) ;
-static int	progsig_workecho(PROGSIG *,MSGDATA *) ;
-static int	progsig_workbiff(PROGSIG *,MSGDATA *) ;
-static int	progsig_workbiffer(PROGSIG *,SESMSG_BIFF *) ;
-static int	progsig_workgen(PROGSIG *,MSGDATA *) ;
-static int	progsig_workgener(PROGSIG *,SESMSG_GEN *) ;
-static int	progsig_workdef(PROGSIG *,MSGDATA *) ;
-static int	progsig_msgenter(PROGSIG *,STORENOTE *) ;
-static int	progsig_reqopen(PROGSIG *) ;
-static int	progsig_reqopener(PROGSIG *,cchar *) ;
-static int	progsig_reqsend(PROGSIG *,MSGDATA *,int) ;
-static int	progsig_reqrecv(PROGSIG *,MSGDATA *) ;
-static int	progsig_reqclose(PROGSIG *) ;
-static int	progsig_poll(PROGSIG *) ;
-static int	progsig_cmdsend(PROGSIG *,int) ;
-static int	progsig_capbegin(PROGSIG *,int) ;
-static int	progsig_capend(PROGSIG *) ;
-static int	progsig_sigbegin(PROGSIG *) ;
-static int	progsig_sigend(PROGSIG *) ;
+static int	progsig_begin(PROGSIG *) noex ;
+static int	progsig_end(PROGSIG *) noex ;
+static int	progsig_runbegin(PROGSIG *) noex ;
+static int	progsig_runner(PROGSIG *) noex ;
+static int	progsig_runend(PROGSIG *) noex ;
+static int	progsig_entfins(PROGSIG *) noex ;
+static int	progsig_mq(PROGSIG *) noex ;
+static int	progsig_mkreqfname(PROGSIG *,char *,cchar *) noex ;
+static int	progsig_worker(PROGSIG *) noex ;
+static int	progsig_workecho(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_workbiff(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_workbiffer(PROGSIG *,SESMSG_BIFF *) noex ;
+static int	progsig_workgen(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_workgener(PROGSIG *,SESMSG_GEN *) noex ;
+static int	progsig_workdef(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_msgenter(PROGSIG *,STORENOTE *) noex ;
+static int	progsig_reqopen(PROGSIG *) noex ;
+static int	progsig_reqopener(PROGSIG *,cchar *) noex ;
+static int	progsig_reqsend(PROGSIG *,MSGDATA *,int) noex ;
+static int	progsig_reqrecv(PROGSIG *,MSGDATA *) noex ;
+static int	progsig_reqclose(PROGSIG *) noex ;
+static int	progsig_poll(PROGSIG *) noex ;
+static int	progsig_cmdsend(PROGSIG *,int) noex ;
+static int	progsig_capbegin(PROGSIG *,int) noex ;
+static int	progsig_capend(PROGSIG *) noex ;
+static int	progsig_sigbegin(PROGSIG *) noex ;
+static int	progsig_sigend(PROGSIG *) noex ;
 
-int		progsig_initmemalloc(int) ;
+static int storenote_start(STORENOTE *,int,time_t,cchar *,cchar *,int) noex ;
+static int storenote_finish(STORENOTE *) noex ;
 
-static int	storenote_start(STORENOTE *,int,time_t,cchar *,cchar *,int) ;
-static int	storenote_finish(STORENOTE *) ;
-
-static int	mallocstrw(cchar *,int,cchar **) ;
-static int	sdir(cchar *,int) ;
-static int	mksdir(cchar *,mode_t) ;
-static int	mksdname(char *,cchar *,pid_t) ;
-
-#if	CF_DEBUGENV && CF_DEBUGN
-static int	ndebugenv(cchar *,cchar **) ;
-#endif
+static int	mallocstrw(cchar *,int,cchar **) noex ;
+static int	sdir(cchar *,int) noex ;
+static int	mksdir(cchar *,mode_t) noex ;
+static int	mksdname(char *,cchar *,pid_t) noex ;
 
 
 /* local variables */
@@ -365,10 +331,6 @@ int progsig_mainbegin(cchar **envv)
 {
 	int		rs ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mainbegin: ent\n") ;
-#endif
-
 	if ((rs = progsig_init()) >= 0) {
 	    PROGSIG	*uip = &progsig_data ;
 	    uip->envv = envv ;
@@ -378,10 +340,6 @@ int progsig_mainbegin(cchar **envv)
 	    	    progsig_sigend(uip) ;
 	    } /* end if (progsig_sigbegin) */
 	} /* end if (progsig_init) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mainbegin: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -394,10 +352,6 @@ int progsig_mainend(void)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mainend: ent\n") ;
-#endif
-
 	if (uip->f_running) {
 	    rs1 = progsig_runend(uip) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -405,10 +359,6 @@ int progsig_mainend(void)
 
 	rs1 = progsig_sigend(uip) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mainend: ret rs=%d\n",rs) ;
-#endif
 
 	uip->envv = nullptr ;
 	return rs ;
@@ -610,7 +560,7 @@ static int progsig_begin(PROGSIG *uip)
 {
 	int		rs = SR_OK ;
 	if (! uip->f_mq) {
-	    const int	n = PROGSIG_NENTS ;
+	    cint	n = PROGSIG_NENTS ;
 	    if ((rs = raqhand_start(&uip->mq,n,0)) >= 0) {
 	        uip->f_mq = true ;
 	    }
@@ -662,10 +612,6 @@ static int progsig_runbegin(PROGSIG *uip)
 	int		rs1 ;
 	int		f = false ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_runbegin: ent f_running=%u\n",uip->f_running) ;
-#endif
-
 	if (! uip->f_running) {
 	    if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 		if (! uip->f_running) {
@@ -678,10 +624,6 @@ static int progsig_runbegin(PROGSIG *uip)
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (capture) */
 	} /* end if (not-running) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_runbegin: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -696,7 +638,7 @@ static int progsig_runner(PROGSIG *uip)
 	int		f = false ;
 
 	if ((rs = pta_create(&ta)) >= 0) {
-	    const int	scope = PROGSIG_SCOPE ;
+	    cint	scope = PROGSIG_SCOPE ;
 	    if ((rs = pta_setscope(&ta,scope)) >= 0) {
 		pthread_t	tid ;
 		tworker		wt = (tworker) progsig_worker ;
@@ -705,18 +647,10 @@ static int progsig_runner(PROGSIG *uip)
 		    uip->tid = tid ;
 		    f = true ;
 		} /* end if (pthread-create) */
-#if	CF_DEBUGN
-		nprintf(NDF,"progsig_runner: pt-create rs=%d tid=%u\n",
-			rs,tid) ;
-#endif
 	    } /* end if (pta-setscope) */
 	    rs1 = pta_destroy(&ta) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pta) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_runner: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -728,12 +662,8 @@ static int progsig_runend(PROGSIG *uip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_runend: ent run=%u\n",uip->f_running) ;
-#endif
-
 	if (uip->f_running) {
-	    const int	cmd = sesmsgtype_exit ;
+	    cint	cmd = sesmsgtype_exit ;
 	    if ((rs = progsig_cmdsend(uip,cmd)) >= 0) {
 	 	pthread_t	tid = uip->tid ;
 		int		trs ;
@@ -741,18 +671,10 @@ static int progsig_runend(PROGSIG *uip)
 		    uip->f_running = false ;
 		    rs = trs ;
 		}
-#if	CF_DEBUGN
-		nprintf(NDF,"progsig_runend: pt-join rs=%d tid=%u\n",
-			rs,tid) ;
-#endif
 	        rs1 = progsig_reqclose(uip) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (progsig_cmdsend) */
 	} /* end if (running) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_runend: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -765,14 +687,7 @@ static int progsig_worker(PROGSIG *uip)
 	MSGDATA		m ;
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_worker: ent\n") ;
-#endif
-
 	    while ((rs = progsig_reqrecv(uip,&m)) > 0) {
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_worker: reqrecv mt=%u\n",rs) ;
-#endif
 	        switch (rs) {
 	        case sesmsgtype_echo:
 		    rs = progsig_workecho(uip,&m) ;
@@ -789,10 +704,6 @@ static int progsig_worker(PROGSIG *uip)
 	        } /* end switch */
 	        if (rs < 0) break ;
 	    } /* end while (looping on commands) */
-
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_worker: ret rs=%d\n",rs) ;
-#endif
 
 	uip->f_exiting = true ;
 	return rs ;
@@ -815,15 +726,6 @@ static int progsig_workgen(PROGSIG *uip,MSGDATA *mip)
 {
 	int		rs ;
 	int		rs1 ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_workgen: ent\n") ;
-#endif
-#if	CF_DEBUGS
-	debugprintf("progsig_workgen: ent\n") ;
-#endif
-#if	CF_DEBUGS && CF_DEBUGHEXB
-	debugprinthexblock("progsig_workgen: ",80,mip->mbuf,mip->mlen) ;
-#endif
 	if ((rs = progsig_capbegin(uip,-1)) >= 0) {
 	    if ((rs = progsig_mq(uip)) >= 0) {
 		SESMSG_GEN	m2 ;
@@ -834,9 +736,6 @@ static int progsig_workgen(PROGSIG *uip,MSGDATA *mip)
 	    rs1 = progsig_capend(uip) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (capture) */
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_workgen: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (progsig_workgen) */
@@ -845,34 +744,24 @@ static int progsig_workgen(PROGSIG *uip,MSGDATA *mip)
 static int progsig_workgener(PROGSIG *uip,SESMSG_GEN *mp)
 {
 	STORENOTE	*ep ;
-	const int	esize = sizeof(STORENOTE) ;
+	cint	esize = sizeof(STORENOTE) ;
 	int		rs ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_workgener: ent\n") ;
-	nprintf(NDF,"progsig_workgener: m=>%t<\n",
-		mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
-#endif
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
-	    const int	mt = mp->msgtype ;
-	    const int	nlen = strlen(mp->nbuf) ;
+	    cint	mt = mp->msgtype ;
+	    cint	nlen = strlen(mp->nbuf) ;
 	    cchar	*nbuf = mp->nbuf ;
 	    cchar	*un = mp->user ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_workgener: m=>%t<\n",
-		nbuf,strlinelen(nbuf,nlen,50)) ;
-#endif
 	    if ((rs = storenote_start(ep,mt,st,un,nbuf,nlen)) >= 0) {
 		rs = progsig_msgenter(uip,ep) ;
-	        if (rs < 0)
+	        if (rs < 0) {
 		    storenote_finish(ep) ;
+		}
 	    } /* end if (storenote_start) */
-	    if (rs < 0)
+	    if (rs < 0) {
 		uc_libfree(ep) ;
+	    }
 	} /* end if (m-a) */
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_workgener: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (progsig_workgener) */
@@ -900,16 +789,12 @@ static int progsig_workbiff(PROGSIG *uip,MSGDATA *mip)
 static int progsig_workbiffer(PROGSIG *uip,SESMSG_BIFF *mp)
 {
 	STORENOTE	*ep ;
-	const int	esize = sizeof(STORENOTE) ;
+	cint	esize = sizeof(STORENOTE) ;
 	int		rs ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_workbiffer: m=>%t<\n",
-		mp->nbuf,strlinelen(mp->nbuf,-1,50)) ;
-#endif
 	if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
 	    time_t	st = mp->stime ;
-	    const int	mt = mp->msgtype ;
-	    const int	nlen = strlen(mp->nbuf) ;
+	    cint	mt = mp->msgtype ;
+	    cint	nlen = strlen(mp->nbuf) ;
 	    cchar	*un = mp->user ;
 	    cchar	*nbuf = mp->nbuf ;
 	    if ((rs = storenote_start(ep,mt,st,un,nbuf,nlen)) >= 0) {
@@ -941,7 +826,7 @@ static int progsig_workdef(PROGSIG *uip,MSGDATA *mip)
 static int progsig_msgenter(PROGSIG *uip,STORENOTE *ep)
 {
 	RAQHAND		*qlp = &uip->mq ;
-	const int	ors = SR_OVERFLOW ;
+	cint	ors = SR_OVERFLOW ;
 	int		rs ;
 	if ((rs = raqhand_ins(qlp,ep)) == ors) {
 	    void	*dum ;
@@ -979,22 +864,23 @@ static int progsig_reqopen(PROGSIG *uip)
 
 static int progsig_reqopener(PROGSIG *uip,cchar *pbuf)
 {
-	const mode_t	om = 0666 ;
-	const int	lo = 0 ;
+	cmode	om = 0666 ;
+	cint	lo = 0 ;
 	int		rs ;
 	if ((rs = listenusd(pbuf,om,lo)) >= 0) {
 	    int	fd = rs ;
 	    if ((rs = uc_closeonexec(fd,true)) >= 0) {
 		SOCKADDRESS	*sap = &uip->servaddr ;
-		const int	af = AF_UNIX ;
+		cint	af = AF_UNIX ;
 		cchar		*rf = pbuf ;
 		if ((rs = sockaddress_start(sap,af,rf,0,0)) >= 0) {
 		    uip->servlen = rs ;
 		    uip->sfd = fd ;
 		}
 	    }
-	    if (rs < 0)
-		u_close(fd) ;
+	    if (rs < 0) {
+		uc_close(fd) ;
+	    }
 	} /* end if (listenusd) */
 	return rs ;
 }
@@ -1006,10 +892,6 @@ static int progsig_reqclose(PROGSIG *uip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_reqclose: ent sfd=%d\n",uip->sfd) ;
-#endif
-
 	if (uip->sfd >= 0) {
 	    rs1 = u_close(uip->sfd) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1020,10 +902,6 @@ static int progsig_reqclose(PROGSIG *uip)
 		if (rs >= 0) rs = rs1 ;
 	    }
 	    if (uip->reqfname != nullptr) {
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_reqclose: reqfname{%p}=¿\n",uip->reqfname) ;
-	nprintf(NDF,"progsig_reqclose: reqfname=%s\n",uip->reqfname) ;
-#endif
 		if (uip->reqfname[0] != '\0') {
 		    uc_unlink(uip->reqfname) ;
 		}
@@ -1033,10 +911,6 @@ static int progsig_reqclose(PROGSIG *uip)
 	    } /* end if (reqfname) */
 	} /* end if (server-open) */
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_reqclose: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (progsig_reqclose) */
@@ -1044,7 +918,7 @@ static int progsig_reqclose(PROGSIG *uip)
 
 static int progsig_reqsend(PROGSIG *uip,MSGDATA *mip,int clen)
 {
-	const int	fd = uip->sfd ;
+	cint	fd = uip->sfd ;
 	return msgdata_send(mip,fd,clen) ;
 }
 /* end subroutine (progsig_reqsend) */
@@ -1053,9 +927,9 @@ static int progsig_reqsend(PROGSIG *uip,MSGDATA *mip,int clen)
 static int progsig_reqrecv(PROGSIG *uip,MSGDATA *mip)
 {
 	struct pollfd	fds[1] ;
-	const int	fd = uip->sfd ;
-	const int	mto = (5*POLLINTMULT) ;
-	const int	nfds = 1 ;
+	cint	fd = uip->sfd ;
+	cint	mto = (5*POLLINTMULT) ;
+	cint	nfds = 1 ;
 	int		size ;
 	int		rs ;
 	int		rc = 0 ;
@@ -1069,7 +943,7 @@ static int progsig_reqrecv(PROGSIG *uip,MSGDATA *mip)
 	while ((rs = u_poll(fds,nfds,mto)) >= 0) {
 	    int	f = false ;
 	    if (rs > 0) {
-		const int	re = fds[0].revents ;
+		cint	re = fds[0].revents ;
 		if (re & (POLLIN|POLLPRI)) {
 		    if ((rs = msgdata_recv(mip,fd)) >= 0) {
 			f = true ;
@@ -1102,10 +976,6 @@ static int progsig_poll(PROGSIG *uip)
 
 	if (uip == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_poll: ent\n") ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (progsig_poll) */
@@ -1115,10 +985,6 @@ static int progsig_cmdsend(PROGSIG *uip,int cmd)
 {
 	int		rs = SR_OK ;
 	int		f = false ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_cmdsend: ent cmd=%u\n",cmd) ;
-	nprintf(NDF,"progsig_cmdsend: f_running=%u\n",uip->f_running) ;
-#endif
 	if (uip->f_running && (uip->reqfname != nullptr)) {
 	    f = true ;
 	    switch (cmd) {
@@ -1127,35 +993,23 @@ static int progsig_cmdsend(PROGSIG *uip,int cmd)
 	    	    MSGDATA	m ;
 		    if ((rs = msgdata_init(&m,0)) >= 0) {
 		        SESMSG_EXIT	m0 ;
-			const int	mlen = MSGBUFLEN ;
-			const int	sal = uip->servlen ;
+			cint	mlen = MSGBUFLEN ;
+			cint	sal = uip->servlen ;
 			const void	*sap = &uip->servaddr ;
 			msgdata_setaddr(&m,sap,sal) ;
 			memset(&m0,0,sizeof(SESMSG_EXIT)) ;
 		        if ((rs = sesmsg_exit(&m0,0,m.mbuf,mlen)) >= 0) {
 			    m.mlen = rs ;
 	    	            rs = progsig_reqsend(uip,&m,0) ;
-#if	CF_DEBUGN
-			    nprintf(NDF,
-				"progsig_cmdsend: progsig_reqsend() rs=%d\n",
-				rs) ;
-#endif
 			} /* end if (sesmsg_exit) */
-#if	CF_DEBUGN
-			nprintf(NDF,
-				"progsig_cmdsend: sesmsg_exit-out rs=%d\n",rs) ;
-#endif
 		    } /* end if (init) */
-		}
+		} /* end block */
 		break ;
 	    default:
 		rs = SR_INVALID ;
 		break ;
 	    } /* end switch */
 	} /* end if (running) */
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_cmdsend: ret rs=%d f=%u\n",rs,f) ;
-#endif
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (progsig_cmdsend) */
@@ -1208,39 +1062,21 @@ static void kshlib_sighand(int sn,siginfo_t *sip,void *vcp)
 static int progsig_mkreqfname(PROGSIG *uip,char *sbuf,cchar *dname)
 {
 	const uint	uv = (uint) uip->pid ;
-	const int	dlen = DIGBUFLEN ;
+	cint	dlen = DIGBUFLEN ;
 	int		rs ;
 	char		dbuf[DIGBUFLEN+1] = { 'p' } ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mkreqfname: ent pid=%u\n",uv) ;
-#endif
-
 	if ((rs = ctdecui((dbuf+1),(dlen-1),uv)) >= 0) {
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mkreqfname: dbuf=%s\n",dbuf) ;
-#endif
 	    if ((rs = mkpath2(sbuf,dname,dbuf)) >= 0) {
-#if	CF_DEBUGN
-		nprintf(NDF,"progsig_mkreqfname: mkpath2() rs=%d sbuf=%s\n",
-		rs,sbuf) ;
-#endif
 		if (uip->reqfname == nullptr) {
 		    cchar	*cp ;
 		    if ((rs = mallocstrw(sbuf,rs,&cp)) >= 0) {
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mkreqfname: reqfname{%p}=¿\n",cp) ;
-	nprintf(NDF,"progsig_mkreqfname: reqfname{%p}=%s\n",cp,cp) ;
-#endif
 			uip->reqfname = cp ;
 		    }
 		}
 	    } /* end if (mkpath) */
 	} /* end if (ctdecui) */
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_mkreqfname: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (progsig_mkreqfname) */
@@ -1300,9 +1136,6 @@ static int progsig_sigbegin(PROGSIG *kip)
 	kip->f_sigterm = 0 ;
 	kip->f_sigintr = 0 ;
 	rs = sighand_start(&kip->sm,sigblocks,sigigns,sigints,sh) ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_sigbegin: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (progsig_sigbegin) */
@@ -1314,9 +1147,6 @@ static int progsig_sigend(PROGSIG *kip)
 	int		rs1 ;
 	rs1 = sighand_finish(&kip->sm) ;
 	if (rs >= 0) rs = rs1 ;
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig_sigend: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (progsig_sigend) */
@@ -1384,8 +1214,8 @@ static int mallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 
 static int sdir(cchar *dname,int am) noex {
 	struct ustat	sb ;
-	const mode_t	dm = 0777 ;
-	const int	nrs = SR_NOTFOUND ;
+	cmode	dm = 0777 ;
+	cint	nrs = SR_NOTFOUND ;
 	int		rs ;
 	int		f = false ;
 
@@ -1411,51 +1241,21 @@ static int mksdir(cchar *dname,mode_t dm) noex {
 
 static int mksdname(char *rbuf,cchar *dname,pid_t sid) noex {
 	const uint	uv = (uint) sid ;
-	const int	dlen = DIGBUFLEN ;
+	cint		dlen = DIGBUFLEN ;
 	int		rs ;
 	char		dbuf[DIGBUFLEN+1] = { 's' } ;
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig/mksdname: sid=%d\n",sid) ;
-#endif
-
 	if ((rs = ctdecui((dbuf+1),(dlen-1),uv)) >= 0) {
 	    if ((rs = mkpath2(rbuf,dname,dbuf)) >= 0) {
-		const mode_t	dm = 0777 ;
+		cmode	dm = 0777 ;
 		if ((rs = mkdirs(rbuf,dm)) >= 0) {
 		    rs = uc_minmod(rbuf,dm) ;
 		}
 	    } /* end if (mkpath) */
 	} /* end if (ctdecui) */
 
-#if	CF_DEBUGN
-	nprintf(NDF,"progsig/mksdname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (mksdname) */
-
-#if	CF_DEBUGENV && CF_DEBUGN
-static int ndebugenv(cchar *s,cchar **ev) noex {
-	cchar		*dfn = NDF ;
-	cchar		*ep ;
-	if (s != nullptr) {
-	    if (ev != nullptr) {
-	        int	i ;
-		cchar	*fmt = "%s: e%03u=>%t<\n" ;
-	        nprintf(dfn,"%s: env¬\n", s) ;
-	        for (i = 0 ; ev[i] != nullptr ; i += 1) {
-	            ep = ev[i] ;
-		    nprintf(dfn,fmt,s,i,ep,strlinelen(ep,-1,50)) ;
-	        }
-	        nprintf(dfn,"%s: nenv=%u\n", s,i) ;
-	    } else
-	        nprintf(dfn,"%s: environ=*null*\n",s) ;
-	}
-	return 0 ;
-}
-/* end subroutine (ndebugenv) */
-#endif /* CF_DEBUGENV */
 
 

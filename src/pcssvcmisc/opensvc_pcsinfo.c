@@ -72,7 +72,7 @@
 #include	<keyopt.h>
 #include	<field.h>
 #include	<sysusernames.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<pcsns.h>
 #include	<filebuf.h>
 #include	<nulstr.h>

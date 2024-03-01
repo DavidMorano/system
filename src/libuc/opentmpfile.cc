@@ -284,7 +284,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 		    cint	af = AF_UNIX ;
 	            fd = rs ;
 	            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
-		        struct sockaddr	*sap = (struct sockaddr *) &sa ;
+		        SOCKADDR	*sap = (SOCKADDR *) &sa ;
 		        cint		sal = rs ;
 	                if ((rs = u_bind(fd,sap,sal)) >= 0) {
 			    rs = u_chmod(obuf,operm) ;
@@ -339,31 +339,21 @@ static int randload(ulong *rvp) noex {
 	    ulong	rv = 0 ;
 	    ulong	v ;
 	    rs = SR_OK ;
-#ifdef	COMMENT
-	v = gethostid() ;
-	rv ^= (v << 32) ;
-#endif
-
-	v = sid ;
-	rv += (v << 48) ;
-
-	v = pid ;
-	rv += (v << 32) ;
-
-	v = uid ;
-	rv += (v << 16) ;
-
-	{
-	    TIMEVAL	tod ;
-	    uc_gettimeofday(&tod,nullptr) ; /* cannot fail?! */
-	        v = tod.tv_sec ;
-	        rv += (v << 32) ;
-	        rv += (v << 12) ;
-	        rv += tod.tv_usec ;
-	} /* end block */
-
-	*rvp = rv ;
-
+	    v = sid ;
+	    rv += (v << 48) ;
+	    v = pid ;
+	    rv += (v << 32) ;
+	    v = uid ;
+	    rv += (v << 16) ;
+	    {
+	        TIMEVAL	tod ;
+	        uc_gettimeofday(&tod,nullptr) ; /* cannot fail?! */
+	            v = tod.tv_sec ;
+	            rv += (v << 32) ;
+	            rv += (v << 12) ;
+	            rv += tod.tv_usec ;
+	    } /* end block */
+	    *rvp = rv ;
 	} /* end if (non-null) */
 	return rs ;
 }

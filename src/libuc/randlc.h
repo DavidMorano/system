@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int	randlc(int v) noex ;
+extern int	randlc(int) noex ;
 
 EXTERNC_end
 

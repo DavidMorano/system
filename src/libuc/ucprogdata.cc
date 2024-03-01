@@ -135,8 +135,8 @@ struct ucprogdata_head {
 } ;
 
 struct ucprogdata_e {
-	time_t		et ;		/* entry-time (load-time) */
 	cchar		*vp ;
+	time_t		et ;		/* entry-time (load-time) */
 	int		vl ;
 	int		ttl ;		/* time-to-live */
 } ;

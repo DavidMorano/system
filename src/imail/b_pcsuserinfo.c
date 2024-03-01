@@ -72,7 +72,7 @@
 #include	<keyopt.h>
 #include	<field.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<vecstr.h>
 #include	<osetstr.h>
 #include	<grmems.h>

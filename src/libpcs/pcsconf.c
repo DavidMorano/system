@@ -55,7 +55,7 @@
 #include	<vecstr.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<modload.h>
 #include	<nulstr.h>
 #include	<uinfo.h>

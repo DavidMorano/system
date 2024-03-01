@@ -81,7 +81,7 @@
 #include	<tmpx.h>
 #include	<realname.h>
 #include	<field.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
 #include	<ucmallreg.h>

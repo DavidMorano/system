@@ -55,7 +55,7 @@
 #include	<keyopt.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

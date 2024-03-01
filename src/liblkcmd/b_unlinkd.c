@@ -96,7 +96,7 @@
 #include	<vecstr.h>
 #include	<paramfile.h>
 #include	<expcook.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<userinfo.h>
 #include	<logfile.h>
 #include	<msfile.h>

@@ -44,7 +44,7 @@
 #include	<bits.h>
 #include	<bfile.h>
 #include	<getax.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

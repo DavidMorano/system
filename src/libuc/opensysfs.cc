@@ -123,8 +123,8 @@ extern "C" {
     extern int	strwcmp(cchar *,cchar *,int) noex ;
     extern int	mktmpfile(char *,mode_t,cchar *) noex ;
     extern int	sperm(ids *,USTAT *,int) noex ;
-    extern int	dirseen_notseen(DIRSEEN *,USTAT *,cchar *,int) noex ;
-    extern int	dirseen_notadd(DIRSEEN *,USTAT *,cchar *,int) noex ;
+    extern int	dirseen_notseen(dirseen *,USTAT *,cchar *,int) noex ;
+    extern int	dirseen_notadd(dirseen *,USTAT *,cchar *,int) noex ;
     extern int	isprintlatin(int) noex ;
     extern int	isNotPresent(int) noex ;
 }
@@ -154,7 +154,7 @@ static int	opencfile(int,int,int) noex ;
 static int	checkperms(cchar *,USTAT *,mode_t) noex ;
 
 static int	findprog(ids *,char *,cchar *) noex ;
-static int	findprogbin(ids *,DIRSEEN *,char *,cchar *,cchar *) noex ;
+static int	findprogbin(ids *,dirseen *,char *,cchar *,cchar *) noex ;
 
 static int	runmkpwi(int,cchar *,int) noex ;
 static int	runsysfs(int) noex ;
@@ -223,6 +223,9 @@ static cchar	*envbads[] = {
 constexpr bool		f_endian = (endian::big == endian::native) ;
 
 constexpr cchar		*endianstr = ((f_endian) ? "1" : "0") ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -356,8 +359,9 @@ static int opencfile(int w,int of,int ttl) noex {
 	            if (of & O_CLOEXEC) {
 	                rs = uc_closeonexec(fd,true) ;
 		    }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                u_close(fd) ;
+		    }
 	        } /* end if (file-open) */
 	    } /* end if (ok) */
 	} /* end if (mkrealpath) */
@@ -418,7 +422,7 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	        cchar	*av[3] ;
 	        char	zbuf[MAXNAMELEN+1] ;
 	        if ((rs = sncpyuc(zbuf,zlen,pn)) >= 0) {
-	            ENVHELP	env ;
+	            envhelp	env ;
 	            if ((rs = envhelp_start(&env,envbads,environ)) >= 0) {
 	                cchar	**ev = nullptr ;
 	                if (rs >= 0) {
@@ -508,7 +512,7 @@ static int runsysfs(int w) noex {
 /* end subroutine (runsysfs) */
 
 static int findprog(ids *idp,char *pfname,cchar *pn) noex {
-	DIRSEEN		bhist, *blp = &bhist ;
+	dirseen		bhist, *blp = &bhist ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
@@ -558,7 +562,7 @@ static int findprog(ids *idp,char *pfname,cchar *pn) noex {
 }
 /* end subroutine (findprog) */
 
-static int findprogbin(ids *idp,DIRSEEN *dsp,char *pfname,cc *pr,cc *pn) noex {
+static int findprogbin(ids *idp,dirseen *dsp,char *pfname,cc *pr,cc *pn) noex {
 	USTAT		sb ;
 	int		rs ;
 	int		pl = 0 ;

@@ -75,7 +75,7 @@
 #include	<char.h>
 #include	<vecstr.h>
 #include	<passwdent.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<localmisc.h>

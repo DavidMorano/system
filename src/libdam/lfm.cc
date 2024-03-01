@@ -67,7 +67,7 @@
 #include	<estrings.h>
 #include	<filebuf.h>
 #include	<storeitem.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<ugetpid.h>
 #include	<localmisc.h>
 

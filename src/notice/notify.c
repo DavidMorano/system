@@ -70,7 +70,7 @@
 #include	<vecstr.h>
 #include	<sbuf.h>
 #include	<ascii.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"config.h"

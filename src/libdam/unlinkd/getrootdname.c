@@ -71,7 +71,7 @@
 #include	<ids.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<fsdir.h>
 #include	<localmisc.h>
 

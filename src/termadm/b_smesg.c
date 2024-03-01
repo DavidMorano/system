@@ -66,7 +66,7 @@
 #include	<field.h>
 #include	<sntmtime.h>
 #include	<ids.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<getutmpent.h>
 #include	<grmems.h>
 #include	<sysrealname.h>

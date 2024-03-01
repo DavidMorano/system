@@ -41,7 +41,7 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
@@ -60,6 +60,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -74,35 +77,38 @@
 
 /* exported subroutines */
 
-int getprojname(char *nbuf,int nlen,cchar *un) noex {
+int getprojname(char *rbuf,int rlen,cchar *un) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		nl = 0 ;
-	if (nbuf && un) {
-	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
-	        cint	ulen = rs ;
-		char	ubuf[rs+1] ;
-	        if ((un[0] == '-') || (un[0] == '\0')) {
-	            un = ubuf ;
-	            rs = getusername(ubuf,ulen,-1) ;
-	        }
-	        if (rs >= 0) {
-	            char	*pjbuf{} ;
-	            if ((rs = malloc_pj(&pjbuf)) >= 0) {
-			auto	getpj = uc_getdefaultproj ;
-	                ucentpj	pj ;
-	                cint	pjlen = rs ;
-	                if ((rs = getpj(&pj,pjbuf,pjlen,un)) >= 0) {
-	                    rs = sncpy1(nbuf,nlen,pj.pj_name) ;
-		            nl = rs ;
-		        }
-		        rs1 = uc_free(pjbuf) ;
-		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (memory-allocation) */
-	        } /* end if (ok) */
-	    } /* end if (getbufsize) */
+	int		rl = 0 ;
+	if (rbuf && un) {
+	    rs = SR_INVALID ;
+	    if (rlen > 0) {
+	        if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	            cint	ulen = rs ;
+		    char	ubuf[rs+1] ;
+	            if ((un[0] == '-') || (un[0] == '\0')) {
+	                un = ubuf ;
+	                rs = getusername(ubuf,ulen,-1) ;
+	            }
+	            if (rs >= 0) {
+	                char	*pjbuf{} ;
+	                if ((rs = malloc_pj(&pjbuf)) >= 0) {
+			    auto	getpj = uc_getdefaultproj ;
+	                    ucentpj	pj ;
+	                    cint	pjlen = rs ;
+	                    if ((rs = getpj(&pj,pjbuf,pjlen,un)) >= 0) {
+	                        rs = sncpy1(rbuf,rlen,pj.pj_name) ;
+		                rl = rs ;
+		            }
+		            rs1 = uc_free(pjbuf) ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (m-a-f) */
+	            } /* end if (ok) */
+	        } /* end if (getbufsize) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return (rs >= 0) ? nl : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (getprojname) */
 

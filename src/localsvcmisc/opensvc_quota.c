@@ -71,7 +71,7 @@
 #include	<char.h>
 #include	<getax.h>
 #include	<ugetpw.h>
-#include	<getxusername.h>
+#include	<getusername.h>
 #include	<localmisc.h>
 
 #include	"opensvc_quota.h"
