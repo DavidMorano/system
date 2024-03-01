@@ -41,14 +41,14 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
 #include	<varnames.hh>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<getax.h>
 #include	<snx.h>
 #include	<sncpyx.h>
@@ -59,22 +59,6 @@
 
 
 /* local defines */
-
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	GROUPNAMELEN
-#define	GROUPNAMELEN	USERNAMELEN
-#endif
-
-#ifndef	VARGROUPNAME
-#define	VARGROUPNAME	"GROUPNAME"
-#endif
 
 
 /* external subroutines */
@@ -105,47 +89,49 @@ constexpr gid_t		gidend = -1 ;
 /* exported subroutines */
 
 int getgroupname(char *gbuf,int glen,gid_t gid) noex {
-	const gid_t	gid_our = getgid() ;
-	int		rs ;
+	const gid_t	ourgid = getgid() ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (gbuf == NULL) return SR_FAULT ;
-
-	if (glen < 0) glen = GROUPNAMELEN ;
-
-	if (gid == gidend) gid = gid_our ;
-
-	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	    GROUP	gr ;
-	    cint	grlen = rs ;
-	    char	*grbuf{} ;
-	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-	        cchar	*vn = VARGROUPNAME ;
-	        cchar	*gn = NULL ;
-	        if ((gid == gid_our) && ((gn = getenv(vn)) != NULL)) {
-	            if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
-	                if (gr.gr_gid != gid) {
-			    rs = SR_SEARCH ;
+	int		len = 0 ;
+	cchar		*vn = varname.groupname ;
+	if (gbuf) {
+	    rs = SR_OVERFLOW ;
+	    if (gid == gidend) gid = ourgid ;
+	    if (glen > 0) {
+	        char		*grbuf{} ;
+	        static cchar	*vgn = getenv(vn) ;
+	        if ((rs = malloc_gr(&grbuf)) >= 0) {
+	            GROUP	gr ;
+	            cint	grlen = rs ;
+		    cchar	*gn = nullptr ;
+	            if ((gid == ourgid) && vgn) {
+	                if ((rs = getgr_name(&gr,grbuf,grlen,vgn)) >= 0) {
+	                    if (gr.gr_gid == gid) {
+				gn = vgn ;
+			    } else {
+			        rs = SR_SEARCH ;
+		            }
 		        }
-		    }
-	        } else {
-	            rs = SR_NOTFOUND ;
-	        }
-	        if (isNotOurs(rs)) {
-	            rs = getgr_gid(&gr,grbuf,grlen,gid) ;
-		    gn = gr.gr_name ;
-	        }
-	        if (rs >= 0) {
-	            rs = sncpy1(gbuf,glen,gn) ;
-	        } else if (isNotOurs(rs)) {
-	            rs = snsd(gbuf,glen,"G",(uint) gid) ;
-	        }
-	        rs1 = uc_free(grbuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
-	} /* end if (getbufsize) */
-
-	return rs ;
+	            } else {
+	                rs = SR_NOTFOUND ;
+	            }
+	            if (isNotOurs(rs)) {
+	                rs = getgr_gid(&gr,grbuf,grlen,gid) ;
+		        gn = gr.gr_name ;
+	            }
+	            if ((rs >= 0) && gn) {
+	                rs = sncpy1(gbuf,glen,gn) ;
+			len = rs ;
+	            } else if (isNotOurs(rs)) {
+	                rs = snsd(gbuf,glen,"G",gid) ;
+			len = rs ;
+	            }
+	            rs1 = uc_free(grbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getgroupname) */
 
