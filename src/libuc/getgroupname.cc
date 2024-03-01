@@ -1,16 +1,19 @@
-/* getgroupname */
+/* getgroupname SUPPORT */
+/* lang=C++20 */
 
 /* get a groupname by GID */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-03-01, David AÂ­DÂ­ Morano
-        This subroutine is being written for use by PCS programs, but it
-        obviously has wider applications. It is simple, but effective!
+	= 1998-03-01, David A­D­ Morano
+	This subroutine is being written for use by PCS programs,
+	but it obviously has wider applications. It is simple, but
+	effective!
 
-	= 2019-01-05, David A.D. Morano
-	Enhanced error checking for |getbufsize(3uc|.
+	= 2019-01-05, David A-D- Morano
+	Enhanced error checking for |getbufsize(3uc)|.
 	
 */
 
@@ -18,41 +21,41 @@
 
 /*******************************************************************************
 
+	Name:
+	getgroupname
+
+	Description:
 	Get a groupname given a GID.
 
 	Synopsis:
-
-	int getgroupname(rbuf,rlen,gid)
-	char		rbuf[] ;
-	int		rlen ;
-	gid_t		gid ;
+	int getgroupname(char *rbuf,int rlen,gid_t gid) noex
 
 	Arguements:
-
 	buf		supplied buffer to receive groupname
 	buflen		length of supplied buffer
 	gid		GID of group to get
 
 	Returns:
-
 	>=0		length of return groupname
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<grp.h>
-
 #include	<usystem.h>
+#include	<varnames.hh>
 #include	<getbufsize.h>
 #include	<getax.h>
+#include	<snx.h>
+#include	<sncpyx.h>
+#include	<isoneof.h>
 #include	<localmisc.h>
+
+#include	"getgroupname.h"
 
 
 /* local defines */
@@ -76,33 +79,32 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	isOneOf(const int *,int) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	isNotOurs(int) ;
+static int	isNotOurs(int) noex ;
 
 
 /* local variables */
 
-const int	rsnotours[] = {
+constexpr int	rsnotours[] = {
 	SR_SEARCH,
 	SR_NOTFOUND,
 	0
 } ;
 
+constexpr gid_t		gidend = -1 ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int getgroupname(char gbuf[],int glen,gid_t gid)
-{
+int getgroupname(char *gbuf,int glen,gid_t gid) noex {
 	const gid_t	gid_our = getgid() ;
 	int		rs ;
 	int		rs1 ;
@@ -111,15 +113,15 @@ int getgroupname(char gbuf[],int glen,gid_t gid)
 
 	if (glen < 0) glen = GROUPNAMELEN ;
 
-	if (gid < 0) gid = gid_our ;
+	if (gid == gidend) gid = gid_our ;
 
 	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	    struct group	gr ;
-	    const int		grlrn = rs ;
-	    char		*grbuf ;
+	    GROUP	gr ;
+	    cint	grlen = rs ;
+	    char	*grbuf{} ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-	        const char	*vn = VARGROUPNAME ;
-	        const char	*gn = NULL ;
+	        cchar	*vn = VARGROUPNAME ;
+	        cchar	*gn = NULL ;
 	        if ((gid == gid_our) && ((gn = getenv(vn)) != NULL)) {
 	            if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
 	                if (gr.gr_gid != gid) {
@@ -150,9 +152,7 @@ int getgroupname(char gbuf[],int glen,gid_t gid)
 
 /* local subroutines */
 
-
-static int isNotOurs(int rs)
-{
+static int isNotOurs(int rs) noex {
 	return isOneOf(rsnotours,rs) ;
 }
 /* end subroutine (isNotOurs) */
