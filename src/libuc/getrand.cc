@@ -27,7 +27,7 @@
 	rlen		length of supplied result buffer
 
 	Returns:
-	>0		returned number of bytes
+	>=0		returned number of bytes
 	<0		error (system-return)
 
 *******************************************************************************/

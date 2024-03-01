@@ -5,6 +5,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-07-01, David A­D­ Morano
+	This subroutine was originally written.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETUSERNAME_INCLUDE

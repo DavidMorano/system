@@ -39,23 +39,14 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstdlib>
-#include	<cstring>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
-#include	<filebuf.h>
-#include	<getax.h>
 #include	<getusername.h>
 #include	<getuserorg.h>
-#include	<char.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"pcsgetorg.h"
 #include	"pcsgetuserorg.h"
 
 

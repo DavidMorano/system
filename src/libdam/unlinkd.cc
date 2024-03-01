@@ -1,11 +1,10 @@
-/* unlinkd */
+/* unlinkd SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to try and invoke the UNLINK daemon */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SETRUID	0		/* set real UID to EUID */
-
 
 /* revision history:
 
@@ -18,41 +17,38 @@
 
 /******************************************************************************
 
-	This subroutine calls the UNLINKD program to delete (unlink) files.
+	Name:
+	unlinkd
+
+	Description:
+	This subroutine calls the UNLINKD program to delete (unlink)
+	files.
 
 	Synopsis:
-
-	int unlinkd(filename,delay)
-	const char	filename[] ;
-	int		delay ;
+	int unlinkd(cchar *filename,int delay) noex
 
 	Arguments:
-
 	filename	filename to unlink
 	delay		time to wait before the unlink in seconds
 
 	Returns:
-
 	>=0		OK
-	<0		some error
-
+	<0		some error (system-return)
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<stdlib.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<usupport.h>		/* |memclear(3u)| */
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<exitcodes.h>
@@ -62,10 +58,6 @@
 
 
 /* local defines */
-
-#ifndef	NOFILE
-#define	NOFILE		20
-#endif
 
 #ifndef	VARPRLOCAL
 #define	VARPRLOCAL	"LOCAL"
@@ -79,13 +71,11 @@
 #define	VARPATH		"PATH"
 #endif
 
+#define	SUBINFO		struct subinfo
+
 #define	DEFDELAY	30
 
-#if	CF_DEBUGS
-#define	PROG_RMER	"/home/dam/src/rmer/rmer.x"
-#else
 #define	PROG_RMER	"rmer"
-#endif
 
 #define	PROG_UNLINKD	"unlinkd"
 
@@ -94,26 +84,25 @@
 
 /* external subroutines */
 
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
+extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	msleep(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
 
-extern const char	**environ ;	/* from system at invocation */
+extern cchar	**environ ;	/* from system at invocation */
 
 
 /* local structures */
 
 struct subinfo_args {
-	const char	*fname ;
+	cchar		*fname ;
 	uint		delay ;
 } ;
 
@@ -130,16 +119,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(struct subinfo *,const char *,int) ;
-static int	subinfo_finish(struct subinfo *) ;
-static int	subinfo_fork(struct subinfo *) ;
-static int	subinfo_daemon(struct subinfo *) ;
-static int	subinfo_rmer(struct subinfo *) ;
+static int	subinfo_start(SUBINFO *,cchar *,int) ;
+static int	subinfo_finish(SUBINFO *) ;
+static int	subinfo_fork(SUBINFO *) ;
+static int	subinfo_daemon(SUBINFO *) ;
+static int	subinfo_rmer(SUBINFO *) ;
 
 
 /* local variables */
 
-static int	(*scheds[])(struct subinfo *) = {
+static constexpr int	(*scheds[])(SUBINFO *) = {
 	subinfo_rmer,
 	subinfo_fork,
 	subinfo_daemon,
@@ -147,30 +136,23 @@ static int	(*scheds[])(struct subinfo *) = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int unlinkd(fname,delay)
-const char	fname[] ;
-int		delay ;
-{
-	struct subinfo	si, *sip = &si ;
-
-	struct ustat	sb ;
-
-	int	rs = SR_OK ;
-	int	i = 0 ;
-
+int unlinkd(cchar *fname,int delay) noex {
+	SUBINFO		si, *sip = &si ;
+	USTAT		sb ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		i = 0 ;
 
 	if (fname == NULL)
 	    return SR_FAULT ;
 
 	if (fname[0] == '\0')
 	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("unlinkd: f=%s d=%d\n",fname,delay) ;
-#endif
 
 	if (u_stat(fname,&sb) >= 0) {
 	    if ((rs = subinfo_start(sip,fname,delay)) >= 0) {
@@ -184,10 +166,6 @@ int		delay ;
 	    } /* end if (subinfo) */
 	} /* end if (stat; file exists) */
 
-#if	CF_DEBUGS
-	debugprintf("unlinkd: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (unlinkd) */
@@ -195,53 +173,30 @@ int		delay ;
 
 /* local subroutines */
 
-
-static int subinfo_start(sip,fname,delay)
-struct subinfo	*sip ;
-const char	fname[] ;
-int		delay ;
-{
+static int subinfo_start(SUBINFO *sip,cc *fname,int delay) noex {
 	int	rs = SR_OK ;
-
-
-	if (delay <= 0)
-	    delay = DEFDELAY ;
-
-	memset(sip,0,sizeof(struct subinfo)) ;
-
+	if (delay <= 0) delay = DEFDELAY ;
+	memclear(sip) ;
 	sip->daytime = time(NULL) ;
-
 	sip->arg.fname = fname ;
 	sip->arg.delay = delay ;
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(sip)
-struct subinfo	*sip ;
-{
-
-
+static int subinfo_finish(SUBINFO *sip) noex {
 	sip->daytime = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_fork(sip)
-struct subinfo	*sip ;
-{
-	struct ustat	sb ;
-
+static int subinfo_fork(SUBINFO *sip) noex {
+	USTAT		sb ;
 	pid_t	pid ;
-
 	time_t	ti_expire ;
-
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	i ;
-
 
 	rs = uc_fork() ;
 	pid = rs ;
@@ -253,13 +208,11 @@ struct subinfo	*sip ;
 #if	CF_SETRUID
 	{
 	    uid_t	uid, euid ;
-
 	    uid = getuid() ;
-
 	    euid = geteuid() ;
-
-	    if (euid != uid)
+	    if (euid != uid) {
 	        u_setreuid(euid,-1) ;
+	    }
 	}
 #endif /* CF_SETRUID */
 
@@ -296,27 +249,16 @@ ret0:
 }
 /* end subroutine (subinfo_fork) */
 
-
-static int subinfo_daemon(sip)
-struct subinfo	*sip ;
-{
+static int subinfo_daemon(SUBINFO *sip) noex {
 	int	rs = SR_NOSYS ;
-
-
 	return rs ;
 }
 /* end subroutine (subinfo_daemon) */
 
-
-static int subinfo_rmer(sip)
-struct subinfo	*sip ;
-{
+static int subinfo_rmer(SUBINFO *sip) noex {
 	struct spawnproc	pg ;
-
 	struct rmermsg_fname	m0 ;
-
 	pid_t	pid ;
-
 	int	rs = SR_OK ;
 	int	rs1 ;
 	int	fd ;
@@ -328,12 +270,8 @@ struct subinfo	*sip ;
 	int	opt = 0 ;
 	int	i ;
 
-#if	CF_DEBUGS
-	int	fd_err ;
-#endif
-
-	const char	*pn = PROG_RMER ;
-	const char	*av[10 + 1] ;
+	cchar	*pn = PROG_RMER ;
+	cchar	*av[10 + 1] ;
 
 	char	dname[MAXHOSTNAMELEN + 1] ;
 	char	pr[MAXPATHLEN + 1] ;
@@ -345,22 +283,10 @@ struct subinfo	*sip ;
 	if (rs1 < 0)
 	    dname[0] = '\0' ;
 
-#if	CF_DEBUGS
-	debugprintf("unlinkd/subinfo_rmer: getnodedomain() rs=%d\n",rs1) ;
-#endif
-
 	rs1 = mkpr(pr,MAXPATHLEN,VARPRLOCAL,dname) ;
-
-#if	CF_DEBUGS
-	debugprintf("unlinkd/subinfo_rmer: mkpr() rs=%d\n",rs1) ;
-#endif
 
 	if (rs1 >= 0) {
 	    rs1 = prgetprogpath(pr,progfname,pn,-1) ;
-
-#if	CF_DEBUGS
-	debugprintf("unlinkd/subinfo_rmer: prgetprogpath() rs=%d\n",rs1) ;
-#endif
 
 	    if (rs1 == 0)
 	        rs = mkpath1(progfname,pn) ;
@@ -370,15 +296,7 @@ struct subinfo	*sip ;
 
 	    rs = findfilepath(VARPATH,progfname,pn,X_OK) ;
 
-#if	CF_DEBUGS
-	debugprintf("unlinkd/subinfo_rmer: findfilepath() rs=%d\n",rs) ;
-#endif
-
 	}
-
-#if	CF_DEBUGS
-	debugprintf("unlinkd/subinfo_rmer: progfname=%s\n",progfname) ;
-#endif
 
 	if (rs < 0)
 	    goto ret0 ;
@@ -402,15 +320,7 @@ struct subinfo	*sip ;
 /* prepare arguments for the spawned program */
 
 	i = 0 ;
-#if	CF_DEBUGS
-	av[i++] = "RMERd" ;
-#else
 	av[i++] = "RMER" ;
-#endif
-#if	CF_DEBUGS
-	fd_err = uc_open("rmer.e",(O_WRONLY | O_CREAT | O_TRUNC),0666) ;
-	av[i++] = "-D=5" ;
-#endif
 	av[i++] = NULL ;
 
 	memset(&pg,0,sizeof(struct spawnproc)) ;
@@ -418,37 +328,10 @@ struct subinfo	*sip ;
 	pg.opts |= SPAWNPROC_OSETPGRP ;
 	pg.disp[0] = SPAWNPROC_DOPEN ;
 	pg.disp[1] = SPAWNPROC_DCLOSE ;
-#if	CF_DEBUGS
-	pg.disp[2] = SPAWNPROC_DDUP ;
-	pg.fd[2] = fd_err ;
-#else
 	pg.disp[2] = SPAWNPROC_DCLOSE ;
-#endif
 
-#if	CF_DEBUGS
-	{
-	vecstr	envs ;
-	int	i ;
-	const char	**ev ;
-	vecstr_start(&envs,10,VECSTR_OCOMPACT) ;
-	for (i = 0 ; environ[i] != NULL ; i += 1)
-		vecstr_add(&envs,environ[i],-1) ;
-	vecstr_add(&envs,"RMER_DEBUGFILE=rmer.d",-1) ;
-	vecstr_getvec(&envs,&ev) ;
-	rs = spawnproc(&pg,progfname,av,ev) ;
-	pid = rs ;
-	vecstr_finish(&envs) ;
-	}
-#else
 	rs = spawnproc(&pg,progfname,av,environ) ;
 	pid = rs ;
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	debugprintf("unlinkd/subinfo_rmer: spawnproc() rs=%d\n",rs) ;
-	if (fd_err >= 0)
-	u_close(fd_err) ;
-#endif
 
 	if (rs < 0)
 	    goto ret1 ;
@@ -456,15 +339,15 @@ struct subinfo	*sip ;
 	fd = pg.fd[0] ;
 	if (fd >= 0) {
 
-	    rs = rmermsg_fname(&m0,0,ipcbuf,ipcbuflen) ;
-	    len = rs ;
-	    if (rs >= 0)
+	    if ((rs = rmermsg_fname(&m0,0,ipcbuf,ipcbuflen)) >= 0) {
+	        len = rs ;
 	        rs = uc_writen(fd,ipcbuf,len) ;
-
+	    }
 	    u_close(fd) ;
 
-	} else
+	} else {
 	    rs = SR_NOSYS ;
+	}
 
 /* wait for the spawned program to exit */
 
