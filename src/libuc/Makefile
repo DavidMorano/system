@@ -243,7 +243,7 @@ OBJ127= utmpaccent.o
 OBJ128= sigaction.o sigevent.o 
 OBJ129= timeval.o itimerspec.o timespec.o timeout.o
 OBJ130= sigignores.o sigdefaults.o
-OBJ131= isasocket.o isinetaddr.o isindomain.o
+OBJ131= isfiledesc.o isinetaddr.o isindomain.o
 OBJ132= hasNotDots.o
 OBJ133= nleadstr.o nleadkeystr.o
 OBJ134= format.o
@@ -1081,6 +1081,16 @@ buffer.o:		buffer.dir
 buffer.dir:
 	makesubdir $@
 
+# ISMISC
+ismisc.o:		ismisc.dir
+ismisc.dir:
+	makesubdir $@
+
+# ISFILEDESC
+isfiledesc.o:		isfiledesc.dir
+isfiledesc.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1157,21 +1167,11 @@ findfilepath.o:		findfilepath.cc findfilepath.h
 #
 isproc.o:		isproc.cc isproc.h
 #
-isasocket.o:		isasocket.cc isfiledesc.h
-isinteractive.o:	isinteractive.cc isfiledesc.h
-isfsremote.o:		isfsremote.cc isfiledesc.h
-#
 isinetaddr.o:		isinetaddr.cc isinetaddr.h
 isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
-#
-isprime.o:		isprime.cc ismisc.h
-isleapyear.o:		isleapyear.cc ismisc.h
-isdotdir.o:		isdotdir.cc ismisc.h
-issamehostname.o:	issamehostname.cc issamehostname.h ismisc.h
-isobjspecial.o:		isobjspecial.cc ismisc.h
 
 
 userattrdb.o:		userattrdb.cc	userattrdb.h
