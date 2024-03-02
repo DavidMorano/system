@@ -13,7 +13,7 @@
 
 	= 2017-11-22, David A­D­ Morano
 	I finally (finally) removed (compiled out) the global
-	function symbol |getuser_uid()|.  Good riddance.
+	function symbol |getuser_uid(3uc)|.  Good riddance.
 
 */
 

@@ -1,7 +1,7 @@
 /* getxid HEADER */
 /* lang=C20 */
 
-/* get the certain system IDs based on a specified name */
+/* get certain system IDs based on a specified name */
 /* version %I% last-modified %G% */
 
 
