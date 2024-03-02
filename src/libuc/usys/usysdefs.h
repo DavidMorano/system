@@ -81,8 +81,8 @@
 
 /* max-name */
 #ifndef	MNBUFLEN
-#ifdef	NAME_LEN
-#define	MNBUFLEN	NAME_LEN
+#ifdef	NAME_MAX
+#define	MNBUFLEN	NAME_MAX
 #else
 #define	MNBUFLEN	(1*1024)
 #endif
@@ -90,8 +90,8 @@
 
 /* max-path */
 #ifndef	MPBUFLEN
-#ifdef	MAXPATHLEN
-#define	MPBUFLEN	MAXPATHLEN
+#ifdef	PATH_MAX
+#define	MPBUFLEN	PATH_MAX
 #else
 #define	MPBUFLEN	(4*1024)
 #endif
@@ -99,7 +99,11 @@
 
 /* max-line */
 #ifndef	MLBUFLEN
+#ifdef	LINE_MAX
+#define	MLBUFLEN	LINE_MAX
+#else
 #define	MLBUFLEN	(2*2048)
+#endif
 #endif
 
 /* node-name */
@@ -117,7 +121,11 @@
 
 /* host-name */
 #ifndef	HNBUFLEN
+#ifdef	MAXHOSTNAMELEN
+#define	HNBUFLEN	MAXHOSTNAMELEN
+#else
 #define	HNBUFLEN	(1*1024)
+#endif
 #endif
 
 /* user-name */
@@ -194,7 +202,11 @@
 
 /* zone-name (from Zone-Info) */
 #ifndef	ZNBUFLEN
-#define	ZNBUFLEN	128
+#ifdef	TZNAME_MAX
+#define	ZNBUFLEN	TZNAME_MAX
+#else
+#define	ZNBUFLEN	20		/* POSIX®-2 value */
+#endif
 #endif
 
 #ifndef	CLUSTERNAMELEN

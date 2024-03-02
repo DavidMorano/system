@@ -261,8 +261,8 @@ int getpjid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr		n ;
-	        cchar		*name{} ;
+	        nulstr	n ;
+	        cchar	*name{} ;
 	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
 	            if ((rs = getbufsize(getbufsize_pj)) >= 0) {
 	                PROJECT	pj ;
