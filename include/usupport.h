@@ -16,9 +16,7 @@
 #include	<sys/time.h>
 #include	<time.h>
 #include	<string.h>		/* <- for |memset(3c)| */
-
 #include	<usys.h>		/* <- auxillary OS support */
-
 #include	<stdint.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

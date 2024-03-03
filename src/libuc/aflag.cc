@@ -41,6 +41,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 bool aflag_co::operator () () noex {

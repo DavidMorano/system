@@ -34,7 +34,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstdarg>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -59,8 +59,6 @@
 
 
 /* forward references */
-
-static char	*strdcpyxw(char *,int,int,...) noex ;
 
 
 /* local variables */
@@ -100,10 +98,7 @@ char *strdcpy6w(char *dp,int dl,cc *s1,cc *s2,cc *s3,cc *s4,
 }
 /* end subroutine (strdcpy6w) */
 
-
-/* local subroutines */
-
-static char *strdcpyxw(char *dp,int dl,int n,...) noex {
+char *strdcpyxw(char *dp,int dl,int n,...) noex {
 	if (dp) {
 	    va_list	ap ;
 	    va_begin(ap,n) ;

@@ -934,7 +934,7 @@ usys_sunos.o:		usys_sunos.cc usys_sunos.h
 usys_darwin.o:		usys_darwin.cc usys_darwin.h
 usys_linux.o:		usys_linux.cc usys_linux.h
 aflag.o:		aflag.cc aflag.hh
-timewatch.o:		timwatch.cc timewatch.hh
+timewatch.o:		timewatch.cc timewatch.hh
 timecount.o:		timecount.cc timecount.hh
 
 # USYS
@@ -1159,6 +1159,7 @@ ids.o:			ids.cc ids.h
 groupids.o:		groupids.cc groupids.hh
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
+strenv.o:		strenv.cc strenv.hh
 strwcpy.o:		strwcmp.cc strwcmp.h
 isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h

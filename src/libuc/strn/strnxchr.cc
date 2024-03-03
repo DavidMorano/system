@@ -75,6 +75,9 @@
 typedef char	*charp ;
 
 
+/* external subroutines */
+
+
 /* forward references */
 
 
@@ -83,6 +86,9 @@ typedef char	*charp ;
 constexpr bool		f_strchr = CF_STRCHR ;
 constexpr bool		f_strrchr = CF_STRRCHR ;
 constexpr bool		f_memchr = CF_MEMCHR ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

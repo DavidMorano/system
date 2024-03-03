@@ -34,9 +34,9 @@
 
 	Notes:
 	Q. Why all of the fuss?
-	A. We need to know when a |fork(2)| occurs so that the PID can
-	be updated on the next read-access of it. That feature comes with
-	the associated baggage (below).
+	A. We need to know when a |fork(2)| occurs so that the PID
+	can be updated on the next read-access of it.  That feature
+	comes with the associated baggage (below).
 
 *******************************************************************************/
 
@@ -151,7 +151,7 @@ int ucgetpid_fini() noex {
 
 int ucgetpid::init() noex {
 	int		rs = SR_NXIO ;
-	int		f = false ;
+	int		fr = false ;
 	if (!fvoid) {
 	    cint	to = utimeout[uto_busy] ;
 	    rs = SR_OK ;
@@ -163,7 +163,7 @@ int ucgetpid::init() noex {
 	            if ((rs = uc_atforkrecord(b,ap,ac)) >= 0) {
 	                if ((rs = uc_atexit(ucgetpid_exit)) >= 0) {
 	                    finitdone = true ;
-	                    f = true ;
+	                    fr = true ;
 	                }
 	                if (rs < 0) {
 	                    uc_atforkexpunge(b,ap,ac) ;
@@ -190,7 +190,7 @@ int ucgetpid::init() noex {
 	        rs = tw(lamb) ;
 	    } /* end if (initialization) */
 	} /* end if (not voided) */
-	return (rs >= 0) ? f : rs ;
+	return (rs >= 0) ? fr : rs ;
 }
 /* end method (ucgetpid::init) */
 
