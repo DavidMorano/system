@@ -29,8 +29,9 @@
 
 	Synopsis:
 	int rmeol(cchar *sp,int sl) noex
+	int rmochr(cchar *sp,int sl,int sch) noex
+	int rmrchr(cchar *sp,int sl,int sch) noex
 	int rmext(cchar *sp,int sl) noex
-	int rmchr(cchar *sp,int sl,int sch) noex
 
 	Arguments:
 	sp		pinter to constant string to consider

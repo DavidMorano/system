@@ -264,19 +264,17 @@ int getpjid_name(cchar *sp,int sl) noex {
 	        nulstr	ns ;
 	        cchar	*name{} ;
 	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
-	            if ((rs = getbufsize(getbufsize_pj)) >= 0) {
-	                PROJECT	pj ;
+	            char	*pjbuf{} ;
+	            if ((rs = malloc_pj(&pjbuf)) >= 0) {
 	                cint	pjlen = rs ;
-	                char	*pjbuf{} ;
-	                if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
-		            {
-	                        rs = getpj_name(&pj,pjbuf,pjlen,name) ;
-	                        pjid = pj.pj_projid ;
-		            }
-	                    rs1 = uc_free(pjbuf) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (m-a-f) */
-	            } /* end if (getbufsize) */
+		        {
+	                    PROJECT	pj ;
+	                    rs = getpj_name(&pj,pjbuf,pjlen,name) ;
+	                    pjid = pj.pj_projid ;
+		        }
+	                rs1 = uc_free(pjbuf) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (m-a-f) */
 	            rs1 = ns.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */

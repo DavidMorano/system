@@ -52,7 +52,7 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int iseol(int ch) noex {
+inline bool iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
 inline bool iszero(int ch) noex {
@@ -64,7 +64,7 @@ inline bool isplusminus(int ch) noex {
 
 #else /* __cplusplus */
 
-static inline int iseol(int ch) noex {
+static inline bool iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
 static inline bool iszero(int ch) noex {
