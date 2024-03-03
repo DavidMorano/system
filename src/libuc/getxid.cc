@@ -149,9 +149,9 @@ int getuid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr	n ;
+	        nulstr	ns ;
 	        cchar	*name{} ;
-	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
+	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
 	            char	*pwbuf{} ;
 	            if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	                cint	pwlen = rs ;
@@ -163,7 +163,7 @@ int getuid_name(cchar *sp,int sl) noex {
 	                rs1 = uc_free(pwbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
-	            rs1 = nulstr_finish(&n) ;
+	            rs1 = ns.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */
 	    } /* end if (valid) */
@@ -196,7 +196,7 @@ int getgid_name(cchar *sp,int sl) noex {
 	int		gid = 0 ;
 	if (sp) {
 	    rs = SR_INVALID ;
-	    if (sp[0] && (sl > 0)) {
+	    if (sp[0]) {
 	        nulstr	ns ;
 	        cchar	*name{} ;
 	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
@@ -224,7 +224,7 @@ int getgid_group(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    rs = SR_INVALID ;
-	    if (sp[0] && (sl > 0)) {
+	    if (sp[0]) {
 	        if (hasalldig(sp,sl)) {
 	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
@@ -261,9 +261,9 @@ int getpjid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr	n ;
+	        nulstr	ns ;
 	        cchar	*name{} ;
-	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
+	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
 	            if ((rs = getbufsize(getbufsize_pj)) >= 0) {
 	                PROJECT	pj ;
 	                cint	pjlen = rs ;
@@ -277,7 +277,7 @@ int getpjid_name(cchar *sp,int sl) noex {
 	                    if (rs >= 0) rs = rs1 ;
 	                } /* end if (m-a-f) */
 	            } /* end if (getbufsize) */
-	            rs1 = nulstr_finish(&n) ;
+	            rs1 = ns.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */
 	    } /* end if (valid) */
