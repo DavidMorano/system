@@ -77,7 +77,7 @@ namespace {
 }
 
 
-/* forward subroutines */
+/* forward references */
 
 
 /* local variables */
