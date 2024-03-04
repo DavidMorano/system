@@ -135,5 +135,6 @@ snuuid.o:		snuuid.cc $(INCS)
 sntid.o:		sntid.cc $(INCS)
 snerrabbr.o:		snerrabbr.cc $(INCS)
 sntmtime.o:		sntmtime.cc sntmtime.h $(INCS)
+snaddw.o:		snaddw.cc snaddw.h $(INCS)
 
 

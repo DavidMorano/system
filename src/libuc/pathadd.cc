@@ -17,12 +17,14 @@
 /*******************************************************************************
 
 	Name:
+	pathaddw
 	pathadd
-	pathaddx
 
 	Description:
 	This subroutine adds a new component to an existing file-path.
 	These subroutines return the total length of the final path.
+	The length of the supplied buffer for the added-to path is
+	assumed to be MAXPATHLEN (determined dynamically).
 
 	Synopses:
 	int pathaddw(char *pbuf,int plen,cchar *sp,int sl) noex
@@ -44,7 +46,10 @@
 	a subroutine that returns just the added part, then check
 	out the |storebuf(3uc)| facility or the |snadd(3uc)| facility,
 	or simply create your own using the various |snx(3uc)| 
-	subroutines (and other methods also).
+	subroutines (and other methods also).  In this subroutines,
+	the length of the supplied buffer for the added-to path is
+	assumed to be MAXPATHLEN (determined dynamically).
+
 
 *******************************************************************************/
 
@@ -67,6 +72,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -103,10 +111,5 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	return (rs >= 0) ? pl : rs ;
 }
 /* end subroutine (pathaddw) */
-
-int pathadd(char *pbuf,int pl,cchar *sp) noex {
-	return pathaddw(pbuf,pl,sp,-1) ;
-}
-/* end subroutine (pathadd) */
 
 

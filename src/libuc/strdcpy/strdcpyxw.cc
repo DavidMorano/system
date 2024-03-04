@@ -64,6 +64,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 char *strdcpy1w(char *dp,int dl,cc *s1,int sl) noex {

@@ -29,11 +29,11 @@
 	name, assumed to be a user-name.
 
 	Synopsis:
-	int getuid_name(cchar *np,int nl) noex
+	int getuid_name(cchar *sp,int sl) noex
 
 	Arguments:
-	np		user-name to lookup
-	nl		length of name string
+	sp		user-name to lookup
+	sl		length of name string
 
 	Returns:
 	>=0		retrieved UID
@@ -85,11 +85,11 @@
 	program-name.
 
 	Synopsis:
-	int getpjid_name(cchar *np,int nl) noex
+	int getpjid_name(cchar *sp,int sl) noex
 
 	Arguments:
-	np		name of project to look up 
-	nl		length of name (in bytes)
+	sp		name of project to look up 
+	sl		length of name (in bytes)
 
 	Returns:
 	>=0		PJID of given project name

@@ -94,6 +94,9 @@ using std::min ;			/* subroutine-template */
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 char *strdcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {

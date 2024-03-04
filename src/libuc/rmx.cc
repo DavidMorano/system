@@ -21,6 +21,8 @@
 	rmochr
 	rmrchr
 	rmext
+	rmtrailchr
+	rmcomment
 
 	Description:
 	Return the length of the given string without any EOL
@@ -32,6 +34,8 @@
 	int rmochr(cchar *sp,int sl,int sch) noex
 	int rmrchr(cchar *sp,int sl,int sch) noex
 	int rmext(cchar *sp,int sl) noex
+	int rmtrailchr(cchar *sp,int sl,int sch) noex
+	int rmcomment(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		pinter to constant string to consider

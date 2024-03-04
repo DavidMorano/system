@@ -66,6 +66,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snaddw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
