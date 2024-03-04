@@ -103,6 +103,9 @@ static int	parsemonth(cchar *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int dayspec_default(dayspec *op) noex {
@@ -150,7 +153,6 @@ int dayspec_yday(dayspec *op) noex {
 static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si ;
-	int		ti ;
 	int		yl = 0 ;
 	int		ml = 0 ;
 	int		dl = 0 ;
@@ -184,7 +186,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 		break ;
 	    } /* end switch */
 	} else {
-	    if ((ti = siourbrk(sp,sl,0)) >= 0) {
+	    if (int ti ; (ti = siourbrk(sp,sl,0)) >= 0) {
 	        bool	f_dig = false ;
 		{
 	            yp = sp ;
@@ -205,7 +207,7 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 		    }
 		}
 		if (sl > 0) {
-		    int	ch = mkchar(sp[0]) ;
+		    int		ch = mkchar(sp[0]) ;
 		    f_dig = isalphalatin(ch) ;
 	        }
 	        if ((ti = siourbrk(sp,sl,f_dig)) >= 0) {
@@ -265,10 +267,9 @@ static int dayspec_parse(dayspec *op,cchar *sp,int sl) noex {
 
 static int parsemonth(cchar *mp,int ml) noex {
 	int		rs = SR_INVALID ;
-	int		cl ;
 	int		mi = -1 ;
 	cchar		*cp ;
-	if ((cl = sfshrink(mp,ml,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(mp,ml,&cp)) > 0) {
 	    cint	ch = mkchar(cp[0]) ;
 	    if (isalphalatin(ch)) {
 	        mi = matpcasestr(calstrs_months,2,cp,cl) ;
@@ -283,7 +284,7 @@ static int parsemonth(cchar *mp,int ml) noex {
 /* end subroutine (parsemonth) */
 
 static int siourbrk(cchar *sp,int sl,int f_dig) noex {
-	int		i = -1 ;
+	int		i = -1 ; /* used afterwards */
 	bool		f = false ;
 	for (i = 0 ; i < sl ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;

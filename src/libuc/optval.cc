@@ -53,6 +53,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local variables */
 
 static constexpr cchar	*hits[] = {

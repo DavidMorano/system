@@ -1,7 +1,7 @@
 
 PERCACHE
 
-	Just so an observer (like myself later on) won't go too
+	Just so an observer (like myself later on) will not go too
 	crazy trying to understand what is going on with the 'struct
 	percache' local data, it is a persistent data structure.
 	This program can operate as both a regular program (is flushed
@@ -26,7 +26,7 @@ PERCACHE
 	be a good bit faster than that.  Hence, pretty much only TSR
 	behavior can beat a single file access.
 
-	Parallelism?  There isn't any, so we don't have to worry about
+	Parallelism?  There is not any, so we don't have to worry about
 	using mutexes or semaphores.  Maybe someday we will have to
 	think about parallelism, but probably not any time soon!
 

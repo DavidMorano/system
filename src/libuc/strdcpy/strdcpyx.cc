@@ -31,7 +31,8 @@
 
 /*******************************************************************************
 
-	This subroutine concatenates strings into a single resulting string.
+	This subroutine concatenates strings into a single resulting
+	string.
 
 *******************************************************************************/
 

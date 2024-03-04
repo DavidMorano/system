@@ -121,6 +121,9 @@ namespace {
 constexpr int		rsn = SR_NOTFOUND ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getfname(cchar *pr,char *rbuf,int type,cchar *fname,int am) noex {

@@ -57,7 +57,6 @@
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"pathadd.h"
 
