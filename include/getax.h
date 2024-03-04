@@ -1,7 +1,7 @@
 /* getax HEADER */
 /* lang=C20 */
 
-/* UNIX® System databases (PASSWD, SHADOW, GROUP, and PROJECT) */
+/* UNIX® System databases (ucentpw, SHADOW, ucentgr, and ucentpj) */
 /* version %I% last-modified %G% */
 
 
@@ -19,39 +19,34 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<pwd.h>			/* <- standard */
-#include	<grp.h>			/* <- standard */
-#include	<spwd.h>		/* <- special */
-#include	<ucproject.h>		/* <- special */
-#include	<clanguage.h>
+#include	<usystem.h>
 
 
 EXTERNC_begin
 
 extern int getpw_begin() noex ;
 extern int getpw_end() noex ;
-extern int getpw_ent(PASSWD *,char *,int) noex ;
-extern int getpw_name(PASSWD *,char *,int,cchar *) noex ;
-extern int getpw_uid(PASSWD *,char *,int,uid_t) noex ;
+extern int getpw_ent(ucentpw *,char *,int) noex ;
+extern int getpw_name(ucentpw *,char *,int,cchar *) noex ;
+extern int getpw_uid(ucentpw *,char *,int,uid_t) noex ;
 
 extern int getsp_begin() noex ;
 extern int getsp_end() noex ;
-extern int getsp_ent(SPWD *sp,char *,int) noex ;
-extern int getsp_name(SPWD *sp,char *,int,cchar *) noex ;
+extern int getsp_ent(ucentsp *sp,char *,int) noex ;
+extern int getsp_name(ucentsp *sp,char *,int,cchar *) noex ;
 
 extern int getgr_begin() noex ;
 extern int getgr_end() noex ;
-extern int getgr_ent(GROUP *,char *,int) noex ;
-extern int getgr_name(GROUP *,char *,int,cchar *name) noex ;
-extern int getgr_gid(GROUP *,char *,int,gid_t) noex ;
+extern int getgr_ent(ucentgr *,char *,int) noex ;
+extern int getgr_name(ucentgr *,char *,int,cchar *name) noex ;
+extern int getgr_gid(ucentgr *,char *,int,gid_t) noex ;
 
 extern int getpj_begin() noex ;
 extern int getpj_end() noex ;
-extern int getpj_ent(PROJECT *,char *,int) noex ;
-extern int getpj_name(PROJECT *,char *,int,cchar *) noex ;
-extern int getpj_pid(PROJECT *,char *,int,projid_t) noex ;
-extern int getpj_def(PROJECT *,char *,int,cchar *) noex ;
+extern int getpj_ent(ucentpj *,char *,int) noex ;
+extern int getpj_name(ucentpj *,char *,int,cchar *) noex ;
+extern int getpj_pid(ucentpj *,char *,int,projid_t) noex ;
+extern int getpj_def(ucentpj *,char *,int,cchar *) noex ;
 
 EXTERNC_end
 

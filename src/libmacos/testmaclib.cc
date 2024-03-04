@@ -1,4 +1,4 @@
-/* testmaclib */
+/* testmaclib SUPPORT */
 /* lang=C++11 */
 
 
@@ -17,7 +17,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
@@ -31,6 +31,9 @@
 #include	<vecint.h>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+
+/* local defines */
 
 
 /* name-spaces */
@@ -52,7 +55,10 @@ using namespace std ;
 
 /* local variables */
 
-static const int	vals[] = { 3, 7, 19, 12, 43 } ;
+constexpr int	vals[] = { 3, 7, 19, 12, 43 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -62,7 +68,7 @@ int main(int argc,mainv,mainv) {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = vecint_start(&vi,5,0)) >= 0) {
-	    const int	n = nelem(vals) ;
+	    cint	n = nelem(vals) ;
 	    if ((rs = vecint_addlist(&vi,vals,n)) >= 0) {
 		if ((rs = vecint_assign(&vi,8,71)) >= 0) {
 	            int		v ;

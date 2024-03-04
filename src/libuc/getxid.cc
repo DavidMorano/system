@@ -13,7 +13,7 @@
 
 	= 2017-11-22, David A­D­ Morano
 	I finally (finally) removed (compiled out) the global
-	function symbol |getuser_uid()|.  Good riddance.
+	function symbol |getuser_uid(3uc)|.  Good riddance.
 
 */
 
@@ -29,11 +29,11 @@
 	name, assumed to be a user-name.
 
 	Synopsis:
-	int getuid_name(cchar *np,int nl) noex
+	int getuid_name(cchar *sp,int sl) noex
 
 	Arguments:
-	np		user-name to lookup
-	nl		length of name string
+	sp		user-name to lookup
+	sl		length of name string
 
 	Returns:
 	>=0		retrieved UID
@@ -85,11 +85,11 @@
 	program-name.
 
 	Synopsis:
-	int getpjid_name(cchar *np,int nl) noex
+	int getpjid_name(cchar *sp,int sl) noex
 
 	Arguments:
-	np		name of project to look up 
-	nl		length of name (in bytes)
+	sp		name of project to look up 
+	sl		length of name (in bytes)
 
 	Returns:
 	>=0		PJID of given project name
@@ -149,9 +149,9 @@ int getuid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr	n ;
+	        nulstr	ns ;
 	        cchar	*name{} ;
-	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
+	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
 	            char	*pwbuf{} ;
 	            if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	                cint	pwlen = rs ;
@@ -163,7 +163,7 @@ int getuid_name(cchar *sp,int sl) noex {
 	                rs1 = uc_free(pwbuf) ;
 		        if (rs >= 0) rs = rs1 ;
 	            } /* end if (m-a-f) */
-	            rs1 = nulstr_finish(&n) ;
+	            rs1 = ns.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */
 	    } /* end if (valid) */
@@ -196,7 +196,7 @@ int getgid_name(cchar *sp,int sl) noex {
 	int		gid = 0 ;
 	if (sp) {
 	    rs = SR_INVALID ;
-	    if (sp[0] && (sl > 0)) {
+	    if (sp[0]) {
 	        nulstr	ns ;
 	        cchar	*name{} ;
 	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
@@ -224,7 +224,7 @@ int getgid_group(cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (sp) {
 	    rs = SR_INVALID ;
-	    if (sp[0] && (sl > 0)) {
+	    if (sp[0]) {
 	        if (hasalldig(sp,sl)) {
 	            if (int v{} ; (rs = cfdeci(sp,sl,&v)) >= 0) {
 		        rs = v ;
@@ -261,23 +261,21 @@ int getpjid_name(cchar *sp,int sl) noex {
 	if (sp) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
-	        nulstr		n ;
-	        cchar		*name{} ;
-	        if ((rs = nulstr_start(&n,sp,sl,&name)) >= 0) {
-	            if ((rs = getbufsize(getbufsize_pj)) >= 0) {
-	                PROJECT	pj ;
+	        nulstr	ns ;
+	        cchar	*name{} ;
+	        if ((rs = ns.start(sp,sl,&name)) >= 0) {
+	            char	*pjbuf{} ;
+	            if ((rs = malloc_pj(&pjbuf)) >= 0) {
 	                cint	pjlen = rs ;
-	                char	*pjbuf{} ;
-	                if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
-		            {
-	                        rs = getpj_name(&pj,pjbuf,pjlen,name) ;
-	                        pjid = pj.pj_projid ;
-		            }
-	                    rs1 = uc_free(pjbuf) ;
-	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (m-a-f) */
-	            } /* end if (getbufsize) */
-	            rs1 = nulstr_finish(&n) ;
+		        {
+	                    PROJECT	pj ;
+	                    rs = getpj_name(&pj,pjbuf,pjlen,name) ;
+	                    pjid = pj.pj_projid ;
+		        }
+	                rs1 = uc_free(pjbuf) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (m-a-f) */
+	            rs1 = ns.finish ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */
 	    } /* end if (valid) */

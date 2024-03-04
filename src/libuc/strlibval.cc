@@ -68,13 +68,13 @@
 /* local strutures */
 
 namespace {
-    struct strenv {
+    struct strvarenv {
 	cchar		*name[strlibval_overlast] ;
-	constexpr strenv() noex ;
-    } ; /* end struct (strenv) */
+	constexpr strvarenv() noex ;
+    } ; /* end struct (strvarenv) */
 }
 
-constexpr strenv::strenv() noex {
+constexpr strvarenv::strvarenv() noex {
 	name[strlibval_path] = varname.path ;
 	name[strlibval_fpath] = varname.fpath ;
 	name[strlibval_incpath] = varname.incpath ;
@@ -96,7 +96,7 @@ constexpr strenv::strenv() noex {
 	name[strlibval_orgloc] = varname.orgloc ;
 	name[strlibval_orgcode] = varname.orgcode ;
 }
-/* end method (strenv::ctor) */
+/* end method (strvarenv::ctor) */
 
 
 /* forward references */
@@ -104,7 +104,7 @@ constexpr strenv::strenv() noex {
 
 /* local variables */
 
-constexpr strenv	enver ;
+constexpr strvarenv	enver ;
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 

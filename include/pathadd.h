@@ -26,7 +26,10 @@
 EXTERNC_begin
 
 extern int pathaddw(char *,int,cchar *,int) noex ;
-extern int pathadd(char *,int,cchar *) noex ;
+
+static inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
+	return pathaddw(pbuf,pl,sp,-1) ;
+}
 
 EXTERNC_end
 

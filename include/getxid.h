@@ -1,7 +1,7 @@
 /* getxid HEADER */
 /* lang=C20 */
 
-/* get the certain system IDs based on a specified name */
+/* get certain system IDs based on a specified name */
 /* version %I% last-modified %G% */
 
 
@@ -27,10 +27,12 @@
 EXTERNC_begin
 
 extern int	getuid_name(cchar *,int) noex ;
+extern int	getuid_user(cchar *,int) noex ;
 extern int	getgid_name(cchar *,int) noex ;
 extern int	getgid_group(cchar *,int) noex ;
 extern int	getgid_def(cchar *,gid_t) noex ;
 extern int	getpjid_name(cchar *,int) noex ;
+extern int	getpjid_proj(cchar *,int) noex ;
 
 EXTERNC_end
 

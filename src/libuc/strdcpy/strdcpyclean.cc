@@ -57,6 +57,7 @@
 
 /* local defines */
 
+
 /* external subroutines */
 
 
@@ -65,7 +66,10 @@
 
 /* forward references */
 
-static int	isour(int) noex ;
+static bool	isour(int) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -90,8 +94,8 @@ char *strdcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int isour(int ch) noex {
-	int		f = false ;
+static bool isour(int ch) noex {
+	bool		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == CH_NL) ;
 	f = f || (ch == CH_BS) ;

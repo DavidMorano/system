@@ -185,6 +185,9 @@ using std::bitset ;
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forward references */
 
 
@@ -273,11 +276,6 @@ bool isalphalatin(int ch) noex {
 	return f ;
 }
 /* end subroutine (isalphalatin) */
-
-bool isdigitlatin(int ch) noex {
-	return (ch >= '0') && (ch <= '9') ;
-}
-/* end subroutine (isdigitlatin) */
 
 bool isalnumlatin(int ch) noex {
 	bool		f = false ;

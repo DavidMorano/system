@@ -1,6 +1,6 @@
-# MAKEFILES (snx)
+# MAKEFILES (isfiledesc)
 
-T= snx
+T= isfiledesc
 
 ALL= $(T).o $(T).a
 
@@ -51,21 +51,18 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= snx.h
+INCS= isfiledesc.h
 
 
-OBJ0_SNX= snabbr.o snaddw.o sncpyarray.o
-OBJ1_SNX= sncpyx.o sncpyxc.o sncpyxw.o snerrabbr.o
-OBJ2_SNX= snfilemode.o snflags.o snfsflags.o sninetaddr.o
-OBJ3_SNX= snkeyval.o snloadavg.o snopenflags.o snpollflags.o
-OBJ4_SNX= snrealname.o snshellunder.o snsigabbr.o sntid.o
-OBJ5_SNX= sntmtime.o snuuid.o snxxx.o
+OBJ0_SIX= isasocket.o
+OBJ1_SIX= isfsremote.o
+OBJ2_SIX= isinteractive.o
 
-OBJA_SNX= obj0_sfx.o obj1_sfx.o
-OBJB_SNX= obj2_sfx.o obj3_sfx.o
-OBJC_SNX= obj4_sfx.o obj5_sfx.o
 
-OBJ_SNX= $(OBJA_SNX) $(OBJB_SNX) $(OBJC_SNX)
+OBJA_SIX= obj0_six.o obj1_six.o
+OBJB_SIX= obj2_six.o
+
+OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
 
 
 default:		$(T).o
@@ -88,10 +85,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SNX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SNX)
+$(T).o:			$(OBJ_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
 
-$(T).a:			$(OBJ_SNX)
+$(T).a:			$(OBJ_SIX)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -111,30 +108,18 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+obj0_six.o:	$(OBJ0_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
 
-obj0_sfx.o:	$(OBJ0_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SNX)
+obj1_six.o:	$(OBJ1_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
 
-obj1_sfx.o:	$(OBJ1_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SNX)
-
-obj2_sfx.o:	$(OBJ2_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SNX)
-
-obj3_sfx.o:	$(OBJ3_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SNX)
-
-obj4_sfx.o:	$(OBJ4_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SNX)
-
-obj5_sfx.o:	$(OBJ5_SNX) $(INCS)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_SNX)
+obj2_six.o:	$(OBJ2_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
 
 
-snuuid.o:		snuuid.cc $(INCS)
-sntid.o:		sntid.cc $(INCS)
-snerrabbr.o:		snerrabbr.cc $(INCS)
-sntmtime.o:		sntmtime.cc sntmtime.h $(INCS)
-snaddw.o:		snaddw.cc snaddw.h $(INCS)
+isasocket.o:		isasocket.cc		$(INCS)
+isfsremote.o:		isfsremote.cc		$(INCS)
+isinteractive.o:	isinteractive.cc	$(INCS)
 
 

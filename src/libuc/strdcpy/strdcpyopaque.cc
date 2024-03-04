@@ -53,10 +53,19 @@
 #include	"strdcpy.h"
 
 
+/* local defines */
+
+
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

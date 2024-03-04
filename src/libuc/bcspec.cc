@@ -1,5 +1,5 @@
-/* bcspec */
-/* lang=C20 */
+/* bcspec SUPPORT */
+/* lang=C++20 */
 
 /* load a Bible-Citation-Specification */
 /* version %I% last-modified %G% */
@@ -35,15 +35,15 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<cfdec.h>
 #include	<estrings.h>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -73,26 +73,28 @@ static int	siourbrk(cchar *,int,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	if (op && sbuf) {
-	    int		sl ;
-	    cchar	*sp ;
+	    cchar	*sp{} ;
 	    rs = SR_OK ;
-	    memclear(op) ;
+	    memclear(op) ;		/* noted as potentially dangerous */
 	    op->c = 1 ;
 	    op->v = 1 ;
-	    if ((sl = sfshrink(sbuf,slen,&sp)) > 0) {
+	    if (int sl ; (sl = sfshrink(sbuf,slen,&sp)) > 0) {
 	        int	si ;
 	        int	v ;
 	        int	ch = mkchar(sp[0]) ;
 	        if (isalphalatin(ch)) {
-		    op->np = sp ;
-	  	    op->nl = sl ;
+		    op->sp = sp ;
+	  	    op->sl = sl ;
 	            if ((si = siourbrk(sp,sl,true)) > 0) {
-	  	        op->nl = si ;
+	  	        op->sl = si ;
 		        sp += si ;
 		        sl -= si ;
 		        if (sl > 0) {
@@ -115,7 +117,7 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 	        }
 	        if ((rs >= 0) && (sl > 0)) {
 		    cchar	*tp ;
-		    if ((tp = strnchr(sp,sl,':')) != NULL) {
+		    if ((tp = strnchr(sp,sl,':')) != nullptr) {
 		        if ((rs = cfdeci(sp,(tp-sp),&v)) >= 0) {
 			    op->c = v ;
 			    sl -= ((tp+1)-sp) ;
@@ -124,12 +126,12 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 		    	        rs = cfdeci(sp,sl,&v) ;
 		    	        op->v = v ;
 			    }
-		        }
+		        } /* end if (cfdec) */
 		    } else {
 		        rs = cfdeci(sp,sl,&v) ;
 		        op->c = v ;
 		    }
-	        }
+	        } /* end if */
 	    } else {
 	        rs = SR_DOM ;
 	    }
@@ -142,11 +144,10 @@ int bcspec_load(bcspec *op,cchar *sbuf,int slen) noex {
 /* local subroutines */
 
 static int siourbrk(cchar *sp,int sl,int f_dig) noex {
-	int		i = -1 ;
-	int		ch ;
+	int		i = -1 ; /* used afterwards */
 	bool		f = false ;
 	for (i = 0 ; i < sl ; i += 1) {
-	    ch = mkchar(sp[i]) ;
+	    cint	ch = mkchar(sp[i]) ;
 	    if (f_dig) {
 		f = isdigitlatin(ch) ;
 	    } else {

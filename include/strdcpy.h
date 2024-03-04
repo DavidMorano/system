@@ -33,20 +33,6 @@ extern char	*strdcpyclean(char *,int,int,cchar *,int) noex ;
 
 EXTERNC_end
 
-#ifdef	__cplusplus
-
-inline char *strdcpy(char *dp,int dl,cchar *s1) noex {
-	return strdcpy1(dp,dl,s1) ;
-}
-
-#else /* __cplusplus */
-
-static inline char *strdcpy(char *dp,int dl,cchar *s1) noex {
-	return strdcpy1(dp,dl,s1) ;
-}
-
-#endif /* __cplusplus */
-
 
 #endif /* STRDCPY_INCLUDE */
 

@@ -31,7 +31,6 @@ extern bool iswhite(int) noex ;
 extern bool isalnumlatin(int) noex ;
 extern bool isalphalatin(int) noex ;
 extern bool isdict(int) noex ;
-extern bool isdigitlatin(int) noex ;
 extern bool isfnamespecial(int) noex ;
 extern bool ishexlatin(int) noex ;
 extern bool islowerlatin(int) noex ;
@@ -52,7 +51,10 @@ EXTERNC_end
 
 #ifdef	__cplusplus
 
-inline int iseol(int ch) noex {
+inline bool isdigitlatin(int ch) noex {
+	return (ch >= '0') && (ch <= '9') ;
+}
+inline bool iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
 inline bool iszero(int ch) noex {
@@ -64,7 +66,10 @@ inline bool isplusminus(int ch) noex {
 
 #else /* __cplusplus */
 
-static inline int iseol(int ch) noex {
+static inline bool isdigitlatin(int ch) noex {
+	return (ch >= '0') && (ch <= '9') ;
+}
+static inline bool iseol(int ch) noex {
 	return ((ch == '\n') || (ch == '\r')) ;
 }
 static inline bool iszero(int ch) noex {

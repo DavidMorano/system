@@ -17,27 +17,31 @@
 
 /******************************************************************************
 
-	This subroutine is a knock off of the |strlcpy(3c)| that first
-	appeared in the Solaris UNIX system from Sun Microsystems.
+	This subroutine is a knock off of the |strlcpy(3c)| that
+	first appeared in the Solaris UNIX® system from Sun
+	Microsystems.
 
 ******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
 
+/* local defines */
+
+
 /* external subroutines */
 
-extern "C" {
-    extern size_t strlen(const char *) noex ;
-}
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-size_t strlcpy(char *dst,const char *src,size_t maxlen) noex {
+size_t strlcpy(char *dst,cchar *src,size_t maxlen) noex {
 	size_t		rsz = 0 ;
 	if (dst && src) {
 	    cint	ml = int(maxlen) ;
@@ -46,8 +50,8 @@ size_t strlcpy(char *dst,const char *src,size_t maxlen) noex {
 	        dst[i] = *src++ ;
 	    }
 	    dst[i] = '\0' ;
-	    rsz = size_t((*src == '\0') ? i : (i+int(strlen(src)))) ;
-	}
+	    rsz = size_t((*src == '\0') ? i : (i + int(strlen(src)))) ;
+	} /* end if (non-null) */
 	return rsz ;
 }
 /* end subroutine (strlcpy) */

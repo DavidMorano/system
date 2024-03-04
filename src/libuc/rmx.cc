@@ -21,6 +21,8 @@
 	rmochr
 	rmrchr
 	rmext
+	rmtrailchr
+	rmcomment
 
 	Description:
 	Return the length of the given string without any EOL
@@ -29,8 +31,11 @@
 
 	Synopsis:
 	int rmeol(cchar *sp,int sl) noex
+	int rmochr(cchar *sp,int sl,int sch) noex
+	int rmrchr(cchar *sp,int sl,int sch) noex
 	int rmext(cchar *sp,int sl) noex
-	int rmchr(cchar *sp,int sl,int sch) noex
+	int rmtrailchr(cchar *sp,int sl,int sch) noex
+	int rmcomment(cchar *sp,int sl) noex
 
 	Arguments:
 	sp		pinter to constant string to consider
@@ -64,6 +69,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* forward references */
@@ -105,7 +113,7 @@ int rmeol(cchar *sp,int sl) noex {
 int rmochr(cchar *sp,int sl,int ch) noex {
 	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
-	if ((tp = strnchr(sp,sl,ch)) != nullptr) {
+	if ((tp = strnochr(sp,sl,ch)) != nullptr) {
 	    sl = (tp-sp) ;
 	} /* end if */
 	return sl ;
@@ -146,11 +154,12 @@ int rmtrailchr(cchar *sp,int sl,int sch) noex {
 /* end subroutine (rmtrailchr) */
 
 int rmcomment(cchar *lp,int ll) noex {
-	int		nl ;
-	if ((nl = rmochr(lp,ll,'#')) == ll) {
-	   nl = rmeol(lp,nl) ;
+	int		rl ;
+	if (ll < 0) ll = strlen(lp) ;
+	if ((rl = rmochr(lp,ll,'#')) == ll) {
+	   rl = rmeol(lp,ll) ;
 	}
-	return nl ;
+	return rl ;
 }
 /* end subroutine (rmcomment) */
 
