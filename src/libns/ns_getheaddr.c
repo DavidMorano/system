@@ -1,12 +1,11 @@
-/* ns_getheaddr */
+/* ns_getheaddr SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to get a single host entry by its address */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_LOG		1
-
 
 /* revision history:
 
@@ -22,37 +21,28 @@
 
 /*******************************************************************************
 
-        This subroutine is a platform independent subroutine to get an INET host
-        entry by its INET address, but does it dumbly on purpose.
+	This subroutine is a platform independent subroutine to get
+	an INET host entry by its INET address, but does it dumbly
+	on purpose.
 
 	Synopsis:
-
-	int ns_getheaddr(addr,hep,buf,buflen)
-	char		addr[] ;
-	struct hostent	*hep ;
-	char		buf[] ;
-	int		buflen ;
+	int ns_getheaddr(ucentho *hep,char *buf,int buflen,cchar *addr) noex
 
 	Arguments:
-
-	addr		address to lookup
 	hep		pointer to 'hostent' structure
 	buf		user supplied buffer to hold result
 	buflen		length of user supplied buffer
+	addr		address to lookup
 
 	Returns:
-
 	0		host was found OK
 	-1		fault with call
 	-2		host could not be found
 	-3		request timed out (bad network someplace)
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -71,7 +61,6 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>

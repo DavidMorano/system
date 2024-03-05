@@ -1,5 +1,5 @@
-/* inet4int */
-/* lang=C20 */
+/* inet4int SUPPORT */
+/* lang=C++20 */
 
 /* convert an INETv4 address (in network form) to an unsigned-integer */
 /* version %I% last-modified %G% */
@@ -64,15 +64,19 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 uint inet4int(cvoid *ap) noex {
 	uint		v = 0 ;
-	cchar		*cp = (cchar *) ap ;
+	cchar		*cp = ccharp(ap) ;
 	for (int i = 0 ; i < 4 ; i += 1) {
+	    uint	uv = UC(cp[i]) ;
 	    v <<= 8 ;
-	    v |= ((uchar) *cp) ;
-	}
+	    v |= uv ;
+	} /* end for */
 	return v ;
 }
 /* end subroutine (inet4int) */

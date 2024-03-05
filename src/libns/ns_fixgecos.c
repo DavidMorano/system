@@ -79,14 +79,13 @@ int		len ;
 	    strwcpy(fn,cp,MIN(cp2 - cp,len)) ;
 
 	} else if ((cp2 = strchr(gn,CH_LPAREN)) != NULL) {
-
 		strwcpy(fn,gn,MIN(len,cp2 - gn)) ;
-
-	} else 
+	} else {
 		strwcpy(fn,gn,len) ;
+	}
 
 	return OK ;
 }
-/* end subroutine */
+/* end subroutine (ns_fixgecos) */
 
 

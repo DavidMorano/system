@@ -72,6 +72,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int gethe_begin(int stayopen) noex {
