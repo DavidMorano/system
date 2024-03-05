@@ -70,6 +70,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 struct addrfamily {
@@ -92,18 +95,21 @@ static constexpr struct addrfamily	addrfamilies[] = {
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getaddrfamily(cchar *name) noex {
 	const struct addrfamily	*afs = addrfamilies ;
-	int		m, m_max = 0 ;
+	int		m ;
+	int		m_max = 0 ;
 	int		si = -1 ;
 	int		cnamelen ;
-	cchar		*anp ;
 	char		cname[AFNAMELEN + 1] ;
 	cnamelen = strwcpylc(cname,name,AFNAMELEN) - cname ;
 	for (int i = 0 ; afs[i].name ; i += 1) {
-	    anp = afs[i].name ;
+	    cchar	*anp = afs[i].name ;
 	    if ((m = nleadstr(anp,cname,cnamelen)) >= 2) {
 	        if (m > m_max) {
 	            m_max = m ;

@@ -12,16 +12,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<netdb.h>
 #include	<usystem.h>
 
 
 EXTERNC_begin
 
 extern int getne_begin(int) noex ;
-extern int getne_ent(NETENT *,char *,int) noex ;
-extern int getne_name(NETENT *,char *,int,cchar *) noex ;
-extern int getne_addr(NETENT *,char *,int,int,int) noex ;
+extern int getne_ent(ucentnw *,char *,int) noex ;
+extern int getne_name(ucentnw *,char *,int,cchar *) noex ;
+extern int getne_addr(ucentnw *,char *,int,int,int) noex ;
 extern int getne_end() noex ;
 
 EXTERNC_end

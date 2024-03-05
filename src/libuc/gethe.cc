@@ -30,7 +30,7 @@
 	DNS lookups used.  In general, DNS lookups are very slow.
 
 	Synopsis:
-	int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex
+	int gethe_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex
 
 	Arguments:
 	hep		pointer to 'hostent' structure
@@ -45,16 +45,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/utsname.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
@@ -94,12 +84,12 @@ int gethe_end() noex {
 }
 /* end subroutine (gethe_end) */
 
-int gethe_ent(HOSTENT *hep,char *hebuf,int helen) noex {
+int gethe_ent(ucentho *hep,char *hebuf,int helen) noex {
 	return uc_gethostent(hep,hebuf,helen) ;
 }
 /* end subroutine (gethe_ent) */
 
-int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
+int gethe_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
@@ -121,7 +111,7 @@ int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
 }
 /* end subroutine (gethe_name) */
 
-int gethe_addr(HOSTENT *hep,char *hb,int hl,int af,cvoid *ap,int al) noex {
+int gethe_addr(ucentho *hep,char *hb,int hl,int af,cvoid *ap,int al) noex {
 	return uc_gethostbyaddr(hep,hb,hl,af,ap,al) ;
 }
 /* end subroutine (gethe_addr) */

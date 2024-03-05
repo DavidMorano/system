@@ -29,9 +29,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -68,7 +65,7 @@ int getse_end() noex {
 }
 /* end subroutine (getse_end) */
 
-int getse_ent(SERVENT *sep,char rbuf[],int rlen) noex {
+int getse_ent(ucentsv *sep,char *rbuf,int rlen) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = uc_getservent(sep,rbuf,rlen)) == rsn) {
@@ -78,13 +75,13 @@ int getse_ent(SERVENT *sep,char rbuf[],int rlen) noex {
 }
 /* end subroutine (getse_ent) */
 
-int getse_name(SERVENT *sep,char *rbuf,int rlen,cchar *pn,cchar *svc) noex {
-	return uc_getservbyname(svc,pn,sep,rbuf,rlen) ;
+int getse_name(ucentsv *sep,char *rbuf,int rlen,cchar *pn,cchar *svc) noex {
+	return uc_getservbyname(sep,rbuf,rlen,pn,svc) ;
 }
 /* end subroutine (getse_name) */
 
-int getse_port(SERVENT *sep,char *rbuf,int rlen,cchar *pn,int num) noex {
-	return uc_getservbyport(num,pn,sep,rbuf,rlen) ;
+int getse_port(ucentsv *sep,char *rbuf,int rlen,int num,cchar *pn) noex {
+	return uc_getservbyport(sep,rbuf,rlen,num,pn) ;
 }
 /* end subroutine (getse_port) */
 

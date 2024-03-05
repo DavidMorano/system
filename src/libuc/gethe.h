@@ -12,16 +12,15 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<netdb.h>
-#include	<usyhstem.h>
+#include	<usystem.h>
 
 
 EXTERNC_begin
 
 extern int gethe_begin(int) noex ;
-extern int gethe_ent(HOSTENT *,char *,int) noex ;
-extern int gethe_name(HOSTENT *,char *,int,cchar *) noex ;
-extern int gethe_addr(HOSTENT *,char *,int,cvoid *,int) noex ;
+extern int gethe_ent(ucentho *,char *,int) noex ;
+extern int gethe_name(ucentho *,char *,int,cchar *) noex ;
+extern int gethe_addr(ucentho *,char *,int,cvoid *,int) noex ;
 extern int gethe_end() noex ;
 
 EXTERNC_end

@@ -30,9 +30,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -69,8 +66,8 @@ int getne_end() noex {
 }
 /* end subroutine (getne_end) */
 
-int getne_ent(NETENT *nep,char *rbuf,int rlen) noex {
-	cint		rsn = SR_NOTFOUND :
+int getne_ent(ucentnw *nep,char *rbuf,int rlen) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	if ((rs = uc_getnetent(nep,rbuf,rlen)) == rsn) {
 	    rs = SR_OK ;
@@ -79,13 +76,13 @@ int getne_ent(NETENT *nep,char *rbuf,int rlen) noex {
 }
 /* end subroutine (getne_ent) */
 
-int getne_name(NETENT *nep,char *rbuf,int rlen,cchar *name) noex {
+int getne_name(ucentnw *nep,char *rbuf,int rlen,cchar *name) noex {
 	return uc_getnetbyname(nep,rbuf,rlen,name) ;
 }
 /* end subroutine (getne_name) */
 
-int getne_addr(NETENT *nep,char *rbuf,int rlen,int type,int num) noex {
-	return uc_getnetbyaddr(nep,rbuf,rlen,num,type,) ;
+int getne_addr(ucentnw *nep,char *rbuf,int rlen,int af,int num) noex {
+	return uc_getnetbyaddr(nep,rbuf,rlen,af,num) ;
 }
 /* end subroutine (getne_addr) */
 
