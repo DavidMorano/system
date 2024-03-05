@@ -82,7 +82,7 @@ namespace {
 	cchar		*vgn = nullptr ;
 	char		*grbuf = nullptr ;
 	char		*rbuf ;
-	GROUP		gr ;
+	ucentgr		gr ;
 	int		grlen ;
 	int		rlen ;
 	gid_t		gid ;

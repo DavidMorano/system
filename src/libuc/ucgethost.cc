@@ -1,14 +1,11 @@
-/* uc_gethost */
+/* ucgethost SUPPORT */
+/* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
 /* subroutine to get a single "host" entry (raw) */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_USEREENT	1		/* use reentrant API if available */
 #define	CF_GETHOSTENT	1		/* compile |uc_gethostent(3uc)| */
-
 
 /* revision history:
 
@@ -22,31 +19,22 @@
 /*******************************************************************************
 
 	Name:
-
 	uc_gethostbyname
 
 	Description:
-
-        This subroutine is a platform independent subroutine to get an INET host
-        address entry, but does it dumbly on purpose.
+	This subroutine is a platform independent subroutine to get
+	an INET host address entry, but does it dumbly on purpose.
 
 	Synopsis:
-
-	int uc_gethostbyname(name,hep,hebuf,helen)
-	cchar	name[] ;
-	HOSTENT	*hep ;
-	char		hebuf[] ;
-	int		helen ;
+	int uc_gethostbyname(ucentho *hep,char *hebuf,int helen,cc *name) noex
 
 	Arguments:
-
-	- name		name to lookup
 	- hep		pointer to 'hostent' structure
 	- hebuf		user supplied buffer to hold result
 	- helen		length of user supplied buffer
+	- name		name to lookup
 
 	Returns:
-
 	0		host was found OK
 	SR_FAULT	address fault
 	SR_TIMEDOUT	request timed out (bad network someplace)
@@ -54,58 +42,44 @@
 
 
 	Name:
-
 	uc_gethostbyaddr
 
 	Description:
-
-        This subroutine is a platform independent subroutine to get an INET host
-        address entry, but does it dumbly on purpose.
+	This subroutine is a platform independent subroutine to get
+	an INET host address entry, but does it dumbly on purpose.
 
 	Synopsis:
 
-	int uc_gethostbyaddr(addr,addrlen,type,hep,hebuf,helen)
-	cchar	*addr ;
-	int		addrlen ;
-	int		type ;
-	HOSTENT	*hep ;
-	char		hebuf[] ;
-	int		helen ;
+	int uc_gethostbyaddr(ucentho *hep,char *hebuf,int helen,
+			int af,cc *ap,int al) noex
 
 	Arguments:
 
-	- addr		address to lookup
-	- addrlen	length if the supplied address
-	- type		type of address to look up
 	- hep		pointer to 'hostent' structure
 	- hebuf		user supplied buffer to hold result
 	- helen		length of user supplied buffer
+	- af		address-family of address to look up
+	- ap		address to lookup
+	- al		length if the supplied address
 
 	Returns:
-
 	0		host was found OK
 	SR_FAULT	address fault
 	SR_TIMEDOUT	request timed out (bad network someplace)
 	SR_NOTFOUND	host could not be found
 
-
 *******************************************************************************/
 
-
-#define	LIBUC_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<errno.h>
 #include	<netdb.h>
-
+#include	<cerrno>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<storeitem.h>
 #include	<hostent.h>
 #include	<localmisc.h>
@@ -122,15 +96,6 @@
 
 
 /* external subroutines */
-
-extern int	msleep(int) ;
-
-#if	CF_DEBUGS
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -174,11 +139,12 @@ static struct herrno	herrnos[] = {
 #endif /* CF_DEBUGS */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_sethostent(int stayopen)
-{
+int uc_sethostent(int stayopen) noex {
 	int		rs ;
 	errno = 0 ;
 	if ((rs = sethostent(stayopen)) != 0) {
@@ -200,17 +166,11 @@ int uc_endhostent()
 }
 /* end subrouttine (uc_endhostent) */
 
-
 #if	CF_GETHOSTENT
-int uc_gethostent(HOSTENT *hep,char *hebuf,int helen)
-{
-	HOSTENT	*lp ;
+int uc_gethostent(HOSTENT *hep,char *hebuf,int helen) noex {
+	OSTENT		*lp ;
 	int		rs = SR_OK ;
 	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_gethostent: ent helen=%d\n",helen) ;
-#endif
 
 	if (hep == NULL) return SR_FAULT ;
 	if (hebuf == NULL) return SR_FAULT ;
@@ -223,16 +183,8 @@ int uc_gethostent(HOSTENT *hep,char *hebuf,int helen)
 	{
 	    int		h_errno ;
 
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostent: USEREENT=1\n") ;
-#endif
-
 	    for (i = 0 ; i < NLOOPS ; i += 1) {
 	        if (i > 0) msleep(1000) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostent: i=%u gethostent_r()\n",i) ;
-#endif
 
 	        rs = SR_OK ;
 	        errno = 0 ;
@@ -242,12 +194,6 @@ int uc_gethostent(HOSTENT *hep,char *hebuf,int helen)
 	        if (lp != NULL) break ;
 	        rs = gethosterr(h_errno) ;
 	        if (rs != SR_AGAIN) break ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostent: gethostent_r() lp=%p\n",lp) ;
-	        debugprintf("uc_gethostent: h_errno=%s\n",
-	            strherrno(h_errno)) ;
-#endif 
 
 	    } /* end for */
 
@@ -261,16 +207,8 @@ int uc_gethostent(HOSTENT *hep,char *hebuf,int helen)
 #else /* CF_USEREENT */
 	{
 
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostent: POSIX=0\n") ;
-#endif
-
 	    for (i = 0 ; i < NLOOPS ; i += 1) {
 	        if (i > 0) msleep(1000) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostent: gethostent()\n") ;
-#endif
 
 	        rs = SR_OK ;
 	        errno = 0 ;
@@ -280,12 +218,6 @@ int uc_gethostent(HOSTENT *hep,char *hebuf,int helen)
 
 	        rs = gethosterr(h_errno) ;
 	        if (rs != SR_AGAIN) break ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostent: gethostent() lp=%p\n",lp) ;
-	        debugprintf("uc_gethostent: h_errno=%s\n",
-	            strherrno(h_errno)) ;
-#endif
 
 	    } /* end for */
 
@@ -300,26 +232,15 @@ int uc_gethostent(HOSTENT *hep,char *hebuf,int helen)
 
 	if (rs == SR_PROTONOSUPPORT) rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("uc_gethostent: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (uc_gethostent) */
 #endif /* CF_GETHOSTENT */
 
-
-int uc_gethostbyname(cchar *name,HOSTENT *hep,char *hebuf,int helen)
-{
-	HOSTENT	*lp ;
+int uc_gethostbyname(HOSTENT *hep,char *hebuf,int helen,cc *name) noex {
+	HOSTENT		*lp ;
 	int		rs = SR_OK ;
 	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_gethostbyname: name=>%s<\n", name) ;
-	debugprintf("uc_gethostbyname: helen=%d\n",helen) ;
-#endif
 
 	if (name == NULL) return SR_FAULT ;
 	if (hep == NULL) return SR_FAULT ;
@@ -333,16 +254,8 @@ int uc_gethostbyname(cchar *name,HOSTENT *hep,char *hebuf,int helen)
 	{
 	    int	h_errno ;
 
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostbyname: USEREENT=1\n") ;
-#endif
-
 	    for (i = 0 ; i < NLOOPS ; i += 1) {
 	        if (i > 0) msleep(1000) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyname: i=%u gethostbyname_r()\n",i) ;
-#endif
 
 	        rs = SR_OK ;
 	        errno = 0 ;
@@ -352,12 +265,6 @@ int uc_gethostbyname(cchar *name,HOSTENT *hep,char *hebuf,int helen)
 	        if (lp != NULL) break ;
 	        rs = gethosterr(h_errno) ;
 	        if (rs != SR_AGAIN) break ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyname: gethostbyname_r() lp=%p\n",lp) ;
-	        debugprintf("uc_gethostbyname: h_errno=%s\n",
-	            strherrno(h_errno)) ;
-#endif 
 
 	    } /* end for */
 
@@ -371,16 +278,8 @@ int uc_gethostbyname(cchar *name,HOSTENT *hep,char *hebuf,int helen)
 #else /* CF_USEREENT */
 	{
 
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostbyname: POSIX=0\n") ;
-#endif
-
 	    for (i = 0 ; i < NLOOPS ; i += 1) {
 	        if (i > 0) msleep(1000) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyname: gethostbyname()\n") ;
-#endif
 
 	        rs = SR_OK ;
 	        errno = 0 ;
@@ -390,12 +289,6 @@ int uc_gethostbyname(cchar *name,HOSTENT *hep,char *hebuf,int helen)
 	        if (lp != NULL) break ;
 	        rs = gethosterr(h_errno) ;
 	        if (rs != SR_AGAIN) break ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyname: gethostbyname() lp=%p\n",lp) ;
-	        debugprintf("uc_gethostbyname: h_errno=%s\n",
-	            strherrno(h_errno)) ;
-#endif
 
 	    } /* end for */
 
@@ -408,37 +301,15 @@ int uc_gethostbyname(cchar *name,HOSTENT *hep,char *hebuf,int helen)
 	}
 #endif /* CF_USEREENT */
 
-#if	CF_DEBUGS
-	if (rs >= 0) {
-	    int	i ;
-	    if (hep->h_aliases != NULL) {
-	        for (i = 0 ; hep->h_aliases[i] != NULL ; i += 1) {
-	            debugprintf("uc_gethostbyname: alias[%u]=>%s<\n",
-	                i,hep->h_aliases[i]) ;
-		}
-	    }
-	}
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	debugprintf("uc_gethostbyname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (uc_gethostbyname) */
 
-
-int uc_gethostbyaddr(cchar *addr,int addrlen,int type,HOSTENT *hep,
-		char *hebuf,int helen)
-{
-	HOSTENT	*lp ;
+int uc_gethostbyaddr(HOSTENT *hep,char *hebuf,int helen,
+		int af,cc *ap,int al) noex {
+	HOSTENT		*lp ;
 	int		rs = SR_OK ;
 	int		i ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_gethostbyaddr: ent\n") ;
-#endif
 
 	if (addr == NULL) return SR_FAULT ;
 	if (hep == NULL) return SR_FAULT ;
@@ -452,31 +323,19 @@ int uc_gethostbyaddr(cchar *addr,int addrlen,int type,HOSTENT *hep,
 	{
 	    int	h_errno ;
 
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostbyname: USEREENT=1\n") ;
-#endif
-
 	    for (i = 0 ; i < NLOOPS ; i += 1) {
 	        if (i > 0) msleep(1000) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyaddr: i=%u gethostbyaddr_r()\n",i) ;
-#endif
 
 	        rs = SR_OK ;
 	        errno = 0 ;
 	        h_errno = 0 ;
-	        lp = gethostbyaddr_r(addr,addrlen,type,
+	        lp = gethostbyaddr_r(addr,addrlen,af,
 	            hep,hebuf,helen,&h_errno) ;
 
 	        if (lp != NULL) break ;
 
 	        rs = gethosterr(h_errno) ;
 	        if (rs != SR_AGAIN) break ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyaddr: gethostbyaddr_r() lp=%p\n",lp) ;
-#endif 
 
 	    } /* end for */
 
@@ -490,35 +349,19 @@ int uc_gethostbyaddr(cchar *addr,int addrlen,int type,HOSTENT *hep,
 #else /* CF_USEREENT */
 	{
 
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostbyaddr: USEREENT=0\n") ;
-#endif
-
 	    for (i = 0 ; i < NLOOPS ; i += 1) {
 	        if (i > 0) msleep(1000) ;
-
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyaddr: gethostbyaddr()\n") ;
-#endif
 
 	        rs = SR_OK ;
 	        errno = 0 ;
 	        h_errno = 0 ;
-	        lp = gethostbyaddr(addr,addrlen,type) ;
+	        lp = gethostbyaddr(addr,addrlen,af) ;
 	        if (lp != NULL) break ;
 
 	        rs = gethosterr(h_errno) ;
 	        if (rs != SR_AGAIN) break ;
 
-#if	CF_DEBUGS
-	        debugprintf("uc_gethostbyaddr: gethostbyaddr() lp=%p\n",lp) ;
-#endif
-
 	    } /* end for */
-
-#if	CF_DEBUGS
-	    debugprintf("uc_gethostbyaddr: some memcpy\n") ;
-#endif
 
 	    if (rs >= 0) {
 	        rs = hostent_load(hep,hebuf,helen,lp) ;
@@ -529,10 +372,6 @@ int uc_gethostbyaddr(cchar *addr,int addrlen,int type,HOSTENT *hep,
 	}
 #endif /* CF_USEREENT */
 
-#if	CF_DEBUGS
-	debugprintf("uc_gethostbyaddr: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (uc_gethostbyaddr) */
@@ -540,9 +379,7 @@ int uc_gethostbyaddr(cchar *addr,int addrlen,int type,HOSTENT *hep,
 
 /* local subroutines */
 
-
-static int gethosterr(int h_errno)
-{
+static int gethosterr(int h_errno) noex {
 	int		rs = SR_OK ;
 	if (errno != 0) {
 	    rs = (- errno) ;
@@ -573,18 +410,5 @@ static int gethosterr(int h_errno)
 	return rs ;
 }
 /* end subroutine (gethosterr) */
-
-
-#if	CF_DEBUGS
-static cchar	*strherrno(int n)
-{
-	int		i ;
-	for (i = 0 ; herrnos[i].herrno != 0 ; i += 1) {
-	    if (n == herrnos[i].herrno) break ;
-	} /* end for */
-	return herrnos[i].name ;
-}
-/* end subroutine (strherrno) */
-#endif /* CF_DEBUGS */
 
 

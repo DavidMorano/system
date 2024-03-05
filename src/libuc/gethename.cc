@@ -91,15 +91,12 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int gethename(name,hep,buf,buflen)
-const char	name[] ;
-struct hostent	*hep ;
-char		buf[] ;
-int		buflen ;
-{
+int gethename(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
 
 #if	CF_LOG
 	logfile	lh ;
@@ -209,10 +206,7 @@ ret0:
 }
 /* end subroutine (gethename) */
 
-
 /* ALTERNATE API */
-
-
 int gethe1(name,hep,buf,buflen)
 char		name[] ;
 struct hostent	*hep ;

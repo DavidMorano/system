@@ -59,6 +59,10 @@
 
 /* external subroutines */
 
+extern "C" {
+    int	getheaddr(HOSTENT *,char *,int,cchar *) noex ;
+}
+
 
 /* external variables */
 
@@ -69,14 +73,17 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int getheaddr(cchar *addr,HOSTENT *hep,char *hbuf,int hlen) noex {
+int getheaddr(HOSTENT *hep,char *hbuf,int hlen,cchar *ap) noex {
 	cint		af = AF_INET ;
 	int		rs = SR_FAULT ;
-	if (addr && hep && hbuf) {
-	    cint	addrlen = sizeof(struct in_addr) ;
-	    rs = uc_gethostbyaddr(addr,addrlen,af,hep,hbuf,hlen) ;
+	if (hep && hbuf && ap) {
+	    cint	al = sizeof(struct in_addr) ;
+	    rs = uc_gethostbyaddr(hep,hbuf,hlen,af,ap,al) ;
 	} /* end if (non-null) */
 	return rs ;
 }

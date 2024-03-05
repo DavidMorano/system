@@ -40,7 +40,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>		/* <- |getenv(3c)| */
 #include	<usystem.h>
-#include	<varnames.hh>
+#include	<ucvariables.hh>
 #include	<getourenv.h>
 #include	<localmisc.h>
 
@@ -59,10 +59,16 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
 /* forward references */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -77,7 +83,7 @@ cchar *gettmpdnamex(mainv envv) noex {
 	    vp = getenv(vn) ;
 	}
 	if ((vp == nullptr) || (vn[0] == '\0')) {
-	    vp = varname.tmpdname ;
+	    vp = sysword.w_tmpdir ;
 	}
 	return vp ;
 } 

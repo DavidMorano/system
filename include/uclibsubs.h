@@ -342,7 +342,7 @@ extern int	uc_sethostent(int) noex ;
 extern int	uc_endhostent() noex ;
 extern int	uc_gethostent(HOSTENT *,char *,int) noex ;
 extern int	uc_gethostbyname(HOSTENT *,char *,int,cchar *) noex ;
-extern int	uc_gethostbyaddr(HOSTENT *,char *,int,cchar *,int,int) noex ;
+extern int	uc_gethostbyaddr(HOSTENT *,char *,int,int,cvoid *,int) noex ;
 
 /* NETWORK SERVICE database */
 extern int	uc_setservent(int) noex ;

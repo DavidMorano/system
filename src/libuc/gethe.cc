@@ -56,6 +56,7 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<getnodename.h>
 #include	<localmisc.h>
 
@@ -99,20 +100,29 @@ int gethe_ent(HOSTENT *hep,char *hebuf,int helen) noex {
 /* end subroutine (gethe_ent) */
 
 int gethe_name(HOSTENT *hep,char *hebuf,int helen,cchar *name) noex {
-	cint		nlen = NODENAMELEN ;
-	int		rs = SR_OK ;
-	char		nbuf[NODENAMELEN+1] ;
-	if ((name == NULL) || (name[0] == '\0')) {
-	    rs = getnodename(nbuf,nlen) ;
-	    name = nbuf ;
-	}
-	if (rs >= 0) rs = uc_gethostbyname(hep,hebuf,helen,name) ;
-	return rs ;
+	int		rs ;
+	int		rs1 ;
+	int		rv = 0 ;
+	char		*nbuf{} ;
+	if ((rs = malloc_nn(&nbuf)) >= 0) {
+	    cint	nlen = rs ;
+	    if ((name == nullptr) || (name[0] == '\0')) {
+	        rs = getnodename(nbuf,nlen) ;
+	        name = nbuf ;
+	    }
+	    if (rs >= 0) {
+	        rs = uc_gethostbyname(hep,hebuf,helen,name) ;
+		rv = rs ;
+	    }
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (gethe_name) */
 
-int gethe_addr(HOSTENT *hep,char *hb,int hl,int af,in_addr_t *ap) noex {
-	return uc_gethostbyaddr(hep,hb,hl,ap,al,type) ;
+int gethe_addr(HOSTENT *hep,char *hb,int hl,int af,cvoid *ap,int al) noex {
+	return uc_gethostbyaddr(hep,hb,hl,af,ap,al) ;
 }
 /* end subroutine (gethe_addr) */
 

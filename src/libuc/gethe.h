@@ -21,7 +21,7 @@ EXTERNC_begin
 extern int gethe_begin(int) noex ;
 extern int gethe_ent(HOSTENT *,char *,int) noex ;
 extern int gethe_name(HOSTENT *,char *,int,cchar *) noex ;
-extern int gethe_addr(HOSTENT *,char *,int,int,in_addr_t) noex ;
+extern int gethe_addr(HOSTENT *,char *,int,cvoid *,int) noex ;
 extern int gethe_end() noex ;
 
 EXTERNC_end

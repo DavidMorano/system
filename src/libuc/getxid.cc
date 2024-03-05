@@ -156,7 +156,7 @@ int getuid_name(cchar *sp,int sl) noex {
 	            if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	                cint	pwlen = rs ;
 		        {
-	                    PASSWD	pw ;
+	                    ucentpw	pw ;
 		            rs = GETPW_NAME(&pw,pwbuf,pwlen,name) ;
 	                    uid = pw.pw_uid ;
 		        }
@@ -204,7 +204,7 @@ int getgid_name(cchar *sp,int sl) noex {
 		    if ((rs = malloc_gr(&grbuf)) >= 0) {
 	                cint	grlen = rs ;
 		        {
-	                    GROUP	gr{} ;
+	                    ucentgr	gr{} ;
 	                    rs = getgr_name(&gr,grbuf,grlen,name) ;
 	                    gid = gr.gr_gid ;
 		        }
@@ -268,7 +268,7 @@ int getpjid_name(cchar *sp,int sl) noex {
 	            if ((rs = malloc_pj(&pjbuf)) >= 0) {
 	                cint	pjlen = rs ;
 		        {
-	                    PROJECT	pj ;
+	                    ucentpj	pj ;
 	                    rs = getpj_name(&pj,pjbuf,pjlen,name) ;
 	                    pjid = pj.pj_projid ;
 		        }
