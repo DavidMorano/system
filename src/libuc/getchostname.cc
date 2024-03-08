@@ -48,6 +48,8 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 
+#include	"getchostname.h"
+
 
 /* local defines */
 
@@ -59,10 +61,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	getcname(cchar *,char *) noex ;
-}
 
 
 /* forward references */
@@ -83,6 +81,5 @@ int getchostname(cchar *name,char *hostname) noex {
 	return getcname(name,hostname) ;
 }
 /* end if (getchostname) */
-
 
 

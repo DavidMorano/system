@@ -50,6 +50,8 @@
 #include	<sncpyx.h>
 #include	<localmisc.h>
 
+#include	"getchostname.h"
+
 
 /* local defines */
 
