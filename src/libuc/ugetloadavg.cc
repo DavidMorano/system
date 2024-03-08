@@ -86,17 +86,22 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
 
 
 /* forward references */
-
-extern "C" {
-    int ucgetloadavg(double *dla,int n) noex ;
-}
 
 static int	ugetloadavg(uint *,int) noex ;
 
@@ -106,6 +111,9 @@ static int	ugetloadavg(uint *,int) noex ;
 constexpr int		maxloadavgs = LOADAVG_NSTATS ;
 
 constexpr bool		f_sunos = F_SUNOS ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -130,7 +138,8 @@ int u_getloadavg(uint *la,int n) noex {
 }
 /* end subroutine (u_getloadavg) */
 
-int ucgetloadavg(double *dla,int n) noex {
+namespace libuc {
+    int ucgetloadavg(double *dla,int n) noex {
 	int		to_again = utimeout[uto_again] ;
 	int		rs ;
 	bool		f_exit = false ;
@@ -154,14 +163,14 @@ int ucgetloadavg(double *dla,int n) noex {
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
+    } /* end subroutine (ucgetloadavg) */
 }
-/* end subroutine (ucgetloadavg) */
 
 
 /* local subroutines */
 
 static int ugetloadavg(uint *la,int n) noex {
-	static constexpr int	nmax = maxloadavgs ;
+	constexpr int	nmax = maxloadavgs ;
 	int		rs = SR_FAULT ;
 	int		rn = 0 ;
 	if (la) {
@@ -169,7 +178,7 @@ static int ugetloadavg(uint *la,int n) noex {
 	    if (n > 0) {
 	        double	d[nmax] ;
 	        if (n > nmax) n = nmax ;
-	        if ((rs = ucgetloadavg(d,n)) >= 0) {
+	        if ((rs = libuc::ucgetloadavg(d,n)) >= 0) {
 		    rn = rs ;
 	            for (int i = 0 ; i < n ; i += 1) {
 	                la[i] = uint(d[i] * FSCALE) ;

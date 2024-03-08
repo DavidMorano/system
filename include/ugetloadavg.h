@@ -31,9 +31,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<stdlib.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 
 
@@ -44,18 +43,19 @@
 #else /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
 EXTERNC_begin
-
 extern int __getloadavg(int *,int) noex ;
-
 EXTERNC_end
 
 #endif /* defined(SYSHAS_LOADAVGINT) && (SYSHAS_LOADAVGINT > 0) */
 
+#ifdef	__cplusplus
+namespace libuc {
+    extern int	ucgetloadavg(double *,int) noex ;
+}
+#endif /* __cplusplus */
+
 EXTERNC_begin
-
-extern int	ucgetloadavg(double *,int) noex ;
 extern int	u_getloadavg(uint *,int) noex ;
-
 EXTERNC_end
 
 

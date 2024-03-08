@@ -574,14 +574,6 @@ base.o:		$(OBJ_BASE)
 	$(LD) -r -o $@ $(OBJ_BASE)
 
 
-# string-to-x
-ucstr.o:	ucstrtox.o ucstrtod.o
-ucsysconf.o:	ucsysconf.cc
-
-# uctimeout (time-out call-backs)
-uctimeout.o:	uctimeout.cc
-
-
 # CHARACTER
 OBJA_CHAR= toxc.o char.o rmeol.o
 OBJB_CHAR= ischarx.o hasx.o
@@ -598,7 +590,16 @@ character.o:	$(OBJ_CHAR)
 	$(LD) -r -o $@ $(OBJ_CHAR)
 
 
-# SYSMISC
+# LIBU special built-ins (user-space enumlated kernel calls)
+uinfo.o:		uinfo.cc uinfo.h
+umask.o:		umask.cc umask.h
+unameo.o:		unameo.cc unameo.h
+ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
+utmpacc.o:		utmpacc.cc utmpacc.h
+utmpaccent.o:		utmpaccent.cc utmpaccent.h
+ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h
+
+# LIBUC
 ucsysmisc.o:		ucsysmisc.cc
 ucnprocs.o:		ucnprocs.cc
 ucpathconf.o:		ucpathconf.cc
@@ -606,7 +607,24 @@ ucmain.o:		ucmain.cc
 ucatfork.o:		ucatfork.cc
 ucatexit.o:		ucatexit.cc
 ucfork.o:		ucfork.cc
+ucgetloadavg.o:		ucgetloadavg.cc ucgetloadavg.h ugetloadavg.h
+ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
+ucgetpid.o:		ucgetpid.cc ucgetpid.h
+ucproguser.o:		ucproguser.cc ucproguser.h
+ucprogdata.o:		ucprogdata.cc ucprogdata.h
+ucclustername.o:	ucclustername.cc ucclustername.h
+uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 
+# UNIX C-language system library string-to-integer interface
+ucstrtox.o:		ucstrtox.cc ucstrtox.h strtox.h
+ucstrtod.o:		ucstrtod.cc ucstrtod.h
+
+# string-to-x
+ucstr.o:	ucstrtox.o ucstrtod.o
+ucsysconf.o:	ucsysconf.cc
+
+# uctimeout (time-out call-backs)
+uctimeout.o:	uctimeout.cc
 
 
 obja.o:			$(OBJA)
@@ -823,7 +841,6 @@ getutmpent.o:		getutmpent.cc getutmpent.h
 mkutmpid.o:		mkutmpid.cc mkutmpid.h
 
 
-unameo.o:		unameo.cc unameo.h
 memfile.o:		memfile.cc memfile.h
 filemap.o:		filemap.cc filemap.h
 
@@ -884,25 +901,10 @@ checkbase.o:		checkbase.cc
 mallocxx.o:		mallocxx.cc mallocxx.h
 mallocstuff.o:		mallocstuff.cc mallocstuff.h
 
-# special built-ins (user-space enumlated kernel calls)
-uinfo.o:		uinfo.cc uinfo.h
-umask.o:		umask.cc umask.h
-ucygetpw.o:		ucygetpw.cc ucygetpw.h ucpwcache.h recarr.h
-ucgetpid.o:		ucgetpid.cc ucgetpid.h
-ucproguser.o:		ucproguser.cc ucproguser.h
-ucprogdata.o:		ucprogdata.cc ucprogdata.h
-ucclustername.o:	ucclustername.cc ucclustername.h
-ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
-utmpacc.o:		utmpacc.cc utmpacc.h
-utmpaccent.o:		utmpaccent.cc utmpaccent.h
 tmpx.o:			tmpx.cc tmpx.h
 
 # part of string-to-integer interface
 strtox.o:		strtox.cc strtox.h
-
-# UNIX C-language system library string-to-integer interface
-ucstrtox.o:		ucstrtox.cc ucstrtox.h strtox.h
-ucstrtod.o:		ucstrtod.cc ucstrtod.h
 
 # UNIX C-language system library data-base interface (support)
 spwd.o:			spwd.cc spwd.h
@@ -912,7 +914,6 @@ ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library support
-uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
 libmallocxx.o:		libmalloccc.xx libmallocxx.h
 
 # UNIX C-language system library memory management

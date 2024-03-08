@@ -1,5 +1,5 @@
-/* ucgetloadavg */
-/* lang=C20 */
+/* ucgetloadavg SUPPORT */
+/* lang=C++20 */
 
 /* get load averages as floating doubles (relatively now standard!) */
 /* version %I% last-modified %G% */
@@ -29,23 +29,42 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<errno.h>
-#include	<stdlib.h>
+#include	<cerrno>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
 #include	"ucgetloadavg.h"
+#include	"ugetloadavg.h"
 
 
 /* local defines */
 
 
+/* local namespaces */
+
+using libuc::ucgetloadavg ;		/* internal library subroutine */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int ucgetloadavg(double *,int) noex ;
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
