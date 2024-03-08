@@ -70,6 +70,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int inetaddrparse_load(inetaddrparse *ap,cchar *sp,int sl) noex {

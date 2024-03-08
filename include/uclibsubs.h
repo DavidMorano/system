@@ -356,8 +356,8 @@ extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
 extern int	uc_freehostent(HOSTENT *) noex ;
 
 /* NETWORK ADDRINFO database */
-extern int uc_getaddrinfo(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
-extern int uc_freeaddrinfo(ADDRINFO *) noex ;
+extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
+extern int uc_addrinfofree(ADDRINFO *) noex ;
 
 /* NETWORK SOCKADDR combined database */
 extern int	uc_getnameinfo(const SOCKADDR *,int,

@@ -67,6 +67,12 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -123,20 +129,20 @@ int getaddrfamily(cchar *name) noex {
 
 int getaddrlen(int af) noex {
 	int		rs = SR_OK ;
-	    switch (af) {
-	    case AF_UNIX:
-	        rs = maxpathlen ;
-	        break ;
-	    case AF_INET4:
-	        rs = INET4ADDRLEN ;
-	        break ;
-	    case AF_INET6:
-	        rs = INET6ADDRLEN ;
-	        break ;
-	    default:
-	        rs = SR_AFNOSUPPORT ;
-	        break ;
-	    } /* end switch */
+        switch (af) {
+        case AF_UNIX:
+            rs = maxpathlen ;
+            break ;
+        case AF_INET4:
+            rs = INET4ADDRLEN ;
+            break ;
+        case AF_INET6:
+            rs = INET6ADDRLEN ;
+            break ;
+        default:
+            rs = SR_AFNOSUPPORT ;
+            break ;
+        } /* end switch */
 	return rs ;
 }
 /* end subroutine (getaddrlen) */

@@ -1,4 +1,4 @@
-/* uc_getaddrinfo SUPPORT */
+/* ucaddrinfo SUPPORT */
 /* lang=C++20 */
 
 /* manipulate host-address entry structures */
@@ -17,14 +17,14 @@
 /*******************************************************************************
 
 	Name:
-	uc_getaddrinfo
+	uc_addrinfoget
 
 	Description:
 	This is a nicer version of the standard |getaddrinfo(3socket)|
 	subroutine.
 
 	Synopsis:
-	int uc_getaddrinfo(cc *hn,cc *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex
+	int uc_addrinfoget(cc *hn,cc *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex
 
 	Arguments:
 	hn		host-name
@@ -37,14 +37,14 @@
 	<0		error (system-return)
 
 	Name:
-	uc_freeaddrinfo
+	uc_addrinfofree
 
 	Description:
 	These subroutine is a cleaned up version of
 	|getaddrinfo(3socket)|.
 
 	Synopsis:
-	int uc_freeaddrinfo(ADDRINFO *aip) noex
+	int uc_eaddrinfofree(ADDRINFO *aip) noex
 
 	Arguments:
 	aip		pointer to 'addrinfo' structure
@@ -87,7 +87,7 @@
 
 /* exported subroutines */
 
-int uc_getaddrinfo(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
+int uc_addrinfoget(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	int		to_again = utimeout[uto_again] ;
 	int		rs ;
 	int		rc = 0 ;
@@ -166,9 +166,9 @@ int uc_getaddrinfo(cchar *hn,cchar *svc,ADDRINFO *hintp,ADDRINFO **rpp) noex {
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
 }
-/* end subroutine (uc_getaddrinfo) */
+/* end subroutine (uc_addrinfoget) */
 
-int uc_freeaddrinfo(ADDRINFO *aip) noex {
+int uc_addrinfofree(ADDRINFO *aip) noex {
 	int		rs = SR_FAULT ;
 	if (aip) {
 	    freeaddrinfo(aip) ;
@@ -176,6 +176,6 @@ int uc_freeaddrinfo(ADDRINFO *aip) noex {
 	}
 	return rs ;
 }
-/* end subroutine (uc_freeaddrinfo) */
+/* end subroutine (uc_addrinfofree) */
 
 
