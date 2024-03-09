@@ -37,25 +37,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>		/* |UC(3local)| */
 
 #include	"inet4int.h"
 
 
 /* local defines */
 
-#ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	sizeof(in_addr_t)
-#endif
 
-#ifndef	INET6ADDRLEN
-#define	INET6ADDRLEN	sizeof(in6_addr_t)
-#endif
+/* local namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

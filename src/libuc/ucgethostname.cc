@@ -1,10 +1,8 @@
-/* uc_gethostname */
+/* ucgethostname SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* get the "hostname" (really the "nodename") of the current machine */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -23,17 +21,11 @@
 
 *******************************************************************************/
 
-
-#define	LIBUC_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<string.h>
-#include	<errno.h>
-
+#include	<cerrno>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -41,23 +33,25 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_gethostname(char *hbuf,int hlen)
-{
-	int		rs ;
-
-	if (hbuf == NULL) return SR_FAULT ;
-
-	hbuf[0] = '\0' ;
-	if ((rs = gethostname(hbuf,(hlen+1))) < 0) rs = (- errno) ;
-
-	if (rs >= 0) {
-	    hbuf[hlen] = '\0' ;
-	    rs = strlen(hbuf) ;
-	}
-
+int uc_gethostname(char *hbuf,int hlen) noex {
+	int		rs = SR_FAULT ;
+	if (hbuf) {
+	    rs = SR_INVALID ;
+	    hbuf[0] = '\0' ;
+	    if (hlen > 0) {
+	        if ((rs = gethostname(hbuf,(hlen+1))) >= 0) {
+	            hbuf[hlen] = '\0' ;
+	            rs = strlen(hbuf) ;
+	        } else {
+	            rs = (- errno) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (uc_gethostname) */

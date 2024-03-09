@@ -590,13 +590,7 @@ character.o:	$(OBJ_CHAR)
 	$(LD) -r -o $@ $(OBJ_CHAR)
 
 
-# LIBU special built-ins (user-space enumlated kernel calls)
-uinfo.o:		uinfo.cc uinfo.h
-umask.o:		umask.cc umask.h
-unameo.o:		unameo.cc unameo.h
-ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
-utmpacc.o:		utmpacc.cc utmpacc.h
-utmpaccent.o:		utmpaccent.cc utmpaccent.h
+# LIBU
 ugetloadavg.o:		ugetloadavg.cc ugetloadavg.h
 
 # LIBUC
@@ -614,6 +608,7 @@ ucproguser.o:		ucproguser.cc ucproguser.h
 ucprogdata.o:		ucprogdata.cc ucprogdata.h
 ucclustername.o:	ucclustername.cc ucclustername.h
 uclibmemalloc.o:	uclibmemalloc.cc uclibmemalloc.h
+ucpwcache.o:		ucpwcache.cc ucpwcache.h recarr.h
 
 # UNIX C-language system library string-to-integer interface
 ucstrtox.o:		ucstrtox.cc ucstrtox.h strtox.h
@@ -1092,6 +1087,11 @@ isfiledesc.o:		isfiledesc.dir
 isfiledesc.dir:
 	makesubdir $@
 
+# GETXX
+getxx.o:		getxx.dir
+getxx.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1206,7 +1206,12 @@ ccfile.o:		ccfile.cc ccfile.hh
 thrcomm.o:		thrcomm.cc thrcomm.h
 thrbase.o:		thrbase.cc thrbase.h thrcomm.h
 
-
+# emulated system kernel calls
+uinfo.o:		uinfo.cc uinfo.h
+umask.o:		umask.cc umask.h
+unameo.o:		unameo.cc unameo.h
+utmpacc.o:		utmpacc.cc utmpacc.h
+utmpaccent.o:		utmpaccent.cc utmpaccent.h
 
 
 # testing

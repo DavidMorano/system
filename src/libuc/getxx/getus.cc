@@ -35,11 +35,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"getus.h"
 
@@ -62,20 +58,23 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getus_begin() noex {
-	return uc_setus() ;
+	return uc_getusbegin() ;
 }
 /* end subroutine (getus_begin) */
 
 int getus_end() noex {
-	return uc_endus() ;
+	return uc_getusend() ;
 }
 /* end subroutine (getus_end) */
 
 int getus_ent(char *rbuf,int rlen) noex {
-	return uc_getus(rbuf,rlen) ;
+	return uc_getusent(rbuf,rlen) ;
 }
 /* end subroutine (getus_ent) */
 

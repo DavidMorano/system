@@ -1,4 +1,4 @@
-/* gethe SUPPORT (Get Host Entry) */
+/* getho SUPPORT (Get Host Entry) */
 /* lang=C++20 */
 
 /* get a host entry from the system database */
@@ -30,7 +30,7 @@
 	DNS lookups used.  In general, DNS lookups are very slow.
 
 	Synopsis:
-	int gethe_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex
+	int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex
 
 	Arguments:
 	hep		pointer to 'hostent' structure
@@ -48,7 +48,8 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<getnodename.h>
-#include	<localmisc.h>
+
+#include	"getho.h"
 
 
 /* local defines */
@@ -77,22 +78,22 @@
 
 /* exported subroutines */
 
-int gethe_begin(int stayopen) noex {
-	return uc_sethostent(stayopen) ;
+int getho_begin(int stayopen) noex {
+	return uc_gethobegin(stayopen) ;
 }
-/* end subroutine (gethe_begin) */
+/* end subroutine (getho_begin) */
 
-int gethe_end() noex {
-	return uc_endhostent() ;
+int getho_end() noex {
+	return uc_gethoend() ;
 }
-/* end subroutine (gethe_end) */
+/* end subroutine (getho_end) */
 
-int gethe_ent(ucentho *hep,char *hebuf,int helen) noex {
-	return uc_gethostent(hep,hebuf,helen) ;
+int getho_ent(ucentho *hep,char *hebuf,int helen) noex {
+	return uc_gethoent(hep,hebuf,helen) ;
 }
-/* end subroutine (gethe_ent) */
+/* end subroutine (getho_ent) */
 
-int gethe_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
+int getho_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	int		rs ;
 	int		rs1 ;
 	int		rv = 0 ;
@@ -104,7 +105,7 @@ int gethe_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	        name = nbuf ;
 	    }
 	    if (rs >= 0) {
-	        rs = uc_gethostbyname(hep,hebuf,helen,name) ;
+	        rs = uc_gethonam(hep,hebuf,helen,name) ;
 		rv = rs ;
 	    }
 	    rs1 = uc_free(nbuf) ;
@@ -112,11 +113,11 @@ int gethe_name(ucentho *hep,char *hebuf,int helen,cchar *name) noex {
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? rv : rs ;
 }
-/* end subroutine (gethe_name) */
+/* end subroutine (getho_name) */
 
-int gethe_addr(ucentho *hep,char *hb,int hl,int af,cvoid *ap,int al) noex {
-	return uc_gethostbyaddr(hep,hb,hl,af,ap,al) ;
+int getho_addr(ucentho *hep,char *hb,int hl,int af,cvoid *ap,int al) noex {
+	return uc_gethoadd(hep,hb,hl,af,ap,al) ;
 }
-/* end subroutine (gethe_addr) */
+/* end subroutine (getho_addr) */
 
 

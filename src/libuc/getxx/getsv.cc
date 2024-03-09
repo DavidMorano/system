@@ -1,4 +1,4 @@
-/* getse SUPPORT */
+/* getsv SUPPORT */
 /* lang=C++20 */
 
 /* get service entry */
@@ -24,15 +24,14 @@
 
 	These are the preferred interfaces:
 
-	preferred interfaces: getse_name(), getse_port() ;
+	preferred interfaces: getsv_name(), getsv_port() ;
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<localmisc.h>
 
-#include	"getse.h"
+#include	"getsv.h"
 
 
 /* local defines */
@@ -53,36 +52,39 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int getse_begin(int sf) noex {
-	return uc_setservent(sf) ;
+int getsv_begin(int sf) noex {
+	return uc_getsvbegin(sf) ;
 }
-/* end subroutine (getse_begin) */
+/* end subroutine (getsv_begin) */
 
-int getse_end() noex {
-	return uc_endservent() ;
+int getsv_end() noex {
+	return uc_getsvend() ;
 }
-/* end subroutine (getse_end) */
+/* end subroutine (getsv_end) */
 
-int getse_ent(ucentsv *sep,char *rbuf,int rlen) noex {
+int getsv_ent(ucentsv *sep,char *rbuf,int rlen) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = uc_getservent(sep,rbuf,rlen)) == rsn) {
+	if ((rs = uc_getsvent(sep,rbuf,rlen)) == rsn) {
 	    rs = SR_OK ;
 	}
 	return rs ;
 }
-/* end subroutine (getse_ent) */
+/* end subroutine (getsv_ent) */
 
-int getse_name(ucentsv *sep,char *rbuf,int rlen,cchar *pn,cchar *svc) noex {
-	return uc_getservbyname(sep,rbuf,rlen,pn,svc) ;
+int getsv_name(ucentsv *sep,char *rbuf,int rlen,cchar *pn,cchar *svc) noex {
+	return uc_getsvnam(sep,rbuf,rlen,pn,svc) ;
 }
-/* end subroutine (getse_name) */
+/* end subroutine (getsv_name) */
 
-int getse_port(ucentsv *sep,char *rbuf,int rlen,int num,cchar *pn) noex {
-	return uc_getservbyport(sep,rbuf,rlen,num,pn) ;
+int getsv_port(ucentsv *sep,char *rbuf,int rlen,int num,cchar *pn) noex {
+	return uc_getsvnum(sep,rbuf,rlen,num,pn) ;
 }
-/* end subroutine (getse_port) */
+/* end subroutine (getsv_port) */
 
 

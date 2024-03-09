@@ -29,16 +29,16 @@
 	int uc_gethoent(ucentho *pep,char *hobuf,int pelen) noex
 	int uc_gethonam(ucentho *pep,char *hobuf,int pelen,cchar *name) noex
 	int uc_gethoadd(ucentho *pep,char *hobuf,int pelen,
-			cv *ap,int al,int af) noex
+			int af,cv *ap,int al) noex
 
 	Arguments:
 	- pep		pointer to 'hostent' structure
 	- hobuf		host-ent buffer pointer
 	- pelen		host-ent buffer length
 	- name		host-name to lookup
+	- af		address family
 	- ap		address pointer
 	- al		address length
-	- af		address family
 
 	Returns:
 	0		entry was found OK
@@ -99,11 +99,11 @@ namespace {
 	cvoid		*ap ;
 	int		al ;
 	int		af ;
-	ucgetho(cchar *n,cvoid *a = 0,int l = 0,int f = 0) noex {
+	ucgetho(cchar *n,int f = 0,cvoid *a = 0,int l = 0) noex {
 	    name = n ;
+	    af = f ;
 	    ap = a ;
 	    al = l ;
-	    af = f ;
 	} ; /* end ctor */
 	int getho_ent(ucentho *,char *,int) noex ;
 	int getho_nam(ucentho *,char *,int) noex ;
@@ -158,8 +158,8 @@ int uc_gethonam(ucentho *hop,char *hobuf,int holen,cchar *name) noex {
 }
 /* end subroutine (uc_gethonam) */
 
-int uc_gethoadd(ucentho *hop,char *hobuf,int holen,cv *ap,int al,int af) noex {
-	ucgetho		hoo(nullptr,ap,al,af) ;
+int uc_gethoadd(ucentho *hop,char *hobuf,int holen,int af,cv *ap,int al) noex {
+	ucgetho		hoo(nullptr,af,ap,al) ;
 	hoo.m = &ucgetho::getho_add ;
 	return hoo(hop,hobuf,holen) ;
 }
@@ -290,7 +290,7 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 	    if ((al >= 0) && (af >= 0)) {
 	        errno = 0 ;
 	        if constexpr (f_gethoxxxr) {
-	            cint	ec = gethoadd_rp(hop,hobuf,holen,ap,al,af) ;
+	            cint	ec = gethoadd_rp(hop,hobuf,holen,af,ap,al) ;
 	            if (ec == 0) {
 	                rs = hop->size() ;
 	            } else if (ec > 0) {
@@ -303,7 +303,7 @@ int ucgetho::getho_add(ucentho *hop,char *hobuf,int holen) noex {
 		        }
 	            }
 	        } else {
-	            ucentho *rp = static_cast<ucentho *>(gethoadd(ap,al,af)) ;
+	            ucentho *rp = static_cast<ucentho *>(gethoadd(af,ap,al)) ;
 	            if (rp) {
 	                rs = hop->load(hobuf,holen,rp) ;
 	            } else {

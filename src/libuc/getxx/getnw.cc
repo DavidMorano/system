@@ -1,4 +1,4 @@
-/* getne SUPPORT */
+/* getnw SUPPORT */
 /* lang=C++20 */
 
 /* get protocol entry */
@@ -24,16 +24,15 @@
 
 	These are the preferred interfaces:
 
-	preferred interfaces: getne_name(), getne_num() ;
+	preferred interfaces: getnw_name(), getnw_num() ;
 	preferred interfaces: getgr_name(), getgr_gid() ;
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<localmisc.h>
 
-#include	"getne.h"
+#include	"getnw.h"
 
 
 /* local defines */
@@ -56,34 +55,34 @@
 
 /* exported subroutines */
 
-int getne_begin(int sf) noex {
-	return uc_setnetent(sf) ;
+int getnw_begin(int sf) noex {
+	return uc_getnwbegin(sf) ;
 }
-/* end subroutine (getne_begin) */
+/* end subroutine (getnw_begin) */
 
-int getne_end() noex {
-	return uc_endnetent() ;
+int getnw_end() noex {
+	return uc_getnwend() ;
 }
-/* end subroutine (getne_end) */
+/* end subroutine (getnw_end) */
 
-int getne_ent(ucentnw *nep,char *rbuf,int rlen) noex {
+int getnw_ent(ucentnw *nep,char *rbuf,int rlen) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = uc_getnetent(nep,rbuf,rlen)) == rsn) {
+	if ((rs = uc_getnwent(nep,rbuf,rlen)) == rsn) {
 	    rs = SR_OK ;
 	}
 	return rs ;
 }
-/* end subroutine (getne_ent) */
+/* end subroutine (getnw_ent) */
 
-int getne_name(ucentnw *nep,char *rbuf,int rlen,cchar *name) noex {
-	return uc_getnetbyname(nep,rbuf,rlen,name) ;
+int getnw_name(ucentnw *nep,char *rbuf,int rlen,cchar *name) noex {
+	return uc_getnwnam(nep,rbuf,rlen,name) ;
 }
-/* end subroutine (getne_name) */
+/* end subroutine (getnw_name) */
 
-int getne_addr(ucentnw *nep,char *rbuf,int rlen,int af,int num) noex {
-	return uc_getnetbyaddr(nep,rbuf,rlen,af,num) ;
+int getnw_addr(ucentnw *nep,char *rbuf,int rlen,int af,int num) noex {
+	return uc_getnwnum(nep,rbuf,rlen,af,num) ;
 }
-/* end subroutine (getne_addr) */
+/* end subroutine (getnw_addr) */
 
 

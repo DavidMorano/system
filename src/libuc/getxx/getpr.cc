@@ -1,4 +1,4 @@
-/* getpe SUPPORT */
+/* getpr SUPPORT */
 /* lang=C++20 */
 
 /* get protocol entry */
@@ -24,9 +24,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
-#include	<localmisc.h>
 
-#include	"getpe.h"
+#include	"getpr.h"
 
 
 /* local defines */
@@ -47,33 +46,39 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int getpe_begin(int sf) noex {
-	return uc_setprotoent(sf) ;
+int getpr_begin(int sf) noex {
+	return uc_getprbegin(sf) ;
 }
-/* end subroutine (getpe_begin) */
+/* end subroutine (getpr_begin) */
 
-int getpe_end() noex {
-	return uc_endprotoent() ;
+int getpr_end() noex {
+	return uc_getprend() ;
 }
-/* end subroutine (getpe_end) */
+/* end subroutine (getpr_end) */
 
-int getpe_ent(ucentpr *pp,char *rbuf,int rlen) noex {
+int getpr_ent(ucentpr *pp,char *rbuf,int rlen) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	if ((rs = uc_getprotoent(pp,rbuf,rlen)) == SR_NOTFOUND) rs = SR_OK ;
+	if ((rs = uc_getprent(pp,rbuf,rlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
-/* end subroutine (getpe_ent) */
+/* end subroutine (getpr_ent) */
 
-int getpe_name(ucentpr *pp,char *rbuf,int rlen,cchar name[]) noex {
-	return uc_getprotobyname(pp,rbuf,rlen,name) ;
+int getpr_name(ucentpr *pp,char *rbuf,int rlen,cchar *name) noex {
+	return uc_getprnam(pp,rbuf,rlen,name) ;
 }
-/* end subroutine (getpe_name) */
+/* end subroutine (getpr_name) */
 
-int getpe_num(ucentpr *pp,char *rbuf,int rlen,int num) noex {
-	return uc_getprotobynumber(pp,rbuf,rlen,num) ;
+int getpr_num(ucentpr *pp,char *rbuf,int rlen,int num) noex {
+	return uc_getprnum(pp,rbuf,rlen,num) ;
 }
-/* end subroutine (getpe_num) */
+/* end subroutine (getpr_num) */
 
 

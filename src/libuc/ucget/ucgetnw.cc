@@ -48,13 +48,15 @@
 	INET 'nwotocol' (by number).
 
 	Synopsis:
-	int uc_getnwnum(ucentnw *pep,char *pebuf,int pelen,int p) noex
+	int uc_getnwnum(ucentnw *pep,char *pebuf,int pelen,
+		int af,uint32_t a) noex
 
 	Arguments:
 	- pep		pointer to 'hostent' structure
 	- rbuf		user supplied buffer to hold result
 	- rlen		length of user supplied buffer
-	- nwoto		service to lookup
+	- af		address familt (aka 'type')
+	- a		address (aka 'number')
 
 	Returns:
 	0		entry was found OK
@@ -62,7 +64,6 @@
 	SR_TIMEDOUT	request timed out (bad network someplace)
 	SR_NOTFOUND	host could not be found
 	SR_OVERFLOW	buffer overflow
-
 
 *******************************************************************************/
 
@@ -113,8 +114,8 @@ namespace {
 	cchar		*name ;
 	uint32_t	num ;
 	int		type ;
-	ucgetnw(cchar *n,uint32_t u = 0,int t = 0) noex : name(n), num(u) { 
-	    type = t ;
+	ucgetnw(cchar *n,int t = 0,uint32_t u = 0) noex : name(n), type(t) { 
+	    num = u ;
 	} ;
 	int getnw_ent(ucentnw *,char *,int) noex ;
 	int getnw_nam(ucentnw *,char *,int) noex ;
@@ -169,8 +170,8 @@ int uc_getnwnam(ucentnw *nwp,char *nwbuf,int nwlen,cchar *name) noex {
 }
 /* end subroutine (uc_getnwnam) */
 
-int uc_getnwnum(ucentnw *nwp,char *nwbuf,int nwlen,uint32_t num,int af) noex {
-	ucgetnw		nwo(nullptr,num,af) ;
+int uc_getnwnum(ucentnw *nwp,char *nwbuf,int nwlen,int af,uint32_t num) noex {
+	ucgetnw		nwo(nullptr,af,num) ;
 	nwo.m = &ucgetnw::getnw_num ;
 	return nwo(nwp,nwbuf,nwlen) ;
 }
@@ -299,7 +300,7 @@ int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 	if (type >= 0) {
 	    errno = 0 ;
 	    if constexpr (f_getnwxxxr) {
-	        cint	ec = getnwnum_rp(nwp,nwbuf,nwlen,num,type) ;
+	        cint	ec = getnwnum_rp(nwp,nwbuf,nwlen,type,num) ;
 	        if (ec == 0) {
 	            rs = nwp->size() ;
 	        } else if (ec > 0) {
@@ -312,7 +313,7 @@ int ucgetnw::getnw_num(ucentnw *nwp,char *nwbuf,int nwlen) noex {
 		    }
 	        }
 	    } else {
-	        ucentnw	*rp = static_cast<ucentnw *>(getnwnum(num,type)) ;
+	        ucentnw	*rp = static_cast<ucentnw *>(getnwnum(type,num)) ;
 	        if (rp) {
 	            rs = nwp->load(nwbuf,nwlen,rp) ;
 	        } else {

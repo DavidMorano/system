@@ -30,9 +30,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<unistd.h>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"getax.h"
 
@@ -74,7 +72,9 @@ int getpw_end() noex {
 
 int getpw_ent(ucentpw *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
-	if ((rs = uc_getpwent(pwp,pwbuf,pwlen)) == rsn) rs = SR_OK ;
+	if ((rs = uc_getpwent(pwp,pwbuf,pwlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (getpw_ent) */
@@ -102,7 +102,9 @@ int getsp_end() noex {
 
 int getsp_ent(ucentsp *spp,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = uc_getspent(spp,rbuf,rlen)) == rsn) rs = SR_OK ;
+	if ((rs = uc_getspent(spp,rbuf,rlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (getsp_ent) */
@@ -125,7 +127,9 @@ int getgr_end() noex {
 
 int getgr_ent(ucentgr *grp,char *grbuf,int grlen) noex {
 	int		rs ;
-	if ((rs = uc_getgrent(grp,grbuf,grlen)) == rsn) rs = SR_OK ;
+	if ((rs = uc_getgrent(grp,grbuf,grlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (getgr_ent) */
@@ -153,7 +157,9 @@ int getpj_end() noex {
 
 int getpj_ent(ucentpj *pjp,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = uc_getpjent(pjp,rbuf,rlen)) == rsn) rs = SR_OK ;
+	if ((rs = uc_getpjent(pjp,rbuf,rlen)) == rsn) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end subroutine (getpj_ent) */

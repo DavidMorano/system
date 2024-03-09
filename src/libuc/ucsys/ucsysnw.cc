@@ -32,7 +32,7 @@
 	int getnwent_rp(NETENT *nwp,char *nwbuf,int nwlen) noex
 	int getnwnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *) noex
 	int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,
-				uint32_t num,int t) noex
+				int t,uint32_t num) noex
 
 	Arguments:
 	nwp		NETENT pointer
@@ -50,9 +50,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<errno.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<cerrno>
+#include	<climits>
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -216,7 +216,7 @@ int getwtnam_rp(NETENT *nwp,char *nwbuf,int nwlen,cchar *n) noex {
 #if	defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0)
 
 /* GNU version (like on Linux) */
-int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,uint32_t n,int t) noex {
+int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
 	NETENT		*rp{} ;
 	int		ec ;
 	int		herr{} ;
@@ -235,10 +235,10 @@ int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,uint32_t n,int t) noex {
 	return ec ;
 }
 
-#else
+#else /* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
 /* POSIX draft-6 inspired version (like on SunOS) */
-int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,uint32_t n,int t) noex {
+int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t n) noex {
 	NETENT		*rp ;
 	int		rc ;
 	errno = 0 ;
@@ -250,9 +250,9 @@ int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,uint32_t n,int t) noex {
 
 #endif	/* defined(SYSHAS_GETNWGNUR) && (SYSHAS_GETNWGNUR > 0) */
 
-#else
+#else /* defined(SYSHAS_GETNWXXXR) && (SYSHAS_GETNWXXXR > 0) */
 
-int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,uint32_t,int t) noex {
+int getnwnum_rp(NETENT *nwp,char *nwbuf,int nwlen,int t,uint32_t) noex {
 	int		ec = EFAULT ;
 	if (nwp && nwbuf) {
 	    ec = EINVAL ;
@@ -286,7 +286,7 @@ NETENT *getnwnam(cchar *n) noex {
 	return rp ;
 }
 
-NETENT *getnwnum(uint32_t num,int t) noex {
+NETENT *getnwnum(int t,uint32_t num) noex {
 	return getnetbyaddr(num,t) ;
 }
 
