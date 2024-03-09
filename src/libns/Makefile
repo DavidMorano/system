@@ -1,4 +1,4 @@
-# MAKEFILE
+# MAKEFILE (libns)
 
 T= libns
 

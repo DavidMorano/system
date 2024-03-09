@@ -256,7 +256,7 @@ static int try_straight(SUBINFO *mip) noex {
 	        hn = nullptr ;
 	    }
 	}
-	if ((rs = uc_getaddrinfo(hn,aip->svcname,aip->hintp,aip->rpp)) >= 0) {
+	if ((rs = uc_addrinfoget(hn,aip->svcname,aip->hintp,aip->rpp)) >= 0) {
 	    if (mip->ehostname != nullptr) {
 	        mip->ehostname[0] = '\0' ;
 	        if (aip->hostname != nullptr) {
@@ -297,7 +297,7 @@ static int try_add(SUBINFO *mip) noex {
 			        ADDRINFO	*hp = aip->hintp ;
 			        ADDRINFO	**rpp = aip->rpp ;
 	                        cchar	*sn = aip->svcname ;
-				auto	gai = uc_getaddrinfo ;
+				auto	gai = uc_addrinfoget ;
 	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				    c = 1 ;
 			        } else if (isNotPresent(rs)) {
@@ -341,7 +341,7 @@ static int try_rem(SUBINFO *mip) noex {
 				    ADDRINFO	*hp = aip->hintp ;
 				    ADDRINFO	**rpp = aip->rpp ;
 				    cchar	*sn = aip->svcname ;
-				    auto	gai = uc_getaddrinfo ;
+				    auto	gai = uc_addrinfoget ;
 	        		    if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				        c = 1 ;
 			            } else if (isNotPresent(rs)) {
@@ -384,7 +384,7 @@ static int try_remlocal(SUBINFO *mip) noex {
 			        ADDRINFO	*hp = aip->hintp ;
 			        ADDRINFO	**rpp = aip->rpp ;
 			        cchar		*sn = aip->svcname ;
-			        auto		gai = uc_getaddrinfo ;
+			        auto		gai = uc_addrinfoget ;
 	                        if ((rs = gai(bp,sn,hp,rpp)) >= 0) {
 				    c = 1 ;
 			        } else if (isNotPresent(rs)) {

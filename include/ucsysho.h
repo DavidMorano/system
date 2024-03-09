@@ -49,11 +49,11 @@ EXTERNC_begin
 
 extern HOSTENT	*gethoent() noex ;
 extern HOSTENT	*gethonam(cchar *) noex ;
-extern HOSTENT	*gethoadd(cvoid *,int,int) noex ;
+extern HOSTENT	*gethoadd(int,cvoid *,int) noex ;
 
 extern int	gethoent_rp(HOSTENT *,char *,int) noex ;
 extern int	gethonam_rp(HOSTENT *,char *,int,cchar *) noex ;
-extern int	gethoadd_rp(HOSTENT *,char *,int,cvoid *,int,int) noex ;
+extern int	gethoadd_rp(HOSTENT *,char *,int,int,cvoid *,int) noex ;
 
 EXTERNC_end
 

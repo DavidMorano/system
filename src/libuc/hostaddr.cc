@@ -99,6 +99,12 @@ ADDRINFO {
 #define	AI	ADDRINFO
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -156,6 +162,9 @@ extern "C" {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int hostaddr_start(HOSTADDR *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
@@ -178,7 +187,7 @@ int hostaddr_start(HOSTADDR *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 			}
 	            } /* end if (hostaddr_sort) */
 	            if (rs < 0) {
-	                uc_freeaddrinfo(op->aip) ;
+	                uc_addrinfofree(op->aip) ;
 		        op->aip = nullptr ;
 	            }
 	        } /* end if (geteaddrinfo) */
@@ -197,17 +206,17 @@ int hostaddr_finish(HOSTADDR *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_magic(op)) >= 0) {
-	        if (op->ehostname) {
-	            rs1 = uc_free(op->ehostname) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->ehostname = nullptr ;
-	        }
-	        {
-	            rs1 = hostaddr_resultend(op) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
+	    if (op->ehostname) {
+	        rs1 = uc_free(op->ehostname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->ehostname = nullptr ;
+	   }
+	   {
+	        rs1 = hostaddr_resultend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    if (op->aip) {
-	        rs1 = uc_freeaddrinfo(op->aip) ;
+	        rs1 = uc_addrinfofree(op->aip) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->aip = nullptr ;
 	    }
@@ -224,9 +233,9 @@ int hostaddr_finish(HOSTADDR *op) noex {
 int hostaddr_getcanonical(HOSTADDR *op,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,rpp)) >= 0) {
-	        ADDRINFO	*aip = op->aip ;
-	        *rpp = aip->ai_canonname ;
-	        rs = strlen(aip->ai_canonname) ;
+	    ADDRINFO	*aip = op->aip ;
+	    *rpp = aip->ai_canonname ;
+	    rs = strlen(aip->ai_canonname) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -244,7 +253,7 @@ int hostaddr_curbegin(HOSTADDR *op,HOSTADDR_CUR *curp) noex {
 int hostaddr_curend(HOSTADDR *op,HOSTADDR_CUR *curp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
-	        curp->i = -1 ;
+	    curp->i = -1 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -254,14 +263,14 @@ int hostaddr_enum(HOSTADDR *op,HOSTADDR_CUR *curp,ADDRINFO **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
-	        i = (curp->i >= 0) ? (curp->i+1) : 0 ;
-	        if (i < op->n) {
-	            if (rpp) *rpp = op->resarr[i] ;
-	            curp->i = i ;
-	        } else {
-	            if (rpp) *rpp = nullptr ;
-	            rs = SR_NOTFOUND ;
-	        }
+	    i = (curp->i >= 0) ? (curp->i+1) : 0 ;
+	    if (i < op->n) {
+	        if (rpp) *rpp = op->resarr[i] ;
+	        curp->i = i ;
+	    } else {
+	        if (rpp) *rpp = nullptr ;
+	        rs = SR_NOTFOUND ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }

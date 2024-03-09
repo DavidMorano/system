@@ -50,9 +50,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<errno.h>
-#include	<limits.h>
 #include	<unistd.h>
+#include	<cerrno>
+#include	<climits>
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -218,7 +218,7 @@ int getwtnam_rp(HOSTENT *hop,char *hobuf,int holen,cchar *n) noex {
 #if	defined(SYSHAS_GETHOGNUR) && (SYSHAS_GETHOGNUR > 0)
 
 /* GNU version (like on Linux) */
-int gethonum_rp(HO *hop,char *hobuf,int holen,cvoid *ap,int al,int af) noex {
+int gethonum_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	HOSTENT		*rp{} ;
 	int		ec ;
 	int		herr{} ;
@@ -240,7 +240,7 @@ int gethonum_rp(HO *hop,char *hobuf,int holen,cvoid *ap,int al,int af) noex {
 #else
 
 /* POSIX draft-6 inspired version (like on SunOS) */
-int gethoad_rp(HO *hop,char *hobuf,int holen,cvoid *ap,int al,int af) noex {
+int gethoad_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	HOSTENT		*rp ;
 	int		rc ;
 	errno = 0 ;
@@ -254,7 +254,7 @@ int gethoad_rp(HO *hop,char *hobuf,int holen,cvoid *ap,int al,int af) noex {
 
 #else
 
-int gethoadd_rp(HO *hop,char *hobuf,int holen,cvoid *ap,int al,int af) noex {
+int gethoadd_rp(HO *hop,char *hobuf,int holen,int af,cvoid *ap,int al) noex {
 	int		ec = EFAULT ;
 	if (hop && hobuf && ap) {
 	    ec = EINVAL ;
@@ -288,7 +288,7 @@ HOSTENT *gethonam(cchar *n) noex {
 	return rp ;
 }
 
-HOSTENT *gethoadd(cvoid *abuf,int alen,int af) noex {
+HOSTENT *gethoadd(int af,cvoid *abuf,int alen) noex {
 	HOSTENT		*rp = nullptr ;
 	errno = EFAULT ;
 	if (abuf) {

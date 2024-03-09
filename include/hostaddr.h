@@ -27,10 +27,10 @@
 
 
 struct hostaddr_head {
-	uint		magic ;
 	ADDRINFO	*aip ;
 	ADDRINFO	**resarr ;
 	cchar		*ehostname ;
+	uint		magic ;
 	int		n ;
 } ;
 

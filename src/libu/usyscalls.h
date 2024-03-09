@@ -80,8 +80,8 @@ EXTERNC_begin
 extern int	u_brk(cvoid *) noex ;
 extern int	u_sbrk(int,void **) noex ;
 
-extern int	u_uname(struct utsname *) noex ;
-extern int	u_getloadavg(unsigned int *,int) noex ;
+extern int	u_uname(UTSNAME *) noex ;
+extern int	u_getloadavg(uint *,int) noex ;
 extern int	u_sysauxinfo(char *,int,int) noex ;
 extern int	u_adjtime(TIMEVAL *,TIMEVAL *) noex ;
 extern int	u_ulimit(int,int) noex ;
@@ -149,12 +149,12 @@ extern int	u_socketpair(int,int,int,int *) noex ;
 extern int	u_connect(int,cvoid *,int) noex ;
 extern int	u_accept(int,cvoid *,int *) noex ;
 
-extern int	u_poll(struct pollfd *,int,int) noex ;
+extern int	u_poll(POLLFD *,int,int) noex ;
 extern int	u_read(int,void *,int) noex ;
-extern int	u_readv(int,struct iovec *,int) noex ;
+extern int	u_readv(int,IOVEC *,int) noex ;
 extern int	u_pread(int,void *,int,off_t) noex ;
 extern int	u_write(int,cvoid *,int) noex ;
-extern int	u_writev(int,const struct iovec *,int) noex ;
+extern int	u_writev(int,const IOVEC *,int) noex ;
 extern int	u_pwrite(int,cvoid *,int,off_t) noex ;
 
 extern int	u_fpathconf(int,int,long *) noex ;
@@ -193,7 +193,7 @@ extern int	u_symlink(cchar *,cchar *) noex ;
 extern int	u_chown(cchar *,uid_t,gid_t) noex ;
 extern int	u_lchown(cchar *,uid_t,gid_t) noex ;
 extern int	u_chmod(cchar *,mode_t) noex ;
-extern int	u_utime(cchar *,const struct utimbuf *) noex ;
+extern int	u_utime(cchar *,const UTIMBUF *) noex ;
 extern int	u_utimes(cchar *,const TIMEVAL *) noex ;
 extern int	u_sync() noex ;
 

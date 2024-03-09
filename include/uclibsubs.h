@@ -323,50 +323,17 @@ extern int	uc_inetntop(char *,int,int,cvoid *) noex ;
 extern int	uc_strtod(cchar *,char **,double *) noex ;
 extern int	uc_getnetname(char *) noex ;
 
-/* NETWORK PROTOCOL database */
-extern int	uc_setprotoent(int) noex ;
-extern int	uc_endprotoent() noex ;
-extern int	uc_getprotoent(PROTOENT *,char *,int) noex ;
-extern int	uc_getprotobyname(PROTOENT *,char *,int, cchar *) noex ;
-extern int	uc_getprotobynumber(PROTOENT *,char *,int,int) noex ;
-
-/* NETWORK NET database */
-extern int	uc_setnetent(int) noex ;
-extern int	uc_endnetent() noex ;
-extern int	uc_getnetent(NETENT *,char *,int) noex ;
-extern int	uc_getnetbyname(NETENT *,char *,int,cchar *) noex ;
-extern int	uc_getnetbyaddr(NETENT *,char *,int,long,int) noex ;
-
-/* NETWORK HOST database */
-extern int	uc_sethostent(int) noex ;
-extern int	uc_endhostent() noex ;
-extern int	uc_gethostent(HOSTENT *,char *,int) noex ;
-extern int	uc_gethostbyname(HOSTENT *,char *,int,cchar *) noex ;
-extern int	uc_gethostbyaddr(HOSTENT *,char *,int,cchar *,int,int) noex ;
-
-/* NETWORK SERVICE database */
-extern int	uc_setservent(int) noex ;
-extern int	uc_endservent() noex ;
-extern int	uc_getservent(SERVENT *,char *,int) noex ;
-extern int	uc_getservbyname(SERVENT *,char *,int,cchar *,cchar *) noex ;
-extern int	uc_getservbyport(SERVENT *,char *,int,int,cchar *) noex ;
-
 /* NETWORK IPNODE database */
 extern int	uc_getipnodebyname(HOSTENT **,cchar *,int,int) noex ;
 extern int	uc_freehostent(HOSTENT *) noex ;
 
 /* NETWORK ADDRINFO database */
-extern int uc_getaddrinfo(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
-extern int uc_freeaddrinfo(ADDRINFO *) noex ;
+extern int uc_addrinfoget(cchar *,cchar *,const ADDRINFO *,ADDRINFO **) noex ;
+extern int uc_addrinfofree(ADDRINFO *) noex ;
 
 /* NETWORK SOCKADDR combined database */
 extern int	uc_getnameinfo(const SOCKADDR *,int,
 			char *,int,char *,int,int) noex ;
-
-/* USER-SHELL database */
-extern int	uc_getusbegin() noex ;
-extern int	uc_getusent(char *,int) noex ;
-extern int	uc_getusend() noex ;
 
 /* why was this missing? */
 extern int	uc_getlogin(char *,int) noex ;

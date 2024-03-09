@@ -30,7 +30,7 @@ EXTERNC_begin
 extern int	uc_gethobegin(int) noex ;
 extern int	uc_gethoent(ucentho *,char *,int) noex ;
 extern int	uc_gethonam(ucentho *,char *,int,cchar *) noex ;
-extern int	uc_gethoadd(ucentho *,char *,int,cvoid *,int,int) noex ;
+extern int	uc_gethoadd(ucentho *,char *,int,int,cvoid *,int) noex ;
 extern int	uc_gethoend() noex ;
 
 EXTERNC_end

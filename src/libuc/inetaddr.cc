@@ -87,6 +87,9 @@ static constexpr int		inet4addrlen = INET4ADDRLEN ;
 static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int inetaddr_start(inetaddr *ip,cvoid *addr) noex {

@@ -1,4 +1,4 @@
-/* inetconv */
+/* inetconv SUPPORT */
 /* lang=C++20 */
 
 /* convert c-strings to binary INET addresses */
@@ -115,6 +115,9 @@ constexpr int			inetxaddrlen = max(inet4addrlen,inet6addrlen) ;
 constexpr int			astrlen = int(INETX_ADDRSTRLEN) ;
 
 static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

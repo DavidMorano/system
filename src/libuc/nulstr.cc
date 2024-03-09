@@ -94,7 +94,7 @@ int nulstr::start(cchar *sp,int sl,cchar **rpp) noex {
 }
 
 nulstr_co::operator int () noex {
-	int	rs = SR_BUGCHECK ;
+	int		rs = SR_BUGCHECK ;
 	switch (w) {
 	case nulstrmem_finish:
 	    rs = nulstr_finish(op) ;

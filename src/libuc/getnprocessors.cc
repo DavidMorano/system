@@ -57,7 +57,7 @@
 #endif
 
 
-/* local namespace */
+/* local namespaces */
 
 
 /* local typedefs */

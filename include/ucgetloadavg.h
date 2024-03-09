@@ -31,9 +31,8 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<stdlib.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 
 

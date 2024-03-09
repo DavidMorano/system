@@ -67,7 +67,16 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -92,18 +101,21 @@ static constexpr struct addrfamily	addrfamilies[] = {
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getaddrfamily(cchar *name) noex {
 	const struct addrfamily	*afs = addrfamilies ;
-	int		m, m_max = 0 ;
+	int		m ;
+	int		m_max = 0 ;
 	int		si = -1 ;
 	int		cnamelen ;
-	cchar		*anp ;
 	char		cname[AFNAMELEN + 1] ;
 	cnamelen = strwcpylc(cname,name,AFNAMELEN) - cname ;
 	for (int i = 0 ; afs[i].name ; i += 1) {
-	    anp = afs[i].name ;
+	    cchar	*anp = afs[i].name ;
 	    if ((m = nleadstr(anp,cname,cnamelen)) >= 2) {
 	        if (m > m_max) {
 	            m_max = m ;
@@ -117,20 +129,20 @@ int getaddrfamily(cchar *name) noex {
 
 int getaddrlen(int af) noex {
 	int		rs = SR_OK ;
-	    switch (af) {
-	    case AF_UNIX:
-	        rs = maxpathlen ;
-	        break ;
-	    case AF_INET4:
-	        rs = INET4ADDRLEN ;
-	        break ;
-	    case AF_INET6:
-	        rs = INET6ADDRLEN ;
-	        break ;
-	    default:
-	        rs = SR_AFNOSUPPORT ;
-	        break ;
-	    } /* end switch */
+        switch (af) {
+        case AF_UNIX:
+            rs = maxpathlen ;
+            break ;
+        case AF_INET4:
+            rs = INET4ADDRLEN ;
+            break ;
+        case AF_INET6:
+            rs = INET6ADDRLEN ;
+            break ;
+        default:
+            rs = SR_AFNOSUPPORT ;
+            break ;
+        } /* end switch */
 	return rs ;
 }
 /* end subroutine (getaddrlen) */

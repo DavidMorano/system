@@ -51,11 +51,11 @@ EXTERNC_begin
 
 extern NETENT	*getnwent() noex ;
 extern NETENT	*getnwnam(cchar *) noex ;
-extern NETENT	*getnwnum(uint32_t,int) noex ;
+extern NETENT	*getnwnum(int,uint32_t) noex ;
 
 extern int	getnwent_rp(NETENT *,char *,int) noex ;
 extern int	getnwnam_rp(NETENT *,char *,int,cchar *) noex ;
-extern int	getnwnum_rp(NETENT *,char *,int,uint32_t,int) noex ;
+extern int	getnwnum_rp(NETENT *,char *,int,int,uint32_t) noex ;
 
 EXTERNC_end
 
