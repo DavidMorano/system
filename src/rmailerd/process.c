@@ -1,25 +1,20 @@
-/* process */
+/* process SUPPORT */
+/* lang=C++20 */
 
 /* mail this message off to its recipients */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* run-time debug print-outs */
 #define	CF_VARVE	1		/* ? */
-
 
 /* revision history:
 
 	= 1994-06-01, David A­D­ Morano
-
 	This program was originally written.
 
-
 	= 1998-07-01, David A­D­ Morano
-
 	I added the ability to specify the "envelope_from"
 	for the case when we add an envelope header to the message.
-
 
 */
 
@@ -44,12 +39,9 @@
 	This whole sequence may be repeated indefinitely but we
 	only process one of these at a time here.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -58,11 +50,11 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<estrings.h>
 #include	<cksum.h>
+#include	<getchostname.h>
 #include	<pcsconf.h>
 #include	<localmisc.h>
 
@@ -89,8 +81,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	addressparse(), addressjoin() ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
-
-extern int	getcname(const char *,char *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;
@@ -987,7 +977,7 @@ const char	domainname[], name[] ;
 	    bufprintf(namebuf,MAXHOSTNAMELEN,"%s.%s",
 	        name,domainname) ;
 
-	    if (getcname(namebuf,NULL) >= 0)
+	    if (getchostname(namebuf,NULL) >= 0)
 	        return TRUE ;
 
 	} else {
@@ -1008,6 +998,5 @@ const char	domainname[], name[] ;
 	return FALSE ;
 }
 /* end subroutine (isindomain) */
-
 
 

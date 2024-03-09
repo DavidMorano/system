@@ -1,22 +1,18 @@
 /* main (RSHE) */
+/* lang=C++20 */
 
 /* program to run a program remotely inheriting the local environment */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
 	= 1995-08-22, David A­D­ Morano
-
 	This program was originally written.
 
-
 	= 1995-10-12, David A­D­ Morano
-
 	This operation of the 'x' option was modified to
 	reflect modern usage of the same option in similar programs.
 
@@ -27,12 +23,10 @@
 
 /**************************************************************************
 
-	Execution synopsis:
-
+	Synopsis:
 	$ rshe [-n] [-l user] [-d] [-e=file] remotehost command [args]
 
-	where:
-
+	Arguments:
 		-n		do not read input
 		-l user		become other 'user' on other side
 		-d		do not change directory on the other side
@@ -52,19 +46,16 @@
 		PATH
 		USER
 
-	are always established (not necessarily by direct actions of
-	this program).  The program will try to change the
-	remote current working directory to that of the local machine
-	if the '-d' option is specified.  The environment variable
-	'DISPLAY' is possibly adjusted for name space shifts between the
-	local and remote machines.
-
+	are always established (not necessarily by direct actions
+	of this program).  The program will try to change the remote
+	current working directory to that of the local machine if
+	the '-d' option is specified.  The environment variable
+	'DISPLAY' is possibly adjusted for name space shifts between
+	the local and remote machines.
 
 **************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -84,7 +75,6 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<baops.h>
@@ -93,6 +83,7 @@
 #include	<logfile.h>
 #include	<bufstr.h>
 #include	<getusername.h>
+#include	<getchostname.h>
 #include	<mallocstuff.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -120,7 +111,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getfiledirs() ;
 extern int	getpwd(char *,int) ;
-extern int	getcname(const char *,char *) ;
 
 extern char	*strbasename(char *) ;
 extern char	*timestr_log(time_t,char *) ;
@@ -1325,7 +1315,7 @@ char	rnodename[], rdomainname[] ;
 	cchar		*cp ;
 
 	rdomainname[0] = '\0' ;
-	if ((rs = getcname(name,rhost)) >= 0) {
+	if ((rs = getchostname(name,rhost)) >= 0) {
 
 	if ((cp = strchr(rhost,'.')) != NULL) {
 	    strwcpy(rnodename,rhost,cp - rhost) ;
@@ -1342,7 +1332,7 @@ char	rnodename[], rdomainname[] ;
 	        } /* end if */
 	    } /* end if (still needed) */
 
-	} /* end if (getcname) */
+	} /* end if (getchostname) */
 
 	return rs ;
 }

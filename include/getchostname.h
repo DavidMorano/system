@@ -25,8 +25,11 @@
 
 EXTERNC_begin
 
-extern int getchostname(cchar *,char *) noex ;
 extern int getcname(cchar *,char *) noex ;
+
+static inline int getchostname(cchar *name,char *hostname) noex {
+	return getcname(name,hostname) ;
+}
 
 EXTERNC_end
 
