@@ -22,6 +22,7 @@
 #include	<usystem.h>
 
 #include	<getax.h>
+#include	<getus.h>
 #include	<getpr.h>
 #include	<getnw.h>
 #include	<getho.h>

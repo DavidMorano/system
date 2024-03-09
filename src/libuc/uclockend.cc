@@ -1,4 +1,5 @@
-/* uc_lockend */
+/* uclockend SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* lock the end of a file */
@@ -16,31 +17,30 @@
 
 /*******************************************************************************
 
-        This subroutine is used to lock the end of files. Other simple
-        subroutines don't quite give a simple way to lock the end of files. Of
-        course, 'fcntl(2)' can do anything along these lines.
-
+	This subroutine is used to lock the end of files. Other
+	simple subroutines do not quite give a simple way to lock
+	the end of files. Of course, |fcntl(2)| can do anything
+	along these lines.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<signal.h>
-
+#include	<csignal>
+#include	<cstdlib>
 #include	<usystem.h>
+#include	<usupport.h>
 #include	<localmisc.h>
 
 
-/* external subroutines */
+/* local defines */
 
-extern int	msleep(int) ;
+
+/* external subroutines */
 
 
 /* external variables */
@@ -54,12 +54,9 @@ extern int	msleep(int) ;
 
 /* exported subroutines */
 
-
-int uc_lockend(int fd,int f_lock,int f_read,int to)
-{
-	struct flock	fl ;
+int uc_lockend(int fd,int f_lock,int f_read,int to) noex {
+	FLOCK		fl ;
 	int		rs = SR_OK ;
-
 	if (f_lock) {
 	    fl.l_type = (f_read) ? F_RDLCK : F_WRLCK ;
 	    fl.l_whence = SEEK_END ;
@@ -67,18 +64,17 @@ int uc_lockend(int fd,int f_lock,int f_read,int to)
 	    fl.l_len = 0L ;
 	    rs = SR_TIMEDOUT ;
 	    if (to > 0) {
-	        int	f_exit = FALSE ;
-		int	i ;
-	        for (i = 0 ; i < to ; i += 1) {
+	        bool	f_exit = false ;
+	        for (int i = 0 ; i < to ; i += 1) {
 	            if (i > 0) msleep(1000) ;
-	            f_exit = TRUE ;
+	            f_exit = true ;
 	            rs = u_fcntl(fd,F_SETLK,&fl) ;
 		    if (rs < 0) {
 	                switch (rs) {
 	                case SR_INTR:
 	                case SR_ACCES:
 	                case SR_AGAIN:
-	                    f_exit = FALSE ;
+	                    f_exit = false ;
 	                    break ;
 	                } /* end switch */
 	            } /* end if */
@@ -94,7 +90,6 @@ int uc_lockend(int fd,int f_lock,int f_read,int to)
 	    fl.l_len = 0L ;
 	    rs = u_fcntl(fd,F_SETLK,&fl) ;
 	} /* end if (lock or unlock) */
-
 	return rs ;
 }
 /* end subroutine (uc_lockend) */

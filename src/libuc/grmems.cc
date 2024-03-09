@@ -877,7 +877,7 @@ static int grmems_pwmapbegin(grmems *op,time_t dt,cchar *fn) noex {
 	            if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                cint		madv = MADV_SEQUENTIAL ;
 			const caddr_t	ma = caddr_t(md) ;
-	                if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	                if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                    op->mapdata = md ;
 	                    op->mapsize = ms ;
 	                } /* end if (advise) */
