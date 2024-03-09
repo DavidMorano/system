@@ -556,7 +556,7 @@ static int bibleparas_dbmapcreate(BIBLEPARAS *op,time_t dt)
 	    		if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
 			    const int	madv = MADV_RANDOM ;
 			    const caddr_t	ma = md ;
-	        	    if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	        	    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	            		op->mapdata = md ;
 	            		op->mapsize = ms ;
 	            		op->ti_map = dt ;

@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} getxusername.h"
+NAMES="${NAMES} uc_madvise"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/getxusername.h/s//getusername.h/g
+g/uc_madvise/s//u_madvise/g
 	w
 	q
 EOF

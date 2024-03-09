@@ -956,11 +956,11 @@ static int procsort(PROGINFO *pip,void *ofp,cchar fname[])
 	                    const char	*mdp = md ;
 	                    const caddr_t	ma = (const caddr_t) md ;
 
-	                    if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                        rs = procsortread(pip,&wlist,mdp,mdl) ;
 	                        if (rs >= 0) {
 	                            madv = MADV_RANDOM ;
-	                            rs = uc_madvise(ma,ms,madv) ;
+	                            rs = u_madvise(ma,ms,madv) ;
 	                        }
 	                    } /* end if (memory-advice) */
 

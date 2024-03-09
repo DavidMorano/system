@@ -1757,7 +1757,7 @@ static int mapfile_start(MAPFILE *mfp,int max,cchar *sp,int sl)
 		        if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
 			    cint		madv = MADV_SEQUENTIAL ;
 			    const caddr_t	ma = md ;
-	    		    if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	    		    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 			         mfp->mdata = md ;
 			         mfp->msize = ms ;
 			    }

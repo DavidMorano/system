@@ -774,7 +774,7 @@ static int termenq_mapper(TERMENQ *op,int ei,uint woff,uint wsize)
 	if ((rs = u_mmap(NULL,ms,mp,mf,fd,mo,&md)) >= 0) {
 	    const int		madv = MADV_SEQUENTIAL ;
 	    const caddr_t	ma = md ;
-	    if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 
 	        op->mapdata = (caddr_t) md ;
 	        op->mapsize = ms ;
