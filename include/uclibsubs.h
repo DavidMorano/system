@@ -223,7 +223,7 @@ extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
 extern int	uc_symlink(cchar *,cchar *) noex ;
 extern int	uc_unlink(cchar *) noex ;
-extern int	uc_lockend(int,int,int,int) noex ;
+extern int	uc_locktail(int,int,int,int) noex ;
 extern int	uc_mkdir(cchar *,mode_t) noex ;
 extern int	uc_rmdir(cchar *) noex ;
 extern int	uc_access(cchar *,int) noex ;

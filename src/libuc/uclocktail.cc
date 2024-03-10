@@ -1,8 +1,8 @@
-/* uclockend SUPPORT */
+/* uclocktail SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
-/* lock the end of a file */
+/* put a file-lock on the tail of a file */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -52,9 +52,12 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int uc_lockend(int fd,int f_lock,int f_read,int to) noex {
+int uc_locktail(int fd,int f_lock,int f_read,int to) noex {
 	FLOCK		fl ;
 	int		rs = SR_OK ;
 	if (f_lock) {
@@ -92,6 +95,6 @@ int uc_lockend(int fd,int f_lock,int f_read,int to) noex {
 	} /* end if (lock or unlock) */
 	return rs ;
 }
-/* end subroutine (uc_lockend) */
+/* end subroutine (uc_locktail) */
 
 

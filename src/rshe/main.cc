@@ -1315,7 +1315,7 @@ char	rnodename[], rdomainname[] ;
 	cchar		*cp ;
 
 	rdomainname[0] = '\0' ;
-	if ((rs = getchostname(name,rhost)) >= 0) {
+	if ((rs = getchostname(rhost,name)) >= 0) {
 
 	if ((cp = strchr(rhost,'.')) != NULL) {
 	    strwcpy(rnodename,rhost,cp - rhost) ;

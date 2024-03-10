@@ -1,6 +1,8 @@
-/* main (REX) */
+/* main SUPPORT (REX) */
+/* lang=C++20 */
 
 /* program to INET REXEC a remote command */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
@@ -29,7 +31,7 @@
 
 **************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -55,6 +57,7 @@
 #include	<vecelem.h>
 #include	<mallocstuff.h>
 #include	<quoteshellarg.h>
+#include	<getchostname.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -90,14 +93,12 @@ static char *argopts[] = {
 
 /* external subroutines */
 
-extern int	getnodedomain() ;
 extern int	authfile() ;
 extern int	cfdec() ;
 extern int	rex_rexec(), rex_rcmd() ;
 extern int	hostequiv() ;
 
 extern char	*putheap() ;
-extern char	*strshrink() ;
 extern char	*strbasename() ;
 extern char	*timestr_log() ;
 extern char	*d_reventstr() ;
@@ -1115,7 +1116,7 @@ char	*argv[] ;
 	            hostname) ;
 #endif
 
-	    rs = getchostname(hostname,buf) ;
+	    rs = getchostname(buf,hostname) ;
 
 	    if (buf[0] != '\0')
 	        chostname = putheap(buf) ;
@@ -2375,7 +2376,7 @@ char		localdomain[] ;
 /* convert all machine names to canonical form */
 
 	        hnp = mp->machine ;
-	        if (getchostname(mp->machine,hostname) >= 0)
+	        if (getchostname(hostname,mp->machine) >= 0)
 	            hnp = hostname ;
 
 /* copy over only those machines that match our target machine */

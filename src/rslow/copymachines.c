@@ -1,17 +1,15 @@
-/* copymachines */
+/* copymachines SUPPORT */
+/* lang=C++20 */
 
 /* copy the NETRC machine entries to a VECELEM */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	1
 
-
 /* revision history:
 
-	- 94/12/01, David A­D­ Morano
-
+	- 1994-12-01, David A­D­ Morano
 	This was copied from the REXEC program.
-
 
 */
 
@@ -19,16 +17,12 @@
 
 /**************************************************************************
 
-	Execute as :
-
+	Synopsis:
 	int copymachines()
-
 
 **************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -42,13 +36,14 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-
+#include	<usystem.h>
 #include	<bfile.h>
 #include	<vecelem.h>
 #include	<logfile.h>
 #include	<netfile.h>
 #include	<rex.h>
 #include	<mallocstuff.h>
+#include	<getchostname.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -119,7 +114,7 @@ char		localdomain[] ;
 /* convert all machine names to canonical form */
 
 	        hnp = mp->machine ;
-	        if (getchostname(mp->machine,hostname) >= 0)
+	        if (getchostname(hostname,mp->machine) >= 0)
 	            hnp = hostname ;
 
 /* copy over only those machines that match our target machine */

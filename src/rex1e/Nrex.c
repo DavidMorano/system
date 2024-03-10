@@ -95,12 +95,10 @@
 
 /* external subroutines */
 
-extern int	getnodedomain() ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getchostname(), getehostname() ;
+extern int	getehostname() ;
 extern int	qualdisplay() ;
 
-extern char	*strshrink() ;
 extern char	*strbasename() ;
 
 

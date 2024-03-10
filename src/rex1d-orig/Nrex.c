@@ -101,16 +101,14 @@
 
 /* external subroutines */
 
-extern int	getnodedomain() ;
 extern int	cfdec() ;
-extern int	getchostname(), getehostname() ;
+extern int	getehostname() ;
 extern int	qualdisplay() ;
 
 #ifdef	F_LOG
 extern int	logfile_printf() ;
 #endif
 
-extern char	*strshrink() ;
 extern char	*strbasename() ;
 
 

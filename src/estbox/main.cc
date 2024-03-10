@@ -1,39 +1,35 @@
 /* main (REXEC) */
+/* lang=C++20 */
 
 /* program to INET REXEC a remote command */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_REXECL	1
 #define	CF_RCMDU	1
 
-
 /* revision history:
 
-	= 96/11/21, David A­D­ Morano
-
+	= 1996-11-21, David A­D­ Morano
 	This program was started by copying from the RSLOW program.
 
-
-	= 96/12/12, David A­D­ Morano
-
+	= 1996-12-12, David A­D­ Morano
 	I modified the program to take the username and password
 	from a specified file (for better security).
 
-
 */
 
+/* Copyright © 2017 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /**************************************************************************
 
 	This is the front-end of the ESTBOX program.
 
-
-
 **************************************************************************/
 
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -56,6 +52,7 @@
 #include	<userinfo.h>
 #include	<vecitem.h>
 #include	<quoteshellarg.h>
+#include	<getchostname.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -1027,7 +1024,7 @@ char	**argv ;
 	        hostname) ;
 #endif
 
-	rs = getchostname(hostname,buf) ;
+	rs = getchostname(buf,hostname) ;
 
 	if (buf[0] != '\0')
 	    hostname = malloc_str(buf) ;
@@ -2082,7 +2079,7 @@ char		localdomain[] ;
 /* convert all machine names to canonical form */
 
 	        hnp = mp->machine ;
-	        if (getchostname(mp->machine,hostname) >= 0)
+	        if (getchostname(hostname,mp->machine) >= 0)
 	            hnp = hostname ;
 
 /* copy over only those machines that match our target machine */

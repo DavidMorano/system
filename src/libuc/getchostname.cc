@@ -33,11 +33,11 @@
 	translated given the existing host information.
 
 	Synopsis:
-	int getchostname(cchar *name,char *hostname) noex
+	int getchostname(char *cbuf,cchar *name) noex
 
 	Arguments:
+	cbuf		result buffer (length assumed to be MAXHOSTNAMELEN)
 	name		name to lookup
-	hostname	if not NULL, a buffer to hold the resulting hostname
 
 	Returns:
 	>=0		<name> had a valid INET address
@@ -48,11 +48,11 @@
 	getcname
 
 	Synopsis:
-	int getcname(cchar *name,char *hostname) noex
+	int getcname(char *cbuf,cchar *tname) noex
 
 	Arguments:
+	cbuf		buffer to hold the resulting hostname
 	name		name to lookup
-	hostname	if not NULL, a buffer to hold the resulting hostname
 
 	Returns:
 	>=0		<name> had a valid INET address
@@ -62,6 +62,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<sncpyx.h>
+#include	<hostinfo.h>
 
 #include	"getchostname.h"
 
@@ -92,7 +95,7 @@
 
 /* exported subroutines */
 
-int getcname(cchar *name,char *hbuf) noex {
+int getchostname(char *hbuf,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -114,6 +117,6 @@ int getcname(cchar *name,char *hbuf) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (getcname) */
+/* end subroutine (getchostname) */
 
 

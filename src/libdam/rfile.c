@@ -82,8 +82,7 @@
 /* external subroutines */
 
 extern int	reade() ;
-extern int	getnodedomain() ;
-extern int	getchostname(), getehostname() ;
+extern int	getehostname() ;
 
 extern char	*strbasename() ;
 

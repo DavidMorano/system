@@ -681,12 +681,8 @@ const char	name[] ;
 	} else {
 
 	chostname[0] = '\0' ;
-
-	rs = getchostname(name,chostname) ;
-
-	    if (rs >= 0)
+	if ((rs = getchostname(chostname,name)) >= 0) {
 	    rs = bprintf(ofp,"%s\n",chostname) ;
-
 	}
 
 	if (rs < 0) {
