@@ -27,12 +27,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<cerrno>
-#include	<cstdlib>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"ucgetloadavg.h"
 #include	"ugetloadavg.h"
