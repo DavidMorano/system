@@ -1,4 +1,4 @@
-/* recorder */
+/* recorder HEADER */
 /* lang=C20 */
 
 
@@ -16,6 +16,7 @@
 #define	RECORDER_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -31,7 +32,6 @@
 #define	RECORDER_NCOLLISIONS	10
 
 /* options */
-
 #define	RECORDER_OSEC		(1<<0)
 #define	RECORDER_ORANDLC	(1<<1)
 
@@ -55,39 +55,35 @@ struct recorder_e {
 } ;
 
 struct recorder_head {
-	uint		magic ;
 	RECORDER_ENT	*rectab ;
 	RECORDER_INFO	s ;
+	uint		magic ;
 	int		i ;		/* current length */
 	int		e ;		/* current buffer extent */
 	int		c ;		/* count */
 	int		opts ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	recorder_start(RECORDER *,int,int) noex ;
+extern int	recorder_finish(RECORDER *) noex ;
+extern int	recorder_add(RECORDER *,RECORDER_ENT *) noex ;
+extern int	recorder_already(RECORDER *,RECORDER_ENT *) noex ;
+extern int	recorder_gettab(RECORDER *,RECORDER_ENT **) noex ;
+extern int	recorder_rtlen(RECORDER *) noex ;
+extern int	recorder_count(RECORDER *) noex ;
+extern int	recorder_indlen(RECORDER *) noex ;
+extern int	recorder_indsize(RECORDER *) noex ;
+extern int	recorder_mkindun(RECORDER *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindl1(RECORDER *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindl3(RECORDER *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindf(RECORDER *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_mkindfl3(RECORDER *,cchar *,uint (*)[2],int) noex ;
+extern int	recorder_info(RECORDER *,RECORDER_INFO *) noex ;
 
-extern int	recorder_start(RECORDER *,int,int) ;
-extern int	recorder_finish(RECORDER *) ;
-extern int	recorder_add(RECORDER *,RECORDER_ENT *) ;
-extern int	recorder_already(RECORDER *,RECORDER_ENT *) ;
-extern int	recorder_gettab(RECORDER *,RECORDER_ENT **) ;
-extern int	recorder_rtlen(RECORDER *) ;
-extern int	recorder_count(RECORDER *) ;
-extern int	recorder_indlen(RECORDER *) ;
-extern int	recorder_indsize(RECORDER *) ;
-extern int	recorder_mkindun(RECORDER *,cchar *,uint (*)[2],int) ;
-extern int	recorder_mkindl1(RECORDER *,cchar *,uint [][2],int) ;
-extern int	recorder_mkindl3(RECORDER *,cchar *,uint [][2],int) ;
-extern int	recorder_mkindf(RECORDER *,cchar *,uint [][2],int) ;
-extern int	recorder_mkindfl3(RECORDER *,cchar *,uint [][2],int) ;
-extern int	recorder_info(RECORDER *,RECORDER_INFO *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* RECORDER_INCLUDE */
 

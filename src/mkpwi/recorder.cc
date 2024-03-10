@@ -1,5 +1,5 @@
-/* recorder */
-/* lang=C20 */
+/* recorder SUPPORT */
+/* lang=C++20 */
 
 /* string recorder object */
 /* version %I% last-modified %G% */
@@ -29,13 +29,14 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
 #include	<hash.h>
+#include	<randlc.h>
+#include	<localmisc.h>
 
 #include	"recorder.h"
 
@@ -55,17 +56,15 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-
-extern int	randlc(int) ;
+extern "C" {
+    extern uint	nextpowtwo(uint) noex ;
+}
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 extern int	mkhexstr(char *,int,const void *,int) ;
 #endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -106,9 +105,7 @@ enum indices {
 
 /* exported subroutines */
 
-
-int recorder_start(RECORDER *asp,int n,int opts)
-{
+int recorder_start(RECORDER *asp,int n,int opts) noex {
 	int		rs ;
 	int		size ;
 	void		*p ;
@@ -140,10 +137,7 @@ int recorder_start(RECORDER *asp,int n,int opts)
 }
 /* end subroutine (recorder_start) */
 
-
-/* free up this recorder object */
-int recorder_finish(RECORDER *asp)
-{
+int recorder_finish(RECORDER *asp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -167,10 +161,7 @@ int recorder_finish(RECORDER *asp)
 }
 /* end subroutine (recorder_finish) */
 
-
-/* add a record to this object */
-int recorder_add(RECORDER *asp,RECORDER_ENT *ep)
-{
+int recorder_add(RECORDER *asp,RECORDER_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 
@@ -212,11 +203,8 @@ int recorder_add(RECORDER *asp,RECORDER_ENT *ep)
 }
 /* end subroutine (recorder_add) */
 
-
-/* is a given entry already present? */
-int recorder_already(RECORDER *asp,RECORDER_ENT *ep)
-{
-	const int	esize = sizeof(RECORDER_ENT) ;
+int recorder_already(RECORDER *asp,RECORDER_ENT *ep) noex {
+	cint		esize = sizeof(RECORDER_ENT) ;
 	int		i ;
 
 #if	CF_SAFE
@@ -236,11 +224,7 @@ int recorder_already(RECORDER *asp,RECORDER_ENT *ep)
 }
 /* end subroutine (recorder_already) */
 
-
-/* get the length (total number of entries) of the table */
-int recorder_rtlen(RECORDER *asp)
-{
-
+int recorder_rtlen(RECORDER *asp) noex {
 	if (asp == NULL) return SR_FAULT ;
 
 	if (asp->magic != RECORDER_MAGIC) return SR_NOTOPEN ;
@@ -249,10 +233,7 @@ int recorder_rtlen(RECORDER *asp)
 }
 /* end subroutine (recorder_rtlen) */
 
-
-/* get the count of valid entries in the table */
-int recorder_count(RECORDER *asp)
-{
+int recorder_count(RECORDER *asp) noex {
 
 #if	CF_SAFE
 	if (asp == NULL) return SR_FAULT ;
@@ -264,10 +245,8 @@ int recorder_count(RECORDER *asp)
 }
 /* end subroutine (recorder_count) */
 
-
 /* calculate the index table length (number of entries) at this point */
-int recorder_indlen(RECORDER *asp)
-{
+int recorder_indlen(RECORDER *asp) noex {
 	int		n ;
 
 #if	CF_SAFE
@@ -282,10 +261,8 @@ int recorder_indlen(RECORDER *asp)
 }
 /* end subroutine (recorder_indlen) */
 
-
 /* calculate the index table size */
-int recorder_indsize(RECORDER *asp)
-{
+int recorder_indsize(RECORDER *asp) noex {
 	int		n ;
 
 #if	CF_SAFE
@@ -300,10 +277,8 @@ int recorder_indsize(RECORDER *asp)
 }
 /* end subroutine (recorder_indsize) */
 
-
 /* get the address of the rectab array */
-int recorder_gettab(RECORDER *asp,RECORDER_ENT **rpp)
-{
+int recorder_gettab(RECORDER *asp,RECORDER_ENT **rpp) noex {
 	int		size ;
 
 #if	CF_SAFE
@@ -321,10 +296,8 @@ int recorder_gettab(RECORDER *asp,RECORDER_ENT **rpp)
 }
 /* end subroutine (recorder_gettab) */
 
-
 /* create a record index for the caller */
-int recorder_mkindl1(RECORDER *asp,cchar *s,uint (*it)[2],int itsize)
-{
+int recorder_mkindl1(RECORDER *asp,cchar *s,uint (*it)[2],int itsize) noex {
 	uint		rhash ;
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
@@ -482,9 +455,7 @@ int recorder_mkindl1(RECORDER *asp,cchar *s,uint (*it)[2],int itsize)
 }
 /* end subroutine (recorder_mkindl1) */
 
-
-int recorder_mkindl3(RECORDER *asp,cchar s[],uint it[][2],int itsize)
-{
+int recorder_mkindl3(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 	uint		rhash ;
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
@@ -601,9 +572,7 @@ int recorder_mkindl3(RECORDER *asp,cchar s[],uint it[][2],int itsize)
 }
 /* end subroutine (recorder_mkindl3) */
 
-
-int recorder_mkindf(RECORDER *asp,cchar s[],uint it[][2],int itsize)
-{
+int recorder_mkindf(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 	uint		rhash ;
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
@@ -725,9 +694,7 @@ int recorder_mkindf(RECORDER *asp,cchar s[],uint it[][2],int itsize)
 }
 /* end subroutine (recorder_mkindf) */
 
-
-int recorder_mkindfl3(RECORDER *asp,cchar s[],uint it[][2],int itsize)
-{
+int recorder_mkindfl3(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 	uint		rhash ;
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
@@ -865,9 +832,7 @@ int recorder_mkindfl3(RECORDER *asp,cchar s[],uint it[][2],int itsize)
 }
 /* end subroutine (recorder_mkindfl3) */
 
-
-int recorder_mkindun(RECORDER *asp,cchar s[],uint it[][2],int itsize)
-{
+int recorder_mkindun(RECORDER *asp,cchar s[],uint it[][2],int itsize) noex {
 	uint		rhash ;
 #if	CF_DEBUGSHIFT
 	int		ns = (nshift > 0) ? nshift : NSHIFT ;
@@ -988,10 +953,8 @@ int recorder_mkindun(RECORDER *asp,cchar s[],uint it[][2],int itsize)
 }
 /* end subroutine (recorder_mkindun) */
 
-
 /* get statistics */
-int recorder_info(RECORDER *asp,RECORDER_INFO *ip)
-{
+int recorder_info(RECORDER *asp,RECORDER_INFO *ip) noex {
 	int		rs = SR_OK ;
 	int		n ;
 
@@ -1017,10 +980,7 @@ int recorder_info(RECORDER *asp,RECORDER_INFO *ip)
 
 /* private subroutines */
 
-
-/* extend the object recorder */
-static int recorder_extend(RECORDER *asp)
-{
+static int recorder_extend(RECORDER *asp) noex {
 	int		rs = SR_OK ;
 	int		ne, size ;
 	uint		*nrt = NULL ;
@@ -1051,45 +1011,29 @@ static int recorder_extend(RECORDER *asp)
 }
 /* end subroutine (recorder_extend) */
 
-
 static int recorder_matfl3(RECORDER *asp,cchar s[],uint it[][2],int hi,
-		cchar *hbuf)
-{
-	int		si, f ;
-
-	si = asp->rectab[it[hi][0]].first ;
+		cchar *hbuf) noex {
+	int		si = asp->rectab[it[hi][0]].first ;
+	int		f ;
 	f = ((s + si)[0] == hbuf[0]) ;
-
 	if (f) {
 	    si = asp->rectab[it[hi][0]].last ;
 	    f = (strncmp((s + si),(hbuf + 1),3) == 0) ;
 	}
-
 	return f ;
 }
 /* end subroutine (recorder_matfl3) */
 
-
-static int recorder_matun(asp,s,it,hi,hbuf)
-RECORDER	*asp ;
-const char	s[] ;
-uint		it[][2] ;
-int		hi ;
-const char	hbuf[] ;
-{
-	int		si, f ;
-
-	si = asp->rectab[it[hi][0]].username ;
+static int recorder_matun(RECORDER *asp,cc *s,uint (*it)[2],int hi,
+		cc *hbuf) noex {
+	int		si = asp->rectab[it[hi][0]].username ;
+	int		f ;
 	f = (strcmp((s + si),hbuf) == 0) ;
-
 	return f ;
 }
 /* end subroutine (recorder_matun) */
 
-
-static int recorder_cden(RECORDER *asp,int wi,int c)
-{
-
+static int recorder_cden(RECORDER *asp,int wi,int c) noex {
 	if (c >= RECORDER_NCOLLISIONS) c = (RECORDER_NCOLLISIONS - 1) ;
 
 	asp->s.cden[wi][c] += 1 ;
@@ -1097,20 +1041,16 @@ static int recorder_cden(RECORDER *asp,int wi,int c)
 }
 /* end subroutine (recorder_cden) */
 
-
 /* calculate the next hash from a given one */
-static int hashindex(uint i,int n)
-{
+static int hashindex(uint i,int n) noex {
 	int	hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
 }
 /* end if (hashindex) */
 
-
 #if	CF_DEBUGS && CF_DEBUGBOUNDS
-static int inbounds(cchar *buf,int buflen,cchar *tp)
-{
+static int inbounds(cchar *buf,int buflen,cchar *tp) noex {
 	return ((tp >= (buf + buflen)) && (tp < buf)) ? TRUE : FALSE ;
 }
 /* end if (inbounds) */

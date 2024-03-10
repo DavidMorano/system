@@ -44,8 +44,8 @@ enum nulstrmems {
 } ;
 struct nulstr ;
 struct nulstr_co {
-	nulstr		*op ;
-	int		w ;
+	nulstr		*op = nullptr ;
+	int		w = -1 ;
 	void operator () (nulstr *p,int m) noex {
 	    op = p ;
 	    w = m ;
