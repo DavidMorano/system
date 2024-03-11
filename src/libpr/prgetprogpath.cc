@@ -62,6 +62,7 @@
 #include	<ids.h>
 #include	<mkpathx.h>
 #include	<mkpathxw.h>
+#include	<pathadd.h>
 #include	<storebuf.h>
 #include	<strn.h>
 #include	<xperm.h>
@@ -69,8 +70,7 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
-
-/* local typedefs */
+#include	"prgetprogpath.h"
 
 
 /* local defines */
@@ -82,11 +82,13 @@
 #define	NDF		"prgetprogpath.deb"
 
 
-/* external subroutines */
+/* local namespaces */
 
-extern "C" {
-    extern int	pathaddw(char *,int,cchar *,int) noex ;
-}
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -123,20 +125,20 @@ static int	isOverNoEntAcc(int) noex ;
 
 /* local variables */
 
-static int 	(*tries[])(subinfo *,char *,cchar *,int) = {
+static constexpr int 	(*tries[])(subinfo *,char *,cchar *,int) = {
 	subinfo_tryfull,
 	subinfo_tryroot,
 	subinfo_tryother,
 	nullptr
 } ;
 
-static cchar	*prbins[] = {
+static constexpr cchar	*prbins[] = {
 	"bin",
 	"sbin",
 	nullptr
 } ;
 
-static const int	rsentacc[] = {
+static constexpr int	rsentacc[] = {
 	SR_NOENT,
 	SR_ACCESS,
 	SR_OVERFLOW,
@@ -146,25 +148,28 @@ static const int	rsentacc[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int prgetprogpath(cchar *pr,char *rbuf,cchar *np,int nl) noex {
+int prgetprogpath(cchar *pr,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (pr && rbuf && np) {
+	if (pr && rbuf && sp) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
-	    if (np[0]) {
+	    if (sp[0]) {
 	        subinfo		si{}, *sip = &si ;
-	        if (nl < 0) nl = strlen(np) ;
-	        while ((nl > 0) && (np[nl-1] == '/')) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        while ((sl > 0) && (sp[sl-1] == '/')) {
 	            sip->f_changed = true ;
-	            nl -= 1 ;
+	            sl -= 1 ;
 	        }
 	        if ((rs = subinfo_start(sip,pr)) >= 0) {
 	            for (int i = 0 ; tries[i] ; i += 1) {
-		        rs = (*tries[i])(sip,rbuf,np,nl) ;
+		        rs = (*tries[i])(sip,rbuf,sp,sl) ;
 		        rl = rs ;
 		        if ((rs != 0) || sip->f_done) break ;
 	            } /* end for */
@@ -188,30 +193,39 @@ int prgetprogpath(cchar *pr,char *rbuf,cchar *np,int nl) noex {
 /* local subroutines */
 
 static int subinfo_start(subinfo *sip,cchar *pr) noex {
-	sip->pr = pr ;
-	return ids_load(&sip->id) ;
+	int		rs = SR_FAULT ;
+	if (sip) {
+	    sip->pr = pr ;
+	    rs = ids_load(&sip->id) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (subinfo_start) */
 
 static int subinfo_finish(subinfo *sip) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (sip->f_dirs) {
-	    sip->f_dirs = false ;
-	    rs1 = vecstr_finish(&sip->dirs) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-	rs1 = ids_release(&sip->id) ;
-	if (rs >= 0) rs = rs1 ;
+	if (sip) {
+	    rs = SR_OK ;
+	    if (sip->f_dirs) {
+	        sip->f_dirs = false ;
+	        rs1 = vecstr_finish(&sip->dirs) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ids_release(&sip->id) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_tryfull(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
+static int subinfo_tryfull(subinfo *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-	if (strnchr(np,nl,'/') != nullptr) {
-	    if ((rs = mkpath1w(rbuf,np,nl)) >= 0) {
+	if (strnchr(sp,sl,'/') != nullptr) {
+	    if ((rs = mkpath1w(rbuf,sp,sl)) >= 0) {
 		rl = rs ;
 		rs = subinfo_xfile(sip,rbuf) ;
 	        if (isNotPresent(rs)) {
@@ -225,7 +239,7 @@ static int subinfo_tryfull(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 }
 /* end subroutine (subinbfo_tryfull) */
 
-static int subinfo_tryroot(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
+static int subinfo_tryroot(subinfo *sip,char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		rl = 0 ;
@@ -234,7 +248,7 @@ static int subinfo_tryroot(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 	    rl = 0 ;
 	    if ((rs = mkpath2(rbuf,pr,prbins[i])) >= 0) {
 	        cint	plen = rs ;
-		if ((rs = pathaddw(rbuf,plen,np,nl)) >= 0) {
+		if ((rs = pathaddw(rbuf,plen,sp,sl)) >= 0) {
 		    rl = rs ;
 	            if ((rs = subinfo_xfile(sip,rbuf)) >= 0) {
 			break ;
@@ -255,21 +269,22 @@ static int subinfo_tryroot(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 }
 /* end subroutine (subinfo_tryroot) */
 
-static int subinfo_tryother(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
+static int subinfo_tryother(subinfo *sip,char *rbuf,cchar *sp,int sl) noex {
+	static cchar	*path = getenv(VARPATH) ;
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-	cchar		*sp ;
-	if ((sp = getenv(VARPATH)) != nullptr) {
+	if (path) {
+	    cchar	*pp = path ;
 	    cchar	*tp ;
-	    while (((tp = strpbrk(sp,":;")) != nullptr) && (rl == 0)) {
-	        rs = subinfo_tryothercheck(sip,sp,(tp - sp),rbuf,np,nl) ;
+	    while (((tp = strpbrk(pp,":;")) != nullptr) && (rl == 0)) {
+	        rs = subinfo_tryothercheck(sip,pp,(tp - pp),rbuf,sp,sl) ;
 	        rl = rs ;
-	        sp = (tp + 1) ;
+	        pp = (tp + 1) ;
 		if (rs < 0) break ;
 	    } /* end while */
 	    if ((rs >= 0) && (rl == 0)) {
-	        if (sp[0] != '\0') {
-	            rs = subinfo_tryothercheck(sip,sp,-1,rbuf,np,nl) ;
+	        if (pp[0] != '\0') {
+	            rs = subinfo_tryothercheck(sip,pp,-1,rbuf,sp,sl) ;
 	            rl = rs ;
 	        }
 	    }
@@ -282,17 +297,17 @@ static int subinfo_tryother(subinfo *sip,char *rbuf,cchar *np,int nl) noex {
 /* end subroutine (subinfo_other) */
 
 static int subinfo_tryothercheck(subinfo *sip,cchar *dp,int dl,
-		char *rbuf,cchar *np,int nl) noex {
+		char *rbuf,cchar *sp,int sl) noex {
 	int		rs = SR_NOENT ;
 	int		rl = 0 ;
 	if (sip->f_dirs) {
 	    rs = vecstr_findn(&sip->dirs,dp,dl) ;
 	}
 	if (rs == SR_NOENT) {
-	    if ((rs = mkdfname(rbuf,dp,dl,np,nl)) >= 0) {
+	    if ((rs = mkdfname(rbuf,dp,dl,sp,sl)) >= 0) {
 	        rl = rs ;
 	        rs = subinfo_xfile(sip,rbuf) ;
-	        if ((rs == SR_NOENT) || (rs == SR_ACCESS)) {
+	        if (isNotAccess(rs)) {
 	            rs = subinfo_record(sip,rbuf,rl) ;
 		    rl = 0 ;
 		}
@@ -328,22 +343,24 @@ static int subinfo_record(subinfo *sip,cchar *dp,int dl) noex {
 }
 /* end subroutine (subinfo_record) */
 
-static int mkdfname(char *rbuf,cchar *dp,int dl,cchar *np,int nl) noex {
-	const int	rlen = MAXPATHLEN ;
-	int		rs = SR_OK ;
+static int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
+	int		rs ;
 	int		i = 0 ;
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
-	    i += rs ;
-	}
-	if ((rs >= 0) && (i > 0) && (rbuf[i - 1] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
-	    i += rs ;
-	}
-	if (rs >= 0) {
-	    rs = storebuf_strw(rbuf,rlen,i,np,nl) ;
-	    i += rs ;
-	}
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    cint	rlen = rs ;
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,dp,dl) ;
+	        i += rs ;
+	    }
+	    if ((rs >= 0) && (i > 0) && (rbuf[i - 1] != '/')) {
+	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        i += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
+	        i += rs ;
+	    }
+	} /* end if (getbufsize) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (mkdfname) */
