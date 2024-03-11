@@ -1142,8 +1142,9 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
-# TILITY
+# UILITY
 pwentry.o:		pwentry.cc pwentry.h
+getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 ids.o:			ids.cc ids.h
 groupids.o:		groupids.cc groupids.hh
 base64.o:		base64.cc base64.h
@@ -1157,8 +1158,10 @@ getngroups.o:		getngroups.cc getngroups.h
 getnodename.o:		getnodename.cc getnodename.h
 getnodedomain.o:	getnodedomain.cc getnodename.h
 getuserorg.o:		getuserorg.cc getuserorg.h
+getrealname.o:		getrealname.cc getrealname.h
 getourenv.o:		getourenv.cc getourenv.h
 getaddr.o:		getaddr.cc getaddr.h
+getmjd.o:		getmjd.cc getmjd.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
@@ -1168,7 +1171,6 @@ isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
-getmjd.o:		getmjd.cc getmjd.h
 #
 isproc.o:		isproc.cc isproc.h
 #
