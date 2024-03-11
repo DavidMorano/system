@@ -196,7 +196,7 @@ static cchar	*envbad[] = {
 	"TERMDEV",
 	"TMOUT",
 	"PWD",
-	NULL
+	nullptr
 } ;
 
 static cchar	*envsys[] = {
@@ -209,7 +209,7 @@ static cchar	*envsys[] = {
 	"NODE",
 	"TZ",
 	"NISDOMAIN",
-	NULL
+	nullptr
 } ;
 
 static cchar	*envdef[] = {
@@ -232,13 +232,13 @@ static cchar	*envdef[] = {
 	"LC_MONETARY",
 	"LC_NUMERIC",
 	"LC_TIME",
-	NULL
+	nullptr
 } ;
 
 static cchar	*envextra[] = {
 	"USERNAME",
 	"HOME",
-	NULL
+	nullptr
 } ;
 
 enum envextra {
@@ -258,10 +258,10 @@ int mkprogenv_start(MKPROGENV *op,cchar **envv) noex {
 	debugprintf("mkprogenv_start: ent\n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	memset(op,0,sizeof(MKPROGENV)) ;
-	op->envv = (envv != NULL) ? envv : environ ;
+	op->envv = (envv != nullptr) ? envv : environ ;
 
 	opts = VECHAND_OCOMPACT ;
 	if ((rs = vechand_start(&op->env,NENVS,opts)) >= 0) {
@@ -287,10 +287,10 @@ int mkprogenv_finish(MKPROGENV *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->uh != NULL) {
+	if (op->uh != nullptr) {
 	    rs1 = uc_free(op->uh) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->uh = NULL ;
+	    op->uh = nullptr ;
 	}
 
 	op->un[0] = '\0' ;
@@ -316,26 +316,26 @@ int mkprogenv_envset(MKPROGENV *op,cchar *kp,cchar *vp,int vl) noex {
 	int		size = 1 ; /* terminating NUL */
 	char		*p ;
 
-	if (kp == NULL) return SR_FAULT ;
+	if (kp == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("mkprogenv_envset: k=%s\n",kp) ;
-	if (vp != NULL)
+	if (vp != nullptr)
 	    debugprintf("mkprogenv_envset: v=%s\n",vp,vl) ;
 #endif
 
 	size += strlen(kp) ;
 	size += 1 ;			/* for the equals sign character */
-	if (vp != NULL) size += strnlen(vp,vl) ;
+	if (vp != nullptr) size += strnlen(vp,vl) ;
 
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    cchar	*ep ;
 	    char	*bp = p ;
 	    bp = strwcpy(bp,kp,-1) ;
 	    *bp++ = '=' ;
-	    if (vp != NULL) bp = strwcpy(bp,vp,vl) ;
+	    if (vp != nullptr) bp = strwcpy(bp,vp,vl) ;
 	    if ((rs = strpack_store(&op->stores,p,(bp-p),&ep)) >= 0) {
-	        rs1 = vechand_search(elp,ep,vstrkeycmp,NULL) ;
+	        rs1 = vechand_search(elp,ep,vstrkeycmp,nullptr) ;
 	        if (rs1 >= 0) vechand_del(elp,rs1) ;
 	        rs = vechand_add(elp,ep) ;
 	    }
@@ -349,7 +349,7 @@ int mkprogenv_envset(MKPROGENV *op,cchar *kp,cchar *vp,int vl) noex {
 int mkprogenv_getvec(MKPROGENV *op,cchar ***eppp) noex {
 	vechand		*elp = &op->env ;
 	int		rs ;
-	if (eppp != NULL) {
+	if (eppp != nullptr) {
 	    rs = vechand_getvec(elp,eppp) ;
 	} else {
 	    rs = vechand_count(elp) ;
@@ -374,9 +374,9 @@ static int mkprogenv_mkenv(MKPROGENV *op,cchar **envv) noex {
 	    cchar	*varpwd = VARPWD ;
 	    cchar	*kp ;
 
-	    if ((rs >= 0) && (envv != NULL)) {
+	    if ((rs >= 0) && (envv != nullptr)) {
 	        int	i ;
-	        for (i = 0 ; (rs >= 0) && (envv[i] != NULL) ; i += 1) {
+	        for (i = 0 ; (rs >= 0) && (envv[i] != nullptr) ; i += 1) {
 	            kp = envv[i] ;
 	            if (matkeystr(envbad,kp,-1) < 0) {
 	                if ((! f_path) && (kp[0] == 'P')) {
@@ -404,7 +404,7 @@ static int mkprogenv_mkenv(MKPROGENV *op,cchar **envv) noex {
 
 /* default environment variables */
 
-	    if ((rs >= 0) && (envv == NULL)) {
+	    if ((rs >= 0) && (envv == nullptr)) {
 	        rs = mkprogenv_mkenvdef(op,etp,envdef) ;
 	        n += rs ;
 	    }
@@ -432,7 +432,7 @@ static int mkprogenv_mkenv(MKPROGENV *op,cchar **envv) noex {
 
 	    if (rs >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
-	        if ((rs = envlist_present(etp,varpwd,-1,NULL)) == rsn) {
+	        if ((rs = envlist_present(etp,varpwd,-1,nullptr)) == rsn) {
 	            char	pwd[MAXPATHLEN + 1] ;
 	            if ((rs = getpwd(pwd,MAXPATHLEN)) > 0) {
 	                n += 1 ;
@@ -461,11 +461,11 @@ static int mkprogenv_mkenvdef(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	cchar	*kp ;
 	cchar	*cp ;
 
-	for (i = 0 ; (rs >= 0) && (envs[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (envs[i] != nullptr) ; i += 1) {
 	    kp = envs[i] ;
-	    if ((rs = envlist_present(etp,kp,-1,NULL)) == rsn) {
+	    if ((rs = envlist_present(etp,kp,-1,nullptr)) == rsn) {
 	        rs = SR_OK ;
-	        if ((cp = getourenv(op->envv,kp)) != NULL) {
+	        if ((cp = getourenv(op->envv,kp)) != nullptr) {
 	            n += 1 ;
 	            rs = mkprogenv_envadd(op,etp,kp,cp,-1) ;
 	        } /* end if */
@@ -503,17 +503,17 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	rs = u_uname(&un) ;
 #endif
 
-	for (i = 0 ; (rs >= 0) && (envs[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (envs[i] != nullptr) ; i += 1) {
 	    kp = envs[i] ;
 
 #if	CF_DEBUGS
 	    debugprintf("mkprogenv_mkenvsys: k=%s\n",kp) ;
 #endif
-	    if ((rs = envlist_present(etp,kp,-1,NULL)) == SR_NOTFOUND) {
+	    if ((rs = envlist_present(etp,kp,-1,nullptr)) == SR_NOTFOUND) {
 	        cint	sc = MKCHAR(kp[0]) ;
 
 	        rs = SR_OK ;
-	        vp = NULL ;
+	        vp = nullptr ;
 	        vl = -1 ;
 	        switch (sc) {
 #if	CF_UINFO
@@ -542,7 +542,7 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	                    vp = vbuf ;
 	                } else {
 	                    vp = uname.nodename ;
-	                    if ((tp = strchr(vp,'.')) != NULL) {
+	                    if ((tp = strchr(vp,'.')) != nullptr) {
 	                        rs = snwcpy(vbuf,vlen,vp,(tp-vp)) ;
 	                        vl = rs ;
 	                        vp = vbuf ;
@@ -566,7 +566,7 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	            break ;
 	        case 'N':
 	            vp = un.nodename ;
-	            if ((tp = strchr(vp,'.')) != NULL) {
+	            if ((tp = strchr(vp,'.')) != nullptr) {
 	                rs = snwcpy(vbuf,vlen,vp,(tp-vp)) ;
 	                vl = rs ;
 	                vp = vbuf ;
@@ -608,7 +608,7 @@ static int mkprogenv_mkenvsys(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	            break ;
 	        } /* end switch */
 
-	        if ((rs >= 0) && (vp != NULL)) {
+	        if ((rs >= 0) && (vp != nullptr)) {
 #if	CF_DEBUGS
 	            debugprintf("mkprogenv_mkenvsys: a=>%t<\n",
 	                vp,strlinelen(vp,vl,40)) ;
@@ -639,9 +639,9 @@ static int mkprogenv_mkenvextras(MKPROGENV *op,ENVLIST *etp,cchar **envs) noex {
 	cchar	*var ;
 	cchar	*kp ;
 
-	for (i = 0 ; (rs >= 0) && (envs[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (envs[i] != nullptr) ; i += 1) {
 	    kp = envs[i] ;
-	    if ((rs = envlist_present(etp,kp,-1,NULL)) == nrs) {
+	    if ((rs = envlist_present(etp,kp,-1,nullptr)) == nrs) {
 	        rs = SR_OK ;
 #if	CF_DEBUGCN
 	        nprintf(DEBFNAME,"uc_openprog: need i=%u var=%s\n",i,kp) ;
@@ -700,7 +700,7 @@ static int mkprogenv_envadd(MKPROGENV *op,ENVLIST *etp,cchar *kp,
 
 
 	bl += (kl+1) ;
-	if (vp != NULL) bl += ((vl >= 0) ? vl : strlen(vp)) ;
+	if (vp != nullptr) bl += ((vl >= 0) ? vl : strlen(vp)) ;
 
 	if ((rs = uc_malloc((bl+1),&bp)) >= 0) {
 	    cchar	*ep ;
@@ -736,12 +736,12 @@ cchar *varpath,cchar *defpath) noex {
 
 	if ((rs = vecstr_start(&deflogin,10,0)) >= 0) {
 
-	    cp = NULL ;
+	    cp = nullptr ;
 	    if ((rs = vecstr_envfile(&deflogin,tp)) >= 0) {
 
 	        rs1 = vecstr_finder(&deflogin,varpath,vstrkeycmp,&cp) ;
 
-	        if ((rs1 >= 0) && ((tp = strchr(cp,'=')) != NULL)) {
+	        if ((rs1 >= 0) && ((tp = strchr(cp,'=')) != nullptr)) {
 	            cp = (tp + 1) ;
 	        }
 
@@ -749,7 +749,7 @@ cchar *varpath,cchar *defpath) noex {
 	        rs = SR_OK ;
 	    } /* end if (vecstr_envfile) */
 
-	    if (cp == NULL) cp = defpath ;
+	    if (cp == nullptr) cp = defpath ;
 
 	    if (rs >= 0) {
 	        n += 1 ;

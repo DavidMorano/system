@@ -96,6 +96,9 @@
 /* local defines */
 
 
+/* external subroutines */
+
+
 /* local structures */
 
 
@@ -103,6 +106,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

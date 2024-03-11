@@ -223,7 +223,7 @@ extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
 extern int	uc_symlink(cchar *,cchar *) noex ;
 extern int	uc_unlink(cchar *) noex ;
-extern int	uc_lockend(int,int,int,int) noex ;
+extern int	uc_locktail(int,int,int,int) noex ;
 extern int	uc_mkdir(cchar *,mode_t) noex ;
 extern int	uc_rmdir(cchar *) noex ;
 extern int	uc_access(cchar *,int) noex ;
@@ -258,13 +258,6 @@ extern int	uc_ttyname(int,char *,int) noex ;
 extern int	uc_mkfifo(cchar *,mode_t) noex ;
 extern int	uc_piper(int *,int) noex ;
 
-extern int	uc_plock(int) noex ;
-extern int	uc_mlock(cvoid *,size_t) noex ;
-extern int	uc_munlock(cvoid *,size_t) noex ;
-extern int	uc_mlockall(int) noex ;
-extern int	uc_munlockall() noex ;
-extern int	uc_madvise(cvoid *,size_t,int) noex ;
-
 /* memory allocation (user-space) */
 
 #ifdef	COMMENT
@@ -282,33 +275,7 @@ extern int	uc_mallocsys(int,char **) noex ;
 extern int	uc_mallocbuf(cvoid *,int,cvoid **) noex ;
 #endif /* COMMENT */
 
-/* OS PASSWD database */
-extern int	uc_getpwbegin() noex ;
-extern int	uc_getpwent(ucentpw *,char *,int) noex ;
-extern int	uc_getpwnam(ucentpw *,char *,int,cchar *) noex ;
-extern int	uc_getpwgid(ucentpw *,char *,int,uid_t) noex ;
-extern int	uc_getpwend() noex ;
-
-/* OS SHADOW database */
-extern int	uc_getspbegin() noex ;
-extern int	uc_getspent(ucentsp *,char *,int) noex ;
-extern int	uc_getspnam(ucentsp *,char *,int,cchar *) noex ;
-extern int	uc_getspend() noex ;
-
-/* OS GROUP database */
-extern int	uc_getgrbegin() noex ;
-extern int	uc_getgrent(ucentgr *,char *,int) noex ;
-extern int	uc_getgrnam(ucentgr *,char *,int,cchar *) noex ;
-extern int	uc_getgrgid(ucentgr *,char *,int,gid_t) noex ;
-extern int	uc_getgrpend() noex ;
-
-/* OS PROJECT database */
-extern int	uc_getpjbegin() noex ;
-extern int	uc_getpjent(ucentpj *,char *,int) noex ;
-extern int	uc_getpjbyid(ucentpj *,char *,int,projid_t) noex ;
-extern int	uc_getpjbyname(ucentpj *,char *,int,cchar *) noex ;
-extern int	uc_getdefaultproj(ucentpj *,char *,int,cchar *) noex ;
-extern int	uc_getpjend() noex ;
+/* project related */
 extern int	uc_inproj(cchar *,cchar *,char *,int) noex ;
 
 /* POSIX shared memory operations */

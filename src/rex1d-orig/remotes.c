@@ -62,13 +62,7 @@
 
 /* external subroutines */
 
-extern int	getnodedomain() ;
-extern int	cfdec() ;
-extern int	getchostname(), getehostname() ;
 extern int	qualdisplay() ;
-
-extern char	*strshrink() ;
-extern char	*strbasename() ;
 
 
 /* forward subroutines */

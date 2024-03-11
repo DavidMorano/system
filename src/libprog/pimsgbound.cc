@@ -1,4 +1,4 @@
-/* mkmsgbound SUPPORT */
+/* pimkmsgbound SUPPORT */
 /* lang=C++20 */
 
 /* create a mail message boundary for multipart MIME messages */
@@ -18,14 +18,14 @@
 /*******************************************************************************
 
 	Name:
-	mkmsgbound
+	pimkmsgbound
 
 	Description:
 	This subroutine creates a unique (?) string no more than
 	MSGBOUND characters.
 
 	Synopsis:
-	int mkmsgbound(PROGINFO *pip,char *rbuf,int rlen) noex
+	int pimkmsgbound(PROGINFO *pip,char *rbuf,int rlen) noex
 
 	Arguments:
 	pip		pointer to program information
@@ -38,11 +38,11 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<ctdec.h>
@@ -65,7 +65,9 @@
 
 /* external subroutines */
 
-extern int	mkrand(PROGINFO *) noex ;
+extern "C" {
+    extern int	pimkrand(PROGINFO *) noex ;
+}
 
 
 /* local structures */
@@ -84,12 +86,12 @@ constexpr bool	f_mtime = CF_MTIME ;
 
 /* exported subroutines */
 
-int mkmsgbound(PROGINFO *pip,char *mbuf,int mlen) noex {
+int pimkmsgbound(PROGINFO *pip,char *mbuf,int mlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (mbuf) {
 	    mbuf[0] = '\0' ;
-	    if ((rs = mkrand(pip)) >= 0) {
+	    if ((rs = pimkrand(pip)) >= 0) {
 	        sbuf	b ;
 	        if ((rs = sbuf_start(&b,mbuf,mlen)) >= 0) {
 	            time_t	t ;
@@ -120,10 +122,10 @@ int mkmsgbound(PROGINFO *pip,char *mbuf,int mlen) noex {
 	            len = sbuf_finish(&b) ;
 	            if (rs >= 0) rs = len ;
 	        } /* end if (sbuf) */
-	    } /* end if (mkrand) */
+	    } /* end if (pimkrand) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (mkmsgbound) */
+/* end subroutine (pimkmsgbound) */
 
 

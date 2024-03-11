@@ -1,12 +1,10 @@
-/* mkrand */
+/* pimkrand SUPPORT */
+/* lang=C++20 */
 
 /* make some light random data */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUG	0		/* not-switchable debug print-outs */
 #define	CF_HEAVY	0		/* use heavy (strong) randomness */
-
 
 /* revision history:
 
@@ -27,7 +25,7 @@
 	MSGBOUND characters.
 
 	Synopsis:
-	int pimkrand(PROGINFO *pip)
+	int pimkrand(PROGINFO *pip) noex
 
 	Arguments:
 	pip		pointer to program information
@@ -43,10 +41,10 @@
 #include	<sys/param.h>
 #include	<sys/time.h>		/* for |gethrtime(3c)| */
 #include	<unistd.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<buffer.h>
+#include	<hash.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -74,9 +72,9 @@
 
 /* external subroutines */
 
-extern uint	hashelf(void *,int) ;
-
-extern int	md5calc(ULONG *,void *,int) ;
+extern "C" {
+    extern int	md5calc(ulong *,void *,int) noex ;
+}
 
 
 /* local structures */
@@ -84,21 +82,22 @@ extern int	md5calc(ULONG *,void *,int) ;
 
 /* forward references */
 
-static int	mkrand_light(PROGINFO *) ;
+static int	mkrand_light(PROGINFO *) noex ;
 
 #if	CF_HEAVY
-static int	mkrand_heavy(PROGINFO *) ;
+static int	mkrand_heavy(PROGINFO *) noex ;
 #endif /* CF_LIGHT */
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mkrand(PROGINFO *pip)
-{
+int pimkrand(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
 	if (pip->rand == 0) {
@@ -111,18 +110,16 @@ int mkrand(PROGINFO *pip)
 
 	return rs ;
 }
-/* end subroutine (mkrand) */
+/* end subroutine (pimkrand) */
 
 
 /* local subroutines */
 
-
-static int mkrand_light(PROGINFO *pip)
-{
-	struct timeval	tod ;
+static int mkrand_light(PROGINFO *pip) noex {
+	TIMEVAL		tod ;
 	const pid_t	pid = getppid() ;
-	ULONG		rv = 0 ;
-	ULONG		v ;
+	ulong		rv = 0 ;
+	ulong		v ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -160,12 +157,10 @@ static int mkrand_light(PROGINFO *pip)
 }
 /* end subroutine (mkrand_light) */
 
-
 #if	CF_HEAVY
-static int mkrand_heavy(PROGINFO *pip,struct timeval *todp)
-{
-	BUFFER		hb ;
-	ULONG		rv = 0 ;
+static int mkrand_heavy(PROGINFO *pip,TIMEVAL *todp) noex {
+	buffer		hb ;
+	ulong		rv = 0 ;
 	int		rs ;
 
 	if ((rs = buffer_start(&hb,RVBUFLEN)) >= 0) {
@@ -229,13 +224,14 @@ static int mkrand_heavy(PROGINFO *pip,struct timeval *todp)
 	    for (i = 0 ; pip->envv[i] != NULL ; i += 1) {
 	        uint	hv ;
 	        hv = hashelf(pip->envv[i],-1) ;
-	        rv ^= (((ULONG) hv) << ((i & 1) ? 32 : 0)) ;
+	        rv ^= (((ulong) hv) << ((i & 1) ? 32 : 0)) ;
 	    } /* end for */
 	}
 #endif /* COMMENT */
 
-	if (rs >= 0)
+	if (rs >= 0) {
 	    pip->rand += rv ;
+	}
 
 	return rs ;
 }

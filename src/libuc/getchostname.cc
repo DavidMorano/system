@@ -1,7 +1,7 @@
 /* getchostname SUPPORT */
 /* lang=C++20 */
 
-/* subroutine to get a canonical hostname */
+/* get a canonical hostname */
 /* version %I% last-modified %G% */
 
 
@@ -33,11 +33,26 @@
 	translated given the existing host information.
 
 	Synopsis:
-	int getchostname(cchar *name,char *hostname) noex
+	int getchostname(char *cbuf,cchar *name) noex
 
 	Arguments:
+	cbuf		result buffer (length assumed to be MAXHOSTNAMELEN)
 	name		name to lookup
-	hostname	if not NULL, a buffer to hold the resulting hostname
+
+	Returns:
+	>=0		<name> had a valid INET address
+	<0		<name> did not have a valid address (system-return)
+
+
+	Name:
+	getcname
+
+	Synopsis:
+	int getcname(char *cbuf,cchar *tname) noex
+
+	Arguments:
+	cbuf		buffer to hold the resulting hostname
+	name		name to lookup
 
 	Returns:
 	>=0		<name> had a valid INET address
@@ -47,6 +62,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<sncpyx.h>
+#include	<hostinfo.h>
 
 #include	"getchostname.h"
 
@@ -77,9 +95,28 @@
 
 /* exported subroutines */
 
-int getchostname(cchar *name,char *hostname) noex {
-	return getcname(name,hostname) ;
+int getchostname(char *hbuf,cchar *name) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		len = 0 ;
+	if (name && hbuf) {
+	    if ((rs = getbufsize(getbufsize_hn)) >= 0) {
+	        hostinfo	hi ;
+	        cint		af = AF_UNSPEC ;
+	        cint		hlen = rs ;
+	        if ((rs = hostinfo_start(&hi,af,name)) >= 0) {
+	            cchar	*cnp{} ;
+	            if ((rs = hostinfo_getcanonical(&hi,&cnp)) >= 0) {
+		        rs = sncpy1(hbuf,hlen,cnp) ;
+		        len = rs ;
+	            }
+	            rs1 = hostinfo_finish(&hi) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (hostinfo) */
+	    } /* end if (getbufsize) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end if (getchostname) */
+/* end subroutine (getchostname) */
 
 

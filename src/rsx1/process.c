@@ -66,6 +66,7 @@
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<bfile.h>
+#include	<getchostname.h>
 
 #include	"localmisc.h"
 #include	"config.h"
@@ -152,7 +153,7 @@ vecstr	*elp ;
 	if ((rs = u_getpeername(s,(struct sockaddr *) &from,&fromlen)) >= 0) {
 
 #ifdef	COMMENT
-		if (getchostnameaddr(&from,peername) >= 0)
+		if (getchostnameaddr(peername,&from) >= 0)
 	    		logfile_printf(&g.lh,
 	        		"DNS peer host=%d\n",peername) ;
 #endif /* COMMENT */

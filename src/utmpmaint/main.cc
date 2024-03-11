@@ -1238,7 +1238,7 @@ static int procmaint(PROGINFO *pip,cchar *fn)
 	        if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
 	            const caddr_t	ma = md ;
 	            const int		madv = MADV_SEQUENTIAL ;
-	            if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	            if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                if ((rs = procmaintbake(pip,md,ms,fs)) > 0) {
 #if	CF_DEBUG
 	                    if (DEBUGLEVEL(3))

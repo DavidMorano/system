@@ -106,7 +106,6 @@ extern int	strncasecmp(const char *,const char *,int) ;
 
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getchostname() ;
 extern int	getehostname() ;
 extern int	mkquoted(char *,int,const char *,int) ;
 

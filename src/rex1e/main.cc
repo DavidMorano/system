@@ -1,13 +1,13 @@
-/* main (REXEC) */
+/* main SUPPORT (REXEC) */
+/* lang=C++20 */
 
 /* program to INET REXEC a remote command */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_REXECL	1
 #define	CF_RCMDU	1
-
 
 /* revision history:
 
@@ -25,16 +25,12 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ rexec [-a auth_file] [-l username] [-p password] [-n] 
 		[-i input] [-N alt_netrc] command arguments < input
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -51,7 +47,6 @@
 #include	<grp.h>
 #include	<time.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -59,6 +54,7 @@
 #include	<vecelem.h>
 #include	<mallocstuff.h>
 #include	<quoteshellarg.h>
+#include	<getchostname.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -1074,7 +1070,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	            hostname) ;
 #endif
 
-	    rs = getchostname(hostname,buf) ;
+	    rs = getchostname(buf,hostname) ;
 
 	    if (buf[0] != '\0')
 	        chostname = putheap(buf) ;
@@ -2238,7 +2234,7 @@ char		localdomain[] ;
 /* convert all machine names to canonical form */
 
 	        hnp = mp->machine ;
-	        if (getchostname(mp->machine,hostname) >= 0)
+	        if (getchostname(hostname,mp->machine) >= 0)
 	            hnp = hostname ;
 
 /* copy over only those machines that match our target machine */

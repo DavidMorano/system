@@ -58,7 +58,7 @@
 
 /* local defines */
 
-#define	OURBASE		26
+#define	OURBASE		26		/* base-26 */
 
 
 /* local namespaces */

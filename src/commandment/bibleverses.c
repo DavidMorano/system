@@ -685,7 +685,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 	                if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                    const caddr_t	ma = md ;
 	                    const int		madv = MADV_RANDOM ;
-	                    if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	                    if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                        op->mapdata = md ;
 	                        op->mapsize = ms ;
 	                        op->ti_map = dt ;
@@ -693,7 +693,7 @@ static int bibleverses_dbmapcreate(BIBLEVERSES *op,time_t dt)
 	                    }
 #if	CF_DEBUGS
 	                    debugprintf("bibleverses_dbmapcreate: "
-				"uc_madvise() rs=%d\n",rs) ;
+				"u_madvise() rs=%d\n",rs) ;
 #endif
 	                    if (rs < 0) {
 	                        u_munmap(md,ms) ;

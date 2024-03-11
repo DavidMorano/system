@@ -45,13 +45,13 @@
 /*******************************************************************************
 
 	Name:
-	mkmailbox
+	pimkmailbox
 
 	Description:
 	This subroutine creates (makes) a mailbox file.
 
 	Synopsis:
-	int mkmailbox(PROGINFO *pip,cchar *mbname) noex
+	int pimkmailbox(PROGINFO *pip,cchar *mbname) noex
 
 	Arguments:
 	pip		program information pointer
@@ -69,7 +69,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<mkpathx.h>

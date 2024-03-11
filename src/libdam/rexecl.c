@@ -166,10 +166,6 @@ int		*fd2p ;
 
 	serial = getserial(SERIALFILE1) ;
 
-#if	CF_DEBUGS
-	debugprintf("getchostname: using serial=%d\n",serial) ;
-#endif
-
 	{
 	    int	lid = (int) pid ;
 	    snddd(logid,LOGIDLEN,lid,serial) ;

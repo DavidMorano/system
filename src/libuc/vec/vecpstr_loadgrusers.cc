@@ -183,7 +183,7 @@ static int subinfo_pwmapbegin(SUBINFO *sip) noex {
 	            if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	                cint		madv = MADV_SEQUENTIAL ;
 			const caddr_t	ma = caddr_t(md) ;
-	                if ((rs = uc_madvise(ma,ms,madv)) >= 0) {
+	                if ((rs = u_madvise(ma,ms,madv)) >= 0) {
 	                    sip->mapdata = md ;
 	                    sip->mapsize = ms ;
 	                } /* end if (advise) */

@@ -170,7 +170,7 @@ namespace libuc {
 /* local subroutines */
 
 static int ugetloadavg(uint *la,int n) noex {
-	constexpr int	nmax = maxloadavgs ;
+	cint		nmax = maxloadavgs ;
 	int		rs = SR_FAULT ;
 	int		rn = 0 ;
 	if (la) {

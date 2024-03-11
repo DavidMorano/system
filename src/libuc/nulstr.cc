@@ -37,6 +37,15 @@
 /* external subroutines */
 
 
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int nulstr_start(nulstr *ssp,cchar *sp,int sl,cchar **rpp) noex {

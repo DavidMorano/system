@@ -42,10 +42,10 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -82,10 +82,16 @@ static constexpr cchar	aterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int piaudit(PROGINFO *pip,ARGINFO *aip,cchar *terms,cc *dbn,char *ofname) noex {
-	int	rs ;
+	int		rs ;
+	(void) aip ;
+	(void) terms ;
+	(void) ofname ;
 	rs = auditdb(pip,dbn) ;
 	return rs ;
 }

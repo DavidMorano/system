@@ -1,11 +1,8 @@
 /* main (CHOSTNAME) */
+/* lang=C++20 */
 
 /* program to get a canonical host name */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug switch */
-#define	CF_DEBUG	0		/* run-time debug switch */
-#define	CF_GETCNAME	1		/* use 'getcname(3dam)' */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,15 +17,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ chostname name(s) [-v] [-V]
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<netinet/in.h>
@@ -40,14 +33,13 @@
 #include	<string.h>
 #include	<time.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<userinfo.h>
-#include	<hostent.h>
 #include	<inetaddr.h>
+#include	<getchostname.h>
 #include	<exitcodes.h>
 #include	<mallocstuff.h>
 #include	<localmisc.h>
@@ -75,8 +67,6 @@ extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	getcname(const char *,char *) ;
-extern int	getchostname() ;
 extern int	getnodedomain(char *,char *) ;
 extern int	isdigitlatin(int) ;
 
@@ -173,13 +163,6 @@ const char	*envv[] ;
 	const char	*ofname = NULL ;
 	const char	*logfname = NULL ;
 	const char	*cp ;
-
-#if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
-	    rs = debugopen(cp) ;
-	    debugprintf("main: starting DFD=%d\n",rs) ;
-	}
-#endif /* CF_DEBUGS */
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {
@@ -497,11 +480,6 @@ const char	*envv[] ;
 	if (rs < 0)
 	    goto badarg ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	debugprintf("main: debuglevel=%u\n",pip->debuglevel) ;
-#endif
-
 	if (pip->debuglevel > 0)
 	    bprintf(pip->efp,"%s: debuglevel=%u\n",
 	        pip->progname,pip->debuglevel) ;
@@ -564,16 +542,11 @@ const char	*envv[] ;
 
 /* go */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: open output\n") ;
-#endif
-
-	if ((ofname != NULL) && (ofname[0] != '-'))
+	if ((ofname != NULL) && (ofname[0] != '-')) {
 	    rs = bopen(ofp,ofname,"wct",0666) ;
-
-	else
+	} else {
 	    rs = bopen(ofp,BFILE_STDOUT,"dwct",0666) ;
+	}
 
 	if (rs < 0) {
 	    ex = EX_CANTCREAT ;
@@ -581,11 +554,6 @@ const char	*envv[] ;
 	}
 
 /* process the arguments */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: process argument names\n") ;
-#endif
 
 	pan = 0 ;
 
@@ -624,11 +592,6 @@ baduser:
 done:
 	ex = (rs >= 0) ? EX_OK : EX_DATAERR ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("main: exiting ex=%d (%d)\n",rs) ;
-#endif
-
 /* finish up */
 ret3:
 ret2:
@@ -644,10 +607,6 @@ ret0:
 	proginfo_finish(pip) ;
 
 badprogstart:
-
-#if	(CF_DEBUGS || CF_DEBUG)
-	debugclose() ;
-#endif
 
 	return ex ;
 
@@ -706,11 +665,6 @@ const char	name[] ;
 	if (name == NULL)
 	    return SR_FAULT ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("procname: name=%s\n",name) ;
-#endif
-
 	if ((name[0] == '\0') || (name[0] == '-'))
 	    name = pip->nodename ;
 
@@ -727,21 +681,8 @@ const char	name[] ;
 	} else {
 
 	chostname[0] = '\0' ;
-
-#if	CF_GETCNAME
-	rs = getcname(name,chostname) ;
-#else
-	rs = getchostname(name,chostname) ;
-#endif
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("procname: getcname() rs=%d\n",rs) ;
-#endif
-
-	    if (rs >= 0)
+	if ((rs = getchostname(chostname,name)) >= 0) {
 	    rs = bprintf(ofp,"%s\n",chostname) ;
-
 	}
 
 	if (rs < 0) {
@@ -753,12 +694,6 @@ const char	name[] ;
 	} /* end if */
 
 ret0:
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("procname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (procname) */
@@ -778,25 +713,11 @@ char		cname[] ;
 	int		rs1 ;
 	char		*hebuf ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("printinfo: yes verbose\n") ;
-#endif
-
 	if ((rs = uc_malloc((helen+1),&gebuf)) >= 0) {
 	if ((rs1 = getourhe(name,cname,&he,hebuf,helen)) >= 0) {
 	    hostent_cur	hc ;
 	    uchar	*ap ;
 	    char	*np ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3)) {
-	    debugprintf("printinfo: inside\n") ;
-	    debugprintf("printinfo: name=%s\n",name) ;
-	    debugprintf("printinfo: cname=%s\n",cname) ;
-	    debugprintf("printinfo: chostname=%s\n",cname) ;
-	}
-#endif
 
 	    bprintf(ofp,"%s:\n",name) ;
 
@@ -809,11 +730,6 @@ char		cname[] ;
 		(as < 0) ? "no" : "yes") ;
 
 /* addresses */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("printinfo: addresses\n") ;
-#endif
 
 	    hostent_curbegin(&he,&hc) ;
 
@@ -846,11 +762,6 @@ char		cname[] ;
 
 /* alias names */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("printinfo: aliases\n") ;
-#endif
-
 	    hostent_curbegin(&he,&hc) ;
 
 	    while (hostent_enumname(&he,&hc,&np) >= 0) {
@@ -863,14 +774,8 @@ char		cname[] ;
 	    uc_free(hebuf) ;
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("printinfo: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (printinfo) */
-
 
 

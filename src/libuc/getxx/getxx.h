@@ -14,20 +14,21 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETAX_INCLUDE
-#define	GETAX_INCLUDE
+#ifndef	GETXX_INCLUDE
+#define	GETXX_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 
 #include	<getax.h>
+#include	<getus.h>
 #include	<getpr.h>
 #include	<getnw.h>
 #include	<getho.h>
 #include	<getsv.h>
 
 
-#endif /* GETAX_INCLUDE */
+#endif /* GETXX_INCLUDE */
 
 

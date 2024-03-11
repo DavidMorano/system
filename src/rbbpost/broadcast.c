@@ -1,9 +1,11 @@
-/* broadcast */
+/* broadcast SUPPOET */
+/* lang=C++20 */
 
+/* some kind of broadcast thing */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	1		/* run-time debugging */
 #define	CF_QUEUE	0
-
 
 /* revision history:
 
@@ -23,12 +25,9 @@
         This subroutine posts the articles that we are given to the remote
         machines in our little cluster (whatever).
 
-
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -39,7 +38,6 @@
 #include	<dirent.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<pcsconf.h>
 #include	<userinfo.h>
@@ -47,6 +45,7 @@
 #include	<vecitem.h>
 #include	<mailmsg.h>
 #include	<mallocstuff.h>
+#include	<getchostname.h>
 #include	<localmisc.h>
 
 #include	"ng.h"
@@ -67,7 +66,6 @@
 extern int	snsds(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
-extern int	getchostname(const char *,char *) ;
 
 extern int	pcsngdir(const char *,char *,const char *,const char *) ;
 extern int	forward(struct proginfo *,
@@ -158,12 +156,7 @@ BBHOSTS		*bhp, *bnp ;
 	}
 #endif
 
-#if	CF_DEBUG
-	if (pip->debuglevel > 1)
-	    debugprintf("broadcast: getchostname=%s\n",tmphostname) ;
-#endif
-
-	if (getchostname(tmphostname,hostname) >= 0) {
+	if (getchostname(hostname,tmphostname) >= 0) {
 	    pathname = cp ;
 	} else
 	    pathname = tmphostname ;
