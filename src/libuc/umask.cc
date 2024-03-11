@@ -24,9 +24,9 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<signal.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<csignal>		/* |sig_atomic_t| */
+#include	<climits>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<sigblocker.h>

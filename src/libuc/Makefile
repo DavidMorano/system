@@ -1167,6 +1167,7 @@ isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
+getmjd.o:		getmjd.cc getmjd.h
 #
 isproc.o:		isproc.cc isproc.h
 #
