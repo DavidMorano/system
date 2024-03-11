@@ -1,10 +1,8 @@
-/* getserial */
+/* getserial HEADER */
+/* lang=C++20 */
 
 /* get the serial number for logging references */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,48 +16,51 @@
 
 /*******************************************************************************
 
-        This subroutine is used to get a unique serial number from a specified
-        file. These numbes are used for sequencing and other purposes in general
-        code. An attempt is made to lock the SERIAL file and if the lock fails,
-        the subroutine returns an error (negative number).
+	Name:
+	getserial
 
-        Locking may indeed fail due to the very poorly written file locking code
-        on the old SunOS 4.xxx version of the UNIX system. Remote file locking
-        over NFS on the old SunOS 4.xxx systems **never** worked correctly!
-        Other errors, like "couldn't create the file" are reported as such.
+	Description:
+	This subroutine is used to get a unique serial number from
+	a specified file. These numbes are used for sequencing and
+	other purposes in general code. An attempt is made to lock
+	the SERIAL file and if the lock fails, the subroutine returns
+	an error (negative number).  Locking may indeed fail due
+	to the very poorly written file locking code on the old
+	SunOS 4.xxx version of the UNIX system. Remote file locking
+	over NFS on the old SunOS 4.xxx systems **never** worked
+	correctly!  Other errors, like "couldn't create the file"
+	are reported as such.
 
 	Synopsis:
-
-	int getserial(sfname)
-	const char	sfname[] ;
+	int getserial(cchar *sfname) noex
 
 	Arguments:
-
 	sfname		sfname of file containing the serial number
 
 	Returns:
-
 	>0		the serial number
 	==0		file was just created
-	<0		could not get it!
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<lockfile.h>
 #include	<estrings.h>
+#include	<cfnum.h>
+#include	<ctdec.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"getserial.h"
 
 
 /* local defines */
@@ -97,23 +98,13 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	cfnumui(const char *,int,int *) ;
-extern int	ctdeci(char *,int,uint) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotValid(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern cchar	*getourenv(const char **,const char *) ;
 
 
 /* external variables */
@@ -124,32 +115,32 @@ extern cchar	*getourenv(const char **,const char *) ;
 
 /* forward references */
 
-static int	getserial_open(cchar *) ;
-static int	getserial_read(int,char *,int) ;
-static int	getserial_write(int,char *,int,int) ;
+static int	getserial_open(cchar *) noex ;
+static int	getserial_read(int,char *,int) noex ;
+static int	getserial_write(int,char *,int,int) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int getserial(cchar *sfname)
-{
+int getserial(cchar *sfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		serial = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("getserial: ent sfn=%s\n",sfname) ;
-#endif
 
 	if ((sfname == NULL) || (sfname[0] == '\0'))
 	    sfname = DEFSERIAL ;
 
 	if ((rs = getserial_open(sfname)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    if ((rs = lockfile(fd,F_LOCK,0L,0L,TO_LOCK)) >= 0) {
-		const int	dlen = DIGBUFLEN ;
-		char		dbuf[DIGBUFLEN+1] ;
+		cint	dlen = DIGBUFLEN ;
+		char	dbuf[DIGBUFLEN+1] ;
 	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) {
 	            serial = rs ; /* result for return */
 	            rs = getserial_write(fd,dbuf,dlen,serial) ;
@@ -159,10 +150,6 @@ int getserial(cchar *sfname)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened successfully) */
 
-#if	CF_DEBUGS
-	debugprintf("getserial: ret rs=%d serial=%u\n",rs,serial) ;
-#endif
-
 	return (rs >= 0) ? serial : rs ;
 }
 /* end subroutine (getserial) */
@@ -170,19 +157,14 @@ int getserial(cchar *sfname)
 
 /* local subroutines */
 
-
-static int getserial_open(cchar *sfname)
-{
-	const mode_t	m = FILEMODE ;
+static int getserial_open(cchar *sfname) noex {
+	cmode		m = FILEMODE ;
 	int		rs ;
+	int		rs1 ;
 	int		fd = -1 ;
 
 	rs = uc_open(sfname,O_RDWR,m) ;
 	fd = rs ;
-
-#if	CF_DEBUGS
-	debugprintf("getserial: u_open() rs=%d\n",rs) ;
-#endif
 
 	if (rs == SR_ACCESS) {
 	    if ((rs = uc_unlink(sfname)) >= 0) {
@@ -190,17 +172,16 @@ static int getserial_open(cchar *sfname)
 	    }
 	}
 	if (rs == SR_NOENT) {
-	    const int	of = (O_RDWR|O_CREAT) ;
+	    cint	of = (O_RDWR|O_CREAT) ;
 	    if ((rs = uc_open(sfname,of,m)) >= 0) {
 	        fd = rs ;
 	        if ((rs = uc_fminmod(fd,m)) >= 0) {
-	            const int	n = _PC_CHOWN_RESTRICTED ;
-	            if ((rs = u_fpathconf(fd,n,NULL)) == 0) {
+	            cint	cmd = _PC_CHOWN_RESTRICTED ;
+	            if ((rs = u_fpathconf(fd,cmd,NULL)) == 0) {
 	                USTAT	sb ;
-	                int	cl ;
-	                cchar	*cp ;
-	                if ((cl = sfdirname(sfname,-1,&cp)) > 0) {
-			    const int	plen = MAXPATHLEN ;
+	                cchar	*cp{} ;
+	                if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
+			    cint	plen = MAXPATHLEN ;
 	                    char	*pbuf ;
 			    if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 	                        if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
@@ -208,7 +189,8 @@ static int getserial_open(cchar *sfname)
 	                                rs = u_fchown(fd,sb.st_uid,sb.st_gid) ;
 	                            }
 	                        } /* end if (mkpath) */
-				uc_free(pbuf) ;
+				rs1 = uc_free(pbuf) ;
+				if (rs >= 0) rs = rs1 ;
 			    } /* end if (m-a-f) */
 	                } /* end if (sfdirname) */
 	            } /* end if (u_pathconf) */
@@ -219,37 +201,32 @@ static int getserial_open(cchar *sfname)
 }
 /* end subroutine (getserial_open) */
 
-
-static int getserial_read(int fd,char *dbuf,int dlen)
-{
+static int getserial_read(int fd,char *dbuf,int dlen) noex {
 	int		rs ;
 	int		serial = 0 ;
 	if ((rs = u_read(fd,dbuf,dlen)) > 0) {
-	    int		len = rs ;
-	    int		cl ;
-	    cchar	*cp ;
-	    if ((cl = nextfield(dbuf,len,&cp)) > 0) {
-	        if ((rs = cfnumui(cp,cl,&serial)) >= 0) {
+	    cint	dl = rs ;
+	    cchar	*cp{} ;
+	    if (int cl ; (cl = sfnext(dbuf,dl,&cp)) > 0) {
+	        if ((rs = cfnum(cp,cl,&serial)) >= 0) {
 	            rs = u_rewind(fd) ;
 	        } else if (isNotValid(rs)) {
 	            serial = 0 ;
 	            rs = SR_OK ;
 	        }
-	    } /* end if (nextfield) */
+	    } /* end if (sfnext) */
 	} /* end if (u_read) */
 	return (rs >= 0) ? serial : rs ;
 }
 /* end subroutine (getserial_read) */
 
-
-static int getserial_write(int fd,char *dbuf,int dlen,int serial)
-{
-	const int	nserial = ((serial+1) & INT_MAX) ;
+static int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
+	cint		nserial = ((serial+1) & INT_MAX) ;
 	int		rs ;
-	    if ((rs = ctdeci(dbuf,dlen,nserial)) >= 0) {
+	    if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) {
 	        dbuf[rs++] = '\n' ;
 	        if ((rs = u_write(fd,dbuf,rs)) >= 0) {
-	            off_t	uoff = rs ;
+	            const off_t	uoff = off_t(rs) ;
 	            rs = uc_ftruncate(fd,uoff) ;
 	        }
 	    } /* end if (ctdeci) */
