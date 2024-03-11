@@ -1471,7 +1471,7 @@ static int config_reader(QCONFIG *csp,char *ebuf,int elen) noex {
 
 	                    case cparam_logfile:
 	                        if (! sip->final.lfname) {
-	                            cchar *lfn = sip->lfname ;
+	                            cchar 	*lfn = sip->lfname ;
 	                            cchar	*tfn = tbuf ;
 	                            sip->final.lfname = true ;
 	                            sip->have.lfname = true ;

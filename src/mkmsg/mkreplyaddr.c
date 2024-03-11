@@ -1,10 +1,8 @@
-/* mkreplyaddr */
+/* pimkreplyaddr SUPPORT */
+/* lang=C++20 */
 
 /* create a mail REPLYTO-address */
-
-
-#define	CF_DEBUGS	0		/* not-switchable debug print-outs */
-#define	CF_DEBUG	0		/* run-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,34 +16,30 @@
 
 /*******************************************************************************
 
+	Name:
+	pimkreplyaddr
+
+	Description:
 	This subroutine creates a mail REPLYTO-address (if we can).
 
 	Synopsis:
-
-	int mkreplyaddr(pip)
-	PROGINFO	*pip ;
+	int pimkreplyaddr(PROGINFO *pip) noex
 
 	Arguments:
-
 	pip		pointer to program information
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<ascii.h>
@@ -76,7 +70,9 @@
 
 /* external subroutines */
 
-extern int	mkfromname(PROGINFO *) ;
+extern "C" {
+    extern int	pimkfromname(PROGINFO *) noex ;
+}
 
 
 /* local structures */
@@ -84,60 +80,52 @@ extern int	mkfromname(PROGINFO *) ;
 
 /* forward references */
 
-static int	loadreply(PROGINFO *) ;
+static int	piloadreply(PROGINFO *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mkreplyaddr(PROGINFO *pip)
-{
+int pimkreplyaddr(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
 
 	if (! pip->f.init_replyto) {
-	    pip->f.init_replyto = TRUE ;
-	    if (pip->hdr_replyto == NULL) {
-	        if (pip->hdr_replyto == NULL) {
-		    cchar	*cp = NULL ;
-	            if ((cp = getenv(VARMAILREPLY)) != NULL) {
+	    pip->f.init_replyto = true ;
+	    if (pip->hdr_replyto == nullptr) {
+	        if (pip->hdr_replyto == nullptr) {
+		    cchar	*cp = nullptr ;
+	            if ((cp = getenv(VARMAILREPLY)) != nullptr) {
 	                if (cp[0] != '\0') {
 	                    pip->hdr_replyto = cp ;
 			    rl = strlen(cp) ;
 	                }
 	            }
 	        }
-	        if (pip->hdr_replyto == NULL) {
-	            rs = loadreply(pip) ;
+	        if (pip->hdr_replyto == nullptr) {
+	            rs = piloadreply(pip) ;
 	 	    rl = rs ;
 	        }
 	    } /* end if (more needed) */
 	} else {
-	    if (pip->hdr_replyto != NULL) {
+	    if (pip->hdr_replyto != nullptr) {
 		rl = strlen(pip->hdr_replyto) ;
 	    }
 	} /* end if (needed) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("mkreplyaddr: ret rs=%d replyto=>%s<\n",
-	        rs, pip->hdr_replyto) ;
-#endif
-
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (mkreplyaddr) */
+/* end subroutine (pimkreplyaddr) */
 
 
 /* local subroutines */
 
-
-static int loadreply(PROGINFO *pip)
-{
-	BUFFER		b ;
+static int piloadreply(PROGINFO *pip) noex {
+	buffer		b ;
 	int		rs ;
 	int		rs1 ;
 	int		bl = 0 ;
@@ -153,7 +141,7 @@ static int loadreply(PROGINFO *pip)
 	        rs = mkfromname(pip) ;
 	    }
 
-	    if ((rs >= 0) && (pip->fromname != NULL)) {
+	    if ((rs >= 0) && (pip->fromname != nullptr)) {
 	        buffer_char(&b,' ') ;
 	        buffer_char(&b,CH_LPAREN) ;
 	        buffer_strw(&b,pip->fromname,-1) ;
@@ -174,6 +162,6 @@ static int loadreply(PROGINFO *pip)
 	} /* end if (buffer) */
 	return (rs >= 0) ? bl : rs ;
 }
-/* end subroutine (loadreply) */
+/* end subroutine (piloadreply) */
 
 

@@ -134,10 +134,13 @@
 #include	<fsdir.h>
 #include	<pathadd.h>
 #include	<sfx.h>
+#include	<getmjd.h>		/* |getmjd(3uc)| */
+#include	<lockfile.h>
 #include	<hasx.h>
 #include	<isnot.h>		/* |isNotAccess(3uc)| */
 #include	<localmisc.h>
 
+#include	"maintqotd.h"
 #include	"openqotd.h"
 
 
@@ -221,6 +224,7 @@ static int	mkqfname(char *,cchar *, cchar *,int,cchar *,int) noex ;
 extern "C" {
     static void	openqotd_atforkbefore() noex ;
     static void	openqotd_atforkafter() noex ;
+    static void	openqotd_exit() noex ;
 }
 
 
@@ -245,7 +249,7 @@ int openqotd_init() noex {
 	    	    void_f	b = openqotd_atforkbefore ;
 	    	    void_f	a = openqotd_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
-	                if ((rs = uc_atexit(openqotd_fini)) >= 0) {
+	                if ((rs = uc_atexit(openqotd_exit)) >= 0) {
 	                    rs = 0 ;
 	                    uip->f_initdone = true ;
 	                }
@@ -437,6 +441,14 @@ static void openqotd_atforkafter() noex {
 }
 /* end subroutine (openqotd_atforkafter) */
 
+static void openqotd_exit() noex {
+	cint		rs = openqotd_fini() ;
+	if (rs < 0) {
+	    ulogerror("openqotd",rs,"exit-fini") ;
+	}
+}
+/* end subroutine (openqotd_exit) */
+
 static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	int		rs ;
 	int		rs1 ;
@@ -523,11 +535,11 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 
 /* ARGSUSED */
 static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
-	const mode_t	om = 0664 ;
 	int		rs ;
 	int		rs1 ;
 	int		lof = of ;
 	int		fd = -1 ;
+	cmode		om = 0664 ;
 	lof &= (~ O_ACCMODE) ;
 	lof &= (~ O_TRUNC) ;
 	lof &= (~ O_EXCL) ;
@@ -541,7 +553,7 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	                cint	cmd = F_WLOCK ;
 	                if ((rs = lockfile(fd,cmd,0L,0L,to)) >= 0) {
 	                    if ((rs = uc_fsize(fd)) == 0) {
-	                        if ((rs = maintqotd(pr,mjd,of,to)) >= 0) {
+	                        if ((rs = maintqotd(pr,mjd,of,ttl)) >= 0) {
 	                            cint	s = rs ;
 	                            if ((rs = uc_writedesc(fd,s,-1)) >= 0) {
 	                                if ((rs = u_rewind(fd)) >= 0) {

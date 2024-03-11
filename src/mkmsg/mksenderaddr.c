@@ -1,12 +1,10 @@
-/* mksenderaddr */
+/* pimksenderaddr SUPPORT */
+/* lang=C++20 */
 
 /* create a mail SENDER-address */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* not-switchable debug print-outs */
-#define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_SENDERNAME	1		/* add a sender name */
-
 
 /* revision history:
 
@@ -19,34 +17,30 @@
 
 /*******************************************************************************
 
+	Name:
+	pimksenderaddr
+
+	Description:
 	This subroutine creates a mail SENDER-address (if we can).
 
 	Synopsis:
-
-	int mksenderaddr(pip)
-	PROGINFO	*pip ;
+	int pimksenderaddr(PROGINFO *pip) noex
 
 	Arguments:
-
 	pip		pointer to program information
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<ascii.h>
@@ -81,7 +75,9 @@
 
 /* external subroutines */
 
-extern int	mkfromname(PROGINFO *) ;
+extern "C" {
+    extern int	pimkfromname(PROGINFO *) noex ;
+}
 
 
 /* local structures */
@@ -89,20 +85,20 @@ extern int	mkfromname(PROGINFO *) ;
 
 /* forward references */
 
-static int	loadsender(PROGINFO *) ;
+static int	piloadsender(PROGINFO *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mksenderaddr(PROGINFO *pip)
-{
+int pimksenderaddr(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		rl = 0 ;
-
 	if (! pip->f.init_sender) {
 	    pip->f.init_sender = TRUE ;
 	    if (pip->hdr_sender == NULL) {
@@ -114,7 +110,7 @@ int mksenderaddr(PROGINFO *pip)
 	            }
 	        }
 	        if (pip->hdr_sender == NULL) {
-	            rs = loadsender(pip) ;
+	            rs = piloadsender(pip) ;
 		    rl = rs ;
 	        }
 	    }
@@ -123,24 +119,15 @@ int mksenderaddr(PROGINFO *pip)
 		rl = strlen(pip->hdr_sender) ;
 	    }
 	}
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("mksenderaddr: ret rs=%d sender=>%s<\n",
-	        rs,pip->hdr_sender) ;
-#endif
-
 	return (rs >= 0) ? rl : rs ;
 }
-/* end subroutine (mksenderaddr) */
+/* end subroutine (pimksenderaddr) */
 
 
 /* local subroutines */
 
-
-static int loadsender(PROGINFO *pip)
-{
-	BUFFER		b ;
+static int piloadsender(PROGINFO *pip) noex {
+	buffer		b ;
 	int		rs ;
 	int		rs1 ;
 	int		bl = 0 ;
@@ -177,6 +164,6 @@ static int loadsender(PROGINFO *pip)
 	} /* end if (buffer) */
 	return (rs >= 0) ? bl : rs ;
 }
-/* end subroutine (loadsender) */
+/* end subroutine (piloadsender) */
 
 

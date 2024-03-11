@@ -1,19 +1,17 @@
-/* progquery */
+/* progquery SUPPORT */
+/* lang=C++20 */
 
 /* make a query */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG 	0		/* run-time debug print-outs */
 #define	CF_READSTDIN	0		/* read STDIN failing arguments */
 
-
 /* revision history:
 
 	= 1994-03-01, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -21,10 +19,13 @@
 
 /*******************************************************************************
 
+	Name:
+	progquery
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
 	int progquery(pip,aip,terms,dbname,ofname)
 	PROGINFO	*pip ;
 	ARGINFO		*aip ;
@@ -33,29 +34,22 @@
 	char		ofname[] ;
 
 	Arguments:
-
 	- pip		program information pointer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -76,38 +70,38 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfcasesub(const char *,int,const char *,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	mkexpandpath(char *,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfcasesub(cchar *,int,cchar *,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	mkexpandpath(char *,cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	vecstr_adds(vecstr *,cchar *,int) ;
 extern int	field_wordphrase(FIELD *,const uchar *,char *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern int	progexit(PROGINFO *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -147,8 +141,8 @@ int progquery(pip,aip,terms,dbname,ofname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 const uchar	terms[] ;
-const char	dbname[] ;
-const char	ofname[] ;
+cchar	dbname[] ;
+cchar	ofname[] ;
 {
 	bfile		ofile, *ofp = &ofile ;
 	int		rs ;
@@ -202,7 +196,7 @@ static int procdb(pip,aip,ofp,dbname)
 PROGINFO	*pip ;
 ARGINFO		*aip ;
 bfile		*ofp ;
-const char	dbname[] ;
+cchar	dbname[] ;
 {
 	TEXTLOOK	tl, *tlp = &tl ;
 	vecstr		qstr ;
@@ -215,8 +209,8 @@ const char	dbname[] ;
 	int		f ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
-	const char	*afname = aip->afname ;
-	const char	*cp ;
+	cchar	*afname = aip->afname ;
+	cchar	*cp ;
 	char		tmpfname[MAXPATHLEN+1] ;
 
 	rs = mkexpandpath(tmpfname,dbname,-1) ;
@@ -360,7 +354,7 @@ static int procspecs(pip,ofp,tlp,sp,sl)
 PROGINFO	*pip ;
 bfile		*ofp ;
 TEXTLOOK	*tlp ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	VECSTR		qstr ;
@@ -427,7 +421,7 @@ vecstr		*qsp ;
 	int		ntags ;
 	int		qopts = 0 ;
 	int		c = 0 ;
-	const char	**qkeya ;
+	cchar	**qkeya ;
 
 	if (qsp == NULL) return SR_FAULT ;
 
@@ -488,8 +482,8 @@ TEXTLOOK_TAG	*tagp ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;
-	const char	*fmt ;
-	const char	*fn ;
+	cchar	*fmt ;
+	cchar	*fn ;
 	char		obuf[OUTBUFLEN + 1] ;
 
 	if (pip == NULL) return SR_FAULT ;
