@@ -1,6 +1,8 @@
-/* pwentry */
+/* pwentry HEADER */
+/* lang=C20 */
 
 /* PW-ENTRY object and interface */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -23,11 +25,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<localmisc.h>		/* unsigned types */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 #ifndef	PWENTRY
-#define	PWENTRY		struct pwentry
+#define	PWENTRY		struct pwentry_head
 #endif
 
 #ifdef	_SC_GETPW_R_SIZE_MAX
@@ -37,27 +42,27 @@
 #endif
 
 
-struct pwentry {
-	const char	*username ;
-	const char	*password ;
-	const char	*gecos ;
-	const char	*dir ;
-	const char	*shell ;
-	const char	*organization ;
-	const char	*realname ;
-	const char	*account ;
-	const char	*bin ;
-	const char	*name_f ;
-	const char	*name_m1 ;
-	const char	*name_m2 ;
-	const char	*name_l ;
-	const char	*office ;
-	const char	*wphone ;
-	const char	*hphone ;
-	const char	*printer ;
+struct pwentry_head {
+	cchar		*username ;
+	cchar		*password ;
+	cchar		*gecos ;
+	cchar		*dir ;
+	cchar		*shell ;
+	cchar		*organization ;
+	cchar		*realname ;
+	cchar		*account ;
+	cchar		*bin ;
+	cchar		*name_f ;
+	cchar		*name_m1 ;
+	cchar		*name_m2 ;
+	cchar		*name_l ;
+	cchar		*office ;
+	cchar		*wphone ;
+	cchar		*hphone ;
+	cchar		*printer ;
 	long		lstchg ;	/* password lastchanged date */
-	long		min ;		/* min days between password changes */
-	long		max ;		/* max days password is valid */
+	long		daymin ;	/* min days between password changes */
+	long		daymax ;	/* max days password is valid */
 	long		warn ;		/* days to warn user to change passwd */
 	long		inact ;		/* days the login may be inactive */
 	long		expire ;	/* login expiration date */
@@ -66,21 +71,14 @@ struct pwentry {
 	gid_t		gid ;
 } ;
 
+typedef PWENTRY		pwentry ;
 
-#if	(! defined(PWENTRY_MASTER)) || (PWENTRY_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 extern int	pwentry_bufsize(void) noex ;
 extern int	getpwentrybufsize(void) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PWENTRY_MASTER */
+EXTERNC_end
 
 
 #endif /* PWENTRY_INCLUDE */

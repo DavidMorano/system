@@ -1,21 +1,21 @@
-/* getgid HEADER */
+/* getmailgid HEADER */
 /* lang=C20 */
 
-/* get the GID for a given group-name */
+/* get the mail-spool-area GID */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-08-20, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services.
+	This was written to collect this code into one subroutine.
 
 */
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETGID_INCLUDE
-#define	GETGID_INCLUDE
+#ifndef	GETMAILGID_INCLUDE
+#define	GETMAILGID_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,13 +26,11 @@
 
 EXTERNC_begin
 
-extern int getgid_name(cchar *,int) noex ;
-extern int getgid_group(cchar *,int) noex ;
-extern int getgid_def(cchar *,gid_t) noex ;
+extern int	getmailgid(cchar *,gid_t) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETGID_INCLUDE */
+#endif /* GETMAILGID_INCLUDE */
 
 

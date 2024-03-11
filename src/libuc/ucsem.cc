@@ -44,7 +44,7 @@
 #include	<usupport.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
-#include	<getgid.h>
+#include	<getxid.h>
 #include	<mkpathx.h>
 #include	<sncpyx.h>
 #include	<strwcpy.h>

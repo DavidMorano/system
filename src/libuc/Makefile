@@ -1142,7 +1142,10 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
-# UTILITY
+# TILITY
+pwentry.o:		pwentry.cc pwentry.h
+ids.o:			ids.cc ids.h
+groupids.o:		groupids.cc groupids.hh
 base64.o:		base64.cc base64.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h
@@ -1157,8 +1160,6 @@ getuserorg.o:		getuserorg.cc getuserorg.h
 getourenv.o:		getourenv.cc getourenv.h
 getaddr.o:		getaddr.cc getaddr.h
 inetaddrparse.o:	inetaddrparse.cc inetaddrparse.h
-ids.o:			ids.cc ids.h
-groupids.o:		groupids.cc groupids.hh
 readln.o:		readln.cc readln.hh
 strlibval.o:		strlibval.cc strlibval.hh
 strenv.o:		strenv.cc strenv.hh

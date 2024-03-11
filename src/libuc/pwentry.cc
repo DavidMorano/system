@@ -1,4 +1,5 @@
-/* pwentry */
+/* pwentry SUPPORT */
+/* lang=C++20 */
 
 /* some miscellaneous PWENTRY subroutines */
 /* version %I% last-modified %G% */
@@ -23,7 +24,7 @@
 	object.
 
 	Synopsis:
-	int getpwentrybufsize(void)
+	int getpwentrybufsize(void) noex
 
 	Arguments:
 	-
@@ -33,12 +34,7 @@
 			a PWENTRY object
 	<0		error (yes, due to error from |getbufsize(3uc)|).
 
-
 *******************************************************************************/
-
-
-#define	PWENTRY_MASTER	0
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -65,6 +61,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

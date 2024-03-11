@@ -1,10 +1,8 @@
-/* pwfile */
+/* pwfile SUPPORT */
+/* lang=C++20 */
 
 /* open a 'passwd' formatted file for access */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,35 +16,30 @@
 
 /*******************************************************************************
 
-	This module manipulates passsword records in a 'passwd' type file.
-
-	No, it is not particularly pretty but such is life often times!
-
+	This module manipulates passsword records in a 'passwd'
+	type file.  No, it is not particularly pretty but such is
+	life often times!
 
 *******************************************************************************/
 
-
-#define	PWFILE_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
-
 #include	<usystem.h>
+#include	<usupport.h>
+#include	<mallocxx.h>
+#include	<pwentry.h>
+#include	<gecos.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<storeitem.h>
-#include	<gecos.h>
-#include	<pwentry.h>
 #include	<mallocstuff.h>
 #include	<localmisc.h>
 
@@ -74,19 +67,13 @@
 #endif
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	snwcpyhyphen(char *,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecl(const char *,int,long *) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -103,25 +90,26 @@ static int	pwfile_filefront(PWFILE *) ;
 static int	pwfile_filefronter(PWFILE *) ;
 static int	pwfile_fileback(PWFILE *) ;
 
-static int	pwentry_start(PWENTRY *) ;
-static int	pwentry_finish(PWENTRY *) ;
-static int	pwentry_fieldpw(PWENTRY *,int,const char *,int) ;
-static int	pwentry_mkextras(PWENTRY *) ;
-static int	pwentry_mkcopy(PWENTRY *,PWENTRY *,char *,int) ;
+static int	pwentry_start(pwentry *) noex ;
+static int	pwentry_finish(pwentry *) noex ;
+static int	pwentry_fieldpw(pwentry *,int,cchar *,int) noex ;
+static int	pwentry_mkextras(pwentry *) noex ;
+static int	pwentry_mkcopy(pwentry *,pwentry *,char *,int) noex ;
 
-static int	loaditem(const char **,const char *,int) ;
+static int	loaditem(cchar **,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pwfile_open(PWFILE *dbp,cchar *pwfname)
-{
+int pwfile_open(PWFILE *dbp,cchar *pwfname) noex {
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if (dbp == NULL) return SR_FAULT ;
 	if (pwfname == NULL) return SR_FAULT ;
@@ -132,7 +120,7 @@ int pwfile_open(PWFILE *dbp,cchar *pwfname)
 	    dbp->fname = cp ;
 	    dbp->lfd = -1 ;
 	    if ((rs = pwfile_loadbegin(dbp)) >= 0) {
-	        memset(&dbp->f,0,sizeof(struct pwfile_flags)) ;
+	        dbp->f = {} ;
 	        dbp->magic = PWFILE_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -145,10 +133,7 @@ int pwfile_open(PWFILE *dbp,cchar *pwfname)
 }
 /* end subroutine (pwfile_open) */
 
-
-/* close the file */
-int pwfile_close(PWFILE *dbp)
-{
+int pwfile_close(PWFILE *dbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -176,54 +161,28 @@ int pwfile_close(PWFILE *dbp)
 }
 /* end subroutine (pwfile_close) */
 
-
-/* enumerate the entries */
-int pwfile_enum(PWFILE *dbp,PWFILE_CUR *curp,PWENTRY *uep,char *rbuf,int rlen)
-{
-	PWENTRY		*ep ;
+int pwfile_enum(PWFILE *dbp,PWFILE_CUR *curp,pwentry *uep,
+		char *rbuf,int rlen) noex {
+	pwentry		*ep ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("pwfile_enum: ent &pe %08lX pebuf %08lX\n",
-	    uep,rbuf) ;
-#endif
 
 	if (dbp == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
 	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("pwfile_enum: about to enum\n") ;
-#endif
-
 	while ((rs = vecitem_get(&dbp->alist,curp->i,&ep)) >= 0) {
-#if	CF_DEBUGS
-	    debugprintf("pwfile_enum: u=%s\n",
-	        (ep != NULL) ? ep->username : "NULL") ;
-#endif
 	    curp->i += 1 ;
 	    if (ep != NULL) break ;
 	} /* end while */
 
 /* load up the user's structure with the information from our internal one */
 
-#if	CF_DEBUGS
-	debugprintf("pwfile_enum: getcopy buflen=%d u=%s\n",
-	    buflen,ep->username) ;
-	uep->username = (char *) 0x5a5a5a5a ;
-#endif
-
 	if (rs >= 0) {
 	    rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
 	} else if (rs == SR_NOTFOUND) {
 	    rs = SR_OK ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("pwfile_enum: &username %08lX\n",uep->username) ;
-	debugprintf("pwfile_enum: ret rs=%d u=%s\n",rs,uep->username) ;
-#endif
 
 	return rs ;
 }
@@ -233,18 +192,14 @@ int pwfile_enum(PWFILE *dbp,PWFILE_CUR *curp,PWENTRY *uep,char *rbuf,int rlen)
 /* fetch the next entry that matches the specified username */
 int pwfile_fetchuser(dbp,username,curp,uep,rbuf,rlen)
 PWFILE		*dbp ;
-const char	username[] ;
+cchar	username[] ;
 PWFILE_CUR	*curp ;
-PWENTRY		*uep ;
+pwentry		*uep ;
 char		rbuf[] ;
 int		rlen ;
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("pwfile_fetchuser: ent w/ \"%s\"\n",username) ;
-#endif
 
 	if (dbp == NULL) return SR_FAULT ;
 	if (username == NULL) return SR_FAULT ;
@@ -275,26 +230,11 @@ int		rlen ;
 	    key.buf = (char *) username ;
 	    key.len = strlen(username) ;
 
-#if	CF_DEBUGS
-	    debugprintf("pwfile_fetchuser: about to fetch\n") ;
-#endif
-
 	    if ((rs = hdb_fetch(&dbp->byuser,key,hcurp,&val)) >= 0) {
 
-#if	CF_DEBUGS
-	        debugprintf("pwfile_fetchuser: fetched rs=%d\n",rs) ;
-#endif
-
 	        if (uep != NULL) {
-	            PWENTRY	*ep = (PWENTRY *) val.buf ;
-
-#if	CF_DEBUGS
-	            debugprintf("pwfile_fetchuser: &pe %08lX\n",ep) ;
-	            debugprintf("pwfile_fetchuser: u=%s\n",ep->username) ;
-#endif
-
+	            pwentry	*ep = (pwentry *) val.buf ;
 	            rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
-
 	        }
 	    } /* end if (hdb_fetch) */
 
@@ -304,12 +244,9 @@ int		rlen ;
 }
 /* end subroutine (pwfile_fetchuser) */
 
-
-/* initialize a cursor for the DB */
-int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp)
-{
+int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp) noex {
 	int		rs ;
-	int		f_locked = FALSE ;
+	bool		f_locked = FALSE ;
 
 	if (dbp == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -358,10 +295,7 @@ int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp)
 }
 /* end subroutine (pwfile_curbegin) */
 
-
-/* free up a cursor for the DB */
-int pwfile_curend(PWFILE *dbp,PWFILE_CUR *curp)
-{
+int pwfile_curend(PWFILE *dbp,PWFILE_CUR *curp) noex {
 	int		rs ;
 
 	if (dbp == NULL) return SR_FAULT ;
@@ -382,10 +316,7 @@ int pwfile_curend(PWFILE *dbp,PWFILE_CUR *curp)
 }
 /* end subroutine (pwfile_curend) */
 
-
-/* lock the DB for read or update */
-int pwfile_lock(PWFILE *dbp,int type,int to_lock)
-{
+int pwfile_lock(PWFILE *dbp,int type,int to_lock) noex {
 	int		rs = SR_OK ;
 	int		f_opened = FALSE ;
 
@@ -449,30 +380,23 @@ int pwfile_lock(PWFILE *dbp,int type,int to_lock)
 
 /* private subroutines */
 
-
-/* load up the database */
-static int pwfile_loadbegin(PWFILE *dbp)
-{
+static int pwfile_loadbegin(PWFILE *dbp) noex {
 	int		rs ;
 	int		n = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("pwfile_loadbegin: ent\n") ;
-#endif
 
 	if ((rs = pwfile_filefront(dbp)) >= 0) {
 	    HDB_DATUM	key, val ;
 	    n = rs ;
 	    if ((rs = hdb_start(&dbp->byuser,n,0,NULL,NULL)) >= 0) {
-	        VECITEM	*alp = &dbp->alist ;
-	        PWENTRY	*ep ;
+	        vecitem	*alp = &dbp->alist ;
+	        pwentry	*ep ;
 	        int	i ;
 	        for (i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
 	            if (ep != NULL) {
 	                key.buf = ep->username ;
 	                key.len = strlen(ep->username) ;
 	                val.buf = ep ;
-	                val.len = sizeof(PWENTRY) ;
+	                val.len = sizeof(pwentry) ;
 	                rs = hdb_store(&dbp->byuser,key,val) ;
 	            }
 	            if (rs < 0) break ;
@@ -486,18 +410,11 @@ static int pwfile_loadbegin(PWFILE *dbp)
 	    }
 	} /* end if (pwfile_filefront) */
 
-#if	CF_DEBUGS
-	debugprintf("pwfile_loadbegin: ret rs=%d n=%d\n",rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_loadbegin) */
 
-
-/* unload the data-base */
-static int pwfile_loadend(PWFILE *dbp)
-{
+static int pwfile_loadend(PWFILE *dbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -511,22 +428,15 @@ static int pwfile_loadend(PWFILE *dbp)
 }
 /* end subroutine (pwfile_loadend) */
 
-
-/* load the contents of the file into the appropriate structures */
-static int pwfile_filefront(PWFILE *dbp)
-{
+static int pwfile_filefront(PWFILE *dbp) noex {
 	USTAT		sb ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("pwfile_filefront: ent\n") ;
-#endif
 
 	if (dbp->fname[0] == '\0') return SR_NOENTRY ;
 
 	if ((rs = uc_stat(dbp->fname,&sb)) >= 0) {
-	    VECITEM	*alp = &dbp->alist ;
-	    const int	vo = VECITEM_PNOHOLES ;
+	    vecitem	*alp = &dbp->alist ;
+	    const int	vo = vecitem_PNOHOLES ;
 	    int		n = ((sb.st_size / 60) + 5) ;
 	    if (n < DEFENTRIES) n = DEFENTRIES ;
 	    if ((rs = vecitem_start(alp,n,vo)) >= 0) {
@@ -541,9 +451,7 @@ static int pwfile_filefront(PWFILE *dbp)
 }
 /* end subroutine (pwfile_filefront) */
 
-
-static int pwfile_filefronter(PWFILE *dbp)
-{
+static int pwfile_filefronter(PWFILE *dbp) noex {
 	bfile		pwfile, *fp = &pwfile ;
 	int		rs ;
 	int		rs1 ;
@@ -554,7 +462,7 @@ static int pwfile_filefronter(PWFILE *dbp)
 	        rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	    }
 	    if (rs >= 0) {
-	        PWENTRY		entry ;
+	        pwentry		entry ;
 	        const int	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN+1] ;
@@ -564,20 +472,11 @@ static int pwfile_filefronter(PWFILE *dbp)
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
 	            lbuf[len] = '\0' ;
 
-#if	CF_DEBUGS
-	            debugprintf("pwfile_filefront: read> %t\n",lbuf,len) ;
-#endif
-
 	            if ((rs = pwentry_start(&entry)) >= 0) {
 	                int		fn = 0 ;
 	                cchar		*tp ;
 	                cchar		*cp = lbuf ;
 	                while ((tp = strchr(cp,':')) != NULL) {
-
-#if	CF_DEBUGS
-	                    debugprintf("pwfile_filefront: %02d field> %t\n",
-	                        fn,cp,(tp - cp)) ;
-#endif
 
 	                    rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
 
@@ -591,25 +490,16 @@ static int pwfile_filefronter(PWFILE *dbp)
 	                    rs = pwentry_fieldpw(&entry,fn,cp,-1) ;
 	                }
 
-#if	CF_DEBUGS
-	                debugprintf("pwfile_filefront: created entry u=%s\n",
-	                    entry.username) ;
-#endif
-
 /* make any extras fields that we want */
 
 	                if (rs >= 0) {
 	                    rs = pwentry_mkextras(&entry) ;
-#if	CF_DEBUGS
-	                    debugprintf("pwfile_filefront: "
-	                        "pwentry_mkextras() rs=%d\n",rs) ;
-#endif
 	                }
 
 /* add the entry to our list */
 
 	                if (rs >= 0) {
-	                    const int	esize = sizeof(PWENTRY) ;
+	                    const int	esize = sizeof(pwentry) ;
 	                    n += 1 ;
 	                    rs = vecitem_add(&dbp->alist,&entry,esize) ;
 	                }
@@ -628,36 +518,25 @@ static int pwfile_filefronter(PWFILE *dbp)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
 
-#if	CF_DEBUGS
-	debugprintf("pwfile_filefront: ret rs=%d n=%d\n",rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_filefronter) */
 
-
-/* free up the resources occupied by loading of the file */
-static int pwfile_fileback(PWFILE *dbp)
-{
-	VECITEM		*alp = &dbp->alist ;
-	PWENTRY		*ep ;
+static int pwfile_fileback(PWFILE *dbp) noex {
+	vecitem		*alp = &dbp->alist ;
+	pwentry		*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	for (int i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
+	    if (ep) {
 	        rs1 = pwentry_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end for */
-
-/* free up the container object itself */
-
-	rs1 = vecitem_finish(alp) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = vecitem_finish(alp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (pwfile_fileback) */
@@ -729,10 +608,10 @@ d.a.morano:
 
 
 /* initialize a 'passwd' entry */
-static int pwentry_start(PWENTRY *ep)
+static int pwentry_start(pwentry *ep)
 {
 
-	memset(ep,0,sizeof(PWENTRY)) ;
+	memclear(ep) ;
 	ep->lstchg = -1 ;
 
 	return SR_OK ;
@@ -740,18 +619,10 @@ static int pwentry_start(PWENTRY *ep)
 /* end subroutine (pwentry_start) */
 
 
-static int pwentry_fieldpw(PWENTRY *ep,int fn,cchar *s,int slen)
-{
+static int pwentry_fieldpw(pwentry *ep,int fn,cchar *s,int slen) noex {
 	int		v ;
-	const char	*mp = NULL ;
-
-	if (slen < 0)
-	    slen = strlen(s) ;
-
-#if	CF_DEBUGS
-	debugprintf("pwentry_field: %02d %t\n",fn,s,slen) ;
-#endif
-
+	cchar		*mp = NULL ;
+	if (slen < 0) slen = strlen(s) ;
 	switch (fn) {
 	case 0:
 	    ep->username = mp = mallocstrw(s,slen) ;
@@ -816,34 +687,22 @@ static int pwentry_fieldpw(PWENTRY *ep,int fn,cchar *s,int slen)
 	    mp = s ;
 	    break ;
 	} /* end switch */
-
 	return ((mp == NULL) ? SR_NOMEM : SR_OK) ;
 }
 /* end subroutine (pwentry_fieldpw) */
 
-
-/* make the extra entries that we have all grown accustomed to */
-static int pwentry_mkextras(PWENTRY *ep)
-{
+static int pwentry_mkextras(pwentry *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (ep->gecos != NULL) {
 	    GECOS	g ;
 	    if ((rs = gecos_start(&g,ep->gecos,-1)) >= 0) {
-	        int	i ;
-	        int	vl ;
-	        cchar	*vp ;
-	        for (i = 0 ; i < gecosval_overlast ; i += 1) {
-	            if ((vl = gecos_getval(&g,i,&vp)) >= 0) {
+	        for (int i = 0 ; i < gecosval_overlast ; i += 1) {
+	            cchar	*vp{} ;
+	            if (int vl ; (vl = gecos_getval(&g,i,&vp)) >= 0) {
 	                if (vp != NULL) {
 	                    void	*p ;
-
-#if	CF_DEBUGS
-	                    debugprintf("pwfile/pwentry_mkextras: "
-	                        "i=%d v=>%t<\n",
-	                        i,vp,strlinelen(vp,vl,40)) ;
-#endif
 	                    switch (i) {
 	                    case gecosval_organization:
 	                        rs = loaditem(&ep->organization,vp,vl) ;
@@ -896,17 +755,13 @@ static int pwentry_mkextras(PWENTRY *ep)
 
 
 /* load a user entry from an internal one */
-static int pwentry_mkcopy(PWENTRY *ep,PWENTRY *uep,char *rbuf,int rlen)
+static int pwentry_mkcopy(pwentry *ep,pwentry *uep,char *rbuf,int rlen)
 {
 	STOREITEM	ubuf ;
 	int		rs ;
 	int		len = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("pwfile_getcopy: ent, &pe %08lX buflen=%d\n",uep,rlen) ;
-#endif
-
-	memcpy(uep,ep,sizeof(PWENTRY)) ;
+	memcpy(uep,ep,sizeof(pwentry)) ;
 
 	if ((rs = storeitem_start(&ubuf,rbuf,rlen)) >= 0) {
 
@@ -967,20 +822,11 @@ static int pwentry_mkcopy(PWENTRY *ep,PWENTRY *uep,char *rbuf,int rlen)
 	    if (rs >= 0) rs = len ;
 	} /* end if (storeitem) */
 
-#if	CF_DEBUGS
-	debugprintf("pwfile_getcopy: ret &username %08lX u=%s\n",
-	    uep->username,uep->username) ;
-	debugprintf("pwfile_getcopy: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (pwentry_mkcopy) */
 
-
-/* free up a 'passwd' entry */
-static int pwentry_finish(PWENTRY *ep)
-{
+static int pwentry_finish(pwentry *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1057,25 +903,17 @@ static int pwentry_finish(PWENTRY *ep)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	memset(ep,0,sizeof(PWENTRY)) ;
+	memset(ep,0,sizeof(pwentry)) ;
 
 	return rs ;
 }
 /* end subroutine (pwentry_finish) */
 
-
-static int loaditem(cchar **rpp,cchar *vp,int vl)
-{
+static int loaditem(cchar **rpp,cchar *vp,int vl) noex {
 	int		rs = SR_FAULT ;
-
-	if (vp != NULL) {
+	if (vp) {
 	    rs = uc_mallocstrw(vp,vl,rpp) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("pwfile/loaditem: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (loaditem) */
