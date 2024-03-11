@@ -122,7 +122,7 @@
 #include	<netdb.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
-#include	<usystem.h>
+#include	<usupport.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ptm.h>
@@ -131,6 +131,9 @@
 #include	<storebuf.h>
 #include	<vecpstr.h>
 #include	<fsdir.h>
+#include	<pathadd.h>
+#include	<sfx.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"openqotd.h"
@@ -231,8 +234,8 @@ int openqotd_init() noex {
 	int		rs = 1 ;
 	if (! uip->f_init) {
 	    uip->f_init = true ;
-	    if ((rs = ptm_create(&uip->m,NULL)) >= 0) {
-	        if ((rs = ptc_create(&uip->c,NULL)) >= 0) {
+	    if ((rs = ptm_create(&uip->m,nullptr)) >= 0) {
+	        if ((rs = ptc_create(&uip->c,nullptr)) >= 0) {
 	    	    void	(*b)() = openqotd_atforkbefore ;
 	    	    void	(*a)() = openqotd_atforkafter ;
 	            if ((rs = uc_atfork(b,a,a)) >= 0) {
@@ -295,10 +298,10 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	cchar		*qcname = QCNAME ;
 	char		qfname[MAXPATHLEN+1] ;
 
-	if (pr == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (mjd <= 0) {
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    rs = getdefmjd(dt) ;
 	    mjd = rs ;
 	}
@@ -311,7 +314,7 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	        cchar	*cn = qcname ;
 
 	        if (of & O_EXCL) {
-	            if (dt == 0) dt = time(NULL) ;
+	            if (dt == 0) dt = time(nullptr) ;
 	            rs = qotdexpire(vtd,rnp,rnl,cn,dt,to) ;
 	        }
 
@@ -410,7 +413,7 @@ static int openqotd_open(OPENQOTD_SUB *sip) noex {
 	    cchar	*qfname = sip->qfname ;
 	    cchar	*vtmpdname = sip->vtmpdname ;
 	    cchar	*qcname = sip->qcname ;
-	    char	*qdname[MAXPATHLEN+1] ;
+	    char	*qdname{} ;
 	    if ((rs = malloc_mp(&qdname)) >= 0) {
 	        if ((rs = prmktmpdir(pr,qdname,vtmpdname,qcname,dm)) >= 0) {
 	            cint	mjd = sip->mjd ;
@@ -439,13 +442,13 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	        if (S_ISDIR(sb.st_mode)) {
 	            cint	n = (sb.st_size / 10) ;
 	            cint	cs = (sb.st_size / 4) ;
-	            VECPSTR	ds ;
+	            vecpstr	ds ;
 	            if ((rs = vecpstr_start(&ds,n,cs,0)) >= 0) {
 	                if ((rs = qotdexpireload(&ds,qdname,dt,to)) > 0) {
 			    auto	vg = vecpstr_get ;
 	                    cchar	*fn ;
 	                    for (int i = 0 ; vg(&ds,i,&fn) >= 0 ; i += 1) {
-	                        if (fn == NULL) continue ;
+	                        if (fn == nullptr) continue ;
 	                        rs1 = u_unlink(fn) ;
 	                        if (rs1 >= 0) c += 1 ;
 	                    } /* end for */
@@ -462,35 +465,43 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 /* end subroutine (qotdexpire) */
 
 static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
-	FSDIR		d ;
-	FSDIR_ENT	de ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = fsdir_open(&d,qfname)) >= 0) {
-	    USTAT	sb ;
-	    cint	dlen = strlen(qfname) ;
-	    while ((rs = fsdir_read(&d,&de)) > 0) {
-	        cint	el = rs ;
-	        cchar	*ep = de.name ;
-	        if (hasNotDots(ep,el)) {
-	            if ((rs = pathadd(qfname,dlen,ep)) >= 0) {
-	                cint	fl = rs ;
-	                if (u_stat(qfname,&sb) >= 0) {
-	                    if (S_ISREG(sb.st_mode)) {
-
-	                        if ((dt-sb.st_mtime) >= to) {
-	                            c += 1 ;
-	                            rs = vecpstr_add(dsp,qfname,fl) ;
-	                        } /* end if (expired) */
-	                    } /* end if (regular file) */
-	                } /* end if (stat) */
-	            } /* end if (pathadd) */
-	        } /* end if (hasNotDots) */
-	        if (rs < 0) break ;
-	    } /* end while (fsdir_read) */
-	    qfname[dlen] = '\0' ;
-	    fsdir_close(&d) ;
-	} /* end if (fsdir) */
+	char		*ebuf{} ;
+	if ((rs = malloc_mn(&ebuf)) >= 0) {
+	    fsdir	d ;
+	    fsdir_ent	de ;
+	    cint	elen = rs ;
+	    if ((rs = fsdir_open(&d,qfname)) >= 0) {
+	        USTAT	sb ;
+	        cint	dlen = strlen(qfname) ;
+	        while ((rs = fsdir_read(&d,&de,ebuf,elen)) > 0) {
+	            cint	el = rs ;
+	            cchar	*ep = de.name ;
+	            if (hasNotDots(ep,el)) {
+	                if ((rs = pathadd(qfname,dlen,ep)) >= 0) {
+	                    cint	fl = rs ;
+	                    if (u_stat(qfname,&sb) >= 0) {
+	                        if (S_ISREG(sb.st_mode)) {
+    
+	                            if ((dt-sb.st_mtime) >= to) {
+	                                c += 1 ;
+	                                rs = vecpstr_add(dsp,qfname,fl) ;
+	                            } /* end if (expired) */
+	                        } /* end if (regular file) */
+	                    } /* end if (stat) */
+	                } /* end if (pathadd) */
+	            } /* end if (hasNotDots) */
+	            if (rs < 0) break ;
+	        } /* end while (fsdir_read) */
+	        qfname[dlen] = '\0' ;
+	        rs1 = fsdir_close(&d) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (fsdir) */
+	    rs1 = uc_free(ebuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (qotdexpireload) */
@@ -510,7 +521,7 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	    fd = rs ;
 	    if ((rs = uc_fminmod(fd,om)) >= 0) {
 	        if ((rs = openqotd_init()) >= 0) {
-	            cint	to = (5*60) ;
+	            cint	to = utimeout[uto_busy] ;
 	            if ((rs = openqotd_capbegin(to)) >= 0) {
 	                cint	cmd = F_WLOCK ;
 	                if ((rs = lockfile(fd,cmd,0L,0L,to)) >= 0) {
@@ -522,7 +533,8 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	                                    rs = loadchown(pr,fd) ;
 					}
 	                            }
-	                            u_close(s) ;
+	                            rs1 = u_close(s) ;
+	                    	    if (rs >= 0) rs = rs1 ;
 	                        } /* end if (maintqotd) */
 	                    } /* end if (file-size-is-zero) */
 	                    rs1 = uc_lockf(fd,F_ULOCK,0L) ;
@@ -573,7 +585,7 @@ static int loadchown(cchar *pr,int fd) noex {
 static int getdefmjd(time_t dt) noex {
 	TMTIME		ct ;
 	int		rs ;
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 	if ((rs = tmtime_localtime(&ct,dt)) >= 0) {
 	    int	y = (ct.year + TM_YEAR_BASE) ;
 	    int	m = ct.mon ;

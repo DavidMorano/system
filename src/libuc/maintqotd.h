@@ -1,20 +1,21 @@
-/* maintqotd (include-header) */
+/* maintqotd HEADER */
+/* lang=C20 */
+
+/* maintenance of the QOTD facility */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	MAINTQOTD_INCLUDE
-#define	MAINTQOTD_INCLUDE	1
+#define	MAINTQOTD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -52,21 +53,20 @@ struct maintqotd_head {
 	vecpstr		sources ;
 	MAINTQOTD_FL	f, have, changed, final ;
 	MAINTQOTD_FL	open ;
-	IDS		id ;
-	const char	*pr ;
-	const char	*pn ;		/* program-name */
-	const char	*sn ;		/* search-name */
-	const char	*nn ;		/* node-name */
-	const char	*dn ;		/* domain-name */
-	const char	*un ;		/* user-name */
-	const char	*logid ;	/* log-ID */
-	const char	*lfname ;	/* log file-name */
-	const char	*hostname ;
-	const char	*spooldname ;	/* spool directory */
-	const char	*qdname ;	/* particular quote directory */
+	ids		id ;
+	cchar		*pr ;
+	cchar		*pn ;		/* program-name */
+	cchar		*sn ;		/* search-name */
+	cchar		*nn ;		/* node-name */
+	cchar		*dn ;		/* domain-name */
+	cchar		*un ;		/* user-name */
+	cchar		*logid ;	/* log-ID */
+	cchar		*lfname ;	/* log file-name */
+	cchar		*hostname ;
+	cchar		*spooldname ;	/* spool directory */
+	cchar		*qdname ;	/* particular quote directory */
 	void		*config ;	/* configuration state */
 	void		*logsub ;	/* log-file state */
-	mode_t		om ;
 	uid_t		euid ;
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
@@ -75,18 +75,14 @@ struct maintqotd_head {
 	int		to ;
 	int		mjd ;
 	int		logsize ;
+	mode_t		om ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int maintqotd(cchar *,int,int,int) noex ;
 
-int maintqotd(const char *,int,int,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* MAINTQOTD_INCLUDE */

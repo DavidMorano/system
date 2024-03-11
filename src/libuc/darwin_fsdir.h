@@ -48,9 +48,9 @@ struct fsdir_flags {
 } ;
 
 struct fsdir_head {
-	uint		magic ;
-	FSDIR_FL	f ;
 	void		*posixp ;	/* pointer to POSIX® adapater */
+	FSDIR_FL	f ;
+	uint		magic ;
 	int		dfd ;		/* directory file-descriptor */
 } ;
 
