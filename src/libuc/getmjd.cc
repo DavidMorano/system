@@ -95,7 +95,7 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<usystem.h>
 #include	<localmisc.h>
 

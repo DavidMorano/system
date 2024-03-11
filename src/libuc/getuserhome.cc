@@ -108,6 +108,12 @@
 #define	SUBINFO_FL	struct subinfo_flags
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {

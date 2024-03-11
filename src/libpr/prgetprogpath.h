@@ -1,21 +1,21 @@
-/* getmjd HEADER */
+/* prgetprohpath HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* make a temporaty directory for a given program-root */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-04-10, David A­D­ Morano
+	= 1998-06-01, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETMJD_INCLUDE
-#define	GETMJD_INCLUDE
+#ifndef	PRGETPROGPATH_INCLUDE
+#define	PRGETPROGPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,12 +25,11 @@
 
 EXTERNC_begin
 
-extern int	getmjd(int,int,int) noex ;
-extern int	getyrd(int,int,int) noex ;
+extern int	prgetprogpath(cchar *,char *,cchar *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETMJD_INCLUDE */
+#endif /* PRGETPROGPATH_INCLUDE */
 
 
