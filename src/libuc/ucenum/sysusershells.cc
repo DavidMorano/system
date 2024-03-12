@@ -103,13 +103,13 @@ static int sysusershells_magic(sysusershells *op,Args ... args) noex {
 
 /* exported subroutines */
 
-int SYSUSERSHELLS_open(sysusershells *op,cchar *sufname) noex {
-	csize		max = INT_MAX ;
+int sysusershells_open(sysusershells *op,cchar *sufname) noex {
+	csize		nmax = INT_MAX ;
 	int		rs ;
 	cchar		*defufname = SYSUSERSHELLS_FNAME ;
 	if ((rs = sysusershells_ctor(op)) >= 0) {
 	    if (sufname == NULL) sufname = defufname ; /* default */
-	    if ((rs = filemap_open(op->fmp,sufname,O_RDONLY,max)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,O_RDONLY,nmax)) >= 0) {
 	        op->magic = SYSUSERSHELLS_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -138,7 +138,7 @@ int sysusershells_close(sysusershells *op) noex {
 } 
 /* end subroutine (sysusershells_close) */
 
-int SYSUSERSHELLS_readent(sysusershells *op,char *ubuf,int ulen) noex {
+int sysusershells_readent(sysusershells *op,char *ubuf,int ulen) noex {
 	int		rs ;
 	if ((rs = sysusershells_magic(op,ubuf)) >= 0) {
 	    int		ll ;
@@ -156,7 +156,7 @@ int SYSUSERSHELLS_readent(sysusershells *op,char *ubuf,int ulen) noex {
 }
 /* end subroutine (SYSUSERSHELLS_readent) */
 
-int SYSUSERSHELLS_reset(sysusershells *op) noex {
+int sysusershells_reset(sysusershells *op) noex {
 	int		rs ;
 	if ((rs = sysusershells_magic(op)) >= 0) {
 	    rs = filemap_rewind(op->fmp) ;
