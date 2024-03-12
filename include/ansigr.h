@@ -1,4 +1,4 @@
-/* ansigr */
+/* ansigr HEADER */
 /* lang=C20 */
 
 /* ANSI® graphic-rendition codes */

@@ -43,9 +43,11 @@
 #include	<buffer.h>
 #include	<ascii.h>
 #include	<ansigr.h>
-#include	<termstr.h>
 #include	<snwcpy.h>
 #include	<strwcpy.h>
+#include	<termstr.h>
+#include	<termconseq.h>
+#include	<tabcols.h>
 #include	<localmisc.h>
 
 #include	"td.h"
@@ -105,10 +107,10 @@ using std:max ;				/* subroutine-template */
 
 /* external subroutines */
 
-extern int	tabcols(int,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	vbufprintf(char *,int,cchar *,va_list) ;
-extern int	termconseq(char *,int,int,int,int,int,int) ;
+extern "C" {
+    extern int	bufprintf(char *,int,cchar *,...) noex ;
+    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+}
 
 extern "C" {
     int		td_vprintf(TD *,int,cchar *,va_list) noex ;
@@ -176,15 +178,11 @@ static const TERMTYPE	terms[] = {
 #endif /* COMMENT */
 
 
-
 /* exported subroutines */
 
-
-int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c)
-{
-	struct ustat	sb ;
-
-	int	rs = SR_OK ;
+int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c) noex {
+	USTAT		sb ;
+	int		rs = SR_OK ;
 
 	if (tdp == nullptr) return SR_FAULT ;
 	if (termtype == nullptr) return SR_FAULT ;
@@ -197,11 +195,10 @@ int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c)
 
 /* initial checks */
 
-	memset(tdp,0,sizeof(TD)) ;
-
+	memclear(tdp) ;			/* noted as potentially dangerous */
 	if ((rs = u_fstat(tfd,&sb)) >= 0) {
 	    if (isatty(tfd)) {
-	        struct termios	termconf ;
+	        TERMIOS	termconf{} ;
 	        tdp->tfd = tfd ;
 	        tdp->termcap = 0 ;
 	        tdp->buflen = TD_BUFLEN ;
@@ -222,15 +219,16 @@ int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c)
 	                    tdp->buf = bp ;
 	                    if ((rs = termstr_start(&tdp->enter,tt)) >= 0) {
 	                        VECITEM		*wlp = &tdp->wins ;
-	                        cint	opts = VECITEM_PHOLES ;
+	                        cint		opts = VECITEM_PHOLES ;
 	                        if ((rs = vecitem_start(wlp,5,opts)) >= 0) {
 	                            if ((rs = td_startwin(tdp,0,0,r,c)) >= 0) {
 	                                tdp->cur.row = -1 ;
 	                                tdp->cur.col = -1 ;
 	                                tdp->magic = TD_MAGIC ;
 	                            }
-	                            if (rs < 0)
+	                            if (rs < 0) {
 	                                vecitem_finish(wlp) ;
+				    }
 	                        } /* end if (vecitem_start) */
 	                        if (rs < 0)
 	                            termstr_finish(&tdp->enter) ;
@@ -246,18 +244,16 @@ int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c)
 	                }
 	            } /* end if (m-a) */
 	        } /* end if (tcgetattr) */
-	    } else
+	    } else {
 	        rs = SR_NOTSOCK ;
+	    }
 	} /* end if (stat) */
 
 	return rs ;
 }
 /* end subroutine (td_start) */
 
-
-/* free up this whole object */
-int td_finish(TD *tdp)
-{
+int td_finish(TD *tdp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -300,10 +296,8 @@ int td_finish(TD *tdp)
 }
 /* end subroutine (td_finish) */
 
-
 /* suspend the windowing object (like for escape or something like that) */
-int td_suspend(TD *tdp,int r,int c)
-{
+int td_suspend(TD *tdp,int r,int c) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		len = 0 ;
@@ -337,10 +331,8 @@ int td_suspend(TD *tdp,int r,int c)
 }
 /* end subroutine (td_suspend) */
 
-
 /* create a new subwindow */
-int td_subnew(TD *tdp,int srow,int scol,int rows,int cols)
-{
+int td_subnew(TD *tdp,int srow,int scol,int rows,int cols) noex {
 	int		rs ;
 
 	if (tdp == nullptr) return SR_FAULT ;
@@ -358,10 +350,8 @@ int td_subnew(TD *tdp,int srow,int scol,int rows,int cols)
 }
 /* end subroutine (td_subnew) */
 
-
 /* delete a subwindow */
-int td_subdel(TD *tdp,int wn)
-{
+int td_subdel(TD *tdp,int wn) noex {
 	int		rs ;
 
 	if (tdp == nullptr) return SR_FAULT ;
@@ -388,9 +378,7 @@ int td_subdel(TD *tdp,int wn)
 }
 /* end subroutine (td_subdel) */
 
-
-int td_getlines(TD *tdp,int w)
-{
+int td_getlines(TD *tdp,int w) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		lines = 0 ;
@@ -406,9 +394,7 @@ int td_getlines(TD *tdp,int w)
 }
 /* end subroutine (td_getlines) */
 
-
-int td_setlines(TD *tdp,int w,int nlines)
-{
+int td_setlines(TD *tdp,int w,int nlines) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		olines = 0 ;
@@ -425,11 +411,8 @@ int td_setlines(TD *tdp,int w,int nlines)
 }
 /* end subroutine (td_setlines) */
 
-
 /* execute a control action */
-/* ARGSUSED */ /* future use? */
-int td_control(TD *tdp,int cmd,int arg1,int arg2)
-{
+int td_control(TD *tdp,int cmd,...) noex {
 	int		rs = SR_OK ;
 
 	if (tdp == nullptr) return SR_FAULT ;
@@ -449,10 +432,8 @@ int td_control(TD *tdp,int cmd,int arg1,int arg2)
 }
 /* end subroutine (td_control) */
 
-
 /* make a cursor screen move */
-int td_move(TD *tdp,int wn,int r,int c)
-{
+int td_move(TD *tdp,int wn,int r,int c) noex {
 	TD_WIN		*wp ;
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -483,10 +464,8 @@ int td_move(TD *tdp,int wn,int r,int c)
 }
 /* end subroutine (td_move) */
 
-
 /* scroll a window ( (n>0)==UP, (n<0)==DOWN ) */
-int td_scroll(TD *tdp,int wn,int n)
-{
+int td_scroll(TD *tdp,int wn,int n) noex {
 	int		rs = SR_OK ;
 
 	if (tdp == nullptr) return SR_FAULT ;
@@ -547,10 +526,8 @@ int td_scroll(TD *tdp,int wn,int n)
 }
 /* end subroutine (td_scroll) */
 
-
 /* position print-formatted */
-int td_pprintf(TD *tdp,int wn,int r,int c,cchar *fmt,...)
-{
+int td_pprintf(TD *tdp,int wn,int r,int c,cchar *fmt,...) noex {
 	int		rs ;
 	{
 	    va_list	ap ;
@@ -562,10 +539,8 @@ int td_pprintf(TD *tdp,int wn,int r,int c,cchar *fmt,...)
 }
 /* end subroutine (td_pprintf) */
 
-
 /* regular print-formatted */
-int td_printf(TD *tdp,int wn,cchar *fmt,...)
-{
+int td_printf(TD *tdp,int wn,cchar *fmt,...) noex {
 	int		rs ;
 	{
 	    va_list	ap ;
@@ -577,18 +552,14 @@ int td_printf(TD *tdp,int wn,cchar *fmt,...)
 }
 /* end subroutine (td_printf) */
 
-
-int td_vprintf(TD *tdp,int wn,cchar *fmt,va_list ap)
-{
+int td_vprintf(TD *tdp,int wn,cchar *fmt,va_list ap) noex {
 	return td_vpprintf(tdp,wn,-1,-1,fmt,ap) ;
 }
 /* end subroutine (td_vprintf) */
 
-
 /* vprintf-like thing */
-int td_vpprintf(TD *tdp,int wn,int r,int c,cchar *fmt,va_list ap)
-{
-	cint	llen = LINEBUFLEN ;
+int td_vpprintf(TD *tdp,int wn,int r,int c,cchar *fmt,va_list ap) noex {
+	cint		llen = LINEBUFLEN ;
 	int		rs ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
@@ -605,25 +576,19 @@ int td_vpprintf(TD *tdp,int wn,int r,int c,cchar *fmt,va_list ap)
 }
 /* end subroutine (td_vpprintf) */
 
-
-int td_write(TD *tdp,int wn,cchar *wbuf,int wlen)
-{
+int td_write(TD *tdp,int wn,cchar *wbuf,int wlen) noex {
 	return td_pwrite(tdp,wn,-1,-1,wbuf,wlen) ;
 }
 /* end subroutine (td_write) */
 
-
 /* position-write */
-int td_pwrite(TD *tdp,int wn,int r,int c,cchar *wbuf,int wlen)
-{
+int td_pwrite(TD *tdp,int wn,int r,int c,cchar *wbuf,int wlen) noex {
 	return td_pwritegr(tdp,wn,r,c,0,wbuf,wlen) ;
 }
 /* end subroutine (td_pwrite) */
 
-
 /* position-write w/ graphic-rendition */
-int td_pwritegr(TD *tdp,int wn,int r,int c,int gr,cchar *wbuf,int wlen)
-{
+int td_pwritegr(TD *tdp,int wn,int r,int c,int gr,cchar *wbuf,int wlen) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		len = 0 ;
@@ -665,10 +630,8 @@ int td_pwritegr(TD *tdp,int wn,int r,int c,int gr,cchar *wbuf,int wlen)
 }
 /* end subroutine (td_pwritegr) */
 
-
 /* clear a window */
-int td_clear(TD *tdp,int w)
-{
+int td_clear(TD *tdp,int w) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		len = 0 ;
@@ -707,10 +670,8 @@ int td_clear(TD *tdp,int w)
 /* end subroutine (td_clear) */
 
 
-/* erase-window */
-/* type: 0=forward, 1=back, 2=whole */
-int td_ew(TD *tdp,int w,int r,int type)
-{
+/* erase-window; type: 0=forward, 1=back, 2=whole */
+int td_ew(TD *tdp,int w,int r,int type) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		len = 0 ;
@@ -721,12 +682,10 @@ int td_ew(TD *tdp,int w,int r,int type)
 
 	if ((rs = vecitem_get(&tdp->wins,w,&wp)) >= 0) {
 	    if ((rs = td_termstrbegin(tdp)) >= 0) {
-
 	        rs = td_flushmove(tdp,wp,r,-1) ;
-
-	        if (rs >= 0)
+	        if (rs >= 0) {
 	            rs = termstr_ed(&tdp->enter,type) ;
-
+		}
 	        if (rs >= 0) {
 	            rs = td_termstrend(tdp) ;
 	            len = rs ;
@@ -738,10 +697,8 @@ int td_ew(TD *tdp,int w,int r,int type)
 }
 /* end subroutine (td_ew) */
 
-
 /* erase-line */
-int td_el(TD *tdp,int w,int type)
-{
+int td_el(TD *tdp,int w,int type) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		len = 0 ;
@@ -755,9 +712,9 @@ int td_el(TD *tdp,int w,int type)
 
 	        rs = td_flushmove(tdp,wp,-1,-1) ;
 
-	        if (rs >= 0)
+	        if (rs >= 0) {
 	            rs = termstr_el(&tdp->enter,type) ;
-
+		}
 	        if (rs >= 0) {
 	            rs = td_termstrend(tdp) ;
 	            len = rs ;
@@ -769,10 +726,8 @@ int td_el(TD *tdp,int w,int type)
 }
 /* end subroutine (td_el) */
 
-
 /* erase-character */
-int td_ec(TD *tdp,int w,int n)
-{
+int td_ec(TD *tdp,int w,int n) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 	int		len = 0 ;
@@ -800,10 +755,8 @@ int td_ec(TD *tdp,int w,int n)
 }
 /* end subroutine (td_ec) */
 
-
 /* flush buffer */
-int td_flush(TD *tdp)
-{
+int td_flush(TD *tdp) noex {
 
 	if (tdp == nullptr) return SR_FAULT ;
 
@@ -813,10 +766,8 @@ int td_flush(TD *tdp)
 }
 /* end subroutine (td_flush) */
 
-
 /* terminal window size change */
-int td_setsize(TD *tdp,int rows,int cols)
-{
+int td_setsize(TD *tdp,int rows,int cols) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 
@@ -837,10 +788,8 @@ int td_setsize(TD *tdp,int rows,int cols)
 }
 /* end subroutine (td_setsize) */
 
-
 /* check */
-int td_check(TD *tdp)
-{
+int td_check(TD *tdp) noex {
 	int		rs ;
 
 	if (tdp == nullptr) return SR_FAULT ;
@@ -855,9 +804,7 @@ int td_check(TD *tdp)
 }
 /* end subroutine (td_check) */
 
-
-int td_position(TD *tdp,int wn,TD_POSITION *pp)
-{
+int td_position(TD *tdp,int wn,TD_POSITION *pp) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 
@@ -881,7 +828,6 @@ int td_position(TD *tdp,int wn,TD_POSITION *pp)
 
 /* private subroutines */
 
-HERE
 /* create and initialize a new sub-window */
 static int td_startwin(TD *tdp,int srow,int scol,int rows,int cols) noex {
 	int		rs = SR_OK ;
@@ -896,10 +842,10 @@ static int td_startwin(TD *tdp,int srow,int scol,int rows,int cols) noex {
 	}
 	if (rs >= 0) {
 	    TD_WIN	win{} ;
-	    win.srow = MIN(srow,(tdp->rows-1)) ;
-	    win.scol = MIN(scol,(tdp->cols-1)) ;
-	    win.rows = MIN(rows,tdp->rows) ;
-	    win.cols = MIN(cols,tdp->cols) ;
+	    win.srow = min(srow,(tdp->rows-1)) ;
+	    win.scol = min(scol,(tdp->cols-1)) ;
+	    win.rows = min(rows,tdp->rows) ;
+	    win.cols = min(cols,tdp->cols) ;
 	    win.move.row = -1 ;
 	    win.move.col = -1 ;
 	    size = sizeof(TD_WIN) ;
@@ -1162,7 +1108,7 @@ static int td_procstr(TD *tdp,TD_WIN *wp,int gr,cchar *sbuf,int slen) noex {
 	                brows -= n ;
 	            }
 	            wp->cur.row += irows ;
-	            tdp->cur.row = MIN((tdp->cur.row + brows),(tdp->rows-1)) ;
+	            tdp->cur.row = min((tdp->cur.row + brows),(tdp->rows-1)) ;
 	        }
 	        if (f_cr) {
 	            f_cr = false ;
@@ -1175,7 +1121,7 @@ static int td_procstr(TD *tdp,TD_WIN *wp,int gr,cchar *sbuf,int slen) noex {
 	                bcols -= n ;
 	            }
 	            wp->cur.col += icols ;
-	            tdp->cur.col = MIN((tdp->cur.col + bcols),(tdp->cols-1)) ;
+	            tdp->cur.col = min((tdp->cur.col + bcols),(tdp->cols-1)) ;
 	        }
 	    } /* end if */
 	} /* end while */

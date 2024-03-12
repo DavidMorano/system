@@ -97,7 +97,7 @@ extern int td_getlines(TD *,int) noex ;
 extern int td_setlines(TD *,int,int) noex ;
 extern int td_move(TD *,int,int,int) noex ;
 extern int td_scroll(TD *,int,int) noex ;
-extern int td_control(TD *,int,int,int) noex ;
+extern int td_control(TD *,int,...) noex ;
 extern int td_setsize(TD *,int,int) noex ;
 extern int td_suspend(TD *,int,int) noex ;
 extern int td_write(TD *,int,cchar *,int) noex ;

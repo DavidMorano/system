@@ -1,17 +1,16 @@
-/* termstr */
+/* termstr SUPPORT */
+/* lang=C++20 */
 
 /* object to manage terminal database strings */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2004-06-24, David A­D­ Morano
-        I rewrote this from scratch. The previous version of this program was a
-        hack.
+	I rewrote this from scratch. The previous version of this
+	program was a hack.
 
 */
 
@@ -20,35 +19,22 @@
 /*******************************************************************************
 
 	Synopsis:
-
-	int termstr_start(op,termtype)
-	TERMSTR		*op ;
-	const char	termtype[] ;
+	int termstr_start(TERMSTR *op,cchar *termtype) noex
 
 	Arguments:
-
 	op		object pointer
 	termtype	terminal type as a descriptive string
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<ansigr.h>
@@ -101,25 +87,25 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	termconseq(char *,int,int,int,int,int,int) ;
 extern int	buffer_blanks(BUFFER *,int) ;
 extern int	buffer_backs(BUFFER *,int) ;
 
 #if	CF_DEBUGS
-extern int	strnnlen(const char *,int,int) ;
-extern int	debugprintf(const char *,...) ;
+extern int	strnnlen(cchar *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -128,7 +114,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local structures */
 
 struct termtype {
-	const char	*name ;
+	cchar		*name ;
 	uint		flags ;
 } ;
 
@@ -136,7 +122,7 @@ struct termtype {
 /* forward references */
 
 static int	termstr_curm(TERMSTR *,int,int) ;
-static int	termstr_findterm(TERMSTR *,const char *) ;
+static int	termstr_findterm(TERMSTR *,cchar *) ;
 static int	termstr_conseq(TERMSTR *,int,int,int,int,int) ;
 
 
@@ -166,7 +152,7 @@ static const struct termtype	terms[] = {
 	{ NULL, 0 }
 } ;
 
-static const char	curtypes[] = "ABCD" ;
+static cchar	curtypes[] = "ABCD" ;
 
 enum curtypes {
 	curtype_u,
@@ -177,8 +163,10 @@ enum curtypes {
 } ;
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int termstr_start(TERMSTR *op,cchar *termtype)
 {
@@ -456,7 +444,7 @@ int termstr_curh(TERMSTR *op,int r,int c)
 {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
-	const char	*sp = NULL ;
+	cchar	*sp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -483,7 +471,7 @@ int termstr_ssr(TERMSTR *op,int r,int n)
 {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
-	const char	*sp = NULL ;
+	cchar	*sp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -510,7 +498,7 @@ int termstr_csr(TERMSTR *op,int f)
 	int		rs = SR_OK ;
 	int		sl = -1 ;
 	int		ti ;
-	const char	*sp = NULL ;
+	cchar	*sp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -593,7 +581,7 @@ static int termstr_findterm(TERMSTR *op,cchar *termtype)
 	int		m ;
 	int		m_max = 0 ;
 	int		i, si ;
-	const char	*np ;
+	cchar	*np ;
 
 	n = 2 ;
 	m_max = -1 ;

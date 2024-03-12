@@ -1,4 +1,5 @@
-/* termstr */
+/* termstr HEADER */
+/* lang=C++20 */
 
 /* terminal display editing control sequences */
 /* version %I% last-modified %G% */
@@ -14,13 +15,10 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TERMSTR_INCLUDE
-#define	TERMSTR_INCLUDE		1
+#define	TERMSTR_INCLUDE
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<localmisc.h>
@@ -34,7 +32,6 @@
 #define	TERMSTR_GRREV	(1<<4)		/* graphic-rendition reverse-video */
 
 /* cursor saving and restoring */
-
 #define	TERMSTR_VCURS	"\0337"		/* cursor save-restore (VT) */
 #define	TERMSTR_VCURR	"\0338"		/* cursor save-restore (VT) */
 
@@ -45,7 +42,6 @@
 #define	TERMSTR_RESTORE	TERMSTR_VCURR	/* cursor save-restore (VT) */
 
 /* cursor positioning */
-
 #define	TERMSTR_CURU	"\033[A"	/* cursor up */
 #define	TERMSTR_CURD	"\033[B"	/* cursor down */
 #define	TERMSTR_CURR	"\033[C"	/* cursor right */
@@ -59,7 +55,6 @@
 #define	TERMSTR_HOME	TERMSTR_CURH
 
 /* editing */
-
 #define	TERMSTR_ED	"\033[J"	/* erase to end of display */
 #define	TERMSTR_EL	"\033[K"	/* erase to end of line */
 #define	TERMSTR_EC	"\033[X"	/* erase character */
@@ -77,7 +72,6 @@
 #define	TERMSTR_ICH	"\033[@"	/* insert character */
 
 /* character renditions */
-
 #define	TERMSTR_NORM	"\033[m"	/* no attributes */
 #define	TERMSTR_BOLD	"\033[1m"	/* bold */
 #define	TERMSTR_UNDER	"\033[4m"	/* underline */
@@ -85,18 +79,15 @@
 #define	TERMSTR_REVERSE	"\033[7m"	/* reverse */
 
 /* character renditions for advanced terminals */
-
 #define	TERMSTR_NOBOLD	"\033[22m"	/* no-bold */
 #define	TERMSTR_NOUNDER	"\033[24m"	/* no-underline */
 #define	TERMSTR_NOBLINK	"\033[27m"	/* no-blink */
 
 /* insert-replacement mode */
-
 #define	TERMSTR_S_IRM	"\033[4h"	/* insert-replacement set */
 #define	TERMSTR_R_IRM	"\033[4l"	/* insert-replacement clear */
 
 /* cursor visibility */
-
 #define	TERMSTR_S_VCUR	"\033[?25h"	/* set cursor ON (VT) */
 #define	TERMSTR_R_VCUR	"\033[?25l"	/* set cursor OFF (VT) */
 
@@ -110,56 +101,48 @@
 #define	TERMSTR_R_CUR	TERMSTR_R_VCUR	/* cursor OFF (VT) */
 
 /* status display */
-
 #define	TERMSTR_S_SD	"\033[1$\175"	/* status display SET */
 #define	TERMSTR_R_SD	"\033[0$\175"	/* status display RESET */
 
-
-#define	TERMSTR			struct termstr_head
+#define	TERMSTR		struct termstr_head
 
 
 struct termstr_head {
+	buffer		b ;		/* storage buffer */
 	uint		magic ;
-	BUFFER		b ;		/* storage buffer */
 	int		ti ;		/* index into database */
 } ;
 
+typedef TERMSTR		termstr ;
 
-#if	(! defined(TD_MASTER)) || (TD_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int termstr_start(TERMSTR *,cchar *) noex ;
+extern int termstr_clean(TERMSTR *) noex ;
+extern int termstr_char(TERMSTR *,int) noex ;
+extern int termstr_write(TERMSTR *,cchar *,int) noex ;
+extern int termstr_writegr(TERMSTR *,int,cchar *,int) noex ;
+extern int termstr_get(TERMSTR *,cchar **) noex ;
+extern int termstr_ed(TERMSTR *,int) noex ;
+extern int termstr_el(TERMSTR *,int) noex ;
+extern int termstr_ec(TERMSTR *,int) noex ;
+extern int termstr_curu(TERMSTR *,int) noex ;
+extern int termstr_curd(TERMSTR *,int) noex ;
+extern int termstr_curl(TERMSTR *,int) noex ;
+extern int termstr_curr(TERMSTR *,int) noex ;
+extern int termstr_curh(TERMSTR *,int,int) noex ;
+extern int termstr_ssr(TERMSTR *,int,int) noex ;
+extern int termstr_csr(TERMSTR *,int) noex ;
+extern int termstr_il(TERMSTR *,int) noex ;
+extern int termstr_ic(TERMSTR *,int) noex ;
+extern int termstr_dl(TERMSTR *,int) noex ;
+extern int termstr_dc(TERMSTR *,int) noex ;
+extern int termstr_irm(TERMSTR *,int) noex ;
+extern int termstr_cvis(TERMSTR *,int) noex ;
+extern int termstr_finish(TERMSTR *) noex ;
 
-extern int termstr_start(TERMSTR *,const char *) ;
-extern int termstr_clean(TERMSTR *) ;
-extern int termstr_char(TERMSTR *,int) ;
-extern int termstr_write(TERMSTR *,const char *,int) ;
-extern int termstr_writegr(TERMSTR *,int,const char *,int) ;
-extern int termstr_get(TERMSTR *,const char **) ;
-extern int termstr_ed(TERMSTR *,int) ;
-extern int termstr_el(TERMSTR *,int) ;
-extern int termstr_ec(TERMSTR *,int) ;
-extern int termstr_curu(TERMSTR *,int) ;
-extern int termstr_curd(TERMSTR *,int) ;
-extern int termstr_curl(TERMSTR *,int) ;
-extern int termstr_curr(TERMSTR *,int) ;
-extern int termstr_curh(TERMSTR *,int,int) ;
-extern int termstr_ssr(TERMSTR *,int,int) ;
-extern int termstr_csr(TERMSTR *,int) ;
-extern int termstr_il(TERMSTR *,int) ;
-extern int termstr_ic(TERMSTR *,int) ;
-extern int termstr_dl(TERMSTR *,int) ;
-extern int termstr_dc(TERMSTR *,int) ;
-extern int termstr_irm(TERMSTR *,int) ;
-extern int termstr_cvis(TERMSTR *,int) ;
-extern int termstr_finish(TERMSTR *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TERMSTR_MASTER */
 
 #endif /* TERMSTR_INCLUDE */
 
