@@ -22,9 +22,9 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"msgdata.h"
@@ -48,7 +48,7 @@
 
 /* forward references */
 
-static int	msgdata_setrecv(msgdata *) ;
+static int	msgdata_setrecv(msgdata *) noex ;
 
 
 /* local variables */
@@ -105,71 +105,57 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 }
 /* end subroutine (msgdata_init) */
 
-
-int msgdata_fini(msgdata *mip)
-{
+int msgdata_fini(msgdata *mip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (mip == NULL) return SR_FAULT ;
-	if (mip->a != NULL) {
+	if (mip == nullptr) return SR_FAULT ;
+	if (mip->a != nullptr) {
 	    rs1 = uc_libfree(mip->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mip->a = NULL ;
-	    mip->mbuf = NULL ;
+	    mip->a = nullptr ;
+	    mip->mbuf = nullptr ;
 	    mip->mlen = 0 ;
 	    mip->ml = 0 ;
-	    mip->cmsgp = NULL ;
+	    mip->cmsgp = nullptr ;
 	    mip->clen = 0 ;
 	}
 	return rs ;
 }
 /* end subroutine (msgdata_fini) */
 
-
-int msgdata_getbufsize(msgdata *mip)
-{
+int msgdata_getbufsize(msgdata *mip) noex {
 	return mip->mlen ;
 }
 /* end subroutine (msgdata_bufsize) */
 
-
-int msgdata_getbuf(msgdata *mip,char **rpp)
-{
-	if (rpp != NULL) {
+int msgdata_getbuf(msgdata *mip,char **rpp) noex {
+	if (rpp) {
 	    *rpp = mip->mbuf ;
 	}
 	return mip->mlen ;
 }
 /* end subroutine (msgdata_get) */
 
-
-int msgdata_getdatalen(msgdata *mip)
-{
+int msgdata_getdatalen(msgdata *mip) noex {
 	return mip->ml ;
 }
 /* end subroutine (msgdata_getdatalen) */
 
-
-int msgdata_setdatalen(msgdata *mip,int dlen)
-{
+int msgdata_setdatalen(msgdata *mip,int dlen) noex {
 	mip->ml = dlen ;
 	return dlen ;
 }
 /* end subroutine (msgdata_setdatalen) */
 
-
-int msgdata_getdata(msgdata *mip,char **rpp)
-{
-	if (rpp != NULL) {
+int msgdata_getdata(msgdata *mip,char **rpp) noex {
+	if (rpp) {
 	    *rpp = mip->mbuf ;
 	}
 	return mip->ml ;
 }
 /* end subroutine (msgdata_getdata) */
 
-
-int msgdata_recvto(msgdata *mip,int fd,int to)
-{
+int msgdata_recvto(msgdata *mip,int fd,int to) noex {
 	MSGHDR		*mp = &mip->msg ;
 	int		rs ;
 	msgdata_setrecv(mip) ;
@@ -180,9 +166,7 @@ int msgdata_recvto(msgdata *mip,int fd,int to)
 }
 /* end subroutine (msgdata_recvto) */
 
-
-int msgdata_recv(msgdata *mip,int fd)
-{
+int msgdata_recv(msgdata *mip,int fd) noex {
 	MSGHDR		*mp = &mip->msg ;
 	int		rs ;
 	msgdata_setrecv(mip) ;
@@ -193,9 +177,7 @@ int msgdata_recv(msgdata *mip,int fd)
 }
 /* end subroutine (msgdata_recv) */
 
-
-int msgdata_send(msgdata *mip,int fd,int dl,int cl)
-{
+int msgdata_send(msgdata *mip,int fd,int dl,int cl) noex {
 	int		rs ;
 	if (cl <= mip->clen) {
 	    MSGHDR	*mp = &mip->msg ;
@@ -209,23 +191,21 @@ int msgdata_send(msgdata *mip,int fd,int dl,int cl)
 }
 /* end subroutine (msgdata_send) */
 
-
 /* receive or reject a passed FD (f=1 -> receive, f=0 -> reject) */
-int msgdata_conpass(msgdata *mip,int f_passfd)
-{
+int msgdata_conpass(msgdata *mip,int f_passfd) noex {
 	MSGHDR		*mp = &mip->msg ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	mip->ns = -1 ;
 	if (mp->msg_controllen > 0) {
 	    CMSGHDR	*cmp = CMSG_FIRSTHDR(mp) ;
 	    int		fd ;
-	    while (cmp != NULL) {
+	    while (cmp != nullptr) {
 		if ((fd = cmsghdr_passed(cmp)) >= 0) {
 	            if ((mip->ns < 0) && f_passfd) {
 	                mip->ns = fd ;
-			f = TRUE ;
+			f = true ;
 	            } else {
 	                rs1 = u_close(fd) ;
 			if (rs >= 0) rs = rs1 ;
@@ -238,19 +218,15 @@ int msgdata_conpass(msgdata *mip,int f_passfd)
 }
 /* end subroutine (msgdata_conpass) */
 
-
-int msgdata_getpassfd(msgdata *mip)
-{
+int msgdata_getpassfd(msgdata *mip) noex {
 	int		rs = mip->ns ;
 	if (rs < 0) rs = SR_NOTOPEN ;
 	return rs ;
 }
 /* end subroutine (msgdata_getpassfd) */
 
-
-int msgdata_setaddr(msgdata *mip,const void *sap,int sal)
-{
-	const int	flen = sizeof(SOCKADDRESS) ;
+int msgdata_setaddr(msgdata *mip,cvoid *sap,int sal) noex {
+	cint		flen = sizeof(SOCKADDRESS) ;
 	int		rs ;
 	if (sal <= flen) {
 	    memcpy(&mip->from,sap,sal) ;
@@ -262,12 +238,9 @@ int msgdata_setaddr(msgdata *mip,const void *sap,int sal)
 }
 /* end subroutine (msgdata_setaddr) */
 
-
-int msgdata_rmeol(msgdata *mip)
-{
-	int		ch ;
+int msgdata_rmeol(msgdata *mip) noex {
 	while (mip->ml > 0) {
-	    ch = MKCHAR(mip->mbuf[mip->ml-1]) ;
+	    cint	ch = MKCHAR(mip->mbuf[mip->ml-1]) ;
  	    if (! iseol(ch)) break ;
 	    mip->ml -= 1 ;
 	}

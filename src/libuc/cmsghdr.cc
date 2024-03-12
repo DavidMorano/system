@@ -1,10 +1,8 @@
-/* cmsghdr */
+/* cmsghdr SUPPORT */
+/* lang=C++20 */
 
 /* Conrol-Message-Header methods */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -20,9 +18,7 @@
 
 	We perform some functions on a Control-Message-Header object.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -30,16 +26,13 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"cmsghdr.h"
+
 
 /* local defines */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -56,16 +49,14 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int cmsghdr_passed(CMSGHDR *cmp)
-{
-	const int	fdlen = sizeof(int) ;
+int cmsghdr_passed(CMSGHDR *cmp) noex {
+	cint		fdlen = sizeof(int) ;
 	int		fd = -1 ;
 	int		*ip = (int *) CMSG_DATA(cmp) ;
-	int		f = TRUE ;
+	int		f = true ;
 	f = f && (cmp->cmsg_level == SOL_SOCKET) ;
 	f = f && (cmp->cmsg_len == CMSG_LEN(fdlen)) ;
-	f = f && (cmp->cmsg_type == SCM_RIGHTS) && (ip != NULL) ;
+	f = f && (cmp->cmsg_type == SCM_RIGHTS) && ip ;
 	if (f) {
 	    fd = *ip ;
 	}
