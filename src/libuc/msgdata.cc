@@ -1,11 +1,8 @@
-/* msgdata */
+/* msgdata SUPPORT */
+/* lang=C++20 */
 
 /* library initialization for KSH built-in command libraries */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time */
-#define	CF_DEBUGN	0		/* extra-special debugging */
 
 
 /* revision history:
@@ -21,16 +18,12 @@
 
 	Message support.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -46,34 +39,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy2w(char *,int,const char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	cmsghdr_passed(CMSGHDR *) ;
-extern int	iseol(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugopen(cchar *) ;
-extern int	debugprintf(cchar *,...) ;
-extern int	debugprinthexblock(cchar *,int,const void *,int) ;
-extern int	debugclose() ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-#if	CF_DEBUGN
-extern int	nprintf(const char *,const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* external variables */
 
@@ -83,18 +48,19 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	msgdata_setrecv(MSGDATA *) ;
+static int	msgdata_setrecv(msgdata *) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int msgdata_init(MSGDATA *mip,int mlen)
-{
-	const int	clen = MAX(CMSGBUFLEN,sizeof(CMSGHDR)) ;
+int msgdata_init(msgdata *mip,int mlen) noex {
+	cint		clen = MAX(CMSGBUFLEN,sizeof(CMSGHDR)) ;
 	int		rs ;
 	int		size = 0 ;
 	int		ml = 0 ;
@@ -140,7 +106,7 @@ int msgdata_init(MSGDATA *mip,int mlen)
 /* end subroutine (msgdata_init) */
 
 
-int msgdata_fini(MSGDATA *mip)
+int msgdata_fini(msgdata *mip)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -160,14 +126,14 @@ int msgdata_fini(MSGDATA *mip)
 /* end subroutine (msgdata_fini) */
 
 
-int msgdata_getbufsize(MSGDATA *mip)
+int msgdata_getbufsize(msgdata *mip)
 {
 	return mip->mlen ;
 }
 /* end subroutine (msgdata_bufsize) */
 
 
-int msgdata_getbuf(MSGDATA *mip,char **rpp)
+int msgdata_getbuf(msgdata *mip,char **rpp)
 {
 	if (rpp != NULL) {
 	    *rpp = mip->mbuf ;
@@ -177,14 +143,14 @@ int msgdata_getbuf(MSGDATA *mip,char **rpp)
 /* end subroutine (msgdata_get) */
 
 
-int msgdata_getdatalen(MSGDATA *mip)
+int msgdata_getdatalen(msgdata *mip)
 {
 	return mip->ml ;
 }
 /* end subroutine (msgdata_getdatalen) */
 
 
-int msgdata_setdatalen(MSGDATA *mip,int dlen)
+int msgdata_setdatalen(msgdata *mip,int dlen)
 {
 	mip->ml = dlen ;
 	return dlen ;
@@ -192,7 +158,7 @@ int msgdata_setdatalen(MSGDATA *mip,int dlen)
 /* end subroutine (msgdata_setdatalen) */
 
 
-int msgdata_getdata(MSGDATA *mip,char **rpp)
+int msgdata_getdata(msgdata *mip,char **rpp)
 {
 	if (rpp != NULL) {
 	    *rpp = mip->mbuf ;
@@ -202,9 +168,9 @@ int msgdata_getdata(MSGDATA *mip,char **rpp)
 /* end subroutine (msgdata_getdata) */
 
 
-int msgdata_recvto(MSGDATA *mip,int fd,int to)
+int msgdata_recvto(msgdata *mip,int fd,int to)
 {
-	struct msghdr	*mp = &mip->msg ;
+	MSGHDR		*mp = &mip->msg ;
 	int		rs ;
 	msgdata_setrecv(mip) ;
 	if ((rs = uc_recvmsge(fd,mp,0,to,0)) >= 0) {
@@ -215,9 +181,9 @@ int msgdata_recvto(MSGDATA *mip,int fd,int to)
 /* end subroutine (msgdata_recvto) */
 
 
-int msgdata_recv(MSGDATA *mip,int fd)
+int msgdata_recv(msgdata *mip,int fd)
 {
-	struct msghdr	*mp = &mip->msg ;
+	MSGHDR		*mp = &mip->msg ;
 	int		rs ;
 	msgdata_setrecv(mip) ;
 	if ((rs = u_recvmsg(fd,mp,0)) >= 0) {
@@ -228,7 +194,7 @@ int msgdata_recv(MSGDATA *mip,int fd)
 /* end subroutine (msgdata_recv) */
 
 
-int msgdata_send(MSGDATA *mip,int fd,int dl,int cl)
+int msgdata_send(msgdata *mip,int fd,int dl,int cl)
 {
 	int		rs ;
 	if (cl <= mip->clen) {
@@ -245,9 +211,9 @@ int msgdata_send(MSGDATA *mip,int fd,int dl,int cl)
 
 
 /* receive or reject a passed FD (f=1 -> receive, f=0 -> reject) */
-int msgdata_conpass(MSGDATA *mip,int f_passfd)
+int msgdata_conpass(msgdata *mip,int f_passfd)
 {
-	struct msghdr	*mp = &mip->msg ;
+	MSGHDR		*mp = &mip->msg ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		f = FALSE ;
@@ -273,7 +239,7 @@ int msgdata_conpass(MSGDATA *mip,int f_passfd)
 /* end subroutine (msgdata_conpass) */
 
 
-int msgdata_getpassfd(MSGDATA *mip)
+int msgdata_getpassfd(msgdata *mip)
 {
 	int		rs = mip->ns ;
 	if (rs < 0) rs = SR_NOTOPEN ;
@@ -282,7 +248,7 @@ int msgdata_getpassfd(MSGDATA *mip)
 /* end subroutine (msgdata_getpassfd) */
 
 
-int msgdata_setaddr(MSGDATA *mip,const void *sap,int sal)
+int msgdata_setaddr(msgdata *mip,const void *sap,int sal)
 {
 	const int	flen = sizeof(SOCKADDRESS) ;
 	int		rs ;
@@ -297,7 +263,7 @@ int msgdata_setaddr(MSGDATA *mip,const void *sap,int sal)
 /* end subroutine (msgdata_setaddr) */
 
 
-int msgdata_rmeol(MSGDATA *mip)
+int msgdata_rmeol(msgdata *mip)
 {
 	int		ch ;
 	while (mip->ml > 0) {
@@ -312,9 +278,7 @@ int msgdata_rmeol(MSGDATA *mip)
 
 /* private subroutines */
 
-
-static int msgdata_setrecv(MSGDATA *mip)
-{
+static int msgdata_setrecv(msgdata *mip) noex {
 	MSGHDR		*mp = &mip->msg ;
 	mip->mbuf[0] = '\0' ;
 	mip->vecs[0].iov_base = mip->mbuf ;
