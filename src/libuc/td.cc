@@ -1,12 +1,12 @@
-/* td */
+/* td SUPPORT */
+/* lang=C++20 */
 
 /* Terminal Display (TD) library */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUGPROC	0		/* ? */
 #define	CF_SAVERESTORE	0		/* implementing cursor-save-restore? */
-
 
 /* revision history:
 
@@ -20,33 +20,26 @@
 /*******************************************************************************
 
 	This object module facilitates managing a terminal display.
-
-        This object contains routines (not unlike in the UNIX 'curses' library)
-        to display information in "windows" on a terminal display. The major
-        difference between this terminal display library and the standard UNIX
-        'curses' library is that THIS LIBRARY WORKS!
+	This object contains routines (not unlike in the UNIX
+	'curses' library) to display information in "windows" on a
+	terminal display. The major difference between this terminal
+	display library and the standard UNIX 'curses' library is
+	that THIS LIBRARY WORKS!
 
 	Other notes:
 
-        An 'xterm' terminal is almost en entire complete 'vt102' terminal. It
-        pretty much only lacks the blinking character attribute and the double
-        height-width characters.
-
+	An 'xterm' terminal is almost en entire complete 'vt102'
+	terminal. It pretty much only lacks the blinking character
+	attribute and the double height-width characters.
 
 *******************************************************************************/
 
-
-#define	TD_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecitem.h>
 #include	<buffer.h>

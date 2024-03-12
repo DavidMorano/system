@@ -1,6 +1,8 @@
-/* td */
+/* td HEADER */
+/* lang=C++20 */
 
 /* terminal display manager */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,24 +15,21 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TD_INCLUDE
-#define	TD_INCLUDE	1
+#define	TD_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stdarg.h>
-
 #include	<vecitem.h>
 #include	<termstr.h>
 #include	<localmisc.h>
 
 
 #define	TD		struct td_head
-#define	TD_POSITION	struct td_position
+#define	TD_POS	struct td_position
 
 /* control codes */
-
 #define	TD_CEOL		0		/* set "erase to EOL" mode */
 #define	TD_CLINES	1		/* change number of lines in window */
 #define	TD_CSCROLL	2		/* scroll the window up or down */
@@ -38,7 +37,6 @@
 #define	TD_CCURSOR	4		/* position the cursor */
 
 /* graphic renditions */
-
 #define	TD_GRBOLD	(1<<0)		/* graphic-rendition bold */
 #define	TD_GRUNDER	(1<<1)		/* graphic-rendition underline */
 #define	TD_GRBLINK	(1<<2)		/* graphic-rendition blinking */
@@ -69,14 +67,14 @@ struct td_window {
 } ;
 
 struct td_head {
-	uint		magic ;
-	struct td_position	cur ;	/* current position */
-	struct td_flags		f ;
-	const char	*termtype ;	/* given terminal type-name */
+	cchar		*termtype ;	/* given terminal type-name */
 	char		*buf ;		/* storage buffer */
 	TERMSTR		enter ;
 	vecitem		wins ;		/* sub windows */
+	TD_POS		cur ;	/* current position */
+	TF_FLAGS	f ;
 	uint		timecounter ;
+	uint		magic ;
 	int		tfd ;
 	int		termcap ;	/* terminal capabilities */
 	int		buflen ;	/* buffer extent */
@@ -85,44 +83,39 @@ struct td_head {
 	int		cols ;
 } ;
 
+typedef TD		td ;
+typedef TD_POS		td_pos ;
 
-#if	(! defined(TD_MASTER)) || (TD_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int td_start(TD *,int,cchar *,int,int) noex ;
+extern int td_finish(TD *) noex ;
+extern int td_flush(TD *) noex ;
+extern int td_subnew(TD *,int,int,int,int) noex ;
+extern int td_subdel(TD *,int) noex ;
+extern int td_getlines(TD *,int) noex ;
+extern int td_setlines(TD *,int,int) noex ;
+extern int td_move(TD *,int,int,int) noex ;
+extern int td_scroll(TD *,int,int) noex ;
+extern int td_control(TD *,int,int,int) noex ;
+extern int td_setsize(TD *,int,int) noex ;
+extern int td_suspend(TD *,int,int) noex ;
+extern int td_write(TD *,int,cchar *,int) noex ;
+extern int td_pwrite(TD *,int,int,int,cchar *,int) noex ;
+extern int td_pwritegr(TD *,int,int,int,int,cchar *,int) noex ;
+extern int td_vprintf(TD *,int,cchar *,va_list) noex ;
+extern int td_vpprintf(TD *,int,int,int,cchar *,va_list) noex ;
+extern int td_printf(TD *,int,cchar *,...) noex ;
+extern int td_pprintf(TD *,int,int,int,cchar *,...) noex ;
+extern int td_clear(TD *,int) noex ;
+extern int td_ew(TD *,int,int,int) noex ;
+extern int td_el(TD *,int,int) noex ;
+extern int td_ec(TD *,int,int) noex ;
+extern int td_check(TD *) noex ;
+extern int td_position(TD *,int,TD_POS *) noex ;
 
-extern int td_start(TD *,int,const char *,int,int) ;
-extern int td_finish(TD *) ;
-extern int td_flush(TD *) ;
-extern int td_subnew(TD *,int,int,int,int) ;
-extern int td_subdel(TD *,int) ;
-extern int td_getlines(TD *,int) ;
-extern int td_setlines(TD *,int,int) ;
-extern int td_move(TD *,int,int,int) ;
-extern int td_scroll(TD *,int,int) ;
-extern int td_control(TD *,int,int,int) ;
-extern int td_setsize(TD *,int,int) ;
-extern int td_suspend(TD *,int,int) ;
-extern int td_write(TD *,int,const char *,int) ;
-extern int td_pwrite(TD *,int,int,int,const char *,int) ;
-extern int td_pwritegr(TD *,int,int,int,int,const char *,int) ;
-extern int td_vprintf(TD *,int,const char *,va_list) ;
-extern int td_vpprintf(TD *,int,int,int,const char *,va_list) ;
-extern int td_printf(TD *,int,const char *,...) ;
-extern int td_pprintf(TD *,int,int,int,const char *,...) ;
-extern int td_clear(TD *,int) ;
-extern int td_ew(TD *,int,int,int) ;
-extern int td_el(TD *,int,int) ;
-extern int td_ec(TD *,int,int) ;
-extern int td_check(TD *) ;
-extern int td_position(TD *,int,TD_POSITION *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TD_MASTER */
 
 #endif /* TD_INCLUDE */
 

@@ -162,6 +162,10 @@
 
 /* local defines */
 
+#ifndef	CMSGBUFLEN
+#define	CMSGBUFLEN	1024
+#endif
+
 #if	(defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0))
 #define	F_STREAMS	1
 #else
@@ -317,7 +321,7 @@ int tcpeek(int fd,char *dbuf,int dlen) noex {
 	    rs = SR_NOTOPEN ;
 	    if (fd >= 0) {
 	        if constexpr (f_streams) {
-	            cint	clen = CBUFLEN ;
+	            cint	clen = CMSGBUFLEN ;
 	            char	*cbuf{} ;
 	            if ((rs = uc_libmalloc((clen+1),&cbuf)) >= 0) {
 			{
