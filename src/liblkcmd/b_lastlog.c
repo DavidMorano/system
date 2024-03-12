@@ -1,14 +1,14 @@
-/* b_lastlog (Last-Login) */
+/* b_lastlog SUPPORT (Last-Login) */
+/* lang=C++20 */
 
 /* (fairly) generic front-end subroutine */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_LOCSETENT	0		/* |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -25,12 +25,10 @@
 	Display the Last-Log entry for given user(s).
 
 	Synopsis:
-
 	$ lastlog [<username(s)>] [-af <afile>] [-a] [-llf <lastlog>] [-V]
 
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -52,8 +50,9 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<pwd.h>
-
 #include	<usystem.h>
+#include	<getpwentry.h>
+#include	<sysusernames.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<paramopt.h>
@@ -67,10 +66,8 @@
 #include	<field.h>
 #include	<lastlogfile.h>
 #include	<pwfile.h>
-#include	<getpwentry.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
-#include	<sysusernames.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

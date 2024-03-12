@@ -26,8 +26,6 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -48,7 +46,6 @@
 #include	"getpwentry.h"
 
 
-
 /* local defines */
 
 #if	CF_PWCACHE
@@ -58,6 +55,12 @@
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
 #endif /* CF_PWCACHE */
+
+#if	defined(SYSHAS_SHADOW) && (SYSHAS_SHADOW > 0)
+#define	F_SHADOW	1
+#else
+#define	F_SHADOW	0
+#endif
 
 
 /* local namespaces */
@@ -77,9 +80,10 @@
 
 /* forward subroutines */
 
-static int	getpwentry_gecos(PWENTRY *,storeitem *,cchar *) noex ;
-static int	getpwentry_shadow(PWENTRY *,storeitem *,PASSWD *) noex ;
-static int	getpwentry_setnuls(PWENTRY *,cchar *) noex ;
+static int	getpwentry_load(pwentry *,char *,int,PASSWD *) noex ;
+static int	getpwentry_gecos(pwentry *,storeitem *,cchar *) noex ;
+static int	getpwentry_shadow(pwentry *,storeitem *,PASSWD *) noex ;
+static int	getpwentry_setnuls(pwentry *,cchar *) noex ;
 
 static int	isNoEntry(int) noex ;
 
@@ -95,13 +99,15 @@ static constexpr int	rsents[] = {
 	    0
 } ;
 
+constexpr bool		f_shadow = F_SHADOW ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int getpwentry_name(PWENTRY *uep,char *ebuf,int elen,cchar *name) noex {
+int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf && name) {
@@ -114,13 +120,13 @@ int getpwentry_name(PWENTRY *uep,char *ebuf,int elen,cchar *name) noex {
 	        }
 	        rs1 = uc_free(pwbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (getpwentry_name) */
 
-int getpwentry_uid(PWENTRY *uep,char *ebuf,int elen,uid_t uid) noex {
+int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf) {
@@ -133,7 +139,7 @@ int getpwentry_uid(PWENTRY *uep,char *ebuf,int elen,uid_t uid) noex {
 	        }
 	        rs1 = uc_free(pwbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
+	    } /* end if (m-a-f) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -142,7 +148,7 @@ int getpwentry_uid(PWENTRY *uep,char *ebuf,int elen,uid_t uid) noex {
 
 /* local subroutines */
 
-static int getpwentry_load(PWENTRY *uep,char *ebuf,int elen,PASSWD *pep) noex {
+static int getpwentry_load(pwentry *uep,char *ebuf,int elen,PASSWD *pep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf && pep) {
@@ -156,13 +162,12 @@ static int getpwentry_load(PWENTRY *uep,char *ebuf,int elen,PASSWD *pep) noex {
 		    vpp = &uep->username ;
 	            rs = storeitem_strw(&ubuf,pep->pw_name,-1,vpp) ;
 	            emptyp = (uep->username + rs) ;
-    
-#if	(! SYSHAS_SHADOW)
-	            if ((rs >= 0) && (pep->pw_passwd != nullptr)) {
-		        vpp = &uep->password ;
-	                storeitem_strw(&ubuf,pep->pw_passwd,-1,vpp) ;
-	            }
-#endif /* SYSHAS_SHADOW */
+		    if constexpr (f_shadow) {
+	                if ((rs >= 0) && pep->pw_passwd) {
+		            vpp = &uep->password ;
+	                    storeitem_strw(&ubuf,pep->pw_passwd,-1,vpp) ;
+	                }
+		    } /* end if-constexpr (f_shadow) */
 	            uep->uid = pep->pw_uid ;
 	            uep->gid = pep->pw_gid ;
 	            if ((rs >= 0) && (pep->pw_gecos != nullptr)) {
@@ -200,23 +205,23 @@ static int getpwentry_load(PWENTRY *uep,char *ebuf,int elen,PASSWD *pep) noex {
 }
 /* end subroutine (getpwentry_load) */
 
-static int getpwentry_gecos(PWENTRY *uep,storeitem *bp,cchar *gecosdata) noex {
+static int getpwentry_gecos(pwentry *uep,storeitem *bp,cchar *gecosdata) noex {
 	gecos		g ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = gecos_start(&g,gecosdata,-1)) >= 0) {
 	    for (int i = 0 ; i < gecosval_overlast ; i += 1) {
-	        cchar	*vp{} ;
+	        cchar	*vp{} ;	/* "Value-Pointer" */
 	        if (int vl ; (vl = gecos_getval(&g,i,&vp)) >= 0) {
-	            void	*p{} ;
+	            void	*mp{} ;	/* "Malloc-Pointer" */
 		    cchar	**vpp = nullptr ;
 	            switch (i) {
 	            case gecosval_organization:
 	                vpp = &uep->organization ;
 	                break ;
 	            case gecosval_realname:
-	                if ((rs = uc_malloc((vl+1),&p)) >= 0) {
-	                    char	*nbuf = p ;
+	                if ((rs = uc_malloc((vl+1),&mp)) >= 0) {
+	                    char	*nbuf = charp(mp) ;
 	                    if (strnchr(vp,vl,'_') != nullptr) {
 	                        rs = snwcpyhyphen(nbuf,-1,vp,vl) ;
 	                        vp = nbuf ;
@@ -226,9 +231,9 @@ static int getpwentry_gecos(PWENTRY *uep,storeitem *bp,cchar *gecosdata) noex {
 	                        rs = storeitem_strw(bp,vp,vl,vpp) ;
 				vpp = nullptr ;
 	                    }
-	                    rs1 = uc_free(p) ;
+	                    rs1 = uc_free(mp) ;
 			    if (rs >= 0) rs = rs1 ;
-	                } /* end if (memory_allocation) */
+	                } /* end if (m-a-f) */
 	                break ;
 	            case gecosval_account:
 	                vpp = &uep->account ;
@@ -262,16 +267,14 @@ static int getpwentry_gecos(PWENTRY *uep,storeitem *bp,cchar *gecosdata) noex {
 }
 /* end subroutine (getpwentry_gecos) */
 
-static int getpwentry_shadow(PWENTRY *uep,storeitem *sip,PASSWD *pep) noex {
+static int getpwentry_shadow(pwentry *uep,storeitem *sip,PASSWD *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	SYSHAS_SHADOW
-	{
-	    PASSWD	sd ;
-	    cint	splen = getbufsize(getbufsize_sp) ;
+	if constexpr (f_shadow) {
 	    char	*spbuf{} ;
-	    if ((rs = uc_malloc((splen+1),&spbuf)) >= 0) {
+	    if ((rs = malloc_sp(&spbuf)) >= 0) {
+	        ucentsp	sd ;
+		cint	splen = rs ;
 	        cchar	*pn = pep->pw_name ;
 	        cchar	**vpp = &uep->password ;
 	        if ((rs = getsp_name(&sd,spbuf,splen,pn)) >= 0) {
@@ -298,31 +301,25 @@ static int getpwentry_shadow(PWENTRY *uep,storeitem *sip,PASSWD *pep) noex {
 	            if (pep->pw_passwd != nullptr) {
 	                rs = storeitem_strw(sip,pep->pw_passwd,-1,vpp) ;
 	            }
-	        }
+	        } /* end if */
 	        rs1 = uc_free(spbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
-	} /* end block */
-#else /* SYSHAS_SHADOW */
-	{
+	    } /* end if (m-a-f) */
+	} else {
 	    rs = SR_NOSYS ;
 	    uep->lstchg = 1 ;
 	    uep->daymin = -1 ;
 	    uep->daymax = -1 ;
 	    uep->warn = -1 ;
 	    uep->inact = -1 ;
-#ifdef	OPTIONAL
 	    uep->expire = 0 ;
 	    uep->flag = 0 ;
-#endif
-	}
-#endif /* SYSHAS_SHADOW */
-
+	} /* end if-constexpr (f_shadow) */
 	return rs ;
 }
 /* end subroutine (getpwentry_shadow) */
 
-static int getpwentry_setnuls(PWENTRY *uep,cchar *emptyp) noex {
+static int getpwentry_setnuls(pwentry *uep,cchar *emptyp) noex {
 	checknul(emptyp,&uep->username) ;
 	checknul(emptyp,&uep->password) ;
 	checknul(emptyp,&uep->gecos) ;

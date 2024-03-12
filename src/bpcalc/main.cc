@@ -1,12 +1,11 @@
-/* main */
+/* main SUPPORT */
+/* lang=C++20 */
 
 /* branch-prediction calculator */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -20,15 +19,11 @@
 /**************************************************************************
 
 	Synopsis:
-
 	$ bpcalc
-
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -39,8 +34,8 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
+#include	<getpwentry.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<realname.h>
@@ -66,11 +61,11 @@
 
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
 extern int	lastlogin(char *,uid_t,time_t *,char *,char *) ;
-extern int	mkgecosname(char *,int,const char *) ;
+extern int	mkgecosname(char *,int,cchar *) ;
 extern int	isdigitlatin(int) ;
 
 extern char	*strbasename(char *) ;
@@ -89,54 +84,16 @@ extern char	*timestr_elapsed(time_t,char *) ;
 
 /* local structures */
 
-/* define command option words */
-
-static char *const argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	NULL
-} ;
-
 enum argopts {
 	argopt_version,
 	argopt_verbose,
 	argopt_overlast
 } ;
 
-/* define the configuration keywords */
-
-static char *const qopts[] = {
-	    "logname",
-	    "username",
-	    "uid",
-	    "gid",
-	    "groupname",
-	    "gecos",		/* 5 */
-	    "gecosname",	/* 6 */
-	    "mailname",
-	    "homedir",
-	    "shell",
-	    "name",
-	    "fullname",
-	    "organization",
-	    "nodename",
-	    "hostname",
-	    "domainname",
-	    "nisdomain",
-	    "password",
-	    "passwd",
-	    "euid",
-	    "egid",
-	    "realname",
-	    "account",
-	    "bin",
-	    "office",
-	    "wphone",
-	    "hphone",
-	    "printer",
-	    "lstchg",
-	    "lastlog",
-	    NULL
+static cchar *const argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	nullptr
 } ;
 
 enum qopts {
@@ -173,31 +130,56 @@ enum qopts {
 	qopt_overlast
 } ;
 
+static cchar *const qopts[] = {
+	    "logname",
+	    "username",
+	    "uid",
+	    "gid",
+	    "groupname",
+	    "gecos",		/* 5 */
+	    "gecosname",	/* 6 */
+	    "mailname",
+	    "homedir",
+	    "shell",
+	    "name",
+	    "fullname",
+	    "organization",
+	    "nodename",
+	    "hostname",
+	    "domainname",
+	    "nisdomain",
+	    "password",
+	    "passwd",
+	    "euid",
+	    "egid",
+	    "realname",
+	    "account",
+	    "bin",
+	    "office",
+	    "wphone",
+	    "hphone",
+	    "printer",
+	    "lstchg",
+	    "lastlog",
+	    nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
-	struct passwd	*pep ;
-
-	struct group	*gep = NULL ;
-
+int main(int argc,mainv argv,mainv envv) noex {
+	PASSWD		*pep ;
+	GROUP		*gep = nullptr ;
 	struct proginfo	pi, *pip = &pi ;
-
 	PWENTRY		entry ;
-
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		nisfile, *nfp = &nisfile ;
-
 	time_t	daytime = 0 ;
-
 	uid_t	uid_cur ;
-
 	int	argr, argl, aol, akl, avl ;
 	int	argvalue = -1 ;
 	int	maxai, pan, npa, kwi, i, j, k ;
@@ -213,20 +195,20 @@ char	*envv[] ;
 	int	f_self = FALSE ;
 	int	f_entok = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
+	cchar	*argp, *aop, *akp, *avp ;
 	char	argpresent[MAXARGGROUPS] ;
 	char	buf[BUFLEN + 1], *bp ;
 	char	nodename[NODENAMELEN + 1] ;
 	char	domainname[MAXHOSTNAMELEN + 1] ;
 	char	entrybuf[PWENTRY_BUFLEN + 1] ;
-	const char	*ofname = NULL ;
-	const char	*pwfname = NULL ;
-	const char	*un = NULL ;
-	const char	*cp, *cp2 ;
+	cchar	*ofname = nullptr ;
+	cchar	*pwfname = nullptr ;
+	cchar	*un = nullptr ;
+	cchar	*cp, *cp2 ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -246,12 +228,9 @@ char	*envv[] ;
 /* initialize */
 
 	pip->f.quiet = FALSE ;
-
 	pip->debuglevel = 0 ;
 	pip->verboselevel = 0 ;
-
-	pip->programroot = NULL ;
-
+	pip->programroot = nullptr ;
 
 /* start parsing the arguments */
 
@@ -286,7 +265,7 @@ char	*envv[] ;
 	                aol = argl - 1 ;
 	                akp = aop ;
 	                f_optequal = FALSE ;
-	                if ((avp = strchr(aop,'=')) != NULL) {
+	                if ((avp = strchr(aop,'=')) != nullptr) {
 
 	                    akl = avp - aop ;
 	                    avp += 1 ;
@@ -532,7 +511,7 @@ char	*envv[] ;
 
 /* open the output file */
 
-	if (ofname != NULL)
+	if (ofname != nullptr)
 	    rs = bopen(ofp,ofname,"wct",0666) ;
 
 	else
@@ -577,14 +556,14 @@ char	*envv[] ;
 	uid_cur = u_getuid() ;
 
 	f_entok = FALSE ;
-	if (pwfname == NULL) {
+	if (pwfname == nullptr) {
 
 #if	CF_DEBUG
 	    if (pip->debuglevel > 1)
 	        debugprintf("main: about to get PW entry, un=%s\n",un) ;
 #endif
 
-	    if (un != NULL) {
+	    if (un != nullptr) {
 
 	        rs = getpwentry_name(&entry,entrybuf,PWENTRY_BUFLEN,un) ;
 
@@ -610,8 +589,8 @@ char	*envv[] ;
 	    if ((rs = pwfile_open(&pf,pwfname)) >= 0) {
 
 	        rs = SR_NOENT ;
-	        if (un != NULL)
-	            rs = pwfile_fetchuser(&pf,un,NULL,
+	        if (un != nullptr)
+	            rs = pwfile_fetchuser(&pf,un,nullptr,
 	                &entry,entrybuf,PWENTRY_BUFLEN) ;
 
 	        pwfile_close(&pf) ;
@@ -697,7 +676,7 @@ char	*envv[] ;
 	            case qopt_logname:
 			case qopt_username:
 	                cp = entry.username ;
-	                bprintf(ofp,"%s\n",((cp != NULL) ? cp : "")) ;
+	                bprintf(ofp,"%s\n",((cp != nullptr) ? cp : "")) ;
 
 	                break ;
 
@@ -730,7 +709,7 @@ char	*envv[] ;
 	                } else if (f_entok)
 	                    gep = getgrgid(entry.gid) ;
 
-	                if (gep != NULL)
+	                if (gep != nullptr)
 	                    bprintf(ofp,"%s\n",gep->gr_name) ;
 
 	                else
@@ -778,14 +757,14 @@ char	*envv[] ;
 	                break ;
 
 	            case qopt_name:
-	                cp = NULL ;
+	                cp = nullptr ;
 	                if (f_self)
 	                    cp = getenv("NAME") ;
 
-	                if ((cp == NULL) && f_entok)
+	                if ((cp == nullptr) && f_entok)
 	                    cp = entry.realname ;
 
-	                if (cp != NULL) {
+	                if (cp != nullptr) {
 
 	                    realname	rn = obj_realname(cp,-1) ;
 
@@ -802,14 +781,14 @@ char	*envv[] ;
 	                break ;
 
 	            case qopt_mailname:
-	                cp = NULL ;
+	                cp = nullptr ;
 	                if (f_self)
 	                    cp = getenv("NAME") ;
 
-	                if ((cp == NULL) && f_entok)
+	                if ((cp == nullptr) && f_entok)
 	                    cp = entry.realname ;
 
-	                if (cp != NULL) {
+	                if (cp != nullptr) {
 
 	                    realname	rn = obj_realname(cp,-1) ;
 
@@ -826,14 +805,14 @@ char	*envv[] ;
 	                break ;
 
 	            case qopt_fullname:
-	                cp = NULL ;
+	                cp = nullptr ;
 	                if (f_self)
 	                    cp = getenv("FULLNAME") ;
 
-	                if ((cp == NULL) && f_entok)
+	                if ((cp == nullptr) && f_entok)
 	                    cp = entry.realname ;
 
-	                if (cp != NULL) {
+	                if (cp != nullptr) {
 
 	                    realname	rn = obj_realname(cp,-1) ;
 
@@ -850,14 +829,14 @@ char	*envv[] ;
 	                break ;
 
 	            case qopt_organization:
-	                cp = NULL ;
+	                cp = nullptr ;
 	                if (f_self)
 	                    cp = getenv("ORGANIZATION") ;
 
-	                if ((cp == NULL) && f_entok)
+	                if ((cp == nullptr) && f_entok)
 	                    cp = entry.organization ;
 
-	                bprintf(ofp,"%s\n",((cp != NULL) ? cp : "")) ;
+	                bprintf(ofp,"%s\n",((cp != nullptr) ? cp : "")) ;
 
 	                break ;
 
@@ -928,7 +907,7 @@ char	*envv[] ;
 
 	            case qopt_password:
 	            case qopt_passwd:
-	                if (f_entok && (entry.password != NULL))
+	                if (f_entok && (entry.password != nullptr))
 	                    bprintf(ofp,"%s\n",entry.password) ;
 
 	                else
@@ -948,7 +927,7 @@ char	*envv[] ;
 
 	            case qopt_realname:
 	                cp = "" ;
-	                if (f_entok && (entry.realname != NULL))
+	                if (f_entok && (entry.realname != nullptr))
 	                    cp = entry.realname ;
 
 	                bprintf(ofp,"%s\n",cp) ;
@@ -957,7 +936,7 @@ char	*envv[] ;
 
 	            case qopt_account:
 	                cp = "" ;
-	                if (f_entok && (entry.account != NULL))
+	                if (f_entok && (entry.account != nullptr))
 	                    cp = entry.account ;
 
 	                bprintf(ofp,"%s\n",cp) ;
@@ -966,7 +945,7 @@ char	*envv[] ;
 
 	            case qopt_bin:
 	                cp = "" ;
-	                if (f_entok && (entry.bin != NULL))
+	                if (f_entok && (entry.bin != nullptr))
 	                    cp = entry.bin ;
 
 	                bprintf(ofp,"%s\n",cp) ;
@@ -975,7 +954,7 @@ char	*envv[] ;
 
 	            case qopt_office:
 	                cp = "" ;
-	                if (f_entok && (entry.office != NULL))
+	                if (f_entok && (entry.office != nullptr))
 	                    cp = entry.office ;
 
 	                bprintf(ofp,"%s\n",cp) ;
@@ -984,7 +963,7 @@ char	*envv[] ;
 
 	            case qopt_wphone:
 	                cp = "" ;
-	                if (f_entok && (entry.wphone != NULL))
+	                if (f_entok && (entry.wphone != nullptr))
 	                    cp = entry.wphone ;
 
 	                bprintf(ofp,"%s\n",cp) ;
@@ -993,7 +972,7 @@ char	*envv[] ;
 
 	            case qopt_hphone:
 	                cp = "" ;
-	                if (f_entok && (entry.hphone != NULL))
+	                if (f_entok && (entry.hphone != nullptr))
 	                    cp = entry.hphone ;
 
 	                bprintf(ofp,"%s\n",cp) ;
@@ -1001,14 +980,14 @@ char	*envv[] ;
 	                break ;
 
 	            case qopt_printer:
-	                cp = NULL ;
+	                cp = nullptr ;
 	                if (f_self)
 	                    cp = getenv("PRINTER") ;
 
-	                if ((cp == NULL) && f_entok)
+	                if ((cp == nullptr) && f_entok)
 	                    cp = entry.printer ;
 
-	                bprintf(ofp,"%s\n",((cp != NULL) ? cp : "")) ;
+	                bprintf(ofp,"%s\n",((cp != nullptr) ? cp : "")) ;
 
 	                break ;
 
@@ -1030,7 +1009,7 @@ char	*envv[] ;
 	                    char	timebuf[TIMEBUFLEN + 1] ;
 
 
-	                    rs = lastlogin(NULL,entry.uid,
+	                    rs = lastlogin(nullptr,entry.uid,
 	                        &t,hostname,line) ;
 
 	                    if (rs >= 0) {
@@ -1042,7 +1021,7 @@ char	*envv[] ;
 	                        if (pip->verboselevel >= 1) {
 
 	                            if (daytime <= 0)
-	                                daytime = time(NULL) ;
+	                                daytime = time(nullptr) ;
 
 	                            bprintf(ofp," (%17s)",
 	                                timestr_elapsed((daytime - t),
@@ -1116,7 +1095,7 @@ usage:
 	bprintf(efp,"%s:    possible configuration keywords are :\n",
 	    pip->progname) ;
 
-	for (i = 0 ; qopts[i] != NULL ; i += 1) {
+	for (i = 0 ; qopts[i] != nullptr ; i += 1) {
 
 	    if ((i % USAGECOLS) == 0)
 	        bprintf(efp,"%s: \t",
