@@ -75,7 +75,6 @@
 #include	<cstring>
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<usystem.h>
-#include	<usupport.h>		/* for |memclear(3u)| */
 #include	<estrings.h>
 #include	<field.h>
 #include	<tmstrs.h>

@@ -70,7 +70,6 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>

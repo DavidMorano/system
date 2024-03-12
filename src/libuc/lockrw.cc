@@ -48,7 +48,6 @@
 #include	<ctime>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"lockrw.h"

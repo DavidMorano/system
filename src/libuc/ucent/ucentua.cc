@@ -30,7 +30,6 @@
 #include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vecstr.h>

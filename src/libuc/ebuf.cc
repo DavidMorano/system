@@ -40,7 +40,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<intfloor.h>
 #include	<localmisc.h>
 

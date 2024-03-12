@@ -58,7 +58,6 @@
 #include	<cstdint>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<fsdir.h>
 #include	<fifostr.h>
 #include	<strwcpy.h>

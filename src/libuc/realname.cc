@@ -28,12 +28,10 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sbuf.h>
 #include	<storeitem.h>
 #include	<dstr.h>
@@ -55,16 +53,26 @@
 #define	NAMESTR	struct namestr
 
 
+/* local namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
 
 struct names {
-	STOREITEM	s ;
+	storeitem	s ;
 	cchar		*a[REALNAME_NNAMES] ;
 	int		li ;
-	int		i, count ;
+	int		i ;
+	int		count ;
 	uchar		l[REALNAME_NNAMES] ;
 	uchar		f_abv[REALNAME_NNAMES] ;
 } ;
@@ -77,7 +85,7 @@ struct namestr {
 
 /* forward references */
 
-int		realname_startparse(REALNAME *,cchar *,int) noex ;
+int		realname_startparse(realname *,cchar *,int) noex ;
 
 static int	names_start(NAMES *,char *) noex ;
 static int	names_add(NAMES *,cchar *,int,int,int) noex ;
@@ -95,17 +103,20 @@ static int	isAbbr(int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int realname_start(REALNAME *rnp,cchar *sbuf,int slen) noex {
+int realname_start(realname *rnp,cchar *sbuf,int slen) noex {
 	int		rs ;
 	rs = realname_startparse(rnp,sbuf,slen) ;
 	return rs ;
 }
 /* end subroutine (realname_start) */
 
-int realname_startparts(REALNAME *rnp,DSTR *stp) noex {
-	STOREITEM	s ;
+int realname_startparts(realname *rnp,dstr *stp) noex {
+	storeitem	s ;
 	int		slen = REALNAME_STORELEN ;
 	int		rs ;
 	int		rs1 ;
@@ -170,8 +181,8 @@ int realname_startparts(REALNAME *rnp,DSTR *stp) noex {
 }
 /* end subroutine (realname_startparts) */
 
-int realname_startpieces(REALNAME *rnp,cchar **sa,int sn) noex {
-	STOREITEM	s ;
+int realname_startpieces(realname *rnp,cchar **sa,int sn) noex {
+	storeitem	s ;
 	cint		slen = REALNAME_STORELEN ;
 	cint		nparts = REALNAME_NPARTS ;
 	int		rs ;

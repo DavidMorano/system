@@ -19,12 +19,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<dstr.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 
 #define	REALNAME		struct realname_head
@@ -73,7 +71,7 @@ typedef REALNAME	realname ;
 EXTERNC_begin
 
 extern int	realname_start(realname *,cchar *,int) noex ;
-extern int	realname_startparts(realname *,DSTR *) noex ;
+extern int	realname_startparts(realname *,dstr *) noex ;
 extern int	realname_startpieces(realname *,cchar **,int) noex ;
 extern int	realname_startparse(realname *,cchar *,int) noex ;
 extern int	realname_getlast(realname *,cchar **) noex ;
@@ -85,7 +83,7 @@ extern int	realname_getpieces(realname *,cchar **) noex ;
 extern int	realname_fullname(realname *,char *,int) noex ;
 extern int	realname_name(realname *,char *,int) noex ;
 extern int	realname_mailname(realname *,char *,int) noex ;
-extern int	realname_mat(realname *,REALNAME *) noex ;
+extern int	realname_mat(realname *,realname *) noex ;
 extern int	realname_matlast(realname *,char *,int) noex ;
 extern int	realname_matfirst(realname *,char *,int) noex ;
 extern int	realname_matm1(realname *,char *,int) noex ;

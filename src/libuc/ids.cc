@@ -43,7 +43,6 @@
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ids.h"

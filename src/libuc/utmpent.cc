@@ -26,7 +26,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<strn.h>
 #include	<mkchar.h>
 #include	<localmisc.h>

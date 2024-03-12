@@ -26,7 +26,6 @@
 #include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<storeitem.h>

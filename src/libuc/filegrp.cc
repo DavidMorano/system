@@ -28,7 +28,6 @@
 #include	<cstring>		/* <- for |strken(3c)| */
 #include	<grp.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<bufsizevar.hh>
 #include	<vechand.h>
 #include	<cq.h>

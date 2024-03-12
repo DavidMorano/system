@@ -49,7 +49,6 @@
 #include	<utypealiases.h>
 #include	<uclibsubs.h>
 #include	<usysrets.h>
-#include	<usupport.h>
 #include	<usysflag.h>
 #include	<snwcpy.h>
 #include	<getbufsize.h>

@@ -87,7 +87,6 @@ ADDRINFO {
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<mallocxx.h>
 #include	<localmisc.h>
 

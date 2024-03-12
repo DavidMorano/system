@@ -55,7 +55,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<filebuf.h>

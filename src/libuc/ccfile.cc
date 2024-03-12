@@ -56,7 +56,6 @@
 #include	<string>
 #include	<istream>
 #include	<usystem.h>
-#include	<usupport.h>		/* for |ulogerror(3uc)| */
 #include	<storebuf.h>		/* <- not used! */
 #include	<sncpyx.h>		/* <- not used! */
 #include	<snwcpy.h>

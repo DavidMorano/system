@@ -85,7 +85,6 @@
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<nulstr.h>
 #include	<nleadstr.h>
 #include	<strwcpy.h>

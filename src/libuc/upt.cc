@@ -32,7 +32,6 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<hasx.h>
 #include	<cfdec.h>
 #include	<localmisc.h>

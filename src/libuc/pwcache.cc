@@ -27,7 +27,6 @@
 #include        <cstring>		/* <- for |strlen(3c)| */
 #include        <ctime>
 #include        <usystem.h>
-#include        <usupport.h>
 #include        <getbufsize.h>
 #include        <mallocxx.h>
 #include        <ucentpw.h>

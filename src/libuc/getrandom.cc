@@ -36,7 +36,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<timewatch.hh>
 #include	<ptm.h>

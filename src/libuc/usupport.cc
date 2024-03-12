@@ -55,8 +55,6 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"usupport.h"
-
 
 /* local defines */
 

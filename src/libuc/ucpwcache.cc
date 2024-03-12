@@ -59,7 +59,6 @@
 #include	<cstring>
 #include	<atomic>		/* |atomic_int(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<ptc.h>

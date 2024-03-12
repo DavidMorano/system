@@ -45,7 +45,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<snwcpy.h>
 #include	<cfdec.h>
 #include	<localmisc.h>

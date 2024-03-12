@@ -61,7 +61,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sbuf.h>
 #include	<char.h>
 #include	<sigblock.h>

@@ -33,7 +33,6 @@
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"vecelem.h"

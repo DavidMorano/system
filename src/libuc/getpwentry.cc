@@ -29,7 +29,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>

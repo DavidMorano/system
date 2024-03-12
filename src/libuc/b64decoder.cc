@@ -34,7 +34,6 @@
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sfx.h>
 #include	<intfloor.h>
 #include	<strwcpy.h>

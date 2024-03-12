@@ -77,7 +77,6 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<sncpyx.h>

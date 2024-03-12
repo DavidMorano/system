@@ -76,7 +76,6 @@
 #include	<climits>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<vecstr.h>
 #include	<matostr.h>

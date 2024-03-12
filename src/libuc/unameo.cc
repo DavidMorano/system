@@ -33,7 +33,6 @@
 #include	<sys/utsname.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 

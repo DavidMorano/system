@@ -39,7 +39,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<cfdec.h>
 #include	<estrings.h>
 #include	<char.h>

@@ -49,7 +49,6 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 
 #include	"memtrack.hh"
 

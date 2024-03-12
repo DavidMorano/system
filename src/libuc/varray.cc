@@ -26,7 +26,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<lookaside.h>
 #include	<localmisc.h>
 

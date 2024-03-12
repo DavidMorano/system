@@ -38,7 +38,6 @@
 #include	<cstring>
 #include	<bit>			/* <- |countr_zero(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<stdintx.h>
 #include	<baops.h>
 #include	<intceil.h>

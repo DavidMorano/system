@@ -42,7 +42,6 @@
 #include	<cstring>		/* <- for |memset(3c)| */
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 
 #include	"sigevent.h"
 

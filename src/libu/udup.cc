@@ -31,7 +31,6 @@
 #include	<unistd.h>
 #include	<errno.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"udup.h"

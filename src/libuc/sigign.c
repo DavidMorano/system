@@ -28,7 +28,6 @@
 #include	<unistd.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"sigign.h"

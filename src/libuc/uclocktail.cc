@@ -33,7 +33,6 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 

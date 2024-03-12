@@ -50,7 +50,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vechand.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>

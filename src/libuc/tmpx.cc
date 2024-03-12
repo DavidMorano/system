@@ -36,7 +36,6 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<intfloor.h>
 #include	<intceil.h>
 #include	<getfdfile.h>

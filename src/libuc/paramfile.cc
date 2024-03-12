@@ -35,7 +35,6 @@
 #include	<new>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ascii.h>

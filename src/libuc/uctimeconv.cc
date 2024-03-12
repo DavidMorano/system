@@ -38,7 +38,6 @@
 #include	<ctime>
 #include	<cstring>		/* <- for |memcpy(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 

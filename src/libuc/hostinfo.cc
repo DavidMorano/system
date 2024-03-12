@@ -42,7 +42,6 @@
 #include	<algorithm>		/* <- for |min(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getbufsize.h>
 #include	<bufsizevar.hh>
 #include	<vecobj.h>

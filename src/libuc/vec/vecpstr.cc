@@ -74,7 +74,6 @@
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vechand.h>
 #include	<vstrcmpx.h>
 #include	<nleadstr.h>

@@ -45,7 +45,6 @@
 #include	<unistd.h>
 #include	<csignal>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 

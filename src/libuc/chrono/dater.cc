@@ -62,7 +62,6 @@
 #include	<ctime>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<estrings.h>
 #include	<calstrs.h>
 #include	<sbuf.h>

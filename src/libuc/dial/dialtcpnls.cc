@@ -52,7 +52,6 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<mallocxx.h>
 #include	<sbuf.h>
 #include	<char.h>

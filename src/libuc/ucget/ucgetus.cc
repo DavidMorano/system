@@ -51,7 +51,6 @@
 #include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 #include	<usysflag.h>
 #include	<timewatch.hh>

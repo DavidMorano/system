@@ -33,7 +33,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>		/* for |getenv(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<varnames.hh>
 #include	<syswords.hh>

@@ -50,7 +50,6 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getax.h>

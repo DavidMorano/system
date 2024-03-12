@@ -123,7 +123,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ptm.h>

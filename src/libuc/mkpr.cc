@@ -61,7 +61,6 @@
 #include	<ctime>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<varnames.hh>
 #include	<getbufsize.h>
 #include	<bufsizevar.hh>

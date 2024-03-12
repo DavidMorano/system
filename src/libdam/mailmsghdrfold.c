@@ -69,7 +69,6 @@
 #include	<limits.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecobj.h>
 #include	<ascii.h>
 #include	<char.h>

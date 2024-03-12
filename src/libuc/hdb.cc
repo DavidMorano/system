@@ -125,7 +125,6 @@
 #include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- |memclear(3u)| */
 #include	<lookaside.h>
 #include	<localmisc.h>
 

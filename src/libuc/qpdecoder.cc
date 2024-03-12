@@ -31,7 +31,6 @@
 #include	<new>
 #include	<algorithm>		/* < for |min(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<digval.h>		/* <- for |hexval(3uc)| */
 #include	<six.h>
 #include	<strwcpy.h>

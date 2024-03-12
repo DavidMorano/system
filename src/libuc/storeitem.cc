@@ -48,7 +48,6 @@
 #include	<cstring>
 #include	<bit>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<intceil.h>
 #include	<localmisc.h>
 

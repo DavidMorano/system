@@ -32,7 +32,6 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ucopen.h"

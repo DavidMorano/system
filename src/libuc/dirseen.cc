@@ -29,7 +29,6 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<nulstr.h>
 #include	<sncpyx.h>
 #include	<mkchar.h>

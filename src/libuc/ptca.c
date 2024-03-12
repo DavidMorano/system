@@ -26,7 +26,6 @@
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ptca.h"

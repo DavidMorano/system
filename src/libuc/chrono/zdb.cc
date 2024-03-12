@@ -28,7 +28,6 @@
 #include	<algorithm>		/* |min(3c++)| */
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3uc)| */
 #include	<estrings.h>
 #include	<nulstr.h>
 #include	<strwcpy.h>

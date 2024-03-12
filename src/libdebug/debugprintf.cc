@@ -96,7 +96,6 @@
 #include	<stdarg.h>
 #include	<stdio.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ptm.h>
 #include	<hasx.h>
 #include	<cfdec.h>

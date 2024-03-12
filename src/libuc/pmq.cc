@@ -38,7 +38,6 @@
 #include	<cerrno>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<usysflag.h>
 #include	<getbufsize.h>
 #include	<getax.h>

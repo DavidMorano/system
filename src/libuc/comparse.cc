@@ -32,7 +32,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<ascii.h>
 #include	<buffer.h>
 #include	<char.h>

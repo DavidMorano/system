@@ -46,7 +46,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3uc)| */
 #include	<upt.h>
 #include	<localmisc.h>
 

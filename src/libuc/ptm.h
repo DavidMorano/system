@@ -23,7 +23,6 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<clanguage.h>
 
 #include	"ptma.h"

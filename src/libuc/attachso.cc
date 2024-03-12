@@ -51,7 +51,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storebuf.h>
 #include	<mkx.h>
 #include	<ids.h>

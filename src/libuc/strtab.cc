@@ -108,7 +108,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecobj.h>
 #include	<sysval.hh>
 #include	<localmisc.h>

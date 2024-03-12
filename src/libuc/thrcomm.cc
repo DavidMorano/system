@@ -28,7 +28,6 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"thrcomm.h"

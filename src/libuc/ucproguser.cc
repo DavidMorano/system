@@ -77,7 +77,6 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<sncpyx.h>

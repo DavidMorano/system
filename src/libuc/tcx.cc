@@ -155,7 +155,6 @@
 #include	<unistd.h>
 #include	<termios.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<localmisc.h>
 
 #include	"tcx.h"

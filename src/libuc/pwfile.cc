@@ -33,7 +33,6 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<mallocxx.h>
 #include	<pwentry.h>
 #include	<gecos.h>

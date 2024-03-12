@@ -39,7 +39,6 @@
 #include	<string.h>
 #include	<stdarg.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<char.h>

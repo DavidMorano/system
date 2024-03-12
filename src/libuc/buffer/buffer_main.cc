@@ -54,7 +54,6 @@
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<stdintx.h>
 #include	<format.h>
 #include	<strwcpy.h>

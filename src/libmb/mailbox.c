@@ -41,7 +41,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblock.h>
 #include	<filebuf.h>
 #include	<char.h>

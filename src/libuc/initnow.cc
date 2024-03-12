@@ -58,7 +58,6 @@
 #include	<cstring>		/* for |memset(3c)| */
 #include	<ctime>			/* structure |TIMEB| */
 #include	<usystem.h>		/* UNIX® structure aliases */
-#include	<usupport.h>		/* for |memclear(3u)| */
 #include	<tmtime.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>

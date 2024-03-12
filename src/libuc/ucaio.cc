@@ -59,7 +59,6 @@
 #include	<aio.h>
 #include	<cerrno>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 

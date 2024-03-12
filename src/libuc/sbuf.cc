@@ -57,7 +57,6 @@
 #include	<cstdarg>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<format.h>
 #include	<ctdec.h>
 #include	<cthex.h>

@@ -58,7 +58,6 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<hostaddr.h>
 #include	<getprotofamily.h>
 #include	<getproto.h>

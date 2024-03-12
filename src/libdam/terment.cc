@@ -29,7 +29,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<snwcpy.h>
 #include	<localmisc.h>
 

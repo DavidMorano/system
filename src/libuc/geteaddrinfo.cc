@@ -60,7 +60,6 @@
 #include	<cstring>		/* <- |strlen(3c)| + |strcmp(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* for |memclear(3u)| */
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<getnodename.h>		/* <- for |getnodedomain(2uc)| */

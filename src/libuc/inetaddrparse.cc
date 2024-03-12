@@ -45,7 +45,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<strn.h>
 #include	<localmisc.h>
 

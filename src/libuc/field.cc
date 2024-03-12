@@ -91,7 +91,6 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ascii.h>
 #include	<baops.h>
 #include	<char.h>

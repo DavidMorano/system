@@ -47,7 +47,6 @@
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecobj.h>
 #include	<localmisc.h>
 #include	<intceil.h>

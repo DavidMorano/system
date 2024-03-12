@@ -58,7 +58,6 @@
 #include	<cstring>
 #include	<atomic>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<syshasutmpx.h>
 #include	<ptm.h>

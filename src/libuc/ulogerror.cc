@@ -45,7 +45,6 @@
 #include	<cstdio>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getfdfile.h>		/* <- for |FD_STDxxx| */
 #include	<strdcpy.h>
 #include	<localmisc.h>

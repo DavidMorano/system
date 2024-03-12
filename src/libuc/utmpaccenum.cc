@@ -25,7 +25,6 @@
 #include	<sys/param.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storeitem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>

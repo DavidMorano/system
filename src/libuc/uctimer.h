@@ -18,10 +18,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<clanguage.h>
+#include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<usupport.h>
+#include	<clanguage.h>
 
 
 EXTERNC_begin

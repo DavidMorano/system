@@ -71,7 +71,6 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<hostinfo.h>
 #include	<hostaddr.h>
 #include	<hostent.h>

@@ -42,7 +42,6 @@
 #include	<sys/utsname.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<sigblocker.h>
 #include	<ptm.h>

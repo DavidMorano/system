@@ -31,7 +31,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<pq.h>
 #include	<intceil.h>
 #include	<localmisc.h>
