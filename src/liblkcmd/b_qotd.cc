@@ -1,14 +1,13 @@
-/* b_qotd */
+/* b_qotd SUPPORT */
+/* lang=C++20 */
 
-/* this is a SHELL built-in version of 'qotd(1)' */
+/* this is a SHELL built-in version of |qotd(1ksh)| */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_BUFLINEIN	1		/* line-buffering for STDIN */
-
 
 /* revision history:
 
@@ -22,11 +21,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ qotd [<day>|<mjd> -m] [-af <afile>] [-r] [-e] [-l <qfile>] [-V]
 
 	Arguments:
-
 	<day>		quote for this day (default today): <mon><mday>
 	-af <afile>	argument file of <day(s)>
 	-m		the day(s) are MJDs in decimal
@@ -35,9 +32,7 @@
 	-l <qfile>	load file into local cache
 	-V		print command version to standard-error and then exit
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

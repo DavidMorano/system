@@ -1,5 +1,7 @@
-/* mfs-adj(unct) */
+/* mfs-adj(unct) HEADER */
+/* lang=C++20 */
 
+/* MFS adjunct subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +18,7 @@
 /* Copyright © 2005,2017 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MFSADJ_INCLUDE
-#define	MFSADJ_INCLUDE	1
+#define	MFSADJ_INCLUDE
 
 
 #include	<envstandards.h>
@@ -24,18 +26,15 @@
 #include	"defs.h"
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	mfsadj_begin(PROGINFO *) ;
-extern int	mfsadj_end(PROGINFO *) ;
-extern int	mfsadj_poll(PROGINFO *,POLLER *,int,int) ;
-extern int	mfsadj_register(PROGINFO *,POLLER *) ;
+extern int	mfsadj_begin(PROGINFO *) noex ;
+extern int	mfsadj_end(PROGINFO *) noex ;
+extern int	mfsadj_poll(PROGINFO *,POLLER *,int,int) noex ;
+extern int	mfsadj_register(PROGINFO *,POLLER *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* MFSADJ_INCLUDE */
 

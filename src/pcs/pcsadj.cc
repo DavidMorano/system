@@ -1,12 +1,11 @@
-/* pcs-adj */
+/* pcsadj SUPPORT */
+/* lang=C++20 */
 
 /* PCS adjunct subroutines */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-
 
 /* revision history:
 
@@ -14,9 +13,9 @@
 	Originally written for Rightcore Network Services.
 
 	= 2005-01-25, David A­D­ Morano
-	This code was separated out from the main code (in 'pcsmain.c') due to
-	conflicts over including different versions of the system socket
-	structures.
+	This code was separated out from the main code (in 'pcsmain.c')
+	due to conflicts over including different versions of the
+	system socket structures.
 
 */
 
@@ -26,12 +25,9 @@
 
 	This is adjunct code to the main PCS program.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -41,11 +37,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<netdb.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<msfile.h>
 #include	<sockaddress.h>
