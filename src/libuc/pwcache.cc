@@ -45,7 +45,7 @@
 #define PWE             PASSWD
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
 

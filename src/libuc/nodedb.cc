@@ -97,7 +97,7 @@
 #define	KEYALIGNMENT		sizeof(char *(*)[2])
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

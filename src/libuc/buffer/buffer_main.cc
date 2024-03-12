@@ -81,7 +81,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 using std::max ;

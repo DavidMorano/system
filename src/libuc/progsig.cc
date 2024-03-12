@@ -80,7 +80,7 @@
 #define	STORENOTE	struct storenote
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

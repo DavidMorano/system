@@ -57,7 +57,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using namespace	std ;
 

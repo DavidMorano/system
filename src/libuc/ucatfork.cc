@@ -72,7 +72,7 @@
 #define	UCATFORK_LIST	struct ucatfork_list
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

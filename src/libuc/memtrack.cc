@@ -71,7 +71,7 @@ extern int	memtrack_finish() noex ;
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

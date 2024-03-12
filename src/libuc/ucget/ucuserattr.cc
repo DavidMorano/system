@@ -64,7 +64,7 @@
 #endif /* defined(SYSHAS_USERATTR) && (SYSHAS_USERATTR > 0) */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

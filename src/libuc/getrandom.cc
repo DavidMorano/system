@@ -65,7 +65,7 @@
 #define	GETRANDOM_MAXENT	256	/* maximum bytes per call */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

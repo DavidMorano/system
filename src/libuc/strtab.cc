@@ -133,7 +133,7 @@
 #define	VALBOGUS	(250000 * 10)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

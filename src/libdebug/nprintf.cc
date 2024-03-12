@@ -86,7 +86,7 @@
 #define	SUBINFO		struct subinfo
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

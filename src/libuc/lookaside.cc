@@ -45,7 +45,7 @@
 #define	OURFREE(pointer)		uc_libfree((pointer))
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;
 using std::nothrow ;

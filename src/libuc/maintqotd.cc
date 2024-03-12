@@ -134,7 +134,7 @@
 #define	QCONFIG		struct qconfig
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -56,7 +56,7 @@
 #define	CHX_STAR	'*'
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

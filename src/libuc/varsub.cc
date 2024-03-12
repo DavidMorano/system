@@ -62,7 +62,7 @@
 #define	VARSUB_SUB	struct varsub_sub
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

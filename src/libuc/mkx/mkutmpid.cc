@@ -120,7 +120,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 

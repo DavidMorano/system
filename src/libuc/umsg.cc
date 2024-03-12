@@ -35,7 +35,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

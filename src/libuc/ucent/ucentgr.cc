@@ -49,7 +49,7 @@
 #define	SI	storeitem
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -36,7 +36,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using libuc::ucgetloadavg ;		/* internal library subroutine */
 

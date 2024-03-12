@@ -52,7 +52,7 @@
 #define	NDF		"libpretime.nd"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

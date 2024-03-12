@@ -53,7 +53,7 @@
 #define	NAMESTR	struct namestr
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

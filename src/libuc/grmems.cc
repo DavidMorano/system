@@ -79,7 +79,7 @@
 #define	GRMEMS_USERGID		struct grmems_ug
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

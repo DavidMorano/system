@@ -44,7 +44,7 @@
 #define	ADDRESSLEN	60		/* starting address length */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

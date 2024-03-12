@@ -63,7 +63,7 @@
 #define	PCSNSMGR	struct pcsnsmgr_head
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

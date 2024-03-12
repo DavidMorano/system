@@ -57,7 +57,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::has_single_bit ;		/* subroutine-template */
 

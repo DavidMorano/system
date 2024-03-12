@@ -98,7 +98,7 @@ ADDRINFO {
 #define	AI	ADDRINFO
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

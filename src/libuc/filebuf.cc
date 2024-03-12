@@ -55,7 +55,7 @@
 	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 using std::max ;

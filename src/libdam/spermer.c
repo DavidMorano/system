@@ -59,7 +59,7 @@
 #include	<localmisc.h>
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local defines */

@@ -72,7 +72,7 @@
 #define	CD_CUR			clusterdb_cur
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

@@ -49,7 +49,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */

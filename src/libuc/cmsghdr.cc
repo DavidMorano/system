@@ -32,6 +32,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -45,6 +51,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -62,6 +71,6 @@ int cmsghdr_passed(CMSGHDR *cmp) noex {
 	}
 	return fd ;
 }
-/* end subroutine (cmsghdr_pass) */
+/* end subroutine (cmsghdr_passed) */
 
 

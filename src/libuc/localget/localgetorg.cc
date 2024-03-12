@@ -89,7 +89,7 @@
 #define	ORGCNAME	"organization"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

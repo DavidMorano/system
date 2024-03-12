@@ -46,7 +46,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::bitset ;
 

@@ -76,7 +76,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 

@@ -42,7 +42,7 @@
 #define	CIQ_ENT		struct ciq_ent
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

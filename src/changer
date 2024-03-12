@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} uc_madvise"
+NAMES="${NAMES} namespace "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/uc_madvise/s//u_madvise/g
+g/local namespaces/s//imported namespaces/g
 	w
 	q
 EOF

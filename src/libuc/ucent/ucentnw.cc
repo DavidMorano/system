@@ -71,7 +71,7 @@
 #define ASTRLEN                 MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */

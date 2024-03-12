@@ -73,7 +73,7 @@
 #define	SUBINFO		struct subinfo
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 using std::max ;

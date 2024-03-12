@@ -72,7 +72,7 @@
 #define	SI		struct subinfo
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

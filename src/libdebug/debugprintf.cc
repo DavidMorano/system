@@ -121,7 +121,7 @@
 #define	O_FLAGS		(O_WRONLY | O_CREAT | O_APPEND)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

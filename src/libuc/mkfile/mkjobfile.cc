@@ -67,7 +67,7 @@
 #define	PREFIXLEN	4		/* file-name prefix length */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

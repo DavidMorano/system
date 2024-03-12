@@ -71,7 +71,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::atomic_int ;			/* type */
 

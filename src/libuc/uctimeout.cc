@@ -87,7 +87,7 @@
 #define	NDF		"uctimeout.deb"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

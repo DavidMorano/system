@@ -66,7 +66,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::max ;
 

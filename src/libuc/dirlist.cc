@@ -64,7 +64,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::nullptr_t ;			/* type */

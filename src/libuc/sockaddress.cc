@@ -48,7 +48,7 @@
 #define	SA	SOCKADDRESS
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 using std::max ;

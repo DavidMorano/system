@@ -94,7 +94,7 @@
 #define	SUBINFO_FL	struct subinfo_flags
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

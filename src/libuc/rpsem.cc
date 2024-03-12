@@ -71,7 +71,7 @@
 #define	NLPS		5	/* number of polls per second */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

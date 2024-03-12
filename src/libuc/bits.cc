@@ -52,7 +52,7 @@
 #define	BITS_MINWORDS	4
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::popcount ;
 using std::countr_zero ;

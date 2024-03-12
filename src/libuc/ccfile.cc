@@ -72,7 +72,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::istream ;			/* type */
 using std::fstream ;			/* type */

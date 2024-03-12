@@ -58,7 +58,7 @@
 #define	PATHBUF_INDEX	(pbp->i)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

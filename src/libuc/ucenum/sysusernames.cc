@@ -39,7 +39,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
 

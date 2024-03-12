@@ -66,7 +66,7 @@
 #define	MAX_TYPES	5		/* max number of types above */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

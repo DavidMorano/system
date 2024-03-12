@@ -75,7 +75,7 @@
 #define	MIDDLECHAR	'.'		/* middle joining character */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

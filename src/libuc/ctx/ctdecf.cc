@@ -71,7 +71,7 @@
 #define	SUBINFO_FL	struct subinfo_flags
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 

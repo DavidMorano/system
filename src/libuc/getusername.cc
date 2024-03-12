@@ -168,7 +168,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
 

@@ -83,7 +83,7 @@
 #define	FNSHELLS	"/etc/shells"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::string ;			/* type */
 using std::ifstream ;			/* type */

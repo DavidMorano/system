@@ -52,7 +52,7 @@
 #define	PLMULT		2		/* path-length multiplier */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

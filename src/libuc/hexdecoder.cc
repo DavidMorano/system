@@ -43,7 +43,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */

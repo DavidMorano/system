@@ -66,7 +66,7 @@
 #define	STRENTRY	struct strentry
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::max ;			/* subroutine-template */

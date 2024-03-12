@@ -49,7 +49,7 @@
 #include	"powtwo.h"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::countl_zero ;
 using std::countl_one ;

@@ -52,7 +52,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* subroutine templates */

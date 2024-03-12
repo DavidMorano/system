@@ -88,7 +88,7 @@
 #define	ARG			utmpacc_a
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::atomic_int ;
 

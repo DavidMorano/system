@@ -61,7 +61,7 @@
 #define	AEBUFLEN	sizeof(struct utmpx)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 

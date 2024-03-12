@@ -50,7 +50,7 @@
 #define	CUA		const ucentua
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

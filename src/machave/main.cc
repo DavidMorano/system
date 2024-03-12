@@ -84,7 +84,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::string ;			/* type */

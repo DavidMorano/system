@@ -101,7 +101,7 @@
 #define	TO_TTL		(2*3600)	/* two hours */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

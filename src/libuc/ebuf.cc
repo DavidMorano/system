@@ -51,7 +51,7 @@
 #define	WAY	struct ebuf_way
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -156,7 +156,7 @@
 #define	SUBINFO_ALLOCS	struct subinfo_allocs
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

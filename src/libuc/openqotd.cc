@@ -156,7 +156,7 @@
 #define	NFNAME		"qotd.ndeb"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

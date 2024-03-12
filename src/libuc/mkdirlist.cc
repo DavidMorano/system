@@ -83,7 +83,7 @@
 #define	ENT		mkdirlist_ent
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
 

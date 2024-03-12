@@ -82,7 +82,7 @@
 #define	NDF		"prgetprogpath.deb"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

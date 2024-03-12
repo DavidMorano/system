@@ -54,7 +54,7 @@
 #define	ENVS_DBCUR			hdb_cur
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

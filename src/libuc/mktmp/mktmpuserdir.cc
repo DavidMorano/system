@@ -63,7 +63,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typenames */

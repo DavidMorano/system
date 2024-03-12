@@ -39,7 +39,7 @@
 #define	OURFREE(pointer)		uc_libfree((pointer))
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;
 

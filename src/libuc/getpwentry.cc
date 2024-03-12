@@ -62,7 +62,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -154,11 +154,10 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,PASSWD *pep) noex {
 	    memclear(uep) ;		 /* noted potentially dangerous */
 	    if (pep->pw_name != nullptr) {
 	        storeitem	ubuf ;
-	        cchar	*emptyp = nullptr ;
+	        cchar		*emptyp = nullptr ;
 	        if ((rs = storeitem_start(&ubuf,ebuf,elen)) >= 0) {
-		    cchar	**vpp ;
+		    cchar	**vpp = &uep->username ;
 /* fill in the stuff that we got from the system */
-		    vpp = &uep->username ;
 	            rs = storeitem_strw(&ubuf,pep->pw_name,-1,vpp) ;
 	            emptyp = (uep->username + rs) ;
 		    if constexpr (f_shadow) {
@@ -185,11 +184,14 @@ static int getpwentry_load(pwentry *uep,char *ebuf,int elen,PASSWD *pep) noex {
 			        vpp = &uep->shell ;
 	                        storeitem_strw(&ubuf,pep->pw_shell,-1,vpp) ;
 		            }
-	                    if ((rs = getpwentry_shadow(uep,&ubuf,pep)) >= 0) {
-	                        rs = 0 ;
-	                    } else if (isNoEntry(rs)) {
-	                        rs = SR_OK ;
-	                    }
+			    if (rs >= 0) {
+				auto	gpws = getpwentry_shadow ;
+	                        if ((rs = gpws(uep,&ubuf,pep)) >= 0) {
+	                            rs = 0 ;
+	                        } else if (isNoEntry(rs)) {
+	                            rs = SR_OK ;
+	                        }
+			    } /* end if (ok) */
 	                } /* end if (gecos) */
 		    } /* end if (ok) */
 	            getpwentry_setnuls(uep,emptyp) ;

@@ -116,7 +116,7 @@
 #define	SI_FL		struct subinfo_flags
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

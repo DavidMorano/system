@@ -128,7 +128,7 @@
 #define	NBLANKS		8		/* number blanks to write at a time */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 

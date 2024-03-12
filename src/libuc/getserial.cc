@@ -91,7 +91,7 @@
 #endif /* defined(IRIX) */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */
