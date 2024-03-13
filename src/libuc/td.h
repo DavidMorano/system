@@ -27,7 +27,9 @@
 
 
 #define	TD		struct td_head
-#define	TD_POS	struct td_position
+#define	TD_POS		struct td_position
+#define	TD_WIN		struct td_window
+#define	TD_FL		struct td_flags
 
 /* control codes */
 #define	TD_CEOL		0		/* set "erase to EOL" mode */
@@ -45,7 +47,7 @@
 
 struct td_flags {
 	uint		statusdisplay:1 ;
-	uint		eol:1 ;		/* erase-to-EOL mode */
+	uint		meol:1 ;	/* erase-to-EOL mode */
 	uint		linebuf:1 ;	/* line buffer mode */
 	uint		smallscroll:1 ;
 	uint		nlcr:1 ;	/* NL-character display behavior */
@@ -58,8 +60,8 @@ struct td_position {
 } ;
 
 struct td_window {
-	struct td_position	move ;	/* move is outstanding */
-	struct td_position	cur ;	/* current position */
+	TD_POS		move ;		/* move is outstanding */
+	TD_POS		cur ;		/* current position */
 	int		srow ;		/* starting absolute row */
 	int		scol ;		/* starting absolute col */
 	int		rows ;		/* rows */
@@ -67,12 +69,12 @@ struct td_window {
 } ;
 
 struct td_head {
-	cchar		*termtype ;	/* given terminal type-name */
+	cchar		*termname ;	/* given terminal type-name */
 	char		*buf ;		/* storage buffer */
-	TERMSTR		enter ;
+	termstr		enter ;
 	vecitem		wins ;		/* sub windows */
-	TD_POS		cur ;	/* current position */
-	TF_FLAGS	f ;
+	TD_POS		cur ;		/* current position */
+	TD_FL		f ;
 	uint		timecounter ;
 	uint		magic ;
 	int		tfd ;
@@ -84,7 +86,9 @@ struct td_head {
 } ;
 
 typedef TD		td ;
+typedef TD_FL		td_fl ;
 typedef TD_POS		td_pos ;
+typedef TD_WIN		td_win ;
 
 EXTERNC_begin
 

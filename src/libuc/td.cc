@@ -4,7 +4,6 @@
 /* Terminal Display (TD) library */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGPROC	0		/* ? */
 #define	CF_SAVERESTORE	0		/* implementing cursor-save-restore? */
 
 /* revision history:
@@ -49,7 +48,7 @@
 #include	<termstr.h>
 #include	<termconseq.h>
 #include	<tabcols.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |HEXBUFLEN| */
 
 #include	"td.h"
 
@@ -59,16 +58,14 @@
 #define	TD_MAGIC	0x02652103
 #define	TD_BUFLEN	(8 * 1024)
 
-#define	TD_WIN		struct td_window
-
 #define	TD_RESTORELEN	4
 #define	TD_SCROLLBUFLEN	20
 
 /* terminal capabilities */
-#define	TD_TCSCROLL	0x0001		/* supports scroll regions */
-#define	TD_TCCOLOR	0x0002		/* supports color */
-#define	TD_TCEIGHT	0x0004		/* 8-bit controls */
-#define	TD_TCIL		0x0008		/* insert line */
+#define	TD_TCSCROLL	(1 << 0)	/* supports scroll regions */
+#define	TD_TCCOLOR	(1 << 1)	/* supports color */
+#define	TD_TCEIGHT	(1 << 2)	/* 8-bit controls */
+#define	TD_TCIL		(1 << 3)	/* insert line */
 
 /* aid for graphic rendition operations */
 #define	TD_GRMASK	(TD_GRBOLD|TD_GRUNDER|TD_GRBLINK|TD_GRREV)
@@ -86,10 +83,8 @@
 #undef	CBUFLEN
 #define	CBUFLEN		((4*4)+3)
 
+#ifndef	HEXBUFLEN
 #define	HEXBUFLEN	100
-
-#ifndef	VARTERM
-#define	VARTERM		"TERM"
 #endif
 
 #ifndef	NTABCOLS
@@ -100,8 +95,8 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
-using std:min ;				/* subroutine-template */
-using std:max ;				/* subroutine-template */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -160,24 +155,24 @@ static int	termmatch(const TERMTYPE *,cchar *) noex ;
 /* local variables */
 
 #ifdef	COMMENT
-/* 	TYPE	CAPABILITY	COLOR */
+/* 	TYPE		CAPABILITY	*/
 static const TERMTYPE	terms[] = {
-	    { "vt100",	(TD_TCSCROLL) },
-	    { "ansi",	(TD_TCSCROLL | TD_TCIL) },
-	    { "xterm",	(TD_TCSCROLL | TD_TCIL | TD_TCCOLOR) },
-	    { "screen",	(TD_TCSCROLL | TD_TCIL) },
-	    { "vt220",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
-	    { "vt240",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
-	    { "vt320",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
-	    { "vt340",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
-	    { "vt420",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
-	    { "vt440",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
-	    { "vt520",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
-	    { "vt540",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
-	    { "vt101",	(TD_TCSCROLL | TD_TCIL) },
-	    { "vt102",	(TD_TCSCROLL | TD_TCIL) },
-	    { nullptr, 0 }
-	} ;
+	{ "vt100",	(TD_TCSCROLL) },
+	{ "ansi",	(TD_TCSCROLL | TD_TCIL) },
+	{ "xterm",	(TD_TCSCROLL | TD_TCIL | TD_TCCOLOR) },
+	{ "screen",	(TD_TCSCROLL | TD_TCIL) },
+	{ "vt220",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
+	{ "vt240",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
+	{ "vt320",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
+	{ "vt340",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
+	{ "vt420",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
+	{ "vt440",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
+	{ "vt520",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT) },
+	{ "vt540",	(TD_TCSCROLL | TD_TCIL | TD_TCEIGHT | TD_TCCOLOR) },
+	{ "vt101",	(TD_TCSCROLL | TD_TCIL) },
+	{ "vt102",	(TD_TCSCROLL | TD_TCIL) },
+	{ nullptr, 0 }
+} ;
 #endif /* COMMENT */
 
 
@@ -186,16 +181,16 @@ static const TERMTYPE	terms[] = {
 
 /* exported subroutines */
 
-int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c) noex {
+int td_start(TD *tdp,int tfd,cchar *termname,int r,int c) noex {
 	USTAT		sb ;
 	int		rs = SR_OK ;
 
 	if (tdp == nullptr) return SR_FAULT ;
-	if (termtype == nullptr) return SR_FAULT ;
+	if (termname == nullptr) return SR_FAULT ;
 
 	if (tfd < 0) return SR_BADF ;
 
-	if (termtype[0] == '\0') return SR_INVALID ;
+	if (termname[0] == '\0') return SR_INVALID ;
 
 	if ((r < 0) || (c < 0)) return SR_INVALID ;
 
@@ -212,21 +207,21 @@ int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c) noex {
 	        tdp->rows = r ;
 	        tdp->cols = c ;
 	        tdp->f.statusdisplay = false ;
-	        tdp->f.eol = false ;
+	        tdp->f.meol = false ;
 	        tdp->f.linebuf = false ;
 	        if ((rs = uc_tcgetattr(tfd,&termconf)) >= 0) {
 	            cchar	*cp ;
 	            tdp->f.nlcr = (termconf.c_oflag & ONLCR) ? true : false ;
-	            if ((rs = uc_mallocstrw(termtype,-1,&cp)) >= 0) {
+	            if ((rs = uc_mallocstrw(termname,-1,&cp)) >= 0) {
 	                char	*bp ;
-	                tdp->termtype = cp ;
+	                tdp->termname = cp ;
 	                if ((rs = uc_malloc(tdp->buflen,&bp)) >= 0) {
-	                    cchar	*tt = termtype ;
+	                    cchar	*tt = termname ;
 	                    tdp->buf = bp ;
 	                    if ((rs = termstr_start(&tdp->enter,tt)) >= 0) {
-	                        VECITEM		*wlp = &tdp->wins ;
-	                        cint		opts = VECITEM_PHOLES ;
-	                        if ((rs = vecitem_start(wlp,5,opts)) >= 0) {
+	                        vecitem	*wlp = &tdp->wins ;
+	                        cint	vo = 0 ;
+	                        if ((rs = vecitem_start(wlp,5,vo)) >= 0) {
 	                            if ((rs = td_startwin(tdp,0,0,r,c)) >= 0) {
 	                                tdp->cur.row = -1 ;
 	                                tdp->cur.col = -1 ;
@@ -236,8 +231,9 @@ int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c) noex {
 	                                vecitem_finish(wlp) ;
 				    }
 	                        } /* end if (vecitem_start) */
-	                        if (rs < 0)
+	                        if (rs < 0) {
 	                            termstr_finish(&tdp->enter) ;
+				}
 	                    } /* end if (termstr_start) */
 	                    if (rs < 0) {
 	                        uc_free(tdp->buf) ;
@@ -245,8 +241,8 @@ int td_start(TD *tdp,int tfd,cchar *termtype,int r,int c) noex {
 	                    }
 	                } /* end if (m-a) */
 	                if (rs < 0) {
-	                    uc_free(tdp->termtype) ;
-	                    tdp->termtype = nullptr ;
+	                    uc_free(tdp->termname) ;
+	                    tdp->termname = nullptr ;
 	                }
 	            } /* end if (m-a) */
 	        } /* end if (tcgetattr) */
@@ -291,10 +287,10 @@ int td_finish(TD *tdp) noex {
 	    tdp->buf = nullptr ;
 	}
 
-	if (tdp->termtype != nullptr) {
-	    rs1 = uc_free(tdp->termtype) ;
+	if (tdp->termname != nullptr) {
+	    rs1 = uc_free(tdp->termname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    tdp->termtype = nullptr ;
+	    tdp->termname = nullptr ;
 	}
 
 	tdp->magic = 0 ;
@@ -481,11 +477,9 @@ int td_scroll(TD *tdp,int wn,int n) noex {
 	if (n != 0) {
 	    TD_WIN	*wp ;
 	    if ((rs = vecitem_get(&tdp->wins,wn,&wp)) >= 0) {
-	        int		index_line ;
-	        int		i ;
-	        int		na ;
-	        int		f = false ;
-	        char		index_chars[8] ;
+	        int	index_line ;
+	        int	na ;
+	        char	index_chars[8] ;
 
 /* prepare a move for after the entire scroll operation -- do it */
 
@@ -497,7 +491,7 @@ int td_scroll(TD *tdp,int wn,int n) noex {
 	            na = wp->rows ;
 
 	        if ((rs = td_termstrbegin(tdp)) >= 0) {
-	            TERMSTR	*tsp = &tdp->enter ;
+	            termstr	*tsp = &tdp->enter ;
 
 	            if ((rs = termstr_ssr(tsp,wp->srow,wp->rows)) >= 0) {
 /* move to the boundary of the scroll region for the proper direction */
@@ -512,7 +506,7 @@ int td_scroll(TD *tdp,int wn,int n) noex {
 
 	            if (rs >= 0) {
 	                if ((rs = termstr_curh(tsp,index_line,-1)) >= 0) {
-	                    for (i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
+	                    for (int i = 0 ; (rs >= 0) && (i < na) ; i += 1) {
 	                        rs = termstr_write(tsp,index_chars,-1) ;
 	                    }
 	                    if (rs >= 0) {
@@ -675,7 +669,6 @@ int td_clear(TD *tdp,int w) noex {
 }
 /* end subroutine (td_clear) */
 
-
 /* erase-window; type: 0=forward, 1=back, 2=whole */
 int td_ew(TD *tdp,int w,int r,int type) noex {
 	TD_WIN		*wp ;
@@ -810,7 +803,7 @@ int td_check(TD *tdp) noex {
 }
 /* end subroutine (td_check) */
 
-int td_position(TD *tdp,int wn,TD_POSITION *pp) noex {
+int td_position(TD *tdp,int wn,TD_POS *pp) noex {
 	TD_WIN		*wp ;
 	int		rs ;
 
@@ -819,7 +812,7 @@ int td_position(TD *tdp,int wn,TD_POSITION *pp) noex {
 
 	if (tdp->magic != TD_MAGIC) return SR_NOTOPEN ;
 
-	memset(pp,0,sizeof(TD_POSITION)) ;
+	memset(pp,0,sizeof(TD_POS)) ;
 
 	if ((rs = vecitem_get(&tdp->wins,wn,&wp)) >= 0) {
 	    pp->timecount = wp->cur.timecount ;
