@@ -1,11 +1,10 @@
-/* osetstr */
+/* osetstr SUPPORT */
 /* lang=C++98 */
 
 /* ordered set of strings */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -18,15 +17,12 @@
 
 /*******************************************************************************
 
-	This object provides am ordered set of strings.  No two strings can
-	be the same (desired for these purposes).
-
+	This object provides am ordered set of strings.  No two
+	strings can be the same (desired for these purposes).
 
 *******************************************************************************/
 
-#define	OSETSTR_MASTER	0	/* must to include "extern-C" classification */
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<string.h>
@@ -43,7 +39,7 @@
 /* local defines */
 
 
-/* default name spaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
 

@@ -1,12 +1,11 @@
-/* osetint */
+/* osetint SUPPORT */
 /* lang=C++98 */
 
 /* ordered set of integers */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1		/* pointer safety */
-
 
 /* revision history:
 
@@ -19,8 +18,8 @@
 
 /*******************************************************************************
 
-	This object provides am ordered set of integers.  No two elements can
-	be the same (desired for these purposes).
+	This object provides am ordered set of integers.  No two
+	elements can be the same (desired for these purposes).
 
 	= Implementation
 

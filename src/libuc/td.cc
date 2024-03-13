@@ -98,8 +98,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std:min ;				/* subroutine-template */
 using std:max ;				/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -176,6 +178,9 @@ static const TERMTYPE	terms[] = {
 	    { nullptr, 0 }
 	} ;
 #endif /* COMMENT */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

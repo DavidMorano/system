@@ -1,12 +1,11 @@
-/* setint */
+/* setint SUPPORT */
 /* lang=C++11 */
 
 /* unordered set of integers */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1		/* pointer safety */
-
 
 /* revision history:
 
@@ -19,15 +18,12 @@
 
 /*******************************************************************************
 
-        This object provides a set of integers. No two elements can be the same
-        (desired for these purposes).
-
+	This object provides a set of integers. No two elements can
+	be the same (desired for these purposes).
 
 *******************************************************************************/
 
-#define	SETINT_MASTER	0	/* must to include "extern-C" classification */
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<new>
@@ -45,10 +41,12 @@
 /* local defines */
 
 
-/* default name spaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
 
+
+/* local typedefs */
 
 /* forward references */
 
@@ -56,11 +54,12 @@ using namespace		std ;		/* yes, we want punishment! */
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int setint_start(setint *op)
-{
+int setint_start(setint *op) noex {
 	unordered_set<int>	*setp ;
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;

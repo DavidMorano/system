@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	UINFO_INCLUDE
-#define	UINFO_INCLUDE
+#ifndef	UMASK_INCLUDE
+#define	UMASK_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -40,6 +40,6 @@ static inline int setumask(mode_t m) noex {
 EXTERNC_end
 
 
-#endif /* UINFO_INCLUDE */
+#endif /* UMASK_INCLUDE */
 
 

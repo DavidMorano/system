@@ -1,11 +1,10 @@
-/* utf8decoder */
+/* utf8decoder SUPPORT */
 /* lang=C++98 */
 
 /* UTF-8 decoding */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -26,23 +25,13 @@
 		utf8decoder_read
 		utf8decoder_finish
 
-
 *******************************************************************************/
 
-
-#define	UTF8DECODER_MASTER	0	/* necessary for proper symbol names */
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<limits.h>
 #include	<string.h>
-
 #include	<vector>
 #include	<new>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -52,9 +41,12 @@
 /* local defines */
 
 
-/* namespaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -133,11 +125,12 @@ public:
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int utf8decoder_start(UTF8DECODER *op)
-{
+int utf8decoder_start(UTF8DECODER *op) noex {
 	int		rs = SR_OK ;
 	widebuf		*wbp ;
 

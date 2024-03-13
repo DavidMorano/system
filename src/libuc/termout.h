@@ -1,6 +1,8 @@
-/* termout */
+/* termout HEADER */
+/* lang=C20 */
 
 /* terminal-output management */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,13 +15,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TERMOUT_INCLUDE
-#define	TERMOUT_INCLUDE	1
+#define	TERMOUT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<vecobj.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	TERMOUT_MAGIC	0x13f3c201
@@ -32,32 +34,27 @@ struct termout_flags {
 } ;
 
 struct termout_head {
-	uint		magic ;
-	TERMOUT_FL	f ;
 	void		*cvp ;		/* character-vector-pointer */
 	void		*lvp ;		/* line-vector-pointer */
+	TERMOUT_FL	f ;
+	uint		magic ;
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
 	int		ncol ;
 } ;
 
+typedef TERMOUT		termout ;
+typedef TERMOUT_FL	termout_fl ;
 
-#if	(! defined(TERMOUT_MASTER)) || (TERMOUT_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int termout_start(termout *,cchar *,int,int) noex ;
+extern int termout_load(termout *,cchar *,int) noex ;
+extern int termout_getline(termout *,int,cchar **) noex ;
+extern int termout_finish(termout *) noex ;
 
-extern int termout_start(TERMOUT *,const char *,int,int) ;
-extern int termout_load(TERMOUT *,const char *,int) ;
-extern int termout_getline(TERMOUT *,int,const char **) ;
-extern int termout_finish(TERMOUT *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TERMOUT_MASTER */
 
 #endif /* TERMOUT_INCLUDE */
 

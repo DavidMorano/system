@@ -1,4 +1,8 @@
-/* osetstr */
+/* osetstr HEADER */
+/* lang=C20 */
+
+/* ordered set of strings */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,21 +14,21 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	OSETSTR_INCLUDE
-#define	OSETSTR_INCLUDE		1
+#define	OSETSTR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>		/* for 'uint' */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	OSETSTR		struct osetstr_head
-#define	OSETSTR_CUR	struct osetstr_c
+#define	OSETSTR_CUR	struct osetstr_cursor
 
 
-struct osetstr_c {
+struct osetstr_cursor {
 	void		*interp ;
 } ;
 
@@ -32,33 +36,24 @@ struct osetstr_head {
 	void		*setp ;
 } ;
 
+typedef OSETSTR		osetstr ;
+typedef OSETSTR_CUR	osetstr_cur ;
 
-typedef struct osetstr_head	osetstr ;
-typedef struct osetstr_c	osetstr_cur ;
+EXTERNC_begin
 
+extern int osetstr_start(osetstr *,int) noex ;
+extern int osetstr_already(osetstr *,cchar *,int) noex ;
+extern int osetstr_add(osetstr *,cchar *,int) noex ;
+extern int osetstr_del(osetstr *,cchar *,int) noex ;
+extern int osetstr_delall(osetstr *) noex ;
+extern int osetstr_count(osetstr *) noex ;
+extern int osetstr_curbegin(osetstr *,osetstr_cur *) noex ;
+extern int osetstr_enum(osetstr *,osetstr_cur *,cchar **) noex ;
+extern int osetstr_curend(osetstr *,osetstr_cur *) noex ;
+extern int osetstr_finish(osetstr *) noex ;
 
-#if	(! defined(OSETSTR_MASTER)) || (OSETSTR_MASTER == 0)
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int osetstr_start(osetstr *,int) ;
-extern int osetstr_already(osetstr *,cchar *,int) ;
-extern int osetstr_add(osetstr *,cchar *,int) ;
-extern int osetstr_del(osetstr *,cchar *,int) ;
-extern int osetstr_delall(osetstr *) ;
-extern int osetstr_count(osetstr *) ;
-extern int osetstr_curbegin(osetstr *,osetstr_cur *) ;
-extern int osetstr_enum(osetstr *,osetstr_cur *,cchar **) ;
-extern int osetstr_curend(osetstr *,osetstr_cur *) ;
-extern int osetstr_finish(osetstr *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* OSETSTR_MASTER */
 
 #endif /* OSETSTR_INCLUDE */
 

@@ -1,6 +1,8 @@
-/* utf8decoder */
+/* utf8decoder HEADER */
+/* lang=C20 */
 
 /* UTF-8 decoder */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,13 +15,14 @@
 /* Copyright © 2016 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UTF8DECODER_INCLUDE
-#define	UTF8DECODER_INCLUDE	1
+#define	UTF8DECODER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stddef.h>		/* for 'wchar_t' */
-#include	<localmisc.h>
+#include	<stddef.h>		/* for |wchar_t| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	UTF8DECODER_MAGIC	0x13f3c205
@@ -27,29 +30,23 @@
 
 
 struct utf8decoder_head {
-	uint		magic ;
 	void		*outbuf ;	/* output-buffer */
+	uint		magic ;
 	uint		code ;		/* UNICODE® code point */
 	int		rem ;		/* remaining bytes */
 } ;
 
+typedef UTF8DECODER	utf8decoder ;
 
-#if	(! defined(UTF8DECODER_MASTER)) || (UTF8DECODER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int utf8decoder_start(utf8decoder *) noex ;
+extern int utf8decoder_load(utf8decoder *,cchar *,int) noex ;
+extern int utf8decoder_read(utf8decoder *,wchar_t *,int) noex ;
+extern int utf8decoder_finish(utf8decoder *) noex ;
 
-extern int utf8decoder_start(UTF8DECODER *) ;
-extern int utf8decoder_load(UTF8DECODER *,cchar *,int) ;
-extern int utf8decoder_read(UTF8DECODER *,wchar_t *,int) ;
-extern int utf8decoder_finish(UTF8DECODER *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* UTF8DECODER_MASTER */
 
 #endif /* UTF8DECODER_INCLUDE */
 

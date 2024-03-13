@@ -1,7 +1,8 @@
-/* querystring */
+/* querystring SUPPORT */
 /* lang=C++11 */
 
 /* Query-String manager */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
@@ -16,23 +17,16 @@
 
 /*******************************************************************************
 
-        We take a raw "query-string" and process it so that its components can
-        be accessed.
-
+	We take a raw "query-string" and process it so that its
+	components can be accessed.
 
 *******************************************************************************/
 
-
-#define	QUERYSTRING_MASTER	0
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<vector>
 #include	<usystem.h>
 #include	<char.h>
@@ -47,12 +41,12 @@
 #define	KEYVAL	struct keyval
 
 
-/* name spaces */
+/* imported namespaces */
 
 using namespace	std ;
 
 
-/* typedefs */
+/* local typedefs */
 
 
 /* external subroutines */
