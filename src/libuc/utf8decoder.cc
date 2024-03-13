@@ -28,7 +28,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<vector>
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -60,52 +60,46 @@ using std::nothrow ;		/* constant */
 /* local structures */
 
 class widebuf {
-	std::vector<int>	b ;
+	std::vector<wchar_t>	b ;
 	int			oi ;		/* output index */
 public:
-	widebuf() noex : oi(0) { 
-	} ;
-	widebuf(cchar *sbuf) noex : oi(0) { 
-	    int	i ;
-	    for (i = 0 ; sbuf[i] ; i += 1) {
-		b.push_back(sbuf[i]) ;
-	    }
-	} ;
-	widebuf(cchar *sbuf,int slen) noex : oi(0) {
-	    int	i ;
-	    if (slen < 0) slen = strlen(sbuf) ;
-	    for (i = 0 ; sbuf[i] ; i += 1) {
-		b.push_back(sbuf[i]) ;
-	    }
-	} ;
-	int operator [] (int i) const noex {
+	widebuf() noex : oi(0) { } ;
+	wchar_t operator [] (int i) const noex {
+	    wchar_t	rch = 0 ;
 	    cint	n = b.size() ;
-	    int		rch = 0 ;
 	    if ((oi+i) < n) rch = b[oi+i] ;
 	    return rch ;
 	} ;
-	widebuf &operator += (int ch) noex {
-	    b.push_back(ch) ;
-	    return *this ;
-	} ;
 	int add(int ch) noex {
-	    b.push_back(ch) ;
-	    return (b.size() - oi) ;
+	    int		rs ;
+	    try {
+	        b.push_back(ch) ;
+		rs = (b.size() - oi) ;
+	    } catch (...) {
+		rs = SR_NOMEM ;
+	    }
+	    return rs ;
 	} ;
 	int add(cchar *sp,int sl = -1) noex {
+	    int		rs ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    for (int i = 0 ; i < sl ; i += 1) {
-		b.push_back(sp[i]) ;
+	    try {
+	        for (int i = 0 ; i < sl ; i += 1) {
+		    b.push_back(sp[i]) ;
+	        }
+	        rs = (b.size() - oi) ;
+	    } catch (...) {
+		rs = SR_NOMEM ;
 	    }
-	    return (b.size() - oi) ;
+	    return rs ;
 	} ;
 	int count() const noex {
 	    return (b.size() - oi) ;
 	} ;
 	int len() const noex {
-	    return (b.size() - oi) ;
+	    return count() ;
 	} ;
-	int at(int i) const noex {
+	wchar_t at(int i) const noex {
 	    cint	n = b.size() ;
 	    int		rch = 0 ;
 	    if ((oi+i) < n) rch = b[oi+i] ;
@@ -178,7 +172,7 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
 	    cnullptr	np{} ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
-	        while (sl-- > 0) {
+	        while ((rs >= 0) && (sl-- > 0)) {
 		    const uint	uch = *sp++ ;
 		    if ((uch & 0x80) == 0) {
 	                wbp->add(uch) ;
@@ -198,7 +192,7 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
 			        op->rem -= 1 ;
 			        op->code |= ((uch & 0x3F) << (op->rem*6)) ;
 			        if (op->rem == 0) {
-	            	            wbp->add(op->code) ;
+	            	            rs = wbp->add(op->code) ;
 		    	            c += 1 ;
 		                }
 		            } /* end if (process continuation portion) */
@@ -227,7 +221,7 @@ int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
 	            for (i = 0 ; i < ml ; i += 1) {
 		        rbuf[i] = wbp->at(i) ;
 	            }
-	            rbuf[i] = '\0' ;
+	            rbuf[i] = 0 ;
 	            rs = wbp->adv(i) ;
 	        } else {
 	            rs = SR_BUGCHECK ;

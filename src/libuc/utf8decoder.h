@@ -31,8 +31,8 @@
 
 struct utf8decoder_head {
 	void		*outbuf ;	/* output-buffer */
+	wchar_t		code ;		/* UNICODE® code point */
 	uint		magic ;
-	uint		code ;		/* UNICODE® code point */
 	int		rem ;		/* remaining bytes */
 } ;
 
