@@ -4,7 +4,6 @@
 /* object to manage terminal database strings */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -18,8 +17,14 @@
 
 /*******************************************************************************
 
+	Name:
+	termstr
+
+	Description:
+	This object manages terminal database strings.
+
 	Synopsis:
-	int termstr_start(TERMSTR *op,cchar *termtype) noex
+	int termstr_start(termstr *op,cchar *termtype) noex
 
 	Arguments:
 	op		object pointer
@@ -34,11 +39,14 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<cstdlib>
+#include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<ansigr.h>
 #include	<buffer.h>
+#include	<termconseq.h>
+#include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"termstr.h"
@@ -87,25 +95,10 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	matostr(cchar **,int,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	termconseq(char *,int,int,int,int,int,int) ;
-extern int	buffer_blanks(BUFFER *,int) ;
-extern int	buffer_backs(BUFFER *,int) ;
-
-#if	CF_DEBUGS
-extern int	strnnlen(cchar *,int,int) ;
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
+extern "C" {
+    extern int	buffer_blanks(buffer *,int) noex ;
+    extern int	buffer_backs(buffer *,int) noex ;
+}
 
 
 /* external variables */
@@ -121,9 +114,48 @@ struct termtype {
 
 /* forward references */
 
-static int	termstr_curm(TERMSTR *,int,int) ;
-static int	termstr_findterm(TERMSTR *,cchar *) ;
-static int	termstr_conseq(TERMSTR *,int,int,int,int,int) ;
+template<typename ... Args>
+static int termstr_ctor(termstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    const nullptr_t	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    op->ti = -1 ;
+	    if ((op->sbp = new(nothrow) buffer) != np) {
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (termstr_ctor) */
+
+static int termstr_dtor(clusterdb *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->sbp) {
+		delete op->sbp ;
+		op->sbp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (termstr_dtor) */
+
+template<typename ... Args>
+static int termstr_magic(termstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TERMSTR_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (termstr_magic) */
+
+static int	termstr_curm(termstr *,int,int) noex ;
+static int	termstr_findterm(termstr *,cchar *) noex ;
+static int	termstr_conseq(termstr *,int,...) noex ;
 
 
 /* local variables */
@@ -149,7 +181,7 @@ static const struct termtype	terms[] = {
 	{ "vt520", (TCF_MVTADV) },
 	{ "vt530", (TCF_MVTADV) },
 	{ "vt540", (TCF_MVTADV) },
-	{ NULL, 0 }
+	{ nullptr, 0 }
 } ;
 
 static cchar	curtypes[] = "ABCD" ;
@@ -168,292 +200,209 @@ enum curtypes {
 
 /* exported subroutines */
 
-int termstr_start(TERMSTR *op,cchar *termtype)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (termtype == NULL) return SR_FAULT ;
-
-	if (termtype[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("termstr_start: termtype=%s\n",termtype) ;
-#endif
-
-	memset(op,0,sizeof(TERMSTR)) ;
-	op->ti = -1 ;
-
-/* find this terminal in the database */
-
-	if ((rs = termstr_findterm(op,termtype)) >= 0) {
-	    if ((rs = buffer_start(&op->b,TERMSTR_START)) >= 0) {
-	        op->magic = TERMSTR_MAGIC ;
+int termstr_start(termstr *op,cchar *termtype) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = termstr_ctor(op,termtype)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (termtype[0]) {
+	        if ((rs = termstr_findterm(op,termtype)) >= 0) {
+		    cint	bsz = TERMSTR_START ;
+	            if ((rs = buffer_start(op->sbp,bsz)) >= 0) {
+	                op->magic = TERMSTR_MAGIC ;
+	            }
+	        } /* end if (termstr_findterm) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		termstr_dtor(op) ;
 	    }
-	} /* end if (termstr_findterm) */
-
+	} /* end if (termstr_ctor) */
 	return rs ;
 }
 /* end subroutine (termstr_start) */
 
-
-int termstr_finish(TERMSTR *op)
-{
-	int		rs = SR_OK ;
+int termstr_finish(termstr *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = buffer_finish(&op->b) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->ti = -1 ;
-	op->magic = 0 ;
+	if ((rs = termstr_magic(op)) >= 0) {
+	    {
+		rs1 = buffer_finish(op->sbp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = termstr_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->ti = -1 ;
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutines (termstr_finish) */
 
-
-/* clear buffer */
-int termstr_clean(TERMSTR *op)
-{
+int termstr_clean(termstr *op) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	rs = buffer_reset(&op->b) ;
-
+	if ((rs = termstr_magic(op)) >= 0) {
+	    rs = buffer_reset(op->sbp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutines (termstr_clean) */
 
-
-/* write to the buffer */
-int termstr_write(TERMSTR *op,cchar bp[],int bl)
-{
-	int		rs = SR_OK ;
+int termstr_write(termstr *op,cchar *bp,int bl) noex {
+	int		rs ;
 	int		len = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	if (rs >= 0) {
-	    rs = buffer_buf(&op->b,bp,bl) ;
+	if ((rs = termstr_magic(op,bp)) >= 0) {
+	    rs = buffer_buf(op->sbp,bp,bl) ;
 	    len += rs ;
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutines (termstr_write) */
 
-
 /* write to the buffer w/ graphic-rendition */
-int termstr_writegr(TERMSTR *op,int gr,cchar bp[],int bl)
-{
-	const int	grmask = TERMSTR_GRMASK ;
-	int		rs = SR_OK ;
+int termstr_writegr(termstr *op,int gr,cchar *bp,int bl) noex {
+	int		rs ;
 	int		len = 0 ;
-	int		f_have = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs >= 0) && (gr & grmask)) {
-	    int	a1 = (gr & TERMSTR_GRBOLD) ? ANSIGR_BOLD : -1 ;
-	    int	a2 = (gr & TERMSTR_GRUNDER) ? ANSIGR_UNDER : -1 ;
-	    int	a3 = (gr & TERMSTR_GRBLINK) ? ANSIGR_BLINK : -1 ;
-	    int	a4 = (gr & TERMSTR_GRREV) ? ANSIGR_REV : -1 ;
-	    f_have = TRUE ;
-	    rs = termstr_conseq(op,'m',a1,a2,a3,a4) ;
-	    len += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = buffer_buf(&op->b,bp,bl) ;
-	    len += rs ;
-	}
-
-	if ((rs >= 0) && gr && f_have) {
-	    const int	code = ANSIGR_OFFALL ;
-	    rs = termstr_conseq(op,'m',code,-1,-1,-1) ;
-	    len += rs ;
-	}
-
+	if ((rs = termstr_magic(op,bp)) >= 0) {
+	    cint	grmask = TERMSTR_GRMASK ;
+	    bool	f_have = false ;
+	    if (gr & grmask) {
+	        cint	a1 = (gr & TERMSTR_GRBOLD) ? ANSIGR_BOLD : -1 ;
+	        cint	a2 = (gr & TERMSTR_GRUNDER) ? ANSIGR_UNDER : -1 ;
+	        cint	a3 = (gr & TERMSTR_GRBLINK) ? ANSIGR_BLINK : -1 ;
+	        cint	a4 = (gr & TERMSTR_GRREV) ? ANSIGR_REV : -1 ;
+	        f_have = true ;
+	        rs = termstr_conseq(op,'m',a1,a2,a3,a4) ;
+	        len += rs ;
+	    }
+	    if (rs >= 0) {
+	        rs = buffer_buf(op->sbp,bp,bl) ;
+	        len += rs ;
+	    }
+	    if ((rs >= 0) && gr && f_have) {
+	        cint	code = ANSIGR_OFFALL ;
+	        rs = termstr_conseq(op,'m',code,-1,-1,-1) ;
+	        len += rs ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutines (termstr_writegr) */
 
-
-/* add a character to the buffer */
-int termstr_char(TERMSTR *op,int ch)
-{
+int termstr_char(termstr *op,int ch) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	rs = buffer_char(&op->b,ch) ;
-
+	if ((rs = termstr_magic(op)) >= 0) {
+	    rs = buffer_char(op->sbp,ch) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutines (termstr_char) */
 
-
-/* get the buffer */
-int termstr_get(TERMSTR *op,cchar **rpp)
-{
+int termstr_get(termstr *op,cchar **rpp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	rs = buffer_get(&op->b,rpp) ;
-
+	if ((rs = termstr_magic(op,rpp)) >= 0) {
+	    rs = buffer_get(op->sbp,rpp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutines (termstr_get) */
 
-
-/* erase-display */
-int termstr_ed(TERMSTR *op,int type)
-{
+/* erase-display (ED) */
+int termstr_ed(termstr *op,int type) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
+	if ((rs = termstr_magic(op)) >= 0) {
 /* type: 0=forward, 1=back, 2=whole */
-
-	if (type >= 2)
-	    type = 2 ;
-
-	rs = termstr_conseq(op,'J',type,-1,-1,-1) ;
-
+	    if (type >= 2) type = 2 ;
+	    rs = termstr_conseq(op,'J',type,-1,-1,-1) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termstr_ed) */
 
-
-/* erase-line */
-int termstr_el(TERMSTR *op,int type)
-{
+/* erase-line (EL) */
+int termstr_el(termstr *op,int type) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
+	if ((rs = termstr_magic(op)) >= 0) {
 /* 0=forward, 1=back, 2=whole */
-
-	if (type >= 2)
-	    type = 2 ;
-
-	rs = termstr_conseq(op,'K',type,-1,-1,-1) ;
-
+	    if (type >= 2) type = 2 ;
+	    rs = termstr_conseq(op,'K',type,-1,-1,-1) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termstr_el) */
 
-
-/* erase-character */
-int termstr_ec(TERMSTR *op,int n)
-{
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
-
-	if (n > 0) {
-	    char	tbuf[TLEN + 1] ;
-	    char	*bp ;
-	    if (n >= TERMSTR_COLS) n = TERMSTR_COLS ;
-	    if (n <= 1) {
-	        bp = tbuf ;
-	        *bp++ = ' ' ;
-	        *bp++ = CH_BS ;
-	        *bp = '\0' ;
-	        rs = buffer_strw(&op->b,tbuf,(bp-tbuf)) ;
-	    } else {
-	        const int	ti = op->ti ;
-	        uint		tf ;
-	        tf = terms[ti].flags ;
-	        if (tf & TCF_MEC) {
-	            rs = termstr_conseq(op,'X',n,-1,-1,-1) ;
+/* erase-character (EC) */
+int termstr_ec(termstr *op,int n) noex {
+	int		rs ;
+	if ((rs = termstr_magic(op)) >= 0) {
+	    if (n > 0) {
+	        uint	tf ;
+	        char	tbuf[TLEN + 1] ;
+	        if (n >= TERMSTR_COLS) n = TERMSTR_COLS ;
+	        if (n <= 1) {
+	            char	*bp = tbuf ;
+	            *bp++ = ' ' ;
+	            *bp++ = CH_BS ;
+	            *bp = '\0' ;
+	            rs = buffer_strw(op->sbp,tbuf,(bp-tbuf)) ;
 	        } else {
-	            rs = buffer_blanks(&op->b,n) ;
-	            if (rs >= 0)
-	                rs = buffer_backs(&op->b,n) ;
+	            cint	ti = op->ti ;
+	            tf = terms[ti].flags ;
+	            if (tf & TCF_MEC) {
+	                rs = termstr_conseq(op,'X',n,-1,-1,-1) ;
+	            } else {
+	                if ((rs = buffer_blanks(op->sbp,n)) >= 0) {
+	                    rs = buffer_backs(op->sbp,n) ;
+			}
+	            } /* end if */
 	        } /* end if */
-	    } /* end if */
-	} else if (n < 0)
-	    rs = SR_INVALID ;
-
+	    } else if (n < 0) {
+	        rs = SR_INVALID ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termstr_ec) */
 
-
-/* cursor-up */
-int termstr_curu(TERMSTR *op,int n)
-{
-
+/* cursor-up (CUP) */
+int termstr_curu(termstr *op,int n) noex {
 	return termstr_curm(op,curtype_u,n) ;
 }
 /* end subroutine (termstr_curu) */
 
-
-/* cursor-down */
-int termstr_curd(TERMSTR *op,int n)
-{
-
+/* cursor-down (CUD) */
+int termstr_curd(termstr *op,int n) noex {
 	return termstr_curm(op,curtype_d,n) ;
 }
 /* end subroutine (termstr_curd) */
 
-
-/* cursor-right */
-int termstr_curr(TERMSTR *op,int n)
-{
-
+/* cursor-right (CUR) */
+int termstr_curr(termstr *op,int n) noex {
 	return termstr_curm(op,curtype_r,n) ;
 }
 /* end subroutine (termstr_curr) */
 
-
-/* cursor-left */
-int termstr_curl(TERMSTR *op,int n)
-{
-
+/* cursor-left (CUL) */
+int termstr_curl(termstr *op,int n) noex {
 	return termstr_curm(op,curtype_l,n) ;
 }
 /* end subroutine (termstr_curl) */
 
-
-/* cursor-home */
-int termstr_curh(TERMSTR *op,int r,int c)
-{
+/* cursor-home (CUH) */
+int termstr_curh(termstr *op,int r,int c) noex {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
-	cchar	*sp = NULL ;
+	cchar	*sp = nullptr ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
 
 	if ((r <= 0) && (c <= 0)) {
 	    sp = "\033[H" ;
 	    sl = 3 ;
-	    rs = buffer_strw(&op->b,sp,sl) ;
+	    rs = buffer_strw(op->sbp,sp,sl) ;
 	} else if (c <= 0) {
 	    rs = termstr_conseq(op,'H',(r+1),-1,-1,-1) ;
 	} else {
@@ -467,20 +416,20 @@ int termstr_curh(TERMSTR *op,int r,int c)
 
 
 /* set-scroll-region */
-int termstr_ssr(TERMSTR *op,int r,int n)
+int termstr_ssr(termstr *op,int r,int n)
 {
 	int		rs = SR_OK ;
 	int		sl = -1 ;
-	cchar	*sp = NULL ;
+	cchar	*sp = nullptr ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
 
 	if (r < 0) {
 	    sp = "\033[r" ;
 	    sl = 3 ;
-	    rs = buffer_strw(&op->b,sp,sl) ;
+	    rs = buffer_strw(op->sbp,sp,sl) ;
 	} else if (n > 0) {
 	    if (r < 0) r = 0 ;
 	    rs = termstr_conseq(op,'r',(r+1),(r+n),-1,-1) ;
@@ -492,15 +441,15 @@ int termstr_ssr(TERMSTR *op,int r,int n)
 
 
 /* crusor-save-restore */
-int termstr_csr(TERMSTR *op,int f)
+int termstr_csr(termstr *op,int f)
 {
 	uint		tf ;
 	int		rs = SR_OK ;
 	int		sl = -1 ;
 	int		ti ;
-	cchar	*sp = NULL ;
+	cchar	*sp = nullptr ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TERMSTR_MAGIC) return SR_NOTOPEN ;
 
@@ -513,8 +462,8 @@ int termstr_csr(TERMSTR *op,int f)
 	} else
 	    rs = SR_NOTSUP ;
 
-	if ((rs >= 0) && (sp != NULL))
-	    rs = buffer_strw(&op->b,sp,sl) ;
+	if ((rs >= 0) && (sp != nullptr))
+	    rs = buffer_strw(op->sbp,sp,sl) ;
 
 	return rs ;
 }
@@ -543,13 +492,13 @@ termstr_cvis(op,f) ;
 /* private subroutines */
 
 
-static int termstr_curm(TERMSTR *op,int curtype,int n)
+static int termstr_curm(termstr *op,int curtype,int n)
 {
 	int		rs = SR_OK ;
 	int		name ;
 	int		bl = -1 ;
 	char		tbuf[TLEN + 1] ;
-	char		*bp = NULL ;
+	char		*bp = nullptr ;
 
 	if (n != 0) {
 	if ((curtype >= 0) && (curtype < curtype_overlast)) {
@@ -560,7 +509,7 @@ static int termstr_curm(TERMSTR *op,int curtype,int n)
 	        *bp++ = CH_LBRACK ;
 	        *bp++ = name ;
 	        bl = 3 ;
-	        rs = buffer_strw(&op->b,bp,bl) ;
+	        rs = buffer_strw(op->sbp,bp,bl) ;
 	    } else {
 	        rs = termstr_conseq(op,name,n,-1,-1,-1) ;
 	    }
@@ -573,7 +522,7 @@ static int termstr_curm(TERMSTR *op,int curtype,int n)
 /* end subroutine (termstr_curm) */
 
 
-static int termstr_findterm(TERMSTR *op,cchar *termtype)
+static int termstr_findterm(termstr *op,cchar *termtype)
 {
 	int		rs = SR_OK ;
 	int		slen = strlen(termtype) ;
@@ -586,15 +535,10 @@ static int termstr_findterm(TERMSTR *op,cchar *termtype)
 	n = 2 ;
 	m_max = -1 ;
 	si = -1 ;
-	for (i = 0 ; terms[i].name != NULL ; i += 1) {
+	for (i = 0 ; terms[i].name != nullptr ; i += 1) {
 
 	    np = terms[i].name ;
 	    m = nleadstr(np,termtype,-1) ;
-
-#if	CF_DEBUGS && 0
-	    debugprintf("termstr_findterm: np=%s\n",np) ;
-	    debugprintf("termstr_findterm: nleadstr() rs=%d\n",m) ;
-#endif
 
 	    if (((m >= n) && (m == slen)) || (np[m] == '\0')) {
 	        if (m > m_max) {
@@ -613,25 +557,21 @@ static int termstr_findterm(TERMSTR *op,cchar *termtype)
 }
 /* end subroutine (termstr_findterm) */
 
-
-static int termstr_conseq(TERMSTR *op,int name,int a1,int a2,int a3,int a4)
-{
-	const int	tlen = TLEN ;
-	int		rs = SR_OK ;
-	int		sl ;
+static int termstr_conseq(termstr *op,int name,...) noex {
+	int		rs = SR_INVALID ;
 	int		len = 0 ;
-	char		tbuf[TLEN + 1] ;
-
 	if (name != 0) {
-	    rs = termconseq(tbuf,tlen,name,a1,a2,a3,a4) ;
-	    sl = rs ;
-	    if (rs >= 0) {
-	        rs = buffer_strw(&op->b,tbuf,sl) ;
+	    va_list	ap ;
+	    cint	tlen = TLEN ;
+	    char	tbuf[TLEN + 1] ;
+	    va_begin(ap,name) ;
+	    if ((rs = termconseqva(tbuf,tlen,name,ap)) >= 0) {
+	        cint	sl = rs ;
+	        rs = buffer_strw(op->sbp,tbuf,sl) ;
 	        len += rs ;
 	    }
-	} else
-	    rs = SR_INVALID ;
-
+	    va_end(ap) ;
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termstr_conseq) */

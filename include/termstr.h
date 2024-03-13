@@ -17,8 +17,8 @@
 #ifndef	TERMSTR_INCLUDE
 #define	TERMSTR_INCLUDE
 
+
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<buffer.h>
 #include	<localmisc.h>
@@ -108,7 +108,7 @@
 
 
 struct termstr_head {
-	buffer		b ;		/* storage buffer */
+	buffer		*sbp ;		/* storage buffer pointer */
 	uint		magic ;
 	int		ti ;		/* index into database */
 } ;
@@ -117,29 +117,29 @@ typedef TERMSTR		termstr ;
 
 EXTERNC_begin
 
-extern int termstr_start(TERMSTR *,cchar *) noex ;
-extern int termstr_clean(TERMSTR *) noex ;
-extern int termstr_char(TERMSTR *,int) noex ;
-extern int termstr_write(TERMSTR *,cchar *,int) noex ;
-extern int termstr_writegr(TERMSTR *,int,cchar *,int) noex ;
-extern int termstr_get(TERMSTR *,cchar **) noex ;
-extern int termstr_ed(TERMSTR *,int) noex ;
-extern int termstr_el(TERMSTR *,int) noex ;
-extern int termstr_ec(TERMSTR *,int) noex ;
-extern int termstr_curu(TERMSTR *,int) noex ;
-extern int termstr_curd(TERMSTR *,int) noex ;
-extern int termstr_curl(TERMSTR *,int) noex ;
-extern int termstr_curr(TERMSTR *,int) noex ;
-extern int termstr_curh(TERMSTR *,int,int) noex ;
-extern int termstr_ssr(TERMSTR *,int,int) noex ;
-extern int termstr_csr(TERMSTR *,int) noex ;
-extern int termstr_il(TERMSTR *,int) noex ;
-extern int termstr_ic(TERMSTR *,int) noex ;
-extern int termstr_dl(TERMSTR *,int) noex ;
-extern int termstr_dc(TERMSTR *,int) noex ;
-extern int termstr_irm(TERMSTR *,int) noex ;
-extern int termstr_cvis(TERMSTR *,int) noex ;
-extern int termstr_finish(TERMSTR *) noex ;
+extern int termstr_start(termstr *,cchar *) noex ;
+extern int termstr_clean(termstr *) noex ;
+extern int termstr_char(termstr *,int) noex ;
+extern int termstr_write(termstr *,cchar *,int) noex ;
+extern int termstr_writegr(termstr *,int,cchar *,int) noex ;
+extern int termstr_get(termstr *,cchar **) noex ;
+extern int termstr_ed(termstr *,int) noex ;
+extern int termstr_el(termstr *,int) noex ;
+extern int termstr_ec(termstr *,int) noex ;
+extern int termstr_curu(termstr *,int) noex ;
+extern int termstr_curd(termstr *,int) noex ;
+extern int termstr_curl(termstr *,int) noex ;
+extern int termstr_curr(termstr *,int) noex ;
+extern int termstr_curh(termstr *,int,int) noex ;
+extern int termstr_ssr(termstr *,int,int) noex ;
+extern int termstr_csr(termstr *,int) noex ;
+extern int termstr_il(termstr *,int) noex ;
+extern int termstr_ic(termstr *,int) noex ;
+extern int termstr_dl(termstr *,int) noex ;
+extern int termstr_dc(termstr *,int) noex ;
+extern int termstr_irm(termstr *,int) noex ;
+extern int termstr_cvis(termstr *,int) noex ;
+extern int termstr_finish(termstr *) noex ;
 
 EXTERNC_end
 
