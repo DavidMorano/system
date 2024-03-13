@@ -535,10 +535,10 @@ static int try_gethost(TRY *tip) noex {
 	    char	*hbuf{} ;
 	    if ((rs = malloc_ho(&hbuf)) >= 0) {
 		const nullptr_t	np{} ;
-	        HOSTENT		he, *hep = &he ;
+	        ucentho		he, *hep = &he ;
 	        cint		hlen = rs ;
 	        cchar		*nn = tip->nodename ;
-	        if ((rs = uc_gethostbyname(&he,hbuf,hlen,nn)) >= 0) {
+	        if ((rs = uc_gethonam(&he,hbuf,hlen,nn)) >= 0) {
 		    cint	dlen = tip->dlen ;
 	            cchar	*tp{} ;
 		    bool	f = true ;

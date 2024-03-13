@@ -1,7 +1,8 @@
-/* uc_ztime */
-/* lang=C20 */
+/* ucztime SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,14 +15,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int uc_ztime(struct tm *tsp,const time_t *tp,int z) noex {
-	int	rs ;
+int uc_ztime(TM *tsp,const time_t *tp,int z) noex {
+	int		rs ;
 	if (z) {
 	    rs = uc_localtime(tp,tsp) ;
 	} else {

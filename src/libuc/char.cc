@@ -286,6 +286,9 @@ const short	char_dictorder[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 bool char_iswhite(int ch) noex {
