@@ -152,6 +152,6 @@ int nodeinfo::uinfo() noex {
 	} /* end if (uinfo_name) */
 	return rs ;
 }
-/* end methode (nodeinfo::uinfo) */
+/* end method (nodeinfo::uinfo) */
 
 
