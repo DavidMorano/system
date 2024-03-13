@@ -34,15 +34,14 @@
 
 
 /* Useful defines and typedefs */
-
 #define	SHA1			SHA1_INFO
-
-
-typedef unsigned char SHA1_BYTE ;	/* 8-bit quantity */
-typedef unsigned long	SHA1_LONG ;	/* 32-or-more-bit quantity */
 
 #define SHA1_BLOCKSIZE		64
 #define SHA1_DIGESTSIZE		20
+
+
+typedef unsigned char	SHA1_BYTE ;	/* 8-bit quantity */
+typedef unsigned long	SHA1_LONG ;	/* 32-or-more-bit quantity */
 
 typedef struct {
     SHA1_LONG digest[5];		/* message digest */
@@ -65,9 +64,9 @@ EXTERNC_end
 #include <stdlib.h>
 #include <stdio.h>
 
-void sha_stream(unsigned char [20], SHA1_INFO *, FILE *);
-void sha_print(unsigned char [20]);
-char *sha_version(void);
+void sha_stream(unsigned char [20], SHA1_INFO *, FILE *) noex ;
+void sha_print(unsigned char [20]) noex ;
+char *sha_version(void) noex ;
 
 #endif /* SHA1_FOR_C */
 
