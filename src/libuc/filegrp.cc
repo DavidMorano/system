@@ -47,9 +47,12 @@
 #define	TO_CHECK	5
 
 
-/* local namesapces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -152,6 +155,9 @@ static int	entry_load(ENT *,REC *) noex ;
 static constexpr gid_t	gidend = gid_t(-1) ;
 
 static bufsizevar	gnl(getbufsize_gn) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

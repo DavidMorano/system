@@ -227,6 +227,9 @@ static char 		aterms[termsize] ;
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int paramfile_open(PF *op,cchar **envv,cchar *fname) noex {

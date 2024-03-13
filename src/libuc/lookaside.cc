@@ -124,6 +124,9 @@ static int	lookaside_newchunk(lookaside *) noex ;
 constexpr int	qalign = int(2 * sizeof(void *)) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int lookaside_start(lookaside *op,int esize,int n) noex {

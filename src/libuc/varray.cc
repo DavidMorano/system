@@ -94,6 +94,9 @@ static int	varray_extend(varray *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int varray_start(varray *op,int esize,int n) noex {

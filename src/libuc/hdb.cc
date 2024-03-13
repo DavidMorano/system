@@ -308,6 +308,9 @@ static const CUR	icur = mkcurnull() ;
 constexpr bool		f_hashelf = CF_HASHELF ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {

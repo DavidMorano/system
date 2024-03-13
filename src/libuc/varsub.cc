@@ -166,6 +166,9 @@ constexpr int		optmask = mkoptmask() ;
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int varsub_start(varsub *op,int aopts) noex {

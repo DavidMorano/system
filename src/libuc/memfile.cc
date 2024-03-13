@@ -51,6 +51,9 @@ using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -111,6 +114,9 @@ static int	memfile_ismemfree(memfile *,caddr_t,size_t) noex ;
 /* local variables */
 
 static sysval		pagesize(sysval_ps) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

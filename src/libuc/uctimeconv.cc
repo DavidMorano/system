@@ -24,12 +24,16 @@
 	Time conversion subroutines.
 
 	Synopsis:
-	int uc_localtime(const time_t *,TM *) noex
-	int uc_gmtime(const time_t *,TM *) noex
+	int uc_localtime(const time_t *dt,TM *tmp) noex
+	int uc_gmtime(const time_t *dt,TM *tmp) noex
 
+	Arguments:
+	dt	time to convert
+	tmp	pointer to TM object
+	
 	Returns:
 	>=0	OK
-	<-	error (system-return)
+	<0	error (system-return)
 
 *******************************************************************************/
 

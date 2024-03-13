@@ -93,6 +93,15 @@ static inline int filebuf_ctor(filebuf *op,Args ... args) noex {
 	return rs ;
 }
 
+static int filebuf_dtor(clusterdb *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (filebuf_dtor) */
+
 static int	filebuf_adjbuf(filebuf *,int) noex ;
 static int	filebuf_bufcpy(filebuf *,cchar *,int) noex ;
 
@@ -102,6 +111,9 @@ static int	filebuf_bufcpy(filebuf *,cchar *,int) noex ;
 static sysval		pagesize(sysval_ps) ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -130,6 +142,9 @@ int filebuf_start(filebuf *op,int fd,off_t coff,int bufsize,int of) noex {
 	            } /* end if (memory-allocation) */
 		} /* end if (filebuf_adjbuf) */
 	    } /* end if (valid) */
+	    if (rs < 0) {
+		filebuf_dtor(op) ;
+	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? bufsize : rs ;
 }
@@ -148,6 +163,10 @@ int filebuf_finish(filebuf *op) noex {
 	        rs1 = uc_libfree(op->buf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->buf = NULL ;
+	    }
+	    {
+	        rs1 = filebuf_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->len = 0 ;
 	} /* end if (non-null) */
