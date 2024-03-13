@@ -46,6 +46,8 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */

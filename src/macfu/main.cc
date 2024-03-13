@@ -1,4 +1,4 @@
-/* main (fu) */
+/* main SUPPORT (fu) */
 /* lang=C++20 */
 
 /* filter filenames */
@@ -36,12 +36,13 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<string>

@@ -38,6 +38,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<new>

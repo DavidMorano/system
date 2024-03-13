@@ -50,6 +50,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<string>
@@ -81,13 +82,13 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;
-using std::nothrow ;
-using std::cout ;
-using std::clog ;
-using std::string ;
-using std::string_view ;
-using std::vector ;
+using std::nullptr_t ;			/* type */
+using std::string ;			/* type */
+using std::string_view ;			/* type */
+using std::vector ;			/* type */
+using std::cout ;			/* variable */
+using std::clog ;			/* variable */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */

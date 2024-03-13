@@ -37,6 +37,8 @@
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(4c)| */
 #include	<new>
 #include	<algorithm>		/* <- for |min(3c++)| */

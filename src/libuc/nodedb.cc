@@ -40,6 +40,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strcmp(3c)| + |strlen(3c)| */
 #include	<ctime>

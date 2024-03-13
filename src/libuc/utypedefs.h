@@ -41,8 +41,6 @@
 
 #include	<arpa/inet.h>		/* <- |in_addr_t| */
 
-#include	<signal.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>		/* for 'u_utime(2)' */
@@ -55,6 +53,10 @@
 #include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
+#include	<limits.h>
+#include	<signal.h>
+#include	<stddef.h>
+#include	<stdlib.h>
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
 #include	<xti.h>

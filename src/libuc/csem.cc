@@ -51,6 +51,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
+#include	<cstddef>
 #include	<ctime>
 #include	<new>
 #include	<usystem.h>

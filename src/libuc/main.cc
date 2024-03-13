@@ -71,6 +71,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<fcntl.h>		/* for |O_RDONLY| */
 #include	<climits>		/* for |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>		/* for |getenv(3c)| */
 #include	<algorithm>		/* for |min(3c++)| */
 #include	<strings.h>		/* from BSD |strncasecmp(3c)| */

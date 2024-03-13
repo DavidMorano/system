@@ -29,6 +29,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<ctime>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |memcpy(3c)| */

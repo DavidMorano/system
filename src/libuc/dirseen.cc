@@ -25,6 +25,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
+#include	<cstddef>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<algorithm>

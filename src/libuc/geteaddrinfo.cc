@@ -56,6 +56,7 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| + |strcmp(3c)| */
 #include	<netdb.h>

@@ -32,6 +32,8 @@
 #include	<unistd.h>		/* |getpagesize(3c)| */
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<ctime>			/* |time(2)| */
 #include	<algorithm>		/* |min(3c++)| */

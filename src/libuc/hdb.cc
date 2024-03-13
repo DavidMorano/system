@@ -121,6 +121,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
 #include	<algorithm>
