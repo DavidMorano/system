@@ -43,7 +43,6 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;		/* type */
 using std::min ;		/* subroutine-template */
 using std::max ;		/* subroutine-template */
 using std::nothrow ;		/* constant */
@@ -115,8 +114,20 @@ public:
 	int adv(int al) noex ;
 } ; /* end structure (widebuf) */
 
+typedef widebuf *	widebufp ;
+
 
 /* forward references */
+
+template<typename ... Args>
+static inline int utf8decoder_magic(utf8decoder *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == UTF8DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (utf8decoder_magic) */
 
 
 /* local variables */
@@ -147,99 +158,82 @@ int utf8decoder_start(utf8decoder *op) noex {
 /* end subroutine (utf8decoder_start) */
 
 int utf8decoder_finish(utf8decoder *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != UTF8DECODER_MAGIC) return SR_NOTOPEN ;
-
-	if (op->outbuf != nullptr) {
-	    widebuf *wbp = (widebuf *) op->outbuf ;
-	    delete wbp ;
-	    op->outbuf = nullptr ;
-	}
-
-	op->magic = 0 ;
+	int		rs ;
+	if ((rs = utf8decoder_magic(op)) >= 0) {
+	    if (op->outbuf) {
+	        widebuf *wbp = widebufp(op->outbuf) ;
+	        delete wbp ;
+	        op->outbuf = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (utf8decoder_finish) */
 
 int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
-	widebuf		*wbp ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (op->magic != UTF8DECODER_MAGIC) return SR_NOTOPEN ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	if ((wbp = ((widebuf *) op->outbuf)) != nullptr) {
-	    while (sl-- > 0) {
-		const uint	uch = *sp++ ;
-		if ((uch & 0x80) == 0) {
-	            wbp->add(uch) ;
-		    c += 1 ;
-		} else {
-		    if ((uch & 0xE0) == 0xC0) {
-		        op->rem = 1 ;
-		        op->code = ((uch & 0x1F) << 6) ;
-		    } else if ((uch & 0xF0) == 0xE0) {
-		        op->rem = 2 ;
-		        op->code = ((uch & 0x0F) << 12) ;
-		    } else if ((uch & 0xF8) == 0xF0) {
-		        op->rem = 3 ;
-		        op->code = ((uch & 0x07) << 18) ;
-		    } else if ((uch & 0xC0) == 0x80) {
-		        if (op->rem > 0) {
-			    op->rem -= 1 ;
-			    op->code |= ((uch & 0x3F) << (op->rem*6)) ;
-			    if (op->rem == 0) {
-	            	        wbp->add(op->code) ;
-		    	        c += 1 ;
-		            }
-		        } /* end if (process continuation portion) */
-		    } /* end if (multi type) */
-		} /* end if (single or multi) */
-	   } /* end while */
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
-
+	if ((rs = utf8decoder_magic(op,sp)) >= 0) {
+	    cnullptr	np{} ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
+	        while (sl-- > 0) {
+		    const uint	uch = *sp++ ;
+		    if ((uch & 0x80) == 0) {
+	                wbp->add(uch) ;
+		        c += 1 ;
+		    } else {
+		        if ((uch & 0xE0) == 0xC0) {
+		            op->rem = 1 ;
+		            op->code = ((uch & 0x1F) << 6) ;
+		        } else if ((uch & 0xF0) == 0xE0) {
+		            op->rem = 2 ;
+		            op->code = ((uch & 0x0F) << 12) ;
+		        } else if ((uch & 0xF8) == 0xF0) {
+		            op->rem = 3 ;
+		            op->code = ((uch & 0x07) << 18) ;
+		        } else if ((uch & 0xC0) == 0x80) {
+		            if (op->rem > 0) {
+			        op->rem -= 1 ;
+			        op->code |= ((uch & 0x3F) << (op->rem*6)) ;
+			        if (op->rem == 0) {
+	            	            wbp->add(op->code) ;
+		    	            c += 1 ;
+		                }
+		            } /* end if (process continuation portion) */
+		        } /* end if (multi type) */
+		    } /* end if (single or multi) */
+	       } /* end while */
+	    } else {
+	        rs = SR_BUGCHECK ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (utf8decoder_load) */
 
 int utf8decoder_read(utf8decoder *op,wchar_t *rbuf,int rlen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		i = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != UTF8DECODER_MAGIC) return SR_NOTOPEN ;
-
-	if (rlen < 0) return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if (rlen > 0) {
-	    widebuf	*wbp ;
-	    if ((wbp = ((widebuf *) op->outbuf)) != nullptr) {
-	        cint	len = wbp->len() ;
-	        int	ml ;
-	        ml = MIN(len,rlen) ;
-	        for (i = 0 ; i < ml ; i += 1) {
-		    rbuf[i] = wbp->at(i) ;
+	if ((rs = utf8decoder_magic(op,rbuf)) >= 0) {
+	    cnullptr	np{} ;
+	    rbuf[0] = '\0' ;
+	    if (rlen > 0) {
+		int	ml ;
+	        if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
+	            cint	len = wbp->len() ;
+	            ml = min(len,rlen) ;
+	            for (i = 0 ; i < ml ; i += 1) {
+		        rbuf[i] = wbp->at(i) ;
+	            }
+	            rbuf[i] = '\0' ;
+	            rs = wbp->adv(i) ;
+	        } else {
+	            rs = SR_BUGCHECK ;
 	        }
-	        rbuf[i] = '\0' ;
-	        rs = wbp->adv(i) ;
-	    } else {
-	        rs = SR_BUGCHECK ;
-	    }
-	} /* end if (positive) */
-
+	    } /* end if (positive) */
+	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (utf8decoder_read) */
