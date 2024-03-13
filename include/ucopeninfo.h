@@ -37,7 +37,7 @@
 
 
 struct ucopeninfo {
-	cchar		**envv ;
+	mainv		envv ;
 	cchar		*fname ;
 	int		clinks ;
 	int		oflags ;

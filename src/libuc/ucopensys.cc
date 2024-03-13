@@ -1,10 +1,8 @@
-/* uc_opensys */
+/* uc_opensys SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* open some system related resource */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
@@ -18,38 +16,41 @@
 
 /*******************************************************************************
 
-	This subroutine attempts to open a special system-wide resource of some
-	kind.
-
+	This subroutine attempts to open a special system-wide
+	resource of some kind.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<opensysfs.h>
 #include	<ipasswd.h>
+#include	<strn.h>
+#include	<sfx.h>
+#include	<matstr.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	opensys_banner(const char *,int,int) ;
-
-extern char	*strnrchr(const char *,int,int) ;
+extern "C" {
+    extern int	opensys_banner(cchar *,int,int) noex ;
+}
 
 
 /* local structures */
@@ -57,30 +58,10 @@ extern char	*strnrchr(const char *,int,int) ;
 
 /* forward references */
 
-static int isRealName(const char *,int) ;
+static int isRealName(cchar *,int) noex ;
 
 
 /* local variables */
-
-static const char	*sysnames[] = {
-	"userhomes",
-	"usernames",
-	"groupnames",
-	"projectnames",
-	"users",
-	"groups",
-	"projects",
-	"passwd",
-	"group",
-	"project",
-	"realname",
-	OPENSYSFS_FSHELLS,
-	OPENSYSFS_FSHADOW,
-	"userattr",
-	"banner",
-	"bandate",
-	NULL
-} ;
 
 enum sysnames {
 	sysname_userhomes,
@@ -100,9 +81,29 @@ enum sysnames {
 	sysname_banner,
 	sysname_bandate,
 	sysname_overlast
+} ; /* end enum (sysnames) */
+
+static constexpr cchar	*sysnames[] = {
+	"userhomes",
+	"usernames",
+	"groupnames",
+	"projectnames",
+	"users",
+	"groups",
+	"projects",
+	"passwd",
+	"group",
+	"project",
+	"realname",
+	OPENSYSFS_FSHELLS,
+	OPENSYSFS_FSHADOW,
+	"userattr",
+	"banner",
+	"bandate",
+	NULL
 } ;
 
-static const int	whiches[] = {
+static constexpr int	whiches[] = {
 	OPENSYSFS_WUSERHOMES,
 	OPENSYSFS_WUSERNAMES,
 	OPENSYSFS_WGROUPNAMES,
@@ -118,23 +119,19 @@ static const int	whiches[] = {
 	OPENSYSFS_WSHADOW,
 	OPENSYSFS_WUSERATTR,
 	-1
-} ;
+} ; /* end array (whiches) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-/* ARGSUSED */
-int uc_opensys(cchar *fname,int of,mode_t om,cchar **envv,int to,int opts)
-{
+int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	int		rs = SR_OK ;
 	int		fl = -1 ;
 	int		fi ;
-	const char	*tp ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_opensys: fname=%s\n",fname) ;
-#endif
+	cchar		*tp ;
 
 /* take off any leading slashes */
 
@@ -182,12 +179,9 @@ int uc_opensys(cchar *fname,int of,mode_t om,cchar **envv,int to,int opts)
 		rs = SR_NOENT ;
 		break ;
 	    } /* end switch */
-	} else
+	} else {
 	    rs = SR_NOENT ;
-
-#if	CF_DEBUGS
-	debugprintf("uc_opensys: ret rs=%d\n",rs) ;
-#endif
+	}
 
 	return rs ;
 }
@@ -196,13 +190,10 @@ int uc_opensys(cchar *fname,int of,mode_t om,cchar **envv,int to,int opts)
 
 /* local subroutines */
 
-
-static int isRealName(const char *fname,int fl)
-{
+static int isRealName(cchar *fname,int fl) noex {
 	int		len = 0 ;
 	int		cl ;
-	const char	*cp ;
-
+	cchar		*cp ;
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*suf = IPASSWD_SUF ;
 	    cchar	*tp ;
@@ -217,7 +208,6 @@ static int isRealName(const char *fname,int fl)
 		}
 	    }
 	}
-
 	return len ;
 }
 /* end subroutine (isRealName) */

@@ -46,6 +46,10 @@
 #endif
 
 
+#ifndef	O_LARGEFILE
+#define	O_LARGEFILE	0		/* specify "largefile" */
+#endif
+
 /* missing from some operating systems */
 
 #ifndef	S_IAMB

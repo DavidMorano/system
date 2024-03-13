@@ -1,4 +1,4 @@
-/* uc_openinfo SUPPORT */
+/* ucopeninfo SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX®Â® library-3c */
@@ -97,6 +97,8 @@
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<localmisc.h>
 
+#include	"ucopeninfo.h"
+
 
 /* local defines */
 
@@ -141,7 +143,7 @@ extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	mkuserpath(char *,cchar *,cchar *,int) ;
 extern int	mkvarpath(char *,cchar *,int) ;
 extern int	mkcdpath(char *,cchar *,int) ;
-extern int	isOneOf(const int *,int) ;
+extern int	isOneOf(cint *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -176,7 +178,7 @@ static int	open_pseudopath(UCOPENINFO *,cchar *,int) ;
 static int	open_nonpath(UCOPENINFO *,int) ;
 static int	open_nonpather(UCOPENINFO *,int,cchar *,cchar *) ;
 
-static int	openproger(cchar *,int,cchar **) ;
+static int	openproger(cchar *,int,mainv) noex ;
 static int	accmode(int) ;
 static int	waitready(int,int,int) ;
 static int	pollok(int) ;
@@ -202,7 +204,7 @@ static cchar	*normalfs[] = {
 	"lib",
 	"xfn",
 	"bin",
-	NULL
+	nullptr
 } ;
 
 static cchar	*prefixfs[] = {
@@ -213,7 +215,7 @@ static cchar	*prefixfs[] = {
 	"u",
 	"sys",
 	"dev",
-	NULL
+	nullptr
 } ;
 
 enum prefixfses {
@@ -245,7 +247,7 @@ enum nonpaths {
 } ;
 
 #if	CF_ISMORE
-static const int	rsmore[] = {
+static cint	rsmore[] = {
 	SR_OPNOTSUPP,
 	SR_NOENT,
 	0
@@ -254,7 +256,6 @@ static const int	rsmore[] = {
 
 
 /* exported subroutines */
-
 
 int uc_openex(cchar *fname,int oflags,mode_t operms,int timeout,int opts)
 {
@@ -274,9 +275,7 @@ int uc_openex(cchar *fname,int oflags,mode_t operms,int timeout,int opts)
 }
 /* end subroutine (uc_openex) */
 
-
-int uc_openinfo(UCOPENINFO *oip)
-{
+int uc_openinfo(UCOPENINFO *oip) noex {
 	int		rs ;
 	int		fd = -1 ;
 
@@ -284,8 +283,8 @@ int uc_openinfo(UCOPENINFO *oip)
 	debugprintf("uc_openinfo: ent\n") ;
 #endif
 
-	if (oip == NULL) return SR_FAULT ;
-	if (oip->fname == NULL) return SR_FAULT ;
+	if (oip == nullptr) return SR_FAULT ;
+	if (oip->fname == nullptr) return SR_FAULT ;
 
 	if (oip->fname[0] == '\0') return SR_INVALID ;
 
@@ -308,7 +307,7 @@ int uc_openinfo(UCOPENINFO *oip)
 #endif
 
 	    if (hascdpath(oip->fname,-1)) {
-	        const int	tlen = MAXPATHLEN ;
+	        cint	tlen = MAXPATHLEN ;
 	        char		*tbuf ;
 #if	CF_DEBUGS
 	    debugprintf("uc_openinfo: cd-path\n") ;
@@ -439,7 +438,7 @@ static int open_eval(UCOPENINFO *oip)
 	int		rs = SR_OK ;
 	int		npi ;			/* non-path index */
 	int		fd = -1 ;
-	char		*efname = NULL ;
+	char		*efname = nullptr ;
 	char		ofname[MAXPATHLEN+1] = { 0 } ;
 
 #if	CF_DEBUGS
@@ -453,8 +452,8 @@ static int open_eval(UCOPENINFO *oip)
 	        rs = open_floatpath(oip,npi) ;
 	        fd = rs ;
 	    } else {
-	        if (hasvarpathprefix(oip->fname,-1) && (efname == NULL)) {
-	            const int	size = (MAXPATHLEN + 1) ;
+	        if (hasvarpathprefix(oip->fname,-1) && (efname == nullptr)) {
+	            cint	size = (MAXPATHLEN + 1) ;
 	            void	*p ;
 #if	CF_DEBUGS
 		    debugprintf("uc_openinfo/open_eval: var-path\n") ;
@@ -471,14 +470,14 @@ static int open_eval(UCOPENINFO *oip)
 #endif
 	                    if (rs == 0) rs = SR_BADFMT ;
 	                    uc_libfree(efname) ;
-	                    efname = NULL ;
+	                    efname = nullptr ;
 	                }
 	            }
 	        } /* end if (var-path) */
 
 	        if (rs >= 0) {
 	            int		pi ;
-	            cchar	*rp = NULL ;
+	            cchar	*rp = nullptr ;
 
 	            if ((oip->fname[0] == '/') && 
 	                ((pi = getprefixfs(oip->fname,&rp)) >= 0)) {
@@ -515,7 +514,7 @@ static int open_eval(UCOPENINFO *oip)
 
 	} /* end while */
 
-	if (efname != NULL) {
+	if (efname != nullptr) {
 	    uc_libfree(efname) ;
 	}
 
@@ -544,8 +543,8 @@ static int open_othertry(UCOPENINFO *oip,int *fdp,char *ofname)
 	    switch (rs) {
 	    case SR_OPNOTSUPP:
 	        {
-	            const int	of = oip->oflags ;
-	            const int	to = oip->to ;
+	            cint	of = oip->oflags ;
+	            cint	to = oip->to ;
 	            int		rs1 ;
 	            cchar	*fn = oip->fname ;
 
@@ -601,7 +600,7 @@ static int open_othertry(UCOPENINFO *oip,int *fdp,char *ofname)
 
 static int open_otherlink(UCOPENINFO *oip,int *fdp,char *ofname)
 {
-	const int	rlen = MAXPATHLEN ;
+	cint	rlen = MAXPATHLEN ;
 	int		rs ;
 	int		fd = -1 ;
 	char		rbuf[MAXPATHLEN + 1] ;
@@ -639,7 +638,7 @@ static int open_otherlink(UCOPENINFO *oip,int *fdp,char *ofname)
 	        char		dname[MAXPATHLEN + 1] ;
 
 	        if ((cl = sfdirname(fn,-1,&cp)) > 0) {
-	            const int	plen = MAXPATHLEN ;
+	            cint	plen = MAXPATHLEN ;
 
 	            oip->fname = (cchar *) ofname ;
 	            if ((rs = snwcpy(dname,plen,cp,cl)) >= 0) {
@@ -725,7 +724,7 @@ static int open_pseudopath(UCOPENINFO *oip,cchar *rp,int pi)
 	    {
 	        int		of = oip->oflags ;
 	        mode_t		om = oip->operms ;
-	        cchar		**envv = oip->envv ;
+	        mainv		envv = oip->envv ;
 	        int		to = oip->to ;
 	        int		opts = oip->opts ;
 	        switch (pi) {
@@ -752,8 +751,8 @@ static int open_pseudopath(UCOPENINFO *oip,cchar *rp,int pi)
 
 static int open_nonpath(UCOPENINFO *oip,int npi)
 {
-	const int	nlen = PRNBUFLEN ;
-	const int	nch = MKCHAR(nonpaths[npi]) ;
+	cint	nlen = PRNBUFLEN ;
+	cint	nch = MKCHAR(nonpaths[npi]) ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 	cchar		*fname = oip->fname ;
@@ -769,11 +768,11 @@ static int open_nonpath(UCOPENINFO *oip,int npi)
 	brkbuf[1] = (char) 0xAD ;
 	brkbuf[2] = '/' ;
 	brkbuf[3] = 0 ;
-	if ((tp = strpbrk(fname,brkbuf)) != NULL) {
+	if ((tp = strpbrk(fname,brkbuf)) != nullptr) {
 
 #if	CF_DEBUGS
 	    debugprintf("uc_openinfo/open_nonpath: tp{%p}\n",tp) ;
-	    if (tp != NULL)
+	    if (tp != nullptr)
 	        debugprintf("uc_openinfo/open_nonpath: tch=%c\n",*tp) ;
 #endif
 
@@ -816,22 +815,22 @@ static int open_nonpather(UCOPENINFO *oip,int npi,cchar *prn,cchar *sp)
 #endif
 
 	if ((rs = vecstr_start(&args,4,0)) >= 0) {
-	    const int	prlen = MAXPATHLEN ;
+	    cint	prlen = MAXPATHLEN ;
 	    int		sl = -1 ;
-	    cchar	**av = NULL ;
-	    cchar	**ev = oip->envv ;
+	    mainv	av = nullptr ;
+	    mainv	ev = oip->envv ;
 	    cchar	*tp ;
 	    char	svc[SVCBUFLEN+1] = { 0 } ;
 	    char	brkbuf[4] ;
 	    char	prbuf[MAXPATHLEN+1] ;
 
-	    if (ev == NULL) ev = (cchar **) environ ;
+	    if (ev == nullptr) ev = (cchar **) environ ;
 
 	    brkbuf[0] = (char) 0xAD ;
 	    brkbuf[1] = ':' ;
 	    brkbuf[2] = 0 ;
-	    if ((tp = strpbrk(sp,brkbuf)) != NULL) {
-	        const int	ch = MKCHAR(*tp) ;
+	    if ((tp = strpbrk(sp,brkbuf)) != nullptr) {
+	        cint	ch = MKCHAR(*tp) ;
 	        int		cl = -1 ;
 	        cchar		*cp = sp ;
 
@@ -851,11 +850,11 @@ static int open_nonpather(UCOPENINFO *oip,int npi,cchar *prn,cchar *sp)
 	            sp,sl,cp,cl) ;
 #endif
 
-	        if (tp != NULL) {
+	        if (tp != nullptr) {
 
 	            cl = (tp-cp) ;
 	            if (sl < 0) {
-	                sl = cl ; /* or Â» if (ch != ':') sl = cl Â« */
+	                sl = cl ; /* or » if (ch != ':') sl = cl « */
 	            }
 	            if ((rs = vecstr_add(&args,cp,cl)) >= 0) {
 	                cp = (tp+1) ;
@@ -886,7 +885,7 @@ static int open_nonpather(UCOPENINFO *oip,int npi,cchar *prn,cchar *sp)
 	            break ;
 	        case nonpath_fsvc:
 	            {
-			const int	dl = MAXHOSTNAMELEN ;
+			cint	dl = MAXHOSTNAMELEN ;
 	                char		dn[MAXHOSTNAMELEN+1] ;
 	                if ((rs = getdomainname(dn,dl)) >= 0) {
 	                    rs = mkpr(prbuf,prlen,prn,dn) ;
@@ -910,8 +909,8 @@ static int open_nonpather(UCOPENINFO *oip,int npi,cchar *prn,cchar *sp)
 
 	    if (rs >= 0) {
 	        const mode_t	om = oip->operms ;
-	        const int	of = oip->oflags ;
-	        const int	to = oip->to ;
+	        cint	of = oip->oflags ;
+	        cint	to = oip->to ;
 	        switch(npi) {
 	        case nonpath_dialer:
 	            rs = uc_opendialer(prn,svc,of,om,av,ev,to) ;
@@ -949,9 +948,7 @@ static int open_nonpather(UCOPENINFO *oip,int npi,cchar *prn,cchar *sp)
 }
 /* end if (open_nonpather) */
 
-
-static int openproger(cchar *fname,int oflags,cchar **ev)
-{
+static int openproger(cchar *fname,int oflags,mainv ev) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -961,9 +958,9 @@ static int openproger(cchar *fname,int oflags,cchar **ev)
 	debugprintf("uc_openinfo/openproger: ent fn=%s\n",fname) ;
 #endif
 
-	if (ev == NULL) ev = (cchar **) environ ;
+	if (ev == nullptr) ev = (cchar **) environ ;
 
-	if ((rs = mkuserpath(expfname,NULL,fname,-1)) >= 0) {
+	if ((rs = mkuserpath(expfname,nullptr,fname,-1)) >= 0) {
 	    vecstr	args ;
 	    cchar	*fnp = fname ;
 	    cchar	*pfp ;
@@ -980,7 +977,7 @@ static int openproger(cchar *fname,int oflags,cchar **ev)
 	    if ((rs = vecstr_start(&args,4,0)) >= 0) {
 
 	        pfp = fnp ;
-	        if ((svcp = strchr(fnp,0xAD)) != NULL) {
+	        if ((svcp = strchr(fnp,0xAD)) != nullptr) {
 	            pfp = progfname ;
 	            if ((rs = mkpath1w(progfname,fnp,(svcp - fnp))) >= 0) {
 	                if ((rs = vecstr_add(&args,pfp,rs)) >= 0) {
@@ -996,7 +993,7 @@ static int openproger(cchar *fname,int oflags,cchar **ev)
 #endif
 
 	        if (rs >= 0) {
-	    	    cchar	**av = NULL ;
+	    	    cchar	**av = nullptr ;
 	            if ((rs = vecstr_getvec(&args,&av)) >= 0) {
 
 #if	CF_DEBUGS
@@ -1057,7 +1054,7 @@ static int accmode(int oflags)
 
 static int waitready(int fd,int oflags,int timeout)
 {
-	const int	f_rdonly = (oflags & O_RDONLY) ;
+	cint	f_rdonly = (oflags & O_RDONLY) ;
 	int		rs = SR_OK ;
 	int		f_wait ;
 	int		f = FALSE ;
@@ -1066,7 +1063,7 @@ static int waitready(int fd,int oflags,int timeout)
 	if ((timeout >= 0) && f_wait) {
 	    struct pollfd	polls[NPOLLS] ;
 	    time_t		ti_timeout ;
-	    time_t		daytime = time(NULL) ;
+	    time_t		daytime = time(nullptr) ;
 	    int			size ;
 	    int			pollto = ((timeout > 0) ? POLLMULT : 0) ;
 
@@ -1080,7 +1077,7 @@ static int waitready(int fd,int oflags,int timeout)
 	    ti_timeout = daytime + timeout ;
 	    while (rs >= 0) {
 	        if ((rs = u_poll(polls,1,pollto)) > 0) {
-	            const int	re = polls[0].revents ;
+	            cint	re = polls[0].revents ;
 	            if ((rs = pollok(re)) >= 0) {
 	                if (f_rdonly) {
 	                    f = !!(re & POLLIN) ;
@@ -1091,7 +1088,7 @@ static int waitready(int fd,int oflags,int timeout)
 		} else {
 	            if (rs == SR_INTR) rs = SR_OK ;
 		    if (rs >= 0) {
-			daytime = time(NULL) ;
+			daytime = time(nullptr) ;
 	                if (daytime >= ti_timeout) {
 	                    rs = SR_TIMEDOUT ;
 			}
@@ -1127,7 +1124,7 @@ static int getnormalfs(cchar *fname,cchar **rpp)
 	int		rs = SR_OK ;
 	int		pi = -1 ;
 
-	*rpp = NULL ;
+	*rpp = nullptr ;
 	if (fname[0] == '/') {
 	    cchar	*tp, *pp ;
 
@@ -1136,9 +1133,9 @@ static int getnormalfs(cchar *fname,cchar **rpp)
 	        pp += 1 ;
 	    }
 
-	    if ((tp = strchr(pp,'/')) != NULL) {
+	    if ((tp = strchr(pp,'/')) != nullptr) {
 	        pi = matstr(normalfs,pp,(tp - pp)) ;
-	        *rpp = (pi >= 0) ? tp : NULL ;
+	        *rpp = (pi >= 0) ? tp : nullptr ;
 	    } else {
 	        rs = SR_NOENT ;
 	    }
@@ -1157,7 +1154,7 @@ static int getprefixfs(cchar *fname,cchar **rpp)
 {
 	int		rs = SR_OK ;
 	int		pi = -1 ;
-	cchar		*tp = NULL ;
+	cchar		*tp = nullptr ;
 
 	if (fname[0] == '/') {
 	    cchar	*pp = (fname + 1) ;
@@ -1165,7 +1162,7 @@ static int getprefixfs(cchar *fname,cchar **rpp)
 
 	    while (*pp && (pp[0] == '/')) pp += 1 ;
 
-	    if ((tp = strchr(pp,'/')) != NULL) {
+	    if ((tp = strchr(pp,'/')) != nullptr) {
 	        pl = (tp-pp) ;
 	    } else {
 	        pl = strlen(pp) ;
@@ -1191,8 +1188,8 @@ static int getprefixfs(cchar *fname,cchar **rpp)
 	    rs = SR_NOENT ;
 	}
 
-	if (rpp != NULL) {
-	    *rpp = (rs >= 0) ? tp : NULL ;
+	if (rpp != nullptr) {
+	    *rpp = (rs >= 0) ? tp : nullptr ;
 	}
 
 	return (rs >= 0) ? pi : rs ;
@@ -1202,7 +1199,7 @@ static int getprefixfs(cchar *fname,cchar **rpp)
 
 static int noexist(cchar *pp,int pl)
 {
-	const int	nlen = MAXNAMELEN ;
+	cint		nlen = MAXNAMELEN ;
 	int		rs ;
 	char		nbuf[MAXNAMELEN + 1] ;
 
@@ -1230,7 +1227,7 @@ static int loadargs(vecstr *alp,cchar *sp)
 	if (sp[0] != '\0') {
 	    cchar		*tp ;
 
-	    while ((tp = strchr(sp,0xAD)) != NULL) {
+	    while ((tp = strchr(sp,0xAD)) != nullptr) {
 #if	CF_DEBUGS
 	        debugprintf("uc_open/loadargs: a%u=>%t<\n",c,sp,(tp-sp)) ;
 #endif
@@ -1260,7 +1257,7 @@ static int hasnonpath(cchar *fp,int fl)
 	if (f) {
 	    cchar	*tp = strnpbrk(fp,fl,nonpaths) ;
 	    f = FALSE ;
-	    if ((tp != NULL) && ((tp-fp) > 0) && (tp[1] != '\0')) {
+	    if ((tp != nullptr) && ((tp-fp) > 0) && (tp[1] != '\0')) {
 	        f = sichr(nonpaths,-1,*tp) ;
 	    }
 	}
@@ -1268,10 +1265,8 @@ static int hasnonpath(cchar *fp,int fl)
 }
 /* end subroutine (hasnonpath) */
 
-
 #if	CF_ISMORE
-static int isMorePossible(int rs)
-{
+static int isMorePossible(int rs) noex {
 	return isOneOf(rsmore,rs) ;
 }
 /* end subroutine (isMorePossible) */
