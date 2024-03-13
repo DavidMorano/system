@@ -1,12 +1,12 @@
-/* progcsmsg */
+/* progcsmsg SUPPORT */
+/* lang=C++20 */
 
 /* process a COMSAT message */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_OUTINFO	1		/* object OUTINFO */
-
 
 /* revision history:
 
@@ -14,14 +14,15 @@
 	The subroutine was written from scratch.
 
 	= 2017-11-03, David A­D­ Morano
-        I swapped out |strftime(3c)| for |sntmtime(3dam)| but it was, in the
-        end, quite unnecessary. I changed the desired time-string specification
-        on |strftime(3c)| and it failed properly as it was supposed to (due to
-        result buffer overrun), but it took me a while to figure it out. I
-        changed to |sntmtime(3dam)| to get a clear error condition (which I then
-        fixed by increasing the result buffer size). In the end, I left the 
-	desired time-string specifiction the way it was, so this whole foray
-	was not really necessary.
+	I swapped out |strftime(3c)| for |sntmtime(3dam)| but it
+	was, in the end, quite unnecessary. I changed the desired
+	time-string specification on |strftime(3c)| and it failed
+	properly as it was supposed to (due to result buffer overrun),
+	but it took me a while to figure it out. I changed to
+	|sntmtime(3dam)| to get a clear error condition (which I
+	then fixed by increasing the result buffer size). In the
+	end, I left the desired time-string specifiction the way
+	it was, so this whole foray was not really necessary.
 
 */
 
@@ -58,33 +59,30 @@
 
 	= What kind of concurrency do we get here?
 
-	Not as much as I would have liked!  We do not get nearly as much
-	concurrency as I would have liked.  Why not?  Because the object
-	TERMNOTE is not thread-safe.  It is reentrant (as all of our code is
-	and always has been) but that does not make it thread-safe
-	subroutine-by-subroutine.  It is not thread-safe because it uses an
-	underlying object named TMPX which is not thread-safe itself.  Both of
-	these objects could be made -- rather easily -- thread-safe but it just
-	has not been done.  If someday they (TMPX and TERMNOTE) become
-	thread-safe, then this whole enchilada would become almost completely
-	concurrent.
-
+	Not as much as I would have liked!  We do not get nearly
+	as much concurrency as I would have liked.  Why not?  Because
+	the object TERMNOTE is not thread-safe.  It is reentrant
+	(as all of our code is and always has been) but that does
+	not make it thread-safe subroutine-by-subroutine.  It is
+	not thread-safe because it uses an underlying object named
+	TMPX which is not thread-safe itself.  Both of these objects
+	could be made -- rather easily -- thread-safe but it just
+	has not been done.  If someday they (TMPX and TERMNOTE)
+	become thread-safe, then this whole enchilada would become
+	almost completely concurrent.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<sys/timeb.h>		/* for 'struct timeb' */
+#include	<sys/timeb.h>		/* for |struct timeb| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<time.h>		/* for 'strftime(3c)' */
-
+#include	<time.h>		/* for |strftime(3c)| */
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<mailmsg.h>
@@ -118,21 +116,24 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
+extern "C" {
+    extern int	wciswhite(wchar_t) noex ;
+}
+
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
 extern int	snwcpywidehdr(char *,int,const wchar_t *,int) ;
 extern int	snwcpycompact(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfsub(cchar *,int,cchar *,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 extern int	wsichr(const wchar_t *,int,int) ;
-extern int	wchar_iswhite(wchar_t) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	compactstr(char *,int) ;
 extern int	mkaddrname(char *,int,cchar *,int) ;
 extern int	mkdisphdr(char *,int,cchar *,int) ;
@@ -148,15 +149,15 @@ extern int	progloglock_printf(PROGINFO *,cchar *,...) ;
 
 extern int	prognote_write(PROGINFO *,cchar **,int,int,cchar *,int) ;
 
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 extern char	*timestr_log(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -192,9 +193,9 @@ struct outinfo {
 
 static int	progcsmsger(PROGINFO *,int,off_t,cchar *) ;
 static int	proclogmsg(PROGINFO *,COMSATMSG_MO *) ;
-static int	procmsginfo(PROGINFO *,MAILMSG *,const char *) ;
+static int	procmsginfo(PROGINFO *,MAILMSG *,cchar *) ;
 static int	procmsgbad(PROGINFO *,cchar *,off_t,int) ;
-static int	getdateinfo(PROGINFO *,char *,int,const char *,int,int) ;
+static int	getdateinfo(PROGINFO *,char *,int,cchar *,int,int) ;
 
 #if	CF_OUTINFO
 static int	outinfo_start(OUTINFO *,PROGINFO *,MAILMSG *,cchar *) ;
@@ -216,11 +217,11 @@ static int	outinfo_termbeginsubj(OUTINFO *) ;
 static int	outinfo_print(OUTINFO *) ;
 #endif /* CF_OUTINFO */
 
-static int	wsfnormfrom(const wchar_t *,int) ;
+static int	wsfnormfrom(const wchar_t *,int) noex ;
 
-static int	isNoMsg(int) ;
-static int	isBadMsg(int) ;
-static int	isBadTime(int) ;
+static bool	isNoMsg(int) noex ;
+static bool	isBadMsg(int) noex ;
+static bool	isBadTime(int) noex ;
 
 
 /* global variables */
@@ -322,7 +323,7 @@ int progcsmsg(PROGINFO *pip,cchar *mbuf,int mlen)
 	            if ((rs = uc_open(mailfname,O_RDONLY,0666)) >= 0) {
 	                off_t	fo = (off_t) m0.offset ;
 	                const int	mfd = rs ;
-	                const char	*un = m0.username ;
+	                cchar	*un = m0.username ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4)) {
@@ -412,7 +413,7 @@ static int progcsmsger(PROGINFO *pip,int mfd,off_t fo,cchar *un)
 static int proclogmsg(PROGINFO *pip,COMSATMSG_MO *m0p)
 {
 	int		rs = SR_OK ;
-	const char	*pn = pip->progname ;
+	cchar	*pn = pip->progname ;
 
 	progerr_printf(pip,"%s: comsat-msg¬\n",pn) ;
 	progerr_printf(pip,"%s:   u=%s\n",pn,m0p->username) ;
@@ -477,7 +478,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 	int		fl = 0 ;
 	int		sl = 0 ;
 	int		rc = 0 ;
-	const char	*hp ;
+	cchar	*hp ;
 	char		tbuf[TIMEBUFLEN+1] ;
 	char		datebuf[TIMEBUFLEN+1] = { 0 } ;
 	char		frombuf[MAILADDRLEN+1] = { 0 } ;
@@ -485,7 +486,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 	char		notebuf[NOTEBUFLEN+1] = { 0 } ;
 
 	if (rs >= 0) {
-	    int	f_edate = FALSE ;
+	    int	f_edate = false ;
 	    rs1 = mailmsg_hdrival(mmp,HN_DATE,0,&hp) ;
 	    hl = rs1 ;
 	    if (rs1 == SR_NOENT) {
@@ -553,7 +554,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 	    int	nl = (COLUMNS - MAXOVERLEN) ;
 
 	    if (fl > MAXOVERLEN) {
-	        const char	*tp = strnchr(frombuf,fl,',') ;
+	        cchar	*tp = strnchr(frombuf,fl,',') ;
 	        if (tp != NULL) {
 	            fl = (tp-frombuf) ;
 	            while (fl && CHAR_ISWHITE(frombuf[fl-1])) fl -= 1 ;
@@ -577,10 +578,10 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 	    progloglock_printf(pip,"  subj=»%s«",subjbuf) ;
 
 	    {
-	        const char	*fmt = "¶ %s %s « %t - %t" ;
-	        const char	*db = datebuf ;
-	        const char	*fb = frombuf ;
-	        const char	*sb = subjbuf ;
+	        cchar	*fmt = "¶ %s %s « %t - %t" ;
+	        cchar	*db = datebuf ;
+	        cchar	*fb = frombuf ;
+	        cchar	*sb = subjbuf ;
 	        rs = bufprintf(notebuf,notelen,fmt,db,un,fb,fl,sb,sl) ;
 	        nl = rs ;
 	    }
@@ -589,7 +590,7 @@ static int procmsginfo(PROGINFO *pip,MAILMSG *mmp,cchar *un)
 	        const int	max = pip->notesmax ;
 	        const int	o = (TERMNOTE_OBIFF | TERMNOTE_OBELL) ;
 	        int		i = 0 ;
-	        const char	*recips[2] ;
+	        cchar		*recips[2] ;
 	        recips[i++] = un ;
 	        recips[i] = NULL ;
 	        rs = prognote_write(pip,recips,max,o,notebuf,nl) ;
@@ -748,7 +749,7 @@ static int outinfo_mkdate(OUTINFO *oip)
 	MAILMSG		*mmp = oip->mmp ;
 	int		rs ;
 	int		hl = 0 ;
-	int		f_edate = FALSE ;
+	int		f_edate = false ;
 	cchar		*hp ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1183,13 +1184,12 @@ static int outinfo_print(OUTINFO *oip)
 }
 /* end subroutine (outinfo_print) */
 
-
-static int wsfnormfrom(const wchar_t *fp,int fl)
-{
-	int		si ;
-	if ((si = wsichr(fp,fl,',')) >= 0) {
+static int wsfnormfrom(const wchar_t *fp,int fl) noex {
+	if (int si ; (si = wsichr(fp,fl,',')) >= 0) {
 	    fl = si ;
-	    while (fl && wchar_iswhite(fp[fl-1])) fl -= 1 ;
+	    while (fl && wciswhite(fp[fl-1])) {
+		fl -= 1 ;
+	    }
 	}
 	return fl ;
 }
@@ -1197,26 +1197,20 @@ static int wsfnormfrom(const wchar_t *fp,int fl)
 
 #endif /* CF_OUTINFO */
 
-
-static int isNoMsg(int rs)
-{
+static bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
 }
 /* end subroutine (isNoMsg) */
 
-
-static int isBadMsg(int rs)
-{
-	int		f = FALSE ;
+static bool isBadMsg(int rs) noex {
+	bool		f = false ;
 	f = f || isOneOf(rsbadmsg,rs) ;
 	f = f || isNoMsg(rs) ;
 	return f ;
 }
 /* end subroutine (isBadMsg) */
 
-
-static int isBadTime(int rs)
-{
+static bool isBadTime(int rs) noex {
 	return isOneOf(rsbadtime,rs) ;
 }
 /* end subroutine (isBadTime) */

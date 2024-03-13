@@ -1127,6 +1127,9 @@ envs_procxe.o:		envs_procxe.cc envs.h
 envs_subs.o:		envs_subs.cc envs.h
 expcook.o:		expcook.cc expcook.h
 keyopt.o:		keyopt.cc keyopt.h
+utf8decoder.o:		utf8decoder.cc utf8decoder.h
+termstr.o:		termstr.cc termstr.h
+td.o:			td.cc td.h termstr.h
 
 findbit.o:		findbit.cc findbit.h
 bits.o:			bits.cc bits.h
@@ -1142,7 +1145,7 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
-# UILITY
+# UTILITY
 pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 ids.o:			ids.cc ids.h

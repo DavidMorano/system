@@ -1,9 +1,8 @@
-/* wchar_iswhite */
+/* wciswhite SUPPORT */
+/* lang=C++20 */
 
 /* check for a white-space wide-character */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,18 +18,23 @@
 
 	We check for a white-space wide-character.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<stddef.h>
+#include	<cstddef>
 #include	<char.h>
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
 /* external subroutines */
+
+extern "C" {
+    bool	wcishite(wchar_t) noex ;
+}
 
 
 /* forward references */
@@ -39,17 +43,18 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int wchar_iswhite(wchar_t ch)
-{
-	int		f = FALSE ;
+bool wciswhite(wchar_t ch) noex {
+	bool		f = false ;
 	if ((ch >= 0) && (ch < 256)) {
 	    f = CHAR_ISWHITE(ch) ;
 	}
 	return f ;
 }
-/* end subroutine (wchar_iswhite) */
+/* end subroutine (wciswhite) */
 
 

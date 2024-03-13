@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stddef.h>		/* for |wchar_t| */
+#include	<wchar.h>		/* for |wchar_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -31,9 +32,9 @@
 
 struct utf8decoder_head {
 	void		*outbuf ;	/* output-buffer */
-	wchar_t		code ;		/* UNICODE® code point */
 	uint		magic ;
 	int		rem ;		/* remaining bytes */
+	wchar_t		code ;		/* UNICODE® code point */
 } ;
 
 typedef UTF8DECODER	utf8decoder ;

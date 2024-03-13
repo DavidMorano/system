@@ -90,7 +90,7 @@
 
 /* imported namespaces */
 
-using std::atomic_int ;
+using std::atomic_int ;			/* type */
 
 
 /* local typedefs */
@@ -218,6 +218,9 @@ static int utmpaccent_loada(ARG *,CUTMPX *) noex ;
 [[maybe_unused]] constexpr int 		lhost = UTMPACCENT_LHOST ;
 
 static utmpacc		utmpacc_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
