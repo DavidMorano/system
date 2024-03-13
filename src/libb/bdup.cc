@@ -28,7 +28,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"

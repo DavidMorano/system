@@ -49,7 +49,6 @@
 #include	<sys/param.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* |msleep(3u)| */
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<isnot.h>
@@ -64,7 +63,7 @@
 #define	PCSNSMGR	struct pcsnsmgr_head
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -28,7 +28,6 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"thrcomm.h"
@@ -37,7 +36,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

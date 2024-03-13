@@ -26,7 +26,6 @@
 #include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<storeitem.h>
@@ -49,7 +48,7 @@
 #define	SI	storeitem
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

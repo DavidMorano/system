@@ -28,7 +28,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* for |memclear(3u)| */
 #include	<mallocstuff.h>
 #include	<strn.h>
 #include	<char.h>
@@ -45,7 +44,7 @@
 #define	ADDRESSLEN	60		/* starting address length */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

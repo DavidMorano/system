@@ -48,7 +48,6 @@
 #include	<sys/stat.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<ptc.h>

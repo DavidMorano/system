@@ -7,26 +7,26 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETPWENTRY_INCLUDE
-#define	GETPWENTRY_INCLUDE
+#ifndef	GETpwentry_INCLUDE
+#define	GETpwentry_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |uit_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<pwfile.h>
+#include	<pwentry.h>
 
 
 EXTERNC_begin
 
-extern int getpwentry_name(PWENTRY *,char *,int,cchar *) noex ;
-extern int getpwentry_uid(PWENTRY *,char *,int,uid_t) noex ;
+extern int getpwentry_name(pwentry *,char *,int,cchar *) noex ;
+extern int getpwentry_uid(pwentry *,char *,int,uid_t) noex ;
 
 EXTERNC_end
 
 
-#endif /* GETPWENTRY_INCLUDE */
+#endif /* GETpwentry_INCLUDE */
 
 

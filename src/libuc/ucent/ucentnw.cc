@@ -31,7 +31,6 @@
 #include	<cstring>		/* <- |memcpy(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storeitem.h>
 #include	<sbuf.h>
 #include	<vechand.h>
@@ -72,7 +71,7 @@
 #define ASTRLEN                 MAX(INET4_ADDRSTRLEN,INET6_ADDRSTRLEN)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */

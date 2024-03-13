@@ -35,7 +35,6 @@
 #include	<new>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<ascii.h>
@@ -66,7 +65,7 @@
 #define	VS			vecstr
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
@@ -226,6 +225,9 @@ static char 		kterms[termsize] ;
 static char 		aterms[termsize] ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

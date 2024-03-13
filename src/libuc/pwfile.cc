@@ -33,7 +33,6 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<mallocxx.h>
 #include	<pwentry.h>
 #include	<gecos.h>
@@ -67,7 +66,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -436,7 +435,7 @@ static int pwfile_filefront(PWFILE *dbp) noex {
 
 	if ((rs = uc_stat(dbp->fname,&sb)) >= 0) {
 	    vecitem	*alp = &dbp->alist ;
-	    const int	vo = vecitem_PNOHOLES ;
+	    cint	vo = VECITEM_PNOHOLES ;
 	    int		n = ((sb.st_size / 60) + 5) ;
 	    if (n < DEFENTRIES) n = DEFENTRIES ;
 	    if ((rs = vecitem_start(alp,n,vo)) >= 0) {
@@ -463,7 +462,7 @@ static int pwfile_filefronter(PWFILE *dbp) noex {
 	    }
 	    if (rs >= 0) {
 	        pwentry		entry ;
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN+1] ;
 	        while ((rs = breadln(fp,lbuf,llen)) > 0) {
@@ -499,7 +498,7 @@ static int pwfile_filefronter(PWFILE *dbp) noex {
 /* add the entry to our list */
 
 	                if (rs >= 0) {
-	                    const int	esize = sizeof(pwentry) ;
+	                    cint	esize = sizeof(pwentry) ;
 	                    n += 1 ;
 	                    rs = vecitem_add(&dbp->alist,&entry,esize) ;
 	                }

@@ -125,7 +125,6 @@
 #include	<cstring>		/* <- |strlen(3c)| + |memcmp(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- |memclear(3u)| */
 #include	<lookaside.h>
 #include	<localmisc.h>
 
@@ -153,7 +152,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
@@ -307,6 +306,9 @@ static const DAT	nulldatum = mkdatnull() ;
 static const CUR	icur = mkcurnull() ;
 
 constexpr bool		f_hashelf = CF_HASHELF ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -23,7 +23,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

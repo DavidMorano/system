@@ -50,7 +50,9 @@
 
 /* local defines */
 
+#ifndef	CBUFLEN
 #define	CBUFLEN		100
+#endif
 
 
 /* external subroutines */

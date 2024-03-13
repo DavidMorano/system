@@ -72,7 +72,6 @@
 #include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<usysflag.h>
 #include	<localmisc.h>
 
@@ -86,7 +85,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -42,7 +42,7 @@
 #define	HS		hdbstr
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

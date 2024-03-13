@@ -29,7 +29,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"ucenumxx.h"
@@ -38,7 +37,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
 

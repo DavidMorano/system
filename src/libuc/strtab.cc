@@ -108,7 +108,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecobj.h>
 #include	<sysval.hh>
 #include	<localmisc.h>
@@ -134,7 +133,7 @@
 #define	VALBOGUS	(250000 * 10)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
@@ -261,6 +260,9 @@ static inline int hashindex(uint hv,int n) noex {
 /* end subroutine (hashindex) */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strtab_start(strtab *op,int startsz) noex {
@@ -296,7 +298,7 @@ int strtab_start(strtab *op,int startsz) noex {
 	    if (rs < 0) {
 		strtab_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (strtab_ctor) */
 	return rs ;
 }
 /* end subroutine (strtab_start) */

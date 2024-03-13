@@ -62,7 +62,6 @@
 #include	<unistd.h>
 #include	<cerrno>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"um.h"
@@ -71,7 +70,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

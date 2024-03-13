@@ -50,7 +50,6 @@
 #include	<cstdlib>
 #include	<cstdint>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"upt.h"

@@ -50,7 +50,6 @@
 #include	<new>			/* |nothrow(3c++)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getax.h>
@@ -80,7 +79,7 @@
 #define	GRMEMS_USERGID		struct grmems_ug
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

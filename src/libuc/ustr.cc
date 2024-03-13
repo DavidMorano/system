@@ -29,7 +29,6 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ustropts.h>
 #include	<localmisc.h>
 

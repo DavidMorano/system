@@ -61,7 +61,6 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ugetpid.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -135,7 +134,7 @@
 #define	QCONFIG		struct qconfig
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

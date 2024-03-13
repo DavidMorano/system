@@ -62,7 +62,7 @@
 #define	VARSUB_SUB	struct varsub_sub
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
@@ -164,6 +164,9 @@ consteval int mkoptmask() noex {
 constexpr int		optmask = mkoptmask() ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

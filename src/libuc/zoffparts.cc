@@ -66,7 +66,7 @@
 #include	"zoffparts.h"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

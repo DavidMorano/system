@@ -1,6 +1,8 @@
-/* termtrans */
+/* termtrans HEADER */
+/* lang=C20 */
 
 /* terminal-character-translation management */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,19 +15,17 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TERMTRANS_INCLUDE
-#define	TERMTRANS_INCLUDE	1
+#define	TERMTRANS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stddef.h>
-
 #include	<uiconv.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
-
-/* object defines */
 
 #define	TERMTRANS	struct termtrans_head
 #define	TERMTRANS_FL	struct termtrans_flags
@@ -38,33 +38,28 @@ struct termtrans_flags {
 } ;
 
 struct termtrans_head {
-	uint		magic ;
-	TERMTRANS_FL	f ;
 	void		*cvp ;		/* character-vector-pointer */
 	void		*lvp ;		/* line-vector-pointer */
 	UICONV		id ;
+	TERMTRANS_FL	f ;
+	uint		magic ;
 	uint		termattr ;	/* mask of terminal attributes */
 	int		ncols ;		/* terminal columns */
 	int		ncol ;
 } ;
 
+typedef TERMTRANS	termtrans ;
+typedef TERMTRANS_FL	termtrans_fl ;
 
-#if	(! defined(TERMTRANS_MASTER)) || (TERMTRANS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int termtrans_start(termtrans *,cchar *,cchar *,int,int) noex ;
+extern int termtrans_load(termtrans *,const wchar_t *,int) noex ;
+extern int termtrans_getline(termtrans *,int,cchar **) noex ;
+extern int termtrans_finish(termtrans *) noex ;
 
-extern int termtrans_start(TERMTRANS *,cchar *,cchar *,int,int) ;
-extern int termtrans_load(TERMTRANS *,const wchar_t *,int) ;
-extern int termtrans_getline(TERMTRANS *,int,cchar **) ;
-extern int termtrans_finish(TERMTRANS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* TERMTRANS_MASTER */
 
 #endif /* TERMTRANS_INCLUDE */
 

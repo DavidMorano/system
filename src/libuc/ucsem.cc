@@ -41,7 +41,6 @@
 #include	<cerrno>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getxid.h>

@@ -46,7 +46,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>
 #include	<varnames.hh>
 #include	<syswords.hh>
@@ -90,7 +89,7 @@
 #define	ORGCNAME	"organization"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

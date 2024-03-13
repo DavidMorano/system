@@ -57,7 +57,6 @@
 #include	<fcntl.h>
 #include	<errno.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ucgetpid.h>
 #include	<upt.h>
 #include	<localmisc.h>

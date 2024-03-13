@@ -94,7 +94,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 
 
 /* local defines */

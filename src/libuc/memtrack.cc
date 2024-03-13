@@ -49,7 +49,6 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 
 #include	"memtrack.hh"
 
@@ -72,7 +71,7 @@ extern int	memtrack_finish() noex ;
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

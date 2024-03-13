@@ -55,14 +55,13 @@
 #include	<cstring>
 #include	<project.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* |msleep(3u)| */
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

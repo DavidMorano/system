@@ -53,6 +53,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<lockfile.h>
 #include	<estrings.h>
 #include	<cfnum.h>
@@ -89,16 +90,8 @@
 #endif
 #endif /* defined(IRIX) */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
 
-
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -132,10 +125,7 @@ int getserial(cchar *sfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		serial = 0 ;
-
-	if ((sfname == NULL) || (sfname[0] == '\0'))
-	    sfname = DEFSERIAL ;
-
+	if ((sfname == NULL) || (sfname[0] == '\0')) sfname = DEFSERIAL ;
 	if ((rs = getserial_open(sfname)) >= 0) {
 	    cint	fd = rs ;
 	    if ((rs = lockfile(fd,F_LOCK,0L,0L,TO_LOCK)) >= 0) {
@@ -158,14 +148,12 @@ int getserial(cchar *sfname) noex {
 /* local subroutines */
 
 static int getserial_open(cchar *sfname) noex {
-	cmode		m = FILEMODE ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-
+	cmode		m = FILEMODE ;
 	rs = uc_open(sfname,O_RDWR,m) ;
 	fd = rs ;
-
 	if (rs == SR_ACCESS) {
 	    if ((rs = uc_unlink(sfname)) >= 0) {
 	        rs = SR_NOENT ;
@@ -181,9 +169,8 @@ static int getserial_open(cchar *sfname) noex {
 	                USTAT	sb ;
 	                cchar	*cp{} ;
 	                if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
-			    cint	plen = MAXPATHLEN ;
-	                    char	*pbuf ;
-			    if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
+	                    char	*pbuf{} ;
+			    if ((rs = malloc_mp(&pbuf)) >= 0) {
 	                        if ((rs = mkpath1w(pbuf,cp,cl)) >= 0) {
 	                            if ((rs = uc_stat(pbuf,&sb)) >= 0) {
 	                                rs = u_fchown(fd,sb.st_uid,sb.st_gid) ;

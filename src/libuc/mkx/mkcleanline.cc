@@ -54,7 +54,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ascii.h>
 #include	<ischarx.h>
 #include	<mkchar.h>

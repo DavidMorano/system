@@ -68,7 +68,7 @@
 #define	NOISEDATA	struct noisedata
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

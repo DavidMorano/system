@@ -25,7 +25,6 @@
 #include	<pthread.h>
 #include	<climits>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<utimeout.h>
 #include	<localmisc.h>
 

@@ -22,20 +22,16 @@
 #include	<poll.h>
 #include	<errno.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
-/* external subroutines */
-
-extern int	msleep(int) ;
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int u_shmat(shmid,shmaddr,flags,app)
 int	shmid ;

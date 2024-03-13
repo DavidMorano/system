@@ -38,12 +38,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<climits>
-#include	<cstdlib>
-#include	<cstring>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<realname.h>
 #include	<localmisc.h>
@@ -52,6 +47,12 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -67,6 +68,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

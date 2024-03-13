@@ -38,7 +38,6 @@
 #include	<ctime>
 #include	<usystem.h>
 #include	<utimeout.h>
-#include	<usupport.h>
 #include	<utypealiases.h>
 #include	<localmisc.h>
 

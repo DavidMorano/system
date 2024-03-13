@@ -58,7 +58,6 @@
 #include	<unistd.h>		/* for |getgroups(2)| */
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"groupids.hh"
@@ -67,7 +66,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

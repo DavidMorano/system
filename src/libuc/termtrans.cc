@@ -1,7 +1,8 @@
-/* termtrans */
+/* termtrans SUPPORT */
 /* lang=C++98 */
 
 /* terminal-character-translation management */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debug print-outs */
@@ -17,15 +18,10 @@
 
 /*******************************************************************************
 
-	We translate UCS characters (in 'wchar_t' form) to byte sequences for
-	output to a terminal (specified).
-
+	We translate UCS characters (in 'wchar_t' form) to byte
+	sequences for output to a terminal (specified).
 
 *******************************************************************************/
-
-
-#define	TERMTRANS_MASTER	0	/* necessary for proper symbol names */
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
@@ -138,36 +134,39 @@
 #define	GR_MWIDE	(1<<GR_VWIDE)	/* double wide */
 
 
-/* default name spaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern "C" int	snsd(char *,int,const char *,uint) ;
-extern "C" int	snsdd(char *,int,const char *,uint) ;
-extern "C" int	sncpy1(char *,int,const char *) ;
-extern "C" int	sncpy2(char *,int,const char *,const char *) ;
-extern "C" int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern "C" int	sncpy1w(char *,int,const char *,int) ;
-extern "C" int	mkpath2(char *,const char *,const char *) ;
-extern "C" int	mkpath3(char *,const char *,const char *,const char *) ;
-extern "C" int	mkpath2w(char *,const char *,const char *,int) ;
+extern "C" int	snsd(char *,int,cchar *,uint) ;
+extern "C" int	snsdd(char *,int,cchar *,uint) ;
+extern "C" int	sncpy1(char *,int,cchar *) ;
+extern "C" int	sncpy2(char *,int,cchar *,cchar *) ;
+extern "C" int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern "C" int	sncpy1w(char *,int,cchar *,int) ;
+extern "C" int	mkpath2(char *,cchar *,cchar *) ;
+extern "C" int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern "C" int	mkpath2w(char *,cchar *,cchar *,int) ;
 extern "C" int	termconseq(char *,int,int,int,int,int,int) ;
 extern "C" int	isprintlatin(int) ;
 extern "C" int	iceil(int,int) ;
 
 #if	CF_DEBUGS || CF_DEBUGN
-extern "C" int	debugprintf(const char *,...) ;
-extern "C" int	nprintf(const char *,const char *,...) ;
-extern "C" int	strlinelen(const char *,int,int) ;
+extern "C" int	debugprintf(cchar *,...) ;
+extern "C" int	nprintf(cchar *,cchar *,...) ;
+extern "C" int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern "C" char	*strwcpy(char *,const char *,int) ;
+extern "C" char	*strwcpy(char *,cchar *,int) ;
 extern "C" char	*strwset(char *,int,int) ;
-extern "C" char	*strnchr(const char *,int,int) ;
-extern "C" char	*strwcmp(const char *,const char *,int) ;
+extern "C" char	*strnchr(cchar *,int,int) ;
+extern "C" char	*strwcmp(cchar *,cchar *,int) ;
 
 
 /* external variables */
@@ -176,7 +175,7 @@ extern "C" char	*strwcmp(const char *,const char *,int) ;
 /* local structures */
 
 struct termtrans_terminfo {
-	const char	*name ;
+	cchar		*name ;
 	int		attr ;
 } ;
 
@@ -211,7 +210,7 @@ struct termtrans_gch {
 } ;
 
 class termtrans_line {
-	const char	*lbuf ;
+	cchar	*lbuf ;
 	int		llen ;
 } ;
 
@@ -220,14 +219,14 @@ class termtrans_line {
 
 static int	termtrans_process(TERMTRANS *,const wchar_t *,int) ;
 static int	termtrans_procline(TERMTRANS *,char *,int,const wchar_t *,int) ;
-static int	termtrans_proclinepost(TERMTRANS *,const char *,int) ;
+static int	termtrans_proclinepost(TERMTRANS *,cchar *,int) ;
 static int	termtrans_loadline(TERMTRANS *,int,int) ;
 
 static int	termtrans_loadgr(TERMTRANS *,string &,int,int) ;
 static int	termtrans_loadch(TERMTRANS *,string &,int,int) ;
-static int	termtrans_loadcs(TERMTRANS *,string &,int,const char *,int) ;
+static int	termtrans_loadcs(TERMTRANS *,string &,int,cchar *,int) ;
 
-static int	gettermattr(const char *,int) ;
+static int	gettermattr(cchar *,int) ;
 static int	wsgetline(const wchar_t *,int) ;
 static int	isspecial(SCH *,uchar,uchar) ;
 
@@ -309,12 +308,12 @@ int termtrans_start(TERMTRANS *op,cchar *pr,cchar *tstr,int tlen,int ncols)
 
 	if ((cvp = new(nothrow) vector<GCH>) != NULL) {
 	    const int	fcslen = CSNLEN ;
-	    const char	*fcs = TERMTRANS_FCS ;
-	    const char	*suf = TERMTRANS_SUF ;
+	    cchar	*fcs = TERMTRANS_FCS ;
+	    cchar	*suf = TERMTRANS_SUF ;
 	    char	fcsbuf[CSNLEN+1] ;
 	    op->cvp = (void *) cvp ;
 	    if ((rs = sncpy2(fcsbuf,fcslen,fcs,suf)) >= 0) {
-	        const char	*tcsp = TERMTRANS_TCS ;
+	        cchar	*tcsp = TERMTRANS_TCS ;
 	        if ((rs = uiconv_open(&op->id,tcsp,fcsbuf)) >= 0) {
 		    op->magic = TERMTRANS_MAGIC ;
 	        }
@@ -495,7 +494,7 @@ static int termtrans_procline(TERMTRANS *op,char *obuf,int olen,
 	    int		ostart = olen ;
 	    int		oleft ;
 	    int		ofill ;
-	    const char	*ibp = (const char *) wbuf ;
+	    cchar	*ibp = (cchar *) wbuf ;
 	    char	*obp = obuf ;
 	    oleft = ostart ;
 	    rs = uiconv_trans(&op->id,&ibp,&ileft,&obp,&oleft) ;
@@ -942,7 +941,7 @@ static int termtrans_loadch(TERMTRANS *op,string &line,int ft,int ch)
 static int gettermattr(cchar *tstr,int tlen)
 {
 	int		ta = 0 ;
-	const char	*np ;
+	cchar	*np ;
 
 	if (tstr != NULL) {
 	    int	i ;

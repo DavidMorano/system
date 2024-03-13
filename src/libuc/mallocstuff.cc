@@ -27,7 +27,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -37,7 +36,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

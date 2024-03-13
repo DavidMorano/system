@@ -68,7 +68,7 @@
 #define	HO	HOSTENT
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -29,7 +29,6 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<nulstr.h>
 #include	<sncpyx.h>
 #include	<mkchar.h>
@@ -41,7 +40,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

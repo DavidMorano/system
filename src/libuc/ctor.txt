@@ -2,7 +2,7 @@ template<typename ... Args>
 static int vecpstr_ctor(clustername *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    nullptr_t	np{} ;
+	    const nullptr_t	np{} ;
 	    rs = SR_OK ;
 
 	} /* end if (non-null) */

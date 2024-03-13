@@ -1147,6 +1147,7 @@ pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 ids.o:			ids.cc ids.h
 groupids.o:		groupids.cc groupids.hh
+realname.o:		realname.cc realname.h
 base64.o:		base64.cc base64.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h

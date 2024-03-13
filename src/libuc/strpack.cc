@@ -50,7 +50,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vechand.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -67,7 +66,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */

@@ -34,7 +34,6 @@
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sfx.h>
 #include	<intfloor.h>
 #include	<strwcpy.h>
@@ -48,7 +47,7 @@
 /* local defines */
 
 
-/* namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
@@ -90,6 +89,9 @@ static int	b64decoder_cvt(B64DECODER *,cchar *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

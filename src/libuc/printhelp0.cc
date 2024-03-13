@@ -80,7 +80,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::ostream ;			/* type */
 

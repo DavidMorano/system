@@ -61,7 +61,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::atomic_int ;
 using std::memory_order_relaxed ;

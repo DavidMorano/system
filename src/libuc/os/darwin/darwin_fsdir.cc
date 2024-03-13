@@ -45,7 +45,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<snwcpy.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
@@ -57,7 +56,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* external subroutines */

@@ -61,7 +61,7 @@
 #define	OURBASE		26		/* base-26 */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

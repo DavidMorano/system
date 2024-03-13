@@ -75,7 +75,6 @@
 #include	<algorithm>		/* for |min(3c++)| */
 #include	<strings.h>		/* from BSD |strncasecmp(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<varnames.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
@@ -112,7 +111,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

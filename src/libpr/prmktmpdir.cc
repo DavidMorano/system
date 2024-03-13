@@ -53,7 +53,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<mkpathx.h>
 #include	<sfx.h>
 #include	<mkdirs.h>

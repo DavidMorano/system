@@ -28,7 +28,6 @@
 #include	<csignal>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<localmisc.h>
 
 #include	"sighand.h"

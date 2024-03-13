@@ -35,7 +35,6 @@
 #include	<climits>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<randlc.h>
 #include	<localmisc.h>
 
@@ -67,7 +66,7 @@
 #define	MAX_TYPES	5		/* max number of types above */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

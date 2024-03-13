@@ -237,6 +237,11 @@ typedef void *			voidp ;
 typedef const void *		cvoidp ;
 #endif
 
+#ifndef	TYPEDEF_CNULLPTR
+#define	TYPEDEF_CNULLPTR
+typedef const nullptr_t		cnullptr ;
+#endif
+
 #ifndef	TYPEDEF_CCP
 #define	TYPEDEF_CCP
 typedef const char		*ccp ;

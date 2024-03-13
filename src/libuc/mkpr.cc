@@ -61,7 +61,6 @@
 #include	<ctime>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<varnames.hh>
 #include	<getbufsize.h>
 #include	<bufsizevar.hh>
@@ -117,7 +116,7 @@
 #define	SI_FL		struct subinfo_flags
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

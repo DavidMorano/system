@@ -51,7 +51,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storebuf.h>
 #include	<mkx.h>
 #include	<ids.h>
@@ -77,7 +76,7 @@
 #define	SI		SUBINFO
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -26,9 +26,7 @@
 #include	<pthread.h>
 #include	<ctime>			/* for |TIMESPEC| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
-#include	<usupport.h>
 
 #include	"ptca.h"
 #include	"ptc.h"

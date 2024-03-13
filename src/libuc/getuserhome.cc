@@ -70,7 +70,6 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -108,7 +107,7 @@
 #define	SUBINFO_FL	struct subinfo_flags
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

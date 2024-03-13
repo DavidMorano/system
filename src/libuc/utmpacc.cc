@@ -58,7 +58,6 @@
 #include	<cstring>
 #include	<atomic>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<syshasutmpx.h>
 #include	<ptm.h>
@@ -89,7 +88,7 @@
 #define	ARG			utmpacc_a
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::atomic_int ;
 

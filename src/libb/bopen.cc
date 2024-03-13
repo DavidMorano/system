@@ -68,7 +68,7 @@
 #define	FLBUFLEN	100
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -94,7 +94,7 @@
 #endif /* MAXNAMELEN */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::endian ;
 

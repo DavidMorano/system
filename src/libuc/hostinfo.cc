@@ -42,7 +42,6 @@
 #include	<algorithm>		/* <- for |min(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getbufsize.h>
 #include	<bufsizevar.hh>
 #include	<vecobj.h>
@@ -84,7 +83,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
@@ -303,7 +302,7 @@ int hostinfo_start(hostinfo *op,int af,cchar *hn) noex {
 	    if (rs < 0) {
 		hostinfo_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (hostinfo_ctor) */
 	return rs ;
 }
 /* end subroutine (hostinfo_start) */
@@ -312,35 +311,35 @@ int hostinfo_finish(hostinfo *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostinfo_magic(op)) >= 0) {
-		{
-		    rs1 = hostinfo_addrend(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		if (op->domainname) {
-	    	    rs1 = uc_free(op->domainname) ;
-	    	    if (rs >= 0) rs = rs1 ;
-	    	    op->domainname = nullptr ;
-		}
-		{
-		    rs1 = hostinfo_finishnames(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = vecobj_finish(op->alp) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = vecobj_finish(op->nlp) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = hostinfo_argsend(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = hostinfo_bufend(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
+            {
+                rs1 = hostinfo_addrend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            if (op->domainname) {
+                rs1 = uc_free(op->domainname) ;
+                if (rs >= 0) rs = rs1 ;
+                op->domainname = nullptr ;
+            }
+            {
+                rs1 = hostinfo_finishnames(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = vecobj_finish(op->alp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = vecobj_finish(op->nlp) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = hostinfo_argsend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = hostinfo_bufend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
 	    {
 		rs1 = hostinfo_dtor(op) ;
 		if (rs >= 0) rs = rs1 ;

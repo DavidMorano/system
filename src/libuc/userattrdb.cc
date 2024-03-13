@@ -55,7 +55,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
@@ -79,7 +78,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -36,7 +36,6 @@
 #include	<csignal>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<sigblocker.h>
 #include	<lockrw.h>
@@ -47,7 +46,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

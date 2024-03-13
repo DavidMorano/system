@@ -35,8 +35,6 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"usupport.h"
-
 
 /* exported subroutines */
 

@@ -42,7 +42,6 @@
 #include	<unistd.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 
 #include	"mapblock.hh"
 

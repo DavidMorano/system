@@ -48,7 +48,6 @@
 #include	<cstring>
 #include	<bit>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<intceil.h>
 #include	<localmisc.h>
 
@@ -58,7 +57,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::has_single_bit ;		/* subroutine-template */
 

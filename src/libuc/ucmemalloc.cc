@@ -83,7 +83,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<sysval.hh>

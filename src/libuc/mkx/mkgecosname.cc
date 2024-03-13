@@ -115,7 +115,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
@@ -142,7 +141,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 
@@ -160,6 +159,8 @@ using std::nullptr_t ;			/* type */
 
 
 /* local variables */
+
+constexpr int	maxgecoslen = MAXGECOSLEN ;
 
 constexpr bool	f_hyphen = CF_GECOSHYPHEN ;
 
@@ -196,7 +197,7 @@ int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
 	    cchar	*tp ;
 	    bool	f = true ;
 	    rs = SR_OK ;
-	    if (glen < 0) glen = strnlen(gbuf,MAXGECOSLEN) ;
+	    if (glen < 0) glen = strnlen(gbuf,maxgecoslen) ;
 	    f = f && ((cp = strnchr(gbuf,glen,'-')) != np) ;
 	    f = f && ((tp = strnchr(cp,(glen - (cp - gbuf)),sch)) != np) ;
 	    if (f) {

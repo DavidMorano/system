@@ -42,7 +42,6 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ctdec.h>
 #include	<char.h>
 #include	<mkchar.h>
@@ -58,7 +57,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

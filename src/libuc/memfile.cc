@@ -32,7 +32,6 @@
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sysval.hh>
 #include	<intsat.h>
 #include	<intceil.h>
@@ -46,10 +45,13 @@
 #define	ZEROBUFLEN	1024
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -112,6 +114,9 @@ static int	memfile_ismemfree(memfile *,caddr_t,size_t) noex ;
 /* local variables */
 
 static sysval		pagesize(sysval_ps) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

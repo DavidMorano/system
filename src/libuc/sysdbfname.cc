@@ -61,7 +61,6 @@
 #include	<csignal>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<syswords.hh>
 #include	<libmallocxx.h>
 #include	<timewatch.hh>
@@ -75,7 +74,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

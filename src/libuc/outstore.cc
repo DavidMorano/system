@@ -35,7 +35,6 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |max(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -45,7 +44,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::max ;			/* subroutine-template */
 

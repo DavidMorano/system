@@ -32,7 +32,6 @@
 
 #include	<envstandards.h>	/* first to configure */
 #include	<usystem.h>
-#include	<usupport.h>
 
 
 enum strenvs {

@@ -46,7 +46,6 @@
 #include	<algorithm>		/* <- for |min(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<mallocxx.h>
 #include	<getpwd.h>
 #include	<bfile.h>
@@ -83,7 +82,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

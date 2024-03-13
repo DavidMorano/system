@@ -40,7 +40,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<intfloor.h>
 #include	<localmisc.h>
 
@@ -52,7 +51,7 @@
 #define	WAY	struct ebuf_way
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

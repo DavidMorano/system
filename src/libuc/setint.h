@@ -1,23 +1,27 @@
-/* setint */
+/* setint HEADER */
 /* lang=C++11 */
+
+/* unordered set of integers */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SETINT_INCLUDE
-#define	SETINT_INCLUDE	1
+#define	SETINT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>		/* for 'uint' */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	SETINT		struct setint_head
-#define	SETINT_CUR	struct setint_cur
+#define	SETINT_CUR	struct setint_cursor
 
 
-struct setint_cur {
+struct setint_cursor {
 	void		*interp ;
 } ;
 
@@ -25,33 +29,25 @@ struct setint_head {
 	void		*setp ;
 } ;
 
+typedef SETINT		setint ;
+typedef SETINT_CUR	setint_cur ;
 
-typedef struct setint_head	setint ;
-typedef struct setint_cur	setint_cur ;
+EXTERNC_begin
 
-#if	(! defined(SETINT_MASTER)) || (SETINT_MASTER == 0)
+extern int setint_start(setint *) noex ;
+extern int setint_finish(setint *) noex ;
+extern int setint_addval(setint *,int) noex ;
+extern int setint_delval(setint *,int) noex ;
+extern int setint_count(setint *) noex ;
+extern int setint_mkvec(setint *,int *) noex ;
+extern int setint_extent(setint *) noex ;
+extern int setint_curbegin(setint *,setint_cur *) noex ;
+extern int setint_enum(setint *,setint_cur *,int *) noex ;
+extern int setint_curend(setint *,setint_cur *) noex ;
+extern int setint_find(setint *,int) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int setint_start(setint *) ;
-extern int setint_finish(setint *) ;
-extern int setint_addval(setint *,int) ;
-extern int setint_delval(setint *,int) ;
-extern int setint_count(setint *) ;
-extern int setint_mkvec(setint *,int *) ;
-extern int setint_extent(setint *) ;
-extern int setint_curbegin(setint *,setint_cur *) ;
-extern int setint_enum(setint *,setint_cur *,int *) ;
-extern int setint_curend(setint *,setint_cur *) ;
-extern int setint_find(setint *,int) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SETINT_MASTER */
 
 #endif /* SETINT_INCLUDE */
 

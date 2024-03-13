@@ -23,7 +23,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear(3u)| */
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<storebuf.h>
 #include	<localmisc.h>
 

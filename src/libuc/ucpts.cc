@@ -103,7 +103,7 @@
 #define	PTSMAXDEVS	1000000000	/* rather arbitrary */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

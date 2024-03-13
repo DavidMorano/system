@@ -55,7 +55,7 @@
 #define	PROCDNAME	"/proc"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

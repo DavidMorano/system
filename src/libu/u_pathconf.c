@@ -27,11 +27,14 @@
 #include	<unistd.h>
 #include	<errno.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 
 /* local defines */
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 

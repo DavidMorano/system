@@ -75,7 +75,7 @@
 #define	SI		SUBINFO
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

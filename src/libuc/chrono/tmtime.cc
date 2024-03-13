@@ -48,7 +48,6 @@
 #include	<ctime>
 #include	<usystem.h>
 #include	<usysflag.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<strwcpy.h>
 #include	<altzone.h>		/* <- special for bad systems */
 #include	<localmisc.h>

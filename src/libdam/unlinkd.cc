@@ -48,7 +48,6 @@
 #include	<cstring>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<exitcodes.h>

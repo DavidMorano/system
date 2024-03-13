@@ -115,7 +115,7 @@
 #define	ISEND(c)	(((c) == '\n') || ((c) == '\r'))
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -85,7 +85,7 @@
 #define	TO_READ		-1		/* read timeout */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

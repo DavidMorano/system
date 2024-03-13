@@ -97,7 +97,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ptm.h>
 #include	<localmisc.h>
 

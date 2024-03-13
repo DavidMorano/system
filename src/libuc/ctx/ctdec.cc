@@ -77,7 +77,7 @@
 using std::countr_zero ;		/* subroutine-template */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

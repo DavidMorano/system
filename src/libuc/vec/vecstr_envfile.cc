@@ -68,7 +68,7 @@
 #define	WORDEXPORT	"export"	/* optional word to ignore */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

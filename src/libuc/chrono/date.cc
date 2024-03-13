@@ -48,7 +48,6 @@
 #include	<ctime>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<snwcpy.h>
 #include	<strn.h>		/* |strnncpy(3uc)| */
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
@@ -60,7 +59,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

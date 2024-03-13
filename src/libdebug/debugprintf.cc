@@ -96,7 +96,6 @@
 #include	<stdarg.h>
 #include	<stdio.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<ptm.h>
 #include	<hasx.h>
 #include	<cfdec.h>
@@ -122,7 +121,7 @@
 #define	O_FLAGS		(O_WRONLY | O_CREAT | O_APPEND)
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

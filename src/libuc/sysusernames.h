@@ -12,11 +12,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<filemap.h>
-#include	<localmisc.h>
-#include	<pwd.h>			/* <- money shot */
 
 
 #define	SYSUSERNAMES		struct sysusernames_head
@@ -33,10 +30,10 @@ typedef SYSUSERNAMES	sysusernames ;
 
 EXTERNC_begin
 
-extern int sysusernames_open(SYSUSERNAMES *,const char *) noex ;
-extern int sysusernames_close(SYSUSERNAMES *) noex ;
-extern int sysusernames_readent(SYSUSERNAMES *,char *,int) noex ;
-extern int sysusernames_reset(SYSUSERNAMES *) noex ;
+extern int sysusernames_open(sysusernames *,cchar *) noex ;
+extern int sysusernames_close(sysusernames *) noex ;
+extern int sysusernames_readent(sysusernames *,char *,int) noex ;
+extern int sysusernames_reset(sysusernames *) noex ;
 
 EXTERNC_end
 

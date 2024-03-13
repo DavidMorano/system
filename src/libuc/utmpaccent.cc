@@ -45,7 +45,6 @@
 #include	<sys/param.h>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<storeitem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>

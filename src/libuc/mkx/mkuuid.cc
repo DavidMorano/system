@@ -40,7 +40,6 @@
 #include	<climits>		/* <- for |UINT_MAX| */
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear| */
-#include	<usupport.h>
 #include	<mkuuid.h>
 #include	<localmisc.h>
 

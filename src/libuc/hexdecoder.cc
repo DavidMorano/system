@@ -31,7 +31,6 @@
 #include	<new>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3u)| */
 #include	<digval.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -44,7 +43,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;			/* subroutine-template */
 using std::nothrow ;			/* constant */

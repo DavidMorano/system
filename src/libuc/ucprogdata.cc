@@ -79,7 +79,6 @@
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<ctime>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -102,7 +101,7 @@
 #define	TO_TTL		(2*3600)	/* two hours */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

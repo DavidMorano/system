@@ -51,7 +51,6 @@ struct timeb {
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<tmtime.h>
 
 

@@ -1,22 +1,27 @@
-/* osetint */
+/* osetint HEADER */
+/* lang=C20 */
+
+/* ordered set of integers */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OSETINT_INCLUDE
-#define	OSETINT_INCLUDE	1
+#define	OSETINT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<localmisc.h>		/* for 'uint' */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #define	OSETINT		struct osetint_head
-#define	OSETINT_CUR	struct osetint_cur
+#define	OSETINT_CUR	struct osetint_cursor
 
 
-struct osetint_cur {
+struct osetint_cursor {
 	void		*interp ;
 } ;
 
@@ -25,32 +30,25 @@ struct osetint_head {
 } ;
 
 
-typedef struct osetint_head	osetint ;
-typedef struct osetint_cur	osetint_cur ;
+typedef OSETINT		osetint ;
+typedef OSETINTO_CUR	osetint_cur ;
 
-#if	(! defined(OSETINT_MASTER)) || (OSETINT_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int osetint_start(osetint *) noex ;
+extern int osetint_finish(osetint *) noex ;
+extern int osetint_addval(osetint *,int) noex ;
+extern int osetint_delval(osetint *,int) noex ;
+extern int osetint_count(osetint *) noex ;
+extern int osetint_mkvec(osetint *,int *) noex ;
+extern int osetint_extent(osetint *) noex ;
+extern int osetint_curbegin(osetint *,osetint_cur *) noex ;
+extern int osetint_enum(osetint *,osetint_cur *,int *) noex ;
+extern int osetint_curend(osetint *,osetint_cur *) noex ;
+extern int osetint_find(osetint *,int) noex ;
 
-extern int osetint_start(osetint *) ;
-extern int osetint_finish(osetint *) ;
-extern int osetint_addval(osetint *,int) ;
-extern int osetint_delval(osetint *,int) ;
-extern int osetint_count(osetint *) ;
-extern int osetint_mkvec(osetint *,int *) ;
-extern int osetint_extent(osetint *) ;
-extern int osetint_curbegin(osetint *,osetint_cur *) ;
-extern int osetint_enum(osetint *,osetint_cur *,int *) ;
-extern int osetint_curend(osetint *,osetint_cur *) ;
-extern int osetint_find(osetint *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* OSETINT_MASTER */
 
 #endif /* OSETINT_INCLUDE */
 

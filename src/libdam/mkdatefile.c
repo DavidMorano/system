@@ -69,7 +69,7 @@
 #define	MAXNLOOP	100
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -1,4 +1,5 @@
-/* hdrdecode */
+/* hdrdecode HEADER */
+/* lang=C20 */
 
 /* mail-header value string decoder */
 /* version %I% last-modified %G% */
@@ -14,7 +15,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	HDRDECODE_INCLUDE
-#define	HDRDECODE_INCLUDE	1
+#define	HDRDECODE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -37,31 +38,25 @@ struct hdrdecode_flags {
 } ;
 
 struct hdrdecode_head {
-	uint		magic ;
-	HDRDECODE_FL	f ;
 	B64DECODER	*b64decoder ;
 	QPDECODER	*qpdecoder ;
 	CHARTRANS	*chartrans ;
 	cchar		*pr ;
+	HDRDECODE_FL	f ;
+	uint		magic ;
 	char		cs[HDRDECODE_CSLEN+1] ;
 } ;
 
+typedef HDRDECODE	hdrdecode ;
 
-#if	(! defined(HDRDECODE_MASTER)) || (HDRDECODE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int hdrdecode_start(HDRDECODE *,cchar *) noex ;
+extern int hdrdecode_proc(HDRDECODE *,wchar_t *,int,cchar *,int) noex ;
+extern int hdrdecode_finish(HDRDECODE *) noex ;
 
-extern int hdrdecode_start(HDRDECODE *,cchar *) ;
-extern int hdrdecode_proc(HDRDECODE *,wchar_t *,int,cchar *,int) ;
-extern int hdrdecode_finish(HDRDECODE *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* HDRDECODE_MASTER */
 
 #endif /* HDRDECODE_INCLUDE */
 

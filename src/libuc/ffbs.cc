@@ -33,7 +33,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::countr_zero ;		/* subroutine-template */
 

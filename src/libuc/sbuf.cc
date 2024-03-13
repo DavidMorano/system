@@ -57,7 +57,6 @@
 #include	<cstdarg>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<format.h>
 #include	<ctdec.h>
 #include	<cthex.h>
@@ -77,7 +76,7 @@
 #endif
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 

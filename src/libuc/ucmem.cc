@@ -45,7 +45,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sysval.hh>
 #include	<intfloor.h>
 #include	<intceil.h>
@@ -58,7 +57,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

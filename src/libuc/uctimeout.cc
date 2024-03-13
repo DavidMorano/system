@@ -53,7 +53,6 @@
 #include	<ctime>
 #include	<queue>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
 #include	<ptc.h>
@@ -88,7 +87,7 @@
 #define	NDF		"uctimeout.deb"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

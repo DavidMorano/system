@@ -61,14 +61,13 @@
 #include	<climits>
 #include	<atomic>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::atomic_int ;			/* type */
 

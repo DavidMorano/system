@@ -48,7 +48,6 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 

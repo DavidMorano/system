@@ -38,7 +38,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using namespace::emaobj ;		/* namespace */
 using std::nullptr_t ;			/* type */

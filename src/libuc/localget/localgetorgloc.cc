@@ -74,7 +74,7 @@
 #define	ORGLOCFNAME	"orgloc"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

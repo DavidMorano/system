@@ -49,7 +49,6 @@
 #include	<cerrno>
 #include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #if	defined(PSEM_REDIRECT) && (PSEM_REDIRECT > 0)
@@ -72,7 +71,7 @@
 #define	NLPS		5	/* number of polls per second */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

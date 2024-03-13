@@ -38,7 +38,6 @@
 #include	<cstring>
 #include	<bit>			/* <- |countr_zero(3c++)| */
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<stdintx.h>
 #include	<baops.h>
 #include	<intceil.h>
@@ -53,7 +52,7 @@
 #define	BITS_MINWORDS	4
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::popcount ;
 using std::countr_zero ;

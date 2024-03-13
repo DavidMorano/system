@@ -74,7 +74,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* <- for |memclear(3c++)| */
 #include	<sbuf.h>
 #include	<ascii.h>
 #include	<strn.h>
@@ -87,7 +86,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

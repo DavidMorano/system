@@ -28,7 +28,6 @@
 #include	<climits>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<ptm.h>
 #include	<localmisc.h>
@@ -39,7 +38,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

@@ -31,7 +31,6 @@
 #include	<cstring>
 #include	<new>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<pq.h>
 #include	<intceil.h>
 #include	<localmisc.h>
@@ -46,7 +45,7 @@
 #define	OURFREE(pointer)		uc_libfree((pointer))
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;
 using std::nothrow ;
@@ -123,6 +122,9 @@ static int	lookaside_newchunk(lookaside *) noex ;
 /* local variables */
 
 constexpr int	qalign = int(2 * sizeof(void *)) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

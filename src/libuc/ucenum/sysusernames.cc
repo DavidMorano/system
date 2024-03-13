@@ -29,7 +29,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<getax.h>
 #include	<localmisc.h>
 #include	<snwcpy.h>
@@ -40,7 +39,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;			/* constant */
 

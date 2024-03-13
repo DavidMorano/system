@@ -52,7 +52,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::cout ;
 using std::cerr ;

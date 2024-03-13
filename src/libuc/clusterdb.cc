@@ -72,7 +72,7 @@
 #define	CD_CUR			clusterdb_cur
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
@@ -176,7 +176,6 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = clusterdb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
-	    memclear(op) ;
 	    if (fname[0]) {
 	         USTAT		sb ;
 	         if ((rs = u_stat(fname,&sb)) >= 0) {

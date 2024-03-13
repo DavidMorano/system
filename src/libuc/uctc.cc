@@ -23,7 +23,6 @@
 #include	<cerrno>
 #include	<cstdlib>
 #include	<usystem.h>		/* |msleep(3u)| */
-#include	<usupport.h>		/* |utimeout| */
 #include	<localmisc.h>
 
 #include	"uctc.h"
@@ -32,7 +31,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

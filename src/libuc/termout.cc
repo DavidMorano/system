@@ -1,7 +1,8 @@
-/* termout */
+/* termout SUPPORT */
 /* lang=C++98 */
 
 /* perform terminal outputting */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debug print-outs */
@@ -9,9 +10,9 @@
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-	This object module was originally written to create a logging mechanism
-	for PCS application programs.  This is a second go at this object.  The
-	first was written in C89.
+	This object module was originally written to create a logging
+	mechanism for PCS application programs.  This is a second
+	go at this object.  The first was written in C89.
 
 */
 
@@ -19,9 +20,9 @@
 
 /*******************************************************************************
 
-	This is a module that operates on termials (to be determined) for the
-	purposes of putting out small messages to them.  Subroutines in this
-	module are:
+	This is a module that operates on termials (to be determined)
+	for the purposes of putting out small messages to them.
+	Subroutines in this module are:
 
 		termout_start
 		termout_load
@@ -29,27 +30,21 @@
 		termout_finish
 
 	Implementation note:
-
-	Note (on the C++ language):
-        Note how we had to create a mess out of our character database below
-        because of how f**ked up the C++ language is. There is no way to provide
-        an unsigned char literal in the language without an incredible mess!
-        This does not occur with the regular C language.
-
+	Note (on the C++ language): Note how we had to create a
+	mess out of our character database below because of how
+	f**ked up the C++ language is. There is no way to provide
+	an unsigned char literal in the language without an incredible
+	mess!  This does not occur with the regular C language.
 
 *******************************************************************************/
-
-
-#define	TERMOUT_MASTER	0		/* necessary for proper symbol names */
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<initializer_list>
 #include	<new>
 #include	<vector>
@@ -140,9 +135,12 @@
 #define	GR_MWIDE	(1<<GR_VWIDE)	/* double wide */
 
 
-/* default name spaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

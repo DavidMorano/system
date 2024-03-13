@@ -70,7 +70,6 @@
 #include	<grp.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<getbufsize.h>
 #include	<mallocxx.h>
@@ -256,7 +255,7 @@
 #define	NDF		"/tmp/userinfo.nd"
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */

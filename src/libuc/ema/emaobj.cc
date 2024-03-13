@@ -31,7 +31,6 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* for |memclear(3u)| */
 #include	<mallocstuff.h>
 #include	<strn.h>
 #include	<char.h>
@@ -47,7 +46,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using namespace::emaobj ;		/* namespace */
 using std::nullptr_t ;			/* type */

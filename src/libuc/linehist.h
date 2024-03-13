@@ -1,6 +1,8 @@
-/* linehist */
+/* linehist HEADER */
+/* lang=C20 */
 
 /* line history */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,7 +15,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LINEHIST_INCLUDE
-#define	LINEHIST_INCLUDE	1
+#define	LINEHIST_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,30 +30,24 @@
 
 
 struct linehist_head {
-	uint		magic ;
 	LANGSTATE	ls ;
 	void		*lvp ;		/* line history */
+	uint		magic ;
 	char		ss[2] ;		/* search-characters */
 } ;
 
+typedef LINEHUST	linehist ;
 
-#if	(! defined(LINEHIST_MASTER)) || (LINEHIST_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int linehist_start(LINEHIST *,cchar *) noex ;
+extern int linehist_proc(LINEHIST *,int,cchar *,int) noex ;
+extern int linehist_count(LINEHIST *) noex ;
+extern int linehist_get(LINEHIST *,int,int *) noex ;
+extern int linehist_finish(LINEHIST *) noex ;
 
-extern int linehist_start(LINEHIST *,cchar *) ;
-extern int linehist_proc(LINEHIST *,int,cchar *,int) ;
-extern int linehist_count(LINEHIST *) ;
-extern int linehist_get(LINEHIST *,int,int *) ;
-extern int linehist_finish(LINEHIST *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* LINEHIST_MASTER */
 
 #endif /* LINEHIST_INCLUDE */
 

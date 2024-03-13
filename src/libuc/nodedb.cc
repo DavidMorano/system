@@ -45,7 +45,6 @@
 #include	<ctime>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<bfile.h>
@@ -98,7 +97,7 @@
 #define	KEYALIGNMENT		sizeof(char *(*)[2])
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
@@ -270,15 +269,17 @@ static char 		saterms[termsize] ;
 static bufsizevar	maxhostlen(getbufsize_hn) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int nodedb_open(nodedb *op,cchar *fname) noex {
-	static cint	srs = mkterms() ;
+	static cint	srm = mkterms() ;
 	cint		nf = NODEDB_NFILES ;
 	cint		defents = NODEDB_DEFENTS ;
 	int		rs ;
-	if ((rs = srs) >= 0) {
-	    rs = SR_FAULT ;
+	if ((rs = srm) >= 0) {
 	    if ((rs = nodedb_ctor(op,fname)) >= 0) {
 	        rs = SR_INVALID ;
 	        if (fname[0]) {
@@ -309,7 +310,7 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 		if (rs < 0) {
 		    nodedb_dtor(op) ;
 		}
-	    } /* end if (non-null) */
+	    } /* end if (nodedb_ctor) */
 	} /* end if (mkterms) */
 	return rs ;
 }

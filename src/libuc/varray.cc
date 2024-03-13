@@ -26,7 +26,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<lookaside.h>
 #include	<localmisc.h>
 
@@ -40,7 +39,7 @@
 #define	OURFREE(pointer)		uc_libfree((pointer))
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nothrow ;
 
@@ -93,6 +92,9 @@ static int	varray_extend(varray *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

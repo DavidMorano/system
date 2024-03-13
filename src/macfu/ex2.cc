@@ -60,7 +60,7 @@
 #define	ENCBUFLEN	10		/* the buffer length for encoding */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::cout ;
 using std::string ;

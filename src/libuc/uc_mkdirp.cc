@@ -47,7 +47,6 @@
 #include	<fcntl.h>
 #include	<errno.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 

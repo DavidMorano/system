@@ -36,7 +36,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<sigblocker.h>
 #include	<timewatch.hh>
 #include	<ptm.h>
@@ -66,7 +65,7 @@
 #define	GETRANDOM_MAXENT	256	/* maximum bytes per call */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

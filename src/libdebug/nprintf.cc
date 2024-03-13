@@ -66,7 +66,6 @@
 #include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<usupport.h>		/* |memclear(3u)| */
 #include	<strwcpy.h>
 #include	<rmx.h>
 #include	<localmisc.h>
@@ -87,7 +86,7 @@
 #define	SUBINFO		struct subinfo
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

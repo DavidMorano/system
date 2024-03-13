@@ -42,7 +42,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecpstr.h>
 #include	<strn.h>
 #include	<cfdec.h>

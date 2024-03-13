@@ -12,10 +12,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<filemap.h>
-#include	<localmisc.h>
 
 
 #define	SYSUSERSHELLS		struct sysusershells_head
@@ -32,7 +30,7 @@ typedef SYSUSERSHELLS	sysusershells ;
 
 EXTERNC_begin
 
-extern int sysusershells_open(sysusershells *,const char *) noex ;
+extern int sysusershells_open(sysusershells *,cchar *) noex ;
 extern int sysusershells_close(sysusershells *) noex ;
 extern int sysusershells_readent(sysusershells *,char *,int) noex ;
 extern int sysusershells_reset(sysusershells *) noex ;

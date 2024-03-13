@@ -47,7 +47,6 @@
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<vecobj.h>
 #include	<localmisc.h>
 #include	<intceil.h>
@@ -67,7 +66,7 @@
 #define	STRENTRY	struct strentry
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 using std::max ;			/* subroutine-template */

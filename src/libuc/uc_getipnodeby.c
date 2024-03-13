@@ -55,7 +55,6 @@
 #include	<string.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 

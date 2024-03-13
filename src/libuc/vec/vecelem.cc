@@ -33,7 +33,6 @@
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<localmisc.h>
 
 #include	"vecelem.h"
@@ -42,7 +41,7 @@
 /* local defines */
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::min ;
 

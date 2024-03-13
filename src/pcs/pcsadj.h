@@ -1,5 +1,7 @@
 /* pcs-adj(unct) */
+/* lang=C20 */
 
+/* PCS adjunct subroutines */
 /* version %I% last-modified %G% */
 
 
@@ -13,20 +15,17 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	PCSADJ_INCLUDE
-#define	PCSADJ_INCLUDE	1
+#define	PCSADJ_INCLUDE
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	pcsadj_begin(PROGINFO *) ;
-extern int	pcsadj_end(PROGINFO *) ;
-extern int	pcsadj_req(PROGINFO *,int) ;
+extern int	pcsadj_begin(PROGINFO *) noex ;
+extern int	pcsadj_end(PROGINFO *) noex ;
+extern int	pcsadj_req(PROGINFO *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* PCSADJ_INCLUDE */
 

@@ -95,7 +95,7 @@
 #define	VS		vecstr
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

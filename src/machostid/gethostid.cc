@@ -33,7 +33,7 @@
 #include	<clanguage.h>
 
 
-/* local namespaces */
+/* imported namespaces */
 
 using std::nullptr_t ;			/* type */
 

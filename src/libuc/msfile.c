@@ -143,7 +143,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<usupport.h>
 #include	<endian.h>
 #include	<mapstrint.h>
 #include	<stdorder.h>

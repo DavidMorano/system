@@ -142,7 +142,7 @@
 #define	NSHIFT		6
 
 
-/* local namespaces */
+/* imported namespaces */
 
 
 /* local typedefs */

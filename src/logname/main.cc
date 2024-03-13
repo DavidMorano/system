@@ -1,21 +1,21 @@
-/* main (LOGDIR) */
+/* main SUPPORT (LOGDIR) */
+/* lang=C++20 */
 
 /* program to return a user's home login directory */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history :
 
 	= 1989-03-01, David A­D­ Morano
-        This subroutine was originally written. This whole program, LOGDIR, is
-        needed for use on the Sun CAD machines because Sun doesn't support
-        LOGDIR or LOGNAME at this time. There was a previous program but it is
-        lost and not as good as this one anyway. This one handles NIS+ also.
-        (The previous one didn't.)
+	This subroutine was originally written. This whole program,
+	LOGDIR, is needed for use on the Sun CAD machines because
+	Sun doesn't support LOGDIR or LOGNAME at this time. There
+	was a previous program but it is lost and not as good as
+	this one anyway. This one handles NIS+ also.  (The previous
+	one didn't.)
 
 	= 1998-06-01, David A­D­ Morano
 	I enhanced the program a little to print out some other user
@@ -32,16 +32,12 @@
 /*******************************************************************************
 
 	Sysnopsis:
-
 	$ logdir [username]
 	$ logname [username] [keyword(s) [...]]
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -54,8 +50,8 @@
 #include	<grp.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<getpwentry.h>
 #include	<bfile.h>
 #include	<baops.h>
 #include	<char.h>
@@ -206,17 +202,15 @@ enum qopts {
 
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 	struct proginfo	pi, *pip = &pi ;
-	struct ustat	sb ;
-	struct passwd	*pep ;
-	struct group	*gep = NULL ;
+	USTAT		sb ;
+	PASSWD		*pep ;
+	GROUP		*gep = NULL ;
+	pwentry		entry ;
 	bfile		errfile, *efp = &errfile ;
 	bfile		outfile, *ofp = &outfile ;
 	bfile		nisfile, *nfp = &nisfile ;
-	PWENTRY		entry ;
 	time_t		daytime = time(NULL) ;
 	const uid_t	uid_cur = getuid() ;
 
