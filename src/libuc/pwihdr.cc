@@ -1,10 +1,8 @@
-/* pwihdr */
+/* pwihdr SUPPORT */
+/* lang=C++20 */
 
 /* PassWord Index file */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
-
+/* version %I% last-modified %G% */
 
 /* revision history:
 
@@ -20,41 +18,35 @@
 
 /*******************************************************************************
 
-        This subroutine reads from and write to a buffer which represents a PWI
-        file header when written out to a file.
+	Name:
+	pwihdr
+
+	Description:
+	This subroutine reads from and write to a buffer which
+	represents a PWI file header when written out to a file.
 
 	Synopsis:
-
-	int pwihdr(ep,f,hbuf,hlen)
-	PWIHDR		*ep ;
-	int		f ;
-	char		hbuf[] ;
-	int		hlen ;
+	int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex
 
 	Arguments:
-
 	- ep		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<localmisc.h>
@@ -67,14 +59,10 @@
 
 /* external subroutines */
 
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
+extern "C" {
+    extern int	mkmagic(char *,int,cchar *) noex ;
+    extern int	isValidMagic(cchar *,int,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -91,15 +79,13 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* exported subroutines */
 
-
-int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen)
-{
+int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = pwihdr_overlast * sizeof(uint) ;
-	const int	magicsize = PWIHDR_MAGICSIZE ;
+	cint		headsize = pwihdr_overlast * sizeof(uint) ;
+	cint		magicsize = PWIHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	const char	*magicstr = PWIHDR_MAGICSTR ;
+	cchar		*magicstr = PWIHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
@@ -204,10 +190,6 @@ int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen)
 	    }
 
 	} /* end if (read-write) */
-
-#if	CF_DEBUGS
-	debugprintf("bvidu: ret f=%d rs=%d\n",f,rs) ;
-#endif
 
 	return (rs >= 0) ? (bp - hbuf) : rs ;
 }

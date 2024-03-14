@@ -135,21 +135,21 @@ int recip_finish(recip *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    if (op->recipient != NULL) {
+	    if (op->recipient != nullptr) {
 	        {
 	            rs1 = uc_free(op->recipient) ;
 	            if (rs >= 0) rs = rs1 ;
-	            op->recipient = NULL ;
+	            op->recipient = nullptr ;
 		}
-	        if (op->name != NULL) {
+	        if (op->name != nullptr) {
 	            rs1 = uc_free(op->name) ;
 	            if (rs >= 0) rs = rs1 ;
-	            op->name = NULL ;
+	            op->name = nullptr ;
 	        }
-	        if (op->maildname != NULL) {
+	        if (op->maildname != nullptr) {
 	            rs1 = uc_free(op->maildname) ;
 	            if (rs >= 0) rs = rs1 ;
-	            op->maildname = NULL ;
+	            op->maildname = nullptr ;
 	        }
 		{
 	            rs1 = vecitem_finish(op->mdp) ;
@@ -166,7 +166,7 @@ int recip_finish(recip *op) noex {
 
 int recip_get(recip *op,cchar **rpp) noex {
 	int		rs ;
-	cchar		*rp = NULL ;
+	cchar		*rp = nullptr ;
 	if ((rs = recip_magic(op)) >= 0) {
 	    if (op->recipient) {
 	        rp = op->recipient ;
@@ -185,7 +185,7 @@ int recip_get(recip *op,cchar **rpp) noex {
 int recip_setuser(recip *op,uid_t uid) noex {
 	int		rs ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    op->f.user = TRUE ;
+	    op->f.user = true ;
 	    op->uid = uid ;
 	}
 	return rs ;
@@ -196,9 +196,9 @@ int recip_setname(recip *op,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = recip_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (op->name != NULL) {
+	    if (op->name != nullptr) {
 	        uc_free(op->name) ;
-	        op->name = NULL ;
+	        op->name = nullptr ;
 	    }
 	    if (sp[0]) {
 	        cchar	*cp{} ;
@@ -218,7 +218,7 @@ int recip_setmailspool(recip *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (op->maildname) {
 	        uc_free(op->maildname) ;
-	        op->maildname = NULL ;
+	        op->maildname = nullptr ;
 	    }
 	    if (sp[0]) {
 	        cchar	*cp{} ;
@@ -266,7 +266,7 @@ int recip_ds(recip *op,int ds) noex {
 
 int recip_match(recip *op,cchar *sp,int sl) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = recip_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {

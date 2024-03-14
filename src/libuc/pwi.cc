@@ -1,11 +1,10 @@
-/* pwi */
+/* pwi SUPPORT */
+/* lang=C++20 */
 
 /* PassWord Index manager */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
+#define	CF_PWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -18,38 +17,35 @@
 
 /*******************************************************************************
 
-	This is a small hack for use by the USERINFO built-in command that is
-	part of the Korn Shell (KSH).
+	This is a small hack for use by the USERINFO built-in command
+	that is part of the Korn Shell (KSH).
 
-	This object provides some front-end glue for using the IPASSWD object
-	on an IPASSWD database.
+	This object provides some front-end glue for using the
+	IPASSWD object on an IPASSWD database.
 
 	Notes:
 
 	= Searching for a PWI DB file:
 
-	If a PWI DB name is passed to us, we only search for that DB.  If no
-	PWI DB is passwed, we search first for a DB with the same name as our
-	cluster name (if we have one); otherwise failing that we search for a
-	DB with our node name.
+	If a PWI DB name is passed to us, we only search for that
+	DB.  If no PWI DB is passwed, we search first for a DB with
+	the same name as our cluster name (if we have one); otherwise
+	failing that we search for a DB with our node name.
 
-	If no DB is present then we either make (a-fresh) the DB given to us by
-	name, or we make a DB using our cluster name.
-
+	If no DB is present then we either make (a-fresh) the DB
+	given to us by name, or we make a DB using our cluster name.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<endianstr.h>
@@ -60,7 +56,7 @@
 #include	<ipasswd.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>
 #include	<localmisc.h>
 
 #include	"pwi.h"
@@ -68,13 +64,13 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
+#if	CF_PWCACHE
+#define	GETPW_NAME	ucpwcache_name
+#define	GETPW_UID	ucpwcache_uid
 #else
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
+#endif /* CF_PWCACHE */
 
 #define	DBDNAME		"var/pwi"
 
@@ -82,8 +78,8 @@
 #define	PASSWDFNAME	"/etc/passwd"
 #endif
 
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100
+#ifndef	realnameLEN
+#define	realnameLEN	100
 #endif
 
 #define	TO_FILEMOD	(24 * 3600)
@@ -132,34 +128,29 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	sncpy4(char *,int, cchar *,cchar *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	sncpylc(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getnodename(char *,int) ;
-extern int	getclustername(const char *,char *,int,const char *) ;
-extern int	getgecosname(const char *,int,const char **) ;
-extern int	hasuc(const char *,int) ;
+extern int	getclustername(cchar *,char *,int,cchar *) ;
+extern int	getgecosname(cchar *,int,cchar **) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isNotPresent(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpyuc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -169,14 +160,14 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	const char	*pr ;
-	const char	*dbname ;
+	cchar		*pr ;
+	cchar		*dbname ;
+	cchar		*midname ;
 	SUBINFO_FL	alloc ;
-	const char	*midname ;
 } ;
 
 struct pwdesc {
-	struct passwd	*pwp ;
+	PASSWD		*pwp ;
 	char		*pwbuf ;
 	int		pwlen ;
 } ;
@@ -184,17 +175,17 @@ struct pwdesc {
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,const char *,const char *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_midname(SUBINFO *) ;
-static int	subinfo_mkpwi(SUBINFO *) ;
+static int	subinfo_start(SUBINFO *,cchar *,cchar *) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
+static int	subinfo_midname(SUBINFO *) noex ;
+static int	subinfo_mkpwi(SUBINFO *) noex ;
 
-static int	realname_isextra(REALNAME *,PWDESC *,const char *) ;
+static int	realname_isextra(realname *,PWDESC *,cchar *) noex ;
 
 
 /* local variables */
 
-static cchar	*exports[] = {
+static constexpr cchar	*exports[] = {
 	VARHZ,
 	VARNODE,
 	VARHOMEDNAME,
@@ -202,71 +193,53 @@ static cchar	*exports[] = {
 	VARLOGNAME,
 	VARTZ,
 	VARPWD,
-	NULL
+	nullptr
 } ;
 
 /* use fixed locations for security reasons (like we care!) */
-static cchar	*prbins[] = {
+static constexpr cchar	*prbins[] = {
 	"bin",
 	"sbin",
-	NULL
+	nullptr
 } ;
 
-static cchar	*extras = "¹²³" ;
+static constexpr cchar	*extras = "¹²³" ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pwi_open(PWI *op,cchar *pr,cchar *dbname)
-{
-	SUBINFO	si, *sip = &si ;
-	struct ustat	sb, *sbp = &sb ;
-	const time_t	daytime = time(NULL) ;
+int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
+	SUBINFO		si, *sip = &si ;
+	YSTAT		sb, *sbp = &sb ;
+	const time_t	daytime = time(nullptr) ;
 	int		rs ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("pwi_open: dbname=%s\n",dbname) ;
-#endif
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if ((rs = subinfo_start(sip,pr,dbname)) >= 0) {
 	    if ((rs = subinfo_midname(sip)) >= 0) {
 	        time_t		ti_pwi ;
-	        const int	to = TO_FILEMOD ;
-	        const char	*suf = IPASSWD_SUF ;
-	        const char	*endstr = ENDIANSTR ;
-	        const char	*midname = sip->midname ;
+	        cint	to = TO_FILEMOD ;
+	        cchar	*suf = IPASSWD_SUF ;
+	        cchar	*endstr = ENDIANSTR ;
+	        cchar	*midname = sip->midname ;
 	        char		fname[MAXPATHLEN+1] ;
-
-#if	CF_DEBUGS
-	        debugprintf("pwi_open: midname=%s\n",midname) ;
-#endif
 
 	        if ((rs = mkfnamesuf2(fname,midname,suf,endstr)) >= 0) {
 	            rs1 = u_stat(fname,sbp) ;
 
-#if	CF_DEBUGS
-	            debugprintf("pwi_open: u_stat() rs=%d fname=%s\n",
-	                rs1,fname) ;
-#endif
-
 	            ti_pwi = sbp->st_mtime ;
 	            if ((rs1 >= 0) && (ti_pwi == 0)) {
 	                rs1 = SR_NOTFOUND ;
-#if	CF_DEBUGS
-	                debugprintf("pwi_open: zero size \n") ;
-#endif
 	            }
 
 	            if ((rs1 >= 0) && ((daytime - ti_pwi) >= to)) {
 	                rs1 = SR_NOTFOUND ;
-#if	CF_DEBUGS
-	                debugprintf("pwi_open: expiration\n") ;
-#endif
 	            }
 
 	            if (rs1 >= 0) {
@@ -275,9 +248,6 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname)
 
 	                if ((rs1 >= 0) && (sb.st_mtime > ti_pwi)) {
 	                    rs1 = SR_NOTFOUND ;
-#if	CF_DEBUGS
-	                    debugprintf("pwi_open: PASSWD file is younger\n") ;
-#endif
 	                }
 
 	            } /* end if (checking against system PASSWD file) */
@@ -290,11 +260,6 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname)
 
 	        } /* end if (mkfnamesuf) */
 
-#if	CF_DEBUGS
-	        debugprintf("pwi_open: mid rs=%d\n",rs) ;
-	        debugprintf("pwi_open: midname=%s\n",sip->midname) ;
-#endif
-
 	        if (rs >= 0) {
 	            if ((rs = ipasswd_open(&op->db,midname)) >= 0) {
 	                op->magic = PWI_MAGIC ;
@@ -305,21 +270,15 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (subinfo) */
 
-#if	CF_DEBUGS
-	debugprintf("pwi_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pwi_open) */
 
-
-int pwi_close(PWI *op)
-{
+int pwi_close(PWI *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != PWI_MAGIC) return SR_NOTOPEN ;
 
@@ -331,24 +290,22 @@ int pwi_close(PWI *op)
 }
 /* end subroutine (pwi_close) */
 
-
-int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name)
-{
+int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
 	IPASSWD_CUR	cur ;
-	REALNAME	rn ;
-	const int	nlen = REALNAMELEN ;
+	realname	rn ;
+	cint		nlen = realnameLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		nl ;
+	int		sl ;
 	int		c = 0 ;
 	int		fopts = 0 ;
 	int		ul = 0 ;
-	const char	*np ;
-	char		nbuf[REALNAMELEN + 1] ;
+	cchar		*sp ;
+	char		nbuf[realnameLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != PWI_MAGIC) return SR_NOTOPEN ;
 
@@ -360,30 +317,26 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name)
 
 /* conditionally convert to lower case as needed */
 
-	np = name ;
-	nl = -1 ;
+	sp = name ;
+	sl = -1 ;
 	if (hasuc(name,-1)) {
-	    np = nbuf ;
+	    sp = nbuf ;
 	    rs = sncpylc(nbuf,nlen,name) ;
-	    nl = rs ;
+	    sl = rs ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("pwi_lookup: ent name=%t\n",np,nl) ;
-#endif
-
-/* load "name" into REALNAME object for lookup */
+/* load "name" into realname object for lookup */
 
 	if (rs >= 0) {
-	    struct passwd	pw ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
-	    char		*pwbuf ;
+	    PASSWD	pw ;
+	    cint	pwlen = getbufsize(getbufsize_pw) ;
+	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 		PWDESC	pd ;
 		pd.pwp = &pw ;
 		pd.pwbuf = pwbuf ;
 		pd.pwlen = pwlen ;
-	        if ((rs = realname_start(&rn,np,nl)) >= 0) {
+	        if ((rs = realname_start(&rn,sp,sl)) >= 0) {
 
 	            if ((rs = ipasswd_curbegin(&op->db,&cur)) >= 0) {
 		        char	un[USERNAMELEN + 1] ;
@@ -392,10 +345,6 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name)
 	                    rs1 = ipasswd_fetch(&op->db,&rn,&cur,fopts,un) ;
 	                    if (rs1 == SR_NOTFOUND) break ;
 			    rs = rs1 ;
-
-#if	CF_DEBUGS
-			    debugprintf("pwi_lookup: matched u=%s\n",un) ;
-#endif
 
 			    if (rs >= 0) {
 			        if ((rs = realname_isextra(&rn,&pd,un)) == 0) {
@@ -419,10 +368,6 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name)
 	    } /* end if (memory-allocation) */
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("pwi_lookup: mid rs=%d c=%u\n",rs,c) ;
-#endif
-
 /* if there was more than one match to the name, punt and issue error */
 
 	if (rs >= 0) {
@@ -433,10 +378,6 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name)
 	    }
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("main/lookup: ret rs=%d ul=%u\n",rs,ul) ;
-#endif
-
 	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (pwi_lookup) */
@@ -444,57 +385,46 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name)
 
 /* private subroutines */
 
-
-static int subinfo_start(SUBINFO *sip,cchar *pr,cchar *dbname)
-{
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+static int subinfo_start(SUBINFO *sip,cchar *pr,cchar *dbname) noex {
+	memclear(sip) ;
 	sip->pr = pr ;
 	sip->dbname = dbname ;
-
 	return SR_OK ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (sip->midname != NULL) {
+	if (sip->midname != nullptr) {
 	    rs1 = uc_free(sip->midname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->midname = NULL ;
+	    sip->midname = nullptr ;
 	}
-
-	if (sip->alloc.dbname && (sip->dbname != NULL)) {
+	if (sip->alloc.dbname && (sip->dbname != nullptr)) {
 	    rs1 = uc_free(sip->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->dbname = NULL ;
+	    sip->dbname = nullptr ;
 	}
-
-	sip->pr = NULL ;
+	sip->pr = nullptr ;
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
 /* find the inverse-passwd database file */
-static int subinfo_midname(SUBINFO *sip)
-{
+static int subinfo_midname(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		dblen = -1 ;
 	cchar		*dbname = sip->dbname ;
 	char		namebuf[MAXNAMELEN + 1] ;
 
-	if ((dbname == NULL) || (dbname[0] == '\0')) {
-	    const int	nlen = NODENAMELEN ;
+	if ((dbname == nullptr) || (dbname[0] == '\0')) {
+	    cint	nlen = NODENAMELEN ;
 	    char	nbuf[NODENAMELEN + 1] ;
 	    char	cbuf[NODENAMELEN + 1] ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	        const int	rsn = SR_NOTFOUND ;
+	        cint	rsn = SR_NOTFOUND ;
 	        cchar		*nn ;
 	        if ((rs = getclustername(sip->pr,cbuf,nlen,nbuf)) >= 0) {
 	            nn = cbuf ;
@@ -510,10 +440,6 @@ static int subinfo_midname(SUBINFO *sip)
 	    }
 	} /* end if (empty specification) */
 
-#if	CF_DEBUGS
-	debugprintf("subinfo_midname: mid dbname=%s\n",dbname) ;
-#endif
-
 	if (rs >= 0) {
 	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(dbname,dblen,&cp)) >= 0) {
@@ -521,62 +447,46 @@ static int subinfo_midname(SUBINFO *sip)
 	    }
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("subinfo_midname: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (subinfo_midname) */
 
-
 /* make the inverse-passwd database file */
-static int subinfo_mkpwi(SUBINFO *sip)
-{
+static int subinfo_mkpwi(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		i ;
-	const char	*pr = sip->pr ;
-	const char	*dbname = sip->midname ;
-	const char	*progmkpwi = PROG_MKPWI ;
+	cchar		*pr = sip->pr ;
+	cchar		*dbname = sip->midname ;
+	cchar		*progmkpwi = PROG_MKPWI ;
 	char		progfname[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("pwi/subinfo_mkpwi: dbname=%s\n",dbname) ;
-#endif
-
-	if (dbname == NULL)
+	if (dbname == nullptr)
 	    return SR_FAULT ;
 
 	if (dbname[0] == '\0')
 	    return SR_INVALID ;
 
-	for (i = 0 ; prbins[i] != NULL ; i += 1) {
+	for (i = 0 ; prbins[i] != nullptr ; i += 1) {
 	    if ((rs = mkpath3(progfname,pr,prbins[i],progmkpwi)) >= 0) {
-	        rs = perm(progfname,-1,-1,NULL,X_OK) ;
+	        rs = perm(progfname,-1,-1,nullptr,X_OK) ;
 	    }
 	    if (rs >= 0) break ;
 	} /* end for */
 
-#if	CF_DEBUGS
-	debugprintf("pwi/subinfo_mkpwi: pr=%s\n",sip->pr) ;
-	debugprintf("pwi/subinfo_mkpwi: progfname=%s\n",progfname) ;
-	debugprintf("pwi/subinfo_mkpwi: perm() rs=%d\n",rs) ;
-#endif
-
 	if (rs >= 0) {
-	    SPAWNPROC	ps ;
+	    spawnproc	ps{} ;
 	    vecstr	envs ;
 	    pid_t	cpid ;
-	    const int	vo = VECSTR_PNOHOLES ;
-	    int		cstat, cex ;
-
+	    cint	vo = VECSTR_OCOMPACT ;
+	    int		cstat ;
+	    int		cex ;
 	    if ((rs = vecstr_start(&envs,10,vo)) >= 0) {
-		const int	alen = MAXNAMELEN ;
-		int		cl ;
-	        const char	*av[10] ;
-		const char	*cp ;
-		const char	*argz = progmkpwi ;
-		char		abuf[MAXNAMELEN+1] ;
+		cint	alen = MAXNAMELEN ;
+		int	cl ;
+	        cchar	*av[10] ;
+		cchar	*cp ;
+		cchar	*argz = progmkpwi ;
+		char	abuf[MAXNAMELEN+1] ;
 	        i = 0 ;
 
 		if ((cl = sfbasename(progmkpwi,-1,&cp)) > 0) {
@@ -587,29 +497,27 @@ static int subinfo_mkpwi(SUBINFO *sip)
 /* setup arguments */
 
 	        av[i++] = argz ;
-	        av[i++] = NULL ;
+	        av[i++] = nullptr ;
 
 /* setup environment */
 
 	        vecstr_envadd(&envs,VARPRPWI,sip->pr,-1) ;
 
-		if (sip->dbname != NULL)
+		if (sip->dbname != nullptr)
 	            vecstr_envadd(&envs,VARDBNAME,sip->dbname,-1) ;
 
-	        for (i = 0 ; exports[i] != NULL ; i += 1) {
-	            if ((cp = getenv(exports[i])) != NULL) {
+	        for (i = 0 ; exports[i] != nullptr ; i += 1) {
+	            if ((cp = getenv(exports[i])) != nullptr) {
 	                rs = vecstr_envadd(&envs,exports[i],cp,-1) ;
 		    }
 	            if (rs < 0) break ;
 	        } /* end for */
-
 /* go */
-
 	        if (rs >= 0) {
-	            cchar	**ev ;
+	            mainv	ev ;
 	            if ((rs = vecstr_getvec(&envs,&ev)) >= 0) {
 
-	            memset(&ps,0,sizeof(SPAWNPROC)) ;
+	            memclear(&ps) ;
 	            ps.opts |= SPAWNPROC_OIGNINTR ;
 	            ps.opts |= SPAWNPROC_OSETPGRP ;
 	            for (i = 0 ; i < 3 ; i += 1) {
@@ -634,33 +542,20 @@ static int subinfo_mkpwi(SUBINFO *sip)
 	        rs = 0 ;
 	        while (rs == 0) {
 	            rs = u_waitpid(cpid,&cstat,0) ;
-#if	CF_DEBUGS
-	            debugprintf("pwi/subinfo_mkpwi: u_waitpid() rs=%d\n",rs) ;
-#endif
 	            if (rs == SR_INTR) rs = 0 ;
 	        } /* end while */
 
 	        if (rs >= 0) {
-
 	            cex = 0 ;
-	            if (WIFSIGNALED(cstat))
+	            if (WIFSIGNALED(cstat)) {
 	                rs = SR_UNATCH ;	/* protocol not attached */
-
-#if	CF_DEBUGS
-	            debugprintf("pwi/subinfo_mkpwi: signaled? rs=%d\n",rs) ;
-#endif
-
+		    }
 	            if ((rs >= 0) && WIFEXITED(cstat)) {
 
 	                cex = WEXITSTATUS(cstat) ;
 
 	                if (cex != 0)
 	                    rs = SR_LIBBAD ;
-
-#if	CF_DEBUGS
-	                debugprintf("pwi/subinfo_mkpwi: "
-				"exited? cex=%d rs=%d\n",cex,rs) ;
-#endif
 
 	            } /* end if (wait-exited) */
 
@@ -670,40 +565,30 @@ static int subinfo_mkpwi(SUBINFO *sip)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("pwi/subinfo_mkpwi: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (subinfo_mkpwi) */
 
-
-static int realname_isextra(REALNAME *op,PWDESC *pdp,const char *un)
-{
-	struct passwd	*pwp = pdp->pwp ;
-	const int	pwlen = pdp->pwlen ;
+static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
+	PASSWD		*pwp = pdp->pwp ;
+	cint		pwlen = pdp->pwlen ;
 	int		rs ;
-	int		f = FALSE ;
-	const char	*ln ;
+	int		f = false ;
+	cchar		*ln ;
 	char		*pwbuf = pdp->pwbuf ;
-
 	if ((rs = realname_getlast(op,&ln)) >= 0) {
-	    const int	ll = rs ;
-#if	CF_DEBUGS
-	    debugprintf("pwi/realname_isextra: ln=>%t<\n",ln,ll) ;
-#endif
-	    if (strnpbrk(ln,ll,extras) == NULL) {
+	    cint	ll = rs ;
+	    if (strnpbrk(ln,ll,extras) == nullptr) {
 		if ((rs = GETPW_NAME(pwp,pwbuf,pwlen,un)) > 0) {
-		    cchar	*np ;
-		    if ((rs = getgecosname(pwp->pw_gecos,-1,&np)) > 0) {
-			f = (strnpbrk(np,rs,extras) != NULL) ;
+		    cchar	*sp ;
+		    if ((rs = getgecosname(pwp->pw_gecos,-1,&sp)) > 0) {
+			f = (strnpbrk(sp,rs,extras) != nullptr) ;
 		    }
-		} else if (rs == SR_NOTFOUND)
+		} else if (rs == SR_NOTFOUND) {
 		    rs = SR_OK ;
+		}
 	    } /* end if (query does not have special extras) */
 	} /* end if (realname_getlast) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (realname_isextra) */

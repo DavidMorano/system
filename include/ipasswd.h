@@ -27,10 +27,10 @@
 
 
 #define	IPASSWD			struct ipasswd_head
-#define	IPASSWD_OBJ		struct ipasswd_obj
-#define	IPASSWD_CUR		struct ipasswd_c
-#define	IPASSWD_INFO		struct ipasswd_i
+#define	IPASSWD_CUR		struct ipasswd_cursor
+#define	IPASSWD_INFO		struct ipasswd_information
 #define	IPASSWD_ENT		struct ipasswd_e
+#define	IPASSWD_OBJ		struct ipasswd_obj
 #define	IPASSWD_FL		struct ipasswd_flags
 
 #define	IPASSWD_SUF		"pwi"
@@ -49,18 +49,18 @@
 
 
 struct ipasswd_obj {
-	cchar	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct ipasswd_c {
+struct ipasswd_cursor {
 	uint		magic ;
 	int		wi ;
 	int		i[IPASSWD_NINDICES] ;
 } ;
 
-struct ipasswd_i {
+struct ipasswd_information {
 	time_t		writetime ;	/* time DB written */
 	uint		writecount ;	/* write counter */
 	uint		entries ;	/* total number of entries */
@@ -89,10 +89,9 @@ struct ipasswd_flags {
 } ;
 
 struct ipasswd_head {
-	uint		magic ;
-	cchar	*fname ;
+	cchar		*fname ;
 	caddr_t		mapdata ;
-	cchar	*stab ;
+	cchar		*stab ;
 	uint		(*recind[IPASSWD_NINDICES])[2] ;
 	IPASSWD_ENT	*rectab ;
 	IPASSWD_FL	f ;
@@ -101,6 +100,7 @@ struct ipasswd_head {
 	time_t		ti_access ;
 	time_t		ti_map ;
 	size_t		mapsize ;
+	uint		magic ;
 	uint		pagesize ;
 	uint		filesize ;
 	uint		stcount ;
@@ -115,25 +115,25 @@ struct ipasswd_head {
 	int		operm ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef IPASSWD			ipasswd ;
+typedef IPASSWD_CUR		ipasswd_cur ;
+typedef IPASSWD_INFO		ipasswd_info ;
 
-extern int	ipasswd_open(IPASSWD *,cchar *) noex ;
-extern int	ipasswd_info(IPASSWD *,IPASSWD_INFO *) noex ;
-extern int	ipasswd_curbegin(IPASSWD *,IPASSWD_CUR *) noex ;
-extern int	ipasswd_curend(IPASSWD *,IPASSWD_CUR *) noex ;
-extern int	ipasswd_enum(IPASSWD *,IPASSWD_CUR *,char *,cchar **,
+EXTERNC_begin
+
+extern int	ipasswd_open(ipasswd *,cchar *) noex ;
+extern int	ipasswd_info(ipasswd *,ipasswd_info *) noex ;
+extern int	ipasswd_curbegin(ipasswd *,ipasswd_cur *) noex ;
+extern int	ipasswd_curend(ipasswd *,ipasswd_cur *) noex ;
+extern int	ipasswd_enum(ipasswd *,ipasswd_cur *,char *,cchar **,
 			char *,int) noex ;
-extern int	ipasswd_fetcher(IPASSWD *,IPASSWD_CUR *,int,char *,cchar **,
+extern int	ipasswd_fetcher(ipasswd *,ipasswd_cur *,int,char *,cchar **,
 			int) noex ;
-extern int	ipasswd_fetch(IPASSWD *,REALNAME *,IPASSWD_CUR *,
+extern int	ipasswd_fetch(ipasswd *,REALNAME *,ipasswd_cur *,
 			int,char *) noex ;
-extern int	ipasswd_close(IPASSWD *) noex ;
+extern int	ipasswd_close(ipasswd *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* IPASSWD_INCLUDE */

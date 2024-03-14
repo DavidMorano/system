@@ -1,7 +1,6 @@
 /* pwihdr HEADER */
 /* lang=C20 */
 
-
 /* Password-Index Header (PWI) */
 /* version %I% last-modified %G% */
 

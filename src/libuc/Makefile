@@ -1130,6 +1130,7 @@ keyopt.o:		keyopt.cc keyopt.h
 utf8decoder.o:		utf8decoder.cc utf8decoder.h
 termstr.o:		termstr.cc termstr.h
 td.o:			td.cc td.h termstr.h
+recip.o:		recip.cc recip.h
 
 findbit.o:		findbit.cc findbit.h
 bits.o:			bits.cc bits.h
@@ -1146,6 +1147,7 @@ syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
 # UTILITY
+endian.o:		endian.cc endian.h
 pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 ids.o:			ids.cc ids.h

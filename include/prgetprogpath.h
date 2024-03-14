@@ -1,4 +1,4 @@
-/* libpr HEADER */
+/* prgetprohpath HEADER */
 /* lang=C20 */
 
 /* make a temporaty directory for a given program-root */
@@ -14,19 +14,22 @@
 
 /* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LIBPR_INCLUDE
-#define	LIBPR_INCLUDE
+#ifndef	PRGETPROGPATH_INCLUDE
+#define	PRGETPROGPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<prgetprogpath.h>
-#include	<prgetclustername.h>
-#include	<prmktmpdir.h>
+
+EXTERNC_begin
+
+extern int	prgetprogpath(cchar *,char *,cchar *,int) noex ;
+
+EXTERNC_end
 
 
-#endif /* LIBPR_INCLUDE */
+#endif /* PRGETPROGPATH_INCLUDE */
 
 

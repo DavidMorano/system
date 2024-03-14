@@ -1,5 +1,5 @@
 /* ipasswd SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* indexed PASSWD GECOS DB */
 /* version %I% last-modified %G% */
@@ -45,14 +45,14 @@
 	Synopsis:
 	int ipasswd_fetch(op,np,curp,opts,up)
 	IPASSWD		*op ;
-	REALNAME	*np ;
+	realname	*np ;
 	IPASSWD_CUR	*curp ;
 	int		opts ;
 	char		*up ;
 
 	Arguments:
 	op		object pointer
-	np		pointer to REALNAME object
+	np		pointer to realname object
 	curp		cursor pointer
 	opts		options
 	up		resumt buffer (at least USERNAMELEN+1 in size)
@@ -72,12 +72,13 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mkfnamesuf.h>
@@ -155,11 +156,11 @@ static int	ipasswd_fileclose(IPASSWD *) ;
 static int	ipasswd_mapbegin(IPASSWD *,time_t) ;
 static int	ipasswd_mapend(IPASSWD *) ;
 static int	ipasswd_remotefs(IPASSWD *) ;
-static int	ipasswd_keymatchfl3(IPASSWD *,int,int,REALNAME *) ;
-static int	ipasswd_keymatchl3(IPASSWD *,int,int,REALNAME *) ;
-static int	ipasswd_keymatchl1(IPASSWD *,int,int,REALNAME *) ;
-static int	ipasswd_keymatchf(IPASSWD *,int,int,REALNAME *) ;
-static int	ipasswd_keymatchall(IPASSWD *,int,int,REALNAME *) ;
+static int	ipasswd_keymatchfl3(IPASSWD *,int,int,realname *) ;
+static int	ipasswd_keymatchl3(IPASSWD *,int,int,realname *) ;
+static int	ipasswd_keymatchl1(IPASSWD *,int,int,realname *) ;
+static int	ipasswd_keymatchf(IPASSWD *,int,int,realname *) ;
+static int	ipasswd_keymatchall(IPASSWD *,int,int,realname *) ;
 
 static int	ipaswd_mapcheck(IPASSWD *,time_t) ;
 
@@ -510,7 +511,7 @@ int		rlen ;
 
 
 /* fetch an entry by a real-name key lookup */
-int ipasswd_fetch(IPASSWD *op,REALNAME *np,IPASSWD_CUR *curp,int opts,char *up)
+int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 {
 	IPASSWD_CUR	cur ;
 	time_t		dt = 0 ;
@@ -876,7 +877,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 /* do we have a hold on the file? */
 
 	if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
-	    REALNAME	rn, *np = &rn ;
+	    realname	rn, *np = &rn ;
 	    uint	hv, hi, ri, ui ;
 	    const int	ns = NSHIFT ;
 	    int		wi ;
@@ -1449,7 +1450,7 @@ static int ipasswd_remotefs(IPASSWD *op)
 /* end subroutine (ipasswd_remotefs) */
 
 
-static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,REALNAME *np)
+static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,realname *np)
 {
 	int		si = op->rectab[ri].last ;
 	int		f ;
@@ -1478,7 +1479,7 @@ static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,REALNAME *np)
 /* end subroutine (ipasswd_keymatchfl3) */
 
 
-static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,REALNAME *np)
+static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,realname *np)
 {
 	int		si ;
 	int		f ;
@@ -1491,7 +1492,7 @@ static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,REALNAME *np)
 /* end subroutine (ipasswd_keymatchl3) */
 
 
-static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,REALNAME *np)
+static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,realname *np)
 {
 	int		si ;
 	int		f ;
@@ -1504,7 +1505,7 @@ static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,REALNAME *np)
 /* end subroutine (ipasswd_keymatchl1) */
 
 
-static int ipasswd_keymatchf(IPASSWD *op,int opts,int ri,REALNAME *np)
+static int ipasswd_keymatchf(IPASSWD *op,int opts,int ri,realname *np)
 {
 	int		si ;
 	int		f ;
@@ -1551,7 +1552,7 @@ int		hl ;
 #endif /* COMMENT */
 
 
-static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,REALNAME *np)
+static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *np)
 {
 	int		si ;
 	int		f = TRUE ;

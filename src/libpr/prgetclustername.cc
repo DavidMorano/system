@@ -1,4 +1,4 @@
-/* getclustername SUPPORT */
+/* prgetclustername SUPPORT */
 /* lang=C++20 */
 
 /* get a cluster name given a nodename */
@@ -17,13 +17,13 @@
 /*******************************************************************************
 
 	Name:
-	getclustername
+	prgetclustername
 
 	Description:
 	Get a cluster name given a nodename.
 
 	Synopsis:
-	int getclustername(cc *pr,char *rbuf,int rlen,cc *nn) noex
+	int prgetclustername(cc *pr,char *rbuf,int rlen,cc *nn) noex
 
 	Arguments:
 	pr		program root
@@ -31,7 +31,7 @@
 	rlen		length of supplied buffer
 	nn		nodename used to find associated cluster
 
-
+	Returns:
 	>=0		string length of cluster name
 	SR_OK		if OK
 	SR_NOTFOUND	if could not get something needed for correct operation
@@ -68,15 +68,15 @@
 	   implementation.
 
 	Q. Are there ways to clean this up further?
-	A. Probably, but it looks I have already done more to this simple
-	   function than may have been ever warranted to begin with!
+	A. Probably, but it looks like I have already done more to this 
+	   simple function than may have been ever warranted to begin with!
 
 	Q. Did this subroutine have to be Asyc-Signal-Safe?
 	A. Not really.
 
 	Q. Then why did you do it?
 	A. The system-call |uname(2)| is Async-Signal-Safe.  Since this
-	   subroutine (|getclustername(3dam)|) sort of looks like
+	   subroutine (|prgetclustername(3dam)|) sort of looks like
 	   |uname(2)| (of a sort), I thought it was a good idea.
 
 	Q. Was it really a good idea?
@@ -85,8 +85,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -100,6 +98,7 @@
 
 #include	"nodedb.h"
 #include	"clusterdb.h"
+#include	"prgetclustername.h"
 
 
 /* local defines */
@@ -154,9 +153,12 @@ static int	subinfo_cdb(SI *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int getclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
+int prgetclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -184,7 +186,7 @@ int getclustername(cchar *pr,char *rbuf,int rlen,cchar *nn) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (getclustername) */
+/* end subroutine (prgetclustername) */
 
 
 /* local subroutines */
@@ -234,9 +236,9 @@ static int subinfo_ndb(SI *sip) noex {
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
 	    if ((rs = mkpath2(tbuf,pr,NODEFNAME)) >= 0) {
-	        NODEDB		st ;
-	        NODEDB_ENT	ste ;
-	        NODEDB_CUR	cur ;
+	        nodedb		st ;
+	        nodedb_ent	ste ;
+	        nodedb_cur	cur ;
 	        if ((rs = nodedb_open(&st,tbuf)) >= 0) {
 	            if ((rs = nodedb_curbegin(&st,&cur)) >= 0) {
 	                cint	rsn = SR_NOTFOUND ;
