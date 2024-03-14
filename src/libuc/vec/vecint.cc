@@ -25,8 +25,9 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -85,6 +86,9 @@ static consteval int mkoptmask() noex {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecint_start(vecint *op,int n,int opts) noex {
@@ -95,10 +99,10 @@ int vecint_start(vecint *op,int n,int opts) noex {
 	    if ((rs = vecint_setopts(op,opts)) >= 0) {
 	        op->n = n ;
 	        if (n > 0) {
-	            cint	size = (n + 1) * sizeof(VECINT_TYPE) ;
+	            cint	sz = (n + 1) * sizeof(VECINT_TYPE) ;
 		    void	*vp{} ;
-	            if ((rs = uc_malloc(size,&vp)) >= 0) {
-		        op->va = (int *) vp ;
+	            if ((rs = uc_malloc(sz,&vp)) >= 0) {
+		        op->va = (VECINT_TYPE *) vp ;
 	    	        op->va[0] = INT_MIN ;
 		    }
 	        } /* end if (wanted pre-allocation) */

@@ -41,6 +41,16 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+extern "C" {
+    typedef int (*qsortcmp_f)(cvoid *,cvoid *) noex ;
+}
+
+
 /* external subroutines */
 
 extern "C" {
@@ -48,7 +58,20 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
 /* forward references */
+
+template<typename ... Args>
+static inline int veclong_magic(veclong *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == VECLONG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (veclong_magic) */
 
 static int	veclong_addval(veclong *op,VECLONG_TYPE) noex ;
 static int	veclong_extend(veclong *,int) noex ;

@@ -303,17 +303,18 @@ EXTERNC_end
 #define	TYPEDEF_SORTVCMP
 EXTERNC_begin
 typedef int (*sort_vcmp)(cvoid *,cvoid *) noex ;
+typedef int (*sortvcmp_f)(cvoid *,cvoid *) noex ;
 EXTERNC_end
 #endif /* TYPEDEF_SORTVCMP */
 
 #ifndef	TYPEDEF_FPERM
 #define	TYPEDEF_FPERM
-typedef mode_t	fsperm ;
+typedef mode_t		fsperm ;
 #endif /* TYPEDEF_FPERM */
 
 #ifndef	TYPEDEF_CFPERM
 #define	TYPEDEF_CFPERM
-typedef mode_t	const cfsperm ;
+typedef const mode_t	cfsperm ;
 #endif /* TYPEDEF_CFPERM */
 
 
