@@ -58,25 +58,27 @@ struct recip_head {
 } ;
 
 typedef RECIP		recip ;
+typedef RECIP_FL	recip_fl ;
+typedef RECIP_ENT	recip_ent ;
 
 EXTERNC_begin
 
-extern int	recip_start(RECIP *,cchar *,int) noex ;
-extern int	recip_get(RECIP *,cchar **) noex ;
-extern int	recip_setuser(RECIP *,uid_t) noex ;
-extern int	recip_setname(RECIP *,cchar *,int) noex ;
-extern int	recip_setmailspool(RECIP *,cchar *,int) noex ;
-extern int	recip_mbo(RECIP *,int) noex ;
-extern int	recip_ds(RECIP *,int) noex ;
-extern int	recip_mo(RECIP *,int,int) noex ;
-extern int	recip_match(RECIP *,cchar *,int) noex ;
-extern int	recip_getmbo(RECIP *) noex ;
-extern int	recip_getmo(RECIP *,int,int *) noex ;
-extern int	recip_getname(RECIP *,cchar **) noex ;
-extern int	recip_getmailspool(RECIP *,cchar **) noex ;
-extern int	recip_getuser(RECIP *,uid_t *) noex ;
-extern int	recip_isuser(RECIP *) noex ;
-extern int	recip_finish(RECIP *) noex ;
+extern int	recip_start(recip *,cchar *,int) noex ;
+extern int	recip_get(recip *,cchar **) noex ;
+extern int	recip_setuser(recip *,uid_t) noex ;
+extern int	recip_setname(recip *,cchar *,int) noex ;
+extern int	recip_setmailspool(recip *,cchar *,int) noex ;
+extern int	recip_mbo(recip *,int) noex ;
+extern int	recip_ds(recip *,int) noex ;
+extern int	recip_mo(recip *,int,int) noex ;
+extern int	recip_match(recip *,cchar *,int) noex ;
+extern int	recip_getmbo(recip *) noex ;
+extern int	recip_getmo(recip *,int,int *) noex ;
+extern int	recip_getname(recip *,cchar **) noex ;
+extern int	recip_getmailspool(recip *,cchar **) noex ;
+extern int	recip_getuser(recip *,uid_t *) noex ;
+extern int	recip_isuser(recip *) noex ;
+extern int	recip_finish(recip *) noex ;
 
 EXTERNC_end
 

@@ -135,7 +135,6 @@ extern int	uc_open(cchar *,int,mode_t) noex ;
 extern int	uc_opene(cchar *,int,mode_t,int) noex ;
 extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
 extern int	uc_openenv(cchar *,int,mode_t,cchar **,int) noex ;
-extern int	uc_openinfo(struct ucopeninfo *) noex ;
 extern int	uc_opensysdb(int,int,mode_t) noex ;
 extern int	uc_openpt(int) noex ;
 extern int	uc_fpassfd(int,int) noex ;
@@ -177,7 +176,7 @@ extern int	uc_openusvc(cchar *,cchar *,cchar *,int,mode_t,
 extern int	uc_openfint(cchar *,cchar *,cchar *,
 			cchar *, cchar *, int,mode_t,
 			cchar **,cchar **,int) noex ;
-extern int	uc_opensys(cchar *,int,mode_t,cchar **,int,int) noex ;
+extern int	uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
 extern int	uc_opendev(cchar *,int,mode_t,cchar **,int,int) noex ;
 
 extern int	uc_accepte(int,cvoid *,int *,int) noex ;

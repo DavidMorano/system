@@ -1,6 +1,9 @@
 /* veclong HEADER */
 /* lang=C20 */
 
+/* vector long-integer operations */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -23,16 +26,14 @@
 
 
 /* object defines */
-
 #define	VECLONG_MAGIC		0x73625199
 #define	VECLONG_DEFENTS		2
 #define	VECLONG			struct veclong_head
 #define	VECLONG_FL		struct veclong_flags
-#define	VECLONG_CUR		struct veclong_c
-#define	VECLONG_TYPE		LONG
+#define	VECLONG_CUR		struct veclong_cursor
+#define	VECLONG_TYPE		long
 
 /* options */
-
 #define	VECLONG_ODEFAULT	0x0000
 #define	VECLONG_OREUSE		0x0001		/* reuse empty slots */
 #define	VECLONG_OCOMPACT	0x0002		/* means NOHOLES */
@@ -43,7 +44,7 @@
 #define	VECLONG_OORDERED	0x0040		/* keep ordered */
 
 
-struct veclong_c {
+struct veclong_cursor {
 	int		i ;
 } ;
 
@@ -60,42 +61,42 @@ struct veclong_flags {
 } ;
 
 struct veclong_head {
-	uint		magic ;
 	VECLONG_TYPE	*va ;
+	VECLONG_FL	f ;
+	uint		magic ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
-	VECLONG_FL	f ;
 } ;
 
-typedef struct veclong_head	veclong ;
-typedef struct veclong_c	veclong_cur ;
+typedef VECLONG		veclong ;
+typedef VECLONG_CUR	veclong_cur ;
 
 EXTERNC_begin
 
-extern int veclong_start(veclong *,int,int) ;
-extern int veclong_finish(veclong *) ;
-extern int veclong_add(veclong *,VECLONG_TYPE) ;
-extern int veclong_addlist(veclong *,const VECLONG_TYPE *,int) ;
-extern int veclong_adduniq(veclong *,VECLONG_TYPE) ;
-extern int veclong_insert(veclong *,VECLONG_TYPE) ;
-extern int veclong_assign(veclong *,int,VECLONG_TYPE) ;
-extern int veclong_resize(veclong *,int) ;
-extern int veclong_del(veclong *,int) ;
-extern int veclong_count(veclong *) ;
-extern int veclong_sort(veclong *,int (*)()) ;
-extern int veclong_setsorted(veclong *) ;
-extern int veclong_find(veclong *,VECLONG_TYPE) ;
-extern int veclong_match(veclong *,VECLONG_TYPE) ;
-extern int veclong_search(veclong *,VECLONG_TYPE,int (*)()) ;
-extern int veclong_getval(veclong *,int,VECLONG_TYPE *) ;
-extern int veclong_getvec(veclong *,VECLONG_TYPE **) ;
-extern int veclong_mkvec(veclong *,VECLONG_TYPE *) ;
-extern int veclong_curbegin(veclong *,veclong_cur *) ;
-extern int veclong_enum(veclong *,veclong_cur *,VECLONG_TYPE *) ;
-extern int veclong_curend(veclong *,veclong_cur *) ;
-extern int veclong_audit(veclong *) ;
+extern int veclong_start(veclong *,int,int) noex ;
+extern int veclong_finish(veclong *) noex ;
+extern int veclong_add(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_addlist(veclong *,const VECLONG_TYPE *,int) noex ;
+extern int veclong_adduniq(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_insert(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_assign(veclong *,int,VECLONG_TYPE) noex ;
+extern int veclong_resize(veclong *,int) noex ;
+extern int veclong_del(veclong *,int) noex ;
+extern int veclong_count(veclong *) noex ;
+extern int veclong_sort(veclong *) noex ;
+extern int veclong_setsorted(veclong *) noex ;
+extern int veclong_find(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_match(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_search(veclong *,VECLONG_TYPE) noex ;
+extern int veclong_getval(veclong *,int,VECLONG_TYPE *) noex ;
+extern int veclong_getvec(veclong *,VECLONG_TYPE **) noex ;
+extern int veclong_mkvec(veclong *,VECLONG_TYPE *) noex ;
+extern int veclong_curbegin(veclong *,veclong_cur *) noex ;
+extern int veclong_enum(veclong *,veclong_cur *,VECLONG_TYPE *) noex ;
+extern int veclong_curend(veclong *,veclong_cur *) noex ;
+extern int veclong_audit(veclong *) noex ;
 
 EXTERNC_end
 

@@ -1,5 +1,7 @@
-/* config */
+/* b_homepage HEADER */
+/* lang=C20 */
 
+/* program to create a "home" webpage in corporate environment */
 /* version %I% last-modified %G% */
 
 
@@ -11,7 +13,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"0a"
 #define	WHATINFO	"@(#)homepage "

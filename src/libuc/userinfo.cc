@@ -64,6 +64,7 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<algorithm>		/* |min(3c++)| */
 #include	<pwd.h>

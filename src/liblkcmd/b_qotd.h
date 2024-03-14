@@ -1,4 +1,8 @@
-/* config */
+/* b_qotd HEADER */
+/* lang=C20 */
+
+/* this is a SHELL built-in version of |qotd(1ksh)| */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,7 +13,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"1"
 #define	WHATINFO	"@(#)qotd "

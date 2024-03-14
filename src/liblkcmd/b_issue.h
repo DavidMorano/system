@@ -1,5 +1,7 @@
-/* config */
+/* b_issue HEADER */
+/* lang=C++20 */
 
+/* SHELL built-in for Issue-of-the-Day (ISSUE) */
 /* version %I% last-modified %G% */
 
 
@@ -11,7 +13,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	P_ISSUE	1
 

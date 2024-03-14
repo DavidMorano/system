@@ -1,11 +1,9 @@
 /* termout SUPPORT */
 /* lang=C++98 */
 
-/* perform terminal outputting */
+/* terminal-output management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGN	0		/* special debug print-outs */
 
 /* revision history:
 
@@ -39,22 +37,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
-#include	<initializer_list>
 #include	<new>
+#include	<initializer_list>
+#include	<algorithm>		/* |min(3c++)| + |nax(3c++)| */
 #include	<vector>
 #include	<string>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<ansigr.h>
 #include	<buffer.h>
+#include	<termconseq.h>
 #include	<findbit.h>		/* for |flbsi(3dam)| */
 #include	<mkchar.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"termout.h"
@@ -137,37 +136,18 @@
 
 /* imported namespaces */
 
-using namespace		std ;		/* yes, we want punishment! */
+using std::initializer_list ;		/* type */
+using std::vector ;			/* type */
+using std::string ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" int	snsd(char *,int,const char *,uint) ;
-extern "C" int	snsdd(char *,int,const char *,uint) ;
-extern "C" int	sncpy1(char *,int,const char *) ;
-extern "C" int	sncpy2(char *,int,const char *,const char *) ;
-extern "C" int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern "C" int	sncpy1w(char *,int,const char *,int) ;
-extern "C" int	mkpath2(char *,const char *,const char *) ;
-extern "C" int	mkpath3(char *,const char *,const char *,const char *) ;
-extern "C" int	mkpath2w(char *,const char *,const char *,int) ;
-extern "C" int	termconseq(char *,int,int,int,int,int,int) ;
-extern "C" int	isprintlatin(int) ;
-extern "C" int	iceil(int,int) ;
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern "C" int	debugprintf(const char *,...) ;
-extern "C" int	nprintf(const char *,const char *,...) ;
-extern "C" int	strlinelen(const char *,int,int) ;
-#endif
-
-extern "C" char	*strwcpy(char *,const char *,int) ;
-extern "C" char	*strwset(char *,int,int) ;
-extern "C" char	*strnchr(const char *,int,int) ;
-extern "C" char	*strwcmp(const char *,const char *,int) ;
 
 
 /* external variables */
@@ -176,7 +156,7 @@ extern "C" char	*strwcmp(const char *,const char *,int) ;
 /* local structures */
 
 struct termout_terminfo {
-	const char	*name ;
+	cchar		*name ;
 	int		attr ;
 } ;
 
@@ -238,30 +218,30 @@ struct termout_gch {
 		} /* end switch */
 	    } /* end for */
 	} ; /* end method (load) */
-} ;
+} ; /* end struct (termout_gch) */
 
 class termout_line {
-	const char	*lbuf ;
+	cchar		*lbuf ;
 	int		llen ;
 } ;
 
 
 /* forward references */
 
-static int	termout_process(TERMOUT *,const char *,int) ;
-static int	termout_loadline(TERMOUT *,int,int) ;
+static int	termout_process(TERMOUT *,cchar *,int) noex ;
+static int	termout_loadline(TERMOUT *,int,int) noex ;
 
-static int	termout_loadgr(TERMOUT *,string &,int,int) ;
-static int	termout_loadch(TERMOUT *,string &,int,int) ;
-static int	termout_loadcs(TERMOUT *,string &,int,const char *,int) ;
+static int	termout_loadgr(TERMOUT *,string &,int,int) noex ;
+static int	termout_loadch(TERMOUT *,string &,int,int) noex ;
+static int	termout_loadcs(TERMOUT *,string &,int,cchar *,int) noex ;
 
-static int	gettermattr(const char *,int) ;
-static int	isspecial(SCH *,uchar,uchar) ;
+static int	gettermattr(cchar *,int) noex ;
+static int	isspecial(SCH *,uchar,uchar) noex ;
 
 
 /* local variables */
 
-static const struct termout_terminfo	terms[] = {
+static constexpr struct termout_terminfo	terms[] = {
 	{ "sun", 0 },
 	{ "ansi", 0 },
 	{ "xterm", TA_MBASE },
@@ -283,9 +263,9 @@ static const struct termout_terminfo	terms[] = {
 	{ "vt530", TA_MALL },
 	{ "vt540", TA_MALL },
 	{ NULL, 0 }
-} ;
+} ; /* end struct (termout_terminfo) */
 
-static const struct termout_sch	specials[] = {
+static constexpr struct termout_sch	specials[] = {
 	{ '1', '4', 0, UC('¼') },
 	{ '1', '2', 0, UC('½') },
 	{ '3', '4', 0, UC('¾') },
@@ -387,14 +367,15 @@ static const struct termout_sch	specials[] = {
 	{ 'v', '^', 3, 0x46 },
 	{ '^', 'v', 3, 0x46 },
 	{ 0, 0, 0, 0 }
-} ;
+} ; /* end struct (termout_sch) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int termout_start(TERMOUT *op,const char *tstr,int tlen,int ncols)
-{
+int termout_start(TERMOUT *op,cchar *tstr,int tlen,int ncols) noex {
 	int		rs = SR_OK ;
 	vector<GCH>	*cvp ;
 
@@ -416,9 +397,7 @@ int termout_start(TERMOUT *op,const char *tstr,int tlen,int ncols)
 }
 /* end subroutine (termout_start) */
 
-
-int termout_finish(TERMOUT *op)
-{
+int termout_finish(TERMOUT *op) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -442,26 +421,15 @@ int termout_finish(TERMOUT *op)
 }
 /* end subroutine (termout_finish) */
 
-
-int termout_load(TERMOUT *op,const char *sbuf,int slen)
-{
+int termout_load(TERMOUT *op,cchar *sbuf,int slen) noex {
 	vector<string>	*lvp ;
 	int		rs = SR_OK ;
 	int		ln = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("termout_load: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (sbuf == NULL) return SR_FAULT ;
 
 	if (slen < 0) slen = strlen(sbuf) ;
-
-#if	CF_DEBUGS
-	debugprintf("termout_load: s=>%t<\n",
-		sbuf,strlinelen(sbuf,slen,60)) ;
-#endif
 
 	if ((lvp = (vector<string> *) op->lvp) == NULL) {
 	    if ((lvp = new(nothrow) vector<string>) != NULL) {
@@ -472,10 +440,6 @@ int termout_load(TERMOUT *op,const char *sbuf,int slen)
 
 /* process given string into the staging area */
 
-#if	CF_DEBUGS
-	debugprintf("termout_load: process slen=%d\n",slen) ;
-#endif
-
 	if (rs >= 0) {
 	    rs = termout_process(op,sbuf,slen) ;
 	    ln = rs ;
@@ -485,9 +449,7 @@ int termout_load(TERMOUT *op,const char *sbuf,int slen)
 }
 /* end subroutine (termout_load) */
 
-
-int termout_getline(TERMOUT *op,int i,const char **lpp)
-{
+int termout_getline(TERMOUT *op,int i,cchar **lpp) noex {
 	vector<string>	*lvp ;
 	uint		ui = i ;
 	int		rs = SR_OK ;
@@ -500,11 +462,12 @@ int termout_getline(TERMOUT *op,int i,const char **lpp)
 	    if (ui < lvp->size()) {
 	        *lpp = lvp->at(i).c_str() ;
 	        ll = lvp->at(i).size() ;
-	    } else
+	    } else {
 	        rs = SR_NOTFOUND ;
-	} else
+	    }
+	} else {
 	    rs = SR_BUGCHECK ;
-
+	}
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (termout_getline) */
@@ -512,22 +475,14 @@ int termout_getline(TERMOUT *op,int i,const char **lpp)
 
 /* private subroutines */
 
-
-static int termout_process(TERMOUT *op,const char *sbuf,int slen)
-{
+static int termout_process(TERMOUT *op,cchar *sbuf,int slen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		ch ;
 	int		j = 0 ;
 	int		ln = 0 ;
-	int		max = 0 ;
+	int		nmax = 0 ;
 	int		len = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("termout_process: ent slen=%d\n",slen) ;
-#endif
-
 #ifdef	COMMENT
 	{
 	    int	sz, rsz ;
@@ -536,24 +491,9 @@ static int termout_process(TERMOUT *op,const char *sbuf,int slen)
 	    if (sz < rsz) cvp->reserve(rsz) ;
 	}
 #endif /* COMMENT */
-
-#if	CF_DEBUGS
-	debugprintf("termout: slen=%d s=>%t<\n",
-		slen,sbuf,strlinelen(sbuf,slen,40)) ;
-	debugprintf("termout: cvp->clear()\n") ;
-#endif
-
 	cvp->clear() ;
-
-#if	CF_DEBUGS
-	debugprintf("termout: for-before\n") ;
-#endif
-
-	for (i = 0 ; i < slen ; i += 1) {
-	    ch = MKCHAR(sbuf[i]) ;
-#if	CF_DEBUGS
-	debugprintf("termout: i=%u switch ch=%c (\\%02x)\n",i,ch,ch) ;
-#endif
+	for (int i = 0 ; i < slen ; i += 1) {
+	    ch = mkchar(sbuf[i]) ;
 	    switch (ch) {
 	    case '\r':
 		j = 0 ;
@@ -561,36 +501,23 @@ static int termout_process(TERMOUT *op,const char *sbuf,int slen)
 	    case '\n':
 	    case '\v':
 	    case '\f':
-		rs = termout_loadline(op,ln++,max) ;
+		rs = termout_loadline(op,ln++,nmax) ;
 		len += rs ;
 	 	cvp->clear() ;
 		j = 0 ;
-		max = 0 ;
+		nmax = 0 ;
 		break ;
 	    case '\b':
 		if (j > 0) j -= 1 ;
-#if	CF_DEBUGS
-		debugprintf("termout: BS\n") ;
-#endif
 		break ;
 	    default:
 		{
 		    GCH	gch(0) ;
-#if	CF_DEBUGS
-		    debugprintf("termout: def max=%u j=%u ch=%c(\\x%02x)\n",
-			max,j,ch,ch) ;
-#endif
-		    if (j < max) {
+		    if (j < nmax) {
 			SCH	sch ;
 		        int	ft = 0 ;
-			int	pch = (j < max) ? cvp->at(j).ch : 0 ;
+			int	pch = (j < nmax) ? cvp->at(j).ch : 0 ;
 		        int	gr = cvp->at(j).gr ;
-#if	CF_DEBUGS
-		        debugprintf("termout: def j=%u pch=%c(\\x%02x)\n",
-				j,pch,pch) ;
-		        debugprintf("termout: def ch=%c(\\x%02x)\n",
-				ch,ch) ;
-#endif
 		        switch (pch) {
 		        case GRCH_BOLD :
 			    if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
@@ -608,20 +535,11 @@ static int termout_process(TERMOUT *op,const char *sbuf,int slen)
 		            if ((pch == GRCH_HIGH) && (ch == '#')) {
 			        if (op->termattr & TA_MHIGH) gr |= GR_MHIGH ;
 			        ch = 0 ;
-#if	CF_DEBUGS
-				debugprintf("termout: DoubleHigh(pre)\n") ;
-#endif
 		            } else if ((pch == GRCH_WIDE) && (ch == '#')) {
 			        if (op->termattr & TA_MWIDE) gr |= GR_MWIDE ;
 			        ch = 0 ;
-#if	CF_DEBUGS
-				debugprintf("termout: DoubleWide(pre)\n") ;
-#endif
 		            } else if (pch == ch) {
 			        if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
-#if	CF_DEBUGS
-				debugprintf("termout: bold(pre)\n") ;
-#endif
 			    } else if (isspecial(&sch,pch,ch)) {
 				ft = sch.ft ;
 				ch = sch.ch ;
@@ -648,10 +566,6 @@ static int termout_process(TERMOUT *op,const char *sbuf,int slen)
 	                cvp->at(j) = gch ;
 	                j += 1 ;
 		    } else {
-#if	CF_DEBUGS
-		        debugprintf("termout: add j=%u ch=%c(\\x%02x)\n",
-				j,ch,ch) ;
-#endif
 			gch.ch = ch ;
 	                cvp->push_back(gch) ;
 	                j += 1 ;
@@ -659,39 +573,22 @@ static int termout_process(TERMOUT *op,const char *sbuf,int slen)
 		} /* end block */
 		break ;
 	    } /* end switch */
-	    if (j > max) max = j ;
+	    if (j > nmax) nmax = j ;
 	    if (rs < 0) break ;
 	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("termout_process: mid rs=%d max=%u\n",rs,max) ;
-#endif
-
-	if ((rs >= 0) && (max > 0)) {
-	    rs = termout_loadline(op,ln++,max) ;
+	if ((rs >= 0) && (nmax > 0)) {
+	    rs = termout_loadline(op,ln++,nmax) ;
 	    len += rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("termout_process: ret rs=%d ln=%u len=%u\n",rs,ln,len) ;
-#endif
-
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termout_process) */
 
-
-static int termout_loadline(TERMOUT *op,int ln,int max)
-{
+static int termout_loadline(TERMOUT *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	vector<string>	*lvp = (vector<string> *) op->lvp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("termout_loadline: ent ln=%u max=%u\n",ln,max) ;
-#endif
-
 	lvp->resize(ln+1) ;		/* instantiates new 'string' */
 	{
 	    int		ft, ch, gr ;
@@ -700,7 +597,7 @@ static int termout_loadline(TERMOUT *op,int ln,int max)
 	    string	&line = lvp->at(ln) ;
 	    line.reserve(120) ;
 	    line.clear() ;
-	    for (i = 0 ; (rs >= 0) && (i < max) ; i += 1) {
+	    for (i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
 		ft = cvp->at(i).ft ; /* font */
 		ch = cvp->at(i).ch ; /* character */
 		gr = cvp->at(i).gr ; /* graphic-rendition */
@@ -718,56 +615,45 @@ static int termout_loadline(TERMOUT *op,int ln,int max)
 		len += rs ;
 	    }
 	} /* end block */
-
-#if	CF_DEBUGS
-	debugprintf("termout_loadline: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termout_loadline) */
 
-
-static int termout_loadgr(TERMOUT *op,string &line,int pgr,int gr)
-{
-	const int	grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
+static int termout_loadgr(TERMOUT *op,string &line,int pgr,int gr) noex {
+	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		n ;
 	int		size ;
 	int		len = 0 ;
 	char		*grbuf ;
-
 	n = flbsi(grmask) + 1 ;
-
 	size = ((2*n)+1+1) ; /* size according to algorithm below */
 	if ((grbuf = new(nothrow) char[size]) != NULL) {
 	    int		gl = 0 ;
 	    int		ogr = pgr ;
 	    int		bgr = pgr ;
-	    int		cc ;
-	    int		i ;
-
+	    int		gch = 0 ;
 	    bgr &= grmask ;
 	    ogr = (bgr & (~ gr) & grmask) ;
 	    if (ogr != (bgr & grmask)) { /* partial gr-off */
 	        if (op->termattr & TA_MOFFIND) {
-		    for (i = 0 ; i < n ; i += 1) {
+		    for (int i = 0 ; i < n ; i += 1) {
 		        if ((ogr>>i)&1) {
 			    switch (i) {
 			    case GR_VBOLD:
-			        cc = ANSIGR_OFFBOLD ;
+			        gch = ANSIGR_OFFBOLD ;
 			        break ;
 			    case GR_VUNDER:
-			        cc = ANSIGR_OFFUNDER ;
+			        gch = ANSIGR_OFFUNDER ;
 			        break ;
 			    case GR_VBLINK:
-			        cc = ANSIGR_OFFBLINK ;
+			        gch = ANSIGR_OFFBLINK ;
 			        break ;
 			    case GR_VREV:
-			        cc = ANSIGR_OFFREV ;
+			        gch = ANSIGR_OFFREV ;
 			        break ;
 			    } /* end switch */
-			    grbuf[gl++] = cc ;
+			    grbuf[gl++] = gch ;
 			    bgr &= (~(1<<i)) ;
 		        } /* end if */
 		    } /* end for */
@@ -776,179 +662,154 @@ static int termout_loadgr(TERMOUT *op,string &line,int pgr,int gr)
 		    bgr &= (~ grmask) ;
 	        } /* end if */
 	    } /* end if (partial gr-off) */
-    
 	    ogr = (bgr & (~ gr) & grmask) ;
 	    if (ogr & grmask) { /* all OFF-GR */
 		grbuf[gl++] = ANSIGR_OFFALL ;
 		bgr &= (~ grmask) ;
 	    } /* end if */
-    
 	    ogr = (gr & (~ bgr) & grmask) ; /* ON-GR */
 	    if (ogr) {
-		for (i = 0 ; i < n ; i += 1) {
+		for (int i = 0 ; i < n ; i += 1) {
 		    if ((ogr>>i)&1) {
 			switch (i) {
 			case GR_VBOLD:
-			    cc = ANSIGR_BOLD ;
+			    gch = ANSIGR_BOLD ;
 			    break ;
 			case GR_VUNDER:
-			    cc = ANSIGR_UNDER ;
+			    gch = ANSIGR_UNDER ;
 			    break ;
 			case GR_VBLINK:
-			    cc = ANSIGR_BLINK ;
+			    gch = ANSIGR_BLINK ;
 			    break ;
 			case GR_VREV:
-			    cc = ANSIGR_REV ;
+			    gch = ANSIGR_REV ;
 			    break ;
 			} /* end switch */
-			grbuf[gl++] = cc ;
+			grbuf[gl++] = gch ;
 			bgr &= (~(1<<i)) ;
 		    } /* end if */
 		} /* end for */
 	    } /* end if (gr-on) */
-    
 	    if (rs >= 0) {
 	        rs = termout_loadcs(op,line,'m',grbuf,gl) ;
 	        len = rs ;
 	    }
-    
 	    delete[] grbuf ;
-	} else
+	} else {
 	    rs = SR_NOMEM ;
-
+	}
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termout_loadgr) */
 
-
-static int termout_loadcs(TERMOUT *op,string &line,int n,cchar *pp,int pl)
-{
+static int termout_loadcs(TERMOUT *op,string &line,int n,cc *pp,int pl) noex {
 	int		rs = SR_OK ;
-	int		i = 0 ;
 	int		len = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
+	if (op) {
+	int		i = 0 ;
 	while ((rs >= 0) && (i < pl)) {
-	    const int	ml = MIN(4,(pl-i)) ;
+	    cint	ml = MIN(4,(pl-i)) ;
 	    int		a1 = -1 ;
 	    int		a2 = -1 ;
 	    int		a3 = -1 ;
 	    int		a4 = -1 ;
 	    switch (ml) {
-/* FALLTHROUGH */
 	    case 4:
 		a4 = pp[i+3] ;
-/* FALLTHROUGH */
+		fallthrough ;
+		/* FALLTHROUGH */
 	    case 3:
 		a3 = pp[i+2] ;
-/* FALLTHROUGH */
+		fallthrough ;
+		/* FALLTHROUGH */
 	    case 2:
 		a2 = pp[i+1] ;
-/* FALLTHROUGH */
+		fallthrough ;
+		/* FALLTHROUGH */
 	    case 1:
 		a1 = pp[i+0] ;
-/* FALLTHROUGH */
+		fallthrough ;
+		/* FALLTHROUGH */
 	    case 0:
 		break ;
 	    } /* end switch */
 	    if (ml > 0) {
-		const int	dlen = DBUFLEN ;
-		char		dbuf[DBUFLEN+1] ;
+		cint	dlen = DBUFLEN ;
+		char	dbuf[DBUFLEN+1] ;
 		if ((rs = termconseq(dbuf,dlen,n,a1,a2,a3,a4)) >= 0) {
-		    const int	dl = rs ;
+		    cint	dl = rs ;
 		    i += ml ;
 		    len += dl ;
 		    line.append(dbuf,dl) ;
 		}
 	    }
 	} /* end while */
-
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termout_loadcs) */
 
-
-static int termout_loadch(TERMOUT *op,string &line,int ft,int ch)
-{
+static int termout_loadch(TERMOUT *op,string &line,int ft,int ch) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-
-	if (ch > 0) {
-	    int	sch = 0 ;
-
-	    if (ft > 0) {
-	        switch (ft) {
-	        case 1:
-		    sch = CH_SO ;
-		    break ;
-	        case 2:
-		    sch = CH_SS2 ;
-		    break ;
-	        case 3:
-		    sch = CH_SS3 ;
-		    break ;
-	        } /* end witch */
-	        line.push_back(sch) ;
+	if (op) {
+	    if (ch > 0) {
+	        int		sch = 0 ;
+	        if (ft > 0) {
+	            switch (ft) {
+	            case 1:
+		        sch = CH_SO ;
+		        break ;
+	            case 2:
+		        sch = CH_SS2 ;
+		        break ;
+	            case 3:
+		        sch = CH_SS3 ;
+		        break ;
+	            } /* end witch */
+	            line.push_back(sch) ;
+	            len += 1 ;
+	        } /* end if (font handling) */
+	        line.push_back(ch) ;
 	        len += 1 ;
-	    } /* end if (font handling) */
-    
-	    line.push_back(ch) ;
-	    len += 1 ;
-
-	    if (ft == 1) {
-		sch = CH_SI ;
-		line.push_back(sch) ;
-		len += 1 ;
-	    }
-
-	} /* end if (non-zero) */
-
+	        if (ft == 1) {
+		    sch = CH_SI ;
+		    line.push_back(sch) ;
+		    len += 1 ;
+	        }
+	    } /* end if (non-zero) */
+	} /* end if */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termout_loadch) */
 
-
-static int gettermattr(const char *tstr,int tlen)
-{
+static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
-
 	if (tstr != NULL) {
-	    int		i ;
-	    const char	*np ;
-
 	    if (tlen < 0) tlen = strlen(tstr) ;
-
-	    for (i = 0 ; terms[i].name != NULL ; i += 1) {
-	        np = terms[i].name ;
-	        if (strwcmp(np,tstr,tlen) == 0) {
+	    for (int i = 0 ; terms[i].name ; i += 1) {
+	        cchar	*sp = terms[i].name ;
+	        if (strwcmp(sp,tstr,tlen) == 0) {
 		    ta = terms[i].attr ;
 		    break ;
 	        }
 	    } /* end for */
-
 	} /* end if (non-NULL terminal-string) */
-
 	return ta ;
 }
 /* end subroutine (gettermattr) */
 
-
-static int isspecial(SCH *scp,uchar ch1,uchar ch2)
-{
-	int		i ;
-	int		f = FALSE ;
-
+static int isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
+	int		i ; /* used afterwards */
+	int		f = false ;
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
 	    f = ((specials[i].ch1 == ch1) && (specials[i].ch2 == ch2)) ;
 	    if (f) break ;
 	} /* end for */
-
 	if (f) {
 	    scp->ft = specials[i].ft ;
 	    scp->ch = specials[i].ch ;
 	}
-
 	return f ;
 }
 /* end subroutine (isspecial) */

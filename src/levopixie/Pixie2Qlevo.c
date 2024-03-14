@@ -1,4 +1,5 @@
 /* main (levopixie) */
+/* lang=C++20 */
 
 
 
@@ -352,7 +353,7 @@ get_next(FILE *fp, long *addr, char *type) {
       break;
     case 7:
       DSize=4-((DAddr|3)-DAddr);
-      DAddr=DAddr-DSize+1;;
+      DAddr=DAddr-DSize+1 ;
       break;
   }
 if( *type == 'R')

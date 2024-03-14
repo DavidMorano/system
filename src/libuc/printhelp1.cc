@@ -43,6 +43,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ostream>
@@ -273,15 +274,14 @@ static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
 	int		rs1 ;
 	mainv		spp = schedule ;
 	    if ((rs = maxpathlen) >= 0) {
+	        vecstr	svars, *svp = &svars ;
 		cint	tlen = rs ;
-	        vecstr	svars ;
-	        if ((rs = vecstr_start(&svars,6,0)) >= 0) {
-	            rs = loadscheds(&svars,pr,sn) ;
-	            if (rs >= 0) {
-	                rs = permsched(spp,&svars,tbuf,tlen,fn,R_OK) ;
-		    }
-	            if (isNotPresent(rs) && (spp != schedule)) {
-	                rs = permsched(schedule,&svars,tbuf,tlen,fn,R_OK) ;
+	        if ((rs = vecstr_start(svp,6,0)) >= 0) {
+	            if ((rs = loadscheds(svp,pr,sn)) >= 0) {
+	                rs = permsched(spp,svp,tbuf,tlen,fn,R_OK) ;
+		        if (isNotPresent(rs) && (spp != schedule)) {
+	                    rs = permsched(schedule,svp,tbuf,tlen,fn,R_OK) ;
+			}
 		    }
 	            rs1 = vecstr_finish(&svars) ;
 		    if (rs >= 0) rs = rs1 ;
@@ -329,7 +329,8 @@ static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	    cchar	*w_lib = sysword.w_lib ;
 	    rs = vecstr_envadd(slp,"l",w_lib,-1) ;
 	}
-	if ((rs >= 0) && (sn != nullptr)) {
+	if (rs >= 0) {
+	    if (sn == nullptr) sn = "prog" ;
 	    rs = vecstr_envadd(slp,"n",sn,-1) ;
 	}
 	return rs ;

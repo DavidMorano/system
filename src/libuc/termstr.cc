@@ -39,6 +39,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>

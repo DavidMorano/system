@@ -31,7 +31,7 @@
 #define	TERMSTR_GRBLINK	(1<<3)		/* graphic-rendition blinking */
 #define	TERMSTR_GRREV	(1<<4)		/* graphic-rendition reverse-video */
 
-/* cursor saving and restoring */
+/* cursor saving and restoring (VT1xx "Fp" escape squences) */
 #define	TERMSTR_VCURS	"\0337"		/* cursor save-restore (VT) */
 #define	TERMSTR_VCURR	"\0338"		/* cursor save-restore (VT) */
 
@@ -40,6 +40,24 @@
 
 #define	TERMSTR_SAVE	TERMSTR_VCURS	/* cursor save-restore (VT) */
 #define	TERMSTR_RESTORE	TERMSTR_VCURR	/* cursor save-restore (VT) */
+
+/* standard "Fs" ISO/IEC 2022 escape sequences */
+#define	TERMSTR_SS2	"\033N"		/* single-shift-2 */
+#define	TERMSTR_SS3	"\033O"		/* single-shift-2 */
+#define	TERMSTR_DCS	"\033P"		/* device-control-string */
+#define	TERMSTR_CSI	"\033["		/* control-sequence-introducer */
+#define	TERMSTR_ST	"\033\\"	/* string-terminator */
+#define	TERMSTR_OSC	"\033]"		/* operating-system-command */
+#define	TERMSTR_PM	"\033^"		/* privacy-message */
+#define	TERMSTR_APC	"\033_"		/* application-program-command */
+
+/* more "Fs" sequences */
+#define	TERMSTR_IND	"\033D"		/* index (UP) */
+#define	TERMSTR_RI	"\033M"		/* reverse-index (DOWN) */
+#define	TERMSTR_NEL	"\033E"		/* new-line */
+#define	TERMSTR_HTS	"\033H"		/* horizontal-tab-set */
+#define	TERMSTR_SOS	"\033X"		/* start-of-string */
+#define	TERMSTR_DECID	"\033Z"		/* VT-indentification */
 
 /* cursor positioning */
 #define	TERMSTR_CURU	"\033[A"	/* cursor up */

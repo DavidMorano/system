@@ -39,11 +39,11 @@
 	Notes:
 	Why use filebuf over BFILE? Yes, filebuf is a tiny bit more
 	lightweight than BFILE -- on a good day. But the real reason
-	may be so that we don't need to load BFILE in code that
-	resides very deep in a software stack if we don't need it
+	may be so that we do not need to load BFILE in code that
+	resides very deep in a software stack if we do not need it
 	-- like deep inside loadable modules. Anyway, just a thought!
 
-	Why are we using FIELD as opposed to 'nextfield()' or
+	Why are we using field as opposed to |sffield(3uc)| or
 	something similar?  Because our sematics are to process
 	quoted strings as a single vecstr entry!
 
@@ -62,8 +62,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<vecstr.h>
@@ -86,6 +88,9 @@
 
 
 /* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -124,8 +129,13 @@ static int	mkvars() noex ;
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
 static bufsizevar	maxlinelen(getbufsize_ml) ;
+
 static char		fterms[termsize] ;
+
 static vars		var ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -155,24 +165,25 @@ int vecstr_loadfile(vecstr *op,int fu,cchar *fname) noex {
 
 static int vecstr_loadfiler(vecstr *op,int fu,cchar *fname) noex {
 	int		rs = SR_OK ;
-	int		fd = FD_STDIN ;
+	int		rs1 ;
 	int		c = 0 ;
-	bool	f_opened = false ;
-	            if (strcmp(fname,"-") != 0) {
-			cint	of = O_RDONLY ;
-			cmode	om = 0666 ;
-	                if ((rs = uc_open(fname,of,om)) >= 0) {
-	                    fd = rs ;
-	                    f_opened = true ;
-	                }
-	            }
-	            if (rs >= 0) {
-	                rs = vecstr_loadfd(op,fu,fd) ;
-	                c = rs ;
-	            }
-	            if (f_opened && (fd >= 0)) {
-	                u_close(fd) ;
-	            }
+        if (strcmp(fname,"-") != 0) {
+            cint    of = O_RDONLY ;
+            cmode   om = 0666 ;
+            if ((rs = uc_open(fname,of,om)) >= 0) {
+		cint	fd = rs ;
+		{
+                    rs = vecstr_loadfd(op,fu,fd) ;
+		    c = rs ;
+		}
+                rs1 = uc_close(fd) ;
+		if (rs >= 0) rs = rs1 ;
+            } /* end if (read-file) */
+        } else {
+	    cint	fd = FD_STDIN ;
+            rs = vecstr_loadfd(op,fu,fd) ;
+            c = rs ;
+        } /* end if (file or STDIN) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_loadfiler) */
@@ -184,27 +195,27 @@ static int vecstr_loadfd(vecstr *vsp,int fu,int fd) noex {
 	int		c = 0 ;
 	USTAT		sb ;
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
+	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_ISDIR ;
 	    if (! S_ISDIR(sb.st_mode)) {
+		cint	linelen = var.linebuflen ;
+	        cint	fs = ((fsz == 0) ? 1 : int(fsz & INT_MAX)) ;
 	        int	fbsize = DEFBUFLEN ;
 	        int	fbo = 0 ;
 	        if (S_ISREG(sb.st_mode)) {
-	            int	fs = ((sb.st_size == 0) ? 1 : (sb.st_size & INT_MAX)) ;
-	            int	cs ;
-	            cs = BCEIL(fs,512) ;
-	            fbsize = MIN(cs,1024) ;
+	            cint	cs = BCEIL(fs,512) ;
+	            fbsize = min(cs,1024) ;
 	        } else {
 	            to = TO_READ ;
 	            if (S_ISSOCK(sb.st_mode)) fbo |= FILEBUF_ONET ;
 	        }
 		if ((rs = maxlinelen) >= 0) {
-		    cint	llen = rs ;
-	            char	*lbuf ;
+		    cint	llen = (linelen > 0) ? linelen : rs ;
+	            char	*lbuf{} ;
 		    if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
-			typedef int (*rl_f)(filebuf *,char *,int,int) ;
 			filebuf		loadfile, *lfp = &loadfile ;
 	        	if ((rs = filebuf_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
-			    rl_f	rl = filebuf_readln ;
+			    auto	rl = filebuf_readln ;
 	                    while ((rs = rl(lfp,lbuf,llen,to)) > 0) {
 	                        int	len = rs ;
 	                        if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -228,8 +239,9 @@ static int vecstr_loadfd(vecstr *vsp,int fu,int fd) noex {
 /* end subroutine (vecstr_loadfd) */
 
 static int vecstr_loadline(vecstr *vsp,int fu,cchar *lbuf,int len) noex {
-	FIELD		fsb ;
+	field		fsb ;
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
 	    int		fl ;
@@ -247,7 +259,8 @@ static int vecstr_loadline(vecstr *vsp,int fu,cchar *lbuf,int len) noex {
 		if (fsb.term == '#') break ;
 		if (rs < 0) break ;
 	    } /* end while (fields) */
-	    field_finish(&fsb) ;
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (fields) */
 	return (rs >= 0) ? c : rs ;
 }

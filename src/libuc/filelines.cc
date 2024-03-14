@@ -20,6 +20,8 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* <- for |memchr(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>

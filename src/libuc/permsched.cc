@@ -75,6 +75,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

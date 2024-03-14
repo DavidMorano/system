@@ -57,6 +57,8 @@
 
 #define	TERMTRANS_ENDIAN	TERMTRANS_FCS TERMTRANS_SUF
 
+#define	TT			termtrans
+
 #undef	GCH
 #define	GCH			struct termtrans_gch
 
@@ -217,14 +219,14 @@ class termtrans_line {
 
 /* forward references */
 
-static int	termtrans_process(TERMTRANS *,const wchar_t *,int) ;
-static int	termtrans_procline(TERMTRANS *,char *,int,const wchar_t *,int) ;
-static int	termtrans_proclinepost(TERMTRANS *,cchar *,int) ;
-static int	termtrans_loadline(TERMTRANS *,int,int) ;
+static int	termtrans_process(TT *,const wchar_t *,int) ;
+static int	termtrans_procline(TT *,char *,int,const wchar_t *,int) ;
+static int	termtrans_proclinepost(TT *,cchar *,int) ;
+static int	termtrans_loadline(TT *,int,int) ;
 
-static int	termtrans_loadgr(TERMTRANS *,string &,int,int) ;
-static int	termtrans_loadch(TERMTRANS *,string &,int,int) ;
-static int	termtrans_loadcs(TERMTRANS *,string &,int,cchar *,int) ;
+static int	termtrans_loadgr(TT *,string &,int,int) ;
+static int	termtrans_loadch(TT *,string &,int,int) ;
+static int	termtrans_loadcs(TT *,string &,int,cchar *,int) ;
 
 static int	gettermattr(cchar *,int) ;
 static int	wsgetline(const wchar_t *,int) ;
@@ -290,10 +292,12 @@ static const struct termtrans_sch	specials[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int termtrans_start(TERMTRANS *op,cchar *pr,cchar *tstr,int tlen,int ncols)
-{
+int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	int		rs = SR_OK ;
 	vector<GCH>	*cvp ;
 
@@ -307,7 +311,7 @@ int termtrans_start(TERMTRANS *op,cchar *pr,cchar *tstr,int tlen,int ncols)
 	op->termattr = gettermattr(tstr,tlen) ;
 
 	if ((cvp = new(nothrow) vector<GCH>) != NULL) {
-	    const int	fcslen = CSNLEN ;
+	    cint	fcslen = CSNLEN ;
 	    cchar	*fcs = TERMTRANS_FCS ;
 	    cchar	*suf = TERMTRANS_SUF ;
 	    char	fcsbuf[CSNLEN+1] ;
@@ -330,7 +334,7 @@ int termtrans_start(TERMTRANS *op,cchar *pr,cchar *tstr,int tlen,int ncols)
 /* end subroutine (termtrans_start) */
 
 
-int termtrans_finish(TERMTRANS *op)
+int termtrans_finish(TT *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -360,7 +364,7 @@ int termtrans_finish(TERMTRANS *op)
 /* end subroutine (termtrans_finish) */
 
 
-int termtrans_load(TERMTRANS *op,const wchar_t *wbuf,int wlen)
+int termtrans_load(TT *op,const wchar_t *wbuf,int wlen)
 {
 	vector<string>	*lvp ;
 	int		rs = SR_OK ;
@@ -401,7 +405,7 @@ int termtrans_load(TERMTRANS *op,const wchar_t *wbuf,int wlen)
 /* end subroutine (termtrans_load) */
 
 
-int termtrans_getline(TERMTRANS *op,int i,cchar **lpp)
+int termtrans_getline(TT *op,int i,cchar **lpp)
 {
 	vector<string>	*lvp ;
 	int		rs = SR_OK ;
@@ -424,9 +428,9 @@ int termtrans_getline(TERMTRANS *op,int i,cchar **lpp)
 /* private subroutines */
 
 
-static int termtrans_process(TERMTRANS *op,const wchar_t *wbuf,int wlen)
+static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen)
 {
-	const int	olen = (3*LINEBUFLEN) ;
+	cint	olen = (3*LINEBUFLEN) ;
 	int		rs = SR_OK ;
 	int		osize ;
 	int		ln = 0 ;
@@ -466,7 +470,7 @@ static int termtrans_process(TERMTRANS *op,const wchar_t *wbuf,int wlen)
 /* end subroutine (termtrans_process) */
 
 
-static int termtrans_procline(TERMTRANS *op,char *obuf,int olen,
+static int termtrans_procline(TT *op,char *obuf,int olen,
 		const wchar_t *wbuf,int wlen)
 {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
@@ -533,7 +537,7 @@ static int termtrans_procline(TERMTRANS *op,char *obuf,int olen,
 /* end subroutine (termtrans_procline) */
 
 
-static int termtrans_proclinepost(TERMTRANS *op,cchar *obuf,int olen)
+static int termtrans_proclinepost(TT *op,cchar *obuf,int olen)
 {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
@@ -683,7 +687,7 @@ static int termtrans_proclinepost(TERMTRANS *op,cchar *obuf,int olen)
 /* end subroutine (termtrans_proclinepost) */
 
 
-static int termtrans_loadline(TERMTRANS *op,int ln,int max)
+static int termtrans_loadline(TT *op,int ln,int max)
 {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	vector<string>	*lvp = (vector<string> *) op->lvp ;
@@ -755,9 +759,9 @@ static int termtrans_loadline(TERMTRANS *op,int ln,int max)
 /* end subroutine (termtrans_loadline) */
 
 
-static int termtrans_loadgr(TERMTRANS *op,string &line,int pgr,int gr)
+static int termtrans_loadgr(TT *op,string &line,int pgr,int gr)
 {
-	const int	grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
+	cint	grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		ogr = pgr ;
 	int		bgr = pgr ;
@@ -839,26 +843,22 @@ static int termtrans_loadgr(TERMTRANS *op,string &line,int pgr,int gr)
 	    }
     
 	    delete[] grbuf ;
-	} else
+	} else {
 	    rs = SR_NOMEM ;
-
+	}
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termtrans_loadgr) */
 
-
-static int termtrans_loadcs(TERMTRANS *op,string &line,int n,cchar *pp,int pl)
-{
-	const int	dlen = DBUFLEN ;
+static int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
+	cint		dlen = DBUFLEN ;
 	int		rs = SR_OK ;
 	int		ml ;
 	int		dl ;
 	int		i = 0 ;
 	int		len = 0 ;
 	char		dbuf[DBUFLEN+1] ;
-
 	if (op == NULL) return SR_FAULT ;
-
 	while ((rs >= 0) && (i < pl)) {
 	    int	a1 = -1 ;
 	    int	a2 = -1 ;
@@ -892,20 +892,15 @@ static int termtrans_loadcs(TERMTRANS *op,string &line,int n,cchar *pp,int pl)
 		}
 	    }
 	} /* end while */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termtrans_loadcs) */
 
-
-static int termtrans_loadch(TERMTRANS *op,string &line,int ft,int ch)
-{
+static int termtrans_loadch(TT *op,string &line,int ft,int ch) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-
 	if (ch > 0) {
-	    int	sch = 0 ;
-
+	    int		sch = 0 ;
 	    if (ft > 0) {
 	        switch (ft) {
 	        case 1:
@@ -921,79 +916,57 @@ static int termtrans_loadch(TERMTRANS *op,string &line,int ft,int ch)
 	        line.push_back(sch) ;
 	        len += 1 ;
 	    } /* end if (font handling) */
-    
 	    line.push_back(ch) ;
 	    len += 1 ;
-
 	    if (ft == 1) {
 		sch = CH_SI ;
 		line.push_back(sch) ;
 		len += 1 ;
 	    }
-
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termtrans_loadch) */
 
-
-static int gettermattr(cchar *tstr,int tlen)
-{
+static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
-	cchar	*np ;
-
 	if (tstr != NULL) {
-	    int	i ;
-
 	    if (tlen < 0) tlen = strlen(tstr) ;
-
-	    for (i = 0 ; terms[i].name != NULL ; i += 1) {
-	        np = terms[i].name ;
-	        if (strwcmp(np,tstr,tlen) == 0) {
+	    for (int i = 0 ; terms[i].name != NULL ; i += 1) {
+	        cchar	*sp = terms[i].name ;
+	        if (strwcmp(sp,tstr,tlen) == 0) {
 		    ta = terms[i].attr ;
 		    break ;
 	        }
 	    } /* end for */
-
 	} /* end if (non-NULL terminal-string) */
-
 	return ta ;
 }
 /* end subroutine (gettermattr) */
 
-
-static int wsgetline(const wchar_t *wbuf,int wlen)
-{
-	int		wl ;
+static int wsgetline(const wchar_t *wbuf,int wlen) noex {
+	int		wl ; /* used afterwards */
 	int		f = FALSE ;
-
 	for (wl = 0 ; wl < wlen ; wl += 1) {
 	    f = ((wbuf[wl] == CH_NL) || (wbuf[wl] == CH_FF)) ;
 	    if (f) break ;
 	} /* end for */
 	if (f) wl += 1 ;
-
 	return (f) ? wl : 0 ;
 }
 /* end subroutine (wsgetline) */
 
-
-static int isspecial(SCH *scp,uchar ch1,uchar ch2)
-{
-	int		i ;
+static int isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
+	int		i ; /* used afterwards */
 	int		f = FALSE ;
-
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
 	    f = ((specials[i].ch1 == ch1) && (specials[i].ch2 == ch2)) ;
 	    if (f) break ;
 	} /* end for */
-
 	if (f) {
 	    scp->ft = specials[i].ft ;
 	    scp->ch = specials[i].ch ;
 	}
-
 	return f ;
 }
 /* end subroutine (isspecial) */

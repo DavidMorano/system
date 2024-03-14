@@ -197,7 +197,7 @@ int vecobj_addnew(vecobj *op,void **epp) noex {
 	    if (op->va) {
 	        void	*sp = nullptr ;		/* storage pointer */
 	        if ((rs = lookaside_get(op->lap,&sp)) >= 0) {
-	            bool	f = true ;;
+	            bool	f = true ;
 	            bool	f_done = false ;
 	            f = f && (op->f.oreuse || op->f.oconserve) ;
 		    f = f && (! op->f.oordered) ;

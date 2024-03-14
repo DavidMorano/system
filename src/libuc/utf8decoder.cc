@@ -28,11 +28,14 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<vector>
 #include	<new>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"utf8decoder.h"
@@ -43,9 +46,10 @@
 
 /* imported namespaces */
 
-using std::min ;		/* subroutine-template */
-using std::max ;		/* subroutine-template */
-using std::nothrow ;		/* constant */
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -173,7 +177,7 @@ int utf8decoder_load(utf8decoder *op,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (widebuf *wbp ; (wbp = widebufp(op->outbuf)) != np) {
 	        while ((rs >= 0) && (sl-- > 0)) {
-		    const uint	uch = *sp++ ;
+		    const wchar_t	uch = mkchar(*sp++) ;
 		    if ((uch & 0x80) == 0) {
 	                wbp->add(uch) ;
 		        c += 1 ;

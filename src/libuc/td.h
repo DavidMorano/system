@@ -27,7 +27,9 @@
 
 
 #define	TD		struct td_head
-#define	TD_POS	struct td_position
+#define	TD_POS		struct td_position
+#define	TD_WIN		struct td_window
+#define	TD_FL		struct td_flags
 
 /* control codes */
 #define	TD_CEOL		0		/* set "erase to EOL" mode */
@@ -45,7 +47,7 @@
 
 struct td_flags {
 	uint		statusdisplay:1 ;
-	uint		eol:1 ;		/* erase-to-EOL mode */
+	uint		meol:1 ;	/* erase-to-EOL mode */
 	uint		linebuf:1 ;	/* line buffer mode */
 	uint		smallscroll:1 ;
 	uint		nlcr:1 ;	/* NL-character display behavior */
@@ -58,8 +60,8 @@ struct td_position {
 } ;
 
 struct td_window {
-	struct td_position	move ;	/* move is outstanding */
-	struct td_position	cur ;	/* current position */
+	TD_POS		move ;		/* move is outstanding */
+	TD_POS		cur ;		/* current position */
 	int		srow ;		/* starting absolute row */
 	int		scol ;		/* starting absolute col */
 	int		rows ;		/* rows */
@@ -67,12 +69,12 @@ struct td_window {
 } ;
 
 struct td_head {
-	cchar		*termtype ;	/* given terminal type-name */
+	cchar		*termname ;	/* given terminal type-name */
 	char		*buf ;		/* storage buffer */
-	TERMSTR		enter ;
-	vecitem		wins ;		/* sub windows */
-	TD_POS		cur ;	/* current position */
-	TF_FLAGS	f ;
+	termstr		*tsp ;		/* term-string-pointer */
+	vecitem		*wlp ;		/* window-list-pointer */
+	TD_POS		cur ;		/* current position */
+	TD_FL		f ;
 	uint		timecounter ;
 	uint		magic ;
 	int		tfd ;
@@ -84,35 +86,37 @@ struct td_head {
 } ;
 
 typedef TD		td ;
+typedef TD_FL		td_fl ;
 typedef TD_POS		td_pos ;
+typedef TD_WIN		td_win ;
 
 EXTERNC_begin
 
-extern int td_start(TD *,int,cchar *,int,int) noex ;
-extern int td_finish(TD *) noex ;
-extern int td_flush(TD *) noex ;
-extern int td_subnew(TD *,int,int,int,int) noex ;
-extern int td_subdel(TD *,int) noex ;
-extern int td_getlines(TD *,int) noex ;
-extern int td_setlines(TD *,int,int) noex ;
-extern int td_move(TD *,int,int,int) noex ;
-extern int td_scroll(TD *,int,int) noex ;
-extern int td_control(TD *,int,...) noex ;
-extern int td_setsize(TD *,int,int) noex ;
-extern int td_suspend(TD *,int,int) noex ;
-extern int td_write(TD *,int,cchar *,int) noex ;
-extern int td_pwrite(TD *,int,int,int,cchar *,int) noex ;
-extern int td_pwritegr(TD *,int,int,int,int,cchar *,int) noex ;
-extern int td_vprintf(TD *,int,cchar *,va_list) noex ;
-extern int td_vpprintf(TD *,int,int,int,cchar *,va_list) noex ;
-extern int td_printf(TD *,int,cchar *,...) noex ;
-extern int td_pprintf(TD *,int,int,int,cchar *,...) noex ;
-extern int td_clear(TD *,int) noex ;
-extern int td_ew(TD *,int,int,int) noex ;
-extern int td_el(TD *,int,int) noex ;
-extern int td_ec(TD *,int,int) noex ;
-extern int td_check(TD *) noex ;
-extern int td_position(TD *,int,TD_POS *) noex ;
+extern int td_start(td *,int,cchar *,int,int) noex ;
+extern int td_finish(td *) noex ;
+extern int td_flush(td *) noex ;
+extern int td_subnew(td *,int,int,int,int) noex ;
+extern int td_subdel(td *,int) noex ;
+extern int td_getlines(td *,int) noex ;
+extern int td_setlines(td *,int,int) noex ;
+extern int td_move(td *,int,int,int) noex ;
+extern int td_scroll(td *,int,int) noex ;
+extern int td_control(td *,int,...) noex ;
+extern int td_setsize(td *,int,int) noex ;
+extern int td_suspend(td *,int,int) noex ;
+extern int td_write(td *,int,cchar *,int) noex ;
+extern int td_pwrite(td *,int,int,int,cchar *,int) noex ;
+extern int td_pwritegr(td *,int,int,int,int,cchar *,int) noex ;
+extern int td_vprintf(td *,int,cchar *,va_list) noex ;
+extern int td_vpprintf(td *,int,int,int,cchar *,va_list) noex ;
+extern int td_printf(td *,int,cchar *,...) noex ;
+extern int td_pprintf(td *,int,int,int,cchar *,...) noex ;
+extern int td_clear(td *,int) noex ;
+extern int td_ew(td *,int,int,int) noex ;
+extern int td_el(td *,int,int) noex ;
+extern int td_ec(td *,int,int) noex ;
+extern int td_check(td *) noex ;
+extern int td_position(td *,int,td_pos *) noex ;
 
 EXTERNC_end
 

@@ -178,7 +178,7 @@ int ema_finish(ema *hp) noex {
 	    void	*vp{} ;
 	    for (int i = 0 ; vechand_get(hp->elp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
-		    ema_ent		*ep = entp(vp) ;;
+		    ema_ent	*ep = entp(vp) ;
 		    {
 	                rs1 = entry_finish(ep) ;
 	                if (rs >= 0) rs = rs1 ;

@@ -12,6 +12,8 @@
 /* Use is subject to license terms. */
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<iostream>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -19,7 +21,9 @@
 #include	<sncpyx.h>
 #include	<sncpyxw.h>
 
-using std::cout ;
+
+using std::nullptr_t ;			/* type */
+using std::cout ;			/* variable */
 
 template<typename ... A>
 int thingx(cchar *,int,A ... arg,int) noex {

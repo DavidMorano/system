@@ -30,6 +30,8 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<errno.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -41,7 +43,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */

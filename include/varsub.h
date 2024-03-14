@@ -1,4 +1,4 @@
-/* varsub */
+/* varsub HEADER */
 /* lang=C20 */
 
 /* module to handle variable substitution in strings */
@@ -29,14 +29,12 @@
 
 
 /* object defines */
-
 #define	VARSUB			struct varsub_head
 #define	VARSUB_FL		struct varsub_flags
 #define	VARSUB_CUR		struct varsub_cursor
 #define	VARSUB_MAGIC		91827364
 
 /* initialization options */
-
 #define	VARSUB_OBLANK		0	/* default, substitute blank */
 #define	VARSUB_ONOBLANK		(1<<0)	/* substitute the key on failure */
 #define	VARSUB_OBADNOKEY	(1<<1)	/* fail out on failure */

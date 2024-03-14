@@ -41,8 +41,6 @@
 
 #include	<arpa/inet.h>		/* <- |in_addr_t| */
 
-#include	<signal.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>		/* for 'u_utime(2)' */
@@ -55,6 +53,10 @@
 #include	<netdb.h>
 #include	<pwd.h>
 #include	<grp.h>
+#include	<limits.h>
+#include	<signal.h>
+#include	<stddef.h>
+#include	<stdlib.h>
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
 #include	<xti.h>
@@ -297,14 +299,22 @@ typedef void (*void_f)() noex ;
 EXTERNC_end
 #endif /* TYPEDEF_VOIDF */
 
+#ifndef	TYPEDEF_SORTVCMP
+#define	TYPEDEF_SORTVCMP
+EXTERNC_begin
+typedef int (*sort_vcmp)(cvoid *,cvoid *) noex ;
+typedef int (*sortvcmp_f)(cvoid *,cvoid *) noex ;
+EXTERNC_end
+#endif /* TYPEDEF_SORTVCMP */
+
 #ifndef	TYPEDEF_FPERM
 #define	TYPEDEF_FPERM
-typedef mode_t	fsperm ;
+typedef mode_t		fsperm ;
 #endif /* TYPEDEF_FPERM */
 
 #ifndef	TYPEDEF_CFPERM
 #define	TYPEDEF_CFPERM
-typedef mode_t	const cfsperm ;
+typedef const mode_t	cfsperm ;
 #endif /* TYPEDEF_CFPERM */
 
 

@@ -71,6 +71,7 @@ struct vecitem_cursor  {
 
 typedef VECITEM		vecitem ;
 typedef VECITEM_CUR	vecitem_cur ;
+typedef VECITEM_FL	vecitem_fl ;
 
 EXTERNC_begin
 

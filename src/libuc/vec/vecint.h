@@ -29,7 +29,7 @@
 #define	VECINT_MAGIC		0x73625198
 #define	VECINT			struct vecint_head
 #define	VECINT_FL		struct vecint_flags
-#define	VECINT_CUR		struct vecint_c
+#define	VECINT_CUR		struct vecint_cursor
 #define	VECINT_DEFENTS		2
 #define	VECINT_TYPE		int
 
@@ -44,7 +44,7 @@
 #define	VECINT_OORDERED		0x0040		/* keep ordered */
 
 
-struct vecint_c {
+struct vecint_cursor {
 	int		i ;
 } ;
 
@@ -62,20 +62,18 @@ struct vecint_flags {
 
 struct vecint_head {
 	VECINT_TYPE	*va ;
+	VECINT_FL	f ;
 	uint		magic ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
-	VECINT_FL	f ;
 } ;
 
-typedef struct vecint_head	vecint ;
-typedef struct vecint_c		vecint_cur ;
+typedef VECINT		vecint ;
+typedef VECINT_CUR	vecint_cur ;
 
 EXTERNC_begin
-
-typedef int (*vecintcmp_f)(int,int) noex ;
 
 extern int vecint_start(vecint *,int,int) noex ;
 extern int vecint_finish(vecint *) noex ;
@@ -92,7 +90,6 @@ extern int vecint_sort(vecint *) noex ;
 extern int vecint_setsorted(vecint *) noex ;
 extern int vecint_find(vecint *,VECINT_TYPE) noex ;
 extern int vecint_match(vecint *,VECINT_TYPE) noex ;
-extern int vecint_search(vecint *,VECINT_TYPE (*)()) noex ;
 extern int vecint_getval(vecint *,int,VECINT_TYPE *) noex ;
 extern int vecint_getvec(vecint *,VECINT_TYPE **) noex ;
 extern int vecint_mkvec(vecint *,VECINT_TYPE *) noex ;

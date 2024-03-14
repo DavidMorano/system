@@ -47,6 +47,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
@@ -162,7 +163,7 @@ int vecstr_envfile(vecstr *vlp,cchar *fname) noex {
 /* local subroutines */
 
 int vecstr_envfiler(vecstr *op,cchar *fname) noex {
-	subinfo	si(op,fterms) ;
+	subinfo		si(op,fterms) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -171,22 +172,19 @@ int vecstr_envfiler(vecstr *op,cchar *fname) noex {
             cint    of = O_RDONLY ;
             cint    to_open = utimeout[uto_open] ;
             if ((rs = uc_opene(fname,of,om,to_open)) >= 0) {
+		cnullptr	np{} ;
                 filebuf     dfile, *dfp = &dfile ;
                 cint        fd = rs ;
                 if ((rs = filebuf_start(dfp,fd,0L,0,0)) >= 0) {
                     cint    to = utimeout[uto_read] ;
                     cint    llen = si.llen ;
-                    int     len ;
-                    int     cl ;
                     rls_f   rls = filebuf_readlns ;
                     char    *lbuf = si.lbuf ;
-                    nullptr_t       n{} ;
-                    while ((rs = rls(dfp,lbuf,llen,to,n)) > 0) {
-                        cchar       *cp ;
-                        len = rs ;
+                    while ((rs = rls(dfp,lbuf,llen,to,np)) > 0) {
+                        cchar	*cp{} ;
+                        int	len = rs ;
                         if (lbuf[len - 1] == '\n') len -= 1 ;
-                        lbuf[len] = '\0' ;
-                        if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
+                        if (int cl ; (cl = sfskipwhite(lbuf,len,&cp)) > 0) {
                             if (cp[0] != '#') {
                                 rs = si.line(cp,cl) ;
                                 c += rs ;
@@ -209,11 +207,11 @@ int vecstr_envfiler(vecstr *op,cchar *fname) noex {
 
 int subinfo::start() noex {
 	int		rs ;
-	int		size = 0 ;
-	char	*bp ;
+	int		sz = 0 ;
+	char		*bp{} ;
 	llen = var.linebuflen ;
-	size += (2*(llen+1)) ;
-	if ((rs = uc_libmalloc(size,&bp)) >= 0) {
+	sz += (2*(llen+1)) ;
+	if ((rs = uc_libmalloc(sz,&bp)) >= 0) {
 	    a = bp ;
 	    lbuf = bp ;
 	    bp += (llen+1) ;

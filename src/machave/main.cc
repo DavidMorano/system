@@ -1,4 +1,4 @@
-/* main (haveprogram) */
+/* main SUPPORT (haveprogram) */
 /* lang=C++20 */
 
 /* determine if a given name is an executable program */
@@ -54,6 +54,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strlen(3c)| + |strcmp(3c)| */
 #include	<string>
