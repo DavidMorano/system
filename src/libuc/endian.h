@@ -14,7 +14,11 @@
 
 
 #ifndef	ENDIAN
-#define	ENDIAN	endianval
+#define	ENDIAN		endianval
+#endif
+
+#ifndef	ENDIANSTR
+#define	ENDIANSTR	endianstr
 #endif
 
 

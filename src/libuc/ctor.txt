@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int vecpstr_ctor(clustername *op,Args ... args) noex {
+static int td_ctor(td *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    const nullptr_t	np{} ;
@@ -8,24 +8,24 @@ static int vecpstr_ctor(clustername *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (clusterdb_ctor) */
+/* end subroutine (td_ctor) */
 
-static int clusterdb_dtor(clusterdb *op) noex {
+static int td_dtor(td *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (clusterdb_dtor) */
+/* end subroutine (td_dtor) */
 
 template<typename ... Args>
-static int clusterdb_magic(clusterdb *op,Args ... args) noex {
+static int td_magic(td *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CLUSTERDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TD_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (clusterdb_magic) */
+/* end subroutine (td_magic) */
 

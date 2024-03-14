@@ -71,8 +71,8 @@ struct td_window {
 struct td_head {
 	cchar		*termname ;	/* given terminal type-name */
 	char		*buf ;		/* storage buffer */
-	termstr		enter ;
-	vecitem		wins ;		/* sub windows */
+	termstr		*tsp ;		/* term-string-pointer */
+	vecitem		*wlp ;		/* window-list-pointer */
 	TD_POS		cur ;		/* current position */
 	TD_FL		f ;
 	uint		timecounter ;
@@ -92,31 +92,31 @@ typedef TD_WIN		td_win ;
 
 EXTERNC_begin
 
-extern int td_start(TD *,int,cchar *,int,int) noex ;
-extern int td_finish(TD *) noex ;
-extern int td_flush(TD *) noex ;
-extern int td_subnew(TD *,int,int,int,int) noex ;
-extern int td_subdel(TD *,int) noex ;
-extern int td_getlines(TD *,int) noex ;
-extern int td_setlines(TD *,int,int) noex ;
-extern int td_move(TD *,int,int,int) noex ;
-extern int td_scroll(TD *,int,int) noex ;
-extern int td_control(TD *,int,...) noex ;
-extern int td_setsize(TD *,int,int) noex ;
-extern int td_suspend(TD *,int,int) noex ;
-extern int td_write(TD *,int,cchar *,int) noex ;
-extern int td_pwrite(TD *,int,int,int,cchar *,int) noex ;
-extern int td_pwritegr(TD *,int,int,int,int,cchar *,int) noex ;
-extern int td_vprintf(TD *,int,cchar *,va_list) noex ;
-extern int td_vpprintf(TD *,int,int,int,cchar *,va_list) noex ;
-extern int td_printf(TD *,int,cchar *,...) noex ;
-extern int td_pprintf(TD *,int,int,int,cchar *,...) noex ;
-extern int td_clear(TD *,int) noex ;
-extern int td_ew(TD *,int,int,int) noex ;
-extern int td_el(TD *,int,int) noex ;
-extern int td_ec(TD *,int,int) noex ;
-extern int td_check(TD *) noex ;
-extern int td_position(TD *,int,TD_POS *) noex ;
+extern int td_start(td *,int,cchar *,int,int) noex ;
+extern int td_finish(td *) noex ;
+extern int td_flush(td *) noex ;
+extern int td_subnew(td *,int,int,int,int) noex ;
+extern int td_subdel(td *,int) noex ;
+extern int td_getlines(td *,int) noex ;
+extern int td_setlines(td *,int,int) noex ;
+extern int td_move(td *,int,int,int) noex ;
+extern int td_scroll(td *,int,int) noex ;
+extern int td_control(td *,int,...) noex ;
+extern int td_setsize(td *,int,int) noex ;
+extern int td_suspend(td *,int,int) noex ;
+extern int td_write(td *,int,cchar *,int) noex ;
+extern int td_pwrite(td *,int,int,int,cchar *,int) noex ;
+extern int td_pwritegr(td *,int,int,int,int,cchar *,int) noex ;
+extern int td_vprintf(td *,int,cchar *,va_list) noex ;
+extern int td_vpprintf(td *,int,int,int,cchar *,va_list) noex ;
+extern int td_printf(td *,int,cchar *,...) noex ;
+extern int td_pprintf(td *,int,int,int,cchar *,...) noex ;
+extern int td_clear(td *,int) noex ;
+extern int td_ew(td *,int,int,int) noex ;
+extern int td_el(td *,int,int) noex ;
+extern int td_ec(td *,int,int) noex ;
+extern int td_check(td *) noex ;
+extern int td_position(td *,int,td_pos *) noex ;
 
 EXTERNC_end
 
