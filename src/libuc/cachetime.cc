@@ -316,7 +316,7 @@ static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 	debugprintf("cachetime_lookup: ret rs=%d f_hit=%u\n",rs,f_hit) ;
 #endif
 
-	return (rs >= 0) ? f_hit : rs ;;
+	return (rs >= 0) ? f_hit : rs ;
 }
 /* end subroutine (cachetime_lookup) */
 

@@ -1,14 +1,13 @@
-/* b_termadm */
+/* b_termadm SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to enquire about terminal device values */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_STDIN	0		/* use standard-input */
-
 
 /* revision history:
 
@@ -22,14 +21,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ termadm [-s|-l] [-dev <device>|-line <line>]
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -1610,7 +1606,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	}
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    cchar	*fmt = "%s: termdev=%s\n" ;;
+	    cchar	*fmt = "%s: termdev=%s\n" ;
 	    shio_printf(pip->efp,fmt,pn,lip->termfname) ;
 	}
 	return rs ;

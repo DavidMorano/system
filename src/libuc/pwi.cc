@@ -223,12 +223,12 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 
 	if ((rs = subinfo_start(sip,pr,dbname)) >= 0) {
 	    if ((rs = subinfo_midname(sip)) >= 0) {
-	        time_t		ti_pwi ;
+	        time_t	ti_pwi ;
 	        cint	to = TO_FILEMOD ;
 	        cchar	*suf = IPASSWD_SUF ;
 	        cchar	*endstr = ENDIANSTR ;
 	        cchar	*midname = sip->midname ;
-	        char		fname[MAXPATHLEN+1] ;
+	        char	fname[MAXPATHLEN+1] ;
 
 	        if ((rs = mkfnamesuf2(fname,midname,suf,endstr)) >= 0) {
 	            rs1 = u_stat(fname,sbp) ;

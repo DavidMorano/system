@@ -764,7 +764,7 @@ static int paramfile_filefins(PF *op) noex {
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(flp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
-	        PF_F	*fep = (PF_F *) vp ;;
+	        PF_F	*fep = (PF_F *) vp ;
 	        rs1 = file_finish(fep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }

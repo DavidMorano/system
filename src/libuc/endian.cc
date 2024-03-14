@@ -73,16 +73,16 @@ cchar	*endianstr ;
 /* local subroutines */
 
 endianhelp::endianhelp() noex {
-	   if constexpr (endian::native == endian::little) {
-		endianval = 0 ;
-		endianstr = "0" ;
-	   } else if constexpr (endian::native == endian::big) {
-		endianval = 1 ;
-		endianstr = "1" ;
-	   } else {
-		endianval = 2 ;
-		endianstr = "2" ;
-	   } /* end if-constexpr (endian) */
+	if constexpr (endian::native == endian::little) {
+	    endianval = 0 ;
+	    endianstr = "0" ;
+	} else if constexpr (endian::native == endian::big) {
+	    endianval = 1 ;
+	    endianstr = "1" ;
+	} else {
+	    endianval = 2 ;
+	    endianstr = "2" ;
+	} /* end if-constexpr (endian) */
 }
 /* end method (endianhelp::endianhelp) */
 

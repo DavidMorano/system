@@ -266,8 +266,9 @@ int	type;
 				buf[--bp] = 0;
 		}
 		else	/* hex */
-			if ((shift = (shift) ? 0 : 4) == 0)
-				buf[--bp] = 0;;
+			if ((shift = (shift) ? 0 : 4) == 0) {
+				buf[--bp] = 0 ;
+			}
 		--end;
 	}
 	if (bp == 0) {

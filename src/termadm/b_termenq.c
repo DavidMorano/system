@@ -1,8 +1,8 @@
-/* b_termenq */
+/* b_termenq SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to enquire about terminal information */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -11,16 +11,16 @@
 #define	CF_SEC		1		/* call secondary */
 #define	CF_ID		0		/* call ID */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
 	This subroutine was originally written.  
 
 	= 2017-12-16, David A­D­ Morano
-        Update puts terminal-type 'screen' ahead of 'vt100'. This still uses an
-        internal database for the various terminal attributes. A reasonable
-        future enhancement would be to read this database in from a file.
+	Update puts terminal-type 'screen' ahead of 'vt100'. This
+	still uses an internal database for the various terminal
+	attributes. A reasonable future enhancement would be to
+	read this database in from a file.
 
 */
 
@@ -29,14 +29,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ termenq [-s|-l] [-dev <device>|-line <line>]
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -1846,7 +1843,7 @@ static int locinfo_termbegin(LOCINFO *lip)
 	}
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
-	    cchar	*fmt = "%s: termdev=%s\n" ;;
+	    cchar	*fmt = "%s: termdev=%s\n" ;
 	    shio_printf(pip->efp,fmt,pn,lip->termfname) ;
 	}
 	return rs ;

@@ -1,10 +1,10 @@
-/* ema_first */
+/* ema_first SUPPORT */
+/* lang=C++20 */
 
 /* get first non-empty E-Mail Address */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -22,16 +22,12 @@
 
 *******************************************************************************/
 
-#define	EMA_MASTER	0	/* we need declaration of |ema_get()| */
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -39,6 +35,7 @@
 
 
 /* local defines */
+
 
 /* external subroutines */
 
@@ -64,17 +61,15 @@ extern int	debugprintf(cchar *,...) ;
 
 /* exported subroutines */
 
-
-int ema_first(EMA *op,cchar **rpp)
-{
+int ema_first(EMA *op,cchar **rpp) noex {
 	EMA_ENT		*ep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		rl = 0 ;
-	cchar		*rp = NULL ;;
+	cchar		*rp = nullptr ;
 	for (i = 0 ; (rs = ema_get(op,i,&ep)) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-		if ((ep->rp != NULL) || (ep->ap != NULL)) {
+	    if (ep != nullptr) {
+		if ((ep->rp != nullptr) || (ep->ap != nullptr)) {
 		    if (rl == 0) {
 			rl = ep->rl ;
 			rp = ep->rp ;
@@ -88,11 +83,11 @@ int ema_first(EMA *op,cchar **rpp)
 	    if (rl > 0) break ;
 	} /* end for */
 	if (rs >= 0) {
-	    if (rpp != NULL) {
-		*rpp = (rl > 0) ? rp : NULL ;
+	    if (rpp != nullptr) {
+		*rpp = (rl > 0) ? rp : nullptr ;
 	    }
 	} else if (rs == SR_NOTFOUND) {
-	    if (rpp != NULL) *rpp = NULL ;
+	    if (rpp != nullptr) *rpp = nullptr ;
 	    rs = SR_OK ;
 	}
 	return (rs >= 0) ? rl : rs ;
