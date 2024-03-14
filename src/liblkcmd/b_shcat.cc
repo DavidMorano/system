@@ -1,8 +1,8 @@
-/* b_shcat */
+/* b_shcat SUPPORT */
+/* lang=C++20 */
 
-/* this is a SHELL built-in version of 'cat(1)' */
+/* this is a SHELL built-in version of |cat(1)| */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -12,7 +12,6 @@
 #define	CF_READINTR	0		/* |shio_readintr(3shio)| */
 #define	CF_SPECIALFIFO	0		/* employ special FIFO handling */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -26,12 +25,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ shcat [<file(s)> ...] [<options>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

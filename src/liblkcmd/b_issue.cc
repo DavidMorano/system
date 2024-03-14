@@ -1,8 +1,8 @@
-/* b_issue */
+/* b_issue SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in for Issue-of-the-Day (ISSUE) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,7 +10,6 @@
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_PROCTEST	0		/* use 'proctest()' */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
 
 /* revision history:
 
@@ -23,17 +22,15 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet.
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet.
 
 	Synopsis:
-
 	$ issue [-k <keyname>] [-a <admin(s)>] [-d[=<intrun>]] [-V]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

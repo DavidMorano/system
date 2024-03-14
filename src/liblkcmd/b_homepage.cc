@@ -1,8 +1,8 @@
 /* b_homepage (HOMEPAGE) */
+/* lang=C++20 */
 
-/* this is a generic "main" module */
+/* program to create a "home" webpage in corporate environment */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debugging */
@@ -15,7 +15,6 @@
 #define	CF_TMPGROUP	1		/* set group on TMP dir */
 #define	CF_MNTCHECK	0		/* perform mount-check */
 
-
 /* revision history:
 
 	= 2000-05-14, David A­D­ Morano
@@ -27,22 +26,16 @@
 
 /*******************************************************************************
 
-	This is a simple program (of some sort!).
-
-	This program appends either specified files or the standard input to a
-	specified file.
+	This program creates a web page that is (generally) meant to
+	be a home page for a browser in a corporate environment.
 
 	Synopsis:
-
 	$ homepage [-V]
 
 	Arguments:
-
 	-V		print program version to standard-error and then exit
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

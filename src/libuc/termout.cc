@@ -218,7 +218,7 @@ struct termout_gch {
 		} /* end switch */
 	    } /* end for */
 	} ; /* end method (load) */
-} ;
+} ; /* end struct (termout_gch) */
 
 class termout_line {
 	cchar		*lbuf ;

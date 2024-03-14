@@ -1,5 +1,7 @@
-/* config */
+/* b_motd HEADER */
+/* lang=C20 */
 
+/* SHELL built-in for Message-of-the-Day (MOTD) */
 /* version %I% last-modified %G% */
 
 
@@ -11,7 +13,6 @@
 */
 
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
-
 
 #define	P_MOTD	1
 

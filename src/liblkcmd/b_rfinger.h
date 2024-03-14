@@ -1,5 +1,7 @@
-/* config */
+/* b_rfinger HEADER */
+/* lang=C20 */
 
+/* SHELL built-in FINGER client */
 /* version %I% last-modified %G% */
 
 
@@ -11,7 +13,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"0b"
 #define	WHATINFO	"@(#)rfinger "

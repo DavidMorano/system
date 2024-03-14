@@ -1,8 +1,8 @@
-/* b_rfinger */
+/* b_rfinger SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in FINGER client */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -16,7 +16,6 @@
 #define	CF_SPECIAL3	0		/* special-3 */
 #define	CF_SPECIAL4	0		/* special-4 */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
@@ -29,12 +28,10 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ rfinger <user>@<host> [-d <dialerspec>]
 
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

@@ -1,21 +1,46 @@
-/* b_issue */
+/* b_motd SUPPORT */
+/* lang=C++20 */
 
-/* SHELL built-in for Issue-of-the-Day (ISSUE) */
+/* SHELL built-in for Message-of-the-Day (MOTD) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGN	0		/* special debugging */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
-#define	CF_PROCTEST	0		/* use 'proctest()' */
+#define	CF_DEBUGN	0		/* special */
+#define	CF_GNCACHE	1		/* use GID (group) cache */
+#define	CF_PROCID	1		/* call 'motd_processid(3dam)' */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
-
+#define	CF_MOTDPROC	1		/* call |motd_processXX()| */
+#define	CF_MOTD		1		/* call |procmotd()| */
+#define	CF_LOCJOBDNAME	0		/* compile |locinfo_jobdname{}| */
 
 /* revision history:
 
 	= 2004-01-10, David A­D­ Morano
 	This code was written as a KSH builtin.  
+
+	= 2011-09-23, David A­D­ Morano
+	I put the "environment" hack into this code.  See the design
+	note in the comments below.
+
+	= 2011-11-08, David A­D­ Morano
+	I took the "environment" hack *out* of the code. It was
+	actually not correct in a multithreaded environment. Currently
+	(at this present time) the KSH Shell is not multithreaded,
+	but other programs (notably servers) that dynamically load
+	"programs" (commands) from a shared-object library containing
+	these might someday (probably much sooner than KSH) become
+	multithreaded. I needed to make environment handling
+	multithreaded before this present command gets dynamically
+	loaded and executed by some server or another. The fix was
+	to take environment handling out of this code and to put
+	into the MOTD object code. Also, a new LIBUC-level call had
+	to be invented to handle the new case of opening a general
+	file w/ a specified environment. The LIBUC call to open
+	programs specifically handled passing environment already
+	but it was not general for opening any sort of "file." The
+	new LIBUC call ('uc_openenv(3uc)') is.
 
 */
 
@@ -29,7 +54,27 @@
 
 	Synopsis:
 
-	$ issue [-k <keyname>] [-a <admin(s)>] [-d[=<intrun>]] [-V]
+	$ motd [-u <username>] [-a <admin(s)>] [-d[=<intrun>] [-V]
+
+	Design problems:
+
+	I put a real hack into this code.  The MOTD object was supposed to
+	handle all aspects of the actual MOTD processing.  But a new issue
+	arose.  People want any subprograms executed as a result of reading
+	sub-MOTD files to know the client UID and GID (the only things that we
+	know).  We are currently doing this by placing these as special
+	environment variables into our own process environment before executing
+	'motd_process()'.  But switching out own actual environment in a way
+	that does not leak memory (meaning do not use 'putenv(3c)') adds a
+	little complication, which can be seen below.  Somehow in the future we
+	will try to move some kind of processing into the MOTD object itself.
+
+	Updated note on design problems:
+
+	The hack above to pass modified environment down to the MOTD object is
+	no longer needed.  The MOTD object itself now handles that.  A new MOTD
+	object method has been added to pass fuller specified identification
+	down into the MOTD object.  This new interface is 'motd_processid()'.
 
 
 *******************************************************************************/
@@ -85,15 +130,17 @@
 #include	<ascii.h>
 #include	<buffer.h>
 #include	<spawner.h>
+#include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #include	"shio.h"
 #include	"kshlib.h"
-#include	"b_issue.h"
+#include	"b_motd.h"
 #include	"defs.h"
 #include	"upt.h"
-#include	"issue.h"
+#include	"gncache.h"
+#include	"motd.h"
 
 
 /* local typedefs */
@@ -156,7 +203,7 @@ typedef const char	cchar ;
 
 #define	TO_LASTFILE	(12*3600)	/* "last" file time-out */
 #define	TO_GID		(5*60)		/* group (GID) cache time-out */
-#define	TO_CHECK	(10*60)		/* check time-out */
+#define	TO_CHECK	(10*60)		/* MOTD check time-out */
 
 #ifndef	TO_TMPFILES
 #define	TO_TMPFILES	(1*3600)	/* temporary file time-out */
@@ -166,8 +213,6 @@ typedef const char	cchar ;
 #define	LOCINFO_FL	struct locinfo_flags
 #define	LOCINFO_GMCUR	struct locinfo_gmcur
 #define	LOCINFO_RNCUR	struct locinfo_rncur
-
-#define	NDF		"issue.deb"
 
 
 /* external subroutines */
@@ -193,8 +238,8 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getrunlevel(cchar *) ;
-extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
+extern int	getnodedomain(char *,char *) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	termwritable(cchar *) ;
 extern int	opentmp(cchar *,int,mode_t) ;
@@ -207,16 +252,17 @@ extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
-extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
+extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,
+			mode_t) ;
 extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	hasMeAlone(cchar *,int) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
-extern int	isIOError(int) ;
+extern int	hasMeAlone(cchar *,int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
+extern int	isIOError(int) ;
 extern int	isStrEmpty(cchar *,int) ;
 
 extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
@@ -229,9 +275,6 @@ extern int	debugprintf(cchar *,...) ;
 extern int	debugprinthexblock(cchar *,int,const void *,int) ;
 extern int	debugclose() ;
 extern int	strlinelen(cchar *,int,int) ;
-#endif
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,...) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
@@ -263,7 +306,6 @@ struct locinfo_rncur {
 
 struct locinfo_flags {
 	uint		stores:1 ;
-	uint		keyname:1 ;
 	uint		un:1 ;
 	uint		mnt:1 ;
 	uint		pidlock:1 ;
@@ -285,7 +327,6 @@ struct locinfo {
 	LOCINFO_FL	open ;
 	PROGINFO	*pip ;
 	cchar		**envv ;
-	cchar		*keyname ;
 	cchar		*un ;
 	cchar		*mdname ;
 	cchar		*termtype ;
@@ -304,16 +345,16 @@ struct locinfo {
 	uid_t		uid_prog ;
 	uid_t		uid_dirs ;
 	gid_t		gid, egid ;
-	gid_t		gid_pr ;
 	gid_t		gid_prog ;
 	gid_t		gid_dirs ;
+	gid_t		gid_pr ;
 	pthread_t	tid ;
 	int		to_cache ;
 	int		to_lock ;
 	int		envc ;
-	char		unbuf[USERNAMELEN+1] ;
-	char		gnbuf[GROUPNAMELEN+1] ;
-	char		termfname[MAXPATHLEN+1] ;
+	char		unbuf[USERNAMELEN + 1] ;
+	char		gnbuf[GROUPNAMELEN + 1] ;
+	char		termfname[MAXPATHLEN + 1] ;
 } ;
 
 struct dargs {
@@ -359,7 +400,7 @@ static int	procregout(PROGINFO *,PARAMOPT *,SHIO *) ;
 static int	procregouter(PROGINFO *,cchar **,SHIO *) ;
 static int	procregouterterm(PROGINFO *,void *,int) ;
 static int	procregouterfile(PROGINFO *,void *,int) ;
-static int	procissue(PROGINFO *,cchar *,cchar **,int) ;
+static int	procmotd(PROGINFO *,cchar *,cchar **,int) ;
 static int	procextras(PROGINFO *) ;
 static int	procpidfname(PROGINFO *) ;
 static int	proclockacquire(PROGINFO *,LFM *,int) ;
@@ -369,7 +410,7 @@ static int	proclockprint(PROGINFO *,LFM_CHECK *) ;
 static int	procdown(PROGINFO *,LFM *,cchar *) ;
 static int	procserve(PROGINFO *,LFM *,cchar *) ;
 static int	procserver(PROGINFO *,LFM *,int) ;
-static int	prochandle(PROGINFO *,ISSUE *,cchar *,int) ;
+static int	prochandle(PROGINFO *,GNCACHE *,MOTD *,uid_t,gid_t,int) ;
 static int	procexecname(PROGINFO *,char *,int) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -397,6 +438,10 @@ static int	locinfo_rnread(LOCINFO *,LOCINFO_RNCUR *,char *,int) ;
 static int	locinfo_loadprids(LOCINFO *) ;
 static int	locinfo_username(LOCINFO *) ;
 static int	locinfo_groupname(LOCINFO *) ;
+
+#if	CF_LOCJOBDNAME
+static int	locinfo_jobdname(LOCINFO *) ;
+#endif
 
 
 /* local variables */
@@ -462,7 +507,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar	*akonames[] = {
+static const char	*akonames[] = {
 	"quiet",
 	"intrun",
 	"termout",
@@ -497,7 +542,7 @@ static const int	sigignores[] = {
 /* exported subroutines */
 
 
-int b_issue(int argc,cchar *argv[],void *contextp)
+int b_motd(int argc,cchar *argv[],void *contextp)
 {
 	int		rs ;
 	int		rs1 ;
@@ -514,15 +559,15 @@ int b_issue(int argc,cchar *argv[],void *contextp)
 
 	return ex ;
 }
-/* end subroutine (b_issue) */
+/* end subroutine (b_motd) */
 
 
-int p_issue(int argc,cchar *argv[],cchar *envv[],void *contextp)
+int p_motd(int argc,cchar *argv[],cchar *envv[],void *contextp)
 {
 
 	return mainsub(argc,argv,envv,contextp) ;
 }
-/* end subroutine (p_issue) */
+/* end subroutine (p_motd) */
 
 
 /* local subroutines */
@@ -538,9 +583,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	KEYOPT		akopts ;
 	PARAMOPT	aparams ;
 	SHIO		errfile ;
+
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
 	uint		mo_start = 0 ;
 #endif
+
 	int		argr, argl, aol, akl, avl, kwi ;
 	int		ai, ai_max, ai_pos ;
 	int		rs, rs1 ;
@@ -558,13 +605,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	cchar		*afname = NULL ;
 	cchar		*ofname = NULL ;
 	cchar		*efname = NULL ;
-	cchar		*cp ;
-
+	cchar		*cp = NULL ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
 	    rs = debugopen(cp) ;
-	    debugprintf("b_issue: starting DFD=%d\n",rs) ;
+	    debugprintf("b_motd: starting DFD=%d\n",rs) ;
 	}
 #endif /* CF_DEBUGS */
 
@@ -652,6 +698,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                akl = aol ;
 	            }
 
+/* do we have a keyword match or should we assume only key letters? */
+
 	            if ((kwi = matostr(argopts,2,akp,akl)) >= 0) {
 
 	                switch (kwi) {
@@ -714,6 +762,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_mnt:
 	                    lip->have.mnt = TRUE ;
+	                    lip->final.mnt = TRUE ;
 	                    if (f_optequal) {
 	                        f_optequal = FALSE ;
 	                        if (avl)
@@ -849,6 +898,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    }
 	                    break ;
 
+/* handle all keyword defaults */
 	                default:
 	                    rs = SR_INVALID ;
 	                    break ;
@@ -945,7 +995,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                            argl = strlen(argp) ;
 	                            if (argl) {
 					PARAMOPT	*pop = &aparams ;
-	                                cchar		*po = po_admin ;
+	                                cchar	*po = po_admin ;
 	                                rs = paramopt_loads(pop,po,argp,argl) ;
 	                            }
 	                        } else
@@ -985,19 +1035,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                    case 'q':
 	                        pip->verboselevel = 0 ;
-	                        break ;
-
-/* target key-name */
-	                    case 'k':
-	                        lip->have.keyname = TRUE ;
-	                        if (argr > 0) {
-	                            argp = argv[++ai] ;
-	                            argr -= 1 ;
-	                            argl = strlen(argp) ;
-	                            if (argl)
-	                                lip->keyname = argp ;
-	                        } else
-	                            rs = SR_INVALID ;
 	                        break ;
 
 /* target username */
@@ -1064,11 +1101,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("b_issue: debuglevel=%u\n",pip->debuglevel) ;
-#endif
-
 	if (rs < 0) goto badarg ;
 
 	if (pip->debuglevel == 0) {
@@ -1082,8 +1114,21 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_issue: debuglevel=%u\n",pip->debuglevel) ;
+	    debugprintf("b_motd: debuglevel=%u\n",pip->debuglevel) ;
 #endif
+
+	if (pip->debuglevel > 0) {
+	    int	f_sfio = FALSE ;
+	    int	f_builtin = FALSE ;
+#if	CF_SFIO
+	    f_sfio = TRUE ;
+#endif
+#if	(defined(KSHBUILTIN) && (KSHBUILTIN > 0))
+	    f_builtin = TRUE ;
+#endif
+	    shio_printf(pip->efp,"%s: f_sfio=%u f_builtin=%u\n",
+	        pip->progname,f_sfio,f_builtin) ;
+	}
 
 	if (f_version) {
 	    shio_printf(pip->efp,"%s: version %s\n",pip->progname,VERSION) ;
@@ -1126,7 +1171,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	ex = EX_OK ;
 
-/* check if we should be doing anything based on system "run-level" */
+/* check if we should be doing anything */
 
 	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
 
@@ -1139,13 +1184,18 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    case '4':
 	        break ;
 	    default:
+	        if (pip->debuglevel > 0) {
+	            cchar	*pn = pip->progname ;
+	            cchar	*fmt = "%s: administrative run-level\n" ;
+	            shio_printf(pip->efp,fmt,pn) ;
+	        }
 	        ex = EX_TEMPFAIL ;
 	        break ;
 	    } /* end if */
 	}
 
 	if ((rs >= 0) && (pip->intrun == 0) && (argval != NULL)) {
-	    rs = cfdecti(argval,-1,&v) ;
+	    rs = cfdeci(argval,-1,&v) ;
 	    pip->intrun = v ;
 	}
 
@@ -1155,7 +1205,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    rs = procopts(pip,&akopts) ;
 	}
 
+#if	CF_DEBUG
+	debugprintf("b_motd: pidfname=%s\n",pip->pidfname) ;
+	debugprintf("b_motd: mntfname=%s\n",lip->mntfname) ;
+#endif
+
 /* argument defaults */
+
+	if (lip->un == NULL) lip->un = getourenv(envv,VARTARUSER) ;
 
 	if (pip->intpoll == 0) pip->intpoll = TO_POLL ;
 
@@ -1165,7 +1222,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_issue: intrun=%d\n",pip->intrun) ;
+	    debugprintf("b_motd: intrun=%d\n",pip->intrun) ;
 #endif
 
 	if (pip->debuglevel > 0) {
@@ -1180,8 +1237,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (pip->tmpdname == NULL) pip->tmpdname = getourenv(envv,VARTMPDNAME) ;
 	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
 
-	if (lip->keyname == NULL) lip->keyname = getourenv(envv,VARKEYNAME) ;
-	if (lip->keyname == NULL) lip->keyname = DEFSVC ;
+/* other */
 
 	if (lip->mntfname == NULL)
 	    lip->mntfname = getourenv(envv,VARMNTFNAME) ;
@@ -1191,11 +1247,6 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	if ((lip->mntfname == NULL) || (lip->mntfname[0] == '\0'))
 	    lip->mntfname = MNTFNAME ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	debugprintf("b_issue: kn=%s\n",lip->keyname) ;
-#endif
 
 /* continue */
 
@@ -1214,16 +1265,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	} else if (ex == EX_OK) {
 	    cchar	*pn = pip->progname ;
 	    cchar	*fmt = "%s: invalid argument or configuration (%d)\n" ;
-	    ex = EX_USAGE ;
 	    shio_printf(pip->efp,fmt,pn,rs) ;
+	    ex = EX_USAGE ;
 	    usage(pip) ;
 	} /* end if (ok) */
 
 /* done */
 	if ((rs < 0) && (ex != EX_OK) && (! pip->f.quiet)) {
-	    cchar	*pn = pip->progname ;
-	    cchar	*fmt = "%s: could not perform function (%d)\n" ;
-	    shio_printf(pip->efp,fmt,pn,rs) ;
+		    cchar	*pn = pip->progname ;
+		    cchar	*fmt = "%s: could not perform function (%d)\n" ;
+	            shio_printf(pip->efp,fmt,pn,rs) ;
 	}
 	if ((rs < 0) && (ex == EX_OK)) {
 	    switch (rs) {
@@ -1251,7 +1302,7 @@ retearly:
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
-	    debugprintf("b_issue: exiting ex=%u (%d)\n",ex,rs) ;
+	    debugprintf("b_motd: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
 	if (pip->efp != NULL) {
@@ -1282,9 +1333,37 @@ badprogstart:
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_DEBUGMALL
 	{
+	    uint	mi[12] ;
 	    uint	mo ;
+	    uint	mdiff ;
 	    uc_mallout(&mo) ;
-	    debugprintf("b_issue: final mallout=%u\n",(mo-mo_start)) ;
+	    mdiff = (mo-mo_start) ;
+	    debugprintf("main: final mallout=%u\n",mdiff) ;
+	    if (mdiff > 0) {
+	        UCMALLREG_CUR	cur ;
+	        UCMALLREG_REG	reg ;
+	        const int	size = (10*sizeof(uint)) ;
+	        cchar		*ids = "main" ;
+	        uc_mallinfo(mi,size) ;
+	        debugprintf("main: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
+	        debugprintf("main: MIoutnummax=%u\n",mi[ucmallreg_outnummax]) ;
+	        debugprintf("main: MIoutsize=%u\n",mi[ucmallreg_outsize]) ;
+	        debugprintf("main: MIoutsizemax=%u\n",
+	            mi[ucmallreg_outsizemax]) ;
+	        debugprintf("main: MIused=%u\n",mi[ucmallreg_used]) ;
+	        debugprintf("main: MIusedmax=%u\n",mi[ucmallreg_usedmax]) ;
+	        debugprintf("main: MIunder=%u\n",mi[ucmallreg_under]) ;
+	        debugprintf("main: MIover=%u\n",mi[ucmallreg_over]) ;
+	        debugprintf("main: MInotalloc=%u\n",mi[ucmallreg_notalloc]) ;
+	        debugprintf("main: MInotfree=%u\n",mi[ucmallreg_notfree]) ;
+	        ucmallreg_curbegin(&cur) ;
+	        while (ucmallreg_enum(&cur,&reg) >= 0) {
+	            debugprintf("main: MIreg.addr=%p\n",reg.addr) ;
+	            debugprintf("main: MIreg.size=%u\n",reg.size) ;
+	            debugprinthexblock(ids,80,reg.addr,reg.size) ;
+	        }
+	        ucmallreg_curend(&cur) ;
+	    }
 	    uc_mallset(0) ;
 	}
 #endif /* CF_DEBUGMALL */
@@ -1315,7 +1394,7 @@ static int usage(PROGINFO *pip)
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	fmt = "%s: USAGE> %s [-k <keyname>] [<admin(s)>]\n" ;
+	fmt = "%s: USAGE> %s [-u <username>] [<admin(s)>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
 	wlen += rs ;
 
@@ -1356,7 +1435,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	            if ((oi = matostr(akonames,2,kp,kl)) >= 0) {
 
-	                vl = keyopt_fetch(kop,kp,NULL,&vp) ;
+			vl = keyopt_fetch(kop,kp,NULL,&vp) ;
 
 	                switch (oi) {
 	                case akoname_quiet:
@@ -1449,7 +1528,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 	                c += 1 ;
 	            } else
-			rs = SR_INVALID ;
+	                rs = SR_INVALID ;
 
 	            if (rs < 0) break ;
 	        } /* end while (looping through key options) */
@@ -1464,7 +1543,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 
 static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
-		PARAMOPT *app, cchar *afn)
+		PARAMOPT *app,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1534,6 +1613,11 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,
 	    } /* end if */
 
 	} /* end if (processing file argument file list) */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(2))
+	    debugprintf("procargs: ret rs=%d pan=%u\n",rs,pan) ;
+#endif
 
 	return (rs >= 0) ? pan : rs ;
 }
@@ -1627,7 +1711,7 @@ static int procbackcheck(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procbackcheck: ent\n") ;
+	    debugprintf("b_motd/procbackcheck: ent\n") ;
 #endif
 
 	if ((rs = proclockacquire(pip,plp,TRUE)) >= 0) {
@@ -1682,7 +1766,7 @@ static int procbacks(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main/procbacks: ent\n") ;
+	    debugprintf("main/procback: ent\n") ;
 #endif
 
 	if ((rs = procexecname(pip,ebuf,elen)) >= 0) {
@@ -1728,7 +1812,7 @@ static int procbacks(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("main/procbacks: ret rs=%d\n",rs) ;
+	    debugprintf("main/procback: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -1907,7 +1991,7 @@ static int procdaemoncheck(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procdaemoncheck: ent\n") ;
+	    debugprintf("b_motd/procdaemoncheck: ent\n") ;
 #endif
 
 	rs = procmntcheck(pip) ;
@@ -1922,6 +2006,11 @@ static int procregular(PROGINFO *pip,PARAMOPT *app,cchar ofname[])
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		wlen = 0 ;
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	    debugprintf("b_motd/procregular: un=%s\n",lip->un) ;
+#endif
 
 	if ((rs = locinfo_loadids(lip)) >= 0) {
 
@@ -1940,7 +2029,7 @@ static int procregular(PROGINFO *pip,PARAMOPT *app,cchar ofname[])
 /* end subroutine (procregular) */
 
 
-static int procregulars(PROGINFO *pip,PARAMOPT *app,cchar ofname[])
+static int procregulars(PROGINFO *pip,PARAMOPT *app,cchar ofn[])
 {
 	LOCINFO		*lip = pip->lip ;
 	SHIO		ofile, *ofp = &ofile ;
@@ -1948,10 +2037,10 @@ static int procregulars(PROGINFO *pip,PARAMOPT *app,cchar ofname[])
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((ofname == NULL) || (ofname[0] == '\0') || (ofname[0] == '-'))
-	    ofname = STDFNOUT ;
+	if ((ofn == NULL) || (ofn[0] == '\0') || (ofn[0] == '-'))
+	    ofn = STDFNOUT ;
 
-	if ((rs = shio_open(ofp,ofname,"wct",0666)) >= 0) {
+	if ((rs = shio_open(ofp,ofn,"wct",0666)) >= 0) {
 
 	    if ((rs = locinfo_termoutbegin(lip,ofp)) >= 0) {
 
@@ -1965,8 +2054,11 @@ static int procregulars(PROGINFO *pip,PARAMOPT *app,cchar ofname[])
 	    rs1 = shio_close(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else {
-	    shio_printf(pip->efp,"%s: unavailable output (%d)\n",
-	        pip->progname,rs) ;
+	    cchar	*pn = pip->progname ;
+	    cchar	*fmt ;
+	    fmt = "%s: inaccessible output (%d)\n" ;
+	    shio_printf(pip->efp,fmt,pn,rs) ;
+	    shio_printf(pip->efp,"%s: ofile=%s\n",pn,ofn) ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
@@ -1982,7 +2074,7 @@ static int procdaemons(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procdaemons: ent\n") ;
+	    debugprintf("b_motd/procdaemons: ent\n") ;
 #endif
 
 	if (rs >= 0) {
@@ -1999,7 +2091,7 @@ static int procdaemons(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/procdaemons: ret rs=%d\n",rs) ;
+	    debugprintf("b_motd/procdaemons: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -2013,15 +2105,19 @@ static int proclockacquire(PROGINFO *pip,LFM *plp,int f)
 	int		rs = SR_OK ;
 	cchar		*pfn = pip->pidfname ;
 
+#if	CF_DEBUG
+	debugprintf("proclockacquire: ent pidfname=%s\n",pfn) ;
+#endif
+
 	if ((pfn != NULL) && (pfn[0] != '\0') && (pfn[0] != '-')) {
+	    USTAT	usb ;
+	    char	tmpfname[MAXPATHLEN + 1] ;
 
 	    if (f) {
-	        struct ustat	usb ;
-	        int		cl ;
-	        cchar		*cp ;
-	        char		tmpfname[MAXPATHLEN + 1] ;
+	        int	cl ;
+	        cchar	*cp ;
 
-	        cl = sfdirname(pfn,-1,&cp) ;
+	        cl = sfdirname(pip->pidfname,-1,&cp) ;
 
 	        rs = mkpath1w(tmpfname,cp,cl) ;
 
@@ -2043,6 +2139,11 @@ static int proclockacquire(PROGINFO *pip,LFM *plp,int f)
 	        rs = lfm_start(plp,pfn,ltype,to,&lc,nn,un,bn) ;
 	        lip->open.pidlock = (rs >= 0) ;
 
+#if	CF_DEBUG
+	        if (DEBUGLEVEL(4))
+	            debugprintf("proclockacquire: lfm_start() rs=%d\n",rs) ;
+#endif
+
 	        if ((rs == SR_LOCKLOST) || (rs == SR_AGAIN)) {
 	            proclockprint(pip,&lc) ;
 		}
@@ -2050,6 +2151,11 @@ static int proclockacquire(PROGINFO *pip,LFM *plp,int f)
 	    } /* end if */
 
 	} /* end if (pidlock) */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	    debugprintf("proclockacquire: ret rs=%d\n",rs) ;
+#endif
 
 	return rs ;
 }
@@ -2079,14 +2185,14 @@ static int procdown(PROGINFO *pip,LFM *plp,cchar mntfname[])
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/procdown: mntfile=%s\n",mntfname) ;
+	    debugprintf("b_motd/procdown: mntfile=%s\n",mntfname) ;
 #endif
 
 	rs = procserve(pip,plp,mntfname) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/procdown: ret rs=%d\n",rs) ;
+	    debugprintf("b_motd/procdown: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -2096,13 +2202,11 @@ static int procdown(PROGINFO *pip,LFM *plp,cchar mntfname[])
 
 static int procserve(PROGINFO *pip,LFM *plp,cchar mntfname[])
 {
-	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		pipes[2] ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if (lip == NULL) return SR_FAULT ; /* lint */
 	if (mntfname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = u_pipe(pipes)) >= 0) {
@@ -2114,7 +2218,7 @@ static int procserve(PROGINFO *pip,LFM *plp,cchar mntfname[])
 	            cfd = -1 ;
 	            if ((rs = uc_closeonexec(sfd,TRUE)) >= 0) {
 	                rs = procserver(pip,plp,sfd) ;
-	            } /* end if (close-on-exec) */
+	            }
 	            uc_fdetach(mntfname) ;
 	        } else {
 	            if ((! pip->f.quiet) && (pip->efp != NULL)) {
@@ -2125,11 +2229,11 @@ static int procserve(PROGINFO *pip,LFM *plp,cchar mntfname[])
 	    } /* end if (u_ioctl) */
 	    if (cfd >= 0) u_close(cfd) ;
 	    u_close(sfd) ;
-	} /* end if (u_pipes) */
+	} /* end if (u_pipe) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/procserve: ret rs=%d\n",rs) ;
+	    debugprintf("b_motd/procserve: ret rs=%d\n",rs) ;
 #endif
 
 	return rs ;
@@ -2140,143 +2244,189 @@ static int procserve(PROGINFO *pip,LFM *plp,cchar mntfname[])
 static int procserver(PROGINFO *pip,LFM *plp,int sfd)
 {
 	LOCINFO		*lip = pip->lip ;
-	ISSUE		m ;
+	GNCACHE		g ;
 	time_t		ti_pid = pip->daytime ;
+	time_t		ti_gncache = pip->daytime ;
 	time_t		ti_run = pip->daytime ;
 	time_t		ti_wait = pip->daytime ;
 	time_t		ti_check = pip->daytime ;
+	const int	to_gid = TO_GID ;
 	const int	to = pip->intpoll ;
 	int		rs ;
 	int		rs1 ;
 	int		nhandle = 0 ;
-	int		f ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
-	if ((rs = issue_open(&m,pip->pr)) >= 0) {
-	    POLLFD	fds[2] ;
-	    int		pto ;
-	    int		i = 0 ;
+	if ((rs = gncache_start(&g,211,to_gid)) >= 0) {
+	    MOTD	m ;
+	    if ((rs = motd_open(&m,pip->pr)) >= 0) {
+	        POLLFD	fds[2] ;
+	        int	pto ;
+	        int	i = 0 ;
+	        int	f = FALSE ;
 
-	    fds[i].fd = sfd ;
-	    fds[i].events = (POLLIN | POLLPRI) ;
-	    i += 1 ;
-	    fds[i].fd = -1 ;
-	    fds[i].events = 0 ;
+	        fds[i].fd = sfd ;
+	        fds[i].events = (POLLIN | POLLPRI) ;
+	        i += 1 ;
+	        fds[i].fd = -1 ;
+	        fds[i].events = 0 ;
 
-	    pto = (to * POLLMULT) ;
-	    while (rs >= 0) {
+	        pto = (to * POLLMULT) ;
+	        while (rs >= 0) {
 
-	        if ((rs = u_poll(fds,1,pto)) > 0) {
-	            const int	re = fds[0].revents ;
-	            pip->daytime = time(NULL) ;
+	            if ((rs = u_poll(fds,1,pto)) > 0) {
+	                const int	re = fds[0].revents ;
+	                pip->daytime = time(NULL) ;
 
-	            if ((re & POLLIN) || (re & POLLPRI)) {
-	                struct strrecvfd	passer ;
-	                if ((rs = acceptpass(sfd,&passer,-1)) >= 0) {
-	                    const int	pfd = rs ;
-	                    nhandle += 1 ;
-	                    rs = prochandle(pip,&m,lip->keyname,pfd) ;
-	                    u_close(pfd) ;
-	                } /* end if */
-	            } else if (re & POLLHUP) {
-	                rs = SR_HANGUP ;
-	            } else if (re & POLLERR) {
-	                rs = SR_POLLERR ;
-	            } else if (re & POLLNVAL) {
-	                rs = SR_NOTOPEN ;
-	            } /* end if (poll returned) */
+	                if ((re & POLLIN) || (re & POLLPRI)) {
+	                    struct strrecvfd	passer ;
+	                    if ((rs = acceptpass(sfd,&passer,-1)) >= 0) {
+	                        const uid_t	uid = passer.uid ;
+	                        const gid_t	gid = passer.gid ;
+	                        const int	pfd = rs ;
+	                        nhandle += 1 ;
+	                        rs = prochandle(pip,&g,&m,uid,gid,pfd) ;
+	                        u_close(pfd) ;
+	                    } /* end if */
+	                } else if (re & POLLHUP) {
+	                    rs = SR_HANGUP ;
+	                } else if (re & POLLERR) {
+	                    rs = SR_POLLERR ;
+	                } else if (re & POLLNVAL) {
+	                    rs = SR_NOTOPEN ;
+	                } /* end if (poll returned) */
 
-		} else {
+		    } else {
 	                pip->daytime = time(NULL) ;
 	                if (rs == SR_INTR) rs = SR_OK ;
-		}
+		    }
 
-	        if (rs >= 0) rs = lib_sigterm() ;
-	        if (rs >= 0) rs = lib_sigintr() ;
+	            if (rs >= 0) rs = lib_sigterm() ;
+	            if (rs >= 0) rs = lib_sigintr() ;
 
-	        f = ((pip->daytime - ti_wait) > (to*10)) ;
-	        if ((rs >= 0) && (nhandle || f)) {
-	            ti_wait = pip->daytime ;
-	            rs1 = SR_OK ;
-	            while ((nhandle > 0) || f) {
-	                rs1 = u_waitpid(-1,NULL,WNOHANG) ;
-	                if (rs1 <= 0) break ;
-	                if (nhandle > 0) nhandle -= 1 ;
-	            }
-	            if ((pip->daytime & 3) == 0) {
-	                if ((rs1 == SR_CHILD) && (nhandle > 0)) {
-	                    nhandle -= 1 ;
+	            f = ((pip->daytime - ti_wait) > (to*10)) ;
+	            if ((rs >= 0) && (nhandle || f)) {
+	                ti_wait = pip->daytime ;
+	                rs1 = SR_OK ;
+	                while ((nhandle > 0) || f) {
+	                    rs1 = u_waitpid(-1,NULL,WNOHANG) ;
+	                    if (rs1 <= 0) break ;
+	                    if (nhandle > 0) nhandle -= 1 ;
+	                }
+	                if ((pip->daytime & 3) == 0) {
+	                    if ((rs1 == SR_CHILD) && (nhandle > 0)) {
+	                        nhandle -= 1 ;
+	                    }
 	                }
 	            }
-	        }
 
-	        f = ((pip->daytime - ti_pid) >= TO_PID) ;
-	        if ((rs >= 0) && lip->open.pidlock && f) {
-	            ti_pid = pip->daytime ;
-	            rs = proclockcheck(pip,plp) ;
-	        }
-
-	        f = ((pip->daytime - ti_check) > TO_CHECK) ;
-	        if ((rs >= 0) && f) {
-	            ti_check = pip->daytime ;
-	            rs = issue_check(&m,pip->daytime) ;
-	        }
-
-	        if ((rs >= 0) && (pip->intrun > 0) &&
-	            ((pip->daytime - ti_run) >= pip->intrun)) {
-
-	            if (pip->efp != NULL) {
-	                fmt = "%s: exiting on run-int timeout\n" ;
-	                shio_printf(pip->efp,fmt,pn) ;
+	            f = ((pip->daytime - ti_pid) >= TO_PID) ;
+	            if ((rs >= 0) && f && lip->open.pidlock) {
+	                ti_pid = pip->daytime ;
+	                rs = proclockcheck(pip,plp) ;
 	            }
 
-	            break ;
-	        } /* end if (run-expiration) */
-
-	        if (rs == SR_INTR) {
-	            if (pip->efp != NULL) {
-	                fmt = "%s: interrupt\n" ;
-	                shio_printf(pip->efp,fmt,pn) ;
+#if	CF_GNCACHE
+	            f = ((pip->daytime - ti_gncache) >= TO_CACHE) ;
+	            if ((rs >= 0) && f) {
+	                ti_gncache = pip->daytime ;
+	                rs = gncache_check(&g,pip->daytime) ;
 	            }
-	            rs = lib_sigreset(SIGINT) ;
-	        } /* end if (interrupt) */
+#endif /* CF_GNCACHE */
 
-	    } /* end while (polling) */
+	            f = ((pip->daytime - ti_check) > TO_CHECK) ;
+	            if ((rs >= 0) && f) {
+	                ti_check = pip->daytime ;
+	                rs = motd_check(&m,pip->daytime) ;
+	            }
 
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("b_issue/procserve: while-out rs=%d\n",rs) ;
-#endif
+	            if ((rs >= 0) && (pip->intrun > 0) &&
+	                ((pip->daytime - ti_run) >= pip->intrun)) {
 
-	    rs1 = issue_close(&m) ;
+	                if (pip->efp != NULL) {
+	                    fmt = "%s: exiting on run-int timeout\n" ;
+	                    shio_printf(pip->efp,fmt,pn) ;
+	                }
+
+	                break ;
+	            } /* end if (run-expiration) */
+
+	            if (rs == SR_INTR) {
+	                if (pip->efp != NULL) {
+	                    fmt = "%s: interrupt\n" ;
+	                    shio_printf(pip->efp,fmt,pn) ;
+	                }
+	                rs = lib_sigreset(SIGINT) ;
+	            } /* end if (interrupt) */
+
+	        } /* end while (polling) */
+
+	        rs1 = motd_close(&m) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (motd) */
+	    rs1 = gncache_finish(&g) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (issue) */
+	} /* end if (gncache) */
 
 	return rs ;
 }
 /* end subroutine (procserver) */
 
 
-static int prochandle(PROGINFO *pip,ISSUE *mp,cchar *keyname,int pfd)
+static int prochandle(PROGINFO *pip,GNCACHE *gp,MOTD *mp,
+		uid_t uid,gid_t gid,int pfd)
 {
-	int		rs ;
+	int		rs = SR_OK ;
+	int		rs1 ;
 	int		wlen = 0 ;
+	char		groupname[GROUPNAMELEN + 1] ;
 
 #if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/prochandle: keyname=%s\n",keyname) ;
+	if (DEBUGLEVEL(3)) {
+	    debugprintf("b_motd/prochandle: uid=%d\n",uid) ;
+	    debugprintf("b_motd/prochandle: gid=%d\n",gid) ;
+	}
 #endif
 
-	if (keyname == NULL) return SR_FAULT ;
-	if (keyname[0] == '\0') return SR_INVALID ;
+	if (gid < 0)
+	    goto ret0 ;
 
-	rs = issue_process(mp,keyname,NULL,pfd) ;
-	wlen = rs ;
+#if	CF_GNCACHE
+	{
+	    GNCACHE_ENT	gre ;
+	    rs1 = gncache_lookgid(gp,&gre,gid) ;
+	    if (rs1 >= 0)
+	        strwcpy(groupname,gre.groupname,GROUPNAMELEN) ;
+	}
+#else
+	rs1 = getgroupname(groupname,GROUPNAMELEN,gid) ;
+#endif /* CF_GNCACHE */
+	if (rs1 < 0)
+	    goto ret0 ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/prochandle: ret rs=%d wlen=%u\n",rs,wlen) ;
+	    debugprintf("b_motd/prochandle: groupname=%s\n",groupname) ;
+#endif
+
+#if	CF_MOTDPROC
+#if	CF_PROCID
+	{
+	    MOTD_ID	id ;
+	    motdid_load(&id,NULL,groupname,uid,gid) ;
+	    rs = motd_processid(mp,&id,NULL,pfd) ;
+	    wlen = rs ;
+	}
+#else /* CF_PROCID */
+	rs = motd_process(mp,groupname,NULL,pfd) ;
+	wlen = rs ;
+#endif /* CF_PROCID */
+#endif /* CF_MOTDPROC */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(3))
+	    debugprintf("b_motd/prochandle: ret rs=%d wlen=%u\n",rs,wlen) ;
 #endif
 
 	if (isIOError(rs)) {
@@ -2284,6 +2434,7 @@ static int prochandle(PROGINFO *pip,ISSUE *mp,cchar *keyname,int pfd)
 	    wlen = 0 ;
 	}
 
+ret0:
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (prochandle) */
@@ -2304,7 +2455,7 @@ static int procextras(PROGINFO *pip)
 	                cchar	**vpp = &pip->domainname ;
 	                rs = proginfo_setentry(pip,vpp,dn,-1) ;
 	            }
-		}
+	        }
 	    }
 	} /* end if (locinfo_username) */
 	return rs ;
@@ -2314,16 +2465,14 @@ static int procextras(PROGINFO *pip)
 
 static int procpidfname(PROGINFO *pip)
 {
-	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	cchar		*pfn = pip->pidfname ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procpidfname: ent\n") ;
+	    debugprintf("b_motd/procpidfname: ent\n") ;
 #endif
 
-	if (lip == NULL) return SR_FAULT ; /* lint */
 	if ((pfn == NULL) || (pfn[0] == '+')) {
 	    cchar	*nn = pip->nodename ;
 	    cchar	*pr = pip->pr ;
@@ -2347,8 +2496,8 @@ static int procpidfname(PROGINFO *pip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
-	    debugprintf("b_issue/procpidfname: pidfname=%s\n",pip->pidfname) ;
-	    debugprintf("b_issue/procpidfname: ret rs=%d\n",rs) ;
+	    debugprintf("b_motd/procpidfname: pidfname=%s\n",pip->pidfname) ;
+	    debugprintf("b_motd/procpidfname: ret rs=%d\n",rs) ;
 	}
 #endif
 
@@ -2357,22 +2506,45 @@ static int procpidfname(PROGINFO *pip)
 /* end subroutine (procpidfname) */
 
 
-static int procregout(PROGINFO *pip,PARAMOPT *app,SHIO *ofp)
+static int procregout(PROGINFO	*pip,PARAMOPT *app,SHIO *ofp)
 {
 	vecpstr		admins ;
 	int		rs ;
 	int		wlen = 0 ;
 
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	    debugprintf("b_motd/procregout: ent\n") ;
+#endif
+
 	if ((rs = vecpstr_start(&admins,4,0,0)) >= 0) {
+#if	CF_DEBUG
+	    if (DEBUGLEVEL(4))
+	        debugprintf("b_motd/procregout: procloadadmins\n") ;
+#endif
 	    if ((rs = procloadadmins(pip,&admins,app)) >= 0) {
 	        cchar	**av ;
 	        if ((rs = vecpstr_getvec(&admins,&av)) >= 0) {
+#if	CF_DEBUG
+	            if (DEBUGLEVEL(4))
+	                debugprintf("b_motd/procregout: procregouter()\n") ;
+#endif
 	            rs = procregouter(pip,av,ofp) ;
 	            wlen += rs ;
 	        } /* end if (vecpstr_getvec) */
+#if	CF_DEBUG
+	        if (DEBUGLEVEL(4))
+	            debugprintf("b_motd/procregout: vecpstr_getvec rs=%d\n",
+	                rs) ;
+#endif
 	    } /* end if (procloadadmins) */
 	    vecpstr_finish(&admins) ;
 	} /* end if (admins) */
+
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	    debugprintf("b_motd/procregout: ret rs=%d wlen=%u\n",rs,wlen) ;
+#endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -2385,7 +2557,7 @@ static int procregouter(PROGINFO *pip,cchar **av,SHIO *ofp)
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (lip->keyname[0] != '\0') {
+	if (lip->gnbuf[0] != '\0') {
 	    if ((rs = locinfo_mdname(lip)) >= 0) {
 	        lip->jobdname = lip->mdname ;
 	        if ((rs = locinfo_tmpcheck(lip)) >= 0) {
@@ -2394,7 +2566,7 @@ static int procregouter(PROGINFO *pip,cchar **av,SHIO *ofp)
 	            cchar		*jobdname = lip->mdname ;
 	            if ((rs = opentmp(jobdname,of,om)) >= 0) {
 	                const int	fd = rs ;
-	                if ((rs = procissue(pip,lip->keyname,av,fd)) >= 0) {
+	                if ((rs = procmotd(pip,lip->gnbuf,av,fd)) >= 0) {
 	                    int	mlen = rs ;
 	                    int	verlev = pip->verboselevel ;
 	                    if ((rs >= 0) && (mlen > 0) && (verlev > 0)) {
@@ -2408,16 +2580,16 @@ static int procregouter(PROGINFO *pip,cchar **av,SHIO *ofp)
 	                            }
 	                        } /* end if (ok) */
 	                    } /* end if (output) */
-	                } /* end if (procissue) */
+	                } /* end if (procmotd) */
 	                u_close(fd) ;
 	            } /* end if (opentmp) */
 	        } /* end if (locinfo_tmpcheck) */
 	    } /* end if (jobdname) */
-	} /* end if (non-nul) */
+	} /* end if (non-null) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procregouter: ret rs=%d wlen=%u\n",rs,wlen) ;
+	    debugprintf("b_motd/procregouter: ret rs=%d wlen=%u\n",rs,wlen) ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
@@ -2439,6 +2611,16 @@ static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
 	    char	lbuf[LINEBUFLEN+1] ;
 	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        len = rs ;
+#if	CF_DEBUG
+	if (DEBUGLEVEL(4))
+	debugprintf("b_motd/procregouterterm: l=>%t<\n",
+		lbuf,strlinelen(lbuf,len,40)) ;
+#endif
+		if (pip->debuglevel > 0) {
+		    cchar	*pn = pip->progname ;
+		    cchar	*fmt = "%s: term l=>%t<\n" ;
+		    shio_printf(pip->efp,fmt,pn,lbuf,strlinelen(lbuf,len,60)) ;
+		}
 	        if (rs >= 0) rs = lib_sigterm() ;
 	        if (rs >= 0) rs = lib_sigintr() ;
 	        if (rs >= 0) {
@@ -2457,16 +2639,19 @@ static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
 
 static int procregouterfile(PROGINFO *pip,void *ofp,int fd)
 {
-	LOCINFO		*lip = pip->lip ;
 	const int	to = pip->to_read ;
 	const int	llen = LINEBUFLEN ;
 	int		rs ;
 	int		len ;
 	int		wlen = 0 ;
 	char		lbuf[LINEBUFLEN+1] ;
-	if (lip == NULL) return SR_FAULT ; /* lint */
 	while ((rs = uc_reade(fd,lbuf,llen,to,FM_TIMED)) > 0) {
 	    len = rs ;
+		if (pip->debuglevel > 0) {
+		    cchar	*pn = pip->progname ;
+		    cchar	*fmt = "%s: file l=>%t<\n" ;
+		    shio_printf(pip->efp,fmt,pn,lbuf,strlinelen(lbuf,len,60)) ;
+		}
 	    if (rs >= 0) rs = lib_sigterm() ;
 	    if (rs >= 0) rs = lib_sigintr() ;
 	    if (rs >= 0) {
@@ -2480,103 +2665,65 @@ static int procregouterfile(PROGINFO *pip,void *ofp,int fd)
 /* end subroutine (procregouterfile) */
 
 
-#if	CF_PROCTEST
-static int procissue(PROGINFO *pip,cchar groupname[],cchar **av,int fd)
+static int procmotd(PROGINFO *pip,cchar	*groupname,cchar **av,int fd)
 {
 	LOCINFO		*lip = pip->lip ;
-	const mode_t	om = 0664 ;
-	const int	of = O_RDONLY ;
-	const int	llen = LINEBUFLEN ;
+	MOTD		m ;
 	int		rs ;
 	int		wlen = 0 ;
-	cchar		*fn = "rightcore.txt" ;
-	char		lbuf[LINEBUFLEN+1] ;
 
 	if (groupname == NULL) return SR_FAULT ;
 
 	if (groupname[0] == '\0') return SR_INVALID ;
 
-	if ((rs = uc_open(fn,of,om)) >= 0) {
-	    int	ifd = rs ;
-	    int	ll ;
+#if	CF_DEBUG
+	if (DEBUGLEVEL(3)) {
+	    debugprintf("b_motd/procmotd: tar uid=%d\n",lip->uid_dirs) ;
+	    debugprintf("b_motd/procmotd: tar gid=%d\n",lip->gid_dirs) ;
+	}
+#endif
 
-	    while (rs >= 0) {
-	        rs = u_read(ifd,lbuf,llen) ;
-	        if (rs <= 0) break ;
-	        ll = rs ;
+#if	CF_MOTD
+	if ((rs = motd_open(&m,pip->pr)) >= 0) {
 
-	        rs = uc_writen(fd,lbuf,ll) ;
+#if	CF_MOTDPROC
+#if	CF_PROCID
+	    {
+	        MOTD_ID		id ;
+		const uid_t	uid = lip->uid_dirs ;
+		const gid_t	gid = lip->gid_dirs ;
+	        motdid_load(&id,lip->un,groupname,uid,gid) ;
+	        rs = motd_processid(&m,&id,av,fd) ;
 	        wlen = rs ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(4))
-	            debugprintf("b_issue/procissue: uc_writen() rs=%d\n",rs) ;
-#endif
-
-	    } /* end while */
-
-	    u_close(ifd) ;
-	} /* end if (issue) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procissue: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
-	return (rs >= 0) ? wlen : rs ;
-}
-/* end subroutine (procissue) */
-#else /* CF_PROCTEST */
-static int procissue(PROGINFO *pip,cchar *groupname,cchar **av,int fd)
-{
-	LOCINFO		*lip = pip->lip ;
-	ISSUE		m ;
-	int		rs ;
-	int		rs1 ;
-	int		wlen = 0 ;
-
-	if (groupname == NULL) return SR_FAULT ;
-	if (lip == NULL) return SR_FAULT ; /* lint */
-
-	if (groupname[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procissue: gn=%s\n",groupname) ;
-#endif
-
-	if ((rs = issue_open(&m,pip->pr)) >= 0) {
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("b_issue/procissue: issue_process()\n") ;
-#endif
-
-	    rs = issue_process(&m,groupname,av,fd) ;
+	    }
+#else /* CF_PROCID */
+	    rs = motd_process(&m,groupname,av,fd) ;
 	    wlen = rs ;
+#endif /* CF_PROCID */
+#endif /* CF_MOTDPROC */
 
 #if	CF_DEBUG
-	    if (DEBUGLEVEL(4))
-	        debugprintf("b_issue/procissue: issue_process() rs=%d\n",rs) ;
+	    if (DEBUGLEVEL(4)) {
+	        const int	srs = uc_fsize(fd) ;
+	        debugprintf("b_motd/procmotd: motd_process() rs=%d\n",rs) ;
+	        debugprintf("b_motd/procmotd: fsize=%d\n",srs) ;
+	    }
 #endif
 
-	    rs1 = issue_close(&m) ;
-	    if (rs >= 0) rs = rs1 ;
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(3))
-	        debugprintf("b_issue/procussue: issue_close() rs=%d\n",rs) ;
-#endif
-	} /* end if (issue) */
+	    motd_close(&m) ;
+	} /* end if (motd) */
+#else /* CF_MOTD */
+	rs = SR_OK ;
+#endif /* CF_MOTD */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procissue: ret rs=%d wlen=%u\n",rs,wlen) ;
+	    debugprintf("b_motd/procmotd: ret rs=%d wlen=%u\n",rs,wlen) ;
 #endif
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (procissue) */
-#endif /* CF_PROCTEST */
+/* end subroutine (procmotd) */
 
 
 static int proclockcheck(PROGINFO *pip,LFM *plp)
@@ -2586,8 +2733,9 @@ static int proclockcheck(PROGINFO *pip,LFM *plp)
 
 	rs = lfm_check(plp,&lc,pip->daytime) ;
 
-	if ((rs == SR_LOCKLOST) || (rs == SR_AGAIN))
+	if ((rs == SR_LOCKLOST) || (rs == SR_AGAIN)) {
 	    proclockprint(pip,&lc) ;
+	}
 
 	return rs ;
 }
@@ -2667,7 +2815,7 @@ static int proclockprint(PROGINFO *pip,LFM_CHECK *lcp)
 
 	    if (lcp->banner != NULL)
 	        shio_printf(pip->efp,
-	            "%s: other_banner=%s\n",
+	            "%s: other_banner=»%s«\n",
 	            pip->progname,lcp->banner) ;
 
 	} /* end if (standard-error) */
@@ -2677,7 +2825,7 @@ static int proclockprint(PROGINFO *pip,LFM_CHECK *lcp)
 /* end subroutine (proclockprint) */
 
 
-static int procloadadmins(PROGINFO *pip,vecpstr *nlp,PARAMOPT *app)
+static int procloadadmins(PROGINFO *pip,vecpstr *alp,PARAMOPT *app)
 {
 	PARAMOPT_CUR	pcur ;
 	int		rs ;
@@ -2693,17 +2841,17 @@ static int procloadadmins(PROGINFO *pip,vecpstr *nlp,PARAMOPT *app)
 	        if (cl == SR_NOTFOUND) break ;
 	        rs = cl ;
 	        if ((rs >= 0) && (cl > 0)) {
-	            rs = procloadadmin(pip,nlp,cp,cl) ;
+	            rs = procloadadmin(pip,alp,cp,cl) ;
 	            c += rs ;
 	        }
 	    } /* end while */
 	    rs1 = paramopt_curend(app,&pcur) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (cursor) */
+	} /* end if (paramopt-cur) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
-	    debugprintf("b_issue/procloadadmins: ret rs=%d c=%u\n",rs,c) ;
+	    debugprintf("b_motd/procloadadmins: ret rs=%d c=%u\n",rs,c) ;
 #endif
 
 	return (rs >= 0) ? c : rs ;
@@ -2711,7 +2859,7 @@ static int procloadadmins(PROGINFO *pip,vecpstr *nlp,PARAMOPT *app)
 /* end subroutine (procloadadmins) */
 
 
-static int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar np[],int nl)
+static int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar *np,int nl)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2760,7 +2908,7 @@ static int procloadadmin(PROGINFO *pip,VECPSTR *nlp,cchar np[],int nl)
 	    } else if (nch == MKCHAR('¡')) {
 	        LOCINFO_GMCUR	gc ;
 	        cchar		*gnp = (np+1) ;
-	        int		gnl = (nl-1) ;
+		int		gnl = (nl-1) ;
 		if (gnl == 0) {
 		    rs = locinfo_groupname(lip) ;
 		    gnl = rs ;
@@ -2945,6 +3093,15 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 
 
+#if	CF_LOCJOBDNAME
+static int locinfo_jobdname(LOCINFO *lip)
+{
+	return locinfo_mdname(lip) ;
+}
+/* end subroutine (locinfo_jobdname) */
+#endif /* CF_LOCJOBDNAME */
+
+
 static int locinfo_mdname(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
@@ -2970,7 +3127,8 @@ static int locinfo_mdname(LOCINFO *lip)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/locinfo_mdname: ret rs=%d\n",rs) ;
+	    debugprintf("b_motd/locinfo_mdname: ret rs=%d len=%u\n",
+	        rs,len) ;
 #endif
 
 	return (rs >= 0) ? len : rs ;
@@ -2984,14 +3142,13 @@ static int locinfo_loadids(LOCINFO *lip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (pip == NULL) return SR_FAULT ; /* lint */
-
+	if (pip == NULL) return SR_FAULT ;
 	if (lip->gnbuf[0] == '\0') {
 	    cchar	*un = lip->un ;
 
 #if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/locinfo_loadids: un=%s\n",lip->un) ;
+	    if (DEBUGLEVEL(3))
+	        debugprintf("b_motd/locinfo_loadids: un=%s\n",lip->un) ;
 #endif
 
 	    if ((un == NULL) || (un[0] == '\0') || (un[0] == '-')) {
@@ -3022,11 +3179,20 @@ static int locinfo_loadids(LOCINFO *lip)
 	        rs = getgroupname(lip->gnbuf,gnlen,gid) ;
 	    }
 
+#if	CF_DEBUG
+	    if (DEBUGLEVEL(3)) {
+	        debugprintf("b_motd/locinfo_loadids: tar uid=%d\n",
+	            lip->uid_dirs) ;
+	        debugprintf("b_motd/locinfo_loadids: tar gid=%d\n",
+	            lip->gid_dirs) ;
+	    }
+#endif
+
 	} /* end if (needed) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
-	    debugprintf("b_issue/locinfo_loadids: ret rs=%d gn=%s\n",
+	    debugprintf("b_motd/locinfo_loadids: ret rs=%d gn=%s\n",
 	        rs,lip->gnbuf) ;
 #endif
 
@@ -3035,6 +3201,7 @@ static int locinfo_loadids(LOCINFO *lip)
 /* end subroutine (locinfo_loadids) */
 
 
+/* this runs as an independent thread */
 static int locinfo_tmpcheck(LOCINFO *lip)
 {
 	PROGINFO	*pip = lip->pip ;
@@ -3190,9 +3357,8 @@ static int locinfo_getgid(LOCINFO *lip)
 	                }
 	            } /* end if */
 
-		    rs1 = uc_free(pwbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
+		    uc_free(pwbuf) ;
+	        } /* end if (m-a) */
 	    } /* end if (getbufsize) */
 	} /* end if (needed) */
 
@@ -3234,10 +3400,10 @@ static int locinfo_termoutbegin(LOCINFO *lip,void *ofp)
 	int		rs1 ;
 	int		f_termout = FALSE ;
 	cchar		*tstr = lip->termtype ;
+	cchar		*vp ;
 
 	if (lip->f.termout || ((rs = shio_isterm(ofp)) > 0)) {
-	    int		ncols = COLUMNS ;
-	    cchar	*vp ;
+	    int	ncols = COLUMNS ;
 	    if ((vp = getourenv(pip->envv,VARCOLUMNS)) != NULL) {
 	        int	v ;
 	        rs1 = cfdeci(vp,-1,&v) ;
@@ -3298,9 +3464,9 @@ static int locinfo_termoutprint(LOCINFO *lip,void *ofp,cchar lbuf[],int llen)
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(4)) {
-	                debugprintf("b_issue/locinfo_termoutprint: ll=%u\n",
+	                debugprintf("b_motd/locinfo_termoutprint: ll=%u\n",
 	                    ll) ;
-	                debugprintf("b_issue/locinfo_termoutprint: l=>%t<\n",
+	                debugprintf("b_motd/locinfo_termoutprint: l=>%t<\n",
 	                    lp,strlinelen(lp,ll,40)) ;
 	            }
 #endif
@@ -3335,9 +3501,8 @@ int locinfo_gmcurbegin(LOCINFO *lip,LOCINFO_GMCUR *curp)
 	    lip->open.gm = (rs >= 0) ;
 	}
 
-	if (rs >= 0) {
+	if (rs >= 0)
 	    rs = grmems_curbegin(&lip->gm,&curp->gmcur) ;
-	}
 
 	return rs ;
 }
@@ -3378,7 +3543,7 @@ int locinfo_gmlook(LOCINFO *lip,LOCINFO_GMCUR *curp,cchar *gnp,int gnl)
 /* end subroutine (locinfo_gmlook) */
 
 
-int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char *ubuf,int ulen)
+int locinfo_gmread(LOCINFO *lip,LOCINFO_GMCUR *curp,char ubuf[],int ulen)
 {
 	const int	rsn = SR_NOTFOUND ;
 	int		rs ;
@@ -3406,9 +3571,8 @@ int locinfo_rncurbegin(LOCINFO *lip,LOCINFO_RNCUR *curp)
 	    lip->open.rn = (rs >= 0) ;
 	}
 
-	if (rs >= 0) {
+	if (rs >= 0)
 	    rs = sysrealname_curbegin(&lip->rn,&curp->rncur) ;
-	}
 
 	return rs ;
 }
