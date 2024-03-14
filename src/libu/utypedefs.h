@@ -299,6 +299,13 @@ typedef void (*void_f)() noex ;
 EXTERNC_end
 #endif /* TYPEDEF_VOIDF */
 
+#ifndef	TYPEDEF_SORTVCMP
+#define	TYPEDEF_SORTVCMP
+EXTERNC_begin
+typedef int (*sort_vcmp)(cvoid *,cvoid *) noex ;
+EXTERNC_end
+#endif /* TYPEDEF_SORTVCMP */
+
 #ifndef	TYPEDEF_FPERM
 #define	TYPEDEF_FPERM
 typedef mode_t	fsperm ;

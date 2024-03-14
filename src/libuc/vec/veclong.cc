@@ -1,11 +1,10 @@
 /* veclong SUPPORT */
+/* lang=C++20 */
 
 /* vector long-integer operations */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		1		/* pointer safety */
-
 
 /* revision history:
 
@@ -18,26 +17,21 @@
 
 /*******************************************************************************
 
-	These routines are used when the caller wants to store a COPY of the
-	passed element data into a vector.  These routines will copy and store
-	the copied data in the list.  The advantage is that the caller does not
-	have to keep the orginal data around in order for the list data to be
-	accessed later.  Element data (unlike string data) can contain NULL
+	These routines are used when the caller wants to store a
+	COPY of the passed element data into a vector.  These
+	routines will copy and store the copied data in the list.
+	The advantage is that the caller does not have to keep the
+	orginal data around in order for the list data to be accessed
+	later.  Element data (unlike string data) can contain nullptr
 	characters-bytes.
-
 
 *******************************************************************************/
 
-
-#define	VECLONG_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -47,30 +41,36 @@
 /* local defines */
 
 
+/* external subroutines */
+
+extern "C" {
+    int		veclong_add(veclong *,VECLONG_TYPE) noex ;
+}
+
+
 /* forward references */
 
-int		veclong_add(veclong *,VECLONG_TYPE) ;
+static int	veclong_addval(veclong *op,VECLONG_TYPE) noex ;
+static int	veclong_extend(veclong *,int) noex ;
+static int	veclong_setopts(veclong *,int) noex ;
+static int	veclong_insertval(veclong *,int,VECLONG_TYPE) noex ;
+static int	veclong_extrange(veclong *,int) noex ;
 
-static int	veclong_addval(veclong *op,VECLONG_TYPE) ;
-static int	veclong_extend(veclong *,int) ;
-static int	veclong_setopts(veclong *,int) ;
-static int	veclong_insertval(veclong *,int,VECLONG_TYPE) ;
-static int	veclong_extrange(veclong *,int) ;
-
-static int	deflongcmp(const VECLONG_TYPE *,const VECLONG_TYPE *) ;
+static int	deflongcmp(const VECLONG_TYPE *,const VECLONG_TYPE *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int veclong_start(veclong *op,int n,int opts)
-{
+int veclong_start(veclong *op,int n,int opts) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (n < 0)
 	    n = VECLONG_DEFENTS ;
@@ -86,22 +86,20 @@ int veclong_start(veclong *op,int n,int opts)
 }
 /* end subroutine (veclong_start) */
 
-
-int veclong_finish(veclong *op)
-{
+int veclong_finish(veclong *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (op->va != NULL) {
+	if (op->va != nullptr) {
 	    rs1 = uc_free(op->va) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->va = NULL ;
+	    op->va = nullptr ;
 	}
 
 	op->c = 0 ;
@@ -113,11 +111,8 @@ int veclong_finish(veclong *op)
 }
 /* end subroutine (veclong_finish) */
 
-
-int veclong_add(veclong *op,VECLONG_TYPE v)
-{
-
-	if (op == NULL) return SR_FAULT ;
+int veclong_add(veclong *op,VECLONG_TYPE v) noex {
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -127,13 +122,11 @@ int veclong_add(veclong *op,VECLONG_TYPE v)
 }
 /* end subroutine (veclong_add) */
 
-
-extern int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll)
-{
+int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -147,13 +140,11 @@ extern int veclong_addlist(veclong *op,const VECLONG_TYPE *lp,int ll)
 }
 /* end subroutine (veclong_addlist) */
 
-
-int veclong_adduniq(veclong *op,VECLONG_TYPE v)
-{
+int veclong_adduniq(veclong *op,VECLONG_TYPE v) noex {
 	int		rs = INT_MAX ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -173,12 +164,10 @@ int veclong_adduniq(veclong *op,VECLONG_TYPE v)
 }
 /* end subroutine (veclong_adduniq) */
 
-
-int veclong_insert(veclong *op,int ii,VECLONG_TYPE val)
-{
+int veclong_insert(veclong *op,int ii,VECLONG_TYPE val) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -201,12 +190,10 @@ int veclong_insert(veclong *op,int ii,VECLONG_TYPE val)
 }
 /* end subroutine (veclong_insert) */
 
-
-int veclong_assign(veclong *op,int ii,VECLONG_TYPE val) 
-{
+int veclong_assign(veclong *op,int ii,VECLONG_TYPE val)  noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -229,12 +216,10 @@ int veclong_assign(veclong *op,int ii,VECLONG_TYPE val)
 }
 /* end subroutine (veclong_assign) */
 
-
-int veclong_resize(veclong *op,int n)
-{
+int veclong_resize(veclong *op,int n) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -258,12 +243,10 @@ int veclong_resize(veclong *op,int n)
 }
 /* end subroutine (veclong_resize) */
 
-
-int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp)
-{
+int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -273,28 +256,25 @@ int veclong_getval(veclong *op,int i,VECLONG_TYPE *rp)
 	    rs = SR_NOTFOUND ;
 	}
 
-	if (rp != NULL) {
-	    *rp = (rs >= 0) ? op->va[i] : NULL ;
+	if (rp) {
+	    *rp = (rs >= 0) ? op->va[i] : long(-1) ;
 	}
 
 	return rs ;
 }
 /* end subroutine (veclong_getval) */
 
-
-/* for compatibility with other objects */
-int veclong_mkvec(veclong *op,VECLONG_TYPE *va)
-{
+int veclong_mkvec(veclong *op,VECLONG_TYPE *va) noex {
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (va != NULL) {
-	    const int	n = op->i ;
+	if (va != nullptr) {
+	    cint	n = op->i ;
 	    int		i ;
 	    int		v ;
 	    for (i = 0 ; i < n ; i += 1) {
@@ -309,36 +289,30 @@ int veclong_mkvec(veclong *op,VECLONG_TYPE *va)
 }
 /* end subroutine (veclong_mkvec) */
 
-
-int veclong_curbegin(veclong *op,veclong_cur *curp)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+int veclong_curbegin(veclong *op,veclong_cur *curp) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 	curp->i = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (veclong_curend) */
 
-
-int veclong_curend(veclong *op,veclong_cur *curp)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+int veclong_curend(veclong *op,veclong_cur *curp) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 	curp->i = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (veclong_end) */
 
-
-int veclong_enum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp)
-{
+int veclong_enum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		v = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 	i = curp->i ;
 	if ((i >= 0) && (i < op->i)) {
@@ -347,18 +321,15 @@ int veclong_enum(veclong *op,veclong_cur *curp,VECLONG_TYPE *rp)
 	} else {
 	    rs = SR_NOTFOUND ;
 	}
-	if (rp != NULL) *rp = (rs >= 0) ? v : INT_MIN ;
+	if (rp != nullptr) *rp = (rs >= 0) ? v : INT_MIN ;
 	return rs ;
 }
 /* end subroutine (veclong_enum) */
 
+int veclong_del(veclong *op,int i) noex {
+	int		f_fi = false ;
 
-/* delete an element from the list */
-int veclong_del(veclong *op,int i)
-{
-	int		f_fi = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -379,7 +350,7 @@ int veclong_del(veclong *op,int i)
 	    if (i == (op->i - 1))
 	        op->i -= 1 ;
 
-	    f_fi = TRUE ;
+	    f_fi = true ;
 
 	} else if (op->f.issorted || op->f.oordered) {
 
@@ -398,7 +369,7 @@ int veclong_del(veclong *op,int i)
 	        if (i == (op->i - 1))
 	            op->i -= 1 ;
 
-	        f_fi = TRUE ;
+	        f_fi = true ;
 
 	    } /* end if */
 
@@ -408,7 +379,7 @@ int veclong_del(veclong *op,int i)
 
 	        (op->va)[i] = (op->va)[op->i - 1] ;
 	        (op->va)[--op->i] = 0 ;
-	        op->f.issorted = FALSE ;
+	        op->f.issorted = false ;
 
 	    } else {
 
@@ -416,7 +387,7 @@ int veclong_del(veclong *op,int i)
 	        if (i == (op->i - 1))
 	            op->i -= 1 ;
 
-	        f_fi = TRUE ;
+	        f_fi = true ;
 
 	    } /* end if */
 
@@ -426,21 +397,12 @@ int veclong_del(veclong *op,int i)
 	    op->fi = i ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("veclong_del: ret count=%d index=%d\n",
-	    op->c,op->i) ;
-#endif
-
 	return op->c ;
 }
 /* end subroutine (veclong_del) */
 
-
-/* return the count of the number of items in this list */
-int veclong_count(veclong *op)
-{
-
-	if (op == NULL) return SR_FAULT ;
+int veclong_count(veclong *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -450,22 +412,19 @@ int veclong_count(veclong *op)
 }
 /* end subroutine (veclong_count) */
 
-
-/* sort the entries in the list */
-int veclong_sort(veclong *op,int (*fcmp)())
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (fcmp == NULL) return SR_FAULT ;
+int veclong_sort(veclong *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (! op->f.issorted) {
-	    op->f.issorted = TRUE ;
+	    op->f.issorted = true ;
 	    if (op->c > 1) {
-	        qsort(op->va,op->i,sizeof(VECLONG_TYPE),fcmp) ;
+		cint		esz = sizeof(VECLONG_TYPE) ;
+	        sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
+	        qsort(op->va,op->i,esz,scmp) ;
 	    }
 	}
 
@@ -473,44 +432,36 @@ int veclong_sort(veclong *op,int (*fcmp)())
 }
 /* end subroutine (veclong_sort) */
 
-
-/* set the object to indicate it is sorted (even if it isn't) */
-int veclong_setsorted(veclong *op)
-{
-
-	if (op == NULL) return SR_FAULT ;
+int veclong_setsorted(veclong *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	op->f.issorted = TRUE ;
+	op->f.issorted = true ;
 	return op->c ;
 }
 /* end subroutine (veclong_setsorted) */
 
-
-/* find an entry in the vector list by memory comparison of entry elements */
-int veclong_find(veclong *op,VECLONG_TYPE v)
-{
-	LONG		*rpp2 ;
+int veclong_find(veclong *op,VECLONG_TYPE v) noex {
 	int		rs = SR_OK ;
-	int		(*fcmp)(const void *,const void *) ;
-	int		i ;
+	int		i = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 #endif
 
 	if (op->f.issorted) {
-	    const int	esz = sizeof(VECLONG_TYPE) ;
-	    fcmp = (int (*)(const void *,const void *)) deflongcmp ;
-	    rpp2 = (LONG *) bsearch(&v,op->va,op->i,esz,fcmp) ;
+	    long	*rpp2 ;
+	    cint	esz = sizeof(VECLONG_TYPE) ;
+	    sort_vcmp	scmp = sort_vcmp(deflongcmp) ;
+	    rpp2 = (long *) bsearch(&v,op->va,op->i,esz,scmp) ;
 
 	    rs = SR_NOTFOUND ;
-	    if (rpp2 != NULL) {
+	    if (rpp2 != nullptr) {
 	        i = rpp2 - op->va ;
 	        rs = SR_OK ;
 	    }
@@ -528,12 +479,10 @@ int veclong_find(veclong *op,VECLONG_TYPE v)
 }
 /* end subroutine (veclong_find) */
 
-
-int veclong_match(veclong *op,VECLONG_TYPE v)
-{
+int veclong_match(veclong *op,VECLONG_TYPE v) noex {
 	int		rs ;
 	if ((rs = veclong_find(op,v)) >= 0) {
-	    rs = TRUE ;
+	    rs = true ;
 	} else if (rs == SR_NOTFOUND) {
 	    rs = SR_OK ;
 	}
@@ -541,13 +490,9 @@ int veclong_match(veclong *op,VECLONG_TYPE v)
 }
 /* end subroutine (veclong_match) */
 
-
-/* get the vector array address */
-int veclong_getvec(VECLONG *op,VECLONG_TYPE **rpp)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
+int veclong_getvec(VECLONG *op,VECLONG_TYPE **rpp) noex {
+	if (op == nullptr) return SR_FAULT ;
+	if (rpp == nullptr) return SR_FAULT ;
 
 #if	CF_SAFE
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
@@ -558,16 +503,13 @@ int veclong_getvec(VECLONG *op,VECLONG_TYPE **rpp)
 }
 /* end subroutine (veclong_getvec) */
 
-
-/* audit the object */
-int veclong_audit(VECLONG *op)
-{
+int veclong_audit(VECLONG *op) noex {
 	long		v = 0 ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != VECLONG_MAGIC) return SR_NOTOPEN ;
 
@@ -584,43 +526,24 @@ int veclong_audit(VECLONG *op)
 
 /* private subroutines */
 
-
-static int veclong_setopts(VECLONG *op,int options)
-{
-
-	memset(&op->f,0,sizeof(VECLONG_FL)) ;
-
-	if (options & VECLONG_OREUSE)
-	    op->f.oreuse = 1 ;
-
-	if (options & VECLONG_OSWAP)
-	    op->f.oswap = 1 ;
-
-	if (options & VECLONG_OSTATIONARY)
-	    op->f.ostationary = 1 ;
-
-	if (options & VECLONG_OCOMPACT)
-	    op->f.ocompact = 1 ;
-
-	if (options & VECLONG_OSORTED)
-	    op->f.osorted = 1 ;
-
-	if (options & VECLONG_OORDERED)
-	    op->f.oordered = 1 ;
-
-	if (options & VECLONG_OCONSERVE)
-	    op->f.oconserve = 1 ;
-
-	return SR_OK ;
+static int veclong_setopts(VECLONG *op,int options) noex {
+	int		rs = SR_OK ;
+	op->f = {} ;
+	if (options & VECLONG_OREUSE) op->f.oreuse = 1 ;
+	if (options & VECLONG_OSWAP) op->f.oswap = 1 ;
+	if (options & VECLONG_OSTATIONARY) op->f.ostationary = 1 ;
+	if (options & VECLONG_OCOMPACT) op->f.ocompact = 1 ;
+	if (options & VECLONG_OSORTED) op->f.osorted = 1 ;
+	if (options & VECLONG_OORDERED) op->f.oordered = 1 ;
+	if (options & VECLONG_OCONSERVE) op->f.oconserve = 1 ;
+	return rs ;
 }
 /* end subroutine (veclong_setopts) */
 
-
-int veclong_addval(veclong *op,VECLONG_TYPE v)
-{
+int veclong_addval(veclong *op,VECLONG_TYPE v) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ; /* ¥ GCC false complaint */
-	int		f_done = FALSE ;
+	int		f_done = false ;
 	int		f ;
 
 /* can we fit this new entry within the existing extent? */
@@ -636,7 +559,7 @@ int veclong_addval(veclong *op,VECLONG_TYPE v)
 	    if (i < op->i) {
 	        (op->va)[i] = v ;
 	        op->fi = (i + 1) ;
-	        f_done = TRUE ;
+	        f_done = true ;
 	    } else {
 	        op->fi = i ;
 	    }
@@ -665,23 +588,20 @@ int veclong_addval(veclong *op,VECLONG_TYPE v)
 
 	if (rs >= 0) {
 	    op->c += 1 ;		/* increment list count */
-	    op->f.issorted = FALSE ;
+	    op->f.issorted = false ;
 	}
 
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (veclong_addval) */
 
-
-static int veclong_extend(veclong *op,int amount)
-{
+static int veclong_extend(veclong *op,int amount) noex {
 	int		rs = SR_OK ;
-
 	if (amount > 0) {
-	    const int		esize = sizeof(VECLONG_TYPE) ;
+	    cint		esize = sizeof(VECLONG_TYPE) ;
 	    int			nn, size ;
 	    VECLONG_TYPE	*va ;
-	    if (op->va == NULL) {
+	    if (op->va == nullptr) {
 	        nn = MAX(amount,VECLONG_DEFENTS) ;
 	        size = ((nn + 1) * esize) ;
 	        rs = uc_malloc(size,&va) ;
@@ -700,10 +620,7 @@ static int veclong_extend(veclong *op,int amount)
 }
 /* end subroutine (veclong_extend) */
 
-
-static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val)
-{
-
+static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val) noex {
 	if (ii < op->i) {
 	    int		i, j ;
 
@@ -733,17 +650,15 @@ static int veclong_insertval(veclong *op,int ii,VECLONG_TYPE val)
 
 	op->va[ii] = val ;
 	op->c += 1 ;
-	op->f.issorted = FALSE ;
+	op->f.issorted = false ;
 
 	return ii ;
 }
 /* end subroutine (veclong_insertval) */
 
-
-static int veclong_extrange(veclong *op,int n)
-{
+static int veclong_extrange(veclong *op,int n) noex {
 	if (n > op->i) {
-		const int nsz = ((n-op->i)*sizeof(VECLONG_TYPE)) ;
+		cint nsz = ((n-op->i)*sizeof(VECLONG_TYPE)) ;
 		memset((op->va+op->i),0,nsz) ;
 	    op->i = n ;
 	    op->va[op->i] = LONG_MIN ;
@@ -752,10 +667,7 @@ static int veclong_extrange(veclong *op,int n)
 }
 /* end subroutine (veclong_extrange) */
 
-
-static int deflongcmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE  *l2p)
-{
-
+static int deflongcmp(const VECLONG_TYPE *l1p,const VECLONG_TYPE  *l2p) noex {
 	return (*l1p - *l2p) ;
 }
 /* end subroutine (deflongcmp) */
