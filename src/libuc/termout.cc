@@ -108,7 +108,6 @@
 #define	TA_MALL		(TA_MBASE|TA_MOFFIND|TA_MDOUBLE|TA_MREV|TA_MFONTS)
 
 /* source graphic rendition specifier characters */
-
 #define	GRCH_BOLD	'*'		/* bold */
 #define	GRCH_UNDER	'_'		/* underline */
 #define	GRCH_BLINK	':'		/* blinking */
@@ -117,7 +116,6 @@
 #define	GRCH_WIDE	'-'		/* double-wide */
 
 /* our graphic renditions */
-
 #define	GR_VBOLD	0		/* indicate BOLD */
 #define	GR_VUNDER	1		/* indicate UNDER */
 #define	GR_VBLINK	2		/* indicate BLINK */
@@ -228,15 +226,25 @@ class termout_line {
 
 /* forward references */
 
-static int	termout_process(TERMOUT *,cchar *,int) noex ;
-static int	termout_loadline(TERMOUT *,int,int) noex ;
+template<typename ... Args>
+static int termout_magic(termout *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (termout_magic) */
 
-static int	termout_loadgr(TERMOUT *,string &,int,int) noex ;
-static int	termout_loadch(TERMOUT *,string &,int,int) noex ;
-static int	termout_loadcs(TERMOUT *,string &,int,cchar *,int) noex ;
+static int	termout_process(termout *,cchar *,int) noex ;
+static int	termout_loadline(termout *,int,int) noex ;
+
+static int	termout_loadgr(termout *,string &,int,int) noex ;
+static int	termout_loadch(termout *,string &,int,int) noex ;
+static int	termout_loadcs(termout *,string &,int,cchar *,int) noex ;
 
 static int	gettermattr(cchar *,int) noex ;
-static int	isspecial(SCH *,uchar,uchar) noex ;
+static bool	isspecial(SCH *,uchar,uchar) noex ;
 
 
 /* local variables */
@@ -262,7 +270,7 @@ static constexpr struct termout_terminfo	terms[] = {
 	{ "vt520", TA_MALL },
 	{ "vt530", TA_MALL },
 	{ "vt540", TA_MALL },
-	{ NULL, 0 }
+	{ nullptr, 0 }
 } ; /* end struct (termout_terminfo) */
 
 static constexpr struct termout_sch	specials[] = {
@@ -375,99 +383,80 @@ static constexpr struct termout_sch	specials[] = {
 
 /* exported subroutines */
 
-int termout_start(TERMOUT *op,cchar *tstr,int tlen,int ncols) noex {
-	int		rs = SR_OK ;
-	vector<GCH>	*cvp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (ncols <= 0) return SR_INVALID ;
-
-	memset(op,0,sizeof(TERMOUT)) ;
-	op->ncols = ncols ;
-	op->termattr = gettermattr(tstr,tlen) ;
-
-	if ((cvp = new(nothrow) vector<GCH>) != NULL) {
-	    op->cvp = (void *) cvp ;
-	    op->magic = TERMOUT_MAGIC ;
-	} else
-	    rs = SR_NOMEM ;
-
+int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
+	int		rs = SR_FAULT ;
+	if (op && tstr) {
+	    rs = SR_INVALID ;
+	    memclear(op) ;		/* <- dangerous */
+	    if (ncols > 0) {
+	        vector<GCH>	*cvp ;
+		rs = SR_NOMEM ;
+	        op->ncols = ncols ;
+	        op->termattr = gettermattr(tstr,tlen) ;
+	        if ((cvp = new(nothrow) vector<GCH>) != nullptr) {
+	    	    vector<string>	*lvp ;
+	            op->cvp = voidp(cvp) ;
+	            if ((lvp = new(nothrow) vector<string>) != nullptr) {
+	                op->lvp = voidp(lvp) ;
+	                op->magic = TERMOUT_MAGIC ;
+	            } /* end if (new-vector<string>) */
+		    if (rs < 0) {
+			delete lvp ;
+			op->lvp = nullptr ;
+		    }
+		} /* end if (new-vector<GCH>) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (termout_start) */
 
-int termout_finish(TERMOUT *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != TERMOUT_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lvp != NULL) {
-	    vector<string> *lvp = (vector<string> *) op->lvp ;
-	    delete lvp ; /* calls all 'string' destructors */
-	    op->lvp = NULL ;
-	}
-
-	if (op->cvp != NULL) {
-	    vector<GCH> *cvp = (vector<GCH> *) op->cvp ;
-	    delete cvp ;
-	    op->cvp = NULL ;
-	}
-
-	op->magic = 0 ;
+int termout_finish(termout *op) noex {
+	int		rs ;
+	if ((rs = termout_magic(op)) >= 0) {
+	    if (op->lvp) {
+	        vector<string> *lvp = (vector<string> *) op->lvp ;
+	        delete lvp ; /* calls all 'string' destructors */
+	        op->lvp = nullptr ;
+	    }
+	    if (op->cvp) {
+	        vector<GCH> *cvp = (vector<GCH> *) op->cvp ;
+	        delete cvp ;
+	        op->cvp = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termout_finish) */
 
-int termout_load(TERMOUT *op,cchar *sbuf,int slen) noex {
-	vector<string>	*lvp ;
-	int		rs = SR_OK ;
+int termout_load(termout *op,cchar *sbuf,int slen) noex {
+	int		rs ;
 	int		ln = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (sbuf == NULL) return SR_FAULT ;
-
-	if (slen < 0) slen = strlen(sbuf) ;
-
-	if ((lvp = (vector<string> *) op->lvp) == NULL) {
-	    if ((lvp = new(nothrow) vector<string>) != NULL) {
-	        op->lvp = lvp ;
-	    } else
-		rs = SR_NOMEM ;
-	}
-
-/* process given string into the staging area */
-
-	if (rs >= 0) {
+	if ((rs = termout_magic(op,sbuf)) >= 0) {
+	    if (slen < 0) slen = strlen(sbuf) ;
 	    rs = termout_process(op,sbuf,slen) ;
 	    ln = rs ;
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termout_load) */
 
-int termout_getline(TERMOUT *op,int i,cchar **lpp) noex {
-	vector<string>	*lvp ;
-	uint		ui = i ;
-	int		rs = SR_OK ;
+int termout_getline(termout *op,int i,cchar **lpp) noex {
+	int		rs ;
 	int		ll = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (lpp == NULL) return SR_FAULT ;
-
-	if ((lvp = ((vector<string> *) op->lvp)) != NULL) {
-	    if (ui < lvp->size()) {
-	        *lpp = lvp->at(i).c_str() ;
-	        ll = lvp->at(i).size() ;
-	    } else {
-	        rs = SR_NOTFOUND ;
-	    }
-	} else {
+	if ((rs = termout_magic(op,lpp)) >= 0) {
+	    vector<string>	*lvp ;
 	    rs = SR_BUGCHECK ;
-	}
+	    if ((lvp = ((vector<string> *) op->lvp)) != nullptr) {
+	        csize	ui = size_t(i) ;
+		rs = SR_NOTFOUND ;
+	        if (ui < lvp->size()) {
+	            *lpp = lvp->at(i).c_str() ;
+	            ll = lvp->at(i).size() ;
+	        } /* end if (found) */
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (termout_getline) */
@@ -475,7 +464,7 @@ int termout_getline(TERMOUT *op,int i,cchar **lpp) noex {
 
 /* private subroutines */
 
-static int termout_process(TERMOUT *op,cchar *sbuf,int slen) noex {
+static int termout_process(termout *op,cchar *sbuf,int slen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
 	int		ch ;
@@ -584,7 +573,7 @@ static int termout_process(TERMOUT *op,cchar *sbuf,int slen) noex {
 }
 /* end subroutine (termout_process) */
 
-static int termout_loadline(TERMOUT *op,int ln,int nmax) noex {
+static int termout_loadline(termout *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	vector<string>	*lvp = (vector<string> *) op->lvp ;
 	int		rs = SR_OK ;
@@ -592,12 +581,11 @@ static int termout_loadline(TERMOUT *op,int ln,int nmax) noex {
 	lvp->resize(ln+1) ;		/* instantiates new 'string' */
 	{
 	    int		ft, ch, gr ;
-	    int		i ;
 	    int		pgr = 0 ; /* holds Previous-Graphic-Rendition */
 	    string	&line = lvp->at(ln) ;
 	    line.reserve(120) ;
 	    line.clear() ;
-	    for (i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
 		ft = cvp->at(i).ft ; /* font */
 		ch = cvp->at(i).ch ; /* character */
 		gr = cvp->at(i).gr ; /* graphic-rendition */
@@ -619,7 +607,7 @@ static int termout_loadline(TERMOUT *op,int ln,int nmax) noex {
 }
 /* end subroutine (termout_loadline) */
 
-static int termout_loadgr(TERMOUT *op,string &line,int pgr,int gr) noex {
+static int termout_loadgr(termout *op,string &line,int pgr,int gr) noex {
 	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		n ;
@@ -628,7 +616,7 @@ static int termout_loadgr(TERMOUT *op,string &line,int pgr,int gr) noex {
 	char		*grbuf ;
 	n = flbsi(grmask) + 1 ;
 	size = ((2*n)+1+1) ; /* size according to algorithm below */
-	if ((grbuf = new(nothrow) char[size]) != NULL) {
+	if ((grbuf = new(nothrow) char[size]) != nullptr) {
 	    int		gl = 0 ;
 	    int		ogr = pgr ;
 	    int		bgr = pgr ;
@@ -702,7 +690,7 @@ static int termout_loadgr(TERMOUT *op,string &line,int pgr,int gr) noex {
 }
 /* end subroutine (termout_loadgr) */
 
-static int termout_loadcs(TERMOUT *op,string &line,int n,cc *pp,int pl) noex {
+static int termout_loadcs(termout *op,string &line,int n,cc *pp,int pl) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
@@ -749,7 +737,7 @@ static int termout_loadcs(TERMOUT *op,string &line,int n,cc *pp,int pl) noex {
 }
 /* end subroutine (termout_loadcs) */
 
-static int termout_loadch(TERMOUT *op,string &line,int ft,int ch) noex {
+static int termout_loadch(termout *op,string &line,int ft,int ch) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (op) {
@@ -785,7 +773,7 @@ static int termout_loadch(TERMOUT *op,string &line,int ft,int ch) noex {
 
 static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
-	if (tstr != NULL) {
+	if (tstr != nullptr) {
 	    if (tlen < 0) tlen = strlen(tstr) ;
 	    for (int i = 0 ; terms[i].name ; i += 1) {
 	        cchar	*sp = terms[i].name ;
@@ -794,14 +782,14 @@ static int gettermattr(cchar *tstr,int tlen) noex {
 		    break ;
 	        }
 	    } /* end for */
-	} /* end if (non-NULL terminal-string) */
+	} /* end if (non-null terminal-string) */
 	return ta ;
 }
 /* end subroutine (gettermattr) */
 
-static int isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
+static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 	int		i ; /* used afterwards */
-	int		f = false ;
+	bool		f = false ;
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
 	    f = ((specials[i].ch1 == ch1) && (specials[i].ch2 == ch2)) ;
 	    if (f) break ;

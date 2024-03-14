@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int comparse_magic(comparse *op,Args ... args) noex {
+static inline int termout_magic(termout *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == COMPARSE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (comparse_magic) */
+/* end subroutine (termout_magic) */
