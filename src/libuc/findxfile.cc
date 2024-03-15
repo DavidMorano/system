@@ -1,10 +1,8 @@
-/* findxfile */
+/* findxfile SUPPORT */
+/* lang=C++20 */
 
 /* find an executable file */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 
 /* revision history:
@@ -18,45 +16,46 @@
 
 /*******************************************************************************
 
-        This subroutine is used to find an executable file using the existing
-        PATH environment variable.
+	Name:
+	findxfile
+
+	Description:
+	This subroutine is used to find an executable file using
+	the existing PATH environment variable.
 
 	Synopsis:
-
-	int findxfile(idp,buf,pn)
-	IDS		*idp ;
-	char		buf[] ;
-	const char	pn[] ;
+	int findxfile(ids *idp,char *buf,cchar *pn) noex
 
 	Arguments:
-
 	idp		pointer to IDS object
 	buf		buffer to receive resulting path
 	pn		program-name string to search for
 
 	Returns:
-
 	>0		length of found path
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<vecstr.h>
+#include	<mkpathx.h>
+#include	<pathclean.h>
+#include	<getprogpath.h>
+#include	<xfile.h>
 #include	<localmisc.h>
+
+#include	"findxfile.h"
 
 
 /* local defines */
@@ -68,28 +67,13 @@
 #define	NENTS	40		/* initial number path components */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,void *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	xfile(IDS *,const char *) ;
-extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
-extern int	vecstr_adduniq(VECSTR *,cchar *,int) ;
-extern int	vecstr_addpath(VECSTR *,cchar *,int) ;
-extern int	vecstr_addcspath(VECSTR *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -104,39 +88,38 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int findxfile(IDS *idp,char *rbuf,cchar *pn)
-{
-	int		rs = SR_NOENT ;
+int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		cl ;
 	int		len = 0 ;
-	const char	*path = getenv(VARPATH) ;
-
+	static cchar	*path = getenv(VARPATH) ;
+	if (idp && rbuf && pn) {
+	rs = SR_NOENT ;
 	rbuf[0] = '\0' ;
-	if (path != NULL) {
-	    VECSTR	plist ;
-	    const int	ne = NENTS ;
-	    int		f_pwd = FALSE ;
+	if (path != nullptr) {
+	    vecstr	plist ;
+	    cint	ne = NENTS ;
+	    bool	f_pwd = false ;
 
 	    if ((rs = vecstr_start(&plist,ne,0)) >= 0) {
+		int	cl ;
 		cchar	*tp ;
 		cchar	*sp = path ;
 	        char	cbuf[MAXPATHLEN + 1] ;
 
-	        while ((tp = strpbrk(sp,":;")) != NULL) {
-
+	        while ((tp = strpbrk(sp,":;")) != nullptr) {
 	            if ((tp-sp) == 0) {
-	                f_pwd = TRUE ;
+	                f_pwd = true ;
 		    }
-
 	            if ((rs = pathclean(cbuf,sp,(tp-sp))) >= 0) {
 	                cl = rs ;
 	                rs = vecstr_adduniq(&plist,cbuf,cl) ;
 	            }
-
 	            sp = (tp + 1) ;
 	            if (rs < 0) break ;
 	        } /* end while */
@@ -166,7 +149,7 @@ int findxfile(IDS *idp,char *rbuf,cchar *pn)
 		len = rs ;
 	    }
 	} /* end if (non-null) */
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (findxfile) */

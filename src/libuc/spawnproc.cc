@@ -77,7 +77,7 @@
 #include	<ids.h>
 #include	<sigign.h>
 #include	<mkpathx.h>
-#include	<sn.h>
+#include	<snx.h>
 #include	<sfx.h>
 #include	<xperm.h>
 #include	<exitcodes.h>

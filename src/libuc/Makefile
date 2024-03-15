@@ -770,7 +770,7 @@ envhelp.o:		envhelp.cc envhelp.h
 mkpr.o:			mkpr.cc
 mkprogenv.o:		mkprogenv.cc mkprogenv.h
 
-spawner.o:		spawner.c spawner.h
+spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
 

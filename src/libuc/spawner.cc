@@ -1,10 +1,9 @@
 /* spawner SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* spawn a local program */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_ENVSORT	0		/* sort the environment? */
 
 /* revision history:
@@ -68,14 +67,22 @@
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<unistd.h>
-#include	<signal.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<ugetpid.h>
+#include	<ucgetpid.h>		/* |uc_getpid(3uc)| */
 #include	<ids.h>
 #include	<sigign.h>
+#include	<xperm.h>
+#include	<xfile.h>
+#include	<getpwd.h>
+#include	<snx.h>
+#include	<sfx.h>
+#include	<mkpathx.h>
+#include	<isnot.h>
+#include	<iserror.h>
 #include	<localmisc.h>
 #include	<exitcodes.h>
 
@@ -108,37 +115,22 @@
 #define	VARPATH		"PATH"
 #endif
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
+#ifndef	nullptrFNAME
+#define	nullptrFNAME	"/dev/null"
 #endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snshellunder(char *,int,pid_t,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	matkeystr(const char **,const char *,int) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	vstrkeycmp(const void **,const void **) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	getpwd(char *,int) ;
-extern int	dupup(int,int) ;
-extern int	sigignores(const int *) ;
-extern int	sigdefaults(const int *) ;
-extern int	findxfile(IDS *,char *,const char *) ;
-extern int	xfile(IDS *,const char *) ;
-extern int	isIOError(int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
+extern int	sigignores(cint *) ;
+extern int	sigdefaults(cint *) ;
+extern int	findxfile(ids *,char *,cchar *) ;
 
 
 /* external variables */
@@ -172,11 +164,11 @@ struct spawner_cmd {
 } ;
 
 
-/* forward reference */
+/* forward references */
 
 int		spawner_fddup2(SPAWNER *,int,int) ;
 
-static int	child(SPAWNER *,SCMD **,const char **,const char **) ;
+static int	child(SPAWNER *,SCMD **,cchar **,cchar **) ;
 
 static int	procparent(SCMD **) ;
 static int	defaultfds(SCMD **) ;
@@ -188,24 +180,20 @@ static int	findprog(char *,char *,cchar *) ;
 static int	isUsed(SCMD **,int) ;
 static int	isChildFD(int) ;
 
-#if	CF_DEBUGS
-static int showdev(int) ;
-#endif
-
 
 /* local variables */
 
-static const char	*envbads[] = {
+static constexpr cchar	*envbads[] = {
 	"_",
 	"_A0",
 	"_EF",
 	"A__z",
 	"RANDOM",
 	"SECONDS",
-	NULL
+	nullptr
 } ;
 
-static const int	sigigns[] = {
+static constexpr int	sigigns[] = {
 	SIGTERM,
 	SIGINT,
 	SIGHUP,
@@ -217,7 +205,7 @@ static const int	sigigns[] = {
 	0
 } ;
 
-static const int	sigdefs[] = {
+static constexpr int	sigdefs[] = {
 	SIGQUIT,
 	SIGTERM,
 	SIGINT,
@@ -225,12 +213,12 @@ static const int	sigdefs[] = {
 	0
 } ;
 
-static const int	sigouts[] = {
+static constexpr int	sigouts[] = {
 	SIGTTOU,
 	0
 } ;
 
-static const struct mapex	mapexs[] = {
+static constexpr struct mapex	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -251,6 +239,9 @@ static const struct mapex	mapexs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
@@ -259,24 +250,8 @@ int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 	char		pwd[MAXPATHLEN + 1] = { 0 } ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("spawner: fname=%s\n",fname) ;
-	if (argv != NULL) {
-	    int	i ;
-	    for (i = 0 ; argv[i] != NULL ; i += 1) {
-	        debugprintf("spawner: argv[%u]=%s\n",i,argv[i]) ;
-	    }
-	}
-	if (envv != NULL) {
-	    int	i ;
-	    for (i = 0 ; envv[i] != NULL ; i += 1) {
-	        debugprintf("spawner: envv[%u]=%s\n",i,envv[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
+	if (op == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 /* check for bad input */
 
@@ -293,7 +268,7 @@ int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 	        efname = pbuf ;
 	    }
 	} else {
-	    rs = perm(fname,-1,-1,NULL,X_OK) ;
+	    rs = perm(fname,-1,-1,nullptr,X_OK) ;
 	}
 
 	if (rs >= 0) {
@@ -314,7 +289,7 @@ int spawner_start(SPAWNER *op,cchar *fname,mainv argv,mainv envv) noex {
 	        } /* end if (vecobj_start) */
 	        if (rs < 0) {
 	            uc_free(op->execfname) ;
-	            op->execfname = NULL ;
+	            op->execfname = nullptr ;
 	        }
 	    } /* end if (uc_mallocstrw) */
 	} /* end if (ok) */
@@ -328,11 +303,11 @@ int spawner_finish(SPAWNER *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if ((rs1 = vecobj_getvec(&op->cmds,&cv)) >= 0) {
 	    int	i ;
-	    for (i = 0 ; cv[i] != NULL ; i += 1) {
+	    for (i = 0 ; cv[i] != nullptr ; i += 1) {
 	        SCMD	*cmdp = cv[i] ;
 	        switch (cmdp->cmd) {
 	        case cmd_fdcreate:
@@ -343,10 +318,10 @@ int spawner_finish(SPAWNER *op) noex {
 	}
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->execfname != NULL) {
+	if (op->execfname != nullptr) {
 	    rs1 = uc_free(op->execfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->execfname = NULL ;
+	    op->execfname = nullptr ;
 	}
 
 	rs1 = envhelp_finish(&op->env) ;
@@ -359,20 +334,16 @@ int spawner_finish(SPAWNER *op) noex {
 }
 /* end subroutine (spawner_finish) */
 
-
-int spawner_setsid(SPAWNER *op)
-{
-	if (op == NULL) return SR_FAULT ;
+int spawner_setsid(SPAWNER *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 	if (op->opts & SPAWNER_OSETPGRP) return SR_INVALID ;
 	op->opts |= SPAWNER_OSETSID ;
 	return SR_OK ;
 }
 /* end subroutine (spawner_setsid) */
 
-
-int spawner_setpgrp(SPAWNER *op,pid_t pgrp)
-{
-	if (op == NULL) return SR_FAULT ;
+int spawner_setpgrp(SPAWNER *op,pid_t pgrp) noex {
+	if (op == nullptr) return SR_FAULT ;
 	if (pgrp < 0) return SR_INVALID ;
 	if (op->opts & SPAWNER_OSETSID) return SR_INVALID ;
 	op->opts |= SPAWNER_OSETPGRP ;
@@ -381,40 +352,34 @@ int spawner_setpgrp(SPAWNER *op,pid_t pgrp)
 }
 /* end subroutine (spawner_setpgrp) */
 
-
-int spawner_setctty(SPAWNER *op,int fdterm,pid_t pgrp)
-{
+int spawner_setctty(SPAWNER *op,int fdterm,pid_t pgrp) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (pgrp < 0) return SR_INVALID ;
 
 	op->pgrp = pgrp ;
-
 	if ((rs = dupup(fdterm,3)) >= 0) {
-	    SCMD	sc ;
-	    int		nfd = rs ;
-
+	    SCMD	sc{} ;
+	    cint	nfd = rs ;
 	    sc.cmd = cmd_setctty ;
 	    sc.pfd = nfd ;
 	    sc.cfd = -1 ;
 	    rs = vecobj_add(&op->cmds,&sc) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        u_close(nfd) ;
-
+	    }
 	} /* end if (dupup) */
 
 	return rs ;
 }
 /* end subroutine (spawner_setctty) */
 
-
-int spawner_seteuid(SPAWNER *op,uid_t uid)
-{
+int spawner_seteuid(SPAWNER *op,uid_t uid) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_seteuid ;
 	sc.pfd = -1 ;
@@ -426,13 +391,11 @@ int spawner_seteuid(SPAWNER *op,uid_t uid)
 }
 /* end subroutine (spawner_seteuid) */
 
-
-int spawner_setegid(SPAWNER *op,gid_t gid)
-{
+int spawner_setegid(SPAWNER *op,gid_t gid) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_setegid ;
 	sc.pfd = -1 ;
@@ -444,24 +407,19 @@ int spawner_setegid(SPAWNER *op,gid_t gid)
 }
 /* end subroutine (spawner_setegid) */
 
-
-int spawner_sigignores(SPAWNER *op)
-{
-
-	if (op == NULL) return SR_FAULT ;
+int spawner_sigignores(SPAWNER *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 	op->opts |= SPAWNER_OIGNINTR ;
 
 	return SR_OK ;
 }
 /* end subroutine (spawner_sigignores) */
 
-
-int spawner_sigignore(SPAWNER *op,int sn)
-{
+int spawner_sigignore(SPAWNER *op,int sn) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_sigign ;
 	sc.pfd = -1 ;
@@ -472,13 +430,11 @@ int spawner_sigignore(SPAWNER *op,int sn)
 }
 /* end subroutine (spawner_sigignore) */
 
-
-int spawner_sigdefault(SPAWNER *op,int sn)
-{
+int spawner_sigdefault(SPAWNER *op,int sn) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_sigdfl ;
 	sc.pfd = -1 ;
@@ -489,13 +445,11 @@ int spawner_sigdefault(SPAWNER *op,int sn)
 }
 /* end subroutine (spawner_sigdefault) */
 
-
-int spawner_sighold(SPAWNER *op,int sn)
-{
+int spawner_sighold(SPAWNER *op,int sn) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_sighold ;
 	sc.pfd = -1 ;
@@ -506,13 +460,11 @@ int spawner_sighold(SPAWNER *op,int sn)
 }
 /* end subroutine (spawner_sighold) */
 
-
-int spawner_sigrelease(SPAWNER *op,int sn)
-{
+int spawner_sigrelease(SPAWNER *op,int sn) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_sigrlse ;
 	sc.pfd = -1 ;
@@ -523,13 +475,11 @@ int spawner_sigrelease(SPAWNER *op,int sn)
 }
 /* end subroutine (spawner_sigrelease) */
 
-
-int spawner_fdclose(SPAWNER *op,int cfd)
-{
+int spawner_fdclose(SPAWNER *op,int cfd) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_fdclose ;
 	sc.pfd = -1 ;
@@ -540,13 +490,11 @@ int spawner_fdclose(SPAWNER *op,int cfd)
 }
 /* end subroutine (spawner_fdclose) */
 
-
-int spawner_fdnull(SPAWNER *op,int of)
-{
+int spawner_fdnull(SPAWNER *op,int of) noex {
 	SCMD		sc ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	sc.cmd = cmd_fdnull ;
 	sc.pfd = of ; /* open-flags */
@@ -557,69 +505,59 @@ int spawner_fdnull(SPAWNER *op,int of)
 }
 /* end subroutine (spawner_fdnull) */
 
-
-int spawner_fddup(SPAWNER *op,int pfd)
-{
+int spawner_fddup(SPAWNER *op,int pfd) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if ((rs = dupup(pfd,3)) >= 0) {
 	    SCMD	sc ;
-	    int		nfd = rs ;
-
+	    cint	nfd = rs ;
 	    sc.cmd = cmd_fddup ;
 	    sc.pfd = nfd ;
 	    sc.cfd = -1 ;
 	    rs = vecobj_add(&op->cmds,&sc) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        u_close(nfd) ;
-
+	    }
 	} /* end if (dupup) */
 
 	return rs ;
 }
 /* end subroutine (spawner_fddup) */
 
-
-int spawner_fddup2(SPAWNER *op,int pfd,int tfd)
-{
+int spawner_fddup2(SPAWNER *op,int pfd,int tfd) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if ((rs = dupup(pfd,3)) >= 0) {
 	    SCMD	sc ;
 	    int		nfd = rs ;
-
 	    sc.cmd = cmd_fddup2 ;
 	    sc.pfd = nfd ;
 	    sc.cfd = tfd ;
 	    rs = vecobj_add(&op->cmds,&sc) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        u_close(nfd) ;
-
+	    }
 	} /* end if (dupup) */
 
 	return rs ;
 }
 /* end subroutine (spawner_fddup2) */
 
-
-int spawner_fddupto(SPAWNER *op,int pfd,int tfd)
-{
+int spawner_fddupto(SPAWNER *op,int pfd,int tfd) noex {
 	return spawner_fddup2(op,pfd,tfd) ;
 }
 /* end subroutine (spawner_fddupto) */
 
-
-int spawner_fdcreate(SPAWNER *op,int cfd)
-{
+int spawner_fdcreate(SPAWNER *op,int cfd) noex {
 	SCMD		sc ;
 	int		rs ;
 	int		pipes[2] ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if ((rs = uc_piper(pipes,3)) >= 0) {
 	    sc.cmd = cmd_fdcreate ;
@@ -637,33 +575,27 @@ int spawner_fdcreate(SPAWNER *op,int cfd)
 }
 /* end subroutine (spawner_fdcreate) */
 
-
-int spawner_envset(SPAWNER *op,cchar *kp,cchar *vp,int vl)
-{
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	rs = envhelp_envset(&op->env,kp,vp,vl) ;
-
+int spawner_envset(SPAWNER *op,cchar *kp,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
+	if (op && kp && vp) {
+	    rs = envhelp_envset(&op->env,kp,vp,vl) ;
+	}
 	return rs ;
 }
 /* end subroutine (spawner_envset) */
 
-
-int spawner_run(SPAWNER *op)
-{
+int spawner_run(SPAWNER *op) noex {
 	int		rs = SR_OK ;
-	const char	*args[2] ;
-	const char	**av ;
+	cchar		*args[2] ;
+	mainv		av ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	av = op->argv ;
-	if ((av == NULL) || (av[0] == NULL)) {
+	if ((av == nullptr) || (av[0] == nullptr)) {
 	    av = args ;
 	    args[0] = op->execfname ;
-	    args[1] = NULL ;
+	    args[1] = nullptr ;
 	}
 
 /* sort all environment variables */
@@ -704,17 +636,11 @@ int spawner_run(SPAWNER *op)
 }
 /* end subroutine (spawner_run) */
 
-
-int spawner_wait(SPAWNER *op,int *csp,int opts)
-{
-	int		rs ;
-
+int spawner_wait(SPAWNER *op,int *csp,int opts) noex {
+	int		rs = SR_INVALID ;
 	if (op->pid >= 0) {
 	    rs = u_waitpid(op->pid,csp,opts) ;
-	} else {
-	    rs = SR_INVALID ;
 	}
-
 	return rs ;
 }
 /* end subroutine (spawner_wait) */
@@ -723,11 +649,9 @@ int spawner_wait(SPAWNER *op,int *csp,int opts)
 /* local subroutines */
 
 
-static int child(SPAWNER *op,SCMD **cv,cchar **av,cchar **ev)
-{
-	const int	opts = op->opts ;
+static int child(SPAWNER *op,SCMD **cv,mainv av,mainv ev) noex {
+	cint		opts = op->opts ;
 	int		rs = SR_OK ;
-	int		i ;
 	cchar		*efname = op->execfname ;
 
 	if ((rs >= 0) && (opts & SPAWNER_OIGNINTR)) {
@@ -742,7 +666,7 @@ static int child(SPAWNER *op,SCMD **cv,cchar **av,cchar **ev)
 	    }
 	}
 
-	for (i = 0 ; (rs >= 0) && (cv[i] != NULL) ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && (cv[i] != nullptr) ; i += 1) {
 	    SCMD	*cmdp = cv[i] ;
 	    switch (cmdp->cmd) {
 	    case cmd_setctty:
@@ -781,8 +705,8 @@ static int child(SPAWNER *op,SCMD **cv,cchar **av,cchar **ev)
 	        break ;
 	    case cmd_fdnull:
 	        {
-	            const int	of = cmdp->pfd ; /* open-falgs */
-	            rs = u_open(NULLFNAME,of,0666) ;
+	            cint	of = cmdp->pfd ; /* open-falgs */
+	            rs = u_open(nullptrFNAME,of,0666) ;
 	        }
 	        break ;
 	    case cmd_fddup:
@@ -825,46 +749,32 @@ static int child(SPAWNER *op,SCMD **cv,cchar **av,cchar **ev)
 }
 /* end subroutine (child) */
 
-
-static int defaultfds(SCMD **cv)
-{
-	const int	rsbadf = SR_BADF ;
+static int defaultfds(SCMD **cv) noex {
+	cint		rsbadf = SR_BADF ;
 	int		rs = SR_OK ;
-	int		i ;
-
-	for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
+	for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	    if (! isUsed(cv,i)) {
 	        if ((rs = u_fcntl(i,F_GETFD,0)) == rsbadf) {
-	            const int of = (i == 0) ? O_RDONLY : O_WRONLY ;
-	            rs = u_open(NULLFNAME,of,0666) ;
+	            cint of = (i == 0) ? O_RDONLY : O_WRONLY ;
+	            rs = u_open(nullptrFNAME,of,0666) ;
 	        }
 	    }
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (defaultfds) */
 
-
-static int closefds(SCMD **cv)
-{
-	int		i ;
-
-	for (i = 3 ; i < NOFILE ; i += 1) {
+static int closefds(SCMD **cv) noex {
+	for (int i = 3 ; i < NOFILE ; i += 1) {
 	    if (! isUsed(cv,i)) u_close(i) ;
 	}
-
 	return SR_OK ;
 }
 /* end subroutine (closefds) */
 
-
-static int procparent(SCMD **cv)
-{
+static int procparent(SCMD **cv) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	for (i = 0 ; cv[i] != NULL ; i += 1) {
+	for (int i = 0 ; cv[i] != nullptr ; i += 1) {
 	    SCMD	*cmdp = cv[i] ;
 	    switch (cmdp->cmd) {
 	    case cmd_setctty:
@@ -877,27 +787,28 @@ static int procparent(SCMD **cv)
 	    } /* end switch */
 	    if (rs < 0) break ;
 	} /* end for */
-
 	return rs ;
 }
 /* end subroutine (procparent) */
 
-
-static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,cchar **argv)
-{
-	const int	rsn = SR_NOTFOUND ;
+static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,mainv argv) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if ((rs = envhelp_envset(ehp,"_EF",efname,-1)) >= 0) {
 	    int		al = -1 ;
-	    cchar	*ap = NULL ;
-	    if (argv != NULL) ap = argv[0] ;
-	    if (ap == NULL) al = sfbasename(efname,-1,&ap) ;
+	    cchar	*ap = nullptr ;
+	    if (argv != nullptr) {
+		ap = argv[0] ;
+	    }
+	    if (ap == nullptr) {
+		al = sfbasename(efname,-1,&ap) ;
+	    }
 	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
-	        const int	sulen = (MAXPATHLEN+22) ;
+	        cint	sulen = (MAXPATHLEN+22) ;
 	        char		*subuf ;
 	        if ((rs = uc_malloc((sulen+1),&subuf)) >= 0) {
-	            const pid_t	pid = ugetpid() ;
+	            const pid_t		pid = uc_getpid() ;
 	            if ((rs = snshellunder(subuf,sulen,pid,efname)) > 0) {
 	                rs = envhelp_envset(ehp,"_",subuf,rs) ;
 	            }
@@ -906,13 +817,9 @@ static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,cchar **argv)
 	    } /* end if (envhelp_envset) */
 	} /* end if (envhelp_envset) */
 
-#if	CF_DEBUGS
-	debugprintf("spawner: def-path\n") ;
-#endif
-
 	if (rs >= 0) {
 	    cchar	*var = VARPWD ;
-	    if ((rs = envhelp_present(ehp,var,-1,NULL)) == rsn) {
+	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
 	        int	pwdl = -1 ;
 	        rs = SR_OK ;
 	        if (pwd[0] == '\0') {
@@ -927,8 +834,8 @@ static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,cchar **argv)
 
 	if (rs >= 0) {
 	    cchar	*var = VARPATH ;
-	    if ((rs = envhelp_present(ehp,var,-1,NULL)) == rsn) {
-	        const int	plen = (2*MAXPATHLEN) ;
+	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
+	        cint	plen = (2*MAXPATHLEN) ;
 	        char		*pbuf ;
 	        if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
 	            if ((rs = uc_confstr(_CS_PATH,pbuf,plen)) >= 0) {
@@ -943,15 +850,13 @@ static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,cchar **argv)
 }
 /* end subroutine (envhelp_load) */
 
-
-static int findprog(char *pwd,char *pbuf,cchar *fname)
-{
-	IDS		id ;
+static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
+	ids		id ;
 	int		rs ;
 	int		rs1 ;
 	int		pl = 0 ;
 	if ((rs = ids_load(&id)) >= 0) {
-	    if (strchr(fname,'/') != NULL) {
+	    if (strchr(fname,'/') != nullptr) {
 	        if (pwd[0] == '\0') {
 	            rs = getpwd(pwd,MAXPATHLEN) ;
 	        }
@@ -960,7 +865,7 @@ static int findprog(char *pwd,char *pbuf,cchar *fname)
 			USTAT	sb ;
 	                pl = rs ;
 		        if ((rs = uc_stat(pbuf,&sb)) >= 0) {
-			    const int	am = X_OK ;
+			    cint	am = X_OK ;
 			    rs = sperm(&id,&sb,am) ;
 		        }
 	            } /* end if (mkpath) */
@@ -977,54 +882,29 @@ static int findprog(char *pwd,char *pbuf,cchar *fname)
 /* end subroutine (findprog) */
 
 
-static int isUsed(SCMD **cv,int fd)
-{
-	int		i ;
-	int		f = FALSE ;
-
-	for (i = 0 ; cv[i] != NULL ; i += 1) {
+static int isUsed(SCMD **cv,int fd) noex {
+	int		f = false ;
+	for (int i = 0 ; cv[i] != nullptr ; i += 1) {
 	    SCMD	*cmdp = cv[i] ;
 	    if (isChildFD(cmdp->cmd)) {
 	        f = (cmdp->cfd == fd) ;
 	        if (f) break ;
 	    }
 	} /* end for */
-
 	return f ;
 }
 /* end subroutine (isUsed) */
 
-
-static int isChildFD(int cmd)
-{
-	int		f = FALSE ;
-
+static int isChildFD(int cmd) noex {
+	int		f = false ;
 	switch (cmd) {
 	case cmd_fddup2:
 	case cmd_fdcreate:
 	    f = TRUE ;
 	    break ;
 	} /* end switch */
-
 	return f ;
 }
 /* end subroutine (isChildFD) */
-
-
-#if	CF_DEBUGS
-static int showdev(fd)
-int	fd ;
-{
-	struct ustat	sb ;
-	int		rs = SR_OK ;
-	memset(&sb,0,sizeof(struct ustat)) ;
-	if (fd >= 0)
-	    rs = u_fstat(fd,&sb) ;
-	debugprintf("spawner/showdev: fd=%d rs=%d ino=%u dev=%08x\n",
-	    fd,rs,sb.st_ino,sb.st_dev) ;
-	return rs ;
-}
-/* end subroutine (showdev) */
-#endif /* CF_DEBUGS */
 
 
