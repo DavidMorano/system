@@ -1,5 +1,5 @@
-/* varsub_dumpfd */
-/* lang=C20 */
+/* varsub_dumpfd SUPPORT */
+/* lang=C++20 */
 
 /* dump the substitution variables of the object */
 /* version %I% last-modified %G% */
@@ -24,19 +24,23 @@
 
 /* external subroutines */
 
-extern int	fdprintf(int,...) noex ;
+extern "C" {
+    extern int	fdprintf(int,...) noex ;
+}
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int varsub_dumpfd(varsub *vshp,int fd) noex {
-	if (vshp->vsa != NULL) {
+	if (vshp->vsa != nullptr) {
 	    varsub_ent	*vsa = vshp->vsa ;
-	    int	i ;
 	    if (fd < 0) fd = egetfd() ;
-	    for (i = 0 ; i < vshp->i ; i += 1) {
-	        if (vsa[i].kp == NULL) {
-	            fdprintf(fd,"varsub_dumpfd NULL\n") ;
+	    for (int i = 0 ; i < vshp->i ; i += 1) {
+	        if (vsa[i].kp == nullptr) {
+	            fdprintf(fd,"varsub_dumpfd nullptr\n") ;
 	        } else {
 	            fdprintf(fd,"varsub_dumpfd key=%t val=%t\n",
 	            vsa[i].kp,vsa[i].klen,
@@ -44,7 +48,6 @@ int varsub_dumpfd(varsub *vshp,int fd) noex {
 	        }
 	    } /* end for */
 	} /* end if (non-null) */
-
 	return 0 ;
 }
 /* end subroutine (varsub_dumpfd) */

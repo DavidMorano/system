@@ -1,4 +1,4 @@
-/* varsub_extras */
+/* varsub_extras SUPPORT */
 /* lang=C++20 */
 
 /* variable manipulation (like for configuration files!) */
@@ -45,7 +45,6 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
@@ -55,12 +54,13 @@
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>
-#include	<varsub.h>
 #include	<strwcpy.h>
 #include	<strn.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
+
+#include	"varsub.h"
 
 
 /* local defines */
@@ -68,7 +68,14 @@
 
 /* external subroutines */
 
-extern cchar	*getenv3(cchar *,int,cchar **) noex ;
+extern "C" {
+    extern cchar	*getenv3(cchar *,int,cchar **) noex ;
+}
+
+extern "C" {
+    int		varsub_addvec(varsub *,vecstr *) noex ;
+    int		varsub_merge(varsub *,vecstr *,char *,int) noex ;
+}
 
 
 /* external variables */
@@ -83,49 +90,43 @@ static int	cmpvalue(cchar *,cchar *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int varsub_addvec(varsub *op,vecstr *vsp) noex {
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
-	cchar	*tp, *kp, *vp ;
-	cchar	*sp ;
-
-	for (i = 0 ; vecstr_get(vsp,i,&sp) >= 0 ; i += 1) {
-	    if (sp != NULL) {
-
-	    kp = sp ;
-	    if ((tp = strchr(sp,'=')) != NULL) {
-		int	ch = MKCHAR(kp[0]) ;
-		int	f ;
-
-		f = isprintlatin(ch) ;
-	        vp = (tp + 1) ;
-	        if (f) {
-		    ch = MKCHAR(vp[0]) ;
-		    f = ((ch == '\0') || isprintlatin(ch)) ;
-	        }
-	        if (f) {
-	            rs = varsub_add(op,kp,(tp - kp),vp,-1) ;
-		    if (rs < INT_MAX) c += 1 ;
+	cchar		*tp, *kp, *vp ;
+	cchar		*sp ;
+	for (int i = 0 ; vecstr_get(vsp,i,&sp) >= 0 ; i += 1) {
+	    if (sp) {
+	        kp = sp ;
+	        if ((tp = strchr(sp,'=')) != NULL) {
+		    int		ch = MKCHAR(kp[0]) ;
+		    bool	f ;
+		    f = isprintlatin(ch) ;
+	            vp = (tp + 1) ;
+	            if (f) {
+		        ch = MKCHAR(vp[0]) ;
+		        f = ((ch == '\0') || isprintlatin(ch)) ;
+	            }
+	            if (f) {
+	                rs = varsub_add(op,kp,(tp - kp),vp,-1) ;
+		        if (rs < INT_MAX) c += 1 ;
+	            } /* end if */
 	        } /* end if */
-
-	    } /* end if */
-
 	    } /* end if (non-null) */
 	    if (rs < 0) break ;
 	} /* end for */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (varsub_addvec) */
 
-int varsub_subbuf(var1p,var2p,s1,s1len,s2,s2len)
-varsub	*var1p, *var2p ;
-char	*s1, *s2 ;
-int	s1len, s2len ;
-{
+#ifdef	COMMENT
+int varsub_subbuf(varsub *var1p,varsub *var2p,cc *s1,int s1len,
+		cc *s2,int s2len) noex {
 	int		rs ;
 	int		rl = 0 ;
 
@@ -144,14 +145,10 @@ int	s1len, s2len ;
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (varsub_subbuf) */
+#endif /* COMMENT */
 
 /* merge variables that are the same into just one (and update all DBs) */
-int varsub_merge(varp,vsp,buf,buflen)
-varsub		*varp ;
-vecstr		*vsp ;
-char		buf[] ;
-int		buflen ;
-{
+int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 	int		rs = SR_OK ;
 	int		size ;
 	int		i ;
