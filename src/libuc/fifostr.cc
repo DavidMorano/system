@@ -102,16 +102,16 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = fifostr_magic(op,sp)) >= 0) {
-	    fifostr_ent	*ep = nullptr ;
+	    fifostr_ent		*ep = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        cint	size = sizeof(fifostr_ent) + (sl + 1) ;
-	        if ((rs = uc_libmalloc(size,&ep)) >= 0) {
+	        cint	sz = sizeof(fifostr_ent) + (sl + 1) ;
+	        if ((rs = uc_libmalloc(sz,&ep)) >= 0) {
 	            ep->slen = sl ;
 	            {
-	                char	*bp = static_cast<charp>(ep) ;
+	                char	*bp = reinterpret_cast<charp>(ep) ;
 	                bp += sizeof(fifostr_ent) ;
-	                strwcpy(bp,sp,sl) ;	/* <- ok: see 'size' above */
+	                strwcpy(bp,sp,sl) ;	/* <- ok: see 'sz' above */
 	            }
 	            ep->next = nullptr ;
 	            ep->prev = nullptr ;
@@ -136,16 +136,16 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-		rs = SR_NOTFOUND ;
-	        if (op->head) {
-	            fifostr_ent	*ep = op->head ;
-	            sl = ep->slen ;
-	            if (rbuf) {
-	                cchar	*sp = static_cast<charp>(ep) ;
-	                sp += sizeof(fifostr_ent) ;
-	                rs = snwcpy(rbuf,rlen,sp,sl) ;
-	            }
-	        }
+	    rs = SR_NOTFOUND ;
+            if (op->head) {
+                fifostr_ent	*ep = op->head ;
+                sl = ep->slen ;
+                if (rbuf) {
+                    cchar	*sp = reinterpret_cast<charp>(ep) ;
+                    sp += sizeof(fifostr_ent) ;
+                    rs = snwcpy(rbuf,rlen,sp,sl) ;
+                }
+            }
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
@@ -154,11 +154,11 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 int fifostr_headlen(fifostr *op) noex {
 	int		rs ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-		rs = SR_NOTFOUND ;
-	        if (op->head) {
-	            fifostr_ent		*ep = op->head ;
-	            rs = ep->slen ;
-	        }
+	    rs = SR_NOTFOUND ;
+	    if (op->head) {
+	        fifostr_ent	*ep = op->head ;
+	        rs = ep->slen ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -168,26 +168,26 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-		rs = SR_INVALID ;
-	        if (n >= 0) {
-		    rs = SR_NOTFOUND ;
-		    if (op->head) {
-	                fifostr_ent	*ep = op->head ;
-	                for (int i = 0 ; (i < n) && ep ; i += 1) {
-	                    ep = ep->next ;
-	                }
-	                if (ep) {
-	                    sl = ep->slen ;
-	                    if (rbuf) {
-	                	cchar	*sp = static_cast<charp>(ep) ;
-	                        sp += sizeof(fifostr_ent) ;
-	                        rs = snwcpy(rbuf,rlen,sp,sl) ;
-			    } else {
-				rs = SR_OK ;
-	                    }
-	                }
-	            } /* end if (possible) */
-	        } /* end if (valid) */
+            rs = SR_INVALID ;
+            if (n >= 0) {
+                rs = SR_NOTFOUND ;
+                if (op->head) {
+                    fifostr_ent     *ep = op->head ;
+                    for (int i = 0 ; (i < n) && ep ; i += 1) {
+                        ep = ep->next ;
+                    }
+                    if (ep) {
+                        sl = ep->slen ;
+                        if (rbuf) {
+                            cchar   *sp = reinterpret_cast<charp>(ep) ;
+                            sp += sizeof(fifostr_ent) ;
+                            rs = snwcpy(rbuf,rlen,sp,sl) ;
+                        } else {
+                            rs = SR_OK ;
+                        }
+                    }
+                } /* end if (possible) */
+            } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
@@ -197,20 +197,20 @@ int fifostr_entlen(fifostr *op,int n) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-		rs = SR_INVALID ;
-		if (n >= 0) {
-		    rs = SR_NOTFOUND ;
-	            if (op->head) {
-	                fifostr_ent	*ep = op->head ;
-			for (int i = 0 ; (i < n) && ep ; i += 1) {
-	    		    ep = ep->next ;
-			}
-			if (ep) {
-			    rs = SR_OK ;
-	    		    sl = ep->slen ;
-			}
-	            } /* end if (possible) */
-	        } /* end if (valid) */
+            rs = SR_INVALID ;
+            if (n >= 0) {
+                rs = SR_NOTFOUND ;
+                if (op->head) {
+                    fifostr_ent     *ep = op->head ;
+                    for (int i = 0 ; (i < n) && ep ; i += 1) {
+                        ep = ep->next ;
+                    }
+                    if (ep) {
+                        rs = SR_OK ;
+                        sl = ep->slen ;
+                    }
+                } /* end if (possible) */
+            } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
@@ -220,28 +220,28 @@ int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-	        if (op->head != nullptr) {
-	            fifostr_ent	*ep = op->head ;
-	            sl = ep->slen ;
-	            if (rbuf) {
-	                cchar	*sp = static_cast<charp>(ep) ;
-	                sp += sizeof(fifostr_ent) ;
-	                rs = snwcpy(rbuf,rlen,sp,sl) ;
-	            }
-	            if (rs >= 0) {
-	                op->head = ep->next ;
-	                if (op->head == nullptr) {
-	                    op->tail = nullptr ;
-	                } else {
-	                    (op->head)->prev = nullptr ;
-	                }
-	                rs = uc_libfree(ep) ;
-	                op->ic -= 1 ;
-	                op->cc -= sl ;
-	            } /* end if (successful removal) */
-	        } else {
-	            rs = SR_NOTFOUND ;
-	        }
+            if (op->head != nullptr) {
+                fifostr_ent *ep = op->head ;
+                sl = ep->slen ;
+                if (rbuf) {
+                    cchar   *sp = reinterpret_cast<charp>(ep) ;
+                    sp += sizeof(fifostr_ent) ;
+                    rs = snwcpy(rbuf,rlen,sp,sl) ;
+                }
+                if (rs >= 0) {
+                    op->head = ep->next ;
+                    if (op->head == nullptr) {
+                        op->tail = nullptr ;
+                    } else {
+                        (op->head)->prev = nullptr ;
+                    }
+                    rs = uc_libfree(ep) ;
+                    op->ic -= 1 ;
+                    op->cc -= sl ;
+                } /* end if (successful removal) */
+            } else {
+	        rs = SR_NOTFOUND ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
@@ -250,7 +250,7 @@ int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
 int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
 	if ((rs = fifostr_magic(op,curp)) >= 0) {
-		curp->current = nullptr ;
+	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -259,7 +259,7 @@ int fifostr_curbegin(fifostr *op,fifostr_cur *curp) noex {
 int fifostr_curend(fifostr *op,fifostr_cur *curp) noex {
 	int		rs ;
 	if ((rs = fifostr_magic(op,curp)) >= 0) {
-		curp->current = nullptr ;
+	    curp->current = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -269,28 +269,30 @@ int fifostr_enum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		sl = 0 ;
 	if ((rs = fifostr_magic(op,curp)) >= 0) {
-	        fifostr_ent	*ep ;
-	        if ((curp == nullptr) || (curp->current == nullptr)) {
-	            ep = op->head ;
-	        } else {
-	            if ((rs = fifostr_mat(op,curp->current)) >= 0) {
-	                ep = (curp->current)->next ;
-	            }
-	        } /* end if */
-	        if (rs >= 0) {
-	            if (curp != nullptr) curp->current = ep ;
-	            if (ep != nullptr) {
-	                sl = ep->slen ;
-	                if (rbuf != nullptr) {
-	                    cchar	*sp = static_cast<charp>(ep) ;
-	                    sp = (cchar *) ep ;
-	                    sp += sizeof(fifostr_ent) ;
-	                    rs = snwcpy(rbuf,rlen,sp,sl) ;
-	                }
-	            } else {
-	                rs = SR_NOTFOUND ;
-	            }
-	        } /* end if (ok) */
+            fifostr_ent     *ep ;
+            if ((curp == nullptr) || (curp->current == nullptr)) {
+                ep = op->head ;
+            } else {
+                if ((rs = fifostr_mat(op,curp->current)) >= 0) {
+                    ep = (curp->current)->next ;
+                }
+            } /* end if */
+            if (rs >= 0) {
+                if (curp != nullptr) {
+                    curp->current = ep ;
+                }
+                if (ep != nullptr) {
+                    sl = ep->slen ;
+                    if (rbuf != nullptr) {
+                        cchar       *sp = reinterpret_cast<charp>(ep) ;
+                        sp = charp(ep) ;
+                        sp += sizeof(fifostr_ent) ;
+                        rs = snwcpy(rbuf,rlen,sp,sl) ;
+                    }
+                } else {
+                    rs = SR_NOTFOUND ;
+                }
+            } /* end if (ok) */
 	} /* end if (magic) */
 	return (rs >= 0) ? sl : rs ;
 }
@@ -301,41 +303,41 @@ int fifostr_del(fifostr *op,fifostr_cur *curp) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = fifostr_magic(op,curp)) >= 0) {
-	        fifostr_ent	*ep ;
-	        if ((curp == nullptr) || (curp->current == nullptr)) {
-	            ep = op->head ;
-	        } else {
-	            ep = curp->current ;
-	        }
-	        if (ep != nullptr) {
-	            int		sl = ep->slen ;
-	            if (curp != nullptr) {
-	                if (ep->prev == nullptr) {
-	                    op->head = ep->next ;
-	                } else {
-	                    (ep->prev)->next = ep->next ;
-	                }
-	                if (ep->next == nullptr) {
-	                    op->tail = ep->prev ;
-	                } else {
-	                    (ep->next)->prev = ep->prev ;
-	                }
-	                curp->current = ep->prev ;
-	            } else {
-	                op->head = ep->next ;
-	                if (op->head == nullptr) {
-	                    op->tail = nullptr ;
-	                } else {
-	                    (op->head)->prev = nullptr ;
-	                }
-	            } /* end if */
-	            rs1 = uc_libfree(ep) ;
-	            if (rs >= 0) rs = rs1 ;
-	            c = --op->ic ;
-	            op->cc -= sl ;
-	        } else {
-	            rs = SR_NOTFOUND ;
-	        }
+            fifostr_ent     *ep ;
+            if ((curp == nullptr) || (curp->current == nullptr)) {
+                ep = op->head ;
+            } else {
+                ep = curp->current ;
+            }
+            if (ep != nullptr) {
+                int         sl = ep->slen ;
+                if (curp != nullptr) {
+                    if (ep->prev == nullptr) {
+                        op->head = ep->next ;
+                    } else {
+                        (ep->prev)->next = ep->next ;
+                    }
+                    if (ep->next == nullptr) {
+                        op->tail = ep->prev ;
+                    } else {
+                        (ep->next)->prev = ep->prev ;
+                    }
+                    curp->current = ep->prev ;
+                } else {
+                    op->head = ep->next ;
+                    if (op->head == nullptr) {
+                        op->tail = nullptr ;
+                    } else {
+                        (op->head)->prev = nullptr ;
+                    }
+                } /* end if */
+                rs1 = uc_libfree(ep) ;
+                if (rs >= 0) rs = rs1 ;
+                c = --op->ic ;
+                op->cc -= sl ;
+            } else {
+                rs = SR_NOTFOUND ;
+            }
 	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
@@ -356,15 +358,15 @@ int fifostr_finder(fifostr *op,char *s,fifostr_cmp cmpfunc,char **rpp) noex {
 	int		rs ;
 	if (cmpfunc == nullptr) cmpfunc = cmpdefault ;
 	if ((rs = fifostr_magic(op)) >= 0) {
-	        fifostr_cur	cur{} ;
-	        if ((rs = fifostr_curbegin(op,&cur)) >= 0) {
-	            cchar	*rp{} ;
-	            while ((rs = fifostr_enum(op,&cur,&rp)) >= 0) {
-	                if ((*cmpfunc)(s,rp) == 0) break ;
-	            } /* end while */
-	            if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
-	            fifostr_curend(op,&cur) ;
-	        } /* end if (fifostr-cur) */
+	    fifostr_cur	cur{} ;
+	    if ((rs = fifostr_curbegin(op,&cur)) >= 0) {
+	        cchar	*rp{} ;
+	        while ((rs = fifostr_enum(op,&cur,&rp)) >= 0) {
+	            if ((*cmpfunc)(s,rp) == 0) break ;
+	        } /* end while */
+	        if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
+	        fifostr_curend(op,&cur) ;
+	    } /* end if (fifostr-cur) */
 	} /* end if (magic) */
 	return rs ;
 }
