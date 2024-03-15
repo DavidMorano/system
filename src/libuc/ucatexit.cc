@@ -124,6 +124,6 @@ int ucatexit::stdatexit() noex {
 	}
 	return rs ;
 }
-/* end subroutine (ucatexit::stdatexit) */
+/* end method (ucatexit::stdatexit) */
 
 

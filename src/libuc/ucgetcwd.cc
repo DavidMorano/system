@@ -40,6 +40,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
@@ -124,6 +127,6 @@ int ucgetcwd::stdgetcwd() noex {
 	}
 	return rs ;
 }
-/* end subroutine (ucgetcwd::stdgetcwd) */
+/* end method (ucgetcwd::stdgetcwd) */
 
 
