@@ -74,7 +74,7 @@
 #define	KBUFLEN		40
 #endif
 
-#define	ELENMULT	2		/* multiply factor cookie expands */
+#define	EXPANDMULT	2		/* multiply factor cookie expands */
 
 #ifndef	HELPSCHEDFNAME
 #define	HELPSCHEDFNAME	"etc/printhelp.filesched"
@@ -138,7 +138,7 @@ static int	printhelper(ostream *,cc *,cc *,cc *) noex ;
 static int	printproc(ostream *,cchar *,cchar *,cchar *) noex ;
 static int	printout(ostream *,expcook *,cc *) noex ;
 
-static int	loadscheds(vecstr *,cchar *,cchar *) noex ;
+static int	vecstr_loadscheds(vecstr *,cchar *,cchar *) noex ;
 
 static int	expcook_load(expcook *,cc *,cc *) noex ;
 
@@ -191,7 +191,7 @@ constexpr helper_m	mems[] = {
 /* exported variables */
 
 
-/* export subroutines */
+/* exported subroutines */
 
 int printhelp(ostream *osp,cchar *pr,cchar *sn,cchar *fn) noex {
 	int		rs = SR_FAULT ;
@@ -230,7 +230,7 @@ static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 	    cint	tlen = rs ;
 	    if (strchr(fn,'/') != nullptr) {
 	        if ((rs = mkpath(tbuf,pr,fn)) >= 0) {
-	            if ((rs = u_access(tbuf,R_OK)) >= 0) {
+	            if ((rs = uc_access(tbuf,R_OK)) >= 0) {
 		        rs = printproc(osp,pr,sn,tbuf) ;
 			len = rs ;
 		    }
@@ -278,15 +278,19 @@ static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
 	    char	*ebuf{} ;
 	    cint	llen = rs ;
-	    cint	elen = (ELENMULT * rs) ;
+	    cint	elen = (EXPANDMULT * rs) ;
 	    if ((rs = uc_malloc((elen+1),&ebuf)) >= 0) {
 	        bfile	helpfile, *hfp = &helpfile ;
 	        if ((rs = bopen(hfp,fn,"r",0666)) >= 0) {
 	            while ((rs = breadln(hfp,lbuf,llen)) > 0) {
 	                cint	len = rmeol(lbuf,rs) ;
 		        if ((rs = expcook_exp(ecp,0,ebuf,elen,lbuf,len)) > 0) {
-			    (*osp) << ebuf << eol ;
-	                    wlen += (rs + 1) ;
+			    try {
+			        (*osp) << ebuf << eol ;
+	                        wlen += (rs + 1) ;
+			    } catch (...) {
+				rs = SR_IO ;
+			    }
 		        } /* end if (expansion) */
 	                if (rs < 0) break ;
 	            } /* end while */
@@ -309,7 +313,7 @@ int helper::start(char *b,int l) noex {
 	tbuf = b ;
 	tlen = l ;
 	if ((rs = vecstr_start(svp,6,0)) >= 0) {
-	    rs = loadscheds(svp,pr,sn) ;
+	    rs = vecstr_loadscheds(svp,pr,sn) ;
 	}
 	return rs ;
 }
@@ -382,7 +386,7 @@ int helper::sched(mainv spp) noex {
 }
 /* end method (helper::sched) */
 
-static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
+static int vecstr_loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	int		rs = SR_OK ;
 	if (pr != nullptr) {
 	    rs = vecstr_envadd(slp,"r",pr,-1) ;
@@ -397,13 +401,14 @@ static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	}
 	return rs ;
 }
-/* end subroutine (loadscheds) */
+/* end subroutine (vecstr_loadscheds) */
 
 static int expcook_load(expcook *ecp,cc *pr,cc *sn) noex {
+	cint		sz = var.maxcombolen ;
 	int		rs ;
 	int		rs1 ;
 	char		*nn{} ;
-	if ((rs = uc_malloc(var.maxcombolen,&nn)) >= 0) {
+	if ((rs = uc_malloc(sz,&nn)) >= 0) {
 	    char	*dn = (nn + (var.maxnodelen + 1)) ;
 	    if ((rs = getnodedomain(nn,dn)) >= 0) {
 	        char	*hbuf{} ;
