@@ -1,33 +1,34 @@
-/* ucatexit SUPPORT */
+/* ucgetcwd SUPPORT */
 /* lang=C++20 */
 
-/* interface component for UNIX® library-3c */
+/* get the current working directory */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 2000-05-14, David A­D­ Morano
+	= 1998-04-13, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Happily, unlike some (several) other middleware calls to
-	the UNIX® system, this one is quite straight-forward.
+	This subroutine returns the Current Working Directory (CWD).
+	If you wanted the Present Working Directory (PWD), you
+	should be calling |getpwd(3uc)|.
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be first to configure */
 #include	<unistd.h>
 #include	<cerrno>
-#include	<climits>
-#include	<cstdlib>		/* |atexit(3c)| */
+#include	<cstring>		/* <- |strnlen(3c)| */
 #include	<usystem.h>
+#include	<usupport.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -36,32 +37,26 @@
 /* imported namespaces */
 
 
-/* local typedefs */
-
-extern "C" {
-    typedef void	(*atexit_f)(void) noex ;
-}
-
-
 /* external subroutines */
 
 
-/* external variables */
-
-
-/* local stuctures */
+/* local structures */
 
 namespace {
-    struct ucatexit ;
-    typedef int (ucatexit::*mem_f)() noex ;
-    struct ucatexit {
+    struct ucgetcwd ;
+    typedef int (ucgetcwd::*mem_f)() noex ;
+    struct ucgetcwd {
 	mem_f		m ;
-	atexit_f	func ;
-	ucatexit(atexit_f f) noex : func(f) { } ;
-	int stdatexit() noex ;
+	char		*cwbuf ;
+	int		cwlen ;
+	ucgetcwd(char *b,int l) noex : cwbuf(b), cwlen(l) { } ;
+	int stdgetcwd() noex ;
 	int operator () () noex ;
-    } ; /* end struct (ucatexit) */
+    } ; /* end struct (ucgetcwd) */
 }
+
+
+/* forward references */
 
 
 /* local variables */
@@ -72,17 +67,21 @@ namespace {
 
 /* exported subroutines */
 
-int uc_atexit(atexit_f f) noex {
-	ucatexit	aeo(f) ;
-	aeo.m = &ucatexit::stdatexit ;
-	return aeo() ;
+int uc_getcwd(char *cwbuf,int cwlen) noex {
+	int		rs = SR_FAULT ;
+	if (cwbuf) {
+	    ucgetcwd	aeo(cwbuf,cwlen) ;
+	    aeo.m = &ucgetcwd::stdgetcwd ;
+	    rs = aeo() ;
+	} /* end if (non-null) */
+	return rs ;
 }
-/* end subroutine (uc_atexit) */
+/* end subroutine (uc_getcwd) */
 
 
 /* local subroutines */
 
-int ucatexit::operator () () noex {
+int ucgetcwd::operator () () noex {
 	int		to_again = utimeout[uto_again] ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		rs = SR_OK ;
@@ -114,16 +113,17 @@ int ucatexit::operator () () noex {
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
 }
-/* end subroutine (ucatexit::operator) */
+/* end subroutine (ucgetcwd::operator) */
 
-int ucatexit::stdatexit() noex {
-	int		rs = SR_FAULT ;
-	if (func) {
-	    rs = SR_OK ;
-	    if (atexit(func) < 0) rs = (- errno) ;
+int ucgetcwd::stdgetcwd() noex {
+	int		rs ;
+	if (getcwd(cwbuf,cwlen) != nullptr) {
+	    rs = strnlen(cwbuf,cwlen) ;
+	} else {
+	    rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end subroutine (ucatexit::stdatexit) */
+/* end subroutine (ucgetcwd::stdgetcwd) */
 
 

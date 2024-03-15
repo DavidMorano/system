@@ -262,7 +262,6 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen) noex {
 	    memclear(rnp) ;
 	    if ((rs = names_start(&n,rnp->store)) >= 0) {
 	        namestr	ns ;
-	        int	i, j ;
 	        int	sl ;
 	        int	f_abv, f_last ;
 	        cchar	*sp ;
@@ -277,6 +276,8 @@ int realname_startparse(realname *rnp,cchar *sbuf,int slen) noex {
 	            namestr_finish(&ns) ;
 	        } /* end if (namestr) */
 	        if (rs >= 0) {
+		    int		i ;
+		    int		j ;
 /* load up the information on the name parts, first the last name part */
 	            if (n.li < 0) {
 	                if (n.count >= nnames) {
