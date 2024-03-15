@@ -169,86 +169,81 @@ int realname_startparts(realname *rnp,dstr *stp) noex {
 /* end subroutine (realname_startparts) */
 
 int realname_startpieces(realname *rnp,cchar **sa,int sn) noex {
-	storeitem	s ;
-	cint		slen = REALNAME_STORELEN ;
-	cint		nparts = REALNAME_NPARTS ;
-	int		rs ;
-	int		c = 0 ;
-	cchar		*pieces[REALNAME_NPARTS] ;
-
-	if (rnp == nullptr) return SR_FAULT ;
-	if (sa == nullptr) return SR_FAULT ;
-
-	if (sn < 0) sn = INT_MAX ;
-
-	{
-	    for (int i = 0 ; ( i < sn) && sa[i] && (c < nparts) ; i += 1) {
-	        if (sa[i][0] != '\0') {
-	            pieces[c++] = sa[i] ;
-	        }
-	    } /* end for */
-	}
-
-	if (c == 0) return SR_INVALID ;
-
-	memclear(rnp) ;
-
-	if ((rs = storeitem_start(&s,rnp->store,slen)) >= 0) {
-	    cchar	*cp ;
-	    int		len = 0 ;
-
-	    if ((rs = storeitem_strw(&s,pieces[--c],-1,&cp)) >= 0) {
-	        int	f_abv = false ;
-	        if (isAbbr(cp[rs-1])) {
-	            f_abv = true ;
-	            rs -= 1 ;
-	        }
-	        rnp->last = cp ;
-	        rnp->len.last = (uchar) rs ;
-	        rnp->abv.last = f_abv ;
-	        if (c > 0) {
-	            int	n = 0 ;
-	            for (int i = 0 ; (rs >= 0) && (i < c) ; i += 1) {
-	                f_abv = false ;
-	                if ((rs = storeitem_strw(&s,pieces[i],-1,&cp)) > 0) {
-	                    if (isAbbr(cp[rs-1])) {
-	                        f_abv = true ;
-	                        rs -= 1 ;
-	                    }
-	                    if (rs > 0) {
-	                        switch (n++) {
-	                        case 0:
-	                            rnp->first = cp ;
-	                            rnp->len.first = (uchar) rs ;
-	                            rnp->abv.first = f_abv ;
-	                            break ;
-	                        case 1:
-	                            rnp->m1 = cp ;
-	                            rnp->len.m1 = (uchar) rs ;
-	                            rnp->abv.m1 = f_abv ;
-	                            break ;
-	                        case 2:
-	                            rnp->m2 = cp ;
-	                            rnp->len.m2 = (uchar) rs ;
-	                            rnp->abv.m2 = f_abv ;
-	                            break ;
-	                        case 3:
-	                            rnp->m3 = cp ;
-	                            rnp->len.m3 = (uchar) rs ;
-	                            rnp->abv.m3 = f_abv ;
-	                            break ;
-	                        } /* end switch */
-	                    } /* end if */
+	int		rs = SR_FAULT ;
+	if (rnp && sa) {
+	    int		c = 0 ;
+	    cchar		*pieces[REALNAME_NPARTS] ;
+	    cint		slen = REALNAME_STORELEN ;
+	    cint		nparts = REALNAME_NPARTS ;
+	    if (sn < 0) sn = INT_MAX ;
+	    {
+	        for (int i = 0 ; ( i < sn) && sa[i] && (c < nparts) ; i += 1) {
+	            if (sa[i][0] != '\0') {
+	                pieces[c++] = sa[i] ;
+	            }
+	        } /* end for */
+	    }
+	    if (c > 0) {
+	        storeitem	s ;
+	        memclear(rnp) ;
+	        if ((rs = storeitem_start(&s,rnp->store,slen)) >= 0) {
+	            cchar	*cp ;
+	            int		len = 0 ;
+	            if ((rs = storeitem_strw(&s,pieces[--c],-1,&cp)) >= 0) {
+	                int	f_abv = false ;
+	                if (isAbbr(cp[rs-1])) {
+	                    f_abv = true ;
+	                    rs -= 1 ;
+	                }
+	                rnp->last = cp ;
+	                rnp->len.last = (uchar) rs ;
+	                rnp->abv.last = f_abv ;
+	                if (c > 0) {
+	                    int		n = 0 ;
+	                    for (int i = 0 ; (rs >= 0) && (i < c) ; i += 1) {
+				auto	ss = storeitem_strw ;
+	                        f_abv = false ;
+	                        if ((rs = ss(&s,pieces[i],-1,&cp)) > 0) {
+	                            if (isAbbr(cp[rs-1])) {
+	                                f_abv = true ;
+	                                rs -= 1 ;
+	                            }
+	                            if (rs > 0) {
+	                                switch (n++) {
+	                                case 0:
+	                                    rnp->first = cp ;
+	                                    rnp->len.first = (uchar) rs ;
+	                                    rnp->abv.first = f_abv ;
+	                                    break ;
+	                                case 1:
+	                                    rnp->m1 = cp ;
+	                                    rnp->len.m1 = (uchar) rs ;
+	                                    rnp->abv.m1 = f_abv ;
+	                                    break ;
+	                                case 2:
+	                                    rnp->m2 = cp ;
+	                                    rnp->len.m2 = (uchar) rs ;
+	                                    rnp->abv.m2 = f_abv ;
+	                                    break ;
+	                                case 3:
+	                                    rnp->m3 = cp ;
+	                                    rnp->len.m3 = (uchar) rs ;
+	                                    rnp->abv.m3 = f_abv ;
+	                                    break ;
+	                                } /* end switch */
+	                            } /* end if */
+	                        } /* end if */
+	                    } /* end for */
 	                } /* end if */
-	            } /* end for */
-	        } /* end if */
-	    } /* end if (last-name) */
-	    len = storeitem_finish(&s) ;
-	    if (rs >= 0) rs = len ;
-	} /* end if (storeitem) */
-
-	if (rs >= 0) rnp->len.store = (uchar) rs ;
-
+	            } /* end if (last-name) */
+	            len = storeitem_finish(&s) ;
+	            if (rs >= 0) rs = len ;
+	        } /* end if (storeitem) */
+	        if (rs >= 0) {
+	            rnp->len.store = (uchar) rs ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (realname_startpieces) */
@@ -427,9 +422,9 @@ int realname_mailname(realname *rnp,char *rbuf,int rlen) noex {
 	    sbuf	s ;
 	    if ((rs = sbuf_start(&s,rbuf,rlen)) >= 0) {
 	        cint	nlen = REALNAME_STORELEN ;
-	        int		len ;
-	        int		sl ;
-	        int		ch ;
+	        int	len ;
+	        int	sl ;
+	        int	ch ;
 	        bool	f = false ;
 	        cchar	*sp ;
 	        char	nbuf[REALNAME_STORELEN + 1] ;
