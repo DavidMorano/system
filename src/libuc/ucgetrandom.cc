@@ -77,7 +77,7 @@ int uc_getrandom(void *rbuf,int rlen,uint fl) noex {
 int uc_getentropy(void *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    char	*cbuf = reinterpret_cast<charp>(rbuf) ;
+	    char	*cbuf = static_cast<charp>(rbuf) ;
 	    rs = SR_OK ;
 	    cbuf[0] = '\0' ;
 	    if (rlen > 0) {

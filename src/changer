@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} namespace "
+NAMES="${NAMES} reinterpret_cast"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/local namespaces/s//imported namespaces/g
+g/reinterpret_cast/s//static_cast/g
 	w
 	q
 EOF

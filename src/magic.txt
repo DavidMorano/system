@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int termout_magic(termout *op,Args ... args) noex {
+static inline int sighand_magic(sighand *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == SIGHAND_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (termout_magic) */
+/* end subroutine (sighand_magic) */

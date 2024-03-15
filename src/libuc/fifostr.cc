@@ -109,7 +109,7 @@ int fifostr_add(fifostr *op,cchar *sp,int sl) noex {
 	        if ((rs = uc_libmalloc(size,&ep)) >= 0) {
 	            ep->slen = sl ;
 	            {
-	                char	*bp = reinterpret_cast<charp>(ep) ;
+	                char	*bp = static_cast<charp>(ep) ;
 	                bp += sizeof(fifostr_ent) ;
 	                strwcpy(bp,sp,sl) ;	/* <- ok: see 'size' above */
 	            }
@@ -141,7 +141,7 @@ int fifostr_headread(fifostr *op,char *rbuf,int rlen) noex {
 	            fifostr_ent	*ep = op->head ;
 	            sl = ep->slen ;
 	            if (rbuf) {
-	                cchar	*sp = reinterpret_cast<charp>(ep) ;
+	                cchar	*sp = static_cast<charp>(ep) ;
 	                sp += sizeof(fifostr_ent) ;
 	                rs = snwcpy(rbuf,rlen,sp,sl) ;
 	            }
@@ -179,7 +179,7 @@ int fifostr_entread(fifostr *op,char *rbuf,int rlen,int n) noex {
 	                if (ep) {
 	                    sl = ep->slen ;
 	                    if (rbuf) {
-	                	cchar	*sp = reinterpret_cast<charp>(ep) ;
+	                	cchar	*sp = static_cast<charp>(ep) ;
 	                        sp += sizeof(fifostr_ent) ;
 	                        rs = snwcpy(rbuf,rlen,sp,sl) ;
 			    } else {
@@ -224,7 +224,7 @@ int fifostr_remove(fifostr *op,char *rbuf,int rlen) noex {
 	            fifostr_ent	*ep = op->head ;
 	            sl = ep->slen ;
 	            if (rbuf) {
-	                cchar	*sp = reinterpret_cast<charp>(ep) ;
+	                cchar	*sp = static_cast<charp>(ep) ;
 	                sp += sizeof(fifostr_ent) ;
 	                rs = snwcpy(rbuf,rlen,sp,sl) ;
 	            }
@@ -282,7 +282,7 @@ int fifostr_enum(fifostr *op,fifostr_cur *curp,char *rbuf,int rlen) noex {
 	            if (ep != nullptr) {
 	                sl = ep->slen ;
 	                if (rbuf != nullptr) {
-	                    cchar	*sp = reinterpret_cast<charp>(ep) ;
+	                    cchar	*sp = static_cast<charp>(ep) ;
 	                    sp = (cchar *) ep ;
 	                    sp += sizeof(fifostr_ent) ;
 	                    rs = snwcpy(rbuf,rlen,sp,sl) ;

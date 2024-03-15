@@ -108,6 +108,21 @@ struct vars {
 	int		maxcombolen ;
 } ;
 
+namespace {
+    struct helper {
+	ostream		*osp ;
+	cchar		*pr ;
+	cchar		*sn ;
+	cchar		*fn ;
+	helper(ostream *sp,cc *p,cc *s,cc *f) noex : osp(sp), pr(p), sn(s) { 
+	    fn = f ;
+	} ; /* end ctor */
+ 	int start() noex ;
+	int finish() noex ;
+	operator int () noex ;
+    } ; /* end struct (helper) */
+}
+
 
 /* forward references */
 
@@ -283,7 +298,7 @@ static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
 	                    rs = permsched(schedule,svp,tbuf,tlen,fn,R_OK) ;
 			}
 		    }
-	            rs1 = vecstr_finish(&svars) ;
+	            rs1 = vecstr_finish(svp) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (schedule variables) */
 	    } /* end if (maxpathlen) */
