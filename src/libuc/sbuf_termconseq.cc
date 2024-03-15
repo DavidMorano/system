@@ -1,5 +1,5 @@
 /* sbuf_termconseq SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* extra method for the storage buffer (SBuf) object */
 /* version %I% last-modified %G% */
@@ -40,9 +40,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<stdarg.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<termconseq.h>
 #include	<localmisc.h>
@@ -66,6 +65,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -73,6 +75,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

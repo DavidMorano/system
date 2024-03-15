@@ -1,5 +1,5 @@
 /* sbuf_addquoted SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* storage buffer (SBuf) object */
 /* version %I% last-modified %G% */
@@ -39,7 +39,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<mkquoted.h>
 #include	<localmisc.h>
@@ -60,6 +61,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

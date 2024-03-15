@@ -53,8 +53,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<cstring>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>
+#include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
 #include	<format.h>
@@ -82,6 +83,9 @@ using std::min ;
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -140,6 +144,9 @@ int sbuf_hexx(sbuf *sbp,T v) noex {
 	return sbuf_xxxx(sbp,cthex,v) ;
 }
 /* end subroutine-template (sbuf_hexx) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -741,8 +741,8 @@ storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
 sbuf.o:			sbuf.cc sbuf.h
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-sbuf_termconseq.o:	sbuf_termconseq.c sbuf.h
+sbuf_addquoted.o:	sbuf_addquoted.cc sbuf.h
+sbuf_termconseq.o:	sbuf_termconseq.cc sbuf.h
 
 obuf.o:			obuf.cc obuf.hh
 
