@@ -1,13 +1,12 @@
-/* b_clustername */
+/* b_clustername SUPPORT */
+/* lang=C++20 */
 
 /* this is a SHELL built-in command */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
-
 
 /* revision history:
 
@@ -23,12 +22,9 @@
 	We find and print the clustername for the specified nodes.
 
 	Synopsis:
-
 	$ clustername [<node(s)>] [<opt(s)>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

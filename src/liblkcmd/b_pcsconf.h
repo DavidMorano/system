@@ -1,5 +1,7 @@
-/* config */
+/* config HEADER */
+/* lang=C20 */
 
+/* PCS Configuration */
 /* version %I% last-modified %G% */
 
 
@@ -11,7 +13,6 @@
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"0d"
 #define	WHATINFO	"@(#)PCSCONF "

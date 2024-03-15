@@ -1,14 +1,13 @@
-/* b_pcsconf (PCSCONF) */
+/* b_pcsconf SUPPORT (PCSCONF) */
+/* lang=C++20 */
 
 /* PCS Configuration */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_CHECKONC	0		/* check ONC */
-
 
 /* revision history:
 
@@ -21,16 +20,14 @@
 
 /*******************************************************************************
 
-	This program is used either by programs or a user to retrieve the
-	current PCS configuration settings from a PCS configuration file in the
-	PCS distribution directory tree.
+	This program is used either by programs or a user to retrieve
+	the current PCS configuration settings from a PCS configuration
+	file in the PCS distribution directory tree.
 
 	Environment variables:
-
 	PCS		root of program files
 
 	Synopsis:
-
 	$ pcsconf [-ROOT program_root] [-C conf] [keyword] [-V?]
 
 	Notes:
@@ -41,9 +38,7 @@
 		pcsorg
 	Look at the code below (carefully) for the answer!
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

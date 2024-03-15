@@ -1,4 +1,8 @@
-/* config */
+/* b_ismailaddr HEADER */
+/* lang=C20 */
+
+/* SHELL built-in to test for local mail-addresses */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,7 +13,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)ismailaddr "

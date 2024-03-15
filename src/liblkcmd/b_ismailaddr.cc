@@ -1,21 +1,21 @@
-/* b_ismailaddr */
+/* b_ismailaddr SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to test for local mail-addresses */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
-
 /* revision history:
 
 	= 2008-08-11, David A­D­ Morano
-	This subroutine (program) was adapted from an old 1999 program (which
-	bore little remote similarity) that was used on the old hardware CAD
-	systems.  This program is also ready-designed for use as a KSH built-in
-	command (if anyone might ever want that for any reason).
+	This subroutine (program) was adapted from an old 1999
+	program (which bore little remote similarity) that was used
+	on the old hardware CAD systems.  This program is also
+	ready-designed for use as a KSH built-in command (if anyone
+	might ever want that for any reason).
 
 */
 
@@ -23,18 +23,16 @@
 
 /*******************************************************************************
 
-	This is (or can be) a built-in KSH command for testing whether
-	specified mail-addresses are local (local native to the current node)
-	or not.  Take a look at this.  Would you have thought that determining
-	a local mail-address was this complicated?
+	This is (or can be) a built-in KSH command for testing
+	whether specified mail-addresses are local (local native
+	to the current node) or not.  Take a look at this.  Would
+	you have thought that determining a local mail-address was
+	this complicated?
 
 	Synopsis:
-
 	$ ismailaddr <mailaddr(s)> [-af <afile>] [-V]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
