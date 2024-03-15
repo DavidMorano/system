@@ -57,6 +57,7 @@
 #include	<vecstr.h>
 #include	<spawnproc.h>
 #include	<ucpwcache.h>
+#include	<prgetclustername.h>
 #include	<localmisc.h>
 
 #include	"pwi.h"
@@ -142,7 +143,6 @@ extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getnodename(char *,int) ;
-extern int	getclustername(cchar *,char *,int,cchar *) ;
 extern int	getgecosname(cchar *,int,cchar **) ;
 extern int	hasuc(cchar *,int) ;
 extern int	isNotPresent(int) ;
@@ -425,8 +425,8 @@ static int subinfo_midname(SUBINFO *sip) noex {
 	    char	cbuf[NODENAMELEN + 1] ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
 	        cint	rsn = SR_NOTFOUND ;
-	        cchar		*nn ;
-	        if ((rs = getclustername(sip->pr,cbuf,nlen,nbuf)) >= 0) {
+	        cchar	*nn ;
+	        if ((rs = prgetclustername(sip->pr,cbuf,nlen,nbuf)) >= 0) {
 	            nn = cbuf ;
 		} else if (rs == rsn) {
 		    rs = SR_OK ;

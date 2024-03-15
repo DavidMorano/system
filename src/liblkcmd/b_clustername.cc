@@ -45,7 +45,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bits.h>
@@ -53,6 +52,7 @@
 #include	<field.h>
 #include	<vecstr.h>
 #include	<clusterdb.h>
+#include	<prgetclustername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -110,7 +110,6 @@ extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getclustername(const char *,char *,int,const char *) ;
 extern int	strwcmp(const char *,const char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -994,20 +993,7 @@ static int procnode(PROGINFO *pip,void *ofp,cchar *np,int nl)
 	        const int	clen = NODENAMELEN ;
 	        char		cbuf[NODENAMELEN+1] ;
 
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(2))
-	            debugprintf("b_clustername/procnode: getclustername() \n") ;
-#endif
-
-	        rs1 = getclustername(pip->pr,cbuf,clen,nbuf) ;
-
-#if	CF_DEBUG
-	        if (DEBUGLEVEL(2))
-	            debugprintf("b_clustername/procnode: getclustername() "
-	                "rs=%d cluster=%s\n",
-	                rs1,cbuf) ;
-#endif
-
+	        rs1 = prgetclustername(pip->pr,cbuf,clen,nbuf) ;
 	        if ((rs1 >= 0) && (cbuf[0] != '\0')) {
 	            c += 1 ;
 	            rs = shio_printf(ofp,"%s",cbuf) ;

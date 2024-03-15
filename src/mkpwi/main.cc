@@ -1,8 +1,8 @@
-/* main */
+/* main SUPPORT (mkpwi) */
+/* lang=C++20 */
 
 /* generic (pretty much) front end program subroutine */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -10,7 +10,6 @@
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_KSHLOGID	0		/* KSH-support log-ID */
 #define	CF_TMPDNAME	0		/* do not think we need this */
-
 
 /* revision history:
 
@@ -23,22 +22,21 @@
 
 /*******************************************************************************
 
-	This subroutine forms the front-end part of a generic PCS type of
-	program.  This front-end is used in a variety of PCS programs.
+	This subroutine forms the front-end part of a generic PCS
+	type of program.  This front-end is used in a variety of
+	PCS programs.
 
-	This subroutine was originally part of the Personal Communication
-	Services (PCS) package but can also be used independently from it.
-	Historically, this was developed as part of an effort to maintain high
-	function (and reliable) email communications in the face of
-	increasingly draconian security restrictions imposed on the computers
-	in the DEFINITY development organization.
-
+	This subroutine was originally part of the Personal
+	Communication Services (PCS) package but can also be used
+	independently from it.  Historically, this was developed
+	as part of an effort to maintain high function (and reliable)
+	email communications in the face of increasingly draconian
+	security restrictions imposed on the computers in the
+	DEFINITY development organization.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -52,11 +50,11 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
 #include	<userinfo.h>
+#include	<prgetclustername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -99,7 +97,6 @@ extern int	mkuibang(char *,int,USERINFO *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
 extern int	pcsuserfile(cchar *,cchar *,cchar *,cchar *,cchar *) ;
 extern int	getfname(cchar *,cchar *,int,char *) ;
-extern int	getclustername(cchar *,char *,int,cchar *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getgid_def(cchar *,gid_t) ;
 extern int	isdigitlatin(int) ;
@@ -309,7 +306,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -534,7 +531,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -965,10 +962,10 @@ static int procdbname(PROGINFO *pip)
 	cchar		*pn = pip->progname ;
 
 	if (pip->dbname == NULL) {
-	    const int	clen = NODENAMELEN ;
+	    cint	clen = NODENAMELEN ;
 	    cchar	*nn = pip->nodename ;
 	    char	cbuf[NODENAMELEN + 1] ;
-	    if ((rs = getclustername(pip->pr,cbuf,clen,nn)) >= 0) {
+	    if ((rs = prgetclustername(pip->pr,cbuf,clen,nn)) >= 0) {
 		char	vbuf[MAXPATHLEN+1] ;
 		if ((rs = procvardname(pip,vbuf)) >= 0) {
 		    char	tbuf[MAXPATHLEN+1] ;
@@ -977,7 +974,7 @@ static int procdbname(PROGINFO *pip)
 			rs = proginfo_setentry(pip,vpp,tbuf,rs) ;
 		    }
 		} /* end if (procvardname) */
-	    } /* end if (getclustername) */
+	    } /* end if (prgetclustername) */
 	} /* end if (needed) */
 
 	proglog_printf(pip,"dbname=%s (%d)",pip->dbname,rs) ;
@@ -1008,7 +1005,7 @@ static int procvardname(PROGINFO *pip,char *dbuf)
 	    if ((rs = uc_stat(dbuf,&sb)) >= 0) {
 		const gid_t	gid = pip->gid_tools ;
 		if ((pip->euid == sb.st_uid) && (sb.st_gid != gid)) {
-		    const int	n = _PC_CHOWN_RESTRICTED ;
+		    cint	n = _PC_CHOWN_RESTRICTED ;
 		    if ((rs = uc_pathconf(dbuf,n,NULL)) == 0) {
 			rs = uc_chown(dbuf,-1,gid) ;
 		    }
@@ -1018,7 +1015,7 @@ static int procvardname(PROGINFO *pip,char *dbuf)
 	        if ((rs = mkdirs(dbuf,dm)) >= 0) {
 		    if ((rs = uc_minmod(dbuf,dm)) >= 0) {
 		        const gid_t	gid = pip->gid_tools ;
-		        const int	n = _PC_CHOWN_RESTRICTED ;
+		        cint	n = _PC_CHOWN_RESTRICTED ;
 		        if ((rs = uc_pathconf(dbuf,n,NULL)) == 0) {
 			    rs = uc_chown(dbuf,-1,gid) ;
 		        }
@@ -1074,7 +1071,7 @@ static int procuserinfo_begin(PROGINFO *pip,USERINFO *uip)
 	pip->egid = uip->egid ;
 
 	if (rs >= 0) {
-	    const int	hlen = MAXHOSTNAMELEN ;
+	    cint	hlen = MAXHOSTNAMELEN ;
 	    char	hbuf[MAXHOSTNAMELEN+1] ;
 	    cchar	*nn = pip->nodename ;
 	    cchar	*dn = pip->domainname ;
@@ -1124,13 +1121,13 @@ static int procuserinfo_logid(PROGINFO *pip)
 #endif
 	    if (rs & KSHLIB_RMKSH) {
 	        if ((rs = lib_serial()) >= 0) {
-	            const int	s = rs ;
-	            const int	plen = LOGIDLEN ;
-	            const int	pv = pip->pid ;
+	            cint	s = rs ;
+	            cint	plen = LOGIDLEN ;
+	            cint	pv = pip->pid ;
 	            cchar	*nn = pip->nodename ;
 	            char	pbuf[LOGIDLEN+1] ;
 	            if ((rs = mkplogid(pbuf,plen,nn,pv)) >= 0) {
-	                const int	slen = LOGIDLEN ;
+	                cint	slen = LOGIDLEN ;
 	                char		sbuf[LOGIDLEN+1] ;
 	                if ((rs = mksublogid(sbuf,slen,pbuf,s)) >= 0) {
 	                    cchar	**vpp = &pip->logid ;
@@ -1150,7 +1147,7 @@ static int procout_begin(PROGINFO *pip,cchar *ofn)
 {
 	int		rs = SR_OK ;
 	if (pip->verboselevel > 1) {
-	    const int	osize = sizeof(bfile) ;
+	    cint	osize = sizeof(bfile) ;
 	    void	*p ;
 	    if ((ofn == NULL) || (ofn[0] == '-')) ofn = BFILE_STDOUT ;
 	    if ((rs = uc_malloc(osize,&p)) >= 0) {

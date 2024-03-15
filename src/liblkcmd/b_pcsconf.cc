@@ -77,6 +77,7 @@
 #include	<pcsconf.h>
 #include	<pcspoll.h>
 #include	<pcsns.h>
+#include	<prgetclustername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -135,7 +136,6 @@ extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	getclustername(cchar *,char *,int,cchar *) ;
 extern int	getlogname(char *,int) ;
 extern int	mkuibang(char *,int,USERINFO *) ;
 extern int	mkuiname(char *,int,USERINFO *) ;
@@ -2163,7 +2163,7 @@ static int locinfo_clustername(LOCINFO *lip)
 	            cchar	*prlocal = lip->prlocal ;
 	            rs1 = SR_NOENT ;
 	            if ((prlocal != NULL) && (prlocal[0] != '\0')) {
-	                rs1 = getclustername(prlocal,nbuf,nlen,nn) ;
+	                rs1 = prgetclustername(prlocal,nbuf,nlen,nn) ;
 	                if (rs1 >= 0) {
 	                    nl = rs1 ;
 	                    np = nbuf ;

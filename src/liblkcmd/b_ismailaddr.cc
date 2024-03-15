@@ -68,6 +68,7 @@
 #include	<storebuf.h>
 #include	<getax.h>
 #include	<pwi.h>
+#include	<prgetclustername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -116,7 +117,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getclustername(cchar *,char *,int,cchar *) ;
 extern int	getuid_name(cchar *,int) ;
 extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	mksublogid(char *,int,cchar *,int) ;
@@ -1112,7 +1112,7 @@ static int locinfo_loadnames(LOCINFO *lip,cchar *lnfname)
 
 	    if ((cp == NULL) || (cp[0] == '\0')) {
 
-	        rs1 = getclustername(pip->pr,nbuf,NODENAMELEN,nn) ;
+	        rs1 = prgetclustername(pip->pr,nbuf,NODENAMELEN,nn) ;
 	        nbl = rs1 ;
 	        if (rs1 >= 0) {
 	            cp = nbuf ;

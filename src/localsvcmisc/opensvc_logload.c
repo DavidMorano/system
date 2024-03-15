@@ -1,20 +1,21 @@
-/* opensvc_logload */
+/* opensvc_logload SUPPORT */
+/* lang=C++20 */
 
 /* GENSERV-user open-service (logload) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_PRNUSER	1		/* use 'prn' as user */
 #define	CF_CTDECF	1		/* use 'ctdecf(3dam)' */
 
-
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -22,11 +23,11 @@
 
 /*******************************************************************************
 
-	This is an user open-service module.  This little diddy supplies a fast
-	little "issue" message for programs that perform logins onto the host.
+	This is an user open-service module.  This little diddy
+	supplies a fast little "issue" message for programs that
+	perform logins onto the host.
 
 	Synopsis:
-
 	int opensvc_logload(pr,prn,of,om,argv,envv,to)
 	const char	*pr ;
 	const char	*prn ;
@@ -37,7 +38,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -47,25 +47,21 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<ctdecf.h>
+#include	<prgetclustername.h>
 #include	<localmisc.h>
 
 #include	"opensvc_logload.h"
@@ -111,7 +107,6 @@ extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	opentmp(const char *,int,mode_t) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getclustername(const char *,char *,int,const char *) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;
@@ -248,7 +243,7 @@ int		to ;
 	if ((rs >= 0) && ((cluster == NULL) || (cluster[0] == '\0'))) {
 	    if (rs >= 0) {
 	        cluster = cbuf ;
-	        rs = getclustername(prlocal,cbuf,clen,nn) ;
+	        rs = prgetclustername(prlocal,cbuf,clen,nn) ;
 	    }
 	} /* end if (cluster) */
 
