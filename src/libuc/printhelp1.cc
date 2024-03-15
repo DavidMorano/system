@@ -109,17 +109,25 @@ struct vars {
 } ;
 
 namespace {
+    struct helper ;
+    typedef int (helper::*helper_m)() noex ;
     struct helper {
 	ostream		*osp ;
 	cchar		*pr ;
 	cchar		*sn ;
 	cchar		*fn ;
+	char		*tbuf ;
+	vecstr		svars ;
+	int		tlen ;
 	helper(ostream *sp,cc *p,cc *s,cc *f) noex : osp(sp), pr(p), sn(s) { 
 	    fn = f ;
 	} ; /* end ctor */
- 	int start() noex ;
+ 	int start(char *,int) noex ;
 	int finish() noex ;
 	operator int () noex ;
+	int sched(mainv) noex ;
+	int schedfile() noex ;
+	int schedlocal() noex ;
     } ; /* end struct (helper) */
 }
 
@@ -130,7 +138,6 @@ static int	printhelper(ostream *,cc *,cc *,cc *) noex ;
 static int	printproc(ostream *,cchar *,cchar *,cchar *) noex ;
 static int	printout(ostream *,expcook *,cc *) noex ;
 
-static int	findhelp(cchar *,cchar *,char *,cchar *) noex ;
 static int	loadscheds(vecstr *,cchar *,cchar *) noex ;
 
 static int	expcook_load(expcook *,cc *,cc *) noex ;
@@ -140,7 +147,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr cchar	*schedule[] = {
+static constexpr cchar *const schedule[] = {
 	"%r/%l/%n/%n.%f",
 	"%r/%l/%n/%f",
 	"%r/share/help/%n.%f",
@@ -173,6 +180,12 @@ static constexpr cchar	*expkeys[] = {
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 static vars		var ;
+
+constexpr helper_m	mems[] = {
+	&helper::schedfile,
+	&helper::schedlocal,
+	nullptr
+} ;
 
 
 /* exported variables */
@@ -214,6 +227,7 @@ static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 	int		len = 0 ;
 	char		*tbuf{} ;
 	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    cint	tlen = rs ;
 	    if (strchr(fn,'/') != nullptr) {
 	        if ((rs = mkpath(tbuf,pr,fn)) >= 0) {
 	            if ((rs = u_access(tbuf,R_OK)) >= 0) {
@@ -222,10 +236,15 @@ static int printhelper(ostream *osp,cc *pr,cc *sn,cc *fn) noex {
 		    }
 	        } /* end if */
 	    } else {
-		if ((rs = findhelp(pr,sn,tbuf,fn)) >= 0) {
-		        rs = printproc(osp,pr,sn,tbuf) ;
+		helper	ho(osp,pr,sn,fn) ;
+		if ((rs = ho.start(tbuf,tlen)) >= 0) {
+		    {
+			rs = ho ;
 			len = rs ;
-	        }
+		    }
+		    rs1 = ho.finish() ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (helper) */
 	    } /* end if (searching for file) */
 	    rs1 = uc_free(tbuf) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -284,41 +303,51 @@ static int printout(ostream *osp,expcook *ecp,cc *fn) noex {
 }
 /* end subroutine (printout) */
 
-static int findhelp(cchar *pr,cchar *sn,char *tbuf,cchar *fn) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-	mainv		spp = schedule ;
-	    if ((rs = maxpathlen) >= 0) {
-	        vecstr	svars, *svp = &svars ;
-		cint	tlen = rs ;
-	        if ((rs = vecstr_start(svp,6,0)) >= 0) {
-	            if ((rs = loadscheds(svp,pr,sn)) >= 0) {
-	                rs = permsched(spp,svp,tbuf,tlen,fn,R_OK) ;
-		        if (isNotPresent(rs) && (spp != schedule)) {
-	                    rs = permsched(schedule,svp,tbuf,tlen,fn,R_OK) ;
-			}
-		    }
-	            rs1 = vecstr_finish(svp) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (schedule variables) */
-	    } /* end if (maxpathlen) */
+int helper::start(char *b,int l) noex {
+	vecstr		*svp = &svars ;
+	int		rs ;
+	tbuf = b ;
+	tlen = l ;
+	if ((rs = vecstr_start(svp,6,0)) >= 0) {
+	    rs = loadscheds(svp,pr,sn) ;
+	}
 	return rs ;
 }
-/* end subroutine (findhelp) */
 
-#ifdef	COMMENT
-static int havealtsched(char *tbuf,cchar *pr,mainv *asp) noex {
+int helper::finish() noex {
+	vecstr		*svp = &svars ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	{
+	    rs1 = vecstr_finish(svp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	return rs ;
+}
+
+helper::operator int () noex {
+	int		rs = SR_OK ;
+	for (int i = 0 ; (rs == SR_OK) && mems[i] ; i += 1) {
+	    helper_m	m = mems[i] ;
+	    rs = (this->*m)() ;
+	} /* end for */
+	return rs ;
+}
+
+int helper::schedfile() noex {
 	int		rs ;
 	int		rs1 ;
+	int		len = 0 ;
 	if ((rs = mkpath2(tbuf,pr,HELPSCHEDFNAME)) >= 0) {
 	    if ((rs = perm(tbuf,-1,-1,nullptr,R_OK)) >= 0) {
 		vecstr	hs ;
 		cint	vo = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(&hs,15,vo)) >= 0) {
 	            if ((rs = vecstr_loadfile(&hs,false,tbuf)) >= 0) {
-			mainv	rp{} ;
-	                if ((rs = vecstr_getvec(&hs,&rp)) >= 0) {
-			    *asp = rp ;
+			mainv	spp{} ;
+	                if ((rs = vecstr_getvec(&hs,&spp)) >= 0) {
+			    rs = sched(spp) ;
+			    len = rs ;
 			}
 		    } else if (isNotPresent(rs)) {
 			rs = SR_OK ;
@@ -330,10 +359,28 @@ static int havealtsched(char *tbuf,cchar *pr,mainv *asp) noex {
 	        rs = SR_OK ;
 	    }
 	} /* end if (mkpath) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (havealtsched) */
-#endif /* COMMENT */
+/* end method (helper::schedfile) */
+
+int helper::schedlocal() noex {
+	return sched(schedule) ;
+}
+/* end method (helper::schedlocal) */
+
+int helper::sched(mainv spp) noex {
+	vecstr		*svp = &svars ;
+	int		rs ;
+	int		len = 0 ;
+	if ((rs = permsched(spp,svp,tbuf,tlen,fn,R_OK)) >= 0) {
+	    rs = printproc(osp,pr,sn,tbuf) ;
+	    len = rs ;
+	} else if (isNotAccess(rs)) {
+	    rs = SR_OK ;
+	}
+	return (rs >= 0) ? len : rs ;
+}
+/* end method (helper::sched) */
 
 static int loadscheds(vecstr *slp,cchar *pr,cchar *sn) noex {
 	int		rs = SR_OK ;
