@@ -1,5 +1,5 @@
-/* ptrwa */
-/* lang=C20 */
+/* ptrwa SUPPORT */
+/* lang=C++20 */
 
 /* POSIX® Thread Read-Write lock attribute manipulation */
 /* version %I% last-modified %G% */
@@ -25,7 +25,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<usystem.h>
@@ -43,13 +43,16 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int ptrwa_create(PTRWA *op) noex {
+int ptrwa_create(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		to_nomem = utimeout[uto_nomem] ;
-	    bool		f_exit = FALSE ;
+	    bool	f_exit = FALSE ;
 	    repeat {
 	        if ((rs = pthread_rwlockattr_init(op)) > 0) rs = (- rs) ;
 	        if (rs < 0) {
@@ -74,7 +77,7 @@ int ptrwa_create(PTRWA *op) noex {
 }
 /* end subroutine (ptrwa_create) */
 
-int ptrwa_destroy(PTRWA *op) noex {
+int ptrwa_destroy(ptrwa *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = pthread_rwlockattr_destroy(op) ;
@@ -84,7 +87,7 @@ int ptrwa_destroy(PTRWA *op) noex {
 }
 /* end subroutine (ptrwa_destroy) */
 
-int ptrwa_getpshared(PTRWA *op,int *oldp) noex {
+int ptrwa_getpshared(ptrwa *op,int *oldp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = pthread_rwlockattr_getpshared(op,oldp) ;
@@ -94,10 +97,10 @@ int ptrwa_getpshared(PTRWA *op,int *oldp) noex {
 }
 /* end subroutine (ptrwa_getpshared) */
 
-int ptrwa_setpshared(PTRWA *op,int new) noex {
+int ptrwa_setpshared(ptrwa *op,int fl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pthread_rwlockattr_setpshared(op,new) ;
+	    rs = pthread_rwlockattr_setpshared(op,fl) ;
 	    if (rs > 0) rs = (- rs) ;
 	}
 	return rs ;

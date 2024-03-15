@@ -17,25 +17,26 @@
 #include	<sys/param.h>
 #include	<pthread.h>
 #include	<clanguage.h>
-
-#include	"ptrwa.h"
+#include	<ptrwa.h>
 
 
 #define	PTRWLOCK		pthread_rwlock_t
 #define	PTRWLOCK_NAMELEN	(MAXNAMELEN+1)
 
 
+typedef PTRWLOCK	ptrwlock ;
+
 EXTERNC_begin
 
-extern int	ptrwlock_create(PTRWLOCK *,PTRWA *) noex ;
-extern int	ptrwlock_rdlock(PTRWLOCK *) noex ;
-extern int	ptrwlock_tryrdlock(PTRWLOCK *) noex ;
-extern int	ptrwlock_rdlockto(PTRWLOCK *,int) noex ;
-extern int	ptrwlock_wrlock(PTRWLOCK *) noex ;
-extern int	ptrwlock_trywrlock(PTRWLOCK *) noex ;
-extern int	ptrwlock_wrlockto(PTRWLOCK *,int) noex ;
-extern int	ptrwlock_unlock(PTRWLOCK *) noex ;
-extern int	ptrwlock_destroy(PTRWLOCK *) noex ;
+extern int	ptrwlock_create(ptrwlock *,ptrwa *) noex ;
+extern int	ptrwlock_rdlock(ptrwlock *) noex ;
+extern int	ptrwlock_tryrdlock(ptrwlock *) noex ;
+extern int	ptrwlock_rdlockto(ptrwlock *,int) noex ;
+extern int	ptrwlock_wrlock(ptrwlock *) noex ;
+extern int	ptrwlock_trywrlock(ptrwlock *) noex ;
+extern int	ptrwlock_wrlockto(ptrwlock *,int) noex ;
+extern int	ptrwlock_unlock(ptrwlock *) noex ;
+extern int	ptrwlock_destroy(ptrwlock *) noex ;
 
 EXTERNC_end
 

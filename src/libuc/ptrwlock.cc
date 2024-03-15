@@ -1,4 +1,5 @@
-/* ptrwlock */
+/* ptrwlock SUPPORT */
+/* lang=C++20 */
 /* ** broken on SOLARIS®! ** */
 
 /* POSIX® Thread Read-Weite Lock (PRWLOCK) */
@@ -38,16 +39,17 @@
 
 	Updated note:
 
-	This object (or rather the underlying RW-LOCK facility itself) is
-	**broken** on Solaris®.  It is rather complicated but when this object
-	is used within a shared object that was loaded by a program manually
-	(through |dlopen(3dl)|) it fails by messing up its lock state for some
-	reason.  This failure, although quite obscure for most, makes this
-	object unusable for any of our purposes.  Use our own read-write lock
-	(which we developed ourselves) instead.  We do not make stupid-ass
-	mistakes like the Solaris® developers do.  Maybe we make our own types
-	of mistakes, but not the stupid-ass mistakes that the Solaris®
-	developers have done.
+	This object (or rather the underlying RW-LOCK facility
+	itself) is **broken** on Solaris®.  It is rather complicated
+	but when this object is used within a shared object that
+	was loaded by a program manually (through |dlopen(3dl)|)
+	it fails by messing up its lock state for some reason.  This
+	failure, although quite obscure for most, makes this object
+	unusable for any of our purposes.  Use our own read-write
+	lock (which we developed ourselves) instead.  We do not
+	make stupid-ass mistakes like the Solaris® developers do.
+	Maybe we make our own types of mistakes, but not the
+	stupid-ass mistakes that the Solaris® developers have done.
 
 *******************************************************************************/
 
@@ -93,9 +95,7 @@ int ptrwlock_create(PTRWLOCK *psp,PTRWA *atp) noex {
 }
 /* end subroutine (ptrwlock_create) */
 
-
-int ptrwlock_destroy(PTRWLOCK *psp)
-{
+int ptrwlock_destroy(PTRWLOCK *psp) noex {
 	int		rs ;
 
 	if (psp == NULL) return SR_FAULT ;
@@ -108,9 +108,7 @@ int ptrwlock_destroy(PTRWLOCK *psp)
 }
 /* end subroutine (ptrwlock_destroy) */
 
-
-int ptrwlock_rdlock(PTRWLOCK *psp)
-{
+int ptrwlock_rdlock(PTRWLOCK *psp) noex {
 	int		rs ;
 
 	if (psp == NULL) return SR_FAULT ;
@@ -123,9 +121,7 @@ int ptrwlock_rdlock(PTRWLOCK *psp)
 }
 /* end subroutine (ptrwlock_rdlock) */
 
-
-int ptrwlock_tryrdlock(PTRWLOCK *psp)
-{
+int ptrwlock_tryrdlock(PTRWLOCK *psp) noex {
 	int		rs ;
 
 	if (psp == NULL) return SR_FAULT ;
@@ -138,10 +134,8 @@ int ptrwlock_tryrdlock(PTRWLOCK *psp)
 }
 /* end subroutine (ptrwlock_tryrdlock) */
 
-
-int ptrwlock_rdlockto(PTRWLOCK *psp,int to)
-{
-	const int	mint = (1000/NLPS) ;
+int ptrwlock_rdlockto(PTRWLOCK *psp,int to) noex {
+	cint		mint = (1000/NLPS) ;
 	int		rs ;
 	int		cto ;
 	int		c = 0 ;
@@ -176,9 +170,7 @@ int ptrwlock_rdlockto(PTRWLOCK *psp,int to)
 }
 /* end subroutine (ptrwlock_rdlockto) */
 
-
-int ptrwlock_wrlock(PTRWLOCK *psp)
-{
+int ptrwlock_wrlock(PTRWLOCK *psp) noex {
 	int		rs ;
 
 	if (psp == NULL) return SR_FAULT ;
@@ -191,9 +183,7 @@ int ptrwlock_wrlock(PTRWLOCK *psp)
 }
 /* end subroutine (ptrwlock_wrlock) */
 
-
-int ptrwlock_trywrlock(PTRWLOCK *psp)
-{
+int ptrwlock_trywrlock(PTRWLOCK *psp) noex {
 	int		rs ;
 
 	if (psp == NULL) return SR_FAULT ;
@@ -206,10 +196,8 @@ int ptrwlock_trywrlock(PTRWLOCK *psp)
 }
 /* end subroutine (ptrwlock_trywrlock) */
 
-
-int ptrwlock_wrlockto(PTRWLOCK *psp,int to)
-{
-	const int	mint = (1000/NLPS) ;
+int ptrwlock_wrlockto(PTRWLOCK *psp,int to) noex {
+	cint		mint = (1000/NLPS) ;
 	int		rs ;
 	int		cto ;
 	int		c = 0 ;
@@ -242,9 +230,7 @@ int ptrwlock_wrlockto(PTRWLOCK *psp,int to)
 }
 /* end subroutine (ptrwlock_wrlockto) */
 
-
-int ptrwlock_unlock(PTRWLOCK *psp)
-{
+int ptrwlock_unlock(PTRWLOCK *psp) noex {
 	int		rs ;
 
 	if (psp == NULL) return SR_FAULT ;

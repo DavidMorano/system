@@ -1,5 +1,5 @@
 /* msfilee SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* machine status entry */
 /* version %I% last-modified %G% */

@@ -1,5 +1,5 @@
 /* mapex SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* map status-return (SR) values to program exit-codes (EX) */
 /* version %I% last-modified %G% */
@@ -22,6 +22,12 @@
 #include	<localmisc.h>
 
 #include	"mapex.h"
+
+
+/* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

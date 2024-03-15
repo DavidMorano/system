@@ -719,10 +719,10 @@ ptc.o:			ptc.cc ptc.h
 psem.o:			psem.cc psem.h
 
 # POSIX Read-Write Lock (broken in dynamically loadable modeules)
-ptrwlock.o:		ptrwlock.c ptrwlock.h
+ptrwlock.o:		ptrwlock.cc ptrwlock.h
 
 # POSIX Thread Read-Write Lock Attribute
-ptrwa.o:		ptrwa.c ptrwa.h
+ptrwa.o:		ptrwa.cc ptrwa.h
 
 # POSIX Message Queue
 pmq.o:			pmq.cc pmq.h
@@ -812,7 +812,7 @@ digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
-mapex.o:		mapex.c mapex.h
+mapex.o:		mapex.cc mapex.h
 
 sigevent.o:		sigevent.cc sigevent.h
 

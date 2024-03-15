@@ -1,5 +1,5 @@
 /* msfile SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* object to manipulate a MSFILE file */
 /* version %I% last-modified %G% */
