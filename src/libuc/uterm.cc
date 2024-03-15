@@ -30,6 +30,7 @@
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<stdlib>
 #include	<stdarg>
 #include	<cstring>

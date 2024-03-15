@@ -20,6 +20,20 @@
 
 /*******************************************************************************
 
+	Name:
+	fieldterm
+
+	Description:
+	This object facilitates initializeing a field-terminator-block
+	given a c-string of characters.
+
+	Synopsis:
+	constexpr fieldterm	qterms("...xxx...") ;
+
+	Returns:
+	There are no returns as this object substitutes as a C++ type.
+
+	Notes:
 	This is a classic, ported forward from the old VAX-11/70
 	days. This was translated from VAX assembly language.
 

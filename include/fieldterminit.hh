@@ -46,7 +46,6 @@
 #include	<clanguage.h>
 #include	<mkchar.h>
 #include	<baops.h>
-#include	<localmisc.h>
 
 
 constexpr int		fieldtermsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
