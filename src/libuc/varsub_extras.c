@@ -31,7 +31,7 @@
 
 */
 
-/* Copyright (c) 1998,2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2001 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

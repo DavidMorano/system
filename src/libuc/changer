@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} reinterpret_cast"
+NAMES="${NAMES} (c)"
 
 
 DN=/dev/null
