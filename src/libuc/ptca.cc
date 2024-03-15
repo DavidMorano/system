@@ -1,5 +1,5 @@
-/* ptca */
-/* lang=C20 */
+/* ptca SUPPORT */
+/* lang=C++20 */
 
 /* POSIX® Thread Condition Attribute manipulation */
 /* version %I% last-modified %G% */
@@ -22,7 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<usystem.h>
@@ -40,9 +40,12 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int ptca_create(PTCA *op) noex {
+int ptca_create(ptca *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    int		to_nomem = utimeout[uto_nomem] ;
@@ -71,7 +74,7 @@ int ptca_create(PTCA *op) noex {
 }
 /* end subroutine (ptca_create) */
 
-int ptca_destroy(PTCA *op) noex {
+int ptca_destroy(ptca *op) noex {
 	int		rs ;
 	rs = pthread_condattr_destroy(op) ;
 	if (rs > 0) rs = (- rs) ;
@@ -79,7 +82,7 @@ int ptca_destroy(PTCA *op) noex {
 }
 /* end subroutine (ptca_destroy) */
 
-int ptca_getpshared(PTCA *op,int *oldp) noex {
+int ptca_getpshared(ptca *op,int *oldp) noex {
 	int		rs ;
 	rs = pthread_condattr_getpshared(op,oldp) ;
 	if (rs > 0) rs = (- rs) ;
@@ -87,9 +90,9 @@ int ptca_getpshared(PTCA *op,int *oldp) noex {
 }
 /* end subroutine (ptca_getpshared) */
 
-int ptca_setpshared(PTCA *op,int new) noex {
+int ptca_setpshared(ptca *op,int fl) noex {
 	int		rs ;
-	rs = pthread_condattr_setpshared(op,new) ;
+	rs = pthread_condattr_setpshared(op,fl) ;
 	if (rs > 0) rs = (- rs) ;
 	return rs ;
 }

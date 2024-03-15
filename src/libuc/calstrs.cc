@@ -1,5 +1,5 @@
 /* calstrs SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* calendar strings */
 /* version %I% last-modified %G% */
@@ -46,6 +46,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 cchar	*calstrs_months[] = {
 	"January", "February", "March", "April", "May", "June", "July", 

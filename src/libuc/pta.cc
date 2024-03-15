@@ -1,5 +1,5 @@
-/* pta */
-/* lang=C20 */
+/* pta SUPPORT */
+/* lang=C++20 */
 
 /* POSIX® Thread Attribute manipulation */
 /* version %I% last-modified %G% */
@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<usystem.h>
@@ -231,7 +231,7 @@ int pta_getschedpolicy(pta *op,int *vp) noex {
 }
 /* end subroutine (pta_getschedpolicy) */
 
-int pta_setschedparam(pta *op,const struct sched_param *vp) noex {
+int pta_setschedparam(pta *op,const SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
 	    rs = pthread_attr_setschedparam(op,vp) ;
@@ -241,7 +241,7 @@ int pta_setschedparam(pta *op,const struct sched_param *vp) noex {
 }
 /* end subroutine (pta_setschedparam) */
 
-int pta_getschedparam(pta *op,struct sched_param *vp) noex {
+int pta_getschedparam(pta *op,SCHEDPARAM *vp) noex {
 	int		rs = SR_FAULT ;
 	if (op && vp) {
 	    rs = pthread_attr_getschedparam(op,vp) ;
@@ -250,7 +250,6 @@ int pta_getschedparam(pta *op,struct sched_param *vp) noex {
 	return rs ;
 }
 /* end subroutine (pta_getschedparam) */
-
 
 int pta_setstack(pta *op,void *saddr,size_t ssize) noex {
 	int		rs = SR_FAULT ;

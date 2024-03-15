@@ -1,5 +1,5 @@
-/* sigign */
-/* lang=C20 */
+/* sigign SUPPORT */
+/* lang=C++20 */
 
 /* manage process signals */
 /* version %I% last-modified %G% */
@@ -24,9 +24,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -35,7 +35,9 @@
 
 /* local defines */
 
+#ifndef	SIGIGN_HANDLE
 #define	SIGIGN_HANDLE	struct sigign_handle
+#endif
 
 
 /* external subroutines */
@@ -52,23 +54,26 @@
 
 /* local variables */
 
-static cint	sigouts[] = {
+static constexpr int	sigouts[] = {
 	SIGTTOU,
 	0
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sigign_start(SIGIGN *iap,const int *ignores) noex {
+int sigign_start(SIGIGN *iap,cint *ignores) noex {
 	int		rs = SR_FAULT ;
 	int		nhandles = 0 ;
 	if (iap) {
 	    rs = SR_OK ;
-	    if (ignores == NULL) ignores = sigouts ;
+	    if (ignores == nullptr) ignores = sigouts ;
 	    memclear(iap) ;
-	    if (ignores != NULL) {
-	        int		i = 0 ;
+	    if (ignores != nullptr) {
+	        int	i = 0 ;
 	        for (i = 0 ; ignores[i] != 0 ; i += 1) {
 		    nhandles += 1 ;
 	        }
@@ -82,7 +87,7 @@ int sigign_start(SIGIGN *iap,const int *ignores) noex {
 	                sigset_t	nsm ;
 	                iap->handles = (SIGIGN_HANDLE *) vp ;
 	                uc_sigsetempty(&nsm) ;
-	                if (ignores != NULL) {
+	                if (ignores != nullptr) {
 	                    SIGIGN_HANDLE	*hp = iap->handles ;
 	                    int		hsig ;
 	                    for (i = 0 ; ignores[i] != 0 ; i += 1) {
@@ -100,13 +105,13 @@ int sigign_start(SIGIGN *iap,const int *ignores) noex {
 	                        for (int j = (i-1) ; j >= 0 ; j -= 1) {
 	                            hsig = hp[j].sig ;
 	                            sap = &hp[j].action ;
-	                            u_sigaction(hsig,sap,NULL) ;
+	                            u_sigaction(hsig,sap,nullptr) ;
 	                        }
 			    }
 	                } /* end if (ignores) */
 		        if (rs < 0) {
 	      		    uc_free(iap->handles) ;
-			    iap->handles = NULL ;
+			    iap->handles = nullptr ;
 	 	         }
 	            } /* end if (memory allocations) */
 	        } /* end if (handles) */
@@ -130,12 +135,12 @@ int sigign_finish(SIGIGN *iap) noex {
 	            for (int j = (iap->nhandles-1)  ; j >= 0 ; j -= 1) {
 	                cint	hsig = iap->handles[j].sig ;
 	                sap = &iap->handles[j].action ;
-	                rs1 = u_sigaction(hsig,sap,NULL) ;
+	                rs1 = u_sigaction(hsig,sap,nullptr) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end for */
 	            rs1 = uc_free(iap->handles) ;
 	            if (rs >= 0) rs = rs1 ;
-	            iap->handles = NULL ;
+	            iap->handles = nullptr ;
 	        } /* end if */
 	        iap->magic = 0 ;
 	    } /* end if (open) */

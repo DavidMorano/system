@@ -1,5 +1,5 @@
-/* ipow SUPPORT */
-/* lang=C20 */
+/* ipowell SUPPORT */
+/* lang=C++20 */
 
 /* return integer-power */
 /* version %I% last-modified %G% */
@@ -64,13 +64,14 @@
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 #if	CF_DYNAMIC
 
-int ipow(int b,int n)
-{
+int ipow(int b,int n) noex {
 	int		r = 1 ;
 	if (n == 1) {
 	    r = b ;
@@ -90,11 +91,9 @@ int ipow(int b,int n)
 
 #else /* CF_DYNAMIC */
 
-int ipow(int b,int n)
-{
+int ipow(int b,int n) noex {
 	int		r = 1 ;
-	int		i ;
-	for (i = 0 ; i < n ; i += 1) {
+	for (int i = 0 ; i < n ; i += 1) {
 	    r *= b ;
 	}
 	return r ;

@@ -701,13 +701,13 @@ sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h posixdirent.hh
 darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h posixdirent.hh
 
 # POSIX Thread Attribute
-pta.o:			pta.c pta.h
+pta.o:			pta.cc pta.h
 
 # POSIX Thread Mutex Attribute
 ptma.o:			ptma.cc ptma.h
 
 # POSIX Thread Condition Attribute
-ptca.o:			ptca.c ptca.h
+ptca.o:			ptca.cc ptca.h
 
 # POSIX Thread Mutex
 ptm.o:			ptm.cc ptm.h
@@ -729,7 +729,7 @@ pmq.o:			pmq.cc pmq.h
 
 sighand.o:		sighand.cc sighand.h
 sigblock.o:		sigblock.cc sigblock.h
-sigign.o:		sigign.c sigign.h
+sigign.o:		sigign.cc sigign.h
 
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
@@ -813,8 +813,6 @@ bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
 mapex.o:		mapex.c mapex.h
-
-calstrs.o:		calstrs.c calstrs.h
 
 sigevent.o:		sigevent.cc sigevent.h
 
@@ -1177,6 +1175,7 @@ isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
+calstrs.o:		calstrs.cc calstrs.h
 #
 isproc.o:		isproc.cc isproc.h
 #
@@ -1203,6 +1202,7 @@ expcook.o:		expcook.cc	expcook.h
 hostinfo.o:		hostinfo.cc	hostinfo.h
 paramfile.o:		paramfile.cc	paramfile.h
 varsub.o:		varsub.cc	varsub.h
+varsub_extras.o:	varsub_extras.cc varsub.h
 memfile.o:		memfile.cc	memfile.h
 dirlist.o:		dirlist.cc	dirlist.h
 varray.o:		varray.cc	varray.h
