@@ -1,7 +1,7 @@
-/* field SUPPORT */
+/* field_main SUPPORT */
 /* lang=C++20 */
 
-/* routine to parse a line into fields */
+/* subroutine to parse a line into fields */
 /* version %I% last-modified %G% */
 
 
@@ -46,7 +46,7 @@
 
 	Returns:
 	>=0	length of field just parsed out
-	<0	error or not-found
+	<0	error or not-found (system-return)
 
 	The return status block outputs are:
 	- length remaining in string
@@ -63,6 +63,9 @@
 	This object retrieves the next shell-like argument (if there
 	is one).
 
+	Synopsis:
+	int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex
+
 	Arguments:
 	fsbp		field status block pointer
 	terms		bit array of terminating characters
@@ -71,7 +74,7 @@
 
 	Returns:
 	>=0	length of field just parsed out
-	<0	error or not-found
+	<0	error or not-found (system-return)
 
 
 	Notes:
@@ -87,6 +90,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
@@ -110,6 +114,12 @@
 /* local typedefs */
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local structures */
 
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
@@ -125,6 +135,9 @@ namespace {
 	} ;
     } ; /* end struct (terminit) */
 }
+
+
+/* forward references */
 
 
 /* local variables */
@@ -148,6 +161,9 @@ static inline bool istermandnotquote(cchar *terms,int ch) noex {
 static inline bool isquoteanddouble(int sl,int ch) noex {
 	return ((ch == CH_SQUOTE) && (sl > 1) && batst(doubles.terms,ch)) ;
 }
+
+
+/* exported variables */
 
 
 /* exported subroutines */

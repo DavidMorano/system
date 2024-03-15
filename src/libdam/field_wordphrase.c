@@ -1,5 +1,5 @@
-/* field_wordphrase */
-/* lang=C20 */
+/* field_wordphrase SUPPORT */
+/* lang=C++20 */
 
 /* subroutine to parse a line into word-fields */
 /* version %I% last-modified %G% */
@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0	length of field just parsed out (length of FIELD!)
-	<0	invalid field block pointer was passwd
+	<0	invalid field block pointer was passwd (system-return)
 
 	The return status block outputs are:
 	- length remaining in string
@@ -44,8 +44,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<char.h>
@@ -57,10 +57,22 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local variables */
 
 /* quote character '\"' */
-static cchar	dquote[] = {
+static constexpr cchar	dquote[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x04, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -72,7 +84,7 @@ static cchar	dquote[] = {
 } ;
 
 /* 'double quote', 'back slash', 'pound', 'back accent', et cetera */
-static cchar	doubles[] = {
+static constexpr cchar	doubles[] = {
 	0x00, 0x00, 
 	0x00, 0x00,
 	0x14, 0x00, 
@@ -91,7 +103,7 @@ static cchar	doubles[] = {
 	0x00, 0x00
 } ;
 
-static cchar	shterms[] = {
+static constexpr cchar	shterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x09, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -101,6 +113,9 @@ static cchar	shterms[] = {
 	0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

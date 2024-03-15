@@ -1,5 +1,5 @@
-/* field_svcargs */
-/* lang=C20 */
+/* field_svcargs SUPPORT */
+/* lang=C++20 */
 
 /* parse a field object into service envelope items */
 /* version %I% last-modified %G% */
@@ -32,7 +32,7 @@
 
 	Returns:
 	>=0		OK
-	<0		bad
+	<0		error (system-return)
 
 	Notes:
 	I note that "service" arguments (at least as we see it at the
@@ -42,6 +42,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
@@ -70,20 +71,23 @@ using std::nullptr_t ;			/* type */
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int field_svcargs(field *fbp,vecstr *sap) noex {
-	int		rs = SR_FAULT;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
 	if (fbp && sap) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    if ((rs = field_remaining(fbp,np)) >= 0) {
 	        cint	alen = rs ;
-	        char	*abuf ;
+	        char	*abuf{} ;
 	        if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
 		    int		al ;
-	            while ((al = field_sharg(fbp,n,abuf,alen)) >= 0) {
+	            while ((al = field_sharg(fbp,np,abuf,alen)) >= 0) {
 	                c += 1 ;
 	                rs = vecstr_add(sap,abuf,al) ;
 	                if (rs < 0) break ;

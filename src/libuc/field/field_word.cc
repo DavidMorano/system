@@ -1,5 +1,5 @@
-/* field_word */
-/* lang=C20 */
+/* field_word SUPPORT */
+/* lang=C++20 */
 
 /* routine to parse a line into words (word field) */
 /* version %I% last-modified %G% */
@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0	length of field just parsed out
-	<0	invalid field block pointer was passwd
+	<0	invalid field block pointer was passwd (system-return)
 
 	The return status block outputs are:
 	- length remaining in string
@@ -46,8 +46,8 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
 #include	<baops.h>
 #include	<char.h>
@@ -59,9 +59,21 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local variables */
 
-static cchar	wterms[] = {
+static constexpr cchar	wterms[] = {
 	0x00, 0x1A, 0x00, 0x00,
 	0x3F, 0x40, 0x00, 0x7C,
 	0x00, 0x00, 0x00, 0x00,
@@ -73,9 +85,12 @@ static cchar	wterms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int field_word(FIELD *fsbp,cchar *terms,cchar **fpp) noex {
+int field_word(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		ll, fl ;
 	int		ch ;
 	int		chterm = '\0' ;

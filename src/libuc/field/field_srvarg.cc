@@ -48,6 +48,7 @@
 	Returns:
 	>0		length of returned field, possibly zero
 	==0		no additional fields
+	<0		error (system-return)
 
 	The return status block outputs are:
 	- length remaining in string
@@ -64,6 +65,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
@@ -119,6 +121,9 @@ static char		doubles[termsize] = {} ;
 static char		dterms[termsize] = {} ;
 
 constexpr bool		f_trailwhite = CF_TRAILWHITE ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

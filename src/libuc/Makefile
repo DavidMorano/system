@@ -750,12 +750,6 @@ baops.o:		baops.c baops.h
 strop.o:		strop.cc strop.h
 dstr.o:			dstr.cc dstr.h
 
-field.o:		field.cc field.h
-field_srvarg.o:		field_srvarg.cc field.h
-field_svcargs.o:	field_svcargs.c field.h
-field_word.o:		field_word.c field.h
-field_wordphrase.o:	field_wordphrase.c field.h
-
 filebuf.o:		filebuf.cc filebuf.h
 filebuf_writers.o:	filebuf_writers.cc filebuf.h
 filebuf_mailsupport.o:	filebuf_mailsupport.c filebuf.h
@@ -1088,6 +1082,11 @@ isfiledesc.dir:
 # GETXX
 getxx.o:		getxx.dir
 getxx.dir:
+	makesubdir $@
+
+# FIELD
+field.o:		field.dir
+field.dir:
 	makesubdir $@
 
 
