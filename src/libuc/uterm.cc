@@ -17,7 +17,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -30,6 +30,7 @@
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<stdlib>
 #include	<stdarg>
 #include	<cstring>

@@ -290,7 +290,7 @@ int rander::geter(char *rbuf,int rlen,uint fl) noex {
 	    rs = addnoise(fl) ;
 	} /* end if */
 	if (rs >= 0) {
-	    randomvar	*rvp = reinterpret_cast<randomvar *>(rv) ;
+	    randomvar	*rvp = static_cast<randomvar *>(rv) ;
 	    ulong	uv{} ;
 	    cint	usize = sizeof(ulong) ;
 	    while ((rs >= 0) && (rlen > 0)) {
@@ -319,7 +319,7 @@ int rander::addnoise(uint fl) noex {
 	    cint	fd = rs ;
 	    char	rbuf[RBUFLEN+1] ;
 	    if ((rs = u_read(fd,rbuf,rlen)) >= 0) {
-		randomvar	*rvp = reinterpret_cast<randomvar *>(rv) ;
+		randomvar	*rvp = static_cast<randomvar *>(rv) ;
 		cint		len = rs ;
 		rs = randomvar_addnoise(rvp,rbuf,len) ;
 	    } /* end if (read) */
@@ -336,7 +336,7 @@ int rander::randbegin() noex {
 	    cint	osize = sizeof(randomvar) ;
 	    void	*vp{} ;
 	    if ((rs = uc_libmalloc(osize,&vp)) >= 0) {
-	        randomvar	*rvp = reinterpret_cast<randomvar *>(vp) ;
+	        randomvar	*rvp = static_cast<randomvar *>(vp) ;
 	        if ((rs = randomvar_start(rvp,0,0)) >= 0) {
 	            rv = vp ;
 		}
@@ -354,7 +354,7 @@ int rander::randend() noex {
 	int		rs1 ;
 	if (rv) {
 	    {
-	        randomvar	*rvp = reinterpret_cast<randomvar *>(rv) ;
+	        randomvar	*rvp = static_cast<randomvar *>(rv) ;
 	        rs1 = randomvar_finish(rvp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }

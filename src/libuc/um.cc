@@ -140,7 +140,7 @@ namespace {
 
 /* local variables */
 
-static cvoid	*mapfailed = reinterpret_cast<voidp>(MAP_FAILED) ;
+static cvoid	*mapfailed = static_cast<voidp>(MAP_FAILED) ;
 
 
 /* exported variables */

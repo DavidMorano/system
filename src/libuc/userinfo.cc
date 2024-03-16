@@ -365,7 +365,7 @@ static int	procinfo_start(PROCINFO *,UI *,strstore *,int *) noex ;
 static int	procinfo_finish(PROCINFO *) noex ;
 static int 	procinfo_find(PROCINFO *,cchar *) noex ;
 static int	procinfo_pwentry(PROCINFO *,cchar *) noex ;
-static int	procinfo_getpwuser(PROCINFO *,PASSWD *,char *,int,
+static int	procinfo_getpwuser(PROCINFO *,ucentpw *,char *,int,
 			cchar *) noex ;
 static int	procinfo_store(PROCINFO *,int,cchar *,int,cchar **) noex ;
 static int	procinfo_uabegin(PROCINFO *) noex ;
@@ -470,7 +470,7 @@ int userinfo_start(UI *uip,cchar *un) noex {
 	            void	*vp{} ;
 	            if ((rs = uc_calloc(1,sz,&vp)) >= 0) {
 	                strstore	st ;
-	                int		*sis = reinterpret_cast<int *>(vp) ;
+	                int		*sis = static_cast<int *>(vp) ;
 	                if ((rs = strstore_start(&st,10,startsize)) >= 0) {
 	                    if ((rs = userinfo_process(uip,&st,sis,un)) >= 0) {
 	                        rs = userinfo_load(uip,&st,sis) ;
@@ -902,19 +902,19 @@ static int procinfo_find(PROCINFO *pip,cchar *un) noex {
 /* end subroutine (procinfo_find) */
 
 static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
-	PASSWD		pw ;
+	ucentpw		pw ;
 	int		rs ;
 	int		pwlen = pip->tlen ;
 	int		f = false ;
 	char		*pwbuf = pip->tbuf ;
 	if ((rs = procinfo_getpwuser(pip,&pw,pwbuf,pwlen,un)) >= 0) {
-	    ucentpw	*pwp = reinterpret_cast<ucentpw *>(&pw) ;
+	    ucentpw	*pwp = static_cast<ucentpw *>(&pw) ;
 	    pip->f.pw = true ;
 	    if ((rs = pwp->size()) >= 0) {
 	        int	pwsz = rs ;
 	        char	*p{} ;
 	        if ((rs = uc_malloc((pwsz+1),&p)) >= 0) {
-	            ucentpw	*tpwp = reinterpret_cast<ucentpw *>(&pip->pw) ;
+	            ucentpw	*tpwp = static_cast<ucentpw *>(&pip->pw) ;
 	            if ((rs = tpwp->load(p,pwsz,pwp)) >= 0) {
 	                pip->pwbuf = p ;
 	                pip->pwlen = pwsz ;
@@ -930,7 +930,7 @@ static int procinfo_pwentry(PROCINFO *pip,cchar *un) noex {
 }
 /* end subroutine (procinfo_pwentry) */
 
-static int procinfo_getpwuser(PROCINFO *pip,PASSWD *pwp,
+static int procinfo_getpwuser(PROCINFO *pip,ucentpw *pwp,
 		char *pwbuf,int pwlen,cchar *un) noex {
 	userinfo	*uip = pip->uip ;
 	int		rs ;

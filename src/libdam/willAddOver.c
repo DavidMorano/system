@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 2011 David A-D- Morano.  All rights reserved. */
+/* Copyright © 2011 David A-D- Morano.  All rights reserved. */
 
 /******************************************************************************
 

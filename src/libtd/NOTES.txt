@@ -1,4 +1,0 @@
-LIBTD
-
-Dave Morano, 1996-09-05
-

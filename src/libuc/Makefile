@@ -701,13 +701,13 @@ sunos_fsdir.o:		sunos_fsdir.cc sunos_fsdir.h posixdirent.hh
 darwin_fsdir.o:		darwin_fsdir.cc darwin_fsdir.h posixdirent.hh
 
 # POSIX Thread Attribute
-pta.o:			pta.c pta.h
+pta.o:			pta.cc pta.h
 
 # POSIX Thread Mutex Attribute
 ptma.o:			ptma.cc ptma.h
 
 # POSIX Thread Condition Attribute
-ptca.o:			ptca.c ptca.h
+ptca.o:			ptca.cc ptca.h
 
 # POSIX Thread Mutex
 ptm.o:			ptm.cc ptm.h
@@ -719,17 +719,17 @@ ptc.o:			ptc.cc ptc.h
 psem.o:			psem.cc psem.h
 
 # POSIX Read-Write Lock (broken in dynamically loadable modeules)
-ptrwlock.o:		ptrwlock.c ptrwlock.h
+ptrwlock.o:		ptrwlock.cc ptrwlock.h
 
 # POSIX Thread Read-Write Lock Attribute
-ptrwa.o:		ptrwa.c ptrwa.h
+ptrwa.o:		ptrwa.cc ptrwa.h
 
 # POSIX Message Queue
 pmq.o:			pmq.cc pmq.h
 
 sighand.o:		sighand.cc sighand.h
 sigblock.o:		sigblock.cc sigblock.h
-sigign.o:		sigign.c sigign.h
+sigign.o:		sigign.cc sigign.h
 
 hostinfo.o:		hostinfo.cc hostinfo.h
 hostaddr.o:		hostaddr.cc hostaddr.h
@@ -741,20 +741,14 @@ storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
 sbuf.o:			sbuf.cc sbuf.h
-sbuf_addquoted.o:	sbuf_addquoted.c sbuf.h
-sbuf_termconseq.o:	sbuf_termconseq.c sbuf.h
+sbuf_addquoted.o:	sbuf_addquoted.cc sbuf.h
+sbuf_termconseq.o:	sbuf_termconseq.cc sbuf.h
 
 obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
 strop.o:		strop.cc strop.h
 dstr.o:			dstr.cc dstr.h
-
-field.o:		field.cc field.h
-field_srvarg.o:		field_srvarg.cc field.h
-field_svcargs.o:	field_svcargs.c field.h
-field_word.o:		field_word.c field.h
-field_wordphrase.o:	field_wordphrase.c field.h
 
 filebuf.o:		filebuf.cc filebuf.h
 filebuf_writers.o:	filebuf_writers.cc filebuf.h
@@ -776,7 +770,7 @@ envhelp.o:		envhelp.cc envhelp.h
 mkpr.o:			mkpr.cc
 mkprogenv.o:		mkprogenv.cc mkprogenv.h
 
-spawner.o:		spawner.c spawner.h
+spawner.o:		spawner.cc spawner.h
 
 nulstr.o:		nulstr.cc nulstr.h
 
@@ -812,9 +806,7 @@ digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
 
-mapex.o:		mapex.c mapex.h
-
-calstrs.o:		calstrs.c calstrs.h
+mapex.o:		mapex.cc mapex.h
 
 sigevent.o:		sigevent.cc sigevent.h
 
@@ -1092,6 +1084,11 @@ getxx.o:		getxx.dir
 getxx.dir:
 	makesubdir $@
 
+# FIELD
+field.o:		field.dir
+field.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1177,6 +1174,7 @@ isort.o:		isort.cc isort.h
 xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
+calstrs.o:		calstrs.cc calstrs.h
 #
 isproc.o:		isproc.cc isproc.h
 #
@@ -1203,6 +1201,7 @@ expcook.o:		expcook.cc	expcook.h
 hostinfo.o:		hostinfo.cc	hostinfo.h
 paramfile.o:		paramfile.cc	paramfile.h
 varsub.o:		varsub.cc	varsub.h
+varsub_extras.o:	varsub_extras.cc varsub.h
 memfile.o:		memfile.cc	memfile.h
 dirlist.o:		dirlist.cc	dirlist.h
 varray.o:		varray.cc	varray.h

@@ -30,6 +30,12 @@
 #include	<usystem.h>
 
 
+/* local defines */
+
+
+/* imported namespaces */
+
+
 /* local typedefs */
 
 extern "C" {
@@ -37,19 +43,31 @@ extern "C" {
 }
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local stuctures */
 
-struct ucatexit ;
-
-typedef int (ucatexit::*mem_f)() noex ;
-
-struct ucatexit {
+namespace {
+    struct ucatexit ;
+    typedef int (ucatexit::*mem_f)() noex ;
+    struct ucatexit {
 	mem_f		m ;
 	atexit_f	func ;
 	ucatexit(atexit_f f) noex : func(f) { } ;
 	int stdatexit() noex ;
 	int operator () () noex ;
-} ; /* end struct (ucatexit) */
+    } ; /* end struct (ucatexit) */
+}
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -65,10 +83,10 @@ int uc_atexit(atexit_f f) noex {
 /* local subroutines */
 
 int ucatexit::operator () () noex {
-	int	to_again = utimeout[uto_again] ;
-	int	to_nomem = utimeout[uto_nomem] ;
-	int	rs = SR_OK ;
-	bool	f_exit = false ;
+	int		to_again = utimeout[uto_again] ;
+	int		to_nomem = utimeout[uto_nomem] ;
+	int		rs = SR_OK ;
+	bool		f_exit = false ;
 	repeat {
             if ((rs = (this->*m)()) < 0) {
                 switch (rs) {
@@ -106,6 +124,6 @@ int ucatexit::stdatexit() noex {
 	}
 	return rs ;
 }
-/* end subroutine (ucatexit::stdatexit) */
+/* end method (ucatexit::stdatexit) */
 
 

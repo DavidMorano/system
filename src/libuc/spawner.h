@@ -50,13 +50,13 @@ struct spawner_head {
 	cchar		**argv ;
 	cchar		*execfname ;
 	vecobj		cmds ;
-	ENVHELP		env ;
+	envhelp		env ;
 	pid_t		pid ;
 	pid_t		pgrp ;
 	int		opts ;
 } ;
 
-typedef S¶AWNER		spawner ;
+typedef SPAWNER		spawner ;
 
 EXTERNC_begin
 

@@ -1,4 +1,8 @@
-/* config */
+/* b_clustername HEADER */
+/* lang=C20 */
+
+/* this is a SHELL built-in command */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -9,7 +13,6 @@
 */
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
-
 
 #define	VERSION		"0"
 #define	WHATINFO	"@(#)clustername "

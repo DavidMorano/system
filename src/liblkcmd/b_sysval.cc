@@ -123,6 +123,7 @@
 #include	<nulstr.h>
 #include	<getbufsize.h>
 #include	<sysmemutil.h>
+#include	<prgetclustername.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -169,7 +170,6 @@ extern int	getrunlevel(cchar *) ;
 extern int	getmjd(int,int,int) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodeinfo(cchar *,char *,char *,vecstr *,cchar *) ;
-extern int	getclustername(cchar *,char *,int,cchar *) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	gethomeorg(char *,int,cchar *) ;
@@ -2916,7 +2916,7 @@ static int locinfo_clustername(LOCINFO *lip)
 	        cchar		*pr = pip->pr ;
 	        cchar		*nn = lip->nodename ;
 	        char		dbuf[NODENAMELEN+1] ;
-	        if ((rs = getclustername(pr,dbuf,dlen,nn)) >= 0) {
+	        if ((rs = prgetclustername(pr,dbuf,dlen,nn)) >= 0) {
 	            cchar	**vpp = &lip->clustername ;
 	            len = rs ;
 	            rs = locinfo_setentry(lip,vpp,dbuf,rs) ;
