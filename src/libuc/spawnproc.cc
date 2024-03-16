@@ -71,7 +71,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<bufsizevar.hh>
+#include	<getbufsize.h>
 #include	<ucgetpid.h>
 #include	<envhelp.h>
 #include	<vecstr.h>
@@ -97,10 +97,6 @@
 
 #ifndef	ENVBUFLEN
 #define	ENVBUFLEN	(MAXPATHLEN + 40)
-#endif
-
-#ifndef	PATHBUFLEN
-#define	PATHBUFLEN	(8 * MAXPATHLEN)
 #endif
 
 #ifndef	VARPWD
@@ -143,6 +139,13 @@ extern "C" {
 /* external variables */
 
 
+/* local structures */
+
+struct vars {
+	int		maxpathlen ;
+} ;
+
+
 /* forward reference */
 
 static int	spawnproc_pipes(scon *,cchar *,cchar **,cchar **) noex ;
@@ -151,12 +154,14 @@ static int	spawnproc_parfin(scon *,int,int *,int (*)[2]) noex ;
 static void	spawnproc_child(scon *,cchar *,cchar **,cchar **,
 			int,int *,int (*)[2]) noex ;
 
-static int	envhelp_load(ENVHELP *,char *,cchar *,cchar **) noex ;
+static int	envhelp_load(envhelp *,char *,cchar *,cchar **) noex ;
 
 static int	findprog(char *,char *,cchar *) noex ;
 static int	findxfile(ids *,char *,cchar *) noex ;
 static int	ourfork() noex ;
 static int	opendevnull(int *,int) noex ;
+
+static int	mkvars() noex ;
 
 
 /* local variables */
@@ -168,7 +173,7 @@ static constexpr cchar	*envbads[] = {
 	"A__z",
 	"RANDOM",
 	"SECONDS",
-	NULL
+	nullptr
 } ;
 
 static constexpr cint	sigigns[] = {
@@ -200,7 +205,9 @@ static constexpr cint	sigouts[] = {
 	0
 } ;
 
-static bufsizevar	maxpathlen(getbufsize_mp) ;
+static vars		var ;
+
+static constexpr cchar	nullfname[] = NULLFNAME ;
 
 
 /* exported variables */
@@ -209,6 +216,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 /* exported subroutines */
 
 int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
+	static int	rsv = mkvars() ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pid = 0 ;
@@ -216,22 +224,21 @@ int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 	char		pwd[MAXPATHLEN + 1] = { 0 } ;
 	char		pbuf[MAXPATHLEN + 1] ;
 
-	if (psap == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
+	if (psap == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
-/* find the program */
 
+	if ((rs = rsv) >= 0) {
 	if (fname[0] != '/') {
 	    if ((rs = findprog(pwd,pbuf,fname)) > 0) {
 	        efname = pbuf ;
 	    }
 	} else {
-	    rs = perm(fname,-1,-1,NULL,X_OK) ;
+	    rs = perm(fname,-1,-1,nullptr,X_OK) ;
 	}
-
 	if (rs >= 0) {
-	    ENVHELP	e, *ehp = &e ;
+	    envhelp	e, *ehp = &e ;
 	    if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
 	        if ((rs = envhelp_load(ehp,pwd,efname,argv)) >= 0) {
 	            cchar	**ev ;
@@ -244,6 +251,7 @@ int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (envhelp_start) */
 	} /* end if (ok) */
+	} /* end if (mkvars) */
 
 	return (rs >= 0) ? pid : rs ;
 }
@@ -255,13 +263,12 @@ int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 static int spawnproc_pipes(scon *psap,cchar *fname,
 		cchar **argv,cchar **ev) noex {
 	int		rs ;
-	int		i ;
 	int		pid = 0 ;
 	int		con[2] ;
 	int		dupes[3] ;
 	int		pipes[3][2] ;
 
-	for (i = 0 ; i < 3 ; i += 1) {
+	for (int i = 0 ; i < 3 ; i += 1) {
 	    pipes[i][0] = -1 ;
 	    pipes[i][1] = -1 ;
 	    dupes[i] = -1 ;
@@ -274,7 +281,7 @@ static int spawnproc_pipes(scon *psap,cchar *fname,
 	    cint	cfd = con[1] ;
 	    if ((rs = uc_closeonexec(cfd,true)) >= 0) {
 
-	        for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
+	        for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	            switch (psap->disp[i]) {
 	            case SPAWNPROC_DINHERIT:
 	                break ;
@@ -306,12 +313,13 @@ static int spawnproc_pipes(scon *psap,cchar *fname,
 	        } /* end if (ok) */
 
 	        if (rs < 0) { /* error */
-	            for (i = 0 ; i < 3 ; i += 1) {
-	                int	j ;
-	                for (j = 0 ; j < 2 ; j += 1) {
+	            for (int i = 0 ; i < 3 ; i += 1) {
+	                for (int j = 0 ; j < 2 ; j += 1) {
 	                    if (pipes[i][j] >= 0) u_close(pipes[i][j]) ;
 	                }
-	                if (dupes[i] >= 0) u_close(dupes[i]) ;
+	                if (dupes[i] >= 0) {
+			    u_close(dupes[i]) ;
+			}
 	                psap->fd[i] = -1 ;
 	            } /* end for */
 	        } /* end if (error) */
@@ -439,11 +447,11 @@ static void spawnproc_child(scon *psap,cchar *fname,
 	    } /* end for */
 	} /* end if (disposition) */
 	av = argv ;
-	if ((rs >= 0) && (argv == NULL)) {
+	if ((rs >= 0) && (argv == nullptr)) {
 	    cchar	*cp ;
 	    if (sfbasename(fname,-1,&cp) > 0) {
 	        arg[0] = cp ;
-	        arg[1] = NULL ;
+	        arg[1] = nullptr ;
 	        av = arg ;
 	    } else {
 	        rs = SR_NOENT ;
@@ -471,16 +479,16 @@ static void spawnproc_child(scon *psap,cchar *fname,
 }
 /* end subroutine (spawnproc_child) */
 
-static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,
+static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,
 		cchar **argv) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if ((rs = envhelp_envset(ehp,"_EF",efname,-1)) >= 0) {
 	    int		al = -1 ;
-	    cchar	*ap = NULL ;
-	    if (argv != NULL) ap = argv[0] ;
-	    if (ap == NULL) al = sfbasename(efname,-1,&ap) ;
+	    cchar	*ap = nullptr ;
+	    if (argv != nullptr) ap = argv[0] ;
+	    if (ap == nullptr) al = sfbasename(efname,-1,&ap) ;
 	    if ((rs = envhelp_envset(ehp,"_A0",ap,al)) >= 0) {
 		cint	sulen = (strlen(efname)+22) ;
 		char		*subuf ;
@@ -495,8 +503,8 @@ static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,
 	} /* end if (envhelp_envset) */
 
 	if (rs >= 0) {
-	    cchar	*var = VARPWD ;
-	    if ((rs = envhelp_present(ehp,var,-1,NULL)) == rsn) {
+	    static cchar	*var = VARPWD ;
+	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
 	        int	pwdl = -1 ;
 	        rs = SR_OK ;
 	        if (pwd[0] == '\0') {
@@ -511,7 +519,7 @@ static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,
 
 	if (rs >= 0) {
 	    cchar	*var = VARPATH ;
-	    if ((rs = envhelp_present(ehp,var,-1,NULL)) == rsn) {
+	    if ((rs = envhelp_present(ehp,var,-1,nullptr)) == rsn) {
 	        cint	plen = (2*MAXPATHLEN) ;
 	        char	*pbuf ;
 	        if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
@@ -534,7 +542,7 @@ static int findprog(char *pwd,char *pbuf,cchar *fname) noex {
 	int		rs1 ;
 	int		pl = 0 ;
 	if ((rs = ids_load(&id)) >= 0) {
-	    if (strchr(fname,'/') != NULL) {
+	    if (strchr(fname,'/') != nullptr) {
 	        if (pwd[0] == '\0') {
 	            rs = getpwd(pwd,MAXPATHLEN) ;
 	        }
@@ -567,7 +575,7 @@ static int findxfile(ids *idp,char *rbuf,cchar *pn) noex {
 	rbuf[0] = '\0' ;
 	if ((rs = vecstr_start(&plist,40,0)) >= 0) {
 	    cchar	*path = getenv(VARPATH) ;
-	    if ((path != NULL) && (path[0] != '\0')) {
+	    if ((path != nullptr) && (path[0] != '\0')) {
 	        rs = vecstr_addpath(&plist,path,-1) ;
 	    } else {
 	        rs = vecstr_addcspath(&plist) ;
@@ -595,7 +603,7 @@ static int opendevnull(int *opens,int i) noex {
 	if ((rs = u_fstat(i,&sb)) == rsbad) {
 	    cint	of = (i == 0) ? O_RDONLY : O_WRONLY ;
 	    cmode	om = 0666 ;
-	    if ((rs = u_open(NULLFNAME,of,om)) >= 0) {
+	    if ((rs = u_open(nullfname,of,om)) >= 0) {
 	        cint	fd = rs ;
 	        if (fd != i) {
 	            if ((rs = u_dup2(fd,i)) >= 0) {
@@ -613,5 +621,14 @@ static int opendevnull(int *opens,int i) noex {
 	return rs ;
 }
 /* end subroutine (opendevnull) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    var.maxpathlen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
