@@ -34,6 +34,11 @@
 #include	<string>
 #include	<new>
 #include	<usystem.h>
+#include	<strn.h>
+#include	<sfx.h>
+#include	<six.h>
+#include	<snwcpyx.h>
+#include	<matstr.h>
 #include	<toxc.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -58,20 +63,15 @@
 using namespace		std ;		/* yes, we want punishment! */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern "C" int	snwcpyuc(char *,int,cchar *,int) ;
-extern "C" int	wsnwcpynarrow(wchar_t *,int,cchar *,int) ;
-extern "C" int	sfshrink(cchar *,int,cchar **) ;
-extern "C" int	sisub(cchar *,int,cchar *) ;
-extern "C" int	sichr(cchar *,int,int) ;
-extern "C" int	matcasestr(cchar **,cchar *,int) ;
-extern "C" int	isprintbad(int) ;
-
-extern "C" char	*strwcpy(char *,char *,int) ;
-extern "C" char	*strwset(char *,int,int) ;
-extern "C" char	*strnchr(char *,int,int) ;
-extern "C" char	*strnsub(char *,int,cchar *) ;
+extern "C" int	wsnwcpynarrow(wchar_t *,int,cchar *,int) noex ;
 
 
 /* external variables */
@@ -89,21 +89,21 @@ struct escinfo {
 } ;
 
 class subinfo {
-	HDRDECODE	*op ;
+	hdrdecode	*op ;
 	wchar_t		*rarr ;
 	cchar		*sp ;
 	int		rlen ;
 	int		rl ;
 	int		sl ;
-	int procreg(int) ;
-	int procreg(cchar *,int) ;
-	int procreger(cchar *,int) ;
-	int proctrans(ESCINFO *) ;
-	int proctranser(ESCINFO *,cchar *,int) ;
-	int proctrans_b(ESCINFO *,char *,int) ;
-	int proctrans_q(ESCINFO *,char *,int) ;
-	int proctrans_unknown(ESCINFO *,char *,int,cchar *) ;
-	int store(int ch) {
+	int procreg(int) noex ;
+	int procreg(cchar *,int) noex ;
+	int procreger(cchar *,int) noex ;
+	int proctrans(ESCINFO *) noex ;
+	int proctranser(ESCINFO *,cchar *,int) noex ;
+	int proctrans_b(ESCINFO *,char *,int) noex ;
+	int proctrans_q(ESCINFO *,char *,int) noex ;
+	int proctrans_unknown(ESCINFO *,char *,int,cchar *) noex ;
+	int store(int ch) noex {
 	    int	c = 0 ;
 	    if ((rlen-rl) > 0) {
 	        rarr[rl++] = ch ;
@@ -111,50 +111,51 @@ class subinfo {
 	    }
 	    return c ;
 	} ;
-	int store(cchar *cp,int cl) {
-	    int	c = 0 ;
-	    int	i ;
-	    for (i = 0 ; (i < cl) && cp[i] ; i += 1) {
-	        int	ch = (int) mkchar(cp[i]) ;
+	int store(cchar *cp,int cl) noex {
+	    int		c = 0 ;
+	    for (int i = 0 ; (i < cl) && cp[i] ; i += 1) {
+	        cint	ch = (int) mkchar(cp[i]) ;
 	        c += store(ch) ;
 	    }
 	    return c ;
 	} ;
-	int store(wchar_t *wp,int wl) {
-	    int	c = 0 ;
-	    int	i ;
-	    for (i = 0 ; (i < wl) && wp[i] ; i += 1) {
-	        int	ch = (int) wp[i] ;
+	int store(wchar_t *wp,int wl) noex {
+	    int		c = 0 ;
+	    for (int i = 0 ; (i < wl) && wp[i] ; i += 1) {
+	        cint	ch = (int) wp[i] ;
 	        c += store(ch) ;
 	    }
 	    return c ;
 	} ;
-	int storetrans(int,cchar *,int) ;
+	int storetrans(int,cchar *,int) noex ;
 public:
-	subinfo(HDRDECODE *aop,wchar_t *ararr,int arlen) : 
-	    op(aop), rlen(arlen), rl(0), rarr(ararr) {
+	subinfo(hdrdecode *aop,wchar_t *ararr,int arlen) noex {
+	    op = aop ;
+	    rlen = arlen ;
+	    rl = 0 ;
+	    rarr = ararr ;
 	} ;
-	int begin(cchar *asp,int asl) {
+	int begin(cchar *asp,int asl) noex {
 	    sp = asp ;
 	    sl = asl ;
 	    return SR_OK ;
 	} ;
-	int end() {
+	int end() noex {
 	    return SR_OK ;
 	} ;
-	int proc() ;
-} ;
+	int proc() noex ;
+} ; /* end struct (subinfo) */
 
 
 /* forward references */
 
-static int	hdrdecode_b64decoder(HDRDECODE *) ;
-static int	hdrdecode_qpdecoder(HDRDECODE *) ;
-static int	hdrdecode_chartrans(HDRDECODE *) ;
+static int	hdrdecode_b64decoder(hdrdecode *) noex ;
+static int	hdrdecode_qpdecoder(hdrdecode *) noex ;
+static int	hdrdecode_chartrans(hdrdecode *) noex ;
 
-static int	escinfo_have(ESCINFO *,cchar *,int) ;
-static int	escinfo_skip(ESCINFO *) ;
-static int	escinfo_pass(ESCINFO *) ;
+static int	escinfo_have(ESCINFO *,cchar *,int) noex ;
+static int	escinfo_skip(ESCINFO *) noex ;
+static int	escinfo_pass(ESCINFO *) noex ;
 
 
 /* local variables */
@@ -165,7 +166,7 @@ static constexpr cchar	*passes[] = {
 	"Latin-1",
 	"us-ascii",
 	"ascii",
-	NULL
+	nullptr
 } ;
 
 
@@ -174,11 +175,11 @@ static constexpr cchar	*passes[] = {
 
 /* exported subroutines */
 
-int hdrdecode_start(HDRDECODE *op,cchar *pr) noex {
+int hdrdecode_start(hdrdecode *op,cchar *pr) noex {
 	int		rs ;
 	cchar		*cp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	memclear(op) ;			/* dangerous */
 
@@ -191,11 +192,11 @@ int hdrdecode_start(HDRDECODE *op,cchar *pr) noex {
 }
 /* end subroutine (hdrdecode_start) */
 
-int hdrdecode_finish(HDRDECODE *op) noex {
+int hdrdecode_finish(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != HDRDECODE_MAGIC) return SR_NOTOPEN ;
 
 	if (op->chartrans) {
@@ -203,49 +204,51 @@ int hdrdecode_finish(HDRDECODE *op) noex {
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(op->chartrans) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->chartrans = NULL ;
+	    op->chartrans = nullptr ;
 	}
 	if (op->b64decoder) {
 	    rs1 = b64decoder_finish(op->b64decoder) ;
 	    if (rs >= 0) rs = rs1 ;
 	    rs1 = uc_free(op->b64decoder) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->b64decoder = NULL ;
+	    op->b64decoder = nullptr ;
 	}
 	if (op->qpdecoder) {
-	    rs1 = qpdecoder_finish(op->qpdecoder) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->qpdecoder) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->qpdecoder = NULL ;
+	    {
+	        rs1 = qpdecoder_finish(op->qpdecoder) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = uc_free(op->qpdecoder) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->qpdecoder = nullptr ;
 	}
-
-	if (op->pr != NULL) {
+	if (op->pr) {
 	    rs1 = uc_free(op->pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->pr = NULL ;
+	    op->pr = nullptr ;
 	}
-
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (hdrdecode_finish) */
 
-int hdrdecode_proc(HDRDECODE *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
+int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (rarr == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rarr == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 	if (op->magic != HDRDECODE_MAGIC) return SR_NOTOPEN ;
 
 	if (rlen < 0) return SR_INVALID ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
-	if (strnsub(sp,sl,"=?") != NULL) {
+	if (strnsub(sp,sl,"=?") != nullptr) {
 	    subinfo	s(op,rarr,rlen) ;
 	    if ((rs = s.begin(sp,sl)) >= 0) {
 	        {
@@ -267,9 +270,9 @@ int hdrdecode_proc(HDRDECODE *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 
 /* private subroutines */
 
-static int hdrdecode_b64decoder(HDRDECODE *op) noex {
+static int hdrdecode_b64decoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
-	if (op->b64decoder == NULL) {
+	if (op->b64decoder == nullptr) {
 	    cint	size = sizeof(B64DECODER) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
@@ -277,7 +280,7 @@ static int hdrdecode_b64decoder(HDRDECODE *op) noex {
 	        rs = b64decoder_start(op->b64decoder) ;
 	        if (rs < 0) {
 	            uc_free(op->b64decoder) ;
-	            op->b64decoder = NULL ;
+	            op->b64decoder = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
@@ -285,17 +288,17 @@ static int hdrdecode_b64decoder(HDRDECODE *op) noex {
 }
 /* end subroutine (hdrdecode_b64decoder) */
 
-static int hdrdecode_qpdecoder(HDRDECODE *op) noex {
+static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
-	if (op->qpdecoder == NULL) {
-	    cint	size = sizeof(QPDECODER) ;
+	if (op->qpdecoder == nullptr) {
+	    cint	size = sizeof(qpdecoder) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        op->qpdecoder = (QPDECODER *) p ;
+	        op->qpdecoder = (qpdecoder *) p ;
 	        rs = qpdecoder_start(op->qpdecoder,TRUE) ;
 	        if (rs < 0) {
 	            uc_free(op->qpdecoder) ;
-	            op->qpdecoder = NULL ;
+	            op->qpdecoder = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
@@ -303,17 +306,17 @@ static int hdrdecode_qpdecoder(HDRDECODE *op) noex {
 }
 /* end subroutine (hdrdecode_qpdecoder) */
 
-static int hdrdecode_chartrans(HDRDECODE *op) noex {
+static int hdrdecode_chartrans(hdrdecode *op) noex {
 	int		rs = SR_OK ;
-	if (op->chartrans == NULL) {
-	    cint	size = sizeof(CHARTRANS) ;
+	if (op->chartrans == nullptr) {
+	    cint	size = sizeof(chartrans) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        op->chartrans = (CHARTRANS *) p ;
+	        op->chartrans = (chartrans *) p ;
 	        rs = chartrans_open(op->chartrans,op->pr,2) ;
 	        if (rs < 0) {
 	            uc_free(op->chartrans) ;
-	            op->chartrans = NULL ;
+	            op->chartrans = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
@@ -417,13 +420,13 @@ int subinfo::proctranser(ESCINFO *eip,cchar *tp,int tl) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = hdrdecode_chartrans(op)) >= 0) {
-	    CHARTRANS		*ctp = op->chartrans ;
-	    const time_t	dt = time(NULL) ;
+	    chartrans		*ctp = op->chartrans ;
+	    const time_t	dt = time(nullptr) ;
 	    cint		nlen = CHARSETNAMELEN ;
 	    char		nbuf[CHARSETNAMELEN+1] ;
 	    if ((rs = snwcpyuc(nbuf,nlen,eip->csp,eip->csl)) >= 0) {
 	        cint	cel = rs ;
-	        cchar		*cep = nbuf ;
+	        cchar	*cep = nbuf ;
 	        if ((rs = chartrans_transbegin(ctp,dt,cep,cel)) >= 0) {
 	            cint	txid = rs ;
 	            {
@@ -445,7 +448,7 @@ int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
 	int		wl = 0 ;
 	wchar_t		*rbuf{} ;
 	if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
-	    CHARTRANS	*ctp = op->chartrans ;
+	    chartrans	*ctp = op->chartrans ;
 	    if ((rs = chartrans_transread(ctp,txid,rbuf,rlen,tp,tl)) >= 0) {
 	        rs = store(rbuf,rs) ;
 	        wl = rs ;
@@ -481,7 +484,7 @@ int subinfo::proctrans_q(ESCINFO *eip,char *tbuf,int tlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = hdrdecode_qpdecoder(op)) >= 0) {
-	    QPDECODER	*dp = op->qpdecoder ;
+	    qpdecoder	*dp = op->qpdecoder ;
 	    cint	el = eip->edl ;
 	    cchar	*ep = eip->edp ;
 	    if ((rs = qpdecoder_load(dp,ep,el)) >= 0) {
@@ -499,14 +502,17 @@ int subinfo::proctrans_q(ESCINFO *eip,char *tbuf,int tlen) noex {
 /* end subroutine (subinfo::proctrans_q) */
 
 int subinfo::proctrans_unknown(ESCINFO *eip,char *tp,int tl,cchar *sp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	while ((tl > 0) && *sp) {
-	    *tp++ = *sp ;
-	    tl -= 1 ;
-	    c += 1 ;
-	} /* end while */
-	if (*sp != '\0') rs = SR_OVERFLOW ;
+	if (eip) {
+	    rs = SR_OK ;
+	    while ((tl > 0) && *sp) {
+	        *tp++ = *sp ;
+	        tl -= 1 ;
+	        c += 1 ;
+	    } /* end while */
+	    if (*sp != '\0') rs = SR_OVERFLOW ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (subinfo::proctrans_unknown) */
