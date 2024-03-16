@@ -24,7 +24,7 @@
 	environment variables list as just a variable key with no
 	value! I fixed this by not putting anything into the exported
 	environment if it doesn't have a value (at least a value
-	of zero length). I *think* that a NULL value and and a
+	of zero length). I *think* that a nullptr value and and a
 	zero-length value distinquish the case of the variable
 	having an empty value string from one where it did not have
 	any value specified at all.
@@ -103,13 +103,13 @@ int varsub_addvec(varsub *op,vecstr *vsp) noex {
 	for (int i = 0 ; vecstr_get(vsp,i,&sp) >= 0 ; i += 1) {
 	    if (sp) {
 	        kp = sp ;
-	        if ((tp = strchr(sp,'=')) != NULL) {
-		    int		ch = MKCHAR(kp[0]) ;
+	        if ((tp = strchr(sp,'=')) != nullptr) {
+		    int		ch = mkchar(kp[0]) ;
 		    bool	f ;
 		    f = isprintlatin(ch) ;
 	            vp = (tp + 1) ;
 	            if (f) {
-		        ch = MKCHAR(vp[0]) ;
+		        ch = mkchar(vp[0]) ;
 		        f = ((ch == '\0') || isprintlatin(ch)) ;
 	            }
 	            if (f) {
@@ -130,14 +130,14 @@ int varsub_subbuf(varsub *var1p,varsub *var2p,cc *s1,int s1len,
 	int		rs ;
 	int		rl = 0 ;
 
-	if (var1p == NULL) return SR_FAULT ;
-	if (s1 == NULL) return SR_FAULT ;
-	if (s2 == NULL) return SR_FAULT ;
+	if (var1p == nullptr) return SR_FAULT ;
+	if (s1 == nullptr) return SR_FAULT ;
+	if (s2 == nullptr) return SR_FAULT ;
 
 	rs = varsub_expand(var1p,s2,s2len,s1,s1len) ;
 	rl = rs ;
 
-	if ((var2p != NULL) && (rs <= 0)) {
+	if ((var2p != nullptr) && (rs <= 0)) {
 	    rs = varsub_expand(var2p,s2,s2len,s1,s1len) ;
 	    rl = rs ;
 	}
@@ -154,23 +154,23 @@ int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 	int		i ;
 	int		klen, vlen ;
 	int		olen, nlen ;
-	int		f_novalue = TRUE ;
-	int		f_done = FALSE ;
+	int		f_novalue = true ;
+	int		f_done = false ;
 	cchar		*kp, *vp ;
 	cchar		*tp, *sp, *cp ;
 	cchar		*ep ;
-	char		*buf2  = NULL ;
+	char		*buf2  = nullptr ;
 
 /* separate the string into its key and value */
 
 	ep = buf ;
 	kp = buf ;
-	vp = NULL ;
+	vp = nullptr ;
 	vlen = -1 ;
-	f_novalue = TRUE ;
-	if ((tp = strnchr(buf,buflen,'=')) != NULL) {
+	f_novalue = true ;
+	if ((tp = strnchr(buf,buflen,'=')) != nullptr) {
 	    klen = tp - buf ;
-	    f_novalue = FALSE ;
+	    f_novalue = false ;
 	    cp = buf + klen ;
 	    vp = cp + 1 ;
 	    vlen = strnlen(vp,(buflen - klen - 1)) ;
@@ -181,7 +181,7 @@ int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 /* search for this key in the given vector string list (exports) */
 
 	for (i = 0 ; (rs = vecstr_get(vsp,i,&sp)) >= 0 ; i += 1) {
-	    if (sp != NULL) {
+	    if (sp != nullptr) {
 	        if (cmpkey(sp,kp,klen) == 0) break ;
 	    }
 	} /* end for */
@@ -216,7 +216,7 @@ int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 
 /* delete the old one from the substitution array */
 
-	        if (varp != NULL) {
+	        if (varp != nullptr) {
 		    varsub_del(varp,kp,klen) ;
 	        } /* end if (deleting from VARSUB DB) */
 
@@ -229,18 +229,18 @@ int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 	        vlen = nlen - klen - 1 ;
 
 		} else {
-		    buf2 = NULL ;
+		    buf2 = nullptr ;
 		} /* end if (m-a) */
 
 		} /* end if (not done) */
 	    } else {
-	        f_done = TRUE ;
+	        f_done = true ;
 	    }
 	} else {
 /* it did NOT exist already */
 	    if (vlen < 0) {
 	        vlen = 0 ;
-	        if ((vp = getenv3(kp,klen,&ep)) != NULL) {
+	        if ((vp = getenv3(kp,klen,&ep)) != nullptr) {
 /* we let anyone who cares to figure out these lengths by themselves */
 	            nlen = -1 ;
 	            vlen = -1 ;
@@ -250,7 +250,7 @@ int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 
 /* add the new variable to the various DBs */
 
-	if ((rs >= 0) && (! f_done) && (vp != NULL)) {
+	if ((rs >= 0) && (! f_done) && (vp != nullptr)) {
 /* add the new string variable to the running string list */
 	    if ((rs = vecstr_add(vsp,ep,nlen)) < 0) {
 	        return rs ;
@@ -258,13 +258,13 @@ int varsub_merge(varsub *varp,vecstr *vsp,char *buf,int buflen) noex {
 
 /* add the new string variable to the variable_substitution_array */
 
-	    if ((varp != NULL) && (vlen >= 0)) {
+	    if ((varp != nullptr) && (vlen >= 0)) {
 	        rs = varsub_add(varp,kp,klen,vp,vlen) ;
 	    } /* end if (adding to the variable substitution VARSUB DB) */
 
 	} /* end if (adding new variable to DBs) */
 
-	if (buf2 != NULL) {
+	if (buf2 != nullptr) {
 	    uc_free(buf2) ;
 	}
 
@@ -287,25 +287,25 @@ static int cmpkey(cchar *s,cchar *k,int klen) noex {
 
 /* compare a new value with the exiting values of a variable */
 static int cmpvalue(cchar *sp,cchar *vp,int vlen) noex {
+	int		rc = -1 ;
 	char		*cp ;
-	if ((cp = strchr(sp,'=')) == NULL)
-	    return -1 ;
-
-	sp = cp + 1 ;
-	while (*sp) {
-
-	    if ((strncmp(sp,vp,vlen) == 0) &&
-	        ((sp[vlen] == '\0') || (sp[vlen] == ':')))
-	        return 0 ;
-
-	    if ((cp = strchr(sp,':')) == NULL)
-	        break ;
-
-	    sp = cp + 1 ;
-
-	} /* end while */
-
-	return -1 ;
+	if ((cp = strchr(sp,'=')) != nullptr) {
+	    sp = (cp + 1) ;
+	    while (*sp) {
+	        bool	f = true ;
+	        f = f && (strncmp(sp,vp,vlen) == 0) ;
+	        f = f && ((sp[vlen] == '\0') || (sp[vlen] == ':')) ;
+	        if (f) {
+	            rc = 0 ;
+		    break ;
+	        }
+	        if ((cp = strchr(sp,':')) == nullptr) {
+	            break ;
+	        }
+	        sp = cp + 1 ;
+	    } /* end while */
+	} /* end if */
+	return rc ;
 }
 /* end subroutine (cmpvalue) */
 

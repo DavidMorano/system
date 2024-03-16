@@ -784,9 +784,9 @@ randomvar.o:		randomvar.cc randomvar.h
 strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
 strstore.o:		strstore.cc strstore.h
-strmgr.o:		strmgr.c strmgr.h
+strmgr.o:		strmgr.cc strmgr.h
 
-serialbuf.o:		serialbuf.c serialbuf.h
+serialbuf.o:		serialbuf.cc serialbuf.h
 
 stdorder.o:		stdorder.cc stdorder.h
 
