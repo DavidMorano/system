@@ -68,6 +68,7 @@
 #include	<sys/wait.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<csignal>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -76,6 +77,7 @@
 #include	<ids.h>
 #include	<sigign.h>
 #include	<xperm.h>
+#include	<findxfile.h>
 #include	<xfile.h>
 #include	<getpwd.h>
 #include	<snx.h>
@@ -84,6 +86,7 @@
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<localmisc.h>
+#include	<mapex.h>
 #include	<exitcodes.h>
 
 #include	"spawner.h"
@@ -115,8 +118,8 @@
 #define	VARPATH		"PATH"
 #endif
 
-#ifndef	nullptrFNAME
-#define	nullptrFNAME	"/dev/null"
+#ifndef	NULLFNAME
+#define	NULLFNAME	"/dev/null"
 #endif
 
 
@@ -128,9 +131,14 @@
 
 /* external subroutines */
 
-extern int	sigignores(cint *) ;
-extern int	sigdefaults(cint *) ;
-extern int	findxfile(ids *,char *,cchar *) ;
+extern "C" {
+    int		spawner_fddup2(SPAWNER *,int,int) noex ;
+}
+
+extern "C" {
+    extern int	sigignores(cint *) noex ;
+    extern int	sigdefaults(cint *) noex ;
+}
 
 
 /* external variables */
@@ -166,19 +174,17 @@ struct spawner_cmd {
 
 /* forward references */
 
-int		spawner_fddup2(SPAWNER *,int,int) ;
+static int	child(SPAWNER *,SCMD **,cchar **,cchar **) noex ;
 
-static int	child(SPAWNER *,SCMD **,cchar **,cchar **) ;
+static int	procparent(SCMD **) noex ;
+static int	defaultfds(SCMD **) noex ;
+static int	closefds(SCMD **) noex ;
 
-static int	procparent(SCMD **) ;
-static int	defaultfds(SCMD **) ;
-static int	closefds(SCMD **) ;
+static int	envhelp_load(ENVHELP *,char *,cchar *,cchar **) noex ;
 
-static int	envhelp_load(ENVHELP *,char *,cchar *,cchar **) ;
-
-static int	findprog(char *,char *,cchar *) ;
-static int	isUsed(SCMD **,int) ;
-static int	isChildFD(int) ;
+static int	findprog(char *,char *,cchar *) noex ;
+static int	isUsed(SCMD **,int) noex ;
+static int	isChildFD(int) noex ;
 
 
 /* local variables */
@@ -218,7 +224,7 @@ static constexpr int	sigouts[] = {
 	0
 } ;
 
-static constexpr struct mapex	mapexs[] = {
+static constexpr MAPEX	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -706,7 +712,7 @@ static int child(SPAWNER *op,SCMD **cv,mainv av,mainv ev) noex {
 	    case cmd_fdnull:
 	        {
 	            cint	of = cmdp->pfd ; /* open-falgs */
-	            rs = u_open(nullptrFNAME,of,0666) ;
+	            rs = u_open(NULLFNAME,of,0666) ;
 	        }
 	        break ;
 	    case cmd_fddup:
@@ -756,7 +762,7 @@ static int defaultfds(SCMD **cv) noex {
 	    if (! isUsed(cv,i)) {
 	        if ((rs = u_fcntl(i,F_GETFD,0)) == rsbadf) {
 	            cint of = (i == 0) ? O_RDONLY : O_WRONLY ;
-	            rs = u_open(nullptrFNAME,of,0666) ;
+	            rs = u_open(NULLFNAME,of,0666) ;
 	        }
 	    }
 	} /* end for */

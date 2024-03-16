@@ -34,6 +34,11 @@
 #include	<sighand.h>
 #include	<sockaddress.h>
 #include	<raqhand.h>
+#include	<strwcpy.h>
+#include	<mkpathx.h>
+#include	<mkdirs.h>
+#include	<xperm.h>
+#include	<ctdec.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
