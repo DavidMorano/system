@@ -1,14 +1,13 @@
-/* b_querystring */
+/* b_querystring SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -16,8 +15,8 @@
 	This subroutine was originally written.  
 
 	= 2017-09-29, David A­D­ Morano
-	I updated this to use the QUERYSTRING object instead of doing it
-	hack-piece previously.
+	I updated this to use the QUERYSTR object instead of
+	doing it hack-piece previously.
 
 */
 
@@ -25,21 +24,21 @@
 
 /*******************************************************************************
 
-	This parses web a query-string into key-value pairs and prints them out
-	to standard-output.
+	Name:
+	querystring
+
+	Description:
+	This parses web a query-string into key-value pairs and
+	prints them out to standard-output.
 
 	Synopsis:
-
 	$ querystring [-qs <querystring>]
 
 	Notes:
-
 	+ QueryStrings look like:
 		<url>[?<key1>=<val1>[&<key2>=<val2>[...]]]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -749,7 +748,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
 
 	if (qs == NULL) qs = getourenv(envv,VARQS) ;
-	if (qs == NULL) qs = getourenv(envv,VARQUERYSTRING) ;
+	if (qs == NULL) qs = getourenv(envv,VARQURYSTR) ;
 
 	if (rs >= 0) {
 	    rs = procopts(pip,&akopts) ;
@@ -1143,7 +1142,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *qs)
 #endif
 
 	if ((qs != NULL) && (qs[0] != '\0')) {
-	    QUERYSTRING	ps ;
+	    querystr	ps ;
 
 	    if (pip->verboselevel >= 2) {
 	        proclogline(pip,qs) ;
@@ -1154,13 +1153,13 @@ static int procname(PROGINFO *pip,void *ofp,cchar *qs)
 	            pip->progname,qs,strlinelen(qs,-1,60)) ;
 	    }
 
-	    if ((rs = querystring_start(&ps,qs,-1)) >= 0) {
-	        QUERYSTRING_CUR	cur ;
+	    if ((rs = querystr_start(&ps,qs,-1)) >= 0) {
+	        querystr_cur	cur ;
 		int		kl, vl ;
 		cchar		*kp ;
 		cchar		*vp ;
-		if ((rs = querystring_curbegin(&ps,&cur)) >= 0) {
-		    while ((rs1 = querystring_enum(&ps,&cur,&kp,&vp)) >= 0) {
+		if ((rs = querystr_curbegin(&ps,&cur)) >= 0) {
+		    while ((rs1 = querystr_enum(&ps,&cur,&kp,&vp)) >= 0) {
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(4)) {
@@ -1180,10 +1179,10 @@ static int procname(PROGINFO *pip,void *ofp,cchar *qs)
 			if (rs < 0) break ;
 		    } /* end while */
 		    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-		    rs1 = querystring_curend(&ps,&cur) ;
+		    rs1 = querystr_curend(&ps,&cur) ;
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (querystring-cur) */
-		rs1 = querystring_finish(&ps) ;
+		rs1 = querystr_finish(&ps) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (querystring) */
 

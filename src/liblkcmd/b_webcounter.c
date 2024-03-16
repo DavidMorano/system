@@ -1,24 +1,25 @@
-/* b_webcounter */
+/* b_webcounter SUPPORT */
+/* lang=C++20 */
 
 /* this is a generic "main" module for the WEBCOUNTER program */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* run-time debugging */
 #define	CF_DEBUG	0		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 
-
 /* revision history:
 
 	= 2000-03-02, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 	= 2017-10-02, David A­D­ Morano
-	I update this to use the QUERYSTRING object.  Frist, using that object
-	puts that "query string" parsing code all in one place, and Secondly,
-	it handles the weirdo cases of query-string which we previously did
-	not handle fully everywhere welse.
+	I update this to use the QUERYSTR object.  Frist, using
+	that object puts that "query string" parsing code all in
+	one place, and Secondly, it handles the weirdo cases of
+	query-string which we previously did not handle fully
+	everywhere welse.
 
 */
 
@@ -28,9 +29,7 @@
 
 	This is a fairly generic front-end subroutine for small programs.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -65,7 +64,7 @@
 #include	<vecstr.h>
 #include	<mapstrint.h>
 #include	<prsetfname.h>
-#include	<querystring.h>
+#include	<querystr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -194,7 +193,7 @@ static int	proclist(PROGINFO *) ;
 static int	procreg(PROGINFO *,MAPSTRINT *) ;
 static int	procreger(PROGINFO *,cchar *,int,int,MAPSTRINT *) ;
 static int	procqs(PROGINFO *,cchar *) ;
-static int	procqsget(PROGINFO *,QUERYSTRING *,COUNTINFO *) ;
+static int	procqsget(PROGINFO *,querystr *,COUNTINFO *) ;
 static int	procqser(PROGINFO *pip,cchar *,cchar *,int,int) ;
 
 static int	procuserinfo_begin(PROGINFO *,USERINFO *) ;
@@ -995,7 +994,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	}
 
 	if (qs == NULL) qs = getourenv(envv,VARQS) ;
-	if (qs == NULL) qs = getourenv(envv,VARQUERYSTRING) ;
+	if (qs == NULL) qs = getourenv(envv,VARquerystr) ;
 
 	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
 
@@ -1913,8 +1912,8 @@ static int procqs(PROGINFO *pip,cchar *qs)
 	    if (lip->f.inc) act = 1 ;
 
 	    if (rs >= 0) {
-	        QUERYSTRING	ps ;
-	        if ((rs = querystring_start(&ps,qs,-1)) >= 0) {
+	        querystr	ps ;
+	        if ((rs = querystr_start(&ps,qs,-1)) >= 0) {
 	            COUNTINFO	ci ;
 	            if ((rs = procqsget(pip,&ps,&ci)) >= 0) {
 
@@ -1948,9 +1947,9 @@ static int procqs(PROGINFO *pip,cchar *qs)
 
 	            } /* end if (procqsget) */
 
-	            rs1 = querystring_finish(&ps) ;
+	            rs1 = querystr_finish(&ps) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (querystring_start) */
+	        } /* end if (querystr_start) */
 	    } /* end if (ok) */
 
 	} /* end if (not empty) */
@@ -1965,15 +1964,15 @@ static int procqs(PROGINFO *pip,cchar *qs)
 /* end subroutine (procqs) */
 
 
-static int procqsget(PROGINFO *pip,QUERYSTRING *qsp,COUNTINFO *cip)
+static int procqsget(PROGINFO *pip,querystr *qsp,COUNTINFO *cip)
 {
-	QUERYSTRING_CUR	cur ;
+	querystr_cur	cur ;
 	int		rs ;
 	int		rs1 ;
 	if (pip == NULL) return SR_FAULT ;
-	if ((rs = querystring_curbegin(qsp,&cur)) >= 0) {
+	if ((rs = querystr_curbegin(qsp,&cur)) >= 0) {
 	    cchar	*kp, *vp ;
-	    while ((rs1 = querystring_enum(qsp,&cur,&kp,&vp)) >= 0) {
+	    while ((rs1 = querystr_enum(qsp,&cur,&kp,&vp)) >= 0) {
 	        int		ki ;
 	        int		vl = rs1 ;
 #if	CF_DEBUG
@@ -1996,7 +1995,7 @@ static int procqsget(PROGINFO *pip,QUERYSTRING *qsp,COUNTINFO *cip)
 	        } /* end if (match) */
 	    } /* end while */
 	    if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-	    rs1 = querystring_curend(qsp,&cur) ;
+	    rs1 = querystr_curend(qsp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (querystring-cur) */
 	return rs ;
