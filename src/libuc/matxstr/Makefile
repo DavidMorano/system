@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS=
 
 
-OBJ0_SIX= matstr.o matostr.o matpstr.o
-OBJ1_SIX= matkeystr.o
-OBJ2_SIX= matsubstr.o matcasesubstr.o
-OBJ3_SIX= matnstr.o
+OBJ0_MATXSTR= matstr.o matostr.o matpstr.o
+OBJ1_MATXSTR= matkeystr.o
+OBJ2_MATXSTR= matsubstr.o matcasesubstr.o
+OBJ3_MATXSTR= matnstr.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJA_MATXSTR= obj0_matxstr.o obj1_matxstr.o
+OBJB_MATXSTR= obj2_matxstr.o obj3_matxstr.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_MATXSTR= $(OBJA_MATXSTR) $(OBJB_MATXSTR)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MATXSTR)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_MATXSTR)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,17 +109,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_matxstr.o:	$(OBJ0_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MATXSTR)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_matxstr.o:	$(OBJ1_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MATXSTR)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_matxstr.o:	$(OBJ2_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MATXSTR)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_matxstr.o:	$(OBJ3_MATXSTR)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MATXSTR)
 
 
 matstr.o:		matstr.cc matstr.h

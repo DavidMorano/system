@@ -1,9 +1,0 @@
-#!/bin/ksh
-# MKVARLINES
-
-while read N ; do
-  LN=$( echo $N | tr '[A-Z]' '[a-z]' )
-  /bin/echo "const char varnames::${LN}[] = QQ${N}QQ ;"
-done
-
-

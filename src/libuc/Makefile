@@ -192,7 +192,7 @@ OBJ082= envlist.o hdb.o lookaside.o ids.o linefold.o nulstr.o
 OBJ083= dirseen.o dirseen_not.o
 OBJ084= strpack.o strmgr.o strtab.o
 OBJ085= varray.o randomvar.o sigign.o ucsem.o
-OBJ086= sbuf.o sbuf_addquoted.o sbuf_termconseq.o
+OBJ086= sbuf.o
 OBJ087= hostinfo.o hostaddr.o hostent.o inetaddr.o sockaddress.o ucpwcache.o
 
 OBJ088= strsub.o
@@ -740,10 +740,6 @@ sockaddress.o:		sockaddress.cc sockaddress.h
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
-sbuf.o:			sbuf.cc sbuf.h
-sbuf_addquoted.o:	sbuf_addquoted.cc sbuf.h
-sbuf_termconseq.o:	sbuf_termconseq.cc sbuf.h
-
 obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
@@ -788,9 +784,9 @@ randomvar.o:		randomvar.cc randomvar.h
 strpack.o:		strpack.cc strpack.h
 strtab.o:		strtab.cc strtab.h
 strstore.o:		strstore.cc strstore.h
-strmgr.o:		strmgr.c strmgr.h
+strmgr.o:		strmgr.cc strmgr.h
 
-serialbuf.o:		serialbuf.c serialbuf.h
+serialbuf.o:		serialbuf.cc serialbuf.h
 
 stdorder.o:		stdorder.cc stdorder.h
 
@@ -1064,6 +1060,11 @@ localget.o:		localget.dir
 localget.dir:
 	makesubdir $@
 
+# SBUF
+sbuf.o:			sbuf.dir
+sbuf.dir:
+	makesubdir $@
+
 # BUFFER
 buffer.o:		buffer.dir
 buffer.dir:
@@ -1087,6 +1088,11 @@ getxx.dir:
 # FIELD
 field.o:		field.dir
 field.dir:
+	makesubdir $@
+
+# VARSUB
+varsub.o:		varsub.dir
+varsub.dir:
 	makesubdir $@
 
 
@@ -1200,8 +1206,6 @@ strstore.o:		strstore.cc	strstore.h
 expcook.o:		expcook.cc	expcook.h
 hostinfo.o:		hostinfo.cc	hostinfo.h
 paramfile.o:		paramfile.cc	paramfile.h
-varsub.o:		varsub.cc	varsub.h
-varsub_extras.o:	varsub_extras.cc varsub.h
 memfile.o:		memfile.cc	memfile.h
 dirlist.o:		dirlist.cc	dirlist.h
 varray.o:		varray.cc	varray.h

@@ -54,15 +54,15 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= isfiledesc.h
 
 
-OBJ0_SIX= isasocket.o
-OBJ1_SIX= isfsremote.o
-OBJ2_SIX= isinteractive.o
+OBJ0_ISFILEDESC= isasocket.o
+OBJ1_ISFILEDESC= isfsremote.o
+OBJ2_ISFILEDESC= isinteractive.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o
+OBJA_ISFILEDESC= obj0_isfiledesc.o obj1_isfiledesc.o
+OBJB_ISFILEDESC= obj2_isfiledesc.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_ISFILEDESC= $(OBJA_ISFILEDESC) $(OBJB_ISFILEDESC)
 
 
 default:		$(T).o
@@ -85,10 +85,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_ISFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_ISFILEDESC)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_ISFILEDESC)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -108,14 +108,14 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_isfiledesc.o:	$(OBJ0_ISFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_ISFILEDESC)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_isfiledesc.o:	$(OBJ1_ISFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_ISFILEDESC)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_isfiledesc.o:	$(OBJ2_ISFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_ISFILEDESC)
 
 
 isasocket.o:		isasocket.cc		$(INCS)

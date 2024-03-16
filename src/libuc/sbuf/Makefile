@@ -1,6 +1,6 @@
-# MAKEFILES (localget)
+# MAKEFILES (sbuf)
 
-T= localget
+T= sbuf
 
 ALL= $(T).o $(T).a
 
@@ -51,19 +51,15 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= localget.h
+INCS= sbuf.h
 
 
-OBJ0_LCOALGET= localgetnetload.o
-OBJ1_LCOALGET= localgetorg.o
-OBJ2_LCOALGET= localgetorgcode.o
-OBJ3_LCOALGET= localgetorgloc.o localgetsystat.o
+OBJ0_SBUF= sbuf_main.o sbuf_addquoted.o sbuf_termconseq.o
 
 
-OBJA_LCOALGET= obj0_localget.o obj1_localget.o
-OBJB_LCOALGET= obj2_localget.o obj3_localget.o
+OBJA_SBUF= obj0_sbuf.o
 
-OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
+OBJ_SBUF= $(OBJA_SBUF)
 
 
 default:		$(T).o
@@ -86,10 +82,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LCOALGET)
+$(T).o:			$(OBJ_SBUF)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SBUF)
 
-$(T).a:			$(OBJ_LCOALGET)
+$(T).a:			$(OBJ_SBUF)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,23 +105,12 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_localget.o:	$(OBJ0_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LCOALGET)
-
-obj1_localget.o:	$(OBJ1_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LCOALGET)
-
-obj2_localget.o:	$(OBJ2_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LCOALGET)
-
-obj3_localget.o:	$(OBJ3_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LCOALGET)
+obj0_sbuf.o:	$(OBJ0_SBUF)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SBUF)
 
 
-localgetnetload.o:		localgetnetload.cc	$(INCS)
-localgetorg.o:			localgetorg.cc		$(INCS)
-localgetorgcode.o:		localgetorgcode.cc	$(INCS)
-localgetorgloc.o:		localgetorgloc.cc	$(INCS)
-localgetsystat.o:		localgetsystat.cc	$(INCS)
+sbuf_main.o:		sbuf_main.cc sbuf.h
+sbuf_addquoted.o:	sbuf_addquoted.cc sbuf.h
+sbuf_termconseq.o:	sbuf_termconseq.cc sbuf.h
 
 

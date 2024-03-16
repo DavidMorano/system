@@ -1,6 +1,6 @@
-# MAKEFILES (localget)
+# MAKEFILES (varsub)
 
-T= localget
+T= varsub
 
 ALL= $(T).o $(T).a
 
@@ -51,19 +51,19 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= localget.h
+INCS= varsub.h
 
 
-OBJ0_LCOALGET= localgetnetload.o
-OBJ1_LCOALGET= localgetorg.o
-OBJ2_LCOALGET= localgetorgcode.o
-OBJ3_LCOALGET= localgetorgloc.o localgetsystat.o
+OBJ0_VARSUB= varsub_main.o
+OBJ1_VARSUB= varsub_loadfile.o
+OBJ2_VARSUB= varsub_extras.o
+OBJ3_VARSUB= varsub_dumpfd.o
 
 
-OBJA_LCOALGET= obj0_localget.o obj1_localget.o
-OBJB_LCOALGET= obj2_localget.o obj3_localget.o
+OBJA_VARSUB= obj0_varsub.o obj1_varsub.o
+OBJB_VARSUB= obj2_varsub.o obj3_varsub.o
 
-OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
+OBJ_VARSUB= $(OBJA_VARSUB) $(OBJB_VARSUB)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LCOALGET)
+$(T).o:			$(OBJ_VARSUB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_VARSUB)
 
-$(T).a:			$(OBJ_LCOALGET)
+$(T).a:			$(OBJ_VARSUB)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,23 +109,22 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_localget.o:	$(OBJ0_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LCOALGET)
+obj0_varsub.o:	$(OBJ0_VARSUB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_VARSUB)
 
-obj1_localget.o:	$(OBJ1_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LCOALGET)
+obj1_varsub.o:	$(OBJ1_VARSUB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_VARSUB)
 
-obj2_localget.o:	$(OBJ2_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LCOALGET)
+obj2_varsub.o:	$(OBJ2_VARSUB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_VARSUB)
 
-obj3_localget.o:	$(OBJ3_LCOALGET)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LCOALGET)
+obj3_varsub.o:	$(OBJ3_VARSUB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_VARSUB)
 
 
-localgetnetload.o:		localgetnetload.cc	$(INCS)
-localgetorg.o:			localgetorg.cc		$(INCS)
-localgetorgcode.o:		localgetorgcode.cc	$(INCS)
-localgetorgloc.o:		localgetorgloc.cc	$(INCS)
-localgetsystat.o:		localgetsystat.cc	$(INCS)
+varsub_main.o:		varsub_main.cc		$(INCS)
+varsub_dumpfd.o:	varsub_dumpfd.cc	$(INCS)
+varsub_extras.o:	varsub_extras.cc	$(INCS)
+varsub_loadfile.o:	varsub_loadfile.cc	$(INCS)
 
 

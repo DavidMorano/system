@@ -46,6 +46,38 @@
 #endif
 
 
+/* missing UNIX® signals */
+
+enum signalmissings {
+	signalmissing_poll = 1000,
+	signalmissing_pwr,
+	signalmissing_cancel,
+	signalmissing_lost,
+	signalmissing_overlast
+} ;
+
+#ifndef	SIGCLD
+#define	SIGCLD		SIGCHLD
+#endif
+
+#ifndef	SIGPOLL
+#define	SIGPOLL		signalmissing_poll
+#endif
+
+#ifndef	SIGPWR
+#define	SIGPWR		signalmissing_pwr
+#endif
+
+#ifndef	SIGCANCEL
+#define	SIGCANCEL	signalmissing_cancel
+#endif
+
+#ifndef	SIGLOST
+#define	SIGLOST		signalmissing_lost
+#endif
+
+/* missing file open-flags */
+
 #ifndef	O_LARGEFILE
 #define	O_LARGEFILE	0		/* specify "largefile" */
 #endif
