@@ -199,30 +199,30 @@ int hdrdecode_finish(hdrdecode *op) noex {
 	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != HDRDECODE_MAGIC) return SR_NOTOPEN ;
 
-	if (op->chartrans) {
-	    rs1 = chartrans_close(op->chartrans) ;
+	if (op->ctp) {
+	    rs1 = chartrans_close(op->ctp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->chartrans) ;
+	    rs1 = uc_free(op->ctp) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->chartrans = nullptr ;
+	    op->ctp = nullptr ;
 	}
-	if (op->b64decoder) {
-	    rs1 = b64decoder_finish(op->b64decoder) ;
+	if (op->b64p) {
+	    rs1 = b64decoder_finish(op->b64p) ;
 	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->b64decoder) ;
+	    rs1 = uc_free(op->b64p) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->b64decoder = nullptr ;
+	    op->b64p = nullptr ;
 	}
-	if (op->qpdecoder) {
+	if (op->qpp) {
 	    {
-	        rs1 = qpdecoder_finish(op->qpdecoder) ;
+	        rs1 = qpdecoder_finish(op->qpp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = uc_free(op->qpdecoder) ;
+	        rs1 = uc_free(op->qpp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->qpdecoder = nullptr ;
+	    op->qpp = nullptr ;
 	}
 	if (op->pr) {
 	    rs1 = uc_free(op->pr) ;
@@ -272,15 +272,15 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 
 static int hdrdecode_b64decoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
-	if (op->b64decoder == nullptr) {
-	    cint	size = sizeof(B64DECODER) ;
+	if (op->b64p == nullptr) {
+	    cint	size = sizeof(b64decoder) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        op->b64decoder = (B64DECODER *) p ;
-	        rs = b64decoder_start(op->b64decoder) ;
+	        op->b64p = (b64decoder *) p ;
+	        rs = b64decoder_start(op->b64p) ;
 	        if (rs < 0) {
-	            uc_free(op->b64decoder) ;
-	            op->b64decoder = nullptr ;
+	            uc_free(op->b64p) ;
+	            op->b64p = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
@@ -290,15 +290,15 @@ static int hdrdecode_b64decoder(hdrdecode *op) noex {
 
 static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
-	if (op->qpdecoder == nullptr) {
+	if (op->qpp == nullptr) {
 	    cint	size = sizeof(qpdecoder) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        op->qpdecoder = (qpdecoder *) p ;
-	        rs = qpdecoder_start(op->qpdecoder,TRUE) ;
+	        op->qpp = (qpdecoder *) p ;
+	        rs = qpdecoder_start(op->qpp,true) ;
 	        if (rs < 0) {
-	            uc_free(op->qpdecoder) ;
-	            op->qpdecoder = nullptr ;
+	            uc_free(op->qpp) ;
+	            op->qpp = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
@@ -308,15 +308,15 @@ static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 
 static int hdrdecode_chartrans(hdrdecode *op) noex {
 	int		rs = SR_OK ;
-	if (op->chartrans == nullptr) {
+	if (op->ctp == nullptr) {
 	    cint	size = sizeof(chartrans) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        op->chartrans = (chartrans *) p ;
-	        rs = chartrans_open(op->chartrans,op->pr,2) ;
+	        op->ctp = (chartrans *) p ;
+	        rs = chartrans_open(op->ctp,op->pr,2) ;
 	        if (rs < 0) {
-	            uc_free(op->chartrans) ;
-	            op->chartrans = nullptr ;
+	            uc_free(op->ctp) ;
+	            op->ctp = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (initialization needed) */
@@ -373,6 +373,7 @@ int subinfo::procreger(cchar *ep,int n) noex {
 
 int subinfo::proctrans(ESCINFO *eip) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		el = eip->edl ;
 	int		c = 0 ;
 	if (el > 0) {
@@ -381,8 +382,8 @@ int subinfo::proctrans(ESCINFO *eip) noex {
 	    char	*tbuf ;
 	    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 	        cint	ki = sichr(keystr,-1,eip->ech) ;
-	        int		tl = 0 ;
-	        int		f_err = FALSE ;
+	        int	tl = 0 ;
+	        bool	f_err = false ;
 	        switch (ki) {
 	        case 0: /* B */
 	            rs = proctrans_b(eip,tbuf,tlen) ;
@@ -393,7 +394,7 @@ int subinfo::proctrans(ESCINFO *eip) noex {
 	            tl = rs ;
 	            break ;
 	        default:
-	            f_err = TRUE ;
+	            f_err = true ;
 	            rs = proctrans_unknown(eip,tbuf,tlen,"«¿»") ;
 	            tl = rs ;
 	            break ;
@@ -407,8 +408,8 @@ int subinfo::proctrans(ESCINFO *eip) noex {
 	                c += rs ;
 	            }
 	        } /* end if (pass or trans) */
-
-	        uc_free(tbuf) ;
+	        rs1 = uc_free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
 	} /* end if (positive) */
 	return (rs >= 0) ? c : rs ;
@@ -420,7 +421,7 @@ int subinfo::proctranser(ESCINFO *eip,cchar *tp,int tl) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = hdrdecode_chartrans(op)) >= 0) {
-	    chartrans		*ctp = op->chartrans ;
+	    chartrans		*ctp = op->ctp ;
 	    const time_t	dt = time(nullptr) ;
 	    cint		nlen = CHARSETNAMELEN ;
 	    char		nbuf[CHARSETNAMELEN+1] ;
@@ -448,7 +449,7 @@ int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
 	int		wl = 0 ;
 	wchar_t		*rbuf{} ;
 	if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
-	    chartrans	*ctp = op->chartrans ;
+	    chartrans	*ctp = op->ctp ;
 	    if ((rs = chartrans_transread(ctp,txid,rbuf,rlen,tp,tl)) >= 0) {
 	        rs = store(rbuf,rs) ;
 	        wl = rs ;
@@ -463,7 +464,7 @@ int subinfo::proctrans_b(ESCINFO *eip,char *tbuf,int tlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = hdrdecode_b64decoder(op)) >= 0) {
-	    B64DECODER	*dp = op->b64decoder ;
+	    b64decoder	*dp = op->b64p ;
 	    cint	el = eip->edl ;
 	    cchar	*ep = eip->edp ;
 	    if ((rs = b64decoder_load(dp,ep,el)) >= 0) {
@@ -484,7 +485,7 @@ int subinfo::proctrans_q(ESCINFO *eip,char *tbuf,int tlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = hdrdecode_qpdecoder(op)) >= 0) {
-	    qpdecoder	*dp = op->qpdecoder ;
+	    qpdecoder	*dp = op->qpp ;
 	    cint	el = eip->edl ;
 	    cchar	*ep = eip->edp ;
 	    if ((rs = qpdecoder_load(dp,ep,el)) >= 0) {
@@ -520,7 +521,7 @@ int subinfo::proctrans_unknown(ESCINFO *eip,char *tp,int tl,cchar *sp) noex {
 /* do we have a coding sequence? */
 static int escinfo_have(ESCINFO *eip,cchar *sp,int sl) noex {
 	int		si ;
-	memclear(eip) ;
+	memclear(eip) ;			/* noted dangerous */
 	if ((si = sisub(sp,sl,"=?")) >= 0) {
 	    int		cl ;
 	    cchar	*sp_start = sp ;
@@ -532,14 +533,13 @@ static int escinfo_have(ESCINFO *eip,cchar *sp,int sl) noex {
 	        sp += (cl+1) ;
 	        sl -= (cl+1) ;
 	        if (int i ; (i = sichr(sp,sl,'?')) >= 0) {
-	            cchar	*chp ;
+	            cchar	*chp{} ;
 	            eip->edp = (sp + (i+1)) ;
 	            if (sfshrink(sp,i,&chp) > 0) {
-	                int	ei ;
 	                eip->ech = touc(*chp) ;
 	                sp += (i+1) ;
 	                sl -= (i+1) ;
-	                if ((ei = sisub(sp,sl,"?=")) >= 0) {
+	                if (int ei ; (ei = sisub(sp,sl,"?=")) >= 0) {
 	                    eip->skip = ((sp+ei+2)-sp_start) ;
 	                    eip->edl = (sp+ei-eip->edp) ;
 	                } else {

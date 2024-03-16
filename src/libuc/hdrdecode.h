@@ -38,9 +38,9 @@ struct hdrdecode_flags {
 } ;
 
 struct hdrdecode_head {
-	B64DECODER	*b64decoder ;
-	QPDECODER	*qpdecoder ;
-	CHARTRANS	*chartrans ;
+	b64decoder	*b64p ;
+	qpdecoder	*qpp ;
+	chartrans	*ctp ;
 	cchar		*pr ;
 	HDRDECODE_FL	f ;
 	uint		magic ;
