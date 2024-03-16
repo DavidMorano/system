@@ -1,5 +1,5 @@
-/* sfill */
-/* lang=C20 */
+/* sfill SUPPORT */
+/* lang=C++20 */
 
 /* text fill */
 /* version %I% last-modified %G% */
@@ -22,8 +22,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
@@ -42,7 +41,9 @@
 
 /* external subroutines */
 
-extern int	bwriteblanks(bfile *,int) noex ;
+extern "C" {
+    extern int	bwriteblanks(bfile *,int) noex ;
+}
 
 
 /* external variables */
@@ -62,11 +63,20 @@ extern int	bwriteblanks(bfile *,int) noex ;
 int sfill_start(sfill *op,int indent,bfile *ofp) noex {
 	int		rs = SR_FAULT ;
 	if (op && ofp) {
-	    memset(op,0,sizeof(SFILL)) ;
+	    cint	osz = sizeof(fifostr) ;
+	    void	*vp{} ;
+	    memclear(op) ;		/* dangerous */
 	    op->ofp = ofp ;
 	    op->indent = indent ;
-	    rs = fifostr_start(&op->sq) ;
-	}
+	    if ((rs = uc_malloc(osz,&vp)) >= 0) {
+		op->fsp = (fifostr *) vp ;
+	        rs = fifostr_start(op->fsp) ;
+		if (rs < 0) {
+		    uc_free(vp) ;
+		    op->fsp = nullptr ;
+		}
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sfill_start) */
@@ -76,9 +86,21 @@ int sfill_finish(sfill *op) noex {
 	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
-	    rs1 = fifostr_finish(&op->sq) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
+	    if (op->fsp) {
+	        {
+	            rs1 = fifostr_finish(op->fsp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+		    rs1 = uc_free(op->fsp) ;
+		    if (rs >= 0) rs = rs1 ;
+		    op->fsp = nullptr ;
+	        }
+	    } /* end if (non-null) */
+	    {
+		op->ofp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sfill_finish) */
@@ -102,7 +124,7 @@ int sfill_proc(sfill *op,int olinelen,cchar *linebuf,int linelen) noex {
 	    int		cl ;
 	    rs = SR_OK ;
 	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
-	        rs = fifostr_add(&op->sq,cp,cl) ;
+	        rs = fifostr_add(op->fsp,cp,cl) ;
 	        op->clen += (cl + 1) ;
 	        sl -= ((cp + cl) - sp) ;
 	        sp = (cp + cl) ;
@@ -135,7 +157,7 @@ int sfill_wline(sfill *op,int olinelen) noex {
 	    }
 	    while ((rs >= 0) && (wlen < olinelen)) {
 	        cp = wordbuf ;
-	        cl = fifostr_headread(&op->sq,wordbuf,WORDBUFLEN) ;
+	        cl = fifostr_headread(op->fsp,wordbuf,WORDBUFLEN) ;
 	        if (cl == SR_NOENT) break ;
 	        rs = cl ;
 	        if (rs < 0) break ;
@@ -149,7 +171,7 @@ int sfill_wline(sfill *op,int olinelen) noex {
 	            wlen += rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = fifostr_remove(&op->sq,NULL,0) ;
+	            rs = fifostr_remove(op->fsp,nullptr,0) ;
 	        }
 	        if (rs < 0) break ;
 	    } /* end while (getting words) */
