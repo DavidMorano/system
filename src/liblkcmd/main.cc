@@ -80,11 +80,11 @@
 #include	<sys/uio.h>
 #include	<sys/msg.h>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<limits.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<cstdlib>
 #include	<string.h>
 #include	<time.h>
 #include	<netdb.h>

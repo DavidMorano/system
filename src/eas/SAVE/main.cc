@@ -48,11 +48,11 @@
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<string.h>
 
 #include	<bio.h>

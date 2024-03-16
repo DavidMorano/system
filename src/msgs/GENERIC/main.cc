@@ -46,9 +46,9 @@ static char sccsid[] = "@(#)msgs.c	5.2 (Berkeley) 4/10/86";
 			   (OBJECT must be defined also) */
 /* #define UNBUFFERED	/* use unbuffered output */
 
-#include <stdio.h>
+#include <cstdio>
 #include <sys/param.h>
-#include <signal.h>
+#include <csignal>
 #include <sys/dir.h>
 #include <sys/stat.h>
 #include <ctype.h>

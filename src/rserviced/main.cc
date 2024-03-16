@@ -38,8 +38,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<errno.h>
+#include	<cstdlib>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<bfile.h>

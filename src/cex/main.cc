@@ -39,7 +39,7 @@
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<netdb.h>
 #include	<time.h>

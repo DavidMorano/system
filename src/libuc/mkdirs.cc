@@ -49,7 +49,7 @@
 #include	<cstring>		/* for |strcmp(3c)| */
 #include	<usystem.h>
 #include	<ids.h>
-#include	<mallocxx.h>
+#include	<libmallocxx.h>
 #include	<mkpathx.h>
 #include	<xperm.h>
 #include	<localmisc.h>
@@ -113,7 +113,7 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	char		*dirbuf{} ;
-	if ((rs = malloc_mp(&dirbuf)) >= 0) {
+	if ((rs = libmalloc_mp(&dirbuf)) >= 0) {
             if ((rs = mkpath1(dirbuf,dname)) >= 0) {
                 cchar       *dp = dirbuf ;
                 char        *bp ;
@@ -135,7 +135,7 @@ static int mkdirer(ids *idp,cchar *dname,mode_t dm) noex {
                     c += rs ;
                 } /* end if */
             } /* end if (mkpath1) */
-	    rs1 = uc_free(dirbuf) ;
+	    rs1 = uc_libfree(dirbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;

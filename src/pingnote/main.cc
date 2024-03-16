@@ -31,8 +31,8 @@
 #include	<sys/socket.h>
 #include	<sys/time.h>
 #include	<netinet/in.h>
-#include	<signal.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<cstdlib>
 #include	<string.h>
 #include	<time.h>
 #include	<netdb.h>

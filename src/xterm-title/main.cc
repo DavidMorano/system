@@ -38,8 +38,8 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<signal.h>
+#include	<cstdlib>
+#include	<csignal>
 #include	<string.h>
 #include	<pwd.h>
 #include	<grp.h>

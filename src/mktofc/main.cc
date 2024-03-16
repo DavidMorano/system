@@ -32,9 +32,9 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<usystem.h>
 #include	<ascii.h>

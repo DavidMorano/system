@@ -49,8 +49,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<signal.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<cstdlib>
 #include	<string.h>
 #include	<netdb.h>
 

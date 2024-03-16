@@ -9,10 +9,10 @@
 
 
 #include	<sys/types.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	"localmisc.h"
 #include	"config.h"

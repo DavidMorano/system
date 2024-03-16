@@ -86,9 +86,9 @@
 #include	<termios.h>
 #include <syslog.h>
 #include <netdb.h>
-#include <signal.h>
-#include <stddef.h>
-#include	<stdlib.h>
+#include <csignal>
+#include <cstddef>
+#include	<cstdlib>
 #include <string.h>
 #include <ctype.h>
 
@@ -106,8 +106,8 @@
 #include <security/pam_appl.h>
 #include <string.h>
 #include	<pwd.h>
-#include <errno.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 
 #include	<usystem.h>
 #include	<mallocstuff.h>

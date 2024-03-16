@@ -30,9 +30,9 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<pwd.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<exitcodes.h>
 #include	<localmisc.h>

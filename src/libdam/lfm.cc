@@ -56,13 +56,13 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<filebuf.h>

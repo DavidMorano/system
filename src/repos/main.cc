@@ -4,7 +4,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<string.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 /* local defines */
 

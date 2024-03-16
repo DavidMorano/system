@@ -56,7 +56,7 @@
 
 #include	<envstandards.h>
 #include	<cmath>
-#include	<limits.h>
+#include	<climits>
 #include	<localmisc.h>
 
 

@@ -80,7 +80,7 @@
 #include	<sys/timeb.h>		/* for |struct timeb| */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<time.h>		/* for |strftime(3c)| */
 #include	<usystem.h>

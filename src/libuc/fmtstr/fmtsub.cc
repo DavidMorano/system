@@ -4,11 +4,9 @@
 /* subroutine to format string output */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGZ	0	/* turn on debugging */
 #define	CF_DEBUGZZ	0	/* extra */
 #define	CF_FLOAT	1	/* do you want floating output conversions? */
-#define	CF_LIMITS	1	/* do you have a 'limits.h' include? */
 #define	CF_LPRINT	0	/* the local-print subroutines */
 #define	CF_LSPRINTF	1	/* use internal 'lsprintf(3c)' */
 #define	CF_LVSPRINTF	0	/* local 'vsprintf(3s)'? */
@@ -21,13 +19,13 @@
 #define	CF_BINARYMIN	1	/* perform binary conversion minimally */
 #define	CF_BINCHAR	0	/* compile in 'binchar()' */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        Of course, this subroutine was inspired by the UNIX® equivalent, but
-        this is my own version for a. when I don't have the UNIX® libraries
-        around, and b. to customize it to what I want!
+	Of course, this subroutine was inspired by the UNIX®
+	equivalent, but this is my own version for a. when I don't
+	have the UNIX® libraries around, and b. to customize it
+	to what I want!
 
 */
 
@@ -36,9 +34,10 @@
 /*******************************************************************************
 
 	Description:
-	This subroutine is used by 'printf()' type routines to format an output
-	string from a format specification.  Floating point support is optional
-	at compile time by using the compile time switch "CF_FLOAT".
+	This subroutine is used by 'printf()' type routines to
+	format an output string from a format specification.  Floating
+	point support is optional at compile time by using the
+	compile time switch "CF_FLOAT".
 
 	Synopsis:
 	int format(char *ubuf,int ulen,int mode,cchar *fmt,va_list ap) noex
@@ -66,9 +65,7 @@
 	Other options:
 
 	There are several compile time options available through the
-	switches located at the top of this file.  If you have a
-	'limits.h' include file, you can optionally select to have it
-	used instead of the default limits.
+	switches located at the top of this file.  
 
 	The following nonstandard additions are supported:
 
@@ -102,10 +99,6 @@
 #include	<cstring>
 #include	<wchar.h>
 #include	<stdarg.h>
-
-#if	CF_LIMITS
-#include	<limits.h>
-#endif
 
 #if	CF_FLOAT && F_SUNOS
 #include	<floatingpoint.h>
@@ -156,18 +149,6 @@
 #define MAXOCTDIG	11		/* maximum octal digits in a long */
 
 /* largest normal length positive integer */
-
-#if	defined(CF_LIMITS)
-#if	(! CF_LIMITS)
-
-#ifndef	INT_MIN
-#define	INT_MIN		(-2147483647-1)	/* min value of an "int" */
-#define	INT_MAX		2147483647	/* max value of an "int" */
-#define	UINT_MAX	4294967295U	/* max value of an "unsigned int" */
-#endif
-
-#endif /* (! CF_LIMITS) */
-#endif
 
 #ifndef	LONG_MIN
 #define	LONG_MIN	(-9223372036854775807L-1LL)

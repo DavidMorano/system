@@ -32,9 +32,9 @@
 #include	<sys/time.h>
 #include	<netinet/in.h>
 #include	<time.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<netdb.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
 

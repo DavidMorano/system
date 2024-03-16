@@ -24,9 +24,9 @@
 
 #include	<sys/types.h>
 #include <malloc.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
-#include <stdio.h>
+#include <cstdio>
 
 
 

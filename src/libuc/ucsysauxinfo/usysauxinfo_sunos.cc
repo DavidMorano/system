@@ -31,8 +31,8 @@
 
 #include	<sys/types.h>
 #include	<sys/systeminfo.h>	/* <- where the stuff we want is */
-#include	<errno.h>
-#include	<limits.h>
+#include	<cerrno>
+#include	<climits>
 #include	<unistd.h>
 #include	<cstring>
 #include	<usysrets.h>

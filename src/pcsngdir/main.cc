@@ -37,8 +37,8 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<time.h>
-#include	<signal.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<cstdlib>
 #include	<string.h>
 
 #include	<bfile.h>

@@ -30,8 +30,8 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<cstdlib>
 #include	<string.h>
 
 #include	<cstdlib>

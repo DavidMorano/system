@@ -18,7 +18,7 @@
 #include	<bfile.h>
 #include	<localmisc.h>
 
-#include	<stdio.h>
+#include	<cstdio>
 
 
 #define		DATA_EOF	0x1A

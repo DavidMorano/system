@@ -25,7 +25,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<arpa/inet.h>		/* <- |htonl(3c)| */
-#include	<errno.h>
+#include	<cerrno>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>		/* <- |memcpy(3c)| */

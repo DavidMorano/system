@@ -36,9 +36,9 @@
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
 #include	<sysexits.h>

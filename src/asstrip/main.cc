@@ -40,7 +40,7 @@
 #include	<time.h>
 #include	<ctype.h>
 #include	<string.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 
 #include	<bfile.h>
 #include	<baops.h>

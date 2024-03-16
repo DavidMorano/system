@@ -37,10 +37,10 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<grp.h>
 #include	<syslog.h>

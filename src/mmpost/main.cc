@@ -26,7 +26,7 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
 #include	<string.h>
 #include	<time.h>

@@ -24,8 +24,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<cstdlib>
 #include	<string.h>
 #include	<vector>
 #include	<usystem.h>

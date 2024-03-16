@@ -5,9 +5,9 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<sncpyx.h>
 #include	<localmisc.h>
 

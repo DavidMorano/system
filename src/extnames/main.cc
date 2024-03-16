@@ -27,9 +27,9 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<usystem.h>
 #include	<exitcodes.h>

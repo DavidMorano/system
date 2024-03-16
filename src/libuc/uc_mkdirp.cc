@@ -45,7 +45,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -31,12 +31,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<unistd.h>
 #include	<time.h>
 #include	<string.h>
 #include	<ctype.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<bfile.h>

@@ -25,7 +25,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>

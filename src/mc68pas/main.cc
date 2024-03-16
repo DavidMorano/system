@@ -44,7 +44,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<dirent.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
 

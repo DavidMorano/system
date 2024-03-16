@@ -40,10 +40,10 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<netdb.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 
 #include	<usystem.h>

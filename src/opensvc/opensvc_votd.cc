@@ -78,11 +78,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>

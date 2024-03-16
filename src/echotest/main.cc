@@ -35,8 +35,8 @@
 #include	<sys/time.h>
 #include	<netinet/in.h>
 #include	<time.h>
-#include	<signal.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
 #include	<netdb.h>

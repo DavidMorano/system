@@ -22,7 +22,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<string.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<usystem.h>
 #include	<randomvar.h>
 #include	<ucmallreg.h>

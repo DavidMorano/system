@@ -49,10 +49,10 @@
 #include	<sys/wait.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<pwd.h>
 #include	<netdb.h>

@@ -30,7 +30,7 @@
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<netdb.h>
 

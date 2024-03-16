@@ -42,7 +42,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<string.h>
 #include	<new>
 #include	<initializer_list>

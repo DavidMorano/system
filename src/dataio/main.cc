@@ -13,7 +13,7 @@
 
 
 
-#include	"stddef.h"
+#include	"cstddef"
 
 #include	"usystem.h"
 
@@ -23,7 +23,7 @@
 
 #include	<time.h>
 
-#include	<stdio.h>
+#include	<cstdio>
 
 
 

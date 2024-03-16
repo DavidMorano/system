@@ -37,7 +37,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<string.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 
 #include	<bfile.h>
 #include	<baops.h>

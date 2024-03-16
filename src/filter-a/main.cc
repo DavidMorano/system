@@ -39,7 +39,7 @@
 #include	<sys/stat.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 
 #include	<usystem.h>

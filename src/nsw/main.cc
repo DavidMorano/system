@@ -46,11 +46,11 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/resource.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
 #include	<pwd.h>

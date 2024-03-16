@@ -30,7 +30,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<bfile.h>
 #include	<mktmp.h>
 #include	<ischarx.h>

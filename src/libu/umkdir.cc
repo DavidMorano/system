@@ -1,5 +1,5 @@
-/* u_mkdir SUPPORT */
-/* lang=C20 */
+/* umkdir SUPPORT */
+/* lang=C++20 */
 
 /* make a directory */
 /* version %I% last-modified %G% */
@@ -15,16 +15,22 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
 
 
 /* local defines */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

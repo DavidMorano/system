@@ -12,7 +12,7 @@
 
 
 #include	<envstandards.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<localmisc.h>
 
 

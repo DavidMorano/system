@@ -38,7 +38,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<netdb.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<ctype.h>
 

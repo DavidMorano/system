@@ -20,7 +20,7 @@
 /*
  *  Header files referenced:
  *	sys/types.h	System data types
- *	stdio.h		Definitions for standard I/O functions and constants
+ *	cstdio		Definitions for standard I/O functions and constants
  *	unistd.h	Standard UNIX definitions
  *	string.h	Definitions for string-handling functions
  *	ctype.h		Character-type definitions
@@ -33,7 +33,7 @@
  */
 
 #include	<sys/types.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<unistd.h>
 #include	<string.h>
 #include	<ctype.h>
@@ -41,7 +41,7 @@
 #include	<pwd.h>
 #include	<shadow.h>
 #include	<time.h>
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<fmtmsg.h>
 #include <locale.h>
 

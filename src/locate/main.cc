@@ -54,7 +54,7 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <time.h>
-#include <stdio.h>
+#include <cstdio>
 #include <getopt.h>
 
 #include <config.h>
@@ -71,14 +71,14 @@
 #endif
 
 #ifdef STDC_HEADERS
-#include <stdlib.h>
+#include <cstdlib>
 #else
 char *getenv() ;
 #endif
 
 #ifdef STDC_HEADERS
-#include <stdlib.h>
-#include	<errno.h>
+#include <cstdlib>
+#include	<cerrno>
 #else
 extern int errno ;
 #endif

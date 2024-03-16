@@ -32,7 +32,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<new>
 #include	<utility>
 #include	<usystem.h>

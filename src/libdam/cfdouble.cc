@@ -24,8 +24,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<errno.h>
+#include	<cstdlib>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<localmisc.h>

@@ -47,7 +47,7 @@
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<netdb.h>
 

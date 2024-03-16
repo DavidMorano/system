@@ -32,8 +32,8 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
-#include	<signal.h>
+#include	<climits>
+#include	<csignal>
 #include	<unistd.h>
 #include	<time.h>
 #include	<cstdlib>

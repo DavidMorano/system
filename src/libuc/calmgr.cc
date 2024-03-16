@@ -32,7 +32,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>

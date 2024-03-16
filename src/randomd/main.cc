@@ -42,11 +42,11 @@
 #include	<sys/utsname.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
+#include	<climits>
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<time.h>
 #include	<ftw.h>
 #include	<dirent.h>

@@ -39,7 +39,7 @@
 
 
 #include	<envstandards.h>
-#include	<limits.h>
+#include	<climits>
 #include	<localmisc.h>
 
 

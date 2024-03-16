@@ -6,7 +6,7 @@
 
 #include	<string>
 
-#include	<stdio.h>
+#include	<cstdio>
 #include	<usystem.h>
 
 

@@ -48,7 +48,7 @@
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<string.h>
 #include	<usystem.h>
 #include	<getpwentry.h>

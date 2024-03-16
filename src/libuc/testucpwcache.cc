@@ -14,7 +14,7 @@
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<stdio.h>
+#include	<cstdio>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */

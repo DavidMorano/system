@@ -39,7 +39,7 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<string.h>
 
 #include	<vector>

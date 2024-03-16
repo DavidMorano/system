@@ -40,7 +40,7 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctype.h>
@@ -49,7 +49,7 @@
 #include	<string.h>
 #include	<time.h>
 #include	<poll.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<logfile.h>

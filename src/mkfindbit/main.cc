@@ -28,8 +28,8 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdio.h>
+#include	<climits>
+#include	<cstdio>
 
 #include	<ascii.h>
 
