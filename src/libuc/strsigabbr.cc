@@ -46,6 +46,8 @@
 
 /* local defines */
 
+#define	SIGABBR		struct sigabbr
+
 
 /* imported namespaces */
 
@@ -72,7 +74,7 @@ struct sigabbr {
 
 /* local variables */
 
-static const struct sigabbr	cvts[] = {
+static const SIGABBR	cvts[] = {
 	{ 0, "TEST" },
 	{ SIGHUP, "HUP" },
 	{ SIGINT, "INT" },
@@ -127,7 +129,7 @@ static const struct sigabbr	cvts[] = {
 	{ _SIGRTMAX, "RTMAX" },
 #endif
 	{ -1, nullptr }
-} ;
+} ; /* end struct (SIGABBR) */
 
 
 /* exported variables */
@@ -135,7 +137,7 @@ static const struct sigabbr	cvts[] = {
 
 /* exported subroutines */
 
-const char *strsigabbr(uint n) noex {
+const char *strsigabbr(int n) noex {
 	cchar		*s = nullptr ;
 
 #if	defined(_SIGRTMIN) && defined(_SIGRTMAX)
