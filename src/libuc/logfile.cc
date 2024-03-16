@@ -1,19 +1,18 @@
-/* logfile */
+/* logfile SUPPORT */
+/* lang=C++20 */
 
 /* perform logging operations on a file */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_CHMOD	0		/* always change file mode (if can) */
 #define	CF_CREATE	0		/* always create the file? */
 
-
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-        This object module was originally written to create a logging mechanism
-        for PCS application programs.
+	This object module was originally written to create a logging
+	mechanism for PCS application programs.
 
 */
 
@@ -21,8 +20,8 @@
 
 /*******************************************************************************
 
-        This is a module to operate on a logfile. The subroutines in this module
-        are:
+	This is a module to operate on a logfile. The subroutines
+	in this module are:
 
 		logfile_open
 		logfile_write
@@ -33,22 +32,17 @@
 		logfile_checksize
 		logfile_close
 
-        Although masking interrupts during the locking of the logfile should NOT
-        be necessary (since a terminated process releases all file locks that it
-        may have), it is a good precaution against some stupid implementations
-        of the NFS helper lock manager daemon. We want to guard against a
-        program terminating abruptly while its lock is retained (for a time)
-        back at the server.
-
+	Although masking interrupts during the locking of the logfile
+	should NOT be necessary (since a terminated process releases
+	all file locks that it may have), it is a good precaution
+	against some stupid implementations of the NFS helper lock
+	manager daemon. We want to guard against a program terminating
+	abruptly while its lock is retained (for a time) back at
+	the server.
 
 *******************************************************************************/
 
-
-#define	LOGFILE_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -59,7 +53,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<sigblock.h>

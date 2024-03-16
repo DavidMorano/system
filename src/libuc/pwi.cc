@@ -185,7 +185,7 @@ static int	realname_isextra(realname *,PWDESC *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr cchar	*exports[] = {
+static constexpr cpcchar	exports[] = {
 	VARHZ,
 	VARNODE,
 	VARHOMEDNAME,
@@ -197,7 +197,7 @@ static constexpr cchar	*exports[] = {
 } ;
 
 /* use fixed locations for security reasons (like we care!) */
-static constexpr cchar	*prbins[] = {
+static constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	nullptr

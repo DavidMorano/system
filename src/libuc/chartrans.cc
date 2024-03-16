@@ -94,7 +94,7 @@ enum charsets {
 	charset_overlast
 } ;
 
-static constexpr cchar	*charsets[] = {
+static constexpr cpcchar	charsets[] = {
 	"utf-8",
 	"iso-8859-1",
 	"iso-Latin-1",

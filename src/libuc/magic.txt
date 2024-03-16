@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int sighand_magic(sighand *op,Args ... args) noex {
+static inline int hdrdecode_magic(hdrdecode *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == SIGHAND_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == HDRDECODE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (sighand_magic) */
+/* end subroutine (hdrdecode_magic) */

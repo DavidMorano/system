@@ -264,8 +264,8 @@ typedef const char		*ccharp ;
 typedef const char *const	cpcchar ;
 #endif
 
-#ifndef	TYPEDEF_CPCCHARP
-#define	TYPEDEF_CPCCHARP
+#ifndef	TYPEDEF_CPCCHARP	/* same as |mainv| */
+#define	TYPEDEF_CPCCHARP	/* same as |mainv| */
 typedef const char *const	*cpccharp ;
 #endif
 

@@ -154,7 +154,7 @@ static int	dirsearch(cchar *,cchar *) noex ;
 
 /* local variables */
 
-static constexpr cchar	*homednames[] = {
+static constexpr cpcchar	homednames[] = {
 	"/home",
 	"/usr/add-on",
 	"/sysadm",

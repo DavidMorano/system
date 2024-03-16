@@ -258,7 +258,7 @@ static int	writeto(int,cchar *,int,int) ;
 
 /* local variables */
 
-static constexpr cchar	*schedmaps[] = {
+static constexpr cpcchar	schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -267,14 +267,14 @@ static constexpr cchar	*schedmaps[] = {
 	NULL
 } ;
 
-static constexpr cchar	*envbad[] = {
+static constexpr cpcchar	envbad[] = {
 	"TMOUT",
 	"A__z",
 	NULL
 
 } ;
 
-static constexpr cchar	*envstrs[] = {
+static constexpr cpcchar	envstrs[] = {
 	"USERNAME",
 	"GROUPNAME",
 	"UID",

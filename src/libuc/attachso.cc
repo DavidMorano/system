@@ -124,7 +124,7 @@ static int	subinfo_modclose(SUBINFO *) noex ;
 
 /* local variables */
 
-static constexpr cchar	*defexts[] = {
+static constexpr cpcchar	defexts[] = {
 	"so",
 	"o",
 	"",

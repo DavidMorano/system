@@ -172,7 +172,9 @@ static char		dterms[termsize] ;
 static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 static constexpr cchar	ssp[] = {
-	CH_LPAREN, CH_RPAREN, 0
+	CH_LPAREN, 
+	CH_RPAREN,
+	0
 } ;
 
 static constexpr cchar	strassign[] = "+:;¶µ­Ð=-" ;

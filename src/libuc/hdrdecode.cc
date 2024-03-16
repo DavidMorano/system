@@ -25,7 +25,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstddef>
@@ -149,6 +148,16 @@ public:
 
 /* forward references */
 
+template<typename ... Args>
+static inline int hdrdecode_magic(hdrdecode *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == HDRDECODE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (hdrdecode_magic) */
+
 static int	hdrdecode_b64decoder(hdrdecode *) noex ;
 static int	hdrdecode_qpdecoder(hdrdecode *) noex ;
 static int	hdrdecode_chartrans(hdrdecode *) noex ;
@@ -160,7 +169,7 @@ static int	escinfo_pass(ESCINFO *) noex ;
 
 /* local variables */
 
-static constexpr cchar	*passes[] = {
+static constexpr cpcchar	passes[] = {
 	"iso-8859-1",
 	"iso-Latin-1",
 	"Latin-1",
@@ -176,60 +185,63 @@ static constexpr cchar	*passes[] = {
 /* exported subroutines */
 
 int hdrdecode_start(hdrdecode *op,cchar *pr) noex {
-	int		rs ;
-	cchar		*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	memclear(op) ;			/* dangerous */
-
-	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	    op->pr = cp ;
-	    op->magic = HDRDECODE_MAGIC ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (op) {
+	    memclear(op) ;		/* dangerous */
+	    if (cchar *cp{} ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	        op->pr = cp ;
+	        op->magic = HDRDECODE_MAGIC ;
+	        rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (hdrdecode_start) */
 
 int hdrdecode_finish(hdrdecode *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != HDRDECODE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->ctp) {
-	    rs1 = chartrans_close(op->ctp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->ctp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->ctp = nullptr ;
-	}
-	if (op->b64p) {
-	    rs1 = b64decoder_finish(op->b64p) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->b64p) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->b64p = nullptr ;
-	}
-	if (op->qpp) {
-	    {
-	        rs1 = qpdecoder_finish(op->qpp) ;
-	        if (rs >= 0) rs = rs1 ;
+	if ((rs = hdrdecode_magic(op)) >= 0) {
+	    if (op->ctp) {
+		{
+	            rs1 = chartrans_close(op->ctp) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(op->ctp) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->ctp = nullptr ;
+		}
 	    }
-	    {
-	        rs1 = uc_free(op->qpp) ;
-	        if (rs >= 0) rs = rs1 ;
+	    if (op->b64p) {
+		{
+	            rs1 = b64decoder_finish(op->b64p) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(op->b64p) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->b64p = nullptr ;
+		}
 	    }
-	    op->qpp = nullptr ;
-	}
-	if (op->pr) {
-	    rs1 = uc_free(op->pr) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->pr = nullptr ;
-	}
-	op->magic = 0 ;
+	    if (op->qpp) {
+	        {
+	            rs1 = qpdecoder_finish(op->qpp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = uc_free(op->qpp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        op->qpp = nullptr ;
+	    }
+	    if (op->pr) {
+	        rs1 = uc_free(op->pr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->pr = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (hdrdecode_finish) */
@@ -238,31 +250,26 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (rarr == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-	if (op->magic != HDRDECODE_MAGIC) return SR_NOTOPEN ;
-
-	if (rlen < 0) return SR_INVALID ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	if (strnsub(sp,sl,"=?") != nullptr) {
-	    subinfo	s(op,rarr,rlen) ;
-	    if ((rs = s.begin(sp,sl)) >= 0) {
-	        {
-	            rs = s.proc() ;
-	            c = rs ;
+	if ((rs = hdrdecode_magic(op,rarr,sp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (rlen >= 0) {
+	        if (strnsub(sp,sl,"=?") != nullptr) {
+	            subinfo	s(op,rarr,rlen) ;
+	            if ((rs = s.begin(sp,sl)) >= 0) {
+	                {
+	                    rs = s.proc() ;
+	                    c = rs ;
+	                }
+	                rs1 = s.end() ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (s) */
+	        } else {
+	            rs = wsnwcpynarrow(rarr,rlen,sp,sl) ;
+	            c += rs ;
 	        }
-	        rs1 = s.end() ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (s) */
-	} else {
-	    rs = wsnwcpynarrow(rarr,rlen,sp,sl) ;
-	    c += rs ;
-	}
-
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (hdrdecode_proc) */

@@ -133,7 +133,7 @@ static int	subinfo_checksyms(SI *) noex ;
 
 /* local variables */
 
-static constexpr cchar	*prnames[] = {
+static constexpr cpcchar	prnames[] = {
 	"LOCAL",
 	"NCMP",
 	"PCS",
@@ -142,20 +142,20 @@ static constexpr cchar	*prnames[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*sysprs[] = {
+static constexpr cpcchar	sysprs[] = {
 	"/usr/extra",
 	"/usr/preroot",
 	nullptr
 } ;
 
-static constexpr cchar	*exts[] = {
+static constexpr cpcchar	exts[] = {
 	"so",
 	"o",
 	"",
 	nullptr
 } ;
 
-static constexpr cchar	*extdirs[] = {
+static constexpr cpcchar	extdirs[] = {
 	"sparcv9",
 	"sparcv8",
 	"sparcv7",

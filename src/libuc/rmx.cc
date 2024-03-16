@@ -79,7 +79,7 @@
 
 /* local variables */
 
-static constexpr cchar	*exts[] = {
+static constexpr cpcchar	exts[] = {
 	"x",
 	"s5",
 	"s5u",

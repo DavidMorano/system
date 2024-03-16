@@ -1,4 +1,5 @@
-/* logfile */
+/* logfile HEADER */
+/* lang=C20 */
 
 /* version %I% last-modified %G% */
 
@@ -13,19 +14,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LOGFILE_INCLUDE
-#define	LOGFILE_INCLUDE	1
+#define	LOGFILE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stdarg.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
 /* object defines */
-
 #define	LOGFILE			struct logfile_head
 #define	LOGFILE_MAGIC		0x13f3c200
 #define	LOGFILE_BUFSIZE		(2 * 1024)
@@ -42,13 +43,13 @@
 
 
 struct logfile_head {
-	uint		magic ;
-	const char	*fname ;
+	cchar		*fname ;
 	char		*buf ;
 	time_t		ti_open ;
 	time_t		ti_data ;
 	time_t		ti_write ;
 	mode_t		operm ;
+	uint		magic ;
 	int		oflags ;
 	int		lfd ;
 	int		logidlen ;
@@ -58,34 +59,25 @@ struct logfile_head {
 	char		logid[LOGFILE_LOGIDLEN + 1] ;
 } ;
 
+typedef LOGFILE		logfile ;
 
-typedef struct logfile_head	logfile ;
+EXTERNC_begin
 
+extern int logfile_open(logfile *,cchar *,int,mode_t,cchar *) noex ;
+extern int logfile_setid(logfile *,cchar *) noex ;
+extern int logfile_write(logfile *,cchar *,int) noex ;
+extern int logfile_print(logfile *,cchar *,int) noex ;
+extern int logfile_printf(logfile *,cchar *,...) noex ;
+extern int logfile_vprintf(logfile *,cchar *,va_list) noex ;
+extern int logfile_checksize(logfile *,int) noex ;
+extern int logfile_check(logfile *,time_t) noex ;
+extern int logfile_flush(logfile *) noex ;
+extern int logfile_chmod(logfile *,mode_t) noex ;
+extern int logfile_control(logfile *,int,void *) noex ;
+extern int logfile_close(logfile *) noex ;
 
-#if	(! defined(LOGFILE_MASTER)) || (LOGFILE_MASTER == 0)
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int logfile_open(LOGFILE *,const char *,int,mode_t,const char *) ;
-extern int logfile_setid(LOGFILE *,const char *) ;
-extern int logfile_write(LOGFILE *,const char *,int) ;
-extern int logfile_print(LOGFILE *,const char *,int) ;
-extern int logfile_printf(LOGFILE *,const char *,...) ;
-extern int logfile_vprintf(LOGFILE *,const char *,va_list) ;
-extern int logfile_checksize(LOGFILE *,int) ;
-extern int logfile_check(LOGFILE *,time_t) ;
-extern int logfile_flush(LOGFILE *) ;
-extern int logfile_chmod(LOGFILE *,mode_t) ;
-extern int logfile_control(LOGFILE *,int,void *) ;
-extern int logfile_close(LOGFILE *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* LOGFILE_MASTER */
 
 #endif /* LOGFILE_INCLUDE */
 

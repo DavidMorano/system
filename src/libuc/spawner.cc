@@ -193,7 +193,7 @@ static bool	isChildFD(int) noex ;
 
 /* local variables */
 
-static constexpr cchar	*envbads[] = {
+static constexpr cpcchar	envbads[] = {
 	"_",
 	"_A0",
 	"_EF",
