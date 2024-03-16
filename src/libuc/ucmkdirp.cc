@@ -1,4 +1,4 @@
-/* uc_mkdirp SUPPORT */
+/* ucmkdirp SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -52,6 +52,12 @@
 
 /* local defines */
 
+#if	defined(SYSHAS_MKDIRP) && (SYSHAS_MKDIRP > 0)
+#define	F_MKDIRP	1
+#else
+#define	F_MKDIRP	0
+#endif
+
 
 /* external subroutines */
 
@@ -60,7 +66,20 @@ extern "C" {
 }
 
 
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+static int	ucmkdirp(cchar *,mode_t) noex ;
+
+
 /* local variables */
+
+constexpr bool		f_mkdirp = F_MKDIRP ;
 
 
 /* exported variables */
@@ -69,6 +88,20 @@ extern "C" {
 /* exported subroutines */
 
 int uc_mkdirp(cchar *fname,mode_t m) noex {
+	int		rs ;
+	if constexpr (f_mkdirp) {
+	    rs = ucmkdirp(fname,m) ;
+	} else {
+	    rs = SR_NOSYS ;
+	}
+	return rs ;
+}
+/* end subroutine (uc_mkdirp) */
+
+
+/* local subroutines */
+
+static int ucmkdirp(cchar *fname,mode_t m) noex {
 	int		rs ;
 	int		to_io = utimeout[uto_io] ;
 	int		to_dquot = utimeout[uto_dquot] ;
@@ -115,6 +148,6 @@ int uc_mkdirp(cchar *fname,mode_t m) noex {
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
 }
-/* end subroutine (uc_mkdirp) */
+/* end subroutine (ucmkdirp) */
 
 

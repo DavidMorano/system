@@ -1,4 +1,4 @@
-/* uc_mkdir SUPPORT */
+/* ucmkdir SUPPORT */
 /* lang=C++20 */
 
 /* like |mkdir(2)| */
@@ -15,6 +15,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
 	Name:
 	uc_mkdir
 
@@ -36,10 +37,8 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/param.h>
 #include	<usystem.h>
 #include	<libmallocxx.h>
-#include	<usystem.h>
 
 
 /* local defines */
@@ -50,6 +49,9 @@
 extern "C" {
     extern int	mkexpandpath(char *,cchar *,int) noex ;
 }
+
+
+/* exported variables */
 
 
 /* exported subroutines */
