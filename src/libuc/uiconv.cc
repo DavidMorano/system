@@ -1,10 +1,8 @@
-/* uiconv */
+/* uiconv SUPPORT */
+/* lang=C++20 */
 
 /* UNIX® international conversion */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */	
-#define	CF_SAFE		1		/* safe mode */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,24 +16,17 @@
 
 /*******************************************************************************
 
-        We create here a more reasonable wrapper around the "standard" ICONV
-        subroutines.
-
+	We create here a more reasonable wrapper around the "standard"
+	ICONV subroutines.
 
 *******************************************************************************/
 
-
-#define	UICONV_MASTER	1
-
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<iconv.h>
-#include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -44,21 +35,10 @@
 
 /* local defines */
 
-#ifndef	MKCHAR
-#define	MKCHAR(ch)	((ch) & 0xff)
-#endif
-
 #define	UICONV_TOMEM	(1*60)
 
 
 /* external subroutines */
-
-extern int	msleep(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
 
 
 /* local structures */
@@ -66,19 +46,20 @@ extern int	strlinelen(const char *,int,int) ;
 
 /* forward references */
 
-static int uiconv_libopen(UICONV *,cchar *,const char *) ;
-static int uiconv_libclose(UICONV *) ;
+static int uiconv_libopen(UICONV *,cchar *,cchar *) noex ;
+static int uiconv_libclose(UICONV *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uiconv_open(UICONV *op ,cchar *tsp,cchar *fsp)
-{
-	const int	isize = sizeof(iconv_t) ;
+int uiconv_open(UICONV *op ,cchar *tsp,cchar *fsp) noex {
+	cint		isize = sizeof(iconv_t) ;
 	int		rs ;
 	char		*p ;
 
@@ -89,11 +70,7 @@ int uiconv_open(UICONV *op ,cchar *tsp,cchar *fsp)
 	if (tsp[0] == '\0') return SR_INVALID ;
 	if (fsp[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("uiconv_open: ent\n") ;
-#endif
-
-	memset(op,0,sizeof(UICONV)) ;
+	memclear(op) ;			/* dangerous */
 
 	if ((rs = uc_malloc(isize,&p)) >= 0) {
 	    op->cdp = p ;
@@ -106,22 +83,15 @@ int uiconv_open(UICONV *op ,cchar *tsp,cchar *fsp)
 	    }
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("uiconv_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (uiconv_open) */
 
-
-int uiconv_close(UICONV *op)
-{
+int uiconv_close(UICONV *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == NULL) return SR_FAULT ;
-
 	if (op->magic != UICONV_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = uiconv_libclose(op) ;
@@ -138,9 +108,7 @@ int uiconv_close(UICONV *op)
 }
 /* end subroutine (uiconv_close) */
 
-
-int uiconv_trans(UICONV *op,const char **ib,int *ilp,char **ob,int *olp)
-{
+int uiconv_trans(UICONV *op,cchar **ib,int *ilp,char **ob,int *olp) noex {
 	size_t		isize ;
 	int		rs = SR_OK ;
 
@@ -158,13 +126,16 @@ int uiconv_trans(UICONV *op,const char **ib,int *ilp,char **ob,int *olp)
 		ileft = (size_t) *ilp ;
 		oleft = (size_t) *olp ;
 	    }
-	    isize = iconv(*cdp,ib,ileftp,ob,oleftp) ;
-	    if (isize == ((size_t)-1)) rs = (-errno) ;
+	    {
+		char	**ibp = const_cast<char **>(ib) ;
+	        isize = iconv(*cdp,ibp,ileftp,ob,oleftp) ;
+	        if (isize == ((size_t)-1)) rs = (-errno) ;
+	    }
 	    {
 		*olp = (int) oleft ;
 		*ilp = (int) ileft ;
 	    }
-	}
+	} /* end block */
 
 	if (rs >= 0) rs = (isize & INT_MAX) ;
 
@@ -175,9 +146,7 @@ int uiconv_trans(UICONV *op,const char **ib,int *ilp,char **ob,int *olp)
 
 /* private subroutines */
 
-
-static int uiconv_libopen(UICONV *op ,const char *tsp,const char *fsp)
-{
+static int uiconv_libopen(UICONV *op ,cchar *tsp,cchar *fsp) noex {
 	iconv_t		cd ;
 	int		rs ;
 	int		to_mem = UICONV_TOMEM ;
@@ -215,17 +184,13 @@ static int uiconv_libopen(UICONV *op ,const char *tsp,const char *fsp)
 }
 /* end subroutine (uiconv_libopen) */
 
-
-static int uiconv_libclose(UICONV *op)
-{
+static int uiconv_libclose(UICONV *op) noex {
 	iconv_t		*cdp = (iconv_t *) op->cdp ;
 	int		rs ;
-
 	repeat {
 	    rs = iconv_close(*cdp) ;
 	    if (rs == -1) rs = (-errno) ;
 	} until (rs != SR_INTR) ;
-
 	return rs ;
 }
 /* end subroutine (uiconv_close) */

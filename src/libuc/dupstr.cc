@@ -81,7 +81,7 @@ int dupstr_finish(dupstr *ssp) noex {
 	        ssp->as = nullptr ;
 	    }
 	    ssp->buf[0] = '\0' ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (dupstr_finish) */

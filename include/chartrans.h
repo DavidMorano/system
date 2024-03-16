@@ -1,13 +1,17 @@
-/* chartrans */
+/* chartrans HEADER */
+/* lang=C20 */
+
+/* character translation */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CHARTRANS_INCLUDE
-#define	CHARTRANS_INCLUDE	1
+#define	CHARTRANS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<stddef.h>
 #include	<uiconv.h>
@@ -26,7 +30,7 @@ struct chartrans_flags {
 } ;
 
 struct chartrans_set {
-	const char	*name ;
+	cchar		*name ;
 	UICONV		id ;			/* converter */
 	time_t		ti_access ;		/* access time */
 	uint		acount ;		/* access time-stamp */
@@ -35,34 +39,28 @@ struct chartrans_set {
 } ;
 
 struct chartrans_head {
-	uint		magic ;
-	CHARTRANS_FL	f ;
 	CHARTRANS_SET	*sets ;
-	const char	*pr ;
+	cchar		*pr ;
 	void		*utf8decoder ;
+	CHARTRANS_FL	f ;
+	uint		magic ;
 	int		nmax ;
 	int		nsets ;
 	int		acount ;
 } ;
 
+typedef CHARTRANS	chartrans ;
 
-#if	(! defined(CHARTRANS_MASTER)) || (CHARTRANS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int chartrans_open(chartrans *,cchar *,int) noex ;
+extern int chartrans_close(chartrans *) noex ;
+extern int chartrans_transbegin(chartrans *,time_t,cchar *,int) noex ;
+extern int chartrans_transend(chartrans *,int) noex ;
+extern int chartrans_transread(chartrans *,int,wchar_t *,int,cchar *,int) noex ;
 
-extern int chartrans_open(CHARTRANS *,cchar *,int) ;
-extern int chartrans_close(CHARTRANS *) ;
-extern int chartrans_transbegin(CHARTRANS *,time_t,cchar *,int) ;
-extern int chartrans_transend(CHARTRANS *,int) ;
-extern int chartrans_transread(CHARTRANS *,int,wchar_t *,int,cchar *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* (! defined(CHARTRANS_MASTER)) || (CHARTRANS_MASTER == 0) */
 
 #endif /* CHARTRANS_INCLUDE */
 
