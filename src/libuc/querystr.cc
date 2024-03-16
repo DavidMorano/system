@@ -27,6 +27,7 @@
 #include	<cstring>
 #include	<vector>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<strwcpy.h>
@@ -127,20 +128,22 @@ static char	*strwebhex(char *,cchar *,int) noex ;
 int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && sp) {
-	    cint	llen = MAXNAMELEN ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(op) ;			/* dangerous */
-	    if ((rs = strpack_start(&op->packer,llen)) >= 0) {
-	        subinfo	si(op) ;
-	        op->open.packer = true ;
-	        if ((rs = si.split(sp,sl)) >= 0) {
-		    rs = si.load() ;
-	        } /* end if (subinfo) */
-	        if (rs < 0) {
-	            op->open.packer = false ;
-		    strpack_finish(&op->packer) ;
-	        }
-	    } /* end if (strpack_start) */
+	    memclear(op) ;		/* dangerous */
+	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
+	        cint	llen = rs ;
+	        if ((rs = strpack_start(&op->packer,llen)) >= 0) {
+	            subinfo		si(op) ;
+	            op->open.packer = true ;
+	            if ((rs = si.split(sp,sl)) >= 0) {
+		        rs = si.load() ;
+	            } /* end if (subinfo) */
+	            if (rs < 0) {
+	                op->open.packer = false ;
+		        strpack_finish(&op->packer) ;
+	            }
+	        } /* end if (strpack_start) */
+	    } /* end if (getbufsize) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -213,72 +216,67 @@ int querystr_curend(querystr *op,cur *curp) noex {
 /* fetch the next entry value matching the given key */
 int querystr_fetch(querystr *op,cchar *kstr,int klen,
 		cur *curp,cchar **rpp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (klen < 0) klen = strlen(kstr) ;
-
-	if (op->n > 0) {
-	    int		i = (curp->i + 1) ;
-	    if (i < op->n) {
-	        cchar	*(*kv)[2] = op->kv ;
-	        bool	f = false ;
-	        while (i < op->n) {
-		    f = (strwcmp(kv[i][0],kstr,klen) == 0) ;
-		    if (f) break ;
-		    i += 1 ;
-	        }
-	        if (f) {
-		    cchar	*vp = kv[i][1] ;
-		    curp->i = i ;
-		    vl = strlen(vp) ;
-		    if (rpp != nullptr) *rpp = vp ;
+	if (op && curp) {
+	    rs = SR_OK ;
+	    if (klen < 0) klen = strlen(kstr) ;
+	    if (op->n > 0) {
+	        int		i = (curp->i + 1) ;
+	        if (i < op->n) {
+	            cchar	*(*kv)[2] = op->kv ;
+	            bool	f = false ;
+	            while (i < op->n) {
+		        f = (strwcmp(kv[i][0],kstr,klen) == 0) ;
+		        if (f) break ;
+		        i += 1 ;
+	            }
+	            if (f) {
+		        cchar	*vp = kv[i][1] ;
+		        curp->i = i ;
+		        vl = strlen(vp) ;
+		        if (rpp != nullptr) *rpp = vp ;
+	            } else {
+	                rs = SR_NOTFOUND ;
+	            }
 	        } else {
-	            rs = SR_NOTFOUND ;
+		    rs = SR_NOTFOUND ;
 	        }
 	    } else {
-		rs = SR_NOTFOUND ;
+	        rs = SR_NOTFOUND ;
 	    }
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (querystr_fetch) */
 
 int querystr_enum(querystr *op,cur *curp,
 		cchar **kpp,cchar **vpp) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		vl = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->n > 0) {
-	    int		i = (curp->i + 1) ;
-	    if (i < op->n) {
-	        cchar	*(*kv)[2] = op->kv ;
-		{
-		    cchar	*kp = kv[i][0] ;
-		    if (kpp != nullptr) *kpp = kp ;
-		}
-	        {
-		    cchar	*vp = kv[i][1] ;
-		    vl = strlen(vp) ;
-		    if (vpp != nullptr) *vpp = vp ;
-	        }
+	if (op && curp) {
+	    rs = SR_OK ;
+	    if (op->n > 0) {
+	        int	i = (curp->i + 1) ;
+	        if (i < op->n) {
+	            cchar	*(*kv)[2] = op->kv ;
+		    {
+		        cchar	*kp = kv[i][0] ;
+		        if (kpp != nullptr) *kpp = kp ;
+		    }
+	            {
+		        cchar	*vp = kv[i][1] ;
+		        vl = strlen(vp) ;
+		        if (vpp != nullptr) *vpp = vp ;
+	            }
 		    curp->i = i ;
+	        } else {
+		    rs = SR_NOTFOUND ;
+	        }
 	    } else {
-		rs = SR_NOTFOUND ;
+	        rs = SR_NOTFOUND ;
 	    }
-	} else {
-	    rs = SR_NOTFOUND ;
-	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (querystr_enum) */
