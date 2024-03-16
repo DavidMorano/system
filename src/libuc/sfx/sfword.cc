@@ -54,7 +54,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<string.h>		/* <- for |strncmp(3c)| */
+#include	<cstring>		/* <- for |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>

@@ -43,13 +43,13 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
+#include	<climits>
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>

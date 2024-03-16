@@ -47,12 +47,12 @@
 #include	<sys/utsname.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<grp.h>
 #include	<netdb.h>

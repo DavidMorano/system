@@ -23,7 +23,7 @@
 /* * change the owner and mode of the pseudo terminal slave device.  */
 
 
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<grp.h>
 
 

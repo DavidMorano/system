@@ -76,7 +76,7 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>

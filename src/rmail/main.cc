@@ -51,10 +51,10 @@
 #include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
 #include	<time.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<grp.h>
 

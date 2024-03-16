@@ -5,8 +5,8 @@
 
 #pragma ident	"@(#)main.c	1.24	99/08/09 SMI"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <unistd.h>
 #include <libintl.h>
 #include <sys/systeminfo.h>
@@ -22,9 +22,9 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#include <string.h>
+#include <cstring>
 #include <syslog.h>
-#include <errno.h>
+#include <cerrno>
 #include <libintl.h>
 
 #include <adaptor.h>

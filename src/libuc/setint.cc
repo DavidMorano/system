@@ -4,8 +4,6 @@
 /* unordered set of integers */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_SAFE		1		/* pointer safety */
 
 /* revision history:
 
@@ -24,8 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<new>
 #include	<initializer_list>
 #include	<utility>
@@ -43,10 +41,19 @@
 
 /* imported namespaces */
 
-using namespace		std ;		/* yes, we want punishment! */
+using std::nullptr_t ;			/* type */
+using std::unordered_set ;		/* type-template */
+using std::pair ;			/* type-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+typedef unordered_set<int>	usetint ;
+typedef unordered_set<int> *	usetintp ;
+typedef unordered_set<int>::iterator	usetintit ;
+typedef unordered_set<int>::iterator *	usetintitp ;
+
 
 /* forward references */
 
@@ -60,183 +67,178 @@ using namespace		std ;		/* yes, we want punishment! */
 /* exported subroutines */
 
 int setint_start(setint *op) noex {
-	unordered_set<int>	*setp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if ((setp = new(nothrow) unordered_set<int>) != NULL) {
-	    op->setp = (void *) setp ;
-	} else {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    cnullptr	np{} ;
+	    usetint	*setp ;
 	    rs = SR_NOMEM ;
-	}
+	    if ((setp = new(nothrow) usetint) != np) {
+	        op->setp = voidp(setp) ;
+	        rs = SR_OK ;
+	    } /* end if (new-usetint) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (setint_start) */
 
-
-int setint_finish(setint *op)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    unordered_set<int>	*setp = (unordered_set<int> *) op->setp ;
-	    delete setp ;
-	    op->setp = NULL ;
-	} else {
+int setint_finish(setint *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	}
+	    if (op->setp) {
+	        usetint		*setp = usetintp(op->setp) ;
+	        delete setp ;
+	        op->setp = nullptr ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (setint_finish) */
 
-
-int setint_addval(setint *op,int v)
-{
-	int		rs = SR_OK ;
+int setint_addval(setint *op,int v) noex {
+	int		rs = SR_FAULT ;
 	int		f = INT_MAX ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    unordered_set<int>	*setp = (unordered_set<int> *) op->setp ;
-	    pair<unordered_set<int>::iterator,bool>	ret ;
-	    ret = setp->insert(v) ;
-	    if (ret.second == true) f = 0 ;
-	} else {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	}
+	    if (op->setp) {
+	        usetint		*setp = usetintp(op->setp) ;
+	        pair<unordered_set<int>::iterator,bool>	ret ;
+	        ret = setp->insert(v) ;
+	        if (ret.second == true) f = 0 ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (setint_addval) */
 
-
-int setint_delval(setint *op,int v)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    unordered_set<int>	*setp = (unordered_set<int> *) op->setp ;
-	    setp->erase(v) ;
-	} else {
+int setint_delval(setint *op,int v) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	}
+	    if (op->setp) {
+	        usetint		*setp = usetintp(op->setp) ;
+	        setp->erase(v) ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (setint_delval) */
 
-
 /* return the count of the number of items in this list */
-int setint_count(setint *op)
-{
-	int		rs = SR_OK ;
+int setint_count(setint *op) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    unordered_set<int>	*setp = (unordered_set<int> *) op->setp ;
-	    c = setp->size() ;
-	} else {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	}
+	    if (op->setp) {
+	        usetint		*setp = usetintp(op->setp) ;
+	        c = setp->size() ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (setint_count) */
 
-
 /* return the extent of the number of items in this list */
-int setint_extent(setint *op)
-{
-	int		rs = SR_OK ;
+int setint_extent(setint *op) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    unordered_set<int>	*setp = (unordered_set<int> *) op->setp ;
-	    c = setp->max_size() ;
-	} else {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	}
+	    if (op->setp) {
+	        usetint		*setp = usetintp(op->setp) ;
+	        c = setp->max_size() ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (setint_extent) */
 
-
-int setint_mkvec(setint *op,int *va)
-{
-	unordered_set<int>	*setp ;
-	int		rs = SR_OK ;
+int setint_mkvec(setint *op,int *va) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if ((setp = (unordered_set<int> *) op->setp) != NULL) {
-	    if (va != NULL) {
-	        unordered_set<int>::iterator it = setp->begin() ;
-	        unordered_set<int>::iterator it_end = setp->end() ;
-	        while (it != it_end) {
-	            va[c++] = *it++ ;
-	        } /* end while */
-	    } else {
-		c = setp->size() ;
-	    }
-	} else {
+	if (op) {
 	    rs = SR_NOTOPEN ;
-	}
+	    if (op->setp) {
+	        usetint		*setp = usetintp(op->setp) ;
+		rs = SR_OK ;
+	        if (va) {
+		    usetintit	it = setp->begin() ;
+	            usetintit	it_end = setp->end() ;
+	            while (it != it_end) {
+	                va[c++] = *it++ ;
+	            } /* end while */
+	        } else {
+		    c = setp->size() ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (setint_mkvec) */
 
-
-int setint_curbegin(setint *op,setint_cur *curp)
-{
-	unordered_set<int>::iterator	*interp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if ((interp = new(nothrow) unordered_set<int>::iterator) != NULL) {
-	    unordered_set<int>	*setp = (unordered_set<int> *) op->setp ;
-	    *interp = setp->begin() ;
-	    curp->interp = (void *) interp ;
-	} else {
-	    rs = SR_NOMEM ;
-	}
+int setint_curbegin(setint *op,setint_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		cnullptr	np{} ;
+	        usetint		*setp = usetintp(op->setp) ;
+	        usetintit	*interp ;
+		rs = SR_NOMEM ;
+	        if ((interp = new(nothrow) usetintit) != np) {
+	            *interp = setp->begin() ;
+	            curp->interp = voidp(interp) ;
+		    rs = SR_OK ;
+		} /* end if (new-usetintit) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (setint_curbegin) */
 
-
-int setint_curend(setint *op,setint_cur *curp)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (curp->interp != NULL) {
-	    unordered_set<int>::iterator *interp = 
-		(unordered_set<int>::iterator *) curp->interp ;
-	    delete interp ;
-	    curp->interp = NULL ;
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
+int setint_curend(setint *op,setint_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		rs = SR_BUGCHECK ;
+	        if (curp->interp) {
+		    usetintit	*interp = usetintitp(curp->interp) ;
+	            delete interp ;
+	            curp->interp = nullptr ;
+		    rs = SR_OK ;
+		} /* end if (cursor-valid) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (setint_curend) */
 
-
-int setint_enum(setint *op,setint_cur *curp,int *rp)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
-	if (curp->interp != NULL) {
-	    unordered_set<int> *setp = (unordered_set<int> *) op->setp ;
-	    unordered_set<int>::iterator it_end ;
-	    unordered_set<int>::iterator *interp = 
-		(unordered_set<int>::iterator *) curp->interp ;
-	    it_end = setp->end() ;
-	    if (*interp != it_end) {
-	        *rp = *(*interp) ;
-	        (*interp)++ ;
-	    } else {
-		rs = SR_NOTFOUND ;
-	    }
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
+int setint_enum(setint *op,setint_cur *curp,int *rp) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp && rp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		rs = SR_BUGCHECK ;
+	        if (curp->interp) {
+		    usetint	*setp = usetintp(op->setp) ;
+		    usetintit	it_end = setp->end() ;
+		    usetintit	*interp = usetintitp(curp->interp) ;
+		    rs = SR_NOTFOUND ;
+	            if (*interp != it_end) {
+	                *rp = *(*interp) ;
+	                (*interp)++ ;
+		        rs = SR_OK ;
+	            }
+		} /* end if (cursor-valid) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (setint_enum) */

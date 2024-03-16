@@ -27,12 +27,12 @@
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstring>
 
 #include	<bfile.h>
 #include	<baops.h>

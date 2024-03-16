@@ -33,7 +33,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 
 #include	<bfile.h>

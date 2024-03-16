@@ -83,8 +83,8 @@
 #include	<sys/systeminfo.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<vecstr.h>

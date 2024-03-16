@@ -31,7 +31,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<exitcodes.h>
 #include	<localmisc.h>

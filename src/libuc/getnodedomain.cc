@@ -204,7 +204,7 @@ static constexpr int	(*systries[])(TRY *) = {
 	nullptr
 } ;
 
-static constexpr cchar	*resolvefnames[] = {
+static constexpr cpcchar	resolvefnames[] = {
 	RESOLVFNAME,			/* most operating systems */
 	"/var/run/resolv.conf",		/* for example: MacOS */
 	nullptr

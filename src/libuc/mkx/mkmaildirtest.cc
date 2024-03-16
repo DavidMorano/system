@@ -26,8 +26,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdarg.h>
-#include	<string.h>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>

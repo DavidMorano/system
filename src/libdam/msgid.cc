@@ -34,12 +34,12 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<inttypes.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<serialbuf.h>

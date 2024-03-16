@@ -38,9 +38,9 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdio.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdio>
 
 #include	<usystem.h>
 #include	<vecstr.h>

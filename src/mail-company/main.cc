@@ -48,7 +48,7 @@
 #include	<grp.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<time.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<bfile.h>
 #include	<logfile.h>

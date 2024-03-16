@@ -35,8 +35,8 @@
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<netdb.h>
 

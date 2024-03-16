@@ -29,10 +29,10 @@
 #include	<sys/time.h>		/* for |gettimeofday(3c)| */
 #include	<sys/timeb.h>		/* for |ftime(3c)| */
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<usystem.h>
 #include	<tmz.h>

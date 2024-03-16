@@ -36,8 +36,8 @@
 #include	<sys/stat.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<string.h>
-#include	<stdlib.h>
+#include	<cstring>
+#include	<cstdlib>
 
 #include	<bfile.h>
 #include	<baops.h>

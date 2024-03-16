@@ -1,4 +1,4 @@
-/* b_homepage (HOMEPAGE) */
+/* b_homepage SUPPORT (HOMEPAGE) */
 /* lang=C++20 */
 
 /* program to create a "home" webpage in corporate environment */
@@ -56,9 +56,9 @@
 #include	<sys/param.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
@@ -90,7 +90,7 @@
 #include	<spawner.h>
 #include	<lfm.h>
 #include	<tmtime.h>
-#include	<querystring.h>
+#include	<querystr.h>
 #include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -1390,7 +1390,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (afname == NULL) afname = getourenv(envv,VARAFNAME) ;
 
 	if (qs == NULL) qs = getourenv(envv,VARQS) ;
-	if (qs == NULL) qs = getourenv(envv,VARQUERYSTRING) ;
+	if (qs == NULL) qs = getourenv(envv,VARquerystr) ;
 
 	if ((rs >= 0) && (pip->n == 0) && (argval != NULL)) {
 	    rs = optvalue(argval,-1) ;
@@ -5876,12 +5876,12 @@ static int locinfo_qs(LOCINFO *lip,cchar *qs)
 	int		rs1 ;
 	int		c = 0 ;
 	if ((! lip->final.svcs) && (qs != NULL)) {
-	    QUERYSTRING		ps ;
-	    QUERYSTRING_CUR	cur ;
-	    if ((rs = querystring_start(&ps,qs,-1)) >= 0) {
-	        if ((rs = querystring_curbegin(&ps,&cur)) >= 0) {
+	    querystr		ps ;
+	    querystr_cur	cur ;
+	    if ((rs = querystr_start(&ps,qs,-1)) >= 0) {
+	        if ((rs = querystr_curbegin(&ps,&cur)) >= 0) {
 	            cchar	*kp, *vp ;
-	            while ((rs1 = querystring_enum(&ps,&cur,&kp,&vp)) >= 0) {
+	            while ((rs1 = querystr_enum(&ps,&cur,&kp,&vp)) >= 0) {
 	                if (vp == NULL) break ; /* lint */
 	                rs = locinfo_svclistadd(lip,kp,-1) ;
 	                c += rs ;
@@ -5889,7 +5889,7 @@ static int locinfo_qs(LOCINFO *lip,cchar *qs)
 	            } /* end while */
 	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
 	        } /* end if (querystring-cur) */
-	        rs1 = querystring_finish(&ps) ;
+	        rs1 = querystr_finish(&ps) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (querystring) */
 	    lip->final.svcs = (c > 0) ;

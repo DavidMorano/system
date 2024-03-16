@@ -31,10 +31,10 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 
 #include	<usystem.h>

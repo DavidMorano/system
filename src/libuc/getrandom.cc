@@ -123,7 +123,7 @@ extern "C" {
 
 static rander		rander_data ;
 
-static constexpr cchar	*devs[] = {
+static constexpr cpcchar	devs[] = {
 	"/dev/urandom",
 	"/dev/random",
 	nullptr

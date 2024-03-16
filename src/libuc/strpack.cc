@@ -136,6 +136,9 @@ static int	chunk_finish(strpack_ch *) noex ;
 constexpr bool		f_prealloc = CF_PREALLOC ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strpack_start(strpack *op,int chsize) noex {

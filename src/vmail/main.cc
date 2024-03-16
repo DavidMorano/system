@@ -39,9 +39,9 @@
 #include	<sys/stat.h>
 #include	<sys/timeb.h>
 #include	<unistd.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 #include	<tzfile.h>
 #include	<netdb.h>
 #include	<usystem.h>

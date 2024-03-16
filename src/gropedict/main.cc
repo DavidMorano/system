@@ -36,11 +36,11 @@
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<fcntl.h>
 #include	<time.h>
 #include	<dirent.h>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<netdb.h>
 #include	<ftw.h>

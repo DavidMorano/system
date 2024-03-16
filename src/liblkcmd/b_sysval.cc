@@ -97,12 +97,12 @@
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<utmpx.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<netdb.h>

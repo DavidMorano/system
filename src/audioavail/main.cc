@@ -21,10 +21,10 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<bfile.h>

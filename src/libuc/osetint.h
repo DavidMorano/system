@@ -31,7 +31,7 @@ struct osetint_head {
 
 
 typedef OSETINT		osetint ;
-typedef OSETINTO_CUR	osetint_cur ;
+typedef OSETINT_CUR	osetint_cur ;
 
 EXTERNC_begin
 

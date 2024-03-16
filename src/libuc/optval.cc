@@ -58,7 +58,7 @@
 
 /* local variables */
 
-static constexpr cchar	*hits[] = {
+static constexpr cpcchar	hits[] = {
 	"0",
 	"1",
 	"no",

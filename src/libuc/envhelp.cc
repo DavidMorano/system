@@ -226,24 +226,24 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 /* end subroutine (envhelp_envset) */
 
 int envhelp_present(envhelp *op,cchar *kp,int kl,cchar **rpp) noex {
-	nulstr		ks ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		i = 0 ;
-	cchar		*cp ;
-	if ((rs = nulstr_start(&ks,kp,kl,&cp)) >= 0) {
-	    vechand	*elp = op->elp ;
-	    {
-		vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-		void		*vp{} ;
+	if (op && kp) {
+	    nulstr	ks ;
+	    cchar	*cp{} ;
+	    if ((rs = nulstr_start(&ks,kp,kl,&cp)) >= 0) {
+	        vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	        vechand		*elp = op->elp ;
+	        void		*vp{} ;
 	        if ((rs = vechand_search(elp,cp,vcf,&vp)) >= 0) {
-		    *rpp = charp(vp) ;
+		    if (rpp) *rpp = charp(vp) ;
 	            i = rs ;
-		}
-	    }
-	    rs1 = nulstr_finish(&ks) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (nulstr) */
+	        } /* end if (vechand_search) */
+	        rs1 = nulstr_finish(&ks) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (nulstr) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (envhelp_present) */

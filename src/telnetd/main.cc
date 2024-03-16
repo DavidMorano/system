@@ -86,10 +86,10 @@
 #include	<termios.h>
 #include <syslog.h>
 #include <netdb.h>
-#include <signal.h>
-#include <stddef.h>
-#include	<stdlib.h>
-#include <string.h>
+#include <csignal>
+#include <cstddef>
+#include	<cstdlib>
+#include <cstring>
 #include <ctype.h>
 
 #ifndef SYSV
@@ -104,10 +104,10 @@
 #endif /* SYSV */
 
 #include <security/pam_appl.h>
-#include <string.h>
+#include <cstring>
 #include	<pwd.h>
-#include <errno.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 
 #include	<usystem.h>
 #include	<mallocstuff.h>

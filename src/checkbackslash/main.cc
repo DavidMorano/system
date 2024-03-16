@@ -30,8 +30,8 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>

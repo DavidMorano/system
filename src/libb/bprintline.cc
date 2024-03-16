@@ -42,8 +42,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>

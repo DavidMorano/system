@@ -70,8 +70,8 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>

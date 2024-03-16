@@ -31,8 +31,8 @@
 
 
 #include	<sys/types.h>
-#include	<errno.h>
-#include	<limits.h>
+#include	<cerrno>
+#include	<climits>
 #include	<unistd.h>
 #include	<cstring>
 #include	<usysrets.h>

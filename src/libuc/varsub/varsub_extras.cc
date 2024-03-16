@@ -48,9 +48,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>

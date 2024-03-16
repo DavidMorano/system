@@ -42,7 +42,7 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<unistd.h>
 #include	<ctime>
 #include	<cstring>

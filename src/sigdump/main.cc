@@ -37,8 +37,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<termios.h>
-#include	<signal.h>
-#include	<stdlib.h>
+#include	<csignal>
+#include	<cstdlib>
 
 #include	<usystem.h>
 #include	<field.h>

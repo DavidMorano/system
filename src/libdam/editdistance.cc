@@ -32,11 +32,11 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
 #include	<new>
 #include	<utility>
 #include	<usystem.h>
-#include	<string.h>
+#include	<cstring>
 #include	<localmisc.h>
 
 

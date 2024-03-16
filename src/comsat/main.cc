@@ -42,12 +42,12 @@
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<syslog.h>
 #include	<netdb.h>
 

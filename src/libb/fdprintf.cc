@@ -48,8 +48,8 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<cstring>
+#include	<cstdarg>
 
 #include	<usystem.h>
 #include	<localmisc.h>

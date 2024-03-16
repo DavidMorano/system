@@ -83,7 +83,7 @@ enum sysnames {
 	sysname_overlast
 } ; /* end enum (sysnames) */
 
-static constexpr cchar	*sysnames[] = {
+static constexpr cpcchar	sysnames[] = {
 	"userhomes",
 	"usernames",
 	"groupnames",

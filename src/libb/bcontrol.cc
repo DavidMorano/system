@@ -30,10 +30,10 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<localmisc.h>
 

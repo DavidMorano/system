@@ -87,8 +87,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<netdb.h>
 #include	<usystem.h>

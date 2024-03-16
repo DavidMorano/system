@@ -6,7 +6,7 @@
 
 #include	<sys/types.h>
 #include	<pwd.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	"localmisc.h"
 

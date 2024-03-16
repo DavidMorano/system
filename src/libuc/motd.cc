@@ -72,12 +72,12 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>
@@ -258,7 +258,7 @@ static int	writeto(int,cchar *,int,int) ;
 
 /* local variables */
 
-static constexpr cchar	*schedmaps[] = {
+static constexpr cpcchar	schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -267,14 +267,14 @@ static constexpr cchar	*schedmaps[] = {
 	NULL
 } ;
 
-static constexpr cchar	*envbad[] = {
+static constexpr cpcchar	envbad[] = {
 	"TMOUT",
 	"A__z",
 	NULL
 
 } ;
 
-static constexpr cchar	*envstrs[] = {
+static constexpr cpcchar	envstrs[] = {
 	"USERNAME",
 	"GROUPNAME",
 	"UID",

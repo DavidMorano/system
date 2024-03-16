@@ -36,8 +36,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<dirent.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>

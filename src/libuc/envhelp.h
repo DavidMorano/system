@@ -40,7 +40,7 @@ extern int envhelp_start(envhelp *,mainv,mainv) noex ;
 extern int envhelp_present(envhelp *,cchar *,int,cchar **) noex ;
 extern int envhelp_envset(envhelp *,cchar *,cchar *,int) noex ;
 extern int envhelp_sort(envhelp *) noex ;
-extern int envhelp_getvec(envhelp *,cchar ***) noex ;
+extern int envhelp_getvec(envhelp *,mainv *) noex ;
 extern int envhelp_finish(envhelp *) noex ;
 
 EXTERNC_end

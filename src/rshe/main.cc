@@ -67,11 +67,11 @@
 #include	<rpcsvc/rstat.h>
 #include	<netdb.h>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>

@@ -121,8 +121,7 @@ static const int	whiches[] = {
 
 
 /* ARGSUSED */
-int uc_opendev(cchar *fname,int of,mode_t om,cchar **envv,int to,int opts)
-{
+int uc_opendev(cchar *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 	int		rs = SR_OK ;
 	int		fl = -1 ;
 	int		fi ;

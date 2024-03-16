@@ -54,7 +54,7 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 #include <time.h>
-#include <stdio.h>
+#include <cstdio>
 #include <getopt.h>
 
 #include <config.h>
@@ -64,21 +64,21 @@
 #include <assert.h>
 
 #if defined(HAVE_STRING_H) || defined(STDC_HEADERS)
-#include <string.h>
+#include <cstring>
 #else
 #include <strings.h>
 #define strchr index
 #endif
 
 #ifdef STDC_HEADERS
-#include <stdlib.h>
+#include <cstdlib>
 #else
 char *getenv() ;
 #endif
 
 #ifdef STDC_HEADERS
-#include <stdlib.h>
-#include	<errno.h>
+#include <cstdlib>
+#include	<cerrno>
 #else
 extern int errno ;
 #endif

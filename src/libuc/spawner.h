@@ -47,7 +47,7 @@ corresponding disposition is OPEN.
 ****/
 
 struct spawner_head {
-	cchar		**argv ;
+	mainv		argv ;
 	cchar		*execfname ;
 	vecobj		cmds ;
 	envhelp		env ;

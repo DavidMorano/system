@@ -29,9 +29,9 @@
 
 #include	<sys/types.h>
 #include	<termio.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>

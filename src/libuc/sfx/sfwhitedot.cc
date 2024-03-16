@@ -39,7 +39,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>

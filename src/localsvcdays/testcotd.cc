@@ -18,7 +18,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<fcntl.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<usystem.h>
 #include	<localmisc.h>
 #include	"testcotd.h"

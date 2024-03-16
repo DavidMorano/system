@@ -31,13 +31,13 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<ucontext.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<intceil.h>

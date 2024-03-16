@@ -46,7 +46,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<ptm.h>

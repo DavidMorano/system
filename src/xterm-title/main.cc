@@ -38,9 +38,9 @@
 #include	<sys/utsname.h>
 #include	<unistd.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<signal.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<csignal>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 

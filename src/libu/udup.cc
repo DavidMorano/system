@@ -29,7 +29,7 @@
 #include	<sys/types.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>

@@ -30,9 +30,9 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>

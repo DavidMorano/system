@@ -87,14 +87,14 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<signal.h>
-#include	<limits.h>
+#include	<csignal>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-#include	<stdio.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdarg>
+#include	<cstdio>
 #include	<usystem.h>
 #include	<ptm.h>
 #include	<hasx.h>

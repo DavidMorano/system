@@ -8,7 +8,7 @@
 #define	CF_DEBUGZ	0	/* turn on debugging */
 #define	CF_DEBUGZZ	0	/* extra */
 #define	CF_FLOAT	1	/* do you want floating output conversions? */
-#define	CF_LIMITS	1	/* do you have a 'limits.h' include? */
+#define	CF_LIMITS	1	/* do you have a 'climits' include? */
 #define	CF_LPRINT	0	/* the local-print subroutines */
 #define	CF_LSPRINTF	1	/* use internal 'lsprintf(3c)' */
 #define	CF_LVSPRINTF	0	/* local 'vsprintf(3s)'? */
@@ -67,7 +67,7 @@
 
 	There are several compile time options available through the
 	switches located at the top of this file.  If you have a
-	'limits.h' include file, you can optionally select to have it
+	'climits' include file, you can optionally select to have it
 	used instead of the default limits.
 
 	The following nonstandard additions are supported:

@@ -59,10 +59,10 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<endian.h>

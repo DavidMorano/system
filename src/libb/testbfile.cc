@@ -34,9 +34,9 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<stdarg.h>
-#include	<stdlib.h>
-#include	<stdio.h>
+#include	<cstdarg>
+#include	<cstdlib>
+#include	<cstdio>
 #include	<usystem.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

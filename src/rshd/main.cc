@@ -73,13 +73,13 @@
 #include <arpa/inet.h>
 
 #include <unistd.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <string.h>
-#include <errno.h>
+#include <csignal>
+#include <cstdarg>
+#include <cstring>
+#include <cerrno>
 #include <pwd.h>
 #include <grp.h>
-#include <stdio.h>
+#include <cstdio>
 #include <netdb.h>
 #include <syslog.h>
 
@@ -88,7 +88,7 @@
 #include <sys/resource.h>
 #include <sys/filio.h>
 #include <shadow.h>
-#include <stdlib.h>
+#include <cstdlib>
 #endif	/* SYSV */
 
 #include	<usystem.h>

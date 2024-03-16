@@ -147,7 +147,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr cchar *const schedule[] = {
+static constexpr cpcchar	schedule[] = {
 	"%r/%l/%n/%n.%f",
 	"%r/%l/%n/%f",
 	"%r/share/help/%n.%f",
@@ -170,7 +170,7 @@ enum expkeys {
 	expkey_overlast
 } ;
 
-static constexpr cchar	*expkeys[] = {
+static constexpr cpcchar	expkeys[] = {
 	"SN",
 	"SS",
 	"PR",

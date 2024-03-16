@@ -44,7 +44,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
@@ -223,7 +223,7 @@ static int	isBaseMatch(cchar *,cchar *,cchar *) ;
 
 /* local variables */
 
-static constexpr cchar	*schedmaps[] = {
+static constexpr cpcchar	schedmaps[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -232,14 +232,14 @@ static constexpr cchar	*schedmaps[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*envbad[] = {
+static constexpr cpcchar	envbad[] = {
 	"TMOUT",
 	"A__z",
 	nullptr
 
 } ;
 
-static constexpr cchar	*envstrs[] = {
+static constexpr cpcchar	envstrs[] = {
 	"KEYNAME",
 	"ADMIN",
 	"ADMINDIR",

@@ -5,9 +5,9 @@
 
 
 
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 
 

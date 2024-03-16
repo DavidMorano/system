@@ -23,7 +23,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<ctype.h>		/* needed: actually used */
-#include	<stdio.h>
+#include	<cstdio>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>

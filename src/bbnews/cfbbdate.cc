@@ -27,7 +27,7 @@
 
 #include	<sys/types.h>
 #include	<time.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<char.h>

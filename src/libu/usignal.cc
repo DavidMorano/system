@@ -1,7 +1,7 @@
 /* usignal */
 /* lang=C++20 */
 
-/* UNIX signal handling */
+/* UNIX csignalandling */
 /* translation layer interface for UNIX® equivalents */
 
 
@@ -29,9 +29,9 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<usystem.h>
 #include	<localmisc.h>
 

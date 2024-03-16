@@ -59,11 +59,11 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<fcntl.h>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<bfile.h>
 #include	<baops.h>
@@ -955,7 +955,7 @@ const char	*envv[] ;
 	} /* end for (loading positional arguments) */
 
 
-/* set up the signal handlers */
+/* set up the csignalandlers */
 
 	g.f_signal = FALSE ;
 	uc_sigsetempty(&signalmask) ;
@@ -1971,7 +1971,7 @@ badslave:
 /* end subroutine (main) */
 
 
-/* signal handlers */
+/* csignalandlers */
 static void int_signal(signo)
 int	signo ;
 {
@@ -1988,7 +1988,7 @@ int	signo ;
 	g.f_pipe = TRUE ;
 
 }
-/* end signal handlers */
+/* end csignalandlers */
 
 
 /* is the provided load OK ? */

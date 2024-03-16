@@ -26,7 +26,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<hasx.h>
 #include	<localmisc.h>

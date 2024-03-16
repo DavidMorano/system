@@ -53,11 +53,11 @@
 #include	<sys/mkdev.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<limits.h>
+#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<grp.h>
 #include	<time.h>

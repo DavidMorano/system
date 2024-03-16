@@ -40,7 +40,7 @@
 #include	<sys/utsname.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstring>		/* <- for |strcmp(3c)| */
 #include	<usystem.h>
 #include	<usysflag.h>

@@ -4,8 +4,6 @@
 /* ordered set of integers */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_SAFE		1		/* pointer safety */
 
 /* revision history:
 
@@ -26,14 +24,11 @@
 	We use the C++ STL |set| container object and let the comparison
 	object default to |less|.
 
-
 *******************************************************************************/
 
-#define	OSETINT_MASTER	0	/* must to include "extern-C" classification */
-
-#include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<new>
 #include	<utility>
 #include	<set>
@@ -46,9 +41,18 @@
 /* local defines */
 
 
-/* default name spaces */
+/* imported namespaces */
 
-using namespace		std ;		/* yes, we want punishment! */
+using std::nullptr_t ;			/* type */
+using std::set ;			/* type-template */
+using std::pair ;			/* type-template */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef set<int>::iterator	setit ;
+typedef set<int>::iterator *	setitp ;
 
 
 /* forward references */
@@ -57,176 +61,182 @@ using namespace		std ;		/* yes, we want punishment! */
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int osetint_start(osetint *op)
-{
-	set<int>	*setp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if ((setp = new(nothrow) set<int>) != NULL) {
-	    op->setp = (void *) setp ;
-	} else
+int osetint_start(osetint *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    cnullptr	np{} ;
+	    set<int>	*setp ;
 	    rs = SR_NOMEM ;
+	    if ((setp = new(nothrow) set<int>) != np) {
+	        op->setp = voidp(setp) ;
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (osetint_start) */
 
-
-int osetint_finish(osetint *op)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<int>	*setp  = (set<int> *) op->setp ;
-	    delete setp ;
-	    op->setp = NULL ;
-	} else
+int osetint_finish(osetint *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
 	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+	        set<int>	*setp  = (set<int> *) op->setp ;
+	        delete setp ;
+	        op->setp = nullptr ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (osetint_finish) */
 
-
-int osetint_addval(osetint *op,int v)
-{
-	int		rs = SR_OK ;
+int osetint_addval(osetint *op,int v) noex {
+	int		rs = SR_FAULT ;
 	int		f = INT_MAX ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<int>	*setp  = (set<int> *) op->setp ;
-	    pair<set<int>::iterator,bool>	ret ;
-	    ret = setp->insert(v) ;
-	    if (ret.second == true) f = 0 ;
-	} else
+	if (op) {
 	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+	        set<int>	*setp  = (set<int> *) op->setp ;
+	        pair<set<int>::iterator,bool>	ret ;
+	        ret = setp->insert(v) ;
+	        if (ret.second == true) f = 0 ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (osetint_addval) */
 
-
-int osetint_delval(osetint *op,int v)
-{
-	set<int>	*setp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<int>	*setp  = (set<int> *) op->setp ;
-	    setp->erase(v) ;
-	} else
+int osetint_delval(osetint *op,int v) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
 	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+	        set<int>	*setp  = (set<int> *) op->setp ;
+	        setp->erase(v) ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (osetint_delval) */
 
-
-/* return the count of the number of items in this list */
-int osetint_count(osetint *op)
-{
-	int		rs = SR_OK ;
+int osetint_count(osetint *op) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<int>	*setp  = (set<int> *) op->setp ;
-	    c = setp->size() ;
-	} else
+	if (op) {
 	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+	        set<int>	*setp  = (set<int> *) op->setp ;
+	        c = setp->size() ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (osetint_count) */
 
-
-/* return the extent of the number of items in this list */
-int osetint_extent(osetint *op)
-{
-	int		rs = SR_OK ;
+int osetint_extent(osetint *op) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<int>	*setp  = (set<int> *) op->setp ;
-	    c = setp->max_size() ;
-	} else
+	if (op) {
 	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+	        set<int>	*setp  = (set<int> *) op->setp ;
+	        c = setp->max_size() ;
+		rs = SR_OK ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (osetint_extent) */
 
-
-int osetint_mkvec(osetint *op,int *va)
-{
-	set<int>	*setp ;
-	int		rs = SR_OK ;
+int osetint_mkvec(osetint *op,int *va) noex {
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if ((setp = (set<int> *) op->setp) != NULL) {
-	    if (va != NULL) {
-	        set<int>::iterator it = setp->begin() ;
-	        set<int>::iterator it_end = setp->end() ;
-	        while (it != it_end) {
-	            va[c++] = *it++ ;
-	        } /* end while */
-	    } else {
-		c = setp->size() ;
-	    }
-	} else
+	if (op && va) {
 	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		set<int>	*setp = (set<int> *) op->setp ;
+		rs = SR_OK ;
+	        if (va) {
+	            set<int>::iterator it = setp->begin() ;
+	            set<int>::iterator it_end = setp->end() ;
+	            while (it != it_end) {
+	                va[c++] = *it++ ;
+	            } /* end while */
+	        } else {
+		    c = setp->size() ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (osetint_mkvec) */
 
-
-int osetint_curbegin(osetint *op,osetint_cur *curp)
-{
-	set<int>::iterator	*interp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if ((interp = new(nothrow) set<int>::iterator) != NULL) {
-	    set<int>	*setp  = (set<int> *) op->setp ;
-	    *interp = setp->begin() ;
-	    curp->interp = (void *) interp ;
-	} else
-	    rs = SR_NOMEM ;
+int osetint_curbegin(osetint *op,osetint_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		cnullptr	np{} ;
+		set<int>	*setp = (set<int> *) op->setp ;
+	        set<int>::iterator	*interp ;
+		rs = SR_NOMEM ;
+	        if ((interp = new(nothrow) set<int>::iterator) != np) {
+	            *interp = setp->begin() ;
+	            curp->interp = voidp(interp) ;
+		    rs = SR_OK ;
+		} /* end if (new-osetint) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (osetint_curbegin) */
 
-
-int osetint_curend(osetint *op,osetint_cur *curp)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (curp->interp != NULL) {
-	    set<int>::iterator *interp = (set<int>::iterator *) curp->interp ;
-	    delete interp ;
-	    curp->interp = NULL ;
-	} else
-	    rs = SR_BUGCHECK ;
+int osetint_curend(osetint *op,osetint_cur *curp) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		rs = SR_BUGCHECK ;
+	        if (curp->interp) {
+		    setit	*interp = setitp(curp->interp) ;
+	            delete interp ;
+	            curp->interp = nullptr ;
+		    rs = SR_OK ;
+		} /* end if (cursor-valid) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (osetint_curend) */
 
-
-int osetint_enum(osetint *op,osetint_cur *curp,int *rp)
-{
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
-	if (curp->interp != NULL) {
-	    set<int>		*setp  = (set<int> *) op->setp ;
-	    set<int>::iterator it_end ;
-	    set<int>::iterator *interp = (set<int>::iterator *) curp->interp ;
-	    it_end = setp->end() ;
-	    if (*interp != it_end) {
-	        *rp = *(*interp) ;
-	        (*interp)++ ;
-	    } else
-		rs = SR_NOTFOUND ;
-	} else
-	    rs = SR_BUGCHECK ;
+int osetint_enum(osetint *op,osetint_cur *curp,int *rp) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp && rp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->setp) {
+		rs = SR_BUGCHECK ;
+	        set<int>	*setp  = (set<int> *) op->setp ;
+	        if (curp->interp) {
+		    setit	*interp = setitp(curp->interp) ;
+	            setit	it_end = setp->end() ;
+		    rs = SR_NOTFOUND ;
+	            if (*interp != it_end) {
+	                *rp = *(*interp) ;
+	                (*interp)++ ;
+			rs = SR_OK ;
+	            } /* end if (found) */
+		} /* end if (cursor-valid) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (osetint_enum) */

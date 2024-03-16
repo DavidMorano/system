@@ -61,7 +61,6 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| */
 #include	<usystem.h>
-#include	<ugetpid.h>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<estrings.h>
@@ -270,7 +269,7 @@ static int debugfmode(cchar *,cchar *,int) noex ;
 
 /* local variables */
 
-static constexpr cchar	*csched[] = {
+static constexpr cpcchar	csched[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
@@ -289,7 +288,7 @@ enum cparams {
 	cparam_overlast
 } ;
 
-static constexpr cchar	*cparams[] = {
+static constexpr cpcchar	cparams[] = {
 	"spooldir",
 	"logsize",
 	"logfile",
@@ -307,20 +306,20 @@ enum sources {
 	source_overlast
 } ;
 
-static constexpr cchar	*sources[] = {
+static constexpr cpcchar	sources[] = {
 	"prog",
 	"systems",
 	"uqotd",
 	nullptr
 } ;
 
-static constexpr cchar	*prbins[] = {
+static constexpr cpcchar	prbins[] = {
 	"bin",
 	"sbin",
 	nullptr
 } ;
 
-static constexpr cchar	*defprogs[] = {
+static constexpr cpcchar	defprogs[] = {
 	"mkqotd",
 	"fortune",
 	"/swd/local/bin/fortune",
@@ -447,8 +446,8 @@ static int subinfo_start(MAINTQOTD *sip,time_t dt,cchar *pr,
 
 	    if ((rs = subinfo_envbegin(sip)) >= 0) {
 	        if ((rs = subinfo_confbegin(sip)) >= 0) {
-		    const int	llen = LOGIDLEN ;
-		    const int	v = (int) ugetpid() ;
+		    cint	llen = LOGIDLEN ;
+		    cint	v = uc_getpid() ;
 		    cchar	*nn = sip->nn ;
 		    char	lbuf[LOGIDLEN+1] ;
 		    if ((rs = mklogid(lbuf,llen,nn,5,v)) >= 0) {
@@ -559,7 +558,7 @@ static int subinfo_envbegin(MAINTQOTD *sip)
 #endif
 
 	{
-	    const int	elen = MAXPATHLEN ;
+	    cint	elen = MAXPATHLEN ;
 	    int		el = -1 ;
 	    cchar	*en ;
 	    char	ebuf[MAXPATHLEN+1] ;
@@ -596,7 +595,7 @@ static int subinfo_envbegin(MAINTQOTD *sip)
 	}
 
 	if (rs >= 0) {
-	    const int	ulen = USERNAMELEN ;
+	    cint	ulen = USERNAMELEN ;
 	    char	ubuf[USERNAMELEN+1] ;
 	    if ((rs = getusername(ubuf,ulen,-1)) >= 0) {
 	        cchar	**vpp = &sip->un ;
@@ -622,7 +621,7 @@ static int subinfo_envend(MAINTQOTD *sip)
 
 static int subinfo_confbegin(MAINTQOTD *sip)
 {
-	const int	csize = sizeof(QCONFIG)  ;
+	cint	csize = sizeof(QCONFIG)  ;
 	int		rs = SR_OK ;
 	cchar		*cfname = CONFIGFNAME ;
 	void		*p ;
@@ -686,7 +685,7 @@ static int subinfo_defaults(MAINTQOTD *sip)
 
 	if (sip->spooldname == nullptr) {
 	    cchar	*vp = sip->sn ;
-	    const int	vl = -1 ;
+	    cint	vl = -1 ;
 	    rs = subinfo_spooldir(sip,vp,vl) ;
 	}
 
@@ -694,7 +693,7 @@ static int subinfo_defaults(MAINTQOTD *sip)
 	    cchar	*lf = sip->lfname ;
 	    if (((lf == nullptr) || (lf[0] == '+')) && sip->f.logsub) {
 	        cchar	*vp = sip->sn ;
-	        const int	vl = -1 ;
+	        cint	vl = -1 ;
 	        rs = subinfo_logfile(sip,vp,vl) ;
 	    }
 	}
@@ -788,7 +787,7 @@ static int subinfo_logbegin(MAINTQOTD *sip)
 	cchar		*lf = sip->lfname ;
 
 	if ((lf != nullptr) && (lf[0] != '-')) {
-	    const int	size = sizeof(LOGFILE) ;
+	    cint	size = sizeof(LOGFILE) ;
 	    void	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 		LOGFILE	*lhp = p ;
@@ -879,8 +878,8 @@ static int subinfo_spoolcheck(MAINTQOTD *sip)
 
 static int subinfo_qdirname(MAINTQOTD *sip,int mjd)
 {
-	const int	dlen = DIGBUFLEN ;
-	const int	prec = 3 ; /* digit precision for another 100 years */
+	cint	dlen = DIGBUFLEN ;
+	cint	prec = 3 ; /* digit precision for another 100 years */
 	int		rs ;
 	int		len = 0 ;
 	cchar		*sdname = sip->spooldname ;
@@ -947,12 +946,11 @@ static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om) noex {
 }
 /* end subroutine (subinfo_gather) */
 #else /* CF_SOURCES */
-static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om)
-{
-	const mode_t	om = 0664 ;
-	const int	of = (O_RDWR|O_CREAT|O_TRUNC) ;
+static int subinfo_gather(MAINTQOTD *sip,cchar *qfname,mode_t om) noex {
+	cint		of = (O_RDWR|O_CREAT|O_TRUNC) ;
 	int		rs ;
 	int		fd = -1 ;
+	cmode		om = 0664 ;
 	if ((rs = u_open(qfname,of,om)) >= 0) {
 	    cchar	*mp = "hello world!\n" ;
 	    int		ml ;

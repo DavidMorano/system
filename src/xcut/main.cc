@@ -32,8 +32,8 @@
 
 #include	<sys/types.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 
 #include	<X11/Xlib.h>

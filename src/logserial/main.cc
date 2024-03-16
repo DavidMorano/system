@@ -35,10 +35,10 @@
 #include	<termios.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 
 #include	<bfile.h>
 #include	<baops.h>

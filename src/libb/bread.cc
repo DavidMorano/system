@@ -34,7 +34,7 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 

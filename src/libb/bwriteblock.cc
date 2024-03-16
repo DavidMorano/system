@@ -47,7 +47,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 
 #include	<usystem.h>
 #include	<localmisc.h>

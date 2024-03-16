@@ -48,8 +48,8 @@
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getpwentry.h>
 #include	<bfile.h>

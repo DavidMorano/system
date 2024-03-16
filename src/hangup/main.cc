@@ -25,10 +25,10 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<termios.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<time.h>
 
 #include	<bfile.h>

@@ -33,7 +33,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctype.h>
-#include	<stdlib.h>
+#include	<cstdlib>
 
 #include	<bfile.h>
 #include	<ascii.h>

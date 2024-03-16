@@ -51,7 +51,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>

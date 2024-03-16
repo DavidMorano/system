@@ -234,7 +234,7 @@ static constexpr struct domainbase	domains[] = {
 	{ nullptr, nullptr }
 } ;
 
-static constexpr cchar		*basednames[] = {
+static constexpr cpcchar	basednames[] = {
 	"/usr/add-on",
 	"/usr",
 	"/opt",
@@ -486,7 +486,7 @@ static int subinfo_user(SI *sip,char *rbuf,int rlen) noex {
 	int		len = 0 ;
 	char		*pwbuf{} ;
 	if ((rs = malloc_pw(&pwbuf)) >= 0) {
-	    PASSWD	pw ;
+	    ucentpw	pw ;
 	    cint	pwlen = rs ;
 	    if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,sip->dname)) >= 0) {
 	        char	*tbuf{} ;

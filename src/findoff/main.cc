@@ -5,9 +5,9 @@
 
 
 #include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdio.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdio>
 
 #include	"config.h"
 #include	"defs.h"

@@ -33,8 +33,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstring>
 #include	<new>
 #include	<vector>
 #include	<usystem.h>

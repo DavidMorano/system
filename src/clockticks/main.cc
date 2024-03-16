@@ -5,8 +5,8 @@
 #include	<sys/types.h>
 #include	<sys/times.h>
 #include	<sys/time.h>
-#include	<limits.h>
-#include	<stdio.h>
+#include	<climits>
+#include	<cstdio>
 
 
 

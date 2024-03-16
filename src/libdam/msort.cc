@@ -42,8 +42,8 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstring>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>

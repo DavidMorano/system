@@ -49,10 +49,10 @@
 #include	<sys/mkdev.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<dirent.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<time.h>
 

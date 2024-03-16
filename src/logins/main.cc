@@ -20,9 +20,9 @@
 /*
  *  Header files referenced:
  *	sys/types.h	System data types
- *	stdio.h		Definitions for standard I/O functions and constants
+ *	cstdio		Definitions for standard I/O functions and constants
  *	unistd.h	Standard UNIX definitions
- *	string.h	Definitions for string-handling functions
+ *	cstring	Definitions for cstringandling functions
  *	ctype.h		Character-type definitions
  *	grp.h		Definitions for referencing the /etc/group file
  *	pwd.h		Definitions for referencing the /etc/passwd file
@@ -33,15 +33,15 @@
  */
 
 #include	<sys/types.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<grp.h>
 #include	<pwd.h>
 #include	<shadow.h>
 #include	<time.h>
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<fmtmsg.h>
 #include <locale.h>
 

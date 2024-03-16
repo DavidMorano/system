@@ -4,7 +4,7 @@
 #include	<envstandards.h>
 
 #include	<sys/types.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<localmisc.h>
 

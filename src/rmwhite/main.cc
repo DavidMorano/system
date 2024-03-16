@@ -4,9 +4,9 @@
 
 
 
-#include	<stdlib.h>
+#include	<cstdlib>
 #include	<ctype.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 
 int main()

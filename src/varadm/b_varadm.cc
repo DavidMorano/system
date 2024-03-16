@@ -6,7 +6,7 @@
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
-#define	CF_DEBUGSIG	0		/* debug signal handling */
+#define	CF_DEBUGSIG	0		/* debug csignalandling */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_PERCACHE	1		/* use persistent cache */
 #define	CF_GETSYSMISC	1		/* use 'getsysmisc()' */
@@ -76,12 +76,12 @@
 #include	<sys/loadavg.h>
 #include	<sys/statvfs.h>
 #include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
-#include	<signal.h>
+#include	<climits>
+#include	<csignal>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<ctype.h>
 #include	<utmpx.h>
 #include	<netdb.h>

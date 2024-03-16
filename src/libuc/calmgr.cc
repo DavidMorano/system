@@ -32,9 +32,9 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>

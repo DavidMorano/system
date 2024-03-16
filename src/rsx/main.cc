@@ -34,9 +34,9 @@
 #include	<sys/time.h>
 #include	<sys/socket.h>
 #include	<sys/in.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<netdb.h>
-#include	<errno.h>
+#include	<cerrno>
 
 #include	<bfile.h>
 

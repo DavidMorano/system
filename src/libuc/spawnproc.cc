@@ -148,13 +148,13 @@ struct vars {
 
 /* forward reference */
 
-static int	spawnproc_pipes(scon *,cchar *,cchar **,cchar **) noex ;
+static int	spawnproc_pipes(scon *,cchar *,mainv,mainv) noex ;
 static int	spawnproc_parfin(scon *,int,int *,int (*)[2]) noex ;
 
-static void	spawnproc_child(scon *,cchar *,cchar **,cchar **,
+static void	spawnproc_child(scon *,cchar *,mainv,mainv,
 			int,int *,int (*)[2]) noex ;
 
-static int	envhelp_load(envhelp *,char *,cchar *,cchar **) noex ;
+static int	envhelp_load(envhelp *,char *,cchar *,mainv) noex ;
 
 static int	findprog(char *,char *,cchar *) noex ;
 static int	findxfile(ids *,char *,cchar *) noex ;
@@ -166,7 +166,7 @@ static int	mkvars() noex ;
 
 /* local variables */
 
-static constexpr cchar	*envbads[] = {
+static constexpr cpcchar	envbads[] = {
 	"_",
 	"_A0",
 	"_EF",
@@ -190,7 +190,7 @@ static constexpr cint	sigigns[] = {
 	0
 } ;
 
-static cint	sigdefs[] = {
+static constexpr cint	sigdefs[] = {
 	SIGQUIT,
 	SIGTERM,
 	SIGINT,
@@ -241,7 +241,7 @@ int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 	    envhelp	e, *ehp = &e ;
 	    if ((rs = envhelp_start(ehp,envbads,envv)) >= 0) {
 	        if ((rs = envhelp_load(ehp,pwd,efname,argv)) >= 0) {
-	            cchar	**ev ;
+	            mainv	ev{} ;
 	            if ((rs = envhelp_getvec(ehp,&ev)) >= 0) {
 	                rs = spawnproc_pipes(psap,efname,argv,ev) ;
 	                pid = rs ;
@@ -261,7 +261,7 @@ int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 /* local subroutines */
 
 static int spawnproc_pipes(scon *psap,cchar *fname,
-		cchar **argv,cchar **ev) noex {
+		mainv argv,mainv ev) noex {
 	int		rs ;
 	int		pid = 0 ;
 	int		con[2] ;
@@ -368,10 +368,10 @@ static int spawnproc_parfin(scon *psap,int pfd,int *dupes,
 /* end subroutine (spawnproc_parfin) */
 
 static void spawnproc_child(scon *psap,cchar *fname,
-	cchar **argv,cchar **ev,int cfd,int *dupes,int (*pipes)[2]) noex {
+	mainv argv,mainv ev,int cfd,int *dupes,int (*pipes)[2]) noex {
 	int		rs = SR_OK ;
 	int		opens[3] ;
-	cchar		**av ;
+	mainv		av ;
 	cchar		*arg[2] ;
 
 	for (int i = 0 ; i < 3 ; i += 1) {
@@ -405,8 +405,7 @@ static void spawnproc_child(scon *psap,cchar *fname,
 
 	if (rs >= 0) {
 	    int		w ;
-	    int		i ;
-	    for (i = 0 ; i < 3 ; i += 1) {
+	    for (int i = 0 ; i < 3 ; i += 1) {
 	        switch (psap->disp[i]) {
 	        case SPAWNPROC_DINHERIT:
 	            rs = opendevnull(opens,i) ;
@@ -438,7 +437,7 @@ static void spawnproc_child(scon *psap,cchar *fname,
 	        } /* end switch */
 	        if (rs < 0) break ;
 	    } /* end for */
-	    for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	        switch (psap->disp[i]) {
 	        case SPAWNPROC_DCLOSE:
 	            u_close(i) ; /* may fail (already closed) */
@@ -480,7 +479,7 @@ static void spawnproc_child(scon *psap,cchar *fname,
 /* end subroutine (spawnproc_child) */
 
 static int envhelp_load(envhelp *ehp,char *pwd,cchar *efname,
-		cchar **argv) noex {
+		mainv argv) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 

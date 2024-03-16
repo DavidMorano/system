@@ -26,15 +26,15 @@
 #include	<sys/wait.h>
 #include	<netinet/in.h>
 #include	<netdb.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<signal.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<csignal>
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<usystem.h>
 #include	<baops.h>

@@ -75,16 +75,16 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
+#include	<climits>
 #include	<time.h>
 #include	<locale.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<errno.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cerrno>
 #include	<pwd.h>
 #include	<utmpx.h>
 #include	<time.h>		/* for |cftime(3c)| */
-#include	<stdio.h>
+#include	<cstdio>
 
 #include	<exitcodes.h>
 

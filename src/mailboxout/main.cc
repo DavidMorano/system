@@ -39,12 +39,12 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<termios.h>
-#include	<signal.h>
+#include	<csignal>
 #include	<unistd.h>
 #include	<time.h>
 #include	<sysexits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<grp.h>
 #include	<syslog.h>
 

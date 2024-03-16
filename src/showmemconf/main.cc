@@ -34,10 +34,10 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdio.h>
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstring>
+#include	<cstdio>
 
 #include	<usystem.h>
 #include	<field.h>
