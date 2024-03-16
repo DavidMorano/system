@@ -23,6 +23,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<vector>
@@ -48,7 +49,9 @@
 
 /* imported namespaces */
 
-using namespace	std ;
+using std::nullptr_t ;			/* type */
+using std::vector ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -114,6 +117,34 @@ public:
 
 /* forward references */
 
+template<typename ... Args>
+static int querystr_ctor(querystr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;		/* dangerous */
+	    if ((op->spp = new(nothrow) strpack) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-strpack) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (querystr_ctor) */
+
+static int querystr_dtor(querystr *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->spp) {
+		delete op->spp ;
+		op->spp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (querystr_dtor) */
+
 static char	*strwebhex(char *,cchar *,int) noex ;
 
 
@@ -126,13 +157,12 @@ static char	*strwebhex(char *,cchar *,int) noex ;
 /* exported subroutines */
 
 int querystr_start(querystr *op,cchar *sp,int sl) noex {
-	int		rs = SR_FAULT ;
-	if (op && sp) {
+	int		rs ;
+	if ((rs = querystr_ctor(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
-	    memclear(op) ;		/* dangerous */
 	    if ((rs = getbufsize(getbufsize_mn)) >= 0) {
 	        cint	llen = rs ;
-	        if ((rs = strpack_start(&op->packer,llen)) >= 0) {
+	        if ((rs = strpack_start(op->spp,llen)) >= 0) {
 	            subinfo		si(op) ;
 	            op->open.packer = true ;
 	            if ((rs = si.split(sp,sl)) >= 0) {
@@ -140,11 +170,14 @@ int querystr_start(querystr *op,cchar *sp,int sl) noex {
 	            } /* end if (subinfo) */
 	            if (rs < 0) {
 	                op->open.packer = false ;
-		        strpack_finish(&op->packer) ;
+		        strpack_finish(op->spp) ;
 	            }
 	        } /* end if (strpack_start) */
 	    } /* end if (getbufsize) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		querystr_dtor(op) ;
+	    }
+	} /* end if (querystr_ctor) */
 	return rs ;
 }
 /* end subroutine (querystr_start) */
@@ -161,7 +194,11 @@ int querystr_finish(querystr *op) noex {
 	    }
 	    if (op->open.packer) {
 	        op->open.packer = false ;
-	        rs1 = strpack_finish(&op->packer) ;
+	        rs1 = strpack_finish(op->spp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = querystr_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	} /* end if (non-null) */
@@ -384,7 +421,7 @@ int subinfo::fixval(char *rbuf,int rlen,cchar *vp,int vl) noex {
 /* end subroutine (subinfo::fixval) */
 
 int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
-	strpack		*spp = &op->packer ;
+	strpack		*spp = op->spp ;
 	int		rs ;
 	cchar		*sp ;
 	if ((rs = strpack_store(spp,kp,kl,&sp)) >= 0) {
@@ -400,7 +437,11 @@ int subinfo::store(cchar *kp,int kl,cchar *vp,int vl) noex {
 	    }
 	    if (rs >= 0) {
 	        keyval	kv(kp,kl,vp,vl) ;
-	        kvs.push_back(kv) ;
+		try {
+	            kvs.push_back(kv) ;
+		} catch (...) {
+		    rs = SR_NOMEM ;
+		}
 	    } /* end if (ok) */
 	} /* end if (strpack_store) */
 	return rs ;

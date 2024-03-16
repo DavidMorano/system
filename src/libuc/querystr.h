@@ -39,9 +39,9 @@ struct querystr_flags {
 } ;
 
 struct querystr_head {
-	QUERYSTR_FL	open ;
-	strpack		packer ;
+	strpack		*spp ;
 	cchar		*(*kv)[2] ;
+	QUERYSTR_FL	open ;
 	int		n ;
 } ;
 

@@ -1134,6 +1134,7 @@ utf8decoder.o:		utf8decoder.cc utf8decoder.h
 termstr.o:		termstr.cc termstr.h
 td.o:			td.cc td.h termstr.h
 recip.o:		recip.cc recip.h
+querystr.o:		querystr.cc querystr.h
 
 findbit.o:		findbit.cc findbit.h
 bits.o:			bits.cc bits.h
