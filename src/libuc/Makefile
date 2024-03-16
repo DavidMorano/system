@@ -1090,6 +1090,11 @@ field.o:		field.dir
 field.dir:
 	makesubdir $@
 
+# VARSUB
+varsub.o:		varsub.dir
+varsub.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1201,8 +1206,6 @@ strstore.o:		strstore.cc	strstore.h
 expcook.o:		expcook.cc	expcook.h
 hostinfo.o:		hostinfo.cc	hostinfo.h
 paramfile.o:		paramfile.cc	paramfile.h
-varsub.o:		varsub.cc	varsub.h
-varsub_extras.o:	varsub_extras.cc varsub.h
 memfile.o:		memfile.cc	memfile.h
 dirlist.o:		dirlist.cc	dirlist.h
 varray.o:		varray.cc	varray.h

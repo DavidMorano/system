@@ -29,7 +29,7 @@
 
 struct serialbuf_head {
 	char		*bp ;	/* current buffer pointer (changes) */
-	int		len ;	/* supplied buffer length (doesn't change) */
+	int		len ;	/* supplied buffer length (does not change) */
 	int		i ;	/* current buffer index (changes) */
 } ;
 

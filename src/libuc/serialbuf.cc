@@ -63,8 +63,9 @@ int serialbuf_start(serialbuf *sbp,char *sbuf,int slen) noex {
 int serialbuf_finish(serialbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
-	    sbp->bp = NULL ;
+	    sbp->bp = nullptr ;
 	    rs = sbp->i ;
+	    sbp->i = 0 ;
 	}
 	return rs ;
 }
@@ -251,7 +252,7 @@ int serialbuf_rstrw(serialbuf *sbp,char *sbuf,int slen) noex {
 	    int		cl ;
 	    char	*cp ;
 	    if (slen >= 0) {
-	        int	i = 0 ;
+	        int	i = 0 ; /* used afterwards */
 	        cp = sbp->bp + (sbp->len - sbp->i) ;
 	        while ((i < slen) && (sbp->bp < cp) && 
 	            (sbp->bp[0] != '\0')) {
@@ -433,7 +434,7 @@ int serialbuf_rustrw(serialbuf *sbp,uchar *usbuf,int slen) noex {
 	    char	*cp ;
 	    char	*sbuf = (char *) usbuf ;
 	    if (slen >= 0) {
-	        int	i = 0 ;
+	        int	i = 0 ; /* used afterwards */
 	        cp = sbp->bp + (sbp->len - sbp->i) ;
 	        while ((i < slen) && (sbp->bp < cp) && (sbp->bp[0] != '\0')) {
 	            sbuf[i] = *sbp->bp++ ;
@@ -589,11 +590,11 @@ int serialbuf_wll(serialbuf *sbp,longlong lw) noex {
 /* end subroutine (serialbuf_wll) */
 
 /* write a fixed length string (possibly not NUL-terminated) */
-int serialbuf_wstrn(serialbuf *sbp,cchar *s,int slen) noex {
-	if (slen < 0) slen = strlen(s) ;
+int serialbuf_wstrn(serialbuf *sbp,cchar *sbuf,int slen) noex {
+	if (slen < 0) slen = strlen(sbuf) ;
 	if (sbp->i >= 0) {
 	    if ((sbp->len - sbp->i) >= slen) {
-	        strncpy(sbp->bp,s,slen) ;
+	        strncpy(sbp->bp,sbuf,slen) ;
 	        sbp->bp += slen ;
 	        sbp->i += slen ;
 	    } else {

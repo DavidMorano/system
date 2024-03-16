@@ -1,4 +1,4 @@
-/* varsub SUPPORT */
+/* varsub_main SUPPORT */
 /* lang=C++20 */
 
 /* module to handle variable substitution in strings */
