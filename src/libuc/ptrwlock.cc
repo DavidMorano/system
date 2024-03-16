@@ -58,6 +58,7 @@
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<pthread.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -71,7 +72,19 @@
 #define	NLPS		2
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
