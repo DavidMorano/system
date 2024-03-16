@@ -1,6 +1,8 @@
-/* langstate */
+/* langstate HEADER */
+/* lang=C20 */
 
 /* language (parse) state */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,7 +15,7 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LANGSTATE_INCLUDE
-#define	LANGSTATE_INCLUDE	1
+#define	LANGSTATE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,7 +27,7 @@
 #define	LANGSTATE_MAGIC		0x13f3c204
 #define	LANGSTATE		struct langstate_head
 #define	LANGSTATE_FL		struct langstate_flags
-#define	LANGSTATE_STAT		struct langstate_stat
+#define	LANGSTATE_INFO		struct langstate_lineinfo
 
 
 enum langstatetypes {
@@ -36,7 +38,7 @@ enum langstatetypes {
 	langstatetype_overlast
 } ;
 
-struct langstate_stat {
+struct langstate_lineinfo {
 	int		line ;
 	int		type ;
 } ;
@@ -50,29 +52,25 @@ struct langstate_flags {
 } ;
 
 struct langstate_head {
-	uint		magic ;
 	LANGSTATE_FL	f ;
+	uint		magic ;
 	int		line ;
 	int		pch ;		/* previous character */
 } ;
 
+typedef LANGSTATE	langstate ;
+typedef LANGSTATE_FL	langstate_fl ;
+typedef LANGSTATE_INFO	langstate_info ;
 
-#if	(! defined(LANGSTATE_MASTER)) || (LANGSTATE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int langstate_start(langstate *) noex ;
+extern int langstate_proc(langstate *,int,int) noex ;
+extern int langstate_stat(langstate *,langstate_info *) noex ;
+extern int langstate_finish(langstate *) noex ;
 
-extern int langstate_start(LANGSTATE *) ;
-extern int langstate_proc(LANGSTATE *,int,int) ;
-extern int langstate_stat(LANGSTATE *,LANGSTATE_STAT *) ;
-extern int langstate_finish(LANGSTATE *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* LANGSTATE_MASTER */
 
 #endif /* LANGSTATE_INCLUDE */
 

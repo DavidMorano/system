@@ -1,10 +1,8 @@
-/* linehist */
+/* linehist SUPPORT */
 /* lang=C++98 */
 
 /* Line History (object) */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,9 +16,9 @@
 
 /*******************************************************************************
 
-        Process characters (a line at a time) for balanced pairs. We record line
-        numbers so that when we are left with some sort of unbalance, we can
-        report the associated line numbers.
+	Process characters (a line at a time) for balanced pairs.
+	We record line numbers so that when we are left with some
+	sort of unbalance, we can report the associated line numbers.
 
 		linehist_start
 		linehist_proc
@@ -28,24 +26,17 @@
 		linehist_get
 		linehist_finish
 
-
 *******************************************************************************/
 
-
-#define	LINEHIST_MASTER		0	/* necessary for proper symbol names */
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstring>
-
 #include	<vector>
 #include	<new>
-
 #include	<usystem.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"linehist.h"
@@ -54,17 +45,12 @@
 /* local defines */
 
 
-/* default name spaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -76,7 +62,7 @@ class item {
 	int		ln ;		/* line number */
 	int		it ;		/* 0=opening, 1=closing */
 public:
-	item(int aln,int ait) : ln(aln), it(ait) { } ;
+	item(int aln,int ait) noex : ln(aln), it(ait) { } ;
 	int type() const { return it ; } ;
 	int line() const { return ln ; } ;
 } ;
@@ -88,11 +74,12 @@ public:
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int linehist_start(LINEHIST *op,cchar *ss)
-{
+int linehist_start(linehist *op,cchar *ss) noex {
 	int		rs = SR_OK ;
 	vector<item>	*lvp ;
 
@@ -101,8 +88,7 @@ int linehist_start(LINEHIST *op,cchar *ss)
 
 	if (ss[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(LINEHIST)) ;
-
+	memclear(op) ;			/* dangerous */
 	if ((lvp = new(nothrow) vector<item>) != NULL) {
 	    op->lvp = (void *) lvp ;
 	    if ((rs = langstate_start(&op->ls)) >= 0) {
@@ -121,9 +107,7 @@ int linehist_start(LINEHIST *op,cchar *ss)
 }
 /* end subroutine (linehist_start) */
 
-
-int linehist_finish(LINEHIST *op)
-{
+int linehist_finish(linehist *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -145,16 +129,10 @@ int linehist_finish(LINEHIST *op)
 }
 /* end subroutine (linehist_finish) */
 
-
-int linehist_proc(LINEHIST *op,int ln,cchar *sp,int sl)
-{
+int linehist_proc(linehist *op,int ln,cchar *sp,int sl) noex {
 	vector<item>	*lvp ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("linehist_proc: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
@@ -162,11 +140,11 @@ int linehist_proc(LINEHIST *op,int ln,cchar *sp,int sl)
 	if (op->magic != LINEHIST_MAGIC) return SR_NOTOPEN ;
 
 	if ((lvp = ((vector<item> *) op->lvp)) != NULL) {
-	    const int	sch0 = MKCHAR(op->ss[0]) ;
-	    const int	sch1 = MKCHAR(op->ss[1]) ;
+	    const int	sch0 = mkchar(op->ss[0]) ;
+	    const int	sch1 = mkchar(op->ss[1]) ;
 	    int		ch ;
 	    while ((rs >= 0) && sl && *sp) {
-		ch = MKCHAR(*sp) ;
+		ch = mkchar(*sp) ;
 		if ((rs = langstate_proc(&op->ls,ln,ch)) > 0) {
 		    if (ch == sch0) {
 		        item	a(ln,0) ;
@@ -198,9 +176,7 @@ int linehist_proc(LINEHIST *op,int ln,cchar *sp,int sl)
 }
 /* end subroutine (linehist_proc) */
 
-
-int linehist_count(LINEHIST *op)
-{
+int linehist_count(linehist *op) noex {
 	vector<item>	*lvp ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
@@ -219,9 +195,7 @@ int linehist_count(LINEHIST *op)
 }
 /* end subroutine (linehist_count) */
 
-
-int linehist_get(LINEHIST *op,int i,int *lnp)
-{
+int linehist_get(linehist *op,int i,int *lnp) noex {
 	vector<item>	*lvp ;
 	int		rs = SR_OK ;
 	int		type = 0 ;

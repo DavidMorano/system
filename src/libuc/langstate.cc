@@ -1,10 +1,8 @@
-/* langstate */
+/* langstate SUPPORT */
 /* lang=C++98 */
 
 /* Language (parse) State (object) */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -23,18 +21,13 @@
 
 	We track the parse state of C-language type input.
 
-
 *******************************************************************************/
-
-
-#define	LANGSTATE_MASTER	0	/* necessary for proper symbol names */
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstring>
 #include	<new>
 #include	<usystem.h>
 #include	<ascii.h>
@@ -52,11 +45,6 @@ using namespace		std ;		/* yes, we want punishment! */
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* external variables */
@@ -80,39 +68,32 @@ public:
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int langstate_start(LANGSTATE *op)
-{
-	if (op == NULL) return SR_FAULT ;
-	memset(op,0,sizeof(LANGSTATE)) ;
+int langstate_start(langstate *op) noex {
+	if (op == nullptr) return SR_FAULT ;
+	memclear(op) ;			/* dangerous */
 	op->f.clear = TRUE ;
 	op->magic = LANGSTATE_MAGIC ;
 	return SR_OK ;
 }
 /* end subroutine (langstate_start) */
 
-
-int langstate_finish(LANGSTATE *op)
-{
-	if (op == NULL) return SR_FAULT ;
+int langstate_finish(langstate *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != LANGSTATE_MAGIC) return SR_NOTOPEN ;
 	op->magic = 0 ;
 	return SR_OK ;
 }
 /* end subroutine (langstate_finish) */
 
-
-int langstate_proc(LANGSTATE *op,int ln,int ch)
-{
+int langstate_proc(langstate *op,int ln,int ch) noex {
 	int		f ;
 
-#if	CF_DEBUGS
-	debugprintf("langstate_proc: ent ln=%u ch=%c (%02x)\n",ln,ch,ch) ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != LANGSTATE_MAGIC) return SR_NOTOPEN ;
 
 	f = op->f.clear ;
@@ -176,27 +157,17 @@ int langstate_proc(LANGSTATE *op,int ln,int ch)
 	} /* end if */
 	op->pch = ch ;
 
-#if	CF_DEBUGS
-	debugprintf("langstate_proc: ret f=%u\n",f) ;
-#endif
-
 	return f ;
 }
 /* end subroutine (langstate_proc) */
 
-
-int langstate_stat(LANGSTATE *op,LANGSTATE_STAT *sbp)
-{
+int langstate_stat(langstate *op,langstate_info *sbp) noex {
 	int		rs = SR_OK ;
 	int		type = langstatetype_clear ;
-	if (op == NULL) return SR_FAULT ;
-	if (sbp == NULL) return SR_FAULT ;
-	memset(sbp,0,sizeof(LANGSTATE_STAT)) ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sbp == nullptr) return SR_FAULT ;
+	memclear(sbp) ;			/* dangerous */
 	sbp->line = op->line ;
-#if	CF_DEBUGS
-	debugprintf("langstate_stat: c=%u q=%u l=%u\n",
-		op->f.comment,op->f.quote,op->f.literal) ;
-#endif
 	if (op->f.comment) {
 	    type = langstatetype_comment ;
 	} else if (op->f.quote) {
@@ -205,9 +176,6 @@ int langstate_stat(LANGSTATE *op,LANGSTATE_STAT *sbp)
 	    type = langstatetype_literal ;
 	}
 	sbp->type = type ;
-#if	CF_DEBUGS
-	debugprintf("langstate_stat: ret rs=%d type=%u\n",rs,type) ;
-#endif
 	return (rs >= 0) ? type : rs ;
 }
 /* end subroutine (langstate_stat) */
