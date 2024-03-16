@@ -80,165 +80,148 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int ptrwlock_create(PTRWLOCK *psp,PTRWA *atp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_init(psp,atp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_create(ptrwlock *psp,ptrwa *atp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_init(psp,atp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_create) */
 
-int ptrwlock_destroy(PTRWLOCK *psp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_destroy(psp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_destroy(ptrwlock *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_destroy(psp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_destroy) */
 
-int ptrwlock_rdlock(PTRWLOCK *psp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_rdlock(psp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_rdlock(ptrwlock *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_rdlock(psp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_rdlock) */
 
-int ptrwlock_tryrdlock(PTRWLOCK *psp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_tryrdlock(ptrwlock *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_tryrdlock) */
 
-int ptrwlock_rdlockto(PTRWLOCK *psp,int to) noex {
-	cint		mint = (1000/NLPS) ;
-	int		rs ;
-	int		cto ;
-	int		c = 0 ;
-	int		f_exit = FALSE ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	cto = (to*NLPS) ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) rs = (- rs) ;
-	    if (rs < 0) {
-		switch (rs) {
-		case SR_BUSY:
-		    if (++c < cto) {
-	    		msleep(mint) ;
-		    } else {
-			f_exit = FALSE ;
-		    }
-		    break ;
-		case SR_INTR:
-		    break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end siwtch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
+int ptrwlock_rdlockto(ptrwlock *psp,int to) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    cint	mint = (1000/NLPS) ;
+	    int		cto ;
+	    int		c = 0 ;
+	    bool	f_exit = false ;
+	    if (to < 0) to = (INT_MAX/(2*NLPS)) ;
+	    cto = (to*NLPS) ;
+	    repeat {
+	        if ((rs = pthread_rwlock_tryrdlock(psp)) > 0) rs = (- rs) ;
+	        if (rs < 0) {
+		    switch (rs) {
+		    case SR_BUSY:
+		        if (++c < cto) {
+	    		    msleep(mint) ;
+		        } else {
+			    f_exit = false ;
+		        }
+		        break ;
+		    case SR_INTR:
+		        break ;
+		    default:
+		        f_exit = true ;
+		        break ;
+	            } /* end siwtch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || f_exit) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_rdlockto) */
 
-int ptrwlock_wrlock(PTRWLOCK *psp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_wrlock(psp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_wrlock(ptrwlock *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_wrlock(psp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_wrlock) */
 
-int ptrwlock_trywrlock(PTRWLOCK *psp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_trywrlock(psp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_trywrlock(ptrwlock *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_trywrlock) */
 
-int ptrwlock_wrlockto(PTRWLOCK *psp,int to) noex {
-	cint		mint = (1000/NLPS) ;
-	int		rs ;
-	int		cto ;
-	int		c = 0 ;
-	int		f_exit = FALSE ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	if (to < 0) to = (INT_MAX/(2*NLPS)) ;
-	cto = (to*NLPS) ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_trywrlock(psp)) > 0) rs = (- rs) ;
-	    if (rs < 0) {
-		switch (rs) {
-		case SR_BUSY:
-		    if (++c < cto) {
-	    	        msleep(mint) ;
-		    } else {
-	    	        f_exit = TRUE ;
-		    }
-		    break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-		} /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
+int ptrwlock_wrlockto(ptrwlock *psp,int to) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    cint	mint = (1000/NLPS) ;
+	    int		cto ;
+	    int		c = 0 ;
+	    bool	f_exit = false ;
+	    if (to < 0) to = (INT_MAX/(2*NLPS)) ;
+	    cto = (to*NLPS) ;
+	    repeat {
+	        if ((rs = pthread_rwlock_trywrlock(psp)) > 0) rs = (- rs) ;
+	        if (rs < 0) {
+		    switch (rs) {
+		    case SR_BUSY:
+		        if (++c < cto) {
+	    	            msleep(mint) ;
+		        } else {
+	    	            f_exit = true ;
+		        }
+		        break ;
+		    default:
+		        f_exit = true ;
+		        break ;
+		    } /* end switch */
+	        } /* end if (error) */
+	    } until ((rs >= 0) || f_exit) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_wrlockto) */
 
-int ptrwlock_unlock(PTRWLOCK *psp) noex {
-	int		rs ;
-
-	if (psp == NULL) return SR_FAULT ;
-
-	repeat {
-	    if ((rs = pthread_rwlock_unlock(psp)) > 0) rs = (- rs) ;
-	} until (rs != SR_INTR) ;
-
+int ptrwlock_unlock(ptrwlock *psp) noex {
+	int		rs = SR_FAULT ;
+	if (psp) {
+	    repeat {
+	        if ((rs = pthread_rwlock_unlock(psp)) > 0) rs = (- rs) ;
+	    } until (rs != SR_INTR) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (ptrwlock_unlock) */

@@ -1,6 +1,8 @@
-/* strsigabbr */
+/* strsigabbr SUPPORT */
+/* lang=C++20 */
 
 /* return a signal abbreviation string given a signal number */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,39 +16,58 @@
 
 /*******************************************************************************
 
+	Name:
+	strsigabbr
+
+	Description:
         We take a signal number and we return a corresponding signal
         abbreviation string.
 
 	Synopsis:
-
-	cchar *strsigabbr(uint n)
+	cchar *strsigabbr(uint n) noex
 
 	Arguments:
-
 	n		signal number to lookup
 
 	Returns:
-
 	-		character-string representation of signal
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<signal.h>
+#include	<csignal>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
-#include	<localmisc.h>
+#include	"strsigabbr.h"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
 
 struct sigabbr {
 	int		n ;
-	const char	*s ;
+	cchar		*s ;
 } ;
+
+
+/* forward references */
 
 
 /* local variables */
@@ -105,16 +126,17 @@ static const struct sigabbr	cvts[] = {
 #if	defined(_SIGRTMAX)
 	{ _SIGRTMAX, "RTMAX" },
 #endif
-	{ -1, NULL }
+	{ -1, nullptr }
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-const char *strsigabbr(uint n)
-{
-	const char	*s = NULL ;
+const char *strsigabbr(uint n) noex {
+	cchar		*s = nullptr ;
 
 #if	defined(_SIGRTMIN) && defined(_SIGRTMAX)
 	if ((n > _SIGRTMIN) && (n < _SIGRTMAX)) {
@@ -122,9 +144,8 @@ const char *strsigabbr(uint n)
 	}
 #endif /* SIGRTXXX */
 
-	if (s == NULL) {
-	    int	i ;
-	    for (i = 0 ; cvts[i].n >= 0 ; i += 1) {
+	if (s == nullptr) {
+	    for (int i = 0 ; cvts[i].n >= 0 ; i += 1) {
 	        if (cvts[i].n == n) {
 		    s = cvts[i].s ;
 		    break ;
