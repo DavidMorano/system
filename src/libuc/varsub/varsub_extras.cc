@@ -50,7 +50,7 @@
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<vecstr.h>

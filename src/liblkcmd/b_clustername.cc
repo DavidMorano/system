@@ -44,7 +44,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bits.h>

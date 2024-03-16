@@ -41,7 +41,7 @@
 #include	<unistd.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<grp.h>
 #include	<syslog.h>
 

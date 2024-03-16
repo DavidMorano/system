@@ -40,7 +40,7 @@
 #include	<csignal>
 #include	<netdb.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>

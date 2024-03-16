@@ -48,7 +48,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 
 #include	<usystem.h>

@@ -32,7 +32,7 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<csignal>
-#include	<string.h>
+#include	<cstring>
 #include	<cerrno>
 
 #include	<bfile.h>

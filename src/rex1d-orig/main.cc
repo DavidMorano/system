@@ -46,7 +46,7 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>
 #include	<poll.h>
 #include	<cerrno>

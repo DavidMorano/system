@@ -48,7 +48,7 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<cstdarg>
 
 #include	<usystem.h>

@@ -64,7 +64,7 @@
 #include <assert.h>
 
 #if defined(HAVE_STRING_H) || defined(STDC_HEADERS)
-#include <string.h>
+#include <cstring>
 #else
 #include <strings.h>
 #define strchr index

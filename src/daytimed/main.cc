@@ -6,7 +6,7 @@
 #include	<sys/types.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<cstdio>
 #include	<sncpyx.h>
 #include	<localmisc.h>

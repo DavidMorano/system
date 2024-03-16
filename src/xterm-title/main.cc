@@ -40,7 +40,7 @@
 #include	<time.h>
 #include	<cstdlib>
 #include	<csignal>
-#include	<string.h>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 

@@ -79,7 +79,7 @@
 #include	<time.h>
 #include	<locale.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<cerrno>
 #include	<pwd.h>
 #include	<utmpx.h>

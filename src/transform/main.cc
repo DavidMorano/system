@@ -44,7 +44,7 @@
 #include	<fcntl.h>
 #include	<dirent.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>

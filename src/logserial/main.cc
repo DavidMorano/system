@@ -38,7 +38,7 @@
 #include	<csignal>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 
 #include	<bfile.h>
 #include	<baops.h>

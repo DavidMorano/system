@@ -37,7 +37,7 @@
 #include	<fcntl.h>
 #include	<dirent.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>

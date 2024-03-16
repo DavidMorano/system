@@ -30,7 +30,7 @@
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>
 #include	<netdb.h>
 #include	<usystem.h>

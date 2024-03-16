@@ -34,7 +34,7 @@
 #include	<ucontext.h>
 #include	<dlfcn.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<sighand.h>

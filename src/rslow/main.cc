@@ -60,7 +60,7 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>
 #include	<usystem.h>
 #include	<bfile.h>

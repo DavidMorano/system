@@ -36,7 +36,7 @@
 #include	<new>
 #include	<utility>
 #include	<usystem.h>
-#include	<string.h>
+#include	<cstring>
 #include	<localmisc.h>
 
 

@@ -81,7 +81,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>		/* for |strftime(3c)| */
 #include	<usystem.h>
 #include	<bfile.h>

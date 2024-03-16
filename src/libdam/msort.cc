@@ -43,7 +43,7 @@
 #include	<envstandards.h>
 #include	<sys/types.h>
 #include	<climits>
-#include	<string.h>
+#include	<cstring>
 #include	<new>
 #include	<initializer_list>
 #include	<utility>

@@ -75,7 +75,7 @@
 #include <unistd.h>
 #include <csignal>
 #include <cstdarg>
-#include <string.h>
+#include <cstring>
 #include <cerrno>
 #include <pwd.h>
 #include <grp.h>

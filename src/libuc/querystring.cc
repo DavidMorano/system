@@ -26,14 +26,14 @@
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<vector>
 #include	<usystem.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
-#include	"querystring.h"
+#include	"querycstring"
 
 
 /* local defines */

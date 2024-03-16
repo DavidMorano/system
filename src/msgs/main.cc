@@ -91,7 +91,7 @@ static char damid[] = "@(#)msgs	5.2a (AT&T) 95/07/30" ;
 #include	<csignal>
 #include	<dirent.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<setjmp.h>
 #include	<cerrno>

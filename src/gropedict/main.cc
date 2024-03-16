@@ -40,7 +40,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<dirent.h>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<netdb.h>
 #include	<ftw.h>

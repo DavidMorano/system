@@ -14,6 +14,7 @@ g/stddef.h/s//cstddef/g
 g/stdlib.h/s//cstdlib/g
 g/stdio.h/s//cstdio/g
 g/stdarg.h/s//cstdarg/g
+g/string.h/s//cstring/g
 	w
 	q
 EOF

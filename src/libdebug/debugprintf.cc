@@ -92,7 +92,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<cstdarg>
 #include	<cstdio>
 #include	<usystem.h>

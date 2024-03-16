@@ -34,7 +34,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
-#include	<string.h>
+#include	<cstring>
 #include	<new>
 #include	<vector>
 #include	<usystem.h>

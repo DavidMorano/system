@@ -72,7 +72,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<pwd.h>
 #include	<project.h>
 #include	<netdb.h>

@@ -55,7 +55,7 @@
 #include	<time.h>
 #include	<ftw.h>
 #include	<dirent.h>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>

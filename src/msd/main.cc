@@ -42,13 +42,13 @@
 #include	<termios.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<kstat.h>
 
 #include	<usystem.h>
 #include	<field.h>
 #include	<bfile.h>
-#include	<termstring.h>
+#include	<termcstring>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

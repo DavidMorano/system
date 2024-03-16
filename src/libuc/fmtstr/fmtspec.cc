@@ -98,7 +98,7 @@
 #include	<cstdint>
 #include	<cstring>
 #include	<wchar.h>
-#include	<stdarg.h>
+#include	<cstdarg>
 
 #if	CF_FLOAT && F_SUNOS
 #include	<floatingpoint.h>

@@ -31,7 +31,7 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<netdb.h>
 
 #include	"usystem.h"

@@ -114,7 +114,7 @@ is intended to remedy the lack of certain critical generic network
 #include	<pwd.h>
 #include	<shadow.h>
 #include	<csignal>
-#include	<string.h>
+#include	<cstring>
 #include	<crypt.h>
 
 #include	<bfile.h>

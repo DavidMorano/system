@@ -42,7 +42,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<netdb.h>
 
 #include	<usystem.h>

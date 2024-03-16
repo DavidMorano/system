@@ -49,7 +49,7 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getpwentry.h>
 #include	<bfile.h>

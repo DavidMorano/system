@@ -41,7 +41,7 @@
 #include	<unistd.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<tzfile.h>
 #include	<netdb.h>
 #include	<usystem.h>

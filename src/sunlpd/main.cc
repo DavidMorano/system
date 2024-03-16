@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#include <string.h>
+#include <cstring>
 #include <syslog.h>
 #include <cerrno>
 #include <libintl.h>

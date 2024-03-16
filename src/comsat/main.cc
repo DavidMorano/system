@@ -47,7 +47,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<syslog.h>
 #include	<netdb.h>
 

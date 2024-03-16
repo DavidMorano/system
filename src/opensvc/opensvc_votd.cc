@@ -83,7 +83,7 @@
 #include	<fcntl.h>
 #include	<dlfcn.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<estrings.h>

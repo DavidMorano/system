@@ -44,7 +44,7 @@
 #include	<time.h>
 #include	<sysexits.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<grp.h>
 #include	<syslog.h>
 

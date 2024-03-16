@@ -50,7 +50,7 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<uprogdata.h>

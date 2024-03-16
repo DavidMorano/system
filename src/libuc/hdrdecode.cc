@@ -39,7 +39,7 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstddef>
-#include	<string.h>
+#include	<cstring>
 
 #include	<string>
 #include	<new>

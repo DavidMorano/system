@@ -22,7 +22,7 @@
 #include	<sys/stat.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<utime.h>
 #include	<time.h>
 #include	<pwd.h>

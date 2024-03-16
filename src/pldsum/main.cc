@@ -21,7 +21,7 @@
 #include	<sys/types.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 
 #include	<bfile.h>
 #include	<localmisc.h>

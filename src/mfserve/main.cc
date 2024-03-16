@@ -85,7 +85,7 @@
 #include	<poll.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>
 #include	<netdb.h>
 

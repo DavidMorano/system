@@ -58,7 +58,7 @@
 #include	<unistd.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 
 #include	<usystem.h>
@@ -90,7 +90,7 @@
 #include	<spawner.h>
 #include	<lfm.h>
 #include	<tmtime.h>
-#include	<querystring.h>
+#include	<querycstring>
 #include	<ucmallreg.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

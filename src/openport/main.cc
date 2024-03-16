@@ -55,7 +55,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 #include	<netdb.h>

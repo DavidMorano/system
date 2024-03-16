@@ -42,7 +42,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<netdb.h>
 #include	<time.h>
 

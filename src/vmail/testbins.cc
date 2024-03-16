@@ -32,7 +32,7 @@
 #include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 
 #include	<cstdlib>
 #include	<cinttypes>

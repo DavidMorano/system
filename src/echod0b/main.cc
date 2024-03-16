@@ -67,7 +67,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<netdb.h>
 

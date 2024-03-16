@@ -30,7 +30,7 @@
 #include	<sys/timeb.h>		/* for |ftime(3c)| */
 #include	<dlfcn.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>
 #include	<cerrno>
 

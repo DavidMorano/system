@@ -29,7 +29,7 @@
 #include	<cerrno>
 #include	<unistd.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<csignal>
 #include	<time.h>
 #include	<pwd.h>

@@ -39,7 +39,7 @@
 #include	<time.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 
 #include	<bfile.h>
 #include	<exitcodes.h>

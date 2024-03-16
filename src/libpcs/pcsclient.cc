@@ -71,7 +71,7 @@
 #include	<time.h>
 #include	<dlfcn.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<estrings.h>

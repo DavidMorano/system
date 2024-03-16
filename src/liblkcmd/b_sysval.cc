@@ -102,7 +102,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<utmpx.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<netdb.h>

@@ -28,7 +28,7 @@
 #include	<sys/param.h>
 #include	<csignal>
 #include	<unistd.h>
-#include	<string.h>
+#include	<cstring>
 #include	<time.h>
 #include	<pwd.h>
 #include	<grp.h>

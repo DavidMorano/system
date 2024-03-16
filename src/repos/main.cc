@@ -3,7 +3,7 @@
 
 #include	<envstandards.h>
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>
 #include	<cstdio>
 
 /* local defines */

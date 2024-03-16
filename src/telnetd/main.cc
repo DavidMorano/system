@@ -89,7 +89,7 @@
 #include <csignal>
 #include <cstddef>
 #include	<cstdlib>
-#include <string.h>
+#include <cstring>
 #include <ctype.h>
 
 #ifndef SYSV
@@ -104,7 +104,7 @@
 #endif /* SYSV */
 
 #include <security/pam_appl.h>
-#include <string.h>
+#include <cstring>
 #include	<pwd.h>
 #include <cerrno>
 #include <cstdio>

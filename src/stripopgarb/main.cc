@@ -5,7 +5,7 @@
 
 
 
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 #include	<cstdio>
 

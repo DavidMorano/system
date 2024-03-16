@@ -42,7 +42,7 @@
 #include	<fcntl.h>
 #include	<time.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<cerrno>
 #include	<cstdio>
 #include	<syslog.h>

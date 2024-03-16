@@ -36,7 +36,7 @@
 #include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<cstdio>
 
 #include	<usystem.h>

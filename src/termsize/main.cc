@@ -31,7 +31,7 @@
 #include	<termio.h>
 #include	<csignal>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<bfile.h>

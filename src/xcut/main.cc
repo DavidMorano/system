@@ -33,7 +33,7 @@
 #include	<sys/types.h>
 #include	<fcntl.h>
 #include	<cstdlib>
-#include	<string.h>
+#include	<cstring>
 #include	<ctype.h>
 
 #include	<X11/Xlib.h>

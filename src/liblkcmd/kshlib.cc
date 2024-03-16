@@ -206,7 +206,7 @@
 #include	<csignal>
 #include	<dlfcn.h>
 #include	<poll.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<lockmemalloc.h>

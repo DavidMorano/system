@@ -27,7 +27,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstdarg>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<storebuf.h>

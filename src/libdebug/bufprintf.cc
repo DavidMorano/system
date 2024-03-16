@@ -27,7 +27,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdarg.h>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<format.h>
 #include	<localmisc.h>

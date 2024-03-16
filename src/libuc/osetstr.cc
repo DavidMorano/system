@@ -25,7 +25,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<climits>
-#include	<string.h>
+#include	<cstring>
 #include	<new>
 #include	<utility>
 #include	<set>

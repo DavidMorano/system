@@ -30,7 +30,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>

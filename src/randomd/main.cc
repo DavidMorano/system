@@ -50,7 +50,7 @@
 #include	<time.h>
 #include	<ftw.h>
 #include	<dirent.h>
-#include	<string.h>
+#include	<cstring>
 #include	<pwd.h>
 #include	<grp.h>
 

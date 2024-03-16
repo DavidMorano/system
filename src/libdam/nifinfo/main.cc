@@ -38,7 +38,7 @@
 #include	<net/if.h>
 #include	<arpa/inet.h>
 #include	<netdb.h>
-#include	<string.h>
+#include	<cstring>
 
 #include	<usystem.h>
 #include	<localmisc.h>
