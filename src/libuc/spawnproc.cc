@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		file descriptor to program STDIN and STDOUT
-	<0		error
+	<0		error (system-return)
 
 	Implementation notes:  
 	Remember that the |pipe(2)| system call creates two pipe
@@ -67,6 +67,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -117,6 +118,14 @@
 #define	DEFPATH		"/usr/xpg4/bin:/usr/bin:/usr/extra/bin"
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef spawnproc_con	scon ;
+
+
 /* external subroutines */
 
 extern "C" {
@@ -136,10 +145,10 @@ extern "C" {
 
 /* forward reference */
 
-static int	spawnproc_pipes(SPAWNPROC *,cchar *,cchar **,cchar **) noex ;
-static int	spawnproc_parfin(SPAWNPROC *,int,int *,int (*)[2]) noex ;
+static int	spawnproc_pipes(scon *,cchar *,cchar **,cchar **) noex ;
+static int	spawnproc_parfin(scon *,int,int *,int (*)[2]) noex ;
 
-static void	spawnproc_child(SPAWNPROC *,cchar *,cchar **,cchar **,
+static void	spawnproc_child(scon *,cchar *,cchar **,cchar **,
 			int,int *,int (*)[2]) noex ;
 
 static int	envhelp_load(ENVHELP *,char *,cchar *,cchar **) noex ;
@@ -152,7 +161,7 @@ static int	opendevnull(int *,int) noex ;
 
 /* local variables */
 
-static cchar	*envbads[] = {
+static constexpr cchar	*envbads[] = {
 	"_",
 	"_A0",
 	"_EF",
@@ -162,7 +171,7 @@ static cchar	*envbads[] = {
 	NULL
 } ;
 
-static cint	sigigns[] = {
+static constexpr cint	sigigns[] = {
 	SIGTERM,
 	SIGINT,
 	SIGHUP,
@@ -186,17 +195,20 @@ static cint	sigdefs[] = {
 	0
 } ;
 
-static cint	sigouts[] = {
+static constexpr cint	sigouts[] = {
 	SIGTTOU,
 	0
 } ;
 
-static bufsizevar		maxpathlen(getbufsize_mp) ;
+static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int spawnproc(SPAWNPROC *psap,cchar *fname,cchar **argv,cchar **envv) noex {
+int spawnproc(scon *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		pid = 0 ;
@@ -240,8 +252,7 @@ int spawnproc(SPAWNPROC *psap,cchar *fname,cchar **argv,cchar **envv) noex {
 
 /* local subroutines */
 
-
-static int spawnproc_pipes(SPAWNPROC *psap,cchar *fname,
+static int spawnproc_pipes(scon *psap,cchar *fname,
 		cchar **argv,cchar **ev) noex {
 	int		rs ;
 	int		i ;
@@ -313,8 +324,7 @@ static int spawnproc_pipes(SPAWNPROC *psap,cchar *fname,
 }
 /* end subroutine (spawnproc_pipes) */
 
-
-static int spawnproc_parfin(SPAWNPROC *psap,int pfd,int *dupes,
+static int spawnproc_parfin(scon *psap,int pfd,int *dupes,
 		int (*pipes)[2]) noex {
 	int		rs = SR_OK ;
 	int		i ;
@@ -349,7 +359,7 @@ static int spawnproc_parfin(SPAWNPROC *psap,int pfd,int *dupes,
 }
 /* end subroutine (spawnproc_parfin) */
 
-static void spawnproc_child(SPAWNPROC *psap,cchar *fname,
+static void spawnproc_child(scon *psap,cchar *fname,
 	cchar **argv,cchar **ev,int cfd,int *dupes,int (*pipes)[2]) noex {
 	int		rs = SR_OK ;
 	int		opens[3] ;
@@ -463,7 +473,7 @@ static void spawnproc_child(SPAWNPROC *psap,cchar *fname,
 
 static int envhelp_load(ENVHELP *ehp,char *pwd,cchar *efname,
 		cchar **argv) noex {
-	cint	rsn = SR_NOTFOUND ;
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 
 	if ((rs = envhelp_envset(ehp,"_EF",efname,-1)) >= 0) {
@@ -583,8 +593,8 @@ static int opendevnull(int *opens,int i) noex {
 	cint		rsbad = SR_BADF ;
 	int		rs ;
 	if ((rs = u_fstat(i,&sb)) == rsbad) {
-	    cmode	om = 0666 ;
 	    cint	of = (i == 0) ? O_RDONLY : O_WRONLY ;
+	    cmode	om = 0666 ;
 	    if ((rs = u_open(NULLFNAME,of,om)) >= 0) {
 	        cint	fd = rs ;
 	        if (fd != i) {

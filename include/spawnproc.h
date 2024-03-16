@@ -24,7 +24,7 @@
 
 
 /* object */
-#define	SPAWNPROC		struct spawnproc_head
+#define	SPAWNPROC_CON		struct spawnproc_control
 
 /* options */
 #define	SPAWNPROC_OIGNINTR	(1<<0)		/* ignore interrupts */
@@ -55,7 +55,7 @@ the subroutine when the corresponding disposition is OPEN.
 ****/
 
 
-struct spawnproc_head {
+struct spawnproc_control {
 	pid_t		pgrp ;		/* input */
 	int		opts ;		/* input */
 	int		disp[3] ;	/* input */
@@ -64,11 +64,11 @@ struct spawnproc_head {
 	int		nice ;		/* input */
 } ;
 
-typedef SPAWNPROC	spawnproc ;
+typedef SPAWNPROC_CON	spawnproc_con ;
 
 EXTERNC_begin
 
-extern int spawnproc(spawnproc *,cchar *,mainv,mainv) noex ;
+extern int spawnproc(spawnproc_con *,cchar *,mainv,mainv) noex ;
 
 EXTERNC_end
 
