@@ -123,11 +123,9 @@
 
 /* external subroutines */
 
-#if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(cchar *,cchar *,int) noex ;
-#endif
-
-extern int	mailmsgmathdr(cchar *,int,int *) noex ;
+extern "C" {
+    extern int	mailmsgmathdr(cchar *,int,int *) noex ;
+}
 
 
 /* external variables */
