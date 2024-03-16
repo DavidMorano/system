@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= ismisc.h
 
 
-OBJ0_SIX= isdotdir.o
-OBJ1_SIX= isleapyear.o
-OBJ2_SIX= isprime.o
-OBJ3_SIX= isobjspecial.o issamehostname.o
+OBJ0_ISMISC= isdotdir.o
+OBJ1_ISMISC= isleapyear.o
+OBJ2_ISMISC= isprime.o
+OBJ3_ISMISC= isobjspecial.o issamehostname.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJA_ISMISC= obj0_ismisc.o obj1_ismisc.o
+OBJB_ISMISC= obj2_ismisc.o obj3_ismisc.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_ISMISC= $(OBJA_ISMISC) $(OBJB_ISMISC)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_ISMISC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_ISMISC)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_ISMISC)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,17 +109,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_ismisc.o:	$(OBJ0_ISMISC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_ISMISC)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_ismisc.o:	$(OBJ1_ISMISC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_ISMISC)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_ismisc.o:	$(OBJ2_ISMISC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_ISMISC)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_ismisc.o:	$(OBJ3_ISMISC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_ISMISC)
 
 
 isdotdir.o:		isdotdir.cc		$(INCS)

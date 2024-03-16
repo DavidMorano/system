@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= buffer.h
 
 
-OBJ0_SIX= buffer_main.o
-OBJ1_SIX= buffer_chrs.o
-OBJ2_SIX= buffer_strquote.o
-OBJ3_SIX= buffer_strcompact.o buffer_stropaque.o
+OBJ0_BUFFER= buffer_main.o
+OBJ1_BUFFER= buffer_chrs.o
+OBJ2_BUFFER= buffer_strquote.o
+OBJ3_BUFFER= buffer_strcompact.o buffer_stropaque.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJA_BUFFER= obj0_buffer.o obj1_buffer.o
+OBJB_BUFFER= obj2_buffer.o obj3_buffer.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_BUFFER= $(OBJA_BUFFER) $(OBJB_BUFFER)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_BUFFER)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_BUFFER)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,17 +109,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_buffer.o:	$(OBJ0_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_BUFFER)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_buffer.o:	$(OBJ1_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_BUFFER)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_buffer.o:	$(OBJ2_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_BUFFER)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_buffer.o:	$(OBJ3_BUFFER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_BUFFER)
 
 
 buffer_main.o:		buffer_main.cc		$(INCS)

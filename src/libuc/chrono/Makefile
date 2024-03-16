@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= chrono.h
 
 
-OBJ0_SIX= tmstrs.o zdb.o
-OBJ1_SIX= date.o
-OBJ2_SIX= tmz.o zos.o
-OBJ3_SIX= dater.o tmtime.o
+OBJ0_CHRONO= tmstrs.o zdb.o
+OBJ1_CHRONO= date.o
+OBJ2_CHRONO= tmz.o zos.o
+OBJ3_CHRONO= dater.o tmtime.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJA_CHRONO= obj0_chrono.o obj1_chrono.o
+OBJB_CHRONO= obj2_chrono.o obj3_chrono.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_CHRONO)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_CHRONO)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,17 +109,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_chrono.o:	$(OBJ0_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CHRONO)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_chrono.o:	$(OBJ1_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CHRONO)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_chrono.o:	$(OBJ2_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CHRONO)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_chrono.o:	$(OBJ3_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CHRONO)
 
 
 date.o:			date.cc	date.h $(INCS)

@@ -4,7 +4,7 @@
 /* get the LOCAL network-load (NETLOAD) */
 /* version %I% last-modified %G% */
 
-#define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
+#define	CF_UCPROGDATA	1		/* use |ucprogdata_xxx(3uc)| */
 
 /* revision history:
 
@@ -51,7 +51,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<uprogdata.h>
+#include	<ucprogdata.h>
 #include	<mallocxx.h>
 #include	<filereadln.h>
 #include	<sncpyx.h>
@@ -72,8 +72,8 @@
 #define	NETLOADFNAME	"netload"
 #define	TO_TTL		(5*60)
 
-#ifndef	CF_UPROGDATA
-#define	CF_UPROGDATA	1
+#ifndef	CF_UCPROGDATA
+#define	CF_UCPROGDATA	1
 #endif
 
 
@@ -91,7 +91,7 @@
 
 /* local variables */
 
-constexpr bool		f_uprogdata = CF_UPROGDATA ;
+constexpr bool		f_ucprogdata = CF_UCPROGDATA ;
 
 constexpr cchar		nlname[] = NETLOADFNAME ;
 
@@ -109,7 +109,7 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (pr[0]) {
-	        cint		di = UPROGDATA_DNETLOAD ;
+	        cint		di = UCPROGDATA_DNETLOAD ;
 	        cint		ttl = TO_TTL ;
 		rs = SR_OK ;
 /* user environment */
@@ -121,13 +121,13 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	            }
 	        } /* end if (needed) */
 /* program cache */
-		if constexpr (f_uprogdata) {
+		if constexpr (f_ucprogdata) {
 	            if ((rs >= 0) && (len == 0)) {
-	                if ((rs = uprogdata_get(di,rbuf,rlen)) > 0) {
+	                if ((rs = ucprogdata_get(di,rbuf,rlen)) > 0) {
 	                    len = rs ;
 	                }
 	            }
-		} /* end if-constexpr (f_uprogdata) */
+		} /* end if-constexpr (f_ucprogdata) */
 /* software facility (LOCAL) configuration */
 	        if ((rs >= 0) && (len == 0)) {
 	            cchar	*vardname = VARDNAME ;
@@ -136,8 +136,8 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	                if ((rs = mkpath3(tfname,pr,vardname,nlname)) >= 0) {
 	                    if ((rs = filereadln(tfname,rbuf,rlen)) > 0) {
 	                        len = rs ;
-			        if constexpr (f_uprogdata) {
-		                    rs = uprogdata_set(di,rbuf,len,ttl) ;
+			        if constexpr (f_ucprogdata) {
+		                    rs = ucprogdata_set(di,rbuf,len,ttl) ;
 			        }
 		            } else if (isNotPresent(rs)) {
 		                rs = SR_OK ;

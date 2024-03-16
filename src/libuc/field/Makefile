@@ -60,8 +60,8 @@ OBJ2_FIELD= field_word.o
 OBJ3_FIELD= field_wordphrase.o
 
 
-OBJA_FIELD= obj0_six.o obj1_six.o
-OBJB_FIELD= obj2_six.o obj3_six.o
+OBJA_FIELD= obj0_field.o obj1_field.o
+OBJB_FIELD= obj2_field.o obj3_field.o
 
 OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
 
@@ -109,16 +109,16 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_FIELD)
+obj0_field.o:	$(OBJ0_FIELD)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_FIELD)
 
-obj1_six.o:	$(OBJ1_FIELD)
+obj1_field.o:	$(OBJ1_FIELD)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_FIELD)
 
-obj2_six.o:	$(OBJ2_FIELD)
+obj2_field.o:	$(OBJ2_FIELD)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_FIELD)
 
-obj3_six.o:	$(OBJ3_FIELD)
+obj3_field.o:	$(OBJ3_FIELD)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_FIELD)
 
 

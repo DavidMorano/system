@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= getxx.h
 
 
-OBJ0_SIX= getho.o
-OBJ1_SIX= getnw.o
-OBJ2_SIX= getpr.o
-OBJ3_SIX= getsv.o getus.o
+OBJ0_GETXX= getho.o
+OBJ1_GETXX= getnw.o
+OBJ2_GETXX= getpr.o
+OBJ3_GETXX= getsv.o getus.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJA_GETXX= obj0_getxx.o obj1_getxx.o
+OBJB_GETXX= obj2_getxx.o obj3_getxx.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_GETXX= $(OBJA_GETXX) $(OBJB_GETXX)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_GETXX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_GETXX)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_GETXX)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,17 +109,17 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_getxx.o:	$(OBJ0_GETXX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_GETXX)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_getxx.o:	$(OBJ1_GETXX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_GETXX)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_getxx.o:	$(OBJ2_GETXX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_GETXX)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_getxx.o:	$(OBJ3_GETXX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_GETXX)
 
 
 getho.o:		getho.cc getho.h $(INCS)

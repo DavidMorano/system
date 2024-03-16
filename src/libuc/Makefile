@@ -192,7 +192,7 @@ OBJ082= envlist.o hdb.o lookaside.o ids.o linefold.o nulstr.o
 OBJ083= dirseen.o dirseen_not.o
 OBJ084= strpack.o strmgr.o strtab.o
 OBJ085= varray.o randomvar.o sigign.o ucsem.o
-OBJ086= sbuf.o sbuf_addquoted.o sbuf_termconseq.o
+OBJ086= sbuf.o
 OBJ087= hostinfo.o hostaddr.o hostent.o inetaddr.o sockaddress.o ucpwcache.o
 
 OBJ088= strsub.o
@@ -740,10 +740,6 @@ sockaddress.o:		sockaddress.cc sockaddress.h
 storeitem.o:		storeitem.cc storeitem.h
 storebuf.o:		storebuf.cc storebuf.h
 
-sbuf.o:			sbuf.cc sbuf.h
-sbuf_addquoted.o:	sbuf_addquoted.cc sbuf.h
-sbuf_termconseq.o:	sbuf_termconseq.cc sbuf.h
-
 obuf.o:			obuf.cc obuf.hh
 
 baops.o:		baops.c baops.h
@@ -1062,6 +1058,11 @@ chrono.dir:
 # LOCALGET
 localget.o:		localget.dir
 localget.dir:
+	makesubdir $@
+
+# SBUF
+sbuf.o:			sbuf.dir
+sbuf.dir:
 	makesubdir $@
 
 # BUFFER
