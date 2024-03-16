@@ -114,9 +114,9 @@ extern int	u_setcontext(const ucontext_t *) noex ;
 
 extern int	u_fork() noex ;
 extern int	u_vfork() noex ;
-extern int	u_execve(cchar *, cchar **,cchar **) noex ;
-extern int	u_execv(cchar *,cchar **) noex ;
-extern int	u_execvp(cchar *,cchar **) noex ;
+extern int	u_execve(cchar *,mainv,mainv) noex ;
+extern int	u_execv(cchar *,mainv) noex ;
+extern int	u_execvp(cchar *,mainv) noex ;
 extern int	u_exit(int) noex ;
 extern int	u_kill(pid_t,int) noex ;
 extern int	u_waitpid(pid_t,int *,int) noex ;

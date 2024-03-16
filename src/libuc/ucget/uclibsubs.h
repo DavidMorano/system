@@ -114,8 +114,8 @@ extern int uc_timerover(timer_t) noex ;
 extern int	uc_fork() noex ;
 extern int	uc_forklockbegin(int) noex ;
 extern int	uc_forklockend() noex ;
-extern int	uc_execve(cchar *,cchar **,cchar **) noex ;
-extern int	uc_isaexecve(cchar *,cchar **,cchar **) noex ;
+extern int	uc_execve(cchar *,mainv,mainv) noex ;
+extern int	uc_isaexecve(cchar *,mainv,mainv) noex ;
 extern int	uc_initgroups(cchar *,gid_t) noex ;
 
 extern int	uc_getcwd(char *,int) noex ;
@@ -165,8 +165,7 @@ extern int	uc_openproto(cchar *,int,int,int) noex ;
 extern int	uc_openpass(cchar *,int,int,int) noex ;
 extern int	uc_openuser(cchar *,cchar *,int,mode_t,int) noex ;
 extern int	uc_openuserinfo(struct ucopeninfo *) noex ;
-extern int	uc_openprog(cchar *,int,
-			cchar **,cchar **) noex ;
+extern int	uc_openprog(cchar *,int,mainv,mainv) noex ;
 extern int	uc_opendialer(cchar *,cchar *,int,mode_t,
 			cchar **,cchar **,int) noex ;
 extern int	uc_openfsvc(cchar *,cchar *,cchar *,int,mode_t,
@@ -177,7 +176,7 @@ extern int	uc_openfint(cchar *,cchar *,cchar *,
 			cchar *, cchar *, int,mode_t,
 			cchar **,cchar **,int) noex ;
 extern int	uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
-extern int	uc_opendev(cchar *,int,mode_t,cchar **,int,int) noex ;
+extern int	uc_opendev(cchar *,int,mode_t,mainv,int,int) noex ;
 
 extern int	uc_accepte(int,cvoid *,int *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
