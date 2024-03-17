@@ -1095,6 +1095,11 @@ varsub.o:		varsub.dir
 varsub.dir:
 	makesubdir $@
 
+# ENVS
+envs.o:			envs.dir
+envs.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1125,9 +1130,6 @@ pathclean.o:		pathclean.cc pathclean.h
 
 nodedb.o:		nodedb.cc nodedb.h
 
-envs.o:			envs.cc envs.h
-envs_procxe.o:		envs_procxe.cc envs.h
-envs_subs.o:		envs_subs.cc envs.h
 expcook.o:		expcook.cc expcook.h
 keyopt.o:		keyopt.cc keyopt.h
 utf8decoder.o:		utf8decoder.cc utf8decoder.h

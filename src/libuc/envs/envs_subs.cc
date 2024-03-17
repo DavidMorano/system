@@ -351,7 +351,7 @@ static int procsub(subinfo *sip,buffer *bp,cchar *vp,int vl) noex {
 #endif /* CF_EXPAND */
 
 static int pathjoin(vecstr *plp,char jbuf[],int jlen) noex {
-	SBUF		b ;
+	sbuf		b ;
 	int		rs ;
 	int		c = 0 ;
 	int		bl = 0 ;

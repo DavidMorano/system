@@ -1,4 +1,4 @@
-/* envs SUPPORT */
+/* envs_main SUPPORT */
 /* lang=C++20 */
 
 /* environment-variable list container */
