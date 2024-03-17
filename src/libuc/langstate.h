@@ -7,21 +7,25 @@
 
 /* revision history:
 
+	= 2008-06-29, David A­D­ Morano
+	This was really made from scratch.
+
 	= 2016-06-29, David A­D­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2008,2016 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LANGSTATE_INCLUDE
 #define	LANGSTATE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 
 #define	LANGSTATE_MAGIC		0x13f3c204
