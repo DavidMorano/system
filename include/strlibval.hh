@@ -36,6 +36,12 @@
 
 
 enum strlibvals {
+	strlibval_logid,
+	strlibval_logname,
+	strlibval_logline,
+	strlibval_utmpid,
+	strlibval_utmpname,
+	strlibval_utmpline,
 	strlibval_path,
 	strlibval_fpath,
 	strlibval_incpath,
@@ -50,7 +56,6 @@ enum strlibvals {
 	strlibval_localdomain,
 	strlibval_username,
 	strlibval_user,
-	strlibval_logname,
 	strlibval_home,
 	strlibval_mail,
 	strlibval_organization,

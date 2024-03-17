@@ -74,6 +74,12 @@ namespace {
 }
 
 constexpr strvarenv::strvarenv() noex {
+	name[strlibval_logid ] = varname.logid ;
+	name[strlibval_logname] = varname.logname ;
+	name[strlibval_logline] = varname.logline ;
+	name[strlibval_utmpid] = varname.utmpid ;
+	name[strlibval_utmpname] = varname.utmpname ;
+	name[strlibval_utmpline] = varname.utmpline ;
 	name[strlibval_path] = varname.path ;
 	name[strlibval_fpath] = varname.fpath ;
 	name[strlibval_incpath] = varname.incpath ;
@@ -88,7 +94,6 @@ constexpr strvarenv::strvarenv() noex {
 	name[strlibval_localdomain] = varname.localdomain ;
 	name[strlibval_username] = varname.username ;
 	name[strlibval_user] = varname.user ;
-	name[strlibval_logname] = varname.logname ;
 	name[strlibval_home] = varname.home ;
 	name[strlibval_mail] = varname.mail ;
 	name[strlibval_organization] = varname.organization ;
