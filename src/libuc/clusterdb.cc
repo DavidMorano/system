@@ -7,13 +7,13 @@
 
 /* revision history:
 
-	- 2004-05-25, David A­D­ Morano
+	- 1998-04-13, David A­D­ Morano
 	This subroutine was generalized from a particular program
 	for wider use.
 
 */
 
-/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

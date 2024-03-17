@@ -7,8 +7,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	GETpwentry_INCLUDE
-#define	GETpwentry_INCLUDE
+#ifndef	GETPWENTRY_INCLUDE
+#define	GETPWENTRY_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -27,6 +27,6 @@ extern int getpwentry_uid(pwentry *,char *,int,uid_t) noex ;
 EXTERNC_end
 
 
-#endif /* GETpwentry_INCLUDE */
+#endif /* GETPWENTRY_INCLUDE */
 
 

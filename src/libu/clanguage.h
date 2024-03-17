@@ -12,7 +12,7 @@
 
 	= 2017-08-01, David A­D­ Morano
 	Updated for lack of interfaces in MacOS Darwin
-Y
+
 */
 
 /* Copyright © 1998,2017 David A­D­ Morano.  All rights reserved. */

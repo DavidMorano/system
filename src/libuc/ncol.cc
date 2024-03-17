@@ -7,12 +7,12 @@
 
 /* revision history:
 
-	= 2009-04-10, David A­D­ Morano
+	= 1998-11-01, David A­D­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
