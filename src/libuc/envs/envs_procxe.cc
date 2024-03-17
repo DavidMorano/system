@@ -24,7 +24,7 @@
 	deleted with a new definition is encountered.
 
 	Synopsis:
-	int envs_procxe(envs *nlp,expcook *clp,cc **ev,vs *dlp,cc *fn)
+	int envs_procxe(envs *nlp,expcook *clp,mainv ev,vs *dlp,cc *fn) noex
 
 	Arguments:
 	nlp		new-list-pointer, new (forming) environment list
@@ -125,13 +125,13 @@ namespace {
     struct subinfo {
 	envs		*nlp ;
 	expcook		*clp ;
-	cchar		**envv ;
 	vecstr		*dlp ;
-	subinfo(envs *op,EC *aclp,cchar **ev,vecstr *adlp) noex {
+	mainv		envv ;
+	subinfo(envs *op,EC *aclp,mainv ev,vecstr *adlp) noex {
 		    nlp = op ;
 		    clp = aclp ;
-		    envv = ev ;
 		    dlp = adlp ;
+		    envv = ev ;
 	} ; /* end if (ctor) */
 	int procer(cchar *) noex ;
 	int expln(cchar *,int) noex ;
@@ -180,9 +180,12 @@ static constexpr cchar	ssp[] = {
 static constexpr cchar	strassign[] = "+:;¶µ­Ð=-" ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int envs_procxe(envs *op,EC *clp,cchar **ev,VS *dlp,cchar *fn) noex {
+int envs_procxe(envs *op,EC *clp,mainv ev,VS *dlp,cchar *fn) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = envs_magic(op,clp,ev,dlp,fn)) >= 0) {
@@ -209,9 +212,9 @@ int subinfo::procer(cchar *fn) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = maxlinelen) >= 0) {
-	    cint	sz = ((rs+1)*NLINES) ;
+	    cint	sz = ((rs + 1) * NLINES) ;
 	    char	*lbuf{} ;
-	    if ((rs = uc_malloc((sz+1),&lbuf)) > 0) {
+	    if ((rs = uc_malloc((sz + 1),&lbuf)) > 0) {
 		cint	llen = sz ;
 	        bfile	xefile, *xfp = &xefile ;
 	        if ((rs = bopen(xfp,fn,"r",0666)) >= 0) {

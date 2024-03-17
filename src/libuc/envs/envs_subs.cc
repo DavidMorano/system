@@ -45,6 +45,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>
@@ -75,8 +76,8 @@
 
 /* imported namespaces */
 
-using std::min ;
-using std::max ;
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -123,6 +124,9 @@ static int	mkvars() noex ;
 static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 static vars		var ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

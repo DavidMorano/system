@@ -15,6 +15,7 @@
 #include	<sys/types.h>
 #include	<usystem.h>
 #include	<hdb.h>
+#include	<expcook.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 
@@ -51,6 +52,9 @@ extern int envs_fetch(envs *,cchar *,int,envs_cur *,cchar **) noex ;
 extern int envs_delname(envs *,cchar *,int) noex ;
 extern int envs_count(envs *) noex ;
 extern int envs_finish(envs *) noex ;
+
+extern int envs_procxe(envs *,expcook *,mainv,vecstr *,cchar *) noex ;
+extern int envs_subs(envs *,expcook *,vecstr *,vecstr *) noex ;
 
 EXTERNC_end
 

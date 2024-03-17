@@ -117,6 +117,9 @@ static int	entry_finish(ENVS_ENT *) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int envs_start(envs *op,int ne) noex {
