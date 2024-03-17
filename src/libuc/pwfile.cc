@@ -251,135 +251,110 @@ int pwfile_fetchuser(pwfile *dbp,cc *username,pwfile_cur *curp,
 /* end subroutine (pwfile_fetchuser) */
 
 int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
-	int		rs = SR_FAULT ;
-
-	if (dbp && curp) {
-
-	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
-
-	bool		f_locked = false ;
-	rs = SR_OK ;
-	if (dbp->lfd < 0) {
-	    rs = u_open(dbp->fname,O_RDONLY,0666) ;
-	    dbp->lfd = rs ;
-	} /* end if (it wasn't open) */
-
-	if (rs >= 0) {
-
-	    if (! dbp->f.locked) {
-
-	        if ((rs = lockfile(dbp->lfd,F_RLOCK,0L,0L,TO_LOCK)) < 0) {
+	int		rs ;
+	if ((rs = pwfile_magic(dbp,curp)) >= 0) {
+	    bool	f_locked = false ;
+	    if (dbp->lfd < 0) {
+	        rs = u_open(dbp->fname,O_RDONLY,0666) ;
+	        dbp->lfd = rs ;
+	    } /* end if (it wasn't open) */
+	    if (rs >= 0) {
+	        if (! dbp->f.locked) {
+		    cint	to = TO_LOCK ;
+	            if ((rs = lockfile(dbp->lfd,F_RLOCK,0L,0L,to)) < 0) {
+	                u_close(dbp->lfd) ;
+	                dbp->lfd = -1 ;
+	                return rs ;
+	            }
+	            dbp->f.locked = dbp->f.locked_cur = true ;
+	            f_locked = true ;
+	        } /* end if (not locked) */
+	        curp->i = 0 ;
+	        rs = hdb_curbegin(&dbp->byuser,&curp->hc) ;
+	        if ((rs < 0) && f_locked) {
+	            dbp->f.locked = dbp->f.locked_cur = false ;
+#ifdef	COMMENT
+	            lockfile(dbp->lfd,F_ULOCK,0L,0L,TO_LOCK) ;
+#else
 	            u_close(dbp->lfd) ;
 	            dbp->lfd = -1 ;
-	            return rs ;
-	        }
-
-	        dbp->f.locked = dbp->f.locked_cur = true ;
-	        f_locked = true ;
-
-	    } /* end if (not locked) */
-
-	    curp->i = 0 ;
-	    rs = hdb_curbegin(&dbp->byuser,&curp->hc) ;
-
-	    if ((rs < 0) && f_locked) {
-
-	        dbp->f.locked = dbp->f.locked_cur = false ;
-
-#ifdef	COMMENT
-	        lockfile(dbp->lfd,F_ULOCK,0L,0L,TO_LOCK) ;
-#else
-	        u_close(dbp->lfd) ;
-	        dbp->lfd = -1 ;
 #endif
-
-	    } /* end if (cleanup on error) */
-
-	} /* end if (ok) */
-
-	} /* end if (non-null) */
+	        } /* end if (cleanup on error) */
+	    } /* end if (ok) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_curbegin) */
 
 int pwfile_curend(pwfile *dbp,pwfile_cur *curp) noex {
-	int		rs = SR_OK ;
-
-	if (dbp == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (dbp->f.locked_cur && (! dbp->f.locked_explicit)) {
-	    dbp->f.locked = false ;
-	    lockfile(dbp->lfd,F_ULOCK,0L,0L,TO_LOCK) ;
-	}
-
-	dbp->f.locked_cur = false ;
-	curp->i = 0 ;
-	rs = hdb_curend(&dbp->byuser,&curp->hc) ;
-
+	int		rs ;
+	if ((rs = pwfile_magic(dbp,curp)) >= 0) {
+	    if (dbp->f.locked_cur && (! dbp->f.locked_explicit)) {
+		cint	to = TO_LOCK ;
+	        dbp->f.locked = false ;
+	        lockfile(dbp->lfd,F_ULOCK,0L,0L,to) ;
+	    }
+	    dbp->f.locked_cur = false ;
+	    curp->i = 0 ;
+	    rs = hdb_curend(&dbp->byuser,&curp->hc) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_curend) */
 
 int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f_opened = false ;
-
-	if (dbp == nullptr) return SR_FAULT ;
-
-	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (dbp->lfd < 0) {
-	    rs = u_open(dbp->fname,O_RDONLY,0666) ;
-	    dbp->lfd = rs ;
-	    f_opened = (rs >= 0) ;
-	}
-
-	if (rs >= 0) {
-	    switch (type) {
-	    case F_ULOCK:
-	        if (dbp->f.locked_explicit) {
-	            dbp->f.locked = dbp->f.locked_explicit = false ;
-	            rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
-	            if (rs < 0) {
-	                u_close(dbp->lfd) ;
-	                dbp->lfd = -1 ;
+	if ((rs = pwfile_magic(dbp)) >= 0) {
+	    if (dbp->lfd < 0) {
+	        rs = u_open(dbp->fname,O_RDONLY,0666) ;
+	        dbp->lfd = rs ;
+	        f_opened = (rs >= 0) ;
+	    }
+	    if (rs >= 0) {
+	        switch (type) {
+	        case F_ULOCK:
+	            if (dbp->f.locked_explicit) {
+	                dbp->f.locked = dbp->f.locked_explicit = false ;
+	                rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
+	                if (rs < 0) {
+	                    u_close(dbp->lfd) ;
+	                    dbp->lfd = -1 ;
+	                }
+	            } else {
+	                rs = SR_INVALID ;
 	            }
-	        } else {
-	            rs = SR_INVALID ;
-	        }
-	        break ;
-	    default:
-	    case F_RTEST:
-	    case F_WTEST:
-	        rs = SR_LOCKED ;
-	        if (! dbp->f.locked) {
-	            rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
+	            break ;
+	        default:
+	        case F_RTEST:
+	        case F_WTEST:
+	            rs = SR_LOCKED ;
+	            if (! dbp->f.locked) {
+	                rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
 #ifdef	COMMENT
-	            if (f_opened) {
-	                u_close(dbp->lfd) ;
-	                dbp->lfd = -1 ;
-	            }
+	                if (f_opened) {
+	                    u_close(dbp->lfd) ;
+	                    dbp->lfd = -1 ;
+	                }
 #endif /* COMMENT */
-	        } /* end if (not locked already) */
-	        break ;
-	    case F_RLOCK:
-	    case F_WLOCK:
-	    case F_TRLOCK:
-	    case F_TWLOCK:
-	        if (! dbp->f.locked) {
-	            if ((rs = lockfile(dbp->lfd,type,0L,0L,to_lock)) >= 0) {
-	                dbp->f.locked = dbp->f.locked_explicit = true ;
+	            } /* end if (not locked already) */
+	            break ;
+	        case F_RLOCK:
+	        case F_WLOCK:
+	        case F_TRLOCK:
+	        case F_TWLOCK:
+	            if (! dbp->f.locked) {
+			cint	to = to_lock ;
+	                if ((rs = lockfile(dbp->lfd,type,0L,0L,to)) >= 0) {
+	                    dbp->f.locked = dbp->f.locked_explicit = true ;
+	                }
+	            } else {
+	                rs = SR_INVALID ;
 	            }
-	        } else {
-	            rs = SR_INVALID ;
-	        }
-	        break ;
-	    } /* end switch */
-	} /* end if (ok) */
-
+	            break ;
+	        } /* end switch */
+	    } /* end if (ok) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f_opened : rs ;
 }
 /* end subroutine (pwfile_lock) */
