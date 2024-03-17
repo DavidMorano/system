@@ -1,9 +1,8 @@
-/* nlinecols */
+/* nlinecols SUPPORT */
+/* lang=C++20 */
 
 /* calculate number of columns used by a line of characters */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,19 +16,18 @@
 
 /*******************************************************************************
 
-	This subroutine calculates the number of columns that a line of
-	characters takes up on a terminal, with tab stops set.
+	Name:
+	nlinecols
+
+	Description:
+	This subroutine calculates the number of columns that a
+	line of characters takes up on a terminal, with tab stops
+	set.
 
 	Synopsis:
-
-	int nlinecols(ntab,ccol,lbuf,llen)
-	int		ntab ;
-	int		ccol ;
-	const char	lbuf[] ;
-	int		llen ;
+	int nlinecols(int ntab,int ccol,cchar *lbuf,int llen) noex
 
 	Arguments:
-
 	ntab		number of columns in a TAB character
 	ccol		current column number
 	lbuf		source string 
@@ -38,18 +36,14 @@
 	Returns:
 	-		column number after line if used up
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<ncol.h>		/* |charcols(3uc)| */
 #include	<localmisc.h>
 
 
@@ -57,10 +51,6 @@
 
 
 /* external subroutines */
-
-extern int	charcols(int,int,int) ;
-extern int	tabcols(int,int) ;
-extern int	iceil(int,int) ;
 
 
 /* external variables */
@@ -75,20 +65,16 @@ extern int	iceil(int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int nlinecols(int ntab,int ccol,cchar *lbuf,int llen)
-{
-	int		i ;
-	int		cols ;
-
+int nlinecols(int ntab,int ccol,cchar *lbuf,int llen) noex {
 	if (llen < 0) llen = strlen(lbuf) ;
-
-	for (i = 0 ; i < llen ; i += 1) {
+	for (int i = 0 ; i < llen ; i += 1) {
 	    ccol += charcols(ntab,ccol,lbuf[i]) ;
 	} /* end for */
-
 	return ccol ;
 }
 /* end subroutine (nlinecols) */

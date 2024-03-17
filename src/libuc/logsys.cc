@@ -47,6 +47,7 @@
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<strdcpy.h>
+#include	<ncol.h>		/* |charcols(3uc)| */
 #include	<localmisc.h>
 
 #include	"logsys.h"
@@ -101,7 +102,6 @@ extern int	ctdecui(char *,int,uint) ;
 extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	getnodename(char *,int) ;
 extern int	vbufprintf(char *,int,cchar *,va_list) ;
-extern int	charcols(int,int,int) ;
 extern int	isprintlatin(int) ;
 
 extern char	*strwcpy(char *,cchar *,int) ;

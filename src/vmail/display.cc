@@ -1,5 +1,5 @@
-/* display */
-/* lang=C20 */
+/* display SUPPORT */
+/* lang=C++20 */
 
 /* manage the display for VMAIL */
 /* version %I% last-modified %G% */
@@ -13,9 +13,10 @@
 /* revision history:
 
 	= 1998-01-10 David A.D. Morano
-        This is a complete rewrite of the previous set of subroutines (might not
-        be able to even call them an object) of the same name. This present
-        module does fairly well qualify indeed as an object.
+	This is a complete rewrite of the previous set of subroutines
+	(might not be able to even call them an object) of the same
+	name. This present module does fairly well qualify indeed
+	as an object.
 
 */
 
@@ -28,13 +29,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ascii.h>
@@ -42,6 +43,7 @@
 #include	<sbuf.h>
 #include	<tmtime.h>
 #include	<sntmtime.h>
+#include	<ncol.h>		/* |charcols(3uc)| */
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -93,7 +95,6 @@ extern int	ctdecui(char *,int,uint) ;
 extern int	ctdecpi(char *,int,int,int) ;
 extern int	iceil(int,int) ;
 extern int	strwcmp(const char *,const char *,int) ;
-extern int	charcols(int,int,int) ;
 extern int	mkdisphdr(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	vbufprintf(char *,int,const char *,va_list) ;

@@ -72,6 +72,7 @@
 #include	<linefold.h>
 #include	<tmpx.h>
 #include	<logfile.h>
+#include	<ncol.h>		/* |charcols(3uc)| */
 #include	<localmisc.h>
 
 #include	"termnote.h"
@@ -146,7 +147,6 @@ extern int	termconseq(char *,int,int,int,int,int,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	writeto(int,cvoid *,int,int) ;
 extern int	tmpx_getuserlines(TMPX *,VECSTR *,cchar *) ;
-extern int	charcols(int,int,int) ;
 extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	isprintlatin(int) ;
 extern int	iceil(int,int) ;
