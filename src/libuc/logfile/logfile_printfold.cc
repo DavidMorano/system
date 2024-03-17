@@ -1,16 +1,15 @@
-/* logfile_printfold */
+/* logfile_printfold HEADER */
+/* lang=C++20 */
 
 /* perform logging operations on a file */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-        This object module was originally written to create a logging mechanism
-        for PCS application programs.
+	This object module was originally written to create a logging
+	mechanism for PCS application programs.
 
 */
 
@@ -20,18 +19,10 @@
 
 	This is an extra method for LOGFILE.
 
-
 *******************************************************************************/
 
-
-#define	LOGFILE_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<linefold.h>
 #include	<localmisc.h>
@@ -44,29 +35,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	mklogid(char *,int,const char *,int,int) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
-extern int	getnodename(char *,int) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
-extern int	charcols(int,int,int) ;
-extern int	isprintlatin(int) ;
-extern int	iceil(int,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -76,19 +44,20 @@ extern char	*strnchr(const char *,int,int) ;
 
 /* forward references */
 
-static int logfile_printfi(LOGFILE *,int,cchar *,int,cchar *,int) ;
+static int logfile_printfi(LOGFILE *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int logfile_printfold(LOGFILE *lhp,cchar *pre,cchar *sp,int sl)
-{
-	LINEFOLD	fo ;
-	const int	pl = strlen(pre) ;
+int logfile_printfold(LOGFILE *lhp,cchar *pre,cchar *sp,int sl) noex {
+	linefold	fo ;
+	cint		pl = strlen(pre) ;
 	int		rs ;
 	int		rs1 ;
 	int		n ;
@@ -120,10 +89,8 @@ int logfile_printfold(LOGFILE *lhp,cchar *pre,cchar *sp,int sl)
 
 /* local subroutines */
 
-
 static int logfile_printfi(LOGFILE *lhp,int li,cchar *pp,int pl,
-		cchar *sp,int sl)
-{
+		cchar *sp,int sl) noex {
 	int		rs ;
 	if (li == 0) {
 	    cchar	*f0 = "%s| %t" ;

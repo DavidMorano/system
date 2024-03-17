@@ -1,4 +1,4 @@
-/* logfile SUPPORT */
+/* logfile_main SUPPORT */
 /* lang=C++20 */
 
 /* perform logging operations on a file */
@@ -149,7 +149,7 @@ static int	colstate_linecols(COLSTATE *,cchar *,int) noex ;
 
 static int	mkclean(char *,int,cchar *,int) noex ;
 static bool	hasourbad(cchar *,int) noex ;
-static bool	isourbad(int) noex noex ;
+static bool	isourbad(int) noex ;
 
 
 /* local variables */
@@ -191,7 +191,7 @@ int logfile_open(logfile *op,cc *lfname,int of,mode_t operm,cc *logid) noex {
 	    op->bufsize = LOGFILE_BUFSIZE ;
 	    op->len = 0 ;
 	    if ((rs = uc_malloc(op->bufsize,&p)) >= 0) {
-	        op->buf = p ;
+	        op->buf = charp(p) ;
 	        if ((rs = logfile_fileopen(op)) >= 0) {
 #if	CF_CHMOD
 	            if (pip->operm >= 0)
@@ -345,6 +345,7 @@ int logfile_chmod(logfile *op,mode_t operm) noex {
 /* ARGSUSED */
 int logfile_control(logfile *op,int cmd,void *ap) noex {
 	int		rs = SR_OK ;
+	(void) ap ;
 
 	if (op == NULL) return SR_FAULT ;
 

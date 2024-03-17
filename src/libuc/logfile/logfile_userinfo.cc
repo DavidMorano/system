@@ -1,18 +1,15 @@
-/* logfile_userinfo */
+/* logfile_userinfo SUPPORT */
+/* lang=C++20 */
 
 /* log user information */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2005-01-20, David A­D­ Morano
-
-	This was originally written to collect some common PCS
-	code into one subroutines.
-
+	This was originally written to collect some common PCS code
+	into one subroutines.
 
 */
 
@@ -21,45 +18,34 @@
 /*******************************************************************************
 
 	This subroutines is generally used to make the first log-file
-	entry at the start of a program involcation.  The subroutine
+	entry at the start of a program involcation. The subroutine
 	requires that both a LOGFILE object have already been opened
 	and that the caller has retrieved the user information using
-	the USERINFO facility (and passed a pointer to that down to
-	this subroutine).
+	the userinfo facility (and passed a pointer to that down
+	to this subroutine).
 
 	Synopsis:
-
-	int logfile_userinfo(op,uip,daytime,pn,vn)
-	LOGFILE		*op ;
-	USERINFO	*uip ;
-	time_t		daytime ;
-	const char	pn[] ;
-	const char	vn[] ;
+	int logfile_userinfo(logfile *op,userinfo *uip,time_t dt,
+		cc *pn,cc *vn) noex
 
 	Arguments:
-
 	op		pointer to LOGFILE object
-	uip		pointer to USERINFO object
-	daytime		current UNIX® time of day
+	uip		pointer to userinfo object
+	dt		current UNIX® time of day
 	pn		program name
 	vn		program-version name
 
 	Returns:
-
 	>=0	number of bytes written to log
-	<0	error
-
+	<0	error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<logfile.h>
 #include	<userinfo.h>
@@ -83,11 +69,14 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkuibang(char *,int,USERINFO *) ;
-extern int	mkuiname(char *,int,USERINFO *) ;
+extern "C" {
+    extern int	mkuibang(char *,int,userinfo *) noex ;
+    extern int	mkuiname(char *,int,userinfo *) noex ;
+}
 
-extern char	*timestr_logz(time_t,char *) ;
+extern "C" {
+    extern char	*timestr_logz(time_t,char *) noex ;
+}
 
 
 /* external variables */
@@ -102,31 +91,18 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int logfile_userinfo(op,uip,daytime,pn,vn)
-LOGFILE		*op ;
-USERINFO	*uip ;
-time_t		daytime ;
-const char	pn[], vn[] ;
-{
-	int	rs, rs1 ;
-	int	wlen = 0 ;
-
-	const char	*a = getenv(VARARCHITECTURE) ;
-	const char	*fmt ;
-
-	char	timebuf[TIMEBUFLEN + 1] ;
-
-
-#if	CF_DEBUGS
-	debugprintf("logfile_userinfo: op=%p\n",op) ;
-	debugprintf("logfile_userinfo: uip=%p\n",uip) ;
-	debugprintf("logfile_userinfo: pn=%s\n",pn) ;
-	debugprintf("logfile_userinfo: vn=%s\n",vn) ;
-	debugprintf("logfile_userinfo: a=%s\n",a) ;
-#endif /* CF_DEBUGS */
+int logfile_userinfo(LOGFILE *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	cchar	*a = getenv(VARARCHITECTURE) ;
+	cchar	*fmt ;
+	char		timebuf[TIMEBUFLEN + 1] ;
 
 	if ((op == NULL) || (uip == NULL))
 	    return SR_FAULT ;
@@ -137,8 +113,8 @@ const char	pn[], vn[] ;
 	if (vn == NULL)
 	    vn = "" ;
 
-	if (daytime <= 0)
-	    daytime = time(NULL) ;
+	if (dt <= 0)
+	    dt = time(NULL) ;
 
 /* first line (w/ possible additional information) */
 
@@ -147,16 +123,16 @@ const char	pn[], vn[] ;
 	    fmt = "%s %s %s/%s" ;
 
 	{
-	    const char	*ts = timestr_logz(daytime,timebuf) ;
-	    const char	*st = (uip->f.sysv_ct) ? "SYSV" : "BSD" ;
+	    cchar	*ts = timestr_logz(dt,timebuf) ;
+	    cchar	*st = (uip->f.sysv_ct) ? "SYSV" : "BSD" ;
 	    rs = logfile_printf(op,fmt,ts,pn,vn,st) ;
 	    wlen += rs ;
 	}
 
 	if (rs >= 0) {
-	    const char	*sn = uip->sysname ;
-	    const char	*rn = uip->release ;
-	    const char	*dn = uip->domainname ;
+	    cchar	*sn = uip->sysname ;
+	    cchar	*rn = uip->release ;
+	    cchar	*dn = uip->domainname ;
 	    if (a != NULL) {
 	        rs = logfile_printf(op,"a=%s os=%s(%s) d=%s",a,sn,rn,dn) ;
 		wlen += rs ;

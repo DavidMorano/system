@@ -1,4 +1,8 @@
-/* logsys */
+/* logsys HEADER */
+/* lang=C20 */
+
+/* send log messages to the system logger device */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,17 +15,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LOGSYS_INCLUDE
-#define	LOGSYS_INCLUDE	1
+#define	LOGSYS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/log.h>
 #include	<sys/strlog.h>
 #include	<sys/syslog.h>
 #include	<stdarg.h>
-
 #include	<vecstr.h>
 #include	<localmisc.h>
 
@@ -34,10 +35,10 @@
 
 
 struct logsys_head {
-	uint		magic ;
-	const char	*logtag ;
+	cchar		*logtag ;
 	time_t		ti_open ;
 	time_t		ti_write ;
+	uint		magic ;
 	int		logfac ;
 	int		opts ;
 	int		lfd ;
@@ -46,30 +47,21 @@ struct logsys_head {
 	char		logid[LOGSYS_LOGIDLEN + 1] ;
 } ;
 
+typedef LOGSYS		logsys ;
 
-typedef struct logsys_head	logsys ;
+EXTERNC_begin
 
+extern int logsys_open(LOGSYS *,int,cchar *,cchar *,int) noex ;
+extern int logsys_setid(LOGSYS *,cchar *) noex ;
+extern int logsys_write(LOGSYS *,int,cchar *,int) noex ;
+extern int logsys_printf(LOGSYS *,int,cchar *,...) noex ;
+extern int logsys_vprintf(LOGSYS *,int,cchar *,va_list) noex ;
+extern int logsys_check(LOGSYS *,time_t) noex ;
+extern int logsys_flush(LOGSYS *) noex ;
+extern int logsys_close(LOGSYS *) noex ;
 
-#if	(! defined(LOGSYS_MASTER)) || (LOGSYS_MASTER == 0)
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int logsys_open(LOGSYS *,int,const char *,const char *,int) ;
-extern int logsys_setid(LOGSYS *,const char *) ;
-extern int logsys_write(LOGSYS *,int,const char *,int) ;
-extern int logsys_printf(LOGSYS *,int,const char *,...) ;
-extern int logsys_vprintf(LOGSYS *,int,const char *,va_list) ;
-extern int logsys_check(LOGSYS *,time_t) ;
-extern int logsys_flush(LOGSYS *) ;
-extern int logsys_close(LOGSYS *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* LOGSYS_MASTER */
 
 #endif /* LOGSYS_INCLUDE */
 

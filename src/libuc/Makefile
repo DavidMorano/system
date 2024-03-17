@@ -1096,6 +1096,11 @@ envs.o:			envs.dir
 envs.dir:
 	makesubdir $@
 
+# LOGFILE
+logfile.o:		logfile.dir
+logfile.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
