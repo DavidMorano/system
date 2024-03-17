@@ -79,13 +79,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 #include	<tabcols.h>
 
 #include	"ncol.h"
@@ -148,14 +148,14 @@ int ncolchar(int ntab,int ccol,int ch) noex {
 }
 /* end subroutine (ncolchar) */
 
-int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
+int getcols(int ntab,int ccol,int ncols,cchar *sp,int sl) noex {
 	cint		tcol = (ccol + ncols) ;
 	int		i = 0 ; /* used afterwards */
-	if (llen < 0) llen = strlen(lbuf) ;
+	if (sl < 0) sl = strlen(sp) ;
 	if (ccol < tcol) {
 	    int		cols ;
-	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
-	        cols = charcols(ntab,ccol,lbuf[i]) ;
+	    for (i = 0 ; (ccol < tcol) && (i < sl) ; i += 1) {
+	        cols = charcols(ntab,ccol,sp[i]) ;
 	        ccol += cols ;
 	    } /* end for */
 	} /* end if */

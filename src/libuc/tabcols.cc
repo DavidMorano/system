@@ -1,5 +1,5 @@
-/* tabcols */
-/* lang=C20 */
+/* tabcols SUPPORT */
+/* lang=C++20 */
 
 /* calculate tab columns */
 /* version %I% last-modified %G% */
@@ -36,9 +36,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<intceil.h>
