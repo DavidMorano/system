@@ -365,7 +365,6 @@ int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
 static int pwfile_loadbegin(pwfile *dbp) noex {
 	int		rs ;
 	int		n = 0 ;
-
 	if ((rs = pwfile_filefront(dbp)) >= 0) {
 	    hdb_dat	key ;
 	    hdb_dat	val ;
@@ -392,7 +391,6 @@ static int pwfile_loadbegin(pwfile *dbp) noex {
 	        pwfile_fileback(dbp) ;
 	    }
 	} /* end if (pwfile_filefront) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_loadbegin) */
@@ -400,36 +398,35 @@ static int pwfile_loadbegin(pwfile *dbp) noex {
 static int pwfile_loadend(pwfile *dbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = hdb_finish(&dbp->byuser) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = pwfile_fileback(dbp) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = hdb_finish(&dbp->byuser) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = pwfile_fileback(dbp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (pwfile_loadend) */
 
 static int pwfile_filefront(pwfile *dbp) noex {
-	USTAT		sb ;
-	int		rs ;
-
-	if (dbp->fname[0] == '\0') return SR_NOENTRY ;
-
-	if ((rs = uc_stat(dbp->fname,&sb)) >= 0) {
-	    vecitem	*alp = &dbp->alist ;
-	    cint	vo = VECITEM_OCOMPACT ;
-	    int		n = ((sb.st_size / 60) + 5) ;
-	    if (n < DEFENTRIES) n = DEFENTRIES ;
-	    if ((rs = vecitem_start(alp,n,vo)) >= 0) {
-	        dbp->readtime = sb.st_mtime ;
-	        rs = pwfile_filefronter(dbp) ;
-	        if (rs < 0)
-	            vecitem_finish(alp) ;
-	    }
-	} /* end if (uc_stat) */
-
+	int		rs = SR_NOENTRY ;
+	if (dbp->fname[0]) {
+	    USTAT	sb ;
+	    if ((rs = uc_stat(dbp->fname,&sb)) >= 0) {
+	        vecitem	*alp = &dbp->alist ;
+	        cint	vo = VECITEM_OCOMPACT ;
+	        int		n = ((sb.st_size / 60) + 5) ;
+	        if (n < DEFENTRIES) n = DEFENTRIES ;
+	        if ((rs = vecitem_start(alp,n,vo)) >= 0) {
+	            dbp->readtime = sb.st_mtime ;
+	            rs = pwfile_filefronter(dbp) ;
+	            if (rs < 0)
+	                vecitem_finish(alp) ;
+	        }
+	    } /* end if (uc_stat) */
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (pwfile_filefront) */
@@ -439,58 +436,46 @@ static int pwfile_filefronter(pwfile *dbp) noex {
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
 	if ((rs = bopen(fp,dbp->fname,"rc",0644)) >= 0) {
 	    if (! dbp->f.locked) {
 	        rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	    }
 	    if (rs >= 0) {
 	        pwentry		entry ;
-	        cint	llen = LINEBUFLEN ;
+	        cint		llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN+1] ;
 	        while ((rs = breadln(fp,lbuf,llen)) > 0) {
 	            len = rs ;
-
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
 	            lbuf[len] = '\0' ;
-
 	            if ((rs = pwentry_start(&entry)) >= 0) {
 	                int		fn = 0 ;
 	                cchar		*tp ;
 	                cchar		*cp = lbuf ;
 	                while ((tp = strchr(cp,':')) != nullptr) {
-
 	                    rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
-
 	                    cp = (tp + 1) ;
 	                    fn += 1 ;
-
 	                    if (rs < 0) break ;
 	                } /* end while */
-
 	                if ((rs >= 0) && (cp[0] != '\0')) {
 	                    rs = pwentry_fieldpw(&entry,fn,cp,-1) ;
 	                }
-
 /* make any extras fields that we want */
-
 	                if (rs >= 0) {
 	                    rs = pwentry_mkextras(&entry) ;
 	                }
-
 /* add the entry to our list */
-
 	                if (rs >= 0) {
 	                    cint	esize = sizeof(pwentry) ;
 	                    n += 1 ;
 	                    rs = vecitem_add(&dbp->alist,&entry,esize) ;
 	                }
-
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    pwentry_finish(&entry) ;
+			}
 	            } /* end if (initialized new entry) */
-
 	            if (rs < 0) break ;
 	        } /* end while (reading file entries) */
 	        if (! dbp->f.locked) {
@@ -500,7 +485,6 @@ static int pwfile_filefronter(pwfile *dbp) noex {
 	    rs1 = bclose(fp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_filefronter) */
