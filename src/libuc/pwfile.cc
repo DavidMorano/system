@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -40,6 +39,10 @@
 #include	<hdb.h>
 #include	<storeitem.h>
 #include	<mallocstuff.h>
+#include	<strn.h>
+#include	<snwcpy.h>
+#include	<cfdec.h>
+#include	<lockfile.h>
 #include	<localmisc.h>
 
 #include	"pwfile.h"
@@ -83,11 +86,40 @@
 
 /* forward references */
 
-static int	pwfile_loadbegin(PWFILE *) ;
-static int	pwfile_loadend(PWFILE *) ;
-static int	pwfile_filefront(PWFILE *) ;
-static int	pwfile_filefronter(PWFILE *) ;
-static int	pwfile_fileback(PWFILE *) ;
+template<typename ... Args>
+static int pwfile_ctor(pwfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (pwfile_ctor) */
+
+static int pwfile_dtor(pwfile *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (pwfile_dtor) */
+
+template<typename ... Args>
+static int pwfile_magic(pwfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (pwfile_magic) */
+
+static int	pwfile_loadbegin(pwfile *) noex ;
+static int	pwfile_loadend(pwfile *) noex ;
+static int	pwfile_filefront(pwfile *) noex ;
+static int	pwfile_filefronter(pwfile *) noex ;
+static int	pwfile_fileback(pwfile *) noex ;
 
 static int	pwentry_start(pwentry *) noex ;
 static int	pwentry_finish(pwentry *) noex ;
@@ -106,152 +138,127 @@ static int	loaditem(cchar **,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int pwfile_open(PWFILE *dbp,cchar *pwfname) noex {
+int pwfile_open(pwfile *dbp,cchar *pwfname) noex {
 	int		rs ;
-	cchar		*cp ;
-
-	if (dbp == NULL) return SR_FAULT ;
-	if (pwfname == NULL) return SR_FAULT ;
-
-	if (pwfname[0] == '\0') return SR_INVALID ;
-
-	if ((rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
-	    dbp->fname = cp ;
-	    dbp->lfd = -1 ;
-	    if ((rs = pwfile_loadbegin(dbp)) >= 0) {
-	        dbp->f = {} ;
-	        dbp->magic = PWFILE_MAGIC ;
-	    }
+	if ((rs = pwfile_ctor(dbp,pwfname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pwfname[0]) {
+	        cchar		*cp{} ;
+	        if ((rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
+	            dbp->fname = cp ;
+	            dbp->lfd = -1 ;
+	            if ((rs = pwfile_loadbegin(dbp)) >= 0) {
+	                dbp->f = {} ;
+	                dbp->magic = PWFILE_MAGIC ;
+	            }
+	            if (rs < 0) {
+	                uc_free(dbp->fname) ;
+	                dbp->fname = nullptr ;
+	            }
+	        } /* end if (m-a) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        uc_free(dbp->fname) ;
-	        dbp->fname = NULL ;
+		pwfile_dtor(dbp) ;
 	    }
-	} /* end if (m-a) */
-
+	} /* end if (pwfile_ctor) */
 	return rs ;
 }
 /* end subroutine (pwfile_open) */
 
-int pwfile_close(PWFILE *dbp) noex {
-	int		rs = SR_OK ;
+int pwfile_close(pwfile *dbp) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (dbp == NULL) return SR_FAULT ;
-
-	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = pwfile_loadend(dbp) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (dbp->lfd >= 0) {
-	    rs1 = u_close(dbp->lfd) ;
-	    if (rs >= 0) rs = rs1 ;
-	    dbp->lfd = -1 ;
-	}
-
-	if (dbp->fname != NULL) {
-	    rs1 = uc_free(dbp->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    dbp->fname = NULL ;
-	}
-
-	dbp->magic = 0 ;
+	if ((rs = pwfile_magic(dbp)) >= 0) {
+	    {
+	        rs1 = pwfile_loadend(dbp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (dbp->lfd >= 0) {
+	        rs1 = u_close(dbp->lfd) ;
+	        if (rs >= 0) rs = rs1 ;
+	        dbp->lfd = -1 ;
+	    }
+	    if (dbp->fname) {
+	        rs1 = uc_free(dbp->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        dbp->fname = nullptr ;
+	    }
+	    {
+		rs1 = pwfile_dtor(dbp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    dbp->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_close) */
 
-int pwfile_enum(PWFILE *dbp,PWFILE_CUR *curp,pwentry *uep,
+int pwfile_enum(pwfile *dbp,pwfile_cur *curp,pwentry *uep,
 		char *rbuf,int rlen) noex {
-	pwentry		*ep ;
 	int		rs ;
-
-	if (dbp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-
-	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
-
-	while ((rs = vecitem_get(&dbp->alist,curp->i,&ep)) >= 0) {
-	    curp->i += 1 ;
-	    if (ep != NULL) break ;
-	} /* end while */
-
+	if ((rs = pwfile_magic(dbp,curp,uep,rbuf)) >= 0) {
+	    pwentry	*ep{} ;
+	    while ((rs = vecitem_get(&dbp->alist,curp->i,&ep)) >= 0) {
+	        curp->i += 1 ;
+	        if (ep != nullptr) break ;
+	    } /* end while */
 /* load up the user's structure with the information from our internal one */
-
-	if (rs >= 0) {
-	    rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
-	} else if (rs == SR_NOTFOUND) {
-	    rs = SR_OK ;
-	}
-
+	    if (rs >= 0) {
+	        rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
+	    } else if (rs == SR_NOTFOUND) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_enum) */
 
-
 /* fetch the next entry that matches the specified username */
-int pwfile_fetchuser(dbp,username,curp,uep,rbuf,rlen)
-PWFILE		*dbp ;
-cchar	username[] ;
-PWFILE_CUR	*curp ;
-pwentry		*uep ;
-char		rbuf[] ;
-int		rlen ;
-{
-	USTAT		sb ;
+int pwfile_fetchuser(pwfile *dbp,cc *username,pwfile_cur *curp,
+		pwentry *uep,char *rbuf,int rlen) noex {
 	int		rs ;
-
-	if (dbp == NULL) return SR_FAULT ;
-	if (username == NULL) return SR_FAULT ;
-
-	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (username[0] == '\0') return SR_FAULT ;
-
-/* has the underlying object changed? */
-
-	if (dbp->lfd < 0) {
-	    rs = u_stat(dbp->fname,&sb) ;
-	} else {
-	    rs = u_fstat(dbp->lfd,&sb) ;
-	}
-
-	if (rs >= 0) {
-	    HDB_DATUM	key, val ;
-	    HDB_CUR	*hcurp = ((curp != NULL) ? &curp->hc : NULL) ;
-
-	    if (sb.st_mtime > dbp->readtime) {
-	        pwfile_loadend(dbp) ;
-	        pwfile_loadbegin(dbp) ;
-	    } /* end if */
-
-/* continue with the query */
-
-	    key.buf = (char *) username ;
-	    key.len = strlen(username) ;
-
-	    if ((rs = hdb_fetch(&dbp->byuser,key,hcurp,&val)) >= 0) {
-
-	        if (uep != NULL) {
-	            pwentry	*ep = (pwentry *) val.buf ;
-	            rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
+	if ((rs = pwfile_magic(dbp,username,curp,uep,rbuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (username[0]) {
+	        USTAT		sb ;
+	        if (dbp->lfd < 0) {
+	            rs = u_stat(dbp->fname,&sb) ;
+	        } else {
+	            rs = u_fstat(dbp->lfd,&sb) ;
 	        }
-	    } /* end if (hdb_fetch) */
-
-	} /* end if (ok) */
-
+	        if (rs >= 0) {
+	            hdb_dat	key ;
+	            hdb_dat	val{} ;
+	            hdb_cur	*hcurp = ((curp) ? &curp->hc : nullptr) ;
+	            if (sb.st_mtime > dbp->readtime) {
+	                pwfile_loadend(dbp) ;
+	                pwfile_loadbegin(dbp) ;
+	            } /* end if */
+/* continue with the query */
+	            key.buf = username ;
+	            key.len = strlen(username) ;
+	            if ((rs = hdb_fetch(&dbp->byuser,key,hcurp,&val)) >= 0) {
+	                if (uep) {
+	                    pwentry	*ep = (pwentry *) val.buf ;
+	                    rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
+	                }
+	            } /* end if (hdb_fetch) */
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pwfile_fetchuser) */
 
-int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp) noex {
-	int		rs ;
-	bool		f_locked = FALSE ;
+int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
+	int		rs = SR_FAULT ;
 
-	if (dbp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (dbp && curp) {
 
 	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
 
+	bool		f_locked = false ;
+	rs = SR_OK ;
 	if (dbp->lfd < 0) {
 	    rs = u_open(dbp->fname,O_RDONLY,0666) ;
 	    dbp->lfd = rs ;
@@ -267,8 +274,8 @@ int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp) noex {
 	            return rs ;
 	        }
 
-	        dbp->f.locked = dbp->f.locked_cur = TRUE ;
-	        f_locked = TRUE ;
+	        dbp->f.locked = dbp->f.locked_cur = true ;
+	        f_locked = true ;
 
 	    } /* end if (not locked) */
 
@@ -277,7 +284,7 @@ int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp) noex {
 
 	    if ((rs < 0) && f_locked) {
 
-	        dbp->f.locked = dbp->f.locked_cur = FALSE ;
+	        dbp->f.locked = dbp->f.locked_cur = false ;
 
 #ifdef	COMMENT
 	        lockfile(dbp->lfd,F_ULOCK,0L,0L,TO_LOCK) ;
@@ -290,24 +297,25 @@ int pwfile_curbegin(PWFILE *dbp,PWFILE_CUR *curp) noex {
 
 	} /* end if (ok) */
 
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pwfile_curbegin) */
 
-int pwfile_curend(PWFILE *dbp,PWFILE_CUR *curp) noex {
-	int		rs ;
+int pwfile_curend(pwfile *dbp,pwfile_cur *curp) noex {
+	int		rs = SR_OK ;
 
-	if (dbp == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (dbp == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
 
 	if (dbp->f.locked_cur && (! dbp->f.locked_explicit)) {
-	    dbp->f.locked = FALSE ;
+	    dbp->f.locked = false ;
 	    lockfile(dbp->lfd,F_ULOCK,0L,0L,TO_LOCK) ;
 	}
 
-	dbp->f.locked_cur = FALSE ;
+	dbp->f.locked_cur = false ;
 	curp->i = 0 ;
 	rs = hdb_curend(&dbp->byuser,&curp->hc) ;
 
@@ -315,11 +323,11 @@ int pwfile_curend(PWFILE *dbp,PWFILE_CUR *curp) noex {
 }
 /* end subroutine (pwfile_curend) */
 
-int pwfile_lock(PWFILE *dbp,int type,int to_lock) noex {
+int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
 	int		rs = SR_OK ;
-	int		f_opened = FALSE ;
+	int		f_opened = false ;
 
-	if (dbp == NULL) return SR_FAULT ;
+	if (dbp == nullptr) return SR_FAULT ;
 
 	if (dbp->magic != PWFILE_MAGIC) return SR_NOTOPEN ;
 
@@ -333,7 +341,7 @@ int pwfile_lock(PWFILE *dbp,int type,int to_lock) noex {
 	    switch (type) {
 	    case F_ULOCK:
 	        if (dbp->f.locked_explicit) {
-	            dbp->f.locked = dbp->f.locked_explicit = FALSE ;
+	            dbp->f.locked = dbp->f.locked_explicit = false ;
 	            rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
 	            if (rs < 0) {
 	                u_close(dbp->lfd) ;
@@ -363,7 +371,7 @@ int pwfile_lock(PWFILE *dbp,int type,int to_lock) noex {
 	    case F_TWLOCK:
 	        if (! dbp->f.locked) {
 	            if ((rs = lockfile(dbp->lfd,type,0L,0L,to_lock)) >= 0) {
-	                dbp->f.locked = dbp->f.locked_explicit = TRUE ;
+	                dbp->f.locked = dbp->f.locked_explicit = true ;
 	            }
 	        } else {
 	            rs = SR_INVALID ;
@@ -379,19 +387,20 @@ int pwfile_lock(PWFILE *dbp,int type,int to_lock) noex {
 
 /* private subroutines */
 
-static int pwfile_loadbegin(PWFILE *dbp) noex {
+static int pwfile_loadbegin(pwfile *dbp) noex {
 	int		rs ;
 	int		n = 0 ;
 
 	if ((rs = pwfile_filefront(dbp)) >= 0) {
-	    HDB_DATUM	key, val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    n = rs ;
-	    if ((rs = hdb_start(&dbp->byuser,n,0,NULL,NULL)) >= 0) {
+	    if ((rs = hdb_start(&dbp->byuser,n,0,nullptr,nullptr)) >= 0) {
 	        vecitem	*alp = &dbp->alist ;
 	        pwentry	*ep ;
 	        int	i ;
 	        for (i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
-	            if (ep != NULL) {
+	            if (ep != nullptr) {
 	                key.buf = ep->username ;
 	                key.len = strlen(ep->username) ;
 	                val.buf = ep ;
@@ -413,7 +422,7 @@ static int pwfile_loadbegin(PWFILE *dbp) noex {
 }
 /* end subroutine (pwfile_loadbegin) */
 
-static int pwfile_loadend(PWFILE *dbp) noex {
+static int pwfile_loadend(pwfile *dbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -427,7 +436,7 @@ static int pwfile_loadend(PWFILE *dbp) noex {
 }
 /* end subroutine (pwfile_loadend) */
 
-static int pwfile_filefront(PWFILE *dbp) noex {
+static int pwfile_filefront(pwfile *dbp) noex {
 	USTAT		sb ;
 	int		rs ;
 
@@ -435,7 +444,7 @@ static int pwfile_filefront(PWFILE *dbp) noex {
 
 	if ((rs = uc_stat(dbp->fname,&sb)) >= 0) {
 	    vecitem	*alp = &dbp->alist ;
-	    cint	vo = VECITEM_PNOHOLES ;
+	    cint	vo = VECITEM_OCOMPACT ;
 	    int		n = ((sb.st_size / 60) + 5) ;
 	    if (n < DEFENTRIES) n = DEFENTRIES ;
 	    if ((rs = vecitem_start(alp,n,vo)) >= 0) {
@@ -450,7 +459,7 @@ static int pwfile_filefront(PWFILE *dbp) noex {
 }
 /* end subroutine (pwfile_filefront) */
 
-static int pwfile_filefronter(PWFILE *dbp) noex {
+static int pwfile_filefronter(pwfile *dbp) noex {
 	bfile		pwfile, *fp = &pwfile ;
 	int		rs ;
 	int		rs1 ;
@@ -475,7 +484,7 @@ static int pwfile_filefronter(PWFILE *dbp) noex {
 	                int		fn = 0 ;
 	                cchar		*tp ;
 	                cchar		*cp = lbuf ;
-	                while ((tp = strchr(cp,':')) != NULL) {
+	                while ((tp = strchr(cp,':')) != nullptr) {
 
 	                    rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
 
@@ -521,7 +530,7 @@ static int pwfile_filefronter(PWFILE *dbp) noex {
 }
 /* end subroutine (pwfile_filefronter) */
 
-static int pwfile_fileback(PWFILE *dbp) noex {
+static int pwfile_fileback(pwfile *dbp) noex {
 	vecitem		*alp = &dbp->alist ;
 	pwentry		*ep ;
 	int		rs = SR_OK ;
@@ -605,22 +614,20 @@ d.a.morano:
 
 #endif /* COMMENT */
 
-
 /* initialize a 'passwd' entry */
-static int pwentry_start(pwentry *ep)
-{
-
-	memclear(ep) ;
-	ep->lstchg = -1 ;
-
-	return SR_OK ;
+static int pwentry_start(pwentry *ep) noex {
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    memclear(ep) ;
+	    ep->lstchg = -1 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (pwentry_start) */
 
-
 static int pwentry_fieldpw(pwentry *ep,int fn,cchar *s,int slen) noex {
 	int		v ;
-	cchar		*mp = NULL ;
+	cchar		*mp = nullptr ;
 	if (slen < 0) slen = strlen(s) ;
 	switch (fn) {
 	case 0:
@@ -655,13 +662,13 @@ static int pwentry_fieldpw(pwentry *ep,int fn,cchar *s,int slen) noex {
 	    break ;
 	case 8:
 	    mp = s ;
-	    ep->min = -1 ;
-	    if (slen > 0) cfdecl(s,slen,&ep->min) ;
+	    ep->daymin = -1 ;
+	    if (slen > 0) cfdecl(s,slen,&ep->daymin) ;
 	    break ;
 	case 9:
 	    mp = s ;
-	    ep->max = -1 ;
-	    if (slen > 0) cfdecl(s,slen,&ep->max) ;
+	    ep->daymax = -1 ;
+	    if (slen > 0) cfdecl(s,slen,&ep->daymax) ;
 	    break ;
 	case 10:
 	    mp = s ;
@@ -686,7 +693,7 @@ static int pwentry_fieldpw(pwentry *ep,int fn,cchar *s,int slen) noex {
 	    mp = s ;
 	    break ;
 	} /* end switch */
-	return ((mp == NULL) ? SR_NOMEM : SR_OK) ;
+	return ((mp == nullptr) ? SR_NOMEM : SR_OK) ;
 }
 /* end subroutine (pwentry_fieldpw) */
 
@@ -694,13 +701,13 @@ static int pwentry_mkextras(pwentry *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep->gecos != NULL) {
+	if (ep->gecos != nullptr) {
 	    GECOS	g ;
 	    if ((rs = gecos_start(&g,ep->gecos,-1)) >= 0) {
 	        for (int i = 0 ; i < gecosval_overlast ; i += 1) {
 	            cchar	*vp{} ;
 	            if (int vl ; (vl = gecos_getval(&g,i,&vp)) >= 0) {
-	                if (vp != NULL) {
+	                if (vp != nullptr) {
 	                    void	*p ;
 	                    switch (i) {
 	                    case gecosval_organization:
@@ -709,7 +716,7 @@ static int pwentry_mkextras(pwentry *ep) noex {
 	                    case gecosval_realname:
 	                        if ((rs = uc_malloc((vl+1),&p)) >= 0) {
 	                            char	*nbuf = (char *) p ;
-	                            if (strnchr(vp,vl,'_') != NULL) {
+	                            if (strnchr(vp,vl,'_') != nullptr) {
 	                                rs = snwcpyhyphen(nbuf,-1,vp,vl) ;
 	                                vp = nbuf ;
 	                            }
@@ -739,7 +746,7 @@ static int pwentry_mkextras(pwentry *ep) noex {
 	                        break ;
 	                    } /* end switch */
 
-	                } /* end if (non-NULL) */
+	                } /* end if (non-nullptr) */
 	            } /* end if (gecos-getval) */
 	            if (rs < 0) break ;
 	        } /* end for */
@@ -752,23 +759,18 @@ static int pwentry_mkextras(pwentry *ep) noex {
 }
 /* end subroutine (pwentry_mkextras) */
 
-
-/* load a user entry from an internal one */
-static int pwentry_mkcopy(pwentry *ep,pwentry *uep,char *rbuf,int rlen)
-{
-	STOREITEM	ubuf ;
+static int pwentry_mkcopy(pwentry *ep,pwentry *uep,char *rbuf,int rlen) noex {
+	storeitem	ubuf ;
 	int		rs ;
 	int		len = 0 ;
-
-	memcpy(uep,ep,sizeof(pwentry)) ;
-
+	memclear(uep) ;
 	if ((rs = storeitem_start(&ubuf,rbuf,rlen)) >= 0) {
 
-	    if (ep->username != NULL) {
+	    if (ep->username != nullptr) {
 	        storeitem_strw(&ubuf,ep->username,-1,&uep->username) ;
 	    }
 
-	    if (ep->password != NULL)
+	    if (ep->password != nullptr)
 	        storeitem_strw(&ubuf,ep->password,-1,&uep->password) ;
 
 #ifdef	OPTIONAL
@@ -776,43 +778,43 @@ static int pwentry_mkcopy(pwentry *ep,pwentry *uep,char *rbuf,int rlen)
 	    uep->gid = ep->gid ;
 #endif
 
-	    if (ep->gecos != NULL)
+	    if (ep->gecos != nullptr)
 	        storeitem_strw(&ubuf,ep->gecos,-1,&uep->gecos) ;
 
 /* the standard AT&T stuff */
 
-	    if (ep->organization != NULL)
+	    if (ep->organization != nullptr)
 	        storeitem_strw(&ubuf,ep->organization,-1,&uep->organization) ;
 
-	    if (ep->realname != NULL)
+	    if (ep->realname != nullptr)
 	        storeitem_strw(&ubuf,ep->realname,-1,&uep->realname) ;
 
-	    if (ep->account != NULL)
+	    if (ep->account != nullptr)
 	        storeitem_strw(&ubuf,ep->account,-1,&uep->account) ;
 
-	    if (ep->bin != NULL)
+	    if (ep->bin != nullptr)
 	        storeitem_strw(&ubuf,ep->bin,-1,&uep->bin) ;
 
 /* the finger information stuff */
 
-	    if (ep->office != NULL)
+	    if (ep->office != nullptr)
 	        storeitem_strw(&ubuf,ep->office,-1,&uep->office) ;
 
-	    if (ep->wphone != NULL)
+	    if (ep->wphone != nullptr)
 	        storeitem_strw(&ubuf,ep->wphone,-1,&uep->wphone) ;
 
-	    if (ep->hphone != NULL)
+	    if (ep->hphone != nullptr)
 	        storeitem_strw(&ubuf,ep->hphone,-1,&uep->hphone) ;
 
-	    if (ep->printer != NULL)
+	    if (ep->printer != nullptr)
 	        storeitem_strw(&ubuf,ep->printer,-1,&uep->printer) ;
 
 /* the remaining standard password stuff */
 
-	    if (ep->dir != NULL)
+	    if (ep->dir != nullptr)
 	        storeitem_strw(&ubuf,ep->dir,-1,&uep->dir) ;
 
-	    if (ep->shell != NULL)
+	    if (ep->shell != nullptr)
 	        storeitem_strw(&ubuf,ep->shell,-1,&uep->shell) ;
 
 /* done */
@@ -829,75 +831,75 @@ static int pwentry_finish(pwentry *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 /* the regulars */
 
-	if (ep->username != NULL) {
+	if (ep->username != nullptr) {
 	    rs1 = uc_free(ep->username) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->password != NULL) {
+	if (ep->password != nullptr) {
 	    rs1 = uc_free(ep->password) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->gecos != NULL) {
+	if (ep->gecos != nullptr) {
 	    rs1 = uc_free(ep->gecos) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->dir != NULL) {
+	if (ep->dir != nullptr) {
 	    rs1 = uc_free(ep->dir) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->shell != NULL) {
+	if (ep->shell != nullptr) {
 	    rs1 = uc_free(ep->shell) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 /* the AT&T standard extras */
 
-	if (ep->organization != NULL) {
+	if (ep->organization != nullptr) {
 	    rs1 = uc_free(ep->organization) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->realname != NULL) {
+	if (ep->realname != nullptr) {
 	    rs1 = uc_free(ep->realname) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->account != NULL) {
+	if (ep->account != nullptr) {
 	    rs1 = uc_free(ep->account) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->bin != NULL) {
+	if (ep->bin != nullptr) {
 	    rs1 = uc_free(ep->bin) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 /* the sometimes pseudo-standard finger information fields */
 
-	if (ep->office != NULL) {
+	if (ep->office != nullptr) {
 	    rs1 = uc_free(ep->office) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->wphone != NULL) {
+	if (ep->wphone != nullptr) {
 	    rs1 = uc_free(ep->wphone) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->hphone != NULL) {
+	if (ep->hphone != nullptr) {
 	    rs1 = uc_free(ep->hphone) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (ep->printer != NULL) {
+	if (ep->printer != nullptr) {
 	    rs1 = uc_free(ep->printer) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
