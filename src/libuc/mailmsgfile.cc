@@ -1,9 +1,8 @@
-/* mailmsgfile */
+/* mailmsgfile SUPPORT */
+/* lang=C++20 */
 
 /* maintain translations for MSGID to filenames */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,39 +16,33 @@
 
 /*******************************************************************************
 
-        This object implements a translation mapping from message-ids (MSGIDs)
-        to unique temporary filenames. Although not our business, these
-        filenames point to files that hold the content (body) of mail messages.
+	This object implements a translation mapping from message-ids
+	(MSGIDs) to unique temporary filenames. Although not our
+	business, these filenames point to files that hold the
+	content (body) of mail messages.
 
 	Implementation notes:
 
 	+ Why the child process on exit?
 
-        Because deleting files is just way too slow -- for whatever reason. So
-        we have a child do it do that we can finish up *fast* and get out. This
-        is a user response-time issue. We want the user to have the program exit
-        quickly so that they are not annoyed (as they were when we previously
-        deleted all of the files inline).
-
+	Because deleting files is just way too slow -- for whatever
+	reason. So we have a child do it do that we can finish up
+	*fast* and get out. This is a user response-time issue. We
+	want the user to have the program exit quickly so that they
+	are not annoyed (as they were when we previously deleted
+	all of the files inline).
 
 *******************************************************************************/
 
-
-#define	MAILMSGFILE_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<signal.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
-#include	<stdarg.h>
-
+#include	<csignal>
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<filebuf.h>
@@ -59,6 +52,7 @@
 #include	<vecstr.h>
 #include	<vecpstr.h>
 #include	<upt.h>
+#include	<ncol.h>		/* |ncolstr(3uc)| */
 #include	<localmisc.h>
 #include	<exitcodes.h>
 
@@ -108,7 +102,6 @@ extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mkdisplayable(char *,int,const char *,int) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	msleep(int) ;
-extern int	nlinecols(int,int,const char *,int) ;
 extern int	filebuf_writeblanks(FILEBUF *,int) ;
 
 #if	CF_DEBUGS
@@ -497,7 +490,7 @@ int		mfd ;
 
 /* calculate the number of columns this line would take up */
 
-	            ncols = nlinecols(ntab,0,lbuf,ll) ;
+	            ncols = ncolstr(ntab,0,lbuf,ll) ;
 
 /* take action based on whether the line fits in the available columns */
 

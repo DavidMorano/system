@@ -1,6 +1,8 @@
-/* mailmsgfile */
+/* mailmsgfile HEADER */
+/* lang=C20 */
 
 /* create and cache message content files */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -12,15 +14,10 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	MAILMSGFILE_INCLUDE
-#define	MAILMSGFILE_INCLUDE	1
-
+#define	MAILMSGFILE_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<localmisc.h>
@@ -29,21 +26,19 @@
 #define	MAILMSGFILE_MAGIC	0x24182132
 #define	MAILMSGFILE		struct mailmsgfile_head
 #define	MAILMSGFILE_FL		struct mailmsgfile_flags
-#define	MAILMSGFILE_MI		struct mailmsgfile_mi
+#define	MAILMSGFILE_MI		struct mailmsgfile_minfo
 
 #define	MAILMSGFILE_STRLEN	100
 #define	MAILMSGFILE_TZNAMELEN	10
-
-/* types */
 
 #define	MAILMSGFILE_TTEMP	0
 #define	MAILMSGFILE_TPERM	1
 
 
-struct mailmsgfile_mi {
-	const char	*a ;		/* memory allocation */
-	const char	*mid ;
-	const char	*mfname ;
+struct mailmsgfile_miinfo {
+	cchar		*a ;		/* memory allocation */
+	cchar		*mid ;
+	cchar		*mfname ;
 	uint		nsize ;
 	uint		vsize ;
 	uint		nlines ;
@@ -57,31 +52,31 @@ struct mailmsgfile_flags {
 } ;
 
 struct mailmsgfile_head {
-	uint		magic ;
 	HDB		files ;
-	MAILMSGFILE_FL	f ;
-	const char	*tmpdname ;
+	cchar		*tmpdname ;
 	pthread_t	tid ;
+	MAILMSGFILE_FL	f ;
+	uint		magic ;
 	int		pagesize ;
 	int		cols ;
 	int		ind ;
 	volatile int	f_checkdone ;	/* thread has completed */
 } ;
 
+typedef MAILMSGFILE	mailmsgfile ;
+typedef MAILMSGFILE_FL	mailmsgfile_fl ;
+typedef MAILMSGFILE_MI	mailmsgfile_mi ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int mailmsgfile_start(MAILMSGFILE *,const char *,int,int) ;
-extern int mailmsgfile_new(MAILMSGFILE *,int,const char *,int,off_t,int) ;
-extern int mailmsgfile_get(MAILMSGFILE *,const char *,const char **) ;
-extern int mailmsgfile_msginfo(MAILMSGFILE *,MAILMSGFILE_MI **,const char *) ;
-extern int mailmsgfile_finish(MAILMSGFILE *) ;
+extern int mailmsgfile_start(mailmsgfile *,cchar *,int,int) noex ;
+extern int mailmsgfile_new(mailmsgfile *,int,cchar *,int,off_t,int) noex ;
+extern int mailmsgfile_get(mailmsgfile *,cchar *,cchar **) noex ;
+extern int mailmsgfile_msginfo(mailmsgfile *,mailmsgfile_mi **,cchar *) noex ;
+extern int mailmsgfile_finish(mailmsgfile *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* MAILMSGFILE_INCLUDE */
 

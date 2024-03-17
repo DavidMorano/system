@@ -88,9 +88,13 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ncolstr(int ntab,int ccol,cchar *sp,int sl) noex {
+	if (sl < 0) sl = strlen(sp) ;
 	int		cols = 0 ;
 	while (sl-- && sp[0]) {
 	    cint	ch = mkchar(sp[0]) ;
