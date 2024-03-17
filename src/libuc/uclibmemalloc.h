@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 
 
@@ -30,7 +31,7 @@ extern int uc_libmallocsys(int,char **) noex ;
 extern int uc_libmalloc(int,void *) noex ;
 extern int uc_libvalloc(int,void *) noex ;
 extern int uc_libcalloc(int,int,void *) noex ;
-extern int uc_librealloc(const void *,int,void *) noex ;
+extern int uc_librealloc(cvoid *,int,void *) noex ;
 extern int uc_libfree(cvoid *) noex ;
 
 EXTERNC_end

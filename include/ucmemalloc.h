@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 #define	UCMEMALLOC_STATS	struct ucmemalloc_stats

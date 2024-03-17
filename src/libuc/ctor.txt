@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int querystr_ctor(querystr *op,Args ... args) noex {
+static int pwfile_ctor(pwfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int querystr_ctor(querystr *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (querystr_ctor) */
+/* end subroutine (pwfile_ctor) */
 
-static int querystr_dtor(querystr *op) noex {
+static int pwfile_dtor(pwfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (querystr_dtor) */
+/* end subroutine (pwfile_dtor) */
 
 template<typename ... Args>
-static int querystr_magic(querystr *op,Args ... args) noex {
+static int pwfile_magic(pwfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == TERMOUT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == PWFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (querystr_magic) */
+/* end subroutine (pwfile_magic) */
 
