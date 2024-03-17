@@ -753,12 +753,8 @@ filebuf_mailsupport.o:	filebuf_mailsupport.c filebuf.h
 varray.o:		varray.cc varray.h
 
 hdb.o:			hdb.cc hdb.h
-
 lookaside.o:		lookaside.cc lookaside.h
-
-pwcache.o:		pwcache.cc pwcache.h
-
-linefold.o:		linefold.c linefold.h
+linefold.o:		linefold.cc linefold.h
 
 envlist.o:		envlist.cc envlist.h
 envhelp.o:		envhelp.cc envhelp.h
@@ -1095,6 +1091,16 @@ varsub.o:		varsub.dir
 varsub.dir:
 	makesubdir $@
 
+# ENVS
+envs.o:			envs.dir
+envs.dir:
+	makesubdir $@
+
+# LOGFILE
+logfile.o:		logfile.dir
+logfile.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1125,9 +1131,6 @@ pathclean.o:		pathclean.cc pathclean.h
 
 nodedb.o:		nodedb.cc nodedb.h
 
-envs.o:			envs.cc envs.h
-envs_procxe.o:		envs_procxe.cc envs.h
-envs_subs.o:		envs_subs.cc envs.h
 expcook.o:		expcook.cc expcook.h
 keyopt.o:		keyopt.cc keyopt.h
 utf8decoder.o:		utf8decoder.cc utf8decoder.h

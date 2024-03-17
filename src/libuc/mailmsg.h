@@ -1,4 +1,8 @@
-/* mailmsg */
+/* mailmsg HEADER */
+/* lang=C20 */
+
+/* message parsing object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

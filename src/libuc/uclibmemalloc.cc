@@ -25,17 +25,16 @@
 	These subroutines need to be able to be interposed upon,
 	so they have to be in their own compilation (object) image.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<localmisc.h>
@@ -55,14 +54,17 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 namespace {
     struct uclibmemalloc ;
-    typedef int (uclibmemalloc::*mem_f)(int,void *) noex ;
+    typedef int (uclibmemalloc::*uclibmalloc_m)(int,void *) noex ;
     struct uclibmemalloc {
-	mem_f		m ;
-	cvoid		*cp ;
+	uclibmalloc_m		m ;
+	cvoid			*cp ;
 	uclibmemalloc(cvoid *op = nullptr) noex : cp(op) { } ;
 	int operator () (int,void *) noex ;
 	int stdmalloc(int,void *) noex ;
@@ -86,7 +88,7 @@ namespace {
 int uc_libmallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
-	    char	*bp ;
+	    char	*bp{} ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = uc_libmalloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
@@ -117,39 +119,39 @@ int uc_libmallocsys(int w,char **rpp) noex {
 }
 /* end subroutine (uc_libmallocsys) */
 
-int uc_libmalloc(int size,void *vp) noex {
+int uc_libmalloc(int sz,void *vp) noex {
 	uclibmemalloc	lmo ;
 	lmo.m = &uclibmemalloc::stdmalloc ;
-	return lmo(size,vp) ;
+	return lmo(sz,vp) ;
 }
 /* end subroutine (uc_libmalloc) */
 
 int uc_libcalloc(int nelem,int esize,void *vp) noex {
-	cint		size = (nelem*esize) ;
+	cint		sz = (nelem * esize) ;
 	int		rs ;
-	if ((rs = uc_libmalloc(size,vp)) >= 0) {
-	    memset(vp,0,size) ;
+	if ((rs = uc_libmalloc(sz,vp)) >= 0) {
+	    memset(vp,0,sz) ;
 	}
-	return rs ;
+	return (rs >= 0) ? sz : rs ;
 }
 /* end subroutine (uc_libcalloc) */
 
-int uc_libvalloc(int size,void *vp) noex {
+int uc_libvalloc(int sz,void *vp) noex {
 	uclibmemalloc	lmo ;
 	lmo.m = &uclibmemalloc::stdvalloc ;
-	return lmo(size,vp) ;
+	return lmo(sz,vp) ;
 }
 /* end subroutine (uc_libvalloc) */
 
-int uc_librealloc(cvoid *cp,int size,void *vp) noex {
+int uc_librealloc(cvoid *cp,int sz,void *vp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
-	    const ulong	v = ulong(cp) ;
+	    const uintptr_t	v = uintptr_t(cp) ;
 	    rs = SR_BADFMT ;
 	    if ((v & 3) == 0) {
 	        uclibmemalloc	lmo(cp) ;
 	        lmo.m = &uclibmemalloc::stdrealloc ;
-	        rs = lmo(size,vp) ;
+	        rs = lmo(sz,vp) ;
 	    } /* end if (aligned correctly) */
 	} /* end if (non-null) */
 	return rs ;
@@ -159,10 +161,10 @@ int uc_librealloc(cvoid *cp,int size,void *vp) noex {
 int uc_libfree(cvoid *cp) noex {
 	int		rs = SR_FAULT ;
 	if (cp) {
-	    const ulong	v = ulong(cp) ;
+	    const uintptr_t	v = uintptr_t(cp) ;
 	    rs = SR_BADFMT ;
 	    if ((v & 3) == 0) {
-	        void	*fvp = (void *) cp ;
+	        void	*fvp = voidp(cp) ;
 	        free(fvp) ;
 		rs = SR_OK ;
 	    } /* end if (valid address alignment) */
@@ -174,16 +176,16 @@ int uc_libfree(cvoid *cp) noex {
 
 /* local subroutines */
 
-int uclibmemalloc::operator () (int size,void *vp) noex {
+int uclibmemalloc::operator () (int sz,void *vp) noex {
 	int     	rs = SR_FAULT ;
 	if (vp) {
 	    rs = SR_INVALID ;
-	    if (size > 0) {
+	    if (sz > 0) {
 	        int     to_again = utimeout[uto_again] ;
 	        int     to_nomem = utimeout[uto_nomem] ;
 	        bool    f_exit = false ;
 	        repeat {
-	            if ((rs = (this->*m)(size,vp)) < 0) {
+	            if ((rs = (this->*m)(sz,vp)) < 0) {
 	                switch (rs) {
 	                case SR_AGAIN:
 	                    if (to_again-- > 0) {
@@ -213,14 +215,13 @@ int uclibmemalloc::operator () (int size,void *vp) noex {
 }
 /* end subroutine (uclibmemalloc::operator) */
 
-int uclibmemalloc::stdmalloc(int size,void *vp) noex {
-	size_t		msize = size_t(size) ;
+int uclibmemalloc::stdmalloc(int sz,void *vp) noex {
+	csize		msize = size_t(sz) ;
 	int		rs ;
 	void		**rpp = (void **) vp ;
-	void		*rp ;
 	errno = 0 ;
-	if ((rp = malloc(msize))) {
-	    rs = size ;
+	if (void *rp ; (rp = malloc(msize))) {
+	    rs = sz ;
 	    *rpp = rp ;
 	} else {
 	    rs = (- errno) ;
@@ -230,14 +231,13 @@ int uclibmemalloc::stdmalloc(int size,void *vp) noex {
 }
 /* end method (uclibmemalloc::stdmalloc) */
 
-int uclibmemalloc::stdvalloc(int size,void *vp) noex {
-	size_t		msize = size_t(size) ;
+int uclibmemalloc::stdvalloc(int sz,void *vp) noex {
+	csize		msize = size_t(sz) ;
 	int		rs ;
 	void		**rpp = (void **) vp ;
-	void		*rp ;
 	errno = 0 ;
-	if ((rp = valloc(msize))) {
-	    rs = size ;
+	if (void *rp ; (rp = valloc(msize))) {
+	    rs = sz ;
 	    *rpp = rp ;
 	} else {
 	    rs = (- errno) ;
@@ -247,15 +247,14 @@ int uclibmemalloc::stdvalloc(int size,void *vp) noex {
 }
 /* end method (uclibmemalloc::stdvalloc) */
 
-int uclibmemalloc::stdrealloc(int size,void *vp) noex {
-	size_t		msize = size_t(size) ;
-	int		rs ;
+int uclibmemalloc::stdrealloc(int sz,void *vp) noex {
+	csize		msize = size_t(sz) ;
+	void		*fvp = voidp(cp) ;
 	void		**rpp = (void **) vp ;
-	void		*fvp = (void *) cp ;
-	void		*rp ;
+	int		rs ;
 	errno = 0 ;
-	if ((rp = realloc(fvp,msize))) {
-	    rs = size ;
+	if (void *rp ; (rp = realloc(fvp,msize))) {
+	    rs = sz ;
 	    *rpp = rp ;
 	} else {
 	    rs = (- errno) ;

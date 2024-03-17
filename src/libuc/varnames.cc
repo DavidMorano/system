@@ -28,9 +28,15 @@
 #include	"varnames.hh"
 
 
+const char varnames::logid[] =		"LOGID" ;
 const char varnames::logname[] =	"LOGNAME" ;
+const char varnames::logline[] =	"LOGLINE" ;
+const char varnames::utmpid[] =		"UTMPID" ;
+const char varnames::utmpname[] =	"UTMPNAME" ;
+const char varnames::utmpline[] =	"UTMPLINE" ;
 const char varnames::username[] =	"USERNAME" ;
 const char varnames::groupname[] =	"GROUPNAME" ;
+const char varnames::projname[] =	"PROJNAME" ;
 const char varnames::user[] =		"USER" ;
 const char varnames::group[] =		"GROUP" ;
 const char varnames::cdpath[] =		"CDPATH" ;
