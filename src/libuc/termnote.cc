@@ -1,11 +1,11 @@
-/* termnote */
+/* termnote SUPPORT */
+/* lang=C++20 */
 
 /* perform terminal noticing */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* special debug print-outs */
-
 
 /* revision history:
 
@@ -19,9 +19,9 @@
 
 /*******************************************************************************
 
-	This is a module that operates on termials (to be determined) for the
-	purposes of putting out small messages to them.  Subroutines in this
-	module are:
+	This is a module that operates on termials (to be determined)
+	for the purposes of putting out small messages to them.
+	Subroutines in this module are:
 
 		termnote_open
 		termnote_printf
@@ -31,43 +31,37 @@
 
 	Implementation note:
 
-        Yes, this can be written so that it performs in a more efficient manner.
-        But this thing is quite seldom used right now (a-days). If there is ever
-        a real need, yes, we can certaintly speed this up. So it is no big deal
-        right now.
+	Yes, this can be written so that it performs in a more
+	efficient manner.  But this thing is quite seldom used right
+	now (a-days). If there is ever a real need, yes, we can
+	certaintly speed this up. So it is no big deal right now.
 
 	BUG NOTE:
 
-        Note that the (stupid) Solaris® version of the standard UTMPX interface
-        does not work properly for some (unknown) strange reason. This bug is
-        quite annoying since some terminals are not biffed as they should be due
-        to the bug. The bug somehow causes an enumeration of the UTMPX database
-        file to skip over some UTMPX records. Skipped records might just contain
-        a terminal that needs to be biffed. To work around the Solaris® bug, we
-        use a separate UTMPX database interface entirely (TMPX). That interface
-        is not too dissimilar to the standard interface, except in the case of
-        Solaris®, it works properly!
-
+	Note that the (stupid) Solaris® version of the standard
+	UTMPX interface does not work properly for some (unknown)
+	strange reason. This bug is quite annoying since some
+	terminals are not biffed as they should be due to the bug.
+	The bug somehow causes an enumeration of the UTMPX database
+	file to skip over some UTMPX records. Skipped records might
+	just contain a terminal that needs to be biffed. To work
+	around the Solaris® bug, we use a separate UTMPX database
+	interface entirely (TMPX). That interface is not too
+	dissimilar to the standard interface, except in the case
+	of Solaris®, it works properly!
 
 *******************************************************************************/
 
-
-#define	TERMNOTE_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<ascii.h>
@@ -121,28 +115,39 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
+extern "C" {
+    int		termnote_write(TERMNOTE *,cc **,int,int,cc *,int) noex ;
+    int		termnote_vprintf(TERMNOTE *,har **,int,int,har *,va_list) noex ;
+}
+
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
+extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	vbufprintf(char *,int,cchar *,va_list) ;
 extern int	termconseq(char *,int,int,int,int,int,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	writeto(int,const void *,int,int) ;
-extern int	tmpx_getuserlines(TMPX *,VECSTR *,const char *) ;
+extern int	writeto(int,cvoid *,int,int) ;
+extern int	tmpx_getuserlines(TMPX *,VECSTR *,cchar *) ;
 extern int	charcols(int,int,int) ;
-extern int	mkplogid(char *,int,const char *,int) ;
+extern int	mkplogid(char *,int,cchar *,int) ;
 extern int	isprintlatin(int) ;
 extern int	iceil(int,int) ;
 extern int	ipow(int,int) ;
@@ -150,17 +155,17 @@ extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 
 #if	CF_DEBUGS || CF_DEBUGN
-extern int	debugprintf(const char *,...) ;
-extern int	nprintf(const char *,const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	nprintf(cchar *,cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
-static int	vcmpatime(const void *,const void *) ;
+static int	vcmpatime(cvoid *,cvoid *) noex ;
 
 
 /* external variables */
@@ -181,11 +186,6 @@ struct colstate {
 
 /* forward references */
 
-int		termnote_write(TERMNOTE *,const char **,int,int,
-			const char *,int) ;
-int		termnote_vprintf(TERMNOTE *,const char **,int,int,
-			const char *,va_list) ;
-
 static int	termnote_writer(TERMNOTE *,cchar **,int,int,cchar *,int) ;
 
 static int	termnote_txopen(TERMNOTE *,time_t) ;
@@ -193,7 +193,7 @@ static int	termnote_txclose(TERMNOTE *) ;
 static int	termnote_lfopen(TERMNOTE *,time_t) ;
 static int	termnote_lfclose(TERMNOTE *) ;
 
-static int	termnote_bufline(TERMNOTE *,BUFFER *,const char *,int) ;
+static int	termnote_bufline(TERMNOTE *,BUFFER *,cchar *,int) ;
 static int	termnote_bufextra(TERMNOTE *,BUFFER *,int) ;
 static int	termnote_dispose(TERMNOTE *,cchar **,int,int,cchar *,int) ;
 static int	termnote_disposeuser(TERMNOTE *,int,int,cchar *,int,cchar *) ;
@@ -204,32 +204,34 @@ static int	termnote_nodename(TERMNOTE *) ;
 
 #ifdef	COMMENT
 static int	colstate_load(struct colstate *,int,int) ;
-static int	colstate_linecols(struct colstate *,const char *,int) ;
+static int	colstate_linecols(struct colstate *,cchar *,int) ;
 #endif
 
-static int	mkclean(char *,int,const char *,int) ;
-static int	hasourbad(const char *,int) ;
-static int	isourbad(int) ;
+static int	mkclean(char *,int,cchar *,int) noex ;
+
+static bool	hasourbad(cchar *,int) noex ;
+static bool	isourbad(int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int termnote_open(TERMNOTE *op,cchar *pr)
-{
+int termnote_open(TERMNOTE *op,cchar *pr) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(TERMNOTE)) ;
+	memclear(op) ;			/* dangerous */
 
 	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
@@ -300,7 +302,7 @@ int termnote_close(TERMNOTE *op)
 
 
 /* make a log entry */
-int termnote_printf(TERMNOTE *op,const char **rpp,int n,int o,cchar *fmt,...)
+int termnote_printf(TERMNOTE *op,cchar **rpp,int n,int o,cchar *fmt,...)
 {
 	int		rs ;
 
@@ -317,7 +319,7 @@ int termnote_printf(TERMNOTE *op,const char **rpp,int n,int o,cchar *fmt,...)
 
 
 /* make a log entry */
-int termnote_vprintf(TERMNOTE *op,const char **rpp,int n,int o,
+int termnote_vprintf(TERMNOTE *op,cchar **rpp,int n,int o,
 		cchar *fmt,va_list ap)
 {
 	const int	olen = TERMNOTE_BUFSIZE ;
@@ -370,7 +372,7 @@ int termnote_check(TERMNOTE *op,time_t dt)
 	            rs = logfile_check(&op->lf,dt) ;
 #if	CF_DEBUGN
 		{
-		const char	*dfname = TERMNOTE_DEBFNAME ;
+		cchar	*dfname = TERMNOTE_DEBFNAME ;
 		nprintf(dfname,"logfile_check() rs=%d\n",rs) ;
 		}
 #endif
@@ -394,10 +396,10 @@ int termnote_check(TERMNOTE *op,time_t dt)
 
 int termnote_write(op,rpp,m,o,sbuf,slen)
 TERMNOTE	*op ;
-const char	**rpp ;
+cchar	**rpp ;
 int		m ;
 int		o ;
-const char	sbuf[] ;
+cchar	sbuf[] ;
 int		slen ;
 {
 	time_t		dt = 0 ;
@@ -522,7 +524,7 @@ static int termnote_writer(TERMNOTE *op,cchar **rpp,int m,int o,
 		rs = termnote_bufextra(op,&ob,o) ;
 
 	    if (rs >= 0) {
-	        const char	*bp ;
+	        cchar	*bp ;
 	        int		bl ;
 	        if ((rs = buffer_get(&ob,&bp)) >= 0) {
 	            bl = rs ;
@@ -568,8 +570,8 @@ static int termnote_bufline(TERMNOTE *op,BUFFER *obp,cchar *lp,int ll)
 	        int		i ;
 		int		cl ;
 		int		bl ;
-		const char	*bp ;
-		const char	*cp ;
+		cchar	*bp ;
+		cchar	*cp ;
 	        char	tmpbuf[COLUMNS+ 1] ;
 	        for (i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
 	            bp = cp ;
@@ -651,9 +653,9 @@ static int termnote_disposeuser(op,max,o,bp,bl,un)
 TERMNOTE	*op ;
 int		max ;
 int		o ;
-const char	*bp ;
+cchar	*bp ;
 int		bl ;
-const char	un[] ;
+cchar	un[] ;
 {
 	VECOBJ		uts ;
 	const int	utsize = sizeof(USERTERM) ;
@@ -662,7 +664,7 @@ const char	un[] ;
 	int		rs1 ;
 	int		i ;
 	int		c = 0 ;
-	const char	*devdname = DEVDNAME ;
+	cchar	*devdname = DEVDNAME ;
 	char		termfname[TERMDEVLEN+1] ;
 
 #if	CF_DEBUGS
@@ -682,7 +684,7 @@ const char	un[] ;
 		debugprintf("termnote_disposeuser: tmpx_getuserlines() rs=%d\n",
 			rs) ;
 		{
-		    const char	*cp ;
+		    cchar	*cp ;
 		    for (i = 0 ; vecstr_get(&lines,i,&cp) >= 0 ; i += 1)
 			debugprintf("termnote_disposeuser: termline=%s\n",cp) ;
 		}
@@ -694,7 +696,7 @@ const char	un[] ;
 	    if ((rs >= 0) && (nlines > 0)) {
 		USERTERM	ut ;
 		int		ll, tl ;
-		const char	*lp ;
+		cchar	*lp ;
 
 		for (i = 0 ; vecstr_get(&lines,i,&lp) >= 0 ; i += 1) {
 		    if (lp == NULL) continue ;
@@ -808,9 +810,9 @@ const char	un[] ;
 static int termnote_disposewrite(op,o,bp,bl,termdev)
 TERMNOTE	*op ;
 int		o ;
-const char	*bp ;
+cchar	*bp ;
 int		bl ;
-const char	termdev[] ;
+cchar	termdev[] ;
 {
 	const int	of = (O_WRONLY | O_NOCTTY | O_NDELAY) ;
 	const int	to = 5 ;
@@ -869,7 +871,7 @@ static int termnote_lfopen(TERMNOTE *op,time_t dt)
 	int		f_opened = FALSE ;
 
 	if (! op->init.lf) {
-	    const char	*sn = TERMNOTE_SEARCHNAME ;
+	    cchar	*sn = TERMNOTE_SEARCHNAME ;
 	    char	lfname[MAXPATHLEN+1] ;
 	    op->init.lf = TRUE ;
 	    if (rs >= 0) {
@@ -892,7 +894,7 @@ static int termnote_lfopen(TERMNOTE *op,time_t dt)
 #endif
 #if	CF_DEBUGN
 		{
-		const char	*dfname = TERMNOTE_DEBFNAME ;
+		cchar	*dfname = TERMNOTE_DEBFNAME ;
 		nprintf(dfname,"logfname=%s\n",lfname) ;
 		nprintf(dfname,"logfile_open() rs=%d\n",rs1) ;
 		}
@@ -970,7 +972,7 @@ static int termnote_nodename(TERMNOTE *op)
 
 	if (op->nodename == NULL) {
 	    char	nn[NODENAMELEN+1] ;
-	    const char	*np ;
+	    cchar	*np ;
 	    if ((rs = getnodename(nn,NODENAMELEN)) >= 0) {
 	        nl = rs ;
 		rs = uc_mallocstrw(nn,nl,&np) ;
@@ -1002,15 +1004,14 @@ int		ncol ;
 /* return the number of characters that will fill the current column limit */
 static int colstate_linecols(csp,sbuf,slen)
 struct colstate	*csp ;
-const char	sbuf[] ;
+cchar	sbuf[] ;
 int		slen ;
 {
-	int		i ;
 	int		cols ;
 	int		rcols ;
 
 	rcols = (csp->ncols - csp->ncol) ;
-	for (i = 0 ; (rcols > 0) && (i < slen) ; i += 1) {
+	for (int i = 0 ; (rcols > 0) && (i < slen) ; i += 1) {
 
 	    cols = charcols(NTABCOLS,csp->ncol,sbuf[i]) ;
 
@@ -1076,21 +1077,21 @@ static int isourbad(int ch)
 }
 /* end subroutine (isourbad) */
 
-
 /* we want to do a reverse sort here (in descending order) */
-static int vcmpatime(const void *v1pp,const void *v2pp)
-{
+static int vcmpatime(cvoid *v1pp,cvoid *v2pp) noex {
 	USERTERM	**e1pp = (USERTERM **) v1pp ;
 	USERTERM	**e2pp = (USERTERM **) v2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != NULL) || (*e2pp != NULL)) {
-	    if (*e1pp != NULL) {
-	        if (*e2pp != NULL) {
+	if (*e1pp || *e2pp) {
+	    if (*e1pp) {
+	        if (*e2pp) {
 	            rc = (*e2pp)->atime - (*e1pp)->atime ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = 1 ;
+	    }
 	} 
 	return rc ;
 }

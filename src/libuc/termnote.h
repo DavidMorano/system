@@ -1,17 +1,17 @@
-/* termnote */
+/* termnote HEADER */
+/* lang=C20 */
+
+/* perform terminal noticing */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TERMNOTE_INCLUDE
-#define	TERMNOTE_INCLUDE	1
-
+#define	TERMNOTE_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<stdarg.h>
-
 #include	<tmpx.h>
 #include	<ids.h>
 #include	<logfile.h>
@@ -19,7 +19,6 @@
 
 
 /* object defines */
-
 #define	TERMNOTE_MAGIC		0x13f3c200
 #define	TERMNOTE		struct termnote_head
 #define	TERMNOTE_FL		struct termnote_flags
@@ -39,43 +38,36 @@ struct termnote_flags {
 } ;
 
 struct termnote_head {
-	UINT		magic ;
-	TERMNOTE_FL	init, open ;
-	IDS		id ;
+	ids		id ;
 	TMPX		tx ;
-	LOGFILE		lf ;
-	const char	*pr ;
-	const char	*nodename ;
+	logfile		lf ;
+	cchar		*pr ;
+	cchar		*nodename ;
 	time_t		ti_check ;
 	time_t		ti_tmpx ;
 	time_t		ti_logcheck ;
 	time_t		ti_write ;
+	TERMNOTE_FL	init, open ;
+	uint		magic ;
 	int		sn ;		/* serial-number */
 	char		username[USERNAMELEN+1] ;
 	char		logid[LOGIDLEN+1] ;
 } ;
 
+typedef TERMNOTE	termnote ;
+typedef TERMNOTE_FL	termnote_fl ;
 
-typedef struct termnote_head	termnote ;
+EXTERNC_begin
 
+extern int termnote_open(termnote *,cchar *) noex ;
+extern int termnote_printf(termnote *,cchar **,int,int,cchar *,...) noex ;
+extern int termnote_vprintf(termnote *,cchar **,int,int,cchar *,va_list) noex ;
+extern int termnote_write(termnote *,cchar **,int,int,cchar *,int) noex ;
+extern int termnote_check(termnote *,time_t) noex ;
+extern int termnote_close(termnote *) noex ;
 
-#if	(! defined(TERMNOTE_MASTER)) || (TERMNOTE_MASTER == 0)
+EXTERNC_end
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int termnote_open(TERMNOTE *,const char *) ;
-extern int termnote_printf(TERMNOTE *,const char **,int,int,const char *,...) ;
-extern int termnote_vprintf(TERMNOTE *,const char **,int,int,
-		const char *,va_list) ;
-extern int termnote_write(TERMNOTE *,const char **,int,int,const char *,int) ;
-extern int termnote_check(TERMNOTE *,time_t) ;
-extern int termnote_close(TERMNOTE *) ;
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* TERMNOTE_MASTER */
 
