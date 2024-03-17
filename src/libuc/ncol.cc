@@ -55,6 +55,27 @@
 	Returns:
 	-		number of columns used up
 
+
+	Name:
+	getcols
+
+	Description:
+	This subroutine returns the number of bytes needed to realize
+	the number of columns specified.
+
+	Synopsis:
+	int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex
+
+	Arguments:
+	ntab		number of columns in a TAB character
+	ccol		current column number
+	ncols		number of additional columns wanted
+	lbuf		line-buffer for given line of characters
+	llen		length of line-buffer
+
+	Returns:
+	-		number of bytes used for the given number of columns
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -126,5 +147,20 @@ int ncolchar(int ntab,int ccol,int ch) noex {
 	return cols ;
 }
 /* end subroutine (ncolchar) */
+
+int getcols(int ntab,int ccol,int ncols,cchar *lbuf,int llen) noex {
+	cint		tcol = (ccol + ncols) ;
+	int		i = 0 ; /* used afterwards */
+	if (llen < 0) llen = strlen(lbuf) ;
+	if (ccol < tcol) {
+	    int		cols ;
+	    for (i = 0 ; (ccol < tcol) && (i < llen) ; i += 1) {
+	        cols = charcols(ntab,ccol,lbuf[i]) ;
+	        ccol += cols ;
+	    } /* end for */
+	} /* end if */
+	return i ;
+}
+/* end subroutine (getcols) */
 
 

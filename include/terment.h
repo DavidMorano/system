@@ -39,7 +39,7 @@
 #include	"terment.h"
 
 
-#define	TERMENT		struct terment
+#define	TERMENT		struct terment_head
 
 /* entry type values */
 #define	TERMENT_TEMPTY		0	/* entry is unused */
@@ -54,7 +54,7 @@
 #define	TERMENT_LANSWER		116
 
 
-struct terment {
+struct terment_head {
 	pid_t		sid ;		/* session ID */
 	uchar		type ;		/* type of entry (see above) */
 	uchar		termcode ;	/* ANSI terminal code */
@@ -66,29 +66,31 @@ struct terment {
 	char		answer[TERMENT_LANSWER] ;
 } ;
 
+typedef TERMENT		terment ;
+
 EXTERNC_begin
 
-extern int terment_start(TERMENT *) noex ;
-extern int terment_settype(TERMENT *,int) noex ;
-extern int terment_setsid(TERMENT *,pid_t) noex ;
-extern int terment_setcode(TERMENT *,int) noex ;
-extern int terment_setlines(TERMENT *,int) noex ;
-extern int terment_setcols(TERMENT *,int) noex ;
-extern int terment_setid(TERMENT *,cchar *,int) noex ;
-extern int terment_setline(TERMENT *,cchar *,int) noex ;
-extern int terment_settermtype(TERMENT *,cchar *,int) noex ;
-extern int terment_setanswer(TERMENT *,cchar *,int) noex ;
+extern int terment_start(terment *) noex ;
+extern int terment_settype(terment *,int) noex ;
+extern int terment_setsid(terment *,pid_t) noex ;
+extern int terment_setcode(terment *,int) noex ;
+extern int terment_setlines(terment *,int) noex ;
+extern int terment_setcols(terment *,int) noex ;
+extern int terment_setid(terment *,cchar *,int) noex ;
+extern int terment_setline(terment *,cchar *,int) noex ;
+extern int terment_settermtype(terment *,cchar *,int) noex ;
+extern int terment_setanswer(terment *,cchar *,int) noex ;
 
-extern int terment_gettype(TERMENT *) noex ;
-extern int terment_getsid(TERMENT *) noex ;
-extern int terment_getcode(TERMENT *) noex ;
-extern int terment_getlines(TERMENT *) noex ;
-extern int terment_getcols(TERMENT *) noex ;
-extern int terment_getid(TERMENT *,cchar **) noex ;
-extern int terment_getline(TERMENT *,cchar **) noex ;
-extern int terment_gettermtype(TERMENT *,cchar **) noex ;
-extern int terment_getanswer(TERMENT *,cchar **) noex ;
-extern int terment_finish(TERMENT *) noex ;
+extern int terment_gettype(terment *) noex ;
+extern int terment_getsid(terment *) noex ;
+extern int terment_getcode(terment *) noex ;
+extern int terment_getlines(terment *) noex ;
+extern int terment_getcols(terment *) noex ;
+extern int terment_getid(terment *,cchar **) noex ;
+extern int terment_getline(terment *,cchar **) noex ;
+extern int terment_gettermtype(terment *,cchar **) noex ;
+extern int terment_getanswer(terment *,cchar **) noex ;
+extern int terment_finish(terment *) noex ;
 
 EXTERNC_end
 

@@ -47,9 +47,12 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int terment_start(TERMENT *op) noex {
+int terment_start(terment *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    memclear(op) ;		/* dangerous */
@@ -59,7 +62,7 @@ int terment_start(TERMENT *op) noex {
 }
 /* end subroutine (terment_start) */
 
-int terment_finish(TERMENT *op) noex {
+int terment_finish(terment *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -68,7 +71,7 @@ int terment_finish(TERMENT *op) noex {
 }
 /* end subroutine (terment_finish) */
 
-int terment_settype(TERMENT *op,int type) noex {
+int terment_settype(terment *op,int type) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    op->type = type ;
@@ -78,7 +81,7 @@ int terment_settype(TERMENT *op,int type) noex {
 }
 /* end subroutine (terment_settype) */
 
-int terment_setsid(TERMENT *op,pid_t sid) noex {
+int terment_setsid(terment *op,pid_t sid) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    op->sid = sid ;
@@ -88,7 +91,7 @@ int terment_setsid(TERMENT *op,pid_t sid) noex {
 }
 /* end subroutine (terment_setsid) */
 
-int terment_setlines(TERMENT *op,int lines) noex {
+int terment_setlines(terment *op,int lines) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    op->lines = lines ;
@@ -98,7 +101,7 @@ int terment_setlines(TERMENT *op,int lines) noex {
 }
 /* end subroutine (terment_setlines) */
 
-int terment_setcols(TERMENT *op,int cols) noex {
+int terment_setcols(terment *op,int cols) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    op->cols = cols ;
@@ -108,7 +111,7 @@ int terment_setcols(TERMENT *op,int cols) noex {
 }
 /* end subroutine (terment_setcols) */
 
-int terment_setid(TERMENT *op,cchar *sp,int sl) noex {
+int terment_setid(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cint	dl = TERMENT_LID ;
@@ -118,7 +121,7 @@ int terment_setid(TERMENT *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (terment_setid) */
 
-int terment_setline(TERMENT *op,cchar *sp,int sl) noex {
+int terment_setline(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cint	dl = TERMENT_LLINE ;
@@ -128,7 +131,7 @@ int terment_setline(TERMENT *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (terment_setline) */
 
-int terment_settermtype(TERMENT *op,cchar *sp,int sl) noex {
+int terment_settermtype(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cint	dl = TERMENT_LTERMTYPE ;
@@ -138,7 +141,7 @@ int terment_settermtype(TERMENT *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (terment_settermtype) */
 
-int terment_setanswer(TERMENT *op,cchar *sp,int sl) noex {
+int terment_setanswer(terment *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    cint	dl = TERMENT_LANSWER ;
@@ -148,52 +151,52 @@ int terment_setanswer(TERMENT *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (terment_setanswer) */
 
-int terment_gettype(TERMENT *op) noex {
+int terment_gettype(terment *op) noex {
 	int	rs = MKCHAR(op->type) ;
 	return rs ;
 }
 /* end subroutine (terment_gettype) */
 
-int terment_getsid(TERMENT *op) noex {
+int terment_getsid(terment *op) noex {
 	int		rs = op->sid ;
 	return rs ;
 }
 /* end subroutine (terment_getsid) */
 
-int terment_getlines(TERMENT *op) noex {
+int terment_getlines(terment *op) noex {
 	int		rs = op->lines ;
 	return rs ;
 }
 /* end subroutine (terment_getlines) */
 
-int terment_getcols(TERMENT *op) noex {
+int terment_getcols(terment *op) noex {
 	int		rs = op->cols ;
 	return rs ;
 }
 /* end subroutine (terment_getcols) */
 
-int terment_getid(TERMENT *op,cchar **rpp) noex {
+int terment_getid(terment *op,cchar **rpp) noex {
 	int		rs = strnlen(op->id,TERMENT_LID) ;
 	if (rpp) *rpp = op->id ;
 	return rs ;
 }
 /* end subroutine (terment_getid) */
 
-int terment_getline(TERMENT *op,cchar **rpp) noex {
+int terment_getline(terment *op,cchar **rpp) noex {
 	int		rs = strnlen(op->line,TERMENT_LLINE) ;
 	if (rpp) *rpp = op->line ;
 	return rs ;
 }
 /* end subroutine (terment_getline) */
 
-int terment_gettermtype(TERMENT *op,cchar **rpp) noex {
+int terment_gettermtype(terment *op,cchar **rpp) noex {
 	int		rs = strnlen(op->termtype,TERMENT_LTERMTYPE) ;
 	if (rpp) *rpp = op->termtype ;
 	return rs ;
 }
 /* end subroutine (terment_gettermtype) */
 
-int terment_getanswer(TERMENT *op,cchar **rpp) noex {
+int terment_getanswer(terment *op,cchar **rpp) noex {
 	int		rs = strnlen(op->answer,TERMENT_LANSWER) ;
 	if (rpp) *rpp = op->answer ;
 	return rs ;

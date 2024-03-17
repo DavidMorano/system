@@ -27,6 +27,7 @@ EXTERNC_begin
 
 extern int ncolchar(int,int,int) noex ;
 extern int ncolstr(int,int,cchar *,int) noex ;
+extern int getcols(int,int,int,cchar *,int) noex ;
 
 static inline int charcols(int ntab,int ccol,int ch) noex {
 	return ncolchar(ntab,ccol,ch) ;
