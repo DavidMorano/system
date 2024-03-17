@@ -37,7 +37,7 @@
 /* local defines */
 
 #define	ENVS_DB			hdb
-#define	ENVS_ENT		struct envs_e
+#define	ENVS_ENT		struct envs_ent
 #define	ENVS_DEFENTS		10
 
 #define	ENVS_DBSTART(op,n,hash,cmp)	hdb_start((op),(n),1,(hash),(cmp))
@@ -72,13 +72,13 @@ using std::nothrow ;			/* constant */
 
 /* local structures */
 
-struct envs_e {
+struct envs_ent {
 	cchar		*kp ;
 	int		kl ;
 	vecstr		elist ;
 } ;
 
-typedef envs_e		*entp ;
+typedef envs_ent	*entp ;
 
 
 /* forward references */
@@ -105,13 +105,13 @@ static inline int envs_magic(envs *op,Args ... args) noex {
 	return rs ;
 }
 
-static int	entry_start(ENVS_ENT *,cchar *,cchar *,int,cchar **) noex ;
-static int	entry_count(ENVS_ENT *) noex ;
-static int	entry_set(ENVS_ENT *,cchar *,int) noex ;
-static int	entry_append(ENVS_ENT *,cchar *,int) noex ;
-static int	entry_get(ENVS_ENT *,int,cchar **) noex ;
-static int	entry_substr(ENVS_ENT *,cchar *,int) noex ;
-static int	entry_finish(ENVS_ENT *) noex ;
+static int	entry_start(envs_ent *,cchar *,cchar *,int,cchar **) noex ;
+static int	entry_count(envs_ent *) noex ;
+static int	entry_set(envs_ent *,cchar *,int) noex ;
+static int	entry_append(envs_ent *,cchar *,int) noex ;
+static int	entry_get(envs_ent *,int,cchar **) noex ;
+static int	entry_substr(envs_ent *,cchar *,int) noex ;
+static int	entry_finish(envs_ent *) noex ;
 
 
 /* local variables */
@@ -142,7 +142,7 @@ int envs_finish(envs *op) noex {
 	    ENVS_DBDAT		key, val ;
 	    ENVS_DBCURBEGIN(op->varp,&cur) ;
 	    while (ENVS_DBENUM(op->varp,&cur,&key,&val) >= 0) {
-	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
+	        ENVS_ENT	*ep = (envs_ent *) val.buf ;
 		if (ep) {
 		    {
 			rs1 = entry_finish(ep) ;
@@ -183,7 +183,7 @@ int envs_store(envs *op,cchar *kp,int fa,cchar *vp,int vl) noex {
 	    val.buf = nullptr ;
 	    val.len = -1 ;
 	    if ((rs1 = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
-	        ep = (ENVS_ENT *) val.buf ;
+	        ep = (envs_ent *) val.buf ;
 	        if (fa) {
 		    rs = entry_append(ep,vp,vl) ;
 	        } else {
@@ -234,7 +234,7 @@ int envs_present(envs *op,cchar *kp,int kl) noex {
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
-	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
+	        ENVS_ENT	*ep = (envs_ent *) val.buf ;
 	        rs = entry_count(ep) ;
 	    }
 	} /* end if (magic) */
@@ -252,7 +252,7 @@ int envs_substr(envs *op,cchar *kp,int kl,cchar *sp,int sl) noex {
 	    key.buf = kp ;
 	    key.len = kl ;
 	    if ((rs = ENVS_DBFETCH(vlp,key,nullptr,&val)) >= 0) {
-	        ENVS_ENT	*ep = (ENVS_ENT *) val.buf ;
+	        ENVS_ENT	*ep = (envs_ent *) val.buf ;
 	        rs = entry_substr(ep,sp,sl) ;
 	    }
 	} /* end if (magic) */
@@ -336,7 +336,7 @@ int envs_enum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	        kp = ccharp(key.buf) ;
 	        kl = strlen(kp) ;
 	        if (kpp) *kpp = kp ;
-	        ep = (ENVS_ENT *) val.buf ;
+	        ep = (envs_ent *) val.buf ;
 	        i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 	        if ((rs = entry_get(ep,i,&vp)) >= 0) {
 		    curp->i = i ;
@@ -367,7 +367,7 @@ int envs_fetch(envs *op,cc *kp,int kl,ENVS_CUR *curp,cc **rpp) noex {
 	    key.len = kl ;
 	    if ((rs = ENVS_DBFETCH(op->varp,key,nullptr,&val)) >= 0) {
 	        cchar	*vp{} ;
-	        ep = (ENVS_ENT *) val.buf ;
+	        ep = (envs_ent *) val.buf ;
 	        if ((rs = entry_get(ep,i,&vp)) >= 0) {
 		    vl = rs ;
 		    if (curp) curp->i = i ;
@@ -395,13 +395,13 @@ int envs_delname(envs *op,cchar *kp,int kl) noex {
 
 /* private subroutines */
 
-static int entry_start(ENVS_ENT *ep,cc *kp,cc *vn,int vnlen,cc**rpp) noex {
+static int entry_start(envs_ent *ep,cc *kp,cc *vn,int vnlen,cc**rpp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
 	if (ep && kp) {
 	    rs = SR_INVALID ;
 	    if (kp[0]) {
-	        cchar		*cp{} ;
+	        cchar	*cp{} ;
 	        if ((rs = uc_mallocstrw(kp,-1,&cp)) >= 0) {
 	            cint	n = ENVS_DEFENTS ;
 	            int		vo = 0 ;
@@ -430,7 +430,7 @@ static int entry_start(ENVS_ENT *ep,cc *kp,cc *vn,int vnlen,cc**rpp) noex {
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(ENVS_ENT *ep) noex {
+static int entry_finish(envs_ent *ep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (ep) {
@@ -449,12 +449,12 @@ static int entry_finish(ENVS_ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_count(ENVS_ENT *ep) noex {
+static int entry_count(envs_ent *ep) noex {
 	return vecstr_count(&ep->elist) ;
 }
 /* end subroutine (entry_count) */
 
-static int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
+static int entry_set(envs_ent *ep,cchar *vp,int vl) noex {
 	int		rs ;
 	if ((rs = vecstr_delall(&ep->elist)) >= 0) {
 	    rs = vecstr_add(&ep->elist,vp,vl) ;
@@ -463,12 +463,12 @@ static int entry_set(ENVS_ENT *ep,cchar *vp,int vl) noex {
 }
 /* end subroutine (entry_set) */
 
-static int entry_append(ENVS_ENT *ep,cchar *vp,int vl) noex {
+static int entry_append(envs_ent *ep,cchar *vp,int vl) noex {
 	return vecstr_add(&ep->elist,vp,vl) ;
 }
 /* end subroutine (entry_append) */
 
-static int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
+static int entry_get(envs_ent *ep,int i,cchar **rpp) noex {
 	int		rs ;
 	int		vl = 0 ;
 	cchar		*rp{} ;
@@ -480,7 +480,7 @@ static int entry_get(ENVS_ENT *ep,int i,cchar **rpp) noex {
 }
 /* end subroutine (entry_get) */
 
-static int entry_substr(ENVS_ENT *ep,cchar *sp,int sl) noex {
+static int entry_substr(envs_ent *ep,cchar *sp,int sl) noex {
 	nulstr		ns ;
 	int		rs ;
 	int		rs1 ;

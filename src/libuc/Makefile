@@ -753,12 +753,8 @@ filebuf_mailsupport.o:	filebuf_mailsupport.c filebuf.h
 varray.o:		varray.cc varray.h
 
 hdb.o:			hdb.cc hdb.h
-
 lookaside.o:		lookaside.cc lookaside.h
-
-pwcache.o:		pwcache.cc pwcache.h
-
-linefold.o:		linefold.c linefold.h
+linefold.o:		linefold.cc linefold.h
 
 envlist.o:		envlist.cc envlist.h
 envhelp.o:		envhelp.cc envhelp.h
