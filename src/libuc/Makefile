@@ -1109,7 +1109,7 @@ ucinetconv.o:		ucinetconv.cc ucinetconv.h
 b64decover.o:		b64decoder.cc b64decoder.h
 
 # tab handling
-ncol.o:			ncol.c ncol.h
+ncol.o:			ncol.cc ncol.h
 
 # INET
 inetconv.o:		inetconv.cc inetconv.h

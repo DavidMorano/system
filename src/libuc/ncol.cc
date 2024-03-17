@@ -1,5 +1,5 @@
-/* ncol */
-/* lang=C20 */
+/* ncol SUPPORT */
+/* lang=C++20 */
 
 /* calculate number of columns used by a character */
 /* version %I% last-modified %G% */
@@ -58,9 +58,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<ascii.h>
@@ -123,11 +122,5 @@ int ncolchar(int ntab,int ccol,int ch) noex {
 	return cols ;
 }
 /* end subroutine (ncolchar) */
-
-int charcols(int ntab,int ccol,int ch) noex {
-	return ncolchar(ntab,ccol,ch) ;
-}
-/* end subroutine (charcols) */
-
 
 
