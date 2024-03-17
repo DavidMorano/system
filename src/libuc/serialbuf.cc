@@ -28,7 +28,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring>		/* |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| + |memcpy(3c)| */
 #include	<usystem.h>
 #include	<stdorder.h>
 #include	<strwcpy.h>
@@ -123,11 +123,11 @@ int serialbuf_adv(serialbuf *sbp,int size) noex {
 /* end subroutine (serialbuf_adv) */
 
 int serialbuf_rc(serialbuf *sbp,char *rp) noex {
-	cint	size = sizeof(char) ;
+	cint		sz = sizeof(char) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        *rp = *sbp->bp++ ;
-	        sbp->i += size ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -137,12 +137,12 @@ int serialbuf_rc(serialbuf *sbp,char *rp) noex {
 /* end subroutine (serialbuf_rc) */
 
 int serialbuf_rs(serialbuf *sbp,short *rp) noex {
-	cint	size = sizeof(ushort) ;
+	cint		sz = sizeof(ushort) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rs(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -152,12 +152,12 @@ int serialbuf_rs(serialbuf *sbp,short *rp) noex {
 /* end subroutine (serialbuf_rshort) */
 
 int serialbuf_ri(serialbuf *sbp,int *rp) noex {
-	cint	size = sizeof(int) ;
+	cint		sz = sizeof(int) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_ri(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -167,12 +167,12 @@ int serialbuf_ri(serialbuf *sbp,int *rp) noex {
 /* end subroutine (serialbuf_ri) */
 
 int serialbuf_ria(serialbuf *sbp,int *rp,int n) noex {
-	cint	size = sizeof(int) ;
+	cint		sz = sizeof(int) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_ri(sbp->bp,(rp + i)) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -182,12 +182,12 @@ int serialbuf_ria(serialbuf *sbp,int *rp,int n) noex {
 /* end subroutine (serialbuf_ria) */
 
 int serialbuf_rl(serialbuf *sbp,long *rp) noex {
-	cint	size = sizeof(long) ;
+	cint		sz = sizeof(long) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rl(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -197,12 +197,12 @@ int serialbuf_rl(serialbuf *sbp,long *rp) noex {
 /* end subroutine (serialbuf_rl) */
 
 int serialbuf_rla(serialbuf *sbp,long *rp,int n) noex {
-	cint	size = sizeof(long) ;
+	cint		sz = sizeof(long) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rl(sbp->bp,(rp + i)) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -212,12 +212,12 @@ int serialbuf_rla(serialbuf *sbp,long *rp,int n) noex {
 /* end subroutine (serialbuf_rla) */
 
 int serialbuf_rll(serialbuf *sbp,longlong *rp) noex {
-	cint	size = sizeof(longlong) ;
+	cint		sz = sizeof(longlong) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rll(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -305,11 +305,11 @@ int serialbuf_rbuf(serialbuf *sbp,char *sbuf,int slen) noex {
 /* end subroutine (serialbuf_rbuf) */
 
 int serialbuf_ruc(serialbuf *sbp,uchar *rp) noex {
-	cint	size = sizeof(uchar) ;
+	cint		sz = sizeof(uchar) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
-	        *rp = (uchar) *sbp->bp++ ;
-	        sbp->i += size ;
+	    if ((sbp->len - sbp->i) >= sz) {
+	        *rp = uchar(*sbp->bp++) ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -319,12 +319,12 @@ int serialbuf_ruc(serialbuf *sbp,uchar *rp) noex {
 /* end subroutine (serialbuf_ruc) */
 
 int serialbuf_rus(serialbuf *sbp,ushort *rp) noex {
-	cint	size = sizeof(ushort) ;
+	cint		sz = sizeof(ushort) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rus(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -334,12 +334,12 @@ int serialbuf_rus(serialbuf *sbp,ushort *rp) noex {
 /* end subroutine (serialbuf_rus) */
 
 int serialbuf_rui(serialbuf *sbp,uint *rp) noex {
-	cint	size = sizeof(uint) ;
+	cint		sz = sizeof(uint) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rui(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -349,12 +349,12 @@ int serialbuf_rui(serialbuf *sbp,uint *rp) noex {
 /* end subroutine (serialbuf_rui) */
 
 int serialbuf_ruia(serialbuf *sbp,uint *rp,int n) noex {
-	cint	size = sizeof(uint) ;
+	cint		sz = sizeof(uint) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rui(sbp->bp,(rp + i)) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -364,12 +364,12 @@ int serialbuf_ruia(serialbuf *sbp,uint *rp,int n) noex {
 /* end subroutine (serialbuf_ruia) */
 
 int serialbuf_rul(serialbuf *sbp,ulong *rp) noex {
-	cint	size = sizeof(ulong) ;
+	cint		sz = sizeof(ulong) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rul(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -379,12 +379,12 @@ int serialbuf_rul(serialbuf *sbp,ulong *rp) noex {
 /* end subroutine (serialbuf_rul) */
 
 int serialbuf_rula(serialbuf *sbp,ulong *rp,int n) noex {
-	cint	size = sizeof(ulong) ;
+	cint		sz = sizeof(ulong) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rul(sbp->bp,(rp + i)) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -394,12 +394,12 @@ int serialbuf_rula(serialbuf *sbp,ulong *rp,int n) noex {
 /* end subroutine (serialbuf_rula) */
 
 int serialbuf_rull(serialbuf *sbp,ulonglong *rp) noex {
-	cint	size = sizeof(ulonglong) ;
+	cint		sz = sizeof(ulonglong) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_rull(sbp->bp,rp) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -432,7 +432,7 @@ int serialbuf_rustrw(serialbuf *sbp,uchar *usbuf,int slen) noex {
 	    int		sl ;
 	    int		cl ;
 	    char	*cp ;
-	    char	*sbuf = (char *) usbuf ;
+	    char	*sbuf = charp(usbuf) ;
 	    if (slen >= 0) {
 	        int	i = 0 ; /* used afterwards */
 	        cp = sbp->bp + (sbp->len - sbp->i) ;
@@ -444,7 +444,7 @@ int serialbuf_rustrw(serialbuf *sbp,uchar *usbuf,int slen) noex {
 	        if ((i <= slen) && (sbp->bp == cp)) {
 	            sbp->i = SR_TOOBIG ;
 	        } else if ((i == slen) && (sbp->bp[0] != '\0')) {
-	            cint	rl = strlen((char *) sbp->bp) ;
+	            cint	rl = strlen(charp(sbp->bp)) ;
 	            sbp->bp += (rl + 1) ;
 	            sbp->i = SR_TOOBIG ;
 	        } else {
@@ -486,11 +486,11 @@ int serialbuf_rubuf(serialbuf *sbp,uchar *sbuf,int slen) noex {
 /* end subroutine (serialbuf_rubuf) */
 
 int serialbuf_wc(serialbuf *sbp,int ch) noex {
-	cint	size = sizeof(char) ;
+	cint		sz = sizeof(char) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        *sbp->bp++ = (char) ch ;
-	        sbp->i += size ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -500,12 +500,12 @@ int serialbuf_wc(serialbuf *sbp,int ch) noex {
 /* end subroutine (serialbuf_wc) */
 
 int serialbuf_ws(serialbuf *sbp,int sw) noex {
-	cint	size = sizeof(short) ;
+	cint		sz = sizeof(short) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_ws(sbp->bp,sw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -515,12 +515,12 @@ int serialbuf_ws(serialbuf *sbp,int sw) noex {
 /* end subroutine (serialbuf_ws) */
 
 int serialbuf_wi(serialbuf *sbp,int iw) noex {
-	cint	size = sizeof(int) ;
+	cint		sz = sizeof(int) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wi(sbp->bp,iw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -530,12 +530,12 @@ int serialbuf_wi(serialbuf *sbp,int iw) noex {
 /* end subroutine (serialbuf_wi) */
 
 int serialbuf_wia(serialbuf *sbp,int *iwa,int n) noex {
-	cint	size = sizeof(int) ;
+	cint		sz = sizeof(int) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wi(sbp->bp,iwa[i]) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -545,12 +545,12 @@ int serialbuf_wia(serialbuf *sbp,int *iwa,int n) noex {
 /* end subroutine (serialbuf_wia) */
 
 int serialbuf_wl(serialbuf *sbp,long lw) noex {
-	cint	size = sizeof(long) ;
+	cint		sz = sizeof(long) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wl(sbp->bp,lw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -560,12 +560,12 @@ int serialbuf_wl(serialbuf *sbp,long lw) noex {
 /* end subroutine (serialbuf_wl) */
 
 int serialbuf_wla(serialbuf *sbp,long *lwa,int n) noex {
-	cint	size = sizeof(long) ;
+	cint		sz = sizeof(long) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wl(sbp->bp,lwa[i]) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -575,12 +575,12 @@ int serialbuf_wla(serialbuf *sbp,long *lwa,int n) noex {
 /* end subroutine (serialbuf_wla) */
 
 int serialbuf_wll(serialbuf *sbp,longlong lw) noex {
-	cint	size = sizeof(longlong) ;
+	cint		sz = sizeof(longlong) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wll(sbp->bp,lw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -641,11 +641,11 @@ int serialbuf_wbuf(serialbuf *sbp,cchar *sbuf,int slen) noex {
 /* end subroutine (serialbuf_wbuf) */
 
 int serialbuf_wuc(serialbuf *sbp,uint ch) noex {
-	cint		size = sizeof(uchar) ;
+	cint		sz = sizeof(uchar) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
-	        *sbp->bp++ = (char) ch ;
-	        sbp->i += size ;
+	    if ((sbp->len - sbp->i) >= sz) {
+	        *sbp->bp++ = char(ch) ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -655,12 +655,12 @@ int serialbuf_wuc(serialbuf *sbp,uint ch) noex {
 /* end subroutine (serialbuf_wuchar) */
 
 int serialbuf_wus(serialbuf *sbp,uint sw) noex {
-	cint		size = sizeof(ushort) ;
+	cint		sz = sizeof(ushort) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wus(sbp->bp,sw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -670,12 +670,12 @@ int serialbuf_wus(serialbuf *sbp,uint sw) noex {
 /* end subroutine (serialbuf_wus) */
 
 int serialbuf_wui(serialbuf *sbp,uint iw) noex {
-	cint		size = sizeof(uint) ;
+	cint		sz = sizeof(uint) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wui(sbp->bp,iw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -685,12 +685,12 @@ int serialbuf_wui(serialbuf *sbp,uint iw) noex {
 /* end subroutine (serialbuf_wui) */
 
 int serialbuf_wuia(serialbuf *sbp,uint *iwa,int n) noex {
-	cint		size = sizeof(uint) ;
+	cint		sz = sizeof(uint) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wui(sbp->bp,iwa[i]) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -700,12 +700,12 @@ int serialbuf_wuia(serialbuf *sbp,uint *iwa,int n) noex {
 /* end subroutine (serialbuf_wuia) */
 
 int serialbuf_wul(serialbuf *sbp,ulong lw) noex {
-	cint	size = sizeof(ulong) ;
+	cint		sz = sizeof(ulong) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wul(sbp->bp,lw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -715,12 +715,12 @@ int serialbuf_wul(serialbuf *sbp,ulong lw) noex {
 /* end subroutine (serialbuf_wul) */
 
 int serialbuf_wula(serialbuf *sbp,ulong *lwa,int n) noex {
-	cint	size = sizeof(ulong) ;
+	cint		sz = sizeof(ulong) ;
 	for (int i = 0 ; (sbp->i >= 0) && (i < n) ; i += 1) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wul(sbp->bp,lwa[i]) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
@@ -730,12 +730,12 @@ int serialbuf_wula(serialbuf *sbp,ulong *lwa,int n) noex {
 /* end subroutine (serialbuf_wula) */
 
 int serialbuf_wull(serialbuf *sbp,ulonglong lw) noex {
-	cint		size = sizeof(ulonglong) ;
+	cint		sz = sizeof(ulonglong) ;
 	if (sbp->i >= 0) {
-	    if ((sbp->len - sbp->i) >= size) {
+	    if ((sbp->len - sbp->i) >= sz) {
 	        stdorder_wull(sbp->bp,lw) ;
-	        sbp->bp += size ;
-	        sbp->i += size ;
+	        sbp->bp += sz ;
+	        sbp->i += sz ;
 	    } else {
 	        sbp->i = SR_TOOBIG ;
 	    }
