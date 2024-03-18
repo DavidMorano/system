@@ -29,7 +29,7 @@
 #define	BFILE		struct bfile_head
 #define	BFILE_BD	struct bfile_bd
 #define	BFILE_BDFLAGS	struct bfile_bdflags
-#define	BFILE_MAP	struct bfile_map
+#define	BFILE_MAP	struct bfile_mapper
 #define	BFILE_FLAGS	struct bfile_flags
 #define	BFILE_MAPFLAGS	struct bfile_mapflags
 
@@ -107,7 +107,7 @@ struct bfile_mapflags {
 	uint		dirty:1 ;
 } ;
 
-struct bfile_map {
+struct bfile_mapper {
 	char		*buf ;
 	size_t		offset ;	/* file offset for page */
 	BFILE_MAPFLAGS	f ;
@@ -161,6 +161,7 @@ struct bfile_head {
 } ;
 
 typedef BFILE		bfile ;
+typedef BFILE_MAP	bfile_map ;
 
 EXTERNC_begin
 
@@ -209,6 +210,10 @@ extern int	bfilefstat(int,USTAT *) noex ;
 
 static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
+}
+
+static inline int bfile_active(bfile *op) noex {
+	return (! op->f.nullfile) ;
 }
 
 EXTERNC_end

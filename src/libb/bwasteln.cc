@@ -1,4 +1,4 @@
-/* bwasteline SUPPORT */
+/* bwasteln SUPPORT */
 /* lang=C++20 */
 
 /* "Basic I/O" package similiar to "stdio" */
@@ -47,7 +47,7 @@
 
 /* exported subroutines */
 
-int bwasteline(bfile *fp,char *linebuf,int linelen) noex {
+int bwasteln(bfile *fp,char *linebuf,int linelen) noex {
 	int		rs ;
 	int		tlen = 0 ;
 	while ((rs = breadln(fp,linebuf,linelen)) > 0) {
@@ -57,6 +57,6 @@ int bwasteline(bfile *fp,char *linebuf,int linelen) noex {
 	} /* end while */
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (bwasteline) */
+/* end subroutine (bwasteln) */
 
 

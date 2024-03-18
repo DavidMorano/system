@@ -1,9 +1,8 @@
-/* bprintlns */
+/* bprintlns SUPPORT */
+/* lang=C++20 */
 
 /* print out lines but filled to the margin */
-
-
-#define	CF_DEBUGS	0		/* run-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,41 +16,33 @@
 
 /*******************************************************************************
 
-        This subroutine prints out some lines but not to exceed the line-folding
-        length (specified by the caller).
+	Name:
+	bprintlns
+
+	Description:
+	This subroutine prints out some lines but not to exceed the
+	line-folding length (specified by the caller).
 
 	Synopsis:
-
-	int bprintlns(fp,flen,sp,sl)
-	bfile		*fp ;
-	int		flen ;
-	const char	sp[] ;
-	int		sl ;
+	int bprintlns(bfile *fp,int flen,cchar *sp,int sl) noex
 
 	Arguments:
-
 	fp		file pointer (BIO)
 	flen		line folding length (maximum line length)
 	sp		buffer to print out
 	sl		amount of data in buffer to print out
 
 	Returns:
-
 	>=0		amount of data printed out
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
@@ -76,11 +67,11 @@
 
 /* external subroutines */
 
-extern int	bprintln(bfile *,const char *,int) ;
+extern int	bprintln(bfile *,cchar *,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -95,11 +86,12 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen)
-{
+int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -120,25 +112,15 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen)
 	if (llen < 0)
 	    llen = strlen(lbuf) ;
 
-#if	CF_DEBUGS
-	debugprintf("bprintlns: flen=%u\n",flen) ;
-#endif
-
 	if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 	    SBUF	b ;
 	    int		ll = llen ;
 	    int		sl, cl ;
 	    int		wc, len ;
 	    int		f_sbuf = FALSE ;
-	    const char	*lp = lbuf ;
-	    const char	*tp, *sp ;
-	    const char	*cp ;
-
-#if	CF_DEBUGS
-	    debugprintf("bprintlns: buf=>%t<\n",
-	        lbuf,
-	        MIN(60,((lbuf[llen - 1] == '\n') ? (llen - 1) : llen))) ;
-#endif
+	    cchar	*lp = lbuf ;
+	    cchar	*tp, *sp ;
+	    cchar	*cp ;
 
 	    while ((rs >= 0) && (ll > 0)) {
 
@@ -151,16 +133,7 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen)
 
 	        while ((rs >= 0) && ((cl = nextfield(sp,sl,&cp)) > 0)) {
 
-#if	CF_DEBUGS
-	            debugprintf("bprintlns: field=>%t<\n",cp,cl) ;
-#endif
-
 	            if ((len + (cl + 1)) > flen) {
-
-#if	CF_DEBUGS
-	                debugprintf("bprintlns: line-overflow len=%u\n",
-	                    len) ;
-#endif
 
 	                f_sbuf = FALSE ;
 	                sbuf_finish(&b) ;
@@ -182,18 +155,8 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen)
 	                    sbuf_char(&b,' ') ;
 	                }
 
-#if	CF_DEBUGS
-	                debugprintf("bprintlns: storing=>%t<\n",
-				cp,cl) ;
-#endif
-
 	                len += cl ;
 	                rs = sbuf_strw(&b,cp,cl) ;
-
-#if	CF_DEBUGS
-	                debugprintf("bprintlns: sbuf_strw() rs=%d\n",
-				rs) ;
-#endif
 
 	            } /* end if */
 
@@ -219,10 +182,6 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen)
 	        ll -= ((tp + 1) - lp) ;
 	        lp = (tp + 1) ;
 
-#if	CF_DEBUGS
-	        debugprintf("bprintlns: bottom rs=%d\n",rs) ;
-#endif
-
 	    } /* end while (outer) */
 
 	    if ((rs >= 0) && (wlen == 0)) {
@@ -236,17 +195,11 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen)
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("bprintlns: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintlns) */
 
-
-int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen)
-{
+int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	return bprintlns(fp,flen,lbuf,llen) ;
 }
 /* end subroutine (bprintlines) */

@@ -4,8 +4,6 @@
 /* perform terminal noticing */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGN	0		/* special debug print-outs */
 
 /* revision history:
 
@@ -55,15 +53,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<ugetpid.h>
+#include	<getnodename.h>
+#include	<getusername.h>
 #include	<ascii.h>
 #include	<ids.h>
 #include	<buffer.h>
@@ -72,7 +72,18 @@
 #include	<linefold.h>
 #include	<tmpx.h>
 #include	<logfile.h>
+#include	<strn.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<mkx.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<termconseq.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
+#include	<ipow.h>
+#include	<xperm.h>
+#include	<ischarx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"termnote.h"
@@ -125,47 +136,18 @@
 /* external subroutines */
 
 extern "C" {
-    int		termnote_write(TERMNOTE *,cc **,int,int,cc *,int) noex ;
-    int		termnote_vprintf(TERMNOTE *,har **,int,int,har *,va_list) noex ;
+    int		termnote_write(termnote *,cc **,int,int,cc *,int) noex ;
+    int		termnote_vprintf(termnote *,har **,int,int,har *,va_list) noex ;
 }
 
-extern int	snsd(char *,int,cchar *,uint) ;
-extern int	snsdd(char *,int,cchar *,uint) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkpath2w(char *,cchar *,cchar *,int) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	getnodename(char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	vbufprintf(char *,int,cchar *,va_list) ;
-extern int	termconseq(char *,int,int,int,int,int,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	writeto(int,cvoid *,int,int) ;
-extern int	tmpx_getuserlines(TMPX *,VECSTR *,cchar *) ;
-extern int	mkplogid(char *,int,cchar *,int) ;
-extern int	isprintlatin(int) ;
-extern int	iceil(int,int) ;
-extern int	ipow(int,int) ;
-extern int	isNotPresent(int) ;
-extern int	isNotAccess(int) ;
-
-#if	CF_DEBUGS || CF_DEBUGN
-extern int	debugprintf(cchar *,...) ;
-extern int	nprintf(cchar *,cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
-
+extern "C" {
+extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
+extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+extern int	writeto(int,cvoid *,int,int) noex ;
+extern int	tmpx_getuserlines(tmpx *,vecstr *,cchar *) noex ;
 static int	vcmpatime(cvoid *,cvoid *) noex ;
+extern char	*timestr_logz(time_t,char *) noex ;
+}
 
 
 /* external variables */
@@ -186,25 +168,25 @@ struct colstate {
 
 /* forward references */
 
-static int	termnote_writer(TERMNOTE *,cchar **,int,int,cchar *,int) ;
+static int termnote_writer(termnote *,cchar **,int,int,cchar *,int) noex ;
 
-static int	termnote_txopen(TERMNOTE *,time_t) ;
-static int	termnote_txclose(TERMNOTE *) ;
-static int	termnote_lfopen(TERMNOTE *,time_t) ;
-static int	termnote_lfclose(TERMNOTE *) ;
+static int termnote_txopen(termnote *,time_t) noex ;
+static int termnote_txclose(termnote *) noex ;
+static int termnote_lfopen(termnote *,time_t) noex ;
+static int termnote_lfclose(termnote *) noex ;
 
-static int	termnote_bufline(TERMNOTE *,BUFFER *,cchar *,int) ;
-static int	termnote_bufextra(TERMNOTE *,BUFFER *,int) ;
-static int	termnote_dispose(TERMNOTE *,cchar **,int,int,cchar *,int) ;
-static int	termnote_disposeuser(TERMNOTE *,int,int,cchar *,int,cchar *) ;
-static int	termnote_disposewrite(TERMNOTE *,int,cchar *,int,cchar *) ;
+static int termnote_bufline(termnote *,BUFFER *,cchar *,int) noex ;
+static int termnote_bufextra(termnote *,BUFFER *,int) noex ;
+static int termnote_dispose(termnote *,cchar **,int,int,cchar *,int) noex ;
+static int termnote_disposeuser(termnote *,int,int,cchar *,int,cchar *) noex ;
+static int termnote_disposewrite(termnote *,int,cchar *,int,cchar *) noex ;
 
-static int	termnote_username(TERMNOTE *) ;
-static int	termnote_nodename(TERMNOTE *) ;
+static int termnote_username(termnote *) noex ;
+static int termnote_nodename(termnote *) noex ;
 
 #ifdef	COMMENT
-static int	colstate_load(struct colstate *,int,int) ;
-static int	colstate_linecols(struct colstate *,cchar *,int) ;
+static int	colstate_load(struct colstate *,int,int) noex ;
+static int	colstate_linecols(struct colstate *,cchar *,int) noex ;
 #endif
 
 static int	mkclean(char *,int,cchar *,int) noex ;
@@ -221,7 +203,7 @@ static bool	isourbad(int) noex ;
 
 /* exported subroutines */
 
-int termnote_open(TERMNOTE *op,cchar *pr) noex {
+int termnote_open(termnote *op,cchar *pr) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	cchar		*cp ;
@@ -257,7 +239,7 @@ int termnote_open(TERMNOTE *op,cchar *pr) noex {
 /* end subroutine (termnote_open) */
 
 
-int termnote_close(TERMNOTE *op)
+int termnote_close(termnote *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -302,7 +284,7 @@ int termnote_close(TERMNOTE *op)
 
 
 /* make a log entry */
-int termnote_printf(TERMNOTE *op,cchar **rpp,int n,int o,cchar *fmt,...)
+int termnote_printf(termnote *op,cchar **rpp,int n,int o,cchar *fmt,...)
 {
 	int		rs ;
 
@@ -319,18 +301,14 @@ int termnote_printf(TERMNOTE *op,cchar **rpp,int n,int o,cchar *fmt,...)
 
 
 /* make a log entry */
-int termnote_vprintf(TERMNOTE *op,cchar **rpp,int n,int o,
+int termnote_vprintf(termnote *op,cchar **rpp,int n,int o,
 		cchar *fmt,va_list ap)
 {
-	const int	olen = TERMNOTE_BUFSIZE ;
+	cint	olen = TERMNOTE_BUFSIZE ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	char		*obuf ;
-
-#if	CF_DEBUGS
-	debugprintf("termnote_printf: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (rpp == NULL) return SR_FAULT ;
@@ -353,7 +331,7 @@ int termnote_vprintf(TERMNOTE *op,cchar **rpp,int n,int o,
 /* end subroutine (termnote_vprintf) */
 
 
-int termnote_check(TERMNOTE *op,time_t dt)
+int termnote_check(termnote *op,time_t dt)
 {
 	int		rs = SR_OK ;
 
@@ -370,18 +348,12 @@ int termnote_check(TERMNOTE *op,time_t dt)
 	        if ((dt - op->ti_logcheck) >= TO_LOGCHECK) {
 		    op->ti_logcheck = dt ;
 	            rs = logfile_check(&op->lf,dt) ;
-#if	CF_DEBUGN
-		{
-		cchar	*dfname = TERMNOTE_DEBFNAME ;
-		nprintf(dfname,"logfile_check() rs=%d\n",rs) ;
-		}
-#endif
 		}
 	    }
 
 	    if ((rs >= 0) && op->open.tx) {
 	        if ((dt - op->ti_tmpx) >= TO_TMPX) {
-	            op->open.tx = FALSE ;
+	            op->open.tx = false ;
 	            rs = tmpx_close(&op->tx) ;
 	        } else
 	            rs = tmpx_check(&op->tx,dt) ;
@@ -416,28 +388,14 @@ int		slen ;
 
 	if (m < 1) m = INT_MAX ;
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; rpp[i] != NULL ; i += 1) {
-		debugprintf("termnote_write: r[%u]=%s\n",i,rpp[i]) ;
-	    }
-	    debugprintf("termnte_write: max=%d\n",m) ;
-	    debugprintf("termnte_write: bell=%u biff=%u all=%u\n",
-		((o & TERMNOTE_OBELL)?1:0),
-		((o & TERMNOTE_OBIFF)?1:0),
-		((o & TERMNOTE_OALL)?1:0)) ;
-	}
-#endif /* CF_DEBUGS */
-
 	if ((rs >= 0) && op->open.lf) {
 	    char	sublogid[LOGIDLEN+1] ;
 	    char	tbuf[TIMEBUFLEN+1] ;
 	    if ((rs = snsdd(sublogid,LOGIDLEN,op->logid,op->sn)) >= 0) {
 		if ((rs = logfile_setid(&op->lf,sublogid)) >= 0) {
-		    const int	f_bell = ((o & TERMNOTE_OBELL)?1:0) ;
-		    const int	f_biff = ((o & TERMNOTE_OBIFF)?1:0) ;
-		    const int	f_all = ((o & TERMNOTE_OALL)?1:0) ;
+		    cint	f_bell = ((o & TERMNOTE_OBELL)?1:0) ;
+		    cint	f_biff = ((o & TERMNOTE_OBIFF)?1:0) ;
+		    cint	f_all = ((o & TERMNOTE_OALL)?1:0) ;
 		    cchar		*fmt ;
 		    if (dt == 0) dt = time(NULL) ;
 		    timestr_logz(dt,tbuf),
@@ -450,14 +408,7 @@ int		slen ;
 	if (slen < 0) slen = strlen(sbuf) ;
 
 	if ((rs >= 0) && (slen > 0)) {
-
-#if	CF_DEBUGS
-	debugprintf("termnote_write: note=>%t<\n",
-		sbuf,strlinelen(sbuf,slen,40)) ;
-#endif
-
 /* ok, now we really go */
-
 	    rs = termnote_writer(op,rpp,m,o,sbuf,slen) ;
 	    c = rs ;
 
@@ -478,10 +429,6 @@ int		slen ;
 
 	} /* end if (not-empty) */
 
-#if	CF_DEBUGS
-	debugprintf("termnote_write: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (termnote_write) */
@@ -490,16 +437,16 @@ int		slen ;
 /* private subroutines */
 
 
-static int termnote_writer(TERMNOTE *op,cchar **rpp,int m,int o,
+static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 		cchar *sp,int sl)
 {
 	BUFFER		ob ;
-	const int	bsize = (sl + 40) ;
+	cint	bsize = (sl + 40) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = buffer_start(&ob,bsize)) >= 0) {
-	    const int	maxlines = TERMNOTE_MAXLINES ;
+	    cint	maxlines = TERMNOTE_MAXLINES ;
 	    int		lines = 0 ;
 	    cchar	*tp ;
 
@@ -545,10 +492,10 @@ static int termnote_writer(TERMNOTE *op,cchar **rpp,int m,int o,
 /* end subroutine (termnote_writer) */
 
 
-static int termnote_bufline(TERMNOTE *op,BUFFER *obp,cchar *lp,int ll)
+static int termnote_bufline(termnote *op,BUFFER *obp,cchar *lp,int ll)
 {
-	const int	cols = COLUMNS ;
-	const int	tmplen = COLUMNS ;
+	cint	cols = COLUMNS ;
+	cint	tmplen = COLUMNS ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -558,11 +505,6 @@ static int termnote_bufline(TERMNOTE *op,BUFFER *obp,cchar *lp,int ll)
 	if (ll < 0) ll = strlen(lp) ;
 
 	if (lp[ll-1] == '\n') ll -= 1 ;
-
-#if	CF_DEBUGS
-	debugprintf("termnote_bufline: line=>%t<\n",
-		lp,strlinelen(lp,ll,40)) ;
-#endif
 
 	if (ll > 0) {
 	    LINEFOLD	lf ;
@@ -600,16 +542,11 @@ static int termnote_bufline(TERMNOTE *op,BUFFER *obp,cchar *lp,int ll)
 	    } /* end if (linefold) */
 	} /* end if (non-zero) */
 
-#if	CF_DEBUGS
-	debugprintf("termnote_bufline: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (termnote_bufline) */
 
-
-static int termnote_bufextra(TERMNOTE *op,BUFFER *obp,int o)
+static int termnote_bufextra(termnote *op,BUFFER *obp,int o)
 {
 	int		rs = SR_OK ;
 
@@ -624,25 +561,17 @@ static int termnote_bufextra(TERMNOTE *op,BUFFER *obp,int o)
 /* end subroutine (termnote_bufextra) */
 
 
-static int termnote_dispose(TERMNOTE *op,cchar **rpp,int n,int o,
+static int termnote_dispose(termnote *op,cchar **rpp,int n,int o,
 		cchar *bp,int bl)
 {
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("termnote_dispose: ent\n") ;
-#endif
-
 	for (i = 0 ; (rs >= 0) && (rpp[i] != NULL) ; i += 1) {
 	    rs = termnote_disposeuser(op,n,o,bp,bl,rpp[i]) ;
 	    c += rs ;
 	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("termnote_dispose: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -658,8 +587,8 @@ int		bl ;
 cchar	un[] ;
 {
 	VECOBJ		uts ;
-	const int	utsize = sizeof(USERTERM) ;
-	const int	tdlen = TERMDEVLEN ;
+	cint	utsize = sizeof(USERTERM) ;
+	cint	tdlen = TERMDEVLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		i ;
@@ -667,28 +596,14 @@ cchar	un[] ;
 	cchar	*devdname = DEVDNAME ;
 	char		termfname[TERMDEVLEN+1] ;
 
-#if	CF_DEBUGS
-	debugprintf("termnote_disposeuser: u=%s\n",un) ;
-#endif
-
 	if ((rs = vecobj_start(&uts,utsize,0,0)) >= 0) {
-	    VECSTR	lines ;
+	    vecstr	lines ;
 
 	    if ((rs = vecstr_start(&lines,0,0)) >= 0) {
 	        int	nlines ;
 
 		rs = tmpx_getuserlines(&op->tx,&lines,un) ;
 		nlines = rs ;
-
-#if	CF_DEBUGS
-		debugprintf("termnote_disposeuser: tmpx_getuserlines() rs=%d\n",
-			rs) ;
-		{
-		    cchar	*cp ;
-		    for (i = 0 ; vecstr_get(&lines,i,&cp) >= 0 ; i += 1)
-			debugprintf("termnote_disposeuser: termline=%s\n",cp) ;
-		}
-#endif /* CF_DEBUGS */
 
 		if (op->open.lf)
 		    logfile_printf(&op->lf,"u=%s termlines=%u",un,nlines) ;
@@ -702,30 +617,16 @@ cchar	un[] ;
 		    if (lp == NULL) continue ;
 		    ll = strlen(lp) ;
 
-#if	CF_DEBUGS
-			debugprintf("termnote_disposeuser: 2 termline=%s\n",
-				lp) ;
-#endif
 		    if (ll > 0) {
 			rs = mkpath2w(termfname,devdname,lp,ll) ;
 			tl = rs ;
 
-#if	CF_DEBUGS
-			debugprintf("termnote_disposeuser: termdev=%s\n",
-			    termfname) ;
-#endif
 			if (rs >= 0) {
 			    rs1 = sncpy1w(ut.termdev,tdlen,termfname,tl) ;
 			    if (rs1 >= 0) {
 				struct ustat	sb ;
-				int		f_go = FALSE ;
+				int		f_go = false ;
 				rs1 = u_stat(ut.termdev,&sb) ;
-#if	CF_DEBUGS
-				debugprintf("termnote_disposeuser: "
-					"u_stat() rs=%d\n",rs1) ;
-				debugprintf("termnote_disposeuser: "
-					"mode=%04o\n",(sb.st_mode & S_IAMB)) ;
-#endif
 				if (rs1 >= 0) {
 				    f_go = (sb.st_mode & S_IWGRP) ;
 				    if (f_go && (o & TERMNOTE_OBIFF))
@@ -733,10 +634,6 @@ cchar	un[] ;
 				}
 				if ((rs1 >= 0) && f_go) {
 				    rs1 = sperm(&op->id,&sb,W_OK) ;
-#if	CF_DEBUGS
-				debugprintf("termnote_disposeuser: "
-					"sperm() rs=%d\n",rs1) ;
-#endif
 				    if (rs1 >= 0) {
 					ut.atime = sb.st_atime ;
 					rs = vecobj_add(&uts,&ut) ;
@@ -755,10 +652,6 @@ cchar	un[] ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (user-term lines) */
 
-#if	CF_DEBUGS
-	    debugprintf("termnote_disposeuser: mid rs=%d\n",rs) ;
-#endif
-
 	    if (rs >= 0) {
 	        USERTERM	*utp ;
 		int		navail ;
@@ -772,12 +665,6 @@ cchar	un[] ;
 		for (i = 0 ; vecobj_get(&uts,i,&utp) >= 0 ; i += 1) {
 		    if (utp == NULL) continue ;
 		    rs1 = termnote_disposewrite(op,o,bp,bl,utp->termdev) ;
-#if	CF_DEBUGS
-	    	    debugprintf("termnote_disposeuser: termdev=%s\n",
-			utp->termdev) ;
-	    	    debugprintf("termnote_disposeuser: "
-				"_disposewrite() rs=%d\n",rs) ;
-#endif
 		    if (rs1 > 0) {
 			n += 1 ;
 			c += 1 ;
@@ -797,10 +684,6 @@ cchar	un[] ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (user-term list) */
 
-#if	CF_DEBUGS
-	debugprintf("termnote_disposeuser: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (termnote_disposeuser) */
@@ -814,13 +697,13 @@ cchar	*bp ;
 int		bl ;
 cchar	termdev[] ;
 {
-	const int	of = (O_WRONLY | O_NOCTTY | O_NDELAY) ;
-	const int	to = 5 ;
+	cint	of = (O_WRONLY | O_NOCTTY | O_NDELAY) ;
+	cint	to = 5 ;
 	int		rs ;
 	int		len = 0 ;
 
 	if ((rs = u_open(termdev,of,0666)) >= 0) {
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    rs = writeto(fd,bp,bl,to) ;
 	    len = rs ;
 	    u_close(fd) ;
@@ -831,7 +714,7 @@ cchar	termdev[] ;
 /* end subroutine (termnote_disposewrite) */
 
 
-static int termnote_txopen(TERMNOTE *op,time_t dt)
+static int termnote_txopen(termnote *op,time_t dt)
 {
 	int		rs = SR_OK ;
 
@@ -847,13 +730,13 @@ static int termnote_txopen(TERMNOTE *op,time_t dt)
 /* end subroutine (termnote_txopen) */
 
 
-static int termnote_txclose(TERMNOTE *op)
+static int termnote_txclose(termnote *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op->open.tx) {
-	    op->open.tx = FALSE ;
+	    op->open.tx = false ;
 	    rs1 = tmpx_close(&op->tx) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -863,22 +746,22 @@ static int termnote_txclose(TERMNOTE *op)
 /* end subroutine (termnote_txclose) */
 
 
-static int termnote_lfopen(TERMNOTE *op,time_t dt)
+static int termnote_lfopen(termnote *op,time_t dt)
 {
-	const mode_t	om = 0666 ;
-	const int	of = O_RDWR ;
+	cint		of = O_RDWR ;
+	cmode		om = 0666 ;
 	int		rs = SR_OK ;
-	int		f_opened = FALSE ;
+	int		f_opened = false ;
 
 	if (! op->init.lf) {
 	    cchar	*sn = TERMNOTE_SEARCHNAME ;
 	    char	lfname[MAXPATHLEN+1] ;
-	    op->init.lf = TRUE ;
+	    op->init.lf = true ;
 	    if (rs >= 0) {
 		rs = termnote_nodename(op) ;
 	    }
 	    if (rs >= 0) {
-		const pid_t	pid = ugetpid() ;
+		const pid_t	pid = uc_getpid() ;
 		rs = mkplogid(op->logid,LOGIDLEN,op->nodename,pid) ;
 	    }
 	    if (rs >= 0) {
@@ -887,18 +770,8 @@ static int termnote_lfopen(TERMNOTE *op,time_t dt)
 	    if (rs >= 0) {
 		LOGFILE	*lfp = &op->lf ;
 	        if ((rs = logfile_open(lfp,lfname,of,om,op->logid)) >= 0) {
-		    f_opened = TRUE ;
-	            op->open.lf = TRUE ;
-#if	CF_DEBUGS
-		debugprintf("termnote_lfopen: logfile_open() rs=%d\n",rs1) ;
-#endif
-#if	CF_DEBUGN
-		{
-		cchar	*dfname = TERMNOTE_DEBFNAME ;
-		nprintf(dfname,"logfname=%s\n",lfname) ;
-		nprintf(dfname,"logfile_open() rs=%d\n",rs1) ;
-		}
-#endif
+		    f_opened = true ;
+	            op->open.lf = true ;
 		    if (rs >= 0) {
 		        rs = logfile_checksize(&op->lf,TERMNOTE_LOGSIZE) ;
 		    }
@@ -913,10 +786,6 @@ static int termnote_lfopen(TERMNOTE *op,time_t dt)
 			timestr_logz(dt,timebuf) ;
 			logfile_printf(&op->lf,"%s %s",timebuf,sn) ;
 			rs = logfile_printf(&op->lf,"%s!%s",nn,un) ;
-#if	CF_DEBUGS
-			debugprintf("termnote_lfopen: "
-				"logfile_printf() rs=%d\n",rs1) ;
-#endif
 		    }
 		} else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
@@ -924,22 +793,18 @@ static int termnote_lfopen(TERMNOTE *op,time_t dt)
 	    } /* end if (ok) */
 	} /* end if (needed initialization) */
 
-#if	CF_DEBUGS
-	debugprintf("termnote_lfopen: ret rs=%d f_open=%u\n",rs,f_opened) ;
-#endif
-
 	return (rs >= 0) ? f_opened : rs ;
 }
 /* end subroutine (termnote_lfopen) */
 
 
-static int termnote_lfclose(TERMNOTE *op)
+static int termnote_lfclose(termnote *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op->open.lf) {
-	    op->open.lf = FALSE ;
+	    op->open.lf = false ;
 	    rs1 = logfile_close(&op->lf) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -949,7 +814,7 @@ static int termnote_lfclose(TERMNOTE *op)
 /* end subroutine (termnote_lfclose) */
 
 
-static int termnote_username(TERMNOTE *op)
+static int termnote_username(termnote *op)
 {
 	int		rs = SR_OK ;
 	int		ul ;
@@ -965,7 +830,7 @@ static int termnote_username(TERMNOTE *op)
 /* end subroutine (termnote_username) */
 
 
-static int termnote_nodename(TERMNOTE *op)
+static int termnote_nodename(termnote *op)
 {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
@@ -1041,13 +906,10 @@ static int mkclean(char *outbuf,int outlen,cchar *sbuf,int slen)
 }
 /* end subroutine (mkclean) */
 
-
-static int hasourbad(cchar *sp,int sl)
-{
-	int		ch ;
-	int		f = FALSE ;
+static bool hasourbad(cchar *sp,int sl) noex {
+	bool		f = false ;
 	while (sl && (sp[0] != '\0')) {
-	    ch = (sp[0] & 0xff) ;
+	    cint	ch = (sp[0] & 0xff) ;
 	    f = isourbad(ch) ;
 	    if (f) break ;
 	    sp += 1 ;
@@ -1057,17 +919,15 @@ static int hasourbad(cchar *sp,int sl)
 }
 /* end subroutine (hasourbad) */
 
-
-static int isourbad(int ch)
-{
-	int		f ;
+static bool isourbad(int ch) noex {
+	bool		f = false ;
 	switch (ch) {
 	case CH_SO:
 	case CH_SI:
 	case CH_SS2:
 	case CH_SS3:
 	case '\t':
-	    f = FALSE ;
+	    f = false ;
 	    break ;
 	default:
 	    f = (! isprintlatin(ch)) ;

@@ -39,7 +39,7 @@ struct termnote_flags {
 
 struct termnote_head {
 	ids		id ;
-	TMPX		tx ;
+	tmpx		tx ;
 	logfile		lf ;
 	cchar		*pr ;
 	cchar		*nodename ;

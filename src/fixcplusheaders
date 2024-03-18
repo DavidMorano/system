@@ -1,0 +1,27 @@
+#!/usr/extra/bin/ksh
+# FIXCPLUSHEADERS
+
+DN=/dev/null
+SF=cplusheaders.txt
+
+if [[ -e ${SF} ]] ; then
+  for F in "${@}" ; do
+    if [[ -r "${F}" ]] ; then
+      if fgrep -q -f ${SF} ${F} ; then
+      ed - ${F} <<\EOF
+g/limits.h/s//climits/g
+g/errno.h/s//cerrno/g
+g/signal.h/s//csignal/g
+g/stddef.h/s//cstdef/g
+g/stdlib.h/s//cstdlib/g
+g/stdio.h/s//cstdio/g
+g/stdarg.h/s//cstdarg/g
+	w
+	q
+EOF
+      fi
+    fi
+  done
+fi
+
+

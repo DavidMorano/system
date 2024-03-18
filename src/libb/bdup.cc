@@ -51,14 +51,16 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bdup(bfile *fp,bfile *fnewp) noex {
 	int		rs = SR_FAULT ;
-	if (fp && fnewp) {
-	    rs = SR_NOTOPEN ;
+	if ((rs = bmagic(fp,fnewp)) >= 0) {
 	    memcpy(fnewp,fp,sizeof(bfile)) ;	/* <- copy */
-	    if (fp->magic == BFILE_MAGIC) {
+	    if ((rs = bfile_active(fp)) > 0) {
 	        if ((rs = bfile_flush(fp)) >= 0) {
 	            if ((rs = u_dup(fp->fd)) >= 0) {
 	                fnewp->fd = rs ;
@@ -79,7 +81,7 @@ int bdup(bfile *fp,bfile *fnewp) noex {
 		        fnewp->magic = 0 ;
 	            }
 	        } /* end if (bfile_flush) */
-	    } /* end if (open) */
+	    } /* end if (active) */
 	} /* end if (non-null) */
 	return rs ;
 }

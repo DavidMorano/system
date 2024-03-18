@@ -1,12 +1,11 @@
-/* bprintf */
+/* bprintf SUPPORT */
+/* lang=C++20 */
 
 /* this is a home made "printf" routine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* debug print-outs */
 #define	CF_DEBUGFLUSH	0		/* ? */
-
 
 /* revision history:
 
@@ -19,22 +18,15 @@
 
 /*******************************************************************************
 
-        This version of printf is compatible with the Version 7 C printf. This
-        function is implemented differently in that the function that does the
-        actual formatting is 'bufprintf(3dam)'.
-
+	This version of printf is compatible with the Version 7 C
+	printf. This function is implemented differently in that
+	the function that does the actual formatting is 'bufprintf(3dam)'.
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
-#include	<ctype.h>
 #include	<cstdarg>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

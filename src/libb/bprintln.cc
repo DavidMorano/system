@@ -1,6 +1,8 @@
-/* bprintline */
+/* bprintln SUPPORT */
+/* lang=C++20 */
 
 /* print out a single line */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -14,37 +16,31 @@
 
 /*******************************************************************************
 
-	This subroutine is very simple.  It just avoids calling 'bprintf(3b)'
-	when that would have been completely fine! :-)
+	Name:
+	bprintln
+
+	Description:
+	This subroutine is very simple.  It just avoids calling
+	|bprintf(3b)| when that would have been completely fine!
+	:-)
 
 	Synopsis:
-
-	int bprintline(fp,lbuf,llen)
-	bfile		*fp ;
-	const char	lbuf[] ;
-	int		llen ;
+	int bprintline(bfile *fp,cchar *lbuf,int llen) noex
 
 	Arguments:
-
 	fp		file-pointer
 	lbuf		buffer of characters to print out
 	llen		length of characters to print
 
 	Returns:
-
-	<0		error
 	>=0		number of characters printed
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ascii.h>
@@ -54,11 +50,12 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bprintln(bfile *fp,cchar *lbuf,int llen)
-{
+int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -91,16 +88,12 @@ int bprintln(bfile *fp,cchar *lbuf,int llen)
 }
 /* end subroutine (bprintln) */
 
-
-int bprint(bfile *fp,cchar *lbuf,int llen)
-{
+int bprint(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
 }
 /* end subroutine (bprint) */
 
-
-int bprintline(bfile *fp,cchar *lbuf,int llen)
-{
+int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
 }
 /* end subroutine (bprintline) */

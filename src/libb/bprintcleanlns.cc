@@ -1,11 +1,11 @@
-/* bprintcleanlines */
+/* bprintcleanlns SUPPORT */
+/* lang=C++20 */
 
 /* print a clean (cleaned up) line of text */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_LINEFOLD	1		/* use 'linefold(3dam)' */
-
 
 /* revision history:
 
@@ -20,20 +20,15 @@
 
 	This subroutine prints out a cleaned up line of text.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<localmisc.h>
@@ -93,15 +88,12 @@ static int	isend(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bprintcleanlines(ofp,linelen,lp,ll)
-bfile	*ofp ;
-int	linelen ;
-char	lp[] ;
-int	ll ;
-{
+int bprintcleanlns(bfile *ofp,int linelen,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 

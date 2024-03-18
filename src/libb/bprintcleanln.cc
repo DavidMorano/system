@@ -1,11 +1,11 @@
-/* bprintcleanline */
+/* bprintcleanln SUPPORT */
+/* lang=C++20 */
 
 /* print a clean (cleaned up) line of text */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_BADSUB	1		/* fill with NBSP */
-
 
 /* revision history:
 
@@ -20,13 +20,9 @@
 
 	This subroutine prints out a cleaned up line of text.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -96,11 +92,12 @@ static int	isend(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bprintcleanline(bfile *ofp,cchar *lp,int ll)
-{
+int bprintcleanln(bfile *ofp,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		oli = 0 ;
 	int		f_needeol = FALSE ;
