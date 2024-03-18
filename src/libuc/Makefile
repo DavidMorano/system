@@ -1186,6 +1186,7 @@ xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
 calstrs.o:		calstrs.cc calstrs.h
+ipow.o:			ipow.cc ipow.h
 #
 isproc.o:		isproc.cc isproc.h
 #

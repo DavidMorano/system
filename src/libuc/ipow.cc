@@ -65,7 +65,7 @@
 
 /* local variables */
 
-constexpt bool		f_dynamic = CF_DYNAMIC ;
+constexpr bool		f_dynamic = CF_DYNAMIC ;
 
 
 /* exported variables */

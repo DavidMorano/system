@@ -1,14 +1,12 @@
-/* b_numbers */
+/* b_numbers SUPPORT */
 /* lang=C++11 */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -22,12 +20,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ numbers <num-n>[,<num-k>] ...
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -41,20 +36,19 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
+#include	<ctime>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
 #include	<estrings.h>
 #include	<cfdec.h>
+#include	<ipow.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -76,13 +70,11 @@
 extern "C" int b_numbers(int,cchar **,void *) ;
 extern "C" int p_numbers(int,cchar **,cchar **,void *) ;
 
-extern "C" LONG	factorial(int) ;
-extern "C" LONG	permutations(int,int) ;
-extern "C" LONG	combinations(int,int) ;
-extern "C" LONG	multicombinations(int,int) ;
-extern "C" LONG	ipowell(int,int) ;
+extern "C" long	factorial(int) ;
+extern "C" long	permutations(int,int) ;
+extern "C" long	combinations(int,int) ;
+extern "C" long	multicombinations(int,int) ;
 
-extern "C" int	ipow(int,int) ;
 extern "C" int	matostr(cchar **,int,cchar *,int) ;
 extern "C" int	matstr(cchar **,cchar *,int) ;
 extern "C" int	matcasestr(cchar **,cchar *,int) ;
@@ -1186,7 +1178,7 @@ static int procspec(PROGINFO *pip,SHIO *ofp,cchar *np,int nl)
 	if (nl < 0) nl = strlen(np) ;
 
 	if ((rs = query.load(np,nl)) >= 0) {
-	    LONG	v = 0 ;
+	    long	v = 0 ;
 	    int		n = query.n ;
 	    int		k = query.k ;
 	    if (rs > 0) numtype = rs ;

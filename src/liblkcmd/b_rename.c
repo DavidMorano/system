@@ -1,13 +1,12 @@
-/* b_rename */
+/* b_rename SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to rename a file */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,18 +19,17 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if any) difficulty.
+	Description:
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if any) difficulty.
 
 	Synopsis:
-
 	$ rename { <basename> | -b <basename> } <file(s)> [-s <suffix>] 
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -43,21 +41,20 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<sbuf.h>
+#include	<ipow.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -105,7 +102,6 @@ extern int	ctdecpi(char *,int,int,int) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	ipow(int,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	hasuc(const char *,int) ;
 extern int	isdigitlatin(int) ;
@@ -1464,8 +1460,8 @@ static int zombiename_start(ZOMBIENAME *op,VECSTR *nnp)
 
 static int zombiename_rename(ZOMBIENAME *op,cchar *fname,char *tmpfname)
 {
-	struct ustat	usb ;
-	struct ustat	*sbp = &usb ;
+	USTAT		usb ;
+	USTAT		*sbp = &usb ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nprec = ipow(10,DEFPREC) ;

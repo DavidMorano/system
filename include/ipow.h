@@ -27,6 +27,10 @@ EXTERNC_begin
 
 extern int	ipow(int,int) noex ;
 
+static inline int ipowell(int b,int e) noex {
+	return ipow(b,e) ;
+}
+
 EXTERNC_end
 
 

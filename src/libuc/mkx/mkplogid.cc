@@ -52,6 +52,8 @@
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<strwcpy.h>
+#include	<ndigit.h>
+#include	<ipow.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
@@ -63,11 +65,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	ndigits(int,int) noex ;
-    extern int	ipow(int,int) noex ;
-}
 
 
 /* external variables */
