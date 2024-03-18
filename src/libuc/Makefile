@@ -551,7 +551,7 @@ prebase.o:	$(OBJ_PREBASE)
 
 
 # base
-OBJ0_BASE= varnames.o syswords.o valuelimits.o digbufsizes.o ucvariables.o
+OBJ0_BASE= varnames.o syswords.o valuelims.o digbufsizes.o ucvariables.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE= bufsizedata.o getbufsizenames.o
 OBJ3_BASE= getbufsize.o bufsizevar.o 
@@ -793,7 +793,7 @@ getbufsize.o:		getbufsizenames.h usysdefs.h bufsizedata.hh
 getbufsizenames.o:	getbufsizenames.c getbufsizenames.h
 varnames.o:		varnames.cc varnames.hh
 syswords.o:		syswords.cc syswords.hh
-valuelimits.o:		valuelimits.cc valuelimits.hh
+valuelims.o:		valuelims.cc valuelims.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
@@ -1394,7 +1394,7 @@ testmemtrack.x:		$(MTOBJ)
 testmemtrack.o:		testmemtrack.cc
 
 # TESYVALUES
-OBJ_TV= testvalues.o digbufsizes.o valuelimits.o ucvariables.o
+OBJ_TV= testvalues.o digbufsizes.o valuelims.o ucvariables.o
 testvalues.x:	$(OBJ_TV)
 	$(LD) -o $@ $(OBJ_TV)
 

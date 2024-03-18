@@ -32,7 +32,7 @@
 #include	<clanguage.h>
 #include	<syswords.hh>
 #include	<varnames.hh>
-#include	<valuelimits.hh>
+#include	<valuelims.hh>
 #include	<digbufsizes.hh>
 
 

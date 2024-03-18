@@ -2,8 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} limits.h errno.h signal.h stddef.h stdlib.h stdio.h string.h"
-NAMES="${NAMES} stdarg.h"
+NAMES="${NAMES} valuelimits.hh "
 
 
 DN=/dev/null
@@ -13,13 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/limits.h/s//climits/g
-g/errno.h/s//cerrno/g
-g/signal.h/s//csignal/g
-g/stddef.h/s//cstdef/g
-g/stdlib.h/s//cstdlib/g
-g/stdio.h/s//cstdio/g
-g/stdarg.h/s//cstdarg/g
+g/valuelimits.hh/s//valuelims.hh/g
 	w
 	q
 EOF

@@ -24,7 +24,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	"valuelimits.hh"
+#include	"valuelims.hh"
 
 
 /* local defines */
