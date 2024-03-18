@@ -942,17 +942,21 @@ static int vcmpatime(cvoid *v1pp,cvoid *v2pp) noex {
 	USERTERM	**e1pp = (USERTERM **) v1pp ;
 	USERTERM	**e2pp = (USERTERM **) v2pp ;
 	int		rc = 0 ;
-	if (*e1pp || *e2pp) {
-	    if (*e1pp) {
-	        if (*e2pp) {
-	            rc = (*e2pp)->atime - (*e1pp)->atime ;
+	{
+	    USERTERM	*e1p = *e1pp ;
+	    USERTERM	*e2p = *e2pp ;
+	    if (e1p || e2p) {
+	        if (e1p) {
+	            if (e2p) {
+	                rc = e2p->atime - e1p->atime ;
+	            } else {
+	                rc = -1 ;
+		    }
 	        } else {
-	            rc = -1 ;
-		}
-	    } else {
-	        rc = 1 ;
+	            rc = 1 ;
+	        }
 	    }
-	} 
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (vcmpatime) */
