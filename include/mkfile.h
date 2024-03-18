@@ -25,7 +25,6 @@
 
 EXTERNC_begin
 
-extern int mktmpfile(char *,cchar *,mode_t) noex ;
 extern int mkjobfile(char *,cchar *,mode_t) noex ;
 extern int mkartfile(char *,cchar *,cchar *,int,mode_t) noex ;
 extern int mkdatefile(char *,cchar *,cchar *,mode_t) noex ;

@@ -8,8 +8,9 @@
 /* revision history:
 
 	= 2002-07-13, David A­D­ Morano
-	I first made this up to get some addition noise from a UNIX®
-	system that is fairly portable (a big problem).
+	I first made this up to get some additional noise from a
+	UNIX® system and which is coded in a fairly portable way
+	(a big problem).
 
 	= 2024-02-27, David A­D­ Morano
 	This whole subroutine is being changed (about to do it).
@@ -17,8 +18,8 @@
 	available.  The world has changed since 2002 (if this was
 	even originally written as late as that).  I am wiping this
 	old crap totall clean, and writing this to use |getrandom(3c)|
-	esclusively.  For those f*cked-up operating systems that do
-	not natively provide |getrandom(3c)| -- like f*cked-up Darwin
+	esclusively.  For those messed-up operating systems that do
+	not natively provide |getrandom(3c)| -- like messed-up Darwin
 	(MacOS) -- then we use the hacked version of |getrandom(3c)|
 	that was written for it as a stop-gap measure.  Oh, before I
 	leave here, I just want to say "F*ck You MacOS" for not 
