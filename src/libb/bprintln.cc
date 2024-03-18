@@ -42,9 +42,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<bfile.h>
 #include	<ascii.h>
 #include	<localmisc.h>
+
+#include	"bfile.h"
 
 
 /* local defines */
@@ -56,34 +57,27 @@
 /* exported subroutines */
 
 int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		wlen = 0 ;
-
-	if (fp == NULL) return SR_FAULT ;
-	if (lbuf == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (! fp->f.nullfile) {
-	    int		f_needeol ;
-
-	    if (llen < 0) llen = strlen(lbuf) ;
-
-	    f_needeol = ((llen == 0) || (lbuf[llen-1] != CH_NL)) ;
-	    if (f_needeol) rs = breserve(fp,(llen+1)) ;
-
-	    if ((rs >= 0) && (llen > 0)) {
-	        rs = bwrite(fp,lbuf,llen) ;
-	        wlen += rs ;
-	    }
-
-	    if ((rs >= 0) && f_needeol) {
-	        rs = bputc(fp,CH_NL) ;
-	        wlen += rs ;
-	    }
-
-	} /* end if (not nullfile) */
-
+	if ((rs = bmagic(fp,lbuf)) >= 0) {
+	    if ((rs = bfile_active(fp)) > 0) {
+	        bool	feol = false ;
+	        if (llen < 0) llen = strlen(lbuf) ;
+	        feol = feol || (llen == 0) ;
+		feol = feol || (lbuf[llen-1] != CH_NL) ;
+	        if (feol) {
+		    rs = breserve(fp,(llen+1)) ;
+		}
+	        if ((rs >= 0) && (llen > 0)) {
+	            rs = bwrite(fp,lbuf,llen) ;
+	            wlen += rs ;
+	        }
+	        if ((rs >= 0) && feol) {
+	            rs = bputc(fp,CH_NL) ;
+	            wlen += rs ;
+	        }
+	    } /* end if (active) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintln) */

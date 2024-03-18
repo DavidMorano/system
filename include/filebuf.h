@@ -27,8 +27,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdarg.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -47,9 +45,9 @@ struct filebuf_flags {
 } ;
 
 struct filebuf_head {
-	off_t		off ;		/* virtual file pointer */
 	char		*buf ;		/* constant */
 	char		*bp ;		/* goes up with use */
+	off_t		off ;		/* virtual file pointer */
 	FILEBUF_FL	f ;
 	int		fd ;		/* file-descriptor */
 	int		of ;		/* open-flags */
