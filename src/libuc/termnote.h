@@ -15,7 +15,7 @@
 #include	<tmpx.h>
 #include	<ids.h>
 #include	<logfile.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |LOGIDLEN| */
 
 
 /* object defines */
@@ -42,7 +42,8 @@ struct termnote_head {
 	tmpx		tx ;
 	logfile		lf ;
 	cchar		*pr ;
-	cchar		*nodename ;
+	char		*nodename ;
+	char		*username ;
 	time_t		ti_check ;
 	time_t		ti_tmpx ;
 	time_t		ti_logcheck ;
@@ -50,7 +51,6 @@ struct termnote_head {
 	TERMNOTE_FL	init, open ;
 	uint		magic ;
 	int		sn ;		/* serial-number */
-	char		username[USERNAMELEN+1] ;
 	char		logid[LOGIDLEN+1] ;
 } ;
 
