@@ -1,7 +1,7 @@
 /* mkfile HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* make a file of a certain type */
 /* version %I% last-modified %G% */
 
 

@@ -1,7 +1,7 @@
 /* bufsizedata HEADER */
 /* lang=C++20 */
 
-/* buffer-size-data */
+/* buffer-size-data (default value database) */
 /* version %I% last-modified %G% */
 
 

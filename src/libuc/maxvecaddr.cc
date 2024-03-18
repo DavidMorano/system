@@ -37,6 +37,9 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 cchar *maxvecaddr(mainv va) noex {

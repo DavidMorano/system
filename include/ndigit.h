@@ -1,7 +1,7 @@
 /* ndigit HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* calculate the number of digits in a given integer given a number-base */
 /* version %I% last-modified %G% */
 
 

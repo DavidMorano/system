@@ -1,7 +1,7 @@
 /* printhelp HEADER */
 /* lang=C++20 */
 
-/* convert a single character to a given case */
+/* print out a help file if we have one */
 /* version %I% last-modified %G% */
 
 

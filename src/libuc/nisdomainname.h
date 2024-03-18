@@ -1,7 +1,7 @@
 /* nisdomainname HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* retrieve the system NIS domain-name */
 /* version %I% last-modified %G% */
 
 

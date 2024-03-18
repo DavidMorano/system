@@ -1,7 +1,7 @@
 /* getrandom HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get some random data (some bytes) of a specified type */
 /* version %I% last-modified %G% */
 
 

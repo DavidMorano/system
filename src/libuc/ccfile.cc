@@ -1,7 +1,7 @@
 /* ccfile SUPPORT */
 /* lang=C++20 */
 
-/* C++ file operations */
+/* C++ file I-O operations */
 /* version %I% last-modified %G% */
 
 

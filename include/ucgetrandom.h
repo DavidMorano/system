@@ -1,7 +1,7 @@
 /* ucgetrnadom HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* LIBUC get some pseudo-randomo data from the operaring system */
 /* version %I% last-modified %G% */
 
 

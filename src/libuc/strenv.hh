@@ -1,7 +1,7 @@
 /* strenv HEADER */
 /* lang=C++20 */
 
-/* this object provides a pointer to a library string-value */
+/* provide a pointer to a library string-value */
 /* version %I% last-modified %G% */
 
 

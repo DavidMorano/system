@@ -1,7 +1,7 @@
 /* strnul HEADER */
 /* lang=C++20 */
 
-/* assert a NUL-terminated string */
+/* assert a NUL-terminated string given a counted c-string */
 /* version %I% last-modified %G% */
 
 

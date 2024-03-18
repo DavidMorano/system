@@ -1,7 +1,7 @@
 /* willaddover HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* Will an Addition Overflow? */
 /* version %I% last-modified %G% */
 
 

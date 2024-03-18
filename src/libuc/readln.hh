@@ -1,7 +1,7 @@
 /* readln HEADER */
 /* lang=C++20 */
 
-/* convert a single character to a given case */
+/* read characters from Standard-Input (STDIN) */
 /* version %I% last-modified %G% */
 
 

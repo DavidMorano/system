@@ -1,7 +1,7 @@
 /* uctc HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* LIBUC Teermina-Control functions */
 /* version %I% last-modified %G% */
 
 

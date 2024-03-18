@@ -1,7 +1,7 @@
 /* clusterdb HEADER */
 /* lang=C20 */
 
-/* perform access table file related functions */
+/* manage a database of cluster names */
 /* version %I% last-modified %G% */
 
 

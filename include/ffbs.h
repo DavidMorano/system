@@ -1,7 +1,7 @@
 /* ffbs HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* Find-First-Bit-Set in various sized integers */
 /* version %I% last-modified %G% */
 
 

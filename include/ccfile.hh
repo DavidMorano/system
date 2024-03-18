@@ -1,7 +1,7 @@
 /* ccfile HEADER */
 /* lang=C++20 */
 
-/* convert a single character to a given case */
+/* C++ file I-O operations */
 /* version %I% last-modified %G% */
 
 

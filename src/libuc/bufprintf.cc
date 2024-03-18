@@ -1,10 +1,8 @@
-/* bufprintf */
+/* bufprintf SUPPOET */
+/* lang=C++20 */
 
 /* subroutine to format "buffered" output */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revistion history:
@@ -18,29 +16,23 @@
 
 /*******************************************************************************
 
-        This subroutine is used by 'printf' type routines to format an output
-        "buffer" from a format specification. This routine has no support for
-        floating point conversion since floating point formats are not general
-        enough for the most portable applications.
-
+	This subroutine is used by 'printf' type routines to format
+	an output "buffer" from a format specification. This routine
+	has no support for floating point conversion since floating
+	point formats are not general enough for the most portable
+	applications.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<stdarg.h>
-
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<format.h>
 #include	<localmisc.h>
 
 
 /* local defines */
-
-#define	MAXLEN		(MAXPATHLEN + 40)
 
 
 /* external references */
@@ -52,15 +44,15 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bufprintf(char *dbuf,int dlen,cchar *fmt,...)
-{
-	const int	m = 0 ;
-	int		rs ;
-	if (dbuf == NULL) return SR_FAULT ;
-	{
+int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
+	cint		m = 0 ;
+	int		rs = SR_FAULT ;
+	if (dbuf && fmt) {
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = format(dbuf,dlen,m,fmt,ap) ;
@@ -70,11 +62,13 @@ int bufprintf(char *dbuf,int dlen,cchar *fmt,...)
 }
 /* end subroutine (bufprintf) */
 
-
-int vbufprintf(char *dbuf,int dlen,cchar *fmt,va_list ap)
-{
-	const int	m = 0 ;
-	return format(dbuf,dlen,m,fmt,ap) ;
+int vbufprintf(char *dbuf,int dlen,cchar *fmt,va_list ap) noex {
+	cint		m = 0 ;
+	int		rs = SR_FAULT ;
+	if (dbuf && fmt) {
+	    rs = format(dbuf,dlen,m,fmt,ap) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (vbufprintf) */
 

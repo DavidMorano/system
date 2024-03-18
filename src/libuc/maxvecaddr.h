@@ -1,7 +1,7 @@
 /* maxvecaddr HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* Maximum-Vector-Address (see SUPPORT source file for more information) */
 /* version %I% last-modified %G% */
 
 
@@ -24,6 +24,8 @@
 
 
 EXTERNC_begin
+
+extern cchar	*maxvecaddr(mainv) noex ;
 
 EXTERNC_end
 

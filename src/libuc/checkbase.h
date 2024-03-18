@@ -1,7 +1,7 @@
 /* checkbase HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* test whether a string is composed of all characters of a given base */
 /* version %I% last-modified %G% */
 
 

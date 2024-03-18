@@ -1,7 +1,7 @@
 /* openshm HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* open a temporåry shared-memory segment */
 /* version %I% last-modified %G% */
 
 

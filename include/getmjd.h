@@ -1,7 +1,7 @@
 /* getmjd HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get (calculate) a Modified-Julian-Day (MJD) */
 /* version %I% last-modified %G% */
 
 

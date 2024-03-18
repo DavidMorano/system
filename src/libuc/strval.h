@@ -1,7 +1,7 @@
 /* strval HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* return (calculate) the numeric value of a given string */
 /* version %I% last-modified %G% */
 
 

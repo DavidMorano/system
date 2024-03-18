@@ -1,7 +1,7 @@
 /* constdiv HEADER */
 /* lang=C++20 */
 
-/* perform divion of a 32-bit value by a constant w/o using division */
+/* perform division of a 32-bit value by a constant w/o using division */
 /* version %I% last-modified %G% */
 
 
