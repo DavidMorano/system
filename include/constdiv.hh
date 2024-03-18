@@ -27,6 +27,19 @@
 	"Hacker's Delight," second edition, ch 10, 
 	"Integer division by constant"
 
+	Rules:
+	Unisigned integer division of 32-bit numbers (|uint|).
+
+	How-to-use:
+	{
+	    uint	n = «x1» ;
+	    uint	d = «x2» ;
+	    uint	q ;
+	    constdiv	diver(d) ;
+	    q = diver(n) ;
+	    cout << q << eol ;
+	}
+
 *******************************************************************************/
 
 #ifndef	CONSTDIV_INCLUDE
