@@ -1,7 +1,7 @@
 /* ipow HEADER */
 /* lang=C20 */
 
-/* calculate the integer expoential of an integer */
+/* calculate the integer exponential of an integer */
 /* version %I% last-modified %G% */
 
 

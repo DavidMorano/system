@@ -17,6 +17,10 @@
 
 /*******************************************************************************
 
+	Name:
+	ipow
+
+	Description:
         This subroutine calculates and returns an integer power for a given
         base.
 

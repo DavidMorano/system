@@ -893,7 +893,7 @@ ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library support
-libmallocxx.o:		libmalloccc.xx libmallocxx.h
+libmallocxx.o:		libmallocxx.cc libmallocxx.h
 
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.cc mapblock.hh
