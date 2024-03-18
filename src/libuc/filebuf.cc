@@ -4,7 +4,6 @@
 /* support low-overhead file bufferring requirements */
 /* version %I% last-modified %G% */
 
-#define	CF_NULTERM	0		/* NUL terminate read-string */
 
 /* revision history:
 
@@ -30,13 +29,15 @@
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>
 #include	<usystem.h>
 #include	<sysval.hh>
 #include	<bufsizevar.hh>
+#include	<mallocxx.h>
 #include	<intfloor.h>
 #include	<format.h>
 #include	<localmisc.h>
@@ -57,8 +58,8 @@
 
 /* imported namespaces */
 
-using std::min ;
-using std::max ;
+using std::min ;		/* subroutine-template */
+using std::max ;		/* subroutine-template */
 
 
 /* local typedefs */
@@ -93,7 +94,7 @@ static inline int filebuf_ctor(filebuf *op,Args ... args) noex {
 	return rs ;
 }
 
-static int filebuf_dtor(clusterdb *op) noex {
+static int filebuf_dtor(filebuf *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -118,16 +119,16 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 /* exported subroutines */
 
-int filebuf_start(filebuf *op,int fd,off_t coff,int bufsize,int of) noex {
+int filebuf_start(filebuf *op,int fd,off_t coff,int bsz,int of) noex {
 	int		rs ;
 	if ((rs = filebuf_ctor(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fd >= 0) {
 		op->fd = fd ;
 		op->of = of ;
-		if ((rs = filebuf_adjbuf(op,bufsize)) >= 0) {
+		if ((rs = filebuf_adjbuf(op,bsz)) >= 0) {
 	            char	*p ;
-	            if ((rs = uc_libvalloc(bufsize,&p)) >= 0) {
+	            if ((rs = uc_libvalloc(bsz,&p)) >= 0) {
 	                op->buf = p ;
 	                op->bp = p ;
 	                if (coff < 0) rs = u_tell(fd,&coff) ;
@@ -137,7 +138,7 @@ int filebuf_start(filebuf *op,int fd,off_t coff,int bufsize,int of) noex {
 	                }
 	                if (rs < 0) {
 		            uc_libfree(op->buf) ;
-		            op->buf = NULL ;
+		            op->buf = nullptr ;
 	                }	
 	            } /* end if (memory-allocation) */
 		} /* end if (filebuf_adjbuf) */
@@ -146,7 +147,7 @@ int filebuf_start(filebuf *op,int fd,off_t coff,int bufsize,int of) noex {
 		filebuf_dtor(op) ;
 	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? bufsize : rs ;
+	return (rs >= 0) ? bsz : rs ;
 }
 /* end subroutine (filebuf_start) */
 
@@ -162,7 +163,7 @@ int filebuf_finish(filebuf *op) noex {
 	    if (op->buf) {
 	        rs1 = uc_libfree(op->buf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->buf = NULL ;
+	        op->buf = nullptr ;
 	    }
 	    {
 	        rs1 = filebuf_dtor(op) ;
@@ -242,7 +243,7 @@ int filebuf_readln(filebuf *op,char *rbuf,int rlen,int to) noex {
 	    char	*bp, *lastp ;
 	    rs = SR_OK ;
 	    while ((rs >= 0) && (tlen < rlen)) {
-	        int		mlen ;
+	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
 		    cint	fd = op->fd ;
 		    cint	bufsize = op->bufsize ;
@@ -278,9 +279,6 @@ int filebuf_readln(filebuf *op,char *rbuf,int rlen,int to) noex {
 	        } /* end if (ok) */
 	    } /* end while (trying to satisfy request) */
 	    if (rs >= 0) {
-#if	CF_NULTERM
-	        *rbp = '\0' ;
-#endif
 	        op->off += tlen ;
 	    }
 	} /* end if (non-null) */
@@ -348,14 +346,14 @@ int filebuf_update(filebuf *op,off_t roff,cchar *rbuf,int rlen) noex {
 }
 /* end subroutine (filebuf_update) */
 
-int filebuf_write(filebuf *op,const void *abuf,int alen) noex {
+int filebuf_write(filebuf *op,cvoid *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	if (op && abuf) {
 	    int		alenr ;
 	    int		blenr ;
 	    int		mlen ;
 	    int		len ;
-	    cchar	*abp = (cchar *) abuf ;
+	    cchar	*abp = charp(abuf) ;
 	    rs = SR_OK ;
 	    op->f.write = true ;
 	    if (alen < 0) alen = strlen(abp) ;
@@ -410,11 +408,12 @@ int filebuf_println(filebuf *op,cchar *sp,int sl) noex {
 	int		wlen = 0 ;
 	if (op && sp) {
 	    int		reslen ;
-	    bool	f_needeol ;
+	    bool	feol = false ;
 	    rs = SR_OK ;
 	    sl = strnlen(sp,sl) ;
-	    f_needeol = ((sl == 0) || (sp[sl-1] != '\n')) ;
-	    reslen = (f_needeol) ? (sl+1) : sl ;
+	    feol = feol || (sl == 0) ;
+	    feol = feol || (sp[sl-1] != '\n') ;
+	    reslen = (feol) ? (sl+1) : sl ;
 	    if (reslen > 1) {
 	        rs = filebuf_reserve(op,reslen) ;
 	    }
@@ -422,10 +421,8 @@ int filebuf_println(filebuf *op,cchar *sp,int sl) noex {
 	        rs = filebuf_write(op,sp,sl) ;
 	        wlen += rs ;
 	    }
-	    if ((rs >= 0) && f_needeol) {
-	        char	buf[2] ;
-	        buf[0] = '\n' ;
-	        buf[1] = '\0' ;
+	    if ((rs >= 0) && feol) {
+	        char	buf[2] = { '\n' } ;
 	        rs = filebuf_write(op,buf,1) ;
 	        wlen += rs ;
 	    }
@@ -441,7 +438,7 @@ int filebuf_vprintf(filebuf *op,cchar *fmt,va_list ap) noex {
 	if (op && fmt) {
 	    if ((rs = maxlinelen) >= 0) {
 		cint	llen = rs ;
-		char	*lbuf ;
+		char	*lbuf{} ;
 		if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
 	    	    if ((rs = format(lbuf,llen,0,fmt,ap)) >= 0) {
 	    	        rs = filebuf_write(op,lbuf,rs) ;
@@ -480,7 +477,7 @@ int filebuf_adv(filebuf *op,int inc) noex {
 	            if (op->f.write) {
 	                rs = filebuf_flush(op) ;
 	            } else {
-	                int	ml = min(inc,op->len) ;
+	                cint	ml = min(inc,op->len) ;
 	                if (ml > 0) {
 	                    inc -= ml ;
 	                    op->len -= ml ;
@@ -587,9 +584,7 @@ int filebuf_poll(filebuf *op,int mto) noex {
 	cint		nfds = 1 ;
 	int		rs = SR_FAULT ;
 	if (op) {
-	    POLLFD	fds[1] ;
-	    cint	size = nfds * sizeof(POLLFD) ;
-	    memset(fds,0,size) ;
+	    POLLFD	fds[nfds] = {} ;
 	    fds[0].fd = op->fd ;
 	    fds[0].events = 0 ;
 	    fds[0].revents = 0 ;
@@ -612,9 +607,9 @@ static int filebuf_adjbuf(filebuf *op,int bufsize) noex {
 	            bufsize = PIPEBUFLEN ;
 	        } else {
 		    if ((rs = pagesize) >= 0) {
-			off_t	ps = off_t(rs) ;
-		        off_t	cs ;
-	        	cint	of = op->of ;
+			const off_t	ps = off_t(rs) ;
+		        off_t		cs ;
+	        	cint		of = op->of ;
 		        if ((of & O_ACCMODE) == O_RDONLY) {
 		            off_t fs = ((sb.st_size == 0) ? 1 : sb.st_size) ;
 		            cs = BCEIL(fs,BLOCKBUFLEN) ;
