@@ -97,43 +97,38 @@ static bool	isNotOurs(int) noex ;
 /* exported subroutines */
 
 int pcsngdname(cchar *pcs,char *rbuf,cchar *newsdname,cchar *ngname) noex {
-	int	rs = SR_OK ;
-	int	n ;
-	int	len = 0 ;
-
-	if (pcs == nullptr) return SR_FAULT ;
-	if (newsdname == nullptr) return SR_FAULT ;
-	if (ngname== nullptr) return SR_FAULT ;
-
-	if (ngname[0] == '\0') return SR_INVALID ;
-
-	n = ndots(ngname) ;
-
-	if ((rs = mknewsdname(pcs,rbuf,newsdname)) >= 0) {
-	    USTAT	sb ;
-	    cint	npow = ipow(2,n) ;
-	    int		rlen = rs ;
-	    if (n > 0) {
-	        for (int c = 0 ; c < npow ; c += 1) {
-	            if ((rs = mkdname(rbuf,rlen,ngname,c)) >= 0) {
-		        len = rs ;
-		        if ((rs = u_stat(rbuf,&sb)) >= 0) {
-			    if (S_ISDIR(sb.st_mode)) break ;
-			    rs = SR_NOTDIR ;
-		        }
-		    } /* end if (mkdname) */
-		    if ((rs >= 0) || isNotOurs(rs)) break ;
-	        } /* end for */
-	    } else {
-	        if ((rs = pathadd(rbuf,rlen,ngname)) >= 0) {
-		    len = rs ;
-		    if ((rs = u_stat(rbuf,&sb)) >= 0) {
-			if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
-		    }
-		} /* end if (pathadd) */
-	    } /* end if */
-	} /* end if (mkpath) */
-
+	int		rs = SR_FAULT ;
+	int		len = 0 ;
+	if (pcs && rbuf && newsdname && ngname) {
+	    rs = SR_INVALID ;
+	    if (ngname[0]) {
+	        cint	n = ndots(ngname) ;
+	        if ((rs = mknewsdname(pcs,rbuf,newsdname)) >= 0) {
+	            USTAT	sb ;
+	            cint	npow = ipow(2,n) ;
+	            int		rlen = rs ;
+	            if (n > 0) {
+	                for (int c = 0 ; c < npow ; c += 1) {
+	                    if ((rs = mkdname(rbuf,rlen,ngname,c)) >= 0) {
+		                len = rs ;
+		                if ((rs = u_stat(rbuf,&sb)) >= 0) {
+			            if (S_ISDIR(sb.st_mode)) break ;
+			            rs = SR_NOTDIR ;
+		                }
+		            } /* end if (mkdname) */
+		            if ((rs >= 0) || isNotOurs(rs)) break ;
+	                } /* end for */
+	            } else {
+	                if ((rs = pathadd(rbuf,rlen,ngname)) >= 0) {
+		            len = rs ;
+		            if ((rs = u_stat(rbuf,&sb)) >= 0) {
+			        if (! S_ISDIR(sb.st_mode)) rs = SR_NOTDIR ;
+		            }
+		        } /* end if (pathadd) */
+	            } /* end if */
+	        } /* end if (mkpath) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (pcsngdname) */
