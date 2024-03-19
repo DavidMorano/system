@@ -7,13 +7,13 @@
 
 /* revision history:
 
-	= 2001-04-11, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This is a spin off of various programs that needed to get
 	the machine HZ value.
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
