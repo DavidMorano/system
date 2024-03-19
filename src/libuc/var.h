@@ -1,6 +1,9 @@
 /* var HEADER */
 /* lang=C20 */
 
+/* VAR management */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -13,6 +16,7 @@
 
 #ifndef	VAR_INCLUDE
 #define	VAR_INCLUDE
+
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
@@ -27,7 +31,7 @@
 
 #define	VAR_MAGIC	0x99447246
 #define	VAR		struct var_head
-#define	var_cur		struct var_cursor
+#define	VAR_CUR		struct var_cursor
 #define	VAR_INFO	struct var_information
 #define	VAR_CALLS	struct var_callsubs
 
@@ -60,7 +64,7 @@ struct var_callsubs {
 } ;
 
 struct var_head {
-	MODLOAD		loader ;
+	modload		loader ;
 	VAR_CALLS	call ;
 	void		*obj ;		/* object pointer */
 	uint		magic ;
@@ -74,7 +78,7 @@ struct varinfo {
 } ;
 
 typedef	VAR		var ;
-typedef var_cur		var_cur ;
+typedef VAR_CUR		var_cur ;
 typedef VAR_INFO	var_info ;
 typedef VAR_CALLS	var_calls ;
 
@@ -87,7 +91,7 @@ extern int	var_curbegin(var *,var_cur *) noex ;
 extern int	var_fetch(var *,cchar *,int,var_cur *,char *,int) noex ;
 extern int	var_enum(var *,var_cur *,char *,int,char *,int) noex ;
 extern int	var_curend(var *,var_cur *) noex ;
-extern int	var_info(var *,VAR_INFO *) noex ;
+extern int	var_info(var *,var_info *) noex ;
 extern int	var_audit(var *) noex ;
 extern int	var_close(var *) noex ;
 

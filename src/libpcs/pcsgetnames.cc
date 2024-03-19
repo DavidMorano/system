@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEFPCS	1		/* try a default PCS program-root */
-#define	CF_UGETPW	1		/* use |ugetpw_xxx(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ugetpw_xxx(3uc)| */
 
 /* revision history:
 
@@ -64,7 +64,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -91,14 +90,14 @@
 
 /* local defines */
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
+#if	CF_UCPWCACHE
+#define	GETPW_NAME	ucpwcache_name
 #else
 #define	GETPW_NAME	getpw_name
-#endif /* CF_UGETPW */
+#endif /* CF_UCPWCACHE */
 
-#ifndef	NULLFNAME
-#define	NULLFNAME	"/dev/null"
+#ifndef	nullptrFNAME
+#define	nullptrFNAME	"/dev/null"
 #endif
 
 #ifndef	NSYSPIDS
@@ -217,7 +216,7 @@ static constexpr int	(*getprojinfos[])(SUBINFO *) = {
 	getprojinfo_userhome,
 	getprojinfo_sysdb,
 	getprojinfo_pcsdef,
-	NULL
+	nullptr
 } ;
 
 enum pcsnametypes {
@@ -229,7 +228,7 @@ enum pcsnametypes {
 static constexpr struct pcsnametype	pcsnametypes[] = {
 	{ VARNAME, NAMEFNAME },
 	{ VARFULLNAME, FULLNAMEFNAME },
-	{ NULL, NULL }
+	{ nullptr, nullptr }
 } ;
 
 static constexpr int	(*getnames[])(SUBINFO *,int) = {
@@ -237,7 +236,7 @@ static constexpr int	(*getnames[])(SUBINFO *,int) = {
 	getname_userhome,
 	getname_again,
 	getname_sysdb,
-	NULL
+	nullptr
 } ;
 
 
@@ -280,13 +279,13 @@ int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int nt) noex {
 	int		rs ;
 
 #if	CF_DEFPCS
-	if (pr == NULL)
+	if (pr == nullptr)
 	    pr = getenv(VARPRPCS) ;
 #endif
 
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (un == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (un == nullptr) return SR_FAULT ;
 
 	if (un[0] == '\0') return SR_INVALID ;
 
@@ -313,24 +312,21 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	SUBINFO		mi ;
 	int		rs ;
 
-	if (pr == NULL)
+	if (pr == nullptr)
 	    pr = getenv(VARPRPCS) ;
 
-	if (pr == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-	if (username == NULL) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
+	if (username == nullptr) return SR_FAULT ;
 
 	if (username[0] == '\0') return SR_INVALID ;
 
 	rbuf[0] = '\0' ;
 	if ((rs = subinfo_start(&mi,pr,rbuf,rlen,username)) >= 0) {
-	    int	i ;
-
-	    for (i = 0 ; getprojinfos[i] != NULL ; i += 1) {
+	    for (int i = 0 ; getprojinfos[i] != nullptr ; i += 1) {
 	        rs = (*getprojinfos[i])(&mi) ;
 	        if (rs != 0) break ;
 	    } /* end for */
-
 	    subinfo_finish(&mi) ;
 	} /* end if */
 
@@ -366,13 +362,13 @@ static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (sip->pwbuf != NULL) {
+	if (sip->pwbuf != nullptr) {
 	    rs1 = uc_free(sip->pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    sip->pwbuf = NULL ;
+	    sip->pwbuf = nullptr ;
 	}
 
-	sip->pr = NULL ;
+	sip->pr = nullptr ;
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
@@ -386,7 +382,7 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	    sip->init.uid = TRUE ;
 	    cp = getenv(sip->varusername) ;
 
-	    if ((cp != NULL) && (strcmp(cp,sip->un) == 0)) {
+	    if ((cp != nullptr) && (strcmp(cp,sip->un) == 0)) {
 	        sip->f.uid = TRUE ;
 	        sip->uid = getuid() ;
 	    } else {
@@ -399,7 +395,7 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 
 	} /* end if (initializing UID) */
 
-	if (uidp != NULL)
+	if (uidp != nullptr)
 	    *uidp = sip->uid ;
 
 	if ((rs >= 0) && (! sip->f.uid))
@@ -417,7 +413,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	    cint	pwlen = sip->pwlen ;
 	    char	*pwbuf = sip->pwbuf ;
 	    sip->init.pw = TRUE ;
-	    if ((un != NULL) && (un[0] != '\0') && (un[0] != '-')) {
+	    if ((un != nullptr) && (un[0] != '\0') && (un[0] != '-')) {
 	        if (hasalldig(un,-1)) {
 	            uint	uv ;
 	            if ((rs = cfdecui(un,-1,&uv)) >= 0) {
@@ -444,7 +440,7 @@ static int getname(SUBINFO *sip,int nt) noex {
 	int		rs = SR_BUGCHECK ;
 	if (nt < pcsnametype_overlast) {
 	    sip->rbuf[0] = '\0' ;
-	    for (int i = 0 ; getnames[i] != NULL ; i += 1) {
+	    for (int i = 0 ; getnames[i] != nullptr ; i += 1) {
 	        rs = (*getnames[i])(sip,nt) ;
 	        if (rs != 0) break ;
 	    } /* end for */
@@ -462,12 +458,12 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 	f = (un[0] == '-') ;
 	if (! f) {
 	    cchar	*vun = getenv(VARUSERNAME) ;
-	    if ((vun != NULL) && (vun[0] != '\0'))
+	    if ((vun != nullptr) && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
 	    cchar	*cp = getenv(pcsnametypes[nt].var) ;
-	    if ((cp != NULL) && (cp[0] != '\0')) {
+	    if ((cp != nullptr) && (cp[0] != '\0')) {
 	        rs = sncpy1(sip->rbuf,sip->rlen,cp) ;
 		len = rs ;
 	    }

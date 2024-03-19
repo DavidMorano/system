@@ -27,15 +27,15 @@
 
 #define	VARS_MAGIC	0x88773421
 #define	VARS		struct vars_head
-#define	VARS_INFO	struct vars_i
+#define	VARS_INFO	struct vars_information
 
 #define	VARS_OBJ	struct vars_obj
-#define	VARS_CUR	struct vars_c
+#define	VARS_CUR	struct vars_cursor
 #define	VARS_FM		struct vars_fm
 #define	VARS_MI		struct vars_mi
 
 
-struct vars_i {
+struct vars_information {
 	time_t		wtime ;
 	time_t		mtime ;
 	uint		nvars ;
@@ -44,12 +44,12 @@ struct vars_i {
 
 /* this is the shared-object description */
 struct vars_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct vars_c {
+struct vars_cursor {
 	uint		chash ;		/* "check" hash for key */
 	int		i ;
 } ;
@@ -69,32 +69,28 @@ struct vars_mi {
 } ;
 
 struct vars_head {
-	uint		magic ;
-	const char 	*dbname ;
+	cchar 		*dbname ;
 	VARS_FM		vf ;
 	VARS_MI		mi ;
 	VARHDR		ifi ;		/* index-file (header) information */
 	time_t		ti_lastcheck ;	/* time last check of file */
+	uint		magic ;
 	int		ncursors ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	vars_open(VARS *,const char *) ;
-extern int	vars_count(VARS *) ;
-extern int	vars_curbegin(VARS *,VARS_CUR *) ;
-extern int	vars_fetch(VARS *,const char *,int,VARS_CUR *,char *,int) ;
-extern int	vars_enum(VARS *,VARS_CUR *,char *,int,char *,int) ;
-extern int	vars_curend(VARS *,VARS_CUR *) ;
-extern int	vars_info(VARS *,VARS_INFO *) ;
-extern int	vars_audit(VARS *) ;
-extern int	vars_close(VARS *) ;
+extern int	vars_open(vars *,cchar *) noex ;
+extern int	vars_count(vars *) noex ;
+extern int	vars_curbegin(vars *,vars_cur *) noex ;
+extern int	vars_fetch(vars *,cchar *,int,vars_cur *,char *,int) noex ;
+extern int	vars_enum(vars *,vars_cur *,char *,int,char *,int) noex ;
+extern int	vars_curend(vars *,vars_cur *) noex ;
+extern int	vars_info(vars *,vars_info *) noex ;
+extern int	vars_audit(vars *) noex ;
+extern int	vars_close(vars *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* VARS_INCLUDE */

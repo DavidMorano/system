@@ -1,6 +1,9 @@
 /* pcsgetnames HEADER */
 /* lang=C++20 */
 
+/* get various information elements related to the PCS environment */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

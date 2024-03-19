@@ -1,4 +1,5 @@
-/* bwops */
+/* bwops HEADER */
+/* lang=C20 */
 
 /* bit-word defines */
 /* last modifided %G% version %I% */
@@ -15,19 +16,14 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	BWOPS_INCLUDE
-#define	BWOPS_INCLUDE	1
+#define	BWOPS_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
-#include	<sys/types.h>
-
-#include	<localmisc.h>		/* for unsigned types */
-
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
 #define	bwtst(w,n)		(((w) >> (n)) & 1)
 #define	bwset(w,n)		((w) |= (1 << (n)))
@@ -58,9 +54,6 @@ extern "C" {
 #define	bwsetll(w,n)		((w) |= (1 << (n)))
 #define	bwclrll(w,n)		((w) &= (~ (1 << (n))))
 
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* BWOPS_INCLUDE */
 

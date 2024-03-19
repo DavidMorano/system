@@ -1,10 +1,10 @@
-/* mailmsghdrs */
+/* mailmsghdrs SUPPORT */
+/* lang=C++20 */
 
 /* put all of the header values of a message into an array */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,26 +17,19 @@
 
 /*******************************************************************************
 
-	This subroutine depends on a MAILMSG object to have already been
-	instantiated (and initialized).    This present object should then be
-	initialized with a pointer to the MAILMSG object.  This object will
-	then put all of the message header values of the MAILMSG object into an
-	array for quick (indexed) access.
-
+	This subroutine depends on a MAILMSG object to have already
+	been instantiated (and initialized).  This present object
+	should then be initialized with a pointer to the MAILMSG
+	object.  This object will then put all of the message header
+	values of the MAILMSG object into an array for quick (indexed)
+	access.
 
 *******************************************************************************/
 
-
-#define	MAILMSGHDRS_MASTER	0
-
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<mailmsg.h>
 #include	<localmisc.h>

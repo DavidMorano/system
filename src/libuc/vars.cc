@@ -1,5 +1,5 @@
-/* vars */
-/* lang=C20 */
+/* vars SUPPORT */
+/* lang=C++20 */
 
 /* read or audit a VAR database */
 /* version %I% last-modified %G% */
@@ -33,22 +33,21 @@
 
 	Returns:
 	>=0		OK
-	<0		error code
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 #include	<hash.h>
 

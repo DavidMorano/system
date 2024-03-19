@@ -1,5 +1,5 @@
-/* mailmsghdrfold */
-/* lang=C20 */
+/* mailmsghdrfold SUPPORT */
+/* lang=C++20 */
 
 /* manage folding of a mail-message header line */
 /* version %I% last-modified %G% */
@@ -24,12 +24,8 @@
 	number of print-output columns.
 
 	Synopsis:
-	int mailmsghdrfold_start(op,mcols,ln,sp,sl)
-	MAILMSGHDRFOLD	*op ;
-	int		mcols ;
-	int		ln ;
-	cchar		*sp ;
-	int		sl ;
+	int mailmsghdrfold_start(mailmsghdrfold *op,int mcols,int ln,
+		cchar *sp,int sl) noex
 
 	Arguments:
 	op		object pointer
@@ -39,15 +35,12 @@
 	sl		header-value string length
 
 	Returns:
-	<0		bad
 	>=0		OK
+	<0		bad (system-return)
 
 
 	Synopsis:
-	int mailmsghdrfold_get(op,ncol,rpp)
-	MAILMSGHDRFOLD	*op ;
-	int		ncol ;
-	cchar	**rpp ;
+	int mailmsghdrfold_get(mailmsghdrfold *op,int ncol,cchar **rpp) noex
 
 	Arguments:
 	op		object pointer
@@ -57,17 +50,16 @@
 	rpp		pointer to resulting line
 
 	Returns:
-	<0		bad
-	==0		done
 	>0		length of line
+	==0		done
+	<0		bad (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<ascii.h>
