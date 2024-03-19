@@ -139,6 +139,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef buffer		mbuf ;
+
 
 /* external subroutines */
 
@@ -228,9 +230,9 @@ static int termnote_lfclose(termnote *) noex ;
 
 static int termnote_bufline(termnote *,buffer *,cchar *,int) noex ;
 static int termnote_bufextra(termnote *,buffer *,int) noex ;
-static int termnote_dis(termnote *,cchar **,int,int,cchar *,int) noex ;
-static int termnote_disuser(termnote *,int,int,cchar *,int,cchar *) noex ;
-static int termnote_diswrite(termnote *,int,cchar *,int,cchar *) noex ;
+static int termnote_dis(termnote *,cchar **,int,int,mbuf *) noex ;
+static int termnote_disuser(termnote *,int,int,mbuf *,cchar *) noex ;
+static int termnote_diswrite(termnote *,int,mbuf *,cchar *) noex ;
 
 static int termnote_username(termnote *) noex ;
 static int termnote_nodename(termnote *) noex ;
@@ -483,7 +485,7 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 			cchar	*fmt = "note lines=%u len=%u" ;
 			logfile_printf(op->lfp,fmt,lines,bl) ;
 		    }
-		    rs = termnote_dis(op,rpp,m,o,bp,bl) ;
+		    rs = termnote_dis(op,rpp,m,o,&ob) ;
 		    c = rs ;
 		} /* end if (get) */
 	    } /* end if */
@@ -552,20 +554,18 @@ static int termnote_bufextra(termnote *op,buffer *obp,int o) noex {
 }
 /* end subroutine (termnote_bufextra) */
 
-static int termnote_dis(termnote *op,cchar **rpp,int n,int o,
-		cchar *bp,int bl) noex {
+static int termnote_dis(termnote *op,cchar **rpp,int n,int o,mbuf *mp) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	for (int i = 0 ; (rs >= 0) && rpp[i] ; i += 1) {
-	    rs = termnote_disuser(op,n,o,bp,bl,rpp[i]) ;
+	    rs = termnote_disuser(op,n,o,mp,rpp[i]) ;
 	    c += rs ;
 	} /* end for */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (termnote_dis) */
 
-static int termnote_disuser(termnote *op,int nmax,int o,
-		cchar *bp,int bl,cchar *un) noex {
+static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 	vecobj		uts ;
 	cint		utsize = sizeof(USERTERM) ;
 	int		rs ;
@@ -638,7 +638,7 @@ static int termnote_disuser(termnote *op,int nmax,int o,
 	                USERTERM	*utp = usertermp(vp) ;
 			int		rsv = 0 ;
 			tdp = utp->termdev ;
-		        if ((rs = termnote_diswrite(op,o,bp,bl,tdp)) >= 0) {
+		        if ((rs = termnote_diswrite(op,o,mp,tdp)) >= 0) {
 			    n += 1 ;
 			    c += 2 ;
 			    rsv = rs ;
@@ -663,19 +663,23 @@ static int termnote_disuser(termnote *op,int nmax,int o,
 }
 /* end subroutine (termnote_disuser) */
 
-static int termnote_diswrite(termnote *op,int o,cc *bp,int bl,
-		cc *termdev) noex {
+static int termnote_diswrite(termnote *op,int o,mbuf *mp,cc *termdev) noex {
 	int		rs = SR_FAULT ;
+	int		rs1 ;
 	int		len = 0 ;
-	if (op && bp) {
+	if (op && mp && termdev) {
 	    cint	of = (O_WRONLY | O_NOCTTY | O_NDELAY) ;
 	    cint	to = 5 ;
 	    (void) o ;
 	    if ((rs = u_open(termdev,of,0666)) >= 0) {
 	        cint	fd = rs ;
-	        rs = writeto(fd,bp,bl,to) ;
-	        len = rs ;
-	        u_close(fd) ;
+		cchar	*bp{} ;
+		if ((rs = buffer_get(mp,&bp)) >= 0) {
+	            rs = writeto(fd,bp,rs,to) ;
+	            len = rs ;
+		}
+	        rs1 = u_close(fd) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (open terminal-device) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
