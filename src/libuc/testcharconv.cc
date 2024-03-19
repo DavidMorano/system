@@ -20,7 +20,7 @@
 #include	<cstdio>
 #include	<iostream>
 #include	<usystem.h>
-#include	<valuelimits.hh>
+#include	<valuelims.hh>
 #include	<ucvariables.hh>
 #include	<localmisc.h>
 #include	<cfdec.h>

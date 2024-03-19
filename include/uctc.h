@@ -1,7 +1,7 @@
 /* uctc HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* LIBUC Teermina-Control functions */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UCTC_INCLUDE
 #define	UCTC_INCLUDE

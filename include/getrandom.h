@@ -1,7 +1,7 @@
 /* getrandom HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get some random data (some bytes) of a specified type */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETRANDOM_INCLUDE
 #define	GETRANDOM_INCLUDE

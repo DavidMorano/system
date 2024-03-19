@@ -21,7 +21,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -46,12 +46,16 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strmgr_start(strmgr *op,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && dbuf) {
 	    rs = SR_OK ;
+	    if (dlen < 0) dlen = strlen(dbuf) ;
 	    op->dp = dbuf ;
 	    op->dlen = dlen ;
 	    op->dl = 0 ;

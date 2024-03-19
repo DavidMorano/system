@@ -33,6 +33,7 @@
 #include	<vecobj.h>
 #include	<ascii.h>
 #include	<cfdec.h>
+#include	<ncol.h>		/* |charcols(3uc)| */
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -57,10 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	charcols(int,int,int) noex ;
-}
 
 
 /* external variables */

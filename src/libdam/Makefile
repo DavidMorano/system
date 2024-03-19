@@ -259,7 +259,7 @@ OBJ99= tmpx.o tmpx_getrunlevel.o tmpx_getuserlines.o tmpx_getsessions.o
 OBJ100= mknoise.o rijndael.o expcook.o schedvar.o
 OBJ101= termnote.o egs.o random.o bits.o 
 OBJ102= loadave.o modload.o userinfo.o pwentry.o 
-OBJ103= dw.o fmq.o useraccdb.o logsys.o csem.o
+OBJ103= dw.o fmq.o useraccdb.o csem.o
 
 OBJ104= sesmsg.o msgdata.o
 OBJ105= dater.o dater_getdate.o date.o cachetime.o
@@ -951,8 +951,6 @@ modload.o:		modload.c modload.h
 dirseen.o:		dirseen.c dirseen.h
 
 dirseen_not.o:		dirseen_not.c dirseen.h
-
-logsys.o:		logsys.c logsys.h
 
 sysmiscem.o:		sysmiscem.c sysmiscem.h
 

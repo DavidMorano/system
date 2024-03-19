@@ -5,6 +5,13 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 2013-02-07, David A­D­ Morano
+	Originally written for Rightcore Network Services.
+
+*/
+
 /* Copyright © 2013 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DAYSPEC_INCLUDE

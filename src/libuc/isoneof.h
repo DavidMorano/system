@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ISONEOF_INCLUDE
 #define	ISONEOF_INCLUDE

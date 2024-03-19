@@ -7,12 +7,12 @@
 
 /* revision history:
 
-	= 2004-05-14, David A­D­ Morano
+	= 1999-05-14, David A­D­ Morano
 	Originally written for Rightcore Network Services.
 
 */
 
-/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 

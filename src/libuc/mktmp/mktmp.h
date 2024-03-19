@@ -1,7 +1,7 @@
 /* mktmp HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* make a temporary file of a certain type */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MKTMP_INCLUDE
 #define	MKTMP_INCLUDE

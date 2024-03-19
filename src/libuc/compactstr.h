@@ -1,7 +1,7 @@
 /* compactstr HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* compact (remove white-space) a c-string inplace */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	COMPACTSTR_INCLUDE
 #define	COMPACTSTR_INCLUDE

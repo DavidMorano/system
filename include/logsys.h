@@ -51,14 +51,14 @@ typedef LOGSYS		logsys ;
 
 EXTERNC_begin
 
-extern int logsys_open(LOGSYS *,int,cchar *,cchar *,int) noex ;
-extern int logsys_setid(LOGSYS *,cchar *) noex ;
-extern int logsys_write(LOGSYS *,int,cchar *,int) noex ;
-extern int logsys_printf(LOGSYS *,int,cchar *,...) noex ;
-extern int logsys_vprintf(LOGSYS *,int,cchar *,va_list) noex ;
-extern int logsys_check(LOGSYS *,time_t) noex ;
-extern int logsys_flush(LOGSYS *) noex ;
-extern int logsys_close(LOGSYS *) noex ;
+extern int logsys_open(logsys *,int,cchar *,cchar *,int) noex ;
+extern int logsys_setid(logsys *,cchar *) noex ;
+extern int logsys_write(logsys *,int,cchar *,int) noex ;
+extern int logsys_printf(logsys *,int,cchar *,...) noex ;
+extern int logsys_vprintf(logsys *,int,cchar *,va_list) noex ;
+extern int logsys_check(logsys *,time_t) noex ;
+extern int logsys_flush(logsys *) noex ;
+extern int logsys_close(logsys *) noex ;
 
 EXTERNC_end
 

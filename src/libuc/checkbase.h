@@ -1,7 +1,7 @@
 /* checkbase HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* test whether a string is composed of all characters of a given base */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CHECKBASE_INCLUDE
 #define	CHECKBASE_INCLUDE

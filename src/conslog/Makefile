@@ -307,8 +307,6 @@ realname.o:		realname.c realname.h
 
 ipasswd.o:		ipasswd.c ipasswd.h
 
-logsys.o:		logsys.c logsys.h
-
 conslog.o:		conslog.c conslog.h
 
 tmpx.o:			tmpx.c tmpx.h

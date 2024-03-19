@@ -1,4 +1,4 @@
-/* baops */
+/* baops SUPPORT */
 /* lang=C20 */
 
 /* bit-array operations */

@@ -60,6 +60,7 @@
 #include	<strn.h>
 #include	<strw.h>
 #include	<strwcpy.h>
+#include	<ncol.h>		/* |charcols(3uc)| */
 #include	<mkx.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -118,7 +119,6 @@ extern "C" {
 extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	opentmp(cchar *,int,mode_t) ;
 extern int	vbufprintf(char *,int,cchar *,va_list) ;
-extern int	charcols(int,int,int) ;
 
 
 /* external variables */

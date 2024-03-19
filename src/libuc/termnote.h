@@ -15,7 +15,7 @@
 #include	<tmpx.h>
 #include	<ids.h>
 #include	<logfile.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |LOGIDLEN| */
 
 
 /* object defines */
@@ -38,11 +38,12 @@ struct termnote_flags {
 } ;
 
 struct termnote_head {
-	ids		id ;
-	TMPX		tx ;
-	logfile		lf ;
+	ids		*idp ;
+	tmpx		*txp ;
+	logfile		*lfp ;
 	cchar		*pr ;
 	cchar		*nodename ;
+	cchar		*username ;
 	time_t		ti_check ;
 	time_t		ti_tmpx ;
 	time_t		ti_logcheck ;
@@ -50,7 +51,6 @@ struct termnote_head {
 	TERMNOTE_FL	init, open ;
 	uint		magic ;
 	int		sn ;		/* serial-number */
-	char		username[USERNAMELEN+1] ;
 	char		logid[LOGIDLEN+1] ;
 } ;
 
@@ -68,8 +68,6 @@ extern int termnote_close(termnote *) noex ;
 
 EXTERNC_end
 
-
-#endif /* TERMNOTE_MASTER */
 
 #endif /* TERMNOTE_INCLUDE */
 

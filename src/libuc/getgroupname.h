@@ -1,7 +1,7 @@
 /* getgroupname HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get a group name (from the system account database) for current process */
 /* version %I% last-modified %G% */
 
 

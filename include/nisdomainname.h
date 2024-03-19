@@ -1,7 +1,7 @@
 /* nisdomainname HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* retrieve the system NIS domain-name */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	NISDOMAINNAME_INCLUDE
 #define	NISDOMAINNAME_INCLUDE

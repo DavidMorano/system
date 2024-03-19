@@ -245,25 +245,3 @@ progout.o:		progout.c $(INCS)
 progadjust.o:		progadjust.c $(INCS)
 
 
-nettime.o:		nettime.c nettime.h
-
-
-userinfo.o:		userinfo.c userinfo.h
-
-vecstr_loadfile.o:	vecstr_loadfile.c
-
-vecstr_env.o:		vecstr_env.c
-
-realname.o:		realname.c realname.h
-
-ipasswd.o:		ipasswd.c ipasswd.h
-
-lastlogfile.o:		lastlogfile.c lastlogfile.h
-
-sockaddress.o:		sockaddress.c sockaddress.h
-
-logsys.o:		logsys.c logsys.h
-
-logfile.o:		logfile.c logfile.h
-
-

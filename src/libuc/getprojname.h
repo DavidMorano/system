@@ -1,7 +1,7 @@
 /* getprojname HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get a project name from the system account database */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETPROJNAME_INCLUDE
 #define	GETPROJNAME_INCLUDE

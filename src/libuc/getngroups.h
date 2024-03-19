@@ -1,7 +1,7 @@
 /* getngroups HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get the maximum number of supplemetary groups allowed per process */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETNGROUPS_INCLUDE
 #define	GETNGROUPS_INCLUDE

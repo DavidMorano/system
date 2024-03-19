@@ -1,7 +1,7 @@
 /* readln HEADER */
 /* lang=C++20 */
 
-/* convert a single character to a given case */
+/* read characters from Standard-Input (STDIN) */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	READLN_INCLUDE
 #define	READLN_INCLUDE

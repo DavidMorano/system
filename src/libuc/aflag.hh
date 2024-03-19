@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	AFLAG_INCLUDE
 #define	AFLAG_INCLUDE

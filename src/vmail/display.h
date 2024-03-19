@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<stdarg.h>
 #include	<varray.h>
 #include	<tmtime.h>
@@ -99,7 +98,7 @@ struct display_mi {
 } ;
 
 struct display_args {
-	const char	*termtype ;
+	cchar		*termtype ;
 	int		tfd ;
 	int		termlines ;
 	int		displines ;
@@ -107,7 +106,7 @@ struct display_args {
 } ;
 
 struct display_scanalt {
-	const void	*a ;
+	cvoid		*a ;
 	char		*fbuf ;
 	char		*sbuf ;
 	int		flen ;
@@ -210,68 +209,63 @@ struct display_head {
 	char		linebot[DISPLAY_LSCANLINE + 1] ;
 } ;
 
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int display_start(DISPLAY *,PROGINFO *,DISPLAY_ARGS *) noex ;
+extern int display_finish(DISPLAY *) noex ;
+extern int display_setdate(DISPLAY *,int) noex ;
+extern int display_setmbname(DISPLAY *,cchar *,int) noex ;
+extern int display_setnewmail(DISPLAY *,int) noex ;
+extern int display_info(DISPLAY *,cchar *,...) noex ;
+extern int display_winfo(DISPLAY *,cchar *,int) noex ;
+extern int display_vinfo(DISPLAY *,cchar *,va_list) noex ;
+extern int display_infots(DISPLAY *,time_t *) noex ;
+extern int display_input(DISPLAY *,cchar *,...) noex ;
+extern int display_vinput(DISPLAY *,cchar *,va_list) noex ;
+extern int display_done(DISPLAY *) noex ;
+extern int display_flush(DISPLAY *) noex ;
+extern int display_cmddig(DISPLAY *,int,int) noex ;
+extern int display_winadj(DISPLAY *,int,int) noex ;
+extern int display_setscanlines(DISPLAY *,int) noex ;
 
-extern int display_start(DISPLAY *,PROGINFO *,DISPLAY_ARGS *) ;
-extern int display_finish(DISPLAY *) ;
-extern int display_setdate(DISPLAY *,int) ;
-extern int display_setmbname(DISPLAY *,const char *,int) ;
-extern int display_setnewmail(DISPLAY *,int) ;
-extern int display_info(DISPLAY *,const char *,...) ;
-extern int display_winfo(DISPLAY *,const char *,int) ;
-extern int display_vinfo(DISPLAY *,const char *,va_list) ;
-extern int display_infots(DISPLAY *,time_t *) ;
-extern int display_input(DISPLAY *,const char *,...) ;
-extern int display_vinput(DISPLAY *,const char *,va_list) ;
-extern int display_done(DISPLAY *) ;
-extern int display_flush(DISPLAY *) ;
-extern int display_cmddig(DISPLAY *,int,int) ;
-extern int display_winadj(DISPLAY *,int,int) ;
-extern int display_setscanlines(DISPLAY *,int) ;
+extern int display_refresh(DISPLAY *) noex ;
+extern int display_rframe(DISPLAY *) noex ;
+extern int display_rtop(DISPLAY *) noex ;
+extern int display_rscantitle(DISPLAY *) noex ;
+extern int display_rmid(DISPLAY *) noex ;
+extern int display_rbot(DISPLAY *) noex ;
 
-extern int display_refresh(DISPLAY *) ;
-extern int display_rframe(DISPLAY *) ;
-extern int display_rtop(DISPLAY *) ;
-extern int display_rscantitle(DISPLAY *) ;
-extern int display_rmid(DISPLAY *) ;
-extern int display_rbot(DISPLAY *) ;
+extern int display_scanclear(DISPLAY *) noex ;
+extern int display_scanload(DISPLAY *,int,DISPLAY_SDATA *) noex ;
+extern int display_scanloadlines(DISPLAY *,int,int,int) noex ;
+extern int display_scanblank(DISPLAY *,int) noex ;
+extern int display_scanblanks(DISPLAY *,int) noex ;
+extern int display_scanfull(DISPLAY *) noex ;
+extern int display_scandel(DISPLAY *,int) noex ;
+extern int display_scanmark(DISPLAY *,int,int) noex ;
+extern int display_scanpoint(DISPLAY *,int) noex ;
+extern int display_scancheck(DISPLAY *,int) noex ;
+extern int display_scandisplay(DISPLAY *,int) noex ;
 
-extern int display_scanclear(DISPLAY *) ;
-extern int display_scanload(DISPLAY *,int,DISPLAY_SDATA *) ;
-extern int display_scanloadlines(DISPLAY *,int,int,int) ;
-extern int display_scanblank(DISPLAY *,int) ;
-extern int display_scanblanks(DISPLAY *,int) ;
-extern int display_scanfull(DISPLAY *) ;
-extern int display_scandel(DISPLAY *,int) ;
-extern int display_scanmark(DISPLAY *,int,int) ;
-extern int display_scanpoint(DISPLAY *,int) ;
-extern int display_scancheck(DISPLAY *,int) ;
-extern int display_scandisplay(DISPLAY *,int) ;
+extern int display_midmsgs(DISPLAY *,int,int) noex ;
 
-extern int display_midmsgs(DISPLAY *,int,int) ;
+extern int display_viewclear(DISPLAY *) noex ;
+extern int display_viewload(DISPLAY *,int,cchar *,int) noex ;
+extern int display_viewscroll(DISPLAY *,int) noex ;
 
-extern int display_viewclear(DISPLAY *) ;
-extern int display_viewload(DISPLAY *,int,const char *,int) ;
-extern int display_viewscroll(DISPLAY *,int) ;
+extern int display_botclear(DISPLAY *) noex ;
+extern int display_botinfo(DISPLAY *,DISPLAY_BOTINFO *) noex ;
+extern int display_botline(DISPLAY *,int) noex ;
 
-extern int display_botclear(DISPLAY *) ;
-extern int display_botinfo(DISPLAY *,DISPLAY_BOTINFO *) ;
-extern int display_botline(DISPLAY *,int) ;
+extern int display_allclear(DISPLAY *) noex ;
 
-extern int display_allclear(DISPLAY *) ;
+extern int display_suspend(DISPLAY *) noex ;
+extern int display_resume(DISPLAY *) noex ;
 
-extern int display_suspend(DISPLAY *) ;
-extern int display_resume(DISPLAY *) ;
+extern int scandata_init(DISPLAY_SDATA *) noex ;
 
+EXTERNC_end
 
-extern int scandata_init(DISPLAY_SDATA *) ;
-
-#ifdef	__cplusplus
-}
-#endif
 
 #endif /* DISPLAY_INCLUDE */
 

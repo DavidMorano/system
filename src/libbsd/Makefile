@@ -938,8 +938,6 @@ dirseen.o:		dirseen.c dirseen.h
 
 dirseen_not.o:		dirseen_not.c dirseen.h
 
-logsys.o:		logsys.c logsys.h
-
 sysmiscem.o:		sysmiscem.c sysmiscem.h
 
 sysmiscfh.o:		sysmiscfh.c sysmiscfh.h

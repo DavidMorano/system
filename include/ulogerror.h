@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 2023 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	ULOGERROR_INCLUDE
 #define	ULOGERROR_INCLUDE

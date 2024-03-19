@@ -1,6 +1,0 @@
-liblkcmd/b_la.cc
-liblkcmd/b_sysval.c
-libprog/pimkrand.cc
-libuc/opentmpfile.cc
-libuc/sysnoise.cc
-varadm/b_varadm.c

@@ -24,7 +24,7 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<stdintx.h>
-#include	<valuelimits.hh>
+#include	<valuelims.hh>
 
 
 extern const valuelimits	valuelimit ;

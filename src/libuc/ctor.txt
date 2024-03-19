@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int langstate_ctor(langstate *op,Args ... args) noex {
+static int termnote_ctor(termnote *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int langstate_ctor(langstate *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (langstate_ctor) */
+/* end subroutine (termnote_ctor) */
 
-static int langstate_dtor(langstate *op) noex {
+static int termnote_dtor(termnote *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (langstate_dtor) */
+/* end subroutine (termnote_dtor) */
 
 template<typename ... Args>
-static int langstate_magic(langstate *op,Args ... args) noex {
+static int termnote_magic(termnote *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LANGSTATE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == TERMNOTE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (langstate_magic) */
+/* end subroutine (termnote_magic) */
 

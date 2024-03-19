@@ -1,7 +1,7 @@
 /* sysnoise HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* retrieve some system noise (pswudo-random data) */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSNOISE_INCLUDE
 #define	SYSNOISE_INCLUDE

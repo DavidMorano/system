@@ -1,6 +1,9 @@
 /* int_fastdiv HEADER */
 /* lang=C++20 */
 
+/* perform specialized fast-integer-division */
+/* version %I% last-modified %G% */
+
 
 /*
  *  Copyright 2014 Maxim Milakov

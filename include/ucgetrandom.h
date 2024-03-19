@@ -1,7 +1,7 @@
 /* ucgetrnadom HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* LIBUC get some pseudo-randomo data from the operaring system */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UCGETRANDOM_INCLUDE
 #define	UCGETRANDOM_INCLUDE

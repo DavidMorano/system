@@ -1,7 +1,7 @@
 /* getprogpath HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* get a program path (given some information) */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GETPROGPATH_INCLUDE
 #define	GETPROGPATH_INCLUDE

@@ -11,11 +11,12 @@
 #define	CALMGR_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vechand.h>
 #include	<vecobj.h>
-#include	<localmisc.h>
 
 #include	"calyears.h"
 #include	"calent.h"
@@ -25,13 +26,13 @@
 
 #define	CALMGR		struct calmgr_head
 #define	CALMGR_Q	CALCITE
-#define	CALMGR_CUR	struct calmgr_c
+#define	CALMGR_CUR	struct calmgr_cursor
 #define	CALMGR_FL	struct calmgr_flags
 
 
-struct calmgr_c {
-	uint		magic ;
+struct calmgr_cursor {
 	void		*results ;
+	uint		magic ;
 	uint		nresults ;
 	int		i ;
 } ;
@@ -48,17 +49,18 @@ struct calmgr_head {
 	void		*calyears ;
 	cchar		*mapdata ;		/* DB memory-map address */
 	vechand		idxes ;			/* indices */
-	CALMGR_FL	f ;
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* DB last check */
 	size_t		filesize ;		/* DB file size */
 	size_t		mapsize ;		/* DB map length */
+	CALMGR_FL	f ;
 	int		nentries ;		/* DB entries */
 	int		cidx ;			/* parent index (ordinal) */
 } ;
 
 typedef CALMGR		calmgr ;
+typedef CALMGR_CUR	calmgr_cur ;
 
 EXTERNC_begin
 

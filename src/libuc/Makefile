@@ -551,7 +551,7 @@ prebase.o:	$(OBJ_PREBASE)
 
 
 # base
-OBJ0_BASE= varnames.o syswords.o valuelimits.o digbufsizes.o ucvariables.o
+OBJ0_BASE= varnames.o syswords.o valuelims.o digbufsizes.o ucvariables.o
 OBJ1_BASE= ucsysconf.o 
 OBJ2_BASE= bufsizedata.o getbufsizenames.o
 OBJ3_BASE= getbufsize.o bufsizevar.o 
@@ -793,7 +793,7 @@ getbufsize.o:		getbufsizenames.h usysdefs.h bufsizedata.hh
 getbufsizenames.o:	getbufsizenames.c getbufsizenames.h
 varnames.o:		varnames.cc varnames.hh
 syswords.o:		syswords.cc syswords.hh
-valuelimits.o:		valuelimits.cc valuelimits.hh
+valuelims.o:		valuelims.cc valuelims.hh
 digbufsizes.o:		digbufsizes.cc digbufsizes.hh
 bufsizedata.o:		bufsizedata.cc bufsizedata.hh
 bufsizevar.o:		bufsizevar.cc bufsizevar.hh
@@ -893,7 +893,7 @@ ucgroup.o:		ucgroup.cc ucgroup.h
 ucproject.o:		ucproject.cc ucproject.h
 
 # UNIX C-language system library support
-libmallocxx.o:		libmalloccc.xx libmallocxx.h
+libmallocxx.o:		libmallocxx.cc libmallocxx.h
 
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.cc mapblock.hh
@@ -1109,7 +1109,7 @@ ucinetconv.o:		ucinetconv.cc ucinetconv.h
 b64decover.o:		b64decoder.cc b64decoder.h
 
 # tab handling
-ncol.o:			ncol.c ncol.h
+ncol.o:			ncol.cc ncol.h
 
 # INET
 inetconv.o:		inetconv.cc inetconv.h
@@ -1186,6 +1186,7 @@ xperm.o:		xperm.cc xperm.h ids.h
 sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
 calstrs.o:		calstrs.cc calstrs.h
+ipow.o:			ipow.cc ipow.h
 #
 isproc.o:		isproc.cc isproc.h
 #
@@ -1394,7 +1395,7 @@ testmemtrack.x:		$(MTOBJ)
 testmemtrack.o:		testmemtrack.cc
 
 # TESYVALUES
-OBJ_TV= testvalues.o digbufsizes.o valuelimits.o ucvariables.o
+OBJ_TV= testvalues.o digbufsizes.o valuelims.o ucvariables.o
 testvalues.x:	$(OBJ_TV)
 	$(LD) -o $@ $(OBJ_TV)
 

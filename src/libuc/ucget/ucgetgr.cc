@@ -32,12 +32,12 @@
 	not support reentrant variations for one or more of these
 	subroutines. I otherwise I could have put a mutex lock
 	around everything to get the same behavior as on other
-	(minimally sane) platforms. I will not name names (f*ck-sh*t
+	(minimally sane) platforms. I will not name names (messed-up
 	Darwin) so as not to offend any particular operation system.
-	But, YES, f*ck those operating systems that did not have
+	But, YES, curse those operating systems that did not have
 	the minimal decency to put mutex locks around all of these
 	subroutines within their standard-C library.  In a parting
-	thought: f*ck Apple Darwin.
+	thought: curse Apple Darwin.
 
 *******************************************************************************/
 

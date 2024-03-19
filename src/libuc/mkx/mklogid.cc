@@ -40,7 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstdlib>
@@ -49,6 +48,8 @@
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<ctdec.h>
+#include	<ndigit.h>
+#include	<ipow.h>
 #include	<localmisc.h>
 
 #include	"mkx.h"
@@ -67,11 +68,6 @@ using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	ndigits(int,int) noex ;
-    extern int	ipow(int,int) noex ;
-}
 
 
 /* external variables */

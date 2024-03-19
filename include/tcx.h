@@ -1,7 +1,7 @@
 /* tcx HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* Teerminal-Control-X (perform various terminal-control functions ) */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TCX_INCLUDE
 #define	TCX_INCLUDE

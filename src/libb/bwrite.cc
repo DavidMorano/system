@@ -1,13 +1,11 @@
-/* bwrite */
+/* bwrite SUPPORT */
+/* lang=C++20 */
 
 /* routine to write bytes */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_CHUNKCPY	0		/* try chunk copy */
 #define	CF_FLUSHPART	1		/* do partial flushes */
-
 
 /* revision history:
 
@@ -20,40 +18,37 @@
 
 /*******************************************************************************
 
-        Unlike the standard I/O library, all writes of this library are atomic
-        in that the entire portion of each write request is actually written to
-        the file as a whole. Each write block is either written to the file as a
-        single block or in conjunction with previous write requests, but in no
-        way will any single write request be broken up and written separately to
-        the file.
+	Unlike the standard I/O library, all writes of this library
+	are atomic in that the entire portion of each write request
+	is actually written to the file as a whole. Each write block
+	is either written to the file as a single block or in
+	conjunction with previous write requests, but in no way
+	will any single write request be broken up and written
+	separately to the file.
 
-        Note that this library can also freely intermix reads and writes to a
-        file with the data ending up where it should without getting scrambled
-        as in the standard library.
+	Note that this library can also freely intermix reads and
+	writes to a file with the data ending up where it should
+	without getting scrambled as in the standard library.
 
-        Both of the above features, as well as some other features unique to
-        this library, would normally make this package slower than the standard
-        I/O library, but this package is normally faster than most versions of
-        the standard package and probably close in performance with some of the
-        latest implemtations which use some of the buffer management strategies
-        used here.
-
+	Both of the above features, as well as some other features
+	unique to this library, would normally make this package
+	slower than the standard I/O library, but this package is
+	normally faster than most versions of the standard package
+	and probably close in performance with some of the latest
+	implemtations which use some of the buffer management
+	strategies used here.
 
 *******************************************************************************/
 
-
-#define	BFILE_MASTER	0
-
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
-
+#include	<algorithm>
 #include	<usystem.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -64,11 +59,13 @@
 #define	MEMCPYLEN	100		/* minimum length for 'memcpy(3c)' */
 
 
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
 /* external subroutines */
-
-extern int	ifloor(int,int) ;
-
-extern char	*strnrchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -79,48 +76,29 @@ extern char	*strnrchr(const char *,int,int) ;
 
 /* forward references */
 
-static int	bwrite_big(bfile *,const void *,int) ;
-static int	bwrite_reg(bfile *,const void *,int) ;
-
-static int	bfile_bufcpy(bfile *,const char *,int) ;
+static int	bfile_wbig(bfile *,cvoid *,int) noex ;
+static int	bfile_wreg(bfile *,cvoid *,int) noex ;
+static int	bfile_bufcpy(bfile *,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bwrite(bfile *fp,const void *abuf,int alen)
-{
-	int		rs = SR_OK ;
+int bwrite(bfile *fp,cvoid *abuf,int alen) noex {
+	int		rs ;
+	if ((rs = bmagic(fp,abuf)) >= 0) {
+	    if ((rs = bfile_active(fp)) > 0) {
+	cchar	*abp = charp(abuf) ;
 	int		f_bufnone ;
-	const char	*abp = (const char *) abuf ;
-
-	if (fp == NULL) return SR_FAULT ;
-	if (abuf == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
 
 	if ((fp->oflags & O_ACCMODE) == 0) return SR_RDONLY ;
 
 	if (alen < 0) alen = strlen(abp) ;
-
-#if	CF_DEBUGS
-	debugprintf("bwrite: ent len=%d\n",alen) ;
-	debugprinthex("bwrite: ",80,abp,alen) ;
-#endif
-
-	if (fp->f.nullfile) goto ret0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bwrite: bufmode=%u\n",fp->bm) ;
-#endif
-
-#if	CF_DEBUGS && 0
-	debugprintf("bwrite: off=%llu alen=%u\n",
-	    fp->offset,alen) ;
-#endif
 
 	f_bufnone = (fp->bm == bfile_bmnone) ;
 
@@ -137,7 +115,7 @@ int bwrite(bfile *fp,const void *abuf,int alen)
 
 	    fp->len = 0 ;
 	    fp->bp = fp->bdata ;
-	    fp->f.write = TRUE ;
+	    fp->f.write = true ;
 
 	} /* end if (previously reading) */
 
@@ -145,18 +123,14 @@ int bwrite(bfile *fp,const void *abuf,int alen)
 
 	if (rs >= 0) {
 	    if (f_bufnone) {
-	        rs = bwrite_big(fp,abuf,alen) ;
+	        rs = bfile_wbig(fp,abuf,alen) ;
 	    } else {
-	        rs = bwrite_reg(fp,abuf,alen) ;
+	        rs = bfile_wreg(fp,abuf,alen) ;
 	    }
 	}
 
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("bwrite: ret rs=%d alen=%u\n",rs,alen) ;
-#endif
-
+	   } /* end if (active) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (bwrite) */
@@ -164,55 +138,41 @@ ret0:
 
 /* local subroutines */
 
-
-static int bwrite_big(bfile *fp,const void *abuf,int alen)
-{
-	int		rs = SR_OK ;
-	int		alenr = alen ;
-	int		len ;
-	const char	*abp = (const char *) abuf ;
-
-	if (fp->len > 0)
-	    rs = bfile_flush(fp) ;
-
-	while ((rs >= 0) && (alenr > 0)) {
-
-	    rs = uc_writen(fp->fd,abp,alenr) ;
-	    len = rs ;
-
-	    if (rs >= 0) {
-	        fp->offset += len ;
-	        abp += len ;
-	        alenr -= len ;
-	    }
-
-	} /* end while */
-
+static int bfile_wbig(bfile *fp,cvoid *abuf,int alen) noex {
+	int		rs ;
+	if ((rs = bfile_flush(fp)) >= 0) {
+	    int		abl = alen ;
+	    cchar	*abp = charp(abuf) ;
+	    while ((rs >= 0) && (abl > 0)) {
+	        if ((rs = uc_writen(fp->fd,abp,abl)) >= 0) {
+	            cint	len = rs ;
+	            fp->offset += len ;
+	            abp += len ;
+	            abl -= len ;
+	        }
+	    } /* end while */
+	} /* end if (flush) */
 	return (rs >= 0) ? alen : rs ;
 }
-/* end subroutine (bwrite_big) */
+/* end subroutine (bfile_wbig) */
 
-
-static int bwrite_reg(bfile *fp,const void *abuf,int alen)
-{
+static int bfile_wreg(bfile *fp,cvoid *abuf,int alen) noex {
 	int		rs = SR_OK ;
 	int		alenr = alen ;
 	int		mlen ;
 	int		len ;
 	int		f_bufline = (fp->bm == bfile_bmline) ;
-	const char	*abp = (const char *) abuf ;
+	cchar	*abp = (cchar *) abuf ;
 
 	while ((rs >= 0) && (alenr > 0)) {
 
 #if	CF_CHUNKCPY
 	    if ((rs >= 0) && (fp->len == 0) && (alenr >= fp->bsize)) {
-
 		while ((rs >= 0) && (alenr >= fp->bsize)) {
 	            mlen = fp->bsize ;
-		    rs = bwrite_big(fp,abuf,mlen)
+		    rs = bfile_wbig(fp,abuf,mlen)
 		    alenr -= mlen ;
 		}
-
 	    } /* end if */
 #endif /* CF_CHUNKCPY */
 
@@ -222,10 +182,7 @@ static int bwrite_reg(bfile *fp,const void *abuf,int alen)
 
 	        mlen = MIN(alenr,blenr) ;
 	        if (f_bufline && (mlen > 0)) {
-	            const char	*tp ;
-#if	CF_DEBUGS
-	            debugprintf("bwrite: lb mlen=%u\n",mlen) ;
-#endif
+	            cchar	*tp ;
 	            if ((tp = strnrchr(abp,mlen,'\n')) != NULL) {
 	                n = (fp->len + ((tp+1) - abp)) ;
 	            }
@@ -239,14 +196,12 @@ static int bwrite_reg(bfile *fp,const void *abuf,int alen)
 	        if (fp->bp == (fp->bdata + fp->bsize)) {
 	            rs = bfile_flush(fp) ;
 	        } else if (f_bufline && (n > 0)) {
-#if	CF_DEBUGS
-	            debugprintf("bwrite: bfile_flushn() n=%u\n",n) ;
-#endif
 	            rs = bfile_flushn(fp,n) ;
 	        }
 #else /* CF_FLUSHPART */
-	        if (fp->bp == (fp->bdata + fp->bsize))
+	        if (fp->bp == (fp->bdata + fp->bsize)) {
 	            rs = bfile_flush(fp) ;
+		}
 #endif /* CF_FLUSHPART */
 
 	    } /* end if */
@@ -255,21 +210,17 @@ static int bwrite_reg(bfile *fp,const void *abuf,int alen)
 
 	return (rs >= 0) ? alen : rs ;
 }
-/* end subroutine (bwrite_reg) */
+/* end subroutine (bfile_wreg) */
 
-
-static int bfile_bufcpy(bfile *fp,cchar *abp,int mlen)
-{
-
+static int bfile_bufcpy(bfile *fp,cchar *abp,int mlen) noex {
 	if (mlen > MEMCPYLEN) {
 	    memcpy(fp->bp,abp,mlen) ;
 	} else {
-	    register int	i ;
-	    register char	*bp = fp->bp ;
-	    for (i = 0 ; i < mlen ; i += 1)
+	    char	*bp = fp->bp ;
+	    for (int i = 0 ; i < mlen ; i += 1) {
 	        *bp++ = *abp++ ;
+	    }
 	}
-
 	fp->bp += mlen ;
 	fp->len += mlen ;
 	fp->offset += mlen ;

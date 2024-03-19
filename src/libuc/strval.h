@@ -1,7 +1,7 @@
 /* strval HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* return (calculate) the numeric value of a given string */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRVAL_INCLUDE
 #define	STRVAL_INCLUDE

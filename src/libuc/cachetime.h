@@ -1,4 +1,4 @@
-/* cachetime */
+/* cachetime HEADER */
 /* lang=C20 */
 
 /* cache-time manager */
@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<hdb.h>
@@ -29,7 +28,7 @@
 
 #define	CACHETIME_MAGIC		0x79854123
 #define	CACHETIME		struct cachetime_head
-#define	CACHETIME_CUR		struct cachetime_c
+#define	CACHETIME_CUR		struct cachetime_cursor
 #define	CACHETIME_STATS		struct cachetime_s
 
 
@@ -37,39 +36,40 @@ struct cachetime_s {
 	uint		req, hit, miss ;
 } ;
 
-struct cachetime_c {
-	HDB_CUR		cur ;
+struct cachetime_cursor {
+	hdb_cur		cur ;
 } ;
 
 struct cachetime_e {
-	const char	*name ;
+	cchar		*name ;
 	time_t		mtime ;
 } ;
 
 struct cachetime_head {
+	hdbB		db ;
+	ptmM		m ;
 	uint		magic ;
-	HDB		db ;
-	PTM		m ;
 	uint		c_req ;
 	uint		c_hit ;
 	uint		c_miss ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef CACHETIME		cachetime ;
+typedef CACHETIME_CUR		cachetime_cur ;
+typedef CACHETIME_STATS		cachetime_stats ;
 
-extern int cachetime_start(CACHETIME *) ;
-extern int cachetime_lookup(CACHETIME *,const char *,int,time_t *) ;
-extern int cachetime_curbegin(CACHETIME *,CACHETIME_CUR *) ;
-extern int cachetime_curend(CACHETIME *,CACHETIME_CUR *) ;
-extern int cachetime_enum(CACHETIME *,CACHETIME_CUR *,char *,int,time_t *) ;
-extern int cachetime_stats(CACHETIME *,CACHETIME_STATS *) ;
-extern int cachetime_finish(CACHETIME *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int cachetime_start(CACHETIME *) noex ;
+extern int cachetime_lookup(CACHETIME *,cchar *,int,time_t *) noex ;
+extern int cachetime_curbegin(CACHETIME *,CACHETIME_CUR *) noex ;
+extern int cachetime_curend(CACHETIME *,CACHETIME_CUR *) noex ;
+extern int cachetime_enum(CACHETIME *,CACHETIME_CUR *,char *,int,
+		time_t *) noex ;
+extern int cachetime_stats(CACHETIME *,CACHETIME_STATS *) noex ;
+extern int cachetime_finish(CACHETIME *) noex ;
+
+EXTERNC_end
 
 
 #endif /* CACHETIME_INCLUDE */

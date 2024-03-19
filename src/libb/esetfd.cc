@@ -1,4 +1,8 @@
-/* debugsetfd */
+/* debugsetfd SUPPORT */
+/* lang=C++20 */
+
+/* set debug file-descriptor */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,40 +14,40 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/stat.h>
-#include	<fcntl.h>
 #include	<unistd.h>
+#include	<fcntl.h>
+#include	<cerrno>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<usysrets.h>
 
 
-
-/* this is it here!!  we are defining this thing!! */
-
-int	err_fd = 2 ;
+/* local defines */
 
 
+/* exported variables */
+
+int	err_fd = -1 ;
 
 
-int debugsetfd(fd)
-int	fd ;
-{
-	struct ustat	sb ;
+/* exported subroutines */
 
-	int		rs = -1 ;
-
-
-	if ((fd < 256) && (fstat(fd,&sb) >= 0))
-		rs = err_fd = fd ;
-
-	else if ((access((char *) fd,W_OK) >= 0) &&
-		((rs = open((char *) fd,O_WRONLY | O_APPEND,0666)) >= 0))
-		err_fd = rs ;
-
+int debugsetfd(int fd) noex {
+	USTAT		sb ;
+	int		rs = SR_BADF ;
+	if (fd < 256) {
+	    if ((rs = fstat(fd,&sb)) >= 0) {
+		err_fd = fd ;
+		rs = fd ;
+	    } else {
+		rs = (- errno) ;
+	    }
+	}
 	return rs ;
 }
 /* end subroutine (debugsetfd) */
-
 
 

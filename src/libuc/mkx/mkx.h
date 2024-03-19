@@ -19,7 +19,7 @@
 
 */
 
-/* Copyright (c) 1998,2018,23023 David A-D- Morano.  All rights reserved. */
+/* Copyright © 1998,2018,23023 David A-D- Morano.  All rights reserved. */
 
 #ifndef	MKX_INCLUDE
 #define	MKX_INCLUDE
@@ -29,7 +29,6 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
-
 #include	<mklogid.h>
 #include	<mkgecosname.h>
 #include	<mkcexsync.h>

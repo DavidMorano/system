@@ -1,7 +1,7 @@
 /* openshm HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* open a temporåry shared-memory segment */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	OPENSHM_INCLUDE
 #define	OPENSHM_INCLUDE

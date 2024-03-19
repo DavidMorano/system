@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CMSGHDR_INCLUDE
 #define	CMSGHDR_INCLUDE

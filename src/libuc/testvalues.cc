@@ -22,7 +22,7 @@
 #include	<cstdlib>
 #include	<cstdio>
 #include	<usystem.h>
-#include	<valuelimits.hh>
+#include	<valuelims.hh>
 #include	<digbufsizes.hh>
 #include	<ucvariables.hh>
 #include	<localmisc.h>

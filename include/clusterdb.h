@@ -1,9 +1,16 @@
 /* clusterdb HEADER */
 /* lang=C20 */
 
-/* perform access table file related functions */
+/* manage a database of cluster names */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

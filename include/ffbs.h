@@ -1,7 +1,7 @@
 /* ffbs HEADER */
 /* lang=C20 */
 
-/* convert a single character to a given case */
+/* Find-First-Bit-Set in various sized integers */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 */
 
-/* Copyright (c) 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	FFBS_INCLUDE
 #define	FFBS_INCLUDE
