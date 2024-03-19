@@ -144,7 +144,7 @@ int uc_mallocbuf(cvoid *vp,int vl,cvoid **vrpp) noex {
 	if (vp && rpp) {
 	    char	*bp{} ;
 	    if (vl < 0) {
-		cchar	*sp = (cchar *) vp ;
+		cchar	*sp = charp(vp) ;
 		vl = strlen(sp) ;
 	    }
 	    if ((rs = uc_malloc((vl+1),&bp)) >= 0) {
@@ -163,7 +163,6 @@ int uc_mallocstrw(cchar *sp,int sl,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (sp && rpp) {
 	    char	*bp{} ;
-	    *rpp = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = uc_malloc((sl+1),&bp)) >= 0) {
 	        *rpp = bp ;
