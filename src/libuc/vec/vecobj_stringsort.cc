@@ -59,6 +59,9 @@ extern "C" {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecobj_stringsort(vecobj *op,vecobj_vcf vcmp) noex {

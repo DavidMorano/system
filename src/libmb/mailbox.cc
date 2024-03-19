@@ -1,5 +1,5 @@
-/* mailbox */
-/* lang=C20 */
+/* mailbox SUPPORT */
+/* lang=C_++20 */
 
 /* mailbox handling object */
 /* version %I% last-modified %G% */
@@ -20,8 +20,8 @@
 
 /*******************************************************************************
 
-        This is a *simple* mailbox object. It reads a mailbox-formatted file and
-        allows some simple manipulations of it.
+	This is a *simple* mailbox object. It reads a mailbox-formatted
+	file and allows some simple manipulations of it.
 
 	Notes on message status:
 
@@ -33,23 +33,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<filebuf.h>
-#include	<char.h>
 #include	<ascii.h>
 #include	<mailmsgmatenv.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
-#include	<localmisc.h>
 #include	<strn.h>
+#include	<mkpathx.h>
+#include	<sncpyx.h>
+#include	<matxstr.h>
+#include	<lockfile.h>
+#include	<char.h>
+#include	<ischarx.h>
+#include	<localmisc.h>
 
 #include	"mailbox.h"
 #include	"mailmsghdrval.h"
@@ -98,38 +103,39 @@
 #define	MAILBOXPI_FL	struct mailboxpi_flags
 
 
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,uint,uint *) ;
-extern int	mailmsgmathdr(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
+extern "C" {
+    extern int	filebuf_writefd(filebuf *,char *,int,int,int) noex ;
+    extern int	filebuf_writehdr(filebuf *,cchar *,int) noex ;
+    extern int	filebuf_writehdrval(filebuf *,cchar *,int) noex ;
+}
+
+extern int	mailmsgmathdr(cchar *,int,int *) ;
 extern int	tmpmailboxes(char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	lockend(int,int,int,int) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	filebuf_writefd(FILEBUF *,char *,int,int,int) ;
-extern int	filebuf_writehdr(FILEBUF *,cchar *,int) ;
-extern int	filebuf_writehdrval(FILEBUF *,cchar *,int) ;
-extern int	hdrextnum(const char *,int) ;
+extern int	opentmpfile(cchar *,int,mode_t,char *) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	hdrextnum(cchar *,int) ;
 extern int	iceil(int,int) ;
 extern int	isprintlatin(int) ;
 extern int	hasEOH(cchar *,int) ;
 
 #if	CF_DEBUGS || CF_FDEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -138,9 +144,9 @@ extern char	*strnchr(const char *,int,int) ;
 /* local structures */
 
 struct liner {
-	FILEBUF		*fbp ;
-	off_t	poff ;			/* file-offset previous */
-	off_t	foff ;			/* file-offset current */
+	filebuf		*fbp ;
+	off_t		poff ;			/* file-offset previous */
+	off_t		foff ;			/* file-offset current */
 	int		to ;			/* read time-out */
 	int		llen ;
 	char		lbuf[LINEBUFLEN + 1] ;
@@ -152,8 +158,8 @@ struct sigstate {
 } ;
 
 struct msgcopy {
-	FILEBUF		*fbp ;
-	off_t	moff ;
+	filebuf		*fbp ;
+	off_t		moff ;
 	char		*bp ;
 	int		bl ;
 } ;
@@ -176,46 +182,39 @@ struct mailboxpi {
 
 /* local (forward) subroutines */
 
-static int mailbox_parse(MAILBOX *) ;
-static int mailbox_parsemsg(MAILBOX *,LINER *,int) ;
-static int mailbox_parsemsger(MAILBOX *,MAILMSGMATENV *,MAILBOXPI *) ;
-static int mailbox_loadmsghead(MAILBOX *,MAILBOX_MSGINFO *,MAILMSGHDRVAL *) ;
-static int mailbox_msgfins(MAILBOX *) ;
-static int mailbox_rewrite(MAILBOX *) ;
-static int mailbox_rewriter(MAILBOX *,int) ;
-static int mailbox_msgcopy(MAILBOX *,MSGCOPY *,MAILBOX_MSGINFO *) ;
-static int mailbox_msgcopyadd(MAILBOX *,MSGCOPY *,MAILBOX_MSGINFO *) ;
+static int mailbox_parse(MAILBOX *) noex ;
+static int mailbox_parsemsg(MAILBOX *,LINER *,int) noex ;
+static int mailbox_parsemsger(MAILBOX *,MAILMSGMATENV *,MAILBOXPI *) noex ;
+static int mailbox_loadmsghead(MAILBOX *,MAILBOX_MSGINFO *,
+		MAILMSGHDRVAL *) noex ;
+static int mailbox_msgfins(MAILBOX *) noex ;
+static int mailbox_rewrite(MAILBOX *) noex ;
+static int mailbox_rewriter(MAILBOX *,int) noex ;
+static int mailbox_msgcopy(MAILBOX *,MSGCOPY *,MAILBOX_MSGINFO *) noex ;
+static int mailbox_msgcopyadd(MAILBOX *,MSGCOPY *,MAILBOX_MSGINFO *) noex ;
 
-static int msginfo_start(MAILBOX_MSGINFO *,off_t,int) ;
-static int msginfo_finish(MAILBOX_MSGINFO *) ;
-static int msginfo_setenv(MAILBOX_MSGINFO *,MAILMSGMATENV *) ;
+static int msginfo_start(MAILBOX_MSGINFO *,off_t,int) noex ;
+static int msginfo_finish(MAILBOX_MSGINFO *) noex ;
+static int msginfo_setenv(MAILBOX_MSGINFO *,MAILMSGMATENV *) noex ;
 
-static int liner_start(LINER *,FILEBUF *,off_t,int) ;
-static int liner_finish(LINER *) ;
-static int liner_read(LINER *,cchar **) ;
-static int liner_done(LINER *) ;
-static int liner_seek(LINER *,int) ;
+static int liner_start(LINER *,filebuf *,off_t,int) noex ;
+static int liner_finish(LINER *) noex ;
+static int liner_read(LINER *,cchar **) noex ;
+static int liner_done(LINER *) noex ;
+static int liner_seek(LINER *,int) noex ;
 
-static int mailboxpi_start(MAILBOXPI *,LINER *,int) ;
-static int mailboxpi_finish(MAILBOXPI *) ;
-static int mailboxpi_havemsg(MAILBOXPI *) ;
+static int mailboxpi_start(MAILBOXPI *,LINER *,int) noex ;
+static int mailboxpi_finish(MAILBOXPI *) noex ;
+static int mailboxpi_havemsg(MAILBOXPI *) noex ;
 
-static int writeblanklines(int,int) ;
+static int writeblanklines(int,int) noex ;
 
 #if	CF_DEBUGS
-static int debuglinelen(const char *,int,int) ;
+static int debuglinelen(cchar *,int,int) noex ;
 #endif
 
 
 /* local variables */
-
-static const char	*msghdrkeys[] = {
-	"content-length",
-	"content-lines",
-	"lines",
-	"x-lines",
-	NULL
-} ;
 
 enum headkeys {
 	headkey_clen,
@@ -225,7 +224,15 @@ enum headkeys {
 	headkey_overlast
 } ;
 
-static const int	sigblocks[] = {
+static constexpr cpcchar	msghdrkeys[] = {
+	"content-length",
+	"content-lines",
+	"lines",
+	"x-lines",
+	NULL
+} ;
+
+static constexpr int	sigblockers[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGQUIT,
@@ -237,22 +244,24 @@ static const int	sigblocks[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mailbox_open(MAILBOX *mbp,cchar *mbfname,int mflags) noex {
-{
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs ;
 	int		oflags ;
 	int		nmsgs = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (mbp == NULL) return SR_FAULT ;
 	if (mbfname == NULL) return SR_FAULT ;
 
 	if (mbfname[0] == '\0') return SR_INVALID ;
 
-	memclear(mbp,sizeof(MAILBOX)) ;
+	memclear(mbp) ;		/* dangerous */
 	mbp->mfd = -1 ;
 	mbp->msgs_total = 0 ;
 	mbp->to_lock = TO_LOCK ;
@@ -282,13 +291,13 @@ int mailbox_open(MAILBOX *mbp,cchar *mbfname,int mflags) noex {
 	            mbp->ti_mod = sb.st_mtime ;
 	            mbp->ti_check = time(NULL) ;
 	            if ((rs = uc_mallocstrw(mbfname,-1,&cp)) >= 0) {
-	                const int	es = sizeof(struct mailbox_msg) ;
-	                const int	vo = VECOBJ_OCOMPACT ;
+	                cint	es = sizeof(struct mailbox_msg) ;
+	                cint	vo = VECOBJ_OCOMPACT ;
 	                mbp->mailfname = cp ;
 	                nmsgs = MAILBOX_DEFMSGS ;
 	                if ((rs = vecobj_start(&mbp->msgs,es,10,vo)) >= 0) {
-	                    const int	to = mbp->to_lock ;
-	                    if ((rs = lockend(mbp->mfd,TRUE,1,to)) >= 0) {
+	                    cint	to = mbp->to_lock ;
+	                    if ((rs = uc_locktail(mbp->mfd,TRUE,1,to)) >= 0) {
 	                        off_t	loff ;
 	                        if ((rs = mailbox_parse(mbp)) >= 0) {
 	                            nmsgs = mbp->msgs_total ;
@@ -322,9 +331,7 @@ int mailbox_open(MAILBOX *mbp,cchar *mbfname,int mflags) noex {
 }
 /* end subroutine (mailbox_open) */
 
-
-int mailbox_close(MAILBOX *mbp)
-{
+int mailbox_close(MAILBOX *mbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		mblen = 0 ;
@@ -391,10 +398,7 @@ int mailbox_close(MAILBOX *mbp)
 }
 /* end subroutine (mailbox_close) */
 
-
-/* get the mail filename */
-int mailbox_mbfile(MAILBOX *mbp,char *mbuf,int mlen)
-{
+int mailbox_mbfile(MAILBOX *mbp,char *mbuf,int mlen) noex {
 	int		rs ;
 
 	if (mbp == NULL) return SR_FAULT ;
@@ -408,11 +412,7 @@ int mailbox_mbfile(MAILBOX *mbp,char *mbuf,int mlen)
 }
 /* end subroutine (mailbox_mbfile) */
 
-
-/* get information */
-int mailbox_info(MAILBOX *mbp,MAILBOX_INFO *mip)
-{
-
+int mailbox_info(MAILBOX *mbp,MAILBOX_INFO *mip) noex {
 	if (mbp == NULL) return SR_FAULT ;
 	if (mip == NULL) return SR_FAULT ;
 	if (mbp->magic != MAILBOX_MAGIC) return SR_NOTOPEN ;
@@ -427,11 +427,7 @@ int mailbox_info(MAILBOX *mbp,MAILBOX_INFO *mip)
 }
 /* end subroutine (mailbox_info) */
 
-
-/* get count of messages */
-int mailbox_count(MAILBOX *mbp)
-{
-
+int mailbox_count(MAILBOX *mbp) noex {
 	if (mbp == NULL) return SR_FAULT ;
 
 	if (mbp->magic != MAILBOX_MAGIC) return SR_NOTOPEN ;
@@ -440,10 +436,7 @@ int mailbox_count(MAILBOX *mbp)
 }
 /* end subroutine (mailbox_count) */
 
-
-/* check whatever */
-int mailbox_check(MAILBOX *mbp,time_t daytime)
-{
+int mailbox_check(MAILBOX *mbp,time_t daytime) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
@@ -461,10 +454,7 @@ int mailbox_check(MAILBOX *mbp,time_t daytime)
 }
 /* end subroutine (mailbox_check) */
 
-
-/* mark a message for deletion */
-int mailbox_msgdel(MAILBOX *mbp,int mi,int f)
-{
+int mailbox_msgdel(MAILBOX *mbp,int mi,int f) noex {
 	MAILBOX_MSGINFO	*mp ;
 	int		rs ;
 	int		f_prev = FALSE ;
@@ -498,10 +488,7 @@ int mailbox_msgdel(MAILBOX *mbp,int mi,int f)
 }
 /* end subroutine (mailbox_msgdel) */
 
-
-/* get count of deleted messages */
-int mailbox_countdel(MAILBOX *mbp)
-{
+int mailbox_countdel(MAILBOX *mbp) noex {
 	int		count = 0 ;
 
 	if (mbp == NULL) return SR_FAULT ;
@@ -523,10 +510,7 @@ int mailbox_countdel(MAILBOX *mbp)
 }
 /* end subroutine (mailbox_countdel) */
 
-
-/* get the file offset to the start-envelope of a message */
-int mailbox_msgoff(MAILBOX *mbp,int mi,off_t *offp)
-{
+int mailbox_msgoff(MAILBOX *mbp,int mi,off_t *offp) noex {
 	MAILBOX_MSGINFO	*mp ;
 	int		rs ;
 	int		mlen = 0 ;
@@ -550,10 +534,7 @@ int mailbox_msgoff(MAILBOX *mbp,int mi,off_t *offp)
 }
 /* end subroutine (mailbox_msgoff) */
 
-
-/* get the information for a message */
-int mailbox_msginfo(MAILBOX *mbp,int mi,MAILBOX_MSGINFO *mip)
-{
+int mailbox_msginfo(MAILBOX *mbp,int mi,MAILBOX_MSGINFO *mip) noex {
 	MAILBOX_MSGINFO	*mp ;
 	int		rs ;
 	int		mlen = 0 ;
@@ -589,9 +570,7 @@ int mailbox_msginfo(MAILBOX *mbp,int mi,MAILBOX_MSGINFO *mip)
 }
 /* end subroutine (mailbox_msginfo) */
 
-
-int mailbox_msghdradd(MAILBOX *mbp,int mi,cchar *k,cchar *vp,int vl)
-{
+int mailbox_msghdradd(MAILBOX *mbp,int mi,cchar *k,cchar *vp,int vl) noex {
 	MAILBOX_MSGINFO	*mp ;
 	int		rs ;
 
@@ -622,22 +601,20 @@ int mailbox_msghdradd(MAILBOX *mbp,int mi,cchar *k,cchar *vp,int vl)
 }
 /* end subroutine (mailbox_msghdradd) */
 
-
-int mailbox_readbegin(MAILBOX *mbp,MAILBOX_READ *curp,off_t foff,int rsize)
-{
+int mailbox_readbegin(MAILBOX *mbp,MAILBOX_READ *curp,off_t foff,int rsz) noex {
 	int		rs ;
 	char		*p ;
 
 	if (mbp == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
-	if (rsize <= 0) rsize = MAILBOX_READSIZE ;
+	if (rsz <= 0) rsz = MAILBOX_READSIZE ;
 
-	memset(curp,0,sizeof(MAILBOX_READ)) ;
+	memclear(curp) ;
 
-	if ((rs = uc_malloc(rsize,&p)) >= 0) {
+	if ((rs = uc_malloc(rsz,&p)) >= 0) {
 	    curp->rbuf = p ;
-	    curp->rsize = rsize ;
+	    curp->rsize = rsz ;
 	    curp->foff = foff ;
 	    curp->roff = foff ;
 	}
@@ -646,9 +623,7 @@ int mailbox_readbegin(MAILBOX *mbp,MAILBOX_READ *curp,off_t foff,int rsize)
 }
 /* end subroutine (mailbox_readbegin) */
 
-
-int mailbox_readend(MAILBOX *mbp,MAILBOX_READ *curp)
-{
+int mailbox_readend(MAILBOX *mbp,MAILBOX_READ *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -670,9 +645,7 @@ int mailbox_readend(MAILBOX *mbp,MAILBOX_READ *curp)
 }
 /* end subroutine (mailbox_readend) */
 
-
-int mailbox_readline(MAILBOX *mbp,MAILBOX_READ *curp,char *lbuf,int llen)
-{
+int mailbox_readline(MAILBOX *mbp,MAILBOX_READ *curp,char *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		mfd ;
 	int		i, mlen ;
@@ -757,14 +730,11 @@ int mailbox_readline(MAILBOX *mbp,MAILBOX_READ *curp,char *lbuf,int llen)
 
 /* private subroutines */
 
-
-/* parse a mailbox file */
-static int mailbox_parse(MAILBOX *mbp)
-{
+static int mailbox_parse(MAILBOX *mbp) noex {
 	LINER		ls, *lsp = &ls ;
-	FILEBUF		fb ;
+	filebuf		fb ;
 	const off_t	soff = 0L ;
-	const int	bsize = (32 * mbp->pagesize) ;
+	cint		bsize = (32 * mbp->pagesize) ;
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
@@ -807,10 +777,7 @@ static int mailbox_parse(MAILBOX *mbp)
 }
 /* end subroutine (mailbox_parse) */
 
-
-/* parse out the headers of this message */
-static int mailbox_parsemsg(MAILBOX *mbp,LINER *lsp,int mi)
-{
+static int mailbox_parsemsg(MAILBOX *mbp,LINER *lsp,int mi) noex {
 	MAILBOXPI	pi ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -823,7 +790,7 @@ static int mailbox_parsemsg(MAILBOX *mbp,LINER *lsp,int mi)
 	if ((rs = mailboxpi_start(&pi,lsp,mi)) >= 0) {
 	    MAILMSGMATENV	me ;
 	    int			vi = 0 ;
-	    const char		*lp ;
+	    cchar		*lp ;
 
 /* find message start */
 
@@ -882,13 +849,12 @@ static int mailbox_parsemsg(MAILBOX *mbp,LINER *lsp,int mi)
 }
 /* end subroutine (mailbox_parsemsg) */
 
-
-static int mailbox_parsemsger(MAILBOX *mbp,MAILMSGMATENV *mep,MAILBOXPI *pip)
-{
+static int mailbox_parsemsger(MAILBOX *mbp,MAILMSGMATENV *mep,
+		MAILBOXPI *pip) noex {
 	LINER		*lsp = pip->lsp ;
 	MAILBOX_MSGINFO	msg, *msgp = &msg ;
 	MAILMSGHDRVAL	mhv ;
-	const int	mi = pip->mi ;
+	cint		mi = pip->mi ;
 	int		rs ;
 	int		rs1 ;
 	int		ll = 0 ;
@@ -1209,15 +1175,13 @@ static int mailbox_parsemsger(MAILBOX *mbp,MAILMSGMATENV *mep,MAILBOXPI *pip)
 }
 /* end subroutine (mailbox_parsemsger) */
 
-
 static int mailbox_loadmsghead(MAILBOX *mbp,MAILBOX_MSGINFO *msgp,
-		MAILMSGHDRVAL *mhvp)
-{
+		MAILMSGHDRVAL *mhvp) noex {
 	int		rs ;
 	int		vl ;
 	int		hi ;
 	int		v = -1 ;
-	const char	*vp ;
+	cchar		*vp ;
 
 	if (mbp == NULL) return SR_FAULT ;
 
@@ -1276,9 +1240,7 @@ static int mailbox_loadmsghead(MAILBOX *mbp,MAILBOX_MSGINFO *msgp,
 }
 /* end subroutine (mailbox_loadmsghead) */
 
-
-static int mailbox_msgfins(MAILBOX *mbp)
-{
+static int mailbox_msgfins(MAILBOX *mbp) noex {
 	MAILBOX_MSGINFO	*mp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1294,10 +1256,8 @@ static int mailbox_msgfins(MAILBOX *mbp)
 }
 /* end subroutine (mailbox_msgfins) */
 
-
-static int mailbox_rewrite(MAILBOX *mbp)
-{
-	const int	dlen = MAXPATHLEN ;
+static int mailbox_rewrite(MAILBOX *mbp) noex {
+	cint		dlen = MAXPATHLEN ;
 	int		rs ;
 	char		dbuf[MAXPATHLEN + 1] ;
 
@@ -1309,14 +1269,14 @@ static int mailbox_rewrite(MAILBOX *mbp)
 	    cchar	*mb = "mbXXXXXXXXXXXX" ;
 	    char	template[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(template,dbuf,mb)) >= 0) {
-	        SIGBLOCK	ss ;
-	        if ((rs = sigblock_start(&ss,sigblocks)) >= 0) {
+		sigblocker	ss ;
+	        if ((rs = sigblocker_start(&ss,sigblockers)) >= 0) {
 	            const mode_t	om = 0600 ;
-	            const int	of = (O_RDWR | O_CREAT) ;
+	            cint	of = (O_RDWR | O_CREAT) ;
 	            char		tbuf[MAXPATHLEN + 1] ;
 
 	            if ((rs = opentmpfile(template,of,om,tbuf)) >= 0) {
-	                const int	tfd = rs ;
+	                cint	tfd = rs ;
 
 	                rs = mailbox_rewriter(mbp,tfd) ;
 
@@ -1329,8 +1289,8 @@ static int mailbox_rewrite(MAILBOX *mbp)
 	                u_unlink(tbuf) ;
 	            } /* end if (open tmp-file) */
 
-	            sigblock_finish(&ss) ;
-	        } /* end if (sigblock) */
+	            sigblocker_finish(&ss) ;
+	        } /* end if (sigblocker) */
 	    } /* end if (mkpath) */
 	} /* end if (tmpmailboxes) */
 
@@ -1347,9 +1307,9 @@ static int mailbox_rewriter(MAILBOX *mbp,int tfd)
 {
 	MSGCOPY		mc ;
 	MAILBOX_MSGINFO	*mip ;
-	FILEBUF		fb, *fbp = &fb ;
+	filebuf		fb, *fbp = &fb ;
 	off_t	mbchange = -1 ;
-	const int	pagesize = mbp->pagesize ;
+	cint	pagesize = mbp->pagesize ;
 	int		rs ;
 	int		bsize ;
 	int		rs1 ;
@@ -1488,12 +1448,12 @@ static int mailbox_msgcopy(MAILBOX *mbp,MSGCOPY *mcp,MAILBOX_MSGINFO *mip)
 
 static int mailbox_msgcopyadd(MAILBOX *mbp,MSGCOPY *mcp,MAILBOX_MSGINFO *mip)
 {
-	const int	mfd = mbp->mfd ;
+	cint	mfd = mbp->mfd ;
 	int		rs = SR_OK ;
 	int		ehlen ;
 	int		i ;
 	int		wlen = 0 ;
-	const char	*sp ;
+	cchar	*sp ;
 
 #if	CF_DEBUGS
 	debugprintf("mailbox_msgcopyadd: mi=%u\n",mip->msgi) ;
@@ -1588,7 +1548,7 @@ static int msginfo_setenv(MAILBOX_MSGINFO *msgp,MAILMSGMATENV *mep)
 /* end subroutine (msginfo_setenv) */
 
 
-static int liner_start(LINER *lsp,FILEBUF *fbp,off_t foff,int to)
+static int liner_start(LINER *lsp,filebuf *fbp,off_t foff,int to)
 {
 
 	lsp->poff = 0 ;
@@ -1614,11 +1574,11 @@ static int liner_finish(LINER *lsp)
 
 static int liner_read(LINER *lsp,cchar **lpp)
 {
-	FILEBUF		*fbp = lsp->fbp ;
+	filebuf		*fbp = lsp->fbp ;
 	int		rs = SR_OK ;
 
 	if (lsp->llen < 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    lsp->poff = lsp->foff ;
 	    if ((rs = filebuf_readln(fbp,lsp->lbuf,llen,lsp->to)) >= 0) {
 	        lsp->llen = rs ;
@@ -1674,16 +1634,12 @@ static int mailboxpi_finish(MAILBOXPI *pip)
 }
 /* end subroutine (mailboxpi_finish) */
 
-
-static int mailboxpi_havemsg(MAILBOXPI *pip)
-{
+static int mailboxpi_havemsg(MAILBOXPI *pip) noex {
 	return (pip->f.env || pip->f.hdr || pip->f.eoh) ;
 }
 /* end subroutine (mailboxpi_havemsg) */
 
-
-static int mailboxpi_start(MAILBOXPI *pip,LINER *lsp,int mi)
-{
+static int mailboxpi_start(MAILBOXPI *pip,LINER *lsp,int mi) noex {
 	memset(pip,0,sizeof(MAILBOXPI)) ;
 	pip->lsp = lsp ;
 	pip->mi = mi ;
@@ -1692,7 +1648,7 @@ static int mailboxpi_start(MAILBOXPI *pip,LINER *lsp,int mi)
 /* end subroutine (mailboxpi_start) */
 
 static int writeblanklines(int mfd,int len) noex {
-	const int	llen = LINEBUFLEN ;
+	cint		llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rlen = len ;
 	int		maxlen ;
@@ -1711,17 +1667,15 @@ static int writeblanklines(int mfd,int len) noex {
 /* end subroutine (writeblanklines) */
 
 #if	CF_DEBUGS
-static int debuglinelen(lp,ll,ml)
-const char	*lp ;
-int		ll ;
-int		ml ;
-{
-	int		rl ;
+static int debuglinelen(cchar *lp,int ll,int ml) noex {
+	int		rl = 0 ;
 	rl = strnlen(lp,ll) ;
-	if (rl > ml)
+	if (rl > ml) {
 	    rl = ml ;
-	if ((rl > 0) && (lp[rl-1] == '\n'))
+	}
+	if ((rl > 0) && (lp[rl-1] == '\n')) {
 	    rl -= 1 ;
+	}
 	return rl ;
 }
 /* end subroutine (debuglinelen) */

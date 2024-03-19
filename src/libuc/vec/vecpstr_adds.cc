@@ -33,16 +33,15 @@
 
 	Returns:
 	>=0		number of elements loaded
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>		/* for |strlen(3c)| */
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>
@@ -66,6 +65,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

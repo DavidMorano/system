@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		number of elements loaded
-	<0		error
+	<0		error (system-return)
 
 	Notes:
 	Why use filebuf over BFILE? Yes, filebuf is a tiny bit more
@@ -56,21 +56,22 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* <- for |UCHAR_MAX| + |CHAR_BIT| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
-#include	<vecpstr.h>
 #include	<filebuf.h>
 #include	<field.h>
 #include	<localmisc.h>
+
+#include	"vecpstr.h"
 
 
 /* local defines */

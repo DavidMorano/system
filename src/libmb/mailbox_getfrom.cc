@@ -1,9 +1,8 @@
-/* mailbox_getfrom */
+/* mailbox_getfrom SUPPORT */
+/* lang=C++20 */
 
 /* get a FROM address from a mail message */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,11 +19,9 @@
 	This subroutine gets a FROM address from a mail message.
 
 	Synopsis:
-
-	int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi)
+	int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cc *fn,int mi) noex
 
 	Arguments:
-
 	mbp		pointer to MAILBOX object
 	rbuf		buffer to hold result
 	rlen		length of supplied result buffer
@@ -32,29 +29,26 @@
 	mi		message-id (ID of message within mail-box)
 
 	Returns:
-
 	>=0		OK
-	<0		some error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<mailbox.h>
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
+#include	<mkx.h>
+#include	<isoneof.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 
@@ -63,34 +57,9 @@
 
 /* external subroutines */
 
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mknpath1(char *,int,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
-extern int	pathadd(char *,cchar *,int) ;
-extern int	sfsubstance(const char *,int,const char **) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkbestfrom(char *,int,const char *,int) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
-extern int	isNotPresent(int) ;
-extern int	isOneOf(const int *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern "C" {
+    extern int	mailmsg_loadfile(mailmsg *,bfile *) noex ;
+}
 
 
 /* external variables */
@@ -101,8 +70,8 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 /* forward references */
 
-static int	mailmsg_fromer(MAILMSG *,char *,int) ;
-static int	isNoMsg(int) ;
+static int	mailmsg_fromer(mailmsg *,char *,int) noex ;
+static bool	isNoMsg(int) noex ;
 
 
 /* local variables */
@@ -114,19 +83,16 @@ static const int	rsnomsg[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi)
-{
+int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 	MAILBOX_MSGINFO	msginfo ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("mailbox_getfrom: ent mi=%d\n",mi) ;
-#endif
 
 	if (mbp == NULL) return SR_FAULT ;
 	if (fn == NULL) return SR_FAULT ;
@@ -162,10 +128,6 @@ int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi)
 	    } /* end if (msg-info) */
 	} /* end if (positive MI) */
 
-#if	CF_DEBUGS
-	debugprintf("mailbox_getfrom: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mailbox_getfrom) */
@@ -173,9 +135,7 @@ int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi)
 
 /* local subroutines */
 
-
-static int mailmsg_fromer(MAILMSG *mmp,char *rbuf,int rlen)
-{
+static int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		vl = 0 ;
 	int		len = 0 ;
@@ -210,9 +170,7 @@ static int mailmsg_fromer(MAILMSG *mmp,char *rbuf,int rlen)
 }
 /* end subroutine (mailmsg_fromer) */
 
-
-static int isNoMsg(int rs)
-{
+static bool isNoMsg(int rs) noex {
 	return isOneOf(rsnomsg,rs) ;
 }
 /* end subroutine (isNoMsg) */

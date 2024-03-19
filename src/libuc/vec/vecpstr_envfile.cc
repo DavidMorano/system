@@ -43,16 +43,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
+#include	<cstdarg>
 #include	<cstring>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<utimeout.h>
-#include	<vecpstr.h>
 #include	<filebuf.h>
 #include	<field.h>
 #include	<sfx.h>
@@ -60,6 +59,8 @@
 #include	<strdcpyxw.h>
 #include	<vstrkeycmpx.h>
 #include	<localmisc.h>
+
+#include	"vecpstr.h"
 
 
 /* local defines */

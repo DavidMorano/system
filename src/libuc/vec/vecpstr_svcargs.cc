@@ -1,4 +1,4 @@
-/* vecpstr_svcargs SUPPORT */
+/* vecpstr_svcargs SUUPORT */
 /* lang=C++20 */
 
 /* load service arguments */
@@ -22,18 +22,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* for |CHAR_MAX| + |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
-#include	<vecpstr.h>
 #include	<strn.h>
 #include	<strwcmp.h>
 #include	<mkchar.h>
 #include	<toxc.h>
 #include	<localmisc.h>
+
+#include	"vecpstr.h"
 
 
 /* local defines */
@@ -60,6 +60,9 @@ static int	hasLong(cchar *,int) noex ;
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
 static char		terms[termsize] ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

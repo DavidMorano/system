@@ -1,10 +1,10 @@
-/* mailmsgstage */
+/* mailmsgstage SUPPORT */
+/* lang=C++20 */
 
 /* process the input messages and spool them up */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -17,17 +17,19 @@
 
 /*******************************************************************************
 
-	This object module processes one or more mail messages (in appropriate
-	mailbox format if more than one) from a file descriptor passed in the
-	'init' call-method.  The input file descriptor can be a pipe as a
-	standard mailbox file is not required (one of the whole reasons for
-	this object as opposed to the MAILBOX object).
+	This object module processes one or more mail messages (in
+	appropriate mailbox format if more than one) from a file
+	descriptor passed in the 'init' call-method.  The input
+	file descriptor can be a pipe as a standard mailbox file
+	is not required (one of the whole reasons for this object
+	as opposed to the MAILBOX object).
 
-	Any mail messages found are effectively partially parsed and the object
-	is then ready for queries by additional method calls.
+	Any mail messages found are effectively partially parsed
+	and the object is then ready for queries by additional
+	method calls.
 
-	The parsed mail meta-data is stored in a manner such that it is
-	optimized for repeated access.
+	The parsed mail meta-data is stored in a manner such that
+	it is optimized for repeated access.
 
 	Use should proceed roughly as:
 
@@ -40,24 +42,19 @@
 
 	This object is pretty fast also!
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<sys/time.h>		/* for 'gethrtime(3c)' */
-#include	<limits.h>
+#include	<sys/time.h>		/* for |gethrtime(3c)| */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<netdb.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<xstring>
 #include	<usystem.h>
 #include	<filebuf.h>
 #include	<vechand.h>
@@ -165,7 +162,7 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct liner {
-	FILEBUF		mfb ;
+	filebuf		mfb ;
 	off_t	poff ;		/* file-offset previous */
 	off_t	foff ;		/* file-offset current */
 	int		to ;		/* read time-out */
@@ -199,12 +196,12 @@ struct msgentry {
 
 static int	mailmsgstage_starter(MAILMSGSTAGE *,int,int) ;
 static int	mailmsgstage_g(MAILMSGSTAGE *,int,int) ;
-static int	mailmsgstage_gmsg(MAILMSGSTAGE *,FILEBUF *,LINER *,int) ;
-static int	mailmsgstage_gmsgbody(MAILMSGSTAGE *,FILEBUF *,LINER *,
+static int	mailmsgstage_gmsg(MAILMSGSTAGE *,filebuf *,LINER *,int) ;
+static int	mailmsgstage_gmsgbody(MAILMSGSTAGE *,filebuf *,LINER *,
 			MSGENTRY *) ;
-static int	mailmsgstage_gmsgent(MAILMSGSTAGE *,FILEBUF *,LINER *,
+static int	mailmsgstage_gmsgent(MAILMSGSTAGE *,filebuf *,LINER *,
 			cchar *,int,int) ;
-static int	mailmsgstage_gmsgenter(MAILMSGSTAGE *,FILEBUF *,LINER *,
+static int	mailmsgstage_gmsgenter(MAILMSGSTAGE *,filebuf *,LINER *,
 			MSGENTRY *) ;
 static int	mailmsgstage_msgfins(MAILMSGSTAGE *) ;
 static int	mailmsgstage_gmsgentnew(MAILMSGSTAGE *,MSGENTRY **) ;
@@ -715,7 +712,7 @@ int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,off_t boff,
 /* gather the messages */
 static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 {
-	FILEBUF		tfb ;
+	filebuf		tfb ;
 	const off_t	ostart = 0L ;
 	int		rs ;
 	int		rs1 ;
@@ -758,7 +755,7 @@ static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 
 
 /* parse out the headers of this message */
-static int mailmsgstage_gmsg(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,int mi)
+static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,int mi)
 {
 	MAILMSGMATENV	me ;
 	int		rs = SR_OK ;
@@ -827,7 +824,7 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,int mi)
 /* end subroutine (mailmsgstage_gmsg) */
 
 
-static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,
+static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 		cchar *lp,int ll,int f_eoh)
 {
 	MSGENTRY	*mep ;
@@ -873,7 +870,7 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,
 /* end subroutine (mailmsgstage_gmsgent) */
 
 
-static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,
+static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	MSGENTRY *mep)
 {
 	int		rs ;
@@ -896,7 +893,7 @@ static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,
 /* end subroutine (mailmsgstage_gmsgenter) */
 
 
-static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,FILEBUF *tfp,LINER *lsp,
+static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	MSGENTRY *mep)
 {
 	int		rs = SR_OK ;
@@ -1342,7 +1339,7 @@ static int liner_start(LINER *lsp,int mfd,off_t foff,int to)
 	    mode_t	m = sb.st_mode ;
 	    lsp->f_net = S_ISCHR(m) || S_ISSOCK(m) ;
 	    if (lsp->f_net) {
-	        fbo |= FILEBUF_ONET ;
+	        fbo |= filebuf_ONET ;
 	    } else {
 	        int	fs = ((sb.st_size == 0) ? 1 : (sb.st_size & INT_MAX)) ;
 	        int	cs ;
@@ -1374,7 +1371,7 @@ static int liner_finish(LINER *lsp)
 
 static int liner_readline(LINER *lsp,cchar **lpp)
 {
-	FILEBUF		*fbp = &lsp->mfb ;
+	filebuf		*fbp = &lsp->mfb ;
 	int		rs = SR_OK ;
 
 #if	CF_DEBUGS

@@ -27,6 +27,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdarg.h>		/* |va_list(3c)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>

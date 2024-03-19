@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		OK
-	<0		some error
+	<0		error (system-return)
 
 
 	------------------------------------------------------------------------
@@ -57,12 +57,11 @@
 
 	Returns:
 	>=0		number of elements loaded
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
@@ -72,8 +71,9 @@
 #include	<bufsizevar.hh>
 #include	<strn.h>
 #include	<pathclean.h>
-#include	<vecstr.h>
 #include	<localmisc.h>
+
+#include	"vecstr.h"
 
 
 /* local defines */
@@ -94,6 +94,9 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

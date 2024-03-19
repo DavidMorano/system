@@ -151,6 +151,9 @@ constexpr int		rsn = SR_NOTFOUND ;
 constexpr int		resz = sizeof(int) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecstr_start(vecstr *op,int n,int opts) noex {

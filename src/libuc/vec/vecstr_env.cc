@@ -1,5 +1,5 @@
 /* vecstr_env SUPPORT */
-/* lang=C23 */
+/* lang=C++23 */
 
 /* environment-type string handling */
 /* version %I% last-modified %G% */
@@ -38,21 +38,21 @@
 
 	Returns:
 	>=0		OK
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
-#include	<vecstr.h>
 #include	<strn.h>
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<vstrkeycmpx.h>
 #include	<localmisc.h>
+
+#include	"vecstr.h"
 
 
 /* local defines */
@@ -77,6 +77,9 @@ static int	vecstr_addwithin(vecstr *,cchar *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

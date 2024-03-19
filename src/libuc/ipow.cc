@@ -66,10 +66,17 @@
 
 /* forward references */
 
+static int	ipow10(int) noex ;
+
 
 /* local variables */
 
 constexpr bool		f_dynamic = CF_DYNAMIC ;
+
+constexpr int		b20tab[] = {
+	1, 10, 100, 1000, 10000, 100000, 1000000,
+	10000000, 100000000, 1000000000
+} ;
 
 
 /* exported variables */
@@ -79,26 +86,44 @@ constexpr bool		f_dynamic = CF_DYNAMIC ;
 
 int ipow(int b,int n) noex {
 	int		r = 1 ;
-	if constexpr (f_dynamic) {
-	    if (n == 1) {
-	        r = b ;
-	    } else if (n == 2) { /* common case */
-	        r = b*b ;
-	    } else if (n > 2) {
-	        int	t = ipow(b,(n/2)) ;
-	        if ((n&1) == 0) {
-		    r = (t*t) ;
-	        } else {
-		    r = b*(t*t) ;
-	        }
-	    }
+	if (b == 10) {
+	    r = ipow10(n) ;
+	} else if (b == 2) {
+	    r = (1 << n) ;
 	} else {
-	    for (int i = 0 ; i < n ; i += 1) {
-	        r *= b ;
-	    }
-	} /* end if-constexpr (f_dynamic) */
+	    if constexpr (f_dynamic) {
+	        if (n == 1) {
+	            r = b ;
+	        } else if (n == 2) { /* common case */
+	            r = b*b ;
+	        } else if (n > 2) {
+	            int	t = ipow(b,(n/2)) ;
+	            if ((n&1) == 0) {
+		        r = (t*t) ;
+	            } else {
+		        r = b*(t*t) ;
+	            }
+	        } /* end if */
+	    } else {
+	        for (int i = 0 ; i < n ; i += 1) {
+	            r *= b ;
+	        } /* end for */
+	    } /* end if-constexpr (f_dynamic) */
+	} /* end if (base-specialization) */
 	return r ;
 }
 /* end subroutine (ipow) */
+
+
+/* local subroutines */
+
+static int ipow10(int n) noex {
+	int		r = 0 ;
+	if (n < 9) {
+	    r = b20tab[n] ;
+	} /* end if */
+	return r ;
+}
+/* end subroutine (ipow10) */
 
 

@@ -1,5 +1,5 @@
-/* vecpstr_avmkstr SUPPORT */
-/* lang=C20 */
+/* vecstr_avmkstr SUPPORT */
+/* lang=C++20 */
 
 /* make the Array-Vector and the String-table */
 /* version %I% last-modified %G% */
@@ -16,23 +16,25 @@
 
 /*******************************************************************************
 
-	These routines are used when the caller wants to store a COPY of the
-	passed string data into a vector.  These routines will copy and store
-	the copied data in the list.  The advantage is that the caller does not
-	have to keep the orginal data around in order for the list data to be
-	accessed later.  String data (unlike "element" data) can not contain
+	These routines are used when the caller wants to store a
+	COPY of the passed string data into a vector.  These routines
+	will copy and store the copied data in the list.  The
+	advantage is that the caller does not have to keep the
+	orginal data around in order for the list data to be accessed
+	later.  String data (unlike "element" data) can not contain
 	nullptr characters-bytes.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<intceil.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
-#include	"vecpstr.h"
+#include	"vecstr.h"
 
 
 /* local defines */
@@ -40,31 +42,30 @@
 
 /* external subroutines */
 
-extern int	iceil(int,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* forward references */
 
-static int vecpstr_cksize(vecpstr *) noex ;
+static int vecstr_cksize(vecstr *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
+int vecstr_avmkstr(vecstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && av && tab) {
-	    if ((rs = vecpstr_cksize(op)) >= 0) {
-		int	size = iceil(op->stsize,sizeof(int)) ;
+	    if ((rs = vecstr_cksize(op)) >= 0) {
+		int	sz = iceil(op->stsize,sizeof(int)) ;
 		rs = SR_OVERFLOW ;
-	        if (tabs >= size) {
-	            size = (op->c + 1) * sizeof(int) ;
-	            if (avs >= size) {
+	        if (tabs >= sz) {
+	            sz = (op->c + 1) * sizeof(int) ;
+	            if (avs >= sz) {
 		        char	*bp = tab ;
 		        rs = SR_OK ;
 	                *bp++ = '\0' ;
@@ -78,22 +79,22 @@ int vecpstr_avmkstr(vecpstr *op,cchar **av,int avs,char *tab,int tabs) noex {
 	                av[c] = nullptr ;
 	            }
 	        }
-	    } /* end if (vecpstr_cksize) */
+	    } /* end if (vecstr_cksize) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (vecpstr_avmkstr) */
+/* end subroutine (vecstr_avmkstr) */
 
 
 /* local subroutines */
 
-static int vecpstr_cksize(vecpstr *op) noex {
+static int vecstr_cksize(vecstr *op) noex {
 	int		rs = SR_OK ;
 	if (op->stsize == 0) {
-	    rs = vecpstr_strsize(op) ;
+	    rs = vecstr_strsize(op) ;
 	}
 	return rs ;
 }
-/* end subroutine (vecpstr_cksize) */
+/* end subroutine (vecstr_cksize) */
 
 

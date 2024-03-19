@@ -1,5 +1,5 @@
-/* vecpstr_adduniqs SUPPORT */
-/* lang=C20 */
+/* vecstr_adduniqs SUPPORT */
+/* lang=C++20 */
 
 /* add string(s) to a vector-string object */
 /* version %I% last-modified %G% */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	vecpstr_adduniqs
+	vecstr_adduniqs
 
 	Description:
 	We add strings to the list, but we only add a given string
@@ -25,7 +25,7 @@
 	unique.
 
 	Synopsis:
-	int vecpstr_adduniqs(vecpstr *vlp,cchar *sp,int sl) noex
+	int vecstr_adduniqs(vecstr *vlp,cchar *sp,int sl) noex
 
 	Arguments:
 	vlp		pointer to object
@@ -39,23 +39,21 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>		/* for |strlen(3c)| */
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<vecpstr.h>
 #include	<localmisc.h>
+
+#include	"vecstr.h"
 
 
 /* local defines */
 
 
 /* external subroutines */
-
-extern int	vecpstr_adduniq(vecpstr *,cchar *,int) noex ;
 
 
 /* external variables */
@@ -70,19 +68,23 @@ extern int	vecpstr_adduniq(vecpstr *,cchar *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int vecpstr_adduniqs(vecpstr *qlp,cchar *sp,int sl) noex {
+int vecstr_adduniqs(vecstr *qlp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (qlp && sp) {
 	    int		cl ;
-	    cchar	*tp, *cp ;
+	    cchar	*cp ;
+	    cchar	*tp ;
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((tp = strnpbrk(sp,sl," ,")) != NULL) {
 	        if ((cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
-	            rs = vecpstr_adduniq(qlp,cp,cl) ;
+	            rs = vecstr_adduniq(qlp,cp,cl) ;
 	            c += ((rs < INT_MAX) ? 1 : 0) ;
 	        }
 	        sl -= ((tp+1)-sp) ;
@@ -91,13 +93,13 @@ int vecpstr_adduniqs(vecpstr *qlp,cchar *sp,int sl) noex {
 	    } /* end while */
 	    if ((rs >= 0) && (sl > 0)) {
 	        if ((cl = sfshrink(sp,sl,&cp)) > 0) {
-	            rs = vecpstr_adduniq(qlp,cp,cl) ;
+	            rs = vecstr_adduniq(qlp,cp,cl) ;
 	            c += ((rs < INT_MAX) ? 1 : 0) ;
 	        }
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (vecpstr_adduniqs) */
+/* end subroutine (vecstr_adduniqs) */
 
 

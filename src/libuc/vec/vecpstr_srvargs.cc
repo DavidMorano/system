@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* for |UCHAR_MAX| + |CHAR_BIT| */
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -61,6 +60,9 @@ static int	mkterms() noex ;
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
 static char		terms[termsize] ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */

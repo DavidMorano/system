@@ -1,71 +1,124 @@
-# MAKEFILE
+# MAKEFILES (libmb)
 
 T= libmb
 
-SRCROOT= $(LOCAL)
+ALL= $(T).o $(T).a
 
 
-LIBDIR= $(PCS)/lib
-INCDIR= $(PCS)/include
+BINDIR= $(REPOROOT)/bin
+INCDIR= $(REPOROOT)/include
+LIBDIR= $(REPOROOT)/lib
+MANDIR= $(REPOROOT)/man
+INFODIR= $(REPOROOT)/info
+HELPDIR= $(REPOROOT)/share/help
 
 
-#CC= cc
+CRTDIR= $(CGS_CRTDIR)
+VALDIR= $(CGS_VALDIR)
+LIBDIR= $(CGS_LIBDIR)
 
-#CCOPTS= -O3 -fpic -mcpu=ultrasparc -mno-app-regs
+CPP= cpp
+CC= gcc
+CXX= gpp
+LD= gld
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
-INCDIRS= -I${INCDIR)
+LORDER= lorder
+TSORT= tsort
+LINT= lint
+RM= rm -f
+TOUCH= touch
+LINT= lint
 
-CFLAGS= -O -I$(INCDIR)
 
+DEFS=
 
-LD= $(CC)
+LDRPATH= $(EXTRA)/lib
 
-LDFLAGS=
-
-LIBDIRS=
+LIBDIRS= -L$(LIBDIR)
 
 LIBS=
 
 
+# flag setting
+CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS= $(MAKECFLAGS)
+CCFLAGS= $(MAKECCFLAGS)
+ARFLAGS= $(MAKEARFLAGS)
+LDFLAGS= $(MAKELDFLAGS)
 
 
-.s.o:
-	$(AS) -o $@ $<
-	ar -sr $(T).a $@
+INCS= libmb.h
+
+
+OBJ0_LIBMB= 
+OBJ1_LIBMB= 
+OBJ2_LIBMB= 
+OBJ3_LIBMB= 
+
+
+OBJA_LIBMB= obj0_libmb.o obj1_libmb.o
+OBJB_LIBMB= obj2_libmb.o obj3_libmb.o
+
+OBJ_LIBMB= $(OBJA_LIBMB) $(OBJB_LIBMB)
+
+
+default:		$(T).o
+
+all:			$(ALL)
+
+.c.ln:
+	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
+
+.c.ls:
+	$(LINT) $(LINTFLAGS) $(CPPFLAGS) $<
+
+.c.i:
+	$(CPP) $(CPPFLAGS) $< > $(*).i
 
 .c.o:
-	$(CC) -c $(CFLAGS) $<
-	ar -r $(T).a $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
 
-.c~.c:
-	null "want to get $@"
-
-.s~.s:
-	null "want to get $@"
-
-.h~.h:
-	null "want to get $@"
+.cc.o:
+	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-# files
+$(T).o:			$(OBJ_LIBMB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBMB)
 
-OBJ0= mb_open.o 
-#OBJ1= mb_close.o
-OBJ1=
-OBJ2=
-OBJ3=
-OBJ4=
-OBJ5=
-OBJ= $(OBJ0) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5)
+$(T).a:			$(OBJ_LIBMB)
+	$(AR) $(ARFLAGS) -rc $@ $?
 
+$(T).nm:		$(T).so
+	$(NM) $(NMFLAGS) $(T).so > $(T).nm
 
-$(T).a:		$(OBJ) Makefile
+$(T).order:		$(OBJ) $(T).a
+	$(LORDER) $(T).a | $(TSORT) > $(T).order
+	$(RM) $(T).a
+	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
-install:	$(T).a
-	install $(T).a $(LIBDIR)
-	ranlib $(LIBDIR)/$(T).a
+again:
+	rm -f $(ALL)
 
 clean:
-	rm -f *.o $(T).a
+	makeclean $(ALL)
+
+control:
+	(uname -n ; date) > Control
+
+obj0_libmb.o:	$(OBJ0_LIBMB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBMB)
+
+obj1_libmb.o:	$(OBJ1_LIBMB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBMB)
+
+obj2_libmb.o:	$(OBJ2_LIBMB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBMB)
+
+obj3_libmb.o:	$(OBJ3_LIBMB)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBMB)
 
 

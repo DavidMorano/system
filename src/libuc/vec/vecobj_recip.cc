@@ -55,6 +55,9 @@
 /* local structures */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecobj_recipadd(vecobj *op,cchar *sp,int sl) noex {
