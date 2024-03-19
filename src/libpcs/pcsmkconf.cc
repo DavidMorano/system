@@ -1,9 +1,8 @@
-/* pcsmkconf */
+/* pcsmkconf SUPPORT */
+/* lang=C++20 */
 
 /* make the PCS CONF index file */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -22,7 +21,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -64,7 +62,7 @@ extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	pathclean(char *,cchar *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,USTAT *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
@@ -72,10 +70,6 @@ extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
 extern int	vecstr_loadfile(vecstr *,int,cchar *) ;
 
 extern int	prmktmpdir(cchar *,char *,cchar *,mode_t) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
 
 extern char	*strwcpy(char *,cchar *,int) ;
 
@@ -93,23 +87,23 @@ struct subinfo_flags {
 
 struct subinfo {
 	SUBINFO_FL	f ;
-	PARAMFILE	pf ;
-	VARMK		v ;
-	cchar	**envv ;
-	cchar	*prconf ;
-	cchar	*pr ;
-	cchar	*cfname ;
+	paramfile	pf ;
+	varmk		v ;
+	mainb		envv ;
+	cchar		*prconf ;
+	cchar		*pr ;
+	cchar		*cfname ;
 } ;
 
 
 /* forward references */
 
-static int	subinfo_start(SUBINFO *,cchar *,cchar **,cchar *) ;
-static int	subinfo_finish(SUBINFO *) ;
-static int	subinfo_startsubs(SUBINFO *,VECSTR *) ;
-static int	subinfo_confglobal(SUBINFO *,char *) ;
-static int	subinfo_conflocal(SUBINFO *,char *) ;
-static int	subinfo_proc(SUBINFO *) ;
+static int	subinfo_start(SUBINFO *,cchar *,cchar **,cchar *) noex ;
+static int	subinfo_finish(SUBINFO *) noex ;
+static int	subinfo_startsubs(SUBINFO *,vecstr *) noex ;
+static int	subinfo_confglobal(SUBINFO *,char *) noex ;
+static int	subinfo_conflocal(SUBINFO *,char *) noex ;
+static int	subinfo_proc(SUBINFO *) noex ;
 
 
 /* global variables */
@@ -121,33 +115,26 @@ static cchar	*schedconf[] = {
 	"%p/etc/%n.%f",
 	"%p/etc/%f",
 	"%p/%n.%f",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int pcsmkconf(pr,envv,cfname)
-cchar	pr[] ;
-cchar	*envv[] ;
-cchar	cfname[] ;
-{
+int pcsmkconf(cchar *pr,mainv envv,cc *cfname) noex {
 	SUBINFO		si ;
 	int		rs ;
 	int		rs1 ;
 
-	if (pr == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("pcsmkconf: pr=%s\n",pr) ;
-	debugprintf("pcsmkconf: cfname=%s\n",cfname) ;
-#endif
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0')
 	    return SR_INVALID ;
 
-	if ((cfname != NULL) && (cfname[0] == '\0')) return SR_INVALID ;
+	if ((cfname != nullptr) && (cfname[0] == '\0')) return SR_INVALID ;
 
 	if ((rs = subinfo_start(&si,pr,envv,cfname)) >= 0) {
 
@@ -159,10 +146,6 @@ cchar	cfname[] ;
 
 	if (rs == SR_EXIST) rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("pcsmkconf: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (pcsmkconf) */
@@ -170,24 +153,19 @@ cchar	cfname[] ;
 
 /* local subroutines */
 
-
-static int subinfo_start(sip,pr,envv,cfname)
-SUBINFO		*sip ;
-cchar	pr[] ;
-cchar	*envv[] ;
-cchar	cfname[] ;
-{
-	VECSTR		subs ;
-	const mode_t	vm = 0444 ;
-	cint	of = O_CREAT ;
-	cint	n = 20 ;
-	cint	f_global = (cfname == NULL) ;
+static int subinfo_start(SUBINFO *sip,cc *pr,mainv envv,cc *cfname) noex {
+	vecstr		subs ;
+	cint		of = O_CREAT ;
+	cint		n = 20 ;
 	int		rs = SR_OK ;
+	int		rs1 ;
+	cmode		vm = 0444 ;
+	vbool		f_global = (cfname == nullptr) ;
 	char		dbname[MAXPATHLEN+1] ;
-
-	if (envv == NULL) envv = (cchar **) environ ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	if (envv == nullptr) {
+	    envv = (cchar **) environ ;
+	}
+	memclear(sip) ;
 	sip->envv = envv ;
 	sip->prconf = PRCONF ;
 	sip->pr = pr ;
@@ -197,65 +175,47 @@ cchar	cfname[] ;
 
 	if ((rs = vecstr_start(&subs,4,0)) >= 0) {
 	    char	tmpfname[MAXPATHLEN+1] ;
-
 	    rs = subinfo_startsubs(sip,&subs) ;
-
-	    if ((rs >= 0) && (cfname == NULL)) {
-	        mode_t	m = R_OK ;
+	    if ((rs >= 0) && (cfname == nullptr)) {
 	        int	tlen = MAXPATHLEN ;
+	        cmode	m = R_OK ;
 	        char	*tbuf = tmpfname ;
 	        cfname = tmpfname ;
-	        rs = permsched(schedconf,&subs, tbuf,tlen, sip->prconf,m) ;
+	        rs = permsched(schedconf,&subs,tbuf,tlen,sip->prconf,m) ;
 	    }
-
-	    vecstr_finish(&subs) ;
-	} /* end if (subs) */
-
-	if (rs < 0) goto bad0 ;
-
-	if (f_global) {
-	    rs = subinfo_confglobal(sip,dbname) ;
-	} else {
-	    rs = subinfo_conflocal(sip,dbname) ;
-	}
-	if (rs < 0) goto bad1 ;
-
+	    if (rs >= 0) {
+	        if (f_global) {
+	            rs = subinfo_confglobal(sip,dbname) ;
+	        } else {
+	            rs = subinfo_conflocal(sip,dbname) ;
+	        }
 /* see if we can create a new VAR DB */
-
-	rs = varmk_open(&sip->v,dbname,of,vm,n) ;
-	if (rs < 0) goto bad1 ; /* can return SR_EXIST */
-
-/* done */
-ret0:
+	        if (rs >= 0) {
+		    rs = varmk_open(&sip->v,dbname,of,vm,n) ;
+	        } /* end if (ok) */
+	    } /* end if (ok) */
+	    rs1 = vecstr_finish(&subs) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (subs) */
 	return rs ;
-
-/* bad stuff */
-bad1:
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_finish(sip)
-SUBINFO		*sip ;
-{
+static int subinfo_finish(SUBINFO *sip) noex )
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = varmk_close(&sip->v) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = varmk_close(&sip->v) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int subinfo_startsubs(SUBINFO *sip,VECSTR *slp)
-{
+static int subinfo_startsubs(SUBINFO *sip,vecstr *slp) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar	*cp ;
+	cchar		*cp ;
 
 	cl = sfbasename(sip->pr,-1,&cp) ;
 	if (cl <= 0) rs = SR_INVALID ;
@@ -270,12 +230,10 @@ static int subinfo_startsubs(SUBINFO *sip,VECSTR *slp)
 }
 /* end subroutine (subinfo_startsubs) */
 
-
-static int subinfo_confglobal(SUBINFO *sip,char *dbname)
-{
-	const mode_t	dm = 0777 ;
+static int subinfo_confglobal(SUBINFO *sip,char *dbname) noex {
 	int		rs ;
-	cchar	*cdname = "pcsconf" ;
+	cmode		dm = 0777 ;
+	cchar		*cdname = "pcsconf" ;
 	char		tmpdname[MAXPATHLEN+1] ;
 
 	if ((rs = prmktmpdir(sip->pr,tmpdname,cdname,dm)) >= 0) {
@@ -286,11 +244,9 @@ static int subinfo_confglobal(SUBINFO *sip,char *dbname)
 }
 /* end subroutine (subinfo_confglobal) */
 
-
-static int subinfo_conflocal(SUBINFO *sip,char *dbname)
-{
-	const mode_t	dm = 0775 ;
+static int subinfo_conflocal(SUBINFO *sip,char *dbname) noex {
 	int		rs ;
+	cmode		dm = 0775 ;
 	cchar		*cdname = "pcsconf" ;
 	char		tmpdname[MAXPATHLEN+1] ;
 
@@ -305,9 +261,9 @@ static int subinfo_conflocal(SUBINFO *sip,char *dbname)
 
 static int subinfo_proc(SUBINFO *sip)
 {
-	PARAMFILE	*pfp = &sip->pf ;
-	PARAMFILE_CUR	cur ;
-	PARAMFILE_ENT	pe ;
+	paramfile	*pfp = &sip->pf ;
+	paramfile_cur	cur ;
+	paramfile_ent	pe ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = paramfile_open(pfp,sip->envv,sip->cfname)) >= 0) {

@@ -1,18 +1,17 @@
-/* var */
+/* var SUPPORT */
+/* lang=C++20 */
 
 /* VAR management */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
-
 /* revision history:
 
-	- 1998-12-01, David A­D­ Morano
-
-	This module was originally written for hardware CAD support.
-
+	= 1998-12-01, David A­D­ Morano
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -20,27 +19,20 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that provides
-	access to the VAR object (which is dynamically loaded).
-
+	This module implements an interface (a trivial one) that
+	provides access to the VAR object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	VAR_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
@@ -92,7 +84,8 @@ extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*strwcpy(char *,const char *,int) ;

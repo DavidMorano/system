@@ -84,7 +84,6 @@
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<ipow.h>
 #include	<xperm.h>
-#include	<sview.hh>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
@@ -581,7 +580,8 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 		rs = tmpx_getuserlines(op->txp,&lines,un) ;
 		nlines = rs ;
 		if (op->open.lf) {
-		    logfile_printf(op->lfp,"u=%s termlines=%u",un,nlines) ;
+		    cchar	*lfmt = "u=%s termlines=%u" ;
+		    logfile_printf(op->lfp,lfmt,un,nlines) ;
 		}
 	    if ((rs >= 0) && (nlines > 0)) {
 		USERTERM	ut ;
@@ -591,9 +591,8 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 		    if (lp == nullptr) continue ;
 		    ll = strlen(lp) ;
 		    if (ll > 0) {
-			rs = mkpath2w(termfname,devdname,lp,ll) ;
-			tl = rs ;
-			if (rs >= 0) {
+			if ((rs = mkpath2w(termfname,devdname,lp,ll)) >= 0) {
+			    tl = rs ;
 			    rs1 = sncpy1w(ut.termdev,tdlen,termfname,tl) ;
 			    if (rs1 >= 0) {
 				USTAT	sb ;
@@ -612,7 +611,7 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 				    }
 				}
 			    }
-			}
+			} /* end if (mkpath) */
 		    } /* end if (positive) */
 		    if (rs < 0) break ;
 		} /* end for */
