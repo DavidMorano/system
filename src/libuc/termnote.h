@@ -69,8 +69,6 @@ extern int termnote_close(termnote *) noex ;
 EXTERNC_end
 
 
-#endif /* TERMNOTE_MASTER */
-
 #endif /* TERMNOTE_INCLUDE */
 
 
