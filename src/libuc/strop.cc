@@ -22,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
@@ -58,6 +57,9 @@ static inline bool iswhiteor(int ch,int tch) noex {
 }
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

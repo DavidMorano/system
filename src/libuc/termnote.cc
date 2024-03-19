@@ -84,6 +84,7 @@
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<ipow.h>
 #include	<xperm.h>
+#include	<sview.hh>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
@@ -471,7 +472,6 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 		     lines += 1 ;
 		}
 	    }
-
 	    if (rs >= 0) {
 		rs = termnote_bufextra(op,&ob,o) ;
 	    }
@@ -495,51 +495,47 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 /* end subroutine (termnote_writer) */
 
 static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll) noex {
-	cint	cols = COLUMNS ;
-	cint	tmplen = COLUMNS ;
+	cint		cols = COLUMNS ;
+	cint		tmplen = COLUMNS ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (lp == nullptr) return SR_FAULT ;
-
-	if (ll < 0) ll = strlen(lp) ;
-
-	if (lp[ll-1] == '\n') ll -= 1 ;
-
-	if (ll > 0) {
-	    linefold	lf ;
-	    if ((rs = linefold_start(&lf,cols,1,lp,ll)) >= 0) {
-		int	cl ;
-		cchar	*cp ;
-	        char	tmpbuf[COLUMNS+ 1] ;
-	        for (int i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
-	            cchar	*bp = cp ;
-	            int		bl = cl ;
-	            if (hasourbad(cp,cl)) {
-	                bp = tmpbuf ;
-	                bl = mkclean(tmpbuf,tmplen,cp,cl) ;
-	            }
-	            if ((rs = buffer_char(obp,'\r')) >= 0) {
-	                rs = buffer_strw(obp,bp,bl) ; /* releases 'tmpbuf' */
-		    }
-		    if (rs >= 0) {
-		         int	tl ;
-		         rs = termconseq(tmpbuf,(tmplen-2),'K',-1,-1,-1,-1) ;
-		         tl = rs ;
-		         if (rs >= 0) {
-			    tmpbuf[tl++] = '\r' ;
-			    tmpbuf[tl++] = '\n' ;
-	        	    rs = buffer_strw(obp,tmpbuf,tl) ;
-		         }
-		    }
-	            if (rs < 0) break ;
-	        } /* end for (getting folded line parts) */
-	        rs1 = linefold_finish(&lf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (linefold) */
-	} /* end if (non-zero) */
-
+	if (op) {
+	    if (ll < 0) ll = strlen(lp) ;
+	    if (lp[ll-1] == '\n') ll -= 1 ;
+	    if (ll > 0) {
+	        linefold	lf ;
+	        if ((rs = linefold_start(&lf,cols,1,lp,ll)) >= 0) {
+		    auto	lg = linefold_get ;
+		    int	cl ;
+		    cchar	*cp ;
+	            char	tmpbuf[COLUMNS+ 1] ;
+	            for (int i = 0 ; (cl = lg(&lf,i,&cp)) >= 0 ; i += 1) {
+	                cchar	*bp = cp ;
+	                int		bl = cl ;
+	                if (hasourbad(cp,cl)) {
+	                    bp = tmpbuf ;
+	                    bl = mkclean(tmpbuf,tmplen,cp,cl) ;
+	                }
+	                if ((rs = buffer_char(obp,'\r')) >= 0) {
+	                    rs = buffer_strw(obp,bp,bl) ;
+		        }
+		        if (rs >= 0) {
+		             int	tl ;
+		             rs = termconseq(tmpbuf,(tmplen-2),'K') ;
+		             tl = rs ;
+		             if (rs >= 0) {
+			        tmpbuf[tl++] = '\r' ;
+			        tmpbuf[tl++] = '\n' ;
+	        	        rs = buffer_strw(obp,tmpbuf,tl) ;
+		             }
+		        }
+	                if (rs < 0) break ;
+	            } /* end for (getting folded line parts) */
+	            rs1 = linefold_finish(&lf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (linefold) */
+	    } /* end if (non-zero) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (termnote_bufline) */
@@ -555,7 +551,6 @@ static int termnote_bufextra(termnote *op,buffer *obp,int o) noex {
 	return rs ;
 }
 /* end subroutine (termnote_bufextra) */
-
 
 static int termnote_dis(termnote *op,cchar **rpp,int n,int o,
 		cchar *bp,int bl) noex {
