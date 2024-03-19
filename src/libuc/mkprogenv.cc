@@ -250,11 +250,13 @@ int mkprogenv_start(mkprogenv *op,mainv envv) noex {
 	    cint	size = 256 ;
 	    if ((rs = strpack_start(&op->stores,size)) >= 0) {
 	        rs = mkprogenv_mkenv(op,envv) ;
-	        if (rs < 0)
+	        if (rs < 0) {
 	            strpack_finish(&op->stores) ;
+		}
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 	        vechand_finish(&op->env) ;
+	    }
 	} /* end if (vechand_start) */
 
 	return rs ;
@@ -262,23 +264,29 @@ int mkprogenv_start(mkprogenv *op,mainv envv) noex {
 /* end subroutine (mkprogenv_start) */
 
 int mkprogenv_finish(mkprogenv *op) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (op->uh != nullptr) {
-	    rs1 = uc_free(op->uh) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->uh = nullptr ;
-	}
-
-	op->un[0] = '\0' ;
-
-	rs1 = strpack_finish(&op->stores) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vechand_finish(&op->env) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->uh) {
+	        rs1 = uc_free(op->uh) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->uh = nullptr ;
+	    }
+	    if (op->un) {
+	        rs1 = uc_free(op->un) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->un = nullptr ;
+	    }
+	    {
+	        rs1 = strpack_finish(&op->stores) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vechand_finish(&op->env) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mkprogenv_finish) */
@@ -546,7 +554,7 @@ static int mkprogenv_mkenvsys(mkprogenv *op,envlist *etp,mainv envs) noex {
 	            }
 	            break ;
 	        case 'T':
-	            if (op->un[0] == '\0') {
+	            if (op->un == nullptr) {
 	                rs = mkprogenv_userinfo(op) ;
 	            }
 	            if (rs >= 0) {
@@ -717,17 +725,21 @@ static int mkprogenv_cspath(mkprogenv *op,envlist *etp) noex {
 static int mkprogenv_userinfo(mkprogenv *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->un[0] == '\0') {
+	if (op->un == nullptr) {
 	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	        ucentpw	pw ;
 	        cint	pwlen = rs ;
 	        char	*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            if ((rs = getpwusername(&pw,pwbuf,pwlen,-1)) >= 0) {
+			cchar	*un = pw.pw_name ;
+			cchar	*uh = pw.pw_dir ;
 	                cchar	*cp ;
-	                strwcpy(op->un,pw.pw_name,USERNAMELEN) ;
-	                if ((rs = uc_mallocstrw(pw.pw_dir,-1,&cp)) >= 0) {
-	                    op->uh = cp ;
+	                if ((rs = uc_mallocstrw(un,-1,&cp)) >= 0) {
+	                    op->un = cp ;
+	                    if ((rs = uc_mallocstrw(uh,-1,&cp)) >= 0) {
+	                        op->uh = cp ;
+			    }
 	                }
 	            } /* end if (getpwusername) */
 	            rs1 = uc_free(pwbuf) ;

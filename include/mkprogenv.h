@@ -22,11 +22,11 @@
 
 
 struct mkprogenv_head {
-	cchar		*uh ;
+	cchar		*un ;		/* user-name */
+	cchar		*uh ;		/* user-home */
 	mainv		envv ;
 	vechand		env ;
 	strpack		stores ;
-	char		un[USERNAMELEN+1] ;
 } ;
 
 typedef MKPROGENV	mkprogenv ;
