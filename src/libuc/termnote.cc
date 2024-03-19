@@ -456,7 +456,6 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 	    cint	maxlines = TERMNOTE_MAXLINES ;
 	    int		lines = 0 ;
 	    cchar	*tp ;
-
 	    while ((tp = strnchr(sp,sl,'\n')) != nullptr) {
 		if (lines < maxlines) {
 	            rs = termnote_bufline(op,&ob,sp,(tp - sp)) ;
@@ -466,7 +465,6 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 	        sp = (tp + 1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-
 	    if ((rs >= 0) && (sl > 0)) {
 		if (lines < maxlines) {
 	             rs = termnote_bufline(op,&ob,sp,sl) ;
@@ -489,7 +487,6 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 		    c = rs ;
 		} /* end if (get) */
 	    } /* end if */
-
 	    rs1 = buffer_finish(&ob) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer) */
@@ -576,37 +573,31 @@ static int termnote_disuser(termnote *op,int nmax,int o,
 		cchar *bp,int bl,cchar *un) noex {
 	vecobj		uts ;
 	cint		utsize = sizeof(USERTERM) ;
-	cint		tdlen = TERMDEVLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	cchar		*devdname = DEVDNAME ;
-	char		termfname[TERMDEVLEN+1] ;
-
 	if ((rs = vecobj_start(&uts,utsize,0,0)) >= 0) {
 	    vecstr	lines ;
-
+	    cint	tdlen = TERMDEVLEN ;
+	    cchar	*devdname = DEVDNAME ;
+	    char	termfname[TERMDEVLEN+1] ;
 	    if ((rs = vecstr_start(&lines,0,0)) >= 0) {
 	        int	nlines ;
-
 		rs = tmpx_getuserlines(op->txp,&lines,un) ;
 		nlines = rs ;
-
-		if (op->open.lf)
+		if (op->open.lf) {
 		    logfile_printf(op->lfp,"u=%s termlines=%u",un,nlines) ;
-
+		}
 	    if ((rs >= 0) && (nlines > 0)) {
 		USERTERM	ut ;
 		int		ll, tl ;
-		cchar	*lp ;
+		cchar		*lp{} ;
 		for (int i = 0 ; vecstr_get(&lines,i,&lp) >= 0 ; i += 1) {
 		    if (lp == nullptr) continue ;
 		    ll = strlen(lp) ;
-
 		    if (ll > 0) {
 			rs = mkpath2w(termfname,devdname,lp,ll) ;
 			tl = rs ;
-
 			if (rs >= 0) {
 			    rs1 = sncpy1w(ut.termdev,tdlen,termfname,tl) ;
 			    if (rs1 >= 0) {
@@ -628,30 +619,23 @@ static int termnote_disuser(termnote *op,int nmax,int o,
 			    }
 			}
 		    } /* end if (positive) */
-
 		    if (rs < 0) break ;
 		} /* end for */
-
 	    } /* end if */
-
 		rs1 = vecstr_finish(&lines) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (user-term lines) */
-
 	    if (rs >= 0) {
 		int		navail ;
 		int		n = 0 ;
 		cchar		*lfmt = "  %s (%d)" ;
-
 		{
 		    vecobj_vcf	vcf = vecobj_vcf(vcmpatime) ;
 		    navail = vecobj_sort(&uts,vcf) ;
 		}
-
 		if (op->open.lf) {
 		    logfile_printf(op->lfp,"  avail=%u",navail) ;
 		}
-
 		void		*vp{} ;
 		cchar		*tdp ;
 		for (int i = 0 ; vecobj_get(&uts,i,&vp) >= 0 ; i += 1) {
@@ -676,13 +660,10 @@ static int termnote_disuser(termnote *op,int nmax,int o,
 		    } /* end if (non-null) */
 		    if (rs < 0) break ;
 		} /* end for (looping through user-terms) */
-
 	    } /* end if (ok) */
-
 	    rs1 = vecobj_finish(&uts) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (user-term list) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (termnote_disuser) */
