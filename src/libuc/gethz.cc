@@ -45,11 +45,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"gethz.h"
 
 
 /* local defines */
@@ -66,12 +67,15 @@ struct gethz {
 
 /* forward references */
 
-static int getval(int) noex ;
+static int	getval(int) noex ;
 
 
 /* local variables */
 
 static GETHZ		gethz_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -111,7 +115,8 @@ static int getval(int w) noex {
 #endif
 #if	defined(_SC_CLK_TCK) 
 	if ((hz < 0) && ((w == 0) || (w == 3))) {
-	    if ((rs = uc_confsys(_SC_CLK_TCK,NULL)) >= 0) {
+	    cint	req = _SC_CLK_TCK ;
+	    if ((rs = uc_confsys(req,nullptr)) >= 0) {
 		hz = rs ;
 	    }
 	}

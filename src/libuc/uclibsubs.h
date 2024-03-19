@@ -93,6 +93,7 @@ extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
 extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 extern int	uc_gethostid(unsigned int *) noex ;
 extern int	uc_gethostname(char *,int) noex ;
+extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocessors(int) noex ;
