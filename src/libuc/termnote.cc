@@ -177,7 +177,22 @@ static int termnote_ctor(termnote *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-
+	    memclear(op) ;		/* dangerous */
+	    if ((op->idp = new(nothrow) ids) != np) {
+	        if ((op->txp = new(nothrow) tmpx) != np) {
+	            if ((op->ldp = new(nothrow) logfile) != np) {
+			rs = SR_OK ;
+		    } /* end if (new-logfile) */
+		    if (rs < 0) {
+		        delete op->txp ;
+		        op->tcp = nullptr ;
+		    }
+		} /* end if (new-tmpx) */
+		if (rs < 0) {
+		    delete op->idp ;
+		    op->idp = nullptr ;
+		}
+	    } /* end if (new-ids) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -241,229 +256,188 @@ static bool	isourbad(int) noex ;
 int termnote_open(termnote *op,cchar *pr) noex {
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
-	cchar		*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;			/* dangerous */
-
-	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	    op->pr = cp ;
-	    if ((rs = termnote_txopen(op,dt)) >= 0) {
-	        if ((rs = ids_load(&op->id)) >= 0) {
-	    	    if ((rs = termnote_lfopen(op,dt)) >= 0) {
-	                op->magic = TERMNOTE_MAGIC ;
-	            }
+	if ((rs = termnote_ctor(op,pr)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	        cchar	*cp{} ;
+	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	            op->pr = cp ;
+	            if ((rs = termnote_txopen(op,dt)) >= 0) {
+	                if ((rs = ids_load(op->idp)) >= 0) {
+	    	            if ((rs = termnote_lfopen(op,dt)) >= 0) {
+	                        op->magic = TERMNOTE_MAGIC ;
+	                    }
+	                    if (rs < 0) {
+		                ids_release(op->idp) ;
+		            }
+	                } /* end if (ids_load) */
+	                if (rs < 0) {
+		            termnote_txclose(op) ;
+		        }
+	            } /* end if (termnote_txopen) */
 	            if (rs < 0) {
-		        ids_release(&op->id) ;
-		    }
-	        } /* end if (ids_load) */
-	        if (rs < 0) {
-		    termnote_txclose(op) ;
-		}
-	    } /* end if (termnote_txopen) */
+	                uc_free(op->pr) ;
+	                op->pr = nullptr ;
+	            }
+	        } /* end if (m-a) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-	        uc_free(op->pr) ;
-	        op->pr = nullptr ;
+		termnote_dtor(op) ;
 	    }
-	} /* end if (m-a) */
-
+	} /* end if (termnote_ctor) */
 	return rs ;
 }
 /* end subroutine (termnote_open) */
 
 int termnote_close(termnote *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TERMNOTE_MAGIC) return SR_NOTOPEN ;
-
-	if (op->open.lf) {
-	    const time_t	dt = time(nullptr) ;
-	    char		tbuf[TIMEBUFLEN+1] ;
-	    timestr_logz(dt,tbuf) ;
-	    logfile_printf(&op->lf,"%s done",tbuf) ;
-	}
-
-	rs1 = termnote_lfclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->nodename != nullptr) {
-	    rs1 = uc_free(op->nodename) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->nodename = nullptr ;
-	}
-
-	rs1 = ids_release(&op->id) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = termnote_txclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->pr != nullptr) {
-	    rs1 = uc_free(op->pr) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->pr = nullptr ;
-	}
-
-	op->username[0] = '\0' ;
-	op->magic = 0 ;
+	if ((rs = termnote_magic(op)) >= 0) {
+	    if (op->open.lf) {
+	        const time_t	dt = time(nullptr) ;
+	        char		tbuf[TIMEBUFLEN+1] ;
+	        timestr_logz(dt,tbuf) ;
+	        logfile_printf(op->lfp,"%s done",tbuf) ;
+	    }
+	    {
+	        rs1 = termnote_lfclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->username) {
+	        rs1 = uc_free(op->username) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->username = nullptr ;
+	    }
+	    if (op->nodename) {
+	        rs1 = uc_free(op->nodename) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->nodename = nullptr ;
+	    }
+	    {
+	        rs1 = ids_release(op->idp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = termnote_txclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->pr) {
+	        rs1 = uc_free(op->pr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->pr = nullptr ;
+	    }
+	    {
+		rs1 = termnote_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termnote_close) */
 
-
-/* make a log entry */
-int termnote_printf(termnote *op,cchar **rpp,int n,int o,cchar *fmt,...)
-{
+int termnote_printf(termnote *op,cc **rpp,int n,int o,cc *fmt,...) noex {
 	int		rs ;
-
-	{
+	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) {
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
 	    rs = termnote_vprintf(op,rpp,n,o,fmt,ap) ;
 	    va_end(ap) ;
-	} /* end block */
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termnote_printf) */
 
-
 /* make a log entry */
 int termnote_vprintf(termnote *op,cchar **rpp,int n,int o,
-		cchar *fmt,va_list ap)
-{
-	cint	olen = TERMNOTE_BUFSIZE ;
+		cchar *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*obuf ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (rpp == nullptr) return SR_FAULT ;
-	if (fmt == nullptr) return SR_FAULT ;
-	if (ap == nullptr) return SR_FAULT ;
-
-	if (op->magic != TERMNOTE_MAGIC) return SR_BADF ;
-
-	if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
-	    if ((rs = vbufprintf(obuf,olen,fmt,ap)) >= 0) {
-	        rs = termnote_write(op,rpp,n,o,obuf,rs) ;
-	        wlen = rs ;
-	    }
-	    rs1 = uc_free(obuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
-
+	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) {
+	    cint	olen = TERMNOTE_BUFSIZE ;
+	    char	*obuf{} ;
+	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
+	        if ((rs = vbufprintf(obuf,olen,fmt,ap)) >= 0) {
+	            rs = termnote_write(op,rpp,n,o,obuf,rs) ;
+	            wlen = rs ;
+	        }
+	        rs1 = uc_free(obuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (termnote_vprintf) */
 
-
-int termnote_check(termnote *op,time_t dt)
-{
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != TERMNOTE_MAGIC) return SR_NOTOPEN ;
-
-	if (dt == 0) dt = time(nullptr) ;
-
-	if ((dt - op->ti_check) >= TO_CHECK) {
-	    op->ti_check = dt ;
-
-	    if ((rs >= 0) && op->open.lf) {
-	        if ((dt - op->ti_logcheck) >= TO_LOGCHECK) {
-		    op->ti_logcheck = dt ;
-	            rs = logfile_check(&op->lf,dt) ;
-		}
-	    }
-
-	    if ((rs >= 0) && op->open.tx) {
-	        if ((dt - op->ti_tmpx) >= TO_TMPX) {
-	            op->open.tx = false ;
-	            rs = tmpx_close(&op->tx) ;
-	        } else
-	            rs = tmpx_check(&op->tx,dt) ;
-	    } /* end if (tmpx) */
-
-	} /* end if (check) */
-
+int termnote_check(termnote *op,time_t dt) noex {
+	int		rs ;
+	if ((rs = termnote_magic(op)) >= 0) {
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((dt - op->ti_check) >= TO_CHECK) {
+	        op->ti_check = dt ;
+	        if ((rs >= 0) && op->open.lf) {
+	            if ((dt - op->ti_logcheck) >= TO_LOGCHECK) {
+		        op->ti_logcheck = dt ;
+	                rs = logfile_check(op->lfp,dt) ;
+		    }
+	        }
+	        if ((rs >= 0) && op->open.tx) {
+	            if ((dt - op->ti_tmpx) >= TO_TMPX) {
+	                op->open.tx = false ;
+	                rs = tmpx_close(op->txp) ;
+	            } else {
+	                rs = tmpx_check(op->txp,dt) ;
+		    }
+	        } /* end if (tmpx) */
+	    } /* end if (check) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (termnote_check) */
 
-
-int termnote_write(op,rpp,m,o,sbuf,slen)
-TERMNOTE	*op ;
-cchar	**rpp ;
-int		m ;
-int		o ;
-cchar	sbuf[] ;
-int		slen ;
-{
-	time_t		dt = 0 ;
+int termnote_write(termnote *op,cc **rpp,int m,int o,cc *sbuf,int slen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (rpp == nullptr) return SR_FAULT ;
-	if (sbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != TERMNOTE_MAGIC) return SR_NOTOPEN ;
-
-	if (rpp[0] != nullptr) {
-
-	if (m < 1) m = INT_MAX ;
-
-	if ((rs >= 0) && op->open.lf) {
-	    char	sublogid[LOGIDLEN+1] ;
-	    char	tbuf[TIMEBUFLEN+1] ;
-	    if ((rs = snsdd(sublogid,LOGIDLEN,op->logid,op->sn)) >= 0) {
-		if ((rs = logfile_setid(&op->lf,sublogid)) >= 0) {
-		    cint	f_bell = ((o & TERMNOTE_OBELL)?1:0) ;
-		    cint	f_biff = ((o & TERMNOTE_OBIFF)?1:0) ;
-		    cint	f_all = ((o & TERMNOTE_OALL)?1:0) ;
-		    cchar		*fmt ;
-		    if (dt == 0) dt = time(nullptr) ;
-		    timestr_logz(dt,tbuf),
-		    fmt = "%s bell=%u biff=%u all=%u" ;
-	    	    logfile_printf(&op->lf,fmt,tbuf,f_bell,f_biff,f_all) ;
-		}
-	    }
-	} /* end if (logging) */
-
-	if (slen < 0) slen = strlen(sbuf) ;
-
-	if ((rs >= 0) && (slen > 0)) {
-/* ok, now we really go */
-	    rs = termnote_writer(op,rpp,m,o,sbuf,slen) ;
-	    c = rs ;
-
-	    if ((rs >= 0) && op->open.lf) {
-	        int	n = (LOGIDLEN - 1 - strlen(op->logid)) ;
-	        int	m ;
-	        m = (n < 10) ? ipow(10,n) : INT_MAX ;
-	        op->sn = ((op->sn + 1) % m) ;
-	        rs = logfile_setid(&op->lf,op->logid) ;
-	    }
-
-	    if (rs >= 0) {
-	        if (dt == 0) dt = time(nullptr) ;
-	        op->ti_write = dt ;
-	    }
-
-	} /* end if (positive) */
-
-	} /* end if (not-empty) */
-
+	if ((rs = termnote_magic(op,rpp,sbuf)) >= 0) {
+	    if (rpp[0] != nullptr) {
+	        time_t		dt = 0 ;
+	        if (m < 1) m = INT_MAX ;
+	        if ((rs >= 0) && op->open.lf) {
+	            char	sublogid[LOGIDLEN+1] ;
+	            char	tbuf[TIMEBUFLEN+1] ;
+	            if ((rs = snsdd(sublogid,LOGIDLEN,op->logid,op->sn)) >= 0) {
+		        if ((rs = logfile_setid(op->lfp,sublogid)) >= 0) {
+		            cbool	fbel = ((o & TERMNOTE_OBELL)?1:0) ;
+		            cbool	fbiff = ((o & TERMNOTE_OBIFF)?1:0) ;
+		            cbool	fall = ((o & TERMNOTE_OALL)?1:0) ;
+		            cchar	*fmt ;
+		            if (dt == 0) dt = time(nullptr) ;
+		            timestr_logz(dt,tbuf),
+		            fmt = "%s bell=%u biff=%u all=%u" ;
+	    	            logfile_printf(op->lfp,fmt,tbuf,fbel,fbiff,fall) ;
+		        }
+	            }
+	        } /* end if (logging) */
+	        if (slen < 0) slen = strlen(sbuf) ;
+	        if ((rs >= 0) && (slen > 0)) {
+        /* ok, now we really go */
+	            rs = termnote_writer(op,rpp,m,o,sbuf,slen) ;
+	            c = rs ;
+	            if ((rs >= 0) && op->open.lf) {
+	                int	n = (LOGIDLEN - 1 - strlen(op->logid)) ;
+	                int	m ;
+	                m = (n < 10) ? ipow(10,n) : INT_MAX ;
+	                op->sn = ((op->sn + 1) % m) ;
+	                rs = logfile_setid(op->lfp,op->logid) ;
+	            }
+	            if (rs >= 0) {
+	                if (dt == 0) dt = time(nullptr) ;
+	                op->ti_write = dt ;
+	            }
+	        } /* end if (positive) */
+	    } /* end if (not-empty) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (termnote_write) */
@@ -471,12 +445,10 @@ int		slen ;
 
 /* private subroutines */
 
-
 static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
-		cchar *sp,int sl)
-{
+		cchar *sp,int sl) noex {
 	buffer		ob ;
-	cint	bsize = (sl + 40) ;
+	cint		bsize = (sl + 40) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -502,17 +474,16 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 		}
 	    }
 
-	    if (rs >= 0)
-		rs = termnote_bufextra(op,&ob,o) ;
-
 	    if (rs >= 0) {
-	        cchar	*bp ;
-	        int		bl ;
+		rs = termnote_bufextra(op,&ob,o) ;
+	    }
+	    if (rs >= 0) {
+	        cchar	*bp{} ;
 	        if ((rs = buffer_get(&ob,&bp)) >= 0) {
-	            bl = rs ;
+	            cint	bl = rs ;
 		    if (op->open.lf) {
 			cchar	*fmt = "note lines=%u len=%u" ;
-			logfile_printf(&op->lf,fmt,lines,bl) ;
+			logfile_printf(op->lfp,fmt,lines,bl) ;
 		    }
 		    rs = termnote_dispose(op,rpp,m,o,bp,bl) ;
 		    c = rs ;
@@ -526,9 +497,7 @@ static int termnote_writer(termnote *op,cchar **rpp,int m,int o,
 }
 /* end subroutine (termnote_writer) */
 
-
-static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll)
-{
+static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll) noex {
 	cint	cols = COLUMNS ;
 	cint	tmplen = COLUMNS ;
 	int		rs = SR_OK ;
@@ -542,24 +511,21 @@ static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll)
 	if (lp[ll-1] == '\n') ll -= 1 ;
 
 	if (ll > 0) {
-	    LINEFOLD	lf ;
+	    linefold	lf ;
 	    if ((rs = linefold_start(&lf,cols,1,lp,ll)) >= 0) {
-	        int		i ;
-		int		cl ;
-		int		bl ;
-		cchar	*bp ;
+		int	cl ;
 		cchar	*cp ;
 	        char	tmpbuf[COLUMNS+ 1] ;
-	        for (i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
-	            bp = cp ;
-	            bl = cl ;
+	        for (int i = 0 ; (cl = linefold_get(&lf,i,&cp)) >= 0 ; i += 1) {
+	            cchar	*bp = cp ;
+	            int		bl = cl ;
 	            if (hasourbad(cp,cl)) {
 	                bp = tmpbuf ;
 	                bl = mkclean(tmpbuf,tmplen,cp,cl) ;
 	            }
-	            rs = buffer_char(obp,'\r') ;
-		    if (rs >= 0)
+	            if ((rs = buffer_char(obp,'\r')) >= 0) {
 	                rs = buffer_strw(obp,bp,bl) ; /* releases 'tmpbuf' */
+		    }
 		    if (rs >= 0) {
 		         int	tl ;
 		         rs = termconseq(tmpbuf,(tmplen-2),'K',-1,-1,-1,-1) ;
@@ -582,14 +548,13 @@ static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll)
 /* end subroutine (termnote_bufline) */
 
 static int termnote_bufextra(termnote *op,buffer *obp,int o) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (o & TERMNOTE_OBELL) {
-	    rs = buffer_char(obp,CH_BELL) ;
-	}
-
+	int		rs = SR_FAULT ;
+	if (op && obp) {
+	    rs = SR_OK ;
+	    if (o & TERMNOTE_OBELL) {
+	        rs = buffer_char(obp,CH_BEL) ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (termnote_bufextra) */
@@ -610,13 +575,13 @@ static int termnote_dispose(termnote *op,cchar **rpp,int n,int o,
 static int termnote_disposeuser(termnote *op,int nmax,int o,
 		char *bp,int bl,cchar *un) noex {
 	vecobj		uts ;
-	cint	utsize = sizeof(USERTERM) ;
-	cint	tdlen = TERMDEVLEN ;
+	cint		utsize = sizeof(USERTERM) ;
+	cint		tdlen = TERMDEVLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		i ;
 	int		c = 0 ;
-	cchar	*devdname = DEVDNAME ;
+	cchar		*devdname = DEVDNAME ;
 	char		termfname[TERMDEVLEN+1] ;
 
 	if ((rs = vecobj_start(&uts,utsize,0,0)) >= 0) {
@@ -625,11 +590,11 @@ static int termnote_disposeuser(termnote *op,int nmax,int o,
 	    if ((rs = vecstr_start(&lines,0,0)) >= 0) {
 	        int	nlines ;
 
-		rs = tmpx_getuserlines(&op->tx,&lines,un) ;
+		rs = tmpx_getuserlines(op->txp,&lines,un) ;
 		nlines = rs ;
 
 		if (op->open.lf)
-		    logfile_printf(&op->lf,"u=%s termlines=%u",un,nlines) ;
+		    logfile_printf(op->lfp,"u=%s termlines=%u",un,nlines) ;
 
 	    if ((rs >= 0) && (nlines > 0)) {
 		USERTERM	ut ;
@@ -656,7 +621,7 @@ static int termnote_disposeuser(termnote *op,int nmax,int o,
 				        f_go = (sb.st_mode & S_IXUSR) ;
 				}
 				if ((rs1 >= 0) && f_go) {
-				    rs1 = sperm(&op->id,&sb,W_OK) ;
+				    rs1 = sperm(op->idp,&sb,W_OK) ;
 				    if (rs1 >= 0) {
 					ut.atime = sb.st_atime ;
 					rs = vecobj_add(&uts,&ut) ;
@@ -682,8 +647,9 @@ static int termnote_disposeuser(termnote *op,int nmax,int o,
 
 		navail = vecobj_sort(&uts,vcmpatime) ;
 
-		if (op->open.lf)
-		    logfile_printf(&op->lf,"  avail=%u",navail) ;
+		if (op->open.lf) {
+		    logfile_printf(op->lfp,"  avail=%u",navail) ;
+		}
 
 		for (i = 0 ; vecobj_get(&uts,i,&utp) >= 0 ; i += 1) {
 		    if (utp == nullptr) continue ;
@@ -693,11 +659,12 @@ static int termnote_disposeuser(termnote *op,int nmax,int o,
 			c += 1 ;
 		    }
 
-		if (op->open.lf)
-		    logfile_printf(&op->lf,"  %s (%d)",
+		if (op->open.lf) {
+		    logfile_printf(op->lfp,"  %s (%d)",
 			(utp->termdev+5),rs1) ;
+		}
 
-		    if (n >= max) break ;
+		    if (n >= nmax) break ;
 		    if (rs < 0) break ;
 		} /* end for (looping through user-terms) */
 
@@ -711,71 +678,52 @@ static int termnote_disposeuser(termnote *op,int nmax,int o,
 }
 /* end subroutine (termnote_disposeuser) */
 
-
-/* ARGSUSED */
-static int termnote_disposewrite(op,o,bp,bl,termdev)
-TERMNOTE	*op ;
-int		o ;
-cchar	*bp ;
-int		bl ;
-cchar	termdev[] ;
-{
-	cint	of = (O_WRONLY | O_NOCTTY | O_NDELAY) ;
-	cint	to = 5 ;
+static int termnote_disposewrite(termnote *op,int o,cc *bp,int bl,
+		cc *termdev) noex {
+	cint		of = (O_WRONLY | O_NOCTTY | O_NDELAY) ;
+	cint		to = 5 ;
 	int		rs ;
 	int		len = 0 ;
-
+	(void) o ;
 	if ((rs = u_open(termdev,of,0666)) >= 0) {
 	    cint	fd = rs ;
 	    rs = writeto(fd,bp,bl,to) ;
 	    len = rs ;
 	    u_close(fd) ;
 	} /* end if (open terminal-device) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termnote_disposewrite) */
 
-
-static int termnote_txopen(termnote *op,time_t dt)
-{
+static int termnote_txopen(termnote *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
 	if (! op->open.tx) {
 	    if (dt == 0) dt = time(nullptr) ;
-	    rs = tmpx_open(&op->tx,nullptr,0) ;
+	    rs = tmpx_open(op->txp,nullptr,0) ;
 	    op->open.tx = (rs >= 0) ;
 	    if (rs >= 0) op->ti_tmpx = dt ;
 	}
-
 	return rs ;
 }
 /* end subroutine (termnote_txopen) */
 
-
-static int termnote_txclose(termnote *op)
-{
+static int termnote_txclose(termnote *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->open.tx) {
 	    op->open.tx = false ;
-	    rs1 = tmpx_close(&op->tx) ;
+	    rs1 = tmpx_close(op->txp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (termnote_txclose) */
 
-
-static int termnote_lfopen(termnote *op,time_t dt)
-{
+static int termnote_lfopen(termnote *op,time_t dt) noex {
 	cint		of = O_RDWR ;
 	cmode		om = 0666 ;
 	int		rs = SR_OK ;
 	int		f_opened = false ;
-
 	if (! op->init.lf) {
 	    cchar	*sn = TERMNOTE_SEARCHNAME ;
 	    char	lfname[MAXPATHLEN+1] ;
@@ -791,12 +739,12 @@ static int termnote_lfopen(termnote *op,time_t dt)
 	        rs = mkpath3(lfname,op->pr,LOGDNAME,sn) ;
 	    }
 	    if (rs >= 0) {
-		LOGFILE	*lfp = &op->lf ;
+		LOGFILE	*lfp = op->lfp ;
 	        if ((rs = logfile_open(lfp,lfname,of,om,op->logid)) >= 0) {
 		    f_opened = true ;
 	            op->open.lf = true ;
 		    if (rs >= 0) {
-		        rs = logfile_checksize(&op->lf,TERMNOTE_LOGSIZE) ;
+		        rs = logfile_checksize(op->lfp,TERMNOTE_LOGSIZE) ;
 		    }
 		    if (rs >= 0) {
 		        rs = termnote_username(op) ;
@@ -807,31 +755,26 @@ static int termnote_lfopen(termnote *op,time_t dt)
 			char	timebuf[TIMEBUFLEN+1] ;
 	        	if (dt == 0) dt = time(nullptr) ;
 			timestr_logz(dt,timebuf) ;
-			logfile_printf(&op->lf,"%s %s",timebuf,sn) ;
-			rs = logfile_printf(&op->lf,"%s!%s",nn,un) ;
+			logfile_printf(op->lfp,"%s %s",timebuf,sn) ;
+			rs = logfile_printf(op->lfp,"%s!%s",nn,un) ;
 		    }
 		} else if (isNotPresent(rs)) {
 		    rs = SR_OK ;
 		} /* end if (logfile opened) */
 	    } /* end if (ok) */
 	} /* end if (needed initialization) */
-
 	return (rs >= 0) ? f_opened : rs ;
 }
 /* end subroutine (termnote_lfopen) */
 
-
-static int termnote_lfclose(termnote *op)
-{
+static int termnote_lfclose(termnote *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->open.lf) {
 	    op->open.lf = false ;
-	    rs1 = logfile_close(&op->lf) ;
+	    rs1 = logfile_close(op->lfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (termnote_lfclose) */
@@ -840,9 +783,20 @@ static int termnote_username(termnote *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rl = 0 ;
-	if (op->username[0] == '\0') {
-	   rs = getusername(op->username,USERNAMELEN,-1) ;
-	   ul = rs ;
+	if (op->username == nullptr) {
+	    char	*ubuf{} ;
+	    if ((rs = malloc_un(&ubuf)) >= 0) {
+		cint	ulen = rs ;
+	        if ((rs = getusername(ubuf,ulen)) >= 0) {
+		    cchar	*cp{} ;
+	            rl = rs ;
+		    if ((rs = uc_mallocstrw(ubuf,rl,&cp)) >= 0) {
+		        op->username = cp ;
+		    }
+	        } /* end if (getnodename) */
+		rs1 = uc_free(ubuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} else {
 	   ul = strlen(op->username) ;
 	}
@@ -860,8 +814,8 @@ static int termnote_nodename(termnote *op) noex {
 		cint	nlen = rs ;
 	        if ((rs = getnodename(nbuf,nlen)) >= 0) {
 		    cchar	*cp{} ;
-	            nl = rs ;
-		    if ((rs = uc_mallocstrw(nbuf,nl,&cp)) >= 0) {
+	            rl = rs ;
+		    if ((rs = uc_mallocstrw(nbuf,rl,&cp)) >= 0) {
 		        op->nodename = cp ;
 		    }
 	        } /* end if (getnodename) */

@@ -38,12 +38,12 @@ struct termnote_flags {
 } ;
 
 struct termnote_head {
-	ids		id ;
-	tmpx		tx ;
-	logfile		lf ;
+	ids		*idp ;
+	tmpx		*txp ;
+	logfile		*lfp ;
 	cchar		*pr ;
-	char		*nodename ;
-	char		*username ;
+	cchar		*nodename ;
+	cchar		*username ;
 	time_t		ti_check ;
 	time_t		ti_tmpx ;
 	time_t		ti_logcheck ;
