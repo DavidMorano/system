@@ -59,9 +59,9 @@ extern char	*strwcpy(char *,cchar *,int) ;
 /* local structures */
 
 
-/* local (forward) subroutines */
+/* forward references */
 
-static int mailmsghdrval_loadadd(MAILMSGHDRVAL *,cchar *,int) ;
+static int mailmsghdrval_loadadd(MAILMSGHDRVAL *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -69,9 +69,7 @@ static int mailmsghdrval_loadadd(MAILMSGHDRVAL *,cchar *,int) ;
 
 /* exported subroutines */
 
-
-int mailmsghdrval_start(MAILMSGHDRVAL *mbp,int i,cchar *hp,int hl)
-{
+int mailmsghdrval_start(MAILMSGHDRVAL *mbp,int i,cchar *hp,int hl) noex {
 	int		rs ;
 
 	if (mbp == NULL) return SR_FAULT ;
@@ -86,9 +84,7 @@ int mailmsghdrval_start(MAILMSGHDRVAL *mbp,int i,cchar *hp,int hl)
 }
 /* end subroutine (mailmsghdrval_start) */
 
-
-int mailmsghdrval_finish(MAILMSGHDRVAL *mbp)
-{
+int mailmsghdrval_finish(MAILMSGHDRVAL *mbp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -105,9 +101,7 @@ int mailmsghdrval_finish(MAILMSGHDRVAL *mbp)
 }
 /* end subroutine (mailmsghdrval_finish) */
 
-
-int mailmsghdrval_add(MAILMSGHDRVAL *mbp,cchar *hp,int hl)
-{
+int mailmsghdrval_add(MAILMSGHDRVAL *mbp,cchar *hp,int hl) noex {
 	int		rs ;
 
 	if (mbp == NULL) return SR_FAULT ;
@@ -118,9 +112,7 @@ int mailmsghdrval_add(MAILMSGHDRVAL *mbp,cchar *hp,int hl)
 }
 /* end subroutine (mailmsghdrval_add) */
 
-
-int mailmsghdrval_get(MAILMSGHDRVAL *mbp,cchar **vpp,int *vlp)
-{
+int mailmsghdrval_get(MAILMSGHDRVAL *mbp,cchar **vpp,int *vlp) noex {
 	cchar	*vp = NULL ;
 
 	if (mbp == NULL) return SR_FAULT ;

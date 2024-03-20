@@ -54,10 +54,10 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= libmb.h
 
 
-OBJ0_LIBMB= 
-OBJ1_LIBMB= 
-OBJ2_LIBMB= 
-OBJ3_LIBMB= 
+OBJ0_LIBMB= mailbox.o
+OBJ1_LIBMB= mailmsghdrval.o
+OBJ2_LIBMB= mailmsgmatenv.o
+OBJ3_LIBMB= mailmsgmathdr.o
 
 
 OBJA_LIBMB= obj0_libmb.o obj1_libmb.o
@@ -126,5 +126,9 @@ obj3_libmb.o:	$(OBJ3_LIBMB)
 mailbox.o:		mailbox.dir
 mailbox.dir:
 	makesubdir $@
+
+mailmsghdrval.o:	mailmsghdrval.cc	$(INCS)
+mailmsgmatenv.o:	mailmsgmatenv.cc	$(INCS)
+mailmsgmathdr.o:	mailmsgmathdr.cc	$(INCS)
 
 
