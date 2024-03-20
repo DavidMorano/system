@@ -1,7 +1,7 @@
 /* dstr SUPPORT */
 /* lang=C++20 */
 
-/* string object */
+/* dynamic (allocated) string object */
 /* version %I% last-modified %G% */
 
 

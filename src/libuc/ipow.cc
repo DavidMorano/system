@@ -89,7 +89,11 @@ int ipow(int b,int n) noex {
 	if (b == 10) {
 	    r = ipow10(n) ;
 	} else if (b == 2) {
-	    r = (1 << n) ;
+	    if (b < 32) {
+	        r = (1 << n) ;
+	    } else {
+		r = 0 ;
+	    }
 	} else {
 	    if constexpr (f_dynamic) {
 	        if (n == 1) {
