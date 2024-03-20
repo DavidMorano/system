@@ -65,7 +65,19 @@
 #define	PO_VAL		paramopt_val
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -77,6 +89,16 @@ extern "C" {
     int		paramopt_curbegin(PO *,PO_CUR *) noex ;
     int		paramopt_curend(PO *,PO_CUR *) noex ;
 }
+
+template<typename ... Args>
+static inline int paramopt_magic(paramopt *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (paramopt_magic) */
 
 static int	paramopt_findkey(PO *,cchar *,PO_NAME **) noex ;
 
@@ -93,50 +115,46 @@ static int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
 /* exported subroutines */
 
 int paramopt_start(PO *php) noex {
-	if (php == nullptr) return SR_FAULT ;
-
-	memclear(php) ;			/* dangerous */
-	php->head = php->tail = nullptr ;
-	php->magic = PARAMOPT_MAGIC ;
-	php->f_inited = true ;
-
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (php) {
+	    rs = memclear(php) ;		/* dangerous */
+	    php->head = php->tail = nullptr ;
+	    php->magic = PARAMOPT_MAGIC ;
+	    php->f_inited = true ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (paramopt_start) */
 
 int paramopt_finish(PO *php) noex {
-	PO_NAME	*np, *nnp ;
-	PO_VAL	*vp, *nvp ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (php == nullptr) return SR_FAULT ;
-
-	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
-
-	for (np = php->head ; np != nullptr ; np = nnp) {
-	    for (vp = np->head ; vp != nullptr ; vp = nvp) {
-	        if (vp->value != nullptr) {
-	            rs1 = uc_free(vp->value) ;
+	if ((rs = paramopt_magic(php)) >= 0) {
+	    PO_NAME	*np, *nnp ;
+	    PO_VAL	*vp, *nvp ;
+	    for (np = php->head ; np != nullptr ; np = nnp) {
+	        for (vp = np->head ; vp != nullptr ; vp = nvp) {
+	            if (vp->value != nullptr) {
+	                rs1 = uc_free(vp->value) ;
+		        if (rs >= 0) rs = rs1 ;
+		    }
+	            nvp = vp->next ;
+	            rs1 = uc_free(vp) ;
 		    if (rs >= 0) rs = rs1 ;
-		}
-	        nvp = vp->next ;
-	        rs1 = uc_free(vp) ;
-		if (rs >= 0) rs = rs1 ;
+	        } /* end for */
+	        if (np->name != nullptr) {
+	            rs1 = uc_free(np->name) ;
+		    if (rs >= 0) rs = rs1 ;
+	        }
+	        nnp = np->next ;
+	        rs1 = uc_free(np) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end for */
-	    if (np->name != nullptr) {
-	        rs1 = uc_free(np->name) ;
-		if (rs >= 0) rs = rs1 ;
-	    }
-	    nnp = np->next ;
-	    rs1 = uc_free(np) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end for */
-
-	php->head = nullptr ;
-	php->tail = nullptr ;
-	php->f_inited = false ;
-	php->magic = 0 ;
+	    php->head = nullptr ;
+	    php->tail = nullptr ;
+	    php->f_inited = false ;
+	    php->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (paramopt_finish) */
@@ -152,34 +170,32 @@ Notice that the keyname is extrcted from the supplied string.
 ****/
 
 int paramopt_loadu(PO *php,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		si ;
+	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-
-	if (php == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	if ((si = sibreak(sp,sl,"=\t")) >= 0) {
-	    int		cl ;
-	    cchar	*cp ;
-	    if ((cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
-		char	*name ;
-		if ((rs = uc_malloc((cl+1),&name)) >= 0) {
-		    strwcpy(name,cp,cl) ;
-	            si += 1 ;
-	            rs = paramopt_loads(php,name,(sp + si),(sl- si)) ;
-	            c += rs ;
-		    uc_free(name) ;
-		} /* end if (memory-allocation) */
-	    } /* end if */
-	} else {
-	    rs = SR_INVALID ;
-	}
-
+	if ((rs = paramopt_magic(php,sp)) >= 0) {
+	    int		si ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((si = sibreak(sp,sl,"=\t")) >= 0) {
+	        int	cl ;
+	        cchar	*cp{} ;
+	        if ((cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
+		    char	*name{} ;
+		    if ((rs = uc_malloc((cl+1),&name)) >= 0) {
+			{
+		            strwcpy(name,cp,cl) ;
+	                    si += 1 ;
+	                    rs = paramopt_loads(php,name,(sp + si),(sl- si)) ;
+	                    c += rs ;
+			}
+		        rs1 = uc_free(name) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (memory-allocation) */
+	        } /* end if */
+	    } else {
+	        rs = SR_INVALID ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (paramopt_loadu) */
@@ -195,125 +211,98 @@ given that a keyname is specified explicitly.
 ****/
 
 int paramopt_loads(PO *php,cchar *name,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-	int		si ;
+	int		rs ;
 	int		c = 0 ;
-	cchar	*cp ;
-
-	if (php == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	while ((si = sibreak(sp,sl," :,\t\r\n\v\f")) >= 0) {
-	    cp = (sp+si) ;
-	    if (si > 0) {
-	        rs = paramopt_load(php,name,sp,si) ;
+	if ((rs = paramopt_magic(php,name,sp)) >= 0) {
+	    int		si ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    while ((si = sibreak(sp,sl," :,\t\r\n\v\f")) >= 0) {
+	        cchar	*cp = (sp+si) ;
+	        if (si > 0) {
+	            rs = paramopt_load(php,name,sp,si) ;
+	            c += rs ;
+	        }
+	        sp = (cp + 1) ;
+	        sl -= (si + 1) ;
+	        if (rs < 0) break ;
+	    }  /* end while */
+	    if ((rs >= 0) && (sl > 0)) {
+	        rs = paramopt_load(php,name,sp,sl) ;
 	        c += rs ;
 	    }
-	    sp = (cp + 1) ;
-	    sl -= (si + 1) ;
-	    if (rs < 0) break ;
-	}  /* end while */
-
-	if ((rs >= 0) && (sl > 0)) {
-	    rs = paramopt_load(php,name,sp,sl) ;
-	    c += rs ;
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (paramopt_loads) */
 
 /* load a single key=value pair */
 int paramopt_load(PO *php,cchar *name,cchar *vbuf,int vlen) noex {
-	int		rs = SR_OK ;
-	int		vl ;
+	int		rs ;
 	int		f = false ;
-	cchar	*vp ;
-
-	if (php == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-	if (vbuf == nullptr) return SR_FAULT ;
-
-	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
-
-	if (name[0] == '\0') return SR_INVALID ;
-
-/* clean up the value a little */
-
-	if (vlen < 0)
-	    vlen = strlen(vbuf) ;
-
-	if ((vl = sfshrink(vbuf,vlen,&vp)) > 0) {
-	    PO_VAL	*ovp, *nvp ;
-	    PO_NAME	*pp ;
-	    cint	rsn = SR_NOTFOUND ;
-	    int		size ;
-	    cchar	*cp ;
-
-	    while ((vl > 0) && 
-	        (CHAR_ISWHITE(vp[vl - 1]) || (vp[vl - 1] == ','))) {
-	        vl -= 1 ;
-	    }
-
-/* do we have one of these named keys already? */
-
-	    if ((rs = paramopt_findkey(php,name,&pp)) == rsn) {
-
-/* make a new parameter header block, insert at head */
-
-	        size = sizeof(PO_NAME) ;
-	        if ((rs = uc_malloc(size,&pp)) >= 0) {
-	            pp->c = 0 ;
-	            pp->next = php->head ;	/* insert at head */
-	            pp->head = nullptr ;
-	            pp->tail = nullptr ;
-	            pp->current = nullptr ;
-	            if ((rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
-	                pp->name = cp ;
-	                php->head = pp ;	/* insert at head */
+	if ((rs = paramopt_magic(php,name,vbuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (name[0]) {
+	        int	vl ;
+	        cchar	*vp{} ;
+	        if (vlen < 0) vlen = strlen(vbuf) ;
+	        if ((vl = sfshrink(vbuf,vlen,&vp)) > 0) {
+	            PO_VAL	*ovp, *nvp ;
+	            PO_NAME	*pp ;
+	            cint	rsn = SR_NOTFOUND ;
+	            int		size ;
+	            cchar	*cp ;
+	            while ((vl > 0) && 
+	                (CHAR_ISWHITE(vp[vl - 1]) || (vp[vl - 1] == ','))) {
+	                vl -= 1 ;
 	            }
-	            if (rs < 0) {
-	                uc_free(pp) ;
-		    }
-	        } /* end if */
-
-	    } /* end if (adding a new parameter block on the list) */
-
+/* do we have one of these named keys already? */
+	            if ((rs = paramopt_findkey(php,name,&pp)) == rsn) {
+/* make a new parameter header block, insert at head */
+	                size = sizeof(PO_NAME) ;
+	                if ((rs = uc_malloc(size,&pp)) >= 0) {
+	                    pp->c = 0 ;
+	                    pp->next = php->head ;	/* insert at head */
+	                    pp->head = nullptr ;
+	                    pp->tail = nullptr ;
+	                    pp->current = nullptr ;
+	                    if ((rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
+	                        pp->name = cp ;
+	                        php->head = pp ;	/* insert at head */
+	                    }
+	                    if (rs < 0) {
+	                        uc_free(pp) ;
+		            }
+	                } /* end if */
+	            } /* end if (adding a new parameter block on the list) */
 /* OK, now we have the parameter block that we are looking for in 'pp' */
-
-	    if (rs >= 0) {
-	        if ((rs = name_vfind(pp,vp,vl,&ovp)) == rsn) {
-	            f = true ;
-	            size = sizeof(PO_VAL) ;
-	            if ((rs = uc_malloc(size,&nvp)) >= 0) {
-	                nvp->next = nullptr ;
-	                if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
-	                    nvp->value = cp ;
-	                    ovp = pp->tail ;
-	                    if (pp->head == nullptr) {
-	                        pp->head = nvp ;
-			    }
-	                    pp->c += 1 ;
-	                    pp->tail = nvp ;
-	                    pp->current = nvp ;
-	                    if (ovp != nullptr) {
-	                        ovp->next = nvp ;
-			    }
-	                }
-	                if (rs < 0) {
-	                    uc_free(nvp) ;
-			}
-	            } /* end if (new value) */
-		} /* end if (name_vfind) */
-	    } /* end if (ok) */
-
-	} /* end if (non-zero) */
-
+	            if (rs >= 0) {
+	                if ((rs = name_vfind(pp,vp,vl,&ovp)) == rsn) {
+	                    f = true ;
+	                    size = sizeof(PO_VAL) ;
+	                    if ((rs = uc_malloc(size,&nvp)) >= 0) {
+	                        nvp->next = nullptr ;
+	                        if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
+	                            nvp->value = cp ;
+	                            ovp = pp->tail ;
+	                            if (pp->head == nullptr) {
+	                                pp->head = nvp ;
+			            }
+	                            pp->c += 1 ;
+	                            pp->tail = nvp ;
+	                            pp->current = nvp ;
+	                            if (ovp) {
+	                                ovp->next = nvp ;
+			            }
+	                        }
+	                        if (rs < 0) {
+	                            uc_free(nvp) ;
+			        }
+	                    } /* end if (new value) */
+		        } /* end if (name_vfind) */
+	            } /* end if (ok) */
+	        } /* end if (non-zero) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (paramopt_load) */

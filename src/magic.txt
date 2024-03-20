@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int hdrdecode_magic(hdrdecode *op,Args ... args) noex {
+static inline int paramopt_magic(paramopt *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == HDRDECODE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (hdrdecode_magic) */
+/* end subroutine (paramopt_magic) */
