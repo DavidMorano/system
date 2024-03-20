@@ -4,7 +4,6 @@
 /* message header-value handling */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -46,12 +45,12 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	mailmsgsmathead(const char *,int,int *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	mailmsgsmathead(cchar *,int,int *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -62,7 +61,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* local (forward) subroutines */
 
-static int mailmsghdrval_loadadd(MAILMSGHDRVAL *,const char *,int) ;
+static int mailmsghdrval_loadadd(MAILMSGHDRVAL *,cchar *,int) ;
 
 
 /* local variables */
@@ -122,7 +121,7 @@ int mailmsghdrval_add(MAILMSGHDRVAL *mbp,cchar *hp,int hl)
 
 int mailmsghdrval_get(MAILMSGHDRVAL *mbp,cchar **vpp,int *vlp)
 {
-	const char	*vp = NULL ;
+	cchar	*vp = NULL ;
 
 	if (mbp == NULL) return SR_FAULT ;
 
@@ -143,12 +142,10 @@ int mailmsghdrval_get(MAILMSGHDRVAL *mbp,cchar **vpp,int *vlp)
 
 /* private subroutines */
 
-
-static int mailmsghdrval_loadadd(MAILMSGHDRVAL *mbp,cchar *hp,int hl)
-{
+static int mailmsghdrval_loadadd(MAILMSGHDRVAL *mbp,cchar *hp,int hl) noex {
 	int		rs = SR_OK ;
 	int		sl ;
-	const char	*sp ;
+	cchar		*sp ;
 
 	if ((sl = sfshrink(hp,hl,&sp)) > 0) {
 	    int		size ;

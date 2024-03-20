@@ -33,10 +33,10 @@
 #define	MAILBOX_MAGIC		0x31415926
 #define	MAILBOX			struct mailbox_head
 #define	MAILBOX_INFO		struct mailbox_information
-#define	MAILBOX_MSGINFO		struct mailbox_msg
+#define	MAILBOX_MI		struct mailbox_msginfo
 #define	MAILBOX_READ		struct mailbox_reader
-#define	MAILBOX_FLAGS		struct mailbox_flags
-#define	MAILBOX_MFLAGS		struct mailbox_msgflags
+#define	MAILBOX_FL		struct mailbox_flags
+#define	MAILBOX_MFL		struct mailbox_msgflags
 
 /* options */
 #define	MAILBOX_ORDONLY		O_RDONLY	/* open read-only */
@@ -64,7 +64,7 @@ struct mailbox_head {
 	cchar		*mailfname ;
 	time_t		ti_mod ;	/* modification time */
 	time_t		ti_check ;	/* check time */
-	MAILBOX_FLAGS	f ;
+	MAILBOX_FL	f ;
 	uint		magic ;
 	int		pagesize ;
 	int		mfd ;		/* mail file-descriptor */
@@ -91,13 +91,13 @@ struct mailbox_msgflags {
 	uint		blen:1 ;
 	uint		msgread:1 ;	/* unused: message has been 'read' */
 	uint		msgold:1 ;	/* unused: message is 'old' */
-	uint		delete:1 ;	/* marked for deletion */
+	uint		msgdel:1 ;	/* marked for deletion */
 	uint		addany:1 ;	/* anything (something) being added */
 } ;
 
-struct mailbox_msg {
+struct mailbox_msginfo {
 	vecstr		hdradds ;	/* HDRs to be added */
-	MAILBOX_MFLAGS	hdr, hdrval, hdradd, f, cmd ;
+	MAILBOX_MFL	hdr, hdrval, hdradd, f, cmd ;
 	off_t		moff ;		/* offset to start of message */
 	off_t		hoff ;		/* offset to top of headers */
 	off_t		soff ;		/* offset to semaphore */
@@ -153,6 +153,7 @@ typedef MAILBOX_READ		mailbox_read ;
 typedef MAILBOX_INFO		mailbox_info ;
 typedef MAILBOX_FL		mailbox_fl ;
 typedef MAILBOX_MFL		mailbox_mfl ;
+typedef MAILBOX_MI		mailbox_mi ;
 
 EXTERNC_begin
 

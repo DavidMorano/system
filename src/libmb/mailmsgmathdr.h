@@ -1,4 +1,8 @@
-/* mailmsgmathdr */
+/* mailmsgmathdr HEADER */
+/* lang=C20 */
+
+/* match on a message header (returns the key-name) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,27 +15,21 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MAILMSGMATHDR_INCLUDE
-#define	MAILMSGMATHDR_INCLUDE	1
+#define	MAILMSGMATHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
-#include	<sys/types.h>
 
+EXTERNC_begin
 
-#if	(! defined(MAILMSGMATHDR_MASTER)) || (MAILMSGMATHDR_MASTER == 0)
+extern int mailmsgmathdr(cchar *,int,int *) noex ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_end
 
-extern int mailmsgmathdr(const char *,int,int *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MAILMSGMATHDR_MASTER */
 
 #endif /* MAILMSGMATHDR_INCLUDE */
 
