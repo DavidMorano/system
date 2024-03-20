@@ -163,7 +163,7 @@ extern int mailbox_count(mailbox *) noex ;
 extern int mailbox_mbfile(mailbox *,char *,int) noex ;
 extern int mailbox_check(mailbox *,time_t) noex ;
 extern int mailbox_msgoff(mailbox *,int,off_t *) noex ;
-extern int mailbox_msginfo(mailbox *,int,MAILBOX_MSGINFO *) noex ;
+extern int mailbox_msginfo(mailbox *,int,mailbox_mi *) noex ;
 extern int mailbox_msgdel(mailbox *,int,int) noex ;
 extern int mailbox_msghdradd(mailbox *,int,cchar *,cchar *,int) noex ;
 extern int mailbox_countdel(mailbox *) noex ;
