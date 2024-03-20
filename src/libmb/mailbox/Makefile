@@ -1,6 +1,6 @@
-# MAKEFILES (libmb)
+# MAKEFILES (mailbox)
 
-T= libmb
+T= mailbox
 
 ALL= $(T).o $(T).a
 
@@ -51,22 +51,21 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= libmb.h
+INCS= mailbox.h
 
 
-OBJ0_LIBMB= 
-OBJ1_LIBMB= 
-OBJ2_LIBMB= 
-OBJ3_LIBMB= 
+OBJ0_LIBMB= mailbox_main.o
+OBJ1_LIBMB= mailbox_fromaddr.o
+OBJ2_LIBMB= mailbox_getfrom.o
 
 
-OBJA_LIBMB= obj0_libmb.o obj1_libmb.o
-OBJB_LIBMB= obj2_libmb.o obj3_libmb.o
+OBJA_LIBMB= obj0_mailbox.o obj1_mailbox.o
+OBJB_LIBMB= obj2_mailbox.o
 
 OBJ_LIBMB= $(OBJA_LIBMB) $(OBJB_LIBMB)
 
 
-default:		$(T).a
+default:		$(T).o
 
 all:			$(ALL)
 
@@ -109,22 +108,18 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_libmb.o:	$(OBJ0_LIBMB)
+obj0_mailbox.o:	$(OBJ0_LIBMB)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBMB)
 
-obj1_libmb.o:	$(OBJ1_LIBMB)
+obj1_mailbox.o:	$(OBJ1_LIBMB)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBMB)
 
-obj2_libmb.o:	$(OBJ2_LIBMB)
+obj2_mailbox.o:	$(OBJ2_LIBMB)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBMB)
 
-obj3_libmb.o:	$(OBJ3_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBMB)
 
-
-# MAILBOX
-mailbox.o:		mailbox.dir
-mailbox.dir:
-	makesubdir $@
+mailbox_main.o:		mailbox_main.cc		$(INCS)
+mailbox_fromaddr.o:	mailbox_fromaddr.cc	$(INCS)
+mailbox_getfrom.o:	mailbox_getfrom.cc	$(INCS)
 
 

@@ -43,13 +43,14 @@
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
-#include	<mailbox.h>
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
 #include	<mkx.h>
 #include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"mailbox.h"
 
 
 /* local defines */
@@ -89,7 +90,6 @@ static const int	rsnomsg[] = {
 /* exported subroutines */
 
 int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
-	MAILBOX_MSGINFO	msginfo ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
@@ -101,16 +101,17 @@ int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 	if (fn[0] == '\0') return SR_INVALID ;
 
 	if (mi < 0) {
-	    MAILBOX_INFO	mbinfo ;
-	    rs = mailbox_info(mbp,&mbinfo) ;
+	    mailbox_info	mbinfo{} ;
+	    rs = mailbox_getinfo(mbp,&mbinfo) ;
 	    if (mbinfo.nmsgs > 0) mi = (mbinfo.nmsgs - 1) ;
 	} /* end if (default) */
 
 	if ((rs >= 0) && (mi >= 0)) {
-	    if ((rs = mailbox_msginfo(mbp,mi,&msginfo)) >= 0) {
+	    mailbox_mi		*mip{} ;
+	    if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
 		bfile		mf ;
 	        if ((rs = bopen(&mf,fn,"r",0666)) >= 0) {
-		    off_t	moff = msginfo.moff ;
+		    const off_t	moff = mip->moff ;
 	            if ((rs = bseek(&mf,moff,SEEK_SET)) >= 0) {
 			MAILMSG		m ;
 	                if ((rs = mailmsg_start(&m)) >= 0) {

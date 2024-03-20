@@ -23,10 +23,10 @@
 	This subroutine gets a FROM address from a mail message.
 
 	Synopsis:
-	int mailbox_fromaddr(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn)
+	int mailbox_fromaddr(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn)
 
 	Arguments:
-	mbp		pointer to MAILBOX object
+	mbp		pointer to mailbox object
 	dp		pointer to DATER object
 	fip		pointer to MAILMSGFROM object
 	mfn		mailbox file-name
@@ -48,7 +48,6 @@
 #include	<estrings.h>
 #include	<dater.h>
 #include	<bfile.h>
-#include	<mailbox.h>
 #include	<mailmsg.h>
 #include	<mailmsghdrs.h>
 #include	<mkx.h>
@@ -57,6 +56,7 @@
 #include	<iserror.h>
 #include	<localmisc.h>
 
+#include	"mailbox.h"
 #include	"mailmsgfrom.h"
 
 
@@ -78,7 +78,7 @@ extern "C" {
 
 /* forward references */
 
-static int mailbox_proc(MAILBOX *,DATER *,MAILMSGFROM *,bfile *,int) noex ;
+static int mailbox_proc(mailbox *,DATER *,MAILMSGFROM *,bfile *,int) noex ;
 
 static int mailmsg_msgfrom(MAILMSG *,MAILMSGFROM *) noex ;
 static int mailmsg_msgtime(MAILMSG *,DATER *,time_t *) noex ;
@@ -102,34 +102,29 @@ static constexpr int	rsnomsg[] = {
 
 /* exported subroutines */
 
-int mailbox_fromaddr(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn) noex {
-	MAILBOX_INFO	mbinfo ;
-	int		rs ;
+int mailbox_fromaddr(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-
-	if (mbp == NULL) return SR_FAULT ;
-	if (fip == NULL) return SR_FAULT ;
-	if (mfn == NULL) return SR_FAULT ;
-
-	if (mfn[0] == '\0') return SR_INVALID ;
-	    
-	if ((rs = mailbox_info(mbp,&mbinfo)) >= 0) {
-	    cint	n = mbinfo.nmsgs ;
-	    if (n > 0) {
-		bfile	mf ;
-	        if ((rs = bopen(&mf,mfn,"r",0666)) >= 0) {
-		    int	i ;
-		    for (i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-			rs = mailbox_proc(mbp,dp,fip,&mf,i) ;
-			c += rs ;
-		    }
-		    rs1 = bclose(&mf) ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (mail-file) */
-	    } /* end if (positive) */
-	} /* end if (mailbox_info) */
-
+	if (mbp && dp && fip && mfn) {
+	    rs = SR_INVALID ;
+	    if (mfn[0]) {
+	        mailbox_info	mi{} ;
+	        if ((rs = mailbox_getinfo(mbp,&mi)) >= 0) {
+	            if (cint n = mi.nmsgs ; (n > 0)) {
+		        bfile	mf ;
+	                if ((rs = bopen(&mf,mfn,"r",0666)) >= 0) {
+		            for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
+			        rs = mailbox_proc(mbp,dp,fip,&mf,i) ;
+			        c += rs ;
+		            }
+		            rs1 = bclose(&mf) ;
+		            if (rs >= 0) rs = rs1 ;
+		        } /* end if (mail-file) */
+	            } /* end if (positive) */
+	        } /* end if (mailbox_info) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailbox_fromaddr) */
@@ -137,16 +132,14 @@ int mailbox_fromaddr(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn) noex {
 
 /* local subroutines */
 
-
-static int mailbox_proc(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,
-		bfile *mfp,int mi)
-{
-	MAILBOX_MSGINFO	msginfo ;
+static int mailbox_proc(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,
+		bfile *mfp,int mi) noex {
+	mailbox_mi	*mip{} ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	if ((rs = mailbox_msginfo(mbp,mi,&msginfo)) >= 0) {
-	    const off_t	moff = msginfo.moff ;
+	if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
+	    const off_t		moff = mip->moff ;
 	    if ((rs = bseek(mfp,moff,SEEK_SET)) >= 0) {
 		MAILMSG		m ;
 		if ((rs = mailmsg_start(&m)) >= 0) {
@@ -163,7 +156,7 @@ static int mailbox_proc(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,
 		    if (rs >= 0) rs = rs1 ;
 		} /* end if (mailmsg) */
 	    } /* end if (seek) */
-	} /* end if (mailbox_msginfo) */
+	} /* end if (mailbox_msgret) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailbox_proc) */
@@ -171,9 +164,7 @@ static int mailbox_proc(MAILBOX *mbp,DATER *dp,MAILMSGFROM *fip,
 
 /* local subroutines */
 
-
-static int mailmsg_msgfrom(MAILMSG *mmp,MAILMSGFROM *fip)
-{
+static int mailmsg_msgfrom(MAILMSG *mmp,MAILMSGFROM *fip) noex {
 	int		rs ;
 	int		vl ;
 	int		len = 0 ;
@@ -215,9 +206,7 @@ static int mailmsg_msgfrom(MAILMSG *mmp,MAILMSGFROM *fip)
 }
 /* end subroutine (mailmsg_msgfrom) */
 
-
-static int mailmsg_msgtime(MAILMSG *mmp,DATER *dp,time_t *tp)
-{
+static int mailmsg_msgtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
 	int		rs ;
 	if ((rs = mailmsg_hdrtime(mmp,dp,tp)) == 0) {
 	    rs = mailmsg_envtime(mmp,dp,tp) ;
@@ -226,16 +215,14 @@ static int mailmsg_msgtime(MAILMSG *mmp,DATER *dp,time_t *tp)
 }
 /* end subroutine (mailmsg_msgtime) */
 
-
-static int mailmsg_hdrtime(MAILMSG *mmp,DATER *dp,time_t *tp)
-{
+static int mailmsg_hdrtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*hn = HN_FROM ;
 	cchar		*vp ;
 	if ((rs = mailmsg_hdrval(mmp,hn,&vp)) > 0) {
 	    if ((rs = dater_setmsg(dp,vp,rs)) >= 0) {
-		f = TRUE ;
+		f = true ;
 		rs = dater_gettime(dp,tp) ;
 	    } else if (isInvalid(rs)) {
 		rs = SR_OK ;
@@ -247,15 +234,13 @@ static int mailmsg_hdrtime(MAILMSG *mmp,DATER *dp,time_t *tp)
 }
 /* end subroutine (mailmsg_hdrtime) */
 
-
-static int mailmsg_envtime(MAILMSG *mmp,DATER *dp,time_t *tp)
-{
+static int mailmsg_envtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
 	int		rs ;
-	int		f = FALSE ;
-	cchar		*vp ;
+	int		f = false ;
+	cchar		*vp{} ;
 	if ((rs = mailmsg_envdate(mmp,0,&vp)) >= 0) {
 	    if ((rs = dater_setstd(dp,vp,rs)) >= 0) {
-		f = TRUE ;
+		f = true ;
 		rs = dater_gettime(dp,tp) ;
 	    } else if (isInvalid(rs)) {
 		rs = SR_OK ;
