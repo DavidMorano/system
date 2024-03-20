@@ -1,16 +1,17 @@
-/* sysvar */
+/* sysvar SUPPORT */
+/* lang=C++20 */
 
 /* SYSVAR management */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_LOOKSELF	0		/* try searching "SELF" for SO */
 
-
 /* revision history:
 
 	= 1998-12-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -18,27 +19,21 @@
 
 /*******************************************************************************
 
-        This module implements an interface (a trivial one) that provides access
-        to the SYSVAR object (which is dynamically loaded).
-
+	This module implements an interface (a trivial one) that
+	provides access to the SYSVAR object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	SYSVAR_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ids.h>
 #include	<vecstr.h>
@@ -81,38 +76,38 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	nleadstr(const char *,const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath4(char *,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	strkeycmp(const char *,const char *) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_envfile(vecstr *,const char *) ;
-extern int	vstrkeycmp(const char **,const char **) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	strkeycmp(cchar *,cchar *) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	vecstr_envfile(vecstr *,cchar *) ;
+extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(const char *,int,const char *,const char *) ;
+extern int	mkpr(cchar *,int,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -124,13 +119,13 @@ struct sysvar_defcur {
 
 /* forward references */
 
-static int	sysvar_objloadbegin(SYSVAR *,const char *,const char *) ;
+static int	sysvar_objloadbegin(SYSVAR *,cchar *,cchar *) ;
 static int	sysvar_objloadend(SYSVAR *) ;
-static int	sysvar_loadcalls(SYSVAR *,const char *) ;
+static int	sysvar_loadcalls(SYSVAR *,cchar *) ;
 static int	sysvar_socurbegin(SYSVAR *,SYSVAR_CUR *) ;
 static int	sysvar_socurend(SYSVAR *,SYSVAR_CUR *) ;
 static int	sysvar_defaults(SYSVAR *) ;
-static int	sysvar_procsysdef(SYSVAR *,const char *) ;
+static int	sysvar_procsysdef(SYSVAR *,cchar *) ;
 static int	sysvar_defcurbegin(SYSVAR *,SYSVAR_CUR *) ;
 static int	sysvar_defcurend(SYSVAR *,SYSVAR_CUR *) ;
 static int	sysvar_deffetch(SYSVAR *,cchar *,int,
@@ -146,18 +141,6 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static const char	*subs[] = {
-	"open",
-	"count",
-	"curbegin",
-	"fetch",
-	"enum",
-	"curend",
-	"audit",
-	"close",
-	NULL
-} ;
-
 enum subs {
 	sub_open,
 	sub_count,
@@ -170,13 +153,25 @@ enum subs {
 	sub_overlast
 } ;
 
-static const char	*sysfnames[] = {
+static constexpr cpcchar	subs[] = {
+	"open",
+	"count",
+	"curbegin",
+	"fetch",
+	"enum",
+	"curend",
+	"audit",
+	"close",
+	NULL
+} ;
+
+static constexpr cpcchar	sysfnames[] = {
 	DEFINITFNAME,	
 	DEFLOGFNAME,
 	NULL
 } ;
 
-static const char	*wstrs[] = {
+static constexpr cpcchar	wstrs[] = {
 	"TZ",
 	"LANG",
 	"UMASK",
@@ -185,19 +180,20 @@ static const char	*wstrs[] = {
 	NULL
 } ;
 
-static const char	*pstrs[] = {
+static constexpr cpcchar	pstrs[] = {
 	"LC_",
 	NULL
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int sysvar_open(SYSVAR *op,cchar *pr,cchar *dbname)
-{
+int sysvar_open(SYSVAR *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	const char	*objname = SYSVAR_OBJNAME ;
+	cchar	*objname = SYSVAR_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
@@ -418,8 +414,8 @@ static int sysvar_objloadbegin(SYSVAR *op,cchar *pr,cchar *objname)
 	    const int	snl = SYMNAMELEN ;
 	    int		i ;
 	    int		f_modload = FALSE ;
-	    const char	**sv ;
-	    const char	*on = objname ;
+	    cchar	**sv ;
+	    cchar	*on = objname ;
 	    char	snb[SYMNAMELEN + 1] ;
 
 	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
@@ -433,8 +429,8 @@ static int sysvar_objloadbegin(SYSVAR *op,cchar *pr,cchar *objname)
 
 	    if (rs >= 0) {
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*mn = SYSVAR_MODBNAME ;
-	            const char	*on = objname ;
+	            cchar	*mn = SYSVAR_MODBNAME ;
+	            cchar	*on = objname ;
 	            int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
 	            mo |= MODLOAD_OPRS ;
@@ -529,7 +525,7 @@ static int sysvar_loadcalls(SYSVAR *op,cchar *soname)
 		switch (i) {
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
 		case sub_count:
 		    op->call.count = (int (*)(void *)) snp ;
@@ -540,7 +536,7 @@ static int sysvar_loadcalls(SYSVAR *op,cchar *soname)
 		    break ;
 		case sub_fetch:
 		    op->call.fetch = 
-			(int (*)(void *,const char *,int,void *,char *,int)) 
+			(int (*)(void *,cchar *,int,void *,char *,int)) 
 				snp ;
 		    break ;
 		case sub_enum:
@@ -718,7 +714,7 @@ static int sysvar_defcurend(SYSVAR *op,SYSVAR_CUR *curp)
 
 static int sysvar_deffetch(op,kp,kl,dcp,vbuf,vlen)
 SYSVAR		*op ;
-const char	*kp ;
+cchar	*kp ;
 int		kl ;
 struct sysvar_defcur	*dcp ;
 char		vbuf[] ;
@@ -728,14 +724,14 @@ int		vlen ;
 	int		rs ;
 	int		rs1 ;
 	int		vl = 0 ;
-	const char	*key ;
+	cchar	*key ;
 
 	if (vbuf != NULL)
 	    vbuf[0] = '\0' ;
 
 	if ((rs = nulstr_start(&ns,kp,kl,&key)) >= 0) {
 	    int		i ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    i = (dcp->i >= 0) ? (dcp->i + 1) : 0 ;
 
@@ -745,7 +741,7 @@ int		vlen ;
 	    } /* end while */
 
 	    if (rs >= 0) {
-	        const char	*tp, *vp ;
+	        cchar	*tp, *vp ;
 
 	        vp = NULL ;
 	        if ((tp = strchr(cp,'=')) != NULL) {
@@ -786,8 +782,8 @@ int		vlen ;
 	int		i ;
 	int		kl ;
 	int		vl = 0 ;
-	const char	*tp, *vp ;
-	const char	*cp ;
+	cchar	*tp, *vp ;
+	cchar	*cp ;
 
 #ifdef	OPTIONAL
 	if (vbuf != NULL)

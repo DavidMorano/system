@@ -1,19 +1,19 @@
-/* sysvars */
+/* sysvars SUPPORT */
+/* lang=C++20 */
 
 /* interface to query the system-variable database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_TMPPRNAME	0		/* use a PR-name in TMP */
 #define	CF_MKSYSVARS	1		/* call 'sysvar' program */
 
-
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-        This little object provides access to the SYSVARS database and index (if
-        any).
+	This little object provides access to the SYSVARS database
+	and index (if any).
 
 	The "in-sequence" procedure for finding indices is:
 
@@ -25,26 +25,21 @@
 	/tmp/%D
 
 	Where:
-
 	%R		program-root
 	%D		DB-name
 	%T		user's TMPDIR
 	%{PRN}		program-root name
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endianstr.h>
 #include	<char.h>
@@ -56,6 +51,7 @@
 #include	<hdbstr.h>
 #include	<expcook.h>
 #include	<dirseen.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sysvars.h"
@@ -63,6 +59,12 @@
 
 
 /* local defines */
+
+#undef	SV
+#define	SV		SYSVARS
+
+#undef	SV_C
+#define	SV_C		SYSVARS_CUR
 
 #ifndef	VARSYSNAME
 #define	VARSYSNAME	"SYSNAME"
@@ -320,9 +322,7 @@ static const char	*dbdirs[] = {
 
 /* exported subroutines */
 
-
-int sysvars_open(SYSVARS *op,cchar *pr,cchar *dbname)
-{
+int sysvars_open(SYSVARS *op,cchar *pr,cchar *dbname) noex {
 	SUBINFO		si ;
 	int		rs ;
 	int		rs1 ;
@@ -362,9 +362,7 @@ int sysvars_open(SYSVARS *op,cchar *pr,cchar *dbname)
 }
 /* end subroutine (sysvars_open) */
 
-
-int sysvars_close(SYSVARS *op)
-{
+int sysvars_close(SYSVARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -391,24 +389,19 @@ int sysvars_close(SYSVARS *op)
 }
 /* end subroutine (sysvars_close) */
 
-
-int sysvars_audit(SYSVARS *op)
-{
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
-
-	rs = var_audit(&op->vind) ;
-
+int sysvars_audit(SYSVARS *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == SYSVARS_MAGIC) {
+		rs = var_audit(&op->vind) ;
+	    } /* end if (open) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sysvars_audit) */
 
-
-int sysvars_curbegin(SYSVARS *op,SYSVARS_CUR *curp)
-{
+int sysvars_curbegin(SYSVARS *op,SYSVARS_CUR *curp) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -425,9 +418,7 @@ int sysvars_curbegin(SYSVARS *op,SYSVARS_CUR *curp)
 }
 /* end subroutine (sysvars_curbegin) */
 
-
-int sysvars_curend(SYSVARS *op,SYSVARS_CUR *curp)
-{
+int sysvars_curend(SYSVARS *op,SYSVARS_CUR *curp) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -443,15 +434,7 @@ int sysvars_curend(SYSVARS *op,SYSVARS_CUR *curp)
 }
 /* end subroutine (sysvars_curend) */
 
-
-int sysvars_fetch(op,kp,kl,curp,vbuf,vlen)
-SYSVARS		*op ;
-const char	*kp ;
-int		kl ;
-SYSVARS_CUR	*curp ;
-char		vbuf[] ;
-int		vlen ;
-{
+int sysvars_fetch(SV *op,cchar *kp,int kl,SV_C *curp,char *vbuf,int vlen) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -470,47 +453,27 @@ int		vlen ;
 }
 /* end subroutine (sysvars_fetch) */
 
-
-int sysvars_enum(op,curp,kbuf,klen,vbuf,vlen)
-SYSVARS		*op ;
-SYSVARS_CUR	*curp ;
-char		kbuf[] ;
-int		klen ;
-char		vbuf[] ;
-int		vlen ;
-{
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (kbuf == NULL) return SR_FAULT ;
-
-	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
-
-	rs = var_enum(&op->vind,&curp->vcur,kbuf,klen,vbuf,vlen) ;
-
-#if	CF_DEBUGS
-	debugprintf("sysvars_enum: var_enum() rs=%d\n",rs) ;
-#endif
-
-	if ((rs < 0) && (vbuf != NULL))
-	    vbuf[0] = '\0' ;
-
+int sysvars_enum(SV *op,SV_C *curp,char *kp,int kl,char *vp,int vl) noex {
+	int		rs = SR_FAULT ;
+	if (op && curp && kp) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == SYSVARS_MAGIC) {
+		rs = var_enum(&op->vind,&curp->vcur,kp,kl,vp,vl) ;
+	        if ((rs < 0) && vp) vp[0] = '\0' ;
+	    } /* end if (open) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sysvars_enum) */
 
-
-int sysvars_count(SYSVARS *op)
-{
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != SYSVARS_MAGIC) return SR_NOTOPEN ;
-
-	rs = var_count(&op->vind) ;
-
+int sysvars_count(SYSVARS *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == SYSVARS_MAGIC) {
+		rs = var_count(&op->vind) ;
+	    } /* end if (open) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (sysvars_count) */
@@ -518,9 +481,7 @@ int sysvars_count(SYSVARS *op)
 
 /* private subroutines */
 
-
-static int sysvars_infoloadbegin(SYSVARS *op,cchar *pr,cchar *dbname)
-{
+static int sysvars_infoloadbegin(SYSVARS *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	int		size = 0 ;
 	char		*bp ;
@@ -539,9 +500,7 @@ static int sysvars_infoloadbegin(SYSVARS *op,cchar *pr,cchar *dbname)
 }
 /* end subroutine (sysvars_infoloadbegin) */
 
-
-static int sysvars_infoloadend(SYSVARS *op)
-{
+static int sysvars_infoloadend(SYSVARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -557,20 +516,12 @@ static int sysvars_infoloadend(SYSVARS *op)
 }
 /* end subroutine (sysvars_infoloadend) */
 
-
-static int sysvars_indopen(SYSVARS *op,SUBINFO *sip)
-{
-	int		rs ;
-
-	rs = sysvars_indopenseq(op,sip) ;
-
-	return rs ;
+static int sysvars_indopen(SYSVARS *op,SUBINFO *sip) noex {
+	return sysvars_indopenseq(op,sip) ;
 }
 /* end subroutine (sysvars_indopen) */
 
-
-static int sysvars_indopenseq(SYSVARS *op,SUBINFO *sip)
-{
+static int sysvars_indopenseq(SYSVARS *op,SUBINFO *sip) noex {
 	EXPCOOK		cooks ;
 	DIRSEEN		ds ;
 	vecstr		sdirs ;
@@ -602,10 +553,8 @@ static int sysvars_indopenseq(SYSVARS *op,SUBINFO *sip)
 }
 /* end subroutines (sysvars_indopenseq) */
 
-
 static int sysvars_indopenseqer(SYSVARS *op,SUBINFO *sip,DIRSEEN *dsp,
-		vecstr *sdp,EXPCOOK *ecp)
-{
+		vecstr *sdp,EXPCOOK *ecp) noex {
 	const int	elen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -683,9 +632,7 @@ static int sysvars_indopenseqer(SYSVARS *op,SUBINFO *sip,DIRSEEN *dsp,
 }
 /* end subroutine (sysvars_indopenseqer) */
 
-
-static int sysvars_loadcooks(SYSVARS *op,EXPCOOK *ecp)
-{
+static int sysvars_loadcooks(SYSVARS *op,EXPCOOK *ecp) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		kch ;
@@ -733,9 +680,7 @@ static int sysvars_loadcooks(SYSVARS *op,EXPCOOK *ecp)
 }
 /* end subroutines (sysvars_loadcooks) */
 
-
-static int sysvars_indopenalt(SYSVARS *op,SUBINFO *sip,DIRSEEN *dsp)
-{
+static int sysvars_indopenalt(SYSVARS *op,SUBINFO *sip,DIRSEEN *dsp) noex {
 	DIRSEEN_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
@@ -784,9 +729,7 @@ static int sysvars_indopenalt(SYSVARS *op,SUBINFO *sip,DIRSEEN *dsp)
 }
 /* end subroutines (sysvars_indopenalt) */
 
-
-static int sysvars_indmk(SYSVARS *op,cchar *dname)
-{
+static int sysvars_indmk(SYSVARS *op,cchar *dname) noex {
 	const int	rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		c = 0 ;
@@ -816,9 +759,7 @@ static int sysvars_indmk(SYSVARS *op,cchar *dname)
 }
 /* end subroutine (sysvars_indmk) */
 
-
-static int sysvars_indmkdata(SYSVARS *op,cchar *indname,mode_t operms)
-{
+static int sysvars_indmkdata(SYSVARS *op,cchar *indname,mode_t operms) noex {
 	HDBSTR		vars, *vlp = &vars ;
 	int		rs ;
 	int		rs1 ;
@@ -859,9 +800,7 @@ static int sysvars_indmkdata(SYSVARS *op,cchar *indname,mode_t operms)
 }
 /* end subroutine (sysvars_indmkdata) */
 
-
-static int sysvars_indclose(SYSVARS *op)
-{
+static int sysvars_indclose(SYSVARS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -878,8 +817,7 @@ static int sysvars_indclose(SYSVARS *op)
 
 /* make the index */
 #if	CF_MKSYSVARS
-static int sysvars_mksysvarsi(SYSVARS *op,SUBINFO *sip,cchar *dname)
-{
+static int sysvars_mksysvarsi(SYSVARS *op,SUBINFO *sip,cchar *dname) noex {
 	int		rs ;
 	int		rs1 ;
 	cchar		*prog = PROG_MKSYSVARSI ;
@@ -1008,9 +946,7 @@ static int sysvars_mksysvarsi(SYSVARS *op,SUBINFO *sip,cchar *dname)
 /* end subroutine (sysvars_mksysvarsi) */
 #endif /* CF_MKSYSVARS */
 
-
-static int subinfo_start(SUBINFO *sip)
-{
+static int subinfo_start(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 
 	memset(sip,0,sizeof(SUBINFO)) ;
@@ -1020,9 +956,7 @@ static int subinfo_start(SUBINFO *sip)
 }
 /* end subroutine (subinfo_start) */
 
-
-static int subinfo_ids(SUBINFO *sip)
-{
+static int subinfo_ids(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 
 	if (! sip->f.id) {
@@ -1034,9 +968,7 @@ static int subinfo_ids(SUBINFO *sip)
 }
 /* end subroutine (subinfo_ids) */
 
-
-static int subinfo_finish(SUBINFO *sip)
-{
+static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -1050,9 +982,7 @@ static int subinfo_finish(SUBINFO *sip)
 }
 /* end subroutine (subinfo_finish) */
 
-
-static int checkdname(cchar *dname)
-{
+static int checkdname(cchar *dname) noex {
 	int		rs = SR_OK ;
 
 	if (dname[0] != '/') {

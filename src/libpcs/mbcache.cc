@@ -1,18 +1,17 @@
-/* mbcache (MailBox-Cache) */
+/* mbcache SUPPORT (MailBox-Cache) */
+/* lang=C++20 */
 
 /* cache mailbox items */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_LOADENVADDR	0		/* compile |mbcache_loadenvaddr()| */
 
-
 /* revision history:
 
 	= 2009-01-10, David A­D­ Morano
-        This module is an attempt to take some of the garbage out of the
-        piece-of-total-garbage VMAIL program.
-
+	This module is an attempt to take some of the garbage out
+	of the piece-of-total-garbage VMAIL program.
 
 */
 
@@ -20,39 +19,37 @@
 
 /*******************************************************************************
 
-	This object parses out and then caches information about messages
-	within a mailbox.  All information saved about each message is stored
-	under the index of that message within the original mailbox.
+	This object parses out and then caches information about
+	messages within a mailbox.  All information saved about
+	each message is stored under the index of that message
+	within the original mailbox.
 
 	Implementation notes
 
 	= Things to watch for (or to do in the future)
 
-	This object is a cache of the MAILBOX object, but we provide some
-	additional processing that the MAILBOX object does not provide.  For
-	the most part, the MAILBOX object contains all read-only data (mail
-	message data).  But the deletion status of a mail message is
-	potentially dynamic -- meaning that it can be set or cleared after the
-	mailbox is opened.  Currently it is assumed that if a message is in a
-	mailbox that it is "not deleted."  But this may not be the case in the
-	future (messages may be deleted but still in the mailbox).  As a cache,
-	this object may need to be enhanced to always get the deletion status
-	of a message from the MAILBOX object rather than assuming that it is by
-	default "not deleted."
-
+	This object is a cache of the MAILBOX object, but we provide
+	some additional processing that the MAILBOX object does not
+	provide.  For the most part, the MAILBOX object contains
+	all read-only data (mail message data).  But the deletion
+	status of a mail message is potentially dynamic -- meaning
+	that it can be set or cleared after the mailbox is opened.
+	Currently it is assumed that if a message is in a mailbox
+	that it is "not deleted."  But this may not be the case in
+	the future (messages may be deleted but still in the mailbox).
+	As a cache, this object may need to be enhanced to always
+	get the deletion status of a message from the MAILBOX object
+	rather than assuming that it is by default "not deleted."
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<limits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<sbuf.h>
@@ -124,24 +121,24 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,uint,uint *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,uint,uint *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	mailmsg_loadmb(MAILMSG *,MAILBOX *,off_t) ;
-extern int	hdrextid(char *,int,const char *,int) ;
+extern int	hdrextid(char *,int,cchar *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	mkaddrname(char *,int,cchar *,int) ;
 extern int	isOneOf(const int *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwcpyblanks(char *,int) ;
 extern char	*timestr_scandate(time_t,char *) ;
 
@@ -184,7 +181,7 @@ static int msgentry_procscandate(MSGENTRY *,MBCACHE *) ;
 static int msgentry_finish(MSGENTRY *) ;
 
 #if	CF_LOADENVADDR
-static int msgentry_loadenvaddr(MSGENTRY *,MBCACHE *,MAILMSG *,const char **) ;
+static int msgentry_loadenvaddr(MSGENTRY *,MBCACHE *,MAILMSG *,cchar **) ;
 #endif /* CF_LOADENVADDR */
 
 #ifdef	COMMENT
@@ -197,7 +194,7 @@ static int	isBadDate(int) ;
 static int	vcmpmsgentry(const void *,const void *) ;
 
 #if	CF_DEBUGS
-static int debugprintlines(const char *,const char *,int,int) ;
+static int debugprintlines(cchar *,cchar *,int,int) ;
 #endif /* CF_DEBUGS */
 
 
@@ -236,7 +233,7 @@ int mbcache_start(MBCACHE *op,cchar *mbfname,int mflags,MAILBOX *mbp)
 	STRPACK		*psp ;
 	int		rs = SR_OK ;
 	int		nmsgs = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (mbfname == NULL) return SR_FAULT ;
@@ -439,7 +436,7 @@ int mbcache_sort(MBCACHE *op)
 	} /* end for */
 
 	if (rs >= 0) {
-	    const int	qsize = sizeof(const char *) ;
+	    const int	qsize = sizeof(cchar *) ;
 	    void	*msgs = (void *) op->msgs ;
 #if	CF_DEBUGS
 	    debugprintf("mbcache_sort: qsort()\n") ;
@@ -558,7 +555,7 @@ int mbcache_msgdeldup(MBCACHE *op)
 	    const int		vi = mbcachemf_hdrmid ;
 	    int			mi ;
 	    int			midl ;
-	    const char		*midp ;
+	    cchar		*midp ;
 	    for (mi = 0 ; mi < nmsgs ; mi += 1) {
 	        if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 		    if (! mep->f.del) {
@@ -1063,7 +1060,7 @@ static int mbcache_msgscanmk(MBCACHE *op,int mi)
 	            int		i ;
 	            int		tcol ;
 	            int		cl ;
-	            const char	*cp ;
+	            cchar	*cp ;
 
 	            strwcpyblanks(bp,sl) ;
 
@@ -1183,7 +1180,7 @@ static int msgentry_frame(MSGENTRY *mep,MAILBOX_MSGINFO *mip)
 
 #if	CF_DEBUGS
 	{
-	    const char	*s = "msgentry_load" ;
+	    cchar	*s = "msgentry_load" ;
 	    debugprintlines(s,"clines",mip->hdrval.clines,mip->clines) ;
 	    debugprintlines(s,"lines",mip->hdrval.lines,mip->lines) ;
 	    debugprintlines(s,"xlines",mip->hdrval.xlines,mip->xlines) ;
@@ -1290,8 +1287,8 @@ static int msgentry_loadenv(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	        int		i ;
 	        int		vl = -1 ;
 	        int		*vlp ;
-	        const char	*vp ;
-	        const char	**vpp ;
+	        cchar	*vp ;
+	        cchar	**vpp ;
 	        for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
 	            vp = NULL ;
 	            switch (i) {
@@ -1341,7 +1338,7 @@ static int msgentry_loadenvaddr(mep,op,mmp,rpp)
 MSGENTRY	*mep ;
 MBCACHE		*op ;
 MAILMSG		*mmp ;
-const char	**rpp ;
+cchar	**rpp ;
 {
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -1367,8 +1364,8 @@ static int msgentry_loadhdrmid(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 {
 	int		rs ;
 	int		sl = 0 ;
-	const char	*hdr = HN_MESSAGEID ;
-	const char	*sp ;
+	cchar	*hdr = HN_MESSAGEID ;
+	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
 	    STRPACK	*psp = &op->strs ;
@@ -1379,7 +1376,7 @@ static int msgentry_loadhdrmid(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 #endif
 	    if ((rs = mkbestaddr(hbuf,hlen,sp,rs)) >= 0) {
 	        const int	vi = mbcachemf_hdrmid ;
-	        const char	**rpp ;
+	        cchar	**rpp ;
 #if	CF_DEBUGS
 	debugprintf("mbcache/msgentry_loadhdrmid: mid2 rs=%d\n",rs) ;
 #endif
@@ -1422,7 +1419,7 @@ static int msgentry_loadhdrfrom(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	if ((rs >= 0) && (vl >= 0)) {
 	    STRPACK	*psp = &op->strs ;
 	    const int	vi = mbcachemf_hdrfrom ;
-	    const char	**rpp ;
+	    cchar	**rpp ;
 	    rpp = (mep->vs + vi) ;
 	    mep->vl[vi] = vl ;
 	    rs = strpack_store(psp,vp,vl,rpp) ;
@@ -1439,13 +1436,13 @@ static int msgentry_loadhdrsubject(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 {
 	int		rs ;
 	int		sl = 0 ;
-	const char	*hdr = HN_SUBJECT ;
-	const char	*sp ;
+	cchar	*hdr = HN_SUBJECT ;
+	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
 	    STRPACK	*psp = &op->strs ;
 	    const int	vi = mbcachemf_hdrsubject ;
-	    const char	**rpp ;
+	    cchar	**rpp ;
 	    sl = rs ;
 	    rpp = (mep->vs + vi) ;
 	    mep->vl[vi] = sl ;
@@ -1463,13 +1460,13 @@ static int msgentry_loadhdrdate(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 {
 	int		rs ;
 	int		sl = 0 ;
-	const char	*hdr = HN_DATE ;
-	const char	*sp ;
+	cchar	*hdr = HN_DATE ;
+	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
 	    STRPACK	*psp = &op->strs ;
 	    const int	vi = mbcachemf_hdrdate ;
-	    const char	**rpp ;
+	    cchar	**rpp ;
 	    sl = rs ;
 	    mep->vl[vi] = sl ;
 	    rpp = (mep->vs + vi) ;
@@ -1487,13 +1484,13 @@ static int msgentry_loadhdrstatus(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 {
 	int		rs ;
 	int		sl = 0 ;
-	const char	*hdr = HN_STATUS ;
-	const char	*sp ;
+	cchar	*hdr = HN_STATUS ;
+	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
 	    STRPACK	*psp = &op->strs ;
 	    const int	vi = mbcachemf_hdrstatus ;
-	    const char	**rpp ;
+	    cchar	**rpp ;
 	    sl = rs ;
 	    rpp = (mep->vs + vi) ;
 	    mep->vl[vi] = sl ;
@@ -1520,7 +1517,7 @@ static int msgentry_procenvdate(MSGENTRY *mep,MBCACHE *op)
 
 	if (! mep->proc.edate) {
 	    int		sl = mep->vl[vi] ;
-	    const char	*sp = mep->vs[vi] ;
+	    cchar	*sp = mep->vs[vi] ;
 	    mep->proc.edate = TRUE ;
 #if	CF_DEBUGS
 	    debugprintf("msgentry_procenvdate: s=>%t<\n",
@@ -1566,7 +1563,7 @@ static int msgentry_prochdrdate(MSGENTRY *mep,MBCACHE *op)
 	if (! mep->proc.hdate) {
 	    const int	vi = mbcachemf_hdrdate ;
 	    int		sl = mep->vl[vi] ;
-	    const char	*sp = mep->vs[vi] ;
+	    cchar	*sp = mep->vs[vi] ;
 	    mep->proc.hdate = TRUE ;
 	    if ((sp != NULL) && (sl > 0)) {
 	        DATER		*dp = &op->dm ;
@@ -1608,7 +1605,7 @@ static int msgentry_procscanfrom(MSGENTRY *mep,MBCACHE *op)
 
 	if (! mep->proc.scanfrom) {
 	    int		sl = mep->vl[mbcachemf_hdrfrom] ;
-	    const char	*sp = mep->vs[mbcachemf_hdrfrom] ;
+	    cchar	*sp = mep->vs[mbcachemf_hdrfrom] ;
 	    mep->proc.scanfrom = TRUE ;
 	    if ((sp == NULL) || (sl == 0)) {
 	        sl = mep->vl[mbcachemf_envaddr] ;
@@ -1620,7 +1617,7 @@ static int msgentry_procscanfrom(MSGENTRY *mep,MBCACHE *op)
 	        char		hbuf[HDRBUFLEN+1] ;
 	        if ((rs = mkaddrname(hbuf,hlen,sp,sl)) >= 0) {
 	            const int	vi = mbcachemf_scanfrom ;
-	            const char	**rpp ;
+	            cchar	**rpp ;
 	            len = rs ;
 	            rpp = (mep->vs + vi) ;
 	            mep->vl[vi] = len ;
@@ -1664,11 +1661,11 @@ static int msgentry_procscandate(MSGENTRY *mep,MBCACHE *op)
 	            }
 	        }
 	        if ((rs >= 0) && (t > 0)) {
-	            const char	*ts ;
+	            cchar	*ts ;
 	            char	timebuf[TIMEBUFLEN + 1] ;
 	            if ((ts = timestr_scandate(t,timebuf)) != NULL) {
 	                STRPACK	*psp = &op->strs ;
-	                const char	*cp ;
+	                cchar	*cp ;
 	                if ((rs = strpack_store(psp,ts,-1,&cp)) >= 0) {
 	                    cl = rs ;
 	                    mep->f.scandate = TRUE ;
