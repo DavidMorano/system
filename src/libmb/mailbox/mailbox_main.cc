@@ -609,8 +609,9 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	                        loff = op->mblen ;
 	                        lockfile(op->mfd,F_UNLOCK,loff,0L,0) ;
 	                    } /* end if (lock) */
-	                    if (rs < 0)
+	                    if (rs < 0) {
 	                        vecobj_finish(&op->msgs) ;
+			    }
 	                } /* end if (vecstr-msgs) */
 	                if (rs < 0) {
 	                    uc_free(op->mailfname) ;
@@ -638,33 +639,23 @@ static int mailbox_parse(mailbox *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		to = -1 ;
-
 #if	CF_READTO
 	to = op->to ;
 #endif
-
-/* parse out this mailbox file the hard way */
-
 	if ((rs = filebuf_start(&fb,op->mfd,soff,bsize,0)) >= 0) {
-
 	    if ((rs = liner_start(lsp,&fb,soff,to)) >= 0) {
 	        int	mi = 0 ;
-
 	        while ((rs = mailbox_parsemsg(op,lsp,mi)) > 0) {
 	            mi += 1 ;
 	        } /* end while */
-
 	        op->mblen = (lsp->foff - soff) ;
 	        op->msgs_total = mi ;
-
 	        rs1 = liner_finish(lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (liner) */
-
 	    rs1 = filebuf_finish(&fb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filebuf) */
-
 	return (rs >= 0) ? op->msgs_total : rs ;
 }
 /* end subroutine (mailbox_parse) */
@@ -674,18 +665,14 @@ static int mailbox_parsemsg(mailbox *op,LINER *lsp,int mi) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ll = 0 ;
-
 	if ((rs = mailboxpi_start(&pi,lsp,mi)) >= 0) {
 	    mailmsgenv	me ;
-	    int			vi = 0 ;
-	    cchar		*lp ;
-
+	    int		vi = 0 ;
+	    cchar	*lp ;
 /* find message start */
-
 	    while ((rs = liner_read(lsp,&lp)) >= 0) {
 	        ll = rs ;
 	        if (ll == 0) break ;
-
 	        if ((rs >= 0) && (ll > 5) && FMAT(lp) &&
 	            ((rs = mailmsgmatenv(&me,lp,ll)) > 0)) {
 	            pi.f.fenv = true ;
@@ -697,24 +684,19 @@ static int mailbox_parsemsg(mailbox *op,LINER *lsp,int mi) noex {
 	                pi.f.feoh = true ;
 	            }
 	        } /* end if */
-
 	        if (rs < 0) break ;
 	        if (pi.f.fenv || pi.f.fhdr) break ;
-
 	        ll = 0 ;
 	        liner_done(lsp) ;
 	        if (pi.f.feoh) break ;
 	    } /* end while */
-
 	    if ((rs >= 0) && mailboxpi_havemsg(&pi)) {
 	        rs = mailbox_parsemsger(op,&me,&pi) ;
 	        ll = rs ;
 	    }
-
 	    rs1 = mailboxpi_finish(&pi) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (mailboxpi) */
-
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailbox_parsemsg) */
@@ -722,7 +704,7 @@ static int mailbox_parsemsg(mailbox *op,LINER *lsp,int mi) noex {
 static int mailbox_parsemsger(mailbox *op,mailmsgenv *mep,
 		MAILBOXPI *pip) noex {
 	LINER		*lsp = pip->lsp ;
-	MB_MI	msg, *msgp = &msg ;
+	MB_MI		msg, *msgp = &msg ;
 	mailmsghdrval	mhv ;
 	cint		mi = pip->mi ;
 	int		rs ;
@@ -759,16 +741,14 @@ static int mailbox_parsemsger(mailbox *op,mailmsgenv *mep,
 	        if ((rs >= 0) && pip->f.fhdr) {
 	            pip->f.fhdr = false ;
 	            if (pip->f.fmhv) { /* previous value outstanding */
-
 	                rs = mailbox_loadmsghead(op,msgp,&mhv) ;
-
 	                pip->f.fmhv = false ;
 	                mailmsghdrval_finish(&mhv) ;
-
 	            } /* end if (had a previous value outstanding) */
 
-	            if (msgp->hoff < 0)
+	            if (msgp->hoff < 0) {
 	                msgp->hoff = lsp->poff ;
+		    }
 
 	            if (rs >= 0) {
 	                hi = matcasestr(msghdrkeys,lp,kl) ;
@@ -821,11 +801,13 @@ static int mailbox_parsemsger(mailbox *op,mailmsgenv *mep,
 	            mailmsghdrval_finish(&mhv) ;
 	        } /* end if */
 
-	        if (msgp->hoff < 0)
+	        if (msgp->hoff < 0) {
 	            msgp->hoff = lsp->poff ;
+		}
 
-	        if (msgp->hlen < 0)
+	        if (msgp->hlen < 0) {
 	            msgp->hlen = (lsp->poff - msgp->hoff) ;
+		}
 
 	        if (pip->f.feoh) {
 	            msgp->boff = lsp->foff ;
@@ -927,49 +909,46 @@ static int mailbox_parsemsger(mailbox *op,mailmsgenv *mep,
 
 static int mailbox_loadmsghead(mailbox *op,MB_MI *msgp,
 		mailmsghdrval *mhvp) noex {
-	int		rs ;
-	int		vl ;
-	int		hi ;
-	int		v = -1 ;
-	cchar		*vp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	rs = mailmsghdrval_get(mhvp,&vp,&vl) ;
-	hi = rs ;
-	if (rs >= 0) {
-	    switch (hi) {
-	    case headkey_clen:
-	        msgp->hdr.clen = true ;
-	        if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
-	            msgp->hdrval.clen = true ;
-	            msgp->clen = v ;
-	        }
-	        break ;
-	    case headkey_clines:
-	        msgp->hdr.clines = true ;
-	        if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
-	            msgp->hdrval.clines = true ;
-	            msgp->clines = v ;
-	        }
-	        break ;
-	    case headkey_lines:
-	        msgp->hdr.lines = true ;
-	        if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
-	            msgp->hdrval.lines = true ;
-	            msgp->lines = v ;
-	        }
-	        break ;
-	    case headkey_xlines:
-	        msgp->hdr.xlines = true ;
-	        if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
-	            msgp->hdrval.xlines = true ;
-	            msgp->xlines = v ;
-	        }
-	        break ;
-	    } /* end switch */
-	} /* end if (ok) */
-
+	int		rs  = SR_FAULT ;
+	int		hi = 0 ;
+	if (op && msgp && mhvp) {
+	    int		vl = -1 ;
+	    cchar	*vp{} ;
+	    if ((rs = mailmsghdrval_get(mhvp,&vp,&vl)) >= 0) {
+	        int	v = -1 ;
+	        hi = rs ;
+	        switch (hi) {
+	        case headkey_clen:
+	            msgp->hdr.clen = true ;
+	            if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
+	                msgp->hdrval.clen = true ;
+	                msgp->clen = v ;
+	            }
+	            break ;
+	        case headkey_clines:
+	            msgp->hdr.clines = true ;
+	            if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
+	                msgp->hdrval.clines = true ;
+	                msgp->clines = v ;
+	            }
+	            break ;
+	        case headkey_lines:
+	            msgp->hdr.lines = true ;
+	            if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
+	                msgp->hdrval.lines = true ;
+	                msgp->lines = v ;
+	            }
+	            break ;
+	        case headkey_xlines:
+	            msgp->hdr.xlines = true ;
+	            if ((vl > 0) && ((v = hdrextnum(vp,vl)) >= 0)) {
+	                msgp->hdrval.xlines = true ;
+	                msgp->xlines = v ;
+	            }
+	            break ;
+	        } /* end switch */
+	    } /* end if (ok) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? hi : rs ;
 }
 /* end subroutine (mailbox_loadmsghead) */
@@ -1067,11 +1046,11 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	        for (int mi = 0 ; mi < op->msgs_total ; mi += 1) {
 		    bool	f = false ;
 		    bool	fcopy = false ;
-		    bool	fdel ;
+		    bool	fdel = false ;
 		    void	*vp{} ;
 	            if ((rs = vecobj_get(&op->msgs,mi,&vp)) >= 0) {
 		        MB_MI	*mip = (MB_MI *) vp ;
-	                fdel  = mip->cmd.msgdel ;
+	                fdel = mip->cmd.msgdel ;
 	                f = fdel || mip->f.addany ;
 	                if (f) {
 	                    if (mbchange < 0) {
