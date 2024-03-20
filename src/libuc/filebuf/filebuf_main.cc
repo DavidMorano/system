@@ -1,4 +1,4 @@
-/* filebuf SUPPORT */
+/* filebuf_main SUPPORT */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */

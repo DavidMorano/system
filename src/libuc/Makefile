@@ -177,7 +177,7 @@ OBJ069= nextpowtwo.o ndigits.o ipow.o llpow.o findbit.o
 OBJ070= isFailOpen.o isFailConn.o
 OBJ071= isnot.o iserror.o isoneof.o
 
-OBJ072= filebuf.o filebuf_writers.o filebuf_mailsupport.o
+OBJ072= 
 OBJ073= inetpton.o xperm.o getprogpath.o findxfile.o xfile.o
 OBJ074=
 OBJ075=
@@ -746,10 +746,6 @@ baops.o:		baops.c baops.h
 strop.o:		strop.cc strop.h
 dstr.o:			dstr.cc dstr.h
 
-filebuf.o:		filebuf.cc filebuf.h
-filebuf_writers.o:	filebuf_writers.cc filebuf.h
-filebuf_mailsupport.o:	filebuf_mailsupport.c filebuf.h
-
 varray.o:		varray.cc varray.h
 
 hdb.o:			hdb.cc hdb.h
@@ -1101,6 +1097,11 @@ logfile.o:		logfile.dir
 logfile.dir:
 	makesubdir $@
 
+# FILEBUF
+filebuf.o:		filebuf.dir
+filebuf.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1220,7 +1221,6 @@ varray.o:		varray.cc	varray.h
 csem.o:			csem.cc		csem.h
 pwcache.o:		pwcache.cc	pwcache.h
 lockrw.o:		lockrw.cc	lockrw.h
-filebuf.o:		filebuf.cc	filebuf.h
 nodedb.o:		nodedb.cc	nodedb.h
 mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc ccfile.hh

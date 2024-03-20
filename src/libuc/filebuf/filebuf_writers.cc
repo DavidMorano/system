@@ -113,7 +113,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<algorithm>
 #include	<usystem.h>
@@ -130,13 +129,16 @@
 
 /* imported namespaces */
 
-using std::min ;
+using std::min ;			/* subroutine-template */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -146,8 +148,10 @@ constexpr int	zsize = sizeof(int) ;
 
 /* forward references */
 
-int		filebuf_writealign(filebuf *,int) noex ;
-int		filebuf_writezero(filebuf *,int) noex ;
+extern "C" {
+    int		filebuf_writealign(filebuf *,int) noex ;
+    int		filebuf_writezero(filebuf *,int) noex ;
+}
 
 
 /* local variables */
@@ -191,7 +195,7 @@ int filebuf_writefill(filebuf *bp,cchar *sp,int sl) noex {
 /* end subroutine (filebuf_writefill) */
 
 int filebuf_writealign(filebuf *bp,int asize) noex {
-	off_t	foff ;
+	off_t		foff ;
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = filebuf_tell(bp,&foff)) >= 0) {
