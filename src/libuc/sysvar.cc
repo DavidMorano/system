@@ -40,6 +40,7 @@
 #include	<nulstr.h>
 #include	<storebuf.h>
 #include	<dirseen.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"sysvar.h"
@@ -51,7 +52,7 @@
 #define	SYSVAR_OBJNAME	"varmks"
 #define	SYSVAR_MODBNAME	"varmks"
 
-#define	CV_DC		SYSVAR_DEFCUR
+#define	SV_DC		SYSVAR_DEFCUR
 
 #ifndef	VARPRLOCAL
 #define	VARPRLOCAL	"LOCAL"
@@ -92,7 +93,7 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	matpstr(cchar **,int,cchar *,int) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,USTAT *,int) ;
 extern int	pathclean(char *,cchar *,int) ;
 extern int	strkeycmp(cchar *,cchar *) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
@@ -100,7 +101,6 @@ extern int	vecstr_envfile(vecstr *,cchar *) ;
 extern int	vstrkeycmp(cchar **,cchar **) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(cchar *,int,cchar *,cchar *) ;
-extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -114,25 +114,25 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* local structures */
 
-SV_DEF {
-	int	i ;
+struct sysvar_defcur {
+	int		i ;
 } ;
 
 
 /* forward references */
 
-static int	sysvar_objloadbegin(SYSVAR *,cchar *,cchar *) noex ;
-static int	sysvar_objloadend(SYSVAR *) noex ;
-static int	sysvar_loadcalls(SYSVAR *,cchar *) noex ;
-static int	sysvar_socurbegin(SYSVAR *,SYSVAR_CUR *) noex ;
-static int	sysvar_socurend(SYSVAR *,SYSVAR_CUR *) noex ;
-static int	sysvar_defaults(SYSVAR *) noex ;
-static int	sysvar_procsysdef(SYSVAR *,cchar *) noex ;
-static int	sysvar_defcurbegin(SYSVAR *,SYSVAR_CUR *) noex ;
-static int	sysvar_defcurend(SYSVAR *,SYSVAR_CUR *) noex ;
-static int	sysvar_deffetch(SYSVAR *,cchar *,int,
+static int	sysvar_objloadbegin(sysvar *,cchar *,cchar *) noex ;
+static int	sysvar_objloadend(sysvar *) noex ;
+static int	sysvar_loadcalls(sysvar *,cchar *) noex ;
+static int	sysvar_socurbegin(sysvar *,SYSVAR_CUR *) noex ;
+static int	sysvar_socurend(sysvar *,SYSVAR_CUR *) noex ;
+static int	sysvar_defaults(sysvar *) noex ;
+static int	sysvar_procsysdef(sysvar *,cchar *) noex ;
+static int	sysvar_defcurbegin(sysvar *,SYSVAR_CUR *) noex ;
+static int	sysvar_defcurend(sysvar *,SYSVAR_CUR *) noex ;
+static int	sysvar_deffetch(sysvar *,cchar *,int,
 			SV_DEF *,char *,int) noex ;
-static int	sysvar_defenum(SYSVAR *,SYSVAR_DEFCUR *,
+static int	sysvar_defenum(sysvar *,SYSVAR_DEFCUR *,
 			char *,int,char *,int) noex ;
 
 static bool	isrequired(int) noex ;
@@ -193,7 +193,7 @@ static constexpr cpcchar	pstrs[] = {
 
 /* exported subroutines */
 
-int sysvar_open(SYSVAR *op,cchar *pr,cchar *dbname) noex {
+int sysvar_open(sysvar *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
 	cchar	*objname = SYSVAR_OBJNAME ;
 
@@ -231,7 +231,7 @@ int sysvar_open(SYSVAR *op,cchar *pr,cchar *dbname) noex {
 }
 /* end subroutine (sysvar_open) */
 
-int sysvar_close(SYSVAR *op) noex {
+int sysvar_close(sysvar *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -253,7 +253,7 @@ int sysvar_close(SYSVAR *op) noex {
 }
 /* end subroutine (sysvar_close) */
 
-int sysvar_audit(SYSVAR *op) noex {
+int sysvar_audit(sysvar *op) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -269,7 +269,7 @@ int sysvar_audit(SYSVAR *op) noex {
 }
 /* end subroutine (sysvar_audit) */
 
-int sysvar_count(SYSVAR *op) noex {
+int sysvar_count(sysvar *op) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -285,7 +285,7 @@ int sysvar_count(SYSVAR *op) noex {
 }
 /* end subroutine (sysvar_count) */
 
-int sysvar_curbegin(SYSVAR *op,SYSVAR_CUR *curp) noex {
+int sysvar_curbegin(sysvar *op,SYSVAR_CUR *curp) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -309,7 +309,7 @@ int sysvar_curbegin(SYSVAR *op,SYSVAR_CUR *curp) noex {
 }
 /* end subroutine (sysvar_curbegin) */
 
-int sysvar_curend(SYSVAR *op,SYSVAR_CUR *curp) noex {
+int sysvar_curend(sysvar *op,SYSVAR_CUR *curp) noex {
 	int		rs = SR_NOSYS ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -330,7 +330,7 @@ int sysvar_curend(SYSVAR *op,SYSVAR_CUR *curp) noex {
 }
 /* end subroutine (sysvar_curend) */
 
-int sysvar_fetch(SYSVAR *op,cchar *kp,int kl,SYSVAR_CUR *curp,
+int sysvar_fetch(sysvar *op,cchar *kp,int kl,SYSVAR_CUR *curp,
 		char *vbuf,int vlen) noex {
 	int		rs ;
 
@@ -375,7 +375,7 @@ int sysvar_enum(SYAVR *op,SYAVR_CUR *curp,char *kbuf,int klen,
 
 /* private subroutines */
 
-static int sysvar_objloadbegin(SYSVAR *op,cchar *pr,cchar *objname) noex {
+static int sysvar_objloadbegin(sysvar *op,cchar *pr,cchar *objname) noex {
 	modeload	*lp = &op->loader ;
 	verstr		syms ;
 	cint		n = nelem(subs) ;
@@ -450,7 +450,7 @@ static int sysvar_objloadbegin(SYSVAR *op,cchar *pr,cchar *objname) noex {
 }
 /* end subroutine (sysvar_objloadbegin) */
 
-static int sysvar_objloadend(SYSVAR *op) noex {
+static int sysvar_objloadend(sysvar *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -467,7 +467,7 @@ static int sysvar_objloadend(SYSVAR *op) noex {
 }
 /* end subroutine (sysvar_objloadend) */
 
-static int sysvar_loadcalls(SYSVAR *op,cchar *soname) noex {
+static int sysvar_loadcalls(sysvar *op,cchar *soname) noex {
 	modeload	*lp = &op->loader ;
 	cint		symlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
@@ -534,7 +534,7 @@ static int sysvar_loadcalls(SYSVAR *op,cchar *soname) noex {
 }
 /* end subroutine (sysvar_loadcalls) */
 
-static int sysvar_socurbegin(SYSVAR *op,SYSVAR_CUR *curp) noex {
+static int sysvar_socurbegin(sysvar *op,SYSVAR_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op->call.curbegin != nullptr) {
@@ -555,7 +555,7 @@ static int sysvar_socurbegin(SYSVAR *op,SYSVAR_CUR *curp) noex {
 }
 /* end subroutine (sysvar_socurbegin) */
 
-static int sysvar_socurend(SYSVAR *op,SYSVAR_CUR *curp) noex {
+static int sysvar_socurend(sysvar *op,SYSVAR_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -575,7 +575,7 @@ static int sysvar_socurend(SYSVAR *op,SYSVAR_CUR *curp) noex {
 }
 /* end subroutine (sysvar_socurend) */
 
-static int sysvar_defaults(SYSVAR *op) noex {
+static int sysvar_defaults(sysvar *op) noex {
 	int		rs ;
 	int		i ;
 	int		f ;
@@ -608,7 +608,7 @@ static int sysvar_defaults(SYSVAR *op) noex {
 }
 /* end subroutine (sysvar_defaults) */
 
-static int sysvar_procsysdef(SYSVAR *op,cchar *fname) noex {
+static int sysvar_procsysdef(sysvar *op,cchar *fname) noex {
 	vecstr		lvars ;
 	int		rs ;
 	int		rs1 ;
@@ -638,7 +638,7 @@ static int sysvar_procsysdef(SYSVAR *op,cchar *fname) noex {
 }
 /* end subroutine (sysvar_procsysdef) */
 
-static int sysvar_defcurbegin(SYSVAR *op,SYSVAR_CUR *curp) noex {
+static int sysvar_defcurbegin(sysvar *op,SYSVAR_CUR *curp) noex {
 	SV_DEF	*dcp ;
 	cint	size = sizeof(SV_DEF) ;
 	int		rs ;
@@ -655,7 +655,7 @@ static int sysvar_defcurbegin(SYSVAR *op,SYSVAR_CUR *curp) noex {
 }
 /* end subroutine (sysvar_defcurbegin) */
 
-static int sysvar_defcurend(SYSVAR *op,SYSVAR_CUR *curp) noex {
+static int sysvar_defcurend(sysvar *op,SYSVAR_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -672,7 +672,7 @@ static int sysvar_defcurend(SYSVAR *op,SYSVAR_CUR *curp) noex {
 }
 /* end subroutine (sysvar_defcurend) */
 
-static int sysvar_deffetch(sysvar *op,cc *kp,int kl,DV_DC *dcp,
+static int sysvar_deffetch(sysvar *op,cc *kp,int kl,SV_DC *dcp,
 		char *vbuf,int vlen) noex {
 	nulstr		ns ;
 	int		rs ;
