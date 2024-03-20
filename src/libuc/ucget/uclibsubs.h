@@ -188,7 +188,8 @@ extern int	uc_readn(int,void *,int) noex ;
 extern int	uc_readline(int,char *,int) noex ;
 extern int	uc_readlinetimed(int,char *,int,int) noex ;
 
-extern int	uc_write(int,cvoid *,int,int) noex ;
+extern int	uc_writeto(int,cvoid *,int,int) noex ;
+extern int	uc_write(int,cvoid *,int) noex ;
 extern int	uc_writen(int,cvoid *,int) noex ;
 extern int	uc_writedesc(int,int,int) noex ;
 extern int	uc_writefile(int,cchar *) noex ;
