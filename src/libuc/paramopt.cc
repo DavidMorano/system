@@ -1,9 +1,8 @@
-/* paramopt */
+/* paramopt SUPPORT */
+/* lang=C++20 */
 
 /* paramater option manipulations */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,44 +16,42 @@
 
 /*******************************************************************************
 
-        This code module contains subroutines used to add paramters to parameter
-        lists and such for later access. Although meant to be relatively
-        straight forward, there are several aspects of this object that are
-        tailored towards special uses that are not at all obvious.
+	This code module contains subroutines used to add paramters
+	to parameter lists and such for later access. Although meant
+	to be relatively straight forward, there are several aspects
+	of this object that are tailored towards special uses that
+	are not at all obvious.
 
-	All parameter names and values are stored in freshly allocated memory.
-	The original storage for parameter names and values can be freed after
-	they are stored using these routines.
+	All parameter names and values are stored in freshly allocated
+	memory.  The original storage for parameter names and values
+	can be freed after they are stored using these routines.
 
-	One of the more strange uses of this object (and actually the reason
-	that it was written) is to gather parameters with values but to also
-	organize them in a way that all combinations of parameter values can be
-	exponentially enumerated.  This is useful for programs that want to
-	enumerate all possible combinations of user supplied values of some
-	sort.
+	One of the more strange uses of this object (and actually
+	the reason that it was written) is to gather parameters
+	with values but to also organize them in a way that all
+	combinations of parameter values can be exponentially
+	enumerated.  This is useful for programs that want to
+	enumerate all possible combinations of user supplied values
+	of some sort.
 
-	This object stores a funny sort of key-value(s) pairs.  For each key,
-	multiple values can be stored along with the same key.  Multiple
-	apparent entries with the same key are stored in the SAME record.  This
-	is unlike regular database objects that will store multiple entries
-	with the same key in different records.
-
+	This object stores a funny sort of key-value(s) pairs.  For
+	each key, multiple values can be stored along with the same
+	key.  Multiple apparent entries with the same key are stored
+	in the SAME record.  This is unlike regular database objects
+	that will store multiple entries with the same key in
+	different records.
 
 *******************************************************************************/
 
-
-#define	PARAMOPT_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
-#include	<char.h>
 #include	<estrings.h>
+#include	<strn.h>
+#include	<strwcpy.h>
+#include	<strwcmp.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"paramopt.h"
@@ -62,66 +59,64 @@
 
 /* local defines */
 
+#define	PO		paramopt
+#define	PO_CUR		paramopt_cur
+#define	PO_NAME		paramopt_name
+#define	PO_VAL		paramopt_val
+
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sibreak(const char *,int,const char *) ;
-extern int	strwcmp(const char *,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* forward references */
 
-int		paramopt_loadu(PARAMOPT *,const char *,int) ;
-int		paramopt_loads(PARAMOPT *,const char *,const char *,int) ;
-int		paramopt_load(PARAMOPT *,const char *,const char *,int) ;
-int		paramopt_curbegin(PARAMOPT *,PARAMOPT_CUR *) ;
-int		paramopt_curend(PARAMOPT *,PARAMOPT_CUR *) ;
+extern "C" {
+    int		paramopt_loadu(PO *,cchar *,int) noex ;
+    int		paramopt_loads(PO *,cchar *,cchar *,int) noex ;
+    int		paramopt_load(PO *,cchar *,cchar *,int) noex ;
+    int		paramopt_curbegin(PO *,PO_CUR *) noex ;
+    int		paramopt_curend(PO *,PO_CUR *) noex ;
+}
 
-static int	paramopt_findkey(PARAMOPT *,const char *,PARAMOPT_NAME **) ;
-static int	name_incri(PARAMOPT_NAME *) ;
-static int	name_vfind(PARAMOPT_NAME *,const char *,int,PARAMOPT_VALUE **) ;
+static int	paramopt_findkey(PO *,cchar *,PO_NAME **) noex ;
+
+static int	name_incri(PO_NAME *) noex ;
+static int	name_vfind(PO_NAME *,cchar *,int,PO_VAL **) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
+int paramopt_start(PO *php) noex {
+	if (php == nullptr) return SR_FAULT ;
 
-int paramopt_start(PARAMOPT *php)
-{
-
-	if (php == NULL) return SR_FAULT ;
-
-	memset(php,0,sizeof(PARAMOPT)) ;
-	php->head = php->tail = NULL ;
+	memclear(php) ;			/* dangerous */
+	php->head = php->tail = nullptr ;
 	php->magic = PARAMOPT_MAGIC ;
-	php->f_inited = TRUE ;
+	php->f_inited = true ;
 
 	return SR_OK ;
 }
 /* end subroutine (paramopt_start) */
 
-
-int paramopt_finish(PARAMOPT *php)
-{
-	PARAMOPT_NAME	*np, *nnp ;
-	PARAMOPT_VALUE	*vp, *nvp ;
+int paramopt_finish(PO *php) noex {
+	PO_NAME	*np, *nnp ;
+	PO_VAL	*vp, *nvp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (php == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
-	for (np = php->head ; np != NULL ; np = nnp) {
-	    for (vp = np->head ; vp != NULL ; vp = nvp) {
-	        if (vp->value != NULL) {
+	for (np = php->head ; np != nullptr ; np = nnp) {
+	    for (vp = np->head ; vp != nullptr ; vp = nvp) {
+	        if (vp->value != nullptr) {
 	            rs1 = uc_free(vp->value) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
@@ -129,7 +124,7 @@ int paramopt_finish(PARAMOPT *php)
 	        rs1 = uc_free(vp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end for */
-	    if (np->name != NULL) {
+	    if (np->name != nullptr) {
 	        rs1 = uc_free(np->name) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -138,14 +133,13 @@ int paramopt_finish(PARAMOPT *php)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end for */
 
-	php->head = NULL ;
-	php->tail = NULL ;
-	php->f_inited = FALSE ;
+	php->head = nullptr ;
+	php->tail = nullptr ;
+	php->f_inited = false ;
 	php->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (paramopt_finish) */
-
 
 /* load a parameter with an unknown "name" and values all in string 's' */
 
@@ -157,26 +151,21 @@ Notice that the keyname is extrcted from the supplied string.
 
 ****/
 
-int paramopt_loadu(PARAMOPT *php,cchar *sp,int sl)
-{
+int paramopt_loadu(PO *php,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si ;
 	int		c = 0 ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
 	if (sl < 0) sl = strlen(sp) ;
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_loadu: ent\n") ;
-#endif
-
 	if ((si = sibreak(sp,sl,"=\t")) >= 0) {
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cl = sfshrink((sp + si),(sl- si),&cp)) > 0) {
 		char	*name ;
 		if ((rs = uc_malloc((cl+1),&name)) >= 0) {
@@ -191,14 +180,9 @@ int paramopt_loadu(PARAMOPT *php,cchar *sp,int sl)
 	    rs = SR_INVALID ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_loadu: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (paramopt_loadu) */
-
 
 /* load parameter with a known "name" and string of values (in 's') */
 
@@ -210,28 +194,19 @@ given that a keyname is specified explicitly.
 
 ****/
 
-int paramopt_loads(PARAMOPT *php,cchar *name,cchar *sp,int sl)
-{
+int paramopt_loads(PO *php,cchar *name,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		si ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_loads: name=%s\n",name) ;
-#endif
-
 	if (sl < 0) sl = strlen(sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("paramopt_loads: sl=%d\n",sl) ;
-#endif
 
 	while ((si = sibreak(sp,sl," :,\t\r\n\v\f")) >= 0) {
 	    cp = (sp+si) ;
@@ -249,131 +224,101 @@ int paramopt_loads(PARAMOPT *php,cchar *name,cchar *sp,int sl)
 	    c += rs ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_loads: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (paramopt_loads) */
 
-
 /* load a single key=value pair */
-int paramopt_load(PARAMOPT *php,cchar *name,cchar *vbuf,int vlen)
-{
+int paramopt_load(PO *php,cchar *name,cchar *vbuf,int vlen) noex {
 	int		rs = SR_OK ;
 	int		vl ;
-	int		f = FALSE ;
-	const char	*vp ;
+	int		f = false ;
+	cchar	*vp ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
-	if (vbuf == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
+	if (vbuf == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
 	if (name[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("paramopt_load: name=%s\n",name) ;
-#endif
 
 /* clean up the value a little */
 
 	if (vlen < 0)
 	    vlen = strlen(vbuf) ;
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_load: value=>%t< len=%d\n",value,vlen,vlen) ;
-#endif
-
 	if ((vl = sfshrink(vbuf,vlen,&vp)) > 0) {
-	    PARAMOPT_VALUE	*ovp, *nvp ;
-	    PARAMOPT_NAME	*pp ;
-	    const int		rsn = SR_NOTFOUND ;
-	    int			size ;
-	    const char		*cp ;
+	    PO_VAL	*ovp, *nvp ;
+	    PO_NAME	*pp ;
+	    cint	rsn = SR_NOTFOUND ;
+	    int		size ;
+	    cchar	*cp ;
 
 	    while ((vl > 0) && 
 	        (CHAR_ISWHITE(vp[vl - 1]) || (vp[vl - 1] == ','))) {
 	        vl -= 1 ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("paramopt_load: len=%d v=\"%t\"\n",vl,vp,vl) ;
-#endif
-
 /* do we have one of these named keys already? */
 
 	    if ((rs = paramopt_findkey(php,name,&pp)) == rsn) {
 
-#if	CF_DEBUGS
-	        debugprintf("paramopt_load: did not find already\n") ;
-#endif
-
 /* make a new parameter header block, insert at head */
 
-	        size = sizeof(PARAMOPT_NAME) ;
+	        size = sizeof(PO_NAME) ;
 	        if ((rs = uc_malloc(size,&pp)) >= 0) {
 	            pp->c = 0 ;
 	            pp->next = php->head ;	/* insert at head */
-	            pp->head = NULL ;
-	            pp->tail = NULL ;
-	            pp->current = NULL ;
+	            pp->head = nullptr ;
+	            pp->tail = nullptr ;
+	            pp->current = nullptr ;
 	            if ((rs = uc_mallocstrw(name,-1,&cp)) >= 0) {
 	                pp->name = cp ;
 	                php->head = pp ;	/* insert at head */
 	            }
-	            if (rs < 0)
+	            if (rs < 0) {
 	                uc_free(pp) ;
+		    }
 	        } /* end if */
 
 	    } /* end if (adding a new parameter block on the list) */
 
 /* OK, now we have the parameter block that we are looking for in 'pp' */
 
-#if	CF_DEBUGS
-	    debugprintf("paramopt_load: about to check if we have value\n") ;
-#endif
-
 	    if (rs >= 0) {
 	        if ((rs = name_vfind(pp,vp,vl,&ovp)) == rsn) {
-	            f = TRUE ;
-	            size = sizeof(PARAMOPT_VALUE) ;
+	            f = true ;
+	            size = sizeof(PO_VAL) ;
 	            if ((rs = uc_malloc(size,&nvp)) >= 0) {
-	                nvp->next = NULL ;
+	                nvp->next = nullptr ;
 	                if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
 	                    nvp->value = cp ;
 	                    ovp = pp->tail ;
-	                    if (pp->head == NULL) {
+	                    if (pp->head == nullptr) {
 	                        pp->head = nvp ;
 			    }
 	                    pp->c += 1 ;
 	                    pp->tail = nvp ;
 	                    pp->current = nvp ;
-	                    if (ovp != NULL) {
+	                    if (ovp != nullptr) {
 	                        ovp->next = nvp ;
 			    }
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_free(nvp) ;
+			}
 	            } /* end if (new value) */
 		} /* end if (name_vfind) */
 	    } /* end if (ok) */
 
 	} /* end if (non-zero) */
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_load: ret rs=%d f=%u\n",rs,f) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (paramopt_load) */
 
-
-int paramopt_loaduniq(PARAMOPT *php,cchar *name,cchar *vp,int vl)
-{
+int paramopt_loaduniq(PO *php,cchar *name,cchar *vp,int vl) noex {
 	int		rs ;
 	if ((rs = paramopt_haveval(php,name,vp,vl)) == 0) {
 	    rs = paramopt_load(php,name,vp,vl) ;
@@ -382,15 +327,13 @@ int paramopt_loaduniq(PARAMOPT *php,cchar *name,cchar *vp,int vl)
 }
 /* end subroutine (paramopt_loaduniq) */
 
-
-int paramopt_havekey(PARAMOPT *php,cchar *name)
-{
-	PARAMOPT_NAME	*pp ;
+int paramopt_havekey(PO *php,cchar *name) noex {
+	PO_NAME	*pp ;
 	int		rs ;
 	int		c = 0 ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (name == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (name == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
@@ -406,33 +349,30 @@ int paramopt_havekey(PARAMOPT *php,cchar *name)
 }
 /* end subroutine (paramopt_havekey) */
 
-
-/* enumerate on all of the keyes */
-int paramopt_enumkeys(PARAMOPT *php,PARAMOPT_CUR *curp,cchar **rpp)
-{
-	PARAMOPT_NAME	*kp ;
+int paramopt_enumkeys(PO *php,PO_CUR *curp,cchar **rpp) noex {
+	PO_NAME	*kp ;
 	int		rs = SR_OK ;
 	int		kl = 0 ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
-	if (rpp != NULL)
-	    *rpp = NULL ;
+	if (rpp != nullptr)
+	    *rpp = nullptr ;
 
-	if (curp->keyp == NULL) {
+	if (curp->keyp == nullptr) {
 	    kp = php->head ;		/* get the next key-pointer */
-	    curp->valuep = NULL ;
+	    curp->valuep = nullptr ;
 	} else {
 	    kp = curp->keyp ;		/* get the current key-pointer */
 	    kp = kp->next ;		/* get the next key-pointer */
 	}
 
-	if (kp != NULL) {
+	if (kp != nullptr) {
 	    curp->keyp = kp ;		/* update to the current key-pointer */
-	    if (rpp != NULL) *rpp = kp->name ;
+	    if (rpp != nullptr) *rpp = kp->name ;
 	    kl = strlen(kp->name) ;
 	} else {
 	    rs = SR_NOTFOUND ;
@@ -442,39 +382,33 @@ int paramopt_enumkeys(PARAMOPT *php,PARAMOPT_CUR *curp,cchar **rpp)
 }
 /* end subroutine (paramopt_enumkeys) */
 
-
-/* enumerate on a key's values */
-int paramopt_fetch(PARAMOPT *php,cchar *key,PARAMOPT_CUR *curp,cchar **rpp)
-{
-	PARAMOPT_NAME	*kp = NULL ;
-	PARAMOPT_VALUE	*vp = NULL ;
-	PARAMOPT_CUR	ncur ;
+int paramopt_fetch(PO *php,cchar *key,PO_CUR *curp,
+		cchar **rpp) noex {
+	PO_NAME	*kp = nullptr ;
+	PO_VAL	*vp = nullptr ;
+	PO_CUR	ncur ;
 	int		rs = SR_OK ;
 	int		vl = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_fetch: ent key=%s\n",key) ;
-#endif
-
-	if (php == NULL) return SR_FAULT ;
-	if (key == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (key == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
 	if (key[0] == '\0') return SR_INVALID ;
 
-	if (curp == NULL) {
+	if (curp == nullptr) {
 	    curp = &ncur ;
-	    curp->keyp = NULL ;
-	    curp->valuep = NULL ;
+	    curp->keyp = nullptr ;
+	    curp->valuep = nullptr ;
 	}
 
-	if (rpp != NULL)
-	    *rpp = NULL ;
+	if (rpp != nullptr)
+	    *rpp = nullptr ;
 
 /* do we have this key? */
 
-	if (curp->keyp == NULL) {
+	if (curp->keyp == nullptr) {
 	    if ((rs = paramopt_findkey(php,key,&kp)) >= 0) {
 	        curp->keyp = kp ;
 	        vp = kp->head ;
@@ -484,9 +418,9 @@ int paramopt_fetch(PARAMOPT *php,cchar *key,PARAMOPT_CUR *curp,cchar **rpp)
 	    vp = (curp->valuep)->next ;
 	} /* end if */
 
-	if ((rs >= 0) && ((kp != NULL) && (vp != NULL))) {
-	    if (rpp != NULL) *rpp = vp->value ;
-	    if (vp->value != NULL) vl = strlen(vp->value) ;
+	if ((rs >= 0) && ((kp != nullptr) && (vp != nullptr))) {
+	    if (rpp != nullptr) *rpp = vp->value ;
+	    if (vp->value != nullptr) vl = strlen(vp->value) ;
 	    curp->valuep = vp ;
 	} else {
 	    rs = SR_NOTFOUND ;
@@ -496,26 +430,21 @@ int paramopt_fetch(PARAMOPT *php,cchar *key,PARAMOPT_CUR *curp,cchar **rpp)
 }
 /* end subroutine (paramopt_fetch) */
 
-
-int paramopt_enumvalues(PARAMOPT *php,cchar *key,PARAMOPT_CUR *curp,
-		cchar **rpp)
-{
-
+int paramopt_enumvalues(PO *php,cchar *key,PO_CUR *curp,
+		cchar **rpp) noex {
 	return paramopt_fetch(php,key,curp,rpp) ;
 }
 /* end subroutine (paramopt_enumvalues) */
 
-
-int paramopt_haveval(PARAMOPT *php,cchar *key,cchar *vp,int vl)
-{
-	PARAMOPT_CUR	cur ;
+int paramopt_haveval(PO *php,cchar *key,cchar *vp,int vl) noex {
+	PO_CUR	cur ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (key == NULL) return SR_FAULT ;
-	if (vp == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (key == nullptr) return SR_FAULT ;
+	if (vp == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
@@ -523,9 +452,9 @@ int paramopt_haveval(PARAMOPT *php,cchar *key,cchar *vp,int vl)
 
 	if ((rs = paramopt_curbegin(php,&cur)) >= 0) {
 	    int		f ;
-	    const char	*ccp ;
+	    cchar	*ccp ;
 	    while ((rs1 = paramopt_enumvalues(php,key,&cur,&ccp)) >= 0) {
-	        if (ccp != NULL) {
+	        if (ccp != nullptr) {
 	            f = (strwcmp(ccp,vp,vl) == 0) ;
 	            c += f ;
 		}
@@ -538,21 +467,19 @@ int paramopt_haveval(PARAMOPT *php,cchar *key,cchar *vp,int vl)
 }
 /* end subroutine (paramopt_haveval) */
 
-
 /* increment the parameters */
-int paramopt_incr(PARAMOPT *php)
-{
-	PARAMOPT_NAME	*pp ;
-	PARAMOPT_VALUE	*vp ;
+int paramopt_incr(PO *php) noex {
+	PO_NAME	*pp ;
+	PO_VAL	*vp ;
 	int		rs ;
 
-	if (php == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
 	pp = php->head ;
 	rs = -1 ;
-	if (pp->next != NULL) {
+	if (pp->next != nullptr) {
 	    rs = name_incri(pp->next) ;
 	}
 
@@ -560,7 +487,7 @@ int paramopt_incr(PARAMOPT *php)
 
 	if (rs < 0) {
 	    vp = pp->current ;
-	    if (vp->next == NULL) {
+	    if (vp->next == nullptr) {
 	        pp->current = pp->head ;
 	        rs = -1 ;
 	    } else {
@@ -573,48 +500,40 @@ int paramopt_incr(PARAMOPT *php)
 }
 /* end subroutine (paramopt_incr) */
 
-
 /* initialize a cursor */
-int paramopt_curbegin(PARAMOPT *php,PARAMOPT_CUR *curp)
-{
-
-	if (php == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+int paramopt_curbegin(PO *php,PO_CUR *curp) noex {
+	if (php == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
-	curp->keyp = NULL ;
-	curp->valuep = NULL ;
+	curp->keyp = nullptr ;
+	curp->valuep = nullptr ;
 	return SR_OK ;
 }
 /* end subroutine (paramopt_curbegin) */
 
-
 /* free up a cursor */
-int paramopt_curend(PARAMOPT *php,PARAMOPT_CUR *curp)
-{
-
-	if (php == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+int paramopt_curend(PO *php,PO_CUR *curp) noex {
+	if (php == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
-	curp->keyp = NULL ;
-	curp->valuep = NULL ;
+	curp->keyp = nullptr ;
+	curp->valuep = nullptr ;
 	return SR_OK ;
 }
 /* end subroutine (paramopt_curend) */
 
-
 /* find the number of values for a given key */
-int paramopt_countvals(PARAMOPT *php,cchar *key)
-{
-	PARAMOPT_NAME	*kp ;
+int paramopt_countvals(PO *php,cchar *key) noex {
+	PO_NAME	*kp ;
 	int		rs ;
 	int		c = 0 ;
 
-	if (php == NULL) return SR_FAULT ;
-	if (key == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
+	if (key == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
@@ -635,45 +554,24 @@ int paramopt_countvals(PARAMOPT *php,cchar *key)
 
 /* private subroutines */
 
-
 /* find a parameter by key-name */
-static int paramopt_findkey(PARAMOPT *php,cchar *name,PARAMOPT_NAME **rpp)
-{
-	PARAMOPT_NAME	*pp ;
+static int paramopt_findkey(PO *php,cc *name,PO_NAME **rpp) noex {
+	PO_NAME	*pp ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_findkey: ent len=%d n=%s\n",
-	    strlen(name),name) ;
-#endif
-
-	for (pp = php->head ; pp != NULL ; pp = pp->next) {
-
-#if	CF_DEBUGS
-	    debugprintf("paramopt_findkey: top loop len=%d n=%s\n",
-	        strlen(pp->name),pp->name) ;
-#endif
+	for (pp = php->head ; pp != nullptr ; pp = pp->next) {
 
 	    if (strcmp(pp->name,name) == 0)
 	        break ;
 
-#if	CF_DEBUGS
-	    debugprintf("paramopt_findkey: bottom of loop\n") ;
-#endif
-
 	} /* end for */
 
-#if	CF_DEBUGS
-	debugprintf("paramopt_findkey: ret %s n=%s\n",
-	    (pp == NULL) ? "NOT FOUND" : "FOUND", name) ;
-#endif
+	if (pp != nullptr) c = pp->c ;
 
-	if (pp != NULL) c = pp->c ;
-
-	if (rpp != NULL)
+	if (rpp != nullptr)
 	    *rpp = pp ;
 
-	return (pp != NULL) ? c : SR_NOTFOUND ;
+	return (pp != nullptr) ? c : SR_NOTFOUND ;
 }
 /* end subroutine (paramopt_findkey) */
 
@@ -683,15 +581,15 @@ static int paramopt_findkey(PARAMOPT *php,cchar *name,PARAMOPT_NAME **rpp)
 /* find a paramter by key/value pair */
 static int paramopt_findvalue(php,key,value,vlen,rpp)
 PARAMOPT	*php ;
-PARAMOPT_VALUE	**rpp ;
-const char	key[] ;
-const char	value[] ;
+PO_VAL	**rpp ;
+cchar	key[] ;
+cchar	value[] ;
 int		vlen ;
 {
-	PARAMOPT_NAME	*kp ;
+	PO_NAME	*kp ;
 	int		rs ;
 
-	if (php == NULL) return SR_FAULT ;
+	if (php == nullptr) return SR_FAULT ;
 
 	if (php->magic != PARAMOPT_MAGIC) return SR_NOTOPEN ;
 
@@ -710,13 +608,11 @@ int		vlen ;
 
 #endif /* COMMENT */
 
-
-static int name_incri(PARAMOPT_NAME *pp)
-{
-	PARAMOPT_VALUE	*vp ;
+static int name_incri(PO_NAME *pp) noex {
+	PO_VAL	*vp ;
 	int		rs = SR_NOSYS ;
 
-	if (pp->next != NULL) {
+	if (pp->next != nullptr) {
 	    rs = name_incri(pp->next) ;
 	}
 
@@ -724,7 +620,7 @@ static int name_incri(PARAMOPT_NAME *pp)
 
 	if (rs < 0) {
 	    vp = pp->current ;
-	    if (vp->next == NULL) {
+	    if (vp->next == nullptr) {
 	        pp->current = pp->head ;
 	        rs = -1 ;
 	    } else {
@@ -737,29 +633,23 @@ static int name_incri(PARAMOPT_NAME *pp)
 }
 /* end subroutine (name_incri) */
 
-
 /* find a paramter by value? */
-static int name_vfind(PARAMOPT_NAME *pp,cchar *vp,int vl,PARAMOPT_VALUE **rpp)
-{
-	PARAMOPT_VALUE	*vep ;
+static int name_vfind(PO_NAME *pp,cchar *vp,int vl,
+		PO_VAL **rpp) noex {
+	PO_VAL		*vep ;
 	int		c = 0 ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("name_vfind: ent v=%t\n",
-	    vp,strnlen(vp,vl)) ;
-#endif /* CF_DEBUGS */
+	int		f = false ;
 
 	if (vl < 0) vl = strlen(vp) ;
 
-	for (vep = pp->head ; vep != NULL ; vep = vep->next) {
+	for (vep = pp->head ; vep != nullptr ; vep = vep->next) {
 	    f = (strncmp(vep->value,vp,vl) == 0) ;
 	    f = f && (vep->value[vl] == '\0') ;
 	    if (f) break ;
 	    c += 1 ;
 	} /* end for */
 
-	if (rpp != NULL)
+	if (rpp != nullptr)
 	    *rpp = vep ;
 
 	return (f) ? c : SR_NOTFOUND ;
