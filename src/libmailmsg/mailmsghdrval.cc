@@ -16,14 +16,19 @@
 
 /*******************************************************************************
 
-	This is a *simple* message header-value object.  
+	This is a (rather) simple message header-value object.  The
+	purpose of this object is to accummulate pieces of an entire
+	header-value, one piece of it at a time.  The reason that
+	header-values have to be accummulated is due to the fact
+	that they may be on different lines from each other.  Further,
+	under circumstances where desired, different header values
+	may be combinæd from entirely different headers themsleves,
+	but sharing the same header key-name.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -70,7 +75,7 @@ constexpr int		extlen = REALNAMELEN ;
 
 int mailmsghdrval_start(mailmsghdrval *op,int i,cchar *hp,int hl) noex {
 	int		rs = SR_FAULT ;
-	if (op && hp) {
+	if (op) {
 	    char	*cp{} ;
 	    op->idx = i ;
 	    op->vl = 0 ;
@@ -78,7 +83,9 @@ int mailmsghdrval_start(mailmsghdrval *op,int i,cchar *hp,int hl) noex {
 		op->vlen = rs ;
 	        op->vbuf = cp ;
 		op->vbuf[0] = '\0' ;
-	        rs = mailmsghdrval_loadadd(op,hp,hl) ;
+		if (hp) {
+	            rs = mailmsghdrval_loadadd(op,hp,hl) ;
+		}
 		if (rs < 0) {
 		    uc_free(cp) ;
 		    op->vbuf = nullptr ;

@@ -20,17 +20,7 @@
 #include	<localmisc.h>
 
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN		MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN		2048
-#endif
-#endif
-
-/* object defines */
 #define	MAILMSGHDRVAL		struct mailmsghdrval_head
-#define	MAILMSGHDRVAL_BUFLEN	LINEBUFLEN
 
 
 struct mailmsghdrval_head {

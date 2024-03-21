@@ -63,7 +63,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<tmstrs.h>
 #include	<strn.h>
@@ -78,6 +78,12 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -143,7 +149,7 @@ int mailmsgmatenv(mailmsgenv *mep,cchar *sp,int sl) noex {
 		        }
 		    }
 	        }
-	    } /* end if */
+	    } /* end if (hit) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
