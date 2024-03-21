@@ -129,7 +129,7 @@ cpcchar		mailmsghdrs_names[] = {
 /* exported subroutines */
 
 int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
-	cint		n = (HI_OVERLAST + 1) ;
+	cint		n = HI_OVERLAST ;
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op && msgp) {
@@ -138,7 +138,7 @@ int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
 	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        int	i ; /* used-afterwards */
 	        mainv	mhnames = mailmsghdrs_names ;
-	        cchar	*hp ;
+	        cchar	*hp{} ;
 	        op->v = ccharpp(p) ;
 	        for (i = 0 ; (i < n) && mhnames[i] ; i += 1) {
 	            op->v[i] = nullptr ;
