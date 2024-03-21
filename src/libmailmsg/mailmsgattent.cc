@@ -90,12 +90,15 @@ static int	mailmsgattent_startct(MME *,cchar *,int) noex ;
 static int	mailmsgattent_startctpri(MME *,cchar *,int) noex ;
 static int	mailmsgattent_startctsub(MME *,cchar *,int) noex ;
 static int	mailmsgattent_checkatt(MME *) noex ;
+static int	mailmsgattent_needaux(MME *,cc *,char *,bfile *) noex ;
 static int	mailmsgattent_analyzer(MME *,bfile *,bfile *) noex ;
 
 static int	freeit(void *) noex ;
 
 
 /* local variables */
+
+constexpr cchar		tmpcname[] = MAILMSGATTENT_TMPCNAME ;
 
 
 /* exported variables */
@@ -395,67 +398,41 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                 USTAT       sb ;
                 if ((rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
                     bfile   auxfile, *afp = &auxfile ;
-                    int     f_needaux = true ;
-                    char    auxfname[MAXPATHLEN+1] ;
-                    auxfname[0] = '\0' ;
-                    if (S_ISREG(sb.st_mode)) {
-                        op->clen = int(sb.st_size & INT_MAX) ;
-                        f_needaux = false ;
-                    }
-                    if (f_needaux) {
-                        cchar       *tmpcname = MAILMSGATTENT_TMPCNAME ;
-                        char        tmpfname[MAXPATHLEN + 1] ;
-                        if (tmpdname == nullptr) {
-                            rs = SR_FAULT ;
-			}
+                    char    *abuf{} ;
+		    if ((rs = malloc_mp(&abuf)) >= 0) {
+                        bool     f_needaux = true ;
+                        abuf[0] = '\0' ;
+                        if (S_ISREG(sb.st_mode)) {
+                            op->clen = int(sb.st_size & INT_MAX) ;
+                            f_needaux = false ;
+                        }
+                        if (f_needaux) {
+			    rs = mailmsgattent_needaux(op,tmpdname,abuf,afp) ;
+                        } /* end if (needed an auxillary file) */
+/* finally! perform the analysis */
                         if (rs >= 0) {
-                            if (tmpdname[0] != '\0') {
-                                rs = mkpath2(tmpfname,tmpdname,tmpcname) ;
-                            } else {
-                                rs = mkpath1(tmpfname,tmpcname) ;
-                            }
-                        } /* end if (ok) */
-                        if (rs >= 0) {
-                            cmode   om = 0660 ;
-                            if ((rs = mktmpfile(auxfname,tmpfname,om)) >= 0) {
-                                cchar       *afn = auxfname ;
-                                cchar       *cp ;
-                                if ((rs = uc_mallocstrw(afn,-1,&cp)) >= 0) {
-                                    op->auxfname = cp ;
-                                    rs = bopen(afp,op->auxfname,"wct",0666) ;
-                                    if (rs < 0) {
-                                        uc_free(op->auxfname) ;
-                                        op->auxfname = nullptr ;
-                                    }
-                                } /* end if (m-a) */
-                                if (rs < 0) {
-                                    uc_unlink(auxfname) ;
-                                    auxfname[0] = '\0' ;
+                            if (! f_needaux) afp = nullptr ;
+                            rs = mailmsgattent_analyzer(op,afp,ifp) ;
+                            code = rs ;
+                            if (rs < 0) {
+                                if (op->auxfname != nullptr) {
+                                    uc_free(op->auxfname) ;
+                                    op->auxfname = nullptr ;
                                 }
-                            } /* end if (mktmpfile) */
+                                if (abuf[0] != '\0') {
+                                    u_unlink(abuf) ;
+                                }
+                            } /* end if (error) */
                         } /* end if (ok) */
-                    } /* end if (needed an auxillary file) */
-    /* finally! perform the analysis */
-                    if (rs >= 0) {
-                        if (! f_needaux) afp = nullptr ;
-                        rs = mailmsgattent_analyzer(op,afp,ifp) ;
-                        code = rs ;
-                        if (rs < 0) {
-                            if (op->auxfname != nullptr) {
-                                uc_free(op->auxfname) ;
-                                op->auxfname = nullptr ;
-                            }
-                            if (auxfname[0] != '\0') {
-                                u_unlink(auxfname) ;
-                            }
-                        } /* end if (error) */
-                    } /* end if (ok) */
-                    if (f_needaux) {
-                        if (afp != nullptr) bclose(afp) ;
-                    } else {
-                        bseek(ifp,0L,SEEK_SET) ;
-                    }
-                } /* end if (stat) */
+                        if (f_needaux) {
+                            if (afp) bclose(afp) ;
+                        } else {
+                            bseek(ifp,0L,SEEK_SET) ;
+                        }
+			rs1 = uc_free(abuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+                } /* end if (bstat) */
                 rs1 = bclose(ifp) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (file-open) */
@@ -552,6 +529,44 @@ static int mailmsgattent_checkatt(MME *op) noex {
         return rs ;
 }
 /* end subroutine (mailmsgattent_checkatt) */
+
+static int mailmsgattent_needaux(MME *op,cc *tmpdn,char *abuf,bfile *afp) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (tmpdn) {
+            char	*tmpfname{} ;
+	    if ((rs = malloc_mp(&tmpfname)) >= 0) {
+                if (tmpdn[0] != '\0') {
+                    rs = mkpath2(tmpfname,tmpdn,tmpcname) ;
+                } else {
+                    rs = mkpath1(tmpfname,tmpcname) ;
+                }
+                if (rs >= 0) {
+                    cmode   om = 0660 ;
+                    if ((rs = mktmpfile(abuf,tmpfname,om)) >= 0) {
+                        cchar       *afn = abuf ;
+                        cchar       *cp ;
+                        if ((rs = uc_mallocstrw(afn,-1,&cp)) >= 0) {
+                            op->auxfname = cp ;
+                            rs = bopen(afp,op->auxfname,"wct",0666) ;
+                            if (rs < 0) {
+                                uc_free(op->auxfname) ;
+                                op->auxfname = nullptr ;
+                            }
+                        } /* end if (m-a) */
+                        if (rs < 0) {
+                            uc_unlink(abuf) ;
+                            abuf[0] = '\0' ;
+                        }
+                    } /* end if (mktmpfile) */
+                } /* end if (ok) */
+	        rs1 = uc_free(tmpfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailmsgattent) */
 
 static int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
         int             rs ;
