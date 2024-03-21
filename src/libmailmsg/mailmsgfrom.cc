@@ -1,9 +1,8 @@
-/* mailmsgfrom */
+/* mailmsgfrom SUPPORT */
+/* lang=C++20 */
 
 /* mail-message-from processing */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,20 +18,14 @@
 
 	Process a time value and return whether it is a "hit."
 
-
 *******************************************************************************/
 
-
-#define	MAILMSGFROM_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<strdcpy.h>
 #include	<localmisc.h>
 
 #include	"mailmsgfrom.h"
@@ -42,17 +35,6 @@
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -67,30 +49,27 @@ extern char	*strdcpy1w(char *,int,cchar *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mailmsgfrom_start(MAILMSGFROM *op,char *fbuf,int flen)
-{
+int mailmsgfrom_start(MAILMSGFROM *op,char *fbuf,int flen) noex {
 	if (op == NULL) return SR_FAULT ;
-	memset(op,0,sizeof(MAILMSGFROM)) ;
+	memclear(op) ; /* dangerous */
 	op->fbuf = fbuf ;
 	op->flen = flen ;
 	return SR_OK ;
 }
 /* end subroutine (mailmsgfrom_start) */
 
-
-int mailmsgfrom_finish(MAILMSGFROM *op)
-{
+int mailmsgfrom_finish(MAILMSGFROM *op) noex {
 	if (op == NULL) return SR_FAULT ;
 	return SR_OK ;
 }
 /* end subroutine (mailmsgfrom_finish) */
 
-
-int mailmsgfrom_test(MAILMSGFROM *op,time_t t)
-{
+int mailmsgfrom_test(MAILMSGFROM *op,time_t t) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 	if (op == NULL) return SR_FAULT ;
@@ -102,9 +81,7 @@ int mailmsgfrom_test(MAILMSGFROM *op,time_t t)
 }
 /* end subroutine (mailmsgfrom_test) */
 
-
-int mailmsgfrom_loadfrom(MAILMSGFROM *op,cchar *sp,int sl)
-{
+int mailmsgfrom_loadfrom(MAILMSGFROM *op,cchar *sp,int sl) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
 	op->fl = strdcpy1w(op->fbuf,op->flen,sp,sl) - op->fbuf ;
