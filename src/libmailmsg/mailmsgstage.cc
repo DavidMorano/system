@@ -127,6 +127,12 @@
 #define	LINER		struct liner
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern int	sncpy1(char *,int,cchar *) ;
@@ -225,10 +231,12 @@ static int liner_done(LINER *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts)
-{
+int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts) noex {
 	int		rs ;
 	int		n = 0 ;
 	cchar	*tmpdname = NULL ;

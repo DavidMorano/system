@@ -766,6 +766,10 @@ lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
+tmpx.o:			tmpx.cc tmpx.h
+fdliner.o:		fdliner.cc fdliner.h
+fbliner.o:		fbliner.cc fbliner.h
+
 dirlist.o:		dirlist.cc dirlist.h
 
 dirseen.o:		dirseen.cc dirseen.h
@@ -875,8 +879,6 @@ checkbase.o:		checkbase.cc
 # malloc
 mallocxx.o:		mallocxx.cc mallocxx.h
 mallocstuff.o:		mallocstuff.cc mallocstuff.h
-
-tmpx.o:			tmpx.cc tmpx.h
 
 # part of string-to-integer interface
 strtox.o:		strtox.cc strtox.h
