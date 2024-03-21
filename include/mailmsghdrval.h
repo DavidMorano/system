@@ -34,10 +34,10 @@
 
 
 struct mailmsghdrval_head {
-	char		*v ;
+	char		*vbuf ;	/* initially LINEBUFLEN in size */
 	char		vlen ;
-	int		i ;
-	char		vbuf[MAILMSGHDRVAL_BUFLEN + 1] ;
+	int		vl ;
+	int		idx ;
 } ;
 
 typedef MAILMSGHDRVAL		mailmsghdrval ;
@@ -47,6 +47,7 @@ EXTERNC_begin
 extern int mailmsghdrval_start(mailmsghdrval *,int,cchar *,int) noex ;
 extern int mailmsghdrval_add(mailmsghdrval *,cchar *,int) noex ;
 extern int mailmsghdrval_get(mailmsghdrval *,cchar **,int *) noex ;
+extern int mailmsghdrval_clr(mailmsghdrval *) noex ;
 extern int mailmsghdrval_finish(mailmsghdrval *) noex ;
 
 EXTERNC_end

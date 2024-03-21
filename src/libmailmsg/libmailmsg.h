@@ -1,4 +1,4 @@
-/* libmb HEADER */
+/* libmailmsg HEADER */
 /* lang=C20 */
 
 /* string-copy variant */
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	LIBMB_INCLUDE
-#define	LIBMB_INCLUDE
+#ifndef	LIBMAILMSG_INCLUDE
+#define	LIBMAILMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -28,6 +28,6 @@
 #include	<mailmsgmathdr.h>
 
 
-#endif /* LIBMB_INCLUDE */
+#endif /* LIBMAILMSG_INCLUDE */
 
 
