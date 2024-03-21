@@ -197,16 +197,6 @@ static int mailbox_dtor(mailbox *op) noex {
 }
 /* end subroutine (mailbox_dtor) */
 
-template<typename ... Args>
-static int mailbox_magic(mailbox *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (mailbox_magic) */
-
 static int mailbox_opener(mailbox *,cc *,int) noex ;
 static int mailbox_parse(mailbox *) noex ;
 static int mailbox_parsemsg(mailbox *,LINER *,int) noex ;

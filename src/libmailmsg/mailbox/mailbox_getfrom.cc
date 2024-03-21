@@ -16,6 +16,10 @@
 
 /*******************************************************************************
 
+	Name:
+	mailbox_getfrom
+
+	Description:
 	This subroutine gets a FROM address from a mail message.
 
 	Synopsis:
@@ -56,6 +60,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -77,7 +87,7 @@ static bool	isNoMsg(int) noex ;
 
 /* local variables */
 
-static const int	rsnomsg[] = {
+static constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
@@ -89,46 +99,43 @@ static const int	rsnomsg[] = {
 
 /* exported subroutines */
 
-int mailbox_getfrom(MAILBOX *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
+int mailbox_getfrom(mailbox *mbp,char *rbuf,int rlen,cchar *fn,int mi) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-
-	if (mbp == NULL) return SR_FAULT ;
-	if (fn == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	if (fn[0] == '\0') return SR_INVALID ;
-
-	if (mi < 0) {
-	    mailbox_info	mbinfo{} ;
-	    rs = mailbox_getinfo(mbp,&mbinfo) ;
-	    if (mbinfo.nmsgs > 0) mi = (mbinfo.nmsgs - 1) ;
-	} /* end if (default) */
-
-	if ((rs >= 0) && (mi >= 0)) {
-	    mailbox_mi		*mip{} ;
-	    if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
-		bfile		mf ;
-	        if ((rs = bopen(&mf,fn,"r",0666)) >= 0) {
-		    const off_t	moff = mip->moff ;
-	            if ((rs = bseek(&mf,moff,SEEK_SET)) >= 0) {
-			MAILMSG		m ;
-	                if ((rs = mailmsg_start(&m)) >= 0) {
-			    if ((rs = mailmsg_loadfile(&m,&mf)) >= 0) {
-				rs = mailmsg_fromer(&m,rbuf,rlen) ;
-			        len = rs ;
-			    }
-	                    rs1 = mailmsg_finish(&m) ;
+	if ((rs = mailbox_magic(mbp,rbuf,fn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (fn[0]) {
+		rs = SR_OK ;
+	        if (mi < 0) {
+	            mailbox_info	mbinfo{} ;
+	            rs = mailbox_getinfo(mbp,&mbinfo) ;
+	            if (mbinfo.nmsgs > 0) mi = (mbinfo.nmsgs - 1) ;
+	        } /* end if (default) */
+	        if ((rs >= 0) && (mi >= 0)) {
+	            mailbox_mi		*mip{} ;
+	            if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
+		        bfile		mf ;
+	                if ((rs = bopen(&mf,fn,"r",0666)) >= 0) {
+		            const off_t	moff = mip->moff ;
+	                    if ((rs = bseek(&mf,moff,SEEK_SET)) >= 0) {
+			        MAILMSG		m ;
+	                        if ((rs = mailmsg_start(&m)) >= 0) {
+			            if ((rs = mailmsg_loadfile(&m,&mf)) >= 0) {
+				        rs = mailmsg_fromer(&m,rbuf,rlen) ;
+			                len = rs ;
+			            }
+	                            rs1 = mailmsg_finish(&m) ;
+	                            if (rs >= 0) rs = rs1 ;
+	                        } /* end if (mailmsg) */
+	                    } /* end if (seek) */
+	                    rs1 = bclose(&mf) ;
 	                    if (rs >= 0) rs = rs1 ;
-	                } /* end if (mailmsg) */
-	            } /* end if (seek) */
-	            rs1 = bclose(&mf) ;
-	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mail-file) */
-	    } /* end if (msg-info) */
-	} /* end if (positive MI) */
-
+	                } /* end if (mail-file) */
+	            } /* end if (msg-info) */
+	        } /* end if (positive MI) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mailbox_getfrom) */

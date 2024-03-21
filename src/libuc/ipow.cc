@@ -1,7 +1,7 @@
 /* ipow SUPPORT */
 /* lang=C++20 */
 
-/* return integer-power */
+/* calculate integer-power */
 /* version %I% last-modified %G% */
 
 #define	CF_DYNAMIC	1		/* dynamic programming */
@@ -21,8 +21,8 @@
 	ipow
 
 	Description:
-        This subroutine calculates and returns an integer power for a given
-        base.
+	This subroutine calculates and returns an integer power for
+	a given base.
 
 	Synopsis:
 	int ipow(int b,int p) noex
@@ -55,6 +55,12 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -71,9 +77,9 @@ static int	ipow10(int) noex ;
 
 /* local variables */
 
-constexpr bool		f_dynamic = CF_DYNAMIC ;
+constexpr bool	f_dynamic = CF_DYNAMIC ;
 
-constexpr int		b20tab[] = {
+constexpr int	b20tab[] = {
 	1, 10, 100, 1000, 10000, 100000, 1000000,
 	10000000, 100000000, 1000000000
 } ;
@@ -99,13 +105,13 @@ int ipow(int b,int n) noex {
 	        if (n == 1) {
 	            r = b ;
 	        } else if (n == 2) { /* common case */
-	            r = b*b ;
+	            r = b * b ;
 	        } else if (n > 2) {
-	            int	t = ipow(b,(n/2)) ;
+	            cint	t = ipow(b,(n/2)) ;
 	            if ((n&1) == 0) {
-		        r = (t*t) ;
+		        r = (t * t) ;
 	            } else {
-		        r = b*(t*t) ;
+		        r = b * (t * t) ;
 	            }
 	        } /* end if */
 	    } else {

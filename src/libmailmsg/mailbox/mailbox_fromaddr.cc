@@ -62,11 +62,19 @@
 
 /* local defines */
 
+#define	MMF	MAILMSGFROM
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
 
 extern "C" {
-    extern int	mailmsg_loadfile(MAILMSG *,bfile *) noex ;
+    extern int	mailmsg_loadfile(mailmsg *,bfile *) noex ;
 }
 
 
@@ -80,10 +88,10 @@ extern "C" {
 
 static int mailbox_proc(mailbox *,DATER *,MAILMSGFROM *,bfile *,int) noex ;
 
-static int mailmsg_msgfrom(MAILMSG *,MAILMSGFROM *) noex ;
-static int mailmsg_msgtime(MAILMSG *,DATER *,time_t *) noex ;
-static int mailmsg_hdrtime(MAILMSG *,DATER *,time_t *) noex ;
-static int mailmsg_envtime(MAILMSG *,DATER *,time_t *) noex ;
+static int mailmsg_msgfrom(mailmsg *,MAILMSGFROM *) noex ;
+static int mailmsg_msgtime(mailmsg *,dater *,time_t *) noex ;
+static int mailmsg_hdrtime(mailmsg *,dater *,time_t *) noex ;
+static int mailmsg_envtime(mailmsg *,dater *,time_t *) noex ;
 
 static int	isNoMsg(int) noex ;
 
@@ -102,11 +110,11 @@ static constexpr int	rsnomsg[] = {
 
 /* exported subroutines */
 
-int mailbox_fromaddr(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn) noex {
+int mailbox_fromaddr(mailbox *mbp,DATER *dp,MMF *fip,cchar *mfn) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		c = 0 ;
-	if (mbp && dp && fip && mfn) {
+	if ((rs = mailbox_magic(mbp,dp,fip,mfn)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (mfn[0]) {
 	        mailbox_info	mi{} ;
@@ -124,7 +132,7 @@ int mailbox_fromaddr(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn) noex {
 	            } /* end if (positive) */
 	        } /* end if (mailbox_info) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailbox_fromaddr) */
@@ -132,8 +140,8 @@ int mailbox_fromaddr(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,cchar *mfn) noex {
 
 /* local subroutines */
 
-static int mailbox_proc(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,
-		bfile *mfp,int mi) noex {
+static int mailbox_proc(mailbox *mbp,DATER *dp,MMF *fip,
+		 bfile *mfp,int mi) noex {
 	mailbox_mi	*mip{} ;
 	int		rs ;
 	int		rs1 ;
@@ -141,7 +149,7 @@ static int mailbox_proc(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,
 	if ((rs = mailbox_msgret(mbp,mi,&mip)) >= 0) {
 	    const off_t		moff = mip->moff ;
 	    if ((rs = bseek(mfp,moff,SEEK_SET)) >= 0) {
-		MAILMSG		m ;
+		mailmsg		m ;
 		if ((rs = mailmsg_start(&m)) >= 0) {
 		    if ((rs = mailmsg_loadfile(&m,mfp)) >= 0) {
 			time_t	t ;
@@ -161,10 +169,7 @@ static int mailbox_proc(mailbox *mbp,DATER *dp,MAILMSGFROM *fip,
 }
 /* end subroutine (mailbox_proc) */
 
-
-/* local subroutines */
-
-static int mailmsg_msgfrom(MAILMSG *mmp,MAILMSGFROM *fip) noex {
+static int mailmsg_msgfrom(mailmsg *mmp,MAILMSGFROM *fip) noex {
 	int		rs ;
 	int		vl ;
 	int		len = 0 ;
@@ -206,7 +211,7 @@ static int mailmsg_msgfrom(MAILMSG *mmp,MAILMSGFROM *fip) noex {
 }
 /* end subroutine (mailmsg_msgfrom) */
 
-static int mailmsg_msgtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
+static int mailmsg_msgtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
 	int		rs ;
 	if ((rs = mailmsg_hdrtime(mmp,dp,tp)) == 0) {
 	    rs = mailmsg_envtime(mmp,dp,tp) ;
@@ -215,7 +220,7 @@ static int mailmsg_msgtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_msgtime) */
 
-static int mailmsg_hdrtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
+static int mailmsg_hdrtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
 	int		rs ;
 	int		f = false ;
 	cchar		*hn = HN_FROM ;
@@ -234,7 +239,7 @@ static int mailmsg_hdrtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
 }
 /* end subroutine (mailmsg_hdrtime) */
 
-static int mailmsg_envtime(MAILMSG *mmp,DATER *dp,time_t *tp) noex {
+static int mailmsg_envtime(mailmsg *mmp,DATER *dp,time_t *tp) noex {
 	int		rs ;
 	int		f = false ;
 	cchar		*vp{} ;
