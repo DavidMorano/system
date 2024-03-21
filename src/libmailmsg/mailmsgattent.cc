@@ -4,7 +4,6 @@
 /* extra subroutines for the 'mailmsgattent' object */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -27,8 +26,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
@@ -60,11 +58,6 @@
 
 /* external subroutines */
 
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
 
 /* external variables */
 
@@ -74,9 +67,11 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* forward references */
 
-int		mailmsgattent_analyze(MME *,cchar *) noex ;
-int		mailmsgattent_finish(MME *) noex ;
-int		mailmsgattent_isplaintext(MME *) noex ;
+extern "C" {
+    int		mailmsgattent_analyze(MME *,cchar *) noex ;
+    int		mailmsgattent_finish(MME *) noex ;
+    int		mailmsgattent_isplaintext(MME *) noex ;
+}
 
 static int	mailmsgattent_startfn(MME *,cchar *,int) noex ;
 static int	mailmsgattent_startct(MME *,cchar *,int) noex ;
@@ -101,10 +96,6 @@ int mailmsgattent_start(MME *op,cchar *ct,cchar *ce,
 	int		rs = SR_OK ;
 	int		si ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_start: ent\n") ;
-#endif
-
 	if (op == NULL) return SR_FAULT ;
 	if (nbuf == NULL) return SR_FAULT ;
 
@@ -117,12 +108,8 @@ int mailmsgattent_start(MME *op,cchar *ct,cchar *ce,
 	op->clen = -1 ;
 	op->clines = -1 ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_start: cont\n") ;
-#endif
-
 	if ((si = sisub(nbuf,nlen,"=")) >= 0) {
-	    const int	fl = (nlen-si-1) ;
+	    cint	fl = (nlen-si-1) ;
 	    cchar	*fp = (nbuf+si+1) ;
 	    if ((rs = mailmsgattent_startfn(op,fp,fl)) >= 0) {
 	    	rs = mailmsgattent_startct(op,nbuf,si) ;
@@ -133,7 +120,7 @@ int mailmsgattent_start(MME *op,cchar *ct,cchar *ce,
 
 	if (rs >= 0) {
 	   if ((ct != NULL) && (op->ext == NULL) && (op->type == NULL)) {
-	        const int	cl = strlen(ct) ;
+	        cint	cl = strlen(ct) ;
 		rs = mailmsgattent_startct(op,ct,cl) ;
 	    } /* end if */
 	} /* end if (ok) */
@@ -151,13 +138,6 @@ int mailmsgattent_start(MME *op,cchar *ct,cchar *ce,
 	if (rs < 0) {
 	    mailmsgattent_finish(op) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_start: ret rs=%d\n",rs) ;
-	debugprintf("mailmsgattent_start: ret type=%s\n",op->type) ;
-	debugprintf("mailmsgattent_start: ret sub=%s\n",op->subtype) ;
-	debugprintf("mailmsgattent_start: ret ext=%s\n",op->ext) ;
-#endif
 
 	return rs ;
 }
@@ -213,12 +193,6 @@ int mailmsgattent_type(MME *op,MIMETYPES *mtp) noex {
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != MAILMSGATTENT_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_type: attfname=%s\n", op->attfname) ;
-	debugprintf("mailmsgattent_type: type=%s\n",op->type) ;
-	debugprintf("mailmsgattent_type: ext=%s\n",op->ext) ;
-#endif
 
 	if ((op->type != NULL) && (op->type[0] == '\0')) {
 	    uc_free(op->type) ;
@@ -367,11 +341,6 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 
 	if (op->magic != MAILMSGATTENT_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_code: ent file=%s type=%s\n",
-	    op->attfname,op->type) ;
-#endif
-
 	if (op->type != NULL) {
 	    rs = mailmsgattent_isplaintext(op) ;
 	} else {
@@ -380,29 +349,11 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 
 	if (! op->f_plaintext) code = CE_BASE64 ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_code: default_code=%d\n",code) ;
-	debugprintf("mailmsgattent_code: encoding=%s\n",op->encoding) ;
-	debugprintf("mailmsgattent_code: f_plaintext=%d\n",op->f_plaintext) ;
-#endif
-
 	if ((rs >= 0) && (op->encoding == NULL)) {
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_code: need coding\n") ;
-#endif
-
 	    if (op->f_plaintext) {
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_code: plaintext\n") ;
-#endif
-
 	        if ((rs = mailmsgattent_analyze(op,tmpdname)) >= 0) {
 	            code = rs ;
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_code: _analyze() rs=%d\n",rs) ;
-#endif
 	            if ((code >= CE_7BIT) && (code < CE_OVERLAST)) {
 			cchar	*enc = contentencodings[code] ;
 			cchar	*cp ;
@@ -455,11 +406,6 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	    }
 	}
 #endif /* COMMENT */
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_code: ret rs=%d code=%d encoding=%s\n",
-	    rs,code,op->encoding) ;
-#endif
 
 	if (rs >= 0) {
 	    op->cte = code ;
@@ -514,17 +460,9 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
 
 		auxfname[0] = '\0' ;
 	        if (S_ISREG(sb.st_mode)) {
-#if	CF_DEBUGS
-	            debugprintf("mailmsgattent_analyze: needaux=%d\n",
-			f_needaux) ;
-#endif
 	            op->clen = (int) sb.st_size ;
 	            f_needaux = FALSE ;
 	        }
-
-#if	CF_DEBUGS
-	        debugprintf("mailmsgattent_analyze: needaux=%d\n",f_needaux) ;
-#endif
 
 	        if (f_needaux) {
 	            cchar	*tmpcname = MAILMSGATTENT_TMPCNAME ;
@@ -570,10 +508,6 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
 	            rs = mailmsgattent_analyzer(op,afp,ifp) ;
 		    code = rs ;
 
-#if	CF_DEBUGS
-	            debugprintf("mailmsgattent_analyze: _analyzer() rs=%d\n",
-			rs) ;
-#endif
 	            if (rs < 0) {
 	                if (op->auxfname != NULL) {
 	                    uc_free(op->auxfname) ;
@@ -595,10 +529,6 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
 	    rs1 = bclose(ifp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (file-open) */
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_analyze: ret rs=%d ce=%u\n",rs,code) ;
-#endif
 
 	return (rs >= 0) ? code : rs ;
 }
@@ -631,7 +561,7 @@ static int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
 	int		si ;
 	if ((si = sisub(sp,sl,"/")) >= 0) {
 	    if ((rs = mailmsgattent_startctpri(op,sp,si)) >= 0) {
-	        const int	cl = (sl-(si+1)) ;
+	        cint	cl = (sl-(si+1)) ;
 		cchar	*cp = (sp+(si+1)) ;
 	        rs = mailmsgattent_startctsub(op,cp,cl) ;
 	    }
@@ -704,10 +634,6 @@ static int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
 	int		code = 0 ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_analyzer: ent\n") ;
-#endif
-
 	while ((rs = breadln(ifp,lbuf,llen)) > 0) {
 	    len = rs ;
 
@@ -722,11 +648,6 @@ static int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
 	            } else if ((code < CE_8BIT) && ismmclass_8bit(ch)) {
 	                code = CE_8BIT ;
 	            }
-
-#if	CF_DEBUGS
-		    debugprintf("mailmsgattent_analyzer: ch=%02x code=%d\n",
-			ch,code) ;
-#endif
 
 		    if (code >= CE_BINARY) break ;
 	        } /* end for (class characterization) */
@@ -748,10 +669,6 @@ static int mailmsgattent_analyzer(MME *op,bfile *afp,bfile *ifp) noex {
 	    if (op->clen < 0) op->clen = clen ;
 	    op->clines = (code < CE_BINARY) ? lines : -1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgattent_analyzer: ret rs=%d code=%u\n",rs,code) ;
-#endif
 
 	return (rs >= 0) ? code : rs ;
 }
