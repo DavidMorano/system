@@ -1,5 +1,5 @@
 /* sidquote SUPPORT (string-index double-quote) */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find the index of the character past a double-quoted string */
 /* version %I% last-modified %G% */
@@ -39,16 +39,22 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
 #include	<ascii.h>
 #include	<toxc.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* exported subroutines */

@@ -4,8 +4,7 @@
 /* manage folding of a mail-message header line */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_STRNBREAK	1		/* use 'strnbreak()' */
+#define	CF_STRNBREAK	1		/* use |strnbreak()| */
 
 /* revision history:
 
@@ -58,16 +57,19 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
-#include	<climits>
-#include	<cstring>
+#include	<climits>		/* |UINT_MAX| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<ascii.h>
-#include	<char.h>
-#include	<mkchar.h>
-#include	<localmisc.h>
+#include	<strn.h>
 #include	<sfx.h>
 #include	<six.h>
+#include	<char.h>
+#include	<mkchar.h>
+#include	<ncol.h>
+#include	<ischarx.h>
+#include	<localmisc.h>
 
 #include	"mailmsghdrfold.h"
 
@@ -87,18 +89,13 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	ncolstr(int,int,cchar *,int) noex ;
-extern int	ncolchar(int,int,int) noex ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) noex ;
-extern int	strlinelen(cchar *,int,int) noex ;
-#endif
-
-extern char	*strnchr(cchar *,int,int) noex ;
-extern char	*strnpbrk(cchar *,int,cchar *) noex ;
 
 
 /* external variables */
@@ -117,8 +114,8 @@ static int	findall(MF *,cchar **) noex ;
 
 static int	nextpiece(int,cchar *,int,int *) noex ;
 static int	nextbreak(int,int,cchar *,int,int *) noex ;
-static int	isskip(int) noex ;
-static int	isend(int) noex ;
+
+static bool	isskip(int) noex ;
 
 #if	CF_STRNBREAK
 static cchar	*strnbreak(cchar *,int,int) noex ;
@@ -127,8 +124,11 @@ static cchar	*strnbreak(cchar *,int,int) noex ;
 
 /* local variables */
 
-static cchar	*blank = " " ;
-static cchar	*breaks = ";:@.%!=" ;
+constexpr cchar		blank[] = " " ;
+constexpr cchar		breaks[] = ";:@.%!=" ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -173,7 +173,7 @@ int mailmsghdrfold_finish(MF *op) noex {
 
 /* get the resulting lines from the folding operation */
 int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
-	const int	ntab = NTABCOLS ;
+	cint	ntab = NTABCOLS ;
 	int		ll = 0 ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -183,16 +183,8 @@ int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
 
 	if (ncol < 0) return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsghdrfold_get: ent mcols=%u ccol=%u\n",
-	    op->mcols,ncol) ;
-#endif
-
 	if (op->sl > 0) {
-	    const int	ncols = ncolstr(ntab,ncol,op->sp,op->sl) ;
-#if	CF_DEBUGS
-	    debugprintf("mailmsghdrfold_get: ncols=%u\n",ncols) ;
-#endif
+	    cint	ncols = ncolstr(ntab,ncol,op->sp,op->sl) ;
 	    if ((ncol + ncols) > op->mcols) {
 	        if ((ll = findpieces(op,ncol,rpp)) == 0) {
 	            if ((ll = findbreaks(op,ncol,rpp)) == 0) {
@@ -209,15 +201,6 @@ int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
 	    *rpp = op->sp ;
 	} /* end if */
 
-#if	CF_DEBUGS
-	{
-	    cchar	*lp = *rpp ;
-	    debugprintf("mailmsghdrfold_get: ret str=>%t<\n",
-	        lp,strlinelen(lp,ll,50)) ;
-	    debugprintf("mailmsghdrfold_get: ret ll=%u\n",ll) ;
-	}
-#endif
-
 	return ll ;
 }
 /* end subroutine (mailmsghdrfold_get) */
@@ -226,14 +209,10 @@ int mailmsghdrfold_get(MF *op,int ncol,cchar **rpp) noex {
 /* private subroutines */
 
 static int findpieces(MF *op,int ncol,cchar **rpp) noex {
-	const int	mcols = op->mcols ;
+	cint	mcols = op->mcols ;
 	int		sl = op->sl ;
 	int		ll = 0 ;
 	cchar	*sp = op->sp ;
-
-#if	CF_DEBUGS
-	debugprintf("findpieces: ent ncol=%u\n",ncol) ;
-#endif
 
 	if (sl > 0) {
 	    int		nc = ncol ;
@@ -247,12 +226,6 @@ static int findpieces(MF *op,int ncol,cchar **rpp) noex {
 
 	    *rpp = sp ;
 	    while ((pl = nextpiece(nc,sp,sl,&ncs)) > 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("findpieces: nc=%u ncs=%u\n",nc,ncs) ;
-	        debugprintf("findpieces: pl=%d piece=>%t<\n",
-	            pl,sp,strlinelen(sp,pl,40)) ;
-#endif
 
 	        if ((nc + ncs) > mcols) {
 	            if (ll == 0) {
@@ -271,14 +244,6 @@ static int findpieces(MF *op,int ncol,cchar **rpp) noex {
 
 	    } /* end while */
 
-#if	CF_DEBUGS
-	    {
-	        cchar	*lp = *rpp ;
-	        debugprintf("findpieces: str=>%t<\n",
-	            lp,strlinelen(lp,ll,40)) ;
-	    }
-#endif
-
 	    if (ll > 0) {
 	        while (sl && isskip(sp[0])) {
 	            sp += 1 ;
@@ -291,15 +256,6 @@ static int findpieces(MF *op,int ncol,cchar **rpp) noex {
 	} else {
 	    *rpp = sp ;
 	} /* end if (string length) */
-
-#if	CF_DEBUGS
-	{
-	    cchar	*lp = *rpp ;
-	    debugprintf("findpieces: str=>%t<\n",
-	        lp,strlinelen(lp,ll,50)) ;
-	    debugprintf("findpieces: ret ll=%u\n",ll) ;
-	}
-#endif
 
 	return ll ;
 }
@@ -316,41 +272,23 @@ static int findbreaks(MF *op,int ncol,cchar **rpp) noex {
 /* end subroutine (findbreaks) */
 
 static int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
-	const int	mcols = op->mcols ;
+	cint	mcols = op->mcols ;
 	int		sl = op->sl ;
 	int		ll = 0 ;
 	cchar		*sp = op->sp ;
-
-#if	CF_DEBUGS
-	debugprintf("findbreakers: ent bch=»%c« ncol=%u\n",bch,ncol) ;
-	debugprintf("findbreakers: mcols=%d sl=%d\n",mcols,sl) ;
-#endif
 
 	if (sl > 0) {
 	    int		nc = ncol ;
 	    int		pl ;
 	    int		ncs ;
 
-#if	CF_DEBUGS
-	    debugprintf("findbreakers: going\n") ;
-#endif
 	    while (sl && isskip(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("findbreakers: while-before\n") ;
-#endif
-
 	    *rpp = sp ;
 	    while ((pl = nextbreak(nc,bch,sp,sl,&ncs)) > 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("findbreakers: nc=%u ncs=%u\n",nc,ncs) ;
-	        debugprintf("findbreakers: pl=%d piece=>%t<\n",
-	            pl,sp,strlinelen(sp,pl,40)) ;
-#endif
 
 	        if ((nc + ncs) > mcols) {
 	            break ;
@@ -362,14 +300,6 @@ static int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	        sl -= pl ;
 
 	    } /* end while */
-
-#if	CF_DEBUGS
-	    {
-	        cchar	*lp = *rpp ;
-	        debugprintf("findbreakers: line=>%t<\n",
-	            lp,strlinelen(lp,ll,40)) ;
-	    }
-#endif
 
 	    if (ll > 0) {
 	        while (sl && isskip(sp[0])) {
@@ -384,29 +314,16 @@ static int findbreakers(MF *op,int bch,int ncol,cchar **rpp) noex {
 	    *rpp = sp ;
 	} /* end if (string length) */
 
-#if	CF_DEBUGS
-	{
-	    cchar	*lp = *rpp ;
-	    debugprintf("findbreakers: str=>%t<\n",
-	        lp,strlinelen(lp,ll,50)) ;
-	    debugprintf("findbreakers: ret ll=%u\n",ll) ;
-	}
-#endif
-
 	return ll ;
 }
 /* end subroutine (findbreakers) */
 
 static int findslices(MF *op,int ncol,cchar **rpp) noex {
-	const int	ntab = NTABCOLS ;
-	const int	mcols = op->mcols ;
+	cint	ntab = NTABCOLS ;
+	cint	mcols = op->mcols ;
 	int		sl = op->sl ;
 	int		ll = 0 ;
 	cchar	*sp = op->sp ;
-
-#if	CF_DEBUGS
-	debugprintf("findslices: ent ncol=%u\n",ncol) ;
-#endif
 
 	if (sl > 0) {
 	    int		si ;
@@ -453,15 +370,6 @@ static int findslices(MF *op,int ncol,cchar **rpp) noex {
 	    *rpp = sp ;
 	} /* end if (string length) */
 
-#if	CF_DEBUGS
-	{
-	    cchar	*lp = *rpp ;
-	    debugprintf("findslices: str=>%t<\n",
-	        lp,strlinelen(lp,ll,50)) ;
-	    debugprintf("findslices: ret ll=%u\n",ll) ;
-	}
-#endif
-
 	return ll ;
 }
 /* end subroutine (findslices) */
@@ -479,7 +387,7 @@ static int findall(MF *op,cchar **rpp) noex {
 /* end subroutine (findall) */
 
 static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
-	const int	ntab = NTABCOLS ;
+	cint	ntab = NTABCOLS ;
 	int		ncs = 0 ;
 	int		cl = sl ;
 	int		si ;
@@ -524,16 +432,12 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	*ncp = ncs ;
 	pl = (cp - sp) ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsghdrfold/nextpiece: ret pl=%u ncs=%u\n",pl,ncs) ;
-#endif
-
 	return pl ;
 }
 /* end subroutine (nextpiece) */
 
 static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
-	const int	ntab = NTABCOLS ;
+	cint	ntab = NTABCOLS ;
 	int		ncs = 0 ;
 	int		cl = sl ;
 	int		n ;
@@ -541,20 +445,12 @@ static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 	cchar	*tp ;
 	cchar	*cp = sp ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsghdrfold/nextbreak: ent bch=»%c« sl=%d\n",
-	    bch,sl) ;
-#endif
-
 	*ncp = 0 ;
 
 /* skip over whitespace */
 
 	while (cl && CHAR_ISWHITE(cp[0])) {
 	    n = ncolchar(ntab,ncol,cp[0]) ;
-#if	CF_DEBUGS
-	    debugprintf("mailmsghdrfold/nextbreak: ncolchar() n=%d\n",n) ;
-#endif
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;
@@ -583,23 +479,14 @@ static int nextbreak(int ncol,int bch,cchar *sp,int sl,int *ncp) noex {
 
 /* done */
 
-#if	CF_DEBUGS
-	debugprintf("mailmsghdrfold/nextbreak: ret pl=%u ncs=%u\n",pl,ncs) ;
-#endif
-
 	return pl ;
 }
 /* end subroutine (nextbreak) */
 
-static int isskip(int ch) noex {
-	return (CHAR_ISWHITE(ch) || isend(ch)) ;
+static bool isskip(int ch) noex {
+	return (CHAR_ISWHITE(ch) || iseol(ch)) ;
 }
 /* end subrouine (isskip) */
-
-static int isend(int ch) noex {
-	return ((ch == '\r') || (ch == '\n')) ;
-}
-/* end subroutine (isend) */
 
 #if	CF_STRNBREAK
 cchar *strnbreak(cchar *sp,int sl,int bch) noex {
@@ -608,7 +495,7 @@ cchar *strnbreak(cchar *sp,int sl,int bch) noex {
 	int		f = FALSE ;
 	bch &= UCHAR_MAX ;
 	while (sl && *sp) {
-	    ch = MKCHAR(sp[0]) ;
+	    ch = mkchar(sp[0]) ;
 	    if (ch == CH_DQUOTE) {
 	        sp += 1 ;
 	        sl -= 1 ;
