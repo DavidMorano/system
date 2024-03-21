@@ -112,6 +112,9 @@ consteval cur mkcurdef() noex {
 constexpr cur		curdef = mkcurdef() ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecitem_start(vecitem *op,int n,int opts) noex {

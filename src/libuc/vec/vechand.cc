@@ -90,6 +90,9 @@ consteval int mkoptmask() noex {
 constexpr int		optmask = mkoptmask() ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vechand_start(vechand *op,int n,int opts) noex {

@@ -32,8 +32,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
@@ -42,12 +41,13 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<vecpstr.h>
 #include	<strn.h>
 #include	<cfdec.h>
 #include	<ascii.h>
 #include	<numsign.h>
 #include	<localmisc.h>
+
+#include	"vecpstr.h"
 
 
 /* local defines */
@@ -91,6 +91,9 @@ static int	pwentparse(cchar *,int,gid_t *) noex ;
 
 
 /* local subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

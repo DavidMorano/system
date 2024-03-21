@@ -32,20 +32,24 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<vecpstr.h>
 #include	<getbufsize.h>
 #include	<ucenumua.h>
 #include	<strwcmp.h>
+#include	<isnot.h>
 #include	<localmisc.h>
+
+#include	"vecpstr.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
 
 
 /* local typedefs */
@@ -59,10 +63,6 @@ extern "C" {
 
 /* external subroutines */
 
-extern "C" {
-    extern int	isNotPresent(int) noex ;
-}
-
 
 /* local structures */
 
@@ -73,6 +73,9 @@ static int	vecpstr_loadpjnent(vecpstr *,ent *,cchar *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

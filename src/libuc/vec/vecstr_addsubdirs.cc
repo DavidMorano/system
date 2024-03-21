@@ -22,8 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -53,6 +52,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecstr_addsubdirs(vecstr *op,cchar *newsdname) noex {
@@ -62,7 +64,7 @@ int vecstr_addsubdirs(vecstr *op,cchar *newsdname) noex {
 	if (op && newsdname) {
 	    char	*fbuf{} ;
 	    if ((rs = libmalloc_mp(&fbuf)) >= 0) {
-	        FSDIRTREE	dir ;
+	        fsdirtree	dir ;
 		cint		flen = rs ;
 	        cint		fo = (FSDIRTREE_MFOLLOW | FSDIRTREE_MDIR) ;
 	        if ((rs = fsdirtree_open(&dir,newsdname,fo)) >= 0) {

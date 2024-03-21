@@ -7,13 +7,13 @@
 
 /* revision history:
 
-	= 2001-04-11, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This is a spin off of various programs that needed to get
 	the machine HZ value.
 
 */
 
-/* Copyright © 2001 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -45,11 +45,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"gethz.h"
 
 
 /* local defines */
@@ -66,12 +67,15 @@ struct gethz {
 
 /* forward references */
 
-static int getval(int) noex ;
+static int	getval(int) noex ;
 
 
 /* local variables */
 
 static GETHZ		gethz_data ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -111,7 +115,8 @@ static int getval(int w) noex {
 #endif
 #if	defined(_SC_CLK_TCK) 
 	if ((hz < 0) && ((w == 0) || (w == 3))) {
-	    if ((rs = uc_confsys(_SC_CLK_TCK,NULL)) >= 0) {
+	    cint	req = _SC_CLK_TCK ;
+	    if ((rs = uc_confsys(req,nullptr)) >= 0) {
 		hz = rs ;
 	    }
 	}

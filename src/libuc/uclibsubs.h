@@ -93,6 +93,7 @@ extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
 extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 extern int	uc_gethostid(unsigned int *) noex ;
 extern int	uc_gethostname(char *,int) noex ;
+extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocessors(int) noex ;
@@ -187,7 +188,8 @@ extern int	uc_readn(int,void *,int) noex ;
 extern int	uc_readline(int,char *,int) noex ;
 extern int	uc_readlinetimed(int,char *,int,int) noex ;
 
-extern int	uc_write(int,cvoid *,int,int) noex ;
+extern int	uc_writeto(int,cvoid *,int,int) noex ;
+extern int	uc_write(int,cvoid *,int) noex ;
 extern int	uc_writen(int,cvoid *,int) noex ;
 extern int	uc_writedesc(int,int,int) noex ;
 extern int	uc_writefile(int,cchar *) noex ;

@@ -26,7 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstring>
 #include	<usystem.h>
@@ -57,9 +56,11 @@
 
 /* forward references */
 
-int		keyopt_loads(keyopt *,cchar *,int) noex ;
-int		keyopt_load(keyopt *,cchar *,int) noex ;
-int		keyopt_loadvalue(keyopt *,cchar *,cchar *,int) noex ;
+extern "C" {
+    int		keyopt_loads(keyopt *,cchar *,int) noex ;
+    int		keyopt_load(keyopt *,cchar *,int) noex ;
+    int		keyopt_loadvalue(keyopt *,cchar *,cchar *,int) noex ;
+}
 
 template<typename ... Args>
 static inline int keyopt_magic(keyopt *op,Args ... args) noex {
@@ -79,6 +80,9 @@ static int	keyname_findv(NAM *,cchar *,int,VAL **) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

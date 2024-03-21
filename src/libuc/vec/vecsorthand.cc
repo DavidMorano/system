@@ -51,6 +51,9 @@ extern "C" {
 }
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecsorthand_start(vecsorthand *op,int n,vecentcmp_f cmpfunc) noex {

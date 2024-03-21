@@ -192,10 +192,10 @@ control:
 
 vecstr.o:		vecstr.cc		vecstr.h
 vecstr_addpath.o:	vecstr_addpath.cc	vecstr.h
-vecstr_adds.o:		vecstr_adds.c		vecstr.h
+vecstr_adds.o:		vecstr_adds.cc		vecstr.h
 vecstr_addsubdirs.o:	vecstr_addsubdirs.cc	vecstr.h
-vecstr_adduniqs.o:	vecstr_adduniqs.c	vecstr.h
-vecstr_avmkstr.o:	vecstr_avmkstr.c	vecstr.h
+vecstr_adduniqs.o:	vecstr_adduniqs.cc	vecstr.h
+vecstr_avmkstr.o:	vecstr_avmkstr.cc	vecstr.h
 vecstr_env.o:		vecstr_env.cc		vecstr.h
 vecstr_envfile.o:	vecstr_envfile.cc	vecstr.h
 vecstr_foilcmp.o:	vecstr_foilcmp.cc	vecstr.h
@@ -206,10 +206,10 @@ vecstr_svcargs.o:	vecstr_svcargs.cc	vecstr.h
 
 vecpstr.o:		vecpstr.cc		vecpstr.h
 vecpstr_addpath.o:	vecpstr_addpath.cc	vecpstr.h
-vecpstr_adds.o:		vecpstr_adds.c		vecpstr.h
+vecpstr_adds.o:		vecpstr_adds.cc		vecpstr.h
 vecpstr_addsubdirs.o:	vecpstr_addsubdirs.cc	vecpstr.h
-vecpstr_adduniqs.o:	vecpstr_adduniqs.c	vecpstr.h
-vecpstr_avmkstr.o:	vecpstr_avmkstr.c	vecpstr.h
+vecpstr_adduniqs.o:	vecpstr_adduniqs.cc	vecpstr.h
+vecpstr_avmkstr.o:	vecpstr_avmkstr.cc	vecpstr.h
 vecpstr_env.o:		vecpstr_env.cc		vecpstr.h
 vecpstr_envfile.o:	vecpstr_envfile.cc	vecpstr.h
 vecpstr_foilcmp.o:	vecpstr_foilcmp.cc	vecpstr.h

@@ -55,6 +55,9 @@ static int	raqhand_valid(raqhand *,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int raqhand_start(raqhand *op,int n,int opts) noex {

@@ -1,0 +1,16 @@
+#!/usr/extra/bin/ksh
+# MKONE
+
+function execone {
+  typeset F=${1}
+  typeset D=$( dirname $F )
+  typeset B=$( basename $F ) 
+  mv $F $B
+  rm -f */${B}
+  mv $B liblkcmd
+}
+
+for FP in "${@}" ; do
+  execone $FP
+done
+

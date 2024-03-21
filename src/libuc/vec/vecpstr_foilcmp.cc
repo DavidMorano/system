@@ -21,7 +21,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -30,7 +29,16 @@
 #include	"vecpstr.h"
 
 
+/* local defines */
+
+
+/* external subroutines */
+
+
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -42,10 +50,10 @@ int vecpstr_foilcmp(vecpstr *lnp,vecpstr *rnp) noex {
 	    cchar	*cp{} ;
 	    for (int i = 0 ; (rs = vecpstr_get(lnp,i,&cp)) >= 0 ; i += 1) {
 	        if (cp) {
-	            cchar	*np{} ;
-	            for (int j = 0 ; vecpstr_get(rnp,j,&np) >= 0 ; j += 1) {
-		        if (np) {
-	        	    f_match = (cp[0] == np[0]) && (strcmp(cp,np) == 0) ;
+	            cchar	*sp{} ;
+	            for (int j = 0 ; vecpstr_get(rnp,j,&sp) >= 0 ; j += 1) {
+		        if (sp) {
+	        	    f_match = (cp[0] == sp[0]) && (strcmp(cp,sp) == 0) ;
 	        	    if (f_match) break ;
 		        }
 	            } /* end for */

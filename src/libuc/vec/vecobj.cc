@@ -91,6 +91,9 @@ consteval int mkoptmask() noex {
 constexpr int		optmask = mkoptmask() ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecobj_start(vecobj *op,int osize,int n,int opts) noex {

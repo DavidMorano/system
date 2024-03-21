@@ -25,6 +25,7 @@
 #include	<clanguage.h>
 
 
+/* bytes */
 #define	bwtst(w,n)		(((w) >> (n)) & 1)
 #define	bwset(w,n)		((w) |= (1 << (n)))
 #define	bwclr(w,n)		((w) &= (~ (1 << (n))))

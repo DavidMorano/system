@@ -184,6 +184,9 @@ constexpr int		optmask = mkoptmask() ;
 constexpr int		resz = sizeof(int) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int vecpstr_start(vecpstr *op,int n,int chsize,int opts) noex {
