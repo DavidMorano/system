@@ -391,19 +391,12 @@ int mailmsgattent_setcode(MME *op,int code) noex {
 
 /* analyze (as best as we can) an attachment */
 int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
-        bfile           infile, *ifp = &infile ;
         int             rs ;
         int             rs1 ;
         int             code = 0 ;
-        cchar           *atf = op->attfname ;
-
-        if (op == NULL) return SR_FAULT ;
-
-        if (op->magic != MAILMSGATTENT_MAGIC) return SR_NOTOPEN ;
-
-        if ((atf == NULL) || (atf[0] == '\0') || (atf[0] == '-'))
-            atf = BFILE_STDIN ;
-
+	if ((rs = mailmsgattent_magic(op,tmpdname)) >= 0) {
+        bfile           infile, *ifp = &infile ;
+	cchar		*atf = bfilestdfname(op->attfname) ;
         if ((rs = bopen(ifp,atf,"r",0666)) >= 0) {
             USTAT       sb ;
             if ((rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
@@ -483,7 +476,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
             rs1 = bclose(ifp) ;
             if (rs >= 0) rs = rs1 ;
         } /* end if (file-open) */
-
+	} /* end if (non-null) */
         return (rs >= 0) ? code : rs ;
 }
 /* end subroutine (mailmsgattent_analyze) */
@@ -512,8 +505,7 @@ static int mailmsgattent_startfn(MME *op,cchar *sp,int sl) noex {
 
 static int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
         int             rs = SR_OK ;
-        int             si ;
-        if ((si = sisub(sp,sl,"/")) >= 0) {
+        if (int si ; (si = sisub(sp,sl,"/")) >= 0) {
             if ((rs = mailmsgattent_startctpri(op,sp,si)) >= 0) {
                 cint    cl = (sl-(si+1)) ;
                 cchar   *cp = (sp+(si+1)) ;
@@ -533,8 +525,7 @@ static int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
                     }
                 }
             }
-        }
-
+        } /* end if */
         return rs ;
 }
 /* end subroutine (mailmsgattent_startct) */

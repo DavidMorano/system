@@ -26,6 +26,8 @@
 #include	<stdfnames.h>
 #include	<localmisc.h>
 
+#include	"bfilestdfname.h"
+
 
 #define	BFILE		struct bfile_head
 #define	BFILE_BD	struct bfile_bd
