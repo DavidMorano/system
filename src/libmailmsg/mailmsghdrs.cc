@@ -4,7 +4,6 @@
 /* put all of the header values of a message into an array */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -62,9 +61,12 @@
 /* forward references */
 
 
-/* global variables */
+/* local variables */
 
-const char	*mailmsghdrs_names[] = {
+
+/* exported variables */
+
+cpcchar		mailmsghdrs_names[] = {
 	"From",			/* 0 */
 	"To",
 	"Date",
@@ -117,15 +119,10 @@ const char	*mailmsghdrs_names[] = {
 } ;
 
 
-/* local variables */
-
-
 /* exported subroutines */
 
-
-int mailmsghdrs_start(MAILMSGHDRS *mhp,MAILMSG *msgp)
-{
-	const int	n = (HI_NULL + 1) ;
+int mailmsghdrs_start(MAILMSGHDRS *mhp,MAILMSG *msgp) noex {
+	cint		n = (HI_NULL + 1) ;
 	int		rs ;
 	int		size ;
 	int		c = 0 ;
@@ -135,11 +132,10 @@ int mailmsghdrs_start(MAILMSGHDRS *mhp,MAILMSG *msgp)
 
 	size = (n+1) * sizeof(char **) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    int		i ;
-	    cchar	**mhnames = mailmsghdrs_names ;
+	    int		i ; /* used-afterwards */
+	    mainv	mhnames = mailmsghdrs_names ;
 	    cchar	*hp ;
-	    mhp->v = p ;
-
+	    mhp->v = (cchar **) p ;
 	    for (i = 0 ; (i < n) && (mhnames[i] != NULL) ; i += 1) {
 	        mhp->v[i] = NULL ;
 	        if ((rs = mailmsg_hdrval(msgp,mhnames[i],&hp)) >= 0) {
@@ -149,7 +145,6 @@ int mailmsghdrs_start(MAILMSGHDRS *mhp,MAILMSG *msgp)
 		    rs = SR_OK ;
 	        } /* end if (message header search) */
 	    } /* end for (looping over header names) */
-
 	    mhp->v[i] = NULL ;
 	    if (rs >= 0) mhp->magic = MAILMSGHDRS_MAGIC ;
 	} /* end if (memory-allocation) */
@@ -158,9 +153,7 @@ int mailmsghdrs_start(MAILMSGHDRS *mhp,MAILMSG *msgp)
 }
 /* end subroutine (mailmsghdrs_start) */
 
-
-int mailmsghdrs_finish(MAILMSGHDRS *mhp)
-{
+int mailmsghdrs_finish(MAILMSGHDRS *mhp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
