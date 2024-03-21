@@ -1,7 +1,7 @@
 /* mailmsgmatenv SUPPORT */
 /* lang=C++20 */
 
-/* manipulate an UNIX® message envelope */
+/* try to match on a UNIX® mail-message envelope */
 /* version %I% last-modified %G% */
 
 
@@ -57,8 +57,9 @@
 	mlen		length of buffer to check
 
 	Returns:
-	>=0		match and this is the length of the address-part
-	<0		error or no match (system-return)
+	>0		match and this is the length of the address-part
+	==0		no match
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -122,7 +123,7 @@ int mailmsgmatenv(mailmsgenv *mep,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (mep && sp) {
 	    bool	f_start = true ;
-	    memclear(mep) ;		/* dangerous */
+	    rs = memclear(mep) ;		/* dangerous */
 	    if (sl < 0) sl = strlen(sp) ;
 	    while (sl && iseol(sp[sl-1])) sl -= 1 ;
 	    if ((sl > 0) && (*sp == '>')) {
@@ -211,7 +212,7 @@ static int mailmsgenv_date(mailmsgenv *mep,cchar *sp,int sl) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if (sfnext) */
 	return skip ;
 }
 /* end subroutine (mailmsgenv_date) */

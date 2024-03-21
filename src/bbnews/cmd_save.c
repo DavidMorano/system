@@ -1,17 +1,16 @@
-/* cmd_save */
+/* cmd_save SUPPORT */
+/* lang=C++20 */
 
 /* save a bulletin board article */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_UGETPW	1		/* use 'ugetpw(3uc)' */
-
 
 /* revision history:
 
 	= 1994-02-01, David A­D­ Morano
-        I wrote this from scratch when I took over the code. The previous code
-        was a mess (still is in many places!).
+	I wrote this from scratch when I took over the code. The
+	previous code was a mess (still is in many places!).
 
 	= 1998-11-22, David A­D­ Morano
 	Some clean-up.
@@ -31,25 +30,22 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<pwd.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<ugetpw.h>
 #include	<getax.h>
 #include	<bfile.h>
-#include	<char.h>
 #include	<dater.h>
+#include	<matthingenv.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"artlist.h"
@@ -84,22 +80,24 @@
 #define	GETPW_UID	getpw_uid
 #endif /* CF_UGETPW */
 
+#define	PI		PROGINFO
+#define	AENT		ARTLIST_ENT
+
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	mkmailname(char *,int,const char *,int) ;
-extern int	matthingenv(cchar *,int) ;
+extern int	mkmailname(char *,int,cchar *,int) ;
 
-extern int	bbcpy(char *,const char *) ;
+extern int	bbcpy(char *,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	strbasename(char *) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
@@ -114,25 +112,20 @@ extern char	*timestr_hdate(time_t,char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cmd_save(pip,ap,ngdir,afname,mode,mailbox)
-struct proginfo	*pip ;
-ARTLIST_ENT	*ap ;
-const char	ngdir[] ;
-const char	afname[] ;
-const int	mode ;
-const char	mailbox[] ;
-{
-	struct ustat	stat_a ;
-	struct ustat	sb ;
+int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
+	USTAT		stat_a ;
+	USTAT		sb ;
 	bfile		afile, *afp = &afile ;
 	bfile		mfile, *mfp = &mfile ;
 	off_t	offset ;
 	time_t		t ;
 	long		flen ;
-	const int	llen = LINEBUFLEN ;
+	cint		llen = LINEBUFLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		line ;
@@ -144,7 +137,7 @@ const char	mailbox[] ;
 	int		f_articleid = FALSE ;
 	int		f_nofile = FALSE ;
 	int		f_envesc = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		ngname[MAXPATHLEN + 1] ;
 	char		maildname[MAXPATHLEN + 1] ;
 	char		mfname[MAXPATHLEN + 1] ;
@@ -154,11 +147,6 @@ const char	mailbox[] ;
 	char		env_date[LINEBUFLEN + 1] ;
 	char		from_username[USERNAMELEN + 1] ;
 	char		from_realname[REALNAMELEN + 1] ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    debugprintf("save: ent mode=%d\n",mode) ;
-#endif
 
 	if (ngdir == NULL) return SR_FAULT ;
 	if (afname == NULL) return SR_FAULT ;
@@ -246,11 +234,6 @@ const char	mailbox[] ;
 
 	    mfp = pip->ofp ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("save: ofp=%08X\n",mfp) ;
-#endif
-
 	} /* end if (mailbox or regular mode) */
 
 	if (rs < 0)
@@ -263,7 +246,7 @@ const char	mailbox[] ;
 	{
 	    struct passwd	pw ;
 	    const uid_t		uid = stat_a.st_uid ;
-	    const int		pwlen = getbufsize(getbufsize_pw) ;
+	    cint		pwlen = getbufsize(getbufsize_pw) ;
 	    char		*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if ((rs = GETPW_UID(&pw,pwbuf,pwlen,uid)) >= 0) {
@@ -288,12 +271,6 @@ const char	mailbox[] ;
 
 	    f_eol = (lbuf[len - 1] == '\n') ? TRUE : FALSE ;
 	    lbuf[len] = '\0' ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	        debugprintf("save: LINE> %s",lbuf) ;
-#endif
-
 	    offset += len ;
 	    if (f_bol) {
 
@@ -303,79 +280,60 @@ const char	mailbox[] ;
 /* check for the envelope header line */
 
 	        if ((line == 0) && pip->f.addenv) {
-	            const char	*envfromstr ;
-
+	            cchar	*envfromstr ;
 	            t = pip->now.time ;
 	            if (pip->f.envdate) {
-
 	                switch (pip->whichenvdate) {
-
 	                case SORTMODE_MTIME:
 	                    t = stat_a.st_mtime ;
 	                    break ;
-
 	                case SORTMODE_ATIME:
-	                    if ((t = ap->atime) == 0)
+	                    if ((t = ap->atime) == 0) {
 	                        t = ap->mtime ;
-
+			    }
 	                    break ;
-
 	                case SORTMODE_PTIME:
 	                    if ((t = ap->ptime) == 0)
-	                        if ((t = ap->atime) == 0)
+	                        if ((t = ap->atime) == 0) {
 	                            t = ap->mtime ;
-
+				}
+			    }
 	                    break ;
-
 	                case SORTMODE_CTIME:
 	                    if ((t = ap->ctime) == 0)
 	                        if ((t = ap->ptime) == 0)
-	                            if ((t = ap->atime) == 0)
+	                            if ((t = ap->atime) == 0) {
 	                                t = ap->mtime ;
-
+				    }
+				}
+			    }
 	                    break ;
-
 	                case SORTMODE_NOW:
 	                default:
 	                    t = pip->now.time ;
 	                    break ;
-
 	                case SORTMODE_SUPPLIED:
 	                    dater_gettime(&pip->envdate,&t) ;
-
 	                    break ;
-
 	                } /* end switch */
-
 	            } /* end if (whichenvdate) */
-
 	            if (! pip->f.envfrom) {
-
-	                envfromstr = env_from ;
 	                sncpy3(env_from,LINEBUFLEN,
 	                    pip->mailhost,"!",from_username) ;
-
-	            } else
+	            } else {
 	                envfromstr = pip->envfrom ;
-
+		    }
 	            bprintf(mfp,
 	                "From %s %s\n",
 	                envfromstr,
 	                timestr_edate(t,env_date)) ;
-
 	            f_envesc = TRUE ;
-
 	        } /* end if (adding an envelope) */
 
 /* write an envelope if it does not already have one */
 
 	        if ((line == 0) && (! f_envesc) &&
 	            (! matthingenv(lbuf,-1))) {
-
-#if	CF_DEBUG
-	            if (pip->debuglevel > 2)
-	                debugprintf("save: writing an envelope header\n") ;
-#endif
 
 	            bprintf(mfp,
 	                "From %s!%s %s\n",
@@ -388,93 +346,65 @@ const char	mailbox[] ;
 
 /* possibly escape all other envelopes (since we added one) */
 
-	        if (f_envesc && matthingenv(lbuf,-1) &&
-	            (lbuf[0] != '>')) {
-
+	        if (f_envesc && matthingenv(lbuf,-1) && (lbuf[0] != '>')) {
 	            bputc(mfp,'>') ;
-
 	        } /* end if (escaping extra envelopes) */
 
 /* all other headers */
 
 	        if (strncasecmp(lbuf,"content-length",14) == 0) {
-
 	            f_clen = TRUE ;
-
 	        } else if ((strncasecmp(lbuf,HK_NEWSGROUPS,10)) == 0) {
-
 	            f_newsgroups = TRUE ;
-
 	        } else if ((strncasecmp(lbuf,HK_ARTICLEID,10)) == 0) {
-
 	            f_articleid = TRUE ;
-
 	        } else if ((strncasecmp(lbuf,HK_DATE,4)) == 0) {
-
 	            f_date = TRUE ;
-
 	        } else if ((strncasecmp(lbuf,HK_BOARD, 5)) == 0) {
-
 	            cp = lbuf + 5 ;
-	            while (CHAR_ISWHITE(*cp))
+	            while (CHAR_ISWHITE(*cp)) {
 	                cp += 1 ;
-
+		    }
 	            if (*cp == ':') {
-
 	                cp += 1 ;
-	                while (CHAR_ISWHITE(*cp))
+	                while (CHAR_ISWHITE(*cp)) {
 	                    cp += 1 ;
-
+			}
 	                bprintf(mfp,"%s: %s",HK_NEWSGROUPS,cp) ;
-
 	            } /* end if */
-
 	            len = 0 ;
 	            f_newsgroups = TRUE ;
-
 	        } else if (strncasecmp(lbuf,"from",4) == 0) {
-
 	            cp = lbuf + 4 ;
-	            while (CHAR_ISWHITE(*cp))
+	            while (CHAR_ISWHITE(*cp)) {
 	                cp += 1 ;
-
-	            if (*cp == ':') cp += 1 ;
-
-	            while (CHAR_ISWHITE(*cp))
+		    }
+	            if (*cp == ':') {
+			cp += 1 ;
+		    }
+	            while (CHAR_ISWHITE(*cp)) {
 	                cp += 1 ;
-
-	            if (*cp == '\n')
+		    }
+	            if (*cp == '\n') {
 	                len = 0 ;
-
-	                else
+		    } else {
 	                f_from = TRUE ;
-
+		    }
 	        } else if ((strncasecmp(lbuf,HK_TITLE,5)) == 0) {
-
 	            cp = lbuf + 5 ;
-	            while (CHAR_ISWHITE(*cp))
+	            while (CHAR_ISWHITE(*cp)) {
 	                cp += 1 ;
-
-	            if (*cp == ':')
+		    }
+	            if (*cp == ':') {
 	                cp += 1 ;
-
-	            while (CHAR_ISWHITE(*cp))
+		    }
+	            while (CHAR_ISWHITE(*cp)) {
 	                cp += 1 ;
-
+		    }
 	            bprintf(mfp,"%s:    %s\n",HK_SUBJECT,cp) ;
-
 	            len = 0 ;
-
 	        } /* end if */
-
 	    } /* end if (BOL processing) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4)) {
-	        lbuf[len] = '\0' ;
-	        debugprintf("save: %d W> %s",len,lbuf) ;
-	    }
-#endif
 
 	    rs = bwrite(mfp,lbuf,len) ;
 	    if (rs < 0)
@@ -517,48 +447,34 @@ const char	mailbox[] ;
 /* "from" person */
 
 	if (! f_from) {
-
 	    if (from_realname != NULL) {
-
 	        if (from_username != NULL) {
 	            bprintf(mfp, "%s:       %s <%s!%s>\n",
 	                HK_FROM,from_realname,
 	                pip->mailhost,from_username) ;
-
 	        } else {
 	            bprintf(mfp, "%s:       %s <%s!pcs>\n",
 	                HK_FROM,from_realname,
 	                pip->mailhost) ;
 		}
-
 	    } else {
-
 	        bprintf(mfp, "%s:       %s\n",
 	            HK_FROM,from_username) ;
-
 	    }
-
 	} /* end if */
 
 /* which newsgroup */
 
 	if (! f_newsgroups) {
-
 	    bbcpy(ngname,ngdir) ;
-
 	    bprintf(mfp,"%s: %s\n",HK_NEWSGROUPS,ngname) ;
-
 	}
 
 /* date of posting */
 
-	if ((! f_date) &&
-	    (bcontrol(afp,BC_STAT,&sb) >= 0)) {
-
+	if ((! f_date) && (bcontrol(afp,BC_STAT,&sb) >= 0)) {
 	    timestr_hdate(sb.st_mtime,hv_date) ;
-
 	    bprintf(mfp,"%s:       %s\n",HK_DATE,hv_date) ;
-
 	} /* end if (posting date) */
 
 /* to whom! (not needed) */
@@ -575,12 +491,6 @@ const char	mailbox[] ;
 
 	rs = bcopyblock(afp,mfp,clen) ;
 
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	    if (rs < 0)
-	        debugprintf("cmd_save: bad file copy rs=%d\n", rs) ;
-#endif
-
 /* close up stuff */
 ret2:
 	if ((mode == SMODE_MAILBOX) && (mfp != NULL))
@@ -593,8 +503,5 @@ ret0:
 	return rs ;
 }
 /* end subroutine (cmd_save) */
-
-
-/* local subroutines */
 
 

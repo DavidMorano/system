@@ -101,14 +101,6 @@
 
 #define	DEFHEADERS	25
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #define	HDRNAMELEN	80
 
 #define	ISHDRCONT(c)	(((c) == ' ') || ((c) == '\t'))

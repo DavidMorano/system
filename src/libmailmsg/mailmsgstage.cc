@@ -4,7 +4,6 @@
 /* process the input messages and spool them up */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -130,27 +129,22 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sisub(const char *,int,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sisub(cchar *,int,cchar *) ;
 extern int	mailmsgmathdr(cchar *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	hdrextnum(const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	hasuc(const char *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	hdrextnum(cchar *,int) ;
+extern int	opentmpfile(cchar *,int,mode_t,char *) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isprintlatin(int) ;
 extern int	iceil(int,int) ;
 extern int	hasEOH(cchar *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
 extern char	*timestr_logz(time_t,char *) ;
@@ -209,7 +203,7 @@ static int	mailmsgstage_gmsgentdel(MAILMSGSTAGE *,MSGENTRY *) ;
 
 static int	msgentry_start(MSGENTRY *) ;
 static int	msgentry_finish(MSGENTRY *) ;
-static int	msgentry_loadline(MSGENTRY *,const char *,int) ;
+static int	msgentry_loadline(MSGENTRY *,cchar *,int) ;
 static int	msgentry_loadhdrs(MSGENTRY *,LINER *) ;
 static int	msgentry_setflags(MSGENTRY *) ;
 static int	msgentry_setct(MSGENTRY *) ;
@@ -220,7 +214,7 @@ static int	msgentry_getclen(MSGENTRY *) ;
 static int	msgentry_setclen(MSGENTRY *,int) ;
 static int	msgentry_setoff(MSGENTRY *,off_t) ;
 static int	msgentry_setlen(MSGENTRY *,int) ;
-static int	mailentry_gethdrnum(MSGENTRY *,const char *) ;
+static int	mailentry_gethdrnum(MSGENTRY *,cchar *) ;
 
 static int liner_start(LINER *,int,off_t,int) ;
 static int liner_finish(LINER *) ;
@@ -233,12 +227,11 @@ static int liner_done(LINER *) ;
 
 /* exported subroutines */
 
-
 int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts)
 {
 	int		rs ;
 	int		n = 0 ;
-	const char	*tmpdname = NULL ;
+	cchar	*tmpdname = NULL ;
 	char		template[MAXPATHLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -256,7 +249,7 @@ int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts)
 
 	if ((rs = mkpath2(template,tmpdname,"msXXXXXXXXXXXX")) >= 0) {
 	    const mode_t	om = 0660 ;
-	    const int		of = O_RDWR ;
+	    cint		of = O_RDWR ;
 	    char		tmpfname[MAXPATHLEN + 1] ;
 	    if ((rs = opentmpfile(template,of,om,tmpfname)) >= 0) {
 	        op->tfd = rs ;
@@ -280,10 +273,6 @@ int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts)
 	    } /* end if (opentmpfile) */
 	} /* end if (mkpath2) */
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_start: ret rs=%d n=%u\n",rs,n) ;
-#endif
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailmsgstage_start) */
@@ -299,12 +288,6 @@ static int mailmsgstage_starter(MAILMSGSTAGE *op,int ifd,int to)
 	if ((rs = vechand_start(&op->msgs,4,vo)) >= 0) {
 	    if ((rs = mailmsgstage_g(op,ifd,to)) >= 0) {
 	        n = rs ;
-#if	CF_DEBUGS
-	        debugprintf("mailmsgstage_start: "
-	            "_g() rs=%d\n",rs) ;
-	        debugprintf("mailmsgstage_start: "
-	            "tflen=%d\n",op->tflen) ;
-#endif
 	        if (op->tflen > 0) {
 	            size_t	ms = (size_t) op->tflen ;
 	            int		mp = PROT_READ ;
@@ -333,18 +316,9 @@ int mailmsgstage_finish(MAILMSGSTAGE *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: ent m=%08x\n",op->magic) ;
-#endif
-
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: sizeof(size_t)=%u\n",sizeof(size_t));
-	debugprintf("mailmsgstage_finish: ms=%lu\n",op->mapsize) ;
-#endif
 
 	if (op->mapdata != NULL) {
 	    rs1 = u_munmap(op->mapdata,op->mapsize) ;
@@ -353,23 +327,11 @@ int mailmsgstage_finish(MAILMSGSTAGE *op)
 	    op->mapsize = 0 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: 1 rs=%d\n",rs) ;
-#endif
-
 	rs1 = mailmsgstage_msgfins(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: 2 rs=%d\n",rs) ;
-#endif
-
 	rs1 = vechand_finish(&op->msgs) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: 3 rs=%d\n",rs) ;
-#endif
 
 	if (op->tfd >= 0) {
 	    rs1 = u_close(op->tfd) ;
@@ -377,21 +339,14 @@ int mailmsgstage_finish(MAILMSGSTAGE *op)
 	    op->tfd = -1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: 4 rs=%d\n",rs) ;
-#endif
-
 	if (op->tmpfname != NULL) {
-	    if (op->tmpfname[0] != '\0')
+	    if (op->tmpfname[0] != '\0') {
 	        u_unlink(op->tmpfname) ;
+	    }
 	    rs1 = uc_free(op->tmpfname) ;
 	    op->tmpfname = NULL ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_finish: ret rs=%d\n",rs) ;
-#endif
 
 	op->magic = 0 ;
 	return rs ;
@@ -651,14 +606,6 @@ int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,off_t boff,cchar **bpp)
 
 	if (boff < 0) return SR_DOM ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_bodyget: mi=%u\n",mi) ;
-	debugprintf("mailmsgstage_bodyget: boff=%lld\n",boff) ;
-	debugprintf("mailmsgstage_bodyget: bpp=\\x%p\n",bpp) ;
-	debugprintf("mailmsgstage_bodyget: mapdata=\\x%p\n",op->mapdata) ;
-	debugprintf("mailmsgstage_bodyget: mapsize=%u\n",op->mapsize) ;
-#endif
-
 	if (bpp != NULL)
 	    *bpp = NULL ;
 
@@ -674,10 +621,6 @@ int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,off_t boff,cchar **bpp)
 	    }
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_bodyget: ret rs=%d wlen=%u\n",rs,ml) ;
-#endif
-
 	return (rs >= 0) ? ml : rs ;
 }
 /* end subroutine (mailmsgstage_bodyget) */
@@ -688,7 +631,7 @@ int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,off_t boff,
 {
 	int		rs ;
 	int		ml = 0 ;
-	const char	*bp ;
+	cchar	*bp ;
 
 	if (boff < 0) return SR_DOM ;
 
@@ -718,10 +661,6 @@ static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 	int		rs1 ;
 	int		n = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_g: ent\n") ;
-#endif
-
 	if ((rs = filebuf_start(&tfb,op->tfd,ostart,0,0)) >= 0) {
 	    LINER	ls, *lsp = &ls ;
 
@@ -729,10 +668,6 @@ static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 		int	mi = 0 ;
 
 	        while ((rs = mailmsgstage_gmsg(op,&tfb,lsp,mi++)) > 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("mailmsgstage_g: GT mi=%u\n",mi) ;
-#endif
 
 	        } /* end while */
 	        n = op->nmsgs ;
@@ -744,10 +679,6 @@ static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 	    rs1 = filebuf_finish(&tfb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filebuf) */
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_g: ret rs=%d nmsgs=%u\n",rs,n) ;
-#endif
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -764,23 +695,13 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,int mi)
 	int		f_env = FALSE ;
 	int		f_hdr = FALSE ;
 	int		f_eoh = FALSE ;
-	const char	*lp ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsg: ent mi=%u\n",mi) ;
-#endif
+	cchar	*lp ;
 
 /* find message start */
 
 	while ((rs = liner_readline(lsp,&lp)) > 0) {
 	    ll = rs ;
 	    if (ll == 0) break ;
-
-#if	CF_DEBUGS
-	    debugprintf("mailmsgstage_gmsg: mi=%u\n",mi) ;
-	    debugprintf("mailmsgstage_gmsg: l=>%t<\n",
-	        lp,strlinelen(lp,ll,40)) ;
-#endif
 
 	    if ((ll > 5) && FMAT(lp) &&
 		((rs = mailmsgmatenv(&me,lp,ll)) > 0)) {
@@ -803,21 +724,10 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,int mi)
 	    if (f_eoh) break ;
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsg: while-out rs=%d\n",rs) ;
-	debugprintf("mailmsgstage_gmsg: f_env=%u f_hdr=%u f_eoh=%u\n",
-	    f_env,f_hdr,f_eoh) ;
-#endif
-
 	if ((rs >= 0) && (f_eoh || f_env || f_hdr)) {
 	    rs = mailmsgstage_gmsgent(op,tfp,lsp,lp,ll,f_eoh) ;
 	    ll = rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsg: ret rs=%d ll=%u\n",
-	    rs,ll) ;
-#endif
 
 	return (rs >= 0) ? ll : rs ;
 }
@@ -829,9 +739,6 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 {
 	MSGENTRY	*mep ;
 	int		rs ;
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgent: ent ll=%d f_eoh=%u\n",ll,f_eoh) ;
-#endif
 	if ((rs = mailmsgstage_gmsgentnew(op,&mep)) >= 0) {
 	    if ((rs = msgentry_start(mep)) >= 0) {
 	        if ((! f_eoh) && (ll > 0)) {
@@ -861,10 +768,6 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	        mep = NULL ;
 	    }
 	} /* end if (mailmsgstage_gmsgentnew) */
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgent: ret rs=%d ll=%u\n",
-	    rs,ll) ;
-#endif
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailmsgstage_gmsgent) */
@@ -875,9 +778,6 @@ static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 {
 	int		rs ;
 	int		ll = 0 ;
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgenter: ent\n") ;
-#endif
 	rs = msgentry_setoff(mep,op->tflen) ;
 	if (rs >= 0) rs = msgentry_setflags(mep) ;
 	if (rs >= 0) {
@@ -885,9 +785,6 @@ static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 		ll = rs ;
 	    } /* end if (mailmsgstage_gmsgbody) */
 	} /* end if (insertion) */
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgenter: ret rs=%d ll=%u\n",rs,ll) ;
-#endif
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailmsgstage_gmsgenter) */
@@ -908,10 +805,6 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	int		f_eol = FALSE ;
 	cchar		*lp ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgentbody: ent\n") ;
-#endif
-
 	if (rs >= 0) clen = msgentry_getclen(mep) ;
 	if (rs >= 0) clines = msgentry_getclines(mep) ;
 
@@ -922,14 +815,6 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	    ((rs = liner_readline(lsp,&lp)) > 0)) {
 
 	    ll = rs ;
-
-#if	CF_DEBUGS
-	    debugprintf("mailmsgstage_gmsg: liner_readline() rs=%d\n",
-	        rs) ;
-	    debugprintf("mailmsgstage_gmsg: line=>%t<\n",
-	        lp,strlinelen(lp,ll,40)) ;
-#endif
-
 	    f_eol = (lp[ll - 1] == '\n') ;
 	    if (f_bol && FMAT(lp) && (ll > 5)) {
 	            MAILMSGMATENV	me ;
@@ -951,11 +836,6 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	    liner_done(lsp) ;
 	} /* end while (searching for new start-msg) */
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgentbody: out rs=%d blen=%u ll=%u\n",
-		rs,blen,ll) ;
-#endif
-
 	if (rs >= 0) {
 	    op->tflen += blen ;
 	    msgentry_setlen(mep,blen) ;
@@ -963,27 +843,17 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	    if (clines < 0) msgentry_setclines(mep,blines) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgentbody: ret rs=%d ll=%u\n",rs,ll) ;
-#endif
-
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailmsgstage_gmsgbody) */
 
-
-static int mailmsgstage_gmsgentnew(MAILMSGSTAGE *op,MSGENTRY **mpp)
-{
-	const int	esize = sizeof(MSGENTRY) ;
+static int mailmsgstage_gmsgentnew(MAILMSGSTAGE *op,MSGENTRY **mpp) noex {
+	cint		esize = sizeof(MSGENTRY) ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	rs = uc_malloc(esize,mpp) ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgentnew: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1000,10 +870,6 @@ static int mailmsgstage_gmsgentdel(MAILMSGSTAGE *op,MSGENTRY *mep)
 
 	rs1 = uc_free(mep) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_gmsgentdel: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1059,10 +925,6 @@ static int msgentry_finish(MSGENTRY *mep)
 	rs1 = mailmsg_finish(&mep->m) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("msgentry_finish: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (msgentry_finish) */
@@ -1087,11 +949,7 @@ static int msgentry_loadhdrs(MSGENTRY *mep,LINER *lsp)
 	int		ll ;
 	int		tlen = 0 ;
 	int		f_eoh = FALSE ;
-	const char	*lp ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_loadhdrs: ent\n") ;
-#endif
+	cchar	*lp ;
 
 	while ((rs = liner_readline(lsp,&lp)) > 0) {
 	    ll = rs ;
@@ -1110,10 +968,6 @@ static int msgentry_loadhdrs(MSGENTRY *mep,LINER *lsp)
 
 	mep->f.eoh = f_eoh ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsgstage_loadhdrs: ret rs=%d tlen=%u\n",rs,tlen) ;
-#endif
-
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (msgentry_loadhdrs) */
@@ -1123,7 +977,7 @@ static int msgentry_getclen(MSGENTRY *mep)
 {
 	int		rs = SR_OK ;
 	int		clen ;
-	const char	*kn = HN_CLEN ;
+	cchar	*kn = HN_CLEN ;
 
 	clen = mep->clen ;
 	if (! mep->f.clen) {
@@ -1172,8 +1026,8 @@ static int msgentry_setct(MSGENTRY *mep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl, vl ;
-	const char	*tp ;
-	const char	*hp, *vp ;
+	cchar	*tp ;
+	cchar	*hp, *vp ;
 
 	mep->f.ctplain = TRUE ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CTYPE,&hp)) > 0) {
@@ -1208,7 +1062,7 @@ static int msgentry_setce(MSGENTRY *mep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
-	const char	*hp ;
+	cchar	*hp ;
 
 	mep->f.ceplain = TRUE ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CENCODING,&hp)) > 0) {
@@ -1247,7 +1101,7 @@ static int msgentry_getclines(MSGENTRY *mep)
 	int		clines = 0 ;
 
 	if (! mep->f.clines) {
-	    const char		*kn = HN_CLINES ;
+	    cchar		*kn = HN_CLINES ;
 	    mep->f.clines = TRUE ; /* once-flag */
 	    mep->clines = -1 ;
 	    if ((clines = mailentry_gethdrnum(mep,kn)) >= 0) {
@@ -1289,27 +1143,18 @@ static int msgentry_setlen(MSGENTRY *mep,int blen)
 }
 /* end subroutine (msgentry_setoff) */
 
-
-static int mailentry_gethdrnum(MSGENTRY *mep,cchar *kn)
+static int mailentry_gethdrnum(MSGENTRY *mep,cchar *kn) noex {
+	mailmsg		*mmp = &mep->m ;
 {
 	int		rs = SR_NOTFOUND ;
-	int		i ;
 	int		hl ;
 	int		v = -1 ;
-	const char	*hp ;
+	cchar	*hp ;
 
-#if	CF_DEBUGS
-	debugprintf("mailentry_gethdrnum: ent\n") ;
-#endif
-
-	for (i = 0 ; (hl = mailmsg_hdrival(&mep->m,kn,i,&hp)) >= 0 ; i += 1) {
+	for (int i = 0 ; (hl = mailmsg_hdrival(mmp,kn,i,&hp)) >= 0 ; i += 1) {
 	    if (hl > 0) {
 	        rs = hdrextnum(hp,hl) ;
 	        v = rs ;
-#if	CF_DEBUGS
-	        debugprintf("mailentry_gethdrnum: i=%u hdrextnum() rs=%d\n",
-			i,rs) ;
-#endif
 	    }
 	    if (rs >= 0) break ;
 	} /* end for */
@@ -1318,10 +1163,8 @@ static int mailentry_gethdrnum(MSGENTRY *mep,cchar *kn)
 }
 /* end subroutine (msgentry_gethdrnum) */
 
-
-static int liner_start(LINER *lsp,int mfd,off_t foff,int to)
-{
-	struct ustat	sb ;
+static int liner_start(LINER *lsp,int mfd,off_t foff,int to) noex {
+	USTAT		sb ;
 	int		rs ;
 
 	if (mfd < 0)
@@ -1374,44 +1217,27 @@ static int liner_readline(LINER *lsp,cchar **lpp)
 	filebuf		*fbp = &lsp->mfb ;
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("liner_readline: ent linelen=%d\n",lsp->llen) ;
-#endif
-
 	if (lsp->llen < 0) {
 
 	    lsp->poff = lsp->foff ;
 	    rs = filebuf_readln(fbp,lsp->lbuf,LINEBUFLEN,lsp->to) ;
 	    lsp->llen = rs ;
 
-#if	CF_DEBUGS
-	    debugprintf("liner_readline: filebuf_readln() rs=%d\n",rs) ;
-	    debugprintf("liner_readline: l=>%t<\n",
-	        lsp->lbuf,strlinelen(lsp->lbuf,rs,40)) ;
-#endif
-
-	    if (rs > 0)
+	    if (rs > 0) {
 	        lsp->foff += lsp->llen ;
+	    }
 
 	} /* end if (needed a new line) */
 
-	if (lpp != NULL) {
+	if (lpp) {
 	    *lpp = (rs >= 0) ? lsp->lbuf : NULL ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("liner_readline: ret rs=%d llen=%d\n",
-	    rs,lsp->llen) ;
-#endif
 
 	return (rs >= 0) ? lsp->llen : rs ;
 }
 /* end subroutine (liner_readline) */
 
-
-static int liner_done(LINER *lsp)
-{
-
+static int liner_done(LINER *lsp) noex {
 	lsp->llen = -1 ;
 	lsp->lbuf[0] = '\0' ;
 	return SR_OK ;

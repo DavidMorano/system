@@ -393,7 +393,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
         int             code = 0 ;
 	if ((rs = mailmsgattent_magic(op,tmpdname)) >= 0) {
             bfile	infile, *ifp = &infile ;
-	    cchar	*atf = bfilestdfname(op->attfname) ;
+	    cchar	*atf = bfilestdfname(stdfile_in,op->attfname) ;
             if ((rs = bopen(ifp,atf,"r",0666)) >= 0) {
                 USTAT       sb ;
                 if ((rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
@@ -409,8 +409,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                         if (f_needaux) {
 			    rs = mailmsgattent_needaux(op,tmpdname,abuf,afp) ;
                         } /* end if (needed an auxillary file) */
-/* finally! perform the analysis */
-                        if (rs >= 0) {
+                        if (rs >= 0) { /* finally! perform the analysis */
                             if (! f_needaux) afp = nullptr ;
                             rs = mailmsgattent_analyzer(op,afp,ifp) ;
                             code = rs ;

@@ -31,10 +31,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -63,14 +63,6 @@
 
 
 /* local defines */
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN		MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN		2048
-#endif
-#endif
 
 #ifndef	MSGCOLS
 #define	MSGCOLS			76

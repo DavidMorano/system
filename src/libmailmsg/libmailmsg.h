@@ -27,6 +27,8 @@
 #include	<mailmsgmatenv.h>
 #include	<mailmsgmathdr.h>
 
+#include	<matthingenv.h>
+
 
 #endif /* LIBMAILMSG_INCLUDE */
 

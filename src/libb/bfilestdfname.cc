@@ -35,7 +35,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -66,9 +65,11 @@
 
 /* exported subroutines */
 
-cchar *bfilestfname(cchar *atf) noex {
-        if ((atf == nullptr) || (atf[0] == '\0') || (atf[0] == '-')) {
-            atf = BFILE_STDIN ;
+cchar *bfilestfname(int w,cchar *atf) noex {
+	if ((w >= 0) && (w < stdfile_overlast)) {
+            if ((atf == nullptr) || (atf[0] == '\0') || (atf[0] == '-')) {
+                atf = stdfnames[w] ;
+	    }
 	}
 	return atf ;
 }

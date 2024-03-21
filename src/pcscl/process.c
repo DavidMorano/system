@@ -256,8 +256,9 @@ char		filename[] ;
 		    if (f) {
 			if ((rs = mailmsgmatenv(&me,buf,(len-1)) >= 0)) {
 			   f = rs ;
-			} else
+			} else {
 			   break ;
+			}
 		    }
 
 	            if (f) {

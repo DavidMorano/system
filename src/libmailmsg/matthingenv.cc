@@ -1,18 +1,20 @@
-/* matthingenv */
+/* matthingenv SUPPORT */
+/* lang=C++20 */
 
 /* match on message boundary */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0
 #define	CF_SHORTENV	0		/* early return? */
 #define	CF_SPACETAB	1		/* header whitespace is space-tab */
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This file is a collection of some subroutines that were individually
-	written in the past.  I think that I added the 'matmsgstart()'
-	subroutine for more general completeness.  Existing applications figure
-	out whether it is a message-start on their own right now.
+	This file is a collection of some subroutines that were
+	individually written in the past.  I think that I added the
+	'matmsgstart()' subroutine for more general completeness.
+	Existing applications figure out whether it is a message-start
+	on their own right now.
 
 */
 
@@ -20,20 +22,20 @@
 
 /*******************************************************************************
 
-	This is a small collection of subroutines that match up with the start
-	of a mail message (its envelope line) or to match up to a mail message
-	header line.
+	This is a small collection of subroutines that match up
+	with the start of a mail message (its envelope line) or to
+	match up to a mail message header line.
 
-	Does the supplied string contain an UNIX mail envelope?  Return 0 if
-	there is no match, else we return the character position of the
-	envelope string after the initial "From " part.  The match is case
-	sensitive!
+	Does the supplied string contain an UNIX mail envelope?
+	Return 0 if there is no match, else we return the character
+	position of the envelope string after the initial "From "
+	part.  The match is case sensitive!
 
 	NOTE:	The return values for this subroutine are historical
 		and are supposed to double as a TRUE/FALSE return.
 
-	Oh, by the way, a typical CORRECT UNIX envelope is supposed to look
-	like this :
+	Oh, by the way, a typical CORRECT UNIX envelope is supposed
+	to look like this:
 
 		From dam Tue Apr 06 20:40 EDT 1994
 
@@ -41,38 +43,37 @@
 
 		From dam Tue Apr 06 20:40:32 EDT 1994
 
-	Synopsis:
+	Name:
+	matthingenv
 
-	int matthingenv(s,slen)
-	const char	s[] ;
-	int		slen ;
+	Synopsis:
+	int matthingenv(cchar *sp,int sl) noex
 
 	Arguments:
-
-	s		possible envelope string (buffer)
-	len		len
+	sp		c-string to test pointer
+	sl		c-string to test length
 
 	Returns:
-
 	>0		the string contained an envelope
 	==0		the string did not contain an envelope
-
+	<0		error
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<calstrs.h>
 #include	<mailmsgmatenv.h>
+#include	<six.h>
+#include	<matxstr.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
+
+#include	"matthingenv.h"
 
 
 /* local defines */
@@ -90,11 +91,13 @@
 #endif
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	sibreak(const char *,int,const char *) ;
-extern int	isdigitlatin(int) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -105,27 +108,28 @@ extern int	isdigitlatin(int) ;
 
 /* forward references */
 
-int		matthingenv(const char *,int) ;
+extern "C" {
+    int		matthingenv(cchar *,int) noex ;
+}
 
-static int	nexttoken(const char *,int,const char **) ;
+static int	nexttoken(cchar *,int,cchar **) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int matthingenv(cchar *s,int slen) noex {
 	int		fromlen ;
-	int		i, ll, fromindex = 0 ;
+	int		ll, fromindex = 0 ;
 	int		f_len, f_esc ;
 	int		ch ;
-	const char	*cp, *cp2 ;
-	const char	*from, *day, *month ;
-
-#if	CF_DEBUGS
-	    debugprintf("matthingenv: ent> %t\n",s,strnlen(s,len)) ;
-#endif
+	cchar		*cp, *cp2 ;
+	cchar		*from, *day, *month ;
 
 	f_esc = (s[0] == '>') ;
 	if ((! f_esc) && (s[0] != 'F'))
@@ -143,10 +147,6 @@ int matthingenv(cchar *s,int slen) noex {
 	f_len = (slen >= 0) ;
 	cp += 5 ;
 	slen -= 5 ;
-
-#if	CF_DEBUGS
-	debugprintf("matthingenv: match so far\n") ;
-#endif
 
 /* skip the white space after the leader string */
 
@@ -196,11 +196,9 @@ int matthingenv(cchar *s,int slen) noex {
 	        return fromindex ;
 #endif /* COMMENT */
 
-	    for (i = 0 ; i < (cp - from) ; i += 1) {
-
+	    for (int i = 0 ; i < (cp - from) ; i += 1) {
 	        if (! isalpha(from[i]))
 	            return 0 ;
-
 	    } /* end for */
 
 	    return fromindex ;
@@ -213,10 +211,6 @@ int matthingenv(cchar *s,int slen) noex {
 		return 0 ;
 
 #endif /* CF_SHORTENV */
-
-#if	CF_DEBUGS
-	debugprintf("matthingenv: long haul\n") ;
-#endif
 
 /* get the field that is supposed to have the day of the week */
 
@@ -243,8 +237,8 @@ int matthingenv(cchar *s,int slen) noex {
 	if ((ll = nexttoken(cp,slen,&cp2)) > 2)
 	    return 0 ;
 
-	for (i = 0 ; i < ll ; i += 1) {
-	    ch = MKCHAR(cp2[i]) ;
+	for (int i = 0 ; i < ll ; i += 1) {
+	    ch = mkchar(cp2[i]) ;
 	    if (! isdigitlatin(ch)) return 0 ;
 	}
 
@@ -255,7 +249,7 @@ int matthingenv(cchar *s,int slen) noex {
 	if ((ll = nexttoken(cp,slen,&cp2)) < 4)
 	    return 0 ;
 
-	ch = MKCHAR(cp2[0]) ;
+	ch = mkchar(cp2[0]) ;
 	if ((! isdigitlatin(ch)) || (strchr(cp2,':') == NULL))
 		return 0 ;
 
@@ -269,7 +263,7 @@ int matthingenv(cchar *s,int slen) noex {
 int matmsgstart(cchar *buf,int len) noex {
 	int		rc = 0 ;
 	if (buf[0] == 'F') {
-	    MAILMSGMATENV	e ;
+	    mailmsgenv	e ;
 	    rc = mailmsgmatenv(&e,buf,len) ;
 	}
 	return rc ;
@@ -281,7 +275,7 @@ int matmsgstart(cchar *buf,int len) noex {
 
 static int nexttoken(cchar *buf,int len,cchar **spp) noex {
 	int		f_len = (len >= 0) ;
-	const char	*cp = buf ;
+	cchar		*cp = buf ;
 /* skip leading white space */
 	while (((! f_len) || (len > 0)) && HDRWHITE(*cp)) {
 	    cp += 1 ;

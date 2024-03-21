@@ -1,6 +1,9 @@
 /* mailmsgstage HEADER */
 /* lang=C20 */
 
+/* process the input messages and spool them up */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

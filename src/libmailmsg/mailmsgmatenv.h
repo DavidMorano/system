@@ -1,5 +1,8 @@
 /* mailmsgmatenv HEADER */
-/* lang=C++20 */
+/* lang=C20 */
+
+/* try to match on a UNIX® mail-message envelope */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

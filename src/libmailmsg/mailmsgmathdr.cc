@@ -104,7 +104,7 @@ int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
 	if (ts) {
 	    int		tl ;
 	    int		kl = 0 ;
-	    cchar		*tp = ts ;
+	    cchar	*tp = ts ;
 	    if (ip) {
 	        *ip = 0 ;
 	    }
