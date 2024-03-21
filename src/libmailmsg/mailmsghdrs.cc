@@ -26,8 +26,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<mailmsg.h>
@@ -38,15 +37,13 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #define	SPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -59,6 +56,16 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static inline int mailmsghdrs_magic(mailmsghdrs *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MAILMSGHDRS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mailmsghdrs_magic) */
 
 
 /* local variables */
@@ -115,59 +122,52 @@ cpcchar		mailmsghdrs_names[] = {
 	"x-mailer",		/* 45 */
 	"x-forwarded-to",	/* 46 */
 	"subj",			/* 47 */
-	NULL			/* 48 */
+	nullptr			/* 48 */
 } ;
 
 
 /* exported subroutines */
 
-int mailmsghdrs_start(MAILMSGHDRS *mhp,MAILMSG *msgp) noex {
-	cint		n = (HI_NULL + 1) ;
-	int		rs ;
-	int		size ;
+int mailmsghdrs_start(mailmsghdrs *op,mailmsg *msgp) noex {
+	cint		n = (HI_OVERLAST + 1) ;
+	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	void		*p ;
-
-	if ((mhp == NULL) || (msgp == NULL)) return SR_FAULT ;
-
-	size = (n+1) * sizeof(char **) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    int		i ; /* used-afterwards */
-	    mainv	mhnames = mailmsghdrs_names ;
-	    cchar	*hp ;
-	    mhp->v = (cchar **) p ;
-	    for (i = 0 ; (i < n) && (mhnames[i] != NULL) ; i += 1) {
-	        mhp->v[i] = NULL ;
-	        if ((rs = mailmsg_hdrval(msgp,mhnames[i],&hp)) >= 0) {
-	            mhp->v[i] = hp ;
-	            c += 1 ;
-		} else if (rs == SR_NOTFOUND) {
-		    rs = SR_OK ;
-	        } /* end if (message header search) */
-	    } /* end for (looping over header names) */
-	    mhp->v[i] = NULL ;
-	    if (rs >= 0) mhp->magic = MAILMSGHDRS_MAGIC ;
-	} /* end if (memory-allocation) */
-
+	if (op && msgp) {
+	    int		sz = (n+1) * sizeof(char **) ;
+	    void	*p{} ;
+	    if ((rs = uc_malloc(sz,&p)) >= 0) {
+	        int	i ; /* used-afterwards */
+	        mainv	mhnames = mailmsghdrs_names ;
+	        cchar	*hp ;
+	        op->v = ccharpp(p) ;
+	        for (i = 0 ; (i < n) && mhnames[i] ; i += 1) {
+	            op->v[i] = nullptr ;
+	            if ((rs = mailmsg_hdrval(msgp,mhnames[i],&hp)) >= 0) {
+	                op->v[i] = hp ;
+	                c += 1 ;
+		    } else if (rs == SR_NOTFOUND) {
+		        rs = SR_OK ;
+	            } /* end if (message header search) */
+	        } /* end for (looping over header names) */
+	        op->v[i] = nullptr ;
+	        if (rs >= 0) op->magic = MAILMSGHDRS_MAGIC ;
+	    } /* end if (memory-allocation) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailmsghdrs_start) */
 
-int mailmsghdrs_finish(MAILMSGHDRS *mhp) noex {
-	int		rs = SR_OK ;
+int mailmsghdrs_finish(mailmsghdrs *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (mhp == NULL) return SR_FAULT ;
-
-	if (mhp->magic != MAILMSGHDRS_MAGIC) return SR_NOTOPEN ;
-
-	if (mhp->v != NULL) {
-	    rs1 = uc_free(mhp->v) ;
-	    if (rs >= 0) rs = rs1 ;
-	    mhp->v = NULL ;
-	}
-
-	mhp->magic = 0 ;
+	if ((rs = mailmsghdrs_magic(op)) >= 0) {
+	    if (op->v) {
+	        rs1 = uc_free(op->v) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->v = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsghdrs_finish) */

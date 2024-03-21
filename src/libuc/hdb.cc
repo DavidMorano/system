@@ -273,7 +273,7 @@ static inline int defcmpfun(cvoid *s1,cvoid *s2,int sl) noex {
 }
 
 static inline int voidlen(cvoid *buf) noex {
-	cchar	*s = ccharp(buf) ;
+	cchar	*s = charp(buf) ;
 	return strlen(s) ;
 }
 
@@ -1236,10 +1236,10 @@ static ENT **getpoint(hdb *op,uint hv,HDB_D *keyp) noex {
 	ENT		*pep = nullptr ;
 	int		hi = (hv % op->htlen) ;
 	int		keylen = keyp->len ;
-	cchar		*keydat = ccharp(keyp->buf) ;
+	cchar		*keydat = charp(keyp->buf) ;
 	hepp = (op->htaddr + hi) ;
 	for (ep = *hepp ; ep ; ep = ep->next) {
-	    cchar	*hpkeydat = ccharp(ep->key.buf) ;
+	    cchar	*hpkeydat = charp(ep->key.buf) ;
 	    bool	f = true ;
 	    if (hpkeydat) {
 	        f = f && (ep->hv == hv) && (ep->key.len == keylen) ;

@@ -34,6 +34,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -54,38 +60,49 @@
 
 /* exported subroutines */
 
-int mailmsgfrom_start(MAILMSGFROM *op,char *fbuf,int flen) noex {
-	if (op == NULL) return SR_FAULT ;
-	memclear(op) ; /* dangerous */
-	op->fbuf = fbuf ;
-	op->flen = flen ;
-	return SR_OK ;
+int mailmsgfrom_start(mailmsgfrom *op,char *fbuf,int flen) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = memclear(op) ; /* dangerous */
+	    op->fbuf = fbuf ;
+	    op->flen = flen ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (mailmsgfrom_start) */
 
-int mailmsgfrom_finish(MAILMSGFROM *op) noex {
-	if (op == NULL) return SR_FAULT ;
-	return SR_OK ;
+int mailmsgfrom_finish(mailmsgfrom *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
 /* end subroutine (mailmsgfrom_finish) */
 
-int mailmsgfrom_test(MAILMSGFROM *op,time_t t) noex {
+int mailmsgfrom_test(mailmsgfrom *op,time_t t) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-	if (op == NULL) return SR_FAULT ;
-	if (t > op->ti_msg) {
-	    f = TRUE ;
-	    op->ti_msg = t ;
-	}
+	int		f = false ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (t > op->ti_msg) {
+	        f = true ;
+	        op->ti_msg = t ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (mailmsgfrom_test) */
 
-int mailmsgfrom_loadfrom(MAILMSGFROM *op,cchar *sp,int sl) noex {
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-	op->fl = strdcpy1w(op->fbuf,op->flen,sp,sl) - op->fbuf ;
-	return op->fl ;
+int mailmsgfrom_loadfrom(mailmsgfrom *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	int		fl = 0 ;
+	if (op && sp) {
+	    rs = SR_OK ;
+	    op->fl = strdcpy1w(op->fbuf,op->flen,sp,sl) - op->fbuf ;
+	    fl = op->fl ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (mailmsgfrom_loadfrom) */
 

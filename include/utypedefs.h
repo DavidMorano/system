@@ -251,12 +251,22 @@ typedef const char		*ccp ;
 
 #ifndef	TYPEDEF_CHARP
 #define	TYPEDEF_CHARP
-typedef char			*charp ;
+typedef char *			charp ;
+#endif
+
+#ifndef	TYPEDEF_CHARPP
+#define	TYPEDEF_CHARPP
+typedef char **			charpp ;
 #endif
 
 #ifndef	TYPEDEF_CCHARP
 #define	TYPEDEF_CCHARP
 typedef const char		*ccharp ;
+#endif
+
+#ifndef	TYPEDEF_CCHARPP
+#define	TYPEDEF_CCHARPP
+typedef const char **		ccharpp ;
 #endif
 
 #ifndef	TYPEDEF_CPCCHAR

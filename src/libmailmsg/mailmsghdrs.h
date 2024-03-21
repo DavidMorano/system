@@ -224,9 +224,9 @@
 #define	HL_SUBJ		4
 
 /* put all new entries before this last (fake) one */
-#define	HI_NULL		48
-#define	HN_NULL		NULL
-#define	HL_NULL		-1
+#define	HI_OVERLAST	48
+#define	HN_OVERLAST	NULL
+#define	HL_OVERLAST	-1
 
 
 struct mailmsghdrs_head {
@@ -236,10 +236,12 @@ struct mailmsghdrs_head {
 
 extern cpcchar		mailmsghdrs_names[] ;
 
+typedef	MAILMSGHDRS	mailmsghdrs ;
+
 EXTERNC_begin
 
-extern int mailmsghdrs_start(MAILMSGHDRS *,MAILMSG *) noex ;
-extern int mailmsghdrs_finish(MAILMSGHDRS *) noex ;
+extern int mailmsghdrs_start(mailmsghdrs *,mailmsg *) noex ;
+extern int mailmsghdrs_finish(mailmsghdrs *) noex ;
 
 EXTERNC_end
 

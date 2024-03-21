@@ -306,7 +306,7 @@ int envs_enumkey(envs *op,ENVS_CUR *curp,cchar **kpp) noex {
 	    ENVS_DB	*dlp = op->varp ;
 	    if (kpp) *kpp = nullptr ;
 	    if ((rs = ENVS_DBENUM(dlp,curp->curp,&key,&val)) >= 0) {
-	        cchar	*kp = ccharp(key.buf) ;
+	        cchar	*kp = charp(key.buf) ;
 	        kl = strlen(kp) ;
 	        if (kpp) *kpp = kp ;
 	    } /* end if */
@@ -333,7 +333,7 @@ int envs_enum(envs *op,ENVS_CUR *curp,cchar **kpp,cchar **vpp) noex {
 	            rs = ENVS_DBGETREC(op->varp,curp->curp,&key,&val) ;
 	        }
 	        if (rs < 0) break ;
-	        kp = ccharp(key.buf) ;
+	        kp = charp(key.buf) ;
 	        kl = strlen(kp) ;
 	        if (kpp) *kpp = kp ;
 	        ep = (envs_ent *) val.buf ;

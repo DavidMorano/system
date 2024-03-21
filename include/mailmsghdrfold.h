@@ -40,21 +40,22 @@ struct mailmsghdrfold_flags {
 } ;
 
 struct mailmsghdrfold_head {
-	uint		magic ;
-	MAILMSGHDRFOLD_FL	f ;
 	cchar		*sp ;
+	MAILMSGHDRFOLD_FL	f ;
+	uint		magic ;
 	int		sl ;
 	int		mcols ;		/* message columns (usually 76) */
 	int		ln ;		/* line within header instance */
 } ;
 
-typedef MAILMSGHDRFOLD	mailmsghdrfold ;
+typedef MAILMSGHDRFOLD		mailmsghdrfold ;
+typedef MAILMSGHDRFOLD_FL	mailmsghdrfold_fl ;
 
 EXTERNC_begin
 
-extern int mailmsghdrfold_start(MAILMSGHDRFOLD *,int,int,cchar *,int) noex ;
-extern int mailmsghdrfold_get(MAILMSGHDRFOLD *,int,cchar **) noex ;
-extern int mailmsghdrfold_finish(MAILMSGHDRFOLD *) noex ;
+extern int mailmsghdrfold_start(mailmsghdrfold *,int,int,cchar *,int) noex ;
+extern int mailmsghdrfold_get(mailmsghdrfold *,int,cchar **) noex ;
+extern int mailmsghdrfold_finish(mailmsghdrfold *) noex ;
 
 EXTERNC_end
 

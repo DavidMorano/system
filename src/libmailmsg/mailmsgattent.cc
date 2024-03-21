@@ -334,7 +334,7 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	                        op->encoding = cp ;
 			    }
 		        }
-		    }
+		    } /* end if */
 	        } else {
 		    cchar	*cp ;
 	            code = CE_BASE64 ;
@@ -348,13 +348,13 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	        if ((si = matstr(contentencodings,enc,-1)) >= 0) {
 	            code = si ;
 	        }
-	    }
+	    } /* end if */
 	    if (rs < 0) {
 	        if (op->encoding != nullptr) {
 	            uc_free(op->encoding) ;
 	            op->encoding = nullptr ;
 	        }
-	    }
+	    } /* end if (error) */
 	    if (rs >= 0) {
 	        op->cte = code ;
 	    }
@@ -374,7 +374,7 @@ int mailmsgattent_setcode(MME *op,int code) noex {
                     if ((rs = uc_mallocstrw(enc,-1,&cp)) >= 0) {
                         op->encoding = cp ;
                     }
-                }
+                } /* end if */
             } else {
                 rs = SR_INVALID ;
             }
@@ -399,7 +399,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                     char    auxfname[MAXPATHLEN+1] ;
                     auxfname[0] = '\0' ;
                     if (S_ISREG(sb.st_mode)) {
-                        op->clen = (int) sb.st_size ;
+                        op->clen = int(sb.st_size & INT_MAX) ;
                         f_needaux = false ;
                     }
                     if (f_needaux) {
@@ -414,7 +414,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                             } else {
                                 rs = mkpath1(tmpfname,tmpcname) ;
                             }
-                        }
+                        } /* end if (ok) */
                         if (rs >= 0) {
                             cmode   om = 0660 ;
                             if ((rs = mktmpfile(auxfname,tmpfname,om)) >= 0) {
@@ -448,7 +448,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
                             if (auxfname[0] != '\0') {
                                 u_unlink(auxfname) ;
                             }
-                        }
+                        } /* end if (error) */
                     } /* end if (ok) */
                     if (f_needaux) {
                         if (afp != nullptr) bclose(afp) ;
@@ -480,8 +480,8 @@ static int mailmsgattent_startfn(MME *op,cchar *sp,int sl) noex {
                     uc_free(op->attfname) ;
                     op->attfname = nullptr ;
                 }
-            }
-        }
+            } /* end if (m-a) */
+        } /* end if */
         return rs ;
 }
 /* end subroutine (mailmsgattent_startfn) */
@@ -493,7 +493,7 @@ static int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
                 cint    cl = (sl-(si+1)) ;
                 cchar   *cp = (sp+(si+1)) ;
                 rs = mailmsgattent_startctsub(op,cp,cl) ;
-            }
+            } /* end if */
         } else {
             int         el ;
             cchar       *ep ;
@@ -507,7 +507,7 @@ static int mailmsgattent_startct(MME *op,cchar *sp,int sl) noex {
                         op->ext = ext ;
                     }
                 }
-            }
+            } /* end if */
         } /* end if */
         return rs ;
 }

@@ -278,7 +278,7 @@ int nodesfile_enum(NF *op,nodesfile_cur *curp,char *nbuf,int nlen) noex {
 	    hdb_datum	key{} ;
 	    hdb_datum	val{} ;
 	    if ((rs = hdb_enum(op->nlp,curp->hcp,&key,&val)) >= 0) {
-	        cchar	*cp = ccharp(key.buf) ;
+	        cchar	*cp = charp(key.buf) ;
 	        cl = (nlen >= 0) ? min(key.len,nlen) : key.len ;
 	        strwcpy(nbuf,cp,cl) ;
 	    }
