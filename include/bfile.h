@@ -23,6 +23,7 @@
 #include	<unistd.h>
 #include	<stdarg.h>
 #include	<usystem.h>
+#include	<stdfnames.h>
 #include	<localmisc.h>
 
 
@@ -39,6 +40,12 @@
 #define	BFILE_FDNAMELEN	22
 #define	BFILE_MAXNEOF	3		/* maximum EOFs on networks */
 #define	BFILE_NMAPS	32		/* number of pages mapped at a time */
+
+#define	BFILE_STDIN	STDFNIN
+#define	BFILE_STDOUT	STDFNOUT
+#define	BFILE_STDERR	STDFNERR
+#define	BFILE_STDLOG	STDFNLOG
+#define	BFILE_STDNULL	STDFNNUL
 
 /* user commands to 'bcontrol' */
 #define	BC_NOOP		0

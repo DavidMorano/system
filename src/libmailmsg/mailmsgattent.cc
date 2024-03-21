@@ -36,6 +36,13 @@
 #include	<contypevals.h>
 #include	<contentencodings.h>
 #include	<ismmclass.h>
+#include	<stdfnames.h>
+#include	<xperm.h>
+#include	<mktmp.h>
+#include	<sfx.h>
+#include	<six.h>
+#include	<mkpathx.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"mailmsgattent.h"
@@ -103,7 +110,7 @@ int mailmsgattent_start(MME *op,cchar *ct,cchar *ce,
 
 /* continue */
 
-	memset(op,0,sizeof(MAILMSGATTENT)) ;
+	memclear(op) ; /* dangerous */
 	op->cte = -1 ;
 	op->clen = -1 ;
 	op->clines = -1 ;
@@ -188,7 +195,7 @@ int mailmsgattent_finish(MME *op) noex {
 /* find the content-type for this particular attachment */
 int mailmsgattent_type(MME *op,MIMETYPES *mtp) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -253,7 +260,7 @@ int mailmsgattent_type(MME *op,MIMETYPES *mtp) noex {
 		if ((rs >= 0) && (vp != NULL)) {
 		    cchar	*cp ;
 		    if ((rs = uc_mallocstrw(vp,vl,&cp)) >= 0) {
-			f = TRUE ;
+			f = true ;
 			op->type = cp ;
 		    }
 		}
@@ -315,7 +322,7 @@ int mailmsgattent_typeset(MME *op,cchar *tstr,cchar *ststr) noex {
 
 int mailmsgattent_isplaintext(MME *op) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -344,7 +351,7 @@ int mailmsgattent_code(MME *op,cchar *tmpdname) noex {
 	if (op->type != NULL) {
 	    rs = mailmsgattent_isplaintext(op) ;
 	} else {
-	    op->f_plaintext = TRUE ;
+	    op->f_plaintext = true ;
 	}
 
 	if (! op->f_plaintext) code = CE_BASE64 ;
@@ -452,16 +459,16 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
 	    atf = BFILE_STDIN ;
 
 	if ((rs = bopen(ifp,atf,"r",0666)) >= 0) {
-	    bfile_stat	sb ;
+	    USTAT	sb ;
 	    if ((rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {
 		bfile	auxfile, *afp = &auxfile ;
-		int	f_needaux = TRUE ;
+		int	f_needaux = true ;
 		char	auxfname[MAXPATHLEN+1] ;
 
 		auxfname[0] = '\0' ;
 	        if (S_ISREG(sb.st_mode)) {
 	            op->clen = (int) sb.st_size ;
-	            f_needaux = FALSE ;
+	            f_needaux = false ;
 	        }
 
 	        if (f_needaux) {
@@ -480,7 +487,8 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
 	            }
 
 	            if (rs >= 0) {
-	                if ((rs = mktmpfile(auxfname,0660,tmpfname)) >= 0) {
+			cmode	om = 0660 ;
+	                if ((rs = mktmpfile(auxfname,tmpfname,om)) >= 0) {
 			    cchar	*afn = auxfname ;
 			    cchar	*cp ;
 			    if ((rs = uc_mallocstrw(afn,-1,&cp)) >= 0) {

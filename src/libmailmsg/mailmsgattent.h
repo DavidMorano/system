@@ -43,14 +43,14 @@ typedef MAILMSGATTENT	mailmsgattent ;
 
 EXTERNC_begin
 
-extern int mailmsgattent_start(MAILMSGATTENT *,cchar *,cchar *,cchar *,int) ;
-extern int mailmsgattent_type(MAILMSGATTENT *,MIMETYPES *) ;
-extern int mailmsgattent_typeset(MAILMSGATTENT *,cchar *,cchar *) ;
-extern int mailmsgattent_isplaintext(MAILMSGATTENT *) ;
-extern int mailmsgattent_finish(MAILMSGATTENT *) ;
-extern int mailmsgattent_code(MAILMSGATTENT *,cchar *) ;
-extern int mailmsgattent_setcode(MAILMSGATTENT *,int) ;
-extern int mailmsgattent_analyze(MAILMSGATTENT *,cchar *) ;
+extern int mailmsgattent_start(MAILMSGATTENT *,cc *,cc *,cc *,int) noex ;
+extern int mailmsgattent_type(MAILMSGATTENT *,MIMETYPES *) noex ;
+extern int mailmsgattent_typeset(MAILMSGATTENT *,cc *,cc *) noex ;
+extern int mailmsgattent_isplaintext(MAILMSGATTENT *) noex ;
+extern int mailmsgattent_finish(MAILMSGATTENT *) noex ;
+extern int mailmsgattent_code(MAILMSGATTENT *,cc *) noex ;
+extern int mailmsgattent_setcode(MAILMSGATTENT *,int) noex ;
+extern int mailmsgattent_analyze(MAILMSGATTENT *,cc *) noex ;
 
 EXTERNC_end
 

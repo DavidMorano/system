@@ -1,4 +1,5 @@
-/* contypevals */
+/* contypevals HRADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,7 +12,12 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CONTYPEVALS
-#define	CONTYPEVALS	1
+#define	CONTYPEVALS
+
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<clanguage.h>
 
 
 enum contypevals {
@@ -22,7 +28,7 @@ enum contypevals {
 } ;
 
 
-extern cchar	*contypevals[] ;
+extern cpcchar	contypevals[] ;
 
 
 #endif /* CONTYPEVALS */

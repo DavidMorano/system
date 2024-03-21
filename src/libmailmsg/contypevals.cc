@@ -1,4 +1,4 @@
-/* contypevals (for Email) */
+/* contypevals SUPPORT (for Email) */
 /* lang=C20 */
 
 /* content type values */
@@ -21,16 +21,40 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+
+#include	"contypevals.h"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */
 
-cchar	*contypevals[] = {
+cpcchar	contypevals[] = {
 	"text",
 	"plain",
 	"binary",

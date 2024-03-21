@@ -132,6 +132,8 @@ mailmsg.o:		mailmsg.dir
 mailmsg.dir:
 	makesubdir $@
 
+contypevals.o:		conttypevals.cc contypevals.h
+
 mailmsghdrval.o:	mailmsghdrval.cc	$(INCS)
 mailmsgmatenv.o:	mailmsgmatenv.cc	$(INCS)
 mailmsgmathdr.o:	mailmsgmathdr.cc	$(INCS)
