@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int paramopt_magic(paramopt *op,Args ... args) noex {
+static inline int mailmsgattent_magic(mailmsgattent *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == PARAMOPT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MAILMSGATTENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (paramopt_magic) */
+/* end subroutine (mailmsgattent_magic) */

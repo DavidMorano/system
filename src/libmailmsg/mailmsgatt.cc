@@ -68,17 +68,14 @@ int mailmsgatt_start(MAILMSGATT *rhp) noex {
 	int		rs = SR_FAULT ;
 	if (rhp) {
 	    cint	ne = MAILMSGATT_DEFENTS ;
-	    cint	vo = VECITEM_PNOHOLES ;
-	    rs = vecitem_start(rhp,nemvo) ;
+	    cint	vo = VECITEM_OCOMPACT ;
+	    rs = vecitem_start(rhp,ne,vo) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailmsgatt_start) */
 
-
-/* free up the mailmsgattments list object */
-int mailmsgatt_finish(MAILMSGATT *rhp)
-{
+int mailmsgatt_finish(MAILMSGATT *rhp) noex {
 	MAILMSGATTENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -173,8 +170,5 @@ int mailmsgatt_typeatts(MAILMSGATT *rhp,MIMETYPES *mtp) noex {
 	return rs ;
 }
 /* end subroutine (mailmsgatt_typeatts) */
-
-
-/* private subroutines */
 
 

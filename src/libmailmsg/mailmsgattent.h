@@ -21,10 +21,10 @@
 
 
 #define	MAILMSGATTENT_MAGIC	0x49827261
-#define	MAILMSGATTENT		struct mailmsgattent
+#define	MAILMSGATTENT		struct mailmsgattent_head
 
 
-struct mailmsgattent {
+struct mailmsgattent_head {
 	cchar		*type ;		/* content-type */
 	cchar		*subtype ;
 	cchar		*attfname ;	/* attachment-filename */
