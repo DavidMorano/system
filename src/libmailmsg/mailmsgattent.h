@@ -1,7 +1,7 @@
 /* mailmsgattent HEADER */
 /* lang=C20 */
 
-/* mail-message attachment entry object */
+/* mail-message attachment entry object management */
 /* version %I% last-modified %G% */
 
 

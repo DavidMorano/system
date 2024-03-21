@@ -1,7 +1,7 @@
 /* mailmsgattent SUPPORT */
 /* lang=C++20 */
 
-/* extra subroutines for the 'mailmsgattent' object */
+/* mail-message attachment entry object management */
 /* version %I% last-modified %G% */
 
 

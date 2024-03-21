@@ -1,7 +1,7 @@
 /* mailmsgatt SUPPORT */
 /* lang=C++20 */
 
-/* mail-message attachment processing */
+/* mail-message attachment object processing */
 /* version %I% last-modified %G% */
 
 
@@ -64,7 +64,7 @@
 
 /* exported subroutines */
 
-int mailmsgatt_start(MAILMSGATT *rhp) noex {
+int mailmsgatt_start(mailmsgatt *rhp) noex {
 	int		rs = SR_FAULT ;
 	if (rhp) {
 	    cint	ne = MAILMSGATT_DEFENTS ;
@@ -75,7 +75,7 @@ int mailmsgatt_start(MAILMSGATT *rhp) noex {
 }
 /* end subroutine (mailmsgatt_start) */
 
-int mailmsgatt_finish(MAILMSGATT *rhp) noex {
+int mailmsgatt_finish(mailmsgatt *rhp) noex {
 	MAILMSGATTENT	*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -96,7 +96,7 @@ int mailmsgatt_finish(MAILMSGATT *rhp) noex {
 /* end subroutine (mailmsgatt_finish) */
 
 /* add an attachment (w/ default content-type and content-encoding) */
-int mailmsgatt_add(MAILMSGATT *rhp,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
+int mailmsgatt_add(mailmsgatt *rhp,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 	int		rs = SR_FAULT ;
 	if (rhp && ct && nbuf) {
 	    MAILMSGATTENT	ve ;
@@ -114,7 +114,7 @@ int mailmsgatt_add(MAILMSGATT *rhp,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 /* end subroutine (mailmsgatt_add) */
 
 /* delete an mailmsgattment */
-int mailmsgatt_del(MAILMSGATT *alp,int i) noex {
+int mailmsgatt_del(mailmsgatt *alp,int i) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (alp) {
@@ -133,7 +133,7 @@ int mailmsgatt_del(MAILMSGATT *alp,int i) noex {
 /* end subroutine (mailmsgatt_del) */
 
 /* return the number of hosts seen so far */
-int mailmsgatt_count(MAILMSGATT *rhp) noex {
+int mailmsgatt_count(mailmsgatt *rhp) noex {
 	int		rs = SR_FAULT ;
 	if (rhp) {
 	    rs = vecitem_count(rhp) ;
@@ -143,7 +143,7 @@ int mailmsgatt_count(MAILMSGATT *rhp) noex {
 /* end subroutine (mailmsgatt_count) */
 
 /* enumerate */
-int mailmsgatt_enum(MAILMSGATT *rhp,int i,MAILMSGATTENT **epp) noex {
+int mailmsgatt_enum(mailmsgatt *rhp,int i,MAILMSGATTENT **epp) noex {
 	int		rs = SR_FAULT ;
 	if (rhp) {
 	    rs = vecitem_get(rhp,i,epp) ;
@@ -152,21 +152,18 @@ int mailmsgatt_enum(MAILMSGATT *rhp,int i,MAILMSGATTENT **epp) noex {
 }
 /* end subroutine (mailmsgatt_enum) */
 
-
 /* find content types for all of the mailmsgattments using a MIME-types DB */
-int mailmsgatt_typeatts(MAILMSGATT *rhp,MIMETYPES *mtp) noex {
-	MAILMSGATTENT	*ep ;
-	int		rs = SR_OK ;
-
-	if (rhp == NULL) return SR_FAULT ;
-
-	for (int i = 0 ; mailmsgatt_enum(rhp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-	        rs = mailmsgattent_type(ep,mtp) ;
-	        if (rs < 0) break ;
-	    }
-	} /* end for */
-
+int mailmsgatt_typeatts(mailmsgatt *rhp,MIMETYPES *mtp) noex {
+	int		rs = SR_FAULT ;
+	if (rhp) {
+	    MAILMSGATTENT	*ep ;
+	    for (int i = 0 ; mailmsgatt_enum(rhp,i,&ep) >= 0 ; i += 1) {
+	        if (ep) {
+	            rs = mailmsgattent_type(ep,mtp) ;
+	            if (rs < 0) break ;
+	        }
+	    } /* end for */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailmsgatt_typeatts) */
