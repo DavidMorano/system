@@ -1,10 +1,8 @@
-/* progspec */
+/* progspec SSUPPORT */
+/* lang=C++20 */
 
 /* process a file */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_DEBUG	0		/* time-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -21,24 +19,19 @@
 
 /*******************************************************************************
 
-	This subroutine just provides optional expansion of directories.
-	The real work is done by the |progfile()| subroutine.
-
+	This subroutine just provides optional expansion of
+	directories.  The real work is done by the |progfile()|
+	subroutine.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<paramopt.h>
@@ -90,13 +83,8 @@ extern char	*timestr_logz(time_t,char *) ;
 
 /* exported subroutines */
 
-
-int progspec(pip,pop,fname)
-PROGINFO	*pip ;
-PARAMOPT	*pop ;
-const char	fname[] ;
-{
-	struct ustat	sb ;
+int progspec(PROGINFO *pip,PARAMOPT *pop,cchar *fname) noex {
+	USTAT		sb ;
 	int		rs ;
 	int		c = 0 ;
 	int		f_dir ;
@@ -106,11 +94,6 @@ const char	fname[] ;
 
 	if (fname[0] == '\0')
 	    return SR_INVALID ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("progspec: fname=%s\n",fname) ;
-#endif /* CF_DEBUG */
 
 	rs = u_stat(fname,&sb) ;
 
@@ -132,19 +115,9 @@ const char	fname[] ;
 	            int		dtopts = 0 ;
 	            char	dename[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("progspec: recursing\n") ;
-#endif
-
 	            dtopts |= ((pip->f.follow) ? FSDIRTREE_MFOLLOW : 0) ;
 	            if ((rs = fsdirtree_open(&dt,fname,dtopts)) >= 0) {
 	                const int	mpl = MAXPATHLEN ;
-
-#if	CF_DEBUG
-	                if (DEBUGLEVEL(4))
-	                    debugprintf("progspec: reading\n") ;
-#endif
 
 	                while (rs >= 0) {
 	                    del = fsdirtree_read(&dt,&fsb,dename,mpl) ;
@@ -153,37 +126,15 @@ const char	fname[] ;
 	                    rs = del ;
 	                    if (rs < 0) break ;
 
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("progspec: de name=%s\n",
-	                            dename) ;
-#endif
-
 	                    if (isDotDir(fname)) {
 	                        rs = mkpath1(tmpfname,dename) ;
 	                    } else {
 	                        rs = mkpath2(tmpfname,fname,dename) ;
 			    }
 
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("progspec: tmpfname=%s\n",
-	                            tmpfname) ;
-#endif
-
 	                    if (rs > 0) {
-
 	                        rs = progfile(pip,pop,tmpfname) ;
-
-#if	CF_DEBUG
-	                        if (DEBUGLEVEL(2))
-	                            debugprintf("progspec: progfile() "
-	                                "rs=%d\n",rs) ;
-#endif
-
-	                        if (rs > 0)
-	                            c += 1 ;
-
+	                        if (rs > 0) c += 1 ;
 	                    } /* end if */
 
 	                    if (progabort(pip) > 0) break ;
@@ -197,43 +148,17 @@ const char	fname[] ;
 	            FSDIR	d ;
 	            FSDIR_ENT	ds ;
 
-#if	CF_DEBUG
-	            if (DEBUGLEVEL(4))
-	                debugprintf("progspec: not recursing\n") ;
-#endif
-
 	            if ((rs = fsdir_open(&d,fname)) >= 0) {
 
 	                while ((rs = fsdir_read(&d,&ds)) > 0) {
 	                    del = rs ;
 
-#if	CF_DEBUG
-	                    if (DEBUGLEVEL(4))
-	                        debugprintf("progspec: de name=%s\n",
-	                            ds.name) ;
-#endif
-
 	                    if (ds.name[0] == '.') continue ;
 
 	                    if ((rs = mkpath2(tmpfname,fname,ds.name)) > 0) {
 
-#if	CF_DEBUG
-	                        if (DEBUGLEVEL(4))
-	                            debugprintf("progspec: tmpfname=%s\n",
-	                                tmpfname) ;
-#endif
-
 	                        rs = progfile(pip,pop,tmpfname) ;
-
-#if	CF_DEBUG
-	                        if (DEBUGLEVEL(2))
-	                            debugprintf("progspec: progfile() "
-	                                "rs=%d\n",rs) ;
-#endif
-
-	                        if (rs > 0)
-	                            c += 1 ;
-
+	                        if (rs > 0) c += 1 ;
 	                    } /* end if */
 
 	                    if (progabort(pip) > 0) break ;
@@ -269,11 +194,6 @@ const char	fname[] ;
 
 ret0:
 bad0:
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(2))
-	    debugprintf("progspec: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }

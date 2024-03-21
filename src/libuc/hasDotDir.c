@@ -47,11 +47,11 @@
 
 /* exported subroutines */
 
-bool isDotDir(cchar *dname) noex {
+bool hasDotDir(cchar *dp,int) noex {
 	bool		f = false ;
-	if (dname[0] == '.') {
-	    f = f || (dname[1] == '\0') ;
-	    f = f || ((dname[1] == '.') && (dname[2] == '\0')) ;
+	if (dp[0] == '.') {
+	    f = f || (dp[1] == '\0') ;
+	    f = f || ((dp[1] == '.') && (sp[2] == '\0')) ;
 	}
 	return f ;
 }

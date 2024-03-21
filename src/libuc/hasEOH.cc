@@ -1,10 +1,8 @@
-/* hasEOH */
+/* hasEOH SUPPORT */
+/* lang=C++20 */
 
 /* check for an End-Of-Header (EOH) */
 /* last modified %G% version %I% */
-
-
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 
 
 /* revision history:
@@ -18,34 +16,34 @@
 
 /*******************************************************************************
 
-        Determine if the given string consists of an End-Of-Header (EOH)
-        sequence.
+	Name:
+	hasEOH
 
-	An EOH is a leadering blank like of two sorts:
+	Description:
+	Determine if the given string consists of an End-Of-Header
+	(EOH) sequence.  An EOH is a leadering blank like of two
+	sorts:
 
 	<NL>
 	<CR><NL>
 
 	Synopsis:
-
-	int hasEOH(cchar *sp,int sl)
+	int hasEOH(cchar *sp,int sl) noex
 
 	Arguments:
-
 	sp		string to test
 	sl		length of strin to test
 
 	Returns:
-
-	FALSE		assertion fails
+	false		assertion fails
 	TRUE		assertion succeeds
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -67,12 +65,13 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int hasEOH(cchar *sp,int sl)
-{
-	int		f = FALSE ;
+bool hasEOH(cchar *sp,int sl) noex {
+	int		f = false ;
 	if (sl >  0) {
 	    f = (sp[0] == '\n') ;
 	    f = f || ((sl > 1) && (sp[0] == '\r') && (sp[1] == '\n')) ;

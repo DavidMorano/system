@@ -24,10 +24,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
 #include	<usystem.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 
@@ -52,8 +50,6 @@
 
 /* external subroutines */
 
-extern int	matstr(const char **,const char *,int) ;
-
 
 /* external variables */
 
@@ -69,7 +65,7 @@ extern int	matstr(const char **,const char *,int) ;
 
 /* local variables */
 
-static const char	*fnames[] = {
+static constexpr cpcchar	fnames[] = {
 	STDFNIN,
 	STDFNOUT,
 	STDFNERR,
@@ -78,9 +74,12 @@ static const char	*fnames[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int hasfnamespecial(const char *fp,int fl) noex {
+bool hasfnamespecial(cchar *fp,int fl) noex {
 	return (matstr(fnames,fp,fl) >= 0) ;
 }
 /* end subroutine (hasfnamespecial) */

@@ -56,7 +56,7 @@ INCS= libmailmsg.h
 
 OBJ0_LIBMAILMSG= mailbox.o
 OBJ1_LIBMAILMSG= mailmsghdrval.o
-OBJ2_LIBMAILMSG= mailmsgmatenv.o matthingenv.o
+OBJ2_LIBMAILMSG= mailmsgmatenv.o
 OBJ3_LIBMAILMSG= mailmsgmathdr.o
 
 
@@ -138,6 +138,5 @@ mailmsghdrval.o:	mailmsghdrval.cc	$(INCS)
 mailmsgmatenv.o:	mailmsgmatenv.cc	$(INCS)
 mailmsgmathdr.o:	mailmsgmathdr.cc	$(INCS)
 
-matthingenv.o:		matthingenv.cc matthingenv.h
 
 

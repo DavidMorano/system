@@ -4,7 +4,7 @@
 /* save a bulletin board article */
 /* version %I% last-modified %G% */
 
-#define	CF_UGETPW	1		/* use 'ugetpw(3uc)' */
+#define	CF_PWCACHE	1		/* use 'ugetpw(3uc)' */
 
 /* revision history:
 
@@ -44,7 +44,7 @@
 #include	<getax.h>
 #include	<bfile.h>
 #include	<dater.h>
-#include	<matthingenv.h>
+#include	<mailmsgmatenv.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -72,13 +72,13 @@
 #define	REALNAMELEN	100		/* real name length */
 #endif
 
-#if	CF_UGETPW
-#define	GETPW_NAME	ugetpw_name
-#define	GETPW_UID	ugetpw_uid
+#if	CF_PWCACHE
+#define	GETPW_NAME	ucpwcache_name
+#define	GETPW_UID	ucpwcache_uid
 #else
 #define	GETPW_NAME	getpw_name
 #define	GETPW_UID	getpw_uid
-#endif /* CF_UGETPW */
+#endif /* CF_PWCACHE */
 
 #define	PI		PROGINFO
 #define	AENT		ARTLIST_ENT
@@ -107,6 +107,8 @@ extern char	*timestr_hdate(time_t,char *) ;
 
 
 /* forward references */
+
+static int	matenv(cchar *,int) noex ;
 
 
 /* local variables */
@@ -333,7 +335,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 /* write an envelope if it does not already have one */
 
 	        if ((line == 0) && (! f_envesc) &&
-	            (! matthingenv(lbuf,-1))) {
+	            (! matenv(lbuf,-1))) {
 
 	            bprintf(mfp,
 	                "From %s!%s %s\n",
@@ -346,7 +348,7 @@ int cmd_save(PI *pip,AENT *ap,cc *ngdir,cc *afname,int mode,cc *mailbox) noex {
 
 /* possibly escape all other envelopes (since we added one) */
 
-	        if (f_envesc && matthingenv(lbuf,-1) && (lbuf[0] != '>')) {
+	        if (f_envesc && matenv(lbuf,-1) && (lbuf[0] != '>')) {
 	            bputc(mfp,'>') ;
 	        } /* end if (escaping extra envelopes) */
 
@@ -503,5 +505,15 @@ ret0:
 	return rs ;
 }
 /* end subroutine (cmd_save) */
+
+
+/* local subroutines */
+
+static int matenv(cchar *sp,int sl) noex {
+	mailmsgenv	e ;
+	return mailmsgmatenv(&e,sp,sl) ;
+}
+/* end subroutine (matenv) */
+
 
 
