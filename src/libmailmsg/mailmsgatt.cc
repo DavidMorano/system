@@ -98,12 +98,12 @@ int mailmsgatt_finish(mailmsgatt *op) noex {
 /* end subroutine (mailmsgatt_finish) */
 
 /* add an attachment (w/ default content-type and content-encoding) */
-int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
+int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op && ct && nbuf) {
 	    mailmsgattent	ve ;
-	    if (nlen < 0) nlen = strlen(nbuf) ;
-	    if ((rs = mailmsgattent_start(&ve,ct,ce,nbuf,nlen)) >= 0) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = mailmsgattent_start(&ve,ct,ce,sp,sl)) >= 0) {
 	        cint	esize = sizeof(mailmsgattent) ;
 	        rs = vecitem_add(op,&ve,esize) ;
 	        if (rs < 0) {
