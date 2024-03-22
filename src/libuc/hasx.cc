@@ -404,6 +404,19 @@ bool hasalpha(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasalpha) */
 
+bool hasalnum(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = isalnumlatin(ch) ;
+	    if (f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasalnum) */
+
 bool hasnum(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while (sl && *sp) {
