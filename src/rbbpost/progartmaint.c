@@ -1,11 +1,11 @@
-/* progartmaint */
+/* progartmaint SUPPORT */
+/* lang=C++20 */
 
 /* perform article maintenance on the bb-newgroup spool area */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
-
 
 /* revision history:
 
@@ -18,24 +18,19 @@
 
 /*******************************************************************************
 
-	This subroutine performs article maintenance on the articles int the
-	PCS BB-newsgroup spool area.
-
+	This subroutine performs article maintenance on the articles
+	int the PCS BB-newsgroup spool area.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<fsdirtree.h>
@@ -145,8 +140,6 @@ extern int	mailmsg_loadline(MAILMSG *,cchar *,int) ;
 extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
 extern int	ema_haveaddr(EMA *,cchar *,int) ;
 extern int	emaentry_getbestaddr(EMAENTRY *,cchar **) ;
-
-extern int	hdrextnum(cchar *,int) ;
 
 extern int	progngdname(PROGINFO *,char *,cchar *,int) ;
 

@@ -43,7 +43,7 @@ extern bool hasmacro(cchar *,int) noex ;
 extern bool hasvalidmagic(cchar *,int) noex ;
 extern bool hasnotdots(cchar *,int) noex ;
 extern bool hasnotempty(cchar *,int) noex ;
-static bool haseoh(cchar *,int) noex ;
+extern bool haseoh(cchar *,int) noex ;
 
 extern bool hasallwhite(cchar *,int) noex ;
 extern bool hasalllc(cchar *,int) noex ;

@@ -53,10 +53,10 @@ typedef FDLINER_FL	fdliner_fl ;
 
 EXTERNC_begin
 
-extern int liner_start(fdliner *,int,off_t,int) noex ;
-extern int liner_finish(fdliner *) noex ;
-extern int liner_read(fdliner *,cchar **) noex ;
-extern int liner_done(fdliner *) noex ;
+extern int fdliner_start(fdliner *,int,off_t,int) noex ;
+extern int fdliner_finish(fdliner *) noex ;
+extern int fdliner_read(fdliner *,cchar **) noex ;
+extern int fdliner_done(fdliner *) noex ;
 
 EXTERNC_end
 

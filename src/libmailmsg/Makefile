@@ -139,4 +139,6 @@ mailmsgmatenv.o:	mailmsgmatenv.cc	$(INCS)
 mailmsgmathdr.o:	mailmsgmathdr.cc	$(INCS)
 
 
+hdrextnum.o:		hdrextnum.cc hdrextnum.h
+
 

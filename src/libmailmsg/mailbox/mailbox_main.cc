@@ -52,7 +52,9 @@
 #include	<matxstr.h>
 #include	<lockfile.h>
 #include	<intceil.h>
+#include	<hdrextnum.h>
 #include	<char.h>
+#include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -123,8 +125,6 @@ extern "C" {
 extern "C" {
     extern int	tmpmailboxes(char *,int) noex ;
     extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
-    extern int	hdrextnum(cchar *,int) noex ;
-    extern int	hasEOH(cchar *,int) noex ;
 }
 
 

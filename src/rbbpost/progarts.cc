@@ -1,7 +1,8 @@
-/* progarts */
+/* progarts SUPPORT */
+/* lang=C++20 */
 
 /* process the input messages and spool them up */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
@@ -19,7 +20,6 @@
 #define	CF_NEWSGROUPS	1		/* newsgroups */
 #define	CF_MKARTFILE	1		/* use |mkartfile(3dam)| */
 
-
 /* revision history:
 
 	= 1998-04-01, David A­D­ Morano
@@ -31,31 +31,27 @@
 
 /*******************************************************************************
 
-        This module processes one or more mail messages (in appropriate mailbox
-        format if more than one) on STDIN. The output is a single file that is
-        ready to be added to each individual mailbox in the spool area.
+	This module processes one or more mail messages (in appropriate
+	mailbox format if more than one) on STDIN. The output is a
+	single file that is ready to be added to each individual
+	mailbox in the spool area.
 
 	Things to do:
 
 	Change use of 'sfsubstance()' to 'mkdisphdr()'.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstdlib>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -77,6 +73,7 @@
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<hdrextnum.h>
 #include	<localmisc.h>
 
 #include	"bfliner.h"
@@ -154,24 +151,24 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpyclean(char *,int,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sisub(const char *,int,const char *) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	mkartfile(char *,mode_t,const char *,const char *,int) ;
-extern int	mkbestaddr(char *,int,const char *,int) ;
-extern int	mailmsgmathdr(const char *,int,int *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	hasuc(const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	snwcpyclean(char *,int,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfsub(cchar *,int,cchar *,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sisub(cchar *,int,cchar *) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	mkartfile(char *,mode_t,cchar *,cchar *,int) ;
+extern int	mkbestaddr(char *,int,cchar *,int) ;
+extern int	mailmsgmathdr(cchar *,int,int *) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isprintlatin(int) ;
 extern int	hasEOH(cchar *,int) ;
 extern int	isNotPresent(int) ;
@@ -183,32 +180,31 @@ extern int	proglog_printf(PROGINFO *,cchar *,...) ;
 
 extern int	progprinthdrs(PROGINFO *,bfile *,MAILMSG *,cchar *) ;
 extern int	progprinthdraddrs(PROGINFO *,bfile *,MAILMSG *,cchar *) ;
-extern int	progprinthdremas(PROGINFO *,bfile *,const char *,EMA *) ;
-extern int	progprinthdr(PROGINFO *,bfile *,const char *,
+extern int	progprinthdremas(PROGINFO *,bfile *,cchar *,EMA *) ;
+extern int	progprinthdr(PROGINFO *,bfile *,cchar *,
 			cchar *,int) ;
-extern int	prognamecache_lookup(PROGINFO *,const char *,cchar **) ;
+extern int	prognamecache_lookup(PROGINFO *,cchar *,cchar **) ;
 extern int	progmsgfromema(PROGINFO *,EMA **) ;
-extern int	progexpiration(PROGINFO *,const char **) ;
+extern int	progexpiration(PROGINFO *,cchar **) ;
 
 extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
-extern int	mailmsg_loadline(MAILMSG *,const char *,int) ;
-extern int	ema_haveaddr(EMA *,const char *,int) ;
+extern int	mailmsg_loadline(MAILMSG *,cchar *,int) ;
+extern int	ema_haveaddr(EMA *,cchar *,int) ;
 
-extern int	sfsubstance(const char *,int,const char **) ;
-extern int	mkaddrpart(char *,int,const char *,int) ;
-extern int	hdrextnum(const char *,int) ;
-extern int	hdrextid(char *,int,const char *,int) ;
+extern int	sfsubstance(cchar *,int,cchar **) ;
+extern int	mkaddrpart(char *,int,cchar *,int) ;
+extern int	hdrextid(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
-extern char	*strdcpyclean(char *,int,int,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
+extern char	*strdcpyclean(char *,int,int,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 extern char	*strwset(char *,int,int) ;
 extern char	*timestr_edate(time_t,char *) ;
 extern char	*timestr_hdate(time_t,char *) ;
@@ -233,7 +229,7 @@ struct procdata_flags {
 } ;
 
 struct procdata {
-	const char	*tdname ;
+	cchar	*tdname ;
 	bfile		*ifp ;
 	bfile		*tfp ;
 	vechand		*alp ;
@@ -278,9 +274,9 @@ static int	procmsgout(PROGINFO *,PROCDATA *) ;
 static int	procmsglog(PROGINFO *,PROCDATA *) ;
 
 static int	procmsgenver(PROGINFO *,PROCDATA *,char *,int) ;
-static int	procmsgenvdate(PROGINFO *,char *,int,const char *,int) ;
+static int	procmsgenvdate(PROGINFO *,char *,int,cchar *,int) ;
 static int	procmsgenveraddr(PROGINFO *,PROCDATA *,
-			STACKADDR *,const char *,int,const char *,int) ;
+			STACKADDR *,cchar *,int,cchar *,int) ;
 static int	procmsgenvmk(PROGINFO *,PROCDATA *,char *,int) ;
 
 static int	procmsghdr_messageid(PROGINFO *,PROCDATA *) ;
@@ -329,26 +325,26 @@ static int	procmsgouthdr_deliveredto(PROGINFO *,PROCDATA *) ;
 #endif
 
 static int	proclogenv(PROGINFO *,int,MAILMSG_ENVER *) ;
-static int	procmsglogaddr(PROGINFO *,const char *,
-			const char *,int) ;
-static int	procmsglogema(PROGINFO *,const char *,EMA *) ;
-static int	procmsglog_date(PROGINFO *,const char *,int) ;
+static int	procmsglogaddr(PROGINFO *,cchar *,
+			cchar *,int) ;
+static int	procmsglogema(PROGINFO *,cchar *,EMA *) ;
+static int	procmsglog_date(PROGINFO *,cchar *,int) ;
 
-static int	cheapspamcheck(PROGINFO *,const char *,int) ;
-static int	vcmpheadname(const char **,const char **) ;
+static int	cheapspamcheck(PROGINFO *,cchar *,int) ;
+static int	vcmpheadname(cchar **,cchar **) ;
 
 static int	mkarticlefile(PROGINFO *,PROCDATA *,char *,
-			const char *) ;
-static int	mknewhdrname(char *,int,const char *) ;
+			cchar *) ;
+static int	mknewhdrname(char *,int,cchar *) ;
 
 
 /* local variables */
 
 #ifdef	COMMENT
-static const char	atypes[] = "LUIR" ;	/* address types */
+static cchar	atypes[] = "LUIR" ;	/* address types */
 #endif
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 static int (*msghdrgets[])(PROGINFO *,PROCDATA *) = {
 	procmsghdr_messageid,
@@ -395,7 +391,7 @@ static int (*msgouthdrs[])(PROGINFO *,PROCDATA *) = {
 } ;
 
 /* mark the following headers as done since we "do" them at the end */
-static const char	*hdrspecials[] = {
+static cchar	*hdrspecials[] = {
 	"status",
 	"references",
 	"from",
@@ -442,7 +438,7 @@ vecstr		*nlp ;
 	    blp = &pd.bline ;
 	if ((rs = bfliner_start(blp,ifp,0L,-1)) >= 0) {
 	        int		ll = 0 ;
-	        const char	*lp ;
+	        cchar	*lp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -584,7 +580,7 @@ int		f_eoh ;
 
 	if ((rs = mailmsg_start(msgp)) >= 0) {
 	    int		ll ;
-	    const char	*lp ;
+	    cchar	*lp ;
 	    pdp->msgp = msgp ;
 
 /* process the MAILMSG file */
@@ -780,7 +776,7 @@ int		alen ;
 	int		ai = 0 ;
 	int		c = 0 ;
 	int		f_remote ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		*ap = abuf ;
 	char		*sap = abuf ;
 	char		*addr = NULL ;
@@ -797,7 +793,7 @@ int		alen ;
 	        MAILMSG_ENVER	*mep = &me ;
 	        EMAINFO		ai ;
 	        int		froml = -1 ;
-	        const char	*fromp = NULL ;
+	        cchar	*fromp = NULL ;
 
 	        if (pip->open.logenv)
 		    rs = proclogenv(pip,i,mep) ;
@@ -823,7 +819,7 @@ int		alen ;
 	        }
 
 		if (rs >= 0) {
-	            const char	*hp = mep->r.ep ;
+	            cchar	*hp = mep->r.ep ;
 	            const int	hl = mep->r.el ;
 	            if (strnchr(fromp,froml,'@') != NULL) {
 		        rs = procmsgenveraddr(pip,pdp,&s,hp,hl,fromp,froml) ;
@@ -838,7 +834,7 @@ int		alen ;
 #endif
 		    }
 		    if ((rs >= 0) && pip->open.logprog) {
-			const char	*fmt ;
+			cchar	*fmt ;
 			if (hp != NULL) {
 			    fmt = "  env %t!%t" ;
 		    	    proglog_printf(pip,fmt,hp,hl,fromp,froml) ;
@@ -872,9 +868,9 @@ static int procmsgenveraddr(pip,pdp,sap,hp,hl,up,ul)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 STACKADDR	*sap ;
-const char	*hp ;
+cchar	*hp ;
 int		hl ;
-const char	*up ;
+cchar	*up ;
 int		ul ;
 {
 	int		rs ;
@@ -905,7 +901,7 @@ static int procmsgenvdate(pip,dbuf,dlen,ep,el)
 PROGINFO	*pip ;
 char		dbuf[] ;
 int		dlen ;
-const char	*ep ;
+cchar	*ep ;
 int		el ;
 {
 	int		rs = SR_OK ;
@@ -979,8 +975,8 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 	int		vl ;
 	int		ml = 0 ;
 	int		f_messageid = FALSE ;
-	const char	*hdr = HN_MESSAGEID ;
-	const char	*vp ;
+	cchar	*hdr = HN_MESSAGEID ;
+	cchar	*vp ;
 	char		mbuf[MAILADDRLEN+1] = { 0 } ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
@@ -1034,9 +1030,9 @@ static int procmsghdr_messageid(PROGINFO *pip,PROCDATA *pdp)
 
 	if ((rs >= 0) && pip->f.logmsg) {
 	    int	f_first = TRUE ;
-	    const char	*fmt ;
-	    const char	*mp = mbuf ;
-	    const char	*cp ;
+	    cchar	*fmt ;
+	    cchar	*mp = mbuf ;
+	    cchar	*cp ;
 	    int		cl ;
 
 	    while (ml > 0) {
@@ -1072,8 +1068,8 @@ static int procmsghdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 	VECSTR		*hlp = &pdp->wh ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_ARTICLEID ;
-	const char	*vp ;
+	cchar	*hdr = HN_ARTICLEID ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    vl = rs ;
@@ -1083,7 +1079,7 @@ static int procmsghdr_articleid(PROGINFO *pip,PROCDATA *pdp)
 		    const int	mlen = MAXNAMELEN ;
 		    char	mbuf[MAXNAMELEN+1] ;
 	            if ((rs = hdrextid(mbuf,mlen,vp,vl)) >= 0) {
-			const char	*fmt = "  prev-articleid=%t" ;
+			cchar	*fmt = "  prev-articleid=%t" ;
 	                proglog_printf(pip,fmt,mbuf,rs) ;
 	            } else if ((rs == SR_NOTFOUND) || isNotValid(rs))
 	                rs = SR_OK ;
@@ -1108,8 +1104,8 @@ PROCDATA	*pdp ;
 	VECSTR		*hlp = &pdp->wh ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_NEWSGROUPS ;
-	const char	*vp ;
+	cchar	*hdr = HN_NEWSGROUPS ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    vl = rs ;
@@ -1141,8 +1137,8 @@ PROCDATA	*pdp ;
 	VECSTR		*hlp = &pdp->wh ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_CLEN ;
-	const char	*vp ;
+	cchar	*hdr = HN_CLEN ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    vl = rs ;
@@ -1216,8 +1212,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs = SR_OK ;
 	int		vl ;
-	const char	*hdr = HN_XMAILER ;
-	const char	*vp ;
+	cchar	*hdr = HN_XMAILER ;
+	cchar	*vp ;
 
 #if	CF_XMAILER
 	if (pip->f.logmsg) {
@@ -1234,7 +1230,7 @@ PROCDATA	*pdp ;
 #endif
 
 	    for (i = 0 ; (vl = mailmsg_hdrival(msgp,hdr,i,&vp)) >= 0 ; i += 1) {
-	        const char	*fmt ;
+	        cchar	*fmt ;
 
 	        proglog_printf(pip,"  xmailer %u",(n - i - 1)) ;
 
@@ -1261,8 +1257,8 @@ PROCDATA	*pdp ;
 	const int	salen = STACKADDRLEN ;
 	int		rs = SR_OK ;
 	int		vl ;
-	const char	*hdr = HN_RECEIVED ;
-	const char	*vp ;
+	cchar	*hdr = HN_RECEIVED ;
+	cchar	*vp ;
 	char		dbuf[DATEBUFLEN+1] ;
 	char		sabuf[STACKADDRLEN+1] ;
 
@@ -1297,9 +1293,9 @@ PROCDATA	*pdp ;
 	        if ((rs = received_start(&rh,vp,vl)) >= 0) {
 	            int		rl ;
 	            int		j ;
-	            const char	*fmt ;
-	            const char	*sp ;
-	            const char	*rp ;
+	            cchar	*fmt ;
+	            cchar	*sp ;
+	            cchar	*rp ;
 
 	            ri = (n - 1) - i ;
 	            proglog_printf(pip,"  received %u",ri) ;
@@ -1333,7 +1329,7 @@ PROCDATA	*pdp ;
 	                        rs = dater_mkstrdig(dp,dbuf,dlen) ;
 
 			    } else {
-				const char *fmt = "** bad date-spec (%d) **" ;
+				cchar *fmt = "** bad date-spec (%d) **" ;
 				sp = dbuf ;
 				bufprintf(dbuf,dlen,fmt,rs1) ;
 			    }
@@ -1386,8 +1382,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_REPLYTO ;
-	const char	*vp ;
+	cchar	*hdr = HN_REPLYTO ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    const int	at = articleaddr_replyto ;
@@ -1413,8 +1409,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_ERRORSTO ;
-	const char	*vp ;
+	cchar	*hdr = HN_ERRORSTO ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    const int	at = articleaddr_errorsto ;
@@ -1440,8 +1436,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_SENDER ;
-	const char	*vp ;
+	cchar	*hdr = HN_SENDER ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    const int	at = articleaddr_sender ;
@@ -1467,8 +1463,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_DELIVEREDTO ;
-	const char	*vp ;
+	cchar	*hdr = HN_DELIVEREDTO ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    const int	at = articleaddr_deliveredto ;
@@ -1494,8 +1490,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_XORIGINALTO ;
-	const char	*vp ;
+	cchar	*hdr = HN_XORIGINALTO ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) >= 0) {
 	    const int	at = articleaddr_xoriginalto ;
@@ -1520,8 +1516,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs = SR_OK ;
 	int		hl ;
-	const char	*hdr = HN_XPRIORITY ;
-	const char	*hp ;
+	cchar	*hdr = HN_XPRIORITY ;
+	cchar	*hp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1536,9 +1532,9 @@ PROCDATA	*pdp ;
 	debugprintf("progmsgs/procmsghdr_xpriority: h=%t\n",hp,hl) ;
 #endif
 	    if ((rs = comparse_start(&com,hp,hl)) >= 0) {
-		const char	*vp ;
+		cchar	*vp ;
 	        if ((rs = comparse_getval(&com,&vp)) > 0) {
-		    const char	*cp ;
+		    cchar	*cp ;
 		    int		vl = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1549,7 +1545,7 @@ PROCDATA	*pdp ;
 		        const int	hlen = HDRNAMELEN ;
 		        int		cl = rs ;
 			int		hnl ;
-		        const char	*hnp = hdr ;
+		        cchar	*hnp = hdr ;
 		        char		hbuf[HDRNAMELEN + 1] ;
 
 		        if ((rs = mknewhdrname(hbuf,hlen,hdr)) > 0) {
@@ -1559,7 +1555,7 @@ PROCDATA	*pdp ;
 	                        hnl = strlen(hnp) ;
 
 		        if (rs >= 0) {
-			    const char	*fmt = "  %t=%t (%t)" ;
+			    cchar	*fmt = "  %t=%t (%t)" ;
 			    if (vl > plen) vl = plen ;
 			    if (cl > plen) cl = plen ;
 			    if (cl == 0) fmt = "  %t=%t" ;
@@ -1691,7 +1687,7 @@ PROCDATA	*pdp ;
 	const int	zoff = pip->now.timezone ;
 	int		rs ;
 	int		tlen = 0 ;
-	const char	*znp = pip->zname ;
+	cchar	*znp = pip->zname ;
 
 	if ((rs = dater_settimezon(tdp,dt,zoff,znp,isdst)) >= 0) {
 
@@ -1714,7 +1710,7 @@ PROCDATA	*pdp ;
 
 	    if (rs >= 0) {
 	        const int	st = articlestr_envfrom ;
-		const char	*sp ;
+		cchar	*sp ;
 
 	        if ((rs = article_getstr(aip,st,&sp)) >= 0) {
 	            const int	dlen = DATEBUFLEN ;
@@ -1726,7 +1722,7 @@ PROCDATA	*pdp ;
 	}
 #endif
 	            if ((rs = dater_mkstd(tdp,dbuf,dlen)) >= 0) {
-		        const char	*fmt = "From %s %s\n" ;
+		        cchar	*fmt = "From %s %s\n" ;
 	                rs = bprintf(pdp->tfp,fmt,sp,dbuf) ;
 	                pdp->tlen += rs ;
 	                tlen += rs ;
@@ -1792,8 +1788,8 @@ PROCDATA	*pdp ;
 	BUFFER		b ;
 	int		rs ;
 	int		vl  = 0 ;
-	const char	*hdr = "x-env" ;
-	const char	*vp ;
+	cchar	*hdr = "x-env" ;
+	cchar	*vp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1809,8 +1805,8 @@ PROCDATA	*pdp ;
 	        MAILMSG_ENVER	*mep = &me ;
 	   	const int	hl = mep->r.el ;
 	        int		froml = mep->a.el ;
-	        const char	*hp = mep->r.ep ;
-	        const char	*fromp = mep->a.ep ;
+	        cchar	*hp = mep->r.ep ;
+	        cchar	*fromp = mep->a.ep ;
 
 		buffer_reset(&b) ;
 
@@ -1820,13 +1816,13 @@ PROCDATA	*pdp ;
 	        }
 
 	        if (rs >= 0) {
-		    const char	*cp = mep->d.ep ;
+		    cchar	*cp = mep->d.ep ;
 		    const int	cl = mep->d.el ;
 	            rs = procmsgenvdate(pip,dbuf,dlen,cp,cl) ;
 		}
 
 		if (rs >= 0) {
-		    const char	*bp ;
+		    cchar	*bp ;
 		    buffer_strw(&b,dbuf,-1) ;
 		    buffer_char(&b,' ') ;
 		    if (hp != NULL) {
@@ -1858,8 +1854,8 @@ PROCDATA	*pdp ;
 	VECSTR		*hlp = &pdp->wh ;
 	int		rs ;
 	int		vl  = 0 ;
-	const char	*hdr = HN_RETURNPATH ;
-	const char	*vp ;
+	cchar	*hdr = HN_RETURNPATH ;
+	cchar	*vp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1880,7 +1876,7 @@ PROCDATA	*pdp ;
 
 	} else if (((rs >= 0) && (vl == 0)) || (rs == SR_NOTFOUND)) {
 	    const int	st = articlestr_envfrom ;
-	    const char	*sp ;
+	    cchar	*sp ;
 
 	    if ((rs = article_getstr(aip,st,&sp)) >= 0) {
 	        rs = progprinthdr(pip,pdp->tfp,hdr,sp,-1) ;
@@ -1902,7 +1898,7 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	VECSTR		*hlp = &pdp->wh ;
 	int		rs ;
-	const char	*hdr = HN_RECEIVED ;
+	cchar	*hdr = HN_RECEIVED ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1938,7 +1934,7 @@ PROCDATA	*pdp ;
 	ARTICLE		*aip = pdp->aip ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs = SR_OK ;
-	const char	*hdr = HN_CLEN ;
+	cchar	*hdr = HN_CLEN ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -1976,7 +1972,7 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	VECSTR		*hlp = &pdp->wh ;
 	int		rs = SR_OK ;
-	const char	*hdr = HN_CLINES ;
+	cchar	*hdr = HN_CLINES ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -2022,8 +2018,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	const int	st = articlestr_messageid ;
 	int		rs ;
-	const char	*hdr = HN_MESSAGEID ;
-	const char	*sp ;
+	cchar	*hdr = HN_MESSAGEID ;
+	cchar	*sp ;
 
 	if ((rs = article_getstr(aip,st,&sp)) >= 0) {
 	    bfile	*tfp = pdp->tfp ;
@@ -2061,7 +2057,7 @@ PROCDATA	*pdp ;
 	int		rs1 ;
 	int		i ;
 	int		kl ;
-	const char	*kp ;
+	cchar	*kp ;
 	char		hdrname[HDRNAMELEN+1] ;
 
 #if	CF_DEBUG
@@ -2120,8 +2116,8 @@ PROCDATA	*pdp ;
 	const int	slen = 10 ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_STATUS ;
-	const char	*vp ;
+	cchar	*hdr = HN_STATUS ;
+	cchar	*vp ;
 	char		sbuf[10+1] ;
 
 #if	CF_DEBUG
@@ -2167,7 +2163,7 @@ PROCDATA	*pdp ;
 	ARTICLE		*aip = pdp->aip ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
-	const char	*hdr = HN_REFERENCES ;
+	cchar	*hdr = HN_REFERENCES ;
 
 	if ((rs = mailmsg_hdrcount(msgp,hdr)) > 0) {
 	    rs = progprinthdrs(pip,pdp->tfp,msgp,hdr) ;
@@ -2188,8 +2184,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_FROM ;
-	const char	*vp ;
+	cchar	*hdr = HN_FROM ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) > 0) {
 	    vl = rs ;
@@ -2226,8 +2222,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_TO ;
-	const char	*vp ;
+	cchar	*hdr = HN_TO ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) > 0) {
 	    vl = rs ;
@@ -2253,8 +2249,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_CC ;
-	const char	*vp ;
+	cchar	*hdr = HN_CC ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) > 0) {
 	    vl = rs ;
@@ -2280,8 +2276,8 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		vl ;
-	const char	*hdr = HN_BCC ;
-	const char	*vp ;
+	cchar	*hdr = HN_BCC ;
+	cchar	*vp ;
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) > 0) {
 	    vl = rs ;
@@ -2307,7 +2303,7 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs ;
 	int		tlen = 0 ;
-	const char	*hdr = HN_DATE ;
+	cchar	*hdr = HN_DATE ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2316,7 +2312,7 @@ PROCDATA	*pdp ;
 
 	if ((rs = mailmsg_hdrcount(msgp,hdr)) > 0) {
 	    int		vl ;
-	    const char	*vp ;
+	    cchar	*vp ;
 
 	    rs = progprinthdrs(pip,pdp->tfp,msgp,hdr) ;
 	    pdp->tlen += rs ;
@@ -2355,7 +2351,7 @@ PROCDATA	*pdp ;
 		time_t		dt = pip->daytime ;
 		const int	isdst = pip->now.dstflag ;
 		const int	zoff = pip->now.timezone ;
-		const char	*znp = pip->zname ;
+		cchar	*znp = pip->zname ;
 		edp = &pip->td ;
 		rs = dater_settimezon(edp,dt,zoff,znp,isdst) ;
 	    } /* end if */
@@ -2364,7 +2360,7 @@ PROCDATA	*pdp ;
 		char		dbuf[DATEBUFLEN+1] ;
 		if ((rs = dater_mkmsg(edp,dbuf,dlen)) >= 0) {
 		    int		dl = rs ;
-		    const char	*fmt = "%s: %t\n" ;
+		    cchar	*fmt = "%s: %t\n" ;
 	            rs = bprintf(pdp->tfp,fmt,hdr,dbuf,dl) ;
 	            pdp->tlen += rs ;
 	            tlen += rs ;
@@ -2391,8 +2387,8 @@ PROCDATA	*pdp ;
 	int		rs ;
 	int		rs1 ;
 	int		vl ;
-	const char	*hdr = HN_SUBJECT ;
-	const char	*vp ;
+	cchar	*hdr = HN_SUBJECT ;
+	cchar	*vp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2400,7 +2396,7 @@ PROCDATA	*pdp ;
 #endif
 
 	if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) > 0) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    int		cl ;
 	    vl = rs ;
 
@@ -2448,7 +2444,7 @@ PROCDATA	*pdp ;
 	    } /* end if */
 
 	} else if ((rs == 0) || (rs == SR_NOTFOUND)) {
-	    const char	*sp = pip->msgsubject ;
+	    cchar	*sp = pip->msgsubject ;
 	    rs = SR_OK ;
 	    if ((sp != NULL) && (sp[0] != '\0')) {
 
@@ -2486,12 +2482,12 @@ PROCDATA	*pdp ;
 {
 	MAILMSG		*msgp = pdp->msgp ;
 	int		rs = SR_OK ;
-	const char	*hdr = HN_EXPIRES ;
+	cchar	*hdr = HN_EXPIRES ;
 
 	if (pip->ti_expires > 0) {
-	    const char	*vp ;
+	    cchar	*vp ;
 	    if ((rs = mailmsg_hdrval(msgp,hdr,&vp)) == SR_NOTFOUND) {
-		const char	*sp ;
+		cchar	*sp ;
 	        if ((rs = progexpiration(pip,&sp)) > 0) {
 	            rs = progprinthdr(pip,pdp->tfp,hdr,sp,rs) ;
 	            pdp->tlen += rs ;
@@ -2512,7 +2508,7 @@ PROCDATA	*pdp ;
 	MAILMSG		*msgp = pdp->msgp ;
 	const int	st = articlestr_articleid ;
 	int		rs ;
-	const char	*sp ;
+	cchar	*sp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2521,7 +2517,7 @@ PROCDATA	*pdp ;
 
 	if ((rs = article_getstr(aip,st,&sp)) >= 0) {
 	    bfile	*tfp = pdp->tfp ;
-	    const char	*hdr = HN_ARTICLEID ;
+	    cchar	*hdr = HN_ARTICLEID ;
 	    rs = bprintf(tfp,"%s: %s\n",hdr,sp) ;
 	} else if (rs == SR_NOTFOUND)
 	    rs = SR_OK ;
@@ -2546,7 +2542,7 @@ PROCDATA	*pdp ;
 	bfile		*tfp = pdp->tfp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	const char	*hdr = HN_NEWSGROUPS ;
+	cchar	*hdr = HN_NEWSGROUPS ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2571,8 +2567,8 @@ PROCDATA	*pdp ;
 	            int		i ;
 		    int		nl ;
 		    int		bl ;
-		    const char	*np ;
-		    const char	*bp ;
+		    cchar	*np ;
+		    cchar	*bp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2644,8 +2640,8 @@ PROCDATA	*pdp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		vl ;
-	const char	*hdr = HN_DELIVEREDTO ;
-	const char	*vp ;
+	cchar	*hdr = HN_DELIVEREDTO ;
+	cchar	*vp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2668,11 +2664,11 @@ PROCDATA	*pdp ;
 #endif
 
 	    for (i = 0 ; vecobj_get(rlp,i,&rp) >= 0 ; i += 1) {
-	        const char	*cp ;
+	        cchar	*cp ;
 		if (rp == NULL) continue ;
 		if ((rs = recip_get(rp,&cp)) > 0) {
 		    int		cl = rs ;
-		    const char	*np ;
+		    cchar	*np ;
 
 #if	CF_DEBUG
 		    if (DEBUGLEVEL(4))
@@ -2781,7 +2777,7 @@ PROCDATA	*pdp ;
 	int		tlen = 0 ;
 	int		f_bol = TRUE ;
 	int		f_eol = FALSE ;
-	const char	*lp ;
+	cchar	*lp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4)) {
@@ -3061,14 +3057,14 @@ static int procmsgct(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
-	const char	*hp ;
+	cchar	*hp ;
 
 	pdp->f.ct_plaintext = TRUE ;
 	if ((hl = mailmsg_hdrval(msgp,HN_CTYPE,&hp)) > 0) {
 	MHCOM		c ;
 	int		vl ;
-	const char	*tp ;
-	const char	*vp ;
+	cchar	*tp ;
+	cchar	*vp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -3114,14 +3110,14 @@ static int procmsgce(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
-	const char	*hp ;
+	cchar	*hp ;
 
 	pdp->f.ce_text = TRUE ;
 	if ((hl = mailmsg_hdrval(msgp,HN_CENCODING,&hp)) > 0) {
 	COMPARSE	com ;
 	int		hl, vl ;
-	const char	*tp ;
-	const char	*vp ;
+	cchar	*tp ;
+	cchar	*vp ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -3167,7 +3163,7 @@ static int procmsghdrval(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp,
 	int		rs ;
 	int		vl ;
 	int		v = -1 ;
-	const char	*vp ;
+	cchar	*vp ;
 
 	if (hname == NULL) return SR_FAULT ;
 
@@ -3193,8 +3189,8 @@ static int procmsghdrval(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp,
 static int procmsgaddr(pip,at,hdrname,ap,al)
 PROGINFO	*pip ;
 int		at ;
-const char	hdrname[] ;
-const char	*ap ;
+cchar	hdrname[] ;
+cchar	*ap ;
 int		al ;
 {
 	EMA		a ;
@@ -3207,9 +3203,9 @@ int		al ;
 	int		cl ;
 	int		c = 0 ;
 	int		f_route = FALSE ;
-	const char	*sp ;
-	const char	*cp ;
-	const char	*hnp = hdrname ;
+	cchar	*sp ;
+	cchar	*cp ;
+	cchar	*hnp = hdrname ;
 	char		hbuf[HDRNAMELEN + 1] ;
 
 	if (ap == NULL) return SR_FAULT ;
@@ -3369,8 +3365,8 @@ static int procspam(PROGINFO *pip,PROCDATA *pdp,MAILMSG *msgp)
 
 static int procmsglogaddr(pip,hdrname,ap,al)
 PROGINFO	*pip ;
-const char	hdrname[] ;
-const char	*ap ;
+cchar	hdrname[] ;
+cchar	*ap ;
 int		al ;
 {
 	EMA		a ;
@@ -3404,7 +3400,7 @@ int		al ;
 
 static int procmsglogema(pip,hdrname,emap)
 PROGINFO	*pip ;
-const char	hdrname[] ;
+cchar	hdrname[] ;
 EMA		*emap ;
 {
 	EMA_ENT		*ep ;
@@ -3415,9 +3411,9 @@ EMA		*emap ;
 	int		hnl = -1 ;
 	int		c = 0 ;
 	int		f_route = FALSE ;
-	const char	*sp ;
-	const char	*cp ;
-	const char	*hnp = hdrname ;
+	cchar	*sp ;
+	cchar	*cp ;
+	cchar	*hnp = hdrname ;
 
 	if (pip->f.logmsg) {
 	    const int	hlen = HDRNAMELEN ;
@@ -3486,7 +3482,7 @@ EMA		*emap ;
 
 static int procmsglog_date(pip,vp,vl)
 PROGINFO	*pip ;
-const char	*vp ;
+cchar	*vp ;
 int		vl ;
 {
 	DATER		*tdp = &pip->td ;
@@ -3545,8 +3541,8 @@ MAILMSG		*msgp ;
 	int		rs1 ;
 	int		sl, cl ;
 	int		f_spam = FALSE ;
-	const char	*tp, *sp ;
-	const char	*cp ;
+	cchar	*tp, *sp ;
+	cchar	*cp ;
 
 #if	defined(HN_SPAMFLAG)
 	rs1 = mailmsg_hdrval(msgp,HN_SPAMFLAG,&sp) ;
@@ -3586,8 +3582,8 @@ MAILMSG		*msgp ;
 	int		rs1 ;
 	int		sl, cl ;
 	int		f_spam = FALSE ;
-	const char	*tp, *sp ;
-	const char	*cp ;
+	cchar	*tp, *sp ;
+	cchar	*cp ;
 
 #if	defined(HN_SPAMSTATUS)
 	rs1 = mailmsg_hdrval(msgp,HN_SPAMSTAUS,&sp) ;
@@ -3627,8 +3623,8 @@ MAILMSG		*msgp ;
 	int		rs1 ;
 	int		sl, cl ;
 	int		f_spam = FALSE ;
-	const char	*tp, *sp ;
-	const char	*cp ;
+	cchar	*tp, *sp ;
+	cchar	*cp ;
 
 #if	defined(HN_BOGOSITY)
 	rs1 = mailmsg_hdrval(msgp,HN_BOGOSITY,&sp) ;
@@ -3664,8 +3660,8 @@ static int proclogenv(PROGINFO *pip,int ei,MAILMSG_ENVER *mep)
 {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*cp ;
-	const char	*fmt ;
+	cchar	*cp ;
+	cchar	*fmt ;
 
 	if (pip->open.logenv) {
 
@@ -3720,12 +3716,12 @@ static int proclogenv(PROGINFO *pip,int ei,MAILMSG_ENVER *mep)
 
 static int cheapspamcheck(pip,buf,buflen)
 PROGINFO	*pip ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int		sl, cl ;
-	const char	*sp, *cp ;
-	const char	*tp ;
+	cchar	*sp, *cp ;
+	cchar	*tp ;
 
 	sp = buf ;
 	sl = (buflen < 0) ? strlen(buf) : buflen ;
@@ -3766,17 +3762,17 @@ static int mkarticlefile(pip,pdp,afname,tdname)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 char		afname[] ;
-const char	tdname[] ;
+cchar	tdname[] ;
 {
 	ARTICLE		*aip = pdp->aip ;
 	const mode_t	om = 0664 ;
 	const int	mi = pdp->mi ;
 	int		rs ;
-	const char	*nn = pip->nodename ;
+	cchar	*nn = pip->nodename ;
 
 	    if ((rs = mkartfile(afname,om,tdname,nn,mi)) >= 0) {
 		int		al ;
-		const char	*ap ;
+		cchar	*ap ;
 		if ((al = sfbasename(afname,rs,&ap)) > 0) {
 		    const int	st = articlestr_articleid ;
 		    rs = article_addstr(aip,st,ap,al) ;
@@ -3799,7 +3795,7 @@ static int mkarticlefile(pip,pdp,afname,tdname)
 PROGINFO	*pip ;
 PROCDATA	*pdp ;
 char		afname[] ;
-const char	tdname[] ;
+cchar	tdname[] ;
 {
 	ARTICLE		*aip = pdp->aip ;
 	const mode_t	om = 0664 ;
@@ -3814,7 +3810,7 @@ const char	tdname[] ;
 	if ((rs = mkpath2(inname,tdname,tmpcname)) >= 0) {
 	    if ((rs = mktmpfile(afname,om,inname)) >= 0) {
 		int		al ;
-		const char	*ap ;
+		cchar	*ap ;
 		if ((al = sfbasename(afname,rs,&ap)) > 0) {
 		    const int	st = articlestr_articleid ;
 		    rs = article_addstr(aip,st,ap,al) ;
@@ -3840,7 +3836,7 @@ const char	tdname[] ;
 static int mknewhdrname(hbuf,hlen,hdrname)
 char		hbuf[] ;
 int		hlen ;
-const char	hdrname[] ;
+cchar	hdrname[] ;
 {
 	int		rs = SR_OK ;
 	int		rlen = hlen ;
@@ -3868,10 +3864,7 @@ const char	hdrname[] ;
 /* end subroutine (mknewhdrname) */
 
 
-static int vcmpheadname(e1pp,e2pp)
-const char	**e1pp, **e2pp ;
-{
-
+static int vcmpheadname(cchar **e1pp,cchar  **e2pp) noex {
 	if ((*e1pp == NULL) && (*e2pp == NULL))
 	    return 0 ;
 

@@ -1,18 +1,17 @@
-/* mhcom */
+/* mhcom SUPPORT */
+/* lang=C++20 */
 
 /* comment-separate (parse) a mail header field value */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_STRIPESC	1		/* strip escape characters */
 
-
 /* revision history:
 
 	= 2002-05-29, David A­D­ Morano
-        This code was adapted from the EMA (E-Mail Address) code (which does a
-        similar function).
-
+	This code was adapted from the EMA (E-Mail Address) code
+	(which does a similar function).
 
 */
 
@@ -20,21 +19,18 @@
 
 /*******************************************************************************
 
-	This object separates comment characters from the value characters in a
-	mail message header field value.  Comment characters are introduced
-	with parentheses.  See RFC-822 for more information on how comments
-	operate within header field values.
-
+	This object separates comment characters from the value
+	characters in a mail message header field value.  Comment
+	characters are introduced with parentheses.  See RFC-822
+	for more information on how comments operate within header
+	field values.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<char.h>
@@ -59,13 +55,13 @@
 
 /* forward references */
 
-static int mhcom_bake(MHCOM *,int,const char *,int) ;
+static int mhcom_bake(MHCOM *,int,cchar *,int) ;
 
 
 /* local variables */
 
 #if	CF_DEBUGS
-static const char	*statename[] = {
+static cchar	*statename[] = {
 	    "value",
 	    "comment",
 	    NULL

@@ -1,16 +1,15 @@
-/* hdrextnum */
+/* hdrextnum SUPPORT */
+/* lang=C++20 */
 
 /* comment separate (parse) a mail header field value */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2004-05-29, David A­D­ Morano
-        This code was adapted from the EMA (E-Mail Address) code (which has code
-        that does a similar function).
+	This code was adapted from the EMA (E-Mail Address) code
+	(which has code that does a similar function).
 
 */
 
@@ -18,41 +17,57 @@
 
 /*******************************************************************************
 
-        This subroutine extracts a numeric value from the characters in a mail
-        message header field value. This is not meant for use with mail
-        addresses (although they certainly need to be comment-separated) but
-        rather with shorter fixed-length header field values. This subroutine
-        was especially created to extract the numeric value element from the
-        CONTENT-LENGTH header field value!
+	Name:
+	hdrextnum
 
+	This subroutine extracts a numeric value from the characters
+	in a mail message header field value. This is not meant for
+	use with mail addresses (although they certainly need to
+	be comment-separated) but rather with shorter fixed-length
+	header field values. This subroutine was especially created
+	to extract the numeric value element from the CONTENT-LENGTH
+	header field value!
+
+	Synopsis:
+	int hdrextnum(cchar *sp,int sl) noex
+
+	Arguments:
+	sp		source c-string pointer
+	sl		source c-string length
+
+	Returns:
+	>=0		the value extracted (always positive)
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<ascii.h>
-#include	<localmisc.h>
+#include	<six.h>
+#include	<cfdec.h>
+#include	<char.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
+
+#include	"hdrextnum.h"
 
 
 /* local defines */
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	sibreak(const char *,int,const char *) ;
+
+/* external variables */
 
 
 /* local structures */
@@ -60,32 +75,32 @@ extern int	sibreak(const char *,int,const char *) ;
 
 /* forward references */
 
-extern int	hdrextnum_ext(char *,const char *,int) ;
+extern int	hdrextnum_ext(char *,cchar *,int) noex ;
 
 
 /* local variables */
 
+constexpr int	digbuflen = DIGBUFLEN ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int hdrextnum(cchar *sp,int sl)
-{
-	int		rs ;
+int hdrextnum(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
 	int		v = 0 ;
-	char		digbuf[DIGBUFLEN + 1] ;
-
-	if (sp == NULL) return SR_FAULT ;
-
-	if ((rs = hdrextnum_ext(digbuf,sp,sl)) > 0) {
-	    int		len = rs ;
-	    int		si ;
-	    if ((si = sibreak(digbuf,len," \t")) >= 0) {
-		len = si ;
+	if (sp) {
+	    char	digbuf[digbuflen + 1] ;
+	    if ((rs = hdrextnum_ext(digbuf,sp,sl)) > 0) {
+	        int	len = rs ;
+	        if (int si ; (si = sibreak(digbuf,len," \t")) >= 0) {
+		    len = si ;
+	        }
+	        rs = cfdeci(digbuf,len,&v) ;
 	    }
-	    rs = cfdeci(digbuf,len,&v) ;
-	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (hdrextnum) */
@@ -93,40 +108,26 @@ int hdrextnum(cchar *sp,int sl)
 
 /* local subroutines */
 
-
-int hdrextnum_ext(char *digbuf,cchar *sp,int sl)
-{
-	SBUF		b ;
+int hdrextnum_ext(char *digbuf,cchar *sp,int sl) noex {
+	sbuf		b ;
 	int		rs ;
 	int		vl = 0 ;
-
-	if (sl < 0)
-	    sl = strlen(sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("hdrextnum: ent s=>%t<\n",sp,sl) ;
-#endif /* CF_DEBUGS */
-
+	if (sl < 0) sl = strlen(sp) ;
 /* skip over any leading white space */
-
 	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	}
-
 /* initialize for this entry */
-
-	if ((rs = sbuf_start(&b,digbuf,DIGBUFLEN)) >= 0) {
+	if ((rs = sbuf_start(&b,digbuf,digbuflen)) >= 0) {
 	    int		ch ;
 	    int		c_comment = 0 ;
-	    int		f_quote = FALSE ;
-	    int		f_wslast = FALSE ;
-	    int		f_wsnew = FALSE ;
-	    int		f_exit = FALSE ;
-
+	    bool	f_quote = false ;
+	    bool	f_wslast = false ;
+	    bool	f_wsnew = false ;
+	    bool	f_exit = false ;
 	    while ((sl >= 0) && (*sp != '\0')) {
-
-	        f_wsnew = FALSE ;
+	        f_wsnew = false ;
 	        ch = (*sp & 0xff) ;
 	        switch (ch) {
 	        case '\\':
@@ -193,7 +194,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl)
 	                sp += 1 ;
 	                sl -= 1 ;
 	            } else
-	                f_exit = TRUE ;
+	                f_exit = true ;
 	            break ;
 	        case ' ':
 	        case '\t':
@@ -204,7 +205,7 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl)
 	                sp += 1 ;
 	                sl -= 1 ;
 	            }
-	            f_wsnew = TRUE ;
+	            f_wsnew = true ;
 	            break ;
 	        default:
 	            if (c_comment == 0) {
@@ -216,21 +217,12 @@ int hdrextnum_ext(char *digbuf,cchar *sp,int sl)
 	            }
 	            break ;
 	        } /* end switch */
-
 	        f_wslast = f_wsnew ;
 	        if (f_exit) break ;
 	    } /* end while (scanning characters) */
-
 	    vl = sbuf_finish(&b) ;
 	    if (rs >= 0) rs = vl ;
 	} /* end if (sbuf) */
-
-#if	CF_DEBUGS
-	debugprintf("hdrextnum_load: ret rs=%d vl=%u\n",rs,vl) ;
-	if ((rs >= 0) && (vl >= 0))
-	    debugprintf("hdrextnum_load: ret v=>%t<\n",digbuf,vl) ;
-#endif
-
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (hdrextnum_ext) */

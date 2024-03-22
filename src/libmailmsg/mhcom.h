@@ -1,6 +1,8 @@
-/* mhcom */
+/* mhcom HEADER */
+/* lang=C20 */
 
 /* comment-parse (for RFC822) small strings (like for stupid RFC822 date) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,47 +15,40 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MHCOM_INCLUDE
-#define	MHCOM_INCLUDE	1
+#define	MHCOM_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
-
-/* object defines */
 
 #define	MHCOM_MAGIC	0x98638451
 #define	MHCOM		struct mhcom_head
 
 
 struct mhcom_head {
-	uint		magic ;
-	int		vlen, clen ;
 	char		*a ;
 	char		*value ;
 	char		*comment ;
+	uint		magic ;
+	int		vlen ;
+	int		clen ;
 } ;
 
+typedef MHCOM		mhcom ;
 
-#if	(! defined(MHCOM_MASTER)) || (MHCOM_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int mhcom_start(MHCOM *,cchar *,int) noex ;
+extern int mhcom_getval(MHCOM *,cchar **) noex ;
+extern int mhcom_getcom(MHCOM *,cchar **) noex ;
+extern int mhcom_finish(MHCOM *) noex ;
 
-extern int mhcom_start(MHCOM *,const char *,int) ;
-extern int mhcom_getval(MHCOM *,const char **) ;
-extern int mhcom_getcom(MHCOM *,const char **) ;
-extern int mhcom_finish(MHCOM *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MHCOM_MASTER */
 
 #endif /* MHCOM_INCLUDE */
 

@@ -327,6 +327,11 @@ typedef mode_t		fsperm ;
 typedef const mode_t	cfsperm ;
 #endif /* TYPEDEF_CFPERM */
 
+#ifndef	TYPEDEF_COFF
+#define	TYPEDEF_COFF
+typedef const off_t	coff ;
+#endif /* TYPEDEF_COFF */
+
 
 #endif /* UTYPEDEFS_INCLUDE */
 

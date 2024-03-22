@@ -54,20 +54,24 @@
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>		/* |memcpy(3c)| */
-#include	<alforithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<filebuf.h>
+#include	<fdliner.h>
 #include	<vechand.h>
 #include	<mailmsghdrs.h>
 #include	<mailmsgmatenv.h>
+#include	<mailmsgmathdr.h>
 #include	<mailmsg.h>
 #include	<comparse.h>
-#include	<fdliner.h>
 #include	<mhcom.h>
 #include	<strn.h>
 #include	<six.h>
 #include	<mkpathx.h>
+#include	<hdrextnum.h>
 #include	<char.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"mailmsgstage.h"
@@ -77,14 +81,6 @@
 
 #ifndef	VARTMPDNAME
 #define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
 #endif
 
 #ifndef	HDRNAMELEN
@@ -126,22 +122,10 @@
 #undef	NBLANKS
 #define	NBLANKS		20
 
+#define	MMS		mailmsgstage
+
 #define	MSGENTRY	struct msgentry
 #define	MSGENTRY_FL	struct msgentry_flags
-
-
-/* imported namespaces */
-
-
-/* local typedefs */
-
-
-/* external subroutines */
-
-extern int	mailmsgmathdr(cchar *,int,int *) ;
-extern int	hdrextnum(cchar *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	hasEOH(cchar *,int) ;
 
 
 /* imported namespaces */
@@ -151,6 +135,13 @@ using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+extern "C" {
+    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
+}
 
 
 /* external variables */
@@ -172,7 +163,7 @@ struct msgentry_flags {
 struct msgentry {
 	MSGENTRY_FL	f, hdr ;
 	MAILMSG		m ;
-	off_t	boff ;		/* w/ tmpfile */
+	off_t		boff ;		/* w/ tmpfile */
 	int		blen ;		/* w/ tmpfile */
 	int		clen ;		/* supplied or calculated */
 	int		clines ;	/* supplied or calculated */
@@ -181,33 +172,34 @@ struct msgentry {
 
 /* forward references */
 
-static int	mailmsgstage_starter(MAILMSGSTAGE *,int,int) ;
-static int	mailmsgstage_g(MAILMSGSTAGE *,int,int) ;
-static int	mailmsgstage_gmsg(MAILMSGSTAGE *,filebuf *,LINER *,int) ;
-static int	mailmsgstage_gmsgbody(MAILMSGSTAGE *,filebuf *,LINER *,
-			MSGENTRY *) ;
-static int	mailmsgstage_gmsgent(MAILMSGSTAGE *,filebuf *,LINER *,
-			cchar *,int,int) ;
-static int	mailmsgstage_gmsgenter(MAILMSGSTAGE *,filebuf *,LINER *,
-			MSGENTRY *) ;
-static int	mailmsgstage_msgfins(MAILMSGSTAGE *) ;
-static int	mailmsgstage_gmsgentnew(MAILMSGSTAGE *,MSGENTRY **) ;
-static int	mailmsgstage_gmsgentdel(MAILMSGSTAGE *,MSGENTRY *) ;
+static int	mailmsgstage_starts(MMS *,int,cc *) noex ;
+static int	mailmsgstage_starter(MMS *,int) noex ;
+static int	mailmsgstage_g(MMS *,int) noex ;
+static int	mailmsgstage_gmsg(MMS *,filebuf *,fdliner *,int) noex ;
+static int	mailmsgstage_gmsgbody(MMS *,filebuf *,fdliner *,
+			MSGENTRY *) noex ;
+static int	mailmsgstage_gmsgent(MMS *,filebuf *,fdliner *,
+			cchar *,int,int) noex ;
+static int	mailmsgstage_gmsgenter(MMS *,filebuf *,fdliner *,
+			MSGENTRY *) noex ;
+static int	mailmsgstage_msgfins(MMS *) noex ;
+static int	mailmsgstage_gmsgentnew(MMS *,MSGENTRY **) noex ;
+static int	mailmsgstage_gmsgentdel(MMS *,MSGENTRY *) noex ;
 
-static int	msgentry_start(MSGENTRY *) ;
-static int	msgentry_finish(MSGENTRY *) ;
-static int	msgentry_loadline(MSGENTRY *,cchar *,int) ;
-static int	msgentry_loadhdrs(MSGENTRY *,LINER *) ;
-static int	msgentry_setflags(MSGENTRY *) ;
-static int	msgentry_setct(MSGENTRY *) ;
-static int	msgentry_setce(MSGENTRY *) ;
-static int	msgentry_getclines(MSGENTRY *) ;
-static int	msgentry_setclines(MSGENTRY *,int) ;
-static int	msgentry_getclen(MSGENTRY *) ;
-static int	msgentry_setclen(MSGENTRY *,int) ;
-static int	msgentry_setoff(MSGENTRY *,off_t) ;
-static int	msgentry_setlen(MSGENTRY *,int) ;
-static int	mailentry_gethdrnum(MSGENTRY *,cchar *) ;
+static int	msgentry_start(MSGENTRY *) noex ;
+static int	msgentry_finish(MSGENTRY *) noex ;
+static int	msgentry_loadline(MSGENTRY *,cchar *,int) noex ;
+static int	msgentry_loadhdrs(MSGENTRY *,fdliner *) noex ;
+static int	msgentry_setflags(MSGENTRY *) noex ;
+static int	msgentry_setct(MSGENTRY *) noex ;
+static int	msgentry_setce(MSGENTRY *) noex ;
+static int	msgentry_getclines(MSGENTRY *) noex ;
+static int	msgentry_setclines(MSGENTRY *,int) noex ;
+static int	msgentry_getclen(MSGENTRY *) noex ;
+static int	msgentry_setclen(MSGENTRY *,int) noex ;
+static int	msgentry_setoff(MSGENTRY *,off_t) noex ;
+static int	msgentry_setlen(MSGENTRY *,int) noex ;
+static int	mailentry_gethdrnum(MSGENTRY *,cchar *) noex ;
 
 
 /* local variables */
@@ -218,109 +210,140 @@ static int	mailentry_gethdrnum(MSGENTRY *,cchar *) ;
 
 /* exported subroutines */
 
-int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts) noex {
-	int		rs ;
+int mailmsgstage_start(MMS *op,int ifd,int to,int mmo) noex {
+	int		rs = SR_FAULT ;
 	int		n = 0 ;
-	cchar	*tmpdname = NULL ;
-	char		template[MAXPATHLEN + 1] ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (ifd < 0) return SR_BADF ;
-
-	memset(op,0,sizeof(MAILMSGSTAGE)) ;
-
-	op->tfd = -1 ;
-	op->f.useclen = (opts & MAILMSGSTAGE_OUSECLEN) ? 1 : 0 ;
-	op->f.useclines = (opts & MAILMSGSTAGE_OUSECLINES) ? 1 : 0 ;
-
-	if (tmpdname == NULL) tmpdname = getenv(VARTMPDNAME) ;
-	if (tmpdname == NULL) tmpdname = MAILMSGSTAGE_TMPDNAME ;
-
-	if ((rs = mkpath2(template,tmpdname,"msXXXXXXXXXXXX")) >= 0) {
-	    const mode_t	om = 0660 ;
-	    cint		of = O_RDWR ;
-	    char		tmpfname[MAXPATHLEN + 1] ;
-	    if ((rs = opentmpfile(template,of,om,tmpfname)) >= 0) {
-	        op->tfd = rs ;
-	        if ((rs = uc_closeonexec(op->tfd,true)) >= 0) {
-	            cchar	*cp ;
-	            if ((rs = uc_mallocstrw(tmpfname,-1,&cp)) >= 0) {
-	                op->tmpfname = cp ;
-	                rs = mailmsgstage_starter(op,ifd,to) ;
-	                n = rs ;
-	                if (rs < 0) {
-	                    uc_free(op->tmpfname) ;
-	                    op->tmpfname = NULL ;
-	                }
-	            } /* end if (m-a) */
-	        } /* end if (uc_closeonexec) */
-	        if (rs < 0) {
-	            u_close(op->tfd) ;
-	            op->tfd = -1 ;
-	            if (tmpfname[0] != '\0') u_unlink(tmpfname) ;
-	        }
-	    } /* end if (opentmpfile) */
-	} /* end if (mkpath2) */
-
+	if (op) {
+	    cnullptr	np{} ;
+	    rs = SR_BADF ;
+	    memclear(op) ; /* dangerous */
+	    if (ifd >= 0) {
+		cint	osz = sizeof(vechand) ;
+	        cchar	*tmpdn = nullptr ;
+		void	*vp{} ;
+	        op->tfd = -1 ;
+		op->to = to ;
+	        op->f.useclen = bool(mmo & MAILMSGSTAGE_OUSECLEN) ;
+	        op->f.useclines = bool(mmo & MAILMSGSTAGE_OUSECLINES) ;
+	        if (tmpdn == np) tmpdn = getenv(VARTMPDNAME) ;
+	        if (tmpdn == np) tmpdn = MAILMSGSTAGE_TMPDNAME ;
+		if ((rs = uc_malloc(osz,&vp)) >= 0) {
+		    op->mlp = (vechand *) vp ;
+	            if ((rs = mailmsgstage_starts(op,ifd,tmpdn)) >= 0) {
+			n = rs ;
+		    } /* end if (mailmsgstage_starts) */
+		    if (rs < 0) {
+			uc_free(op->mlp) ;
+			op->mlp = nullptr ;
+		    }
+		} /* end if (m-a) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailmsgstage_start) */
 
+static int mailmsgstage_starts(MMS *op,int ifd,cc *tmpdn) noex {
+	int		rs ;
+	int		rs1 ;
+	int		nmsgs = 0 ;
+	char		*tpat{} ;
+	if ((rs = malloc_mp(&tpat)) >= 0) {
+	    cchar	*xpat = "msXXXXXXXXXXXX" ;
+	    if ((rs = mkpath2(tpat,tmpdn,xpat)) >= 0) {
+	        cint	of = O_RDWR ;
+	        cmode	om = 0660 ;
+	        char	*tbuf{} ;
+		if ((rs = malloc_mp(&tbuf)) >= 0) {
+	            if ((rs = opentmpfile(tpat,of,om,tbuf)) >= 0) {
+	                op->tfd = rs ;
+	                if ((rs = uc_closeonexec(op->tfd,true)) >= 0) {
+	                    cchar	*cp ;
+	                    if ((rs = uc_mallocstrw(tbuf,-1,&cp)) >= 0) {
+	                        op->tmpfname = cp ;
+			        {
+	                            rs = mailmsgstage_starter(op,ifd) ;
+	                            nmsgs = rs ;
+			        }
+	                        if (rs < 0) {
+	                            uc_free(op->tmpfname) ;
+	                            op->tmpfname = nullptr ;
+	                        }
+	                    } /* end if (m-a) */
+	                } /* end if (uc_closeonexec) */
+	                if (rs < 0) {
+	                    u_close(op->tfd) ;
+	                    op->tfd = -1 ;
+	                    if (tbuf[0] != '\0') {
+			        u_unlink(tbuf) ;
+			        tbuf[0] = '\0' ;
+		            }
+	                }
+	            } /* end if (opentmpfile) */
+		    rs1 = uc_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (mkpath2) */
+	    rs1 = uc_free(tpat) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? nmsgs : rs ;
+}
+/* end subroutine (mailmsgstage_starts) */
 
-static int mailmsgstage_starter(MAILMSGSTAGE *op,int ifd,int to)
-{
+static int mailmsgstage_starter(MMS *op,int ifd) noex {
 	int		rs ;
 	int 		vo = 0 ;
 	int		n = 0 ;
 	vo |= VECHAND_OCOMPACT ;
 	vo |= VECHAND_OSTATIONARY ;
-	if ((rs = vechand_start(&op->msgs,4,vo)) >= 0) {
-	    if ((rs = mailmsgstage_g(op,ifd,to)) >= 0) {
+	if ((rs = vechand_start(op->mlp,4,vo)) >= 0) {
+	    if ((rs = mailmsgstage_g(op,ifd)) >= 0) {
 	        n = rs ;
 	        if (op->tflen > 0) {
-	            size_t	ms = (size_t) op->tflen ;
-	            int		mp = PROT_READ ;
-	            int		mf = MAP_SHARED ;
-	            int		fd = op->tfd ;
-	            void	*md ;
-	            if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
-	                op->mapdata = md ;
+		    cnullptr	np{} ;
+	            csize	ms = size_t(op->tflen) ;
+	            cint	mp = PROT_READ ;
+	            cint	mf = MAP_SHARED ;
+	            cint	fd = op->tfd ;
+	            void	*md{} ;
+	            if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	                op->mapdata = charp(md) ;
 	                op->mapsize = ms ;
 	            }
 	        } /* end if */
 	        if (rs >= 0) op->magic = MAILMSGSTAGE_MAGIC ;
-	        if (rs < 0)
+	        if (rs < 0) {
 	            mailmsgstage_msgfins(op) ;
+		}
 	    } /* end if */
-	    if (rs < 0)
-	        vechand_finish(&op->msgs) ;
+	    if (rs < 0) {
+	        vechand_finish(op->mlp) ;
+	    }
 	} /* end if (vechand) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailmsgstage_starter) */
 
-
-int mailmsgstage_finish(MAILMSGSTAGE *op)
-{
+int mailmsgstage_finish(MMS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if (op->mapdata != NULL) {
+	if (op->mapdata != nullptr) {
 	    rs1 = u_munmap(op->mapdata,op->mapsize) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->mapdata = NULL ;
+	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
 	}
 
 	rs1 = mailmsgstage_msgfins(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	rs1 = vechand_finish(&op->msgs) ;
+	rs1 = vechand_finish(op->mlp) ;
 	if (rs >= 0) rs = rs1 ;
 
 	if (op->tfd >= 0) {
@@ -329,12 +352,12 @@ int mailmsgstage_finish(MAILMSGSTAGE *op)
 	    op->tfd = -1 ;
 	}
 
-	if (op->tmpfname != NULL) {
+	if (op->tmpfname != nullptr) {
 	    if (op->tmpfname[0] != '\0') {
 	        u_unlink(op->tmpfname) ;
 	    }
 	    rs1 = uc_free(op->tmpfname) ;
-	    op->tmpfname = NULL ;
+	    op->tmpfname = nullptr ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
@@ -343,32 +366,28 @@ int mailmsgstage_finish(MAILMSGSTAGE *op)
 }
 /* end subroutine (mailmsgstage_finish) */
 
-
-int mailmsgstage_count(MAILMSGSTAGE *op)
-{
+int mailmsgstage_count(MMS *op) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	rs = vechand_count(&op->msgs) ;
+	rs = vechand_count(op->mlp) ;
 
 	return rs ;
 }
 /* end subroutine (mailmsgstage_count) */
 
-
-int mailmsgstage_clen(MAILMSGSTAGE *op,int mi)
-{
+int mailmsgstage_clen(MMS *op,int mi) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = (mep->clen >= 0) ? mep->clen : SR_NOTFOUND ;
 	}
 
@@ -376,17 +395,15 @@ int mailmsgstage_clen(MAILMSGSTAGE *op,int mi)
 }
 /* end subroutine (mailmsgstage_clen) */
 
-
-int mailmsgstage_clines(MAILMSGSTAGE *op,int mi)
-{
+int mailmsgstage_clines(MMS *op,int mi) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = (mep->clines >= 0) ? mep->clines : SR_NOTFOUND ;
 	}
 
@@ -394,17 +411,15 @@ int mailmsgstage_clines(MAILMSGSTAGE *op,int mi)
 }
 /* end subroutine (mailmsgstage_clines) */
 
-
-int mailmsgstage_envcount(MAILMSGSTAGE *op,int mi)
-{
+int mailmsgstage_envcount(MMS *op,int mi) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_envcount(&mep->m) ;
 	}
 
@@ -412,17 +427,15 @@ int mailmsgstage_envcount(MAILMSGSTAGE *op,int mi)
 }
 /* end subroutine (mailmsgstage_envcount) */
 
-
-int mailmsgstage_envaddress(MAILMSGSTAGE *op,int mi,int n,cchar **rpp)
-{
+int mailmsgstage_envaddress(MMS *op,int mi,int n,cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_envaddress(&mep->m,n,rpp) ;
 	}
 
@@ -430,17 +443,15 @@ int mailmsgstage_envaddress(MAILMSGSTAGE *op,int mi,int n,cchar **rpp)
 }
 /* end subroutine (mailmsgstage_envaddress) */
 
-
-int mailmsgstage_envdate(MAILMSGSTAGE *op,int mi,int n,cchar **rpp)
-{
+int mailmsgstage_envdate(MMS *op,int mi,int n,cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_envdate(&mep->m,n,rpp) ;
 	}
 
@@ -448,17 +459,15 @@ int mailmsgstage_envdate(MAILMSGSTAGE *op,int mi,int n,cchar **rpp)
 }
 /* end subroutine (mailmsgstage_envdate) */
 
-
-int mailmsgstage_envremote(MAILMSGSTAGE *op,int mi,int n,cchar **rpp)
-{
+int mailmsgstage_envremote(MMS *op,int mi,int n,cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_envremote(&mep->m,n,rpp) ;
 	}
 
@@ -466,17 +475,15 @@ int mailmsgstage_envremote(MAILMSGSTAGE *op,int mi,int n,cchar **rpp)
 }
 /* end subroutine (mailmsgstage_envremote) */
 
-
-int mailmsgstage_hdrikey(MAILMSGSTAGE *op,int mi,int hi,cchar **rpp)
-{
+int mailmsgstage_hdrikey(MMS *op,int mi,int hi,cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_hdrikey(&mep->m,hi,rpp) ;
 	}
 
@@ -484,17 +491,15 @@ int mailmsgstage_hdrikey(MAILMSGSTAGE *op,int mi,int hi,cchar **rpp)
 }
 /* end subroutine (mailmsgstage_hdrikey) */
 
-
-int mailmsgstage_hdrcount(MAILMSGSTAGE *op,int mi,cchar *name)
-{
+int mailmsgstage_hdrcount(MMS *op,int mi,cchar *name) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_hdrcount(&mep->m,name) ;
 	}
 
@@ -502,18 +507,16 @@ int mailmsgstage_hdrcount(MAILMSGSTAGE *op,int mi,cchar *name)
 }
 /* end subroutine (mailmsgstage_hdrcount) */
 
-
-int mailmsgstage_hdriline(MAILMSGSTAGE *op,int mi,cchar *name,int hi,int li,
-		cchar **rpp)
-{
+int mailmsgstage_hdriline(MMS *op,int mi,cchar *name,int hi,int li,
+		cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_hdriline(&mep->m,name,hi,li,rpp) ;
 	}
 
@@ -521,17 +524,16 @@ int mailmsgstage_hdriline(MAILMSGSTAGE *op,int mi,cchar *name,int hi,int li,
 }
 /* end subroutine (mailmsgstage_hdriline) */
 
-
-int mailmsgstage_hdrival(MAILMSGSTAGE *op,int mi,cchar *name,int hi,cchar **rpp)
-{
+int mailmsgstage_hdrival(MMS *op,int mi,cchar *name,
+		int hi,cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_hdrival(&mep->m,name,hi,rpp) ;
 	}
 
@@ -539,17 +541,16 @@ int mailmsgstage_hdrival(MAILMSGSTAGE *op,int mi,cchar *name,int hi,cchar **rpp)
 }
 /* end subroutine (mailmsgstage_hdrival) */
 
-
-int mailmsgstage_hdrval(MAILMSGSTAGE *op,int mi,cchar *name,cchar **rpp)
-{
+int mailmsgstage_hdrval(MMS *op,int mi,cchar *name,
+		cchar **rpp) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    rs = mailmsg_hdrval(&mep->m,name,rpp) ;
 	}
 
@@ -557,18 +558,16 @@ int mailmsgstage_hdrval(MAILMSGSTAGE *op,int mi,cchar *name,cchar **rpp)
 }
 /* end subroutine (mailmsgstage_hdrval) */
 
-
-int mailmsgstage_flags(MAILMSGSTAGE *op,int mi)
-{
+int mailmsgstage_flags(MMS *op,int mi) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 	int		flags = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	    flags |= ((mep->hdr.clen) ? MAILMSGSTAGE_MCLEN : 0) ;
 	    flags |= ((mep->hdr.clines) ? MAILMSGSTAGE_MCLINES : 0) ;
 	    flags |= ((mep->hdr.ctype) ? MAILMSGSTAGE_MCTYPE : 0) ;
@@ -582,13 +581,11 @@ int mailmsgstage_flags(MAILMSGSTAGE *op,int mi)
 }
 /* end subroutine (mailmsgstage_flags) */
 
-
-int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,off_t boff,cchar **bpp)
-{
+int mailmsgstage_bodyget(MMS *op,int mi,off_t boff,cchar **bpp) noex {
 	int		rs = SR_OK ;
 	int		ml = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MAILMSGSTAGE_MAGIC) return SR_NOTOPEN ;
 
@@ -596,16 +593,16 @@ int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,off_t boff,cchar **bpp)
 
 	if (boff < 0) return SR_DOM ;
 
-	if (bpp != NULL)
-	    *bpp = NULL ;
+	if (bpp != nullptr)
+	    *bpp = nullptr ;
 
 	if (op->mapsize > 0) {
 	    MSGENTRY	*mep ;
-	    if ((rs = vechand_get(&op->msgs,mi,&mep)) >= 0) {
+	    if ((rs = vechand_get(op->mlp,mi,&mep)) >= 0) {
 	        if (boff < mep->blen) {
 	            off_t	moff = (mep->boff + boff) ;
 	            ml = (mep->blen - boff) ;
-	            if (bpp != NULL)
+	            if (bpp != nullptr)
 	                *bpp = (op->mapdata + moff) ;
 	        }
 	    }
@@ -615,17 +612,15 @@ int mailmsgstage_bodyget(MAILMSGSTAGE *op,int mi,off_t boff,cchar **bpp)
 }
 /* end subroutine (mailmsgstage_bodyget) */
 
-
-int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,off_t boff,
-		char *bbuf,int blen)
-{
+int mailmsgstage_bodyread(MMS *op,int mi,off_t boff,
+		char *bbuf,int blen) noex {
 	int		rs ;
 	int		ml = 0 ;
-	cchar	*bp ;
+	cchar		*bp ;
 
 	if (boff < 0) return SR_DOM ;
 
-	if (bbuf == NULL) return SR_FAULT ;
+	if (bbuf == nullptr) return SR_FAULT ;
 
 	if (blen < 0) return SR_INVALID ;
 
@@ -641,39 +636,34 @@ int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,off_t boff,
 
 /* private subroutines */
 
-static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to) noex {
+static int mailmsgstage_g(MMS *op,int ifd) noex {
 	filebuf		tfb ;
 	const off_t	ostart = 0L ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-
 	if ((rs = filebuf_start(&tfb,op->tfd,ostart,0,0)) >= 0) {
-	    LINER	ls, *lsp = &ls ;
-
-	    if ((rs = liner_start(lsp,ifd,ostart,to)) >= 0) {
+	    fdliner	ls, *lsp = &ls ;
+	    cint	to = op->to ;
+	    if ((rs = fdliner_start(lsp,ifd,ostart,to)) >= 0) {
 		int	mi = 0 ;
-
 	        while ((rs = mailmsgstage_gmsg(op,&tfb,lsp,mi++)) > 0) {
-
+		    /* nothing to do here */
 	        } /* end while */
 	        n = op->nmsgs ;
-
-	        rs1 = liner_finish(lsp) ;
+	        rs1 = fdliner_finish(lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (liner) */
-
 	    rs1 = filebuf_finish(&tfb) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (filebuf) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailmsgstage_g) */
 
 /* parse out the headers of this message */
-static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,
-		LINER *lsp,int mi) noex {
+static int mailmsgstage_gmsg(MMS *op,filebuf *tfp,
+		fdliner *lsp,int mi) noex {
 	MAILMSGMATENV	me ;
 	int		rs = SR_OK ;
 	int		vi = -1 ;
@@ -685,7 +675,7 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,
 
 /* find message start */
 
-	while ((rs = liner_readline(lsp,&lp)) > 0) {
+	while ((rs = fdliner_read(lsp,&lp)) > 0) {
 	    ll = rs ;
 	    if (ll == 0) break ;
 
@@ -705,7 +695,7 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,
 	    if (f_env || f_hdr) break ;
 
 	    ll = 0 ;
-	    liner_done(lsp) ;
+	    fdliner_done(lsp) ;
 
 	    if (f_eoh) break ;
 	} /* end while */
@@ -719,7 +709,7 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,
 }
 /* end subroutine (mailmsgstage_gmsg) */
 
-static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
+static int mailmsgstage_gmsgent(MMS *op,filebuf *tfp,fdliner *lsp,
 		cchar *lp,int ll,int f_eoh) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
@@ -729,7 +719,7 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	            rs = msgentry_loadline(mep,lp,ll) ;
 		    ll = rs ;
 	            f_eoh = (rs == 1) ;
-	            liner_done(lsp) ;
+	            fdliner_done(lsp) ;
 	        }
 	        if ((rs >= 0) && (! f_eoh)) {
 	            rs = msgentry_loadhdrs(mep,lsp) ;
@@ -738,9 +728,9 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	        if (rs >= 0) {
 	            if ((rs = mailmsgstage_gmsgenter(op,tfp,lsp,mep)) >= 0) {
 		        ll = rs ;
-	                if ((rs = vechand_add(&op->msgs,mep)) >= 0) {
+	                if ((rs = vechand_add(op->mlp,mep)) >= 0) {
 			    op->nmsgs += 1 ;
-	                    mep = NULL ;
+	                    mep = nullptr ;
 			}
 	            }
 		}
@@ -748,16 +738,16 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 		    msgentry_finish(mep) ;
 		}
 	    } /* end if (msgentry_start) */
-	    if ((rs < 0) && (mep != NULL)) {
+	    if ((rs < 0) && (mep != nullptr)) {
 	        mailmsgstage_gmsgentdel(op,mep) ;
-	        mep = NULL ;
+	        mep = nullptr ;
 	    }
 	} /* end if (mailmsgstage_gmsgentnew) */
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailmsgstage_gmsgent) */
 
-static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
+static int mailmsgstage_gmsgenter(MMS *op,filebuf *tfp,fdliner *lsp,
 		MSGENTRY *mep) noex {
 	int		rs ;
 	int		ll = 0 ;
@@ -772,7 +762,7 @@ static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 }
 /* end subroutine (mailmsgstage_gmsgenter) */
 
-static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
+static int mailmsgstage_gmsgbody(MMS *op,filebuf *tfp,fdliner *lsp,
 		MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		max = INT_MAX ;
@@ -793,7 +783,7 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	    max = clines ;
 
 	while ((rs >= 0) && (blines < max) && 
-	    ((rs = liner_readline(lsp,&lp)) > 0)) {
+	    ((rs = fdliner_read(lsp,&lp)) > 0)) {
 
 	    ll = rs ;
 	    f_eol = (lp[ll - 1] == '\n') ;
@@ -814,7 +804,7 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	    if (f_eol) blines += 1 ;
 	    f_bol = f_eol ;
 	    ll = 0 ; /* signal possible EOF */
-	    liner_done(lsp) ;
+	    fdliner_done(lsp) ;
 	} /* end while (searching for new start-msg) */
 
 	if (rs >= 0) {
@@ -828,11 +818,11 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 }
 /* end subroutine (mailmsgstage_gmsgbody) */
 
-static int mailmsgstage_gmsgentnew(MAILMSGSTAGE *op,MSGENTRY **mpp) noex {
+static int mailmsgstage_gmsgentnew(MMS *op,MSGENTRY **mpp) noex {
 	cint		esize = sizeof(MSGENTRY) ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	rs = uc_malloc(esize,mpp) ;
 
@@ -840,12 +830,12 @@ static int mailmsgstage_gmsgentnew(MAILMSGSTAGE *op,MSGENTRY **mpp) noex {
 }
 /* end subroutine (mailmsgstage_gmsgentnew) */
 
-static int mailmsgstage_gmsgentdel(MAILMSGSTAGE *op,MSGENTRY *mep) noex {
+static int mailmsgstage_gmsgentdel(MMS *op,MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (mep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (mep == nullptr) return SR_FAULT ;
 
 	rs1 = uc_free(mep) ;
 	if (rs >= 0) rs = rs1 ;
@@ -854,8 +844,8 @@ static int mailmsgstage_gmsgentdel(MAILMSGSTAGE *op,MSGENTRY *mep) noex {
 }
 /* end subroutine (mailmsgstage_gmsgentdel) */
 
-static int mailmsgstage_msgfins(MAILMSGSTAGE *op) noex {
-	VECHAND		*mlp = &op->msgs ;
+static int mailmsgstage_msgfins(MMS *op) noex {
+	VECHAND		*mlp = op->mlp ;
 	MSGENTRY	*mep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -916,13 +906,13 @@ static int msgentry_loadline(MSGENTRY *mep,cchar *lp,int ll) noex {
 }
 /* end subroutine (msgentry_loadline) */
 
-static int msgentry_loadhdrs(MSGENTRY *mep,LINER *lsp) noex {
+static int msgentry_loadhdrs(MSGENTRY *mep,fdliner *lsp) noex {
 	int		rs ;
 	int		ll ;
 	int		tlen = 0 ;
 	int		f_eoh = false ;
 	cchar		*lp ;
-	while ((rs = liner_readline(lsp,&lp)) > 0) {
+	while ((rs = fdliner_read(lsp,&lp)) > 0) {
 	    ll = rs ;
 	    tlen += ll ;
 	    f_eoh = (lp[0] == '\n') ;
@@ -930,7 +920,7 @@ static int msgentry_loadhdrs(MSGENTRY *mep,LINER *lsp) noex {
 	        rs = mailmsg_loadline(&mep->m,lp,ll) ;
 	    }
 	    if (rs < 0) break ;
-	    liner_done(lsp) ;
+	    fdliner_done(lsp) ;
 	    if (f_eoh) break ;
 	} /* end while */
 	mep->f.eoh = f_eoh ;
@@ -993,11 +983,11 @@ static int msgentry_setct(MSGENTRY *mep) noex {
 		int	vl ;
 		cchar	*vp ;
 	        if ((vl = mhcom_getval(&hc,&vp)) > 0) {
-	            if (cchar *tp ; (tp = strnchr(vp,vl,';')) != NULL) {
+	            if (cchar *tp ; (tp = strnchr(vp,vl,';')) != nullptr) {
 	                vl = (tp - vp) ;
 		    }
 	            rs1 = sisub(vp,vl,"text") ;
-	            if ((rs1 >= 0) && (strnchr(vp,vl,'/') != NULL)) {
+	            if ((rs1 >= 0) && (strnchr(vp,vl,'/') != nullptr)) {
 	                rs1 = sisub(vp,vl,"plain") ;
 		    }
 	            mep->f.ctplain = (rs1 >= 0) ;
@@ -1024,7 +1014,7 @@ static int msgentry_setce(MSGENTRY *mep) noex {
 	    mep->hdr.cencoding = true ;
 	    if ((rs = comparse_start(&com,hp,hl)) >= 0) {
 	        if ((vl = comparse_getval(&com,&vp)) > 0) {
-	            if ((tp = strnchr(vp,vl,';')) != NULL) {
+	            if ((tp = strnchr(vp,vl,';')) != nullptr) {
 	                vl = (tp - vp) ;
 	            }
 	            rs1 = sisub(vp,vl,"7bit") ;

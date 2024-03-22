@@ -37,7 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -68,6 +67,8 @@
 #include	<nulstr.h>
 #include	<buffer.h>
 #include	<ascii.h>
+#include	<hdrextnum.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"received.h"
@@ -154,7 +155,6 @@ extern int	prognamecache_lookup(PROGINFO *,cchar *,cchar **) ;
 extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
 extern int	mailmsg_loadline(MAILMSG *,cchar *,int) ;
 
-extern int	hdrextnum(cchar *,int) ;
 extern int	hdrextid(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
