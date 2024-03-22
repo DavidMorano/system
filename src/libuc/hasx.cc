@@ -209,24 +209,6 @@
 
 
 	Name:
-	hasnonpath
-
-	Description:
-	We test a string to see if it is a floating or non-path filename.
-
-	Synopsis:
-	int hasnonpath(cchar *pp,int pl) noex
-
-	Arguments:
-	- pp	pointer to path string
-	- pl	length of given path string
-
-	Returns:
-	false
-	true
-
-
-	Name:
 	hasvarprefix
 
 	Description:

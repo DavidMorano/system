@@ -21,6 +21,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<matxstr.h>
+#include	<stdfnames.h>
 
 
 EXTERNC_begin
@@ -50,6 +52,9 @@ extern bool hasalldig(cchar *,int) noex ;
 extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
 
+static inline bool hasfnamespecial(cchar *fp,int fl) noex {
+	return (matstr(stdfnames,fp,fl) >= 0) ;
+}
 static inline bool hasValidMagic(cchar *sp,int sl) noex  {
 	return hasvalidmagic(sp,sl) ;
 }
