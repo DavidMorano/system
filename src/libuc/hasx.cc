@@ -209,6 +209,24 @@
 
 
 	Name:
+	hasnonpath
+
+	Description:
+	We test a string to see if it is a floating or non-path filename.
+
+	Synopsis:
+	int hasnonpath(cchar *pp,int pl) noex
+
+	Arguments:
+	- pp	pointer to path string
+	- pl	length of given path string
+
+	Returns:
+	false
+	true
+
+
+	Name:
 	hasvarprefix
 
 	Description:
@@ -262,29 +280,6 @@
 	Returns:
 	false		string has the standard dot-dirs
 	true		string does not have the standard dot-dirs
-
-
-	Name:
-	haseoh
-
-	Description:
-	Determine if the given string consists of an End-Of-Header
-	(EOH) sequence.  An EOH is a leadering blank like of two
-	sorts:
-
-	<NL>
-	<CR><NL>
-
-	Synopsis:
-	int haseoh(cchar *sp,int sl) noex
-
-	Arguments:
-	sp		string to test
-	sl		length of strin to test
-
-	Returns:
-	false		assertion fails
-	TRUE		assertion succeeds
 
 
 *******************************************************************************/
@@ -723,16 +718,6 @@ bool hasnotempty(cchar *sp,int sl) noex {
 	return f ;
 }
 /* end subroutine (hasnotempty) */
-
-bool haseoh(cchar *sp,int sl) noex {
-	bool		f = false ;
-	if (sl >  0) {
-	    f = (sp[0] == '\n') ;
-	    f = f || ((sl > 1) && (sp[0] == '\r') && (sp[1] == '\n')) ;
-	}
-	return f ;
-}
-/* end subroutine (haseoh) */
 
 
 /* local subroutines */

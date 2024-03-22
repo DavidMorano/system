@@ -1,11 +1,10 @@
-/* uc_stat */
+/* uc_stat SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* get status on a file */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -18,27 +17,26 @@
 
 /*******************************************************************************
 
-        This subroutine provides an enchanced |stat(2)| function. It also
-        removes trailing slash ('/') character from file-names, but it will
-        preserve a lone pair of characters consisting of '//'.
+	This subroutine provides an enchanced |stat(2)| function.
+	It also removes trailing slash ('/') character from file-names,
+	but it will preserve a lone pair of characters consisting
+	of '//'.
 
-	Some systems do not ignore trailing slash characters on file-names,
-	so we take care of it for them (at least here we do).
-
+	Some systems do not ignore trailing slash characters on
+	file-names, so we take care of it for them (at least here
+	we do).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstring>
 #include	<usystem.h>
+#include	<typenonpath.h>
 #include	<localmisc.h>
 
 
@@ -59,7 +57,6 @@ extern int	mkuserpath(char *,const char *,const char *,int) ;
 extern int	mkcdpath(char *,const char *,int) ;
 extern int	mkvarpath(char *,const char *,int) ;
 extern int	hasvarpathprefix(const char *,int) ;
-extern int	hasnonpath(const char *,int) ;
 
 
 /* forward references */
@@ -93,8 +90,8 @@ int uc_stat(cchar *fname,struct ustat *sbp)
 
 	if (rs >= 0) {
 
-	    if (hasnonpath(fname,fl)) {
-	        memset(sbp,0,sizeof(struct ustat)) ;
+	    if (typenonpath(fname,fl)) {
+	        memclear(sbp) ;
 	        sbp->st_mode = S_IFNAM ;
 	        sbp->st_uid = UID_NOBODY ;
 	        sbp->st_gid = GID_NOBODY ;

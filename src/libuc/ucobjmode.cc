@@ -64,7 +64,6 @@ extern "C" {
     extern int	mkuserpath(char *,cchar *,cchar *,int) noex ;
     extern int	mkcdpath(char *,cchar *,int) noex ;
     extern int	mkvarpath(char *,cchar *,int) noex ;
-    extern int	hasnonpath(cchar *,int) noex ;
 }
 
 
@@ -93,7 +92,7 @@ int uc_chmod(cchar *fname,mode_t fm) noex {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
 	        fl = strlen(fname) ;
-	        if (! hasnonpath(fname,fl)) {
+	        if (! typenonpath(fname,fl)) {
 	    	    char	*efname{} ;
 		    if ((rs = libmalloc_mp(&efname)) >= 0) {
 	                if ((rs = mkuserpath(efname,nullptr,fname,fl)) > 0) {

@@ -1,4 +1,4 @@
-/* hasnonpath HEADER */
+/* typenonpath HEADER */
 /* lang=C20 */
 
 
@@ -11,8 +11,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	HASNONPATH_INCLUDE
-#define	HASNONPATH_INCLUDE
+#ifndef	TYPENONPATH_INCLUDE
+#define	TYPENONPATH_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -20,13 +20,21 @@
 #include	<clanguage.h>
 
 
+enum nonpathtypes {
+	nonpathtype_not,
+	nonpathtype_dialer,
+	nonpathtype_fsvc,
+	nonpathtype_usvc,
+	nonpathtype_overlast
+} ;
+
 EXTERNC_begin
 
-extern int hasnonpath(cchar *,int) noex ;
+extern bool typenonpath(cchar *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* HASNONPATH_INCLUDE */
+#endif /* TYPENONPATH_INCLUDE */
 
 

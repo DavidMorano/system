@@ -1,5 +1,5 @@
-/* hasdupai (Has-Duplicate-Array-Integers) */
-/* lang=C99 */
+/* detdupai SUPPORT (Determine-Duplicate-Array-Integers) */
+/* lang=C++20 */
 
 /* does the given array of integers have duplicate entries */
 /* version %I% last-modified %G% */
@@ -17,34 +17,33 @@
 /*******************************************************************************
 
 	Name:
-	hasdupa
+	detdupai
 
 	Description:
 	This subroutine checks if the given array of integers has
 	duplicate entries.
 
 	Synopsis:
-	int hasdupai(cint *sp,int sl) noex
+	int detdupai(cint *sp,int sl) noex
 
 	Arguments:
 	sp		source array of integers
 	sl		length of source array
 
 	Returns:
-	<0		error
-	==0		no duplicates
 	==1		found a duplicate entry
+	==0		no duplicates
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>		/* <- for |qsort(3c)| */
-#include	<string.h>		/* <- for |memset(3c)| */
+#include	<cstdlib>		/* <- for |qsort(3c)| */
+#include	<cstring>		/* <- for |memset(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"hasdupai.h"
+#include	"detdupai.h"
 
 
 /* local defines */
@@ -58,9 +57,15 @@
 static int	vcmp(cvoid *,cvoid *) noex ;
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int hasdupai(cint *ap,int al) noex {
+int detdupai(cint *ap,int al) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		f = false ;
@@ -83,7 +88,7 @@ int hasdupai(cint *ap,int al) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
-/* end subroutine (hasdupai) */
+/* end subroutine (detdupai) */
 
 
 /* local subroutines */

@@ -1,7 +1,7 @@
-/* hasnonpath SUPPORT */
+/* typenonpath SUPPORT */
 /* lang=C++20 */
 
-/* determine if the given string represent a non-path filename */
+/* determine the type of nonpath in give counted c-string (filename) */
 /* version %I% last-modified %G% */
 
 
@@ -17,27 +17,28 @@
 /*******************************************************************************
 
 	Name:
-	hasnonpath
+	typenonpath
 
 	Description:
-	We test a string to see if it is a floating or non-path filename.
+	We test a string to see if it is a floating or non-path
+	filename.  If we find a non-path filename, we determie
+	the type (and return it).
 
 	Synopsis:
-	int hasnonpath(cchar *pp,int pl) noex
+	int typenonpath(cchar *pp,int pl) noex
 
 	Arguments:
 	- pp	pointer to path string
 	- pl	length of given path string
 
 	Returns:
-	>0	yes and this is the index of the type of non-path
-	==0	no
-	<0	error (syhstem-return)
+	0	no non-path filename found
+	>0	type of non-path filename determined
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -46,13 +47,15 @@
 #include	<strn.h>
 #include	<localmisc.h>
 
-#include	"hasnonpath.h"
+#include	"typenonpath.h"
 
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
 
 
 /* local typedefs */
@@ -66,40 +69,30 @@
 
 /* local structures */
 
-enum nonpaths {
-	nonpath_not,
-	nonpath_dialer,
-	nonpath_fsvc,
-	nonpath_usvc,
-	nonpath_overlast
-} ;
-
-
-/* forward references */
-
 
 /* local variables */
 
 static constexpr cchar		nonpaths[] = "/ез~" ;
 
 
-/* export variables */
+/* exported variables */
 
 
 /* exported subroutines */
 
-int hasnonpath(cchar *fp,int fl) noex {
-	int		f = (fp[0] != '/') ;
+bool typenonpath(cchar *fp,int fl) noex {
+	int		t = 0 ; /* assume not non-path */
 	if (fl < 0) fl = strlen(fp) ;
-	if (f) {
-	    cchar	*tp = strnpbrk(fp,fl,nonpaths) ;
-	    f = false ;
-	    if ((tp != nullptr) && ((tp - fp) > 0) && (tp[1] != '\0')) {
-	        f = sichr(nonpaths,-1,*tp) ;
+	if ((fl > 0) && (fp[0] != '/')) {
+	    cnullptr	np{} ;
+	    if (cchar *tp ; (tp = strnpbrk(fp,fl,nonpaths)) != np) {
+	        if (((tp - fp) > 0) && (tp[1] != '\0')) {
+	            t = sichr(nonpaths,-1,*tp) ;
+	        }
 	    }
 	}
-	return f ;
+	return t ; /* type-of-nonpath */
 }
-/* end subroutine (hasnonpath) */
+/* end subroutine (typenonpath) */
 
 

@@ -1158,6 +1158,7 @@ syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
 # UTILITY
+typenonpath.o:		typenonpath.cc typenonpath.h
 endian.o:		endian.cc endian.h
 pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h

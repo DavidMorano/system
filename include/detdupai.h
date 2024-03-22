@@ -1,4 +1,4 @@
-/* hasdupai HEADER */
+/* detdupai HEADER */
 /* lang=C20 */
 
 /* does the given array of integers have duplicate entries */
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	HASDUPAI_INCLUDE
-#define	HASDUPAI_INCLUDE
+#ifndef	DETDUPAI_INCLUDE
+#define	DETDUPAI_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,11 +25,11 @@
 
 EXTERNC_begin
 
-extern int hasdupai(cint *,int) noex ;
+extern int detdupai(cint *,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* HASDUPAI_INCLUDE */
+#endif /* DETDUPAI_INCLUDE */
 
 

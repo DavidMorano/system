@@ -94,6 +94,7 @@
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<getax.h>
+#include	<typenonpath.h>
 #include	<ucpwcache.h>		/* |ucpwcache_name(3uc)| */
 #include	<localmisc.h>
 
@@ -186,7 +187,6 @@ static int	getprefixfs(cchar *,cchar **) ;
 static int	getnormalfs(cchar *,cchar **) ;
 static int	noexist(cchar *,int) ;
 static int	loadargs(vecstr *,cchar *) ;
-static int	hasnonpath(cchar *,int) ;
 
 #if	CF_ISMORE
 extern int	isMorePossible(int) ;
@@ -448,7 +448,7 @@ static int open_eval(UCOPENINFO *oip)
 
 	while ((rs >= 0) && (fd < 0)) {
 
-	    if ((npi = hasnonpath(oip->fname,-1)) > 0) {
+	    if ((npi = typenonpath(oip->fname,-1)) > 0) {
 	        rs = open_floatpath(oip,npi) ;
 	        fd = rs ;
 	    } else {
@@ -619,18 +619,14 @@ static int open_otherlink(UCOPENINFO *oip,int *fdp,char *ofname)
 #endif
 
 	    if (rbuf[0] == '/') {
-
 	        oip->fname = (cchar *) ofname ;
 	        rs = mkpath1(ofname,rbuf) ;
-
-	    } else if ((npi = hasnonpath(rbuf,-1)) > 0) {
-
+	    } else if ((npi = typenonpath(rbuf,-1)) > 0) {
 	        oip->fname = (cchar *) ofname ;
 	        if ((rs = mkpath1(ofname,rbuf)) >= 0) {
 	            rs = open_floatpath(oip,npi) ;
 	            fd = rs ;
 	        }
-
 	    } else {
 	        int		cl ;
 	        cchar		*cp ;
@@ -1249,21 +1245,6 @@ static int loadargs(vecstr *alp,cchar *sp)
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (loadargs) */
-
-
-static int hasnonpath(cchar *fp,int fl)
-{
-	int		f = (fp[0] != '/') ;
-	if (f) {
-	    cchar	*tp = strnpbrk(fp,fl,nonpaths) ;
-	    f = FALSE ;
-	    if ((tp != nullptr) && ((tp-fp) > 0) && (tp[1] != '\0')) {
-	        f = sichr(nonpaths,-1,*tp) ;
-	    }
-	}
-	return f ;
-}
-/* end subroutine (hasnonpath) */
 
 #if	CF_ISMORE
 static int isMorePossible(int rs) noex {

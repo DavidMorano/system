@@ -1,11 +1,10 @@
-/* uc_readlink */
+/* uc_readlink SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* read a symbolic link */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -16,16 +15,14 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
+#include	<typenonpath.h>
 #include	<localmisc.h>
 
 
@@ -46,17 +43,17 @@ extern int	mkuserpath(char *,const char *,const char *,int) ;
 extern int	mkcdpath(char *,const char *,int) ;
 extern int	mkvarpath(char *,const char *,int) ;
 extern int	hasvarpathprefix(const char *,int) ;
-extern int	hasnonpath(const char *,int) ;
 
 
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_readlink(cchar *fname,char *rbuf,int rlen)
-{
+int uc_readlink(cchar *fname,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		fl ;
 
@@ -67,7 +64,7 @@ int uc_readlink(cchar *fname,char *rbuf,int rlen)
 
 	fl = strlen(fname) ;
 
-	if (hasnonpath(fname,fl)) {
+	if (typenonpath(fname,fl)) {
 	    rs = SR_INVALID ;
 	} else {
 	    char	efname[MAXPATHLEN + 1] ;

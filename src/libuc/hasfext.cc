@@ -64,6 +64,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int hasfext(cchar **exts,cchar *fp,int fl) noex {

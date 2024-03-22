@@ -41,6 +41,7 @@ extern bool hasmacro(cchar *,int) noex ;
 extern bool hasvalidmagic(cchar *,int) noex ;
 extern bool hasnotdots(cchar *,int) noex ;
 extern bool hasnotempty(cchar *,int) noex ;
+static bool haseoh(cchar *,int) noex ;
 
 extern bool hasallwhite(cchar *,int) noex ;
 extern bool hasalllc(cchar *,int) noex ;
@@ -55,7 +56,7 @@ static inline bool hasValidMagic(cchar *sp,int sl) noex  {
 static inline bool hasNotDots(cchar *sp,int sl) noex {
 	return hasnotdots(sp,sl) ;
 }
-static intline bool hasEOH(cchar *sp,int sl) noex {
+static inline bool hasEOH(cchar *sp,int sl) noex {
 	return haseoh(sp,sl) ;
 }
 

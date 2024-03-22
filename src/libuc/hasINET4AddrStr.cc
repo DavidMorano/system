@@ -1,10 +1,8 @@
-/* hasINET4AddrStr */
+/* hasINET4AddrStr SUPPORT */
+/* lang=C++20 */
 
 /* test whether the given string contains an INET4 address string */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 
 
 /* revision history:
@@ -18,47 +16,47 @@
 
 /*******************************************************************************
 
-	We test whether the given string consists of an INET4 address string.
+	Name:
+	hasINET4AddrStr
+
+	Description:
+	We test whether the given string consists of an INET4 address
+	string.
 
 	Synopsis:
-
-	int hasINET4AddrStr(sp,sl)
-	const char	sp[] ;
-	int		sl ;
+	int hasINET4AddrStr(cchar *sp,int sl) noex
 
 	Arguments:
-
 	sp		string to test
 	sl		length of strin to test
 
 	Returns:
-
-	FALSE		assertion fails
-	TRUE		assertion succeeds
-
+	false		assertion fails
+	true		assertion succeeds
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<strn.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	hasalldig(cchar *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -69,22 +67,23 @@ extern char	*strnchr(cchar *,int,int) ;
 
 /* forward references */
 
-static int	hasINET4Num(cchar *,int) ;
+static int	hasINET4Num(cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int hasINET4AddrStr(cchar *sp,int sl)
-{
-	int		f = TRUE ;
+int hasINET4AddrStr(cchar *sp,int sl) noex {
+	bool		f = true ;
 	int		c = 0 ;
 	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
-	while ((tp = strnchr(sp,sl,'.')) != NULL) {
+	while ((tp = strnchr(sp,sl,'.')) != nullptr) {
 	    f = hasINET4Num(sp,(tp-sp)) ;
 	    if (! f) break ;
 	    sl -= ((tp+1)-sp) ;
@@ -96,11 +95,8 @@ int hasINET4AddrStr(cchar *sp,int sl)
 	    f = hasINET4Num(sp,sl) ;
 	} /* end if */
 	if (f && (c != 4)) {
-	    f = FALSE ;
+	    f = false ;
 	}
-#if	CF_DEBUGS
-	debugprintf("hasINET4AddrStr: ret f=%u\n",f) ;
-#endif
 	return f ;
 }
 /* end subroutine (hasINET4AddrStr) */
@@ -108,17 +104,8 @@ int hasINET4AddrStr(cchar *sp,int sl)
 
 /* local subroutines */
 
-
-static int hasINET4Num(cchar *sp,int sl)
-{
-	int		f = FALSE ;
-#if	CF_DEBUGS
-	   debugprintf("hasINET4AddrStr: sl=%d s=>%t<\n",sl,sp,sl) ;
-#endif
-	if (hasalldig(sp,sl)) {
-	    f = (sl <= 3) ;
-	}
-	return f ;
+static bool hasINET4Num(cchar *sp,int sl) noex {
+	retitn ((sl <= 3) && hasalldig(sp,sl)) ;
 }
 /* end subroutine (hasINET4Num) */
 
