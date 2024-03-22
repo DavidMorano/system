@@ -1,6 +1,9 @@
 /* hasx HEADER */
 /* lang=C20 */
 
+/* has a counted c-string some characteristic? */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -49,9 +52,11 @@ extern bool hasallchr(cchar *,int,int) noex ;
 static inline bool hasValidMagic(cchar *sp,int sl) noex  {
 	return hasvalidmagic(sp,sl) ;
 }
-
 static inline bool hasNotDots(cchar *sp,int sl) noex {
 	return hasnotdots(sp,sl) ;
+}
+static intline bool hasEOH(cchar *sp,int sl) noex {
+	return haseoh(sp,sl) ;
 }
 
 EXTERNC_end

@@ -1,8 +1,8 @@
-/* b_bibleverse */
+/* b_bibleverse SUPPORT */
+/* lang=C++20 */
 
 /* translate a bible number to its corresponding name */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -10,7 +10,6 @@
 #define	CF_DEBUGN	0		/* special */
 #define	CF_COOKIE	0		/* use cookie as separator */
 #define	CF_LOCNDAYS	0		/* use |locinfo_ndays()| */
-
 
 /* revision history:
 
@@ -23,16 +22,14 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ bibleverse <bcspec(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -65,6 +62,7 @@
 #include	<tmtime.h>
 #include	<dayspec.h>
 #include	<bcspec.h>
+#include	<ourmjd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -143,7 +141,6 @@ extern int	bufprintf(char *,int,const char *,...) ;
 extern int	vecstr_adds(vecstr *,const char *,int) ;
 extern int	getmjd(int,int,int) ;
 extern int	msleep(int) ;
-extern int	hasourmjd(const char *,int) ;
 extern int	hasalldig(const char *,int) ;
 extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
@@ -1681,7 +1678,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	        int	mjd = -1 ;
 
 	        if (lip->qtype == qtype_day) {
-	            if ((rs = hasourmjd(sp,sl)) > 0) {
+	            if ((rs = ourmjd(sp,sl)) > 0) {
 	                mjd = rs ;
 	            } else {
 	                DAYSPEC	ds ;
@@ -1693,7 +1690,7 @@ static int procspec(PROGINFO *pip,cchar *sp,int sl)
 	                } /* end if (dayspec) */
 	            } /* end if (type-day) */
 	        } else if (lip->qtype == qtype_mjd) {
-	            if ((rs = hasourmjd(sp,sl)) > 0) {
+	            if ((rs = ourmjd(sp,sl)) > 0) {
 	                mjd = rs ;
 	            } else {
 	                rs = optvalue(sp,sl) ;

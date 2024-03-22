@@ -1,4 +1,5 @@
-/* config */
+/* b_mjd HEADER */
+/* lang=C20 */
 
 
 /* revision history:

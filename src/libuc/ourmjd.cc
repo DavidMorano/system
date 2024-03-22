@@ -1,10 +1,8 @@
-/* hasourmjd */
+/* ourmjd SUPPORT */
+/* lang=C++20 */
 
 /* test whether a string is composed of our MJD specifiction */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 
 
 /* revision history:
@@ -18,44 +16,48 @@
 
 /*******************************************************************************
 
-	Does the given string contain a Modified-Julian-Day (MJD) specification?
+	Name:
+	ourmjd
+
+	Description:
+	Does the given string contain a Modified-Julian-Day (MJD)
+	specification?
 
 	Synopsis:
-
-	int hasourmjd(sp,sl)
-	const char	sp[] ;
-	int		sl ;
+	int ourmjd(cchar *sp,int sl) noex
 
 	Arguments:
-
 	sp		string to test
 	sl		length of strin to test
 
 	Returns:
-
-	<0		error
-	0		no MJD found (not ours anyway)
 	>0		MJD
-
+	0		no MJD found (not ours anyway)
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<string.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<cfdec.h>
+#include	<hasx.h>
 #include	<char.h>
 #include	<localmisc.h>
+
+#include	"ourmjd.h"
 
 
 /* local defines */
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	cfdeci(const char *,int,int *) ;
-extern int	hasalldig(const char *,int) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -72,13 +74,9 @@ extern int	hasalldig(const char *,int) ;
 
 /* exported subroutines */
 
-
-int hasourmjd(const char *sp,int sl)
-{
+int ourmjd(cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-
 	if (sl < 0) sl = strlen(sp) ;
-
 	if ((sl > 1) && (CHAR_TOLC(sp[0]) == 'm')) {
 	    sp += 1 ;
 	    sl -= 1 ;
@@ -89,9 +87,8 @@ int hasourmjd(const char *sp,int sl)
 		}
 	    }
 	} /* end if (has our 'm' marker) */
-
 	return rs ;
 }
-/* end subroutine (hasourmjd) */
+/* end subroutine (sourmjd) */
 
 

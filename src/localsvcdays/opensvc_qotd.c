@@ -1,20 +1,21 @@
-/* opensvc_qotd */
+/* opensvc_qotd SUPPORT */
+/* lang=C++20 */
 
 /* LOCAL facility open-service (qotd) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_GETUSERHOME	1		/* use 'getuserhome(3dam)' */
 #define	CF_LOCSETENT	0		/* need 'subinfo_setentry()' */
 
-
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-	This code was started by taking the corresponding code from the
-	TCP-family module.  In retrospect, that was a mistake.  Rather I should
-	have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -22,10 +23,10 @@
 
 /*******************************************************************************
 
+	Description:
 	This is an open-facility-service module.
 
 	Synopsis:
-
 	int opensvc_qotd(pr,prn,of,om,argv,envv,to)
 	cchar		*pr ;
 	cchar		*prn ;
@@ -36,7 +37,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -46,16 +46,12 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
 	<0		error
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -77,6 +73,7 @@
 #include	<tmtime.h>
 #include	<filebuf.h>
 #include	<wordfill.h>
+#include	<ourmjd.h>
 #include	<localmisc.h>
 
 #include	"opensvc_qotd.h"
@@ -128,7 +125,6 @@ extern int	getmjd(int,int,int) ;
 extern int	getyrd(int,int,int) ;
 extern int	ndigits(int,int) ;
 extern int	hasalldig(cchar *,int) ;
-extern int	hasourmjd(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUGS
@@ -642,7 +638,7 @@ static int subinfo_mjd(SUBINFO *sip,cchar *dayspec)
 	        sip->f.mjd = TRUE ;
 		rs = getmjd(sip->year,sip->mon,sip->mday) ;
 	    }
-	} else if ((rs = hasourmjd(dp,dl)) > 0) {
+	} else if ((rs = ourmjd(dp,dl)) > 0) {
 	    sip->f.mjd = TRUE ;
 	} else {
 	    DAYSPEC	ds ;

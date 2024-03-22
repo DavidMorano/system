@@ -1,8 +1,8 @@
-/* b_mjd */
+/* b_mjd SUPPORT */
+/* lang=C++20 */
 
-/* this is a SHELL built-in version of 'mjd(1)' */
+/* this is a SHELL built-in version of |mjd(1)| */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
@@ -11,11 +11,11 @@
 #define	CF_READINTR	0		/* |shio_readintr(3shio)| */
 #define	CF_SPECIALFIFO	0		/* employ special FIFO handling */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written as a KSH built-in command.
+	This subroutine was originally written as a KSH built-in
+	command.
 
 */
 
@@ -24,18 +24,14 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ mjd [<day(s)>] [-af <afile>] [-V]
 
-	where:
-
+	Arguments:
 	<day(s)>	quote for this day (default today): <mon><mday>
 	-af <afile>	argument file of <day(s)>
 	-V		print command version to standard-error and then exit
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -65,6 +61,7 @@
 #include	<tmtime.h>
 #include	<dayspec.h>
 #include	<filebuf.h>
+#include	<ourmjd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -122,7 +119,6 @@ extern int	cfdecti(const char *,int,int *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getmjd(int,int,int) ;
-extern int	hasourmjd(const char *,int) ;
 extern int	hasalldig(const char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -1344,7 +1340,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	    uint	uv ;
 	    rs = cfdecui(qp,ql,&uv) ;
 	    mjd = (int) uv ;
-	} else if ((rs = hasourmjd(qp,ql)) > 0) {
+	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {
 	    DAYSPEC	ds ;

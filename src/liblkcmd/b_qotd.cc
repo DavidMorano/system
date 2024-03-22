@@ -65,6 +65,7 @@
 #include	<openqotd.h>
 #include	<filebuf.h>
 #include	<termout.h>
+#include	<ourmjd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -113,7 +114,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getmjd(int,int,int) ;
 extern int	dialudp(cchar *,cchar *,int,int,int) ;
-extern int	hasourmjd(cchar *,int) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -1529,7 +1529,7 @@ static int procquery(PROGINFO *pip,void *ofp,cchar qp[],int ql)
 	    uint	uv ;
 	    rs = cfdecui(qp,ql,&uv) ;
 	    mjd = (int) uv ;
-	} else if ((rs = hasourmjd(qp,ql)) > 0) {
+	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {
 	    DAYSPEC	ds ;
@@ -2172,7 +2172,7 @@ static int locinfo_netparse(LOCINFO *lip,cchar *qp,int ql)
 	    uint	uv ;
 	    rs = cfdecui(qp,ql,&uv) ;
 	    mjd = (int) uv ;
-	} else if ((rs = hasourmjd(qp,ql)) > 0) {
+	} else if ((rs = ourmjd(qp,ql)) > 0) {
 	    mjd = rs ;
 	} else {
 	    DAYSPEC	ds ;
