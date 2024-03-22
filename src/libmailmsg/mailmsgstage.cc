@@ -53,16 +53,21 @@
 #include	<netdb.h>
 #include	<climits>
 #include	<cstdlib>
-#include	<xstring>
+#include	<cstring>		/* |memcpy(3c)| */
+#include	<alforithm>
 #include	<usystem.h>
 #include	<filebuf.h>
 #include	<vechand.h>
 #include	<mailmsghdrs.h>
 #include	<mailmsgmatenv.h>
 #include	<mailmsg.h>
-#include	<char.h>
-#include	<mhcom.h>
 #include	<comparse.h>
+#include	<fdliner.h>
+#include	<mhcom.h>
+#include	<strn.h>
+#include	<six.h>
+#include	<mkpathx.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"mailmsgstage.h"
@@ -124,8 +129,6 @@
 #define	MSGENTRY	struct msgentry
 #define	MSGENTRY_FL	struct msgentry_flags
 
-#define	LINER		struct liner
-
 
 /* imported namespaces */
 
@@ -135,41 +138,25 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	sisub(cchar *,int,cchar *) ;
 extern int	mailmsgmathdr(cchar *,int,int *) ;
-extern int	cfdeci(cchar *,int,int *) ;
 extern int	hdrextnum(cchar *,int) ;
 extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isprintlatin(int) ;
-extern int	iceil(int,int) ;
 extern int	hasEOH(cchar *,int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
-extern char	*timestr_edate(time_t,char *) ;
-extern char	*timestr_hdate(time_t,char *) ;
-extern char	*timestr_logz(time_t,char *) ;
+
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external variables */
 
 
 /* local structures */
-
-struct liner {
-	filebuf		mfb ;
-	off_t	poff ;		/* file-offset previous */
-	off_t	foff ;		/* file-offset current */
-	int		to ;		/* read time-out */
-	int		f_net ;		/* regular file */
-	int		llen ;
-	char		lbuf[LINEBUFLEN + 1] ;
-} ;
 
 struct msgentry_flags {
 	uint		ctype:1 ;
@@ -222,11 +209,6 @@ static int	msgentry_setoff(MSGENTRY *,off_t) ;
 static int	msgentry_setlen(MSGENTRY *,int) ;
 static int	mailentry_gethdrnum(MSGENTRY *,cchar *) ;
 
-static int liner_start(LINER *,int,off_t,int) ;
-static int liner_finish(LINER *) ;
-static int liner_readline(LINER *,cchar **) ;
-static int liner_done(LINER *) ;
-
 
 /* local variables */
 
@@ -261,7 +243,7 @@ int mailmsgstage_start(MAILMSGSTAGE *op,int ifd,int to,int opts) noex {
 	    char		tmpfname[MAXPATHLEN + 1] ;
 	    if ((rs = opentmpfile(template,of,om,tmpfname)) >= 0) {
 	        op->tfd = rs ;
-	        if ((rs = uc_closeonexec(op->tfd,TRUE)) >= 0) {
+	        if ((rs = uc_closeonexec(op->tfd,true)) >= 0) {
 	            cchar	*cp ;
 	            if ((rs = uc_mallocstrw(tmpfname,-1,&cp)) >= 0) {
 	                op->tmpfname = cp ;
@@ -659,10 +641,7 @@ int mailmsgstage_bodyread(MAILMSGSTAGE *op,int mi,off_t boff,
 
 /* private subroutines */
 
-
-/* gather the messages */
-static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
-{
+static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to) noex {
 	filebuf		tfb ;
 	const off_t	ostart = 0L ;
 	int		rs ;
@@ -692,17 +671,16 @@ static int mailmsgstage_g(MAILMSGSTAGE *op,int ifd,int to)
 }
 /* end subroutine (mailmsgstage_g) */
 
-
 /* parse out the headers of this message */
-static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,int mi)
-{
+static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,
+		LINER *lsp,int mi) noex {
 	MAILMSGMATENV	me ;
 	int		rs = SR_OK ;
 	int		vi = -1 ;
 	int		ll = 0 ;
-	int		f_env = FALSE ;
-	int		f_hdr = FALSE ;
-	int		f_eoh = FALSE ;
+	int		f_env = false ;
+	int		f_hdr = false ;
+	int		f_eoh = false ;
 	cchar	*lp ;
 
 /* find message start */
@@ -713,13 +691,13 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,int mi)
 
 	    if ((ll > 5) && FMAT(lp) &&
 		((rs = mailmsgmatenv(&me,lp,ll)) > 0)) {
-	        f_env = TRUE ;
+	        f_env = true ;
 	    } else if ((ll > 2) &&
 	       ((rs = mailmsgmathdr(lp,ll,&vi)) > 0)) {
-	        f_hdr = TRUE ;
+	        f_hdr = true ;
 	    } else if ((ll <= 2) && (mi == 0)) {
 	        if ((lp[0] == '\n') || hasEOH(lp,ll)) {
-	            f_eoh = TRUE ;
+	            f_eoh = true ;
 		}
 	    }
 
@@ -741,10 +719,8 @@ static int mailmsgstage_gmsg(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,int mi)
 }
 /* end subroutine (mailmsgstage_gmsg) */
 
-
 static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
-		cchar *lp,int ll,int f_eoh)
-{
+		cchar *lp,int ll,int f_eoh) noex {
 	MSGENTRY	*mep ;
 	int		rs ;
 	if ((rs = mailmsgstage_gmsgentnew(op,&mep)) >= 0) {
@@ -768,8 +744,9 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 			}
 	            }
 		}
-		if (rs < 0)
+		if (rs < 0) {
 		    msgentry_finish(mep) ;
+		}
 	    } /* end if (msgentry_start) */
 	    if ((rs < 0) && (mep != NULL)) {
 	        mailmsgstage_gmsgentdel(op,mep) ;
@@ -780,10 +757,8 @@ static int mailmsgstage_gmsgent(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 }
 /* end subroutine (mailmsgstage_gmsgent) */
 
-
 static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
-	MSGENTRY *mep)
-{
+		MSGENTRY *mep) noex {
 	int		rs ;
 	int		ll = 0 ;
 	rs = msgentry_setoff(mep,op->tflen) ;
@@ -797,10 +772,8 @@ static int mailmsgstage_gmsgenter(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 }
 /* end subroutine (mailmsgstage_gmsgenter) */
 
-
 static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
-	MSGENTRY *mep)
-{
+		MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		max = INT_MAX ;
 	int		blen = 0 ;
@@ -808,9 +781,9 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	int		clen = -1 ;
 	int		clines = -1 ;
 	int		ll = 0 ;
-	int		f_env = FALSE ;
-	int		f_bol = TRUE ;
-	int		f_eol = FALSE ;
+	int		f_env = false ;
+	int		f_bol = true ;
+	int		f_eol = false ;
 	cchar		*lp ;
 
 	if (rs >= 0) clen = msgentry_getclen(mep) ;
@@ -827,7 +800,7 @@ static int mailmsgstage_gmsgbody(MAILMSGSTAGE *op,filebuf *tfp,LINER *lsp,
 	    if (f_bol && FMAT(lp) && (ll > 5)) {
 	            MAILMSGMATENV	me ;
 	            if ((rs = mailmsgmatenv(&me,lp,ll)) > 0) {
-			f_env = TRUE ;
+			f_env = true ;
 		    }
 	        if (f_env) break ;
 	    }
@@ -867,9 +840,7 @@ static int mailmsgstage_gmsgentnew(MAILMSGSTAGE *op,MSGENTRY **mpp) noex {
 }
 /* end subroutine (mailmsgstage_gmsgentnew) */
 
-
-static int mailmsgstage_gmsgentdel(MAILMSGSTAGE *op,MSGENTRY *mep)
-{
+static int mailmsgstage_gmsgentdel(MAILMSGSTAGE *op,MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -883,22 +854,22 @@ static int mailmsgstage_gmsgentdel(MAILMSGSTAGE *op,MSGENTRY *mep)
 }
 /* end subroutine (mailmsgstage_gmsgentdel) */
 
-
-static int mailmsgstage_msgfins(MAILMSGSTAGE *op)
-{
+static int mailmsgstage_msgfins(MAILMSGSTAGE *op) noex {
 	VECHAND		*mlp = &op->msgs ;
 	MSGENTRY	*mep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vechand_get(mlp,i,&mep) >= 0 ; i += 1) {
-	    if (mep != NULL) {
-	        rs1 = msgentry_finish(mep) ;
-	        if (rs >= 0) rs = rs1 ;
-	        rs1 = uc_free(mep) ;
-	        if (rs >= 0) rs = rs1 ;
-		vechand_del(mlp,i--) ;
+	for (int i = 0 ; vechand_get(mlp,i,&mep) >= 0 ; i += 1) {
+	    if (mep) {
+		{
+	            rs1 = msgentry_finish(mep) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(mep) ;
+	            if (rs >= 0) rs = rs1 ;
+		    vechand_del(mlp,i--) ;
+	 	}
 	    }
 	} /* end for */
 
@@ -906,94 +877,78 @@ static int mailmsgstage_msgfins(MAILMSGSTAGE *op)
 }
 /* end subroutine (mailmsgstage_msgfins) */
 
-
-static int msgentry_start(MSGENTRY *mep)
-{
-	int		rs ;
-
-	memset(mep,0,sizeof(MSGENTRY)) ;
-	mep->clines = -1 ;
-	mep->clen = -1 ;
-	mep->blen = -1 ;
-	mep->boff = -1 ;
-	rs = mailmsg_start(&mep->m) ;
-
+static int msgentry_start(MSGENTRY *mep) noex {
+	int		rs = SR_FAULT ;
+	if (mep) {
+	    memclear(mep) ;
+	    mep->clines = -1 ;
+	    mep->clen = -1 ;
+	    mep->blen = -1 ;
+	    mep->boff = -1 ;
+	    rs = mailmsg_start(&mep->m) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (msgentry_start) */
 
-
-static int msgentry_finish(MSGENTRY *mep)
-{
-	int		rs = SR_OK ;
+static int msgentry_finish(MSGENTRY *mep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	mep->boff = -1 ;
-	mep->blen = -1 ;
-	rs1 = mailmsg_finish(&mep->m) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (mep) {
+	    rs = SR_OK ;
+	    mep->boff = -1 ;
+	    mep->blen = -1 ;
+	    {
+	        rs1 = mailmsg_finish(&mep->m) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (msgentry_finish) */
 
-
-static int msgentry_loadline(MSGENTRY *mep,cchar *lp,int ll)
-{
+static int msgentry_loadline(MSGENTRY *mep,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-
 	if (ll > 0) {
 	    rs = mailmsg_loadline(&mep->m,lp,ll) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (msgentry_loadline) */
 
-
-static int msgentry_loadhdrs(MSGENTRY *mep,LINER *lsp)
-{
+static int msgentry_loadhdrs(MSGENTRY *mep,LINER *lsp) noex {
 	int		rs ;
 	int		ll ;
 	int		tlen = 0 ;
-	int		f_eoh = FALSE ;
-	cchar	*lp ;
-
+	int		f_eoh = false ;
+	cchar		*lp ;
 	while ((rs = liner_readline(lsp,&lp)) > 0) {
 	    ll = rs ;
-
 	    tlen += ll ;
 	    f_eoh = (lp[0] == '\n') ;
 	    if (! f_eoh) {
 	        rs = mailmsg_loadline(&mep->m,lp,ll) ;
 	    }
-
 	    if (rs < 0) break ;
-
 	    liner_done(lsp) ;
 	    if (f_eoh) break ;
 	} /* end while */
-
 	mep->f.eoh = f_eoh ;
-
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (msgentry_loadhdrs) */
 
-
-static int msgentry_getclen(MSGENTRY *mep)
-{
+static int msgentry_getclen(MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		clen ;
-	cchar	*kn = HN_CLEN ;
-
+	cchar		*kn = HN_CLEN ;
 	clen = mep->clen ;
 	if (! mep->f.clen) {
-	    mep->f.clen = TRUE ; /* once-flag */
+	    mep->f.clen = true ; /* once-flag */
 	    mep->clen = -1 ;
 	    clen = mailentry_gethdrnum(mep,kn) ;
 	    if (clen >= 0) {
-	        mep->hdr.clen = TRUE ;
+	        mep->hdr.clen = true ;
 	        mep->clen = clen ;
 	    }
 	} /* end if (only once) */
@@ -1002,150 +957,122 @@ static int msgentry_getclen(MSGENTRY *mep)
 }
 /* end subroutine (msgentry_getclen) */
 
-
-static int msgentry_setclen(MSGENTRY *mep,int clen)
-{
-
-	mep->f.clen = TRUE ;
-	mep->clen = clen ;
-	return SR_OK ;
+static int msgentry_setclen(MSGENTRY *mep,int clen) noex {
+	int		rs = SR_FAULT ;
+	if (mep) {
+	    rs = SR_OK ;
+	    mep->f.clen = true ;
+	    mep->clen = clen ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (msgentry_setclen) */
 
-
-static int msgentry_setflags(MSGENTRY *mep)
-{
+static int msgentry_setflags(MSGENTRY *mep) noex {
 	int		rs ;
-
 	if ((rs = msgentry_setct(mep)) >= 0) {
 	    if ((rs = msgentry_setce(mep)) >= 0) {
 	        mep->f.plaintext = mep->f.ctplain && mep->f.ceplain ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (msgentry_setflags) */
 
-
-static int msgentry_setct(MSGENTRY *mep)
-{
+static int msgentry_setct(MSGENTRY *mep) noex {
 	MHCOM		hc ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		hl, vl ;
-	cchar	*tp ;
-	cchar	*hp, *vp ;
-
-	mep->f.ctplain = TRUE ;
+	int		rs1 ;
+	int		hl ;
+	cchar		*hp ;
+	mep->f.ctplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CTYPE,&hp)) > 0) {
-
-	    mep->hdr.ctype = TRUE ;
+	    mep->hdr.ctype = true ;
 	    if ((rs = mhcom_start(&hc,hp,hl)) >= 0) {
-
+		int	vl ;
+		cchar	*vp ;
 	        if ((vl = mhcom_getval(&hc,&vp)) > 0) {
-
-	            if ((tp = strnchr(vp,vl,';')) != NULL)
+	            if (cchar *tp ; (tp = strnchr(vp,vl,';')) != NULL) {
 	                vl = (tp - vp) ;
-
+		    }
 	            rs1 = sisub(vp,vl,"text") ;
-	            if ((rs1 >= 0) && (strnchr(vp,vl,'/') != NULL))
+	            if ((rs1 >= 0) && (strnchr(vp,vl,'/') != NULL)) {
 	                rs1 = sisub(vp,vl,"plain") ;
+		    }
 	            mep->f.ctplain = (rs1 >= 0) ;
-
 	        } /* end if */
-
-	        mhcom_finish(&hc) ;
+	        rs1 = mhcom_finish(&hc) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mhcom) */
-
 	} /* end if (positive) */
-
 	return rs ;
 }
 /* end subroutine (msgentry_setct) */
 
-
-static int msgentry_setce(MSGENTRY *mep)
-{
+static int msgentry_setce(MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
-	cchar	*hp ;
-
-	mep->f.ceplain = TRUE ;
+	cchar		*hp ;
+	mep->f.ceplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CENCODING,&hp)) > 0) {
 	    COMPARSE	com ;
 	    int		vl ;
 	    cchar	*tp ;
 	    cchar	*vp ;
-	    mep->hdr.cencoding = TRUE ;
+	    mep->hdr.cencoding = true ;
 	    if ((rs = comparse_start(&com,hp,hl)) >= 0) {
-
-	    if ((vl = comparse_getval(&com,&vp)) > 0) {
-
-	        if ((tp = strnchr(vp,vl,';')) != NULL)
-	            vl = (tp - vp) ;
-
-	        rs1 = sisub(vp,vl,"7bit") ;
-	        if (rs1 < 0)
-	            rs1 = sisub(vp,vl,"8bit") ;
-	        mep->f.ceplain = (rs1 >= 0) ;
-
-	    } /* end if */
-
+	        if ((vl = comparse_getval(&com,&vp)) > 0) {
+	            if ((tp = strnchr(vp,vl,';')) != NULL) {
+	                vl = (tp - vp) ;
+	            }
+	            rs1 = sisub(vp,vl,"7bit") ;
+	            if (rs1 < 0) {
+	                rs1 = sisub(vp,vl,"8bit") ;
+		    }
+	            mep->f.ceplain = (rs1 >= 0) ;
+	        } /* end if */
 	        rs1 = comparse_finish(&com) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (comparse) */
 	} /* end if (mailmsg_hdrval) */
-
 	return rs ;
 }
 /* end subroutine (msgentry_setce) */
 
-
-static int msgentry_getclines(MSGENTRY *mep)
-{
+static int msgentry_getclines(MSGENTRY *mep) noex {
 	int		rs = SR_OK ;
 	int		clines = 0 ;
-
 	if (! mep->f.clines) {
 	    cchar		*kn = HN_CLINES ;
-	    mep->f.clines = TRUE ; /* once-flag */
+	    mep->f.clines = true ; /* once-flag */
 	    mep->clines = -1 ;
 	    if ((clines = mailentry_gethdrnum(mep,kn)) >= 0) {
-	        mep->hdr.clines = TRUE ;
+	        mep->hdr.clines = true ;
 	        mep->clines = clines ;
 	    }
-	} else
+	} else {
 	    clines = mep->clines ;
-
+	}
 	return (rs >= 0) ? clines : rs ;
 }
 /* end subroutine (msgentry_getclines) */
 
-
-static int msgentry_setclines(MSGENTRY *mep,int clines)
-{
-
-	mep->f.clines = TRUE ;
+static int msgentry_setclines(MSGENTRY *mep,int clines) noex {
+	mep->f.clines = true ;
 	mep->clines = clines ;
 	return SR_OK ;
 }
 /* end subroutine (msgentry_setclines) */
 
-
-static int msgentry_setoff(MSGENTRY *mep,off_t boff)
-{
-
+static int msgentry_setoff(MSGENTRY *mep,off_t boff) noex {
 	mep->boff = boff ;
 	return SR_OK ;
 }
 /* end subroutine (msgentry_setoff) */
 
-
-static int msgentry_setlen(MSGENTRY *mep,int blen)
-{
-
+static int msgentry_setlen(MSGENTRY *mep,int blen) noex {
 	mep->blen = blen ;
 	return SR_OK ;
 }
@@ -1153,12 +1080,10 @@ static int msgentry_setlen(MSGENTRY *mep,int blen)
 
 static int mailentry_gethdrnum(MSGENTRY *mep,cchar *kn) noex {
 	mailmsg		*mmp = &mep->m ;
-{
 	int		rs = SR_NOTFOUND ;
 	int		hl ;
 	int		v = -1 ;
-	cchar	*hp ;
-
+	cchar		*hp ;
 	for (int i = 0 ; (hl = mailmsg_hdrival(mmp,kn,i,&hp)) >= 0 ; i += 1) {
 	    if (hl > 0) {
 	        rs = hdrextnum(hp,hl) ;
@@ -1166,90 +1091,8 @@ static int mailentry_gethdrnum(MSGENTRY *mep,cchar *kn) noex {
 	    }
 	    if (rs >= 0) break ;
 	} /* end for */
-
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (msgentry_gethdrnum) */
-
-static int liner_start(LINER *lsp,int mfd,off_t foff,int to) noex {
-	USTAT		sb ;
-	int		rs ;
-
-	if (mfd < 0)
-	    return SR_BADF ;
-
-	lsp->poff = 0 ;
-	lsp->foff = foff ;
-	lsp->to = to ;
-	lsp->llen = -1 ;
-	lsp->lbuf[0] = '\0' ;
-
-	if ((rs = u_fstat(mfd,&sb)) >= 0) {
-	    int		fbsize = 1024 ;
-	    int		fbo = 0 ;
-	    mode_t	m = sb.st_mode ;
-	    lsp->f_net = S_ISCHR(m) || S_ISSOCK(m) ;
-	    if (lsp->f_net) {
-	        fbo |= filebuf_ONET ;
-	    } else {
-	        int	fs = ((sb.st_size == 0) ? 1 : (sb.st_size & INT_MAX)) ;
-	        int	cs ;
-	        cs = BCEIL(fs,512) ;
-	        fbsize = MIN(cs,4096) ;
-	    }
-	    rs = filebuf_start(&lsp->mfb,mfd,foff,fbsize,fbo) ;
-	} /* end if (stat) */
-
-	return rs ;
-}
-/* end subroutine (liner_start) */
-
-
-static int liner_finish(LINER *lsp)
-{
-	int		rs = SR_OK ;
-	int		rs1 ;
-
-	lsp->llen = 0 ;
-	lsp->lbuf[0] = '\0' ;
-	rs1 = filebuf_finish(&lsp->mfb) ;
-	if (rs >= 0) rs = rs1 ;
-
-	return rs ;
-}
-/* end subroutine (liner_finish) */
-
-
-static int liner_readline(LINER *lsp,cchar **lpp)
-{
-	filebuf		*fbp = &lsp->mfb ;
-	int		rs = SR_OK ;
-
-	if (lsp->llen < 0) {
-
-	    lsp->poff = lsp->foff ;
-	    rs = filebuf_readln(fbp,lsp->lbuf,LINEBUFLEN,lsp->to) ;
-	    lsp->llen = rs ;
-
-	    if (rs > 0) {
-	        lsp->foff += lsp->llen ;
-	    }
-
-	} /* end if (needed a new line) */
-
-	if (lpp) {
-	    *lpp = (rs >= 0) ? lsp->lbuf : NULL ;
-	}
-
-	return (rs >= 0) ? lsp->llen : rs ;
-}
-/* end subroutine (liner_readline) */
-
-static int liner_done(LINER *lsp) noex {
-	lsp->llen = -1 ;
-	lsp->lbuf[0] = '\0' ;
-	return SR_OK ;
-}
-/* end subroutine (liner_done) */
 
 
