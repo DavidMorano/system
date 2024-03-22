@@ -148,7 +148,7 @@ int msgentry_getclen(msgentry *mep) noex {
 	if (! mep->f.clen) {
 	    mep->f.clen = true ; /* once-flag */
 	    mep->clen = -1 ;
-	    clen = mailentry_gethdrnum(mep,kn) ;
+	    clen = msgentry_gethdrnum(mep,kn) ;
 	    if (clen >= 0) {
 	        mep->hdr.clen = true ;
 	        mep->clen = clen ;
@@ -249,7 +249,7 @@ int msgentry_getclines(msgentry *mep) noex {
 	    cchar		*kn = HN_CLINES ;
 	    mep->f.clines = true ; /* once-flag */
 	    mep->clines = -1 ;
-	    if ((clines = mailentry_gethdrnum(mep,kn)) >= 0) {
+	    if ((clines = msgentry_gethdrnum(mep,kn)) >= 0) {
 	        mep->hdr.clines = true ;
 	        mep->clines = clines ;
 	    }
@@ -279,7 +279,7 @@ int msgentry_setlen(msgentry *mep,int blen) noex {
 }
 /* end subroutine (msgentry_setoff) */
 
-int mailentry_gethdrnum(msgentry *mep,cchar *kn) noex {
+int msgentry_gethdrnum(msgentry *mep,cchar *kn) noex {
 	mailmsg		*mmp = &mep->m ;
 	int		rs = SR_NOTFOUND ;
 	int		hl ;

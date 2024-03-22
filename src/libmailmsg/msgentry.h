@@ -80,7 +80,7 @@ extern int	msgentry_getclen(msgentry *) noex ;
 extern int	msgentry_setclen(msgentry *,int) noex ;
 extern int	msgentry_setoff(msgentry *,off_t) noex ;
 extern int	msgentry_setlen(msgentry *,int) noex ;
-extern int	mailentry_gethdrnum(msgentry *,cchar *) noex ;
+extern int	msgentry_gethdrnum(msgentry *,cchar *) noex ;
 
 EXTERNC_end
 
