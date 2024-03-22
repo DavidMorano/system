@@ -1,4 +1,8 @@
-/* termcmd */
+/* termcmd HEADER */
+/* lang=C20 */
+
+/* clear out the TERMCMD object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,15 +15,17 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TERMCMD_INCLUDE
-#define	TERMCMD_INCLUDE	1
+#define	TERMCMD_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<localmisc.h>		/* for "unsigned" types */
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
-#define	TERMCMD		struct termcmd
+#define	TERMCMD		struct termcmd_head
 #define	TERMCMD_FL	struct termcmd_flags
 #define	TERMCMD_NP	16	/* number of paramters (as per ANSI) */
 #define	TERMCMD_PEOL	SHORT_MIN	/* parameter End-Of-Line (EOL) */
@@ -38,12 +44,12 @@ enum termcmdtypes {
 } ;
 
 struct termcmd_flags {
-	uint		private:1 ;	/* private CSI */
+	uint		priv:1 ;	/* private CSI */
 	uint		iover:1 ;	/* intermediate-string overflow */
 	uint		dover:1 ;	/* device-control-string overflow */
 } ;
 
-struct termcmd {
+struct termcmd_head {
 	TERMCMD_FL	f ;
 	short		type ;		/* terminal-command type */
 	short		name ;		/* "final" */
@@ -52,19 +58,14 @@ struct termcmd {
 	char		dstr[TERMCMD_DSIZE+1] ;
 } ;
 
-#if	(! defined(TERMCMD_MASTER)) || (TERMCMD_MASTER == 0)
+typedef	TERMCMD		termcmd ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int termcmd_clear(TERMCMD *) ;
+extern int termcmd_clear(termcmd *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif /* TERMCMD_MASTER */
 
 #endif /* TERMCMD_INCLUDE */
 

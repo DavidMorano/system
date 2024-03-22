@@ -1,8 +1,8 @@
-/* termcmd */
-/* langu=C89 */
+/* termcmd SUPPORT */
+/* lang=C++20 */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* clear out the TERMCMD object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -16,32 +16,26 @@
 
 /*******************************************************************************
 
+	Name:
+	termcmd_clear
+
+	Descrption:
 	This subroutine clears out the TERMCMD object.
 
 	Synopsis:
-
-	int termcmd_clear(CMD *ckp)
-	TERMCMD		*ckp ;
+	int termcmd_clear(termcmd *ckp) noex
 
 	Arguments:
-
 	ckp		TERMCMD object pointer (for clearing)
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<string.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<cfdec.h>
@@ -65,25 +59,26 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int termcmd_clear(TERMCMD *ckp)
-{
-	ckp->type = 0 ;
-	ckp->name = 0 ;
-	ckp->istr[0] = '\0' ;
-	ckp->dstr[0] = '\0' ;
-	ckp->f.private = FALSE ;
-	ckp->f.iover = FALSE ;
-	ckp->f.dover = FALSE ;
-	{
-	    int		i ;
-	    for (i = 0 ; i < TERMCMD_NP ; i += 1) {
+int termcmd_clear(termcmd *ckp) noex {
+	int		rs = SR_FAULT ;
+	if (ckp) {
+	    ckp->type = 0 ;
+	    ckp->name = 0 ;
+	    ckp->istr[0] = '\0' ;
+	    ckp->dstr[0] = '\0' ;
+	    ckp->f.priv = false ;
+	    ckp->f.iover = false ;
+	    ckp->f.dover = false ;
+	    for (int i = 0 ; i < TERMCMD_NP ; i += 1) {
 	        ckp->p[i] = TERMCMD_PEOL ;
 	    }
-	}
-	return SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (termcmd_clear) */
 

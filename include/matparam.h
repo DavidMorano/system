@@ -1,7 +1,7 @@
-/* detdupai HEADER */
+/* matparam HEADER */
 /* lang=C20 */
 
-/* does the given array of integers have duplicate entries */
+/* does the parameter array have a given value? */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DETDUPAI_INCLUDE
-#define	DETDUPAI_INCLUDE
+#ifndef	MATPARAM_INCLUDE
+#define	MATPARAM_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,11 +25,11 @@
 
 EXTERNC_begin
 
-extern int detdupai(cint *,int) noex ;
+extern bool	matparam(cshort *,int,int) noex ;
 
 EXTERNC_end
 
 
-#endif /* DETDUPAI_INCLUDE */
+#endif /* MATPARAM_INCLUDE */
 
 

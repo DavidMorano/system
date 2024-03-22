@@ -1,4 +1,4 @@
-/* hasParam SUPPORT */
+/* matparam SUPPORT */
 /* lang=C++20 */
 
 /* does the parameter array have a given value? */
@@ -30,6 +30,8 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	"matparam.h"
+
 
 /* local defines */
 
@@ -43,18 +45,21 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-bool hasParam(cshort *pp,int pl,int v) noex {
+bool matparam(cshort *pp,int pl,int v) noex {
 	bool		f = false ;
 	for (int i = 0 ; (i < pl) && (pp[i] >= 0) ; i += 1) {
-	    cint	pv = (int) pp[i] ;
+	    cint	pv = int(pp[i]) ;
 	    if (pv == SHORT_MIN) break ;
 	    f = (pv == v) ;
 	    if (f) break ;
 	} /* end for */
 	return f ;
 }
-/* end subroutine (hasParam) */
+/* end subroutine (matparam) */
 
 

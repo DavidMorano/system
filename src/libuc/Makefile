@@ -1158,6 +1158,9 @@ syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
 # UTILITY
+termtypemat.o:		termtypemat.cc termtypemat.h
+termcmd.o:		termcmd.cc termcmd.h
+matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 endian.o:		endian.cc endian.h
 pwentry.o:		pwentry.cc pwentry.h
