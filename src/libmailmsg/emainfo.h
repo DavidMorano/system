@@ -46,8 +46,8 @@ typedef	EMAINFO		emainfo ;
 
 EXTERNC_begin
 
-extern int	emainfo_load(EMAINFO *,cchar *,int) noex ;
-extern int	emainfo_mktype(EMAINFO *,int,char *,int) noex ;
+extern int	emainfo_load(emainfo *,cchar *,int) noex ;
+extern int	emainfo_mktype(emainfo *,int,char *,int) noex ;
 
 EXTERNC_end
 

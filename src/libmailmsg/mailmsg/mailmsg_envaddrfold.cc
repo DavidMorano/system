@@ -48,7 +48,7 @@
 #include	<sbuf.h>
 #include	<localmisc.h>
 
-#include	"mailmsg_enver.h"
+#include	"mailmsg_envget.h"
 
 
 /* local defines */
@@ -75,6 +75,9 @@
 
 /* local typedefs */
 
+typedef mailmsg			mm ;
+typedef mailmsg_envdat		dat ;
+
 
 /* external subroutines */
 
@@ -86,6 +89,8 @@
 
 
 /* forward references */
+
+static int mailmsg_ema(mm *,dat *,char *,int,sbuf *) noex ;
 
 
 /* local variables */
@@ -106,13 +111,11 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	    if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
 	        sbuf	b ;
 	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	            MAILMSG_ENVER	me, *mep = &me ;
-		    auto		mef = mailmsg_enver ;
+	            mailmsg_envdat	me, *mep = &me ;
+		    auto		mef = mailmsg_envget ;
 	            int			cl ;
 	            cchar		*cp ;
 	            for (int i = 0 ; mef(op,i,mep) >= 0 ; i += 1) {
-	                EMAINFO		ai ;
-	                int		atype ;
 	                if ((mep->r.ep != NULL) && (mep->r.el > 0)) {
 	                    cp = mep->r.ep ;
 	                    cl = mep->r.el ;
@@ -123,18 +126,8 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	                    }
 	                } /* end if (remote) */
 	                if (rs >= 0) {
-	                    cint	at = EMAINFO_TUUCP ;
-	                    int		al ;
-	                    cp = mep->a.ep ;
-	                    cl = mep->a.el ;
-	                    atype = emainfo(&ai,cp,cl) ;
-	                    if ((al = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
-	                        if (c > 0) rs = sbuf_char(&b,'!') ;
-	                        if (rs >= 0) {
-	                            c += 1 ;
-	                            rs = sbuf_strw(&b,abuf,al) ;
-	                        }
-	                    }
+			    rs = mailmsg_ema(op,mep,abuf,alen,&b) ;
+			    c += rs ;
 	                } /* end if (address) */
 	                if (rs < 0) break ;
 	            } /* end for (looping through envelopes) */
@@ -148,5 +141,31 @@ int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailmsg_envaddrfold) */
+
+
+/* local subroutines */
+
+static int mailmsg_ema(mm *op,dat *mep,char *abuf,int alen,sbuf *sbp) noex {
+	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (op && mep && abuf && sbp) {
+	    emainfo	ai ;
+	    int		cl = mep->a.el ;
+	    cchar	*cp = mep->a.ep ;
+	    if ((rs = emainfo_load(&ai,cp,cl)) >= 0) {
+	        cint	at = rs ;
+	        if ((rs = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
+		    cint	al = rs ;
+		    if (c > 0) rs = sbuf_char(sbp,'!') ;
+		    if (rs >= 0) {
+		        c += 1 ;
+		        rs = sbuf_strw(sbp,abuf,al) ;
+		    } /* end if (ok) */
+	        } /* end if */
+	    } /* end if (emainfo_load) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (mailmsg_ema) */
 
 
