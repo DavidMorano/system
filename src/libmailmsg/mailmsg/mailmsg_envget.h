@@ -1,4 +1,4 @@
-/* mailmsg_enver HEADER */
+/* mailmsg_envget HEADER */
 /* lang=C++20 */
 
 
@@ -11,8 +11,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	MAILMSGENVER_INCLUDE
-#define	MAILMSGENVER_INCLUDE
+#ifndef	MAILMSGENVGET_INCLUDE
+#define	MAILMSGENVGET_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
@@ -22,30 +22,31 @@
 #include	<mailmsg.h>
 
 
-#define	MAILMSG_ENVER		struct mailmsg_enver
-#define	MAILMSG_ENVSTR		struct mailmsg_envstr
+#define	MAILMSG_ENVDAT		struct mailmsg_envdata
+#define	MAILMSG_ENVSTR		struct mailmsg_envstring
 
 
-struct mailmsg_envstr {
+struct mailmsg_envstring {
 	cchar		*ep ;
 	int		el ;
 } ;
 
-struct mailmsg_enver {
+struct mailmsg_envdata {
 	MAILMSG_ENVSTR	a ;		/* address */
 	MAILMSG_ENVSTR	d ;		/* ?? */
 	MAILMSG_ENVSTR	r ;		/* route-address */
 } ;
 
-typedef MAILMSG_ENVER	mailmsg_enver ;
+typedef MAILMSG_ENVSTR		mailmsg_envstr ;
+typedef MAILMSG_ENVDAT		mailmsg_envdat ;
 
 EXTERNC_begin
 
-extern int	mailmsg_enver(mailmsg *,int,mailmsg_enver *) noex ;
+extern int	mailmsg_envget(mailmsg *,int,mailmsg_envdat *) noex ;
 
 EXTERNC_end
 
 
-#endif /* MAILMSGENVER_INCLUDE */
+#endif /* MAILMSGENVGET_INCLUDE */
 
 

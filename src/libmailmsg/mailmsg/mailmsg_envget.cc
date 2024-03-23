@@ -1,4 +1,4 @@
-/* mailmsg_enver SUPPORT */
+/* mailmsg_envget SUPPORT */
 /* lang=C++20 */
 
 /* MAILMSG get-envelope */
@@ -30,7 +30,7 @@
 #include	<mailmsgmatenv.h>
 #include	<localmisc.h>
 
-#include	"mailmsg_enver.h"
+#include	"mailmsg_envget.h"
 
 
 /* local defines */
@@ -77,11 +77,12 @@ static const int	rsnofield[] = {
 /* exported subroutines */
 
 #if	CF_DIRECT
-int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
+int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 	int		rs ;
 	if ((rs = mailmsg_magic(op,mep)) >= 0) {
-	    mmenvdat		*ep ;
-	    if ((rs = vecobj_get(op->elp,ei,&ep)) >= 0) {
+	    void	*vp{} ;
+	    if ((rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
+	        mmenvdat	*ep = (mmenvdat *) vp ;
 	        mep->a.ep = ep->a.ep ;
 	        mep->a.el = ep->a.el ;
 	        mep->d.ep = ep->d.ep ;
@@ -92,12 +93,12 @@ int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (mailmsg_enver) */
+/* end subroutine (mailmsg_envget) */
 #else /* CF_DIRECT */
-int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
+int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 	int		rs ;
 	if ((rs = mailmsg_magic(op,mep)) >= 0) {
-	    cchar	*sp ;
+	    cchar	*sp{} ;
 	    memclear(mep) ;
 	    if ((rs = mailmsg_envaddress(op,ei,&sp)) >= 0) {
 	        mep->a.el = rs ;
@@ -116,7 +117,7 @@ int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (mailmsg_enver) */
+/* end subroutine (mailmsg_envget) */
 #endif /* CF_DIRECT */
 
 
