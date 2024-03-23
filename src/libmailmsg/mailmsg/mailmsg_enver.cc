@@ -1,11 +1,10 @@
-/* mailmsg_enver */
+/* mailmsg_enver SUPPORT */
+/* lang=C++20 */
 
 /* MAILMSG get-envelope */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DIRECT	1		/* try the more direct approach */
-
 
 /* revision history:
 
@@ -20,18 +19,12 @@
 
 	This subroutine gets information about a MAILMSG envelope.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<mailmsg.h>
 #include	<mailmsgmatenv.h>
@@ -42,51 +35,14 @@
 
 /* local defines */
 
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
+/* imported namespaces */
 
-#ifndef	HDRNAMELEN
-#define	HDRNAMELEN	80
-#endif
 
-#ifndef	MSGLINELEN
-#define	MSGLINELEN	(2 * 1024)
-#endif
-
-#ifndef	MAXMSGLINELEN
-#define	MAXMSGLINELEN	76
-#endif
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	isOneOf(const int *,int) ;
-extern int	isNotPresent(int) ;
-
-extern int	sfsubstance(const char *,int,const char **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -115,22 +71,17 @@ static const int	rsnofield[] = {
 #endif /* CF_DIRECT */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
 #if	CF_DIRECT
-int mailmsg_enver(MAILMSG *msgp,int ei,MAILMSG_ENVER *mep)
-{
+int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
 	int		rs ;
-
-	if (msgp == NULL) return SR_FAULT ;
-	if (mep == NULL) return SR_FAULT ;
-	if (msgp->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	{
-	    MAILMSG_ENV		*eop = &msgp->envs ;
-	    MAILMSGMATENV	*ep ;
-	    if ((rs = vecobj_get(&eop->insts,ei,&ep)) >= 0) {
+	if ((rs = mailmsg_magic(op,mep)) >= 0) {
+	    mailmsgenv		*ep ;
+	    if ((rs = vecobj_get(op->elp,ei,&ep)) >= 0) {
 	        mep->a.ep = ep->a.ep ;
 	        mep->a.el = ep->a.el ;
 	        mep->d.ep = ep->d.ep ;
@@ -138,51 +89,31 @@ int mailmsg_enver(MAILMSG *msgp,int ei,MAILMSG_ENVER *mep)
 	        mep->r.ep = ep->r.ep ;
 	        mep->r.el = ep->r.el ;
 	    }
-	}
-
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsg_enver) */
 #else /* CF_DIRECT */
-int mailmsg_enver(MAILMSG *msgp,int ei,MAILMSG_ENVER *mep)
-{
+int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
 	int		rs ;
-	const char	*sp ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsg_enver: ei=%u\n",ei) ;
-#endif
-
-	memset(mep,0,sizeof(MAILMSG_ENVER)) ;
-
-	if ((rs = mailmsg_envaddress(msgp,ei,&sp)) >= 0) {
-	    mep->a.el = rs ;
-	    mep->a.ep = sp ;
-#if	CF_DEBUGS
-	    debugprintf("mailmsg_enver: a=>%t<\n",sp,rs) ;
-#endif
-	    if ((rs = mailmsg_envdate(msgp,ei,&sp)) >= 0) {
-	        mep->d.el = rs ;
-	        mep->d.ep = sp ;
-#if	CF_DEBUGS
-	        debugprintf("mailmsg_enver: d=>%t<\n",sp,rs) ;
-#endif
-	        if ((rs = mailmsg_envremote(msgp,ei,&sp)) >= 0) {
-	            mep->r.el = rs ;
-	            mep->r.ep = sp ;
-#if	CF_DEBUGS
-	            debugprintf("mailmsg_enver: r=>%t<\n",sp,rs) ;
-#endif
-	        } else if (isNotField(rs)) {
-	            rs = SR_OK ;
-		}
-	    } /* end if (mailmsg_envdate) */
-	} /* end if (mailmsg_envaddress) */
-
-#if	CF_DEBUGS
-	debugprintf("mailmsg_enver: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = mailmsg_magic(op,mep)) >= 0) {
+	    cchar	*sp ;
+	    memclear(mep) ;
+	    if ((rs = mailmsg_envaddress(op,ei,&sp)) >= 0) {
+	        mep->a.el = rs ;
+	        mep->a.ep = sp ;
+	        if ((rs = mailmsg_envdate(op,ei,&sp)) >= 0) {
+	            mep->d.el = rs ;
+	            mep->d.ep = sp ;
+	            if ((rs = mailmsg_envremote(op,ei,&sp)) >= 0) {
+	                mep->r.el = rs ;
+	                mep->r.ep = sp ;
+	            } else if (isNotField(rs)) {
+	                rs = SR_OK ;
+		    }
+	        } /* end if (mailmsg_envdate) */
+	    } /* end if (mailmsg_envaddress) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsg_enver) */
@@ -191,11 +122,9 @@ int mailmsg_enver(MAILMSG *msgp,int ei,MAILMSG_ENVER *mep)
 
 /* provate subroutines */
 
-
 #if	CF_DIRECT
 #else /* CF_DIRECT */
-static int isNotField(int rs)
-{
+static int isNotField(int rs) noex {
 	return isOneOf(rsnofield,rs) ;
 }
 /* end subroutine (isNotField) */

@@ -24,6 +24,7 @@
 
 #include	<mailmsghdrs.h>
 #include	<mailbox.h>
+#include	<msgentry.h>
 
 #include	<mailmsghdrfold.h>
 #include	<mailmsghdrval.h>
@@ -31,9 +32,20 @@
 #include	<mailmsgmathdr.h>
 
 #include	<mailmsgstage.h>
-#include	<msgentry.h>
+#include	<emainfo.h>
+
+#include	<mhcom.h>
+#include	<mcmsg.h>
 
 #include	<hdrextnum.h>
+#include	<contypevals.h>
+
+
+#include	<mailmsgatt.h>
+#include	<mailmsgattent.h>
+#include	<mailmsgfrom.h>
+
+#include	<mimetypes.h>
 
 
 #endif /* LIBMAILMSG_INCLUDE */

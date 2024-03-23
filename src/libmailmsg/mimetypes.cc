@@ -4,7 +4,6 @@
 /* manage a MIME-type database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -35,12 +34,17 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<strn.h>
+#include	<snwcpy.h>
+#include	<strwcpy.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -49,19 +53,25 @@
 
 /* local defines */
 
-#define	MIMETYPES_NUMKEYS	200	/* initial estimated number of keys */
-
 #undef	LINEBUFLEN
 #define	LINEBUFLEN	2048
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+typedef mimetypes	mt ;
+typedef mimetypes_cur	mt_cur ;
+typedef mimetypes_dat	mt_dat ;
+
+
 /* external subroutines */
-
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -87,71 +97,64 @@ static int	cmpentry(cchar *,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int mimetypes_start(MIMETYPES *dbp) noex {
-	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("mimetypes_start: ent\n") ;
-#endif
-
-	rs = hdb_start(dbp,MIMETYPES_NUMKEYS,1,NULL,NULL) ;
-
+int mimetypes_start(mt *dbp) noex {
+	int		rs = SR_FAULT ;
+	if (dbp) {
+	    cint	ne = MIMETYPES_NUMKEYS ;
+	    rs = hdb_start(dbp,ne,1,nullptr,nullptr) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mimetypes_start) */
 
-int mimetypes_finish(MIMETYPES *dbp) noex {
-	HDB_CUR		cur ;
-	HDB_DATUM	key ;
-	HDB_DATUM	data ;
-	int		rs ;
+int mimetypes_finish(mt *dbp) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
-	    while (hdb_enum(dbp,&cur,&key,&data) >= 0) {
-	        if (key.buf != NULL) {
-	            rs1 = uc_free((void *) key.buf) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	    } /* end while */
-	    hdb_curend(dbp,&cur) ;
-	} /* end if */
-
-	rs1 = hdb_finish(dbp) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (dbp) {
+	    mt_cur	cur ;
+	    mt_dat	key ;
+	    mt_dat	data ;
+	    if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	        while (hdb_enum(dbp,&cur,&key,&data) >= 0) {
+	            if (key.buf != nullptr) {
+		        void	*vp = voidp(key.buf) ;
+	                rs1 = uc_free(vp) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end while */
+	        rs1 = hdb_curend(dbp,&cur) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if */
+	    {
+	        rs1 = hdb_finish(dbp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mimetypes_finish) */
 
 /* read a whole file into the database */
-int mimetypes_file(MIMETYPES *dbp,cchar *fname) noex {
+int mimetypes_file(mt *dbp,cchar *fname) noex {
 	bfile		mfile, *mfp = &mfile ;
 	int		rs ;
+	int		rs1 ;
 	int		ctl ;
 	int		size ;
 	int		cl, fl ;
 	int		c = 0 ;
-	uchar		terms[32] ;
+	char		terms[32] ;
 	cchar	*fp ;
 	cchar	*cp ;
 	cchar	*ctp ;
 
-#if	CF_DEBUGS
-	debugprintf("mimetypes_file: ent\n") ;
-#endif
+	if (dbp == nullptr) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
-	if (dbp == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("mimetypes_file: ent, fname=%s\n",fname) ;
-#endif
-
-	fieldterms(terms,FALSE," \t#") ;
+	fieldterms(terms,false," \t#") ;
 
 	if ((rs = bopen(mfp,fname,"r",0666)) >= 0) {
-	    HDB_DATUM	key, data ;
+	    mt_dat	key, data ;
 	    FIELD	fb ;
 	    cint	llen = LINEBUFLEN ;
 	    int		len ;
@@ -163,54 +166,33 @@ int mimetypes_file(MIMETYPES *dbp,cchar *fname) noex {
 	        if (lbuf[len - 1] == '\n') len -= 1 ;
 	        lbuf[len] = '\0' ;
 
-#if	CF_DEBUGS
-	        debugprintf("mimetypes_file: line> %s\n",lbuf) ;
-#endif
-
 	        if (len == 0)
 	            continue ;
 
 /* extract the typespec (MIME content type) */
 
 	        ctl = exttypespec(lbuf,len,&ctp) ;
-
-#if	CF_DEBUGS
-	        debugprintf("mimetypes_file: exttypespec() ctp=%t ctl=%d\n",
-	            ctp,ctl,ctl) ;
-#endif
-
-	        if (ctl <= 0)
-	            continue ;
+	        if (ctl <= 0) continue ;
 
 /* get the file suffixes for this MIME content type */
 
 	        cp = ctp + ctl ;
 	        cl = len - (cp - lbuf) ;
 	        if ((rs = field_start(&fb,cp,cl)) >= 0) {
-
+		    cchar	*kp{} ;
 	            while ((fl = field_get(&fb,terms,&fp)) >= 0) {
-
-#if	CF_DEBUGS
-	                debugprintf("mimetypes_file: field> %t\n",fp,fl) ;
-#endif
-
 	                if (fl > 0) {
-
 	                    key.buf = fp ;
 	                    key.len = fl ;
-	                    if (hdb_fetch(dbp,key,NULL,&data) < 0) {
+	                    if (hdb_fetch(dbp,key,nullptr,&data) < 0) {
 	                        char	*bkp, *bvp ;
-
-#if	CF_DEBUGS
-	                        debugprintf("mimetypes_file: key=%t val=%t\n",
-	                            key.buf,key.len,ctp,ctl) ;
-#endif
 
 	                        size = key.len + 1 + ctl + 1 ;
 	                        rs = uc_malloc(size,&bkp) ;
 	                        if (rs < 0) break ;
 
-	                        bvp = strwcpy(bkp,key.buf,key.len) + 1 ;
+				kp = charp(key.buf) ;
+	                        bvp = strwcpy(bkp,kp,key.len) + 1 ;
 
 	                        key.buf = bkp ;
 	                        strwcpy(bvp,ctp,ctl) ;
@@ -229,65 +211,47 @@ int mimetypes_file(MIMETYPES *dbp,cchar *fname) noex {
 	                    } /* end if */
 
 	                } /* end if */
-
 	                if (fb.term == '#') break ;
 	                if (rs < 0) break ;
 	            } /* end while (reading fields) */
-
-	            field_finish(&fb) ;
+	            rs1 = field_finish(&fb) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (field) */
-
 	        if (rs < 0) break ;
 	    } /* end while (reading lines) */
-
-	    bclose(mfp) ;
+	    rs1 = bclose(mfp) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (bfile) */
-
-#if	CF_DEBUGS
-	{
-	    HDB_CUR	cur ;
-	    debugprintf("mimetypes_file: dumping key-val pairs\n") ;
-	    hdb_curbegin(dbp,&cur) ;
-	    while (hdb_enum(dbp,&cur,&key,&data) >= 0) {
-	        debugprintf("mimetypes_file: key=%t val=%t\n",
-	            key.buf,key.len,data.buf,data.len) ;
-	    }
-	    hdb_curend(dbp,&cur) ;
-	} /* end block */
-#endif /* CF_DEBUGS */
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mimetypes_file) */
 
 /* find a MIME type for the given extension */
-int mimetypes_find(MIMETYPES *dbp,char *typespec,cchar *ext) noex {
+int mimetypes_find(mt *dbp,char *typespec,cchar *ext) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	cchar	*tp ;
 
-#if	CF_DEBUGS
-	debugprintf("mimetypes_get: ent\n") ;
-#endif
+	if (ext == nullptr) return SR_FAULT ;
 
-	if (ext == NULL) return SR_FAULT ;
+	if (typespec != nullptr) typespec[0] = '\0' ;
 
-	if (typespec != NULL) typespec[0] = '\0' ;
-
-	if ((tp = strrchr(ext,'.')) == NULL) {
+	if ((tp = strrchr(ext,'.')) == nullptr) {
 	    tp = ext ;
 	} else {
 	    tp += 1 ;
 	}
 
 	if (tp[0] != '\0') {
-	    HDB_DATUM	key, data ;
+	    mt_dat	key, data ;
 	    key.len = -1 ;
 	    key.buf = tp ;
-	    if ((rs = hdb_fetch(dbp,key,NULL,&data)) >= 0) {
-	        if (typespec != NULL) {
+	    if ((rs = hdb_fetch(dbp,key,nullptr,&data)) >= 0) {
+	        if (typespec != nullptr) {
 	            cint	typelen = MIMETYPES_TYPELEN ;
-	            rs = snwcpy(typespec,typelen,data.buf,data.len) ;
+		    cchar	*valp = charp(data.buf) ;
+	            rs = snwcpy(typespec,typelen,valp,data.len) ;
 	            len = rs ;
 	        }
 	    }
@@ -295,41 +259,40 @@ int mimetypes_find(MIMETYPES *dbp,char *typespec,cchar *ext) noex {
 	    rs = SR_NOTFOUND ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mimetypes_get: ret rs=%d len=%d\n",rs,data.len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mimetypes_find) */
 
-int mimetypes_curbegin(MIMETYPES *dbp,HDB_CUR *cp) noex {
+int mimetypes_curbegin(mt *dbp,mt_cur *cp) noex {
 	return hdb_curbegin(dbp,cp) ;
 }
 /* end subroutine (mimetypes_curbegin) */
 
-int mimetypes_curend(MIMETYPES *dbp,HDB_CUR *cp) noex {
+int mimetypes_curend(mt *dbp,mt_cur *cp) noex {
 	return hdb_curend(dbp,cp) ;
 }
 /* end subroutine (mimetypes_curend) */
 
 /* enumerate all of the key-val pairs */
-int mimetypes_enum(MIMETYPES *dbp,MIMETYPES_CUR *curp,
-		char *ext,char *ts) noex {
-	HDB_DATUM	key, val ;
+int mimetypes_enum(mt *dbp,mt_cur *curp,char *ext,char *ts) noex {
+	mt_dat	key, val ;
 	int		rs ;
 
-	if (dbp == NULL) return SR_FAULT ;
-	if (ext == NULL) return SR_FAULT ;
+	if (dbp == nullptr) return SR_FAULT ;
+	if (ext == nullptr) return SR_FAULT ;
 
 	ext[0] = '\0' ;
-	if (ts != NULL) ts[0] = '\0' ;
+	if (ts != nullptr) ts[0] = '\0' ;
 
 	if ((rs = hdb_enum(dbp,curp,&key,&val)) >= 0) {
-	    cint	ml = MIN(key.len,MIMETYPES_TYPELEN) ;
-	    strwcpy(ext,key.buf,ml) ;
-	    rs = MIN(val.len,MIMETYPES_TYPELEN) ;
-	    if (ts != NULL) strwcpy(ts,val.buf,rs) ;
+	    cint	ml = min(key.len,MIMETYPES_TYPELEN) ;
+	    cchar	*kp = charp(key.buf) ;
+	    strwcpy(ext,kp,ml) ;
+	    rs = min(val.len,MIMETYPES_TYPELEN) ;
+	    if (ts != nullptr) {
+		cchar	*valp = charp(val.buf) ;
+		strwcpy(ts,valp,rs) ;
+	    }
 	}
 
 	return rs ;
@@ -338,20 +301,20 @@ int mimetypes_enum(MIMETYPES *dbp,MIMETYPES_CUR *curp,
 
 
 /* fetch the next val by extension and a possible cursor */
-int mimetypes_fetch(MIMETYPES *dbp,MIMETYPES_CUR *curp,
+int mimetypes_fetch(mt *dbp,mt_cur *curp,
 		char *ext,char *ts) noex {
-	HDB_DATUM	key, val ;
+	mt_dat	key, val ;
 	int		rs ;
 
-	if (dbp == NULL) return SR_FAULT ;
-	if ((ext == NULL) || (ts == NULL)) return SR_FAULT ;
+	if (dbp == nullptr) return SR_FAULT ;
+	if ((ext == nullptr) || (ts == nullptr)) return SR_FAULT ;
 
 	key.buf = ext ;
 	key.len = -1 ;
 	ts[0] = '\0' ;
 	if ((rs = hdb_fetch(dbp,key,curp,&val)) >= 0) {
-	    cint	ml = MIN(val.len,MIMETYPES_TYPELEN) ;
-	    cchar	*mp = (cchar *) val.buf ;
+	    cint	ml = min(val.len,MIMETYPES_TYPELEN) ;
+	    cchar	*mp = charp(val.buf) ;
 	    rs = (strwcpy(ts,mp,ml) - ts) ;
 	}
 
@@ -360,7 +323,7 @@ int mimetypes_fetch(MIMETYPES *dbp,MIMETYPES_CUR *curp,
 /* end subroutine (mimetypes_fetch) */
 
 /* OLDER API: find a MIME type given an extension */
-int mimetypes_get(MIMETYPES *dbp,char *typespec,cchar *ext) noex {
+int mimetypes_get(mt *dbp,char *typespec,cchar *ext) noex {
 	return mimetypes_find(dbp,typespec,ext) ;
 }
 /* end subroutine (mimetypes_get) */

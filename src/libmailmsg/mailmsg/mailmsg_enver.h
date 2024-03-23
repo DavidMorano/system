@@ -1,4 +1,5 @@
 /* mailmsg_enver HEADER */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -14,37 +15,35 @@
 #define	MAILMSGENVER_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<mailmsg.h>
 
 
 #define	MAILMSG_ENVER		struct mailmsg_enver
+#define	MAILMSG_ENVSTR		struct mailmsg_envstr
 
 
 struct mailmsg_envstr {
-	const char	*ep ;
+	cchar		*ep ;
 	int		el ;
 } ;
 
 struct mailmsg_enver {
-	struct mailmsg_envstr	a, d, r ;
+	MAILMSG_ENVSTR	a ;		/* address */
+	MAILMSG_ENVSTR	d ;		/* ?? */
+	MAILMSG_ENVSTR	r ;		/* route-address */
 } ;
 
+typedef MAILMSG_ENVER	mailmsg_enver ;
 
-#if	(! defined(MAILMSGENVER_MASTER)) || (MAILMSGENVER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	mailmsg_enver(mailmsg *,int,mailmsg_enver *) noex ;
 
-extern int mailmsg_enver(MAILMSG *,int,MAILMSG_ENVER *) noex ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* MAILMSGENVER_MASTER */
+EXTERNC_end
 
 
 #endif /* MAILMSGENVER_INCLUDE */
