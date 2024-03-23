@@ -100,7 +100,7 @@ int mailmsgatt_finish(mailmsgatt *op) noex {
 /* add an attachment (w/ default content-type and content-encoding) */
 int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (op && ct && nbuf) {
+	if (op && ct && sp) {
 	    mailmsgattent	ve ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = mailmsgattent_start(&ve,ct,ce,sp,sl)) >= 0) {

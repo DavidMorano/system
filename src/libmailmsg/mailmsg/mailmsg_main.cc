@@ -199,7 +199,7 @@ static int mailmsg_dtor(mailmsg *op) noex {
 static int mailmsg_procline(mailmsg *,cchar *,int) noex ;
 
 static int mailmsg_envbegin(mailmsg *) noex ;
-static int mailmsg_envadd(mailmsg *,mailmsgenv *) noex ;
+static int mailmsg_envadd(mailmsg *,mmenvdat *) noex ;
 static int mailmsg_envend(mailmsg *) noex ;
 
 static int mailmsg_hdrbegin(mailmsg *) noex ;
@@ -320,7 +320,7 @@ int mailmsg_envaddress(mailmsg *op,int i,cchar **rpp) noex {
 	    void	*vp{} ;
 	    if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
 	        if (vp) {
-		    mailmsgenv	*ep = (mailmsgenv *) vp ;
+		    mmenvdat	*ep = (mmenvdat *) vp ;
 		    el = ep->a.el ;
 		    rp =  ep->a.ep ;
 	        }
@@ -341,7 +341,7 @@ int mailmsg_envdate(mailmsg *op,int i,cchar **rpp) noex {
 	    void	*vp{} ;
 	    if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
 	        if (vp) {
-		    mailmsgenv	*ep = (mailmsgenv *) vp ;
+		    mmenvdat	*ep = (mmenvdat *) vp ;
 		    el = ep->d.el ;
 		    rp = ep->d.ep ;
 	        }
@@ -362,7 +362,7 @@ int mailmsg_envremote(mailmsg *op,int i,cchar **rpp) noex {
 	    void	*vp{} ;
 	    if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
 	        if (vp) {
-		    mailmsgenv	*ep = (mailmsgenv *) vp ;
+		    mmenvdat	*ep = (mmenvdat *) vp ;
 		    el = ep->r.el ;
 		    rp = ep->r.ep ;
 	        }
@@ -510,7 +510,7 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	int		vi = 0 ;
 	cchar		*vp ;
 	if (op->msgstate == msgstate_env) {
-	    mailmsgenv	es ;
+	    mmenvdat	es ;
 	    if ((rs = mailmsgmatenv(&es,lp,ll)) > 0) {
 	        rs = mailmsg_envadd(op,&es) ;
 	    } else if (rs == 0) {
@@ -531,7 +531,7 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 /* end subroutine (mailmsg_procline) */
 
 static int mailmsg_envbegin(mailmsg *op) noex {
-	cint		esz = sizeof(mailmsgenv) ;
+	cint		esz = sizeof(mmenvdat) ;
 	return vecobj_start(op->elp,esz,4,0) ;
 }
 /* end subroutine (mailmsg_envbegin) */
@@ -547,7 +547,7 @@ static int mailmsg_envend(mailmsg *op) noex {
 }
 /* end subroutine (mailmsg_envend) */
 
-static int mailmsg_envadd(mailmsg *op,mailmsgenv *esp) noex {
+static int mailmsg_envadd(mailmsg *op,mmenvdat *esp) noex {
 	int		rs = SR_FAULT ;
 	if (op && esp) {
 	    rs = vecobj_add(op->elp,esp) ;

@@ -80,7 +80,7 @@ static const int	rsnofield[] = {
 int mailmsg_enver(mailmsg *op,int ei,mailmsg_enver *mep) noex {
 	int		rs ;
 	if ((rs = mailmsg_magic(op,mep)) >= 0) {
-	    mailmsgenv		*ep ;
+	    mmenvdat		*ep ;
 	    if ((rs = vecobj_get(op->elp,ei,&ep)) >= 0) {
 	        mep->a.ep = ep->a.ep ;
 	        mep->a.el = ep->a.el ;

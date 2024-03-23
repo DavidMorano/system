@@ -187,7 +187,7 @@ static int mailbox_dtor(mailbox *op) noex {
 static int mailbox_opener(mailbox *,cc *,int) noex ;
 static int mailbox_parse(mailbox *) noex ;
 static int mailbox_parsemsg(mailbox *,fbliner *,int) noex ;
-static int mailbox_parsemsger(mailbox *,mailmsgenv *,MAILBOXPI *) noex ;
+static int mailbox_parsemsger(mailbox *,mmenvdat *,MAILBOXPI *) noex ;
 static int mailbox_loadmsghead(mailbox *,MB_MI *,mailmsghdrval *) noex ;
 static int mailbox_msgfins(mailbox *) noex ;
 static int mailbox_rewrite(mailbox *) noex ;
@@ -198,7 +198,7 @@ static int mailbox_msgcopyadd(mailbox *,MSGCOPY *,MB_MI *) noex ;
 
 static int msginfo_start(MB_MI *,off_t,int) noex ;
 static int msginfo_finish(MB_MI *) noex ;
-static int msginfo_setenv(MB_MI *,mailmsgenv *) noex ;
+static int msginfo_setenv(MB_MI *,mmenvdat *) noex ;
 
 static int mailboxpi_start(MAILBOXPI *,fbliner *,int) noex ;
 static int mailboxpi_finish(MAILBOXPI *) noex ;
@@ -639,7 +639,7 @@ static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
 	int		rs1 ;
 	int		ll = 0 ;
 	if ((rs = mailboxpi_start(&pi,lsp,mi)) >= 0) {
-	    mailmsgenv	me ;
+	    mmenvdat	me ;
 	    int		vi = 0 ;
 	    cchar	*lp ;
 /* find message start */
@@ -674,7 +674,7 @@ static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
 }
 /* end subroutine (mailbox_parsemsg) */
 
-static int mailbox_parsemsger(mailbox *op,mailmsgenv *mep,
+static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,
 		MAILBOXPI *pip) noex {
 	fbliner		*lsp = pip->lsp ;
 	MB_MI		msg, *msgp = &msg ;
@@ -1163,7 +1163,7 @@ static int msginfo_finish(MB_MI *mp) noex {
 }
 /* end subroutine (msginfo_finish) */
 
-static int msginfo_setenv(MB_MI *msgp,mailmsgenv *mep) noex {
+static int msginfo_setenv(MB_MI *msgp,mmenvdat *mep) noex {
 	int		rs = SR_OK ;
 	msgp->f.env = true ;
 	msgp->f.senv = mep->f.start ;

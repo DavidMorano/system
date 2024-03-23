@@ -26,35 +26,35 @@
 
 
 /* object defines */
-#define	MAILMSGENV		struct mailmsgenv_head
-#define	MAILMSGENV_FL		struct mailmsgenv_flags
-#define	MAILMSGENV_ELEM		struct mailmsgenv_elemement
+#define	MMENVDAT		struct mmenvdat_head
+#define	MMENVDAT_FL		struct mmenvdat_flags
+#define	MMENVDAT_ELEM		struct mmenvdat_elemement
 
 
-struct mailmsgenv_flags {
+struct mmenvdat_flags {
 	uint		start:1 ;	/* starting envelope? (most are) */
 } ;
 
-struct mailmsgenv_elemement {
+struct mmenvdat_elemement {
 	cchar		*ep ;
 	int		el ;
 } ;
 
-struct mailmsgenv_head {
-	MAILMSGENV_ELEM		a ;	/* address (EMA) */
-	MAILMSGENV_ELEM		d ;	/* date */
-	MAILMSGENV_ELEM		r ;	/* remove-from (EMA) */
-	MAILMSGENV_FL		f ;	/* flags */
+struct mmenvdat_head {
+	MMENVDAT_ELEM		a ;	/* address (EMA) */
+	MMENVDAT_ELEM		d ;	/* date */
+	MMENVDAT_ELEM		r ;	/* remove-from (EMA) */
+	MMENVDAT_FL		f ;	/* flags */
 	int			rt ;	/* remote type */
 } ;
 
-typedef MAILMSGENV		mailmsgenv ;
-typedef MAILMSGENV_FL		mailmsgenv_fl ;
-typedef MAILMSGENV_ELEM		mailmsgenv_elem ;
+typedef MMENVDAT		mmenvdat ;
+typedef MMENVDAT_FL		mmenvdat_fl ;
+typedef MMENVDAT_ELEM		mmenvdat_elem ;
 
 EXTERNC_begin
 
-extern int mailmsgmatenv(mailmsgenv *,cchar *,int) noex ;
+extern int mailmsgmatenv(mmenvdat *,cchar *,int) noex ;
 
 EXTERNC_end
 

@@ -88,28 +88,6 @@
 #define	HDRNAMELEN	80
 #endif
 
-#ifndef	MSGLINELEN
-#define	MSGLINELEN	(2 * 1024)
-#endif
-
-#ifndef	MAXMSGLINELEN
-#define	MAXMSGLINELEN	76
-#endif
-
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-#ifndef	TABLEN
-#define	TABLEN		8
-#endif
-
-#define	DATEBUFLEN	80
-#define	STACKADDRBUFLEN	(2 * 1024)
-
-#undef	BUFLEN
-#define	BUFLEN		(2 * 1024)
-
 #define	FMAT(cp)	((cp)[0] == 'F')
 
 #ifndef	HN_XMAILER
@@ -119,9 +97,6 @@
 #ifndef	HN_RECEIVED
 #define	HN_RECEIVED	"received"
 #endif
-
-#undef	NBLANKS
-#define	NBLANKS		20
 
 #define	MMS		mailmsgstage
 
@@ -602,7 +577,7 @@ static int mailmsgstage_g(MMS *op,int ifd) noex {
 /* parse out the headers of this message */
 static int mailmsgstage_gmsg(MMS *op,filebuf *tfp,
 		fdliner *lsp,int mi) noex {
-	mailmsgenv	me ;
+	mmenvdat	me ;
 	int		rs = SR_OK ;
 	int		vi = -1 ;
 	int		ll = 0 ;
@@ -717,7 +692,7 @@ static int mailmsgstage_gmsgbody(MMS *op,filebuf *tfp,fdliner *lsp,
 	    ll = rs ;
 	    f_eol = (lp[ll - 1] == '\n') ;
 	    if (f_bol && FMAT(lp) && (ll > 5)) {
-	            mailmsgenv	me ;
+	            mmenvdat	me ;
 	            if ((rs = mailmsgmatenv(&me,lp,ll)) > 0) {
 			f_env = true ;
 		    }
