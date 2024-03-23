@@ -58,10 +58,11 @@ OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
 OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
 OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o 
 OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o contypevals.o
+OBJ4_LIBMAILMSG= emainfo.o
 
 
 OBJA_LIBMAILMSG= obj0_mailmsg.o obj1_mailmsg.o
-OBJB_LIBMAILMSG= obj2_mailmsg.o obj3_mailmsg.o
+OBJB_LIBMAILMSG= obj2_mailmsg.o obj3_mailmsg.o obj4_mailmsg.o
 
 OBJ_LIBMAILMSG= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG)
 
@@ -121,6 +122,9 @@ obj2_mailmsg.o:	$(OBJ2_LIBMAILMSG)
 obj3_mailmsg.o:	$(OBJ3_LIBMAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBMAILMSG)
 
+obj4_mailmsg.o:	$(OBJ5_LIBMAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_LIBMAILMSG)
+
 
 # MAILBOX
 mailbox.o:		mailbox.dir
@@ -144,6 +148,7 @@ msgentry.o:		msgentry.cc msgentry.h		$(INCS)
 
 mhcom.o:		mhcom.cc mhcom.h
 mcmsg.o:		mcmsg.cc mcmsg.h
+emainfo.o:		emainfo.cc emainfo.h
 mimetypes.o:		mimetypes.cc mimetypes.h
 
 hdrextnum.o:		hdrextnum.cc hdrextnum.h

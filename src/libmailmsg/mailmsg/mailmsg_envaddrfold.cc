@@ -24,10 +24,10 @@
 	various envelope components.
 
 	Synopsis:
-	int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen)
+	int mailmsg_envaddrfold(MAILMSG *op,char *rbuf,int rlen)
 
 	Arguments:
-	mmp		pointer to MAILMSG object
+	op		pointer to MAILMSG object
 	rbuf		buffer to receive result
 	rlen		length of result buffer
 
@@ -55,14 +55,6 @@
 
 #ifndef	MAILADDRLEN
 #define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
 #endif
 
 #ifndef	HDRNAMELEN
@@ -104,56 +96,55 @@
 
 /* exported subroutines */
 
-int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen) noex {
+int mailmsg_envaddrfold(mailmsg *op,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
-	if (mmp == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
-
-	cint		alen = MAILADDRLEN ;
-	char		*abuf ;
-	if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
-	    sbuf	b ;
-	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
-	        MAILMSG_ENVER	me, *mep = &me ;
-	        int		cl ;
-	        cchar		*cp ;
-	        for (int i = 0 ; mailmsg_enver(mmp,i,mep) >= 0 ; i += 1) {
-	            EMAINFO	ai ;
-	            int		atype ;
-	            if ((mep->r.ep != NULL) && (mep->r.el > 0)) {
-	                cp = mep->r.ep ;
-	                cl = mep->r.el ;
-	                if (c > 0) rs = sbuf_char(&b,'!') ;
-	                if (rs >= 0) {
-	                    c += 1 ;
-	                    rs = sbuf_strw(&b,cp,cl) ;
-	                }
-	            } /* end if (remote) */
-	            if (rs >= 0) {
-	                cint	at = EMAINFO_TUUCP ;
-	                int	al ;
-	                cp = mep->a.ep ;
-	                cl = mep->a.el ;
-	                atype = emainfo(&ai,cp,cl) ;
-	                if ((al = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
+	if ((rs = mailmsg_magic(op,rbuf)) >= 0) {
+	    cint	alen = MAILADDRLEN ;
+	    char	*abuf ;
+	    if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
+	        sbuf	b ;
+	        if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
+	            MAILMSG_ENVER	me, *mep = &me ;
+		    auto		mef = mailmsg_enver ;
+	            int			cl ;
+	            cchar		*cp ;
+	            for (int i = 0 ; mef(op,i,mep) >= 0 ; i += 1) {
+	                EMAINFO		ai ;
+	                int		atype ;
+	                if ((mep->r.ep != NULL) && (mep->r.el > 0)) {
+	                    cp = mep->r.ep ;
+	                    cl = mep->r.el ;
 	                    if (c > 0) rs = sbuf_char(&b,'!') ;
 	                    if (rs >= 0) {
 	                        c += 1 ;
-	                        rs = sbuf_strw(&b,abuf,al) ;
+	                        rs = sbuf_strw(&b,cp,cl) ;
 	                    }
-	                }
-	            } /* end if (address) */
-	            if (rs < 0) break ;
-	        } /* end for (looping through envelopes) */
-	        rs1 = sbuf_finish(&b) ;
+	                } /* end if (remote) */
+	                if (rs >= 0) {
+	                    cint	at = EMAINFO_TUUCP ;
+	                    int		al ;
+	                    cp = mep->a.ep ;
+	                    cl = mep->a.el ;
+	                    atype = emainfo(&ai,cp,cl) ;
+	                    if ((al = emainfo_mktype(&ai,at,abuf,alen)) > 0) {
+	                        if (c > 0) rs = sbuf_char(&b,'!') ;
+	                        if (rs >= 0) {
+	                            c += 1 ;
+	                            rs = sbuf_strw(&b,abuf,al) ;
+	                        }
+	                    }
+	                } /* end if (address) */
+	                if (rs < 0) break ;
+	            } /* end for (looping through envelopes) */
+	            rs1 = sbuf_finish(&b) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (sbuf) */
+	        rs1 = uc_free(abuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (sbuf) */
-	    rs1 = uc_free(abuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-allocation) */
+	    } /* end if (memory-allocation) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailmsg_envaddrfold) */

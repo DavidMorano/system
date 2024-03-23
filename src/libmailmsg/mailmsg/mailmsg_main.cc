@@ -531,12 +531,8 @@ static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 /* end subroutine (mailmsg_procline) */
 
 static int mailmsg_envbegin(mailmsg *op) noex {
-	cint		size = sizeof(mailmsgenv) ;
-	int		rs ;
-
-	rs = vecobj_start(op->elp,size,4,0) ;
-
-	return rs ;
+	cint		esz = sizeof(mailmsgenv) ;
+	return vecobj_start(op->elp,esz,4,0) ;
 }
 /* end subroutine (mailmsg_envbegin) */
 
@@ -675,21 +671,15 @@ static int msghdrname_start(MMHNAME *hnp,cchar *hp,int hl,
 		cchar *vp,int vl) noex {
 	vecobj		*ilp = &hnp->insts ;
 	int		rs ;
-	int		size ;
-
-#if	CF_PEDANTIC
-	memset(hnp,0,sizeof(MMHNAME)) ;
-#endif
-
+	int		isz = sizeof(MMHINST) ;
+	memclear(hnp) ;
 	hnp->vp = nullptr ;
 	hnp->vl = 0 ;
 	hnp->f_alloc = false ;
 	hnp->name = nullptr ;
 	hnp->namelen = 0 ;
 	hnp->lastinst = -1 ;
-
-	size = sizeof(MMHINST) ;
-	if ((rs = vecobj_start(ilp,size,2,0)) >= 0) {
+	if ((rs = vecobj_start(ilp,isz,2,0)) >= 0) {
 	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(hp,hl,&cp)) >= 0) {
 	        hnp->name = cp ;
@@ -705,7 +695,6 @@ static int msghdrname_start(MMHNAME *hnp,cchar *hp,int hl,
 		vecobj_finish(ilp) ;
 	    }
 	} /* end if (vecobj_start) */
-
 	return rs ;
 }
 /* end subroutine (msghdrname_start) */
@@ -738,7 +727,7 @@ static int msghdrname_finish(MMHNAME *hnp) noex {
 	    hnp->lastinst = -1 ;
 	    rs1 = vecobj_finish(&hnp->insts) ;
 	    if (rs >= 0) rs = rs1 ;
-	}
+	} /* end block */
 	hnp->vp = nullptr ;
 	hnp->f_alloc = false ;
 	return rs ;
@@ -746,15 +735,13 @@ static int msghdrname_finish(MMHNAME *hnp) noex {
 /* end subroutine (msghdrname_finish) */
 
 static int msghdrname_match(MMHNAME *hnp,cchar *hp,int hl) noex {
-	int		rs = SR_OK ;
-	int		f ;
-
-	if (hp == nullptr) return SR_FAULT ;
-
-	f = (hnp->namelen == hl) ;
-	f = f && (hnp->name[0] == hp[0]) ;
-	f = f && (strncmp(hnp->name,hp,hl) == 0) ;
-
+	int		rs = SR_FAULT ;
+	int		f = false ;
+	if (hnp && hp) {
+	    f = (hnp->namelen == hl) ;
+	    f = f && (hnp->name[0] == hp[0]) ;
+	    f = f && (strncmp(hnp->name,hp,hl) == 0) ;
+	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (msghdrname_match) */
@@ -795,7 +782,6 @@ static int msghdrname_addcont(MMHNAME *hnp,cchar *vp,int vl) noex {
 		}
 	    } /* end if (positive) */
 	} /* end if (positive) */
-
 	return rs ;
 }
 /* end subroutine (msghdrname_addcont) */
@@ -835,10 +821,10 @@ static int msghdrname_val(MMHNAME *hnp,cchar **rpp) noex {
 	int		vl = hnp->vl ;
 	if (hnp->vp == nullptr) {
 	    vecobj	*ilp = &hnp->insts ;
-	    MMHINST	*hip ;
+	    MMHINST	*hip{} ;
 	    int		size = 1 ;
 	    cchar	*hivp = nullptr ;
-	    char	*bp ;
+	    char	*bp{} ;
 	    void	*vp{} ;
 	    for (int i = 0 ; vecobj_get(ilp,i,&vp) >= 0 ; i += 1) {
 	        if (vp) {
@@ -883,23 +869,19 @@ static int msghdrname_count(MMHNAME *hnp) noex {
 /* end subroutine (msghdrname_count) */
 
 static int msghdrinst_start(MMHINST *hip,cchar *vp,int vl) noex {
-	cint		size = sizeof(MMHVAL) ;
+	cint		vsz = sizeof(MMHVAL) ;
 	int		rs ;
-
-#if	CF_PEDANTIC
-	memset(hip,0,sizeof(MMHINST)) ;
-#endif
-
+	memclear(hip) ;
 	hip->vp = nullptr ;
 	hip->vl = 0 ;
-	if ((rs = vecobj_start(&hip->vals,size,4,0)) >= 0) {
-	    if ((vl > 0) && (vp != nullptr)) {
+	if ((rs = vecobj_start(&hip->vals,vsz,4,0)) >= 0) {
+	    if ((vl > 0) && vp) {
 	        rs = msghdrinst_add(hip,vp,vl) ;
-	        if (rs < 0)
+	        if (rs < 0) {
 		    vecobj_finish(&hip->vals) ;
+		}
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (msghdrinst_start) */

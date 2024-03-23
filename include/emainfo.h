@@ -1,4 +1,5 @@
-/* emainfo */
+/* emainfo HEADER */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -11,25 +12,20 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	EMAINFO_INCLUDE
-#define	EMAINFO_INCLUDE		1
+#define	EMAINFO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
-
-#ifndef	UINT
-#define	UINT	unsigned int
-#endif
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 /* object defines */
-
 #define	EMAINFO		struct emainfo_head
 
 /* other defines */
-
 #define	EMAINFO_TLOCAL		0
 #define	EMAINFO_TUUCP		1
 #define	EMAINFO_TARPA		2
@@ -39,28 +35,22 @@
 
 
 struct emainfo_head {
-	const char	*local ;
-	const char	*host ;
+	cchar		*local ;
+	cchar		*host ;
 	int		type ;
 	int		llen ;
 	int		hlen ;
 } ;
 
+typedef	EMAINFO		emainfo ;
 
-#if	(! defined(EMAINFO_MASTER)) || (EMAINFO_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	emainfo_load(EMAINFO *,cchar *,int) noex ;
+extern int	emainfo_mktype(EMAINFO *,int,char *,int) noex ;
 
-extern int emainfo(EMAINFO *,const char *,int) ;
-extern int emainfo_mktype(EMAINFO *,int,char *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* EMAINFO_MASTER */
 
 #endif /* EMAINFO_INCLUDE */
 
