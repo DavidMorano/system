@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int mailmsgstage_magic(mailmsgstage *op,Args ... args) noex {
+static inline int mailmsg_magic(mailmsg *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSGSTAGE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailmsgstage_magic) */
+/* end subroutine (mailmsg_magic) */

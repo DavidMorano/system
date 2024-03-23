@@ -183,7 +183,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static int mailbox_magic(mailbox *op,Args ... args) noex {
+inline int mailbox_magic(mailbox *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;

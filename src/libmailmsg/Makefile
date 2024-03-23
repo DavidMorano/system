@@ -54,10 +54,10 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= libmailmsg.h
 
 
-OBJ0_LIBMAILMSG= mailbox.o
-OBJ1_LIBMAILMSG= mailmsghdrval.o
-OBJ2_LIBMAILMSG= mailmsgmatenv.o
-OBJ3_LIBMAILMSG= mailmsgmathdr.o
+OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
+OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
+OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o 
+OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o contypevals.o
 
 
 OBJA_LIBMAILMSG= obj0_mailmsg.o obj1_mailmsg.o
@@ -134,10 +134,17 @@ mailmsg.dir:
 
 contypevals.o:		conttypevals.cc contypevals.h
 
-mailmsghdrval.o:	mailmsghdrval.cc	$(INCS)
-mailmsgmatenv.o:	mailmsgmatenv.cc	$(INCS)
-mailmsgmathdr.o:	mailmsgmathdr.cc	$(INCS)
+mailmsghdrfold.o:	mailmsghdrfold.cc mailmsghdrfold.h	$(INCS)
+mailmsghdrval.o:	mailmsghdrval.cc mailmsghdrval.h	$(INCS)
+mailmsgmatenv.o:	mailmsgmatenv.cc mailmsgmatenv.h	$(INCS)
+mailmsgmathdr.o:	mailmsgmathdr.cc mailmsgmathdr.h	$(INCS)
 
+mailmsgstage.o:		mailmsgstage.cc mailmsgstage.h	$(INCS)
+msgentry.o:		msgentry.cc msgentry.h		$(INCS)
+
+mhcom.o:		mhcom.cc mhcom.h
+mcmsg.o:		mcmsg.cc mcmsg.h
+mimetypes.o:		mimetypes.cc mimetypes.h
 
 hdrextnum.o:		hdrextnum.cc hdrextnum.h
 

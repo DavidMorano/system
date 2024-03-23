@@ -1,9 +1,8 @@
-/* mailmsg_envaddrfold */
+/* mailmsg_envaddrfold SUPPORT */
+/* lang=C++20 */
 
 /* MAILMSG create a folded envelope address */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,36 +16,32 @@
 
 /*******************************************************************************
 
-        This subroutine creates a folded envelope address from the various
-        envelope components.
+	Name:
+	mailmsg_envaddrfold
+
+	Description:
+	This subroutine creates a folded envelope address from the
+	various envelope components.
 
 	Synopsis:
-
 	int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen)
 
 	Arguments:
-
 	mmp		pointer to MAILMSG object
 	rbuf		buffer to receive result
 	rlen		length of result buffer
 
 	Returns:
-
 	>=0		length of result (in bytes)
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<mailmsg.h>
 #include	<emainfo.h>
@@ -83,26 +78,13 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfsub(const char *,int,const char *,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	hasuc(const char *,int) ;
-extern int	isprintlatin(int) ;
-
-extern int	sfsubstance(const char *,int,const char **) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -117,36 +99,30 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen)
-{
-	const int	alen = MAILADDRLEN ;
+int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*abuf ;
 
 	if (mmp == NULL) return SR_FAULT ;
 	if (rbuf == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("mailmsg_envaddrfold: ent\n") ;
-#endif
-
+	cint		alen = MAILADDRLEN ;
+	char		*abuf ;
 	if ((rs = uc_malloc((alen+1),&abuf)) >= 0) {
-	    SBUF	b ;
+	    sbuf	b ;
 	    if ((rs = sbuf_start(&b,rbuf,rlen)) >= 0) {
 	        MAILMSG_ENVER	me, *mep = &me ;
-	        int		i ;
 	        int		cl ;
-	        const char	*cp ;
-
-	        for (i = 0 ; mailmsg_enver(mmp,i,mep) >= 0 ; i += 1) {
+	        cchar		*cp ;
+	        for (int i = 0 ; mailmsg_enver(mmp,i,mep) >= 0 ; i += 1) {
 	            EMAINFO	ai ;
 	            int		atype ;
-
 	            if ((mep->r.ep != NULL) && (mep->r.el > 0)) {
 	                cp = mep->r.ep ;
 	                cl = mep->r.el ;
@@ -156,10 +132,9 @@ int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen)
 	                    rs = sbuf_strw(&b,cp,cl) ;
 	                }
 	            } /* end if (remote) */
-
 	            if (rs >= 0) {
-	                const int	at = EMAINFO_TUUCP ;
-	                int		al ;
+	                cint	at = EMAINFO_TUUCP ;
+	                int	al ;
 	                cp = mep->a.ep ;
 	                cl = mep->a.el ;
 	                atype = emainfo(&ai,cp,cl) ;
@@ -171,21 +146,15 @@ int mailmsg_envaddrfold(MAILMSG *mmp,char *rbuf,int rlen)
 	                    }
 	                }
 	            } /* end if (address) */
-
 	            if (rs < 0) break ;
 	        } /* end for (looping through envelopes) */
-
 	        rs1 = sbuf_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sbuf) */
-	    uc_free(abuf) ;
+	    rs1 = uc_free(abuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("mailmsg_envaddrfold: ret rs=%d\n",rs) ;
-#endif
-
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailmsg_envaddrfold) */
 

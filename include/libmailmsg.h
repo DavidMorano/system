@@ -22,12 +22,18 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+#include	<mailmsghdrs.h>
 #include	<mailbox.h>
+
+#include	<mailmsghdrfold.h>
 #include	<mailmsghdrval.h>
 #include	<mailmsgmatenv.h>
 #include	<mailmsgmathdr.h>
 
-#include	<matthingenv.h>
+#include	<mailmsgstage.h>
+#include	<msgentry.h>
+
+#include	<hdrextnum.h>
 
 
 #endif /* LIBMAILMSG_INCLUDE */

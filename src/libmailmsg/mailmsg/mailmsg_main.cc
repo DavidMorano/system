@@ -66,17 +66,18 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<vechand.h>
-#include	<vecobj.h>
-#include	<mailmsgmatenv.h>
 #include	<strpack.h>
+#include	<vecobj.h>
+#include	<vechand.h>
+#include	<mailmsgmatenv.h>
+#include	<mailmsgmathdr.h>
 #include	<strwcpy.h>
 #include	<toxc.h>
 #include	<hasx.h>
@@ -87,14 +88,6 @@
 
 /* local defines */
 
-#ifndef	MAILMSG_HDR
-#define	MAILMSG_HDR	struct mailmsg_hdr
-#endif /* MAILMSG_HDR */
-#ifndef	MAILMSG_ENV
-#define	MAILMSG_ENV	struct mailmsg_env
-#endif /* MAILMSG_ENV */
-
-#define	MMH		MAILMSG_HDR
 #define	MMHVAL		struct msghdrval
 #define	MMHINST		struct msghdrinst
 #define	MMHNAME		struct msghdrname
@@ -109,15 +102,14 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mailmsgmathdr(cchar *,int,int *) noex ;
-}
 
 
 /* external variables */
@@ -156,17 +148,65 @@ enum msgstates {
 
 /* forward references */
 
-static int mailmsg_procline(MAILMSG *,cchar *,int) noex ;
+template<typename ... Args>
+static int mailmsg_ctor(mailmsg *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ; /* dangerous */
+	    if ((op->slp = new(nothrow) strpack) != np) {
+	        if ((op->elp = new(nothrow) vecobj) != np) {
+	            if ((op->hlp = new(nothrow) vecobj) != np) {
+			rs = SR_OK ;
+		    } /* end if (new-vecobj) */
+		    if (rs < 0) {
+		        delete op->elp ;
+		        op->elp = nullptr ;
+		    }
+		} /* end if (new-vecobj) */
+		if (rs < 0) {
+		    delete op->slp ;
+		    op->slp = nullptr ;
+		}
+	    } /* end if (new-strpack) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailmsg_ctor) */
 
-static int mailmsg_envbegin(MAILMSG *) noex ;
-static int mailmsg_envadd(MAILMSG *,MAILMSGMATENV *) noex ;
-static int mailmsg_envend(MAILMSG *) noex ;
+static int mailmsg_dtor(mailmsg *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->hlp) {
+		delete op->hlp ;
+		op->hlp = nullptr ;
+	    }
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	    if (op->slp) {
+		delete op->slp ;
+		op->slp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailmsg_dtor) */
 
-static int mailmsg_hdrbegin(MAILMSG *) noex ;
-static int mailmsg_hdrend(MAILMSG *) noex ;
-static int mailmsg_hdraddnew(MAILMSG *,cchar *,int,cchar *,int) noex ;
-static int mailmsg_hdraddcont(MAILMSG *,cchar *,int) noex ;
-static int mailmsg_hdrmatch(MAILMSG *,MMHNAME **,cchar *,int) noex ;
+static int mailmsg_procline(mailmsg *,cchar *,int) noex ;
+
+static int mailmsg_envbegin(mailmsg *) noex ;
+static int mailmsg_envadd(mailmsg *,mailmsgenv *) noex ;
+static int mailmsg_envend(mailmsg *) noex ;
+
+static int mailmsg_hdrbegin(mailmsg *) noex ;
+static int mailmsg_hdrend(mailmsg *) noex ;
+static int mailmsg_hdraddnew(mailmsg *,cchar *,int,cchar *,int) noex ;
+static int mailmsg_hdraddcont(mailmsg *,cchar *,int) noex ;
+static int mailmsg_hdrmatch(mailmsg *,MMHNAME **,cchar *,int) noex ;
 
 static int msghdrname_start(MMHNAME *,cchar *,int,cchar *,int) noex ;
 static int msghdrname_match(MMHNAME *,cchar *,int) noex ;
@@ -193,330 +233,270 @@ static int msghdrinst_finish(MMHINST *) noex ;
 
 /* exported subroutines */
 
-int mailmsg_start(MAILMSG *op) noex {
+int mailmsg_start(mailmsg *op) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	memset(op,0,sizeof(MAILMSG)) ;
-
-	if ((rs = strpack_start(&op->stores,2000)) >= 0) {
-	    if ((rs = mailmsg_envbegin(op)) >= 0) {
-		if ((rs = mailmsg_hdrbegin(op)) >= 0) {
-		    op->magic = MAILMSG_MAGIC ;
-		}
-		if (rs < 0) {
-		    mailmsg_envend(op) ;
-		}
-	    }
+	if ((rs = mailmsg_ctor(op)) >= 0) {
+	    if ((rs = strpack_start(op->slp,2000)) >= 0) {
+	        if ((rs = mailmsg_envbegin(op)) >= 0) {
+		    if ((rs = mailmsg_hdrbegin(op)) >= 0) {
+		        op->magic = MAILMSG_MAGIC ;
+		    }
+		    if (rs < 0) {
+		        mailmsg_envend(op) ;
+		    }
+	        }
+	        if (rs < 0) {
+		    strpack_finish(op->slp) ;
+	        }
+	    } /* end if */
 	    if (rs < 0) {
-		strpack_finish(&op->stores) ;
+		mailmsg_dtor(op) ;
 	    }
-	} /* end if */
-
+	} /* end if (mailmsg_ctor) */
 	return rs ;
 }
 /* end subroutine (mailmsg_start) */
 
-int mailmsg_finish(MAILMSG *op) noex {
-	int		rs = SR_OK ;
+int mailmsg_finish(mailmsg *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = mailmsg_hdrend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = mailmsg_envend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = strpack_finish(&op->stores) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    {
+	        rs1 = mailmsg_hdrend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = mailmsg_envend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = strpack_finish(op->slp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = mailmsg_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsg_finish) */
 
-int mailmsg_loadline(MAILMSG *op,cchar *lp,int ll) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if (ll < 0)
-	    ll = strlen(lp) ;
-
-	while ((ll > 0) && ISEND(lp[ll-1])) {
-	    ll -= 1 ;
-	}
-
-	if (ll > 0) {
-	    int		sl ;
-	    cchar	*sp ;
-	    if ((rs = strpack_store(&op->stores,lp,ll,&sp)) >= 0) {
-		sl = ll ;
-	        rs = mailmsg_procline(op,sp,sl) ;
+int mailmsg_loadline(mailmsg *op,cchar *lp,int ll) noex {
+	int		rs ;
+	if ((rs = mailmsg_magic(op,lp)) >= 0) {
+	    if (ll < 0) ll = strlen(lp) ;
+	    while ((ll > 0) && ISEND(lp[ll-1])) {
+	        ll -= 1 ;
 	    }
-	}
-
+	    if (ll > 0) {
+	        int	sl ;
+	        cchar	*sp ;
+	        if ((rs = strpack_store(op->slp,lp,ll,&sp)) >= 0) {
+		    sl = ll ;
+	            rs = mailmsg_procline(op,sp,sl) ;
+	        }
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailmsg_loadline) */
 
-int mailmsg_envcount(MAILMSG *op) noex {
-	MAILMSG_ENV	*oep ;
+int mailmsg_envcount(mailmsg *op) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	oep = &op->envs ;
-	rs = vecobj_count(&oep->insts) ;
-
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    rs = vecobj_count(op->elp) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsg_envcount) */
 
-int mailmsg_envaddress(MAILMSG *op,int i,cchar **rpp) noex {
-	MAILMSG_ENV	*oep = &op->envs ;
+int mailmsg_envaddress(mailmsg *op,int i,cchar **rpp) noex {
 	int		rs ;
 	int		el = 0 ;
-	cchar		*rp = nullptr ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	void	*vp{} ;
-	if ((rs = vecobj_get(&oep->insts,i,&vp)) >= 0) {
-	    if (vp) {
-		MAILMSGMATENV	*ep = (MAILMSGMATENV *) vp ;
-		el = ep->a.el ;
-		rp =  ep->a.ep ;
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    cchar	*rp = nullptr ;
+	    void	*vp{} ;
+	    if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (vp) {
+		    mailmsgenv	*ep = (mailmsgenv *) vp ;
+		    el = ep->a.el ;
+		    rp =  ep->a.ep ;
+	        }
 	    }
-	}
-
-	if (rpp) {
-	    *rpp = (rs >= 0) ? rp : nullptr ;
-	}
-
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? rp : nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
 }
 /* end subroutine (mailmsg_envaddress) */
 
-int mailmsg_envdate(MAILMSG *op,int i,cchar **rpp) noex {
-	MAILMSG_ENV	*oep = &op->envs ;
+int mailmsg_envdate(mailmsg *op,int i,cchar **rpp) noex {
 	int		rs ;
 	int		el = 0 ;
-	void		*vp{} ;
-	cchar		*rp = nullptr ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = vecobj_get(&oep->insts,i,&vp)) >= 0) {
-	    if (vp) {
-		MAILMSGMATENV	*ep = (MAILMSGMATENV *) vp ;
-		el = ep->d.el ;
-		rp = ep->d.ep ;
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    cchar	*rp = nullptr ;
+	    void	*vp{} ;
+	    if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (vp) {
+		    mailmsgenv	*ep = (mailmsgenv *) vp ;
+		    el = ep->d.el ;
+		    rp = ep->d.ep ;
+	        }
 	    }
-	}
-
-	if (rpp) {
-	    *rpp = (rs >= 0) ? rp : nullptr ;
-	}
-
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? rp : nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
 }
 /* end subroutine (mailmsg_envdate) */
 
-int mailmsg_envremote(MAILMSG *op,int i,cchar **rpp) noex {
-	MAILMSG_ENV	*oep = &op->envs ;
+int mailmsg_envremote(mailmsg *op,int i,cchar **rpp) noex {
 	int		rs ;
 	int		el = 0 ;
-	cchar		*rp = nullptr ;
-	void		*vp{} ;
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = vecobj_get(&oep->insts,i,&vp)) >= 0) {
-	    if (vp) {
-		MAILMSGMATENV	*ep = (MAILMSGMATENV *) vp ;
-		el = ep->r.el ;
-		rp = ep->r.ep ;
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    cchar	*rp = nullptr ;
+	    void	*vp{} ;
+	    if ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (vp) {
+		    mailmsgenv	*ep = (mailmsgenv *) vp ;
+		    el = ep->r.el ;
+		    rp = ep->r.ep ;
+	        }
 	    }
-	}
-
-	if (rpp) {
-	    *rpp = (rs >= 0) ? rp : nullptr ;
-	}
-
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? rp : nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? el : rs ;
 }
 /* end subroutine (mailmsg_envremote) */
 
-int mailmsg_hdrcount(MAILMSG *op,cchar *name) noex {
-	MMHNAME		*hnp ;
-	cint		hlen = HDRNAMELEN ;
+int mailmsg_hdrcount(mailmsg *op,cchar *name) noex {
 	int		rs ;
-	int		hl = -1 ;
 	int		c = 0 ;
-	cchar		*hp = name ;
-	char		hbuf[HDRNAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if (hasuc(name,-1)) {
-	    hl = strwcpylc(hbuf,name,hlen) - hbuf ;
-	    hp = hbuf ;
-	}
-
-	if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
-	    if (hnp) {
-	        rs = msghdrname_count(hnp) ;
-	        c = rs ;
+	if ((rs = mailmsg_magic(op,name)) >= 0) {
+	    MMHNAME	*hnp{} ;
+	    cint	hlen = HDRNAMELEN ;
+	    int		hl = -1 ;
+	    cchar	*hp = name ;
+	    char	hbuf[HDRNAMELEN + 1] ;
+	    if (hasuc(name,-1)) {
+	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hp = hbuf ;
 	    }
-	}
-
+	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
+	        if (hnp) {
+	            rs = msghdrname_count(hnp) ;
+	            c = rs ;
+	        }
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mailmsg_hdrcount) */
 
-int mailmsg_hdrikey(MAILMSG *op,int hi,cchar **rpp) noex {
-	MAILMSG_HDR	*ohp ;
+int mailmsg_hdrikey(mailmsg *op,int hi,cchar **rpp) noex {
 	int		rs ;
 	int		nl = 0 ;
-	cchar		*namep = nullptr ;
-	void		*vp{} ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	ohp = &op->hdrs ;
-	if ((rs = vecobj_get(&ohp->names,hi,&vp)) >= 0) {
-	    if (vp) {
-		MMHNAME		*hnp = (MMHNAME *) vp ;
-		nl = hnp->namelen ;
-		namep = hnp->name ;
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    cchar	*namep = nullptr ;
+	    void	*vp{} ;
+	    if ((rs = vecobj_get(op->hlp,hi,&vp)) >= 0) {
+	        if (vp) {
+		    MMHNAME	*hnp = (MMHNAME *) vp ;
+		    nl = hnp->namelen ;
+		    namep = hnp->name ;
+	        }
 	    }
-	}
-
-	if (rpp) {
-	    *rpp = (rs >= 0) ? namep : nullptr ;
-	}
-
+	    if (rpp) {
+	        *rpp = (rs >= 0) ? namep : nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? nl : rs ;
 }
 /* end subroutine (mailmsg_hdrikey) */
 
-int mailmsg_hdriline(MAILMSG *op,cchar *name,int hi,int li,cchar **rpp) noex {
-	MMHNAME		*hnp = nullptr ;
-	cint		hlen = HDRNAMELEN ;
+int mailmsg_hdriline(mailmsg *op,cchar *name,int hi,int li,cchar **rpp) noex {
 	int		rs ;
-	int		hl = -1 ;
 	int		vl = 0 ;
-	cchar		*hp = name ;
-	char		hbuf[HDRNAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if (hasuc(name,-1)) {
-	    hl = strwcpylc(hbuf,name,hlen) - hbuf ;
-	    hp = hbuf ;
-	}
-
-	if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
-	    if (hnp) {
-	        rs = msghdrname_iline(hnp,hi,li,rpp) ;
-	        vl = rs ;
+	if ((rs = mailmsg_magic(op,name)) >= 0) {
+	    MMHNAME	*hnp = nullptr ;
+	    cint	hlen = HDRNAMELEN ;
+	    int		hl = -1 ;
+	    cchar	*hp = name ;
+	    char	hbuf[HDRNAMELEN + 1] ;
+	    if (hasuc(name,-1)) {
+	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hp = hbuf ;
 	    }
-	}
-
-	if (rs < 0) {
-	    if (rpp) *rpp = nullptr ;
-	}
-
+	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
+	        if (hnp) {
+	            rs = msghdrname_iline(hnp,hi,li,rpp) ;
+	            vl = rs ;
+	        }
+	    }
+	    if (rs < 0) {
+	        if (rpp) *rpp = nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (mailmsg_hdriline) */
 
-int mailmsg_hdrival(MAILMSG *op,cchar *name,int hi,cchar **rpp) noex {
-	MMHNAME	*hnp = nullptr ;
-	cint		hlen = HDRNAMELEN ;
+int mailmsg_hdrival(mailmsg *op,cchar *name,int hi,cchar **rpp) noex {
 	int		rs ;
-	int		hl = -1 ;
 	int		vl = 0 ;
-	cchar		*hp = name ;
-	char		hbuf[HDRNAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if (hasuc(name,-1)) {
-	    hl = strwcpylc(hbuf,name,hlen) - hbuf ;
-	    hp = hbuf ;
-	}
-
-	if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
-	    if (hnp) {
-	        rs = msghdrname_ival(hnp,hi,rpp) ;
-	        vl = rs ;
+	if ((rs = mailmsg_magic(op,name)) >= 0) {
+	    MMHNAME	*hnp = nullptr ;
+	    cint	hlen = HDRNAMELEN ;
+	    int		hl = -1 ;
+	    cchar	*hp = name ;
+	    char	hbuf[HDRNAMELEN + 1] ;
+	    if (hasuc(name,-1)) {
+	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hp = hbuf ;
 	    }
-	}
-
-	if (rs < 0) {
-	    if (rpp) *rpp = nullptr ;
-	}
-
+	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
+	        if (hnp) {
+	            rs = msghdrname_ival(hnp,hi,rpp) ;
+	            vl = rs ;
+	        }
+	    }
+	    if (rs < 0) {
+	        if (rpp) *rpp = nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (mailmsg_hdrival) */
 
-int mailmsg_hdrval(MAILMSG *op,cchar *name,cchar **rpp) noex {
-	MMHNAME	*hnp = nullptr ;
-	cint		hlen = HDRNAMELEN ;
+int mailmsg_hdrval(mailmsg *op,cchar *name,cchar **rpp) noex {
 	int		rs ;
-	int		hl = -1 ;
 	int		vl = 0 ;
-	cchar		*hp = name ;
-	char		hbuf[HDRNAMELEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (name == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILMSG_MAGIC) return SR_NOTOPEN ;
-
-	if (hasuc(name,-1)) {
-	    hl = strwcpylc(hbuf,name,hlen) - hbuf ;
-	    hp = hbuf ;
-	}
-
-	if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
-	    if (hnp != nullptr) {
-	        rs = msghdrname_val(hnp,rpp) ;
-	        vl = rs ;
+	if ((rs = mailmsg_magic(op,name)) >= 0) {
+	    MMHNAME	*hnp = nullptr ;
+	    cint	hlen = HDRNAMELEN ;
+	    int		hl = -1 ;
+	    cchar	*hp = name ;
+	    char	hbuf[HDRNAMELEN + 1] ;
+	    if (hasuc(name,-1)) {
+	        hl = strwcpylc(hbuf,name,hlen) - hbuf ;
+	        hp = hbuf ;
 	    }
-	}
-
-	if (rs < 0) {
-	    if (rpp) *rpp = nullptr ;
-	}
-
+	    if ((rs = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
+	        if (hnp) {
+	            rs = msghdrname_val(hnp,rpp) ;
+	            vl = rs ;
+	        }
+	    }
+	    if (rs < 0) {
+	        if (rpp) *rpp = nullptr ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (mailmsg_hdrval) */
@@ -524,23 +504,19 @@ int mailmsg_hdrval(MAILMSG *op,cchar *name,cchar **rpp) noex {
 
 /* local subroutines */
 
-static int mailmsg_procline(MAILMSG *op,cchar *lp,int ll) noex {
+static int mailmsg_procline(mailmsg *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		vl ;
 	int		vi = 0 ;
 	cchar		*vp ;
-
 	if (op->msgstate == msgstate_env) {
-	    MAILMSGMATENV	es ;
-
+	    mailmsgenv	es ;
 	    if ((rs = mailmsgmatenv(&es,lp,ll)) > 0) {
 	        rs = mailmsg_envadd(op,&es) ;
 	    } else if (rs == 0) {
 	        op->msgstate = msgstate_hdr ;
 	    }
-		
 	} /* end if */
-
 	if ((rs >= 0) && (op->msgstate == msgstate_hdr)) {
 	    if ((rs = mailmsgmathdr(lp,ll,&vi)) > 0) {
 	        vp = (lp + vi) ;
@@ -550,70 +526,52 @@ static int mailmsg_procline(MAILMSG *op,cchar *lp,int ll) noex {
 	        rs = mailmsg_hdraddcont(op,(lp+1),(ll-1)) ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (mailmsg_procline) */
 
-static int mailmsg_envbegin(MAILMSG *op) noex {
-	MAILMSG_ENV	*oep = &op->envs ;
-	cint		size = sizeof(MAILMSGMATENV) ;
+static int mailmsg_envbegin(mailmsg *op) noex {
+	cint		size = sizeof(mailmsgenv) ;
 	int		rs ;
 
-#if	CF_PEDANTIC
-	memset(oep,0,sizeof(MAILMSG_ENV)) ;
-#endif
-
-	rs = vecobj_start(&oep->insts,size,4,0) ;
+	rs = vecobj_start(op->elp,size,4,0) ;
 
 	return rs ;
 }
 /* end subroutine (mailmsg_envbegin) */
 
-static int mailmsg_envend(MAILMSG *op) noex {
-	MAILMSG_ENV	*oep = &op->envs ;
+static int mailmsg_envend(mailmsg *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = vecobj_finish(&oep->insts) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op->elp) {
+	    rs1 = vecobj_finish(op->elp) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (mailmsg_envend) */
 
-static int mailmsg_envadd(MAILMSG *op,MAILMSGMATENV *esp) noex {
-	MAILMSG_ENV	*oep = &op->envs ;
-	int		rs ;
-
-	rs = vecobj_add(&oep->insts,esp) ;
-
+static int mailmsg_envadd(mailmsg *op,mailmsgenv *esp) noex {
+	int		rs = SR_FAULT ;
+	if (op && esp) {
+	    rs = vecobj_add(op->elp,esp) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailmsg_envadd) */
 
-static int mailmsg_hdrbegin(MAILMSG *op) noex {
-	MAILMSG_HDR	*ohp = &op->hdrs ;
-	cint		size = sizeof(MMHNAME) ;
-	int		rs ;
-
-#if	CF_PEDANTIC
-	memset(ohp,0,sizeof(MAILMSG_HDR)) ;
-#endif
-
-	ohp->lastname = -1 ;
-	rs = vecobj_start(&ohp->names,size,10,0) ;
-
-	return rs ;
+static int mailmsg_hdrbegin(mailmsg *op) noex {
+	cint		hsz = sizeof(MMHNAME) ;
+	op->lastname = -1 ;
+	return vecobj_start(op->hlp,hsz,10,0) ;
 }
 /* end subroutine (mailmsg_hdrbegin) */
 
-static int mailmsg_hdrend(MAILMSG *op) noex {
-	MAILMSG_HDR	*ohp = &op->hdrs ;
+static int mailmsg_hdrend(mailmsg *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	void		*vp{} ;
-	for (int i = 0 ; vecobj_get(&ohp->names,i,&vp) >= 0 ; i += 1) {
+	for (int i = 0 ; vecobj_get(op->hlp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		MMHNAME		*hnp = (MMHNAME *) vp ;
 	        rs1 = msghdrname_finish(hnp) ;
@@ -621,68 +579,61 @@ static int mailmsg_hdrend(MAILMSG *op) noex {
 	    }
 	} /* end for */
 	{
-	    rs1 = vecobj_finish(&ohp->names) ;
+	    rs1 = vecobj_finish(op->hlp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
 }
 /* end subroutine (mailmsg_hdrend) */
 
-static int mailmsg_hdraddnew(MAILMSG *op,cc *hp,int hl,cc *vp,int vl) noex {
-	MAILMSG_HDR	*ohp = &op->hdrs ;
+static int mailmsg_hdraddnew(mailmsg *op,cc *hp,int hl,cc *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (hl != 0) {
 	    cint	hlen = HDRNAMELEN ;
 	    int		cl ;
 	    cchar	*cp ;
 	    char	hbuf[HDRNAMELEN + 1] ;
-
 	    if (hasuc(hp,hl)) {
 	        if ((hl < 0) || (hl > hlen)) hl = hlen ;
 	        strwcpylc(hbuf,hp,hl) ;
 	        hp = hbuf ;
 	    }
-
 	    if ((cl = sfshrink(vp,vl,&cp)) >= 0) {
 	        MMHNAME	*hnp ;
 	        if ((rs1 = mailmsg_hdrmatch(op,&hnp,hp,hl)) >= 0) {
-	            ohp->lastname = rs1 ;
+	            op->lastname = rs1 ;
 	            rs = msghdrname_addnew(hnp,cp,cl) ;
 	        } else {
-		    vecobj	*nlp = &ohp->names ;
+		    vecobj	*nlp = op->hlp ;
 	            void	*p ;
 	            if ((rs = vecobj_addnew(nlp,&p)) >= 0) {
 	                MMHNAME	*hnp = (MMHNAME *) p ;
 		        cint	i = rs ;
 	                if ((rs = msghdrname_start(hnp,hp,hl,cp,cl)) >= 0) {
-	                    ohp->lastname = i ;
+	                    op->lastname = i ;
 		        } else {
 		            vecobj_del(nlp,i) ;
 		        }
 	            }
 	        } /* end if */
 	    } /* end if (shrink) */
-
 	} else {
-	    ohp->lastname = -1 ;
+	    op->lastname = -1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (mailmsg_hdraddnew) */
 
-static int mailmsg_hdraddcont(MAILMSG *op,cchar *vp,int vl) noex {
+static int mailmsg_hdraddcont(mailmsg *op,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	if (vl > 0) {
-	    MAILMSG_HDR	*ohp = &op->hdrs ;
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfshrink(vp,vl,&cp)) > 0) {
-		cint	ln = ohp->lastname ;
+		cint	ln = op->lastname ;
 		if (ln >= 0) {
 		    void	*vp{} ;
-		    if ((rs = vecobj_get(&ohp->names,ln,&vp)) >= 0) {
+		    if ((rs = vecobj_get(op->hlp,ln,&vp)) >= 0) {
 	    	        if (vp) {
 		    	    MMHNAME	*hnp = (MMHNAME *) vp ;
 	        	    rs = msghdrname_addcont(hnp,cp,cl) ;
@@ -695,9 +646,8 @@ static int mailmsg_hdraddcont(MAILMSG *op,cchar *vp,int vl) noex {
 }
 /* end subroutine (mailmsg_hdraddcont) */
 
-static int mailmsg_hdrmatch(MAILMSG *op,MMHNAME **hnpp,
+static int mailmsg_hdrmatch(mailmsg *op,MMHNAME **hnpp,
 		cc *hp,int hl) noex {
-	MAILMSG_HDR	*ohp = &op->hdrs ;
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		i{} ;		/* used afterwards */
@@ -705,7 +655,7 @@ static int mailmsg_hdrmatch(MAILMSG *op,MMHNAME **hnpp,
 	void		*vp{} ;
 	if (hl < 0) hl = strlen(hp) ;
 	*hnpp = nullptr ;
-	for (i = 0 ; (rs = vecobj_get(&ohp->names,i,&vp)) >= 0 ; i += 1) {
+	for (i = 0 ; (rs = vecobj_get(op->hlp,i,&vp)) >= 0 ; i += 1) {
 	    *hnpp = (MMHNAME *) vp ;
 	    if (*hnpp != nullptr) {
 	        if ((rs = msghdrname_match(*hnpp,hp,hl)) > 0) {
