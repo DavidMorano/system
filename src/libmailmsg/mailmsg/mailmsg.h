@@ -28,8 +28,9 @@
 #include	<localmisc.h>
 
 
-#define	MAILMSG_MAGIC		0x97634587
-#define	MAILMSG			struct mailmsg_head
+#define	MAILMSG		struct mailmsg_head
+#define	MAILMSG_MAGIC	0x97634587
+#define	MAILMSG_MF	5		/* buffer-size multiply factor */
 
 
 struct mailmsg_head {

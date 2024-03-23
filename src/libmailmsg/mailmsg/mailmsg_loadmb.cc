@@ -43,7 +43,6 @@
 /* local defines */
 
 #define	MAILMSG_BSIZE	0		/* let it figure out what is best */
-#define	MAILMSG_MF	5		/* buffer-size multiply factor */
 
 
 /* external subroutines */
@@ -69,34 +68,37 @@
 
 /* exported subroutines */
 
-int mailmsg_loadmb(mailmsg *mmp,mailbox *mbp,off_t fbo) noex {
+int mailmsg_loadmb(mailmsg *op,mailbox *mbp,off_t fbo) noex {
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
-	if ((rs = getbufsize(getbufsize_ml)) >= 0) {
-	    cint	llen = (rs * MAILMSG_MF) ;
-	    char	*lbuf{} ;
-	    if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-	        mailbox_read	cur ;
-	        cint		bsize = MAILMSG_BSIZE ;
-	        if ((rs = mailbox_readbegin(mbp,&cur,fbo,bsize)) >= 0) {
-	            int		line = 0 ;
-	            while ((rs = mailbox_readln(mbp,&cur,lbuf,llen)) > 0) {
-			cint	ll = rmeol(lbuf,rs) ;
-	                tlen += rs ;
-	                if ((ll > 0) || (line > 0)) {
-			    line += 1 ;
-	                    rs = mailmsg_loadline(mmp,lbuf,ll) ;
-	                }
-	                if (rs <= 0) break ;
-	            } /* end while (reading lines) */
-	            rs1 = mailbox_readend(mbp,&cur) ;
+	if ((rs = mailmsg_magic(op)) >= 0) {
+	    if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	        cint	llen = (rs * MAILMSG_MF) ;
+	        char	*lbuf{} ;
+	        if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
+	            mailbox_read	cur ;
+	            cint		bsize = MAILMSG_BSIZE ;
+	            if ((rs = mailbox_readbegin(mbp,&cur,fbo,bsize)) >= 0) {
+	                int	line = 0 ;
+	    	        cchar	*lp = lbuf ;
+	                while ((rs = mailbox_readln(mbp,&cur,lbuf,llen)) > 0) {
+			    cint	ll = rmeol(lbuf,rs) ;
+	                    tlen += rs ;
+	                    if ((ll > 0) || (line > 0)) {
+			        line += 1 ;
+	                        rs = mailmsg_loadline(op,lp,ll) ;
+	                    }
+	                    if (rs <= 0) break ;
+	                } /* end while (reading lines) */
+	                rs1 = mailbox_readend(mbp,&cur) ;
+	                if (rs >= 0) rs = rs1 ;
+	            } /* end if (mailbox) */
+	            rs1 = uc_free(lbuf) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (mailbox) */
-	        rs1 = uc_free(lbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
- 	} /* end if (getbufsize) */
+	        } /* end if (m-a-f) */
+ 	    } /* end if (getbufsize) */
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (mailmsg_loadmb) */
