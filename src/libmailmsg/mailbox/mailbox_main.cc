@@ -503,7 +503,7 @@ int mailbox_readend(mailbox *op,MAILBOX_READ *curp) noex {
 }
 /* end subroutine (mailbox_readend) */
 
-int mailbox_readline(mailbox *op,MAILBOX_READ *curp,char *lbuf,int llen) noex {
+int mailbox_readln(mailbox *op,MAILBOX_READ *curp,char *lbuf,int llen) noex {
 	int		rs ;
 	int		tlen = 0 ;
 	if ((rs = mailbox_magic(op,curp,lbuf)) >= 0) {
@@ -546,7 +546,7 @@ int mailbox_readline(mailbox *op,MAILBOX_READ *curp,char *lbuf,int llen) noex {
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (mailbox_readline) */
+/* end subroutine (mailbox_readln) */
 
 
 /* private subroutines */
