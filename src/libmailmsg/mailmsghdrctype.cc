@@ -1,17 +1,14 @@
-/* mailmsghdrctype */
+/* mailmsghdrctype SUPPORT */
+/* lang=C++20 */
 
-/* process the input messages and spool them up */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* manage content-types with header field */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-04-01, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -23,17 +20,12 @@
 	The parsed results are broken into three types of items:
 	the type, the sub-type, and parameters.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -45,6 +37,8 @@
 
 #define	MAILMSGHDRCTYPE_MAGIC		0x53232857
 
+#define	MMHCT		mailmsghdrctype
+M
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX
 #define	LINEBUFLEN	MAX(2048,LINE_MAX)
@@ -82,11 +76,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	hasuc(const char *,int) ;
 extern int	isprintlatin(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strnchr(const char *,int,int) ;
 extern char	*strnpbrk(const char *,int,const char *) ;
@@ -105,7 +94,6 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* exported subroutines */
-
 
 int mailmsghdrctype_start(op,hp,hl)
 MAILMSGHDRCTYPE	*op ;
@@ -177,11 +165,6 @@ int		hl ;
 	        op->mapsize = msize ;
 	    } else
 	        goto bad3 ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsghdrctype_init: mapdata=\\x%p\n",op->mapdata) ;
-	debugprintf("mailmsghdrctype_init: mapsize=%u\n",op->mapsize) ;
-#endif
 
 	} /* end if */
 
@@ -302,6 +285,5 @@ const char	**rpp ;
 	return rs ;
 }
 /* end subroutine (mailmsghdrctype_paramfind) */
-
 
 
