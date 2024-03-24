@@ -58,7 +58,7 @@ OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
 OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
 OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o 
 OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o contypevals.o
-OBJ4_LIBMAILMSG= emainfo.o
+OBJ4_LIBMAILMSG= emainfo.o hdrdecode.o
 
 
 OBJA_LIBMAILMSG= obj0_mailmsg.o obj1_mailmsg.o
@@ -150,6 +150,7 @@ mhcom.o:		mhcom.cc mhcom.h
 mcmsg.o:		mcmsg.cc mcmsg.h
 emainfo.o:		emainfo.cc emainfo.h
 mimetypes.o:		mimetypes.cc mimetypes.h
+hdrdecode.o:		hdrdecode.cc hdrdecode.h
 
 hdrextnum.o:		hdrextnum.cc hdrextnum.h
 

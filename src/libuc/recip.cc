@@ -4,7 +4,6 @@
 /* recipient object for DMAIL¦DMAILBOX */
 /* version %I% last-modified %G% */
 
-#define	CF_MAXNAMELEN	1		/* use MAXNAMELEN */
 
 /* revision history:
 
@@ -244,8 +243,8 @@ int recip_mbo(recip *op,int mbo) noex {
 int recip_mo(recip *op,int moff,int mlen) noex {
 	int		rs ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    RECIP_ENT	mo ;
-	    cint	esize = sizeof(RECIP_ENT) ;
+	    recip_ent	mo ;
+	    cint	esize = sizeof(recip_ent) ;
 	    mo.moff = moff ;
 	    mo.mlen = mlen ;
 	    op->n += 1 ;
@@ -300,7 +299,7 @@ int recip_getmo(recip *op,int i,int *offp) noex {
 	if ((rs = recip_magic(op)) >= 0) {
 	    int		mo = 0 ;
 	    if (op->ds >= 0) {
-	        RECIP_ENT	*ep ;
+	        recip_ent	*ep ;
 	        if ((rs = vecitem_get(op->mdp,i,&ep)) >= 0) {
 	            mo = ep->moff ;
 	            ml = ep->mlen ;

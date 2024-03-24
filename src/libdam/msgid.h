@@ -29,8 +29,8 @@
 
 #define	MSGID_MAGIC		1092847456
 #define	MSGID			struct msgid_head
-#define	MSGID_KEY		struct msgid_k
-#define	MSGID_CUR		struct msgid_c
+#define	MSGID_KEY		struct msgid_keyer
+#define	MSGID_CUR		struct msgid_cursor
 #define	MSGID_BUF		struct msgid_buffer
 #define	MSGID_FM		struct msgid_filemagic
 #define	MSGID_FH		struct msgid_filehead
@@ -94,11 +94,11 @@ struct msgid_head {
 	int		ebs ;		/* entry buffer size */
 } ;
 
-struct msgid_c {
+struct msgid_cursor {
 	int		i ;
 } ;
 
-struct msgid_k {
+struct msgid_keyer {
 	cchar		*recip ;
 	cchar		*from ;
 	cchar		*mid ;
@@ -108,27 +108,30 @@ struct msgid_k {
 } ;
 
 typedef MSGID		msgid ;
+typedef MSGID_CUR	msgid_cur ;
+typedef MSGID_ENT	msgid_ent ;
+typedef MSGID_KEY	msgid_key ;
 
 EXTERNC_begin
 
-extern int msgid_open(MSGID *,cchar *,int,mode_t,int) noex ;
-extern int msgid_check(MSGID *,time_t) noex ;
-extern int msgid_close(MSGID *) noex ;
-extern int msgid_curbegin(MSGID *,MSGID_CUR *) noex ;
-extern int msgid_curend(MSGID *,MSGID_CUR *) noex ;
-extern int msgid_enum(MSGID *,MSGID_CUR *,MSGID_ENT *) noex ;
-extern int msgid_match(MSGID *,time_t,MSGID_KEY *,MSGID_ENT *) noex ;
-extern int msgid_update(MSGID *,time_t,MSGID_KEY *,MSGID_ENT *) noex ;
-extern int msgid_matchid(MSGID *,time_t,cchar *,int,MSGID_ENT *) noex ;
-extern int msgid_write(MSGID *,int,MSGID_ENT *) noex ;
+extern int msgid_open(msgid *,cchar *,int,mode_t,int) noex ;
+extern int msgid_check(msgid *,time_t) noex ;
+extern int msgid_close(msgid *) noex ;
+extern int msgid_curbegin(msgid *,msgid_cur *) noex ;
+extern int msgid_curend(msgid *,msgid_cur *) noex ;
+extern int msgid_enum(msgid *,msgid_cur *,msgid_ent *) noex ;
+extern int msgid_match(msgid *,time_t,msgid_key *,msgid_ent *) noex ;
+extern int msgid_update(msgid *,time_t,msgid_key *,msgid_ent *) noex ;
+extern int msgid_matchid(msgid *,time_t,cchar *,int,msgid_ent *) noex ;
+extern int msgid_write(msgid *,int,msgid_ent *) noex ;
 
 #ifdef	COMMENT
-extern int msgid_txbegin(MSGID *) noex ;
-extern int msgid_txabort(MSGID *,int) noex ;
-extern int msgid_txcommit(MSGID *,int) noex ;
-extern int msgid_fetchsvc(MSGID *,cchar *,MSGID_CUR *,MSGID_ENT *) noex ;
-extern int msgid_fetchhostsvc(MSGID *,uint,cc *,MSGID_CUR *,MSGID_ENT *) noex ;
-extern int msgid_fetchhostpid(MSGID *,uint,int,MSGID_CUR *,MSGID_ENT *) noex ;
+extern int msgid_txbegin(msgid *) noex ;
+extern int msgid_txabort(msgid *,int) noex ;
+extern int msgid_txcommit(msgid *,int) noex ;
+extern int msgid_fetchsvc(msgid *,cchar *,msgid_cur *,msgid_ent *) noex ;
+extern int msgid_fetchhostsvc(msgid *,uint,cc *,msgid_cur *,msgid_ent *) noex ;
+extern int msgid_fetchhostpid(msgid *,uint,int,msgid_cur *,msgid_ent *) noex ;
 #endif /* COMMENT */
 
 EXTERNC_end

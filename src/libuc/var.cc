@@ -67,20 +67,20 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath4(char *,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	getdomainname(char *,int,const char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
+extern int	getdomainname(char *,int,cchar *) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -88,7 +88,7 @@ extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -96,11 +96,11 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-int		var_opena(VAR *,const char **) ;
+int		var_opena(VAR *,cchar **) ;
 
-static int	var_objloadbegin(VAR *,const char *) ;
+static int	var_objloadbegin(VAR *,cchar *) ;
 static int	var_objloadend(VAR *) ;
-static int	var_loadcalls(VAR *,const char *) ;
+static int	var_loadcalls(VAR *,cchar *) ;
 
 static int	isrequired(int) ;
 
@@ -110,7 +110,7 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static const char	*subs[] = {
+static cchar	*subs[] = {
 	"open",
 	"count",
 	"curbegin",
@@ -143,7 +143,7 @@ enum subs {
 int var_open(VAR *op,cchar *dbname)
 {
 	int		rs ;
-	const char	*objname = VAR_OBJNAME ;
+	cchar	*objname = VAR_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (dbname == NULL) return SR_FAULT ;
@@ -180,7 +180,7 @@ int var_open(VAR *op,cchar *dbname)
 int var_opena(VAR *op,cchar *narr[])
 {
 	int		rs ;
-	const char	*objname = VAR_OBJNAME ;
+	cchar	*objname = VAR_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (narr == NULL) return SR_FAULT ;
@@ -419,7 +419,7 @@ int varinfo(VARINFO *vip,cchar dbnp[],int dbnl)
 	NULSTR		ns ;
 	int		rs ;
 	int		rs1 ;
-	const char	*np ;
+	cchar	*np ;
 
 	if (vip == NULL) return SR_FAULT ;
 	if (dbnp == NULL) return SR_FAULT ;
@@ -427,7 +427,7 @@ int varinfo(VARINFO *vip,cchar dbnp[],int dbnl)
 	if (dbnp[0] == '\0') return SR_INVALID ;
 
 	if ((rs = nulstr_start(&ns,dbnp,dbnl,&np)) >= 0) {
-	    const char	*end = ENDIANSTR ;
+	    cchar	*end = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 	    memset(vip,0,sizeof(VARINFO)) ;
@@ -453,13 +453,13 @@ int varunlink(cchar dbnp[],int dbnl)
 {
 	NULSTR		ns ;
 	int		rs ;
-	const char	*np ;
+	cchar	*np ;
 
 	if (dbnp == NULL) return SR_FAULT ;
 	if (dbnp[0] == '\0') return SR_INVALID ;
 
 	if ((rs = nulstr_start(&ns,dbnp,dbnl,&np)) >= 0) {
-	    const char	*end = ENDIANSTR ;
+	    cchar	*end = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 	    if ((rs = mkfnamesuf2(tmpfname,np,INDSUF,end)) >= 0) {
@@ -485,18 +485,18 @@ static int var_objloadbegin(VAR *op,cchar *objname)
 	char		dn[MAXHOSTNAMELEN+1] ;
 
 	if ((rs = getnodedomain(NULL,dn)) >= 0) {
-	    const char	*prname = VARPRLOCAL ;
+	    cchar	*prname = VARPRLOCAL ;
 	    char	pr[MAXPATHLEN+1] ;
 	    if ((rs = mkpr(pr,MAXPATHLEN,prname,dn)) >= 0) {
-		VECSTR		syms ;
-	        const int	n = nelem(subs) ;
-		const int	vo = VECSTR_OCOMPACT ;
+		vecstr	syms ;
+	        cint	n = nelem(subs) ;
+		cint	vo = vecstr_OCOMPACT ;
 
 	        if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-		    const int	snl = SYMNAMELEN ;
+		    cint	snl = SYMNAMELEN ;
 	            int		i ;
-		    const char	**sv ;
-		    const char	*on = objname ;
+		    cchar	**sv ;
+		    cchar	*on = objname ;
 		    char	snb[SYMNAMELEN + 1] ;
 
 	            for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
@@ -510,7 +510,7 @@ static int var_objloadbegin(VAR *op,cchar *objname)
         
 	            if (rs >= 0) {
 	                if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	                    const char	*modbname = VAR_MODBNAME ;
+	                    cchar	*modbname = VAR_MODBNAME ;
 			    int		mo = 0 ;
 	                    mo |= MODLOAD_OLIBVAR ;
 			    mo |= MODLOAD_OPRS ;
@@ -601,7 +601,7 @@ static int var_loadcalls(VAR *op,cchar objname[])
 
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *)) snp ;
+			(int (*)(void *,cchar *)) snp ;
 		    break ;
 
 		case sub_count:
@@ -615,7 +615,7 @@ static int var_loadcalls(VAR *op,cchar objname[])
 
 		case sub_fetch:
 		    op->call.fetch = 
-			(int (*)(void *,const char *,int,void *,char *,int)) 
+			(int (*)(void *,cchar *,int,void *,char *,int)) 
 				snp ;
 		    break ;
 

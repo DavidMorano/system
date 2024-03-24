@@ -48,6 +48,7 @@ struct hdrdecode_head {
 } ;
 
 typedef HDRDECODE	hdrdecode ;
+typedef	HDRDECODE_FL	hdrdecode_fl ;
 
 EXTERNC_begin
 

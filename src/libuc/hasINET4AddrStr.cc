@@ -37,7 +37,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -45,6 +44,8 @@
 #include	<strn.h>
 #include	<hasx.h>
 #include	<localmisc.h>
+
+#include	"hasinet4addrstr.h"
 
 
 /* local defines */
@@ -67,7 +68,7 @@
 
 /* forward references */
 
-static int	hasINET4Num(cchar *,int) noex ;
+static bool	hasINET4Num(cchar *,int) noex ;
 
 
 /* local variables */
@@ -78,7 +79,7 @@ static int	hasINET4Num(cchar *,int) noex ;
 
 /* exported subroutines */
 
-int hasINET4AddrStr(cchar *sp,int sl) noex {
+bool hasinet4addrstr(cchar *sp,int sl) noex {
 	bool		f = true ;
 	int		c = 0 ;
 	cchar		*tp ;
@@ -105,7 +106,7 @@ int hasINET4AddrStr(cchar *sp,int sl) noex {
 /* local subroutines */
 
 static bool hasINET4Num(cchar *sp,int sl) noex {
-	retitn ((sl <= 3) && hasalldig(sp,sl)) ;
+	return ((sl <= 3) && hasalldig(sp,sl)) ;
 }
 /* end subroutine (hasINET4Num) */
 
