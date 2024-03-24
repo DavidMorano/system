@@ -59,12 +59,14 @@ OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
 OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o 
 OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o contypevals.o
 OBJ4_LIBMAILMSG= emainfo.o hdrdecode.o
+OBJ5_LIBMAILMSG= mailmsgheadkey.o
 
 
 OBJA_LIBMAILMSG= obj0_mailmsg.o obj1_mailmsg.o
-OBJB_LIBMAILMSG= obj2_mailmsg.o obj3_mailmsg.o obj4_mailmsg.o
+OBJB_LIBMAILMSG= obj2_mailmsg.o obj3_mailmsg.o
+OBJC_LIBMAILMSG= obj4_mailmsg.o obj5_mailmsg.o
 
-OBJ_LIBMAILMSG= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG)
+OBJ_LIBMAILMSG= $(OBJA_LIBMAILMSG) $(OBJB_LIBMAILMSG) $(OBJC_LIBMAILMSG)
 
 
 default:		$(T).a
@@ -125,6 +127,9 @@ obj3_mailmsg.o:	$(OBJ3_LIBMAILMSG)
 obj4_mailmsg.o:	$(OBJ4_LIBMAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_LIBMAILMSG)
 
+obj5_mailmsg.o:	$(OBJ5_LIBMAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ5_LIBMAILMSG)
+
 
 # MAILBOX
 mailbox.o:		mailbox.dir
@@ -153,5 +158,6 @@ mimetypes.o:		mimetypes.cc mimetypes.h
 hdrdecode.o:		hdrdecode.cc hdrdecode.h
 
 hdrextnum.o:		hdrextnum.cc hdrextnum.h
+mailmsgheadkey.o:	mailmsgheadkey.cc 		$(INCS)
 
 
