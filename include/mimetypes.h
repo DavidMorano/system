@@ -17,6 +17,7 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<hdb.h>
+#include	<localmisc.h>		/* |MAXNAMELEN| */
 
 
 /* object defines */

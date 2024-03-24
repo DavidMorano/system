@@ -181,7 +181,7 @@ int msgentry_setflags(msgentry *mep) noex {
 /* end subroutine (msgentry_setflags) */
 
 int msgentry_setct(msgentry *mep) noex {
-	MHCOM		hc ;
+	mhcom		hc ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		hl ;
@@ -217,7 +217,7 @@ int msgentry_setce(msgentry *mep) noex {
 	cchar		*hp ;
 	mep->f.ceplain = true ;
 	if ((hl = mailmsg_hdrval(&mep->m,HN_CENCODING,&hp)) > 0) {
-	    COMPARSE	com ;
+	    comparse	com ;
 	    int		vl ;
 	    cchar	*tp ;
 	    cchar	*vp ;

@@ -39,6 +39,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
@@ -52,9 +53,6 @@
 
 
 /* local defines */
-
-#undef	LINEBUFLEN
-#define	LINEBUFLEN	2048
 
 
 /* imported namespaces */
@@ -83,10 +81,6 @@ typedef mimetypes_dat	mt_dat ;
 /* forward references */
 
 static int	exttypespec(cchar *,int,cchar **) noex ;
-
-#ifdef	COMMENT
-static int	cmpentry(cchar *,cchar *,int) noex ;
-#endif
 
 
 /* local variables */
@@ -136,129 +130,108 @@ int mimetypes_finish(mt *dbp) noex {
 
 /* read a whole file into the database */
 int mimetypes_file(mt *dbp,cchar *fname) noex {
-	bfile		mfile, *mfp = &mfile ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		ctl ;
-	int		size ;
-	int		cl, fl ;
-	int		c = 0 ;
-	char		terms[32] ;
-	cchar	*fp ;
-	cchar	*cp ;
-	cchar	*ctp ;
-
-	if (dbp == nullptr) return SR_FAULT ;
-	if (fname == nullptr) return SR_FAULT ;
-
-	fieldterms(terms,false," \t#") ;
-
-	if ((rs = bopen(mfp,fname,"r",0666)) >= 0) {
-	    mt_dat	key, data ;
-	    FIELD	fb ;
-	    cint	llen = LINEBUFLEN ;
-	    int		len ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-	    while ((rs = breadln(mfp,lbuf,llen)) > 0) {
-	        len = rs ;
-
-	        if (lbuf[len - 1] == '\n') len -= 1 ;
-	        lbuf[len] = '\0' ;
-
-	        if (len == 0)
-	            continue ;
-
-/* extract the typespec (MIME content type) */
-
-	        ctl = exttypespec(lbuf,len,&ctp) ;
-	        if (ctl <= 0) continue ;
-
-/* get the file suffixes for this MIME content type */
-
-	        cp = ctp + ctl ;
-	        cl = len - (cp - lbuf) ;
-	        if ((rs = field_start(&fb,cp,cl)) >= 0) {
-		    cchar	*kp{} ;
-	            while ((fl = field_get(&fb,terms,&fp)) >= 0) {
-	                if (fl > 0) {
-	                    key.buf = fp ;
-	                    key.len = fl ;
-	                    if (hdb_fetch(dbp,key,nullptr,&data) < 0) {
-	                        char	*bkp, *bvp ;
-
-	                        size = key.len + 1 + ctl + 1 ;
-	                        rs = uc_malloc(size,&bkp) ;
-	                        if (rs < 0) break ;
-
-				kp = charp(key.buf) ;
-	                        bvp = strwcpy(bkp,kp,key.len) + 1 ;
-
-	                        key.buf = bkp ;
-	                        strwcpy(bvp,ctp,ctl) ;
-
-	                        data.len = ctl ;
-	                        data.buf = bvp ;
-
-	                        rs = hdb_store(dbp,key,data) ;
-	                        if (rs < 0) {
-	                            uc_free(bkp) ;
-	                            break ;
-	                        }
-
-	                        c += 1 ;
-
-	                    } /* end if */
-
-	                } /* end if */
-	                if (fb.term == '#') break ;
-	                if (rs < 0) break ;
-	            } /* end while (reading fields) */
-	            rs1 = field_finish(&fb) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (field) */
-	        if (rs < 0) break ;
-	    } /* end while (reading lines) */
-	    rs1 = bclose(mfp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (bfile) */
-
+        int             c = 0 ;
+	if (dbp && fname) {
+	    cnullptr	np{} ;
+            int             ctl ;
+            int             size ;
+            int             cl, fl ;
+            cchar   *fp ;
+            cchar   *cp ;
+            cchar   *ctp ;
+	    char	*lbuf{} ;
+	    if ((rs = malloc_ml(&lbuf)) >= 0) {
+                bfile	mfile, *mfp = &mfile ;
+                char	terms[32] ;
+		cint	llen = rs ;
+                fieldterms(terms,false," \t#") ;
+                if ((rs = bopen(mfp,fname,"r",0666)) >= 0) {
+                    mt_dat      key ;
+                    mt_dat      data ;
+                    while ((rs = breadln(mfp,lbuf,llen)) > 0) {
+                        field       fb ;
+                        int		len = rs ;
+                        if (lbuf[len - 1] == '\n') len -= 1 ;
+                        lbuf[len] = '\0' ;
+                        if (len == 0) continue ;
+    /* extract the typespec (MIME content type) */
+                        ctl = exttypespec(lbuf,len,&ctp) ;
+                        if (ctl <= 0) continue ;
+    /* get the file suffixes for this MIME content type */
+                        cp = ctp + ctl ;
+                        cl = len - (cp - lbuf) ;
+                        if ((rs = field_start(&fb,cp,cl)) >= 0) {
+                            cchar       *kp{} ;
+                            while ((fl = field_get(&fb,terms,&fp)) >= 0) {
+                                if (fl > 0) {
+                                    key.buf = fp ;
+                                    key.len = fl ;
+                                    if (hdb_fetch(dbp,key,np,&data) < 0) {
+                                        char    *bkp, *bvp ;
+                                        size = key.len + 1 + ctl + 1 ;
+                                        rs = uc_malloc(size,&bkp) ;
+                                        if (rs < 0) break ;
+                                        kp = charp(key.buf) ;
+                                        bvp = strwcpy(bkp,kp,key.len) + 1 ;
+                                        key.buf = bkp ;
+                                        strwcpy(bvp,ctp,ctl) ;
+                                        data.len = ctl ;
+                                        data.buf = bvp ;
+                                        rs = hdb_store(dbp,key,data) ;
+                                        if (rs < 0) {
+                                            uc_free(bkp) ;
+                                            break ;
+                                        }
+                                        c += 1 ;
+                                    } /* end if */
+                                } /* end if */
+                                if (fb.term == '#') break ;
+                                if (rs < 0) break ;
+                            } /* end while (reading fields) */
+                            rs1 = field_finish(&fb) ;
+                            if (rs >= 0) rs = rs1 ;
+                        } /* end if (field) */
+                        if (rs < 0) break ;
+                    } /* end while (reading lines) */
+                    rs1 = bclose(mfp) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (bfile) */
+		rs1 = uc_free(lbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (mimetypes_file) */
 
 /* find a MIME type for the given extension */
 int mimetypes_find(mt *dbp,char *typespec,cchar *ext) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		len = 0 ;
-	cchar	*tp ;
-
-	if (ext == nullptr) return SR_FAULT ;
-
-	if (typespec != nullptr) typespec[0] = '\0' ;
-
-	if ((tp = strrchr(ext,'.')) == nullptr) {
-	    tp = ext ;
-	} else {
-	    tp += 1 ;
-	}
-
-	if (tp[0] != '\0') {
-	    mt_dat	key, data ;
-	    key.len = -1 ;
-	    key.buf = tp ;
-	    if ((rs = hdb_fetch(dbp,key,nullptr,&data)) >= 0) {
-	        if (typespec != nullptr) {
-	            cint	typelen = MIMETYPES_TYPELEN ;
-		    cchar	*valp = charp(data.buf) ;
-	            rs = snwcpy(typespec,typelen,valp,data.len) ;
-	            len = rs ;
-	        }
-	    }
-	} else {
+	if (ext) {
+	    cchar	*tp = ext ;
 	    rs = SR_NOTFOUND ;
-	}
-
+	    if (typespec) typespec[0] = '\0' ;
+	    if ((tp = strrchr(ext,'.')) != nullptr) {
+	        tp += 1 ;
+	    }
+	    if (tp[0] != '\0') {
+	        mt_dat	key ;
+	        mt_dat	data ;
+	        key.len = -1 ;
+	        key.buf = tp ;
+	        if ((rs = hdb_fetch(dbp,key,nullptr,&data)) >= 0) {
+	            if (typespec != nullptr) {
+	                cint	typelen = MIMETYPES_TYPELEN ;
+		        cchar	*valp = charp(data.buf) ;
+	                rs = snwcpy(typespec,typelen,valp,data.len) ;
+	                len = rs ;
+	            }
+	        }
+	    } /* end if (found) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mimetypes_find) */
@@ -275,26 +248,23 @@ int mimetypes_curend(mt *dbp,mt_cur *cp) noex {
 
 /* enumerate all of the key-val pairs */
 int mimetypes_enum(mt *dbp,mt_cur *curp,char *ext,char *ts) noex {
-	mt_dat	key, val ;
-	int		rs ;
-
-	if (dbp == nullptr) return SR_FAULT ;
-	if (ext == nullptr) return SR_FAULT ;
-
-	ext[0] = '\0' ;
-	if (ts != nullptr) ts[0] = '\0' ;
-
-	if ((rs = hdb_enum(dbp,curp,&key,&val)) >= 0) {
-	    cint	ml = min(key.len,MIMETYPES_TYPELEN) ;
-	    cchar	*kp = charp(key.buf) ;
-	    strwcpy(ext,kp,ml) ;
-	    rs = min(val.len,MIMETYPES_TYPELEN) ;
-	    if (ts != nullptr) {
-		cchar	*valp = charp(val.buf) ;
-		strwcpy(ts,valp,rs) ;
+	int		rs = SR_FAULT ;
+	if (dbp && curp && ext) {
+	    mt_dat	key ;
+	    mt_dat	val ;
+	    ext[0] = '\0' ;
+	    if (ts) ts[0] = '\0' ;
+	    if ((rs = hdb_enum(dbp,curp,&key,&val)) >= 0) {
+	        cint	ml = min(key.len,MIMETYPES_TYPELEN) ;
+	        cchar	*kp = charp(key.buf) ;
+	        strwcpy(ext,kp,ml) ;
+	        rs = min(val.len,MIMETYPES_TYPELEN) ;
+	        if (ts != nullptr) {
+		    cchar	*valp = charp(val.buf) ;
+		    strwcpy(ts,valp,rs) ;
+	        }
 	    }
-	}
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mimetypes_enum) */
@@ -333,40 +303,25 @@ int mimetypes_get(mt *dbp,char *typespec,cchar *ext) noex {
 
 /* extract the typespec from this buffer */
 static int exttypespec(cchar *tbuf,int tlen,cchar **rpp) noex {
-	int		cl ;
-	cchar		*sp, *cp ;
-
-	cp = tbuf ;
-	cl = tlen ;
+	int		spec = -1 ;
+	int		cl = tlen ;
+	cchar		*cp = tbuf ;
+	cchar		*sp ;
 	while (CHAR_ISWHITE(*cp) && (cl > 0)) {
 	    cp += 1 ;
 	    cl -= 1 ;
 	}
-
-	if (*cp == '#')
-	    return -1 ;
-
-	sp = cp ;
-	while (*cp && (cl > 0) && (! CHAR_ISWHITE(*cp)) && (*cp != '#')) {
-	    cp += 1 ;
-	    cl -= 1 ;
-	}
-
-	*rpp = sp ;
-	return (cp - sp) ;
+	if (*cp != '#') {
+	    sp = cp ;
+	    while (*cp && (cl > 0) && (! CHAR_ISWHITE(*cp)) && (*cp != '#')) {
+	        cp += 1 ;
+	        cl -= 1 ;
+	    }
+	    *rpp = sp ;
+	    spec = (cp - sp) ;
+	} /* end if */
+	return spec ;
 }
 /* end subroutine (exttypespec) */
-
-#ifdef	COMMENT
-static int cmpentry(cchar *s1,cchar *s2,int len) noex {
-	int		rc = 0 ;
-	if (len > 0) {
-	    rc = (s2[len] - s1[len]) ;
-	    if (rc == 0) rc = strncmp(s1,s2,len) ;
-	}
-	return rc ;
-}
-/* end subroutine (cmpentry) */
-#endif /* COMMENT */
 
 

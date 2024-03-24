@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<netdb.h>
+#include	<sys/param.h>
 #include	<usystem.h>
 #include	<localmisc.h>
 

@@ -122,7 +122,7 @@ obj2_mailmsg.o:	$(OBJ2_LIBMAILMSG)
 obj3_mailmsg.o:	$(OBJ3_LIBMAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBMAILMSG)
 
-obj4_mailmsg.o:	$(OBJ5_LIBMAILMSG)
+obj4_mailmsg.o:	$(OBJ4_LIBMAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_LIBMAILMSG)
 
 
@@ -136,7 +136,7 @@ mailmsg.o:		mailmsg.dir
 mailmsg.dir:
 	makesubdir $@
 
-contypevals.o:		conttypevals.cc contypevals.h
+contypevals.o:		contypevals.cc contypevals.h
 
 mailmsghdrfold.o:	mailmsghdrfold.cc mailmsghdrfold.h	$(INCS)
 mailmsghdrval.o:	mailmsghdrval.cc mailmsghdrval.h	$(INCS)
