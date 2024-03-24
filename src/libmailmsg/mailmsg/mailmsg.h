@@ -28,28 +28,18 @@
 #include	<localmisc.h>
 
 
-#define	MAILMSG_MAGIC		0x97634587
-#define	MAILMSG			struct mailmsg_head
-#define	MAILMSG_ENV		struct mailmsg_env
-#define	MAILMSG_HDR		struct mailmsg_hdr
-#define	MAILMSG_MAXLINELEN	MAX((5 * LINEBUFLEN),MAXPATHLEN)
+#define	MAILMSG		struct mailmsg_head
+#define	MAILMSG_MAGIC	0x97634587
+#define	MAILMSG_MF	5		/* buffer-size multiply factor */
 
-
-struct mailmsg_env {
-	vecobj		insts ;
-} ;
-
-struct mailmsg_hdr {
-	vecobj		names ;
-	int		lastname ;	/* index of last HDR-name */
-} ;
 
 struct mailmsg_head {
-	strpack		stores ;
-	MAILMSG_ENV	envs ;
-	MAILMSG_HDR	hdrs ;
+	strpack		*slp ;		/* String-List-Pointer */
+	vecobj		*elp ;		/* Envelope-List-Pointer */
+	vecobj		*hlp ;		/* Header-List-Pointer */
 	uint		magic ;
 	int		msgstate ;
+	int		lastname ;	/* index of last HDR-name */
 } ;
 
 typedef MAILMSG		mailmsg ;
@@ -70,6 +60,20 @@ extern int mailmsg_hdrval(mailmsg *,cchar *,cchar **) noex ;
 extern int mailmsg_finish(mailmsg *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline int mailmsg_magic(mailmsg *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MAILMSG_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mailmsg_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* MAILMSG_INCLUDE */

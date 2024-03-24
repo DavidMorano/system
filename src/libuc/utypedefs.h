@@ -246,17 +246,27 @@ typedef const nullptr_t		cnullptr ;
 
 #ifndef	TYPEDEF_CCP
 #define	TYPEDEF_CCP
-typedef const char		*ccp ;
+typedef const char *		ccp ;
 #endif
 
 #ifndef	TYPEDEF_CHARP
 #define	TYPEDEF_CHARP
-typedef char			*charp ;
+typedef char *			charp ;
+#endif
+
+#ifndef	TYPEDEF_CHARPP
+#define	TYPEDEF_CHARPP
+typedef char **			charpp ;
 #endif
 
 #ifndef	TYPEDEF_CCHARP
 #define	TYPEDEF_CCHARP
-typedef const char		*ccharp ;
+typedef const char *		ccharp ;
+#endif
+
+#ifndef	TYPEDEF_CCHARPP
+#define	TYPEDEF_CCHARPP
+typedef const char **		ccharpp ;
 #endif
 
 #ifndef	TYPEDEF_CPCCHAR
@@ -266,16 +276,16 @@ typedef const char *const	cpcchar ;
 
 #ifndef	TYPEDEF_CPCCHARP	/* same as |mainv| */
 #define	TYPEDEF_CPCCHARP	/* same as |mainv| */
-typedef const char *const	*cpccharp ;
+typedef const char *const *	cpccharp ;
 #endif
 
 #ifndef	TYPEDEF_MAINV
 #define	TYPEDEF_MAINV
-typedef const char *const	*mainv ;
+typedef const char *const *	mainv ;
 #endif
 
-#ifndef	TYPEDEF_IN6ADDRT
-#define	TYPEDEF_IN6ADDRT
+#ifndef	TYPEDEF_IN4ADDRT
+#define	TYPEDEF_IN4ADDRT
 typedef in_addr_t		in4_addr_t ;
 #endif
 
@@ -316,6 +326,11 @@ typedef mode_t		fsperm ;
 #define	TYPEDEF_CFPERM
 typedef const mode_t	cfsperm ;
 #endif /* TYPEDEF_CFPERM */
+
+#ifndef	TYPEDEF_COFF
+#define	TYPEDEF_COFF
+typedef const off_t	coff ;
+#endif /* TYPEDEF_COFF */
 
 
 #endif /* UTYPEDEFS_INCLUDE */

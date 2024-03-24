@@ -169,13 +169,13 @@ extern int mailbox_msgdel(mailbox *,int,int) noex ;
 extern int mailbox_msghdradd(mailbox *,int,cchar *,cchar *,int) noex ;
 extern int mailbox_countdel(mailbox *) noex ;
 extern int mailbox_readbegin(mailbox *,mailbox_read *,off_t,int) noex ;
-extern int mailbox_readline(mailbox *,mailbox_read *,char *,int) noex ;
+extern int mailbox_readln(mailbox *,mailbox_read *,char *,int) noex ;
 extern int mailbox_readend(mailbox *,mailbox_read *) noex ;
 extern int mailbox_close(mailbox *) noex ;
 
 #ifdef	COMMENT
 extern int mailbox_msgread(mailbox *,int,char *,int) noex ;
-extern int mailbox_msgreadline(mailbox *,int,char *,int) noex ;
+extern int mailbox_msgreadln(mailbox *,int,char *,int) noex ;
 #endif
 
 EXTERNC_end
@@ -183,7 +183,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static int mailbox_magic(mailbox *op,Args ... args) noex {
+inline int mailbox_magic(mailbox *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;

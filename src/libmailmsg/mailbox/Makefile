@@ -54,15 +54,15 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mailbox.h
 
 
-OBJ0_LIBMB= mailbox_main.o
-OBJ1_LIBMB= mailbox_fromaddr.o
-OBJ2_LIBMB= mailbox_getfrom.o
+OBJ0_MAILBOX= mailbox_main.o
+OBJ1_MAILBOX= mailbox_fromaddr.o
+OBJ2_MAILBOX= mailbox_getfrom.o
 
 
-OBJA_LIBMB= obj0_mailbox.o obj1_mailbox.o
-OBJB_LIBMB= obj2_mailbox.o
+OBJA_MAILBOX= obj0_mailbox.o obj1_mailbox.o
+OBJB_MAILBOX= obj2_mailbox.o
 
-OBJ_LIBMB= $(OBJA_LIBMB) $(OBJB_LIBMB)
+OBJ_MAILBOX= $(OBJA_MAILBOX) $(OBJB_MAILBOX)
 
 
 default:		$(T).o
@@ -85,10 +85,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBMB)
+$(T).o:			$(OBJ_MAILBOX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILBOX)
 
-$(T).a:			$(OBJ_LIBMB)
+$(T).a:			$(OBJ_MAILBOX)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -108,14 +108,14 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_mailbox.o:	$(OBJ0_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBMB)
+obj0_mailbox.o:	$(OBJ0_MAILBOX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILBOX)
 
-obj1_mailbox.o:	$(OBJ1_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBMB)
+obj1_mailbox.o:	$(OBJ1_MAILBOX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILBOX)
 
-obj2_mailbox.o:	$(OBJ2_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBMB)
+obj2_mailbox.o:	$(OBJ2_MAILBOX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILBOX)
 
 
 mailbox_main.o:		mailbox_main.cc		$(INCS)

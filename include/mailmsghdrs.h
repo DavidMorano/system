@@ -1,4 +1,5 @@
-/* mailmsghdrs */
+/* mailmsghdrs HEADER */
+/* lang=C20 */
 
 
 /* revision history:
@@ -11,16 +12,18 @@
 /* Copyright © 2002 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MAILMSGHDRS_INCLUDE
-#define	MAILMSGHDRS_INCLUDE	1
+#define	MAILMSGHDRS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<mailmsg.h>
+#include	<localmisc.h>
 
 
 /* object defines */
-
 #define	MAILMSGHDRS_MAGIC	0x87987598
 #define	MAILMSGHDRS		struct mailmsghdrs_head
 
@@ -221,43 +224,27 @@
 #define	HL_SUBJ		4
 
 /* put all new entries before this last (fake) one */
-
-#define	HI_NULL		48
-#define	HN_NULL		NULL
-#define	HL_NULL		-1
+#define	HI_OVERLAST	48
+#define	HN_OVERLAST	NULL
+#define	HL_OVERLAST	-1
 
 
 struct mailmsghdrs_head {
+	cchar		**v ;
 	uint		magic ;
-	const char	**v ;
 } ;
 
+extern cpcchar		mailmsghdrs_names[] ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	MAILMSGHDRS	mailmsghdrs ;
 
-extern const char	*mailmsghdrs_names[] ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int mailmsghdrs_start(mailmsghdrs *,mailmsg *) noex ;
+extern int mailmsghdrs_finish(mailmsghdrs *) noex ;
 
+EXTERNC_end
 
-#if	(! defined(MAILMSGHDRS_MASTER)) || (MAILMSGHDRS_MASTER == 0)
-
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int mailmsghdrss_start(MAILMSGHDRS *,MAILMSG *) ;
-extern int mailmsghdrss_finish(MAILMSGHDRS *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* (! defined(MAILMSGHDRS_MASTER)) || (MAILMSGHDRS_MASTER == 0) */
 
 #endif /* MAILMSGHDRS_INCLUDE */
 

@@ -103,6 +103,7 @@
 #include	<bvs.h>
 #include	<bvsmk.h>
 #include	<votdc.h>
+#include	<ourmjd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1370,9 +1371,8 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 
 	    } else {
 	        int	mjd = -1 ;
-
 	        if (sip->qtype == qtype_day) {
-	            if ((rs = hasourmjd(sp,sl)) > 0) {
+	            if ((rs = ourmjd(sp,sl)) > 0) {
 	                mjd = rs ;
 	            } else {
 	                DAYSPEC	ds ;
@@ -1384,7 +1384,7 @@ static int procspec(SUBINFO *sip,cchar sp[],int sl) noex {
 	                } /* end if (dayspec) */
 	            } /* end if (type-day) */
 	        } else if (sip->qtype == qtype_mjd) {
-	            if ((rs = hasourmjd(sp,sl)) > 0) {
+	            if ((rs = ourmjd(sp,sl)) > 0) {
 	                mjd = rs ;
 	            } else {
 	                uint	uv ;

@@ -1,9 +1,16 @@
 /* mailmsgatt HEADER */
 /* lang=C20 */
 
-/* message attachment object */
+/* mail-message attachment object processing */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-12-01, David A­D­ Morano
+	This module was originally written.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -25,14 +32,16 @@
 #define	MAILMSGATT		VECITEM
 
 
+typedef MAILMSGATT		mailmsgatt ;
+
 EXTERNC_begin
 
-extern int mailmsgatt_start(MAILMSGATT *) noex ;
-extern int mailmsgatt_finish(MAILMSGATT *) noex ;
-extern int mailmsgatt_add(MAILMSGATT *,cchar *,cchar *,cchar *,int) noex ;
-extern int mailmsgatt_count(MAILMSGATT *) noex ;
-extern int mailmsgatt_enum(MAILMSGATT *,int,MAILMSGATTENT **) noex ;
-extern int mailmsgatt_typeatts(MAILMSGATT *,MIMETYPES *) noex ;
+extern int mailmsgatt_start(mailmsgatt *) noex ;
+extern int mailmsgatt_finish(mailmsgatt *) noex ;
+extern int mailmsgatt_add(mailmsgatt *,cchar *,cchar *,cchar *,int) noex ;
+extern int mailmsgatt_count(mailmsgatt *) noex ;
+extern int mailmsgatt_enum(mailmsgatt *,int,mailmsgattent **) noex ;
+extern int mailmsgatt_typeatts(mailmsgatt *,MIMETYPES *) noex ;
 
 EXTERNC_end
 

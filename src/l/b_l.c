@@ -1,14 +1,13 @@
-/* b_l */
+/* b_l SUPPORT */
+/* lang=C++20 */
 
 /* this is a SHELL built-in version of 'l(1)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
-
 
 /* revision history:
 
@@ -21,20 +20,18 @@
 
 /*******************************************************************************
 
-	There have been many program like this, but this is the first that is
-	built into the shell (Korn Shell in this case).  This was written from
-	scratch so it may not have all of the options of other programs like
-	this.  But it is fast when the filesystem is slow (like when it is all
-	remote on a slow network).  It works great!  This really worked out
-	for good.
+	There have been many program like this, but this is the
+	first that is built into the shell (Korn Shell in this
+	case).  This was written from scratch so it may not have
+	all of the options of other programs like this.  But it is
+	fast when the filesystem is slow (like when it is all remote
+	on a slow network).  It works great!  This really worked
+	out for good.
 
 	Synopsis:
-
 	$ l [<file(s)>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -63,6 +60,7 @@
 #include	<vecstr.h>
 #include	<vstrcmpx.h>
 #include	<fsdir.h>
+#include	<typenonpath.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -125,7 +123,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	lastlogin(char *,uid_t,time_t *,char *,char *) ;
-extern int	hasnonpath(cchar *,int) ;
 extern int	mkvarpath(char *,cchar *,int) ;
 extern int	mkuserpath(char *,cchar *,cchar *,int) ;
 extern int	mkcdpath(char *,cchar *,int) ;
@@ -1299,10 +1296,8 @@ static int filesuf(cchar fname[],int fl)
 	debugprintf("b_l/filesuf: fname=>%s<\n",fname) ;
 #endif
 
-	if (hasnonpath(fname,fl)) {
-
+	if (typenonpath(fname,fl)) {
 	    si = suffix_nonpath ;
-
 	} else {
 	    USTAT	sb ;
 	    char	tmpfname[MAXPATHLEN+1] ;

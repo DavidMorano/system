@@ -1,7 +1,7 @@
 /* contypevals SUPPORT (for Email) */
 /* lang=C20 */
 
-/* content type values */
+/* email content-type values */
 /* version %I% last-modified %G% */
 
 

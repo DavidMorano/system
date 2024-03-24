@@ -1,11 +1,10 @@
-/* uc_lstat */
+/* uc_lstat SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* get status on a file */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -16,16 +15,14 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
+#include	<typenonpath.h>
 #include	<localmisc.h>
 
 
@@ -46,17 +43,17 @@ extern int	mkuserpath(char *,const char *,const char *,int) ;
 extern int	mkcdpath(char *,const char *,int) ;
 extern int	mkvarpath(char *,const char *,int) ;
 extern int	hasvarpathprefix(const char *,int) ;
-extern int	hasnonpath(const char *,int) ;
 
 
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_lstat(cchar *fname,struct ustat *sbp)
-{
+int uc_lstat(cchar *fname,USTAT *sbp) noex {
 	int		rs = SR_OK ;
 	int		fl ;
 
@@ -67,14 +64,12 @@ int uc_lstat(cchar *fname,struct ustat *sbp)
 
 	fl = strlen(fname) ;
 
-	if (hasnonpath(fname,fl)) {
-
-	    memset(sbp,0,sizeof(struct ustat)) ;
+	if (typenonpath(fname,fl)) {
+	    memclear(sbp) ;
 	    sbp->st_mode = S_IFNAM ;
 	    sbp->st_uid = UID_NOBODY ;
 	    sbp->st_gid = GID_NOBODY ;
 	    strncpy(sbp->st_fstype,FSTYPE_FLOAT,FSTYPESZ) ;
-
 	} else {
 	    char	efname[MAXPATHLEN + 1] ;
 

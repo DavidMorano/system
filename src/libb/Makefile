@@ -72,8 +72,8 @@ OBJ13=
 OBJ14=
 OBJ15=
 
-OBJ16=
-OBJ17=
+OBJ16= bfliner.o
+OBJ17= bfilestrfname.o
 OBJ18=
 OBJ19=
 OBJ20=
@@ -203,5 +203,8 @@ bprintcleanlines.o:	bprintcleanlines.cc	$(INCS)
 brewind.o:		brewind.cc		$(INCS)
 bdup.o:			bdup.cc			$(INCS)
 bsupport.o:		bsupport.cc		$(INCS)
+
+bfliner.o:		bfliner.cc bfliner.h
+bfilestdfnames.o:	bfilestdfname.cc bfilestdfname.h
 
 

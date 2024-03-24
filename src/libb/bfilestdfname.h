@@ -21,11 +21,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<stdfnames.h>
 
 
 EXTERNC_begin
 
-extern cchar	*bfilestdfname(cchar *) noex ;
+extern cchar	*bfilestdfname(int,cchar *) noex ;
 
 EXTERNC_end
 

@@ -30,6 +30,7 @@ extern int sirchr(cchar *,int,int) noex ;
 extern int sialpha(cchar *,int) noex ;
 extern int sidigit(cchar *,int) noex ;
 extern int sialnum(cchar *,int) noex ;
+extern int sidquote(cchar *,int) noex ;
 extern int sibasename(cchar *,int) noex ;
 extern int sibreak(cchar *,int,cchar *) noex ;
 extern int sibrk(cchar *,int,cchar *) noex ;

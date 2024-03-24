@@ -1,7 +1,7 @@
 /* hasx SUPPORT */
 /* lang=C++20 */
 
-/* has a c-string some characteristic? */
+/* has a counted c-string some characteristic? */
 /* version %I% last-modified %G% */
 
 #define	CF_HASNOTDOTSWITCH	1	/* switch or not */
@@ -403,6 +403,19 @@ bool hasalpha(cchar *sp,int sl) noex {
 	return f ;
 }
 /* end subroutine (hasalpha) */
+
+bool hasalnum(cchar *sp,int sl) noex {
+	bool		f = false ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = isalnumlatin(ch) ;
+	    if (f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasalnum) */
 
 bool hasnum(cchar *sp,int sl) noex {
 	bool		f = false ;

@@ -66,6 +66,7 @@
 #include	<matxstr.h>
 #include	<hasx.h>
 #include	<ischarx.h>
+#include	<ismisc.h>
 #include	<localmisc.h>
 
 #include	"fsdirtree.h"
@@ -96,10 +97,6 @@ typedef uint32_t	ui ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	isDotDir(cchar *) noex ;
-}
 
 
 /* external variables */

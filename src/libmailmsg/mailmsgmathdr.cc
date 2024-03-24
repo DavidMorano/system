@@ -72,6 +72,10 @@
 #define	HEADERWHITE(c)	CHAR_ISWHITE(c)
 #endif
 
+#ifndef	CF_ALT1
+#define	CF_ALT1		0		/* use alternative-1 */
+#endif
+
 
 /* external subroutines */
 
@@ -87,6 +91,8 @@
 
 /* local variables */
 
+constexpr bool		f_alt = CF_ALT1 ;
+
 
 /* exported variables */
 
@@ -98,14 +104,13 @@ int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
 	if (ts) {
 	    int		tl ;
 	    int		kl = 0 ;
-	    cchar		*tp = ts ;
+	    cchar	*tp = ts ;
 	    if (ip) {
 	        *ip = 0 ;
 	    }
 	    if (tslen < 0) tslen = strlen(ts) ;
 	    tl = tslen ;
-#if	CF_ALT1
-	    {
+	    if constexpr (f_alt) {
 	        bool	f = false ;
 	        while (tl) {
 	            cint	ch = *tp ;
@@ -116,13 +121,12 @@ int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
 	            tp += 1 ;
 	            tl -= 1 ;
 	        } /* end while */
-	    }
-#else
-	    while (tl && *tp && (! HEADERWHITE(*tp)) && (*tp != ':')) {
-	        tp += 1 ;
-	        tl -= 1 ;
-	    } /* end while */
-#endif /* CF_ALT1 */
+	    } else {
+	        while (tl && *tp && (! HEADERWHITE(*tp)) && (*tp != ':')) {
+	            tp += 1 ;
+	            tl -= 1 ;
+	        } /* end while */
+	    } /* end if-constexpr (f_alt) */
 	    kl = (tp - ts) ;
 	    while (tl && HEADERWHITE(*tp)) {
 	        tp += 1 ;

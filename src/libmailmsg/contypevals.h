@@ -1,6 +1,9 @@
 /* contypevals HRADER */
 /* lang=C20 */
 
+/* email content-type values */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 

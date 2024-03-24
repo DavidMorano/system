@@ -67,7 +67,7 @@
 
 uint inet4int(cvoid *ap) noex {
 	uint		v = 0 ;
-	cchar		*cp = ccharp(ap) ;
+	cchar		*cp = charp(ap) ;
 	for (int i = 0 ; i < 4 ; i += 1) {
 	    uint	uv = UC(cp[i]) ;
 	    v <<= 8 ;

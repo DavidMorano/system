@@ -1,6 +1,9 @@
 /* mailmsgstage HEADER */
 /* lang=C20 */
 
+/* process the input messages and spool them up */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -49,13 +52,14 @@ struct mailmsgstage_flags {
 struct mailmsgstage_head {
 	cchar		*tmpfname ;
 	char		*mapdata ;
-	vechand		msgs ;
+	vechand		*mlp ;
 	size_t		tflen ;
 	size_t		mapsize ;
 	MAILMSGSTAGE_FL	f ;
 	uint		magic ;
 	int		nmsgs ;
 	int		tfd ;
+	int		to ;
 } ;
 
 typedef MAILMSGSTAGE		mailmsgstage ;

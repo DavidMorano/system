@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int mailmsgattent_magic(mailmsgattent *op,Args ... args) noex {
+static inline int mhcom_magic(mhcom *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSGATTENT_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MHCOM_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailmsgattent_magic) */
+/* end subroutine (mhcom_magic) */

@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mailmsg.h
 
 
-OBJ0_LIBMB= mailbox.o
-OBJ1_LIBMB= mailmsghdrval.o
-OBJ2_LIBMB= mailmsgmatenv.o
-OBJ3_LIBMB= mailmsgmathdr.o
+OBJ0_MAILMSG= mailmsg_main.o mailmsg_loadmb.o mailmsg_loadfile.o
+OBJ1_MAILMSG= mailmsg_envaddrfold.o
+OBJ2_MAILMSG= mailmsg_envget.o
+OBJ3_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
 
 
-OBJA_LIBMB= obj0_mailmsg.o obj1_mailmsg.o
-OBJB_LIBMB= obj2_mailmsg.o obj3_mailmsg.o
+OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
+OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o
 
-OBJ_LIBMB= $(OBJA_LIBMB) $(OBJB_LIBMB)
+OBJ_MAILMSG= $(OBJA_MAILMSG) $(OBJB_MAILMSG)
 
 
 default:		$(T).a
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LIBMB)
+$(T).o:			$(OBJ_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_MAILMSG)
 
-$(T).a:			$(OBJ_LIBMB)
+$(T).a:			$(OBJ_MAILMSG)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,31 +109,25 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_mailmsg.o:	$(OBJ0_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LIBMB)
+obj0_mailmsg.o:	$(OBJ0_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_MAILMSG)
 
-obj1_mailmsg.o:	$(OBJ1_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LIBMB)
+obj1_mailmsg.o:	$(OBJ1_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_MAILMSG)
 
-obj2_mailmsg.o:	$(OBJ2_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LIBMB)
+obj2_mailmsg.o:	$(OBJ2_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_MAILMSG)
 
-obj3_mailmsg.o:	$(OBJ3_LIBMB)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBMB)
+obj3_mailmsg.o:	$(OBJ3_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILMSG)
 
 
-# MAILBOX
-mailbox.o:		mailbox.dir
-mailbox.dir:
-	makesubdir $@
-
-# MAILMSG
-mailmsg.o:		mailmsg.dir
-mailmsg.dir:
-	makesubdir $@
-
-mailmsghdrval.o:	mailmsghdrval.cc	$(INCS)
-mailmsgmatenv.o:	mailmsgmatenv.cc	$(INCS)
-mailmsgmathdr.o:	mailmsgmathdr.cc	$(INCS)
+mailmsg_main.o:			mailmsg_main.cc			$(INCS)
+mailmsg_loadmb.o:		mailmsg_loadmb.cc		$(INCS)
+mailmsg_loadfile.o:		mailmsg_loadfile.cc		$(INCS)
+mailmsg_envaddrfold.o:		mailmsg_envaddrfold.cc		$(INCS)
+mailmsg_envget.o:		mailmsg_envget.cc mailmsg_envget.h $(INCS)
+mailmsg_envdates.o:		mailmsg_envdates.cc		$(INCS)
+mailmsg_envtimes.o:		mailmsg_envtimes.cc		$(INCS)
 
 

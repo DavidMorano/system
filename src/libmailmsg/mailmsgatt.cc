@@ -1,7 +1,7 @@
 /* mailmsgatt SUPPORT */
 /* lang=C++20 */
 
-/* mail-message attachment processing */
+/* mail-message attachment object processing */
 /* version %I% last-modified %G% */
 
 
@@ -28,7 +28,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -64,46 +63,49 @@
 
 /* exported subroutines */
 
-int mailmsgatt_start(MAILMSGATT *rhp) noex {
+int mailmsgatt_start(mailmsgatt *op) noex {
 	int		rs = SR_FAULT ;
-	if (rhp) {
+	if (op) {
 	    cint	ne = MAILMSGATT_DEFENTS ;
 	    cint	vo = VECITEM_OCOMPACT ;
-	    rs = vecitem_start(rhp,ne,vo) ;
+	    rs = vecitem_start(op,ne,vo) ;
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailmsgatt_start) */
 
-int mailmsgatt_finish(MAILMSGATT *rhp) noex {
-	MAILMSGATTENT	*ep ;
+int mailmsgatt_finish(mailmsgatt *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-
-	for (i = 0 ; vecitem_get(rhp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-	        rs1 = mailmsgattent_finish(ep) ;
+	if (op) {
+	    rs = SR_OK ;
+	    {
+	        mailmsgattent	*ep ;
+	        for (int i = 0 ; vecitem_get(op,i,&ep) >= 0 ; i += 1) {
+	            if (ep) {
+	                rs1 = mailmsgattent_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	        } /* end for */
+	    }
+	    {
+	        rs1 = vecitem_finish(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	} /* end for */
-
-	rs1 = vecitem_finish(rhp) ;
-	if (rs >= 0) rs = rs1 ;
-
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailmsgatt_finish) */
 
 /* add an attachment (w/ default content-type and content-encoding) */
-int mailmsgatt_add(MAILMSGATT *rhp,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
+int mailmsgatt_add(mailmsgatt *op,cc *ct,cc *ce,cc *sp,int sl) noex {
 	int		rs = SR_FAULT ;
-	if (rhp && ct && nbuf) {
-	    MAILMSGATTENT	ve ;
-	    if (nlen < 0) nlen = strlen(nbuf) ;
-	    if ((rs = mailmsgattent_start(&ve,ct,ce,nbuf,nlen)) >= 0) {
-	        cint	esize = sizeof(MAILMSGATTENT) ;
-	        rs = vecitem_add(rhp,&ve,esize) ;
+	if (op && ct && sp) {
+	    mailmsgattent	ve ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rs = mailmsgattent_start(&ve,ct,ce,sp,sl)) >= 0) {
+	        cint	esize = sizeof(mailmsgattent) ;
+	        rs = vecitem_add(op,&ve,esize) ;
 	        if (rs < 0) {
 	            mailmsgattent_finish(&ve) ;
 	        }
@@ -114,13 +116,13 @@ int mailmsgatt_add(MAILMSGATT *rhp,cc *ct,cc *ce,cc *nbuf,int nlen) noex {
 /* end subroutine (mailmsgatt_add) */
 
 /* delete an mailmsgattment */
-int mailmsgatt_del(MAILMSGATT *alp,int i) noex {
+int mailmsgatt_del(mailmsgatt *alp,int i) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (alp) {
-	    MAILMSGATTENT	*ep ;
+	    mailmsgattent	*ep ;
 	    if ((rs = vecitem_get(alp,i,&ep)) >= 0) {
-	        if (ep != NULL) {
+	        if (ep) {
 	            rs1 = mailmsgattent_finish(ep) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
@@ -133,40 +135,38 @@ int mailmsgatt_del(MAILMSGATT *alp,int i) noex {
 /* end subroutine (mailmsgatt_del) */
 
 /* return the number of hosts seen so far */
-int mailmsgatt_count(MAILMSGATT *rhp) noex {
+int mailmsgatt_count(mailmsgatt *op) noex {
 	int		rs = SR_FAULT ;
-	if (rhp) {
-	    rs = vecitem_count(rhp) ;
+	if (op) {
+	    rs = vecitem_count(op) ;
 	}
 	return rs ;
 }
 /* end subroutine (mailmsgatt_count) */
 
 /* enumerate */
-int mailmsgatt_enum(MAILMSGATT *rhp,int i,MAILMSGATTENT **epp) noex {
+int mailmsgatt_enum(mailmsgatt *op,int i,mailmsgattent **epp) noex {
 	int		rs = SR_FAULT ;
-	if (rhp) {
-	    rs = vecitem_get(rhp,i,epp) ;
+	if (op && epp) {
+	    rs = vecitem_get(op,i,epp) ;
 	}
 	return rs ;
 }
 /* end subroutine (mailmsgatt_enum) */
 
-
 /* find content types for all of the mailmsgattments using a MIME-types DB */
-int mailmsgatt_typeatts(MAILMSGATT *rhp,MIMETYPES *mtp) noex {
-	MAILMSGATTENT	*ep ;
-	int		rs = SR_OK ;
-
-	if (rhp == NULL) return SR_FAULT ;
-
-	for (int i = 0 ; mailmsgatt_enum(rhp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
-	        rs = mailmsgattent_type(ep,mtp) ;
-	        if (rs < 0) break ;
-	    }
-	} /* end for */
-
+int mailmsgatt_typeatts(mailmsgatt *op,MIMETYPES *mtp) noex {
+	int		rs = SR_FAULT ;
+	if (op && mtp) {
+	    mailmsgattent	*ep ;
+	    rs = SR_OK ;
+	    for (int i = 0 ; mailmsgatt_enum(op,i,&ep) >= 0 ; i += 1) {
+	        if (ep) {
+	            rs = mailmsgattent_type(ep,mtp) ;
+	            if (rs < 0) break ;
+	        }
+	    } /* end for */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailmsgatt_typeatts) */

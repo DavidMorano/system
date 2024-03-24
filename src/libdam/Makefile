@@ -214,7 +214,7 @@ OBJ59= isindomain.o issamehostname.o isleapyear.o isfnamespecial.o
 OBJ60= hasalpha.o hasnum.o
 OBJ61= hasalllc.o hasalluc.o hasallalnum.o hasallalpha.o hasnonwhite.o
 OBJ62= hasalldig.o hasallbase.o hasprintbad.o hasallminus.o hasallplusminus.o
-OBJ63= hasdoublewhite.o hasallwhite.o hasfext.o hasallof.o hasourmjd.o
+OBJ63= hasdoublewhite.o hasallwhite.o hasfext.o hasallof.o
 
 OBJ64= optbool.o optvalue.o
 OBJ65= freadln.o hasMeAlone.o hasEOH.o

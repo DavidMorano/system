@@ -48,7 +48,7 @@ cchar *maxvecaddr(mainv va) noex {
 	    cchar	*lp ;
 	    int		n{} ;
 	    for (n = 0 ; va[n] != nullptr ; n += 1) ;
-	    lp = ccharp(va + (n + 1)) ;
+	    lp = charp(va + (n + 1)) ;
 	    if (lp > maxp) maxp = lp ;
 	    {
 		cchar	*sp = va[0] ;

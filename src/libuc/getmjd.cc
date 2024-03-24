@@ -25,7 +25,7 @@
         A. The base date for Modified-Julian-Days (17 Nov 1858) is 2400000.5
         days after the start of day zero (0) of the Julian calendar.
 
-	Validity of thse subroutines:
+	Validity of these subroutines:
         These subroutines are only valid for years starting from 1900.
 
 
@@ -94,7 +94,6 @@ define	isleap(y) ((((y) % 4) == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<tzfile.h>		/* for |TM_YEAR_BASE| */
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -223,4 +222,5 @@ static int indomain(int yr,int mo,int day) noex {
 	return rs ;
 }
 /* end subroutine (indomain) */
+
 

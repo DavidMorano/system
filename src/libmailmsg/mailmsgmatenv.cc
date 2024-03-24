@@ -1,7 +1,7 @@
 /* mailmsgmatenv SUPPORT */
 /* lang=C++20 */
 
-/* manipulate an UNIX® message envelope */
+/* try to match on a UNIX® mail-message envelope */
 /* version %I% last-modified %G% */
 
 
@@ -57,13 +57,14 @@
 	mlen		length of buffer to check
 
 	Returns:
-	>=0		match and this is the length of the address-part
-	<0		error or no match (system-return)
+	>0		match and this is the length of the address-part
+	==0		no match
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<tmstrs.h>
 #include	<strn.h>
@@ -80,6 +81,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -91,10 +98,10 @@
 
 /* forward references */
 
-static int	mailmsgenv_ema(mailmsgenv *,cchar *,int) noex ;
-static int	mailmsgenv_date(mailmsgenv *,cchar *,int) noex ;
-static int	mailmsgenv_datefin(mailmsgenv *,cchar *,int) noex ;
-static int	mailmsgenv_remote(mailmsgenv *,cchar *,int) noex ;
+static int	mmenvdat_ema(mmenvdat *,cchar *,int) noex ;
+static int	mmenvdat_date(mmenvdat *,cchar *,int) noex ;
+static int	mmenvdat_datefin(mmenvdat *,cchar *,int) noex ;
+static int	mmenvdat_remote(mmenvdat *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -111,12 +118,12 @@ static constexpr cpcchar	exts[] = {
 
 /* exported subroutines */
 
-int mailmsgmatenv(mailmsgenv *mep,cchar *sp,int sl) noex {
+int mailmsgmatenv(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (mep && sp) {
 	    bool	f_start = true ;
-	    memclear(mep) ;		/* dangerous */
+	    rs = memclear(mep) ;		/* dangerous */
 	    if (sl < 0) sl = strlen(sp) ;
 	    while (sl && iseol(sp[sl-1])) sl -= 1 ;
 	    if ((sl > 0) && (*sp == '>')) {
@@ -130,20 +137,20 @@ int mailmsgmatenv(mailmsgenv *mep,cchar *sp,int sl) noex {
 	            mep->rt = -1 ;
 	            sp += si ;
 	            sl -= si ;
-		    if ((si = mailmsgenv_ema(mep,sp,sl)) > 0) {
+		    if ((si = mmenvdat_ema(mep,sp,sl)) > 0) {
 	                sp += si ;
 	                sl -= si ;
-		        if ((si = mailmsgenv_date(mep,sp,sl)) > 0) {
+		        if ((si = mmenvdat_date(mep,sp,sl)) > 0) {
 	                    sp += si ;
 	                    sl -= si ;
-			    if ((si = mailmsgenv_remote(mep,sp,sl)) >= 0) {
+			    if ((si = mmenvdat_remote(mep,sp,sl)) >= 0) {
 			        len = mep->a.el ;
 			        mep->f.start = f_start ;
 			    }
 		        }
 		    }
 	        }
-	    } /* end if */
+	    } /* end if (hit) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -152,7 +159,7 @@ int mailmsgmatenv(mailmsgenv *mep,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int mailmsgenv_ema(mailmsgenv *mep,cchar *sp,int sl) noex {
+static int mmenvdat_ema(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	int		cl ;
 	cchar		*cp ;
@@ -163,10 +170,10 @@ static int mailmsgenv_ema(mailmsgenv *mep,cchar *sp,int sl) noex {
 	}
 	return skip ;
 }
-/* end subroutine (mailmsgenv_ema) */
+/* end subroutine (mmenvdat_ema) */
 
 /* > From rightcore.com!dam Wed Dec 8 11:44:30 EDT 1993 -0400 */
-static int mailmsgenv_date(mailmsgenv *mep,cchar *sp,int sl) noex {
+static int mmenvdat_date(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	int		cl ;
 	cchar		*cp ;
@@ -194,7 +201,7 @@ static int mailmsgenv_date(mailmsgenv *mep,cchar *sp,int sl) noex {
 			    	    skip = sl ;
 		            	    rp += (si+1) ;
 		            	    rl -= (si+1) ;
-				    si = mailmsgenv_datefin(mep,rp,rl) ;
+				    si = mmenvdat_datefin(mep,rp,rl) ;
 				    if (si >= 0) {
 					skip = (rp+si-begin) ;
 					mep->d.el = (rp+si-begin) ;
@@ -205,12 +212,12 @@ static int mailmsgenv_date(mailmsgenv *mep,cchar *sp,int sl) noex {
 		    }
 		}
 	    }
-	}
+	} /* end if (sfnext) */
 	return skip ;
 }
-/* end subroutine (mailmsgenv_date) */
+/* end subroutine (mmenvdat_date) */
 
-static int mailmsgenv_datefin(mailmsgenv *mep,cchar *rp,int rl) noex {
+static int mmenvdat_datefin(mmenvdat *mep,cchar *rp,int rl) noex {
 	int		i ; /* used afterwards */
 	int		si = -1 ;
 	for (i = 0 ; exts[i] != nullptr ; i += 1) {
@@ -221,9 +228,9 @@ static int mailmsgenv_datefin(mailmsgenv *mep,cchar *rp,int rl) noex {
 	}
 	return si ;
 }
-/* end subroutine (mailmsgenv_datefin) */
+/* end subroutine (mmenvdat_datefin) */
 
-static int mailmsgenv_remote(mailmsgenv *mep,cchar *sp,int sl) noex {
+static int mmenvdat_remote(mmenvdat *mep,cchar *sp,int sl) noex {
 	int		skip = 0 ;
 	if ((sl > 0) && (mep->rt >= 0)) {
 	    cint	el = strlen(exts[mep->rt]) ;
@@ -239,6 +246,6 @@ static int mailmsgenv_remote(mailmsgenv *mep,cchar *sp,int sl) noex {
 	}
 	return skip ;
 }
-/* end subroutine (mailmsgenv_remote) */
+/* end subroutine (mmenvdat_remote) */
 
 
