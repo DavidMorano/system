@@ -54,10 +54,10 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= mailmsg.h
 
 
-OBJ0_MAILMSG= 
-OBJ1_MAILMSG= 
-OBJ2_MAILMSG= 
-OBJ3_MAILMSG= 
+OBJ0_MAILMSG= mailmsg_main.o mailmsg_loadmb.o mailmsg_loadfile.o
+OBJ1_MAILMSG= mailmsg_envaddrfold.o
+OBJ2_MAILMSG= mailmsg_envget.o
+OBJ3_MAILMSG= mailmsg_envdates.o mailmsg_envtimes.o
 
 
 OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
@@ -120,5 +120,14 @@ obj2_mailmsg.o:	$(OBJ2_MAILMSG)
 
 obj3_mailmsg.o:	$(OBJ3_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MAILMSG)
+
+
+mailmsg_main.o:			mailmsg_main.cc			$(INCS)
+mailmsg_loadmb.o:		mailmsg_loadmb.cc		$(INCS)
+mailmsg_loadfile.o:		mailmsg_loadfile.cc		$(INCS)
+mailmsg_envaddrfold.o:		mailmsg_envaddrfold.cc		$(INCS)
+mailmsg_envget.o:		mailmsg_envget.cc mailmsg_envget.h $(INCS)
+mailmsg_envdates.o:		mailmsg_envdates.cc		$(INCS)
+mailmsg_envtimes.o:		mailmsg_envtimes.cc		$(INCS)
 
 

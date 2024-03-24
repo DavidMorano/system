@@ -1,9 +1,8 @@
-/* mailmsg_envtimes */
+/* mailmsg_envtimes SUPPORT */
+/* lang=C++20 */
 
 /* extract all environment times (if any) from a message */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,55 +16,49 @@
 
 /*******************************************************************************
 
-        This subroutine will extract all of the times (from the dates) out of
-        all envelopes that may be present in the message.
+	Name:
+	mailmsg_envtimes
+
+	Description:
+	This subroutine will extract all of the times (from the
+	dates) out of all envelopes that may be present in the
+	message.
 
 	Symopsis:
-
-	int mailmsg_envtimes(MAILMSG *msgp,DATER *dp,time_t *ta,int nents)
+	int mailmsg_envtimes(mailmsg *op,dater *dp,time_t *ta,int nents) noex
 
 	Arguments:
-
-	msgp		pointer to MAILMSG object
+	op		pointer to MAILMSG object
 	dp		pointer to DATER object
 	ta		array of 'time_t' entries
 	nents		number of entries in 'time_t' array
 
 	Returns:
-
 	>=0		number of entries returned
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<mailmsg.h>
 #include	<dater.h>
 #include	<localmisc.h>
+
+#include	"mailmsg.h"
 
 
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-#if	CF_DEBUGS
-extern char	*timestr_log() ;
-#endif
 
 
 /* external variables */
@@ -74,69 +67,35 @@ extern char	*timestr_log() ;
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mailmsg_envtimes(MAILMSG *msgp,DATER *dp,time_t *ta,int nents)
-{
-	time_t		t ;
+int mailmsg_envtimes(mailmsg *op,dater *dp,time_t *ta,int nents) noex {
 	int		rs ;
-	int		i ;
 	int		n = 0 ;
-	const char	*cp ;
-
-#if	CF_DEBUGS
-	debugprintf("mailmsg_envtimes: ent\n") ;
-#endif
-
-	if (msgp == NULL) return SR_FAULT ;
-
-	for (i = 0 ; (rs = mailmsg_envdate(msgp,i,&cp)) >= 0 ; i += 1) {
-	    if ((cp != NULL) && (cp[0] != '\0')) {
-
-#if	CF_DEBUGS
-	    debugprintf("mailmsg_envtimes: envelope %d\n",i) ;
-#endif
-
-
-#if	CF_DEBUGS
-	        debugprintf("mailmsg_envtimes: date string\n") ;
-	        debugprintf("mailmsg_envtimes: date string=>%s<\n",cp) ;
-	        debugprintf("mailmsg_envtimes: calling 'getabsdate()'\n") ;
-#endif
-
-		if ((rs = dater_setstd(dp,cp,-1)) >= 0) {
-
-#if	CF_DEBUGS
-		    {
-		        char	timebuf[TIMEBUFLEN + 1] ;
-	                debugprintf("mailmsg_envtimes: got a good date\n") ;
-	                debugprintf("mailmsg_envtimes: %s\n",
-	                    timestr_log(t,timebuf)) ;
-		    }
-#endif /* CF_DEBUGS */
-
-		    if ((rs = dater_gettime(dp,&t)) >= 0) {
-	                if (n < nents) ta[n++] = t ;
-		    }
-
-		} else if (rs == SR_INVALID) {
-		    rs = SR_OK ;
-	        } /* end if (got a date) */
-
-	    } /* end if (we got a good date) */
-	    if (n >= nents) break ;
-	    if (rs < 0) break ;
-	} /* end for (looping through envelopes) */
-
-	if ((n > 0) || (rs == SR_NOTFOUND)) {
-	    rs = SR_OK ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("mailmsg_envtimes: ret rs=%d n=%d\n", rs,n) ;
-#endif
-
+	if ((rs = mailmsg_magic(op,dp,ta)) >= 0) {
+	    auto	mef = mailmsg_envdate ;
+	    cchar	*cp ;
+	    for (int i = 0 ; (rs = mef(op,i,&cp)) >= 0 ; i += 1) {
+	        if (cp && (cp[0] != '\0')) {
+		    if ((rs = dater_setstd(dp,cp,-1)) >= 0) {
+		        time_t	t ;
+		        if ((rs = dater_gettime(dp,&t)) >= 0) {
+	                    if (n < nents) ta[n++] = t ;
+		        }
+		    } else if (rs == SR_INVALID) {
+		        rs = SR_OK ;
+	            } /* end if (got a date) */
+	        } /* end if (we got a good date) */
+	        if (n >= nents) break ;
+	        if (rs < 0) break ;
+	    } /* end for (looping through envelopes) */
+	    if ((n > 0) || (rs == SR_NOTFOUND)) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailmsg_envtimes) */

@@ -26,10 +26,10 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<mailmsg.h>
 #include	<mailmsgmatenv.h>
 #include	<localmisc.h>
 
+#include	"mailmsg.h"
 #include	"mailmsg_envget.h"
 
 

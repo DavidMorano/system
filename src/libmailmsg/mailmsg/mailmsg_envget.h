@@ -1,6 +1,9 @@
 /* mailmsg_envget HEADER */
 /* lang=C++20 */
 
+/* MAILMSG get-envelope */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
