@@ -4,8 +4,6 @@
 /* comment-separate (parse) a mail header field value */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_STRIPESC	1		/* strip escape characters */
 
 /* revision history:
 
@@ -30,11 +28,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<ascii.h>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"mhcom.h"
@@ -47,6 +46,12 @@
 #define	MHCOM_SOVERLAST	2
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -55,134 +60,91 @@
 
 /* forward references */
 
-static int mhcom_bake(MHCOM *,int,cchar *,int) ;
+template<typename ... Args>
+static inline int mhcom_magic(mhcom *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MHCOM_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mhcom_magic) */
+
+static int	mhcom_bake(mhcom *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
-#if	CF_DEBUGS
-static cchar	*statename[] = {
-	    "value",
-	    "comment",
-	    NULL
-} ;
-#endif /* CF_DEBUGS */
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int mhcom_start(MHCOM *op,cchar sp[],int sl)
-{
-	int		rs ;
-	int		size ;
-	int		buflen ;
-	void		*p ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-#if	CF_DEBUGS
-	debugprintf("mhcom_start: ent sl=%d s=>%t<\n",sl,sp,sl) ;
-#endif /* CF_DEBUGS */
-
-/* skip over any leading white space */
-
-	while ((sl > 0) && CHAR_ISWHITE(*sp)) {
-	    sp += 1 ;
-	    sl -= 1 ;
-	}
-
-/* initialize stuff */
-
-	buflen = (sl + 2) ;
-
-	memset(op,0,sizeof(MHCOM)) ;
-
-	size = (2*buflen) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    op->a = p ;
-	    op->value = (op->a + (0*buflen)) ;
-	    op->comment = (op->a + (1*buflen)) ;
-	    if ((rs = mhcom_bake(op,buflen,sp,sl)) >= 0) {
-	        op->magic = MHCOM_MAGIC ;
+int mhcom_start(mhcom *op,cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (op && sp) {
+	    int		size ;
+	    int		buflen ;
+	    void	*p{} ;
+	    memclear(op) ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    while ((sl > 0) && CHAR_ISWHITE(*sp)) {
+	        sp += 1 ;
+	        sl -= 1 ;
 	    }
-	    if (rs < 0) {
-	        uc_free(op->a) ;
-	        op->a = NULL ;
-	    }
-	} /* end if (m-a) */
-
-#if	CF_DEBUGS
-	debugprintf("mhcom_start: ret rs=%d\n",rs) ;
-#endif
-
+	    buflen = (sl + 2) ;
+	    size = (2*buflen) ;
+	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	        op->a = charp(p) ;
+	        op->value = (op->a + (0*buflen)) ;
+	        op->comment = (op->a + (1*buflen)) ;
+	        if ((rs = mhcom_bake(op,buflen,sp,sl)) >= 0) {
+	            op->magic = MHCOM_MAGIC ;
+	        }
+	        if (rs < 0) {
+	            uc_free(op->a) ;
+	            op->a = nullptr ;
+	        }
+	    } /* end if (m-a) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mhcom_start) */
 
-
-int mhcom_finish(MHCOM *op)
-{
-	int		rs = SR_OK ;
+int mhcom_finish(mhcom *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != MHCOM_MAGIC) return SR_NOTOPEN ;
-
-	if (op->a != NULL) {
-	    rs1 = uc_free(op->a) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->a = NULL ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("mhcom_finish: ret rs=%d\n",rs) ;
-#endif
-
-	op->magic = 0 ;
+	if ((rs = mhcom_magic(op)) >= 0) {
+	    if (op->a) {
+	        rs1 = uc_free(op->a) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->a = nullptr ;
+	    }
+	    op->value = nullptr ;
+	    op->comment = nullptr ;
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mhcom_finish) */
 
-
-int mhcom_getval(MHCOM *op,cchar **rpp)
-{
+int mhcom_getval(mhcom *op,cchar **rpp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != MHCOM_MAGIC) return SR_NOTOPEN ;
-
-	if (rpp != NULL)
-	    *rpp = op->value ;
-
-	rs = (op->value != NULL) ? op->vlen : SR_NOENT ;
-
-#if	CF_DEBUGS
-	debugprintf("mhcom_getval: ret rs=%d\n",rs) ;
-#endif
-
+	if ((rs = mhcom_magic(op)) >= 0) {
+	    if (rpp) *rpp = op->value ;
+	    rs = (op->value) ? op->vlen : SR_NOENT ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mhcom_getval) */
 
-
-int mhcom_getcom(MHCOM *op,cchar **rpp)
-{
+int mhcom_getcom(mhcom *op,cchar **rpp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != MHCOM_MAGIC) return SR_NOTOPEN ;
-
-	if (rpp != NULL)
-	    *rpp = op->comment ;
-
-	rs = (op->comment != NULL) ? op->clen : SR_NOENT ;
+	if ((rs = mhcom_magic(op)) >= 0) {
+	    if (rpp) *rpp = op->comment ;
+	    rs = (op->comment) ? op->clen : SR_NOENT ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mhcom_getcom) */
@@ -190,56 +152,29 @@ int mhcom_getcom(MHCOM *op,cchar **rpp)
 
 /* private subroutines */
 
-
-static int mhcom_bake(MHCOM *op,int bl,cchar *sp,int sl)
-{
-	SBUF		as[MHCOM_SOVERLAST] ;
+static int mhcom_bake(mhcom *op,int bl,cchar *sp,int sl) noex {
+	sbuf		as[MHCOM_SOVERLAST] ;
 	int		rs ;
 	int		rs1 ;
-	int		cl, vl ;
-	int		pstate = MHCOM_SVALUE ;
-	int		state ;
-	int		ch ;
-	int		c_comment = 0 ;
-	int		pc ;
-	int		f_quote = FALSE ;
-
+	int		vl = 0 ;
 	if ((rs = sbuf_start((as+MHCOM_SVALUE),op->value,bl)) >= 0) {
 	    if ((rs = sbuf_start((as+MHCOM_SCOMMENT),op->comment,bl)) >= 0) {
-
-/* start scanning */
-
-	        state = MHCOM_SVALUE ;
+	        int	state = MHCOM_SVALUE ;
+		int	cl ;
+		int	pstate = MHCOM_SVALUE ;
+		int	c_comment = 0 ;
+		int	pc ;
+		int	f_quote = false ;
 	        while ((sl != 0) && (*sp != '\0')) {
-#if	CF_DEBUGS
-	            vl = sbuf_getlen((as + MHCOM_SVALUE)) ;
-	            debugprintf("mhcom_start: value len=%d\n",vl) ;
-	            vl = sbuf_getlen((as + MHCOM_SCOMMENT)) ;
-	            debugprintf("mhcom_start: comment len=%d\n",vl) ;
-#endif
-#if	CF_DEBUGS
-	            debugprintf("mhcom_start: C='%c' S=%s P=%s cl=%d q=%d\n",
-	                *s,statename[state],
-	                statename[pstate],c_comment,f_quote) ;
-#endif
-	            ch = (*sp & 0xff) ;
+	            cint	ch = mkchar(*sp) ;
 	            switch (ch) {
 	            case '\\':
-#if	CF_STRIPESC
 	                sp += 1 ;
 	                if ((f_quote || c_comment) &&
 	                    (sl > 1) && (sp[0] != '\0')) {
 	                    sbuf_char((as + state),*sp++) ;
 	                    sl -= 1 ;
 	                }
-#else /* CF_STRIPESC */
-	                if ((f_quote || c_comment) &&
-	                    (sl > 1) && (sp[1] != '\0')) {
-	                    sbuf_char((as + state),*sp++) ;
-	                    slen -= 1 ;
-	                }
-	                sbuf_char((as + state),*sp++) ;
-#endif /* CF_STRIPESC */
 	                break ;
 	            case CH_DQUOTE:
 	                f_quote = (! f_quote) ;
@@ -300,8 +235,8 @@ static int mhcom_bake(MHCOM *op,int bl,cchar *sp,int sl)
 	                        }
 	                    } /* end if */
 	                } /* end if (not in a quote) */
-/* we fall through to the next case below */
-/* FALLTHROUGH */
+			fallthrough ;
+			/* FALLTHROUGH */
 	            default:
 	                if (c_comment) {
 	                    sbuf_char((as + MHCOM_SCOMMENT),*sp++) ;
@@ -310,23 +245,16 @@ static int mhcom_bake(MHCOM *op,int bl,cchar *sp,int sl)
 			}
 	                break ;
 	            } /* end switch */
-
 	            if (sl > 0) sl -= 1 ;
 	        } /* end while (scanning characters) */
-#if	CF_DEBUGS
-	        debugprintf("mhcom_start: finishing\n") ;
-#endif
-
 	        rs1 = sbuf_finish(&as[MHCOM_SCOMMENT]) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->clen = rs1 ;
 	    } /* end if (sbuf) */
-
 	    vl = sbuf_finish(&as[MHCOM_SVALUE]) ;
 	    if (rs >= 0) rs = vl ;
 	    op->vlen = vl ;
 	} /* end if (sbuf) */
-
 	return (rs >= 0) ? vl : rs ;
 }
 /* end subroutine (mhcom_bake) */
