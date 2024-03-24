@@ -1049,6 +1049,11 @@ chrono.o:		chrono.dir
 chrono.dir:
 	makesubdir $@
 
+# LOCALSET
+localset.o:		localset.dir
+localset.dir:
+	makesubdir $@
+
 # LOCALGET
 localget.o:		localget.dir
 localget.dir:

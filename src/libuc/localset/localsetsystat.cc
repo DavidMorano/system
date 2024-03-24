@@ -5,7 +5,7 @@
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_UPROGDATA	1		/* use |uprogdata_xxx(3uc)| */
+#define	CF_UCPROGDATA	1		/* use |ucprogdata_xxx(3uc)| */
 
 /* revision history:
 
@@ -45,17 +45,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<uprogdata.h>
+#include	<ucprogdata.h>
 #include	<localmisc.h>
+
+#include	"localset.h"
 
 
 /* local defines */
@@ -93,10 +92,13 @@ extern int	isNotPresent(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int localsetsystat(cchar *pr,cchar *sbuf,int slen) noex {
-	const int	di = UPROGDATA_DSYSTAT ;
+	const int	di = UCPROGDATA_DSYSTAT ;
 	const int	ttl = TO_TTL ;
 	int		rs ;
 	int		rs1 ;
@@ -117,7 +119,7 @@ int localsetsystat(cchar *pr,cchar *sbuf,int slen) noex {
 		cchar	*fmt = "# SYSTAT (Machine System-Status)" ;
 		if ((rs = bprintln(dfp,fmt,-1)) >= 0) {
 	            if ((rs = bprintln(dfp,sbuf,slen)) >= 0) {
-		        rs = uprogdata_set(di,sbuf,slen,ttl) ;
+		        rs = ucprogdata_set(di,sbuf,slen,ttl) ;
 			rc = rs ;
 		    }
 		}
