@@ -41,10 +41,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"snxxx.h"
 
@@ -59,6 +57,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */

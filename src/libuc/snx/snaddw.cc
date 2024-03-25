@@ -43,7 +43,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"snaddw.h"
 

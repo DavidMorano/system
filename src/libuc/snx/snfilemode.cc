@@ -33,12 +33,11 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -103,6 +102,9 @@ static constexpr struct flagstrs	fileperms[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
@@ -157,7 +159,7 @@ int snfilemode(char *dbuf,int dlen,mode_t fm) noex {
 		    cint	n = 4 ; /* last characters */
 		    cint	plen = OCTBUFLEN ;
 		    char	pbuf[OCTBUFLEN+1] ;
-		    if ((rs = ctocti(pbuf,plen,(fm&S_IAMB))) >= 0) {
+		    if ((rs = ctocti(pbuf,plen,(fm & S_IAMB))) >= 0) {
 		        cchar	*cp = ((rs > n) ? (pbuf+(rs-n)) : pbuf) ;
 	                rs = snflags_addstr(&ss,cp) ;
 		    }

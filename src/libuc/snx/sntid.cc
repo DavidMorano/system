@@ -42,18 +42,26 @@
 #include	<stdint.h>		/* <- for |uintptr_t| */
 #include	<usystem.h>
 #include	<ctdec.h>
-#include	<localmisc.h>
 
 #include	"snx.h"
 
 
+/* local defines */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

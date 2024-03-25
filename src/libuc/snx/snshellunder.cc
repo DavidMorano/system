@@ -46,7 +46,6 @@
 #include	<sys/types.h>		/* |pid_t| */
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"snx.h"
 
@@ -77,7 +76,7 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	            i += rs ;
 	        }
 	        if (rs >= 0) {
-	            uint	v = (int) pid ;
+	            uint	v = uint(pid) ;
 	            rs = storebuf_decui(dbuf,dlen,i,v) ;
 	            i += rs ;
 	        }

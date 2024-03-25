@@ -42,7 +42,15 @@
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

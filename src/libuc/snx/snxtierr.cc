@@ -41,7 +41,6 @@
 #include	<xti.h>
 #include	<usystem.h>
 #include	<sncpyx.h>
-#include	<localmisc.h>
 
 
 /* local defines */

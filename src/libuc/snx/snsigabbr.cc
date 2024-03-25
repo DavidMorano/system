@@ -40,7 +40,6 @@
 #include	<usystem.h>
 #include	<ctdec.h>
 #include	<sncpyx.h>
-#include	<localmisc.h>
 
 
 /* local defines */

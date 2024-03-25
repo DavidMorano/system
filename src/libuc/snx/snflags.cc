@@ -24,7 +24,6 @@
 #include	<cstring>
 #include	<usystem.h>		/* <- for |memclear(3u)| */
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"snflags.h"
 

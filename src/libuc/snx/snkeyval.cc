@@ -46,7 +46,6 @@
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<sncpyx.h>
-#include	<localmisc.h>
 
 
 /* local defines */
@@ -55,6 +54,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local variables */
