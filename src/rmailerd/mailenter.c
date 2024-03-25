@@ -1,18 +1,15 @@
-/* mailenter */
+/* mailenter SUPPORT */
+/* lang=C++20 */
 
 /* enter the mail message into the mail stream */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1		/* run-time debug print-outs */
-
 
 /* revision history:
 
 	= 1997-09-01, David A­D­ Morano
-
 	This program was originally written.
-
 
 */
 
@@ -35,22 +32,18 @@
 	read by the mailer program.
 
 	Notes:  
-
-	Remember that the 'pipe(2)' system call creates two pipe file
-	descriptors.  Both of these file descriptors are open for reading
-	and writing on System V UNIX.  On BSD systems, or older BSD
-	systems assuming that they have not yet upgraded to the System V
-	behavior, the first file descriptor, the one in the zeroth array
-	element, is open for reading.  The second file descriptor, the
-	one in the oneth array element, is open for writing.
-
+	Remember that the |pipe(2)| system call creates two pipe
+	file descriptors.  Both of these file descriptors are open
+	for reading and writing on System V UNIX.  On BSD systems,
+	or older BSD systems assuming that they have not yet upgraded
+	to the System V behavior, the first file descriptor, the
+	one in the zeroth array element, is open for reading.  The
+	second file descriptor, the one in the oneth array element,
+	is open for writing.
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -68,10 +61,10 @@
 #include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
+#include	<mailaddr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
-#include	"address.h"
 #include	"config.h"
 #include	"defs.h"
 
@@ -279,10 +272,10 @@ int		ifd, ofd, efd ;
 	            sl = strwcpy(buf,pp->rp[i].localpart,LOCALPARTLEN) - buf ;
 
 	    } else
-	        sl = addressarpa(buf,BUFLEN,
+	        sl = mailaddrarpa(buf,BUFLEN,
 	            pp->rp[i].hostpart, pp->rp[i].localpart, pp->rp[i].type) ;
 #else
-	    sl = addressarpa(buf,BUFLEN,
+	    sl = mailaddrarpa(buf,BUFLEN,
 	        pp->rp[i].hostpart, pp->rp[i].localpart, pp->rp[i].type) ;
 #endif /* COMMENT */
 

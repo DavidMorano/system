@@ -168,7 +168,7 @@ int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 
 	return (rs >= 0) ? t : rs ;
 }
-/* end subroutine (addressparse) */
+/* end subroutine (mailaddrparse) */
 
 /* put an address back together as it was ORIGINALLY */
 int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {

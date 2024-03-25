@@ -42,7 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -56,9 +55,9 @@
 #include	<cksum.h>
 #include	<getchostname.h>
 #include	<pcsconf.h>
+#include	<mailaddr.h>
 #include	<localmisc.h>
 
-#include	"address.h"
 #include	"recipient.h"
 #include	"config.h"
 #include	"defs.h"
@@ -79,7 +78,6 @@ extern int	sfshrink(const char *,int,const char **) ;
 extern int	nextfield(const char *,int,const char **) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
-extern int	addressparse(), addressjoin() ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -284,7 +282,7 @@ int		ofd, efd ;
 	                    debugprintf("process: recipient=%t\n",cp,cl) ;
 #endif
 
-	                type = addressparse(cp,cl,hostpart,localpart) ;
+	                type = mailaddrparse(cp,cl,hostpart,localpart) ;
 
 #if	CF_DEBUG
 	                if (DEBUGLEVEL(2))

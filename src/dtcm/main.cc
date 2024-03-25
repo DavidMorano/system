@@ -59,6 +59,7 @@
 #include	<hostaddr.h>
 #include	<sockaddress.h>
 #include	<mallocstuff.h>
+#include	<mailaddr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -68,7 +69,6 @@
 #include	"dialer.h"
 #include	"cm.h"
 #include	"havemsg.h"
-#include	"address.h"
 #include	"recipient.h"
 #include	"nifinfo.h"
 
@@ -1229,7 +1229,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    for (i = 0 ; vecstr_get(&addrs,i,&sp) >= 0 ; i += 1) {
 	        if (sp == NULL) continue ;
 
-	        type = addressparse(sp,-1,hostpart,localpart) ;
+	        type = mailaddrparse(sp,-1,hostpart,localpart) ;
 
 	        if (type == ADDRESSTYPE_LOCAL)
 	            sncpy1(hostpart,MAILADDRLEN,u.nodename) ;
@@ -1783,7 +1783,7 @@ const char	svcspec[] ;
 	            if (sl < 0)
 	                break ;
 
-	            cl = addressarpa(calendar,MAILADDRLEN,
+	            cl = mailaddrarpa(calendar,MAILADDRLEN,
 	                hostname,rvp->localpart, ADDRESSTYPE_LOCAL) ;
 
 #if	CF_DEBUG

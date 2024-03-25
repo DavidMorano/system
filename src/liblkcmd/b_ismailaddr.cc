@@ -69,6 +69,7 @@
 #include	<getax.h>
 #include	<pwi.h>
 #include	<prgetclustername.h>
+#include	<mailaddr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -77,7 +78,6 @@
 #include	"b_ismailaddr.h"
 #include	"defs.h"
 #include	"proglog.h"
-#include	"address.h"
 
 
 /* local defines */
@@ -1536,7 +1536,7 @@ static int procname(PROGINFO *pip,void *ofp,cchar *namep,int namel)
 /* parse the mail-address into local and host parts */
 
 	if (rs >= 0) {
-	    rs = addressparse(namep,namel,parthost,partlocal) ;
+	    rs = mailaddparse(namep,namel,parthost,partlocal) ;
 	    type = rs ;
 	}
 
