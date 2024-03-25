@@ -44,9 +44,9 @@ typedef PWI_CUR		pwi_cur ;
 
 EXTERNC_begin
 
-extern int pwi_open(PWI *,cchar *,cchar *) noex ;
-extern int pwi_lookup(PWI *,char *,int,cchar *) noex ;
-extern int pwi_close(PWI *) noex ;
+extern int pwi_open(pwi *,cchar *,cchar *) noex ;
+extern int pwi_lookup(pwi *,char *,int,cchar *) noex ;
+extern int pwi_close(pwi *) noex ;
 
 EXTERNC_end
 

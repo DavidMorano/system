@@ -1,6 +1,6 @@
-# MAKEFILES (six)
+# MAKEFILES (localset)
 
-T= six
+T= localset
 
 ALL= $(T).o $(T).a
 
@@ -51,20 +51,19 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= six.h
+INCS= localset.h
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_SIX= sifext.o
+OBJ0_LOCALSET= localsetsystat.o localsetnetload.o
+OBJ1_LOCALSET= 
+OBJ2_LOCALSET= 
+OBJ3_LOCALSET= 
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
+OBJA_LOCALSET= obj0_localset.o
+OBJB_LOCALSET= obj2_localset.o obj3_localset.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_LOCALSET= $(OBJA_LOCALSET)
 
 
 default:		$(T).o
@@ -87,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_LOCALSET)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_LOCALSET)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_LOCALSET)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -110,22 +109,20 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_localset.o:	$(OBJ0_LOCALSET)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_LOCALSET)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_localset.o:	$(OBJ1_LOCALSET)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_LOCALSET)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_localset.o:	$(OBJ2_LOCALSET)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_LOCALSET)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
-
-obj4_six.o:	$(OBJ4_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
+obj3_localset.o:	$(OBJ3_LOCALSET)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LOCALSET)
 
 
-sifext.o:		sifext.cc sifext.h
+localsetnetload.o:		localsetnetload.cc	$(INCS)
+localsetsystat.o:		localsetsystat.cc	$(INCS)
 
 

@@ -1,6 +1,8 @@
-/* pcspolls */
+/* pcspolls HEADER  */
+/* lang=C20 */
 
 /* access manager interface to PCS loadable-object polling */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,16 +15,13 @@
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	PCSPOLLS_INCLUDE
-#define	PCSPOLLS_INCLUDE	1
+#define	PCSPOLLS_INCLUDE
 
 
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
-
 #include	<thrcomm.h>
 #include	<pcsconf.h>		/* need def for PCSCONF */
 #include	<localmisc.h>
@@ -30,7 +29,7 @@
 
 #define	PCSPOLLS	struct pcspolls_head
 #define	PCSPOLLS_OBJ	struct pcspolls_obj
-#define	PCSPOLLS_INFO	struct pcspolls_i
+#define	PCSPOLLS_INFO	struct pcspolls_information
 #define	PCSPOLLS_NAME	struct pcspolls_n
 #define	PCSPOLLS_THREAD	struct pcspolls_thread
 #define	PCSPOLLS_FL	struct pcspolls_flags
@@ -40,18 +39,18 @@
 
 
 struct pcspolls_n {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		infosize ;
 } ;
 
 struct pcspolls_obj {
-	const char	*name ;
+	cchar		*name ;
 	int		objsize ;
 	int		infosize ;
 } ;
 
-struct pcspolls_i {
+struct pcspolls_information {
 	int		dummy ;
 } ;
 
@@ -61,10 +60,10 @@ struct pcspolls_flags {
 
 struct pcspolls_thread {
 	PCSPOLLS	*op ;
-	PCSCONF		*pcp ;
-	const char	*sn ;
-	const char 	*pr ;
-	const char	**envv ;
+	pcsconf		*pcp ;
+	cchar		*sn ;
+	cchar 		*pr ;
+	cchar		**envv ;
 	THRCOMM		tc ;
 	pid_t		pid ;
 	pthread_t	tid ;
@@ -73,33 +72,28 @@ struct pcspolls_thread {
 } ;
 
 struct pcspolls_head {
-	uint		magic ;
-	PCSCONF		*pcp ;
-	const char	*a ;		/* memory-allocation */
-	const char	*sn ;
-	const char 	*pr ;
-	const char	**envv ;
+	pcsconf		*pcp ;
+	cchar		*a ;		/* memory-allocation */
+	cchar		*sn ;
+	cchar 		*pr ;
+	mainv		envv ;
 	PCSPOLLS_THREAD	t ;
 	PCSPOLLS_FL	f ;
+	uint		magic ;
 } ;
 
+typedef	PCSPOLLS	pcspolls ;
+typedef	PCSPOLLS_INFO	pcspolls_info ;
 
-#if	(! defined(PCSPOLLS_MASTER)) || (PCSPOLLS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	pcspolls_start(pcspolls *,pcsconf *,cchar *) noex ;
+extern int	pcspolls_info(pcspolls *,pcspolls_info *) noex ;
+extern int	pcspolls_cmd(pcspolls *,int) noex ;
+extern int	pcspolls_finish(pcspolls *) noex ;
 
-extern int	pcspolls_start(PCSPOLLS *,PCSCONF *,const char *) ;
-extern int	pcspolls_info(PCSPOLLS *,PCSPOLLS_INFO *) ;
-extern int	pcspolls_cmd(PCSPOLLS *,int) ;
-extern int	pcspolls_finish(PCSPOLLS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* PCSPOLLS_MASTER */
 
 #endif /* PCSPOLLS_INCLUDE */
 

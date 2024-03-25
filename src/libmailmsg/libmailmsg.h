@@ -40,12 +40,18 @@
 #include	<hdrextnum.h>
 #include	<contypevals.h>
 
-
 #include	<mailmsgatt.h>
 #include	<mailmsgattent.h>
 #include	<mailmsgfrom.h>
 
 #include	<mimetypes.h>
+
+
+EXTERNC_begin
+
+extern int	mailmsgheadkey(cchar *,int,cchar **) noex ;
+
+EXTERNC_end
 
 
 #endif /* LIBMAILMSG_INCLUDE */

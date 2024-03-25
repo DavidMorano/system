@@ -25,19 +25,21 @@
 /*******************************************************************************
 
 	This object module manages the reading and writing of entries
-	to or from a message identification database file.
+	to or from a message identification database file.  This
+	database is normally used to reject duplicate mail messages
+	that have come in to the local server from remote mail
+	servers.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<inttypes.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<climits>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

@@ -244,7 +244,7 @@ OBJ128= sigaction.o sigevent.o
 OBJ129= timeval.o itimerspec.o timespec.o timeout.o
 OBJ130= sigignores.o sigdefaults.o
 OBJ131= isfiledesc.o isinetaddr.o isindomain.o
-OBJ132= hasNotDots.o
+OBJ132=
 OBJ133= nleadstr.o nleadkeystr.o
 OBJ134= format.o
 OBJ135= getrootdname.o getdig.o randlc.o
@@ -1049,6 +1049,11 @@ chrono.o:		chrono.dir
 chrono.dir:
 	makesubdir $@
 
+# LOCALSET
+localset.o:		localset.dir
+localset.dir:
+	makesubdir $@
+
 # LOCALGET
 localget.o:		localget.dir
 localget.dir:
@@ -1141,7 +1146,6 @@ termstr.o:		termstr.cc termstr.h
 td.o:			td.cc td.h termstr.h
 recip.o:		recip.cc recip.h
 querystr.o:		querystr.cc querystr.h
-hdrdecode.o:		hdrdecode.cc hdrdecode.h
 
 findbit.o:		findbit.cc findbit.h
 bits.o:			bits.cc bits.h

@@ -264,12 +264,50 @@
 	true		string does not have the standard dot-dirs
 
 
+	Name:
+	hasmealone
+
+	Description:
+	We test whether the given string consists only of those
+	characters that symbolically represent the "current" user.
+
+	Synopsis:
+	int hasmealone(cchar *sp,int sl) noex
+
+	Arguments:
+	sp		string to test
+	sl		length of strin to test
+
+	Returns:
+	false		assertion fails
+	true		assertion succeeds
+
+
+	Name:
+	hasINET4AddrStr
+
+	Description:
+	We test whether the given string consists of an INET4 address
+	string.
+
+	Synopsis:
+	int hasINET4AddrStr(cchar *sp,int sl) noex
+
+	Arguments:
+	sp		string to test
+	sl		length of strin to test
+
+	Returns:
+	false		assertion fails
+	true		assertion succeeds
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<ucvariables.hh>
 #include	<ascii.h>
+#include	<strn.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -292,7 +330,8 @@
 
 /* forward references */
 
-static int twochars(char *,cchar *,int) noex ;
+static int	twochars(char *,cchar *,int) noex ;
+static bool	hasINET4Num(cchar *,int) noex ;
 
 
 /* local variables */
@@ -370,12 +409,12 @@ bool hasempty(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasempty) */
 
-bool hasdots(cchar *np,int nl) noex {
+bool hasdots(cchar *sp,int sl) noex {
 	bool		f = false ;
-	if (np[0] == '.') {
-	    if (nl < 0) nl = strlen(np) ;
-	    f = f || (nl == 1) ;
-	    f = f || ((nl == 2) && (np[1] == '.')) ;
+	if (sp[0] == '.') {
+	    if (sl < 0) sl = strlen(sp) ;
+	    f = f || (sl == 1) ;
+	    f = f || ((sl == 2) && (sp[1] == '.')) ;
 	}
 	return f ;
 }
@@ -714,6 +753,46 @@ bool hasnotempty(cchar *sp,int sl) noex {
 }
 /* end subroutine (hasnotempty) */
 
+bool hasmealone(cchar *sp,int sl) noex {
+	bool		f = false ;
+	if (sl < 0) sl = strlen(sp) ;
+	if (sl == 1) {
+	    cint	ch = mkchar(*sp) ;
+	    switch (ch) {
+	    case '+':
+	    case '-':
+	    case '!':
+		f = true ;
+		break ;
+	    } /* end switch */
+	} /* end if */
+	return f ;
+}
+/* end subroutine (hasMeAlone) */
+
+bool hasinet4addrstr(cchar *sp,int sl) noex {
+	bool		f = true ;
+	int		c = 0 ;
+	cchar		*tp ;
+	if (sl < 0) sl = strlen(sp) ;
+	while ((tp = strnchr(sp,sl,'.')) != nullptr) {
+	    f = hasINET4Num(sp,(tp-sp)) ;
+	    if (! f) break ;
+	    sl -= ((tp+1)-sp) ;
+	    sp = (tp+1) ;
+	    c += 1 ;
+	} /* end while */
+	if (f && (sl > 0)) {
+	    c += 1 ;
+	    f = hasINET4Num(sp,sl) ;
+	} /* end if */
+	if (f && (c != 4)) {
+	    f = false ;
+	}
+	return f ;
+}
+/* end subroutine (hasINET4AddrStr) */
+
 
 /* local subroutines */
 
@@ -730,5 +809,10 @@ static int twochars(char *tbuf,cchar *sp,int sl) noex {
 	return c ;
 }
 /* end subroutine (twochars) */
+
+static bool hasINET4Num(cchar *sp,int sl) noex {
+	return ((sl <= 3) && hasalldig(sp,sl)) ;
+}
+/* end subroutine (hasINET4Num) */
 
 

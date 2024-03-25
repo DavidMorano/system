@@ -55,7 +55,7 @@
 
 /* imported namespaces */
 
-using std::nullptr_t ;
+using std::nullptr_t ;			/* type */
 
 
 /* external subroutines */
@@ -79,13 +79,16 @@ static int	ids_ngids(const ids *) noex ;
 static constexpr gid_t	gidend = gid_t(-1) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ids_load(ids *op) noex {
 	int		rs ;
 	int		ng = 0 ;
 	if ((rs = ids_ctor(op)) >= 0) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    if ((rs = u_getgroups(0,np)) >= 0) {
 	        cint	size = ((rs+1)*sizeof(gid_t)) ;
 	        void	*vp{} ;
