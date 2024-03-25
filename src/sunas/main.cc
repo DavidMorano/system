@@ -1,13 +1,12 @@
-/* main (SUNAS) */
+/* main SUPPORT (SUNAS) */
+/* lang=C++20 */
 
 /* (another) program to switch programs */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_DEBUGARGS	1		/* debug argument handling */
-
 
 /* revision history:
 
@@ -23,29 +22,24 @@
 	This program cleanes up the arguments to the SUN AS progran.
 
 	Synopsis:
-
 	$ <name> <arg(s)>
-
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ids.h>
 #include	<envhelp.h>
 #include	<vecpstr.h>
+#include	<hasx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -86,7 +80,6 @@ extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	chmods(cchar *,mode_t) ;
-extern int	hasfext(cchar **,cchar *,int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 
@@ -131,7 +124,7 @@ static int	debugargs(cchar **) ;
 
 /* local variables */
 
-static const struct pivars	initvars = {
+static constexpr struct pivars	initvars = {
 	VARPROGRAMROOT1,
 	VARPROGRAMROOT2,
 	VARPROGRAMROOT3,
@@ -139,7 +132,7 @@ static const struct pivars	initvars = {
 	VARPRNAME
 } ;
 
-static const struct mapex	mapexs[] = {
+static constexpr struct mapex	mapexs[] = {
 	{ SR_NOENT, EX_NOUSER },
 	{ SR_AGAIN, EX_TEMPFAIL },
 	{ SR_DEADLK, EX_TEMPFAIL },
@@ -151,7 +144,7 @@ static const struct mapex	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static cchar	*sysdirs[] = {
+static constexpr cpcchar	sysdirs[] = {
 	"/usr/xpg4/bin",
 	"/usr/ccs/bin",
 	"/usr/bin",
@@ -163,37 +156,38 @@ static cchar	*sysdirs[] = {
 	"/usr/preroot/sbin",
 	"/usr/preroot/libexec",
 	"/usr/sbin",
-	NULL
+	nullptr
 } ;
 
-static cchar	*envbads[] = {
+static constexpr cpcchar	envbads[] = {
 	"LD_PRELOAD",
 	"RANDOM",
 	"A__z",
-	NULL
+	nullptr
 } ;
 
-static cchar	*argdels[] = {
+static constexpr cpcchar	argdels[] = {
 	"-v",
-	NULL
+	nullptr
 } ;
 
-static cchar	*argchecks[] = {
+static constexpr cpcchar	argchecks[] = {
 	"-I",
-	NULL
+	nullptr
 } ;
 
-static cchar	*assexts[] = {
+static constexpr cpcchar	assexts[] = {
 	"s",
-	NULL
+	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	PROGINFO	pi, *pip = &pi ;
 	bfile		errfile ;
 
@@ -204,11 +198,11 @@ int main(int argc,cchar **argv,cchar **envv)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ex = EX_INFO ;
-	cchar		*pr = NULL ;
+	cchar		*pr = nullptr ;
 	cchar		*cp ;
 
 #if	CF_DEBUGS
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -225,13 +219,13 @@ int main(int argc,cchar **argv,cchar **envv)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	proginfo_setbanner(pip,cp) ;
 
-	if ((cp = getenv(VARERRORFNAME)) == NULL) cp = BFILE_STDERR ;
+	if ((cp = getenv(VARERRORFNAME)) == nullptr) cp = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,cp,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->f.errfile = TRUE ;
+	    pip->f.errfile = true ;
 	    bcontrol(&errfile,BC_LINEBUF,0) ;
 	} else if (! isNotPresent(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
@@ -245,7 +239,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	if (rs >= 0) {
 	    if ((rs = proginfo_setpiv(pip,pr,&initvars)) >= 0) {
-	        rs = proginfo_setsearchname(pip,VARSEARCHNAME,NULL) ;
+	        rs = proginfo_setsearchname(pip,VARSEARCHNAME,nullptr) ;
 	    }
 	}
 
@@ -302,10 +296,10 @@ int main(int argc,cchar **argv,cchar **envv)
 	} /* end if (bad) */
 
 /* return */
-	if (pip->efp != NULL) {
-	    pip->f.errfile = FALSE ;
+	if (pip->efp != nullptr) {
+	    pip->f.errfile = false ;
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 	proginfo_finish(pip) ;
@@ -382,18 +376,18 @@ static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar **argv)
 	const int	clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
-	int		f_found = FALSE ;
+	int		f_found = false ;
 	cchar		*prefix = PROG_PREFIX ;
 	char		rbuf[MAXPATHLEN+1] ;
 	char		cbuf[MAXNAMELEN+1] ;
-	for (i = 0 ; sysdirs[i] != NULL ; i += 1) {
+	for (i = 0 ; sysdirs[i] != nullptr ; i += 1) {
 	    cchar	*sd = sysdirs[i] ;
 	    if ((rs = sncpy2(cbuf,clen,prefix,bn)) >= 0) {
 	        if ((rs = mkpath2(rbuf,sd,cbuf)) >= 0) {
 	            if ((rs = proc_progok(pip,rbuf)) > 0) {
 	                cchar	**ev ;
 	                if ((rs = envhelp_getvec(elp,&ev)) >= 0) {
-			    f_found = TRUE ;
+			    f_found = true ;
 	                    rs = proc_exec(pip,rbuf,argv,ev) ;
 	                }
 	            }
@@ -411,7 +405,7 @@ static int proc_progok(PROGINFO *pip,cchar *progfname)
 {
 	struct ustat	sb ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 #if	CF_DEBUGS
 	debugprintf("main/proc_progok: ent progfname=%s\n",progfname) ;
 #endif
@@ -429,7 +423,7 @@ static int proc_progok(PROGINFO *pip,cchar *progfname)
 	    if (S_ISREG(sb.st_mode)) {
 	        if ((rs = sperm(&pip->id,&sb,X_OK)) >= 0) {
 	            if ((sb.st_dev != pip->dev) || (sb.st_ino != pip->ino)) {
-	                f = TRUE ;
+	                f = true ;
 	            }
 	        } else if (isNotPresent(rs)) {
 #if	CF_DEBUGS
@@ -494,23 +488,23 @@ static int proc_args(PROGINFO *pip,VECPSTR *alp,cchar **argv)
 {
 	int		rs ;
 	if ((rs = vecpstr_add(alp,argv[0],-1)) >= 0) {
-	    int		f_del = FALSE ;
+	    int		f_del = false ;
 	    int		i ;
-	    for (i = 1 ; argv[i] != NULL ; i += 1) {
+	    for (i = 1 ; argv[i] != nullptr ; i += 1) {
 	        cchar	*a = argv[i] ;
 	        if (matstr(argdels,a,-1) < 0) {
 		    if (matstr(argchecks,a,-1) >= 0) {
-		        f_del = TRUE ;
+		        f_del = true ;
 		    } else {
 		        if (! f_del) {
-			    if ((a[0] != '-') && hasfext(assexts,a,-1)) {
+			    if ((a[0] != '-') && hasfext(a,-1,assexts)) {
 				rs = proc_savecopy(pip,a) ;
 			    }
 			    if (rs >= 0) {
 			        rs = vecpstr_add(alp,a,-1) ;
 			    }
 		        }
-		        f_del = FALSE ;
+		        f_del = false ;
 		    }
 	        }
 	        if (rs < 0) break ;
@@ -527,7 +521,7 @@ static int proc_savecopy(PROGINFO *pip,cchar *a)
 	bfile		cfile, *cfp = &cfile ;
 	int		rs ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*dn = COPYDNAME ;
 	if ((rs = uc_stat(dn,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
@@ -537,7 +531,7 @@ static int proc_savecopy(PROGINFO *pip,cchar *a)
 	            if ((rs = mkcfname(cbuf,dn,a)) >= 0) {
 	                if ((rs = bopen(cfp,cbuf,"wct",0666)) >= 0) {
 		            {
-				f = TRUE ;
+				f = true ;
 	                        rs = bwritefile(cfp,a) ;
     		            }
 	                    rs1 = bclose(cfp) ;
@@ -575,7 +569,7 @@ static int mkcfname(char *cbuf,cchar *dn,cchar *a)
 static int debugargs(cchar **va)
 {
 	int	i ;
-	for (i = 0 ; va[i] != NULL ; i += 1) {
+	for (i = 0 ; va[i] != nullptr ; i += 1) {
 	   debugprintf("main: a[%02u]=%s\n",i,va[i]) ;
 	}
 	return i ;

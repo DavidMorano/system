@@ -1,18 +1,18 @@
-/* pcspolls */
+/* pcspolls SUPPORT */
+/* lang=C++20 */
 
 /* management interface to the PCSPOLL loadable-object poll facility */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_EARLY	1		/* early exit */
 
-
 /* revision history:
 
 	- 2008-10-07, David A­D­ Morano
-	This module was originally written to allow for the main part of the
-	PCS-poll facility to be a loadable module.
+	This module was originally written to allow for the main
+	part of the PCS-poll facility to be a loadable module.
 
 */
 
@@ -20,42 +20,35 @@
 
 /*******************************************************************************
 
-	This object module serves as the manager for the PCS loadable-object
-	poll facility.
+	Name:
+	pcspolls
+
+	Description:
+	This object module serves as the manager for the PCS
+	loadable-object poll facility.
 
 	Synopsis:
-
-	int pcspolls_start(op,pcp,searchname)
-	PCSPOLLS	*op ;
-	PCSCONF		*pcp ;
-	const char	searchname[] ;
+	int pcspolls_start(pcspolls *op,pcsconf *pcp,cchar *searchname) noex
 
 	Arguments:
-
 	- op		object pointer
 	- pcp		PCS configuration pointer
 	- searchname	search-name to use
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<pcsconf.h>
@@ -63,6 +56,7 @@
 #include	<storebuf.h>
 #include	<upt.h>
 #include	<endianstr.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"pcspolls.h"
@@ -106,7 +100,6 @@ extern int	nleadstr(const char *,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	fileobject(const char *) ;
-extern int	hasfext(const char **,const char *,int) ;
 extern int	hasNotDots(const char *,int) ;
 extern int	isNotPresent(int) ;
 
@@ -131,7 +124,7 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 struct pollinfo {
 	void		*sop ;
-	const void	*objname ;
+	cvoid		*objname ;
 	int		(*start)(void *) ;
 	int		(*check)(void *) ;
 	int		(*info)(void *) ;
@@ -145,7 +138,7 @@ struct pollobj_flags {
 } ;
 
 struct pollobj {
-	const char	*name ;
+	cchar		*name ;
 	void		*sop ;
 	void		*obj ;
 	int		(*start)(void *) ;
@@ -178,10 +171,10 @@ enum cmds {
 
 /* forward references */
 
-static int pcspolls_valsbegin(PCSPOLLS *,PCSCONF *,cchar *) ;
-static int pcspolls_valsend(PCSPOLLS *) ;
+static int pcspolls_valsbegin(pcspolls *,PCSCONF *,cchar *) ;
+static int pcspolls_valsend(pcspolls *) ;
 
-static int thread_start(THREAD *,PCSPOLLS *) ;
+static int thread_start(THREAD *,pcspolls *) ;
 static int thread_finish(THREAD *) ;
 static int thread_cmdrecv(THREAD *,int) ;
 static int thread_exiting(THREAD *) ;
@@ -253,7 +246,7 @@ PCSPOLLS_OBJ	pcspolls = {
 /* exported subroutines */
 
 
-int pcspolls_start(PCSPOLLS *op,PCSCONF *pcp,cchar *sn)
+int pcspolls_start(pcspolls *op,PCSCONF *pcp,cchar *sn)
 {
 	int		rs ;
 
@@ -287,7 +280,7 @@ int pcspolls_start(PCSPOLLS *op,PCSCONF *pcp,cchar *sn)
 /* end subroutine (pcspolls_start) */
 
 
-int pcspolls_finish(PCSPOLLS *op)
+int pcspolls_finish(pcspolls *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -318,7 +311,7 @@ int pcspolls_finish(PCSPOLLS *op)
 /* end subroutine (pcspolls_finish) */
 
 
-int pcspolls_info(PCSPOLLS *op,PCSPOLLS_INFO *ip)
+int pcspolls_info(pcspolls *op,PCSPOLLS_INFO *ip)
 {
 	int		rs = SR_OK ;
 
@@ -336,7 +329,7 @@ int pcspolls_info(PCSPOLLS *op,PCSPOLLS_INFO *ip)
 /* end subroutine (pcspolls_info) */
 
 
-int pcspolls_cmd(PCSPOLLS *op,int cmd)
+int pcspolls_cmd(pcspolls *op,int cmd)
 {
 	int		rs = SR_OK ;
 
@@ -352,7 +345,7 @@ int pcspolls_cmd(PCSPOLLS *op,int cmd)
 /* private subroutines */
 
 
-static int pcspolls_valsbegin(PCSPOLLS *op,PCSCONF *pcp,const char *sn)
+static int pcspolls_valsbegin(pcspolls *op,PCSCONF *pcp,const char *sn)
 {
 	int		rs ;
 	int		size = 0 ;
@@ -377,7 +370,7 @@ static int pcspolls_valsbegin(PCSPOLLS *op,PCSCONF *pcp,const char *sn)
 /* end subroutine (pcspolls_valsbegin) */
 
 
-static int pcspolls_valsend(PCSPOLLS *op)
+static int pcspolls_valsend(pcspolls *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -411,7 +404,7 @@ struct pcspolls_thread {
 #endif /* COMMENT */
 
 
-static int thread_start(THREAD *tip,PCSPOLLS *op)
+static int thread_start(THREAD *tip,pcspolls *op)
 {
 	int		rs ;
 
@@ -714,7 +707,7 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 	        nl = rs ;
 	        if (hasNotDots(np,nl)) {
 	            int	ol ;
-	            if ((ol = hasfext(exts,np,nl)) > 0) {
+	            if ((ol = hasfext(np,nl,exts)) > 0) {
 	                if ((rs = pathadd(dbuf,dlen,np)) >= 0) {
 #if	CF_DEBUGS
 	debugprintf("pcspolls/work_objloads: db=%s\n",dbuf) ;
