@@ -1,5 +1,5 @@
 /* sispan SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find the index of character pass a span of a string */
 /* version %I% last-modified %G% */
@@ -39,14 +39,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* for |strchr(3c)| */
+#include	<cstring>		/* for |strchr(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<mkchar.h>
 #include	<strnxchr.h>
-#include	<localmisc.h>
 #include	<ascii.h>
 #include	<toxc.h>
+#include	<mkchar.h>
+#include	<localmisc.h>
 
 #include	"six.h"
 
@@ -57,13 +57,16 @@
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sispan(cchar *sp,int sl,cchar *class) noex {
-	int		i ;
+int sispan(cchar *sp,int sl,cchar *strclass) noex {
+	int		i ; /* userd afterwards */
 	for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	    cint	ch = mkchar(sp[i]) ;
-	    if (strchr(class,ch) != nullptr) break ;
+	    if (strchr(strclass,ch) != nullptr) break ;
 	} /* end for */
 	return i ;
 }

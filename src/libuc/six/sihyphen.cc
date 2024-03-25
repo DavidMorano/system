@@ -1,5 +1,5 @@
 /* sihyphen SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find a hyphen (a fake hyphen of two minus characters) in a string */
 /* version %I% last-modified %G% */
@@ -38,14 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
 #include	<ascii.h>
-#include	<toxc.h>
 #include	<strn.h>
+#include	<toxc.h>
+#include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"six.h"

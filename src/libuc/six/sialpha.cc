@@ -1,5 +1,5 @@
 /* sialpha SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find the index of an alpha character in a given string */
 /* version %I% last-modified %G% */
@@ -39,14 +39,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<ascii.h>
+#include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
-#include	<ascii.h>
-#include	<toxc.h>
 
 #include	"six.h"
 

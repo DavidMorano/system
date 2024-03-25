@@ -1,5 +1,5 @@
 /* sichr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find the index of a character in a given string */
 /* version %I% last-modified %G% */
@@ -41,14 +41,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<limits.h>		/* <- for |UCHAR_MAX| */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<mkchar.h>
-#include	<ischarx.h>
 #include	<ascii.h>
 #include	<toxc.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -58,6 +58,9 @@
 
 
 /* external subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

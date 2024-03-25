@@ -1,5 +1,5 @@
 /* sibreak SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find a character in a given string */
 /* version %I% last-modified %G% */
@@ -42,14 +42,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<ascii.h>
+#include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
-#include	<ascii.h>
-#include	<toxc.h>
 
 #include	"six.h"
 
@@ -57,16 +57,19 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sibreak(cchar *sp,int sl,cchar *s2) noex {
-	int		i, j ;
+	int		i ; /* used afterwards */
 	bool		f = false ;
 	for (i = 0 ; sl && sp[i] ; i += 1) {
-	    for (j = 0 ; s2[j] ; j += 1) {
+	    for (int j = 0 ; s2[j] ; j += 1) {
 	        f = (sp[i] == s2[j]) ;
 		if (f) break ;
-	    }
+	    } /* end for */
 	    if (f) break ;
 	    sl -= 1 ;
 	} /* end for */

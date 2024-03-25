@@ -1,7 +1,7 @@
-/* sibasename SUPPORT */
-/* lang=C20 */
+/* sinext SUPPORT */
+/* lang=C++20 */
 
-/* get the base file name out of a file-path */
+/* return index to end of next string-field */
 /* version %I% last-modified %G% */
 
 
@@ -16,54 +16,63 @@
 
 /*******************************************************************************
 
-	Name
-	sibasename
+	Name:
+	sinext
 
 	Description:
-	This routine returns the index within the given string to
-	the start of the base-name portion of the given path string.
+	Find the index to the end of the first string field within
+	the given string.
 
 	Synopsis:
-	int sibasename(cchar *sp,int sl) noex
+	int sinext(cchar *sp,int sl) noex
 
 	Arguments:
-	sp	given path string
-	sl	length of given path string (can be -1)
+	sp	string to be examined
+	sl	length of string to be examined
 
 	Returns:
-	+	index of found string
+	>=0	index of beginning of next field
+	<0	substring not found
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strlen(3c)| */
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<ascii.h>
+#include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
-#include	<ascii.h>
-#include	<toxc.h>
 
 #include	"six.h"
 
 
 /* local defines */
 
+#define	ISWHITE(ch)	CHAR_ISWHITE(ch)
+
+
+/* external subroutines */
+
+
+/* external subroutines */
+
 
 /* exported subroutines */
 
-int sibasename(cchar *sp,int sl) noex {
-	int		si ;
+int sinext(cchar *sp,int sl) noex {
+	int		i = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
-	while ((sl > 0) && (sp[sl - 1] == '/'))  {
-	    sl -= 1 ;
+	while ((i < sl) && ISWHITE(sp[i])) {
+	    i += 1 ;
 	}
-	for (si = sl ; si > 0 ; si -= 1) {
-	    if (sp[si - 1] == '/') break ;
+	while ((i < sl) && sp[i] && (! ISWHITE(sp[i]))) {
+	    i += 1 ;
 	}
-	return si ;
+	return i ;
 }
-/* end subroutine (sibasename) */
+/* end subroutine (sinext) */
 
 

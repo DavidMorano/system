@@ -1,5 +1,5 @@
 /* siskipwhite SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find a character in a given string */
 /* version %I% last-modified %G% */
@@ -48,10 +48,13 @@
 /* external subroutines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int siskipwhite(cchar *sp,int sl) noex {
-	int		i ;
+	int		i ; /* used afterwards */
 	for (i = 0 ; sl-- && sp[i] ; i += 1) {
 	    if (! CHAR_ISWHITE(sp[i])) break ;
 	} /* end while */

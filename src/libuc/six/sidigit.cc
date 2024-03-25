@@ -1,5 +1,5 @@
 /* sidigit SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find the index of a numeric character */
 /* version %I% last-modified %G% */
@@ -41,11 +41,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<ascii.h>
+#include	<toxc.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
-#include	<ascii.h>
-#include	<toxc.h>
 
 #include	"six.h"
 
@@ -59,11 +59,10 @@
 /* exported subroutines */
 
 int sidigit(cchar *sp,int sl) noex {
-	int		i ;
-	int		ch ;
+	int		i ; /* used afterwards */
 	bool		f = false ;
 	for (i = 0 ; sl && sp[i] ; i += 1) {
-	    ch = mkchar(sp[i]) ;
+	    cint	ch = mkchar(sp[i]) ;
 	    f = isdigitlatin(ch) ;
 	    if (f) break ;
 	    sl -= 1 ;

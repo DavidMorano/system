@@ -1,5 +1,5 @@
 /* sileader SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* retrieve the string-index into a "leader" */
 /* version %I% last-modified %G% */
@@ -21,13 +21,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<ascii.h>
 #include	<toxc.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"

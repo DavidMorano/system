@@ -1,5 +1,5 @@
 /* sifield SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* subroutine to find the index of a character in a given string */
 /* version %I% last-modified %G% */
@@ -38,13 +38,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>		/* <- for |UCHAR_MAX| */
-#include	<string.h>
+#include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstring>
 #include	<localmisc.h>
 
 
 /* local defines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
