@@ -1,38 +1,29 @@
-/* inter */
+/* pcsmail_inter SUPPORT */
+/* lang=C++20 */
 
-
-#define	CF_DEBUG	1
+/* collect the mail-message to send, interactively */
+/* version %I% last-modified %G% */
 
 
 /************************************************************************
 
 	= 94-01-06, David A­D­ Morano
-
-	This subroutine was adopted from the 'main' subroutine of the
-	old SENDMAIL program.
-
+	This subroutine was adopted from the 'main' subroutine of
+	the old PCS-SENDMAIL program.
 
 ************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/param.h>
-#include	<sys/utsname.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
 #include	<netinet/in.h>
 #include	<netdb.h>
-#include	<errno.h>
 #include	<unistd.h>
-#include	<string.h>
-#include	<signal.h>
-#include	<time.h>
-#include	<pwd.h>
-#include	<grp.h>
-#include	<stdio.h>
-
+#include	<cerrno>
+#include	<csignal>
+#include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<logfile.h>
@@ -123,16 +114,6 @@ int inter()
 
 	if (isfile) {
 
-#if	CF_DEBUG
-	    if (g.f.debug) {
-
-	        debugprintf("main: 'isfile' is ON \"%s\"\n",filename) ;
-
-	        fileinfo(filename,"main got a ISFILE") ;
-
-	    }
-#endif
-
 	    if (access(filename,R_OK) < 0) {
 
 	        logfile_printf(&g.eh,"main: could not access FILENAME \"%s\"\n",
@@ -161,11 +142,6 @@ int inter()
 
 	} /* end if (we have a file) */
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to get the message contents\n") ;
-#endif
-
 /* the message itself */
 
 /* if we already have recipients then the following will not ask ? */
@@ -176,21 +152,11 @@ int inter()
 
 	}
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to put the header\n") ;
-#endif
-
 /* write the headers that we have so far to the message file */
 
 	writeheader(mfp,TRUE) ;
 
 	bclose(mfp) ;
-
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to execute non-PC code\n") ;
-#endif
 
 /* now we fork so that we can process the inputting of the message */
 
@@ -215,19 +181,9 @@ int inter()
 
 	    bflush(g.ofp) ;
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to execute the fork code\n") ;
-#endif
-
 	pid_child = -1 ;
 	    if ((! g.f.interactive) || iswait || 
 		((pid_child = uc_fork()) <= 0)) {
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: forked pid=%d\n",pid_child) ;
-#endif
 
 /* if we forked, the child is executing the following code */
 
@@ -244,61 +200,18 @@ int inter()
 
 	        bseek(mfp,0L,SEEK_END) ;
 
-#if	CF_DEBUG
-	            if (g.f.debug) {
-
-			bflush(mfp) ;
-
-	                fileinfo(tempfile,"after seek end") ;
-
-			}
-#endif
-
 	        if (ex_mode == EM_PCSMAIL) {
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: interactive program mode \n") ;
-#endif
 
 /* body of the message */
 
 	            if (*message != '\0') {
-
-#if	CF_DEBUG
-	                if (g.f.debug)
-	                    debugprintf("main: we have a message ? \"%s\"\n",
-	                        message) ;
-#endif
-
 /* we were given the message on the command invocation line */
-
 	                bprintf(mfp,"\n%s\n",message) ;
-
 	            } else if (isfile) {
-
-#if	CF_DEBUG
-	                if (g.f.debug) {
-
-	                    debugprintf("main: we have a file already \"%s\"\n",
-	                        filename) ;
-
-	                    fileinfo(filename,"main filename") ;
-
-	                    fileinfo(tempfile,"before add on") ;
-
-	                }
-#endif
 
 /* we were not given the message body on the command invocation line */
 
 	                if ((rs = bopen(tfp,filename,"r",0600)) < 0) {
-
-#if	CF_DEBUG
-	                if (g.f.debug)
-	                    	debugprintf("main: cannot open \"%s\" rs %d\n",
-				filename,rs) ;
-#endif
 
 	                    bprintf(g.efp,
 	                        "%s: ERROR cannot open \"%s\"\n",
@@ -330,154 +243,43 @@ int inter()
 				bwrite(mfp,linebuf,l) ;
 #endif
 
-#if	CF_DEBUG
-	                if (g.f.debug) {
-
-				offset = bseek(tfp,0L,SEEK_CUR) ;
-
-	                    debugprintf("main: skipped headers, off=%ld\n",
-				offset) ;
-
-	                    fileinfo(tempfile,"after skip headers") ;
-
-			}
-#endif
-
 /* copy the body of the message that was given us in the input file */
-
-#if	CF_DEBUG
-	if (g.f.debug) {
-
-		bflush(mfp) ;
-
-	                    fileinfo(tempfile,"before copyblock") ;
-
-			bflush(tfp) ;
-
-	                    fileinfo(filename,"before copyblock") ;
-
-	}
-#endif
 
 	                while ((rs = bcopyblock(tfp,mfp,BUFLEN)) > 0)
 	                    len += rs ;
 
-#if	CF_DEBUG
-	if (g.f.debug) {
-
-			bflush(tfp) ;
-
-			bflush(mfp) ;
-
-	                    fileinfo(tempfile,"after copyblock") ;
-
-	                    fileinfo(filename,"after copyblock") ;
-
-	}
-#endif
-
 	                bclose(tfp) ;
 
-#if	CF_DEBUG
-	                if (g.f.debug)
-	                    debugprintf("main: %d MSG body bytes copied\n",len) ;
-#endif
-
 	                if (rs < 0) {
-
 	                    logfile_printf(&g.lh,
 	                        "possible full filesystem (rs %d)\n",
 	                        rs) ;
-
 	                    bprintf(g.efp,
 	                        "%s: possible full filesystem (rs %d)\n",
 	                        g.progname,rs) ;
-
 	                }
-
 	            } /* end if (have a file given) */
 
 	        } /* end if (regular mode) */
 
 	        bflush(mfp) ;
 
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                fileinfo(tempfile,"before isedit") ;
-#endif
-
 	        if (isedit) {
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: we are working on an edit\n") ;
-#endif
 
 	            bclose(mfp) ;
 
 	            if (iseforward) {
-
-#if	CF_DEBUG
-	                if (g.f.debug) {
-
-	                    debugprintf("main: we are working on an eforward\n") ;
-
-	                    fileinfo(eforwfile,"eforward") ;
-
-	                }
-#endif
-
 	                fappend(eforwfile,tempfile) ;
-
 	                unlink(eforwfile) ;
-
 	                iseforward = 0 ;
-
 	            } /* end if (we have a forward file) */
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: about to edit it\n") ;
-#endif
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                fileinfo(tempfile,"main before editit") ;
-#endif
 
 	            editit(tempfile) ;
 
-#if	DEBUG && 0
-	            sprintf(buf,"cp %s /home/dam/rje/edit2.out",tempfile) ;
-
-	            system(buf) ;
-#endif
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                fileinfo(tempfile,"main after editit") ;
-#endif
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: edited it\n") ;
-#endif
-
 	        } else if ((! isfile) && (*message == '\0')) {
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: not file and not messages\n") ;
-#endif
 
 	            if (g.f.interactive) bprintf(g.ofp,
 	                "enter message - terminate by period or EOF :\n") ;
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf(
-	                    "main: about to read the message that we got ??\n") ;
-#endif
 
 	            while (((len = breadln(g.ifp,linebuf,LINELEN)) > 0) && 
 	                (strncmp(linebuf,".\n",2) != 0)) {
@@ -496,11 +298,6 @@ int inter()
 
 	            bclose(mfp) ;
 
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: read the message that we collected\n") ;
-#endif
-
 	        } else {
 
 	            bclose(mfp) ;
@@ -511,42 +308,16 @@ int inter()
 
 /* exit only if fork did happen, otherwise just continue */
 
-#if	CF_DEBUG
-	        if (g.f.debug)
-	            debugprintf("main: child about to possibly exit\n") ;
-#endif
-
 	        if (g.f.interactive && (! iswait) && (pid_child != -1))
 	            exit(0) ;
 
-#if	CF_DEBUG
-	        if (g.f.debug)
-	            debugprintf("main: child DID NOT exit\n") ;
-#endif
-
 	    } /* end if (of forked off code) */
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: end of forked off code \n") ;
-#endif
 
 /* while the other process is collecting input from the terminal */
 /* the main process ignores any interrupts and continues with its*/
 /* housekeeping chores, i.e. read translation table from the disk*/
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf(
-	            "main: about to exit the 'not PC' if\n") ;
-#endif
-
 	} /* end if (not running as PCS PostCard) */
-
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to read in translation table\n") ;
-#endif
 
 /* get last->myname conversion table */
 
@@ -558,11 +329,6 @@ int inter()
 	        g.progname) ;
 
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: we are about to attempt joining\n") ;
-#endif
-
 /* This is where the join happens 				*/
 /* the join needs to be done only if the forking actually	*/
 /* happened. pid_child has a positive non-zero value only if the	*/
@@ -571,17 +337,8 @@ int inter()
 	if (pid_child > 0) {
 
 	    while ((wstatus = u_waitpid(pid_child,&status,0)) >= 0) {
-
 	        if (wstatus == pid_child) break ;
-
 	    }
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf(
-	            "main: we're in the join code w/ wstatus=%02X status=%d\n",
-	            wstatus,status) ;
-#endif
 
 	    if (wstatus == -1) {
 
@@ -592,27 +349,14 @@ int inter()
 
 	} /* end if */
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf( "main: we joined \n") ;
-#endif
-
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf( "main: about to get names again\n") ;
-#endif
-
 	if (pid_child > 0) {
 
 /* scan message for changes */
 
 	    if (isedit != 0) {
-
 	        *subject = *recipient = '\0';			/* (11/30) */
 	        *copyto  = *bcopyto = '\0' ;
-
 	        isedit = 0 ;	/* MR# gw85-00801 2/7/85 (JM)*/
-
 	    }
 
 	    getheader(tempfile,syscom) ;	/* (11/30) */
@@ -635,12 +379,6 @@ int inter()
 
 	} /* end if (gettinu.name ?) */
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf(
-	        "main: end of gettinu.names again\n") ;
-#endif
-
 /* convert user name (in 'username') to real name and put in variable 'from' */
 
 #ifdef	COMMENT
@@ -649,11 +387,6 @@ int inter()
 	if (myname == 0) u.name = putheap(buf) ;
 #endif
 
-
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to create the 'from' address\n") ;
-#endif
 
 /* create the 'fromaddr' header field */
 
@@ -742,20 +475,7 @@ int inter()
 	}
 #endif
 
-#if	CF_DEBUG
-	if (g.f.debug)
-	    debugprintf("main: about to do some real work again\n") ;
-#endif
-
-
-
-
 	if (ex_mode != EM_PCSMAIL) {
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: execution mode not PCSMAIL\n") ;
-#endif
 
 	    if (ex_mode == EM_PC) redo_message() ;
 
@@ -765,105 +485,40 @@ int inter()
 
 	} else {
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: execution mode is PCSMAIL\n") ;
-#endif
-
 	    if (iseforward) {
-
 	        fappend(eforwfile,tempfile) ;
-
 	        unlink(eforwfile) ;
-
 	    }
 
 /* check TO:, CC:, BCC: list */
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: about to get header fields\n") ;
-#endif
-
 	    getfield(tempfile,HS_CC,copyto) ;
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: and the BCC\n") ;
-#endif
 
 	    getfield(tempfile,HS_BCC,bcopyto) ;
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: about to 'getnames(copyto)'\n") ;
-#endif
-
 	    if (*copyto != '\0') ccnames = getnames(copyto) ;
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: about to 'getnames(bcopyto)'\n") ;
-#endif
 
 	    if (*bcopyto != '\0') bccnames = getnames(bcopyto) ;
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: about to 'checkreclist()'\n") ;
-#endif
-
 	    checkreclist(0) ;
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: about to 'redo_message()'\n") ;
-#endif
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        fileinfo(tempfile,
-	            "main: about to 'redo_message()'") ;
-#endif
-
 	    redo_message() ;
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        fileinfo(tempfile,
-	            "main: after 'redo_message()'") ;
-#endif
-
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        debugprintf("main: about to ask for sending command\n") ;
-#endif
 
 /* ask for sending command */
 opts:
 	    if (ambiguous) redo_message() ;
 
 	    if (! g.f.interactive) {
-
 	        strcpy(command,"send") ;
-
 	        isedit = 0 ;
-
 	    } else {
-
 	        if (*recipient == '\0') {
-
 	            bprintf(g.ofp,"\nno recipient(s) specified\n") ;
-
 	            tonames = 0 ;
 	            prompt(TO) ;
-
 	            strcpy(realto, recipient) ;
-
 	            checkreclist(0) ;
-
 	            redo_message() ;
-
 	        }
 
 	        if (error != 0) {
@@ -880,16 +535,16 @@ opts:
 	            }
 
 	            if (*s != 'y') {
-
 	                bprintf(g.ofp,"%s%s","OK, please edit",
 	                    " the message or quit\n") ;
-
 	            }
 	        }
 
-	        if (isedit != 0) strcpy(command,"edit") ;
-
-	        else prompt(SENDCOM) ;
+	        if (isedit != 0) {
+		    strcpy(command,"edit") ;
+	        } else {
+		    prompt(SENDCOM) ;
+		}
 
 	    } /* end if */
 
@@ -920,50 +575,23 @@ opts1:
 /* review the message */
 	        case 'r':
 	            reviewit(option) ;
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                fileinfo(tempfile,"main reviewit") ;
-#endif
-
 	            break ;
 
 /* check recipient list */
 	        case 'c':
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: about to call 'checkit()'\n") ;
-#endif
-
 	            checkit() ;
-
 	            break ;
 
 /* edit the message */
 	        case 'e':
 	            editit(tempfile) ;
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                fileinfo(tempfile,"main CMD editit") ;
-#endif
-
 	            checkreclist(0) ;
-
 	            redo_message() ;
-
 	            ambiguous = 0 ;
 	            break ;
 
 /* terminate the mail */
 	        case 'q':
-
-#if	CF_DEBUG
-	            if (g.f.debug)
-	                debugprintf("main: quitting program\n") ;
-#endif
-
 	            if (fork() == 0) {
 
 	                close(0) ;
@@ -1119,11 +747,6 @@ opts2:
 	if ((tonames > 0) && 
 	    (iswait || ((pid_child = fork()) == 0) || (pid_child == -1))) {
 
-#if	CF_DEBUG
-	    if (g.f.debug)
-	        fileinfo(tempfile,"main 1") ;
-#endif
-
 	    deliverem() ;
 
 /* if we forked, the child exits here */
@@ -1137,18 +760,9 @@ opts2:
 	if (tonames == 0) {
 
 	    if (access(tempfile,R_OK) < 0) {
-
 	        debugprintf("main: no tempfile here\n") ;
-
 	        sprintf(syscom,"cp /dev/null %s",tempfile) ;
-
-#if	CF_DEBUG
-	        if (g.f.debug)
-	            debugprintf("main: SYSTEM> %s\n",syscom) ;
-#endif
-
 	        system(syscom) ;
-
 	    }
 
 	    sprintf(syscom, "cat %s >> %s/%s\n", tempfile,

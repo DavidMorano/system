@@ -81,6 +81,15 @@ extern int	filebuf_tell(filebuf *,off_t *) noex ;
 extern int	filebuf_poll(filebuf *,int) noex ;
 extern int	filebuf_finish(filebuf *) noex ;
 
+extern int	filebuf_writeblanks(filebuf *,int) noex ;
+extern int	filebuf_writefill(filebuf *,cchar *,int) noex ;
+extern int	filebuf_writealign(filebuf *,int) noex ;
+extern int	filebuf_writezero(filebuf *,int) noex ;
+extern int	filebuf_writefd(filebuf *,char *,int,int,int) noex ;
+extern int	filebuf_writehdr(filebuf *,cchar *,int) noex ;
+extern int	filebuf_writehdrkey(filebuf *,cchar *) noex ;
+extern int	filebuf_printlncont(filebuf *,int,cchar *,int) noex ;
+
 EXTERNC_end
 
 

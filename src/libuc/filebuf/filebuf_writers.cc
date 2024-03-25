@@ -30,8 +30,8 @@
 	n		number of bytes to write
 
 	Returns:
-	<0		error
 	>=0		number of bytes written
+	<0		error (system-return)
 
 
 	Name:
@@ -49,8 +49,8 @@
 	sl		source buffer length
 
 	Returns:
-	<0		error
 	>=0		number of bytes written
+	<0		error (system-return)
 
 
 	Name:
@@ -68,8 +68,8 @@
 	align		source buffer length
 
 	Returns:
-	<0		error
 	>=0		number of bytes written
+	<0		error (system-return)
 
 
 	Name:
@@ -86,8 +86,8 @@
 	size		amount of zeros to write
 
 	Returns:
-	<0		error
 	>=0		number of bytes written
+	<0		error (system-return)
 
 
 	Name:
@@ -108,7 +108,8 @@
 	len		length of data to read from given file-descriptor
 
 	Returns:
-	-		number of bytes written
+	>=0		number of bytes written
+	<0		error (system-return)
 
 *******************************************************************************/
 
