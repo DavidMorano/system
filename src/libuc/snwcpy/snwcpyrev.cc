@@ -1,5 +1,5 @@
 /* snwcpyrev SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* copy in reverse the characters from a source to a destiation */
 /* version %I% last-modified %G% */
@@ -22,9 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -51,6 +50,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

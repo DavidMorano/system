@@ -1,5 +1,5 @@
 /* snwcpyclean SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* copy a source string to a destination while cleaning it up */
 /* version %I% last-modified %G% */
@@ -49,18 +49,23 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
 
+/* local defines */
+
+
 /* external subroutines */
 
-extern int	isprintlatin(int) noex ;
+
+/* local variables */
 
 
 /* external variables */
@@ -68,17 +73,19 @@ extern int	isprintlatin(int) noex ;
 
 /* forward references */
 
-static int	isour(int) noex ;
+static bool	isour(int) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
 int snwcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
-	int		ch ;
 	int		dl = 0 ;
 	int		rs = SR_OK ;
 	while (dlen-- && sl && *sp) {
-	    ch = MKCHAR(*sp) ;
+	    cint	ch = mkchar(*sp) ;
 	    if (isour(ch)) {
 		dbuf[dl++] = (char) ch ;
 	    } else if (sch != 0) {
@@ -96,8 +103,8 @@ int snwcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int isour(int ch) noex {
-	int		f = FALSE ;
+static bool isour(int ch) noex {
+	bool		f = false ;
 	f = f || isprintlatin(ch) ;
 	f = f || (ch == CH_BEL) ;
 	f = f || (ch == CH_BS) ;

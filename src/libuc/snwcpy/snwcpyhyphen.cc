@@ -1,5 +1,5 @@
 /* snwcpyhyphen SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* similar to |snwcpy(3dam)| w/ exceptions */
 /* version %I% last-modified %G% */
@@ -46,9 +46,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<limits.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -71,6 +69,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snwcpyhyphen(char *dbuf,int dlen,cchar *sp,int sl) noex {
@@ -80,7 +81,7 @@ int snwcpyhyphen(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	while (dlen-- && sl && *sp) {
 	    ch = mkchar(*sp++) ;
 	    if (ch == '_') ch = '-' ;
-	    dbuf[dl++] = (char) ch ;
+	    dbuf[dl++] = char(ch) ;
 	    sl -= 1 ;
 	} /* end while */
 	if ((sl != 0) && (*sp != '\0')) rs = SR_OVERFLOW ;

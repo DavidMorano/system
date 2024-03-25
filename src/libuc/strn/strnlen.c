@@ -43,6 +43,12 @@
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strnlen(cchar *s,int n) noex {

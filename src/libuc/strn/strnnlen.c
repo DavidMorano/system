@@ -39,13 +39,15 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<string.h>		/* <- for |strnlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"strn.h"
+
+
+/* local defines */
 
 
 /* external subroutines */

@@ -1,5 +1,5 @@
 /* snwcpywidehdr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* counted-string copy while compacting white-space from the source */
 /* version %I% last-modified %G% */
@@ -26,7 +26,7 @@
 	(consisting of string data).
 
 	Synopsis:
-	int snwcpywidehdr(char *dbuf,int dlen,const wchar_t *wp,int wl) noex
+	int snwcpywidehdr(char *dbuf,int dlen,cwchar *wp,int wl) noex
 
 	Arguments:
 	dbuf		result buffer
@@ -56,12 +56,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<stddef.h>		/* presumably for |wchar_t| type */
+#include	<climits>
+#include	<cstddef>		/* presumably for |wchar_t| type */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<strmgr.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
@@ -72,11 +72,11 @@
 
 /* external subroutines */
 
-extern int	wsfnext(const wchar_t *,int,const wchar_t **) ;
-extern int	wsnlen(const wchar_t *,int) ;
-extern int	isprintbad(int) ;
-
-extern cchar	*straltwchar(uint) ;
+extern "C" {
+    extern int		wsfnext(cwchar *,int,cwchar **) noex ;
+    extern int		wsnlen(cwchar *,int) noex ;
+    extern cchar	*straltwchar(uint) noex ;
+}
 
 
 /* external variables */
@@ -91,9 +91,12 @@ extern cchar	*straltwchar(uint) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int snwcpywidehdr(char *dbuf,int dlen,const wchar_t *wsp,int wsl) noex {
+int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
 	strmgr		m ;
 	int		rs ;
 	int		rs1 ;
@@ -101,8 +104,8 @@ int snwcpywidehdr(char *dbuf,int dlen,const wchar_t *wsp,int wsl) noex {
 	if (dlen < 0) dlen = INT_MAX ;
 	if (wsl < 0) wsl = wsnlen(wsp,-1) ;
 	if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
-	    int			wl ;
-	    const wchar_t	*wp ;
+	    int		wl ;
+	    cwchar	*wp ;
 	    while ((wl = wsfnext(wsp,wsl,&wp)) > 0) {
 	        if (dl > 0) {
 	            rs = strmgr_char(&m,' ') ;

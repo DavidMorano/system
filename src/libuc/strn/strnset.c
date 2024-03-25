@@ -74,6 +74,9 @@
 /* local defines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 char *strnset(char *dp,int ch,int n) noex {

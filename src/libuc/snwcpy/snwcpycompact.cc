@@ -55,10 +55,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<string.h>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<strmgr.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"snwcpyx.h"
@@ -68,8 +69,6 @@
 
 
 /* external subroutines */
-
-extern int	nextfield(cchar *,int,cchar **) noex ;
 
 
 /* external variables */
@@ -84,10 +83,13 @@ extern int	nextfield(cchar *,int,cchar **) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
-	STRMGR		m ;
+	strmgr		m ;
 	int		rs ;
 	int		rs1 ;
 	int		dl = 0 ;
@@ -96,7 +98,7 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	if ((rs = strmgr_start(&m,dbuf,dlen)) >= 0) {
 	    int		cl ;
 	    cchar	*cp ;
-	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
+	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	        if (dl > 0) {
 	            rs = strmgr_char(&m,' ') ;
 	            if (rs >= 0) dl += 1 ;

@@ -55,7 +55,7 @@
 #include	<grp.h>
 #include	<limits.h>
 #include	<signal.h>
-#include	<stddef.h>
+#include	<stddef.h>		/* |wchar_t| */
 #include	<stdlib.h>
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
@@ -277,6 +277,11 @@ typedef const char *const	cpcchar ;
 #ifndef	TYPEDEF_CPCCHARP	/* same as |mainv| */
 #define	TYPEDEF_CPCCHARP	/* same as |mainv| */
 typedef const char *const *	cpccharp ;
+#endif
+
+#ifndef	TYPEDEF_CWCHAR
+#define	TYPEDEF_CWCHAR
+typedef const wchar_t		cwchar ;
 #endif
 
 #ifndef	TYPEDEF_MAINV

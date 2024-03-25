@@ -1,5 +1,5 @@
 /* snwcpyshrink SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* copy the shrunken part of a source string */
 /* version %I% last-modified %G% */
@@ -45,14 +45,14 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<ascii.h>
-#include	<char.h>
 #include	<sfx.h>
 #include	<strmgr.h>
 #include	<strn.h>
+#include	<char.h>
+#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -63,16 +63,18 @@
 /* external subroutines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 #if	CF_ONEPASS
 int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		cl ;
 	cchar		*cp ;
 	dbuf[0] = '\0' ;
-	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	    strmgr	d ;
 	    if ((rs = strmgr_start(&d,dbuf,dlen)) >= 0) {
 		while ((rs >= 0) && cl--) {
@@ -90,13 +92,12 @@ int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 #else /* CF_ONEPASS */
 int snwcpyshrink(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
-	int		cl ;
-	cchar		*tp, *cp ;
+	cchar		*cp ;
 	dbuf[0] = '\0' ;
-	if ((tp = strnchr(sp,sl,CH_NL)) != nullptr) {
+	if (cchar *tp ; (tp = strnchr(sp,sl,CH_NL)) != nullptr) {
 	    sl = (tp-sp) ;
 	}
-	if ((cl = sfshrink(sp,sl,&cp)) > 0) {
+	if (int cl ; (cl = sfshrink(sp,sl,&cp)) > 0) {
 	    rs = snwcpy(dbuf,dlen,cp,cl) ;
 	}
 	return rs ;

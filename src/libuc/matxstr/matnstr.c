@@ -39,8 +39,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<string.h>		/* for |strlen(3c)| + |strncmp(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -58,6 +57,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
