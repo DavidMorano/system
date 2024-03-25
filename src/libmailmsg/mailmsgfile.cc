@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	This object implements a translation mapping from message-ids
-	(MSGIDs) to unique temporary filenames. Although not our
+	(MSGIDs) to unique temporary filenames.  Although not our
 	business, these filenames point to files that hold the
 	content (body) of mail messages.
 
@@ -26,8 +26,8 @@
 	+ Why the child process on exit?
 
 	Because deleting files is just way too slow -- for whatever
-	reason. So we have a child do it do that we can finish up
-	*fast* and get out. This is a user response-time issue. We
+	reason.  So we have a child do it do that we can finish up
+	*fast* and get out.  This is a user response-time issue. We
 	want the user to have the program exit quickly so that they
 	are not annoyed (as they were when we previously deleted
 	all of the files inline).
@@ -38,7 +38,6 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<csignal>
 #include	<cstdlib>
 #include	<cstdarg>
 #include	<cstring>
@@ -91,30 +90,30 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	pathadd(char *,int,const char *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	mkdisplayable(char *,int,const char *,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath2w(char *,cchar *,cchar *,int) ;
+extern int	pathadd(char *,int,cchar *) ;
+extern int	opentmpfile(cchar *,int,mode_t,char *) ;
+extern int	mkdisplayable(char *,int,cchar *,int) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	msleep(int) ;
 extern int	filebuf_writeblanks(FILEBUF *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwcpyblanks(char *,int) ;
-extern char	*strncpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnrpbrk(const char *,int,const char *) ;
+extern char	*strncpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnrchr(cchar *,int,int) ;
+extern char	*strnrpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -124,20 +123,20 @@ extern char	*strnrpbrk(const char *,int,const char *) ;
 
 struct dargs {
 	HDB		*mp ;
-	const char	*tmpdname ;
+	cchar	*tmpdname ;
 } ;
 
 
 /* forward references */
 
-static int mailmsgfile_mk(MAILMSGFILE *,const char *,const char *,int,
+static int mailmsgfile_mk(MAILMSGFILE *,cchar *,cchar *,int,
 			off_t,int) ;
 static int mailmsgfile_mkdis(MAILMSGFILE *,MAILMSGFILE_MI *,
 			int,int,off_t) ;
 static int mailmsgfile_proclines(MAILMSGFILE *,MAILMSGFILE_MI *,
-			FILEBUF *,const char *,int) ;
+			FILEBUF *,cchar *,int) ;
 
-static int mailmsgfile_procout(MAILMSGFILE *,FILEBUF *,int,const char *,int,
+static int mailmsgfile_procout(MAILMSGFILE *,FILEBUF *,int,cchar *,int,
 			int) ;
 static int mailmsgfile_store(MAILMSGFILE *,MAILMSGFILE_MI *) ;
 static int mailmsgfile_filefins(MAILMSGFILE *) ;
@@ -148,7 +147,7 @@ static int mailmsgfile_checkout(MAILMSGFILE *) ;
 static int mailmsgfile_checker(MAILMSGFILE *) ;
 static int mailmsgfile_checkerx(MAILMSGFILE *) ;
 
-static int mi_start(MAILMSGFILE_MI *,const char *,const char *,int) ;
+static int mi_start(MAILMSGFILE_MI *,cchar *,cchar *,int) ;
 static int mi_finish(MAILMSGFILE_MI *) ;
 static int mi_newlines(MAILMSGFILE_MI *,int) ;
 
@@ -161,13 +160,13 @@ static int mi_newlines(MAILMSGFILE_MI *,int) ;
 
 int mailmsgfile_start(op,tmpdname,cols,ind)
 MAILMSGFILE	*op ;
-const char	tmpdname[] ;
+cchar	tmpdname[] ;
 int		cols ;
 int		ind ;
 {
 	int		rs = SR_OK ;
 	int		n = 30 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -254,7 +253,7 @@ MAILMSGFILE	*op ;
 int mailmsgfile_new(op,type,msgid,mfd,boff,blen)
 MAILMSGFILE	*op ;
 int		type ;
-const char	msgid[] ;
+cchar	msgid[] ;
 int		mfd ;
 off_t	boff ;
 int		blen ;
@@ -286,7 +285,7 @@ int		blen ;
 	    MAILMSGFILE_MI	*mip = (MAILMSGFILE_MI *) val.buf ;
 	    vlines = mip->vlines ;
 	} else if (rs == SR_NOTFOUND) {
-	    const char	*template = "msgXXXXXXXXXXX" ;
+	    cchar	*template = "msgXXXXXXXXXXX" ;
 	    char	infname[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath2(infname,op->tmpdname,template)) >= 0) {
 	        rs = mailmsgfile_mk(op,msgid,infname,mfd,boff,blen) ;
@@ -306,7 +305,7 @@ int		blen ;
 int mailmsgfile_msginfo(op,mipp,msgid)
 MAILMSGFILE	*op ;
 MAILMSGFILE_MI	**mipp ;
-const char	msgid[] ;
+cchar	msgid[] ;
 {
 	int		rs ;
 	int		vlines = 0 ;
@@ -336,8 +335,8 @@ const char	msgid[] ;
 
 int mailmsgfile_get(op,msgid,rpp)
 MAILMSGFILE	*op ;
-const char	msgid[] ;
-const char	**rpp ;
+cchar	msgid[] ;
+cchar	**rpp ;
 {
 	MAILMSGFILE_MI	*mip ;
 	int		rs ;
@@ -353,7 +352,7 @@ const char	**rpp ;
 	if ((rs = mailmsgfile_msginfo(op,&mip,msgid)) >= 0) {
 	    vlines = mip->vlines ;
 	    if (rpp != NULL)
-	        *rpp = (const char *) mip->mfname ;
+	        *rpp = (cchar *) mip->mfname ;
 	}
 
 	return (rs >= 0) ? vlines : rs ;
@@ -366,8 +365,8 @@ const char	**rpp ;
 
 static int mailmsgfile_mk(op,msgid,infname,mfd,boff,blen)
 MAILMSGFILE	*op ;
-const char	msgid[] ;
-const char	infname[] ;
+cchar	msgid[] ;
+cchar	infname[] ;
 int		mfd ;
 off_t	boff ;
 int		blen ;
@@ -527,7 +526,7 @@ static int mailmsgfile_proclines(op,mip,fbp,lbuf,llen)
 MAILMSGFILE	*op ;
 MAILMSGFILE_MI	*mip ;
 FILEBUF		*fbp ;
-const char	lbuf[] ;
+cchar	lbuf[] ;
 int		llen ;
 {
 	LINEFOLD	ff ;
@@ -541,7 +540,7 @@ int		llen ;
 	    int		plen ;
 	    int		sl ;
 	    int		f ;
-	    const char	*sp ;
+	    cchar	*sp ;
 
 	    while ((rs = linefold_getline(&ff,li,&sp)) > 0) {
 		sl = rs ;
@@ -587,7 +586,7 @@ static int mailmsgfile_procout(op,fbp,li,lp,ll,f_cont)
 MAILMSGFILE	*op ;
 FILEBUF		*fbp ;
 int		li ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 int		f_cont ;
 {
@@ -784,7 +783,7 @@ static int mailmsgfile_checkerx(MAILMSGFILE *op)
 
 	        if (rs >= 0) {
 	            int		i ;
-	            const char	*fp ;
+	            cchar	*fp ;
 	            for (i = 0 ; vecpstr_get(&files,i,&fp) >= 0 ; i += 1) {
 	                if (fp != NULL) {
 	                    if (fp[0] != '\0') {
@@ -805,8 +804,8 @@ static int mailmsgfile_checkerx(MAILMSGFILE *op)
 
 static int mi_start(mip,msgid,mfname,blen)
 MAILMSGFILE_MI	*mip ;
-const char	msgid[] ;
-const char	mfname[] ;
+cchar	msgid[] ;
+cchar	mfname[] ;
 int		blen ;
 {
 	int		rs ;

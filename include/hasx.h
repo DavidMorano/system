@@ -50,6 +50,10 @@ extern bool haseoh(cchar *,int) noex ;
 extern bool hasleadcolon(cchar *,int) noex ;
 extern bool hasonlyminus(cchar *,int) noex ;
 extern bool hasonlyplusminus(cchar *,int) noex ;
+extern bool hasmealone(cchar *,int) noex ;
+extern bool hasinet4addrstr(cchar *,int) noex ;
+
+extern bool hasvalidmagic(cchar *,int,cchar *) noex ;
 
 extern bool hasallalpha(cchar *,int) noex ;
 extern bool hasallalnum(cchar *,int) noex ;
@@ -60,7 +64,6 @@ extern bool hasalldig(cchar *,int) noex ;
 
 extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;
-extern bool hasvalidmagic(cchar *,int,cchar *) noex ;
 
 static inline bool hasfnamespecial(cchar *fp,int fl) noex {
 	return (matstr(stdfnames,fp,fl) >= 0) ;
@@ -73,6 +76,15 @@ static inline bool hasNotDots(cchar *sp,int sl) noex {
 }
 static inline bool hasEOH(cchar *sp,int sl) noex {
 	return haseoh(sp,sl) ;
+}
+static inline bool hasMeAlone(cchar *sp,int sl) noex {
+	return hasmealone(sp,sl) ;
+}
+static inline bool hasDotDir(cchar *sp,int sl) noex {
+	return hasdots(sp,sl) ;
+}
+static inline bool hasINET4AddrStr(cchar *sp,int sl) noex {
+	return hasinet4addrstr(sp,sl) ;
 }
 
 EXTERNC_end

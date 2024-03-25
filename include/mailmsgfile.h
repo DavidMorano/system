@@ -17,6 +17,7 @@
 #ifndef	MAILMSGFILE_INCLUDE
 #define	MAILMSGFILE_INCLUDE
 
+
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<hdb.h>
@@ -52,7 +53,7 @@ struct mailmsgfile_flags {
 } ;
 
 struct mailmsgfile_head {
-	HDB		files ;
+	hdb		files ;
 	cchar		*tmpdname ;
 	pthread_t	tid ;
 	MAILMSGFILE_FL	f ;
