@@ -87,9 +87,9 @@ int snwcpyclean(char *dbuf,int dlen,int sch,cchar *sp,int sl) noex {
 	while (dlen-- && sl && *sp) {
 	    cint	ch = mkchar(*sp) ;
 	    if (isour(ch)) {
-		dbuf[dl++] = (char) ch ;
+		dbuf[dl++] = char(ch) ;
 	    } else if (sch != 0) {
-		dbuf[dl++] = (char) sch ;
+		dbuf[dl++] = char(sch) ;
 	    }
 	    sp += 1 ;
 	    sl -= 1 ;
