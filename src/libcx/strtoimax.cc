@@ -1,4 +1,8 @@
-/* strtoimax */
+/* strtoimax SUPPORT */
+/* lang=C++20 */
+
+/* UNIX® c-string support */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -19,25 +23,21 @@
 
 #if defined(_LP64)
 
-intmax_t strtoimax(const char *str,char **endptr,int base)
-{
+intmax_t strtoimax(const char *str,char **endptr,int base) {
 	return strtol(str,endptr,base) ;
 }
 
-intmax_t strtointmax(const char *str,char **endptr,int base)
-{
+intmax_t strtointmax(const char *str,char **endptr,int base) {
 	return strtol(str,endptr,base) ;
 }
 
 #else /* defined(_LP64) */
 
-intmax_t strtoimax(const char *str,char **endptr,int base)
-{
+intmax_t strtoimax(const char *str,char **endptr,int base) {
 	return strtoll(str,endptr,base) ;
 }
 
-intmax_t strtointmax(const char *str,char **endptr,int base)
-{
+intmax_t strtointmax(const char *str,char **endptr,int base) {
 	return strtoll(str,endptr,base) ;
 }
 

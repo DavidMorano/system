@@ -1,7 +1,7 @@
-/* strlocktype */
-/* lang=C20 */
+/* strlocktype SUPPORT */
+/* lang=C++20 */
 
-/* return a signal abbreviation string given a signal number */
+/* return a c-string abbreviation for a UNIX® file-lock type */
 /* version %I% last-modified %G% */
 
 
@@ -24,21 +24,30 @@
         abbreviation string.
 
 	Synopsis:
-	cchar *strlocktype(uint n) noex
+	cchar *strlocktype(uint n) noex 
 
 	Arguments:
-	n		signal number to lookup
+	n		file-lock type
 
 	Returns:
 	-		character-string representation of signal
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<signal.h>
+#include	<unistd.h>
+#include	<fcntl.h>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"strlocktype.h"
+
+
+/* local defines */
+
+
+/* external subroutines */
 
 
 /* local structures */
@@ -51,7 +60,7 @@ struct locktype {
 
 /* local variables */
 
-static const struct locktype	types[] = {
+static constexpr struct locktype	types[] = {
 	{ F_UNLOCK, "UNLOCK" },
 	{ F_WLOCK, "WLOCK" },
 	{ F_RLOCK, "RLOCK" },
@@ -63,12 +72,14 @@ static const struct locktype	types[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-cchar *strlocktype(uint t) noex {
-	int		i ;
+cchar *strlocktype(int t) noex {
 	cchar		*s = "unknown" ;
-	for (i = 0 ; types[i].t >= 0 ; i += 1) {
+	for (int i = 0 ; types[i].t >= 0 ; i += 1) {
 	    if (types[i].t == t) {
 		s = types[i].n ;
 		break ;

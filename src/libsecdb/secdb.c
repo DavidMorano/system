@@ -1,4 +1,4 @@
-/* secdb */
+/* secdb SUPPORT */
 /* lang=C20 */
 
 /* Security Data-Base (SecDB) management support */

@@ -1,9 +1,8 @@
-/* address */
+/* mailaddr SUPPORT */
+/* lang=C++20 */
 
 /* parse email route addresses into host and local parts */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,11 +16,12 @@
 
 /*****************************************************************************
 
-	This subroutine will parse email route addresses into hostname and
-	localname parts.  The assumption is that only route addresses are given
-	to us.  If this is wrong, the results are indeterminate.  The hostname
-	part is just the first host in the address as if the "focus" (using
-	SENDMAIL language) was on the first host.
+	This subroutine will parse email route addresses into
+	hostname and localname parts.  The assumption is that only
+	route addresses are given to us.  If this is wrong, the
+	results are indeterminate.  The hostname part is just the
+	first host in the address as if the "focus" (using SENDMAIL
+	language) was on the first host.
 
 	Synopsis:
 
@@ -31,7 +31,6 @@
 	char		parthost[], partlocal[] ;
 
 	Synopsis:
-
 	int addressjoin(buf,buflen,parthost,partlocal,type)
 	char		buf[] ;
 	int		buflen ;
@@ -39,7 +38,6 @@
 	int		type ;
 
 	Synopsis:
-
 	int addressarpa(buf,buflen,parthost,partlocal,type)
 	char		buf[] ;
 	int		buflen ;
@@ -47,7 +45,6 @@
 	int		type ;
 
 	Arguments:
-
 	buf		string buffer containing route address
 	buflen		length of string buffer
 	parthost	supplied buffer to receive parthost
@@ -55,22 +52,16 @@
 	type		type of address desired
 
 	Returns:
-
 	0		local address
 	1		UUCP
 	2		ARPAnet normal
 	3		ARPAnet route address
 	<0		bad address of some kind
 
-
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<string.h>
-
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -95,7 +86,6 @@ extern char	*strnrchr(const char *,int,int) ;
 
 
 /* exported subroutines */
-
 
 int addressparse(s,slen,parthost,partlocal)
 const char	s[] ;
