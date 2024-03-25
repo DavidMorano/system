@@ -1,5 +1,5 @@
 /* matsubstr SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* matsubstr (match a string) */
 /* version %I% last-modified %G% */
@@ -38,11 +38,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<six.h>
 #include	<localmisc.h>
+
+#include	"matxstr.h"
+
+
+/* local defines */
 
 
 /* external subroutines */
