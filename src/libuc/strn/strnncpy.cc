@@ -22,8 +22,10 @@
 	Description:
 	Copy a source string to a destination until either the end
 	of the source string is reached (by its end-marker) or the
-	length of the source string is exhausted.  Additionally we
-	always zero out to the length of the destination string.
+	length of the source string is exhausted.  We always zero
+	out to the length of the destination string.  The copy
+	terminates also on the exhaustion of the maximum-length
+	value.  The result is not NUL-terminated.
 
 	Synopsis:
 	char *strnncpy(char *d,cchar *s,int slen,int n) noex
@@ -40,12 +42,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>		/* |strncpy(3c)| */
+#include	<cstring>		/* |strncpy(3c)| | |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"strn.h"
 
@@ -59,6 +60,9 @@ using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
 
 
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -66,7 +70,13 @@ extern "C" {
 }
 
 
-/* local typedefs */
+/* external variables */
+
+
+/* forward references */
+
+
+/* local variables */
 
 
 /* exported variables */

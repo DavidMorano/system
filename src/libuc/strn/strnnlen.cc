@@ -39,9 +39,9 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strnlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"strn.h"
 
@@ -49,7 +49,28 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -58,7 +79,7 @@ int strnnlen(cchar *sp,int sl,int mlen) noex {
 	int		len = 0 ;
 	if (sp && (sl != 0) && (mlen != 0)) {
 	    if (sl >= 0) {
-	        if (mlen >= 0) sl = MIN(sl,mlen) ;
+	        if (mlen >= 0) sl = min(sl,mlen) ;
 	    } else {
 	        sl = mlen ;
 	    }

@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found (system-return)
+	<0		no match found (not further distinguished)
 
 *******************************************************************************/
 

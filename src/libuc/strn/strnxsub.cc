@@ -53,13 +53,12 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<cstring>		/* <- |strstr(3c)| + |strnstr(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<char.h>
 #include	<nleadstr.h>
-#include	<localmisc.h>
 
 #include	"strn.h"
 
@@ -79,8 +78,6 @@
 
 
 /* local typedefs */
-
-typedef char	*charp ;
 
 
 /* forward references */

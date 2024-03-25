@@ -1,4 +1,4 @@
-/* matostr */
+/* matostr SUPPORT */
 /* lang=C++20 */
 
 /* Match-Option-String */
@@ -36,7 +36,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found
+	<0		no match found (not further distinguished)
 
 
 	Name:
@@ -59,7 +59,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found
+	<0		no match found (not further distinguished)
 
 
 	Notes:
@@ -77,7 +77,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -88,7 +87,13 @@
 #include	"matostr.h"
 
 
-/* typedefs */
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 typedef int (*toxc_f)(int) noex ;
 typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
@@ -126,6 +131,9 @@ int matoxstr(cchar *const *a,int n,cchar *sp,int sl) noex {
 	return (a[i]) ? i : -1 ;
 }
 /* end subroutine-template (matoxstr) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -41,13 +41,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* <- for |UCHAR_MAX| */
 #include	<cstring>		/* |strlen(3c)| + |strchr(3c)| + ... */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"strnxchr.h"
 
@@ -73,6 +71,9 @@
 /* local typedefs */
 
 typedef char	*charp ;
+
+
+/* external subroutines */
 
 
 /* external subroutines */
@@ -107,7 +108,7 @@ char *strnochr(cchar *sp,int sl,int sch) noex {
 		        if (f) break ;
 	                sp += 1 ;
 	            } /* end while */
-		    if (f) rsp = ((char *) sp) ;
+		    if (f) rsp = charp( sp) ;
 	        } /* end if-constexpr (f_strchr) */
 	    } else {
 		if constexpr (f_memchr) {

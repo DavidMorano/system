@@ -37,9 +37,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstring.h>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"strn.h"
 

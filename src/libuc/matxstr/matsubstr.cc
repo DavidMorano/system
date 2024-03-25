@@ -33,7 +33,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found (system-return)
+	<0		no match found (not further distinguished)
 
 *******************************************************************************/
 
@@ -68,7 +68,7 @@
 /* exported subroutines */
 
 int matsubstr(mainv a,cchar *sp,int sl) noex {
-	int		i = 0 ;
+	int		i = 0 ; /* used afterwards */
 	for (i = 0 ; a[i] ; i += 1) {
 	    if (sisub(sp,sl,a[i]) >= 0) break ;
 	} /* end for */
