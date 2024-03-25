@@ -24,29 +24,17 @@
 	language) was on the first host.
 
 	Synopsis:
-
 	int mailaddrparse(dp,dl,mahost,malocal)
-	cchar	buf[] ;
-	int		buflen ;
-	char		mahost[], malocal[] ;
 
 	Synopsis:
 	int mailaddrjoin(dp,dl,mahost,malocal,type)
-	char		buf[] ;
-	int		buflen ;
-	cchar	mahost[], malocal[] ;
-	int		type ;
 
 	Synopsis:
 	int mailaddrarpa(dp,dl,mahost,malocal,type)
-	char		buf[] ;
-	int		buflen ;
-	cchar	mahost[], malocal[] ;
-	int		type ;
 
 	Arguments:
-	buf		string buffer containing route address
-	buflen		length of string buffer
+	dp		string buffer containing route address
+	dl		length of string buffer
 	mahost	supplied buffer to receive mahost
 	malocal	supplied buffer to receive malocal
 	type		type of address desired
