@@ -1,5 +1,5 @@
 /* strnset SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* set a string to a number of characters */
 /* version %I% last-modified %G% */

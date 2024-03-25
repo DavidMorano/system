@@ -1,14 +1,13 @@
-/* strnnlen SUPPORT */
-/* lang=C20 */
+/* strnlen SUPPORT */
+/* lang=C++20 */
 
-
-/* calculate the length of a counted c-string */
+/* calculate the length of a c-string */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-02-01, David A­D­ Morano
+	= 1998-03-17, David A­D­ Morano
 	This subroutine was originally written.
 
 */
@@ -18,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	strnnlen
+	strnlen
 
 	Description:
 	This subroutine computes the length of a supplied string
@@ -26,20 +25,18 @@
 	length.
 
 	Synopsis:
-	int strnnlen(cchar *sp,int sl,int max) noex
+	int strnlen(cchar *s,int n) noex
 
 	Arguments:
-	sp	string to be examined
-	sl	length of string (or -1)
-	nax	maximum length of string to be examined
+	s	string to be examined
+	n	maximum length of string to be examined
 
 	Returns:
-	len	mimimum of length of string or MIN(slen,max)
+	len	mimimum of length of string or 'n' above
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string.h>		/* <- for |strnlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -50,23 +47,24 @@
 /* local defines */
 
 
-/* external subroutines */
+/* exported variables */
 
 
 /* exported subroutines */
 
-int strnnlen(cchar *sp,int sl,int mlen) noex {
-	int		len = 0 ;
-	if (sp && (sl != 0) && (mlen != 0)) {
-	    if (sl >= 0) {
-	        if (mlen >= 0) sl = MIN(sl,mlen) ;
+int strnlen(cchar *s,int n) noex {
+	int	i = 0 ;
+	if (s) {
+	    if (n >= 0) {
+	        for (i = 0 ; (i < n) && *s ; i += 1) {
+	            s += 1 ;
+	        }
 	    } else {
-	        sl = mlen ;
+	        i = strlen(s) ;
 	    }
-	    len = strnlen(sp,sl) ;
-	} /* end if */
-	return len ;
+	} /* end if (non-null) */
+	return i ;
 }
-/* end subroutine (strnnlen) */
+/* end subroutine (strnlen) */
 
 

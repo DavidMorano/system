@@ -32,15 +32,15 @@ EXTERNC_begin
 
 /* calculate string length */
 extern int strnnlen(cchar *,int,int) noex ;
-
 /* find */
 extern char *strnsub(cchar *,int,cchar *) noex ;
 extern char *strncasesub(cchar *,int,cchar *) noex ;
-
-/* copy-set */
-extern char *strnset(char *,int,int) noex ;
+/* copy */
 extern char *strnncpy(char *,cchar *,int,int) noex ;
 extern char *strnwcpy(char *,int,cchar *,int) noex ;
+/* set */
+extern char *strnset(char *,int,int) noex ;
+extern char *strnset(char *,int,int) noex ;
 
 static inline char *strnsetblanks(char *dp,int dl) noex {
 	return strnset(dp,dl,' ') ;
