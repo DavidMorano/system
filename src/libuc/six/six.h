@@ -22,6 +22,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+#include	<sifext.h>
+
 
 EXTERNC_begin
 

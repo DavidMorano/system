@@ -39,6 +39,7 @@
 #include	<ids.h>
 #include	<envhelp.h>
 #include	<vecpstr.h>
+#include	<six.h>
 #include	<hasx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -77,7 +78,7 @@ extern int	matstr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecti(cchar *,int,int *) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,USTAT	 *,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	chmods(cchar *,mode_t) ;
 extern int	isNotPresent(int) ;
@@ -329,7 +330,7 @@ badprogstart:
 
 static int proc_devino(PROGINFO *pip)
 {
-	const int	tlen = MAXPATHLEN ;
+	cint	tlen = MAXPATHLEN ;
 	int		rs ;
 	char		tbuf[MAXPATHLEN+1] ;
 
@@ -338,7 +339,7 @@ static int proc_devino(PROGINFO *pip)
 #endif
 
 	if ((rs = proginfo_getename(pip,tbuf,tlen)) >= 0) {
-	    struct ustat	sb ;
+	    USTAT		sb ;
 #if	CF_DEBUGS
 	    debugprintf("main/proc_devino: ent tbuf=%s\n",tbuf) ;
 #endif
@@ -373,7 +374,7 @@ static int proc_idsend(PROGINFO *pip)
 
 static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar **argv)
 {
-	const int	clen = MAXNAMELEN ;
+	cint	clen = MAXNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		f_found = false ;
@@ -403,7 +404,7 @@ static int proc_find(PROGINFO *pip,ENVHELP *elp,cchar *bn,cchar **argv)
 
 static int proc_progok(PROGINFO *pip,cchar *progfname)
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs ;
 	int		f = false ;
 #if	CF_DEBUGS
@@ -412,7 +413,7 @@ static int proc_progok(PROGINFO *pip,cchar *progfname)
 	if ((rs = uc_stat(progfname,&sb)) >= 0) {
 #if	CF_DEBUGS
 	    {
-	        const int	mlen = TIMEBUFLEN ;
+	        cint	mlen = TIMEBUFLEN ;
 	        char		mbuf[TIMEBUFLEN+1] ;
 	        snfilemode(mbuf,mlen,sb.st_mode) ;
 	        debugprintf("main/proc_progok: mode=%s (%07o)\n",
@@ -463,7 +464,7 @@ static int proc_exec(PROGINFO *pip,cchar *rbuf,cchar **argv,cchar **penvv)
 		    debugargs(va) ;
 #else /* CF_DEBUGARGS */
 #ifdef	COMMENT
-		    const int	rsn = SR_NOTENT ;
+		    cint	rsn = SR_NOTENT ;
 	            if ((rs = uc_execve(rbuf,va,penvv)) == rsn) {
 	                rs = uc_isaexecve(rbuf,va,penvv) ;
 	            }
@@ -497,7 +498,7 @@ static int proc_args(PROGINFO *pip,VECPSTR *alp,cchar **argv)
 		        f_del = true ;
 		    } else {
 		        if (! f_del) {
-			    if ((a[0] != '-') && hasfext(a,-1,assexts)) {
+			    if ((a[0] != '-') && (sifext(a,-1,assexts) > 0)) {
 				rs = proc_savecopy(pip,a) ;
 			    }
 			    if (rs >= 0) {
@@ -514,10 +515,8 @@ static int proc_args(PROGINFO *pip,VECPSTR *alp,cchar **argv)
 }
 /* end subroutine (proc_args) */
 
-
-static int proc_savecopy(PROGINFO *pip,cchar *a)
-{
-	struct ustat	sb ;
+static int proc_savecopy(PROGINFO *pip,cchar *a) noex {
+	USTAT		sb ;
 	bfile		cfile, *cfp = &cfile ;
 	int		rs ;
 	int		rs1 ;
@@ -525,7 +524,7 @@ static int proc_savecopy(PROGINFO *pip,cchar *a)
 	cchar		*dn = COPYDNAME ;
 	if ((rs = uc_stat(dn,&sb)) >= 0) {
 	    if (S_ISDIR(sb.st_mode)) {
-		const int	am = (X_OK|W_OK) ;
+		cint	am = (X_OK|W_OK) ;
 		if ((rs = sperm(&pip->id,&sb,am)) >= 0) {
 	            char	cbuf[MAXPATHLEN+1] ;
 	            if ((rs = mkcfname(cbuf,dn,a)) >= 0) {
@@ -549,9 +548,7 @@ static int proc_savecopy(PROGINFO *pip,cchar *a)
 }
 /* end subroutine (proc_savecopy) */
 
-
-static int mkcfname(char *cbuf,cchar *dn,cchar *a)
-{
+static int mkcfname(char *cbuf,cchar *dn,cchar *a) noex {
 	int		rs = SR_OK ;
 	int		bl ;
 	cchar		*bp ;
@@ -564,10 +561,8 @@ static int mkcfname(char *cbuf,cchar *dn,cchar *a)
 }
 /* end subroutine (mkcfname) */
 
-
 #if	CF_DEBUGS && CF_DEBUGARGS
-static int debugargs(cchar **va)
-{
+static int debugargs(cchar **va) noex {
 	int	i ;
 	for (i = 0 ; va[i] != nullptr ; i += 1) {
 	   debugprintf("main: a[%02u]=%s\n",i,va[i]) ;

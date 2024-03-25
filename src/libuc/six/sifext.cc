@@ -1,7 +1,7 @@
-/* hasfext SUPPORT */
+/* sifext SUPPORT */
 /* lang=C++20 */
 
-/* determine if file-name (just a string) has an approved file-extension */
+/* determine if file-name (just a c-string) has an approved file-extension */
 /* version %I% last-modified %G% */
 
 
@@ -17,22 +17,23 @@
 /*******************************************************************************
 
 	Name:
-	hasfext
+	sifext
 
 	Description:
-        Given a file-name (a counted string) we determine if it has a
-        file-extension of a given class.
+        Given a file-name (a counted c-string) we determine if it has a
+        file-extension of a given set.
 
 	Synopsis:
-	int hasfext(cchar **exts,cchar *fp,int fl) noex
+	int sifext(cchar *fp,int fl,mainv exts) noex
 
 	Arguments:
-	exts		arrays of strings (allowable extensions)
 	fp		file-name string
 	fl		file-name length
+	exts		arrays of strings (allowable extensions)
 
 	Returns:
-	==0		does not have an approved extension
+	<0		does not have an approved extension
+	==0		has an approved extension, but has no base part
 	>0              has an approved extension (and this is
 			base-str length)
 
@@ -46,7 +47,7 @@
 #include	<strn.h>
 #include	<localmisc.h>
 
-#include	"hasfext.h"
+#include	"sifext.h"
 
 
 /* local defines */
@@ -69,24 +70,18 @@
 
 /* exported subroutines */
 
-int hasfext(cchar **exts,cchar *fp,int fl) noex {
-	cchar		*tp ;
-	int		si = 0 ;
-	bool		f = false ;
+int sifext(cchar *fp,int fl,mainv exts) noex {
+	int		si = -1 ;
 	if (fl < 0) fl = strlen(fp) ;
-	if ((tp = strnrchr(fp,fl,'.')) != nullptr) {
+	if (cchar *tp ; (tp = strnrchr(fp,fl,'.')) != nullptr) {
 	    cint	el = ((fp+fl)-(tp+1)) ;
 	    cchar	*ep = (tp+1) ;
-	    si = (tp-fp) ;
-	    if (el > 0) {
-	        f = (matstr(exts,ep,el) >= 0) ;
+	    if ((el > 0) && (matstr(exts,ep,el) >= 0)) {
+	    	si = (tp-fp) ;
 	    }
-	} else {
-	    si = fl ;
-	    f = (matstr(exts,fp,0) >= 0) ;
-	}
-	return (f) ? si : 0 ;
+	} /* end if(had extension) */
+	return si ;
 }
-/* end subroutine (hasfext) */
+/* end subroutine (sifext) */
 
 

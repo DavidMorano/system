@@ -44,9 +44,9 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -56,6 +56,7 @@
 #include	<storebuf.h>
 #include	<upt.h>
 #include	<endianstr.h>
+#include	<six.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 
@@ -707,7 +708,7 @@ static int work_objloads(WORK *wp,THREAD *tip,char *dbuf,int dlen)
 	        nl = rs ;
 	        if (hasNotDots(np,nl)) {
 	            int	ol ;
-	            if ((ol = hasfext(np,nl,exts)) > 0) {
+	            if ((ol = sifext(np,nl,exts)) > 0) {
 	                if ((rs = pathadd(dbuf,dlen,np)) >= 0) {
 #if	CF_DEBUGS
 	debugprintf("pcspolls/work_objloads: db=%s\n",dbuf) ;

@@ -1,4 +1,4 @@
-/* hasfext HEADER */
+/* sifext HEADER */
 /* lang=C20 */
 
 /* determine if file-name (just a string) has an approved file-extension */
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	HASFEXT_INCLUDE
-#define	HASFEXT_INCLUDE
+#ifndef	SIFEXT_INCLUDE
+#define	SIFEXT_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -25,11 +25,11 @@
 
 EXTERNC_begin
 
-extern int hasfext(cchar **,cchar *,int) noex ;
+extern int	sifext(cchar *,int,mainv) noex ;
 
 EXTERNC_end
 
 
-#endif /* HASFEXT_INCLUDE */
+#endif /* SIFEXT_INCLUDE */
 
 

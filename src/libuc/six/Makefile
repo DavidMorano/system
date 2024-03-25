@@ -58,10 +58,11 @@ OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
 OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
 OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
 OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
+OBJ4_SIX= sifext.o
 
 
 OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
 
 OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
 
@@ -120,5 +121,11 @@ obj2_six.o:	$(OBJ2_SIX)
 
 obj3_six.o:	$(OBJ3_SIX)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+
+obj4_six.o:	$(OBJ4_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
+
+
+sifext.o:		sifext.cc sifext.h
 
 
