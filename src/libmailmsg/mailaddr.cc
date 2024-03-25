@@ -25,30 +25,30 @@
 
 	Synopsis:
 
-	int addressparse(buf,buflen,parthost,partlocal)
-	const char	buf[] ;
+	int mailaddrparse(dp,dl,mahost,malocal)
+	cchar	buf[] ;
 	int		buflen ;
-	char		parthost[], partlocal[] ;
+	char		mahost[], malocal[] ;
 
 	Synopsis:
-	int addressjoin(buf,buflen,parthost,partlocal,type)
+	int mailaddrjoin(dp,dl,mahost,malocal,type)
 	char		buf[] ;
 	int		buflen ;
-	const char	parthost[], partlocal[] ;
+	cchar	mahost[], malocal[] ;
 	int		type ;
 
 	Synopsis:
-	int addressarpa(buf,buflen,parthost,partlocal,type)
+	int mailaddrarpa(dp,dl,mahost,malocal,type)
 	char		buf[] ;
 	int		buflen ;
-	const char	parthost[], partlocal[] ;
+	cchar	mahost[], malocal[] ;
 	int		type ;
 
 	Arguments:
 	buf		string buffer containing route address
 	buflen		length of string buffer
-	parthost	supplied buffer to receive parthost
-	partlocal	supplied buffer to receive partlocal
+	mahost	supplied buffer to receive mahost
+	malocal	supplied buffer to receive malocal
 	type		type of address desired
 
 	Returns:
@@ -61,316 +61,256 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<storebuf.h>
+#include	<strn.h>
+#include	<sncpyx.h>
+#include	<snwcpy.h>
 #include	<localmisc.h>
 
-#include	"address.h"
+#include	"mailaddr.h"
 
 
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int addressparse(s,slen,parthost,partlocal)
-const char	s[] ;
-int		slen ;
-char		parthost[], partlocal[] ;
-{
+int mailaddrparse(cc *sp,int sl,char *mahost,char *malocal) noex {
 	int		rs = SR_OK ;
 	int		t ;
 	int		mal = MAILADDRLEN ;
-	const char	*localhostpart = ADDRESS_LOCALHOST ;
-	const char	*cp ;
-	const char	*cp1, *cp2 ;
+	cchar	*localhostpart = MAILADDR_LOCALHOST ;
+	cchar	*cp ;
+	cchar	*cp1, *cp2 ;
 
-	if (s == NULL) return SR_FAULT ;
-	if (parthost == NULL) return SR_FAULT ;
-	if (partlocal == NULL) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
+	if (mahost == nullptr) return SR_FAULT ;
+	if (malocal == nullptr) return SR_FAULT ;
 
-	parthost[0] = '\0' ;
-	partlocal[0] = '\0' ;
-	if (slen < 0)
-	    slen = strlen(s) ;
+	mahost[0] = '\0' ;
+	malocal[0] = '\0' ;
+	if (sl < 0) sl = strlen(sp) ;
 
 /* what kind of address do we have? */
 
-	if ((cp1 = strnchr(s,slen,'@')) != NULL) {
-
-#if	CF_DEBUGS
-	    debugprintf("addressparse: @\n") ;
-#endif
-
-	    if ((cp2 = strnchr(s,slen,':')) != NULL) {
-
-#if	CF_DEBUGS
-	        debugprintf("addressparse: :\n") ;
-#endif
-
+	if ((cp1 = strnchr(sp,sl,'@')) != nullptr) {
+	    if ((cp2 = strnchr(sp,sl,':')) != nullptr) {
 /* ARPAnet route address */
-
-	        t = ADDRESSTYPE_ARPAROUTE ;
-	        if ((cp = strnchr(s,slen,',')) != NULL) {
-
-	            if (rs >= 0)
-	                rs = snwcpy(parthost,mal,(cp1 + 1),(cp - (cp1 + 1))) ;
-
-	            if (rs >= 0)
-	                rs = sncpy1(partlocal,mal,(cp + 1)) ;
-
+	        t = MAILADDRTYPE_ARPAROUTE ;
+	        if ((cp = strnchr(sp,sl,',')) != nullptr) {
+	            if (rs >= 0) {
+	                rs = snwcpy(mahost,mal,(cp1 + 1),(cp - (cp1 + 1))) ;
+		    }
+	            if (rs >= 0) {
+	                rs = sncpy1(malocal,mal,(cp + 1)) ;
+		    }
 	        } else {
-
-	            if (rs >= 0)
-	                rs = snwcpy(parthost,mal,(cp1 + 1),cp2 - (cp1 + 1)) ;
-
-	            if (rs >= 0)
-	                rs = sncpy1(partlocal,mal,(cp2 + 1)) ;
-
+	            if (rs >= 0) {
+	                rs = snwcpy(mahost,mal,(cp1 + 1),cp2 - (cp1 + 1)) ;
+		    }
+	            if (rs >= 0) {
+	                rs = sncpy1(malocal,mal,(cp2 + 1)) ;
+		    }
 	        } /* end if */
-
 	    } else {
-
 /* normal ARPAnet address */
-
-	        t = ADDRESSTYPE_ARPA ;
-	        if (rs >= 0)
-	            rs = sncpy1(parthost,mal,(cp1 + 1)) ;
-
-	        if (rs >= 0)
-	            rs = snwcpy(partlocal,mal,s,(cp1 - s)) ;
-
+	        t = MAILADDRTYPE_ARPA ;
+	        if (rs >= 0) {
+	            rs = sncpy1(mahost,mal,(cp1 + 1)) ;
+		}
+	        if (rs >= 0) {
+	            rs = snwcpy(malocal,mal,sp,(cp1 - sp)) ;
+		}
 	    } /* end if */
-
-	} else if ((cp = strnrchr(s,slen,'!')) != NULL) {
-
-#if	CF_DEBUGS
-	    debugprintf("addressparse: !\n") ;
-#endif
-
-	    t = ADDRESSTYPE_UUCP ;
-	    if (rs >= 0)
-	        rs = snwcpy(parthost,mal,s,(cp - s)) ;
-
-	    if (rs >= 0)
-	        rs = sncpy1(partlocal,mal,(cp + 1)) ;
-
+	} else if ((cp = strnrchr(sp,sl,'!')) != nullptr) {
+	    t = MAILADDRTYPE_UUCP ;
+	    if (rs >= 0) {
+	        rs = snwcpy(mahost,mal,sp,(cp - sp)) ;
+	    }
+	    if (rs >= 0) {
+	        rs = sncpy1(malocal,mal,(cp + 1)) ;
+	    }
 	} else {
-
-#if	CF_DEBUGS
-	    debugprintf("addressparse: NONE@\n") ;
-#endif
-
 /* local */
-
-	    t = ADDRESSTYPE_LOCAL ;
-	    if (rs >= 0)
-	        rs = sncpy1(parthost,mal,localhostpart) ;
-
-	    if (rs >= 0)
-	        rs = sncpy1(partlocal,mal,s) ;
-
+	    t = MAILADDRTYPE_LOCAL ;
+	    if (rs >= 0) {
+	        rs = sncpy1(mahost,mal,localhostpart) ;
+	    }
+	    if (rs >= 0) {
+	        rs = snwcpy(malocal,mal,sp,sl) ;
+	    }
 	} /* end if */
-
 /* perform some cleanup on host-domain part (remove stupid trailing dots) */
-
-	{
-	    int	cl = strlen(parthost) ;
-	    while ((cl > 0) && (parthost[cl - 1] == '.')) {
+	if (rs >= 0) {
+	    int		cl = strlen(mahost) ;
+	    while ((cl > 0) && (mahost[cl - 1] == '.')) {
 	        cl -= 1 ;
 	    }
-	    parthost[cl] = '\0' ;
-	}
+	    mahost[cl] = '\0' ;
+	} /* end if (ok) */
 
 	return (rs >= 0) ? t : rs ;
 }
 /* end subroutine (addressparse) */
 
-
 /* put an address back together as it was ORIGINALLY */
-int addressjoin(buf,buflen,parthost,partlocal,type)
-char		buf[] ;
-int		buflen ;
-const char	parthost[], partlocal[] ;
-int		type ;
-{
-	int		rs = SR_OK ;
+int mailaddrjoin(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
+	int		rs = SR_FAULT ;
 	int		i = 0 ;
-
-	if (type >= 0) {
-
-	    switch (type) {
-
-	    case ADDRESSTYPE_LOCAL:
-	  	{
-	            rs = storebuf_strw(buf,buflen,i,partlocal,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    case ADDRESSTYPE_UUCP:
-		{
-	            rs = storebuf_strw(buf,buflen,i, parthost,-1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, "!",1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    case ADDRESSTYPE_ARPA:
-		{
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, "@",1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, parthost,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    case ADDRESSTYPE_ARPAROUTE:
-		{
-	            rs = storebuf_strw(buf,buflen,0, "@",1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, parthost,-1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            if (strchr(partlocal,':') != NULL) {
-	                rs = storebuf_strw(buf,buflen,i, ",",1) ;
-	            } else
-	                rs = storebuf_strw(buf,buflen,i, ":",1) ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    } /* end switch */
-
-	} else {
-
-	    rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	    i += rs ;
-
-	} /* end if */
-
+	if (dp && mahost && malocal) {
+	    rs = SR_INVALID ;
+	    if (type >= 0) {
+		rs = SR_OK ;
+	        switch (type) {
+	        case MAILADDRTYPE_LOCAL:
+	  	    {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        case MAILADDRTYPE_UUCP:
+		    {
+	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,"!",1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        case MAILADDRTYPE_ARPA:
+		    {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,"@",1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        case MAILADDRTYPE_ARPAROUTE:
+		    {
+	                rs = storebuf_strw(dp,dl,0, "@",1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                if (strchr(malocal,':') != nullptr) {
+	                    rs = storebuf_strw(dp,dl,i,",",1) ;
+	                } else {
+	                    rs = storebuf_strw(dp,dl,i,":",1) ;
+	                    i += rs ;
+		        }
+	            }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        } /* end switch */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (addressjoin) */
-
+/* end subroutine (mailaddjoin) */
 
 /* put an address back together as its ARPA form only */
-int addressarpa(buf,buflen,parthost,partlocal,type)
-char		buf[] ;
-int		buflen ;
-const char	parthost[], partlocal[] ;
-int		type ;
-{
-	int		rs = SR_OK ;
+int mailaddrarpa(char *dp,int dl,cc *mahost,cc *malocal,int type) noex {
+	int		rs = SR_FAULT ;
 	int		i = 0 ;
-
-	if (type >= 0) {
-
-	    switch (type) {
-
-	    case ADDRESSTYPE_LOCAL:
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    case ADDRESSTYPE_UUCP:
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, "@",1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, parthost,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    case ADDRESSTYPE_ARPA:
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, "@",1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, parthost,-1) ;
-	            i += rs ;
-		}
-	        break ;
-
-	    case ADDRESSTYPE_ARPAROUTE:
-		if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, "@",1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, parthost,-1) ;
-	            i += rs ;
-		}
-	        if (rs >= 0) {
-	            if (strchr(partlocal,':') != NULL) {
-	                rs = storebuf_strw(buf,buflen,i, ",",1) ;
-	            } else
-	                rs = storebuf_strw(buf,buflen,i, ":",1) ;
-	            i += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	            i += rs ;
-		}
-
-	        break ;
-
-	    } /* end switch */
-
-	} else {
-	    rs = storebuf_strw(buf,buflen,i, partlocal,-1) ;
-	    i += rs ;
-	}
-
+	if (dp && mahost && malocal) {
+	    rs = SR_INVALID ;
+	    if (type >= 0) {
+	        rs = SR_OK ;
+	        switch (type) {
+	        case MAILADDRTYPE_LOCAL:
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        case MAILADDRTYPE_UUCP:
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,"@",1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        case MAILADDRTYPE_ARPA:
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,"@",1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        case MAILADDRTYPE_ARPAROUTE:
+		    if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,"@",1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,mahost,-1) ;
+	                i += rs ;
+		    }
+	            if (rs >= 0) {
+	                if (strchr(malocal,':') != nullptr) {
+	                    rs = storebuf_strw(dp,dl,i,",",1) ;
+	                } else
+	                    rs = storebuf_strw(dp,dl,i,":",1) ;
+	                i += rs ;
+	            }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(dp,dl,i,malocal,-1) ;
+	                i += rs ;
+		    }
+	            break ;
+	        } /* end switch */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (addressarpa) */
+/* end subroutine (mailaddrarpa) */
 
 

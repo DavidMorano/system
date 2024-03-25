@@ -1,13 +1,26 @@
-/* address */
+/* ma SUPPORT */
+/* lang=C++20 */
 
 /* process mail address strings */
+/* version %I% last-modified %G% */
 
+/* revision history:
 
+	= 1998-04-13, David A-D- Morano
+	Originally written for Rightcore Network Services.
 
-#include	<string.h>
-#include	<stdio.h>
+*/
 
-#include	"localmisc.h"
+/*******************************************************************************
+
+	Some sort of messsaging object.
+
+*******************************************************************************/
+
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring>
+#include	<localmisc.h>
+
 #include	"defs.h"
 
 
@@ -51,55 +64,42 @@ char	s[] ;
 	c_quote = 0 ;
 	f_end = FALSE ;
 	while (*cp != '\0') {
-
 	    switch (*cp) {
-
 	    case '\\':
 	        if ((c_quote > 0) && (cp[1] != '\0'))
 	            cp += 1 ;
 
 	        break ;
-
 	    case '"':
-	        if (c_quote == 1)
+	        if (c_quote == 1) {
 	            c_quote = 0 ;
-
-	        else 
+	        } else  {
 	            c_quote = 1 ;
-
+		}
 	        break ;
-
 	    case '(':
-	        if (c_quote == 0) c_comment += 1 ;
-
+	        if (c_quote == 0) {
+		    c_comment += 1 ;
+		}
 	        break ;
-
 	    case ')':
-	        if ((c_quote == 0) && (c_comment > 0))
+	        if ((c_quote == 0) && (c_comment > 0)) {
 	            c_comment -= 1 ;
-
+		}
 	        break ;
-
 	    case ',':
-	        if ((c_quote == 0) && (c_comment == 0))
+	        if ((c_quote == 0) && (c_comment == 0)) {
 	            f_end = TRUE ;
-
+		}
 	        break ;
-
 	    } /* end switch */
-
 	    if (f_end) break ;
-
 	    cp += 1 ;
-
 	} /* end while */
-
 	if (f_end) *cp = '\0' ;
-
 	return cp2 ;
 }
 /* end subroutine (ma_next) */
-
 
 /* extract a mail route path out of the address */
 char *ma_path(p)

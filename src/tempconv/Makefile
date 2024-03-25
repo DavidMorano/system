@@ -1,6 +1,6 @@
 # MAKEFILE
 
-T= temp
+T= tempconv
 
 ALL= $(T)
 

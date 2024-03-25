@@ -1,4 +1,0 @@
-TMAIL
-
-Test Mail (TMail).
-
