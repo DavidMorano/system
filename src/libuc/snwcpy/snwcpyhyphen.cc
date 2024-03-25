@@ -49,7 +49,6 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 

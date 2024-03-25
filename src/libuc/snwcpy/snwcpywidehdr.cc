@@ -56,13 +56,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* presumably for |wchar_t| type */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<strmgr.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 

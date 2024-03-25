@@ -21,19 +21,23 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<climits>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |INT_MAX| */
 #include	<utypedefs.h>
 #include	<usysrets.h>
 #include	<toxc.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 #include	"snwcpyxc.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -54,6 +58,9 @@ int snwcpyxc(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	return ((sl == 0) || (sp[i] == '\0')) ? (dp - dbuf) : SR_OVERFLOW ;
 }
 /* end subroutine-template (snwcpyxc) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

@@ -51,7 +51,6 @@
 #include	<usystem.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
@@ -77,7 +76,7 @@ int snwcpyopaque(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    cint	ch = mkchar(*sp) ;
 	    if (! CHAR_ISWHITE(ch)) {
 		if (dlen-- == 0) break ;
-		dbuf[dl++] = (char) ch ;
+		dbuf[dl++] = char(ch) ;
 	    } /* end if */
 	    sp += 1 ;
 	    sl -= 1 ;

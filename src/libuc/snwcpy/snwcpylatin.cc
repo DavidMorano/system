@@ -57,7 +57,6 @@
 #include	<usystem.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 

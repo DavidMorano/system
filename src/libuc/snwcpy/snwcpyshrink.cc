@@ -48,11 +48,10 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<usystem.h>
 #include	<ascii.h>
-#include	<sfx.h>
 #include	<strmgr.h>
+#include	<sfx.h>
 #include	<strn.h>
 #include	<char.h>
-#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 

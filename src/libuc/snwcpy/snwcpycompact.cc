@@ -60,7 +60,6 @@
 #include	<usystem.h>
 #include	<strmgr.h>
 #include	<sfx.h>
-#include	<localmisc.h>
 
 #include	"snwcpyx.h"
 
