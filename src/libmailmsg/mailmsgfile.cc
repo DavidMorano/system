@@ -60,6 +60,7 @@
 #include	<mkpathx.h>
 #include	<pathadd.h>
 #include	<strwcpy.h>
+#include	<rmx.h>
 #include	<cfdec.h>
 #include	<char.h>
 #include	<localmisc.h>		/* |COLUMNS| + |NTABCOLS| */
@@ -552,41 +553,42 @@ static int mailmsgfile_procout(MMF *op,filebuf *fbp,int li,cc *lp,int ll,
 		int f_cont) noex {
 	cint		ind = op->ind ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		wlen = 0 ;
-	int		f_eol = false ;
 	if ((li > 0) && (ind > 0)) {
 	    rs = filebuf_writeblanks(fbp,ind) ;
 	    wlen += rs ;
 	}
 	if (rs >= 0) {
-	    cint	outlen = OUTBUFLEN ;
-	    char	outbuf[OUTBUFLEN + 1] ;
-	    f_eol = ((ll > 0) && (lp[ll-1] == '\n')) ;
-	    if ((rs = mkdisplayable(outbuf,outlen,lp,ll)) >= 0) {
-	        int	olen = rs ;
-	        if (f_cont) {
-	            if ((olen > 0) && (outbuf[olen-1] == '\n')) {
-	                olen -= 1 ;
-		    }
-	            if ((rs = filebuf_write(fbp,outbuf,olen)) >= 0) {
-	                wlen += rs ;
+	    cint	olen = var.outbuflen ;
+	    char	*obuf{} ;
+	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
+		bool	f_eol = ((ll > 0) && (lp[ll-1] == '\n')) ;
+	        if ((rs = mkdisplayable(obuf,olen,lp,ll)) >= 0) {
+	            cint	ol = rmeol(obuf,rs) ;
+	            if (f_cont) {
+	                if ((rs = filebuf_write(fbp,obuf,ol)) >= 0) {
+	                    wlen += rs ;
+	                    f_eol = true ;
+	                    obuf[0] = '¬' ;
+	                    obuf[1] = '\n' ;
+	                    rs = filebuf_write(fbp,obuf,2) ;
+	                    wlen += rs ;
+	                } /* end if (filebuf_write) */
+	            } else {
 	                f_eol = true ;
-	                outbuf[0] = '¬' ;
-	                outbuf[1] = '\n' ;
-	                rs = filebuf_write(fbp,outbuf,2) ;
+	                rs = filebuf_println(fbp,obuf,olen) ;
 	                wlen += rs ;
 	            }
-	        } else {
-	            f_eol = true ;
-	            rs = filebuf_println(fbp,outbuf,olen) ;
-	            wlen += rs ;
-	        }
-	    } /* end if (mkdisplayable) */
-	    if ((rs >= 0) && (! f_eol)) {
-	        outbuf[0] = '\n' ;
-	        rs = filebuf_write(fbp,outbuf,1) ;
-	        wlen += rs ;
-	    }
+	            if ((rs >= 0) && (! f_eol)) {
+	                obuf[0] = '\n' ;
+	                rs = filebuf_write(fbp,obuf,1) ;
+	                wlen += rs ;
+	            }
+	        } /* end if (mkdisplayable) */
+		rs1 = uc_free(obuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (ok) */
 	return (rs >= 0) ? wlen : rs ;
 }
