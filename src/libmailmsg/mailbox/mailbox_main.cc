@@ -35,6 +35,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
+#include	<csignal>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -107,20 +108,16 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
 using std::max ;			/* subroutine-template */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	filebuf_writefd(filebuf *,char *,int,int,int) noex ;
-    extern int	filebuf_writehdr(filebuf *,cchar *,int) noex ;
-    extern int	filebuf_writehdrval(filebuf *,cchar *,int) noex ;
-}
 
 extern "C" {
     extern int	tmpmailboxes(char *,int) noex ;
@@ -168,8 +165,11 @@ template<typename ... Args>
 static int mailbox_ctor(mailbox *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    rs = SR_NOMEM ;
 	    memclear(op) ;		/* dangerous */
+	    if ((op->mlp = new(nothrow) vecobj) != nullptr) {
+		rs = SR_OK ;
+	    } /* end if (new-vecobj) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -179,6 +179,10 @@ static int mailbox_dtor(mailbox *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->mlp) {
+		delete op->mlp ;
+		op->mlp = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -290,7 +294,7 @@ int mailbox_close(mailbox *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    {
-	        rs1 = vecobj_finish(&op->msgs) ;
+	        rs1 = vecobj_finish(op->mlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    if (op->mailfname) {
@@ -365,7 +369,7 @@ int mailbox_msgdel(mailbox *op,int mi,int f) noex {
 	    	    rs = SR_ROFS ;
 	            if (! op->f.readonly) {
 			void	*vp{} ;
-	                if ((rs = vecobj_get(&op->msgs,mi,&vp)) >= 0) {
+	                if ((rs = vecobj_get(op->mlp,mi,&vp)) >= 0) {
 	                    MB_MI	*mp = (MB_MI *) vp ;
 	                    f_prev = mp->cmd.msgdel ;
 	                    if (! LEQUIV(f,f_prev)) {
@@ -405,7 +409,7 @@ int mailbox_msgoff(mailbox *op,int mi,off_t *offp) noex {
 		rs = SR_NOTFOUND ;
 	        if (mi < op->msgs_total) {
 	            void	*vp{} ;
-	            if ((rs = vecobj_get(&op->msgs,mi,&vp)) >= 0) {
+	            if ((rs = vecobj_get(op->mlp,mi,&vp)) >= 0) {
 	                MB_MI	*mp = (MB_MI *) vp ;
 	                *offp = mp->hoff ;
 	                mlen = mp->mlen ;
@@ -428,7 +432,7 @@ int mailbox_msgret(mailbox *op,int mi,MB_MI **rpp) noex {
 	        rs = SR_NOTFOUND ;
 	        if (mi < op->msgs_total) {
 	            void	*vp{} ;
-	            if ((rs = vecobj_get(&op->msgs,mi,&vp)) >= 0) {
+	            if ((rs = vecobj_get(op->mlp,mi,&vp)) >= 0) {
 	                MB_MI	*mp = (MB_MI *) vp ;
 	                *rpp = mp ;
 	                mlen = mp->mlen ;
@@ -447,7 +451,7 @@ int mailbox_msghdradd(mailbox *op,int mi,cchar *k,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (k[0]) {
 	        void	*vp{} ;
-	        if ((rs = vecobj_get(&op->msgs,mi,&vp)) >= 0) {
+	        if ((rs = vecobj_get(op->mlp,mi,&vp)) >= 0) {
 	            MB_MI	*mp = (MB_MI *) vp ;
 	            if (! mp->f.hdradds) {
 	                mp->f.hdradds = true ;
@@ -568,7 +572,7 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	                cint	vo = VECOBJ_OCOMPACT ;
 	                op->mailfname = cp ;
 	                nmsgs = MAILBOX_DEFMSGS ;
-	                if ((rs = vecobj_start(&op->msgs,es,10,vo)) >= 0) {
+	                if ((rs = vecobj_start(op->mlp,es,10,vo)) >= 0) {
 	                    cint	to = op->to_lock ;
 	                    if ((rs = uc_locktail(op->mfd,true,1,to)) >= 0) {
 	                        off_t	loff ;
@@ -583,7 +587,7 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 	                        lockfile(op->mfd,F_UNLOCK,loff,0L,0) ;
 	                    } /* end if (lock) */
 	                    if (rs < 0) {
-	                        vecobj_finish(&op->msgs) ;
+	                        vecobj_finish(op->mlp) ;
 			    }
 	                } /* end if (vecstr-msgs) */
 	                if (rs < 0) {
@@ -863,7 +867,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,
 	    if ((rs >= 0) && pip->f.fmsg) {
 	        ll = msgp->mlen ;
 	        msgp->msgi = mi ;
-	        rs = vecobj_add(&op->msgs,msgp) ;
+	        rs = vecobj_add(op->mlp,msgp) ;
 	        if (rs >= 0) pip->f.fmsg = false ;
 	    } /* end if (insertion) */
 
@@ -926,7 +930,7 @@ static int mailbox_msgfins(mailbox *op) noex {
 	int		rs1 ;
 	int		i ; /* used afterwards */
 	void		*vp{} ;
-	for (i = 0 ; vecobj_get(&op->msgs,i,&vp) >= 0 ; i += 1) {
+	for (i = 0 ; vecobj_get(op->mlp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		MB_MI	*mp = (MB_MI *) vp ;
 	        rs1 = msginfo_finish(mp) ;
@@ -1016,7 +1020,7 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 		    bool	fcopy = false ;
 		    bool	fdel = false ;
 		    void	*vp{} ;
-	            if ((rs = vecobj_get(&op->msgs,mi,&vp)) >= 0) {
+	            if ((rs = vecobj_get(op->mlp,mi,&vp)) >= 0) {
 		        MB_MI	*mip = (MB_MI *) vp ;
 	                fdel = mip->cmd.msgdel ;
 	                f = fdel || mip->f.addany ;

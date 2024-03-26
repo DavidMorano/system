@@ -1,23 +1,21 @@
-/* mfs-watch */
+/* mfs-watch SUPPORT */
 /* lang=C99 */
 
 /* watch (listen on) the specified service-access-points */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_UGETPW	1		/* use |ugetpw(3uc)| */
 #define	CF_SHLIB	0		/* shared-object library loading */
 
-
 /* revision history:
 
 	= 2008-06-23, David A­D­ Morano
-        I updated this subroutine to just poll for machine status and write the
-        Machine Status (MS) file. This was a cheap excuse for not writing a
-        whole new daemon program just to poll for machine status. I hope this
-        works out! :-)
+	I updated this subroutine to just poll for machine status
+	and write the Machine Status (MS) file. This was a cheap
+	excuse for not writing a whole new daemon program just to
+	poll for machine status. I hope this works out!
 
 	= 2017-08-10, David A­D­ Morano
 	This subroutine was borrowed to code the MFSERVE program.
@@ -28,11 +26,12 @@
 
 /*******************************************************************************
 
-        This subroutine is responsible for listening on the given socket and
-        spawning off a program to handle any incoming connection. Some of the
-        "internal" messages are handled here (the easy ones -- or the ones that
-        fit here best). The rest (that look like client-sort-of requests) are
-        handled in the 'standing' object module.
+	This subroutine is responsible for listening on the given
+	socket and spawning off a program to handle any incoming
+	connection. Some of the "internal" messages are handled
+	here (the easy ones -- or the ones that fit here best). The
+	rest (that look like client-sort-of requests) are handled
+	in the 'standing' object module.
 
 	Notes:
 
@@ -48,7 +47,6 @@
 
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 

@@ -1,7 +1,7 @@
 /* tabexpand HEADER */
 /* lang=C20 */
 
-/* calculate column values */
+/* expand the TAB characters into spaces */
 /* version %I% last-modified %G% */
 
 
@@ -25,7 +25,7 @@
 
 EXTERNC_begin
 
-extern int	tabexpand(char *,int,cchar *,int) noex ;
+extern int	tabexpand(char *,int,int,cchar *,int) noex ;
 
 EXTERNC_end
 

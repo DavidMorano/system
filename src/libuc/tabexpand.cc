@@ -69,15 +69,13 @@ static int	dstore_finish(DSTORE *) noex ;
 
 /* local variables */
 
-constexpr int	ntabcols = NTABCOLS ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen) noex {
+int tabexpand(char *dbuf,int dlen,int ntabcols,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		dcol = 0 ;
 	if (dbuf && sbuf) {
