@@ -1,4 +1,4 @@
-/* tabexpand */
+/* tabexpand SUPPORT */
 /* lang=C20 */
 
 /* expand TAB characters to the appropriate number of spaces */
@@ -22,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
@@ -31,14 +30,10 @@
 #include	<ascii.h>
 #include	<char.h>
 #include	<sbuf.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 
 /* local defines */
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8		/* number of columns per tab */
-#endif
 
 #define	DSTORE		struct dstore
 

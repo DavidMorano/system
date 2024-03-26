@@ -69,7 +69,7 @@
 #include	<mkchar.h>
 #include	<ncol.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"mailmsghdrfold.h"
 
@@ -83,10 +83,6 @@
 
 #undef	PARAMS
 #define	PARAMS		struct params
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
-#endif
 
 
 /* imported namespaces */

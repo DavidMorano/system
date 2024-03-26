@@ -50,7 +50,7 @@
 #include	<termstr.h>
 #include	<termconseq.h>
 #include	<tabcols.h>
-#include	<localmisc.h>		/* |HEXBUFLEN| */
+#include	<localmisc.h>		/* |HEXBUFLEN| + |NTABCOLS| */
 
 #include	"td.h"
 
@@ -87,10 +87,6 @@
 
 #ifndef	HEXBUFLEN
 #define	HEXBUFLEN	100
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8		/* maximum number columns in a TAB */
 #endif
 
 

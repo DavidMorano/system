@@ -1,8 +1,8 @@
-/* b_imail */
+/* b_imail SUPPORT */
+/* lang=C++20 */
 
 /* SHELL built-in to return load averages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
@@ -29,7 +29,6 @@
 #define	CF_PROCEXTID	0		/* |procextid()| */
 #define	CF_VSENDERS	0		/* alternative version */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
@@ -42,33 +41,32 @@
 /*******************************************************************************
 
 	Whew!  This was bigger (much bigger) than I expected.  This
-	program (command) reads an RFC-822 mail message (actually an UNIX®
-	mailbox-formatted set of mail messages) on STDIN and (as specified)
-	generally:
+	program (command) reads an RFC-822 mail message (actually
+	an UNIX® mailbox-formatted set of mail messages) on STDIN
+	and (as specified) generally:
 		1. deliver it to a MTA
 		2. saves a copy to the caller's "copy" mailbox
 
-	Basic mail-message parsing is done with the MAILMSGSTAGE object.  That
-	object is optimized to efficiently allow for repeated access to the
-	individual component messages of the input mailbox data.
+	Basic mail-message parsing is done with the MAILMSGSTAGE
+	object.  That object is optimized to efficiently allow for
+	repeated access to the individual component messages of the
+	input mailbox data.
 
-	This command is a huge, self contained, high-feature rich mail
-	processing engine.  Google mail processing is probably not nearly this
-	careful and fast!
+	This command is a huge, self contained, high-feature rich
+	mail processing engine.  Google mail processing is probably
+	not nearly this careful and fast!
 
 	Synopsis:
-
 	$ imail <recip(s)> [-t[=<b>]]
 
 	Implementation note:
 
-	Choices for what code sequences should be subroutines (seperate from
-	other subroutines) were made so as to achieve the maximum
-	code-reusability.
+	Choices for what code sequences should be subroutines
+	(seperate from other subroutines) were made so as to achieve
+	the maximum code-reusability.
 
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -130,7 +128,7 @@
 #include	<mkuuid.h>
 #include	<pcsns.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -167,10 +165,6 @@
 
 #ifndef	MSGCOLS
 #define	MSGCOLS		76		/* message-columns (RFC-?) */
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8		/* number of columns for a TAB */
 #endif
 
 #undef	DMODE

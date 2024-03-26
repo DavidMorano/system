@@ -26,8 +26,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
@@ -38,7 +37,7 @@
 #include	<estrings.h>
 #include	<buffer.h>
 #include	<ascii.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"outema.h"
 
@@ -62,10 +61,6 @@
 
 #ifndef	MAXMSGLINELEN
 #define	MAXMSGLINELEN	76
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #define	BASE64LINELEN	72

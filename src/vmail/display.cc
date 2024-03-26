@@ -44,7 +44,7 @@
 #include	<tmtime.h>
 #include	<sntmtime.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -65,10 +65,6 @@
 
 #ifndef	NYEARS_CENTURY
 #define	NYEARS_CENTURY		100
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #define	SCANBUFLEN	((DISPLAY_LSCANLINE*2) + 20)

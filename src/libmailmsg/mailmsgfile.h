@@ -53,7 +53,7 @@ struct mailmsgfile_flags {
 } ;
 
 struct mailmsgfile_head {
-	hdb		files ;
+	hdb		*flp ;		/* File-List-Pointer */
 	cchar		*tmpdname ;
 	pthread_t	tid ;
 	MAILMSGFILE_FL	f ;
@@ -61,6 +61,7 @@ struct mailmsgfile_head {
 	int		pagesize ;
 	int		cols ;
 	int		ind ;
+	int		to ;
 	volatile int	f_checkdone ;	/* thread has completed */
 } ;
 

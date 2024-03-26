@@ -55,7 +55,7 @@
 #include	<ctdec.h>
 #include	<mkchar.h>		/* |mkchar(3uc)| */
 #include	<ischarx.h>
-#include	<localmisc.h>		/* |TIMEBUFLEN| */
+#include	<localmisc.h>		/* |TIMEBUFLEN| + |NTABCOLS| */
 
 #include	"logsys.h"
 
@@ -70,10 +70,6 @@
 
 #ifndef	LOGDEV
 #define	LOGDEV		"/dev/conslog"
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #undef	BUFLEN

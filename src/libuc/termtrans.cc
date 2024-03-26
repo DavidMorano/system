@@ -38,7 +38,7 @@
 #include	<ansigr.h>
 #include	<buffer.h>
 #include	<findbit.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"termtrans.h"
 
@@ -80,10 +80,6 @@
 
 #ifndef	COLUMNS
 #define	COLUMNS		80
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #undef	OUTBUFLEN

@@ -1,23 +1,23 @@
-/* b_linefold */
+/* b_linefold SUPPORT */
+/* lang=C++20 */
 
 /* this is a SHELL built-in version of 'cat(1)' */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_LOCSETENT	0		/* allow |locinfo_setentry()| */
 
-
 /* revision history:
 
 	= 2004-03-01, David A­D­ Morano
-	This subroutine was originally written as a KSH built-in command.
+	This subroutine was originally written as a KSH built-in
+	command.
 
 	= 2016-07-27, David A­D­ Morano
-	This subroutine was enhanced to include an approximation of the function
-	previously embodoed in the FMT program.
+	This subroutine was enhanced to include an approximation
+	of the function previously embodoed in the FMT program.
 
 */
 
@@ -26,12 +26,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ linefold [<file(s)> ...] [<options>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -52,7 +49,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<char.h>
 #include	<bits.h>
@@ -62,7 +58,7 @@
 #include	<linefold.h>
 #include	<wordfill.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"shio.h"
 #include	"kshlib.h"
@@ -74,10 +70,6 @@
 /* local defines */
 
 #define	CBUFLEN		COLUMNS
-
-#ifndef	TABCOLS
-#define	TABCOLS		8
-#endif
 
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX

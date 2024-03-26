@@ -64,7 +64,7 @@
 #include	<mkx.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"logfile.h"
 
@@ -72,10 +72,6 @@
 /* local defines */
 
 #define	LOGFILE_EXTRA	100
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
-#endif
 
 #undef	OUTBUFLEN
 #define	OUTBUFLEN	(LOGFILE_LINELEN + 2 + LOGFILE_EXTRA)

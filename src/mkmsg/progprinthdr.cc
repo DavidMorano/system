@@ -1,13 +1,13 @@
-/* progprinthdr */
+/* progprinthdr SUPPORT */
+/* lang=C++20 */
 
 /* print messages addresses */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_OUTVALUE	1		/* use 'outvalue()' */
 #define	CF_HDRILINE	1		/* use 'mailmsg_hdriline()' */
-
 
 /* revision history:
 
@@ -15,8 +15,9 @@
 	This subroutine was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-        I added a little code to "post" articles that do not have a valid
-        newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -24,23 +25,19 @@
 
 /*******************************************************************************
 
-        This module processes one or more mail messages (in appropriate mailbox
-        format if more than one) on STDIN. The output is a single file that is
-        ready to be added to each individual mailbox in the spool area.
-
+	This module processes one or more mail messages (in appropriate
+	mailbox format if more than one) on STDIN. The output is a
+	single file that is ready to be added to each individual
+	mailbox in the spool area.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
@@ -49,7 +46,7 @@
 #include	<ema.h>
 #include	<emainfo.h>
 #include	<outline.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -72,10 +69,6 @@
 
 #ifndef	MAILMSGLINELEN
 #define	MAILMSGLINELEN	76
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #define	BASE64LINELEN	72

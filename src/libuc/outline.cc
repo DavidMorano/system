@@ -1,10 +1,10 @@
-/* outline */
+/* outline SUPPORT */
+/* lang=C++20 */
 
 /* manage printing lines */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -12,8 +12,9 @@
 	This subroutine was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-	I added a little code to "post" articles that do not have a valid
-	newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -23,22 +24,16 @@
 
 	This object deals with printing lines.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"outline.h"
 #include	"contentencodings.h"
@@ -65,10 +60,6 @@
 
 #undef	BUFLEN
 #define	BUFLEN		(2 * 1024)
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
-#endif
 
 #define	BASE64LINELEN	72
 #define	BASE64BUFLEN	((BASE64LINELEN / 4) * 3)

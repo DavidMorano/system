@@ -35,7 +35,7 @@
 #include	<cfdec.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<char.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"linefold.h"
 
@@ -44,10 +44,6 @@
 
 #ifndef	COLUMNS
 #define	COLUMNS		80		/* output cols (should be 80) */
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 
