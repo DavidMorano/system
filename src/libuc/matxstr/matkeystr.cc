@@ -35,12 +35,11 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found
+	<0		no match found (not further distinguished)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -54,7 +53,16 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local variables */
@@ -67,16 +75,18 @@ static inline bool keyend(cint ch) noex {
 }
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int matkeystr(mainv a,cchar *sp,int sl) noex {
 	cint		sch = sp[0] ; /* ok: everything promotes the same */
-	int		i ;
+	int		i ; /* used afterwards */
 	int		f = false ;
 	if (sl >= 0) {
-	    int		m ;
-	    for (i = 0 ; a[i] != NULL ; i += 1) {
-		m = (sch == a[i][0]) ;
+	    for (i = 0 ; a[i] != nullptr ; i += 1) {
+		int	m = (sch == a[i][0]) ;
 		if (m > 0) {
 		    m = nleadkeystr(a[i],sp,sl) ;
 		}
@@ -84,7 +94,7 @@ int matkeystr(mainv a,cchar *sp,int sl) noex {
 		if (f) break ;
 	    } /* end for */
 	} else {
-	    for (i = 0 ; a[i] != NULL ; i += 1) {
+	    for (i = 0 ; a[i] != nullptr ; i += 1) {
 	        if (sch == a[i][0]) {
 		    f = (strkeycmp(a[i],sp) == 0) ;
 		} else {

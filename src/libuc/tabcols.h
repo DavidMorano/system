@@ -23,6 +23,9 @@
 #include	<clanguage.h>
 
 
+#define	TABCOLS_DEF	8		/* eight columns per TAB character */
+
+
 EXTERNC_begin
 
 extern int tabcols(int,int) noex ;

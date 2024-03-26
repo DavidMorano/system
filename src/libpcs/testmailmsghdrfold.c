@@ -1,4 +1,4 @@
-/* testmailmsghdrfold */
+/* testmailmsghdrfold SUPPORT */
 /* lang=C89 */
 
 /* revision history:
@@ -10,9 +10,7 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#define	CF_DEBUGS	1
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -20,7 +18,8 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<filebuf.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
+
 #include	"mailmsghdrfold.h"
 
 /* local defines */
@@ -29,10 +28,6 @@
 
 #ifndef	MSGCOLS
 #define	MSGCOLS		76
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #if	CF_DEBUGS

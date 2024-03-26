@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found
+	<0		no match found (not further distinguished)
 
 	Implementation-note:
 	I used to use virtual inheritance to implement subroutine
@@ -52,8 +52,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
@@ -108,6 +107,9 @@ namespace {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int matpbasestr(mainv a,int n,cchar *sp,int sl) noex {
@@ -132,7 +134,7 @@ int mater::matpxstr(mainv a,int n,cchar *sp,int sl) noex {
 	int		si = -1 ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (n >= 0) {
-	    cint	lch = toxc(sp[0]) ; /* everything promotes */
+	    cint	lch = toxc(sp[0]) ;
 	    int		m_max = 0 ;
 	    int		m ;
 	    si = -1 ;

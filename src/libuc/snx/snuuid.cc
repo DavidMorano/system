@@ -38,14 +38,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |UINT_MAX| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<cthex.h>
 #include	<mkuuid.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"snx.h"
 

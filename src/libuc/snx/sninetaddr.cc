@@ -35,13 +35,11 @@
 
 	Returns:
 	>=0		number of bytes in result
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<netinet/in.h>
 #include	<cstring>
 #include	<usystem.h>
@@ -50,7 +48,7 @@
 #include	<strdcpyx.h>
 #include	<cthex.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MIN| */
 
 #include	"snx.h"
 
@@ -58,15 +56,15 @@
 /* local defines */
 
 #ifndef	INET4ADDRLEN
-#define	INET4ADDRLEN	sizeof(in_addr_t)
+#define	INET4ADDRLEN		sizeof(in_addr_t)
 #endif
 
 #ifndef	INET6ADDRLEN
-#define	INET6ADDRLEN	16
+#define	INET6ADDRLEN		16
 #endif
 
 #ifndef	INETXADDRLEN
-#define	INETXADDRLEN	MAX(INET4ADDRLEN,INET6ADDRLEN)
+#define	INETXADDRLEN		MAX(INET4ADDRLEN,INET6ADDRLEN)
 #endif /* INETXADDRLEN */
 
 #ifndef	INET4_ADDRSTRLEN

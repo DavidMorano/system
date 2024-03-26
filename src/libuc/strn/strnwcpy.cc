@@ -47,12 +47,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strncpy(3c)| + |memset(3c)| */
 #include	<algorithm>		/* |min(3c++)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<strwcpy.h>
-#include	<localmisc.h>
 
 #include	"strn.h"
 

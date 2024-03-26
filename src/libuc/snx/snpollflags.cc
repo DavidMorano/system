@@ -43,7 +43,6 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"snflags.h"
 

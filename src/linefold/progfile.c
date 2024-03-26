@@ -1,11 +1,10 @@
-/* progfile */
+/* progfile SUPPORT */
+/* lang=C++20 */
 
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* non-switchable debug print-outs */
 #define	CF_TESTLINE	0		/* test long lines */
-
 
 /* revision history:
 
@@ -18,65 +17,64 @@
 
 /*******************************************************************************
 
-	This module will take as input a filename and it will perform specified
-	cleanup activities on the contents of the file and write the results
-	out to either STDOUT or back to the original file.
+	This module will take as input a filename and it will perform
+	specified cleanup activities on the contents of the file
+	and write the results out to either STDOUT or back to the
+	original file.
 
 	= Forward verses backwards
 
-	I've actually coded up two different ways to break long lines.  One is
-	called "backward" since it searches for a line break starting from the
-	end of the line and moving towards the beginning of the line.  This was
-	the first algorithm implemented.  But tabs embeeded in the lines were
-	not properly handled since there was no column count available (and
-	tabs can take up more than one column) in order to know how long the
-	leading part of a line was (column-wise).  So I coded up the "forward"
-	algorithm.  This latter one searches for a line break starting from the
-	beginning of the line and also keeps track of columns used by the
-	leading part of the line.  This is the algorithm currently being used.
+	I have actually coded up two different ways to break long
+	lines.  One is called "backward" since it searches for a
+	line break starting from the end of the line and moving
+	towards the beginning of the line.  This was the first
+	algorithm implemented.  But tabs embeeded in the lines were
+	not properly handled since there was no column count available
+	(and tabs can take up more than one column) in order to
+	know how long the leading part of a line was (column-wise).
+	So I coded up the "forward" algorithm.  This latter one
+	searches for a line break starting from the beginning of
+	the line and also keeps track of columns used by the leading
+	part of the line.  This is the algorithm currently being
+	used.
 
 	= Forward algorithm
 
-	We search ahead in the line for a 'token'.  The token is either a
-	single whitespace character (so that it can be examined for its
-	specific type (perhaps a tab as opposed to a regular space) or a
-	sequence of non-whitespace characters.  All sequences of non-whitespace
-	characters are always kept together -- as they should be.  Whitespace
-	occuring after an output line is filled, is removed when the "rmwhite"
-	option is turned ON (the default).  Further, whitespace characters that
-	are not ignored are examined to see if they are tabs and if so, they
-	are processed to determine how many characters columns they will take
-	in the output line.  The created output line length is updated
-	accordingly.
+	We search ahead in the line for a 'token'.  The token is
+	either a single whitespace character (so that it can be
+	examined for its specific type (perhaps a tab as opposed
+	to a regular space) or a sequence of non-whitespace characters.
+	All sequences of non-whitespace characters are always kept
+	together -- as they should be.  Whitespace occuring after
+	an output line is filled, is removed when the "rmwhite"
+	option is turned ON (the default).  Further, whitespace
+	characters that are not ignored are examined to see if they
+	are tabs and if so, they are processed to determine how
+	many characters columns they will take in the output line.
+	The created output line length is updated accordingly.
 
 	= Note on "rmwhite" option
 
-	This option generally gives a more pleasing output appearance for those
-	certain (perhaps) rare circumstances where one or more whitespace
-	characters might mess up the output by creating things like
-	whitespace-only lines where none existed in the input.  Consequently,
-	this option is ON by default.
-
+	This option generally gives a more pleasing output appearance
+	for those certain (perhaps) rare circumstances where one
+	or more whitespace characters might mess up the output by
+	creating things like whitespace-only lines where none existed
+	in the input.  Consequently, this option is ON by default.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<ascii.h>
 #include	<char.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
 #include	"defs.h"
@@ -95,10 +93,6 @@
 #define	LINEBUFLEN	4096
 #endif
 #endif
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #undef	CHAR_TOKSEP

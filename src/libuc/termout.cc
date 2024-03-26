@@ -54,7 +54,7 @@
 #include	<findbit.h>		/* for |flbsi(3dam)| */
 #include	<mkchar.h>
 #include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"termout.h"
 
@@ -78,10 +78,6 @@
 
 #ifndef	COLUMNS
 #define	COLUMNS		80
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #undef	OUTBUFLEN

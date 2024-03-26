@@ -20,10 +20,10 @@
 	strn{x}pbrk
 
 	Description:
-	This subroutine is, of course, like the standard 'strpbrk(3c)'
+	This subroutine is, of course, like the standard |strpbrk(3c)|
 	except that length of the string to be tested can be given.
 	If a test string length of <0 is given, then this subroutine
-	acts just like 'strpbrk(3c)'.
+	acts just like |strpbrk(3c)|.
 
 	Synopsis:
 	char *str{x}npbrk(cchar *sp,int sl,cchar *ss) noex
@@ -39,12 +39,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstring>
+#include	<cstring>		/* |strchr(3c)| + |strpbrk(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 
 #include	"strnxpbrk.h"
 

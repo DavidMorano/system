@@ -118,25 +118,24 @@ extern int vecpstr_audit(vecpstr *) noex ;
 extern int vecpstr_getvec(vecpstr *,mainv *) noex ;
 extern int vecpstr_finish(vecpstr *) noex ;
 /* extras (so-called) */
-extern int vecstr_addpathclean(vecpstr *,cchar *,int) noex ;
-extern int vecstr_addpath(vecpstr *,cchar *,int) noex ;
-extern int vecstr_addcspath(vecpstr *) noex ;
-extern int vecstr_adds(vecpstr *,cchar *,int) noex ;
-extern int vecstr_addsubdirs(vecpstr *,cchar *) noex ;
-extern int vecstr_loaddirs(vecpstr *,cchar *) noex ;
-extern int vecstr_adduniqs(vecpstr *,cchar *,int) noex ;
-extern int vecstr_adduniqs(vecpstr *,cchar *,int) noex ;
-extern int vecstr_envadd(vecpstr *,cchar *,cchar *,int) noex ;
-extern int vecstr_envadds(vecpstr *,cchar *,int) noex ;
-extern int vecstr_envset(vecpstr *,cchar *,cchar *,int) noex ;
-extern int vecstr_envget(vecpstr *,cchar *,cchar **) noex ;
-extern int vecstr_envfile(vecpstr *,cchar *) noex ;
-extern int vecstr_foilcmp(vecpstr *,vecpstr *) noex ;
-extern int vecstr_loadfile(vecpstr *,int,cchar *) noex ;
-extern int vecstr_loadgrusers(vecpstr *,gid_t) noex ;
-extern int vecstr_srvargs(vecpstr *,cchar *) noex ;
-extern int vecstr_svcargs(vecpstr *,int *,cchar *) noex ;
-
+extern int vecpstr_addpathclean(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addpath(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addcspath(vecpstr *) noex ;
+extern int vecpstr_adds(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_addsubdirs(vecpstr *,cchar *) noex ;
+extern int vecpstr_loaddirs(vecpstr *,cchar *) noex ;
+extern int vecpstr_adduniqs(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_adduniqs(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_envadd(vecpstr *,cchar *,cchar *,int) noex ;
+extern int vecpstr_envadds(vecpstr *,cchar *,int) noex ;
+extern int vecpstr_envset(vecpstr *,cchar *,cchar *,int) noex ;
+extern int vecpstr_envget(vecpstr *,cchar *,cchar **) noex ;
+extern int vecpstr_envfile(vecpstr *,cchar *) noex ;
+extern int vecpstr_foilcmp(vecpstr *,vecpstr *) noex ;
+extern int vecpstr_loadfile(vecpstr *,int,cchar *) noex ;
+extern int vecpstr_loadgrusers(vecpstr *,gid_t) noex ;
+extern int vecpstr_srvargs(vecpstr *,cchar *) noex ;
+extern int vecpstr_svcargs(vecpstr *,int *,cchar *) noex ;
 
 EXTERNC_end
 

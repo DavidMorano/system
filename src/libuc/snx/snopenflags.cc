@@ -41,7 +41,6 @@
 #include	<fcntl.h>
 #include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
 
 #include	"snflags.h"
 

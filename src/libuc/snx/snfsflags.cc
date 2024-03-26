@@ -42,7 +42,6 @@
 #include	<sys/statvfs.h>
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 #include	"snflags.h"
 

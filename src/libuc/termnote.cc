@@ -87,7 +87,7 @@
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"termnote.h"
 
@@ -105,10 +105,6 @@
 
 #ifndef	COLUMNS
 #define	COLUMNS		80
-#endif
-
-#ifndef	NTABCOLS
-#define	NTABCOLS	8
 #endif
 
 #ifndef	TERMDEVLEN

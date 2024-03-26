@@ -38,12 +38,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>
 #include	<sncpyx.h>
 #include	<ctdec.h>
-#include	<localmisc.h>
 
 #include	"snx.h"
 
@@ -68,6 +66,9 @@ extern "C" {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

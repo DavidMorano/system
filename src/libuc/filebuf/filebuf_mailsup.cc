@@ -1,4 +1,4 @@
-/* filebuf_mailsup SUPPORT*/
+/* filebuf_mailsup SUPPORT */
 /* lang=C++20 */
 
 /* mail supprt from the FILEBUF object */
@@ -58,6 +58,9 @@ static int filebuf_writehdrval(filebuf *,cchar *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

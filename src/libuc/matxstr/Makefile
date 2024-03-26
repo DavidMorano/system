@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS=
+INCS= matxstr.h
 
 
 OBJ0_MATXSTR= matstr.o matostr.o matpstr.o
@@ -122,12 +122,12 @@ obj3_matxstr.o:	$(OBJ3_MATXSTR)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_MATXSTR)
 
 
-matstr.o:		matstr.cc matstr.h
-matostr.o:		matostr.cc matostr.h
-matpstr.o:		matpstr.cc matpstr.h
-matkeystr.o:		matkeystr.cc matkeystr.h
-matsubstr.o:		matsubstr.c
-matcasesubstr.o:	matcasesubstr.c
-matnstr.o:		matnstr.c
+matstr.o:		matstr.cc matstr.h		$(INCS)
+matostr.o:		matostr.cc matostr.h		$(INCS)
+matpstr.o:		matpstr.cc matpstr.h		$(INCS)
+matkeystr.o:		matkeystr.cc matkeystr.h	$(INCS)
+matsubstr.o:		matsubstr.cc			$(INCS)
+matcasesubstr.o:	matcasesubstr.cc		$(INCS)
+matnstr.o:		matnstr.cc			$(INCS)
 
 

@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found
+	<0		no match found (not further distinguished)
 
 
 	Name:
@@ -57,7 +57,7 @@
 
 	Returns:
 	>=0		index of match in array
-	<0		no match found
+	<0		no match found (not further distinguished)
 
 
 	Notes:
@@ -75,7 +75,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<nleadstr.h>
 #include	<toxc.h>
@@ -87,7 +86,10 @@
 /* local defines */
 
 
-/* typedefs */
+/* imported namespaces */
+
+
+/* local typedefs */
 
 typedef int (*toxc_f)(int) noex ;
 typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
@@ -110,7 +112,7 @@ typedef int (*nleadxstr_f)(cchar *,cchar *,int) noex ;
 template<toxc_f toxc,nleadxstr_f nleadxstr>
 int matxstr(mainv a,cchar *sp,int sl) noex {
 	cint		lch = toxc(sp[0]) ;
-	int		i ;
+	int		i ; /* used afterwards */
 	int		m ;
 	if (sl >= 0) {
 	    for (i = 0 ; a[i] ; i += 1) {
@@ -128,6 +130,9 @@ int matxstr(mainv a,cchar *sp,int sl) noex {
 	return (a[i]) ? i : -1 ;
 }
 /* end subroutine-template (matxstr) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

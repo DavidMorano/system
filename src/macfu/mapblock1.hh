@@ -47,6 +47,8 @@
 #include	<utility>
 #include	<unordered_map>
 #include	<functional>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<usysrets.h>
 #include	<clanguage.h>
 

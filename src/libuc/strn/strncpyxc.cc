@@ -42,12 +42,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<cstring>
+#include	<cstring>		/* |memset(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<toxc.h>
-#include	<localmisc.h>
 
 #include	"strcpyxc.h"
 #include	"strncpyxc.h"
@@ -64,6 +62,9 @@ extern "C" {
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local variables */
@@ -91,6 +92,9 @@ char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	return dst ;
 }
 /* end subroutine-template (strncpyxc) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

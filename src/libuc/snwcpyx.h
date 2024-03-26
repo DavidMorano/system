@@ -36,6 +36,7 @@ extern int snwcpyhyphen(char *,int,cchar *,int) noex ;
 extern int snwcpylatin(char *,int,cchar *,int) noex ;
 extern int snwcpyopaque(char *,int,cchar *,int) noex ;
 extern int snwcpyshrink(char *,int,cchar *,int) noex ;
+extern int snwcpyrev(char *,int,cchar *,int) noex ;
 extern int snwcpywidehdr(char *,int,const wchar_t *,int) noex ;
 
 EXTERNC_end

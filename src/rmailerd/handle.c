@@ -50,13 +50,9 @@
 	Phases 1 through 3 can be repeated (as a unit) as necessary until
 	the input is empty.
 
-
 ***************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/utsname.h>
 #include	<sys/param.h>
@@ -95,8 +91,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	getfiledirs(char *,const char *,const char *,char *) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
-
-extern int	addressparse(), addressjoin() ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;

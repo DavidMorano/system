@@ -121,13 +121,13 @@ obj3_strn.o:	$(OBJ3_STRN)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRN)
 
 
-strnxsub.o:		strnxsub.cc $(INCS)
-strnnlen.o:		strnnlen.c $(INCS)
-strnxchr.o:		strnxchr.cc $(INCS)
-strnxpbrk.o:		strnxpbrk.cc $(INCS)
-strnwcpy.o:		strnwcpy.cc $(INCS)
-strnncpy.o:		strnncpy.cc $(INCS)
-strncpyxc.o:		strncpyxc.cc $(INCS)
-strnset.o:		strnset.c $(INCS)
+strnxsub.o:		strnxsub.cc	$(INCS)
+strnnlen.o:		strnnlen.cc	$(INCS)
+strnxchr.o:		strnxchr.cc	$(INCS)
+strnxpbrk.o:		strnxpbrk.cc	$(INCS)
+strnwcpy.o:		strnwcpy.cc	$(INCS)
+strnncpy.o:		strnncpy.cc	$(INCS)
+strncpyxc.o:		strncpyxc.cc	$(INCS)
+strnset.o:		strnset.cc	$(INCS)
 
 

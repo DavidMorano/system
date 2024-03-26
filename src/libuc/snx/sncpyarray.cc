@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		resulting length
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
@@ -42,10 +42,12 @@
 #include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
 #include	<storebuf.h>
-#include	<localmisc.h>
 
 
-/* external subroutines */
+/* local defines */
+
+
+/* external variables */
 
 
 /* exported subroutines */

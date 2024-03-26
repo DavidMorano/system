@@ -22,8 +22,10 @@
 	Description:
 	Copy a source string to a destination until either the end
 	of the source string is reached (by its end-marker) or the
-	length of the source string is exhausted.  Additionally we
-	always zero out to the length of the destination string.
+	length of the source string is exhausted.  We always zero
+	out to the length of the destination string.  The copy
+	terminates also on the exhaustion of the maximum-length
+	value.  The result is not NUL-terminated.
 
 	Synopsis:
 	char *strnncpy(char *d,cchar *s,int slen,int n) noex
@@ -40,26 +42,66 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strncpy(3c)| | |memset(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
+
+#include	"strn.h"
+
+
+/* local defines */
+
+
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
+
+
+/* external subroutines */
+
+extern "C" {
+    extern char	*strwcpy(char *,cchar *,int) noex ;
+}
+
+
+/* external variables */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-char *strnncpy(char *d,cchar *sp,int sl,int size) noex {
-	if (sl >= 0) {
-	    const int	ml = MIN(sl,size) ;
-	    strncpy(d,sp,ml) ;
-	    if (ml < size) {
-	        memset((d + ml),0,(size - ml)) ;
+char *strnncpy(char *d,cchar *sp,int sl,int sz) noex {
+	char		*rp = d ;
+	if (sz >= 0) {
+	    if (sl >= 0) {
+	        cint	ml = min(sl,sz) ;
+	        strncpy(d,sp,ml) ;
+	        if (ml < sz) {
+	            memset((d + ml),0,(sz - ml)) ;
+	        }
+	    } else {
+	        strncpy(d,sp,sz) ;
 	    }
+	    rp = (d + sz) ;
 	} else {
-	    strncpy(d,sp,size) ;
+	    strncpy(d,sp,sl) ;
+	    rp = (d + sl) ;
 	}
-	return (d + size) ;
+	return rp ;
 }
 /* end subroutine (strnncpy) */
 
