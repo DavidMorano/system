@@ -44,6 +44,7 @@
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<ucvariables.hh>
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<mallocxx.h>
@@ -80,20 +81,9 @@
 #define	MMF_MI			mailmsgfile_mi
 #define	MMF_CD			mailmsgfile_checkdat
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #ifndef	VARCOLUMNS
 #define	VARCOLUMNS	"COLUMNS"
 #endif
-
-#define	INBUFLEN	LINEBUFLEN
-#define	OUTBUFLEN	(INBUFLEN * 2)
 
 
 /* imported namespaces */
@@ -815,8 +805,9 @@ static int mkvars() noex {
 /* end subroutine (mkvars) */
 
 static int mkcols(int cols) noex {
+	static cchar	*vn = varname.columns ;
 	if (cols < MAILMSGFILE_MINCOLS) {
-	    static cchar	*cval = getenv(VARCOLUMNS) ;
+	    static cchar	*cval = getenv(vn) ;
 	    if (cval) {
 		if (cfdec(cval,-1,&cols) < 0) cols = 0 ;
 	    } /* end if (non-null) */
