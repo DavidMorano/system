@@ -36,7 +36,7 @@
 #define	MAILMSGFILE_TPERM	1
 
 
-struct mailmsgfile_miinfo {
+struct mailmsgfile_minfo {
 	cchar		*a ;		/* memory allocation */
 	cchar		*mid ;
 	cchar		*mfname ;
