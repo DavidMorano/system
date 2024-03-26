@@ -124,6 +124,12 @@ struct mailmsgfile_checkdat {
 	mailmsgfile_checkdat(char *b,int l) noex : pbuf(b), plen(l) { } ;
 } ;
 
+struct vars {
+	int		linebuflen ;
+	int		outbuflen ;
+	int		cols ;
+} ;
+
 
 /* forward references */
 
@@ -164,6 +170,7 @@ static int mailmsgfile_magic(mailmsgfile *op,Args ... args) noex {
 }
 /* end subroutine (mailmsgfile_magic) */
 
+static int mailmsgfile_starter(MMF *,cc *) noex ;
 static int mailmsgfile_newx(MMF *,cc *,int,off_t,int) noex ;
 static int mailmsgfile_mk(MMF *,cchar *,cchar *,int,off_t,int) noex ;
 static int mailmsgfile_mkdis(MMF *,MMF_MI *,int,int,off_t) noex ;
@@ -185,10 +192,15 @@ static int mi_start(MMF_MI *,cchar *,cchar *,int) noex ;
 static int mi_finish(MMF_MI *) noex ;
 static int mi_newlines(MMF_MI *,int) noex ;
 
+static int mkvars() noex ;
+static int mkcols(int) noex ;
+
 
 /* local variables */
 
 static sysval		pagesize(sysval_ps) ;
+
+static vars		var ;
 
 
 /* exported variables */
@@ -198,47 +210,27 @@ static sysval		pagesize(sysval_ps) ;
 
 int mailmsgfile_start(MMF *op,cc *tmpdname,int cols,int ind) noex {
 	int		rs ;
+	int		rv = 0 ;
 	if ((rs = mailmsgfile_magic(op,tmpdname)) >= 0) {
-	    if ((rs = pagesize) >= 0) {
-	        cint	ne = MAILMSGFILE_NE ;
-		cchar	*cp{} ;
-		op->pagesize = rs ;
-		op->to = MAILMSGFILE_FILEINT ;
-	        if (cols < MAILMSGFILE_MINCOLS) {
-	            if ((cp = getenv(VARCOLUMNS)) != nullptr) {
-	                uint	v ;
-	                int	rs1 = cfdecui(cp,-1,&v) ;
-	                cols = (rs1 >= 0) ? v : 0 ;
-	            }
-	            if (cols < 2) {
-	                cols = COLUMNS ;
-	            }
-	        } /* end if */
-	        if (ind < 0) {
-		    ind = MAILMSGFILE_DEFIND ;
-		}
-	        op->cols = cols ;
-	        op->ind = ind ;
-	        if ((rs = uc_mallocstrw(tmpdname,-1,&cp)) >= 0) {
-	            cnullptr	np{} ;
-	            op->tmpdname = cp ;
-	            if ((rs = hdb_start(op->flp,ne,true,np,np)) >= 0) {
-	                op->f.files = true ;
-	                if ((rs = mailmsgfile_checkbegin(op)) >= 0) {
-	                    op->magic = MAILMSGFILE_MAGIC ;
-	                }
-	            }
-	            if (rs < 0) {
-	                uc_free(op->tmpdname) ;
-	                op->tmpdname = nullptr ;
-	            }
-	        } /* end if (memory-allocation) */
-	    } /* end if (sysval) */
+	    static int	rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	        if ((rs = pagesize) >= 0) {
+		    op->pagesize = rs ;
+		    op->to = MAILMSGFILE_FILEINT ;
+	            if (ind < 0) {
+		        ind = MAILMSGFILE_DEFIND ;
+		    }
+	            op->cols = mkcols(cols) ;
+	            op->ind = ind ;
+		    rs = mailmsgfile_starter(op,tmpdname) ;
+		    rv = rs ;
+	        } /* end if (sysval) */
+	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		mailmsgfile_dtor(op) ;
 	    }
 	} /* end if (mailmsgfile_ctor) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (mailmsgfile_start) */
 
@@ -337,6 +329,28 @@ int mailmsgfile_get(MMF *op,cc *msgid,cc **rpp) noex {
 
 /* private subroutines */
 
+static int mailmsgfile_starter(MMF *op,cc *tmpdname) noex {
+	cint		ne = MAILMSGFILE_NE ;
+	int		rs ;
+	cchar		*cp{} ;
+	if ((rs = uc_mallocstrw(tmpdname,-1,&cp)) >= 0) {
+	    cnullptr	np{} ;
+	    op->tmpdname = cp ;
+	    if ((rs = hdb_start(op->flp,ne,true,np,np)) >= 0) {
+		op->f.files = true ;
+		if ((rs = mailmsgfile_checkbegin(op)) >= 0) {
+		    op->magic = MAILMSGFILE_MAGIC ;
+		}
+	    }
+	    if (rs < 0) {
+	        uc_free(op->tmpdname) ;
+		op->tmpdname = nullptr ;
+	    }
+	} /* end if (memory-allocation) */
+	return rs ;
+}
+/* end subroutine (mailmsgfile_starter) */
+
 static int mailmsgfile_newx(MMF *op,cc *mid,int mfd,off_t bo,int bl) noex {
 	int		rs ;
 	int		rs1 ;
@@ -434,60 +448,64 @@ static int mailmsgfile_filefins(MMF *op) noex {
 
 static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 		int tfd,int mfd,off_t bo) noex {
-	filebuf		in ;
 	cint		ntab = NTABCOLS ;
 	cint		blen = mip->nsize ;
 	int		rs ;
 	int		rs1 ;
-	int		inlen ;
-	int		ibsize ;
 	int		vlines = 0 ;
-	int		wlen = 0 ;
-	ibsize = min(blen,(op->pagesize*8)) ;
-	if ((rs = filebuf_start(&in,mfd,bo,ibsize,0)) >= 0) {
-	    filebuf	out ;
-	    cint	obsize = rs ;
-	    int		rlen = blen ;
-	    if ((rs = filebuf_start(&out,tfd,0L,obsize,0)) >= 0) {
-	        cint	llen = LINEBUFLEN ;
-		int		ncols ;
-	        int		ll ;
-	        char		lbuf[INBUFLEN + 1] ;
-	        while ((rs >= 0) && (rlen > 0)) {
-	            rs = filebuf_readln(&in,lbuf,llen,0) ;
-	            inlen = rs ;
-	            if (rs <= 0) break ;
-	            ll = inlen ;
-	            if (lbuf[ll-1] == '\n') {
-	                mip->nlines += 1 ;
-	                ll -= 1 ;
-	            }
-	            while ((ll > 0) && CHAR_ISWHITE(lbuf[ll-1])) {
-	                ll -= 1 ;
-		    }
-/* calculate the number of columns this line would take up */
-	            ncols = ncolstr(ntab,0,lbuf,ll) ;
-/* take action based on whether the line fits in the available columns */
-	            if (ncols > op->cols) {
-	                rs = mailmsgfile_proclines(op,mip,&out,lbuf,ll) ;
-	                wlen += rs ;
-	            } else {
-	                if ((rs = mi_newlines(mip,1)) >= 0) {
-	                    rs = mailmsgfile_procout(op,&out,0,lbuf,ll,false) ;
-	                    wlen += rs ;
+	char		*lbuf{} ;
+	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    filebuf	in ;
+	    cint	llen = rs ;
+	    cint	ibsize = min(blen,(op->pagesize*8)) ;
+	    int		inlen ;
+	    int		wlen = 0 ;
+	    if ((rs = filebuf_start(&in,mfd,bo,ibsize,0)) >= 0) {
+	        filebuf	out ;
+	        cint	obsize = rs ;
+	        int	rlen = blen ;
+	        if ((rs = filebuf_start(&out,tfd,0L,obsize,0)) >= 0) {
+		    int		ncols ;
+	            int		ll ;
+	            while ((rs >= 0) && (rlen > 0)) {
+	                rs = filebuf_readln(&in,lbuf,llen,0) ;
+	                inlen = rs ;
+	                if (rs <= 0) break ;
+	                ll = inlen ;
+	                if (lbuf[ll-1] == '\n') {
+	                    mip->nlines += 1 ;
+	                    ll -= 1 ;
 	                }
-	            } /* end if (what kind of printing) */
-	            rlen -= inlen ;
-	        } /* end while (reading lines) */
-	        if (rs >= 0) {
-	            mip->vsize = wlen ;
-	        }
-	        rs1 = filebuf_finish(&out) ;
-		if (rs >= 0) rs = rs1 ;
+	                while ((ll > 0) && CHAR_ISWHITE(lbuf[ll-1])) {
+	                    ll -= 1 ;
+		        }
+    /* calculate the number of columns this line would take up */
+	                ncols = ncolstr(ntab,0,lbuf,ll) ;
+    /* take action based on whether the line fits in the available columns */
+	                if (ncols > op->cols) {
+	                    rs = mailmsgfile_proclines(op,mip,&out,lbuf,ll) ;
+	                    wlen += rs ;
+	                } else {
+	                    if ((rs = mi_newlines(mip,1)) >= 0) {
+			        cbool	f = false ;
+	                        rs = mailmsgfile_procout(op,&out,0,lbuf,ll,f) ;
+	                        wlen += rs ;
+	                    }
+	                } /* end if (what kind of printing) */
+	                rlen -= inlen ;
+	            } /* end while (reading lines) */
+	            if (rs >= 0) {
+	                mip->vsize = wlen ;
+	            }
+	            rs1 = filebuf_finish(&out) ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (filebuf) */
+	        rs1 = filebuf_finish(&in) ;
+	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filebuf) */
-	    rs1 = filebuf_finish(&in) ;
+	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? vlines : rs ;
 }
 /* end subroutine (mailmsgfile_mkdis) */
@@ -659,8 +677,9 @@ static int mailmsgfile_checkerx(MMF *op) noex {
 	int		rv = 0 ;
 	char		*pbuf{} ;
 	if ((rs = malloc_mp(&pbuf)) >= 0) {
+	    cint	plen = rs ;
 	    if ((rs = mkpath1(pbuf,op->tmpdname)) >= 0) {
-		MMF_CD	cd(pbuf,rs) ;
+		MMF_CD	cd(pbuf,plen) ;
 		rs = mailmsgfile_checkerxx(op,&cd) ;
 		rv = rs ;
 	    } /* end if (mkpath) */
@@ -782,5 +801,29 @@ static int mi_newlines(MMF_MI *mip,int n) noex {
 	return SR_OK ;
 }
 /* end subroutine (mi_newlines) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_ml)) >= 0) {
+	    var.linebuflen = rs ;
+	    var.outbuflen = (rs * 2) ;
+	} /* end if (getbufsize) */
+	return rs ;
+}
+/* end subroutine (mkvars) */
+
+static int mkcols(int cols) noex {
+	if (cols < MAILMSGFILE_MINCOLS) {
+	    static cchar	*cval = getenv(VARCOLUMNS) ;
+	    if (cval) {
+		if (cfdec(cval,-1,&cols) < 0) cols = 0 ;
+	    } /* end if (non-null) */
+	    if (cols < 2) {
+		cols = COLUMNS ;
+	    }
+	} /* end if (new 'cols' needed) */
+	return cols ;
+}
+/* end subroutine (mkcols) */
 
 
