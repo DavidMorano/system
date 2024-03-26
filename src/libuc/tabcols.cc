@@ -37,8 +37,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
-#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<intceil.h>
@@ -62,6 +60,9 @@
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

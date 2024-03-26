@@ -1,5 +1,5 @@
 /* tabexpand SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* expand TAB characters to the appropriate number of spaces */
 /* version %I% last-modified %G% */
@@ -22,15 +22,16 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
-#include	<char.h>
 #include	<sbuf.h>
+#include	<tabcols.h>
+#include	<char.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
+
+#include	"tabexpand.h"
 
 
 /* local defines */
@@ -38,9 +39,13 @@
 #define	DSTORE		struct dstore
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	tabcols(int,int) noex ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -64,6 +69,11 @@ static int	dstore_finish(DSTORE *) noex ;
 
 /* local variables */
 
+constexpr int	ntabcols = NTABCOLS ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
@@ -77,7 +87,7 @@ int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 	        cchar	*sp = sbuf ;
 	        while ((dcol >= 0) && sl && sp[0]) {
 	            if (*sp == '\t') {
-	                cint	n = tabcols(NTABCOLS,dcol) ;
+	                cint	n = tabcols(ntabcols,dcol) ;
 	                for (int j = 0 ; (dcol >= 0) && (j < n) ; j += 1) {
 	                    dcol = dstore_add(&d,' ') ;
 		        }
@@ -99,10 +109,14 @@ int tabexpand(char *dbuf,int dlen,cchar *sbuf,int slen) noex {
 /* local subroutines */
 
 static int dstore_start(DSTORE *dp,char *dbuf,int dlen) noex {
-	dp->dlen = dlen ;
-	dp->dp = dbuf ;
-	dp->dl = 0 ;
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (dp && dbuf) {
+	    rs = SR_OK ;
+	    dp->dlen = dlen ;
+	    dp->dp = dbuf ;
+	    dp->dl = 0 ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (dstore_start) */
 
@@ -118,8 +132,13 @@ static int dstore_add(DSTORE *dp,int c) noex {
 /* end subroutine (dstore_add) */
 
 static int dstore_finish(DSTORE *dp) noex {
-	dp->dp = '\0' ;
-	return dp->dl ;
+	int		rs = SR_FAULT ;
+	if (dp) {
+	    char	*bp = dp->dp ;
+	    *bp = '\0' ;
+	    rs = dp->dl ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (dstore_finish) */
 

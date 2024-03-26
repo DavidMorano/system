@@ -226,7 +226,7 @@ OBJ112= strcpyxc.o
 OBJ113=
 OBJ114=
 OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o
-OBJ116= mkcleanline.o tabcols.o checkbase.o ncol.o
+OBJ116= mkcleanline.o checkbase.o ncol.o tabexpand.o tabcols.o 
 OBJ117= mapex.o calstrs.o
 OBJ118=
 OBJ119= toxc.o base64.o 
@@ -1117,7 +1117,9 @@ ucinetconv.o:		ucinetconv.cc ucinetconv.h
 b64decover.o:		b64decoder.cc b64decoder.h
 
 # tab handling
-ncol.o:			ncol.cc ncol.h
+tabcols.o:		tabcols.cc tabcols.h
+ncol.o:			ncol.cc ncol.h tabcols.h
+tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 
 # INET
 inetconv.o:		inetconv.cc inetconv.h
