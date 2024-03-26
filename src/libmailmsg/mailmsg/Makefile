@@ -62,9 +62,10 @@ OBJ4_MAILMSG= mailmsg_loadfd.o mailmsg_loadmb.o mailmsg_loadfile.o
 
 
 OBJA_MAILMSG= obj0_mailmsg.o obj1_mailmsg.o
-OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o obj4_mailmsg.o
+OBJB_MAILMSG= obj2_mailmsg.o obj3_mailmsg.o
+OBJC_MAILMSG= obj4_mailmsg.o
 
-OBJ_MAILMSG= $(OBJA_MAILMSG) $(OBJB_MAILMSG)
+OBJ_MAILMSG= obja_mailmsg.o objb_mailmsg.o objc_mailmsg.o
 
 
 default:		$(T).a
@@ -125,6 +126,14 @@ obj3_mailmsg.o:	$(OBJ3_MAILMSG)
 obj4_mailmsg.o:	$(OBJ4_MAILMSG)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_MAILMSG)
 
+obja_mailmsg.o:	$(OBJA_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_MAILMSG)
+
+objb_mailmsg.o:	$(OBJB_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_MAILMSG)
+
+objc_mailmsg.o:	$(OBJC_MAILMSG)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJC_MAILMSG)
 
 mailmsg_main.o:			mailmsg_main.cc			$(INCS)
 mailmsg_loadfd.o:		mailmsg_loadfd.cc		$(INCS)
