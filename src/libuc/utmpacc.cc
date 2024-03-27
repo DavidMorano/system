@@ -85,7 +85,7 @@
 #define	UTMPACC_TOCAP		(5*60)
 
 #define	ENT			utmpaccent
-#define	ARG			utmpacc_a
+#define	ARG			utmpacc_arg
 
 
 /* imported namespaces */
@@ -133,18 +133,18 @@ namespace {
 	    return callout(-1) ;
 	} ;
     } ; /* end struct (utmpacc_co) */
-    struct utmpacc_a {
+    struct utmpacc_arg {
 	ENT		*uep ;
 	time_t		dt = 0 ;
 	char		*uebuf ;
 	int		uelen ;
-	utmpacc_a(time_t t,ENT *p,char *b,int l) noex {
+	utmpacc_arg(time_t t,ENT *p,char *b,int l) noex {
 	    dt = t ;
 	    uep = p ;
 	    uebuf = b ;
 	    uelen = l ;
 	} ; /* end ctor */
-    } ; /* end struct (utmpacc_a) */
+    } ; /* end struct (utmpacc_arg) */
     struct utmpacc {
 	utmpacc_co	init ;
 	utmpacc_co	fini ;
@@ -246,12 +246,12 @@ int utmpacc_users(int w) noex {
 }
 
 int utmpacc_entsid(ENT *uep,char *uebuf,int uelen,pid_t sid) noex {
-	utmpacc_a	a(0,uep,uebuf,uelen) ;
+	utmpacc_arg	a(0,uep,uebuf,uelen) ;
 	return utmpacc_data.entsid(&a,sid) ;
 }
 
 int utmpacc_entline(ENT *uep,char *uebuf,int uelen,cchar *lp,int ll) noex {
-	utmpacc_a	a(0,uep,uebuf,uelen) ;
+	utmpacc_arg	a(0,uep,uebuf,uelen) ;
 	return utmpacc_data.entline(&a,lp,ll) ;
 }
 
