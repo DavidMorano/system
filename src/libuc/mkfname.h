@@ -22,6 +22,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+#include	<mkfnamesuf.h>
+
 
 EXTERNC_begin
 

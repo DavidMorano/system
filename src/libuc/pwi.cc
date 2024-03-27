@@ -21,7 +21,7 @@
 	that is part of the Korn Shell (KSH).
 
 	This object provides some front-end glue for using the
-	IPASSWD object on an IPASSWD database.
+	Iucentpw object on an Iucentpw database.
 
 	Notes:
 
@@ -47,17 +47,27 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucpwcache.h>
 #include	<getbufsize.h>
 #include	<endianstr.h>
-#include	<mkpath.h>
+#include	<mkpathx.h>
+#include	<mkfname.h>
+#include	<sfx.h>
+#include	<snx.h>
+#include	<snwcpy.h>
+#include	<strwcpy.h>
+#include	<strn.h>
 #include	<mkfnamesuf.h>
-#include	<char.h>
+#include	<mkgecosname.h>
 #include	<realname.h>
 #include	<ipasswd.h>
 #include	<vecstr.h>
 #include	<spawnproc.h>
-#include	<ucpwcache.h>
+#include	<getnodename.h>
 #include	<prgetclustername.h>
+#include	<xperm.h>
+#include	<char.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"pwi.h"
@@ -75,8 +85,8 @@
 
 #define	DBDNAME		"var/pwi"
 
-#ifndef	PASSWDFNAME
-#define	PASSWDFNAME	"/etc/passwd"
+#ifndef	ucentpwFNAME
+#define	ucentpwFNAME	"/etc/passwd"
 #endif
 
 #ifndef	realnameLEN
@@ -127,30 +137,16 @@
 #define	PWDESC		struct pwdesc
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy4(char *,int, cchar *,cchar *,cchar *,cchar *) ;
-extern int	sncpylc(char *,int,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath1(char *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	getnodename(char *,int) ;
-extern int	getgecosname(cchar *,int,cchar **) ;
-extern int	hasuc(cchar *,int) ;
-extern int	isNotPresent(int) ;
 
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpyuc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
+/* external variables */
 
 
 /* local structures */
@@ -167,7 +163,7 @@ struct subinfo {
 } ;
 
 struct pwdesc {
-	PASSWD		*pwp ;
+	ucentpw		*pwp ;
 	char		*pwbuf ;
 	int		pwlen ;
 } ;
@@ -203,7 +199,7 @@ static constexpr cpcchar	prbins[] = {
 	nullptr
 } ;
 
-static constexpr cchar	*extras = "¹²³" ;
+static constexpr cchar		extras[] = "¹²³" ;
 
 
 /* exported variables */
@@ -225,7 +221,7 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 	    if ((rs = subinfo_midname(sip)) >= 0) {
 	        time_t	ti_pwi ;
 	        cint	to = TO_FILEMOD ;
-	        cchar	*suf = IPASSWD_SUF ;
+	        cchar	*suf = Iucentpw_SUF ;
 	        cchar	*endstr = ENDIANSTR ;
 	        cchar	*midname = sip->midname ;
 	        char	fname[MAXPATHLEN+1] ;
@@ -244,13 +240,13 @@ int pwi_open(PWI *op,cchar *pr,cchar *dbname) noex {
 
 	            if (rs1 >= 0) {
 
-	                rs1 = u_stat(PASSWDFNAME,&sb) ;
+	                rs1 = u_stat(ucentpwFNAME,&sb) ;
 
 	                if ((rs1 >= 0) && (sb.st_mtime > ti_pwi)) {
 	                    rs1 = SR_NOTFOUND ;
 	                }
 
-	            } /* end if (checking against system PASSWD file) */
+	            } /* end if (checking against system ucentpw file) */
 
 	            if ((rs1 == SR_NOTFOUND) || (rs1 == SR_ACCESS)) {
 	                rs = subinfo_mkpwi(sip) ;
@@ -291,7 +287,7 @@ int pwi_close(PWI *op) noex {
 /* end subroutine (pwi_close) */
 
 int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
-	IPASSWD_CUR	cur ;
+	Iucentpw_CUR	cur ;
 	realname	rn ;
 	cint		nlen = realnameLEN ;
 	int		rs = SR_OK ;
@@ -328,7 +324,7 @@ int pwi_lookup(PWI *op,char *rbuf,int rlen,cchar *name) noex {
 /* load "name" into realname object for lookup */
 
 	if (rs >= 0) {
-	    PASSWD	pw ;
+	    ucentpw	pw ;
 	    cint	pwlen = getbufsize(getbufsize_pw) ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
@@ -570,7 +566,7 @@ static int subinfo_mkpwi(SUBINFO *sip) noex {
 /* end subroutine (subinfo_mkpwi) */
 
 static int realname_isextra(realname *op,PWDESC *pdp,cchar *un) noex {
-	PASSWD		*pwp = pdp->pwp ;
+	ucentpw		*pwp = pdp->pwp ;
 	cint		pwlen = pdp->pwlen ;
 	int		rs ;
 	int		f = false ;
