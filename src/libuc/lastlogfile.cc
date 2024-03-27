@@ -1,16 +1,16 @@
-/* lastlogfile */
+/* lastlogfile SUPPORT */
+/* lang=C++20 */
 
 /* manage reading or writing a LASTLOG file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 1998-08-22, David A­D­ Morano
-        This subroutine module was adopted for use from some previous code that
-        performed the similar sorts of functions.
+	This subroutine module was adopted for use from some previous
+	code that performed the similar sorts of functions.
 
 */
 
@@ -18,31 +18,27 @@
 
 /*******************************************************************************
 
-        This code is used to manage one LASTLOG type file. This sort of file is
-        usually used to track the last time that a person has logged in. This
-        function was implemented as part of PCS long before it was adopted as
-        standard (or pseudo standard) practice in UNIX® proper.
-
-        This code represents a shift for PCS related software from using the
-        older proprietary LASTLOG feature to the newer UNIX® standard (pseudo
-        standard -- whatever) mechanism.
-
+	This code is used to manage one LASTLOG type file.  This
+	sort of file is usually used to track the last time that a
+	person has logged in.  This function was implemented as
+	part of PCS long before it was adopted as standard (or
+	pseudo standard) practice in UNIX® proper.  This code
+	represents a shift for PCS related software from using the
+	older proprietary LASTLOG feature to the newer UNIX® standard
+	(pseudo standard -- whatever) mechanism.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"lastlogfile.h"
@@ -54,26 +50,39 @@
 #define	LASTLOGFILE_OPENTIME	30	/* seconds */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern "C" {
+    int		lastlogfile_close(LASTLOGFILE *) noex ;
+}
+
+
+/* external variables */
 
 
 /* forward references */
 
-int		lastlogfile_close(LASTLOGFILE *) ;
+static int	lastlogfile_checkopen(LASTLOGFILE *) noex ;
+static int	lastlogfile_fileclose(LASTLOGFILE *) noex ;
 
-static int	lastlogfile_checkopen(LASTLOGFILE *) ;
-static int	lastlogfile_fileclose(LASTLOGFILE *) ;
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int lastlogfile_open(LASTLOGFILE *llp,cchar *fname,int oflags)
-{
+int lastlogfile_open(LASTLOGFILE *llp,cchar *fname,int oflags) noex {
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
 #if	CF_DEBUGS
 	debugprintf("lastlogfile_open: ent filename=%s\n",fname) ;
