@@ -417,10 +417,13 @@ UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
 UOBJ11= strwcpy.o
 
+UOBJ12= ufstat.o ucttyname.o
+
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
 UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
 UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
+UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ14)
 
 
 .SUFFIXES:		.ls .i .cx .cs
