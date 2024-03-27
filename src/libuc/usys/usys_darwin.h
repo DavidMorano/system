@@ -255,6 +255,29 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
+/* UTMPENT-FIELDS begin (unnamed POSIX® semaphores) */
+#if	defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0)
+
+#ifndef	UTMPXSTRUCTGIELD_SESSION
+#define	UTMPXSTRUCTGIELD_SESSION
+
+#define	ut_session	ut_type
+
+#endif /* UTMPXSTRUCTGIELD_SESSION */
+
+#ifndef	UTMPXSTRUCTGIELD_SYSLEN
+#define	UTMPXSTRUCTGIELD_SYSLEN
+
+#define	ut_syslen	ut_type
+
+#endif /* UTMPXSTRUCTGIELD_SYSLEN */
+
+#endif /* defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0) */
+/* UTMPENT_FIELDS end */
+/*----------------------------------------------------------------------------*/
+
+
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
 /* USYS_DARWIN finish */
 

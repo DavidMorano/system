@@ -28,6 +28,7 @@
 #include	<utmpx.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #ifndef	UTMPENT

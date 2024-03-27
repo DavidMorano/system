@@ -74,7 +74,7 @@
 #endif
 
 #ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	40
+#define	TIMEBUFLEN	80
 #endif
 
 #ifndef	TERMBUFLEN
@@ -390,7 +390,7 @@ static int findline(int pm) noex {
 		    UTMPX	ut{} ;
 		    UTMPX	*up ;
 		    cchar	*line = (tbuf+n) ;
-		    strncpy(ut.ut_line,line,sizeof(ut.ut_line)) ;
+		    strncpy(ut.ut_line,line,utl_line) ;
 		    if ((up = getutxliner(&ut)) != nullptr) {
 			f = true ;
 			rs = printutxval(pm,up) ;
@@ -415,7 +415,7 @@ static int findenv(int pm) noex {
 	    if (line[0]) {
 	        UTMPX	ut{} ;
 	        UTMPX	*up ;
-	        strncpy(ut.ut_line,line,sizeof(ut.ut_line)) ;
+	        strncpy(ut.ut_line,line,utl_line) ;
 	        if ((up = getutxliner(&ut)) != nullptr) {
 		    f = true ;
 		    rs = printutxval(pm,up) ;
