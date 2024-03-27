@@ -53,13 +53,15 @@
 #include	<clanguage.h>
 
 
+template<typename K,typename B> class mapblock ;
+
 template <typename K,typename B>
 class mapblock_iter {
-	typedef mapblock_node<K,B>	node ;
-	mapblock_node<K,B>	*n = nullptr ;
-	mutable K		defval ;
-	mapblock_iter<K,B>	&findnext(int) ;
+	typedef typename mapblock_node<K,B>	node ;
 	typedef mapblock_iter	bit ;
+	mapblock_node<K,B>	*n = nullptr ;
+	mapblock_iter<K,B>	&findnext(int) ;
+	mutable K		defval ;
 public:
 	mapblock_iter() noex { } ;
 	mapblock_iter(node *an) : n(an) noex { } ;
@@ -192,6 +194,14 @@ public:
 	int	get(K,B *) noex ;
 	int	count() noex ;
 	int	finish() noex ;
+	iterator begin() noex {
+	    interactor	it(this,false) ;
+	    return it ;
+	} ;
+	iterator end() noex {
+	    interactor	it(this,true) ;
+	    return it ;
+	} ;
 } ; /* end class (mapblock) */
 
 template<typename K,typename B>

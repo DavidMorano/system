@@ -1,7 +1,7 @@
 /* singlist HEADER */
 /* lang=C++98 */
 
-/* regular (no-frills) pointer queue (not-circular) */
+/* regular (no-frills) singly-linked pointer queue (not-circular) */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-	This is a conainer object (elements are stored within it).
+	This is a container object (elements are stored within it).
 	This also is implemented as a single-linked list of nodes.
 	This object is very useful for normal queue operations
 	(insert at tail, remove at head). The following operations
