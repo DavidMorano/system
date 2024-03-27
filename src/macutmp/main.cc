@@ -58,6 +58,7 @@
 #include	<cstring>		/* <- |strncmp(3c)| + |strlen(3c)| */
 #include	<iostream>
 #include	<usystem.h>		/* for |u_fstat(3u)| */
+#include	<isoneof.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
@@ -161,6 +162,8 @@ static bool isourtype(UTMPX *up) noex {
 	return f ;
 }
 
+static bool	isNoTerm(int) noex ;
+
 static char	*strtcpy(char *,cchar *,int) noex ;
 
 static UTMPX	*getutxliner(UTMPX *) noex ;
@@ -205,6 +208,13 @@ constexpr int		utl_user = UT_NAMESIZE ;
 constexpr int		utl_line = UT_LINESIZE ;
 constexpr int		utl_host = UT_HOSTSIZE ;
 constexpr int		tlen = TIMEBUFLEN ;
+
+constexpr int		rsnoterm[] = {
+	SR_BADF,
+	SR_BADFD,
+	SR_NOTTY,
+	0
+} ;
 
 
 /* exported variables */
@@ -386,7 +396,7 @@ static int findline(int pm) noex {
 			rs = printutxval(pm,up) ;
 		    }
 		} /* end if (matched) */
-	    } else if (isNotAccess(rs)) {
+	    } else if (isNoTerm(rs)) {
 		rs = SR_OK ;
 	    } /* end if (ttyname) */
 	} else if (isNotAccess(rs)) {
@@ -501,5 +511,9 @@ static UTMPX *getutxliner(UTMPX *sup) noex {
 	return up ;
 }
 /* end subroutine (getutxliner) */
+
+static bool isNoTerm(int rs) noex {
+	return isOneOf(rsnoterm,rs) ;
+}
 
 
