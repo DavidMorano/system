@@ -40,9 +40,11 @@
 #include	<usys_sunos.h>
 #include	<usys_darwin.h>
 #include	<usys_linux.h>
+
 #include	<usys_mqueue.h>
 #include	<usys_gethrtime.h>
 #include	<usys_getrandom.h>
+#include	<usys_ttynamerp.h>
 
 
 #endif /* USYS_INCLUDE */

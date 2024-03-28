@@ -28,7 +28,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-# if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+#if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 #define	F_SUNOS		1
 #else
 #define	F_SUNOS		0
@@ -38,7 +38,7 @@
 #else
 #define	F_DARWIN	0
 #endif
-# if defined(OSNAME_Linux) && (OSNAME_Linux > 0)
+#if defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 #define	F_LINUX		1
 #else
 #define	F_LINUX		0

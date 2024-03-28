@@ -48,13 +48,8 @@
 
 /* forward references */
 
-static int	ucttyname(int,char *,int) noex ;
-
 
 /* local variables */
-
-constexpr bool		f_sunos = F_SUNOS ;
-constexpr bool		f_darwin = F_DARWIN ;
 
 
 /* exported variables */
@@ -70,8 +65,10 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	    if (fd >= 0) {
 		rs = SR_INVALID ;
 		if (dlen >= 0) {
-		    if ((rs = ucttyname(fd,dbuf,dlen)) >= 0) {
+		    if ((rs = ttynamerp(fd,dbuf,dlen)) >= 0) {
 	    	        len = strnlen(dbuf,dlen) ;
+		    } else {
+			rs = (- rs) ; /* returned an ERRNO code */
 		    }
 		} /* end if (valid) */
 	    } /* end if (valid) */
@@ -79,27 +76,5 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uc_ttyname) */
-
-
-/* local subroutines */
-
-static int ucttyname(int fd,char *dbuf,int dlen) noex {
-	int		rs = SR_OK ;
-	if constexpr (f_sunos) {
-	    cnullptr	np{} ;
-	    char	*p ;
-	    errno = 0 ; /* clear before next call */
-	    p = reinterpret_cast<char *>(ttyname_r(fd,dbuf,dlen)) ;
-	    if (p == np) {
-		rs = (- errno) ;
-	    }
-	} else {
-	    if ((rs = ttyname_r(fd,dbuf,dlen)) != 0) {
-		rs = (- rs) ;
-	    }
-	}
-	return rs ;
-}
-/* end subhroutine (ucttyname) */
 
 
