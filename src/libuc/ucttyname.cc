@@ -65,7 +65,7 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	    if (fd >= 0) {
 		rs = SR_INVALID ;
 		if (dlen >= 0) {
-		    if ((rs = ttynamerp(fd,dbuf,dlen)) >= 0) {
+		    if ((rs = ttyname_rp(fd,dbuf,dlen)) >= 0) {
 	    	        len = strnlen(dbuf,dlen) ;
 		    } else {
 			rs = (- rs) ; /* returned an ERRNO code */

@@ -27,13 +27,13 @@
 
 *******************************************************************************/
 
-#ifndef	USYS_DARWIN_INCLUDE
-#define	USYS_DARWIN_INCLUDE
+#ifndef	USYSDARWIN_INCLUDE
+#define	USYSDARWIN_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* USYS_DARWIN start */
+/* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
@@ -279,9 +279,9 @@ EXTERNC_end
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
-/* USYS_DARWIN finish */
+/* USYSDARWIN finish */
 
 
-#endif /* USYS_DARWIN_INCLUDE */
+#endif /* USYSDARWIN_INCLUDE */
 
 

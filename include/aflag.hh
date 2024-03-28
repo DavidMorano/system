@@ -12,11 +12,11 @@
 
 */
 
-/* Copyright (c) 2020 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2020 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	AFLAG_INCLUDE
 #define	AFLAG_INCLUDE
-#ifdef	__cplusplus
+#ifdef	__cplusplus			/* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -33,6 +33,8 @@ enum aflagmems {
 	aflagmem_wait,
 	aflagmem_notify,
 	aflagmem_notifyall,
+	aflagmem_guardbegin,
+	aflagmem_guardend,
 	aflagmem_overlast
 } ;
 struct aflag ;
@@ -58,6 +60,8 @@ struct aflag {
 	aflag_co	wait ;
 	aflag_co	notify ;
 	aflag_co	notifyall ;
+	aflag_co	guardbegin ;
+	aflag_co	guardend ;
 	constexpr aflag() noex {
 	    set(this,aflagmem_set) ;
 	    clear(this,aflagmem_clear) ;
@@ -66,6 +70,8 @@ struct aflag {
 	    wait(this,aflagmem_wait) ;
 	    notify(this,aflagmem_notify) ;
 	    notifyall(this,aflagmem_notifyall) ;
+	    guardbegin(this,aflagmem_guardbegin) ;
+	    guardend(this,aflagmem_guardend) ;
 	} ;
 	operator bool () noex {
 	    return af.test() ;
@@ -80,6 +86,8 @@ struct aflag {
 	    }
 	    return rf ;
 	} ;
+	int iguardbegin(int = -1) noex ;
+	int iguardend() noex ;
 } ; /* end struct (aflag) */
 
 

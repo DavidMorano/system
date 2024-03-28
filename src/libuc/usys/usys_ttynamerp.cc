@@ -28,6 +28,7 @@
 #include	<utypedefs.h>
 #include	<usysrets.h>
 #include	<clanguage.h>
+#include	<aflag.hh>		/* mutex-flag */
 
 #include	"usys_ttynamerp.h"
 
@@ -36,7 +37,7 @@
 
 #if defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
-int ttynamerp(int fd,char *rbuf,int rlen) noex {
+int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		sz = size_t(rlen) ;
 	int		ec = 0 ;
 	if (char *p ; (p = ttyname_r(fd,rbuf,sz)) == nullptr) {
@@ -47,7 +48,7 @@ int ttynamerp(int fd,char *rbuf,int rlen) noex {
 
 #else /* all other operatring systems at this time */
 
-int ttynamerp(int fd,char *rbuf,int rlen) noex {
+int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	csize		sz = size_t(rlen) ;
 	return ttyname_r(fd,rbuf,sz) ;
 }
@@ -56,18 +57,26 @@ int ttynamerp(int fd,char *rbuf,int rlen) noex {
 
 #else /* defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0) */
 
-int ttynamerp(int fd,char *rbuf,int rlen) noex {
+static aflag	mx ;
+
+int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	int		ec = 0 ;
 	if (fd >= 0) {
 	    if (rbuf) {
 		if (rlen >= 0) {
 		    csize	sz = size_t(rlen) ;
-		    if (char *p ; (p = ttyname(fd)) != nullptr) {
-			char	*dp = stpncpy(rbuf,p,sz) ;
-			*dp = '\0' ;
+		    int		rc ;
+		    if ((rc = mx.iguardbegin()) >= 0) {
+		        if (char *p ; (p = ttyname(fd)) != nullptr) {
+			    char	*dp = stpncpy(rbuf,p,sz) ;
+			    *dp = '\0' ;
+		        } else {
+			    ec = errno ;
+		        } /* end if (ttyname) */
+			mx.iguardend(0 ;
 		    } else {
-			ec = errno ;
-		    } /* end if (ttyname) */
+		        ec = (- rc) ;
+		    } /* end if (aflag-mx) */
 		} else {
 	            ec = EINVAL ;
 		}

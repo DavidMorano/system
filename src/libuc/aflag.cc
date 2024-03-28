@@ -21,7 +21,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<atomic>
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usupport.h>		/* |timewatch(3u)| */
 
 #include	"aflag.hh"
 
@@ -29,10 +32,19 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
+
+
+/* local structures */
 
 
 /* forward references */
@@ -104,5 +116,25 @@ bool aflag_co::operator () (bool a) noex {
 	return rf ;
 }
 /* end method (aflag_co::operator) */
+
+int aflag::iguardbegin(int to) noex {
+	int		rs = SR_OK ;
+	if (to >= 0) {
+	    rs = SR_NOSYS ;
+	} else {
+	    while (af.test_and_set(memord_acquire) == true) {
+		af.wait(true,memord_relaxed) ;
+	    }
+	}
+	return rs ;
+}
+/* end method (aflag::iguardbegin) */
+
+int aflag::iguardend() noex {
+	af.clear(memord_release) ;
+	af.notify_one() ;
+	return SR_OK ;
+}
+/* end method (aflag::iguardend) */
 
 

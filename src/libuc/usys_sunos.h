@@ -24,13 +24,13 @@
 
 *******************************************************************************/
 
-#ifndef	USYS_SUNOS_INCLUDE
-#define	USYS_SUNOS_INCLUDE
+#ifndef	USYSSUNOS_INCLUDE
+#define	USYSSUNOS_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* USYS_SUNOS start */
+/* USYSSUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 
 #include	<sys/types.h>
@@ -72,9 +72,9 @@ typedef userattr_t	userattr ;
 
 
 #endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
-/* USYS_SUNOS finish */
+/* USYSSUNOS finish */
 
 
-#endif /* USYS_SUNOS_INCLUDE */
+#endif /* USYSSUNOS_INCLUDE */
 
 
