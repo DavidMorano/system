@@ -57,7 +57,7 @@ int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 
 #else /* defined(SYSHAS_TTYNAMER) && (SYSHAS_TTYNAMER > 0) */
 
-static aflag	mx ;
+static constinit aflag	mx ;
 
 int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	int		ec = 0 ;
@@ -65,8 +65,8 @@ int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 	    if (rbuf) {
 		if (rlen >= 0) {
 		    csize	sz = size_t(rlen) ;
-		    int		rc ;
-		    if ((rc = mx.iguardbegin()) >= 0) {
+		    int		rs ;
+		    if ((rs = mx.iguardbegin()) >= 0) {
 		        if (char *p ; (p = ttyname(fd)) != nullptr) {
 			    char	*dp = stpncpy(rbuf,p,sz) ;
 			    *dp = '\0' ;
@@ -75,7 +75,7 @@ int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 		        } /* end if (ttyname) */
 			mx.iguardend(0 ;
 		    } else {
-		        ec = (- rc) ;
+		        ec = (- rs) ;
 		    } /* end if (aflag-mx) */
 		} else {
 	            ec = EINVAL ;

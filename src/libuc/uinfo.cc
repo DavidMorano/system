@@ -181,6 +181,9 @@ constexpr bool		f_hwserial = F_HWSERIAL ;
 constexpr bool		f_srpcdomain = F_SRPCDOMAIN ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uinfo_init() noex {
