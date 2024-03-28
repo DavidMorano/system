@@ -24,7 +24,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
-#include	<usupport.h>		/* |timewatch(3u)| */
+#include	<usupport.h>
+#include	<timewatch.hh>		/* |timewatch(3u)| */
 
 #include	"aflag.hh"
 
@@ -133,7 +134,11 @@ int aflag_gu::operator () (int to) noex {
 int aflag::iguardbegin(int to) noex {
 	int		rs = SR_OK ;
 	if (to >= 0) {
-	    rs = SR_NOSYS ;
+	    timewatch	tw(to) ;
+	    auto lamb = [this] () -> int {
+	        return int(! af.test_and_set(memord_acquire)) ;
+	    } ; /* end lambda (lamb) */
+	    rs = tw(lamb) ;		/* <- time-watching occurs in there */
 	} else {
 	    while (af.test_and_set(memord_acquire) == true) {
 		af.wait(true,memord_relaxed) ;
