@@ -1,4 +1,4 @@
-# MAKEFILES (libpr)
+# MAKEFILE (libpr)
 
 T= libpr
 

@@ -22,11 +22,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<unistd.h>
+#include	<unistd.h>		/* |ttyname_r(3c)| */
 #include	<fcntl.h>
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstring>
+#include	<cstring>		/* |strnlen(3c)| */
 #include	<usystem.h>
 #include	<usysflag.h>
 
@@ -67,10 +67,13 @@ int uc_ttyname(int fd,char *dbuf,int dlen) noex {
 	int		len = 0 ;
 	if (dbuf) {
 	    rs = SR_BADF ;
-	    if ((fd >= 0) && (dlen > 0)) {
-		if ((rs = ucttyname(fd,dbuf,dlen)) >= 0) {
-	    	    len = strnlen(dbuf,dlen) ;
-		}
+	    if (fd >= 0) {
+		rs = SR_INVALID ;
+		if (dlen >= 0) {
+		    if ((rs = ucttyname(fd,dbuf,dlen)) >= 0) {
+	    	        len = strnlen(dbuf,dlen) ;
+		    }
+		} /* end if (valid) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

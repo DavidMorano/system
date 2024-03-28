@@ -1,4 +1,4 @@
-# MAKEFILES (macutmp)
+# MAKEFILE (macutmp)
 
 T= macutmp
 
