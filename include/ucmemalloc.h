@@ -24,10 +24,10 @@
 #include	<clanguage.h>
 
 
-#define	UCMEMALLOC_STATS	struct ucmemalloc_stats
+#define	UCMEMALLOC_STATS	struct ucmemalloc_status
 
 
-struct ucmemalloc_stats {
+struct ucmemalloc_status {
 	ulong		err_underflow ;
 	ulong		err_overflow ;
 	ulong		err_noalloc ;
@@ -44,6 +44,8 @@ struct ucmemalloc_stats {
 	int		err_rs ;
 } ; /* end structure (ucmemalloc_stats) */
 
+typedef	UCMEMALLOC_STATS	ucmemalloc_stats ;
+
 EXTERNC_begin
 
 extern int uc_malloc(int,void *) noex ;
@@ -55,7 +57,7 @@ extern int uc_free(cvoid *vp) noex ;
 extern int uc_mallset(int) noex ;
 extern int uc_mallcount(ulong *) noex ;
 extern int uc_mallout(ulong *) noex ;
-extern int uc_mallstats(UCMEMALLOC_STATS *) noex ;
+extern int uc_mallstats(ucmemalloc_stats *) noex ;
 extern int uc_mallpresent(cvoid *) noex ;
 
 EXTERNC_end

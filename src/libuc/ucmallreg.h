@@ -29,38 +29,27 @@
 #include	<usystem.h>
 
 
-#define		UCMALLREG_CUR	struct ucmallreg_cur
-#define		UCMALLREG_REG	struct ucmallreg_reg
+#define		UCMALLREG_CUR	struct ucmallreg_cursor
+#define		UCMALLREG_ENT	struct ucmallreg_entry
 
-
-enum ucmallregs {
-	ucmallreg_used,
-	ucmallreg_usedmax,
-	ucmallreg_outnum,
-	ucmallreg_outnummax,
-	ucmallreg_outsize,
-	ucmallreg_outsizemax,
-	ucmallreg_under,
-	ucmallreg_over,
-	ucmallreg_notalloc,
-	ucmallreg_notfree,
-	ucmallreg_overlast
-} ;
 
 struct ucmallreg_cur {
 	int		i ;
 } ;
 
-struct ucmallreg_reg {
+struct ucmallreg_entry {
 	caddr_t		addr ;
 	size_t		size ;
 } ;
 
+typedef	UCMALLREG_CUR	ucmallreg_cur ;
+typedef	UCMALLREG_ENT	ucmallreg_ent ;
+
 EXTERNC_begin
 
-extern int ucmallreg_curbegin(UCMALLREG_CUR *) noex ;
-extern int ucmallreg_curend(UCMALLREG_CUR *) noex ;
-extern int ucmallreg_enum(UCMALLREG_CUR *,UCMALLREG_REG *) noex ;
+extern int ucmallreg_curbegin(ucmallreg_cur *) noex ;
+extern int ucmallreg_curend(ucmallreg_cur *) noex ;
+extern int ucmallreg_enum(ucmallreg_cur *,ucmallreg_ent *) noex ;
 
 EXTERNC_end
 
