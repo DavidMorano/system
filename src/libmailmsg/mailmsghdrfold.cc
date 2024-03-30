@@ -17,6 +17,9 @@
 
 /*******************************************************************************
 
+	Name:
+	mailmsghdrfold
+
 	Description:
 	This object module takes a line of text as input and breaks
 	it up into pieces that are folded so as to fit in a specified
@@ -450,12 +453,11 @@ static bool isskip(int ch) noex {
 
 #if	CF_STRNBREAK
 cchar *strnbreak(cchar *sp,int sl,int bch) noex {
-	int		ch ;
 	int		si ;
-	int		f = false ;
+	bool		f = false ;
 	bch &= UCHAR_MAX ;
 	while (sl && *sp) {
-	    ch = mkchar(sp[0]) ;
+	    cint	ch = mkchar(sp[0]) ;
 	    if (ch == CH_DQUOTE) {
 	        sp += 1 ;
 	        sl -= 1 ;

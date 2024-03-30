@@ -35,6 +35,11 @@ enum aflagmems {
 	aflagmem_notifyall,
 	aflagmem_overlast
 } ;
+enum aflagmxs {
+	aflagmx_guardbegin,
+	aflagmx_guardend,
+	aflagmx_overlast
+} ;
 struct aflag ;
 struct aflag_co {
 	aflag		*op = nullptr ;
@@ -48,7 +53,19 @@ struct aflag_co {
 	operator bool () noex {
 	    return operator () () ;
 	} ;
-} ;
+} ; /* end struct (aglag_co) */
+struct aflag_gu {
+	aflag		*op = nullptr ;
+	int		w = -1 ;
+	constexpr void operator () (aflag *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	int operator () (int = -1) noex ;
+	operator int () noex {
+	    return operator () () ;
+	} ;
+} ; /* end struct (aglag_gu) */
 struct aflag {
 	std::atomic_flag	af{} ;
 	aflag_co	set ;
@@ -58,6 +75,8 @@ struct aflag {
 	aflag_co	wait ;
 	aflag_co	notify ;
 	aflag_co	notifyall ;
+	aflag_gu	guardbegin ;
+	aflag_gu	guardend ;
 	constexpr aflag() noex {
 	    set(this,aflagmem_set) ;
 	    clear(this,aflagmem_clear) ;
@@ -66,8 +85,10 @@ struct aflag {
 	    wait(this,aflagmem_wait) ;
 	    notify(this,aflagmem_notify) ;
 	    notifyall(this,aflagmem_notifyall) ;
+	    guardbegin(this,aflagmx_guardbegin) ;
+	    guardend(this,aflagmx_guardend) ;
 	} ;
-	operator bool () noex {
+	operator bool () const noex {
 	    return af.test() ;
 	} ;
 	bool operator = (const bool f) noex {
@@ -80,6 +101,8 @@ struct aflag {
 	    }
 	    return rf ;
 	} ;
+	int iguardbegin(int = -1) noex ;
+	int iguardend() noex ;
 } ; /* end struct (aflag) */
 
 

@@ -54,11 +54,12 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h
 
 
-OBJ0_UCSYS= ucsys_sup.o userattr.o spwd.o
-OBJ1_UCSYS= ucsyspw.o ucsysgr.o ucsyspj.o
-OBJ2_UCSYS= ucsyspr.o ucsysnw.o ucsysho.o ucsyssv.o
+OBJ0_UCSYS= ucsys_sup.o
+OBJ1_UCSYS= userattr.o spwd.o
+OBJ2_UCSYS= ucsyspw.o ucsysgr.o ucsyspj.o
+OBJ3_UCSYS= ucsyspr.o ucsysnw.o ucsysho.o ucsyssv.o
 
-OBJ_UCSYS= obj0_ucget.o obj1_ucget.o obj2_ucget.o
+OBJ_UCSYS= obj0_ucsys.o obj1_ucsys.o obj2_ucsys.o obj3_ucsys.o
 
 
 default:		$(T).o
@@ -105,14 +106,17 @@ control:
 	(uname -n ; date) > Control
 
 
-obj0_ucget.o:	$(OBJ0_UCSYS)
+obj0_ucsys.o:	$(OBJ0_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UCSYS)
 
-obj1_ucget.o:	$(OBJ1_UCSYS)
+obj1_ucsys.o:	$(OBJ1_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UCSYS)
 
-obj2_ucget.o:	$(OBJ2_UCSYS)
+obj2_ucsys.o:	$(OBJ2_UCSYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UCSYS)
+
+obj3_ucsys.o:	$(OBJ3_UCSYS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UCSYS)
 
 
 ucsys_sup.o:	ucsys_sup.cc ucsys.h $(INCS)

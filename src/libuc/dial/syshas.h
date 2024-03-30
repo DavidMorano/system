@@ -357,7 +357,7 @@
 #define	SYSHAS_GMTIMER		1
 
 /* Darwin: ttyname_r(3c) */
-#define	SYSHAS_TTYNAMER		0
+#define	SYSHAS_TTYNAMER		1
 
 /* Darwin: postix_openpt(3c) */
 #define	SYSHAS_OPENPT		1

@@ -27,13 +27,13 @@
 
 *******************************************************************************/
 
-#ifndef	USYS_DARWIN_INCLUDE
-#define	USYS_DARWIN_INCLUDE
+#ifndef	USYSDARWIN_INCLUDE
+#define	USYSDARWIN_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* USYS_DARWIN start */
+/* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
 #include	<sys/types.h>
@@ -255,10 +255,33 @@ EXTERNC_end
 /*----------------------------------------------------------------------------*/
 
 
+/*----------------------------------------------------------------------------*/
+/* UTMPENT-FIELDS begin (unnamed POSIX® semaphores) */
+#if	defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0)
+
+#ifndef	UTMPXSTRUCTGIELD_SESSION
+#define	UTMPXSTRUCTGIELD_SESSION
+
+#define	ut_session	ut_type
+
+#endif /* UTMPXSTRUCTGIELD_SESSION */
+
+#ifndef	UTMPXSTRUCTGIELD_SYSLEN
+#define	UTMPXSTRUCTGIELD_SYSLEN
+
+#define	ut_syslen	ut_type
+
+#endif /* UTMPXSTRUCTGIELD_SYSLEN */
+
+#endif /* defined(SYSHAS_UTMPX) && (SYSHAS_UTMPX > 0) */
+/* UTMPENT_FIELDS end */
+/*----------------------------------------------------------------------------*/
+
+
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
-/* USYS_DARWIN finish */
+/* USYSDARWIN finish */
 
 
-#endif /* USYS_DARWIN_INCLUDE */
+#endif /* USYSDARWIN_INCLUDE */
 
 

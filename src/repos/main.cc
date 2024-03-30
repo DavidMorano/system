@@ -1,10 +1,17 @@
-/* main (repos) */
-/* lang=C89 */
+/* main SUPPORT (repos) */
+/* lang=C++20 */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<cstring>
 #include	<cstdio>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<strn.h>
+#include	<strwcmp.h>
+#include	<localmisc.h>
+
 
 /* local defines */
 
@@ -14,31 +21,24 @@
 
 /* external subroutines */
 
-extern int	strwcmp(const char *,const char *,int) ;
-
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* forward references */
 
-static int hmat(const char *,int) ;
-static int rmat(const char *,int,const char *) ;
+static bool hmat(cchar *,int) noex ;
+static bool rmat(cchar *,int,cchar *) noex ;
 
 /* exported subroutines */
 
-int main(int argc,const char **argv,const char **envv)
-{
+int main(int argc,cchar **argv,cchar **envv) {
 	FILE		*ifp = stdin ;
 	FILE		*ofp = stdout ;
-	const int	llen = LINEBUFLEN ;
+	cint		llen = LINEBUFLEN ;
 	int		f = 0 ;
 	char		lbuf[LINEBUFLEN+1] ;
-	const char	*name = "REPOS" ;
-
+	cchar		*name = "REPOS" ;
 	if (argc > 1) {
 	    name = argv[1] ;
 	}
-
 	while (fgets(lbuf,llen,ifp) > 0) {
 	   int	ll = strlen(lbuf) ;
 	   if (lbuf[ll-1] == '\n') ll -= 1 ;
@@ -46,47 +46,44 @@ int main(int argc,const char **argv,const char **envv)
 		f = rmat(lbuf,ll,name) ;
 	   }
  	   if (f) {
-		if (strstr(lbuf,"enabled=1") != NULL) {
+		if (strstr(lbuf,"enabled=1") != nullptr) {
 		    fprintf(ofp,"enabled=0\n") ;
-		} else
+		} else {
 		    fprintf(ofp,"%s",lbuf) ;
-	   } else
+		}
+	   } else {
 		fprintf(ofp,"%s",lbuf) ;
+	    }
 	} /* end while */
-
 	return 0 ;
 }
 /* end subroutine (main) */
 
 /* local subrouines */
 
-static int hmat(const char *sp,int sl)
-{
-	int		f = 0 ;
-	const char	*cp ;
-	const char	*tp ;
-	if ((tp = strnchr(sp,sl,'{')) != NULL) {
+static bool hmat(cchar *sp,int sl) noex {
+	bool		f = 0 ;
+	cchar		*cp ;
+	if (cchar *tp ; (tp = strnchr(sp,sl,'{')) != nullptr) {
 	    cp = (tp+1) ;
 	    sl -= ((tp+1)-sp) ;
 	    sp = (tp+1) ;
-	    if ((tp = strnchr(sp,sl,'}')) != NULL) {
+	    if ((tp = strnchr(sp,sl,'}')) != nullptr) {
 		f = 1 ;
 	    }
 	}
 	return f ;
 }
 
-static int rmat(const char *sp,int sl,const char *name)
-{
+static bool rmat(cchar *sp,int sl,cchar *name) noex {
 	int		cl ;
-	int		f = 0 ;
-	const char	*cp ;
-	const char	*tp ;
-	if ((tp = strnchr(sp,sl,'{')) != NULL) {
+	bool		f = 0 ;
+	cchar		*cp ;
+	if (cchar *tp ; (tp = strnchr(sp,sl,'{')) != nullptr) {
 	    cp = (tp+1) ;
 	    sl -= ((tp+1)-sp) ;
 	    sp = (tp+1) ;
-	    if ((tp = strnchr(sp,sl,'}')) != NULL) {
+	    if ((tp = strnchr(sp,sl,'}')) != nullptr) {
 		cl = (tp-sp) ;
 		f = (strwcmp(name,cp,cl) == 0) ;
 	    }

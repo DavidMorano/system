@@ -51,14 +51,15 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h
+INCS= usys.h
 
 
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
+OBJ3_USYS= usys_ttynamerp.o
 
-OBJ_USYS= obj0_ucent.o obj1_ucent.o obj2_ucent.o
+OBJ_USYS= obj0_usys.o obj1_usys.o obj2_usys.o obj3_usys.o
 
 
 default:		$(T).o
@@ -104,23 +105,27 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_ucent.o:	$(OBJ0_USYS)
+obj0_usys.o:	$(OBJ0_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_USYS)
 
-obj1_ucent.o:	$(OBJ1_USYS)
+obj1_usys.o:	$(OBJ1_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_USYS)
 
-obj2_ucent.o:	$(OBJ2_USYS)
+obj2_usys.o:	$(OBJ2_USYS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_USYS)
 
+obj3_usys.o:	$(OBJ3_USYS)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_USYS)
 
-usys_xxx.o:		usys_xxx.cc usys_xxx.h
-usys_sunos.o:		usys_sunos.cc usys_sunos.h
-usys_darwin.o:		usys_darwin.cc usys_darwin.h
-usys_linux.o:		usys_linux.cc usys_linux.h
 
-usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h
-usys_gethrtime.o:	usys_gethrtime.cc usys_gethrtime.h
-usys_getrandom.o:	usys_getrandom.cc usys_getrandom.h
+usys_xxx.o:		usys_xxx.cc usys_xxx.h			$(INCS)
+usys_sunos.o:		usys_sunos.cc usys_sunos.h		$(INCS)
+usys_darwin.o:		usys_darwin.cc usys_darwin.h		$(INCS)
+usys_linux.o:		usys_linux.cc usys_linux.h		$(INCS)
+
+usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h		$(INCS)
+usys_gethrtime.o:	usys_gethrtime.cc usys_gethrtime.h	$(INCS)
+usys_getrandom.o:	usys_getrandom.cc usys_getrandom.h	$(INCS)
+usys_ttynamerp.o:	usys_ttynamerp.cc usys_ttynamerp.h	$(INCS)
 
 

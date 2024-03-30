@@ -1,6 +1,10 @@
 /* testchar SUPPORT */
 /* lang=C++20 */
 
+/* test if |orintf(3c)| can print out ISO-Latin1 characters */
+/* version %I% last-modified %G% */
+
+
 /* revision history:
 
 	= 1998-04-13, David A-D- Morano

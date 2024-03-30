@@ -1,5 +1,5 @@
 /* groupids HEADER */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* group-ID fetch (UNIX® group-IDs) */
 /* version %I% last-modified %G% */

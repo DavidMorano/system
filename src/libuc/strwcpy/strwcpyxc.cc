@@ -60,6 +60,12 @@ extern "C" {
 }
 
 
+/* external subroutines */
+
+
+/* external variables */
+
+
 /* local subroutine-templates */
 
 template<toxc_f toxc>
@@ -73,6 +79,9 @@ char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 	return dp ;
 }
 /* end subroutine-template (strwcpyxc) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

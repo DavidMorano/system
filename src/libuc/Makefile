@@ -226,7 +226,7 @@ OBJ112= strcpyxc.o
 OBJ113=
 OBJ114=
 OBJ115= upt.o uptspawn.o tmtime.o spawnproc.o dupup.o
-OBJ116= mkcleanline.o tabcols.o checkbase.o ncol.o
+OBJ116= mkcleanline.o checkbase.o ncol.o tabexpand.o tabcols.o 
 OBJ117= mapex.o calstrs.o
 OBJ118=
 OBJ119= toxc.o base64.o 
@@ -417,10 +417,13 @@ UOBJ09= ustat.o readln.o ccfile.o
 UOBJ10= isnot.o isoneof.o
 UOBJ11= strwcpy.o
 
+UOBJ12= ufstat.o ucttyname.o
+
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
 UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
 UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
+UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ14)
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -896,7 +899,7 @@ libmallocxx.o:		libmallocxx.cc libmallocxx.h
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.cc mapblock.hh
 memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh mapblock.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management
@@ -1117,7 +1120,9 @@ ucinetconv.o:		ucinetconv.cc ucinetconv.h
 b64decover.o:		b64decoder.cc b64decoder.h
 
 # tab handling
-ncol.o:			ncol.cc ncol.h
+tabcols.o:		tabcols.cc tabcols.h
+ncol.o:			ncol.cc ncol.h tabcols.h
+tabexpand.o:		tabexpand.cc tabexpand.h tabcols.h
 
 # INET
 inetconv.o:		inetconv.cc inetconv.h

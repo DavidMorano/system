@@ -1,4 +1,4 @@
-# MAKEFILES (libpcs)
+# MAKEFILE (libpcs)
 
 T= libpcs
 

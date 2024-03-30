@@ -45,8 +45,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdint>		/* |uintptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 
@@ -89,6 +90,9 @@ extern int	memtrack_finish() noex ;
 /* lcaal variables */
 
 constexpr uint		memtrack_magic = MEMTRACK_MAGIC ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -197,24 +201,13 @@ void memtrack::dtor() noex {
 }
 /* end method (memtrack::dtor) */
 
-int memtrack_start::operator () (int n) noex { 
-	int		rs = SR_BUGCHECK ;
-	if (op) {
-	    return op->istart(n) ;
-	}
-	return rs ;
-}
-/* end method (memtrack_start::operator) */
-
-memtrack_start::operator int () noex { 
-	return (*this)() ;
-}
-/* end method (memtrack_start::operator) */
-
-memtrack_co::operator int () noex {
+int memtrack_co::operator () (int a) noex {
 	int		rs = SR_BUGCHECK ;
 	if ((w >= 0) && op) {
 	    switch (w) {
+	    case memtrackmem_start:
+		rs = op->istart(a) ;
+		break ;
 	    case memtrackmem_count:
 		rs = op->icount() ;
 		break ;

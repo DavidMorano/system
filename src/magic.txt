@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int mailmsgview_magic(mailmsgview *op,Args ... args) noex {
+static inline int mailbox_magic(mailbox *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSGVIEWER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MAILBOX_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailmsgview_magic) */
+/* end subroutine (mailbox_magic) */

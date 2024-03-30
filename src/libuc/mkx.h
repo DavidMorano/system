@@ -42,8 +42,8 @@
 #include	<mknpathxw.h>
 #include	<mknpathx.h>
 #include	<mkmagic.h>
-#include	<mkfnamesuf.h>
 #include	<mkfname.h>
+#include	<mkfnamesuf.h>
 #include	<mkfdfname.h>
 #include	<mkdisplayable.h>
 #include	<mknpath.h>

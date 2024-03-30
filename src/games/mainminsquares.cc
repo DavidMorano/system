@@ -23,8 +23,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstdlib>		/* |EXIT_SUCCESS| */
 #include	<cstring>
 #include	<new>
 #include	<initializer_list>
@@ -58,9 +58,9 @@ using namespace	std ;
 
 /* external subroutines */
 
-extern "C" int	igcd(int,int) ;
+extern "C" int		igcd(int,int) noex ;
 
-extern "C" cchar	*getourenv(cchar **,cchar *) ;
+extern "C" cchar	*getourenv(cchar **,cchar *) noex ;
 
 
 /* local structures */
@@ -74,12 +74,12 @@ struct papercase {
 	int		w = 0 ;	/* width */
 	papercase() = default ;
 	papercase(const papercase &) = default ;
-	papercase(int _h,int _w) : h(_h), w(_w) { } ;
+	papercase(int _h,int _w) noex : h(_h), w(_w) { } ;
 	friend papercase_equal ;
 	friend papercase_less ;
 	friend papercase_hash ;
-	papercase &operator = (initializer_list<int> &il) {
-	    int	p = 0 ;
+	papercase &operator = (initializer_list<int> &il) noex {
+	    int		p = 0 ;
 	    for (auto e : il) {
 		switch (p++) {
 		case 0:
@@ -88,8 +88,8 @@ struct papercase {
 		case 1:
 		    w = e ;
 		    break ;
-		}
-	    }
+		} /* end switch */
+	    } /* end for */
 	    return (*this) ;
 	} ;
 	friend ostream &operator  << (ostream &out,const papercase &pc) {
@@ -99,13 +99,13 @@ struct papercase {
 } ;
 
 struct papercase_equal {
-	bool operator () (const papercase &p1,const papercase &p2) const {
+	bool operator () (const papercase &p1,const papercase &p2) const noex {
 	    return (p1.h == p2.h) && (p1.w == p2.w) ;
 	} ;
 } ;
 
 struct papercase_less {
-	bool operator () (const papercase &p1,const papercase &p2) const {
+	bool operator () (const papercase &p1,const papercase &p2) const noex {
 	    int	rc ;
 	    if ((rc = (p1.h - p2.h)) == 0) {
 		rc = (p1.w - p2.w) ;
@@ -115,7 +115,7 @@ struct papercase_less {
 } ;
 
 struct papercase_hash {
-	size_t operator () (const papercase &pc) const {
+	size_t operator () (const papercase &pc) const noex {
 	    size_t	h = pc.h ;
 	    size_t	w = pc.w ;
 	    return (h ^ w) ;
@@ -125,11 +125,11 @@ struct papercase_hash {
 
 /* forward references */
 
-static void	printres(int) ;
+static void	printres(int) noex ;
 
-static int	minsquares1(const papercase &) ;
-static int	minsquares2(const papercase &) ;
-static int	minsquares3(const papercase &) ;
+static int	minsquares1(const papercase &) noex ;
+static int	minsquares2(const papercase &) noex ;
+static int	minsquares3(const papercase &) noex ;
 
 
 /* local variables */
@@ -152,11 +152,10 @@ int main(int,mainv,mainv) {
 	const int	algos[] = { 1, 2, 3 } ;
 	int		ex = 0 ;
 	int		rs = SR_OK ;
-
 	for (auto pc : pcases) {
 	    if (pc.h > 0) {
 	        for (auto al : algos) {
-	            int	res = 0 ;
+	            int		res = 0 ;
 	            cout << "algo=" << al << " pc=" << pc << endl ;
 	            switch (al) {
 	            case 1:
@@ -174,7 +173,6 @@ int main(int,mainv,mainv) {
 	        cout << endl ;
 	    } /* end if */
 	} /* end for (pcases) */
-
 	if (rs < 0) ex = 1 ;
 	return ex ;
 }
@@ -183,19 +181,15 @@ int main(int,mainv,mainv) {
 
 /* local subroutines */
 
-
 /* this is a (quite) bad solution! */
-static int minsquares1(const papercase &pc) 
-{
+static int minsquares1(const papercase &pc) noex {
 	const int	g = igcd(pc.h,pc.w) ;
 	return (pc.h / g) * (pc.w / g) ;
 }
 /* end subroutine (minsquares1) */
 
-
 /* standard greedy solution (cutting and rotating remaining paper) */
-static int minsquares2(const papercase &pc)
-{
+static int minsquares2(const papercase &pc) noex {
 	int		ans = 0 ;
 	int		a = pc.h ;
 	int		b = pc.w ;
@@ -210,9 +204,7 @@ static int minsquares2(const papercase &pc)
 }
 /* end subroutine (minsquares2) */
 
-
 /* third algorithm */
-
 typedef unordered_map<papercase,int,papercase_hash,papercase_equal>	
 		cache_t ;
 
@@ -221,16 +213,13 @@ typedef cache_t::const_iterator		cit_t ;
 struct minsquares3_head {
 	int		maxtry = MAXTRY ;
 	cache_t		cache ;
-	minsquares3_head() : minsquares3_head(MAXTRY) { 
-	} ;
-	minsquares3_head(int amaxtry) : maxtry(amaxtry) { 
-	} ;
+	minsquares3_head() : minsquares3_head(MAXTRY) { } ;
+	minsquares3_head(int amaxtry) : maxtry(amaxtry) { } ;
 	int haveCache(int h,int w) const {
 	    papercase	pc(h,w) ;
 	    cit_t	end = cache.end() ;
-	    cit_t	it ;
 	    int		ans = 0 ;
-	    if ((it = cache.find(pc)) != end) {
+	    if (cit_t it ; (it = cache.find(pc)) != end) {
 		ans = it->second ;
 	    }
 	    return ans ;
@@ -251,12 +240,11 @@ struct minsquares3_head {
 	    } else if ((ans = haveCache(h,w)) == 0) {
     	        int	ver_min = INT_MAX ;
     	        int	hor_min = INT_MAX ;
-		int	i ;
-    	        for (i = 1 ; i <= (h/2) ; i += 1) { /* cut horizontally */
+    	        for (int i = 1 ; i <= (h/2) ; i += 1) { /* cut horizontally */
 		    int wans = find(i,w) + find(h-i,w) ;
         	    hor_min = min(wans,hor_min) ; 
     		} /* end for */
-    	        for (i = 1 ; i <= (w/2) ; i += 1) { /* cut vertically */
+    	        for (int i = 1 ; i <= (w/2) ; i += 1) { /* cut vertically */
 		    int	hans = find(h,i) + find(h,w-i) ;
         	    ver_min = min(hans,ver_min) ;
 		} /* end for */
@@ -269,8 +257,7 @@ struct minsquares3_head {
 	} ;
 } ;
 
-static int minsquares3(const papercase &pc)
-{
+static int minsquares3(const papercase &pc) {
 	minsquares3_head	obj ;
 	int		res = 0 ;
 	int		h = pc.h ;
@@ -280,9 +267,7 @@ static int minsquares3(const papercase &pc)
 }
 /* end subroutine (minsquares3) */
 
-
-static void printres(int r)
-{
+static void printres(int r) {
 	cout << r << endl ;
 }
 /* end subroutine (printres) */

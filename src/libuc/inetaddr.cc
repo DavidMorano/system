@@ -43,12 +43,13 @@
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<ctdec.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<cfnum.h>
+#include	<getdig.h>
 #include	<strwcpy.h>
 #include	<uinet.h>
 #include	<inaddrbad.hh>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"inetaddr.h"
@@ -65,9 +66,8 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	getdig(int) noex ;
-}
+
+/* external variables */
 
 
 /* local typedefs */
@@ -94,8 +94,7 @@ static constexpr in_addr_t	inaddrbad = mkinaddrbad() ;
 int inetaddr_start(inetaddr *ip,cvoid *addr) noex {
 	int		rs = SR_FAULT ;
 	if (ip && addr) {
-	    rs = SR_OK ;
-	    memclear(ip) ;
+	    rs = memclear(ip) ;
 	}
 	return rs ;
 }

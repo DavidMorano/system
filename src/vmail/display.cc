@@ -44,6 +44,7 @@
 #include	<tmtime.h>
 #include	<sntmtime.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
+#include	<tabexpand.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"
@@ -85,26 +86,25 @@
 /* external subroutines */
 
 extern int	sfsubstance(cchar *,int,cchar **) ;
-extern int	nleadstr(const char *,const char *,int) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	ctdecui(char *,int,uint) ;
 extern int	ctdecpi(char *,int,int,int) ;
 extern int	iceil(int,int) ;
-extern int	strwcmp(const char *,const char *,int) ;
+extern int	strwcmp(cchar *,cchar *,int) ;
 extern int	mkdisphdr(char *,int,cchar *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	vbufprintf(char *,int,cchar *,va_list) ;
 extern int	isprintlatin(int) ;
 extern int	isdigitlatin(int) ;
 
 extern int	mkdisplayable(char *,int,cchar *,int) ;
 extern int	digit3(char *,int) ;
 extern int	compactstr(char *,int) ;
-extern int	tabexpand(char *,int,const char *,int) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern char	*strsub(cchar *,cchar *) ;
@@ -158,7 +158,7 @@ static int	display_scanpointset(DISPLAY *,int,int,int) ;
 static int	display_scanmarkset(DISPLAY *,int,int) ;
 
 static int	display_botloadnum(DISPLAY *,int) ;
-static int	display_botloadfrom(DISPLAY *,const char *) ;
+static int	display_botloadfrom(DISPLAY *,cchar *) ;
 static int	display_botloadline(DISPLAY *,int) ;
 static int	display_botloadlines(DISPLAY *,int) ;
 
@@ -178,10 +178,10 @@ static int	scanline_setlines(SCANLINE *,int) ;
 static int	scanline_checkblank(SCANLINE *) ;
 static int	scanline_finish(SCANLINE *) ;
 
-static int	nstrcols(int,int,const char *,int) ;
+static int	nstrcols(int,int,cchar *,int) ;
 
 #if	CF_SFEND
-static int	sfend(const char *,int,int,const char **) ;
+static int	sfend(cchar *,int,int,cchar **) ;
 #endif
 
 #if	CF_DEBUGS
@@ -194,21 +194,21 @@ static char	*stridig(char *,int,int) ;
 #if	CF_BLINKER
 #else /* CF_BLINKER */
 
-static const char	*months[] = {
+static cchar	*months[] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 	NULL
 } ;
 
-static const char	*days[] = {
+static cchar	*days[] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", NULL
 } ;
 
 #endif /* CF_BLINKER */
 
-static const char	dashes[] = "----------------" ;
+static cchar	dashes[] = "----------------" ;
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 static const struct scantitle	scantitles[] = {
 	{ "FROM", COL_SCANFROM },
@@ -226,18 +226,22 @@ enum scantitles {
 	scantitle_overlast
 } ;
 
+constexpr int		ntabcols = NTABCOLS ;
+constexpr int		digbuflen = DIGBUFLEN ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap)
-{
-	const int	cols = COLUMNS ;
+int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap) noex {
+	cint	cols = COLUMNS ;
 	int		rs ;
 	int		dlines ;
 	int		slines ;
-	const char	*termtype ;
-	const char	*cp ;
+	cchar	*termtype ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pip == NULL) return SR_FAULT ;
@@ -270,11 +274,11 @@ int display_start(DISPLAY *op,PROGINFO *pip,DISPLAY_ARGS *dap)
 	    op->v.msgline = -1 ;
 	    op->v.msglines = -1 ;
 	    if ((rs = uc_mallocstrw(termtype,-1,&cp)) >= 0) {
-	        const int	n = 1000 ;
-	        const int	esize = sizeof(SCANLINE) ;
+	        cint	n = 1000 ;
+	        cint	esize = sizeof(SCANLINE) ;
 	        op->termtype = cp ;
 	        if ((rs = varray_start(&op->scans,esize,n)) >= 0) {
-	            const char	*tt = termtype ;
+	            cchar	*tt = termtype ;
 	            if ((rs = ds_start(&op->ds,dap->tfd,tt,dlines,cols)) >= 0) {
 	                op->rl_top = 0 ;
 	                op->rl_scantitle = 1 ;
@@ -362,7 +366,7 @@ int display_flush(DISPLAY *op)
 
 
 /* display some information */
-int display_info(DISPLAY *op,const char *fmt,...)
+int display_info(DISPLAY *op,cchar *fmt,...)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
@@ -399,7 +403,7 @@ int display_info(DISPLAY *op,const char *fmt,...)
 /* end subroutine (display_info) */
 
 
-int display_winfo(DISPLAY *op,const char *sp,int sl)
+int display_winfo(DISPLAY *op,cchar *sp,int sl)
 {
 	PROGINFO	*pip ;
 	int		rs = SR_OK ;
@@ -433,7 +437,7 @@ int display_winfo(DISPLAY *op,const char *sp,int sl)
 /* end subroutine (display_winfo) */
 
 
-int display_vinfo(DISPLAY *op,const char *fmt,va_list ap)
+int display_vinfo(DISPLAY *op,cchar *fmt,va_list ap)
 {
 	PROGINFO	*pip ;
 	int		rs ;
@@ -468,7 +472,7 @@ int display_vinfo(DISPLAY *op,const char *fmt,va_list ap)
 
 
 /* display in the input area */
-int display_input(DISPLAY *op,const char *fmt,...)
+int display_input(DISPLAY *op,cchar *fmt,...)
 {
 	int		rs = SR_OK ;
 	int		x, y ;
@@ -505,7 +509,7 @@ int display_input(DISPLAY *op,const char *fmt,...)
 
 
 /* display in the input area */
-int display_vinput(DISPLAY *op,const char *fmt,va_list ap)
+int display_vinput(DISPLAY *op,cchar *fmt,va_list ap)
 {
 	int		rs ;
 	int		x, y ;
@@ -575,16 +579,16 @@ int display_setdate(DISPLAY *op,int f_end)
 /* get current time */
 
 	if ((rs = tmtime_localtime(&d,pip->daytime)) >= 0) {
-	    const int	tlen = TIMEBUFLEN ;
-	    const int	w = 0 ;
+	    cint	tlen = TIMEBUFLEN ;
+	    cint	w = 0 ;
 	    int		timelen = 0 ; /* ¥ GCC false complaint */
 	    int		x, y ;
 	    int		tl = 0 ;
 	    int		dl ;
 	    int		ml ;
 	    int		m = 0 ;
-	    const char	*fmt ;
-	    const char	*tp ;
+	    cchar	*fmt ;
+	    cchar	*tp ;
 	    char	*dp ;
 	    char	tbuf[TIMEBUFLEN + 1] = { 0 } ;
 
@@ -628,8 +632,8 @@ int display_setdate(DISPLAY *op,int f_end)
 #endif
 
 	    if ((rs >= 0) && (f || f_end)) {
-	        const int	gr = (f_end) ? 0 : DS_GRBLINK ;
-	        const char	*s = ":" ;
+	        cint	gr = (f_end) ? 0 : DS_GRBLINK ;
+	        cchar	*s = ":" ;
 	        x = (COL_DATESTR + 13) ;
 	        y = op->rl_top ;
 	        rs = ds_pwritegr(&op->ds,w,y,x,gr,s,1) ;
@@ -752,9 +756,9 @@ int display_setmbname(DISPLAY *op,cchar *mbname,int mblen)
 	int		mbleadlen ;
 	int		w, x, y ;
 	int		f_change = FALSE ;
-	const char	*mbleadstr = DISPLAY_MBSTRLEAD ;
-	const char	*ccp ;
-	const char	*cp ;
+	cchar	*mbleadstr = DISPLAY_MBSTRLEAD ;
+	cchar	*ccp ;
+	cchar	*cp ;
 	char		*fp ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -774,7 +778,7 @@ int display_setmbname(DISPLAY *op,cchar *mbname,int mblen)
 /* put the mailbox-name in buffer */
 
 	if (f_change) {
-	    const int	mbnamelen = DISPLAY_LMBSTR ;
+	    cint	mbnamelen = DISPLAY_LMBSTR ;
 	    char	mbnamebuf[DISPLAY_LMBSTR+1] ;
 
 	    strdcpy1w(mbnamebuf,mbnamelen,mbname,mblen) ;
@@ -808,7 +812,7 @@ int display_setnewmail(DISPLAY *op,int nmsgs)
 	int		w, x, y ;
 	int		f_newmail ;
 	int		f_change = FALSE ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -924,11 +928,11 @@ int display_viewclear(DISPLAY *op)
 int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 {
 	PROGINFO	*pip ;
-	const int	dislen = DISPLAY_LSCANLINE ;
+	cint	dislen = DISPLAY_LSCANLINE ;
 	int		rs = SR_OK ;
 	int		w ;
 	int		dl ;
-	const char	*dp ;
+	cchar	*dp ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -955,7 +959,7 @@ int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 	    if (sl > dislen) sl = dislen ;
 	    if (strnchr(sp,sl,'\t') != NULL) {
 	        dp = disbuf ;
-	        dl = tabexpand(disbuf,dislen,sp,sl) ;
+	        dl = tabexpand(disbuf,dislen,ntabcols,sp,sl) ;
 	    } else {
 	        dp = sp ;
 	        dl = sl ;
@@ -970,7 +974,7 @@ int display_viewload(DISPLAY *op,int ln,cchar *sp,int sl)
 
 int display_viewscroll(DISPLAY *op,int inc)
 {
-	const int	ainc = abs(inc) ;
+	cint	ainc = abs(inc) ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -980,7 +984,7 @@ int display_viewscroll(DISPLAY *op,int inc)
 	if (ainc >= op->viewlines) {
 	    rs = display_viewclear(op) ;
 	} else {
-	    const int	w = op->wview ;
+	    cint	w = op->wview ;
 	    rs = ds_scroll(&op->ds,w,inc) ;
 	} /* end if */
 
@@ -1093,7 +1097,7 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 #endif
 
 	if (rs >= 0) {
-	    const int	fcols = DISPLAY_LFROM ;
+	    cint	fcols = DISPLAY_LFROM ;
 	    int		flen = ssp->flen ;
 	    char	*fbuf = (char *) ssp->fbuf ;
 #if	CF_DEBUG
@@ -1113,11 +1117,11 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 		    ddp->fcol = wl ;
 		    if ((rs = display_scancvtalt(op,ddp)) >= 0) {
 		        DISPLAY_SALT	*sap = &ddp->alt ;
-		        const int	tlen = DISPLAY_FROMLEN ;
+		        cint	tlen = DISPLAY_FROMLEN ;
 			wchar_t		*wbuf = op->wbuf ;
 			char		tbuf[DISPLAY_FROMLEN+1] ;
 		        if ((rs = snwcpywidehdr(tbuf,tlen,wbuf,wl)) >= 0) {
-		            const int	flen = sap->flen ;
+		            cint	flen = sap->flen ;
 			    char	*fbuf = (char *) sap->fbuf ;
 			    if ((rs = mkdisphdr(fbuf,flen,tbuf,rs)) >= 0) {
 			        ddp->fbuf = sap->fbuf ;
@@ -1133,7 +1137,7 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 	}
 
 	if (rs >= 0) {
-	    const int	fcols = DISPLAY_LSUBJ ;
+	    cint	fcols = DISPLAY_LSUBJ ;
 	    int		slen = ssp->slen ;
 	    char	*sbuf = (char *) ssp->sbuf ;
 #if	CF_DEBUG
@@ -1153,7 +1157,7 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 		    ddp->scol = wl ;
 		    if ((rs = display_scancvtalt(op,ddp)) >= 0) {
 		        DISPLAY_SALT	*sap = &ddp->alt ;
-		        const int	slen = sap->slen ;
+		        cint	slen = sap->slen ;
 			wchar_t		*wbuf = op->wbuf ;
 			char		*sbuf = (char *) sap->sbuf ;
 		        if ((rs = snwcpywidehdr(sbuf,slen,wbuf,wl)) >= 0) {
@@ -1181,8 +1185,8 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 static int display_scancvtalt(DISPLAY *op,DISPLAY_SDATA *ddp)
 {
 	DISPLAY_SALT	*sap = &ddp->alt ;
-	const int	flen = (2*DISPLAY_LFROM) ;
-	const int	slen = (2*DISPLAY_LSUBJ) ;
+	cint	flen = (2*DISPLAY_LFROM) ;
+	cint	slen = (2*DISPLAY_LSUBJ) ;
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
 	if (sap->a == NULL) {
@@ -1274,12 +1278,12 @@ int display_scanloadlines(DISPLAY *op,int si,int lines,int f_upd)
 	if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
 	    if (slp != NULL) {
 	        if ((rs = scanline_setlines(slp,lines)) >= 0) {
-	            const int	ns = op->scanlines ;
-	            const int	top = op->si_top ;
+	            cint	ns = op->scanlines ;
+	            cint	top = op->si_top ;
 	            if (f_upd && (si >= top) && (si < (top + ns))) {
 	                int	w, x, y ;
 	                int	fl, fi ;
-	                const char	*fp ;
+	                cchar	*fp ;
 
 	                fi = COL_SCANLINES ;
 	                fp = (slp->data + fi) ;
@@ -1679,7 +1683,7 @@ int display_midmsgs(DISPLAY *op,int total,int current)
 	int		fl ;
 	int		nl ;
 	int		w, x, y ;
-	const char	*ccp ;
+	cchar	*ccp ;
 	char		nmsgbuf[NMSGBUFLEN + 1] ;
 	char		*fp ;
 
@@ -1906,12 +1910,12 @@ int display_winadj(DISPLAY *op,int dlines,int slines)
 #endif
 
 	if ((rs = display_linesload(op,dlines,slines)) >= 0) {
-	    const int	w = 0 ;
+	    cint	w = 0 ;
 	    if ((rs = ds_setlines(&op->ds,w,dlines)) >= 0) {
 
 	        if ((rs = display_linescalc(op)) >= 0) {
 	            if ((rs = display_subwinadj(op)) >= 0) {
-	                const int	r = op->rl_input ;
+	                cint	r = op->rl_input ;
 #ifdef	COMMENT
 	                if ((rs = ds_ew(&op->ds,w,r,2)) >= 0) {
 	                    rs = display_refresh(op) ;
@@ -2024,8 +2028,8 @@ int display_rtop(DISPLAY *op)
 	int		i ;
 	int		cl = -1 ;
 	int		ll = 0 ;
-	const char	*lp ;
-	const char	*cp ;
+	cchar	*lp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -2093,8 +2097,8 @@ int display_rmid(DISPLAY *op)
 	int		i ;
 	int		cl ;
 	int		ll = 0 ;
-	const char	*lp ;
-	const char	*cp ;
+	cchar	*lp ;
+	cchar	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -2200,7 +2204,7 @@ int display_rscantitle(DISPLAY *op)
 	int		sl ;
 	int		w, x, y ;
 	int		len = 0 ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -2305,8 +2309,8 @@ int display_rscan(DISPLAY *op,int si)
 
 int display_suspend(DISPLAY *op)
 {
-	const int	r = op->rl_input ;
-	const int	c = 0 ;
+	cint	r = op->rl_input ;
+	cint	c = 0 ;
 	int		rs ;
 
 	if ((rs = display_flush(op)) >= 0) {
@@ -2631,7 +2635,7 @@ static int display_scanprint(DISPLAY *op,int si)
 	}
 
 	if ((rs = varray_acc(&op->scans,si,&slp)) >= 0) {
-	    const char	*fmt ;
+	    cchar	*fmt ;
 	    if (slp != NULL) {
 	        int	ch_mark = (isprintlatin(slp->mark)) ? slp->mark : ' ' ;
 	        c += 1 ;
@@ -2850,7 +2854,7 @@ static int display_scantitlemk(DISPLAY *op)
 	int		cl ;
 	int		tcol ;
 	int		i ;
-	const char	*cp ;
+	cchar	*cp ;
 	char		*bp = op->scantitle ;
 
 	strwcpyblanks(bp,DISPLAY_LSCANLINE) ;
@@ -2912,7 +2916,7 @@ static int display_botloadnum(DISPLAY *op,int msgnum)
 	        int	bl = MIN(5,DISPLAY_LMSGNUM) ;
 	        char	*bp = (op->linebot + fi) ;
 	        if (msgnum >= 0) {
-	            const int	v = MIN(9999,msgnum) ;
+	            cint	v = MIN(9999,msgnum) ;
 	            char	dbuf[DIGBUFLEN + 1] ;
 	            if ((rs = ctdeci(dbuf,DIGBUFLEN,v)) >= 0) {
 	                strdfill3(bp,bl,"#",dbuf,blanks) ;
@@ -2951,7 +2955,7 @@ static int display_botloadline(DISPLAY *op,int msgline)
 	    fp = (op->linebot + fi) ;
 	    fl = MIN(4,DISPLAY_LMSGLINES) ;
 	    if (op->v.msgline >= 0) {
-	        const int	v = MIN(9999,op->v.msgline) ;
+	        cint	v = MIN(9999,op->v.msgline) ;
 	    	int		ml ;
 	        char		digbuf[DIGBUFLEN + 1] ;
 	        if ((rs = ctdeci(digbuf,DIGBUFLEN,v)) >= 0) {
@@ -2978,7 +2982,7 @@ static int display_botloadline(DISPLAY *op,int msgline)
 static int display_botloadlines(DISPLAY *op,int msglines)
 {
 	PROGINFO	*pip = op->pip ;
-	const int	n = 4 ;
+	cint	n = 4 ;
 	int		rs = SR_OK ;
 	int		f_change = FALSE ;
 
@@ -2992,7 +2996,7 @@ static int display_botloadlines(DISPLAY *op,int msglines)
 	        int	bl = (DISPLAY_LMSGLINES - n) ;
 	        char	*bp = (op->linebot + fi) ;
 	        if (msglines >= 0) {
-	            const int	v = MIN(9999,msglines) ;
+	            cint	v = MIN(9999,msglines) ;
 	            char	dbuf[DIGBUFLEN + 1] ;
 	            if ((rs = ctdeci(dbuf,DIGBUFLEN,v)) >= 0) {
 	                strdfill3(bp,bl,":",dbuf,blanks) ;
@@ -3154,9 +3158,9 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	    int		nncol ;
 	    int		dl = 0 ;
 	    int		f_check = FALSE ;
-	    const char	*dp ;
-	    const char	*cp ;
-	    const char	*ccp ;
+	    cchar	*dp ;
+	    cchar	*cp ;
+	    cchar	*ccp ;
 	    char	scanbuf[SCANBUFLEN + 1] ;
 	    char	dispbuf[DISPBUFLEN + 1] ;
 	    char	linesbuf[LINESBUFLEN + 1] ;
@@ -3251,10 +3255,7 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 
 	                if ((rs >= 0) && (cp != NULL) && (cl > 0)) {
 	                    rs = sbuf_strw(&b,cp,cl) ;
-	                    icols = nstrcols(NTABCOLS,ncol,cp,cl) ;
-#if	CF_DEBUGS
-	                debugprintf("scanline_fill: icols=%u\n",icols) ;
-#endif
+	                    icols = nstrcols(ntabcols,ncol,cp,cl) ;
 	                    ncol += icols ;
 	                }
 	            } /* end if (non-empty field) */
@@ -3395,50 +3396,38 @@ static int scanline_checkblank(SCANLINE *slp)
 #if	CF_SFEND
 
 /* string-find-end */
-static int sfend(cchar *sp,int sl,int n,cchar **rpp)
-{
+static int sfend(cchar *sp,int sl,int n,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	int		ml ;
-
 	if (sl < 0) sl = strlen(sp) ;
-
 	ml = MIN(sl,n) ;
-	if (rpp != NULL)
+	if (rpp) {
 	    *rpp = (rs >= 0) ? (sp + sl - ml) : NULL ;
-
+	}
 	return (rs >= 0) ? ml : rs ;
 }
 /* end subroutine (sfend) */
 
 #endif /* CF_SFEND */
 
-
 /* number-string-colums (numer of columns a string takes up) */
-static int nstrcols(int ntabcols,int nc,const char *sp,int sl)
-{
+static int nstrcols(int ntabcols,int nc,cchar *sp,int sl) noex {
 	int		n = 0 ;
-
 	if (sp != NULL) {
-	    int		icols ;
-	    int		scols ;
-	    int		i ;
+	    int		scols = nc ;
 	    if (sl < 0) sl = strlen(sp) ;
-	    scols = nc ;
-	    for (i = 0 ; i < sl ; i += 1) {
-	        icols = charcols(ntabcols,nc,sp[i]) ;
+	    for (int i = 0 ; i < sl ; i += 1) {
+	        cint	icols = charcols(ntabcols,nc,sp[i]) ;
 	        nc += icols ;
 	    }
 	    n = (nc - scols) ;
 	} /* end if (non-null) */
-
 	return n ;
 }
 /* end subroutine (nstrcols) */
 
-
 #if	CF_DEBUGS
-static char *stridig(char *ip,int il,int n)
-{
+static char *stridig(char *ip,int il,int n) noex {
 	int		nd ;
 	char		digbuf[DIGBUFLEN + 1] ;
 	nd = ctdecui(digbuf,DIGBUFLEN,n) ;
@@ -3447,8 +3436,9 @@ static char *stridig(char *ip,int il,int n)
 	    il -= 1 ;
 	    ip = strnset(ip,' ',(il - nd)) ;
 	    ip = strncpy(ip,digbuf,nd) ;
-	} else
+	} else {
 	    ip = strnset(ip,' ',il) ;
+	}
 	return ip ;
 }
 /* end subroutine (stridig) */

@@ -41,21 +41,21 @@
 
 
 class timewatch {
-	int		to ;
+	int		mto ;
 public:
-	timewatch(int a) : to(a*POLLMULT) { } ;
+	timewatch(int a) : mto(a * POLLMULT) { } ;
 	timewatch(const timewatch &) = delete ;
 	timewatch &operator = (const timewatch &) = delete ;
 	template<typename L>
 	int operator () (L &lamb) noex {
 	    int		rs = SR_OK ;
-	    int		i ;
-	    for (i = 0 ; (rs == 0) && (i < to) ; i += 1) {
+	    int		i ; /* used afterwards */
+	    for (i = 0 ; (rs == 0) && (i < mto) ; i += 1) {
 		if ((rs = msleep(1)) >= 0) {
 		    rs = lamb() ;
 		}
 	    } /* end for */
-	    if ((rs == 0) && (i == to)) rs = SR_TIMEDOUT ;
+	    if ((rs == 0) && (i == mto)) rs = SR_TIMEDOUT ;
 	    return rs ;
 	} ; /* end method (operator) */
 } ; /* end class (timewatch) */

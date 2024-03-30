@@ -45,9 +45,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstdarg>
 #include	<usystem.h>
 #include	<bufsizevar.hh>

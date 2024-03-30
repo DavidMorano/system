@@ -24,13 +24,13 @@
 
 *******************************************************************************/
 
-#ifndef	USYS_LINUX_INCLUDE
-#define	USYS_LINUX_INCLUDE
+#ifndef	USYSLINUX_INCLUDE
+#define	USYSLINUX_INCLUDE
 
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* USYS_LINUX start */
+/* USYSLINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
 #include	<sys/types.h>
@@ -54,9 +54,9 @@
 
 
 #endif /* defined(OSNAME_Linux) && (OSNAME_Linux > 0)*/
-/* USYS_LINUX finish */
+/* USYSLINUX finish */
 
 
-#endif /* USYS_LINUX_INCLUDE */
+#endif /* USYSLINUX_INCLUDE */
 
 

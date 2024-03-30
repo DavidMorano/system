@@ -23,6 +23,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -37,6 +38,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -44,6 +51,13 @@
 
 
 /* local variables */
+
+constexpr bool		f_utmpsession = SYSHASUTMP_SESSION ;
+constexpr bool		f_utmpsyslen = SYSHASUTMP_SYSLEN ;
+constexpr bool		f_utmpexit = SYSHASUTMP_EXIT ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -90,11 +104,11 @@ int utmpent_setsession(utmpent *op,int sess) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
-#if	SYSHASUTMP_SESSION
+	    if constexpr (f_utmpsession) {
 	        op->ut_session = sess ;
-#else
+	    } else {
 		(void) sess ;
-#endif
+	    } /* end if-constexpr (f_utmpsession) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -131,9 +145,9 @@ int utmpent_sethost(utmpent *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = (strnwcpy(op->ut_host,UTMPENT_LHOST,sp,sl) - op->ut_host) ;
-#if	SYSHASUTMP_SYSLEN
+	    if constexpr (f_utmpsyslen) {
 	        op->ut_syslen = rs ;
-#endif
+	    } /* end if-constexpr (f_utmpsyslen) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -160,11 +174,11 @@ int utmpent_getpid(utmpent *op) noex {
 int utmpent_getsession(utmpent *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-#if	SYSHASUTMP_SESSION
+	    if constexpr (f_utmpsession) {
 	        rs = op->ut_session ;
-#else
+	    } else {
 	        rs = SR_OK ;
-#endif
+	    } /* end if-constexpr (f_utmpsession) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -204,13 +218,13 @@ int utmpent_gethost(utmpent *op,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = strnlen(op->ut_host,UTMPENT_LHOST) ;
-#if	SYSHASUTMP_SYSLEN
-	    if (op->ut_syslen > 0) {
-	        if (rs > op->ut_syslen) {
-		    rs = op->ut_syslen ;
-		}
-	    }
-#endif
+	    if constexpr (f_utmpsyslen) {
+	        if (op->ut_syslen > 0) {
+	            if (rs > op->ut_syslen) {
+		        rs = op->ut_syslen ;
+		    }
+	        }
+	    } /* end if-constexpr (f_utmpsession) */
 	    if (rpp) *rpp = op->ut_host ;
 	} /* end if (non-null) */
 	return rs ;

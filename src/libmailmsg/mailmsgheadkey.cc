@@ -98,7 +98,7 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-/* this character must be a colon (':') or else we didn't have a head-key */
+/* this character must be a colon (':') or else we did not have a head-key */
 	    klen = (*sp == ':') ? kl : -1 ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? klen : rs ;

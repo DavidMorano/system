@@ -1,4 +1,4 @@
-# MAKEFILES (libmailmsg)
+# MAKEFILE (libmailmsg)
 
 T= libmailmsg
 

@@ -25,7 +25,7 @@
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<csignal>		/* |sig_atomic_t| */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<sigblocker.h>
@@ -51,7 +51,7 @@ typedef volatile sig_atomic_t	vaflag ;
 
 /* local structures */
 
-struct umask {
+struct umasker {
 	ptm		m ;		/* data mutex */
 	vaflag		f_void ;
 	vaflag		f_init ;
@@ -70,7 +70,7 @@ extern "C" {
 
 /* local variables */
 
-static struct umask	umask_data ;
+static struct umasker	umask_data ;
 
 
 /* exported variables */
@@ -79,7 +79,7 @@ static struct umask	umask_data ;
 /* exported subroutines */
 
 int umask_init() noex {
-	struct umask	*uip = &umask_data ;
+	struct umasker	*uip = &umask_data ;
 	int		rs = SR_NXIO ;
 	int		f = false ;
 	if (! uip->f_void) {
@@ -118,7 +118,7 @@ int umask_init() noex {
 /* end subroutine (umask_init) */
 
 int umask_fini() noex {
-	struct umask	*uip = &umask_data ;
+	struct umasker	*uip = &umask_data ;
 	int		rs = SR_NXIO ;
 	int		rs1 ;
 	if (uip->f_initdone && (! uip->f_void)) {
@@ -142,7 +142,7 @@ int umask_fini() noex {
 /* end subroutine (umask_fini) */
 
 int umaskget() noex {
-	struct umask	*uip = &umask_data ;
+	struct umasker	*uip = &umask_data ;
 	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
@@ -171,7 +171,7 @@ int umaskget() noex {
 /* end subroutine (umaskget) */
 
 int umaskset(mode_t cmask) noex {
-	struct umask	*uip = &umask_data ;
+	struct umasker	*uip = &umask_data ;
 	sigblocker	b ;
 	int		rs ;
 	int		rs1 ;
@@ -202,13 +202,13 @@ int umaskset(mode_t cmask) noex {
 /* local subroutines */
 
 static void umask_atforkbefore() noex {
-	struct umask	*uip = &umask_data ;
+	struct umasker	*uip = &umask_data ;
 	ptm_lock(&uip->m) ;
 }
 /* end subroutine (umask_atforkbefore) */
 
 static void umask_atforkafter() noex {
-	struct umask	*uip = &umask_data ;
+	struct umasker	*uip = &umask_data ;
 	ptm_unlock(&uip->m) ;
 }
 /* end subroutine (umask_atforkafter) */

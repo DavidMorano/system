@@ -56,7 +56,7 @@
 #include	<vecpstr.h>
 #include	<upt.h>
 #include	<ncol.h>		/* |ncolstr(3uc)| */
-#include	<tabcols.h>		/* |TABCOLS| */
+#include	<tabcols.h>		/* |TABCOLS_DEF| */
 #include	<mkx.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>

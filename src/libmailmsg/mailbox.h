@@ -61,7 +61,7 @@ struct mailbox_flags {
 } ;
 
 struct mailbox_head {
-	vecobj		msgs ;
+	vecobj		*mlp ;		/* Message-List-Pointer */
 	cchar		*mailfname ;
 	time_t		ti_mod ;	/* modification time */
 	time_t		ti_check ;	/* check time */

@@ -30,7 +30,6 @@
 #include	<utility>
 #include	<functional>
 #include	<algorithm>
-#include	<unordered_map>
 #include	<array>
 #include	<set>
 #include	<vector>
