@@ -899,7 +899,7 @@ libmallocxx.o:		libmallocxx.cc libmallocxx.h
 # UNIX C-language system library memory management
 mapblock.o:		mapblock.cc mapblock.hh
 memtrack.o:		memtrack.cc memtrack.hh mapblock.hh
-ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh
+ucmemalloc.o:		ucmemalloc.cc ucmemalloc.h memtrack.hh mapblock.hh
 ucmallocx.o:		ucmallocx.cc ucmallocx.h
 
 # UNIX C-language system library timer management

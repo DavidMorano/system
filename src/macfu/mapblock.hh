@@ -193,6 +193,7 @@ public:
 		mp = nullptr ;
 	    }
 	} ; /* end dtor */
+	friend iterator ;
 } ; /* end class (mapblock) */
 
 template<typename K,typename B>

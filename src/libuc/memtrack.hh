@@ -41,7 +41,8 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstdint>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdint>		/* |uintptr_t| */
 #include	<usysdefs.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -53,6 +54,7 @@
 
 
 enum memtrackmems {
+	memtrackmem_start,
 	memtrackmem_count,
 	memtrackmem_finish,
 	memtrackmem_overlast
@@ -72,32 +74,23 @@ struct memtrack_co {
 	    op = p ;
 	    w = m ;
 	} ;
-	operator int () noex ;
-	int operator () () noex { 
-	    return operator int () ;
+	int operator () (int = 0) noex ;
+	operator int () noex {
+	    return operator () () ;
 	} ;
 } ; /* end struct (memtrack_co) */
-
-struct memtrack_start {
-	memtrack	*op = nullptr ;
-	constexpr void operator () (memtrack *p) noex {
-	    op = p ;
-	} ;
-	int operator () (int = 0) noex ;
-	operator int () noex ;
-} ; /* end struct (memtrack_start) */
 
 struct memtrack {
 	typedef memtrack_ent	ent ;
 	mapblock<uintptr_t,memtrack_ent>	t ; /* <- the "tracker" */
-	memtrack_start	start ;
+	memtrack_co	start ;
 	memtrack_co	count ;
 	memtrack_co	finish ;
 	uint		magic = 0 ;
 	constexpr memtrack() noex {
-	    start(this) ;
-	    count(this,memtrackmem_count) ;
+	    start(this,memtrackmem_start) ;
 	    finish(this,memtrackmem_finish) ;
+	    count(this,memtrackmem_count) ;
 	} ; /* end ctor */
 	memtrack(const memtrack &) = delete ;
 	memtrack &operator = (const memtrack &) = delete ;
@@ -106,8 +99,8 @@ struct memtrack {
 	int	present(cvoid *) noex ;
 	int	get(cvoid *,ent *) noex ;
 	int	istart(int = 0) noex ;
-	int	icount() noex ;
 	int	ifinish() noex ;
+	int	icount() noex ;
 	void	dtor() noex ;
 	~memtrack() noex {
 	    dtor() ;
