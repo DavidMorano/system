@@ -1,11 +1,11 @@
-/* inter_trans */
+/* inter_trans SUPPORT */
+/* lang=C++20 */
 
 /* translate (TRANS) compoeent of INTER */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* run-time debug print-outs */
-
 
 /* revision history:
 
@@ -20,21 +20,17 @@
 
 	These subroutines for the TRANS component of INTER.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stddef.h>		/* for 'wchar_t' */
-
+#include	<cstddef>		/* for |wchar_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<hdrdecode.h>

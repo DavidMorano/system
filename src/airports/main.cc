@@ -218,18 +218,18 @@ static int	usage(struct proginfo *) ;
 int			if_int ;
 int			if_child ;
 
-static const int	sigblocks[] = {
+static constexpr int	sigblocks[] = {
 	SIGHUP,
 	SIGURG,
 	0
 } ;
 
-static const int	sigignores[] = {
+static constexpr int	sigignores[] = {
 	SIGPIPE,
 	0
 } ;
 
-static const int	sigints[] = {
+static constexpr int	sigints[] = {
 	SIGUSR1,
 	SIGUSR2,
 	SIGINT,
@@ -237,20 +237,6 @@ static const int	sigints[] = {
 	SIGPOLL,
 	SIGCHLD,
 	0
-} ;
-
-static const char *argopts[] = {
-	"VERSION",
-	"VERBOSE",
-	"ROOT",
-	"HELP",
-	"LOGFILE",
-	"of",
-	"slfile",
-	"slpoll",
-	"ddir",
-	"caf",
-	NULL
 } ;
 
 enum argopts {
@@ -267,25 +253,25 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*sched1[] = {
+static constexpr cpcchar	argopts[] = {
+	"VERSION",
+	"VERBOSE",
+	"ROOT",
+	"HELP",
+	"LOGFILE",
+	"of",
+	"slfile",
+	"slpoll",
+	"ddir",
+	"caf",
+	NULL
+} ;
+
+static constexpr cpcchar	sched1[] = {
 	"%p/%e/%n/%n.%f",
 	"%p/%e/%n/%f",
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
-	NULL
-} ;
-
-static const char	*params[] = {
-	"cmd",
-	"loglen",
-	"msfile",
-	"pidfile",
-	"logfile",
-	"runint",
-	"pollint",
-	"markint",
-	"lockint",
-	"speedint",
 	NULL
 } ;
 
@@ -303,6 +289,20 @@ enum params {
 	param_overlast
 } ;
 
+static constexpr cpcchar	params[] = {
+	"cmd",
+	"loglen",
+	"msfile",
+	"pidfile",
+	"logfile",
+	"runint",
+	"pollint",
+	"markint",
+	"lockint",
+	"speedint",
+	NULL
+} ;
+
 static const struct errormap	errormaps[] = {
 	{ SR_NOMEM, EX_OSERR },
 	{ SR_NOENT, EX_NOUSER },
@@ -318,33 +318,21 @@ static const struct errormap	errormaps[] = {
 } ;
 
 
+/* exported variables */
 
 
+/* exported subroutins */
 
-
-int main(argc,argv,envv)
-int	argc ;
-char	*argv[] ;
-char	*envv[] ;
-{
-	struct proginfo	pi, *pip = &pi ;
-
-	struct sigaction	san ;
-	struct sigaction	sao[nelem(sigints) + nelem(sigignores)] ;
-
+int main(int argc,mainv argv,mainv envv) {
+	PROGINFO	pi, *pip = &pi ;
+	SIGACTION	san ;
+	SIGACTION	sao[nelem(sigints) + nelem(sigignores)] ;
 	struct session	sinfo ;
-
-	struct ustat32	sb ;
-
-	struct ustat	*sbp = (struct ustat *) &sb ;
-
+	USTAT		sb ;
+	USTAT		*sbp = (USTAT *) &sb ;
 	sigset_t	oldsigmask, newsigmask ;
-
 	SHIO	errfile ;
 	SHIO	outfile ;
-
-	vecstr	flist ;
-
 	int	argr, argl, aol, akl, avl, kwi ;
 	int	ai, ai_max, ai_pos ;
 	int	argvalue = -1 ;

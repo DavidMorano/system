@@ -91,6 +91,9 @@ extern int	memtrack_finish() noex ;
 constexpr uint		memtrack_magic = MEMTRACK_MAGIC ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int memtrack::ins(cvoid *addr,int size) noex {

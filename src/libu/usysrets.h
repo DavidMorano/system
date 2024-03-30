@@ -123,7 +123,7 @@ enum errnomssings {
 #ifdef	EBADR
 #define	SR_BADR		(- EBADR)	/* invalid request descriptor */
 #else
-#define	SR_BADR		errnomissing_badr
+#define	SR_BADR		(- errnomissing_badr)
 #endif
 
 #define	SR_XFULL	(- EXFULL)	/* exchange full */
@@ -131,7 +131,7 @@ enum errnomssings {
 #ifdef	ENOANO
 #define	SR_NOANO	(- ENOANO)	/* no anode */
 #else
-#define	SR_NOANO	errnomissing_noano
+#define	SR_NOANO	(- errnomissing_noano)
 #endif /* ENOANO */
 
 #ifdef	EBADRQC

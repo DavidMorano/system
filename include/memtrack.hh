@@ -43,6 +43,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdint>
 #include	<usysdefs.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<mapblock.hh>
 

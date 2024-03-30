@@ -1,4 +1,8 @@
-/* inter */
+/* inter HEADER */
+/* lang=C20 */
+
+/* the user interface (command interpreter) for VMAIL */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,16 +14,13 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	INTER_INCLUDE
-#define	INTER_INCLUDE	1
+#define	INTER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<signal.h>
-
+#include	<csignal>
 #include	<usystem.h>
 #include	<uterm.h>
 #include	<mailbox.h>
@@ -78,12 +79,10 @@ struct inter_flags {
 } ;
 
 struct inter_head {
-	uint		magic ;
-	INTER_FL	f, open ;
 	PROGINFO	*pip ;
 	UTERM		*utp ;
-	const char	*mbname ;	/* current mailbox */
-	const char	*pathprefix ;
+	cchar		*mbname ;	/* current mailbox */
+	cchar		*pathprefix ;
 	void		*trans ;
 	CMDMAP		cm ;
 	KEYSYMER	ks ;
@@ -103,6 +102,8 @@ struct inter_head {
 	time_t		ti_info ;
 	time_t		ti_child ;
 	pid_t		pgrp ;		/* controlling term PGID */
+	INTER_FL	f, open ;
+	uint		magic ;
 	int		termlines ;	/* terminal lines (actual) */
 	int		displines ;	/* display lines (requested) */
 	int		scanlines ;	/* scan lines */
@@ -124,22 +125,21 @@ struct inter_head {
 	char		numbuf[INTER_NUMLEN + 1] ;
 } ;
 
+typedef	INTER		inter ;
+typedef	INTER_FL	inter_fl ;
 
-#if	(! defined(INTER_MASTER)) || (INTER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	inter_start(INTER *,PROGINFO *,UTERM *) noex ;
+extern int	inter_cmd(INTER *) noex ;
+extern int	inter_finish(INTER *) noex ;
+extern int	intter_transbegin(INTER *) noex ;
+extern int	intter_transend(INTER *) noex ;
+extern int	intter_transhd(INTER *) noex ;
+extern int	intter_transproc(INTER *,char *,int,cchar *,int,int) noex ;
 
-extern int	inter_start(INTER *,PROGINFO *,UTERM *) ;
-extern int	inter_cmd(INTER *) ;
-extern int	inter_finish(INTER *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* INTER_MASTER */
 
 #endif /* INTER_INCLUDE */
 

@@ -65,7 +65,7 @@ struct aflag_gu {
 	operator int () noex {
 	    return operator () () ;
 	} ;
-} ; /* end struct (aglag_gy) */
+} ; /* end struct (aglag_gu) */
 struct aflag {
 	std::atomic_flag	af{} ;
 	aflag_co	set ;
@@ -88,7 +88,7 @@ struct aflag {
 	    guardbegin(this,aflagmx_guardbegin) ;
 	    guardend(this,aflagmx_guardend) ;
 	} ;
-	operator bool () noex {
+	operator bool () const noex {
 	    return af.test() ;
 	} ;
 	bool operator = (const bool f) noex {

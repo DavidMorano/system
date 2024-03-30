@@ -20,7 +20,7 @@
 	if traversing through the array by taking the value of an
 	element as a relative addition to the current index in the
 	array to advance to the next element, if the total of
-	advancements return to the original or beginning element.
+	advancements returns to the original or beginning element.
 	We start off considering the first element.
 
 	Example arrays:
@@ -43,7 +43,6 @@
 #include	<utility>
 #include	<functional>
 #include	<algorithm>
-#include	<unordered_map>
 #include	<array>
 #include	<set>
 #include	<vector>

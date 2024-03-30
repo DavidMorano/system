@@ -19,7 +19,7 @@
 	This is a container object (elements are stored within it).
 	This also is implemented as a single-linked list of nodes.
 	This object is very useful for normal queue operations
-	(insert at tail, remove at head). The following operations
+	(insert at tail, remove at head).  The following operations
 	are supported:
 
 	+ instail		insert at tail

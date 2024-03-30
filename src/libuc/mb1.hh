@@ -29,7 +29,7 @@
 	int mapblock_start<typename K,typename B>(int n = 0) noex
 
 	Arguments:
-	n		suggested starting size
+	n		suggested starting possible number of elements
 
 	Returns:
 	>=0		ok
@@ -57,120 +57,75 @@ template<typename K,typename B> class mapblock ;
 
 template <typename K,typename B>
 class mapblock_iter {
-	typedef typename mapblock_node<K,B>	node ;
-	typedef mapblock_iter	bit ;
-	mapblock_node<K,B>	*n = nullptr ;
-	mapblock_iter<K,B>	&findnext(int) ;
-	mutable K		defval ;
+	typedef mapblock<K,B>				mb ;
+	typedef typename std::unordered_map<K,B>::iterator	map_it ;
+	map_it			mit ;
 public:
 	mapblock_iter() noex { } ;
-	mapblock_iter(node *an) : n(an) noex { } ;
-	mapblock_iter(const mapblock_iter<K,B> &it) noex {
-	    if (this != &it) {
-	        n = it.n ;
+	mapblock_iter(const mapblock_iter<K,B> &oit) noex {
+	    if (this != &oit) {
+	        mit = oit.mit ;
 	    }
 	} ;
-	mapblock_iter(mapblock_iter<K,B> &&it) noex {
-	    if (this != &it) {
-	        n = it.n ;
-		it.n = nullptr ;
+	mapblock_iter(mapblock_iter<K,B> &&oit) noex {
+	    if (this != &oit) {
+	        mit = oit.mit ;
 	    }
 	} ;
-	mapblock_iter<K,B> &operator = (const mapblock_iter<K,B> &it) noex {
-	    if (this != &it) {
-	        n = it.n ;
+	mapblock_iter(mb *mbp,bool fend) noex {
+	    if (mbp->mp) {
+	        if (fend) {
+	            mit = mbp->mp->end() ;
+	        } else {
+	            mit = mbp->mp->begin() ;
+	        }
 	    }
-	    return (*this) ;
 	} ;
-	mapblock_iter<K,B> &operator = (mapblock_iter<K,B> &&it) noex {
-	    if (this != &it) {
-	        n = it.n ;
-		it.n = nullptr ;
+	mapblock_iter<K,B> &operator = (const mapblock_iter<K,B> &oit) noex {
+	    if (this != &oit) {
+	        mit = oit.mit ;
 	    }
-	    return (*this) ;
+	    return *this ;
 	} ;
-	mapblock_iter<K,B> &operator = (const mapblock_iter<K,B> *ip) noex {
-	    if (this != ip) {
-	        n = ip->n ;
+	mapblock_iter<K,B> &operator = (mapblock_iter<K,B> &&oit) noex {
+	    if (this != &oit) {
+	        mit = oit.mit ;
 	    }
-	    return (*this) ;
+	    return *this ;
 	} ;
-	mapblock_iter<K,B> &operator = (const node *nn) noex {
-	    n = nn ; /* possible nullptr */
-	    return (*this) ;
-	} ;
-	~mapblock_iter() {
-	    n = nullptr ;
-	} ;
-	void setnode(node *nn) noex {
-	    n = nn ; /* possible nullptr */
-	} ;
-	K &operator * () const noex {
-	    K &rv = defval ;
-	    if (n != nullptr) {
-		rv = n->val ;
+	mapblock_iter<K,B> &operator = (const mapblock_iter<K,B> *oip) noex {
+	    if (this != oip) {
+	        mit = oip->mit ;
 	    }
-	    return rv ;
+	    return *this ;
+	} ;
+	std::pair<K,B> &operator * () const noex {
+	    return *mit ;
 	} ;
 	mapblock_iter<K,B> &operator ++ () noex { /* pre-increment */
-	    return findnext(1) ;
+	    ++mit ;
+	    return *this ;
 	} ;
 	mapblock_iter<K,B> operator ++ (int) noex { /* post-increment */
-	    btree_iter<K.B>	tmp = *this ;
-	    if (inc > 0) {
-	        findnext(inc) ;
-	    } else {
-	        findnext(1) ;
-	    }
+	    mapblock_iter<K,B>	tmp = *this ;
+	    mit++ ;
 	    return tmp ; /* returns previous PRVALUE */
 	} ;
 	mapblock_iter<K,B> &operator += (int inc) noex {
-	    return findnext(inc) ;
+	    mit += inc ;
+	    return *this ;
 	} ;
-	mapblock_iter<K,B> &operator + (int inc) noex {
-	    return findnext(inc) ;
-	} ;
-	operator int() const noex {
-	    return (n != nullptr) ;
-	} ;
-	operator bool() const noex {
-	    return (n != nullptr) ;
+	mapblock_iter<K,B> &operator + (int inc) const noex {
+	    mapblock_iter<K,B>	tmp = *this ;
+	    tmp.mit + inc ;
+	    return tmp ;
 	} ;
 	friend bool operator == (const mapblock_iter<K,B> &i1,
 		const mapblock_iter<K,B> &i2) noex {
-	    return (i1.n == i2.n) ;
-	} ;
-	friend bool operator != (const mapblock_iter<K,B> &i1,
-		const mapblock_iter<K,B> &i2) noex {
-	    return (i1.n != i2.n) ;
+	    return (i1.mit == i2.mit) ;
 	} ;
 	friend mapblock<K,B> ;
 } ; /* end class (mapblock_iter) */
-
-template <typename K,typename B>
-mapblock_iter<K,B> &mapblock_iter<K,B>::findnext(int inc) noex {
-	if (n != nullptr) {
-	    if (inc > 1) {
-		findnext(1) ;
-		findnext(inc-1) ;
-	    } else if (inc > 0) {
-   	        if (n->right != nullptr) {
-      		    n = n->right ;
-      		    while (n->left != nullptr) {
-        	        n = n->left ;
-        	    }
-     	        } else {
-		    mapblock_node<K,B> *p = n->parent ;
-		    while ((p != nullptr) && (n == p->right)) {
-           	        n = p ;
-           	        p = p->parent;
-         	    }
-		    n = p ;
-		} /* end if */
-	    } /* end if (inc) */
-        } /* end if (not-nullptr) */
- 	return (*this) ;
-} /* end method (mapblock_iterator::findnext) */
 
 template<typename K,typename B>
 class mapblock {
@@ -195,11 +150,11 @@ public:
 	int	count() noex ;
 	int	finish() noex ;
 	iterator begin() noex {
-	    interactor	it(this,false) ;
+	    iterator	it(this,false) ;
 	    return it ;
 	} ;
 	iterator end() noex {
-	    interactor	it(this,true) ;
+	    iterator	it(this,true) ;
 	    return it ;
 	} ;
 } ; /* end class (mapblock) */

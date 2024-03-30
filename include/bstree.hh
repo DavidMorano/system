@@ -77,7 +77,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<new>
 #include	<initializer_list>
@@ -88,11 +87,6 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-
-/* external subroutines */
-
-
-/* local structures */
 
 template <typename T,typename Comp = std::less<T>>
 class bstree ;
@@ -233,11 +227,11 @@ bstree_iter<T,Comp> &bstree_iter<T,Comp>::findnext(int inc) noex {
 } /* end method (bstree_iterator::findnext) */
 
 struct bstree_depth {
-	int		min = INT_MAX ;
-	int		max = 0 ;
+	int		dmin = INT_MAX ;
+	int		dmax = 0 ;
 	void clear() noex {
-	    min = INT_MAX ;
-	    max = 0 ;
+	    dmin = INT_MAX ;
+	    dmax = 0 ;
 	} ;
 } /* end method (bstree_depth) */
 
@@ -584,8 +578,8 @@ public:
 	        d += std::max(d_left,d_right) ;
 	    } else {
 		if (resp != nullptr) {
-		     resp->min = std::min(resp->min,i) ;
-		     resp->max = std::max(resp->max,i) ;
+		     resp->dmin = std::min(resp->dmin,i) ;
+		     resp->dmax = std::max(resp->dmax,i) ;
 		}
 	    }
 	    return d ;
