@@ -18,6 +18,10 @@
 
 /*******************************************************************************
 
+	Name:
+	logfile_userinfo
+
+	Description:
 	This subroutines is generally used to make the first log-file
 	entry at the start of a program involcation. The subroutine
 	requires that both a LOGFILE object have already been opened
@@ -87,10 +91,10 @@ namespace {
     struct loguser ;
     typedef int (loguser::*loguser_m)() noex ;
     struct loguser {
-	logfile		*op = nullptr ;
-	userinfo	*uip = nullptr ;
-	cchar		*pn = nullptr ;
-	cchar		*vn = nullptr ;
+	logfile		*op ;
+	userinfo	*uip ;
+	cchar		*pn ;
+	cchar		*vn ;
 	time_t		dt ;
 	loguser(logfile *lp,userinfo *up,time_t t,cc *p,cc *v) noex : dt(t) {
 	    op = lp ;
@@ -107,10 +111,10 @@ namespace {
 }
 
 struct vars {
+	cchar		*a ;
 	int		nodenamelen ;
 	int		usernamelen ;
 	int		bangnamelen ;
-	cchar		*a ;
 } ;
 
 
@@ -185,6 +189,7 @@ int loguser::first() noex {
 int loguser::second() noex {
 	int		rs = SR_OK ;
 	cchar		*a = var.a ;
+	cchar		*mn = uip->machine ;
 	cchar		*sn = uip->sysname ;
 	cchar		*rn = uip->release ;
 	cchar		*dn = uip->domainname ;
@@ -193,7 +198,7 @@ int loguser::second() noex {
 	    rs = logfile_printf(op,"a=%s os=%s(%s) d=%s",a,sn,rn,dn) ;
 	    wlen += rs ;
 	} else {
-	    rs = logfile_printf(op,"os=%s(%s) d=%s",sn,rn,dn) ;
+	    rs = logfile_printf(op,"m=%s os=%s(%s) d=%s",mn,sn,rn,dn) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
