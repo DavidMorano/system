@@ -266,9 +266,9 @@ int mapblock<K,B>::present(K &k) noex {
 	typedef typename maptype::iterator	mit_t ;
 	int		rs = SR_BUGCHECK ;
 	if (mp) {
-	    const mit_t	it_end = mp->end() ;
+	    const mit_t	itend = mp->end() ;
 	    mit_t	it = mp->find(k) ;
-	    rs = (it != it_end) ? SR_OK : SR_NOENT ;
+	    rs = (it != itend) ? SR_OK : SR_NOENT ;
 	} /* end if (non-null) */
 	return rs ;
 }

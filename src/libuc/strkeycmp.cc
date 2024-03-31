@@ -46,6 +46,8 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	"strkeycmp.h"
+
 
 /* local defines */
 

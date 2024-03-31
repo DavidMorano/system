@@ -402,28 +402,31 @@ TOBJG0= $(TOBJA)
 TOBJ= $(TOBJG0) $(TOBJG1)
 
 
-UOBJ00= matxstr.o toxc.o char.o
+UOBJ00= matxstr.o toxc.o char.o 
 UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o
-UOBJ02= snwcpy.o strcpyxc.o
+UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strdcpy.o
 UOBJ03= varnames.o syswords.o stdfnames.o
 
-UOBJ04= hasx.o ischarx.o ulogerror.o strdcpy.o
+UOBJ04= isnot.o isoneof.o hasx.o ischarx.o 
 UOBJ05= nleadstr.o nleadkeystr.o
 UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
 UOBJ08= strkeycmp.o strwcmp.o
-UOBJ09= ustat.o readln.o ccfile.o
-UOBJ10= isnot.o isoneof.o
-UOBJ11= strwcpy.o
+UOBJ09= readln.o ccfile.o
+UOBJ10= 
+UOBJ11= strmgr.o
 
 UOBJ12= ufstat.o ucttyname.o
+UOBJ13=
+UOBJ14=
+UOBJ15= ustat.o ulogerror.o
 
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
 UOBJ+= $(UOBJ04) $(UOBJ05) $(UOBJ06) $(UOBJ07)
 UOBJ+= $(UOBJ08) $(UOBJ09) $(UOBJ10) $(UOBJ11)
-UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ14)
+UOBJ+= $(UOBJ12) $(UOBJ13) $(UOBJ14) $(UOBJ15)
 
 
 .SUFFIXES:		.ls .i .cx .cs

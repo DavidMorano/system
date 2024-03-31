@@ -1,6 +1,7 @@
 /* logfile HEADER */
 /* lang=C20 */
 
+/* perform logging operations on a file */
 /* version %I% last-modified %G% */
 
 
@@ -18,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>
+#include	<stdarg.h>		/* |va_list| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -47,7 +48,6 @@ struct logfile_head {
 	time_t		ti_open ;
 	time_t		ti_data ;
 	time_t		ti_write ;
-	mode_t		operm ;
 	uint		magic ;
 	int		oflags ;
 	int		lfd ;
@@ -55,6 +55,7 @@ struct logfile_head {
 	int		bufsize ;
 	int		len ;		/* length of buffer filled so far */
 	int		percent ;
+	mode_t		operm ;
 	char		logid[LOGFILE_LOGIDLEN + 1] ;
 } ;
 
@@ -76,6 +77,20 @@ extern int logfile_control(logfile *,int,void *) noex ;
 extern int logfile_close(logfile *) noex ;
 
 EXTERNC_end
+
+#ifdef	__cplusplus
+
+template<typename ... Args>
+inline int logfile_magic(logfile *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LOGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (logfile_magic) */
+
+#endif /* __cplusplus */
 
 
 #endif /* LOGFILE_INCLUDE */

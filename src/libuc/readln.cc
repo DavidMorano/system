@@ -53,7 +53,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<string>
 #include	<istream>
 #include	<usystem.h>
 #include	<storebuf.h>		/* <- not used! */
@@ -91,15 +90,15 @@ using std::istream ;			/* type */
 
 /* exported subroutines */
 
-int readln(istream &is,char *ibuf,int ilen,int dch) noex {
+int readln(istream *isp,char *ibuf,int ilen,int dch) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (dch == 0) dch = eol ;
-	if (ibuf) {
+	if (isp && ibuf) {
 	    try {
 		rs = SR_BADFMT ;
-	        if (bool(is.getline(ibuf,(ilen+1),char(dch)))) {
-		    if ((rs = is.gcount()) <= ilen) {
+	        if (bool(isp->getline(ibuf,(ilen+1),char(dch)))) {
+		    if ((rs = isp->gcount()) <= ilen) {
 			len = rs ;
 			if (len > 0) {
 			    ibuf[len-1]= dch ;
@@ -109,9 +108,9 @@ int readln(istream &is,char *ibuf,int ilen,int dch) noex {
 			rs = SR_OVERFLOW ;
 		    } /* end if (adding delimiter to input buffer) */
 		} else {
-		    cbool	feof	= is.eof() ;
-		    cbool	ffail	= is.fail() ;
-		    cbool	fbad	= is.bad() ;
+		    cbool	feof	= isp->eof() ;
+		    cbool	ffail	= isp->fail() ;
+		    cbool	fbad	= isp->bad() ;
 		    if (feof) {
 		        rs = SR_OK ;
 		    } else if (ffail) {

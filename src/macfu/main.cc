@@ -80,8 +80,10 @@ using std::string ;			/* type */
 using std::string_view ;		/* type */
 using std::unordered_map ;		/* type */
 using std::vector ;			/* type */
+using std::istream ;			/* type */
 using std::cin;				/* variable */
 using std::cout ;			/* variable */
+using std::cerr ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -341,13 +343,14 @@ int proginfo::iflistend() noex {
 /* end method (proginfo::iflistend) */
 
 int proginfo::readin() noex {
+	istream		*isp = &cin ;
 	int		rs ;
 	if ((rs = maxpathlen) >= 0) {
 	    cint	llen = rs ;
 	    char	*lbuf ;
 	    rs = SR_NOMEM ;
 	    if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
-	        while ((rs = readln(cin,lbuf,llen)) >= 0) {
+	        while ((rs = readln(isp,lbuf,llen)) > 0) {
 		    int		ll = rs ;
 		    if ((ll > 0) && (lbuf[ll - 1] == eol)) ll -= 1 ;
 		    if (ll > 0) {
@@ -367,7 +370,7 @@ int proginfo::filecandidate(cchar *sp,int sl) noex {
 	strnul		s(sp,sl) ;
 	int		rs ;
 	if ((rs = u_stat(s,&sb)) >= 0) {
-	    if (S_ISDIR(sb.st_mode)) {
+	    if (S_ISREG(sb.st_mode)) {
 	        const dev_t	d = sb.st_dev ;
 	        const ino_t	i = sb.st_ino ;
 	        if ((rs = filealready(d,i)) == 0) {
@@ -386,11 +389,11 @@ int proginfo::filecandidate(cchar *sp,int sl) noex {
 int proginfo::filealready(dev_t d,ino_t i) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
-	bool		f = false ;
+	bool		f = true ;
 	devino		di(d,i) ;
 	if ((rs = flist.present(di)) == rsn) {
 	    rs = SR_OK ;
-	    f = true ;
+	    f = false ;
 	} /* end if (mapblock::present) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -400,12 +403,14 @@ int proginfo::output() noex {
 	int		rs = SR_OK ;
 	for (const auto &e : flist) {
 	    const filenode	&f = e.second ;
-	    {
+	    try {
 		cint		rc = f.rc ;
 		if (rc > 0) {
 		    const string	*n = &f.fn ;
 	            cout << *n << eol ;
 		}
+	    } catch (...) {
+		rs = SR_IO ;
 	    }
 	    if (rs < 0) break ;
 	} /* end for */

@@ -34,7 +34,6 @@
 
 struct strnul {
 	typedef std::string_view	strview ;
-	typedef const char	*charp ;
 	cchar		*rp = nullptr ;
 	cchar		*sp = nullptr ;
 	char		*as = nullptr ;	/* allocated memory */
@@ -51,7 +50,7 @@ struct strnul {
 	strnul() noex : strnul(nullptr,0) { } ;
 	strnul(const strnul &) = delete ;
 	strnul &operator = (const strnul &) = delete ;
-	charp operator () (cchar *ap,int al) noex {
+	ccharp operator () (cchar *ap,int al) noex {
 	    rp = nullptr ;
 	    if (as) {
 		delete [] as ;
@@ -59,14 +58,14 @@ struct strnul {
 	    }
 	    sp = ap ;
 	    sl = al ;
-	    return operator charp () ;
+	    return operator ccharp () ;
 	} ; /* end method */
-	charp operator () (strview &sv) noex {
+	ccharp operator () (strview &sv) noex {
 	    cchar	*ap = sv.data() ;
 	    cint	al = sv.length() ;
 	    return operator () (ap,al) ;
 	} ; /* end method */
-	operator charp () noex ;
+	operator ccharp () noex ;
 	~strnul() noex {
 	    if (as) {
 		delete [] as ;
