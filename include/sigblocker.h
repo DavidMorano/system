@@ -48,7 +48,7 @@ struct sigblocker_co {
 	    w = m ;
 	} ;
 	operator int () noex ;
-	int operator () (int * = nullptr) noex ;
+	int operator () (const int * = nullptr) noex ;
 } ; /* end struct (sigblocker_co) */
 struct sigblocker : sigblocker_head {
 	sigblocker_co	start ;
