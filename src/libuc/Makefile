@@ -403,13 +403,13 @@ TOBJ= $(TOBJG0) $(TOBJG1)
 
 
 UOBJ00= matxstr.o toxc.o char.o
-UOBJ01= strn.o strnxcmp.o sfx.o six.o hasx.o
+UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o
 UOBJ02= snwcpy.o strcpyxc.o
 UOBJ03= varnames.o syswords.o stdfnames.o
 
-UOBJ04= ischarx.o ulogerror.o strdcpy.o
+UOBJ04= hasx.o ischarx.o ulogerror.o strdcpy.o
 UOBJ05= nleadstr.o nleadkeystr.o
-UOBJ06= mapex.o strnul.o rmx.o
+UOBJ06= mapex.o strnul.o
 UOBJ07= getourenv.o
 
 UOBJ08= strkeycmp.o strwcmp.o

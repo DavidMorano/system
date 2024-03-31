@@ -53,7 +53,6 @@
 #include	<usysrets.h>
 #include	<clanguage.h>
 
-using std::cerr ;			/* variable */
 
 template<typename K,typename B> class mapblock ;
 
@@ -154,15 +153,15 @@ struct mapblock_co {
 
 template<typename K,typename B>
 class mapblock {
+	std::unordered_map<K,B>			*mp = nullptr ;
+	typedef std::unordered_map<K,B>		maptype ;
+	typedef mapblock_co<K,B>		mbco_type ;
+public:
 	typedef K				key_type ;
 	typedef B				mapped_type ;
 	typedef std::pair<const K,B>		value_type ;
 	typedef mapblock_iter<K,B>		iterator ;
 	typedef const mapblock_iter<K,B>	const_iterator ;
-	typedef std::unordered_map<K,B>		maptype ;
-	typedef mapblock_co<K,B>		mbco_type ;
-	std::unordered_map<K,B>			*mp = nullptr ;
-public:
 	mapblock(const mapblock &) = delete ;
 	mapblock &operator = (const mapblock &) = delete ;
 	mbco_type	start ;
@@ -236,9 +235,7 @@ int mapblock<K,B>::ins(K k,const B &v) noex {
 	if (mp) {
 	    rs = SR_OK ;
 	    try {
-	        cerr << "ins k=" << k << eol ;
 	        std::pair<mit_t,bool>	r = mp->insert({k,v}) ;
-	        cerr << "done" << eol ;
 	        if (!r.second) rs = SR_EXISTS ;
 	    } catch (...) {
 	        rs = SR_NOMEM ;
