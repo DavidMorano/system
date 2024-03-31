@@ -9,7 +9,8 @@
 
 	= 2005-01-20, David A­D­ Morano
 	This was originally written to collect some common PCS code
-	into one subroutines.
+	into one subroutines.  Making and refactoring PCS programs
+	accounts for a good bit of these subroutine libraries.
 
 */
 
@@ -44,27 +45,25 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
 #include	<usystem.h>
+#include	<ucvariables.hh>
+#include	<getbufsize.h>
 #include	<logfile.h>
 #include	<userinfo.h>
-#include	<localmisc.h>
+#include	<isnot.h>
+#include	<iserror.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 
 /* local defines */
 
-#ifndef	VARARCHITECTURE
-#define VARARCHITECTURE	"ARCHITECTURE"
-#endif
 
-#ifndef	BANGBUFLEN
-#define	BANGBUFLEN	(NODENAMELEN+1+USERNAMELEN)
-#endif
+/* imported namespaces */
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -84,11 +83,51 @@ extern "C" {
 
 /* local structures */
 
+namespace {
+    struct loguser ;
+    typedef int (loguser::*loguser_m)() noex ;
+    struct loguser {
+	logfile		*op = nullptr ;
+	userinfo	*uip = nullptr ;
+	cchar		*pn = nullptr ;
+	cchar		*vn = nullptr ;
+	time_t		dt ;
+	loguser(logfile *lp,userinfo *up,time_t t,cc *p,cc *v) noex : dt(t) {
+	    op = lp ;
+	    uip = up ;
+	    dt = (t) ? t : time(nullptr) ;
+	    pn = (p) ? p : "" ;
+	    vn = (v) ? v : "" ;
+	} ;
+	operator int () noex ;
+	int first() noex ;
+	int second() noex ;
+	int third() noex ;
+    } ; /* end struct (loguser) */
+}
+
+struct vars {
+	int		nodenamelen ;
+	int		usernamelen ;
+	int		bangnamelen ;
+	cchar		*a ;
+} ;
+
 
 /* forward references */
 
+static int	mkvars() noex ;
+
 
 /* local variables */
+
+static constexpr loguser_m	mems[] = {
+	&loguser::first,
+	&loguser::second,
+	&loguser::third
+} ;
+
+static vars			var ;
 
 
 /* exported variables */
@@ -96,62 +135,104 @@ extern "C" {
 
 /* exported subroutines */
 
-int logfile_userinfo(LOGFILE *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
+int logfile_userinfo(logfile *op,userinfo *uip,time_t dt,cc *pn,cc *vn) noex {
 	int		rs ;
-	int		rs1 ;
 	int		wlen = 0 ;
-	cchar	*a = getenv(VARARCHITECTURE) ;
-	cchar	*fmt ;
-	char		timebuf[TIMEBUFLEN + 1] ;
-
-	if ((op == NULL) || (uip == NULL))
-	    return SR_FAULT ;
-
-	if (pn == NULL)
-	    pn = "" ;
-
-	if (vn == NULL)
-	    vn = "" ;
-
-	if (dt <= 0)
-	    dt = time(NULL) ;
-
-/* first line (w/ possible additional information) */
-
-	fmt = "%s starting" ;
-	if ((pn[0] != '\0') || (vn[0] != '\0'))
-	    fmt = "%s %s %s/%s" ;
-
-	{
-	    cchar	*ts = timestr_logz(dt,timebuf) ;
-	    cchar	*st = (uip->f.sysv_ct) ? "SYSV" : "BSD" ;
-	    rs = logfile_printf(op,fmt,ts,pn,vn,st) ;
-	    wlen += rs ;
-	}
-
-	if (rs >= 0) {
-	    cchar	*sn = uip->sysname ;
-	    cchar	*rn = uip->release ;
-	    cchar	*dn = uip->domainname ;
-	    if (a != NULL) {
-	        rs = logfile_printf(op,"a=%s os=%s(%s) d=%s",a,sn,rn,dn) ;
+	if ((rs = logfile_magic(op,uip)) >= 0) {
+	    static int	rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+		loguser		lo(op,uip,dt,pn,vn) ;
+		rs = lo ;
 		wlen += rs ;
-	    } else {
-	        rs = logfile_printf(op,"os=%s(%s) d=%s",sn,rn,dn) ;
-		wlen += rs ;
-	    }
-	}
-
-	if (rs >= 0) {
-	    char	namebuf[BANGBUFLEN + 1] ;
-	    if ((rs1 = mkuibang(namebuf,BANGBUFLEN,uip)) >= 0) {
-	        rs = logfile_print(op,namebuf,rs1) ;
-	        wlen += rs ;
-	    }
-	}
-
+	    } /* end if (mkvars) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (logfile_userinfo) */
+
+loguser::operator int () noex {
+	int		rs = SR_OK ;
+	int		wlen = 0 ;
+	for (auto m : mems) {
+	    rs = (this->*m)() ;
+	    wlen += rs ;
+	    if (rs < 0) break ;
+	} /* end for */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (loguser::operator) */
+
+int loguser::first() noex {
+	int		rs ;
+	int		wlen = 0 ;
+	char		timebuf[TIMEBUFLEN + 1] ;
+	{
+	    cchar	*ts = timestr_logz(dt,timebuf) ;
+	    cchar	*st = (uip->f.sysv_ct) ? "SYSV" : "BSD" ;
+	    cchar	*fmt ;
+	    if ((pn[0] != '\0') || (vn[0] != '\0')) {
+	        fmt = "%s %s %s/%s" ;
+	    } else {
+	        fmt = "%s starting" ;
+	    }
+	    rs = logfile_printf(op,fmt,ts,pn,vn,st) ;
+	    wlen += rs ;
+	} /* end block */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (loguser::first) */
+
+int loguser::second() noex {
+	int		rs = SR_OK ;
+	cchar		*a = var.a ;
+	cchar		*sn = uip->sysname ;
+	cchar		*rn = uip->release ;
+	cchar		*dn = uip->domainname ;
+	int		wlen = 0 ;
+	if (a) {
+	    rs = logfile_printf(op,"a=%s os=%s(%s) d=%s",a,sn,rn,dn) ;
+	    wlen += rs ;
+	} else {
+	    rs = logfile_printf(op,"os=%s(%s) d=%s",sn,rn,dn) ;
+	    wlen += rs ;
+	}
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (loguser::second) */
+
+int loguser::third() noex {
+	cint		nlen = var.bangnamelen ;
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	char		*nbuf{} ;
+	if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
+	    if ((rs = mkuibang(nbuf,nlen,uip)) >= 0) {
+	        rs = logfile_print(op,nbuf,rs) ;
+	        wlen += rs ;
+	    } else if (isNotPresent(rs)) {
+	        rs = SR_OK ;
+	    }
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end method (loguser::third) */
+
+static int mkvars() noex {
+	cchar		*vn = varname.architecture ;
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_nn)) >= 0) {
+	    var.nodenamelen = rs ;
+	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
+		var.usernamelen = rs ;
+		var.bangnamelen = (var.nodenamelen + var.usernamelen + 1) ;
+		var.a = getenv(vn) ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
