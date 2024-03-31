@@ -33,8 +33,8 @@
 #define		UCMALLREG_ENT	struct ucmallreg_entry
 
 
-struct ucmallreg_cur {
-	int		i ;
+struct ucmallreg_cursor {
+	void		*mcp ;		/* Mall-Cursor-Pointer */
 } ;
 
 struct ucmallreg_entry {

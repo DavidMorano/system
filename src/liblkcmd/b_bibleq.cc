@@ -1,14 +1,13 @@
-/* b_bibleq */
+/* b_bibleq SUPPORT */
+/* lang=C++20 */
 
 /* query the bible database using words as the query keys */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocation */
 #define	CF_COOKIE	0		/* use cookie as separator */
-
 
 /* revision history:
 
@@ -21,16 +20,14 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  This little program looks
-	up a number in a database and returns the corresponding string.
+	This is a built-in command to the KSH shell.  This little
+	program looks up a number in a database and returns the
+	corresponding string.
 
 	Synopsis:
-
 	$ bibleq <word(s)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -44,14 +41,12 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>

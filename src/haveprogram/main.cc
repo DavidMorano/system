@@ -1,11 +1,11 @@
-/* main */
+/* main SUPPORT */
+/* lang=C++20 */
 
 /* front-end for HAVEPROGRAM */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_USAGE	0		/* |usage()| */
-
 
 /* revision history:
 
@@ -18,21 +18,15 @@
 
 /*******************************************************************************
 
-	This little program checks to see if programs are available with the
-	current PATH environment variables.
-
+	This little program checks to see if programs are available
+	with the current PATH environment variables.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<ids.h>
@@ -54,7 +48,7 @@
 
 /* external subroutines */
 
-extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
+extern int	getprogpath(IDS *,vecstr *,char *,const char *,int) ;
 extern int	vecstr_addpath(vecstr *,const char *,int) ;
 extern int	vecstr_addpathclean(vecstr *,const char *,int) ;
 
@@ -75,17 +69,18 @@ static int	usage(PROGINFO *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int main(int argc,cchar *argv[],cchar *envv[])
-{
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
-	VECSTR		dirs ;
+	vecstr		dirs ;
 	int		rs = SR_INVALID ;
 	int		ex = EX_USAGE ;
-	const char	*varpath = VARPATH ;
-	const char	*path ;
+	cchar		*varpath = VARPATH ;
+	cchar		*path ;
 
 #if	CF_DEBUGS || CF_DEBUG
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -111,11 +106,10 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	    if (rs >= 0) {
 		IDS	id ;
 	        if ((rs = ids_load(&id)) >= 0) {
-		    int		i ;
-		    const char	*pn ;
+		    cchar	*pn ;
 		    char	pbuf[MAXPATHLEN + 1] ;
 	            ex = EX_NOPROG ;
-	            for (i = 1 ; (i < argc) && (argv[i] != NULL) ; i += 1) {
+	            for (int i = 1 ; (i < argc) && (argv[i] != NULL) ; i += 1) {
 	                pn = argv[i] ;
 	                if ((pn[0] != '\0') && (strcmp(pn,"--") != 0)) {
 	                    rs = getprogpath(&id,&dirs,pbuf,pn,-1) ;
@@ -146,8 +140,7 @@ badarg:
 
 #if	CF_USAGE
 /* print out (standard error) some short usage */
-static int usage(PROGINFO *pip)
-{
+static int usage(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	const char	*pn = pip->progname ;

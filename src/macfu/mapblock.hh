@@ -61,6 +61,7 @@ template <typename K,typename B>
 class mapblock_iter {
 	typedef mapblock<K,B>		mb_t ;
 	typedef typename std::unordered_map<K,B>::iterator	mapit_type ;
+	typedef std::pair<const K,B>		value_type ;
 	mapit_type		mit ;
 public:
 	mapblock_iter() noex { } ;

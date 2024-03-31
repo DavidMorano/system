@@ -13,7 +13,7 @@
 #define	CF_DEBUGN	0		/* special */
 #define	CF_MSGENV	0		/* message environment */
 #define	CF_TESTIN	0		/* test std-input */
-#define	CF_OUTENTRY	1		/* use 'outema_ent(3imail)' */
+#define	CF_OUTENTRY	1		/* use |outema_ent(3imail)| */
 #define	CF_XMAILER	0		/* compliled-in x-mailer */
 #define	CF_PRTMPDIR	1		/* use a PR tmp-dir */
 #define	CF_CSPATH	1		/* use CSPATH */
@@ -65,7 +65,6 @@
 	(seperate from other subroutines) were made so as to achieve
 	the maximum code-reusability.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -87,10 +86,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<utime.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<utmpx.h>
 #include	<netdb.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ucmallreg.h>
 #include	<mktmp.h>
