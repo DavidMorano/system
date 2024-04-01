@@ -311,6 +311,7 @@ int pcsgetprojinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
+	int		rl = 0 ;
 	if (pr && rbuf && username) {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
@@ -320,6 +321,7 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	            for (int i = 0 ; getprojinfos[i] ; i += 1) {
 			projinfo_f	fn = getprojinfos[i] ;
 	                rs = fn(&mi) ;
+			rl = rs ;
 	                if (rs != 0) break ;
 	            } /* end for */
 	            rs1 = subinfo_finish(&mi) ;
@@ -327,7 +329,7 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 	        } /* end if (subinfo) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (pcsprojectinfo) */
 
@@ -368,13 +370,9 @@ static int subinfo_finish(SUBINFO *sip) noex {
 
 static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	int		rs = SR_OK ;
-
 	if (! sip->init.uid) {
-	    cchar	*cp ;
-
+	    cchar	*cp = getenv(sip->varusername) ;
 	    sip->init.uid = true ;
-	    cp = getenv(sip->varusername) ;
-
 	    if ((cp != nullptr) && (strcmp(cp,sip->un) == 0)) {
 	        sip->f.uid = true ;
 	        sip->uid = getuid() ;
@@ -385,23 +383,20 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	            sip->uid = sip->pw.pw_uid ;
 	        }
 	    } /* end if */
-
 	} /* end if (initializing UID) */
-
-	if (uidp != nullptr)
+	if (uidp != nullptr) {
 	    *uidp = sip->uid ;
-
-	if ((rs >= 0) && (! sip->f.uid))
+	}
+	if ((rs >= 0) && (! sip->f.uid)) {
 	    rs = SR_NOTFOUND ;
-
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_getuid) */
 
 static int subinfo_getpw(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
-	cchar	*un = sip->un ;
-
+	cchar		*un = sip->un ;
 	if (! sip->init.pw) {
 	    cint	pwlen = sip->pwlen ;
 	    char	*pwbuf = sip->pwbuf ;
@@ -424,22 +419,23 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	        sip->uid = sip->pw.pw_uid ;
 	    }
 	} /* end if (was not already initialized) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_getpw) */
 
 static int getname(SUBINFO *sip,int nt) noex {
 	int		rs = SR_BUGCHECK ;
+	int		rl = 0 ;
 	if (nt < pcsnametype_overlast) {
 	    sip->rbuf[0] = '\0' ;
 	    for (int i = 0 ; getnames[i] ; i += 1) {
 	        nameinfo_f	fn = getnames[i] ;
 	        rs = fn(sip,nt) ;
+		rl = rs ;
 	        if (rs != 0) break ;
 	    } /* end for */
 	} /* end if (ok) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (getname) */
 
@@ -447,8 +443,7 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	int		f ;
-	cchar	*un = sip->un ;
-
+	cchar		*un = sip->un ;
 	f = (un[0] == '-') ;
 	if (! f) {
 	    cchar	*vun = getenv(VARUSERNAME) ;
@@ -462,7 +457,6 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 		len = rs ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_var) */
