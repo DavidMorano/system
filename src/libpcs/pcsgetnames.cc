@@ -462,20 +462,28 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 /* end subroutine (getname_var) */
 
 static int getname_userhome(SUBINFO *sip ,int nt) noex {
-	cint	hlen = MAXPATHLEN ;
+        cint            sz = (2 * (maxpathlen + 1)) ;
 	int		rs ;
-	cchar		*un = sip->un ;
-	char		hbuf[MAXPATHLEN + 1] ;
-
-	if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-	    cchar	*fn = pcsnametypes[nt].fname ;
-	    char	tbuf[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
-	        rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
-		if (isNotPresent(rs)) rs = SR_OK ;
-	    }
-	} /* end if (getuserhome) */
-
+	int		rs1 ;
+	int		len = 0 ;
+	int		na = 0 ;
+	char		*a{} ;
+        if ((rs = uc_malloc(sz,&a)) >= 0) {
+            cint        hlen = maxpathlen ; 
+	    cchar	*un = sip->un ;
+            char        *hbuf = (a + (na++ * (maxpathlen + 1))) ;
+	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
+	        cchar	*fn = pcsnametypes[nt].fname ;
+                char    *tbuf = (a + (na++ * (maxpathlen + 1))) ;
+	        if ((rs = mkpath2(tbuf,hbuf,fn)) >= 0) {
+	            rs = filereadln(tbuf,sip->rbuf,sip->rlen) ;
+		    len = rs ;
+		    if (isNotPresent(rs)) rs = SR_OK ;
+	        }
+	    } /* end if (getuserhome) */
+	    rs1 = uc_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (getname_userhome) */
@@ -549,7 +557,6 @@ static int getprojinfo_userhome(SUBINFO *sip) noex {
 	    cchar	*un = sip->un ;
 	    cchar	*fname = PROJECTFNAME ;
 	    char	*hbuf = (a + (na++ * (maxpathlen + 1))) ;
-	    hbuf[0] = '\0' ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
 	        char	*tbuf = (a + (na++ * (maxpathlen + 1))) ;
 	        if ((rs = mkpath2(tbuf,hbuf,fname)) >= 0) {
