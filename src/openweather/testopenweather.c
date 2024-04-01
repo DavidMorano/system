@@ -9,7 +9,7 @@
 #include	<stdio.h>
 #include	<usystem.h>
 #include	<fsdir.h>
-#include	<openpcsdircache.h>
+#include	<pcsopendircache.h>
 #include	<filebuf.h>
 #include	<localmisc.h>
 

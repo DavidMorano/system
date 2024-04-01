@@ -24,7 +24,7 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
-#include	<openpcsdircache.h>
+#include	<pcsopendircache.h>
 #include	<pcsconf.h>
 #include	<pcsconf_config.h>
 #include	<pcsconfs.h>

@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} valuelimits.hh "
+NAMES="${NAMES} openpcsdircache "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/valuelimits.hh/s//valuelims.hh/g
+g/openpcsdircache/s//pcsopendircache/g
 	w
 	q
 EOF

@@ -20,7 +20,7 @@
 #include	<stdio.h>
 #include	<usystem.h>
 #include	<fsdir.h>
-#include	<openpcsdircache.h>
+#include	<pcsopendircache.h>
 #include	<filebuf.h>
 #include	<localmisc.h>
 
@@ -99,11 +99,11 @@ int main(int argc,const char **argv,const char **envv)
 #if	CF_DEBUGS
 	        debugprintf("main: fn=%s\n",fn) ;
 #endif
-	        if ((rs1 = openpcsdircache(pr,fn,of,om,to)) >= 0) {
+	        if ((rs1 = pcsopendircache(pr,fn,of,om,to)) >= 0) {
 	            struct ustat	sb ;
 	            int		fd = rs1 ;
 #if	CF_DEBUGS
-	            debugprintf("main: openpcsdircache() rs=%d\n",rs1) ;
+	            debugprintf("main: pcsopendircache() rs=%d\n",rs1) ;
 #endif
 	            if ((rs = u_fstat(fd,&sb)) >= 0) {
 #if	CF_DEBUGS

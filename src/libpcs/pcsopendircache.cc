@@ -212,7 +212,7 @@ int dirhelp::proc() noex {
 	        fsz += 1 ;
 	        fsz += (strlen(dc) + 1) ;
 	        if ((rs = uc_malloc(fsz,&fbuf)) >= 0) {
-		    if ((rs = mkpath2(fbuf,ndname,dc)) >= 0) {
+		    if ((rs = mkpath(fbuf,ndname,dc)) >= 0) {
 	    	        if ((rs = u_open(fbuf,of,om)) >= 0) {
 	    	            fd = rs ;
 		            if ((rs >= 0) && (of & O_CLOEXEC)) {
@@ -239,7 +239,7 @@ static int procdname(cchar *newsdname,int ttl) noex {
 	char		*dbuf{} ;
 	if ((rs = malloc_mp(&dbuf)) >= 0) {
 	    cchar	*dc = DIRCACHE_CFNAME ;
-	    if ((rs = mkpath2(dbuf,newsdname,dc)) >= 0) {
+	    if ((rs = mkpath(dbuf,newsdname,dc)) >= 0) {
 	        USTAT	sb ;
 	        if ((rs = u_stat(dbuf,&sb)) >= 0) {
 		    if (ttl >= 0) {
@@ -344,23 +344,31 @@ static int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
 
 static int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	char		dcfname[MAXPATHLEN + 1] ;
-	if ((rs = mkpath2(dcfname,newsdname,DIRCACHE_CFNAME)) >= 0) {
-	    cchar	*patname = DIRCACHE_PATNAME ;
-	    char	tpat[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(tpat,newsdname,patname)) >= 0) {
-		char	tbuf[MAXPATHLEN + 1] ;
-	        if ((rs = mktmpfile(tbuf,tpat,0664)) >= 0) {
-		     if ((rs = procdircacher(dlp,tbuf)) >= 0) {
-	                rs = u_rename(tbuf,dcfname) ;
-			if (rs < 0) {
-	                    u_unlink(tbuf) ;
-			}
-	            } /* end if (renaming attempt) */
-	        } /* end if (mktmpfile) */
+	int		na = 0 ;
+	cint		sz = (3 * (maxpathlen + 1)) ;
+	char		*a{} ;
+	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    char	*dcfname = (a + (na++ * (maxpathlen + 1))) ;
+	    if ((rs = mkpath(dcfname,newsdname,DIRCACHE_CFNAME)) >= 0) {
+	        cchar	*patname = DIRCACHE_PATNAME ;
+	        char	*tpat = (a + (na++ * (maxpathlen + 1))) ;
+	        if ((rs = mkpath(tpat,newsdname,patname)) >= 0) {
+		    char	*tbuf = (a + (na++ * (maxpathlen + 1))) ;
+	            if ((rs = mktmpfile(tbuf,tpat,0664)) >= 0) {
+		         if ((rs = procdircacher(dlp,tbuf)) >= 0) {
+	                    rs = u_rename(tbuf,dcfname) ;
+			    if (rs < 0) {
+	                        u_unlink(tbuf) ;
+			    }
+	                } /* end if (renaming attempt) */
+	            } /* end if (mktmpfile) */
+	        } /* end if (mkpath) */
 	    } /* end if (mkpath) */
-	} /* end if (mkpath) */
+	    rs1 = uc_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procdircache) */
@@ -373,17 +381,16 @@ static int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	if ((rs = bopen(dcfp,fn,"wct",0664)) >= 0) {
 	    cchar	*magicstr = DIRCACHE_MAGICSTR ;
 	    if ((rs = bprintln(dcfp,magicstr,-1)) >= 0) {
-	        int	dl ;
-	        cchar	*dp ;
+	        cchar	*dp{} ;
 	        for (int i = 0 ; vecpstr_get(dlp,i,&dp) >= 0 ; i += 1) {
-	            if (dp != NULL) {
-	                dl = strlen(dp) ;
+	            if (dp) {
+	                cint	dl = strlen(dp) ;
 	                c += 1 ;
 	                rs = bprintln(dcfp,dp,dl) ;
 	            }
 	            if (rs < 0) break ;
 	        } /* end for */
-	    } /* end if */
+	    } /* end if (bprintln) */
 	    rs1 = bclose(dcfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened replacement file) */

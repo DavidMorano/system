@@ -72,7 +72,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<getusername.h>
-#include	<openpcsdircache.h>
+#include	<pcsopendircache.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -511,7 +511,7 @@ int		to ;
 
 	if (rs >= 0) {
 	    const int	ttl = sip->ttl ;
-	    rs = openpcsdircache(pr,newsdname,of,om,ttl) ;
+	    rs = pcsopendircache(pr,newsdname,of,om,ttl) ;
 	    fd = rs ;
 	}
 
