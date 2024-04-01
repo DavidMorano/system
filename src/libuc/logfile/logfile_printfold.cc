@@ -33,6 +33,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -44,7 +50,7 @@
 
 /* forward references */
 
-static int logfile_printfi(LOGFILE *,int,cchar *,int,cchar *,int) noex ;
+static int logfile_printfi(logfile *,int,cchar *,int,cchar *,int) noex ;
 
 
 /* local variables */
@@ -55,7 +61,7 @@ static int logfile_printfi(LOGFILE *,int,cchar *,int,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int logfile_printfold(LOGFILE *lhp,cchar *pre,cchar *sp,int sl) noex {
+int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 	linefold	fo ;
 	cint		pl = strlen(pre) ;
 	int		rs ;
@@ -63,10 +69,9 @@ int logfile_printfold(LOGFILE *lhp,cchar *pre,cchar *sp,int sl) noex {
 	int		n ;
 	n = (LOGFILE_FMTLEN - pl - 2) ;
 	if ((rs = linefold_start(&fo,n,0,sp,sl)) >= 0) {
-	    int		i ;
 	    int		c = 0 ;
-	    cchar	*sp ;
-	    for (i = 0 ; (rs = linefold_getline(&fo,i,&sp)) > 0 ; i += 1) {
+	    cchar	*sp{} ;
+	    for (int i = 0 ; (rs = linefold_getline(&fo,i,&sp)) > 0 ; i += 1) {
 		int	sl = rs ;
 		while (sl > n) {
 	            rs = logfile_printfi(lhp,c++,pre,pl,sp,n) ;
@@ -89,7 +94,7 @@ int logfile_printfold(LOGFILE *lhp,cchar *pre,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int logfile_printfi(LOGFILE *lhp,int li,cchar *pp,int pl,
+static int logfile_printfi(logfile *lhp,int li,cchar *pp,int pl,
 		cchar *sp,int sl) noex {
 	int		rs ;
 	if (li == 0) {

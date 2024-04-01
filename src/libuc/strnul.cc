@@ -47,9 +47,18 @@ using std::nothrow ;			/* constant */
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-strnul::operator charp () noex {
+strnul::operator ccharp () noex {
 	if (rp == nullptr) {
 	    rp = sp ;
 	    if ((sl >= 0) && (sp[sl] != '\0')) {

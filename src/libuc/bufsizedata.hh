@@ -46,6 +46,29 @@
 #include	"usysdefs.h"
 
 
+#ifndef	_SC_ARG_MAX
+#define	_SC_ARG_MAX		-1
+#endif
+#ifndef	_SC_LINE_MAX
+#define	_SC_LINE_MAX		-1
+#endif
+#ifndef	_SC_HOST_NAME_MAX
+#define	_SC_HOST_NAME_MAX	-1
+#endif
+#ifndef	_SC_LOGIN_NAME_MAX
+#define	_SC_LOGIN_NAME_MAX	-1
+#endif
+#ifndef	_SC_GETPW_R_SIZE_MAX
+#define	_SC_GETPW_R_SIZE_MAX	-1
+#endif
+#ifndef	_SC_GETGR_R_SIZE_MAX
+#define	_SC_GETGR_R_SIZE_MAX	-1
+#endif
+#ifndef	_SC_TZNAME_MAX
+#define	_SC_TZNAME_MAX		-1
+#endif
+
+
 namespace {
     struct bufsizeitem {
 	int	name ;
@@ -71,9 +94,7 @@ constexpr bufsizedata::bufsizedata() noex {
 	    ip->name = -1 ;
 	    switch (i) {
 	    case getbufsize_ma:
-#ifdef	_SC_ARG_MAX
 	        ip->name = _SC_ARG_MAX ;
-#endif
 		ip->defval = ARBUFLEN ;
 	        break ;
 	    case getbufsize_mn:		/* max-name */
@@ -83,24 +104,18 @@ constexpr bufsizedata::bufsizedata() noex {
 	        ip->defval = MPBUFLEN ;
 	        break ;
 	    case getbufsize_ml:		/* max-line */
-#ifdef	_SC_LINE_MAX
 	        ip->name = _SC_LINE_MAX ;
-#endif
 		ip->defval = MLBUFLEN ;
 	        break ;
 	    case getbufsize_nn:		/* node-name */
-#ifdef	_SC_HOST_NAME_MAX
 	        ip->name = _SC_HOST_NAME_MAX ;
-#endif
 		ip->defval = NNBUFLEN ;
 	        break ;
 	    case getbufsize_hn:		/* host-name */
 	        ip->defval = HNBUFLEN ;
 	        break ;
 	    case getbufsize_un:		/* user-name */
-#ifdef	_SC_LOGIN_NAME_MAX
 		ip->name = _SC_LOGIN_NAME_MAX ;
-#endif
 	        ip->defval = UNBUFLEN ;
 	        break ;
 	    case getbufsize_gn:		/* group-name */
@@ -110,9 +125,7 @@ constexpr bufsizedata::bufsizedata() noex {
 	        ip->defval = PNBUFLEN ;
 	        break ;
 	    case getbufsize_pw:
-#ifdef	_SC_GETPW_R_SIZE_MAX
 	        ip->name = _SC_GETPW_R_SIZE_MAX ;
-#endif
 		ip->defval = PWBUFLEN ;
 	        break ;
 	    case getbufsize_sp:
@@ -122,9 +135,7 @@ constexpr bufsizedata::bufsizedata() noex {
 	        ip->defval = UABUFLEN ;
 	        break ;
 	    case getbufsize_gr:
-#ifdef	_SC_GETGR_R_SIZE_MAX
 		ip->name = _SC_GETGR_R_SIZE_MAX ;
-#endif
 		ip->defval = GRBUFLEN ;
 	        break ;
 	    case getbufsize_pj:
@@ -143,9 +154,7 @@ constexpr bufsizedata::bufsizedata() noex {
 		ip->defval = SVBUFLEN ;		/* service-buf */
 	        break ;
 	    case getbufsize_zn:
-#ifdef	_SC_TZNAME_MAX
 	        ip->name = _SC_TZNAME_MAX ;
-#endif
 		ip->defval = ZNBUFLEN ;
 	        break ;
 	    } /* end switch */

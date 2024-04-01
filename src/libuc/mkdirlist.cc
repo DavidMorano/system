@@ -97,7 +97,7 @@ typedef mkdirlist_ent *	entp ;
 /* external subroutines */
 
 extern "C" {
-    extern int	openpcsdircache(cchar *,cchar *,int,mode_t,int) noex ;
+    extern int	pcsopendircache(cchar *,cchar *,int,mode_t,int) noex ;
     extern int	bbcmp(cchar *,cchar *) noex ;
 }
 
@@ -178,7 +178,7 @@ int mkdirlist_start(mkdirlist *op,cchar *pr,cchar *ndname) noex {
 	        if ((rs = vechand_start(op->dlp,20,0)) >= 0) {
 	            cint	of = O_RDONLY ;
 	            cmode	om = 0666 ;
-	            if ((rs = openpcsdircache(pr,ndname,of,om,-1)) >= 0) {
+	            if ((rs = pcsopendircache(pr,ndname,of,om,-1)) >= 0) {
 	                cint	fd = rs ;
 	                if ((rs = mkdirlist_procdircache(op,ndname,fd)) >= 0) {
 	                    c = rs ;

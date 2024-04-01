@@ -5,14 +5,21 @@
 /* version %I% last-modified %G% */
 
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* revision history:
+
+	= 1997-07-01, David A­D­ Morano
+	This subroutine was originally written.
+
+*/
+
+/* Copyright © 1997 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USERINFO_INCLUDE
 #define	USERINFO_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* various system IDs */
 #include	<usystem.h>
 #include	<localmisc.h>		/* |MAXHOSTNAMELEN| */
 

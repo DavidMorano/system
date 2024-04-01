@@ -58,6 +58,8 @@
 #include	<isnot.h>
 #include	<localmisc.h>
 
+#include	"pcsngdname.h"
+
 
 /* local defines */
 

@@ -25,7 +25,7 @@
 #include	<clanguage.h>
 
 
-extern int readln(std::istream &,char *,int,int = eol) noex ;
+extern int readln(std::istream *,char *,int,int = eol) noex ;
 
 
 #endif /* __cplusplus */

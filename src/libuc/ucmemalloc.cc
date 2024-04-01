@@ -326,27 +326,32 @@ int uc_mallstats(ucmemalloc_stats *statp) noex {
 
 #ifdef	COMMENT
 
-int ucmallreg_curbegin(UCMALLREG_CUR *curp) noex {
+int ucmallreg_curbegin(ucmallreg_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (curp) {
-	    curp->i = -1 ;
-	    rs = SR_OK ;
-	}
+	    rs = SR_NOMEM ;
+	    if ((curp->mcp = new(nothrow) memtrack_iter) != nullptr) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uc_ucmallreg_curbegin) */
+/* end subroutine (ucmallreg_curbegin) */
 
-int ucmallreg_curend(UCMALLREG_CUR *curp) noex {
+int ucmallreg_curend(ucmallreg_cur *curp) noex {
 	int		rs = SR_FAULT ;
 	if (curp) {
-	    curp->i = -1 ;
 	    rs = SR_OK ;
-	}
+	    if (curp->mcp) {
+		delete curp->mcp ;
+		curp->mcp = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uc_ucmallreg_curend) */
+/* end subroutine (ucmallreg_curend) */
 
-int ucmallreg_enum(UCMALLREG_CUR *curp,UCMALLREG_REG *rp) noex {
+int ucmallreg_curenum(ucmallreg_cur *curp,ucmallreg_ent *rp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (curp && rp) {
@@ -381,7 +386,7 @@ int ucmallreg_enum(UCMALLREG_CUR *curp,UCMALLREG_REG *rp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? rsize : rs ;
 }
-/* end subroutine (uc_mallreg) */
+/* end subroutine (ucmallreg_curenum) */
 
 #endif /* COMMENT */
 
@@ -393,6 +398,7 @@ int ucmemalloc::iinit() noex {
 	int		f = false ;
 	if (!fvoid) {
 	    cint		to = utimeout[uto_busy] ;
+	    rs = SR_OK ;
 	    if (! finit.testandset) {			/* <- the money shot */
 	        if ((rs = mx.create) >= 0) {
 	            void_f	b = ucmemalloc_atforkbefore ;
@@ -402,8 +408,9 @@ int ucmemalloc::iinit() noex {
 	                    finitdone = true ;
 	                    f = true ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    uc_atforkexpunge(b,a,a) ;
+			}
 	            } /* end if (uc_atfork) */
 	            if (rs < 0) {
 	                mx.destroy() ;

@@ -22,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<csignal>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -48,12 +47,15 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int sigblocker_start(SIGBLOCKER *op,const int *sigs) noex {
+int sigblocker_start(sigblocker *op,const int *sigs) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	sigset_t	nsm ;
+	    sigset_t	nsm ;
 	    rs = SR_OK ;
 	    if (sigs) {
 	        uc_sigsetempty(&nsm) ;
@@ -72,10 +74,10 @@ int sigblocker_start(SIGBLOCKER *op,const int *sigs) noex {
 }
 /* end subroutine (sigblocker_start) */
 
-int sigblocker_finish(SIGBLOCKER *op) noex {
+int sigblocker_finish(sigblocker *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    rs = pt_sigmask(SIG_SETMASK,&op->osm,NULL) ;
+	    rs = pt_sigmask(SIG_SETMASK,&op->osm,nullptr) ;
 	}
 	return rs ;
 }
@@ -84,7 +86,7 @@ int sigblocker_finish(SIGBLOCKER *op) noex {
 
 /* local subroutines */
 
-int sigblocker_co::operator () (int *sigs) noex {
+int sigblocker_co::operator () (cint *sigs) noex {
 	int	rs = SR_BUGCHECK ;
 	if (op) {
 	    rs = sigblocker_start(op,sigs) ;

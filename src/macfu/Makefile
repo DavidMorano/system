@@ -1,6 +1,6 @@
-# MAKEFILE (fu)
+# MAKEFILE (macfu)
 
-T= fu
+T= macfu
 
 ALL= $(T).x
 
@@ -40,7 +40,7 @@ LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
 
-LIBS= -luserhome
+LIBS= -lmacuser
 
 
 # flag setting
@@ -51,7 +51,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= usystem.h localmisc.h
+INCS= 
 
 
 OBJ_FU= main.o
@@ -93,6 +93,6 @@ control:
 	(uname -n ; date) > Control
 
 
-main.o:			main.cc
+main.o:			main.cc mapblock.hh $(INCS)
 
 

@@ -4,7 +4,6 @@
 /* fix the GECOS name as it comes out of the password file ('/etc/passwd') */
 /* version %I% last-modified %G% */
 
-#define	CF_GECOSHYPHEN	1		/* handle hyphen characters in name */
 
 /* revision history:
 
@@ -12,7 +11,7 @@
 	This subroutine was originally adopted from a similar
 	subroutine that was a part of the PCS package distribution.
 	However, the original was garbage so this version is
-	essentially a complete rewrite of the original. Also the
+	essentially a complete rewrite of the original.  Also the
 	name of the subroutine is changed from the original.  The
 	original name of the subroutine was GECOSNAME.
 
@@ -43,16 +42,29 @@
 	<0	failed (system-return)
 
 
-*	SUBROUTINES CALLED:						
-*		
-		getgecosname(3dam)
-*									
-*	GLOBAL VARIABLES USED:						
-*		None!  AS IT SHOULD BE!
-*									
+	Name:
+	getgecosname
 
-	Extra Notes:
+	Description:
+	This subroutine is the core workhorse of the function.
+	It is used in the implementation of |mkgecosname(3uc)| above.
+	It is provided for historical reasons, since some old
+	routines used this in the past.
 
+	Synopsis:
+	int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex
+
+	Arguments:
+	gbuf		source c-string pointer
+	glen		source c-string length
+	rpp		pointer to pointer to hold result (constant-char)
+
+	Returns:
+	>=0		succeded and this is the result length
+	<0		error (system-return)
+
+
+	Notes:
 	The GECOS field of the PASSWD database should be formatted
 	in one of the following ways:
 
@@ -137,10 +149,6 @@
 #define	MAXGECOSLEN	1024
 #endif
 
-#ifndef	CF_GECOSHYPHEN
-#define	CF_GECOSHYPHEN	1		/* handle hyphen characters in name */
-#endif
-
 
 /* imported namespaces */
 
@@ -163,8 +171,6 @@ using std::nullptr_t ;			/* type */
 
 constexpr int	maxgecoslen = MAXGECOSLEN ;
 
-constexpr bool	f_hyphen = CF_GECOSHYPHEN ;
-
 
 /* exported variables */
 
@@ -173,23 +179,21 @@ constexpr bool	f_hyphen = CF_GECOSHYPHEN ;
 
 int mkgecosname(char *rbuf,int rlen,cchar *gf) noex {
 	int		rs = SR_FAULT ;
+	int		rl = 0 ;
 	if (rbuf && gf) {
 	    cchar	*cp{} ;
 	    if ((rs = getgecosname(gf,-1,&cp)) >= 0) {
 		cint	cl = rs ;
-	        if constexpr (f_hyphen) {
-	            rs = snwcpyhyphen(rbuf,rlen,cp,cl) ;
-	        } else {
-	            rs = snwcpy(rbuf,rlen,cp,cl) ;
-	        }
+	        rs = snwcpyhyphen(rbuf,rlen,cp,cl) ;
+		rl = rs ;
 	    } /* end if (getgecosname) */
 	} /* end if (non-null) */
-	return rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (mkgecosname) */
 
 int getgecosname(cchar *gbuf,int glen,cchar **rpp) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	int		rs = SR_FAULT ;
 	int		cl = 0 ;
 	cchar		*cp = nullptr ;

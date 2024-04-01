@@ -1,18 +1,20 @@
-/* mbcache */
+/* mbcache HEADER */
+/* lang=C20 */
 
 /* mailbox cache */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2009 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	MBCACHE_INCLUDE
-#define	MBCACHE_INCLUDE		1
+#define	MBCACHE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vecint.h>
 #include	<strpack.h>
 #include	<dater.h>
@@ -24,9 +26,9 @@
 
 #define	MBCACHE_MAGIC		0x31415927
 #define	MBCACHE			struct mbcache_head
-#define	MBCACHE_FLAGS		struct mbcache_flags
-#define	MBCACHE_INFO		struct mbcache_info
-#define	MBCACHE_SCAN		struct mbcache_scan
+#define	MBCACHE_FL		struct mbcache_flags
+#define	MBCACHE_INFO		struct mbcache_information
+#define	MBCACHE_SCAN		struct mbcache_scanner
 #define	MBCACHE_SFLAGS		struct mbcache_sflags
 
 /* open options */
@@ -59,7 +61,7 @@ enum mbcachemfs {
 	mbcachemf_overlast
 } ;
 
-struct mbcache_info {
+struct mbcache_information {
 	int		nmsgs ;		/* mailbox messages total */
 	int		nmsgdels ;	/* mailbox messages deleted */
 } ;
@@ -86,18 +88,18 @@ struct mbcache_sflags {
 	uint		scandate:1 ;
 } ;
 
-struct mbcache_scan {
-	const char	*vs[mbcachemf_overlast] ;
-	const char	*fname ;	/* processed content file */
+struct mbcache_scanner {
+	cchar		*vs[mbcachemf_overlast] ;
+	cchar		*fname ;	/* processed content file */
 	vecint		lineoffs ;
-	MBCACHE_SFLAGS	hdr, hdrval, proc, f ;
 	DATE		edate ;		/* date-envelope */
 	DATE		hdate ;		/* date-header */
-	off_t	moff ;		/* offset message start (envelope) */
-	off_t	hoff ;		/* offset message headers */
-	off_t	boff ;		/* offset message body */
+	off_t		moff ;		/* offset message start (envelope) */
+	off_t		hoff ;		/* offset message headers */
+	off_t		boff ;		/* offset message body */
 	time_t		etime ;		/* time-envelope */
 	time_t		htime ;		/* time-header */
+	MBCACHE_SFLAGS	hdr, hdrval, proc, f ;
 	int		vl[mbcachemf_overlast] ;
 	int		mlen ;		/* length message whole */
 	int		hlen ;		/* length message headers */
@@ -113,45 +115,46 @@ struct mbcache_flags {
 } ;
 
 struct mbcache_head {
-	uint		magic ;
-	MAILBOX		*mbp ;
-	const char	*mbfname ;
+	mailbox		*mbp ;
+	cchar		*mbfname ;
 	MBCACHE_SCAN	**msgs ;
-	MBCACHE_FLAGS	f ;
 	MAILBOX_INFO	mbi ;
-	STRPACK		strs ;
-	DATER		dm ;		/* date-manager */
+	strpack		strs ;
+	dater		dm ;		/* dater-manager */
+	MBCACHE_FLAGS	f ;
+	uint		magic ;
 	int		mflags ;	/* mailbox open-flags */
 } ;
 
+typedef	MBCACHE		mbcache ;
+typedef	MBCACHE_FL	mbcache_fl ;
+typedef	MBCACHE_SCAN	mbcache_scan ;
+typedef	MBCACHE_INFO	mbcache_info ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int mbcache_start(MBCACHE *,const char *,int,MAILBOX *) ;
-extern int mbcache_mbfile(MBCACHE *,char *,int) ;
-extern int mbcache_mbinfo(MBCACHE *,MBCACHE_INFO *) ;
-extern int mbcache_count(MBCACHE *) ;
-extern int mbcache_countdel(MBCACHE *) ;
-extern int mbcache_sort(MBCACHE *) ;
-extern int mbcache_msgoff(MBCACHE *,int,off_t *) ;
-extern int mbcache_msglines(MBCACHE *,int,int *) ;
-extern int mbcache_msginfo(MBCACHE *,int,MBCACHE_SCAN **) ;
-extern int mbcache_msgscan(MBCACHE *,int,MBCACHE_SCAN **) ;
-extern int mbcache_msghdrtime(MBCACHE *,int,time_t *) ;
-extern int mbcache_msgenvtime(MBCACHE *,int,time_t *) ;
-extern int mbcache_msgtimes(MBCACHE *,int,time_t *) ;
-extern int mbcache_msgflags(MBCACHE *,int) ;
-extern int mbcache_msgsetflag(MBCACHE *,int,int,int) ;
-extern int mbcache_msgsetlines(MBCACHE *,int,int) ;
-extern int mbcache_msgdel(MBCACHE *,int,int) ;
-extern int mbcache_msgdeldup(MBCACHE *) ;
-extern int mbcache_finish(MBCACHE *) ;
+extern int mbcache_start(mbcache *,cchar *,int,mailbox *) noex ;
+extern int mbcache_mbfile(mbcache *,char *,int) noex ;
+extern int mbcache_mbinfo(mbcache *,mbcache_info *) noex ;
+extern int mbcache_count(mbcache *) noex ;
+extern int mbcache_countdel(mbcache *) noex ;
+extern int mbcache_sort(mbcache *) noex ;
+extern int mbcache_msgoff(mbcache *,int,off_t *) noex ;
+extern int mbcache_msglines(mbcache *,int,int *) noex ;
+extern int mbcache_msginfo(mbcache *,int,mbcache_scan **) noex ;
+extern int mbcache_msgscan(mbcache *,int,mbcache_scan **) noex ;
+extern int mbcache_msghdrtime(mbcache *,int,time_t *) noex ;
+extern int mbcache_msgenvtime(mbcache *,int,time_t *) noex ;
+extern int mbcache_msgtimes(mbcache *,int,time_t *) noex ;
+extern int mbcache_msgflags(mbcache *,int) noex ;
+extern int mbcache_msgsetflag(mbcache *,int,int,int) noex ;
+extern int mbcache_msgsetlines(mbcache *,int,int) noex ;
+extern int mbcache_msgdel(mbcache *,int,int) noex ;
+extern int mbcache_msgdeldup(mbcache *) noex ;
+extern int mbcache_finish(mbcache *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* MBCACHE_INCLUDE */
 

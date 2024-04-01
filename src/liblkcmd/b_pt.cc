@@ -1,16 +1,14 @@
-/* b_pt */
+/* b_pt SUPPORT */
 /* lang=C++11 */
 
 /* SHELL built-in to find an item */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGN	0		/* special debugging */
 #define	CF_DEFSECTION	0		/* use default MAN section? */
-
 
 /* revision history:
 
@@ -23,21 +21,18 @@
 
 /*******************************************************************************
 
-	This is the front-end for retrieving environment variables and
-	outputting them in a packaged-up format for SHELL interpretation.
+	This is the front-end for retrieving environment variables
+	and outputting them in a packaged-up format for SHELL
+	interpretation.
 
 	Synopsis:
-
 	$ pt [-p <varname>] <name(s)>
 
 	Notes:
-
-	This is not entirely pretty everywhere.  But it works, and certainly
-	well enough for the present purposes.
-
+	This is not entirely pretty everywhere.  But it works, and
+	certainly well enough for the present purposes.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -58,7 +53,6 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<cfdec.h>

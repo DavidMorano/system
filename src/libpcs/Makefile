@@ -66,7 +66,7 @@ OBJB_LIBPCS= obj2_libpcs.o obj3_libpcs.o
 OBJ_LIBPCS= $(OBJA_LIBPCS) $(OBJB_LIBPCS)
 
 
-default:		$(T).o
+default:		$(T).a
 
 all:			$(ALL)
 

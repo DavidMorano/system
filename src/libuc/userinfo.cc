@@ -11,7 +11,7 @@
 
 /* revision history:
 
-	= 1999-07-01, David A­D­ Morano
+	= 1997-07-01, David A­D­ Morano
 	This subroutine was originally written.
 
 	= 2005-03-30, David A­D­ Morano
@@ -35,7 +35,7 @@
 
 */
 
-/* Copyright © 1999,2005,2008 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1997,2005,2008 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -705,19 +705,19 @@ static int userinfo_setnuls(USERINFO *uep,cchar *emptyp) noex {
 static int procinfo_start(PROCINFO *pip,UI *uip,strstore *stp,int *sis) noex {
 	cint		pwlen = var.pwlen ;
 	int		rs ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	char		*bp{} ;
 	memclear(pip) ;			/* <- noted */
 	pip->uip = uip ;
 	pip->stp = stp ;
 	pip->sis = sis ;
 	pip->tlen = max(pwlen,var.maxpathlen) ;
-	size += sizeof(userattrdb) ;
-	size += var.nodenamelen ;
-	size += var.hostnamelen ;
-	size += var.maxpathlen ;
-	size += pip->tlen ;
-	if ((rs = uc_malloc(size,&bp)) >= 0) {
+	sz += sizeof(userattrdb) ;
+	sz += var.nodenamelen ;
+	sz += var.hostnamelen ;
+	sz += var.maxpathlen ;
+	sz += pip->tlen ;
+	if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	    int		bl = 0 ;
 	    pip->a = bp ;
 	    pip->uap = (userattrdb *) (bp+bl) ;
