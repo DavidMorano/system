@@ -4,7 +4,6 @@
 /* cache mailbox items */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_LOADENVADDR	0		/* compile |mbcache_loadenvaddr()| */
 
 /* revision history:
@@ -130,13 +129,8 @@ extern int	mailmsg_loadmb(MAILMSG *,MAILBOX *,off_t) ;
 extern int	hdrextid(char *,int,cchar *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	mkaddrname(char *,int,cchar *,int) ;
-extern int	isOneOf(const int *,int) ;
+extern int	isOneOf(cint *,int) ;
 extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
 
 extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwcpyblanks(char *,int) ;
@@ -156,58 +150,54 @@ struct scantitle {
 
 /* forward references */
 
-static int mbcache_msgfins(MBCACHE *) ;
-static int mbcache_msgframing(MBCACHE *,int,MSGENTRY **) ;
-static int mbcache_msgtimers(MBCACHE *,int,time_t *) ;
+static int mbcache_msgfins(MBCACHE *) noex ;
+static int mbcache_msgframing(MBCACHE *,int,MSGENTRY **) noex ;
+static int mbcache_msgtimers(MBCACHE *,int,time_t *) noex ;
 
 #ifdef	COMMENT
-static int mbcache_msgscanmk(MBCACHE *,int) ;
+static int mbcache_msgscanmk(MBCACHE *,int) noex ;
 #endif
 
-static int msgentry_start(MSGENTRY *,int) ;
-static int msgentry_frame(MSGENTRY *,MAILBOX_MSGINFO *) ;
-static int msgentry_load(MSGENTRY *,MBCACHE *) ;
-static int msgentry_loadenv(MSGENTRY *,MBCACHE *,MAILMSG *) ;
-static int msgentry_loadhdrmid(MSGENTRY *,MBCACHE *,MAILMSG *) ;
-static int msgentry_loadhdrfrom(MSGENTRY *,MBCACHE *,MAILMSG *) ;
-static int msgentry_loadhdrsubject(MSGENTRY *,MBCACHE *,MAILMSG *) ;
-static int msgentry_loadhdrdate(MSGENTRY *,MBCACHE *,MAILMSG *) ;
-static int msgentry_loadhdrstatus(MSGENTRY *,MBCACHE *,MAILMSG *) ;
-static int msgentry_procenvdate(MSGENTRY *,MBCACHE *) ;
-static int msgentry_prochdrdate(MSGENTRY *,MBCACHE *) ;
-static int msgentry_msgtimes(MSGENTRY *,MBCACHE *) ;
-static int msgentry_procscanfrom(MSGENTRY *,MBCACHE *) ;
-static int msgentry_procscandate(MSGENTRY *,MBCACHE *) ;
-static int msgentry_finish(MSGENTRY *) ;
+static int msgentry_start(MSGENTRY *,int) noex ;
+static int msgentry_frame(MSGENTRY *,MAILBOX_MSGINFO *) noex ;
+static int msgentry_load(MSGENTRY *,MBCACHE *) noex ;
+static int msgentry_loadenv(MSGENTRY *,MBCACHE *,MAILMSG *) noex ;
+static int msgentry_loadhdrmid(MSGENTRY *,MBCACHE *,MAILMSG *) noex ;
+static int msgentry_loadhdrfrom(MSGENTRY *,MBCACHE *,MAILMSG *) noex ;
+static int msgentry_loadhdrsubject(MSGENTRY *,MBCACHE *,MAILMSG *) noex ;
+static int msgentry_loadhdrdate(MSGENTRY *,MBCACHE *,MAILMSG *) noex ;
+static int msgentry_loadhdrstatus(MSGENTRY *,MBCACHE *,MAILMSG *) noex ;
+static int msgentry_procenvdate(MSGENTRY *,MBCACHE *) noex ;
+static int msgentry_prochdrdate(MSGENTRY *,MBCACHE *) noex ;
+static int msgentry_msgtimes(MSGENTRY *,MBCACHE *) noex ;
+static int msgentry_procscanfrom(MSGENTRY *,MBCACHE *) noex ;
+static int msgentry_procscandate(MSGENTRY *,MBCACHE *) noex ;
+static int msgentry_finish(MSGENTRY *) noex ;
 
 #if	CF_LOADENVADDR
-static int msgentry_loadenvaddr(MSGENTRY *,MBCACHE *,MAILMSG *,cchar **) ;
+static int msgentry_loadenvaddr(MSGENTRY *,MBCACHE *,MAILMSG *,cchar **) noex ;
 #endif /* CF_LOADENVADDR */
 
 #ifdef	COMMENT
-static int	headappend(char **,char *,int) ;
+static int	headappend(char **,char *,int) noex ;
 #endif
 
-static int	isNoMsg(int) ;
-static int	isBadDate(int) ;
+static int	isNoMsg(int) noex ;
+static int	isBadDate(int) noex ;
 
-static int	vcmpmsgentry(const void *,const void *) ;
-
-#if	CF_DEBUGS
-static int debugprintlines(cchar *,cchar *,int,int) ;
-#endif /* CF_DEBUGS */
+static int	vcmpmsgentry(const void *,const void *) noex ;
 
 
 /* local variables */
 
-static const int	rsdatebad[] = {
+static constexpr int	rsdatebad[] = {
 	SR_INVALID,
 	SR_DOM,
 	SR_NOMSG,
 	0
 } ;
 
-static const int	rsnomsg[] = {
+static constexpr int	rsnomsg[] = {
 	SR_NOMSG,
 	SR_NOENT,
 	0
@@ -215,35 +205,32 @@ static const int	rsnomsg[] = {
 
 
 #ifdef	COMMENT
-static const struct scantitle	scantitles[] = {
+static constexpr struct scantitle	scantitles[] = {
 	{ "FROM", COL_SCANFROM },
 	{ "SUBJECT", COL_SCANSUBJECT },
 	{ "DATE", COL_SCANDATE },
 	{ "LINES", COL_SCANLINES },
-	{ NULL, 0 }
+	{ nullptr, 0 }
 } ;
 #endif /* COMMENT */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int mbcache_start(MBCACHE *op,cchar *mbfname,int mflags,MAILBOX *mbp)
-{
-	STRPACK		*psp ;
+int mbcache_start(MBCACHE *op,cchar *mbfname,int mflags,MAILBOX *mbp) noex {
+	strpack		*psp ;
 	int		rs = SR_OK ;
 	int		nmsgs = 0 ;
 	cchar	*cp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (mbfname == NULL) return SR_FAULT ;
-	if (mbp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (mbfname == nullptr) return SR_FAULT ;
+	if (mbp == nullptr) return SR_FAULT ;
 
 	if (mbfname[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_start: mbfname=%s\n",mbfname) ;
-#endif
 
 	memset(op,0,sizeof(MBCACHE)) ;
 	op->mflags = mflags ;
@@ -256,17 +243,17 @@ int mbcache_start(MBCACHE *op,cchar *mbfname,int mflags,MAILBOX *mbp)
 	    MAILBOX_INFO	*mip = &op->mbi ;
 	    op->mbfname = cp ;
 	    if ((rs = mailbox_info(mbp,mip)) >= 0) {
-	        const int	mssize = sizeof(MBCACHE_SCAN **) ;
+	        cint	mssize = sizeof(MBCACHE_SCAN **) ;
 	        if (mip->nmsgs >= 0) {
-	            const int	size = ((mip->nmsgs + 1) * mssize) ;
+	            cint	size = ((mip->nmsgs + 1) * mssize) ;
 	            void	*p ;
 	            nmsgs = mip->nmsgs ;
 	            if ((rs = uc_malloc(size,&p)) >= 0) {
-	                const int	csize = (mip->nmsgs * 6 * 20) ;
+	                cint	csize = (mip->nmsgs * 6 * 20) ;
 	                op->msgs = p ;
 	                memset(op->msgs,0,size) ;
 	                if ((rs = strpack_start(psp,csize)) >= 0) {
-			    if ((rs = dater_start(&op->dm,NULL,NULL,0)) >= 0) {
+			    if ((rs = dater_start(&op->dm,nullptr,nullptr,0)) >= 0) {
 	    			op->magic = MBCACHE_MAGIC ;
 			    }
 	                    if (rs < 0)
@@ -274,7 +261,7 @@ int mbcache_start(MBCACHE *op,cchar *mbfname,int mflags,MAILBOX *mbp)
 	                } /* end if (strpack_start) */
 	                if (rs < 0) {
 	                    uc_free(op->msgs) ;
-	                    op->msgs = NULL ;
+	                    op->msgs = nullptr ;
 	                }
 	            } /* end if (memory-allocation) */
 	        } else {
@@ -283,13 +270,9 @@ int mbcache_start(MBCACHE *op,cchar *mbfname,int mflags,MAILBOX *mbp)
 	    }
 	    if (rs < 0) {
 	        uc_free(op->mbfname) ;
-	        op->mbfname = NULL ;
+	        op->mbfname = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_start: ret rs=%d n=%u\n",rs,nmsgs) ;
-#endif
 
 	return (rs >= 0) ? nmsgs : rs ;
 }
@@ -301,57 +284,33 @@ int mbcache_finish(MBCACHE *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = mbcache_msgfins(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_finish: _msgfins() rs=%d\n",rs) ;
-#endif
-
 	rs1 = dater_finish(&op->dm) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_finish: dater_finish() rs=%d\n",rs) ;
-#endif
 
 	rs1 = strpack_finish(&op->strs) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_finish: strpack_finish() rs=%d\n",rs) ;
-#endif
-
-	if (op->msgs != NULL) {
+	if (op->msgs != nullptr) {
 	    rs1 = uc_free(op->msgs) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->msgs = NULL ;
+	    op->msgs = nullptr ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_finish: msgs rs=%d\n",rs) ;
-#endif
-
-	if (op->mbfname != NULL) {
+	if (op->mbfname != nullptr) {
 	    rs1 = uc_free(op->mbfname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->mbfname = NULL ;
+	    op->mbfname = nullptr ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_finish: mbfname rs=%d\n",rs) ;
-#endif
-
-	op->mbp = NULL ;
+	op->mbp = nullptr ;
 	op->magic = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_finish: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -363,8 +322,8 @@ int mbcache_mbfile(MBCACHE *op,char *dbuf,int dlen)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
@@ -381,8 +340,8 @@ int mbcache_mbinfo(MBCACHE *op,MBCACHE_INFO *mep)
 	int		rs ;
 	int		nmsgs = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (mep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (mep == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
@@ -405,7 +364,7 @@ int mbcache_count(MBCACHE *op)
 {
 	int		nmsgs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	nmsgs = op->mbi.nmsgs ;
@@ -421,26 +380,19 @@ int mbcache_sort(MBCACHE *op)
 	int		nmsgs ;
 	int		mi ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	nmsgs = op->mbi.nmsgs ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_sort: nmsgs=%u\n",nmsgs) ;
-#endif
-
 	for (mi = 0 ; (rs >= 0) && (mi < nmsgs) ; mi += 1) {
-	    rs = mbcache_msgtimers(op,mi,NULL) ;
+	    rs = mbcache_msgtimers(op,mi,nullptr) ;
 	} /* end for */
 
 	if (rs >= 0) {
-	    const int	qsize = sizeof(cchar *) ;
+	    cint	qsize = sizeof(cchar *) ;
 	    void	*msgs = (void *) op->msgs ;
-#if	CF_DEBUGS
-	    debugprintf("mbcache_sort: qsort()\n") ;
-#endif
 	    qsort(msgs,nmsgs,qsize,vcmpmsgentry) ;
 	}
 
@@ -452,24 +404,24 @@ int mbcache_sort(MBCACHE *op)
 #ifdef	COMMENT
 
 /* check whatever */
-int mbcache_check(MBCACHE *op,struct timeb *nowp,cchar *zname)
+int mbcache_check(MBCACHE *op,TIMEB *nowp,cchar *zname)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (nowp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (nowp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	op->now = *nowp ;
 	strncpy(op->zname,zname,DATER_ZNAMELEN) ;
 
-	op->f.now = TRUE ;
+	op->f.now = true ;
 
 /* do anything ? */
 
 	if (! op->f.tmpdate) {
-	    op->f.tmpdate = TRUE ;
+	    op->f.tmpdate = true ;
 	    rs = dater_start(&op->tmpdate,&op->now,op->zname,-1) ;
 	} else {
 	    op->tmpdate.cb = *nowp ;
@@ -488,44 +440,32 @@ int mbcache_msgdel(MBCACHE *op,int mi,int delcmd)
 {
 	int		rs = SR_OK ;
 	int		nmsgs ;
-	int		f_delprev = FALSE ;
+	int		f_delprev = false ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	nmsgs = op->mbi.nmsgs ;
 	if ((mi < 0) || (mi >= nmsgs)) return SR_NOMSG ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgdel: ent mi=%d delcmd=%d\n",mi,delcmd) ;
-#endif
-
 	if ((delcmd >= 0) && op->f.readonly)
 	    return SR_ROFS ;
 
 /* if this is only an inquiry, we may have a short cut (not really valid) */
 
-	if ((delcmd >= 0) || (op->msgs[mi] != NULL)) {
+	if ((delcmd >= 0) || (op->msgs[mi] != nullptr)) {
 	    MBCACHE_SCAN	*mep ;
 	    if ((rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
 	        f_delprev = mep->f.del ;
 	        if (delcmd >= 0) {
 	            if (! LEQUIV(mep->f.del,delcmd)) {
-	                mep->f.del = (delcmd) ? TRUE : FALSE ;
+	                mep->f.del = (delcmd) ? true : false ;
 	                rs = mailbox_msgdel(op->mbp,mi,delcmd) ;
-#if	CF_DEBUGS
-	                debugprintf("mbcache_msgdel: mailbox_msgdel() rs=%d\n",
-		                rs) ;
-#endif
 	            }
 	        } /* end if */
 	    } /* end if */
 	} /* end if (short cut) */
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgdel: ret rs=%d f_delprev=%u\n",rs,f_delprev) ;
-#endif
 
 	return (rs >= 0) ? f_delprev : rs ;
 }
@@ -540,19 +480,15 @@ int mbcache_msgdeldup(MBCACHE *op)
 	int		nmsgs ;
 	int		c = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	nmsgs = op->mbi.nmsgs ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgdeldup: ent nmsgs=%u\n",nmsgs) ;
-#endif
-
 	if ((rs = mapstrint_start(&mm,nmsgs)) >= 0) {
 	    MBCACHE_SCAN	*mep ;
-	    const int		vi = mbcachemf_hdrmid ;
+	    cint		vi = mbcachemf_hdrmid ;
 	    int			mi ;
 	    int			midl ;
 	    cchar		*midp ;
@@ -561,35 +497,21 @@ int mbcache_msgdeldup(MBCACHE *op)
 		    if (! mep->f.del) {
 	                midp = mep->vs[vi] ;
 	                midl = mep->vl[vi] ;
-#if	CF_DEBUGS
-		        debugprintf("mbcache_msgdeldup: mid=%t\n",
-			    midp,strlinelen(midp,midl,40)) ;
-#endif
-		        if ((midp != NULL) && (midl > 0)) {
+		        if ((midp != nullptr) && (midl > 0)) {
 		            if ((rs = mapstrint_already(&mm,midp,midl)) >= 0) {
 			        c += 1 ;
-	                        mep->f.del = TRUE ;
-	                        rs = mailbox_msgdel(op->mbp,mi,TRUE) ;
+	                        mep->f.del = true ;
+	                        rs = mailbox_msgdel(op->mbp,mi,true) ;
 		            } else if (rs == SR_NOTFOUND) {
 		                rs = mapstrint_add(&mm,midp,midl,mi) ;
-#if	CF_DEBUGS
-		            debugprintf("mbcache_msgdeldup: added rs=%d\n",rs) ;
-#endif
 		            }
 		        } /* end if (non-null) */
-#if	CF_DEBUGS
-		        debugprintf("mbcache_msgdeldup: mid rs=%d\n",rs) ;
-#endif
 		    } /* end if (not already being deleted) */
 	        } /* end (_msginfo) */
 		if (rs < 0) break ;
 	    } /* end for */
 	    mapstrint_finish(&mm) ;
 	} /* end if (mapstrint) */
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgdeldup: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }
@@ -604,16 +526,12 @@ int mbcache_msgflags(MBCACHE *op,int mi)
 	int		nmsgs ;
 	int		mf = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	nmsgs = op->mbi.nmsgs ;
 	if ((mi < 0) || (mi >= nmsgs)) return SR_NOMSG ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgflags: ent mi=%d\n",mi) ;
-#endif
 
 	if ((rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
 	    if (mep->f.read) mf |= MBCACHE_MFMREAD ;
@@ -621,10 +539,6 @@ int mbcache_msgflags(MBCACHE *op,int mi)
 	    if (mep->f.spam) mf |= MBCACHE_MFMSPAM ;
 	    if (mep->f.trash) mf |= MBCACHE_MFMTRASH ;
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgflags: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? mf : rs ;
 }
@@ -639,16 +553,12 @@ int mbcache_msgsetflag(MBCACHE *op,int mi,int w,int v)
 	int		nmsgs ;
 	int		mf = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
 	nmsgs = op->mbi.nmsgs ;
 	if ((mi < 0) || (mi >= nmsgs)) return SR_NOMSG ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgsetflag: ent mi=%d\n",mi) ;
-#endif
 
 	if ((rs = mbcache_msgframing(op,mi,&mep)) >= 0) {
 	    switch (w) {
@@ -671,10 +581,6 @@ int mbcache_msgsetflag(MBCACHE *op,int mi,int w,int v)
 	    } /* end switch */
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgsetflag: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? mf : rs ;
 }
 /* end subroutine (mbcache_msgsetflag) */
@@ -685,7 +591,7 @@ int mbcache_countdel(MBCACHE *op)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
@@ -702,7 +608,7 @@ int mbcache_msgsetlines(MBCACHE *op,int mi,int vlines)
 	int		rs ;
 	int		rlines = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
@@ -733,8 +639,8 @@ int mbcache_msgoff(MBCACHE *op,int mi,off_t *rp)
 	int		rs = SR_OK ;
 	int		nmsgs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
@@ -742,12 +648,12 @@ int mbcache_msgoff(MBCACHE *op,int mi,off_t *rp)
 	if ((mi < 0) || (mi >= nmsgs)) return SR_NOMSG ;
 
 	mep = op->msgs[mi] ;
-	if (mep == NULL) {
-	    rs = mbcache_msgframing(op,mi,NULL) ;
+	if (mep == nullptr) {
+	    rs = mbcache_msgframing(op,mi,nullptr) ;
 	    mep = op->msgs[mi] ;
 	}
 
-	if (rp != NULL)
+	if (rp != nullptr)
 	    *rp = (rs >= 0) ? mep->moff : 0 ;
 
 	if (rs >= 0) rs = (mep->mlen & INT_MAX) ;
@@ -765,8 +671,8 @@ int mbcache_msglines(MBCACHE *op,int mi,int *rp)
 	int		nmsgs ;
 	int		rlines = -1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
@@ -774,8 +680,8 @@ int mbcache_msglines(MBCACHE *op,int mi,int *rp)
 	if ((mi < 0) || (mi >= nmsgs)) return SR_NOMSG ;
 
 	mep = op->msgs[mi] ;
-	if (mep == NULL) {
-	    rs = mbcache_msgframing(op,mi,NULL) ;
+	if (mep == nullptr) {
+	    rs = mbcache_msgframing(op,mi,nullptr) ;
 	    mep = op->msgs[mi] ;
 	}
 
@@ -786,10 +692,6 @@ int mbcache_msglines(MBCACHE *op,int mi,int *rp)
 	        rlines = mep->nlines ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msglines: ret rs=%d nlines=%d\n",rs,rlines) ;
-#endif
 
 	*rp = rlines ;
 	return rs ;
@@ -804,28 +706,24 @@ int mbcache_msginfo(MBCACHE *op,int mi,MBCACHE_SCAN **mpp)
 	int		rs = SR_OK ;
 	int		nmsgs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (mpp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (mpp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
-	if (mpp != NULL) *mpp = NULL ;
+	if (mpp != nullptr) *mpp = nullptr ;
 	nmsgs = op->mbi.nmsgs ;
 	if ((mi < 0) || (mi >= nmsgs)) return SR_NOMSG ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_msginfo: mi=%u\n",mi) ;
-#endif
-
 	mep = op->msgs[mi] ;
-	if (mep == NULL) {
-	    rs = mbcache_msgframing(op,mi,NULL) ;
+	if (mep == nullptr) {
+	    rs = mbcache_msgframing(op,mi,nullptr) ;
 	    mep = op->msgs[mi] ;
 	}
 
 	if (rs >= 0) {
 	    if ((rs = msgentry_load(mep,op)) >= 0) {
-	        if (mpp != NULL) *mpp = mep ;
+	        if (mpp != nullptr) *mpp = mep ;
 	    }
 	}
 
@@ -839,26 +737,18 @@ int mbcache_msgscan(MBCACHE *op,int mi,MBCACHE_SCAN **mpp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (mpp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (mpp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MBCACHE_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgscan: ent mi=%u\n",mi) ;
-#endif
-
-	*mpp = NULL ;
+	*mpp = nullptr ;
 	if ((rs = mbcache_msginfo(op,mi,mpp)) >= 0) {
 	    MBCACHE_SCAN	*mep = *mpp ;
 	    if ((rs = msgentry_procscanfrom(mep,op)) >= 0) {
 	        rs = msgentry_procscandate(mep,op) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgscan: ret rs=%d \n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -870,19 +760,19 @@ int mbcache_msgenvtime(MBCACHE *op,int mi,time_t *timep)
 	MSGENTRY	*mep ;
 	time_t		t = 0 ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (timep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (timep == nullptr) return SR_FAULT ;
 
 	if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	    if ((rs = msgentry_procenvdate(mep,op)) >= 0) {
 	        t = mep->etime ;
-	        f = TRUE ;
+	        f = true ;
 	    }
 	}
 
-	if (timep != NULL) *timep = t ;
+	if (timep != nullptr) *timep = t ;
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (mbcache_msgenvtime) */
@@ -893,19 +783,19 @@ int mbcache_msghdrtime(MBCACHE *op,int mi,time_t *timep)
 	MSGENTRY	*mep ;
 	time_t		t = 0 ;
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (timep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (timep == nullptr) return SR_FAULT ;
 
 	if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	    if ((rs = msgentry_prochdrdate(mep,op)) >= 0) {
-	        f = TRUE ;
+	        f = true ;
 	        t = mep->htime ;
 	    }
 	}
 
-	if (timep != NULL) *timep = t ;
+	if (timep != nullptr) *timep = t ;
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (mbcache_msghdrtime) */
@@ -916,8 +806,8 @@ int mbcache_msgtimes(MBCACHE *op,int mi,time_t *timep)
 	MSGENTRY	*mep ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (timep == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (timep == nullptr) return SR_FAULT ;
 
 	if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	    if ((rs = msgentry_msgtimes(mep,op)) >= 0) {
@@ -933,35 +823,24 @@ int mbcache_msgtimes(MBCACHE *op,int mi,time_t *timep)
 
 /* private subroutines */
 
-
-static int mbcache_msgfins(MBCACHE *op)
-{
+static int mbcache_msgfins(MBCACHE *op) noex {
 	MBCACHE_SCAN	*mep ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		mi ;
-
-	for (mi = 0 ; mi < op->mbi.nmsgs ; mi += 1) {
+	for (int mi = 0 ; mi < op->mbi.nmsgs ; mi += 1) {
 	    mep = op->msgs[mi] ;
-	    if (mep != NULL) {
-	        rs1 = msgentry_finish(mep) ;
-	        if (rs >= 0) rs = rs1 ;
-#if	CF_DEBUGS
-	        debugprintf("mbcache_msgfins: mi=%u msgentry_finish() rs=%d\n",
-			mi,rs) ;
-#endif
-	        rs1 = uc_free(mep) ;
-	        if (rs >= 0) rs = rs1 ;
-	        op->msgs[mi] = NULL ;
-#if	CF_DEBUGS
-	        debugprintf("mbcache_msgfins: uc_free() rs=%d\n",rs) ;
-#endif
+	    if (mep) {
+		{
+	            rs1 = msgentry_finish(mep) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(mep) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+	        op->msgs[mi] = nullptr ;
 	    }
 	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgfins: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -972,25 +851,11 @@ static int mbcache_msgframing(MBCACHE *op,int mi,MSGENTRY **mpp)
 {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgframing: ent mi=%u\n",mi) ;
-#endif
-
-	if (op->msgs[mi] == NULL) {
+	if (op->msgs[mi] == nullptr) {
 	    MAILBOX_MSGINFO	minfo ;
 	    if ((rs = mailbox_msginfo(op->mbp,mi,&minfo)) >= 0) {
-	        MBCACHE_SCAN	*mep = NULL ;
-	        const int	size = sizeof(MBCACHE_SCAN) ;
-
-#if	CF_DEBUGS
-	        debugprintf("mbcache_msgframing: mailbox_msginfo() rs=%d\n",
-	            rs) ;
-	        debugprintf("mbcache_msgframing: blen=%d\n",minfo.blen) ;
-	        debugprintf("mbcache_msgframing: CLEN hdr=%u hdrval=%u v=%d\n",
-	            minfo.hdr.clen,minfo.hdrval.clen,minfo.clen) ;
-	        debugprintf("mbcache_msgframing: blen=%d\n",
-	            minfo.blen) ;
-#endif /* CF_DEBUGS */
+	        MBCACHE_SCAN	*mep = nullptr ;
+	        cint	size = sizeof(MBCACHE_SCAN) ;
 
 	        if ((rs = uc_malloc(size,&mep)) >= 0) {
 	            if ((rs = msgentry_start(mep,mi)) >= 0) {
@@ -1007,12 +872,8 @@ static int mbcache_msgframing(MBCACHE *op,int mi,MSGENTRY **mpp)
 	    } /* end if (mailbox_msginfo) */
 	} /* end if (needed) */
 
-	if (mpp != NULL)
-	    *mpp = (rs >= 0) ? op->msgs[mi] : NULL ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache_msgframing: ret rs=%d\n",rs) ;
-#endif
+	if (mpp != nullptr)
+	    *mpp = (rs >= 0) ? op->msgs[mi] : nullptr ;
 
 	return rs ;
 }
@@ -1026,14 +887,10 @@ static int mbcache_msgtimers(MBCACHE *op,int mi,time_t *timep)
 
 	if ((rs = mbcache_msginfo(op,mi,&mep)) >= 0) {
 	    if ((rs = msgentry_msgtimes(mep,op)) >= 0) {
-	        if (timep != NULL) {
+	        if (timep != nullptr) {
 	            timep[0] = mep->etime ;
 	            timep[1] = mep->htime ;
 	        }
-#if	CF_DEBUGS
-	        debugprintf("mbcache_msgtimers: mi=%u e=%08x h=%08x\n",
-	            mi,mep->etime, mep->htime) ;
-#endif
 	    }
 	}
 
@@ -1047,13 +904,13 @@ static int mbcache_msgtimers(MBCACHE *op,int mi,time_t *timep)
 static int mbcache_msgscanmk(MBCACHE *op,int mi)
 {
 	MBCACHE_SCAN	*mep ;
-	const int	sl = SCANBUFLEN ;
+	cint	sl = SCANBUFLEN ;
 	int		rs = SR_OK ;
 
 	mep = op->msgs[mi] ;
-	if (mep != NULL) {
-	    if (mep->vs[mbcachemf_scanline] == NULL) {
-	        const int	size = (sl + 1) ;
+	if (mep != nullptr) {
+	    if (mep->vs[mbcachemf_scanline] == nullptr) {
+	        cint	size = (sl + 1) ;
 	        char		*bp ;
 
 	        if ((rs = uc_malloc(size,&bp)) >= 0) {
@@ -1064,7 +921,7 @@ static int mbcache_msgscanmk(MBCACHE *op,int mi)
 
 	            strwcpyblanks(bp,sl) ;
 
-	            for (i = 0 ; scantitles[i].name != NULL ; i += 1) {
+	            for (i = 0 ; scantitles[i].name != nullptr ; i += 1) {
 	                cp = scantitles[i].name ;
 	                cl = strlen(cp) ;
 	                tcol = scantitles[i].col ;
@@ -1092,7 +949,7 @@ static int mbcache_msgscanmk(MBCACHE *op,int mi)
 
 static int mbcache_setnow(MBCACHE *op)
 {
-	struct timeb	*tbp = &op->now ;
+	TIMEB		*tbp = &op->now ;
 	int		rs = SR_OK ;
 
 	if (! op->f.now) {
@@ -1103,7 +960,7 @@ static int mbcache_setnow(MBCACHE *op)
 	            tbp->timezone = (tmt.gmtoff / 60) ;
 	            tbp->dstflag = tmt.isdst ;
 	            strncpy(op->zname,tmt.zname,DATER_ZNAMELEN) ;
-	            op->f.now = TRUE ;
+	            op->f.now = true ;
 	        } /* end if */
 	    } /* end if (uc_ftime) */
 	} /* end if (have-now) */
@@ -1118,7 +975,7 @@ static int mbcache_setnow(MBCACHE *op)
 static int msgentry_start(MBCACHE_SCAN *mep,int mi)
 {
 
-	memset(mep,0,sizeof(MBCACHE_SCAN)) ;
+	memclear(mep) ;
 	mep->msgi = mi ;
 	mep->nlines = -1 ;
 	mep->vlines = -1 ;
@@ -1138,15 +995,15 @@ static int msgentry_finish(MBCACHE_SCAN *mep)
 	int		rs1 ;
 
 	if (mep->f.lineoffs) {
-	    mep->f.lineoffs = FALSE ;
+	    mep->f.lineoffs = false ;
 	    rs1 = vecint_finish(&mep->lineoffs) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	if (mep->fname != NULL) {
+	if (mep->fname != nullptr) {
 	    rs1 = uc_free(mep->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mep->fname = NULL ;
+	    mep->fname = nullptr ;
 	}
 
 	return rs ;
@@ -1158,8 +1015,8 @@ static int msgentry_frame(MSGENTRY *mep,MAILBOX_MSGINFO *mip)
 {
 	int		rs = SR_OK ;
 
-	if (mep == NULL) return SR_FAULT ;
-	if (mip == NULL) return SR_FAULT ;
+	if (mep == nullptr) return SR_FAULT ;
+	if (mip == nullptr) return SR_FAULT ;
 
 	mep->moff = mip->moff ;
 	mep->hoff = mip->hoff ;
@@ -1177,15 +1034,6 @@ static int msgentry_frame(MSGENTRY *mep,MAILBOX_MSGINFO *mip)
 	mep->hdrval.clines = mip->hdrval.clines ;
 	mep->hdrval.lines = mip->hdrval.lines ;
 	mep->hdrval.xlines = mip->hdrval.xlines ;
-
-#if	CF_DEBUGS
-	{
-	    cchar	*s = "msgentry_load" ;
-	    debugprintlines(s,"clines",mip->hdrval.clines,mip->clines) ;
-	    debugprintlines(s,"lines",mip->hdrval.lines,mip->lines) ;
-	    debugprintlines(s,"xlines",mip->hdrval.xlines,mip->xlines) ;
-	}
-#endif /* CF_DEBUGS */
 
 	if ((mep->nlines < 0) && mip->hdrval.clines)
 	    mep->nlines = mip->clines ;
@@ -1207,18 +1055,11 @@ static int msgentry_load(MSGENTRY *mep,MBCACHE *op)
 
 	if (! mep->f.info) {
 	    MAILMSG	m ;
-	    mep->f.info = TRUE ;
+	    mep->f.info = true ;
 	    if ((rs = mailmsg_start(&m)) >= 0) {
 	        MAILBOX		*mbp = op->mbp ;
 	        off_t	mbo = mep->moff ;
-#if	CF_DEBUGS
-	        debugprintf("mbcache_load: mbo=%llu\n",mbo) ;
-#endif
 	        if ((rs = mailmsg_loadmb(&m,mbp,mbo)) >= 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("mbcache_load: mailmsg_loadmb() loaded\n") ;
-#endif
 
 	            if (rs >= 0) {
 	                rs = msgentry_loadenv(mep,op,&m) ;
@@ -1256,7 +1097,7 @@ static int msgentry_load(MSGENTRY *mep,MBCACHE *op)
 
 /* set VS bit */
 
-	            if (rs >= 0) mep->f.vs = TRUE ;
+	            if (rs >= 0) mep->f.vs = true ;
 
 	        } /* end if (mailmsg-loadmb) */
 	        mailmsg_finish(&m) ;
@@ -1272,17 +1113,10 @@ static int msgentry_loadenv(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 {
 	int		rs ;
 
-#if	CF_DEBUGS
-	{
-	    const int	mi = mep->msgi ;
-	    debugprintf("msgentry_loadenv: mi=%u\n",mi) ;
-	}
-#endif
-
 	if ((rs = mailmsg_envcount(mmp)) >= 0) {
 	    MAILMSG_ENVER	e ;
-	    STRPACK		*psp = &op->strs ;
-	    const int		n = rs ;
+	    strpack		*psp = &op->strs ;
+	    cint		n = rs ;
 	    if ((rs = mailmsg_enver(mmp,(n-1),&e)) >= 0) {
 	        int		i ;
 	        int		vl = -1 ;
@@ -1290,7 +1124,7 @@ static int msgentry_loadenv(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	        cchar	*vp ;
 	        cchar	**vpp ;
 	        for (i = 0 ; (rs >= 0) && (i < 3) ; i += 1) {
-	            vp = NULL ;
+	            vp = nullptr ;
 	            switch (i) {
 	            case 0:
 	                vpp = (mep->vs + mbcachemf_envaddr) ;
@@ -1303,10 +1137,6 @@ static int msgentry_loadenv(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	                vlp = (mep->vl + mbcachemf_envdate) ;
 	                vp = e.d.ep ;
 	                vl = e.d.el ;
-#if	CF_DEBUGS
-	                debugprintf("msgentry_loadenv: env d=>%t<\n",
-	                    vp,strlinelen(vp,vl,40)) ;
-#endif
 	                break ;
 	            case 2:
 	                vpp = (mep->vs + mbcachemf_envremote) ;
@@ -1315,15 +1145,12 @@ static int msgentry_loadenv(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	                vl = e.r.el ;
 	                break ;
 	            } /* end switch */
-	            if (vp != NULL) {
+	            if (vp != nullptr) {
 	                rs = strpack_store(psp,vp,vl,vpp) ;
 	                *vlp = rs ;
 	            }
 	        } /* end for */
 	    } else if (isNoMsg(rs)) {
-#if	CF_DEBUGS
-	        debugprintf("msgentry_loadenv: no-env rs=%d\n",rs) ;
-#endif
 	        rs = SR_OK ;
 	    }
 	} /* end if (mailmsg_envcount) */
@@ -1343,11 +1170,11 @@ cchar	**rpp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-	if (mep->vs[mbcachemf_envaddr] == NULL) {
+	if (mep->vs[mbcachemf_envaddr] == nullptr) {
 	    rs = msgentry_loadenv(mep,op,mmp) ;
 	}
-	if ((rs >= 0) && (rpp != NULL)) {
-	    const int	vi = mbcachemf_envaddr ;
+	if ((rs >= 0) && (rpp != nullptr)) {
+	    cint	vi = mbcachemf_envaddr ;
 	    *rpp = mep->vs[vi] ;
 	    len = mep->vl[vi] ;
 	} else if (isNoMsg(rs)) {
@@ -1368,33 +1195,20 @@ static int msgentry_loadhdrmid(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
-	    STRPACK	*psp = &op->strs ;
-	    const int	hlen = HDRBUFLEN ;
+	    strpack	*psp = &op->strs ;
+	    cint	hlen = HDRBUFLEN ;
 	    char	hbuf[HDRBUFLEN+1] ;
-#if	CF_DEBUGS
-	debugprintf("mbcache/msgentry_loadhdrmid: mid1 rs=%d\n",rs) ;
-#endif
 	    if ((rs = mkbestaddr(hbuf,hlen,sp,rs)) >= 0) {
-	        const int	vi = mbcachemf_hdrmid ;
+	        cint	vi = mbcachemf_hdrmid ;
 	        cchar	**rpp ;
-#if	CF_DEBUGS
-	debugprintf("mbcache/msgentry_loadhdrmid: mid2 rs=%d\n",rs) ;
-#endif
 	        sl = rs ;
 	        rpp = (mep->vs + vi) ;
 	        mep->vl[vi] = sl ;
 	        rs = strpack_store(psp,hbuf,sl,rpp) ;
-#if	CF_DEBUGS
-	debugprintf("mbcache/msgentry_loadhdrmid: mid3 rs=%d\n",rs) ;
-#endif
 	    } /* end if (mkbestaddr) */
 	} else if (isNoMsg(rs)) {
 	    rs = SR_OK ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mbcache/msgentry_loadhdrmid: ret rs=%d sl=%u\n",rs,sl) ;
-#endif
 
 	return (rs >= 0) ? sl : rs ;
 }
@@ -1417,8 +1231,8 @@ static int msgentry_loadhdrfrom(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	    }
 	}
 	if ((rs >= 0) && (vl >= 0)) {
-	    STRPACK	*psp = &op->strs ;
-	    const int	vi = mbcachemf_hdrfrom ;
+	    strpack	*psp = &op->strs ;
+	    cint	vi = mbcachemf_hdrfrom ;
 	    cchar	**rpp ;
 	    rpp = (mep->vs + vi) ;
 	    mep->vl[vi] = vl ;
@@ -1440,8 +1254,8 @@ static int msgentry_loadhdrsubject(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
-	    STRPACK	*psp = &op->strs ;
-	    const int	vi = mbcachemf_hdrsubject ;
+	    strpack	*psp = &op->strs ;
+	    cint	vi = mbcachemf_hdrsubject ;
 	    cchar	**rpp ;
 	    sl = rs ;
 	    rpp = (mep->vs + vi) ;
@@ -1464,8 +1278,8 @@ static int msgentry_loadhdrdate(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
-	    STRPACK	*psp = &op->strs ;
-	    const int	vi = mbcachemf_hdrdate ;
+	    strpack	*psp = &op->strs ;
+	    cint	vi = mbcachemf_hdrdate ;
 	    cchar	**rpp ;
 	    sl = rs ;
 	    mep->vl[vi] = sl ;
@@ -1488,8 +1302,8 @@ static int msgentry_loadhdrstatus(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 	cchar	*sp ;
 
 	if ((rs = mailmsg_hdrval(mmp,hdr,&sp)) >= 0) {
-	    STRPACK	*psp = &op->strs ;
-	    const int	vi = mbcachemf_hdrstatus ;
+	    strpack	*psp = &op->strs ;
+	    cint	vi = mbcachemf_hdrstatus ;
 	    cchar	**rpp ;
 	    sl = rs ;
 	    rpp = (mep->vs + vi) ;
@@ -1506,49 +1320,30 @@ static int msgentry_loadhdrstatus(MSGENTRY *mep,MBCACHE *op,MAILMSG *mmp)
 
 static int msgentry_procenvdate(MSGENTRY *mep,MBCACHE *op)
 {
-	const int	vi = mbcachemf_envdate ;
+	cint	vi = mbcachemf_envdate ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("msgentry_procenvdate: ent proc=%u\n",
-	    mep->proc.edate) ;
-#endif
+	int		f = false ;
 
 	if (! mep->proc.edate) {
 	    int		sl = mep->vl[vi] ;
 	    cchar	*sp = mep->vs[vi] ;
-	    mep->proc.edate = TRUE ;
-#if	CF_DEBUGS
-	    debugprintf("msgentry_procenvdate: s=>%t<\n",
-	        sp,strlinelen(sp,sl,40)) ;
-#endif
-	    if ((sp != NULL) && (sl > 0)) {
-	        DATER		*dp = &op->dm ;
+	    mep->proc.edate = true ;
+	    if ((sp != nullptr) && (sl > 0)) {
+	        dater	*dp = &op->dm ;
 	        if ((rs = dater_setstd(dp,sp,sl)) >= 0) {
 	            DATE	*dop = &mep->edate ;
 	            time_t	t = 0 ;
 	            if ((rs = dater_getdate(dp,dop)) >= 0) {
-	                mep->f.edate = TRUE ;
+	                mep->f.edate = true ;
 	                dater_gettime(dp,&t) ;
 	                mep->etime = t ;
-	                f = TRUE ;
-#if	CF_DEBUGS
-	                debugprintf("msgentry_procenvdate: t=%u\n",t) ;
-#endif
+	                f = true ;
 	            }
 	        } else if (isBadDate(rs)) {
-#if	CF_DEBUGS
-	            debugprintf("msgentry_procenvdate: bad-date rs=%d\n",rs) ;
-#endif
 	            rs = SR_OK ;
 	        }
 	    } /* end if (had ENV value) */
 	} /* end if (processing) */
-
-#if	CF_DEBUGS
-	debugprintf("msgentry_procenvdate: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -1558,40 +1353,29 @@ static int msgentry_procenvdate(MSGENTRY *mep,MBCACHE *op)
 static int msgentry_prochdrdate(MSGENTRY *mep,MBCACHE *op)
 {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (! mep->proc.hdate) {
-	    const int	vi = mbcachemf_hdrdate ;
+	    cint	vi = mbcachemf_hdrdate ;
 	    int		sl = mep->vl[vi] ;
 	    cchar	*sp = mep->vs[vi] ;
-	    mep->proc.hdate = TRUE ;
-	    if ((sp != NULL) && (sl > 0)) {
-	        DATER		*dp = &op->dm ;
-#if	CF_DEBUGS
-	        debugprintf("msgentry_prochdrdate: hdr=>%t<\n",sp,sl) ;
-#endif
+	    mep->proc.hdate = true ;
+	    if ((sp != nullptr) && (sl > 0)) {
+	        dater	*dp = &op->dm ;
 	        if ((rs = dater_setmsg(dp,sp,sl)) >= 0) {
 	            DATE	*dop = &mep->hdate ;
 	            time_t	t = 0 ;
 	            if ((rs = dater_getdate(dp,dop)) >= 0) {
-	                mep->f.hdate = TRUE ;
+	                mep->f.hdate = true ;
 	                dater_gettime(dp,&t) ;
 	                mep->htime = t ;
-	                f = TRUE ;
+	                f = true ;
 	            }
 	        } else if (isBadDate(rs)) {
-#if	CF_DEBUGS
-	            debugprintf("msgentry_prochdrdate: dater_setmsg rs=%d\n",
-			rs) ;
-#endif
 	            rs = SR_OK ;
 	        }
 	    } /* end if (had HDR value) */
 	} /* end if (processing) */
-
-#if	CF_DEBUGS
-	debugprintf("msgentry_prochdrdate: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
@@ -1606,27 +1390,27 @@ static int msgentry_procscanfrom(MSGENTRY *mep,MBCACHE *op)
 	if (! mep->proc.scanfrom) {
 	    int		sl = mep->vl[mbcachemf_hdrfrom] ;
 	    cchar	*sp = mep->vs[mbcachemf_hdrfrom] ;
-	    mep->proc.scanfrom = TRUE ;
-	    if ((sp == NULL) || (sl == 0)) {
+	    mep->proc.scanfrom = true ;
+	    if ((sp == nullptr) || (sl == 0)) {
 	        sl = mep->vl[mbcachemf_envaddr] ;
 	        sp = mep->vs[mbcachemf_envaddr] ;
 	    }
-	    if ((sp != NULL) && (sl > 0)) {
-	        STRPACK		*psp = &op->strs ;
-	        const int	hlen = HDRBUFLEN ;
+	    if ((sp != nullptr) && (sl > 0)) {
+	        strpack		*psp = &op->strs ;
+	        cint	hlen = HDRBUFLEN ;
 	        char		hbuf[HDRBUFLEN+1] ;
 	        if ((rs = mkaddrname(hbuf,hlen,sp,sl)) >= 0) {
-	            const int	vi = mbcachemf_scanfrom ;
+	            cint	vi = mbcachemf_scanfrom ;
 	            cchar	**rpp ;
 	            len = rs ;
 	            rpp = (mep->vs + vi) ;
 	            mep->vl[vi] = len ;
 	            if ((rs = strpack_store(psp,hbuf,len,rpp)) >= 0) {
-	                mep->f.scanfrom = TRUE ;
+	                mep->f.scanfrom = true ;
 	            }
 	        }
 	    } /* end if (positive) */
-	} else if (mep->vs[mbcachemf_scanfrom] != NULL) {
+	} else if (mep->vs[mbcachemf_scanfrom] != nullptr) {
 	    len = mep->vl[mbcachemf_scanfrom] ;
 	}
 
@@ -1640,48 +1424,33 @@ static int msgentry_procscandate(MSGENTRY *mep,MBCACHE *op)
 	int		rs = SR_OK ;
 	int		cl = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("msgentry_procscandate: ent proc=%u\n",
-	    mep->proc.scandate) ;
-#endif
-
 	if (! mep->proc.scandate) {
-	    mep->proc.scandate = TRUE ;
+	    mep->proc.scandate = true ;
 	    if ((rs = msgentry_prochdrdate(mep,op)) >= 0) {
 	        time_t	t = mep->htime ;
-#if	CF_DEBUGS
-	        debugprintf("msgentry_procscandate: hdrtime t=%u\n",t) ;
-#endif
 	        if (t == 0) {
 	            if ((rs = msgentry_procenvdate(mep,op)) >= 0) {
 	                t = mep->etime ;
-#if	CF_DEBUGS
-	                debugprintf("msgentry_procscandate: envtime t=%u\n",t) ;
-#endif
 	            }
 	        }
 	        if ((rs >= 0) && (t > 0)) {
 	            cchar	*ts ;
 	            char	timebuf[TIMEBUFLEN + 1] ;
-	            if ((ts = timestr_scandate(t,timebuf)) != NULL) {
-	                STRPACK	*psp = &op->strs ;
+	            if ((ts = timestr_scandate(t,timebuf)) != nullptr) {
+	                strpack	*psp = &op->strs ;
 	                cchar	*cp ;
 	                if ((rs = strpack_store(psp,ts,-1,&cp)) >= 0) {
 	                    cl = rs ;
-	                    mep->f.scandate = TRUE ;
+	                    mep->f.scandate = true ;
 	                    mep->vs[mbcachemf_scandate] = cp ;
 	                    mep->vl[mbcachemf_scandate] = cl ;
 	                }
 	            }
 	        }
 	    } /* end if */
-	} else if (mep->vs[mbcachemf_scandate] != NULL) {
+	} else if (mep->vs[mbcachemf_scandate] != nullptr) {
 	    cl = mep->vl[mbcachemf_scandate] ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("msgentry_procscandate: ret rs=%d len=%u\n",rs,cl) ;
-#endif
 
 	return (rs >= 0) ? cl : rs ;
 }
@@ -1729,14 +1498,9 @@ static int vcmpmsgentry(const void *e1pp,const void *e2pp)
 	m1p = (*m1pp) ;
 	m2p = (*m2pp) ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache/vcmpmsgentry: m1{%p} m2{%p}\n",
-	    m1p, m2p) ;
-#endif
-
-	if ((m1p != NULL) || (m2p != NULL)) {
-	    if ((rc == 0) && (m1p == NULL)) rc = 1 ;
-	    if ((rc == 0) && (m2p == NULL)) rc = -1 ;
+	if ((m1p != nullptr) || (m2p != nullptr)) {
+	    if ((rc == 0) && (m1p == nullptr)) rc = 1 ;
+	    if ((rc == 0) && (m2p == nullptr)) rc = -1 ;
 	    if (rc == 0) {
 	        time_t	t1e = m1p->etime ;
 	        time_t	t2e = m2p->etime ;
@@ -1762,19 +1526,10 @@ static int headappend(cchar **pp,cchar *sp,int sl)
 	int		cl, cl2 ;
 	char		*cp, *cp2 ;
 
-#if	CF_DEBUGS
-	debugprintf("mbcache/headappend: ent sp=>%t<\n",
-	    sp,MIN(sl,30)) ;
-#endif
-
-	if (*pp == NULL)
+	if (*pp == nullptr)
 	    return 0 ;
 
 	cl2 = strlen(*pp) ;
-
-#if	CF_DEBUGS
-	debugprintf("mbcache/headappend: cl2=%d\n",cl2) ;
-#endif
 
 	cl = sl + cl2 + 2 ;
 	if ((rs = uc_malloc(cl,&cp)) >= 0) {
@@ -1796,7 +1551,6 @@ static int headappend(cchar **pp,cchar *sp,int sl)
 /* end subroutine (headappend) */
 #endif /* COMMENT */
 
-
 #ifdef	COMMENT
 /* is the next non-white-space character a colon */
 static int nextnonwhite(cchar *sp,int sl)
@@ -1809,18 +1563,4 @@ static int nextnonwhite(cchar *sp,int sl)
 }
 /* end subroutine (nextnonwhite) */
 #endif /* COMMENT */
-
-
-#if	CF_DEBUGS
-static int debugprintlines(cchar *sub,cchar *s,int f,int l)
-{
-	char		digbuf[DIGBUFLEN + 1] ;
-	digbuf[0] = '\0' ;
-	if (f) ctdeci(digbuf,DIGBUFLEN,l) ;
-	debugprintf("%s: %s=%s\n",sub,s,((f) ? digbuf : "")) ;
-	return f ;
-}
-/* end subroutine (debugprintlines) */
-#endif /* CF_DEBUGS */
-
 
