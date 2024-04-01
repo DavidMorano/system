@@ -47,7 +47,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -296,6 +295,7 @@ int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 	    if (ng[0]) {
 		vechand		*dlp = op->dlp ;
 		void		*vp{} ;
+		rs = SR_OK ;
 	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                mkdirlist_ent	*ep = entp(vp) ;
@@ -318,6 +318,7 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 	    if (ung[0]) {
 	        vechand		*dlp = op->dlp ;
 		void		*vp{} ;
+		rs = SR_OK ;
 	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                mkdirlist_ent	*ep = entp(vp) ;
