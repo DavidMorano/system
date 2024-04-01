@@ -73,6 +73,8 @@
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
+#include	<varnames.hh>
+#include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<getax.h>
@@ -109,16 +111,6 @@
 #ifndef	NSYSPIDS
 #define	NSYSPIDS	100
 #endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#define	BUFLEN		(MAXPATHLEN + MAXHOSTNAMELEN + LINEBUFLEN)
 
 #ifndef	VARPRPCS
 #define	VARPRPCS	"PCS"
@@ -251,6 +243,8 @@ static constexpr nameinfo_f	getnames[] = {
 	nullptr
 } ;
 
+static bufsizevar		maxpathlen(getbufsize_mp) ;
+
 
 /* exported variables */
 
@@ -342,17 +336,19 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 
 static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 	int		rs ;
-	char		*pwbuf{} ;
 	memclear(sip) ; /* dangerous */
 	sip->pr = pr ;
 	sip->rbuf = rbuf ;
 	sip->rlen = rlen ;
 	sip->un = un ;
 	sip->varusername = VARUSERNAME ;
-	if ((rs = malloc_pw(&pwbuf)) >= 0) {
-	    sip->pwbuf = pwbuf ;
-	    sip->pwlen = rs ;
-	}
+	if ((rs = maxpathlen) >= 0) {
+	    char	*pwbuf{} ;
+	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	        sip->pwbuf = pwbuf ;
+	        sip->pwlen = rs ;
+	    } /* end if (memory-allocation) */
+	} /* end if (maxpathlen) */
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
@@ -376,16 +372,16 @@ static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	if (! sip->init.uid) {
 	    cchar	*cp ;
 
-	    sip->init.uid = TRUE ;
+	    sip->init.uid = true ;
 	    cp = getenv(sip->varusername) ;
 
 	    if ((cp != nullptr) && (strcmp(cp,sip->un) == 0)) {
-	        sip->f.uid = TRUE ;
+	        sip->f.uid = true ;
 	        sip->uid = getuid() ;
 	    } else {
 	        rs = subinfo_getpw(sip) ;
 	        if ((rs >= 0) && (! sip->f.uid)) {
-	            sip->f.uid = TRUE ;
+	            sip->f.uid = true ;
 	            sip->uid = sip->pw.pw_uid ;
 	        }
 	    } /* end if */
@@ -409,7 +405,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	if (! sip->init.pw) {
 	    cint	pwlen = sip->pwlen ;
 	    char	*pwbuf = sip->pwbuf ;
-	    sip->init.pw = TRUE ;
+	    sip->init.pw = true ;
 	    if ((un != nullptr) && (un[0] != '\0') && (un[0] != '-')) {
 	        if (hasalldig(un,-1)) {
 	            uint	uv ;
@@ -424,7 +420,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	        rs = getpwusername(&sip->pw,pwbuf,pwlen,-1) ;
 	    }
 	    if (rs >= 0) {
-	        sip->f.uid = TRUE ;
+	        sip->f.uid = true ;
 	        sip->uid = sip->pw.pw_uid ;
 	    }
 	} /* end if (was not already initialized) */
@@ -548,26 +544,33 @@ static int getname_sysdb(SUBINFO *sip,int) noex {
 /* end subroutine (getname_sysdb) */
 
 static int getprojinfo_userhome(SUBINFO *sip) noex {
-	cint	hlen = MAXPATHLEN ;
+	cint		sz = (2 * (maxpathlen + 1)) ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	cchar		*un = sip->un ;
-	cchar	*fname = PROJECTFNAME ;
-	char		hbuf[MAXPATHLEN + 1] ;
-
-	hbuf[0] = '\0' ;
-	if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-	    char	tbuf[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(tbuf,hbuf,fname)) >= 0) {
-		cint	rlen = sip->rlen ;
-		char		*rbuf = sip->rbuf ;
-	        if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
-		    len = rs ;
-		} else if (isNotPresent(rs)) 
-		    rs = SR_OK ;
-	    }
-	} /* end if (gethome) */
-
+	int		na = 0 ;
+	char		*a{} ;
+	if ((rs = uc_malloc(sz,&a)) >= 0) {
+	    cint	hlen = maxpathlen ;
+	    cchar	*un = sip->un ;
+	    cchar	*fname = PROJECTFNAME ;
+	    char	*hbuf = (a + (na++ * (maxpathlen + 1))) ;
+	    hbuf[0] = '\0' ;
+	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
+	        char	*tbuf = (a + (na++ * (maxpathlen + 1))) ;
+	        if ((rs = mkpath2(tbuf,hbuf,fname)) >= 0) {
+		    cint	rlen = sip->rlen ;
+		    char	*rbuf = sip->rbuf ;
+	            if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
+		        len = rs ;
+		    } else if (isNotPresent(rs)) {
+		        rs = SR_OK ;
+		    }
+	        } /* end if (mkpath) */
+	    } /* end if (gethome) */
+	    rs1 = uc_free(a) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_userhome) */
