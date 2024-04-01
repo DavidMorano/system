@@ -50,11 +50,13 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<varnames.hh>
+#include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<vecpstr.h>
 #include	<bfile.h>
@@ -73,22 +75,7 @@
 
 #define	DIRCACHE_MAGICSTR	"DIRCACHE"
 #define	DIRCACHE_CFNAME		".dircache"
-
-#ifndef	USERNAMELEN
-#ifndef	LOGNAME_MAX
-#define	USERNAMELEN	LOGNAME_MAX
-#else
-#define	USERNAMELEN	32
-#endif
-#endif
-
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
-#define	BUFLEN		100
-
-#define	VTMPDNAME	"/var/tmp"
+#define	DIRCACHE_PATNAME	".dircacheXXXXXX"
 
 
 /* imported namespaces */
@@ -105,10 +92,31 @@
 
 /* local structures */
 
+namespace {
+    struct dirhelp {
+	cchar		*pr ;
+	cchar		*ndname ;
+	char		*nbuf = nullptr ;
+	int		ttl ;
+	int		of ;
+	mode_t		om ;
+	dirhelp(cc *p,cc *n,int f,mode_t m,int t) noex : pr(p), ndname(n) {
+	    of = f ;
+	    om = m ;
+	    ttl = t ;
+	} ; /* end ctor */
+	operator int () noex ;
+	int start() noex ;
+	int finish() noex ;
+	int proc() noex ;
+    } ; /* end struct (dirhelp) */
+}
+
 
 /* forward references */
 
 static int procdname(cchar *,int) noex ;
+static int procdnamer(cchar *) noex ;
 static int procdiffer(vecpstr *,cchar *) noex ;
 static int procdircache(vecpstr *,cchar *) noex ;
 static int procdircacher(vecpstr *,cchar *) noex ;
@@ -116,46 +124,96 @@ static int procdircacher(vecpstr *,cchar *) noex ;
 
 /* local variables */
 
+static bufsizevar		maxpathlen(getbufsize_mp) ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int pcsopendircache(cchar *pr,cchar *newsdname,int of,mode_t om,int ttl) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
+int pcsopendircache(cchar *pr,cchar *ndname,int of,mode_t om,int ttl) noex {
+	int		rs = SR_FAULT ;
 	int		fd = -1 ;
-	char		ndname[MAXPATHLEN+1] ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (newsdname == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (newsdname[0] == '\0') return SR_INVALID ;
-
 	of &= O_ACCMODE ;
 	of |= O_RDONLY ;
+	if (pr && ndname) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && ndname[0]) {
+		dirhelp		ho(pr,ndname,of,om,ttl) ;
+		rs = ho ;
+		fd = rs ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fd : rs ;
+}
+/* end subroutine (pcsopendircache) */
 
-	if (newsdname[0] != '/') {
-	     rs = mkpath2(ndname,pr,newsdname) ;
-	     newsdname = ndname ;
+
+/* local subroutines */
+
+dirhelp::operator int () noex {
+	int		rs ;
+	int		rs1 ;
+	int		fd = -1 ;
+	if ((rs = start()) >= 0) {
+	    {
+		rs = proc() ;
+		fd = rs ;
+	    }
+	    rs1 = finish() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (start-finish) */
+	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	return (rs >= 0) ? fd : rs ;
+}
+/* end method (dirhelp::operator) */
+
+int dirhelp::start() noex {
+	int		rs = SR_OK ;
+	if (ndname[0] != '/') {
+	    if ((rs = malloc_mp(&nbuf)) >= 0) {
+	        rs = mkpath(nbuf,pr,ndname) ;
+	        ndname = nbuf ;
+		if (rs < 0) {
+		    uc_free(nbuf) ;
+		    nbuf = nullptr ;
+		}
+	    } /* end if (memory-allocation) */
 	}
+	return rs ;
+}
+/* end method (dirhelp::finish) */
 
-	if (rs >= 0) {
-	    if ((rs = procdname(newsdname,ttl)) >= 0) {
+int dirhelp::finish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (nbuf) {
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    nbuf = nullptr ;
+	}
+	return rs ;
+}
+/* end method (dirhelp::start) */
+
+int dirhelp::proc() noex {
+	int		rs ;
+	int		rs1 ;
+	int		fd = -1 ;
+	if ((rs = procdname(ndname,ttl)) >= 0) {
 	        int	fsz = 1 ;
 	        cchar	*dc = DIRCACHE_CFNAME ;
-	        char	*fbuf ;
-	        fsz += (strlen(newsdname) + 1) ;
+	        char	*fbuf{} ;
+	        fsz += (strlen(ndname) + 1) ;
 	        fsz += 1 ;
 	        fsz += (strlen(dc) + 1) ;
 	        if ((rs = uc_malloc(fsz,&fbuf)) >= 0) {
-		    if ((rs = mkpath2(fbuf,newsdname,dc)) >= 0) {
+		    if ((rs = mkpath2(fbuf,ndname,dc)) >= 0) {
 	    	        if ((rs = u_open(fbuf,of,om)) >= 0) {
 	    	            fd = rs ;
 		            if ((rs >= 0) && (of & O_CLOEXEC)) {
-			        rs = uc_closeonexec(fd,TRUE) ;
+			        rs = uc_closeonexec(fd,true) ;
 		            }
 		            if (rs < 0) {
 			        u_close(fd) ;
@@ -166,58 +224,61 @@ int pcsopendircache(cchar *pr,cchar *newsdname,int of,mode_t om,int ttl) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory-allocation) */
 		if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	    } /* end if (procdname) */
-	} /* end if (ok) */
-
+	} /* end if (procdname) */
 	return (rs >= 0) ? fd : rs ;
 }
-/* end subroutine (pcsopendircache) */
-
-
-/* local subroutines */
+/* end method (dirhelp::proc) */
 
 static int procdname(cchar *newsdname,int ttl) noex {
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	char		*dbuf{} ;
+	if ((rs = malloc_mp(&dbuf)) >= 0) {
+	    cchar	*dc = DIRCACHE_CFNAME ;
+	    if ((rs = mkpath2(dbuf,newsdname,dc)) >= 0) {
+	        USTAT	sb ;
+	        if ((rs = u_stat(dbuf,&sb)) >= 0) {
+		    if (ttl >= 0) {
+		        time_t	dt = time(NULL) ;
+		        if ((dt-sb.st_mtime) >= ttl) rs = SR_STALE ;
+		    }
+	        }
+	        if ((rs == SR_NOENT) || (rs == SR_STALE)) {
+		    rs = procdnamer(newsdname) ;
+	        } /* end (not-found or stale) */
+	    } /* end if (mkpath) */
+	    rs1 = uc_free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (procdname) */
+
+static int procdnamer(cchar *newsdname) noex {
 	vecpstr		dirs ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	cchar		*dc = DIRCACHE_CFNAME ;
-	char		dcfname[MAXPATHLEN+1] ;
-
-	if ((rs = mkpath2(dcfname,newsdname,dc)) >= 0) {
-	    USTAT	sb ;
-	    if ((rs = u_stat(dcfname,&sb)) >= 0) {
-		if (ttl >= 0) {
-		    time_t	dt = time(NULL) ;
-		    if ((dt-sb.st_mtime) >= ttl) rs = SR_STALE ;
+	if ((rs = vecpstr_start(&dirs,25,0,0)) >= 0) {
+	    if ((rs = vecpstr_loaddirs(&dirs,newsdname)) >= 0) {
+		c = rs ;
+		if ((rs = procdiffer(&dirs,newsdname)) > 0) {
+		    rs = procdircache(&dirs,newsdname) ;
 		}
-	    }
-
-	    if ((rs == SR_NOENT) || (rs == SR_STALE)) {
-		if ((rs = vecpstr_start(&dirs,25,0,0)) >= 0) {
-	    	    if ((rs = vecpstr_loaddirs(&dirs,newsdname)) >= 0) {
-	        	c = rs ;
-	        	if ((rs = procdiffer(&dirs,newsdname)) > 0) {
-	            	    rs = procdircache(&dirs,newsdname) ;
-	        	}
-	    	    } /* end if (load-dirs) */
-	    	    rs1 = vecpstr_finish(&dirs) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (vecpstr-dirs) */
-	    } /* end (not-found or stale) */
-
-	} /* end if (mkpath) */
-
+	    } /* end if (load-dirs) */
+	    rs1 = vecpstr_finish(&dirs) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (vecpstr-dirs) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (procdname) */
+/* end subroutine (procdnamer) */
 
 static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	cint		ml = strlen(DIRCACHE_MAGICSTR) ;
 	int		rs ;
 	int		rs1 ;
-	int		f = TRUE ;
-
+	int		f = true ;
 	if ((rs = vecpstr_getsize(dlp)) >= 0) {
 	    cint	dsize = rs ;
 	    cchar	*dc = DIRCACHE_CFNAME ;
@@ -226,12 +287,12 @@ static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	        USTAT	sb ;
 	        if ((rs = uc_stat(dcfname,&sb)) >= 0) {
 	            bfile	cfile, *cfp = &cfile ;
-	            int	fsize = (sb.st_size & INT_MAX) ;
+	            int		fsize = (sb.st_size & INT_MAX) ;
 	            if (dsize == (fsize-ml-1)) {
 	                if ((rs = bopen(cfp,dcfname,"r",0666)) >= 0) {
 	                    cint	dlen = MAXPATHLEN ;
 	                    int		line = 0 ;
-	                    int		f_mis = FALSE ;
+	                    int		f_mis = false ;
 	                    cchar	*dp ;
 	                    char	dbuf[MAXPATHLEN+1] ;
 	                    while ((rs = breadln(cfp,dbuf,dlen)) > 0) {
@@ -241,13 +302,13 @@ static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	                            if (vecpstr_get(dlp,(line-1),&dp) >= 0) {
 	                                f_mis = (strwcmp(dp,dbuf,dl) != 0) ;
 	                            } else {
-	                                f_mis = TRUE ;
+	                                f_mis = true ;
 				    }
 	                        }
 	                        line += 1 ;
 	                        if (f_mis) break ;
 	                    } /* end while */
-	                    if (! f_mis) f = FALSE ;
+	                    if (! f_mis) f = false ;
 	                    rs1 = bclose(cfp) ;
 			    if (rs >= 0) rs = rs1 ;
 	                } /* end if (file-open) */
@@ -267,10 +328,11 @@ static int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	int		c = 0 ;
 	char		dcfname[MAXPATHLEN + 1] ;
 	if ((rs = mkpath2(dcfname,newsdname,DIRCACHE_CFNAME)) >= 0) {
+	    cchar	*patname = DIRCACHE_PATNAME ;
 	    char	tpat[MAXPATHLEN + 1] ;
-	    if ((rs = mkpath2(tpat,newsdname,".dircacheXXXXXX")) >= 0) {
+	    if ((rs = mkpath2(tpat,newsdname,patname)) >= 0) {
 		char	tbuf[MAXPATHLEN + 1] ;
-	        if ((rs = mktmpfile(tbuf,0664,tpat)) >= 0) {
+	        if ((rs = mktmpfile(tbuf,tpat,0664)) >= 0) {
 		     if ((rs = procdircacher(dlp,tbuf)) >= 0) {
 	                rs = u_rename(tbuf,dcfname) ;
 			if (rs < 0) {
@@ -290,11 +352,11 @@ static int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = bopen(dcfp,fn,"wct",0664)) >= 0) {
-	    if ((rs = bprintln(dcfp,DIRCACHE_MAGICSTR,-1)) >= 0) {
-	        int	i ;
+	    cchar	*magicstr = DIRCACHE_MAGICSTR ;
+	    if ((rs = bprintln(dcfp,magicstr,-1)) >= 0) {
 	        int	dl ;
 	        cchar	*dp ;
-	        for (i = 0 ; vecpstr_get(dlp,i,&dp) >= 0 ; i += 1) {
+	        for (int i = 0 ; vecpstr_get(dlp,i,&dp) >= 0 ; i += 1) {
 	            if (dp != NULL) {
 	                dl = strlen(dp) ;
 	                c += 1 ;
@@ -306,7 +368,6 @@ static int procdircacher(vecpstr *dlp,cchar *fn) noex {
 	    rs1 = bclose(dcfp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened replacement file) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (procdircacher) */

@@ -246,7 +246,7 @@ enum signalmissings {
 #endif
 
 #ifndef	CLUSTERNAMELEN
-#if	defined(NODENAMELEN)
+#ifdef	NODENAMELEN
 #define	CLUSTERNAMELEN	NODENAMELEN
 #else
 #define	CLUSTERNAMELEN	256
@@ -254,7 +254,7 @@ enum signalmissings {
 #endif
 
 #ifndef	NODENAMELEN
-#if	defined(SYS_NMLN)
+#ifdef	SYS_NMLN
 #define	NODENAMELEN	(SYS_NMLN-1)	/* usually 256 for SVR4! */
 #else
 #define	NODENAMELEN	256		/* should be at least 256 for SVR4! */
