@@ -23,7 +23,7 @@
 	Oh boy!  We want to be careful with those foreign names that
 	have funny article-preposition (whatever?) words in front of
 	their last names.  Some examples, of these might be: a, da, 
-	de, do, du, mc, mac, o, ou, von .
+	de, do, du, mc, mac, o, ou, von, van, dell.
 
 ******************************************************************************/
 

@@ -493,24 +493,25 @@ static int entry_loadnames(NC_ENT *ep,cchar *up,cchar *rp,int rl) noex {
 
 /* make a real name from a GECOS name */
 static int mkaname(char *nbuf,int nlen,cchar *gecos) noex {
+	cint		glen = GNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		rl = 0 ;
-	cchar		*gp ;
+	char		gbuf[GNAMELEN+1] ;
 	nbuf[0] = '\0' ;
-	if ((rs = getgecosname(gecos,-1,&gp)) > 0) {
+	if ((rs = mkgecosname(gbuf,glen,gecos)) >= 0) {
 	    realname	rn ;
 	    cint	gl = rs ;
-	    if ((rs = realname_start(&rn,gp,gl)) >= 0) {
-#if	CF_FULLNAME
-	        rl = realname_fullname(&rm,mbuf,nlen) ;
-#else
-	        rl = realname_name(&rn,nbuf,nlen) ;
-#endif
+	    if ((rs = realname_start(&rn,gbuf,gl)) >= 0) {
+		if constexpr (f_fullname) {
+	            rl = realname_fullname(&rn,nbuf,nlen) ;
+		} else {
+	            rl = realname_name(&rn,nbuf,nlen) ;
+		} /* end if-constexpr (f_fullanem) */
 	        rs1 = realname_finish(&rn) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (realname) */
-	} /* end if (gecos-name) */
+	} /* end if (mkgeoxname) */
 	return (rs >= 0) ? rl : 0 ;
 }
 /* end subroutine (mkaname) */
