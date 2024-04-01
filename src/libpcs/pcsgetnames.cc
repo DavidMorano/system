@@ -169,7 +169,6 @@ struct subinfo_flags {
 
 struct subinfo {
 	cchar		*pr ;
-	cchar		*varusername ;
 	cchar		*un ;
 	char		*rbuf ;		/* user supplied buffer */
 	char		*pwbuf ;
@@ -331,7 +330,6 @@ static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 	sip->rbuf = rbuf ;
 	sip->rlen = rlen ;
 	sip->un = un ;
-	sip->varusername = varname.username ;
 	if ((rs = maxpathlen) >= 0) {
 	    char	*pwbuf{} ;
 	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
@@ -358,8 +356,9 @@ static int subinfo_finish(SUBINFO *sip) noex {
 
 static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	int		rs = SR_OK ;
+	cchar		*vn = varname.username ;
 	if (! sip->init.uid) {
-	    static cchar	*cp = getenv(sip->varusername) ;
+	    static cchar	*cp = getenv(vn) ;
 	    sip->init.uid = true ;
 	    if ((cp != nullptr) && (strcmp(cp,sip->un) == 0)) {
 	        sip->f.uid = true ;
@@ -430,9 +429,9 @@ static int getname(SUBINFO *sip,int nt) noex {
 static int getname_var(SUBINFO *sip,int nt) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	bool		f ;
 	cchar		*vn = varname.username ;
 	cchar		*un = sip->un ;
+	bool		f ;
 	f = (un[0] == '-') ;
 	if (! f) {
 	    static cchar	*vun = getenv(vn) ;
