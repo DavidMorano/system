@@ -175,7 +175,10 @@ int namecache_start(NC *op,cchar *varname,int nmax,int ttl) noex {
 	            }
 	        } /* end if (memory-allocation) */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		namecache_dtor(op) ;
+	    }
+	} /* end if (namecache_ctor) */
 	return rs ;
 }
 /* end subroutine (namecache_start) */
@@ -242,9 +245,9 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	    const time_t	dt = time(nullptr) ;
 	    rs = SR_INVALID ;
 	    if (un[0]) {
-	        ucentpw	pw ;
-	        cchar	*rp = nullptr ;
-	        char	*pwbuf{} ;
+	        ucentpw		pw ;
+	        cchar		*rp = nullptr ;
+	        char		*pwbuf{} ;
 	        op->s.total += 1 ;
 	        if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	            hdb_dat	key, val ;
@@ -358,14 +361,12 @@ static int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	int		rs1 ;
 	if (epp) *epp = nullptr ;
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
-	    NC_ENT	*tep = nullptr ;
 	    while ((rs = hdb_enum(dbp,&cur,&key,&val)) >= 0) {
-		tep = (NC_ENT *) val.buf ;
+	        NC_ENT	*tep = (NC_ENT *) val.buf ;
 		if ((ep == nullptr) || (ep->ti_access < tep->ti_access)) {
 		    ep = tep ;
 		}
 	    } /* end while */
-
 	    rs1 = hdb_curend(dbp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
@@ -389,13 +390,16 @@ static int namecache_entfins(NC *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((rs1 = hdb_curbegin(elp,&cur)) >= 0) {
-	    NC_ENT	*ep ;
 	    while (hdb_enum(elp,&cur,&key,&val) >= 0) {
-	        ep = (NC_ENT *) val.buf ;
-	        rs1 = entry_finish(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-	        rs1 = uc_free(ep) ;
-	        if (rs >= 0) rs = rs1 ;
+	        NC_ENT	*ep = (NC_ENT *) val.buf ;
+		{
+	            rs1 = entry_finish(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
+		{
+	            rs1 = uc_free(ep) ;
+	            if (rs >= 0) rs = rs1 ;
+		}
 	    } /* end while */
 	    rs1 = hdb_curend(elp,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -445,15 +449,13 @@ static int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 	int		rs1 ;
 	int		f_changed = true ;
 	if (ep && rp) {
-	    time_t	dt = 0 ;
 	    rs = SR_OK ;
 	    if (rl < 0) rl = strlen(rp) ;
 	    f_changed = f_changed && (strncmp(ep->realname,rp,rl) == 0) ;
 	    f_changed = f_changed && (ep->realname[rl] == '\0') ;
 	    if (f_changed) {
 		char	*ubuf{} ;
-	        if (dt == 0) dt = time(nullptr) ;
-	        ep->ti_init = dt ;
+	        ep->ti_init = time(nullptr) ;
 	        ep->realnamelen = rl ;
 	        if ((rs = malloc_un(&ubuf)) >= 0) {
 		    cint	ulen = rs ;
