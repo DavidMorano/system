@@ -150,7 +150,7 @@ int envmgr_set(envmgr *op,cchar *kp,cchar *vp,int vl) noex {
 	    if ((rs = vecstr_envset(esp,kp,vp,vl)) >= 0) {
 	        vechand	*elp = op->listp ;
 	        cint	i = rs ;
-	        cchar	*ep ;
+	        cchar	*ep{} ;
 	        if ((rs = vecstr_get(esp,i,&ep)) >= 0) {
 		    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
 		    cnullptr		np{} ;

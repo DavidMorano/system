@@ -55,6 +55,10 @@
 #include	<unistd.h>
 #include	<usystem.h>
 #include	<sbuf.h>
+#include	<strn.h>
+#include	<sncpyx.h>
+#include	<mkpathx.h>
+#include	<cfdec.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -65,15 +69,6 @@
 
 
 /* external subroutines */
-
-extern int	mkpath1w(char *,cchar *,int) ;
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy1w(char *,int,cchar *,int) ;
-extern int	cfdecl(cchar *,int,long *) ;
-extern int	cfdecul(cchar *,int,ulong *) ;
-
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -92,30 +87,23 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
 	ulong		ulv ;
 	int		rs ;
 	int		rs1 ;
-
 	if (f_read) { /* read */
 	    int		cl ;
 	    int		sl = mlen ;
 	    cchar	*tp, *cp ;
 	    cchar	*sp = mbuf ;
-
 	    msp->offset = 0 ;
 	    msp->username[0] = '\0' ;
 	    msp->fname[0] = '\0' ;
-
 	    while ((sl > 0) && CHAR_ISWHITE(sp[sl - 1])) {
 	        sl -= 1 ;
 	    }
-
 	    if ((tp = strnchr(sp,sl,'@')) != NULL) {
 	        cint	ulen = USERNAMELEN ;
 	        char	*ubuf = msp->username ;
-
 	        if ((rs = sncpy1w(ubuf,ulen,sp,(tp-sp))) >= 0) {
-
 	            sl -= ((tp + 1) - mbuf) ;
 	            sp = (tp + 1) ;
-
 	            cp = sp ;
 	            cl = sl ;
 	            if ((tp = strnchr(sp,sl,':')) != NULL) {
@@ -125,44 +113,30 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
 	                    rs = mkpath1w(fbuf,(tp+1),((sp+sl)-(tp+1))) ;
 	                }
 	            }
-
 	            if (rs >= 0) {
 	                rs = cfdecul(cp,cl,&ulv) ;
 	                msp->offset = ulv ;
 	            }
-
 	        } /* end if */
-
 	    } else {
 	        rs = SR_BADMSG ;
 	    }
-
 	} else { /* write */
-
 	    if ((rs = sbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
-
 	        sbuf_strw(&msgbuf,msp->username,-1) ;
-
 	        sbuf_char(&msgbuf,'@') ;
-
 	        ulv = msp->offset ;
 	        sbuf_decul(&msgbuf,ulv) ;
-
 	        if (msp->fname[0] != '\0') {
-
 	            sbuf_char(&msgbuf,':') ;
-
 	            sbuf_strw(&msgbuf,msp->fname,-1) ;
-
 	        } /* end if */
-
 	        rs1 = sbuf_finish(&msgbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sbuf) */
-
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (comsatmsg_mo) */
+
 

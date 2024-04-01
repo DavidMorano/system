@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<unistd.h>		/* |off_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -33,9 +34,9 @@
 
 
 struct comsatmsg_mo {
-	ulong		offset ;
 	char		username[USERNAMELEN + 1] ;
 	char		fname[MAXNAMELEN + 1] ;
+	ulong		offset ;
 } ;
 
 
