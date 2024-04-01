@@ -266,6 +266,7 @@ int recip_match(recip *op,cchar *sp,int sl) noex {
 	if ((rs = recip_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
+		rs = SR_OK ;
 	        if (sl < 0) sl = strlen(sp) ;
 	        if (op->recipient) {
 	            f = (strwcmp(op->recipient,sp,sl) == 0) ;
