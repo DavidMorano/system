@@ -1,9 +1,8 @@
-/* comsatmsg */
+/* comsatmsg SUPPORT */
+/* lang=C++20 */
 
 /* create and parse COMSAT messages */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,39 +12,47 @@
 
 */
 
-/* Copyright © 1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright Â© 1999 David AÂ­DÂ­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This module contains the code to make and parse Comsat messages.
-
-	A Comsat message looks like:
-
+	This module contains the code to make and parse Comsat
+	messages.  A Comsat message looks like:
 		<user>@<offset>[:<file>]
 
 	Where:
-
 		<user>		is the user who received the message
 		<offset>	is the file-offset to this message
 		<file>		associated filename (If present)
 
 	Example:
-
 		dam@251:bobby
 
 
+	Description:
+	This subroutine is used to create or to parse a Comsat message.
+		
+	Synopsis:
+	int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex
+		
+	Arguments:
+		msp		pointer to COMSATMSG_MO object (the result)
+		f_read		flag to indicate if we are parsing (read)
+				or creating (write)
+		mbuf		string buffer (input for parseing,
+				output for creating
+		mlen		length of string buffer
+
+	Returns:
+		<0		error
+		>=0		for parsing
+		>0		lrngth of result when creating
+
 *******************************************************************************/
 
-
-#define	COMSATMSG_MASTER	0
-
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<char.h>
@@ -59,14 +66,14 @@
 
 /* external subroutines */
 
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	cfdecl(const char *,int,long *) ;
-extern int	cfdecul(const char *,int,ulong *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	cfdecl(cchar *,int,long *) ;
+extern int	cfdecul(cchar *,int,ulong *) ;
 
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -75,12 +82,13 @@ extern char	*strwcpy(char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen)
-{
-	SBUF		msgbuf ;
+int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen) noex {
+	sbuf		msgbuf ;
 	ulong		ulv ;
 	int		rs ;
 	int		rs1 ;
@@ -88,8 +96,8 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen)
 	if (f_read) { /* read */
 	    int		cl ;
 	    int		sl = mlen ;
-	    const char	*tp, *cp ;
-	    const char	*sp = mbuf ;
+	    cchar	*tp, *cp ;
+	    cchar	*sp = mbuf ;
 
 	    msp->offset = 0 ;
 	    msp->username[0] = '\0' ;
@@ -100,8 +108,8 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen)
 	    }
 
 	    if ((tp = strnchr(sp,sl,'@')) != NULL) {
-	        const int	ulen = USERNAMELEN ;
-	        char		*ubuf = msp->username ;
+	        cint	ulen = USERNAMELEN ;
+	        char	*ubuf = msp->username ;
 
 	        if ((rs = sncpy1w(ubuf,ulen,sp,(tp-sp))) >= 0) {
 
@@ -125,8 +133,9 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen)
 
 	        } /* end if */
 
-	    } else
+	    } else {
 	        rs = SR_BADMSG ;
+	    }
 
 	} else { /* write */
 
@@ -153,12 +162,7 @@ int comsatmsg_mo(COMSATMSG_MO *msp,int f_read,char *mbuf,int mlen)
 
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("comsatmsg_mo: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (comsatmsg_mo) */
-
 

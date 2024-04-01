@@ -67,15 +67,15 @@
 
 /* external subroutines */
 
-extern int	getgecosname(const char *,int,const char **) ;
-extern int	mkgecosname(char *,int,const char *) ;
+extern int	getgecosname(cchar *,int,cchar **) ;
+extern int	mkgecosname(char *,int,cchar *) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1(char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1(char *,int,cchar *) ;
 
 #if	CF_DEBUGS
 extern char	*timestr_log(time_t,char *) ;
@@ -85,8 +85,8 @@ extern char	*timestr_log(time_t,char *) ;
 /* local structures */
 
 struct namecache_e {
-	const char	*username ;
-	const char	*realname ;
+	cchar	*username ;
+	cchar	*realname ;
 	char		*a ;
 	time_t		ti_init ;
 	time_t		ti_access ;
@@ -102,12 +102,12 @@ static int	namecache_repentry(NAMECACHE *,NAMECACHE_ENT **,
 			cchar *,cchar *,int) ;
 static int	namecache_entfins(NAMECACHE *) ;
 
-static int	entry_start(NAMECACHE_ENT *,const char *,const char *,int) ;
-static int	entry_update(NAMECACHE_ENT *,const char *,int) ;
+static int	entry_start(NAMECACHE_ENT *,cchar *,cchar *,int) ;
+static int	entry_update(NAMECACHE_ENT *,cchar *,int) ;
 static int	entry_finish(NAMECACHE_ENT *) ;
 static int	entry_loadnames(NAMECACHE_ENT *,cchar *,cchar *,int) ;
 
-static int	mkaname(char *,int,const char *) ;
+static int	mkaname(char *,int,cchar *) ;
 
 
 /* local variables */
@@ -119,7 +119,7 @@ static int	mkaname(char *,int,const char *) ;
 int namecache_start(NAMECACHE *op,cchar *varname,int max,int ttl)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (varname == NULL) return SR_FAULT ;
@@ -135,7 +135,7 @@ int namecache_start(NAMECACHE *op,cchar *varname,int max,int ttl)
 	memset(op,0,sizeof(NAMECACHE)) ;
 
 	if ((rs = uc_mallocstrw(varname,-1,&cp)) >= 0) {
-	    const int	n = NAMECACHE_DEFENTS ;
+	    cint	n = NAMECACHE_DEFENTS ;
 	    op->varname = cp ;
 	    if ((rs = hdb_start(&op->db,n,1,NULL,NULL)) >= 0) {
 	        op->max = max ;
@@ -224,10 +224,10 @@ int namecache_add(NAMECACHE *op,cchar *un,cchar *rnp,int rnl)
 int namecache_lookup(NAMECACHE *op,cchar *un,cchar **rpp)
 {
 	struct passwd	pw ;
-	const int	pwlen = getbufsize(getbufsize_pw) ;
+	cint	pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
 	int		rl = 0 ;
-	const char	*rp = NULL ;
+	cchar	*rp = NULL ;
 	char		*pwbuf ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -248,7 +248,7 @@ int namecache_lookup(NAMECACHE *op,cchar *un,cchar **rpp)
 	    HDB_DATUM		key, val ;
 	    NAMECACHE_ENT	*ep ;
 	    const time_t	dt = time(NULL) ;
-	    const int		rlen = REALNAMELEN ;
+	    cint		rlen = REALNAMELEN ;
 	    char		rbuf[REALNAMELEN + 1] ;
 
 	    key.buf = un ;
@@ -358,7 +358,7 @@ static int namecache_newentry(NAMECACHE *op,NAMECACHE_ENT **epp,cchar *un,
 		cchar *np,int nl)
 {
 	NAMECACHE_ENT	*ep ;
-	const int	msize = sizeof(NAMECACHE_ENT) ;
+	cint	msize = sizeof(NAMECACHE_ENT) ;
 	int		rs ;
 
 	if (epp != NULL)
@@ -521,7 +521,7 @@ static int entry_update(NAMECACHE_ENT *ep,cchar *rp,int rl)
 	    ep->realnamelen = rl ;
 
 	    {
-		const int	ulen = USERNAMELEN ;
+		cint	ulen = USERNAMELEN ;
 		char		ubuf[USERNAMELEN+1] ;
 		strdcpy1(ubuf,ulen,ep->username) ;
 	        rs = entry_loadnames(ep,ubuf,rp,rl) ;
@@ -562,12 +562,12 @@ static int mkaname(char *nbuf,int nlen,cchar *gecos)
 {
 	int		rs ;
 	int		rl = 0 ;
-	const char	*gp ;
+	cchar	*gp ;
 
 	nbuf[0] = '\0' ;
 	if ((rs = getgecosname(gecos,-1,&gp)) > 0) {
-	    REALNAME	rn ;
-	    int		gl = rs ;
+	    realname	rn ;
+	    cint	gl = rs ;
 	    if ((rs = realname_start(&rn,gp,gl)) >= 0) {
 
 #if	CF_FULLNAME

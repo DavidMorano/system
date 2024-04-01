@@ -1,6 +1,8 @@
-/* comsatmsg */
+/* comsatmsg HEADER */
+/* lang=C20 */
 
 /* create and parse COMSAT messages */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,13 +15,13 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	COMSATMSG_INCLUDE
-#define	COMSATMSG_INCLUDE	1
+#define	COMSATMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
@@ -44,19 +46,12 @@ enum comsatmsgtypes {
 } ;
 
 
-#if	(! defined(COMSATMSG_MASTER)) || (COMSATMSG_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int comsatmsg_mo(COMSATMSG_MO *,int,char *,int) noex ;
 
-extern int comsatmsg_mo(COMSATMSG_MO *,int,char *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* COMSATMSG_MASTER */
 
 #endif /* COMSATMSG_INCLUDE */
 
