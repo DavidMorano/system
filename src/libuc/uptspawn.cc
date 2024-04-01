@@ -62,6 +62,9 @@
 #endif
 
 
+/* imported namespaces */
+
+
 /* local typedefs */
 
 extern "C" {
@@ -89,6 +92,9 @@ static void	*uptruner(void *) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -131,7 +137,9 @@ static int uptcreator(pthread_t *rp,pthread_attr_t *ptap,void *arg) noex {
 	int		rs ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = pthread_create(rp,ptap,uptruner,arg)) > 0) rs = (- rs) ;
+	    if ((rs = pthread_create(rp,ptap,uptruner,arg)) > 0) {
+		rs = (- rs) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_NOMEM:
