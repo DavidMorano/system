@@ -82,7 +82,9 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<sysval.hh>
 #include	<mkchar.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
@@ -114,8 +116,15 @@
 #define	TO_ACCESS	(2 * 60)	/* maximum access idle time */
 #define	TO_LOCK		10		/* seconds */
 
+#ifndef	CF_CREAT
+#define	CF_CREAT	0		/* always create the file? */
+#endif
+
 
 /* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -145,6 +154,17 @@ extern char	*strnwcpy(char *,int,cchar *,int) ;
 
 /* forward references */
 
+template<typename ... Args>
+static inline int logzones_magic(logzones *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LOGZONES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (logzones_magic) */
+
+static int	logzones_opener(LZ *,cc *,int,mode_t) noex ;
 static int	logzones_fileopen(LZ *,time_t) noex ;
 static int	logzones_fileclose(LZ *) noex ;
 static int	logzones_lockget(LZ *,time_t,int) noex ;
@@ -164,7 +184,11 @@ static bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 
 /* local variables */
 
-static cchar	blanks[] = "                       " ;
+static sysval		pagesize(sysval_ps) ;
+
+static cchar		blanks[] = "                       " ;
+
+constexpr bool		f_creat = CF_CREAT ;
 
 
 /* exported variables */
@@ -172,67 +196,22 @@ static cchar	blanks[] = "                       " ;
 
 /* exported subroutines */
 
-int logzones_open(LZ *op,cchar *fname,int oflags,mode_t operms) noex {
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (fname == NULL) return SR_FAULT ;
-
-	if (fname[0] == '\0') return SR_INVALID ;
-
-	op->magic = 0 ;
-	op->mtime = 0 ;
-	op->fd = -1 ;
-	op->fname = NULL ;
-	memset(&op->f,0,sizeof(struct logzones_flags)) ;
-
-#if	CF_CREAT
-	oflags |= O_CREAT ;
-#endif
-
-	if ((rs = u_open(fname,oflags,operms)) >= 0) {
-	    cchar	*cp ;
-	    op->fd = rs ;
-	    if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	        struct ustat	sb ;
-	        const time_t	dt = time(NULL) ;
-	        op->fname = cp ;
-	        op->oflags = (oflags &= (~ O_TRUNC)) ;
-	        op->operms = operms ;
-	        if ((rs = uc_closeonexec(op->fd,TRUE)) >= 0) {
-	            cint	am = (oflags & O_ACCMODE) ;
-	            op->f.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
-	            op->opentime = dt ;
-	            op->accesstime = dt ;
-	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	                cint	n = LOGZONES_NENTS ;
-	                cint	entlen = LZ_ENTLEN ;
-	                op->mtime = sb.st_mtime ;
-	                op->filesize = sb.st_size ;
-	                op->pagesize = getpagesize() ;
-	                if ((rs = isfsremote(op->fd)) >= 0) {
-	                    cint	size = (n * entlen) ;
-	                    char	*bp ;
-	                    op->f.remote = (rs > 0) ;
-	                    if ((rs = uc_malloc(size,&bp)) >= 0) {
-	                        op->bufsize = size ;
-	                        op->buf = bp ;
-	                        op->magic = LOGZONES_MAGIC ;
-	                    }
-	                } /* end if (isfsremote) */
-	            } /* end if (stat) */
-	        } /* end if (uc_closeonexec) */
-	        if (rs < 0) {
-	            uc_free(op->fname) ;
-	            op->fname = NULL ;
-	        }
-	    } /* end if (m-a) */
-	    if (rs < 0) {
-	        u_close(op->fd) ;
+int logzones_open(LZ *op,cchar *fname,int of,mode_t om) noex {
+	int		rs = SR_FAULT ;
+	if (op && fname) {
+	    rs = SR_INVALID ;
+	    if (fname[0]) {
+		memclear(op) ;
 	        op->fd = -1 ;
-	    }
-	} /* end if (open) */
-
+	        if constexpr (f_creat) {
+	            of |= O_CREAT ;
+	        } /* end if-constexpr (f_creat) */
+		if ((rs = pagesize) >= 0) {
+		    op->pagesize = rs ;
+		    rs = logzones_opener(op,fname,of,om) ;
+		} /* end if (pagesize) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (logzones_open) */
@@ -241,14 +220,14 @@ int logzones_close(LZ *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
-	if (op->buf != NULL) {
+	if (op->buf != nullptr) {
 	    rs1 = uc_free(op->buf) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->buf = NULL ;
+	    op->buf = nullptr ;
 	}
 
 	if (op->fd >= 0) {
@@ -257,10 +236,10 @@ int logzones_close(LZ *op) noex {
 	    op->fd = -1 ;
 	}
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -270,14 +249,14 @@ int logzones_close(LZ *op) noex {
 
 /* initialize a cursor */
 int logzones_curbegin(LZ *op,LZ_CUR *curp) noex {
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
-	op->f.cursor = TRUE ;
-	op->f.cursorlockbroken = FALSE ;
-	op->f.cursoracc = FALSE ;
+	op->f.cursor = true ;
+	op->f.cursorlockbroken = false ;
+	op->f.cursoracc = false ;
 	curp->i = -1 ;
 	return SR_OK ;
 }
@@ -287,17 +266,17 @@ int logzones_curend(LZ *op,LZ_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
 	if (op->f.cursoracc) {
-	    time_t	dt = time(NULL) ;
+	    time_t	dt = time(nullptr) ;
 	    op->accesstime = dt ;
 	}
 
-	op->f.cursor = FALSE ;
+	op->f.cursor = false ;
 
 	if (op->f.lockedread || op->f.lockedwrite) {
 	    rs1 = logzones_lockrelease(op) ;
@@ -314,8 +293,8 @@ int logzones_enum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	int		rs = SR_OK ;
 	int		ei = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
@@ -325,12 +304,12 @@ int logzones_enum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 
 	if (! op->f.cursorlockbroken) {
 	    if (op->fd < 0) {
-	        if (dt == 0) dt = time(NULL) ;
+	        if (dt == 0) dt = time(nullptr) ;
 	        rs = logzones_fileopen(op,dt) ;
 	    }
 	    if (rs >= 0) {
 	        if ((! op->f.lockedread) && (! op->f.lockedwrite)) {
-	            if (dt == 0) dt = time(NULL) ;
+	            if (dt == 0) dt = time(nullptr) ;
 	            rs = logzones_lockget(op,dt,1) ;
 	        }
 	        if (rs >= 0) {
@@ -340,14 +319,14 @@ int logzones_enum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 	            ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	            eoff = (ei * ebl) ;
 	            if ((eoff + ebl) <= op->filesize) {
-	                if (ep != NULL) {
+	                if (ep != nullptr) {
 	                    if ((rs = u_pread(op->fd,ebp,ebl,eoff)) >= 0) {
 	                        rs = entry_startbuf(ep,(op->buf + eoff),ebl) ;
 	                    }
 	                }
 	                if (rs >= 0) {
 	                    curp->i = ei ;
-	                    op->f.cursoracc = TRUE ;
+	                    op->f.cursoracc = true ;
 	                }
 	            } else {
 	                rs = SR_NOTFOUND ;
@@ -364,15 +343,15 @@ int logzones_enum(LZ *op,LZ_CUR *curp,LZ_ENT *ep) noex {
 
 int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	LZ_ENT	e ;
-	const time_t	dt = time(NULL) ;
+	const time_t	dt = time(nullptr) ;
 	cint	ebl = LZ_ENTLEN ;
 	int		rs ;
 	int		ei ;
 	char		ebp[LZ_ENTLEN + 1] ;
 	char		*bp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (znb == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (znb == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
@@ -390,7 +369,7 @@ int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 
 	    if (rs >= 0) {
 
-	        if ((rs = entry_start(&e,znb,znl,off,NULL)) >= 0) {
+	        if ((rs = entry_start(&e,znb,znl,off,nullptr)) >= 0) {
 
 /* formulate the search string in the buffer */
 
@@ -415,7 +394,7 @@ int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 	            if (! op->f.cursor) {
 	                op->accesstime = dt ;
 	            } else {
-	                op->f.cursoracc = TRUE ;
+	                op->f.cursoracc = true ;
 	            }
 
 	        } /* end if (ok) */
@@ -430,15 +409,15 @@ int logzones_match(LZ *op,cchar *znb,int znl,int off,LZ_ENT *ep) noex {
 
 int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 	LZ_ENT		e ;
-	const time_t	dt = time(NULL) ;
+	const time_t	dt = time(nullptr) ;
 	cint		ebl = LZ_ENTLEN ;
 	int		rs ;
 	int		ei = 0 ;
 	char		ebp[LZ_ENTLEN + 1] ;
 	char		*bp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (znb == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (znb == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
@@ -452,12 +431,12 @@ int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 /* lose any READ lock (we need a WRITE lock) */
 
 	    if (op->f.lockedread) {
-	        if (op->f.cursor) op->f.cursorlockbroken = TRUE ;
+	        if (op->f.cursor) op->f.cursorlockbroken = true ;
 
 #ifdef	OPTIONAL
 	        logzones_lockrelease(op) ;
 #else
-	        op->f.lockedread = FALSE ;
+	        op->f.lockedread = false ;
 #endif /* OPTIONAL */
 
 	    }
@@ -473,7 +452,7 @@ int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 /* we do comparisons in "string" representation form (much faster !) */
 
 	        if (rs >= 0) {
-	            if ((rs = entry_start(&e,znb,znl,off,NULL)) >= 0) {
+	            if ((rs = entry_start(&e,znb,znl,off,nullptr)) >= 0) {
 
 /* formulate the search string in the buffer */
 
@@ -511,7 +490,7 @@ int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 
 	                ei = op->filesize / ebl ;
 
-	                if ((rs = entry_start(&e,znb,znl,off,NULL)) >= 0) {
+	                if ((rs = entry_start(&e,znb,znl,off,nullptr)) >= 0) {
 
 	                    entry_update(&e,st) ;
 
@@ -542,7 +521,7 @@ int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 	            if (! op->f.cursor) {
 	                op->accesstime = dt ;
 	            } else {
-	                op->f.cursoracc = TRUE ;
+	                op->f.cursoracc = true ;
 	            }
 	        } /* end if (ok) */
 	    } /* end if (ok) */
@@ -554,13 +533,13 @@ int logzones_update(LZ *op,cchar *znb,int znl,int off,cchar *st) noex {
 int logzones_check(LZ *op,time_t dt) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
 	if (op->fd >= 0) {
-	    int		f = FALSE ;
-	    if (dt == 0) dt = time(NULL) ;
+	    int		f = false ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    f = f || ((dt - op->accesstime) > TO_ACCESS) ;
 	    f = f || ((dt - op->opentime) > TO_OPEN) ;
 	    if (f) {
@@ -575,9 +554,58 @@ int logzones_check(LZ *op,time_t dt) noex {
 
 /* private subroutines */
 
+static int logzones_opener(LZ *op,cc *fname,int of,mode_t om) noex {
+	int		rs ;
+	if ((rs = u_open(fname,of,om)) >= 0) {
+	    cchar	*cp ;
+	    op->fd = rs ;
+	    if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
+	        USTAT	sb ;
+	        const time_t	dt = time(nullptr) ;
+	        op->fname = cp ;
+	        op->oflags = (of &= (~ O_TRUNC)) ;
+	        op->operms = om ;
+	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
+	            cint	am = (of & O_ACCMODE) ;
+		    if ((am == O_WRONLY) || (am == O_RDWR)) {
+	                op->f.writable = true ;
+		    }
+	            op->opentime = dt ;
+	            op->accesstime = dt ;
+	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	                cint	n = LOGZONES_NENTS ;
+	                cint	entlen = LZ_ENTLEN ;
+	                op->mtime = sb.st_mtime ;
+	                op->filesize = sb.st_size ;
+	                if ((rs = isfsremote(op->fd)) >= 0) {
+	                    cint	sz = (n * entlen) ;
+	                    char	*bp ;
+	                    op->f.remote = (rs > 0) ;
+	                    if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	                        op->bufsize = sz ;
+	                        op->buf = bp ;
+	                        op->magic = LOGZONES_MAGIC ;
+	                    }
+	                } /* end if (isfsremote) */
+	            } /* end if (stat) */
+	        } /* end if (uc_closeonexec) */
+	        if (rs < 0) {
+	            uc_free(op->fname) ;
+	            op->fname = nullptr ;
+	        }
+	    } /* end if (m-a) */
+	    if (rs < 0) {
+	        u_close(op->fd) ;
+	        op->fd = -1 ;
+	    }
+	} /* end if (open) */
+	return rs ;
+}
+/* end subroutine (logzones_opener) */
+
 static int logzones_lockget(LZ *op,time_t dt,int f_read) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
 	if (op->fd < 0) {
 	    rs = logzones_fileopen(op,dt) ;
@@ -589,14 +617,14 @@ static int logzones_lockget(LZ *op,time_t dt,int f_read) noex {
 	    int		cmd ;
 
 	    if (f_read || (! op->f.writable)) {
-	        op->f.lockedread = TRUE ;
+	        op->f.lockedread = true ;
 	        cmd = F_RLOCK ;
 	    } else {
-	        op->f.lockedwrite = TRUE ;
+	        op->f.lockedwrite = true ;
 	        cmd = F_WLOCK ;
 	    }
 	    if ((rs = lockfile(op->fd,cmd,0L,fs,to)) >= 0) {
-	        struct ustat	sb ;
+	        USTAT	sb ;
 	        if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 	            f = f || (sb.st_size != op->filesize) ;
 	            f = f || (sb.st_mtime != op->mtime) ;
@@ -605,8 +633,8 @@ static int logzones_lockget(LZ *op,time_t dt,int f_read) noex {
 	                op->mtime = sb.st_mtime ;
 	            }
 	        } else {
-	            op->f.lockedread = FALSE ;
-	            op->f.lockedwrite = FALSE ;
+	            op->f.lockedread = false ;
+	            op->f.lockedwrite = false ;
 	        }
 	    } /* end if (lockfile) */
 
@@ -623,8 +651,8 @@ static int logzones_lockrelease(LZ *op) noex {
 	        cint	size = op->filesize ;
 	        rs = lockfile(op->fd,F_ULOCK,0L,size,TO_LOCK) ;
 	    }
-	    op->f.lockedread = FALSE ;
-	    op->f.lockedwrite = FALSE ;
+	    op->f.lockedread = false ;
+	    op->f.lockedwrite = false ;
 	}
 	return rs ;
 }
@@ -691,7 +719,7 @@ static int logzones_fileopen(LZ *op,time_t dt) noex {
 	if (op->fd < 0) {
 	    if ((rs = u_open(op->fname,op->oflags,op->operms)) >= 0) {
 	        op->fd = rs ;
-	        rs = uc_closeonexec(op->fd,TRUE) ;
+	        rs = uc_closeonexec(op->fd,true) ;
 	        op->opentime = dt ;
 	        if (rs < 0) {
 	            u_close(op->fd) ;
@@ -720,8 +748,8 @@ static int logzones_fileclose(LZ *op) noex {
 static int logzones_enteropen(LZ *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
-	    if (dt == 0) dt = time(NULL) ;
-	    dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
+	    dt = time(nullptr) ;
 	    rs = logzones_fileopen(op,dt) ;
 	} /* end if (valid) */
 	return rs ;
@@ -734,10 +762,10 @@ static int entry_start(LZ_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
 	if (ep && znb) {
 	    rs = SR_OK ;
 	    ep->count = 0 ;
-	    ep->znl = strnlen(znb,MIN(znl,LOGZONES_ZNAMESIZE)) ;
+	    ep->znl = strnlen(znb,min(znl,LOGZONES_ZNAMESIZE)) ;
 	    ep->off = soff ;
 	    strnwcpy(ep->znb,LOGZONES_ZNAMESIZE,znb,znl) ;
-	    cp = (st != NULL) ? st : blanks ;
+	    cp = (st != nullptr) ? st : blanks ;
 	    strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -750,7 +778,7 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	int		cl ;
 	cchar		*bp ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if (elen < 0) elen = INT_MAX ;
 
@@ -822,7 +850,7 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 	char		*bp = ebuf ;
 	char		*cp ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if (elen < 23) return SR_OVERFLOW ;
 
@@ -914,7 +942,7 @@ static bool haveoffset(int off) noex {
 }
 /* end subroutine (haveoffset) */
 
-/* return TRUE if a field matched up */
+/* return true if a field matched up */
 static bool fieldmatch(cchar *ebp,cchar *mbp,int fo,int fl) noex {
 	return (strncmp((ebp + fo),(mbp + fo),fl) == 0) ;
 }
