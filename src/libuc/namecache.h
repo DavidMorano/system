@@ -27,7 +27,7 @@
 
 
 #define	NAMECACHE		struct namecache_head
-#define	NAMECACHE_STATS		struct namecache_statistics
+#define	NAMECACHE_ST		struct namecache_statistics
 
 #define	NAMECACHE_MAGIC		0x98643167
 #define	NAMECACHE_DEFENTS	20
@@ -44,23 +44,23 @@ struct namecache_statistics {
 } ;
 
 struct namecache_head {
-	NAMECACHE_STATS	s ;
-	hdn		*dbp ;
+	hdb		*dbp ;
 	cchar		*varname ;
+	NAMECACHE_ST	s ;
 	uint		magic ;
 	int		nmax ;		/* maximum number of entries */
 	int		ttl ;		/* time-to-live (in seconds) */
 } ;
 
 typedef	NAMECACHE		namecache ;
-typedef	NAMECACHE_STATS		namecache_stats ;
+typedef	NAMECACHE_ST		namecache_st ;
 
 EXTERNC_begin
 
 extern int namecache_start(namecache *,cchar *,int,int) noex ;
 extern int namecache_add(namecache *,cchar *,cchar *,int) noex ;
 extern int namecache_lookup(namecache *,cchar *,cchar **) noex ;
-extern int namecache_stats(namecache *,namecache_stats *) noex ;
+extern int namecache_stats(namecache *,namecache_st *) noex ;
 extern int namecache_finish(namecache *) noex ;
 
 EXTERNC_end
