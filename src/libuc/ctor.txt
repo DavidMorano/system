@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mailmsgfile_ctor(mailmsgfile *op,Args ... args) noex {
+static int envmgr_ctor(envmgr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int mailmsgfile_ctor(mailmsgfile *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailmsgfile_ctor) */
+/* end subroutine (envmgr_ctor) */
 
-static int mailmsgfile_dtor(mailmsgfile *op) noex {
+static int envmgr_dtor(envmgr *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mailmsgfile_dtor) */
+/* end subroutine (envmgr_dtor) */
 
 template<typename ... Args>
-static int mailmsgfile_magic(mailmsgfile *op,Args ... args) noex {
+static int envmgr_magic(envmgr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = (op->magic == MAILMSGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mailmsgfile_magic) */
+/* end subroutine (envmgr_magic) */
 

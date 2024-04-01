@@ -32,8 +32,8 @@
 
 
 struct envmgr_head {
-	vecstr		envstrs ;
-	vechand		envlist ;
+	vechand		*listp ;
+	vecstr		*strp ;
 } ;
 
 typedef ENVMGR		envmgr ;
