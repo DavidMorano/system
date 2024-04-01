@@ -73,7 +73,7 @@
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<varnames.hh>
+#include	<ucvariables.hh>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<bfile.h>
@@ -110,18 +110,6 @@
 
 #ifndef	NSYSPIDS
 #define	NSYSPIDS	100
-#endif
-
-#ifndef	VARPRPCS
-#define	VARPRPCS	"PCS"
-#endif
-
-#ifndef	VARHOME
-#define	VARHOME		"HOME"
-#endif
-
-#ifndef	VARUSERNAME
-#define	VARUSERNAME	"USERNAME"
 #endif
 
 #ifndef	VARNAME
@@ -343,7 +331,7 @@ static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 	sip->rbuf = rbuf ;
 	sip->rlen = rlen ;
 	sip->un = un ;
-	sip->varusername = VARUSERNAME ;
+	sip->varusername = varname.username ;
 	if ((rs = maxpathlen) >= 0) {
 	    char	*pwbuf{} ;
 	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
@@ -443,10 +431,11 @@ static int getname_var(SUBINFO *sip,int nt) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	bool		f ;
+	cchar		*vn = varname.username ;
 	cchar		*un = sip->un ;
 	f = (un[0] == '-') ;
 	if (! f) {
-	    static cchar	*vun = getenv(VARUSERNAME) ;
+	    static cchar	*vun = getenv(vn) ;
 	    if ((vun != nullptr) && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
@@ -502,12 +491,9 @@ static int getname_sysdb(SUBINFO *sip,int) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-
 	if (! sip->init.pw) {
 	    rs = subinfo_getpw(sip) ;
 	}
-
-#ifdef	COMMENT /* we have two implementations */
 	if (rs >= 0) {
 	    cint	nlen = (strlen(sip->pw.pw_gecos)+10) ;
 	    cchar	*gecos = sip->pw.pw_gecos ;
@@ -521,26 +507,6 @@ static int getname_sysdb(SUBINFO *sip,int) noex {
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if */
-#else /* COMMENT */
-	if (rs >= 0) {
-	    int		gl ;
-	    cchar	*gecos = sip->pw.pw_gecos ;
-	    cchar	*gp ;
-	    if ((gl = getgecosname(gecos,-1,&gp)) > 0) {
-	        cint	nlen = (gl+10) ;
-	        char	*nbuf{} ;
-	        if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
-	            if ((rs = snwcpyhyphen(nbuf,nlen,gp,gl)) > 0) {
-	                rs = mkrealname(sip->rbuf,sip->rlen,nbuf,rs) ;
-	                len = rs ;
-	            }
-	            rs1 = uc_free(nbuf) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (memory-allocation) */
-	    } /* end if (getgecosname) */
-	} /* end if */
-#endif /* COMMENT */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_sysdb) */

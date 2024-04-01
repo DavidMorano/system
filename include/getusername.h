@@ -20,7 +20,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* <- for |uid_t| */
-#include	<pwd.h>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
