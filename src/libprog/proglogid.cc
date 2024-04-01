@@ -1,13 +1,12 @@
-/* proglogid */
+/* proglogid SUPPORT */
+/* lang=C++20 */
 
 /* process the service names given us */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_SERIAL	1		/* serial or PID */
-
 
 /* revision history:
 
@@ -20,52 +19,45 @@
 
 /*******************************************************************************
 
-        This subroutine creates a log-id for use in logging entries to a
-        log-file.
+	Name:
+
+	Description:
+	This subroutine creates a log-id for use in logging entries
+	to a log-file.
 
 	Synopsis:
-
-	int proglogid(pip)
-	PROGINFO	*pip ;
+	int proglogid(PROGINFO *pip) noex
 
 	Arguments:
-
 	pip		pointer to PROGINFO object
 
 	Returns:
-
-	<0		error
 	>=0		OK
+	<0		error (system-return)
 
 	Notes:
-
-        For programs that are actually built-in SHELL commands, the compile-time
-        switch flag CF_SERIAL must always be enabled (set to '1') so that the
-        process PID is not used. This is because the process PID will always be
-        the same for calls to built-in commands.
-
+	For programs that are actually built-in SHELL commands, the
+	compile-time switch flag CF_SERIAL must always be enabled
+	(set to '1') so that the process PID is not used. This is
+	because the process PID will always be the same for calls
+	to built-in commands.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<ugetpid.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |LOGIDLEN| */
 
-#include	"config.h"
-#include	"defs.h"
+#include	"proginfo.h"
 
 
 /* local defines */
@@ -75,20 +67,26 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	snsdd(char *,int,const char *,uint) ;
+extern int	snsd(char *,int,cchar *,uint) ;
+extern int	snsdd(char *,int,cchar *,uint) ;
 extern int	snddd(char *,int,uint,uint) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	fperm(int,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	mklogid(char *,int,const char *,int,int) ;
-extern int	getserial(const char *) ;
+extern int	mklogid(char *,int,cchar *,int,int) ;
+extern int	getserial(cchar *) ;
 extern int	isprintlatin(int) ;
 
 
@@ -104,21 +102,22 @@ extern int	isprintlatin(int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int proglogid(PROGINFO *pip)
-{
+int proglogid(PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 	int		v = -1 ;
 	int		ll = 0 ;
 
-	if (pip->pid < 0) pip->pid = ugetpid() ;
+	if (pip->pid < 0) pip->pid = uc_getpid() ;
 
 #if	CF_SERIAL
 	{
-	    const char	*sfname = SERIALFNAME ;
-	    const char	*tdn ;
+	    cchar	*sfname = SERIALFNAME ;
+	    cchar	*tdn ;
 	    char	tbuf[MAXPATHLEN + 1] ;
 
 	    tbuf[0] = '\0' ;
@@ -145,11 +144,11 @@ int proglogid(PROGINFO *pip)
 	}
 
 	if (rs >= 0) {
-	    const int	llen = LOGIDLEN ;
+	    cint	llen = LOGIDLEN ;
 	    cchar	*nn = pip->nodename ;
 	    char	lbuf[LOGIDLEN + 1] ;
 	    if ((rs = mklogid(lbuf,llen,nn,-1,v)) > 0) {
-		const char	**vpp = &pip->logid ;
+		cchar	**vpp = &pip->logid ;
 		ll = rs ;
 	        rs = proginfo_setentry(pip,vpp,lbuf,ll) ;
 	    }

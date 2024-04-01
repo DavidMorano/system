@@ -147,7 +147,7 @@ int ccfile::readln(char *ibuf,int ilen,int dch) noex {
 		    if ((rs = gcount()) <= ilen) {
 			len = rs ;
 			if (len > 0) {
-			    ibuf[len-1]= dch ;
+			    ibuf[len-1] = dch ;
 			    ibuf[len] = '\0' ;
 			}
 		    } else {
