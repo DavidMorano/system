@@ -1,11 +1,10 @@
-/* logzones */
+/* logzones SUPPORT */
+/* lang=C++20 */
 
 /* object to manipulate a LOGZONES file */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_CREAT	0		/* always create the file? */
-
 
 /* revision history:
 
@@ -18,8 +17,8 @@
 
 /*******************************************************************************
 
-        This subroutine maintains a LOGZONES file. This file is used to maintain
-        the names and offsets for time-zone names.
+	This subroutine maintains a LOGZONES file. This file is
+	used to maintain the names and offsets for time-zone names.
 
 	Format of file records:
 
@@ -39,55 +38,52 @@
 
 	Philosophy of implementation:
 
-	We are not indexing the file (sigh).  Actually, many of these little
-	shared database files have used indexing in the past and it wasn't
-	worth the effort!  The time-zone names and possible offsets (a
-	name-offset pair) serve as the key to the database.  These (pairs)
-	 are finite in the world.  Ya, maybe there are way too many more than
-	you would like but the number isn't worth jumping through hoops to make
-	this little thing as fast as possible.  So, we just search the whole
-	database file linearly when we have to find a name-offset match.  We
-	are also not caching any entries either.  So we just search it again
-	whenever we need to.  Now don't get your underwear in a bunch over
-	this.
+	We are not indexing the file (sigh).  Actually, many of
+	these little shared database files have used indexing in
+	the past and it wasn't worth the effort!  The time-zone
+	names and possible offsets (a name-offset pair) serve as
+	the key to the database.  These (pairs) are finite in the
+	world.  Ya, maybe there are way too many more than you would
+	like but the number isn't worth jumping through hoops to
+	make this little thing as fast as possible.  So, we just
+	search the whole database file linearly when we have to
+	find a name-offset match.  We are also not caching any
+	entries either.  So we just search it again whenever we
+	need to.  Now don't get your underwear in a bunch over this.
 
-	Also, we do compaisons of fields in their ASCII string form.  Other
-	things like this always did comparisons in their logical binary forms,
-	but those are actually much slower since the ASCII forms needs to be
-	converted to binary form for all entries examined.  By doing the
-	comparison in string form, only the search key entry needs to be
-	converted to string for for a search!
+	Also, we do compaisons of fields in their ASCII string form.
+	Other things like this always did comparisons in their
+	logical binary forms, but those are actually much slower
+	since the ASCII forms needs to be converted to binary form
+	for all entries examined.  By doing the comparison in string
+	form, only the search key entry needs to be converted to
+	string for for a search!
 
-	Note also that the 'update()' method takes a string argument called the
-	'stamp'.  This is meant to be a time stamp in regular LOGZ format.
-	However, this format is NOT enforced at all and isn't even examined.
-	It is blindly written into the 'stamp' field of an entry (a field
-	trailing all other fields).  Only the length of the stamp passed is
-	constrained.  Due to possible abuse, this field may be of limited value
+	Note also that the 'update()' method takes a string argument
+	called the 'stamp'.  This is meant to be a time stamp in
+	regular LOGZ format.  However, this format is NOT enforced
+	at all and isn't even examined.  It is blindly written into
+	the 'stamp' field of an entry (a field trailing all other
+	fields).  Only the length of the stamp passed is constrained.
+	Due to possible abuse, this field may be of limited value
 	if examining it from other writters.
-
 
 *******************************************************************************/
 
-
-#define	LOGZONES_MASTER		0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<netdb.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"logzones.h"
@@ -117,20 +113,26 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	isfsremote(int) ;
 extern int	isdigitlatin(int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strnwcpy(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpyuc(char *,cchar *,int) ;
+extern char	*strnwcpy(char *,int,cchar *,int) ;
 
 
 /* external variables */
@@ -141,50 +143,40 @@ extern char	*strnwcpy(char *,int,const char *,int) ;
 
 /* forward references */
 
-static int	logzones_fileopen(LOGZONES *,time_t) ;
-static int	logzones_fileclose(LOGZONES *) ;
-static int	logzones_lockget(LOGZONES *,time_t,int) ;
-static int	logzones_lockrelease(LOGZONES *) ;
-static int	logzones_search(LOGZONES *,char *,int,int,char **) ;
-static int	logzones_enteropen(LOGZONES *,time_t) ;
+static int	logzones_fileopen(LOGZONES *,time_t) noex ;
+static int	logzones_fileclose(LOGZONES *) noex ;
+static int	logzones_lockget(LOGZONES *,time_t,int) noex ;
+static int	logzones_lockrelease(LOGZONES *) noex ;
+static int	logzones_search(LOGZONES *,char *,int,int,char **) noex ;
+static int	logzones_enteropen(LOGZONES *,time_t) noex ;
 
-static int entry_start(LOGZONES_ENT *,const char *,int,int,const char *) ;
-static int entry_startbuf(LOGZONES_ENT *,const char *,int) ;
-static int entry_update(LOGZONES_ENT *,const char *) ;
-static int entry_write(LOGZONES_ENT *,char *,int) ;
-static int entry_finish(LOGZONES_ENT *) ;
+static int entry_start(LOGZONES_ENT *,cchar *,int,int,cchar *) noex ;
+static int entry_startbuf(LOGZONES_ENT *,cchar *,int) noex ;
+static int entry_update(LOGZONES_ENT *,cchar *) noex ;
+static int entry_write(LOGZONES_ENT *,char *,int) noex ;
+static int entry_finish(LOGZONES_ENT *) noex ;
 
-static int	haveoffset(int) ;
-static int	fieldmatch(const char *,const char *,int,int) ;
+static bool	haveoffset(int) noex ;
+static bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 
 
 /* local variables */
 
-static const char	blanks[] = "                       " ;
+static cchar	blanks[] = "                       " ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int logzones_open(LOGZONES *op,cchar *fname,int oflags,mode_t operms)
-{
+int logzones_open(LOGZONES *op,cchar *fname,int oflags,mode_t operms) noex {
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_open: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (fname == NULL) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_open: oflags=%4o\n",oflags) ;
-	debugprintf("logzones_open: fname=%s\n",fname) ;
-	if (oflags & O_CREAT)
-	    debugprintf("logzones_open: creating as needed\n") ;
-#endif
 
 	op->magic = 0 ;
 	op->mtime = 0 ;
@@ -206,18 +198,18 @@ int logzones_open(LOGZONES *op,cchar *fname,int oflags,mode_t operms)
 	        op->oflags = (oflags &= (~ O_TRUNC)) ;
 	        op->operms = operms ;
 	        if ((rs = uc_closeonexec(op->fd,TRUE)) >= 0) {
-	            const int	am = (oflags & O_ACCMODE) ;
+	            cint	am = (oflags & O_ACCMODE) ;
 	            op->f.writable = ((am == O_WRONLY) || (am == O_RDWR)) ;
 	            op->opentime = dt ;
 	            op->accesstime = dt ;
 	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	                const int	n = LOGZONES_NENTS ;
-	                const int	entlen = LOGZONES_ENTLEN ;
+	                cint	n = LOGZONES_NENTS ;
+	                cint	entlen = LOGZONES_ENTLEN ;
 	                op->mtime = sb.st_mtime ;
 	                op->filesize = sb.st_size ;
 	                op->pagesize = getpagesize() ;
 	                if ((rs = isfsremote(op->fd)) >= 0) {
-	                    const int	size = (n * entlen) ;
+	                    cint	size = (n * entlen) ;
 	                    char	*bp ;
 	                    op->f.remote = (rs > 0) ;
 	                    if ((rs = uc_malloc(size,&bp)) >= 0) {
@@ -243,15 +235,9 @@ int logzones_open(LOGZONES *op,cchar *fname,int oflags,mode_t operms)
 }
 /* end subroutine (logzones_open) */
 
-
-int logzones_close(LOGZONES *op)
-{
+int logzones_close(LOGZONES *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_close: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -280,11 +266,8 @@ int logzones_close(LOGZONES *op)
 }
 /* end subroutine (logzones_close) */
 
-
 /* initialize a cursor */
-int logzones_curbegin(LOGZONES *op,LOGZONES_CUR *curp)
-{
-
+int logzones_curbegin(LOGZONES *op,LOGZONES_CUR *curp) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
@@ -298,10 +281,7 @@ int logzones_curbegin(LOGZONES *op,LOGZONES_CUR *curp)
 }
 /* end subroutine (logzones_curbegin) */
 
-
-/* free up a cursor */
-int logzones_curend(LOGZONES *op,LOGZONES_CUR *curp)
-{
+int logzones_curend(LOGZONES *op,LOGZONES_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -327,10 +307,7 @@ int logzones_curend(LOGZONES *op,LOGZONES_CUR *curp)
 }
 /* end subroutine (logzones_curend) */
 
-
-/* enumerate the entries */
-int logzones_enum(LOGZONES *op,LOGZONES_CUR *curp,LOGZONES_ENT *ep)
-{
+int logzones_enum(LOGZONES *op,LOGZONES_CUR *curp,LOGZONES_ENT *ep) noex {
 	time_t		dt = 0 ;
 	int		rs = SR_OK ;
 	int		ei = 0 ;
@@ -356,7 +333,7 @@ int logzones_enum(LOGZONES *op,LOGZONES_CUR *curp,LOGZONES_ENT *ep)
 	        }
 	        if (rs >= 0) {
 	            uint	eoff ;
-	            const int	ebl = LOGZONES_ENTLEN ;
+	            cint	ebl = LOGZONES_ENTLEN ;
 	            char	ebp[LOGZONES_ENTLEN + 1] ;
 	            ei = (curp->i < 0) ? 0 : (curp->i + 1) ;
 	            eoff = (ei * ebl) ;
@@ -389,15 +366,11 @@ int logzones_match(LOGZONES *op,cchar *znb,int znl,int off,LOGZONES_ENT *ep)
 {
 	LOGZONES_ENT	e ;
 	const time_t	dt = time(NULL) ;
-	const int	ebl = LOGZONES_ENTLEN ;
+	cint	ebl = LOGZONES_ENTLEN ;
 	int		rs ;
 	int		ei ;
 	char		ebp[LOGZONES_ENTLEN + 1] ;
 	char		*bp ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_match: ent\n") ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (znb == NULL) return SR_FAULT ;
@@ -462,45 +435,24 @@ int logzones_update(LOGZONES *op,cchar *znb,int znl,int off,cchar *st)
 {
 	LOGZONES_ENT	e ;
 	const time_t	dt = time(NULL) ;
-	const int	ebl = LOGZONES_ENTLEN ;
+	cint	ebl = LOGZONES_ENTLEN ;
 	int		rs ;
 	int		ei ;
 	char		ebp[LOGZONES_ENTLEN + 1] ;
 	char		*bp ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_update: ent znb=>%t< off=%d\n",
-	    znb,strnlen(znb,znl),off) ;
-	debugprintf("logzones_update: st=%s\n",st) ;
-	debugprintf("logzones_update: filesize=%u\n",op->filesize) ;
-#endif
 
 	if (op == NULL) return SR_FAULT ;
 	if (znb == NULL) return SR_FAULT ;
 
 	if (op->magic != LOGZONES_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("logzones_update: writable?\n") ;
-#endif
-
 	if (! op->f.writable) return SR_RDONLY ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_update: writable? => YES\n") ;
-#endif
 
 /* is the file open */
 
 	if ((rs = logzones_enteropen(op,dt)) >= 0) {
 
 /* capture the lock if we do not already have it */
-
-#if	CF_DEBUGS
-	    debugprintf("logzones_update: check lock, filesize=%u\n",
-	        op->filesize) ;
-#endif
-
 /* lose any READ lock (we need a WRITE lock) */
 
 	    if (op->f.lockedread) {
@@ -521,10 +473,6 @@ int logzones_update(LOGZONES *op,cchar *znb,int znl,int off,cchar *st)
 	        if (! op->f.lockedwrite) {
 	            rs = logzones_lockget(op,dt,0) ;
 	        }
-
-#if	CF_DEBUGS
-	        debugprintf("logzones_update: filesize=%u\n",op->filesize) ;
-#endif
 
 /* we do comparisons in "string" representation form (much faster !) */
 
@@ -547,11 +495,6 @@ int logzones_update(LOGZONES *op,cchar *znb,int znl,int off,cchar *st)
 
 /* found existing entry (update in memory) */
 
-#if	CF_DEBUGS
-	                debugprintf("logzones_update: entry eoff=%u\n",
-			eoff) ;
-#endif
-
 	                if ((rs = entry_startbuf(&e,bp,ebl)) >= 0) {
 
 	                    entry_update(&e,st) ;
@@ -561,11 +504,6 @@ int logzones_update(LOGZONES *op,cchar *znb,int znl,int off,cchar *st)
 /* write into the actual memory window */
 
 	                    rs = u_pwrite(op->fd,ebp,ebl,eoff) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("logzones_update: u_pwrite() rs=%d\n",
-				rs) ;
-#endif
 
 /* ok, we're done */
 
@@ -577,27 +515,13 @@ int logzones_update(LOGZONES *op,cchar *znb,int znl,int off,cchar *st)
 
 	                ei = op->filesize / ebl ;
 
-#if	CF_DEBUGS
-	                debugprintf("logzones_update: need new entry \n") ;
-#endif
-
 	                if ((rs = entry_start(&e,znb,znl,off,NULL)) >= 0) {
 
 	                    entry_update(&e,st) ;
 
 	                    entry_write(&e,ebp,ebl) ;
 
-#if	CF_DEBUGS
-	                    debugprintf("logzones_update: u_pwrite() off=%u\n",
-	                        op->filesize) ;
-#endif
-
 	                    rs = u_pwrite(op->fd,ebp,ebl,op->filesize) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("logzones_update: u_pwrite() rs=%d\n",
-				rs) ;
-#endif
 
 	                    if ((rs >= 0) && (rs == ebl)) {
 	                        op->filesize += ebl ;
@@ -662,29 +586,17 @@ int logzones_check(LOGZONES *op,time_t dt)
 
 /* private subroutines */
 
-
-/* lock the file */
-static int logzones_lockget(LOGZONES *op,time_t dt,int f_read)
-{
+static int logzones_lockget(LOGZONES *op,time_t dt,int f_read) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones_lockget: ent\n") ;
-#endif
 
 	if (op->fd < 0) {
 	    rs = logzones_fileopen(op,dt) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("logzones_lockget: logzones_fileopen() rs=%d fd=%d\n",
-	    rs,op->fd) ;
-#endif
-
 	if (rs >= 0) {
 	    off_t	fs = op->filesize ;
-	    const int	to = TO_LOCK ;
+	    cint	to = TO_LOCK ;
 	    int		cmd ;
 
 	    if (f_read || (! op->f.writable)) {
@@ -711,10 +623,6 @@ static int logzones_lockget(LOGZONES *op,time_t dt,int f_read)
 
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("logzones_lockget: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (logzones_lockget) */
@@ -725,7 +633,7 @@ static int logzones_lockrelease(LOGZONES *op)
 	int		rs = SR_OK ;
 	if (op->f.lockedread || op->f.lockedwrite) {
 	    if (op->fd >= 0) {
-	        const int	size = op->filesize ;
+	        cint	size = op->filesize ;
 	        rs = lockfile(op->fd,F_ULOCK,0L,size,TO_LOCK) ;
 	    }
 	    op->f.lockedread = FALSE ;
@@ -743,14 +651,14 @@ static int logzones_search(LOGZONES *op,char *ebp,int ebl,int soff,char **rpp)
 	if ((rs = u_seek(op->fd,0L,SEEK_SET)) >= 0) {
 	    uint	off = 0 ;
 	    uint	eoff = 0 ;
-	    const int	efo = EFO_OFFSET ;
-	    const int	efl = EFL_OFFSET ;
+	    cint	efo = EFO_OFFSET ;
+	    cint	efl = EFL_OFFSET ;
 	    int		ne = 0 ;
 	    int		ei = 0 ;
 	    int		i = 1 ;
 	    char	*bp ;
 	    while ((rs = u_read(op->fd,op->buf,op->bufsize)) > 0) {
-	        const int	len = rs ;
+	        cint	len = rs ;
 	        ne = (len / ebl) ;
 	        for (i = 0 ; i < ne ; i += 1) {
 
@@ -794,13 +702,8 @@ static int logzones_search(LOGZONES *op,char *ebp,int ebl,int soff,char **rpp)
 }
 /* end subroutine (logzones_search) */
 
-
-static int logzones_fileopen(LOGZONES *op,time_t dt)
-{
+static int logzones_fileopen(LOGZONES *op,time_t dt) noex {
 	int		rs ;
-#if	CF_DEBUGS
-	debugprintf("logzones_fileopen: ent fname=%s\n",op->fname) ;
-#endif
 	if (op->fd < 0) {
 	    if ((rs = u_open(op->fname,op->oflags,op->operms)) >= 0) {
 	        op->fd = rs ;
@@ -818,9 +721,7 @@ static int logzones_fileopen(LOGZONES *op,time_t dt)
 }
 /* end subroutine (logzones_fileopen) */
 
-
-static int logzones_fileclose(LOGZONES *op)
-{
+static int logzones_fileclose(LOGZONES *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -832,48 +733,38 @@ static int logzones_fileclose(LOGZONES *op)
 }
 /* end subroutine (logzones_fileclose) */
 
-
-static int logzones_enteropen(LOGZONES *op,time_t dt)
-{
+static int logzones_enteropen(LOGZONES *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if (dt == 0) dt = time(NULL) ;
 	    dt = time(NULL) ;
 	    rs = logzones_fileopen(op,dt) ;
-	}
+	} /* end if (valid) */
 	return rs ;
 }
 /* end subroutine (logzones_enteropen) */
 
-
-/* initialize a fresh entry */
-static int entry_start(LOGZONES_ENT *ep,cchar *znb,int znl,int soff,cchar *st)
-{
+static int entry_start(LOGZONES_ENT *ep,cc *znb,int znl,int soff,cc *st) noex {
+	int		rs = SR_FAULT ;
 	cchar		*cp ;
-
-	if (ep == NULL) return SR_FAULT ;
-	if (znb == NULL) return SR_FAULT ;
-
-	ep->count = 0 ;
-	ep->znl = strnlen(znb,MIN(znl,LOGZONES_ZNAMESIZE)) ;
-
-	ep->off = soff ;
-	strnwcpy(ep->znb,LOGZONES_ZNAMESIZE,znb,znl) ;
-
-	cp = (st != NULL) ? st : blanks ;
-	strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
-
-	return SR_OK ;
+	if (ep && znb) {
+	    rs = SR_OK ;
+	    ep->count = 0 ;
+	    ep->znl = strnlen(znb,MIN(znl,LOGZONES_ZNAMESIZE)) ;
+	    ep->off = soff ;
+	    strnwcpy(ep->znb,LOGZONES_ZNAMESIZE,znb,znl) ;
+	    cp = (st != NULL) ? st : blanks ;
+	    strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_startbuf(LOGZONES_ENT *ep,cchar *ebuf,int elen)
-{
+static int entry_startbuf(LOGZONES_ENT *ep,cchar *ebuf,int elen) noex {
 	uint		uv ;
 	int		rs ;
 	int		cl ;
-	const char	*bp ;
+	cchar		*bp ;
 
 	if (ep == NULL) return SR_FAULT ;
 
@@ -885,7 +776,7 @@ static int entry_startbuf(LOGZONES_ENT *ep,cchar *ebuf,int elen)
 	if ((rs = cfdecui(bp,EFL_COUNT,&uv)) >= 0) {
 	    int		i ;
 	    int		hours, mins, sign ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    ep->count = uv ;
 
@@ -901,7 +792,7 @@ static int entry_startbuf(LOGZONES_ENT *ep,cchar *ebuf,int elen)
 /* do we have an offset? */
 
 	    for (i = 0 ; i < 4 ; i += 1) {
-	        const int	ch = MKCHAR(bp[i]) ;
+	        cint	ch = MKCHAR(bp[i]) ;
 	        if (! isdigitlatin(ch)) break ;
 	    } /* end for */
 
@@ -926,21 +817,18 @@ static int entry_startbuf(LOGZONES_ENT *ep,cchar *ebuf,int elen)
 }
 /* end subroutine (entry_startbuf) */
 
-
-static int entry_update(LOGZONES_ENT *ep,cchar *st)
-{
-	const char	*cp ;
-
-	if (ep == NULL) return SR_FAULT ;
-
-	ep->count += 1 ;
-	cp = (st != NULL) ? st : blanks ;
-	strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
-
-	return SR_OK ;
+static int entry_update(LOGZONES_ENT *ep,cchar *st) noex {
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    cchar	*cp ;
+	    rs = SR_OK ;
+	    ep->count += 1 ;
+	    cp = (st) ? st : blanks ;
+	    strncpy(ep->st,cp,LOGZONES_STAMPSIZE) ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_update) */
-
 
 /* write out this entry to a buffer */
 static int entry_write(LOGZONES_ENT *ep,char *ebuf,int elen)
@@ -1030,43 +918,23 @@ static int entry_write(LOGZONES_ENT *ep,char *ebuf,int elen)
 }
 /* end subroutine (entry_write) */
 
-
-/* free up an entry */
-static int entry_finish(LOGZONES_ENT *ep)
-{
-
-	if (ep == NULL) return SR_FAULT ;
-
-	return SR_OK ;
+static int entry_finish(LOGZONES_ENT *ep) noex {
+	int		rs = SR_FAULT ;
+	if (ep) {
+	    rs = SR_OK ;
+	}
+	return rs ;
 }
 /* end subroutine (entry_finish) */
 
-
-static int haveoffset(int off)
-{
-
+static bool haveoffset(int off) noex {
 	return (abs(off) <= (12 * 60)) ;
 }
 /* end subroutine (haveoffset) */
 
-
 /* return TRUE if a field matched up */
-static int fieldmatch(cchar *ebp,cchar *mbp,int fo,int fl)
-{
-	int		f ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones/fieldmatch: ebp=>%t< mbp=>%t<\n",
-	    (ebp + fo),fl,(mbp + fo),fl) ;
-#endif
-
-	f = (strncmp((ebp + fo),(mbp + fo),fl) == 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("logzones/fieldmatch: ret f=%d\n",f) ;
-#endif
-
-	return f ;
+static bool fieldmatch(cchar *ebp,cchar *mbp,int fo,int fl) noex {
+	return (strncmp((ebp + fo),(mbp + fo),fl) == 0) ;
 }
 /* end subroutine (fieldmatch) */
 

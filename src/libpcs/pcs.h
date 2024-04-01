@@ -24,10 +24,11 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
-#include	<pcsopendircache.h>
 #include	<pcsconf.h>
 #include	<pcsconf_config.h>
 #include	<pcsconfs.h>
+#include	<pcsopendircache.h>
+#include	<pcsngdname.h>
 #include	<pcsgetnames.h>
 #include	<pcsmsg.h>
 #include	<pcsns.h>

@@ -1,6 +1,8 @@
-/* logzones */
+/* logzones HEADER */
+/* lang=C++20 */
 
 /* log timezone names */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,21 +15,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	LOGZONES_INCLUDE
-#define	LOGZONES_INCLUDE	1
+#define	LOGZONES_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
-/* object defines */
-
 #define	LOGZONES		struct logzones_head
-#define	LOGZONES_ENT		struct logzones_e
-#define	LOGZONES_CUR		struct logzones_c
+#define	LOGZONES_ENT		struct logzones_entry
+#define	LOGZONES_CUR		struct logzones_cursor
 #define	LOGZONES_FL		struct logzones_flags
 
 #define	LOGZONES_MAGIC		91824563
@@ -38,7 +38,7 @@
 #define	LOGZONES_NOZONEOFFSET	(13 * 60)
 
 
-struct logzones_e {
+struct logzones_entry {
 	uint		count ;
 	short		off ;
 	short		znl ;
@@ -57,46 +57,43 @@ struct logzones_flags {
 } ;
 
 struct logzones_head {
-	uint		magic ;
-	const char	*fname ;
+	cchar		*fname ;
 	char		*buf ;
-	LOGZONES_FL	f ;
 	time_t		opentime ;		/* file open time */
 	time_t		accesstime ;		/* file access time */
 	time_t		mtime ;			/* file modification time */
-	mode_t		operms ;
+	LOGZONES_FL	f ;
+	uint		magic ;
 	int		oflags ;
 	int		pagesize ;
 	int		filesize ;
 	int		bufsize ;
 	int		fd ;
+	mode_t		operms ;
 } ;
 
-struct logzones_c {
+struct logzones_cursor {
 	int		i ;
 } ;
 
+typedef LOGZONES	logzones ;
+typedef	LOGZONES_ENT	logzones_ent ;
+typedef	LOGZONES_CUR	logzones_cur ;
+typedef	LOGZONES_FL	logzones_fl ;
 
-#if	(! defined(LOGZONES_MASTER)) || (LOGZONES_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int logzones_open(LOGZONES *,cchar *,int,mode_t) noex ;
+extern int logzones_curbegin(LOGZONES *,LOGZONES_CUR *) noex ;
+extern int logzones_curend(LOGZONES *,LOGZONES_CUR *) noex ;
+extern int logzones_enum(LOGZONES *,LOGZONES_CUR *,LOGZONES_ENT *) noex ;
+extern int logzones_match(LOGZONES *,cchar *,int,int,LOGZONES_ENT *) noex ;
+extern int logzones_update(LOGZONES *,cchar *,int,int,cchar *) noex ;
+extern int logzones_check(LOGZONES *,time_t) noex ;
+extern int logzones_close(LOGZONES *) noex ;
 
-extern int logzones_open(LOGZONES *,const char *,int,mode_t) ;
-extern int logzones_curbegin(LOGZONES *,LOGZONES_CUR *) ;
-extern int logzones_curend(LOGZONES *,LOGZONES_CUR *) ;
-extern int logzones_enum(LOGZONES *,LOGZONES_CUR *,LOGZONES_ENT *) ;
-extern int logzones_match(LOGZONES *,const char *,int,int,LOGZONES_ENT *) ;
-extern int logzones_update(LOGZONES *,const char *,int,int,const char *) ;
-extern int logzones_check(LOGZONES *,time_t) ;
-extern int logzones_close(LOGZONES *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* LOGZONES_MASTER */
 
 #endif /* LOGZONES_INCLUDE */
 
