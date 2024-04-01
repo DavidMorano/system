@@ -192,12 +192,12 @@ struct subinfo {
 	cchar		*varusername ;
 	cchar		*un ;
 	char		*rbuf ;		/* user supplied buffer */
-	SUBINFO_FL	init, f ;
+	char		*pwbuf ;
 	PASSWD		pw ;
+	SUBINFO_FL	init, f ;
 	uid_t		uid ;
 	int		rlen ;
 	int		pwlen ;
-	char		*pwbuf ;
 } ;
 
 struct pcsnametype {
@@ -226,7 +226,9 @@ static int	getprojinfo_pcsdef(SUBINFO *) noex ;
 
 /* local variables */
 
-static constexpr int	(*getprojinfos[])(SUBINFO *) = {
+typedef int (*projinfo_f)(SUBINFO *) noex ;
+
+static constexpr projinfo_f	getprojinfos[] = {
 	getprojinfo_userhome,
 	getprojinfo_sysdb,
 	getprojinfo_pcsdef,
@@ -239,7 +241,9 @@ static constexpr struct pcsnametype	pcsnametypes[] = {
 	{ nullptr, nullptr }
 } ;
 
-static constexpr int	(*getnames[])(SUBINFO *,int) = {
+typedef int (*nameinfo_f)(SUBINFO *,int) noex ;
+
+static constexpr nameinfo_f	getnames[] = {
 	getname_var,
 	getname_userhome,
 	getname_again,
@@ -288,9 +292,9 @@ int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int nt) noex {
 	int		rl = 0 ;
 	if (pr && rbuf && un) {
 	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
 	    if (pr[0] && un[0] && (nt < pcsnametype_overlast)) {
 	        SUBINFO		si ;
-	        rbuf[0] = '\0' ;
 	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,un)) >= 0) {
 	            {
 	                rs = getname(&si,nt) ;
@@ -311,27 +315,24 @@ int pcsgetprojinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 /* end subroutine (pcsgetprojinfo) */
 
 int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
-	SUBINFO		mi ;
-	int		rs ;
-
-	if (pr == nullptr)
-	    pr = getenv(VARPRPCS) ;
-
-	if (pr == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-	if (username == nullptr) return SR_FAULT ;
-
-	if (username[0] == '\0') return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = subinfo_start(&mi,pr,rbuf,rlen,username)) >= 0) {
-	    for (int i = 0 ; getprojinfos[i] != nullptr ; i += 1) {
-	        rs = (*getprojinfos[i])(&mi) ;
-	        if (rs != 0) break ;
-	    } /* end for */
-	    subinfo_finish(&mi) ;
-	} /* end if */
-
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (pr && rbuf && username) {
+	    rs = SR_INVALID ;
+	    rbuf[0] = '\0' ;
+	    if (username[0]) {
+	        SUBINFO		mi ;
+	        if ((rs = subinfo_start(&mi,pr,rbuf,rlen,username)) >= 0) {
+	            for (int i = 0 ; getprojinfos[i] ; i += 1) {
+			projinfo_f	fn = getprojinfos[i] ;
+	                rs = fn(&mi) ;
+	                if (rs != 0) break ;
+	            } /* end for */
+	            rs1 = subinfo_finish(&mi) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (pcsprojectinfo) */
@@ -436,8 +437,9 @@ static int getname(SUBINFO *sip,int nt) noex {
 	int		rs = SR_BUGCHECK ;
 	if (nt < pcsnametype_overlast) {
 	    sip->rbuf[0] = '\0' ;
-	    for (int i = 0 ; getnames[i] != nullptr ; i += 1) {
-	        rs = (*getnames[i])(sip,nt) ;
+	    for (int i = 0 ; getnames[i] ; i += 1) {
+	        nameinfo_f	fn = getnames[i] ;
+	        rs = fn(sip,nt) ;
 	        if (rs != 0) break ;
 	    } /* end for */
 	} /* end if (ok) */
@@ -602,21 +604,26 @@ static int getprojinfo_sysdb(SUBINFO *sip) noex {
 
 static int getprojinfo_pcsdef(SUBINFO *sip) noex {
 	uid_t		uid ;
-	int		rs = SR_OK ;
+	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-
 	if ((rs = subinfo_getuid(sip,&uid)) >= 0) {
 	    if (uid >= NSYSPIDS) {
 	        cchar	*fname = PCSDPIFNAME ;
-	        char	tbuf[MAXPATHLEN + 1] ;
-	        if ((rs = mkpath2(tbuf,sip->pr,fname)) >= 0) {
-		    cint	rlen = sip->rlen ;
-		    char	*rbuf = sip->rbuf ;
-	            if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
-	                len = rs ;
-		    } else if (isNotPresent(rs)) 
-			rs = SR_OK ;
-	        }
+	        char	*tbuf{} ;
+		if ((rs = malloc_mp(&tbuf)) >= 0) {
+	            if ((rs = mkpath2(tbuf,sip->pr,fname)) >= 0) {
+		        cint	rlen = sip->rlen ;
+		        char	*rbuf = sip->rbuf ;
+	                if ((rs = filereadln(tbuf,rbuf,rlen)) >= 0) {
+	                    len = rs ;
+		        } else if (isNotPresent(rs)) {
+			    rs = SR_OK ;
+		        }
+	            } /* end if (mkpath) */
+		    rs1 = uc_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    } /* end if (system UID) */
 	} /* end if */
 
