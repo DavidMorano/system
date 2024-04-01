@@ -484,7 +484,7 @@ static int getname_userhome(SUBINFO *sip ,int nt) noex {
 	    rs1 = uc_free(a) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	return rs ;
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getname_userhome) */
 
@@ -601,7 +601,7 @@ static int getprojinfo_sysdb(SUBINFO *sip) noex {
 	    }
 	    rs1 = uc_free(pjbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (memory-allocation) */
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_sysdb) */
@@ -630,7 +630,6 @@ static int getprojinfo_pcsdef(SUBINFO *sip) noex {
 		} /* end if (m-a-f) */
 	    } /* end if (system UID) */
 	} /* end if */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_pcsdef) */
