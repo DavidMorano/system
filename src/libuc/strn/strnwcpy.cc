@@ -24,11 +24,11 @@
 	zero-fills out any remainder of the destiation string buffer
 	which is not otherwise filled up by characters from the
 	source string) but it takes a counted string for the source
-	rather than only a NUL-terminated string. The arguments to
-	this are also different than from 'strncpy(3c)'. It also
+	rather than only a NUL-terminated string.  The arguments to
+	this are also different than from |strncpy(3c)|.  It also
 	returns a pointer to the end of the filled in (non-NUL)
 	part of the destination string (created) rather than to the
-	beginning of it. No NUL character is placed at the end
+	beginning of it.  No NUL character is placed at the end
 	(overlast-end) of the destination string.
 
 	Synopsis:
@@ -62,9 +62,19 @@
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local variables */
 
 
 /* external subroutines */

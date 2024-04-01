@@ -48,6 +48,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -88,6 +94,9 @@ static constexpr cchar	*localfs[] = {
 	"autofs",
 	nullptr
 } ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
