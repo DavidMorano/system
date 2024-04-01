@@ -371,7 +371,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 static int subinfo_getuid(SUBINFO *sip,uid_t *uidp) noex {
 	int		rs = SR_OK ;
 	if (! sip->init.uid) {
-	    cchar	*cp = getenv(sip->varusername) ;
+	    static cchar	*cp = getenv(sip->varusername) ;
 	    sip->init.uid = true ;
 	    if ((cp != nullptr) && (strcmp(cp,sip->un) == 0)) {
 	        sip->f.uid = true ;
@@ -442,16 +442,16 @@ static int getname(SUBINFO *sip,int nt) noex {
 static int getname_var(SUBINFO *sip,int nt) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
-	int		f ;
+	bool		f ;
 	cchar		*un = sip->un ;
 	f = (un[0] == '-') ;
 	if (! f) {
-	    cchar	*vun = getenv(VARUSERNAME) ;
+	    static cchar	*vun = getenv(VARUSERNAME) ;
 	    if ((vun != nullptr) && (vun[0] != '\0'))
 	        f = (strcmp(vun,un) == 0) ;
 	}
 	if (f) {
-	    cchar	*cp = getenv(pcsnametypes[nt].var) ;
+	    static cchar	*cp = getenv(pcsnametypes[nt].var) ;
 	    if ((cp != nullptr) && (cp[0] != '\0')) {
 	        rs = sncpy1(sip->rbuf,sip->rlen,cp) ;
 		len = rs ;
