@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int envmgr_ctor(envmgr *op,Args ... args) noex {
+static int namecache_ctor(namecache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int envmgr_ctor(envmgr *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (envmgr_ctor) */
+/* end subroutine (namecache_ctor) */
 
-static int envmgr_dtor(envmgr *op) noex {
+static int namecache_dtor(namecache *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (envmgr_dtor) */
+/* end subroutine (namecache_dtor) */
 
 template<typename ... Args>
-static int envmgr_magic(envmgr *op,Args ... args) noex {
+static int namecache_magic(namecache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MAILMSGFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == NAMECACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (envmgr_magic) */
+/* end subroutine (namecache_magic) */
 

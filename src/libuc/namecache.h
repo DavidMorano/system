@@ -1,4 +1,8 @@
-/* namecache */
+/* namecache HEADER */
+/* lang=C20 */
+
+/* real-name cache (from UNIX® System PASSWD database) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,19 +15,19 @@
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	NAMECACHE_INCLUDE
-#define	NAMECACHE_INCLUDE	1
+#define	NAMECACHE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<hdb.h>
 #include	<localmisc.h>
 
 
 #define	NAMECACHE		struct namecache_head
-#define	NAMECACHE_STATS		struct namecache_s
+#define	NAMECACHE_STATS		struct namecache_statistics
 
 #define	NAMECACHE_MAGIC		0x98643167
 #define	NAMECACHE_DEFENTS	20
@@ -31,7 +35,7 @@
 #define	NAMECACHE_DEFTO		(5 * 60)
 
 
-struct namecache_s {
+struct namecache_statistics {
 	uint		nentries ;
 	uint		total ;			/* access */
 	uint		refreshes ;
@@ -40,32 +44,27 @@ struct namecache_s {
 } ;
 
 struct namecache_head {
-	uint		magic ;
 	NAMECACHE_STATS	s ;
-	HDB		db ;
-	const char	*varname ;
-	int		max ;		/* maximum number of entries */
+	hdn		*dbp ;
+	cchar		*varname ;
+	uint		magic ;
+	int		nmax ;		/* maximum number of entries */
 	int		ttl ;		/* time-to-live (in seconds) */
 } ;
 
+typedef	NAMECACHE		namecache ;
+typedef	NAMECACHE_STATS		namecache_stats ;
 
-#if	(! defined(NAMECACHE_MASTER)) || (NAMECACHE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int namecache_start(namecache *,cchar *,int,int) noex ;
+extern int namecache_add(namecache *,cchar *,cchar *,int) noex ;
+extern int namecache_lookup(namecache *,cchar *,cchar **) noex ;
+extern int namecache_stats(namecache *,namecache_stats *) noex ;
+extern int namecache_finish(namecache *) noex ;
 
-extern int namecache_start(NAMECACHE *,const char *,int,int) ;
-extern int namecache_add(NAMECACHE *,const char *,const char *,int) ;
-extern int namecache_lookup(NAMECACHE *,const char *,const char **) ;
-extern int namecache_stats(NAMECACHE *,NAMECACHE_STATS *) ;
-extern int namecache_finish(NAMECACHE *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* NAMECACHE_MASTER */
 
 #endif /* NAMECACHE_INCLUDE */
 
