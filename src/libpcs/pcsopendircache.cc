@@ -117,6 +117,7 @@ namespace {
 
 static int procdname(cchar *,int) noex ;
 static int procdnamer(cchar *) noex ;
+static int procdiffers(vecpstr *,cchar *) noex ;
 static int procdiffer(vecpstr *,cchar *) noex ;
 static int procdircache(vecpstr *,cchar *) noex ;
 static int procdircacher(vecpstr *,cchar *) noex ;
@@ -140,9 +141,11 @@ int pcsopendircache(cchar *pr,cchar *ndname,int of,mode_t om,int ttl) noex {
 	if (pr && ndname) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && ndname[0]) {
-		dirhelp		ho(pr,ndname,of,om,ttl) ;
-		rs = ho ;
-		fd = rs ;
+		if ((rs = maxpathlen) >= 0) {
+		    dirhelp	ho(pr,ndname,of,om,ttl) ;
+		    rs = ho ;
+		    fd = rs ;
+		} /* end if (maxpathlen) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
@@ -246,6 +249,7 @@ static int procdname(cchar *newsdname,int ttl) noex {
 	        }
 	        if ((rs == SR_NOENT) || (rs == SR_STALE)) {
 		    rs = procdnamer(newsdname) ;
+		    c = rs ;
 	        } /* end (not-found or stale) */
 	    } /* end if (mkpath) */
 	    rs1 = uc_free(dbuf) ;
@@ -282,46 +286,61 @@ static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	if ((rs = vecpstr_getsize(dlp)) >= 0) {
 	    cint	dsize = rs ;
 	    cchar	*dc = DIRCACHE_CFNAME ;
-	    char	dcfname[MAXPATHLEN+1] ;
-	    if ((rs = mkpath2(dcfname,newsdname,dc)) >= 0) {
-	        USTAT	sb ;
-	        if ((rs = uc_stat(dcfname,&sb)) >= 0) {
-	            bfile	cfile, *cfp = &cfile ;
-	            int		fsize = (sb.st_size & INT_MAX) ;
-	            if (dsize == (fsize-ml-1)) {
-	                if ((rs = bopen(cfp,dcfname,"r",0666)) >= 0) {
-	                    cint	dlen = MAXPATHLEN ;
-	                    int		line = 0 ;
-	                    int		f_mis = false ;
-	                    cchar	*dp ;
-	                    char	dbuf[MAXPATHLEN+1] ;
-	                    while ((rs = breadln(cfp,dbuf,dlen)) > 0) {
-	                        int	dl = rs ;
-	                        if (line > 0) {
-	                            if (dbuf[dl-1] == '\n') dl -= 1 ;
-	                            if (vecpstr_get(dlp,(line-1),&dp) >= 0) {
-	                                f_mis = (strwcmp(dp,dbuf,dl) != 0) ;
-	                            } else {
-	                                f_mis = true ;
-				    }
-	                        }
-	                        line += 1 ;
-	                        if (f_mis) break ;
-	                    } /* end while */
-	                    if (! f_mis) f = false ;
-	                    rs1 = bclose(cfp) ;
-			    if (rs >= 0) rs = rs1 ;
-	                } /* end if (file-open) */
-	            } /* end if (sizes were the same) */
-	        } else if (isNotAccess(rs)) {
-	            rs = SR_OK ;
-		}
-	    } /* end if (mkpath) */
+	    char	*dcfname{} ;
+	    if ((rs = malloc_mp(&dcfname)) >= 0) {
+	        if ((rs = mkpath(dcfname,newsdname,dc)) >= 0) {
+	            USTAT	sb ;
+	            if ((rs = uc_stat(dcfname,&sb)) >= 0) {
+	                cint	fsize = int(sb.st_size & INT_MAX) ;
+	                if (dsize == (fsize-ml-1)) {
+			    rs = procdiffers(dlp,dcfname) ;
+			    if (rs == 0) f = false ;
+	                } /* end if (sizes were the same) */
+	            } else if (isNotAccess(rs)) {
+	                rs = SR_OK ;
+		    }
+	        } /* end if (mkpath) */
+		rs1 = uc_free(dcfname) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (vecpstr-getsize) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (procdiffer) */
+
+static int procdiffers(vecpstr *dlp,cchar *dcfname) noex {
+	int		rs ;
+	int		rs1 ;
+	bool		fmis = false ;
+	char		*dbuf{} ;
+	if ((rs = malloc_mp(&dbuf)) >= 0) {
+	    bfile	cfile, *cfp = &cfile ;
+	    cint	dlen = rs ;
+	    if ((rs = bopen(cfp,dcfname,"r",0666)) >= 0) {
+                int         line = 0 ;
+                cchar       *dp ;
+                while ((rs = breadln(cfp,dbuf,dlen)) > 0) {
+                    int     dl = rs ;
+                    if (line > 0) {
+                        if (dbuf[dl-1] == '\n') dl -= 1 ;
+                        if (vecpstr_get(dlp,(line-1),&dp) >= 0) {
+                            fmis = (strwcmp(dp,dbuf,dl) != 0) ;
+                        } else {
+                            fmis = true ;
+                        }
+                    }
+                    line += 1 ;
+                    if (fmis) break ;
+                } /* end while */
+                rs1 = bclose(cfp) ;
+                if (rs >= 0) rs = rs1 ;
+	    } /* end if (bfile) */
+	    rs1 = uc_free(dbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? fmis : rs ;
+}
+/* end subroutine (procdiffers) */
 
 static int procdircache(vecpstr *dlp,cchar *newsdname) noex {
 	int		rs ;
