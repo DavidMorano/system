@@ -250,8 +250,9 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	        char		*pwbuf{} ;
 	        op->s.total += 1 ;
 	        if ((rs = malloc_pw(&pwbuf)) >= 0) {
-	            hdb_dat	key, val ;
 	            NC_ENT	*ep ;
+	            hdb_dat	key ;
+	            hdb_dat	val ;
 		    cint	pwlen = rs ;
 	            cint	rlen = REALNAMELEN ;
 	            char	rbuf[REALNAMELEN + 1] ;
@@ -289,7 +290,7 @@ int namecache_lookup(NC *op,cchar *un,cchar **rpp) noex {
 	                        } else if (rs >= 0) {
 	                            rs = namecache_newent(op,&ep,un,rbuf,rl) ;
 		                }
-	                        if ((rs >= 0) && (ep != nullptr)) {
+	                        if ((rs >= 0) && ep) {
 		                    rp = ep->realname ;
 		                    rl = ep->realnamelen ;
 	                        }
@@ -355,12 +356,12 @@ static int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 	NC_ENT		*ep = nullptr ;
 	hdb		*dbp = op->dbp ;
 	hdb_cur		cur ;
-	hdb_dat		key ;
-	hdb_dat		val ;
 	int		rs ;
 	int		rs1 ;
 	if (epp) *epp = nullptr ;
 	if ((rs = hdb_curbegin(dbp,&cur)) >= 0) {
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    while ((rs = hdb_enum(dbp,&cur,&key,&val)) >= 0) {
 	        NC_ENT	*tep = (NC_ENT *) val.buf ;
 		if ((ep == nullptr) || (ep->ti_access < tep->ti_access)) {
@@ -381,15 +382,14 @@ static int namecache_repent(NC *op,NC_ENT **epp,cc *un,cc *sp,int sl) noex {
 }
 /* end subroutine (namecache_repent) */
 
-
 static int namecache_entfins(NC *op) noex {
 	hdb		*elp = op->dbp ;
 	hdb_cur		cur ;
-	hdb_dat		key ;
-	hdb_dat		val ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((rs1 = hdb_curbegin(elp,&cur)) >= 0) {
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    while (hdb_enum(elp,&cur,&key,&val) >= 0) {
 	        NC_ENT	*ep = (NC_ENT *) val.buf ;
 		{
@@ -447,10 +447,11 @@ static int entry_finish(NC_ENT *ep) noex {
 static int entry_update(NC_ENT *ep,cchar *rp,int rl) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	int		f_changed = true ;
+	int		f_changed = false ;
 	if (ep && rp) {
 	    rs = SR_OK ;
 	    if (rl < 0) rl = strlen(rp) ;
+	    f_changed = true ;
 	    f_changed = f_changed && (strncmp(ep->realname,rp,rl) == 0) ;
 	    f_changed = f_changed && (ep->realname[rl] == '\0') ;
 	    if (f_changed) {
