@@ -4,8 +4,7 @@
 /* get various information elements related to the PCS environment */
 /* version %I% last-modified %G% */
 
-#define	CF_DEFPCS	1		/* try a default PCS program-root */
-#define	CF_UCPWCACHE	1		/* use |ugetpw_xxx(3uc)| */
+#define	CF_UCPWCACHE	1		/* use |ucpwcache(3uc)| */
 
 /* revision history:
 
@@ -68,21 +67,28 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>
-#include	<pwd.h>
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<getbufsize.h>
-#include	<char.h>
+#include	<mallocxx.h>
 #include	<bfile.h>
-#include	<sbuf.h>
-#include	<fsdir.h>
 #include	<getax.h>
-#include	<ugetpw.h>
+#include	<ucpwcache.h>
 #include	<filereadln.h>
 #include	<getusername.h>
+#include	<getuserhome.h>
+#include	<cfdec.h>
+#include	<mkx.h>
+#include	<mkpathx.h>
+#include	<sncpyx.h>
+#include	<snwcpyx.h>
+#include	<strwcpy.h>
+#include	<char.h>
+#include	<hasx.h>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"pcsgetnames.h"
@@ -158,7 +164,17 @@
 #define	SUBINFO_FL	struct subinfo_flags
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+extern "C" {
+    int	pcsprojectinfo(cchar *,char *,int,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -192,8 +208,6 @@ struct pcsnametype {
 
 /* forward references */
 
-static int	pcsprojectinfo(cchar *,char *,int,cchar *) noex ;
-
 static int	subinfo_start(SUBINFO *,cchar *,char *,int,cchar *) noex ;
 static int	subinfo_getuid(SUBINFO *,uid_t *) noex ;
 static int	subinfo_getpw(SUBINFO *) noex ;
@@ -217,12 +231,6 @@ static constexpr int	(*getprojinfos[])(SUBINFO *) = {
 	getprojinfo_sysdb,
 	getprojinfo_pcsdef,
 	nullptr
-} ;
-
-enum pcsnametypes {
-	pcsnametype_name,
-	pcsnametype_fullname,
-	pcsnametype_overlast
 } ;
 
 static constexpr struct pcsnametype	pcsnametypes[] = {
@@ -275,31 +283,25 @@ int pcsnames(cc *pr,char *rbuf,int rlen,cc *un,int nt) noex {
 /* end subroutine (pcsnames) */
 
 int pcsgetnames(cc *pr,char *rbuf,int rlen,cc *un,int nt) noex {
-	SUBINFO		si ;
-	int		rs ;
-
-#if	CF_DEFPCS
-	if (pr == nullptr)
-	    pr = getenv(VARPRPCS) ;
-#endif
-
-	if (pr == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-	if (un == nullptr) return SR_FAULT ;
-
-	if (un[0] == '\0') return SR_INVALID ;
-
-	if (nt >= pcsnametype_overlast) return SR_INVALID ;
-
-	rbuf[0] = '\0' ;
-	if ((rs = subinfo_start(&si,pr,rbuf,rlen,un)) >= 0) {
-
-	    rs = getname(&si,nt) ;
-
-	    subinfo_finish(&si) ;
-	} /* end if */
-
-	return rs ;
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	int		rl = 0 ;
+	if (pr && rbuf && un) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && un[0] && (nt < pcsnametype_overlast)) {
+	        SUBINFO		si ;
+	        rbuf[0] = '\0' ;
+	        if ((rs = subinfo_start(&si,pr,rbuf,rlen,un)) >= 0) {
+	            {
+	                rs = getname(&si,nt) ;
+		        rl = rs ;
+	            }
+	            rs1 = subinfo_finish(&si) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (subinfo) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (pcsgetnames) */
 
@@ -338,22 +340,18 @@ int pcsprojectinfo(cc *pr,char *rbuf,int rlen,cc *username) noex {
 /* local subroutines */
 
 static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
-	cint		pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
-	char		*pwbuf ;
-
-	memset(sip,0,sizeof(SUBINFO)) ;
+	char		*pwbuf{} ;
+	memclear(sip) ; /* dangerous */
 	sip->pr = pr ;
 	sip->rbuf = rbuf ;
 	sip->rlen = rlen ;
 	sip->un = un ;
 	sip->varusername = VARUSERNAME ;
-
-	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
+	if ((rs = malloc_pw(&pwbuf)) >= 0) {
 	    sip->pwbuf = pwbuf ;
-	    sip->pwlen = pwlen ;
+	    sip->pwlen = rs ;
 	}
-
 	return rs ;
 }
 /* end subroutine (subinfo_start) */
@@ -361,13 +359,11 @@ static int subinfo_start(SUBINFO *sip,cc *pr,char *rbuf,int rlen,cc *un) noex {
 static int subinfo_finish(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (sip->pwbuf != nullptr) {
+	if (sip->pwbuf) {
 	    rs1 = uc_free(sip->pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    sip->pwbuf = nullptr ;
 	}
-
 	sip->pr = nullptr ;
 	return rs ;
 }
@@ -494,18 +490,17 @@ static int getname_userhome(SUBINFO *sip ,int nt) noex {
 
 static int getname_again(SUBINFO *sip,int nt) noex {
 	int		rs = SR_OK ;
-
 	if (nt == pcsnametype_fullname) {
 	    nt = pcsnametype_name ;
 	    rs = getname(sip,nt) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (getname_again) */
 
-static int getname_sysdb(SUBINFO *sip,int nt) noex {
+static int getname_sysdb(SUBINFO *sip,int) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		len = 0 ;
 
 	if (! sip->init.pw) {
@@ -516,13 +511,14 @@ static int getname_sysdb(SUBINFO *sip,int nt) noex {
 	if (rs >= 0) {
 	    cint	nlen = (strlen(sip->pw.pw_gecos)+10) ;
 	    cchar	*gecos = sip->pw.pw_gecos ;
-	    char	*nbuf ;
+	    char	*nbuf{} ;
 	    if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
 	        if ((rs = mkgecosname(nbuf,nlen,gecos)) > 0) {
 	            rs = mkrealname(sip->rbuf,sip->rlen,nbuf,rs) ;
 	            len = rs ;
 	        }
-	        uc_free(nbuf) ;
+	        rs1 = uc_free(nbuf) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory-allocation) */
 	} /* end if */
 #else /* COMMENT */
@@ -532,13 +528,14 @@ static int getname_sysdb(SUBINFO *sip,int nt) noex {
 	    cchar	*gp ;
 	    if ((gl = getgecosname(gecos,-1,&gp)) > 0) {
 	        cint	nlen = (gl+10) ;
-	        char		*nbuf ;
+	        char	*nbuf{} ;
 	        if ((rs = uc_malloc((nlen+1),&nbuf)) >= 0) {
 	            if ((rs = snwcpyhyphen(nbuf,nlen,gp,gl)) > 0) {
 	                rs = mkrealname(sip->rbuf,sip->rlen,nbuf,rs) ;
 	                len = rs ;
 	            }
-	            uc_free(nbuf) ;
+	            rs1 = uc_free(nbuf) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (memory-allocation) */
 	    } /* end if (getgecosname) */
 	} /* end if */
@@ -574,15 +571,15 @@ static int getprojinfo_userhome(SUBINFO *sip) noex {
 /* end subroutine (getprojinfo_userhome) */
 
 static int getprojinfo_sysdb(SUBINFO *sip) noex {
-	PROJECT		pj ;
-	cint	pjlen = getbufsize(getbufsize_pj) ;
 	int		rs ;
+	int		rs1 ;
 	int		len = 0 ;
-	char		*pjbuf ;
-
-	if ((rs = uc_malloc((pjlen+1),&pjbuf)) >= 0) {
-	    if ((rs = uc_getdefaultproj(sip->un,&pj,pjbuf,pjlen)) >= 0) {
-	        int	f = (strcmp(pj.pj_name,DEFPROJNAME) != 0) ;
+	char		*pjbuf{} ;
+	if ((rs = malloc_pj(&pjbuf)) >= 0) {
+	    ucentpj	pj ;
+	    cint	pjlen = rs ;
+	    if ((rs = uc_getpjdef(&pj,pjbuf,pjlen,sip->un)) >= 0) {
+	        bool	f = (strcmp(pj.pj_name,DEFPROJNAME) != 0) ;
 	        if (f) {
 	            uid_t	uid ;
 	            if ((rs = subinfo_getuid(sip,&uid)) >= 0) {
@@ -596,9 +593,9 @@ static int getprojinfo_sysdb(SUBINFO *sip) noex {
 	    } else if (isNotPresent(rs)) {
 	        rs = SR_OK ;
 	    }
-	    uc_free(pjbuf) ;
+	    rs1 = uc_free(pjbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory-allocation) */
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (getprojinfo_sysdb) */
