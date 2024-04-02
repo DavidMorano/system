@@ -1,5 +1,5 @@
 /* logzones HEADER */
-/* lang=C++20 */
+/* lang=C20 */
 
 /* log timezone names */
 /* version %I% last-modified %G% */
@@ -83,14 +83,14 @@ typedef	LOGZONES_FL	logzones_fl ;
 
 EXTERNC_begin
 
-extern int logzones_open(LOGZONES *,cchar *,int,mode_t) noex ;
-extern int logzones_curbegin(LOGZONES *,LOGZONES_CUR *) noex ;
-extern int logzones_curend(LOGZONES *,LOGZONES_CUR *) noex ;
-extern int logzones_enum(LOGZONES *,LOGZONES_CUR *,LOGZONES_ENT *) noex ;
-extern int logzones_match(LOGZONES *,cchar *,int,int,LOGZONES_ENT *) noex ;
-extern int logzones_update(LOGZONES *,cchar *,int,int,cchar *) noex ;
-extern int logzones_check(LOGZONES *,time_t) noex ;
-extern int logzones_close(LOGZONES *) noex ;
+extern int logzones_open(logzones *,cchar *,int,mode_t) noex ;
+extern int logzones_curbegin(logzones *,logzones_cur *) noex ;
+extern int logzones_curend(logzones *,logzones_cur *) noex ;
+extern int logzones_enum(logzones *,logzones_cur *,logzones_ent *) noex ;
+extern int logzones_match(logzones *,cchar *,int,int,logzones_ent *) noex ;
+extern int logzones_update(logzones *,cchar *,int,int,cchar *) noex ;
+extern int logzones_check(logzones *,time_t) noex ;
+extern int logzones_close(logzones *) noex ;
 
 EXTERNC_end
 
