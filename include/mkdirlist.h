@@ -66,16 +66,16 @@ typedef MKDIRLIST_ENT	mkdirlist_ent ;
 
 EXTERNC_begin
 
-extern int mkdirlist_start(MKDIRLIST *,cchar *,cchar *) noex ;
-extern int mkdirlist_link(MKDIRLIST *) noex ;
-extern int mkdirlist_defshow(MKDIRLIST *) noex ;
-extern int mkdirlist_sort(MKDIRLIST *) noex ;
-extern int mkdirlist_get(MKDIRLIST *,int,MKDIRLIST_ENT **) noex ;
-extern int mkdirlist_ung(MKDIRLIST *,cchar *,time_t,int,int) noex ;
-extern int mkdirlist_showdef(MKDIRLIST *) noex ;
-extern int mkdirlist_show(MKDIRLIST *,cchar *,int) noex ;
-extern int mkdirlist_audit(MKDIRLIST *) noex ;
-extern int mkdirlist_finish(MKDIRLIST *) noex ;
+extern int mkdirlist_start(mkdirlist *,cchar *,cchar *) noex ;
+extern int mkdirlist_link(mkdirlist *) noex ;
+extern int mkdirlist_defshow(mkdirlist *) noex ;
+extern int mkdirlist_sort(mkdirlist *) noex ;
+extern int mkdirlist_get(mkdirlist *,int,mkdirlist_ent **) noex ;
+extern int mkdirlist_ung(mkdirlist *,cchar *,time_t,int,int) noex ;
+extern int mkdirlist_showdef(mkdirlist *) noex ;
+extern int mkdirlist_show(mkdirlist *,cchar *,int) noex ;
+extern int mkdirlist_audit(mkdirlist *) noex ;
+extern int mkdirlist_finish(mkdirlist *) noex ;
 
 EXTERNC_end
 

@@ -12,14 +12,13 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<vechand.h>
 #include	<localmisc.h>
 
 
 #define	STRPACK_MAGIC		0x42114683
 #define	STRPACK			struct strpack_head
-#define	STRPACK_CHUNK		struct strpack_chunk
+#define	STRPACK_CH		struct strpack_chunk
 
 
 struct strpack_chunk {
@@ -30,7 +29,7 @@ struct strpack_chunk {
 } ;
 
 struct strpack_head {
-	STRPACK_CHUNK	*ccp ;		/* current chunk pointer */
+	STRPACK_CH	*chp ;		/* current chunk pointer */
 	vechand		*clp ;		/* chunk-list-pointer */
 	uint		magic ;
 	int		chsize ;
@@ -38,16 +37,16 @@ struct strpack_head {
 	int		c ;		/* total count */
 } ;
 
-typedef struct strpack_head	strpack ;
-typedef struct strpack_chunk	strpack_ch ;
+typedef STRPACK		strpack ;
+typedef STRPACK_CH	strpack_ch ;
 
 EXTERNC_begin
 
-extern int	strpack_start(STRPACK *,int) noex ;
-extern int	strpack_store(STRPACK *,cchar *,int,cchar **) noex ;
-extern int	strpack_count(STRPACK *) noex ;
-extern int	strpack_size(STRPACK *) noex ;
-extern int	strpack_finish(STRPACK *) noex ;
+extern int	strpack_start(strpack *,int) noex ;
+extern int	strpack_store(strpack *,cchar *,int,cchar **) noex ;
+extern int	strpack_count(strpack *) noex ;
+extern int	strpack_size(strpack *) noex ;
+extern int	strpack_finish(strpack *) noex ;
 
 EXTERNC_end
 

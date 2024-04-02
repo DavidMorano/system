@@ -85,7 +85,17 @@ static inline int b64decoder_dtor(b64decoder *op) noex {
 	return rs ;
 }
 
-static int	b64decoder_cvt(B64DECODER *,cchar *,int) noex ;
+template<typename ... Args>
+static inline int b64decoder_magic(b64decoder *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == B64DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (b64decoder_magic) */
+
+static int	b64decoder_cvt(b64decoder *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -96,7 +106,7 @@ static int	b64decoder_cvt(B64DECODER *,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int b64decoder_start(B64DECODER *op) noex {
+int b64decoder_start(b64decoder *op) noex {
 	int		rs ;
 	if ((rs = b64decoder_ctor(op)) >= 0) {
 	    obuf	*obp ;
@@ -114,12 +124,10 @@ int b64decoder_start(B64DECODER *op) noex {
 }
 /* end subroutine (b64decoder_start) */
 
-int b64decoder_finish(B64DECODER *op) noex {
+int b64decoder_finish(b64decoder *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
-	if (op) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == B64DECODER_MAGIC) {
+	if ((rs = b64decoder_magic(op)) >= 0) {
 	        if (op->outbuf) {
 	            obuf 	*obp = (obuf *) op->outbuf ;
 	            delete obp ;
@@ -130,20 +138,16 @@ int b64decoder_finish(B64DECODER *op) noex {
 		    if (rs >= 0) rs = rs1 ;
 	        }
 	        op->magic = 0 ;
-	    } /* end if (magic) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (b64decoder_finish) */
 
-int b64decoder_load(B64DECODER *op,cchar *sp,int sl) noex {
+int b64decoder_load(b64decoder *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
-	if (op && sp) {
-	    rs = SR_NOTOPEN ;
-	    if (op->magic == B64DECODER_MAGIC) {
+	if ((rs = b64decoder_magic(op,sp)) >= 0) {
 	        obuf		*obp ;
-		rs = SR_OK ;
 	        if (sl < 0) sl = strlen(sp) ;
 	        if ((obp = ((obuf *) op->outbuf)) != nullptr) {
 	            int		cl ;
@@ -182,19 +186,16 @@ int b64decoder_load(B64DECODER *op,cchar *sp,int sl) noex {
 	        } else {
 	            rs = SR_BUGCHECK ;
 	        }
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (b64decoder_load) */
 
-int b64decoder_read(B64DECODER *op,char *rbuf,int rlen) noex {
+int b64decoder_read(b64decoder *op,char *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
-	if (op && rbuf) {
-	    rs = SR_NOTOPEN ;
+	if ((rs = b64decoder_magic(op,rbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
-	    if (op->magic == B64DECODER_MAGIC) {
 		rs = SR_INVALID ;
 	        if (rlen >= 0) {
 	            obuf	*obp ;
@@ -214,8 +215,7 @@ int b64decoder_read(B64DECODER *op,char *rbuf,int rlen) noex {
 	                }
 	            } /* end if (positive) */
 		} /* end if (valid) */
-	    } /* end if (real money) */
-	} /* end if (non-null) */
+	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (b64decoder_read) */
@@ -223,7 +223,7 @@ int b64decoder_read(B64DECODER *op,char *rbuf,int rlen) noex {
 
 /* private subroutines */
 
-static int b64decoder_cvt(B64DECODER *op,cchar *cp,int cl) noex {
+static int b64decoder_cvt(b64decoder *op,cchar *cp,int cl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op->outbuf) {

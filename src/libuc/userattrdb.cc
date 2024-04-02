@@ -213,12 +213,14 @@ int userattrdb_lookup(uad *op,char *rbuf,int rlen,cchar *keyname) noex {
 
 static int userattrdb_opensysdb(uad *op) noex {
 	int		rs = SR_OK ;
+	int		f = false ;
 	if (! op->init.sysdb) {
 	    op->init.sysdb = true ;
 	    rs = uc_userattrnam(&op->uap,op->username) ;
 	    op->have.sysdb = (rs >= 0) ;
+	    f = op->have.sysdb ;
 	}
-	return (rs >= 0) ? op->have.sysdb : rs ;
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (userattrdb_opensysdb) */
 

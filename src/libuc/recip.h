@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<utypedefs.h>
@@ -49,8 +48,8 @@ struct recip_head {
 	cchar		*recipient ;	/* recipient name */
 	cchar		*name ;		/* recipient real-name (if known) */
 	cchar		*maildname ;	/* recipient maildir */
-	RECIP_FL	f ;		/* flags */
 	uid_t		uid ;
+	RECIP_FL	f ;		/* flags */
 	uint		magic ;
 	int		mbo ;		/* mailbox-message offset */
 	int		n ;		/* number of deliveries */

@@ -65,6 +65,7 @@
 #include	<mktmp.h>
 #include	<mkpathx.h>
 #include	<strwcmp.h>
+#include	<intsat.h>
 #include	<isnot.h>
 #include	<localmisc.h>
 
@@ -284,15 +285,15 @@ static int procdiffer(vecpstr *dlp,cchar *newsdname) noex {
 	int		rs1 ;
 	int		f = true ;
 	if ((rs = vecpstr_getsize(dlp)) >= 0) {
-	    cint	dsize = rs ;
+	    int		dsz = rs ;
 	    cchar	*dc = DIRCACHE_CFNAME ;
 	    char	*dcfname{} ;
 	    if ((rs = malloc_mp(&dcfname)) >= 0) {
 	        if ((rs = mkpath(dcfname,newsdname,dc)) >= 0) {
 	            USTAT	sb ;
 	            if ((rs = uc_stat(dcfname,&sb)) >= 0) {
-	                cint	fsize = int(sb.st_size & INT_MAX) ;
-	                if (dsize == (fsize-ml-1)) {
+	                int	isz = intsat(sb.st_size) ;
+	                if (dsz == (isz -ml-1)) {
 			    rs = procdiffers(dlp,dcfname) ;
 			    if (rs == 0) f = false ;
 	                } /* end if (sizes were the same) */

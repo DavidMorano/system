@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstring>
@@ -57,7 +56,7 @@ namespace {
     class item {
 	int		ln ;		/* line number */
 	int		it ;		/* 0=opening, 1=closing */
-public:
+    public:
 	item(int aln,int ait) noex : ln(aln), it(ait) { } ;
 	int type() const noex { 
 	    return it ; 
@@ -76,6 +75,7 @@ static int langstate_ctor(langstate *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
+	    memclear(op) ; /* dangerous */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -112,7 +112,6 @@ static int langstate_magic(langstate *op,Args ... args) noex {
 int langstate_start(langstate *op) noex {
 	int		rs ;
 	if ((rs = langstate_ctor(op)) >= 0) {
-	    rs = memclear(op) ;			/* dangerous */
 	    op->f.clear = true ;
 	    op->magic = LANGSTATE_MAGIC ;
 	    if (rs < 0) {
@@ -125,7 +124,12 @@ int langstate_start(langstate *op) noex {
 
 int langstate_finish(langstate *op) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = langstate_magic(op)) >= 0) {
+	    {
+		rs1 = langstate_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -205,7 +209,7 @@ int langstate_stat(langstate *op,langstate_info *sbp) noex {
 	int		rs ;
 	int		type = langstatetype_clear ;
 	if ((rs = langstate_magic(op,sbp)) >= 0) {
-	    memclear(sbp) ;		/* dangerous */
+	    memclear(sbp) ; /* dangerous */
 	    sbp->line = op->line ;
 	    if (op->f.comment) {
 	        type = langstatetype_comment ;

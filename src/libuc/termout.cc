@@ -393,6 +393,7 @@ int termout_start(termout *op,cchar *tstr,int tlen,int ncols) noex {
 	    	    vector<string>	*lvp ;
 	            op->cvp = voidp(cvp) ;
 	            if ((lvp = new(nothrow) vector<string>) != nullptr) {
+			rs = SR_OK ;
 	                op->lvp = voidp(lvp) ;
 	                op->magic = TERMOUT_MAGIC ;
 	            } /* end if (new-vector<string>) */
@@ -607,12 +608,12 @@ static int termout_loadgr(termout *op,string &line,int pgr,int gr) noex {
 	cint		grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		n ;
-	int		size ;
+	int		sz ;
 	int		len = 0 ;
 	char		*grbuf ;
 	n = flbsi(grmask) + 1 ;
-	size = ((2*n)+1+1) ; /* size according to algorithm below */
-	if ((grbuf = new(nothrow) char[size]) != nullptr) {
+	sz = ((2*n)+1+1) ; /* size according to algorithm below */
+	if ((grbuf = new(nothrow) char[sz]) != nullptr) {
 	    int		gl = 0 ;
 	    int		ogr = pgr ;
 	    int		bgr = pgr ;
@@ -692,7 +693,7 @@ static int termout_loadcs(termout *op,string &line,int n,cc *pp,int pl) noex {
 	if (op) {
 	int		i = 0 ;
 	while ((rs >= 0) && (i < pl)) {
-	    cint	ml = MIN(4,(pl-i)) ;
+	    cint	ml = min(4,(pl-i)) ;
 	    int		a1 = -1 ;
 	    int		a2 = -1 ;
 	    int		a3 = -1 ;

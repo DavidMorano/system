@@ -62,7 +62,7 @@ template<typename ... Args>
 static inline int recip_ctor(recip *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    if ((op->mdp = new(nothrow) vecitem) != np) {
@@ -254,7 +254,7 @@ int recip_mo(recip *op,int moff,int mlen) noex {
 int recip_ds(recip *op,int ds) noex {
 	int		rs ;
 	if ((rs = recip_magic(op)) >= 0) {
-	    op->ds = ds ;
+	    op->ds = ds ;		/* delivery-status */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -266,6 +266,7 @@ int recip_match(recip *op,cchar *sp,int sl) noex {
 	if ((rs = recip_magic(op,sp)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
+		rs = SR_OK ;
 	        if (sl < 0) sl = strlen(sp) ;
 	        if (op->recipient) {
 	            f = (strwcmp(op->recipient,sp,sl) == 0) ;
@@ -281,9 +282,9 @@ int recip_getmbo(recip *op) noex {
 	int		mbo = 0 ;
 	if ((rs = recip_magic(op)) >= 0) {
 	    if (op->ds >= 0) {
-	        mbo = (op->mbo & INT_MAX) ;
+	        mbo = op->mbo ;		/* mail-box offset */
 	    } else {
-	        rs = op->ds ;
+	        mbo = op->ds ;		/* delivery-status */
 	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? mbo : rs ;

@@ -138,7 +138,7 @@ int filemap_read(filemap *op,int rlen,void *vp) noex {
 		{
 		    cchar	*ebp = (bdata + fsize) ;
 		    op->bp = min(ebp,(sbp+rlen)) ;
-		    *bpp = (void *) sbp ;
+		    *bpp = voidp(sbp) ;
 		    rs = (op->bp - sbp) ;
 		} /* end block */
 	    } /* end if (open) */
@@ -153,7 +153,7 @@ int filemap_getline(filemap *op,cchar **bpp) noex {
 	    size_t	fsize = size_t(op->sb.st_size) ;
 	    rs = SR_NOTOPEN ;
 	    if (op->mapdata) {
-	        cchar	*bdata = (cchar *) op->mapdata ;
+	        cchar	*bdata = charp(op->mapdata) ;
 		cchar	*sbp = op->bp ;
 		if (fsize > op->maxsize) fsize = op->maxsize ;
 		{
@@ -242,7 +242,7 @@ int filemap_rewind(filemap *op) noex {
 /* local subroutines */
 
 static int filemap_opener(filemap *op,cchar *fn,int of) noex {
-	csize		max = op->maxsize ;
+	csize		nmax = op->maxsize ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = uc_open(fn,of,0666)) >= 0) {
@@ -252,7 +252,7 @@ static int filemap_opener(filemap *op,cchar *fn,int of) noex {
 		if (S_ISREG(sbp->st_mode)) {
 		    csize	fsize = size_t(sbp->st_size) ;
 		    rs = SR_TOOBIG ;
-		    if ((max > 0) && (fsize <= max)) {
+		    if ((nmax > 0) && (fsize <= nmax)) {
 			rs = filemap_openmap(op,fd,fsize) ;
 		    } /* end if (size appropriate) */
 	        } else {

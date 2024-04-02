@@ -28,7 +28,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
@@ -215,10 +214,10 @@ int calmgr_finish(CALMGR *calp)
 	rs1 = calmgr_dbloadend(calp) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (calp->idxdname != NULL) {
+	if (calp->idxdname != nullptr) {
 	    rs1 = uc_free(calp->idxdname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    calp->idxdname = NULL ;
+	    calp->idxdname = nullptr ;
 	}
 
 	rs1 = calmgr_argend(calp) ;
@@ -256,13 +255,13 @@ int calmgr_getbase(CALMGR *calp,cchar **rpp)
 {
 	int		rs ;
 	cchar		*md ;
-	if (calp->mapdata != NULL) {
+	if (calp->mapdata != nullptr) {
 	     md = calp->mapdata ;
 	     rs = calp->mapsize ;
 	} else {
 	     rs = SR_INVALID ;
 	}
-	*rpp = (rs >= 0) ? md : NULL ;
+	*rpp = (rs >= 0) ? md : nullptr ;
 	return rs ;
 }
 /* end subroutine (calmgr_getbase) */
@@ -307,7 +306,7 @@ int calmgr_audit(CALMGR *calp)
 	int		rs = SR_OK ;
 	int		i ;
 	for (i = 0 ; vechand_get(ilp,i,&cip) >= 0 ; i += 1) {
-	    if (cip != NULL) {
+	    if (cip != nullptr) {
 	        rs = calmgr_idxaudit(calp,cip) ;
 	    }
 	    if (rs < 0) break ;
@@ -343,10 +342,10 @@ static int calmgr_argend(CALMGR *calp)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (calp->a != NULL) {
+	if (calp->a != nullptr) {
 	    rs1 = uc_free(calp->a) ;
 	    if (rs >= 0) rs = rs1 ;
-	    calp->a = NULL ;
+	    calp->a = nullptr ;
 	}
 	return rs ;
 }
@@ -389,21 +388,22 @@ static int calmgr_dbmapcreate(CALMGR *calp,time_t dt)
 	    if ((rs = mkpath2(dbfname,calp->dn,nbuf)) >= 0) {
 	        if ((rs = u_open(dbfname,O_RDONLY,0666)) >= 0) {
 	            USTAT	sb ;
-	            const int	fd = rs ;
+	            cint	fd = rs ;
 	            if ((rs = u_fstat(fd,&sb)) >= 0) {
 	                if (S_ISREG(sb.st_mode)) {
-	                    calp->filesize = sb.st_size ;
+			    csize	im = size_t(INT_MAX) ;
+	                    calp->fsize = size_t(sb.st_size) ;
 	                    calp->ti_db = sb.st_mtime ;
-	                    if (sb.st_size <= INT_MAX) {
-	                        size_t	ms = (size_t) calp->filesize ;
+	                    if (sb.st_size <= im) {
+	                        size_t	ms = calp->fsize ;
 	                        int	mp = PROT_READ ;
 	                        int	mf = MAP_SHARED ;
-	                        void	*n = NULL ;
+	                        void	*n = nullptr ;
 	                        void	*md ;
 	                        if ((rs = u_mmap(n,ms,mp,mf,fd,0L,&md)) >= 0) {
-	                            if (dt == 0) dt = time(NULL) ;
+	                            if (dt == 0) dt = time(nullptr) ;
 	                            calp->mapdata = md ;
-	                            calp->mapsize = calp->filesize ;
+	                            calp->mapsize = calp->fsize ;
 	                            calp->ti_map = dt ;
 	                            calp->ti_lastcheck = dt ;
 	                        } /* end if (u_mmap) */
@@ -428,9 +428,9 @@ static int calmgr_dbmapdestroy(CALMGR *calp)
 {
 	int		rs = SR_OK ;
 
-	if (calp->mapdata != NULL) {
+	if (calp->mapdata != nullptr) {
 	    rs = u_munmap(calp->mapdata,calp->mapsize) ;
-	    calp->mapdata = NULL ;
+	    calp->mapdata = nullptr ;
 	    calp->mapsize = 0 ;
 	}
 
@@ -458,12 +458,12 @@ static int calmgr_idxdir(CALMGR *calp)
 static int calmgr_lookyear(CALMGR *calp,CALMGR_Q *qp,CYI **cypp)
 {
 	CALMGR_IDX	*cip ;
-	CYI		*yip = NULL ;
+	CYI		*yip = nullptr ;
 	vechand		*clp = &calp->idxes ;
 	int		rs ;
 	int		i ;
 	for (i = 0 ; (rs = vechand_get(clp,i,&cip)) >= 0 ; i += 1) {
-	    if ((cip != NULL) && (cip->year == qp->y)) {
+	    if ((cip != nullptr) && (cip->year == qp->y)) {
 	        yip = &cip->cy ;
 	        break ;
 	    }
@@ -477,8 +477,8 @@ static int calmgr_lookyear(CALMGR *calp,CALMGR_Q *qp,CYI **cypp)
 	        }
 	    }
 	}
-	if (cypp != NULL) {
-	    *cypp = (rs >= 0) ? yip : NULL ;
+	if (cypp != nullptr) {
+	    *cypp = (rs >= 0) ? yip : nullptr ;
 	}
 #if	CF_DEBUGS
 	debugprintf("calmgr_lookyear: ret rs=%d i=%u\n",rs,i) ;
@@ -716,7 +716,7 @@ static int calmgr_cyiclose(CALMGR *calp,CALMGR_IDX *cip)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (calp == NULL) return SR_FAULT ;
+	if (calp == nullptr) return SR_FAULT ;
 
 	rs1 = cyi_close(cyp) ;
 	if (rs >= 0) rs = rs1 ;
@@ -768,7 +768,7 @@ static int calmgr_mkcyi(CALMGR *calp,int y)
 	    debugprintf("calmgr_mkcyi: mp=%p ml=%d\n",mp,ml) ;
 #endif
 
-	    while ((tp = strnchr(mp,ml,'\n')) != NULL) {
+	    while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
 
 	        len = ((tp + 1) - mp) ;
 	        lp = mp ;
@@ -947,8 +947,8 @@ static int calmgr_mkdirs(CALMGR *calp,cchar dname[],mode_t dm)
 static int calmgr_mapdata(CALMGR *calp,cchar **rpp)
 {
 	int		rs ;
-	if (calp->mapdata != NULL) {
-	    if (rpp != NULL) *rpp = (cchar *) calp->mapdata ;
+	if (calp->mapdata != nullptr) {
+	    if (rpp != nullptr) *rpp = (cchar *) calp->mapdata ;
 	    rs = (int) calp->mapsize ;
 	} else {
 	    rs = SR_INVALID ;
@@ -966,7 +966,7 @@ static int calmgr_idxends(CALMGR *calp)
 	int		rs1 ;
 	int		i ;
 	for (i = 0 ; vechand_get(ilp,i,&cip) >= 0 ; i += 1) {
-	    if (cip != NULL) {
+	    if (cip != nullptr) {
 	        rs1 = vechand_del(ilp,i--) ; /* really optional! */
 	        if (rs >= 0) rs = rs1 ;
 	        rs1 = calmgr_idxend(calp,cip) ;
@@ -984,7 +984,7 @@ static int calmgr_idxaudit(CALMGR *calp,CALMGR_IDX *cip)
 {
 	CYI		*cyp = &cip->cy ;
 	int		rs ;
-	if (calp == NULL) return SR_FAULT ;
+	if (calp == nullptr) return SR_FAULT ;
 	rs = cyi_audit(cyp) ;
 	return rs ;
 }
@@ -996,7 +996,7 @@ static int mkbve_start(CYIMK_ENT *bvep,cchar *md,CALENT *ep)
 	int		rs ;
 	int		nlines = 0 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if ((rs = calent_mkhash(ep,md)) >= 0) {
 	    bvep->m = ep->q.m ;
@@ -1004,7 +1004,7 @@ static int mkbve_start(CYIMK_ENT *bvep,cchar *md,CALENT *ep)
 	    bvep->voff = ep->voff ;
 	    bvep->vlen = ep->vlen ;
 	    bvep->hash = ep->hash ;
-	    bvep->lines = NULL ;
+	    bvep->lines = nullptr ;
 	    nlines = ep->i ;
 	    if (nlines <= UCHAR_MAX) {
 	        CYIMK_LINE	*lines ;
@@ -1035,12 +1035,12 @@ static int mkbve_finish(CYIMK_ENT *bvep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (bvep == NULL) return SR_FAULT ;
+	if (bvep == nullptr) return SR_FAULT ;
 
-	if (bvep->lines != NULL) {
+	if (bvep->lines != nullptr) {
 	    rs1 = uc_free(bvep->lines) ;
 	    if (rs >= 0) rs = rs1 ;
-	    bvep->lines = NULL ;
+	    bvep->lines = nullptr ;
 	}
 
 	return rs ;

@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstdlib>
@@ -108,10 +107,10 @@ constexpr cchar		*defufname = SYSUSERNAMES_FNAME ;
 int sysusernames_open(sysusernames *op,cchar *sufname) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    csize	max = INT_MAX ;
+	    csize	nmax = INT_MAX ;
 	    cint	of = O_RDONLY ;
 	    if (sufname == nullptr) sufname = defufname ;
-	    if ((rs = filemap_open(op->fmp,sufname,of,max)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,of,nmax)) >= 0) {
 	    	op->magic = SYSUSERNAMES_MAGIC ;
 	    }
 	    if (rs < 0) {

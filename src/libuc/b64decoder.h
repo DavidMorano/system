@@ -27,9 +27,9 @@
 
 
 struct b64decoder_head {
+	void		*outbuf ;	/* output-buffer */
 	uint		magic ;
 	int		rl ;		/* stage length */
-	void		*outbuf ;	/* output-buffer */
 	char		rb[4+1] ;	/* stage buffer */
 } ;
 
@@ -37,10 +37,10 @@ typedef struct b64decoder_head	b64decoder ;
 
 EXTERNC_begin
 
-extern int b64decoder_start(B64DECODER *) noex ;
-extern int b64decoder_load(B64DECODER *,cchar *,int) noex ;
-extern int b64decoder_read(B64DECODER *,char *,int) noex ;
-extern int b64decoder_finish(B64DECODER *) noex ;
+extern int b64decoder_start(b64decoder *) noex ;
+extern int b64decoder_load(b64decoder *,cchar *,int) noex ;
+extern int b64decoder_read(b64decoder *,char *,int) noex ;
+extern int b64decoder_finish(b64decoder *) noex ;
 
 EXTERNC_end
 

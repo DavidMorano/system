@@ -14,8 +14,13 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-/******************************************************************************* 
-	Retrieve the numeric sign of a variable.
+/*******************************************************************************
+
+	This object provides an atomic flag that can be used for a 
+	variety of purposes.  Two of the more populate purposes is
+	to provide for:
+	1, executing a sequence of code only once.
+	2. implementing a lghtweight mutual-exclusion semaphore.
 
 *******************************************************************************/
 

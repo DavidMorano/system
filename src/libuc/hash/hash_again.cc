@@ -41,7 +41,10 @@
 #include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<randlc.h>
 #include	<localmisc.h>
+
+#include	"hash.h"
 
 
 /* local defines */
@@ -63,7 +66,6 @@
 
 extern "C" {
     extern uint	urotate(uint,int) noex ;
-    extern int	randlc(int) noex ;
 }
 
 

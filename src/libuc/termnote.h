@@ -11,7 +11,7 @@
 #define	TERMNOTE_INCLUDE
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<stdarg.h>
+#include	<stdarg.h>		/* |va_list| */
 #include	<tmpx.h>
 #include	<ids.h>
 #include	<logfile.h>
@@ -22,7 +22,6 @@
 #define	TERMNOTE_MAGIC		0x13f3c200
 #define	TERMNOTE		struct termnote_head
 #define	TERMNOTE_FL		struct termnote_flags
-#define	TERMNOTE_BUFSIZE	LINEBUFLEN
 #define	TERMNOTE_MAXLINES	20
 #define	TERMNOTE_LOGSIZE	400000
 

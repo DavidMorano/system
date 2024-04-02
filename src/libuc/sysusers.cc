@@ -151,25 +151,25 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = sysusers_magic(op,pwp,pwbuf)) >= 0) {
-		if ((rs = getbufsize(getbufsize_un)) >= 0) {
-		    cint	ulen = rs ;
-		    char	*ubuf ;
-		    if ((rs = uc_libmalloc((ulen+1),&ubuf)) >= 0) {
-		        cchar	*lp{} ;
-		        while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
-	    	            int		ll = rs ;
-	    	            if (lp[ll-1] == '\n') ll -= 1 ;
-	    	            if ((rs = (strdcpy1w(ubuf,ulen,lp,ll)-ubuf)) > 0) {
-		                rs = GETPW_NAME(pwp,pwbuf,pwlen,ubuf) ;
-		                if (rs == SR_NOTFOUND) rs = SR_OK ;
-	    	            }
-	    	            if (rs > 0) break ;
-	    	            if (rs < 0) break ;
-		        } /* end while */
-			rs1 = uc_libfree(ubuf) ;
-			if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-		} /* end if (getbufsize) */
+            if ((rs = getbufsize(getbufsize_un)) >= 0) {
+                cint        ulen = rs ;
+                char        *ubuf ;
+                if ((rs = uc_libmalloc((ulen+1),&ubuf)) >= 0) {
+                    cchar   *lp{} ;
+                    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
+                        int         ll = rs ;
+                        if (lp[ll-1] == '\n') ll -= 1 ;
+                        if ((rs = (strdcpy1w(ubuf,ulen,lp,ll)-ubuf)) > 0) {
+                            rs = GETPW_NAME(pwp,pwbuf,pwlen,ubuf) ;
+                            if (rs == SR_NOTFOUND) rs = SR_OK ;
+                        }
+                        if (rs > 0) break ;
+                        if (rs < 0) break ;
+                    } /* end while */
+                    rs1 = uc_libfree(ubuf) ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (m-a-f) */
+            } /* end if (getbufsize) */
 	} /* end if (magic) */
 	return rs ;
 }

@@ -9,7 +9,7 @@
 
 	= 2003-10-22, David A­D­ Morano
 	This code module is an attempt to make a better entry-buffer
-	mamager than was used in the old (quite old) SRVREG and
+	mamager than what was used in the old (quite old) SRVREG and
 	MSGID objects.
 
 */
@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<netinet/in.h>
@@ -41,6 +40,7 @@
 #include	<cstring>		/* |memset(3c)| */
 #include	<usystem.h>
 #include	<intfloor.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"ebuf.h"
@@ -116,10 +116,11 @@ int ebuf_start(ebuf *op,int fd,uint soff,int esize,int nways,int npw) noex {
 	    op->iways = 0 ;
 	    op->npw = npw ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
+		csize	fsz = size_t(sb.st_size) ;
 	        int	sz ;
 	        void	*vp{} ;
-	        if (sb.st_size > soff) {
-	            op->nentries = ((sb.st_size - soff) / esize) ;
+	        if (uint foff = intsat(fsz) ; foff > soff) {
+	            op->nentries = ((foff - soff) / esize) ;
 	        }
 	        sz = nways * sizeof(WAY) ;
 	        if ((rs = uc_malloc(sz,&vp)) >= 0) {

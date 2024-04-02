@@ -145,7 +145,7 @@ static int td_ctor(td *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;		/* noted as potentially dangerous */
+	    memclear(op) ; /* dangerous */
 	    if ((op->tsp = new(nothrow) termstr) != np) {
 	        if ((op->wlp = new(nothrow) vecitem) != np) {
 		    rs = SR_OK ;

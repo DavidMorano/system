@@ -1,7 +1,7 @@
 /* pwcache SUPPORT */
 /* lang=C++20 */
 
-/* PASSWD cache */
+/* ucentpw cache */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,7 @@
 
 /*******************************************************************************
 
-        This object provides a crude cache for PASSWD-DB entries.
+        This object provides a crude cache for ucentpw-DB entries.
 
 *******************************************************************************/
 
@@ -42,7 +42,7 @@
 #define PWCACHE_REC	struct pwcache_record
 #endif
 
-#define PWE             PASSWD
+#define PWE             ucentpw
 
 
 /* imported namespaces */
@@ -74,7 +74,7 @@ enum cts {
 struct pwcache_record : pq_ent {
         char            *un ;		/* allocated: username */
         char            *pwbuf ;	/* allocated: PW-buffer */
-        PASSWD          pw ;
+        ucentpw		pw ;
         time_t          ti_create ;
         time_t          ti_access ;
         uint            wcount ;
@@ -157,14 +157,14 @@ static int      pwcache_record(pwcache *,int,int) noex ;
 static int	pwcache_finduid(pwcache *,rec **,uid_t) noex ;
 
 static int	record_start(rec *,time_t,int,ureq *) noex ;
-static int	record_loadun(rec *,PASSWD *) noex ;
+static int	record_loadun(rec *,ucentpw *) noex ;
 static int	record_access(rec *,time_t) noex ;
 static int	record_refresh(rec *,time_t,int) noex ;
 static int	record_old(rec *,time_t,int) noex ;
 static int	record_finish(rec *) noex ;
 
-static int	getpw(PASSWD *,char *,int,ureq *) noex ;
-static int	getpw_name(PASSWD *,char *,int,cchar *) noex ;
+static int	getpw(ucentpw *,char *,int,ureq *) noex ;
+static int	getpw_name(ucentpw *,char *,int,cchar *) noex ;
 
 
 /* local variables */
@@ -603,11 +603,10 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
         int             pwl = 0 ;
         if (ep && rp) {
             char        *pwbuf{} ;
-	    rs = SR_INVALID ;
-            memclear(ep) ;		/* dangerous */
+            memclear(ep) ; /* dangerous */
             if ((rs = malloc_pw(&pwbuf)) >= 0) {
-                PASSWD      pw{} ;
-                cint        pwlen = rs ;
+                ucentpw		pw{} ;
+                cint		pwlen = rs ;
                 if ((rs = getpw(&pw,pwbuf,pwlen,rp)) >= 0) {
 		    if ((rs = record_loadun(ep,&pw)) >= 0) {
                         void	*vp{} ;
@@ -645,7 +644,7 @@ static int record_start(rec *ep,time_t dt,int wc,ureq *rp) noex {
 }
 /* end subroutine (record_start) */
 
-static int record_loadun(rec *ep,PASSWD *pwp) noex {
+static int record_loadun(rec *ep,ucentpw *pwp) noex {
 	int		rs ;
 	cchar		*cp{} ;
 	cchar		*un = pwp->pw_name ;
@@ -681,6 +680,7 @@ static int record_access(rec *ep,time_t dt) noex {
         int             rs = SR_FAULT ;
         int             pwl = 0 ;
         if (ep) {
+	    rs = SR_OK ;
             ep->ti_access = dt ;
             pwl  = ep->pwl ;
 	} /* end if (non-null) */
@@ -695,8 +695,8 @@ static int record_refresh(rec *ep,time_t dt,int wc) noex {
         if (ep) {
             char    *pwbuf{} ;
             if ((rs = malloc_pw(&pwbuf)) >= 0) {
-                PASSWD      pw{} ;
-                cint        pwlen = rs ;
+                ucentpw		pw{} ;
+                cint		pwlen = rs ;
                 if ((rs = getpw_name(&pw,pwbuf,pwlen,ep->un)) >= 0) {
                     void    *vp{} ;
                     pwl = rs ;
@@ -741,13 +741,14 @@ static int record_old(rec *ep,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
         int             f_old = false ;
         if (ep) {
+	    rs = SR_OK ;
             f_old = ((dt - ep->ti_create) >= ttl) ;
 	}
         return (rs >= 0) ? f_old : rs ;
 }
 /* end subroutine (record_old) */
 
-static int getpw(PASSWD *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
+static int getpw(ucentpw *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 	ucentpw		*pp = pwentp(pwp) ;
 	int		rs ;
 	if (rp->un) {
@@ -758,7 +759,7 @@ static int getpw(PASSWD *pwp,char *pwbuf,int pwlen,ureq *rp) noex {
 	return rs ;
 }
 
-static int getpw_name(PASSWD *pwp,char *pwbuf,int pwlen,cchar *un) noex {
+static int getpw_name(ucentpw *pwp,char *pwbuf,int pwlen,cchar *un) noex {
 	ucentpw		*ep = pwentp(pwp) ;
 	return uc_getpwnam(ep,pwbuf,pwlen,un) ;
 }

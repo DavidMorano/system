@@ -75,6 +75,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef strpack_ch *	chunkp ;
+
 
 /* external subroutines */
 
@@ -88,9 +90,9 @@ template<typename ... Args>
 static int strpack_ctor(strpack *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    op->ccp = nullptr ;
+	    op->chp = nullptr ;
 	    op->magic = 0 ;
 	    op->chsize = 0 ;
 	    op->totalsize = 0 ;
@@ -182,7 +184,7 @@ int strpack_finish(strpack *op) noex {
 		rs1 = strpack_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    op->ccp = nullptr ;
+	    op->chp = nullptr ;
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -194,17 +196,17 @@ int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 	if ((rs = strpack_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        strpack_ch	*ccp = op->ccp ;
+	        strpack_ch	*chp = op->chp ;
 	        int		amount = (sl + 1) ;
-	        if ((ccp == nullptr) || (amount > (ccp->csz - ccp->i))) {
+	        if ((chp == nullptr) || (amount > (chp->csz - chp->i))) {
 	            rs = strpack_chunknew(op,amount) ;
-	            ccp = op->ccp ;
+	            chp = op->chp ;
 	        }
 	        if (rs >= 0) { /* chunk-add */
-	            char	*bp = (ccp->cdata + ccp->i) ;
+	            char	*bp = (chp->cdata + chp->i) ;
 	            strwcpy(bp,sp,sl) ;
-	            ccp->i += amount ;
-	            ccp->c += 1 ;		/* count in chunk */
+	            chp->i += amount ;
+	            chp->c += 1 ;		/* count in chunk */
 	            op->c += 1 ;		/* count in object */
 	            op->totalsize += amount ;
 	            if (rpp) *rpp = (rs >= 0) ? bp : nullptr ;
@@ -218,7 +220,7 @@ int strpack_store(strpack *op,cchar *sp,int sl,cchar **rpp) noex {
 int strpack_count(strpack *op) noex {
 	int		rs  ;
 	if ((rs = strpack_magic(op)) >= 0) {
-		rs = op->c ;
+	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -242,10 +244,10 @@ static int strpack_chunknew(strpack *op,int amount) noex {
 	void		*vp{} ;
 	if (op->chsize > amount) amount = op->chsize ;
 	if ((rs = uc_libmalloc(csz,&vp)) >= 0) {
-	    strpack_ch	*cep = (strpack_ch *) vp ;
+	    strpack_ch	*cep = chunkp(vp) ;
 	    if ((rs = chunk_start(cep,(amount + 1))) >= 0) {
 	        if ((rs = vechand_add(op->clp,cep)) >= 0) {
-	            op->ccp = cep ;
+	            op->chp = cep ;
 	            if (op->totalsize == 0) {
 	                chunk_adv(cep) ;
 	                op->totalsize = 1 ;
@@ -269,14 +271,14 @@ static int strpack_chunkfins(strpack *op) noex {
 	int		rs1 ;
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(clp,i,&vp) >= 0 ; i += 1) {
-	    strpack_ch	*ccp = (strpack_ch *) vp ;
-	    if (ccp) {
+	    if (vp) {
+	        strpack_ch	*chp = chunkp(vp) ;
 		{
-	            rs1 = chunk_finish(ccp) ;
+	            rs1 = chunk_finish(chp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_libfree(ccp) ;
+	            rs1 = uc_libfree(chp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
@@ -289,10 +291,10 @@ static int chunk_start(strpack_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
 	memclear(cnp,sizeof(strpack_ch)) ;
 	if (csz > 0) {
-	    cnp->csz = csz ;
 	    void	*vp{} ;
+	    cnp->csz = csz ;
 	    if ((rs = uc_libmalloc(csz,&vp)) >= 0) {
-	        cnp->cdata = (char *) vp ;
+	        cnp->cdata = charp(vp) ;
 	    }
 	}
 	return rs ;

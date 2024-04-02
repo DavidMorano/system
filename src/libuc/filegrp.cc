@@ -26,7 +26,6 @@
 #include	<ctime>
 #include	<cstdlib>
 #include	<cstring>		/* <- for |strken(3c)| */
-#include	<grp.h>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<vechand.h>
@@ -88,7 +87,7 @@ static inline int filegrp_ctor(filegrp *op,Args ... args) noex {
 	    op->ti_check = 0 ;
 	    op->magic = 0 ;
 	    op->ttl = 0 ;
-	    op->max = 0 ;
+	    op->nmax = 0 ;
 	    op->s = {} ;
  	    if ((op->flp = new(nothrow) cq) != nullptr) {
  	        if ((op->alp = new(nothrow) vechand) != nullptr) {
@@ -162,21 +161,22 @@ static bufsizevar	gnl(getbufsize_gn) ;
 
 /* exported subroutines */
 
-int filegrp_start(FGO *op,int max,int ttl) noex {
+int filegrp_start(FGO *op,int nmax,int ttl) noex {
 	cint		defnum = FILEGRP_DEFENTRIES ;
 	int		rs ;
 	if ((rs = filegrp_ctor(op)) >= 0) {
-	    if (max < 4) max = FILEGRP_DEFMAX ;
+	    if (nmax < 4) nmax = FILEGRP_DEFMAX ;
 	    if (ttl < 1) ttl = FILEGRP_DEFTTL ;
 	    if ((rs = cq_start(op->flp)) >= 0) {
 	        if ((rs = vechand_start(op->alp,defnum,0)) >= 0) {
-		    op->max = max ;
+		    op->nmax = nmax ;
 		    op->ttl = ttl ;
-		    op->ti_check = time(NULL) ;
+		    op->ti_check = time(nullptr) ;
 		    op->magic = FILEGRP_MAGIC ;
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 		    cq_finish(op->flp) ;
+		}
 	    } /* end if (cq-start) */
 	    if (rs < 0) {
 		filegrp_dtor(op) ;
@@ -190,36 +190,36 @@ int filegrp_finish(FGO *op) noex {
 	int		rs ;
 	int		rs1{} ;		/* <- because possible compiler bug */
 	if ((rs = filegrp_magic(op)) >= 0) {
-		{
-		    vechand	*rlp = op->alp ;
-	            void	*vp{} ;
-	            for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
-	                if (vp) {
-	                    REC	*rp = (REC *) vp ;
-		            {
-	                        rs1 = record_finish(rp) ;
-	                        if (rs >= 0) rs = rs1 ;
-		            }
-		            {
-	                        rs1 = uc_libfree(rp) ;
-	                        if (rs >= 0) rs = rs1 ;
-		            }
-	                }
-	            } /* end while */
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = vechand_finish(op->alp) ;
-		    if (rs >= 0) rs = rs1 ;	/* <- compiler bug here */
-		}
-		{
-	            void	*vp{} ;
-		    while (cq_rem(op->flp,&vp) >= 0) {
-	    	        rs1 = uc_libfree(vp) ;
-	    	        if (rs >= 0) rs = rs1 ;
-		    }
-		}
-	    {
+            {
+                vechand     *rlp = op->alp ;
+                void        *vp{} ;
+                for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+                    if (vp) {
+                        REC *rp = (REC *) vp ;
+                        {
+                            rs1 = record_finish(rp) ;
+                            if (rs >= 0) rs = rs1 ;
+                        }
+                        {
+                            rs1 = uc_libfree(rp) ;
+                            if (rs >= 0) rs = rs1 ;
+                        }
+                    }
+                } /* end while */
+                if (rs >= 0) rs = rs1 ;
+            }
+            if (op->alp) {
+                rs1 = vechand_finish(op->alp) ;
+                if (rs >= 0) rs = rs1 ;     /* <- compiler bug here */
+            }
+            {
+                void        *vp{} ;
+                while (cq_rem(op->flp,&vp) >= 0) {
+                    rs1 = uc_libfree(vp) ;
+                    if (rs >= 0) rs = rs1 ;
+                }
+            }
+	    if (op->flp) {
 	        rs1 = cq_finish(op->flp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -234,7 +234,7 @@ int filegrp_finish(FGO *op) noex {
 /* end subroutine (filegrp_finish) */
 
 int filegrp_add(FGO *op,gid_t gid,cc *gn) noex {
-	const time_t	dt = time(NULL) ;
+	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		gl = 0 ;
 	if ((rs = filegrp_magic(op,gn)) >= 0) {
@@ -245,7 +245,7 @@ int filegrp_add(FGO *op,gid_t gid,cc *gn) noex {
 	                gl = rs ;
 	                rs = record_update(rp,dt,gn) ;
 	            } else if (rs == SR_NOTFOUND) {
-	                rs = filegrp_newrec(op,dt,NULL,gid,gn) ;
+	                rs = filegrp_newrec(op,dt,nullptr,gid,gn) ;
 	                gl = rs ;
 	            }
 	        } /* end if (valid) */
@@ -255,7 +255,7 @@ int filegrp_add(FGO *op,gid_t gid,cc *gn) noex {
 /* end subroutine (filegrp_add) */
 
 int filegrp_lookgid(FGO *op,ENT *ep,gid_t gid) noex {
-	const time_t	dt = time(NULL) ;
+	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		gl = 0 ;
 	if ((rs = filegrp_magic(op,ep)) >= 0) {
@@ -290,10 +290,10 @@ int filegrp_lookgid(FGO *op,ENT *ep,gid_t gid) noex {
 int filegrp_stats(FGO *op,FILEGRP_STATS *sp) noex {
 	int		rs ;
 	if ((rs = filegrp_magic(op,sp)) >= 0) {
-	        if ((rs = vechand_count(op->alp)) >= 0) {
-	            *sp = op->s ;
-	            sp->nentries = rs ;
-	        }
+	    if ((rs = vechand_count(op->alp)) >= 0) {
+	        *sp = op->s ;
+	        sp->nentries = rs ;
+	    }
 	} /* end if (magic) */
 	return rs ;
 }
@@ -303,12 +303,12 @@ int filegrp_check(FGO *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
 	if ((rs = filegrp_magic(op)) >= 0) {
-	        if (dt == 0) dt = time(NULL) ;
-	        if ((dt - op->ti_check) >= TO_CHECK) {
-	            f = true ;
-	            op->ti_check = dt ;
-	            rs = filegrp_maintenance(op,dt) ;
-	        }
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((dt - op->ti_check) >= TO_CHECK) {
+	        f = true ;
+	        op->ti_check = dt ;
+	        rs = filegrp_maintenance(op,dt) ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
@@ -331,7 +331,7 @@ static int filegrp_newrec(FGO *op,time_t dt,REC **rpp,gid_t gid,cc *gn) noex {
 	    if (rs < 0)
 		uc_libfree(rp) ;
 	} /* end if */
-	if (rpp) *rpp = (rs >= 0) ? rp : NULL ;
+	if (rpp) *rpp = (rs >= 0) ? rp : nullptr ;
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (filegrp_newrec) */
@@ -374,7 +374,7 @@ static int filegrp_searchgid(FGO *op,REC **rpp,gid_t gid) noex {
 static int filegrp_maintenance(FGO *op,time_t dt) noex {
 	vechand		*rlp = op->alp ;
 	REC		*rp{} ;
-	time_t		ti_oldest = LONG_MAX ;
+	time_t		ti_oldest = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		iold = -1 ; /* the oldest one */
@@ -396,7 +396,7 @@ static int filegrp_maintenance(FGO *op,time_t dt) noex {
 	} /* end for */
 	if ((rs >= 0) && (iold >= 0)) {
 	    cint	n = vechand_count(op->alp) ;
-	    if (n > op->max) {
+	    if (n > op->nmax) {
 	        rs1 = vechand_get(op->alp,iold,&vp) ;
 	        if ((rs1 >= 0) && rp) {
 		    rp = (REC *) vp ;
@@ -411,11 +411,11 @@ static int filegrp_maintenance(FGO *op,time_t dt) noex {
 /* end subroutine (filegrp_maintenance) */
 
 static int filegrp_allocrec(FGO *op,REC **rpp) noex {
-	cint		size = sizeof(REC) ;
+	cint		sz = sizeof(REC) ;
 	int		rs ;
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
 	    void	*vp{} ;
-	    rs = uc_libmalloc(size,&vp) ;
+	    rs = uc_libmalloc(sz,&vp) ;
 	    if (rs >= 0) *rpp = (REC *) vp ;
 	}
 	return rs ;
@@ -481,8 +481,8 @@ static int record_start(REC *rp,time_t dt,gid_t gid,cc *gn) noex {
 	int		gl = 0 ;
 	if (rp && gn) {
 	    rs = SR_INVALID ;
-	    memclear(rp,sizeof(REC)) ;
-	    if (dt == 0) dt = time(NULL) ;
+	    memclear(rp) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    if (gn[0]) {
 		char	*gp{} ;
 		if ((rs = libmalloc_gn(&gp)) >= 0) {
@@ -559,7 +559,7 @@ static int record_access(REC *rp,time_t dt) noex {
 /* end subroutine (record_access) */
 
 static int entry_load(ENT *ep,REC *rp) noex {
-	cint	egl = GROUPNAMELEN ;
+	cint	egl = FILEGRPENT_GRPLEN ;
 	ep->gid = rp->gid ;
 	return (strwcpy(ep->gn,rp->gn,egl) - ep->gn) ;
 }

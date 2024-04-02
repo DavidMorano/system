@@ -601,7 +601,7 @@ static int getpmquid(void) noex {
 	int		rs1 ;
 	int		uid = -1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    PASSWD	pw ;
+	    ucentpw	pw ;
 	    cint	pwlen = rs ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {

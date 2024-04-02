@@ -50,6 +50,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+#include	"hash.h"
+
 
 /* local defines */
 

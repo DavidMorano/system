@@ -47,7 +47,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -115,7 +114,7 @@ static int mkdirlist_ctor(mkdirlist *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOMEM ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(op) ; /* dangerous */
 	    if ((op->dlp = new(nothrow) vechand) != nullptr) {
 		rs = SR_OK ;
 	    } /* end if (new-vechand) */
@@ -296,6 +295,7 @@ int mkdirlist_show(mkdirlist *op,cchar *ng,int order) noex {
 	    if (ng[0]) {
 		vechand		*dlp = op->dlp ;
 		void		*vp{} ;
+		rs = SR_OK ;
 	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                mkdirlist_ent	*ep = entp(vp) ;
@@ -318,6 +318,7 @@ int mkdirlist_ung(mkdirlist *op,cc *ung,time_t utime,int f_sub,int order) noex {
 	    if (ung[0]) {
 	        vechand		*dlp = op->dlp ;
 		void		*vp{} ;
+		rs = SR_OK ;
 	        for (int i = 0 ; vechand_get(dlp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                mkdirlist_ent	*ep = entp(vp) ;
@@ -481,7 +482,7 @@ static int entry_start(ENT *ep,USTAT *sbp,cchar *dbuf,int dlen) noex {
 	int		rs ;
 	int		c = 0 ;
 	cchar		*cp ;
-	memclear(ep) ;			/* dangerous */
+	memclear(ep) ; /* dangerous */
 	if ((rs = uc_mallocstrw(dbuf,dlen,&cp)) >= 0) {
 	    cint	nlen = rs ;
 	    ep->name = cp ;
@@ -509,14 +510,14 @@ static int entry_finish(ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int entry_matung(ENT *ep,cc *ung,time_t utime,int f_sub,int order) noex {
+static int entry_matung(ENT *ep,cc *ung,time_t ut,int f_sub,int order) noex {
 	int		rs = SR_OK ;
 	if (! ep->f.link) {
 	    if (bbcmp(ung,ep->name) == 0) {
 	        rs = 1 ;
 	        ep->f.seen = true ;
 	        ep->f.subscribe = f_sub ;
-	        ep->utime = utime ;
+	        ep->utime = ut ;
 		ep->order = order ;
 	    } /* end if (name match) */
 	} /* end if (not a linked entry) */

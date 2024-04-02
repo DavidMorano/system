@@ -42,7 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -108,7 +107,7 @@ template<typename ... Args>
 static inline int strstore_ctor(strstore *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ccp = nullptr ;
@@ -221,7 +220,7 @@ int strstore_start(strstore *op,int n,int csz) noex {
 	        if ((rs = vechand_start(op->nlp,n,vo)) >= 0) {
 		    cint	isize = sizeof(int) ;
 	            if ((rs = lookaside_start(op->lap,isize,n)) >= 0) {
-		        const nullptr_t	np{} ;
+		        cnullptr	np{} ;
 		        cint		hn = ((n*3)/2) ;
 	                if ((rs = hdb_start(op->hlp,hn,true,np,np)) >= 0) {
 	                    op->magic = STRSTORE_MAGIC ;
@@ -403,7 +402,7 @@ int strstore_already(strstore *op,cchar *sp,int sl) noex {
 int strstore_count(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-		rs = op->c ;
+	    rs = op->c ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -412,7 +411,7 @@ int strstore_count(strstore *op) noex {
 int strstore_size(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-		rs = op->totalsize ;
+	    rs = op->totalsize ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -421,7 +420,8 @@ int strstore_size(strstore *op) noex {
 int strstore_strsize(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-		rs = iceil(op->totalsize,sizeof(int)) ;
+	    cint	vsz = int(sizeof(int)) ;
+	    rs = iceil(op->totalsize,vsz) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -460,8 +460,8 @@ int strstore_strmk(strstore *op,char *tabp,int tabl) noex {
 int strstore_recsize(strstore *op) noex {
 	int		rs ;
 	if ((rs = strstore_magic(op)) >= 0) {
-	        cint	n = (op->c + 1) ;
-	        rs = (n + 1) * sizeof(int) ;
+	    cint	n = (op->c + 1) ;
+	    rs = (n + 1) * sizeof(int) ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -473,11 +473,11 @@ int strstore_recmk(strstore *op,int *rdata,int rsize) noex {
 	if ((rs = strstore_magic(op,rdata)) >= 0) {
 	    cint	n = (op->c + 1) ;
 	    {
-		cint	size = (n + 1) * sizeof(int) ;
+		cint	sz = (n + 1) * sizeof(int) ;
 		rs = SR_OVERFLOW ;
-	        if (rsize >= size) {
-		    HDB		*hp = op->hlp ;
-	            HDB_CUR	cur ;
+	        if (rsize >= sz) {
+		    hdb		*hp = op->hlp ;
+	            hdb_cur	cur ;
 	            hdb_dat	key, val ;
 	            rdata[c++] = 0 ;	/* ZERO-entry is NUL-string */
 	            if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
@@ -531,9 +531,10 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 	            memset(it,0,isize) ;
 	            if ((rs = vecobj_start(&ses,esize,op->c,vo)) >= 0) {
 	                STRENTRY	se ;
-			HDB		*hp = op->hlp ;
-	                HDB_CUR		cur ;
-	                hdb_dat	key, val ;
+			hdb		*hp = op->hlp ;
+	                hdb_cur		cur ;
+	                hdb_dat		key ;
+	                hdb_dat		val ;
 	                uint		khash, chash, nhash ;
 	                int		lhi, nhi, hi, si ;
 	                if ((rs = hdb_curbegin(hp,&cur)) >= 0) {
@@ -614,7 +615,7 @@ int strstore_indmk(strstore *op,int (*it)[3],int itsize,int nskip) noex {
 
 static int strstore_chunknew(strstore *op,int amount) noex {
 	STRSTORE_CHUNK	*cep ;
-	const int	csize = sizeof(STRSTORE_CHUNK) ;
+	cint		csize = sizeof(STRSTORE_CHUNK) ;
 	int		rs ;
 	if (op->chsize > amount) amount = op->chsize ;
 	if ((rs = uc_malloc(csize,&cep)) >= 0) {
@@ -659,10 +660,11 @@ static int strstore_chunkfins(strstore *op) noex {
 /* end subroutine (strstore_chunkfins) */
 
 static int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		*ip{} ;
 	if ((rs = lookaside_get(op->lap,&ip)) >= 0) {
-	    hdb_dat	key, val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    *ip = si ;
 	    key.buf = kp ;
 	    key.len = kl ;
@@ -676,12 +678,12 @@ static int strstore_manage(strstore *op,cchar *kp,int kl,int si) noex {
 }
 /* end subroutine (strstore_manage) */
 
-static int chunk_start(strstore_ch *cnp,int csize) noex {
+static int chunk_start(strstore_ch *cnp,int csz) noex {
 	int		rs = SR_INVALID ;
 	memclear(cnp) ;
-	if (csize > 0) {
-	    cnp->csz = csize ;
-	    rs = uc_malloc(csize,&cnp->cdata) ;
+	if (csz > 0) {
+	    cnp->csz = csz ;
+	    rs = uc_malloc(csz,&cnp->cdata) ;
 	}
 	return rs ;
 }

@@ -30,9 +30,11 @@
 EXTERNC_begin
 
 extern int intsatl(long) noex ;
+extern int intsato(off_t) noex ;
 extern int intsatll(longlong) noex ;
 
 extern int intsatul(ulong) noex ;
+extern int intsats(size_t) noex ;
 extern int intsatull(ulonglong) noex ;
 
 extern int iaddsat(int,int) noex ;
@@ -50,6 +52,9 @@ EXTERNC_end
 static inline int intsat(long v) noex {
 	return intsatl(v) ;
 }
+static inline int intsat(off_t v) noex {
+	return intsato(v) ;
+}
 static inline int intsat(longlong v) noex {
 	return intsatll(v) ;
 }
@@ -57,6 +62,11 @@ static inline int intsat(longlong v) noex {
 static inline int intsat(ulong v) noex {
 	return intsatul(v) ;
 }
+#ifdef	COMMENT
+static inline int intsat(size_t v) noex {
+	return intsats(v) ;
+}
+#endif /* COMMENT */
 static inline int intsat(ulonglong v) noex {
 	return intsatull(v) ;
 }

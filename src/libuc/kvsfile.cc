@@ -59,6 +59,7 @@
 #include	<mkpathx.h>
 #include	<strwcpy.h>
 #include	<sfx.h>
+#include	<intsat.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -112,7 +113,7 @@ struct kvsfile_file {
 	time_t		mtime ;
 	ino_t		ino ;
 	dev_t		dev ;
-	int		size ;
+	int		fsize ;
 } ;
 
 struct kvsfile_key {
@@ -570,7 +571,7 @@ static int kvsfile_fparse(kvsfile *op,int fi) noex {
 	                            fep->dev = dev ;
 	                            fep->ino = ino ;
 	                            fep->mtime = sb.st_mtime ;
-	                            fep->size = sb.st_size ;
+	                            fep->fsize = intsat(sb.st_size) ;
 	                            rs = kvsfile_fparser(op,fi,lfp) ;
 	                            c = rs ;
 	                            if (rs < 0) {
@@ -943,31 +944,39 @@ static int entry_finish(kf_ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int cmpfname(kf_file **e1pp,KVSFILE_FILE **e2pp) noex {
+static int cmpfname(kf_file **e1pp,kf_file **e2pp) noex {
+	kf_file		*e1p = *e1pp ;
+	kf_file		*e2p = *e2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp != nullptr) {
-	        if (*e2pp != nullptr) {
+	if (e1p || e2p) {
+	    if (e1p) {
+	        if (e2p) {
 	            rc = strcmp((*e1pp)->fname,(*e2pp)->fname) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	       rc = 1 ;
+	    }
 	}
 	return rc ;
 }
 /* end subroutine (cmpfname) */
 
 static int cmpkey(kf_key **e1pp,kf_key **e2pp) noex {
+	kf_key		*e1p = *e1pp ;
+	kf_key		*e2p = *e2pp ;
 	int		rc = 0 ;
-	if ((*e1pp != nullptr) || (*e2pp != nullptr)) {
-	    if (*e1pp != nullptr) {
-	        if (*e2pp != nullptr) {
+	if (e1p || e2p) {
+	    if (e1p) {
+	        if (e2p) {
 	            rc = strcmp((*e1pp)->kname,(*e2pp)->kname) ;
-	        } else
+	        } else {
 	            rc = -1 ;
-	    } else
+		}
+	    } else {
 	        rc = 1 ;
+	    }
 	}
 	return rc ;
 }

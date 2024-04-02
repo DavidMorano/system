@@ -67,7 +67,8 @@ typedef querystr_cur	cur ;
 
 /* local structures */
 
-struct keyval {
+namespace {
+    struct keyval {
 	cchar		*kp = nullptr ;
 	cchar		*vp = nullptr ;
 	int		kl = 0 ;
@@ -78,14 +79,13 @@ struct keyval {
 	    kl = akl ;
 	    vl = avl ;
 	} ;
-} ;
-
-class subinfo {
+    } ; /* end struct (keyval) */
+    class subinfo {
 	querystr	*op ;
 	vector<keyval>	kvs ;
 	char		*tbuf = nullptr ;
 	int		tlen = 0 ;
-public:
+    public:
 	subinfo(querystr *aop) noex : op(aop) { } ;
 	~subinfo() {
 	    if (tbuf != nullptr) {
@@ -112,7 +112,8 @@ public:
 	int fixval(char *,int,cchar *,int) noex ;
 	int load() noex ;
 	int store(cchar *,int,cchar *,int) noex ;
-} ;
+    } ; /* end struct (subinfo) */
+}
 
 
 /* forward references */
@@ -123,7 +124,7 @@ static int querystr_ctor(querystr *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(op) ; /* dangerous */
 	    if ((op->spp = new(nothrow) strpack) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-strpack) */
@@ -187,7 +188,7 @@ int querystr_finish(querystr *op) noex {
 	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
-	    if (op->kv != nullptr) {
+	    if (op->kv) {
 	        rs1 = uc_free(op->kv) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->kv = nullptr ;
@@ -220,6 +221,7 @@ int querystr_already(querystr *op,cchar *kstr,int klen) noex {
 	int		f = false ;
 	if (op && kstr) {
 	    cint	n = op->n ;
+	    rs = SR_OK ;
 	    if (klen < 0) klen = strlen(kstr) ;
 	    for (int i = 0 ; i < n ; i += 1) {
 	        f = (strwcmp(op->kv[i][0],kstr,klen) == 0) ;
@@ -452,10 +454,10 @@ int subinfo::load() noex {
 	cint		n = kvs.size() ;
 	cint		esize = 2*sizeof(cchar *) ;
 	int		rs ;
-	int		size ;
+	int		sz ;
 	void		*p ;
-	size = ((n+1)*esize) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
+	sz = ((n+1)*esize) ;
+	if ((rs = uc_malloc(sz,&p)) >= 0) {
 	    op->kv = (cchar *(*)[2]) p ;
 	    op->n = n ;
 	    for (int i = 0 ; i < n ; i += 1) {

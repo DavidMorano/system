@@ -144,7 +144,7 @@ static int	envhelp_envadd(envhelp *,cchar *,cchar *,int) noex ;
 
 int envhelp_start(envhelp *op,mainv envbads,mainv envv) noex {
 	cint		vo = (VECHAND_OCOMPACT | VECHAND_OSORTED) ;
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if (envv == nullptr) envv = environ ;
 	if ((rs = envhelp_ctor(op)) >= 0) {
 	    cint	ne = NENVS ;
@@ -198,16 +198,16 @@ int envhelp_envset(envhelp *op,cchar *kp,cchar *vp,int vl) noex {
 	int		i = INT_MAX ;
 	if (op && kp) {
 	    vechand	*elp = op->elp ;
-	    int		size = 0 ;
+	    int		sz = 0 ;
 	    char	*p{} ;		/* 'char' for pointer arithmentic */
-	    size += strlen(kp) ;
-	    size += 1 ;			/* for the equals sign character */
+	    sz += strlen(kp) ;
+	    sz += 1 ;			/* for the equals sign character */
 	    if (vp != nullptr) {
 	        if (vl < 0) vl = strlen(vp) ;
-	        size += strnlen(vp,vl) ;
+	        sz += strnlen(vp,vl) ;
 	    }
-	    size += 1 ;			/* terminating NUL */
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	    sz += 1 ;			/* terminating NUL */
+	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        cchar		*ep{} ;
 	        char		*bp = p ;
 	        bp = strwcpy(bp,kp,-1) ;
@@ -259,16 +259,18 @@ int envhelp_sort(envhelp *op) noex {
 /* end subroutine (envhelp_sort) */
 
 int envhelp_getvec(envhelp *op,cchar ***eppp) noex {
-	vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
-	vechand		*elp = op->elp ;
-	int		rs ;
-	if ((rs = vechand_sort(elp,vcf)) >= 0) {
-	    if (eppp != nullptr) {
-	        rs = vechand_getvec(elp,eppp) ;
-	    } else {
-	        rs = vechand_count(elp) ;
-	    }
-	} /* end if (vechand_sort) */
+	int		rs = SR_FAULT ;
+	if (op) {
+	    vechand_vcmp	vcf = vechand_vcmp(vstrkeycmp) ;
+	    vechand		*elp = op->elp ;
+	    if ((rs = vechand_sort(elp,vcf)) >= 0) {
+	        if (eppp != nullptr) {
+	            rs = vechand_getvec(elp,eppp) ;
+	        } else {
+	            rs = vechand_count(elp) ;
+	        }
+	    } /* end if (vechand_sort) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (envhelp_getvec) */

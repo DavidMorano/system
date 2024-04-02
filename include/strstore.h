@@ -49,12 +49,12 @@ struct strstore_chunk {
 } ;
 
 struct strstore_head {
-	uint		magic ;
 	STRSTORE_CHUNK	*ccp ;		/* current chunk pointer */
 	vechand		*clp ;		/* chunk-list-pointer */
 	vechand		*nlp ;		/* number-list-pointer */
 	lookaside	*lap ;		/* look-aside-pointer */
 	hdb		*hlp ;		/* hash-list-pointer */
+	uint		magic ;
 	int		chsize ;
 	int		totalsize ;
 	int		c ;		/* total count */
