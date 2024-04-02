@@ -552,7 +552,7 @@ static int logzones_updater(LZ *op,cc *znb,int znl,int off,cc *st) noex {
 	            } else if (rs == SR_NOTFOUND) {
 /* need a new entry (write it to the file) */
 	                ei = op->filesize / ebl ;
-	                if ((rs = entry_start(&e,znb,znl,off,nullptr)) >= 0) {
+	                if ((rs = entry_start(&e,znb,znl,off,np)) >= 0) {
 	                    entry_update(&e,st) ;
 	                    entry_write(&e,ebp,ebl) ;
 	                    rs = u_pwrite(op->fd,ebp,ebl,op->filesize) ;
@@ -693,7 +693,7 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	    if (elen >= (EFO_OVERLAST - 1)) {
 	        uint	uv ;
 	        if ((rs = cfdecui(ebuf,EFL_COUNT,&uv)) >= 0) {
-	            int		hours, mins, sign ;
+		    int		sign ;
 	            int		cl ;
 	            cchar	*bp = ebuf ;
 	            cchar	*cp ;
@@ -706,6 +706,7 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	            sign = (*bp++ == '-') ? 1 : -1 ; /* reverse of thinking */
 /* do we have an offset? */
 	            {
+	                int	hours, mins ;
 		        int	i = 0 ; /* used afterwards */
 	                for (i = 0 ; i < 4 ; i += 1) {
 	                    cint	ch = mkchar(bp[i]) ;
@@ -744,89 +745,72 @@ static int entry_update(LZ_ENT *ep,cchar *st) noex {
 /* end subroutine (entry_update) */
 
 static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
-	int		v ;
-	int		hours, mins ;
-	int		zl, cl, rl ;
-	char		numbuf1[EFL_COUNT + 1] ;
-	char		*bp = ebuf ;
-	char		*cp ;
-
-	if (ep == nullptr) return SR_FAULT ;
-
-	if (elen < 23) return SR_OVERFLOW ;
-
+	int		rs = SR_FAULT ;
+	if (ep && ebuf) {
+	    cint	clen = EFL_COUNT ;
+	    char	cbuf[EFL_COUNT + 1] ;
+	    rs = SR_OVERFLOW ;
+	    if (elen >= 23) {
+	        int	zl ;
+		int	rl ;
+	        int	cl = ctdecui(cbuf,clen,ep->count) ;
+	        char	*bp = ebuf ;
+	        char	*cp = cbuf ;
+		rs = SR_OK ;
 /* the count field */
-
-	cp = numbuf1 ;
-	cl = ctdecui(numbuf1,EFL_COUNT,ep->count) ;
-
-	if (cl > EFL_COUNT) {
-	    cp += (cl - EFL_COUNT) ;
-	    cl -= (cl - EFL_COUNT) ;
-	}
-
-	rl = (EFL_COUNT - cl) ;
-	strncpy(bp,blanks,rl) ;
-
-	strncpy((bp + rl),cp,cl) ;
-
-	bp += EFL_COUNT ;
-	*bp++ = ' ' ;
-
+	        if (cl > clen) {
+	            cp += (cl - clen) ;
+	            cl -= (cl - clen) ;
+	        }
+		{
+	            rl = (clen - cl) ;
+	            strncpy(bp,blanks,rl) ;
+	            strncpy((bp + rl),cp,cl) ;
+		}
+	        bp += clen ;
+	        *bp++ = ' ' ;
 /* write out the zone-name */
-
+		{
 #ifdef	COMMENT
-	zl = ep->znl ;
+	            zl = ep->znl ;
 #else
-	zl = strnlen(ep->znb,EFL_NAME) ;
+	            zl = strnlen(ep->znb,EFL_NAME) ;
 #endif /* COMMENT */
-
-	rl = (EFL_NAME - zl) ;
-	strncpy(bp,blanks,rl) ;
-
-	strwcpyuc((bp + rl),ep->znb,zl) ;
-
-	bp += EFL_NAME ;
-	*bp++ = ' ' ;
-
+	            rl = (EFL_NAME - zl) ;
+	            strncpy(bp,blanks,rl) ;
+	            strwcpyuc((bp + rl),ep->znb,zl) ;
+	            bp += EFL_NAME ;
+		}
+	        *bp++ = ' ' ;
 /* write out the zone offset (field len=EFL_OFFSET) */
-
-	if (haveoffset(ep->off)) {
-
-	    *bp++ = (ep->off >= 0) ? '-' : '+' ;
-	    v = abs(ep->off) ;
-
-	    hours = v / 60 ;
-	    mins = v % 60 ;
-
-	    *bp++ = ((hours / 10) + '0') ;
-	    *bp++ = ((hours % 10) + '0') ;
-	    *bp++ = ((mins / 10) + '0') ;
-	    *bp++ = ((mins % 10) + '0') ;
-
-	} else {
-	    bp = strwcpy(bp,blanks,5) ;
-	}
-
-	*bp++ = ' ' ;
-
+	        if (haveoffset(ep->off)) {
+	            int		v = abs(ep->off) ;
+	            int		hours, mins ;
+	            *bp++ = (ep->off >= 0) ? '-' : '+' ;
+	            hours = v / 60 ;
+	            mins = v % 60 ;
+	            *bp++ = ((hours / 10) + '0') ;
+	            *bp++ = ((hours % 10) + '0') ;
+	            *bp++ = ((mins / 10) + '0') ;
+	            *bp++ = ((mins % 10) + '0') ;
+	        } else {
+	            bp = strwcpy(bp,blanks,5) ;
+	        }
+	        *bp++ = ' ' ;
 /* the stamp field */
-
-	cp = strwcpy(bp,ep->st,EFL_STAMP) ;
-
-	cl = cp - bp ;
-	rl = EFL_STAMP - cl ;
-	if (rl > 0) {
-	    strwcpy(cp,blanks,rl) ;
-	}
-
-	bp += EFL_STAMP ;
-
+	        cp = strwcpy(bp,ep->st,EFL_STAMP) ;
+	        cl = cp - bp ;
+	        rl = EFL_STAMP - cl ;
+	        if (rl > 0) {
+	            strwcpy(cp,blanks,rl) ;
+	        }
+	        bp += EFL_STAMP ;
 /* end it off */
-
-	*bp++ = '\n' ;
-
-	return (bp - ebuf) ;
+	        *bp++ = '\n' ;
+	        rs = (bp - ebuf) ;
+	    } /* end if (overflow) */
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_write) */
 
