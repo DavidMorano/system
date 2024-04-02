@@ -358,15 +358,15 @@ int termnote_printf(termnote *op,cc **rpp,int n,int o,cc *fmt,...) noex {
 /* end subroutine (termnote_printf) */
 
 /* make a log entry */
-int termnote_vprintf(termnote *op,cchar **rpp,int n,int o,
-		cchar *fmt,va_list ap) noex {
+int termnote_vprintf(termnote *op,cc **rpp,int n,int o,
+		cc *fmt,va_list ap) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = termnote_magic(op,rpp,fmt)) >= 0) {
-	    cint	olen = TERMNOTE_BUFSIZE ;
 	    char	*obuf{} ;
-	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
+	    if ((rs = malloc_ml(&obuf)) >= 0) {
+		cint	olen = rs ;
 	        if ((rs = vbufprintf(obuf,olen,fmt,ap)) >= 0) {
 	            rs = termnote_write(op,rpp,n,o,obuf,rs) ;
 	            wlen = rs ;
