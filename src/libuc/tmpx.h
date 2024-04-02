@@ -25,7 +25,6 @@
 
 
 /* object defines */
-
 #define	TMPX		struct tmpx_head
 #define	TMPX_CUR	struct tmpx_cursor
 #define	TMPX_FL		struct tmpx_flags
@@ -34,7 +33,6 @@
 #define	TMPX_ENTSIZE	sizeof(TMPX_ENT)
 
 /* other defines */
-
 #if	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0))
 #define	TMPX_DEFUTMP	"/var/adm/utmpx"
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -45,7 +43,6 @@
 #endif
 
 /* entry type values */
-
 #define	TMPX_TEMPTY		0	/* entry is unused */
 #define	TMPX_TRUNLEVEL		1
 #define	TMPX_TBOOTTIME		2
@@ -59,14 +56,12 @@
 #define	TMPX_TSIGNATURE		10	/* used in WTMPX only? */
 
 /* entry lengths */
-
 #define	TMPX_LID		4
 #define	TMPX_LUSER		32
 #define	TMPX_LLINE		32
 #define	TMPX_LHOST		256
 
 /* UTMPX stuff (in theory could be different from above) */
-
 #ifndef	UTMPX_TEMPTY
 #define	UTMPX_TEMPTY		0	/* entry is unused */
 #define	UTMPX_TRUNLEVEL		1

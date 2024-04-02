@@ -1,10 +1,9 @@
 /* tmpx_getuserterms SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* get all of the terminals where the given user is logged in */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -19,15 +18,16 @@
 
 /*******************************************************************************
 
+	Name:
+	tmpx_getuserterms
+
+	Descrption:
 	This subroutine will find and return the names of all of
 	the controlling terminals for the specified username, if
 	there are any.
 
 	Synopsis:
-	int tmpx_getuserterms(op,lp,username)
-	TMPX		*op ;
-	VECSTR		*lp ;
-	const char	username[] ;
+	int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex
 
 	Arguments:
 	op		pointer to TMPX object
@@ -41,11 +41,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<time.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<vecitem.h>
@@ -58,37 +57,50 @@
 /* local defines */
 
 #define	DEVDNAME	"/dev/"
-#define	TERMENTRY	struct xtermentry
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
-TERMENTRY {
+struct terment {
 	cchar		*devpath ;
 	time_t		atime ;
 } ;
 
+typedef terment *	termentp ;
+
 
 /* forward references */
 
-static int	entry_start(TERMENTRY *,char *,int,time_t) ;
-static int	entry_finish(TERMENTRY *) ;
+static int	entry_start(terment *,char *,int,time_t) noex ;
+static int	entry_finish(terment *) noex ;
 
-static int	mktermfname(char *,int,const char *,int) ;
-static int	getatime(const char *,time_t *) ;
-static int	revsortfunc(TERMENTRY **,TERMENTRY **) ;
+static int	mktermfname(char *,int,cchar *,int) noex ;
+static int	getatime(cchar *,time_t *) noex ;
+static int	revsortfunc(cvoid **,cvoid **) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
-	VECITEM		el ;
+int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
+	vecitem		el ;
 	int		rs ;
 	int		rs1 ;
 	int		ddnl ;
@@ -102,16 +114,12 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
 
 	if (username[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("tmpx_getuserterms: u=%s\n",username) ;
-#endif
-
 	ddnl = mkpath1(termfname,devdname) ;
 
-	if ((rs = vecitem_start(&el,10,VECITEM_PSORTED)) >= 0) {
-	    TERMENTRY		*ep ;
-	    TMPX_ENT		ue ;
-	    TMPX_CUR		cur ;
+	if ((rs = vecitem_start(&el,10,VECITEM_OSORTED)) >= 0) {
+	    terment	*ep ;
+	    tmpx_ent		ue ;
+	    tmpx_cur		cur ;
 	    cint		llen = TMPX_LLINE ;
 	    int			i ;
 	    int			f ;
@@ -126,8 +134,8 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
 	            rs = rs1 ;
 	            if (rs < 0) break ;
 
-	            f = FALSE ;
-	            f = f || (ue.ut_type != TMPX_TUSERPROC) ;
+	            f = false ;
+	            f = f || (ue.ut_type != TMPX_TPROCUSER) ;
 	            f = f || (ue.ut_line[0] == '\0') ;
 #ifdef	COMMENT
 	            f = f || (strncmp(username,ue.ut_user,llen) != 0) ;
@@ -140,26 +148,28 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
 /* check the access time of this terminal and permissions */
 
 	            if ((rs1 = getatime(termfname,&ti_access)) >= 0) {
-	                TERMENTRY	te ;
+	                terment		te ;
 			cint		ti = ti_access ;
 	                if ((rs = entry_start(&te,termfname,tlen,ti)) >= 0) {
-	                    cint	esize = sizeof(TERMENTRY) ;
+	                    cint	esize = sizeof(terment) ;
 	                    n += 1 ;
 	                    rs = vecitem_add(&el,&te,esize) ;
-	                    if (rs < 0) 
+	                    if (rs < 0)  {
 				entry_finish(&te) ;
+			    }
 			}
 	            } /* end if (we had a better one) */
 
 	        } /* end while (looping through entries) */
 
-	        tmpx_curend(op,&cur) ;
+	        rs1 = tmpx_curend(op,&cur) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 
 	    if ((rs >= 0) && (n > 0)) {
 	        if ((rs = vecitem_sort(&el,revsortfunc)) >= 0) {
 	            for (i = 0 ; vecitem_get(&el,i,&ep) >= 0 ; i += 1) {
-	                if (ep != NULL) {
+	                if (ep) {
 	                    rs = vecstr_add(lp,ep->devpath,-1) ;
 		        }
 	                if (rs < 0) break ;
@@ -170,12 +180,13 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
 /* free up */
 
 	    for (i = 0 ; vecitem_get(&el,i,&ep) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep) {
 	            entry_finish(ep) ;
 		}
 	    } /* end for */
 
-	    vecitem_finish(&el) ;
+	    rs1 = vecitem_finish(&el) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (vecitem) */
 
 	return (rs >= 0) ? n : rs ;
@@ -185,29 +196,30 @@ int tmpx_getuserterms(TMPX *op,VECSTR *lp,cchar *username) noex {
 
 /* local subroutines */
 
-static int entry_start(TERMENTRY *ep,char *fp,int fl,time_t t) noex {
-	int		rs ;
-	cchar		*cp ;
-	ep->atime = t ;
-	rs = uc_mallocstrw(fp,fl,&cp) ;
-	if (rs >= 0) ep->devpath = cp ;
-
+static int entry_start(terment *ep,char *fp,int fl,time_t t) noex {
+	int		rs = SR_FAULT ;
+	if (ep && fp) {
+	    cchar	*cp{} ;
+	    ep->atime = t ;
+	    if ((rs = uc_mallocstrw(fp,fl,&cp)) >= 0) {
+	        ep->devpath = cp ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(TERMENTRY *ep) noex {
-	int		rs = SR_OK ;
+static int entry_finish(terment *ep) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (ep == NULL) return SR_FAULT ;
-
-	if (ep->devpath != NULL) {
-	    rs1 = uc_free(ep->devpath) ;
-	    if (rs >= 0) rs = rs1 ;
-	    ep->devpath = NULL ;
-	}
-
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->devpath) {
+	        rs1 = uc_free(ep->devpath) ;
+	        if (rs >= 0) rs = rs1 ;
+	        ep->devpath = NULL ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (entry_finish) */
@@ -227,29 +239,37 @@ static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
 static int getatime(cchar *termdev,time_t *rp) noex {
 	USTAT		sb ;
 	int		rs ;
-	int		f = TRUE ;
+	int		f = true ;
 	*rp = 0 ;
 	if ((rs = u_stat(termdev,&sb)) >= 0) {
 	    *rp = sb.st_atime ;
 	    if ((sb.st_mode & S_IWGRP) != S_IWGRP) {
-	        f = FALSE ;
+	        f = false ;
 	    }
 	} /* end if */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (getatime) */
 
-static int revsortfunc(TERMENTRY **f1pp,TERMENTRY **f2pp) noex {
+static int revsortfunc(cvoid **v1pp,cvoid **v2pp) noex {
+	cvoid		*v1p = *v1pp ;
+	cvoid		*v2p = *v2pp ;
 	int		rc = 0 ;
-	if ((f1pp != NULL) || (f2pp != NULL)) {
-	    if (f1pp != NULL) {
-	        if (f2pp != NULL) {
-	            rc = ((*f2pp)->atime - (*f1pp)->atime) ;
-	        } else
-	            rc = -1 ;
-	    } else
-	        rc = 1 ;
-	} 
+	{
+	    const terment *f1p = termentp(v1p) ;
+	    const terment *f2p = termentp(v2p) ;
+	    if (f1p || f2p) {
+	        if (f1p) {
+	            if (f2p) {
+	                rc = (f2p->atime - f1p->atime) ; /* reversed */
+	            } else {
+	                rc = -1 ;
+		    }
+	        } else {
+	            rc = 1 ;
+		}
+	    } 
+	} /* end block */
 	return rc ;
 }
 /* end subroutine (revsortfunc) */

@@ -1,4 +1,4 @@
-/* tmpx SUPPORT */
+/* tmpx_main SUPPORT */
 /* lang=C++20 */
 
 /* manage reading or writing of the [UW]TMP database */
@@ -25,7 +25,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>

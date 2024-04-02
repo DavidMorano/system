@@ -87,7 +87,7 @@
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
 
 #include	"termnote.h"
 
@@ -103,10 +103,6 @@
 
 #define	LOGDNAME	"log"
 
-#ifndef	COLUMNS
-#define	COLUMNS		80
-#endif
-
 #ifndef	TERMDEVLEN
 #define	TERMDEVLEN	80
 #endif
@@ -120,10 +116,6 @@
 #define	USERTERM	struct userterm
 
 #define	COLSTATE	struct colstate
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
 
 
 /* imported namespaces */
@@ -143,8 +135,6 @@ extern "C" {
     extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
     extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
     extern int	writeto(int,cvoid *,int,int) noex ;
-    extern int	tmpx_getuserlines(tmpx *,vecstr *,cchar *) noex ;
-    static int	vcmpatime(cvoid *,cvoid *) noex ;
     extern char	*timestr_logz(time_t,char *) noex ;
 }
 
@@ -250,6 +240,7 @@ static int	colstate_linecols(struct colstate *,cchar *,int) noex ;
 #endif
 
 static int	mkclean(char *,int,cchar *,int) noex ;
+static int	vcmpatime(cvoid *,cvoid *) noex ;
 
 static bool	hasourbad(cchar *,int) noex ;
 static bool	isourbad(int) noex ;

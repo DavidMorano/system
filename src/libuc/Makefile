@@ -772,7 +772,6 @@ lockrw.o:		lockrw.cc lockrw.h
 csem.o:			csem.cc csem.h
 ucsem.o:		ucsem.cc ucsem.h
 
-tmpx.o:			tmpx.cc tmpx.h
 fdliner.o:		fdliner.cc fdliner.h
 fbliner.o:		fbliner.cc fbliner.h
 
@@ -1113,6 +1112,11 @@ logfile.dir:
 # FILEBUF
 filebuf.o:		filebuf.dir
 filebuf.dir:
+	makesubdir $@
+
+# TMPX
+tmpx.o:			tmpx.dir
+tmpx.dir:
 	makesubdir $@
 
 
