@@ -105,10 +105,10 @@
 
 	Arguments:
 	fd		file-descriptor of terminal
-	f_new		new TRUE or false setting of message reeption
+	f_new		new TRUE or FALSE setting of message reeption
 
 	Returns:
-	>=0		previous TRUE or false setting
+	>=0		previous TRUE or FALSE setting
 	<0		error (system-return)
 
 
@@ -292,7 +292,7 @@ int tcsetmesg(int fd,int f_new) noex {
 
 int tcsetbiff(int fd,int f_new) noex {
 	int		rs = SR_NOTOPEN ;
-	int		f_old = FALSE ;
+	int		f_old = false ;
 	if (fd >= 0) {
 	    USTAT		sb ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
