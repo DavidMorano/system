@@ -41,7 +41,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strncmp(3c)| */
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<tmpx.h>

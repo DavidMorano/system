@@ -49,7 +49,7 @@
 #include	<vecstr.h>
 #include	<vecitem.h>
 #include	<tmpx.h>
-#include	<storebuf.h>
+#include	<pathadd.h>
 #include	<mkpath.h>
 #include	<localmisc.h>
 
@@ -225,14 +225,7 @@ static int entry_finish(terment *ep) noex {
 /* end subroutine (entry_finish) */
 
 static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
-	cint		rlen = MAXPATHLEN ;
-	int		rs ;
-	int		len = ddnl ;
-
-	rs = storebuf_strw(rbuf,rlen,ddnl,sp,sl) ;
-	len += rs ;
-
-	return (rs >= 0) ? len : rs ;
+	return paddaddw(rbuf,ddnl,sp,sl) ;
 }
 /* end subroutine (mktermfname) */
 

@@ -46,10 +46,9 @@
 	a subroutine that returns just the added part, then check
 	out the |storebuf(3uc)| facility or the |snadd(3uc)| facility,
 	or simply create your own using the various |snx(3uc)| 
-	subroutines (and other methods also).  In this subroutines,
+	subroutines (and other methods also).  In these subroutines,
 	the length of the supplied buffer for the added-to path is
 	assumed to be MAXPATHLEN (determined dynamically).
-
 
 *******************************************************************************/
 

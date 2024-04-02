@@ -5,7 +5,6 @@
 /* version %I% last-modified %G% */
 
 
-
 /* revision history:
 
 	= 1998-08-22, David A­D­ Morano
@@ -50,7 +49,16 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
