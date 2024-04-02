@@ -232,6 +232,7 @@ static int termnote_writer(termnote *,cchar **,int,int,cchar *,int) noex ;
 static int termnote_txopen(termnote *,time_t) noex ;
 static int termnote_txclose(termnote *) noex ;
 static int termnote_lfopen(termnote *,time_t) noex ;
+static int termnote_lfopener(termnote *,time_t,cchar *,cchar *) noex ;
 static int termnote_lfclose(termnote *) noex ;
 
 static int termnote_bufline(termnote *,buffer *,cchar *,int) noex ;
@@ -638,12 +639,11 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 		    logfile_printf(op->lfp,"  avail=%u",navail) ;
 		}
 		void		*vp{} ;
-		cchar		*tdp ;
 		for (int i = 0 ; vecobj_get(&uts,i,&vp) >= 0 ; i += 1) {
 		    if (vp) {
 	                USERTERM	*utp = usertermp(vp) ;
 			int		rsv = 0 ;
-			tdp = utp->termdev ;
+			cchar		*tdp = utp->termdev ;
 		        if ((rs = termnote_diswrite(op,o,mp,tdp)) >= 0) {
 			    n += 1 ;
 			    c += 2 ;
@@ -696,9 +696,10 @@ static int termnote_txopen(termnote *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (! op->open.tx) {
 	    if (dt == 0) dt = time(nullptr) ;
-	    rs = tmpx_open(op->txp,nullptr,0) ;
-	    op->open.tx = (rs >= 0) ;
-	    if (rs >= 0) op->ti_tmpx = dt ;
+	    if ((rs = tmpx_open(op->txp,nullptr,0)) >= 0) {
+	        op->open.tx = true ;
+	        op->ti_tmpx = dt ;
+	    }
 	}
 	return rs ;
 }
@@ -717,13 +718,10 @@ static int termnote_txclose(termnote *op) noex {
 /* end subroutine (termnote_txclose) */
 
 static int termnote_lfopen(termnote *op,time_t dt) noex {
-	cint		of = O_RDWR ;
-	cmode		om = 0666 ;
 	int		rs = SR_OK ;
+	int		rs1 ;
 	int		f_opened = false ;
 	if (! op->init.lf) {
-	    cchar	*sn = TERMNOTE_SEARCHNAME ;
-	    char	lfname[MAXPATHLEN+1] ;
 	    op->init.lf = true ;
 	    if (rs >= 0) {
 		rs = termnote_nodename(op) ;
@@ -733,36 +731,53 @@ static int termnote_lfopen(termnote *op,time_t dt) noex {
 		rs = mkplogid(op->logid,LOGIDLEN,op->nodename,pid) ;
 	    }
 	    if (rs >= 0) {
-	        rs = mkpath3(lfname,op->pr,LOGDNAME,sn) ;
-	    }
-	    if (rs >= 0) {
-		LOGFILE	*lfp = op->lfp ;
-	        if ((rs = logfile_open(lfp,lfname,of,om,op->logid)) >= 0) {
-		    f_opened = true ;
-	            op->open.lf = true ;
-		    if (rs >= 0) {
-		        rs = logfile_checksize(op->lfp,TERMNOTE_LOGSIZE) ;
+	        char	*lfname{} ;
+		if ((rs = malloc_mp(&lfname)) >= 0) {
+	  	    cchar	*sn = TERMNOTE_SEARCHNAME ;
+	            if ((rs = mkpath3(lfname,op->pr,LOGDNAME,sn)) >= 0) {
+		        rs = termnote_lfopener(op,dt,lfname,sn) ;
+		        f_opened = (rs > 0) ;
 		    }
-		    if (rs >= 0) {
-		        rs = termnote_username(op) ;
-		    }
-		    if (rs >= 0) {
-			cchar	*nn = op->nodename ;
-			cchar	*un = op->username ;
-			char	timebuf[TIMEBUFLEN+1] ;
-	        	if (dt == 0) dt = time(nullptr) ;
-			timestr_logz(dt,timebuf) ;
-			logfile_printf(op->lfp,"%s %s",timebuf,sn) ;
-			rs = logfile_printf(op->lfp,"%s!%s",nn,un) ;
-		    }
-		} else if (isNotPresent(rs)) {
-		    rs = SR_OK ;
-		} /* end if (logfile opened) */
+		    rs1 = uc_free(lfname) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
 	    } /* end if (ok) */
 	} /* end if (needed initialization) */
 	return (rs >= 0) ? f_opened : rs ;
 }
 /* end subroutine (termnote_lfopen) */
+
+static int termnote_lfopener(termnote *op,time_t dt,cc *lfname,cc *sn) noex {
+	logfile		*lfp = op->lfp ;
+	int		rs ;
+	int		fopened = false ;
+	cint		of = O_RDWR ;
+	cmode		om = 0666 ;
+        if ((rs = logfile_open(lfp,lfname,of,om,op->logid)) >= 0) {
+            fopened = true ;
+            op->open.lf = true ;
+            if (rs >= 0) {
+                rs = logfile_checksize(lfp,TERMNOTE_LOGSIZE) ;
+            }
+            if (rs >= 0) {
+                rs = termnote_username(op) ;
+            }
+            if (rs >= 0) {
+                cchar   *nn = op->nodename ;
+                cchar   *un = op->username ;
+                char    timebuf[TIMEBUFLEN+1] ;
+                if (dt == 0) dt = time(nullptr) ;
+                timestr_logz(dt,timebuf) ;
+                if ((rs = logfile_printf(lfp,"%s %s",timebuf,sn)) >= 0) {
+                    rs = logfile_printf(lfp,"%s!%s",nn,un) ;
+		}
+            } /* end if (ok) */
+        } else if (isNotPresent(rs)) {
+            rs = SR_OK ;
+        } /* end if (logfile opened) */
+	return (rs >= 0) ? fopened : rs ;
+}
+/* end subroutine (termnote_lfopener) */
 
 static int termnote_lfclose(termnote *op) noex {
 	int		rs = SR_OK ;
