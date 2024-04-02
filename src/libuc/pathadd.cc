@@ -50,6 +50,18 @@
 	the length of the supplied buffer for the added-to path is
 	assumed to be MAXPATHLEN (determined dynamically).
 
+	Extra:
+	The |pathaddw| subroutine is roughly equivalent to:
+	    int pathaddw(char *rbuf,int rl,cc *sp,int sl) noex {
+	        int		rs ;
+	        if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+		    cint	rlen = rs ;
+	            rs = storebuf_strw(rbuf,rlen,rl,sp,sl) ;
+		    rl += rs ;
+	        }
+	        return (rs >= 0) ? rl : rs ;
+	    }
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */

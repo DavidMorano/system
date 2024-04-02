@@ -83,7 +83,7 @@ typedef terment *	termentp ;
 
 /* forward references */
 
-static int	entry_start(terment *,char *,int,time_t) noex ;
+static int	entry_start(terment *,cchar *,int,time_t) noex ;
 static int	entry_finish(terment *) noex ;
 
 static int	mktermfname(char *,int,cchar *,int) noex ;
@@ -196,7 +196,7 @@ int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
 
 /* local subroutines */
 
-static int entry_start(terment *ep,char *fp,int fl,time_t t) noex {
+static int entry_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (ep && fp) {
 	    cchar	*cp{} ;
@@ -225,7 +225,7 @@ static int entry_finish(terment *ep) noex {
 /* end subroutine (entry_finish) */
 
 static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
-	return paddaddw(rbuf,ddnl,sp,sl) ;
+	return pathaddw(rbuf,ddnl,sp,sl) ;
 }
 /* end subroutine (mktermfname) */
 
