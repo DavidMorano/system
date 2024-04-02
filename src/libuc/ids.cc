@@ -90,10 +90,10 @@ int ids_load(ids *op) noex {
 	if ((rs = ids_ctor(op)) >= 0) {
 	    cnullptr	np{} ;
 	    if ((rs = u_getgroups(0,np)) >= 0) {
-	        cint	size = ((rs+1)*sizeof(gid_t)) ;
+	        cint	sz = ((rs+1)*sizeof(gid_t)) ;
 	        void	*vp{} ;
 	        ng = rs ;
-	        if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    op->gids = (gid_t *) vp ;
 		    if ((rs = u_getgroups(ng,op->gids)) >= 0) {
 		        op->gids[ng] = gidend ;
@@ -154,7 +154,9 @@ int ids_refresh(ids *op) noex {
 	        if (rs >= 0) rs = rs1 ;
 	        op->gids = nullptr ;
 	    }
-	    if (rs >= 0) rs = ids_load(op) ;
+	    if (rs >= 0) {
+		rs = ids_load(op) ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -169,10 +171,10 @@ int ids_copy(ids *op,const ids *otherp) noex {
 	    op->egid = otherp->egid ;
 	    if ((rs = ids_ngids(otherp)) >= 0) {
 	        cint	n = rs ;
-	        int	size = 0 ;
+	        int	sz = 0 ;
 	        void	*p{} ;
-	        size += ((n+1)*sizeof(gid_t)) ;
-	        if ((rs = uc_libmalloc(size,&p)) >= 0) {
+	        sz += ((n + 1) * sizeof(gid_t)) ;
+	        if ((rs = uc_libmalloc(sz,&p)) >= 0) {
 	            int		i = 0 ; /* <- used afterwards */
 		    op->gids = (gid_t *) p ;
 		    for (i = 0 ; otherp->gids[i] ; i += 1) {

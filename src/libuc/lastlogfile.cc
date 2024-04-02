@@ -105,9 +105,9 @@ int lastlogfile_open(LASTLOGFILE *llp,cchar *fname,int oflags) noex {
 	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	    llp->fname = cp ;
 	    if ((rs = lastlogfile_checkopen(llp)) >= 0) {
-		struct ustat	sb ;
+		USTAT	sb ;
 	        if ((rs = u_fstat(llp->fd,&sb)) >= 0) {
-	            llp->fsize = sb.st_size ;
+	            llp->fsize = size_t(sb.st_size) ;
 	            llp->mtime = sb.st_mtime ;
 	            llp->magic = LASTLOGFILE_MAGIC ;
 		}
@@ -337,11 +337,9 @@ int lastlogfile_writeinfo(LASTLOGFILE *llp,uid_t uid,time_t t,cchar *line,
 }
 /* end subroutine (lastlogfile_writeinfo) */
 
-
 /* check up on the object */
-int lastlogfile_check(LASTLOGFILE *llp,time_t daytime)
-{
-	struct ustat	sb ;
+int lastlogfile_check(LASTLOGFILE *llp,time_t daytime) noex {
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		f_close = FALSE ;
 

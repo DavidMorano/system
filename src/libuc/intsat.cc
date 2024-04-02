@@ -56,6 +56,10 @@ int intsatx(T v) noex {
 	}
 	return r ;
 }
+/* end subroutine-template (intsatx) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -64,12 +68,22 @@ int intsatl(long v) noex {
 	return intsatx(v) ;
 }
 
+int intsato(off_t v) noex {
+	return intsatx(v) ;
+}
+
 int intsatll(longlong v) noex {
 	return intsatx(v) ;
 }
 
 int intsatul(ulong v) noex {
-	ulong	im = ulong(INT_MAX) ;
+	ulong		im = ulong(INT_MAX) ;
+	if (v > im) v = im ;
+	return int(v) ;
+}
+
+int intsats(size_t v) noex {
+	size_t		im = size_t(INT_MAX) ;
 	if (v > im) v = im ;
 	return int(v) ;
 }

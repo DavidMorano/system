@@ -52,7 +52,7 @@ struct calmgr_head {
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* DB last check */
-	size_t		filesize ;		/* DB file size */
+	size_t		fsize ;			/* DB file size */
 	size_t		mapsize ;		/* DB map length */
 	CALMGR_FL	f ;
 	int		nentries ;		/* DB entries */

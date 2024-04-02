@@ -154,19 +154,19 @@ int lockrw_destroy(lockrw *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = lockrw_magic(op)) >= 0) {
-		{
-	            rs1 = ptc_destroy(op->cvp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-	            rs1 = ptm_destroy(op->mxp) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
-		{
-		    rs1 = lockrw_dtor(op) ;
-		    if (rs >= 0) rs = rs1 ;
-		}
-	        op->magic = 0 ;
+	    {
+	        rs1 = ptc_destroy(op->cvp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = ptm_destroy(op->mxp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = lockrw_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

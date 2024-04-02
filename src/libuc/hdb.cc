@@ -4,7 +4,6 @@
 /* general-purpose in-core hashing */
 /* version %I% last-modified %G% */
 
-#define	CF_HASHELF	1		/* use ELF-hash as default */
 
 /* revision history:
 
@@ -127,6 +126,8 @@
 #include	<algorithm>
 #include	<usystem.h>
 #include	<lookaside.h>
+#include	<strn.h>
+#include	<hash.h>
 #include	<localmisc.h>
 
 #include	"hdb.h"
@@ -148,10 +149,6 @@
 #define	ENTRYINFO		struct entryinfo
 #define	FETCUR			struct fetchcur
 
-#ifndef	CF_HASHELF
-#define	CF_HASHELF	0
-#endif
-
 
 /* imported namespaces */
 
@@ -167,10 +164,6 @@ typedef uint		hdbhv ;		/* HDB hash-value */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	strnnlen(cchar *,int,int) noex ;
-}
 
 extern "C" {
     int		hdb_delall(hdb *) noex ;
@@ -297,7 +290,10 @@ consteval DAT mkdatnull() noex {
 	return d ;
 }
 
-static uint	defhashfun(cvoid *,int) noex ;
+static uint defhashfun(cvoid *vp,int vl) noex {
+	cchar		*cp = charp(vp) ;
+	return hash_elf(cp,vl) ;
+}
 
 
 /* local variables */
@@ -305,8 +301,6 @@ static uint	defhashfun(cvoid *,int) noex ;
 static const DAT	nulldatum = mkdatnull() ;
 
 static const CUR	icur = mkcurnull() ;
-
-constexpr bool		f_hashelf = CF_HASHELF ;
 
 
 /* exported variables */
@@ -344,7 +338,7 @@ int hdb_start(hdb *op,int n,int at,hdbhash_f h,hdbcmp_f c) noex {
 	    if (rs < 0) {
 		hdb_dtor(op) ;
 	    }
-	} /* end if (non-null) */
+	} /* end if (hdn_ctor) */
 	return rs ;
 }
 /* end subroutine (hdb_start) */
@@ -459,7 +453,6 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 	        ENT	*hp ;
 	        ENT	**nextp ;
 	        uint	hv = (*op->hashfunc)(key.buf,key.len) ;
-		rs = SR_OK ;
 	        if (key.len < 0) {
 	            key.len = voidlen(key.buf) ;
 	        }
@@ -470,9 +463,7 @@ int hdb_delkey(hdb *op,HDB_D key) noex {
 	            int	ocount = op->count ;
 /* unlink this entry from the chain */
 	            *nextp = hp->next ;			/* skip this entry */
-#ifdef	OPTIONAL
-	            hp->next = nullptr ;			/* optional */
-#endif
+	            hp->next = nullptr ;
 /* OK, we are isolated now from the chain */
 	            while (hp->same != nullptr) {
 	        	ENT	*nhp = hp->same ;
@@ -935,14 +926,14 @@ static int hdb_ext(hdb *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		nhtlen = (op->htlen * 2) ;
-	int		size ;
+	int		sz ;
 	void		*vp{} ;
-	size = nhtlen * sizeof(ENT *) ;
-	if ((rs = uc_malloc(size,&vp)) >= 0) {
+	sz = nhtlen * sizeof(ENT *) ;
+	if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	    int		i = 0 ; /* <- used later */
 	    ENT		*hep, *nhep ;
 	    ENT		**nhtaddr = (ENT **) vp ;
-	    memclear(nhtaddr,size) ;
+	    memclear(nhtaddr,sz) ;
 	    for (i = 0 ; i < op->htlen ; i += 1) {
 	        if (htaddr[i] != nullptr) {
 	            for (hep = htaddr[i] ; hep ; hep = nhep) {
@@ -1079,8 +1070,7 @@ static int hdb_getentry(hdb *op,ENTRYINFO *eip,CUR *curp) noex {
 static int entry_load(ENT *ep,hdbhv hv,DAT *keyp,DAT *valp) noex {
 	int		rs = SR_FAULT ;
 	if (ep && keyp && valp) {
-	    rs = SR_OK ;
-	    memclear(ep,sizeof(ENT)) ;
+	    rs = memclear(ep) ;
 	    ep->next = nullptr ;
 	    ep->same = nullptr ;
 	    ep->hv = hv ;
@@ -1196,28 +1186,6 @@ static int fetchcur_adv(FETCUR *fcp) noex {
 	return (rs >= 0) ? idx : rs ;
 }
 /* end subroutine (fetchcur_adv) */
-
-static uint defhashfun(cvoid *dbuf,int dlen) noex {
-	uint		h = 0 ;
-	cchar		*s = (cchar *) dbuf ;
-	if constexpr (f_hashelf) {
-	    while (dlen-- > 0) {
-		uint	g ;
-	        h <<= 4 ;
-	        h += *s++ ;
-	        if ((g = (h & 0xF0000000)) != 0) {
-	            h ^= (g >> 24) ;
-	            h ^= g ;
-	        }
-	    } /* end while */
-	} else {
-	    while (dlen-- > 0) {
-	        h = ((h << 1) + *s++) ;
-	    } /* end while */ 
-	}
-	return h ;
-}
-/* end subroutine (defhashfun) */
 
 /* see if an entry is in the database */
 

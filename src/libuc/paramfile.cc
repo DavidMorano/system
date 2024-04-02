@@ -35,6 +35,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |memcpy(3c)| */
 #include	<new>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<netdb.h>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -70,6 +71,8 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -99,7 +102,7 @@ struct paramfile_file {
 	time_t		mtime ;
 	dev_t		dev ;
 	ino_t		ino ;
-	int		size ;
+	size_t		fsize ;
 } ;
 
 
@@ -111,7 +114,7 @@ template<typename ... Args>
 static inline int paramfile_ctor(paramfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->envv = nullptr ;
 	    op->a = nullptr ;
@@ -582,7 +585,7 @@ static int paramfile_fileparse(PF *op,int fi) noex {
 	                    fep->dev = sb.st_dev ;
 	                    fep->ino = sb.st_ino ;
 	                    fep->mtime = sb.st_mtime ;
-	                    fep->size = sb.st_size ;
+	                    fep->fsize = size_t(sb.st_size) ;
 	                    rs = paramfile_fileparser(op,fi,lfp) ;
 	                    c = rs ;
 	                } /* end if (needed update) */
@@ -689,10 +692,11 @@ static int paramfile_entsub(PF *op,PF_E *pep,cchar **rpp) noex {
 	if (op && pep) {
 	    rs = SR_OK ;
 	    if (pep->oval) {
+		cint		vallen = PARAMFILE_VALLEN ;
 	        rvl = pep->vlen ;
 	        if (pep->value == nullptr) {
 	            buffer	b ;
-	            cint	start = MAX(pep->vlen,USERNAMELEN) ;
+	            cint	start = max(pep->vlen,vallen) ;
 	            bool	f_exptry = false ;
 	            cchar	*rvp = nullptr ;
 	            if ((rs = buffer_start(&b,start)) >= 0) {
@@ -919,7 +923,6 @@ static int paramfile_defload(PF *op,vecstr *dvp) noex {
 	return rs ;
 }
 /* end subroutine (paramfile_defload) */
-
 
 static int paramfile_entrels(PF *op) noex {
 	vecobj		*slp = op->entsp ;

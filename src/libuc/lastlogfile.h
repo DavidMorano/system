@@ -47,7 +47,7 @@ struct lastlogfile_cursor {
 
 struct lastlogfile_head {
 	cchar		*fname ;	/* stored file name */
-	off_t		fsize ;		/* file size */
+	size_t		fsize ;		/* file size */
 	time_t		otime ;		/* open time (for FD caching) */
 	time_t		mtime ;		/* last modification time */
 	uint		magic ;

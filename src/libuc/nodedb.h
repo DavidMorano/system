@@ -55,7 +55,7 @@ struct nodedb_entry {
 	cchar		*clu ;
 	cchar		*sys ;
 	int		nkeys ;
-	int		size ;
+	int		esize ;		/* entry-size */
 	int		fi ;		/* file index */
 } ;
 

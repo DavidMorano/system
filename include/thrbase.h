@@ -55,6 +55,7 @@ struct thrbase_head {
 } ;
 
 typedef THRBASE		thrbase ;
+typedef	THRBASE_SI	thrbase_si;
 typedef THRBASE_INFO	thrbase_info ;
 
 EXTERNC_begin

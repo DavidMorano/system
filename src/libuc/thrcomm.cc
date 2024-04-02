@@ -56,7 +56,7 @@ template<typename ... Args>
 static int thrcomm_ctor(thrcomm *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->cmd = 0 ;
@@ -106,6 +106,8 @@ static int	thrcomm_ptcinit(thrcomm *,int) noex ;
 
 
 /* local variables */
+
+constexpr clockid_t	cid = CLOCK_REALTIME ;
 
 
 /* exported variables */
@@ -160,7 +162,7 @@ int thrcomm_cmdsend(thrcomm *op,int cmd,int to) noex {
 	if ((rs = thrcomm_magic(op)) >= 0) {
 	    TIMESPEC	ts{} ;
 	    if (to >= 0) {
-	        clock_gettime(CLOCK_REALTIME,&ts) ;
+	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
 	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
@@ -197,7 +199,7 @@ int thrcomm_cmdrecv(thrcomm *op,int to) noex {
 	if ((rs = thrcomm_magic(op)) >= 0) {
 	    TIMESPEC	ts{} ;
 	    if (to >= 0) {
-	        clock_gettime(CLOCK_REALTIME,&ts) ;
+	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
 	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
@@ -226,7 +228,7 @@ int thrcomm_rspsend(thrcomm *op,int rrs,int to) noex {
 	if ((rs = thrcomm_magic(op)) >= 0) {
 	    TIMESPEC	ts{} ;
 	    if (to >= 0) {
-	        clock_gettime(CLOCK_REALTIME,&ts) ;
+	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
 	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {
@@ -256,7 +258,7 @@ int thrcomm_rsprecv(thrcomm *op,int to) noex {
 	if ((rs = thrcomm_magic(op)) >= 0) {
 	    TIMESPEC	ts{} ;
 	    if (to >= 0) {
-	        clock_gettime(CLOCK_REALTIME,&ts) ;
+	        clock_gettime(cid,&ts) ;
 	        ts.tv_sec += to ;
 	    }
 	    if ((rs = ptm_lockto(op->mxp,to)) >= 0) {

@@ -71,6 +71,8 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+
 
 /* local typedefs */
 
@@ -255,7 +257,8 @@ int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
 	if ((rs = pwfile_magic(dbp,curp)) >= 0) {
 	    bool	f_locked = false ;
 	    if (dbp->lfd < 0) {
-	        rs = u_open(dbp->fname,O_RDONLY,0666) ;
+		cint	of = O_RDONLY ;
+	        rs = u_open(dbp->fname,of,0666) ;
 	        dbp->lfd = rs ;
 	    } /* end if (it wasn't open) */
 	    if (rs >= 0) {
@@ -307,7 +310,8 @@ int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
 	int		f_opened = false ;
 	if ((rs = pwfile_magic(dbp)) >= 0) {
 	    if (dbp->lfd < 0) {
-	        rs = u_open(dbp->fname,O_RDONLY,0666) ;
+		cint	of = O_RDONLY ;
+	        rs = u_open(dbp->fname,of,0666) ;
 	        dbp->lfd = rs ;
 	        f_opened = (rs >= 0) ;
 	    }
@@ -366,10 +370,11 @@ static int pwfile_loadbegin(pwfile *dbp) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = pwfile_filefront(dbp)) >= 0) {
+	    cnullptr	np{} ;
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    n = rs ;
-	    if ((rs = hdb_start(&dbp->byuser,n,0,nullptr,nullptr)) >= 0) {
+	    if ((rs = hdb_start(&dbp->byuser,n,0,np,np)) >= 0) {
 	        vecitem	*alp = &dbp->alist ;
 	        pwentry	*ep ;
 	        int	i ;
@@ -577,7 +582,7 @@ d.a.morano:
 static int pwentry_start(pwentry *ep) noex {
 	int		rs = SR_FAULT ;
 	if (ep) {
-	    memclear(ep) ;
+	    rs = memclear(ep) ;
 	    ep->lstchg = -1 ;
 	} /* end if (non-null) */
 	return rs ;
@@ -692,7 +697,8 @@ static int pwentry_mkextras(pwentry *ep) noex {
 	                                if (rs >= 0) {
 	                                    rs = loaditem(&ep->realname,vp,vl) ;
 	                                }
-	                                uc_free(p) ;
+	                                rs1 = uc_free(p) ;
+					if (rs >= 0) rs = rs1 ;
 	                            } /* end if (m-a-f) */
 	                            break ;
 	                        case gecosval_account:

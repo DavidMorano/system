@@ -127,7 +127,7 @@ template<typename ... Args>
 static int termstr_ctor(termstr *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
 	    op->ti = -1 ;
@@ -528,7 +528,7 @@ static int termstr_conseq(termstr *op,int name,int na,...) noex {
 	int		rs = SR_INVALID ;
 	int		len = 0 ;
 	if (name != 0) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    va_list	ap ;
 	    cint	tlen = TLEN ;
 	    char	tbuf[TLEN + 1] ;

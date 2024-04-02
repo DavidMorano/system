@@ -176,7 +176,7 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 		if ((op->off + wlen) > fsize) {
 		    csize	a = szceil(fsize,ps) ;
 	    	    if ((op->off + wlen) > a) {
-	        	csize e = max(((op->off + wlen) - a),p) ;
+	        	csize 	e = max(((op->off + wlen) - a),p) ;
 	                if ((rs = memfile_mapextend(op,e)) >= 0) {
 		            char	zbuf[2] = {} ;
 	                    for (size_t off = a ; off < (a + e) ; off += ps) {
@@ -337,7 +337,7 @@ static int memfile_mapextend(memfile *op,size_t ext) noex {
 	    if ((rs = u_mmap(addr,ms,mp,mf,fd,mo,&md)) >= 0) {
 	        op->dbuf = (char *) md ;
 	        op->dlen += ms ;
-	    }
+e	    }
 	} /* end if */
 /* do we need to remap entirely? */
 	if (rs < 0) {

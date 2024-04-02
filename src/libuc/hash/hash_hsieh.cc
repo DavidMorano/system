@@ -9,6 +9,8 @@
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
+#include	"hash.h"
+
 
 /* local defines */
 
@@ -33,7 +35,7 @@
 /* external subroutines */
 
 
-/* local varaibles */
+/* local variables */
 
 
 /* exported variables */

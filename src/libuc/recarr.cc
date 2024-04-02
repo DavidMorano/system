@@ -26,7 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>
@@ -126,9 +125,9 @@ int recarr_start(recarr *op,int n,int opts) noex {
 	if ((rs = recarr_ctor(op)) >= 0) {
 	    if (n <= 1) n = RECARR_DEFENTS ;
 	    if ((rs = recarr_setopts(op,opts)) >= 0) {
-	        cint	size = (n + 1) * sizeof(void **) ;
+	        cint	sz = (n + 1) * sizeof(void **) ;
 	        void	*vp{} ;
-	        if ((rs = uc_libmalloc(size,&vp)) >= 0) {
+	        if ((rs = uc_libmalloc(sz,&vp)) >= 0) {
 		    op->va = (void **) vp ;
 		    op->n = n ;
 	            op->va[0] = nullptr ;
@@ -329,7 +328,7 @@ int recarr_del(recarr *op,int i) noex {
 	            if (f_fi && (i < op->fi)) {
 	                op->fi = i ;
 	            }
-	            rs = op->c ;
+	            rs = op->c ; /* <- return-status set */
 	        } /* end if (populated) */
 	    } /* end if (valid index) */
 	} /* end if (non-null) */
@@ -490,20 +489,21 @@ static int recarr_setopts(recarr *op,int vo) noex {
 static int recarr_extend(recarr *op,int n) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
-	    int		nn, size ;
-	    void	*np{} ;
+	    int		nn ;
+	    int		sz ;
+	    void	*ap{} ;
 	    if (op->va == nullptr) {
 	        nn = (n) ? n : RECARR_DEFENTS ;
-	        size = (nn + 1) * sizeof(void **) ;
-	        rs = uc_libmalloc(size,&np) ;
+	        sz = (nn + 1) * sizeof(void **) ;
+	        rs = uc_libmalloc(sz,&ap) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        size = (nn + 1) * sizeof(void **) ;
-	        rs = uc_librealloc(op->va,size,&np) ;
+	        sz = (nn + 1) * sizeof(void **) ;
+	        rs = uc_librealloc(op->va,sz,&ap) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
-	        op->va = (void **) np ;
+	        op->va = (void **) ap ;
 	        op->n = nn ;
 		op->va[op->i] = nullptr ;
 	    }

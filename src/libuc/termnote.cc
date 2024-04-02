@@ -175,7 +175,7 @@ static int termnote_ctor(termnote *op,Args ... args) noex {
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	    memclear(op) ;		/* dangerous */
+	    memclear(op) ; /* dangerous */
 	    if ((op->idp = new(nothrow) ids) != np) {
 	        if ((op->txp = new(nothrow) tmpx) != np) {
 	            if ((op->lfp = new(nothrow) logfile) != np) {
@@ -200,6 +200,18 @@ static int termnote_dtor(termnote *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->lfp) {
+		delete op->lfp ;
+		op->lfp = nullptr ;
+	    }
+	    if (op->txp) {
+		delete op->txp ;
+		op->txp = nullptr ;
+	    }
+	    if (op->idp) {
+		delete op->idp ;
+		op->idp = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -214,7 +226,6 @@ static int termnote_magic(termnote *op,Args ... args) noex {
 	return rs ;
 }
 /* end subroutine (termnote_magic) */
-
 
 static int termnote_writer(termnote *,cchar **,int,int,cchar *,int) noex ;
 

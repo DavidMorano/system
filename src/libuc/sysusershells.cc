@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstdlib>
@@ -108,8 +107,11 @@ int sysusershells_open(sysusershells *op,cchar *sufname) noex {
 	int		rs ;
 	cchar		*defufname = SYSUSERSHELLS_FNAME ;
 	if ((rs = sysusershells_ctor(op)) >= 0) {
-	    if (sufname == NULL) sufname = defufname ; /* default */
-	    if ((rs = filemap_open(op->fmp,sufname,O_RDONLY,nmax)) >= 0) {
+	    cint	of = O_RDONLY ;
+	    if (sufname == nullptr) {
+		sufname = defufname ; /* default */
+	    }
+	    if ((rs = filemap_open(op->fmp,sufname,of,nmax)) >= 0) {
 	        op->magic = SYSUSERSHELLS_MAGIC ;
 	    }
 	    if (rs < 0) {
@@ -141,11 +143,10 @@ int sysusershells_close(sysusershells *op) noex {
 int sysusershells_readent(sysusershells *op,char *ubuf,int ulen) noex {
 	int		rs ;
 	if ((rs = sysusershells_magic(op,ubuf)) >= 0) {
-	    int		ll ;
 	    cchar	*lp ;
 	    ubuf[0] = '\0' ;
 	    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
-	        ll = rs ;
+	        int	ll = rs ;
 	        if (lp[ll-1] == '\n') ll -= 1 ;
 	        rs = snwcpy(ubuf,ulen,lp,ll) ;
 	        if (rs > 0) break ;

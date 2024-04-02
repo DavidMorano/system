@@ -75,8 +75,6 @@ using std::nothrow ;			/* constant */
 
 /* forward references */
 
-int		expcook_expbuf(EX *,int,buffer *,cchar *,int) noex ;
-
 static inline int expcook_ctor(EX *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
@@ -217,10 +215,10 @@ int expcook_curend(EX *op,expcook_cur *curp) noex {
 
 int expcook_enum(EX *op,expcook_cur *curp,char *rbuf,int rlen) noex {
 	int		rs ;
-	int		vl ;
 	int		bl = 0 ;
 	if ((rs = expcook_magic(op,curp,rbuf)) >= 0) {
 	    hdbstr	*slp = op->hlp ;
+	    int		vl ;
 	    cchar	*kp{} ;
 	    cchar	*vp{} ;
 	    if ((rs = hdbstr_enum(slp,curp->clp,&kp,&vp,&vl)) >= 0) {
@@ -284,10 +282,10 @@ int expcook_exp(EX *op,int wch,char *rbuf,int rlen,cchar *sp,int sl) noex {
 /* end subroutine (expcook_exp) */
 
 int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
-	cint		sch = '%' ;
 	int		rs ;
 	int		len = 0 ;
 	if ((rs = expcook_magic(op,bufp,sp)) >= 0) {
+	    cint	sch = '%' ;
 	    cchar	*ss = "{}" ;
 	    cchar	*tp ;
 	    if (sl < 0) sl = strlen(sp) ;
@@ -349,11 +347,11 @@ int expcook_expbuf(EX *op,int wch,buffer *bufp,cchar *sp,int sl) noex {
 /* private subroutines */
 
 static int expcook_prockey(EX *op,int wch,buffer *bufp,cchar *kp,int kl) noex {
-	hdbstr		*slp = op->hlp ;
 	int		rs = SR_NOTFOUND ;
 	int		len = 0 ;
 	if (kl < 0) kl = strlen(kp) ;
 	if (kl > 0) {
+	    hdbstr	*slp = op->hlp ;
 	    cchar	*vp{} ;
 	    if ((rs = hdbstr_fetch(slp,kp,kl,nullptr,&vp)) >= 0) {
 	        cint	vl = rs ;

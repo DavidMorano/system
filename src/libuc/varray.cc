@@ -34,8 +34,8 @@
 
 /* local defines */
 
-#define	OURMALLOC(size,pointer)		uc_libmalloc((size),(pointer))
-#define	OURREALLOC(p1,size,p2)		uc_librealloc((p1),(size),(p2))
+#define	OURMALLOC(sz,pointer)		uc_libmalloc((sz),(pointer))
+#define	OURREALLOC(p1,sz,p2)		uc_librealloc((p1),(sz),(p2))
 #define	OURFREE(pointer)		uc_libfree((pointer))
 
 
@@ -48,8 +48,6 @@ using std::nothrow ;
 
 
 /* external subroutines */
-
-int		varray_search(varray *,void *,varray_vcmp,void *) noex ;
 
 
 /* local structures */
@@ -105,11 +103,11 @@ int varray_start(varray *op,int esize,int n) noex {
 	    rs = SR_INVALID ;
 	    if (n <= 0) n = VARRAY_DEFENTS ;
 	    if (esize > 0) {
-	        cint	size = (n + 1) * sizeof(void **) ;
+	        cint	sz = (n + 1) * sizeof(void **) ;
 	        void	*vp{} ;
 	        op->esize = esize ;
-	        if ((rs = OURMALLOC(size,&vp)) >= 0) {
-	            memclear(vp,size) ;
+	        if ((rs = OURMALLOC(sz,&vp)) >= 0) {
+	            memclear(vp,sz) ;
 	            op->va = (void **) vp ;
 	            op->n = n ;
 	            rs = lookaside_start(op->lap,esize,n) ;
@@ -163,7 +161,7 @@ int varray_enum(varray *op,int i,void *rp) noex {
 	        if (i >= 0) {
 		    rs = SR_NOTFOUND ;
 	            if (i < (op->imax+1)) {
-	                if (op->va[i]) rs = 1 ;
+	                if (op->va[i]) rs = 1 ; /* <- return-status */
 	            } 
 	            if (rp) {
 	                void	**rpp = (void **) rp ;
@@ -187,7 +185,7 @@ int varray_acc(varray *op,int i,void *rp) noex {
 		    void	*ep = nullptr ;
 	            if (i < op->n) {
 	                ep = (op->va)[i] ;
-	                rs = (ep != nullptr) ;
+	                rs = (ep != nullptr) ; /* <- return-status */
 	            }
 	            if (rp) {
 	                void	**rpp = (void **) rp ;
@@ -363,17 +361,18 @@ static int varray_extend(VARRAY *op,int ni) noex {
 	if (ni >= op->n) {
 	    cint	ninc = VARRAY_DEFENTS ;
 	    cint	ndif = ((ni+1)-op->n) ;
-	    int		nn, size ;
-	    void	*np{} ;
+	    int		nn ;
+	    int		sz ;
+	    void	*vp{} ;
 	    nn = (op->n + MAX(ndif,ninc)) ;
-	    size = nn * sizeof(void **) ;
+	    sz = nn * sizeof(void **) ;
 	    if (op->va == nullptr) {
-	        if ((rs = OURMALLOC(size,&np)) >= 0) {
-	            memclear(np,size) ;
+	        if ((rs = OURMALLOC(sz,&vp)) >= 0) {
+	            memclear(vp,sz) ;
 	        }
 	    } else {
-	        if ((rs = OURREALLOC(op->va,size,&np)) >= 0) {
-	            void	**nva = (void **) np ;
+	        if ((rs = OURREALLOC(op->va,sz,&vp)) >= 0) {
+	            void	**nva = (void **) vp ;
 	            cint	nndif = (nn-op->n) ;
 	            int		dsize ;
 	            dsize = (nndif * sizeof(void **)) ;
@@ -382,7 +381,7 @@ static int varray_extend(VARRAY *op,int ni) noex {
 	        }
 	    } /* end if */
 	    if (rs >= 0) {
-	        op->va = (void **) np ;
+	        op->va = (void **) vp ;
 	        op->n = nn ;
 	    }
 	} /* end if (reallocation needed) */

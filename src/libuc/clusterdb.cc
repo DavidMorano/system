@@ -24,7 +24,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -41,6 +40,7 @@
 #include	<hdb.h>
 #include	<storeitem.h>
 #include	<kvsfile.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"clusterdb.h"
@@ -77,6 +77,7 @@
 
 using std::nullptr_t ;			/* type */
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -94,7 +95,7 @@ using std::nothrow ;			/* constant */
 struct clusterdb_file {
 	cchar		*fname ;
 	time_t		mtime ;
-	uint		size ;
+	uint		fsize ;
 } ;
 
 struct clusterdb_keyname {
@@ -106,7 +107,7 @@ struct clusterdb_ie {
 	cchar		*(*keys)[2] ;
 	cchar		*svc, *clu, *sys ;
 	int		nkeys ;			/* number of keys */
-	int		size ;			/* total size */
+	int		fsize ;			/* total size */
 	int		fi ;			/* file index */
 } ;
 
@@ -178,13 +179,19 @@ int clusterdb_open(clusterdb *op,cchar *fname) noex {
 	if ((rs = clusterdb_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
-	         USTAT		sb ;
-	         if ((rs = u_stat(fname,&sb)) >= 0) {
-	             cint	n = MAX((sb.st_size / 4),10) ;
-	             if ((rs = kvsfile_open(op->ctp,n,fname)) >= 0) {
-	                 op->magic = CLUSTERDB_MAGIC ;
-	             }
-	         } /* end if (stat) */
+	        USTAT	sb ;
+	        if ((rs = u_stat(fname,&sb)) >= 0) {
+		    csize	fsz = size_t(sb.st_size) ;
+		    int		isz ;
+		    int		ne ;
+		    {
+			isz = intsat(fsz / 4) ;
+	                ne = max(isz,10) ;
+	                if ((rs = kvsfile_open(op->ctp,ne,fname)) >= 0) {
+	                    op->magic = CLUSTERDB_MAGIC ;
+	                }
+		    } /* end block */
+	        } /* end if (stat) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		clusterdb_dtor(op) ;

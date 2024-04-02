@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<vecobj.h>
@@ -37,6 +36,7 @@
 #define	PARAMFILE_MAGIC		0x12349876
 #define	PARAMFILE_INTCHECK	2	/* file check interval (seconds) */
 #define	PARAMFILE_INTCHANGE	2	/* wait change interval (seconds) */
+#define	PARAMFILE_VALLEN	60	/* starting value-length */
 
 
 struct paramfile_flags {

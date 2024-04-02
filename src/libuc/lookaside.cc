@@ -254,17 +254,18 @@ int lookaside_audit(lookaside *op) noex {
 static int lookaside_newchunk(lookaside *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    int		size = op->eaoff + (op->n * op->esize) ;
+	    int		sz = op->eaoff + (op->n * op->esize) ;
 	    caddr_t	a ;
-	    if ((rs = OURMALLOC(size,&a)) >= 0) {
+	    if ((rs = OURMALLOC(sz,&a)) >= 0) {
 		pq_ent	*nep = (pq_ent *) a ;
 	        if ((rs = pq_ins(op->cqp,nep)) >= 0) {
 	            op->eap = caddr_t(a + op->eaoff) ;
 	            op->i = 0 ;
 	            op->nchunks += 1 ;
 	        } /* end if (pq_ins) */
-	        if (rs < 0)
+	        if (rs < 0) {
 		    OURFREE(a) ;
+		}
 	    } /* end if (m-a) */
 	} /* end if (non-null) */
 	return rs ;

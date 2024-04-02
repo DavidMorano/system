@@ -147,6 +147,8 @@ extern "C" {
     typedef int (*vog_f)(vecobj *,int,void **) noex ;
 }
 
+typedef strtab_ch *	chunkp ;
+
 
 /* external subroutines */
 
@@ -173,7 +175,7 @@ static inline int strtab_ctor(strtab *op,Args ... args) noex {
 	    const nullptr_t	np{} ;
 	    rs = SR_NOMEM ;
 	    op->magic = 0 ;
-	    op->ccp = nullptr ;
+	    op->chp = nullptr ;
 	    op->chsize = 0 ;
 	    op->stsize = 0 ;
 	    op->count = 0 ;
@@ -423,11 +425,11 @@ int strtab_strmk(strtab *op,char *tabdata,int tabsize) noex {
 			rs = SR_OK ;
 			c = op->count ;
 	    		for (int i = 0 ; vg(vlp,i,&vp) >= 0 ; i += 1) {
-	    		    strtab_ch	*ccp = (strtab_ch *) vp ;
-	        	    if (ccp) {
-	            		if (ccp->cdata) {
-	                	    memcpy(bp,ccp->cdata,ccp->cl) ;
-	                	    bp += ccp->cl ;
+	    		    strtab_ch	*chp = chunkp(vp) ;
+	        	    if (chp) {
+	            		if (chp->cdata) {
+	                	    memcpy(bp,chp->cdata,chp->cl) ;
+	                	    bp += chp->cl ;
 	            		}
 	        	    }
 	    		} /* end for */
@@ -528,7 +530,7 @@ int strtab_indmk(strtab *op,int (*it)[3],int itsize,int nskip) noex {
 		            int		sl ;
 		            cchar	*sp ;
 	                    while ((sl = hdb_enum(hp,&cur,&key,&val)) >= 0) {
-	                        sp = (cchar *) key.buf ;
+	                        sp = charp(key.buf) ;
 	                        sl = key.len ;
 	                        ip = (int *) val.buf ;
 	                        si = *ip ;
@@ -609,7 +611,7 @@ static int strtab_stuff(strtab *op,cchar *sp,int sl) noex {
 	if ((rs = strtab_extend(op,amount)) >= 0) {
 	    cchar	*vp = nullptr ;
 	    vi = op->stsize ;
-	    if ((rs = chunk_add(op->ccp,sp,sl,&vp)) >= 0) {
+	    if ((rs = chunk_add(op->chp,sp,sl,&vp)) >= 0) {
 		int	*ip ;
 	        if ((rs = STRTAB_AOGET(op->lap,&ip)) >= 0) {
 		    hdb_dat	key{} ;
@@ -637,34 +639,34 @@ static int strtab_finishchunks(strtab *op) noex {
 	int		c = 0 ;
 	void		*vp{} ;
 	for (int i = 0 ; vechand_get(clp,i,&vp) >= 0 ; i += 1) {
-	    strtab_ch	*ccp = (strtab_ch *) vp ;
-	    if (ccp) {
+	    if (vp) {
+	        strtab_ch	*chp = chunkp(vp) ;
 	        c += 1 ;
 		{
-	            rs1 = chunk_finish(ccp) ;
+	            rs1 = chunk_finish(chp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 		{
-	            rs1 = uc_free(ccp) ;
+	            rs1 = uc_free(chp) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
 	    }
 	} /* end for */
-	op->ccp = nullptr ;
+	op->chp = nullptr ;
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (strtab_finishchunks) */
 
 static int strtab_extend(strtab *op,int amount) noex {
 	int		rs = SR_OK ;
-	if (op->ccp) {
+	if (op->chp) {
 	    cint	rso = SR_OVERFLOW ;
-	    if ((rs = chunk_check(op->ccp,amount)) == rso) {
+	    if ((rs = chunk_check(op->chp,amount)) == rso) {
 		rs = SR_OK ;
-	        op->ccp = nullptr ;
+	        op->chp = nullptr ;
 	    }
 	} /* end if (tried to extend a chunk) */
-	if ((rs >= 0) && (op->ccp == nullptr)) {
+	if ((rs >= 0) && (op->chp == nullptr)) {
 	    rs = strtab_newchunk(op,amount) ;
 	}
 	return rs ;
@@ -672,77 +674,81 @@ static int strtab_extend(strtab *op,int amount) noex {
 /* end subroutine (strtab_extend) */
 
 static int strtab_newchunk(strtab *op,int amount) noex {
-	cint		size = sizeof(strtab_ch) ;
+	cint		sz = sizeof(strtab_ch) ;
 	int		rs ;
 	int		start = 0 ;
+	void		*vp{} ;
 	if (amount < op->chsize) amount = op->chsize ;
-	op->ccp = nullptr ;
-	if ((rs = uc_malloc(size,&op->ccp)) >= 0) {
+	op->chp = nullptr ;
+	if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	    op->chp = chunkp(vp) ;
 	    if (op->stsize == 0) {
 	        op->stsize = 1 ;
 	        start = 1 ;
 	    }
-	    if ((rs = chunk_start(op->ccp,amount,start)) >= 0) {
-		rs = vechand_add(op->clp,op->ccp) ;
+	    if ((rs = chunk_start(op->chp,amount,start)) >= 0) {
+		rs = vechand_add(op->clp,op->chp) ;
 		if (rs < 0)
-		    chunk_finish(op->ccp) ;
+		    chunk_finish(op->chp) ;
 	    }
 	    if (rs < 0) {
-	        uc_free(op->ccp) ;
-	        op->ccp = nullptr ;
+	        uc_free(op->chp) ;
+	        op->chp = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (strtab_newchunk) */
 
-static int chunk_start(strtab_ch *ccp,int chsize,int start) noex {
+static int chunk_start(strtab_ch *chp,int chsize,int start) noex {
 	static constexpr int	minsize = STRTAB_MINCHUNKSIZE ;
 	int		rs ;
+	char		*dp{} ;
 	if (chsize < minsize) chsize = minsize ;
-	memclear(ccp) ;
+	memclear(chp) ;
 	if (start > chsize) chsize = start ;
-	if ((rs = uc_malloc(chsize,&ccp->cdata)) >= 0) {
-	    ccp->csz = chsize ;
-	    ccp->cdata[0] = '\0' ;
-	    ccp->cl = start ;
+	if ((rs = uc_malloc(chsize,&dp)) >= 0) {
+	    chp->cdata = dp ;
+	    chp->csz = chsize ;
+	    chp->cdata[0] = '\0' ;
+	    chp->cl = start ;
 	} /* end if (m-a) */
 	return rs ;
 }
 /* end subroutine (chunk_start) */
 
-static int chunk_finish(strtab_ch *ccp) noex {
+static int chunk_finish(strtab_ch *chp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (ccp->cdata) {
-	    rs1 = uc_free(ccp->cdata) ;
+	if (chp->cdata) {
+	    rs1 = uc_free(chp->cdata) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ccp->cdata = nullptr ;
+	    chp->cdata = nullptr ;
 	}
-	ccp->csz = 0 ;
-	ccp->cl = 0 ;
+	chp->csz = 0 ;
+	chp->cl = 0 ;
 	return rs ;
 }
 /* end subroutine (chunk_finish) */
 
-static int chunk_check(strtab_ch *ccp,int amount) noex {
+static int chunk_check(strtab_ch *chp,int amount) noex {
 	int		rs = SR_OK ;
-	if (amount > (ccp->csz - ccp->cl)) {
+	if (amount > (chp->csz - chp->cl)) {
 	    rs = SR_OVERFLOW ;
 	}
 	return rs ;
 }
 /* end subroutine (chunk_check) */
 
-static int chunk_add(strtab_ch *ccp,cchar *sp,int sl,cchar **spp) noex {
+static int chunk_add(strtab_ch *chp,cc *sp,int sl,cc **spp) noex {
 	cint		amount = (sl + 1) ;
 	int		rs = SR_OK ;
-	if (amount <= (ccp->csz - ccp->cl)) {
-	    char	*bp = (ccp->cdata + ccp->cl) ;
+	if (amount <= (chp->csz - chp->cl)) {
+	    char	*bp = (chp->cdata + chp->cl) ;
 	    *spp = bp ;
 	    strwcpy(bp,sp,sl) ;
-	    ccp->cl += amount ;
-	    ccp->count += 1 ;
+	    chp->cl += amount ;
+	    chp->count += 1 ;
 	} else {
 	    *spp = nullptr ;
 	    rs = SR_NOANODE ;

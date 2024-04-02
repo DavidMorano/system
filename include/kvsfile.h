@@ -43,11 +43,11 @@ struct kvsfile_cursor {
 } ;
 
 struct kvsfile_head {
-	time_t		ti_check ;
 	vecobj		files ;
 	vecobj		keys ;
 	hdb		keyvals ;	/* indexed by key-value */
 	hdb		entries ;	/* indexed by key */
+	time_t		ti_check ;
 	uint		magic ;
 } ;
 

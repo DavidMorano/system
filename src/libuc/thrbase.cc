@@ -80,7 +80,8 @@ template<typename ... Args>
 static int thrbase_ctor(thrbase *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
 	    op->ap = np ;
 	    op->sip = np ;
 	    op->tcp = np ;
@@ -88,7 +89,6 @@ static int thrbase_ctor(thrbase *op,Args ... args) noex {
 	    op->trs = 0 ;
 	    op->f_exiting = {} ;
 	    op->f_exited = {} ;
-	    rs = SR_NOMEM ;
 	    if ((op->tcp = new(nothrow) thrcomm) != np) {
 		rs = SR_OK ;
 	    } /* end if (new-thrcomm) */
@@ -131,9 +131,9 @@ int thrbase_start(thrbase *op,thrbase_sub worker,void *ap) noex {
 	        if ((rs = uc_sigsetfill(&nsm)) >= 0) {
 		    if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	                THRBASE_SI	*sip ;
-			const nullptr_t	np{} ;
-	                cint		size = sizeof(THRBASE_SI) ;
-	                if ((rs = uc_malloc(size,&sip)) >= 0) {
+			cnullptr	np{} ;
+	                cint		sz = sizeof(THRBASE_SI) ;
+	                if ((rs = uc_malloc(sz,&sip)) >= 0) {
 	                    uptsub_f	thrsub = uptsub_f(startworker) ;
 	                    pthread_t	tid ;
 		            {

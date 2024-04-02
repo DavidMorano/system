@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int logzones_magic(logzones *op,Args ... args) noex {
+static inline int b64decoder_magic(b64decoder *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LOGZONES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == B64DECODER_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (logzones_magic) */
+/* end subroutine (b64decoder_magic) */

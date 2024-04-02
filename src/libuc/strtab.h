@@ -20,7 +20,7 @@
 
 
 #define	STRTAB			struct strtab_head
-#define	STRTAB_CHUNK		struct strtab_chunk
+#define	STRTAB_CH		struct strtab_chunk
 
 #define	STRTAB_AOBJ		lookaside
 #define	STRTAB_MAGIC		0x88776215
@@ -35,18 +35,18 @@ struct strtab_chunk {
 } ;
 
 struct strtab_head {
-	uint		magic ;
-	strtab_chunk	*ccp ;
+	STRTAB_CH	*chp ;
 	vechand		*clp ;		/* chunk-list-pointer */
 	hdb		*hlp ;		/* hash-list-pointer */
 	lookaside	*lap ;		/* lookaside-list-pointer */
+	uint		magic ;
 	int		chsize ;
 	int		stsize ;	/* "string table" size */
 	int		count ;		/* total item count */
 } ; /* end struct (strtab) */
 
-typedef struct strtab_head	strtab ;
-typedef struct strtab_chunk	strtab_ch ;
+typedef STRTAB		strtab ;
+typedef STRTAB_CH	strtab_ch ;
 
 EXTERNC_begin
 

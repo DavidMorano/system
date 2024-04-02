@@ -15,7 +15,6 @@
 /* Copyright © 2023 David A­D­ Morano.  All rights reserved. */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<unistd.h>
@@ -24,6 +23,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* <- for |memchr(3c)| */
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"filelines.h"
@@ -92,7 +92,7 @@ static int liner(int fd,size_t ms) noex {
 	int		rs ;
 	int		rs1 ;
 	int		lines = 0 ;
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	void		*md{} ;
 	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	    cint	cmd = MADV_SEQUENTIAL ;

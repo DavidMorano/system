@@ -28,11 +28,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<cstring>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -80,6 +80,8 @@ static inline int unameo_dtor(unameo *op) noex {
 
 /* local variables */
 
+static bufsizevar		nodenamelen(getbufsize_nn) ;
+
 
 /* exported variables */
 
@@ -90,36 +92,38 @@ int unameo_start(unameo *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = unameo_ctor(op)) >= 0) {
-	    cint	usz = sizeof(UTSNAME) ;
-	    void	*vp{} ;
-	    if ((rs = uc_malloc(usz,&vp)) >= 0) {
-	        UTSNAME		*unp = (UTSNAME *) vp ;
-	        if ((rs = u_uname(unp)) >= 0) {
-	            cint	nlen = NODENAMELEN ;
-	            int		size = 0 ;
-	            char	*bp ;
-	            size += (strnlen(unp->sysname,nlen) + 1) ;
-	            size += (strnlen(unp->nodename,nlen) + 1) ;
-	            size += (strnlen(unp->release,nlen) + 1) ;
-	            size += (strnlen(unp->version,nlen) + 1) ;
-	            size += (strnlen(unp->machine,nlen) + 1) ;
-	            if ((rs = uc_malloc(size,&bp)) >= 0) {
-	                op->a = bp ;
-	                op->sysname = bp ;
-	                bp = (strwcpy(bp,unp->sysname,nlen) + 1) ;
-	                op->nodename = bp ;
-	                bp = (strwcpy(bp,unp->nodename,nlen) + 1) ;
-	                op->release = bp ;
-	                bp = (strwcpy(bp,unp->release,nlen) + 1) ;
-	                op->version = bp ;
-	                bp = (strwcpy(bp,unp->version,nlen) + 1) ;
-	                op->machine = bp ;
-	                bp = (strwcpy(bp,unp->machine,nlen) + 1) ;
-	            } /* end if (memory-allocation) */
-	        } /* end if (uname) */
-	        rs1 = uc_free(unp) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a-f) */
+	    if ((rs = nodenamelen) >= 0) {
+	        cint	nlen = rs ;
+	        cint	usz = sizeof(UTSNAME) ;
+	        void	*vp{} ;
+	        if ((rs = uc_malloc(usz,&vp)) >= 0) {
+	            UTSNAME	*unp = (UTSNAME *) vp ;
+	            if ((rs = u_uname(unp)) >= 0) {
+	                int	sz = 0 ;
+	                char	*bp ;
+	                sz += (strnlen(unp->sysname,nlen) + 1) ;
+	                sz += (strnlen(unp->nodename,nlen) + 1) ;
+	                sz += (strnlen(unp->release,nlen) + 1) ;
+	                sz += (strnlen(unp->version,nlen) + 1) ;
+	                sz += (strnlen(unp->machine,nlen) + 1) ;
+	                if ((rs = uc_malloc(sz,&bp)) >= 0) {
+	                    op->a = bp ;
+	                    op->sysname = bp ;
+	                    bp = (strwcpy(bp,unp->sysname,nlen) + 1) ;
+	                    op->nodename = bp ;
+	                    bp = (strwcpy(bp,unp->nodename,nlen) + 1) ;
+	                    op->release = bp ;
+	                    bp = (strwcpy(bp,unp->release,nlen) + 1) ;
+	                    op->version = bp ;
+	                    bp = (strwcpy(bp,unp->version,nlen) + 1) ;
+	                    op->machine = bp ;
+	                    bp = (strwcpy(bp,unp->machine,nlen) + 1) ;
+	                } /* end if (memory-allocation) */
+	            } /* end if (uname) */
+	            rs1 = uc_free(unp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (nodenamelen) */
 	    if (rs < 0) {
 		unameo_dtor(op) ;
 	    }

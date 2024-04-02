@@ -35,7 +35,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -134,7 +133,7 @@ struct nodedb_file {
 	time_t		mtime ;
 	dev_t		dev ;
 	ino_t		ino ;
-	int		size ;
+	size_t		fsize ;
 } ;
 
 struct nodedb_keyname {
@@ -149,7 +148,7 @@ struct nodedb_ie {
 	cchar		*sys ;
 	cchar		*a ;			/* allocation */
 	int		nkeys ;			/* number of keys */
-	int		size ;			/* total size */
+	int		tsize ;			/* total size */
 	int		fi ;			/* file index */
 } ;
 
@@ -233,15 +232,15 @@ static int	nodedb_fileadder(nodedb *op,cchar *fname) noex ;
 static int	nodedb_filefins(nodedb *) noex ;
 static int	nodedb_entfins(nodedb *) noex ;
 static int	nodedb_fileparse(nodedb *,int) noex ;
-static int	nodedb_fileparser(nodedb *,NODEDB_FILE *,int) noex ;
-static int	nodedb_fileparseline(nodedb *,int,cchar *,int) noex ;
+static int	nodedb_fileparser(nodedb *,nodedb_f *,int) noex ;
+static int	nodedb_fileparseln(nodedb *,int,cchar *,int) noex ;
 static int	nodedb_filedump(nodedb *,int) noex ;
 static int	nodedb_filedel(nodedb *,int) noex ;
 static int	nodedb_addentry(nodedb *,int,SVCENTRY *) noex ;
 static int	nodedb_checkfiles(nodedb *,time_t) noex ;
 
-static int	file_start(NODEDB_FILE *,cchar *) noex ;
-static int	file_finish(NODEDB_FILE *) noex ;
+static int	file_start(nodedb_f *,cchar *) noex ;
+static int	file_finish(nodedb_f *) noex ;
 
 static int	ientry_start(NODEDB_IE *,int,SVCENTRY *) noex ;
 static int	ientry_finish(NODEDB_IE *) noex ;
@@ -252,7 +251,7 @@ static int	svcentry_finish(SVCENTRY *) noex ;
 
 static int	entry_load(NODEDB_ENT *,char *,int,NODEDB_IE *) noex ;
 
-static int	vcmpfname(NODEDB_FILE **,NODEDB_FILE **) noex ;
+static int	vcmpfname(nodedb_f **,nodedb_f **) noex ;
 
 static int	freeit(cchar **) noex ;
 
@@ -285,10 +284,10 @@ int nodedb_open(nodedb *op,cchar *fname) noex {
 	        rs = SR_INVALID ;
 	        if (fname[0]) {
 		    vecobj	*flp = op->filep ;
-	            cint	fsize = sizeof(NODEDB_FILE) ;
+	            cint	fsize = sizeof(nodedb_f) ;
 	            cint	vo = VECOBJ_OREUSE ;
 	            if ((rs = vecobj_start(flp,fsize,nf,vo)) >= 0) {
-	                const nullptr_t	np{} ;
+	                cnullptr	np{} ;
 		        hdb		*elp = op->entsp ;
 	                if ((rs = hdb_start(elp,defents,0,np,np)) >= 0) {
 	                    op->checktime = time(nullptr) ;
@@ -468,7 +467,7 @@ int nodedb_check(nodedb *op) noex {
 /* private subroutines */
 
 static int nodedb_fileadder(NODEDB *op,cchar *fname) noex {
-	NODEDB_FILE	fe{} ;
+	nodedb_f	fe{} ;
 	int		rs ;
 	if ((rs = file_start(&fe,fname)) >= 0) {
 	    vecobj	*flp = op->filep ;
@@ -498,7 +497,7 @@ static int nodedb_filefins(nodedb *op) noex {
 	void		*vp{} ;
 	for (int i = 0 ; vecobj_get(flp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
-	        NODEDB_FILE	*fep = (NODEDB_FILE *) vp ;
+	        nodedb_f	*fep = (nodedb_f *) vp ;
 	        rs1 = file_finish(fep) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
@@ -515,7 +514,7 @@ static int nodedb_checkfiles(nodedb *op,time_t daytime) noex {
 	for (int i = 0 ; vecobj_get(flp,i,&vp) >= 0 ; i += 1) {
 	    if (vp) {
 		USTAT		sb ;
-		NODEDB_FILE	*fep = (NODEDB_FILE *) vp ;
+		nodedb_f	*fep = (nodedb_f *) vp ;
 	        if ((rs = u_stat(fep->fname,&sb)) >= 0) {
 	            if (sb.st_mtime > fep->mtime) {
 	                c_changed += 1 ;
@@ -541,7 +540,7 @@ static int nodedb_fileparse(nodedb *op,int fi) noex {
 	if ((rs = vecobj_get(flp,fi,&vp)) >= 0) {
 	    rs = SR_NOTFOUND ;
 	    if (vp) {
-		NODEDB_FILE	*fep = (NODEDB_FILE *) vp ;
+		nodedb_f	*fep = (nodedb_f *) vp ;
 	        rs = nodedb_fileparser(op,fep,fi) ;
 		c = rs ;
 	        if (rs < 0) {
@@ -553,7 +552,7 @@ static int nodedb_fileparse(nodedb *op,int fi) noex {
 }
 /* end subroutine (nodedb_fileparse) */
 
-static int nodedb_fileparser(nodedb *op,NODEDB_FILE *fep,int fi) noex {
+static int nodedb_fileparser(nodedb *op,nodedb_f *fep,int fi) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -568,11 +567,11 @@ static int nodedb_fileparser(nodedb *op,NODEDB_FILE *fep,int fi) noex {
 	        if ((rs = bcontrol(lfp,BC_STAT,&sb)) >= 0) {
 	            if (S_ISREG(sb.st_mode)) {
 	                if (fep->mtime < sb.st_mtime) {
-			    const nullptr_t	np{} ;
+			    cnullptr	np{} ;
 	                    fep->dev = sb.st_dev ;
 	                    fep->ino = sb.st_ino ;
 	                    fep->mtime = sb.st_mtime ;
-	                    fep->size = sb.st_size ;
+	                    fep->fsize = size_t(sb.st_size) ;
 	                    while ((rs = breadlns(lfp,lbuf,llen,-1,np)) > 0) {
 	                        int	len = rs ;
 	                        int	cl ;
@@ -582,7 +581,7 @@ static int nodedb_fileparser(nodedb *op,NODEDB_FILE *fep,int fi) noex {
 	                        lbuf[len] = '\0' ;
 	                        if ((cl = sfskipwhite(lbuf,len,&cp)) > 0) {
 	                            if (f_bol && (*cp != '#')) {
-	                                rs = nodedb_fileparseline(op,fi,cp,cl) ;
+	                                rs = nodedb_fileparseln(op,fi,cp,cl) ;
 	                                if (rs > 0) c += 1 ;
 	                            }
 	                        }
@@ -604,7 +603,7 @@ static int nodedb_fileparser(nodedb *op,NODEDB_FILE *fep,int fi) noex {
 }
 /* end subroutine (nodedb_fileparser) */
 
-static int nodedb_fileparseline(nodedb *op,int fi,cchar *lp,int ll) noex {
+static int nodedb_fileparseln(nodedb *op,int fi,cchar *lp,int ll) noex {
 	SVCENTRY	se ;
 	LINEINFO	li{} ;
 	field		fsb ;
@@ -673,14 +672,14 @@ static int nodedb_fileparseline(nodedb *op,int fi,cchar *lp,int ll) noex {
 
 	return (rs >= 0) ? f_ent : rs ;
 }
-/* end subroutine (nodedb_fileparseline) */
+/* end subroutine (nodedb_fileparseln) */
 
 static int nodedb_addentry(nodedb *op,int fi,SVCENTRY *sep) noex {
 	int		rs = SR_FAULT ;
 	if (sep) {
-	    cint	size = sizeof(NODEDB_IE) ;
+	    cint	sz = sizeof(NODEDB_IE) ;
 	    void	*vp{} ;
-	    if ((rs = uc_malloc(size,&vp)) >= 0) {
+	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	        NODEDB_IE	*iep = (NODEDB_IE *) vp ;
 	        if ((rs = ientry_start(iep,fi,sep)) >= 0) {
 	            hdb_dat	key ;
@@ -745,7 +744,7 @@ static int nodedb_filedel(nodedb *op,int fi) noex {
 	if ((rs = vecobj_get(flp,fi,&vp)) >= 0) {
 	    if (vp) {
 		{
-	            NODEDB_FILE	*fep = (NODEDB_FILE *) vp ;
+	            nodedb_f	*fep = (nodedb_f *) vp ;
 	            rs1 = file_finish(fep) ;
 	            if (rs >= 0) rs = rs1 ;
 		}
@@ -764,7 +763,7 @@ static int nodedb_entfins(nodedb *op) noex {
 }
 /* end subroutine (nodedb_entfins) */
 
-static int file_start(NODEDB_FILE *fep,cchar *fname) noex {
+static int file_start(nodedb_f *fep,cchar *fname) noex {
 	int		rs = SR_FAULT ;
 	if (fep && fname) {
 	    rs = SR_INVALID ;
@@ -780,7 +779,7 @@ static int file_start(NODEDB_FILE *fep,cchar *fname) noex {
 }
 /* end subroutine (file_start) */
 
-static int file_finish(NODEDB_FILE *fep) noex {
+static int file_finish(nodedb_f *fep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (fep) {
@@ -808,19 +807,19 @@ static int ientry_start(NODEDB_IE *iep,int fi,SVCENTRY *sep) noex {
 /* ok to continue */
 	        if ((rs = vecobj_count(klp)) >= 0) {
 	            SVCENTRY_KEY	*kep ;
-	            int		size = 0 ;
+	            int		sz = 0 ;
 	            void	*vp{} ;
 	            iep->nkeys = rs ;
 	            c = rs ;
 /* find the size to allocate (everything) */
-	            size += ((c + 1) * 2 * sizeof(char *)) ;
+	            sz += ((c + 1) * 2 * sizeof(char *)) ;
 	            for (int i = 0 ; vecobj_get(klp,i,&vp) >= 0 ; i += 1) {
 	                if (vp) {
 			    kep = (SVCENTRY_KEY *) vp ;
-	                    if (kep->kname) size += kep->kl ;
-	                    size += 1 ;
-	                    if (kep->args) size += kep->al ;
-	                    size += 1 ;
+	                    if (kep->kname) sz += kep->kl ;
+	                    sz += 1 ;
+	                    if (kep->args) sz += kep->al ;
+	                    sz += 1 ;
 	                } /* end if (non-null) */
 	            } /* end for */
 		    for (int i = 0 ; i < 3 ; i += 1) {
@@ -836,11 +835,11 @@ static int ientry_start(NODEDB_IE *iep,int fi,SVCENTRY *sep) noex {
 	                    cp = sep->sys ;
 	                    break ;
 	                } /* end switch */
-	                size += (strlen(cp) + 1) ;
+	                sz += (strlen(cp) + 1) ;
 	            } /* end for */
 /* allocate */
-	            iep->size = size ;
-	            if ((rs = uc_malloc(size,&vp)) >= 0) {
+	            iep->tsize = sz ;
+	            if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	                int	j = 0 ;
 	                cchar	*(*keys)[2] = keytabp(vp) ;
 	                char	*bp = charp(vp) ;
@@ -914,16 +913,16 @@ static int ientry_finish(NODEDB_IE *iep) noex {
 static int svcentry_start(SVCENTRY *sep,LINEINFO *lip) noex {
 	int		rs = SR_FAULT ;
 	if (sep && lip) {
-	    int		size = 0 ;
+	    int		sz = 0 ;
 	    char	*bp ;
 	    memclear(sep) ;
 	    for (int i = 0 ; i < 3 ; i += 1) {
 	        int	cl = lip->f[i].fl ;
 	        cchar	*cp = lip->f[i].fp ;
 	        if (cl < 0) cl = strlen(cp) ;
-	        size += (cl + 1) ;
+	        sz += (cl + 1) ;
 	    } /* end for */
-	    if ((rs = uc_malloc(size,&bp)) >= 0) {
+	    if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	        cint	ksize = sizeof(SVCENTRY_KEY) ;
 	        sep->a = bp ;
 	        for (int i = 0 ; i < 3 ; i += 1) {
@@ -957,20 +956,20 @@ static int svcentry_start(SVCENTRY *sep,LINEINFO *lip) noex {
 /* add a key to this entry */
 static int svcentry_addkey(SVCENTRY *sep,cc *kp,int kl,cc *ap,int al) noex {
 	int		rs = SR_FAULT ;
-	int		size = 0 ;
+	int		sz = 0 ;
 	if (sep && kp) {
 	    rs = SR_INVALID ;
  	    if ((kl != 0) && kp[0]) {
 		char	*bp{} ;
 	        if (kl < 0) kl = strlen(kp) ;
-	        size += (kl + 1) ;
+	        sz += (kl + 1) ;
 	        if (ap != nullptr) {
 	            if (al < 0) al = strlen(ap) ;
-	            size += (al + 1) ;
+	            sz += (al + 1) ;
 	        } else {
-	            size += 1 ;
+	            sz += 1 ;
 	        }
-	        if ((rs = uc_malloc(size,&bp)) >= 0) {
+	        if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	            SVCENTRY_KEY	key{} ;
 /* copy over (load) the key-name */
 	            key.kname = bp ;
@@ -1037,7 +1036,7 @@ static int entry_load(ND_E *ep,char *ebuf,int elen,ND_I *iep) noex {
 	cint		bo = NODEDB_BO((ulong) ebuf) ;
 	int		rs = SR_OK ;
 	int		svclen = 0 ;
-	if (iep->size <= (elen - bo)) {
+	if (iep->tsize <= (elen - bo)) {
 	    cint	kal = (iep->nkeys + 1) * 2 * sizeof(char *) ;
 	    cchar	*(*keys)[2] = (cchar *(*)[2]) (ebuf + bo) ;
 	    char	*bp ;
@@ -1079,7 +1078,7 @@ static int entry_load(ND_E *ep,char *ebuf,int elen,ND_I *iep) noex {
 	    ep->keys = keys ;
 	    ep->fi = iep->fi ;
 	    ep->nkeys = iep->nkeys ;
-	    ep->size = iep->size ;
+	    ep->esize = iep->tsize ;
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
@@ -1108,7 +1107,7 @@ static int mkterms() noex {
 }
 /* end subroutine (mkterms) */
 
-static int vcmpfname(NODEDB_FILE **e1pp,NODEDB_FILE **e2pp) noex {
+static int vcmpfname(nodedb_f **e1pp,nodedb_f **e2pp) noex {
 	ND_F		*e1p = *e1pp ;
 	ND_F		*e2p = *e2pp ;
 	int		rc = 0 ;

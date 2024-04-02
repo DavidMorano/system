@@ -111,7 +111,7 @@ static int	envlist_storer(envlist *) noex ;
 /* exported subroutines */
 
 int envlist_start(envlist *op,int ne) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if ((rs = envlist_ctor(op)) >= 0) {
 	    rs = ENVLIST_DBINIT(op->elp,ne,0,nullptr,nullptr) ;
 	    if (rs < 0) {
@@ -158,14 +158,14 @@ int envlist_addkeyval(envlist *op,cchar *kp,cchar *vp,int vl) noex {
 	int		ridx = 0 ;
 	if (op && kp) {
 	    int		kl = strlen(kp) ;
-	    int		size = 1 ;
+	    int		sz = 1 ;
 	    char	*ep{} ;
-	    size += (kl+1) ;
+	    sz += (kl+1) ;
 	    if (vp != nullptr) {
 	        if (vl < 0) vl = strlen(vp) ;
-	        size += vl ;
+	        sz += vl ;
 	    }
-	    if ((rs = uc_malloc(size,&ep)) >= 0) {
+	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
 		{
 	            int		el ;
 	            char	*bp = ep ;

@@ -54,6 +54,7 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<filebuf.h>
+#include	<intsat.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -212,9 +213,11 @@ static int fdliner_bufsize(fdliner *op,int mfd) noex {
 	int		rs ;
 	int		bs = 0 ;
 	if ((rs = u_fstat(mfd,&sb)) >= 0) {
+	    csize	im(INT_MAX) ;
+	    csize	fsz = size_t(sb.st_size) ;
 	    rs = SR_TOOBIG ;
-	    if (sb.st_size <= INT_MAX) {
-		cint	fs = int(sb.st_size) ;
+	    if (fsz <= im) {
+		cint	fs = intsat(fsz) ;
 	        cmode	m = sb.st_mode ;
 	        bs = FDLINER_BUFSIZEDEF ;
 	        op->f.fnet = S_ISCHR(m) || S_ISSOCK(m) || S_ISFIFO(m) ;

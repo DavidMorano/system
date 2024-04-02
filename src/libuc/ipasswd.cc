@@ -85,11 +85,12 @@
 #include	<storeitem.h>
 #include	<realname.h>
 #include	<pwihdr.h>
-#include	<intceil.h>
 #include	<hash.h>
 #include	<strwcpy.h>
 #include	<mkpath.h>
 #include	<sfx.h>
+#include	<intceil.h>
+#include	<intsat.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -176,7 +177,7 @@ static int	hashindex(uint,int) ;
 static int	mkprstr(char *,int,cchar *,int) ;
 #endif
 
-static int	isOurSuf(cchar *,cchar *,int) ;
+static int	detOurSuf(cchar *,cchar *,int) ;
 
 
 /* local variables */
@@ -460,7 +461,7 @@ int		rlen ;
 				j,sl,sp) ;
 #endif
 	                    if ((sp != NULL) && (sl != 0) && (*sp != '\0')) {
-				const int	ssl = ss[j].slen ;
+				cint	ssl = ss[j].slen ;
 				cchar		*ssp = ss[j].sbuf ;
 	                        spp = (sa+c++) ;
 	                        rs = storeitem_strw(&sio,ssp,ssl,spp) ;
@@ -481,7 +482,7 @@ int		rlen ;
 #endif
 
 	            if (ubuf != NULL) {
-			const int	ulen = IPASSWD_USERNAMELEN ;
+			cint	ulen = IPASSWD_USERNAMELEN ;
 	                cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
 	                ul = (cp - ubuf) ;
 	            } else {
@@ -562,7 +563,7 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 	if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
 	    uint	hv, hi, ri, ui ;
-	    const int	ns = NSHIFT ;
+	    cint	ns = NSHIFT ;
 	    int		wi ;
 	    int		hl, c ;
 	    cchar	*hp ;
@@ -879,7 +880,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 	if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
 	    realname	rn, *np = &rn ;
 	    uint	hv, hi, ri, ui ;
-	    const int	ns = NSHIFT ;
+	    cint	ns = NSHIFT ;
 	    int		wi ;
 	    int		hl, c ;
 	    cchar	*hp ;
@@ -1100,7 +1101,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 
 	                ui = op->rectab[ri].username ;
 	                if (ubuf != NULL) {
-			    const int	ulen = IPASSWD_USERNAMELEN ;
+			    cint	ulen = IPASSWD_USERNAMELEN ;
 	                    cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
 	                    ul = (cp - ubuf) ;
 #if	CF_DEBUGS
@@ -1345,11 +1346,8 @@ static int ipasswd_enterend(IPASSWD *op,time_t dt)
 }
 /* end subroutine (ipasswd_enterend) */
 
-
-static int ipasswd_fileopen(IPASSWD *op,time_t dt)
-{
+static int ipasswd_fileopen(IPASSWD *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd < 0) {
 	    if ((rs = uc_open(op->fname,op->oflags,op->operm)) >= 0) {
 	        op->fd = rs ;
@@ -1358,10 +1356,11 @@ static int ipasswd_fileopen(IPASSWD *op,time_t dt)
 	        if ((uc_closeonexec(op->fd,TRUE)) >= 0) {
 	            USTAT	sb ;
 	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-	                int	size = 0 ;
-	                size += IPASSWD_IDLEN ;
-	                size += (pwihdr_overlast * sizeof(int)) ;
-	                if (sb.st_size >= size) {
+			csize	fsz = size_t(sb.st_size) ;
+	                int	sz = 0 ;
+	                sz += IPASSWD_IDLEN ;
+	                sz += (pwihdr_overlast * sizeof(int)) ;
+	                if (int isz = intsat(fsz) ; sb.st_size >= sz) {
 	                    op->mtime = sb.st_mtime ;
 	                    op->filesize = sb.st_size ;
 	                    rs = ipasswd_remotefs(op) ;
@@ -1376,16 +1375,12 @@ static int ipasswd_fileopen(IPASSWD *op,time_t dt)
 	        }
 	    } /* end if (u_open) */
 	} /* end if (needed) */
-
 	return (rs >= 0) ? op->fd : rs ;
 }
 /* end subroutine (ipasswd_fileopen) */
 
-
-static int ipasswd_fileclose(IPASSWD *op)
-{
+static int ipasswd_fileclose(IPASSWD *op) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd >= 0) {
 	    rs = u_close(op->fd) ;
 	    op->fd = -1 ;
@@ -1400,12 +1395,11 @@ static int ipasswd_mapbegin(IPASSWD *op,time_t dt)
 {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
-
 	if (op->mapdata == NULL) {
 	    size_t	ms = uceil(op->filesize,op->pagesize) ;
-	    const int	fd = op->fd ;
-	    const int	mp = PROT_READ ;
-	    const int	mf = MAP_SHARED ;
+	    cint	fd = op->fd ;
+	    cint	mp = PROT_READ ;
+	    cint	mf = MAP_SHARED ;
 	    void	*md ;
 	    if (ms == 0) ms = op->pagesize ;
 	    if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
@@ -1647,7 +1641,7 @@ static int mkourfname(char *dbfname,cchar *dbname)
 	cchar	*suf = IPASSWD_SUF ;
 	cchar	*endstr = ((ENDIAN != 0) ? "1" : "0") ;
 
-	if (isOurSuf(suf,dbname,-1) > 0) {
+	if (detOurSuf(suf,dbname,-1) > 0) {
 	    rs = mkpath1(dbfname,dbname) ;
 	} else {
 	    rs = mkfnamesuf2(dbfname,dbname,suf,endstr) ;
@@ -1667,16 +1661,13 @@ static int hashindex(uint i,int n)
 }
 /* end subroutine (hashindex) */
 
-
 #if	CF_DEBUGS
-static int mkprstr(char *rbuf,int rlen,cchar *sp,int sl)
-{
+static int mkprstr(char *rbuf,int rlen,cchar *sp,int sl) noex {
 	int		n = 0 ;
-	int		i ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (rlen < 0) rlen = INT_MAX ;
-	for (i = 0 ; (i < sl) && sp[i] ; i += 1) {
-	    const int	ch = MKCHAR(sp[i]) ;
+	for (int i = 0 ; (i < sl) && sp[i] ; i += 1) {
+	    cint	ch = mkchar(sp[i]) ;
 	    if (n >= rlen) break ;
 	    rbuf[n] = (char) ('?' + 128) ;
 	    if (isprintlatin(ch)) rbuf[n] = ch ;
@@ -1688,25 +1679,21 @@ static int mkprstr(char *rbuf,int rlen,cchar *sp,int sl)
 /* end subroutine (mkprstr) */
 #endif /* CF_DEBUGS */
 
-
-static int isOurSuf(cchar *suf,cchar *fname,int fl)
-{
+static int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	int		len = 0 ;
 	int		cl ;
 	cchar	*cp ;
-
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*tp ;
 	    if ((tp = strnrchr(cp,cl,'.')) != NULL) {
-	        const int	suflen = strlen(suf) ;
+	        cint	suflen = strlen(suf) ;
 	        if (strncmp((tp+1),suf,suflen) == 0) {
 	            len = (tp-fname) ;
 	        }
 	    }
 	}
-
 	return len ;
 }
-/* end subroutine (isOurSuf) */
+/* end subroutine (detOurSuf) */
 
 

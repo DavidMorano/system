@@ -158,7 +158,7 @@ int csem_create(csem *op,int f_shared,int count) noex {
 /* end subroutine (csem_start) */
 
 int csem_destroy(csem *op) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	int		rs1 ;
 	if ((rs = csem_magic(op)) >= 0) {
 	    {

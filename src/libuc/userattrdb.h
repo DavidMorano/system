@@ -54,6 +54,7 @@ struct userattrdb_head {
 } ;
 
 typedef USERATTRDB	userattrdb ;
+typedef	USERATTRDB_FL	userattrdb_fl ;
 
 EXTERNC_begin
 

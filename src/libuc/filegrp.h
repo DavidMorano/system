@@ -37,10 +37,12 @@
 #define	FILEGRP_DEFTTL		600	/* default time-to-live */
 #define	FILEGRP_MAXFREE		4
 
+#define	FILEGRPENT_GRPLEN	GROUPNAMELEN
+
 
 struct filegrp_entry {
 	gid_t		gid ;
-	char		gn[GROUPNAMELEN + 1] ;
+	char		gn[FILEGRPENT_GRPLEN + 1] ;
 } ;
 
 struct filegrp_statistics {
@@ -58,7 +60,7 @@ struct filegrp_head {
 	FILEGRP_STATS	s ;
 	uint		magic ;
 	int		ttl ;		/* time-to-live in seconds */
-	int		max ;		/* maximum entries */
+	int		nmax ;		/* maximum entries */
 } ;
 
 typedef FILEGRP		filegrp ;

@@ -78,7 +78,6 @@ ADDRINFO {
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
@@ -150,8 +149,8 @@ static inline int hostaddr_magic(hostaddr *op,Args ... args) noex {
 	return rs ;
 }
 
-static int	hostaddr_resultbegin(HOSTADDR *) noex ;
-static int	hostaddr_resultend(HOSTADDR *) noex ;
+static int	hostaddr_resultbegin(hostaddr *) noex ;
+static int	hostaddr_resultend(hostaddr *) noex ;
 
 extern "C" {
     static int	vcmp(cvoid *,cvoid *) noex ;
@@ -166,7 +165,7 @@ extern "C" {
 
 /* exported subroutines */
 
-int hostaddr_start(HOSTADDR *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
+int hostaddr_start(hostaddr *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_ctor(op,hn,svc)) >= 0) {
@@ -201,7 +200,7 @@ int hostaddr_start(HOSTADDR *op,cchar *hn,cchar *svc,ADDRINFO *hintp) noex {
 }
 /* end subroutine (hostaddr_start) */
 
-int hostaddr_finish(HOSTADDR *op) noex {
+int hostaddr_finish(hostaddr *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = hostaddr_magic(op)) >= 0) {
@@ -229,7 +228,7 @@ int hostaddr_finish(HOSTADDR *op) noex {
 }
 /* end subroutine (hostaddr_finish) */
 
-int hostaddr_getcanonical(HOSTADDR *op,cchar **rpp) noex {
+int hostaddr_getcanonical(hostaddr *op,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,rpp)) >= 0) {
 	    ADDRINFO	*aip = op->aip ;
@@ -240,7 +239,7 @@ int hostaddr_getcanonical(HOSTADDR *op,cchar **rpp) noex {
 }
 /* end subroutine (hostaddr_cannonical) */
 
-int hostaddr_curbegin(HOSTADDR *op,HOSTADDR_CUR *curp) noex {
+int hostaddr_curbegin(hostaddr *op,HOSTADDR_CUR *curp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
 	        curp->i = -1 ;
@@ -249,7 +248,7 @@ int hostaddr_curbegin(HOSTADDR *op,HOSTADDR_CUR *curp) noex {
 }
 /* end subroutine (hostaddr_curbegin) */
 
-int hostaddr_curend(HOSTADDR *op,HOSTADDR_CUR *curp) noex {
+int hostaddr_curend(hostaddr *op,HOSTADDR_CUR *curp) noex {
 	int		rs ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
 	    curp->i = -1 ;
@@ -258,7 +257,7 @@ int hostaddr_curend(HOSTADDR *op,HOSTADDR_CUR *curp) noex {
 }
 /* end subroutine (hostaddr_curend) */
 
-int hostaddr_enum(HOSTADDR *op,HOSTADDR_CUR *curp,ADDRINFO **rpp) noex {
+int hostaddr_enum(hostaddr *op,HOSTADDR_CUR *curp,ADDRINFO **rpp) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = hostaddr_magic(op,curp)) >= 0) {
@@ -278,20 +277,20 @@ int hostaddr_enum(HOSTADDR *op,HOSTADDR_CUR *curp,ADDRINFO **rpp) noex {
 
 /* private subroutines */
 
-static int hostaddr_resultbegin(HOSTADDR *op) noex {
+static int hostaddr_resultbegin(hostaddr *op) noex {
 	ADDRINFO	*aip = op->aip ;
 	ADDRINFO	**resarr{} ;
 	cint		esize = sizeof(ADDRINFO) ;
 	int		rs ;
 	int		n = 0 ;
-	int		size ;
+	int		sz ;
 	n += 1 ;
 	while (aip->ai_next != nullptr) {
 	    aip = aip->ai_next ;
 	    n += 1 ;
 	} /* end while */
-	size = ((n+1) * esize) ;
-	if ((rs = uc_malloc(size,&resarr)) >= 0) {
+	sz = ((n+1) * esize) ;
+	if ((rs = uc_malloc(sz,&resarr)) >= 0) {
 	    int		i = 0 ;
 	    op->resarr = resarr ;
 	    op->n = n ;
@@ -311,7 +310,7 @@ static int hostaddr_resultbegin(HOSTADDR *op) noex {
 }
 /* end subroutine (hostaddr_resultbegin) */
 
-static int hostaddr_resultend(HOSTADDR *op) noex {
+static int hostaddr_resultend(hostaddr *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->resarr) {

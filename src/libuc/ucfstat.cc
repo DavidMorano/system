@@ -21,6 +21,7 @@
 #include	<cerrno>
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<usystem.h>
+#include	<intsat.h>
 
 
 /* exported subroutines */
@@ -29,7 +30,7 @@ int uc_fsize(int fd) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
-	    rs = (sb.st_size & INT_MAX) ;
+	    rs = intsat(sb.st_size) ;
 	}
 	return rs ;
 }
@@ -39,7 +40,7 @@ int uc_fuid(int fd) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
-	    rs = int(sb.st_uid & INT_MAX) ;
+	    rs = intsat(sb.st_uid) ;
 	}
 	return rs ;
 }
@@ -49,7 +50,7 @@ int uc_fgid(int fd) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
-	    rs = int(sb.st_gid & INT_MAX) ;
+	    rs = intsat(sb.st_gid) ;
 	}
 	return rs ;
 }

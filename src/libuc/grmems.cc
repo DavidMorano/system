@@ -108,6 +108,7 @@ typedef int	(*stdsort_f)(cvoid *,cvoid *) noex ;
 /* local structures */
 
 struct vars {
+	int		grlen ;
 	int		usernamelen ;
 	int		groupnamelen ;
 } ;
@@ -486,9 +487,9 @@ int grmems_stats(grmems *op,GRMEMS_STATS *sp) noex {
 static int grmems_starter(grmems *op) noex {
 	int		rs = SR_OK ;
 	if (op->recs == nullptr) {
-	    cint	size = sizeof(recarr) ;
+	    cint	sz = sizeof(recarr) ;
 	    void	*vp{} ;
-	    if ((rs = uc_malloc(size,&vp)) >= 0) {
+	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	        int	ro = 0 ;
 	        ro |= RECARR_OSTATIONARY ;
 	        ro |= RECARR_OREUSE ;
@@ -592,7 +593,7 @@ static int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	    char	*grbuf{} ;
 	    strdcpy1w(gn,gnlen,gnp,gnl) ;
 	    if ((rs = malloc_gr(&grbuf)) >= 0) {
-	        GROUP	gr{} ;
+	        ucentgr	gr{} ;
 	        cint	grlen = rs ;
 	        if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
 	            vecelem	u ;
@@ -628,10 +629,10 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	int		rs1 ;
 	cchar		*gnp{} ;
 	if ((rs = record_getgnp(ep,&gnp)) >= 0) {
-	    GROUP	gr ;
-	    cint	grlen = getbufsize(getbufsize_gr) ;
 	    char	*grbuf{} ;
-	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
+	    if ((rs = malloc_gr(&grbuf)) >= 0) {
+	        ucentgr		gr ;
+		cint		grlen = rs ;
 	        if ((rs = getgr_name(&gr,grbuf,grlen,gnp)) >= 0) {
 	            vecelem	u ;
 	            const gid_t	gid = gr.gr_gid ;
@@ -646,7 +647,7 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	        } /* end if (getgr-name) */
 	        rs1 = uc_free(grbuf) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (memory-allocation) */
+	    } /* end if (malloc_gr) */
 	} /* end if (record_getgnp) */
 	return (rs >= 0) ? wc : rs ;
 }
@@ -869,7 +870,7 @@ static int grmems_pwmapbegin(grmems *op,time_t dt,cchar *fn) noex {
 	        op->fd = rs ;
 	        op->ti_open = dt ;
 	        if ((rs = uc_fsize(op->fd)) >= 0) {
-	            size_t	ms = MAX(rs,op->pagesize) ;
+	            size_t	ms = max(rs,op->pagesize) ;
 	            int		mp = PROT_READ ;
 	            int		mf = MAP_SHARED ;
 	            int		fd = op->fd ;
@@ -971,29 +972,29 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 	    if ((rs = vecelem_count(ulp)) >= 0) {
 	        GRMEMS_USER	*up ;
 		cint		ulen = var.usernamelen ;
-	        int		size = 0 ;
+	        int		sz = 0 ;
 	        int		masize ;
 		int		ul ;
 	        char		*bp ;
 	        n = rs ;
 	        masize = ((n + 1) * sizeof(cchar *)) ;
-	        size += masize ;
+	        sz += masize ;
 	        for (int i = 0 ; vecelem_get(ulp,i,&up) >= 0 ; i += 1) {
-	            if (up != nullptr) {
+	            if (up) {
 		        ul = up->ul ;
 		        if (ul < 0) {
 			    ul = strnlen(up->up,ulen) ;
 			    up->ul = ul ;
 		        }
-	                size += (ul+1) ;
+	                sz += (ul+1) ;
 		    }
 	        } /* end for */
-	        if ((rs = uc_malloc(size,&bp)) >= 0) {
+	        if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	            cchar	**mems = (cchar **) bp ;
 	            int		c = 0 ;
 	            bp += masize ;
 	            for (int i = 0 ; vecelem_get(ulp,i,&up) >= 0 ; i += 1) {
-	                if (up != nullptr) {
+	                if (up) {
 	                    mems[c++] = bp ;
 	                    bp = (strwcpy(bp,up->up,up->ul) + 1) ;
 			}
@@ -1142,13 +1143,17 @@ static int ugcmp(cvoid *v1p,cvoid *v2p) noex {
 
 static int mkvars() noex {
 	int		rs ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
-	    var.usernamelen = rs ;
-	    if ((rs = getbufsize(getbufsize_gn)) >= 0) {
-	        var.groupnamelen = rs ;
+	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
+	    var.grlen = rs ;
+	    if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	        var.usernamelen = rs ;
+	        if ((rs = getbufsize(getbufsize_gn)) >= 0) {
+	            var.groupnamelen = rs ;
+	        }
 	    }
 	}
 	return rs ;
 }
+/* end subroutine (mkvars) */
 
 
