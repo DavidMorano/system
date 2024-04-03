@@ -1,28 +1,28 @@
 /* main (RBBPOST) */
+/* lang=C++20 */
 
 /* RBBPOST news spooler */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
 #define	CF_DEBUGCONF	0		/* debug PCSCONF */
 
-
 /* revision history:
 
 	= 1995-05-01, David A­D­ Morano
-	This code module was completely rewritten to replace any original
-	garbage that was here before.
+	This code module was completely rewritten to replace any
+	original garbage that was here before.
 
 	= 1998-06-01, David A­D­ Morano
-	I modified the code to change the effective UID to 'pcs' so that the
-	program could properly access the newsgroup spool area under all
-	circumstances.
+	I modified the code to change the effective UID to 'pcs'
+	so that the program could properly access the newsgroup
+	spool area under all circumstances.
 
 	= 2008-10-07, David A­D­ Morano
-	This was modified to allow for the new PCSCONF facility that used
-	loadable modules for polling things.
+	This was modified to allow for the new PCSCONF facility
+	that used loadable modules for polling things.
 
 */
 
@@ -30,24 +30,19 @@
 
 /*******************************************************************************
 
-	This is probably a pretty-much generic main subroutine.  This is for
-	the RBBPOST program.
-
+	This is probably a pretty-much generic main subroutine.
+	This is for the RBBPOST program.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/timeb.h>
 #include	<unistd.h>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<time.h>
-
 #include	<usystem.h>
 #include	<umask.h>
 #include	<bits.h>
@@ -398,7 +393,7 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	memset(&stz,0,sizeof(TMZ)) ;
 
-	setumask(0002) ;
+	umaskset(0002) ;
 
 	rs = proginfo_start(pip,envv,argv[0],VERSION) ;
 	if (rs < 0) {

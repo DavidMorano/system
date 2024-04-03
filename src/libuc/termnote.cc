@@ -11,9 +11,13 @@
 	This object module was originally written to create a logging
 	mechanism for PCS application programs.
 
+	= 2024-04-03, David A­D­ Morano
+	I updated the comments below about the use of the TMPX
+	database.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -31,22 +35,44 @@
 
 	Yes, this can be written so that it performs in a more
 	efficient manner.  But this thing is quite seldom used right
-	now (a-days). If there is ever a real need, yes, we can
+	now (a-days).  If there is ever a real need, yes, we can
 	certaintly speed this up. So it is no big deal right now.
 
 	BUG NOTE:
 
 	Note that the (stupid) Solaris® version of the standard
 	UTMPX interface does not work properly for some (unknown)
-	strange reason. This bug is quite annoying since some
+	strange reason.  This bug is quite annoying since some
 	terminals are not biffed as they should be due to the bug.
 	The bug somehow causes an enumeration of the UTMPX database
-	file to skip over some UTMPX records. Skipped records might
-	just contain a terminal that needs to be biffed. To work
+	file to skip over some UTMPX records.  Skipped records might
+	just contain a terminal that needs to be biffed.  To work
 	around the Solaris® bug, we use a separate UTMPX database
-	interface entirely (TMPX). That interface is not too
+	interface entirely (TMPX).  That interface is not too
 	dissimilar to the standard interface, except in the case
 	of Solaris®, it works properly!
+
+	Updated note (2024-04-03, David A-D- Morano):
+	1. Just for the knowledge of the reader: The TMPX object
+	database is used in the original code (below) and is still
+	used now.  But how the TMPX database is actually implemented
+	now-a-days is likely changed since the original.  Originally,
+	the TMPX database read the underlying UTMPX database file
+	(whatever that was) directly.  I do not know if this is
+	still the case today.  If the TMPX databse depends on the
+	hosting operating system UTMPX database system, bugs could
+	still be in that system code.
+	2. In a separate matter, the use (existence) of this object
+	is not as important as it once was.  The more modern idea
+	about putting messages on user terminals is to have it done
+	synchronously (some how).  Rather than just splashing some
+	foreign message (from who knows from where) onto a user
+	terminal, rather the newer idea is to make a pending message
+	known the the user shell or other program, and then have
+	the user program (one or more) then display the message
+	synchronously to the user (on the terminal display).
+	3. I would be remiss to not note that the use of (old)
+	terminals is pretty much passay already.
 
 *******************************************************************************/
 

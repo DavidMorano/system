@@ -1,4 +1,5 @@
 limits.h
+time.h
 errno.h
 signal.h
 stddef.h
