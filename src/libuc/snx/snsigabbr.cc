@@ -41,6 +41,8 @@
 #include	<ctdec.h>
 #include	<sncpyx.h>
 
+#include	"snx.h"
+
 
 /* local defines */
 

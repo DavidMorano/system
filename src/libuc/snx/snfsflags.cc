@@ -44,6 +44,7 @@
 #include	<storebuf.h>
 
 #include	"snflags.h"
+#include	"snx.h"
 
 
 /* local defines */

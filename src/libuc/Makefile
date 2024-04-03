@@ -1119,6 +1119,11 @@ tmpx.o:			tmpx.dir
 tmpx.dir:
 	makesubdir $@
 
+# TIMESTR
+timestr.o:		timestr.dir
+timestr.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h

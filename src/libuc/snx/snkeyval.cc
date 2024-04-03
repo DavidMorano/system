@@ -47,6 +47,8 @@
 #include	<storebuf.h>
 #include	<sncpyx.h>
 
+#include	"snx.h"
+
 
 /* local defines */
 

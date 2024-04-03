@@ -43,6 +43,8 @@
 #include	<usystem.h>
 #include	<storebuf.h>
 
+#include	"snx.h"
+
 
 /* local defines */
 

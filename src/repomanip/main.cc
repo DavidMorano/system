@@ -2,7 +2,6 @@
 /* lang=C++20 */
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<cstdio>
 #include	<utypedefs.h>
@@ -10,7 +9,7 @@
 #include	<clanguage.h>
 #include	<strn.h>
 #include	<strwcmp.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |LINEBUFLEN| */
 
 
 /* local defines */
@@ -29,7 +28,7 @@ static bool rmat(cchar *,int,cchar *) noex ;
 
 /* exported subroutines */
 
-int main(int argc,cchar **argv,cchar **envv) {
+int main(int argc,mainv argv,mainv) {
 	FILE		*ifp = stdin ;
 	FILE		*ofp = stdout ;
 	cint		llen = LINEBUFLEN ;
@@ -39,7 +38,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 	if (argc > 1) {
 	    name = argv[1] ;
 	}
-	while (fgets(lbuf,llen,ifp) > 0) {
+	while (fgets(lbuf,llen,ifp) != nullptr) {
 	   int	ll = strlen(lbuf) ;
 	   if (lbuf[ll-1] == '\n') ll -= 1 ;
 	   if (hmat(lbuf,ll)) {
@@ -63,9 +62,7 @@ int main(int argc,cchar **argv,cchar **envv) {
 
 static bool hmat(cchar *sp,int sl) noex {
 	bool		f = 0 ;
-	cchar		*cp ;
 	if (cchar *tp ; (tp = strnchr(sp,sl,'{')) != nullptr) {
-	    cp = (tp+1) ;
 	    sl -= ((tp+1)-sp) ;
 	    sp = (tp+1) ;
 	    if ((tp = strnchr(sp,sl,'}')) != nullptr) {

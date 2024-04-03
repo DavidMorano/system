@@ -1,7 +1,7 @@
 /* pathadd SUPPORT */
 /* lang=C++20 */
 
-/* add a component to an existing path */
+/* add a component (c-string) to an existing path (c-string) */
 /* version %I% last-modified %G% */
 
 
@@ -27,12 +27,12 @@
 	assumed to be MAXPATHLEN (determined dynamically).
 
 	Synopses:
-	int pathaddw(char *pbuf,int plen,cchar *sp,int sl) noex
-	int pathadd(char *pbuf,int plen,cchar *sp) noex
+	int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex
+	int pathadd(char *pbuf,int pl,cchar *sp) noex
 
 	Arguments:
 	pbuf		result buffer pointer
-	plen		result buffer length
+	pl		length of result buffer that is already filled
 	sp		new-componment c-string pointer
 	sl		new-componment c-string length
 
@@ -106,17 +106,20 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	if (pbuf && sp) {
-	    if ((rs = maxpathlen) >= 0) {
-		cint	plen = rs ;
-	        if ((pl > 0) && (pbuf[pl-1] != '/')) {
-	            rs = storebuf_char(pbuf,plen,pl,'/') ;
-	            pl += rs ;
-	        }
-	        if (rs >= 0) {
-	            rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
-	            pl += rs ;
-	        }
-	    } /* end if (maxpathlen) */
+	    rs = SR_INVALID ;
+	    if (pl >= 0) {
+	        if ((rs = maxpathlen) >= 0) {
+		    cint	plen = rs ;
+	            if ((pl > 0) && (pbuf[pl-1] != '/')) {
+	                rs = storebuf_char(pbuf,plen,pl,'/') ;
+	                pl += rs ;
+	            }
+	            if (rs >= 0) {
+	                rs = storebuf_strw(pbuf,plen,pl,sp,sl) ;
+	                pl += rs ;
+	            }
+	        } /* end if (maxpathlen) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? pl : rs ;
 }

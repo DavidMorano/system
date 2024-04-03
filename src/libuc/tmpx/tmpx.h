@@ -19,8 +19,9 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |pid_t| */
 #include	<utmpx.h>
+#include	<time.h>		/* |time_t| */
 #include	<usystem.h>
 #include	<vecstr.h>
 

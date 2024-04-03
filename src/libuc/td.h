@@ -19,8 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<stdarg.h>
+#include	<stdarg.h>		/* |va_list| */
 #include	<vecitem.h>
 #include	<termstr.h>
 #include	<localmisc.h>
