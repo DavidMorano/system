@@ -67,14 +67,6 @@
 
 /* local defines */
 
-#define	TIMESTR_TSTD		0	/* standard (and MSG envelope) */
-#define	TIMESTR_TGMSTD		1	/* standard for GMT */
-#define	TIMESTR_TMSG		2	/* RFC-822 message */
-#define	TIMESTR_TLOG		3	/* "log" format */
-#define	TIMESTR_TGMLOG		4	/* "log" format for GMT */
-#define	TIMESTR_TLOGZ		5	/* "logz" format */
-#define	TIMESTR_TGMLOGZ		6	/* "logz" format for GMT */
-
 
 /* imported namespaces */
 
@@ -122,61 +114,61 @@ static cchar	*days[] = {
 /* exported subroutines */
 
 char *timestr_std(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TSTD,buf) ;
+	return timestr_date(t,timestrtype_std,buf) ;
 }
 /* end subroutine (timestr_std) */
 
 char *timestr_edate(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TSTD,buf) ;
+	return timestr_date(t,timestrtype_std,buf) ;
 }
 /* end subroutine (timestr_edate) */
 
 char *timestr_gmtstd(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TGMSTD,buf) ;
+	return timestr_date(t,timestrtype_gmstd,buf) ;
 }
 /* end subroutine (timestr_gmtstd) */
 
 char *timestr_msg(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TMSG,buf) ;
+	return timestr_date(t,timestrtype_msg,buf) ;
 }
 /* end subroutine (timestr_msg) */
 
 char *timestr_hdate(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TMSG,buf) ;
+	return timestr_date(t,timestrtype_msg,buf) ;
 }
 /* end subroutine (timestr_hdate) */
 
 char *timestr_log(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TLOG,buf) ;
+	return timestr_date(t,timestrtype_log,buf) ;
 }
 /* end subroutine (timestr_log) */
 
 #ifdef	COMMENT
 char *timestr_loggm(time-t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TGMLOG,buf) ;
+	return timestr_date(t,timestrtype_gmlog,buf) ;
 }
 /* end subroutine (timestr_loggm) */
 #endif /* COMMENT */
 
 char *timestr_gmlog(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TGMLOG,buf) ;
+	return timestr_date(t,timestrtype_gmlog,buf) ;
 }
 /* end subroutine (timestr_gmlog) */
 
 char *timestr_logz(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TLOGZ,buf) ;
+	return timestr_date(t,timestrtype_logz,buf) ;
 }
 /* end subroutine (timestr_logz) */
 
 #ifdef	COMMENT
 char *timestr_loggmz(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TGMLOGZ,buf) ;
+	return timestr_date(t,timestrtype_gmlogz,buf) ;
 }
 /* end subroutine (timestr_loggmz) */
 #endif /* COMMENT */
 
 char *timestr_gmlogz(time_t t,char *buf) noex {
-	return timestr_date(t,TIMESTR_TGMLOGZ,buf) ;
+	return timestr_date(t,timestrtype_gmlogz,buf) ;
 }
 /* end subroutine (timestr_gmlogz) */
 
@@ -191,9 +183,9 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	TMTIME		tmt ;
 	int		f_gmt = false ;
 	switch (type) {
-	case TIMESTR_TGMSTD:
-	case TIMESTR_TGMLOG:
-	case TIMESTR_TGMLOGZ:
+	case timestrtype_gmstd:
+	case timestrtype_gmlog:
+	case timestrtype_gmlogz:
 	    f_gmt = true ;
 	    break ;
 	} /* end switch */
@@ -211,8 +203,8 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	if (rs >= 0) {
 	    switch (type) {
 
-	    case TIMESTR_TSTD:
-	    case TIMESTR_TGMSTD:
+	    case timestrtype_std:
+	    case timestrtype_gmstd:
 
 #if	CF_SNTMTIME
 	        rs = sntmtime(tbuf,tlen,&tmt,"%a %b %d %T %Z %Y %O") ;
@@ -237,7 +229,7 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 
 	        break ;
 
-	    case TIMESTR_TMSG:
+	    case timestrtype_msg:
 
 #if	CF_SNTMTIME
 	        rs = sntmtime(tbuf,tlen,&tmt,"%d %b %Y %T %O (%Z)") ;
@@ -261,8 +253,8 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 
 	        break ;
 
-	    case TIMESTR_TLOG:
-	    case TIMESTR_TGMLOG:
+	    case timestrtype_log:
+	    case timestrtype_gmlog:
 
 #if	CF_SNTMTIME
 	        rs = sntmtime(tbuf,tlen,&tmt,"%y%m%d_%H%M:%S") ;
@@ -279,8 +271,8 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 
 	        break ;
 
-	    case TIMESTR_TLOGZ:
-	    case TIMESTR_TGMLOGZ:
+	    case timestrtype_logz:
+	    case timestrtype_gmlogz:
 
 #if	CF_SNTMTIME
 	        rs = sntmtime(tbuf,tlen,&tmt,"%y%m%d_%H%M:%S_%Z") ;
