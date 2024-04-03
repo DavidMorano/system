@@ -94,9 +94,6 @@ int tmpx_getuserlines(tmpx *op,vecstr *lp,cchar *un) noex {
 		        f = true ;
 	                f = f && (ue.ut_type == TMPX_TPROCUSER) ;
 	                f = f && (ue.ut_line[0] != '\0') ;
-#ifdef	COMMENT
-	                f = f && (strncmp(un,ue.ut_user,TMPX_LUSER) == 0) ;
-#endif
 		        if (f) {
 		            n += 1 ;
 	                    rs = vecstr_add(lp,ue.ut_line,llen) ;

@@ -46,8 +46,9 @@
 #include	<ctime>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<vecstr.h>
-#include	<vecitem.h>
+#include	<vecobj.h>
 #include	<tmpx.h>
 #include	<pathadd.h>
 #include	<mkpath.h>
@@ -80,6 +81,25 @@ struct terment {
 
 typedef terment *	termentp ;
 
+namespace {
+    struct subinfo {
+	tmpx		*op ;
+	vecstr		*rlp ;		/* caller argument */
+	cchar		*un ;		/* username */
+	char		*tbuf = nullptr ;
+	int		tlen ;
+	int		dnl ;		/* directoy-name-length */
+	subinfo(tmpx *o,vecstr *l,cchar *u) noex : op(o), rlp(l), un(u) { } ;
+	int start() noex ;
+	int finish() noex ;
+	int entget() noex ;
+	int entproc(vecobj *,int) noex ;
+	int entstore(vecobj *) noex ;
+	int entfins(vecobj *) noex ;
+	operator int () noex ;
+    } ; /* end struct (subinfo) */
+}
+
 
 /* forward references */
 
@@ -93,6 +113,8 @@ static int	revsortfunc(cvoid **,cvoid **) noex ;
 
 /* local variables */
 
+constexpr cchar		devdname[] = DEVDNAME ;
+
 
 /* exported variables */
 
@@ -100,101 +122,168 @@ static int	revsortfunc(cvoid **,cvoid **) noex ;
 /* exported subroutines */
 
 int tmpx_getuserterms(tmpx *op,vecstr *lp,cchar *username) noex {
-	vecitem		el ;
-	int		rs ;
-	int		rs1 ;
-	int		ddnl ;
-	int		n = 0 ;
-	cchar		*devdname = DEVDNAME ;
-	char		termfname[MAXPATHLEN + 1] ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (lp == NULL) return SR_FAULT ;
-	if (username == NULL) return SR_FAULT ;
-
-	if (username[0] == '\0') return SR_INVALID ;
-
-	ddnl = mkpath1(termfname,devdname) ;
-
-	if ((rs = vecitem_start(&el,10,VECITEM_OSORTED)) >= 0) {
-	    terment	*ep ;
-	    tmpx_ent		ue ;
-	    tmpx_cur		cur ;
-	    cint		llen = TMPX_LLINE ;
-	    int			i ;
-	    int			f ;
-
-	    if ((rs = tmpx_curbegin(op,&cur)) >= 0) {
-	        time_t	ti_access ;
-		int	tlen ;
-
-	        while (rs >= 0) {
-	            rs1 = tmpx_fetchuser(op,&cur,&ue,username) ;
-	            if (rs1 == SR_NOTFOUND) break ;
-	            rs = rs1 ;
-	            if (rs < 0) break ;
-
-	            f = false ;
-	            f = f || (ue.ut_type != TMPX_TPROCUSER) ;
-	            f = f || (ue.ut_line[0] == '\0') ;
-#ifdef	COMMENT
-	            f = f || (strncmp(username,ue.ut_user,llen) != 0) ;
-#endif
-	            if (f)
-	                continue ;
-
-	            tlen = mktermfname(termfname,ddnl,ue.ut_line,llen) ;
-
-/* check the access time of this terminal and permissions */
-
-	            if ((rs1 = getatime(termfname,&ti_access)) >= 0) {
-	                terment		te ;
-			cint		ti = ti_access ;
-	                if ((rs = entry_start(&te,termfname,tlen,ti)) >= 0) {
-	                    cint	esize = sizeof(terment) ;
-	                    n += 1 ;
-	                    rs = vecitem_add(&el,&te,esize) ;
-	                    if (rs < 0)  {
-				entry_finish(&te) ;
-			    }
-			}
-	            } /* end if (we had a better one) */
-
-	        } /* end while (looping through entries) */
-
-	        rs1 = tmpx_curend(op,&cur) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (cursor) */
-
-	    if ((rs >= 0) && (n > 0)) {
-	        if ((rs = vecitem_sort(&el,revsortfunc)) >= 0) {
-	            for (i = 0 ; vecitem_get(&el,i,&ep) >= 0 ; i += 1) {
-	                if (ep) {
-	                    rs = vecstr_add(lp,ep->devpath,-1) ;
-		        }
-	                if (rs < 0) break ;
-	            } /* end for */
-		} /* end if (vecitem_sort) */
-	    } /* end if (positive) */
-
-/* free up */
-
-	    for (i = 0 ; vecitem_get(&el,i,&ep) >= 0 ; i += 1) {
-	        if (ep) {
-	            entry_finish(ep) ;
-		}
-	    } /* end for */
-
-	    rs1 = vecitem_finish(&el) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (vecitem) */
-
-	return (rs >= 0) ? n : rs ;
+	int		rs = SR_FAULT ;
+	int		c = 0 ;
+	if (op && lp && username) {
+	    rs = SR_INVALID ;
+	    if (username[0]) {
+		subinfo	go(op,lp,username) ;
+		rs = go ;
+		c = rs ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (tmpx_getuserterms) */
 
 
 /* local subroutines */
+
+int subinfo::start() noex {
+	int		rs ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    tlen = rs ;
+	    if ((rs = mkpath(tbuf,devdname)) >= 0) {
+		dnl = rs ;
+	    } /* end if (mkpath) */
+	    if (rs < 0) {
+		uc_free(tbuf) ;
+		tbuf = nullptr ;
+		tlen = 0 ;
+	    }
+	} /* end if (memory-allocation) */
+	return rs ;
+}
+/* end method (subinfo::start) */
+
+int subinfo::finish() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (tbuf) {
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	    tbuf = nullptr ;
+	    tlen = 0 ;
+	}
+	return rs ;
+}
+/* end method (subinfo::finish) */
+
+subinfo::operator int () noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	if ((rs = start()) >= 0) {
+	    {
+		rs = entget() ;
+		c = rs ;
+	    }
+	    rs1 = finish() ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (start-finish) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (subinfo::operator) */
+
+int subinfo::entget() noex {
+	vecobj		elist, *elp = &elist ;
+	cint		esz = sizeof(terment) ;
+	cint		vne = 10 ;
+	cint		vo = VECOBJ_OSORTED ;
+	int		rs ;
+	int		rs1 ;
+	int		c = 0 ;
+	if ((rs = vecobj_start(elp,esz,vne,vo)) >= 0) {
+	    tmpx_ent	ue ;
+	    tmpx_cur	cur ;
+	    bool	f ;
+	    if ((rs = tmpx_curbegin(op,&cur)) >= 0) {
+	    	cint	utl_line = TMPX_LLINE ;
+	        while (rs >= 0) {
+	            rs1 = tmpx_fetchuser(op,&cur,&ue,un) ;
+	            if (rs1 == SR_NOTFOUND) break ;
+	            rs = rs1 ;
+	            if (rs < 0) break ;
+	            f = false ;
+	            f = f || (ue.ut_type != TMPX_TPROCUSER) ;
+	            f = f || (ue.ut_line[0] == '\0') ;
+	            if (f) {
+			cint	sl = utl_line ;
+			cchar	*sp = ue.ut_line ;
+			if ((rs = mktermfname(tbuf,dnl,sp,sl)) >= 0) {
+			    rs = entproc(elp,rs) ;
+			    c += rs ;
+			}
+		    }
+		} /* end while */
+	        rs1 = tmpx_curend(op,&cur) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (cursor) */
+	    if ((rs >= 0) && (c > 0)) {
+		rs = entstore(elp) ;
+	    } /* end if (positive) */
+	    {
+		rs1 = entfins(elp) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    rs1 = vecobj_finish(elp) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (vecobj) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (subinfo::operator) */
+
+int subinfo::entproc(vecobj *elp,int tl) noex {
+	time_t		ti_access{} ;
+	int		rs = SR_OK ;
+	int		rs1 ;
+	int		c = 0 ;
+	if ((rs1 = getatime(tbuf,&ti_access)) >= 0) {
+	    terment	te ;
+	    if ((rs = entry_start(&te,tbuf,tl,ti_access)) >= 0) {
+		c += 1 ;
+		rs = vecobj_add(elp,&te) ;
+		if (rs < 0)  {
+		    entry_finish(&te) ;
+		}
+	    } /* end if (entry_start) */
+	} /* end if (we had a better one) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end method (subinfo::entproc) */
+
+int subinfo::entstore(vecobj *elp) noex {
+	int		rs ;
+	if ((rs = vecobj_sort(elp,revsortfunc)) >= 0) {
+	    void	*vp{} ;
+	    for (int i = 0 ; vecobj_get(elp,i,&vp) >= 0 ; i += 1) {
+		if (vp) {
+		    terment	*ep = termentp(vp) ;
+		    rs = vecstr_add(rlp,ep->devpath,-1) ;
+		}
+		if (rs < 0) break ;
+	    } /* end for */
+	} /* end if (vecobj_sort) */
+	return rs ;
+}
+/* end method (subinfo::entstore) */
+
+int subinfo::entfins(vecobj *elp) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	void		*vp{} ;
+	for (int i = 0 ; vecobj_get(elp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		terment	*ep = termentp(vp) ;
+		{
+	            rs1 = entry_finish(ep) ;
+		    if (rs >= 0) rs = rs1 ;
+		}
+	    }
+	} /* end for */
+	return rs ;
+}
+/* end method (subinfo::entfins) */
 
 static int entry_start(terment *ep,cchar *fp,int fl,time_t t) noex {
 	int		rs = SR_FAULT ;
@@ -225,7 +314,7 @@ static int entry_finish(terment *ep) noex {
 /* end subroutine (entry_finish) */
 
 static int mktermfname(char *rbuf,int ddnl,cchar *sp,int sl) noex {
-	return pathaddw(rbuf,ddnl,sp,sl) ;
+	return pathaddw(rbuf,ddnl,sp,sl) ; /* <- nice refactor here */
 }
 /* end subroutine (mktermfname) */
 

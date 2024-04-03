@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* <- for |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |memcmp(3c)| */

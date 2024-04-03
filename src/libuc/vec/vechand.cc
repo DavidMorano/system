@@ -25,7 +25,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

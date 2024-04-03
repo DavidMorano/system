@@ -51,9 +51,9 @@
 	assumed to be MAXPATHLEN (determined dynamically).
 
 	Extra:
-	The |pathaddw| subroutine is roughly equivalent to:
+	The |pathaddw| subroutine is almost equivalent to:
 	    int pathaddw(char *rbuf,int rl,cc *sp,int sl) noex {
-	        int		rs ;
+	        int	rs ;
 	        if ((rs = getbufsize(getbufsize_mp)) >= 0) {
 		    cint	rlen = rs ;
 	            rs = storebuf_strw(rbuf,rlen,rl,sp,sl) ;
