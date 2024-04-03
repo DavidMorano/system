@@ -26,6 +26,7 @@
 #include	<cstdio>
 #include	<usystem.h>
 #include	<usupport.h>		/* |ulogerror(3u)| */
+#include	<snx.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 
@@ -58,7 +59,7 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	                cuint	days = (thours / 24) ;
 	                cuint	hours = (thours % 24) ;
 	                cchar	*fmt = "%5u-%02u:%02u:%02u" ;
-	                rs = snprintf(rbuf,rlen,fmt,days,hours,mins,secs) ;
+	                rs = snwprintf(rbuf,rlen,fmt,days,hours,mins,secs) ;
 		    }
 		}
 	    } /* end if (valid) */
