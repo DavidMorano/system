@@ -30,13 +30,11 @@
 	Arguments:
 	rbuf		c-string buffer pointer
 	rlen		c-string buffer length
-	rl		lenght of buffer already filled
-	sp		new c-string pointer to be added
-	sl		new c-string length to be added
+	fmt		c-string specifying format conversions
+	ap		of type |va_list| for variatic arguments
 
 	Returns:
-	>=0		the amount of additional string added to
-			the existing c-string buffer
+	>=0		length of written c-string to result buffer
 	<0		error (system-return)
 
 *******************************************************************************/
