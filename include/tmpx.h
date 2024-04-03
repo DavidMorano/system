@@ -22,6 +22,7 @@
 #include	<sys/types.h>
 #include	<utmpx.h>
 #include	<usystem.h>
+#include	<vecstr.h>
 
 
 /* object defines */
@@ -129,6 +130,11 @@ extern int tmpx_fetchuser(tmpx *,tmpx_cur *,tmpx_ent *,cchar *) noex ;
 extern int tmpx_fetchpid(tmpx *,tmpx_ent *,pid_t) noex ;
 extern int tmpx_nusers(tmpx *) noex ;
 extern int tmpx_close(tmpx *) noex ;
+
+extern int tmpx_getboottime(tmpx *,time_t *) noex ;
+extern int tmpx_getrunlevel(tmpx *) noex ;
+extern int tmpx_getuserlines(tmpx *,vecstr *,cchar *) noex ;
+extern int tmpx_getuserterms(tmpx *,vecstr *,cchar *) noex ;
 
 EXTERNC_end
 

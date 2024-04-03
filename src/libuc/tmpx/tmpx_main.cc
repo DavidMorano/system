@@ -35,6 +35,7 @@
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
+#include	<sysval.hh>
 #include	<intfloor.h>
 #include	<intceil.h>
 #include	<getfdfile.h>
@@ -63,7 +64,8 @@
 
 /* external subroutines */
 
-int		tmpx_close(tmpx *) noex ;
+
+/* external variables */
 
 
 /* forward references */
@@ -101,7 +103,12 @@ static constexpr int	proctypes[] = {
 	-1
 } ;
 
+static sysval		pagesize(sysval_ps) ;
+
 constexpr bool		f_dynents = CF_DYNENTS ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -122,16 +129,18 @@ int tmpx_open(tmpx *op,cchar *dbfn,int oflags) noex {
 	    op->f = {} ;
 	    op->mapoff = 0 ;
 	    op->magic = 0 ;
-	    op->pagesize = getpagesize() ;
 	    op->oflags = oflags ;
 	    op->operms = 0 ;
 	    op->fd = -1 ;
 	    op->ncursors = 0 ;
 	    op->mapei = 0 ;
 	    op->mapen = 0 ;
-	    if ((rs = tmpx_writable(op,oflags)) >= 0) {
-	        rs = tmpx_openbegin(op,dbfn) ;
-	    }
+	    if ((rs = pagesize) >= 0) {
+		op->pagesize = rs ;
+	        if ((rs = tmpx_writable(op,oflags)) >= 0) {
+	            rs = tmpx_openbegin(op,dbfn) ;
+	        }
+	    } /* end if (pagesize) */
 	} /* end if (non-null) */
 	return rs ;
 }
