@@ -81,6 +81,7 @@ char *timestr_scandate(time_t t,char *tbuf) noex {
 	            rs = sntmtime(tbuf,tlen,&ts,fmt) ;
 	        }
 	    } /* end if (valid) */
+	    if (rs < 0) tbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"scandate") ;

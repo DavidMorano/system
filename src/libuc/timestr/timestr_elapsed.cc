@@ -65,6 +65,7 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 		    }
 		}
 	    } /* end if (valid) */
+	    if (rs < 0) rbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"elapsed") ;

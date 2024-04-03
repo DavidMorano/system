@@ -132,6 +132,7 @@ char *timestr_nist(time_t t,nistinfo *nip,char *tbuf) noex {
 	            } /* end if (uc_getlocaltime) */
 	        } /* end if (uc_gmtime) */
 	    } /* end if (valid) */
+	    if (rs < 0) tbuf[0] = '\0' ;
 	} /* end if (non-null) */
 	if (rs < 0) {
 	    ulogerror("timestr",rs,"nist") ;

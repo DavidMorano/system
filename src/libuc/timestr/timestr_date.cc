@@ -4,7 +4,6 @@
 /* convert UNIX® time into a various date formats */
 /* version %I% last-modified %G% */
 
-#define	CF_SNTMTIME	1		/* use |sntmtime(3dam)| */
 
 /* revision history:
 
@@ -26,7 +25,7 @@
 
 /*******************************************************************************
  
-	Return the date (in UNIX® mail evelope format) into the
+	Return the date (in UNIX® mail envelope format) into the
 	user supplied buffer.
 
 	The correct (newer) UNIX® mail envelope format time string is:
@@ -50,7 +49,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
@@ -91,21 +89,6 @@ extern "C" {
 
 
 /* local variables */
-
-#if	CF_SNTMTIME
-
-#else /* CF_SNTMTIME */
-
-static cchar	*months[] = {
-	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-} ;
-
-static cchar	*days[] = {
-	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-} ;
-
-#endif /* CF_SNTMTIME */
 
 
 /* exported variables */
@@ -180,121 +163,48 @@ char *timestr_date(time_t t,int type,char *tbuf) noex {
 	    tbuf[0] = '\0' ;
 	    rs = SR_DOM ;
 	    if (t >= 0) {
-	TMTIME		tmt ;
-	int		f_gmt = false ;
-	switch (type) {
-	case timestrtype_gmstd:
-	case timestrtype_gmlog:
-	case timestrtype_gmlogz:
-	    f_gmt = true ;
-	    break ;
-	} /* end switch */
-
-/* split the time into its component parts */
-
-	if (f_gmt) {
-	    rs = tmtime_gmtime(&tmt,t) ;
-	} else {
-	    rs = tmtime_localtime(&tmt,t) ;
-	}
-
-/* create the appropriate string based on the type-code */
-
-	if (rs >= 0) {
-	    switch (type) {
-
-	    case timestrtype_std:
-	    case timestrtype_gmstd:
-
-#if	CF_SNTMTIME
-	        rs = sntmtime(tbuf,tlen,&tmt,"%a %b %d %T %Z %Y %O") ;
-#else
-	        {
-	            ZOFFPARTS	zo ;
-	            zoffparts_set(&zo,tmt.gmtoff) ;
-	            rs = snwprintf(tbuf,tlen,
-	                "%t %t %2u %02u:%02u:%02u %s %04u %c%02u%02u",
-	                days[tmt.wday],3,
-	                months[tmt.mon],3,
-	                tmt.mday,
-	                tmt.hour,
-	                tmt.min,
-	                tmt.sec,
-	                tmt.zname,
-	                (tmt.year + TM_YEAR_BASE),
-	                ((tmt.gmtoff >= 0) ? '-' : '+'),
-	                zo.hours,zo.mins) ;
+	        TMTIME	tmt ;
+	        bool	f_gmt = false ;
+	        switch (type) {
+	        case timestrtype_gmstd:
+	        case timestrtype_gmlog:
+	        case timestrtype_gmlogz:
+	            f_gmt = true ;
+	            break ;
+	        } /* end switch */
+        /* split the time into its component parts */
+	        if (f_gmt) {
+	            rs = tmtime_gmtime(&tmt,t) ;
+	        } else {
+	            rs = tmtime_localtime(&tmt,t) ;
 	        }
-#endif /* CF_SNTMTIME */
-
-	        break ;
-
-	    case timestrtype_msg:
-
-#if	CF_SNTMTIME
-	        rs = sntmtime(tbuf,tlen,&tmt,"%d %b %Y %T %O (%Z)") ;
-#else
-	        {
-	            ZOFFPARTS	zo ;
-	            zoffparts_set(&zo,tmt.gmtoff) ;
-	            rs = snwprintf(tbuf,tlen,
-	                "%2u %t %4u %02u:%02u:%02u %c%02u%02u (%s)",
-	                tmt.mday,
-	                months[tmt.mon],3,
-	                (tmt.year + TM_YEAR_BASE),
-	                tmt.hour,
-	                tmt.min,
-	                tmt.sec,
-	                ((tmt.gmtoff >= 0) ? '-' : '+'),
-	                zo.hours,zo.mins,
-	                tmt.zname) ;
-	        }
-#endif /* CF_SNTMTIME */
-
-	        break ;
-
-	    case timestrtype_log:
-	    case timestrtype_gmlog:
-
-#if	CF_SNTMTIME
-	        rs = sntmtime(tbuf,tlen,&tmt,"%y%m%d_%H%M:%S") ;
-#else
-	        rs = snwprintf(tbuf,tlen,
-	            "%02u%02u%02u_%02u%02u:%02u",
-	            (tmt.year % NYEARS_CENTURY),
-	            (tmt.mon + 1),
-	            tmt.mday,
-	            tmt.hour,
-	            tmt.min,
-	            tmt.sec) ;
-#endif /* CF_SNTMTIME */
-
-	        break ;
-
-	    case timestrtype_logz:
-	    case timestrtype_gmlogz:
-
-#if	CF_SNTMTIME
-	        rs = sntmtime(tbuf,tlen,&tmt,"%y%m%d_%H%M:%S_%Z") ;
-#else
-	        rs = snwprintf(tbuf,tlen,
-	            "%02u%02u%02u_%02u%02u:%02u_%s",
-	            (tmt.year % NYEARS_CENTURY),
-	            (tmt.mon + 1),
-	            tmt.mday,
-	            tmt.hour,
-	            tmt.min,
-	            tmt.sec,
-	            tmt.zname) ;
-#endif /* CF_SNTMTIME */
-
-	        break ;
-
-	    default:
-	        rs = sncpy1(tbuf,tlen,"** invalid type **") ;
-	        break ;
-	    } /* end switch */
-	} /* end if (ok) */
+        /* create the appropriate string based on the type-code */
+	        if (rs >= 0) {
+		    cchar	*fmt = nullptr ;
+	            switch (type) {
+	            case timestrtype_std:
+	            case timestrtype_gmstd:
+	                fmt = "%a %b %d %T %Z %Y %O" ;
+	                break ;
+	            case timestrtype_msg:
+			fmt = "%d %b %Y %T %O (%Z)" ;
+	                break ;
+	            case timestrtype_log:
+	            case timestrtype_gmlog:
+			fmt = "%y%m%d_%H%M:%S" ;
+	                break ;
+	            case timestrtype_logz:
+	            case timestrtype_gmlogz:
+			fmt = "%y%m%d_%H%M:%S_%Z" ;
+	                break ;
+	            default:
+	                rs = sncpy1(tbuf,tlen,"** invalid type **") ;
+	                break ;
+	            } /* end switch */
+		    if (fmt) {
+	                rs = sntmtime(tbuf,tlen,&tmt,fmt) ;
+		    }
+	        } /* end if (ok) */
 	    } /* end if (valid) */
 	    if (rs < 0) tbuf[0] = '\0' ;
 	} /* end if (non-null) */

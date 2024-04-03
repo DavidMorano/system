@@ -49,7 +49,7 @@ typedef TMTIME		tmtime ;
 EXTERNC_begin
 
 extern int	tmtime_insert(tmtime *,TM *) noex ;
-extern int	tmtime_ztime(tmtime *,int,time_t) noex ;
+extern int	tmtime_ztime(tmtime *,bool,time_t) noex ;
 extern int	tmtime_gmtime(tmtime *,time_t) noex ;
 extern int	tmtime_localtime(tmtime *,time_t) noex ;
 extern int	tmtime_extract(tmtime *,TM *) noex ;
