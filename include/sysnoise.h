@@ -1,32 +1,35 @@
-/* dirs HEADER */
+/* sysnoise HEADER */
 /* lang=C20 */
 
-/* make a series of possibly hierarchical directories */
+/* retrieve some system noise (pswudo-random data) */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
-	= 1998-11-01, David A­D­ Morano
+	= 1998-04-10, David A­D­ Morano
 	This subroutine was written for Rightcore Network Services.
 
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DIRS_INCLUDE
-#define	DIRS_INCLUDE
+#ifndef	SYSNOISE_INCLUDE
+#define	SYSNOISE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<mkdirs.h>
-#include	<rmdirs.h>
-#include	<dirempty.h>
+
+EXTERNC_begin
+
+extern int	sysnoise(uchar *,int) noex ;
+
+EXTERNC_end
 
 
-#endif /* DIRS_INCLUDE */
+#endif /* SYSNOISE_INCLUDE */
 
 

@@ -1,7 +1,7 @@
-/* dirs HEADER */
+/* quoteshellarg HEADER */
 /* lang=C20 */
 
-/* make a series of possibly hierarchical directories */
+/* Make-a-Quoted c-string (from a source c-string) */
 /* version %I% last-modified %G% */
 
 
@@ -14,19 +14,22 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	DIRS_INCLUDE
-#define	DIRS_INCLUDE
+#ifndef	QUOTESHELLARG_INCLUDE
+#define	QUOTESHELLARG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<mkdirs.h>
-#include	<rmdirs.h>
-#include	<dirempty.h>
+
+EXTERNC_begin
+
+extern int quoteshellarg(char *,int,cchar *,int,char **) noex ;
+
+EXTERNC_end
 
 
-#endif /* DIRS_INCLUDE */
+#endif /* QUOTESHELLARG_INCLUDE */
 
 

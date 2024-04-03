@@ -1,7 +1,7 @@
-/* rmdirs HEADER */
-/* lang=C20 */
+/* printhelp HEADER */
+/* lang=C++20 */
 
-/* make a series of possibly hierarchical directories */
+/* print out a help file if we have one */
 /* version %I% last-modified %G% */
 
 
@@ -14,24 +14,25 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	RMDIRS_INCLUDE
-#define	RMDIRS_INCLUDE
+#ifndef	PRINTHELP_INCLUDE
+#define	PRINTHELP_INCLUDE
+#ifdef	__cplusplus /* C++ only */
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<ostream>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
 
 EXTERNC_begin
 
-extern int rmdirs(cchar *) noex ;
-extern int removes(cchar *) noex ;
-extern int rmdirfiles(cchar *,cchar *,int) noex ;
+extern int printhelp(std::ostream *,cchar *,cchar *,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* RMDIRS_INCLUDE */
+#endif /* __cplusplus */
+#endif /* PRINTHELP_INCLUDE */
 
 
