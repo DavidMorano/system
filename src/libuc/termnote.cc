@@ -84,6 +84,7 @@
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<ipow.h>
 #include	<xperm.h>
+#include	<timestr.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<isnot.h>
@@ -95,7 +96,6 @@
 /* local defines */
 
 #define	TERMNOTE_SEARCHNAME	"termnote"
-#define	TERMNOTE_DEBFNAME	"termnote.deb"
 
 #ifndef	DEVDNAME
 #define	DEVDNAME	"/dev"
@@ -112,8 +112,6 @@
 #define	TO_WRITE	30
 #define	TO_LOGCHECK	5
 #define	TO_LOCK		4
-
-#define	USERTERM	struct userterm
 
 #define	COLSTATE	struct colstate
 
@@ -135,7 +133,6 @@ extern "C" {
     extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
     extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
     extern int	writeto(int,cvoid *,int,int) noex ;
-    extern char	*timestr_logz(time_t,char *) noex ;
 }
 
 
@@ -144,10 +141,19 @@ extern "C" {
 
 /* local structures */
 
-struct userterm {
+namespace {
+    struct userterm {
+	static cint	tdlen ;
 	time_t		atime ;
-	char		termdev[MAXNAMELEN+1] ;
-} ;
+	char		tdbuf[TERMDEVLEN + 1] ;
+	userterm() noex : atime(0) {
+	    tdbuf[0] = '\0' ;
+	} ;
+	int load(cchar *sp,int sl = -1) noex {
+	    return sncpy1w(tdbuf,tdlen,sp,sl) ;
+	} ;
+   } ; /* end struct (userterm) */
+}
 
 typedef userterm *	usertermp ;
 
@@ -240,13 +246,15 @@ static int	colstate_linecols(struct colstate *,cchar *,int) noex ;
 #endif
 
 static int	mkclean(char *,int,cchar *,int) noex ;
-static int	vcmpatime(cvoid *,cvoid *) noex ;
+static int	vcmpatime(cvoid **,cvoid **) noex ;
 
 static bool	hasourbad(cchar *,int) noex ;
 static bool	isourbad(int) noex ;
 
 
 /* local variables */
+
+cint	userterm::tdlen = TERMDEVLEN ;
 
 
 /* exported variables */
@@ -511,7 +519,7 @@ static int termnote_bufline(termnote *op,buffer *obp,cchar *lp,int ll) noex {
 	            char	tmpbuf[COLUMNS+ 1] ;
 	            for (int i = 0 ; (cl = lg(&lf,i,&cp)) >= 0 ; i += 1) {
 	                cchar	*bp = cp ;
-	                int		bl = cl ;
+	                int	bl = cl ;
 	                if (hasourbad(cp,cl)) {
 	                    bp = tmpbuf ;
 	                    bl = mkclean(tmpbuf,tmplen,cp,cl) ;
@@ -565,13 +573,12 @@ static int termnote_dis(termnote *op,cchar **rpp,int n,int o,mbuf *mp) noex {
 
 static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 	vecobj		uts ;
-	cint		utsize = sizeof(USERTERM) ;
+	cint		utsize = sizeof(userterm) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 	if ((rs = vecobj_start(&uts,utsize,0,0)) >= 0) {
 	    vecstr	lines ;
-	    cint	tdlen = TERMDEVLEN ;
 	    cchar	*devdname = DEVDNAME ;
 	    char	termfname[TERMDEVLEN+1] ;
 	    if ((rs = vecstr_start(&lines,0,0)) >= 0) {
@@ -583,8 +590,9 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 		    logfile_printf(op->lfp,lfmt,un,nlines) ;
 		}
 	    if ((rs >= 0) && (nlines > 0)) {
-		USERTERM	ut ;
-		int		ll, tl ;
+		userterm	ut ;
+		int		ll ;
+		int		tl ;
 		cchar		*lp{} ;
 		for (int i = 0 ; vecstr_get(&lines,i,&lp) >= 0 ; i += 1) {
 		    if (lp == nullptr) continue ;
@@ -592,15 +600,16 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 		    if (ll > 0) {
 			if ((rs = mkpath2w(termfname,devdname,lp,ll)) >= 0) {
 			    tl = rs ;
-			    rs1 = sncpy1w(ut.termdev,tdlen,termfname,tl) ;
+			    rs1 = ut.load(termfname,tl) ;
 			    if (rs1 >= 0) {
 				USTAT	sb ;
 				bool	f_go = false ;
-				rs1 = u_stat(ut.termdev,&sb) ;
+				rs1 = u_stat(ut.tdbuf,&sb) ;
 				if (rs1 >= 0) {
 				    f_go = (sb.st_mode & S_IWGRP) ;
-				    if (f_go && (o & TERMNOTE_OBIFF))
+				    if (f_go && (o & TERMNOTE_OBIFF)) {
 				        f_go = (sb.st_mode & S_IXUSR) ;
+				    }
 				}
 				if ((rs1 >= 0) && f_go) {
 				    rs1 = sperm(op->idp,&sb,W_OK) ;
@@ -632,9 +641,9 @@ static int termnote_disuser(termnote *op,int nmax,int o,mbuf *mp,cc *un) noex {
 		void		*vp{} ;
 		for (int i = 0 ; vecobj_get(&uts,i,&vp) >= 0 ; i += 1) {
 		    if (vp) {
-	                USERTERM	*utp = usertermp(vp) ;
+	                userterm	*utp = usertermp(vp) ;
 			int		rsv = 0 ;
-			cchar		*tdp = utp->termdev ;
+			cchar		*tdp = utp->tdbuf ;
 		        if ((rs = termnote_diswrite(op,o,mp,tdp)) >= 0) {
 			    n += 1 ;
 			    c += 2 ;
@@ -862,11 +871,11 @@ static int colstate_linecols(colstate *csp,cchar *sbuf,int slen) noex {
 
 #endif /* COMMENT */
 
-static int mkclean(char *outbuf,int outlen,cchar *sbuf,int slen) noex {
+static int mkclean(char *obuf,int olen,cchar *sp,int sl) noex {
 	int		i ; /* used afterwards */
-	for (i = 0 ; (i < outlen) && (i < slen) ; i += 1) {
-	    outbuf[i] = sbuf[i] ;
-	    if (isourbad(sbuf[i] & 0xff)) outbuf[i] = '­' ;
+	for (i = 0 ; (i < olen) && (i < sl) ; i += 1) {
+	    cint	ch = mkchar(sp[i]) ;
+	    obuf[i] = (isourbad(ch)) ? '¿' : ch ;
 	} /* end for */
 	return i ;
 }
@@ -875,7 +884,7 @@ static int mkclean(char *outbuf,int outlen,cchar *sbuf,int slen) noex {
 static bool hasourbad(cchar *sp,int sl) noex {
 	bool		f = false ;
 	while (sl && (sp[0] != '\0')) {
-	    cint	ch = (sp[0] & 0xff) ;
+	    cint	ch = mkchar(sp[0]) ;
 	    f = isourbad(ch) ;
 	    if (f) break ;
 	    sp += 1 ;
@@ -904,13 +913,13 @@ static bool isourbad(int ch) noex {
 /* end subroutine (isourbad) */
 
 /* we want to do a reverse sort here (in descending order) */
-static int vcmpatime(cvoid *v1pp,cvoid *v2pp) noex {
-	USERTERM	**e1pp = (USERTERM **) v1pp ;
-	USERTERM	**e2pp = (USERTERM **) v2pp ;
+static int vcmpatime(cvoid **v1pp,cvoid **v2pp) noex {
+	userterm	**e1pp = (userterm **) v1pp ;
+	userterm	**e2pp = (userterm **) v2pp ;
 	int		rc = 0 ;
 	{
-	    USERTERM	*e1p = *e1pp ;
-	    USERTERM	*e2p = *e2pp ;
+	    userterm	*e1p = *e1pp ;
+	    userterm	*e2p = *e2pp ;
 	    if (e1p || e2p) {
 	        if (e1p) {
 	            if (e2p) {
