@@ -174,6 +174,10 @@ extern int	sbuf_printf(sbuf *,cchar *,...) noex ;
 extern int	sbuf_termconseq(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted(sbuf *,cchar *,int) noex ;
 
+static inline int sbuf_chr(sbuf *op,int ch) noex {
+	return sbuf_char(op,ch) ;
+}
+
 EXTERNC_end
 
 #ifdef	__cplusplus
