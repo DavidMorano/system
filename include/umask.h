@@ -30,13 +30,6 @@ extern int umask_fini() noex ;
 extern int umaskset(mode_t) noex ;
 extern int umaskget() noex ;
 
-static inline int getmask() noex {
-	return umaskget() ;
-}
-static inline int setumask(mode_t m) noex {
-	return umaskset(m) ;
-}
-
 EXTERNC_end
 
 
