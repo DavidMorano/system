@@ -61,6 +61,7 @@
 #include	<format.h>
 #include	<ctdec.h>
 #include	<cthex.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sbuf.h"
@@ -71,10 +72,6 @@
 #define	SBUF_RBUF	(sbp->rbuf)
 #define	SBUF_RLEN	(sbp->rlen)
 #define	SBUF_INDEX	(sbp->index)
-
-#ifndef	MKCHAR
-#define	MKCHAR(ch)	((ch) & UCHAR_MAX)
-#endif
 
 
 /* imported namespaces */
@@ -102,7 +99,9 @@ static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 /* local variables */
 
-static cchar	blanks[] = "        " ;
+constexpr cchar		blanks[] = "        " ;
+
+constexpr int		nblanks = strlen(blanks) ;
 
 
 /* local subroutine-templates */
@@ -388,14 +387,13 @@ int sbuf_nchar(sbuf *sbp,int ch,int len) noex {
 /* end subroutine (sbuf_nchar) */
 
 int sbuf_blanks(sbuf *sbp,int n) noex {
-	static cint	nblank = strlen(blanks) ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		if (n >= 0) {
 	            while ((rs >= 0) && (len < n)) {
-	                cint	ml = min(nblank,(n - len)) ;
+	                cint	ml = min(nblanks,(n - len)) ;
 	                rs = sbuf_addstrw(sbp,blanks,ml) ;
 	                len += rs ;
 	            } /* end while */
@@ -511,7 +509,7 @@ int sbuf_getprev(sbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-	        rs = MKCHAR(SBUF_RBUF[SBUF_INDEX - 1]) ;
+	        rs = mkchar(SBUF_RBUF[SBUF_INDEX - 1]) ;
 	    }
 	} /* end if */
 	return rs ;

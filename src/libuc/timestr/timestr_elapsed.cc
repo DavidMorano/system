@@ -29,6 +29,8 @@
 #include	<snx.h>
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
+#include	"timestr.h"
+
 
 /* local defines */
 
@@ -48,7 +50,7 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	cint		rlen = TIMEBUFLEN ;
 	int		rs = SR_FAULT ;
 	if (rbuf) {
-	    rs = SR_INVALID ;
+	    rs = SR_DOM ;
 	    if (t >= 0) {
 	        cuint	tmins = (t / 60) ;
 	        cuint	secs = (t % 60) ;
@@ -65,7 +67,7 @@ char *timestr_elapsed(time_t t,char *rbuf) noex {
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	if (rs < 0) {
-	    ulogerror("timestr_elapse",rs,"ret") ;
+	    ulogerror("timestr",rs,"elapsed") ;
 	}
 	return (rs >= 0) ? rbuf : nullptr ;
 }

@@ -1,11 +1,10 @@
-/* timestr_date */
+/* timestr_date SUPPORT */
+/* lang=C++20 */
 
 /* convert UNIX® time into a various date formats */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
-#define	CF_SNTMTIME	1		/* use 'sntmtime(3dam)' */
-
+#define	CF_SNTMTIME	1		/* use |sntmtime(3dam)| */
 
 /* revision history:
 
@@ -13,12 +12,13 @@
 	This subroutine was originally written.
 
 	= 2013-11-24, David A­D­ Morano
-        I changed this (after all of these years) to use 'sntmtime(3dam)' rather
-        than 'bufprintf(3dam)'. This should be faster than before -- at least
-        that was what was expected. The 'sntmtime(3dam)' subroutine is similar
-        to the 'strftime(3c)' subroutine except that it has a couple of extra
-        format codes to make creating time-strings with time-zone offsets within
-        them a little bit easier.
+	I changed this (after all of these years) to use |sntmtime(3dam)|
+	rather than |snwprintf(3dam)|.  This should be faster than
+	before -- at least that was what was expected.  The
+	|sntmtime(3dam)| subroutine is similar to the |strftime(3c)|
+	subroutine except that it has a couple of extra format codes
+	to make creating time-strings with time-zone offsets within
+	them a little bit easier.
 
 */
 
@@ -26,8 +26,8 @@
 
 /*******************************************************************************
  
-        Return the date (in UNIX® mail evelope format) into the user's supplied
-        buffer.
+	Return the date (in UNIX® mail evelope format) into the
+	user supplied buffer.
 
 	The correct (newer) UNIX® mail envelope format time string is:
 
@@ -41,26 +41,28 @@
 
 		Wed Jun  4 20:52:47 EDT 1997 -0400
 
-        The program '/usr/lib/mail.local' uses the *old* format while the newer
-        program '/usr/bin/mail' uses the new format. Most PCS utilities use the
-        newer (newest) format (which is (far) suprerior since it includes the
-        timezone abbreviation and the time-zone offset value).
-
+	The program '/usr/lib/mail.local' uses the *old* format
+	while the newer program '/usr/bin/mail' uses the new format.
+	Most PCS utilities use the newer (newest) format (which is
+	(far) suprerior since it includes the timezone abbreviation
+	and the time-zone offset value).
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<stdlib.h>
-#include	<time.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<usystem.h>
+#include	<usupport.h>		/* |ulogerror(3u)| */
+#include	<snx.h>
+#include	<sncpyx.h>
 #include	<tmtime.h>
-#include	<localmisc.h>
+#include	<zoffparts.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| + |NYEARS_CENTURY| */
 
-#include	"zoffparts.h"
+#include	"timestr.h"
 
 
 /* local defines */
@@ -73,25 +75,14 @@
 #define	TIMESTR_TLOGZ		5	/* "logz" format */
 #define	TIMESTR_TGMLOGZ		6	/* "logz" format for GMT */
 
-#ifndef	NYEARS_CENTURY
-#define	NYEARS_CENTURY	100
-#endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-
-#if	CF_SNTMTIME
-extern int	sntmtime(char *,int,TMTIME *,const char *) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -102,7 +93,9 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-char *timestr_date(time_t,int,char *) ;
+extern "C" {
+    char *timestr_date(time_t,int,char *) noex ;
+}
 
 
 /* local variables */
@@ -111,123 +104,97 @@ char *timestr_date(time_t,int,char *) ;
 
 #else /* CF_SNTMTIME */
 
-static const char	*months[] = {
+static cchar	*months[] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 } ;
 
-static const char	*days[] = {
+static cchar	*days[] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
 } ;
 
 #endif /* CF_SNTMTIME */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-char *timestr_std(time_t t,char *buf)
-{
+char *timestr_std(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TSTD,buf) ;
 }
 /* end subroutine (timestr_std) */
 
-
-char *timestr_edate(time_t t,char *buf)
-{
+char *timestr_edate(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TSTD,buf) ;
 }
 /* end subroutine (timestr_edate) */
 
-
-char *timestr_gmtstd(time_t t,char *buf)
-{
+char *timestr_gmtstd(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TGMSTD,buf) ;
 }
 /* end subroutine (timestr_gmtstd) */
 
-
-char *timestr_msg(time_t t,char *buf)
-{
+char *timestr_msg(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TMSG,buf) ;
 }
 /* end subroutine (timestr_msg) */
 
-
-char *timestr_hdate(time_t t,char *buf)
-{
+char *timestr_hdate(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TMSG,buf) ;
 }
 /* end subroutine (timestr_hdate) */
 
-
-char *timestr_log(time_t t,char *buf)
-{
+char *timestr_log(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TLOG,buf) ;
 }
 /* end subroutine (timestr_log) */
 
-
 #ifdef	COMMENT
-char *timestr_loggm(time-t t,char *buf)
-{
+char *timestr_loggm(time-t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TGMLOG,buf) ;
 }
 /* end subroutine (timestr_loggm) */
 #endif /* COMMENT */
 
-
-char *timestr_gmlog(time_t t,char *buf)
-{
+char *timestr_gmlog(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TGMLOG,buf) ;
 }
 /* end subroutine (timestr_gmlog) */
 
-
-char *timestr_logz(time_t t,char *buf)
-{
+char *timestr_logz(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TLOGZ,buf) ;
 }
 /* end subroutine (timestr_logz) */
 
-
 #ifdef	COMMENT
-char *timestr_loggmz(time_t t,char *buf)
-{
+char *timestr_loggmz(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TGMLOGZ,buf) ;
 }
 /* end subroutine (timestr_loggmz) */
 #endif /* COMMENT */
 
-
-char *timestr_gmlogz(time_t t,char *buf)
-{
+char *timestr_gmlogz(time_t t,char *buf) noex {
 	return timestr_date(t,TIMESTR_TGMLOGZ,buf) ;
 }
 /* end subroutine (timestr_gmlogz) */
 
-
 /* create a date-string as specified by its type-code */
-char *timestr_date(time_t t,int type,char *tbuf)
-{
+char *timestr_date(time_t t,int type,char *tbuf) noex {
+	cint		tlen = TIMEBUFLEN ;
+	int		rs = SR_FAULT ;
+	if (tbuf) {
+	    tbuf[0] = '\0' ;
+	    rs = SR_DOM ;
+	    if (t >= 0) {
 	TMTIME		tmt ;
-	const int	tlen = TIMEBUFLEN ;
-	int		rs ;
-	int		f_gmt = FALSE ;
-
-	if (tbuf == NULL) return NULL ;
-
-	tbuf[0] = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("timestr_date: ent type=%u\n",type) ;
-#endif
-
+	int		f_gmt = false ;
 	switch (type) {
 	case TIMESTR_TGMSTD:
 	case TIMESTR_TGMLOG:
 	case TIMESTR_TGMLOGZ:
-	    f_gmt = TRUE ;
+	    f_gmt = true ;
 	    break ;
 	} /* end switch */
 
@@ -253,7 +220,7 @@ char *timestr_date(time_t t,int type,char *tbuf)
 	        {
 	            ZOFFPARTS	zo ;
 	            zoffparts_set(&zo,tmt.gmtoff) ;
-	            rs = bufprintf(tbuf,tlen,
+	            rs = snwprintf(tbuf,tlen,
 	                "%t %t %2u %02u:%02u:%02u %s %04u %c%02u%02u",
 	                days[tmt.wday],3,
 	                months[tmt.mon],3,
@@ -278,7 +245,7 @@ char *timestr_date(time_t t,int type,char *tbuf)
 	        {
 	            ZOFFPARTS	zo ;
 	            zoffparts_set(&zo,tmt.gmtoff) ;
-	            rs = bufprintf(tbuf,tlen,
+	            rs = snwprintf(tbuf,tlen,
 	                "%2u %t %4u %02u:%02u:%02u %c%02u%02u (%s)",
 	                tmt.mday,
 	                months[tmt.mon],3,
@@ -300,7 +267,7 @@ char *timestr_date(time_t t,int type,char *tbuf)
 #if	CF_SNTMTIME
 	        rs = sntmtime(tbuf,tlen,&tmt,"%y%m%d_%H%M:%S") ;
 #else
-	        rs = bufprintf(tbuf,tlen,
+	        rs = snwprintf(tbuf,tlen,
 	            "%02u%02u%02u_%02u%02u:%02u",
 	            (tmt.year % NYEARS_CENTURY),
 	            (tmt.mon + 1),
@@ -318,7 +285,7 @@ char *timestr_date(time_t t,int type,char *tbuf)
 #if	CF_SNTMTIME
 	        rs = sntmtime(tbuf,tlen,&tmt,"%y%m%d_%H%M:%S_%Z") ;
 #else
-	        rs = bufprintf(tbuf,tlen,
+	        rs = snwprintf(tbuf,tlen,
 	            "%02u%02u%02u_%02u%02u:%02u_%s",
 	            (tmt.year % NYEARS_CENTURY),
 	            (tmt.mon + 1),
@@ -334,19 +301,15 @@ char *timestr_date(time_t t,int type,char *tbuf)
 	    default:
 	        rs = sncpy1(tbuf,tlen,"** invalid type **") ;
 	        break ;
-
 	    } /* end switch */
 	} /* end if (ok) */
-
-	if (rs < 0)
-	    tbuf[0] = '\0' ;
-
-#if	CF_DEBUGS
-	if (buf != NULL)
-	    debugprintf("timestr_date: ret rs=%d tbuf=>%s<\n",rs,tbuf) ;
-#endif
-
-	return tbuf ;
+	    } /* end if (valid) */
+	    if (rs < 0) tbuf[0] = '\0' ;
+	} /* end if (non-null) */
+	if (rs < 0) {
+	    ulogerror("timestr",rs,"date") ;
+	}
+	return (rs >= 0) ? tbuf : nullptr ;
 }
 /* end subroutine (timestr_date) */
 

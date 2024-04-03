@@ -41,7 +41,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<climits>
 #include	<cstdlib>
-#include	<algorithm>		/* |min(3c++)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -81,7 +81,7 @@ extern "C" {
 
 /* local variables */
 
-static constexpr char		blanks[] = "        " ;
+constexpr cchar		blanks[] = "        " ;
 
 
 /* exported variables */
@@ -101,7 +101,7 @@ int buffer_chrs(buffer *bp,int ch,int n) noex {
 /* end subroutine (buffer_chrs) */
 
 int buffer_blanks(buffer *bp,int n) noex {
-	cint		nblanks = sizeof(blanks) ;
+	static cint	nblanks = strlen(blanks) ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	while ((rs >= 0) && (n > 0)) {
