@@ -1205,6 +1205,7 @@ pathadd.o:		pathadd.cc pathadd.h
 pathclean.o:		pathclean.cc pathclean.h
 
 # UTILITY
+strtabfind.o:		strtabfind.cc strtabfind.h
 findbit.o:		findbit.cc findbit.h
 termtypemat.o:		termtypemat.cc termtypemat.h
 termcmd.o:		termcmd.cc termcmd.h

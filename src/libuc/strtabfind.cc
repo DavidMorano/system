@@ -55,6 +55,8 @@
 #include	<hash.h>
 #include	<localmisc.h>
 
+#include	"strtabfind.h"
+
 
 /* local defines */
 
