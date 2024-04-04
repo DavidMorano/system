@@ -248,7 +248,7 @@ const char	configfname[] ;
 
 	const char	*fp ;
 
-	char	linebuf[LINEBUFLEN + 1] ;
+	char	lbuf[LINEBUFLEN + 1] ;
 	char	buf[BUFLEN + 1] ;
 	char	buf2[BUFLEN + 1] ;
 	char	*bp, *cp ;
@@ -313,13 +313,13 @@ const char	configfname[] ;
 	debugprintf("configfile_start: reading lines\n") ;
 #endif
 
-	while ((rs = breadln(cfp,linebuf,LINEBUFLEN)) > 0) {
+	while ((rs = breadln(cfp,lbuf,LINEBUFLEN)) > 0) {
 
 	    len = rs ;
 	    line += 1 ;
 	    if (len == 1) continue ;	/* blank line */
 
-	    if (linebuf[--len] != '\n') {
+	    if (lbuf[--len] != '\n') {
 
 #ifdef	COMMENT
 	        f_trunc = TRUE ;
@@ -330,10 +330,10 @@ const char	configfname[] ;
 	        continue ;
 	    }
 
-	    if ((len == 0) || (linebuf[0] == '#'))
+	    if ((len == 0) || (lbuf[0] == '#'))
 	        continue ;
 
-	    if ((rs = field_start(&fsb,linebuf,len)) >= 0) {
+	    if ((rs = field_start(&fsb,lbuf,len)) >= 0) {
 
 	    	fl = field_get(&fsb,fterms,&fp) ;
 

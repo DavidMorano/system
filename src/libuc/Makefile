@@ -1124,6 +1124,11 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
+# STRLIST
+strlist.o:		strlist.dir
+strlist.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h

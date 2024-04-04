@@ -1,10 +1,10 @@
-/* strlist */
+/* strlist SUPPORT */
+/* lang=C++20 */
 
 /* read or audit a STRLIST database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,32 +17,25 @@
 
 /*******************************************************************************
 
-	This subroutine opens and allows for reading or auditing of a STRLIST
-	database (which currently consists of two files).
+	Description:
+	This subroutine opens and allows for reading or auditing
+	of a STRLIST database (which currently consists of two
+	files).
 
 	Synopsis:
-
-	int strlist_open(op,dbname)
-	STRLIST		*op ;
-	const char	dbname[] ;
+	int strlist_open(strlist *op,cchar *dbname) noex
 
 	Arguments:
-
 	- op		object pointer
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>

@@ -1,10 +1,10 @@
-/* strlisthdr */
+/* strlisthdr SUPPORT */
+/* lang=C++20 */
 
-/* spellcheck file header */
-
+/*  spellcheck file header */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS 	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,41 +17,30 @@
 
 /*******************************************************************************
 
+	Description:
 	This subroutine writes out a STRLIST file.
 
 	Synopsis:
-
-	int strlisthdr(ep,f,hbuf,hlen)
-	STRLISTHDR	*ep ;
-	int		f ;
-	char		hbuf[] ;
-	int		hlen ;
+	int strlisthdr(strlisthdr *ep,int f,char *hbuf,int hlen) noex
 
 	Arguments:
-
 	- ep		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<localmisc.h>

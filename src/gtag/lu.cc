@@ -1,12 +1,11 @@
-/* lu */
+/* lu SUPPORT */
+/* lang=C++20 */
 
 /* lookup a reference in the databases */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
-
 
 /* revision history:
 
@@ -14,8 +13,9 @@
 	This subroutine was originally written.
 
 	= 1998-09-10, David A­D­ Morano
-        This subroutine was modified to be able to handle the response from the
-        GNU 'lookbib' program in addition to the (old) standard UNIX version.
+	This subroutine was modified to be able to handle the
+	response from the GNU 'lookbib' program in addition to the
+	(old) standard UNIX version.
 
 */
 
@@ -23,23 +23,20 @@
 
 /*******************************************************************************
 
-        This subroutine processes a file by looking up and inserting the
-        bibliographical references into the text. All input is copied to the
-        output with the addition of the bibliographical references.
-
+	This subroutine processes a file by looking up and inserting
+	the bibliographical references into the text. All input is
+	copied to the output with the addition of the bibliographical
+	references.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<bfile.h>
 #include	<localmisc.h>
 
@@ -133,7 +130,7 @@ char		keys[] ;
 	int	f_started ;
 
 	char	*database ;
-	char	linebuf[LINELEN + 1] ;
+	char	lbuf[LINELEN + 1] ;
 	char	bibbuf[BIBLEN + 1] ;
 	char	cmd_lookbib[CMDBUFLEN + 1] ;
 	char	*cp, *rbuf ;
@@ -194,7 +191,7 @@ char		keys[] ;
 #endif
 
 	f_begin = TRUE ;
-	while ((len = breadln(ifp,linebuf,LINELEN)) > 0) {
+	while ((len = breadln(ifp,lbuf,LINELEN)) > 0) {
 
 #if	CF_DEBUG
 	    if (gp->debuglevel > 1)
@@ -202,23 +199,23 @@ char		keys[] ;
 #endif
 
 	    f_end = TRUE ;
-	    if (linebuf[len - 1] != '\n') f_end = FALSE ;
+	    if (lbuf[len - 1] != '\n') f_end = FALSE ;
 
 #if	CF_DEBUG
 	    if (gp->debuglevel > 1)
 	        debugprintf("process: processing a line begin=%d end=%d\n%W",
-	            f_begin,f_end,linebuf,len) ;
+	            f_begin,f_end,lbuf,len) ;
 #endif
 
 	    macrolen = 0 ;
 	    if (f_begin) {
 
 	        if ((len >= (macrolen1 + 1)) &&
-	            (strncmp(linebuf,MACRONAME1,macrolen1) == 0))
+	            (strncmp(lbuf,MACRONAME1,macrolen1) == 0))
 	            macrolen = macrolen1 ;
 
 	        if ((! macrolen) && (len >= (macrolen2 + 1)) &&
-	            (strncmp(linebuf,MACRONAME2,macrolen2) == 0))
+	            (strncmp(lbuf,MACRONAME2,macrolen2) == 0))
 	            macrolen = macrolen2 ;
 
 	    }
@@ -229,11 +226,11 @@ char		keys[] ;
 	        if (gp->debuglevel > 1) {
 
 	            debugprintf("process: input line >\n%W",
-	                linebuf,len) ;
+	                lbuf,len) ;
 
 #ifdef	COMMENT
 	            for (ii = 0 ; ii < len ; ii += 1)
-	                debugprintf(" %02X",linebuf[ii]) ;
+	                debugprintf(" %02X",lbuf[ii]) ;
 #endif
 
 	            debugprintf("\n") ;
@@ -258,7 +255,7 @@ char		keys[] ;
 	                debugprintf("process: line\n") ;
 
 	                for (ii = 0 ; ii < len ; ii += 1)
-	                    debugprintf(" %02X",linebuf[ii]) ;
+	                    debugprintf(" %02X",lbuf[ii]) ;
 
 	                debugprintf("\n") ;
 
@@ -276,7 +273,7 @@ char		keys[] ;
 	                if (gp->debuglevel > 1) {
 
 	                    for (ii = 0 ; ii < len ; ii += 1)
-	                        debugprintf(" %02X",linebuf[ii]) ;
+	                        debugprintf(" %02X",lbuf[ii]) ;
 
 	                    debugprintf("\n") ;
 
@@ -325,10 +322,10 @@ char		keys[] ;
 
 	                    } /* end for */
 
-	                    debugprintf("process: linebuf :\n") ;
+	                    debugprintf("process: lbuf :\n") ;
 
 	                    for (ii = 0 ; ii < len ; ii += 1)
-	                        debugprintf(" %02X",linebuf[ii]) ;
+	                        debugprintf(" %02X",lbuf[ii]) ;
 
 	                    debugprintf("\n") ;
 
@@ -346,7 +343,7 @@ char		keys[] ;
 	                if (gp->debuglevel > 1) {
 
 	                    for (ii = 0 ; ii < len ; ii += 1)
-	                        debugprintf(" %02X",linebuf[ii]) ;
+	                        debugprintf(" %02X",lbuf[ii]) ;
 
 	                    debugprintf("\n") ;
 
@@ -360,7 +357,7 @@ char		keys[] ;
 	                if (gp->debuglevel > 1) {
 
 	                    for (ii = 0 ; ii < len ; ii += 1)
-	                        debugprintf(" %02X",linebuf[ii]) ;
+	                        debugprintf(" %02X",lbuf[ii]) ;
 
 	                    debugprintf("\n") ;
 
@@ -382,7 +379,7 @@ char		keys[] ;
 	                if (gp->debuglevel > 1) {
 
 	                    for (ii = 0 ; ii < len ; ii += 1)
-	                        debugprintf(" %02X",linebuf[ii]) ;
+	                        debugprintf(" %02X",lbuf[ii]) ;
 
 	                    debugprintf("\n") ;
 
@@ -400,7 +397,7 @@ char		keys[] ;
 	                if (gp->debuglevel > 1) {
 
 	                    for (ii = 0 ; ii < len ; ii += 1)
-	                        debugprintf(" %02X",linebuf[ii]) ;
+	                        debugprintf(" %02X",lbuf[ii]) ;
 
 	                    debugprintf("\n") ;
 
@@ -424,14 +421,14 @@ char		keys[] ;
 	            if (gp->debuglevel > 1) {
 
 	                for (ii = 0 ; ii < len ; ii += 1)
-	                    debugprintf(" %02X",linebuf[ii]) ;
+	                    debugprintf(" %02X",lbuf[ii]) ;
 
 	                debugprintf("\n") ;
 
 	            }
 #endif /* CF_DEBUG */
 
-	            rbuf = linebuf + (macrolen + 1) ;
+	            rbuf = lbuf + (macrolen + 1) ;
 	            rlen = len - (macrolen + 1) ;
 
 /* comment in output */
@@ -442,10 +439,10 @@ char		keys[] ;
 	                debugprintf(
 	                    "process: printing in output %d characters >\n%W",
 	                    len - (macrolen + 1),
-	                    linebuf + (macrolen + 1),len - (macrolen + 1)) ;
+	                    lbuf + (macrolen + 1),len - (macrolen + 1)) ;
 
 	                for (ii = 0 ; ii < (len - (macrolen + 1)) ; ii += 1)
-	                    debugprintf(" %02X",(linebuf + (macrolen + 1))[ii]) ;
+	                    debugprintf(" %02X",(lbuf + (macrolen + 1))[ii]) ;
 
 	                debugprintf("\n") ;
 
@@ -453,31 +450,31 @@ char		keys[] ;
 #endif /* CF_DEBUG */
 
 	            bprintf(ofp,".\\\"_ %W",
-	                linebuf + (macrolen + 1),len - (macrolen + 1)) ;
+	                lbuf + (macrolen + 1),len - (macrolen + 1)) ;
 
 /* to program */
 
 	            bwrite(lifp,
-	                linebuf + (macrolen + 1),len - (macrolen + 1)) ;
+	                lbuf + (macrolen + 1),len - (macrolen + 1)) ;
 
-	            while (linebuf[len - 1] != '\n') {
+	            while (lbuf[len - 1] != '\n') {
 
 #if	CF_DEBUG
 	                if (gp->debuglevel > 1)
 	                    debugprintf("process: more off of input line\n") ;
 #endif
 
-	                if ((len = breadln(ifp,linebuf,LINELEN)) < 0)
+	                if ((len = breadln(ifp,lbuf,LINELEN)) < 0)
 	                    break ;
 
 /* place a comment in the output consisting of the keywords given */
 
 	                bprintf(ofp,".\\\"_ %W",
-	                    linebuf,len) ;
+	                    lbuf,len) ;
 
 /* to program */
 
-	                bwrite(lifp,linebuf,len) ;
+	                bwrite(lifp,lbuf,len) ;
 
 	            } /* end while */
 
@@ -853,7 +850,7 @@ char		keys[] ;
 	        if (gp->debuglevel > 0)
 	            bprintf(gp->efp,"done with reference\n") ;
 
-	    } else if ((rs = bwrite(ofp,linebuf,len)) < 0)
+	    } else if ((rs = bwrite(ofp,lbuf,len)) < 0)
 	        goto badwrite ;
 
 	    f_begin = f_end ;
