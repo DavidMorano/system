@@ -51,15 +51,8 @@
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #define	DEFENTRIES	10
+
 #define	TO_LOCK		60
 
 #ifndef	F_LOCK
@@ -452,59 +445,62 @@ static int pwfile_filefront(pwfile *op) noex {
 /* end subroutine (pwfile_filefront) */
 
 static int pwfile_filefronter(pwfile *op) noex {
-	bfile		pwfile, *fp = &pwfile ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = bopen(fp,op->fname,"rc",0644)) >= 0) {
-	    if (! op->f.locked) {
-	        rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
-	    }
-	    if (rs >= 0) {
-	        pwentry		entry ;
-	        cint		llen = LINEBUFLEN ;
-	        int		len ;
-	        char		lbuf[LINEBUFLEN+1] ;
-	        while ((rs = breadln(fp,lbuf,llen)) > 0) {
-	            len = rs ;
-	            if (lbuf[len - 1] == '\n') len -= 1 ;
-	            lbuf[len] = '\0' ;
-	            if ((rs = pwentry_start(&entry)) >= 0) {
-	                int		fn = 0 ;
-	                cchar		*tp ;
-	                cchar		*cp = lbuf ;
-	                while ((tp = strchr(cp,':')) != nullptr) {
-	                    rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
-	                    cp = (tp + 1) ;
-	                    fn += 1 ;
-	                    if (rs < 0) break ;
-	                } /* end while */
-	                if ((rs >= 0) && (cp[0] != '\0')) {
-	                    rs = pwentry_fieldpw(&entry,fn,cp,-1) ;
-	                }
-/* make any extras fields that we want */
-	                if (rs >= 0) {
-	                    rs = pwentry_mkextras(&entry) ;
-	                }
-/* add the entry to our list */
-	                if (rs >= 0) {
-	                    cint	esize = sizeof(pwentry) ;
-	                    n += 1 ;
-	                    rs = vecitem_add(op->alp,&entry,esize) ;
-	                }
-	                if (rs < 0) {
-	                    pwentry_finish(&entry) ;
-			}
-	            } /* end if (initialized new entry) */
-	            if (rs < 0) break ;
-	        } /* end while (reading file entries) */
+	char		*lbuf{} ;
+	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    bfile	pwfile, *fp = &pwfile ;
+	    cint	llen = rs ;
+	    if ((rs = bopen(fp,op->fname,"rc",0644)) >= 0) {
 	        if (! op->f.locked) {
-	            bcontrol(fp,BC_UNLOCK,0) ;
+	            rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	        }
-	    } /* end if (ok) */
-	    rs1 = bclose(fp) ;
+	        if (rs >= 0) {
+	            pwentry		entry ;
+	            while ((rs = breadln(fp,lbuf,llen)) > 0) {
+	                int		len = rs ;
+	                if (lbuf[len - 1] == '\n') len -= 1 ;
+	                lbuf[len] = '\0' ;
+	                if ((rs = pwentry_start(&entry)) >= 0) {
+	                    int		fn = 0 ;
+	                    cchar		*tp ;
+	                    cchar		*cp = lbuf ;
+	                    while ((tp = strchr(cp,':')) != nullptr) {
+	                        rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
+	                        cp = (tp + 1) ;
+	                        fn += 1 ;
+	                        if (rs < 0) break ;
+	                    } /* end while */
+	                    if ((rs >= 0) && (cp[0] != '\0')) {
+	                        rs = pwentry_fieldpw(&entry,fn,cp,-1) ;
+	                    }
+/* make any extras fields that we want */
+	                    if (rs >= 0) {
+	                        rs = pwentry_mkextras(&entry) ;
+	                    }
+/* add the entry to our list */
+	                    if (rs >= 0) {
+	                        cint	esize = sizeof(pwentry) ;
+	                        n += 1 ;
+	                        rs = vecitem_add(op->alp,&entry,esize) ;
+	                    }
+	                    if (rs < 0) {
+	                        pwentry_finish(&entry) ;
+			    }
+	                } /* end if (initialized new entry) */
+	                if (rs < 0) break ;
+	            } /* end while (reading file entries) */
+	            if (! op->f.locked) {
+	                bcontrol(fp,BC_UNLOCK,0) ;
+	            }
+	        } /* end if (ok) */
+	        rs1 = bclose(fp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (bfile) */
+	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (bfile) */
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_filefronter) */
