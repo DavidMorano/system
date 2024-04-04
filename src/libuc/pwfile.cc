@@ -135,6 +135,7 @@ static int	pwfile_loadend(pwfile *) noex ;
 static int	pwfile_filefront(pwfile *) noex ;
 static int	pwfile_filefronter(pwfile *) noex ;
 static int	pwfile_fileback(pwfile *) noex ;
+static int	pwfile_checkopen(pwfile *) noex ;
 
 
 /* local variables */
@@ -260,14 +261,9 @@ int pwfile_fetchuser(pwfile *op,cc *username,pwfile_cur *curp,
 int pwfile_curbegin(pwfile *op,pwfile_cur *curp) noex {
 	int		rs ;
 	if ((rs = pwfile_magic(op,curp)) >= 0) {
-	    bool	f_locked = false ;
-	    if (op->lfd < 0) {
-		cint	of = O_RDONLY ;
-	        rs = u_open(op->fname,of,0666) ;
-	        op->lfd = rs ;
-	    } /* end if (it wasn't open) */
-	    if (rs >= 0) {
+	    if ((rs = pwfile_checkopen(op)) >= 0) {
 		int	cmd ;
+	        bool	f_locked = false ;
 	        if (! op->f.locked) {
 		    cint	to = TO_LOCK ;
 		    cmd = F_RLOCK ;
@@ -291,7 +287,7 @@ int pwfile_curbegin(pwfile *op,pwfile_cur *curp) noex {
 	            op->lfd = -1 ;
 #endif
 	        } /* end if (cleanup on error) */
-	    } /* end if (ok) */
+	    } /* end if (pwfile_checkopen) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -317,13 +313,8 @@ int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 	int		rs ;
 	int		f_opened = false ;
 	if ((rs = pwfile_magic(op)) >= 0) {
-	    if (op->lfd < 0) {
-		cint	of = O_RDONLY ;
-	        rs = u_open(op->fname,of,0666) ;
-	        op->lfd = rs ;
-	        f_opened = (rs >= 0) ;
-	    }
-	    if (rs >= 0) {
+	    if ((rs = pwfile_checkopen(op)) >= 0) {
+	        f_opened = (rs > 0) ;
 	        switch (type) {
 	        case F_ULOCK:
 	            if (op->f.locked_explicit) {
@@ -365,7 +356,7 @@ int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 	            }
 	            break ;
 	        } /* end switch */
-	    } /* end if (ok) */
+	    } /* end if (pwfile_checkopen) */
 	} /* end if (magic) */
 	return (rs >= 0) ? f_opened : rs ;
 }
@@ -523,5 +514,17 @@ static int pwfile_fileback(pwfile *op) noex {
 	return rs ;
 }
 /* end subroutine (pwfile_fileback) */
+
+static int pwfile_checkopen(pwfile *op) noex {
+	int		rs = SR_OK ;
+	int		f = false ;
+	if (op->lfd < 0) {
+	    cint	of = O_RDONLY ;
+	    rs = u_open(op->fname,of,0666) ;
+	    op->lfd = rs ;
+	} /* end if (it wasn't open) */
+	return (rs >= 0) ? f : rs ;
+}
+/* end subroutine (pwfile_checkopen) */
 
 
