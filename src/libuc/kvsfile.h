@@ -38,15 +38,15 @@
 
 
 struct kvsfile_cursor {
-	hdb_cur		ec ;
+	hdb_cur		*ecp ;
 	int		i ;
 } ;
 
 struct kvsfile_head {
-	vecobj		files ;
-	vecobj		keys ;
-	hdb		keyvals ;	/* indexed by key-value */
-	hdb		entries ;	/* indexed by key */
+	vecobj		*flp ;
+	vecobj		*klp ;
+	hdb		*kvlp ;		/* indexed by key-value */
+	hdb		*elp ;		/* indexed by key */
 	time_t		ti_check ;
 	uint		magic ;
 } ;

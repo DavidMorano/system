@@ -1150,22 +1150,44 @@ ucmemla.o:		ucmemla.cc ucmemla.h
 ucpts.o:		ucpts.cc ucpts.h
 
 
-# PATH
-pathadd.o:		pathadd.cc pathadd.h
-pathclean.o:		pathclean.cc pathclean.h
-
 nodedb.o:		nodedb.cc nodedb.h
-
-expcook.o:		expcook.cc expcook.h
-keyopt.o:		keyopt.cc keyopt.h
+expcook.o:		expcook.cc	expcook.h
+keyopt.o:		keyopt.cc	keyopt.h
 utf8decoder.o:		utf8decoder.cc utf8decoder.h
-termstr.o:		termstr.cc termstr.h
-td.o:			td.cc td.h termstr.h
-recip.o:		recip.cc recip.h
-querystr.o:		querystr.cc querystr.h
-
-findbit.o:		findbit.cc findbit.h
-bits.o:			bits.cc bits.h
+termstr.o:		termstr.cc	termstr.h
+td.o:			td.cc		td.h termstr.h
+recip.o:		recip.cc	recip.h
+querystr.o:		querystr.cc	querystr.h
+absfn.o:		absfn.cc	absfn.h
+ids.o:			ids.cc		ids.h
+groupids.o:		groupids.cc	groupids.hh
+realname.o:		realname.cc	realname.h
+bits.o:			bits.cc		bits.h
+userattrdb.o:		userattrdb.cc	userattrdb.h
+hdb.o:			hdb.cc		hdb.h
+pmq.o:			pmq.cc		pmq.h
+filegrp.o:		filegrp.cc	filegrp.h
+unameo.o:		unameo.cc	unameo.h
+hostaddr.o:		hostaddr.cc	hostaddr.h
+b64decoder.o:		b64decoder.cc	b64decoder.h
+lookaside.o:		lookaside.cc	lookaside.h
+strpack.o:		strpack.cc	strpack.h
+strtab.o:		strtab.cc	strtab.h
+strstore.o:		strstore.cc	strstore.h
+expcook.o:		expcook.cc	expcook.h
+hostinfo.o:		hostinfo.cc	hostinfo.h
+paramfile.o:		paramfile.cc	paramfile.h
+memfile.o:		memfile.cc	memfile.h
+dirlist.o:		dirlist.cc	dirlist.h
+varray.o:		varray.cc	varray.h
+csem.o:			csem.cc		csem.h
+pwcache.o:		pwcache.cc	pwcache.h
+lockrw.o:		lockrw.cc	lockrw.h
+nodedb.o:		nodedb.cc	nodedb.h
+mailmsg.o:		mailmsg.cc	mailmsg.h
+ccfile.o:		ccfile.cc	ccfile.hh
+thrcomm.o:		thrcomm.cc	thrcomm.h
+thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
 
 
 # sring-comparisons
@@ -1178,7 +1200,12 @@ stdfnames.o:		stdfnames.c stdfnames.h
 syhsdbfnames.o:		sysdbfnames.c sysdbfnames.h
 sysdbfname.o:		sysdbfname.cc sysdbfname.h
 
+# PATH
+pathadd.o:		pathadd.cc pathadd.h
+pathclean.o:		pathclean.cc pathclean.h
+
 # UTILITY
+findbit.o:		findbit.cc findbit.h
 termtypemat.o:		termtypemat.cc termtypemat.h
 termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
@@ -1186,10 +1213,6 @@ typenonpath.o:		typenonpath.cc typenonpath.h
 endian.o:		endian.cc endian.h
 pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
-ids.o:			ids.cc ids.h
-groupids.o:		groupids.cc groupids.hh
-realname.o:		realname.cc realname.h
-base64.o:		base64.cc base64.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h
 intceil.o:		intceil.cc intceil.h
@@ -1217,6 +1240,7 @@ sysnoise.o:		sysnoise.cc sysnoise.h
 findfilepath.o:		findfilepath.cc findfilepath.h
 calstrs.o:		calstrs.cc calstrs.h
 ipow.o:			ipow.cc ipow.h
+base64.o:		base64.cce	base64.h
 #
 isproc.o:		isproc.cc isproc.h
 #
@@ -1225,34 +1249,6 @@ isindomain.o:		isindomain.cc isindomain.h
 isoneof.o:		isoneof.cc isoneof.h
 isnot.o:		isnot.cc isnot.h isoneof.h
 iserror.o:		iserror.cc iserror.h isoneof.h
-
-
-userattrdb.o:		userattrdb.cc	userattrdb.h
-hdb.o:			hdb.cc		hdb.h
-pmq.o:			pmq.cc		pmq.h
-filegrp.o:		filegrp.cc	filegrp.h
-ids.o:			ids.cc		ids.h
-unameo.o:		unameo.cc	unameo.h
-hostaddr.o:		hostaddr.cc	hostaddr.h
-b64decoder.o:		b64decoder.cc	b64decoder.h
-lookaside.o:		lookaside.cc	lookaside.h
-strpack.o:		strpack.cc	strpack.h
-strtab.o:		strtab.cc	strtab.h
-strstore.o:		strstore.cc	strstore.h
-expcook.o:		expcook.cc	expcook.h
-hostinfo.o:		hostinfo.cc	hostinfo.h
-paramfile.o:		paramfile.cc	paramfile.h
-memfile.o:		memfile.cc	memfile.h
-dirlist.o:		dirlist.cc	dirlist.h
-varray.o:		varray.cc	varray.h
-csem.o:			csem.cc		csem.h
-pwcache.o:		pwcache.cc	pwcache.h
-lockrw.o:		lockrw.cc	lockrw.h
-nodedb.o:		nodedb.cc	nodedb.h
-mailmsg.o:		mailmsg.cc	mailmsg.h
-ccfile.o:		ccfile.cc ccfile.hh
-thrcomm.o:		thrcomm.cc thrcomm.h
-thrbase.o:		thrbase.cc thrbase.h thrcomm.h
 
 # emulated system kernel calls
 uinfo.o:		uinfo.cc uinfo.h
