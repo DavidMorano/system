@@ -22,8 +22,8 @@
 
 #define	PWFILE_MAGIC	0x98127643
 #define	PWFILE		struct pwfile_head
-#define	PWFILE_CUR	struct pwfile_cursor
 #define	PWFILE_FL	struct pwfile_flags
+#define	PWFILE_CUR	struct pwfile_cursor
 #define	PWFILE_ENT	pwentry
 
 #define	PWFILE_RECLEN	PWENTRY_BUFLEN
@@ -57,16 +57,18 @@ struct pwfile_head {
 } ;
 
 typedef PWFILE		pwfile ;
+typedef	PWFILE_FL	pwfile_fl ;
 typedef PWFILE_CUR	pwfile_cur ;
+typedef	PWFILE_ENT	pwfile_ent ;
 
 EXTERNC_begin
 
 extern int pwfile_open(pwfile *,cchar *) noex ;
 extern int pwfile_curbegin(pwfile *,pwfile_cur *) noex ;
 extern int pwfile_curend(pwfile *,pwfile_cur *) noex ;
-extern int pwfile_enum(pwfile *,pwfile_cur *,pwentry *,char *,int) noex ;
+extern int pwfile_enum(pwfile *,pwfile_cur *,pwfile_ent *,char *,int) noex ;
 extern int pwfile_fetchuser(pwfile *,cchar *,pwfile_cur *,
-		pwentry *,char *,int) noex ;
+		pwfile_ent *,char *,int) noex ;
 extern int pwfile_lock(pwfile *,int,int) noex ;
 extern int pwfile_close(pwfile *) noex ;
 

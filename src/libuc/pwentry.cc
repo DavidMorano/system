@@ -437,12 +437,6 @@ int getpwentrybufsize() noex {
 }
 /* end subroutine (pwentry_bufsize) */
 
-/* legacy only */
-int pwentry_bufsize() noex {
-	return getpwentrybufsize() ;
-}
-/* end subroutine (pwentry_bufsize) */
-
 
 /* local subroutines */
 

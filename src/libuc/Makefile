@@ -1193,6 +1193,8 @@ mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc	ccfile.hh
 thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
+pwentry.o:		pwentry.cc	pwentry.h
+pwfile.o:		pwfile.cc	pwfile.h
 
 
 # sring-comparisons
@@ -1217,7 +1219,6 @@ termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 endian.o:		endian.cc endian.h
-pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h
