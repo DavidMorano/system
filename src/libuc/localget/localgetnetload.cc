@@ -109,8 +109,8 @@ int localgetnetload(cchar *pr,char *rbuf,int rlen) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (pr[0]) {
-	        cint		di = UCPROGDATA_DNETLOAD ;
-	        cint		ttl = TO_TTL ;
+	        cint	di = UCPROGDATA_DNETLOAD ;
+	        cint	ttl = TO_TTL ;
 		rs = SR_OK ;
 /* user environment */
 	        if ((rs >= 0) && (len == 0)) {

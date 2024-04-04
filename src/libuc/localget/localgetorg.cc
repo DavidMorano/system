@@ -292,7 +292,7 @@ static int localgetorg_pretc(SI *sip) noex {
 	int		len = 0 ;
 	char		*ofname{} ;
 	if ((rs = malloc_mp(&ofname)) >= 0) {
-	    if ((rs = mkpath3(ofname,sip->pr,etcdir,sip->ofn)) >= 0) {
+	    if ((rs = mkpath(ofname,sip->pr,etcdir,sip->ofn)) >= 0) {
 	        if ((rs = filereadln(ofname,sip->rbuf,sip->rlen)) >= 0) {
 	            len = rs ;
 	        } else if (isNotPresent(rs)) {
@@ -312,7 +312,7 @@ static int localgetorg_sys(SI *sip) noex {
 	int		len = 0 ;
 	char		*ofname{} ;
 	if ((rs = malloc_mp(&ofname)) >= 0) {
-	    if ((rs = mkpath2(ofname,etcdir,sip->ofn)) >= 0) {
+	    if ((rs = mkpath(ofname,etcdir,sip->ofn)) >= 0) {
 	        if ((rs = filereadln(ofname,sip->rbuf,sip->rlen)) >= 0) {
 	            len = rs ;
 	        } else if (isNotPresent(rs)) {
@@ -340,7 +340,7 @@ static int subinfo_homer(SI *sip,cchar *un) noex {
 	            if ((rs = sncpy2(obuf,olen,"/.",sip->ofn)) >= 0) {
 		        char	*ofname{} ;
 		        if ((rs = malloc_mp(&ofname)) >= 0) {
-	                    if ((rs = mkpath2(ofname,hbuf,obuf)) >= 0) {
+	                    if ((rs = mkpath(ofname,hbuf,obuf)) >= 0) {
 		                cint	rlen = sip->rlen ;
 		                char	*rbuf = sip->rbuf ;
 	                        if ((rs = filereadln(ofname,rbuf,rlen)) >= 0) {

@@ -109,8 +109,8 @@ int localgetsystat(cchar *pr,char *rbuf,int rlen) noex {
 	if (pr && rbuf) {
 	    rs = SR_INVALID ;
 	    if (pr[0]) {
-	        cint		di = UCPROGDATA_DSYSTAT ;
-	        cint		ttl = TO_TTL ;
+	        cint	di = UCPROGDATA_DSYSTAT ;
+	        cint	ttl = TO_TTL ;
 		rs = SR_OK ;
 	        rbuf[0] = '\0' ;
 /* user environment */

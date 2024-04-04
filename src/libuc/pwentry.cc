@@ -11,7 +11,7 @@
 	This program was originally written.
 
 	= 2018-12-21, David A.D. Morano
-	Added |getpwentrybufsize(3dam)|.
+	Added |pwentrybufsize(3dam)|.
 
 */
 
@@ -20,14 +20,14 @@
 /*******************************************************************************
 
 	Name:
-	getpwentrybufsize
+	pwentrybufsize
 
 	Description:
 	We provide some miscelleneous utility subroutines for the PWENTRY
 	object.
 
 	Synopsis:
-	int getpwentrybufsize(void) noex
+	int pwentrybufsize(void) noex
 
 	Arguments:
 	-
@@ -424,7 +424,7 @@ int pwentry_finish(pwentry *ep) noex {
 }
 /* end subroutine (pwentry_finish) */
 
-int getpwentrybufsize() noex {
+int pwentrybufsize() noex {
 	int		rs ;
 	int		pwlen = 0 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
@@ -435,7 +435,7 @@ int getpwentrybufsize() noex {
 	}
 	return (rs >= 0) ? pwlen : rs ;
 }
-/* end subroutine (pwentry_bufsize) */
+/* end subroutine (pwentrybufsize) */
 
 
 /* local subroutines */

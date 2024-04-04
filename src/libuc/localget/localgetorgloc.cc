@@ -210,7 +210,7 @@ int orglocer::userconf() noex {
 	if ((rs = malloc_mp(&hbuf)) >= 0) {
 	    cint	hlen = rs ;
 	    if ((rs = getuserhome(hbuf,hlen,un)) >= 0) {
-		if ((rs = mkpath3(tfname,hbuf,etcdname,oln)) >= 0) {
+		if ((rs = mkpath(tfname,hbuf,etcdname,oln)) >= 0) {
 		     if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
 		         len = rs ;
 		     } else if (isNotPresent(rs)) {
@@ -227,7 +227,7 @@ int orglocer::userconf() noex {
 int orglocer::localconf() noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = mkpath3(tfname,pr,etcdname,oln)) >= 0) {
+	if ((rs = mkpath(tfname,pr,etcdname,oln)) >= 0) {
 	    if ((rs = filereadln(tfname,rbuf,rlen)) >= 0) {
 		len = rs ;
 	    } else if (isNotPresent(rs)) {

@@ -11,7 +11,7 @@
 	This was originally written.
 
 	= 2018-12-21, David A.D. Morano
-	Added |getpwentrybufsize(3dam)|.
+	Added |pwentrybufsize(3dam)|.
 
 
 ***********************************************************************/
@@ -74,7 +74,7 @@ extern int	pwentry_fieldpw(pwentry *,int,cchar *,int) noex ;
 extern int	pwentry_mkextras(pwentry *) noex ;
 extern int	pwentry_mkcopy(pwentry *,pwentry *,char *,int) noex ;
 
-extern int	getpwentrybufsize(void) noex ;
+extern int	pwentrybufsize(void) noex ;
 
 EXTERNC_end
 

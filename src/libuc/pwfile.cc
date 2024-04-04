@@ -23,11 +23,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
-#include	<fcntl.h>
-#include	<ctime>
+#include	<fcntl.h>		/* open-flags */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -389,7 +387,7 @@ static int pwfile_loadbegin(pwfile *op) noex {
 	        if (rs < 0) {
 	            hdb_finish(op->ulp) ;
 	        }
-	    }
+	    } /* end if (hdb_start) */
 	    if (rs < 0) {
 	        pwfile_fileback(op) ;
 	    }
@@ -448,15 +446,15 @@ static int pwfile_filefronter(pwfile *op) noex {
 	            rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	        }
 	        if (rs >= 0) {
-	            pwentry		entry ;
+	            pwentry	entry ;
 	            while ((rs = breadln(fp,lbuf,llen)) > 0) {
-	                int		len = rs ;
+	                int	len = rs ;
 	                if (lbuf[len - 1] == '\n') len -= 1 ;
 	                lbuf[len] = '\0' ;
 	                if ((rs = pwentry_start(&entry)) >= 0) {
 	                    int		fn = 0 ;
-	                    cchar		*tp ;
-	                    cchar		*cp = lbuf ;
+	                    cchar	*tp ;
+	                    cchar	*cp = lbuf ;
 	                    while ((tp = strchr(cp,':')) != nullptr) {
 	                        rs = pwentry_fieldpw(&entry,fn,cp,(tp - cp)) ;
 	                        cp = (tp + 1) ;
@@ -522,7 +520,7 @@ static int pwfile_checkopen(pwfile *op) noex {
 	    cint	of = O_RDONLY ;
 	    rs = u_open(op->fname,of,0666) ;
 	    op->lfd = rs ;
-	} /* end if (it wasn't open) */
+	} /* end if (it wasn not open) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (pwfile_checkopen) */
