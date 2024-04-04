@@ -4,7 +4,6 @@
 /* cache-time manager */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -28,11 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<sys/stat.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sncpyx.h>
 #include	<localmisc.h>
@@ -42,8 +38,22 @@
 
 /* local defines */
 
-#define	CACHETIME_ENT		struct cachetime_e
-#define	CACHETIME_NENTRY	400
+#define	CT	cachetime
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef cachetime_ent	ent ;
+typedef cachetime_ent *	entp ;
+
+typedef cachetime_cur	cur ;
+typedef cachetime_cur *	curp ;
+
+typedef cachetime_st	st ;
+typedef cachetime_st *	stp ;
 
 
 /* external subroutines */
@@ -54,33 +64,27 @@
 
 /* forward references */
 
-static int	cachetime_lookuper(CACHETIME *,cchar *,int,time_t *) ;
+static int	cachetime_lookuper(CT *,cchar *,int,time_t *) noex ;
 
-static int	entry_start(CACHETIME_ENT *,cchar *,int) ;
-static int	entry_finish(CACHETIME_ENT *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern cchar	*getourenv(cchar **,cchar *) ;
+static int	entry_start(ent *,cchar *,int) noex ;
+static int	entry_finish(ent *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cachetime_start(CACHETIME *op)
-{
-	cint	n = CACHETIME_NENTRY ;
+int cachetime_start(CT *op) noex {
+	cint		n = CACHETIME_NENTS ;
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	memset(op,0,sizeof(CACHETIME)) ;
+	memclear(op) ;
 
 	if ((rs = hdb_start(&op->db,n,1,nullptr,nullptr)) >= 0) {
 	    if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
@@ -90,20 +94,14 @@ int cachetime_start(CACHETIME *op)
 		hdb_finish(&op->db) ;
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("cachetime_start: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cachetime_start) */
 
-
-int cachetime_finish(CACHETIME *op)
-{
-	CACHETIME_ENT	*ep ;
-	HDB_DATUM	key, val ;
-	HDB_CUR		cur ;
+int cachetime_finish(CT *op) noex {
+	hdb_dat		key ;
+	hdb_dat		val ;
+	hdb_cur		cur ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -118,11 +116,17 @@ int cachetime_finish(CACHETIME *op)
 
 	if ((rs1 = hdb_curbegin(&op->db,&cur)) >= 0) {
 	    while (hdb_enum(&op->db,&cur,&key,&val) >= 0) {
-	        ep = (CACHETIME_ENT *) val.buf ;
-	        rs1 = entry_finish(ep) ;
-	        if (rs >= 0) rs = rs1 ;
-		rs1 = uc_free(ep) ;
-	        if (rs >= 0) rs = rs1 ;
+		ent	*ep = entp(val.buf) ;
+		if (ep) {
+		    {
+	                rs1 = entry_finish(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+		    {
+		        rs1 = uc_free(ep) ;
+	                if (rs >= 0) rs = rs1 ;
+		    }
+		}
 	    } /* end while */
 	    rs1 = hdb_curend(&op->db,&cur) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -134,23 +138,13 @@ int cachetime_finish(CACHETIME *op)
 	rs1 = hdb_finish(&op->db) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("cachetime_finish: ret rs=%d\n",rs) ;
-#endif
-
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (cachetime_finish) */
 
-
-int cachetime_lookup(CACHETIME *op,cchar *sp,int sl,time_t *timep)
-{
+int cachetime_lookup(CT *op,cchar *sp,int sl,time_t *timep) noex {
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("cachetime_lookup: ent\n") ;
-#endif
 
 	if (op == nullptr) return SR_FAULT ;
 	if (sp == nullptr) return SR_FAULT ;
@@ -164,17 +158,11 @@ int cachetime_lookup(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 	    ptm_unlock(&op->m) ;
 	} /* end if (mutex) */
 
-#if	CF_DEBUGS
-	debugprintf("cachetime_lookup: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cachetime_lookup) */
 
-
-int cachetime_curbegin(CACHETIME *op,CACHETIME_CUR *curp)
-{
+int cachetime_curbegin(CT *op,cur *curp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -182,7 +170,7 @@ int cachetime_curbegin(CACHETIME *op,CACHETIME_CUR *curp)
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(CACHETIME_CUR)) ;
+	memclear(curp) ;
 
 	if ((rs = ptm_lock(&op->m)) >= 0) {
 	    rs = hdb_curbegin(&op->db,&curp->cur) ;
@@ -194,9 +182,7 @@ int cachetime_curbegin(CACHETIME *op,CACHETIME_CUR *curp)
 }
 /* end subroutine (cachetime_curbegin) */
 
-
-int cachetime_curend(CACHETIME *op,CACHETIME_CUR *curp)
-{
+int cachetime_curend(CT *op,cur *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -205,7 +191,7 @@ int cachetime_curend(CACHETIME *op,CACHETIME_CUR *curp)
 
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(CACHETIME_CUR)) ;
+	memclear(curp) ;
 
 	rs1 = hdb_curend(&op->db,&curp->cur) ;
 	if (rs >= 0) rs = rs1 ;
@@ -217,12 +203,10 @@ int cachetime_curend(CACHETIME *op,CACHETIME_CUR *curp)
 }
 /* end subroutine (cachetime_curend) */
 
-
-int cachetime_enum(CACHETIME *op,CACHETIME_CUR *curp,
-	char *pbuf,int plen,time_t *timep)
-{
-	CACHETIME_ENT	*ep ;
-	HDB_DATUM	key, val ;
+int cachetime_enum(CT *op,cur *curp,char *pbuf,int plen,time_t *timep) noex {
+	ent		*ep ;
+	hdb_dat		key ;
+	hdb_dat		val ;
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -231,7 +215,7 @@ int cachetime_enum(CACHETIME *op,CACHETIME_CUR *curp,
 	if (op->magic != CACHETIME_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = hdb_enum(&op->db,&curp->cur,&key,&val)) >= 0) {
-	    ep = (CACHETIME_ENT *) val.buf ;
+	    ep = (ent *) val.buf ;
 	    if ((rs = sncpy1(pbuf,plen,ep->name)) >= 0) {
 	        if (timep != nullptr) {
 	            *timep = ep->mtime ;
@@ -243,9 +227,7 @@ int cachetime_enum(CACHETIME *op,CACHETIME_CUR *curp,
 }
 /* end subroutine (cachetime_enum) */
 
-
-int cachetime_stats(CACHETIME *op,CACHETIME_STATS *statp)
-{
+int cachetime_stats(CT *op,st *statp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -260,10 +242,6 @@ int cachetime_stats(CACHETIME *op,CACHETIME_STATS *statp)
 	    ptm_unlock(&op->m) ;
 	} /* end if (mutex) */
 
-#if	CF_DEBUGS
-	debugprintf("cachetime_stats: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cachetime_stats) */
@@ -271,11 +249,10 @@ int cachetime_stats(CACHETIME *op,CACHETIME_STATS *statp)
 
 /* private subroutines */
 
-
-static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
-{
-	CACHETIME_ENT	*ep ;
-	HDB_DATUM	key, val ;
+static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
+	ent		*ep ;
+	hdb_dat		key ;
+	hdb_dat		val ;
 	int		rs ;
 	int		f_hit = FALSE ;
 
@@ -287,17 +264,17 @@ static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 	op->c_req += 1 ;
 	if ((rs = hdb_fetch(&op->db,key,nullptr,&val)) >= 0) {
 	    op->c_hit += 1 ;
-	    ep = (CACHETIME_ENT *) val.buf ;
+	    ep = (ent *) val.buf ;
 	    if (timep != nullptr) *timep = ep->mtime ;
 	    f_hit = TRUE ;
 	} else if (rs == SR_NOTFOUND) {
-	    cint	size = sizeof(CACHETIME_ENT) ;
-	    if ((rs = uc_malloc(size,&ep)) >= 0) {
+	    cint	sz = sizeof(ent) ;
+	    if ((rs = uc_malloc(sz,&ep)) >= 0) {
 	        if ((rs = entry_start(ep,sp,sl)) >= 0) {
 	    	    key.buf = ep->name ;
 	    	    key.len = strlen(ep->name) ;
 	            val.buf = ep ;
-	    	    val.len = size ;
+	    	    val.len = sz ;
 	    	    if ((rs = hdb_store(&op->db,key,val)) >= 0) {
 	    		op->c_miss += 1 ;
 	    		if (timep != nullptr) *timep = ep->mtime ;
@@ -312,18 +289,14 @@ static int cachetime_lookuper(CACHETIME *op,cchar *sp,int sl,time_t *timep)
 	    } /* end if (memory-allocation) */
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("cachetime_lookup: ret rs=%d f_hit=%u\n",rs,f_hit) ;
-#endif
-
 	return (rs >= 0) ? f_hit : rs ;
 }
 /* end subroutine (cachetime_lookup) */
 
-static int entry_start(CACHETIME_ENT *ep,cchar *sp,int sl) noex {
+static int entry_start(ent *ep,cchar *sp,int sl) noex {
 	int		rs ;
 	cchar		*cp ;
-	memclear(ep) ;			/* dangerous */
+	memclear(ep) ; /* dangerous */
 	if ((rs = uc_mallocstrw(sp,sl,&cp)) >= 0) {
 	    USTAT	sb ;
 	    if ((rs = u_stat(cp,&sb)) >= 0) {
@@ -334,12 +307,11 @@ static int entry_start(CACHETIME_ENT *ep,cchar *sp,int sl) noex {
 	        uc_free(cp) ;
 	    }
 	} /* end if (memory-allocation) */
-
 	return rs ;
 }
 /* end subroutine (entry_start) */
 
-static int entry_finish(CACHETIME_ENT *ep) noex {
+static int entry_finish(ent *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (ep->name != nullptr) {
