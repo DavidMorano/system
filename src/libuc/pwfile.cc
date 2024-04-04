@@ -28,6 +28,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<pwd.h>
@@ -72,6 +73,7 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -92,7 +94,17 @@ template<typename ... Args>
 static int pwfile_ctor(pwfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = SR_OK ;
+	    memclear(op) ;
+	    rs = SR_NOMEM ;
+	    if ((op->alp = new(nothrow) vecitem) != nullptr) {
+	        if ((op->ulp = new(nothrow) hdb) != nullptr) {
+		    rs = SR_OK ;
+		} /* end if (new-hdb) */
+		if (rs < 0) {
+		    delete op->alp ;
+		    op->alp = nullptr ;
+		}
+	    } /* end if (new-vecitem) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -102,6 +114,14 @@ static int pwfile_dtor(pwfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
+	    if (op->ulp) {
+		delete op->ulp ;
+		op->ulp = nullptr ;
+	    }
+	    if (op->alp) {
+		delete op->alp ;
+		op->alp = nullptr ;
+	    }
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -140,67 +160,67 @@ static int	loaditem(cchar **,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int pwfile_open(pwfile *dbp,cchar *pwfname) noex {
+int pwfile_open(pwfile *op,cchar *pwfname) noex {
 	int		rs ;
-	if ((rs = pwfile_ctor(dbp,pwfname)) >= 0) {
+	if ((rs = pwfile_ctor(op,pwfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pwfname[0]) {
 	        cchar	*cp{} ;
 	        if ((rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
-	            dbp->fname = cp ;
-	            dbp->lfd = -1 ;
-	            if ((rs = pwfile_loadbegin(dbp)) >= 0) {
-	                dbp->f = {} ;
-	                dbp->magic = PWFILE_MAGIC ;
+	            op->fname = cp ;
+	            op->lfd = -1 ;
+	            if ((rs = pwfile_loadbegin(op)) >= 0) {
+	                op->f = {} ;
+	                op->magic = PWFILE_MAGIC ;
 	            }
 	            if (rs < 0) {
-	                uc_free(dbp->fname) ;
-	                dbp->fname = nullptr ;
+	                uc_free(op->fname) ;
+	                op->fname = nullptr ;
 	            }
 	        } /* end if (m-a) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
-		pwfile_dtor(dbp) ;
+		pwfile_dtor(op) ;
 	    }
 	} /* end if (pwfile_ctor) */
 	return rs ;
 }
 /* end subroutine (pwfile_open) */
 
-int pwfile_close(pwfile *dbp) noex {
+int pwfile_close(pwfile *op) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = pwfile_magic(dbp)) >= 0) {
+	if ((rs = pwfile_magic(op)) >= 0) {
 	    {
-	        rs1 = pwfile_loadend(dbp) ;
+	        rs1 = pwfile_loadend(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (dbp->lfd >= 0) {
-	        rs1 = u_close(dbp->lfd) ;
+	    if (op->lfd >= 0) {
+	        rs1 = u_close(op->lfd) ;
 	        if (rs >= 0) rs = rs1 ;
-	        dbp->lfd = -1 ;
+	        op->lfd = -1 ;
 	    }
-	    if (dbp->fname) {
-	        rs1 = uc_free(dbp->fname) ;
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
 	        if (rs >= 0) rs = rs1 ;
-	        dbp->fname = nullptr ;
+	        op->fname = nullptr ;
 	    }
 	    {
-		rs1 = pwfile_dtor(dbp) ;
+		rs1 = pwfile_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    dbp->magic = 0 ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_close) */
 
-int pwfile_enum(pwfile *dbp,pwfile_cur *curp,pwentry *uep,
+int pwfile_enum(pwfile *op,pwfile_cur *curp,pwentry *uep,
 		char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(dbp,curp,uep,rbuf)) >= 0) {
+	if ((rs = pwfile_magic(op,curp,uep,rbuf)) >= 0) {
 	    pwentry	*ep{} ;
-	    while ((rs = vecitem_get(&dbp->alist,curp->i,&ep)) >= 0) {
+	    while ((rs = vecitem_get(op->alp,curp->i,&ep)) >= 0) {
 	        curp->i += 1 ;
 	        if (ep != nullptr) break ;
 	    } /* end while */
@@ -216,30 +236,30 @@ int pwfile_enum(pwfile *dbp,pwfile_cur *curp,pwentry *uep,
 /* end subroutine (pwfile_enum) */
 
 /* fetch the next entry that matches the specified username */
-int pwfile_fetchuser(pwfile *dbp,cc *username,pwfile_cur *curp,
+int pwfile_fetchuser(pwfile *op,cc *username,pwfile_cur *curp,
 		pwentry *uep,char *rbuf,int rlen) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(dbp,username,curp,uep,rbuf)) >= 0) {
+	if ((rs = pwfile_magic(op,username,curp,uep,rbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (username[0]) {
 	        USTAT	sb ;
-	        if (dbp->lfd < 0) {
-	            rs = u_stat(dbp->fname,&sb) ;
+	        if (op->lfd < 0) {
+	            rs = u_stat(op->fname,&sb) ;
 	        } else {
-	            rs = u_fstat(dbp->lfd,&sb) ;
+	            rs = u_fstat(op->lfd,&sb) ;
 	        }
 	        if (rs >= 0) {
 	            hdb_dat	key ;
 	            hdb_dat	val{} ;
-	            hdb_cur	*hcurp = ((curp) ? &curp->hc : nullptr) ;
-	            if (sb.st_mtime > dbp->readtime) {
-	                pwfile_loadend(dbp) ;
-	                pwfile_loadbegin(dbp) ;
+	            hdb_cur	*hcurp = ((curp) ? curp->hcp : nullptr) ;
+	            if (sb.st_mtime > op->readtime) {
+	                pwfile_loadend(op) ;
+	                pwfile_loadbegin(op) ;
 	            } /* end if */
 /* continue with the query */
 	            key.buf = username ;
 	            key.len = strlen(username) ;
-	            if ((rs = hdb_fetch(&dbp->byuser,key,hcurp,&val)) >= 0) {
+	            if ((rs = hdb_fetch(op->ulp,key,hcurp,&val)) >= 0) {
 	                if (uep) {
 	                    pwentry	*ep = (pwentry *) val.buf ;
 	                    rs = pwentry_mkcopy(ep,uep,rbuf,rlen) ;
@@ -252,38 +272,38 @@ int pwfile_fetchuser(pwfile *dbp,cc *username,pwfile_cur *curp,
 }
 /* end subroutine (pwfile_fetchuser) */
 
-int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
+int pwfile_curbegin(pwfile *op,pwfile_cur *curp) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(dbp,curp)) >= 0) {
+	if ((rs = pwfile_magic(op,curp)) >= 0) {
 	    bool	f_locked = false ;
-	    if (dbp->lfd < 0) {
+	    if (op->lfd < 0) {
 		cint	of = O_RDONLY ;
-	        rs = u_open(dbp->fname,of,0666) ;
-	        dbp->lfd = rs ;
+	        rs = u_open(op->fname,of,0666) ;
+	        op->lfd = rs ;
 	    } /* end if (it wasn't open) */
 	    if (rs >= 0) {
 		int	cmd ;
-	        if (! dbp->f.locked) {
+	        if (! op->f.locked) {
 		    cint	to = TO_LOCK ;
 		    cmd = F_RLOCK ;
-	            if ((rs = lockfile(dbp->lfd,cmd,0L,0L,to)) < 0) {
-	                u_close(dbp->lfd) ;
-	                dbp->lfd = -1 ;
+	            if ((rs = lockfile(op->lfd,cmd,0L,0L,to)) < 0) {
+	                u_close(op->lfd) ;
+	                op->lfd = -1 ;
 	                return rs ;
 	            }
-	            dbp->f.locked = dbp->f.locked_cur = true ;
+	            op->f.locked = op->f.locked_cur = true ;
 	            f_locked = true ;
 	        } /* end if (not locked) */
 	        curp->i = 0 ;
-	        rs = hdb_curbegin(&dbp->byuser,&curp->hc) ;
+	        rs = hdb_curbegin(op->ulp,curp->hcp) ;
 	        if ((rs < 0) && f_locked) {
-	            dbp->f.locked = dbp->f.locked_cur = false ;
+	            op->f.locked = op->f.locked_cur = false ;
 #ifdef	COMMENT
 		    cmd = F_ULOCK ;
-	            lockfile(dbp->lfd,cmd,0L,0L,to) ;
+	            lockfile(op->lfd,cmd,0L,0L,to) ;
 #else
-	            u_close(dbp->lfd) ;
-	            dbp->lfd = -1 ;
+	            u_close(op->lfd) ;
+	            op->lfd = -1 ;
 #endif
 	        } /* end if (cleanup on error) */
 	    } /* end if (ok) */
@@ -292,41 +312,41 @@ int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
 }
 /* end subroutine (pwfile_curbegin) */
 
-int pwfile_curend(pwfile *dbp,pwfile_cur *curp) noex {
+int pwfile_curend(pwfile *op,pwfile_cur *curp) noex {
 	int		rs ;
-	if ((rs = pwfile_magic(dbp,curp)) >= 0) {
-	    if (dbp->f.locked_cur && (! dbp->f.locked_explicit)) {
+	if ((rs = pwfile_magic(op,curp)) >= 0) {
+	    if (op->f.locked_cur && (! op->f.locked_explicit)) {
 		cint	to = TO_LOCK ;
-	        dbp->f.locked = false ;
-	        lockfile(dbp->lfd,F_ULOCK,0L,0L,to) ;
+	        op->f.locked = false ;
+	        lockfile(op->lfd,F_ULOCK,0L,0L,to) ;
 	    }
-	    dbp->f.locked_cur = false ;
+	    op->f.locked_cur = false ;
 	    curp->i = 0 ;
-	    rs = hdb_curend(&dbp->byuser,&curp->hc) ;
+	    rs = hdb_curend(op->ulp,curp->hcp) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (pwfile_curend) */
 
-int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
+int pwfile_lock(pwfile *op,int type,int to_lock) noex {
 	int		rs ;
 	int		f_opened = false ;
-	if ((rs = pwfile_magic(dbp)) >= 0) {
-	    if (dbp->lfd < 0) {
+	if ((rs = pwfile_magic(op)) >= 0) {
+	    if (op->lfd < 0) {
 		cint	of = O_RDONLY ;
-	        rs = u_open(dbp->fname,of,0666) ;
-	        dbp->lfd = rs ;
+	        rs = u_open(op->fname,of,0666) ;
+	        op->lfd = rs ;
 	        f_opened = (rs >= 0) ;
 	    }
 	    if (rs >= 0) {
 	        switch (type) {
 	        case F_ULOCK:
-	            if (dbp->f.locked_explicit) {
-	                dbp->f.locked = dbp->f.locked_explicit = false ;
-	                rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
+	            if (op->f.locked_explicit) {
+	                op->f.locked = op->f.locked_explicit = false ;
+	                rs = lockfile(op->lfd,type,0L,0L,to_lock) ;
 	                if (rs < 0) {
-	                    u_close(dbp->lfd) ;
-	                    dbp->lfd = -1 ;
+	                    u_close(op->lfd) ;
+	                    op->lfd = -1 ;
 	                }
 	            } else {
 	                rs = SR_INVALID ;
@@ -336,12 +356,12 @@ int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
 	        case F_RTEST:
 	        case F_WTEST:
 	            rs = SR_LOCKED ;
-	            if (! dbp->f.locked) {
-	                rs = lockfile(dbp->lfd,type,0L,0L,to_lock) ;
+	            if (! op->f.locked) {
+	                rs = lockfile(op->lfd,type,0L,0L,to_lock) ;
 #ifdef	COMMENT
 	                if (f_opened) {
-	                    u_close(dbp->lfd) ;
-	                    dbp->lfd = -1 ;
+	                    u_close(op->lfd) ;
+	                    op->lfd = -1 ;
 	                }
 #endif /* COMMENT */
 	            } /* end if (not locked already) */
@@ -350,10 +370,10 @@ int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
 	        case F_WLOCK:
 	        case F_TRLOCK:
 	        case F_TWLOCK:
-	            if (! dbp->f.locked) {
+	            if (! op->f.locked) {
 			cint	to = to_lock ;
-	                if ((rs = lockfile(dbp->lfd,type,0L,0L,to)) >= 0) {
-	                    dbp->f.locked = dbp->f.locked_explicit = true ;
+	                if ((rs = lockfile(op->lfd,type,0L,0L,to)) >= 0) {
+	                    op->f.locked = op->f.locked_explicit = true ;
 	                }
 	            } else {
 	                rs = SR_INVALID ;
@@ -369,16 +389,16 @@ int pwfile_lock(pwfile *dbp,int type,int to_lock) noex {
 
 /* private subroutines */
 
-static int pwfile_loadbegin(pwfile *dbp) noex {
+static int pwfile_loadbegin(pwfile *op) noex {
 	int		rs ;
 	int		n = 0 ;
-	if ((rs = pwfile_filefront(dbp)) >= 0) {
+	if ((rs = pwfile_filefront(op)) >= 0) {
 	    cnullptr	np{} ;
 	    hdb_dat	key ;
 	    hdb_dat	val ;
 	    n = rs ;
-	    if ((rs = hdb_start(&dbp->byuser,n,0,np,np)) >= 0) {
-	        vecitem	*alp = &dbp->alist ;
+	    if ((rs = hdb_start(op->ulp,n,0,np,np)) >= 0) {
+	        vecitem	*alp = op->alp ;
 	        pwentry	*ep ;
 	        for (int i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
 	            if (ep) {
@@ -386,51 +406,52 @@ static int pwfile_loadbegin(pwfile *dbp) noex {
 	                key.len = strlen(ep->username) ;
 	                val.buf = ep ;
 	                val.len = sizeof(pwentry) ;
-	                rs = hdb_store(&dbp->byuser,key,val) ;
+	                rs = hdb_store(op->ulp,key,val) ;
 	            }
 	            if (rs < 0) break ;
 	        } /* end for */
 	        if (rs < 0) {
-	            hdb_finish(&dbp->byuser) ;
+	            hdb_finish(op->ulp) ;
 	        }
 	    }
 	    if (rs < 0) {
-	        pwfile_fileback(dbp) ;
+	        pwfile_fileback(op) ;
 	    }
 	} /* end if (pwfile_filefront) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (pwfile_loadbegin) */
 
-static int pwfile_loadend(pwfile *dbp) noex {
+static int pwfile_loadend(pwfile *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	{
-	    rs1 = hdb_finish(&dbp->byuser) ;
+	if (op->ulp) {
+	    rs1 = hdb_finish(op->ulp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	{
-	    rs1 = pwfile_fileback(dbp) ;
+	    rs1 = pwfile_fileback(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 	return rs ;
 }
 /* end subroutine (pwfile_loadend) */
 
-static int pwfile_filefront(pwfile *dbp) noex {
+static int pwfile_filefront(pwfile *op) noex {
 	int		rs = SR_NOENTRY ;
-	if (dbp->fname[0]) {
+	if (op->fname[0]) {
 	    USTAT	sb ;
-	    if ((rs = uc_stat(dbp->fname,&sb)) >= 0) {
-	        vecitem	*alp = &dbp->alist ;
+	    if ((rs = uc_stat(op->fname,&sb)) >= 0) {
+	        vecitem	*alp = op->alp ;
 	        cint	vo = VECITEM_OCOMPACT ;
-	        int		n = ((sb.st_size / 60) + 5) ;
-	        if (n < DEFENTRIES) n = DEFENTRIES ;
-	        if ((rs = vecitem_start(alp,n,vo)) >= 0) {
-	            dbp->readtime = sb.st_mtime ;
-	            rs = pwfile_filefronter(dbp) ;
-	            if (rs < 0)
+	        int	ne = ((sb.st_size / 60) + 5) ;
+	        if (ne < DEFENTRIES) ne = DEFENTRIES ;
+	        if ((rs = vecitem_start(alp,ne,vo)) >= 0) {
+	            op->readtime = sb.st_mtime ;
+	            rs = pwfile_filefronter(op) ;
+	            if (rs < 0) {
 	                vecitem_finish(alp) ;
+		    }
 	        }
 	    } /* end if (uc_stat) */
 	} /* end if (valid) */
@@ -438,13 +459,13 @@ static int pwfile_filefront(pwfile *dbp) noex {
 }
 /* end subroutine (pwfile_filefront) */
 
-static int pwfile_filefronter(pwfile *dbp) noex {
+static int pwfile_filefronter(pwfile *op) noex {
 	bfile		pwfile, *fp = &pwfile ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = bopen(fp,dbp->fname,"rc",0644)) >= 0) {
-	    if (! dbp->f.locked) {
+	if ((rs = bopen(fp,op->fname,"rc",0644)) >= 0) {
+	    if (! op->f.locked) {
 	        rs = bcontrol(fp,BC_LOCKREAD,TO_LOCK) ;
 	    }
 	    if (rs >= 0) {
@@ -477,7 +498,7 @@ static int pwfile_filefronter(pwfile *dbp) noex {
 	                if (rs >= 0) {
 	                    cint	esize = sizeof(pwentry) ;
 	                    n += 1 ;
-	                    rs = vecitem_add(&dbp->alist,&entry,esize) ;
+	                    rs = vecitem_add(op->alp,&entry,esize) ;
 	                }
 	                if (rs < 0) {
 	                    pwentry_finish(&entry) ;
@@ -485,7 +506,7 @@ static int pwfile_filefronter(pwfile *dbp) noex {
 	            } /* end if (initialized new entry) */
 	            if (rs < 0) break ;
 	        } /* end while (reading file entries) */
-	        if (! dbp->f.locked) {
+	        if (! op->f.locked) {
 	            bcontrol(fp,BC_UNLOCK,0) ;
 	        }
 	    } /* end if (ok) */
@@ -496,8 +517,8 @@ static int pwfile_filefronter(pwfile *dbp) noex {
 }
 /* end subroutine (pwfile_filefronter) */
 
-static int pwfile_fileback(pwfile *dbp) noex {
-	vecitem		*alp = &dbp->alist ;
+static int pwfile_fileback(pwfile *op) noex {
+	vecitem		*alp = op->alp ;
 	pwentry		*ep ;
 	int		rs = SR_OK ;
 	int		rs1 ;

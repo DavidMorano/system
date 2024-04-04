@@ -12,7 +12,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vecitem.h>
 #include	<hdb.h>
 #include	<pwentry.h>
@@ -24,8 +26,8 @@
 #define	PWFILE_FL	struct pwfile_flags
 #define	PWFILE_ENT	pwentry
 
-#define	PWFILE_RECLEN	pwentry_BUFLEN
-#define	PWFILE_ENTLEN	pwentry_BUFLEN
+#define	PWFILE_RECLEN	PWENTRY_BUFLEN
+#define	PWFILE_ENTLEN	PWENTRY_BUFLEN
 
 /* are these even needed? */
 #define	PWFILE_NAMELEN	32		/* max username length */
@@ -34,7 +36,7 @@
 
 
 struct pwfile_cursor {
-	hdb_cur		hc ;
+	hdb_cur		*hcp ;
 	int		i ;
 } ;
 
@@ -46,10 +48,8 @@ struct pwfile_flags {
 
 struct pwfile_head {
 	cchar		*fname ;
-	vecitem		alist ;
-	hdb		byuser ;
-	hdb		byuid ;
-	hdb		bylastname ;
+	vecitem		*alp ;
+	hdb		*ulp ;		/* user-list-pointer */
 	time_t		readtime ;
 	PWFILE_FL	f ;
 	uint		magic ;
