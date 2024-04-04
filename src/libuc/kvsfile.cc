@@ -50,6 +50,7 @@
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<absfn.h>		/* absolute-file-name */
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
@@ -74,11 +75,7 @@
 #define	KVSFILE_KEY		struct kvsfile_key
 #define	KVSFILE_ENT		struct kvsfile_ent
 
-#ifdef	KVSFILE_KEYLEN
 #define	KEYBUFLEN		KVSFILE_KEYLEN
-#else
-#define	KEYBUFLEN		MAXHOSTNAMELEN
-#endif
 
 
 /* imported namespaces */
@@ -353,21 +350,14 @@ int kvsfile_close(kvsfile *op) noex {
 
 int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	int		rs ;
+	int		rs1 ;
 	int		fi = 0 ;
 	if ((rs = kvsfile_magic(op,atfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (atfname[0]) {
-	        cchar		*fp = atfname ;
-	        char		abuf[MAXPATHLEN + 1] ;
-	        if (atfname[0] != '/') {
-	            cint	plen = MAXPATHLEN ;
-	            char	pbuf[MAXPATHLEN+1] ;
-	            if ((rs = getpwd(pbuf,plen)) >= 0) {
-	                rs = mkpath2(abuf,pbuf,atfname) ;
-	                fp = abuf ;
-	            }
-	        } /* end if (added PWD) */
-	        if (rs >= 0) {
+		absfn	af ;
+		cchar	*fp ;
+		if ((rs = af.start(atfname,0,&fp)) >= 0) {
 	            kf_file	fe ;
 	            if ((rs = file_start(&fe,fp)) >= 0) {
 			cnullptr	np{} ;
@@ -390,7 +380,9 @@ int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	                    file_finish(&fe) ;
 	                }
 	            } /* end if (file-start) */
-	        } /* end if (ok) */
+		    rs1 = af.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (absfn) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fi : rs ;
