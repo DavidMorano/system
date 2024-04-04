@@ -63,7 +63,7 @@
 
 #ifdef	__cplusplus
 
-static cint		xxtostr_maxbase = strlen(varname.digtab) ;
+static cint		xxtostr_maxbase = strlen(sysword.w_digtab) ;
 
 template<typename UT>
 inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
@@ -82,7 +82,7 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	                while ((v & vmask) != 0L) {
 	                    nv = v / ub ;
                             di = int(v - (nv * ub)) ;
-                            *--rp = varname.digtab[di] ;
+                            *--rp = sysword.w_digtab[di] ;
 	                    v = nv ;
 	                } /* end while (slower) */
 	                {
@@ -91,7 +91,7 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 		            while (lv != 0) {
 	                        nv = lv / ub ;
                                 di = int(lv - (nv * ub)) ;
-                                *--rp = varname.digtab[di] ;
+                                *--rp = sysword.w_digtab[di] ;
 	                        lv = nv ;
 		            } /* end while */
 		            v = lv ;
@@ -101,7 +101,7 @@ inline constexpr int uxxtostr(char *endp,int b,UT v) noex {
 	                while (v != 0) {
 	                    nv = v / ub ;
                             di = int(v - (nv * ub)) ;
-                            *--rp = varname.digtab[di] ;
+                            *--rp = sysword.w_digtab[di] ;
 	                    v = nv ;
 	                } /* end while (regular) */
 		    } /* end if-constexpr (size-of-operand) */

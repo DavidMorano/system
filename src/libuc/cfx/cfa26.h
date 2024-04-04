@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-int cfa26(cchar *sp,int sl,int *rp) noex {
+inline int cfa26(cchar *sp,int sl,int *rp) noex {
 	return cfa26i(sp,sl,rp) ;
 }
-int cfa26(cchar *sp,int sl,long *rp) noex {
+inline int cfa26(cchar *sp,int sl,long *rp) noex {
 	return cfa26l(sp,sl,rp) ;
 }
-int cfa26(cchar *sp,int sl,longlong *rp) noex {
+inline int cfa26(cchar *sp,int sl,longlong *rp) noex {
 	return cfa26ll(sp,sl,rp) ;
 }
 
-int cfa26(cchar *sp,int sl,uint *rp) noex {
+inline int cfa26(cchar *sp,int sl,uint *rp) noex {
 	return cfa26ui(sp,sl,rp) ;
 }
-int cfa26(cchar *sp,int sl,ulong *rp) noex {
+inline int cfa26(cchar *sp,int sl,ulong *rp) noex {
 	return cfa26ul(sp,sl,rp) ;
 }
-int cfa26(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfa26(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfa26ull(sp,sl,rp) ;
 }
 

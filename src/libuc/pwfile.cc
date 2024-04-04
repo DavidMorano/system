@@ -145,7 +145,7 @@ int pwfile_open(pwfile *dbp,cchar *pwfname) noex {
 	if ((rs = pwfile_ctor(dbp,pwfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pwfname[0]) {
-	        cchar		*cp{} ;
+	        cchar	*cp{} ;
 	        if ((rs = uc_mallocstrw(pwfname,-1,&cp)) >= 0) {
 	            dbp->fname = cp ;
 	            dbp->lfd = -1 ;
@@ -222,7 +222,7 @@ int pwfile_fetchuser(pwfile *dbp,cc *username,pwfile_cur *curp,
 	if ((rs = pwfile_magic(dbp,username,curp,uep,rbuf)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (username[0]) {
-	        USTAT		sb ;
+	        USTAT	sb ;
 	        if (dbp->lfd < 0) {
 	            rs = u_stat(dbp->fname,&sb) ;
 	        } else {
@@ -262,9 +262,11 @@ int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
 	        dbp->lfd = rs ;
 	    } /* end if (it wasn't open) */
 	    if (rs >= 0) {
+		int	cmd ;
 	        if (! dbp->f.locked) {
 		    cint	to = TO_LOCK ;
-	            if ((rs = lockfile(dbp->lfd,F_RLOCK,0L,0L,to)) < 0) {
+		    cmd = F_RLOCK ;
+	            if ((rs = lockfile(dbp->lfd,cmd,0L,0L,to)) < 0) {
 	                u_close(dbp->lfd) ;
 	                dbp->lfd = -1 ;
 	                return rs ;
@@ -277,7 +279,8 @@ int pwfile_curbegin(pwfile *dbp,pwfile_cur *curp) noex {
 	        if ((rs < 0) && f_locked) {
 	            dbp->f.locked = dbp->f.locked_cur = false ;
 #ifdef	COMMENT
-	            lockfile(dbp->lfd,F_ULOCK,0L,0L,TO_LOCK) ;
+		    cmd = F_ULOCK ;
+	            lockfile(dbp->lfd,cmd,0L,0L,to) ;
 #else
 	            u_close(dbp->lfd) ;
 	            dbp->lfd = -1 ;
@@ -377,9 +380,8 @@ static int pwfile_loadbegin(pwfile *dbp) noex {
 	    if ((rs = hdb_start(&dbp->byuser,n,0,np,np)) >= 0) {
 	        vecitem	*alp = &dbp->alist ;
 	        pwentry	*ep ;
-	        int	i ;
-	        for (i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
-	            if (ep != nullptr) {
+	        for (int i = 0 ; vecitem_get(alp,i,&ep) >= 0 ; i += 1) {
+	            if (ep) {
 	                key.buf = ep->username ;
 	                key.len = strlen(ep->username) ;
 	                val.buf = ep ;

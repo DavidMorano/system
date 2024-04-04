@@ -24,10 +24,10 @@
 
 	= 2023-10,10, David A-D- Morano
 	I took the liberty to rewite these subroutines in terms of
-	a subroutine-template. This did nothing to make the code
+	a subroutine-template.  This did nothing to make the code
 	faster in any way. After template expansion the code is the
 	same as before.  All type-versions of the former subroutines
-	are now in a single subroutine-template. I guess that I had
+	are now in a single subroutine-template.  I guess that I had
 	too much idle time on my hands.
 
 */
@@ -50,6 +50,9 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
 
 
 /* local typedefs */

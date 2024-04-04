@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-static inline int cfdecmf(cchar *sp,int sl,int *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,int *rp) noex {
 	return cfdecmfi(sp,sl,rp) ;
 }
-static inline int cfdecmf(cchar *sp,int sl,long *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,long *rp) noex {
 	return cfdecmfl(sp,sl,rp) ;
 }
-static inline int cfdecmf(cchar *sp,int sl,longlong *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,longlong *rp) noex {
 	return cfdecmfll(sp,sl,rp) ;
 }
 
-static inline int cfdecmf(cchar *sp,int sl,uint *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,uint *rp) noex {
 	return cfdecmfui(sp,sl,rp) ;
 }
-static inline int cfdecmf(cchar *sp,int sl,ulong *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,ulong *rp) noex {
 	return cfdecmful(sp,sl,rp) ;
 }
-static inline int cfdecmf(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfdecmf(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfdecmfull(sp,sl,rp) ;
 }
 

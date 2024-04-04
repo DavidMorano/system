@@ -86,6 +86,9 @@ using std::countr_zero ;		/* subroutine-template */
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forward references */
 
 static inline constexpr int ffbsi(int b) noex {

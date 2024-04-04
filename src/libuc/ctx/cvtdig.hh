@@ -61,10 +61,10 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
+#include	<ucvariables.hh>
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<varnames.hh>
 #include	<stdintx.h>
 
 
@@ -87,7 +87,7 @@ constexpr int cvtdig(char *rbuf,int rlen,UT val,int n,int b) noex {
 	    if (ndig <= rlen) {
 	        cuint	mask = uint(b-1) ;
 	        for (int i = (ndig - 1) ; i >= 0 ; i -= 1) {
-	            rbuf[i] = varname.digtab[val & mask] ;
+	            rbuf[i] = sysword.w_digtab[val & mask] ;
 	            val >>= nshift ;
 	        } /* end for */
 	        rbuf[ndig] = '\0' ;
