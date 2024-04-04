@@ -80,7 +80,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| */
 #include	<algorithm>

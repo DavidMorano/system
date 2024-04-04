@@ -61,6 +61,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int mkpathrooted(char *rbuf,cchar *fn) noex {

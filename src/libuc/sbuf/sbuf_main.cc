@@ -1,4 +1,4 @@
-/* sbuf SUPPORT */
+/* sbuf_main SUPPORT */
 /* lang=C++20 */
 
 /* storage buffer (SBuf) object */
@@ -11,14 +11,16 @@
 	This object module was originally written.
 
 	= 2016-11-06, David A­D­ Morano
-        I did some optimization for the method |sbuf_decX()| and |sbuf_hexX()|
-        to form the digits in the object buffer directly rather than in a
-        separate buffer and then copying the data into the object buffer.
+	I did some optimization for the method |sbuf_decX()| and
+	|sbuf_hexX()| to form the digits in the object buffer
+	directly rather than in a separate buffer and then copying
+	the data into the object buffer.
 
 	= 2017-11-06, David A­D­ Morano
-        I enhanced the |sbuf_hexXX()| methods using the property that the length
-        (in bytes) of the result is known ahead of time. We cannot do this
-	(really quickly) with decimal conversions.
+	I enhanced the |sbuf_hexXX()| methods using the property
+	that the length (in bytes) of the result is known ahead of
+	time. We cannot do this (really quickly) with decimal
+	conversions.
 
 */
 
@@ -30,14 +32,13 @@
 	sbuf
 
 	Description:
-        This module can be used to construct strings or messages in buffers
-        WITHOUT using the 'sprint(3c)' subroutine or something similar.
-
-        This module is useful when the user SUPPLIES a buffer of a specified
-        length to the object at object initialization.
-
-        This module uses an object, that must be initialized and eventually
-        freed, to track the state of the user supplied buffer.
+	This module can be used to construct strings or messages
+	in buffers WITHOUT using the "snwprint(3c)| subroutine or
+	something similar.  This module is useful when the user
+	SUPPLIES a buffer of a specified length to the object at
+	object initialization.  This module uses an object, that
+	must be initialized and eventually freed, to track the state
+	of the user supplied buffer.
 
 	Arguments:
 	bop		pointer to the buffer object
@@ -46,21 +47,21 @@
 	Returns:
 	>=0		amount of new space used by the newly stored item
 			(not including any possible trailing NUL characters)
-	<0		error
+	<0		error (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdarg>
 #include	<cstring>
-#include	<algorithm>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<format.h>
 #include	<ctdec.h>
 #include	<cthex.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sbuf.h"
@@ -72,14 +73,11 @@
 #define	SBUF_RLEN	(sbp->rlen)
 #define	SBUF_INDEX	(sbp->index)
 
-#ifndef	MKCHAR
-#define	MKCHAR(ch)	((ch) & UCHAR_MAX)
-#endif
-
 
 /* imported namespaces */
 
-using std::min ;
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* external subroutines */
@@ -93,15 +91,17 @@ using std::min ;
 
 /* forward references */
 
-int		sbuf_buf(sbuf *,const char *,int) noex ;
-int		sbuf_vprintf(sbuf *,const char *,va_list) noex ;
+int		sbuf_buf(sbuf *,cchar *,int) noex ;
+int		sbuf_vprintf(sbuf *,cchar *,va_list) noex ;
 
-static int	sbuf_addstrw(sbuf *,const char *,int) noex ;
+static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 
 /* local variables */
 
-static cchar	blanks[] = "        " ;
+constexpr cchar		blanks[] = "        " ;
+
+constexpr int		nblanks = strlen(blanks) ;
 
 
 /* local subroutine-templates */
@@ -171,7 +171,7 @@ int sbuf_finish(sbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-	        SBUF_RBUF = NULL ;
+	        SBUF_RBUF = nullptr ;
 	        SBUF_RLEN = 0 ;
 	        SBUF_INDEX = SR_NOTOPEN ;
 	    }
@@ -387,16 +387,15 @@ int sbuf_nchar(sbuf *sbp,int ch,int len) noex {
 /* end subroutine (sbuf_nchar) */
 
 int sbuf_blanks(sbuf *sbp,int n) noex {
-	cint		nblank = sizeof(blanks) ;
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
 		if (n >= 0) {
 	            while ((rs >= 0) && (len < n)) {
-	                cint	m = min(nblank,(n-len)) ;
-	                rs = sbuf_addstrw(sbp,blanks,m) ;
-	                len += m ;
+	                cint	ml = min(nblanks,(n - len)) ;
+	                rs = sbuf_addstrw(sbp,blanks,ml) ;
+	                len += rs ;
 	            } /* end while */
 		} /* end if (valid) */
 	    } /* end if (not in error-mode) */
@@ -410,31 +409,34 @@ int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (sbp && fmt) {
-	    if ((rs = SBUF_INDEX) >= 0) {
-	        cint	fm = 0x01 ; /* *will* error out on overflow! */
-	        int	dl = (SBUF_RLEN - SBUF_INDEX) ;
-	        char	*dp = (SBUF_RBUF + SBUF_INDEX) ;
-	        if ((rs = format(dp,dl,fm,fmt,ap)) >= 0) {
-	            len = rs ;
-		    SBUF_INDEX += len ;
-	        } else {
-		    SBUF_INDEX = rs ;
-	        }
-	    } /* end if (not error mode) */
+	    rs = SR_INVALID ;
+	    if (fmt[0]) {
+	        if ((rs = SBUF_INDEX) >= 0) {
+	            cint	fm = 0x01 ; /* *will* error out on overflow! */
+	            cint	dl = (SBUF_RLEN - SBUF_INDEX) ;
+	            char	*dp = (SBUF_RBUF + SBUF_INDEX) ;
+	            if ((rs = format(dp,dl,fm,fmt,ap)) >= 0) {
+	                len = rs ;
+		        SBUF_INDEX += len ;
+	            } else {
+		        SBUF_INDEX = rs ;
+	            }
+	        } /* end if (not error mode) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (sbuf_vprintf) */
 
 /* PRINTFLIKE2 */
-int sbuf_printf(sbuf *op,const char *fmt,...) noex {
+int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 	int		rs ;
 	{
-	    va_list	ap ;
-	    va_begin(ap,fmt) ;
-	    rs = sbuf_vprintf(op,fmt,ap) ;
-	    va_end(ap) ;
-	}
+	        va_list	ap ;
+	        va_begin(ap,fmt) ;
+	        rs = sbuf_vprintf(op,fmt,ap) ;
+	        va_end(ap) ;
+	} /* end block */
 	return rs ;
 }
 /* end subroutine (sbuf_printf) */
@@ -442,10 +444,10 @@ int sbuf_printf(sbuf *op,const char *fmt,...) noex {
 int sbuf_adv(sbuf *sbp,int adv,char **dpp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
-	    if (dpp) *dpp = NULL ;
+	    if (dpp) *dpp = nullptr ;
 	    if ((rs = SBUF_INDEX) >= 0) {
 	        if ((SBUF_RLEN - SBUF_INDEX) >= adv) {
-		    if (dpp != NULL) *dpp = (SBUF_RBUF + SBUF_INDEX) ;
+		    if (dpp != nullptr) *dpp = (SBUF_RBUF + SBUF_INDEX) ;
 		    SBUF_INDEX += adv ;
 	        } else {
 		    rs = SR_TOOBIG ;
@@ -507,7 +509,7 @@ int sbuf_getprev(sbuf *sbp) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
-	        rs = MKCHAR(SBUF_RBUF[SBUF_INDEX - 1]) ;
+	        rs = mkchar(SBUF_RBUF[SBUF_INDEX - 1]) ;
 	    }
 	} /* end if */
 	return rs ;

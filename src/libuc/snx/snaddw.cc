@@ -29,7 +29,7 @@
 	Arguments:
 	rbuf		c-string buffer pointer
 	rlen		c-string buffer length
-	rl		lenght of buffer already filled
+	rl		length of buffer already filled
 	sp		new c-string pointer to be added
 	sl		new c-string length to be added
 

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int namecache_ctor(namecache *op,Args ... args) noex {
+static int kvsfile_ctor(kvsfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int namecache_ctor(namecache *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (namecache_ctor) */
+/* end subroutine (kvsfile_ctor) */
 
-static int namecache_dtor(namecache *op) noex {
+static int kvsfile_dtor(kvsfile *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (namecache_dtor) */
+/* end subroutine (kvsfile_dtor) */
 
 template<typename ... Args>
-static int namecache_magic(namecache *op,Args ... args) noex {
+static int kvsfile_magic(kvsfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == NAMECACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == KVSFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (namecache_magic) */
+/* end subroutine (kvsfile_magic) */
 

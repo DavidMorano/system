@@ -27,7 +27,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstdlib>
 #include	<cstring>

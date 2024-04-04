@@ -55,6 +55,11 @@
 #include	<sfx.h>
 #include	<toxc.h>
 
+#include	"snx.h"
+
+
+/* local defines */
+
 
 /* external subroutines */
 

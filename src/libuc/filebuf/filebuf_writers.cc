@@ -114,8 +114,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
-#include	<algorithm>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -131,6 +132,7 @@
 /* imported namespaces */
 
 using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -144,8 +146,6 @@ using std::min ;			/* subroutine-template */
 
 /* local structures */
 
-constexpr int	zsize = sizeof(int) ;
-
 
 /* forward references */
 
@@ -157,6 +157,7 @@ extern "C" {
 
 /* local variables */
 
+constexpr int	zsize = sizeof(int) ;
 constexpr int	nblanks = NBLANKS ;
 
 static cchar	blanks[] = "        " ;

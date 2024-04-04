@@ -19,15 +19,21 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* types (see below) */
+#include	<stdarg.h>		/* |va_list| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
-#include	<sncpyx.h>
-#include	<snwcpy.h>
+#include	<sncpy.h>
+#include	<sncpyx.h>		/* repeat? */
+#include	<sncpyxc.h>		/* repeat? */
+#include	<sncpyxw.h>		/* repeat? */
 #include	<snxxx.h>
 #include	<snuuid.h>
 #include	<snaddw.h>
 #include	<sntmtime.h>
+#include	<snflags.h>
+#include	<snuuid.h>
 
 
 EXTERNC_begin
@@ -43,6 +49,11 @@ extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 extern int snfilemode(char *,int,mode_t) noex ;
 extern int sntid(char *,int,pthread_t) noex ;
 extern int snerrabbr(char *,int,int) noex ;
+extern int vsnwprintf(char *,int,cchar *,va_list) noex ;
+extern int snwprintf(char *,int,cchar *,...) noex ;
+extern int snrealname(char *,int,cchar **,int) noex ;
+extern int snloadavg(char *,int,uint,int,int,int) noex ;
+extern int snkeyval(char *,int,cchar *,int,cchar *,int) noex ;
 
 EXTERNC_end
 

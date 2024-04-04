@@ -5,6 +5,14 @@
 /* version %I% last-modified %G% */
 
 
+/* revision history:
+
+	= 1998-02-01, David A­D­ Morano
+	This object module was originally written to create a logging
+	mechanism for PCS application programs.
+
+*/
+
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	TERMNOTE_INCLUDE

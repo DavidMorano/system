@@ -43,9 +43,9 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<cstring>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
 #include	<usysflag.h>
 #include	<strwcpy.h>
@@ -56,6 +56,12 @@
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -87,10 +93,10 @@ constexpr bool	f_darwin = F_DARWIN ;
 
 /* exported subroutines */
 
-int tmtime_ztime(tmtime *op,int z,time_t t) noex {
+int tmtime_ztime(tmtime *op,bool fz,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    if (z) {
+	    if (fz) {
 	        rs = tmtime_localtime(op,t) ;
 	    } else {
 	        rs = tmtime_gmtime(op,t) ;
@@ -103,7 +109,7 @@ int tmtime_ztime(tmtime *op,int z,time_t t) noex {
 int tmtime_gmtime(tmtime *op,time_t t) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    TM	tms ;
+	    TM		tms ;
 	    if (t == 0) t = time(nullptr) ;
 	    memclear(op) ;
 	    if ((rs = uc_gmtime(&t,&tms)) >= 0) {
@@ -136,8 +142,7 @@ int tmtime_insert(tmtime *op,TM *tmp) noex {
 	if (op && tmp) {
 	    TM		tc = *tmp ;
 	    cchar	*zp ;
-	    rs = SR_OK ;
-	    memclear(op) ;
+	    rs = memclear(op) ;
 	    op->gmtoff = 0 ;
 	    op->sec = tmp->tm_sec ;
 	    op->min = tmp->tm_min ;
@@ -211,9 +216,9 @@ int tmtime_mktimer(tmtime *op,int f_adj,time_t *tp) noex {
 	    time_t	t = 0 ;
 	    tmtime_extract(op,&tms) ;
 	    if ((rs = uc_mktime(&tms,&t)) >= 0) {
-	        int	f_isdst = (tms.tm_isdst > 0) ;
 	        int	taroff = op->gmtoff ;
 	        int 	locoff ;
+	        cbool	f_isdst = (tms.tm_isdst > 0) ;
 	        locoff = (f_isdst) ? altzone : timezone ;
 	        t += (taroff - locoff) ;
 	        if (f_adj) {

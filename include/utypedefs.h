@@ -234,9 +234,19 @@ typedef const char		cc ;
 typedef void *			voidp ;
 #endif
 
+#ifndef	TYPEDEF_VOIDPP
+#define	TYPEDEF_VOIDPP
+typedef void **			voidpp ;
+#endif
+
 #ifndef	TYPEDEF_CVOIDP
 #define	TYPEDEF_CVOIDP
 typedef const void *		cvoidp ;
+#endif
+
+#ifndef	TYPEDEF_CVOIDPP
+#define	TYPEDEF_CVOIDPP
+typedef const void **		cvoidpp ;
 #endif
 
 #ifndef	TYPEDEF_CNULLPTR

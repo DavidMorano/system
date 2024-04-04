@@ -154,7 +154,7 @@ int sntmtime(char *dbuf,int dlen,TMTIME *tmp,cchar *fmt) noex {
 	        {
 	            rs = sbuf_fmtstrs(&ss,tmp,fmt) ;
 	        }
-	        rs1 = sbuf_finish(&ss) ;
+	        rs1 = sbuf_finish(&ss) ; /* <- return value */
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 	} /* end if (non-null) */

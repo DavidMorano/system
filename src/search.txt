@@ -1,8 +1,0 @@
-limits.h
-errno.h
-signal.h
-stddef.h
-stdlib.h
-stdarg.h
-stdio.h
-string.h

@@ -50,6 +50,8 @@
 #include	<ctdec.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
+#include	"snx.h"
+
 
 /* local defines */
 
