@@ -1,5 +1,5 @@
-/* strtabfind */
-/* lang=C20 */
+/* strtabfind SUPPORT */
+/* lang=C++20 */
 
 /* find a string in tables created by a STRTAB object */
 /* version %I% last-modified %G% */
@@ -16,29 +16,28 @@
 
 /*******************************************************************************
 
+	Name:
+	strtabfind
+
 	Description:
 	This subroutine finds a specified string in tables that
 	were (assumed) created by a STRTAB object.
 
 	Synopsis:
-	int strtabfind(tab,it,itlen,nskip,sp,sl)
-	const char	tab[] ;
-	int		(*it)[3] ;
-	int		itlen ;
-	const char	*sp ;
-	int		sl ;
+	typedef int (*it_t)[3] ;
+	int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex
 
 	Arguments:
 	tab		the string table
 	it		the index table
 	itlen		the length (number of entries) of index table
 	nskip		the "skip" factor
-	sp		pointer to string to lookup
-	sl		length of string to lookup
+	sp		lookup c-string pointer
+	sl		lookup c-string length
 
 	Returns:
 	>=0		collisions
-	<0		error code (NOTFOUND)
+	<0		error code (SR_NOTFOUND)
 
 
 	Note: 
@@ -48,15 +47,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<nleadstr.h>
 #include	<hash.h>
+#include	<localmisc.h>
 
 
 /* local defines */
@@ -64,9 +61,15 @@
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	nleadstr(const char *,const char *,int) noex ;
+
+/* local typedefs */
+
+typedef int (*it_t)[3] ;
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -81,26 +84,27 @@ extern int	nleadstr(const char *,const char *,int) noex ;
 /* forward references */
 
 static int	hashindex(uint,int) noex ;
-static int	ismatkey(const char *,const char *,int) noex ;
+static bool	ismatkey(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int strtabfind(cchar tab[],int (*it)[3],int itlen,int nskip,cchar *sp,int sl)
-{
+int strtabfind(cc *tab,it_t it,int itlen,int nskip,cc *sp,int sl) noex {
 	uint		khash, nhash ;
 	uint		chash ;
 	int		nhi, hi ;
 	int		nmax ;
-	int		j ;
+	int		j ; /* used-afterwards */
 	int		si = -1 ;
 	int		sc = 0 ; /* Skip-Count */
-	int		f_mathash = FALSE ;
-	int		f_mat = FALSE ;
-	const char	*cp ;
+	bool		f_mathash = false ;
+	bool		f_mat = false ;
 
 	nmax = itlen + nskip ;
 	khash = hash_elf(sp,sl) ;
@@ -109,39 +113,27 @@ int strtabfind(cchar tab[],int (*it)[3],int itlen,int nskip,cchar *sp,int sl)
 	nhash = khash ;
 	hi = hashindex(nhash,itlen) ;
 
+        for (j = 0 ; (j < nmax) && ((si = it[hi][0]) > 0) ; j += 1) {
 	    f_mathash = ((it[hi][1] & INT_MAX) == chash) ;
 	    if (f_mathash) break ;
-
 	    if ((it[hi][1] & (~ INT_MAX)) == 0) {
 		break ;
 	    }
-
-	    nhash = hashagain(nhash,j,nskip) ;
-
+	    nhash = hash_again(nhash,j,nskip) ;
 	    hi = hashindex(nhash,itlen) ;
-
 	} /* end for */
-
 	sc += j ;
 
 	if ((si > 0) && f_mathash) {
-
 	    while ((si = it[hi][0]) > 0) {
-
-	        cp = (tab + si) ;
+	        cchar	*cp = (tab + si) ;
 	        f_mat = (cp[0] == sp[0]) && ismatkey(cp,sp,sl) ;
-	        if (f_mat)
-	            break ;
-
+	        if (f_mat) break ;
 		nhi = it[hi][2] ;
-		if (nhi == 0)
-		    break ;
-
+		if (nhi == 0) break ;
 		hi = nhi ;
 		sc += 1 ;
-
 	    } /* end while */
-
 	} /* end if */
 
 	return (f_mat) ? sc : SR_NOTFOUND ;
@@ -158,8 +150,8 @@ static int hashindex(uint i,int n) noex {
 }
 /* end subroutine (hashindex) */
 
-static int ismatkey(cchar key[],cchar kp[],int kl) noex {
-	int	f = (key[0] == kp[0]) ;
+static bool ismatkey(cchar *key,cchar *kp,int kl) noex {
+	bool		f = (key[0] == kp[0]) ;
 	if (f) {
 	    int	m = nleadstr(key,kp,kl) ;
 	    f = (m == kl) && (key[m] == '\0') ;
