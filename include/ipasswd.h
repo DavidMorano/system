@@ -29,7 +29,7 @@
 #define	IPASSWD			struct ipasswd_head
 #define	IPASSWD_CUR		struct ipasswd_cursor
 #define	IPASSWD_INFO		struct ipasswd_information
-#define	IPASSWD_ENT		struct ipasswd_e
+#define	IPASSWD_ENT		struct ipasswd_entry
 #define	IPASSWD_OBJ		struct ipasswd_obj
 #define	IPASSWD_FL		struct ipasswd_flags
 
@@ -70,7 +70,7 @@ struct ipasswd_information {
 	uint		collisions ;
 } ;
 
-struct ipasswd_e {
+struct ipasswd_entry {
 	uint		username ;
 	uint		last ;
 	uint		first ;
@@ -122,7 +122,7 @@ typedef IPASSWD_INFO		ipasswd_info ;
 EXTERNC_begin
 
 extern int	ipasswd_open(ipasswd *,cchar *) noex ;
-extern int	ipasswd_info(ipasswd *,ipasswd_info *) noex ;
+extern int	ipasswd_getinfo(ipasswd *,ipasswd_info *) noex ;
 extern int	ipasswd_curbegin(ipasswd *,ipasswd_cur *) noex ;
 extern int	ipasswd_curend(ipasswd *,ipasswd_cur *) noex ;
 extern int	ipasswd_enum(ipasswd *,ipasswd_cur *,char *,cchar **,

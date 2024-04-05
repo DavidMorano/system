@@ -1,10 +1,10 @@
-/* userports */
+/* userports SUPPORT */
+/* lang=C++20 */
 
+/* query the USERPOTS database for entries */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
@@ -17,7 +17,9 @@
 
 /*******************************************************************************
 
-	This object reads the USERPORTS DB and provides for queries to it.
+	Descriptiopn:
+	This object reads the USERPORTS DB and provides for queries
+	to it.
 
 	Synopsis:
 
@@ -446,43 +448,23 @@ static int userports_procfile(USERPORTS *op)
 	int		rs1 ;
 	int		c = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: fname=%s\n",op->fname) ;
-#endif
-
 	if ((rs = pwcache_start(&pwc,MAXPWENT,MAXPWTTL)) >= 0) {
-	    struct ustat	sb ;
-	    FILEMAP		fm, *fmp = &fm ;
-	    const size_t	fsize = MAXFSIZE ;
-	    const int	of = O_RDONLY ;
+	    USTAT	sb ;
+	    FILEMAP	fm, *fmp = &fm ;
+	    csize	fsize = MAXFSIZE ;
 	    int		ll ;
-	    const char	*lp ;
-
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: filemap_open()\n") ;
-#endif
-
-	    if ((rs = filemap_open(fmp,op->fname,of,fsize)) >= 0) {
+	    cchar	*lp ;
+	    if ((rs = filemap_open(fmp,op->fname,fsize)) >= 0) {
 
 	        rs = filemap_stat(fmp,&sb) ;
-
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: filemap_stat() rs=%d\n",rs) ;
-#endif
-
 	        op->fi.mtime = sb.st_mtime ;
 	        op->fi.dev = sb.st_dev ;
 	        op->fi.ino = sb.st_ino ;
 
 	        while (rs >= 0) {
-	            rs = filemap_getline(fmp,&lp) ;
+	            rs = filemap_getln(fmp,&lp) ;
 	            ll = rs ;
 	            if (rs <= 0) break ;
-
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: line=»%t«\n",
-		    lp,strlinelen(lp,ll,40)) ;
-#endif
 
 		    if (lp[ll-1] == '\n') ll -= 1 ;
 
@@ -493,23 +475,12 @@ static int userports_procfile(USERPORTS *op)
 
 	        } /* end if (reading lines) */
 
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: mid1 rs=%d\n",rs) ;
-#endif
-
 	        filemap_close(fmp) ;
 	    } /* end if (filemap) */
 
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: mid2 rs=%d\n",rs) ;
-#endif
 	    rs1 = pwcache_finish(&pwc) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pwcache) */
-
-#if	CF_DEBUGS
-	debugprintf("userports_procfile: ret rs=%d c=%u\n",rs,c) ;
-#endif
 
 	return (rs >= 0) ? c : rs ;
 }

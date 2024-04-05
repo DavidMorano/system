@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} openpcsdircache "
+NAMES="${NAMES} filemap_getline"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/openpcsdircache/s//pcsopendircache/g
+g/filemap_getline/s//filemap_getln/g
 	w
 	q
 EOF

@@ -11,8 +11,12 @@
 #define	STRLISTMK_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* systems IDs */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<modload.h>
 #include	<localmisc.h>
 
 #include	"strlistmks.h"
@@ -24,36 +28,31 @@
 
 
 struct strlistmk_calls {
-	int	(*open)(void *,const char *,const char *,int,mode_t,int) ;
+	int	(*open)(void *,cchar *,cchar *,int,mode_t,int) ;
 	int	(*chgrp)(void *,gid_t) ;
-	int	(*add)(void *,const char *,int) ;
+	int	(*add)(void *,cchar *,int) ;
 	int	(*abort)(void *) ;
 	int	(*close)(void *) ;
 } ;
 
 struct strlistmk_head {
-	uint		magic ;
-	MODLOAD		loader ;
-	STRLISTMK_CALLS call ;
+	modload		loader ;
 	void		*sop ;		/* shared-object (SO) pointer */
 	void		*obj ;		/* object pointer */
+	STRLISTMK_CALLS call ;
+	uint		magic ;
 	int		objsize ;	/* object size */
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	strlistmk_open(STRLISTMK *,const char *,const char *,
-			int,mode_t,int) ;
-extern int	strlistmk_chgrp(STRLISTMK *,gid_t) ;
-extern int	strlistmk_add(STRLISTMK *,const char *,int) ;
-extern int	strlistmk_abort(STRLISTMK *) ;
-extern int	strlistmk_close(STRLISTMK *) ;
+extern int strlistmk_open(STRLISTMK *,cc *,cc *,int,mode_t,int) noex ;
+extern int strlistmk_chgrp(STRLISTMK *,gid_t) noex ;
+extern int strlistmk_add(STRLISTMK *,cchar *,int) noex ;
+extern int strlistmk_abort(STRLISTMK *) noex ;
+extern int strlistmk_close(STRLISTMK *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* STRLISTMK_INCLUDE */

@@ -11,8 +11,11 @@
 #define	STRLISTMKS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<sys/types.h>		/* systems IDs */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<strtab.h>
 #include	<localmisc.h>
 
@@ -47,17 +50,17 @@ struct strlistmks_rectab {
 } ;
 
 struct strlistmks_head {
-	uint		magic ;
-	const char 	*dbname ;
-	const char	*idname ;
+	cchar 		*dbname ;
+	cchar		*idname ;
 	char		*nfname ;
 	STRTAB		strs ;
 	STRLISTMKS_REC	rectab ;
 	STRLISTMKS_FL	f ;
-	mode_t		om ;
 	gid_t		gid ;
+	uint		magic ;
 	int		nstrs ;
 	int		nfd ;
+	mode_t		om ;
 } ;
 
 #ifdef	__cplusplus

@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstdlib>
@@ -92,9 +91,8 @@ static inline int ucenumxx_dtor(ucenumxx *op) noex {
 int ucenumxxbase::open(cchar *efname) noex {
 	int		rs ;
 	if ((rs = ucenumxx_ctor(op,efname)) >= 0) {
-	    cint	of = O_RDONLY ;
-	    csize	max = INT_MAX ;
-	    if ((rs = filemap_open(fmp,efname,of,max)) >= 0) {
+	    csize	nmax = INT_MAX ;
+	    if ((rs = filemap_open(fmp,efname,nmax)) >= 0) {
 	        magic = mxx ;
 	    }
 	    if (rs < 0) {

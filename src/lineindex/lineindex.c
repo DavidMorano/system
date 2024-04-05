@@ -1,5 +1,5 @@
-/* lineindex */
-/* lang=C20 */
+/* lineindex SUPPORT */
+/* lang=C++20 */
 
 /* line indexing object */
 /* version %I% last-modified %G% */
@@ -32,7 +32,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
@@ -777,10 +776,9 @@ time_t		dt ;
 #endif
 
 	if ((rs == SR_NOENT) && f_create && (op->txtfname != NULL)) {
-
-	    if ((rs = lineindex_mkindex(op)) >= 0)
+	    if ((rs = lineindex_mkindex(op)) >= 0) {
 	        rs = u_open(op->idxfname,oflags,op->operm) ;
-
+	    }
 	}
 
 	if (rs < 0)
@@ -851,7 +849,7 @@ LINEINDEX	*op ;
 {
 	FILEMAP		lmap ;
 	bfile		ifile ;
-	off_t	headoff ;
+	off_t		headoff ;
 	uint		recoff, lineoff ;
 	uint		table[header_overlast + 1] ;
 	uint		recs[NRECS + 1] ;
@@ -859,14 +857,10 @@ LINEINDEX	*op ;
 	int		i, cl, len ;
 	int		headsize, lines ;
 	int		size ;
-	const char	*cp ;
+	cchar		*cp ;
 	char		dfname[MAXPATHLEN + 1] ;
 	char		template[MAXPATHLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: lfname=%s\n",op->txtfname) ;
-#endif
 
 /* determine if the directory is writable */
 
@@ -876,22 +870,14 @@ LINEINDEX	*op ;
 	    mkpath1(dfname,".") ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: dfname=%s\n",dfname) ;
-#endif
-
 	rs = perm(dfname,-1,-1,NULL,W_OK) ;
 	if (rs < 0)
 	    goto ret0 ;
 
 #if	CF_FILEMAP
-	rs = filemap_open(&lmap,op->txtfname,O_RDONLY,FILEMAPSIZE) ;
+	rs = filemap_open(&lmap,op->txtfname,FILEMAPSIZE) ;
 #else
 	rs = bopen(&lfile,op->txtfname,"r",0666) ;
-
-#if	CF_DEBUGS
-	debugprintf("lineindex_mkindex: bopen() rs=%d\n",rs) ;
-#endif
 
 #endif /* CF_FILEMAP */
 
@@ -970,7 +956,7 @@ LINEINDEX	*op ;
 		const char	*lp ;
 
 #if	CF_FILEMAP
-		rs = filemap_getline(&lmap,&lp) ;
+		rs = filemap_getln(&lmap,&lp) ;
 	    len = rs ;
 		if (rs <= 0)
 			break ;

@@ -1136,10 +1136,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 }
 /* end subroutine (ipasswd_fetcher) */
 
-
-/* get information */
-int ipasswd_info(IPASSWD *op,IPASSWD_INFO *rp)
-{
+int ipasswd_getinfo(IPASSWD *op,IPASSWD_INFO *rp) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -1155,10 +1152,7 @@ int ipasswd_info(IPASSWD *op,IPASSWD_INFO *rp)
 }
 /* end subroutine (ipasswd_info) */
 
-
-/* do some checking */
-int ipasswd_check(IPASSWD *op,time_t dt)
-{
+int ipasswd_check(IPASSWD *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 
@@ -1183,10 +1177,7 @@ int ipasswd_check(IPASSWD *op,time_t dt)
 
 /* private subroutines */
 
-
-/* read the file header and check it out */
-static int ipasswd_hdrload(IPASSWD *op)
-{
+static int ipasswd_hdrload(IPASSWD *op) noex {
 	int		rs = SR_OK ;
 	cchar	*cp = (cchar *) op->mapdata ;
 

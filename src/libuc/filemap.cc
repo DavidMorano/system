@@ -1,7 +1,7 @@
 /* filemap SUPPORT */
 /* lang=C++20 */
 
-/* support low-overhead file bufferring requirements */
+/* support low-overhead file bufferring operations (read-only) */
 /* version %I% last-modified %G% */
 
 
@@ -17,16 +17,15 @@
 /*******************************************************************************
 
         This little object supports some buffered file operations for
-        low-overhead buffered I/O requirements.
+        low-overhead buffered I/O operations (read-only).
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<unistd.h>
+#include	<unistd.h>		/* |off_t| */
 #include	<fcntl.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -73,9 +72,12 @@ static int filemap_openmap(filemap *,int,size_t) noex ;
 static sysval		pagesize(sysval_ps) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int filemap_open(filemap *op,cchar *fname,int oflags,size_t max) noex {
+int filemap_open(filemap *op,cchar *fname,size_t nmax) noex {
 	int		rs = SR_FAULT ;
 	if (op && fname) {
 	    rs = SR_INVALID ;
@@ -85,9 +87,9 @@ int filemap_open(filemap *op,cchar *fname,int oflags,size_t max) noex {
 	    op->bp = nullptr ;
 	    op->sb = {} ;
 	    if (fname[0]) {
-	        if (max <= 0) max = ULONG_MAX ;
-	        op->maxsize = max ;
-		rs = filemap_opener(op,fname,oflags) ;
+	        if (nmax <= 0) nmax = ULONG_MAX ;
+	        op->maxsize = nmax ;
+		rs = filemap_opener(op,fname) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -147,7 +149,7 @@ int filemap_read(filemap *op,int rlen,void *vp) noex {
 }
 /* end subroutine (filemap_read) */
 
-int filemap_getline(filemap *op,cchar **bpp) noex {
+int filemap_getln(filemap *op,cchar **bpp) noex {
 	int		rs = SR_FAULT ;
 	if (op && bpp) {
 	    size_t	fsize = size_t(op->sb.st_size) ;
@@ -168,7 +170,7 @@ int filemap_getline(filemap *op,cchar **bpp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filemap_getline) */
+/* end subroutine (filemap_getln) */
 
 int filemap_seek(filemap *op,off_t off,int w) noex {
 	int		rs = SR_FAULT ;
@@ -241,8 +243,9 @@ int filemap_rewind(filemap *op) noex {
 
 /* local subroutines */
 
-static int filemap_opener(filemap *op,cchar *fn,int of) noex {
+static int filemap_opener(filemap *op,cchar *fn) noex {
 	csize		nmax = op->maxsize ;
+	cint		of = (O_RDONLY | O_CLOEXEC) ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = uc_open(fn,of,0666)) >= 0) {
@@ -281,7 +284,7 @@ static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	        if ((rs = u_madvise(md,ms,madv)) >= 0) {
 	            op->mapdata = md ;
 	            op->mapsize = ms ;
-	            op->bp = (cchar *) md ;
+	            op->bp = charp(md) ;
 	        }
 	        if (rs < 0) {
 	            u_mmapend(md,ms) ;

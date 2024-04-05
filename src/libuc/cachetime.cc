@@ -296,16 +296,13 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 	hdb_dat		val ;
 	int		rs ;
 	int		f_hit = false ;
-
 	key.buf = sp ;
 	key.len = sl ;
-
 /* now see if it is already in the list by NAME */
-
 	op->c_req += 1 ;
 	if ((rs = hdb_fetch(op->dbp,key,nullptr,&val)) >= 0) {
 	    op->c_hit += 1 ;
-	    ep = (ent *) val.buf ;
+	    ep = entp(val.buf) ;
 	    if (timep != nullptr) *timep = ep->mtime ;
 	    f_hit = true ;
 	} else if (rs == SR_NOTFOUND) {
@@ -329,7 +326,6 @@ static int cachetime_lookuper(CT *op,cc *sp,int sl,time_t *timep) noex {
 		}
 	    } /* end if (memory-allocation) */
 	} /* end if */
-
 	return (rs >= 0) ? f_hit : rs ;
 }
 /* end subroutine (cachetime_lookup) */

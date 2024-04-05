@@ -1,6 +1,6 @@
-# MAKEFILES (strlist)
+# MAKEFILES (strlistx)
 
-T= strlist
+T= strlistx
 
 ALL= $(T).o $(T).a
 
@@ -51,14 +51,12 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= strlist.h
+INCS= strlist.h strlisthdr.h
 
-
-OBJ0_STRLIST= 
-OBJ1_STRLIST= 
-OBJ2_STRLIST= 
-OBJ3_STRLIST= 
-OBJ4_STRLIST= 
+OBJ0_STRLIST= strlist.o
+OBJ1_STRLIST= strlisthdr.o
+OBJ2_STRLIST= strlistmk.o
+OBJ3_STRLIST= strlistmks.o
 
 
 OBJA_STRLIST= obj0_strlist.o obj1_strlist.o
@@ -125,5 +123,10 @@ obj3_strlist.o:	$(OBJ3_STRLIST)
 obj4_strlist.o:	$(OBJ4_STRLIST)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_STRLIST)
 
+
+strlist.o:		strlist.cc			$(INCS)
+strlisthdr.o:		strlisthdr.cc			$(INCS)
+strlistmk.o:		strlistmk.cc strlistmk.h 	$(INCS)
+strlistmks.o:		strlistmks.cc strlistmks.h	$(INCS)
 
 

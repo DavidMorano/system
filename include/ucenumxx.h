@@ -27,7 +27,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
 #include	<filemap.h>
 #include	<localmisc.h>
@@ -65,7 +64,7 @@ struct ucenumxxco : ucenumxxbase {
 	        rs = SR_NOTOPEN ;
 	        if (op->magic == mxx) {
 		    cchar	*lp ;
-		    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
+		    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
 	    	        rs = ep->parse(bp,bl,lp,rs) ;
 	    	        len = rs ;
 	    	        if (len > 0) break ;

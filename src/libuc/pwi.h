@@ -34,7 +34,7 @@ struct pwi_flags {
 } ;
 
 struct pwi_head {
-	IPASSWD		db ;
+	ipasswd		db ;
 	PWI_FL		f ;
 	uint		magic ;
 	int		i ;

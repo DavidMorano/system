@@ -4,7 +4,7 @@
 /* Open the System Banner */
 /* version %I% last-modified %G% */
 
-#define	CF_filemap	1		/* use |filemap(3uc)| */
+#define	CF_FILEMAP	1		/* use |filemap(3uc)| */
 
 /* revision history:
 
@@ -21,8 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
@@ -70,7 +69,7 @@ using std::max ;			/* subroutine-template */
 /* forward references */
 
 static int	process(int,mode_t,cchar *,int) noex ;
-static int	procfile(filebuf *,int,mode_t,cchar *,int) noex ;
+static int	procfile(filebuf *,mode_t,cchar *,int) noex ;
 static int	printend(filebuf *,cchar *,cchar *,int) noex ;
 static int	printsub(filebuf *,cchar *,cchar *,int) noex ;
 static int	filebuf_char(filebuf *,int) noex ;
@@ -95,8 +94,9 @@ int opensys_banner(cchar *fname,int of,mode_t om) noex {
 	if (fname == NULL) return SR_FAULT ;
 
 	if ((rs = tmtime_gmtime(&tm,dt)) >= 0) {
-	    char	ds[TIMEBUFLEN+1] ;
-	    if ((rs = sntmtime(ds,TIMEBUFLEN,&tm,tspec)) >= 0) {
+	    cint	tlen = TIMEBUFLEN ;
+	    char	tbuf[TIMEBUFLEN+1] ;
+	    if ((rs = sntmtime(tbuf,tlen,&tm,tspec)) >= 0) {
 	        rs = process(of,om,ds,f_top) ;
 	        fd = rs ;
 	    }
@@ -119,7 +119,7 @@ static int process(int of,mode_t om,cchar *ds,int f_top) noex {
 	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
 	    if ((rs = filebuf_start(wfp,wfd,0L,0,0)) >= 0) {
-	        rs = procfile(wfp,of,om,ds,f_top) ;
+	        rs = procfile(wfp,om,ds,f_top) ;
 	        rs1 = filebuf_finish(wfp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filebuf) */
@@ -133,19 +133,19 @@ static int process(int of,mode_t om,cchar *ds,int f_top) noex {
 }
 /* end subroutine (process) */
 
-#if	CF_filemap
+#if	CF_FILEMAP
 /* ARGSUSED */
-static int procfile(filebuf *wfp,int of,mode_t om,cchar *ds,int f_top) noex {
+static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 	filemap		sysban, *sfp = &sysban ;
 	cint		maxsize = (5*1024) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	cchar		*sysbanner = SYSBANNER ;
-	if ((rs = filemap_open(sfp,sysbanner,of,maxsize)) >= 0) {
+	if ((rs = filemap_open(sfp,sysbanner,maxsize)) >= 0) {
 	    int		line = 0 ;
 	    cchar	*lbuf{} ;
-	    while ((rs = filemap_getline(sfp,&lbuf)) > 0) {
+	    while ((rs = filemap_getln(sfp,&lbuf)) > 0) {
 	        int	len = rs ;
 
 	        if (lbuf[len-1] == '\n') len -= 1 ;
@@ -171,8 +171,8 @@ static int procfile(filebuf *wfp,int of,mode_t om,cchar *ds,int f_top) noex {
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procfile) */
-#else /* CF_filemap */
-static int procfile(filebuf *wfp,int of,mode_t om,cchar *ds,int f_top) noex {
+#else /* CF_FILEMAP */
+static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 	cint		of = O_RDONLY ;
 	cint		to = -1 ;
 	int		rs ;
@@ -219,7 +219,7 @@ static int procfile(filebuf *wfp,int of,mode_t om,cchar *ds,int f_top) noex {
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procfile) */
-#endif /* CF_filemap */
+#endif /* CF_FILEMAP */
 
 static int printend(filebuf *wfp,cchar *ds,cchar *lbuf,int len) noex {
 	cint		cols = COLUMNS ;
