@@ -1125,8 +1125,8 @@ timestr.dir:
 	makesubdir $@
 
 # STRLIST
-strlist.o:		strlist.dir
-strlist.dir:
+strlistx.o:		strlistx.dir
+strlistx.dir:
 	makesubdir $@
 
 
