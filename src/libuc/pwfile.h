@@ -12,7 +12,9 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vecitem.h>
 #include	<hdb.h>
 #include	<pwentry.h>
@@ -20,12 +22,12 @@
 
 #define	PWFILE_MAGIC	0x98127643
 #define	PWFILE		struct pwfile_head
-#define	PWFILE_CUR	struct pwfile_cursor
 #define	PWFILE_FL	struct pwfile_flags
+#define	PWFILE_CUR	struct pwfile_cursor
 #define	PWFILE_ENT	pwentry
 
-#define	PWFILE_RECLEN	pwentry_BUFLEN
-#define	PWFILE_ENTLEN	pwentry_BUFLEN
+#define	PWFILE_RECLEN	PWENTRY_BUFLEN
+#define	PWFILE_ENTLEN	PWENTRY_BUFLEN
 
 /* are these even needed? */
 #define	PWFILE_NAMELEN	32		/* max username length */
@@ -34,7 +36,7 @@
 
 
 struct pwfile_cursor {
-	hdb_cur		hc ;
+	hdb_cur		*hcp ;
 	int		i ;
 } ;
 
@@ -46,10 +48,8 @@ struct pwfile_flags {
 
 struct pwfile_head {
 	cchar		*fname ;
-	vecitem		alist ;
-	hdb		byuser ;
-	hdb		byuid ;
-	hdb		bylastname ;
+	vecitem		*alp ;
+	hdb		*ulp ;		/* user-list-pointer */
 	time_t		readtime ;
 	PWFILE_FL	f ;
 	uint		magic ;
@@ -57,16 +57,18 @@ struct pwfile_head {
 } ;
 
 typedef PWFILE		pwfile ;
+typedef	PWFILE_FL	pwfile_fl ;
 typedef PWFILE_CUR	pwfile_cur ;
+typedef	PWFILE_ENT	pwfile_ent ;
 
 EXTERNC_begin
 
 extern int pwfile_open(pwfile *,cchar *) noex ;
 extern int pwfile_curbegin(pwfile *,pwfile_cur *) noex ;
 extern int pwfile_curend(pwfile *,pwfile_cur *) noex ;
-extern int pwfile_enum(pwfile *,pwfile_cur *,pwentry *,char *,int) noex ;
+extern int pwfile_enum(pwfile *,pwfile_cur *,pwfile_ent *,char *,int) noex ;
 extern int pwfile_fetchuser(pwfile *,cchar *,pwfile_cur *,
-		pwentry *,char *,int) noex ;
+		pwfile_ent *,char *,int) noex ;
 extern int pwfile_lock(pwfile *,int,int) noex ;
 extern int pwfile_close(pwfile *) noex ;
 

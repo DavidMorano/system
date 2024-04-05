@@ -1,5 +1,5 @@
-/* strlist */
-/* lang=C20 */
+/* strlist SUPPORT */
+/* lang=C++20 */
 
 /* read or audit a STRLIST database */
 /* version %I% last-modified %G% */
@@ -23,7 +23,7 @@
 	files).
 
 	Synopsis:
-	int strlist_open(STRLEN *op,cchar *dbname) noex
+	int strlist_open(strlist *op,cchar *dbname) noex
 
 	Arguments:
 	- op		object pointer
@@ -31,12 +31,11 @@
 
 	Returns:
 	>=0		OK
-	<0		error code
+	<0		error code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
@@ -45,10 +44,10 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
+
 #include	<usystem.h>
 #include	<endianstr.h>
 #include	<localmisc.h>
-#include	<hash.h>
 
 #include	"strlist.h"
 #include	"strlisthdr.h"
@@ -72,6 +71,9 @@
 
 
 /* external subroutines */
+
+extern uint	hashelf(const char *,int) ;
+extern uint	hashagain(uint,int,int) ;
 
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
@@ -370,7 +372,7 @@ int strlist_look(STRLIST *op,STRLIST_CUR *curp,cchar *kp,int kl)
 
 /* unhappy or not, the index-table uses same-hash-linking! */
 
-	    khash = hash_elf(kp,kl) ;
+	    khash = hashelf(kp,kl) ;
 
 	    nhash = khash ;
 	    chash = (khash & INT_MAX) ;
@@ -762,7 +764,7 @@ static int strlist_ouraudit(STRLIST *op)
 	        if (rs >= 0) {
 
 	            ki = rt[ri][0] ;
-	            khash = hash_elf((kst + ki),-1) ;
+	            khash = hashelf((kst + ki),-1) ;
 
 	            chash = (khash & INT_MAX) ;
 	            if (chash != (it[i][1] & INT_MAX)) {

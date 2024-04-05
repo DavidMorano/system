@@ -1,5 +1,5 @@
-/* strlistmks */
-/* lang=C20 */
+/* strlistmks SUPPORT */
+/* lang=C++20 */
 
 /* make a STRLIST database */
 /* version %I% last-modified %G% */
@@ -24,23 +24,18 @@
 	This subroutine creates a STRLIST database file.
 
 	Synopsis:
-	int strlistmks_open(op,dbname,oflags,om,n)
-	STRLISTMKS	*op ;
-	const char	dbname[] ;
-	int		oflags ;
-	mode_t		om ;
-	int		n ;
+	int strlistmks_open(strlistmks *op,cc *dbn,int of,mode_t om,int n) noex
 
 	Arguments:
 	op		object pointer
-	dbname		name of (path-to) DB
-	oflags		open-flags
+	dbn		name of (path-to) DB
+	of		open-flags
 	om		open-mode
 	n		starting estimate of numbers of variables
 
 	Returns:
 	>=0		OK
-	<0		error code
+	<0		error code (system-return)
 
 	Notes:
 
@@ -70,7 +65,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>

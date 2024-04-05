@@ -245,6 +245,14 @@ typedef const char	cc ;
 
 /* parameters */
 
+#ifndef	MAXARGLEN
+#ifdef	ARG_MAX
+#define	MAXARGLEN	ARG_MAX
+#else
+#define	MAXARGLEN	(256 * 1024)
+#endif
+#endif
+
 #ifndef	MAXNAMELEN
 #ifdef	NAME_MAX
 #define	MAXNAMELEN	NAME_MAX
@@ -303,6 +311,10 @@ typedef const char	cc ;
 /* mail address */
 #ifndef	MAILADDRLEN
 #define	MAILADDRLEN	(3 * HOSTNAMELEN)
+#endif
+
+#ifndef	ARGBUFLEN
+#define	ARGBUFLEN	MAXARGLEN
 #endif
 
 #ifndef	NAMEBUFLEN

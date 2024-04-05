@@ -1,17 +1,17 @@
-/* process */
+/* passwdv_proc SUPPORT */
+/* lang=C++20 */
 
 /* process a name */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* run-time debugging */
 #define	CF_GETPASSWORD	1		/* use 'getpassword(3dam)' */
 
-
 /* revision history:
 
 	= 1998-03-01, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did.
+	The program was written from scratch to do what the previous
+	program by the same name did.
 
 */
 
@@ -19,43 +19,34 @@
 
 /******************************************************************************
 
+	Description:
 	This module processes a single password verification request.
 
 	Synopsis:
-
-	int process(pip,pfp,ofp,name)
-	PROGINFO	*pip ;
-	PWFILE		*pfp ;
-	bfile		*ofp ;
-	const char	name[] ;
+	int passwdv_proc(PI *pip,pwfile *pfp,bfile *ofp,cc *name) noex
 
 	Arguments:
-
-	gp		global data pointer
-	username	username to check on
+	pip		proginfo-pointer
+	pfp		passwd-file-pointer
+	ofp		output-file-pointer
+	rname		username to check on
 
 	Returns:
-
 	0		the password verified OK
-	<0		the password did not verify
-
+	<0		the password did not verify (system-return)
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<termios.h>
-#include	<signal.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
 #include	<pwd.h>
-
+#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
+#include	<ctime>
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
@@ -183,7 +174,7 @@ int process(PROGINFO *pip,PWFILE *pfp,bfile *ofp,cchar *name)
 	if (pfp != NULL) {
 	    PWFILE_ENT	pw ;
 	    PWFILE_CUR	cur ;
-	    const int	pwlen = PWFILE_ENTLEN ;
+	    cint	pwlen = PWFILE_ENTLEN ;
 	    char	pwbuf[PWFILE_ENTLEN + 1] ;
 
 #if	CF_DEBUG
@@ -250,8 +241,8 @@ static int userexists(PROGINFO *pip,PWFILE *pfp,cchar *name)
 
 	if (pip == NULL) return SR_FAULT ;
 
-	if ((rs = pwentry_bufsize()) >= 0) {
-	    const int	pwlen = rs ;
+	if ((rs = pwentrybufsize()) >= 0) {
+	    cint	pwlen = rs ;
 	    char	*pwbuf ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	        if (pfp != NULL) {

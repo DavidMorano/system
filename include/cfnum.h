@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-static inline int cfnum(cchar *sp,int sl,int *rp) noex {
+inline int cfnum(cchar *sp,int sl,int *rp) noex {
 	return cfnumi(sp,sl,rp) ;
 }
-static inline int cfnum(cchar *sp,int sl,long *rp) noex {
+inline int cfnum(cchar *sp,int sl,long *rp) noex {
 	return cfnuml(sp,sl,rp) ;
 }
-static inline int cfnum(cchar *sp,int sl,longlong *rp) noex {
+inline int cfnum(cchar *sp,int sl,longlong *rp) noex {
 	return cfnumll(sp,sl,rp) ;
 }
 
-static inline int cfnum(cchar *sp,int sl,uint *rp) noex {
+inline int cfnum(cchar *sp,int sl,uint *rp) noex {
 	return cfnumui(sp,sl,rp) ;
 }
-static inline int cfnum(cchar *sp,int sl,ulong *rp) noex {
+inline int cfnum(cchar *sp,int sl,ulong *rp) noex {
 	return cfnumul(sp,sl,rp) ;
 }
-static inline int cfnum(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfnum(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfnumull(sp,sl,rp) ;
 }
 

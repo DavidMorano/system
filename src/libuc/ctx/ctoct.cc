@@ -41,6 +41,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -52,43 +55,46 @@
 constexpr int	b = OURBASE ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int ctocti(char *dp,int dl,int val) noex {
-	uint		uv = val ;
-	const int	n = sizeof(int) ;
+	uint		uv = uint(val) ;
+	cint		n = sizeof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (ctocti) */
 
 int ctoctl(char *dp,int dl,long val) noex {
-	ulong		uv = val ;
-	const int	n = sizeof(long) ;
+	ulong		uv = ulong(val) ;
+	cint		n = sizeof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (ctoctl) */
 
 int ctoctll(char *dp,int dl,longlong val) noex {
-	ulonglong	uv = val ;
-	const int	n = sizeof(longlong) ;
+	ulonglong	uv = ulonglong(val) ;
+	cint		n = sizeof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (ctoctll) */
 
 int ctoctui(char *dp,int dl,uint uv) noex {
-	const int	n = sizeof(uint) ;
+	cint		n = sizeof(uint) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (ctoctui) */
 
 int ctoctul(char *dp,int dl,ulong uv) noex {
-	const int	n = sizeof(ulong) ;
+	cint		n = sizeof(ulong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (ctoctul) */
 
 int ctoctull(char *dp,int dl,ulonglong uv) noex {
-	const int	n = sizeof(ulonglong) ;
+	cint		n = sizeof(ulonglong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (ctoctull) */

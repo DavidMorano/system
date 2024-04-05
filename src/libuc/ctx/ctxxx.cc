@@ -63,12 +63,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |ULONG_MAX| */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<bit>			/* <- for |countr_zero(3c++)| */
 #include	<usystem.h>		/* <- memory-allocation */
-#include	<stdintx.h>
 #include	<ucvariables.hh>
-#include	<varnames.hh>
+#include	<syswords.hh>
+#include	<stdintx.h>
 #include	<sncpyx.h>
 
 #include	"ctxxx.h"
@@ -86,6 +87,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* forward references */
 
 static inline constexpr int ffbsi(int b) noex {
@@ -96,7 +100,7 @@ static inline constexpr int ffbsi(int b) noex {
 
 /* local variables */
 
-static cint		maxbase = strlen(varname.digtab) ;
+static cint		maxbase = strlen(sysword.w_digtab) ;
 
 constexpr int		maxstack = (1024+1) ;
 
@@ -116,7 +120,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	        while ((v & vmask) != 0UL) {
 	            nv = v / ub ;
 		    di = int(v - (nv * ub)) ;
-		    *--rp = varname.digtab[di] ;
+		    *--rp = sysword.w_digtab[di] ;
 		    v = nv ;
 	        } /* end while (slower) */
 	        {
@@ -125,7 +129,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 		    while (lv != 0) {
 	                nv = lv / ub ;
 			di = int(lv - (nv * ub)) ;
-	                *--rp = varname.digtab[di] ;
+	                *--rp = sysword.w_digtab[di] ;
 	                lv = nv ;
 		    } /* end while */
 		    v = lv ;
@@ -135,7 +139,7 @@ static int ctxxxx(char *dbuf,int dlen,int b,UT v) noex {
 	        while (v != 0) {
 	            nv = v / ub ;
 		    di = int(v - (nv * ub)) ;
-		    *--rp = varname.digtab[di] ;
+		    *--rp = sysword.w_digtab[di] ;
 	            v = nv ;
 	        } /* end while (regular) */
 	    } /* end if-constexpr (size-of-operand) */

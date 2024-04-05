@@ -4,8 +4,6 @@
 /* set the LOCAL network-load (NETLOAD) */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_UCPROGDATA	1		/* use |ucprogdata_xxx(3uc)| */
 
 /* revision history:
 
@@ -45,13 +43,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<cstdlib>
-#include	<cstring>
 #include	<usystem.h>
-#include	<bfile.h>
 #include	<ucprogdata.h>
+#include	<mallocxx.h>
+#include	<bfile.h>
+#include	<mkpathx.h>
 #include	<localmisc.h>
 
 #include	"localset.h"
@@ -59,25 +55,19 @@
 
 /* local defines */
 
-#ifndef	VARNETLOAD
-#define	VARNETLOAD	"NETLOAD"
-#endif
-
 #define	ETCDNAME	"etc"
 #define	VARDNAME	"var"
 #define	NETLOADFNAME	"netload"
 #define	TO_TTL		(5*60)
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	getuserhome(char *,int,const char *) ;
-extern int	localgetorg(const char *,char *,int,const char *) ;
-extern int	isNotPresent(int) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -91,6 +81,8 @@ extern int	isNotPresent(int) ;
 
 /* local variables */
 
+constexpr cchar		filetitle[] = "# NETLOAD (Machine Network-Load)" ;
+
 
 /* exported variables */
 
@@ -98,40 +90,38 @@ extern int	isNotPresent(int) ;
 /* exported subroutines */
 
 int localsetnetload(cchar *pr,cchar *sbuf,int slen) noex {
-	const int	di = UCPROGDATA_DNETLOAD ;
-	const int	ttl = TO_TTL ;
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		rc = 0 ;
-	const char	*vardname = VARDNAME ;
-	const char	*netloadname = NETLOADFNAME ;
-	char		tfname[MAXPATHLEN+1] ;
-
-	if (pr == NULL) return SR_FAULT ;
-	if (sbuf == NULL) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
-	if ((rs = mkpath3(tfname,pr,vardname,netloadname)) >= 0) {
-	    bfile		dfile, *dfp = &dfile ;
-	    const mode_t	om = 0664 ;
-	    if ((rs = bopen(dfp,tfname,"wct",om)) >= 0) {
-		cchar	*fmt = "# NETLOAD (Machine Network-Load)" ;
-		if ((rs = bprintln(dfp,fmt,-1)) >= 0) {
-	            if ((rs = bprintln(dfp,sbuf,slen)) >= 0) {
-		        rs = ucprogdata_set(di,sbuf,slen,ttl) ;
-			rc = rs ;
-		    }
-		}
-		rs1 = bclose(dfp) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (file-write) */
-	} /* end if (mkpath) */
-
-#if	CF_DEBUGS
-	debugprintf("localsetnetload: ret rs=%d rc=%u\n",rs,rc) ;
-#endif
-
+	if (pr && sbuf) {
+	    rs = SR_INVALID ;
+	    if (pr[0]) {
+	        cint		di = UCPROGDATA_DNETLOAD ;
+	        cint		ttl = TO_TTL ;
+	        cchar		*vardname = VARDNAME ;
+	        cchar		*netloadname = NETLOADFNAME ;
+	        char		*tbuf{} ;
+	        if ((rs = malloc_mp(&tbuf)) >= 0) {
+	            if ((rs = mkpath(tbuf,pr,vardname,netloadname)) >= 0) {
+	                bfile	dfile, *dfp = &dfile ;
+	                cmode	om = 0664 ;
+	                if ((rs = bopen(dfp,tbuf,"wct",om)) >= 0) {
+		            cchar	*fmt = filetitle ;
+		            if ((rs = bprintln(dfp,fmt,-1)) >= 0) {
+	                        if ((rs = bprintln(dfp,sbuf,slen)) >= 0) {
+		                    rs = ucprogdata_set(di,sbuf,slen,ttl) ;
+			            rc = rs ;
+		                }
+		            }
+		            rs1 = bclose(dfp) ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (file-write) */
+	            } /* end if (mkpath) */
+		    rs1 = uc_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? rc : rs ;
 }
 /* end subroutine (localsetnetload) */

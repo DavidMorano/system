@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-static inline int cfbin(cchar *sp,int sl,int *rp) noex {
+inline int cfbin(cchar *sp,int sl,int *rp) noex {
 	return cfbini(sp,sl,rp) ;
 }
-static inline int cfbin(cchar *sp,int sl,long *rp) noex {
+inline int cfbin(cchar *sp,int sl,long *rp) noex {
 	return cfbinl(sp,sl,rp) ;
 }
-static inline int cfbin(cchar *sp,int sl,longlong *rp) noex {
+inline int cfbin(cchar *sp,int sl,longlong *rp) noex {
 	return cfbinll(sp,sl,rp) ;
 }
 
-static inline int cfbin(cchar *sp,int sl,uint *rp) noex {
+inline int cfbin(cchar *sp,int sl,uint *rp) noex {
 	return cfbinui(sp,sl,rp) ;
 }
-static inline int cfbin(cchar *sp,int sl,ulong *rp) noex {
+inline int cfbin(cchar *sp,int sl,ulong *rp) noex {
 	return cfbinul(sp,sl,rp) ;
 }
-static inline int cfbin(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfbin(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfbinull(sp,sl,rp) ;
 }
 

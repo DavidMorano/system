@@ -19,35 +19,40 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<sys/stat.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<hdb.h>
 #include	<ptm.h>
 #include	<localmisc.h>
 
 
 #define	CACHETIME_MAGIC		0x79854123
+#define	CACHETIME_NENTS		400
 #define	CACHETIME		struct cachetime_head
 #define	CACHETIME_CUR		struct cachetime_cursor
-#define	CACHETIME_STATS		struct cachetime_s
+#define	CACHETIME_ENT		struct cachetime_entry
+#define	CACHETIME_ST		struct cachetime_statistics
 
 
-struct cachetime_s {
-	uint		req, hit, miss ;
+struct cachetime_statistics {
+	uint		req ;
+	uint		hit ;
+	uint		miss ;
 } ;
 
 struct cachetime_cursor {
-	hdb_cur		cur ;
+	hdb_cur		*hcp ;
 } ;
 
-struct cachetime_e {
+struct cachetime_entry {
 	cchar		*name ;
 	time_t		mtime ;
 } ;
 
 struct cachetime_head {
-	hdbB		db ;
-	ptmM		m ;
+	hdb		*dbp ;
+	ptm		*mxp ;
 	uint		magic ;
 	uint		c_req ;
 	uint		c_hit ;
@@ -56,18 +61,19 @@ struct cachetime_head {
 
 typedef CACHETIME		cachetime ;
 typedef CACHETIME_CUR		cachetime_cur ;
-typedef CACHETIME_STATS		cachetime_stats ;
+typedef CACHETIME_ENT		cachetime_ent ;
+typedef CACHETIME_ST		cachetime_st ;
 
 EXTERNC_begin
 
-extern int cachetime_start(CACHETIME *) noex ;
-extern int cachetime_lookup(CACHETIME *,cchar *,int,time_t *) noex ;
-extern int cachetime_curbegin(CACHETIME *,CACHETIME_CUR *) noex ;
-extern int cachetime_curend(CACHETIME *,CACHETIME_CUR *) noex ;
-extern int cachetime_enum(CACHETIME *,CACHETIME_CUR *,char *,int,
+extern int cachetime_start(cachetime *) noex ;
+extern int cachetime_lookup(cachetime *,cchar *,int,time_t *) noex ;
+extern int cachetime_curbegin(cachetime *,cachetime_cur *) noex ;
+extern int cachetime_curend(cachetime *,cachetime_cur *) noex ;
+extern int cachetime_enum(cachetime *,cachetime_cur *,char *,int,
 		time_t *) noex ;
-extern int cachetime_stats(CACHETIME *,CACHETIME_STATS *) noex ;
-extern int cachetime_finish(CACHETIME *) noex ;
+extern int cachetime_stats(cachetime *,cachetime_st *) noex ;
+extern int cachetime_finish(cachetime *) noex ;
 
 EXTERNC_end
 

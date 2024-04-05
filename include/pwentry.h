@@ -11,7 +11,7 @@
 	This was originally written.
 
 	= 2018-12-21, David A.D. Morano
-	Added |getpwentrybufsize(3dam)|.
+	Added |pwentrybufsize(3dam)|.
 
 
 ***********************************************************************/
@@ -23,8 +23,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<sys/types.h>		/* system IDs */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -33,12 +32,6 @@
 
 #ifndef	PWENTRY
 #define	PWENTRY		struct pwentry_head
-#endif
-
-#ifdef	_SC_GETPW_R_SIZE_MAX
-#define	PWENTRY_BUFLEN	(_SC_GETPW_R_SIZE_MAX + MAXNAMELEN)
-#else
-#define	PWENTRY_BUFLEN	(MAXPATHLEN + MAXNAMELEN)
 #endif
 
 
@@ -75,8 +68,13 @@ typedef PWENTRY		pwentry ;
 
 EXTERNC_begin
 
-extern int	pwentry_bufsize(void) noex ;
-extern int	getpwentrybufsize(void) noex ;
+extern int	pwentry_start(pwentry *) noex ;
+extern int	pwentry_finish(pwentry *) noex ;
+extern int	pwentry_fieldpw(pwentry *,int,cchar *,int) noex ;
+extern int	pwentry_mkextras(pwentry *) noex ;
+extern int	pwentry_mkcopy(pwentry *,pwentry *,char *,int) noex ;
+
+extern int	pwentrybufsize(void) noex ;
 
 EXTERNC_end
 

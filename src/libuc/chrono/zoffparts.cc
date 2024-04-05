@@ -54,16 +54,22 @@
 	Returns:
 	0		always succeeds
 
+	Note:
+	The "zone-offset" for these subroutines is in the time-units
+	of SECONDS.  It is not in minutes, as it is in other interfaces.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<cstdlib>		/* for |abs(3c)| */
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
 
 #include	"zoffparts.h"
+
+
+/* local defines */
 
 
 /* imported namespaces */
@@ -85,12 +91,12 @@ static int	storebuf_twodig(char *,int,int,int) noex ;
 
 /* exported subroutines */
 
-int zoffparts_set(zoffparts *zop,int v) noex {
+int zoffparts_set(zoffparts *zop,int zo) noex {
 	int		rs = SR_FAULT ;
 	if (zop) {
+	    cint	v = abs(zo) / 60 ;	/* discard seconds */
+	    zop->zoff = zo ;
 	    rs = SR_OK ;
-	    zop->zoff = v ;
-	    v = abs(v) / 60 ;
 	    zop->hours = (v / 60) ;
 	    zop->mins = (v % 60) ;
 	} /* end if (non-null) */
@@ -103,7 +109,7 @@ int zoffparts_get(zoffparts *zop,int *vp) noex {
 	int		v = 0 ;
 	if (zop) {
 	    rs = SR_OK ;
-	    v = ((zop->hours * 60) + zop->mins) * 60 ;
+	    v = ((zop->hours * 60) + zop->mins) * 60 ; /* create seconds */
 	    if (zop->zoff < 0) v = (-v) ;
 	    if (vp) *vp = v ;
 	    v = abs(v) ;

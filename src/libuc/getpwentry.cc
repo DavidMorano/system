@@ -26,6 +26,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -79,9 +80,9 @@
 
 /* forward subroutines */
 
-static int	getpwentry_load(pwentry *,char *,int,PASSWD *) noex ;
+static int	getpwentry_load(pwentry *,char *,int,ucentpw *) noex ;
 static int	getpwentry_gecos(pwentry *,storeitem *,cchar *) noex ;
-static int	getpwentry_shadow(pwentry *,storeitem *,PASSWD *) noex ;
+static int	getpwentry_shadow(pwentry *,storeitem *,ucentpw *) noex ;
 static int	getpwentry_setnuls(pwentry *,cchar *) noex ;
 
 static int	isNoEntry(int) noex ;
@@ -92,10 +93,10 @@ static int	checknul(cchar *,cchar **) noex ;
 /* local variables */
 
 static constexpr int	rsents[] = {
-	    SR_NOTFOUND,
-	    SR_ACCESS,
-	    SR_NOSYS,
-	    0
+	SR_NOTFOUND,
+	SR_ACCESS,
+	SR_NOSYS,
+	0
 } ;
 
 constexpr bool		f_shadow = F_SHADOW ;
@@ -112,7 +113,7 @@ int getpwentry_name(pwentry *uep,char *ebuf,int elen,cchar *name) noex {
 	if (uep && ebuf && name) {
 	    char	*pwbuf{} ;
 	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
-	        PASSWD	pw ;
+	        ucentpw	pw ;
 	        cint	pwlen = rs ;
 	        if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,name)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
@@ -131,7 +132,7 @@ int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 	if (uep && ebuf) {
 	    char	*pwbuf{} ;
 	    if ((rs = malloc_pw(&pwbuf)) >= 0) {
-	        PASSWD	pw ;
+	        ucentpw	pw ;
 		cint	pwlen = rs ;
 	        if ((rs = getpwusername(&pw,pwbuf,pwlen,uid)) >= 0) {
 	            rs = getpwentry_load(uep,ebuf,elen,&pw) ;
@@ -147,7 +148,7 @@ int getpwentry_uid(pwentry *uep,char *ebuf,int elen,uid_t uid) noex {
 
 /* local subroutines */
 
-static int getpwentry_load(pwentry *uep,char *ebuf,int elen,PASSWD *pep) noex {
+static int getpwentry_load(pwentry *uep,char *ebuf,int elen,ucentpw *pep) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (uep && ebuf && pep) {
@@ -268,7 +269,7 @@ static int getpwentry_gecos(pwentry *uep,storeitem *bp,cchar *gecosdata) noex {
 }
 /* end subroutine (getpwentry_gecos) */
 
-static int getpwentry_shadow(pwentry *uep,storeitem *sip,PASSWD *pep) noex {
+static int getpwentry_shadow(pwentry *uep,storeitem *sip,ucentpw *pep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if constexpr (f_shadow) {

@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-static inline int cfchars(cchar *sp,int sl,int *rp) noex {
+inline int cfchars(cchar *sp,int sl,int *rp) noex {
 	return cfcharsi(sp,sl,rp) ;
 }
-static inline int cfchars(cchar *sp,int sl,long *rp) noex {
+inline int cfchars(cchar *sp,int sl,long *rp) noex {
 	return cfcharsl(sp,sl,rp) ;
 }
-static inline int cfchars(cchar *sp,int sl,longlong *rp) noex {
+inline int cfchars(cchar *sp,int sl,longlong *rp) noex {
 	return cfcharsll(sp,sl,rp) ;
 }
 
-static inline int cfchars(cchar *sp,int sl,uint *rp) noex {
+inline int cfchars(cchar *sp,int sl,uint *rp) noex {
 	return cfcharsui(sp,sl,rp) ;
 }
-static inline int cfchars(cchar *sp,int sl,ulong *rp) noex {
+inline int cfchars(cchar *sp,int sl,ulong *rp) noex {
 	return cfcharsul(sp,sl,rp) ;
 }
-static inline int cfchars(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfchars(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfcharsull(sp,sl,rp) ;
 }
 

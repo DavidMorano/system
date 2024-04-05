@@ -50,6 +50,7 @@
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<absfn.h>		/* absolute-file-name */
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
@@ -74,11 +75,7 @@
 #define	KVSFILE_KEY		struct kvsfile_key
 #define	KVSFILE_ENT		struct kvsfile_ent
 
-#ifdef	KVSFILE_KEYLEN
 #define	KEYBUFLEN		KVSFILE_KEYLEN
-#else
-#define	KEYBUFLEN		MAXHOSTNAMELEN
-#endif
 
 
 /* imported namespaces */
@@ -234,8 +231,8 @@ static int	key_finish(kf_key *) noex ;
 static int entry_start(kf_ent *,int,int,kf_key *,cchar *,int) noex ;
 static int entry_finish(kf_ent *) noex ;
 
-static int	cmpfname(kf_file **,kf_file **) noex ;
-static int	cmpkey(kf_key **,KVSFILE_KEY **) noex ;
+static int	vcmpfname(kf_file **,kf_file **) noex ;
+static int	vcmpkey(kf_key **,kf_key **) noex ;
 static int	cmpkeyval(kf_ent *,kf_ent *,int) noex ;
 
 static uint	hashkeyval(kf_ent *,int) noex ;
@@ -353,26 +350,19 @@ int kvsfile_close(kvsfile *op) noex {
 
 int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	int		rs ;
+	int		rs1 ;
 	int		fi = 0 ;
 	if ((rs = kvsfile_magic(op,atfname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (atfname[0]) {
-	        cchar		*fp = atfname ;
-	        char		abuf[MAXPATHLEN + 1] ;
-	        if (atfname[0] != '/') {
-	            cint	plen = MAXPATHLEN ;
-	            char	pbuf[MAXPATHLEN+1] ;
-	            if ((rs = getpwd(pbuf,plen)) >= 0) {
-	                rs = mkpath2(abuf,pbuf,atfname) ;
-	                fp = abuf ;
-	            }
-	        } /* end if (added PWD) */
-	        if (rs >= 0) {
+		absfn	af ;
+		cchar	*fp ;
+		if ((rs = af.start(atfname,0,&fp)) >= 0) {
 	            kf_file	fe ;
 	            if ((rs = file_start(&fe,fp)) >= 0) {
 			cnullptr	np{} ;
 	                vecobj		*flp = op->flp ;
-		        vecobj_vcf	vcf = vecobj_vcf(cmpfname) ;
+		        vecobj_vcf	vcf = vecobj_vcf(vcmpfname) ;
 	                cint		nrs = SR_NOTFOUND ;
 	                if ((rs = vecobj_search(flp,&fe,vcf,np)) == nrs) {
 	                    if ((rs = vecobj_add(op->flp,&fe)) >= 0) {
@@ -390,7 +380,9 @@ int kvsfile_fileadd(kvsfile *op,cchar *atfname) noex {
 	                    file_finish(&fe) ;
 	                }
 	            } /* end if (file-start) */
-	        } /* end if (ok) */
+		    rs1 = af.finish ;
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (absfn) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? fi : rs ;
@@ -413,7 +405,7 @@ int kvsfile_curbegin(kvsfile *op,kf_cur *curp) noex {
 int kvsfile_curend(kvsfile *op,kf_cur *curp) noex {
 	int		rs ;
 	if ((rs = kvsfile_magic(op,curp)) >= 0) {
-	    rs = SR_NOMEM ;
+	    rs = SR_BUGCHECK ;
 	    if (curp->ecp) {
 		{
 	            curp->i = -1 ;
@@ -675,31 +667,31 @@ static int kvsfile_fparsel(kvsfile *op,int fi,cc *lp,int ll) noex {
 	    cchar	*fp{} ;
 	    char	keybuf[KEYBUFLEN + 1] = {} ;
 	    while ((fl = field_get(&fsb,fterms,&fp)) >= 0) {
-	            if ((c_field++ == 0) && (fsb.term == ':')) {
-	                c = 0 ;
-	                strwcpy(keybuf,fp,min(fl,KEYBUFLEN)) ;
-	            } else if ((fl > 0) && (keybuf[0] != '\0')) {
-/* enter key into string table (if first time) */
-	                if (c++ == 0) {
-	                    rs = kvsfile_getkeyp(op,keybuf,&kep) ;
-	                    ki = rs ;
-	                } /* end if (entering key) */
-	                if ((rs >= 0) && (kep != nullptr)) {
-	                    bool	f = true ;
-	                    if ((rs = entry_start(&ve,fi,ki,kep,fp,fl)) >= 0) {
-	                        cint	nrs = SR_NOTFOUND ;
-	                        if ((rs = kvsfile_already(op,&ve)) == nrs) {
-	                            if ((rs = kvsfile_addentry(op,&ve)) >= 0) {
-	                                f = false ;
-	                                c_added += 1 ;
-	                            }
-	                        } /* end if (new entry) */
-	                        if (f) entry_finish(&ve) ;
-	                    } /* end if (entry initialized) */
-	                } /* end if */
-	            } /* end if (handling record) */
-	            if (fsb.term == '#') break ;
-	            if (rs < 0) break ;
+                if ((c_field++ == 0) && (fsb.term == ':')) {
+                    c = 0 ;
+                    strwcpy(keybuf,fp,min(fl,KEYBUFLEN)) ;
+                } else if ((fl > 0) && (keybuf[0] != '\0')) {
+                    /* enter key into string table (if first time) */
+                    if (c++ == 0) {
+                        rs = kvsfile_getkeyp(op,keybuf,&kep) ;
+                        ki = rs ;
+                    } /* end if (entering key) */
+                    if ((rs >= 0) && (kep != nullptr)) {
+                        bool        f = true ;
+                        if ((rs = entry_start(&ve,fi,ki,kep,fp,fl)) >= 0) {
+                            cint    nrs = SR_NOTFOUND ;
+                            if ((rs = kvsfile_already(op,&ve)) == nrs) {
+                                if ((rs = kvsfile_addentry(op,&ve)) >= 0) {
+                                    f = false ;
+                                    c_added += 1 ;
+                                }
+                            } /* end if (new entry) */
+                            if (f) entry_finish(&ve) ;
+                        } /* end if (entry initialized) */
+                    } /* end if */
+                } /* end if (handling record) */
+                if (fsb.term == '#') break ;
+                if (rs < 0) break ;
 	    } /* end while (fields) */
 	    rs1 = field_finish(&fsb) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -715,7 +707,7 @@ static int kvsfile_getkeyp(kvsfile *op,cchar *kbuf,kf_key **kpp) noex {
 	int		ki = 0 ;
 	if ((rs = key_start(&ke,kbuf)) >= 0) {
 	    vecobj	*klp = op->klp ;
-	    vecobj_vcf	vcf = vecobj_vcf(cmpkey) ;
+	    vecobj_vcf	vcf = vecobj_vcf(vcmpkey) ;
 	    cint	nrs = SR_NOTFOUND ;
 	    bool	f = true ;
 	    void	*vp{} ;
@@ -988,14 +980,14 @@ static int entry_finish(kf_ent *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static int cmpfname(kf_file **e1pp,kf_file **e2pp) noex {
+static int vcmpfname(kf_file **e1pp,kf_file **e2pp) noex {
 	kf_file		*e1p = *e1pp ;
 	kf_file		*e2p = *e2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    if (e1p) {
 	        if (e2p) {
-	            rc = strcmp((*e1pp)->fname,(*e2pp)->fname) ;
+	            rc = strcmp(e1p->fname,e2p->fname) ;
 	        } else {
 	            rc = -1 ;
 		}
@@ -1005,16 +997,16 @@ static int cmpfname(kf_file **e1pp,kf_file **e2pp) noex {
 	}
 	return rc ;
 }
-/* end subroutine (cmpfname) */
+/* end subroutine (vcmpfname) */
 
-static int cmpkey(kf_key **e1pp,kf_key **e2pp) noex {
+static int vcmpkey(kf_key **e1pp,kf_key **e2pp) noex {
 	kf_key		*e1p = *e1pp ;
 	kf_key		*e2p = *e2pp ;
 	int		rc = 0 ;
 	if (e1p || e2p) {
 	    if (e1p) {
 	        if (e2p) {
-	            rc = strcmp((*e1pp)->kname,(*e2pp)->kname) ;
+	            rc = strcmp(e1p->kname,e2p->kname) ;
 	        } else {
 	            rc = -1 ;
 		}
@@ -1024,7 +1016,7 @@ static int cmpkey(kf_key **e1pp,kf_key **e2pp) noex {
 	}
 	return rc ;
 }
-/* end subroutine (cmpkey) */
+/* end subroutine (vcmpkey) */
 
 static int cmpkeyval(kf_ent *e1p,kf_ent *e2p,int) noex {
 	int		rc ;

@@ -39,37 +39,37 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename T>
-extern int ctroman(char *,int,T) noex {
+inline int ctroman(char *,int,T) noex {
 	return SR_NOSYS ;
 }
 
 template<>
-extern int ctroman(char *dp,int dl,int v) noex {
+inline int ctroman(char *dp,int dl,int v) noex {
 	return ctromani(dp,dl,v) ;
 }
 
 template<>
-extern int ctroman(char *dp,int dl,long v) noex {
+inline int ctroman(char *dp,int dl,long v) noex {
 	return ctromanl(dp,dl,v) ;
 }
 
 template<>
-extern int ctroman(char *dp,int dl,longlong v) noex {
+inline int ctroman(char *dp,int dl,longlong v) noex {
 	return ctromanll(dp,dl,v) ;
 }
 
 template<>
-extern int ctroman(char *dp,int dl,uint v) noex {
+inline int ctroman(char *dp,int dl,uint v) noex {
 	return ctromanui(dp,dl,v) ;
 }
 
 template<>
-extern int ctroman(char *dp,int dl,ulong v) noex {
+inline int ctroman(char *dp,int dl,ulong v) noex {
 	return ctromanul(dp,dl,v) ;
 }
 
 template<>
-extern int ctroman(char *dp,int dl,ulonglong v) noex {
+inline int ctroman(char *dp,int dl,ulonglong v) noex {
 	return ctromanull(dp,dl,v) ;
 }
 

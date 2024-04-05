@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-static inline int cfxxx(cchar *sp,int sl,int *rp) noex {
+inline int cfxxx(cchar *sp,int sl,int *rp) noex {
 	return cfxxxi(sp,sl,rp) ;
 }
-static inline int cfxxx(cchar *sp,int sl,long *rp) noex {
+inline int cfxxx(cchar *sp,int sl,long *rp) noex {
 	return cfxxxl(sp,sl,rp) ;
 }
-static inline int cfxxx(cchar *sp,int sl,longlong *rp) noex {
+inline int cfxxx(cchar *sp,int sl,longlong *rp) noex {
 	return cfxxxll(sp,sl,rp) ;
 }
 
-static inline int cfxxx(cchar *sp,int sl,uint *rp) noex {
+inline int cfxxx(cchar *sp,int sl,uint *rp) noex {
 	return cfxxxui(sp,sl,rp) ;
 }
-static inline int cfxxx(cchar *sp,int sl,ulong *rp) noex {
+inline int cfxxx(cchar *sp,int sl,ulong *rp) noex {
 	return cfxxxul(sp,sl,rp) ;
 }
-static inline int cfxxx(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfxxx(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfxxxull(sp,sl,rp) ;
 }
 

@@ -135,8 +135,8 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	msleep(int) ;
 extern int	findfilepath(cchar *,char *,cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
+extern int	sperm(IDS *,USTAT *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecpstr_adduniq(vecpstr *,cchar *,int) ;
 extern int	getnprocessors(cchar **,int) ;
@@ -150,15 +150,15 @@ extern int	isNotAccess(int) ;
 extern int	isFailOpen(int) ;
 extern int	isStrEmpty(cchar *,int) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
@@ -208,10 +208,10 @@ struct locinfo {
 	PTM		ofm ;			/* mutex file-output */
 	PROGINFO	*pip ;
 	void		*ofp ;
-	const char	*jobdname ;		/* tmp-user directory */
-	const char	*suffix_from ;
-	const char	*suffix_to ;
-	const char	*prog_cpp ;
+	cchar	*jobdname ;		/* tmp-user directory */
+	cchar	*suffix_from ;
+	cchar	*suffix_to ;
+	cchar	*prog_cpp ;
 	pthread_t	tid ;
 	uid_t		uid_pr ;
 	gid_t		gid_pr ;
@@ -256,8 +256,8 @@ struct lstate {
 } ;
 
 struct cpperr {
-	const char	*fname ;
-	const char	*ifname ;
+	cchar	*fname ;
+	cchar	*ifname ;
 	int		line ;
 } ;
 
@@ -269,11 +269,11 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procsubprog(PROGINFO *,const char *) ;
-static int	proctouchfile(PROGINFO *,const char *) ;
+static int	procsubprog(PROGINFO *,cchar *) ;
+static int	proctouchfile(PROGINFO *,cchar *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,DISP *) ;
 static int	procargfile(PROGINFO *,DISP *,cchar *) ;
-static int	procfiler(PROGINFO *,const char *) ;
+static int	procfiler(PROGINFO *,cchar *) ;
 static int	procfilerdeps(PROGINFO *,cchar *,time_t) ;
 static int	procfilerfinds(PROGINFO *,cchar *,time_t) ;
 static int	procfilefind(PROGINFO *,cchar *,time_t,cchar *) ;
@@ -283,37 +283,37 @@ static int	proceprintf(PROGINFO *,cchar *,...) ;
 
 static int procdeps_check(PROGINFO *,char *,time_t,cchar *) ;
 static int procdeps_checker(PROGINFO *,char *,time_t,vecpstr *,cchar *) ;
-static int procdeps_get(PROGINFO *,vecpstr *,VECOBJ *,const char *) ;
+static int procdeps_get(PROGINFO *,vecpstr *,VECOBJ *,cchar *) ;
 static int procdeps_loadargs(PROGINFO *,vecstr *,cchar *) ;
 static int procdeps_incargs(PROGINFO *,vecstr *) ;
 static int proclines(PROGINFO *,vecpstr *,int) ;
 static int procline(PROGINFO *,vecpstr *,LSTATE *,cchar *,int) ;
 static int procerr(PROGINFO *,VECOBJ *,int) ;
-static int procerrline(PROGINFO *,VECOBJ *,const char *,int) ;
+static int procerrline(PROGINFO *,VECOBJ *,cchar *,int) ;
 
 static int	procout_begin(PROGINFO *,void *,cchar *) ;
 static int	procout_end(PROGINFO *) ;
 static int	procout_printf(PROGINFO *,cchar *,...) ;
 
-static int	locinfo_start(LOCINFO *,PROGINFO *) ;
-static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_jobdname(LOCINFO *) ;
-static int	locinfo_tmpcheck(LOCINFO *) ;
-static int	locinfo_tmpmaint(LOCINFO *) ;
-static int	locinfo_tmpdone(LOCINFO *) ;
-static int	locinfo_fchmodown(LOCINFO *,int,struct ustat *,mode_t) ;
-static int	locinfo_loadprids(LOCINFO *) ;
-static int	locinfo_alreadybegin(LOCINFO *) ;
-static int	locinfo_alreadyend(LOCINFO *) ;
-static int	locinfo_alreadystat(LOCINFO *) ;
-static int	locinfo_incdirs(LOCINFO *) ;
-static int	locinfo_incadds(LOCINFO *,cchar *,int) ;
-static int	locinfo_alreadylookup(LOCINFO *,cchar *,int,time_t *) ;
+static int	locinfo_start(LOCINFO *,PROGINFO *) noex ;
+static int	locinfo_finish(LOCINFO *) noex ;
+static int	locinfo_jobdname(LOCINFO *) noex ;
+static int	locinfo_tmpcheck(LOCINFO *) noex ;
+static int	locinfo_tmpmaint(LOCINFO *) noex ;
+static int	locinfo_tmpdone(LOCINFO *) noex ;
+static int	locinfo_fchmodown(LOCINFO *,int,USTAT *,mode_t) noex ;
+static int	locinfo_loadprids(LOCINFO *) noex ;
+static int	locinfo_alreadybegin(LOCINFO *) noex ;
+static int	locinfo_alreadyend(LOCINFO *) noex ;
+static int	locinfo_alreadystat(LOCINFO *) noex ;
+static int	locinfo_incdirs(LOCINFO *) noex ;
+static int	locinfo_incadds(LOCINFO *,cchar *,int) noex ;
+static int	locinfo_alreadylookup(LOCINFO *,cchar *,int,time_t *) noex ;
 
-static int	locinfo_incbegin(LOCINFO *,LOCINFO_CUR *) ;
-static int	locinfo_incenum(LOCINFO *,LOCINFO_CUR *,char *,int) ;
-static int	locinfo_incend(LOCINFO *,LOCINFO_CUR *) ;
-static int	locinfo_ncpu(LOCINFO *) ;
+static int	locinfo_incbegin(LOCINFO *,LOCINFO_CUR *) noex ;
+static int	locinfo_incenum(LOCINFO *,LOCINFO_CUR *,char *,int) noex ;
+static int	locinfo_incend(LOCINFO *,LOCINFO_CUR *) noex ;
+static int	locinfo_ncpu(LOCINFO *) noex ;
 
 #if	CF_LOCSETENT
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
@@ -337,8 +337,8 @@ static int	disp_readywait(DISP *) ;
 static int	disp_abort(DISP *) ;
 #endif
 
-static int cpperr_start(CPPERR *,int,const char *,int) ;
-static int cpperr_ifname(CPPERR *,const char *,int) ;
+static int cpperr_start(CPPERR *,int,cchar *,int) ;
+static int cpperr_ifname(CPPERR *,cchar *,int) ;
 static int cpperr_finish(CPPERR *) ;
 
 #if	CF_DEBUG && CF_DEBUGENV
@@ -368,7 +368,7 @@ enum argopts {
 	argopt_overlast
 } ;
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"VERBOSE",
@@ -416,7 +416,7 @@ enum aknames {
 	akname_overlast
 } ;
 
-static const char	*aknames[] = {
+static cchar	*aknames[] = {
 	"cache",
 	"cpp",
 	"npar",
@@ -426,17 +426,17 @@ static const char	*aknames[] = {
 	NULL
 } ;
 
-static const char	*progcpps[] = {
+static cchar	*progcpps[] = {
 	"/usr/ccs/lib/cpp",
 	"/usr/lib/cpp",
 	"/usr/add-on/ncmp/bin/cpp",
 	NULL
 } ;
 
-static const char	errsub1[] = ", line " ;
-static const char	errsub2[] = ": Can't find include file " ;
+static cchar	errsub1[] = ", line " ;
+static cchar	errsub2[] = ": Can't find include file " ;
 
-static const char	*deps[] = {
+static cchar	*deps[] = {
 	"c",
 	"cc",
 	"h",
@@ -496,20 +496,20 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	int		rs, rs1 ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
-	int		f_version = FALSE ;
+	int		f_usage = false ;
+	int		f_help = false ;
+	int		f_version = false ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*touchfname = NULL ;
-	const char	*progcpp = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*touchfname = NULL ;
+	cchar	*progcpp = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -566,7 +566,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int	ach = MKCHAR(argp[1]) ;
+	        cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -582,9 +582,9 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -602,7 +602,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -619,7 +619,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -628,7 +628,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -639,7 +639,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* temporary directory */
 	                case argopt_tmpdir:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pip->tmpdname = avp ;
 	                    } else {
@@ -656,13 +656,13 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* help */
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -680,7 +680,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* argument file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -698,7 +698,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -716,7 +716,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* output file */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -733,7 +733,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 	                case argopt_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            cp = avp ;
 	                    } else {
@@ -751,7 +751,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* CPP program */
 	                case argopt_cpp:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            progcpp = avp ;
 	                    } else {
@@ -768,7 +768,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 /* job directory */
 	                case argopt_jd:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            lip->jobdname = avp ;
 	                    } else {
@@ -794,14 +794,14 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -823,7 +823,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* quiet */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 	                    case 'R':
@@ -838,7 +838,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                        break ;
 
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* options */
@@ -857,16 +857,16 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* no-change */
 	                    case 'n':
-	                        lip->f.nochange = TRUE ;
+	                        lip->f.nochange = true ;
 	                        break ;
 
 /* print something !! */
 	                    case 'p':
-	                        lip->f.print = TRUE ;
+	                        lip->f.print = true ;
 	                        break ;
 
 	                    case 'r':
-	                        lip->f.remote = TRUE ;
+	                        lip->f.remote = true ;
 	                        break ;
 
 /* touch file */
@@ -885,7 +885,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -895,9 +895,9 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 
 /* zero files (are OK) */
 	                    case 'z':
-	                        lip->f.zero = TRUE ;
+	                        lip->f.zero = true ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optbool(avp,avl) ;
 	                                lip->f.zero = (rs > 0) ;
@@ -906,7 +906,7 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -939,8 +939,8 @@ static int mainsub(int argc,mainv argv,mainv envv,void *contextp) noex {
 	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1240,13 +1240,13 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -1292,8 +1292,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_NOTOPEN ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -1345,7 +1345,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1366,8 +1366,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                switch (ki) {
 	                case akname_cache:
 	                    if (! lip->final.cache) {
-	                        lip->have.cache = TRUE ;
-	                        lip->f.cache = TRUE ;
+	                        lip->have.cache = true ;
+	                        lip->f.cache = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.cache = (rs > 0) ;
@@ -1383,7 +1383,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                case akname_npar:
 	                case akname_par:
 	                    if (! lip->final.optpar) {
-	                        lip->have.optpar = TRUE ;
+	                        lip->have.optpar = true ;
 	                        if (vl > 0) {
 	                            rs = optvalue(vp,vl) ;
 	                            lip->npar = rs ;
@@ -1392,8 +1392,8 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akname_debug:
 	                    if (! lip->final.optdebug) {
-	                        lip->have.optdebug = TRUE ;
-	                        lip->f.optdebug = TRUE ;
+	                        lip->have.optdebug = true ;
+	                        lip->f.optdebug = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.optdebug = (rs > 0) ;
@@ -1402,9 +1402,9 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case akname_maint:
 	                    if (! lip->final.maint) {
-	                        lip->have.maint = TRUE ;
-	                        lip->f.maint = TRUE ;
-	                        lip->f.zero = TRUE ;
+	                        lip->have.maint = true ;
+	                        lip->f.maint = true ;
+	                        lip->f.zero = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.maint = (rs > 0) ;
@@ -1436,8 +1436,8 @@ static int procsubprog(PROGINFO *pip,cchar *progcpp)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
-	const char	*cp ;
-	const char	**vpp = &lip->prog_cpp ;
+	cchar	*cp ;
+	cchar	**vpp = &lip->prog_cpp ;
 
 	if (progcpp != NULL) {
 	    rs = locinfo_setentry(lip,vpp,progcpp,-1) ;
@@ -1451,7 +1451,7 @@ static int procsubprog(PROGINFO *pip,cchar *progcpp)
 
 	if ((rs >= 0) && (lip->prog_cpp == NULL)) {
 	    int		sl = -1 ;
-	    const char	*sp = CPPFNAME ;
+	    cchar	*sp = CPPFNAME ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 
 #if	CF_DEBUG
@@ -1510,7 +1510,7 @@ static int proctouchfile(PROGINFO *pip,cchar *touchfname)
 {
 	bfile		touchfile ;
 	int		rs = SR_OK ;
-	int		f_write = FALSE ;
+	int		f_write = false ;
 	char		timebuf[TIMEBUFLEN + 1] ;
 
 	if (pip == NULL) return SR_FAULT ;
@@ -1523,7 +1523,7 @@ static int proctouchfile(PROGINFO *pip,cchar *touchfname)
 	rs = bopen(&touchfile,touchfname,"w",0666) ;
 
 	if (isNotPresent(rs)) {
-	    f_write = TRUE ;
+	    f_write = true ;
 	    rs = bopen(&touchfile,touchfname,"wct",0666) ;
 	}
 
@@ -1553,7 +1553,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,DISP *dop)
 	int		ai ;
 	int		pan = 0 ;
 	int		f ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (pip == NULL) return SR_FAULT ;
 
@@ -1598,10 +1598,10 @@ static int procargfile(PROGINFO *pip,DISP *dop,cchar *afn)
 	    if (afn[0] == '-') afn = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afn,"r",0666)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        int		cl ;
-	        const char	*cp ;
+	        cchar	*cp ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1678,7 +1678,7 @@ static int procfiler(PROGINFO *pip,cchar *name)
 {
 	USTAT		sb ;
 	int		rs ;
-	int		f_remove = FALSE ;
+	int		f_remove = false ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 
@@ -1697,10 +1697,10 @@ static int procfiler(PROGINFO *pip,cchar *name)
 	    if (S_ISREG(sb.st_mode)) {
 	        const time_t	mo = sb.st_mtime ;
 		if ((rs = procfilerdeps(pip,name,mo)) > 0) {
-		    f_remove = TRUE ;
+		    f_remove = true ;
 		} else if (rs == 0) {
 	            if ((rs = procfilerfinds(pip,name,mo)) > 0) {
-	                f_remove = TRUE ;
+	                f_remove = true ;
 	            }
 	        } /* end if (procfilerdeps) */
 	    } /* end if (regular file) */
@@ -1728,7 +1728,7 @@ static int procfilerdeps(PROGINFO *pip,cchar *name,time_t mo)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		i ;
-	int		f_done = FALSE ;
+	int		f_done = false ;
 	for (i = 0 ; deps[i] != NULL ; i += 1) {
 	    cchar	*dep = deps[i] ;
 	    char	dbuf[MAXPATHLEN+1] ;
@@ -1737,7 +1737,7 @@ static int procfilerdeps(PROGINFO *pip,cchar *name,time_t mo)
 	        if ((rs = u_stat(dbuf,&sb)) >= 0) {
 	            const time_t 	mc = sb.st_mtime ;
 	            if (mc > mo) {
-	                f_done = TRUE ;
+	                f_done = true ;
 	                if (! lip->f.nochange) rs = u_unlink(name) ;
 	                if (rs >= 0) {
 	                    rs = procfiletell(pip,dbuf,name) ;
@@ -1763,7 +1763,7 @@ static int procfilerfinds(PROGINFO *pip,cchar *name,time_t mo)
 {
 	int		rs = SR_OK ;
 	int		i ;
-	int		f_done = FALSE ;
+	int		f_done = false ;
 	for (i = 0 ; deps[i] != NULL ; i += 1) {
 	    cchar	*dep = deps[i] ;
 	    char	dbuf[MAXPATHLEN+1] ;
@@ -1772,7 +1772,7 @@ static int procfilerfinds(PROGINFO *pip,cchar *name,time_t mo)
 	            USTAT	sb ;
 	            if ((rs = u_stat(dbuf,&sb)) >= 0) {
 		        if ((rs = procfilefind(pip,name,mo,dbuf)) > 0) {
-			    f_done = TRUE ;
+			    f_done = true ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
 	    debugprintf("procfilerfinds: mid2 rs=%d\n",rs) ;
@@ -1799,7 +1799,7 @@ static int procfilefind(PROGINFO *pip,cchar *name,time_t mo,cchar *dbuf)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
-	int		f_remove = FALSE ;
+	int		f_remove = false ;
 	char		obuf[MAXPATHLEN+1] ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1807,7 +1807,7 @@ static int procfilefind(PROGINFO *pip,cchar *name,time_t mo,cchar *dbuf)
 #endif 
 	if ((rs = procdeps_check(pip,obuf,mo,dbuf)) > 0) {
 	    cchar	*dname = dbuf ;
-	    f_remove = TRUE ;
+	    f_remove = true ;
 	    if (! lip->f.nochange) rs = u_unlink(name) ;
 	    if (rs >= 0) {
 	        if (obuf[0] != '\0') {
@@ -1855,11 +1855,11 @@ static int procfiletell(PROGINFO *pip,cchar *dbuf,cchar *name)
 static int procdeps_check(PROGINFO *pip,char *rbuf,time_t mo,cchar *dname)
 {
 	vecpstr		deps ;
-	const int	cs = LINEBUFLEN ;
-	const int	vo = 0 ;
+	cint	cs = LINEBUFLEN ;
+	cint	vo = 0 ;
 	int		rs ;
 	int		rs1 ;
-	int		f_remove = FALSE ;
+	int		f_remove = false ;
 	cchar		*pn = pip->progname ;
 
 #if	CF_DEBUG
@@ -1877,7 +1877,7 @@ static int procdeps_check(PROGINFO *pip,char *rbuf,time_t mo,cchar *dname)
 
 	if ((rs = vecpstr_start(&deps,NDEPS,cs,vo)) >= 0) {
 	    if ((rs = procdeps_checker(pip,rbuf,mo,&deps,dname)) > 0) {
-	        f_remove = TRUE ;
+	        f_remove = true ;
 	    }
 	    rs1 = vecpstr_finish(&deps) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1903,10 +1903,10 @@ static int procdeps_checker(PROGINFO *pip,char *rbuf,time_t mo,
 {
 	LOCINFO		*lip = pip->lip ;
 	VECOBJ		errs ;
-	const int	size = sizeof(CPPERR) ;
+	cint	size = sizeof(CPPERR) ;
 	int		rs ;
 	int		rs1 ;
-	int		f_remove = FALSE ;
+	int		f_remove = false ;
 	cchar		*pn = pip->progname ;
 	cchar		*fmt ;
 #if	CF_DEBUG
@@ -1963,7 +1963,7 @@ static int procdeps_checker(PROGINFO *pip,char *rbuf,time_t mo,
 					"remove\n") ;
 #endif
 	                    if (rbuf != NULL) mkpath1(rbuf,cp) ;
-	                    f_remove = TRUE ;
+	                    f_remove = true ;
 	                    break ;
 	                } else if (isNotPresent(rs)) {
 	                    rs = SR_OK ;
@@ -2007,7 +2007,7 @@ static int procdeps_checker(PROGINFO *pip,char *rbuf,time_t mo,
 static int procdeps_get(PROGINFO *pip,vecpstr *dp,VECOBJ *errp,cchar *fname)
 {
 	LOCINFO		*lip = pip->lip ;
-	const mode_t	operms = 0664 ;
+	cmode	operms = 0664 ;
 	int		rs ;
 	int		rs1 ;
 	int		oflags ;
@@ -2026,14 +2026,14 @@ static int procdeps_get(PROGINFO *pip,vecpstr *dp,VECOBJ *errp,cchar *fname)
 
 	oflags = O_RDWR ;
 	if ((rs = opentmpfile(tbuf,oflags,operms,efname)) >= 0) {
-	    const int	efd = rs ;
+	    cint	efd = rs ;
 	    if (efname[0] != '\0') {
 	        rs = u_unlink(efname) ;
 	        efname[0] = '\0' ;
 	    }
 	    if (rs >= 0) {
 	        VECSTR		args ;
-	        const int	vo = VECSTR_OCOMPACT ;
+	        cint	vo = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(&args,10,vo)) >= 0) {
 	            if ((rs = procdeps_loadargs(pip,&args,fname)) >= 0) {
 	                cchar	**av ;
@@ -2057,8 +2057,8 @@ static int procdeps_get(PROGINFO *pip,vecpstr *dp,VECOBJ *errp,cchar *fname)
 	                    psa.fd[2] = efd ;
 	                    if ((rs = spawnproc(&psa,pf,av,ev)) >= 0) {
 	                        const pid_t	pid = rs ;
-	                        const int	w = WUNTRACED ;
-	                        const int	ofd = psa.fd[1] ;
+	                        cint	w = WUNTRACED ;
+	                        cint	ofd = psa.fd[1] ;
 				int		cstat ;
 #if	CF_DEBUG
 	                        if (DEBUGLEVEL(5)) {
@@ -2130,7 +2130,7 @@ static int procdeps_loadargs(PROGINFO *pip,vecstr *alp,cchar *fn)
 
 static int procdeps_incargs(PROGINFO *pip,vecstr *alp)
 {
-	const int	alen = (MAXNAMELEN+MAXPATHLEN) ;
+	cint	alen = (MAXNAMELEN+MAXPATHLEN) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -2171,7 +2171,7 @@ static int procdeps_incargs(PROGINFO *pip,vecstr *alp)
 static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 {
 	FILEBUF		buf ;
-	const int	to = pip->to_read ;
+	cint	to = pip->to_read ;
 	int		rs ;
 	int		rs1 ;
 	int		tlen = 0 ;
@@ -2179,7 +2179,7 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    struct ustat	sb ;
+	    USTAT	sb ;
 	    int	rs1 ;
 #if	CF_TESTSLEEP
 	    sleep(5) ;
@@ -2194,7 +2194,7 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 
 	if ((rs = filebuf_start(&buf,fd,0L,FBUFLEN,0)) >= 0) {
 	    LSTATE	ls ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
@@ -2251,15 +2251,15 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 {
 	int		rs = SR_OK ;
 	int		sl, cl ;
-	int		f_continue = FALSE ;
+	int		f_continue = false ;
 	int		c = 0 ;
-	const char	*tp, *sp, *cp ;
+	cchar	*tp, *sp, *cp ;
 
 	if (pip == NULL) return SR_FAULT ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5)) {
-	    const int	f = lsp->f_continue ;
+	    cint	f = lsp->f_continue ;
 	    debugprintf("b_makesafe/procline: ent\n") ;
 	    debugprintf("b_makesafe/procline: l=%t\n",lbuf,len) ;
 	    debugprintf("b_makesafe/procline: f_con=%u\n",f) ;
@@ -2267,7 +2267,7 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 #endif
 
 	if ((len > 1) && (lbuf[len - 1] == CH_BSLASH)) {
-	    f_continue = TRUE ;
+	    f_continue = true ;
 	    len -= 1 ;
 	}
 
@@ -2310,9 +2310,9 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 /* process the error output */
 static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 	FILEBUF		buf ;
-	const int	fsize = FBUFLEN ;
+	cint	fsize = FBUFLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		to = pip->to_read ;
@@ -2325,7 +2325,7 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 
 	if ((rs >= 0) && (sb.st_size > 0)) {
 	    if ((rs = filebuf_start(&buf,fd_err,0L,fsize,0)) >= 0) {
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -2383,15 +2383,15 @@ static int procerrline(PROGINFO *pip,VECOBJ *errp,cchar *lbuf,int len)
 {
 	int		rs = SR_OK ;
 	int		cl, cl1, cl2 ;
-	const char	*cp, *cp1, *cp2 ;
+	cchar	*cp, *cp1, *cp2 ;
 
 	if (pip == NULL) return SR_FAULT ;
 	if ((cl2 = sfsub(lbuf,len,errsub2,&cp2)) >= 0) {
 	    if ((cl1 = sfsub(lbuf,MIN(len,(cp2-lbuf)),errsub1,&cp1)) > 0) {
 	        if ((cl = sfdequote(lbuf,(cp1-lbuf),&cp)) > 0) {
-	            const int	dl = (cp2 - (cp1 + cl1)) ;
+	            cint	dl = (cp2 - (cp1 + cl1)) ;
 		    int		line ;
-	            const char	*dp = (cp1 + cl1) ;
+	            cchar	*dp = (cp1 + cl1) ;
 	            if ((rs = cfdeci(dp,dl,&line)) >= 0) {
 	                CPPERR	e ;
 	                if ((rs = cpperr_start(&e,line,cp,cl)) >= 0) {
@@ -2415,7 +2415,7 @@ static int procerrline(PROGINFO *pip,VECOBJ *errp,cchar *lbuf,int len)
 /* end subroutine (procerrline) */
 
 
-static int procout_begin(PROGINFO *pip,void *ofp,const char *ofn)
+static int procout_begin(PROGINFO *pip,void *ofp,cchar *ofn)
 {
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
@@ -2488,7 +2488,7 @@ static int procout_printf(PROGINFO *pip,cchar *fmt,...)
 static int cpperr_start(CPPERR *ep,int line,cchar *fp,int fl)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (fp == NULL) return SR_FAULT ;
 
@@ -2507,7 +2507,7 @@ static int cpperr_start(CPPERR *ep,int line,cchar *fp,int fl)
 static int cpperr_ifname(CPPERR *ep,cchar *fp,int fl)
 {
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (fp == NULL) return SR_FAULT ;
 
@@ -2559,10 +2559,10 @@ static int disp_start(DISP *dop,DISP_ARGS *wap)
 	dop->nthr = wap->npar ;
 
 	if ((rs = fsi_start(&dop->wq)) >= 0) {
-	    if ((rs = psem_create(&dop->wq_sem,FALSE,0)) >= 0) {
+	    if ((rs = psem_create(&dop->wq_sem,false,0)) >= 0) {
 	        if ((rs = ptm_create(&dop->m,NULL)) >= 0) {
 	            if ((rs = ptc_create(&dop->cond,NULL)) >= 0) {
-	                const int	size = (dop->nthr * sizeof(DISP_THR)) ;
+	                cint	size = (dop->nthr * sizeof(DISP_THR)) ;
 	                void		*p ;
 	                if ((rs = uc_malloc(size,&p)) >= 0) {
 	                    dop->threads = p ;
@@ -2614,7 +2614,7 @@ static int disp_starter(DISP *dop)
 	    uptsub_t	fn = (uptsub_t) disp_worker ;
 	    if ((rs = uptcreate(&tid,NULL,fn,dop)) >= 0) {
 	        dop->threads[i].tid = tid ;
-	        dop->threads[i].f_active = TRUE ;
+	        dop->threads[i].f_active = true ;
 	    }
 #if	CF_DEBUG
 	if (DEBUGLEVEL(2))
@@ -2628,14 +2628,14 @@ static int disp_starter(DISP *dop)
 
 	if (rs < 0) {
 	    int		n = i ;
-	    dop->f_exit = TRUE ;
+	    dop->f_exit = true ;
 	    for (i = 0 ; i < n ; i += 1) {
 	        psem_post(&dop->wq_sem) ;
 	    }
 	    for (i = 0 ; i < n ; i += 1) {
 	        tid = dop->threads[i].tid ;
 	        uptjoin(tid,NULL) ;
-	        dop->threads[i].f_active = FALSE ;
+	        dop->threads[i].f_active = false ;
 	    }
 	} /* end if (failure) */
 
@@ -2664,8 +2664,8 @@ static int disp_finish(DISP *dop,int f_abort)
 	    debugprintf("b_makesafe/disp_finish: ent f_abort=%u\n",f_abort) ;
 #endif
 
-	dop->f_done = TRUE ;		/* exit when no more work */
-	if (f_abort) dop->f_exit = TRUE ;
+	dop->f_done = true ;		/* exit when no more work */
+	if (f_abort) dop->f_exit = true ;
 
 	for (i = 0 ; i < dop->nthr ; i += 1) {
 	    rs1 = psem_post(&dop->wq_sem) ;
@@ -2684,7 +2684,7 @@ static int disp_finish(DISP *dop,int f_abort)
 	    for (i = 0 ; i < dop->nthr ; i += 1) {
 	        dtp = (dop->threads+i) ;
 	        if (dtp->f_active) {
-	            dtp->f_active = FALSE ;
+	            dtp->f_active = false ;
 	            tid = dtp->tid ;
 	            rs1 = uptjoin(tid,&trs) ;
 #if	CF_DEBUG
@@ -2744,7 +2744,7 @@ static int disp_addwork(DISP *dop,cchar *tagbuf,int taglen)
 static int disp_worker(DISP *dop)
 {
 	PROGINFO	*pip = dop->pip ;
-	const int	rlen = MAXPATHLEN ;
+	cint	rlen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -2797,7 +2797,7 @@ static int disp_taskdone(DISP *dop)
 	if ((rs = ptm_lock(mp)) >= 0) {
 	    dop->tasks += 1 ;
 	    if (! dop->f_wakeup) {
-	        dop->f_wakeup = TRUE ;
+	        dop->f_wakeup = true ;
 	        rs = ptc_signal(&dop->cond) ;
 	    }
 	    rs1 = ptm_unlock(mp) ;
@@ -2815,7 +2815,7 @@ static int disp_exiting(DISP *dop)
 	int		i = 0 ;
 	if ((rs = disp_getourthr(dop,&dtp)) >= 0) {
 	    i = rs ;
-	    dtp->f_exiting = TRUE ;
+	    dtp->f_exiting = true ;
 	    rs = ptc_signal(&dop->cond) ;
 	} /* end if (disp_getourthr) */
 	return (rs >= 0) ? i : rs ;
@@ -2828,7 +2828,7 @@ static int disp_allexiting(DISP *dop)
 	DISP_THR	*threads = dop->threads ;
 	int		rs = SR_OK ;
 	int		i ;
-	int		f = TRUE ;
+	int		f = true ;
 	for (i = 0 ; i < dop->nthr ; i += 1) {
 	    f = f && threads[i].f_exiting ;
 	}
@@ -2849,7 +2849,7 @@ static int disp_waiting(DISP *dop)
 	        rs = ptc_wait(&dop->cond,mp) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-	    dop->f_wakeup = FALSE ;
+	    dop->f_wakeup = false ;
 	    rs1 = ptm_unlock(mp) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ptm) */
@@ -2865,7 +2865,7 @@ static int disp_waiting(DISP *dop)
 static int disp_notready(DISP *dop,int *cp)
 {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 #if	CF_DEBUGS
 	debugprintf("b_makesafe/disp_notready: ent f_wakeup=%u\n",
 		dop->f_wakeup) ;
@@ -2881,7 +2881,7 @@ static int disp_notready(DISP *dop,int *cp)
 #if	CF_DEBUGS
 	            debugprintf("b_makesafe/disp_notready: not-allexiting\n") ;
 #endif
-		    f = TRUE ;
+		    f = true ;
 		}
 	    }
 	}
@@ -2901,7 +2901,7 @@ static int disp_getourthr(DISP *dop,DISP_THR **rpp)
 	if ((rs = disp_readywait(dop)) >= 0) {
 	    DISP_THR	*dtp ;
 	    pthread_t	tid = pthread_self() ;
-	    int		f = FALSE ;
+	    int		f = false ;
 	    for (i = 0 ; i < dop->nthr ; i += 1) {
 	        dtp = (dop->threads+i) ;
 	        f = uptequal(dtp->tid,tid) ;
@@ -2926,7 +2926,7 @@ static int disp_readyset(DISP *dop)
 	int		rs1 ;
 	if ((rs = ptm_lock(mp)) >= 0) {
 	    {
-	        dop->f_ready = TRUE ;
+	        dop->f_ready = true ;
 	        rs = ptc_broadcast(&dop->cond) ; /* 0-bit semaphore */
 	    }
 	    rs1 = ptm_unlock(mp) ;
@@ -2955,22 +2955,18 @@ static int disp_readywait(DISP *dop)
 }
 /* end subroutine (disp_readywait) */
 
-
 #if	CF_DISPABORT
-static int disp_abort(DISP *dop)
-{
-	dop->f_exit = TRUE ;
+static int disp_abort(DISP *dop) noex {
+	dop->f_exit = true ;
 	return SR_OK ;
 }
 /* end subroutine (disp_abort) */
 #endif /* CF_DISPABORT */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	int		rs = SR_OK ;
 
-	memset(lip,0,sizeof(LOCINFO)) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->to_tmpfiles = TO_TMPFILES ;
 	lip->f.cache = OPT_CACHE ;
@@ -2978,7 +2974,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	if ((rs = ids_load(&lip->id)) >= 0) {
 	    if ((rs = ptm_create(&lip->efm,NULL)) >= 0) {
 	        if (( rs = dirlist_start(&lip->incs)) >= 0) {
-	            lip->open.incs = TRUE ;
+	            lip->open.incs = true ;
 	            rs = locinfo_alreadybegin(lip) ;
 	            if (rs < 0)
 	                dirlist_finish(&lip->incs) ;
@@ -2994,9 +2990,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
+static int locinfo_finish(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -3024,7 +3018,7 @@ static int locinfo_finish(LOCINFO *lip)
 	}
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -3033,10 +3027,8 @@ static int locinfo_finish(LOCINFO *lip)
 }
 /* end subroutine (locinfo_finish) */
 
-
 #if	CF_LOCSETENT
-static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
-{
+static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl) noex {
 	VECSTR		*slp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -3071,9 +3063,7 @@ static int locinfo_setentry(LOCINFO *lip,cchar **epp,cchar *vp,int vl)
 /* end subroutine (locinfo_setentry) */
 #endif /* CF_LOCSETENT */
 
-
-static int locinfo_jobdname(LOCINFO *lip)
-{
+static int locinfo_jobdname(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs ;
 	if (lip->jobdname == NULL) {
@@ -3090,10 +3080,8 @@ static int locinfo_jobdname(LOCINFO *lip)
 }
 /* end subroutine (locinfo_jobdname) */
 
-
 /* this conditionally spawns an independent thread for maintenance */
-static int locinfo_tmpcheck(LOCINFO *lip)
-{
+static int locinfo_tmpcheck(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 
@@ -3106,7 +3094,7 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 	            if ((rs = uptcreate(&tid,NULL,thr,lip)) >= 0) {
 	                rs = 1 ;
 	                lip->tid = tid ;
-	                lip->f.tmpmaint = TRUE ;
+	                lip->f.tmpmaint = true ;
 	            } /* end if (uptcreate) */
 	        } /* end if (after hours) */
 	    } /* end if (tmtime_localtime) */
@@ -3116,12 +3104,10 @@ static int locinfo_tmpcheck(LOCINFO *lip)
 }
 /* end subroutine (locinfo_tmpcheck) */
 
-
 /* this runs as an independent thread */
-static int locinfo_tmpmaint(LOCINFO *lip)
-{
+static int locinfo_tmpmaint(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
-	const int	to = lip->to_tmpfiles ;
+	cint	to = lip->to_tmpfiles ;
 	int		rs ;
 	int		c = 0 ;
 	int		f_need = lip->f.maint ;
@@ -3129,11 +3115,11 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 	char		tsfname[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath2(tsfname,dname,TSFNAME)) >= 0) {
-	    const mode_t	om = 0666 ;
-	    const int		of = (O_WRONLY|O_CREAT) ;
+	    cmode	om = 0666 ;
+	    cint		of = (O_WRONLY|O_CREAT) ;
 	    if ((rs = u_open(tsfname,of,om)) >= 0) {
 	        USTAT		usb ;
-	        const int	fd = rs ;
+	        cint	fd = rs ;
 	        if ((rs = u_fstat(fd,&usb)) >= 0) {
 	            time_t	dt = pip->daytime ;
 	            if ((rs = locinfo_fchmodown(lip,fd,&usb,om)) >= 0) {
@@ -3163,9 +3149,7 @@ static int locinfo_tmpmaint(LOCINFO *lip)
 }
 /* end subroutine (locinfo_tmpmaint) */
 
-
-static int locinfo_tmpdone(LOCINFO *lip)
-{
+static int locinfo_tmpdone(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->f.tmpmaint) {
@@ -3178,21 +3162,19 @@ static int locinfo_tmpdone(LOCINFO *lip)
 }
 /* end subroutine (locinfo_tmpdone) */
 
-
-static int locinfo_fchmodown(LOCINFO *lip,int fd,struct ustat *sbp,mode_t mm)
-{
+static int locinfo_fchmodown(LOCINFO *lip,int fd,USTAT *sbp,mode_t mm) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((sbp->st_size == 0) && (pip->euid == sbp->st_uid)) {
 	    if ((sbp->st_mode & S_IAMB) != mm) {
 	        if ((rs = locinfo_loadprids(lip)) >= 0) {
 	            if ((rs = uc_fminmod(fd,mm)) >= 0) {
 	                const uid_t	uid_pr = lip->uid_pr ;
 	                const gid_t	gid_pr = lip->gid_pr ;
-	                const int	n = _PC_CHOWN_RESTRICTED ;
+	                cint	n = _PC_CHOWN_RESTRICTED ;
 	                if ((rs = u_fpathconf(fd,n,NULL)) == 0) {
-	                    f = TRUE ;
+	                    f = true ;
 	                    u_fchown(fd,uid_pr,gid_pr) ; /* may fail */
 	                } else if (rs == SR_NOSYS) {
 	                    rs = SR_OK ;
@@ -3205,9 +3187,7 @@ static int locinfo_fchmodown(LOCINFO *lip,int fd,struct ustat *sbp,mode_t mm)
 }
 /* end subroutine (locinfo_fchmodown) */
 
-
-static int locinfo_loadprids(LOCINFO *lip)
-{
+static int locinfo_loadprids(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if (lip->uid_pr < 0) {
@@ -3221,26 +3201,22 @@ static int locinfo_loadprids(LOCINFO *lip)
 }
 /* end subroutine (locinfo_loadprids) */
 
-
-static int locinfo_alreadybegin(LOCINFO *lip)
-{
+static int locinfo_alreadybegin(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (lip->f.cache) {
 	    if ((rs = cachetime_start(&lip->mtdb)) >= 0) {
-	        lip->open.cache = TRUE ;
+	        lip->open.cache = true ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (locinfo_alreadybegin) */
 
-
-static int locinfo_alreadyend(LOCINFO *lip)
-{
+static int locinfo_alreadyend(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (lip->open.cache) {
-	    lip->open.cache = FALSE ;
+	    lip->open.cache = false ;
 	    rs1 = cachetime_finish(&lip->mtdb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -3248,13 +3224,11 @@ static int locinfo_alreadyend(LOCINFO *lip)
 }
 /* end subroutine (locinfo_alreadyend) */
 
-
-static int locinfo_incdirs(LOCINFO *lip)
-{
+static int locinfo_incdirs(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar		*cp ;
 	if ((cp = getourenv(pip->envv,VARINCDIRS)) != NULL) {
 	    rs = dirlist_adds(&lip->incs,cp,-1) ;
 	    c = rs ;
@@ -3263,9 +3237,7 @@ static int locinfo_incdirs(LOCINFO *lip)
 }
 /* end subroutine (locinfo_incdirs) */
 
-
-static int locinfo_incadds(LOCINFO *lip,cchar *sp,int sl)
-{
+static int locinfo_incadds(LOCINFO *lip,cchar *sp,int sl) noex {
 	DIRLIST		*dlp = &lip->incs ;
 	int		rs = SR_OK ;
 
@@ -3279,9 +3251,7 @@ static int locinfo_incadds(LOCINFO *lip,cchar *sp,int sl)
 }
 /* end subroutine (locinfo_incadds) */
 
-
-static int locinfo_alreadystat(LOCINFO *lip)
-{
+static int locinfo_alreadystat(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
 	int		rs = SR_OK ;
 	if ((pip->verboselevel > 0) || (pip->debuglevel > 0)) {
@@ -3308,9 +3278,7 @@ static int locinfo_alreadystat(LOCINFO *lip)
 }
 /* end subroutine (locinfo_alreadystat) */
 
-
-static int locinfo_alreadylookup(LOCINFO *lip,cchar *cp,int cl,time_t *rtp)
-{
+static int locinfo_alreadylookup(LOCINFO *lip,cc *cp,int cl,time_t *rtp) noex {
 	int		rs = SR_OK ;
 	if (lip->open.cache) {
 	    rs = cachetime_lookup(&lip->mtdb,cp,cl,rtp) ;
@@ -3319,9 +3287,7 @@ static int locinfo_alreadylookup(LOCINFO *lip,cchar *cp,int cl,time_t *rtp)
 }
 /* end subroutine (locinfo_alreadylookup) */
 
-
-static int locinfo_incbegin(LOCINFO *lip,LOCINFO_CUR *curp)
-{
+static int locinfo_incbegin(LOCINFO *lip,LOCINFO_CUR *curp) noex {
 	DIRLIST		*dlp = &lip->incs ;
 	DIRLIST_CUR	*dcp = &curp->c ;
 	int		rs ;
@@ -3332,9 +3298,8 @@ static int locinfo_incbegin(LOCINFO *lip,LOCINFO_CUR *curp)
 }
 /* end subroutine (locinfo_incbegin) */
 
-
-static int locinfo_incenum(LOCINFO *lip,LOCINFO_CUR *curp,char *rbuf,int rlen)
-{
+static int locinfo_incenum(LOCINFO *lip,LOCINFO_CUR *curp,
+		char *rbuf,int rlen) noex {
 	DIRLIST		*dlp = &lip->incs ;
 	DIRLIST_CUR	*dcp = &curp->c ;
 	int		rs ;
@@ -3345,9 +3310,7 @@ static int locinfo_incenum(LOCINFO *lip,LOCINFO_CUR *curp,char *rbuf,int rlen)
 }
 /* end subroutine (locinfo_incenum) */
 
-
-static int locinfo_incend(LOCINFO *lip,LOCINFO_CUR *curp)
-{
+static int locinfo_incend(LOCINFO *lip,LOCINFO_CUR *curp) noex {
 	DIRLIST		*dlp = &lip->incs ;
 	DIRLIST_CUR	*dcp = &curp->c ;
 	int		rs ;
@@ -3358,9 +3321,7 @@ static int locinfo_incend(LOCINFO *lip,LOCINFO_CUR *curp)
 }
 /* end subroutine (locinfo_incend) */
 
-
-static int locinfo_ncpu(LOCINFO *lip)
-{
+static int locinfo_ncpu(LOCINFO *lip) noex {
 	int		rs = SR_OK ;
 	if (lip->ncpu == 0) {
 	    PROGINFO	*pip = lip->pip ;
@@ -3392,15 +3353,15 @@ static int debugdumpenv(cchar **envv)
 #if	CF_WRFILE
 static int wrfile(cchar *fn,int rfd)
 {
-	const int	of = (O_WRONLY|O_CREAT) ;
-	const int	to = 30 ;
-	const int	ro = FM_TIMED ;
-	const int	llen = LINEBUFLEN ;
+	cint	of = (O_WRONLY|O_CREAT) ;
+	cint	to = 30 ;
+	cint	ro = FM_TIMED ;
+	cint	llen = LINEBUFLEN ;
 	int		rs ;
 	int		tlen = 0 ;
 	char		lbuf[LINEBUFLEN+1] ;
 	if ((rs = u_open(fn,of,0666)) >= 0) {
-	    const int	wfd = rs ;
+	    cint	wfd = rs ;
 	    while ((rs = uc_reade(rfd,lbuf,llen,to,ro)) > 0) {
 	        tlen += rs ;
 #if	CF_DEBUGS

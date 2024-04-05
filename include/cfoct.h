@@ -39,23 +39,23 @@ EXTERNC_end
 
 #if	__cplusplus
 
-static inline int cfoct(cchar *sp,int sl,int *rp) noex {
+inline int cfoct(cchar *sp,int sl,int *rp) noex {
 	return cfocti(sp,sl,rp) ;
 }
-static inline int cfoct(cchar *sp,int sl,long *rp) noex {
+inline int cfoct(cchar *sp,int sl,long *rp) noex {
 	return cfoctl(sp,sl,rp) ;
 }
-static inline int cfoct(cchar *sp,int sl,longlong *rp) noex {
+inline int cfoct(cchar *sp,int sl,longlong *rp) noex {
 	return cfoctll(sp,sl,rp) ;
 }
 
-static inline int cfoct(cchar *sp,int sl,uint *rp) noex {
+inline int cfoct(cchar *sp,int sl,uint *rp) noex {
 	return cfoctui(sp,sl,rp) ;
 }
-static inline int cfoct(cchar *sp,int sl,ulong *rp) noex {
+inline int cfoct(cchar *sp,int sl,ulong *rp) noex {
 	return cfoctul(sp,sl,rp) ;
 }
-static inline int cfoct(cchar *sp,int sl,ulonglong *rp) noex {
+inline int cfoct(cchar *sp,int sl,ulonglong *rp) noex {
 	return cfoctull(sp,sl,rp) ;
 }
 

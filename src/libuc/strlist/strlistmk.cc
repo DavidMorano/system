@@ -1,5 +1,5 @@
-/* strlistmk */
-/* lang=C20 */
+/* strlistmk SUPPORT */
+/* lang=C++20 */
 
 /* STRLISTMK management */
 /* version %I% last-modified %G% */
@@ -24,14 +24,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<modload.h>

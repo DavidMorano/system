@@ -78,7 +78,7 @@ int mkpathrooted(char *rbuf,cchar *fn) noex {
 	            if ((rs = libmalloc_mp(&pbuf)) >= 0) {
 	                cint	plen = rs ;
 	                if ((rs = getpwd(pbuf,plen)) >= 0) {
-	                    rs = mkpath2(rbuf,pbuf,fn) ;
+	                    rs = mkpath(rbuf,pbuf,fn) ;
 		            rl = rs ;
 	                }
 	                rs1 = uc_libfree(pbuf) ;

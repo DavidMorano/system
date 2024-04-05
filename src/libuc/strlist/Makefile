@@ -1,6 +1,6 @@
-# MAKEFILES (chrono)
+# MAKEFILES (strlist)
 
-T= chrono
+T= strlist
 
 ALL= $(T).o $(T).a
 
@@ -51,19 +51,20 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= chrono.h
+INCS= strlist.h
 
 
-OBJ0_CHRONO= tmstrs.o zdb.o
-OBJ1_CHRONO= date.o
-OBJ2_CHRONO= tmz.o zos.o zoffparts.o
-OBJ3_CHRONO= dater.o tmtime.o
+OBJ0_STRLIST= 
+OBJ1_STRLIST= 
+OBJ2_STRLIST= 
+OBJ3_STRLIST= 
+OBJ4_STRLIST= 
 
 
-OBJA_CHRONO= obj0_chrono.o obj1_chrono.o
-OBJB_CHRONO= obj2_chrono.o obj3_chrono.o
+OBJA_STRLIST= obj0_strlist.o obj1_strlist.o
+OBJB_STRLIST= obj2_strlist.o obj3_strlist.o obj4_strlist.o
 
-OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
+OBJ_STRLIST= $(OBJA_STRLIST) $(OBJB_STRLIST)
 
 
 default:		$(T).o
@@ -86,10 +87,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_CHRONO)
+$(T).o:			$(OBJ_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_STRLIST)
 
-$(T).a:			$(OBJ_CHRONO)
+$(T).a:			$(OBJ_STRLIST)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,26 +110,20 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_chrono.o:	$(OBJ0_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CHRONO)
+obj0_strlist.o:	$(OBJ0_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_STRLIST)
 
-obj1_chrono.o:	$(OBJ1_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CHRONO)
+obj1_strlist.o:	$(OBJ1_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_STRLIST)
 
-obj2_chrono.o:	$(OBJ2_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CHRONO)
+obj2_strlist.o:	$(OBJ2_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_STRLIST)
 
-obj3_chrono.o:	$(OBJ3_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CHRONO)
+obj3_strlist.o:	$(OBJ3_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_STRLIST)
 
+obj4_strlist.o:	$(OBJ4_STRLIST)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_STRLIST)
 
-date.o:			date.cc	date.h $(INCS)
-dater.o:		dater.cc dater.h $(INCS)
-tmstrs.o:		tmstrs.cc tmstrs.h $(INCS)
-tmtime.o:		tmtime.cc tmtime.h $(INCS)
-tmz.o:			tmz.cc tmz.h $(INCS)
-zdb.o:			zdb.cc zdb.h $(INCS)
-zos.o:			zos.cc zos.h $(INCS)
-zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
 
 

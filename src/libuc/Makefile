@@ -1124,6 +1124,11 @@ timestr.o:		timestr.dir
 timestr.dir:
 	makesubdir $@
 
+# STRLIST
+strlist.o:		strlist.dir
+strlist.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1188,6 +1193,8 @@ mailmsg.o:		mailmsg.cc	mailmsg.h
 ccfile.o:		ccfile.cc	ccfile.hh
 thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
+pwentry.o:		pwentry.cc	pwentry.h
+pwfile.o:		pwfile.cc	pwfile.h
 
 
 # sring-comparisons
@@ -1205,13 +1212,13 @@ pathadd.o:		pathadd.cc pathadd.h
 pathclean.o:		pathclean.cc pathclean.h
 
 # UTILITY
+strtabfind.o:		strtabfind.cc strtabfind.h
 findbit.o:		findbit.cc findbit.h
 termtypemat.o:		termtypemat.cc termtypemat.h
 termcmd.o:		termcmd.cc termcmd.h
 matparam.o:		matparam.cc matparam.h
 typenonpath.o:		typenonpath.cc typenonpath.h
 endian.o:		endian.cc endian.h
-pwentry.o:		pwentry.cc pwentry.h
 getpwetry.o:		getpwentry.cc getpwentry.h pwentry.h
 intsat.o:		intsat.cc intsat.h
 intfloor.o:		intfloor.cc intfloor.h

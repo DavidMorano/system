@@ -41,6 +41,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local structures */
 
 
@@ -52,71 +55,72 @@
 constexpr int	b = OURBASE ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int cthexc(char *dp,int dl,int val) noex {
-	uint		uv = val ;
-	const int	n = sizeof(char) ;
+	uint		uv = uint(val) ;
+	cint		n = sizeof(char) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexc) */
 
 int cthexs(char *dp,int dl,int val) noex {
-	uint		uv = val ;
-	const int	n = sizeof(short) ;
+	uint		uv = uint(val) ;
+	cint		n = sizeof(short) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexs) */
 
 int cthexi(char *dp,int dl,int val) noex {
-	uint		uv = val ;
-	const int	n = sizeof(int) ;
+	uint		uv = uint(val) ;
+	cint		n = sizeof(int) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexi) */
 
 int cthexl(char *dp,int dl,long val) noex {
-	ulong		uv = val ;
-	const int	n = sizeof(long) ;
+	ulong		uv = ulong(val) ;
+	cint		n = sizeof(long) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexl) */
 
 int cthexll(char *dp,int dl,longlong val) noex {
-	ulonglong	uv = val ;
-	const int	n = sizeof(longlong) ;
+	ulonglong	uv = ulonglong(val) ;
+	cint		n = sizeof(longlong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexll) */
 
-int cthexuc(char *dp,int dl,uint val) noex {
-	uint		uv = val ;
-	const int	n = sizeof(uchar) ;
+int cthexuc(char *dp,int dl,uint uv) noex {
+	cint		n = sizeof(uchar) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexuc) */
 
-int cthexus(char *dp,int dl,uint val) noex {
-	uint		uv = val ;
-	const int	n = sizeof(ushort) ;
+int cthexus(char *dp,int dl,uint uv) noex {
+	cint		n = sizeof(ushort) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexus) */
 
 int cthexui(char *dp,int dl,uint uv) noex {
-	const int	n = sizeof(uint) ;
+	cint		n = sizeof(uint) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexui) */
 
 int cthexul(char *dp,int dl,ulong uv) noex {
-	const int	n = sizeof(ulong) ;
+	cint		n = sizeof(ulong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexul) */
 
 int cthexull(char *dp,int dl,ulonglong uv) noex {
-	const int	n = sizeof(ulonglong) ;
+	cint		n = sizeof(ulonglong) ;
 	return cvtdig(dp,dl,uv,n,b) ;
 }
 /* end subroutine (cthexull) */
