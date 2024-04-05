@@ -8,10 +8,10 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<grp.h>
-
 #include	<filemap.h>
 #include	<localmisc.h>
 
@@ -24,8 +24,8 @@
 
 
 struct sysgroups_head {
+	filemap		b ;
 	uint		magic ;
-	FILEMAP		b ;
 } ;
 
 
