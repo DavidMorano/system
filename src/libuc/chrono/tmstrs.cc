@@ -23,11 +23,11 @@
 	Note on year calculations for MSG-type year strings:
 
 	RFC2822 says that all three digit years should be interpreted
-	as being added to 2000 to get the actual year. This would
+	as being added to 2000 to get the actual year.  This would
 	seem to be an unfortunate choice since the only way that
 	three digit years were ever used was due to buggy software
 	from the Y2K problem (the year 2000 was represented as 100
-	in some time-date software). Therefore a better interpretation
+	in some time-date software).  Therefore a better interpretation
 	of three digit years would have been to add it to 1900 in
 	order to get the actual year, but who are we, just dumb
 	software designers that make the world work! See the
@@ -38,7 +38,7 @@
 	get the actual year, while two digit years greater than
 	about that should be added to 1900 to get the actual year.
 	Prior practice in UNIX® was to use the year 69 or 70 for
-	this purpose. Better compatibility is probably achieved
+	this purpose.  Better compatibility is probably achieved
 	using 69, but we go with 70 for avant-gauard reasons!
 
 *******************************************************************************/

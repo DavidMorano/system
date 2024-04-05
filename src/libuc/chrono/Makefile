@@ -56,7 +56,7 @@ INCS= chrono.h
 
 OBJ0_CHRONO= tmstrs.o zdb.o
 OBJ1_CHRONO= date.o
-OBJ2_CHRONO= tmz.o zos.o
+OBJ2_CHRONO= tmz.o zos.o zoffparts.o
 OBJ3_CHRONO= dater.o tmtime.o
 
 
@@ -129,5 +129,6 @@ tmtime.o:		tmtime.cc tmtime.h $(INCS)
 tmz.o:			tmz.cc tmz.h $(INCS)
 zdb.o:			zdb.cc zdb.h $(INCS)
 zos.o:			zos.cc zos.h $(INCS)
+zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
 
 

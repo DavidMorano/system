@@ -175,7 +175,7 @@ static int entry_update(LZ_ENT *,cchar *) noex ;
 static int entry_write(LZ_ENT *,char *,int) noex ;
 static int entry_finish(LZ_ENT *) noex ;
 
-static bool	haveoffset(int) noex ;
+static bool	hasoffset(int) noex ;
 static bool	fieldmatch(cchar *,cchar *,int,int) noex ;
 
 
@@ -606,7 +606,7 @@ static int logzones_search(LZ *op,char *ebp,int ebl,int soff,char **rpp) noex {
 	            f = f && fieldmatch(bp,ebp,EFO_NAME,EFL_NAME) ;
 		    f = f && fieldmatch(bp,ebp,(efo+ 1),(efl- 1)) ;
 		    if (f) {
-	                if ((! haveoffset(soff)) || (soff == 0)) break ;
+	                if ((! hasoffset(soff)) || (soff == 0)) break ;
 	                if ((soff > 0) && (bp[efo] == '-')) break ;
 	                if ((soff < 0) && (bp[efo] != '-')) break ;
 	            } /* end if */
@@ -661,7 +661,6 @@ static int logzones_enteropen(LZ *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	if (op->fd < 0) {
 	    if (dt == 0) dt = time(nullptr) ;
-	    dt = time(nullptr) ;
 	    rs = logzones_fileopen(op,dt) ;
 	} /* end if (valid) */
 	return rs ;
@@ -713,10 +712,10 @@ static int entry_startbuf(LZ_ENT *ep,cchar *ebuf,int elen) noex {
 	                    if (! isdigitlatin(ch)) break ;
 	                } /* end for */
 	                if (i >= 4) {
-	                    hours = (((int) *bp++) - '0') * 10 ;
-	                    hours += (((int) *bp++) - '0') ;
-	                    mins = (((int) *bp++) - '0') * 10 ;
-	                    mins += (((int) *bp++) - '0') ;
+	                    hours = (mkchar(*bp++) - '0') * 10 ;
+	                    hours += (mkchar(*bp++) - '0') ;
+	                    mins = (mkchar(*bp++) - '0') * 10 ;
+	                    mins += (mkchar(*bp++) - '0') ;
 	                    ep->off = sign * ((hours * 60) + mins) ;
 	                } else {
 	                    ep->off = LOGZONES_NOZONEOFFSET ;
@@ -783,8 +782,8 @@ static int entry_write(LZ_ENT *ep,char *ebuf,int elen) noex {
 		}
 	        *bp++ = ' ' ;
 /* write out the zone offset (field len=EFL_OFFSET) */
-	        if (haveoffset(ep->off)) {
-	            int		v = abs(ep->off) ;
+	        if (hasoffset(ep->off)) {
+	            cint	v = abs(ep->off) ;
 	            int		hours, mins ;
 	            *bp++ = (ep->off >= 0) ? '-' : '+' ;
 	            hours = v / 60 ;
@@ -823,10 +822,10 @@ static int entry_finish(LZ_ENT *ep) noex {
 }
 /* end subroutine (entry_finish) */
 
-static bool haveoffset(int off) noex {
+static bool hasoffset(int off) noex {
 	return (abs(off) <= (12 * 60)) ;
 }
-/* end subroutine (haveoffset) */
+/* end subroutine (hasoffset) */
 
 /* return true if a field matched up */
 static bool fieldmatch(cchar *ebp,cchar *mbp,int fo,int fl) noex {

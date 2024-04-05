@@ -1,6 +1,9 @@
 /* zos HEADER */
 /* lang=C20 */
 
+/* time-zone offset string management */
+/* lang=C20 */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 

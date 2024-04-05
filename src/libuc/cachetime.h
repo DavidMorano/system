@@ -42,7 +42,7 @@ struct cachetime_statistics {
 } ;
 
 struct cachetime_cursor {
-	hdb_cur		cur ;
+	hdb_cur		*hcp ;
 } ;
 
 struct cachetime_entry {
@@ -51,8 +51,8 @@ struct cachetime_entry {
 } ;
 
 struct cachetime_head {
-	hdb		db ;
-	ptm		m ;
+	hdb		*dbp ;
+	ptm		*mxp ;
 	uint		magic ;
 	uint		c_req ;
 	uint		c_hit ;

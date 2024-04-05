@@ -1,4 +1,8 @@
-/* config */
+/* b_makesafe HEADER */
+/* lang=C++20 */
+
+/* generic short program front-end */
+/* version %I% last-modified %G% */
 
 
 /* revision history:

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int kvsfile_ctor(kvsfile *op,Args ... args) noex {
+static int cachetime_ctor(cachetime *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int kvsfile_ctor(kvsfile *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (kvsfile_ctor) */
+/* end subroutine (cachetime_ctor) */
 
-static int kvsfile_dtor(kvsfile *op) noex {
+static int cachetime_dtor(cachetime *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (kvsfile_dtor) */
+/* end subroutine (cachetime_dtor) */
 
 template<typename ... Args>
-static int kvsfile_magic(kvsfile *op,Args ... args) noex {
+static int cachetime_magic(cachetime *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == KVSFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == CACHETIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (kvsfile_magic) */
+/* end subroutine (cachetime_magic) */
 
