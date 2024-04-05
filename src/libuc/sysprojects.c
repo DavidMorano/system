@@ -1,20 +1,19 @@
 /* sysprojects */
+/* lang=C20 */
 
 /* system project-entry enumeration */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
-	= 1998-03-24, David A­D­ Morano
+	= 1998-03-24, David AÂ­DÂ­ Morano
         This object module was morphed from some previous one. I do not remember
         what the previous one was.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A-D- Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -24,19 +23,13 @@
 
 *******************************************************************************/
 
-
 #define	SYSPROJECTS_MASTER	0
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
 #include	<usystem.h>
+#include	<filemap.h>
 #include	<getax.h>
 #include	<localmisc.h>
 
@@ -46,16 +39,24 @@
 /* local defines */
 
 
+/* typedefs */
+
+#ifndef	TYPEDEF_PROJECT
+#define	TYPEDEF_PROJECT	1
+typedef struct project	pj_t ;
+#endif
+
+
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strdcpy1w(char *,int,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 
 /* local structures */
@@ -69,12 +70,10 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 
 /* exported subroutines */
 
-
-int sysprojects_open(SYSPROJECTS *op,const char *spfname)
-{
+int sysprojects_open(SYSPROJECTS *op,const char *spfname) noex {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*pfname = SYSPROJECTS_FNAME ;
+	cchar		*pfname = SYSPROJECTS_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
@@ -82,17 +81,15 @@ int sysprojects_open(SYSPROJECTS *op,const char *spfname)
 
 	memset(op,0,sizeof(SYSPROJECTS)) ;
 
-	    if ((rs = filemap_open(&op->b,spfname,O_RDONLY,max)) >= 0) {
-		op->magic = SYSPROJECTS_MAGIC ;
-	    }
+	if ((rs = filemap_open(&op->b,spfname,O_RDONLY,max)) >= 0) {
+	    op->magic = SYSPROJECTS_MAGIC ;
+	}
 
 	return rs ;
 }
 /* end if (sysprojects_start) */
 
-
-int sysprojects_close(SYSPROJECTS *op)
-{
+int sysprojects_close(SYSPROJECTS *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -107,22 +104,18 @@ int sysprojects_close(SYSPROJECTS *op)
 } 
 /* end subroutine (sysprojects_close) */
 
-
-int sysprojects_readent(op,pjp,pjbuf,pjlen)
-SYSPROJECTS	*op ;
-struct project	*pjp ;
-char		pjbuf[] ;
-int		pjlen ;
-{
+int sysprojects_readent(SYSPROJECTS *op,pj_t *pjp,char *pjbuf,int pjlen) noex {
 	const int	plen = PROJNAMELEN ;
 	int		rs ;
 	int		ll ;
-	const char	*lp ;
-	char		pbuf[PROJNAMELEN+1] = { 0 } ;
+	cchar		*lp ;
+	char		pbuf[PROJNAMELEN+1] ;
+	
 	if (op == NULL) return SR_FAULT ;
 	if (pjp == NULL) return SR_FAULT ;
 	if (pjbuf == NULL) return SR_FAULT ;
-	while ((rs = filemap_getline(&op->b,&lp)) > 0) {
+	
+	while ((rs = filemap_getln(&op->b,&lp)) > 0) {
 	    ll = rs ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
 	    if ((rs = (strdcpy1w(pbuf,plen,lp,ll)-pbuf)) > 0) {
@@ -135,22 +128,17 @@ int		pjlen ;
 
 #if	CF_DEBUGS
 	debugprintf("sysprojects_readent: ret rs=%d\n",rs) ;
-	debugprintf("sysprojects_readent: pn=%s\n",pbuf) ;
 #endif
 
 	return rs ;
 }
 /* end subroutine (sysprojects_readent) */
 
-
-int sysprojects_reset(op)
-SYSPROJECTS	*op ;
-{
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	rs = filemap_rewind(&op->b) ;
-
+int sysprojects_reset(SYSPROJECTS *op) noex {
+	int		rs = SR_FAULT ;
+	if (op != NULL) {
+	    rs = filemap_rewind(&op->b) ;
+	}
 	return rs ;
 }
 /* end subroutine (sysprojects_reset) */

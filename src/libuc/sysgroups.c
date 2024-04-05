@@ -121,7 +121,7 @@ int sysgroups_readent(SYSGROUPS *op,struct group *grp,char *grbuf,int grlen)
 	if (grbuf == NULL) return SR_FAULT ;
 	if (op->magic != SYSGROUPS_MAGIC) return SR_NOTOPEN ;
 
-	while ((rs = filemap_getline(&op->b,&lp)) > 0) {
+	while ((rs = filemap_getln(&op->b,&lp)) > 0) {
 	    ll = rs ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
 	    if ((rs = (strdcpy1w(gbuf,glen,lp,ll)-gbuf)) > 0) {

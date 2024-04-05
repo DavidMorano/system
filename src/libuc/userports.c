@@ -475,7 +475,7 @@ static int userports_procfile(USERPORTS *op)
 	        op->fi.ino = sb.st_ino ;
 
 	        while (rs >= 0) {
-	            rs = filemap_getline(fmp,&lp) ;
+	            rs = filemap_getln(fmp,&lp) ;
 	            ll = rs ;
 	            if (rs <= 0) break ;
 

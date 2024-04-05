@@ -26,9 +26,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
+#include	<unistd.h>		/* |off_t| */
 #include	<usystem.h>		/* for |USTAT| */
 #include	<localmisc.h>
 
@@ -51,7 +49,7 @@ EXTERNC_begin
 extern int	filemap_open(filemap *,cchar *,int,size_t) noex ;
 extern int	filemap_stat(filemap *,USTAT *) noex ;
 extern int	filemap_read(filemap *,int,void *) noex ;
-extern int	filemap_getline(filemap *,cchar **) noex ;
+extern int	filemap_getln(filemap *,cchar **) noex ;
 extern int	filemap_seek(filemap *,off_t,int) noex ;
 extern int	filemap_tell(filemap *,off_t *) noex ;
 extern int	filemap_rewind(filemap *) noex ;

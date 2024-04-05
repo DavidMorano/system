@@ -65,7 +65,7 @@ struct ucenumxxco : ucenumxxbase {
 	        rs = SR_NOTOPEN ;
 	        if (op->magic == mxx) {
 		    cchar	*lp ;
-		    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
+		    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
 	    	        rs = ep->parse(bp,bl,lp,rs) ;
 	    	        len = rs ;
 	    	        if (len > 0) break ;

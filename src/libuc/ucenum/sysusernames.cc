@@ -144,7 +144,7 @@ int sysusernames_readent(sysusernames *op,char *ubuf,int ulen) noex {
 	if ((rs = sysusernames_magic(op,ubuf)) >= 0) {
 	    cchar	*lp ;
 	    ubuf[0] = '\0' ;
-	    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
+	    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
 	        int		ll = rs ;
 	        if (lp[ll-1] == '\n') ll -= 1 ;
 	        rs = snwcpy(ubuf,ulen,lp,ll) ;

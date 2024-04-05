@@ -970,7 +970,7 @@ LINEINDEX	*op ;
 		const char	*lp ;
 
 #if	CF_FILEMAP
-		rs = filemap_getline(&lmap,&lp) ;
+		rs = filemap_getln(&lmap,&lp) ;
 	    len = rs ;
 		if (rs <= 0)
 			break ;

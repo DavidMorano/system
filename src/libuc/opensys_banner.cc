@@ -145,7 +145,7 @@ static int procfile(filebuf *wfp,int of,mode_t om,cchar *ds,int f_top) noex {
 	if ((rs = filemap_open(sfp,sysbanner,of,maxsize)) >= 0) {
 	    int		line = 0 ;
 	    cchar	*lbuf{} ;
-	    while ((rs = filemap_getline(sfp,&lbuf)) > 0) {
+	    while ((rs = filemap_getln(sfp,&lbuf)) > 0) {
 	        int	len = rs ;
 
 	        if (lbuf[len-1] == '\n') len -= 1 ;

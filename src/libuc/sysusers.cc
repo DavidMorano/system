@@ -156,7 +156,7 @@ int sysusers_readent(sysusers *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
                 char        *ubuf ;
                 if ((rs = uc_libmalloc((ulen+1),&ubuf)) >= 0) {
                     cchar   *lp{} ;
-                    while ((rs = filemap_getline(op->fmp,&lp)) > 0) {
+                    while ((rs = filemap_getln(op->fmp,&lp)) > 0) {
                         int         ll = rs ;
                         if (lp[ll-1] == '\n') ll -= 1 ;
                         if ((rs = (strdcpy1w(ubuf,ulen,lp,ll)-ubuf)) > 0) {

@@ -1,4 +1,4 @@
-/* sysgroups */
+/* sysgroup */
 
 /* system group-entry enumeration */
 
@@ -18,29 +18,27 @@
 
 /*******************************************************************************
 
-	We enumerate (reentrantly and thread safely) group names from the
+	We enumerate (reentrantly and thread safely) group entries from the
 	system GROUP database.
 
 
 *******************************************************************************/
 
 
-#define	SYSGROUPS_MASTER	0
+#define	SYSGROUP_MASTER	0
 
 
 #include	<envstandards.h>
 
 #include	<sys/types.h>
 #include	<limits.h>
-#include	<unistd.h>
-#include	<stdlib.h>
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<getax.h>
+#include	<groupent.h>
 #include	<localmisc.h>
 
-#include	"sysgroups.h"
+#include	"sysgroup.h"
 
 
 /* local defines */
@@ -70,34 +68,34 @@ extern char	*strdcpy1w(char *,int,const char *,int) ;
 /* exported subroutines */
 
 
-int sysgroups_open(SYSGROUPS *op,const char *sgfname)
+int sysgroup_open(SYSGROUP *op,const char *sgfname)
 {
 	const size_t	max = INT_MAX ;
 	int		rs ;
-	const char	*defgfname = SYSGROUPS_FNAME ;
+	const char	*defgfname = SYSGROUP_FNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (sgfname == NULL) sgfname = defgfname ; /* default */
 
-	memset(op,0,sizeof(SYSGROUPS)) ;
+	memset(op,0,sizeof(SYSGROUP)) ;
 
 	if ((rs = filemap_open(&op->b,sgfname,O_RDONLY,max)) >= 0) {
-	    op->magic = SYSGROUPS_MAGIC ;
+	    op->magic = SYSGROUP_MAGIC ;
 	}
 
 	return rs ;
 }
-/* end if (sysgroups_open) */
+/* end if (sysgroup_open) */
 
 
-int sysgroups_close(SYSGROUPS *op)
+int sysgroup_close(SYSGROUP *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == NULL) return SR_FAULT ;
-	if (op->magic != SYSGROUPS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SYSGROUP_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = filemap_close(&op->b) ;
 	if (rs >= 0) rs = rs1 ;
@@ -105,54 +103,64 @@ int sysgroups_close(SYSGROUPS *op)
 	op->magic = 0 ;
 	return rs ;
 } 
-/* end subroutine (sysgroups_close) */
+/* end subroutine (sysgroup_close) */
 
 
-int sysgroups_readent(SYSGROUPS *op,struct group *grp,char *grbuf,int grlen)
+int sysgroup_readent(SYSGROUP *op,struct group *grp,char grbuf[],int grlen)
 {
-	const int	glen = GROUPNAMELEN ;
 	int		rs ;
 	int		ll ;
 	const char	*lp ;
-	char		gbuf[GROUPNAMELEN+1] = { 0 } ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (grp == NULL) return SR_FAULT ;
 	if (grbuf == NULL) return SR_FAULT ;
-	if (op->magic != SYSGROUPS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SYSGROUP_MAGIC) return SR_NOTOPEN ;
 
-	while ((rs = filemap_getline(&op->b,&lp)) > 0) {
+#if	CF_DEBUGS
+	debugprintf("sysgroup_readent: ent\n") ;
+#endif
+
+	while ((rs = filemap_getln(&op->b,&lp)) > 0) {
 	    ll = rs ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
-	    if ((rs = (strdcpy1w(gbuf,glen,lp,ll)-gbuf)) > 0) {
-	        rs = getgr_name(grp,grbuf,grlen,gbuf) ;
-	        if (rs == SR_NOTFOUND) rs = SR_OK ;
-	    }
-	    if (rs > 0) break ;
-	    if (rs < 0) break ;
+	    rs = groupent_parse(grp,grbuf,grlen,lp,ll) ;
+#if	CF_DEBUGS
+	    debugprintf("sysgroup_readent: groupent_parse() rs=%d\n",rs) ;
+	    debugprintf("sysgroup_readent: gn=%s\n",grp->gr_name) ;
+#endif
+	    if (rs != 0) break ;
 	} /* end while */
 
 #if	CF_DEBUGS
-	debugprintf("sysgroups_readent: ret rs=%d\n",rs) ;
-	debugprintf("sysgroups_readent: gn=%s\n",gbuf) ;
-#endif
+	{
+	    int		i ;
+	    cchar	**groups = (const char **) grp->gr_mem ;
+	    if (groups != NULL) {
+		for (i = 0 ; groups[i] != NULL ; i += 1) {
+		    debugprintf("sysgroup_readent: gm=%s\n",groups[i]) ;
+		}
+	    }
+	    debugprintf("sysgroup_readent: ret rs=%d\n",rs) ;
+	}
+#endif /* CF_DEBUGS */
 
 	return rs ;
 }
-/* end subroutine (sysgroups_readent) */
+/* end subroutine (sysgroup_readent) */
 
 
-int sysgroups_reset(SYSGROUPS *op)
+int sysgroup_reset(SYSGROUP *op)
 {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
-	if (op->magic != SYSGROUPS_MAGIC) return SR_NOTOPEN ;
+	if (op->magic != SYSGROUP_MAGIC) return SR_NOTOPEN ;
 
 	rs = filemap_rewind(&op->b) ;
 
 	return rs ;
 }
-/* end subroutine (sysgroups_reset) */
+/* end subroutine (sysgroup_reset) */
 
 

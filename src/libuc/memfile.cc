@@ -22,7 +22,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
@@ -148,7 +147,9 @@ int memfile_close(memfile *op) noex {
 	            op->fd = -1 ;
 	        }
 	        if (op->dbuf) {
-	            rs1 = u_munmap(op->dbuf,op->dlen) ;
+		    void	*ma = op->dbuf ;
+		    csize	ms = op->dlen ;
+	            rs1 = u_mmapend(ma,ms) ;
 	            if (rs >= 0) rs = rs1 ;
 	            op->dbuf = nullptr ;
 	            op->dlen = 0 ;
@@ -284,13 +285,15 @@ static int memfile_openmap(memfile *op,int fd,size_t fsize) noex {
 	op->fd = fd ;
 	if ((rs = u_mmapbegin(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
 	    op->fsize = fsize ;
-	    op->dbuf = (char *) md ;
+	    op->dbuf = charp(md) ;
 	    op->dlen = ms ;
 	    if ((rs = memfile_extend(op)) >= 0) {
 	        op->bp = op->dbuf ;
 	    }
 	    if (rs < 0) {
-		u_munmap(op->dbuf,op->dlen) ;
+		void	*ma = op->dbuf ;
+		csize	ms = op->dlen ;
+		u_mmapend(ma,ms) ;
 		op->dbuf = nullptr ;
 		op->dlen = 0 ;
 	    } /* end if (error) */
@@ -334,25 +337,26 @@ static int memfile_mapextend(memfile *op,size_t ext) noex {
 	    void	*md{} ;
 	    mo = op->dlen ;
 	    ms = ext ;
-	    if ((rs = u_mmap(addr,ms,mp,mf,fd,mo,&md)) >= 0) {
-	        op->dbuf = (char *) md ;
+	    if ((rs = u_mmapbegin(addr,ms,mp,mf,fd,mo,&md)) >= 0) {
+	        op->dbuf = charp(md) ;
 	        op->dlen += ms ;
-e	    }
+	    }
 	} /* end if */
 /* do we need to remap entirely? */
 	if (rs < 0) {
 	    if ((rs = uc_fdatasync(op->fd)) >= 0) {
+		void	*ma = op->dbuf ;
 	        ms = op->dlen ;
-	        rs = u_munmap(op->dbuf,ms) ;
+	        rs = u_mmapend(ma,ms) ;
 	        op->dbuf = nullptr ;
+		op->dlen = 0 ;
 	    }
 	    if (rs >= 0) {
 	        cint	fd = op->fd ;
 	        void	*md{} ;
 	        ms = (op->dlen + ext) ;
-	        op->dlen = 0 ;
-	        if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
-	            op->dbuf = (char *) md ;
+	        if ((rs = u_mmapbegin(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	            op->dbuf = charp(md) ;
 	            op->dlen = ms ;
 	        }
 	    } /* end if */

@@ -105,7 +105,7 @@ int syspasswd_readent(SYSPASSWD *op,PASSWD *pwp,char *pwbuf,int pwlen) noex {
 	if (pwbuf == NULL) return SR_FAULT ;
 	if (op->magic != SYSPASSWD_MAGIC) return SR_NOTOPEN ;
 
-	while ((rs = filemap_getline(&op->b,&lp)) > 0) {
+	while ((rs = filemap_getln(&op->b,&lp)) > 0) {
 	    ll = rs ;
 	    if (lp[ll-1] == '\n') ll -= 1 ;
 	    rs = passwdent_parse(pwp,pwbuf,pwlen,lp,ll) ;

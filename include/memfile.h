@@ -12,7 +12,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -23,13 +22,13 @@
 
 
 struct memfile_head {
-	uint		magic ;
-	int		pagesize ;
 	char		*dbuf ;
 	void		*bp ;
 	size_t		off ;
 	size_t		dlen ;
 	size_t		fsize ;
+	uint		magic ;
+	int		pagesize ;
 	int		fd ;
 } ;
 
