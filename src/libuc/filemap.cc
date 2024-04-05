@@ -1,7 +1,7 @@
 /* filemap SUPPORT */
 /* lang=C++20 */
 
-/* support low-overhead file bufferring requirements */
+/* support low-overhead file bufferring operations (read-only) */
 /* version %I% last-modified %G% */
 
 
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
         This little object supports some buffered file operations for
-        low-overhead buffered I/O requirements.
+        low-overhead buffered I/O operations (read-only).
 
 *******************************************************************************/
 
@@ -77,7 +77,7 @@ static sysval		pagesize(sysval_ps) ;
 
 /* exported subroutines */
 
-int filemap_open(filemap *op,cchar *fname,int of,size_t nmax) noex {
+int filemap_open(filemap *op,cchar *fname,size_t nmax) noex {
 	int		rs = SR_FAULT ;
 	if (op && fname) {
 	    rs = SR_INVALID ;
@@ -89,7 +89,7 @@ int filemap_open(filemap *op,cchar *fname,int of,size_t nmax) noex {
 	    if (fname[0]) {
 	        if (nmax <= 0) nmax = ULONG_MAX ;
 	        op->maxsize = nmax ;
-		rs = filemap_opener(op,fname,of) ;
+		rs = filemap_opener(op,fname) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
@@ -243,8 +243,9 @@ int filemap_rewind(filemap *op) noex {
 
 /* local subroutines */
 
-static int filemap_opener(filemap *op,cchar *fn,int of) noex {
+static int filemap_opener(filemap *op,cchar *fn) noex {
 	csize		nmax = op->maxsize ;
+	cint		of = (O_RDONLY | O_CLOEXEC) ;
 	int		rs ;
 	int		rs1 ;
 	if ((rs = uc_open(fn,of,0666)) >= 0) {

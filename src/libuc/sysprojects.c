@@ -1,15 +1,16 @@
-/* sysprojects */
-/* lang=C20 */
+/* sysprojects SUPPORT */
+/* lang=C++20 */
 
 /* system project-entry enumeration */
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
-	= 1998-03-24, David AÂ­DÂ­ Morano
-        This object module was morphed from some previous one. I do not remember
-        what the previous one was.
+	= 1998-03-24, David A­D­ Morano
+	This object module was morphed from some previous one. I
+	do not remember what the previous one was.
 
 */
 
@@ -17,16 +18,12 @@
 
 /*******************************************************************************
 
-	We enumerate (reentrantly and thread safely) project names from the
-	system PROJECT database.
-
+	We enumerate (reentrantly and thread safely) project names
+	from the system PROJECT database.
 
 *******************************************************************************/
 
-#define	SYSPROJECTS_MASTER	0
-
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<limits.h>
 #include	<usystem.h>
 #include	<filemap.h>
@@ -52,7 +49,7 @@ typedef struct project	pj_t ;
 extern int	snwcpy(char *,int,cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
 extern char	*strwcpy(char *,cchar *,int) ;
@@ -70,8 +67,8 @@ extern char	*strdcpy1w(char *,int,cchar *,int) ;
 
 /* exported subroutines */
 
-int sysprojects_open(SYSPROJECTS *op,const char *spfname) noex {
-	const size_t	max = INT_MAX ;
+int sysprojects_open(SYSPROJECTS *op,cchar *spfname) noex {
+	csize		nmax = INT_MAX ;
 	int		rs ;
 	cchar		*pfname = SYSPROJECTS_FNAME ;
 
@@ -81,7 +78,7 @@ int sysprojects_open(SYSPROJECTS *op,const char *spfname) noex {
 
 	memset(op,0,sizeof(SYSPROJECTS)) ;
 
-	if ((rs = filemap_open(&op->b,spfname,O_RDONLY,max)) >= 0) {
+	if ((rs = filemap_open(&op->b,spfname,nmax)) >= 0) {
 	    op->magic = SYSPROJECTS_MAGIC ;
 	}
 

@@ -1,7 +1,7 @@
 /* memfile HEADER */
 /* lang=C20 */
 
-/* support low-overhead file bufferring requirements */
+/* support low-overhead file bufferring operations */
 /* version %I% last-modified %G% */
 
 

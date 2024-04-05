@@ -61,7 +61,7 @@ extern int	debugprintf(cchar *,...) ;
 /* exported subroutines */
 
 int syspasswd_open(SYSPASSWD *op,cchar *sufname) noex {
-	const size_t	max = INT_MAX ;
+	csize_t		nmax = INT_MAX ;
 	int		rs ;
 	cchar		*defufname = SYSPASSWD_FNAME ;
 
@@ -71,7 +71,7 @@ int syspasswd_open(SYSPASSWD *op,cchar *sufname) noex {
 
 	memset(op,0,sizeof(SYSPASSWD)) ;
 
-	if ((rs = filemap_open(&op->b,sufname,O_RDONLY,max)) >= 0) {
+	if ((rs = filemap_open(&op->b,sufname,nmax)) >= 0) {
 	    op->magic = SYSPASSWD_MAGIC ;
 	}
 

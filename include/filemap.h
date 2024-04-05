@@ -1,7 +1,7 @@
 /* filemap HEADER */
 /* lang=C20 */
 
-/* support some buffered file operations */
+/* support low-overhead file bufferring operations */
 /* version %I% last-modified %G% */
 
 
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
         This little object supports some buffered file operations for
-        low-overhead buffered I/O requirements.
+        low-overhead buffered I/O operations (read-only).
 
 *******************************************************************************/
 
@@ -46,7 +46,7 @@ typedef	FILEMAP		filemap ;
 
 EXTERNC_begin
 
-extern int	filemap_open(filemap *,cchar *,int,size_t) noex ;
+extern int	filemap_open(filemap *,cchar *,size_t) noex ;
 extern int	filemap_stat(filemap *,USTAT *) noex ;
 extern int	filemap_read(filemap *,int,void *) noex ;
 extern int	filemap_getln(filemap *,cchar **) noex ;

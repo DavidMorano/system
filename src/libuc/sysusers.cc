@@ -24,7 +24,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstdlib>
@@ -116,9 +115,8 @@ int sysusers_open(sysusers *op,cchar *sufname) noex {
 	int		rs ;
 	if ((rs = sysusers_ctor(op)) >= 0) {
 	    csize	nmax = INT_MAX ;
-	    cint	of = O_RDONLY ;
 	    if (sufname == nullptr) sufname = defufname ;
-	    if ((rs = filemap_open(op->fmp,sufname,of,nmax)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) {
 	        op->magic = SYSUSERS_MAGIC ;
 	    }
 	    if (rs < 0) {

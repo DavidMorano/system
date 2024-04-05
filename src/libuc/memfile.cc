@@ -1,7 +1,7 @@
 /* memfile SUPPORT */
 /* lang=C++20 */
 
-/* support low-overhead file bufferring requirements */
+/* support low-overhead file bufferring operations */
 /* version %I% last-modified %G% */
 
 
@@ -17,7 +17,12 @@
 /******************************************************************************
 
         This little object supports some buffered file operations for
-        low-overhead buffered I-O requirements.
+        low-overhead buffered I-O operations.
+
+	Notes:
+	1. Comparison to other mapped-memory file facilities:
+	This object allows for writing to the mapped file, while
+	several other mapped-file facilities only allow for reading.
 
 ******************************************************************************/
 

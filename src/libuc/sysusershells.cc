@@ -107,11 +107,10 @@ int sysusershells_open(sysusershells *op,cchar *sufname) noex {
 	int		rs ;
 	cchar		*defufname = SYSUSERSHELLS_FNAME ;
 	if ((rs = sysusershells_ctor(op)) >= 0) {
-	    cint	of = O_RDONLY ;
 	    if (sufname == nullptr) {
 		sufname = defufname ; /* default */
 	    }
-	    if ((rs = filemap_open(op->fmp,sufname,of,nmax)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) {
 	        op->magic = SYSUSERSHELLS_MAGIC ;
 	    }
 	    if (rs < 0) {

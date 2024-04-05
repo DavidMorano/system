@@ -108,9 +108,8 @@ int sysusernames_open(sysusernames *op,cchar *sufname) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    csize	nmax = INT_MAX ;
-	    cint	of = O_RDONLY ;
 	    if (sufname == nullptr) sufname = defufname ;
-	    if ((rs = filemap_open(op->fmp,sufname,of,nmax)) >= 0) {
+	    if ((rs = filemap_open(op->fmp,sufname,nmax)) >= 0) {
 	    	op->magic = SYSUSERNAMES_MAGIC ;
 	    }
 	    if (rs < 0) {
