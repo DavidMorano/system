@@ -87,6 +87,7 @@ static int chartrans_setopen(CT *,time_t,int,cchar *,int) noex ;
 static int chartrans_setclose(CT *,int) noex ;
 static int chartrans_setfind(CT *,time_t) noex ;
 static int chartrans_transutf8(CT *,wchar_t *,int,cchar *,int) noex ;
+static int chartrans_checkdecoder(CT *) noex ;
 
 static int mktransname(char *,int,cchar *,int) noex ;
 
@@ -130,7 +131,7 @@ int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
 	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	            cint	asize = (maxtx * sizeof(chartrans_set)) ;
 	            void	*p ;
-	            op->pr = cp ;
+	            op->pr = cp ; /* <- store allocation */
 	            if ((rs = uc_malloc(asize,&p)) >= 0) {
 	                op->sets = (chartrans_set *) p ;
 	                op->nmax = maxtx ;
@@ -275,9 +276,8 @@ static int chartrans_setfins(CT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((op->sets != nullptr) && (op->nsets > 0)) {
-	    int	si ;
-	    for (si = 0 ; si < op->nmax ; si += 1) {
-	        if (op->sets[si].name != nullptr) {
+	    for (int si = 0 ; si < op->nmax ; si += 1) {
+	        if (op->sets[si].name) {
 	            rs1 = chartrans_setclose(op,si) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
@@ -384,20 +384,7 @@ static int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (rcl > 0) {
-	    if (op->utf8decoder == nullptr) {
-	        cint	osize = sizeof(utf8decoder) ;
-	        void	*p ;
-	        if ((rs = uc_malloc(osize,&p)) >= 0) {
-		    utf8decoder	*uop = (utf8decoder *) p ;
-		    op->utf8decoder = p ;
-		    rs = utf8decoder_start(uop) ;
-		    if (rs < 0) {
-		        uc_free(p) ;
-		        op->utf8decoder = nullptr ;
-		    }
-	        } /* end if (a-m) */
-	    } /* end if (needed initialization) */
-	    if (rs >= 0) {
+	    if ((rs = chartrans_checkdecoder(op)) >= 0) {
 	        utf8decoder	*uop = (utf8decoder *) op->utf8decoder ;
 	        if ((rs = utf8decoder_load(uop,sp,sl)) > 0) {
 		    if ((rs = utf8decoder_read(uop,rcp,rcl)) > 0) {
@@ -411,6 +398,25 @@ static int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (chartrans_transutf8) */
+
+static int chartrans_checkdecoder(CT *op) noex {
+	int		rs = SR_OK ;
+        if (op->utf8decoder == nullptr) {
+            cint    osize = sizeof(utf8decoder) ;
+            void    *p ;
+            if ((rs = uc_malloc(osize,&p)) >= 0) {
+                utf8decoder *uop = (utf8decoder *) p ;
+                op->utf8decoder = p ;
+                rs = utf8decoder_start(uop) ;
+                if (rs < 0) {
+                    uc_free(p) ;
+                    op->utf8decoder = nullptr ;
+                }
+            } /* end if (a-m) */
+        } /* end if (needed initialization) */
+	return rs ;
+}
+/* end subroutine (chartrans_checkdecoder) */
 
 static int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
