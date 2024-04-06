@@ -22,13 +22,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
-#include	<cstddef>		/* presumably for type 'wchar_t' */
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |wchar_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<storebuf.h>
 #include	<utf8decoder.h>
 #include	<matstr.h>
@@ -41,21 +41,19 @@
 
 /* local defines */
 
-#ifndef	CSNLEN
-#define	CSNLEN		MAXNAMELEN
-#endif
-
-#ifdef	_BIG_ENDIAN
-#define	CHARTRANS_SUF	"BE"
-#else
-#define	CHARTRANS_SUF	"LE"
-#endif
+#define	CT		chartrans
 
 
 /* imported namespaces */
 
 
 /* local typedefs */
+
+typedef wchar_t		wchr ;
+typedef const wchar_t	cwchr ;
+
+typedef wchar_t *	wchrp ;
+typedef const wchar_t *	cwchrp ;
 
 
 /* external subroutines */
@@ -73,12 +71,22 @@ extern "C"{
 
 /* forward references */
 
-static int chartrans_setfins(CHARTRANS *) noex ;
-static int chartrans_sethave(CHARTRANS *,cchar *,int) noex ;
-static int chartrans_setopen(CHARTRANS *,time_t,int,cchar *,int) noex ;
-static int chartrans_setclose(CHARTRANS *,int) noex ;
-static int chartrans_setfind(CHARTRANS *,time_t) noex ;
-static int chartrans_transutf8(CHARTRANS *,wchar_t *,int,cchar *,int) noex ;
+template<typename ... Args>
+static inline int chartrans_magic(chartrans *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == CHARTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (chartrans_magic) */
+
+static int chartrans_setfins(CT *) noex ;
+static int chartrans_sethave(CT *,cchar *,int) noex ;
+static int chartrans_setopen(CT *,time_t,int,cchar *,int) noex ;
+static int chartrans_setclose(CT *,int) noex ;
+static int chartrans_setfind(CT *,time_t) noex ;
+static int chartrans_transutf8(CT *,wchar_t *,int,cchar *,int) noex ;
 
 static int mktransname(char *,int,cchar *,int) noex ;
 
@@ -111,167 +119,151 @@ static constexpr cpcchar	charsets[] = {
 
 /* exported subroutines */
 
-int chartrans_open(CHARTRANS *op ,cchar *pr,int maxtx) noex {
-	int		rs ;
-	cchar		*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-
+int chartrans_open(CT *op ,cchar *pr,int maxtx) noex {
+	int		rs = SR_FAULT ;
 	if (maxtx < 1) maxtx = 1 ;
-
-	memclear(op) ;			/* dangerous */
-
-	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	    cint	asize = (maxtx * sizeof(CHARTRANS_SET)) ;
-	    void	*p ;
-	    op->pr = cp ;
-	    if ((rs = uc_malloc(asize,&p)) >= 0) {
-	        op->sets = (CHARTRANS_SET *) p ;
-	        op->nmax = maxtx ;
-	        op->magic = CHARTRANS_MAGIC ;
-	        memset(p,0,asize) ;
-	    } /* end if (memory-allocation) */
-	    if (rs < 0) {
-	        uc_free(op->pr) ;
-	        op->pr = nullptr ;
-	    }
-	} /* end if (memory_allocation) */
-
+	if (op && pr) {
+	    rs = SR_INVALID ;
+	    memclear(op) ; /* dangerous */
+	    if (pr[0]) {
+	        cchar	*cp{} ;
+	        if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	            cint	asize = (maxtx * sizeof(chartrans_set)) ;
+	            void	*p ;
+	            op->pr = cp ;
+	            if ((rs = uc_malloc(asize,&p)) >= 0) {
+	                op->sets = (chartrans_set *) p ;
+	                op->nmax = maxtx ;
+	                op->magic = CHARTRANS_MAGIC ;
+	                memset(p,0,asize) ;
+	            } /* end if (memory-allocation) */
+	            if (rs < 0) {
+	                uc_free(op->pr) ;
+	                op->pr = nullptr ;
+	            }
+	        } /* end if (memory_allocation) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (chartrans_open) */
 
-int chartrans_close(CHARTRANS *op) noex {
-	int		rs = SR_OK ;
+int chartrans_close(CT *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->utf8decoder != nullptr) {
-	    UTF8DECODER	*uop = (UTF8DECODER *) op->utf8decoder ;
-	    rs1 = utf8decoder_finish(uop) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(op->utf8decoder) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->utf8decoder = nullptr ;
-	}
-
-	if (op->nsets > 0) {
-	    rs1 = chartrans_setfins(op) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (op->sets != nullptr) {
-	    rs1 = uc_free(op->sets) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->sets = nullptr ;
-	}
-
-	if (op->pr != nullptr) {
-	    rs1 = uc_free(op->pr) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->pr = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = chartrans_magic(op)) >= 0) {
+	    if (op->utf8decoder) {
+	        {
+	            utf8decoder	*uop = (utf8decoder *) op->utf8decoder ;
+	            rs1 = utf8decoder_finish(uop) ;
+	            if (rs >= 0) rs = rs1 ;
+	        }
+	        {
+	            rs1 = uc_free(op->utf8decoder) ;
+	            if (rs >= 0) rs = rs1 ;
+	            op->utf8decoder = nullptr ;
+	        }
+	    }
+	    if (op->nsets > 0) {
+	        rs1 = chartrans_setfins(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->sets) {
+	        rs1 = uc_free(op->sets) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->sets = nullptr ;
+	    }
+	    if (op->pr) {
+	        rs1 = uc_free(op->pr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->pr = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (chartrans_close) */
 
-int chartrans_transbegin(CHARTRANS *op,time_t dt,cchar *np,int nl) noex {
+int chartrans_transbegin(CT *op,time_t dt,cchar *sp,int sl) noex {
 	int		rs ;
 	int		txid = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (np == nullptr) return SR_FAULT ;
-
-	if (np[0] == '\0') return SR_INVALID ;
-
-	if (nl < 0) nl = strlen(np) ;
-
-	if ((rs = chartrans_sethave(op,np,nl)) >= 0) {
-	    txid = rs ;
-	    op->sets[txid].uc += 1 ;
-	    op->sets[txid].acount = op->acount++ ;
-	} else if (rs == SR_NOTFOUND) {
-	    if ((rs = chartrans_setfind(op,dt)) >= 0) {
-	        CHARTRANS_SET	*setp = (op->sets + rs) ;
-	        txid = rs ;
-	        if (setp->name != nullptr) {
-	            rs = chartrans_setclose(op,txid) ;
-	        }
-	        if (rs >= 0) {
-	            if ((rs = chartrans_setopen(op,dt,txid,np,nl)) >= 0) {
-	                op->sets[txid].uc += 1 ;
-	            }
-	        }
-	    } /* end if (chartrans_setfind) */
-	} /* end if (have it) */
-
+	if ((rs = chartrans_magic(op,sp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	       if (sl < 0) sl = strlen(sp) ;
+	       if ((rs = chartrans_sethave(op,sp,sl)) >= 0) {
+	           txid = rs ;
+	           op->sets[txid].uc += 1 ;
+	           op->sets[txid].acount = op->acount++ ;
+	       } else if (rs == SR_NOTFOUND) {
+	           if ((rs = chartrans_setfind(op,dt)) >= 0) {
+	               chartrans_set	*setp = (op->sets + rs) ;
+	               txid = rs ;
+	               if (setp->name != nullptr) {
+	                   rs = chartrans_setclose(op,txid) ;
+	               }
+	               if (rs >= 0) {
+			   auto		ct_so = chartrans_setopen ;
+	                   if ((rs = ct_so(op,dt,txid,sp,sl)) >= 0) {
+	                       op->sets[txid].uc += 1 ;
+	                   }
+	               }
+	           } /* end if (chartrans_setfind) */
+	       } /* end if (have it) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? txid : rs ;
 }
 /* end subroutine (chartrans_transbegin) */
 
-int chartrans_transend(CHARTRANS *op,int txid) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if ((txid < 0) || (txid >= op->nmax)) return SR_INVALID ;
-
-	if (rs >= 0) {
-	    CHARTRANS_SET	*setp = (op->sets + txid) ;
-	    if (setp->uc > 0) setp->uc -= 1 ;
-	}
-
+int chartrans_transend(CT *op,int txid) noex {
+	int		rs ;
+	if ((rs = chartrans_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if ((txid >= 0) && (txid < op->nmax)) {
+	        chartrans_set	*setp = (op->sets + txid) ;
+		rs = SR_OK ;
+	        if (setp->uc > 0) setp->uc -= 1 ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (chartrans_transend) */
 
-int chartrans_transread(CHARTRANS *op,int txid,wchar_t *rcp,int rcl,
+int chartrans_transread(CT *op,int txid,wchr *rcp,int rcl,
 		cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (rcp == nullptr) return SR_FAULT ;
-	if (sp == nullptr) return SR_FAULT ;
-
-	if (rcl < 0) return SR_INVALID ;
-
-	if ((txid < 0) || (txid >= op->nmax)) return SR_INVALID ;
-
-	if (sl < 0) sl = strlen(sp) ;
-
-	if (rs >= 0) {
-	    CHARTRANS_SET	*setp = (op->sets + txid) ;
-	    if (setp->pc >= 0) {
-		switch (setp->pc) {
-		case charset_utf8:
-	            rs = chartrans_transutf8(op,rcp,rcl,sp,sl) ;
-		    break ;
-		default:
-	            rs = wsnwcpynarrow(rcp,rcl,sp,sl) ;
-		    break ;
-		} /* end switch */
-	    } else {
-	        int	ileft = sl ;
-	        int	ostart = (rcl * sizeof(wchar_t)) ;
-	        int	oleft ;
-	        int	ofill ;
-	        cchar	*ibp = sp ;
-	        char	*obp = (char *) rcp ;
-	        setp->acount = op->acount++ ;
-	        oleft = ostart ;
-	        rs = uiconv_trans(&setp->id,&ibp,&ileft,&obp,&oleft) ;
-	        ofill = (ostart-oleft) ;
-	        if (rs >= 0) {
-	            rs = ((ofill & INT_MAX) >> 2) ;
-	        }
-	    } /* end if */
-	} /* end if (ok) */
+	int		rs ;
+	if ((rs = chartrans_magic(op,rcp,sp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if ((txid >= 0) && (txid < op->nmax) && (rcl >= 0)) {
+	        if (sl < 0) sl = strlen(sp) ;
+	        chartrans_set	*setp = (op->sets + txid) ;
+	        if (setp->pc >= 0) {
+		    switch (setp->pc) {
+		    case charset_utf8:
+	                rs = chartrans_transutf8(op,rcp,rcl,sp,sl) ;
+		        break ;
+		    default:
+	                rs = wsnwcpynarrow(rcp,rcl,sp,sl) ;
+		        break ;
+		    } /* end switch */
+	        } else {
+	            uiconv	*uip = &setp->id ;
+	            int		ileft = sl ;
+	            int		ostart = (rcl * sizeof(wchar_t)) ;
+	            int		oleft ;
+	            int		ofill ;
+	            cchar	*ibp = sp ;
+	            char	*obp = (char *) rcp ;
+	            setp->acount = op->acount++ ;
+	            oleft = ostart ;
+	            if ((rs = uiconv_trans(uip,&ibp,&ileft,&obp,&oleft)) >= 0) {
+	                ofill = (ostart-oleft) ;
+	                rs = ((ofill & INT_MAX) >> 2) ;
+	            }
+	        } /* end if */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (chartrans_transread) */
@@ -279,7 +271,7 @@ int chartrans_transread(CHARTRANS *op,int txid,wchar_t *rcp,int rcl,
 
 /* private subroutines */
 
-static int chartrans_setfins(CHARTRANS *op) noex {
+static int chartrans_setfins(CT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if ((op->sets != nullptr) && (op->nsets > 0)) {
@@ -295,42 +287,45 @@ static int chartrans_setfins(CHARTRANS *op) noex {
 }
 /* end subroutine (chartrans_setfins) */
 
-static int chartrans_setopen(CHARTRANS *op,time_t dt,int txid,
-		cchar *np,int nl) noex {
-	CHARTRANS_SET	*setp = (op->sets + txid) ;
+static int chartrans_setopen(CT *op,time_t dt,int txid,cc *sp,int sl) noex {
+	chartrans_set	*setp = (op->sets + txid) ;
 	int		rs ;
+	int		rs1 ;
 	cchar		*tcsp = CHARTRANS_NCS ;
 	cchar		*name ;
-	memclear(setp) ;		/* dangerous */
-	    if ((rs = uc_mallocstrw(np,nl,&name)) >= 0) {
-	        int	pc ;
-	            setp->name = name ;
-	        if ((pc = matcasestr(charsets,np,nl)) >= 0) {
-	            setp->pc = pc ;
-	        } else {
-	            cint	tlen = CSNLEN ;
-	            char	tbuf[CSNLEN+1] = { 0 } ;
-		    setp->pc = -1 ;
-	            if ((rs = mktransname(tbuf,tlen,tcsp,-1)) >= 0) {
-	                rs = uiconv_open(&setp->id,tbuf,name) ;
-		    } /* end if (mktransname) */
-	        }
-	        if (rs >= 0) {
-	            setp->ti_access = dt ;
-	            setp->acount = op->acount++ ;	/* time-stamp */
-	            op->nsets += 1 ;
-	        }
-	        if (rs < 0) {
-	            uc_free(name) ;
-	            setp->name = nullptr ;
-	        }
-	    } /* end if (memory-allocation) */
+	memclear(setp) ; /* dangerous */
+        if ((rs = uc_mallocstrw(sp,sl,&name)) >= 0) {
+            setp->name = name ;		/* <- store allocation */
+            if (int pc ; (pc = matcasestr(charsets,sp,sl)) >= 0) {
+                setp->pc = pc ;
+            } else {
+                char        *tbuf{} ;
+		if ((rs = malloc_mp(&tbuf)) >= 0) {
+		    cint	tlen = rs ;
+                    setp->pc = -1 ;
+                    if ((rs = mktransname(tbuf,tlen,tcsp,-1)) >= 0) {
+                        rs = uiconv_open(&setp->id,tbuf,name) ;
+                    } /* end if (mktransname) */
+		    rs1 = uc_free(tbuf) ;
+		    if (rs >= 0) rs = rs1 ;
+		} /* end if (m-a-f) */
+            } /* end if */
+            if (rs >= 0) {
+                setp->ti_access = dt ;
+                setp->acount = op->acount++ ;       /* time-stamp */
+                op->nsets += 1 ;
+            }
+            if (rs < 0) {
+                uc_free(name) ;
+                setp->name = nullptr ;
+            }
+        } /* end if (memory-allocation) */
 	return rs ;
 }
 /* end subroutine (chartrans_setopen) */
 
-static int chartrans_setclose(CHARTRANS *op,int txid) noex {
-	CHARTRANS_SET	*setp = (op->sets + txid) ;
+static int chartrans_setclose(CT *op,int txid) noex {
+	chartrans_set	*setp = (op->sets + txid) ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (setp->name != nullptr) {
@@ -347,14 +342,14 @@ static int chartrans_setclose(CHARTRANS *op,int txid) noex {
 }
 /* end subroutine (chartrans_setclose) */
 
-static int chartrans_sethave(CHARTRANS *op,cchar *np,int nl) noex {
-	CHARTRANS_SET	*setp ;
+static int chartrans_sethave(CT *op,cchar *sp,int sl) noex {
+	chartrans_set	*setp ;
 	int		i ; /* used afterwards */
-	int		f = FALSE ;
+	int		f = false ;
 	for (i = 0 ; i < op->nmax ; i += 1) {
 	    setp = (op->sets + i) ;
 	    if (setp->name != nullptr) {
-	        f = (strwcmp(setp->name,np,nl) == 0) ;
+	        f = (strwcmp(setp->name,sp,sl) == 0) ;
 	        if (f) break ;
 	    }
 	} /* end for */
@@ -362,8 +357,8 @@ static int chartrans_sethave(CHARTRANS *op,cchar *np,int nl) noex {
 }
 /* end subroutine (chartrans_sethave) */
 
-static int chartrans_setfind(CHARTRANS *op,time_t dt) noex {
-	CHARTRANS_SET	*setp ;
+static int chartrans_setfind(CT *op,time_t dt) noex {
+	chartrans_set	*setp ;
 	uint		acount = INT_MAX ;
 	int		rs = SR_OK ;
 	int		mini = -1 ;
@@ -385,16 +380,15 @@ static int chartrans_setfind(CHARTRANS *op,time_t dt) noex {
 }
 /* end subroutine (chartrans_setfind) */
 
-static int chartrans_transutf8(CHARTRANS *op,wchar_t *rcp,int rcl,
-		cchar *sp,int sl) noex {
+static int chartrans_transutf8(CT *op,wchr *rcp,int rcl,cc *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (rcl > 0) {
 	    if (op->utf8decoder == nullptr) {
-	        cint	osize = sizeof(UTF8DECODER) ;
+	        cint	osize = sizeof(utf8decoder) ;
 	        void	*p ;
 	        if ((rs = uc_malloc(osize,&p)) >= 0) {
-		    UTF8DECODER	*uop = (UTF8DECODER *) p ;
+		    utf8decoder	*uop = (utf8decoder *) p ;
 		    op->utf8decoder = p ;
 		    rs = utf8decoder_start(uop) ;
 		    if (rs < 0) {
@@ -404,7 +398,7 @@ static int chartrans_transutf8(CHARTRANS *op,wchar_t *rcp,int rcl,
 	        } /* end if (a-m) */
 	    } /* end if (needed initialization) */
 	    if (rs >= 0) {
-	        UTF8DECODER	*uop = (UTF8DECODER *) op->utf8decoder ;
+	        utf8decoder	*uop = (utf8decoder *) op->utf8decoder ;
 	        if ((rs = utf8decoder_load(uop,sp,sl)) > 0) {
 		    if ((rs = utf8decoder_read(uop,rcp,rcl)) > 0) {
 		        c += rs ;
@@ -418,15 +412,15 @@ static int chartrans_transutf8(CHARTRANS *op,wchar_t *rcp,int rcl,
 }
 /* end subroutine (chartrans_transutf8) */
 
-static int mktransname(char *nbuf,int nlen,cchar *np,int nl) noex {
+static int mktransname(char *nbuf,int nlen,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if (rs >= 0) {
-	    rs = storebuf_strw(nbuf,nlen,i,np,nl) ;
+	    rs = storebuf_strw(nbuf,nlen,i,sp,sl) ;
 	    i += rs ;
 	}
 	if (rs >= 0) {
-	    cchar	*suf = CHARTRANS_SUF ;
+	    cchar	*suf = (ENDIAN) ? "BE" : "LE" ;
 	    rs = storebuf_strw(nbuf,nlen,i,suf,-1) ;
 	    i += rs ;
 	}
