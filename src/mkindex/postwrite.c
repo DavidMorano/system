@@ -57,6 +57,7 @@
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<field.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"memfile.h"
@@ -72,27 +73,11 @@
 #define	POSTINDEX_VERSION	0
 #define	POSTINDEX_TYPE		0
 
-#ifndef	ENDIAN
-#if	defined(SOLARIS) && defined(__sparc)
-#define	ENDIAN		1
-#else
-#ifdef	_BIG_ENDIAN
-#define	ENDIAN		1
-#endif
-#ifdef	_LITTLE_ENDIAN
-#define	ENDIAN		0
-#endif
-#ifndef	ENDIAN
-#error	"could not determine endianness of this machine"
-#endif
-#endif
-#endif
-
 
 /* external subroutines */
 
 extern uint	nextpowtwo(uint) ;
-extern uint	hashelf(void *,int) ;
+extern uint	hash_elf(void *,int) ;
 extern uint	uceil(uint,int) ;
 
 extern int	sfbasename(const char *,int,const char **) ;

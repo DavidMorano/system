@@ -44,7 +44,6 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<endianstr.h>
 #include	<estrings.h>
 #include	<vechand.h>
 #include	<storebuf.h>

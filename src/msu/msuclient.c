@@ -76,7 +76,6 @@
 #include	<getbufsize.h>
 #include	<estrings.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<nulstr.h>
 #include	<filebuf.h>
 #include	<expcook.h>

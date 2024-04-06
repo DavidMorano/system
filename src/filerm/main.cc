@@ -61,7 +61,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(const char *,int) ;
+extern uint	hash_elf(const char *,int) ;
 
 extern int	matstr(const char **,const char *,int) ;
 extern int	matostr(const char **,int,const char *,int) ;
@@ -933,7 +933,7 @@ static int mkrn(PROGINFO *pip)
 /* pop in our environment also! */
 
 	for (i = 0 ; envv[i] != NULL ; i += 1)
-	    rn ^= hashelf(envv[i],-1) ;
+	    rn ^= hash_elf(envv[i],-1) ;
 
 /* get some "entropy" and mix it in */
 

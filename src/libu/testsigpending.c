@@ -21,7 +21,7 @@
 #include	<string.h>
 #include	<stdio.h>
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 #define	VARDEBUGFNAME	"TESTSIGPENDING_DEBUGFILE"
@@ -79,7 +79,7 @@ int main(int argc,const char **argv,const char **envv)
 	    if ((rs = uc_sigsetadd(&nsm,sig)) >= 0) {
 	        if ((rs = u_sigprocmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 		    SIGBLOCK	b ;
-		    if ((rs = sigblock_start(&b,NULL)) >= 0) {
+		    if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 			const time_t	st = time(NULL) ;
 			time_t		dt ;
 
@@ -94,7 +94,7 @@ int main(int argc,const char **argv,const char **envv)
 
 			    dt = time(NULL) ;
 			} /* end while */
-			sigblock_finish(&b) ;
+			sigblocker_finish(&b) ;
 		    } /* end if (sigblock) */
 	            u_sigprocmask(SIG_SETMASK,&osm,NULL) ;
 	        } /* end if (sigmask) */

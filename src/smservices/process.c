@@ -23,16 +23,15 @@
 #include	<sys/mman.h>
 #include	<elf.h>
 
-#include	"localmisc.h"
+#include	<endian.h>
+#include	<localmisc.h>
+
 #include	"config.h"
 #include	"defs.h"
-
 #include	"lmapprog.h"
 #include	"mipsdis.h"
-
 #include	"recorder.h"
 #include	"ssh.h"
-
 #include	"lflowgroup.h"
 #include	"lmipsregs.h"
 #include	"opclass.h"
@@ -54,22 +53,6 @@
 #define	SSHFILE_MAGIC	"HAMMOCKS"
 #define	SSHFILE_VERSION	0
 #define	SSHFILE_TYPE	0
-
-#ifndef	ENDIAN
-#if	defined(SOLARIS) && defined(__sparc)
-#define	ENDIAN		1
-#else
-#ifdef	_BIG_ENDIAN
-#define	ENDIAN		1
-#endif
-#ifdef	_LITTLE_ENDIAN
-#define	ENDIAN		0
-#endif
-#ifndef	ENDIAN
-#error	"could not determine endianness of this machine"
-#endif
-#endif
-#endif
 
 #ifndef	LINELEN
 #define	LINELEN		100

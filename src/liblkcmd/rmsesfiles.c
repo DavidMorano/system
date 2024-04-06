@@ -60,7 +60,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<cfdec.h>
 #include	<ids.h>
 #include	<fsdir.h>
@@ -153,7 +153,7 @@ int rmsesfiles(cchar *dname)
 	if ((rs = mkpath1(pbuf,dname)) >= 0) {
 	    SIGBLOCK	s ;
 	    const int	plen = rs ;
-	    if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	        if ((rs = lockbegin(pbuf,plen)) >= 0) {
 	            IDS		id ;
 	            const int	lfd = rs ;
@@ -185,7 +185,7 @@ int rmsesfiles(cchar *dname)
 	        } else if (isLocked(rs)) {
 	            rs = SR_OK ;
 	        } /* end if (lockend) */
-	        rs1 = sigblock_finish(&s) ;
+	        rs1 = sigblocker_finish(&s) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (mkpath) */

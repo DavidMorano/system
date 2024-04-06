@@ -41,7 +41,6 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<endianstr.h>
 #include	<nulstr.h>
 #include	<sbuf.h>
 #include	<char.h>

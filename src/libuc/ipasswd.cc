@@ -167,11 +167,13 @@ enum indices {
 
 /* exported variables */
 
+#ifdef	COMMENT
 IPASSWD_OBJ	ipasswd = {
 	"ipasswd",
-	sizeof(IPASSWD),
-	sizeof(IPASSWD_CUR)
+	sizeof(ipasswd),
+	sizeof(ipasswd_cur)
 } ;
+#endif /* COMMENT */
 
 
 /* exported subroutines */

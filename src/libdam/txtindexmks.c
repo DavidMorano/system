@@ -83,7 +83,6 @@
 #include	<string.h>
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<estrings.h>
 #include	<vecint.h>
 #include	<osetint.h>

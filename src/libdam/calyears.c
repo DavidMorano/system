@@ -56,7 +56,6 @@
 #include	<tmtime.h>
 #include	<getusername.h>
 #include	<fsdir.h>
-#include	<endianstr.h>
 #include	<localmisc.h>
 #include	<mkpathx.h>
 #include	<six.h>

@@ -88,7 +88,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(const void *,int) ;
+extern uint	hash_elf(const void *,int) ;
 
 extern int	snsds(char *,int,const char *,const char *) ;
 extern int	sncpy1(char *,int,const char *) ;
@@ -204,7 +204,7 @@ int prognotify(PROGINFO *pip,vecobj *mip,vecobj *rsp)
 	{
 	    char	hashbuf[MAXHOSTNAMELEN+ 1] ;
 	    cl = snsds(hashbuf,MAXHOSTNAMELEN,cluster,pip->logid) ;
-	    ri.tag = hashelf(hashbuf,cl) ;
+	    ri.tag = hash_elf(hashbuf,cl) ;
 	}
 
 	if (rs >= 0) {

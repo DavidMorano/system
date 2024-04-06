@@ -59,7 +59,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<vecstr.h>
 #include	<ids.h>
 #include	<storebuf.h>

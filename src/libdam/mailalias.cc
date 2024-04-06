@@ -66,7 +66,6 @@
 #include	<strings.h>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<bfile.h>
@@ -696,7 +695,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	                hl = strlen(aname) ;
 	            } /* end if */
 
-	            khash = hashelf(hp,hl) ;
+	            khash = hash_elf(hp,hl) ;
 
 	            hi = hashindex(khash,op->rilen) ;
 
@@ -1939,7 +1938,7 @@ static int mailalias_mkind(MA *op,VECOBJ *rp,cchar skey[],
 	            debugprintf("mailalias_mkind: kl=%d key=%s\n",kl,kp) ;
 #endif
 
-	            khash = hashelf(kp,kl) ;
+	            khash = hash_elf(kp,kl) ;
 
 	            hi = hashindex(khash,n) ;
 

@@ -72,7 +72,8 @@
 #include	<dstr.h>
 #include	<realname.h>
 #include	<mallocstuff.h>
-#include	<localmisc.h>
+#include	<endian.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"postfile.h"
 
@@ -90,33 +91,13 @@
 
 #define	TI_MINUPDATE	4		/* minimum time between updates */
 
-#ifndef	ENDIAN
-#if	defined(SOLARIS) && defined(__sparc)
-#define	ENDIAN		1
-#else
-#ifdef	_BIG_ENDIAN
-#define	ENDIAN		1
-#endif
-#ifdef	_LITTLE_ENDIAN
-#define	ENDIAN		0
-#endif
-#ifndef	ENDIAN
-#error	"could not determine endianness of this machine"
-#endif
-#endif
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	NSHIFT	6
 
 
 /* external subroutines */
 
 extern uint	nextpowtwo(uint) ;
-extern uint	hashelf(const void *,int) ;
+extern uint	hash_elf(const void *,int) ;
 
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	randlc(int) ;
@@ -685,7 +666,7 @@ char		*up ;
 	    sp = np->last ;
 	    hl = MIN(np->len.last,((wi == 0) ? 1 : 3)) ;
 
-	    rhash = hashelf(sp,hl) ;
+	    rhash = hash_elf(sp,hl) ;
 
 	    hi = hashindex(rhash,op->rilen) ;
 

@@ -41,7 +41,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<endianstr.h>
 #include	<char.h>
 #include	<vecobj.h>
 #include	<vecstr.h>

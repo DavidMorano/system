@@ -88,6 +88,7 @@
 #include	<nulstr.h>
 #include	<filebuf.h>
 #include	<kinfo.h>
+#include	<endian.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -101,18 +102,6 @@
 
 #define	NCPU_PREFIXLEN		5
 #define	NCPU_POSTFIXLEN		7
-
-#ifndef	ENDIANSTR
-#ifdef	ENDIAN
-#if	(ENDIAN == 0)
-#define	ENDIANSTR	"0"
-#else
-#define	ENDIANSTR	"1"
-#endif
-#else
-#define	ENDIANSTR	"1"
-#endif
-#endif
 
 #define	LIBCNAME	"lib"
 #define	SHMPERMS	0666

@@ -63,7 +63,7 @@
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<char.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<cfdec.h>
 #include	<localmisc.h>
 

@@ -83,7 +83,6 @@
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<ciq.h>
-#include	<endianstr.h>
 #include	<localmisc.h>
 #include	<intfloor.h>
 #include	<intceil.h>

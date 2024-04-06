@@ -46,6 +46,7 @@
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 

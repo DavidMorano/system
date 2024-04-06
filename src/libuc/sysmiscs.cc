@@ -54,7 +54,6 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<endianstr.h>
 #include	<vecobj.h>
 #include	<msfile.h>
 #include	<spawnproc.h>
@@ -79,7 +78,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(const char *,int) ;
+extern uint	hash_elf(const char *,int) ;
 extern uint	hashagain(uint,int,int) ;
 extern uint	nextpowtwo(uint) ;
 

@@ -50,7 +50,7 @@
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<fsdirtree.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<bwops.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -3337,7 +3337,7 @@ FSDIRTREE_STAT	*sbp ;
 	}
 	if (rs < 0) goto ret0 ;
 
-	if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
 
 	    if (S_ISREG(sbp->st_mode)) {
 
@@ -3361,7 +3361,7 @@ FSDIRTREE_STAT	*sbp ;
 
 	    } /* end if */
 
-	    sigblock_finish(&blocker) ;
+	    sigblocker_finish(&blocker) ;
 	} /* end if (blocking signals) */
 
 ret0:

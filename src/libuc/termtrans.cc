@@ -38,6 +38,7 @@
 #include	<ansigr.h>
 #include	<buffer.h>
 #include	<findbit.h>
+#include	<endian.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"termtrans.h"

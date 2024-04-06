@@ -47,7 +47,8 @@
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"votds.h"
@@ -383,7 +384,7 @@ int votds_titleloads(VOTDS *op,const char *lang,const char **tv)
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 #if	CF_DEBUGS
 	debugprintf("votds_titleloads: locked\n") ;
@@ -396,7 +397,7 @@ int votds_titleloads(VOTDS *op,const char *lang,const char **tv)
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 #if	CF_DEBUGS
@@ -427,7 +428,7 @@ int votds_titlelang(VOTDS *op,const char *lang)
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	            int		bi ;
 	            const char	*blang ;
@@ -441,7 +442,7 @@ int votds_titlelang(VOTDS *op,const char *lang)
 	            } /* end for */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 #if	CF_DEBUGS
@@ -468,7 +469,7 @@ int votds_titlefetch(VOTDS *op,char *rbuf,int rlen,const char *lang,int ti)
 	if ((ti < 0) || (ti >= VOTDS_NTITLES)) return SR_INVALID ;
 
 	rbuf[0] = '\0' ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votds_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -489,7 +490,7 @@ int votds_titlefetch(VOTDS *op,char *rbuf,int rlen,const char *lang,int ti)
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 	return rs ;
@@ -512,7 +513,7 @@ int votds_titlematch(VOTDS *op,const char *lang,const char *sp,int sl)
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (sp[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votds_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -537,7 +538,7 @@ int votds_titlematch(VOTDS *op,const char *lang,const char *sp,int sl)
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? bi : rs ;
@@ -565,7 +566,7 @@ int		mjd ;
 	if (lang == NULL) return SR_FAULT ;
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (mjd < 0) return SR_INVALID ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	        if ((rs = votds_booklanghave(op,lang)) >= 0) {
 	            int	li = rs ;
@@ -578,7 +579,7 @@ int		mjd ;
 	        } /* end if (votds_booklanghave) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
 	if (rs >= 0) {
@@ -613,7 +614,7 @@ int		vl ;
 	if (vp == NULL) return SR_FAULT ;
 	if (vp[0] == '\0') return SR_INVALID ;
 	if (mjd < 0) return SR_INVALID ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votds_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -671,7 +672,7 @@ int		vl ;
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
 	debugprintf("votds_verseload: ret rs=%d\n",rs) ;
@@ -693,7 +694,7 @@ VOTDS_INFO	*bip ;
 
 	if (op->magic != VOTDS_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	        VOTDSHDR	*hdrp = &op->hdr ;
 	        int		n, i ;
@@ -725,7 +726,7 @@ VOTDS_INFO	*bip ;
 	        }
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 	return rs ;

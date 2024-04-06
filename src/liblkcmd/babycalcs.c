@@ -54,7 +54,7 @@
 
 #include	<usystem.h>
 #include	<endian.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<bfile.h>
 #include	<estrings.h>
 #include	<vecobj.h>
@@ -1288,7 +1288,7 @@ static int babycalcs_reloadshm(BABYCALCS *op,time_t dt,USTAT *sbp)
 	    int		mapextent ;
 	    int		f = FALSE ;
 
-	    if ((rs = sigblock_start(&sb,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&sb,NULL)) >= 0) {
 
 	        if ((rs = ptm_lock(op->mp)) >= 0) {
 
@@ -1315,7 +1315,7 @@ static int babycalcs_reloadshm(BABYCALCS *op,time_t dt,USTAT *sbp)
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (mutex lock) */
 
-	        rs1 = sigblock_finish(&sb) ;
+	        rs1 = sigblocker_finish(&sb) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 

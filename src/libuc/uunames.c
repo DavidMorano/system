@@ -40,7 +40,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<char.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
@@ -725,11 +725,9 @@ static int uunames_indmapdestroy(UUNAMES *op)
 static int uunames_filemapcreate(UUNAMES *op,time_t dt)
 {
 	USTAT		sb ;
-	size_t		sz ;
 	int		rs = SR_OK ;
 	int		fd ;
 	int		mprot, mflags ;
-	void		*vp ;
 
 	if (dt == 0) dt = time(NULL) ;
 
@@ -761,9 +759,8 @@ static int uunames_filemapcreate(UUNAMES *op,time_t dt)
 
 	mprot = PROT_READ ;
 	mflags = MAP_SHARED ;
-	sz = op->indfname ;
-	rs = u_mmap(NULL,sz,mprot,mflags, fd,0L,&vp) ;
-	op->indfmap = (caddr_t) vp ;
+	rs = u_mmap(NULL,(size_t) op->indfsize,mprot,mflags,
+	    fd,0L,&op->indfmap) ;
 
 	if (rs >= 0) {
 	    op->ti_map = dt ;

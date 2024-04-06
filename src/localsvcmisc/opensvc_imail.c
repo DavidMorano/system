@@ -124,7 +124,7 @@
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<filebuf.h>
 #include	<envhelp.h>
 #include	<spawnproc.h>
@@ -500,7 +500,7 @@ int		to ;
 #endif
 
 	if (rs >= 0) {
-	    if ((rs = sigblock_start(&b,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 	        const char	*template = "/tmp/opensvcXXXXXXX" ;
 	        char		afname[MAXPATHLEN+1] ;
 
@@ -580,7 +580,7 @@ int		to ;
 	            uc_unlink(afname) ;
 	        } /* end if (opentmpfile) */
 
-	        rs1 = sigblock_finish(&b) ;
+	        rs1 = sigblocker_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (sigblock) */
 	} /* end if (ok) */

@@ -58,7 +58,7 @@
 #include	<usystem.h>
 #include	<sbuf.h>
 #include	<bfile.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 #include	"mailspool.h"
@@ -193,7 +193,7 @@ static int progdeliverer(PROGINFO *pip,int tfd,RECIP *rp,cchar *md,int f)
 	}
 #endif
 
-	if ((rs = sigblock_start(&blocks,sigblocks)) >= 0) {
+	if ((rs = sigblocker_start(&blocks,sigblocks)) >= 0) {
 	    if ((rs = u_rewind(tfd)) >= 0) {
 	        MAILSPOOL	ms ;
 		mode_t		om = 0660 ;
@@ -232,7 +232,7 @@ static int progdeliverer(PROGINFO *pip,int tfd,RECIP *rp,cchar *md,int f)
 	    	    if (rs >= 0) rs = rs1 ;
 	        } /* end if (mailspool) */
 	    } /* end if (u_rewind) */
-	    rs1 = sigblock_finish(&blocks) ;
+	    rs1 = sigblocker_finish(&blocks) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 

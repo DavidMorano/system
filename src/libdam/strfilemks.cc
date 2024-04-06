@@ -85,13 +85,13 @@
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<filebuf.h>
-#include	<endidanstr.h>
-#include	<localmisc.h>
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<mkpath.h>
 #include	<sfx.h>
 #include	<strwcpy.h>
+#include	<endian.h>
+#include	<localmisc.h>
 
 #include	"strfilemks.h"
 #include	"strlisthdr.h"

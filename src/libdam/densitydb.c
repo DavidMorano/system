@@ -52,6 +52,7 @@
 
 #include	<usystem.h>
 #include	<serialbuf.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"densitydb.h"
@@ -888,7 +889,7 @@ static int densitydb_fileinit(DENSITYDB *op,time_t dt)
 	        f = f && (fm.vetu[1] == DENSITYDB_ENDIAN) ;
 
 #if	CF_DEBUGS
-	        debugprintf("densitydb_fileinit: endian cmp f=%d\n",f) ;
+	        debugprintf("densitydb_fileinit: cmp f=%d\n",f) ;
 #endif
 
 	        if (! f)

@@ -58,7 +58,7 @@
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<cthex.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 
@@ -131,7 +131,7 @@ int openshmtmp(char *rbuf,int rlen,mode_t om)
 	    ULONG	rv ;
 	    if ((rs = randinit(&rv)) >= 0) {
 	        SIGBLOCK	b ;
-	        if ((rs = sigblock_start(&b,NULL)) >= 0) {
+	        if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 	            const int	oflags = (O_CREAT | O_EXCL | O_RDWR) ;
 	            const int	ntries = NTRIES ;
 		    int		i ;
@@ -153,7 +153,7 @@ int openshmtmp(char *rbuf,int rlen,mode_t om)
 		        uc_unlinkshm(rbuf) ;
 	 	    }
 
-	            sigblock_finish(&b) ;
+	            sigblocker_finish(&b) ;
 	        } /* end if (sigblock) */
 	    } /* end if (randinit) */
 	} /* end if (ok) */

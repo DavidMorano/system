@@ -55,7 +55,6 @@
 #include	<fsdir.h>
 #include	<storebuf.h>
 #include	<upt.h>
-#include	<endianstr.h>
 #include	<six.h>
 #include	<hasx.h>
 #include	<localmisc.h>

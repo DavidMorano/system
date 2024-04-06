@@ -77,7 +77,7 @@
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<filebuf.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 #include	<hash.h>
 

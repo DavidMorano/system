@@ -74,6 +74,7 @@
 #include	<ascii.h>
 #include	<getax.h>
 #include	<getusername.h>
+#include	<endian.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -87,18 +88,6 @@
 #define	SYSMISCEMS_SHMDBNAME	"sm"
 
 #define	LOADINFO		struct loadinfo
-
-#ifndef	ENDIANSTR
-#ifdef	ENDIAN
-#if	(ENDIAN == 0)
-#define	ENDIANSTR	"0"
-#else
-#define	ENDIANSTR	"1"
-#endif
-#else
-#define	ENDIANSTR	"1"
-#endif
-#endif
 
 #ifndef	SHMNAMELEN
 #define	SHMNAMELEN	14		/* shared-memory name length */

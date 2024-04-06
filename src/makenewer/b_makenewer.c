@@ -67,7 +67,7 @@
 #include	<storebuf.h>
 #include	<field.h>
 #include	<fsdirtree.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1883,12 +1883,12 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname,FSDIRTREESTAT *sbp)
 
 	if ((rs >= 0) && f) {
 	    SIGBLOCK	blocker ;
-	    if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
 
 	        rs = procfiler(pip,ofp,sbp,fname) ;
 	        f_updated = (rs > 0) ;
 
-	        sigblock_finish(&blocker) ;
+	        sigblocker_finish(&blocker) ;
 	    } /* end if (blocking signals) */
 	} /* end if (processing issued) */
 

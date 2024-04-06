@@ -74,7 +74,7 @@
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<vecstr.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -117,7 +117,7 @@ int		f_lock ;
 	    debugprintf("progmailbox: mfd=%d\n",mfd) ;
 #endif
 
-	if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
 	    off_t	moff ;
 
 /* lock the user's mailbox file */
@@ -165,7 +165,7 @@ int		f_lock ;
 
 	    } /* end if (ok) */
 
-	    sigblock_finish(&blocker) ;
+	    sigblocker_finish(&blocker) ;
 	} /* end if (sigblock) */
 
 /* cleanup */

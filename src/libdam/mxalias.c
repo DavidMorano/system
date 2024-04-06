@@ -86,22 +86,6 @@
 #define	TO_FILECHANGED	5		/* DB file check */
 #define	TO_FILEOLD	10		/* backing-store check */
 
-#ifndef	ENDIAN
-#if	defined(OSNAME_SunOS) && defined(__sparc)
-#define	ENDIAN		1
-#else
-#ifdef	_BIG_ENDIAN
-#define	ENDIAN		1
-#endif
-#ifdef	_LITTLE_ENDIAN
-#define	ENDIAN		0
-#endif
-#ifndef	ENDIAN
-#error	"could not determine endianness of this machine"
-#endif
-#endif
-#endif
-
 #ifndef	LINEBUFLEN
 #define	LINEBUFLEN	2048
 #endif

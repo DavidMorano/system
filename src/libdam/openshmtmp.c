@@ -85,7 +85,7 @@
 #include	<usystem.h>
 #include	<ugetpid.h>
 #include	<cthex.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 
@@ -155,7 +155,7 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	    if ((rs = randinit(&rv)) >= 0) {
 	        SIGBLOCK	b ;
 		rbuf[0] = '\0' ;
-	        if ((rs = sigblock_start(&b,NULL)) >= 0) {
+	        if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 	            const int	of = (O_CREAT | O_EXCL | O_RDWR) ;
 	            const int	ntries = NTRIES ;
 		    int		i ;
@@ -177,7 +177,7 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 			rbuf[0] = '\0' ;
 	 	    }
 
-	            rs1 = sigblock_finish(&b) ;
+	            rs1 = sigblocker_finish(&b) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 		if ((rs < 0) && (fd_shm >= 0) && (rbuf[0] != '\0')) {

@@ -87,22 +87,6 @@
 #define	NENTRIES	100
 #define	FBUFLEN		(SRVREG_FLTOP + 9)
 
-#ifndef	ENDIAN
-#if	defined(OSNAME_SunOS) && defined(__sparc)
-#define	ENDIAN		1
-#else
-#ifdef	_BIG_ENDIAN
-#define	ENDIAN		1
-#endif
-#ifdef	_LITTLE_ENDIAN
-#define	ENDIAN		0
-#endif
-#ifndef	ENDIAN
-#error	"could not determine endianness of this machine"
-#endif
-#endif
-#endif
-
 
 /* external subroutines */
 
@@ -1158,7 +1142,7 @@ time_t		daytime ;
 	        f = f && (fm.vetu[1] == SRVREG_ENDIAN) ;
 
 #if	CF_DEBUGS
-	        debugprintf("srvreg_fileinit: endian cmp f=%d\n",f) ;
+	        debugprintf("srvreg_fileinit: cmp f=%d\n",f) ;
 #endif
 
 	        if (! f)

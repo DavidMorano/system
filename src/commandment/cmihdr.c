@@ -56,7 +56,6 @@
 
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<localmisc.h>
 
 #include	"cmihdr.h"

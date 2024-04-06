@@ -223,7 +223,7 @@ static int mkrand_heavy(PROGINFO *pip,TIMEVAL *todp) noex {
 	if (rs >= 0) {
 	    for (i = 0 ; pip->envv[i] != NULL ; i += 1) {
 	        uint	hv ;
-	        hv = hashelf(pip->envv[i],-1) ;
+	        hv = hash_elf(pip->envv[i],-1) ;
 	        rv ^= (((ulong) hv) << ((i & 1) ? 32 : 0)) ;
 	    } /* end for */
 	}

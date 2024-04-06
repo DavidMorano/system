@@ -48,7 +48,7 @@
 #include	<bfile.h>
 #include	<hdb.h>
 #include	<fsdirtree.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<bwops.h>
 #include	<cfdec.h>
 #include	<field.h>
@@ -4928,7 +4928,7 @@ static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
 	}
 	if (rs >= 0) {
 	    SIGBLOCK	blocker ;
-	    if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
 	        if (S_ISREG(sbp->st_mode)) {
 	            rs = procsyncer_reg(pip,name,sbp) ;
 	        } else if (S_ISDIR(sbp->st_mode)) {
@@ -4940,7 +4940,7 @@ static int procsyncer(PROGINFO *pip,cchar *name,USTAT *sbp)
 	        } else if (S_ISSOCK(sbp->st_mode)) {
 	            rs = procsyncer_sock(pip,name,sbp) ;
 	        } /* end if */
-	        sigblock_finish(&blocker) ;
+	        sigblocker_finish(&blocker) ;
 	    } /* end if (blocking signals) */
 	} /* end if (ok) */
 

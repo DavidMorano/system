@@ -86,7 +86,7 @@
 #include	<vecobj.h>
 #include	<filebuf.h>
 #include	<char.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"ttimk.h"

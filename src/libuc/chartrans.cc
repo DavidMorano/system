@@ -33,6 +33,7 @@
 #include	<utf8decoder.h>
 #include	<matstr.h>
 #include	<strwcmp.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"chartrans.h"

@@ -57,8 +57,8 @@
 
 	= NOT thread-safe!
 
-	This subroutine is not thread-safe!  This is because the KINFO object
-	is not thread-safe.
+        This subroutine is not thread-safe! This is because the KINFO object is
+        not thread-safe.
 
 
 *******************************************************************************/
@@ -82,18 +82,6 @@
 
 
 /* local defines */
-
-#ifndef	ENDIANSTR
-#ifdef	ENDIAN
-#if	(ENDIAN == 0)
-#define	ENDIANSTR	"0"
-#else
-#define	ENDIANSTR	"1"
-#endif
-#else
-#define	ENDIANSTR	"1"
-#endif
-#endif
 
 #ifndef	VARLIBPATH
 #define	VARLIBPATH	"LD_LIBRARY_PATH"

@@ -56,7 +56,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -122,7 +122,7 @@ int bopentmp(bfile *fp,cchar *tname,cchar *ostr,mode_t om)
 	if ((rs = mkxfn(xfname,tname)) >= 0) {
 	    if ((rs = mktmpdirs(xfname,om)) >= 0) {
 	        SIGBLOCK	b ;
-	        if ((rs = sigblock_start(&b,NULL)) >= 0) {
+	        if ((rs = sigblocker_start(&b,NULL)) >= 0) {
 		    char	tbuf[MAXPATHLEN + 1] ;
     	
 	            if ((rs = mktmpfile(tbuf,om,xfname)) >= 0) {
@@ -130,7 +130,7 @@ int bopentmp(bfile *fp,cchar *tname,cchar *ostr,mode_t om)
 	                u_unlink(tbuf) ;
 	            } /* end if (tmp-file) */
     
-	            sigblock_finish(&b) ;
+	            sigblocker_finish(&b) ;
 	        } /* end if (sigblock) */
 	    } /* end if (mktmpdirs) */
 	} /* end if (ok) */
