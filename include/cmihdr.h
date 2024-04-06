@@ -1,26 +1,28 @@
-/* cmihdr */
+/* cmihdr HEADER */
+/* lang=C20 */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CMIHDR_INCLUDE
-#define	CMIHDR_INCLUDE	1
+#define	CMIHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
-#define	CMIHDR			struct cmihdr
-
+#define	CMIHDR			struct cmihdr_head
 #define	CMIHDR_MAGICSTR		"CMDINDEX"
 #define	CMIHDR_MAGICLEN		sizeof(CMIHDR_MAGICSTR)
 #define	CMIHDR_MAGICSIZE	16
 #define	CMIHDR_VERSION		0
 
 
-struct cmihdr {
+struct cmihdr_head {
 	uint		dbsize ;	/* DB-file size */
 	uint		dbtime ;	/* DB modification-time */
 	uint		idxsize ;	/* IDX-file size */
@@ -34,16 +36,14 @@ struct cmihdr {
 	uchar		vetu[4] ;
 } ;
 
+typedef	CMIHDR		cmihdr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int cmihdr(CMIHDR *,int,char *,int) ;
+extern int cmihdr_read(cmihdr *,int,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* CMIHDR_INCLUDE */
 

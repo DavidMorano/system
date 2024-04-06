@@ -1,6 +1,8 @@
-/* cmi */
+/* cmi HEADER */
+/* lang=C20 */
 
 /* ComMand Index object */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,31 +15,31 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	CMI_INCLUDE
-#define	CMI_INCLUDE	1
+#define	CMI_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
+
 #include	"cmihdr.h"		/* this is the hash-file-header */
 
 
 #define	CMI_MAGIC	0x88773427
 #define	CMI_SUF		"cmi"		/* variable-index */
-
 #define	CMI		struct cmi_head
+#define	CMI_OBJ		struct cmi_object
+#define	CMI_CUR		struct cmi_cursor
+#define	CMI_ENT		struct cmi_entry
+#define	CMI_LINE	struct cmi_liner
+#define	CMI_INFO	struct cmi_information
+#define	CMI_FMI		struct cmi_fmidx
 
-#define	CMI_OBJ		struct cmi_obj
-#define	CMI_CUR		struct cmi_c
-#define	CMI_ENT		struct cmi_e
-#define	CMI_LINE	struct cmi_l
-#define	CMI_INFO	struct cmi_i
-#define	CMI_FMI		struct cmi_fmi
 
-
-/* this is the shared-object description */
 struct cmi_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -52,12 +54,12 @@ struct cmi_i {
 	uint		maxent ;
 } ;
 
-struct cmi_l {
+struct cmi_liner {
 	uint		loff ;
 	uint		llen ;
 } ;
 
-struct cmi_e {
+struct cmi_entry {
 	CMI_LINE	*lines ;
 	uint		eoff ;
 	uint		elen ;
@@ -65,51 +67,51 @@ struct cmi_e {
 	ushort		cn ;
 } ;
 
-struct cmi_c {
+struct cmi_cursor {
 	int		i ;
 } ;
 
-struct cmi_fmi {
+struct cmi_fmidx {
 	char		*mapdata ;	/* file map */
+	uint		(*vt)[4] ;	/* mapped verses table */
+	uint		(*lt)[2] ;	/* mapped lines table */
 	time_t		ti_mod ;	/* time file modication */
 	time_t		ti_map ;	/* time file map */
 	size_t		mapsize ;
-	uint		(*vt)[4] ;	/* mapped verses table */
-	uint		(*lt)[2] ;	/* mapped lines table */
 } ;
 
 struct cmi_head {
-	uint		magic ;
-	const char 	*dbname ;
-	const char	*fname ;
+	cchar 		*dbname ;
+	cchar		*fname ;
 	CMI_FMI		fmi ;		/* file-map information */
 	CMIHDR		fhi ;		/* file-header information */
 	time_t		ti_lastcheck ;	/* time last check of file */
+	uint		magic ;
 	int		ncursors ;
 } ;
 
+typedef	CMI		cmi ;
+typedef	CMI_OBJ		cmi_obj ;
+typedef	CMI_CUR		cmi_cur ;
+typedef	CMI_ENT		cmi_ent ;
+typedef	CMI_LINE	cmi_line ;
+typedef	CMI_INFO	cmi_info ;
+typedef	CMI_FMI		cmi_fmi ;
 
-#if	(! defined(CMI_MASTER)) || (CMI_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	cmi_open(CMI *,cchar *) noex ;
+extern int	cmi_count(CMI *) noex ;
+extern int	cmi_getinfo(CMI *,CMI_INFO *) noex ;
+extern int	cmi_read(CMI *,CMI_ENT *,char *,int,uint) noex ;
+extern int	cmi_curbegin(CMI *,CMI_CUR *) noex ;
+extern int	cmi_enum(CMI *,CMI_CUR *,CMI_ENT *,char *,int) noex ;
+extern int	cmi_curend(CMI *,CMI_CUR *) noex ;
+extern int	cmi_audit(CMI *) noex ;
+extern int	cmi_close(CMI *) noex ;
 
-extern int	cmi_open(CMI *,const char *) ;
-extern int	cmi_count(CMI *) ;
-extern int	cmi_info(CMI *,CMI_INFO *) ;
-extern int	cmi_read(CMI *,CMI_ENT *,char *,int,uint) ;
-extern int	cmi_curbegin(CMI *,CMI_CUR *) ;
-extern int	cmi_enum(CMI *,CMI_CUR *,CMI_ENT *,char *,int) ;
-extern int	cmi_curend(CMI *,CMI_CUR *) ;
-extern int	cmi_audit(CMI *) ;
-extern int	cmi_close(CMI *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* CMI_MASTER */
 
 #endif /* CMI_INCLUDE */
 

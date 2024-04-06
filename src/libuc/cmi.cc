@@ -1,11 +1,11 @@
-/* cmi */
+/* cmi SPPORT */
+/* lang=C++20 */
 
 /* read or audit a ComMandment Index (CMI) database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SEARCH	1		/* use 'bsearch(3c)' */
-
 
 /* revision history:
 
@@ -18,38 +18,33 @@
 
 /*******************************************************************************
 
-	This subroutine opens and allows for reading or auditing of a CMI
-	(ComMandment Index) database.
+	Name:
+	cmi
+
+	Descriptiom:
+	This subroutine opens and allows for reading or auditing
+	of a CMI (ComMandment Index) database.
 
 	Synopsis:
-
-	int cmi_open(op,dbname)
-	CMI		*op ;
-	const char	dbname[] ;
+	int cmi_open(CMI *op,cchar *dbname) noex
 
 	Arguments:
-
 	- op		object pointer
 	- dbname	name of (path-to) DB
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<char.h>
 #include	<endian.h>
@@ -61,8 +56,6 @@
 
 
 /* local defines */
-
-#define	CMI_FMI		struct cmi_fmi
 
 #define	CMI_KA		sizeof(CMI_LINE)
 #define	CMI_BO(v)	((CMI_KA - ((v) % CMI_KA)) % CMI_KA)
@@ -76,16 +69,16 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -94,10 +87,10 @@ extern int	strlinelen(cchar *,int,int) ;
 extern char	*timestr_log(time_t,char *) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -105,7 +98,7 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported variables */
 
-CMI_OBJ	cmi = {
+CMI_OBJ	cmi_modinfo = {
 	"cmi",
 	sizeof(CMI),
 	sizeof(CMI_CUR)
@@ -117,38 +110,39 @@ CMI_OBJ	cmi = {
 
 /* forward references */
 
-static int	cmi_loadbegin(CMI *,time_t) ;
-static int	cmi_loadend(CMI *) ;
-static int	cmi_mapcreate(CMI *,time_t) ;
-static int	cmi_mapdestroy(CMI *) ;
-static int	cmi_proc(CMI *,time_t) ;
-static int	cmi_verify(CMI *,time_t) ;
-static int	cmi_auditvt(CMI *) ;
-static int	cmi_checkupdate(CMI *,time_t) ;
-static int	cmi_search(CMI *,uint) ;
-static int	cmi_loadcmd(CMI *,CMI_ENT *,char *,int,int) ;
+static int	cmi_loadbegin(CMI *,time_t) noex ;
+static int	cmi_loadend(CMI *) noex ;
+static int	cmi_mapcreate(CMI *,time_t) noex ;
+static int	cmi_mapdestroy(CMI *) noex ;
+static int	cmi_proc(CMI *,time_t) noex ;
+static int	cmi_verify(CMI *,time_t) noex ;
+static int	cmi_auditvt(CMI *) noex ;
+static int	cmi_checkupdate(CMI *,time_t) noex ;
+static int	cmi_search(CMI *,uint) noex ;
+static int	cmi_loadcmd(CMI *,CMI_ENT *,char *,int,int) noex ;
 
 #if	CF_SEARCH
-static int	vtecmp(const void *,const void *) ;
+static int	vtecmp(cvoid *,cvoid *) noex ;
 #endif
 
 #if	CF_DEBUGS
-static int	debugpresent(cchar *,const void *) ;
+static int	debugpresent(cchar *,cvoid *) noex ;
 #endif
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cmi_open(CMI *op,cchar *dbname)
-{
+int cmi_open(CMI *op,cchar *dbname) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	int		nents = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (dbname == NULL) return SR_FAULT ;
@@ -161,7 +155,7 @@ int cmi_open(CMI *op,cchar *dbname)
 	memset(op,0,sizeof(CMI)) ;
 
 	if ((rs = uc_mallocstrw(dbname,-1,&cp)) >= 0) {
-	    const char	*es = ENDIANSTR ;
+	    cchar	*es = ENDIANSTR ;
 	    char	tmpfname[MAXPATHLEN + 1] ;
 	    op->dbname = cp ;
 	    if ((rs = mkfnamesuf2(tmpfname,op->dbname,CMI_SUF,es)) >= 0) {
@@ -301,7 +295,7 @@ int cmi_count(CMI *op)
 
 
 /* this is so vital to normal operation! (no joke) */
-int cmi_info(CMI *op,CMI_INFO *ip)
+int cmi_getinfo(CMI *op,CMI_INFO *ip)
 {
 	CMIHDR		*hip ;
 	int		rs = SR_OK ;
@@ -325,7 +319,7 @@ int cmi_info(CMI *op,CMI_INFO *ip)
 
 	return (rs >= 0) ? hip->nents : rs ;
 }
-/* end subroutine (cmi_info) */
+/* end subroutine (cmi_getinfo) */
 
 
 int cmi_read(CMI *op,CMI_ENT *bvep,char *vbuf,int vlen,uint cn)
@@ -888,7 +882,7 @@ static int cmi_loadcmd(CMI *op,CMI_ENT *bvep,char *ebuf,int elen,int vi)
 
 
 #if	CF_SEARCH
-static int vtecmp(const void *v1p,const void *v2p)
+static int vtecmp(cvoid *v1p,cvoid *v2p)
 {
 	uint		*vte1 = (uint *) v1p ;
 	uint		*vte2 = (uint *) v2p ;
@@ -902,7 +896,7 @@ static int vtecmp(const void *v1p,const void *v2p)
 
 
 #if	CF_DEBUGS
-static int debugpresent(cchar *s,const void *a)
+static int debugpresent(cchar *s,cvoid *a)
 {
 	int	rs = uc_mallpresent(a) ;
 	debugprintf(s,rs) ;

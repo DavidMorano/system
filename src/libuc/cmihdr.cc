@@ -1,9 +1,8 @@
-/* cmihdr */
+/* cmihdr SUPPORT */
+/* lang=C++20 */
 
 /* index for Commandment-entry file */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,40 +19,32 @@
 
 /*******************************************************************************
 
+	Name:
+	cmihdrx
+
+	Description:
 	This subroutine reads and write a commandment-entry index file.
 
 	Synopsis:
-
-	int cmihdr(ep,f,hbuf,hlen)
-	CMIHDR		*ep ;
-	int		f ;
-	char		hbuf[] ;
-	int		hlen ;
+	int cmihdr_msg(cmihdr *ep,int f,char *hbuf,int hlen) noex
 
 	Arguments:
-
 	- ep		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<localmisc.h>
@@ -66,14 +57,10 @@
 
 /* external subroutines */
 
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strnchr(const char *,int,int) ;
+extern "C" {
+    extern int	mkmagic(char *,int,cchar *) noex ;
+    extern int	isValidMagic(cchar *,int,cchar *) noex ;
+}
 
 
 /* external variables */
@@ -102,17 +89,18 @@ enum his {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cmihdr(CMIHDR *ep,int f,char *hbuf,int hlen)
-{
+int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = CMIHDR_MAGICSIZE ;
+	cint	headsize = hi_overlast * sizeof(uint) ;
+	cint	magicsize = CMIHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	const char	*magicstr = CMIHDR_MAGICSTR ;
+	cchar	*magicstr = CMIHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
@@ -201,10 +189,6 @@ int cmihdr(CMIHDR *ep,int f,char *hbuf,int hlen)
 	    }
 
 	} /* end if (read-write) */
-
-#if	CF_DEBUGS
-	debugprintf("bvidu: f=%d rs=%d\n",f,rs) ;
-#endif
 
 	return (rs >= 0) ? (bp - hbuf) : rs ;
 }
