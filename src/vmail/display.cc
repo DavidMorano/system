@@ -73,7 +73,7 @@
 
 #define	NMSGBUFLEN	12
 
-#define	LINESBUFLEN	(4+1)
+#define	LINESBSBUF	UFLEN	(4+1)
 
 #define	DCH_MARK	'*'
 #define	DCH_POINT	'>'
@@ -3151,7 +3151,7 @@ static int scanline_fill(SCANLINE *slp,DISPLAY_SDATA *ddp)
 	}
 
 	if (ddp != NULL) {
-	    SBUF	b ;
+	    sbuf	b ;
 	    int		cl ;
 	    int		icols ;
 	    int		nblank ;

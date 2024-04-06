@@ -30,7 +30,7 @@
 #define	IPASSWD_CUR		struct ipasswd_cursor
 #define	IPASSWD_INFO		struct ipasswd_information
 #define	IPASSWD_ENT		struct ipasswd_entry
-#define	IPASSWD_OBJ		struct ipasswd_obj
+#define	IPASSWD_OBJ		struct ipasswd_object
 #define	IPASSWD_FL		struct ipasswd_flags
 
 #define	IPASSWD_SUF		"pwi"
@@ -48,7 +48,7 @@
 #define	IPASSWD_FOLASTFULL	0x01	/* require full last name for match */
 
 
-struct ipasswd_obj {
+struct ipasswd_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
@@ -90,9 +90,9 @@ struct ipasswd_flags {
 
 struct ipasswd_head {
 	cchar		*fname ;
-	caddr_t		mapdata ;
 	cchar		*stab ;
 	uint		(*recind[IPASSWD_NINDICES])[2] ;
+	caddr_t		mapdata ;
 	IPASSWD_ENT	*rectab ;
 	IPASSWD_FL	f ;
 	time_t		mtime ;
@@ -116,22 +116,22 @@ struct ipasswd_head {
 } ;
 
 typedef IPASSWD			ipasswd ;
+typedef	IPASSWD_FL		ipasswd_fl ;
 typedef IPASSWD_CUR		ipasswd_cur ;
+typedef	IPASSWD_ENT		ipasswd_ent ;
 typedef IPASSWD_INFO		ipasswd_info ;
+typedef	IPASSWD_OBJ		ipasswd_obj ;
 
 EXTERNC_begin
 
-extern int	ipasswd_open(ipasswd *,cchar *) noex ;
-extern int	ipasswd_getinfo(ipasswd *,ipasswd_info *) noex ;
-extern int	ipasswd_curbegin(ipasswd *,ipasswd_cur *) noex ;
-extern int	ipasswd_curend(ipasswd *,ipasswd_cur *) noex ;
-extern int	ipasswd_enum(ipasswd *,ipasswd_cur *,char *,cchar **,
-			char *,int) noex ;
-extern int	ipasswd_fetcher(ipasswd *,ipasswd_cur *,int,char *,cchar **,
-			int) noex ;
-extern int	ipasswd_fetch(ipasswd *,REALNAME *,ipasswd_cur *,
-			int,char *) noex ;
-extern int	ipasswd_close(ipasswd *) noex ;
+extern int ipasswd_open(ipasswd *,cchar *) noex ;
+extern int ipasswd_getinfo(ipasswd *,ipasswd_info *) noex ;
+extern int ipasswd_curbegin(ipasswd *,ipasswd_cur *) noex ;
+extern int ipasswd_curend(ipasswd *,ipasswd_cur *) noex ;
+extern int ipasswd_enum(ipasswd *,ipasswd_cur *,char *,cc **,char *,int) noex ;
+extern int ipasswd_fetcher(ipasswd *,ipasswd_cur *,int,char *,cc **,int) noex ;
+extern int ipasswd_fetch(ipasswd *,realname *,ipasswd_cur *,int,char *) noex ;
+extern int ipasswd_close(ipasswd *) noex ;
 
 EXTERNC_end
 

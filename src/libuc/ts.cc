@@ -1,5 +1,5 @@
-/* ts (Time-Stamp) */
-/* lang=C20 */
+/* ts SUPPORT (Time-Stamp) */
+/* lang=C++20 */
 
 /* time-stamp file manager */
 /* version %I% last-modified %G% */
@@ -126,20 +126,19 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<inttypes.h>
-#include	<limits.h>
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cinttypes>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<vecstr.h>
@@ -149,6 +148,8 @@
 #include	<hash.h>
 #include	<strwcpy.h>
 #include	<strdcpyx.h>
+#include	<matxstr.h>
+#include	<localmisc.h>
 
 #include	"ts.h"
 #include	"tse.h"
@@ -186,7 +187,6 @@
 
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	getfstype(char *,int,int) ;
-extern int	islocalfs(const char *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -1826,12 +1826,10 @@ time_t		dt ;
 
 	{
 	    char	fstype[USERNAMELEN + 1] ;
-	    int		fslen ;
-
-	    rs = getfstype(fstype,USERNAMELEN,op->fd) ;
-	    fslen = rs ;
-	    if (rs >= 0) {
-		int	f = islocalfs(fstype,fslen) ;
+	    int		fslen = USERNAMELEN ;
+	    if ((rs = getfstype(fstype,fslen,op->fd)) >= 0) {
+	        cint	fsl = rs ;
+		cbool	f = (matlocalfs(fstype,fsl) >= 0) ;
 	        op->f.remote = (! f) ; /* remote if not local! */
 	    }
 

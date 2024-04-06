@@ -1,4 +1,4 @@
-/* ts (Time-Stamp) */
+/* ts INCLUDE (Time-Stamp) */
 /* lang=C20 */
 
 /* time-stamp file manager */
@@ -12,17 +12,18 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<mapstrint.h>
 #include	<localmisc.h>
+
 #include	"tse.h"
 #include	"ebuf.h"
 
 
 #define	TS_MAGIC		918245636
 #define	TS			struct ts_head
-#define	TS_CUR			struct ts_c
+#define	TS_CUR			struct ts_cursor
+#define	TS_H			struct ts_h
 #define	TS_ENT			TSE_ALL
 
 #define	TS_FILEMAGIC		"MS"
@@ -60,16 +61,15 @@ struct ts_flags {
 } ;
 
 struct ts_head {
-	uint		magic ;
-	const char	*fname ;
-	struct ts_flags	f ;
-	struct ts_h	h ;
+	cchar		*fname ;
+	TS_FL		f ;
+	TS_H		h ;
 	EBUF		ebm ;			/* entry-buffer-manager */
 	MAPSTRINT	ni ;			/* nodename index */
 	time_t		ti_open ;		/* file open time */
 	time_t		ti_access ;		/* file access time */
 	time_t		ti_mod ;		/* file modification time */
-	mode_t		operm ;
+	uint		magic ;
 	int		oflags ;
 	int		pagesize ;
 	int		filesize ;
@@ -77,6 +77,7 @@ struct ts_head {
 	int		fd ;
 	int		ncursors ;
 	int		fileversion, fileencoding, filetype ;
+	mode_t		operm ;
 	char		topbuf[TS_TOPLEN + 1] ;	/* top-buffer */
 } ;
 
@@ -84,24 +85,25 @@ struct ts_c {
 	int		i ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	TS		ts ;
+typedef	TS_CUR		ts_cur ;
+typedef	TS_H		ts_h ;
+typedef	TS_ENT		ts_ednt ;
 
-extern int ts_open(TS *,const char *,int,mode_t) ;
-extern int ts_curbegin(TS *,TS_CUR *) ;
-extern int ts_curend(TS *,TS_CUR *) ;
-extern int ts_enum(TS *,TS_CUR *,TS_ENT *) ;
-extern int ts_match(TS *,time_t,const char *,int,TS_ENT *) ;
-extern int ts_write(TS *,time_t,const char *,int,TS_ENT *) ;
-extern int ts_update(TS *,time_t,TS_ENT *) ;
-extern int ts_check(TS *,time_t) ;
-extern int ts_count(TS *) ;
-extern int ts_close(TS *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int ts_open(ts *,cchar *,int,mode_t) noex ;
+extern int ts_curbegin(ts *,ts_cur *) noex ;
+extern int ts_curend(ts *,ts_cur *) noex ;
+extern int ts_enum(ts *,ts_cur *,ts_ent *) noex ;
+extern int ts_match(ts *,time_t,cchar *,int,ts_ent *) noex ;
+extern int ts_write(ts *,time_t,cchar *,int,ts_ent *) noex ;
+extern int ts_update(ts *,time_t,ts_ent *) noex ;
+extern int ts_check(ts *,time_t) noex ;
+extern int ts_count(ts *) noex ;
+extern int ts_close(ts *) noex ;
+
+EXTERNC_end
 
 
 #endif /* TS_INCLUDE */

@@ -4,7 +4,6 @@
 /* indexed PASSWD GECOS DB */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_SAFE		0		/* safe mode */
 #define	CF_USEFL3	1		/* use first-last3 index (fast) */
 
@@ -43,19 +42,15 @@
 	ipasswd_fetch
 
 	Synopsis:
-	int ipasswd_fetch(op,np,curp,opts,up)
-	IPASSWD		*op ;
-	realname	*np ;
-	IPASSWD_CUR	*curp ;
-	int		opts ;
-	char		*up ;
+	int ipasswd_fetch(IP *op,realname *np,IP_CUR *curp,int opts,
+			char *up) noex
 
 	Arguments:
 	op		object pointer
 	np		pointer to realname object
 	curp		cursor pointer
 	opts		options
-	up		resumt buffer (at least USERNAMELEN+1 in size)
+	up		result buffer (at least USERNAMELEN+1 in size)
 
 	Returns:
 	<0		error
@@ -63,19 +58,14 @@
 
 *******************************************************************************/
 
-#undef	LOCAL_SUNOS
-#define	LOCAL_SUNOS	(defined(SUNOS) || \
-	(defined(OSTYPE_SUNOS) && (OSTYPE_SUNOS > 0)))
-
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>		/* Memory Management */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<climits>
 #include	<ctime>
+#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -86,11 +76,15 @@
 #include	<realname.h>
 #include	<pwihdr.h>
 #include	<hash.h>
-#include	<strwcpy.h>
+#include	<strn.h>
 #include	<mkpath.h>
+#include	<mkfnamesuf.h>
 #include	<sfx.h>
+#include	<strwcpy.h>
 #include	<intceil.h>
 #include	<intsat.h>
+#include	<randlc.h>
+#include	<matxstr.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -118,28 +112,11 @@
 
 #define	NSHIFT		6		/* shift bits for secondary hash */
 
-#if	CF_DEBUGS
-#define	PRSTRLEN	80
-#endif
-
 
 /* external subroutines */
 
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	randlc(int) ;
-extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	getfstype(char *,int,int) ;
-extern int	lockfile(int,int,off_t,off_t,int) ;
-extern int	islocalfs(cchar *,int) ;
 extern int	isValidMagic(cchar *,int,cchar *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strnrchr(cchar *,int,int) ;
 
 
 /* local structures */
@@ -147,37 +124,33 @@ extern char	*strnrchr(cchar *,int,int) ;
 
 /* forward references */
 
-static int	ipasswd_hdrload(IPASSWD *) ;
-static int	ipasswd_hdrloader(IPASSWD *) ;
-static int	ipasswd_enterbegin(IPASSWD *,time_t) ;
-static int	ipasswd_enterend(IPASSWD *,time_t) ;
+static int	ipasswd_hdrload(IPASSWD *) noex ;
+static int	ipasswd_hdrloader(IPASSWD *) noex ;
+static int	ipasswd_enterbegin(IPASSWD *,time_t) noex ;
+static int	ipasswd_enterend(IPASSWD *,time_t) noex ;
 
-static int	ipasswd_fileopen(IPASSWD *,time_t) ;
-static int	ipasswd_fileclose(IPASSWD *) ;
-static int	ipasswd_mapbegin(IPASSWD *,time_t) ;
-static int	ipasswd_mapend(IPASSWD *) ;
-static int	ipasswd_remotefs(IPASSWD *) ;
-static int	ipasswd_keymatchfl3(IPASSWD *,int,int,realname *) ;
-static int	ipasswd_keymatchl3(IPASSWD *,int,int,realname *) ;
-static int	ipasswd_keymatchl1(IPASSWD *,int,int,realname *) ;
-static int	ipasswd_keymatchf(IPASSWD *,int,int,realname *) ;
-static int	ipasswd_keymatchall(IPASSWD *,int,int,realname *) ;
+static int	ipasswd_fileopen(IPASSWD *,time_t) noex ;
+static int	ipasswd_fileclose(IPASSWD *) noex ;
+static int	ipasswd_mapbegin(IPASSWD *,time_t) noex ;
+static int	ipasswd_mapend(IPASSWD *) noex ;
+static int	ipasswd_remotefs(IPASSWD *) noex ;
+static int	ipasswd_keymatchfl3(IPASSWD *,int,int,realname *) noex ;
+static int	ipasswd_keymatchl3(IPASSWD *,int,int,realname *) noex ;
+static int	ipasswd_keymatchl1(IPASSWD *,int,int,realname *) noex ;
+static int	ipasswd_keymatchf(IPASSWD *,int,int,realname *) noex ;
+static int	ipasswd_keymatchall(IPASSWD *,int,int,realname *) noex ;
 
-static int	ipaswd_mapcheck(IPASSWD *,time_t) ;
+static int	ipaswd_mapcheck(IPASSWD *,time_t) noex ;
 
 #ifdef	COMMENT
-static int	ipasswd_keymatchlast(IPASSWD *,int,int,char *,int) ;
+static int	ipasswd_keymatchlast(IPASSWD *,int,int,char *,int) noex ;
 #endif
 
-static int	mkourfname(char *,cchar *) ;
+static int	mkourfname(char *,cchar *) noex ;
 
-static int	hashindex(uint,int) ;
+static int	hashindex(uint,int) noex ;
 
-#if	CF_DEBUGS
-static int	mkprstr(char *,int,cchar *,int) ;
-#endif
-
-static int	detOurSuf(cchar *,cchar *,int) ;
+static int	detOurSuf(cchar *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -203,22 +176,16 @@ IPASSWD_OBJ	ipasswd = {
 
 /* exported subroutines */
 
-
-int ipasswd_open(IPASSWD *op,cchar *dbname)
-{
-	const time_t	dt = time(NULL) ;
+int ipasswd_open(IPASSWD *op,cchar *dbname) noex {
+	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		rs1 ;
 	char		dbfname[MAXPATHLEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("ipasswd_open: dbname=%s\n",dbname) ;
-#endif
-
-	memset(op,0,sizeof(IPASSWD)) ;
+	memclear(op) ;
 	op->fd = -1 ;
 	op->oflags = O_RDONLY ;
 	op->operm = 0666 ;
@@ -244,31 +211,24 @@ int ipasswd_open(IPASSWD *op,cchar *dbname)
 	        } /* end if (file-open) */
 	        if (rs < 0) {
 	            uc_free(op->fname) ;
-	            op->fname = NULL ;
+	            op->fname = nullptr ;
 	        }
 	    } /* end if (store) */
 	} /* end if (mk-filename) */
-
-#if	CF_DEBUGS
-	debugprintf("ipasswd_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (ipasswd_open) */
 
-
-/* free up this IPASSWD object */
-int ipasswd_close(IPASSWD *op)
-{
+int ipasswd_close(IPASSWD *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 
-	if (op->mapdata != NULL) {
+	if (op->mapdata != nullptr) {
 	    rs1 = ipasswd_mapend(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -279,10 +239,10 @@ int ipasswd_close(IPASSWD *op)
 	    op->fd = -1 ;
 	}
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -290,12 +250,8 @@ int ipasswd_close(IPASSWD *op)
 }
 /* end subroutine (ipasswd_close) */
 
-
-/* get the string count in the table */
-int ipasswd_count(IPASSWD *op)
-{
-
-	if (op == NULL) return SR_FAULT ;
+int ipasswd_count(IPASSWD *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 
@@ -303,12 +259,8 @@ int ipasswd_count(IPASSWD *op)
 }
 /* end subroutine (ipasswd_count) */
 
-
-/* calculate the index table length (number of entries) at this point */
-int ipasswd_countindex(IPASSWD *op)
-{
-
-	if (op == NULL) return SR_FAULT ;
+int ipasswd_countindex(IPASSWD *op) noex {
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 
@@ -316,17 +268,14 @@ int ipasswd_countindex(IPASSWD *op)
 }
 /* end subroutine (ipasswd_countindex) */
 
-
-/* initialize a cursor */
-int ipasswd_curbegin(IPASSWD *op,IPASSWD_CUR *curp)
-{
+int ipasswd_curbegin(IPASSWD *op,IPASSWD_CUR *curp) noex {
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	op->f.cursor = TRUE ;
-	op->f.cursoracc = FALSE ;
+	op->f.cursor = true ;
+	op->f.cursoracc = false ;
 
 	for (i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
 	    curp->i[i] = -1 ;
@@ -337,16 +286,13 @@ int ipasswd_curbegin(IPASSWD *op,IPASSWD_CUR *curp)
 }
 /* end subroutine (ipasswd_curbegin) */
 
-
-/* free up a cursor */
-int ipasswd_curend(IPASSWD *op,IPASSWD_CUR *curp)
-{
-	const time_t	dt = time(NULL) ;
+int ipasswd_curend(IPASSWD *op,IPASSWD_CUR *curp) noex {
+	const time_t	dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		i ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
@@ -354,7 +300,7 @@ int ipasswd_curend(IPASSWD *op,IPASSWD_CUR *curp)
 	if (op->f.cursoracc)
 	    op->ti_access = dt ;
 
-	op->f.cursor = FALSE ;
+	op->f.cursor = false ;
 	for (i = 0 ; i < IPASSWD_NINDICES ; i += 1) {
 	    curp->i[i] = -1 ;
 	}
@@ -364,16 +310,8 @@ int ipasswd_curend(IPASSWD *op,IPASSWD_CUR *curp)
 }
 /* end subroutine (ipasswd_curend) */
 
-
-/* enumerate */
-int ipasswd_enum(op,curp,ubuf,sa,rbuf,rlen)
-IPASSWD		*op ;
-IPASSWD_CUR	*curp ;
-char		ubuf[] ;
-cchar	*sa[] ;
-char		rbuf[] ;
-int		rlen ;
-{
+int ipasswd_enum(IPASSWD *op,IPASSWD_CUR *curp,char *ubuf,cc *sa,
+		char *rbuf,int rlen) noex {
 	time_t		dt = 0 ;
 	int		rs ;
 	int		rs1 ;
@@ -381,24 +319,20 @@ int		rlen ;
 	int		ul = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (curp == NULL) return SR_FAULT ;
-	if (ubuf == NULL) return SR_FAULT ;
-	if (sa == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (ubuf == nullptr) return SR_FAULT ;
+	if (sa == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
 
 	if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
 
 	if (! op->f.cursor) return SR_INVALID ;
 
 	ri = (curp->i[0] < 1) ? 1 : (curp->i[0] + 1) ;
-
-#if	CF_DEBUGS
-	debugprintf("ipasswd_enum: ent ri=%u\n",ri) ;
-#endif
 
 /* capture a hold on the file */
 
@@ -408,13 +342,9 @@ int		rlen ;
 	        int	ui ;
 	        cchar	*cp ;
 
-	        if (sa != NULL) {
+	        if (sa != nullptr) {
 	            STOREITEM	sio ;
 	            DSTR	ss[5] ;
-
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_enum: sa-ing\n") ;
-#endif
 
 /* first */
 
@@ -436,7 +366,7 @@ int		rlen ;
 
 /* middle=3 */
 
-	            ss[3].sbuf = NULL ;
+	            ss[3].sbuf = nullptr ;
 	            ss[3].slen = 0 ;
 
 /* last */
@@ -456,18 +386,14 @@ int		rlen ;
 	                for (j = 0 ; (rs >= 0) && (j < 5) ; j += 1) {
 	                    sp = ss[j].sbuf ;
 	                    sl = ss[j].slen ;
-#if	CF_DEBUGS
-	                    debugprintf("ipasswd_enum: j=%u sl=%d sp=%s\n",
-				j,sl,sp) ;
-#endif
-	                    if ((sp != NULL) && (sl != 0) && (*sp != '\0')) {
+	                    if ((sp != nullptr) && (sl != 0) && (*sp != '\0')) {
 				cint	ssl = ss[j].slen ;
 				cchar		*ssp = ss[j].sbuf ;
 	                        spp = (sa+c++) ;
 	                        rs = storeitem_strw(&sio,ssp,ssl,spp) ;
 	                    }
 	                } /* end for */
-	                sa[c] = NULL ;
+	                sa[c] = nullptr ;
 	                rs1 = storeitem_finish(&sio) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (storeitem) */
@@ -477,11 +403,7 @@ int		rlen ;
 
 	            ui = op->rectab[ri].username ;
 
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_enum: ui=%d\n",ui) ;
-#endif
-
-	            if (ubuf != NULL) {
+	            if (ubuf != nullptr) {
 			cint	ulen = IPASSWD_USERNAMELEN ;
 	                cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
 	                ul = (cp - ubuf) ;
@@ -502,44 +424,30 @@ int		rlen ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ipasswd-enter) */
 
-#if	CF_DEBUGS
-	debugprintf("ipasswd_enum: ret rs=%d ul=%u\n",rs,ul) ;
-#endif
-
 	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (ipasswd_enum) */
 
 
 /* fetch an entry by a real-name key lookup */
-int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
-{
+int ipasswd_fetch(IPASSWD *op,realname *rp,IPASSWD_CUR *curp,
+		int opts,char *up) noex {
 	IPASSWD_CUR	cur ;
 	time_t		dt = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
 	int		ul = 0 ;
-	int		f_cur = FALSE ;
+	int		f_cur = false ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (np == NULL) return SR_FAULT ;
+	if (rp == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	{
-	    cchar	*ln ;
-	    debugprintf("ipasswd_fetch: ent\n") ;
-	    if ((rs1 = realname_getlast(np,&ln)) >= 0) {
-	        debugprintf("ipasswd_fetch: ln=>%s<\n",ln) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
-	if (curp == NULL) {
+	if (curp == nullptr) {
 	    curp = &cur ;
 	    curp->magic = IPASSWD_CURMAGIC ;
 	    curp->wi = 0 ;
@@ -547,17 +455,12 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 	        curp->i[i] = -1 ;
 	    }
 	} else {
-	    f_cur = TRUE ;
+	    f_cur = true ;
 	    if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
 	    if (! op->f.cursor) return SR_INVALID ;
 	}
 
-	if (up != NULL)
-	    *up = '\0' ;
-
-#if	CF_DEBUGS
-	debugprintf("ipasswd_fetch: holding\n") ;
-#endif
+	if (up) *up = '\0' ;
 
 /* do we have a hold on the file? */
 
@@ -572,36 +475,36 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 /* continue with regular fetch activities */
 
-	    op->f.cursoracc = TRUE ;	/* doesn't hurt if no cursor! */
+	    op->f.cursoracc = true ;	/* doesn't hurt if no cursor! */
 
 /* which index do we want to use? */
 
 	    wi = -1 ;
 	    if (rs >= 0) {
 
-	        if ((np->len.first >= 1) && (np->len.last >= 3)) {
+	        if ((rp->len.first >= 1) && (rp->len.last >= 3)) {
 #if	CF_USEFL3
 	            wi = index_fl3 ;
 	            hp = hbuf ;
 	            hl = 4 ;
-	            hbuf[0] = np->first[0] ;
-	            strncpy((hbuf + 1),np->last,3) ;
+	            hbuf[0] = rp->first[0] ;
+	            strncpy((hbuf + 1),rp->last,3) ;
 #else
 	            wi = index_l3 ;
-	            hp = np->last ;
+	            hp = rp->last ;
 	            hl = 3 ;
 #endif /* CF_USEFL3 */
-	        } else if (np->len.last >= 3) {
+	        } else if (rp->len.last >= 3) {
 	            wi = index_l3 ;
-	            hp = np->last ;
+	            hp = rp->last ;
 	            hl = 3 ;
-	        } else if (np->len.last >= 1) {
+	        } else if (rp->len.last >= 1) {
 	            wi = index_l1 ;
-	            hp = np->last ;
+	            hp = rp->last ;
 	            hl = 1 ;
-	        } else if (np->len.first >= 1) {
+	        } else if (rp->len.first >= 1) {
 	            wi = index_f ;
-	            hp = np->first ;
+	            hp = rp->first ;
 	            hl = 1 ;
 	        } else {
 	            wi = -1 ;
@@ -613,47 +516,23 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 	    } /* end if (ok) */
 
-#if	CF_DEBUGS
-	    debugprintf("ipasswd_fetch: wi=%d key=%t\n",wi,hp,hl) ;
-	    debugprintf("ipasswd_fetch: rilen=%u (\\x%08x)\n",
-	        op->rilen, op->rilen) ;
-#endif
-
 /* OK, we go from here */
 
 	    if (rs >= 0) {
 
 	        if (curp->i[wi] < 0) {
 
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_fetch: new cursor\n") ;
-#endif
-
 	            hv = hash_elf(hp,hl) ;
 
 	            hi = hashindex(hv,op->rilen) ;
 
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_fetch: hv=%08x hi=%u\n",hv,hi) ;
-#endif
-
 /* start searching! */
 
 	            if (op->ropts & IPASSWD_ROSEC) {
-	                int	f ;
-
-#if	CF_DEBUGS
-	                if (hi < op->rilen)
-	                    debugprintf("ipasswd_fetch: sec-init ri=%u\n",
-	                        (op->recind[wi])[hi][0]) ;
-#endif
+	                bool	f{} ;
 
 	                c = 0 ;
 	                while ((ri = (op->recind[wi])[hi][0]) != 0) {
-
-#if	CF_DEBUGS
-	                    debugprintf("ipasswd_fetch: trymatch ri=%u\n",ri) ;
-#endif
 
 	                    if (ri >= op->rtlen) {
 	                        rs = 0 ;
@@ -662,16 +541,16 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 	                    switch (wi) {
 	                    case index_fl3:
-	                        f = ipasswd_keymatchfl3(op,opts,ri,np) ;
+	                        f = ipasswd_keymatchfl3(op,opts,ri,rp) ;
 	                        break ;
 	                    case index_l3:
-	                        f = ipasswd_keymatchl3(op,opts,ri,np) ;
+	                        f = ipasswd_keymatchl3(op,opts,ri,rp) ;
 	                        break ;
 	                    case index_l1:
-	                        f = ipasswd_keymatchl1(op,opts,ri,np) ;
+	                        f = ipasswd_keymatchl1(op,opts,ri,rp) ;
 	                        break ;
 	                    case index_f:
-	                        f = ipasswd_keymatchf(op,opts,ri,np) ;
+	                        f = ipasswd_keymatchf(op,opts,ri,rp) ;
 	                        break ;
 	                    } /* end switch */
 
@@ -686,19 +565,9 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 	                    hi = hashindex(hv,op->rilen) ;
 
-#if	CF_DEBUGS
-	                    debugprintf("ipasswd_fetch: new hv=%08x hi=%u\n",
-	                        hv,hi) ;
-#endif
-
 	                    c += 1 ;
 
 	                } /* end while */
-
-#if	CF_DEBUGS
-	                debugprintf("ipasswd_fetch: index-key-match ri=%u\n",
-				ri) ;
-#endif
 
 	                if (ri == 0) {
 	                    rs = SR_NOTFOUND ;
@@ -710,33 +579,15 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 /* get the next record index (if there is one) */
 
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_fetch: old cursor wi=%u\n",wi) ;
-#endif
-
 	            hi = curp->i[wi] ;
 	            if ((hi != 0) && (hi < op->rilen)) {
 
-#if	CF_DEBUGS
-	                debugprintf("ipasswd_fetch: hi=%u\n",hi) ;
-#endif
-
 	                ri = (op->recind[wi])[hi][0] ;
-#if	CF_DEBUGS
-	                debugprintf("ipasswd_fetch: ri=%u\n",ri) ;
-#endif
-
 	                if ((ri != 0) && (ri < op->rtlen)) {
 
 	                    hi = (op->recind[wi])[hi][1] ;
-#if	CF_DEBUGS
-	                    debugprintf("ipasswd_fetch: hi=%u\n",hi) ;
-#endif
 	                    if ((hi != 0) && (hi < op->rilen)) {
 	                        ri = (op->recind[wi])[hi][0] ;
-#if	CF_DEBUGS
-	                        debugprintf("ipasswd_fetch: ri=%u\n",ri) ;
-#endif
 	                    } else {
 	                        rs = SR_NOTFOUND ;
 			    }
@@ -753,25 +604,16 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 	    } /* end if (ok) */
 
-#if	CF_DEBUGS
-	    debugprintf("ipasswd_fetch: match search rs=%d hi=%u ri=%u\n",
-	        rs,hi,ri) ;
-#endif
-
 	    if (rs >= 0) {
 
 	        while ((ri = (op->recind[wi])[hi][0]) != 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_fetch: loop ri=%u\n",ri) ;
-#endif
 
 	            if (ri >= op->rtlen) {
 	                ri = 0 ;
 	                break ;
 	            }
 
-	            if (ipasswd_keymatchall(op,opts,ri,np)) break ;
+	            if (ipasswd_keymatchall(op,opts,ri,rp)) break ;
 
 	            hi = (op->recind[wi])[hi][1] ;
 	            if (hi == 0)
@@ -787,22 +629,14 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 	    } /* end if (following the existing chain) */
 
-#if	CF_DEBUGS
-	    debugprintf("ipasswd_fetch: done w/ search rs=%d ri=%u\n",rs,ri) ;
-#endif
-
 /* if successful, retrieve username */
 
 	    if (rs >= 0) {
 
 	        ui = op->rectab[ri].username ;
-	        if (up != NULL) {
+	        if (up != nullptr) {
 
 	            cp = strwcpy(up,(op->stab + ui),IPASSWD_USERNAMELEN) ;
-
-#if	CF_DEBUGS
-	            debugprintf("ipasswd_fetch: username=%s\n",up) ;
-#endif
 
 	            ul = (cp - up) ;
 
@@ -811,10 +645,6 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 	        }
 
 /* update cursor */
-
-#if	CF_DEBUGS
-	        debugprintf("ipasswd_fetch: update-cur hi=%u\n",hi) ;
-#endif
 
 	        if (f_cur) {
 	            curp->i[wi] = hi ;
@@ -826,10 +656,6 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (ipasswd-enter) */
 
-#if	CF_DEBUGS
-	debugprintf("ipasswd_fetch: ret rs=%d ul=%u\n",rs,ul) ;
-#endif
-
 	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (ipasswd_fetch) */
@@ -837,48 +663,38 @@ int ipasswd_fetch(IPASSWD *op,realname *np,IPASSWD_CUR *curp,int opts,char *up)
 
 /* fetch an entry by an array of real-name component strings */
 int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
-		cchar **sa,int sn)
-{
+		cchar **sa,int sn) noex {
 	IPASSWD_CUR	cur ;
 	time_t		dt = 0 ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
 	int		ul = 0 ;
-	int		f_cur = FALSE ;
+	int		f_cur = false ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 #endif
 
-	if (sa == NULL) return SR_FAULT ;
+	if (sa == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	if (curp != NULL)
-	    debugprintf("ipasswd_fetcher: ent curp->magic{%p}\n",curp->magic) ;
-#endif
-
-	if (curp == NULL) {
+	if (curp == nullptr) {
 	    curp = &cur ;
 	    curp->magic = IPASSWD_CURMAGIC ;
 	    for (i = 0 ; i < IPASSWD_NINDICES ; i += 1) curp->i[i] = -1 ;
 	} else {
-	    f_cur = TRUE ;
+	    f_cur = true ;
 	    if (curp->magic != IPASSWD_CURMAGIC) return SR_NOTOPEN ;
 	    if (! op->f.cursor) return SR_INVALID ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("ipasswd_fetcher: con\n") ;
-#endif
-
-	if (ubuf != NULL) ubuf[0] = '\0' ;
+	if (ubuf) ubuf[0] = '\0' ;
 
 /* do we have a hold on the file? */
 
 	if ((rs = ipasswd_enterbegin(op,dt)) >= 0) {
-	    realname	rn, *np = &rn ;
+	    realname	rn, *rp = &rn ;
 	    uint	hv, hi, ri, ui ;
 	    cint	ns = NSHIFT ;
 	    int		wi ;
@@ -889,37 +705,37 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 
 /* continue with regular fetch activities */
 
-	    op->f.cursoracc = TRUE ;	/* doesn't hurt if no cursor! */
+	    op->f.cursoracc = true ;	/* doesn't hurt if no cursor! */
 
 	    if (rs >= 0) {
-	        if ((rs = realname_startpieces(np,sa,sn)) >= 0) {
+	        if ((rs = realname_startpieces(rp,sa,sn)) >= 0) {
 
 /* which index do we want to use? */
 
 	            wi = -1 ;
-	            if ((np->len.first >= 1) && (np->len.last >= 3)) {
+	            if ((rp->len.first >= 1) && (rp->len.last >= 3)) {
 #if	CF_USEFL3
 	                wi = index_fl3 ;
 	                hp = hbuf ;
 	                hl = 4 ;
-	                hbuf[0] = np->first[0] ;
-	                strncpy((hbuf + 1),np->last,3) ;
+	                hbuf[0] = rp->first[0] ;
+	                strncpy((hbuf + 1),rp->last,3) ;
 #else
 	                wi = index_l3 ;
-	                hp = np->last ;
+	                hp = rp->last ;
 	                hl = 3 ;
 #endif /* CF_USEFL3 */
-	            } else if (np->len.last >= 3) {
+	            } else if (rp->len.last >= 3) {
 	                wi = index_l3 ;
-	                hp = np->last ;
+	                hp = rp->last ;
 	                hl = 3 ;
-	            } else if (np->len.last >= 1) {
+	            } else if (rp->len.last >= 1) {
 	                wi = index_l1 ;
-	                hp = np->last ;
+	                hp = rp->last ;
 	                hl = 1 ;
-	            } else if (np->len.first >= 1) {
+	            } else if (rp->len.first >= 1) {
 	                wi = index_f ;
-	                hp = np->first ;
+	                hp = rp->first ;
 	                hl = 1 ;
 	            } else {
 	                wi = -1 ;
@@ -981,16 +797,16 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 
 	                            switch (wi) {
 	                            case index_fl3:
-	                                f = ipasswd_keymatchfl3(op,opts,ri,np) ;
+	                                f = ipasswd_keymatchfl3(op,opts,ri,rp) ;
 	                                break ;
 	                            case index_l3:
-	                                f = ipasswd_keymatchl3(op,opts,ri,np) ;
+	                                f = ipasswd_keymatchl3(op,opts,ri,rp) ;
 	                                break ;
 	                            case index_l1:
-	                                f = ipasswd_keymatchl1(op,opts,ri,np) ;
+	                                f = ipasswd_keymatchl1(op,opts,ri,rp) ;
 	                                break ;
 	                            case index_f:
-	                                f = ipasswd_keymatchf(op,opts,ri,np) ;
+	                                f = ipasswd_keymatchf(op,opts,ri,rp) ;
 	                                break ;
 	                            } /* end switch */
 
@@ -1076,7 +892,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 	                        break ;
 	                    }
 
-	                    if (ipasswd_keymatchall(op,opts,ri,np)) break ;
+	                    if (ipasswd_keymatchall(op,opts,ri,rp)) break ;
 
 	                    hi = (op->recind[wi])[hi][1] ;
 	                    if (hi == 0) break ;
@@ -1100,7 +916,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 	            if (rs >= 0) {
 
 	                ui = op->rectab[ri].username ;
-	                if (ubuf != NULL) {
+	                if (ubuf != nullptr) {
 			    cint	ulen = IPASSWD_USERNAMELEN ;
 	                    cp = strwcpy(ubuf,(op->stab + ui),ulen) ;
 	                    ul = (cp - ubuf) ;
@@ -1119,7 +935,7 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 
 	            } /* end if (got one) */
 
-	            rs1 = realname_finish(np) ;
+	            rs1 = realname_finish(rp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (realname) */
 	    } /* end if (ok) */
@@ -1139,12 +955,12 @@ int ipasswd_fetcher(IPASSWD *op,IPASSWD_CUR *curp,int opts,char *ubuf,
 int ipasswd_getinfo(IPASSWD *op,IPASSWD_INFO *rp) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (rp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (rp == nullptr) return SR_FAULT ;
 
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 
-	if (rp != NULL) {
+	if (rp != nullptr) {
 	    rp->collisions = op->collisions ;
 	}
 
@@ -1154,9 +970,9 @@ int ipasswd_getinfo(IPASSWD *op,IPASSWD_INFO *rp) noex {
 
 int ipasswd_check(IPASSWD *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
+	int		f = false ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != IPASSWD_MAGIC) return SR_NOTOPEN ;
 
@@ -1240,9 +1056,7 @@ static int ipasswd_hdrload(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_hdrload) */
 
-
-static int ipasswd_hdrloader(IPASSWD *op)
-{
+static int ipasswd_hdrloader(IPASSWD *op) noex {
 	uint		*table = (uint *) (op->mapdata + IPASSWD_IDLEN) ;
 	int		rs = SR_OK ;
 
@@ -1302,37 +1116,29 @@ static int ipasswd_hdrloader(IPASSWD *op)
 }
 /* end subroutine (ipasswd_hdrloader) */
 
-
-/* acquire access to the file (mapped memory) */
-static int ipasswd_enterbegin(IPASSWD *op,time_t dt)
-{
+static int ipasswd_enterbegin(IPASSWD *op,time_t dt) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 
 #if	CF_DEBUGS
 	debugprintf("ipasswd_enterbegin: ent\n") ;
 #endif
 
-	op->f.held = TRUE ;
+	op->f.held = true ;
 	if ((rs = ipaswd_mapcheck(op,dt)) > 0) {
-	    f = TRUE ;
+	    f = true ;
 	}
 
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ipasswd_enterbegin) */
 
-
-/* release our hold on the filemap */
-/* ARGSUSED */
-static int ipasswd_enterend(IPASSWD *op,time_t dt)
-{
+static int ipasswd_enterend(IPASSWD *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
+	(void) dt ;
 	if (op->f.held) {
-	    op->f.held = FALSE ;
+	    op->f.held = false ;
 	}
-
 	return rs ;
 }
 /* end subroutine (ipasswd_enterend) */
@@ -1342,9 +1148,9 @@ static int ipasswd_fileopen(IPASSWD *op,time_t dt) noex {
 	if (op->fd < 0) {
 	    if ((rs = uc_open(op->fname,op->oflags,op->operm)) >= 0) {
 	        op->fd = rs ;
-	        if (dt == 0) dt = time(NULL) ;
+	        if (dt == 0) dt = time(nullptr) ;
 	        op->ti_open = dt ;
-	        if ((uc_closeonexec(op->fd,TRUE)) >= 0) {
+	        if ((uc_closeonexec(op->fd,true)) >= 0) {
 	            USTAT	sb ;
 	            if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 			csize	fsz = size_t(sb.st_size) ;
@@ -1381,148 +1187,110 @@ static int ipasswd_fileclose(IPASSWD *op) noex {
 }
 /* end subroutine (ipasswd_fileclose) */
 
-
-static int ipasswd_mapbegin(IPASSWD *op,time_t dt)
-{
+static int ipasswd_mapbegin(IPASSWD *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-	if (op->mapdata == NULL) {
+	int		f = false ;
+	if (op->mapdata == nullptr) {
+	    cnullptr	np{} ;
 	    size_t	ms = uceil(op->filesize,op->pagesize) ;
 	    cint	fd = op->fd ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;
 	    void	*md ;
 	    if (ms == 0) ms = op->pagesize ;
-	    if ((rs = u_mmap(NULL,ms,mp,mf,fd,0L,&md)) >= 0) {
-	        op->mapdata = md ;
+	    if ((rs = u_mmap(np,ms,mp,mf,fd,0L,&md)) >= 0) {
+	        op->mapdata = charp(md) ;
 	        op->mapsize = ms ;
 	        op->ti_map = dt ;
-	        f = TRUE ;
+	        f = true ;
 	    }
 	} /* end if (needed) */
-
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ipasswd_mapbegin) */
 
-
-static int ipasswd_mapend(IPASSWD *op)
-{
+static int ipasswd_mapend(IPASSWD *op) noex {
 	int		rs = SR_OK ;
-	if (op->mapdata != NULL) {
-	    rs = u_munmap(op->mapdata,op->mapsize) ;
-	    op->mapdata = NULL ;
+	if (op->mapdata != nullptr) {
+	    void	*ma = voidp(op->mapdata) ;
+	    csize	ms = op->mapsize ;
+	    rs = u_munmap(ma,ms) ;
+	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
 	}
 	return rs ;
 }
 /* end subroutine (ipasswd_mapend) */
 
-
-static int ipasswd_remotefs(IPASSWD *op)
-{
+static int ipasswd_remotefs(IPASSWD *op) noex {
 	int		rs ;
-	int		fslen ;
-	int		f = FALSE ;
+	int		fslen = USERNAMELEN ;
+	int		f = false ;
 	char		fstype[USERNAMELEN + 1] ;
-	if ((rs = getfstype(fstype,USERNAMELEN,op->fd)) >= 0) {
+	if ((rs = getfstype(fstype,fslen,op->fd)) >= 0) {
 	    fslen = rs ;
-	    f = (! islocalfs(fstype,fslen)) ;
+	    f = (matlocalfs(fstype,fslen) < 0) ;
 	    op->f.remote = f ;
 	}
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (ipasswd_remotefs) */
 
-
-static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,realname *np)
-{
+static int ipasswd_keymatchfl3(IPASSWD *op,int opts,int ri,realname *rp) noex {
 	int		si = op->rectab[ri].last ;
 	int		f ;
 
-	f = (strncmp((op->stab + si),np->last,3) == 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("ipasswd_keymatchfl3: sp=%s last=%s f=%u\n",
-	    (op->stab + si),np->last,f) ;
-#endif
+	f = (strncmp((op->stab + si),rp->last,3) == 0) ;
 
 	if (f) {
-
 	    si = op->rectab[ri].first ;
-	    f = ((op->stab + si)[0] == np->first[0]) ;
-
-#if	CF_DEBUGS
-	    debugprintf("ipasswd_keymatchfl3: sp=%s first=%s f=%u\n",
-	        (op->stab + si),np->first,f) ;
-#endif
-
+	    f = ((op->stab + si)[0] == rp->first[0]) ;
 	}
 
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchfl3) */
 
-
-static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,realname *np)
-{
+static int ipasswd_keymatchl3(IPASSWD *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f ;
 
 	si = op->rectab[ri].last ;
-	f = (strncmp((op->stab + si),np->last,3) == 0) ;
+	f = (strncmp((op->stab + si),rp->last,3) == 0) ;
 
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchl3) */
 
-
-static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,realname *np)
-{
+static int ipasswd_keymatchl1(IPASSWD *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f ;
 
 	si = op->rectab[ri].last ;
-	f = ((op->stab + si)[0] == np->last[0]) ;
+	f = ((op->stab + si)[0] == rp->last[0]) ;
 
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchl1) */
 
-
-static int ipasswd_keymatchf(IPASSWD *op,int opts,int ri,realname *np)
-{
+static int ipasswd_keymatchf(IPASSWD *op,int opts,int ri,realname *rp) noex {
 	int		si ;
 	int		f ;
 
 	si = op->rectab[ri].first ;
-	f = ((op->stab + si)[0] == np->first[0]) ;
+	f = ((op->stab + si)[0] == rp->first[0]) ;
 
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchf) */
 
-
 #ifdef	COMMENT
-
-static int ipasswd_keymatchlast(op,opts,ri,sp,hl)
-IPASSWD		*op ;
-int		opts ;
-int		ri ;
-char		*sp ;
-int		hl ;
-{
+static int ipasswd_keymatchlast(IPASSWD *op,int opts,int ri,
+		char *sp,int hl) noex {
 	int		si ;
 	int		f ;
 
 	si = op->rectab[ri].last ;
-
-#if	CF_DEBUGS
-	debugprintf("keymatchlast: hl=%d sp=%t stab=%t\n",
-	    hl,
-	    sp,hl,
-	    (op->stab + si),hl) ;
-#endif
 
 	if (opts & IPASSWD_FOLASTFULL) {
 	    f = (strncmp((op->stab + si),sp,3) == 0) ;
@@ -1536,31 +1304,21 @@ int		hl ;
 
 #endif /* COMMENT */
 
-
-static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *np)
-{
+static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *rp) noex {
 	int		si ;
-	int		f = TRUE ;
+	int		f = true ;
 	cchar	*s = op->stab ;
 	cchar	*sp ;
-
-#if	CF_DEBUGS
-	debugprintf("keymatchall: keyname last=%s first=%s\n",
-	    np->last,np->first) ;
-	debugprintf("keymatchall: ri=%u last=%s first=%s\n",ri,
-	    (s + op->rectab[ri].last),
-	    (s + op->rectab[ri].first)) ;
-#endif
 
 /* last */
 
 	if (f) {
 	    if (opts & IPASSWD_FOLASTFULL) {
 	        si = op->rectab[ri].last ;
-	        f = (strcmp((s + si),np->last) == 0) ;
+	        f = (strcmp((s + si),rp->last) == 0) ;
 	    } else {
 	        si = op->rectab[ri].last ;
-	        f = (strncmp((s + si),np->last,np->len.last) == 0) ;
+	        f = (strncmp((s + si),rp->last,rp->len.last) == 0) ;
 	    } /* end if */
 	}
 
@@ -1568,10 +1326,10 @@ static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *np)
 
 	if (f) {
 	    si = op->rectab[ri].first ;
-	    sp = np->first ;
-	    if ((sp != NULL) && (sp[0] != '\0')) {
+	    sp = rp->first ;
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        si = op->rectab[ri].first ;
-	        f = (strncmp((s + si),sp,np->len.first) == 0) ;
+	        f = (strncmp((s + si),sp,rp->len.first) == 0) ;
 	    }
 	}
 
@@ -1579,10 +1337,10 @@ static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *np)
 
 	if (f) {
 	    si = op->rectab[ri].m1 ;
-	    sp = np->m1 ;
-	    if ((sp != NULL) && (sp[0] != '\0')) {
+	    sp = rp->m1 ;
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        si = op->rectab[ri].m1 ;
-	        f = (strncmp((s + si),sp,np->len.m1) == 0) ;
+	        f = (strncmp((s + si),sp,rp->len.m1) == 0) ;
 	    }
 	}
 
@@ -1590,30 +1348,24 @@ static int ipasswd_keymatchall(IPASSWD *op,int opts,int ri,realname *np)
 
 	if (f) {
 	    si = op->rectab[ri].m2 ;
-	    sp = np->m2 ;
-	    if ((sp != NULL) && (sp[0] != '\0')) {
+	    sp = rp->m2 ;
+	    if ((sp != nullptr) && (sp[0] != '\0')) {
 	        si = op->rectab[ri].m2 ;
-	        f = (strncmp((s + si),sp,np->len.m2) == 0) ;
+	        f = (strncmp((s + si),sp,rp->len.m2) == 0) ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("keymatchall: ret f=%u\n",f) ;
-#endif
 
 	return f ;
 }
 /* end subroutine (ipasswd_keymatchall) */
 
-
-static int ipaswd_mapcheck(IPASSWD *op,time_t dt)
-{
+static int ipaswd_mapcheck(IPASSWD *op,time_t dt) noex {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-	if (op->mapdata == NULL) {
+	int		f = false ;
+	if (op->mapdata == nullptr) {
 	    if ((rs = ipasswd_fileopen(op,dt)) >= 0) {
 	        if ((rs = ipasswd_mapbegin(op,dt)) > 0) { /* only if */
-	            f = TRUE ;
+	            f = true ;
 	            rs = ipasswd_hdrload(op) ;
 	            if (rs < 0) {
 	                ipasswd_mapend(op) ;
@@ -1625,9 +1377,7 @@ static int ipaswd_mapcheck(IPASSWD *op,time_t dt)
 }
 /* end subroutine (ipaswd_mapcheck) */
 
-
-static int mkourfname(char *dbfname,cchar *dbname)
-{
+static int mkourfname(char *dbfname,cchar *dbname) noex {
 	int		rs ;
 	cchar	*suf = IPASSWD_SUF ;
 	cchar	*endstr = ((ENDIAN != 0) ? "1" : "0") ;
@@ -1642,33 +1392,12 @@ static int mkourfname(char *dbfname,cchar *dbname)
 }
 /* end subroutine (mkourfname) */
 
-
-/* calculate the next hash table index from a given one */
-static int hashindex(uint i,int n)
-{
+static int hashindex(uint i,int n) noex {
 	uint		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;
 }
 /* end subroutine (hashindex) */
-
-#if	CF_DEBUGS
-static int mkprstr(char *rbuf,int rlen,cchar *sp,int sl) noex {
-	int		n = 0 ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (rlen < 0) rlen = INT_MAX ;
-	for (int i = 0 ; (i < sl) && sp[i] ; i += 1) {
-	    cint	ch = mkchar(sp[i]) ;
-	    if (n >= rlen) break ;
-	    rbuf[n] = (char) ('?' + 128) ;
-	    if (isprintlatin(ch)) rbuf[n] = ch ;
-	    n += 1 ;
-	} /* end for */
-	rbuf[n] = '\0' ;
-	return n ;
-}
-/* end subroutine (mkprstr) */
-#endif /* CF_DEBUGS */
 
 static int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	int		len = 0 ;
@@ -1676,7 +1405,7 @@ static int detOurSuf(cchar *suf,cchar *fname,int fl) noex {
 	cchar	*cp ;
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*tp ;
-	    if ((tp = strnrchr(cp,cl,'.')) != NULL) {
+	    if ((tp = strnrchr(cp,cl,'.')) != nullptr) {
 	        cint	suflen = strlen(suf) ;
 	        if (strncmp((tp+1),suf,suflen) == 0) {
 	            len = (tp-fname) ;

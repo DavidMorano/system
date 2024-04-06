@@ -1,7 +1,7 @@
-/* isfsremote SUPPORT */
+/* matlocalfs SUPPORT */
 /* lang=C++20 */
 
-/* is the file on a local or remote filesystem? */
+/* determine is the given counted c-string is a local-filesystem name */
 /* version %I% last-modified %G% */
 
 
@@ -17,17 +17,19 @@
 /*******************************************************************************
 
 	Name:
-	isfsremote
+	matlocalfs
 
 	Description:
-	This subroutine checks if the specified file-descriptor
-	(FD) points to a file on a remote file-system.
+	This subroutine deterines if the given counted c-string
+	matches up against (fixed at the moment) list of file-sytem
+	name that are assume to be local file-systems.
 
 	Synopsis:
-	int isfsremote(int fd) noex
+	int matlocalfs(cchar *,sp,int sl noex
 
 	Arguments:
-	fd		file-descriptor to check
+	sp		name pointer
+	sl		name length
 
 	Returns:
 	>0		Yes, on a remote file-system
@@ -39,10 +41,10 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<matxstr.h>		/* |matlocalfs(3uc)| */
+#include	<matstr.h>
 #include	<localmisc.h>
 
-#include	"isfiledesc.h"
+#include	"matxstr.h"
 
 
 /* local defines */
@@ -56,10 +58,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	getfstype(char *,int,int) noex ;
-}
-
 
 /* external variables */
 
@@ -72,24 +70,41 @@ extern "C" {
 
 /* local variables */
 
+static constexpr cpcchar	localfs[] = {
+	"sysv",
+	"ufs",
+	"ext1",
+	"ext2",
+	"ext3",
+	"ext4",
+	"xfs",
+	"zfs",
+	"btrfs",
+	"apfs",
+	"tmpfs",
+	"devfs",
+	"lofs",
+	"vxfs",
+	"pcfs",
+	"hsfs",
+	"smbfs",
+	"autofs",
+	nullptr
+} ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int isfsremote(int fd) noex {
-	int		rs ;
-	bool		f = false ;
-	if ((rs = getbufsize(getbufsize_un)) >= 0) {
-	    cint	fslen = rs ;
-	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */
-	    if ((rs = getfstype(fstype,fslen,fd)) >= 0) {
-	        f = (matlocalfs(fstype,rs) < 0) ;
-	    }
-	} /* end if (getbufsize) */
-	return (rs >= 0) ? f : rs ;
+int matlocalfs(cchar *sp,int sl) noex {
+	int		rs = SR_FAULT ;
+	if (sp) {
+ 	    rs = (matstr(localfs,sp,sl) >= 0) ;
+	}
+	return rs ;
 }
-/* end subroutine (isfsremote) */
+/* end subroutine (matlocalfs) */
 
 
