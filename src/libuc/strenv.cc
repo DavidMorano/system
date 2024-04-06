@@ -126,9 +126,11 @@ namespace {
 	int imonend() noex {
 	    return mx.lockend ;
 	} ;
-	int getval(int,cchar **) noex ;
+	int valget(int,cchar **) noex ;
+	int valtmpdir(int) noex ;
+	int valmaildir(int) noex ;
+	int valpath(int) noex ;
 	int valenv(int) noex ;
-	int calc(int) noex ;
         void atforkbefore() noex {
 	    mx.lockbegin() ;
         }
@@ -205,7 +207,7 @@ strenv::operator ccharp () noex {
 	cchar		*rp = strp ;
 	if (! facc) {
 	    int		rs ;
-	    if ((rs = data.getval(w,&rp)) >= 0) {
+	    if ((rs = data.valget(w,&rp)) >= 0) {
 		strp = rp ;
 		facc = true ;
 	    } else {
@@ -214,7 +216,7 @@ strenv::operator ccharp () noex {
 	} /* end if (needed) */
 	return rp ;
 }
-/* end method (strenv::operator) */
+/* end method (valstore::operator) */
 
 int valstore::iinit() noex {
 	int		rs = SR_NXIO ;
@@ -290,7 +292,7 @@ int valstore::ifini() noex {
 }
 /* end method (valstore::ifini) */
 
-int valstore::getval(int aw,cchar **rpp) noex {
+int valstore::valget(int aw,cchar **rpp) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
 	if ((aw >= 0) && (aw < strenv_overlast)) {
@@ -298,10 +300,13 @@ int valstore::getval(int aw,cchar **rpp) noex {
 	        if (! facc[aw]) {
 		    switch (aw) {
 		    case strenv_tmpdir:
+		        rs = valtmpdir(aw) ;
 		        break ;
 		    case strenv_maildir:
+		        rs = valmaildir(aw) ;
 		        break ;
 		    case strenv_path:
+		        rs = valpath(aw) ;
 		        break ;
 		    default:
 		        rs = valenv(aw) ;
@@ -315,67 +320,81 @@ int valstore::getval(int aw,cchar **rpp) noex {
 	} /* end if (valid) */
 	return rs ;
 }
-/* end method (valstore::getval) */
+/* end method (valstore::valget) */
 
-#ifdef	COMMENT
-int valstore::calc(int aw) noex {
+int valstore::valtmpdir(int aw) noex {
 	int		rs = SR_OK ;
-	cchar		*rp = strp[aw] ;
-	if (! facc) {
-	    cint	to = utimeout[uto_busy] ;
-	    if (! fmx.testandset) {
-	        if ((w >= 0) && (w < strenv_overlast)) {
-		    switch (w) {
-		    case strenv_tmpdir:
-		        rp = strtmpdir() ;
-		        break ;
-		    case strenv_maildir:
-		        rp = strmaildir() ;
-		        break ;
-		    case strenv_path:
-		        rp = strpath() ;
-		        break ;
-		    default:
-		        rp = valenv() ;
-		        break ;
-		    } /* end switch */
-		    if (rp) {
-			fready.notifyall(true) ;
-		    }
-	        } /* end if (type) */
-            } else if (!fready) {
-                timewatch       tw(to) ;
-                auto lamb = [this] () -> int {
-                    int         rs = SR_OK ;
-                    if (!fmx) {
-                        rs = SR_LOCKLOST ;
-                    } else if (fready) {
-                        rs = 1 ;
-                    }
-                    return rs ;
-                } ; /* end lambda */
-                if (int rs ; (rs = tw(lamb)) >= 0) { /* <- time-watching */
-		    rp = strp ;
-	        } ;
-	    } else {
-		rp = strp ;
-	    } /* end if (atomic access) */
-	} /* end if (need to create value) */
-	return rp ;
+	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
+	    cchar *rp ; 
+	    if ((rp = getenv(vn)) == nullptr) {
+		rp = sysword.w_tmpdir ;
+	    } /* end if (env-variable access) */
+	    strp[aw] = rp ;
+	} /* end if (env-variabiel name) */
+	facc[aw] = true ;
+	return rs ;
 }
-/* end method (valstore::calc) */
-#endif /* COMMENT */
+/* end method (valstore::valtmpdir) */
+
+int valstore::valmaildir(int aw) noex {
+	int		rs = SR_OK ;
+	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
+	    cchar *rp ; 
+	    if ((rp = getenv(vn)) == nullptr) {
+		rp = sysword.w_maildir ;
+	    } /* end if (env-variable access) */
+	    strp[aw] = rp ;
+	} /* end if (env-variabiel name) */
+	facc[aw] = true ;
+	return rs ;
+}
+/* end method (valstore::valmaildir) */
+
+int valstore::valpath(int aw) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
+	    cchar *rp ; 
+	    if ((rp = getenv(vn)) == nullptr) {
+		if ((rs = maxpathlen) >= 0) {
+		    cint	tlen = (rs * PLMULT) ;
+		    char	*tbuf{} ;
+		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
+		        cchar	*usrlocal = sysword.w_usrlocaldir ;
+		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
+			    int		tl = rs ;
+			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
+		                cint	cmd = _CS_PATH ;
+			        cint	clen = (tlen - (tl+rs)) ;
+			        char	*cbuf = (tbuf + (tl+rs)) ;
+			        tl += rs ;
+		                if ((rs = uc_confstr(cbuf,clen,cmd)) >= 0) {
+			            tl += rs ;
+			            a[aw] = mallocstrw(tbuf,tl) ;
+		                } /* end if (uc_confstr) */
+			    } /* end if (sncpy) */
+		        } /* end if (mkpath) */
+		        rs1 = uc_free(tbuf) ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+		} /* end if (maxpathlen) */
+	    } /* end if (env-variable access) */
+	    strp[aw] = rp ;
+	} /* end if (env-variabiel name) */
+	facc[aw] = true ;
+	return rs ;
+}
+/* end method (valstore::valpath) */
 
 int valstore::valenv(int aw) noex {
 	int		rs = SR_OK ;
-	if (! facc[aw]) {
-	    cchar	*vn = enver.name[aw] ;
+	if (cchar *vn ; (vn = enver.name[aw]) != nullptr) {
 	    strp[aw] = getenv(vn) ;
-	    facc[aw] = true ;
 	}
+	facc[aw] = true ;
 	return rs ;
 }
-/* end method (strenv::valenv) */
+/* end method (valstore::valenv) */
 
 void valstore::dtor() noex {
 	cint		rs = fini() ;
