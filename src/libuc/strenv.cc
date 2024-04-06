@@ -83,10 +83,11 @@ namespace {
 	valstoremem_monend,
 	valstoremem_overlast
     } ; /* end enum (valstoremems) */
+    struct valstore ;
     struct valstore_co {
-	vecstr		*op = nullptr ;
+	valstore	*op = nullptr ;
 	int		w = -1 ;
-	void operator () (vecstr *p,int m) noex {
+	void operator () (valstore *p,int m) noex {
 	    op = p ;
 	    w = m ;
 	} ;
@@ -95,7 +96,6 @@ namespace {
 	    return operator int () ;
 	} ;
     } ; /* end struct (valstore_co) */
-    struct valstore ;
     struct valstore {
 	cchar		*strp[strenv_overlast] ;
 	char		*a[strenv_overlast] ;
@@ -118,7 +118,7 @@ namespace {
 	int ifini() noex ;
 	int imonbegin() noex {
 	    int		rs ;
-	    if (rs = init) {
+	    if ((rs = init) >= 0) {
 		rs = mx.lockbegin ;
 	    }
 	    return rs ;
@@ -317,6 +317,7 @@ int valstore::getval(int aw,cchar **rpp) noex {
 }
 /* end method (valstore::getval) */
 
+#ifdef	COMMENT
 int valstore::calc(int aw) noex {
 	int		rs = SR_OK ;
 	cchar		*rp = strp[aw] ;
@@ -363,13 +364,14 @@ int valstore::calc(int aw) noex {
 	return rp ;
 }
 /* end method (valstore::calc) */
+#endif /* COMMENT */
 
 int valstore::valenv(int aw) noex {
 	int		rs = SR_OK ;
 	if (! facc[aw]) {
-		cchar	*vn = enver.name[aw] ;
-		strp[aw] = getenv(vn) ;
-		facc[aw] = true ;
+	    cchar	*vn = enver.name[aw] ;
+	    strp[aw] = getenv(vn) ;
+	    facc[aw] = true ;
 	}
 	return rs ;
 }
@@ -400,6 +402,7 @@ valstore_co::operator int () noex {
 	    break ;
 	} /* end switch */
 	return rs ;
+}
 /* end method (valstore_co) */
 
 static void valstore_atforkbefore() noex {
