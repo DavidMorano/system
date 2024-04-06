@@ -76,6 +76,26 @@ namespace {
 	cchar		*name[strenv_overlast] ;
 	constexpr strvarenv() noex ;
     } ; /* end struct (strvarenv) */
+    enum valstoremems {
+	valstoremem_init,
+	valstoremem_fini,
+	valstoremem_monbegin,
+	valstoremem_monend,
+	valstoremem_overlast
+    } ; /* end enum (valstoremems) */
+    struct valstore_co {
+	vecstr		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (vecstr *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+    } ; /* end struct (valstore_co) */
+    struct valstore ;
     struct valstore {
 	cchar		*strp[strenv_overlast] ;
 	char		*a[strenv_overlast] ;
@@ -84,8 +104,28 @@ namespace {
 	aflag		fvoid ;
 	aflag		finit ;
 	aflag		finitdone ;
-	int init() noex ;
-	int fini() noex ;
+	valstore_co	init ;
+	valstore_co	fini ;
+	valstore_co	monbegin ;
+	valstore_co	monend ;
+	valstore() noex {
+	    init(this,valstoremem_init) ;
+	    fini(this,valstoremem_fini) ;
+	    monbegin(this,valstoremem_monbegin) ;
+	    monend(this,valstoremem_monend) ;
+	} ; /* end ctor */
+	int iinit() noex ;
+	int ifini() noex ;
+	int imonbegin() noex {
+	    int		rs ;
+	    if (rs = init) {
+		rs = mx.lockbegin ;
+	    }
+	    return rs ;
+	} ;
+	int imonend() noex {
+	    return mx.lockend ;
+	} ;
 	int getval(int,cchar **) noex ;
 	int valenv(int) noex ;
 	int calc(int) noex ;
@@ -176,121 +216,7 @@ strenv::operator ccharp () noex {
 }
 /* end method (strenv::operator) */
 
-#ifdef	COMMENT
-
-strenv::operator ccharp () noex {
-	cchar		*rp = strp ;
-	if (! facc) {
-	    cint	to = utimeout[uto_busy] ;
-	    if (! fmx.testandset) {
-	        if ((w >= 0) && (w < strenv_overlast)) {
-		    switch (w) {
-		    case strenv_tmpdir:
-		        rp = strtmpdir() ;
-		        break ;
-		    case strenv_maildir:
-		        rp = strmaildir() ;
-		        break ;
-		    case strenv_path:
-		        rp = strpath() ;
-		        break ;
-		    default:
-		        rp = valenv() ;
-		        break ;
-		    } /* end switch */
-		    if (rp) {
-			fready.notifyall(true) ;
-		    }
-	        } /* end if (type) */
-            } else if (!fready) {
-                timewatch       tw(to) ;
-                auto lamb = [this] () -> int {
-                    int         rs = SR_OK ;
-                    if (!fmx) {
-                        rs = SR_LOCKLOST ;
-                    } else if (fready) {
-                        rs = 1 ;
-                    }
-                    return rs ;
-                } ; /* end lambda */
-                if (int rs ; (rs = tw(lamb)) >= 0) { /* <- time-watching */
-		    rp = strp ;
-	        } ;
-	    } else {
-		rp = strp ;
-	    } /* end if (atomic access) */
-	} /* end if (need to create value) */
-	return rp ;
-}
-/* end method (strenv::operator) */
-
-ccharp strenv::strtmpdir() noex {
-	cchar	*rp = nullptr ;
-	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
-	    if ((rp = getenv(vn)) == nullptr) {
-		rp = sysword.w_tmpdir ;
-	    } /* end if (env-variable access) */
-	    strp = rp ;
-	} /* end if (env-variabiel name) */
-	return rp ;
-}
-/* end method (strenv::strtmpdir) */
-
-ccharp strenv::strmaildir() noex {
-	cchar	*rp = nullptr ;
-	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
-	    if ((rp = getenv(vn)) == nullptr) {
-		rp = sysword.w_maildir ;
-	    } /* end if (env-variable access) */
-	    strp = rp ;
-	} /* end if (env-variabiel name) */
-	return rp ;
-}
-/* end method (strenv::strmaildir) */
-
-cchar *strenv::strpath() noex {
-	cchar	*rp = nullptr ;
-	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
-	    if ((rp = getenv(vn)) == nullptr) {
-		int	rs ;
-		int	rs1 ;
-		if ((rs = maxpathlen) >= 0) {
-		    cint	tlen = (rs * PLMULT) ;
-		    char	*tbuf{} ;
-		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
-		        cchar	*usrlocal = sysword.w_usrlocaldir ;
-		        if ((rs = mkpath(tbuf,usrlocal,"bin")) >= 0) {
-			    int		tl = rs ;
-			    if ((rs = sncpy((tbuf+tl),(tlen-tl),":")) >= 0) {
-		                cint	cmd = _CS_PATH ;
-			        cint	clen = (tlen - (tl+rs)) ;
-			        char	*cbuf = (tbuf + (tl+rs)) ;
-			        tl += rs ;
-		                if ((rs = uc_confstr(cbuf,clen,cmd)) >= 0) {
-			            tl += rs ;
-			            a = mallocstrw(tbuf,tl) ;
-			            rp = a ;
-		                } /* end if (uc_confstr) */
-			    } /* end if (sncpy) */
-		        } /* end if (mkpath) */
-		        rs1 = uc_free(tbuf) ;
-		        if (rs >= 0) rs = rs1 ;
-		    } /* end if (m-a-f) */
-		} /* end if (maxpathlen) */
-		if (rs < 0) {
-		    rp = nullptr ;
-		    ulogerror("strenv::strpath",rs,"path construction") ;
-		}
-	    } /* end if (env-variable access) */
-	    strp = rp ;
-	} /* end if (env-variabiel name) */
-	return rp ;
-}
-/* end method (strenv::strpath) */
-
-#endif /* COMMENT */
-
-int valstore::init() noex {
+int valstore::iinit() noex {
 	int		rs = SR_NXIO ;
 	int		fr = false ;
 	if (!fvoid) {
@@ -332,9 +258,9 @@ int valstore::init() noex {
 	} /* end if (not voided) */
 	return (rs >= 0) ? fr : rs ;
 }
-/* end method (valstore::init) */
+/* end method (valstore::iinit) */
 
-int valstore::fini() noex {
+int valstore::ifini() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (finitdone && (! fvoid.testandset)) {
@@ -362,15 +288,14 @@ int valstore::fini() noex {
 	} /* end if (was initialized) */
 	return rs ;
 }
-/* end method (valstore::fini) */
+/* end method (valstore::ifini) */
 
 int valstore::getval(int aw,cchar **rpp) noex {
 	int		rs = SR_INVALID ;
 	int		rs1 ;
 	if ((aw >= 0) && (aw < strenv_overlast)) {
-	    rs = SR_OK ;
-	    if (! facc[aw]) {
-		if ((rs = mx.lockbegin) >= 0) {
+	    if ((rs = monbegin) >= 0) {
+	        if (! facc[aw]) {
 		    switch (aw) {
 		    case strenv_tmpdir:
 		        break ;
@@ -382,11 +307,11 @@ int valstore::getval(int aw,cchar **rpp) noex {
 		        rs = valenv(aw) ;
 		        break ;
 		    } /* end switch */
-		    rs1 = mx.lockend ;
-		    if (rs >= 0) rs = rs1 ;
-		} /* end if (mutex) */
-	    } /* end if (not accessed) */
-	    *rpp = strp[aw] ;
+	        } /* end if (not accessed) */
+	        *rpp = strp[aw] ;
+		rs1 = monend ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (mon) */
 	} /* end if (valid) */
 	return rs ;
 }
@@ -457,6 +382,25 @@ void valstore::dtor() noex {
 	}
 }
 /* end method (valstore::dtor) */
+
+valstore_co::operator int () noex {
+	int	rs = SR_BUGCHECK ;
+	switch (w) {
+	case valstoremem_init:
+	    rs = op->iinit() ;
+	    break ;
+	case valstoremem_fini:
+	    rs = op->ifini() ;
+	    break ;
+	case valstoremem_monbegin:
+	    rs = op->imonbegin() ;
+	    break ;
+	case valstoremem_monend:
+	    rs = op->imonend() ;
+	    break ;
+	} /* end switch */
+	return rs ;
+/* end method (valstore_co) */
 
 static void valstore_atforkbefore() noex {
 	data.atforkbefore() ;
