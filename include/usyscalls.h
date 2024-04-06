@@ -149,6 +149,7 @@ extern int	u_socketpair(int,int,int,int *) noex ;
 extern int	u_connect(int,cvoid *,int) noex ;
 extern int	u_accept(int,cvoid *,int *) noex ;
 
+extern int	u_closeonexec(int,bool) noex ;
 extern int	u_poll(POLLFD *,int,int) noex ;
 extern int	u_read(int,void *,int) noex ;
 extern int	u_readv(int,IOVEC *,int) noex ;

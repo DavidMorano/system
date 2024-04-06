@@ -40,17 +40,17 @@
 
 	More Solaris® bugs!
 
-	Stupid Solaris tries to prevent developers from mapping
+	Stupid Solaris® tries to prevent developers from mapping
 	files while simultaneously using record locks on that file.
-	There are even some reports that (stupid) Solaris also
+	There are even some reports that (stupid) Solaris® also
 	prevents users from mapping files and allowing that same
-	file from being mounted remotely. However, the problem is
-	that (stupid) Solaris is not consistent in its attempts to
-	prevent uses from mapping these sorts of files. If someone
+	file from being mounted remotely.  However, the problem is
+	that (stupid) Solaris® is not consistent in its attempts to
+	prevent uses from mapping these sorts of files.  If someone
 	maps a file that has record locks on it but maps it at
-	exactly the size of that file, Solaris prevents it (or
-	allows it, I forget). But if someone maps a file beyond the
-	end of it, then (stupid) Solaris denies (or allows) it.
+	exactly the size of that file, Solaris® prevents it (or
+	allows it, I forget).  But if someone maps a file beyond the
+	end of it, then (stupid) Solaris® denies (or allows) it.
 
 	Developer beware!
 
@@ -89,49 +89,19 @@ using std::nullptr_t ;			/* type */
 /* local structures */
 
 namespace {
-    struct um ;
-    typedef int (um::*um_m)(void *,size_t) noex ;
-    struct um {
-	um_m		m ;
-	char		*vec ;
-	void		*vp ;
-	void		*arg ;
-	off_t		off ;
-	int		pr ;
-	int		fl ;
-	int		fd ;
-	int		attr ;
-	int		mask ;
+    struct opener ;
+    typedef int (um::*opener_m)(void *,size_t) noex ;
+    struct opener {
+	opener_m	m ;
 	um() noex { } ;
-	um(int p,int f,int d,off_t o,void *v) noex {
-	    pr = p ;
-	    fl = f ;
-	    fd = d ;
-	    off = o ;
-	    vp = v ;
-	} ;
-	um(int f) noex : fl(f) { } ;
-	um(char *v) noex : vec(v) { } ;
-	um(int c,void *a,int t,int m) noex {
-	    fl = c ;
-	    arg = a ;
-	    attr = t ;
-	    mask = m ;
+	opener(int p,int f,int d,off_t o,void *v) noex {
 	} ;
 	int operator () (void *,size_t) noex ;
-	int mapbegin(void *,size_t) noex ;
-	int mapend(void *,size_t) noex ;
-	int lockbegin(void *,size_t) noex ;
-	int lockend(void *,size_t) noex ;
-	int lockallbegin(void *,size_t) noex ;
-	int lockallend(void *,size_t) noex ;
-	int cntl(void *,size_t) noex ;
-	int incore(void *,size_t) noex ;
-	int protect(void *,size_t) noex ;
-	int advise(void *,size_t) noex ;
-	int sync(void *,size_t) noex ;
-	int lockp(void *,size_t) noex ;
-    } ; /* end struct (um) */
+	int iopen(void *,size_t) noex ;
+	int iopenat(void *,size_t) noex ;
+	int icreat(void *,size_t) noex ;
+	int isocket() noex ;
+    } ; /* end struct (opener) */
 }
 
 
@@ -140,16 +110,13 @@ namespace {
 
 /* local variables */
 
-static cvoid	*mapfailed = static_cast<voidp>(MAP_FAILED) ;
-
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd,
-		off_t off,void *vp) noex {
+int u_mmapbegin(void *ma,size_t ms,int pr,int fl,int fd) noex {
 	um		umo(pr,fl,fd,off,vp) ;
 	umo.m = &um::mapbegin ;
 	return umo(ma,ms) ;
