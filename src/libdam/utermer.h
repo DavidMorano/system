@@ -1,6 +1,8 @@
-/* utermer */
+/* utermer HEADER */
+/* lang=C++20 */
 
 /* object to handle UNIX terminal stuff */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,12 +15,10 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	UTERMER_INCLUDE
-#define	UTERMER_INCLUDE	1
+#define	UTERMER_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<termios.h>
 #include	<limits.h>
 #include	<pthead.h>

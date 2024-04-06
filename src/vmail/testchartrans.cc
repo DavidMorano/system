@@ -1,10 +1,8 @@
-/* main (testchartrans) */
+/* main SUPPORT (testtermtrans) */
 /* lang=C99 */
-
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -15,17 +13,15 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<linefold.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"chartrans.h"
@@ -35,10 +31,6 @@
 #include	"config.h"
 
 /* local defines */
-
-#ifndef	MKCHAR
-#define	MKCHAR(ch)	((ch) & UCHAR_MAX)
-#endif
 
 #ifndef	PCS
 #define	PCS		"/usr/add-on/pcs"
@@ -58,23 +50,23 @@
 extern int	optvalue(cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern const char	*getourenv(cchar **,cchar *) ;
+extern cchar	*getourenv(cchar **,cchar *) ;
 
 
 /* forward references */
 
 static int	procfile(PROGINFO *,CHARTRANS *,TERMTRANS *,bfile *,
-			const char *) ;
+			cchar *) ;
 static int	procoutlines(PROGINFO *,bfile *,TERMTRANS *,
 			const wchar_t *,int) ;
-static int	procoutline(PROGINFO *,bfile *,int,int,const char *,int) ;
+static int	procoutline(PROGINFO *,bfile *,int,int,cchar *,int) ;
 
 
 /* exported subroutines */
@@ -93,9 +85,9 @@ int main(int argc,cchar *argv[],cchar *envv[])
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		cols = 0 ;
-	const char	*termtype = getenv(VARTERM) ;
-	const char	*pr = PCS ;
-	const char	*cp ;
+	cchar	*termtype = getenv(VARTERM) ;
+	cchar	*pr = PCS ;
+	cchar	*cp ;
 
 #if	CF_DEBUGS
 	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
@@ -134,8 +126,8 @@ int main(int argc,cchar *argv[],cchar *envv[])
 
 	        if (argv != NULL) {
 	            bfile	of ;
-	            const char	*ofname = BFILE_STDOUT ;
-		    const char	*ifname ;
+	            cchar	*ofname = BFILE_STDOUT ;
+		    cchar	*ifname ;
 	            if ((rs = bopen(&of,ofname,"wct",0666)) >= 0) {
 	                int	ai ;
 	                for (ai = 1 ; ai < argc ; ai += 1) {
@@ -184,16 +176,16 @@ PROGINFO	*pip ;
 CHARTRANS	*op ;
 TERMTRANS	*ttp ;
 bfile		*ofp ;
-const char	*ifname ;
+cchar	*ifname ;
 {
 	bfile		ifile, *ifp = &ifile ;
 	wchar_t		*wbuf ;
 	time_t		dt = time(NULL) ;
-	const int	wlen = WCHARLEN ;
+	cint	wlen = WCHARLEN ;
 	int		rs ;
 	int		wsize ;
 	int		rc = 0 ;
-	const char	*ics = "UTF-8" ;
+	cchar	*ics = "UTF-8" ;
 
 	if (ifname == NULL) return SR_FAULT ;
 
@@ -208,14 +200,14 @@ const char	*ifname ;
 	if ((rs = uc_malloc(wsize,&wbuf)) >= 0) {
 
 	    if ((rs = chartrans_transbegin(op,dt,ics,-1)) >= 0) {
-	        const int	txid = rs ;
+	        cint	txid = rs ;
 
 #if	CF_DEBUGS
 	        debugprintf("main/procfile: txid=%u\n",txid) ;
 #endif
 
 	        if ((rs = bopen(ifp,ifname,"r",0666)) >= 0) {
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN+1] ;
 
 	            while ((rs = breadln(ifp,lbuf,llen)) > 0) {
@@ -282,8 +274,8 @@ TERMTRANS	*ttp ;
 const wchar_t	*wcbuf ;
 int		wclen ;
 {
-	const int	lw = pip->linelen ;
-	const int	li = 2 ;
+	cint	lw = pip->linelen ;
+	cint	li = 2 ;
 	int		rs ;
 	int		wlen = 0 ;
 
@@ -294,7 +286,7 @@ int		wclen ;
 	if ((rs = termtrans_load(ttp,wcbuf,wclen)) >= 0) {
 	    int		i ;
 	    int		ll ;
-	    const char	*lp ;
+	    cchar	*lp ;
 
 #if	CF_DEBUGS
 	    debugprintf("main/procoutline: 1 \n") ;
@@ -325,7 +317,7 @@ PROGINFO	*pip ;
 bfile		*ofp ;
 int		lw ;
 int		li ;
-const char	*lp ;
+cchar	*lp ;
 int		ll ;
 {
 	LINEFOLD	lf ;
@@ -334,7 +326,7 @@ int		ll ;
 	if ((rs = linefold_start(&lf,lw,li,lp,ll)) >= 0) {
 	    int		j ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 	    for (j = 0 ; (cl = linefold_get(&lf,j,&cp)) >= 0 ; j += 1) {
 	        rs = bprintln(ofp,cp,cl) ;
 		wlen += rs ;

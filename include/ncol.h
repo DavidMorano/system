@@ -33,10 +33,6 @@ static inline int charcols(int ntab,int ccol,int ch) noex {
 	return ncolchar(ntab,ccol,ch) ;
 }
 
-static inline int nlinecols(int ntab,int ccol,cchar *sp,int sl) noex {
-	return ncolstr(ntab,ccol,sp,sl) ;
-}
-
 EXTERNC_end
 
 

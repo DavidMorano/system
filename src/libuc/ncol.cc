@@ -17,6 +17,25 @@
 /*******************************************************************************
 
 	Name:
+	ncolchar
+
+	Description:
+	This subroutine calculates the number of columns that a
+	character takes up on a terminal with tab stops set.
+
+	Synopsis:
+	int ncolchar(int ntab,int ccol,int ch) noex ;
+
+	Arguments:
+	ntab		maximum number of columns in a TAB character
+	ccol		current column number
+	ch		the character to calculate columns for
+
+	Returns:
+	-		number of columns used up
+
+
+	Name:
 	ncolstr
 
 	Description:
@@ -38,25 +57,6 @@
 
 
 	Name:
-	ncolchar
-
-	Description:
-	This subroutine calculates the number of columns that a
-	character takes up on a terminal with tab stops set.
-
-	Synopsis:
-	int ncolchar(int ntab,int ccol,int ch) noex ;
-
-	Arguments:
-	ntab		maximum number of columns in a TAB character
-	ccol		current column number
-	ch		the character to calculate columns for
-
-	Returns:
-	-		number of columns used up
-
-
-	Name:
 	getcols
 
 	Description:
@@ -70,11 +70,15 @@
 	ntab		number of columns in a TAB character
 	ccol		current column number
 	ncols		number of additional columns wanted
-	lbuf		line-buffer for given line of characters
-	llen		length of line-buffer
+	lbuf		c-string pointer
+	llen		c-string length
 
 	Returns:
 	-		number of bytes used for the given number of columns
+
+	Mote:
+	It appears that this (above) |getcols| subroutine is not currently
+	used anywhere.
 
 *******************************************************************************/
 
@@ -161,7 +165,8 @@ int getcols(int ntab,int ccol,int ncols,cchar *sp,int sl) noex {
 	if (ccol < tcol) {
 	    int		cols ;
 	    for (i = 0 ; (ccol < tcol) && (i < sl) ; i += 1) {
-	        cols = charcols(ntab,ccol,sp[i]) ;
+	        cint	ch = mkchar(sp[i]) ;
+	        cols = ncolchar(ntab,ccol,ch) ;
 	        ccol += cols ;
 	    } /* end for */
 	} /* end if */

@@ -1,16 +1,14 @@
-/* utermer */
+/* utermer SUPPORT */
 /* UNFINISHED! */
 
 /* "UNIX Terminal" helper routines */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0	/* compile-time debug print-outs */
 #define	CF_SIGNAL	1	/* 1={local handle}, 0={UNIX handles} */
 #define	CF_BADTIME	0	/* Solaris timeout screwup */
 #define	CF_FIRSTREAD	0	/* perform an initial 'read()'? */
 #define	CF_WRITEATOM	1	/* atomic write */
-
 
 /* revision history:
 
@@ -28,19 +26,16 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<poll.h>
 #include	<termios.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>

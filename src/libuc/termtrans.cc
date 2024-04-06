@@ -4,8 +4,6 @@
 /* terminal-character-translation management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGN	0		/* special debug print-outs */
 
 /* revision history:
 
@@ -24,10 +22,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
 #include	<cstdlib>
 #include	<cstring>
 #include	<new>
@@ -65,9 +62,6 @@
 
 #undef	SCH
 #define	SCH			struct termtrans_sch
-
-#undef	LINE
-#define	LINE			struct termtrans_line
 
 #ifndef	CSNLEN
 #define	CSNLEN		MAXNAMELEN
@@ -156,12 +150,6 @@ extern "C" int	termconseq(char *,int,int,int,int,int,int) ;
 extern "C" int	isprintlatin(int) ;
 extern "C" int	iceil(int,int) ;
 
-#if	CF_DEBUGS || CF_DEBUGN
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	nprintf(cchar *,cchar *,...) ;
-extern "C" int	strlinelen(cchar *,int,int) ;
-#endif
-
 extern "C" char	*strwcpy(char *,cchar *,int) ;
 extern "C" char	*strwset(char *,int,int) ;
 extern "C" char	*strnchr(cchar *,int,int) ;
@@ -173,16 +161,15 @@ extern "C" char	*strwcmp(cchar *,cchar *,int) ;
 
 /* local structures */
 
-struct termtrans_terminfo {
+namespace {
+    struct termtrans_terminfo {
 	cchar		*name ;
 	int		attr ;
-} ;
-
-struct termtrans_sch {
+    } ;
+    struct termtrans_sch {
 	uchar		ch1, ch2, ft, ch ;
-} ;
-
-struct termtrans_gch {
+    } ;
+    struct termtrans_gch {
 	uchar		gr ;
 	uchar		ft ;
 	uchar		ch ;
@@ -206,33 +193,29 @@ struct termtrans_gch {
 		ch = nch ;
 		return (*this) ;
 	} ;
-} ;
-
-class termtrans_line {
-	cchar	*lbuf ;
-	int		llen ;
-} ;
+    } ; /* end struct (termstrans) */
+}
 
 
 /* forward references */
 
-static int	termtrans_process(TT *,const wchar_t *,int) ;
-static int	termtrans_procline(TT *,char *,int,const wchar_t *,int) ;
-static int	termtrans_proclinepost(TT *,cchar *,int) ;
-static int	termtrans_loadline(TT *,int,int) ;
+static int	termtrans_process(TT *,const wchar_t *,int) noex ;
+static int	termtrans_procline(TT *,char *,int,const wchar_t *,int) noex ;
+static int	termtrans_proclinepost(TT *,cchar *,int) noex ;
+static int	termtrans_loadline(TT *,int,int) noex ;
 
-static int	termtrans_loadgr(TT *,string &,int,int) ;
-static int	termtrans_loadch(TT *,string &,int,int) ;
-static int	termtrans_loadcs(TT *,string &,int,cchar *,int) ;
+static int	termtrans_loadgr(TT *,string &,int,int) noex ;
+static int	termtrans_loadch(TT *,string &,int,int) noex ;
+static int	termtrans_loadcs(TT *,string &,int,cchar *,int) noex ;
 
-static int	gettermattr(cchar *,int) ;
-static int	wsgetline(const wchar_t *,int) ;
-static int	isspecial(SCH *,uchar,uchar) ;
+static int	gettermattr(cchar *,int) noex ;
+static int	wsgetline(const wchar_t *,int) noex ;
+static bool	isspecial(SCH *,uchar,uchar) noex ;
 
 
 /* local variables */
 
-static const struct termtrans_terminfo	terms[] = {
+static constexpr struct termtrans_terminfo	terms[] = {
 	{ "sun", 0 },
 	{ "ansi", 0 },
 	{ "xterm", TA_MBASE },
@@ -253,10 +236,10 @@ static const struct termtrans_terminfo	terms[] = {
 	{ "vt520", TA_MALL },
 	{ "vt530", TA_MALL },
 	{ "vt540", TA_MALL },
-	{ NULL, 0 }
-} ;
+	{ nullptr, 0 }
+} ; /* end array (terms) */
 
-static const struct termtrans_sch	specials[] = {
+static constexpr struct termtrans_sch	specials[] = {
 	{ UC('x'), '*', 2, 0x60 },
 	{ UC('×'), '*', 2, 0x60 },
 	{ 'X', '*', 2, 0x60 },
@@ -286,7 +269,7 @@ static const struct termtrans_sch	specials[] = {
 	{ 'e', '-', 3, 0x65 },
 	{ '-', ':', 3, 0x43 },
 	{ 0, 0, 0, 0 }
-} ;
+} ; /* end array (specials) */
 
 
 /* exported variables */
@@ -298,8 +281,8 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	int		rs = SR_OK ;
 	vector<GCH>	*cvp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (ncols <= 0) return SR_INVALID ;
 
@@ -307,7 +290,7 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	op->ncols = ncols ;
 	op->termattr = gettermattr(tstr,tlen) ;
 
-	if ((cvp = new(nothrow) vector<GCH>) != NULL) {
+	if ((cvp = new(nothrow) vector<GCH>) != nullptr) {
 	    cint	fcslen = CSNLEN ;
 	    cchar	*fcs = TERMTRANS_FCS ;
 	    cchar	*suf = TERMTRANS_SUF ;
@@ -321,7 +304,7 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 	    }
 	    if (rs < 0) {
 		delete cvp ;
-		op->cvp = NULL ;
+		op->cvp = nullptr ;
 	    }
 	} else
 	    rs = SR_NOMEM ;
@@ -330,29 +313,27 @@ int termtrans_start(TT *op,cc *pr,cc *tstr,int tlen,int ncols) noex {
 }
 /* end subroutine (termtrans_start) */
 
-
-int termtrans_finish(TT *op)
-{
+int termtrans_finish(TT *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TERMTRANS_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = uiconv_close(&op->id) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->lvp != NULL) {
+	if (op->lvp != nullptr) {
 	    vector<string>	*lvp = (vector<string> *) op->lvp ;
 	    delete lvp ; /* calls all 'string' destructors */
-	    op->lvp = NULL ;
+	    op->lvp = nullptr ;
 	}
 
-	if (op->cvp != NULL) {
+	if (op->cvp != nullptr) {
 	    vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	    delete cvp ;
-	    op->cvp = NULL ;
+	    op->cvp = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -360,23 +341,17 @@ int termtrans_finish(TT *op)
 }
 /* end subroutine (termtrans_finish) */
 
-
-int termtrans_load(TT *op,const wchar_t *wbuf,int wlen)
-{
+int termtrans_load(TT *op,const wchar_t *wbuf,int wlen) noex {
 	vector<string>	*lvp ;
 	int		rs = SR_OK ;
 	int		ln = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_load: ent\n") ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
-	if (wbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (wbuf == nullptr) return SR_FAULT ;
 
 	lvp = (vector<string> *) op->lvp ;
-	if (lvp == NULL) {
-	    if ((lvp = new(nothrow) vector<string>) != NULL) {
+	if (lvp == nullptr) {
+	    if ((lvp = new(nothrow) vector<string>) != nullptr) {
 	        op->lvp = lvp ;
 	    } else
 		rs = SR_NOMEM ;
@@ -384,32 +359,22 @@ int termtrans_load(TT *op,const wchar_t *wbuf,int wlen)
 
 /* process given string into the staging area */
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_load: process wlen=%d\n",wlen) ;
-#endif
-
 	if (rs >= 0) {
 	    rs = termtrans_process(op,wbuf,wlen) ;
 	    ln = rs ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_load: ret rs=%d ln=%u\n",rs,ln) ;
-#endif
-
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termtrans_load) */
 
-
-int termtrans_getline(TT *op,int i,cchar **lpp)
-{
+int termtrans_getline(TT *op,int i,cchar **lpp) noex {
 	vector<string>	*lvp ;
 	int		rs = SR_OK ;
 	int		ll = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (lpp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (lpp == nullptr) return SR_FAULT ;
 
 	lvp = (vector<string> *) op->lvp ;
 	if (i < lvp->size()) {
@@ -424,18 +389,12 @@ int termtrans_getline(TT *op,int i,cchar **lpp)
 
 /* private subroutines */
 
-
-static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen)
-{
+static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen) noex {
 	cint	olen = (3*LINEBUFLEN) ;
 	int		rs = SR_OK ;
 	int		osize ;
 	int		ln = 0 ;
 	char		*obuf ;
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_process: ent wlen=%d\n",wlen) ;
-#endif
 
 	osize = (olen+1) ;
 	if ((rs = uc_malloc(osize,&obuf)) >= 0) {
@@ -458,36 +417,21 @@ static int termtrans_process(TT *op,const wchar_t *wbuf,int wlen)
 	    uc_free(obuf) ;
 	} /* end if (memory-allocation) */
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_process: ret rs=%d ln=%u \n",rs,ln) ;
-#endif
-
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termtrans_process) */
 
-
 static int termtrans_procline(TT *op,char *obuf,int olen,
-		const wchar_t *wbuf,int wlen)
-{
+		const wchar_t *wbuf,int wlen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		ch ;
 	int		j = 0 ;
 	int		ln = 0 ;
-	int		max = 0 ;
 	int		len = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_procline: ent wlen=%d\n",wlen) ;
-#endif
-
 	cvp->clear() ;
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_procline: for-before\n") ;
-#endif
 
 	{
 	    int		istart = (wlen * sizeof(wchar_t)) ;
@@ -502,21 +446,6 @@ static int termtrans_procline(TT *op,char *obuf,int olen,
 
 	    ofill = (ostart-oleft) ;
 
-#if	CF_DEBUGS
-	{
-		int	ifill = (istart-ileft) ;
-		int	wi = (ifill >> 2) ;
-	debugprintf("termtrans_procline: uiconv_trans() rs=%d\n",rs) ;
-	debugprintf("termtrans_procline: ileft=%lu ifill=%lu\n",
-		ileft,ifill) ;
-	debugprintf("termtrans_procline: oleft=%lu ofill=%lu\n",
-		oleft,ofill) ;
-		debugprintf("termtrans_procline: wc[wi]=%08x\n",wbuf[wi]) ;
-		if (wi > 0) 
-		debugprintf("termtrans_procline: wc[wi-1]=%08x\n",wbuf[wi-1]) ;
-	}
-#endif
-
 	    if (rs >= 0) {
 		int	ol = ofill ;
 		rs = termtrans_proclinepost(op,obuf,ol) ;
@@ -525,38 +454,22 @@ static int termtrans_procline(TT *op,char *obuf,int olen,
 
 	} /* end block */
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_procline: ret rs=%d ln=%u \n",rs,ln) ;
-#endif
-
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termtrans_procline) */
 
-
-static int termtrans_proclinepost(TT *op,cchar *obuf,int olen)
-{
+static int termtrans_proclinepost(TT *op,cchar *obuf,int olen) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	int		rs = SR_OK ;
-	int		i ;
-	int		ch ;
 	int		j = 0 ;
 	int		ln = 0 ;
-	int		max = 0 ;
+	int		nmax = 0 ;
 	int		len = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_proclinepost: olen=%d\n",olen) ;
-#endif
 
 	cvp->clear() ;
 
-	for (i = 0 ; i < olen ; i += 1) {
-	    ch = (obuf[i] & 0xff) ;
-#if	CF_DEBUGS
-	debugprintf("termtrans_proclinepost: "
-		"i=%u switch ch=%c (\\x%02x)\n",i,ch,ch) ;
-#endif
+	for (int i = 0 ; i < olen ; i += 1) {
+	    cint	ch = (obuf[i] & 0xff) ;
 	    switch (ch) {
 	    case '\r':
 		j = 0 ;
@@ -564,36 +477,23 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen)
 	    case '\n':
 	    case '\v':
 	    case '\f':
-		rs = termtrans_loadline(op,ln++,max) ;
+		rs = termtrans_loadline(op,ln++,nmax) ;
 		len += rs ;
 	 	cvp->clear() ;
 		j = 0 ;
-		max = 0 ;
+		nmax = 0 ;
 		break ;
 	    case '\b':
 		if (j > 0) j -= 1 ;
-#if	CF_DEBUGS
-				debugprintf("termout: BS\n") ;
-#endif
 		break ;
 	    default:
 		{
 		    GCH	gch(0) ;
-#if	CF_DEBUGS
-		        debugprintf("termout: def max=%u j=%u ch=%c(\\x%02x)\n",
-			max,j,ch,ch) ;
-#endif
-		    if (j < max) {
+		    if (j < nmax) {
 			SCH	sch ;
 		        int	ft = 0 ;
-			int	pch = (j < max) ? cvp->at(j).ch : 0 ;
+			int	pch = (j < nmax) ? cvp->at(j).ch : 0 ;
 		        int	gr = cvp->at(j).gr ;
-#if	CF_DEBUGS
-		        debugprintf("termout: def j=%u pch=%c(\\x%02x)\n",
-				j,pch,pch) ;
-		        debugprintf("termout: def ch=%c(\\x%02x)\n",
-				ch,ch) ;
-#endif
 		        switch (pch) {
 		        case GRCH_BOLD :
 			    if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
@@ -611,20 +511,11 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen)
 		            if ((pch == GRCH_HIGH) && (ch == '#')) {
 			        if (op->termattr & TA_MHIGH) gr |= GR_MHIGH ;
 			        ch = 0 ;
-#if	CF_DEBUGS
-				debugprintf("termout: DoubleHigh(pre)\n") ;
-#endif
 		            } else if ((pch == GRCH_WIDE) && (ch == '#')) {
 			        if (op->termattr & TA_MWIDE) gr |= GR_MWIDE ;
 			        ch = 0 ;
-#if	CF_DEBUGS
-				debugprintf("termout: DoubleWide(pre)\n") ;
-#endif
 		            } else if (pch == ch) {
 			        if (op->termattr & TA_MBOLD) gr |= GR_MBOLD ;
-#if	CF_DEBUGS
-				debugprintf("termout: bold(pre)\n") ;
-#endif
 			    } else if (isspecial(&sch,pch,ch)) {
 				ft = sch.ft ;
 				ch = sch.ch ;
@@ -651,10 +542,6 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen)
 	                cvp->at(j) = gch ;
 	                j += 1 ;
 		    } else {
-#if	CF_DEBUGS
-		        debugprintf("termout: add j=%u ch=%c(\\x%02x)\n",
-				j,ch,ch) ;
-#endif
 			gch.ch = ch ;
 	                cvp->push_back(gch) ;
 	                j += 1 ;
@@ -662,80 +549,44 @@ static int termtrans_proclinepost(TT *op,cchar *obuf,int olen)
 		} /* end block */
 		break ;
 	    } /* end switch */
-	    if (j > max) max = j ;
+	    if (j > nmax) nmax = j ;
 	    if (rs < 0) break ;
 	} /* end for */
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_proclinepost: mid rs=%d max=%u\n",rs,max) ;
-#endif
-
-	if ((rs >= 0) && (max > 0)) {
-	    rs = termtrans_loadline(op,ln++,max) ;
+	if ((rs >= 0) && (nmax > 0)) {
+	    rs = termtrans_loadline(op,ln++,nmax) ;
 	    len += rs ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_proclinepost: ret rs=%d ln=%u \n",rs,ln) ;
-#endif
 
 	return (rs >= 0) ? ln : rs ;
 }
 /* end subroutine (termtrans_proclinepost) */
 
-
-static int termtrans_loadline(TT *op,int ln,int max)
-{
+static int termtrans_loadline(TT *op,int ln,int nmax) noex {
 	vector<GCH>	*cvp = (vector<GCH> *) op->cvp ;
 	vector<string>	*lvp = (vector<string> *) op->lvp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_loadline: ent ln=%u max=%u\n",ln,max) ;
-#endif
-
 	lvp->resize(ln+1) ;		/* instantiates new 'string' */
 	{
 	    int		ft, ch, gr ;
-	    int		i ;
 	    int		pgr = 0 ;
 	    string	&line = lvp->at(ln) ;
-#if	CF_DEBUGS
-	debugprintf("termtrans_loadline: line.reserve()\n") ;
-#endif
 	    line.reserve(120) ;
-#if	CF_DEBUGS && 0
-	debugprintf("termtrans_loadline: line.clear()\n") ;
-#endif
 	    line.clear() ;
-#if	CF_DEBUGS && 0
-	debugprintf("termtrans_loadline: for-before\n") ;
-#endif
-	    for (i = 0 ; (rs >= 0) && (i < max) ; i += 1) {
+	    for (int i = 0 ; (rs >= 0) && (i < nmax) ; i += 1) {
 		ft = cvp->at(i).ft ;
 		ch = cvp->at(i).ch ;
 		gr = cvp->at(i).gr ;
 
-#if	CF_DEBUGS
-	debugprintf("termtrans_loadline: _loadgr() ch=%c(\\x%02x)\n",ch,ch) ;
-#endif
-
 		rs = termtrans_loadgr(op,line,pgr,gr) ;
 		len += rs ;
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_loadline: _loadgr() rs=%d\n",rs) ;
-#endif
 
 		if ((rs >= 0) && (ch > 0)) {
 		    rs = termtrans_loadch(op,line,ft,ch) ;
 		    len += rs ;
 		}
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_loadline: _loadch() rs=%d\n",rs) ;
-#endif
 
 		pgr = gr ;
 	    } /* end for */
@@ -744,26 +595,17 @@ static int termtrans_loadline(TT *op,int ln,int max)
 		len += rs ;
 	    }
 	} /* end block */
-
-/* done */
-
-#if	CF_DEBUGS
-	debugprintf("termtrans_loadline: ret rs=%d len=%u\n",rs,len) ;
-#endif
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (termtrans_loadline) */
 
-
-static int termtrans_loadgr(TT *op,string &line,int pgr,int gr)
-{
+static int termtrans_loadgr(TT *op,string &line,int pgr,int gr) noex {
 	cint	grmask = ( GR_MBOLD| GR_MUNDER| GR_MBLINK| GR_MREV) ;
 	int		rs = SR_OK ;
 	int		ogr = pgr ;
 	int		bgr = pgr ;
 	int		cc ;
-	int		n, i ;
+	int		n ;
 	int		size ;
 	int		gl = 0 ;
 	int		len = 0 ;
@@ -772,13 +614,13 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr)
 	n = flbsi(grmask) + 1 ;
 
 	size = ((2*n)+1+1) ; /* size according to algorithm below */
-	if ((grbuf = new(nothrow) char[size]) != NULL) {
+	if ((grbuf = new(nothrow) char[size]) != nullptr) {
 
 	    bgr &= grmask ;
 	    ogr = (bgr & (~ gr) & grmask) ;
 	    if (ogr != (bgr & grmask)) { /* partial gr-off */
 	        if (op->termattr & TA_MOFFIND) {
-		    for (i = 0 ; i < n ; i += 1) {
+		    for (int i = 0 ; i < n ; i += 1) {
 		        if ((ogr>>i)&1) {
 			    switch (i) {
 			    case GR_VBOLD:
@@ -812,7 +654,7 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr)
     
 	    ogr = (gr & (~ bgr) & grmask) ; /* ON-GR */
 	    if (ogr) {
-		for (i = 0 ; i < n ; i += 1) {
+		for (int i = 0 ; i < n ; i += 1) {
 		    if ((ogr>>i)&1) {
 			switch (i) {
 			case GR_VBOLD:
@@ -833,12 +675,10 @@ static int termtrans_loadgr(TT *op,string &line,int pgr,int gr)
 		    } /* end if */
 		} /* end for */
 	    } /* end if (gr-on) */
-    
 	    if (rs >= 0) {
 	        rs = termtrans_loadcs(op,line,'m',grbuf,gl) ;
 	        len = rs ;
 	    }
-    
 	    delete[] grbuf ;
 	} else {
 	    rs = SR_NOMEM ;
@@ -855,7 +695,7 @@ static int termtrans_loadcs(TT *op,string &line,int n,cc *pp,int pl) noex {
 	int		i = 0 ;
 	int		len = 0 ;
 	char		dbuf[DBUFLEN+1] ;
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 	while ((rs >= 0) && (i < pl)) {
 	    int	a1 = -1 ;
 	    int	a2 = -1 ;
@@ -927,23 +767,23 @@ static int termtrans_loadch(TT *op,string &line,int ft,int ch) noex {
 
 static int gettermattr(cchar *tstr,int tlen) noex {
 	int		ta = 0 ;
-	if (tstr != NULL) {
+	if (tstr != nullptr) {
 	    if (tlen < 0) tlen = strlen(tstr) ;
-	    for (int i = 0 ; terms[i].name != NULL ; i += 1) {
+	    for (int i = 0 ; terms[i].name != nullptr ; i += 1) {
 	        cchar	*sp = terms[i].name ;
 	        if (strwcmp(sp,tstr,tlen) == 0) {
 		    ta = terms[i].attr ;
 		    break ;
 	        }
 	    } /* end for */
-	} /* end if (non-NULL terminal-string) */
+	} /* end if (non-nullptr terminal-string) */
 	return ta ;
 }
 /* end subroutine (gettermattr) */
 
 static int wsgetline(const wchar_t *wbuf,int wlen) noex {
 	int		wl ; /* used afterwards */
-	int		f = FALSE ;
+	int		f = false ;
 	for (wl = 0 ; wl < wlen ; wl += 1) {
 	    f = ((wbuf[wl] == CH_NL) || (wbuf[wl] == CH_FF)) ;
 	    if (f) break ;
@@ -953,9 +793,9 @@ static int wsgetline(const wchar_t *wbuf,int wlen) noex {
 }
 /* end subroutine (wsgetline) */
 
-static int isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
+static bool isspecial(SCH *scp,uchar ch1,uchar ch2) noex {
 	int		i ; /* used afterwards */
-	int		f = FALSE ;
+	int		f = false ;
 	for (i = 0 ; specials[i].ch1 > 0 ; i += 1) {
 	    f = ((specials[i].ch1 == ch1) && (specials[i].ch2 == ch2)) ;
 	    if (f) break ;
