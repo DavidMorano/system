@@ -23,10 +23,11 @@
 	**left as exercise for the reader**
 
 	Note:
-	Every OS has its own problems (sometimes quite bad one).
-	Solatis® has the problem that is does not support an
-	atomic open with the O_CLOEXEC flag.  So this has to 
-	be emulated for Solaris®.  What a flipping embarrassment!
+	Every OS has its own problems (sometimes quite bad ones).
+	Solatis® has the problem that is does not support an atomic
+	open with the O_CLOEXEC flag.  Actually, Solaris® does not
+	support te O_CLOEXEC open-flag at all!  So this has to be
+	emulated for Solaris®.  What a flipping embarrassment!
 
 *******************************************************************************/
 
@@ -58,6 +59,12 @@ using std::nullptr_t ;			/* type */
 
 /* local structures */
 
+enum flavors {
+	flavor_single,
+	flavor_pipes,
+	flavor_overlast
+} ;
+
 namespace {
     struct opener ;
     typedef int (opener::*opener_m)(cchar *,int,mode_t) noex ;
@@ -69,14 +76,24 @@ namespace {
 	int		pf ;
 	int		st ;
 	int		pr ;
+	int		flavor ;
 	opener() noex { } ;
 	opener(int adfd) noex : dfd(adfd) { } ;
 	opener(int apf,int ast,int apr,int *ap = nullptr) noex : pf(apf) {
 	    st = ast ;
 	    pr = apr ;
 	    pipes = ap ;
+	    if (pipes) {
+		pipes[0] = -1 ;
+		pipes[1] = -1 ;
+	    }
 	} ;
-	opener(int *apipes) noex : pipes(apipes) { } ;
+	opener(int *apipes) noex : pipes(apipes) { 
+	    if (pipes) {
+		pipes[0] = -1 ;
+		pipes[1] = -1 ;
+	    }
+	} ;
 	int operator () (cchar *,int,mode_t) noex ;
 	int openjack(cchar *,int,mode_t) noex ;
 	int iopen(cchar *,int,mode_t) noex ;
@@ -84,6 +101,7 @@ namespace {
 	int isocket(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
+	void fixfd(int) noex ;
     } ; /* end struct (opener) */
     struct openlock {
 	aflag		fmx ;
@@ -109,12 +127,14 @@ constexpr bool		f_sunos = F_SUNOS ;
 int u_open(cchar *fname,int of,mode_t om) noex {
 	opener		oo ;
 	oo.m = &opener::iopen ;
+	oo.flavor = flavor_single ;
 	return oo(fname,of,om) ;
 }
 
 int u_openat(int dfd,cchar *fname,int of,mode_t om) noex {
 	opener		oo(dfd) ;
 	oo.m = &opener::iopenat ;
+	oo.flavor = flavor_single ;
 	return oo(fname,of,om) ;
 }
 
@@ -127,6 +147,7 @@ int u_socket(int pf,int st,int pr) noex {
 	opener		oo(pf,st,pr) ;
 	cnullptr	np{} ;
 	oo.m = &opener::isocket ;
+	oo.flavor = flavor_single ;
 	return oo(np,0,0) ;
 }
 
@@ -134,6 +155,7 @@ int u_socketpair(int pf,int st,int pr,int *pipes) noex {
 	opener		oo(pf,st,pr,pipes) ;
 	cnullptr	np{} ;
 	oo.m = &opener::isocketpair ;
+	oo.flavor = flavor_pipes ;
 	return oo(np,0,0) ;
 }
 
@@ -141,6 +163,7 @@ int u_pipe(int *pipes) noex {
 	opener		oo(pipes) ;
 	cnullptr	np{} ;
 	oo.m = &opener::ipipe ;
+	oo.flavor = flavor_pipes ;
 	return oo(np,0,0) ;
 }
 
@@ -159,6 +182,7 @@ int opener::operator () (cchar *fname,int of,mode_t om) noex {
 	    rs1 = oguard.guardend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (oguard) */
+	if (rs < 0) fixfd(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end method (opener::operator) */
@@ -272,4 +296,21 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 }
 /* end method (opener::ipipe) */
 
+void opener::fixfd(int fd) noex {
+	switch (flavor) {
+	case flavor_single:
+	    if (fd >= 0) close(fd) ;
+	    break ;
+	case flavor_pipes:
+	    if (pipes) {
+		for (int i = 0 ; i < flavor_overlast ; i += 1) {
+		    if (pipes[i] >= 0) {
+			close(pipes[i]) ;
+			pipes[i] = -1 ;
+		    }
+	        } /* end for */
+	    }
+	    break ;
+	} /* end switch */
+}
 
