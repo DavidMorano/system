@@ -4,8 +4,6 @@
 /* time-stamp file manager */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGTEST	0		/* special debugging for test */
 #define	CF_SAFE		1		/* safer? */
 #define	CF_CREAT	0		/* always create the file? */
 #define	CF_LOCKF	0		/* use 'lockf(3c)' */
@@ -149,7 +147,7 @@
 #include	<strwcpy.h>
 #include	<strdcpyx.h>
 #include	<matxstr.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"ts.h"
 #include	"tse.h"
@@ -168,19 +166,9 @@
 #define	TS_NEPW		(((8*1024) / TS_ENTSIZE) - 1)
 #define	TS_NIDXENT	100
 
-#if	CF_DEBUGTEST
-#define	TO_OPEN		(5 * 60)	/* maximum file-open time */
-#define	TO_ACCESS	(2 * 60)	/* maximum access idle time */
-#define	TO_LOCK		30		/* seconds */
-#else
 #define	TO_OPEN		(60 * 60)	/* maximum file-open time */
 #define	TO_ACCESS	(2 * 60)	/* maximum access idle time */
 #define	TO_LOCK		30		/* seconds */
-#endif /* CF_DEBUGTEST */
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
 
 
 /* external subroutines */
@@ -188,11 +176,6 @@
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	getfstype(char *,int,int) ;
 extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	stroflags(char *,int) ;
-#endif
 
 extern char	*timestr_log(time_t,char *) ;
 
@@ -234,40 +217,26 @@ static int	namematch(const char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int ts_open(TS *op,cchar *fname,int oflags,mode_t operm)
-{
-	time_t		dt = time(NULL) ;
+int ts_open(TS *op,cchar *fname,int oflags,mode_t operm) noex {
+	time_t		dt = time(nullptr) ;
 	int		rs ;
-	int		f_created = FALSE ;
+	int		f_created = false ;
 	cchar		*cp ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_open: ent\n") ;
-#endif
-
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 #endif /* CF_SAFE */
 
-	if (fname == NULL) return SR_FAULT ;
+	if (fname == nullptr) return SR_FAULT ;
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	{
-	    char	timebuf[TIMEBUFLEN + 1] ;
-	    debugprintf("ts_open: fname=%s\n", fname) ;
-	    stroflags(timebuf,oflags) ;
-	    debugprintf("ts_open: oflags=%s\n",timebuf) ;
-	    if (oflags & O_CREAT)
-	        debugprintf("ts_open: creating as needed\n") ;
-	}
-#endif /* CF_DEBUGS */
-
-	memset(op,0,sizeof(TS)) ;
+	memclear(op) ;
 	op->pagesize = getpagesize() ;
 	op->fd = -1 ;
 	op->oflags = oflags ;
@@ -280,10 +249,6 @@ int ts_open(TS *op,cchar *fname,int oflags,mode_t operm)
 	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
 	    op->fname = cp ;
 /* try to open the file */
-#if	CF_DEBUGS
-	    debugprintf("ts_open: msfname=%s\n",op->fname) ;
-	    debugprintf("ts_open: operm=%06o\n",operm) ;
-#endif
 	    if ((rs = ts_fileopen(op,dt)) >= 0) {
 		if ((rs = ts_filebegin(op,dt)) >= 0) {
 		    if ((rs = mapstrint_start(&op->ni,TS_NIDXENT)) >= 0) {
@@ -296,13 +261,9 @@ int ts_open(TS *op,cchar *fname,int oflags,mode_t operm)
 	    }
 	    if (rs < 0) {
 	        uc_free(op->fname) ;
-	        op->fname = NULL ;
+	        op->fname = nullptr ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("ts_open: ret rs=%d f_created=%u\n",rs,f_created) ;
-#endif
 
 	return (rs >= 0) ? f_created : rs ;
 }
@@ -315,38 +276,22 @@ int ts_close(TS *op)
 	int		rs1 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-#if	CF_DEBUGS
-	debugprintf("ts_close: mapstrint_finish() \n") ;
-#endif
-
 	rs1 = mapstrint_finish(&op->ni) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_close: _fileclose() \n") ;
-#endif
 
 	rs1 = ts_fileclose(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_close: uc_free() \n") ;
-#endif
-
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("ts_close: ret rs=%d\n") ;
-#endif
 
 	op->magic = 0 ;
 	return rs ;
@@ -361,7 +306,7 @@ int ts_count(TS *op)
 	int		c ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
@@ -378,16 +323,16 @@ int ts_curbegin(TS *op,TS_CUR *cp)
 {
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
-	if (cp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (cp == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	op->ncursors += 1 ;
 
-	op->f.cursorlockbroken = FALSE ;
-	op->f.cursoracc = FALSE ;
+	op->f.cursorlockbroken = false ;
+	op->f.cursoracc = false ;
 	cp->i = -1 ;
 	return SR_OK ;
 }
@@ -402,15 +347,15 @@ int ts_curend(TS *op,TS_CUR *cp)
 	time_t		dt = 0 ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (cp == NULL) return SR_FAULT ;
+	if (cp == nullptr) return SR_FAULT ;
 
 	if (op->f.cursoracc) {
-	    dt = time(NULL) ;
+	    dt = time(nullptr) ;
 	    op->ti_access = dt ;
 	} /* end if */
 
@@ -437,29 +382,17 @@ int ts_enum(TS *op,TS_CUR *curp,TS_ENT *ep)
 	int		ei ;
 	char		*bp ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_enum: ent\n") ;
-#endif
-
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (curp == NULL) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
-	if (dt == 0) dt = time(NULL) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_enum: _acquire() \n") ;
-#endif
+	if (dt == 0) dt = time(nullptr) ;
 
 	rs = ts_acquire(op,dt,1) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_enum: _acquire() rs=%d\n",rs) ;
-#endif
 
 	if (rs < 0)
 	     goto ret0 ;
@@ -470,22 +403,10 @@ int ts_enum(TS *op,TS_CUR *curp,TS_ENT *ep)
 
 	rs = ts_readentry(op,ei,&bp) ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_enum: _readentry() rs=%d\n",rs) ;
-	if (rs >= 0)
-	debugprintf("ts_enum: bp=%p\n",bp) ;
-#endif
-
 /* copy entry to caller buffer */
 
-	if ((rs >= 0) && (ep != NULL) && (bp != NULL)) {
-
+	if ((rs >= 0) && (ep != nullptr) && (bp != nullptr)) {
 	    rs = tse_all(ep,1,bp,ebs) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_enum: tse_all() rs=%d\n",rs) ;
-#endif
-
 	} /* end if */
 
 /* commit the cursor movement? */
@@ -493,13 +414,9 @@ int ts_enum(TS *op,TS_CUR *curp,TS_ENT *ep)
 	if (rs >= 0)
 	    curp->i = ei ;
 
-	op->f.cursoracc = TRUE ;
+	op->f.cursoracc = true ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("ts_enum: ret rs=%d ei=%u\n",rs,ei) ;
-#endif
 
 	return (rs >= 0) ? ei : rs ;
 }
@@ -520,18 +437,13 @@ TS_ENT	*ep ;
 	int		ei = 0 ;
 	char		*bp ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_match: ent nnl=%d nnp=%t\n",
-	    nnl,nnp,strnlen(nnp,nnl)) ;
-#endif
-
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (nnp == NULL) return SR_FAULT ;
+	if (nnp == nullptr) return SR_FAULT ;
 
 	i = TS_KEYNAMELEN ;
 	if (nnl >= 0) {
@@ -539,11 +451,7 @@ TS_ENT	*ep ;
 	}
 	nnl = strnlen(nnp,i) ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_match: nnl=%d nnp=%t\n",nnl,nnp,nnl) ;
-#endif
-
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 
 	rs = ts_acquire(op,dt,1) ;
 	if (rs < 0)
@@ -552,42 +460,28 @@ TS_ENT	*ep ;
 	rs = ts_findname(op,nnp,nnl,&bp) ;
 	ei = rs ;
 
-	if ((rs >= 0) && (ep != NULL)) {
-
-#if	CF_DEBUGS 
-	    debugprintf("ts_match: found it rs=%d\n",rs) ;
-#endif
-
+	if ((rs >= 0) && (ep != nullptr)) {
 	    rs = tse_all(ep,1,bp,ebs) ;
-
-#if	CF_DEBUGS 
-	    debugprintf("ts_match: rs1=%d ep->nodename=%s\n",
-	        rs,ep->nodename) ;
-#endif
-
 	} /* end if */
 
 /* optionally release our lock if we didn't have a cursor outstanding */
 
-	if (op->ncursors == 0)
+	if (op->ncursors == 0) {
 	    ts_lockrelease(op) ;
+	}
 
 /* update access time as appropriate */
 
 	if (op->ncursors == 0) {
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    op->ti_access = dt ;
 	} else {
-	    op->f.cursoracc = TRUE ;
+	    op->f.cursoracc = true ;
 	}
 
 /* we're out of here */
 done:
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("ts_match: ret rs=%d ei=%u\n",rs,ei) ;
-#endif
 
 	return (rs >= 0) ? ei : rs ;
 }
@@ -607,24 +501,19 @@ TS_ENT	*ep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		ei ;
-	int		f_newentry = FALSE ;
+	int		f_newentry = false ;
 	char		*bp ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_write: ent nnl=%d nodename=%t\n",
-	    nnl,nnp,strnlen(nnp,nnl)) ;
-#endif /* CF_DEBUGS */
-
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (nnp == NULL) return SR_FAULT ;
+	if (nnp == nullptr) return SR_FAULT ;
 
 #ifdef	COMMENT
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 #endif
 
 	i = TS_KEYNAMELEN ;
@@ -632,10 +521,6 @@ TS_ENT	*ep ;
 	    i = MIN(nnl,TS_KEYNAMELEN) ;
 	}
 	nnl = strnlen(nnp,i) ;
-
-#if	CF_DEBUGS && 0
-	debugprintf("ts_write: nodename=%t\n",nnp,nnl) ;
-#endif
 
 	rs = ts_acquire(op,dt,1) ;
 	if (rs < 0)
@@ -646,12 +531,12 @@ TS_ENT	*ep ;
 
 /* write the entry */
 
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 
 	if (rs >= 0) {
 	    TS_ENT	ew ;
 
-  	    if (ep != NULL) {
+  	    if (ep != nullptr) {
 		ew = *ep ;
 	    } else {
 		memset(&ew,0,sizeof(TS_ENT)) ;
@@ -669,14 +554,14 @@ TS_ENT	*ep ;
 
 	    tse_all(&ew,0,bp,ebs) ;
 
-	    rs = ebuf_write(&op->ebm,ei,NULL) ; /* sync */
+	    rs = ebuf_write(&op->ebm,ei,nullptr) ; /* sync */
 
 	} else if (rs == SR_NOTFOUND) {
 	    TS_ENT	ew ;
 	    char	ebuf[TS_ENTSIZE + 2] ;
 
-	    f_newentry = TRUE ;
-  	    if (ep != NULL) {
+	    f_newentry = true ;
+  	    if (ep != nullptr) {
 		ew = *ep ;
 	    } else {
 		memset(&ew,0,sizeof(TS_ENT)) ;
@@ -695,11 +580,6 @@ TS_ENT	*ep ;
 	    ei = op->h.nentries ;
 	    rs = ebuf_write(&op->ebm,ei,ebuf) ;
 
-#if	CF_DEBUGS
-	    debugprintf("ts_write: 1 ebuf_pwrite() rs=%d\n",rs) ;
-#endif
-
-
 	} /* end if (existing or new entry) */
 
 /* update the file header-table (for a write) */
@@ -707,7 +587,7 @@ TS_ENT	*ep ;
 	if ((rs >= 0) && op->f.writable) {
 
 #ifdef	COMMENT
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 #endif
 
 	    op->h.wcount += 1 ;
@@ -730,19 +610,15 @@ TS_ENT	*ep ;
 /* update access time as appropriate */
 
 	if (op->ncursors == 0) {
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    op->ti_access = dt ;
 	} else {
-	    op->f.cursoracc = TRUE ;
+	    op->f.cursoracc = true ;
 	}
 
 /* we're out of here */
 done:
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("ts_write: ret rs=%d ei=%u\n",rs,ei) ;
-#endif
 
 	return (rs >= 0) ? ei : rs ;
 }
@@ -761,34 +637,22 @@ TS_ENT		*ep ;
 	int		rs1 ;
 	int		nnl ;
 	int		ei ;
-	int		f_newentry = FALSE ;
+	int		f_newentry = false ;
 	const char	*nnp ;
 	char		ebuf[TS_ENTSIZE + 2] ;
 	char		*bp ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_update: ent\n") ;
-#endif
-
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 	if (ep->keyname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_update: writable=%u\n",op->f.writable) ;
-#endif
-
 	rs = ts_acquire(op,dt,1) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_update: _acquire() rs=%d\n",rs) ;
-#endif
 
 	if (rs < 0)
 	     goto ret0 ;
@@ -817,16 +681,12 @@ TS_ENT		*ep ;
 	    ew.count += 1 ;
 	    tse_all(&ew,0,bp,ebs) ;
 
-	    rs = ebuf_write(&op->ebm,ei,NULL) ; /* sync */
-
-#if	CF_DEBUGS
-	    debugprintf("ts_update: 0 ebuf_write() rs=%d\n",rs) ;
-#endif
+	    rs = ebuf_write(&op->ebm,ei,nullptr) ; /* sync */
 
 	} else if (rs == SR_NOTFOUND) {
 	    TS_ENT	ew = *ep ;
 
-	    f_newentry = TRUE ;
+	    f_newentry = true ;
 	    if (ew.count == 0) ew.count = 1 ;
 	    if (ew.utime == 0) ew.utime = dt ;
 	    if (ew.ctime == 0) ew.ctime = dt ;
@@ -837,22 +697,14 @@ TS_ENT		*ep ;
 	    ei = op->h.nentries ;
 	    rs = ebuf_write(&op->ebm,ei,ebuf) ;
 
-#if	CF_DEBUGS
-	    debugprintf("ts_update: 1 ebuf_pwrite() rs=%d\n",rs) ;
-#endif
-
 	} /* end if (entry update) */
 
 /* update the file header */
 
-#if	CF_DEBUGS
-	debugprintf("ts_update: header rs=%d\n",rs) ;
-#endif
-
 	if (rs >= 0) {
 
 	    if (dt == 0)
-	        dt = time(NULL) ;
+	        dt = time(nullptr) ;
 
 	    op->h.wcount += 1 ;
 	    op->h.wtime = dt ;
@@ -871,35 +723,21 @@ TS_ENT		*ep ;
 /* optionally release our lock if we didn't have a cursor outstanding */
 ret2:
 
-#if	CF_DEBUGS
-	debugprintf("ts_update: release rs=%d\n",rs) ;
-#endif
-
 	if (op->ncursors == 0) {
-
 	    rs1 = ts_lockrelease(op) ;
-
-#if	CF_DEBUGS
-	    debugprintf("ts_update: ts_lockrelease() rs=%d\n",rs1) ;
-#endif
-
 	} /* end if */
 
 /* update access time as appropriate */
 ret1:
 	if (op->ncursors == 0) {
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    op->ti_access = dt ;
 	} else
-	    op->f.cursoracc = TRUE ;
+	    op->f.cursoracc = true ;
 
 /* we're out of here */
 done:
 ret0:
-
-#if	CF_DEBUGS
-	    debugprintf("ts_update: ret rs=%d ei=%u\n",rs,ei) ;
-#endif
 
 	return (rs >= 0) ? ei : rs ;
 
@@ -918,26 +756,18 @@ bad0:
 int ts_check(TS *op,time_t dt)
 {
 	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	char	timebuf[TIMEBUFLEN + 1] ;
-#endif
+	int		f = false ;
 
 #if	CF_SAFE
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != TS_MAGIC) return SR_NOTOPEN ;
 #endif /* CF_SAFE */
 
 	if (op->fd < 0) return SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_check: %s\n", timestr_log(dt,timebuf)) ;
-#endif
-
 	if ((! op->f.lockedread) && (! op->f.lockedwrite)) {
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 	    f = ((dt - op->ti_access) >= TO_ACCESS) ;
 	    f = f || ((dt - op->ti_open) >= TO_OPEN) ;
 	    if (f) {
@@ -961,24 +791,14 @@ char		**rpp ;
 {
 	int		rs ;
 	int		ei = 0 ;
-	char		*bp = NULL ;
+	char		*bp = nullptr ;
 	char		*np ;
 
-	rs = mapstrint_fetch(&op->ni,nnp,nnl,NULL,&ei) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_update: mapstrint_fetch() rs=%d\n",rs) ;
-	if (rs >= 0)
-	debugprintf("ts_update: ei=%d\n",ei) ;
-#endif
+	rs = mapstrint_fetch(&op->ni,nnp,nnl,nullptr,&ei) ;
 
 	if (rs >= 0) {
 
 	    rs = ebuf_read(&op->ebm,ei,&bp) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_update: ebuf_read() rs=%d\n",rs) ;
-#endif
 
 	    if (rs > 0) {
 
@@ -995,26 +815,18 @@ char		**rpp ;
 
 	} /* end if (was in the index) */
 
-#if	CF_DEBUGS
-	debugprintf("ts_update: mid rs=%d\n",rs) ;
-#endif
-
 	if (rs == SR_NOTFOUND) {
 
 	    rs = ts_search(op,nnp,nnl,&bp) ;
 	    ei = rs ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_update: ts_search() rs=%d\n",rs) ;
-#endif
-
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        rs = mapstrint_add(&op->ni,nnp,nnl,ei) ;
+	    }
 
 	} /* end if */
 
-	if (rpp != NULL)
-	    *rpp = (rs >= 0) ? bp : NULL ;
+	if (rpp != nullptr)
+	    *rpp = (rs >= 0) ? bp : nullptr ;
 
 	return (rs >= 0) ? ei : rs ;
 }
@@ -1034,32 +846,18 @@ char		**rpp ;
 	int		ne, ei ;
 	int		f_found ;
 	char		*bp ;
-	char		*np = NULL ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_search: ent nnl=%u nodename=%t\n",
-	    nnl,nnp,strnlen(nnp,nnl)) ;
-#endif
+	char		*np = nullptr ;
 
 	if (nnl < 0)
 	    nnl = strlen(nnp) ;
 
-#if	CF_DEBUGS 
-	debugprintf("ts_search: nnl=%u pagesize=%u ebs=%u\n",
-		nnl,op->pagesize,ebs) ;
-#endif
-
 	ei = 0 ;
 	ne = 0 ;
-	f_found = FALSE ;
+	f_found = false ;
 	while ((rs >= 0) && (! f_found)) {
 
 	    rs = ebuf_read(&op->ebm,ei,&bp) ;
 	    ne = rs ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_search: ebuf_read() rs=%d\n",rs) ;
-#endif
 
 	    if (rs <= 0)
 	        break ;
@@ -1070,13 +868,8 @@ char		**rpp ;
 
 /* is this a match for what we want? */
 
-#if	CF_DEBUGS
-		debugprintf("ts_search: i=%u db_node=%t\n",i,
-		np,strnlen(np,TSE_LKEYNAME)) ;
-#endif
-
 	        if (namematch(np,nnp,nnl)) {
-		    f_found = TRUE ;
+		    f_found = true ;
 	            break ;
 		}
 
@@ -1084,37 +877,19 @@ char		**rpp ;
 
 	    } /* end for (looping through entries) */
 
-#if	CF_DEBUGS
-	    debugprintf("ts_search: for-out i=%d f_found=%u\n",
-			i,f_found) ;
-#endif
-
 	    ei += i ;
-
-#if	CF_DEBUGS
-	    debugprintf("ts_search: ei=%d f_found=%u\n",ei,f_found) ;
-#endif
 
 	    if (f_found) break ;
 	} /* end while */
 
-#if	CF_DEBUGS
-	debugprintf("ts_search: fin rs=%d f_found=%u\n",rs,f_found) ;
-	debugprintf("ts_search: ne=%d \n",ne) ;
-#endif
-
 	if (rs >= 0) {
 	    if ((ne != 0) && f_found) {
-		if (rpp != NULL)
+		if (rpp != nullptr)
 		    *rpp = bp ;
 	    } else {
 	        rs = SR_NOTFOUND ;
 	    }
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("ts_search: ret rs=%d ei=%u\n",rs,ei) ;
-#endif
 
 	return (rs >= 0) ? ei : rs ;
 }
@@ -1129,29 +904,19 @@ time_t		dt ;
 	const int	ebs = TS_ENTSIZE ;
 
 	int		rs = SR_OK ;
-	int		f_changed = FALSE ;
+	int		f_changed = false ;
 	int		f ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_acquire: ent\n") ;
-#endif
-
-	if (dt == 0) dt = time(NULL) ;
+	if (dt == 0) dt = time(nullptr) ;
 
 /* is the file open? */
 
 	if (op->fd < 0) {
 	    rs = ts_fileopen(op,dt) ;
-#if	CF_DEBUGS
-	debugprintf("ts_acquire: _fileopen() rs=%d\n",rs) ;
-#endif
 	}
 
 	if ((rs >= 0) && (! f_read) && op->f.lockedread) {
 	    rs = ts_lockrelease(op) ;
-#if	CF_DEBUGS
-	debugprintf("ts_acquire: _lockrelease() rs=%d\n",rs) ;
-#endif
 	}
 
 /* capture the lock if we do not already have it */
@@ -1169,10 +934,6 @@ time_t		dt ;
 	    }
 	} /* end if (need lock) */
 
-#if	CF_DEBUGS
-	debugprintf("ts_acquire: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (ts_acquire) */
@@ -1184,17 +945,12 @@ TS		*op ;
 time_t		dt ;
 {
 	int		rs = SR_OK ;
-	int		f_locked = FALSE ;
+	int		f_locked = false ;
 	int		f ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_filebegin: ent fd=%d filesize=%u\n",
-		op->fd,op->filesize) ;
-#endif
 
 	if (op->filesize == 0) {
 
-	    op->f.fileinit = FALSE ;
+	    op->f.fileinit = false ;
 	    if (op->f.writable) {
 
 		if (op->f.lockedread) {
@@ -1202,7 +958,7 @@ time_t		dt ;
 		}
 
 	        if ((rs >= 0) && (! op->f.lockedwrite)) {
-	            f_locked = TRUE ;
+	            f_locked = true ;
 	            rs = ts_lockget(op,dt,0) ;
 	        }
 
@@ -1222,10 +978,6 @@ time_t		dt ;
 	        rs = ts_lockget(op,dt,1) ;
 	        f_locked = (rs >= 0) ;
 	    }
-
-#if	CF_DEBUGS
-	    debugprintf("ts_filebegin: ts_fileverify() \n") ;
-#endif
 
 	    if (rs >= 0)
 	        rs = ts_filetopread(op) ;
@@ -1249,10 +1001,6 @@ time_t		dt ;
 /* we're out of here */
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("ts_filebegin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (ts_filebegin) */
@@ -1263,12 +1011,12 @@ TS		*op ;
 time_t		dt ;
 {
 	int	rs = SR_OK ;
-	int	f_changed = FALSE ;
+	int	f_changed = false ;
 
 
 	if (op->filesize < TS_TABOFF) {
 
-	    f_changed = TRUE ;
+	    f_changed = true ;
 	    if (op->f.writable)
 		rs = ts_filetopwrite(op,dt) ;
 
@@ -1332,19 +1080,11 @@ time_t		dt ;
 	        op->filetype = 0 ;
 	        memset(&op->h,0,sizeof(struct ts_h)) ;
 
-#if	CF_DEBUGS
-	        debugprintf("ts_filebegin: u_write() wlen=%d\n",bl) ;
-#endif
-
 	poff = 0L ;
 	rs = u_pwrite(op->fd,op->topbuf,bl,poff) ;
 	op->filesize = rs ;
 	op->topsize = rs ;
 	op->f.fileinit = (rs >= 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_filetopwrite: u_write() rs=%d\n",rs) ;
-#endif
 
 ret0:
 	return rs ;
@@ -1375,13 +1115,7 @@ TS		*op ;
 {
 	int	rs = SR_OK ;
 	int	f ;
-
 	const char	*cp ;
-
-
-#if	CF_DEBUGS
-	debugprintf("ts_fileverify: ent\n") ;
-#endif
 
 	if (op->topsize < TS_TOPLEN) {
 	    rs = SR_INVALID ;
@@ -1393,11 +1127,6 @@ TS		*op ;
 	f = f && (*(cp + TS_FILEMAGICLEN) == '\n') ;
 
 	if (! f) {
-
-#if	CF_DEBUGS
-	    debugprintf("ts_fileverify: bad magic=>%t<\n",
-	        cp,strnlen(cp,14)) ;
-#endif
 
 	    rs = SR_BADFMT ;
 	    goto ret0 ;
@@ -1420,10 +1149,6 @@ TS		*op ;
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("ts_fileverify: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (ts_fileverify) */
@@ -1435,12 +1160,12 @@ TS		*op ;
 int		f_read ;
 {
 	int	rs = SR_OK ;
-	int	f_changed = FALSE ;
+	int	f_changed = false ;
 
 	char	*bp = (op->topbuf + TS_HEADTABOFF) ;
 
 
-	if (op->topbuf == NULL)
+	if (op->topbuf == nullptr)
 	    return SR_BADFMT ;
 
 	if (f_read) {
@@ -1484,26 +1209,17 @@ TS		*op ;
 int		f_read ;
 time_t		dt ;
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 
 	int	rs = SR_OK ;
 	int	lockcmd ;
-	int	f_already = FALSE ;
-	int	f_changed = FALSE ;
+	int	f_already = false ;
+	int	f_changed = false ;
 
-
-#if	CF_DEBUGS && 0
-	debugprintf("ts_lockget: ent f_read=%d\n",f_read) ;
-#endif
 
 	if (op->fd < 0) {
 
 	    rs = ts_fileopen(op,dt) ;
-
-#if	CF_DEBUGS && 0
-	    debugprintf("ts_lockget: ts_fileopen() rs=%d fd=%d\n",
-	        rs,op->fd) ;
-#endif
 
 	    if (rs < 0)
 	        goto bad0 ;
@@ -1514,23 +1230,16 @@ time_t		dt ;
 
 	if (f_read || (! op->f.writable)) {
 
-#if	CF_DEBUGS && 0
-	    debugprintf("ts_lockget: need READ lock\n") ;
-#endif
 	    f_already = op->f.lockedread ;
-	    op->f.lockedread = TRUE ;
-	    op->f.lockedwrite = FALSE ;
+	    op->f.lockedread = true ;
+	    op->f.lockedwrite = false ;
 	    lockcmd = F_RLOCK ;
 
 	} else {
 
-#if	CF_DEBUGS && 0
-	    debugprintf("ts_lockget: need WRITE lock\n") ;
-#endif
-
 	    f_already = op->f.lockedwrite ;
-	    op->f.lockedread = FALSE ;
-	    op->f.lockedwrite = TRUE ;
+	    op->f.lockedread = false ;
+	    op->f.lockedwrite = true ;
 	    lockcmd = F_WLOCK ;
 
 	} /* end if */
@@ -1555,10 +1264,6 @@ time_t		dt ;
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
 
-#if	CF_DEBUGS && 0
-	debugprintf("ts_lockget: LOCK lockfile() rs=%d\n",rs) ;
-#endif
-
 	if (rs < 0)
 	    goto bad2 ;
 
@@ -1581,7 +1286,7 @@ time_t		dt ;
 	if (f_changed) {
 
 	    if (op->f.bufvalid)
-	        op->f.bufvalid = FALSE ;
+	        op->f.bufvalid = false ;
 
 	    op->filesize = sb.st_size ;
 	    op->ti_mod = sb.st_mtime ;
@@ -1589,20 +1294,15 @@ time_t		dt ;
 	} /* end if */
 
 	if (op->filesize < TS_TABOFF)
-	    op->f.fileinit = FALSE ;
+	    op->f.fileinit = false ;
 
 ret0:
-
-#if	CF_DEBUGS && 0
-	debugprintf("ts_lockget: ret rs=%d f_changed=%u\n",
-		rs,f_changed) ;
-#endif
 
 	return (rs >= 0) ? f_changed : rs ;
 
 /* bad stuff */
 bad2:
-	op->f.fileinit = FALSE ;
+	op->f.fileinit = false ;
 
 #if	CF_LOCKF
 	rs = uc_lockf(op->fd,F_ULOCK,0L) ;
@@ -1617,13 +1317,9 @@ bad2:
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
 
-#if	CF_DEBUGS && 0
-	debugprintf("ts_lockget: UNLOCK lockfile() rs=%d\n",rs) ;
-#endif
-
 bad1:
-	op->f.lockedread = FALSE ;
-	op->f.lockedwrite = FALSE ;
+	op->f.lockedread = false ;
+	op->f.lockedwrite = false ;
 
 bad0:
 	goto ret0 ;
@@ -1636,10 +1332,6 @@ TS		*op ;
 {
 	int	rs = SR_OK ;
 
-
-#if	CF_DEBUGS && 0
-	debugprintf("ts_lockrelease: ent\n") ;
-#endif
 
 	if ((op->f.lockedread || op->f.lockedwrite)) {
 
@@ -1658,25 +1350,12 @@ TS		*op ;
 #endif /* CF_SOLARISBUF */
 #endif /* CF_LOCKF */
 
-#if	CF_DEBUGS && 0
-	        debugprintf("ts_lockrelease: lockfile() rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS
-	        debugprintf("ts_lockrelease: UNLOCK lockfile() rs=%d\n",
-			rs) ;
-#endif
-
 	    } /* end if (file was open) */
 
-	    op->f.lockedread = FALSE ;
-	    op->f.lockedwrite = FALSE ;
+	    op->f.lockedread = false ;
+	    op->f.lockedwrite = false ;
 
 	} /* end if (there was a possible lock set) */
-
-#if	CF_DEBUGS
-	debugprintf("ts_lockrelease: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1689,72 +1368,31 @@ time_t		dt ;
 {
 	int	rs = SR_OK ;
 	int	oflags ;
-	int	f_created = FALSE ;
-
-
-#if	CF_DEBUGS
-	debugprintf("ts_fileopen: fname=%s\n",op->fname) ;
-#endif
-
+	int	f_created = false ;
 	if (op->fd >= 0)
 	    goto ret0 ;
 
-#if	CF_DEBUGS
-	{
-	    char	timebuf[TIMEBUFLEN+1] ;
-	    stroflags(timebuf,op->oflags) ;
-	    debugprintf("ts_fileopen: need open oflags=%s\n",
-		timebuf) ;
-	}
-#endif
-
-	op->f.fileinit = FALSE ;
-	op->f.lockedread = FALSE ;
-	op->f.lockedwrite = FALSE ;
+	op->f.fileinit = false ;
+	op->f.lockedread = false ;
+	op->f.lockedwrite = false ;
 
 	oflags = (op->oflags & (~ O_CREAT)) ;
 	rs = u_open(op->fname,oflags,op->operm) ;
 	op->fd = rs ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_fileopen: 1 u_open() rs=%d\n",rs) ;
-#endif
-
 	if (isNotPresent(rs) && (op->oflags & O_CREAT)) {
 
-	    f_created = TRUE ;
+	    f_created = true ;
 	    oflags = op->oflags ;
 	    rs = u_open(op->fname,oflags,op->operm) ;
 	    op->fd = rs ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_fileopen: 2 u_open() rs=%d\n",rs) ;
-#endif
-
 	} /* end if (creating file) */
 
-#if	CF_DEBUGS
 	if (rs >= 0) {
-	    int	rs1 = u_fcntl(op->fd,F_GETFL,0) ;
-	    char	timebuf[TIMEBUFLEN+1] ;
-		stroflags(timebuf,rs1) ;
-	    debugprintf("ts_fileopen: fl=%08o sfl=%s\n",
-		rs1,timebuf) ;
-	}
-#endif
-
-
-	if (rs >= 0) {
-
-	    if (dt == 0) dt = time(NULL) ;
-
+	    if (dt == 0) dt = time(nullptr) ;
 	    op->ti_open = dt ;
-	    rs = uc_closeonexec(op->fd,TRUE) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_fileopen: uc_closeonexec() rs=%d\n",rs) ;
-#endif
-
+	    rs = uc_closeonexec(op->fd,true) ;
 	} /* end if */
 
 	if (rs >= 0)
@@ -1764,11 +1402,6 @@ time_t		dt ;
 	    rs = ts_ebufstart(op) ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("ts_fileopen: ret rs=%d f_create=%u\n",rs,f_created) ;
-#endif
-
 	return (rs >= 0) ? f_created : rs ;
 }
 /* end subroutine (ts_fileopen) */
@@ -1787,8 +1420,8 @@ TS		*op ;
 	}
 
 	if (op->fd >= 0) {
-	    op->f.lockedread = FALSE ;
-	    op->f.lockedwrite = FALSE ;
+	    op->f.lockedread = false ;
+	    op->f.lockedwrite = false ;
 	    rs1 = u_close(op->fd) ;
 	    op->fd = -1 ;
 	    if (rs >= 0) rs = rs1 ;
@@ -1803,7 +1436,7 @@ static int ts_filesetinfo(op,dt)
 TS		*op ;
 time_t		dt ;
 {
-	struct ustat	sb ;
+	USTAT	sb ;
 
 	int	rs ;
 	int	amode ;
@@ -1811,10 +1444,6 @@ time_t		dt ;
 
 	amode = (op->oflags & O_ACCMODE) ;
 	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
-
-#if	CF_DEBUGS
-	debugprintf("ts_open: f_writable=%u\n",op->f.writable) ;
-#endif
 
 	rs = u_fstat(op->fd,&sb) ;
 	if (rs < 0) goto ret0 ;
@@ -1876,7 +1505,7 @@ TS		*op ;
 	in		rs1 ;
 
 	if (op->f.ebuf) {
-	    op->f.ebuf = FALSE ;
+	    op->f.ebuf = false ;
 	    rs1 = ebuf_finish(&op->ebm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1898,17 +1527,13 @@ char		**rpp ;
 
 	rs = ebuf_read(&op->ebm,ei,&bp) ;
 
-#if	CF_DEBUGS
-	debugprintf("ts_readentry: ebuf_read() rs=%d\n",rs) ;
-#endif
-
 	if (rs < 0)
 	    goto ret0 ;
 
 	if (rs == 0) rs = SR_NOTFOUND ;
 
-	if (rpp != NULL)
-	    *rpp = (rs >= 0) ? bp : NULL ;
+	if (rpp != nullptr)
+	    *rpp = (rs >= 0) ? bp : nullptr ;
 
 /* enter into the index */
 
@@ -1926,11 +1551,6 @@ char		**rpp ;
 #endif /* CF_NIENUM */
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("ts_readentry: ret rs=%d \n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (ts_readentry) */
@@ -1953,7 +1573,7 @@ int		ei ;
 	if (nl < 0)
 	    nl = strlen(np) ;
 
-	        rs1 = mapstrint_fetch(&op->ni,np,nl,NULL,&ei2) ;
+	        rs1 = mapstrint_fetch(&op->ni,np,nl,nullptr,&ei2) ;
 
 	        if ((rs1 >= 0) && (ei != ei2)) {
 
@@ -2012,13 +1632,7 @@ const char	np[] ;
 const char	nnp[] ;
 int		nnl ;
 {
-	int	f = FALSE ;
-
-
-#if	CF_DEBUGS
-	debugprintf("namematch: ent np=%s\n",np) ;
-	debugprintf("namematch: nnl=%d nnp=%t\n",nnl,nnp,strnlen(nnp,nnl)) ;
-#endif
+	int	f = false ;
 
 	if (nnl > TSE_LKEYNAME)
 	    goto ret0 ;
@@ -2027,11 +1641,6 @@ int		nnl ;
 	f = f && (np[nnl] == '\0') ;
 
 ret0:
-
-#if	CF_DEBUGS
-	debugprintf("namematch: ret f=%u\n",f) ;
-#endif
-
 	return f ;
 }
 /* end subroutine (namematch) */
