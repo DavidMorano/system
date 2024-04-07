@@ -22,6 +22,8 @@
 #include	<vsystem.h>
 #include	<localmisc.h>
 
+#include	"usysinfo.h"
+
 
 /* local defines */
 
