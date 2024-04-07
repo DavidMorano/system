@@ -195,7 +195,7 @@ const char	fname[] ;
 
 	memfile_tell(mfp,&poff) ;
 
-	memfile_buf(mfp,&posta) ;
+	memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -417,7 +417,7 @@ const char	fname[] ;
 
 	            c += 1 ;
 	            poff += rs ;
-	            memfile_buf(mfp,&posta) ;
+	            memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))

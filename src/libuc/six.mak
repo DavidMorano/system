@@ -1,6 +1,6 @@
-# MAKEFILES (filebuf)
+# MAKEFILES (six)
 
-T= filebuf
+T= six
 
 ALL= $(T).o $(T).a
 
@@ -51,19 +51,20 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= filebuf.h
+INCS= six.h
 
 
-OBJ0_FILEBUF= filebuf_main.o
-OBJ1_FILEBUF= filebuf_writers.o
-OBJ2_FILEBUF= filebuf_mailsup.o
-OBJ3_FILEBUF=
+OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
+OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
+OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
+OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
+OBJ4_SIX= sifext.o
 
 
-OBJA_FILEBUF= obj0_filebuf.o obj1_filebuf.o
-OBJB_FILEBUF= obj2_filebuf.o
+OBJA_SIX= obj0_six.o obj1_six.o
+OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
 
-OBJ_FILEBUF= $(OBJA_FILEBUF) $(OBJB_FILEBUF)
+OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
 
 
 default:		$(T).o
@@ -86,10 +87,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_FILEBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_FILEBUF)
+$(T).o:			$(OBJ_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
 
-$(T).a:			$(OBJ_FILEBUF)
+$(T).a:			$(OBJ_SIX)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,21 +110,22 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_filebuf.o:	$(OBJ0_FILEBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_FILEBUF)
+obj0_six.o:	$(OBJ0_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
 
-obj1_filebuf.o:	$(OBJ1_FILEBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_FILEBUF)
+obj1_six.o:	$(OBJ1_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
 
-obj2_filebuf.o:	$(OBJ2_FILEBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_FILEBUF)
+obj2_six.o:	$(OBJ2_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
 
-obj3_filebuf.o:	$(OBJ3_FILEBUF)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_FILEBUF)
+obj3_six.o:	$(OBJ3_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+
+obj4_six.o:	$(OBJ4_SIX)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
 
 
-filebuf_main.o:		filebuf_main.cc		$(INCS)
-filebuf_writers.o:	filebuf_writers.cc	$(INCS)
-filebuf_mailsup.o:	filebuf_mailsup.cc	$(INCS)
+sifext.o:		sifext.cc sifext.h
 
 

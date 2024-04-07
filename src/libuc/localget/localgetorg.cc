@@ -55,7 +55,6 @@
 #include	<getuserhome.h>
 #include	<getax.h>
 #include	<gecos.h>
-#include	<filebuf.h>
 #include	<filereadln.h>
 #include	<sfx.h>
 #include	<sncpyx.h>

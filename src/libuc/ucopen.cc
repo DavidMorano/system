@@ -22,11 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<sys/stat.h>
-#include	<sys/wait.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
@@ -34,6 +30,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"ucopeninfo.h"
 #include	"ucopen.h"
 
 
@@ -52,7 +49,34 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
+
+int uc_open(cchar *fn,int of,mode_t om) noex {
+	int		oo = 0 ;
+	return uc_openex(fn,of,om,-1,oo) ;
+}
+/* end subroutine (uc_open) */
+
+int uc_opene(cchar *fn,int of,mode_t om,int to) noex {
+	int		oo = 0 ;
+	return uc_openex(fn,of,om,to,oo) ;
+}
+/* end subroutine (uc_opene) */
+
+int uc_openenv(cchar *fn,int of,mode_t om,mainv ev,int to) noex {
+	UCOPENINFO	oi{} ;
+	oi.fname = fn ;
+	oi.oflags = of ;
+	oi.operms = om ;
+	oi.to = to ;
+	oi.opts = 0 ;
+	oi.envv = ev ;
+	return uc_openinfo(&oi) ;
+}
+/* end subroutine (uc_openenv) */
 
 int uc_socket(int pf,int pt,int proto) noex {
 	return u_socket(pf,pt,proto) ;

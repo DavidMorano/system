@@ -1,7 +1,7 @@
 /* memfile SUPPORT */
 /* lang=C++20 */
 
-/* provides a memory-mapped file for both reading and writing */
+/* provides a memory-mapped file for writing */
 /* version %I% last-modified %G% */
 
 
@@ -16,8 +16,8 @@
 
 /******************************************************************************
 
-        This little object supports some buffered file operations for
-        low-overhead buffered I-O operations.
+	This little object provides a file writing facility for
+	low-overhead raw writes (no separate user-space buffering).
 
 	Notes:
 	1. Comparison to other mapped-memory file facilities:
@@ -47,6 +47,7 @@
 /* local defines */
 
 #define	ZEROBUFLEN	1024
+#define	PSZMULT		4
 
 
 /* imported namespaces */
@@ -126,7 +127,7 @@ static sysval		pagesize(sysval_ps) ;
 /* exported subroutines */
 
 int memfile_open(memfile *op,cchar *fname,int of,mode_t om) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if ((rs = memfile_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
@@ -176,7 +177,7 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	    cint	ps = op->pagesize ;
 	    rs = SR_NOTOPEN ;
 	    if (op->dbuf) {
-	        csize	psz = (4 * ps) ;
+	        csize	psz = (PSZMULT * ps) ;
 		uint	pmo = (ps - 1) ;
 		rs = SR_OK ;
 		if ((op->off + wlen) > fsize) {
@@ -238,7 +239,7 @@ int memfile_tell(memfile *op,off_t *offp) noex {
 }
 /* end subroutine (memfile_tell) */
 
-int memfile_buf(memfile *op,void *vp) noex {
+int memfile_getbuf(memfile *op,void *vp) noex {
 	caddr_t		*rpp = (caddr_t *) vp ;
 	int		rs ;
 	if ((rs = memfile_magic(op,vp)) >= 0) {
@@ -246,7 +247,7 @@ int memfile_buf(memfile *op,void *vp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (memfile_buf) */
+/* end subroutine (memfile_getbuf) */
 
 
 /* private subroutines */

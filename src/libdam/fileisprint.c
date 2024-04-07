@@ -51,7 +51,7 @@
 
 #include	<usystem.h>
 #include	<char.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 
@@ -117,14 +117,14 @@ int fileisprint(cchar *fname)
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
-	    FILEBUF	b ;
+	    FILER	b ;
 	    int		fd = rs ;
-	    if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 	        const int	llen = LINEBUFLEN ;
 	        int		ll ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	            ll = rs ;
 
 	            if (lbuf[ll - 1] == '\n') ll -= 1 ;
@@ -135,9 +135,9 @@ int fileisprint(cchar *fname)
 
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
-	        rs1 = filebuf_finish(&b) ;
+	        rs1 = filer_finish(&b) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    u_close(fd) ;
 	} /* end if (open) */
 

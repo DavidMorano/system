@@ -156,7 +156,7 @@ const char	indexname[] ;
 
 /* get the starting offset of the posting file */
 
-	memfile_buf(mfp,&posta) ;
+	memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))

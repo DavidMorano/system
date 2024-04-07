@@ -56,7 +56,7 @@
 #include	<preload.h>
 #include	<buffer.h>
 #include	<vecstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<localmisc.h>
@@ -227,15 +227,15 @@ static int sysinfo_setdomainlog(int name,char *rbuf,long len,long rc)
 	int		rs1 ;
 	cchar		*fn = SYSINFO_LOGDOMAIN ;
 	if ((rs = u_open(fn,of,om)) >= 0) {
-	    FILEBUF	b ;
+	    FILER	b ;
 	    const int	fd = rs ;
-	    if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
 		const int	rl = (int) (len & INT_MAX) ;
 		cchar		*fmt = "setoncdomain dn=%t (%ld)\n" ;
-		filebuf_printf(&b,fmt,rbuf,rl,rc) ;
-		rs1 = filebuf_finish(&b) ;
+		filer_printf(&b,fmt,rbuf,rl,rc) ;
+		rs1 = filer_finish(&b) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    u_close(fd) ;
 	} /* end if (file) */
 	return rs ;

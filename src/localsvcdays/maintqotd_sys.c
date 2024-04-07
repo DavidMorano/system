@@ -54,7 +54,7 @@
 #include	<vecstr.h>
 #include	<ascii.h>
 #include	<spawner.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<logfile.h>
 #include	<localmisc.h>
 
@@ -422,13 +422,13 @@ const char	*ap ;
 	        if (rs >= 0) rs = u_rewind(fd) ;
 
 	        if (rs >= 0) {
-	            FILEBUF	b ;
+	            FILER	b ;
 	            const int	opts = 0 ;
 
-	            if ((rs = filebuf_start(&b,fd,0L,512,opts)) >= 0) {
+	            if ((rs = filer_start(&b,fd,0L,512,opts)) >= 0) {
 
 	                while (rs >= 0) {
-	                    rs = filebuf_readlns(&b,lbuf,llen,to,NULL) ;
+	                    rs = filer_readlns(&b,lbuf,llen,to,NULL) ;
 	                    ll = rs ;
 	                    if (rs <= 0) break ;
 
@@ -451,8 +451,8 @@ const char	*ap ;
 
 	                } /* end while (reading lines) */
 
-	                filebuf_finish(&b) ;
-	            } /* end if (filebuf) */
+	                filer_finish(&b) ;
+	            } /* end if (filer) */
 
 	        } /* end if */
 
@@ -882,22 +882,22 @@ const char	*sname ;
 #if	CF_DEBUGS
 static int debugoutput(const char *ids,int fd)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		wlen = 0 ;
 	debugprintf("%t\n",ids,strlinelen(ids,80,60)) ;
 	sleep(2) ;
 	if ((rs = uc_fsize(fd)) >= 0) {
 	    debugprintf("%t fsize=%u\n",ids,strlinelen(ids,80,60),rs) ;
-	    if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
 	        const int	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN+1] ;
-	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	            debugprintf("o> %t\n",
 	                lbuf,strlinelen(lbuf,rs,70)) ;
 	        } /* end while */
-	        filebuf_finish(&b) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&b) ;
+	    } /* end if (filer) */
 	} /* end if (fsize) */
 	if (rs >= 0) u_rewind(fd) ;
 	return (rs >= 0) ? wlen : rs ;

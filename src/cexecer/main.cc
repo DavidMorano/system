@@ -52,7 +52,7 @@
 #include	<vecstr.h>
 #include	<stdorder.h>
 #include	<sockaddress.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -193,7 +193,7 @@ static int	usage(PROGINFO *) ;
 static int	procenvsys(PROGINFO *) ;
 static int	process_input(PROGINFO *,int,int,
 			TARGETINFO *) ;
-static int	process_record(PROGINFO *,FILEBUF *,int,int,char *,
+static int	process_record(PROGINFO *,FILER *,int,int,char *,
 			int,TARGETINFO *) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
@@ -1163,9 +1163,9 @@ TARGETINFO	*tip ;
 	struct dialcprogmsg_end		m0 ;
 	struct dialcprogmsg_light	m5 ;
 
-	FILEBUF		rd ;
+	FILER		rd ;
 	const int	salen = sizeof(SOCKADDRESS) ;
-	const int	fbo = FILEBUF_ONET ;
+	const int	fbo = FILER_ONET ;
 	int		rs ;
 	int		rs1 ;
 	int		type ;
@@ -1176,15 +1176,15 @@ TARGETINFO	*tip ;
 
 	memset(tip,0,sizeof(TARGETINFO)) ;
 
-	if ((rs = filebuf_start(&rd,fd,0L,BUFLEN,fbo)) >= 0) {
+	if ((rs = filer_start(&rd,fd,0L,BUFLEN,fbo)) >= 0) {
 	    f_exit = FALSE ;
 
-	    while ((! f_exit) && ((rs = filebuf_read(&rd,buf,1,to)) > 0)) {
+	    while ((! f_exit) && ((rs = filer_read(&rd,buf,1,to)) > 0)) {
 	        type = buf[0] & 0xff ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
-	            debugprintf("process_input: filebuf_read() rs=%d type=%d\n",
+	            debugprintf("process_input: filer_read() rs=%d type=%d\n",
 	                rs,type) ;
 #endif
 
@@ -1192,7 +1192,7 @@ TARGETINFO	*tip ;
 
 	        case dialcprogmsgtype_end:
 	            mlen = DIALCPROGMSG_END ;
-	            rs = filebuf_read(&rd,(buf + 1),(mlen - 1),to) ;
+	            rs = filer_read(&rd,(buf + 1),(mlen - 1),to) ;
 	            if (rs >= 0) {
 	                rs = dialcprogmsg_end(buf,mlen,1,&m0) ;
 	                f_exit = (rs >= 0) ;
@@ -1208,10 +1208,10 @@ TARGETINFO	*tip ;
 	            break ;
 
 	        case dialcprogmsgtype_light:
-	            rs = filebuf_read(&rd,(buf + 1),2,to) ;
+	            rs = filer_read(&rd,(buf + 1),2,to) ;
 	            if (rs >= 0) {
 	                stdorder_rushort((buf + 1),&usw) ;
-	                rs = filebuf_read(&rd,(buf + 3),(int) usw,to) ;
+	                rs = filer_read(&rd,(buf + 3),(int) usw,to) ;
 	                mlen = (3 + rs) ;
 	                if (rs >= 0) {
 #if	CF_DEBUGS
@@ -1243,12 +1243,12 @@ TARGETINFO	*tip ;
 	            if (DEBUGLEVEL(4))
 	                debugprintf("process_input: unknown type\n") ;
 #endif
-	            rs = filebuf_read(&rd,(buf + 1),2,to) ;
+	            rs = filer_read(&rd,(buf + 1),2,to) ;
 	            cl = rs ;
 	            if (rs >= 0) {
 	                if (cl < 2) rs = SR_INVALID ;
 	                stdorder_rushort((buf + 1),&usw) ;
-	                rs = filebuf_read(&rd,(buf + 3),(int) usw,to) ;
+	                rs = filer_read(&rd,(buf + 3),(int) usw,to) ;
 	            }
 	            break ;
 
@@ -1263,9 +1263,9 @@ TARGETINFO	*tip ;
 	            rs,f_exit) ;
 #endif
 
-	    rs1 = filebuf_finish(&rd) ;
+	    rs1 = filer_finish(&rd) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	if (rs >= 0) {
 	    rs = (f_exit) ? SR_OK : SR_PROTO ;
@@ -1278,7 +1278,7 @@ TARGETINFO	*tip ;
 
 static int process_record(pip,fbp,to,type,rbuf,rlen,tip)
 PROGINFO	*pip ;
-FILEBUF		*fbp ;
+FILER		*fbp ;
 int		to ;
 int		type ;
 char		rbuf[] ;
@@ -1293,11 +1293,11 @@ TARGETINFO	*tip ;
 	char		*lenbuf = (rbuf + 1) ;
 	char		*envbuf = (rbuf + 3) ;
 
-	if ((rs = filebuf_read(fbp,lenbuf,2,to)) >= 0) {
+	if ((rs = filer_read(fbp,lenbuf,2,to)) >= 0) {
 	    stdorder_rushort(lenbuf,&usw) ;
 	    len = usw & USHORT_MAX ;
 	    if (len <= (rlen-3)) {
-	        if ((rs = filebuf_read(fbp,envbuf,len,to)) >= 0) {
+	        if ((rs = filer_read(fbp,envbuf,len,to)) >= 0) {
 	            const char	**vpp = NULL ;
 	            envlen = (len-1) ;
 	            switch (type) {

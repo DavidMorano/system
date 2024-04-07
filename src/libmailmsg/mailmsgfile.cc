@@ -49,7 +49,7 @@
 #include	<sysval.hh>
 #include	<mallocxx.h>
 #include	<hdb.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<linefold.h>
 #include	<fsdir.h>
 #include	<vecstr.h>
@@ -165,9 +165,9 @@ static int mailmsgfile_starter(MMF *,cc *) noex ;
 static int mailmsgfile_newx(MMF *,cc *,int,off_t,int) noex ;
 static int mailmsgfile_mk(MMF *,cchar *,cchar *,int,off_t,int) noex ;
 static int mailmsgfile_mkdis(MMF *,MMF_MI *,int,int,off_t) noex ;
-static int mailmsgfile_proclines(MMF *,MMF_MI *,filebuf *,cchar *,int) noex ;
+static int mailmsgfile_proclines(MMF *,MMF_MI *,filer *,cchar *,int) noex ;
 
-static int mailmsgfile_procout(MMF *,filebuf *,int,cchar *,int,int) noex ;
+static int mailmsgfile_procout(MMF *,filer *,int,cchar *,int,int) noex ;
 static int mailmsgfile_store(MMF *,MMF_MI *) noex ;
 static int mailmsgfile_filefins(MMF *) noex ;
 
@@ -446,20 +446,20 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	int		vlines = 0 ;
 	char		*lbuf{} ;
 	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    filebuf	in ;
+	    filer	in ;
 	    cint	llen = rs ;
 	    cint	ibsize = min(blen,(op->pagesize*8)) ;
 	    int		inlen ;
 	    int		wlen = 0 ;
-	    if ((rs = filebuf_start(&in,mfd,bo,ibsize,0)) >= 0) {
-	        filebuf	out ;
+	    if ((rs = filer_start(&in,mfd,bo,ibsize,0)) >= 0) {
+	        filer	out ;
 	        cint	obsize = rs ;
 	        int	rlen = blen ;
-	        if ((rs = filebuf_start(&out,tfd,0L,obsize,0)) >= 0) {
+	        if ((rs = filer_start(&out,tfd,0L,obsize,0)) >= 0) {
 		    int		ncols ;
 	            int		ll ;
 	            while ((rs >= 0) && (rlen > 0)) {
-	                rs = filebuf_readln(&in,lbuf,llen,0) ;
+	                rs = filer_readln(&in,lbuf,llen,0) ;
 	                inlen = rs ;
 	                if (rs <= 0) break ;
 	                ll = inlen ;
@@ -488,12 +488,12 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 	            if (rs >= 0) {
 	                mip->vsize = wlen ;
 	            }
-	            rs1 = filebuf_finish(&out) ;
+	            rs1 = filer_finish(&out) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
-	        rs1 = filebuf_finish(&in) ;
+	        } /* end if (filer) */
+	        rs1 = filer_finish(&in) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    rs1 = uc_free(lbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
@@ -501,7 +501,7 @@ static int mailmsgfile_mkdis(MMF *op,MMF_MI *mip,
 }
 /* end subroutine (mailmsgfile_mkdis) */
 
-static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filebuf *fbp,
+static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 		cchar *lbuf,int llen) noex {
 	linefold	ff ;
 	cint		c = op->cols ;
@@ -539,14 +539,14 @@ static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filebuf *fbp,
 }
 /* end subroutine (mailmsgfile_proclines) */
 
-static int mailmsgfile_procout(MMF *op,filebuf *fbp,int li,cc *lp,int ll,
+static int mailmsgfile_procout(MMF *op,filer *fbp,int li,cc *lp,int ll,
 		int f_cont) noex {
 	cint		ind = op->ind ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((li > 0) && (ind > 0)) {
-	    rs = filebuf_writeblanks(fbp,ind) ;
+	    rs = filer_writeblanks(fbp,ind) ;
 	    wlen += rs ;
 	}
 	if (rs >= 0) {
@@ -557,22 +557,22 @@ static int mailmsgfile_procout(MMF *op,filebuf *fbp,int li,cc *lp,int ll,
 	        if ((rs = mkdisplayable(obuf,olen,lp,ll)) >= 0) {
 	            cint	ol = rmeol(obuf,rs) ;
 	            if (f_cont) {
-	                if ((rs = filebuf_write(fbp,obuf,ol)) >= 0) {
+	                if ((rs = filer_write(fbp,obuf,ol)) >= 0) {
 	                    wlen += rs ;
 	                    f_eol = true ;
 	                    obuf[0] = '¬' ;
 	                    obuf[1] = '\n' ;
-	                    rs = filebuf_write(fbp,obuf,2) ;
+	                    rs = filer_write(fbp,obuf,2) ;
 	                    wlen += rs ;
-	                } /* end if (filebuf_write) */
+	                } /* end if (filer_write) */
 	            } else {
 	                f_eol = true ;
-	                rs = filebuf_println(fbp,obuf,olen) ;
+	                rs = filer_println(fbp,obuf,olen) ;
 	                wlen += rs ;
 	            }
 	            if ((rs >= 0) && (! f_eol)) {
 	                obuf[0] = '\n' ;
-	                rs = filebuf_write(fbp,obuf,1) ;
+	                rs = filer_write(fbp,obuf,1) ;
 	                wlen += rs ;
 	            }
 	        } /* end if (mkdisplayable) */

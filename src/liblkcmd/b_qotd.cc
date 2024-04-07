@@ -63,7 +63,7 @@
 #include	<tmtime.h>
 #include	<dayspec.h>
 #include	<openqotd.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<termout.h>
 #include	<ourmjd.h>
 #include	<exitcodes.h>
@@ -1818,18 +1818,18 @@ static int procqueryouter(PROGINFO *pip,void *ofp,int qfd)
 static int procquerytermout(PROGINFO *pip,void *ofp,int qfd)
 {
 	LOCINFO		*lip = pip->lip ;
-	FILEBUF		b ;
+	FILER		b ;
 	const int	to = pip->to_read ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((rs = filebuf_start(&b,qfd,0L,0,0)) >= 0) {
+	if ((rs = filer_start(&b,qfd,0L,0,0)) >= 0) {
 	    const int	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
-	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        len = rs ;
 
 	            if (len > 0) {
@@ -1845,9 +1845,9 @@ static int procquerytermout(PROGINFO *pip,void *ofp,int qfd)
 	        if (rs < 0) break ;
 	    } /* end while */
 
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))

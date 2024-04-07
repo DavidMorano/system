@@ -86,7 +86,7 @@
 #include	<ids.h>
 #include	<storebuf.h>
 #include	<nulstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<kinfo.h>
 #include	<endian.h>
 #include	<exitcodes.h>
@@ -210,8 +210,8 @@ static int	ncpu_shmupdate(struct subinfo *) ;
 static int	ncpu_shmchild(struct subinfo *) ;
 static int	ncpu_shmopenwait(struct subinfo *,mode_t) ;
 
-static int	filebuf_writefill(FILEBUF *,const char *,int) ;
-static int	filebuf_writezero(FILEBUF *,int) ;
+static int	filer_writefill(FILER *,const char *,int) ;
+static int	filer_writezero(FILER *,int) ;
 
 static int	istermrs(int) ;
 
@@ -639,7 +639,7 @@ mode_t		operms ;
 {
 	SYSMISCFH	hdr ;
 
-	FILEBUF	babyfile ;
+	FILER	babyfile ;
 
 	uint	fileoff = 0 ;
 
@@ -677,12 +677,12 @@ mode_t		operms ;
 /* write file-header */
 
 	if (rs >= 0) {
-	    if ((rs = filebuf_start(&babyfile,fd,0L,size,0)) >= 0) {
+	    if ((rs = filer_start(&babyfile,fd,0L,size,0)) >= 0) {
 
-	        rs = filebuf_writefill(&babyfile,hdrbuf,bl) ;
+	        rs = filer_writefill(&babyfile,hdrbuf,bl) ;
 	        fileoff += rs ;
 
-	        rs1 = filebuf_finish(&babyfile) ;
+	        rs1 = filer_finish(&babyfile) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (file) */
 	} /* end if */
@@ -1089,8 +1089,8 @@ struct subinfo	*sip ;
 /* end subroutine (ncpu_default) */
 
 
-static int filebuf_writezero(fp,size)
-FILEBUF		*fp ;
+static int filer_writezero(fp,size)
+FILER		*fp ;
 int		size ;
 {
 	int		rs = SR_OK ;
@@ -1101,7 +1101,7 @@ int		size ;
 	while ((rs >= 0) && (rlen > 0)) {
 
 	    ml = MIN(rlen,4) ;
-	    rs = filebuf_write(fp,zerobuf,ml) ;
+	    rs = filer_write(fp,zerobuf,ml) ;
 	    rlen -= rs ;
 	    wlen += rs ;
 
@@ -1109,11 +1109,11 @@ int		size ;
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writezero) */
+/* end subroutine (filer_writezero) */
 
 
-static int filebuf_writefill(bp,buf,buflen)
-FILEBUF		*bp ;
+static int filer_writefill(bp,buf,buflen)
+FILER		*bp ;
 const char	buf[] ;
 int		buflen ;
 {
@@ -1125,21 +1125,21 @@ int		buflen ;
 	if (buflen < 0)
 	    buflen = (strlen(buf) + 1) ;
 
-	rs = filebuf_write(bp,buf,buflen) ;
+	rs = filer_write(bp,buf,buflen) ;
 	len = rs ;
 
 	r = (buflen & (asize - 1)) ;
 	if ((rs >= 0) && (r > 0)) {
 	    nzero = (asize - r) ;
 	    if (nzero > 0) {
-	        rs = filebuf_write(bp,zerobuf,nzero) ;
+	        rs = filer_write(bp,zerobuf,nzero) ;
 	        len += rs ;
 	    }
 	}
 
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (filebuf_writefill) */
+/* end subroutine (filer_writefill) */
 
 
 static int istermrs(int rs)

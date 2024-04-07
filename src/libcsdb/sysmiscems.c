@@ -68,7 +68,7 @@
 
 #include	<usystem.h>
 #include	<nulstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<expcook.h>
 #include	<getsysmisc.h>
 #include	<ascii.h>
@@ -210,10 +210,10 @@ static int	loadinfo_rn(LOADINFO *) ;
 static int	loadinfo_username(LOADINFO *) ;
 static int	loadinfo_chown(LOADINFO *,int,int) ;
 
-static int	filebuf_writefill(FILEBUF *,const char *,int) ;
+static int	filer_writefill(FILER *,const char *,int) ;
 
 #ifdef	COMMENT
-static int	filebuf_writezero(FILEBUF *,int) ;
+static int	filer_writezero(FILER *,int) ;
 #endif
 
 static int	getcookname(const char *,const char **) ;
@@ -749,7 +749,7 @@ int		operms ;
 {
 	SYSMISCFH	hdr ;
 
-	FILEBUF	babyfile ;
+	FILER	babyfile ;
 
 	uint	fileoff = 0 ;
 
@@ -768,7 +768,7 @@ int		operms ;
 	    op->pagesize = getpagesize() ;
 
 	size = (op->pagesize * 4) ;
-	rs = filebuf_start(&babyfile,fd,0,size,0) ;
+	rs = filer_start(&babyfile,fd,0,size,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
@@ -792,13 +792,13 @@ int		operms ;
 /* write file-header */
 
 	if (rs >= 0) {
-	    rs = filebuf_writefill(&babyfile,hdrbuf,bl) ;
+	    rs = filer_writefill(&babyfile,hdrbuf,bl) ;
 	    fileoff += rs ;
 	}
 
 /* write out the header -- again! */
 ret2:
-	filebuf_finish(&babyfile) ;
+	filer_finish(&babyfile) ;
 
 	if (rs >= 0) {
 
@@ -1323,8 +1323,8 @@ int		shmi ;
 
 #ifdef	COMMENT
 
-static int filebuf_writezero(fp,size)
-FILEBUF		*fp ;
+static int filer_writezero(fp,size)
+FILER		*fp ;
 int		size ;
 {
 	int	rs = SR_OK ;
@@ -1336,7 +1336,7 @@ int		size ;
 	while ((rs >= 0) && (rlen > 0)) {
 
 	    ml = MIN(rlen,4) ;
-	    rs = filebuf_write(fp,zerobuf,ml) ;
+	    rs = filer_write(fp,zerobuf,ml) ;
 	    rlen -= rs ;
 	    wlen += rs ;
 
@@ -1344,13 +1344,13 @@ int		size ;
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writezero) */
+/* end subroutine (filer_writezero) */
 
 #endif /* COMMENT */
 
 
-static int filebuf_writefill(bp,buf,buflen)
-FILEBUF		*bp ;
+static int filer_writefill(bp,buf,buflen)
+FILER		*bp ;
 const char	buf[] ;
 int		buflen ;
 {
@@ -1363,21 +1363,21 @@ int		buflen ;
 	if (buflen < 0)
 	    buflen = (strlen(buf) + 1) ;
 
-	rs = filebuf_write(bp,buf,buflen) ;
+	rs = filer_write(bp,buf,buflen) ;
 	len = rs ;
 
 	r = (buflen & (asize - 1)) ;
 	if ((rs >= 0) && (r > 0)) {
 	    nzero = (asize - r) ;
 	    if (nzero > 0) {
-	        rs = filebuf_write(bp,zerobuf,nzero) ;
+	        rs = filer_write(bp,zerobuf,nzero) ;
 	        len += rs ;
 	    }
 	}
 
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (filebuf_writefill) */
+/* end subroutine (filer_writefill) */
 
 
 static int getcookname(sp,rpp)

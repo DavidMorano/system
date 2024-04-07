@@ -29,7 +29,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 #include	"fbliner.h"
@@ -67,7 +67,7 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int fbliner_start(fbliner *lsp,filebuf *fbp,off_t foff,int to) noex {
+int fbliner_start(fbliner *lsp,filer *fbp,off_t foff,int to) noex {
 	int		rs = SR_FAULT ;
 	if (lsp && fbp) {
 	    char	*lp{} ;
@@ -103,7 +103,7 @@ int fbliner_finish(fbliner *lsp) noex {
 /* end subroutine (fbliner_finish) */
 
 int fbliner_read(fbliner *lsp,cchar **lpp) noex {
-	filebuf		*fbp = lsp->fbp ;
+	filer		*fbp = lsp->fbp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (lsp->llen < 0) {
@@ -111,7 +111,7 @@ int fbliner_read(fbliner *lsp,cchar **lpp) noex {
 	    cint	ll = lsp->llen ;
 	    char	*lp = lsp->lbuf ;
 	    lsp->poff = lsp->foff ;
-	    if ((rs = filebuf_readln(fbp,lp,ll,to)) >= 0) {
+	    if ((rs = filer_readln(fbp,lp,ll,to)) >= 0) {
 		len = rs ;
 	        lsp->foff += len ;
 	    }
@@ -143,7 +143,7 @@ int fbliner_seek(fbliner *lsp,int inc) noex {
 	    lsp->lbuf[0] = '\0' ;
 	    lsp->poff += inc ;
 	    lsp->foff += inc ;
-	    rs = filebuf_adv(lsp->fbp,inc) ;
+	    rs = filer_adv(lsp->fbp,inc) ;
 	} /* end if */
 	return rs ;
 }

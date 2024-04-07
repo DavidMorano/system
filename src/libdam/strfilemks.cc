@@ -84,7 +84,7 @@
 #include	<nulstr.h>
 #include	<vecobj.h>
 #include	<strtab.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<mkpath.h>
@@ -185,7 +185,7 @@ struct idx {
 	cchar	*ai ;
 	STRLISTHDR	hdr ;
 	IDX_FL		f ;
-	filebuf		fb ;
+	filer		fb ;
 	int		fd ;
 	uint		fo ;
 } ;
@@ -245,7 +245,7 @@ static int	rectab_count(RECTAB *) ;
 static int	mapfile_start(MAPFILE *,int,cchar *,int) ;
 static int	mapfile_end(MAPFILE *) ;
 
-static int	filebuf_writefill(filebuf *,cchar *,int) ;
+static int	filer_writefill(filer *,cchar *,int) ;
 
 static int	indinsert(uint (*rt)[2],uint (*it)[3],int,struct strentry *) ;
 static int	hashindex(uint,int) ;
@@ -892,7 +892,7 @@ static int idx_bufbegin(IDX *ixp)
 {
 	int	rs ;
 
-	if ((rs = filebuf_start(&ixp->fb,ixp->fd,0L,0)) >= 0) {
+	if ((rs = filer_start(&ixp->fb,ixp->fd,0L,0)) >= 0) {
 	    ixp->f.fb = TRUE ;
 	}
 
@@ -908,7 +908,7 @@ static int idx_bufend(IDX *ixp)
 
 	if (ixp->f.fb) {
 	    ixp->f.fb = FALSE ;
-	    rs1 = filebuf_finish(&ixp->fb) ;
+	    rs1 = filer_finish(&ixp->fb) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
@@ -919,7 +919,7 @@ static int idx_bufend(IDX *ixp)
 
 static int idx_bufwrite(IDX *ixp,const void *wbuf,int wlen)
 {
-	int	rs = filebuf_write(&ixp->db,wbuf,wlen) ;
+	int	rs = filer_write(&ixp->db,wbuf,wlen) ;
 	ixp->fo += rs ;
 	return rs ;
 }
@@ -931,7 +931,7 @@ static int idx_bufhdr(IDX *ixp)
 	cint	hlen = sizeof(STRLISTHDR) ;
 	int	rs ;
 
-	rs = filebuf_write(&ixp->db,&ixp->hdr,hlen) ;
+	rs = filer_write(&ixp->db,&ixp->hdr,hlen) ;
 	ixp->fo += rs ;
 	ixp->hdr.stoff = ixp->fo ;
 	return rs ;
@@ -941,9 +941,9 @@ static int idx_bufhdr(IDX *ixp)
 
 static int idx_bufstr(IDX *ixp,cchar *lp,int ll)
 {
-	filebuf	*fbp = &ixp->fb ;
+	filer	*fbp = &ixp->fb ;
 	int	rs ;
-	rs = filebuf_println(fbp,lp,ll) ;
+	rs = filer_println(fbp,lp,ll) ;
 	return rs ;
 }
 /* end subroutine (idx_bufstr) */
@@ -1293,7 +1293,7 @@ STRFILEMKS	*op ;
 {
 	STRLISTGDR	hf ;
 
-	filebuf	varfile ;
+	filer	varfile ;
 
 	STRTAB	*ksp = &op->strs ;
 
@@ -1325,7 +1325,7 @@ STRFILEMKS	*op ;
 
 	op->f.viopen = TRUE ;
 	size = (pagesize * 4) ;
-	rs = filebuf_start(&varfile,op->nfd,0,size,0) ;
+	rs = filer_start(&varfile,op->nfd,0,size,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
@@ -1351,7 +1351,7 @@ STRFILEMKS	*op ;
 /* write header */
 
 	if (rs >= 0) {
-	    rs = filebuf_writefill(&varfile,buf,bl) ;
+	    rs = filer_writefill(&varfile,buf,bl) ;
 	    fileoff += rs ;
 	}
 
@@ -1364,7 +1364,7 @@ STRFILEMKS	*op ;
 	hf.rtlen = rtl ;
 
 	size = (rtl + 1) * 2 * sizeof(uint) ;
-	rs = filebuf_write(&varfile,rt,size) ;
+	rs = filer_write(&varfile,rt,size) ;
 	fileoff += rs ;
 
 /* make and write out key-string table */
@@ -1384,7 +1384,7 @@ STRFILEMKS	*op ;
 /* write out the key-string table */
 
 	        if (rs >= 0) {
-	            rs = filebuf_write(&varfile,kstab,size) ;
+	            rs = filer_write(&varfile,kstab,size) ;
 	            fileoff += rs ;
 	        }
 
@@ -1411,7 +1411,7 @@ STRFILEMKS	*op ;
 	                rs = strfilemks_mkind(op,kstab,indtab,itl) ;
 
 	                if (rs >= 0) {
-	                    rs = filebuf_write(&varfile,indtab,size) ;
+	                    rs = filer_write(&varfile,indtab,size) ;
 	                    fileoff += rs ;
 	                }
 
@@ -1427,7 +1427,7 @@ STRFILEMKS	*op ;
 
 /* write out the header -- again! */
 ret2:
-	filebuf_finish(&varfile) ;
+	filer_finish(&varfile) ;
 
 	if (rs >= 0) {
 
@@ -1792,7 +1792,7 @@ static int mapfile_end(MAPFILE *mfp) noex {
 /* end subroutine (mapfile_end) */
 
 
-static int filebuf_writefill(filebuf *bp,cchar *wbuf,iknt elen) noex {
+static int filer_writefill(filer *bp,cchar *wbuf,iknt elen) noex {
 	int		rs ;
 	int		r, nzero ;
 	int		len ;
@@ -1801,21 +1801,21 @@ static int filebuf_writefill(filebuf *bp,cchar *wbuf,iknt elen) noex {
 	    wlen = (strlen(wbuf) + 1) ;
 	}
 
-	rs = filebuf_write(bp,wbuf,wlen) ;
+	rs = filer_write(bp,wbuf,wlen) ;
 	len = rs ;
 
 	r = (wlen & 3) ;
 	if ((rs >= 0) && (r > 0)) {
 	    nzero = (4 - r) ;
 	    if (nzero > 0) {
-	        rs = filebuf_write(bp,zerobuf,nzero) ;
+	        rs = filer_write(bp,zerobuf,nzero) ;
 	        len += rs ;
 	    }
 	}
 
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (filebuf_writefill) */
+/* end subroutine (filer_writefill) */
 
 
 static int indinsert(rt,it,il,vep)

@@ -71,7 +71,6 @@
 #include	<ugetpw.h>
 #include	<dayspec.h>
 #include	<tmtime.h>
-#include	<filebuf.h>
 #include	<wordfill.h>
 #include	<ourmjd.h>
 #include	<localmisc.h>

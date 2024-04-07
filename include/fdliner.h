@@ -22,7 +22,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<filebuf.h>
+#include	<filer.h>
 
 
 #define	FDLINER			struct fdliner_head
@@ -37,7 +37,7 @@ struct fdliner_flags {
 } ;
 
 struct fdliner_head {
-	filebuf		*fbp ;		/* allocated */
+	filer		*fbp ;		/* allocated */
 	char		*lbuf ;
 	off_t		poff ;		/* file-offset previous */
 	off_t		foff ;		/* file-offset current */

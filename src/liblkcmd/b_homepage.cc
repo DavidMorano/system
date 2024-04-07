@@ -84,7 +84,7 @@
 #include	<ptc.h>
 #include	<upt.h>
 #include	<bwops.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<termout.h>
 #include	<ugetpw.h>
 #include	<spawner.h>
@@ -4591,13 +4591,13 @@ static int filer_workreadterm(FILER *fep,int fd)
 	    const int	llen = LINEBUFLEN ;
 	    char	*lbuf ;
 	    if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-	        FILEBUF		b ;
-	        if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	        FILER		b ;
+	        if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 	            const int	to = fep->to ;
 	            int		len ;
 	            void	*n = NULL ;
 	            char	*dp = fep->dbuf ;
-	            while ((rs = filebuf_readlns(&b,lbuf,llen,to,n)) > 0) {
+	            while ((rs = filer_readlns(&b,lbuf,llen,to,n)) > 0) {
 	                len = rs ;
 #if	CF_DEBUGS
 	                debugprintf("filer_workreadterm: len=%u\n",len) ;
@@ -4615,9 +4615,9 @@ static int filer_workreadterm(FILER *fep,int fd)
 	                }
 	                if (rs <= 0) break ;
 	            } /* end while (reading lines) */
-	            rs1 = filebuf_finish(&b) ;
+	            rs1 = filer_finish(&b) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+	        } /* end if (filer) */
 	        uc_free(lbuf) ;
 	    } /* end if (m-a-f) */
 	    rs1 = termout_finish(&out) ;

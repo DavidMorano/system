@@ -1,4 +1,4 @@
-/* filebuf_main SUPPORT */
+/* filer_main SUPPORT */
 /* lang=C++20 */
 
 /* support low-overhead file bufferring requirements */
@@ -41,7 +41,7 @@
 #include	<format.h>
 #include	<localmisc.h>
 
-#include	"filebuf.h"
+#include	"filer.h"
 
 
 /* local defines */
@@ -76,34 +76,34 @@ using std::max ;		/* subroutine-template */
 /* forward references */
 
 template<typename ... Args>
-static inline int filebuf_ctor(filebuf *op,Args ... args) noex {
+static inline int filer_ctor(filer *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_OK ;
 	    op->off = 0 ;
-	    op->buf = nullptr ;
+	    op->dbuf = nullptr ;
 	    op->bp = nullptr ;
 	    op->f = {} ;
 	    op->fd = 0 ;
 	    op->of = 0 ;
 	    op->dt = 0 ;
-	    op->bufsize = 0 ;
+	    op->dlen = 0 ;
 	    op->len = 0 ;
 	}
 	return rs ;
 }
 
-static int filebuf_dtor(filebuf *op) noex {
+static int filer_dtor(filer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_dtor) */
+/* end subroutine (filer_dtor) */
 
-static int	filebuf_adjbuf(filebuf *,int) noex ;
-static int	filebuf_bufcpy(filebuf *,cchar *,int) noex ;
+static int	filer_adjbuf(filer *,int) noex ;
+static int	filer_bufcpy(filer *,cchar *,int) noex ;
 
 
 /* local variables */
@@ -118,68 +118,68 @@ static bufsizevar	maxlinelen(getbufsize_ml) ;
 
 /* exported subroutines */
 
-int filebuf_start(filebuf *op,int fd,off_t coff,int bsz,int of) noex {
+int filer_start(filer *op,int fd,off_t coff,int bsz,int of) noex {
 	int		rs ;
-	if ((rs = filebuf_ctor(op)) >= 0) {
+	if ((rs = filer_ctor(op)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fd >= 0) {
 		op->fd = fd ;
 		op->of = of ;
-		if ((rs = filebuf_adjbuf(op,bsz)) >= 0) {
+		if ((rs = filer_adjbuf(op,bsz)) >= 0) {
 	            char	*p ;
 	            if ((rs = uc_libvalloc(bsz,&p)) >= 0) {
-	                op->buf = p ;
+	                op->dbuf = p ;
 	                op->bp = p ;
 	                if (coff < 0) rs = u_tell(fd,&coff) ;
 	                if (rs >= 0) {
 		            op->off = coff ;
-		            if (of & FILEBUF_ONET) op->f.net = true ;
+		            if (of & FILER_ONET) op->f.net = true ;
 	                }
 	                if (rs < 0) {
-		            uc_libfree(op->buf) ;
-		            op->buf = nullptr ;
+		            uc_libfree(op->dbuf) ;
+		            op->dbuf = nullptr ;
 	                }	
 	            } /* end if (memory-allocation) */
-		} /* end if (filebuf_adjbuf) */
+		} /* end if (filer_adjbuf) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
-		filebuf_dtor(op) ;
+		filer_dtor(op) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? bsz : rs ;
 }
-/* end subroutine (filebuf_start) */
+/* end subroutine (filer_start) */
 
-int filebuf_finish(filebuf *op) noex {
+int filer_finish(filer *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->f.write && (op->len > 0)) {
-	        rs1 = uc_writen(op->fd,op->buf,op->len) ;
+	        rs1 = uc_writen(op->fd,op->dbuf,op->len) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    if (op->buf) {
-	        rs1 = uc_libfree(op->buf) ;
+	    if (op->dbuf) {
+	        rs1 = uc_libfree(op->dbuf) ;
 	        if (rs >= 0) rs = rs1 ;
-	        op->buf = nullptr ;
+	        op->dbuf = nullptr ;
 	    }
 	    {
-	        rs1 = filebuf_dtor(op) ;
+	        rs1 = filer_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->len = 0 ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_finish) */
+/* end subroutine (filer_finish) */
 
-int filebuf_read(filebuf *op,void *rbuf,int rlen,int to) noex {
+int filer_read(filer *op,void *rbuf,int rlen,int to) noex {
 	int		rs = SR_FAULT ;
 	int		tlen = 0 ;
 	if (op && rbuf) {
 	    cint	fmo = FM_TIMED ;
-	    int		rc = (op->f.net) ? FILEBUF_RCNET : 1 ;
+	    int		rc = (op->f.net) ? FILER_RCNET : 1 ;
 	    bool	f_timedout = false ;
 	    char	*dbp = (char *) rbuf ;
 	    char	*bp, *lastp ;
@@ -188,9 +188,9 @@ int filebuf_read(filebuf *op,void *rbuf,int rlen,int to) noex {
 	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
 		    cint	fd = op->fd ;
-		    cint	bufsize = op->bufsize ;
-		    char	*buf = op->buf ;
-	            op->bp = op->buf ;
+		    cint	bufsize = op->dlen ;
+		    char	*buf = op->dbuf ;
+	            op->bp = op->dbuf ;
 		    if (to >= 0) {
 	                rs = uc_reade(fd,buf,bufsize,to,fmo) ;
 		    } else {
@@ -219,24 +219,24 @@ int filebuf_read(filebuf *op,void *rbuf,int rlen,int to) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (filebuf_read) */
+/* end subroutine (filer_read) */
 
 #ifdef	COMMENT
-int filebuf_readp(filebuf op,void *buf,int buflen,off_t off,int to) noex {
+int filer_readp(filer op,void *buf,int buflen,off_t off,int to) noex {
 	int		rs = SR_NOSYS ;
 	int		tlen = 0 ;
 
 	return (rs >= 0) ? tlen : SR_NOSYS ;
 }
-/* end subroutine (filebuf_readp) */
+/* end subroutine (filer_readp) */
 #endif /* COMMENT */
 
-int filebuf_readln(filebuf *op,char *rbuf,int rlen,int to) noex {
+int filer_readln(filer *op,char *rbuf,int rlen,int to) noex {
 	int		rs = SR_FAULT ;
 	int		tlen = 0 ;
 	if (op) {
 	    cint	fmo = FM_TIMED ;
-	    int		rc = (op->f.net) ? FILEBUF_RCNET : 1 ;
+	    int		rc = (op->f.net) ? FILER_RCNET : 1 ;
 	    bool	f_timedout = false ;
 	    char	*rbp = rbuf ;
 	    char	*bp, *lastp ;
@@ -245,9 +245,9 @@ int filebuf_readln(filebuf *op,char *rbuf,int rlen,int to) noex {
 	        int	mlen ;
 	        while ((op->len == 0) && (rc-- > 0)) {
 		    cint	fd = op->fd ;
-		    cint	bufsize = op->bufsize ;
-		    char	*buf = op->buf ;
-	            op->bp = op->buf ;
+		    cint	bufsize = op->dlen ;
+		    char	*buf = op->dbuf ;
+	            op->bp = op->dbuf ;
 		    if (to >= 0) {
 	                rs = uc_reade(fd,buf,bufsize,to,fmo) ;
 		    } else {
@@ -283,9 +283,9 @@ int filebuf_readln(filebuf *op,char *rbuf,int rlen,int to) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (filebuf_readln) */
+/* end subroutine (filer_readln) */
 
-int filebuf_readlns(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
+int filer_readlns(filer *fp,char *lbuf,int llen,int to,int *lcp) noex {
 	int		rs = SR_FAULT ;
 	int		i = 0 ;
 	if (fp && lbuf) {
@@ -295,7 +295,7 @@ int filebuf_readlns(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
 	    lbuf[0] = '\0' ;
 	    while ((lines == 0) || (f_cont = ISCONT(lbuf,i))) {
 	        if (f_cont) i -= 2 ;
-	        rs = filebuf_readln(fp,(lbuf + i),(llen - i),to) ;
+	        rs = filer_readln(fp,(lbuf + i),(llen - i),to) ;
 	        if (rs <= 0) break ;
 	        i += rs ;
 	        lines += 1 ;
@@ -304,10 +304,10 @@ int filebuf_readlns(filebuf *fp,char *lbuf,int llen,int to,int *lcp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;
 }
-/* end subroutine (filebuf_readlns) */
+/* end subroutine (filer_readlns) */
 
 /* update a section of the buffer */
-int filebuf_update(filebuf *op,off_t roff,cchar *rbuf,int rlen) noex {
+int filer_update(filer *op,off_t roff,cchar *rbuf,int rlen) noex {
 	int		rs = SR_FAULT ;
 	if (op && rbuf) {
 	    uint	boff, bext ;
@@ -315,7 +315,7 @@ int filebuf_update(filebuf *op,off_t roff,cchar *rbuf,int rlen) noex {
 	    int		bdiff ;
 	    bool	f_exit = false ;
 	    rs = SR_OK ;
-	    boff = op->off - (op->bp - op->buf) ;
+	    boff = op->off - (op->bp - op->dbuf) ;
 	    bext = op->off + op->len ;
 	    if (roff < boff) {
 	        if (rext > boff) {
@@ -338,14 +338,14 @@ int filebuf_update(filebuf *op,off_t roff,cchar *rbuf,int rlen) noex {
 	    }
 	    if ((! f_exit) && (rlen > 0)) {
 	        bdiff = roff - boff ;
-	        memcpy((op->buf + bdiff),rbuf,rlen) ;
+	        memcpy((op->dbuf + bdiff),rbuf,rlen) ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? rlen : rs ;
 }
-/* end subroutine (filebuf_update) */
+/* end subroutine (filer_update) */
 
-int filebuf_write(filebuf *op,cvoid *abuf,int alen) noex {
+int filer_write(filer *op,cvoid *abuf,int alen) noex {
 	int		rs = SR_FAULT ;
 	if (op && abuf) {
 	    int		alenr ;
@@ -358,8 +358,8 @@ int filebuf_write(filebuf *op,cvoid *abuf,int alen) noex {
 	    if (alen < 0) alen = strlen(abp) ;
 	    alenr = alen ;
 	    while ((rs >= 0) && (alenr > 0)) {
-	        if ((rs >= 0) && (op->len == 0) && (alenr >= op->bufsize)) {
-	            mlen = ifloor(alenr,op->bufsize) ;
+	        if ((rs >= 0) && (op->len == 0) && (alenr >= op->dlen)) {
+	            mlen = ifloor(alenr,op->dlen) ;
 	            rs = uc_writen(op->fd,abp,mlen) ;
 	            len = rs ;
 	            if (rs >= 0) {
@@ -368,15 +368,15 @@ int filebuf_write(filebuf *op,cvoid *abuf,int alen) noex {
 	            }
 	        } /* end if */
 	        if ((rs >= 0) && (alenr > 0)) {
-	            blenr = op->bufsize - op->len ;
+	            blenr = op->dlen - op->len ;
 	            mlen = min(alenr,blenr) ;
-	            filebuf_bufcpy(op,abp,mlen) ;
+	            filer_bufcpy(op,abp,mlen) ;
 	            len = mlen ;
 	            op->len += len ;
 	            abp += len ;
 	            alenr -= len ;
-	            if (op->len == op->bufsize) {
-	                rs = filebuf_flush(op) ;
+	            if (op->len == op->dlen) {
+	                rs = filer_flush(op) ;
 		    }
 	        } /* end if */
 	    } /* end while */
@@ -386,23 +386,23 @@ int filebuf_write(filebuf *op,cvoid *abuf,int alen) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? alen : rs ;
 }
-/* end subroutine (filebuf_write) */
+/* end subroutine (filer_write) */
 
-int filebuf_reserve(filebuf *op,int len) noex {
+int filer_reserve(filer *op,int len) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->f.write && (len > 0)) {
-	        if (len > (op->bufsize - op->len)) {
-		    rs = filebuf_flush(op) ;
+	        if (len > (op->dlen - op->len)) {
+		    rs = filer_flush(op) ;
 	        }
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_reserve) */
+/* end subroutine (filer_reserve) */
 
-int filebuf_println(filebuf *op,cchar *sp,int sl) noex {
+int filer_println(filer *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && sp) {
@@ -414,23 +414,23 @@ int filebuf_println(filebuf *op,cchar *sp,int sl) noex {
 	    feol = feol || (sp[sl-1] != '\n') ;
 	    reslen = (feol) ? (sl+1) : sl ;
 	    if (reslen > 1) {
-	        rs = filebuf_reserve(op,reslen) ;
+	        rs = filer_reserve(op,reslen) ;
 	    }
 	    if ((rs >= 0) && (sl > 0)) {
-	        rs = filebuf_write(op,sp,sl) ;
+	        rs = filer_write(op,sp,sl) ;
 	        wlen += rs ;
 	    }
 	    if ((rs >= 0) && feol) {
 	        char	buf[2] = { '\n' } ;
-	        rs = filebuf_write(op,buf,1) ;
+	        rs = filer_write(op,buf,1) ;
 	        wlen += rs ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_println) */
+/* end subroutine (filer_println) */
 
-int filebuf_vprintf(filebuf *op,cchar *fmt,va_list ap) noex {
+int filer_vprintf(filer *op,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -440,7 +440,7 @@ int filebuf_vprintf(filebuf *op,cchar *fmt,va_list ap) noex {
 		char	*lbuf{} ;
 		if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
 	    	    if ((rs = format(lbuf,llen,0,fmt,ap)) >= 0) {
-	    	        rs = filebuf_write(op,lbuf,rs) ;
+	    	        rs = filer_write(op,lbuf,rs) ;
 			wlen = rs ;
 		    }
 		    rs1 = uc_libfree(lbuf) ;
@@ -450,23 +450,23 @@ int filebuf_vprintf(filebuf *op,cchar *fmt,va_list ap) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_vprintf) */
+/* end subroutine (filer_vprintf) */
 
-int filebuf_printf(filebuf *op,cchar *fmt,...) noex {
+int filer_printf(filer *op,cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
 	if (op && fmt) {
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
-	    rs = filebuf_vprintf(op,fmt,ap) ;
+	    rs = filer_vprintf(op,fmt,ap) ;
 	    wlen = rs ;
 	    va_end(ap) ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_printf) */
+/* end subroutine (filer_printf) */
 
-int filebuf_adv(filebuf *op,int inc) noex {
+int filer_adv(filer *op,int inc) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_INVALID ;
@@ -474,7 +474,7 @@ int filebuf_adv(filebuf *op,int inc) noex {
 		rs = SR_OK ;
 	        if (inc > 0) {
 	            if (op->f.write) {
-	                rs = filebuf_flush(op) ;
+	                rs = filer_flush(op) ;
 	            } else {
 	                cint	ml = min(inc,op->len) ;
 	                if (ml > 0) {
@@ -493,9 +493,9 @@ int filebuf_adv(filebuf *op,int inc) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_adv) */
+/* end subroutine (filer_adv) */
 
-int filebuf_seek(filebuf *op,off_t woff,int w) noex {
+int filer_seek(filer *op,off_t woff,int w) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_NOTSEEK ;
@@ -503,7 +503,7 @@ int filebuf_seek(filebuf *op,off_t woff,int w) noex {
 	        rs = SR_OK ;
 	        if (op->f.write) { /* write */
 	            if (op->len > 0) {
-	                rs = filebuf_flush(op) ;
+	                rs = filer_flush(op) ;
 	            }
 	            if (rs >= 0) {
 			off_t	noff ;
@@ -528,16 +528,16 @@ int filebuf_seek(filebuf *op,off_t woff,int w) noex {
 	                rs = u_seeko(op->fd,(woff + aoff),w,&noff) ;
 	                op->off = noff ;
 	            }
-	            op->bp = op->buf ;
+	            op->bp = op->dbuf ;
 	            op->len = 0 ;
 	        } /* end if (write or read)  */
 	    } /* end if (seekable) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_seek) */
+/* end subroutine (filer_seek) */
 
-int filebuf_tell(filebuf *op,off_t *offp) noex {
+int filer_tell(filer *op,off_t *offp) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    if (offp) *offp = op->off ;
@@ -545,9 +545,9 @@ int filebuf_tell(filebuf *op,off_t *offp) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_tell) */
+/* end subroutine (filer_tell) */
 
-int filebuf_invalidate(filebuf *op) noex {
+int filer_invalidate(filer *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -557,29 +557,29 @@ int filebuf_invalidate(filebuf *op) noex {
 		}
 	    }
 	    op->len = 0 ;
-	    op->bp = op->buf ;
+	    op->bp = op->dbuf ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_invalidate) */
+/* end subroutine (filer_invalidate) */
 
-int filebuf_flush(filebuf *op) noex {
+int filer_flush(filer *op) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) {
 	    rs = SR_OK ;
 	    if (op->f.write && (op->len > 0)) {
-	        rs = uc_writen(op->fd,op->buf,op->len) ;
+	        rs = uc_writen(op->fd,op->dbuf,op->len) ;
 	        len = rs ;
-	        op->bp = op->buf ;
+	        op->bp = op->dbuf ;
 	        op->len = 0 ;
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (filebuf_flush) */
+/* end subroutine (filer_flush) */
 
-int filebuf_poll(filebuf *op,int mto) noex {
+int filer_poll(filer *op,int mto) noex {
 	cint		nfds = 1 ;
 	int		rs = SR_FAULT ;
 	if (op) {
@@ -591,12 +591,12 @@ int filebuf_poll(filebuf *op,int mto) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (filebuf_poll) */
+/* end subroutine (filer_poll) */
 
 
 /* private subroutines */
 
-static int filebuf_adjbuf(filebuf *op,int bufsize) noex {
+static int filer_adjbuf(filer *op,int bufsize) noex {
 	USTAT		sb ;
 	int		rs ;
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
@@ -619,13 +619,13 @@ static int filebuf_adjbuf(filebuf *op,int bufsize) noex {
 		    } /* end if (pagesize) */
 	        } /* end if */
 	    } /* end if (bufsize) */
-	    op->bufsize = bufsize ;
+	    op->dlen = bufsize ;
 	} /* end if (stat) */
 	return rs ;
 }
-/* end subroutine (filebuf_adjbuf) */
+/* end subroutine (filer_adjbuf) */
 
-static int filebuf_bufcpy(filebuf *op,cchar *abp,int mlen) noex {
+static int filer_bufcpy(filer *op,cchar *abp,int mlen) noex {
 	if (mlen > MEMCPYLEN) {
 	    memcpy(op->bp,abp,mlen) ;
 	} else {
@@ -637,6 +637,6 @@ static int filebuf_bufcpy(filebuf *op,cchar *abp,int mlen) noex {
 	op->bp += mlen ;
 	return mlen ;
 }
-/* end subroutine (filebuf_bufcpy) */
+/* end subroutine (filer_bufcpy) */
 
 

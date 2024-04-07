@@ -34,7 +34,7 @@
 
 #include	<usystem.h>
 #include	<spawnproc.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<ids.h>
 #include	<localmisc.h>
 
@@ -217,8 +217,8 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 #endif
 
 		if ((rs = uc_malloc((cmdlen+1),&cmdbuf)) >= 0) {
-	            FILEBUF	b ;
-		    if ((rs = filebuf_start(&b,sfd,0L,0,0)) >= 0) {
+	            FILER	b ;
+		    if ((rs = filer_start(&b,sfd,0L,0,0)) >= 0) {
 			int	i ;
 			int	cl ;
 
@@ -247,13 +247,13 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 			    } /* end switch */
 			    cl = rs ;
 			    if ((rs >= 0) && (cl > 0)) {
-	            	        rs = filebuf_println(&b,cmdbuf,cl) ;
+	            	        rs = filer_println(&b,cmdbuf,cl) ;
 	        	    }
 			} /* end for */
 
-	                rs1 = filebuf_finish(&b) ;
+	                rs1 = filer_finish(&b) ;
 		        if (rs >= 0) rs = rs1 ;
-	            } /* end if (filebuf) */
+	            } /* end if (filer) */
 		    uc_free(cmdbuf) ;
 		} /* end if (m-a-f) */
 

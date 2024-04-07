@@ -53,7 +53,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<intsat.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -98,7 +98,7 @@ int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 	if (op) {
 	    rs = SR_BADF ;
 	    if (mfd >= 0) {
-		cint	osz = sizeof(filebuf) ;
+		cint	osz = sizeof(filer) ;
 		void	*vp{} ;
 	        op->poff = 0 ;
 	        op->foff = foff ;
@@ -108,7 +108,7 @@ int fdliner_start(fdliner *op,int mfd,off_t foff,int to) noex {
 	        op->lbuf = nullptr ;
 		if ((rs = uc_malloc(osz,&vp)) >= 0) {
 		    char	*lp{} ;
-		    op->fbp = (filebuf *) vp ;
+		    op->fbp = (filer *) vp ;
 		    if ((rs = malloc_ml(&lp)) >= 0) {
 			op->lbuf = lp ;
 			op->llen = rs ;
@@ -144,7 +144,7 @@ int fdliner_finish(fdliner *op) noex {
 	    }
 	    if (op->fbp) {
 		{
-		    rs1 = filebuf_finish(op->fbp) ;
+		    rs1 = filer_finish(op->fbp) ;
 		    if (rs >= 0) rs = rs1 ;
 		}
 		{
@@ -162,14 +162,14 @@ int fdliner_read(fdliner *op,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op && lpp) {
-	    filebuf	*fbp = op->fbp ;
+	    filer	*fbp = op->fbp ;
 	    rs = SR_OK ;
 	    if (op->llen < 0) {
 		cint	to = op->to ;
 	        cint	ll = op->llen ;
 	        char	*lp = op->lbuf ;
 	        op->poff = op->foff ;
-	        if ((rs = filebuf_readln(fbp,lp,ll,to)) > 0) {
+	        if ((rs = filer_readln(fbp,lp,ll,to)) > 0) {
 	            len = rs ;
 	            op->foff += len ;
 	        }
@@ -202,7 +202,7 @@ static int fdliner_starter(fdliner *op,int mfd) noex {
 	    const off_t	foff = op->foff ;
 	    cint	bs = rs ;
 	    cint	fbo = op->fbo ;
-	    rs = filebuf_start(op->fbp,mfd,foff,bs,fbo) ;
+	    rs = filer_start(op->fbp,mfd,foff,bs,fbo) ;
 	}
 	return rs ;
 }
@@ -222,7 +222,7 @@ static int fdliner_bufsize(fdliner *op,int mfd) noex {
 	        bs = FDLINER_BUFSIZEDEF ;
 	        op->f.fnet = S_ISCHR(m) || S_ISSOCK(m) || S_ISFIFO(m) ;
 	        if (op->f.fnet) {
-	            op->fbo |= FILEBUF_ONET ;
+	            op->fbo |= FILER_ONET ;
 	        } else {
 	            bs = BCEIL(fs,FDLINER_BUFSIZEBLOCK) ;
 	        }

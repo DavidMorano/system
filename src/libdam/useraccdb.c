@@ -59,7 +59,7 @@
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ascii.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<storeitem.h>
 #include	<dater.h>
 #include	<localmisc.h>
@@ -278,7 +278,7 @@ int useraccdb_close(USERACCDB *op)
 int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 		cchar *user)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		rs1 ;
 
@@ -293,14 +293,14 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 
 	if ((rs = useraccdb_openlock(op)) >= 0) {
 
-	    if ((rs = filebuf_start(&b,op->fd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
 	        USERACCDB_REC	rec ;
 	        const int	llen = LINEBUFLEN ;
 	        int		ll, sl ;
 	        cchar		*sp ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs1 = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs1 = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	            ll = rs ;
 	            rs = useraccdb_recparse(op,&rec,lbuf,ll) ;
 	            if (rs >= 0) {
@@ -319,9 +319,9 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 	            rs = (rs1 < 0) ? rs1 : SR_NOTFOUND ;
 	        }
 
-	        rs1 = filebuf_finish(&b) ;
+	        rs1 = filer_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 
 	    rs1 = useraccdb_lock(op,FALSE) ;
 	    if (rs >= 0) rs = rs1 ;
@@ -356,12 +356,12 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 	debugprintf("useraccdb_update: upinfo_start() rs=%d\n",rs) ;
 #endif
 	    if ((rs = useraccdb_openlock(op)) >= 0) {
-		FILEBUF	b ;
+		FILER	b ;
 
 #if	CF_DEBUGS
 	debugprintf("useraccdb_update: _openlock() rs=%d\n",rs) ;
 #endif
-	        if ((rs = filebuf_start(&b,op->fd,0L,0,0)) >= 0) {
+	        if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
 	            USERACCDB_REC	rec ;
 	            off_t	ro = 0L ;
 	            const int	llen = LINEBUFLEN ;
@@ -369,9 +369,9 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 	            char	lbuf[LINEBUFLEN+1] ;
 
 #if	CF_DEBUGS
-	debugprintf("useraccdb_update: filebuf_start() rs=%d\n",rs) ;
+	debugprintf("useraccdb_update: filer_start() rs=%d\n",rs) ;
 #endif
-	            while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	            while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	                ll = rs ;
 #if	CF_DEBUGS
 	                debugprintf("useraccdb_update: ll=%u\n",ll) ;
@@ -402,11 +402,11 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 	            debugprintf("useraccdb_update: while-end rs=%d\n",rs) ;
 #endif
 
-	            filebuf_finish(&b) ;
-	        } /* end if (filebuf) */
+	            filer_finish(&b) ;
+	        } /* end if (filer) */
 
 #if	CF_DEBUGS
-	            debugprintf("useraccdb_update: filebuf-end rs=%d\n",rs) ;
+	            debugprintf("useraccdb_update: filer-end rs=%d\n",rs) ;
 #endif
 
 	        if (rs >= 0) {
@@ -468,7 +468,7 @@ int useraccdb_curend(USERACCDB *op,USERACCDB_CUR *curp)
 
 	if (curp->eo >= 0) {
 	    curp->eo = -1 ;
-	    rs1 = filebuf_finish(&curp->b) ;
+	    rs1 = filer_finish(&curp->b) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
@@ -501,7 +501,7 @@ int		elen ;
 	if (op->fd <= 0) return SR_INVALID ;
 
 	if (curp->eo < 0) {
-	    rs = filebuf_start(&curp->b,op->fd,0L,0,0) ;
+	    rs = filer_start(&curp->b,op->fd,0L,0,0) ;
 	    if (rs >= 0) curp->eo = 0L ;
 	}
 
@@ -509,7 +509,7 @@ int		elen ;
 	    const int	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    off_t	eo = curp->eo ;
-	    if ((rs = filebuf_readln(&curp->b,lbuf,llen,-1)) >= 0) {
+	    if ((rs = filer_readln(&curp->b,lbuf,llen,-1)) >= 0) {
 		ll = rs ;
 	        if (ll > 0) {
 	            USERACCDB_REC	rec ;
@@ -523,7 +523,7 @@ int		elen ;
 		}
 	        if (rs >= 0)
 	            curp->eo = (eo + ll) ;
-	    } /* end if (filebuf_readln) */
+	    } /* end if (filer_readln) */
 	} /* end if (ok) */
 
 	return rs ;

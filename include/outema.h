@@ -37,7 +37,7 @@
 
 #include	<usystem.h>
 #include	<ema.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 
@@ -50,7 +50,7 @@ struct outema_flags {
 } ;
 
 struct outema_head {
-	FILEBUF		*ofp ;
+	filer		*ofp ;
 	OUTEMA_FL	f ;
 	int		maxlen ;
 	int		rlen ;
@@ -67,7 +67,7 @@ struct outema_head {
 extern "C" {
 #endif
 
-extern int	outema_start(OUTEMA *,FILEBUF *,int) ;
+extern int	outema_start(OUTEMA *,filer *,int) ;
 extern int	outema_ent(OUTEMA *,EMA_ENT *) ;
 extern int	outema_write(OUTEMA *,const char *,int) ;
 extern int	outema_hdrkey(OUTEMA *,const char *) ;

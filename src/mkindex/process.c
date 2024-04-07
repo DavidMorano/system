@@ -195,7 +195,7 @@ const char	fname[] ;
 
 	memfile_tell(mfp,&poff) ;
 
-	memfile_buf(mfp,&posta) ;
+	memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -209,9 +209,10 @@ const char	fname[] ;
 /* write the first posting entry as NULL */
 
 	if (rs >= 0) {
-	e.noff = 0 ;
-	e.next = 0 ;
-	rs = memfile_write(mfp,&e,sizeof(struct postentry)) ;
+	    cint	wsz = sizeof(struct postentry) ;
+	    e.noff = 0 ;
+	    e.next = 0 ;
+	    rs = memfile_write(mfp,&e,wsz) ;
 	}
 
 /* go to it, read the file line by line */
@@ -417,7 +418,7 @@ const char	fname[] ;
 
 	            c += 1 ;
 	            poff += rs ;
-	            memfile_buf(mfp,&posta) ;
+	            memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))

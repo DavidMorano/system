@@ -32,7 +32,7 @@
 #include	<mallocxx.h>
 #include	<tmtime.h>
 #include	<sntmtime.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<filemap.h>
 #include	<char.h>
 #include	<mkchar.h>
@@ -69,10 +69,10 @@ using std::max ;			/* subroutine-template */
 /* forward references */
 
 static int	process(int,mode_t,cchar *,int) noex ;
-static int	procfile(filebuf *,mode_t,cchar *,int) noex ;
-static int	printend(filebuf *,cchar *,cchar *,int) noex ;
-static int	printsub(filebuf *,cchar *,cchar *,int) noex ;
-static int	filebuf_char(filebuf *,int) noex ;
+static int	procfile(filer *,mode_t,cchar *,int) noex ;
+static int	printend(filer *,cchar *,cchar *,int) noex ;
+static int	printsub(filer *,cchar *,cchar *,int) noex ;
+static int	filer_char(filer *,int) noex ;
 
 
 /* local variables */
@@ -115,14 +115,14 @@ static int process(int of,mode_t om,cchar *ds,int f_top) noex {
 	int		fd = -1 ;
 	int		pipes[2] ;
 	if ((rs = u_pipe(pipes)) >= 0) {
-	    filebuf	wfile, *wfp = &wfile ;
+	    filer	wfile, *wfp = &wfile ;
 	    cint	wfd = pipes[1] ;
 	    fd = pipes[0] ;
-	    if ((rs = filebuf_start(wfp,wfd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(wfp,wfd,0L,0,0)) >= 0) {
 	        rs = procfile(wfp,om,ds,f_top) ;
-	        rs1 = filebuf_finish(wfp) ;
+	        rs1 = filer_finish(wfp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    rs1 = u_close(wfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pipes) */
@@ -135,7 +135,7 @@ static int process(int of,mode_t om,cchar *ds,int f_top) noex {
 
 #if	CF_FILEMAP
 /* ARGSUSED */
-static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
+static int procfile(filer *wfp,mode_t om,cchar *ds,int f_top) noex {
 	filemap		sysban, *sfp = &sysban ;
 	cint		maxsize = (5*1024) ;
 	int		rs ;
@@ -157,7 +157,7 @@ static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 	            rs = printsub(wfp,ds,lbuf,len) ;
 	            wlen += rs ;
 	        } else {
-	            rs = filebuf_println(wfp,lbuf,len) ;
+	            rs = filer_println(wfp,lbuf,len) ;
 	            wlen += rs ;
 	        }
 
@@ -172,7 +172,7 @@ static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 }
 /* end subroutine (procfile) */
 #else /* CF_FILEMAP */
-static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
+static int procfile(filer *wfp,mode_t om,cchar *ds,int f_top) noex {
 	cint		of = O_RDONLY ;
 	cint		to = -1 ;
 	int		rs ;
@@ -180,14 +180,14 @@ static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 	int		wlen = 0 ;
 	cchar		*sysbanner = SYSBANNER ;
 	if ((rs = uc_open(sysbanner,of,0666)) >= 0) {
-	    filebuf	sysban, *sfp = &sysban ;
+	    filer	sysban, *sfp = &sysban ;
 	    cint	fd = rs ;
-	    if ((rs = filebuf_start(sfp,fd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(sfp,fd,0L,0,0)) >= 0) {
 	        cint		llen = LINEBUFLEN ;
 	        char		*lbuf{} ;
 	        if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
 	            int		line = 0 ;
-	            while ((rs = filebuf_readln(sfp,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(sfp,lbuf,llen,to)) > 0) {
 	                int		len = rs ;
 
 	        	if (lbuf[len-1] == '\n') len -= 1 ;
@@ -199,7 +199,7 @@ static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 	                    rs = printsub(wfp,ds,lbuf,len) ;
 	                    wlen += rs ;
 	                } else {
-	                    rs = filebuf_println(wfp,lbuf,len) ;
+	                    rs = filer_println(wfp,lbuf,len) ;
 	                    wlen += rs ;
 	                }
 
@@ -210,9 +210,9 @@ static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 	            rs1 = uc_free(lbuf) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a) */
-	        rs1 = filebuf_finish(sfp) ;
+	        rs1 = filer_finish(sfp) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    rs1 = uc_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (output-file) */
@@ -221,7 +221,7 @@ static int procfile(filebuf *wfp,mode_t om,cchar *ds,int f_top) noex {
 /* end subroutine (procfile) */
 #endif /* CF_FILEMAP */
 
-static int printend(filebuf *wfp,cchar *ds,cchar *lbuf,int len) noex {
+static int printend(filer *wfp,cchar *ds,cchar *lbuf,int len) noex {
 	cint		cols = COLUMNS ;
 	cint		dl = strlen(ds) ;
 	int		rs = SR_OK ;
@@ -234,25 +234,25 @@ static int printend(filebuf *wfp,cchar *ds,cchar *lbuf,int len) noex {
 
 	if ((rs >= 0) && (i < breaklen)) {
 	    ml = MIN(len,breaklen) ;
-	    rs = filebuf_write(wfp,(lbuf+i),ml) ;
+	    rs = filer_write(wfp,(lbuf+i),ml) ;
 	    wlen += rs ;
 	    i += rs ;
 	}
 
 	if ((rs >= 0) && (i < breaklen)) {
 	    ml = (breaklen-i) ;
-	    rs = filebuf_writeblanks(wfp,ml) ;
+	    rs = filer_writeblanks(wfp,ml) ;
 	    wlen += rs ;
 	    i += rs ;
 	}
 
 	if (rs >= 0) {
-	    rs = filebuf_write(wfp,ds,dl) ;
+	    rs = filer_write(wfp,ds,dl) ;
 	    wlen += rs ;
 	}
 
 	if (rs >= 0) {
-	    rs = filebuf_char(wfp,'\n') ;
+	    rs = filer_char(wfp,'\n') ;
 	    wlen += rs ;
 	}
 
@@ -260,7 +260,7 @@ static int printend(filebuf *wfp,cchar *ds,cchar *lbuf,int len) noex {
 }
 /* end subroutine (printend) */
 
-static int printsub(filebuf *wfp,cchar *ds,cchar *lbuf,int llen) noex {
+static int printsub(filer *wfp,cchar *ds,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		di = 0 ;
 	int		wlen = 0 ;
@@ -270,23 +270,23 @@ static int printsub(filebuf *wfp,cchar *ds,cchar *lbuf,int llen) noex {
 	        if (ds[di] != ' ') ch = ds[di] ;
 	        di += 1 ;
 	    }
-	    rs = filebuf_char(wfp,ch) ;
+	    rs = filer_char(wfp,ch) ;
 	    wlen += rs ;
 	} /* end for */
 	if (rs >= 0) {
-	    rs = filebuf_char(wfp,'\n') ;
+	    rs = filer_char(wfp,'\n') ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (printsub) */
 
-static int filebuf_char(filebuf *wfp,int ch) noex {
+static int filer_char(filer *wfp,int ch) noex {
 	char		wbuf[2] ;
 	wbuf[0] = ch ;
 	wbuf[1] = '\0' ;
-	return filebuf_write(wfp,wbuf,1) ;
+	return filer_write(wfp,wbuf,1) ;
 }
-/* end subroutine (filebuf_char) */
+/* end subroutine (filer_char) */
 
 

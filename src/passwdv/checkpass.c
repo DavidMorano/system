@@ -49,7 +49,7 @@
 #include	<des.h>
 #include	<getax.h>
 #include	<spawnproc.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -356,7 +356,7 @@ ret0:
 
 static int readpass(int fd,char *outbuf,int outlen)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		len ;
 	int		cl = -1 ;
@@ -371,11 +371,11 @@ static int readpass(int fd,char *outbuf,int outlen)
 	    goto ret0 ;
 	}
 
-	rs = filebuf_start(&b,fd,0,-1,0) ;
+	rs = filer_start(&b,fd,0,-1,0) ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	rs = filebuf_readln(&b,rdbuf,RDBUFLEN,TO_READ) ;
+	rs = filer_readln(&b,rdbuf,RDBUFLEN,TO_READ) ;
 	len = rs ;
 	if (rs >= 0) {
 
@@ -395,7 +395,7 @@ static int readpass(int fd,char *outbuf,int outlen)
 
 	} /* end if (reading line) */
 
-	filebuf_finish(&b) ;
+	filer_finish(&b) ;
 
 	if (rs >= 0) {
 	    rs = SR_NOEXIST ;

@@ -60,7 +60,7 @@
 #include	<vecobj.h>
 #include	<tmz.h>
 #include	<tmtime.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
@@ -136,8 +136,8 @@ extern int	strnnlen(const char *,int,int) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	msleep(uint) ;
 extern int	iceil(int,int) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
-extern int	filebuf_writezero(FILEBUF *,int) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
+extern int	filer_writezero(FILER *,int) ;
 extern int	isOneOf(const int *,int) ;
 extern int	isNotPresent(int) ;
 
@@ -847,12 +847,12 @@ static int babycalcs_shmwr(BABYCALCS *op,time_t dt,int fd,mode_t om)
 static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 		BABIESFU *hfp)
 {
-	FILEBUF		babyfile ;
+	FILER		babyfile ;
 	const int	bsize = op->pagesize ;
 	int		rs ;
 	int		rs1 ;
 	int		foff = 0 ;
-	if ((rs = filebuf_start(&babyfile,fd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(&babyfile,fd,0,bsize,0)) >= 0) {
 	    const int	hlen = HDRBUFLEN ;
 	    int		bl ;
 	    char	hbuf[HDRBUFLEN + 1] ;
@@ -864,7 +864,7 @@ static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 /* write file-header */
 
 	        if (rs >= 0) {
-	            rs = filebuf_writefill(&babyfile,hbuf,bl) ;
+	            rs = filer_writefill(&babyfile,hbuf,bl) ;
 	            foff += rs ;
 	        }
 
@@ -873,7 +873,7 @@ static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 	        if (rs >= 0) {
 	            int		noff = iceil(foff,8) ;
 	            if (noff != foff) {
-	                rs = filebuf_writezero(&babyfile,(noff - foff)) ;
+	                rs = filer_writezero(&babyfile,(noff - foff)) ;
 	                foff += rs ;
 	            }
 	        }
@@ -881,7 +881,7 @@ static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 	        hfp->muoff = foff ;
 	        hfp->musize = uceil(sizeof(PTM),sizeof(uint)) ;
 	        if (rs >= 0) {
-	            rs = filebuf_writezero(&babyfile,hfp->musize) ;
+	            rs = filer_writezero(&babyfile,hfp->musize) ;
 	            foff += rs ;
 	        }
 
@@ -891,16 +891,16 @@ static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 	        hfp->btlen = op->nentries ;
 	        tsize = (op->nentries + 1) * sizeof(BABYCALCS_ENT) ;
 	        if (rs >= 0) {
-	            rs = filebuf_write(&babyfile,op->table,tsize) ;
+	            rs = filer_write(&babyfile,op->table,tsize) ;
 	            foff += rs ;
 	        }
 
 	        hfp->shmsize = foff ;
 	    } /* end if (babiesfu) */
 
-	    rs1 = filebuf_finish(&babyfile) ;
+	    rs1 = filer_finish(&babyfile) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? foff : rs ;
 }
 /* end subroutine (babycalcs_shmwrer) */

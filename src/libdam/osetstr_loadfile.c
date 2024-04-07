@@ -41,7 +41,7 @@
 
 	Notes:
 
-        Why use FILEBUF over BFILE? Yes, FILEBUF is a tiny bit more lightweight
+        Why use FILER over BFILE? Yes, FILER is a tiny bit more lightweight
         than BFILE -- on a good day. But the real reason may be so that we don't
         need to load BFILE in code that resides very deep in a software stack if
         we don't need it -- like deep inside loadable modules. Anyway, just a
@@ -74,7 +74,7 @@
 
 #include	<usystem.h>
 #include	<osetstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<field.h>
 #include	<localmisc.h>
 
@@ -181,7 +181,7 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd)
 
 	if ((rs = u_fstat(fd,&sb)) >= 0) {
 	    if (! S_ISDIR(sb.st_mode)) {
-		FILEBUF	loadfile, *lfp = &loadfile ;
+		FILER	loadfile, *lfp = &loadfile ;
 		int	fbsize = 1024 ;
 		int	fbo = 0 ;
 
@@ -192,15 +192,15 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd)
 	            fbsize = MIN(cs,1024) ;
 	        } else {
 	            to = TO_READ ;
-	            if (S_ISSOCK(sb.st_mode)) fbo |= FILEBUF_ONET ;
+	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
 	        }
 
-	        if ((rs = filebuf_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
+	        if ((rs = filer_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
 	            const int	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            while ((rs = filebuf_readln(lfp,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(lfp,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	                if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -213,9 +213,9 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd)
 	                if (rs < 0) break ;
 	            } /* end while (reading lines) */
 
-	            rs1 = filebuf_finish(lfp) ;
+	            rs1 = filer_finish(lfp) ;
 		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+	        } /* end if (filer) */
 
 	    } else {
 	        rs = SR_ISDIR ;

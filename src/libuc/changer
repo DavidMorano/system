@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} sigblock.h "
+NAMES="${NAMES} filebuf  "
 
 
 DN=/dev/null
@@ -12,8 +12,8 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/sigblock.h/s//sigblocker.h/g
-g/sigblock_/s//sigblocker_/g
+g/FILEBUF/s//FILER/g
+g/filebuf/s//filer/g
 	w
 	q
 EOF

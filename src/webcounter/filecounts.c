@@ -64,7 +64,7 @@
 #include	<time.h>
 
 #include	<usystem.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<vecobj.h>
 #include	<storebuf.h>
 #include	<dater.h>
@@ -158,7 +158,7 @@ struct worker_ent {
 /* forward references */
 
 static int	filecounts_proclist(FILECOUNTS *,FILECOUNTS_N *) ;
-static int	filecounts_scan(FILECOUNTS *,WORKER *,FILEBUF *) ;
+static int	filecounts_scan(FILECOUNTS *,WORKER *,FILER *) ;
 static int	filecounts_update(FILECOUNTS *,WORKER *) ;
 static int 	filecounts_fins(FILECOUNTS *,WORKER *) ;
 static int	filecounts_procline(FILECOUNTS *,WORKER *,int,cchar *,int) ;
@@ -473,8 +473,8 @@ static int filecounts_proclist(FILECOUNTS *op,FILECOUNTS_N *nlp)
 
 	if ((rs = worker_start(&work,nlp)) >= 0) {
 	    if ((rs = filecounts_lockbegin(op)) >= 0) {
-	        FILEBUF	fb ;
-	        if ((rs = filebuf_start(&fb,op->fd,0L,0,opts)) >= 0) {
+	        FILER	fb ;
+	        if ((rs = filer_start(&fb,op->fd,0L,0,opts)) >= 0) {
 	            if ((rs = filecounts_scan(op,&work,&fb)) >= 0) {
 	                if (! op->f.rdonly) {
 	                    rs = filecounts_update(op,&work) ;
@@ -482,9 +482,9 @@ static int filecounts_proclist(FILECOUNTS *op,FILECOUNTS_N *nlp)
 	                if (rs >= 0)
 	                    rs = filecounts_fins(op,&work) ;
 	            } /* end if (search) */
-	            rs1 = filebuf_finish(&fb) ;
+	            rs1 = filer_finish(&fb) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+	        } /* end if (filer) */
 	        if (rs >= 0) rs = rs1 ;
 	        rs1 = filecounts_lockend(op) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -498,7 +498,7 @@ static int filecounts_proclist(FILECOUNTS *op,FILECOUNTS_N *nlp)
 /* end subroutine (filecounts_proclist) */
 
 
-static int filecounts_scan(FILECOUNTS *op,WORKER *wp,FILEBUF *fbp)
+static int filecounts_scan(FILECOUNTS *op,WORKER *wp,FILER *fbp)
 {
 	uint		foff = 0 ;
 	const int	llen = LINEBUFLEN ;
@@ -508,7 +508,7 @@ static int filecounts_scan(FILECOUNTS *op,WORKER *wp,FILEBUF *fbp)
 	int		rn = 1 ;
 	char		lbuf[LINEBUFLEN + 1] ;
 
-	while ((rs = filebuf_readln(fbp,lbuf,llen,to)) > 0) {
+	while ((rs = filer_readln(fbp,lbuf,llen,to)) > 0) {
 	    len = rs ;
 
 #if	CF_DEBUGS
@@ -764,18 +764,18 @@ static int filecounts_snaper(FILECOUNTS *op,VECOBJ *ilp)
 	int		rs ;
 
 	if ((rs = dater_start(&dm,NULL,NULL,0)) >= 0) {
-	    FILEBUF	fb ;
+	    FILER	fb ;
 	    const int	opts = 0 ;
-	    if ((rs = filebuf_start(&fb,op->fd,0L,0,opts)) >= 0) {
+	    if ((rs = filer_start(&fb,op->fd,0L,0,opts)) >= 0) {
 	        const int	to = -1 ;
 	        const int	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
-	        while ((rs = filebuf_readln(&fb,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
 	            rs = filecounts_snaperline(op,&dm,ilp,lbuf,rs) ;
 	            if (rs < 0) break ;
 	        } /* end while */
-	        filebuf_finish(&fb) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&fb) ;
+	    } /* end if (filer) */
 	    dater_finish(&dm) ;
 	} /* end if (dater) */
 

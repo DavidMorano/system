@@ -68,7 +68,7 @@
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -418,7 +418,7 @@ badpargs:
 
 static int worker(int rfd,int fac,int pri)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	const mode_t	om = 0666 ;
 	const int	of = O_WRONLY ;
 	int		rs ;
@@ -432,11 +432,11 @@ static int worker(int rfd,int fac,int pri)
 	if ((rs = u_open(LOGDEV,of,om)) >= 0) {
 	    const int	fd = rs ;
 
-	    if ((rs = filebuf_start(&b,rfd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&b,rfd,0L,0,0)) >= 0) {
 	   	const int	llen = LINEBUFLEN ;
 		char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 		    int	ll = rs ;
 
 		    if (lbuf[ll-1] == '\n') ll -= 1 ;
@@ -447,8 +447,8 @@ static int worker(int rfd,int fac,int pri)
 
 		} /* end while (reading lines) */
 
-		filebuf_finish(&b) ;
-	    } /* end if (filebuf) */
+		filer_finish(&b) ;
+	    } /* end if (filer) */
 
 	    u_close(fd) ;
 	} /* end if (open) */

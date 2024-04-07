@@ -74,7 +74,7 @@
 #include	<sysusernames.h>
 #include	<getusername.h>
 #include	<pcsns.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<nulstr.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -508,17 +508,17 @@ int		to ;
 		    break ;
 		} /* end switch */
 	        if ((rs = subpcs_start(&si,pr,envv,w)) >= 0) {
-		    FILEBUF	b ;
-		    if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
+		    FILER	b ;
+		    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
 		        if (sip->f.all) {
 			    rs = subpcs_all(&si,&b) ;
 		        } else {
 			    cchar	*afn = afname ;
 			    rs = subpcs_args(&si,&b,&ainfo,&pargs,afn) ;
 		        }
-		        rs1 = filebuf_finish(&b) ;
+		        rs1 = filer_finish(&b) ;
 		        if (rs >= 0) rs = rs1 ;
-		    } /* end if (filebuf) */
+		    } /* end if (filer) */
 	            rs1 = subpcs_finish(&si) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (subpcs) */

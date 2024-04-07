@@ -57,7 +57,7 @@
 
 #include	<usystem.h>
 #include	<char.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 
@@ -112,7 +112,7 @@ char		*rbuf ;
 int		rlen ;
 const char	*fname ;
 {
-	FILEBUF		f ;
+	FILER		f ;
 
 	const int	llen = LINEBUFLEN ;
 	const int	to = -1 ;
@@ -140,11 +140,11 @@ const char	*fname ;
 	if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
 	    int	fd = rs ;
 
-	    if ((rs = filebuf_start(&f,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&f,fd,0L,512,0)) >= 0) {
 	        int		ll ;
 		const char	*lp ;
 
-	        while ((rs = filebuf_readln(&f,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(&f,lbuf,llen,to)) > 0) {
 	            ll = rs ;
 
 	            if (lbuf[ll - 1] == '\n') ll -= 1 ;
@@ -168,8 +168,8 @@ const char	*fname ;
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
 
-	        filebuf_finish(&f) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&f) ;
+	    } /* end if (filer) */
 
 	    u_close(fd) ;
 	} /* end if (open) */

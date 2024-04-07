@@ -1,7 +1,7 @@
-/* filebuf_writers SUPPORT */
+/* filer_writers SUPPORT */
 /* lang=C++20 */
 
-/* extra write methods for the FILEBUF object */
+/* extra write methods for the FILER object */
 /* version %I% last-modified %G% */
 
 
@@ -17,13 +17,13 @@
 /*******************************************************************************
 
 	Name:
-	filebuf_writeblanks
+	filer_writeblanks
 
 	Description:
-	Write a specified number of blanks to a FILEBUF object.
+	Write a specified number of blanks to a FILER object.
 
 	Synopsis:
-	int filebuf_writeblanks(FILEBUF *fbp,int n)
+	int filer_writeblanks(FILER *fbp,int n)
 
 	Arguments:
 	fbp		pointer to object
@@ -35,16 +35,16 @@
 
 
 	Name:
-	filebuf_writefill
+	filer_writefill
 
 	Description:
 	Write enough data (bytes) to fill something.
 
 	Synopsis:
-	int filebuf_writefill(FILEBUF *bp,cchar *sp,int sl) noex
+	int filer_writefill(FILER *bp,cchar *sp,int sl) noex
 
 	Arguments:
-	bp		FILEBUF object pointer
+	bp		FILER object pointer
 	sp		source buffer
 	sl		source buffer length
 
@@ -54,17 +54,17 @@
 
 
 	Name:
-	filebuf_writealign
+	filer_writealign
 
 	Description:
 	Align the file-pointer to the specified alignment (zero-filling
 	as needed).
 
 	Synopsis:
-	int filebuf_writealign(FILEBUF *bp,int align) noex
+	int filer_writealign(FILER *bp,int align) noex
 
 	Arguments:
-	bp		FILEBUF object pointer
+	bp		FILER object pointer
 	align		source buffer length
 
 	Returns:
@@ -73,16 +73,16 @@
 
 
 	Name:
-	filebuf_writezero
+	filer_writezero
 
 	Description:
 	We provide some extra small function for special circumstances.
 
 	Synopsis:
-	int filebuf_writezero(FILEBUF *bp,int size) noex
+	int filer_writezero(FILER *bp,int size) noex
 
 	Arguments:
-	bp		FILEBUF object pointer
+	bp		FILER object pointer
 	size		amount of zeros to write
 
 	Returns:
@@ -91,17 +91,17 @@
 
 
 	Name:
-	filebuf_writefd
+	filer_writefd
 
 	Description:
 	Read a file (until a length-limit or an EOF) as given by a
 	file-descriptor and write it to the present buffered-file.
 
 	Synosis:
-	int filebuf_writefd(filebuf *fbp,char *bp,int bl,int mfd,int len) noex
+	int filer_writefd(filer *fbp,char *bp,int bl,int mfd,int len) noex
 
 	Arguments:
-	fbp		the present FILEBUF object pointer
+	fbp		the present FILER object pointer
 	bp		buffer pointer to use as staging
 	bl		buffer length to use as staging
 	mfd		file-descriptor to read from
@@ -120,7 +120,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"filebuf.h"
+#include	"filer.h"
 
 
 /* local defines */
@@ -150,8 +150,8 @@ using std::max ;			/* subroutine-template */
 /* forward references */
 
 extern "C" {
-    int		filebuf_writealign(filebuf *,int) noex ;
-    int		filebuf_writezero(filebuf *,int) noex ;
+    int		filer_writealign(filer *,int) noex ;
+    int		filer_writezero(filer *,int) noex ;
 }
 
 
@@ -170,65 +170,65 @@ static cchar	zerobuf[zsize] = { } ;
 
 /* exported subroutines */
 
-int filebuf_writeblanks(filebuf *fbp,int n) noex {
+int filer_writeblanks(filer *fbp,int n) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 	while ((rs >= 0) && (wlen < n)) {
 	    cint	ml = min((n-wlen),nblanks) ;
-	    rs = filebuf_write(fbp,blanks,ml) ;
+	    rs = filer_write(fbp,blanks,ml) ;
 	    wlen += rs ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writeblanks) */
+/* end subroutine (filer_writeblanks) */
 
-int filebuf_writefill(filebuf *bp,cchar *sp,int sl) noex {
+int filer_writefill(filer *bp,cchar *sp,int sl) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if (sl < 0) sl = (strlen(sp) + 1) ;
-	if ((rs = filebuf_write(bp,sp,sl)) >= 0) {
+	if ((rs = filer_write(bp,sp,sl)) >= 0) {
 	    cint	asize = sizeof(int) ;
 	    wlen = rs ;
-	    rs = filebuf_writealign(bp,asize) ;
+	    rs = filer_writealign(bp,asize) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writefill) */
+/* end subroutine (filer_writefill) */
 
-int filebuf_writealign(filebuf *bp,int asize) noex {
+int filer_writealign(filer *bp,int asize) noex {
 	off_t		foff ;
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = filebuf_tell(bp,&foff)) >= 0) {
+	if ((rs = filer_tell(bp,&foff)) >= 0) {
 	    cint	r = int(foff & (asize - 1)) ;
 	    if (r > 0) {
 	        cint	nzero = (asize - r) ;
 	        if (nzero > 0) {
-	            rs = filebuf_writezero(bp,nzero) ;
+	            rs = filer_writezero(bp,nzero) ;
 	            wlen += rs ;
 	        }
 	    }
-	} /* end if (filebuf_tell) */
+	} /* end if (filer_tell) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writeallign) */
+/* end subroutine (filer_writeallign) */
 
-int filebuf_writezero(filebuf *fp,int size) noex {
+int filer_writezero(filer *fp,int size) noex {
 	int		rs = SR_OK ;
 	int		rlen = size ;
 	int		wlen = 0 ;
 	while ((rs >= 0) && (rlen > 0)) {
 	    cint	ml = min(rlen,zsize) ;
-	    rs = filebuf_write(fp,zerobuf,ml) ;
+	    rs = filer_write(fp,zerobuf,ml) ;
 	    rlen -= rs ;
 	    wlen += rs ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writezero) */
+/* end subroutine (filer_writezero) */
 
-int filebuf_writefd(filebuf *fbp,char *bp,int bl,int mfd,int len) noex {
+int filer_writefd(filer *fbp,char *bp,int bl,int mfd,int len) noex {
 	int		rs = SR_OK ;
 	int		rlen = len ;
 	int		rl ;
@@ -239,13 +239,13 @@ int filebuf_writefd(filebuf *fbp,char *bp,int bl,int mfd,int len) noex {
 	    rl = rs ;
 	    if (rs <= 0) break ;
 	    {
-	        rs = filebuf_write(fbp,bp,rl) ;
+	        rs = filer_write(fbp,bp,rl) ;
 	        wlen += rs ;
 	    }
 	    rlen -= rl ;
 	} /* end while */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writefd) */
+/* end subroutine (filer_writefd) */
 
 

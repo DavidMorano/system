@@ -64,7 +64,7 @@
 #include	<keyopt.h>
 #include	<spawnproc.h>
 #include	<linefold.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1153,7 +1153,7 @@ static int procexec(PROGINFO *pip,struct calarger *cap,int ofd)
 
 static int procerrout(PROGINFO *pip,int cols,cchar s[],int ofd)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs = SR_OK ;
 	int		rs1 = SR_OK ;
 	int		wlen = 0 ;
@@ -1161,12 +1161,12 @@ static int procerrout(PROGINFO *pip,int cols,cchar s[],int ofd)
 	cchar		*pn = pip->progname ;
 
 	if (pip->efp != NULL) {
-	    if ((rs = filebuf_start(&b,ofd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&b,ofd,0L,0,0)) >= 0) {
 	        const int	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        rs1 = SR_OK ;
-	        while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	        while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	            int	len = rs ;
 
 	            if (lbuf[len - 1] == '\n') lbuf[--len] = '\0' ;
@@ -1188,8 +1188,8 @@ static int procerrout(PROGINFO *pip,int cols,cchar s[],int ofd)
 	        } /* end while (reading lines) */
 	        if (rs1 < 0) wlen = 0 ;
 
-	        filebuf_finish(&b) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&b) ;
+	    } /* end if (filer) */
 	} /* end if (ok) */
 
 	return (rs >= 0) ? wlen : rs ;

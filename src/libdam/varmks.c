@@ -82,7 +82,7 @@
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<strtab.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 #include	<hash.h>
 
@@ -131,7 +131,7 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	vstrkeycmp(const char *,const char *) ;
-extern int	filebuf_writefill(FILEBUF *,cchar *,int) ;
+extern int	filer_writefill(FILER *,cchar *,int) ;
 extern int	hasuc(const char *,int) ;
 extern int	isNotPresent(int) ;
 
@@ -181,10 +181,10 @@ static int	varmks_listend(VARMKS *) ;
 static int	varmks_mkvarfile(VARMKS *) ;
 static int	varmks_mkvarfiler(VARMKS *) ;
 static int	varmks_mkidxwrmain(VARMKS *,VARHDR *) ;
-static int	varmks_mkidxwrhdr(VARMKS *,VARHDR *,FILEBUF *) ;
-static int	varmks_mkrectab(VARMKS *,VARHDR *,FILEBUF *,int) ;
+static int	varmks_mkidxwrhdr(VARMKS *,VARHDR *,FILER *) ;
+static int	varmks_mkrectab(VARMKS *,VARHDR *,FILER *,int) ;
 static int	varmks_mkind(VARMKS *,const char *,uint (*)[3],int) ;
-static int	varmks_mkstrtab(VARMKS *,VARHDR *,FILEBUF *,int) ;
+static int	varmks_mkstrtab(VARMKS *,VARHDR *,FILER *,int) ;
 static int	varmks_nidxopen(VARMKS *) ;
 static int	varmks_nidxclose(VARMKS *) ;
 static int	varmks_renamefiles(VARMKS *) ;
@@ -646,7 +646,7 @@ static int varmks_mkvarfiler(VARMKS *op)
 
 static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -654,7 +654,7 @@ static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 	int		rs1 ;
 	int		off = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = varmks_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {
@@ -666,16 +666,16 @@ static int varmks_mkidxwrmain(VARMKS *op,VARHDR *hdrp)
 	            off += rs ;
 	        }
 	    } /* end if (varmks_mkidxwrhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
 }
 /* end subroutine (varmks_mkidxwrmain) */
 
 
 /* ARGSUSED */
-static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp)
+static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILER *hfp)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -683,7 +683,7 @@ static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp)
 	char		hbuf[HDRBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = varhdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    rs = filebuf_writefill(hfp,hbuf,rs) ;
+	    rs = filer_writefill(hfp,hbuf,rs) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -691,7 +691,7 @@ static int varmks_mkidxwrhdr(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp)
 /* end subroutine (varmks_mkidxwrhdr) */
 
 
-static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp,int off)
+static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 {
 	int		rs ;
 	int		rtl ;
@@ -702,7 +702,7 @@ static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp,int off)
 	hdrp->rtoff = off ;
 	hdrp->rtlen = rtl ;
 	size = ((rtl + 1) * 2 * sizeof(uint)) ;
-	if ((rs = filebuf_write(hfp,rt,size)) >= 0) {
+	if ((rs = filer_write(hfp,rt,size)) >= 0) {
 	    STRTAB	*ksp = &op->keys ;
 	    char	*kstab = NULL ;
 	    off += rs ;
@@ -712,7 +712,7 @@ static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp,int off)
 	    hdrp->kslen = size ;
 	    if ((rs = uc_malloc(size,&kstab)) >= 0) {
 	        if ((rs = strtab_strmk(ksp,kstab,size)) >= 0) {
-	            rs = filebuf_write(hfp,kstab,size) ;
+	            rs = filer_write(hfp,kstab,size) ;
 	            off += rs ;
 	    	    wlen += rs ;
 	        }
@@ -725,7 +725,7 @@ static int varmks_mkrectab(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp,int off)
 	            if ((rs = uc_malloc(size,&indtab)) >= 0) {
 	                memset(indtab,0,size) ;
 	                if ((rs = varmks_mkind(op,kstab,indtab,itl)) >= 0) {
-	                    rs = filebuf_write(hfp,indtab,size) ;
+	                    rs = filer_write(hfp,indtab,size) ;
 	                    off += rs ;
 	    		    wlen += rs ;
 	                }
@@ -853,7 +853,7 @@ int		il ;
 /* end subroutine (varmks_mkind) */
 
 
-static int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp,int off)
+static int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,FILER *hfp,int off)
 {
 	STRTAB		*vsp = &op->vals ;
 	int		rs ;
@@ -865,7 +865,7 @@ static int varmks_mkstrtab(VARMKS *op,VARHDR *hdrp,FILEBUF *hfp,int off)
 	    hdrp->vslen = size ;
 	    if ((rs = uc_malloc(size,&vstab)) >= 0) {
 	        if ((rs = strtab_strmk(vsp,vstab,size)) >= 0) {
-	            rs = filebuf_write(hfp,vstab,size) ;
+	            rs = filer_write(hfp,vstab,size) ;
 	            off += rs ;
 		    wlen += rs ;
 	        }

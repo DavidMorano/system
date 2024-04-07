@@ -1,14 +1,14 @@
 # MAKEFILE (libuc)
 
 T= libuc
+TT= libuctest
 
-ALL= $(T).so $(T).a
+ALL= $(T).a $(T).so
 
 
 BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
-RUNDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
@@ -35,27 +35,71 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS +=
+DEF0=
+DEF1=
+DEF2=
+DEF3=
+DEF4=
+DEF5=
+DEF6=
+DEF7=
 
+DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
 
-INCS += usystem.h localmisc.h
-INCS += uclibsubs.h
-
-
-LIBS=
-
-
+#INCDIRS= -Iinclude
 INCDIRS=
 
+LDRPATH= $(EXTRA)/lib
+
 LIBDIRS= -L$(LIBDIR)
+
+LIBS=
 
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
 CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
-ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
+
+
+SLDFLAGS= -R$(LIBDIR):$(CGS_RPATH):$(LDRPATH)
+
+SLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
+
+SLIB0=
+SLIB1=
+SLIB2=
+SLIB3= -lu
+SLIB4= $(CGS_LIBS)
+SLIB5=
+SLIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
+SLIB7= -ldl
+
+SLIBS= $(SLIB0) $(SLIB1) $(SLIB2) $(SLIB3) $(SLIB4) $(SLIB5) $(SLIB6) $(SLIB7)
+
+SLIBINFO= $(SLIBDIRS) $(SLIBS)
+
+
+XLDFLAGS= -R$(LIBDIR):$(CGS_RPATH):$(LDRPATH)
+
+XLIBDIRS= -L$(LIBDIR)
+
+XLIB0=
+XLIB1= -ldam -lb
+XLIB2= -ldebug
+XLIB3= -luc -lu
+XLIB4= $(CGS_LIBS)
+XLIB5=
+XLIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
+XLIB7= -ldl
+
+XLIBS= $(XLIB0) $(XLIB1) $(XLIB2) $(XLIB3) $(XLIB4) $(XLIB5) $(XLIB6) $(XLIB7)
+
+XLIBINFO= $(XLIBDIRS) $(XLIBS)
+
+
+INCS= usystem.h localmisc.h
 
 
 OBJ001= uclibmemalloc.o ucmemalloc.o ucmallocx.o
@@ -108,8 +152,8 @@ OBJ045=
 OBJ046= uc_madvise.o uc_mlock.o uc_munlock.o uc_mlockall.o uc_munlockall.o
 OBJ047= uc_plock.o 
 OBJ048= uc_fork.o uc_execve.o uc_isaexecve.o 
-OBJ049= uc_gethostid.o uc_confstr.o uc_gethostname.o
-OBJ050= uc_mallocstrw.o uc_mallocbuf.o
+OBJ049=
+OBJ050=
 OBJ051= uc_waitwritable.o
 OBJ052= 
 OBJ053= uc_piper.o
@@ -318,6 +362,44 @@ OBJg1= $(OBJI) $(OBJJ) $(OBJK) $(OBJL) $(OBJM) $(OBJN) $(OBJO) $(OBJP)
 OBJg2= $(OBJQ) $(OBJR) $(OBJS) $(OBJT)
 
 OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
+
+
+SOBJ0= obja.o objb.o objc.o objd.o obje.o objf.o objg.o objh.o obji.o objj.o
+SOBJ1= objk.o objl.o objm.o objn.o objo.o objp.o objq.o objr.o objs.o objt.o
+
+SOBJ= $(SOBJ0) $(SOBJ1)
+
+
+TOBJ00= uc_gethostid.o uc_confstr.o uc_gethostname.o
+
+#TOBJ01a= uc_memalloc.o 
+TOBJ01b= uc_mallocstrw.o uc_mallocbuf.o
+
+TOBJ01= $(TOBJ01a) $(TOBJ01b) $(TOBJ01c) $(TOBJ01d)
+
+#TOBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
+#TOBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) 
+# working
+#TOBJA= $(OBJ02) $(OBJ03) 
+# not-working
+#TOBJA= $(OBJ00) $(OBJ01) 
+# not-working
+TOBJA= $(TOBJ01) 
+# working
+#TOBJA= $(TOBJ00) 
+
+#TOBJG0= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG) $(OBJH) 
+#TOBJG0= $(OBJE) $(OBJF) $(OBJG) $(OBJH) 
+#TOBJG0= $(OBJA) $(OBJB) $(OBJC) $(OBJD) 
+#TOBJG0= $(OBJA) $(OBJB) 
+#TOBJG0= $(OBJB) 
+TOBJG0= $(TOBJA) 
+#TOBJG0= $(OBJC) $(OBJD) 
+#TOBJG1= $(OBJI) $(OBJJ) $(OBJK) $(OBJL) $(OBJM) $(OBJN) $(OBJO) $(OBJP)
+#TOBJG1= $(OBJI) $(OBJJ) $(OBJK) $(OBJL) 
+#TOBJG1= $(OBJM) $(OBJN) $(OBJO) $(OBJP)
+
+TOBJ= $(TOBJG0) $(TOBJG1)
 
 
 UOBJ00= matxstr.o toxc.o char.o 
@@ -1027,9 +1109,9 @@ logfile.o:		logfile.dir
 logfile.dir:
 	makesubdir $@
 
-# FILER
-filer.o:		filer.dir
-filer.dir:
+# FILEBUF
+filebuf.o:		filebuf.dir
+filebuf.dir:
 	makesubdir $@
 
 # TMPX
@@ -1181,5 +1263,172 @@ umask.o:		umask.cc umask.h
 unameo.o:		unameo.cc unameo.h
 utmpacc.o:		utmpacc.cc utmpacc.h
 utmpaccent.o:		utmpaccent.cc utmpaccent.h
+
+
+# testing
+
+X01= testugetpw
+
+X01OBJ= $(X01).o ugetpw.o ucpwcache.o recarr.o
+
+$(X01).o:		$(X01).c ugetpw.h ucpwcache.h recarr.h
+
+$(X01).x:		$(X01OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X01OBJ) $(XLIBINFO)
+
+
+X02= testutmpacc
+
+X02OBJ= $(X02).o utmpacc.o utmpaccent.o filemap.o recarr.o
+
+$(X02).o:		$(X02).c utmpacc.h utmpaccent.h filemap.h recarr.h
+
+$(X02).x:		$(X02OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X02OBJ) $(XLIBINFO)
+
+
+#XDIAL0= dialticotsordnls.o dialticotsordmux.o dialticotsord.o 
+XDIAL1= filebuf.o opensysfs.o
+XDIAL2= nlsdialassist.o strnwcpy.o
+XDIAL3= snopenflags.o
+XDIAL4= uc_reade.o uc_openuser.o uc_opensys.o uc_opendev.o
+
+XDIALERS= $(XDIAL0) $(XDIAL1) $(XDIAL2) $(XDIAL3) $(XDIAL4)
+
+
+X03= testucopen
+
+X03OBJ00= $(X03).o mkprogenv.o spawnproc.o
+X03OBJ01= uc_openinfo.o uc_openproto.o uc_openprog.o 
+X03OBJ02= uc_opendialer.o uc_openfsvc.o uc_openusvc.o uc_execve.o
+X03OBJ03= $(XDIALERS)
+
+X03OBJ04= attachso.o opensvc_hotd.o
+X03OBJ05= mkexpandpath.o mkuserpath.o mkvarpath.o mkcdpath.o
+X03OBJ06=
+X03OBJ07= debug.o
+
+X03OBJa= $(X03OBJ00) $(X03OBJ01) $(X03OBJ02) $(X03OBJ03) 
+X03OBJb= $(X03OBJ04) $(X03OBJ05) $(X03OBJ06) $(X03OBJ07)
+X03OBJ= $(X03OBJa) $(X03OBJb)
+
+$(X03).o:		$(X03).c usystem.h nlsdialassist.h
+
+$(X03).x:		$(X03OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X03OBJ) $(XLIBINFO)
+
+
+X04= testsafesleep
+
+X04OBJ00= $(X04).o 
+X04OBJ01=
+X04OBJ02=
+X04OBJ03=
+X04OBJ04=
+X04OBJ05= debug.o
+
+X04OBJ= $(X04OBJ00) $(X04OBJ01) $(X04OBJ02) $(X04OBJ03) $(X04OBJ04) $(X04OBJ05)
+
+$(X04).o:		$(X04).c usystem.h
+
+$(X04).x:		$(X04OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X04OBJ) $(XLIBINFO)
+
+
+X05= testspawnproc
+
+X05OBJ00= $(X05).o 
+X05OBJ01= spawnproc.o
+X05OBJ02=
+X05OBJ03=
+X05OBJ04=
+X05OBJ05= debug.o
+
+X05OBJ= $(X05OBJ00) $(X05OBJ01) $(X05OBJ02) $(X05OBJ03) $(X05OBJ04) $(X05OBJ05)
+
+$(X05).o:		$(X05).c usystem.h
+
+$(X05).x:		$(X05OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X05OBJ) $(XLIBINFO)
+
+
+X06= testugetpid
+
+X06OBJ00= $(X06).o 
+X06OBJ01= ucgetpid.o
+X06OBJ02= ucatfork.o
+X06OBJ03=
+X06OBJ04=
+X06OBJ05= debug.o
+X06OBJ06=
+X06OBJ07=
+
+X06OBJa= $(X06OBJ00) $(X06OBJ01) $(X06OBJ02) $(X06OBJ03) 
+X06OBJb= $(X06OBJ04) $(X06OBJ05) $(X06OBJ06) $(X06OBJ07)
+
+X06OBJ= $(X06OBJa) $(X06OBJb)
+
+$(X06).o:		$(X06).c usystem.h
+
+$(X06).x:		$(X06OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X06OBJ) $(XLIBINFO)
+
+
+X07= testnaked
+
+X07OBJ00= $(X07).o 
+X07OBJ01=
+X07OBJ02=
+X07OBJ03=
+X07OBJ04=
+X07OBJ05=
+X07OBJ06=
+X07OBJ07=
+
+X07OBJa= $(X07OBJ00) $(X07OBJ01) $(X07OBJ02) $(X07OBJ03) 
+X07OBJb= $(X07OBJ04) $(X07OBJ05) $(X07OBJ06) $(X07OBJ07)
+
+X07OBJ= $(X07OBJa) $(X07OBJb)
+
+$(X07).o:		$(X07).c usystem.h
+
+$(X07).x:		$(X07OBJ)
+	$(CC) -o $@ $(XLDFLAGS) $(X07OBJ) $(XLIBINFO)
+
+
+# testcharconv
+X08= testcharconv
+
+$(X08):			$(X08).x
+
+X08OBJ = $(X08).o
+X08OBJ += ctdec.o
+X08OBJ += cfdec.o 
+X08OBJ += digbufsizes.o
+X08OBJ += sncpyx.o
+X08OBJ += getbufsize.o
+
+$(X08).o:		$(X08).cc usystem.h
+
+$(X08).x:		$(X08OBJ)
+	print -- $(LD) -o $@ $(X08OBJ)
+
+UCMAOBJ =
+UCMAOBJ += ucmalloc.o
+UCMAOBJ += ucmallocsyc.o
+UCMAOBJ += ucmallocsyc.o
+
+# testmemtrack
+MTOBJ = testmemtrack.o mapblock.o memtrack.o
+
+testmemtrack.x:		$(MTOBJ)
+	$(LD) -o $@ $(MTOBJ)
+
+testmemtrack.o:		testmemtrack.cc
+
+# TESYVALUES
+OBJ_TV= testvalues.o digbufsizes.o valuelims.o ucvariables.o
+testvalues.x:	$(OBJ_TV)
+	$(LD) -o $@ $(OBJ_TV)
 
 

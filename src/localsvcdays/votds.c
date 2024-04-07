@@ -43,7 +43,7 @@
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<estrings.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
@@ -132,9 +132,9 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	msleep(uint) ;
 extern int	isOneOf(const int *,int) ;
 extern int	uc_openshmto(const char *,int,mode_t,int) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
-extern int	filebuf_writezero(FILEBUF *,int) ;
-extern int	filebuf_writealign(FILEBUF *,int) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
+extern int	filer_writezero(FILER *,int) ;
+extern int	filer_writealign(FILER *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
@@ -981,7 +981,7 @@ VOTDSHDR	*hdrp ;
 const char	hbuf[] ;
 int		hlen ;
 {
-	FILEBUF		sfile, *sfp = &sfile ;
+	FILER		sfile, *sfp = &sfile ;
 	const int	bsize = 2048 ;
 	int		rs ;
 	int		rs1 ;
@@ -991,111 +991,111 @@ int		hlen ;
 	op->shmsize = 0 ;
 	if (dt == 0) dt = time(NULL) ;
 
-	if ((rs = filebuf_start(sfp,fd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(sfp,fd,0,bsize,0)) >= 0) {
 	    const int	asize = SHMALLOC_ALIGNSIZE ;
 
 	    if (rs >= 0) {
-	        rs = filebuf_write(sfp,hbuf,hlen) ;
+	        rs = filer_write(sfp,hbuf,hlen) ;
 	        foff += rs ;
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_MUSIZE ;
 		    hdrp->muoff = foff ;
 		    hdrp->musize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_LANGSIZE ;
 		    hdrp->lanoff = foff ;
 		    hdrp->lanlen = VOTDS_NLANGS ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_BOOKSIZE ;
 		    hdrp->bookoff = foff ;
 		    hdrp->booklen = VOTDS_NBOOKS ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_VERSESIZE ;
 		    hdrp->recoff = foff ;
 		    hdrp->reclen = VOTDS_NVERSES ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = sizeof(SHMALLOC) ;
 		    hdrp->balloff = foff ;
 		    hdrp->ballsize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = sizeof(SHMALLOC) ;
 		    hdrp->valloff = foff ;
 		    hdrp->vallsize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_BSTRSIZE ;
 		    hdrp->bstroff = foff ;
 		    hdrp->bstrlen = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_VSTRSIZE ;
 		    hdrp->vstroff = foff ;
 		    hdrp->vstrlen = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
 		size = iceil(foff,op->pagesize) - foff ;
-		rs = filebuf_writezero(sfp,size) ;
+		rs = filer_writezero(sfp,size) ;
 	        foff += rs ;
 	    }
 
-	    rs1 = filebuf_finish(sfp) ;
+	    rs1 = filer_finish(sfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	hdrp->shmsize = foff ;
 	return (rs >= 0) ? foff : rs ;

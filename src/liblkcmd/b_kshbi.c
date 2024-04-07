@@ -56,7 +56,7 @@
 #include	<keyopt.h>
 #include	<vecstr.h>
 #include	<field.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<tmtime.h>
 #include	<upt.h>
@@ -1298,12 +1298,12 @@ static int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 	        av[i++] = rbuf ;
 	        av[i] = NULL ;
 	        if ((rs = uc_openprog(pfname,of,av,ev)) >= 0) {
-	            FILEBUF	b ;
+	            FILER	b ;
 	            const int	fd = rs ;
-	            if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
+	            if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
 	                const int	llen = LINEBUFLEN ;
 	                char		lbuf[LINEBUFLEN+1] ;
-	                while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	                while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	                    int		len = rs ;
 	                    if (lbuf[len-1] == '\n') len -= 1 ;
 #if	CF_DEBUG
@@ -1316,9 +1316,9 @@ static int procsfnmk(PROGINFO *pip,cchar *sfname,cchar *rbuf)
 	                    } /* end if (positive) */
 	                    if (rs < 0) break ;
 	                } /* end if (reading lines) */
-	                rs1 = filebuf_finish(&b) ;
+	                rs1 = filer_finish(&b) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (filebuf) */
+	            } /* end if (filer) */
 	            u_close(fd) ;
 	        } /* end if (r-file) */
 #if	CF_DEBUG

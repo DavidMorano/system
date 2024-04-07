@@ -85,7 +85,7 @@
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -124,7 +124,7 @@ extern int	getpwd(char *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filebuf_writefill(FILEBUF *,const void *,int) ;
+extern int	filer_writefill(FILER *,const void *,int) ;
 extern int	iceil(int,int) ;
 extern int	isNotPresent(int) ;
 
@@ -177,9 +177,9 @@ static int	cmimk_listbegin(CMIMK *,int) ;
 static int	cmimk_listend(CMIMK *) ;
 static int	cmimk_mkidx(CMIMK *) ;
 static int	cmimk_mkidxwrmain(CMIMK *,CMIHDR *) ;
-static int	cmimk_mkidxwrhdr(CMIMK *,CMIHDR *,FILEBUF *) ;
-static int	cmimk_mkidxwrents(CMIMK *,CMIHDR *,FILEBUF *,int) ;
-static int	cmimk_mkidxwrlines(CMIMK *,CMIHDR *,FILEBUF *,int) ;
+static int	cmimk_mkidxwrhdr(CMIMK *,CMIHDR *,FILER *) ;
+static int	cmimk_mkidxwrents(CMIMK *,CMIHDR *,FILER *,int) ;
+static int	cmimk_mkidxwrlines(CMIMK *,CMIHDR *,FILER *,int) ;
 static int	cmimk_nidxopen(CMIMK *) ;
 static int	cmimk_nidxclose(CMIMK *) ;
 static int	cmimk_renamefiles(CMIMK *) ;
@@ -660,7 +660,7 @@ static int cmimk_mkidx(CMIMK *op)
 
 static int cmimk_mkidxwrmain(CMIMK *op,CMIHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -668,7 +668,7 @@ static int cmimk_mkidxwrmain(CMIMK *op,CMIHDR *hdrp)
 	int		rs1 ;
 	int		off = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = cmimk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {
@@ -680,16 +680,16 @@ static int cmimk_mkidxwrmain(CMIMK *op,CMIHDR *hdrp)
 	            off += rs ;
 	        }
 	    } /* end if (cmimk_mkidxwrhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
 }
 /* end subroutine (cmimk_mkidxwrmain) */
 
 
 /* ARGSUSED */
-static int cmimk_mkidxwrhdr(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp)
+static int cmimk_mkidxwrhdr(CMIMK *op,CMIHDR *hdrp,FILER *hfp)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -697,7 +697,7 @@ static int cmimk_mkidxwrhdr(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp)
 	char		hbuf[HDRBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = cmihdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    rs = filebuf_writefill(hfp,hbuf,rs) ;
+	    rs = filer_writefill(hfp,hbuf,rs) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -705,7 +705,7 @@ static int cmimk_mkidxwrhdr(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp)
 /* end subroutine (cmimk_mkidxwrhdr) */
 
 
-static int cmimk_mkidxwrents(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp,int off)
+static int cmimk_mkidxwrents(CMIMK *op,CMIHDR *hdrp,FILER *hfp,int off)
 {
 	struct cmentry	*cmep ;
 	uint		a[4] ;
@@ -722,7 +722,7 @@ static int cmimk_mkidxwrents(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp,int off)
 	        a[2] = cmep->li ;
 	        a[3] = ((cmep->nlines << 16) | (cmep->cn & UINT_MAX)) ;
 	        n += 1 ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;
@@ -733,7 +733,7 @@ static int cmimk_mkidxwrents(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp,int off)
 /* end subroutine (cmimk_mkidxwrents) */
 
 
-static int cmimk_mkidxwrlines(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp,int off)
+static int cmimk_mkidxwrlines(CMIMK *op,CMIHDR *hdrp,FILER *hfp,int off)
 {
 	BLENTRY		*blep ;
 	uint		a[4] ;
@@ -748,7 +748,7 @@ static int cmimk_mkidxwrlines(CMIMK *op,CMIHDR *hdrp,FILEBUF *hfp,int off)
 	        a[0] = blep->loff ;
 	        a[1] = blep->llen ;
 	        n += 1 ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;

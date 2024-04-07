@@ -125,7 +125,7 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<sigblocker.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<envhelp.h>
 #include	<spawnproc.h>
 #include	<mkfdfname.h>
@@ -615,12 +615,12 @@ badpargs:
 
 static int writeargs(int afd,BITS *blp,int ai_pos,int argc,cchar **argv)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
 
-	if ((rs = filebuf_start(&b,afd,0L,512,0)) >= 0) {
+	if ((rs = filer_start(&b,afd,0L,512,0)) >= 0) {
 	    int		ai ;
 	    int		f ;
 	    const char	*ap ;
@@ -632,14 +632,14 @@ static int writeargs(int afd,BITS *blp,int ai_pos,int argc,cchar **argv)
 	            ap = argv[ai] ;
 	            if (ap[0] != '-') {
 	                n += 1 ;
-	                rs = filebuf_println(&b,ap,-1) ;
+	                rs = filer_println(&b,ap,-1) ;
 	            }
 	        }
 	    } /* end for */
 
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	if (rs >= 0) u_rewind(afd) ;
 

@@ -77,7 +77,7 @@
 #include	<estrings.h>
 #include	<endian.h>
 #include	<nulstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<expcook.h>
 #include	<getax.h>
 #include	<getusername.h>
@@ -149,7 +149,7 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	mkpr(char *,int,const char *,const char *) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	filebuf_writefill(FILEBUF *,char *,int) ;
+extern int	filer_writefill(FILER *,char *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -620,7 +620,7 @@ static int msuclient_shmdestroy(MSUCLIENT *op)
 static int msuclient_shmwr(MSUCLIENT *op,int fd,mode_t om)
 {
 	SYSMISCFH	hdr ;
-	FILEBUF		babyfile ;
+	FILER		babyfile ;
 	uint		fileoff = 0 ;
 	int		rs = SR_OK ;
 	int		size ;
@@ -646,16 +646,16 @@ static int msuclient_shmwr(MSUCLIENT *op,int fd,mode_t om)
 /* create the file-header */
 
 	size = (op->pagesize * 4) ;
-	if ((rs = filebuf_start(&babyfile,fd,0,size,0)) >= 0) {
+	if ((rs = filer_start(&babyfile,fd,0,size,0)) >= 0) {
 
 	if ((rs = sysmiscfh(&hdr,0,hdrbuf,HDRBUFLEN)) >= 0) {
 	    bl = rs ;
-	    rs = filebuf_writefill(&babyfile,hdrbuf,bl) ;
+	    rs = filer_writefill(&babyfile,hdrbuf,bl) ;
 	    fileoff += rs ;
 	}
 
-	filebuf_finish(&babyfile) ;
-	} /* end if (filebuf) */
+	filer_finish(&babyfile) ;
+	} /* end if (filer) */
 
 	if (rs >= 0) {
 	    hdr.shmsize = fileoff ;

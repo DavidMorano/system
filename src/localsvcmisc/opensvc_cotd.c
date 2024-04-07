@@ -74,7 +74,7 @@
 #include	<commandment.h>
 #include	<dayspec.h>
 #include	<tmtime.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<wordfill.h>
 #include	<localmisc.h>
 
@@ -171,7 +171,7 @@ static int	subinfo_setentry(SUBINFO *,cchar **,cchar *,int) ;
 
 static int	subinfo_cotd(SUBINFO *,int,const char *,const char *) ;
 static int	subinfo_procout(SUBINFO *,int,int,int,cchar *,int) ;
-static int	subinfo_procoutline(SUBINFO *,FILEBUF *,
+static int	subinfo_procoutline(SUBINFO *,FILER *,
 			int,int,int,cchar *,int) ;
 static int	subinfo_tmtime(SUBINFO *) ;
 
@@ -657,7 +657,7 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 		cchar *cbuf,int clen)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		wlen = 0 ;
 
@@ -665,7 +665,7 @@ static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 	    debugprintf("b_commandment/procout: n=%u clen=%d\n",n,clen) ;
 #endif
 
-	if ((rs = filebuf_start(&b,wfd,0L,512,0)) >= 0) {
+	if ((rs = filer_start(&b,wfd,0L,512,0)) >= 0) {
 	    WORDFILL	w ;
 
 	    if ((rs = wordfill_start(&w,cbuf,clen)) >= 0) {
@@ -698,15 +698,15 @@ static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 	        wordfill_finish(&w) ;
 	    } /* end if (wordfill) */
 
-	    filebuf_finish(&b) ;
-	} /* end if (filebuf) */
+	    filer_finish(&b) ;
+	} /* end if (filer) */
 
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (subinfo_procout) */
 
 
-static int subinfo_procoutline(SUBINFO *sip,FILEBUF *fbp,int prec,int ln,int n,
+static int subinfo_procoutline(SUBINFO *sip,FILER *fbp,int prec,int ln,int n,
 		cchar *lp,int ll)
 {
 	int		rs ;
@@ -715,10 +715,10 @@ static int subinfo_procoutline(SUBINFO *sip,FILEBUF *fbp,int prec,int ln,int n,
 	if (sip == NULL) return SR_FAULT ;
 
 	if (ln == 0) {
-	    rs = filebuf_printf(fbp,"%*u %t\n", prec,n, lp,ll) ;
+	    rs = filer_printf(fbp,"%*u %t\n", prec,n, lp,ll) ;
 	    wlen += rs ;
 	} else {
-	    rs = filebuf_printf(fbp,"%t %t\n", blanks,prec, lp,ll) ;
+	    rs = filer_printf(fbp,"%t %t\n", blanks,prec, lp,ll) ;
 	    wlen += rs ;
 	}
 

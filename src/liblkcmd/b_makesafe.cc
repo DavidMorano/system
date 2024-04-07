@@ -67,7 +67,7 @@
 #include	<keyopt.h>
 #include	<tmtime.h>
 #include	<bfile.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<vecstr.h>
 #include	<vecpstr.h>
 #include	<vecobj.h>
@@ -2170,7 +2170,7 @@ static int procdeps_incargs(PROGINFO *pip,vecstr *alp)
 /* process the lines that contain dependency names */
 static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 {
-	FILEBUF		buf ;
+	FILER		buf ;
 	cint	to = pip->to_read ;
 	int		rs ;
 	int		rs1 ;
@@ -2192,14 +2192,14 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 	}
 #endif /* CF_DEBUG */
 
-	if ((rs = filebuf_start(&buf,fd,0L,FBUFLEN,0)) >= 0) {
+	if ((rs = filer_start(&buf,fd,0L,FBUFLEN,0)) >= 0) {
 	    LSTATE	ls ;
 	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    memset(&ls,0,sizeof(struct lstate)) ;
-	    while ((rs = filebuf_readln(&buf,lbuf,llen,to)) > 0) {
+	    while ((rs = filer_readln(&buf,lbuf,llen,to)) > 0) {
 	        tlen += rs ;
 	        len = rs ;
 
@@ -2218,9 +2218,9 @@ static int proclines(PROGINFO *pip,vecpstr *dp,int fd)
 	        if (rs < 0) break ;
 	    } /* end while */
 
-	    rs1 = filebuf_finish(&buf) ;
+	    rs1 = filer_finish(&buf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	if (pip->debuglevel > 0) {
 	    cchar	*pn = pip->progname ;
@@ -2311,7 +2311,7 @@ static int procline(PROGINFO *pip,vecpstr *dp,LSTATE *lsp,cchar *lbuf,int len)
 static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 {
 	USTAT	sb ;
-	FILEBUF		buf ;
+	FILER		buf ;
 	cint	fsize = FBUFLEN ;
 	int		rs ;
 	int		rs1 ;
@@ -2324,7 +2324,7 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 	}
 
 	if ((rs >= 0) && (sb.st_size > 0)) {
-	    if ((rs = filebuf_start(&buf,fd_err,0L,fsize,0)) >= 0) {
+	    if ((rs = filer_start(&buf,fd_err,0L,fsize,0)) >= 0) {
 	        cint	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
@@ -2336,7 +2336,7 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 #endif
 
 	        while (rs >= 0) {
-	            rs = filebuf_readln(&buf,lbuf,llen,to) ;
+	            rs = filer_readln(&buf,lbuf,llen,to) ;
 	            len = rs ;
 	            if (rs <= 0) break ;
 
@@ -2368,9 +2368,9 @@ static int procerr(PROGINFO *pip,VECOBJ *errp,int fd_err)
 	        }
 #endif /* CF_DEBUG */
 
-	        rs1 = filebuf_finish(&buf) ;
+	        rs1 = filer_finish(&buf) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	} /* end if (stat) */
 
 	return rs ;

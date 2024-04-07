@@ -42,7 +42,7 @@
 #include	<usystem.h>
 #include	<sigblocker.h>
 #include	<mallocxx.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<fbliner.h>
 #include	<ascii.h>
 #include	<vecobj.h>
@@ -136,7 +136,7 @@ struct sigstate {
 } ;
 
 struct msgcopy {
-	filebuf		*fbp ;
+	filer		*fbp ;
 	char		*bp ;
 	off_t		moff ;
 	int		bl ;
@@ -610,7 +610,7 @@ static int mailbox_opener(mailbox *op,cc *mbfname,int of) noex {
 
 static int mailbox_parse(mailbox *op) noex {
 	fbliner		ls, *lsp = &ls ;
-	filebuf		fb ;
+	filer		fb ;
 	const off_t	soff = 0L ;
 	cint		bsize = (32 * op->pagesize) ;
 	int		rs ;
@@ -619,7 +619,7 @@ static int mailbox_parse(mailbox *op) noex {
 	if constexpr (f_readto) {
 	    to = op->to_read ;
 	}
-	if ((rs = filebuf_start(&fb,op->mfd,soff,bsize,0)) >= 0) {
+	if ((rs = filer_start(&fb,op->mfd,soff,bsize,0)) >= 0) {
 	    if ((rs = fbliner_start(lsp,&fb,soff,to)) >= 0) {
 	        int	mi = 0 ;
 	        while ((rs = mailbox_parsemsg(op,lsp,mi)) > 0) {
@@ -630,9 +630,9 @@ static int mailbox_parse(mailbox *op) noex {
 	        rs1 = fbliner_finish(lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (liner) */
-	    rs1 = filebuf_finish(&fb) ;
+	    rs1 = filer_finish(&fb) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? op->msgs_total : rs ;
 }
 /* end subroutine (mailbox_parse) */
@@ -1005,7 +1005,7 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	char		*bp{} ;
 	if ((rs = uc_valloc(bl,&bp)) >= 0) {
 	    MSGCOPY	mc{} ;
-	    filebuf	fb, *fbp = &fb ;
+	    filer	fb, *fbp = &fb ;
 	    off_t	mbchange = -1 ;
 	    cint	mfd = op->mfd ;
 	    cint	bsize = min(iceil(op->mblen,ps),(16*ps)) ;
@@ -1014,7 +1014,7 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	    mc.bp = bp ;
 	    mc.bl = bl ;
 	    mc.moff = 0 ;
-	    if ((rs = filebuf_start(fbp,tfd,0L,bsize,0)) >= 0) {
+	    if ((rs = filer_start(fbp,tfd,0L,bsize,0)) >= 0) {
 	        for (int mi = 0 ; mi < op->msgs_total ; mi += 1) {
 		    bool	f = false ;
 		    bool	fcopy = false ;
@@ -1044,13 +1044,13 @@ static int mailbox_rewriter(mailbox *op,int tfd) noex {
 	                u_seek(mfd,op->mblen,SEEK_SET) ;
 	                mc.moff = op->mblen ;
 	            }
-	            rs = filebuf_writefd(fbp,bp,bl,mfd,-1) ;
+	            rs = filer_writefd(fbp,bp,bl,mfd,-1) ;
 	            elen = rs ;
 	            wlen += rs ;
 	        } /* end if (finishing off) */
-	        rs1 = filebuf_finish(fbp) ;
+	        rs1 = filer_finish(fbp) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    if (rs >= 0) {
 /* extend the mailbox file if necessary (rarely happens?) */
 	        if ((op->mblen + elen) < (mbchange + wlen)) {
@@ -1088,7 +1088,7 @@ static int mailbox_msgcopy(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	        rs = mailbox_msgcopyadd(op,mcp,mip) ;
 	        wlen += rs ;
 	    } else {
-	        rs = filebuf_writefd(mcp->fbp,mcp->bp,mcp->bl,mfd,mip->mlen) ;
+	        rs = filer_writefd(mcp->fbp,mcp->bp,mcp->bl,mfd,mip->mlen) ;
 	        wlen += rs ;
 	    }
 	    mcp->moff += wlen ;
@@ -1104,14 +1104,14 @@ static int mailbox_msgcopyadd(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	int		wlen = 0 ;
 	int		wl = mcp->bl ;
 	char		*wp = mcp->bp ;
-	if ((rs = filebuf_writefd(mcp->fbp,wp,wl,mfd,ehlen)) >= 0) {
+	if ((rs = filer_writefd(mcp->fbp,wp,wl,mfd,ehlen)) >= 0) {
 	    wlen += rs ;
 	    if (mip->f.addany && mip->f.hdradds) {
 		vecstr	*hlp = &mip->hdradds ;
 	        cchar	*sp{} ;
 	        for (int i = 0 ; vecstr_get(hlp,i,&sp) >= 0 ; i += 1) {
 	            if (sp) {
-	                rs = filebuf_writehdr(mcp->fbp,sp,-1) ;
+	                rs = filer_writehdr(mcp->fbp,sp,-1) ;
 	                wlen += rs ;
 		    }
 	            if (rs < 0) break ;
@@ -1120,10 +1120,10 @@ static int mailbox_msgcopyadd(mailbox *op,MSGCOPY *mcp,MB_MI *mip) noex {
 	    if (rs >= 0) {
 		wl = mcp->bl ;
 		wp = mcp->bp ;
-	        rs = filebuf_writefd(mcp->fbp,wp,wl,mfd,(mip->blen+1)) ;
+	        rs = filer_writefd(mcp->fbp,wp,wl,mfd,(mip->blen+1)) ;
 	        wlen += rs ;
 	    }
-	} /* end if (filebuf_writefd) */
+	} /* end if (filer_writefd) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mailbox_msgcopyadd) */

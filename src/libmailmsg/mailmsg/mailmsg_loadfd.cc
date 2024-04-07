@@ -31,7 +31,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<rmx.h>
 #include	<localmisc.h>
 
@@ -80,11 +80,11 @@ int mailmsg_loadfd(mailmsg *op,int mfd,off_t fbo) noex {
 		cint	llen = (rs * MAILMSG_MF) ;
 		char	*lbuf{} ;
 		if ((rs = uc_malloc((llen+1),&lbuf)) >= 0) {
-		    filebuf	b ;
+		    filer	b ;
 	    	    cchar	*lp = lbuf ;
-	            if ((rs = filebuf_start(&b,mfd,fbo,bsize,0)) >= 0) {
+	            if ((rs = filer_start(&b,mfd,fbo,bsize,0)) >= 0) {
 			int	line = 0 ;
-	                while ((rs = filebuf_readln(&b,lbuf,llen,-1)) > 0) {
+	                while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	                    int		ll = rs ;
 	                    tlen += ll ;
 	                    while ((ll > 0) && ISEND(lbuf[0])) {
@@ -96,9 +96,9 @@ int mailmsg_loadfd(mailmsg *op,int mfd,off_t fbo) noex {
 	                    }
 	                    if (rs <= 0) break ;
 	                } /* end while (reading lines) */
-	                rs1 = filebuf_finish(&b) ;
+	                rs1 = filer_finish(&b) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (filebuf) */
+	            } /* end if (filer) */
 	    	    rs1 = uc_free(lbuf) ;
 	    	    if (rs >= 0) rs = rs1 ;
 		} /* end if (memory-allocation) */

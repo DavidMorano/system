@@ -64,7 +64,7 @@
 #include	<vechand.h>
 #include	<strpack.h>
 #include	<field.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<termout.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -1536,16 +1536,16 @@ static int procdial(PROGINFO *pip,void *ofp,cchar *ap)
 static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp)
 {
 	LOCINFO		*lip = pip->lip ;
-	FILEBUF		b ;
-	const int	opts = (FILEBUF_ONET&0) ;
+	FILER		b ;
+	const int	opts = (FILER_ONET&0) ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filebuf_start(&b,s,0L,512,opts)) >= 0) {
+	if ((rs = filer_start(&b,s,0L,512,opts)) >= 0) {
 	    const int	to = pip->to_read ;
 	    const int	llen = lbp->llen ;
 	    char	*lbuf = lbp->lbuf ;
-	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 		cchar	*lp = lbuf ;
 		int	ll = rs ;
 
@@ -1582,9 +1582,9 @@ static int procdialread(PROGINFO *pip,void *ofp,int s,LINEBUF *lbp)
 
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procdialread) */
@@ -1822,16 +1822,16 @@ static int procsystemread(PROGINFO *pip,void *ofp,CM *conp,LINEBUF *lbp)
 static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp)
 {
 	LOCINFO		*lip = pip->lip ;
-	FILEBUF		b ;
-	const int	opts = FILEBUF_ONET ;
+	FILER		b ;
+	const int	opts = FILER_ONET ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filebuf_start(&b,fd,0L,512,opts)) >= 0) {
+	if ((rs = filer_start(&b,fd,0L,512,opts)) >= 0) {
 	    const int	llen = lbp->llen ;
 	    const int	to = pip->to_read ;
 	    char	*lbuf = lbp->lbuf ;
-	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        cchar	*lp = lbuf ;
 	        int	ll = rs ;
 
@@ -1857,9 +1857,9 @@ static int procsystemout(PROGINFO *pip,void *ofp,int fd,LINEBUF *lbp)
 	        } /* end if (ok) */
 
 	    } /* end while (reading lines) */
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procsystemout) */

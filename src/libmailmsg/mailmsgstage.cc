@@ -57,7 +57,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<fdliner.h>
 #include	<vechand.h>
 #include	<comparse.h>
@@ -140,12 +140,12 @@ static inline int mailmsgstage_magic(MMS *op,Args ... args) noex {
 static int	mailmsgstage_starts(MMS *,int,cc *) noex ;
 static int	mailmsgstage_starter(MMS *,int) noex ;
 static int	mailmsgstage_g(MMS *,int) noex ;
-static int	mailmsgstage_gmsg(MMS *,filebuf *,fdliner *,int) noex ;
-static int	mailmsgstage_gmsgbody(MMS *,filebuf *,fdliner *,
+static int	mailmsgstage_gmsg(MMS *,filer *,fdliner *,int) noex ;
+static int	mailmsgstage_gmsgbody(MMS *,filer *,fdliner *,
 			msgentry *) noex ;
-static int	mailmsgstage_gmsgent(MMS *,filebuf *,fdliner *,
+static int	mailmsgstage_gmsgent(MMS *,filer *,fdliner *,
 			cchar *,int,int) noex ;
-static int	mailmsgstage_gmsgenter(MMS *,filebuf *,fdliner *,
+static int	mailmsgstage_gmsgenter(MMS *,filer *,fdliner *,
 			msgentry *) noex ;
 static int	mailmsgstage_msgfins(MMS *) noex ;
 static int	mailmsgstage_gmsgentnew(MMS *,msgentry **) noex ;
@@ -550,12 +550,12 @@ int mailmsgstage_bodyread(MMS *op,int mi,off_t boff,
 /* private subroutines */
 
 static int mailmsgstage_g(MMS *op,int ifd) noex {
-	filebuf		tfb ;
+	filer		tfb ;
 	const off_t	ostart = 0L ;
 	int		rs ;
 	int		rs1 ;
 	int		n = 0 ;
-	if ((rs = filebuf_start(&tfb,op->tfd,ostart,0,0)) >= 0) {
+	if ((rs = filer_start(&tfb,op->tfd,ostart,0,0)) >= 0) {
 	    fdliner	ls, *lsp = &ls ;
 	    cint	to = op->to ;
 	    if ((rs = fdliner_start(lsp,ifd,ostart,to)) >= 0) {
@@ -567,15 +567,15 @@ static int mailmsgstage_g(MMS *op,int ifd) noex {
 	        rs1 = fdliner_finish(lsp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (liner) */
-	    rs1 = filebuf_finish(&tfb) ;
+	    rs1 = filer_finish(&tfb) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailmsgstage_g) */
 
 /* parse out the headers of this message */
-static int mailmsgstage_gmsg(MMS *op,filebuf *tfp,
+static int mailmsgstage_gmsg(MMS *op,filer *tfp,
 		fdliner *lsp,int mi) noex {
 	mmenvdat	me ;
 	int		rs = SR_OK ;
@@ -614,7 +614,7 @@ static int mailmsgstage_gmsg(MMS *op,filebuf *tfp,
 }
 /* end subroutine (mailmsgstage_gmsg) */
 
-static int mailmsgstage_gmsgent(MMS *op,filebuf *tfp,fdliner *lsp,
+static int mailmsgstage_gmsgent(MMS *op,filer *tfp,fdliner *lsp,
 		cchar *lp,int ll,int f_eoh) noex {
 	msgentry	*mep ;
 	int		rs ;
@@ -652,7 +652,7 @@ static int mailmsgstage_gmsgent(MMS *op,filebuf *tfp,fdliner *lsp,
 }
 /* end subroutine (mailmsgstage_gmsgent) */
 
-static int mailmsgstage_gmsgenter(MMS *op,filebuf *tfp,fdliner *lsp,
+static int mailmsgstage_gmsgenter(MMS *op,filer *tfp,fdliner *lsp,
 		msgentry *mep) noex {
 	int		rs ;
 	int		ll = 0 ;
@@ -667,7 +667,7 @@ static int mailmsgstage_gmsgenter(MMS *op,filebuf *tfp,fdliner *lsp,
 }
 /* end subroutine (mailmsgstage_gmsgenter) */
 
-static int mailmsgstage_gmsgbody(MMS *op,filebuf *tfp,fdliner *lsp,
+static int mailmsgstage_gmsgbody(MMS *op,filer *tfp,fdliner *lsp,
 		msgentry *mep) noex {
 	int		rs = SR_OK ;
 	int		nmax = INT_MAX ;
@@ -699,7 +699,7 @@ static int mailmsgstage_gmsgbody(MMS *op,filebuf *tfp,fdliner *lsp,
 	        if (f_env) break ;
 	    }
 	    if (rs >= 0) {
-	        rs = filebuf_write(tfp,lp,ll) ;
+	        rs = filer_write(tfp,lp,ll) ;
 	    }
 	    if (rs < 0) break ;
 	    blen += ll ;

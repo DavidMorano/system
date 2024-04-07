@@ -28,7 +28,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<utypedefs.h>
@@ -36,7 +35,10 @@
 #include	<clanguage.h>
 
 
-struct ucopeninfo {
+#define	UCOPENINFO	ucopeninfo_head
+
+
+struct ucopeninfo_head {
 	mainv		envv ;
 	cchar		*fname ;
 	int		clinks ;
@@ -45,6 +47,14 @@ struct ucopeninfo {
 	int		opts ;
 	mode_t		operms ;
 } ;
+
+typedef UCOPENINFO	ucopeninfo ;
+
+EXTERNC_begin
+
+extern int	uc_openinfo(ucopeninfo *) noex ;
+
+EXTERNC_end
 
 
 #endif /* UCOPENINFO_INCLUDE */

@@ -121,7 +121,7 @@
 #include	<getutmpent.h>
 #include	<fsdir.h>
 #include	<ptm.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<termout.h>
 #include	<grmems.h>
 #include	<sysrealname.h>
@@ -2600,16 +2600,16 @@ static int procregouter(PROGINFO *pip,cchar **av,SHIO *ofp)
 static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
 {
 	LOCINFO		*lip = pip->lip ;
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 	    const int	to = pip->to_read ;
 	    const int	llen = LINEBUFLEN ;
 	    int		len ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    while ((rs = filebuf_readlns(&b,lbuf,llen,to,NULL)) > 0) {
+	    while ((rs = filer_readlns(&b,lbuf,llen,to,NULL)) > 0) {
 	        len = rs ;
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -2629,9 +2629,9 @@ static int procregouterterm(PROGINFO *pip,void *ofp,int fd)
 	        }
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (procregouterterm) */

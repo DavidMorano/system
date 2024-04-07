@@ -85,7 +85,7 @@
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -122,7 +122,7 @@ extern int	getpwd(char *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filebuf_writefill(FILEBUF *,const void *,int) ;
+extern int	filer_writefill(FILER *,const void *,int) ;
 extern int	iceil(int,int) ;
 extern int	isNotPresent(int) ;
 
@@ -174,9 +174,9 @@ static int	bvimk_listbegin(BVIMK *,int) ;
 static int	bvimk_listend(BVIMK *) ;
 static int	bvimk_mkidx(BVIMK *) ;
 static int	bvimk_mkidxwrmain(BVIMK *,BVIHDR *) ;
-static int	bvimk_mkidxwrhdr(BVIMK *,BVIHDR *,FILEBUF *) ;
-static int	bvimk_mkidxwrverses(BVIMK *,BVIHDR *,FILEBUF *,int) ;
-static int	bvimk_mkidxwrlines(BVIMK *,BVIHDR *,FILEBUF *,int) ;
+static int	bvimk_mkidxwrhdr(BVIMK *,BVIHDR *,FILER *) ;
+static int	bvimk_mkidxwrverses(BVIMK *,BVIHDR *,FILER *,int) ;
+static int	bvimk_mkidxwrlines(BVIMK *,BVIHDR *,FILER *,int) ;
 static int	bvimk_nidxopen(BVIMK *) ;
 static int	bvimk_nidxclose(BVIMK *) ;
 static int	bvimk_renamefiles(BVIMK *) ;
@@ -662,7 +662,7 @@ static int bvimk_mkidx(BVIMK *op)
 
 static int bvimk_mkidxwrmain(BVIMK *op,BVIHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -673,7 +673,7 @@ static int bvimk_mkidxwrmain(BVIMK *op,BVIHDR *hdrp)
 	debugprintf("bvimk_mkidxwrmain: ent\n") ;
 #endif
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = bvimk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {
@@ -685,9 +685,9 @@ static int bvimk_mkidxwrmain(BVIMK *op,BVIHDR *hdrp)
 	            off += rs ;
 	        }
 	    } /* end if (bvimk_mkidxwrhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 #if	CF_DEBUGS
 	debugprintf("bvimk_mkidxwrmain: ret rs=%d off=%u\n",rs,off) ;
 #endif
@@ -697,7 +697,7 @@ static int bvimk_mkidxwrmain(BVIMK *op,BVIHDR *hdrp)
 
 
 /* ARGSUSED */
-static int bvimk_mkidxwrhdr(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp)
+static int bvimk_mkidxwrhdr(BVIMK *op,BVIHDR *hdrp,FILER *hfp)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -708,10 +708,10 @@ static int bvimk_mkidxwrhdr(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp)
 #endif
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = bvihdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    rs = filebuf_writefill(hfp,hbuf,rs) ;
+	    rs = filer_writefill(hfp,hbuf,rs) ;
 	    wlen += rs ;
 #if	CF_DEBUGS
-	debugprintf("bvimk_mkidxwrhdr: filebuf_writefill() rs=%d\n",rs) ;
+	debugprintf("bvimk_mkidxwrhdr: filer_writefill() rs=%d\n",rs) ;
 #endif
 	}
 #if	CF_DEBUGS
@@ -722,7 +722,7 @@ static int bvimk_mkidxwrhdr(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp)
 /* end subroutine (bvimk_mkidxwrhdr) */
 
 
-static int bvimk_mkidxwrverses(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp,int off)
+static int bvimk_mkidxwrverses(BVIMK *op,BVIHDR *hdrp,FILER *hfp,int off)
 {
 	struct bventry	*bvep ;
 	uint		a[4] ;
@@ -739,7 +739,7 @@ static int bvimk_mkidxwrverses(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp,int off)
 	        a[2] = bvep->li ;
 	        a[3] = bvep->citation ;
 	        n += 1 ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;
@@ -753,7 +753,7 @@ static int bvimk_mkidxwrverses(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp,int off)
 /* end subroutine (bvimk_mkidxwrverses) */
 
 
-static int bvimk_mkidxwrlines(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp,int off)
+static int bvimk_mkidxwrlines(BVIMK *op,BVIHDR *hdrp,FILER *hfp,int off)
 {
 	struct blentry	*blep ;
 	uint		a[4] ;
@@ -768,7 +768,7 @@ static int bvimk_mkidxwrlines(BVIMK *op,BVIHDR *hdrp,FILEBUF *hfp,int off)
 	        a[0] = blep->loff ;
 	        a[1] = blep->llen ;
 	        n += 1 ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        wlen += rs ;
 	    }
 	    if (rs < 0) break ;

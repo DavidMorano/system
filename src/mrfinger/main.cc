@@ -744,7 +744,7 @@ const char	query[] ;
 	int	rs ;
 	int	s ;
 	int	len ;
-	int	fbo = FILEBUF_ONET ;
+	int	fbo = FILER_ONET ;
 	int	wlen = 0 ;
 
 	char	querybuf[QUERYLEN + 1], *bp = querybuf ;
@@ -766,16 +766,16 @@ const char	query[] ;
 
 	rs = u_write(s,querybuf,(bp - querybuf)) ;
 	if (rs >= 0) {
-	    FILEBUF	rd ;
+	    FILER	rd ;
 
 	    u_shutdown(s,SHUT_WR) ;
 
-	    rs = filebuf_start(&rd,s,0L,BUFLEN,fbo) ;
+	    rs = filer_start(&rd,s,0L,BUFLEN,fbo) ;
 	    if (rs >= 0) {
 
 	        while (rs >= 0) {
 
-	            rs = filebuf_readln(&rd,linebuf,LINEBUFLEN,to) ;
+	            rs = filer_readln(&rd,linebuf,LINEBUFLEN,to) ;
 	            len = rs ;
 	            if (rs <= 0)
 	                break ;
@@ -791,7 +791,7 @@ const char	query[] ;
 
 	        } /* end while */
 
-	        filebuf_finish(&rd) ;
+	        filer_finish(&rd) ;
 	    } /* end if (initialized file buffer) */
 
 	} /* end if (successful write) */

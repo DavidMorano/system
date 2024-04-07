@@ -113,7 +113,7 @@
 #include	<mallocstuff.h>
 #include	<getax.h>
 #include	<bfile.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -3461,7 +3461,7 @@ int	fd ;
 
 static int blowoff(int fd)
 {
-	FILEBUF	b ;
+	FILER	b ;
 
 	bfile	src, *sfp = &src ;
 
@@ -3472,7 +3472,7 @@ static int blowoff(int fd)
 
 
 	if ((rs = bopen(sfp,fn,"r",0666)) >= 0) {
-	    if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 		const int	llen = LINEBUFLEN ;
 		char		lbuf[LINEBUFLEN+3] ;
 
@@ -3483,14 +3483,14 @@ static int blowoff(int fd)
 
 		    lbuf[len++] = '\r' ;
 		    lbuf[len++] = '\n' ;
-		    rs = filebuf_write(&b,lbuf,len) ;
+		    rs = filer_write(&b,lbuf,len) ;
 		    wlen += rs ;
 
 		    if (rs < 0) break ;
 		} /* end while (reading lines) */
 
-		filebuf_finish(&b) ;
-	    } /* end if (filebuf) */
+		filer_finish(&b) ;
+	    } /* end if (filer) */
 	    bclose(sfp) ;
 	} /* end if (open source) */
 
