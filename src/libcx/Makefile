@@ -275,26 +275,7 @@ control:
 	(uname -n ; date) > Control
 
 
-mtime.o:		mtime.c mtime.h
-
-strtoimax.o:		strtoimax.c
-strtoumax.o:		strtoumax.c
-strtointmax.o:		strtointmax.c
-strtouintmax.o:		strtouintmax.c
-
-
-
-# testing
-
-X01= testsigpending
-
-X01OBJ= $(X01).o u_sigpending.o
-
-X01OBJS= $(CRTFRONT) $(X01OBJ) $(CRTC) $(CRTBACK)
-
-$(X01).o:		$(X01).c
-
-$(X01).x:		$(X01OBJ) Makefile
-	$(LD) -o $@ $(X01OBJS) $(XLIBDIRS) $(XLIBS) -lc
+strtoimax.o:		strtoimax.cc
+strtoumax.o:		strtoumax.cc
 
 

@@ -1,8 +1,8 @@
-	Notes:
+	Pipes:
 
-	In the old days (or on many BSD type UNIX® systems to the present day)
-	the two resulting pipe ends from |pipe(2)| were unidirectional as
-	follows:
+	In the old days (or on many BSD type UNIX® systems to the
+	present day) the two resulting pipe ends from |pipe(2)|
+	were unidirectional as follows:
 
 	end	access
 	---------------
@@ -10,5 +10,4 @@
 	1	writing
 
 	With the advent of SYSV UNIX® both ends are bidirectional.
-
 

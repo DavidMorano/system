@@ -45,6 +45,8 @@
 #include	<aflag.hh>
 #include	<localmisc.h>
 
+#include	"uopen.h"
+
 
 /* local defines */
 

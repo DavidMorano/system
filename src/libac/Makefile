@@ -60,7 +60,7 @@ OBJ0_LIBAC= isalpha.o isdigit.o
 OBJ1_LIBAC= strlen.o strncasecmp.o
 OBJ2_LIBAC= strlcat.o strlcpy.o strncpy.o 
 OBJ3_LIBAC= basename.o dirname.o 
-OBJ4_LIBAC= fork1.o mkdir.o
+OBJ4_LIBAC= fork1.o
 
 
 OBJA_LIBAC= obj0_libac.o obj1_libac.o

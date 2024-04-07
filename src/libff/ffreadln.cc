@@ -1,20 +1,18 @@
-/* ffreadline */
+/* ffreadln SUPPORT */
+/* lang=C++20 */
 
 /* read a coded line from the STDIO stream */
-
+/* version %I% last-modified %G% */
 
 #define	CF_FGETS	1	/* faster or not? */
-
 
 /* revision history:
 
 	= 1986-01-17, David A­D­ Morano
-
 	This subroutine was originally written.
 
 	= 2001-09-10, David A­D­ Morano
-
-	I discovered that on the SGI Irix systems, 'getc()' does
+	I discovered that on the SGI Irix systems, |getc()| does
 	not seem to work properly so I hacked it out for that
 	system.
 
@@ -34,17 +32,13 @@
 	With 'fgets(3c)', it will never write more than the user's
 	supplied length of bytes.
 
-
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<stdio.h>
-#include	<errno.h>
-#include	<string.h>
-
+#include	<cerrno>
+#include	<cstdio>
+#include	<cstring>
 #include	<usystem.h>
 
 #include	"ffile.h"
@@ -64,34 +58,32 @@
 #define	TO_AGAIN	(5*60)
 
 #if	CF_FGETS
-static int ffreadline_gets(FFILE *,char *,int) ;
+static int ffreadln_gets(FFILE *,char *,int) ;
 #else
-static int ffreadline_getc(FFILE *,char *,int) ;
+static int ffreadln_getc(FFILE *,char *,int) ;
 #endif /* CF_FGETS */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int ffreadline(fp,buf,len)
-FFILE	*fp ;
-char	buf[] ;
-int	len ;
-{
-	int	rs = SR_OK ;
-	int	to = TO_AGAIN ;
-
-
-	if (fp == NULL) return SR_FAULT ;
-	if (buf == NULL) return SR_FAULT ;
-	if (len < 1) return SR_INVALID ;
-
+int ffreadln(FILE *fp,char *rbuf,int rlen) noex {
+	uint		to = utimeout[uto_again] ;
+	int		rs = SR_FAULT ;
+	if (fd && rbuf) {
+	    rs = SR_INVALID ;
+	    if (len >= 0) {
 again:
 	if (len > 0) {
 #if	CF_FGETS
-	    rs = ffreadline_gets(fp,buf,len) ;
+	    rs = ffreadln_gets(fp,buf,len) ;
 #else
-	    rs = ffreadline_getc(fp,buf,len) ;
+	    rs = ffreadln_getc(fp,buf,len) ;
 #endif /* CF_FGETS */
 	}
 
@@ -108,17 +100,18 @@ again:
 	    } /* end switch */
 	} /* end if */
 
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (ffreadline) */
+/* end subroutine (ffreadln) */
 
 
 /* local subroutines */
 
-
 #if	CF_FGETS
 
-static int ffreadline_gets(fp,buf,len)
+static int ffreadln_gets(fp,buf,len)
 FFILE		*fp ;
 char		*buf ;
 int		len ;
@@ -143,11 +136,11 @@ int		len ;
 
 	return rs ;
 }
-/* end subroutine (ffreadline_gets) */
+/* end subroutine (ffreadln_gets) */
 
 #else /* CF_FGETS */
 
-static int ffreadline_getc(fp,buf,len)
+static int ffreadln_getc(fp,buf,len)
 FFILE		*fp ;
 char		*buf ;
 int		len ;
@@ -167,9 +160,8 @@ int		len ;
 	*bp = '\0' ;
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (ffreadline_getc) */
+/* end subroutine (ffreadln_getc) */
 
 #endif /* CF_FGETS */
-
 
 
