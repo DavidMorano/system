@@ -243,6 +243,15 @@
 #define	CUTMPX		const UTMPX
 #endif
 
+#ifndef	CRLIMIT
+#define	CRLIMIT		const RLIMIT
+#endif
+
+#ifndef	CIOVEC
+#define	CIOVEC		const IOVEC
+#endif
+
+
 /* SYSDB account management structures */
 
 #ifndef	PASSWD

@@ -121,7 +121,7 @@ extern int	u_exit(int) noex ;
 extern int	u_kill(pid_t,int) noex ;
 extern int	u_waitpid(pid_t,int *,int) noex ;
 extern int	u_getrlimit(int,RLIMIT *) noex ;
-extern int	u_setrlimit(int,const RLIMIT *) noex ;
+extern int	u_setrlimit(int,CRLIMIT *) noex ;
 extern int	u_nice(int) noex ;
 
 extern int	u_mknod(cchar *,mode_t,dev_t) noex ;
@@ -135,10 +135,7 @@ extern int	u_lstat(cchar *,USTAT *) noex ;
 extern int	u_creat(cchar *,mode_t) noex ;
 extern int	u_open(cchar *,int,mode_t) noex ;
 
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
 extern int	u_getdents(int,dirent_t *,int) noex ;
-#endif
-
 extern int	u_fchdir(int) noex ;
 extern int	u_fsync(int) noex ;
 extern int	u_pipe(int *) noex ;
@@ -155,7 +152,7 @@ extern int	u_read(int,void *,int) noex ;
 extern int	u_readv(int,IOVEC *,int) noex ;
 extern int	u_pread(int,void *,int,off_t) noex ;
 extern int	u_write(int,cvoid *,int) noex ;
-extern int	u_writev(int,const IOVEC *,int) noex ;
+extern int	u_writev(int,CIOVEC *,int) noex ;
 extern int	u_pwrite(int,cvoid *,int,off_t) noex ;
 
 extern int	u_fpathconf(int,int,long *) noex ;

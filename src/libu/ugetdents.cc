@@ -30,7 +30,7 @@
 	be avoided.
 
 	Synopsis:
-	int u_getdents(int fd,struct dirent *dbuf,int dsize) noex
+	int u_getdents(int fd,struct dirent *dbuf,int dsz) noex
 
 	Returns:
 	>=0		size of data returned
@@ -38,11 +38,12 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/dirent.h>
 #include	<errno.h>
 #include	<usystem.h>
+#include	<usysflag.h>
 #include	<localmisc.h>
 
 
@@ -54,13 +55,32 @@
 
 /* exported subroutines */
 
-int u_getdents(int fd,DIRENT *dbuf,int dsize) noex {
+#if	defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) 
+
+int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
 	int		rs ;
 	repeat {
-	    if ((rs = getdents(fd,dbuf,dsize)) < 0) rs = (- errno) ;
+	    if ((rs = getdents(fd,dbuf,dsz)) < 0) rs = (- errno) ;
 	} until (rs != SR_INTR) ;
 	return rs ;
 }
 /* end subroutine (u_getdents) */
 
+#else /* defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) */
+
+int u_getdents(int fd,DIRENT *dbuf,int dsz) noex {
+	int		rs = SR_FAULT ;
+	if (dbuf) {
+	    rs = SR_INVALID ;
+	    if (dsz >= 0) {
+	        rs = SR_BADF ;
+	        if (fd >= 0) {
+	            rs = SR_NOSYS ;
+	        } /* end if (not BADFD) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+
+#endif /* defined(SYSHAS_GETDENTS) && (SYSHAS_GETDENTS > 0) */
 
