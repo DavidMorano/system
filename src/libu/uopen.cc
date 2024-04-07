@@ -76,7 +76,7 @@ namespace {
 	int		pf ;
 	int		st ;
 	int		pr ;
-	int		flavor ;
+	int		flavor{} ;
 	opener() noex { } ;
 	opener(int adfd) noex : dfd(adfd) { } ;
 	opener(int apf,int ast,int apr,int *ap = nullptr) noex : pf(apf) {
@@ -274,10 +274,13 @@ int opener::isocket(cchar *,int,mode_t) noex {
 int opener::isocketpair(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
 	if (pipes) {
-	    if ((rs = socketpair(pf,st,pf,pipes)) < 0) {
-		rs = (- errno) ;
-	    }
-	} /* end if (valid) */
+	    rs = SR_INVALID ;
+	    if ((pf >= 0) && (st >= 0) && (pr >= 0)) {
+	        if ((rs = socketpair(pf,st,pf,pipes)) < 0) {
+		    rs = (- errno) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (opener::isocketpair) */
@@ -295,6 +298,7 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 
 int opener::fdcloseonexec(int fd) noex {
 	int		rs = SR_OK ;
+	int		rs1 ;
 	switch (flavor) {
 	case flavor_single:
 	    if (fd >= 0) {
@@ -306,7 +310,8 @@ int opener::fdcloseonexec(int fd) noex {
 	    if (pipes) {
 		for (int i = 0 ; i < flavor_overlast ; i += 1) {
 		    if (pipes[i] >= 0) {
-			u_closeonexec(pipes[i],true) ;
+			rs1 = u_closeonexec(pipes[i],true) ;
+			if (rs >= 0) rs = rs1 ;
 		    }
 	        } /* end for */
 	    }
