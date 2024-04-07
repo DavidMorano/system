@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
+#include	<unistd.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<filer.h>
@@ -55,7 +56,7 @@ EXTERNC_begin
 
 extern int fdliner_start(fdliner *,int,off_t,int) noex ;
 extern int fdliner_finish(fdliner *) noex ;
-extern int fdliner_read(fdliner *,cchar **) noex ;
+extern int fdliner_getln(fdliner *,cchar **) noex ;
 extern int fdliner_done(fdliner *) noex ;
 
 EXTERNC_end

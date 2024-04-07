@@ -647,7 +647,7 @@ static int mailbox_parsemsg(mailbox *op,fbliner *lsp,int mi) noex {
 	    int		vi = 0 ;
 	    cchar	*lp ;
 /* find message start */
-	    while ((rs = fbliner_read(lsp,&lp)) >= 0) {
+	    while ((rs = fbliner_getln(lsp,&lp)) >= 0) {
 	        ll = rs ;
 	        if (ll == 0) break ;
 	        if ((rs >= 0) && (ll > 5) && FMAT(lp) &&
@@ -706,7 +706,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,
 
 /* read headers (ignoring envelope) */
 
-	    while ((rs >= 0) && ((rs = fbliner_read(lsp,&lp)) >= 0)) {
+	    while ((rs >= 0) && ((rs = fbliner_getln(lsp,&lp)) >= 0)) {
 	        ll = rs ;
 	        if (ll == 0) break ;
 	        if ((ll > 2) && (! pip->f.fenv) && 
@@ -807,7 +807,7 @@ static int mailbox_parsemsger(mailbox *op,mmenvdat *mep,
 	            pip->f.fbol = true ;
 	            clines = 0 ;
 	            while ((rs >= 0) && (clines < linemax) && 
-	                ((rs = fbliner_read(lsp,&lp)) >= 0)) {
+	                ((rs = fbliner_getln(lsp,&lp)) >= 0)) {
 	                ll = rs ;
 	                if (ll == 0) break ;
 	                pip->f.feol = (lp[ll-1] == '\n') ;

@@ -4,7 +4,6 @@
 /* get the NIS domain name for the current host */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGFILE	0		/* test the file-reading code */
 
 /* revision history:

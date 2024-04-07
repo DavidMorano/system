@@ -29,35 +29,13 @@
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 
 #include	"usys_xxx.h"
 
-
-/* local defines */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported subroutines */
 
 /*----------------------------------------------------------------------------*/
 /* USERATTR begin */
@@ -127,5 +105,19 @@ int plock(int) noex {
 #endif /* (! defined(SYSHAS_MEMPLOCK)) || (SYSHAS_MEMPLOCK == 0) */
 /* MEMPLOCK end */
 /*----------------------------------------------------------------------------*/
+
+
+int xxx_ugetnisdom(char *rbuf,int rlen) noex {
+	int		ec = EFAULT ;
+	if (rbuf) {
+	    ec = EINVAL ;
+	    if (rlen >= 0) {
+		ec = ENOSYS ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+	return (- ec) ;
+}
+/* end subroutine (xxx_ugetnisdom) */
 
 

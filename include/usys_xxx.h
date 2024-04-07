@@ -40,6 +40,13 @@
 #include	<clanguage.h>
 
 
+EXTERNC_begin
+
+extern int xxx_ugetnisdom(char *,int) noex ;
+
+EXTERNC_end
+
+
 /*----------------------------------------------------------------------------*/
 /* SECDB begin */
 #if	(!defined(SYSHAS_SECDB)) || (SYSHAS_SECDB == 0)

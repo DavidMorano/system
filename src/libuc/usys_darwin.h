@@ -32,6 +32,17 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
+EXTERNC_begin
+
+extern int	darwin_ugetnisdom(char *,int) noex ;
+
+EXTERNC_end
+
 
 /* USYSDARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
@@ -39,11 +50,10 @@
 #include	<sys/types.h>
 #include	<sys/wait.h>		/* <- type |idtype_t| is there */
 #include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<signal.h>
+#include	<csignal>
+#include	<ctime>
 #include	<pthread.h>
 #include	<semaphore.h>
-#include	<time.h>
-#include	<clanguage.h>
 
 
 #ifndef	SIGEVENT

@@ -24,13 +24,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-
-/* USYS_DARWIN start */
-#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
-
-#include	<sys/types.h>
-#include	<sys/mman.h>
-#include	<unistd.h>
 #include	<cerrno>
 #include	<climits>
 #include	<cstring>
@@ -41,36 +34,19 @@
 #include	"usys_darwin.h"
 
 
-/* local defines */
+/* USYS_DARWIN start */
+#if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
+#include	<sys/types.h>
+#include	<sys/mman.h>
+#include	<unistd.h>		/* |getdomainname(3darwin)| */
 
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported subroutines */
 
 /*----------------------------------------------------------------------------*/
 /* TIMER begin */
 #if	(!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0)
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
 int timer_create(clockid_t,SIGEVENT *,timer_t *tmp) noex {
 	int	ec = EFAULT ;
@@ -100,9 +76,7 @@ int timer_getoverrun(timer_t) noex {
     return ENOSYS ;
 }
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 #endif /* (!defined(SYSHAS_TIMER)) || (SYSHAS_TIMER == 0) */
 /* TIMER end */
@@ -140,6 +114,33 @@ int memcntl(void *ma,size_t ms,int,void *,int,int) noex {
 }
 /* MEMCNTL end */
 /*----------------------------------------------------------------------------*/
+
+
+int darwin_ugetnisdom(char *rbuf,int rlen) noex {
+	int		rs ;
+	if ((rs = getdomainname(rbuf,(rlen+1))) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (darwin_ugetnisdom) */
+
+
+#else /* other operating systems */
+
+
+int darwin_ugetnisdom(char *rbuf,int rlen) noex {
+	int		ec = EFAULT ;
+	if (rbuf) {
+	    ec = EINVAL ;
+	    if (rlen >= 0) {
+		ec = ENOSYS ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	if (ec) errno = ec ;
+	return (- ec) ;
+}
+/* end subroutine (darwin_ugetnisdom) */
 
 
 #endif /* defined(OSNAME_Darwin) && (OSNAME_Darwin > 0) */
