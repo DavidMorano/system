@@ -83,13 +83,12 @@
 #include	<string.h>
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<estrings.h>
 #include	<vecint.h>
 #include	<osetint.h>
 #include	<strtab.h>
 #include	<bfile.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<localmisc.h>
 #include	<hash.h>
@@ -168,7 +167,7 @@ extern int	getpwd(char *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	msleep(int) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
 extern int	hasuc(const char *,int) ;
 extern int	isNotPresent(int) ;
 
@@ -218,13 +217,13 @@ static int	txtindexmks_addtag(TXTINDEXMKS *,TXTINDEXMKS_TAG *) ;
 static int	txtindexmks_mkhash(TXTINDEXMKS *) ;
 static int	txtindexmks_mkhashwrmain(TXTINDEXMKS *,TXTINDEXHDR *) ;
 static int	txtindexmks_mkhashwrhdr(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILEBUF *,int) ;
+			FILER *,int) ;
 static int	txtindexmks_mkhashwrtab(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILEBUF *,int) ;
+			FILER *,int) ;
 static int	txtindexmks_mkhashwreigen(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILEBUF *,int) ;
+			FILER *,int) ;
 static int	txtindexmks_mkhashwrtabone(TXTINDEXMKS *,TXTINDEXHDR *,
-			FILEBUF *,int,int *,int) ;
+			FILER *,int,int *,int) ;
 static int	txtindexmks_nhashopen(TXTINDEXMKS *) ;
 static int	txtindexmks_nhashclose(TXTINDEXMKS *) ;
 static int	txtindexmks_ntagclose(TXTINDEXMKS *) ;
@@ -932,7 +931,7 @@ static int txtindexmks_mkhash(TXTINDEXMKS *op)
 
 static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -940,19 +939,19 @@ static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
 	int		rs1 ;
 	int		off = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = txtindexmks_mkhashwrhdr(op,hdrp,hfp,off)) >= 0) {
 	        off += rs ;
 /* write SDN string */
 	        if ((rs >= 0) && (op->pi.sdn != NULL)) {
 	            hdrp->sdnoff = off ;
-	            rs = filebuf_writefill(hfp,op->pi.sdn,-1) ;
+	            rs = filer_writefill(hfp,op->pi.sdn,-1) ;
 	            off += rs ;
 	        }
 /* write SFN string */
 	        if ((rs >= 0) && (op->pi.sfn != NULL)) {
 	            hdrp->sfnoff = off ;
-	            rs = filebuf_writefill(hfp,op->pi.sfn,-1) ;
+	            rs = filer_writefill(hfp,op->pi.sfn,-1) ;
 	            off += rs ;
 	        }
 /* write out the lists while creating the offset table */
@@ -966,9 +965,9 @@ static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
 	            off += rs ;
 	        }
 	    } /* end if (txtindexmks_mkhashwrhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
 }
 /* end subroutine (txtindexmks_mkhashwrmain) */
@@ -976,7 +975,7 @@ static int txtindexmks_mkhashwrmain(TXTINDEXMKS *op,TXTINDEXHDR *hdrp)
 
 /* ARGSUSED */
 static int txtindexmks_mkhashwrhdr(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILEBUF *hfp,int off)
+		FILER *hfp,int off)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -985,7 +984,7 @@ static int txtindexmks_mkhashwrhdr(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = txtindexhdr(hdrp,0,hbuf,hlen)) >= 0) {
 	    const int	bl = rs ;
-	    rs = filebuf_writefill(hfp,hbuf,bl) ;
+	    rs = filer_writefill(hfp,hbuf,bl) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -994,7 +993,7 @@ static int txtindexmks_mkhashwrhdr(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 
 
 static int txtindexmks_mkhashwrtab(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILEBUF *hfp,int off)
+		FILER *hfp,int off)
 {
 	int		*table = NULL ;
 	const int	tsize = op->pi.tablen * sizeof(uint) ;
@@ -1012,7 +1011,7 @@ static int txtindexmks_mkhashwrtab(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 	    hdrp->taboff = off ;
 	    if (rs >= 0) {
 	        const int	tsize = op->pi.tablen * sizeof(uint) ;
-	        rs = filebuf_write(hfp,table,tsize) ;
+	        rs = filer_write(hfp,table,tsize) ;
 	        off += rs ;
 	        wlen += rs ;
 	    }
@@ -1025,7 +1024,7 @@ static int txtindexmks_mkhashwrtab(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 
 /* ARGSUSED */
 static int txtindexmks_mkhashwrtabone(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILEBUF *hfp,int off,int *tab,int i)
+		FILER *hfp,int off,int *tab,int i)
 {
 	LISTOBJ		*lop = (LISTOBJ *) op->lists ;
 	int		rs ;
@@ -1042,16 +1041,16 @@ static int txtindexmks_mkhashwrtabone(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 	                const int	csize = sizeof(int) ;
 	                op->clists += 1 ;
 	                tab[i] = off ;
-	                if ((rs = filebuf_write(hfp,&c,csize)) >= 0) {
+	                if ((rs = filer_write(hfp,&c,csize)) >= 0) {
 	                    off += rs ;
 	                    wlen += rs ;
 	                    if (c > 0) {
 	                        const int	vsize = (c*sizeof(uint)) ;
-	                        rs = filebuf_write(hfp,va,vsize) ;
+	                        rs = filer_write(hfp,va,vsize) ;
 	                        off += rs ;
 	                        wlen += rs ;
 	                    }
-	                } /* end if (filebuf_write) */
+	                } /* end if (filer_write) */
 	            } /* end if (positive) */
 	        } /* end if (LISTINT_MKVEC) */
 	        uc_free(va) ;
@@ -1065,7 +1064,7 @@ static int txtindexmks_mkhashwrtabone(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 
 
 static int txtindexmks_mkhashwreigen(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
-		FILEBUF *hfp,int off)
+		FILER *hfp,int off)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -1095,7 +1094,7 @@ static int txtindexmks_mkhashwreigen(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 #endif
 
 	            if (rs >= 0) {
-	                rs = filebuf_write(hfp,estab,essize) ;
+	                rs = filer_write(hfp,estab,essize) ;
 	                off += rs ;
 	                wlen += rs ;
 	            }
@@ -1137,7 +1136,7 @@ static int txtindexmks_mkhashwreigen(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 #endif
 
 	                    if (rs >= 0) {
-	                        rs = filebuf_write(hfp,ertab,ersize) ;
+	                        rs = filer_write(hfp,ertab,ersize) ;
 	                        off += rs ;
 	                        wlen += rs ;
 	                    }
@@ -1176,7 +1175,7 @@ static int txtindexmks_mkhashwreigen(TXTINDEXMKS *op,TXTINDEXHDR *hdrp,
 #endif
 
 	                    if (rs >= 0) {
-	                        rs = filebuf_write(hfp,eitab,eisize) ;
+	                        rs = filer_write(hfp,eitab,eisize) ;
 	                        off += rs ;
 	                        wlen += rs ;
 	                    }

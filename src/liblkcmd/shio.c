@@ -84,7 +84,7 @@
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<bfile.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<outstore.h>
 #include	<localmisc.h>
 
@@ -417,13 +417,13 @@ int shio_opentmp(SHIO *op,mode_t om)
 
 	if ((rs = mkpath2(template,tmpdname,tfn)) >= 0) {
 	    SIGBLOCK	blocker ;
-	    if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
+	    if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
 	        char	tbuf[MAXPATHLEN+1] ;
 	        if ((rs = mktmpfile(tbuf,om,template)) >= 0) {
 	            rs = shio_opene(op,tbuf,"rw",om,-1) ;
 	            uc_unlink(tbuf) ;
 	        } /* end if (mktmpfile) */
-	        sigblock_finish(&blocker) ;
+	        sigblocker_finish(&blocker) ;
 	    } /* end if (sigblock) */
 	} /* end if (mkpath) */
 

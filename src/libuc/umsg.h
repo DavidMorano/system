@@ -19,8 +19,9 @@
 
 /*******************************************************************************
 
-	This file contains the subroutine declarations for the
-	UNIX® system STREAMS message interface.
+	This file contains the subroutine declarations for the UNIX®
+	system Inter-Process-Communication (IPC) messaging (MSG)
+	facility interface.
 
 	Names:
 	u_msgctl

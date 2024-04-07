@@ -70,7 +70,7 @@
 
 /* external subroutines */
 
-extern int	hashelf(const void *,int) ;
+extern int	hash_elf(const void *,int) ;
 
 
 /* external variables */
@@ -132,7 +132,7 @@ const char	name[] ;
 #endif
 
 	if (rvp == NULL) {
-	    uint	h = hashelf(name,-1) ;
+	    uint	h = hash_elf(name,-1) ;
 
 	    rs = randomvar_start(&x,FALSE,h) ;
 	    if (rs >= 0) f_rv = TRUE ;

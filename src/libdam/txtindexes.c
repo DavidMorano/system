@@ -73,7 +73,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
 #include	<char.h>

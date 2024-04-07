@@ -36,7 +36,7 @@
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<nulstr.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"var.h"

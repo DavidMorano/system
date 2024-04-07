@@ -80,11 +80,10 @@
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<estrings.h>
 #include	<ids.h>
 #include	<storebuf.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<tmtime.h>
 #include	<localmisc.h>
@@ -119,7 +118,7 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	filebuf_writefill(FILEBUF *,const void *,int) ;
+extern int	filer_writefill(FILER *,const void *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -178,10 +177,10 @@ static int	cyimk_listend(CYIMK *) ;
 
 static int	cyimk_mkidx(CYIMK *) ;
 static int	cyimk_mkidxmain(CYIMK *,CYIHDR *) ;
-static int	cyimk_mkidxhdr(CYIMK *,CYIHDR *,FILEBUF *) ;
-static int	cyimk_mkidxstrs(CYIMK *,CYIHDR *,FILEBUF *,int) ;
-static int	cyimk_mkidxents(CYIMK *,CYIHDR *,FILEBUF *,int) ;
-static int	cyimk_mkidxlines(CYIMK *,CYIHDR *,FILEBUF *,int) ;
+static int	cyimk_mkidxhdr(CYIMK *,CYIHDR *,FILER *) ;
+static int	cyimk_mkidxstrs(CYIMK *,CYIHDR *,FILER *,int) ;
+static int	cyimk_mkidxents(CYIMK *,CYIHDR *,FILER *,int) ;
+static int	cyimk_mkidxlines(CYIMK *,CYIHDR *,FILER *,int) ;
 static int	cyimk_nidxopen(CYIMK *) ;
 static int	cyimk_nidxclose(CYIMK *) ;
 static int	cyimk_renamefiles(CYIMK *) ;
@@ -750,7 +749,7 @@ static int cyimk_mkidx(CYIMK *op)
 
 static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -758,7 +757,7 @@ static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 	int		rs1 ;
 	int		off = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = cyimk_mkidxhdr(op,hdrp,hfp)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {
@@ -774,16 +773,16 @@ static int cyimk_mkidxmain(CYIMK *op,CYIHDR *hdrp)
 	            off += rs ;
 	        }
 	    } /* end if (cyimk_mkidxhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
 }
 /* end subroutine (cyimk_mkidxmain) */
 
 
 /* ARGSUSED */
-static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp)
+static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILER *hfp)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -791,7 +790,7 @@ static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp)
 	char		hbuf[HDRBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = cyihdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    rs = filebuf_writefill(hfp,hbuf,rs) ;
+	    rs = filer_writefill(hfp,hbuf,rs) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -799,7 +798,7 @@ static int cyimk_mkidxhdr(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp)
 /* end subroutine (cyimk_mkidxhdr) */
 
 
-static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
+static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -808,15 +807,15 @@ static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
 	hdrp->diroff = off ;
 	if ((rs = pathclean(tbuf,op->idname,-1)) >= 0) {
 	    int	tl = rs ;
-	    if ((rs = filebuf_writefill(hfp,tbuf,(tl+1))) >= 0) {
+	    if ((rs = filer_writefill(hfp,tbuf,(tl+1))) >= 0) {
 	        tl = strlen(op->cname) ;
 	        off += rs ;
 	        wlen += rs ;
 	        hdrp->caloff = off ;
-	        rs = filebuf_writefill(hfp,op->cname,(tl+1)) ;
+	        rs = filer_writefill(hfp,op->cname,(tl+1)) ;
 	        off += rs ;
 	        wlen += rs ;
-	    } /* end if (filebuf_writefill) */
+	    } /* end if (filer_writefill) */
 	} /* end if (pathclean) */
 
 	return (rs >= 0) ? wlen : rs ;
@@ -824,7 +823,7 @@ static int cyimk_mkidxstrs(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
 /* end subroutine (cyimk_mkidxstrs) */
 
 
-static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
+static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 {
 	struct bventry	*bvep ;
 	vecobj		*elp = &op->verses ;
@@ -844,7 +843,7 @@ static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
 	        a[3] = bvep->citation ;
 	        a[4] = bvep->hash ;
 	        n += 1 ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        off += rs ;
 	        wlen += rs ;
 	    }
@@ -857,7 +856,7 @@ static int cyimk_mkidxents(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
 /* end subroutine (cyimk_mkidxents) */
 
 
-static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
+static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILER *hfp,int off)
 {
 	struct blentry	*blep ;
 	vecobj		*llp = &op->lines ;
@@ -874,7 +873,7 @@ static int cyimk_mkidxlines(CYIMK *op,CYIHDR *hdrp,FILEBUF *hfp,int off)
 	        a[0] = blep->loff ;
 	        a[1] = blep->llen ;
 	        n += 1 ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        off += rs ;
 	        wlen += rs ;
 	    }

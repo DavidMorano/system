@@ -64,7 +64,7 @@
 #include	<ptc.h>
 #include	<sigblocker.h>
 #include	<filemap.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<mkchar.h>
 #include	<strnxcmp.h>		/* <- for |strnncmp(3uc)| */
 #include	<localmisc.h>
@@ -745,24 +745,24 @@ int utmpacc::getentline(ARG *ap,cchar *lp,int ll) noex {
 /* end method (utmpacc::getentline) */
 
 int utmpacc::getextract(int fd) noex {
-	filebuf		fb ;
+	filer		fb ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
-	if ((rs = filebuf_start(&fb,fd,0z,0,0)) >= 0) {
+	if ((rs = filer_start(&fb,fd,0z,0,0)) >= 0) {
 	    {
 	        constexpr int	ul = sizeof(UTMPX) ;
 	        CUTMPX	*up ;
 	        setutxent() ;
 	        while ((up = getutxent()) != nullptr) {
-		    rs = filebuf_write(&fb,up,ul) ;
+		    rs = filer_write(&fb,up,ul) ;
 	            if (rs < 0) break ;
 	        } /* end while (reading UTMPX entries) */
 	        endutxent() ;
 	    } /* end block */
-	    rs1 = filebuf_finish(&fb) ;
+	    rs1 = filer_finish(&fb) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end method (utmpacc::getextract) */

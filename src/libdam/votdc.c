@@ -44,11 +44,11 @@
 #include	<getbufsize.h>
 #include	<intceil.h>
 #include	<estrings.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<getax.h>
 #include	<localmisc.h>
 
@@ -112,9 +112,9 @@ extern int	strnnlen(const char *,int,int) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	msleep(uint) ;
 extern int	isOneOf(const int *,int) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
-extern int	filebuf_writezero(FILEBUF *,int) ;
-extern int	filebuf_writealign(FILEBUF *,int) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
+extern int	filer_writezero(FILER *,int) ;
+extern int	filer_writealign(FILER *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
@@ -329,7 +329,7 @@ int votdc_titleloads(VOTDC *op,cchar *lang,cchar **tv)
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 #if	CF_DEBUGS
 		debugprintf("votdc_titleloads: locked\n") ;
@@ -343,7 +343,7 @@ int votdc_titleloads(VOTDC *op,cchar *lang,cchar **tv)
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
@@ -376,7 +376,7 @@ int votdc_titlelang(VOTDC *op,cchar *lang)
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	            int		bi ;
 	            const char	*blang ;
@@ -391,7 +391,7 @@ int votdc_titlelang(VOTDC *op,cchar *lang)
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
@@ -420,7 +420,7 @@ int votdc_titleget(VOTDC *op,char *rbuf,int rlen,int li,int ti)
 	if ((ti < 0) || (ti >= VOTDC_NTITLES)) return SR_INVALID ;
 
 	rbuf[0] = '\0' ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votdc_access(op)) >= 0) {
 		    VOTDC_BOOK	*bep = (op->books+li) ;
@@ -432,7 +432,7 @@ int votdc_titleget(VOTDC *op,char *rbuf,int rlen,int li,int ti)
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
@@ -458,7 +458,7 @@ int votdc_titlefetch(VOTDC *op,char *rbuf,int rlen,cchar *lang,int ti)
 	if ((ti < 0) || (ti >= VOTDC_NTITLES)) return SR_INVALID ;
 
 	rbuf[0] = '\0' ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votdc_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -482,7 +482,7 @@ int votdc_titlefetch(VOTDC *op,char *rbuf,int rlen,cchar *lang,int ti)
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
@@ -507,7 +507,7 @@ int votdc_titlematch(VOTDC *op,cchar *lang,cchar *sp,int sl)
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (sp[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votdc_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -534,7 +534,7 @@ int votdc_titlematch(VOTDC *op,cchar *lang,cchar *sp,int sl)
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
@@ -564,7 +564,7 @@ int		mjd ;
 	if (lang == NULL) return SR_FAULT ;
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (mjd < 0) return SR_INVALID ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	        if ((rs = votdc_booklanghave(op,lang)) >= 0) {
 	            int	li = rs ;
@@ -581,7 +581,7 @@ int		mjd ;
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
@@ -618,7 +618,7 @@ int		vl ;
 	if (vp == NULL) return SR_FAULT ;
 	if (vp[0] == '\0') return SR_INVALID ;
 	if (mjd < 0) return SR_INVALID ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votdc_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -680,7 +680,7 @@ int		vl ;
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
@@ -702,7 +702,7 @@ int votdc_info(VOTDC *op,VOTDC_INFO *bip)
 
 	if (op->magic != VOTDC_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	        VOTDCHDR	*hdrp = &op->hdr ;
 	        int		n, i ;
@@ -727,7 +727,7 @@ int votdc_info(VOTDC *op,VOTDC_INFO *bip)
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 
@@ -770,7 +770,7 @@ int votdc_vcurenum(VOTDC *op,VOTDC_VCUR *curp,VOTDC_CITE *citep,
 #if	CF_DEBUGS
 	debugprintf("votdc_vcurenum: ent\n") ;
 #endif
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		const int	vi = (curp->i >= 0) ? (curp->i+1) : 0 ;
 		if ((rs = votdc_verseslotnext(op,vi)) >= 0) {
@@ -785,7 +785,7 @@ int votdc_vcurenum(VOTDC *op,VOTDC_VCUR *curp,VOTDC_CITE *citep,
 	        rs1 = ptm_unlock(op->mp) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (mutex) */
-	    rs1 = sigblock_finish(&s) ;
+	    rs1 = sigblocker_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
@@ -1111,7 +1111,7 @@ VOTDCHDR	*hdrp ;
 const char	hbuf[] ;
 int		hlen ;
 {
-	FILEBUF		sfile, *sfp = &sfile ;
+	FILER		sfile, *sfp = &sfile ;
 	const int	bsize = 2048 ;
 	int		rs ;
 	int		rs1 ;
@@ -1121,100 +1121,100 @@ int		hlen ;
 	op->shmsize = 0 ;
 	if (dt == 0) dt = time(NULL) ;
 
-	if ((rs = filebuf_start(sfp,fd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(sfp,fd,0,bsize,0)) >= 0) {
 	    const int	asize = SHMALLOC_ALIGNSIZE ;
 
 	    if (rs >= 0) {
-	        rs = filebuf_write(sfp,hbuf,hlen) ;
+	        rs = filer_write(sfp,hbuf,hlen) ;
 	        foff += rs ;
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDC_MUSIZE ;
 		    hdrp->muoff = foff ;
 		    hdrp->musize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDC_BOOKSIZE ;
 		    hdrp->bookoff = foff ;
 		    hdrp->booklen = VOTDC_NBOOKS ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDC_VERSESIZE ;
 		    hdrp->recoff = foff ;
 		    hdrp->reclen = VOTDC_NVERSES ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = sizeof(SHMALLOC) ;
 		    hdrp->balloff = foff ;
 		    hdrp->ballsize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = sizeof(SHMALLOC) ;
 		    hdrp->valloff = foff ;
 		    hdrp->vallsize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDC_BSTRSIZE ;
 		    hdrp->bstroff = foff ;
 		    hdrp->bstrlen = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDC_VSTRSIZE ;
 		    hdrp->vstroff = foff ;
 		    hdrp->vstrlen = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
 		size = iceil(foff,op->pagesize) - foff ;
-		rs = filebuf_writezero(sfp,size) ;
+		rs = filer_writezero(sfp,size) ;
 	        foff += rs ;
 	    }
 
-	    rs1 = filebuf_finish(sfp) ;
+	    rs1 = filer_finish(sfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	hdrp->shmsize = foff ;
 	return (rs >= 0) ? foff : rs ;

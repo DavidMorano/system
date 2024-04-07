@@ -42,7 +42,7 @@
 #include	<ctype.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
 #include	<usystem.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<getbufsize.h>
 #include	<mktmp.h>
 #include	<estrings.h>

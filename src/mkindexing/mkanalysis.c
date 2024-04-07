@@ -51,6 +51,7 @@
 #include	<field.h>
 #include	<hdbstr.h>
 #include	<vecint.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"config.h"

@@ -58,7 +58,7 @@
 /* external subroutines */
 
 extern uint	nextpowtwo(uint) ;
-extern uint	hashelf(const void *,int) ;
+extern uint	hash_elf(const void *,int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 
@@ -242,7 +242,7 @@ SSH_ENT	**rpp ;
 	    return SR_FAULT ;
 
 	*rpp = NULL ;
-	rhash = hashelf(&ia,sizeof(uint)) ;
+	rhash = hash_elf(&ia,sizeof(uint)) ;
 
 #if	CF_DEBUGS
 	debugprintf("ssh_lookup: rhash=%08x\n",rhash) ;

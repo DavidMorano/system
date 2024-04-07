@@ -56,7 +56,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vecstr.h>

@@ -66,7 +66,7 @@
 #include	<bfile.h>
 #include	<userinfo.h>
 #include	<vecstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1186,17 +1186,17 @@ static int procsearch(PROGINFO *pip,VECSTR *nlp)
 	args[i] = NULL ;
 
 	if ((rs = uc_openprog(pfname,of,args,NULL)) >= 0) {
-	    FILEBUF	b ;
+	    FILER	b ;
 	    const int	fd = rs ;
 
-	    if ((rs = filebuf_start(&b,fd,0L,2048,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,2048,0)) >= 0) {
 	        const int	llen = LINEBUFLEN ;
 	        int		line = 0 ;
 	        int		f_bol = TRUE ;
 	        int		f_eol ;
 	        char		lbuf[LINEBUFLEN+1] ;
 
-	        while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	            int	len = rs ;
 
 #if	CF_DEBUG
@@ -1219,9 +1219,9 @@ static int procsearch(PROGINFO *pip,VECSTR *nlp)
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
 
-	        rs1 = filebuf_finish(&b) ;
+	        rs1 = filer_finish(&b) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;

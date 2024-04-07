@@ -55,7 +55,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 
@@ -179,7 +179,7 @@ static int mailboxappender(cchar *mbfname,int sfd,int slen,int to)
 	            rs,offend) ;
 #endif
 
-	        if ((rs = sigblock_start(&blocker,NULL)) >= 0) {
+	        if ((rs = sigblocker_start(&blocker,NULL)) >= 0) {
 
 	            rs = uc_writedesc(tfd,sfd,slen) ;
 	            wlen = rs ;
@@ -191,7 +191,7 @@ static int mailboxappender(cchar *mbfname,int sfd,int slen,int to)
 	            if (rs < 0)
 	                uc_ftruncate(tfd,offend) ;
 
-	            rs1 = sigblock_finish(&blocker) ;
+	            rs1 = sigblocker_finish(&blocker) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end block (sigblock) */
 

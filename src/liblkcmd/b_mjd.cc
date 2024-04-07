@@ -60,7 +60,6 @@
 #include	<vecstr.h>
 #include	<tmtime.h>
 #include	<dayspec.h>
-#include	<filebuf.h>
 #include	<ourmjd.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

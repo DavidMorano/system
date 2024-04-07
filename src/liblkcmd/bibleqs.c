@@ -77,7 +77,6 @@
 #include	<ascii.h>
 #include	<field.h>
 #include	<sbuf.h>
-#include	<endianstr.h>
 #include	<localmisc.h>
 
 #include	"naturalwords.h"

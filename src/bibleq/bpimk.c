@@ -83,9 +83,8 @@
 
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -129,7 +128,7 @@ extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -172,8 +171,8 @@ static int	bpimk_listbegin(BPIMK *,int) ;
 static int	bpimk_listend(BPIMK *) ;
 static int	bpimk_mkidx(BPIMK *) ;
 static int	bpimk_mkidxwrmain(BPIMK *,BPIHDR *) ;
-static int	bpimk_mkidxwrhdr(BPIMK *,BPIHDR *,FILEBUF *,int) ;
-static int	bpimk_mkidxwrtab(BPIMK *,BPIHDR *,FILEBUF *,int) ;
+static int	bpimk_mkidxwrhdr(BPIMK *,BPIHDR *,FILER *,int) ;
+static int	bpimk_mkidxwrtab(BPIMK *,BPIHDR *,FILER *,int) ;
 static int	bpimk_nidxopen(BPIMK *) ;
 static int	bpimk_nidxclose(BPIMK *) ;
 static int	bpimk_renamefiles(BPIMK *) ;
@@ -601,7 +600,7 @@ static int bpimk_mkidx(BPIMK *op)
 
 static int bpimk_mkidxwrmain(BPIMK *op,BPIHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -609,7 +608,7 @@ static int bpimk_mkidxwrmain(BPIMK *op,BPIHDR *hdrp)
 	int		rs1 ;
 	int		off = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = bpimk_mkidxwrhdr(op,hdrp,hfp,off)) >= 0) {
 	        off += rs ;
 	        if (rs >= 0) {
@@ -617,16 +616,16 @@ static int bpimk_mkidxwrmain(BPIMK *op,BPIHDR *hdrp)
 	            off += rs ;
 	        }
 	    } /* end if (bpimk_mkidxwrhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? off : rs ;
 }
 /* end subroutine (bpimk_mkidxwrmain) */
 
 
 /* ARGSUSED */
-static int bpimk_mkidxwrhdr(BPIMK *op,BPIHDR *hdrp,FILEBUF *hfp,int off)
+static int bpimk_mkidxwrhdr(BPIMK *op,BPIHDR *hdrp,FILER *hfp,int off)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -635,7 +634,7 @@ static int bpimk_mkidxwrhdr(BPIMK *op,BPIHDR *hdrp,FILEBUF *hfp,int off)
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = bpihdr(hdrp,0,hbuf,hlen)) >= 0) {
 	    const int	bl = rs ;
-	    rs = filebuf_writefill(hfp,hbuf,bl) ;
+	    rs = filer_writefill(hfp,hbuf,bl) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -643,7 +642,7 @@ static int bpimk_mkidxwrhdr(BPIMK *op,BPIHDR *hdrp,FILEBUF *hfp,int off)
 /* end subroutine (bpimk_mkidxwrhdr) */
 
 
-static int bpimk_mkidxwrtab(BPIMK *op,BPIHDR *hdrp,FILEBUF *hfp,int off)
+static int bpimk_mkidxwrtab(BPIMK *op,BPIHDR *hdrp,FILER *hfp,int off)
 {
 	struct bventry	*bvep ;
 	uint		a[4] ;
@@ -656,7 +655,7 @@ static int bpimk_mkidxwrtab(BPIMK *op,BPIHDR *hdrp,FILEBUF *hfp,int off)
 	for (i = 0 ; vecobj_get(&op->verses,i,&bvep) >= 0 ; i += 1) {
 	    if (bvep != NULL) {
 	        a[0] = bvep->citation ;
-	        rs = filebuf_write(hfp,a,size) ;
+	        rs = filer_write(hfp,a,size) ;
 	        wlen += rs ;
 	        n += 1 ;
 	    }

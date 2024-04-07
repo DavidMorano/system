@@ -44,7 +44,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<mallocxx.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<sfx.h>
 #include	<sncpyxw.h>
 #include	<localmisc.h>
@@ -89,10 +89,10 @@ int filereadln(cchar *fn,char *rbuf,int rlen) noex {
 		    cint	of = O_RDONLY ;
 		    cmode	om = 0666 ;
 	            if ((rs = uc_open(fn,of,om)) >= 0) {
-	                filebuf		b ;
+	                filer		b ;
 	                cint		fd = rs ;
-	                if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
-	                    while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	                if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
+	                    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 				int	cl ;
 		                cchar	*cp{} ;
 		                if ((cl = sfcontent(lbuf,rs,&cp)) > 0) {
@@ -102,9 +102,9 @@ int filereadln(cchar *fn,char *rbuf,int rlen) noex {
 	                        if (len > 0) break ;
 	                        if (rs < 0) break ;
 	                    } /* end while (reading lines) */
-	                    rs1 = filebuf_finish(&b) ;
+	                    rs1 = filer_finish(&b) ;
 		            if (rs >= 0) rs = rs1 ;
-	                } /* end if (filebuf) */
+	                } /* end if (filer) */
 	                rs1 = uc_close(fd) ;
 	                if (rs >= 0) rs = rs1 ;
 	            } /* end if (uc_open) */

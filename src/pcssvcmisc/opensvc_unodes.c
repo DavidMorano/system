@@ -63,7 +63,7 @@
 
 #include	<usystem.h>
 #include	<pcsunodes.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -162,23 +162,23 @@ static int process(int wfd,cchar *pr)
 
 static int pcsunodes_trans(PCSUNODES *unp,int wfd,char *nbuf,int nlen)
 {
-	FILEBUF		fb ;
+	FILER		fb ;
 	int		rs ;
 	int		rs1 ;
-	if ((rs = filebuf_start(&fb,wfd,0L,0,0)) >= 0) {
+	if ((rs = filer_start(&fb,wfd,0L,0,0)) >= 0) {
 	    PCSUNODES_CUR	cur ;
 	    if ((rs = pcsunodes_curbegin(unp,&cur)) >= 0) {
 		while ((rs = pcsunodes_enum(unp,&cur,nbuf,nlen)) >= 0) {
-		    rs = filebuf_println(&fb,nbuf,rs) ;
+		    rs = filer_println(&fb,nbuf,rs) ;
 		    if (rs < 0) break ;
 		} /* end while */
 		if (rs == SR_NOTFOUND) rs = SR_OK ;
 		rs1 = pcsunodes_curend(unp,&cur) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (pcsunodes-cur) */
-	    rs1 = filebuf_finish(&fb) ;
+	    rs1 = filer_finish(&fb) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return rs ;
 }
 /* end subroutine (pcsunodes_trans) */

@@ -1,16 +1,16 @@
-/* opentermnote */
+/* opentermnote SUPPORT */
+/* lang=C++20 */
 
 /* open a channel to send a note to a terminal */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
 	= 2013-04-20, David A­D­ Morano
         This subroutine was originally written. It obviously just takes
-        advantange of the 'termnote(3dam)' object.
+        advantange of the |termnote(3dam)| object.
 
 */
 
@@ -18,10 +18,14 @@
 
 /*******************************************************************************
 
-	This subroutine will open a channel for writing a note to a terminal.
+	Name:
+	opentermnote
+
+	Description:
+	This subroutine will open a channel for writing a note to
+	a terminal.
 
 	Synopsis:
-
 	int opentermnote(pr,recips,max,opts)
 	const char	*pr ;
 	const char	**recips ;
@@ -29,7 +33,6 @@
 	int		opts ;
 
 	Arguments:
-
 	pr		program-root
 	recips		array of username-strings to write to
 	max		maximum number of terminals for each user
@@ -37,17 +40,12 @@
 	wlen		length of bytes to write
 
 	Returns:
-
 	>=0		FD
-	<0		error
-
+	<0		error (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<signal.h>
@@ -56,9 +54,7 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
-#include	<filebuf.h>
 #include	<termnote.h>
 #include	<vecstr.h>
 #include	<exitcodes.h>

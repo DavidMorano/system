@@ -45,7 +45,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<absfn.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<hash.h>
 #include	<localmisc.h>
 

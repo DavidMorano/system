@@ -62,7 +62,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<holidays.h>
 #include	<localmisc.h>
 
@@ -102,7 +102,7 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	printhols(const char *,FILEBUF *,int,const char *) ;
+static int	printhols(const char *,FILER *,int,const char *) ;
 
 
 /* local variables */
@@ -152,14 +152,14 @@ int		to ;
 
 	if (rs >= 0) {
 	if ((rs = opentmp(NULL,0,0664)) >= 0) {
-	    FILEBUF	b ;
+	    FILER	b ;
 	    fd = rs ;
 
-	    if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 
 		rs = printhols(pr,&b,year,query) ;
 
-		filebuf_finish(&b) ;
+		filer_finish(&b) ;
 	    } /* end if (issue) */
 
 	    if (rs >= 0) u_rewind(fd) ;
@@ -177,7 +177,7 @@ int		to ;
 
 static int printhols(pr,fbp,year,query)
 const char	*pr ;
-FILEBUF		*fbp ;
+FILER		*fbp ;
 int		year ;
 const char	*query ;
 {
@@ -203,7 +203,7 @@ const char	*query ;
 		        if (vl == SR_NOTFOUND) break ;
 			rs = vl ;
 			if (rs >= 0) {
-			    rs = filebuf_println(fbp,vbuf,vl) ;
+			    rs = filer_println(fbp,vbuf,vl) ;
 			    wlen += rs ;
 			}
 		    } /* end while */

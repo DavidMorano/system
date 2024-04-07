@@ -6,15 +6,15 @@
 #include	<envstandards.h>
 #include	<stdio.h>
 #include	<usystem.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 #ifndef	UEBUFLEN
 #define	UEBUFLEN	UTMPACCENT_BUFLEN
 #endif
 
-#ifndef FILEBUF_RCNET
-#define	FILEBUF_RCNET	4		/* read-count for network */
+#ifndef FILER_RCNET
+#define	FILER_RCNET	4		/* read-count for network */
 #endif
 
 #ifndef	TIMEBUFLEN
@@ -76,15 +76,15 @@ int main(int argc,const char **argv,const char **envv)
 	        debugprintf("main: fn=%s\n",fn) ;
 #endif
 	        if ((rs = uc_open(fn,of,0666)) >= 0) {
-	            FILEBUF	b ;
+	            FILER	b ;
 	            const int	fo = (of | O_NETWORK) ;
 	            int		fd = rs ;
 #if	CF_DEBUGS
 	            debugprintf("main: uc_open() rs=%d\n",rs1) ;
 #endif
-	            if ((rs = filebuf_start(&b,fd,0L,0,fo)) >= 0) {
+	            if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
 	                const int	to = 5 ;
-	                while ((rs = filebuf_read(&b,lbuf,llen,to)) > 0) {
+	                while ((rs = filer_read(&b,lbuf,llen,to)) > 0) {
 	                    int	len = rs ;
 #if	CF_DEBUGS
 	                    debugprintf("main: readline() len=%d\n",len) ;
@@ -92,9 +92,9 @@ int main(int argc,const char **argv,const char **envv)
 	                    fbwrite(stdout,lbuf,len) ;
 	                    if (rs < 0) break ;
 	                } /* end while */
-	                rs1 = filebuf_finish(&b) ;
+	                rs1 = filer_finish(&b) ;
 			if (rs >= 0) rs = rs1 ;
-	            } /* end if (filebuf) */
+	            } /* end if (filer) */
 #if	CF_DEBUGS
 	            debugprintf("main: readline-out rs=%d\n",rs) ;
 #endif

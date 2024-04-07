@@ -42,7 +42,7 @@
 #include	<sysusernames.h>
 #include	<getusername.h>
 #include	<pcsns.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<nulstr.h>
 #include	<localmisc.h>
 
@@ -138,7 +138,7 @@ int subpcs_finish(SUBPCS *sip)
 /* end subroutine (subpcs_finish) */
 
 
-int subpcs_all(SUBPCS *sip,FILEBUF *ofp)
+int subpcs_all(SUBPCS *sip,FILER *ofp)
 {
 	SYSUSERNAMES	u ;
 	int		rs ;
@@ -161,7 +161,7 @@ int subpcs_all(SUBPCS *sip,FILEBUF *ofp)
 
 
 /* ARGSUSED */
-int subpcs_args(SUBPCS *sip,FILEBUF *ofp,ARGINFO *aip,BITS *bop,
+int subpcs_args(SUBPCS *sip,FILER *ofp,ARGINFO *aip,BITS *bop,
 		cchar *afn)
 {
 	const int	argc = aip->argc ;
@@ -195,7 +195,7 @@ int subpcs_args(SUBPCS *sip,FILEBUF *ofp,ARGINFO *aip,BITS *bop,
 /* end subroutine (subpcs_args) */
 
 
-int subpcs_af(SUBPCS *sip,FILEBUF *ofp,cchar *afn)
+int subpcs_af(SUBPCS *sip,FILER *ofp,cchar *afn)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -204,17 +204,17 @@ int subpcs_af(SUBPCS *sip,FILEBUF *ofp,cchar *afn)
 	    const mode_t	om = 0666 ;
 	    const int		of = O_RDONLY ;
 	    if ((rs = uc_open(afn,of,om)) >= 0) {
-		FILEBUF		afile, *afp = &afile ;
+		FILER		afile, *afp = &afile ;
 		const int	to = -1 ;
 		const int	afd = rs ;
-		if ((rs = filebuf_start(afp,afd,0L,0,0)) >= 0) {
+		if ((rs = filer_start(afp,afd,0L,0,0)) >= 0) {
 	            const int	llen = LINEBUFLEN ;
 	            int		len ;
 		    int		cl ;
 		    cchar	*cp ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            while ((rs = filebuf_readln(afp,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(afp,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	                if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -231,9 +231,9 @@ int subpcs_af(SUBPCS *sip,FILEBUF *ofp,cchar *afn)
 			if (rs < 0) break ;
 	            } /* end while (reading lines) */
 
-	            rs1 = filebuf_finish(afp) ;
+	            rs1 = filer_finish(afp) ;
 	    	    if (rs >= 0) rs = rs1 ;
-	        }  /* end if (filebuf) */
+	        }  /* end if (filer) */
 		u_close(afd) ;
 	    } /* end if (file) */
 	} /* end if (processing argument-list file) */
@@ -242,7 +242,7 @@ int subpcs_af(SUBPCS *sip,FILEBUF *ofp,cchar *afn)
 /* end subroutine (subpcs_af) */
 
 
-int subpcs_def(SUBPCS *sip,FILEBUF *ofp)
+int subpcs_def(SUBPCS *sip,FILER *ofp)
 {
 	const int	ulen = USERNAMELEN ;
 	int		rs ;
@@ -258,7 +258,7 @@ int subpcs_def(SUBPCS *sip,FILEBUF *ofp)
 /* end subroutine (subpcs_def) */
 
 
-int subpcs_users(SUBPCS *sip,FILEBUF *ofp,cchar *lbuf,int llen)
+int subpcs_users(SUBPCS *sip,FILER *ofp,cchar *lbuf,int llen)
 {
 	FIELD		fsb ;
 	int		rs ;
@@ -281,7 +281,7 @@ int subpcs_users(SUBPCS *sip,FILEBUF *ofp,cchar *lbuf,int llen)
 /* end subroutine (subpcs_users) */
 
 
-int subpcs_user(SUBPCS *sip,FILEBUF *ofp,cchar *sp,int sl)
+int subpcs_user(SUBPCS *sip,FILER *ofp,cchar *sp,int sl)
 {
 	NULSTR		n ;
 	const int	w = sip->w ;
@@ -293,7 +293,7 @@ int subpcs_user(SUBPCS *sip,FILEBUF *ofp,cchar *sp,int sl)
 	    const int	rlen = REALNAMELEN ;
 	    char	rbuf[REALNAMELEN+1] ;
 	    if ((rs = pcsns_get(&sip->ns,rbuf,rlen,un,w)) >= 0) {
-	        rs = filebuf_println(ofp,rbuf,rs) ;
+	        rs = filer_println(ofp,rbuf,rs) ;
 	        wlen += rs ;
 	    }
 	    rs1 = nulstr_finish(&n) ;

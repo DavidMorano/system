@@ -56,7 +56,7 @@
 #include	<usystem.h>
 #include	<mallocxx.h>
 #include	<bfile.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<fsdirtree.h>
 #include	<mkpathx.h>
 #include	<pathadd.h>
@@ -364,17 +364,17 @@ static int mkdirlist_procdircache(mkdirlist *op,cchar *ndname,int fd) noex {
 	char		dbuf[MAXPATHLEN+1] ;
 
 	if ((rs = mkpath1(dbuf,ndname)) >= 0) {
-	    filebuf	b ;
+	    filer	b ;
 	    cint	dlen = rs ;
 
-	    if ((rs = filebuf_start(&b,fd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,0,0)) >= 0) {
 	        USTAT	sb ;
 	        cint	nlen = MAXPATHLEN ;
 	        int	line = 0 ;
 	        int	f_bol = true ;
 	        int	f_eol ;
 	        char	nbuf[MAXPATHLEN+1] ;
-	        while ((rs = filebuf_readln(&b,nbuf,nlen,-1)) > 0) {
+	        while ((rs = filer_readln(&b,nbuf,nlen,-1)) > 0) {
 	            int		len = rs ;
 	            f_eol = (len && (nbuf[len-1] == '\n')) ;
 	            if (f_eol) nbuf[--len] = '\0' ;
@@ -395,7 +395,7 @@ static int mkdirlist_procdircache(mkdirlist *op,cchar *ndname,int fd) noex {
 	            f_bol = f_eol ;
 	            if (rs < 0) break ;
 	        } /* end while */
-	        rs1 = filebuf_finish(&b) ;
+	        rs1 = filer_finish(&b) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if */
 

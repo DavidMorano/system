@@ -7,7 +7,7 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<bfile.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 #ifndef	LINEBUFLEN
@@ -21,7 +21,7 @@ extern int	bufprintf(const char *,...) ;
 
 int main(int argc,const char **argv,const char **envv)
 {
-	FILEBUF	b ;
+	FILER	b ;
 
 	bfile	src, *sfp = &src ;
 
@@ -50,7 +50,7 @@ int main(int argc,const char **argv,const char **envv)
 
 #if	CF_REAL
 	if ((rs = bopen(sfp,fn,"r",0666)) >= 0) {
-	    if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 		const int	llen = LINEBUFLEN ;
 		char		lbuf[LINEBUFLEN+3] ;
 
@@ -61,21 +61,21 @@ int main(int argc,const char **argv,const char **envv)
 
 		    lbuf[len++] = '\r' ;
 		    lbuf[len++] = '\n' ;
-		    rs = filebuf_write(&b,lbuf,len) ;
+		    rs = filer_write(&b,lbuf,len) ;
 		    wlen += rs ;
 
 		    if (rs < 0) break ;
 		} /* end while (reading lines) */
 
-		filebuf_finish(&b) ;
-	    } /* end if (filebuf) */
+		filer_finish(&b) ;
+	    } /* end if (filer) */
 	    bclose(sfp) ;
 	} /* end if (open source) */
 #else /* CF_REAL */
 	rs = bopen(sfp,fn,"r",0666) ;
 	nprintf(DFNAME,"bopen() rs=%d\n",rs) ;
 	if (rs >= 0) {
-	    if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 		const int	llen = LINEBUFLEN ;
 		char		lbuf[LINEBUFLEN+3] ;
 
@@ -90,20 +90,20 @@ int main(int argc,const char **argv,const char **envv)
 
 		    lbuf[len++] = '\r' ;
 		    lbuf[len++] = '\n' ;
-		    rs = filebuf_write(&b,lbuf,len) ;
+		    rs = filer_write(&b,lbuf,len) ;
 		    wlen += rs ;
 
 		    if (rs < 0) break ;
 		} /* end while (reading lines) */
 
-		filebuf_finish(&b) ;
-	    } /* end if (filebuf) */
+		filer_finish(&b) ;
+	    } /* end if (filer) */
 	    bclose(sfp) ;
 	} /* end if (open source) */
-	    if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 	    const char	*resp = "hello there\r\n" ;
-		    rs = filebuf_write(&b,resp,strlen(resp)) ;
-		filebuf_finish(&b) ;
+		    rs = filer_write(&b,resp,strlen(resp)) ;
+		filer_finish(&b) ;
 	    }
 #endif /* CF_REAL */
 

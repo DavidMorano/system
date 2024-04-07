@@ -56,12 +56,9 @@
 #endif
 
 
-/* default name spaces */
+/* imported namespaces */
 
 using namespace		std ;		/* yes, we want punishment! */
-
-
-/* imported namespaces */
 
 
 /* local typedefs */
@@ -77,16 +74,16 @@ extern "C" int	wsnwcpynarrow(wchar_t *,int,cchar *,int) noex ;
 
 /* local structures */
 
-struct escinfo {
+namespace {
+    struct escinfo {
 	cchar		*csp ;			/* charset specification */
 	cchar		*edp ;			/* encoded data */
 	int		csl ;			/* charset specification */
 	int		edl ;			/* encoded data */
 	int		ech ;			/* encoding (character) */
 	int		skip ;			/* skip length */
-} ;
-
-class subinfo {
+    } ;
+    class subinfo {
 	hdrdecode	*op ;
 	wchar_t		*rarr ;
 	cchar		*sp ;
@@ -94,7 +91,6 @@ class subinfo {
 	int		rl ;
 	int		sl ;
 	int procreg(int) noex ;
-	int procreg(cchar *,int) noex ;
 	int procreger(cchar *,int) noex ;
 	int proctrans(ESCINFO *) noex ;
 	int proctranser(ESCINFO *,cchar *,int) noex ;
@@ -126,7 +122,7 @@ class subinfo {
 	    return c ;
 	} ;
 	int storetrans(int,cchar *,int) noex ;
-public:
+    public:
 	subinfo(hdrdecode *aop,wchar_t *ararr,int arlen) noex {
 	    op = aop ;
 	    rlen = arlen ;
@@ -142,7 +138,8 @@ public:
 	    return SR_OK ;
 	} ;
 	int proc() noex ;
-} ; /* end struct (subinfo) */
+    } ; /* end struct (subinfo) */
+}
 
 
 /* forward references */
@@ -186,7 +183,7 @@ static constexpr cpcchar	passes[] = {
 int hdrdecode_start(hdrdecode *op,cchar *pr) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
-	    memclear(op) ;		/* dangerous */
+	    memclear(op) ; /* dangerous */
 	    if (cchar *cp{} ; (rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	        op->pr = cp ;
 	        op->magic = HDRDECODE_MAGIC ;
@@ -279,9 +276,9 @@ int hdrdecode_proc(hdrdecode *op,wchar_t *rarr,int rlen,cchar *sp,int sl) noex {
 static int hdrdecode_b64decoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->b64p == nullptr) {
-	    cint	size = sizeof(b64decoder) ;
+	    cint	sz = sizeof(b64decoder) ;
 	    void	*p ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        op->b64p = (b64decoder *) p ;
 	        rs = b64decoder_start(op->b64p) ;
 	        if (rs < 0) {
@@ -297,9 +294,9 @@ static int hdrdecode_b64decoder(hdrdecode *op) noex {
 static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->qpp == nullptr) {
-	    cint	size = sizeof(qpdecoder) ;
+	    cint	sz = sizeof(qpdecoder) ;
 	    void	*p ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        op->qpp = (qpdecoder *) p ;
 	        rs = qpdecoder_start(op->qpp,true) ;
 	        if (rs < 0) {
@@ -315,9 +312,9 @@ static int hdrdecode_qpdecoder(hdrdecode *op) noex {
 static int hdrdecode_chartrans(hdrdecode *op) noex {
 	int		rs = SR_OK ;
 	if (op->ctp == nullptr) {
-	    cint	size = sizeof(chartrans) ;
+	    cint	sz = sizeof(chartrans) ;
 	    void	*p ;
-	    if ((rs = uc_malloc(size,&p)) >= 0) {
+	    if ((rs = uc_malloc(sz,&p)) >= 0) {
 	        op->ctp = (chartrans *) p ;
 	        rs = chartrans_open(op->ctp,op->pr,2) ;
 	        if (rs < 0) {
@@ -358,11 +355,6 @@ int subinfo::proc() noex {
 
 int subinfo::procreg(int n) noex {
 	return procreger(sp,n) ;
-}
-/* end subroutine (subinfo_procreg) */
-
-int subinfo::procreg(cchar *ep,int n) noex {
-	return procreger(ep,n) ;
 }
 /* end subroutine (subinfo_procreg) */
 
@@ -450,7 +442,7 @@ int subinfo::proctranser(ESCINFO *eip,cchar *tp,int tl) noex {
 /* end subroutine (subinfo::proctranser) */
 
 int subinfo::storetrans(int txid,cchar *tp,int tl) noex {
-	cint		rlen = (tl*sizeof(wchar_t)) ;
+	cint		rlen = (tl * sizeof(wchar_t)) ;
 	int		rs ;
 	int		wl = 0 ;
 	wchar_t		*rbuf{} ;

@@ -84,9 +84,9 @@
 
 #include	<usystem.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"ttimk.h"
@@ -132,7 +132,7 @@ extern int	cfhexi(const char *,int,uint *) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	filebuf_writefill(FILEBUF *,const void *,int) ;
+extern int	filer_writefill(FILER *,const void *,int) ;
 extern int	iceil(int,int) ;
 
 #if	CF_DEBUGS
@@ -596,7 +596,7 @@ TTIMK		*op ;
 	struct bventry	*bvep ;
 	struct blentry	*blep ;
 	TTIFU		hf ;
-	FILEBUF		bvifile ;
+	FILER		bvifile ;
 	time_t		daytime = time(NULL) ;
 	uint		fileoff = 0 ;
 	uint		a[4] ;
@@ -615,7 +615,7 @@ TTIMK		*op ;
 	    goto ret0 ;
 
 	size = (pagesize * 4) ;
-	rs = filebuf_start(&bvifile,op->nfd,0,size,0) ;
+	rs = filer_start(&bvifile,op->nfd,0,size,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
@@ -643,7 +643,7 @@ TTIMK		*op ;
 /* write header */
 
 	if (rs >= 0) {
-	    rs = filebuf_writefill(&bvifile,buf,bl) ;
+	    rs = filer_writefill(&bvifile,buf,bl) ;
 	    fileoff += rs ;
 	}
 
@@ -668,7 +668,7 @@ TTIMK		*op ;
 #endif
 
 	    n += 1 ;
-	    rs = filebuf_write(&bvifile,a,size) ;
+	    rs = filer_write(&bvifile,a,size) ;
 	    fileoff += rs ;
 	    if (rs < 0)
 		break ;
@@ -690,7 +690,7 @@ TTIMK		*op ;
 	    a[0] = blep->loff ;
 	    a[1] = blep->llen ;
 	    n += 1 ;
-	    rs = filebuf_write(&bvifile,a,size) ;
+	    rs = filer_write(&bvifile,a,size) ;
 	    fileoff += rs ;
 	    if (rs < 0)
 		break ;
@@ -701,7 +701,7 @@ TTIMK		*op ;
 
 /* write out the header -- again! */
 ret2:
-	filebuf_finish(&bvifile) ;
+	filer_finish(&bvifile) ;
 
 	if (rs >= 0) {
 

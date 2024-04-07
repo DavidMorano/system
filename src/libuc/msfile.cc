@@ -146,6 +146,7 @@
 #include	<endian.h>
 #include	<mapstrint.h>
 #include	<stdorder.h>
+#include	<matxstr.h>
 #include	<localmisc.h>
 
 #include	"msfile.h"
@@ -187,7 +188,6 @@ extern int	mkmagic(char *,int,cchar *) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	getfstype(char *,int,int) ;
 extern int	iceil(int,int) ;
-extern int	islocalfs(cchar *,int) ;
 extern int	isValidMagic(cchar *,int,cchar *) ;
 extern int	isNotPresent(int) ;
 
@@ -1531,24 +1531,18 @@ static int msfile_filesetinfo(MSFILE *op) noex {
 	USTAT		sb ;
 	int		rs ;
 	int		amode ;
-
 	amode = (op->oflags & O_ACCMODE) ;
 	op->f.writable = ((amode == O_WRONLY) || (amode == O_RDWR)) ;
-
-#if	CF_DEBUGS
-	debugprintf("msfile_open: f_writable=%u\n",op->f.writable) ;
-#endif
-
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+	    cint	fslen = USERNAMELEN ;
 	    char	fstype[USERNAMELEN + 1] ;
 	    op->ti_mod = sb.st_mtime ;
 	    op->filesize = sb.st_size ;
-	    if ((rs = getfstype(fstype,USERNAMELEN,op->fd)) >= 0) {
-	        int	f = islocalfs(fstype,rs) ;
+	    if ((rs = getfstype(fstype,fslen,op->fd)) >= 0) {
+	        cbool	f = (matlocalfs(fstype,rs) >= 0) ;
 	        op->f.remote = (! f) ; /* remote if not local! */
 	    }
 	} /* end if (stat) */
-
 	return rs ;
 }
 /* end subroutine (msfile_filesetinfo) */

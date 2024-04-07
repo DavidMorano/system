@@ -63,7 +63,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(void *,int) ;
+extern uint	hash_elf(void *,int) ;
 extern uint	uceil(uint,int) ;
 
 

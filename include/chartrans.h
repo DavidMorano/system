@@ -12,7 +12,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<stddef.h>
 #include	<uiconv.h>
 #include	<localmisc.h>
@@ -50,6 +49,8 @@ struct chartrans_head {
 } ;
 
 typedef CHARTRANS	chartrans ;
+typedef	CHARTRANS_FL	chartrans_fl ;
+typedef	CHARTRANS_SET	chartrans_set ;
 
 EXTERNC_begin
 

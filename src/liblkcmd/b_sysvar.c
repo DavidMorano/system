@@ -64,7 +64,7 @@
 #include	<nulstr.h>
 #include	<vecstr.h>
 #include	<hdbstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<field.h>
 #include	<char.h>
 #include	<ids.h>
@@ -1914,7 +1914,7 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl)
 	LOCINFO		*lip = pip->lip ;
 	HDBSTR		*varp ;
 	FIELD		fsb ;
-	FILEBUF		dfile, *dfp = &dfile ;
+	FILER		dfile, *dfp = &dfile ;
 	const int	llen = LINEBUFLEN ;
 	const int	vlen = VBUFLEN ;
 	int		rs = SR_OK ;
@@ -1948,9 +1948,9 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl)
 	if ((rs = u_open(fnp,O_RDONLY,0666)) >= 0) {
 	    int	fd = rs ;
 
-	    if ((rs = filebuf_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
+	    if ((rs = filer_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
 
-	        while ((rs = filebuf_readln(dfp,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(dfp,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -2019,8 +2019,8 @@ static int procvarfile(PROGINFO *pip,cchar *fnp,int fnl)
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
 
-	        filebuf_finish(dfp) ;
-	    } /* end if (filebuf) */
+	        filer_finish(dfp) ;
+	    } /* end if (filer) */
 
 	    u_close(fd) ;
 	} /* end if (file-open) */

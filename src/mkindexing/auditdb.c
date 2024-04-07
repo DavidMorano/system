@@ -56,6 +56,7 @@
 #include	<storebuf.h>
 #include	<char.h>
 #include	<eigendb.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"offindex.h"

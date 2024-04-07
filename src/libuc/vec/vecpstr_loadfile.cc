@@ -37,7 +37,7 @@
 	<0		error (system-return)
 
 	Notes:
-	Why use filebuf over BFILE? Yes, filebuf is a tiny bit more
+	Why use filer over BFILE? Yes, filer is a tiny bit more
 	lightweight than BFILE -- on a good day. But the real reason
 	may be so that we do not need to load BFILE in code that
 	resides very deep in a software stack if we do not need it
@@ -67,7 +67,7 @@
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<field.h>
 #include	<localmisc.h>
 
@@ -207,15 +207,15 @@ static int vecpstr_loadfd(vecpstr *vsp,int fu,int fd) noex {
 	            fbsize = min(cs,1024) ;
 	        } else {
 	            to = TO_READ ;
-	            if (S_ISSOCK(sb.st_mode)) fbo |= FILEBUF_ONET ;
+	            if (S_ISSOCK(sb.st_mode)) fbo |= FILER_ONET ;
 	        }
 		if ((rs = maxlinelen) >= 0) {
 		    cint	llen = (linelen > 0) ? linelen : rs ;
 	            char	*lbuf{} ;
 		    if ((rs = uc_libmalloc((llen+1),&lbuf)) >= 0) {
-			filebuf		loadfile, *lfp = &loadfile ;
-	        	if ((rs = filebuf_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
-			    auto	rl = filebuf_readln ;
+			filer		loadfile, *lfp = &loadfile ;
+	        	if ((rs = filer_start(lfp,fd,0L,fbsize,fbo)) >= 0) {
+			    auto	rl = filer_readln ;
 	                    while ((rs = rl(lfp,lbuf,llen,to)) > 0) {
 	                        int	len = rs ;
 	                        if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -225,9 +225,9 @@ static int vecpstr_loadfd(vecpstr *vsp,int fu,int fd) noex {
 			        }
 	                        if (rs < 0) break ;
 	                    } /* end while (reading lines) */
-	                    rs1 = filebuf_finish(lfp) ;
+	                    rs1 = filer_finish(lfp) ;
 		            if (rs >= 0) rs = rs1 ;
-	                } /* end if (filebuf) */
+	                } /* end if (filer) */
 			rs1 = uc_libfree(lbuf) ;
 			if (rs >= 0) rs = rs1 ;
 		    } /* end if (m-a-f) */

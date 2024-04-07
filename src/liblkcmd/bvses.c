@@ -57,7 +57,7 @@
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<char.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"bvses.h"

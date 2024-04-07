@@ -1,5 +1,4 @@
-
-* quote */
+/* quote */
 
 /* quote database operations */
 
@@ -91,18 +90,6 @@
 #define	IDXNAME		"quote"
 #define	IDXSUF		"cyi"
 
-#ifndef	ENDIANSTR
-#ifdef	ENDIAN
-#if	(ENDIAN == 0)
-#define	ENDIANSTR	"0"
-#else
-#define	ENDIANSTR	"1"
-#endif
-#else
-#define	ENDIANSTR	"1"
-#endif
-#endif
-
 #ifndef	LINEBUFLEN
 #ifdef	LINE_MAX
 #define	LINEBUFLEN	MAX(LINE_MAX,2048)
@@ -138,7 +125,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(const char *,int) ;
+extern uint	hash_elf(const char *,int) ;
 
 extern int	snsds(char *,int,const char *,const char *) ;
 extern int	snwcpy(char *,int,const char *,int) ;
@@ -3516,7 +3503,7 @@ QUOTE	*op ;
 	    sp = (mp + elp[i].loff) ;
 	    sl = elp[i].llen ;
 	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
-		hash += hashelf(cp,cl) ;
+		hash += hash_elf(cp,cl) ;
 		sl -= ((cp + cl) - sp) ;
 		sp = (cp + cl) ;
 	    } /* end while */

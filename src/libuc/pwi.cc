@@ -49,7 +49,7 @@
 #include	<usystem.h>
 #include	<ucpwcache.h>
 #include	<getbufsize.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<mkpathx.h>
 #include	<mkfname.h>
 #include	<sfx.h>

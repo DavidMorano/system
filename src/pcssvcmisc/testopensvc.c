@@ -24,12 +24,12 @@
 #include	<stdio.h>
 #include	<usystem.h>
 #include	<fsdir.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<ucmallreg.h>
 #include	<localmisc.h>
 
-#ifndef FILEBUF_RCNET
-#define	FILEBUF_RCNET	4		/* read-count for network */
+#ifndef FILER_RCNET
+#define	FILER_RCNET	4		/* read-count for network */
 #endif
 
 #ifndef	TIMEBUFLEN
@@ -190,7 +190,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 static int dumpfile(FILE *ofp,int fd,int of)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	const int	to = 5 ;
 	const int	fo = (of | O_NETWORK) ;
 	int		rs ;
@@ -198,11 +198,11 @@ static int dumpfile(FILE *ofp,int fd,int of)
 #if	CF_DEBUGS
 	debugprintf("main/dumpfile: ent to=%d\n",to) ;
 #endif
-	if ((rs = filebuf_start(&b,fd,0L,0,fo)) >= 0) {
+	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
 	    const int	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 		fbwrite(ofp,lbuf,len) ;
 #if	CF_DEBUGS
@@ -215,9 +215,9 @@ static int dumpfile(FILE *ofp,int fd,int of)
 #endif /* CF_DEBUGS */
 	        if (rs < 0) break ;
 	    } /* end while */
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 #if	CF_DEBUGS
 	debugprintf("main/dumpfile: ret rs=%d\n",rs) ;

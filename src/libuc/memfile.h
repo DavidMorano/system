@@ -1,9 +1,16 @@
 /* memfile HEADER */
 /* lang=C20 */
 
-/* support low-overhead file bufferring operations */
+/* provides a memory-mapped file for writing */
 /* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-04-01, David A­D­ Morano
+	This subroutine was originally written.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -41,7 +48,7 @@ extern int	memfile_write(memfile *,cvoid *,int) noex ;
 extern int	memfile_len(memfile *) noex ;
 extern int	memfile_allocation(memfile *) noex ;
 extern int	memfile_tell(memfile *,off_t *) noex ;
-extern int	memfile_buf(memfile *,void *) noex ;
+extern int	memfile_getbuf(memfile *,void *) noex ;
 extern int	memfile_close(memfile *) noex ;
 
 EXTERNC_end

@@ -59,7 +59,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<sncpyx.h>
 #include	<snwcpy.h>
 #include	<sfx.h>
@@ -164,10 +164,10 @@ static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = uc_open(fname,O_RDONLY,0666)) >= 0) {
-	    filebuf	fb ;
+	    filer	fb ;
 	    cint	fd = rs ;
 
-	    if ((rs = filebuf_start(&fb,fd,0L,256,0)) >= 0) {
+	    if ((rs = filer_start(&fb,fd,0L,256,0)) >= 0) {
 		cint		llen = LINEBUFLEN ;
 		int		len ;
 		int		cl ;
@@ -175,7 +175,7 @@ static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 		cchar		*cp ;
 		char		lbuf[LINEBUFLEN + 1] ;
 
-	        while ((rs = filebuf_readln(&fb,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 		    if (lbuf[len-1] == '\n') len -= 1 ;
@@ -196,7 +196,7 @@ static int nisfile(char *rbuf,int rlen,cchar *fname) noex {
 		    if (rs < 0) break ;
 	        } /* end while */
 
-	        rs1 = filebuf_finish(&fb) ;
+	        rs1 = filer_finish(&fb) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (reading file) */
 

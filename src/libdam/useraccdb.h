@@ -14,7 +14,7 @@
 #include	<sys/types.h>
 
 #include	<usystem.h>		/* for 'ino_t' */
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<dater.h>
 #include	<localmisc.h>
 
@@ -33,8 +33,8 @@ struct useraccdb_e {
 } ;
 
 struct useraccdb_c {
-	FILEBUF		b ;
-	off_t	eo ;		/* enumeration offset */
+	filer		b ;
+	off_t		eo ;		/* enumeration offset */
 } ;
 
 struct useraccdb_flags {

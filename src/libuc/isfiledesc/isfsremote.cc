@@ -39,7 +39,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<matstr.h>
+#include	<matxstr.h>		/* |matlocalfs(3uc)| */
 #include	<localmisc.h>
 
 #include	"isfiledesc.h"
@@ -58,7 +58,6 @@
 
 extern "C" {
     extern int	getfstype(char *,int,int) noex ;
-    extern int	islocalfs(cchar *,int) noex ;
 }
 
 
@@ -73,28 +72,6 @@ extern "C" {
 
 /* local variables */
 
-static constexpr cchar	*localfs[] = {
-	"sysv",
-	"ufs",
-	"ext1",
-	"ext2",
-	"ext3",
-	"ext4",
-	"xfs",
-	"zfs",
-	"btrfs",
-	"apfs",
-	"tmpfs",
-	"devfs",
-	"lofs",
-	"vxfs",
-	"pcfs",
-	"hsfs",
-	"smbfs",
-	"autofs",
-	nullptr
-} ;
-
 
 /* exported variables */
 
@@ -103,21 +80,16 @@ static constexpr cchar	*localfs[] = {
 
 int isfsremote(int fd) noex {
 	int		rs ;
-	int		f = false ;
+	bool		f = false ;
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	    cint	fslen = rs ;
 	    char	fstype[fslen+ 1] ;	/* <- VLA (yeh!) */
 	    if ((rs = getfstype(fstype,fslen,fd)) >= 0) {
-	        f = (matstr(localfs,fstype,rs) < 0) ;
+	        f = (matlocalfs(fstype,rs) < 0) ;
 	    }
 	} /* end if (getbufsize) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (isfsremote) */
-
-int islocalfs(cchar *sp,int sl) noex {
-	return (matstr(localfs,sp,sl) >= 0) ;
-}
-/* end subroutine (islocalfs) */
 
 

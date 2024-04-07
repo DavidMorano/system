@@ -17,7 +17,7 @@
 #include	<stdio.h>
 #include	<usystem.h>
 #include	<bfile.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"mailmsghdrfold.h"
@@ -41,15 +41,15 @@ extern const char 	*getourenv(const char **,const char *) ;
 
 /* forward references */
 
-static int procprinthdrline(FILEBUF *,int,int,int,const char *,int) ;
-static int filebuf_hdrkey(FILEBUF *,const char *) ;
-static int	filebuf_printcont(FILEBUF *,int,const char *,int) ;
+static int procprinthdrline(FILER *,int,int,int,const char *,int) ;
+static int filer_hdrkey(FILER *,const char *) ;
+static int	filer_printcont(FILER *,int,const char *,int) ;
 
 /* exported subroutines */
 
 int main(int argc,const char **argv,const char **envv)
 {
-	FILEBUF		ofile, *ofp = &ofile  ;
+	FILER		ofile, *ofp = &ofile  ;
 
 	const int	mcols = MSGCOLS ;
 	const int	hlen = MAXPATHLEN ;
@@ -71,7 +71,7 @@ int main(int argc,const char **argv,const char **envv)
 	}
 #endif /* CF_DEBUGS */
 
-	if ((rs = filebuf_start(ofp,1,0L,0,0)) >= 0) {
+	if ((rs = filer_start(ofp,1,0L,0,0)) >= 0) {
 	        bfile	ifile, *ifp = &ifile ;
 
 	        if ((rs = bopen(ifp,ifname,"r",0666)) >= 0) {
@@ -94,12 +94,12 @@ int main(int argc,const char **argv,const char **envv)
 	debugprintf("main: l=>%t<\n",
 		lbuf,strlinelen(lbuf,len,50)) ;
 #endif
-		        rs = filebuf_hdrkey(ofp,hdr) ;
+		        rs = filer_hdrkey(ofp,hdr) ;
 			wlen += rs ;
 			indent = rs ;
 
 #if	CF_DEBUGS
-	debugprintf("main: filebuf_hdrkey() rs=%d\n",rs) ;
+	debugprintf("main: filer_hdrkey() rs=%d\n",rs) ;
 #endif
 
 			lp = lbuf ;
@@ -120,8 +120,8 @@ int main(int argc,const char **argv,const char **envv)
 	            bclose(ifp) ;
 	        } /* end if (file-open) */
 
-	    filebuf_finish(ofp) ;
-	} /* end if (filebuf) */
+	    filer_finish(ofp) ;
+	} /* end if (filer) */
 
 #if	CF_DEBUGS
 	debugprintf("main: done rs=%d\n",rs) ;
@@ -141,7 +141,7 @@ int main(int argc,const char **argv,const char **envv)
 
 /* "indent" is initial indent only! */
 static int procprinthdrline(fbp,mcols,ln,indent,lp,ll)
-FILEBUF		*fbp ;
+FILER		*fbp ;
 int		mcols ;
 int		ln ;
 int		indent ;
@@ -162,7 +162,7 @@ int		ll ;
 
 	    while ((sl = mailmsghdrfold_get(&mf,nc,&sp)) > 0) {
 	        leader = (i == 0) ? ' ' : '\t' ;
-	        rs = filebuf_printcont(fbp,leader,sp,sl) ;
+	        rs = filer_printcont(fbp,leader,sp,sl) ;
 	        wlen += rs ;
 	        if (rs < 0) break ;
 	        i += 1 ;
@@ -170,7 +170,7 @@ int		ll ;
 	    } /* end while */
 
 	    if ((rs >= 0) && (i == 0)) {
-	        rs = filebuf_println(fbp,lp,0) ;
+	        rs = filer_println(fbp,lp,0) ;
 	        wlen += rs ;
 	    }
 
@@ -181,7 +181,7 @@ int		ll ;
 }
 /* end subroutine (procprinthdrline) */
 
-static int filebuf_hdrkey(filebuf *fbp,cchar *kname) noex {
+static int filer_hdrkey(filer *fbp,cchar *kname) noex {
 	int	rs = SR_OK ;
 	int	wlen = 0 ;
 
@@ -198,24 +198,24 @@ static int filebuf_hdrkey(filebuf *fbp,cchar *kname) noex {
 	    return SR_INVALID ;
 
 	if (rs >= 0) {
-	    rs = filebuf_write(fbp,kname,-1) ;
+	    rs = filer_write(fbp,kname,-1) ;
 	    wlen += rs ;
 	}
 
 	if (rs >= 0) {
 	    buf[0] = ':' ;
 	    buf[1] = '\0' ;
-	    rs = filebuf_write(fbp,buf,1) ;
+	    rs = filer_write(fbp,buf,1) ;
 	    wlen += rs ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_hdrkey) */
+/* end subroutine (filer_hdrkey) */
 
 
-static int filebuf_printcont(fbp,leader,sp,sl)
-FILEBUF		*fbp ;
+static int filer_printcont(fbp,leader,sp,sl)
+FILER		*fbp ;
 int		leader ;
 const char	*sp ;
 int		sl ;
@@ -236,19 +236,19 @@ int		sl ;
 	    if ((rs >= 0) && (leader > 0)) {
 	        buf[0] = leader ;
 	        buf[1] = '\0' ;
-	        rs = filebuf_write(fbp,buf,1) ;
+	        rs = filer_write(fbp,buf,1) ;
 	        wlen += rs ;
 	    }
 
 	    if (rs >= 0) {
-	        rs = filebuf_write(fbp,sp,sl) ;
+	        rs = filer_write(fbp,sp,sl) ;
 	        wlen += rs ;
 	    }
 
 	    if (rs >= 0) {
 	        buf[0] = '\n' ;
 	        buf[1] = '\0' ;
-	        rs = filebuf_write(fbp,buf,1) ;
+	        rs = filer_write(fbp,buf,1) ;
 	        wlen += rs ;
 	    }
 
@@ -256,6 +256,6 @@ int		sl ;
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_printcont) */
+/* end subroutine (filer_printcont) */
 
 

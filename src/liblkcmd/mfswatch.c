@@ -88,7 +88,7 @@
 #include	<upt.h>
 #include	<envhelp.h>
 #include	<spawnproc.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -1977,17 +1977,17 @@ static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = sreq_ofd(jep)) >= 0) {
-	    FILEBUF	b ;
+	    FILER	b ;
 	    cint	ofd = rs ;
 	    cint	bs = MAXNAMELEN ;
 	    cint	fo = 0 ;
-	    if ((rs = filebuf_start(&b,ofd,0L,bs,fo)) >= 0) {
+	    if ((rs = filer_start(&b,ofd,0L,bs,fo)) >= 0) {
 	        SREQ_SNCUR	cur ;
 	        if ((rs = sreq_snbegin(jep,&cur)) >= 0) {
 	            cint	rsn = SR_NOTFOUND ;
 	            cchar	*sp ;
 	            while ((rs1 = sreq_snenum(jep,&cur,&sp)) >= 0) {
-	                rs = filebuf_println(&b,sp,-1) ;
+	                rs = filer_println(&b,sp,-1) ;
 	                wlen += rs ;
 	                if (rs < 0) break ;
 	            } /* end while */
@@ -1995,9 +1995,9 @@ static int mfswatch_svchelper(PROGINFO *pip,SREQ *jep)
 	            rs1 = sreq_snend(jep,&cur) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (osetstr-cur) */
-	        rs1 = filebuf_finish(&b) ;
+	        rs1 = filer_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	} /* end if (sreq_ofd) */
 	return (rs >= 0) ? wlen : rs ;
 }

@@ -178,7 +178,7 @@ char	*envv[] ;
 	const char	*cp ;
 	char	argpresent[MAXARGGROUPS + 1] ;
 	char	buf[BUFLEN + 1] ;
-	char	filebuf[MAXNAMELEN + 1], *pp ;
+	char	fbuf[MAXNAMELEN + 1], *pp ;
 	char	pwdbuf[MAXPATHLEN + 1], *pwd = NULL ;
 	char	progfname[MAXPATHLEN + 1] ;
 
@@ -647,10 +647,10 @@ char	*envv[] ;
 #endif
 
 	pp = progfname ;
-	rs = currentdir(&pwd_sb,progfname,filebuf) ;
+	rs = currentdir(&pwd_sb,progfname,fbuf) ;
 
 	if (rs > 0)
-	    pp = filebuf ;
+	    pp = fbuf ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3)) {

@@ -54,7 +54,7 @@
 
 #include	<usystem.h>
 #include	<getbufsize.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<ascii.h>
 #include	<linefold.h>
 #include	<getax.h>
@@ -126,12 +126,12 @@ const char *,const char *) ;
 static int	proguseracct_projinfo(PROGINFO *,int,
 PASSWDENT *) ;
 static int	proguseracct_copyover(PROGINFO *,int,int) ;
-static int	proguseracct_prints(PROGINFO *,FILEBUF *,
+static int	proguseracct_prints(PROGINFO *,FILER *,
 char *,int, const char *,int) ;
-static int	proguseracct_print(PROGINFO *,FILEBUF *,int,int,
+static int	proguseracct_print(PROGINFO *,FILER *,int,int,
 const char *,int) ;
 
-static int	filebuf_writeblanks(FILEBUF *,int) ;
+static int	filer_writeblanks(FILER *,int) ;
 
 #if	CF_LINEFOLD
 #else
@@ -372,7 +372,7 @@ static int proguseracct_projinfo(PROGINFO *pip,int ofd,PASSWDENT *pep)
 
 static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 {
-	FILEBUF		local, net ;
+	FILER		local, net ;
 	const int	clen = LINEBUFLEN ;
 	const int	to = TO_READ ;
 	int		rs = SR_OK ;
@@ -392,13 +392,13 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 	size = (clen + 2) ; /* plus two characters: NL and NUL */
 	if ((rs = uc_malloc(size,&cbuf)) >= 0) {
 
-	    if ((rs = filebuf_start(&net,ofd,0L,0,0)) >= 0) {
+	    if ((rs = filer_start(&net,ofd,0L,0,0)) >= 0) {
 
-	        if ((rs = filebuf_start(&local,fd,0L,0,0)) >= 0) {
+	        if ((rs = filer_start(&local,fd,0L,0,0)) >= 0) {
 	            const int	llen = LINEBUFLEN ;
 	            char	lbuf[LINEBUFLEN + 2] ;
 
-	            while ((rs = filebuf_readln(&local,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(&local,lbuf,llen,to)) > 0) {
 	                int	len = rs ;
 	                int	cll ;
 	                cchar	*clp ;
@@ -435,10 +435,10 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 
 	            } /* end while */
 
-	            filebuf_finish(&local) ;
+	            filer_finish(&local) ;
 	        } /* end if (local) */
 
-	        filebuf_finish(&net) ;
+	        filer_finish(&net) ;
 	    } /* end if (net) */
 
 	    uc_free(cbuf) ;
@@ -462,7 +462,7 @@ static int proguseracct_copyover(PROGINFO *pip,int ofd,int fd)
 /* end subroutine (proguseracct_copyover) */
 
 
-static int proguseracct_prints(PROGINFO *pip,FILEBUF *fbp,char *cbuf,int cbl,
+static int proguseracct_prints(PROGINFO *pip,FILER *fbp,char *cbuf,int cbl,
 		cchar *lbuf,int llen)
 {
 	int		rs = SR_OK ;
@@ -558,7 +558,7 @@ static int proguseracct_prints(PROGINFO *pip,FILEBUF *fbp,char *cbuf,int cbl,
 /* end subroutine (proguseracct_prints) */
 
 
-static int proguseracct_print(PROGINFO *pip,FILEBUF *fbp,int indent,
+static int proguseracct_print(PROGINFO *pip,FILER *fbp,int indent,
 		int ln,cchar *lp,int ll)
 {
 	int		rs = SR_OK ;
@@ -571,17 +571,17 @@ static int proguseracct_print(PROGINFO *pip,FILEBUF *fbp,int indent,
 	    f_eol = ((ll > 0) && (lp[ll-1] == '\n')) ;
 
 	    if ((ln > 0) && (indent > 0)) {
-	        rs = filebuf_writeblanks(fbp,indent) ;
+	        rs = filer_writeblanks(fbp,indent) ;
 	        wlen += rs ;
 	    }
 
 	    if (rs >= 0) {
-	        rs = filebuf_write(fbp,lp,ll) ;
+	        rs = filer_write(fbp,lp,ll) ;
 	        wlen += rs ;
 	    }
 
 	    if ((rs >= 0) && (! f_eol)) {
-	        rs = filebuf_write(fbp,"\n",1) ;
+	        rs = filer_write(fbp,"\n",1) ;
 	        wlen += 1 ;
 	    }
 
@@ -592,7 +592,7 @@ static int proguseracct_print(PROGINFO *pip,FILEBUF *fbp,int indent,
 /* end subroutine (proguseracct_print) */
 
 
-static int filebuf_writeblanks(FILEBUF *fbp,int indent)
+static int filer_writeblanks(FILER *fbp,int indent)
 {
 	int		rs = SR_OK ;
 	int		ml ;
@@ -600,7 +600,7 @@ static int filebuf_writeblanks(FILEBUF *fbp,int indent)
 
 	while ((rs >= 0) && (wlen < indent)) {
 	    ml = MIN((indent-wlen),NBLANKS) ;
-	    rs = filebuf_write(fbp,blanks,ml) ;
+	    rs = filer_write(fbp,blanks,ml) ;
 	    wlen += rs ;
 	} /* end while */
 

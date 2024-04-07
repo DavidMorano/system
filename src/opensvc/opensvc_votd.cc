@@ -95,7 +95,7 @@
 #include	<tmtime.h>
 #include	<dayspec.h>
 #include	<bcspec.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<bfile.h>
 #include	<biblebook.h>
 #include	<biblepara.h>
@@ -1155,13 +1155,13 @@ static int procopts(SUBINFO *sip,KEYOPT *kop) noex {
 
 static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 		int f_apm) noex {
-	FILEBUF		b ;
+	FILER		b ;
 	const int	fd = sip->wfd ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((rs = filebuf_start(&b,fd,0L,512,0)) >= 0) {
+	if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 	    sip->ofp = &b ;
 
 	    if (sip->f.allcache) {
@@ -1180,9 +1180,9 @@ static int process(SUBINFO *sip,ARGINFO *aip,BITS *bop,cchar *afn,
 #endif
 
 	    sip->ofp = NULL ;
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 #if	CF_DEBUGS
 	debugprintf("opensvc_votd/process: ret rs=%d wlen=%u\n",rs,wlen) ;
@@ -1423,7 +1423,7 @@ static int procallcache(SUBINFO *sip) noex {
 	debugprintf("opensvc_votd/procallcache: ent\n") ;
 #endif
 #if	CF_TEST1
-	rs = filebuf_printf(sip->ofp,"hello world\n") ;
+	rs = filer_printf(sip->ofp,"hello world\n") ;
 	wlen += rs ;
 #else /* CF_TEST1 */
 	if ((rs = votdc_open(vcp,pr,NULL,0)) >= 0) {
@@ -1502,7 +1502,7 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 #endif
 	if (sip->f.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
-	    rs = filebuf_printf(sip->ofp,fmt) ;
+	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
 	} /* end if (separator) */
 	if (rs >= 0) {
@@ -1519,12 +1519,12 @@ static int procallcacheoutcite(SUBINFO *sip,VOTDC *vcp,VOTDC_CITE *citep) noex {
 	        }
 	        if (rs >= 0) {
 	            fmt = "%t %u:%u\n" ;
-	            rs = filebuf_printf(sip->ofp,fmt,nbuf,rs,c,v) ;
+	            rs = filer_printf(sip->ofp,fmt,nbuf,rs,c,v) ;
 	            wlen += rs ;
 	        }
 	    } else {
 	        fmt = "%u:%u:%u\n" ;
-	        rs = filebuf_printf(sip->ofp,fmt,b,c,v) ;
+	        rs = filer_printf(sip->ofp,fmt,b,c,v) ;
 	        wlen += rs ;
 	    }
 	} /* end if (ok) */
@@ -1820,7 +1820,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 
 	if (sip->f.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
-	    rs = filebuf_printf(sip->ofp,fmt) ;
+	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
 	} /* end if (separator) */
 
@@ -1843,7 +1843,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	            rs = bufprintf(cbuf,clen,fmt,nbuf,nlen,c,v,ndays) ;
 	            cl = rs ;
 	            if (rs >= 0) {
-	                rs = filebuf_println(sip->ofp,cbuf,cl) ;
+	                rs = filer_println(sip->ofp,cbuf,cl) ;
 	                wlen += rs ;
 	            }
 	        } /* end if (nin-nul) */
@@ -1854,7 +1854,7 @@ static int procvoutcite(SUBINFO *sip,VCINFO *vip,int ndays) noex {
 	        rs = bufprintf(cbuf,clen,fmt,b,c,v,ndays) ;
 	        cl = rs ;
 	        if (rs >= 0) {
-	            rs = filebuf_println(sip->ofp,cbuf,cl) ;
+	            rs = filer_println(sip->ofp,cbuf,cl) ;
 	            wlen += rs ;
 	        }
 	    } /* end if (type of book-name display) */
@@ -1895,7 +1895,7 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 
 	if (sip->f.separate && (sip->cout++ > 0)) {
 	    fmt = OUTCOOKIE ;
-	    rs = filebuf_printf(sip->ofp,fmt) ;
+	    rs = filer_printf(sip->ofp,fmt) ;
 	    wlen += rs ;
 	} /* end if (separator) */
 
@@ -1919,7 +1919,7 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 	            rs = bufprintf(cbuf,clen,fmt,bbuf,bbl,c,v,ndays) ;
 	            cl = rs ;
 	            if (rs >= 0) {
-	                rs = filebuf_println(sip->ofp,cbuf,cl) ;
+	                rs = filer_println(sip->ofp,cbuf,cl) ;
 	                wlen += rs ;
 	            }
 
@@ -1933,7 +1933,7 @@ static int procoutcite(SUBINFO *sip,BIBLEVERSE_Q *qp,int ndays) noex {
 	        rs = bufprintf(cbuf,clen,fmt,b,c,v,ndays) ;
 	        cl = rs ;
 	        if (rs >= 0) {
-	            rs = filebuf_println(sip->ofp,cbuf,cl) ;
+	            rs = filer_println(sip->ofp,cbuf,cl) ;
 	            wlen += rs ;
 	        }
 
@@ -2027,7 +2027,7 @@ static int procoutline(SUBINFO *sip,int line,cchar *lp,int ll) noex {
 
 	indent = MIN(sip->indent,NBLANKS) ;
 	fmt = "%t%t\n" ;
-	rs = filebuf_printf(sip->ofp,fmt,blanks,indent,lp,ll) ;
+	rs = filer_printf(sip->ofp,fmt,blanks,indent,lp,ll) ;
 	wlen += rs ;
 
 #if	CF_DEBUGS

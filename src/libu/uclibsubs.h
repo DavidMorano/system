@@ -165,7 +165,7 @@ extern int	uc_opensocket(cchar *,int,int) noex ;
 extern int	uc_openproto(cchar *,int,int,int) noex ;
 extern int	uc_openpass(cchar *,int,int,int) noex ;
 extern int	uc_openuser(cchar *,cchar *,int,mode_t,int) noex ;
-extern int	uc_openuserinfo(struct ucopeninfo *) noex ;
+extern int	uc_openuserinfo(ucopeninfo *) noex ;
 extern int	uc_openprog(cchar *,int,mainv,mainv) noex ;
 extern int	uc_opendialer(cchar *,cchar *,int,mode_t,
 			cchar **,cchar **,int) noex ;

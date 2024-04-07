@@ -55,7 +55,7 @@ INCS= matxstr.h
 
 
 OBJ0_MATXSTR= matstr.o matostr.o matpstr.o
-OBJ1_MATXSTR= matkeystr.o
+OBJ1_MATXSTR= matkeystr.o matlocalfs.o
 OBJ2_MATXSTR= matsubstr.o matcasesubstr.o
 OBJ3_MATXSTR= matnstr.o
 
@@ -129,5 +129,6 @@ matkeystr.o:		matkeystr.cc matkeystr.h	$(INCS)
 matsubstr.o:		matsubstr.cc			$(INCS)
 matcasesubstr.o:	matcasesubstr.cc		$(INCS)
 matnstr.o:		matnstr.cc			$(INCS)
+matlocalfs.o:		matlocalfs.cc			$(INCS)
 
 

@@ -81,7 +81,7 @@
 #include	<mallocxx.h>
 #include	<estrings.h>
 #include	<uinfo.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<strn.h>
 #include	<sfx.h>
 #include	<sncpyx.h>
@@ -100,7 +100,7 @@
 #define	RESOLVFNAME	"/etc/resolv.conf"
 #define	LOCALHOSTNAME	"localhost"
 
-#define	FILEBUFLEN	1024		/* initial size for FILEBUF */
+#define	FILERLEN	1024		/* initial size for FILER */
 #define	TO_READ		30		/* time-out for read */
 
 #undef	TRY
@@ -607,20 +607,20 @@ static int try_resolvefile(TRY *tip,cchar *fname) noex {
 /* end subroutine (try_resolvefile) */
 
 static int try_resolvefd(TRY *tip,char *lbuf,int llen,int fd) noex {
-	filebuf		b ;
+	filer		b ;
 	int		rs ;
 	int		rs1 ;
 	int		len = 0 ;
 	cchar		*dp = nullptr ;
-        if ((rs = filebuf_start(&b,fd,0L,FILEBUFLEN,0)) >= 0) {
+        if ((rs = filer_start(&b,fd,0L,FILERLEN,0)) >= 0) {
 	    cint	to = TO_READ ;
 	    cchar	*key = "domain" ;
-            while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
                 if ((len = sfkeyval(lbuf,rs,key,&dp)) > 0) break ;
             } /* end while (reading lines) */
-            rs1 = filebuf_finish(&b) ;
+            rs1 = filer_finish(&b) ;
             if (rs >= 0) rs = rs1 ;
-        } /* end if (filebuf) */
+        } /* end if (filer) */
         if ((rs >= 0) && (len > 0)) {
 	    cint	dlen = tip->dlen ;
             rs = snwcpy(tip->domainname,dlen,dp,len) ;

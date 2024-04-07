@@ -2,47 +2,33 @@
 
 /* SMS service entry table object */
 
-
 #define	CF_DEBUGS	0		/* non-switchable print-outs */
 #define	CF_FASTGROW	1		/* grow exponetially ? */
 #define	CF_UCMALLOC	1
 #define	CF_SAFE		1
 
-
 /* revision history:
 
 	= 2002-04-29, David A­D­ Morano
-
 	This object module was created for building a SMS service
 	entry table.
 
-
 */
-
 
 /******************************************************************************
 
 	This object module creates a table of SMS service entries.
 
-
 *****************************************************************************/
 
-
-#define	RECSVC_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 
 #include	"localmisc.h"
 #include	"recsvc.h"
-
-
 
 
 /* local defines */
@@ -51,28 +37,11 @@
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
-#ifndef	ENDIAN
-#if	defined(SOLARIS) && defined(__sparc)
-#define	ENDIAN		1
-#else
-#ifdef	_BIG_ENDIAN
-#define	ENDIAN		1
-#endif
-#ifdef	_LITTLE_ENDIAN
-#define	ENDIAN		0
-#endif
-#ifndef	ENDIAN
-#error	"could not determine endianness of this machine"
-#endif
-#endif
-#endif
-
-
 
 /* external subroutines */
 
 extern uint	nextpowtwo(uint) ;
-extern uint	hashelf(const void *,int) ;
+extern uint	hash_elf(const void *,int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 
@@ -390,7 +359,7 @@ int	itsize ;
 	for (i = 1 ; i < asp->i ; i += 1) {
 
 	    key = asp->rectab[i].ia ;
-	    rhash = hashelf(&key,sizeof(uint)) ;
+	    rhash = hash_elf(&key,sizeof(uint)) ;
 
 	    hi = hashindex(rhash,n) ;
 

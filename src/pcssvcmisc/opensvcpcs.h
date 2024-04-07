@@ -32,7 +32,7 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<bits.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<pcsns.h>
 #include	<localmisc.h>
 
@@ -68,12 +68,12 @@ extern "C" {
 
 extern int subpcs_start(SUBPCS *,cchar *,cchar **,int) ;
 extern int subpcs_finish(SUBPCS *) ;
-extern int subpcs_af(SUBPCS *,FILEBUF *,cchar *) ;
-extern int subpcs_def(SUBPCS *,FILEBUF *) ;
-extern int subpcs_all(SUBPCS *,FILEBUF *) ;
-extern int subpcs_args(SUBPCS *,FILEBUF *,ARGINFO *,BITS *,cchar *) ;
-extern int subpcs_users(SUBPCS *,FILEBUF *,cchar *,int) ;
-extern int subpcs_user(SUBPCS *,FILEBUF *,cchar *,int) ;
+extern int subpcs_af(SUBPCS *,filer *,cchar *) ;
+extern int subpcs_def(SUBPCS *,filer *) ;
+extern int subpcs_all(SUBPCS *,filer *) ;
+extern int subpcs_args(SUBPCS *,filer *,ARGINFO *,BITS *,cchar *) ;
+extern int subpcs_users(SUBPCS *,filer *,cchar *,int) ;
+extern int subpcs_user(SUBPCS *,filer *,cchar *,int) ;
 
 #ifdef	__cplusplus
 }

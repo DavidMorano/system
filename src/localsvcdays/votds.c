@@ -43,11 +43,12 @@
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<estrings.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<storebuf.h>
 #include	<ptma.h>
 #include	<ptm.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"votds.h"
@@ -131,9 +132,9 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	msleep(uint) ;
 extern int	isOneOf(const int *,int) ;
 extern int	uc_openshmto(const char *,int,mode_t,int) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
-extern int	filebuf_writezero(FILEBUF *,int) ;
-extern int	filebuf_writealign(FILEBUF *,int) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
+extern int	filer_writezero(FILER *,int) ;
+extern int	filer_writealign(FILER *,int) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
@@ -383,7 +384,7 @@ int votds_titleloads(VOTDS *op,const char *lang,const char **tv)
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 #if	CF_DEBUGS
 	debugprintf("votds_titleloads: locked\n") ;
@@ -396,7 +397,7 @@ int votds_titleloads(VOTDS *op,const char *lang,const char **tv)
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 #if	CF_DEBUGS
@@ -427,7 +428,7 @@ int votds_titlelang(VOTDS *op,const char *lang)
 
 	if (lang[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	            int		bi ;
 	            const char	*blang ;
@@ -441,7 +442,7 @@ int votds_titlelang(VOTDS *op,const char *lang)
 	            } /* end for */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 #if	CF_DEBUGS
@@ -468,7 +469,7 @@ int votds_titlefetch(VOTDS *op,char *rbuf,int rlen,const char *lang,int ti)
 	if ((ti < 0) || (ti >= VOTDS_NTITLES)) return SR_INVALID ;
 
 	rbuf[0] = '\0' ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votds_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -489,7 +490,7 @@ int votds_titlefetch(VOTDS *op,char *rbuf,int rlen,const char *lang,int ti)
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 	return rs ;
@@ -512,7 +513,7 @@ int votds_titlematch(VOTDS *op,const char *lang,const char *sp,int sl)
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (sp[0] == '\0') return SR_INVALID ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votds_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -537,7 +538,7 @@ int votds_titlematch(VOTDS *op,const char *lang,const char *sp,int sl)
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 	return (rs >= 0) ? bi : rs ;
@@ -565,7 +566,7 @@ int		mjd ;
 	if (lang == NULL) return SR_FAULT ;
 	if (lang[0] == '\0') return SR_INVALID ;
 	if (mjd < 0) return SR_INVALID ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	        if ((rs = votds_booklanghave(op,lang)) >= 0) {
 	            int	li = rs ;
@@ -578,7 +579,7 @@ int		mjd ;
 	        } /* end if (votds_booklanghave) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
 	if (rs >= 0) {
@@ -613,7 +614,7 @@ int		vl ;
 	if (vp == NULL) return SR_FAULT ;
 	if (vp[0] == '\0') return SR_INVALID ;
 	if (mjd < 0) return SR_INVALID ;
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 		if ((rs = votds_access(op)) >= 0) {
 		    const int	ac = rs ;
@@ -671,7 +672,7 @@ int		vl ;
 		} /* end if (votds_access) */
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 #if	CF_DEBUGS
 	debugprintf("votds_verseload: ret rs=%d\n",rs) ;
@@ -693,7 +694,7 @@ VOTDS_INFO	*bip ;
 
 	if (op->magic != VOTDS_MAGIC) return SR_NOTOPEN ;
 
-	if ((rs = sigblock_start(&s,NULL)) >= 0) {
+	if ((rs = sigblocker_start(&s,NULL)) >= 0) {
 	    if ((rs = ptm_lock(op->mp)) >= 0) {
 	        VOTDSHDR	*hdrp = &op->hdr ;
 	        int		n, i ;
@@ -725,7 +726,7 @@ VOTDS_INFO	*bip ;
 	        }
 	        ptm_unlock(op->mp) ;
 	    } /* end if (mutex) */
-	    sigblock_finish(&s) ;
+	    sigblocker_finish(&s) ;
 	} /* end if (sigblock) */
 
 	return rs ;
@@ -980,7 +981,7 @@ VOTDSHDR	*hdrp ;
 const char	hbuf[] ;
 int		hlen ;
 {
-	FILEBUF		sfile, *sfp = &sfile ;
+	FILER		sfile, *sfp = &sfile ;
 	const int	bsize = 2048 ;
 	int		rs ;
 	int		rs1 ;
@@ -990,111 +991,111 @@ int		hlen ;
 	op->shmsize = 0 ;
 	if (dt == 0) dt = time(NULL) ;
 
-	if ((rs = filebuf_start(sfp,fd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(sfp,fd,0,bsize,0)) >= 0) {
 	    const int	asize = SHMALLOC_ALIGNSIZE ;
 
 	    if (rs >= 0) {
-	        rs = filebuf_write(sfp,hbuf,hlen) ;
+	        rs = filer_write(sfp,hbuf,hlen) ;
 	        foff += rs ;
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_MUSIZE ;
 		    hdrp->muoff = foff ;
 		    hdrp->musize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_LANGSIZE ;
 		    hdrp->lanoff = foff ;
 		    hdrp->lanlen = VOTDS_NLANGS ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_BOOKSIZE ;
 		    hdrp->bookoff = foff ;
 		    hdrp->booklen = VOTDS_NBOOKS ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_VERSESIZE ;
 		    hdrp->recoff = foff ;
 		    hdrp->reclen = VOTDS_NVERSES ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = sizeof(SHMALLOC) ;
 		    hdrp->balloff = foff ;
 		    hdrp->ballsize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = sizeof(SHMALLOC) ;
 		    hdrp->valloff = foff ;
 		    hdrp->vallsize = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_BSTRSIZE ;
 		    hdrp->bstroff = foff ;
 		    hdrp->bstrlen = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
-	        if ((rs = filebuf_writealign(sfp,asize)) >= 0) {
+	        if ((rs = filer_writealign(sfp,asize)) >= 0) {
 	            foff += rs ;
 		    size = VOTDS_VSTRSIZE ;
 		    hdrp->vstroff = foff ;
 		    hdrp->vstrlen = size ;
-		    rs = filebuf_writezero(sfp,size) ;
+		    rs = filer_writezero(sfp,size) ;
 	            foff += rs ;
 	        }
 	    }
 
 	    if (rs >= 0) {
 		size = iceil(foff,op->pagesize) - foff ;
-		rs = filebuf_writezero(sfp,size) ;
+		rs = filer_writezero(sfp,size) ;
 	        foff += rs ;
 	    }
 
-	    rs1 = filebuf_finish(sfp) ;
+	    rs1 = filer_finish(sfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	hdrp->shmsize = foff ;
 	return (rs >= 0) ? foff : rs ;

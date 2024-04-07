@@ -142,8 +142,6 @@ struct display_date {
 struct display_flags {
 	uint		header:1 ;
 	uint		check:1 ;
-	uint		bol:1 ;
-	uint		eol:1 ;
 	uint		newmail:1 ;	/* "new-msg" display indicator */
 	uint		moremsgs:1 ;	/* "more-msgs" display indicator */
 	uint		morelines:1 ;	/* "more-lines" display indicator */

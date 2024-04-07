@@ -1,7 +1,7 @@
 /* memfile SUPPORT */
 /* lang=C++20 */
 
-/* support low-overhead file bufferring operations */
+/* provides a memory-mapped file for writing */
 /* version %I% last-modified %G% */
 
 
@@ -16,8 +16,8 @@
 
 /******************************************************************************
 
-        This little object supports some buffered file operations for
-        low-overhead buffered I-O operations.
+	This little object provides a file writing facility for
+	low-overhead raw writes (no separate user-space buffering).
 
 	Notes:
 	1. Comparison to other mapped-memory file facilities:
@@ -47,6 +47,7 @@
 /* local defines */
 
 #define	ZEROBUFLEN	1024
+#define	PSZMULT		4
 
 
 /* imported namespaces */
@@ -126,7 +127,7 @@ static sysval		pagesize(sysval_ps) ;
 /* exported subroutines */
 
 int memfile_open(memfile *op,cchar *fname,int of,mode_t om) noex {
-	int		rs = SR_FAULT ;
+	int		rs ;
 	if ((rs = memfile_ctor(op,fname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (fname[0]) {
@@ -146,23 +147,23 @@ int memfile_close(memfile *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = memfile_magic(op)) >= 0) {
-	        if (op->fd >= 0) {
-	            rs1 = uc_close(op->fd) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->fd = -1 ;
-	        }
-	        if (op->dbuf) {
-		    void	*ma = op->dbuf ;
-		    csize	ms = op->dlen ;
-	            rs1 = u_mmapend(ma,ms) ;
-	            if (rs >= 0) rs = rs1 ;
-	            op->dbuf = nullptr ;
-	            op->dlen = 0 ;
-	        }
-		{
-		    rs1 = memfile_dtor(op) ;
-	            if (rs >= 0) rs = rs1 ;
-		}
+            if (op->fd >= 0) {
+                rs1 = uc_close(op->fd) ;
+                if (rs >= 0) rs = rs1 ;
+                op->fd = -1 ;
+            }
+            if (op->dbuf) {
+                void        *ma = op->dbuf ;
+                csize       ms = op->dlen ;
+                rs1 = u_mmapend(ma,ms) ;
+                if (rs >= 0) rs = rs1 ;
+                op->dbuf = nullptr ;
+                op->dlen = 0 ;
+            }
+            {
+                rs1 = memfile_dtor(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -176,13 +177,13 @@ int memfile_write(memfile *op,cvoid *wbuf,int wlen) noex {
 	    cint	ps = op->pagesize ;
 	    rs = SR_NOTOPEN ;
 	    if (op->dbuf) {
-	        csize	p = (4 * ps) ;
+	        csize	psz = (PSZMULT * ps) ;
 		uint	pmo = (ps - 1) ;
 		rs = SR_OK ;
 		if ((op->off + wlen) > fsize) {
 		    csize	a = szceil(fsize,ps) ;
 	    	    if ((op->off + wlen) > a) {
-	        	csize 	e = max(((op->off + wlen) - a),p) ;
+	        	csize 	e = max(((op->off + wlen) - a),psz) ;
 	                if ((rs = memfile_mapextend(op,e)) >= 0) {
 		            char	zbuf[2] = {} ;
 	                    for (size_t off = a ; off < (a + e) ; off += ps) {
@@ -238,7 +239,7 @@ int memfile_tell(memfile *op,off_t *offp) noex {
 }
 /* end subroutine (memfile_tell) */
 
-int memfile_buf(memfile *op,void *vp) noex {
+int memfile_getbuf(memfile *op,void *vp) noex {
 	caddr_t		*rpp = (caddr_t *) vp ;
 	int		rs ;
 	if ((rs = memfile_magic(op,vp)) >= 0) {
@@ -246,7 +247,7 @@ int memfile_buf(memfile *op,void *vp) noex {
 	} /* end if (magic) */
 	return rs ;
 }
-/* end subroutine (memfile_buf) */
+/* end subroutine (memfile_getbuf) */
 
 
 /* private subroutines */
@@ -254,7 +255,7 @@ int memfile_buf(memfile *op,void *vp) noex {
 static int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	of &= (~ (O_RDONLY | O_WRONLY)) ;
-	of |= O_RDWR ;
+	of |= (O_RDWR | O_CLOEXEC) ;
         if ((rs = uc_open(fname,of,om)) >= 0) {
             USTAT       sb ;
             cint        fd = rs ;
@@ -263,9 +264,7 @@ static int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
                     csize       fsize = size_t(sb.st_size) ;
                     if ((rs = pagesize) >= 0) {
                         op->pagesize = rs ;
-                        if ((rs = uc_closeonexec(fd,true)) >= 0) {
-                            rs = memfile_openmap(op,fd,fsize) ;
-                        }
+                        rs = memfile_openmap(op,fd,fsize) ;
                     } /* end if (pagesize) */
                 } else {
                     rs = SR_PROTO ;

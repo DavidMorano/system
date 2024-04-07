@@ -63,18 +63,6 @@
 #define	SYSMISCERS_MSPROG	"msu"
 #define	SYSMISCERS_MSPR		"MSU_PROGRAMROOT"
 
-#ifndef	ENDIANSTR
-#ifdef	ENDIAN
-#if	(ENDIAN == 0)
-#define	ENDIANSTR	"0"
-#else
-#define	ENDIANSTR	"1"
-#endif
-#else
-#define	ENDIANSTR	"1"
-#endif
-#endif
-
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	120
 #endif

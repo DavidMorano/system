@@ -106,7 +106,7 @@
 #include	<storeitem.h>
 #include	<storebuf.h>
 #include	<inetaddr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<linefold.h>
 #include	<localmisc.h>
 
@@ -177,7 +177,7 @@ extern int	openshmtmp(char *,int,mode_t) ;
 extern int	hasalldig(const char *,int) ;
 extern int	isprintlatin(int) ;
 
-extern int	filebuf_writeblanks(FILEBUF *,int) ;
+extern int	filer_writeblanks(FILER *,int) ;
 extern int	sbuf_addquoted(SBUF *,const char *,int) ;
 
 extern int	getaf(cchar *) ;
@@ -288,9 +288,9 @@ static int	dialfinger(INETARGS *,const char *,int,int,int) ;
 static int	fingerclean(int) ;
 #if	CF_FINERBACK
 static int	fingerworker(FINGERARGS *) ;
-static int	fingerworker_loop(FINGERARGS *,FILEBUF *,FILEBUF *,
+static int	fingerworker_loop(FINGERARGS *,FILER *,FILER *,
 int,int,int) ;
-static int	fingerworker_liner(FINGERARGS *,FILEBUF *,
+static int	fingerworker_liner(FINGERARGS *,FILER *,
 int,int,int,cchar *,int) ;
 #endif /* CF_FINERBACK */
 #endif /* CF_FINGERCLEAN */
@@ -1159,7 +1159,7 @@ static int fingerclean(int nfd)
 
 static int fingerworker(FINGERARGS *fap)
 {
-	FILEBUF		out, *ofp = &out ;
+	FILER		out, *ofp = &out ;
 	const int	nfd = fap->nfd ;
 	const int	cfd = fap->cfd ;
 	const int	cols = COLUMNS ;
@@ -1169,20 +1169,20 @@ static int fingerworker(FINGERARGS *fap)
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if ((rs = filebuf_start(ofp,cfd,0L,0,0)) >= 0) {
-	    FILEBUF	fb ;
-	    const int	fbo = FILEBUF_ONET ;
-	    if ((rs = filebuf_start(&fb,nfd,0L,0,fbo)) >= 0) {
+	if ((rs = filer_start(ofp,cfd,0L,0,0)) >= 0) {
+	    FILER	fb ;
+	    const int	fbo = FILER_ONET ;
+	    if ((rs = filer_start(&fb,nfd,0L,0,fbo)) >= 0) {
 	        {
 	            rs = fingerworker_loop(fap,ofp,&fb,cols,ind,to) ;
 	            wlen = rs ;
 	        }
-	        rs1 = filebuf_finish(&fb) ;
+	        rs1 = filer_finish(&fb) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
-	    rs1 = filebuf_finish(ofp) ;
+	    } /* end if (filer) */
+	    rs1 = filer_finish(ofp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	u_close(nfd) ;
 	u_close(cfd) ;
@@ -1193,7 +1193,7 @@ static int fingerworker(FINGERARGS *fap)
 /* end subroutine (fingerworker) */
 
 
-static int fingerworker_loop(FINGERARGS *fap,FILEBUF *ofp,FILEBUF *ifp,
+static int fingerworker_loop(FINGERARGS *fap,FILER *ofp,FILER *ifp,
 int cols,int ind,int to)
 {
 	const int	llen = LINEBUFLEN ;
@@ -1207,7 +1207,7 @@ int cols,int ind,int to)
 	    cchar	*lp, *sp ;
 	    cchar	*cp ;
 
-	    while ((rs = filebuf_readln(ifp,lbuf,llen,to)) > 0) {
+	    while ((rs = filer_readln(ifp,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 	        clen = mkcleanline(lbuf,len,0) ;
 #if	CF_DEBUGS
@@ -1252,7 +1252,7 @@ int cols,int ind,int to)
 	            debugprintf("uc_openproto: if-end rs=%d\n",rs) ;
 #endif
 	        } else {
-	            rs = filebuf_println(ofp,lbuf,0) ;
+	            rs = filer_println(ofp,lbuf,0) ;
 	            wlen += rs ;
 	        } /* end if (clen) */
 
@@ -1270,7 +1270,7 @@ int cols,int ind,int to)
 
 static int fingerworker_liner(fap,ofp,cols,ind,ln,sp,sl)
 FINGERARGS	*fap ;
-FILEBUF		*ofp ;
+FILER		*ofp ;
 int		cols ;
 int		ind ;
 int		ln ;
@@ -1334,12 +1334,12 @@ int		sl ;
 #endif
 
 	        if ((rs >= 0) && (nind > 0)) {
-	            rs = filebuf_writeblanks(ofp,nind) ;
+	            rs = filer_writeblanks(ofp,nind) ;
 	            wlen += rs ;
 	        }
 
 	        if (rs >= 0) {
-	            rs = filebuf_println(ofp,cp,cl) ;
+	            rs = filer_println(ofp,cp,cl) ;
 	            wlen += rs ;
 	        }
 
@@ -1371,10 +1371,10 @@ static int fingerclean(const int fd)
 	int		rs1 ;
 	int		nfd = -1 ;
 	if ((rs = openshmtmp(NULL,0,om)) >= 0) {
-	    const int	fo = FILEBUF_ONET ;
-	    FILEBUF	b ;
+	    const int	fo = FILER_ONET ;
+	    FILER	b ;
 	    nfd = rs ;
-	    if ((rs = filebuf_start(&b,fd,0L,0,fo)) >= 0) {
+	    if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
 	        const int	to = (1*60) ;
 	        const int	llen = LINEBUFLEN ;
 	        const int	clen = LINEBUFLEN ;
@@ -1387,7 +1387,7 @@ static int fingerclean(const int fd)
 	        if ((rs = uc_libmalloc(size,&bp)) >= 0) {
 	            lbuf = bp ;
 	            cbuf = (bp+(llen+1)) ;
-	            while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	                int	len = rs ;
 	                if (hasmseol(lbuf,len)) {
 	                    len -= 1 ;
@@ -1408,9 +1408,9 @@ static int fingerclean(const int fd)
 	            } /* end while */
 	            uc_libfree(bp) ;
 	        } /* end if (m-a) */
-	        rs1 = filebuf_finish(&b) ;
+	        rs1 = filer_finish(&b) ;
 	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filebuf) */
+	    } /* end if (filer) */
 	    if (rs >= 0) rs = u_rewind(nfd) ;
 	    if (rs < 0) u_close(nfd) ;
 	} /* end if (tmp-file) */

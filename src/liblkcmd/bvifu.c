@@ -55,7 +55,7 @@
 #include	<ctype.h>
 
 #include	<usystem.h>
-#include	<endianstr.h>
+#include	<endian.h>
 #include	<localmisc.h>
 
 #include	"bvihdr.h"

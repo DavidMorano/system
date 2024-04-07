@@ -41,7 +41,7 @@
 #include	<estrings.h>
 #include	<strpack.h>
 #include	<hdb.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<naturalwords.h>
 #include	<localmisc.h>
@@ -365,7 +365,7 @@ static int eigendb_fileparse(EIGENDB *op,cchar fname[])
 
 static int eigendb_fileparseread(EIGENDB *op,int fd,int fsize)
 {
-	FILEBUF		fb ;
+	FILER		fb ;
 	const int	to = TO_READ ;
 	int		rs ;
 	int		bufsize = 0 ;
@@ -374,7 +374,7 @@ static int eigendb_fileparseread(EIGENDB *op,int fd,int fsize)
 	if (fsize >= 0)
 	    bufsize = iceil(fsize,1024) ;
 
-	if ((rs = filebuf_start(&fb,fd,0L,bufsize,0)) >= 0) {
+	if ((rs = filer_start(&fb,fd,0L,bufsize,0)) >= 0) {
 	    const int	llen = MAXPATHLEN ;
 	    int		len ;
 	    int		sl, cl ;
@@ -386,7 +386,7 @@ static int eigendb_fileparseread(EIGENDB *op,int fd,int fsize)
 /* read the file */
 
 	    f_bol = TRUE ;
-	    while ((rs = filebuf_readln(&fb,lbuf,llen,to)) > 0) {
+	    while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
 	        len = rs ;
 
 	        f_eol = (lbuf[len - 1] == '\n') ;
@@ -423,8 +423,8 @@ static int eigendb_fileparseread(EIGENDB *op,int fd,int fsize)
 	        if (rs < 0) break ;
 	    } /* end while (lines) */
 
-	    filebuf_finish(&fb) ;
-	} /* end if (filebuf-finish) */
+	    filer_finish(&fb) ;
+	} /* end if (filer-finish) */
 
 	return (rs >= 0) ? c : rs ;
 }

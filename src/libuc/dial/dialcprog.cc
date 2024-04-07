@@ -96,7 +96,7 @@
 #include	<inetaddr.h>
 #include	<ids.h>
 #include	<getusername.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<findfilepath.h>
 #include	<localmisc.h>
 
@@ -282,8 +282,8 @@ struct bestnode {
 
 static int	getnodenames(cchar *,vecstr *,cchar *) ;
 static int	dialremote(struct dialinfo *,cchar *,cchar **, cchar **,int *) ;
-static int	findsync(FILEBUF *) ;
-static int	getrnode(FILEBUF *,char *) ;
+static int	findsync(FILER *) ;
+static int	getrnode(FILER *,char *) ;
 
 static int	sendvars(struct dialinfo *,int,cchar *,cchar **,cchar **) ;
 
@@ -300,7 +300,7 @@ static int	bestnode_get(BESTNODE *,struct dbinfo *,vecstr *,
 			char *,double *) ;
 #endif
 
-static int	filebuf_sendrecord(FILEBUF *,int,cchar *,int) ;
+static int	filer_sendrecord(FILER *,int,cchar *,int) ;
 
 static int	loadlocalnames(cchar *,struct dialinfo *,vecstr *) ;
 
@@ -932,7 +932,7 @@ badnoprog:
 /* local subroutines */
 
 static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
-	FILEBUF		rd ;
+	FILER		rd ;
 	int		rs = SR_OK ;
 	int		cl ;
 	int		fd ;
@@ -996,8 +996,8 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 
 /* initialize read buffer */
 
-	fbo = FILEBUF_ONET ;
-	rs = filebuf_start(&rd,fd,0L,BUFLEN,fbo) ;
+	fbo = FILER_ONET ;
+	rs = filer_start(&rd,fd,0L,BUFLEN,fbo) ;
 	if (rs < 0)
 	    goto badinit ;
 
@@ -1099,13 +1099,13 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 /* if we had an error channel, then find synchronization there also */
 
 	if (ip != NULL) {
-	    FILEBUF		rd2 ;
+	    FILER		rd2 ;
 
 #if	CF_DEBUGS
 	    debugprintf("dialremote: have an error channel FD=%d\n",*fd2p) ;
 #endif
 
-	    if ((rs = filebuf_start(&rd2,*fd2p,0L,BUFLEN,fbo)) >= 0) {
+	    if ((rs = filer_start(&rd2,*fd2p,0L,BUFLEN,fbo)) >= 0) {
 
 	        rs = findsync(&rd2) ;
 
@@ -1115,8 +1115,8 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 
 	        if (rs == 0) rs = SR_PROTO ;
 
-	        filebuf_finish(&rd2) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&rd2) ;
+	    } /* end if (filer) */
 
 	} /* end if */
 
@@ -1225,7 +1225,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 	    goto badkeep ;
 
 ret1:
-	filebuf_finish(&rd) ;
+	filer_finish(&rd) ;
 
 badrcmdr:
 badinit:
@@ -1272,7 +1272,7 @@ badsync:
 
 /* find synchronization in the data stream */
 static int findsync(bdp)
-FILEBUF		*bdp ;
+FILER		*bdp ;
 {
 	STREAMSYNC	ps ;
 	int		rs = SR_OK ;
@@ -1302,10 +1302,10 @@ FILEBUF		*bdp ;
 	    while ((rs >= 0) && (! f_sync)) {
 
 #if	CF_DEBUGS && CF_DEBUGFSYNC
-	        debugprintf("findsync: filebuf_read() \n") ;
+	        debugprintf("findsync: filer_read() \n") ;
 #endif
 
-	        rs = filebuf_read(bdp,databuf,1,TO_SYNC) ;
+	        rs = filer_read(bdp,databuf,1,TO_SYNC) ;
 	        len = rs ;
 	        if (rs < 0)
 	            break ;
@@ -1350,7 +1350,7 @@ FILEBUF		*bdp ;
 
 /* get the remote node name */
 static int getrnode(bdp,rnode)
-FILEBUF		*bdp ;
+FILER		*bdp ;
 char		rnode[] ;
 {
 	int		rs = SR_OK ;
@@ -1375,7 +1375,7 @@ char		rnode[] ;
 	    debugprintf("getrnode: while_loop rs=%d state=%d\n",rs,state) ;
 #endif
 
-	    rs = filebuf_read(bdp,databuf,1,TO_SYNC) ;
+	    rs = filer_read(bdp,databuf,1,TO_SYNC) ;
 	    len = rs ;
 	    if (rs < 0) break ;
 
@@ -1550,7 +1550,7 @@ static int mklisten_bind(DIALINFO *dip,DIALINFO_SI *sip,int s)
 /* send the various variables over to the other side */
 static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	ENVLIST		vars ;
-	FILEBUF		wr ;
+	FILER		wr ;
 	cint		envlen = ENVBUFLEN ;
 	int		rs, rs1 ;
 	int		i, cl ;
@@ -1564,28 +1564,28 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	if (rs < 0)
 	    goto ret0 ;
 
-	fbo = FILEBUF_ONET ;
-	rs = filebuf_start(&wr,fd,0L,BUFLEN,fbo) ;
+	fbo = FILER_ONET ;
+	rs = filer_start(&wr,fd,0L,BUFLEN,fbo) ;
 	if (rs < 0)
 	    goto ret1 ;
 
 /* our (local) node name */
 
 	rtype = dialcprogmsgtype_nodename ;
-	rs = filebuf_sendrecord(&wr,rtype,dip->nodename,-1) ;
+	rs = filer_sendrecord(&wr,rtype,dip->nodename,-1) ;
 
 /* program file name */
 
 	if (rs >= 0) {
 	    rtype = dialcprogmsgtype_fname ;
-	    rs = filebuf_sendrecord(&wr,rtype,pfn,-1) ;
+	    rs = filer_sendrecord(&wr,rtype,pfn,-1) ;
 	}
 
 /* arguments */
 
 	rtype = dialcprogmsgtype_arg ;
 	for (i = 0 ; (rs >= 0) && (av[i] != NULL) ; i += 1) {
-	    rs = filebuf_sendrecord(&wr,rtype,av[i],-1) ;
+	    rs = filer_sendrecord(&wr,rtype,av[i],-1) ;
 	} /* end for */
 
 /* environment */
@@ -1604,7 +1604,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	        el = rs ;
 	        if ((rs = envlist_add(&vars,envbuf,el)) >= 0) {
 	            rtype = dialcprogmsgtype_env ;
-	            rs = filebuf_sendrecord(&wr,rtype,envbuf,el) ;
+	            rs = filer_sendrecord(&wr,rtype,envbuf,el) ;
 	        }
 	    }
 	} /* end if (remote node as environment) */
@@ -1630,7 +1630,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 
 	                if (rs >= 0) {
 	                    rtype = dialcprogmsgtype_env ;
-	                    rs = filebuf_sendrecord(&wr,rtype,ev[i],-1) ;
+	                    rs = filer_sendrecord(&wr,rtype,ev[i],-1) ;
 	                }
 
 	            } else if (strkeycmp(VARDISPLAY,ev[i]) == 0) {
@@ -1663,7 +1663,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 
 	                if ((rs = envlist_add(&vars,cp,-1)) >= 0) {
 	                    rtype = dialcprogmsgtype_env ;
-	                    rs = filebuf_sendrecord(&wr,rtype,cp,cl) ;
+	                    rs = filer_sendrecord(&wr,rtype,cp,cl) ;
 	                }
 
 	            } /* end if (good or bad environment variables) */
@@ -1680,7 +1680,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	    (dip->pwd[0] != '\0')) {
 
 	    rtype = dialcprogmsgtype_pwd ;
-	    if ((rs = filebuf_sendrecord(&wr,rtype,dip->pwd,-1)) >= 0) {
+	    if ((rs = filer_sendrecord(&wr,rtype,dip->pwd,-1)) >= 0) {
 	        cchar	*varpwd = VARPWD ;
 
 	        rs1 = envlist_present(&vars,varpwd,-1,NULL) ;
@@ -1695,7 +1695,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	            cl = rs ;
 	            if (rs >= 0) {
 	                rtype = dialcprogmsgtype_env ;
-	                rs = filebuf_sendrecord(&wr,rtype,cp,cl) ;
+	                rs = filer_sendrecord(&wr,rtype,cp,cl) ;
 	            }
 
 	        } else
@@ -1735,7 +1735,7 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 	    }
 #endif
 
-	    rs = filebuf_write(&wr,buf,cl) ;
+	    rs = filer_write(&wr,buf,cl) ;
 
 	} /* end if (light-weight sockets) */
 
@@ -1750,18 +1750,18 @@ static int sendvars(DIALINFO *dip,int fd,cchar *pfn,mainv av,mainv ev) noex {
 
 	    cl = dialcprogmsg_end(buf,BUFLEN,0,&m0) ;
 
-	    rs = filebuf_write(&wr,buf,cl) ;
+	    rs = filer_write(&wr,buf,cl) ;
 
 	} /* end if (end of data records) */
 
 /* finish up */
 
 #ifdef	COMMENT
-	rs1 = filebuf_flush(&wr) ;
+	rs1 = filer_flush(&wr) ;
 	if (rs >= 0) rs = rs1 ;
 #endif
 
-	rs1 = filebuf_finish(&wr) ;
+	rs1 = filer_finish(&wr) ;
 	if (rs >= 0) rs = rs1 ;
 
 /* we're out of here */
@@ -1780,7 +1780,7 @@ ret0:
 /* end subroutine (sendvars) */
 
 
-static int filebuf_sendrecord(FILEBUF *bp,int type,cchar *sp,int sl)
+static int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
 {
 	int		rs ;
 	int		tlen = 0 ;
@@ -1793,31 +1793,31 @@ static int filebuf_sendrecord(FILEBUF *bp,int type,cchar *sp,int sl)
 	    return SR_TOOBIG ;
 
 #if	CF_DEBUGS
-	debugprintf("dialcprog/filebuf_sendrecord: t=%u s=>%t<\n",
+	debugprintf("dialcprog/filer_sendrecord: t=%u s=>%t<\n",
 	    type,sp,strlinelen(sp,sl,40)) ;
 #endif
 
 	data[0] = type ;
 	if ((rs = stdorder_wushort((data+1),(sl+1))) >= 0) {
-	    if ((rs = filebuf_write(bp,data,3)) >= 0) {
+	    if ((rs = filer_write(bp,data,3)) >= 0) {
 	        tlen += rs ;
-	        if ((rs = filebuf_write(bp,sp,sl)) >= 0) {
+	        if ((rs = filer_write(bp,sp,sl)) >= 0) {
 	    	    tlen += rs ;
 	    	    data[0] = '\0' ;
-	    	    rs = filebuf_write(bp,data,1) ;
+	    	    rs = filer_write(bp,data,1) ;
 	    	    tlen += rs ;
 		}
 	    }
 	}
 
 #if	CF_DEBUGS && 0
-	debugprintf("dialcprog/filebuf_sendrecord: ret rs=%d tlen=%u\n",
+	debugprintf("dialcprog/filer_sendrecord: ret rs=%d tlen=%u\n",
 	    rs,tlen) ;
 #endif
 
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (filebuf_sendrecord) */
+/* end subroutine (filer_sendrecord) */
 
 
 static int getclusters(dbip,sp,nodename)

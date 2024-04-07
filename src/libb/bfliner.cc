@@ -160,11 +160,11 @@ static int bfliner_adv(bfliner *op,int inc) noex {
 	            int		rlen = inc ;
 	            while ((rs >= 0) && (rlen > 0)) {
 	                cint	mlen = min(rlen,op->llen) ;
-	                rs = filebuf_read(&op->mfb,op->lbuf,mlen,op->to) ;
+	                rs = filer_read(&op->mfb,op->lbuf,mlen,op->to) ;
 	                rlen -= rs ;
 	            } /* end while */
 	        } else {
-	            rs = filebuf_adv(&op->mfb,inc) ;
+	            rs = filer_adv(&op->mfb,inc) ;
 		}
 	        op->foff += inc ;
 	    } /* end if */

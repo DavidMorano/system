@@ -50,7 +50,7 @@
 #include	<strings.h>		/* |strncasecmp(3c)| */
 
 #include	<usystem.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<vecstr.h>
 #include	<hdbstr.h>
 #include	<field.h>
@@ -247,10 +247,10 @@ const char	fname[] ;
 	if (fname[0] == '\0') return SR_INVALID ;
 
 	if ((rs = u_open(fname,O_RDONLY,0666)) >= 0) {
-	    FILEBUF	dfile, *dfp = &dfile ;
+	    FILER	dfile, *dfp = &dfile ;
 	    int	fd = rs ;
 
-	    if ((rs = filebuf_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
+	    if ((rs = filer_start(dfp,fd,0L,BUFLEN,0)) >= 0) {
 		FIELD		fsb ;
 	        const int	llen = LINEBUFLEN ;
 		const int	vlen = VBUFLEN ;
@@ -260,7 +260,7 @@ const char	fname[] ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 		char		vbuf[VBUFLEN + 1] ;
 
-	        while ((rs = filebuf_readln(dfp,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(dfp,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -312,8 +312,8 @@ const char	fname[] ;
 	            if (rs < 0) break ;
 	        } /* end while (reading lines) */
 
-	        filebuf_finish(dfp) ;
-	    } /* end if (filebuf) */
+	        filer_finish(dfp) ;
+	    } /* end if (filer) */
 
 	    u_close(fd) ;
 	} /* end if (file) */

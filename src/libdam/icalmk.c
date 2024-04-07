@@ -94,10 +94,9 @@
 
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<estrings.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<tmtime.h>
 #include	<localmisc.h>
@@ -124,7 +123,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(const char *,int) ;
+extern uint	hash_elf(const char *,int) ;
 
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
@@ -185,7 +184,7 @@ static int	icalmk_nfexists(ICALMK *) ;
 static int	icalmk_mkcyi(ICALMK *) ;
 static int	icalmk_renamefiles(ICALMK *) ;
 
-static int	filebuf_writefill(FILEBUF *,const char *,int) ;
+static int	filer_writefill(FILER *,const char *,int) ;
 
 static int	mkcitation(uint *,ICALMK_ENT *) ;
 
@@ -707,7 +706,7 @@ ICALMK	*op ;
 
 	ICALHDR	hf ;
 
-	FILEBUF	cyifile ;
+	FILER	cyifile ;
 
 	time_t	daytime = time(NULL) ;
 
@@ -732,7 +731,7 @@ ICALMK	*op ;
 
 	op->f.viopen = TRUE ;
 	size = (pagesize * 4) ;
-	rs = filebuf_start(&cyifile,op->nfd,0,size,0) ;
+	rs = filer_start(&cyifile,op->nfd,0,size,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
@@ -759,7 +758,7 @@ ICALMK	*op ;
 /* write header */
 
 	if (rs >= 0) {
-	    rs = filebuf_writefill(&cyifile,buf,bl) ;
+	    rs = filer_writefill(&cyifile,buf,bl) ;
 	    fileoff += rs ;
 	}
 
@@ -772,7 +771,7 @@ ICALMK	*op ;
 	    rs = pathclean(tmpdname,op->idname,-1) ;
 	    tl = rs ;
 	    if (rs >= 0) {
-	        rs = filebuf_writefill(&cyifile,tmpdname,(tl+1)) ;
+	        rs = filer_writefill(&cyifile,tmpdname,(tl+1)) ;
 	        fileoff += rs ;
 	    }
 	}
@@ -780,7 +779,7 @@ ICALMK	*op ;
 	if (rs >= 0) {
 	    int		tl = strlen(op->calname) ;
 	    hf.caloff = fileoff ;
-	    rs = filebuf_writefill(&cyifile,op->calname,(tl+1)) ;
+	    rs = filer_writefill(&cyifile,op->calname,(tl+1)) ;
 	    fileoff += rs ;
 	}
 
@@ -806,7 +805,7 @@ ICALMK	*op ;
 #endif
 
 	    n += 1 ;
-	    rs = filebuf_write(&cyifile,a,size) ;
+	    rs = filer_write(&cyifile,a,size) ;
 	    fileoff += rs ;
 	    if (rs < 0)
 		break ;
@@ -828,7 +827,7 @@ ICALMK	*op ;
 	    a[0] = blep->loff ;
 	    a[1] = blep->llen ;
 	    n += 1 ;
-	    rs = filebuf_write(&cyifile,a,size) ;
+	    rs = filer_write(&cyifile,a,size) ;
 	    fileoff += rs ;
 	    if (rs < 0)
 		break ;
@@ -839,7 +838,7 @@ ICALMK	*op ;
 
 /* write out the header -- again! */
 ret2:
-	filebuf_finish(&cyifile) ;
+	filer_finish(&cyifile) ;
 
 	if (rs >= 0) {
 
@@ -921,8 +920,8 @@ ret0:
 /* end subroutine (icalmk_renamefiles) */
 
 
-static int filebuf_writefill(bp,fbuf,flen)
-FILEBUF		*bp ;
+static int filer_writefill(bp,fbuf,flen)
+FILER		*bp ;
 const char	fbuf[] ;
 int		flen ;
 {
@@ -935,21 +934,21 @@ int		flen ;
 	if (flen < 0)
 	    flen = strlen(fbuf) ;
 
-	rs = filebuf_write(bp,fbuf,flen) ;
+	rs = filer_write(bp,fbuf,flen) ;
 	wlen = rs ;
 
 	r = (flen & (asize - 1)) ;
 	if ((rs >= 0) && (r > 0)) {
 	    nzero = (asize - r) ;
 	    if (nzero > 0) {
-	        rs = filebuf_write(bp,zerobuf,nzero) ;
+	        rs = filer_write(bp,zerobuf,nzero) ;
 	        wlen += rs ;
 	    }
 	}
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_writefill) */
+/* end subroutine (filer_writefill) */
 
 
 static int mkcitation(cip,bvp)

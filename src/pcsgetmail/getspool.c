@@ -71,7 +71,7 @@
 #include	<string.h>
 
 #include	<usystem.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<sbuf.h>
@@ -350,7 +350,7 @@ struct modinfo	*mip ;
 	int		rs1 ;
 	int		tlen = 0 ;
 
-	if ((rs = sigblock_start(&blocker,sigblocks)) >= 0) {
+	if ((rs = sigblocker_start(&blocker,sigblocks)) >= 0) {
 	    struct ustat	sb ;
 	    int			lfd ;
 	    int			j ;
@@ -462,7 +462,7 @@ struct modinfo	*mip ;
 
 /* turn interrupts, etc back on */
 
-	    sigblock_finish(&blocker) ;
+	    sigblocker_finish(&blocker) ;
 	} /* end if (sigblock) */
 
 #if	CF_DEBUG

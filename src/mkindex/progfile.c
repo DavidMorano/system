@@ -73,7 +73,7 @@
 /* external subroutines */
 
 extern uint	nextpowtwo(uint) ;
-extern uint	hashelf(const void *,int) ;
+extern uint	hash_elf(const void *,int) ;
 
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
@@ -195,7 +195,7 @@ const char	fname[] ;
 
 	memfile_tell(mfp,&poff) ;
 
-	memfile_buf(mfp,&posta) ;
+	memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(5))
@@ -329,7 +329,7 @@ const char	fname[] ;
 	            debugprintf("procdata: word=%t\n",cp,cl) ;
 #endif
 
-	        hi = hashelf(cp,cl) & himask ;
+	        hi = hash_elf(cp,cl) & himask ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(5))
@@ -417,7 +417,7 @@ const char	fname[] ;
 
 	            c += 1 ;
 	            poff += rs ;
-	            memfile_buf(mfp,&posta) ;
+	            memfile_getbuf(mfp,&posta) ;
 
 #if	CF_DEBUG
 	            if (DEBUGLEVEL(5))

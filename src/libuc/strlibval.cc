@@ -213,7 +213,7 @@ ccharp strlibval::strmaildir() noex {
 }
 /* end method (strlibval::strmaildir) */
 
-cchar *strlibval::strpath() noex {
+ccharp strlibval::strpath() noex {
 	cchar	*rp = nullptr ;
 	if (cchar *vn ; (vn = enver.name[w]) != nullptr) {
 	    if ((rp = getenv(vn)) == nullptr) {

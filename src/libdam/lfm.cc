@@ -65,7 +65,7 @@
 #include	<cstdarg>
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<storeitem.h>
 #include	<getusername.h>
 #include	<ugetpid.h>
@@ -158,7 +158,7 @@ static int	lfm_startcheck(LFM *,time_t) ;
 static int	lfm_startopen(LFM *,LFM_LOCKINFO *) ;
 
 static int	lfm_lockload(LFM *,LFM_CHECK *) ;
-static int	lfm_locklost(LFM *,LFM_CHECK *,FILEBUF *) ;
+static int	lfm_locklost(LFM *,LFM_CHECK *,FILER *) ;
 static int	lfm_lockwrite(LFM *,LFM_LOCKINFO *,int) ;
 static int	lfm_lockwriter(LFM *,LFM_LOCKINFO *,int) ;
 static int	lfm_lockwritedate(LFM *,time_t) ;
@@ -649,14 +649,14 @@ static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
 	    check_init(lcp) ;
 
 	    if ((rs = u_open(op->lfname,of,omode)) >= 0) {
-	        FILEBUF		b ;
+	        FILER		b ;
 	        const int	lfd = rs ;
 
-	        if ((rs = filebuf_start(&b,lfd,0L,512,0)) >= 0) {
+	        if ((rs = filer_start(&b,lfd,0L,512,0)) >= 0) {
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            if ((rs = filebuf_readln(&b,lbuf,llen,0)) > 0) {
+	            if ((rs = filer_readln(&b,lbuf,llen,0)) > 0) {
 	                len = rs ;
 
 	                if ((len > 0) && (lbuf[len - 1] == '\n'))
@@ -679,9 +679,9 @@ static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
 	                rs = SR_LOCKLOST ;
 	            }
 
-	            rs1 = filebuf_finish(&b) ;
+	            rs1 = filer_finish(&b) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+	        } /* end if (filer) */
 
 	        rs1 = u_close(lfd) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -695,7 +695,7 @@ static int lfm_lockload(LFM *op,LFM_CHECK *lcp)
 
 
 /* read the lock information on a failure */
-static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILEBUF *fp)
+static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILER *fp)
 {
 	STOREITEM	cb ;
 	const int	buflen = LFM_CHECKBUFLEN ;
@@ -718,7 +718,7 @@ static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILEBUF *fp)
 	    const char	*tp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
-	    if ((rs = filebuf_readln(fp,lbuf,llen,0)) > 0) {
+	    if ((rs = filer_readln(fp,lbuf,llen,0)) > 0) {
 	        len = rs ;
 
 	        if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -753,7 +753,7 @@ static int lfm_locklost(LFM *op,LFM_CHECK *lcp,FILEBUF *fp)
 
 	    if ((rs >= 0) && (len > 0)) {
 
-	        if ((rs = filebuf_readln(fp,lbuf,llen,0)) > 0) {
+	        if ((rs = filer_readln(fp,lbuf,llen,0)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -802,20 +802,20 @@ static int lfm_lockwrite(LFM *op,LFM_LOCKINFO *lip,int lfd)
 
 static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	int		rs ;
 	int		rs1 ;
 	int		woff = 0 ;
 
-	if ((rs = filebuf_start(&b,lfd,0L,512,0)) >= 0) {
+	if ((rs = filer_start(&b,lfd,0L,512,0)) >= 0) {
 
 	    if (rs >= 0) {
-	        rs = filebuf_printf(&b,"%u\n",op->pid) ;
+	        rs = filer_printf(&b,"%u\n",op->pid) ;
 	        woff += rs ;
 	    }
 
 	    if (rs >= 0) {
-	        rs = filebuf_printf(&b,"%s!%s\n",lip->nn,lip->un) ;
+	        rs = filer_printf(&b,"%s!%s\n",lip->nn,lip->un) ;
 	        woff += rs ;
 	    }
 
@@ -824,13 +824,13 @@ static int lfm_lockwriter(LFM *op,LFM_LOCKINFO *lip,int lfd)
 	        char		tbuf[TIMEBUFLEN+1] ;
 	        op->odate = woff ;
 	        timestr_logz(lip->dt,tbuf) ;
-	        rs = filebuf_printf(&b,"%s %s\n",tbuf,bn) ;
+	        rs = filer_printf(&b,"%s %s\n",tbuf,bn) ;
 	        woff += rs ;
 	    }
 
-	    rs1 = filebuf_finish(&b) ;
+	    rs1 = filer_finish(&b) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 
 	return (rs >= 0) ? woff : rs ;
 }

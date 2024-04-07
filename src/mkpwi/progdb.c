@@ -44,7 +44,6 @@
 
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<getbufsize.h>
 #include	<bfile.h>
 #include	<pwfile.h>

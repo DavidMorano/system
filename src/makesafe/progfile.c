@@ -46,7 +46,7 @@
 #include	<vecstr.h>
 #include	<vecobj.h>
 #include	<spawnproc.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<sbuf.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -582,7 +582,7 @@ PROGINFO	*pip ;
 VECSTR		*dp ;
 int		fd ;
 {
-	FILEBUF		buf ;
+	FILER		buf ;
 	const int	to = pip->to_read ;
 	int		rs ;
 	int		c = 0 ;
@@ -599,14 +599,14 @@ int		fd ;
 #endif
 
 	if ((rs = u_rewind(fd)) >= 0) {
-	    if ((rs = filebuf_start(&buf,fd,0L,BUFLEN,0)) >= 0) {
+	    if ((rs = filer_start(&buf,fd,0L,BUFLEN,0)) >= 0) {
 	        struct lstate	ls ;
 	        const int	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        memset(&ls,0,sizeof(struct lstate)) ;
-	        while ((rs = filebuf_readln(&buf,lbuf,llen,to)) > 0) {
+	        while ((rs = filer_readln(&buf,lbuf,llen,to)) > 0) {
 	            len = rs ;
 
 	            if (lbuf[len - 1] == '\n') len -= 1 ;
@@ -624,8 +624,8 @@ int		fd ;
 	            if (rs < 0) break ;
 	        } /* end while */
 
-	        filebuf_finish(&buf) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&buf) ;
+	    } /* end if (filer) */
 	} /* end if (rewind) */
 
 	if ((pip->debuglevel > 0) && (rs < 0)) {
@@ -692,7 +692,7 @@ VECOBJ		*errp ;
 int		fd_err ;
 {
 	struct ustat	sb ;
-	FILEBUF		buf ;
+	FILER		buf ;
 	const int	fsize = BUFLEN ;
 	int		rs ;
 	int		to = pip->to_read ;
@@ -704,7 +704,7 @@ int		fd_err ;
 	}
 
 	if ((rs >= 0) && (sb.st_size > 0)) {
-	    if ((rs = filebuf_start(&buf,fd_err,0L,fsize,0)) >= 0) {
+	    if ((rs = filer_start(&buf,fd_err,0L,fsize,0)) >= 0) {
 	        const int	llen = LINEBUFLEN ;
 	        int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
@@ -716,7 +716,7 @@ int		fd_err ;
 #endif
 
 	        while (rs >= 0) {
-	            rs = filebuf_readln(&buf,lbuf,llen,to) ;
+	            rs = filer_readln(&buf,lbuf,llen,to) ;
 	            len = rs ;
 	            if (rs <= 0) break ;
 
@@ -748,8 +748,8 @@ int		fd_err ;
 	        }
 #endif /* CF_DEBUG */
 
-	        filebuf_finish(&buf) ;
-	    } /* end if (filebuf) */
+	        filer_finish(&buf) ;
+	    } /* end if (filer) */
 	} /* end if (stat) */
 
 	return rs ;

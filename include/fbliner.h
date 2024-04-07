@@ -31,14 +31,14 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<filebuf.h>
+#include	<filer.h>
 
 
 #define	FBLINER		struct fbliner_head
 
 
 struct fbliner_head {
-	filebuf		*fbp ;		/* externally-owned */
+	filer		*fbp ;		/* externally-owned */
 	char		*lbuf ;		/* allocated */
 	off_t		poff ;		/* file-offset previous */
 	off_t		foff ;		/* file-offset current */
@@ -50,7 +50,7 @@ typedef	FBLINER		fbliner ;
 
 EXTERNC_begin
 
-extern int fbliner_start(fbliner *,filebuf *,off_t,int) noex ;
+extern int fbliner_start(fbliner *,filer *,off_t,int) noex ;
 extern int fbliner_finish(fbliner *) noex ;
 extern int fbliner_read(fbliner *,cchar **) noex ;
 extern int fbliner_done(fbliner *) noex ;

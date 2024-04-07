@@ -1,34 +1,36 @@
-/* userports */
+/* userports HEADER */
+/* lang=C20 */
+
+/* query the USERPOTS database for entries */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	USERPORTS_INCLUDE
-#define	USERPORTS_INCLUDE	1
+#define	USERPORTS_INCLUDE
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/socket.h>
-
-#include	<usystem.h>		/* for 'ino_t' */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<usystem.h>		/* for |ino_t| */
 #include	<vecobj.h>
 #include	<vecpstr.h>
 #include	<localmisc.h>
 
 
 #define	USERPORTS	struct userports_head
-#define	USERPORTS_CUR	struct userports_cur
-#define	USERPORTS_ENT	struct userports_ent
-
+#define	USERPORTS_FL	struct userports_flags ;
+#define	USERPORTS_CUR	struct userports_curusor
+#define	USERPORTS_ENT	struct userports_enttry
+#define	USERPORTS_FI	struct userports_file
 #define	USERPORTS_MAGIC	0x87437174
 #define	USERPORTS_FNAME	"/etc/userports"
 
-struct userports_ent {
+
+struct userports_entry {
+	cchar		*protocol ;
+	cchar		*portname ;
 	uid_t		uid ;
-	const char	*protocol ;
-	const char	*portname ;
 } ;
 
 struct userports_cur {
@@ -36,7 +38,7 @@ struct userports_cur {
 } ;
 
 struct userports_flags {
-	uint		eof:1 ;
+	uint		feof:1 ;
 	uint		sorted:1 ;
 } ;
 
@@ -47,35 +49,34 @@ struct userports_file {
 } ;
 
 struct userports_head {
-	uint		magic ;
 	vecobj		ents ;
 	vecpstr		protos ;
 	vecpstr		ports ;
-	struct userports_flags	f ;
-	struct userports_file	fi ;
-	const char	*fname ;
+	cchar		*fname ;
+	USERPORTS_FL	f ;
+	USERPORTS_FI	fi ;
+	uint		magic ;
 } ;
 
+typedef	USERPORTS	userports ;
+typedef	USERPORTS_FL	userports_fl ;
+typedef	USERPORTS_CUR	userports_cur ;
+typedef	USERPORTS_ENT	userports_ent ;
+typedef	USERPORTS_FI	userports_fi ;
 
-#if	(! defined(USERPORTS_MASTER)) || (USERPORTS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int userports_open(userports *,cchar *) noex ;
+extern int userports_query(userports *,uid_t,cchar *,int) noex ;
+extern int userports_curbegin(userports *,userports_cur *) noex ;
+extern int userports_enum(userports *,userports_cur *,userports_ent *) noex ;
+extern int userports_fetch(userports *,userports_cur *,uid_t,
+		userports_ent *) noex ;
+extern int userports_curend(userports *,userports_cur *) noex ;
+extern int userports_close(userports *) noex ;
 
-extern int userports_open(USERPORTS *,const char *) ;
-extern int userports_query(USERPORTS *,uid_t,const char *,int) ;
-extern int userports_curbegin(USERPORTS *,USERPORTS_CUR *) ;
-extern int userports_enum(USERPORTS *,USERPORTS_CUR *,USERPORTS_ENT *) ;
-extern int userports_fetch(USERPORTS *,USERPORTS_CUR *,uid_t,USERPORTS_ENT *) ;
-extern int userports_curend(USERPORTS *,USERPORTS_CUR *) ;
-extern int userports_close(USERPORTS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* USERPORTS_MASTER */
 
 #endif /* USERPORTS_INCLUDE */
 

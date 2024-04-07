@@ -8,20 +8,11 @@
 #include	<stdarg.h>
 #include	<stdio.h>
 #include	<usystem.h>
-#include	<filebuf.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
 #ifndef	UEBUFLEN
 #define	UEBUFLEN	UTMPACCENT_BUFLEN
-#endif
-
-#ifndef FILEBUF_RCNET
-#define	FILEBUF_RCNET	4		/* read-count for network */
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
 #endif
 
 #define	VARDEBUGFNAME	"TESTREST_DEBUGFILE"

@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	This module manages the UNIX® System V Inter-Process-Communication
-	(IPC) Messaging (MSG) subroutine interface.
+	(IPC) Messaging (MSG) facility interface.
 
 *******************************************************************************/
 

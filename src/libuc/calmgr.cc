@@ -46,7 +46,6 @@
 #include	<getusername.h>
 #include	<fsdir.h>
 #include	<ucmallreg.h>
-#include	<endianstr.h>
 #include	<localmisc.h>
 #include	<mkpathx.h>
 

@@ -112,7 +112,7 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 int		outema_item(OUTEMA *,const char *,int) ;
 
-static int	filebuf_outpart(FILEBUF *,int,const char *,int) ;
+static int	filer_outpart(FILER *,int,const char *,int) ;
 
 
 /* local variables */
@@ -121,7 +121,7 @@ static int	filebuf_outpart(FILEBUF *,int,const char *,int) ;
 /* exported subroutines */
 
 
-int outema_start(OUTEMA *op,FILEBUF *ofp,int maxlen)
+int outema_start(OUTEMA *op,FILER *ofp,int maxlen)
 {
 
 	if (op == NULL)
@@ -146,7 +146,7 @@ int outema_finish(OUTEMA *ldp)
 	if (ldp->ofp == NULL) return SR_FAULT ;
 
 	if (ldp->llen > 0) {
-	    rs = filebuf_println(ldp->ofp,NULL,0) ;
+	    rs = filer_println(ldp->ofp,NULL,0) ;
 	    ldp->wlen += rs ;
 	    ldp->rlen = ldp->maxlen ;
 	    ldp->llen = 0 ;
@@ -297,7 +297,7 @@ int outema_value(OUTEMA *ldp,cchar vp[],int vl)
 	                    ldp->f.comma = FALSE ;
 	                    fmt = ",\n" ;
 	                }
-	                rs = filebuf_write(ldp->ofp,fmt,-1) ;
+	                rs = filer_write(ldp->ofp,fmt,-1) ;
 	                wlen += rs ;
 	            }
 
@@ -311,7 +311,7 @@ int outema_value(OUTEMA *ldp,cchar vp[],int vl)
 	            if (f_comma) {
 	                ldp->f.comma = FALSE ;
 	            }
-	            rs = filebuf_outpart(ldp->ofp,f_comma,cp,cl) ;
+	            rs = filer_outpart(ldp->ofp,f_comma,cp,cl) ;
 	            wlen += rs ;
 	            ldp->llen += rs ;
 	            ldp->rlen -= rs ;
@@ -351,7 +351,7 @@ int outema_write(OUTEMA *ldp,cchar v[],int vlen)
 	    vlen = strlen(v) ;
 
 	if (vlen > 0) {
-	    rs = filebuf_write(ldp->ofp,v,vlen) ;
+	    rs = filer_write(ldp->ofp,v,vlen) ;
 	    wlen += rs ;
 	    ldp->llen += rs ;
 	    ldp->rlen -= rs ;
@@ -385,7 +385,7 @@ int outema_printf(OUTEMA *ldp,const char *fmt,...)
 	}
 
 	if (rs >= 0) {
-	    rs = filebuf_write(ldp->ofp,buf,len) ;
+	    rs = filer_write(ldp->ofp,buf,len) ;
 	    wlen += rs ;
 	    ldp->wlen += rs ;
 	    ldp->llen += rs ;
@@ -415,14 +415,14 @@ int outema_hdrkey(OUTEMA *ldp,cchar kname[])
 	if (kname[0] == '\0') return SR_INVALID ;
 
 	if ((rs >= 0) && (ldp->llen > 0)) {
-	    rs = filebuf_println(ldp->ofp,kname,0) ;
+	    rs = filer_println(ldp->ofp,kname,0) ;
 	    wlen += rs ;
 	    ldp->llen = 0 ;
 	    ldp->rlen = ldp->maxlen ;
 	}
 
 	if (rs >= 0) {
-	    rs = filebuf_write(ldp->ofp,kname,-1) ;
+	    rs = filer_write(ldp->ofp,kname,-1) ;
 	    wlen += rs ;
 	    nlen += rs ;
 	}
@@ -431,7 +431,7 @@ int outema_hdrkey(OUTEMA *ldp,cchar kname[])
 	    char	buf[2] ;
 	    buf[0] = ':' ;
 	    buf[1] = '\0' ;
-	    rs = filebuf_write(ldp->ofp,buf,1) ;
+	    rs = filer_write(ldp->ofp,buf,1) ;
 	    wlen += rs ;
 	    nlen += rs ;
 	}
@@ -467,7 +467,7 @@ int outema_needlength(OUTEMA *ldp,int cl)
 /* private subroutines */
 
 
-static int filebuf_outpart(FILEBUF *fbp,int f_comma,cchar *cp,int cl)
+static int filer_outpart(FILER *fbp,int f_comma,cchar *cp,int cl)
 {
 	int		rs = SR_OK ;
 	int		i ;
@@ -481,14 +481,14 @@ static int filebuf_outpart(FILEBUF *fbp,int f_comma,cchar *cp,int cl)
 	if (f_comma) buf[i++] = CH_COMMA ;
 	buf[i++] = ' ' ;
 	buf[i] = '\0' ;
-	if ((rs = filebuf_write(fbp,buf,i)) >= 0) {
+	if ((rs = filer_write(fbp,buf,i)) >= 0) {
 	    wlen += rs ;
-	    rs = filebuf_write(fbp,cp,cl) ;
+	    rs = filer_write(fbp,cp,cl) ;
 	    wlen += rs ;
 	}
 
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (filebuf_outpart) */
+/* end subroutine (filer_outpart) */
 
 

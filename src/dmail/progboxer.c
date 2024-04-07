@@ -66,7 +66,7 @@
 #include	<getax.h>
 #include	<sbuf.h>
 #include	<bfile.h>
-#include	<sigblock.h>
+#include	<sigblocker.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -323,7 +323,7 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 
 /* do the copy atomically */
 
-	            if ((rs = sigblock_start(&blocks,oursigs)) >= 0) {
+	            if ((rs = sigblocker_start(&blocks,oursigs)) >= 0) {
 			off_t	soff ;
 
 #if	(CF_DEBUGS || CF_DEBUG) && CF_TESTSLEEP
@@ -361,7 +361,7 @@ static int boxadd(PROGINFO *pip,int tfd,RECIP *rp,cchar *mailfname)
 
 /* turn interrupts, etc back on */
 
-	                sigblock_finish(&blocks) ;
+	                sigblocker_finish(&blocks) ;
 	            } /* end if (sigblock) */
 
 /* unlock the mailbox file */

@@ -48,7 +48,6 @@
 #include	<field.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

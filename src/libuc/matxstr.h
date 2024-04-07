@@ -34,6 +34,7 @@ EXTERNC_begin
 extern int	matsubstr(mainv,cchar *,int) noex ;
 extern int	matcasesubstr(mainv,cchar *,int) noex ;
 extern int	matnstr(mainv,cchar *,int) noex ;
+extern int	matlocalfs(cchar *,int) noex ;
 
 EXTERNC_end
 

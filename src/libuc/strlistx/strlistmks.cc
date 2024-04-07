@@ -76,8 +76,8 @@
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<strtab.h>
-#include	<filebuf.h>
-#include	<endianstr.h>
+#include	<filer.h>
+#include	<endian.h>
 #include	<localmisc.h>
 #include	<hash.h>
 
@@ -202,7 +202,7 @@ static int	rectab_finish(RECTAB *) ;
 static int	rectab_count(RECTAB *) ;
 #endif
 
-static int	filebuf_writefill(FILEBUF *,const char *,int) ;
+static int	filer_writefill(FILER *,const char *,int) ;
 
 static int	indinsert(uint (*rt)[1],uint (*it)[3],int,struct varentry *) ;
 static int	hashindex(uint,int) ;
@@ -740,7 +740,7 @@ static int strlistmks_wrvarfile(op)
 STRLISTMKS	*op ;
 {
 	STRLISTHDR	hf ;
-	FILEBUF		varfile ;
+	FILER		varfile ;
 	STRTAB		*ksp = &op->strs ;
 	const time_t	daytime = time(NULL) ;
 	uint		fileoff = 0 ;
@@ -764,7 +764,7 @@ STRLISTMKS	*op ;
 
 	op->f.viopen = TRUE ;
 	size = (pagesize * 4) ;
-	rs = filebuf_start(&varfile,op->nfd,0,size,0) ;
+	rs = filer_start(&varfile,op->nfd,0,size,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
@@ -789,7 +789,7 @@ STRLISTMKS	*op ;
 /* write header */
 
 	if (rs >= 0) {
-	    rs = filebuf_writefill(&varfile,buf,bl) ;
+	    rs = filer_writefill(&varfile,buf,bl) ;
 	    fileoff += rs ;
 	}
 
@@ -802,7 +802,7 @@ STRLISTMKS	*op ;
 	hf.rtlen = rtl ;
 
 	size = (rtl + 1) * 2 * sizeof(uint) ;
-	rs = filebuf_write(&varfile,rt,size) ;
+	rs = filer_write(&varfile,rt,size) ;
 	fileoff += rs ;
 
 /* make and write out key-string table */
@@ -822,7 +822,7 @@ STRLISTMKS	*op ;
 /* write out the key-string table */
 
 	        if (rs >= 0) {
-	            rs = filebuf_write(&varfile,kstab,size) ;
+	            rs = filer_write(&varfile,kstab,size) ;
 	            fileoff += rs ;
 	        }
 
@@ -849,7 +849,7 @@ STRLISTMKS	*op ;
 	                rs = strlistmks_mkind(op,kstab,indtab,itl) ;
 
 	                if (rs >= 0) {
-	                    rs = filebuf_write(&varfile,indtab,size) ;
+	                    rs = filer_write(&varfile,indtab,size) ;
 	                    fileoff += rs ;
 	                }
 
@@ -865,7 +865,7 @@ STRLISTMKS	*op ;
 
 /* write out the header -- again! */
 ret2:
-	filebuf_finish(&varfile) ;
+	filer_finish(&varfile) ;
 
 	if (rs >= 0) {
 
@@ -1160,8 +1160,8 @@ uint		(**rpp)[1] ;
 /* end subroutine (rectab_getvec) */
 
 
-static int filebuf_writefill(bp,wbuf,wlen)
-FILEBUF		*bp ;
+static int filer_writefill(bp,wbuf,wlen)
+FILER		*bp ;
 const char	wbuf[] ;
 int		wlen ;
 {
@@ -1172,21 +1172,21 @@ int		wlen ;
 	if (wlen < 0)
 	    wlen = (strlen(wbuf) + 1) ;
 
-	rs = filebuf_write(bp,wbuf,wlen) ;
+	rs = filer_write(bp,wbuf,wlen) ;
 	len = rs ;
 
 	r = (wlen & 3) ;
 	if ((rs >= 0) && (r > 0)) {
 	    nzero = (4 - r) ;
 	    if (nzero > 0) {
-	        rs = filebuf_write(bp,zerobuf,nzero) ;
+	        rs = filer_write(bp,zerobuf,nzero) ;
 	        len += rs ;
 	    }
 	}
 
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (filebuf_writefill) */
+/* end subroutine (filer_writefill) */
 
 
 static int indinsert(rt,it,il,vep)

@@ -35,7 +35,6 @@
 #include	<project.h>
 #include	<netdb.h>
 #include	<usystem.h>
-#include	<endianstr.h>
 #include	<getbufsize.h>
 #include	<estrings.h>
 #include	<char.h>

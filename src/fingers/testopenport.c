@@ -10,19 +10,10 @@
 #include	<usystem.h>
 #include	<sockaddress.h>
 #include	<openport.h>
-#include	<filebuf.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* TIMEBUFLEN */
 
 #ifndef	INETXADDRLEN
 #define	INETXADDRLEN		MAX(INET4ADDRLEN,INET6ADDRLEN)
-#endif
-
-#ifndef FILEBUF_RCNET
-#define	FILEBUF_RCNET	4		/* read-count for network */
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
 #endif
 
 #define	VARDEBUGFNAME	"TESTOPENPORT_DEBUGFILE"

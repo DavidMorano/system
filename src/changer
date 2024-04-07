@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} filemap_getline"
+NAMES="${NAMES} filebuf  "
 
 
 DN=/dev/null
@@ -12,7 +12,8 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/filemap_getline/s//filemap_getln/g
+g/FILEBUF/s//FILER/g
+g/filebuf/s//filer/g
 	w
 	q
 EOF

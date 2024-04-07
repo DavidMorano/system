@@ -90,9 +90,9 @@ using std::nullptr_t ;			/* type */
 
 namespace {
     struct um ;
-    typedef int (um::*mem_f)(void *,size_t) noex ;
+    typedef int (um::*um_m)(void *,size_t) noex ;
     struct um {
-	mem_f		m ;
+	um_m		m ;
 	char		*vec ;
 	void		*vp ;
 	void		*arg ;

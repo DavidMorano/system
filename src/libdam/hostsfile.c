@@ -66,7 +66,7 @@
 
 /* external subroutines */
 
-extern uint	hashelf(const char *,int) ;
+extern uint	hash_elf(const char *,int) ;
 
 extern int	mkpath2(char *,const char *,const char *) ;
 
@@ -278,7 +278,7 @@ VECITEM		*eep ;
 
 /* calculate the cache name */
 
-	rs = hashelf(hnp,-1) ;
+	rs = hash_elf(hnp,-1) ;
 
 	strcpy(cachename,"hc") ;
 

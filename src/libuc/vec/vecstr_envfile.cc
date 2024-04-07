@@ -52,7 +52,7 @@
 #include	<cstring>		/* |strncasecmp(3c)| */
 #include	<usystem.h>
 #include	<utimeout.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<field.h>
 #include	<sfx.h>
 #include	<strcpyx.h>
@@ -78,7 +78,7 @@ using std::nullptr_t ;			/* type */
 /* local typedefs */
 
 extern "C" {
-    typedef int (*rls_f)(filebuf *,char *,int,int,int *) noex ;
+    typedef int (*rls_f)(filer *,char *,int,int,int *) noex ;
     typedef int (*vs_f)(cchar **,cchar **) noex ;
 }
 
@@ -174,12 +174,12 @@ int vecstr_envfiler(vecstr *op,cchar *fname) noex {
             cint    to_open = utimeout[uto_open] ;
             if ((rs = uc_opene(fname,of,om,to_open)) >= 0) {
 		cnullptr	np{} ;
-                filebuf     dfile, *dfp = &dfile ;
+                filer     dfile, *dfp = &dfile ;
                 cint        fd = rs ;
-                if ((rs = filebuf_start(dfp,fd,0L,0,0)) >= 0) {
+                if ((rs = filer_start(dfp,fd,0L,0,0)) >= 0) {
                     cint    to = utimeout[uto_read] ;
                     cint    llen = si.llen ;
-                    rls_f   rls = filebuf_readlns ;
+                    rls_f   rls = filer_readlns ;
                     char    *lbuf = si.lbuf ;
                     while ((rs = rls(dfp,lbuf,llen,to,np)) > 0) {
                         cchar	*cp{} ;
@@ -193,9 +193,9 @@ int vecstr_envfiler(vecstr *op,cchar *fname) noex {
                         }
                         if (rs < 0) break ;
                     } /* end while (reading lines) */
-                    rs1 = filebuf_finish(dfp) ;
+                    rs1 = filer_finish(dfp) ;
                     if (rs >= 0) rs = rs1 ;
-                } /* end if (filebuf) */
+                } /* end if (filer) */
                 rs1 = uc_close(fd) ;
                 if (rs >= 0) rs = rs1 ;
             } /* end if (file) */

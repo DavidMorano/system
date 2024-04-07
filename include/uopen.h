@@ -80,7 +80,11 @@
 
 EXTERNC_begin
 
+extern int u_open(cchar *,int,mode_t) noex ;
+extern int u_openat(int,cchar *,int,mode_t) noex ;
 extern int u_socket(int,int,int) noex ;
+extern int u_socketpair(int,int,int,int *) noex ;
+extern int u_pipe(int *) noex ;
 
 EXTERNC_end
 

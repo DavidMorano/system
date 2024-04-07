@@ -46,7 +46,7 @@
 #include	<bfile.h>
 #include	<field.h>
 #include	<nulstr.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
@@ -924,17 +924,17 @@ const char	query[] ;
 	    *bp = '\0' ;
 
 	    if ((rs = u_write(s,querybuf,(bp - querybuf))) >= 0) {
-	        FILEBUF		rd ;
-	        const int	fbo = FILEBUF_ONET ;
+	        FILER		rd ;
+	        const int	fbo = FILER_ONET ;
 
 	        u_shutdown(s,SHUT_WR) ;
 
-	        if ((rs = filebuf_start(&rd,s,0L,BUFLEN,fbo)) >= 0) {
+	        if ((rs = filer_start(&rd,s,0L,BUFLEN,fbo)) >= 0) {
 	            const int	llen = LINEBUFLEN ;
 	            int		len ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
-	            while ((rs = filebuf_readln(&rd,lbuf,llen,to)) > 0) {
+	            while ((rs = filer_readln(&rd,lbuf,llen,to)) > 0) {
 	                len = rs ;
 
 	                while ((len > 0) && CHAR_ISWHITE(lbuf[len - 1])) {
@@ -948,9 +948,9 @@ const char	query[] ;
 			if (rs < 0) break ;
 	            } /* end while */
 
-	            rs1 = filebuf_finish(&rd) ;
+	            rs1 = filer_finish(&rd) ;
 	            if (rs >= 0) rs = rs1 ;
-	        } /* end if (filebuf) */
+	        } /* end if (filer) */
 
 	    } /* end if (successful write) */
 

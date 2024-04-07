@@ -85,10 +85,9 @@
 
 #include	<usystem.h>
 #include	<endian.h>
-#include	<endianstr.h>
 #include	<estrings.h>
 #include	<vecobj.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<nulstr.h>
 #include	<localmisc.h>
 
@@ -121,8 +120,8 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	filebuf_writefill(FILEBUF *,const char *,int) ;
-extern int	filebuf_writealign(FILEBUF *,int,uint) ;
+extern int	filer_writefill(FILER *,const char *,int) ;
+extern int	filer_writealign(FILER *,int,uint) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -161,9 +160,9 @@ static int	bvsmk_listbegin(BVSMK *,int) ;
 static int	bvsmk_listend(BVSMK *) ;
 static int	bvsmk_mkidx(BVSMK *) ;
 static int	bvsmk_mkidxwrmain(BVSMK *,BVSHDR *) ;
-static int	bvsmk_mkidxwrhdr(BVSMK *,BVSHDR *,FILEBUF *) ;
-static int	bvsmk_mkidxchaptab(BVSMK *,BVSHDR *,FILEBUF *,int) ;
-static int	bvsmk_mkidxbooktab(BVSMK *,BVSHDR *,FILEBUF *,int) ;
+static int	bvsmk_mkidxwrhdr(BVSMK *,BVSHDR *,FILER *) ;
+static int	bvsmk_mkidxchaptab(BVSMK *,BVSHDR *,FILER *,int) ;
+static int	bvsmk_mkidxbooktab(BVSMK *,BVSHDR *,FILER *,int) ;
 static int	bvsmk_nidxopen(BVSMK *) ;
 static int	bvsmk_nidxclose(BVSMK *) ;
 static int	bvsmk_renamefiles(BVSMK *) ;
@@ -642,7 +641,7 @@ static int bvsmk_mkidx(BVSMK *op)
 
 static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 {
-	FILEBUF		hf, *hfp = &hf ;
+	FILER		hf, *hfp = &hf ;
 	const int	nfd = op->nfd ;
 	const int	ps = getpagesize() ;
 	int		bsize ;
@@ -650,7 +649,7 @@ static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 	int		rs1 ;
 	int		foff = 0 ;
 	bsize = (ps * 4) ;
-	if ((rs = filebuf_start(hfp,nfd,0,bsize,0)) >= 0) {
+	if ((rs = filer_start(hfp,nfd,0,bsize,0)) >= 0) {
 	    if ((rs = bvsmk_mkidxwrhdr(op,hdrp,hfp)) >= 0) {
 	        foff += rs ;
 		op->maxbook = 0 ;
@@ -663,16 +662,16 @@ static int bvsmk_mkidxwrmain(BVSMK *op,BVSHDR *hdrp)
 	            foff += rs ;
 	        }
 	    } /* end if (bvsmk_mkidxwrhdr) */
-	    rs1 = filebuf_finish(hfp) ;
+	    rs1 = filer_finish(hfp) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (filebuf) */
+	} /* end if (filer) */
 	return (rs >= 0) ? foff : rs ;
 }
 /* end subroutine (bvsmk_mkidxwrmain) */
 
 
 /* ARGSUSED */
-static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp)
+static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILER *hfp)
 {
 	const int	hlen = HDRBUFLEN ;
 	int		rs ;
@@ -680,7 +679,7 @@ static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp)
 	char		hbuf[HDRBUFLEN+1] ;
 	if (op == NULL) return SR_FAULT ; /* LINT */
 	if ((rs = bvshdr(hdrp,0,hbuf,hlen)) >= 0) {
-	    rs = filebuf_writefill(hfp,hbuf,rs) ;
+	    rs = filer_writefill(hfp,hbuf,rs) ;
 	    wlen += rs ;
 	}
 	return (rs >= 0) ? wlen : rs ;
@@ -688,7 +687,7 @@ static int bvsmk_mkidxwrhdr(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp)
 /* end subroutine (bvsmk_mkidxwrhdr) */
 
 
-static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp,int foff)
+static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 {
 	BVSBOOK		*bep ;
 	vecobj		*blp = &op->books ;
@@ -704,7 +703,7 @@ static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp,int foff)
 		if (bep->book > op->maxbook) op->maxbook = bep->book ;
 		ctlen += bep->al ;
 	        bep->ci = (foff - hdrp->ctoff) ;
-	        rs = filebuf_write(hfp,bep->ap,bep->al) ;
+	        rs = filer_write(hfp,bep->ap,bep->al) ;
 	        foff += rs ;
 		wlen += rs ;
 	        if (rs < 0) break ;
@@ -717,13 +716,13 @@ static int bvsmk_mkidxchaptab(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp,int foff)
 /* end subroutine (bvsmk_mkidxchaptab) */
 
 
-static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp,int foff)
+static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILER *hfp,int foff)
 {
 	const int	n = (op->maxbook + 1) ;
 	int		rs ;
 	int		wlen = 0 ;
 
-	if ((rs = filebuf_writealign(hfp,sizeof(int),foff)) >= 0) {
+	if ((rs = filer_writealign(hfp,sizeof(int),foff)) >= 0) {
 	    const int	size = (n * 4) * sizeof(ushort) ;
 	    ushort	(*array)[4] = NULL ;
 	    wlen += rs ;
@@ -743,13 +742,13 @@ static int bvsmk_mkidxbooktab(BVSMK *op,BVSHDR *hdrp,FILEBUF *hfp,int foff)
 	    if (rs >= 0) {
 	        hdrp->btoff = foff ;
 	        hdrp->btlen = n ;
-	        rs = filebuf_write(hfp,array,size) ;
+	        rs = filer_write(hfp,array,size) ;
 	        wlen += rs ;
 	    }
 
 	    uc_free(array) ;
 	} /* end if (memory allocation) */
-	} /* end if (filebuf_writealign) */
+	} /* end if (filer_writealign) */
 
 	return (rs >= 0) ? wlen : rs ;
 }

@@ -94,10 +94,10 @@ const char	*envv[] ;
 {
 	int	rs ;
 	int	i, j ;
-	int	size ;
+	int	sz ;
 
 	char	interpretpath[MAXPATHLEN + 1] ;
-	char	filebuf[MAXNAMELEN + 1] ;
+	char	fbuf[MAXNAMELEN + 1] ;
 	char	*ip ;
 	char	**sargv ;
 
@@ -121,10 +121,10 @@ const char	*envv[] ;
 		strwcpy(interpretpath,interpreter,MAXPATHLEN) ;
 
 	ip = interpretpath ;
-	rs = currentdir(sbp,interpretpath,filebuf) ;
+	rs = currentdir(sbp,interpretpath,fbuf) ;
 
 	if (rs > 0)
-		ip = filebuf ;
+		ip = fbuf ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(3))
@@ -132,8 +132,8 @@ const char	*envv[] ;
 	        ip) ;
 #endif
 
-	size = (argc + 3) * sizeof(char *) ;
-	rs = uc_malloc(size,&sargv) ;
+	sz = (argc + 3) * sizeof(char *) ;
+	rs = uc_malloc(sz,&sargv) ;
 
 	if (rs < 0)
 	    return rs ;

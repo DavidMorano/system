@@ -21,7 +21,7 @@
 #include	<usystem.h>
 #include	<fsdir.h>
 #include	<pcsopendircache.h>
-#include	<filebuf.h>
+#include	<filer.h>
 #include	<localmisc.h>
 
 #ifndef	VARPRPCS
@@ -32,8 +32,8 @@
 #define	UEBUFLEN	UTMPACCENT_BUFLEN
 #endif
 
-#ifndef FILEBUF_RCNET
-#define	FILEBUF_RCNET	4		/* read-count for network */
+#ifndef FILER_RCNET
+#define	FILER_RCNET	4		/* read-count for network */
 #endif
 
 #ifndef	TIMEBUFLEN
@@ -154,18 +154,18 @@ int main(int argc,const char **argv,const char **envv)
 
 static int dumpfile(int fd,int of)
 {
-	FILEBUF		b ;
+	FILER		b ;
 	const int	fo = (of | O_NETWORK) ;
 	int		rs ;
 #if	CF_DEBUGS
 	debugprintf("main/dumpfile: ent\n") ;
 #endif
-	if ((rs = filebuf_start(&b,fd,0L,0,fo)) >= 0) {
+	if ((rs = filer_start(&b,fd,0L,0,fo)) >= 0) {
 	    const int	to = 0 ;
 	    const int	llen = LINEBUFLEN ;
 	    int		li ;
 	    char	lbuf[LINEBUFLEN+1] ;
-	    while ((rs = filebuf_readln(&b,lbuf,llen,to)) > 0) {
+	    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 	        int	len = rs ;
 #if	CF_DEBUGS
 	        debugprintf("main/dumpfile: readline() len=%d\n",len) ;
@@ -175,8 +175,8 @@ static int dumpfile(int fd,int of)
 	        printf("l=>%s<\n",lbuf) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-	    filebuf_finish(&b) ;
-	} /* end if (filebuf) */
+	    filer_finish(&b) ;
+	} /* end if (filer) */
 
 #if	CF_DEBUGS
 	debugprintf("main/dumpfile: rs=%d\n",rs) ;

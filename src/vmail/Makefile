@@ -5,7 +5,7 @@ T= vmail
 ALL= $(T)
 
 #PCS= /usr/add-on/pcs
-SRCROOT= $(PCS)
+SRCROOT= $(REPOROOT)
 
 
 BINDIR= $(SRCROOT)/bin
@@ -23,12 +23,12 @@ CC= $(CGS_CC)
 GPP= $(CGS_GPP)
 
 GPPFLAGS= $(CGS_CCFLAGS)
-CCOPTS_GCCALL= -pthreads -fexceptions
+CCOPTS_GCCALL= -pthread -fexceptions
 CCOPTS_CCALL= -MT
 
 CCOPTS_GCCOPTSGPP= $(CGS_CCFLAGS)
 
-CCOPTS= $(CCOPTS_GCCALL) -O3 -mcpu=ultrasparc
+CCOPTS= $(CCOPTS_GCCALL) -g
 #CCOPTS= $(CCOPTS_GCCALL) -g -O
 #CCOPTS= $(CCOPTS_GCCALL) -g -pg
 #CCOPTS= $(CCOPTS_GCCALL) -g -Wstrict-aliasing
@@ -361,7 +361,7 @@ inter.o:		kbdinfo.h cmdmap.h subprocs.h
 
 inter_trans.o:		inter_trans.c inter.h ${INCS}
 
-display.o:		display.c display.h $(INCS) ds.h
+display.o:		display.cc display.h $(INCS) ds.h
 
 ds.o:			ds.c ds.h $(INCS) td.h termstr.h
 

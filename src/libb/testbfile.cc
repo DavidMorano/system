@@ -54,14 +54,6 @@
 #define	UEBUFLEN	UTMPACCENT_BUFLEN
 #endif
 
-#ifndef FILEBUF_RCNET
-#define	FILEBUF_RCNET	4		/* read-count for network */
-#endif
-
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 #define	VARDEBUGFNAME	"TESTBFILE_DEBUGFILE"
 
 

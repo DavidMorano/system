@@ -16,7 +16,29 @@
 
 /*******************************************************************************
 
-	This module provides machine endian managemnt.
+	This module provides machine endian managemnt.  Basically,
+	this code just sets two global variables with an indication
+	of what the machine endianess is.  The two varaibles are
+	(below):
+
+ 	+ endianval
+	+ endianstr
+
+	For little endian machines:
+		endianval == 0
+		anddianstr == "0"
+	For big endian machines:
+		endianval == 1
+		anddianstr == "1"
+
+	To the programmer, these variables are available (for
+	somewhat historical reasons) as the following preprocessor
+	defined macros:
+		ENDIAN (endianval)
+		ENDIANSTR (endianstr)
+
+	Both the (global) variables and preprocessor macros are
+	avilable for both the C language and the C++ language.
 
 *******************************************************************************/
 

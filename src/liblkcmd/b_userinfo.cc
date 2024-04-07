@@ -12,7 +12,7 @@
 
 /* revision history:
 
-	= 2004-03-01, David AÂ­DÂ­ Morano
+	= 2004-03-01, David A­D­ Morano
 	This subroutine was originally written.  It was inspired
 	by many programs that performs various subset functions of
 	this program.  This can be either a KSH builtin or a
@@ -20,7 +20,7 @@
 
 */
 
-/* Copyright Â© 2004 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -86,7 +86,6 @@
 #include	<lastlogfile.h>
 #include	<sncpy.h>
 #include	<ctdec.h>
-#include	<filebuf.h>
 #include	<sysgroup.h>
 #include	<sysproject.h>
 #include	<tmpx.h>
