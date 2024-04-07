@@ -101,7 +101,8 @@ namespace {
 	int isocket(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
-	void fixfd(int) noex ;
+	int fdcloseonexec(int) noex ;
+	void fderror(int) noex ;
     } ; /* end struct (opener) */
     struct openlock {
 	aflag		fmx ;
@@ -182,7 +183,7 @@ int opener::operator () (cchar *fname,int of,mode_t om) noex {
 	    rs1 = oguard.guardend ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (oguard) */
-	if (rs < 0) fixfd(fd) ;
+	if (rs < 0) fderror(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end method (opener::operator) */
@@ -222,15 +223,11 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	if constexpr (f_sunos) {
-	    cbool	f_cloexec = (of & O_CLOEXEC) ;
-	    if ((rs >= 0) && f_cloexec) {
-	        rs = u_closeonexec(fd,true) ;
-	        if (rs < 0) u_close(fd) ;
+	    if ((rs >= 0) && (of & O_CLOEXEC)) {
+		rs = fdcloseonexec(fd) ;
 	    }
 	} /* end if-constexpr (f_sunos) */
-
 	return (rs >= 0) ? fd : rs ;
 }
 /* end method (opener::openjack) */
@@ -296,7 +293,30 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 }
 /* end method (opener::ipipe) */
 
-void opener::fixfd(int fd) noex {
+int opener::fdcloseonexec(int fd) noex {
+	int		rs = SR_OK ;
+	switch (flavor) {
+	case flavor_single:
+	    if (fd >= 0) {
+	        rs = u_closeonexec(fd,true) ;
+	        if (rs < 0) u_close(fd) ;
+	    }
+	    break ;
+	case flavor_pipes:
+	    if (pipes) {
+		for (int i = 0 ; i < flavor_overlast ; i += 1) {
+		    if (pipes[i] >= 0) {
+			u_closeonexec(pipes[i],true) ;
+		    }
+	        } /* end for */
+	    }
+	    break ;
+	} /* end switch */
+	return rs ;
+}
+/* end method (opener::fdcloseonexec) */
+
+void opener::fderror(int fd) noex {
 	switch (flavor) {
 	case flavor_single:
 	    if (fd >= 0) close(fd) ;
@@ -313,4 +333,5 @@ void opener::fixfd(int fd) noex {
 	    break ;
 	} /* end switch */
 }
+/* end method (opener::fderror) */
 
