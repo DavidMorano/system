@@ -1,4 +1,4 @@
-/* spellchecks */
+/* spellchecks HEADER */
 /* lang=C20 */
 
 /* SPELLCHECKS object implementation */
@@ -11,8 +11,10 @@
 #define	SPELLCHECKS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vechand.h>
 #include	<bits.h>
 #include	<localmisc.h>
@@ -22,20 +24,20 @@
 #define	SPELLCHECKS_CONFNAME	"conf"
 #define	SPELLCHECKS_SEARCHNAME	"spellchecks"
 #define	SPELLCHECKS		struct spellchecks_head
-#define	SPELLCHECKS_OBJ		struct spellchecks_obj
-#define	SPELLCHECKS_CUR		struct spellchecks_c
+#define	SPELLCHECKS_OBJ		struct spellchecks_object
+#define	SPELLCHECKS_CUR		struct spellchecks_cursor
 #define	SPELLCHECKS_FL		struct spellchecks_flags
 
 
 struct spellchecks_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
 
-struct spellchecks_c {
-	uint		magic ;
+struct spellchecks_cursor {
 	void		*results ;
+	uint		magic ;
 	uint		nresults ;
 	int		i ;
 } ;
@@ -45,33 +47,34 @@ struct spellchecks_flags {
 } ;
 
 struct spellchecks_head {
-	uint		magic ;
-	const char	*pr ;
-	const char	*tmpdname ;
+	cchar		*pr ;
+	cchar		*tmpdname ;
 	SPELLCHECKS_FL	f ;
 	vechand		lists ;			/* spell-lists */
+	uint		magic ;
 	int		nlists ;
 	int		ncursors ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	SPELLCHECKS	spellchecks ;
+typedef	SPELLCHECKS_OBJ	spellchecks_obj ;
+typedef	SPELLCHECKS_CUR	spellchecks_cur ;
+typedef	SPELLCHECKS_FL	spellchecks_fl ;
 
-extern int spellchecks_start(SPELLCHECKS *,const char *,const char *) ;
-extern int spellchecks_count(SPELLCHECKS *) ;
-extern int spellchecks_look(SPELLCHECKS *,const char *,int) ;
-extern int spellchecks_looks(SPELLCHECKS *,BITS *,const char *,int) ;
-extern int spellchecks_curbegin(SPELLCHECKS *,SPELLCHECKS_CUR *) ;
-extern int spellchecks_enum(SPELLCHECKS *,SPELLCHECKS_CUR *,char *,int) ;
-extern int spellchecks_curend(SPELLCHECKS *,SPELLCHECKS_CUR *) ;
-extern int spellchecks_check(SPELLCHECKS *,time_t) ;
-extern int spellchecks_audit(SPELLCHECKS *) ;
-extern int spellchecks_finish(SPELLCHECKS *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int spellchecks_start(spellchecks *,cchar *,cchar *) noex ;
+extern int spellchecks_count(spellchecks *) noex ;
+extern int spellchecks_look(spellchecks *,cchar *,int) noex ;
+extern int spellchecks_looks(spellchecks *,BITS *,cchar *,int) noex ;
+extern int spellchecks_curbegin(spellchecks *,spellchecks_cur *) noex ;
+extern int spellchecks_enum(spellchecks *,spellchecks_cur *,char *,int) noex ;
+extern int spellchecks_curend(spellchecks *,spellchecks_cur *) noex ;
+extern int spellchecks_check(spellchecks *,time_t) noex ;
+extern int spellchecks_audit(spellchecks *) noex ;
+extern int spellchecks_finish(spellchecks *) noex ;
+
+EXTERNC_end
 
 
 #endif /* SPELLCHECKS_INCLUDE */

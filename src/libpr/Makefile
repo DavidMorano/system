@@ -36,11 +36,16 @@ LINT= lint
 
 DEFS=
 
+
+INCS= libpr.h
+
+
+LIBS=
+
+
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
-LIBS=
 
 
 # flag setting
@@ -51,11 +56,8 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-INCS= libpr.h
-
-
-OBJ0_LIBPR= prgetprogpath.o
-OBJ1_LIBPR= prmktmpdir.o
+OBJ0_LIBPR= prgetprogpath.o prgetclustername.o
+OBJ1_LIBPR= prmktmpdir.o prsetfname.o
 
 
 OBJA_LIBPR= obj0_libpr.o obj1_libpr.o
@@ -120,6 +122,8 @@ obj3_libpr.o:	$(OBJ3_LIBPR)
 
 
 prgetprogpath.o:	prgetprogpath.cc prgetprogpath.h	$(INCS)
+prgetclustername.o:	prgetclustername.cc prgetclustername.h	#(INCS)
 prmktmpdir.o:		prmktmpdir.cc prmktmpdir.h		$(INCS)
+prsetfname.o:		prsetfname.cc prsetfname.h		$(INCS)
 
 
