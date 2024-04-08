@@ -46,6 +46,10 @@ typedef STRLISTHDR	strlisthdr ;
 EXTERNC_begin
 
 extern int strlisthdr_msg(strlisthdr *,int,char *,int) noex ;
+/* read from file-buffer to object */
+extern int strlisthdr_rd(strlisthdr *,cchar *,int) noex ;
+/* write to file-buffer from object */
+extern int strlisthdr_wr(strlisthdr *,char *,int) noex ;
 
 EXTERNC_end
 

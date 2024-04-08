@@ -22,7 +22,7 @@
 	Description:
 	This subroutine constructs a filename (a single filename
 	component) out the given source strings.  This subroutine
-	it totally just a bif concatenation of strings but with the
+	it totally just a big concatenation of c-strings but with the
 	restriction that the destination buffer is only MAXPATHLEN
 	long.
 

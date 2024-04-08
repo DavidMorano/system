@@ -4,7 +4,6 @@
 /* make a STRLIST database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_FIRSTHASH	0		/* arrange for first-attempt hashing */
 #define	CF_MINMOD	1		/* ensure minimum file mode */
 #define	CF_LATE		0		/* late open */
@@ -67,19 +66,29 @@
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
+#include	<endian.h>
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<filer.h>
-#include	<endian.h>
-#include	<localmisc.h>
+#include	<getpwd.h>
+#include	<xperm.h>
 #include	<hash.h>
+#include	<sfx.h>
+#include	<sncpyx.h>
+#include	<mkx.h>
+#include	<mkpathx.h>
+#include	<mkfnamesuf.h>
+#include	<localmisc.h>
 
 #include	"strlistmks.h"
 #include	"strlisthdr.h"
@@ -91,14 +100,18 @@
 #define	STRLISTMKS_NSKIP	5
 #define	STRLISTMKS_INDPERMS	0664
 
-#undef	RECTAB
+#define	SLM		strlistmks
+#define	SLM_OBJ		strlistmks_obj
+#define	SLM_REC		strlistmks_rec
+#define	SLM_FL		strlistmks_fl
 #define	RECTAB		struct strlistmks_rectab
+#define	VE		struct varentry
 
 #ifndef	KEYBUFLEN
 #define	KEYBUFLEN	120
 #endif
 
-#define	BUFLEN		(sizeof(STRLISTHDR) + 128)
+#define	BUFLEN		(sizeof(strlisthdr) + 128)
 
 #define	FSUF_IND	"si"
 
@@ -111,44 +124,10 @@
 
 /* external subroutines */
 
-extern uint	nextpowtwo(uint) ;
-
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,const char *,
-			const char *) ;
-extern int	sncpy5(char *,int,const char *,const char *,const char *,
-			const char *,const char *) ;
-extern int	sncpy6(char *,int,const char *,const char *,const char *,
-			const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	hasuc(const char *,int) ;
-extern int	vstrkeycmp(const char *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
+extern "C" {
+    extern uint	nextpowtwo(uint) noex ;
+    extern int	opentmpfile(char *,int,mode_t,char *) noex ;
+}
 
 
 /* external variables */
@@ -156,7 +135,7 @@ extern int	debugprintf(const char *,...) ;
 
 /* exported variables */
 
-STRLISTMKS_OBJ	strlistmks = {
+STRLISTMKS_OBJ	strlistmks_mod = {
 	"strlistmks",
 	sizeof(STRLISTMKS)
 } ;
@@ -174,81 +153,69 @@ struct varentry {
 
 /* forward references */
 
-static int	strlistmks_filesbegin(STRLISTMKS *) ;
-static int	strlistmks_filesend(STRLISTMKS *,int) ;
+static int	strlistmks_filesbegin(SLM *) noex ;
+static int	strlistmks_filesend(SLM *,int) noex ;
 
-static int	strlistmks_listbegin(STRLISTMKS *,int) ;
-static int	strlistmks_listend(STRLISTMKS *) ;
+static int	strlistmks_listbegin(SLM *,int) noex ;
+static int	strlistmks_listend(SLM *) noex ;
 
-static int	strlistmks_nfcreate(STRLISTMKS *,const char *) ;
-static int	strlistmks_nfcreatecheck(STRLISTMKS *,cchar *,cchar *) ;
-static int	strlistmks_nfdestroy(STRLISTMKS *) ;
-static int	strlistmks_nfstore(STRLISTMKS *,const char *) ;
-static int	strlistmks_fexists(STRLISTMKS *) ;
+static int	strlistmks_nfcreate(SLM *,cchar *) noex ;
+static int	strlistmks_nfcreatecheck(SLM *,cchar *,cchar *) noex ;
+static int	strlistmks_nfdestroy(SLM *) noex ;
+static int	strlistmks_nfstore(SLM *,char *) noex ;
+static int	strlistmks_fexists(SLM *) noex ;
 
-static int	strlistmks_mkvarfile(STRLISTMKS *) ;
-static int	strlistmks_wrvarfile(STRLISTMKS *) ;
-static int	strlistmks_mkind(STRLISTMKS *,const char *,uint (*)[3],int) ;
-static int	strlistmks_renamefiles(STRLISTMKS *) ;
+static int	strlistmks_mkvarfile(SLM *) noex ;
+static int	strlistmks_wrvarfile(SLM *) noex ;
+static int	strlistmks_mkind(SLM *,char *,uint (*)[3],int) noex ;
+static int	strlistmks_renamefiles(SLM *) noex ;
 
-static int	rectab_start(RECTAB *,int) ;
-static int	rectab_add(RECTAB *,uint) ;
-static int	rectab_done(RECTAB *) ;
-static int	rectab_getvec(RECTAB *,uint (**)[1]) ;
-static int	rectab_extend(RECTAB *) ;
-static int	rectab_finish(RECTAB *) ;
+static int	rectab_start(RECTAB *,int) noex ;
+static int	rectab_add(RECTAB *,uint) noex ;
+static int	rectab_done(RECTAB *) noex ;
+static int	rectab_getvec(RECTAB *,uint (**)[1]) noex ;
+static int	rectab_extend(RECTAB *) noex ;
+static int	rectab_finish(RECTAB *) noex ;
 
 #ifdef	COMMENT
-static int	rectab_count(RECTAB *) ;
+static int	rectab_count(RECTAB *) noex ;
 #endif
 
-static int	filer_writefill(FILER *,const char *,int) ;
+static int	filer_writefill(FILER *,char *,int) noex ;
 
-static int	indinsert(uint (*rt)[1],uint (*it)[3],int,struct varentry *) ;
-static int	hashindex(uint,int) ;
+static int	indinsert(uint (*rt)[1],uint (*it)[3],int,VE *) noex ;
+static int	hashindex(uint,int) noex ;
 
 
 /* local variables */
 
-static const char	zerobuf[4] = {
+static char	zerobuf[4] = {
 	0, 0, 0, 0 
 } ;
+
+constexpr gid_t		gidend = -1 ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int strlistmks_open(op,dbname,oflags,om,n)
-STRLISTMKS	*op ;
-const char	dbname[] ;
-int		oflags ;
-mode_t		om ;
-int		n ;
-{
+int strlistmks_open(SLM *op,cc *dbname,int oflags,mode_t om,int n) noex {
 	int		rs ;
-	const char	*cp ;
+	cchar		*cp ;
 
-#if	CF_DEBUGS && defined(DEBFNAME)
-	{
-	    int	dfd = debuggetfd() ;
-	    nprintf(DEBFNAME,"strlistmks_open: ent dfd=%d\n",dfd) ;
-	}
-#endif /* DEBFNAME */
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op == NULL) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_open: ent dbname=%s\n",dbname) ;
-#endif /* CF_DEBUGS */
-
-	if (dbname == NULL) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 
-	if (n < STRLISTMKS_NENTRIES)
+	if (n < STRLISTMKS_NENTRIES) {
 	    n = STRLISTMKS_NENTRIES ;
+	}
 
-	memset(op,0,sizeof(STRLISTMKS)) ;
+	memclear(op) ;
 	op->om = om ;
 	op->nfd = -1 ;
 	op->gid = -1 ;
@@ -263,39 +230,29 @@ int		n ;
 		    if ((rs = strlistmks_listbegin(op,n)) >= 0) {
 			op->magic = STRLISTMKS_MAGIC ;
 		    }
-		    if (rs < 0)
-			strlistmks_filesend(op,FALSE) ;
+		    if (rs < 0) {
+			strlistmks_filesend(op,false) ;
+		    }
 		} /* end if */
 		if (rs < 0) {
 	    	    uc_free(op->dbname) ;
-	    	    op->dbname = NULL ;
+	    	    op->dbname = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (strlistmks_open) */
 
-
-int strlistmks_close(op)
-STRLISTMKS	*op ;
-{
+int strlistmks_close(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f_remove = TRUE ;
+	int		f_remove = true ;
 	int		nvars = 0 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != STRLISTMKS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_close: nvars=%u\n",op->nstrs) ;
-#endif
 
 	nvars = op->nstrs ;
 	if (! op->f.abort) {
@@ -303,10 +260,6 @@ STRLISTMKS	*op ;
 	    f_remove = (rs1 < 0) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_close: strlistmks_mkvarfile() rs=%d\n",rs) ;
-#endif
 
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
@@ -323,78 +276,54 @@ STRLISTMKS	*op ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("strlistmks_close: strlistmks_renamefiles() rs=%d\n",rs) ;
-#endif
-
 	rs1 = strlistmks_filesend(op,f_remove) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->dbname != NULL) {
+	if (op->dbname != nullptr) {
 	    rs1 = uc_free(op->dbname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->dbname = NULL ;
+	    op->dbname = nullptr ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_close: ret=%d\n",rs) ;
-#endif /* CF_DEBUGS */
 
 	op->magic = 0 ;
 	return (rs >= 0) ? nvars : rs ;
 }
 /* end subroutine (strlistmks_close) */
 
-
-int strlistmks_addvar(op,sp,sl)
-STRLISTMKS	*op ;
-const char	sp[] ;
-int		sl ;
-{
+int strlistmks_addvar(SLM *op,cchar *sp,int sl) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (op->magic != STRLISTMKS_MAGIC) return SR_NOTOPEN ;
 
 	if ((rs = strtab_add(&op->strs,sp,sl)) >= 0) {
 	    uint	ki = rs ;
-	        if ((rs = rectab_add(&op->rectab,ki)) >= 0) {
-	            op->nstrs += 1 ;
-	        }
+	    if ((rs = rectab_add(&op->rectab,ki)) >= 0) {
+	        op->nstrs += 1 ;
+	    }
 	}
-
-#if	CF_DEBUGS && 0
-	debugprintf("strlistmks_add: ret=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (strlistmks_addvar) */
 
-
-int strlistmks_abort(op)
-STRLISTMKS	*op ;
-{
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != STRLISTMKS_MAGIC) return SR_NOTOPEN ;
-
-	op->f.abort = TRUE ;
-	return SR_OK ;
+int strlistmks_abort(SLM *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == STRLISTMKS_MAGIC) {
+		rs = SR_OK ;
+	        op->f.abort = true ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (strlistmks_abort) */
 
-
-int strlistmks_chgrp(op,gid)
-STRLISTMKS	*op ;
-gid_t		gid ;
-{
-
-	if (op == NULL) return SR_FAULT ;
-
+int strlistmks_chgrp(SLM *op,gid_t gid) noex {
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != STRLISTMKS_MAGIC) return SR_NOTOPEN ;
 
 	op->gid = gid ;
@@ -405,19 +334,16 @@ gid_t		gid ;
 
 /* private subroutines */
 
-
-static int strlistmks_filesbegin(op)
-STRLISTMKS	*op ;
-{
+static int strlistmks_filesbegin(SLM *op) noex {
 	int		rs = SR_INVALID ;
 	int		dnl ;
-	const char	*dnp ;
+	cchar		*dnp ;
 	char		tmpdname[MAXPATHLEN + 1] ;
 
 /* check that the parent directory is writable to us */
 
 	if ((dnl = sfdirname(op->dbname,-1,&dnp)) > 0) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(dnp,dnl,&cp)) >= 0) {
 	        op->idname = cp ;
 	        if (dnl == 0) {
@@ -427,7 +353,7 @@ STRLISTMKS	*op ;
 	            rs = mkpath1w(tmpdname,dnp,dnl) ;
 	        if (rs >= 0) {
 	            int	operm = (X_OK | W_OK) ;
-	            rs = perm(tmpdname,-1,-1,NULL,operm) ;
+	            rs = perm(tmpdname,-1,-1,nullptr,operm) ;
 	        }
 	        if (rs >= 0) {
 	            if ((rs = strlistmks_nfcreate(op,FSUF_IND)) >= 0) {
@@ -439,61 +365,49 @@ STRLISTMKS	*op ;
 	            } /* end if (nfcreate) */
 	        }
 	        if (rs < 0) {
-		    if (op->idname != NULL) {
+		    if (op->idname != nullptr) {
 	    	        uc_free(op->idname) ;
-	    	        op->idname = NULL ;
+	    	        op->idname = nullptr ;
 		    }
 	        }
 	    } /* end if (memory-allocation) */
-	} /* end if (sfshrink) */
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_filesbegin: ret rs=%d\n",rs) ;
-#endif
+	} /* end if (sfdirname) */
 
 	return rs ;
 }
 /* end subroutine (strlistmks_filesbegin) */
 
-
-static int strlistmks_filesend(op,f)
-STRLISTMKS	*op ;
-{
+static int strlistmks_filesend(SLM *op,int f) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (op->nfname != NULL) {
+	if (op->nfname) {
 	    if (f && (op->nfname[0] != '\0')) {
 	        u_unlink(op->nfname) ;
+		op->nfname[0] = '\0' ;
 	    }
-	    rs1 = uc_free(op->nfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->nfname = NULL ;
+	    {
+	        rs1 = uc_free(op->nfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->nfname = nullptr ;
+	    }
 	}
-
-	if (op->idname != NULL) {
+	if (op->idname) {
 	    rs1 = uc_free(op->idname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->idname = NULL ;
+	    op->idname = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (strlistmks_filesend) */
 
-
-/* exclusively create this new file */
-static int strlistmks_nfcreate(op,fsuf)
-STRLISTMKS	*op ;
-const char	fsuf[] ;
-{
-	struct ustat	sb ;
-	const int	to_old = TO_OLDFILE ;
+static int strlistmks_nfcreate(SLM *op,cchar *fsuf) noex {
+	USTAT		sb ;
+	cint		to_old = TO_OLDFILE ;
 	int		rs ;
 	int		rs1 ;
 	int		nfl ;
 	int		oflags = (O_CREAT | O_EXCL | O_WRONLY) ;
-	const char	*cp ;
+	cchar		*cp ;
 	char		nfname[MAXPATHLEN + 1] ;
 
 	rs = mkfnamesuf3(nfname,op->dbname,fsuf,ENDIANSTR,"n") ;
@@ -517,25 +431,25 @@ again:
 #endif /* CF_LATE */
 
 	if (rs == SR_EXIST) {
-	    time_t	daytime = time(NULL) ;
+	    time_t	daytime = time(nullptr) ;
 	    int		f_inprogress ;
 	    rs1 = u_stat(op->nfname,&sb) ;
 	    if ((rs1 >= 0) && ((daytime - sb.st_mtime) > to_old)) {
 		u_unlink(op->nfname) ;
 		goto again ;
 	    }
-	    op->f.inprogress = TRUE ;
+	    op->f.inprogress = true ;
 	    f_inprogress = op->f.none ;
 	    f_inprogress = f_inprogress || (op->f.creat && op->f.excl) ;
 	    rs = (f_inprogress) ? SR_INPROGRESS : SR_OK ;
 	} /* end if */
 
 	if (rs >= 0) {
-	    op->f.created = TRUE ;
+	    op->f.created = true ;
 	} else {
-	    if (op->nfname != NULL) {
+	    if (op->nfname != nullptr) {
 	        uc_free(op->nfname) ;
-	        op->nfname = NULL ;
+	        op->nfname = nullptr ;
 	    }
 	}
 
@@ -544,20 +458,9 @@ ret0:
 }
 /* end subroutine (txindexmks_nfcreate) */
 
-
-static int strlistmks_nfcreatecheck(op,fpre,fsuf)
-STRLISTMKS	*op ;
-const char	fpre[] ;
-const char	fsuf[] ;
-{
+static int strlistmks_nfcreatecheck(SLM *op,cchar *fpre,cchar *fsuf) noex {
 	int		rs = SR_OK ;
 	int		oflags ;
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_nfcreatecheck: nfd=%d\n",op->nfd) ;
-	debugprintf("strlistmks_nfcreatecheck: f_inprogress=%u\n",
-		op->f.inprogress) ;
-#endif
 
 	if ((op->nfd < 0) || op->f.inprogress) {
 	    if (op->nfd >= 0) {
@@ -573,21 +476,24 @@ const char	fsuf[] ;
 		rs = sncpy6(cname,MAXNAMELEN,
 			fpre,"XXXXXXXX",".",fsuf,ENDIANSTR,"n") ;
 		if (rs >= 0) {
-		    if ((op->idname != NULL) && (op->idname[0] != '\0')) {
+		    if ((op->idname != nullptr) && (op->idname[0] != '\0')) {
 		        rs = mkpath2(infname,op->idname,cname) ;
-		    } else
+		    } else {
 		        rs = mkpath1(infname,cname) ;
+		    }
 		}
 		if (rs >= 0) {
 		    rs = opentmpfile(infname,oflags,op->om,outfname) ;
 	            op->nfd = rs ;
 		    op->f.created = (rs >= 0) ;
 		}
-		if (rs >= 0)
+		if (rs >= 0) {
 		    rs = strlistmks_nfstore(op,outfname) ;
+		}
 		if (rs < 0) {
-		    if (outfname[0] != '\0')
+		    if (outfname[0] != '\0') {
 			u_unlink(outfname) ;
+		    }
 		}
 	    } else {
 	        rs = u_open(op->nfname,oflags,op->om) ;
@@ -599,12 +505,15 @@ const char	fsuf[] ;
 		    u_close(op->nfd) ;
 		    op->nfd = -1 ;
 		}
-	        if (op->nfname != NULL) {
+	        if (op->nfname != nullptr) {
 		    if (op->nfname[0] != '\0') {
 			u_unlink(op->nfname) ;
+			op->nfname[0] = '\0' ;
 		    }
-	            uc_free(op->nfname) ;
-	            op->nfname = NULL ;
+		    {
+	                uc_free(op->nfname) ;
+	                op->nfname = nullptr ;
+		    }
 		}
 	    }
 	} /* end if */
@@ -613,144 +522,121 @@ const char	fsuf[] ;
 }
 /* end subroutine (strlistmks_nfcreatecheck) */
 
-
-static int strlistmks_nfdestroy(op)
-STRLISTMKS	*op ;
-{
+static int strlistmks_nfdestroy(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->nfd >= 0) {
 	    rs1 = u_close(op->nfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->nfd = -1 ;
 	}
-
-	if (op->nfname != NULL) {
+	if (op->nfname) {
 	    if (op->nfname[0] != '\0') {
 		rs1 = u_unlink(op->nfname) ;
 	        if (rs >= 0) rs = rs1 ;
+		op->nfname[0] = '\0' ;
 	    }
-	    rs1 = uc_free(op->nfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->nfname = NULL ;
+	    {
+	        rs1 = uc_free(op->nfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->nfname = nullptr ;
+	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (strlistmks_nfdestroy) */
 
-
-static int strlistmks_nfstore(op,outfname)
-STRLISTMKS	*op ;
-const char	outfname[] ;
-{
-	int		rs ;
-	const char	*cp ;
-
-	if (op->nfname != NULL) {
+static int strlistmks_nfstore(SLM *op,char *outfname) noex {
+	int		rs = SR_OK ;
+	cchar		*cp ;
+	if (op->nfname) {
 	    uc_free(op->nfname) ;
-	    op->nfname = NULL ;
+	    op->nfname = nullptr ;
 	}
-
-	rs = uc_mallocstrw(outfname,-1,&cp) ;
-	if (rs >= 0) op->nfname = (char *) cp ;
-
+	{
+	    if ((rs = uc_mallocstrw(outfname,-1,&cp)) >= 0) {
+		op->nfname = charp(cp) ;
+	    }
+	}
 	return rs ;
 }
 /* end subroutine (strlistmks_nfstore) */
 
-
-static int strlistmks_fexists(op)
-STRLISTMKS	*op ;
-{
+static int strlistmks_fexists(SLM *op) noex {
 	int		rs = SR_OK ;
-
+	int		rs1 ;
 	if (op->f.creat && op->f.excl && op->f.inprogress) {
-	    const char	*suf = FSUF_IND ;
-	    const char	*end = ENDIANSTR ;
-	    char	hfname[MAXPATHLEN + 1] ;
-	    if ((rs = mkfnamesuf2(hfname,op->dbname,suf,end)) >= 0) {
-		struct ustat	sb ;
-	        int	rs1 = u_stat(hfname,&sb) ;
-	        if (rs1 >= 0) rs = SR_EXIST ;
-	    }
-	}
-
+	    cchar	*suf = FSUF_IND ;
+	    cchar	*end = ENDIANSTR ;
+	    char	*tbuf{} ;
+	    if ((rs = malloc_mp(&tbuf)) >= 0) {
+	        if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
+		    USTAT	sb ;
+	            int	rs1 = u_stat(tbuf,&sb) ;
+	            if (rs1 >= 0) rs = SR_EXIST ;
+	        }
+		rs1 = uc_free(tbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if */
 	return rs ;
 }
 /* end subroutine (strlistmks_fexists) */
 
-
-static int strlistmks_listbegin(op,n)
-STRLISTMKS	*op ;
-int		n ;
-{
+static int strlistmks_listbegin(SLM *op,int n) noex {
+	cint		sz = (n * STRLISTMKS_SIZEMULT) ;
 	int		rs ;
-	int		size ;
-
-	size = (n * STRLISTMKS_SIZEMULT) ;
-	if ((rs = strtab_start(&op->strs,size)) >= 0) {
-	        rs = rectab_start(&op->rectab,n) ;
-	    if (rs < 0)
+	if ((rs = strtab_start(&op->strs,sz)) >= 0) {
+	    rs = rectab_start(&op->rectab,n) ;
+	    if (rs < 0) {
 		strtab_finish(&op->strs) ;
+	    }
 	} /* end if (strtab-keys) */
-
 	return rs ;
 }
 /* end subroutine (strlistmks_listbegin) */
 
-
-static int strlistmks_listend(op)
-STRLISTMKS	*op ;
-{
+static int strlistmks_listend(SLM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	rs1 = rectab_finish(&op->rectab) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = strtab_finish(&op->strs) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = rectab_finish(&op->rectab) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
+	{
+	    rs1 = strtab_finish(&op->strs) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (strlistmks_listend) */
 
-
-static int strlistmks_mkvarfile(op)
-STRLISTMKS	*op ;
-{
-	int		rs = SR_OK ;
-	int		rtl ;
-
-	rtl = rectab_done(&op->rectab) ;
-
+static int strlistmks_mkvarfile(SLM *op) noex {
+	cint		rtl = rectab_done(&op->rectab) ;
+	int		rs = SR_BUGCHECK ;
+	int		nstrs = 0 ;
 	if (rtl == (op->nstrs + 1)) {
-	    rs = strlistmks_wrvarfile(op) ;
-	} else
-	    rs = SR_BUGCHECK ;
-
-	return (rs >= 0) ? op->nstrs : rs ;
+	    if ((rs = strlistmks_wrvarfile(op)) >= 0) {
+		nstrs = op->nstrs ;
+	    }
+	}
+	return (rs >= 0) ? nstrs : rs ;
 }
 /* end subroutine (strlistmks_mkvarfile) */
 
-
-static int strlistmks_wrvarfile(op)
-STRLISTMKS	*op ;
-{
-	STRLISTHDR	hf ;
+static int strlistmks_wrvarfile(SLM *op) noex {
+	strlisthdr	hf ;
 	FILER		varfile ;
 	STRTAB		*ksp = &op->strs ;
-	const time_t	daytime = time(NULL) ;
+	const time_t	daytime = time(nullptr) ;
 	uint		fileoff = 0 ;
 	uint		(*rt)[1] ;
-	const int	pagesize = getpagesize() ;
+	cint	pagesize = getpagesize() ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		rtl ;
 	int		itl ;
-	int		size ;
+	int		sz ;
 	int		bl ;
 	char		buf[BUFLEN + 1] ;
 
@@ -762,16 +648,16 @@ STRLISTMKS	*op ;
 	if (rs < 0)
 	    goto ret0 ;
 
-	op->f.viopen = TRUE ;
-	size = (pagesize * 4) ;
-	rs = filer_start(&varfile,op->nfd,0,size,0) ;
+	op->f.viopen = true ;
+	sz = (pagesize * 4) ;
+	rs = filer_start(&varfile,op->nfd,0,sz,0) ;
 	if (rs < 0)
 	    goto ret1 ;
 
 /* prepare the file-header */
 
-	memset(&hf,0,sizeof(STRLISTHDR)) ;
-	hf.vetu[0] = STRLISTHDR_VERSION ;
+	memset(&hf,0,sizeof(strlisthdr)) ;
+	hf.vetu[0] = STRLISTMKS_VERSION ;
 	hf.vetu[1] = ENDIAN ;
 	hf.vetu[2] = 0 ;
 	hf.vetu[3] = 0 ;
@@ -781,7 +667,7 @@ STRLISTMKS	*op ;
 
 /* create the file-header */
 
-	rs = strlisthdr(&hf,0,buf,BUFLEN) ;
+	rs = strlisthdr_msg(&hf,0,buf,BUFLEN) ;
 	bl = rs ;
 	if (rs < 0)
 	    goto ret2 ;
@@ -801,55 +687,48 @@ STRLISTMKS	*op ;
 	hf.rtoff = fileoff ;
 	hf.rtlen = rtl ;
 
-	size = (rtl + 1) * 2 * sizeof(uint) ;
-	rs = filer_write(&varfile,rt,size) ;
+	sz = (rtl + 1) * 2 * sizeof(uint) ;
+	rs = filer_write(&varfile,rt,sz) ;
 	fileoff += rs ;
 
 /* make and write out key-string table */
 
 	if (rs >= 0) {
-	    char	*kstab = NULL ;
+	    char	*kstab = nullptr ;
 
-	    size = strtab_strsize(ksp) ;
+	    sz = strtab_strsize(ksp) ;
 
 	    hf.stoff = fileoff ;
-	    hf.stlen = size ;
+	    hf.stlen = sz ;
 
-	    if ((rs = uc_malloc(size,&kstab)) >= 0) {
+	    if ((rs = uc_malloc(sz,&kstab)) >= 0) {
 
-	        rs = strtab_strmk(ksp,kstab,size) ;
+	        rs = strtab_strmk(ksp,kstab,sz) ;
 
 /* write out the key-string table */
 
 	        if (rs >= 0) {
-	            rs = filer_write(&varfile,kstab,size) ;
+	            rs = filer_write(&varfile,kstab,sz) ;
 	            fileoff += rs ;
 	        }
 
 /* make and write out the record-index table */
 
 	        if (rs >= 0) {
-		    uint	(*indtab)[3] = NULL ;
+		    uint	(*indtab)[3] = nullptr ;
 
 	            itl = nextpowtwo(rtl) ;
 
 	            hf.itoff = fileoff ;
 	            hf.itlen = itl ;
 
-	            size = (itl + 1) * 3 * sizeof(int) ;
+	            sz = (itl + 1) * 3 * sizeof(int) ;
 
-	            if ((rs = uc_malloc(size,&indtab)) >= 0) {
-
-			memset(indtab,0,size) ;
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_wrvarfile: _mkind() \n") ;
-#endif
-
+	            if ((rs = uc_malloc(sz,&indtab)) >= 0) {
+			memset(indtab,0,sz) ;
 	                rs = strlistmks_mkind(op,kstab,indtab,itl) ;
-
 	                if (rs >= 0) {
-	                    rs = filer_write(&varfile,indtab,size) ;
+	                    rs = filer_write(&varfile,indtab,sz) ;
 	                    fileoff += rs ;
 	                }
 
@@ -871,20 +750,18 @@ ret2:
 
 	    hf.fsize = fileoff ;
 
-	    rs = strlisthdr(&hf,0,buf,BUFLEN) ;
+	    rs = strlisthdr_msg(&hf,0,buf,BUFLEN) ;
 	    bl = rs ;
-	    if (rs >= 0)
+	    if (rs >= 0) {
 	        rs = u_pwrite(op->nfd,buf,bl,0L) ;
+	    }
 
 #if	CF_MINMOD
 	if (rs >= 0)
 	    rs = uc_fminmod(op->nfd,op->om) ;
 #endif /* CF_MINMOD */
 
-	    if ((rs >= 0) && (op->gid >= 0)) {
-#if	CF_DEBUGS
-		debugprintf("strlistmks_wrvarfile: gid=%d\n",op->gid) ;
-#endif
+	    if ((rs >= 0) && (op->gid != gidend)) {
 		rs = u_fchown(op->nfd,-1,op->gid) ;
 	    }
 
@@ -892,7 +769,7 @@ ret2:
 
 /* we're out of here */
 ret1:
-	op->f.viopen = FALSE ;
+	op->f.viopen = false ;
 	rs1 = u_close(op->nfd) ;
 	if (rs >= 0) rs = rs1 ;
 	op->nfd = -1 ;
@@ -907,43 +784,32 @@ ret0:
 }
 /* end subroutine (strlistmks_wrvarfile) */
 
-
-/* make an index table of the record table */
-int strlistmks_mkind(op,kst,it,il)
-STRLISTMKS	*op ;
-const char	kst[] ;
-uint		(*it)[3] ;
-int		il ;
-{
-	struct varentry	ve ;
-	uint		ri, ki, hi ;
+int strlistmks_mkind(SLM *op,char *kst,uint (*it)[3], int il) noex {
+	VE		ve ;
+	uint		ki, hi ;
 	uint		khash ;
 	uint		(*rt)[1] ;
 	int		rs = SR_OK ;
 	int		rtl ;
 	int		sc = 0 ;
-	const char	*kp ;
+	char	*kp ;
 
 	rtl = rectab_getvec(&op->rectab,&rt) ;
 
-#if	CF_DEBUGS
-	debugprintf("strlistmks_mkind: rtl=%u\n",rtl) ;
-#endif
-
 #if	CF_FIRSTHASH
 	{
-	    struct varentry	*vep ;
+	    VE	*vep ;
 
 	    VECOBJ	ves ;
 
-	    int	size, opts, i ;
+	    int	sz, opts, i ;
 
 
-	    size = sizeof(struct varentry) ;
+	    sz = sizeof(VE) ;
 	    opts = VECOBJ_OCOMPACT ;
-	    if ((rs = vecobj_start(&ves,size,rtl,opts)) >= 0) {
+	    if ((rs = vecobj_start(&ves,sz,rtl,opts)) >= 0) {
 
-	    for (ri = 1 ; ri < rtl ; ri += 1) {
+	    for (int ri = 1 ; ri < rtl ; ri += 1) {
 
 	        ki = rt[ri][0] ;
 	        kp = kst + ki ;
@@ -979,15 +845,10 @@ int		il ;
 	}
 #else /* CF_FIRSTHASH */
 	{
-	for (ri = 1 ; ri < rtl ; ri += 1) {
+	for (int ri = 1 ; ri < rtl ; ri += 1) {
 
 	    ki = rt[ri][0] ;
 	    kp = kst + ki ;
-
-#if	CF_DEBUGS
-	debugprintf("strlistmks_mkind: ri=%u k=%s\n",ri,
-		kp,strnlen(kp,20)) ;
-#endif
 
 	    khash = hash_elf(kp,-1) ;
 
@@ -1010,191 +871,134 @@ int		il ;
 	if (sc < 0)
 	    sc = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("strlistmks_mkind: ret rs=%d\n",rs) ;
-#endif
-
 	return (rs >= 0) ? sc : rs ;
 }
 /* end subroutine (strlistmks_mkind) */
 
-
-static int strlistmks_renamefiles(op)
-STRLISTMKS	*op ;
-{
+static int strlistmks_renamefiles(SLM *op) noex {
 	int		rs ;
-	const char	*end = ENDIANSTR ;
-	char		hashfname[MAXPATHLEN + 1] ;
-
-	if ((rs = mkfnamesuf2(hashfname,op->dbname,FSUF_IND,end)) >= 0) {
-	    if ((rs = u_rename(op->nfname,hashfname)) >= 0)
-	        op->nfname[0] = '\0' ;
-	    if (op->nfname[0] != '\0') {
-	        u_unlink(op->nfname) ;
-	        op->nfname[0] = '\0' ;
-	    }
-	}
-
+	int		rs1 ;
+	cchar		*end = ENDIANSTR ;
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,op->dbname,FSUF_IND,end)) >= 0) {
+	        if ((rs = u_rename(op->nfname,tbuf)) >= 0) {
+	            op->nfname[0] = '\0' ;
+		}
+	        if (op->nfname[0] != '\0') {
+	            u_unlink(op->nfname) ;
+	            op->nfname[0] = '\0' ;
+	        }
+	    } /* end if (mkfnamesuf) */
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (strlistmks_renamefiles) */
 
-
-static int rectab_start(rtp,n)
-RECTAB		*rtp ;
-int		n ;
-{
+static int rectab_start(RECTAB *rtp,int n) noex {
 	int		rs = SR_OK ;
-	int		size ;
+	int		sz ;
 	void		*p ;
-
-	if (n < 10)
-	    n = 10 ;
-
+	if (n < 10) n = 10 ;
 	rtp->i = 0 ;
 	rtp->n = n ;
-	size = (n + 1) * 1 * sizeof(int) ;
-	if ((rs = uc_malloc(size,&p)) >= 0) {
-	    rtp->rectab = p ;
+	sz = (n + 1) * 1 * sizeof(int) ;
+	if ((rs = uc_malloc(sz,&p)) >= 0) {
+	    typedef uint (*rectab_t)[1] ;
+	    rtp->rectab = rectab_t(p) ;
 	    rtp->rectab[0][0] = 0 ;
 	    rtp->i = 1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (rectab_start) */
 
-
-static int rectab_finish(rtp)
-RECTAB		*rtp ;
-{
+static int rectab_finish(RECTAB *rtp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-	if (rtp->rectab != NULL) {
+	if (rtp->rectab) {
 	    rs1 = uc_free(rtp->rectab) ;
 	    if (rs >= 0) rs = rs1 ;
-	    rtp->rectab = NULL ;
+	    rtp->rectab = nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (rectab_finish) */
 
-
-static int rectab_add(rtp,ki)
-RECTAB		*rtp ;
-uint		ki ;
-{
+static int rectab_add(RECTAB *rtp,uint ki) noex {
 	int		rs = SR_OK ;
-	int		i ;
-
-	i = rtp->i ;
-	if ((i + 1) > rtp->n)
+	int		i = rtp->i ;
+	if ((i + 1) > rtp->n) {
 	    rs = rectab_extend(rtp) ;
-
+	}
 	if (rs >= 0) {
 	    rtp->rectab[i][0] = ki ;
 	    rtp->i += 1 ;
 	}
-
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (rectab_add) */
 
-
-static int rectab_extend(rtp)
-RECTAB		*rtp ;
-{
+static int rectab_extend(RECTAB *rtp) noex {
 	int		rs = SR_OK ;
-
 	if ((rtp->i + 1) > rtp->n) {
 	    uint	(*va)[1] ;
-	    int		nn ;
-	    int		size ;
-	    nn = (rtp->n + 1) * 1 ;
-	    size = (nn + 1) * 1 * sizeof(int) ;
-	    if ((rs = uc_realloc(rtp->rectab,size,&va)) >= 0) {
+	    int		nn = (rtp->n + 1) * 1 ;
+	    int		sz ;
+	    sz = (nn + 1)  * sizeof(int) ;
+	    if ((rs = uc_realloc(rtp->rectab,sz,&va)) >= 0) {
 	        rtp->rectab = va ;
 	        rtp->n = nn ;
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (rectab_extend) */
 
-
-static int rectab_done(rtp)
-RECTAB		*rtp ;
-{
+static int rectab_done(RECTAB *rtp) noex {
 	int		i = rtp->i ;
-
 	rtp->rectab[i][0] = UINT_MAX ;
 	return i ;
 }
 /* end subroutine (rectab_done) */
 
-
 #ifdef	COMMENT
-
-static int rectab_count(rtp)
-RECTAB		*rtp ;
-{
-
+static int rectab_count(RECTAB *rtp) noex {
 	return rtp->i ;
 }
 /* end subroutine (rectab_count) */
-
 #endif /* COMMENT */
 
-
-static int rectab_getvec(rtp,rpp)
-RECTAB		*rtp ;
-uint		(**rpp)[1] ;
-{
-
+static int rectab_getvec(RECTAB *rtp,uint (**rpp)[1]) noex {
 	*rpp = rtp->rectab ;
 	return rtp->i ;
 }
 /* end subroutine (rectab_getvec) */
 
-
-static int filer_writefill(bp,wbuf,wlen)
-FILER		*bp ;
-const char	wbuf[] ;
-int		wlen ;
-{
+static int filer_writefill(filer *bp,char *wbuf,int wlen) noex {
 	int		rs ;
-	int		r, nzero ;
-	int		len ;
-
-	if (wlen < 0)
+	int		len = 0 ;
+	if (wlen < 0) {
 	    wlen = (strlen(wbuf) + 1) ;
-
-	rs = filer_write(bp,wbuf,wlen) ;
-	len = rs ;
-
-	r = (wlen & 3) ;
-	if ((rs >= 0) && (r > 0)) {
-	    nzero = (4 - r) ;
-	    if (nzero > 0) {
-	        rs = filer_write(bp,zerobuf,nzero) ;
-	        len += rs ;
-	    }
 	}
-
+	if ((rs = filer_write(bp,wbuf,wlen)) >= 0) {
+	    cint	r = (wlen & 3) ;
+	    len += rs ;
+	    if (r > 0) {
+	    	cint	nzero = (4 - r) ;
+	        if (nzero > 0) {
+	            rs = filer_write(bp,zerobuf,nzero) ;
+	            len += rs ;
+	        }
+	    }
+	} /* end if (filer_writer) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (filer_writefill) */
 
-
-static int indinsert(rt,it,il,vep)
-uint		(*rt)[1] ;
-uint		(*it)[3] ;
-int		il ;
-struct varentry	*vep ;
-{
+static int indinsert(uint (*rt)[1], uint (*it)[3],int il,VE *vep) noex {
 	uint		nhash, chash ;
 	uint		ri, ki ;
 	uint		lhi, nhi, hi ;
@@ -1204,82 +1008,41 @@ struct varentry	*vep ;
 	nhash = vep->khash ;
 	chash = (nhash & INT_MAX) ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: ve ri=%u ki=%u khash=%08X hi=%u\n",
-		vep->ri,vep->ki,vep->khash,vep->hi) ;
-	debugprintf("indinsert: il=%u loop 1\n",il) ;
-#endif
-
 /* CONSTCOND */
-	while (TRUE) {
-
-#if	CF_DEBUGS
-	debugprintf("indinsert: it%u ri=%u nhi=%u\n",
-		hi,it[hi][0],it[hi][2]) ;
-#endif
-
-	    if (it[hi][0] == 0)
-		break ;
-
+	forever {
+	    if (it[hi][0] == 0) break ;
 	    ri = it[hi][0] ;
 	    ki = rt[ri][0] ;
-	    if (ki == vep->ki)
-		break ;
-
+	    if (ki == vep->ki) break ;
 	    it[hi][1] |= (~ INT_MAX) ;
-	    nhash = hashagain(nhash,c++,STRLISTMKS_NSKIP) ;
-
+	    nhash = hash_again(nhash,c++,STRLISTMKS_NSKIP) ;
 	    hi = hashindex(nhash,il) ;
-
-#if	CF_DEBUGS
-	debugprintf("indinsert: nhash=%08X nhi=%u\n",nhash,hi) ;
-#endif
-
 	} /* end while */
 
 	if (it[hi][0] > 0) {
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: loop 2\n") ;
-#endif
-
 	    lhi = hi ;
-	    while ((nhi = it[lhi][2]) > 0)
+	    while ((nhi = it[lhi][2]) > 0) {
 	        lhi = nhi ;
+	    }
 
 	    hi = hashindex((lhi + 1),il) ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: loop 3 lhi=%u\n",lhi) ;
-#endif
-
-	    while (it[hi][0] > 0)
+	    while (it[hi][0] > 0) {
 	        hi = hashindex((hi + 1),il) ;
-
+	    }
 	    it[lhi][2] = hi ;
-
-#if	CF_DEBUGS
-	debugprintf("indinsert: loop 3 it%u ki=%u nhi=%u\n",lhi,
-		it[lhi][0],hi) ;
-#endif
-
 	} /* end if (same-key continuation) */
 
 	it[hi][0] = vep->ri ;
 	it[hi][1] = chash ;
 	it[hi][2] = 0 ;
 
-#if	CF_DEBUGS
-	debugprintf("indinsert: ret hi=%u c=%u\n",hi,c) ;
-#endif
-
 	return c ;
 }
 /* end subroutine (indinsert) */
 
-
-static int hashindex(uint i,int n)
-{
+static int hashindex(uint i,int n) noex {
 	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;

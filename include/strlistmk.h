@@ -23,7 +23,7 @@
 
 
 #define	STRLISTMK	struct strlistmk_head
-#define	STRLISTMK_CALLS	struct strlistmk_calls
+#define	STRLISTMK_CA	struct strlistmk_calls
 #define	STRLISTMK_MAGIC	0x99447256
 
 
@@ -39,10 +39,13 @@ struct strlistmk_head {
 	modload		loader ;
 	void		*sop ;		/* shared-object (SO) pointer */
 	void		*obj ;		/* object pointer */
-	STRLISTMK_CALLS call ;
+	STRLISTMK_CA	call ;
 	uint		magic ;
 	int		objsize ;	/* object size */
 } ;
+
+typedef	STRLISTMK	strlistmk ;
+typedef	STRLISTMK_CA	strlistmk_ca ;
 
 EXTERNC_begin
 

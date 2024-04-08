@@ -44,9 +44,16 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<getpwd.h>
 #include	<absfn.h>
 #include	<endian.h>
 #include	<hash.h>
+#include	<sncpyx.h>
+#include	<mkx.h>
+#include	<mkpathx.h>
+#include	<mkfnamesuf.h>
+#include	<nleadstr.h>
 #include	<localmisc.h>
 
 #include	"strlist.h"
@@ -66,8 +73,6 @@
 #define	SL_FM		strlist_fm
 #define	SL_MI		strlist_mi
 
-#define	FE_VI		STRLISTHDR_FSUF
-
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
@@ -78,27 +83,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy1(char *,int,cchar *) ;
-extern int	sncpy2(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	snwcpy(char *,int,cchar *,int) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
-extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
-extern int	sfbasename(cchar *,int,cchar **) ;
-extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	hasuc(cchar *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwcpylc(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -489,11 +473,17 @@ static int strlist_dbloadend(SL *op) noex {
 
 static int strlist_dbmapcreate(SL *op,time_t dt) noex {
 	int		rs ;
+	int		rs1 ;
+	cchar		*suf = STRLISTHDR_FSUF ;
 	cchar		*end = ENDIANSTR ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-	if ((rs = mkfnamesuf2(tmpfname,op->dbname,FE_VI,end)) >= 0) {
-	    rs = strlist_filemapcreate(op,&op->vf,tmpfname,dt) ;
-	}
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    if ((rs = mkfnamesuf2(tbuf,op->dbname,suf,end)) >= 0) {
+	        rs = strlist_filemapcreate(op,&op->vf,tbuf,dt) ;
+	    }
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (strlist_dbmapcreate) */
@@ -505,15 +495,15 @@ static int strlist_dbmapdestroy(SL *op) noex {
 }
 /* end subroutine (strlist_dbmapdestroy) */
 
-static int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fname,
-		time_t dt) noex {
+static int strlist_filemapcreate(SL *op,SL_FM *fip,cchar *fn,time_t dt) noex {
 	cint		of = O_RDONLY ;
 	int		rs ;
 	int		rs1 ;
+	cmode		om = 0666 ;
 
 	if (op == nullptr) return SR_FAULT ;
 
-	if ((rs = u_open(fname,of,0666)) >= 0) {
+	if ((rs = u_open(fn,of,om)) >= 0) {
 	    USTAT	sb ;
 	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
