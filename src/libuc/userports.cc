@@ -288,131 +288,116 @@ int userports_close(UP *op) noex {
 /* end subroutine (userports_close) */
 
 int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex {
-	ENTRY		*ep ;
 	int		rs = SR_OK ;
-	int		protoidx = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != USERPORTS_MAGIC) return SR_NOTOPEN ;
-
-	if (uid < 0) return SR_INVALID ;
-	if (port < 0) return SR_INVALID ;
-
-	if ((protoname != nullptr) && (protoname[0] != '\0')) {
-	    rs = vecpstr_already(op->plp,protoname,-1) ;
-	    protoidx = rs ;
-	}
-
-	if (rs >= 0) {
-	    int	i ;
-	    int	f ;
-	    for (i = 0 ; (rs = vecobj_get(op->elp,i,&ep)) >= 0 ; i += 1) {
-	        if (ep) {
-		    f = (uid == ep->uid) ;
-		    f = f && (port == ep->port) ;
-		    if (f && (protoidx > 0)) {
-		        f = (protoidx == ep->protoidx) ;
-		    }
-		    if (f) break ;
+	if ((rs = userports_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (port >= 0) {
+	        int	protoidx = 0 ;
+		rs = SR_OK ;
+	        if ((protoname != nullptr) && (protoname[0] != '\0')) {
+	            rs = vecpstr_already(op->plp,protoname,-1) ;
+	            protoidx = rs ;
 	        }
-	    } /* end for */
-	} /* end if (ok) */
-
+	        if (rs >= 0) {
+		    vecobj	*elp = op->elp ;
+		    auto	vg = vecobj_get ;
+		    void	*vp{} ;
+	            for (int i = 0 ; (rs = vg(elp,i,&vp)) >= 0 ; i += 1) {
+	                if (vp) {
+	        	    ENTRY	*ep = (ENTRY *) vp ;
+		            bool	f = true ;
+		            f = f && (uid == ep->uid) ;
+		            f = f && (port == ep->port) ;
+		            if (f && (protoidx > 0)) {
+		                f = (protoidx == ep->protoidx) ;
+		            }
+		            if (f) break ;
+	                } /* end if (non-null) */
+	            } /* end for */
+	        } /* end if (ok) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (userports_query) */
 
 int userports_curbegin(UP *op,USERPORTS_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	curp->i = -1 ;
+	int		rs ;
+	if ((rs = userports_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	}
 	return rs ;
 }
 /* end subroutine (userports_curbegin) */
 
 int userports_curend(UP *op,USERPORTS_CUR *curp) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	curp->i = -1 ;
+	int		rs ;
+	if ((rs = userports_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	}
 	return rs ;
 }
 /* end subroutine (userports_curend) */
 
 int userports_enum(UP *op,USERPORTS_CUR *curp,
 		USERPORTS_ENT *entp) noex {
-	ENTRY		*ep ;
 	int		rs = SR_OK ;
-	int		i ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (entp == nullptr) return SR_FAULT ;
-
-	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-
-	while ((rs = vecobj_get(op->elp,i,&ep)) >= 0) {
-	    if (ep != nullptr) break ;
-	    i += 1 ;
-	} /* end while */
-
-	if (rs >= 0) {
-	    cchar	*cp ;
-	    entp->uid = ep->uid ;
-	    if (rs >= 0) {
-	        rs = vecpstr_get(op->plp,ep->protoidx,&cp) ;
-	        entp->protocol = cp ;
-	    }
-	    if (rs >= 0) {
-	        rs = vecpstr_get(op->olp,ep->portidx,&cp) ;
-	        entp->portname = cp ;
-	    }
-	    curp->i = i ;
-	} /* end if (found entry) */
-
+	int		i ; /* used-afterwards */
+	if ((rs = userports_magic(op,curp,entp)) >= 0) {
+	    void	*vp{} ;
+	    i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (vp) break ;
+	        i += 1 ;
+	    } /* end while */
+	    if ((rs >= 0) && vp) {
+	        ENTRY	*ep = (ENTRY *) vp ;
+	        cchar	*cp{} ;
+	        entp->uid = ep->uid ;
+	        if (rs >= 0) {
+	            rs = vecpstr_get(op->plp,ep->protoidx,&cp) ;
+	            entp->protocol = cp ;
+	        }
+	        if (rs >= 0) {
+	            rs = vecpstr_get(op->olp,ep->portidx,&cp) ;
+	            entp->portname = cp ;
+	        }
+	        curp->i = i ;
+	    } /* end if (found entry) */
+	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (userports_enum) */
 
 int userports_fetch(UP *op,USERPORTS_CUR *curp,uid_t uid,
 		USERPORTS_ENT *entp) noex {
-	ENTRY		*ep ;
-	int		rs = SR_OK ;
-	int		i ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (entp == nullptr) return SR_FAULT ;
-
-	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
-
-	while ((rs = vecobj_get(op->elp,i,&ep)) >= 0) {
-	    if (ep != nullptr) {
-		if (ep->uid == uid) break ;
-	    }
-	    i += 1 ;
-	} /* end while */
-
-	if (rs >= 0) {
-	    cchar	*cp ;
-	    entp->uid = ep->uid ;
-	    if (rs >= 0) {
-	        rs = vecpstr_get(op->plp,ep->protoidx,&cp) ;
-	        entp->protocol = cp ;
-	    }
-	    if (rs >= 0) {
-	        rs = vecpstr_get(op->olp,ep->portidx,&cp) ;
-	        entp->portname = cp ;
-	    }
-	    curp->i = i ;
-	} /* end if (found entry) */
-
+	int		rs ;
+	int		i = 0 ; /* used-afterwards */
+	if ((rs = userports_magic(op,curp,entp)) >= 0) {
+	    void	*vp{} ;
+	    i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
+	    while ((rs = vecobj_get(op->elp,i,&vp)) >= 0) {
+	        if (vp) {
+		    ENTRY	*ep = (ENTRY *) vp ;;
+		    if (ep->uid == uid) break ;
+	        }
+	        i += 1 ;
+	    } /* end while */
+	    if ((rs >= 0) && vp) {
+	        ENTRY	*ep = (ENTRY *) vp ;
+	        cchar	*cp ;
+	        entp->uid = ep->uid ;
+	        if (rs >= 0) {
+	            rs = vecpstr_get(op->plp,ep->protoidx,&cp) ;
+	            entp->protocol = cp ;
+	        }
+	        if (rs >= 0) {
+	            rs = vecpstr_get(op->olp,ep->portidx,&cp) ;
+	            entp->portname = cp ;
+	        }
+	        curp->i = i ;
+	    } /* end if (found entry) */
+	} /* end if (magic) */
 	return (rs >= 0) ? i : rs ;
 }
 /* end subroutine (userports_fetch) */
