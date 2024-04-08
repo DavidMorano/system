@@ -4,7 +4,6 @@
 /* manage printing lines */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -29,10 +28,10 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
 #include	<netdb.h>
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<buffer.h>
@@ -82,25 +81,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	snwcpycompact(char *,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextqtoken(const char *,int,const char **) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
-extern int	haswhite(const char *,int) ;
-extern int	isprintlatin(int) ;
-
-extern int	buffer_strquote(BUFFER *,const char *,int) ;
-extern int	buffer_stropaque(BUFFER *,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
 
 /* external variables */
 
@@ -110,24 +90,21 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-int		outema_item(OUTEMA *,const char *,int) ;
-
-static int	filer_outpart(FILER *,int,const char *,int) ;
+static int	filer_outpart(filer *,int,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
+int outema_start(outema *op,filer *ofp,int maxlen) noex {
+	if (op == nullptr) return SR_FAULT ;
 
-int outema_start(OUTEMA *op,FILER *ofp,int maxlen)
-{
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	memset(op,0,sizeof(OUTEMA)) ;
+	memclear(op) ;
 	op->maxlen = maxlen ;
 	op->rlen = maxlen ;
 	op->ofp = ofp ;
@@ -136,70 +113,59 @@ int outema_start(OUTEMA *op,FILER *ofp,int maxlen)
 }
 /* end subroutine (outema_start) */
 
-
-int outema_finish(OUTEMA *ldp)
-{
+int outema_finish(outema *ldp) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
-	if (ldp == NULL) return SR_FAULT ;
-	if (ldp->ofp == NULL) return SR_FAULT ;
+	if (ldp == nullptr) return SR_FAULT ;
+	if (ldp->ofp == nullptr) return SR_FAULT ;
 
 	if (ldp->llen > 0) {
-	    rs = filer_println(ldp->ofp,NULL,0) ;
+	    rs = filer_println(ldp->ofp,nullptr,0) ;
 	    ldp->wlen += rs ;
 	    ldp->rlen = ldp->maxlen ;
 	    ldp->llen = 0 ;
 	}
 
 	wlen = ldp->wlen ;
-	ldp->ofp = NULL ;
+	ldp->ofp = nullptr ;
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_finish) */
 
-
-int outema_ent(OUTEMA *ldp,EMA_ENT *ep)
-{
+int outema_ent(outema *ldp,EMA_ENT *ep) noex {
 	BUFFER		b, *bufp = &b ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 
 	if ((rs = buffer_start(bufp,80)) >= 0) {
-	    const char	*bp ;
+	    cchar	*bp ;
 	    int		bl ;
 	    int		c = 0 ;
 
-	    if ((rs >= 0) && (ep->ap != NULL) && (ep->al > 0)) {
+	    if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
 	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
 	        if (rs >= 0)
 	            rs = buffer_strquote(bufp,ep->ap,ep->al) ;
 	    }
 
-	    if ((rs >= 0) && (ep->rp != NULL) && (ep->rl > 0)) {
+	    if ((rs >= 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
 	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
-	        if (rs >= 0)
-	            rs = buffer_char(bufp,CH_LANGLE) ;
-	        if (rs >= 0)
-	            rs = buffer_stropaque(bufp,ep->rp,ep->rl) ;
-	        if (rs >= 0)
-	            rs = buffer_char(bufp,CH_RANGLE) ;
+	        if (rs >= 0) rs = buffer_char(bufp,CH_LANGLE) ;
+	        if (rs >= 0) rs = buffer_stropaque(bufp,ep->rp,ep->rl) ;
+	        if (rs >= 0) rs = buffer_char(bufp,CH_RANGLE) ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("outema_ent: c=>%t<\n",ep->cp,ep->cl) ;
-#endif
-
-	    if ((rs >= 0) && (ep->cp != NULL) && (ep->cl > 0)) {
-	        const char	*cp ;
-	        int		cl ;
+	    if ((rs >= 0) && (ep->cp != nullptr) && (ep->cl > 0)) {
+	        cchar	*cp ;
+	        int	cl ;
 	        if ((cl = sfshrink(ep->cp,ep->cl,&cp)) > 0) {
 	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
 	            if (rs >= 0) {
-	                const int	size = (cl+2+1) ;
-	                char		*ap ;
-	                if ((rs = uc_malloc(size,&ap)) >= 0) {
+	                cint	sz = (cl+2+1) ;
+	                char	*ap ;
+	                if ((rs = uc_malloc(sz,&ap)) >= 0) {
 	                    char	*bp = ap ;
 	                    *bp++ = CH_LPAREN ;
 	                    if ((rs = snwcpycompact(bp,cl,cp,cl)) >= 0) {
@@ -225,17 +191,11 @@ int outema_ent(OUTEMA *ldp,EMA_ENT *ep)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (buffer-ret) */
 
-#if	CF_DEBUGS
-	debugprintf("outema_ent: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_ent) */
 
-
-int outema_item(OUTEMA *ldp,cchar vp[],int vl)
-{
+int outema_item(outema *ldp,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -256,22 +216,19 @@ int outema_item(OUTEMA *ldp,cchar vp[],int vl)
 }
 /* end subroutine (outema_item) */
 
-
-/* output a single value for a header (folding lines as needed) */
-int outema_value(OUTEMA *ldp,cchar vp[],int vl)
-{
+int outema_value(outema *ldp,cchar *vp,int vl) noex {
 	int		rs = SR_OK ;
 	int		nlen ;
 	int		cl, cl2 ;
 	int		wlen = 0 ;
 	int		f_comma = FALSE ;
-	const char	*fmt ;
-	const char	*tp, *cp ;
+	cchar	*fmt ;
+	cchar	*tp, *cp ;
 
-	if (ldp == NULL)
+	if (ldp == nullptr)
 	    return SR_INVALID ;
 
-	if ((vp == NULL) || (vp[0] == '\0'))
+	if ((vp == nullptr) || (vp[0] == '\0'))
 	    return SR_OK ;
 
 	if (vl < 0) vl = strlen(vp) ;
@@ -280,10 +237,6 @@ int outema_value(OUTEMA *ldp,cchar vp[],int vl)
 	while ((rs >= 0) && (vl > 0)) {
 
 	    if ((cl = nextqtoken(vp,vl,&cp)) > 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("outema_value: qt=>%t<\n",cp,cl) ;
-#endif
 
 	        f_comma = (ldp->f.comma && (ldp->c_items > 0)) ;
 	        nlen = outema_needlength(ldp,cl) ;
@@ -323,27 +276,19 @@ int outema_value(OUTEMA *ldp,cchar vp[],int vl)
 	        vp += cl2 ;
 	        vl -= cl2 ;
 
-	    } else if ((tp = strnchr(vp,vl,'\n')) != NULL) {
+	    } else if ((tp = strnchr(vp,vl,'\n')) != nullptr) {
 	        vl -= ((tp + 1) - vp) ;
 	        vp = (tp + 1) ;
 	    } else
 	        vl = 0 ;
 
 	} /* end while */
-
 	ldp->wlen += wlen ;
-
-#if	CF_DEBUGS
-	debugprintf("outema_value: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_value) */
 
-
-int outema_write(OUTEMA *ldp,cchar v[],int vlen)
-{
+int outema_write(outema *ldp,cchar *v,int vlen) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
 
@@ -362,55 +307,40 @@ int outema_write(OUTEMA *ldp,cchar v[],int vlen)
 }
 /* end subroutine (outema_write) */
 
-
 #ifdef	COMMENT
 
-int outema_printf(OUTEMA *ldp,const char *fmt,...)
-{
-	int		rs = SR_OK ;
-	int		len = 0 ;
+int outema_printf(outema *ldp,cchar *fmt,...) noex {
+	va_list		ap ;
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	char		buf[BUFLEN + 1] ;
-
-#if	CF_DEBUGS
-	debugprintf("outema_printf: ent fmt=>%s<\n",fmt) ;
-#endif
-
-	{
-	    va_list	ap ;
+	if (ldp && fmt) {
+	    cint	flen = BUFLEN ;
+	    char	fbuf[BUFLEN + 1] ;
 	    va_begin(ap,fmt) ;
-	    rs = vbufprintf(buf,BUFLEN,fmt,ap) ;
-	    len = rs ;
+	    if ((rs = vbufprintf(buf,BUFLEN,fmt,ap)) >= 0) {
+	    	cint	len = rs ;
+	        if ((rs = filer_write(ldp->ofp,buf,len)) >= 0) {
+	            wlen += rs ;
+	            ldp->wlen += rs ;
+	            ldp->llen += rs ;
+	            ldp->rlen -= rs ;
+		} /* end if (filer_write) */
+	    } /* end if (vbufprintf) */
 	    va_end(ap) ;
-	}
-
-	if (rs >= 0) {
-	    rs = filer_write(ldp->ofp,buf,len) ;
-	    wlen += rs ;
-	    ldp->wlen += rs ;
-	    ldp->llen += rs ;
-	    ldp->rlen -= rs ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("outema_printf: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_printf) */
 
 #endif /* COMMENT */
 
-
-int outema_hdrkey(OUTEMA *ldp,cchar kname[])
-{
+int outema_hdrkey(outema *ldp,cchar *kname) noex {
 	int		rs = SR_OK ;
 	int		nlen = 0 ;
 	int		wlen = 0 ;
 
-	if (ldp == NULL) return SR_FAULT ;
-	if (kname == NULL) return SR_FAULT ;
+	if (ldp == nullptr) return SR_FAULT ;
+	if (kname == nullptr) return SR_FAULT ;
 
 	if (kname[0] == '\0') return SR_INVALID ;
 
@@ -446,19 +376,14 @@ int outema_hdrkey(OUTEMA *ldp,cchar kname[])
 }
 /* end subroutine (outema_hdrkey) */
 
-
-int outema_needlength(OUTEMA *ldp,int cl)
-{
+int outema_needlength(outema *ldp,int cl) noex {
 	int		nlen = (cl + 1) ;
-
 	if (ldp->llen == 0) {
 	    nlen += 1 ;
 	}
-
 	if (ldp->f.comma && (ldp->c_items > 0)) {
 	    nlen += 1 ;
 	}
-
 	return nlen ;
 }
 /* end subroutine (outema_needlength) */
@@ -466,15 +391,13 @@ int outema_needlength(OUTEMA *ldp,int cl)
 
 /* private subroutines */
 
-
-static int filer_outpart(FILER *fbp,int f_comma,cchar *cp,int cl)
-{
+static int filer_outpart(filer *fbp,int f_comma,cchar *cp,int cl) noex {
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
 	char		buf[3] ;
 
-	if (fbp == NULL)
+	if (fbp == nullptr)
 	    return SR_FAULT ;
 
 	i = 0 ;

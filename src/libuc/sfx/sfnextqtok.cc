@@ -1,9 +1,8 @@
-/* nextqtoken */
+/* sfnextqtok SUPPORT */
+/* lang=C++20 */
 
 /* find the next quoted string token */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,60 +16,53 @@
 
 /*******************************************************************************
 
-        This subroutine finds the next quoted string token in a given string.
+	This subroutine finds the next quoted string token in a
+	given string.
 
 	Synopsis:
 
-	int nextqtoken(sp,sl,rpp)
-	const char	*sp ;
-	int		sl ;
-	const char	**rpp ;
+	int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex
 
 	Arguments:
-
 	sp		pointer to source string
 	sl		length of given source string
 	rpp		pointer to result pointer
 
 	Returns:
-
-	==0		no more token strings were found
 	>0		lenght of found string token
-
+	==0		no more token strings were found
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<char.h>
 #include	<localmisc.h>
 
+#include	"sfx.h"
+
 
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
+/* exported variables */
+
+
 /* external subroutines */
 
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sidquote(const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern "C" {
+    extern int	sidquote(cchar *,int) noex ;
+}
 
 
 /* external variables */
@@ -87,30 +79,19 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported subroutines */
 
-
-int nextqtoken(sp,sl,rpp)
-const char	*sp ;
-int		sl ;
-const char	**rpp ;
-{
-	int	si ;
-	int	len ;
-
+int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
+	int		len = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
-
 /* skip over whitespace */
-
 	while (sl && CHAR_ISWHITE(sp[0])) {
 	    sp += 1 ;
 	    sl -= 1 ;
 	} /* end while */
-
-	if (rpp != NULL) *rpp = sp ;
-
+	if (rpp) *rpp = sp ;
 /* skip over the non-whitespace */
-
 	len = sl ;
 	while (sl && sp[0] && (! CHAR_ISWHITE(sp[0]))) {
+	    int		si ;
 	    if (sp[0] == CH_DQUOTE) {
 	        sp += 1 ;
 	        sl -= 1 ;
@@ -121,15 +102,7 @@ const char	**rpp ;
 	    sp += si ;
 	    sl -= si ;
 	} /* end while */
-
-/* done */
-
-	len = (len-sl) ;
-
-#if	CF_DEBUGS
-	debugprintf("nextqtoken: ret len=%u\n",len) ;
-#endif
-
+	len = (len - sl) ;
 	return len ;
 }
 /* end subroutine (nextqtoken) */

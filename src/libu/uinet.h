@@ -35,7 +35,7 @@
 #include	<arpa/inet.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
-#include	<clanguage.h>
+#include	<clanguage.h>		/* |MAX| */
 
 
 #ifndef	PF_INET4

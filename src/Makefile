@@ -1,4 +1,4 @@
-# MAKEFILES (src)
+
 
 T= src
 
@@ -54,16 +54,16 @@ LDFLAGS= $(MAKELDFLAGS)
 INCS= usystem.h localmisc.h
 
 
-OBJ0_SIX= 
-OBJ1_SIX= 
-OBJ2_SIX= 
-OBJ3_SIX= 
+OBJ0_SRC= 
+OBJ1_SRC= 
+OBJ2_SRC= 
+OBJ3_SRC= 
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o
+OBJA_SRC= obj0_src.o obj1_src.o
+OBJB_SRC= obj2_src.o obj3_src.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_SRC= $(OBJA_SRC) $(OBJB_SRC)
 
 
 default:		$(T).o
@@ -86,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_SRC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SRC)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_SRC)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,16 +109,16 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_src.o:	$(OBJ0_SRC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SRC)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_src.o:	$(OBJ1_SRC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SRC)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_src.o:	$(OBJ2_SRC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SRC)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
+obj3_src.o:	$(OBJ3_SRC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SRC)
 
 

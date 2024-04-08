@@ -2,27 +2,30 @@
 
 T= libu
 
-ALL= $(T).a $(T).so
+ALL= $(T).so $(T).a
 
 
-BINDIR= $(SRCROOT)/bin
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
-MANDIR= $(SRCROOT)/man
-HELPDIR= $(SRCROOT)/share/help
+BINDIR= $(REPOROOT)/bin
+INCDIR= $(REPOROOT)/include
+LIBDIR= $(REPOROOT)/lib
+RUNDIR= $(REPOROOT)/lib
+MANDIR= $(REPOROOT)/man
+INFODIR= $(REPOROOT)/info
+HELPDIR= $(REPOROOT)/share/help
 
-LDCRTDIR= $(CGS_CRTDIR)
-VALDIR= $(VGS_VALDIR)
 
+CRTDIR= $(CGS_CRTDIR)
+VALDIR= $(CGS_VALDIR)
+LIBDIR= $(CGS_LIBDIR)
 
 CPP= cpp
 CC= gcc
 CXX= gpp
-LD= $(CGS_GLD)
-RANLIB= $(CGS_GRANLIB)
-AR= $(GS_GAR)
-NM= $(GS_GNM)
-COV= $(GS_GCOV)
+LD= gld
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -31,103 +34,28 @@ RM= rm -f
 TOUCH= touch
 LINT= lint
 
-RM= rm -f
-TOUCH= touch
+
+DEFS +=
 
 
-CXXFLAGS= $(CGS_CCFLAGS)
-CCFLAGS= $(CGS_CCFLAGS)
-
-CCOPTS_CCOPTSCXX= $(CGS_CCFLAGS)
-CCOPTS= $(CCOPTS_CCOPT) $(CCOPTS_CCALL) $(CCOPTS_CCLIB)
-#CCOPTS= $(CCOPTS_CCALL) $(CCOPTS_CCLIB)
-#CCOPTS= -g -Wstrict-aliasing $(CCOPTS_CCALL) $(CCOPTS_CCLIB) 
+INCS += usystem.h localmisc.h
+INCS += uclibsubs.h
 
 
-DEF0=
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
-
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
+LIBS +=
 
 
-INCDIRS= -I$(INCDIR)
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
 
 
-CPPFLAGS= $(DEFS) $(INCDIRS)
-
-CFLAGS= $(CCOPTS) $(LF_CFLAGS)
-
-LDRPATH= /usr/lib/lwp
-
-LDFLAGS= $(LF_LDFLAGS) -R$(CGS_RPATH):$(LDRPATH)
-
-
-SLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-SLIB0=
-SLIB1=
-SLIB2=
-SLIB3=
-SLIB4= $(CGS_LIBS)
-SLIB5= $(LF_LIBS) 
-SLIB6=
-SLIB7=
-
-SLIBS= $(SLIB0) $(SLIB1) $(SLIB2) $(SLIB3) $(SLIB4) $(SLIB5) $(SLIB6) $(SLIB7)
-
-SLIBINFO= $(SLIBDIRS) $(SLIBS)
-
-
-XLIBDIRS= -L$(LIBDIR) -L$(CGS_LIBDIR)
-
-XLIB0=
-XLIB1= -ldam -lb
-XLIB2= -ldebug
-XLIB3= -luc -lut -lu
-XLIB4= $(CFS_LIBS)
-XLIB5= 
-XLIB6= -lsecdb -lproject -lpthread -lrt -lxnet -lsocket -lnsl
-XLIB7= -ldl
-
-XLIBS= $(XLIB0) $(XLIB1) $(XLIB2) $(XLIB3) $(XLIB4) $(XLIB5) $(XLIB6) $(XLIB7)
-
-XLIBINFO= $(XLIBDIRS) $(XLIBS)
-
-
-VALUES= $(VALDIR)/$(CGS_VALUES)
-
-CRT1= $(LDCRTDIR)/crt1.o
-CRTI= $(LDCRTDIR)/crti.o
-CRTBEGIN= $(LDCRTDIR)/crtbegin.o
-MCRT1= $(LDCRTDIR)/mcrt1.o
-GCRT1= $(LDCRTDIR)/gcrt1.o
-CRTEND= $(LDCRTDIR)/crtend.o
-CRTN= $(LDCRTDIR)/crtn.o
-
-CRTFRONT= $(CRT1) $(CRTI) $(VALUES) $(CRTBEGIN)
-CRTBACK= $(CRTEND) $(CRTN)
-
-# for regular (no profiling)
-CRT0= $(CRT1) $(CRTI) $(VALUES)
-# for 'prof(1)'
-MCRT0= $(CRTI) $(MCRT1) $(VALUES)
-# for 'gprof(1)'
-GCRT0= $(CRTI) $(GCRT1) $(VALUES)
-
-LINTFLAGS= $(LF_LINTFLAGS) -uxn -Dlint
-
-NMFLAGS= -sx -v
-
-
-INSTALLINCS= vsystem.h localmisc.h syshas.h
-
-INCS= localmisc.h syshas.h vsystem.h
+# flag setting
+CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS= $(MAKECFLAGS)
+CCFLAGS= $(MAKECCFLAGS)
+ARFLAGS= $(MAKEARFLAGS)
+LDFLAGS= $(MAKELDFLAGS)
 
 
 OBJ00= u_getdents.o

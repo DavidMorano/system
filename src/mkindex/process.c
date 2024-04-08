@@ -1,12 +1,12 @@
-/* progfile */
+/* progfile SUPPORT */
+/* lang=C++20 */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUG 	0		/* switchable debug print-outs */
 #define	CF_LINE		1		/* use line number instead of offset */
-
 
 /* revision history:
 
@@ -19,11 +19,13 @@
 
 /*******************************************************************************
 
+	Name:
+
+	Description:
 	This subroutine processes a single file.
 
 	Synopsis:
-
-	int progfile(pip,hasha,nhash,mfp,nfp,fname)
+	int progfile(PROGINFO *pip,hasha,nhash,mfp,nfp,fname) noex
 	struct proginfo	*pip ;
 	uint		hasha[] ;
 	int		nhash ;
@@ -32,29 +34,22 @@
 	const char	fname[] ;
 
 	Arguments:
-
 	- pip		program information pointer
 	- fname	file to process
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<hdb.h>
@@ -104,8 +99,10 @@ static int	bwasteline(bfile *,char *,int) ;
 /* local variables */
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int progfile(pip,hasha,nhash,mfp,nfp,fname)
 struct proginfo	*pip ;

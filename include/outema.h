@@ -1,10 +1,8 @@
-/* outema */
+/* outema HEADER */
+/* lang=C20 */
 
 /* output lines */
-
-
-#ifndef	OUTEMA_INCLUDE
-#define	OUTEMA_INCLUDE	1
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,8 +11,9 @@
 	This subroutine was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-	I added a little code to "post" articles that do not have a valid
-	newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -27,14 +26,14 @@
 
 ****************************************************************************/
 
+#ifndef	OUTEMA_INCLUDE
+#define	OUTEMA_INCLUDE
 
-#include	<envstandards.h>
 
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<ema.h>
 #include	<filer.h>
@@ -60,31 +59,26 @@ struct outema_head {
 	int		c_items ;
 } ;
 
+typedef	OUTEMA		outema ;
+typedef	OUTEMA_FL	outema_fl ;
 
-#if	(! defined(OUTEMA_MASTER)) || (OUTEMA_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
-
-extern int	outema_start(OUTEMA *,filer *,int) ;
-extern int	outema_ent(OUTEMA *,EMA_ENT *) ;
-extern int	outema_write(OUTEMA *,const char *,int) ;
-extern int	outema_hdrkey(OUTEMA *,const char *) ;
-extern int	outema_item(OUTEMA *,const char *,int) ;
-extern int	outema_value(OUTEMA *,const char *,int) ;
-extern int	outema_needlength(OUTEMA *,int) ;
-extern int	outema_finish(OUTEMA *) ;
+extern int	outema_start(outema *,filer *,int) noex ;
+extern int	outema_ent(outema *,ema_ent *) noex ;
+extern int	outema_write(outema *,cchar *,int) noex ;
+extern int	outema_hdrkey(outema *,cchar *) noex ;
+extern int	outema_item(outema *,cchar *,int) noex ;
+extern int	outema_value(outema *,cchar *,int) noex ;
+extern int	outema_needlength(outema *,int) noex ;
+extern int	outema_finish(outema *) noex ;
 
 #ifdef	COMMENT
-extern int	outema_printf(OUTEMA *,const char *,...) ;
+extern int	outema_printf(outema *,cchar *,...) noex ;
 #endif /* COMMENT */
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
-#endif	/* (! defined(OUTEMA_MASTER)) || (OUTEMA_MASTER == 0) */
 
 #endif	/* OUTEMA_INCLUDE */
 

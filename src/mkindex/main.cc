@@ -1,13 +1,12 @@
-/* main */
+/* main SUPPORT */
+/* lang=C++20 */
 
 /* main subroutine for the MKINDEX program */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time */
 #define	CF_DEBUG	0		/* run-time */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -20,20 +19,16 @@
 
 /*******************************************************************************
 
-        This is the 'main' module for the 'mkkey' program. This module processes
-        the program invocation arguments and performs some preprocessing steps
-        before any actual input files are scanned.
-
-        The real work of processing the input files (one at a time) is performed
-        by the 'process()' subroutine.
-
+	This is the 'main' module for the 'mkkey' program. This
+	module processes the program invocation arguments and
+	performs some preprocessing steps before any actual input
+	files are scanned.  The real work of processing the input
+	files (one at a time) is performed by the |process()|
+	subroutine.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>
 #include	<unistd.h>
@@ -41,7 +36,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
@@ -78,40 +72,40 @@
 
 extern uint	nextpowtwo(uint) ;
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matpstr(const char **,int,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecmfi(const char *,int,int *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
-extern int	varsub_addva(VARSUB *,const char **) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matpstr(cchar **,int,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecmfi(cchar *,int,int *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
+extern int	varsub_addva(VARSUB *,cchar **) ;
 extern int	varsub_addvec(VARSUB *,VECSTR *) ;
 extern int	varsub_subbuf(), varsub_merge() ;
 extern int	isdigitlatin(int) ;
 
-extern int	printhelp(void *,const char *,const char *,const char *) ;
-extern int	proginfo_setpiv(struct proginfo *,const char *,
+extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
+extern int	proginfo_setpiv(struct proginfo *,cchar *,
 			const struct pivars *) ;
 extern int	progfile(struct proginfo *,uint *,uint,
-			MEMFILE *,bfile *,const char *) ;
+			MEMFILE *,bfile *,cchar *) ;
 extern int	postwrite(struct proginfo *, uint *,int,
-			MEMFILE *, const char *) ;
+			MEMFILE *, cchar *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
-extern int	debugprinthex(const char *,int,const char *,int) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	debugprinthex(cchar *,int,cchar *,int) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strshrink(char *) ;
 extern char	*timestr_log(time_t,char *) ;
 
@@ -126,7 +120,7 @@ extern char	makedate[] ;
 struct hashinfo {
 	struct proginfo	*pip ;
 	uint		*hasha ;
-	const char	*postfname ;
+	cchar	*postfname ;
 	MEMFILE		mf ;
 	bfile		namefile ;
 	int		hashn ;
@@ -138,11 +132,11 @@ struct hashinfo {
 static int	usage(struct proginfo *) ;
 
 static int	procargs(struct proginfo *,struct arginfo *,BITS *,
-			HASHINFO *,const char *,const char *) ;
+			HASHINFO *,cchar *,cchar *) ;
 
-static int	hashinfo_begin(HASHINFO *,struct proginfo *,int,const char *) ;
+static int	hashinfo_begin(HASHINFO *,struct proginfo *,int,cchar *) ;
 static int	hashinfo_end(HASHINFO *) ;
-static int	hashinfo_post(HASHINFO *,const char *) ;
+static int	hashinfo_post(HASHINFO *,cchar *) ;
 
 #ifdef	COMMENT
 static int	mkfieldterms(uchar *) ;
@@ -151,7 +145,7 @@ static int	mkfieldterms(uchar *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
+static cchar *argopts[] = {
 	"ROOT",
 	"CONFIG",
 	"VERSION",
@@ -164,7 +158,7 @@ static const char *argopts[] = {
 	"ef",
 	"of",
 	"idx",
-	NULL
+	nullptr
 } ;
 
 enum argopts {
@@ -236,26 +230,26 @@ int main(int argc,cchar **argv,cchar **envv)
 	int	f_append = FALSE ;
 	int	f_noinput = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = nullptr ;
 	char	userbuf[USERINFO_LEN + 1] ;
 	char	tmpfname[MAXPATHLEN + 1] ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*lfname = NULL ;
-	const char	*idxname = NULL ;
-	const char	*cp ;
+	cchar	*pr = nullptr ;
+	cchar	*sn = nullptr ;
+	cchar	*afname = nullptr ;
+	cchar	*efname = nullptr ;
+	cchar	*ofname = nullptr ;
+	cchar	*lfname = nullptr ;
+	cchar	*idxname = nullptr ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getenv(VARDEBUGFNAME)) == NULL) {
-	    if ((cp = getenv(VARDEBUGFD1)) == NULL)
+	if ((cp = getenv(VARDEBUGFNAME)) == nullptr) {
+	    if ((cp = getenv(VARDEBUGFD1)) == nullptr)
 	        cp = getenv(VARDEBUGFD2) ;
 	}
-	if (cp != NULL)
+	if (cp != nullptr)
 	    debugopen(cp) ;
 	debugprintf("main: starting\n") ;
 #endif /* CF_DEBUGS */
@@ -271,7 +265,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    goto badprogstart ;
 	}
 
-	if ((cp = getenv(VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getenv(VARBANNER)) == nullptr) cp = BANNER ;
 	proginfo_setbanner(pip,cp) ;
 
 /* initialize */
@@ -295,7 +289,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	ai_max = 0 ;
 	ai_pos = 0 ;
 	argr = argc ;
-	for (ai = 0 ; (ai < argc) && (argv[ai] != NULL) ; ai += 1) {
+	for (ai = 0 ; (ai < argc) && (argv[ai] != nullptr) ; ai += 1) {
 	    if (rs < 0) break ;
 	    argr -= 1 ;
 	    if (ai == 0) continue ;
@@ -323,14 +317,14 @@ int main(int argc,cchar **argv,cchar **envv)
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-	                avp = NULL ;
+	                avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -666,8 +660,8 @@ int main(int argc,cchar **argv,cchar **envv)
 
 	} /* end while (all command line argument processing) */
 
-	if (efname == NULL) efname = getenv(VAREFNAME) ;
-	if (efname == NULL) efname = BFILE_STDERR ;
+	if (efname == nullptr) efname = getenv(VAREFNAME) ;
+	if (efname == nullptr) efname = BFILE_STDERR ;
 	if ((rs1 = bopen(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
 	    pip->open.errfile = TRUE ;
@@ -686,7 +680,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    bprintf(pip->efp,"%s: version %s\n",
 	        pip->progname,VERSION) ;
 	    if (f_makedate) {
-	        if ((cp = strchr(makedate,CH_RPAREN)) != NULL) {
+	        if ((cp = strchr(makedate,CH_RPAREN)) != nullptr) {
 	            cp += 1 ;
 	            while (*cp && isspace(*cp))
 	                cp += 1 ;
@@ -720,7 +714,7 @@ int main(int argc,cchar **argv,cchar **envv)
 /* help */
 
 	if (f_help) {
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 	}
 
 	if (f_version || f_help || f_usage)
@@ -734,7 +728,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	pip->f.noinput = f_noinput ;
 	pip->f.append = f_append ;
 
-	memset(&ainfo,0,sizeof(struct arginfo)) ;
+	memclear(&ainfo) ;
 	ainfo.argc = argc ;
 	ainfo.ai = ai ;
 	ainfo.argv = argv ;
@@ -743,7 +737,7 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* get some host/user information */
 
-	rs = userinfo(&u,userbuf,USERINFO_LEN,NULL) ;
+	rs = userinfo(&u,userbuf,USERINFO_LEN,nullptr) ;
 
 	if (rs < 0) {
 	    ex = EX_NOUSER ;
@@ -773,7 +767,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    debugprintf("main: checking program parameters\n") ;
 #endif
 
-	if ((pip->tmpdname == NULL) || (pip->tmpdname[0] == '\0'))
+	if ((pip->tmpdname == nullptr) || (pip->tmpdname[0] == '\0'))
 	    pip->tmpdname = TMPDNAME ;
 
 /* do we have an activity log file? */
@@ -783,7 +777,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	    debugprintf("main: 0 lfname=%s\n",lfname) ;
 #endif
 
-	if ((lfname == NULL) || (lfname[0] == '\0'))
+	if ((lfname == nullptr) || (lfname[0] == '\0'))
 	    lfname = LOGFNAME ;
 
 	if ((lfname[0] == '/') || (u_access(lfname,W_OK) >= 0))
@@ -809,12 +803,12 @@ int main(int argc,cchar **argv,cchar **envv)
 
 /* set some defaults */
 
-	if (idxname == NULL) idxname = getenv(VARIDXNAME) ;
+	if (idxname == nullptr) idxname = getenv(VARIDXNAME) ;
 
-	if ((idxname == NULL) || (idxname[0] == '\0'))
+	if ((idxname == nullptr) || (idxname[0] == '\0'))
 	    idxname = INDEXNAME ;
 
-	if ((argval != NULL) && (hashn == 0)) {
+	if ((argval != nullptr) && (hashn == 0)) {
 	    rs = cfdecmfi(argval,-1,&hashn) ;
 	}
 	if (hashn <= NHASH) hashn = NHASH ;
@@ -869,9 +863,9 @@ retearly:
 	    debugprintf("main: exiting ex=%u (%d)\n",ex,rs) ;
 #endif
 
-	if (pip->efp != NULL) {
+	if (pip->efp != nullptr) {
 	    bclose(pip->efp) ;
-	    pip->efp = NULL ;
+	    pip->efp = nullptr ;
 	}
 
 ret1:
@@ -917,8 +911,8 @@ struct proginfo	*pip ;
 	int	rs ;
 	int	wlen = 0 ;
 
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [-idx <name>] [<file(s)>] [-af <argfile>]\n" ;
 	rs = bprintf(pip->efp,fmt,pn,pn) ;
@@ -942,8 +936,8 @@ struct proginfo	*pip ;
 struct arginfo	*aip ;
 BITS		*app ;
 HASHINFO	*hip ;
-const char	*afname ;
-const char	*ofname ;
+cchar	*afname ;
+cchar	*ofname ;
 {
 	MEMFILE	*mfp = &hip->mf ;
 
@@ -958,7 +952,7 @@ const char	*ofname ;
 	int	f_append = pip->f.append ;
 	int	f_noinput = pip->f.noinput ;
 
-	const char	*cp ;
+	cchar	*cp ;
 
 	char	ofbuf[10] ;
 
@@ -974,7 +968,7 @@ const char	*ofname ;
 	} else
 	    strcat(ofbuf,"t") ;
 
-	if ((ofname == NULL) || (ofname[0] == '\0') || (ofname[0] == '-'))
+	if ((ofname == nullptr) || (ofname[0] == '\0') || (ofname[0] == '-'))
 	    ofname = BFILE_STDOUT ;
 
 	if ((rs = bopen(ofp,ofname,ofbuf,0666)) >= 0) {
@@ -985,7 +979,7 @@ const char	*ofname ;
 	        for (ai = 1 ; ai < aip->argc ; ai += 1) {
 
 	            f = (ai <= aip->ai_max) && (bits_test(app,ai) > 0) ;
-	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != NULL)) ;
+	            f = f || ((ai > aip->ai_pos) && (aip->argv[ai] != nullptr)) ;
 	            if (! f) continue ;
 
 	            cp = aip->argv[ai] ;
@@ -998,7 +992,7 @@ const char	*ofname ;
 
 /* process any files in the argument filename list file */
 
-	    if ((rs >= 0) && (afname != NULL) && (afname[0] != '\0')) {
+	    if ((rs >= 0) && (afname != nullptr) && (afname[0] != '\0')) {
 	        bfile	afile, *afp = &afile ;
 
 	        if (afname[0] == '-') afname = BFILE_STDIN ;
@@ -1073,19 +1067,12 @@ const char	*ofname ;
 /* end subroutine (procargs) */
 
 
-static int hashinfo_begin(hip,pip,hashn,idxname)
-HASHINFO	*hip ;
-struct proginfo	*pip ;
-int		hashn ;
-const char	*idxname ;
-{
+static int hashinfo_begin(HASHINFO *hip,PROGINFO *pip,int hashn,cc *ifn) noex {
 	int	rs = SR_OK ;
-	int	size ;
-
+	int	sz ;
 	void	*hasha ;
 
-
-	memset(hip,0,sizeof(HASHINFO)) ;
+	memclear(hip) ;
 
 	hip->pip = pip ;
 	hashn = nextpowtwo(hashn) ;
@@ -1095,28 +1082,28 @@ const char	*idxname ;
 	    debugprintf("main/hashinfo_begin: hashn=%u\n",hashn) ;
 #endif
 
-	size = (hashn * sizeof(uint)) ;
-	if ((rs = uc_malloc(size,&hasha)) >= 0) {
-	    const char	*tf = "/tmp/whenXXXXXXXXXX" ;
-	    const char	*cp ;
+	sz = (hashn * sizeof(uint)) ;
+	if ((rs = uc_malloc(sz,&hasha)) >= 0) {
+	    cchar	*tf = "/tmp/whenXXXXXXXXXX" ;
+	    cchar	*cp ;
 	    char	postfname[MAXPATHLEN+1] ;
-	    memset(hasha,0,size) ;
+	    memset(hasha,0,sz) ;
 	    hip->hasha = hasha ;
 	    hip->hashn = hashn ;
 	    if ((rs = mktmpfile(postfname,0660,tf)) >= 0) {
-	        const int	of = (O_RDWR | O_CREAT) ;
+	        cint	of = (O_RDWR | O_CREAT) ;
 	        if ((rs = uc_mallocstrw(postfname,rs,&cp)) >= 0) {
 	            hip->postfname = cp ;
 	            if ((rs = memfile_open(&hip->mf,postfname,of,0660)) >= 0) {
 	                char	tmpfname[MAXPATHLEN+1] ;
-	                mkfnamesuf1(tmpfname,idxname,"nnames") ;
+	                mkfnamesuf1(tmpfname,ifn,"nnames") ;
 	                rs = bopen(&hip->namefile,tmpfname,"wct",0666) ;
 	                if (rs < 0)
 	                    memfile_close(&hip->mf) ;
 	            }
 	            if (rs < 0) {
 	                uc_free(hip->postfname) ;
-	                hip->postfname = NULL ;
+	                hip->postfname = nullptr ;
 	            }
 	        }
 	        if (rs < 0)
@@ -1124,7 +1111,7 @@ const char	*idxname ;
 	    }
 	    if (rs < 0) {
 	        uc_free(hip->hasha) ;
-	        hip->hasha = NULL ;
+	        hip->hasha = nullptr ;
 	    }
 	}
 
@@ -1139,43 +1126,40 @@ const char	*idxname ;
 }
 /* end subroutine (hashinfo_begin) */
 
-
-static int hashinfo_end(HASHINFO *hip)
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-	rs1 = bclose(&hip->namefile) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = memfile_close(&hip->mf) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (hip->postfname[0] != '\0') {
-	    rs1 = uc_unlink(hip->postfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	if (hip->postfname != NULL) {
-	    rs1 = uc_free(hip->postfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    hip->postfname = NULL ;
-	}
-
-	if (hip->hasha != NULL) {
-	    rs1 = uc_free(hip->hasha) ;
-	    if (rs >= 0) rs = rs1 ;
-	    hip->hasha = NULL ;
-	}
-
+static int hashinfo_end(HASHINFO *hip) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (hip) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = bclose(&hip->namefile) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = memfile_close(&hip->mf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (hip->postfname[0] != '\0') {
+	        rs1 = uc_unlink(hip->postfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (hip->postfname) {
+	        rs1 = uc_free(hip->postfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        hip->postfname = nullptr ;
+	    }
+	    if (hip->hasha) {
+	        rs1 = uc_free(hip->hasha) ;
+	        if (rs >= 0) rs = rs1 ;
+	        hip->hasha = nullptr ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (hashinfo_end) */
 
-
-static int hashinfo_post(HASHINFO *hip,const char *idxname)
-{
-	struct proginfo	*pip = hip->pip ;
+static int hashinfo_post(HASHINFO *hip,cchar *idxname) noex {
+	PROGINFO	*pip = hip->pip ;
 	MEMFILE	*mfp = &hip->mf ;
 	uint	*hasha = hip->hasha ;
 	int	rs = SR_OK ;
@@ -1187,28 +1171,20 @@ static int hashinfo_post(HASHINFO *hip,const char *idxname)
 	mkfnamesuf1(namefname,idxname,"names") ;
 	if ((rs = postwrite(pip,hasha,hashn,mfp,idxname)) >= 0) {
 	    rs = u_rename(tmpfname,namefname) ;
-
-#if	CF_DEBUG
-	    if (DEBUGLEVEL(2))
-	        debugprintf("main: u_rename() rs=%d\n",rs) ;
-#endif
-
 	}
 
 	return rs ;
 }
 /* end subroutine (hashinfo_post) */
 
-
 #ifdef	COMMENT
-static int mkfieldterms(uchar *terms)
-{
+static int mkfieldterms(uchar *terms) noex {
 	int	ch ;
-	int	i ;
 	int	c = 256 ;
 
-	for (i = 0 ; i < 32 ; i += 1)
+	for (int i = 0 ; i < 32 ; i += 1) {
 	    terms[i] = 0xFF ;
+	}
 
 	BACLR(terms,'_') ;
 	c -= 1 ;
