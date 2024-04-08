@@ -1,7 +1,7 @@
 /* outema HEADER */
 /* lang=C20 */
 
-/* output lines */
+/* manage printing EMAs (E-Mail-Addresses) as lines */
 /* version %I% last-modified %G% */
 
 
@@ -10,14 +10,9 @@
 	= 1998-04-01, David A­D­ Morano
 	This subroutine was originally written.
 
-	= 1999-02-01, David A­D­ Morano
-	I added a little code to "post" articles that do not have
-	a valid newsgroup to a special "dead article" directory in
-	the BB spool area.
-
 */
 
-/* Copyright © 1998,1999 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /****************************************************************************
 
@@ -31,12 +26,9 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
 #include	<usystem.h>
-#include	<ema.h>
 #include	<filer.h>
+#include	<ema.h>
 #include	<localmisc.h>
 
 

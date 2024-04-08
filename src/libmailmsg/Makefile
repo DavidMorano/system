@@ -159,5 +159,6 @@ hdrdecode.o:		hdrdecode.cc hdrdecode.h
 
 hdrextnum.o:		hdrextnum.cc hdrextnum.h
 mailmsgheadkey.o:	mailmsgheadkey.cc 		$(INCS)
+outema.o:		outema.cc outema.h
 
 
