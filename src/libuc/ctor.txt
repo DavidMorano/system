@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int userports_ctor(userports *op,Args ... args) noex {
+static int eigendb_ctor(eigendb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int userports_ctor(userports *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (userports_ctor) */
+/* end subroutine (eigendb_ctor) */
 
-static int userports_dtor(userports *op) noex {
+static int eigendb_dtor(eigendb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (userports_dtor) */
+/* end subroutine (eigendb_dtor) */
 
 template<typename ... Args>
-static int userports_magic(userports *op,Args ... args) noex {
+static int eigendb_magic(eigendb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == USERPORTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == EIGENDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (userports_magic) */
+/* end subroutine (eigendb_magic) */
 

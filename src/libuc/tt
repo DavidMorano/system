@@ -1,8 +1,3 @@
-	vecobj		ents ;		/* entry-list-pointer */
-	vecpstr		protos ;	/* protocol-list-pointer */
-	vecpstr		ports ;		/* port-list-pinter */
-
-elp
-plp
-olp
+	strpack		packer ;	spp
+	hdb		db ;		dbp
 

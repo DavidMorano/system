@@ -1,9 +1,8 @@
-/* postwrite */
+/* postwrite SUPPORT */
+/* lang=C++20 */
 
 /* postwrite the input files */
-
-
-#define	CF_DEBUG 	0		/* switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,42 +16,36 @@
 
 /*******************************************************************************
 
+	Name:
+	postwrite
+
+	Description:
 	This subroutine postwritees a single file.
 
 	Synopsis:
-
-	int postwrite(pip,hasha,nhash,mfp,filename)
-	struct proginfo	*pip ;
-	uint		hasha[] ;
-	int		nhash ;
-	MEMFILE		*mfp ;
-	const char	filename[] ;
+	int postwrite(PI *pip,uint *hasha,int nhash,memfile *mfp,cc *fn) noex
 
 	Arguments:
-
 	- pip		program information pointer
-	- filename	file to postwrite
+	hasha		hash-array pointer
+	nhash		number of array entries
+	mfp		memory-file-pointer
+	- fn		file to postwrite
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<hdb.h>
@@ -80,15 +73,15 @@ extern uint	nextpowtwo(uint) ;
 extern uint	hash_elf(void *,int) ;
 extern uint	uceil(uint,int) ;
 
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	nextfield(cchar *,int,cchar **) ;
 extern int	ffbsi(uint) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
 extern int	iceil(int,int) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -116,7 +109,7 @@ struct proginfo	*pip ;
 uint		hasha[] ;
 int		nhash ;
 MEMFILE		*mfp ;		/* post MEMFILE */
-const char	indexname[] ;
+cchar	indexname[] ;
 {
 	struct postentry	*posta ;
 
@@ -134,7 +127,7 @@ const char	indexname[] ;
 	int	shift ;
 	int	c = 0 ;
 
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	char	magicbuf[16] ;
 	char	vetu[4] ;
