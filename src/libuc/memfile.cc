@@ -110,7 +110,9 @@ static inline int memfile_magic(memfile *op,Args ... args) noex {
 /* end subroutine (memfile_magic) */
 
 static int	memfile_opener(memfile *,cchar *,int,mode_t) noex ;
-static int	memfile_openmap(memfile *,int,size_t) noex ;
+static int	memfile_openmap(memfile *,size_t) noex ;
+static int	memfile_mapbegin(memfile *,size_t,size_t) noex ;
+static int	memfile_mapend(memfile *) noex ;
 static int	memfile_extend(memfile *) noex ;
 static int	memfile_mapextend(memfile *,size_t) noex ;
 static int	memfile_ismemfree(memfile *,caddr_t,size_t) noex ;
@@ -147,18 +149,14 @@ int memfile_close(memfile *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = memfile_magic(op)) >= 0) {
+            if (op->dbuf) {
+		rs1 = memfile_mapend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
             if (op->fd >= 0) {
                 rs1 = uc_close(op->fd) ;
                 if (rs >= 0) rs = rs1 ;
                 op->fd = -1 ;
-            }
-            if (op->dbuf) {
-                void        *ma = op->dbuf ;
-                csize       ms = op->dlen ;
-                rs1 = u_mmapend(ma,ms) ;
-                if (rs >= 0) rs = rs1 ;
-                op->dbuf = nullptr ;
-                op->dlen = 0 ;
             }
             {
                 rs1 = memfile_dtor(op) ;
@@ -262,9 +260,10 @@ static int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
             if ((rs = uc_fstat(fd,&sb)) >= 0) {
                 if (S_ISREG(sb.st_mode)) {
                     csize       fsize = size_t(sb.st_size) ;
+		    op->fd = fd ;
                     if ((rs = pagesize) >= 0) {
                         op->pagesize = rs ;
-                        rs = memfile_openmap(op,fd,fsize) ;
+                        rs = memfile_openmap(op,fsize) ;
                     } /* end if (pagesize) */
                 } else {
                     rs = SR_PROTO ;
@@ -279,32 +278,48 @@ static int memfile_opener(memfile *op,cchar *fname,int of,mode_t om) noex {
 }
 /* end subroutine (memfile_opener) */
 
-static int memfile_openmap(memfile *op,int fd,size_t fsize) noex {
-	csize		ms = szceil(fsize,op->pagesize) ;
-	cint		mp = (PROT_READ | PROT_WRITE) ;
-	cint		mf = MAP_SHARED ;
+static int memfile_openmap(memfile *op,size_t fsize) noex {
 	int		rs ;
-	void		*md{} ;
-	op->off = 0 ;
-	op->fd = fd ;
-	if ((rs = u_mmapbegin(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	if ((rs = memfile_mapbegin(op,0z,fsize)) >= 0) {
 	    op->fsize = fsize ;
-	    op->dbuf = charp(md) ;
-	    op->dlen = ms ;
 	    if ((rs = memfile_extend(op)) >= 0) {
 	        op->bp = op->dbuf ;
 	    }
 	    if (rs < 0) {
-		void	*ma = op->dbuf ;
-		csize	ms = op->dlen ;
-		u_mmapend(ma,ms) ;
-		op->dbuf = nullptr ;
-		op->dlen = 0 ;
+		memfile_mapend(op) ;
 	    } /* end if (error) */
 	} /* end if (u_mmapbegin) */
 	return rs ;
 }
 /* end subroutine (memfile_openmap) */
+
+static int memfile_mapbegin(memfile *op,size_t of,size_t sz) noex {
+	cnullptr	np{} ;
+	csize		ms = szceil((of+sz),op->pagesize) ;
+	cint		mp = (PROT_READ | PROT_WRITE) ;
+	cint		mf = MAP_SHARED ;
+	cint		fd = op->fd ;
+	int		rs ;
+	void		*md{} ;
+	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,of,&md)) >= 0) {
+	    op->dbuf = charp(md) ;
+	    op->dlen = sz ;
+	}
+	return rs ;
+}
+/* end subroutine (memfile_mepend) */
+
+static int memfile_mapend(memfile *op) noex {
+	int		rs ;
+	void		*ma = op->dbuf ;
+	csize		ms = op->dlen ;
+	if ((rs = u_mmapend(ma,ms)) >= 0) {
+	    op->dbuf = nullptr ;
+	    op->dlen = 0 ;
+	}
+	return rs ;
+}
+/* end subroutine (memfile_mapend) */
 
 static int memfile_extend(memfile *op) noex {
 	size_t		off = op->fsize ;
@@ -329,6 +344,7 @@ static int memfile_extend(memfile *op) noex {
 /* end subroutine (memfile_extend) */
 
 static int memfile_mapextend(memfile *op,size_t ext) noex {
+	cnullptr	np{} ;
 	off_t		mo = 0 ;
 	caddr_t		addr = (op->dbuf + op->dlen) ;
 	size_t		ms ;
@@ -359,7 +375,7 @@ static int memfile_mapextend(memfile *op,size_t ext) noex {
 	        cint	fd = op->fd ;
 	        void	*md{} ;
 	        ms = (op->dlen + ext) ;
-	        if ((rs = u_mmapbegin(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
+	        if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
 	            op->dbuf = charp(md) ;
 	            op->dlen = ms ;
 	        }

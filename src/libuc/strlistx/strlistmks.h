@@ -21,15 +21,16 @@
 
 
 #define	STRLISTMKS		struct strlistmks_head
-#define	STRLISTMKS_OBJ		struct strlistmks_obj
+#define	STRLISTMKS_OBJ		struct strlistmks_object
 #define	STRLISTMKS_REC		struct strlistmks_rectab
 #define	STRLISTMKS_FL		struct strlistmks_flags
 #define	STRLISTMKS_MAGIC	0x88773423
 #define	STRLISTMKS_NENTRIES	(2 * 1024)
+#define	STRLISTMKS_VERSION	0
 
 
-struct strlistmks_obj {
-	char		*name ;
+struct strlistmks_object {
+	cchar		*name ;
 	uint		objsize ;
 } ;
 
@@ -53,7 +54,7 @@ struct strlistmks_head {
 	cchar 		*dbname ;
 	cchar		*idname ;
 	char		*nfname ;
-	STRTAB		strs ;
+	strtab		strs ;
 	STRLISTMKS_REC	rectab ;
 	STRLISTMKS_FL	f ;
 	gid_t		gid ;
@@ -63,19 +64,20 @@ struct strlistmks_head {
 	mode_t		om ;
 } ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+typedef	STRLISTMKS	strlistmks ;
+typedef	STRLISTMKS_OBJ	strlistmks_obj ;
+typedef	STRLISTMKS_REC	strlistmks_rec ;
+typedef	STRLISTMKS_FL	strlistmks_fl ;
 
-extern int	strlistmks_open(STRLISTMKS *,const char *,int,mode_t,int) ;
-extern int	strlistmks_addvar(STRLISTMKS *,const char *,int) ;
-extern int	strlistmks_abort(STRLISTMKS *) ;
-extern int	strlistmks_chgrp(STRLISTMKS *,gid_t) ;
-extern int	strlistmks_close(STRLISTMKS *) ;
+EXTERNC_begin
 
-#ifdef	__cplusplus
-}
-#endif
+extern int	strlistmks_open(strlistmks *,cchar *,int,mode_t,int) noex ;
+extern int	strlistmks_addvar(strlistmks *,cchar *,int) noex ;
+extern int	strlistmks_abort(strlistmks *) noex ;
+extern int	strlistmks_chgrp(strlistmks *,gid_t) noex ;
+extern int	strlistmks_close(strlistmks *) noex ;
+
+EXTERNC_end
 
 
 #endif /* STRLISTMKS_INCLUDE */

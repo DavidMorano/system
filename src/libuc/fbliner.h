@@ -28,6 +28,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |off_t| */
+#include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -52,7 +53,7 @@ EXTERNC_begin
 
 extern int fbliner_start(fbliner *,filer *,off_t,int) noex ;
 extern int fbliner_finish(fbliner *) noex ;
-extern int fbliner_read(fbliner *,cchar **) noex ;
+extern int fbliner_getln(fbliner *,cchar **) noex ;
 extern int fbliner_done(fbliner *) noex ;
 extern int fbliner_seek(fbliner *,int) noex ;
 

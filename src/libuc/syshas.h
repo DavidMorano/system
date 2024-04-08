@@ -556,22 +556,22 @@
 /* Linux: ptmx(9) */
 #define	SYSHAS_PTMX		1
 
-/* Linux: POSIX shared memory ('shm(3rt)') */
+/* Linux: POSIX shared memory (|shm(3rt)|) */
 #define	SYSHAS_PSHM		1
 
-/* Linux: POSIX regular semaphores ('sem(3rt)') */
+/* Linux: POSIX regular semaphores (|sem(3rt)|) */
 #define	SYSHAS_PSEM		1
 
-/* Linux: POSIX named semaphores ('sem(3rt)') */
+/* Linux: POSIX named semaphores (|sem(3rt)|) */
 #define	SYSHAS_NSEM		1
 
-/* Linux: POSIX message queues ('mq(3rt)') */
+/* Linux: POSIX message queues (|mq(3rt)|) */
 #define	SYSHAS_PMQ		1
 
 /* Linux: AUDIT - part of Linux Basic-Security-Module (BSM) */
 #define	SYSHAS_AUDIT		1
 
-/* Linux: get-directory-entries ('getdents(2)') */
+/* Linux: get-directory-entries (|getdents(2)|) */
 #define	SYSHAS_GETDENTS		1
 
 /* Linux: XTI */

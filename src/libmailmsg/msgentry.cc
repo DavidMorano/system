@@ -123,7 +123,7 @@ int msgentry_loadhdrs(msgentry *mep,fdliner *lsp) noex {
 	int		tlen = 0 ;
 	int		f_eoh = false ;
 	cchar		*lp ;
-	while ((rs = fdliner_read(lsp,&lp)) > 0) {
+	while ((rs = fdliner_getln(lsp,&lp)) > 0) {
 	    ll = rs ;
 	    tlen += ll ;
 	    f_eoh = (lp[0] == '\n') ;

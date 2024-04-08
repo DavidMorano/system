@@ -29,6 +29,18 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+
+EXTERNC_begin
+
+extern int	sunos_sysinfo(char *,int,int) noex ;
+extern int	sunos_ugetnisdom(char *,int) noex ;
+
+EXTERNC_end
+
 
 /* USYSSUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
@@ -39,7 +51,6 @@
 #include	<signal.h>
 #include	<pthread.h>
 #include	<time.h>
-#include	<clanguage.h>
 
 #include	<sys/loadavg.h>		/* <- for |__getloadavg(2)| */
 #include	<sys/lock.h>		/* <- for |plock(2)| */

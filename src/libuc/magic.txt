@@ -1,9 +1,9 @@
 template<typename ... Args>
-static inline int chartrans_magic(chartrans *op,Args ... args) noex {
+static inline int outema_magic(outema *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CHARTRANS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == OUTEMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (chartrans_magic) */
+/* end subroutine (outema_magic) */

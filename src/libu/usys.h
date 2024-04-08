@@ -32,9 +32,6 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/wait.h>		/* <- type |idtype_t| is there */
-#include	<sys/time.h>		/* <- |TIMESPEC| is there */
-#include	<clanguage.h>
 
 #include	<usys_xxx.h>
 #include	<usys_sunos.h>
@@ -45,6 +42,7 @@
 #include	<usys_gethrtime.h>
 #include	<usys_getrandom.h>
 #include	<usys_ttynamerp.h>
+#include	<usys_ugetnisdom.h>
 
 
 #endif /* USYS_INCLUDE */

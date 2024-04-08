@@ -57,7 +57,7 @@ INCS= usys.h
 OBJ0_USYS= usys_xxx.o
 OBJ1_USYS= usys_sunos.o usys_darwin.o usys_linux.o 
 OBJ2_USYS= usys_mqueue.o usys_gethrtime.o usys_getrandom.o
-OBJ3_USYS= usys_ttynamerp.o
+OBJ3_USYS= usys_ttynamerp.o usys_ugetnisdom.o
 
 OBJ_USYS= obj0_usys.o obj1_usys.o obj2_usys.o obj3_usys.o
 
@@ -127,5 +127,6 @@ usys_mqueue.o:		usys_mqueue.cc usys_mqueue.h		$(INCS)
 usys_gethrtime.o:	usys_gethrtime.cc usys_gethrtime.h	$(INCS)
 usys_getrandom.o:	usys_getrandom.cc usys_getrandom.h	$(INCS)
 usys_ttynamerp.o:	usys_ttynamerp.cc usys_ttynamerp.h	$(INCS)
+usys_ugetnisdom.o:	usys_ugetnisdom.cc usys_ugetnisdom.h	$(INCS)
 
 

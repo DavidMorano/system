@@ -102,7 +102,7 @@ int fbliner_finish(fbliner *lsp) noex {
 }
 /* end subroutine (fbliner_finish) */
 
-int fbliner_read(fbliner *lsp,cchar **lpp) noex {
+int fbliner_getln(fbliner *lsp,cchar **lpp) noex {
 	filer		*fbp = lsp->fbp ;
 	int		rs = SR_OK ;
 	int		len = 0 ;
@@ -121,7 +121,7 @@ int fbliner_read(fbliner *lsp,cchar **lpp) noex {
 	}
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (fbliner_read) */
+/* end subroutine (fbliner_getln) */
 
 int fbliner_done(fbliner *lsp) noex {
 	int		rs = SR_FAULT ;

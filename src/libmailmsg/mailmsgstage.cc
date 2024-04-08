@@ -586,7 +586,7 @@ static int mailmsgstage_gmsg(MMS *op,filer *tfp,
 	bool		f_eoh = false ;
 	cchar		*lp ;
 /* find message start */
-	while ((rs = fdliner_read(lsp,&lp)) > 0) {
+	while ((rs = fdliner_getln(lsp,&lp)) > 0) {
 	    ll = rs ;
 	    if (ll == 0) break ;
 	    if ((ll > 5) && FMAT(lp) &&
@@ -688,7 +688,7 @@ static int mailmsgstage_gmsgbody(MMS *op,filer *tfp,fdliner *lsp,
 	    nmax = clines ;
 	}
 	while ((rs >= 0) && (blines < nmax) && 
-	    ((rs = fdliner_read(lsp,&lp)) > 0)) {
+	    ((rs = fdliner_getln(lsp,&lp)) > 0)) {
 	    ll = rs ;
 	    f_eol = (lp[ll - 1] == '\n') ;
 	    if (f_bol && FMAT(lp) && (ll > 5)) {

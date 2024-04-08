@@ -32,12 +32,9 @@
 	>=0	OK
 	<0	error
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 
 #if	defined(DARWIN)

@@ -14,34 +14,33 @@
 
 /*******************************************************************************
 
-        Yes, Virginia. We need this for p-thread work. We need it for the same
-        reasons we need any other 'uc_xxx(3uc)' subroutine.
-
+	Yes, Virginia. We need this for p-thread work. We need it
+	for the same reasons we need any other 'uc_xxx(3uc)'
+	subroutine.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
 
+/* local defines */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int pt_sigmask(int how,sigset_t *setp,sigset_t *osetp)
-{
+int pt_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 	int		rs ;
-
 	errno = 0 ;
 	rs = pthread_sigmask(how,setp,osetp) ;
 	if (rs != 0) rs = (- errno) ;
-
 	return rs ;
 }
 /* end subroutine (pt_sigmask) */

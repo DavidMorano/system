@@ -81,10 +81,10 @@ int buffer_strquote(buffer *bufp,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (sl < 0) sl = strlen(sp) ;
 	if (strnpbrk(sp,sl," \t\r\n\v\f\b\"\\") != NULL) {
-	    cint	size = ((2*sl)+3) ;
+	    cint	sz = ((2*sl)+3) ;
 	    cchar	*tp ;
 	    char	*ap ;
-	    if ((rs = uc_malloc(size,&ap)) >= 0) {
+	    if ((rs = uc_malloc(sz,&ap)) >= 0) {
 		char	*bp = ap ;
 		{
 		    *bp++ = qch ;

@@ -158,7 +158,7 @@ int fdliner_finish(fdliner *op) noex {
 }
 /* end subroutine (fdliner_finish) */
 
-int fdliner_read(fdliner *op,cchar **lpp) noex {
+int fdliner_getln(fdliner *op,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op && lpp) {
@@ -180,7 +180,7 @@ int fdliner_read(fdliner *op,cchar **lpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (fdliner_read) */
+/* end subroutine (fdliner_getln) */
 
 int fdliner_done(fdliner *op) noex {
 	int		rs = SR_FAULT ;

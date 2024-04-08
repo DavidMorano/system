@@ -60,7 +60,7 @@ OBJ2_SFX= sfkey.o sflast.o sfnamecomp.o sfprogroot.o
 OBJ3_SFX= sfrootname.o sfshrink.o sfskipwhite.o sfsub.o 
 OBJ4_SFX= sfcasesub.o sfsubstance.o sfthing.o 
 OBJ5_SFX= sfwhitedot.o sfword.o sfprogname.o
-OBJ6_SFX= sfnext.o sfkeyval.o
+OBJ6_SFX= sfnext.o sfnextqtok.o sfkeyval.o 
 OBJ7_SFX= sfbrk.o sfsign.o
 
 

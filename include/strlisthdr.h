@@ -1,20 +1,24 @@
-/* strlisthdr */
+/* strlisthdr HEADER */
+/* lang=C20 */
+
+/* string-list database-file header */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STRLISTHDR_INCLUDE
-#define	STRLISTHDR_INCLUDE	1
+#define	STRLISTHDR_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 
-#define	STRLISTHDR		struct strlisthdr
+#define	STRLISTHDR		struct strlisthdr_head
 
 #define	STRLISTHDR_MAGICSTR	"STRLISTHDR"
 #define	STRLISTHDR_FSUF		"si"
@@ -23,7 +27,7 @@
 #define	STRLISTHDR_VERSION	0
 
 
-struct strlisthdr {
+struct strlisthdr_head {
 	uint		fsize ;		/* file size */
 	uint		wtime ;		/* write time (creation time?) */
 	uint		stoff ;		/* string table offset */
@@ -37,16 +41,18 @@ struct strlisthdr {
 	char		vetu[4] ;
 } ;
 
+typedef STRLISTHDR	strlisthdr ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int strlisthdr(STRLISTHDR *,int,char *,int) ;
+extern int strlisthdr_msg(strlisthdr *,int,char *,int) noex ;
+/* read from file-buffer to object */
+extern int strlisthdr_rd(strlisthdr *,cchar *,int) noex ;
+/* write to file-buffer from object */
+extern int strlisthdr_wr(strlisthdr *,char *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* STRLISTHDR_INCLUDE */
 

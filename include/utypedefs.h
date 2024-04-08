@@ -299,6 +299,11 @@ typedef const wchar_t		cwchar ;
 typedef const char *const *	mainv ;
 #endif
 
+#ifndef	TYPEDEF_DIRENT
+#define	TYPEDEF_DIRENT
+typedef struct dirent		dirent_t ;
+#endif
+
 #ifndef	TYPEDEF_IN4ADDRT
 #define	TYPEDEF_IN4ADDRT
 typedef in_addr_t		in4_addr_t ;

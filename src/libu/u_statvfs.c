@@ -26,9 +26,7 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>

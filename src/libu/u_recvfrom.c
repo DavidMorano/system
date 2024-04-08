@@ -18,18 +18,13 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#define	LIBU_MASTER	1
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/uio.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<poll.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

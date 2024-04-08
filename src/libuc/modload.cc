@@ -42,7 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -66,6 +65,9 @@
 
 
 /* local defines */
+
+#define	ML		modload
+#define	ML_MI		modload_mi
 
 #define	SUBINFO		struct subinfo
 #define	SUBINFO_FL	struct subinfo_flags
@@ -99,9 +101,9 @@ struct subinfo_flags {
 
 struct subinfo {
 	void		*op ;
-	cchar	*pr ;
-	cchar	*modfname ;
-	cchar	**syms ;
+	cchar		*pr ;
+	cchar		*modfname ;
+	cchar		**syms ;
 	SUBINFO_FL	f ;
 	ids		id ;
 	int		opts ;
@@ -110,9 +112,9 @@ struct subinfo {
 
 /* forward references */
 
-static int	modload_objloadclose(MODLOAD *) noex ;
+static int	modload_objloadclose(ML *) noex ;
 
-static int	subinfo_start(SI *,MODLOAD *,cchar *,
+static int	subinfo_start(SI *,ML *,cchar *,
 			cchar *,int,cchar **) noex ;
 static int	subinfo_modload(SI *) noex ;
 static int	subinfo_finish(SI *,int) noex ;
@@ -170,7 +172,7 @@ static constexpr cpcchar	extdirs[] = {
 
 /* exported subroutines */
 
-int modload_open(MODLOAD *op,cc *pr,cc *modfname,cc *modname,int opts,
+int modload_open(ML *op,cc *pr,cc *modfname,cc *modname,int opts,
 		cc **syms) noex {
 	SUBINFO		si ;
 	int		rs ;
@@ -189,7 +191,7 @@ int modload_open(MODLOAD *op,cc *pr,cc *modfname,cc *modname,int opts,
 	if (modfname[0] == '\0') return SR_INVALID ;
 	if (modfname[0] == '\0') return SR_INVALID ;
 
-	memset(op,0,sizeof(MODLOAD)) ;
+	memclear(op) ;
 	op->modname = modname ;
 
 	if ((rs = subinfo_start(&si,op,pr,modfname,opts,syms)) >= 0) {
@@ -204,7 +206,7 @@ int modload_open(MODLOAD *op,cc *pr,cc *modfname,cc *modname,int opts,
 }
 /* end subroutine (modload_open) */
 
-int modload_close(MODLOAD *op) noex {
+int modload_close(ML *op) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	if (op) {
@@ -222,7 +224,7 @@ int modload_close(MODLOAD *op) noex {
 }
 /* end subroutine (modload_close) */
 
-int modload_getsym(MODLOAD *op,cchar *symname,cvoid **vpp) noex {
+int modload_getsym(ML *op,cchar *symname,cvoid **vpp) noex {
 	int		rs = SR_OK ;
 	cvoid		*rp ;
 
@@ -235,10 +237,12 @@ int modload_getsym(MODLOAD *op,cchar *symname,cvoid **vpp) noex {
 
 	if (op->sop != nullptr) {
 	    rp = dlsym(op->sop,symname) ;
-	    if (rp == nullptr)
+	    if (rp == nullptr) {
 	        rs = SR_NOTFOUND ;
-	} else
+	    }
+	} else {
 	    rs = SR_NOTFOUND ;
+	}
 
 	if (vpp != nullptr) {
 	    *vpp = (rs >= 0) ? rp : nullptr ;
@@ -248,7 +252,7 @@ int modload_getsym(MODLOAD *op,cchar *symname,cvoid **vpp) noex {
 }
 /* end subroutine (modload_getsym) */
 
-int modload_getmv(MODLOAD *op,int vi) noex {
+int modload_getmv(ML *op,int vi) noex {
 	int		rs = SR_OK ;
 	int		v = 0 ;
 
@@ -259,16 +263,17 @@ int modload_getmv(MODLOAD *op,int vi) noex {
 	if (vi < 0) return SR_INVALID ;
 
 	if (op->midp != nullptr) {
-	    MODLOAD_MID	*mip = op->midp ;
+	    ML_MI	*mip = op->midp ;
 	    v = mip->mv[vi] ;
-	} else
+	} else {
 	    rs = SR_NOTFOUND ;
+	}
 
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (modload_getmv) */
 
-int modload_getmva(MODLOAD *op,int *mva,int mvn) noex {
+int modload_getmva(ML *op,int *mva,int mvn) noex {
 	int		rs = SR_OK ;
 	int		v = 0 ;
 
@@ -278,14 +283,14 @@ int modload_getmva(MODLOAD *op,int *mva,int mvn) noex {
 	if (op->magic != MODLOAD_MAGIC) return SR_NOTOPEN ;
 
 	if (op->midp != nullptr) {
-	    MODLOAD_MID	*mip = op->midp ;
-	    int		i ;
+	    MODLOAD_MI	*mip = op->midp ;
 	    v = mip->mv[0] ;
-	    for (i = 0 ; i < mvn ; i += 1) {
+	    for (int i = 0 ; i < mvn ; i += 1) {
 	        mva[i] = mip->mv[i] ;
 	    }
-	} else
+	} else {
 	    rs = SR_NOTFOUND ;
+	}
 
 	return (rs >= 0) ? v : rs ;
 }
@@ -294,7 +299,7 @@ int modload_getmva(MODLOAD *op,int *mva,int mvn) noex {
 
 /* private subroutines */
 
-static int modload_objloadclose(MODLOAD *op) noex {
+static int modload_objloadclose(ML *op) noex {
 	if (op->sop != nullptr) {
 	    if ((op->sop != RTLD_DEFAULT) && (op->sop != RTLD_SELF)) {
 	        dlclose(op->sop) ;
@@ -305,7 +310,7 @@ static int modload_objloadclose(MODLOAD *op) noex {
 }
 /* end subroutine (modload_objloadclose) */
 
-static int subinfo_start(SI *sip,MODLOAD *op,cc *pr,cc *modfname,
+static int subinfo_start(SI *sip,ML *op,cc *pr,cc *modfname,
 		int opts,cc **syms) noex {
 	int		rs ;
 	memclear(sip) ;
@@ -322,9 +327,8 @@ static int subinfo_start(SI *sip,MODLOAD *op,cc *pr,cc *modfname,
 static int subinfo_finish(SI *sip,int f_abort) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (f_abort) {
-	    MODLOAD	*op = (MODLOAD *) sip->op ;
+	    modload	*op = (ML *) sip->op ;
 	    rs1 = modload_objloadclose(op) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -338,32 +342,31 @@ static int subinfo_finish(SI *sip,int f_abort) noex {
 
 static int subinfo_modload(SI *sip) noex {
 	int		rs ;
-
 	if ((rs = subinfo_objloadbegin(sip)) >= 0) {
 	    rs = subinfo_checksyms(sip) ;
-	    if (rs < 0)
+	    if (rs < 0) {
 	        subinfo_objloadend(sip) ;
+	    }
 	} /* end if (objload-begin) */
-
 	return rs ;
 }
 /* end subroutine (subinfo_modload) */
 
 static int subinfo_objloadbegin(SI *sip) noex {
 	int		rs ;
-
+	{
 	    rs = subinfo_sofind(sip) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_objloadbegin) */
 
 static int subinfo_objloadend(SI *sip) noex {
-	MODLOAD		*op = (MODLOAD *) sip->op ;
+	modload		*op = (ML *) sip->op ;
 	int		rs ;
-
-	rs = modload_objloadclose(op) ;
-
+	{
+	    rs = modload_objloadclose(op) ;
+	}
 	return rs ;
 }
 /* end subroutine (subinfo_objloadend) */
@@ -531,7 +534,7 @@ static int subinfo_socheckvarc(SI *sip,dirseen *dsp,
 
 static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
 	USTAT		sb ;
-	MODLOAD		*op = (MODLOAD *) sip->op ;
+	modload		*op = (ML *) sip->op ;
 	cint		am = (R_OK | X_OK) ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -572,7 +575,7 @@ static int subinfo_sochecklib(SI *sip,dirseen *dsp,cchar *ldname,int dlm) noex {
 /* end subroutine (subinfo_sochecklib) */
 
 static int subinfo_socheckliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
-	MODLOAD		*op = (MODLOAD *) sip->op ;
+	modload		*op = (ML *) sip->op ;
 	ids		*idp = &sip->id ;
 	cint		am = (X_OK|R_OK) ;
 	int		rs = SR_OK ;
@@ -615,14 +618,14 @@ static int subinfo_socheckliber(SI *sip,dirseen *dsp,cchar *ldnp,int dlm) noex {
 /* end subroutine (subinfo_socheckliber) */
 
 static int subinfo_sotest(SI *sip) noex {
-	MODLOAD		*op = (MODLOAD *) sip->op ;
+	modload		*op = (ML *) sip->op ;
 	int		rs = SR_NOTFOUND ;
 	void		*vp ;
 
 	if (op->sop == nullptr) return SR_FAULT ;
 
 	if ((vp = dlsym(op->sop,op->modname)) != nullptr) {
-	    MODLOAD_MID	*mip = (MODLOAD_MID *) vp ;
+	    MODLOAD_MI	*mip = (MODLOAD_MI *) vp ;
 	    op->midp = mip ;
 	    if (strcmp(mip->name,op->modname) == 0) {
 		rs = SR_OK ;
@@ -634,7 +637,7 @@ static int subinfo_sotest(SI *sip) noex {
 /* end subroutine (subinfo_sotest) */
 
 static int subinfo_checksyms(SI *sip) noex {
-	MODLOAD		*op = (MODLOAD *) sip->op ;
+	modload		*op = (ML *) sip->op ;
 	int		rs = SR_OK ;
 	if (sip->syms != nullptr) {
 	    void	*p = nullptr ;

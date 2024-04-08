@@ -25,6 +25,7 @@
 #include	<prgetprogpath.h>
 #include	<prgetclustername.h>
 #include	<prmktmpdir.h>
+#include	<prsetfname.h>
 
 
 #endif /* LIBPR_INCLUDE */

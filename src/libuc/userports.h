@@ -19,9 +19,9 @@
 
 
 #define	USERPORTS	struct userports_head
-#define	USERPORTS_FL	struct userports_flags ;
-#define	USERPORTS_CUR	struct userports_curusor
-#define	USERPORTS_ENT	struct userports_enttry
+#define	USERPORTS_FL	struct userports_flags
+#define	USERPORTS_CUR	struct userports_cursor
+#define	USERPORTS_ENT	struct userports_entry
 #define	USERPORTS_FI	struct userports_file
 #define	USERPORTS_MAGIC	0x87437174
 #define	USERPORTS_FNAME	"/etc/userports"
@@ -33,7 +33,7 @@ struct userports_entry {
 	uid_t		uid ;
 } ;
 
-struct userports_cur {
+struct userports_cursor {
 	int		i ;
 } ;
 
@@ -49,9 +49,9 @@ struct userports_file {
 } ;
 
 struct userports_head {
-	vecobj		ents ;
-	vecpstr		protos ;
-	vecpstr		ports ;
+	vecobj		*elp ;		/* entry-list-pointer */
+	vecpstr		*plp ;		/* protocol-list-pointer */
+	vecpstr		*olp ;		/* port-list-pinter */
 	cchar		*fname ;
 	USERPORTS_FL	f ;
 	USERPORTS_FI	fi ;

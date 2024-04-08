@@ -25,7 +25,7 @@
 
 
 #define	MODLOAD			struct modload_head
-#define	MODLOAD_MID		struct modload_mid
+#define	MODLOAD_MI		struct modload_mid
 #define	MODLOAD_MAGIC		0x99447246
 #define	MODLOAD_DEFENTS		(44 * 1000)
 
@@ -44,19 +44,20 @@ struct modload_mid {
 struct modload_head {
 	void		*sop ;		/* shared-object (SO) pointer */
 	cchar		*modname ;
-	MODLOAD_MID	*midp ;
+	MODLOAD_MI	*midp ;
 	uint		magic ;
 } ;
 
 typedef MODLOAD		modload ;
+typedef MODLOAD_MI	modload_mi ;
 
 EXTERNC_begin
 
-extern int modload_open(MODLOAD *,cchar *,cchar *,cchar *,int,cchar **) noex ;
-extern int modload_getmv(MODLOAD *,int) noex ;
-extern int modload_getmva(MODLOAD *,int *,int) noex ;
-extern int modload_getsym(MODLOAD *,cchar *,cvoid **) noex ;
-extern int modload_close(MODLOAD *) noex ;
+extern int modload_open(modload *,cchar *,cchar *,cchar *,int,mainv) noex ;
+extern int modload_getmv(modload *,int) noex ;
+extern int modload_getmva(modload *,int *,int) noex ;
+extern int modload_getsym(modload *,cchar *,cvoid **) noex ;
+extern int modload_close(modload *) noex ;
 
 EXTERNC_end
 

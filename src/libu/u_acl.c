@@ -15,9 +15,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>
-
 #include	<sys/types.h>
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
@@ -38,8 +36,6 @@
 
 
 /* external subroutines */
-
-extern int	msleep(int) ;
 
 
 /* exported subroutines */

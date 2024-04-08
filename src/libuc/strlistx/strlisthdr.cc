@@ -1,10 +1,9 @@
 /* strlisthdr SUPPORT */
 /* lang=C++20 */
 
-/*  spellcheck file header */
+/* string-list database-file header */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS 	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -57,14 +56,14 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	mkmagic(char *,int,cchar *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -93,22 +92,19 @@ enum his {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int strlisthdr(ep,f,hbuf,hlen)
-STRLISTHDR	*ep ;
-int		f ;
-char		hbuf[] ;
-int		hlen ;
-{
+int strlisthdr_msg(strlisthdr *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	magicsize = STRLISTHDR_MAGICSIZE ;
+	cint	magicsize = STRLISTHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		headsize ;
 	int		bl, cl ;
-	const char	*magicstr = STRLISTHDR_MAGICSTR ;
-	const char	*tp, *cp ;
+	cchar	*magicstr = STRLISTHDR_MAGICSTR ;
+	cchar	*tp, *cp ;
 	char		*bp ;
 
 	if (ep == NULL) return SR_FAULT ;

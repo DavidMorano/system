@@ -66,6 +66,10 @@ extern int	buffer_getprev(buffer *) noex ;
 extern int	buffer_get(buffer *,cchar **) noex ;
 extern int	buffer_finish(buffer *) noex ;
 
+extern int	buffer_strcompact(buffer *,cchar *,int) noex ;
+extern int	buffer_stropaque(buffer *,cchar *,int) noex ;
+extern int	buffer_strquote(buffer *,cchar *,int) noex ;
+
 EXTERNC_end
 
 #ifdef	__cplusplus

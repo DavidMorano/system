@@ -4,7 +4,6 @@
 /* STRLISTMK management */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -35,6 +34,7 @@
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<modload.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"strlistmk.h"
@@ -47,33 +47,23 @@
 #define	STRLISTMK_OBJNAME	"strlistmks"
 #define	STRLISTMK_PRLOCAL	"LOCAL"
 
+#define	SLM		strlistmk
+
 #ifndef	SYMNAMELEN
 #define	SYMNAMELEN	60
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mksofname(char *,const char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
+/* external variables */
 
 
 /* local structures */
@@ -81,26 +71,14 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	strlistmk_objloadbegin(STRLISTMK *,const char *,const char *) ;
-static int	strlistmk_objloadend(STRLISTMK *) ;
-static int	strlistmk_loadcalls(STRLISTMK *,const char *) ;
+static int	strlistmk_objloadbegin(SLM *,cchar *,cchar *) noex ;
+static int	strlistmk_objloadend(SLM *) noex ;
+static int	strlistmk_loadcalls(SLM *,cchar *) noex ;
 
-static int	isrequired(int) ;
-
-
-/* global variables */
+static bool	isrequired(int) noex ;
 
 
 /* local variables */
-
-static const char	*subs[] = {
-	"open",
-	"add",
-	"abort",
-	"chgrp",
-	"close",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -111,37 +89,35 @@ enum subs {
 	sub_overlast
 } ;
 
+static constexpr cpcchar	subs[] = {
+	"open",
+	"add",
+	"abort",
+	"chgrp",
+	"close",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
+int strlistmk_open(SLM *op,cc *pr,cc *dbname,cc *lfname,
+		int of,mode_t om,int n) noex {
+	int		rs ;
+	cchar		*objname = STRLISTMK_OBJNAME ;
 
-int strlistmk_open(op,pr,dbname,lfname,of,om,n)
-STRLISTMK	*op ;
-const char	pr[] ;
-const char	dbname[] ;
-const char	lfname[] ;
-int		of ;
-mode_t		om ;
-int		n ;
-{
-	int	rs ;
-
-	const char	*objname = STRLISTMK_OBJNAME ;
-
-
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
-	if (lfname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
+	if (lfname == nullptr) return SR_FAULT ;
 
 	if (dbname[0] == '\0') return SR_INVALID ;
 	if (lfname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("strlistmk_open: ent dbname=%s\n",dbname) ;
-#endif
-
-	memset(op,0,sizeof(STRLISTMK)) ;
+	memclear(op) ;
 
 	if ((rs = strlistmk_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,dbname,lfname,of,om,n)) >= 0) {
@@ -151,59 +127,33 @@ int		n ;
 		strlistmk_objloadend(op) ;
 	} /* end if (objloadbegin) */
 
-#if	CF_DEBUGS
-	debugprintf("strlistmk_open: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (strlistmk_open) */
 
-
-/* free up the entire vector string data structure object */
-int strlistmk_close(op)
-STRLISTMK	*op ;
-{
+int strlistmk_close(SLM *op) noex {
 	int	rs = SR_OK ;
 	int	rs1 ;
 
+	if (op == nullptr) return SR_FAULT ;
 
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != STRLISTMK_MAGIC)
-	    return SR_NOTOPEN ;
+	if (op->magic != STRLISTMK_MAGIC) return SR_NOTOPEN ;
 
 	rs1 = (*op->call.close)(op->obj) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("strlistmk_close: strlistmks_close() rs=%d\n",rs) ;
-#endif
-
 	rs1 = strlistmk_objloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("strlistmk_close: strlistmk_objloadend() rs=%d\n",rs) ;
-#endif
 
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (strlistmk_close) */
 
-
-int strlistmk_add(op,sp,sl)
-STRLISTMK	*op ;
-const char	sp[] ;
-int		sl ;
-{
-	int	rs ;
-
-
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
+int strlistmk_add(SLM *op,cc *sp,int sl) noex {
+	int		rs ;
+	if (op == nullptr) return SR_FAULT ;
+	if (sp == nullptr) return SR_FAULT ;
 
 	if (op->magic != STRLISTMK_MAGIC) return SR_NOTOPEN ;
 
@@ -213,41 +163,24 @@ int		sl ;
 }
 /* end subroutine (strlistmk_add) */
 
+int strlistmk_abort(SLM *op) noex {
+	int		rs = SR_NOSYS ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != STRLISTMK_MAGIC) return SR_NOTOPEN ;
 
-int strlistmk_abort(op)
-STRLISTMK	*op ;
-{
-	int	rs = SR_NOSYS ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != STRLISTMK_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (op->call.abort != NULL)
+	if (op->call.abort != nullptr)
 	    rs = (*op->call.abort)(op->obj) ;
 
 	return rs ;
 }
 /* end subroutine (strlistmk_abort) */
 
+int strlistmk_chgrp(SLM *op,gid_t gid) noex {
+	int		rs = SR_NOSYS ;
+	if (op == nullptr) return SR_FAULT ;
+	if (op->magic != STRLISTMK_MAGIC) return SR_NOTOPEN ;
 
-int strlistmk_chgrp(op,gid)
-STRLISTMK	*op ;
-gid_t		gid ;
-{
-	int	rs = SR_NOSYS ;
-
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (op->magic != STRLISTMK_MAGIC)
-	    return SR_NOTOPEN ;
-
-	if (op->call.chgrp != NULL)
+	if (op->call.chgrp != nullptr)
 	    rs = (*op->call.chgrp)(op->obj,gid) ;
 
 	return rs ;
@@ -257,30 +190,20 @@ gid_t		gid ;
 
 /* private subroutines */
 
-
-/* find and load the DB-access object */
-static int strlistmk_objloadbegin(op,pr,objname)
-STRLISTMK	*op ;
-const char	*pr ;
-const char	*objname ;
-{
+static int strlistmk_objloadbegin(SLM *op,cc *pr,cc *objname) noex {
 	MODLOAD	*lp = &op->loader ;
-
 	int	rs ;
-
-
 	{
-		VECSTR		syms ;
-	        const int	n = nelem(subs) ;
+		vecstr		syms ;
+	        cint	n = nelem(subs) ;
 		int		opts = VECSTR_OCOMPACT ;
 	        if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-		    const int	symlen = SYMNAMELEN ;
-	            int		i ;
+		    cint	symlen = SYMNAMELEN ;
 		    int		snl ;
-		    const char	**sv ;
+		    mainv	sv ;
 		    char	symname[SYMNAMELEN + 1] ;
 
-	            for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	            for (int i = 0 ; (i < n) && subs[i] ; i += 1) {
 	                if (isrequired(i)) {
 	                    rs = sncpy3(symname,symlen,objname,"_",subs[i]) ;
 		            snl = rs ;
@@ -290,11 +213,12 @@ const char	*objname ;
 		        if (rs < 0) break ;
 	            } /* end for */
         
-	            if (rs >= 0)
+	            if (rs >= 0) {
 	                rs = vecstr_getvec(&syms,&sv) ;
+		    }
         
 	            if (rs >= 0) {
-	                const char	*modbname = STRLISTMK_MODBNAME ;
+	                cchar	*modbname = STRLISTMK_MODBNAME ;
 			opts = 0 ;
 	                opts |= MODLOAD_OLIBVAR ;
 			opts |= MODLOAD_OPRS ;
@@ -314,12 +238,13 @@ const char	*objname ;
 			        rs = strlistmk_loadcalls(op,objname) ;
 			        if (rs < 0) {
 	    			    uc_free(op->obj) ;
-	    			    op->obj = NULL ;
+	    			    op->obj = nullptr ;
 			        }
 			    } /* end if (memory-allocation) */
 		    } /* end if (modload_getmva) */
-		    if (rs < 0)
+		    if (rs < 0) {
 			modload_close(lp) ;
+		    }
 		} /* end if (modload_open) */
 	} /* end block */
 
@@ -327,42 +252,29 @@ const char	*objname ;
 }
 /* end subroutine (strlistmk_objloadbegin) */
 
-
-static int strlistmk_objloadend(op)
-STRLISTMK	*op ;
-{
-	int	rs = SR_OK ;
-	int	rs1 ;
-
-
-	if (op->obj != NULL) {
+static int strlistmk_objloadend(SLM *op) noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
-
-	rs1 = modload_close(&op->loader) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = modload_close(&op->loader) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (strlistmk_objloadend) */
 
-
-static int strlistmk_loadcalls(op,soname)
-STRLISTMK	*op ;
-const char	soname[] ;
-{
+static int strlistmk_loadcalls(SLM *op,cc *soname) noex {
 	int	rs = SR_NOTFOUND ;
-	int	i ;
 	int	c = 0 ;
-
 	char	symname[SYMNAMELEN + 1] ;
-
 	void	*snp ;
 
-
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (int i = 0 ; subs[i] ; i += 1) {
 
 	    rs = sncpy3(symname,SYMNAMELEN,soname,"_",subs[i]) ;
 	    if (rs < 0)
@@ -370,29 +282,23 @@ const char	soname[] ;
 
 	    snp = dlsym(op->sop,symname) ;
 
-	    if ((snp == NULL) && isrequired(i)) {
+	    if ((snp == nullptr) && isrequired(i)) {
 	        rs = SR_NOTFOUND ;
 		break ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("strlistmk_loadcalls: call=%s %c\n",
-		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
-#endif
-
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 
 	        c += 1 ;
 		switch (i) {
 
 		case sub_open:
 		    op->call.open = (int (*)(void *,
-			const char *,const char *,int,mode_t,int)) snp ;
+			cchar *,cchar *,int,mode_t,int)) snp ;
 		    break ;
 
 		case sub_add:
-		    op->call.add = (int (*)(void *,const char *,int)) snp ;
+		    op->call.add = (int (*)(void *,cchar *,int)) snp ;
 		    break ;
 
 		case sub_abort:
@@ -417,12 +323,8 @@ const char	soname[] ;
 }
 /* end subroutine (strlistmk_loadcalls) */
 
-
-static int isrequired(i)
-int	i ;
-{
-	int	f = FALSE ;
-
+static bool isrequired(int i) noex {
+	bool		f = FALSE ;
 	switch (i) {
 	case sub_open:
 	case sub_add:
@@ -430,7 +332,6 @@ int	i ;
 	    f = TRUE ;
 	    break ;
 	} /* end switch */
-
 	return f ;
 }
 /* end subroutine (isrequired) */
