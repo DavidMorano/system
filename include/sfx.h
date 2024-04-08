@@ -37,6 +37,7 @@ extern int sfkeyval(cchar *,int,cchar *,cchar **) noex ;
 extern int sflast(cchar *,int,int,cchar **) noex ;
 extern int sfnamecomp(cchar *,int,cchar **) noex ;
 extern int sfnext(cchar *,int,cchar **) noex ;
+extern int sfnextqtok(cchar *,int,cchar **) noex ;
 extern int sfnextterm(cchar *,int,cchar *,cchar **) noex ;
 extern int sfprogroot(cchar *,int,cchar **) noex ;
 extern int sfprogname(cchar *,int,cchar **) noex ;
@@ -49,6 +50,7 @@ extern int sfthing(cchar *,int,cchar *,cchar **) noex ;
 extern int sfwhitedot(cchar *,int,cchar **) noex ;
 extern int sfword(cchar *,int,cchar **) noex ;
 extern int sfsign(cchar *,int,cchar **,bool *) noex ;
+extern int sfcenter(cchar *,int,cchar *,cchar **) noex ;
 
 static inline int sfbreak(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	return sfbrk(sp,sl,s2,rpp) ;

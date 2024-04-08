@@ -33,9 +33,10 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ascii.h>
 #include	<estrings.h>
 #include	<buffer.h>
-#include	<ascii.h>
+#include	<sfx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"outema.h"
@@ -90,6 +91,16 @@
 
 /* forward references */
 
+template<typename ... Args>
+static inline int outema_magic(outema *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == OUTEMA_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (outema_magic) */
+
 static int	filer_outpart(filer *,int,cchar *,int) noex ;
 
 
@@ -102,116 +113,109 @@ static int	filer_outpart(filer *,int,cchar *,int) noex ;
 /* exported subroutines */
 
 int outema_start(outema *op,filer *ofp,int maxlen) noex {
-	if (op == nullptr) return SR_FAULT ;
-
-	memclear(op) ;
-	op->maxlen = maxlen ;
-	op->rlen = maxlen ;
-	op->ofp = ofp ;
-
-	return SR_OK ;
+	int		rs = SR_FAULT ;
+	if (op && ofp) {
+	    rs = memclear(op) ;
+	    op->maxlen = maxlen ;
+	    op->rlen = maxlen ;
+	    op->ofp = ofp ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (outema_start) */
 
 int outema_finish(outema *ldp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		wlen = 0 ;
-
-	if (ldp == nullptr) return SR_FAULT ;
-	if (ldp->ofp == nullptr) return SR_FAULT ;
-
-	if (ldp->llen > 0) {
-	    rs = filer_println(ldp->ofp,nullptr,0) ;
-	    ldp->wlen += rs ;
-	    ldp->rlen = ldp->maxlen ;
-	    ldp->llen = 0 ;
-	}
-
-	wlen = ldp->wlen ;
-	ldp->ofp = nullptr ;
+	if ((rs = outema_magic(ldp)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (ldp->ofp) {
+	        if (ldp->llen > 0) {
+	            rs = filer_println(ldp->ofp,nullptr,0) ;
+	            ldp->wlen += rs ;
+	            ldp->rlen = ldp->maxlen ;
+	            ldp->llen = 0 ;
+	        }
+	        wlen = ldp->wlen ;
+	        ldp->ofp = nullptr ;
+	    } /* end if (bugcheck) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_finish) */
 
 int outema_ent(outema *ldp,EMA_ENT *ep) noex {
-	BUFFER		b, *bufp = &b ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-
-	if ((rs = buffer_start(bufp,80)) >= 0) {
-	    cchar	*bp ;
-	    int		bl ;
-	    int		c = 0 ;
-
-	    if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
-	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
-	        if (rs >= 0)
-	            rs = buffer_strquote(bufp,ep->ap,ep->al) ;
-	    }
-
-	    if ((rs >= 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
-	        if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
-	        if (rs >= 0) rs = buffer_char(bufp,CH_LANGLE) ;
-	        if (rs >= 0) rs = buffer_stropaque(bufp,ep->rp,ep->rl) ;
-	        if (rs >= 0) rs = buffer_char(bufp,CH_RANGLE) ;
-	    }
-
-	    if ((rs >= 0) && (ep->cp != nullptr) && (ep->cl > 0)) {
-	        cchar	*cp ;
-	        int	cl ;
-	        if ((cl = sfshrink(ep->cp,ep->cl,&cp)) > 0) {
+	if ((rs = outema_magic(ldp)) >= 0) {
+	    buffer	b, *bufp = &b ;
+	    if ((rs = buffer_start(bufp,80)) >= 0) {
+	        cchar	*bp ;
+	        int	bl ;
+	        int	c = 0 ;
+	        if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
 	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
-	            if (rs >= 0) {
-	                cint	sz = (cl+2+1) ;
-	                char	*ap ;
-	                if ((rs = uc_malloc(sz,&ap)) >= 0) {
-	                    char	*bp = ap ;
-	                    *bp++ = CH_LPAREN ;
-	                    if ((rs = snwcpycompact(bp,cl,cp,cl)) >= 0) {
-	                        bp += rs ;
-	                        *bp++ = CH_RPAREN ;
-	                        rs = buffer_strw(bufp,ap,(bp-ap)) ;
-	                    } /* end if (snwcpycompact) */
-	                    uc_free(ap) ;
-	                } /* end if (m-a-f) */
-	            }
-	        } /* end if (shrink) */
-	    } /* end if (comment) */
-
-	    if (rs >= 0) {
-	        if ((rs = buffer_get(bufp,&bp)) > 0) {
-	            bl = rs ;
-	            rs = outema_item(ldp,bp,bl) ;
-	            wlen += rs ;
+	            if (rs >= 0)
+	                rs = buffer_strquote(bufp,ep->ap,ep->al) ;
 	        }
-	    }
-
-	    rs1 = buffer_finish(bufp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (buffer-ret) */
-
+	        if ((rs >= 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
+	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	            if (rs >= 0) rs = buffer_char(bufp,CH_LANGLE) ;
+	            if (rs >= 0) rs = buffer_stropaque(bufp,ep->rp,ep->rl) ;
+	            if (rs >= 0) rs = buffer_char(bufp,CH_RANGLE) ;
+	        }
+	        if ((rs >= 0) && (ep->cp != nullptr) && (ep->cl > 0)) {
+	            cchar	*cp ;
+	            int		cl ;
+	            if ((cl = sfshrink(ep->cp,ep->cl,&cp)) > 0) {
+	                if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
+	                if (rs >= 0) {
+	                    cint	sz = (cl+2+1) ;
+	                    char	*ap ;
+	                    if ((rs = uc_malloc(sz,&ap)) >= 0) {
+	                        char	*bp = ap ;
+	                        *bp++ = CH_LPAREN ;
+	                        if ((rs = snwcpycompact(bp,cl,cp,cl)) >= 0) {
+	                            bp += rs ;
+	                            *bp++ = CH_RPAREN ;
+	                            rs = buffer_strw(bufp,ap,(bp-ap)) ;
+	                        } /* end if (snwcpycompact) */
+	                        rs1 = uc_free(ap) ;
+				if (rs >= 0) rs = rs1 ;
+	                    } /* end if (m-a-f) */
+	                } /* end if (ok) */
+	            } /* end if (shrink) */
+	        } /* end if (comment) */
+	        if (rs >= 0) {
+	            if ((rs = buffer_get(bufp,&bp)) > 0) {
+	                bl = rs ;
+	                rs = outema_item(ldp,bp,bl) ;
+	                wlen += rs ;
+	            }
+	        }
+	        rs1 = buffer_finish(bufp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (buffer-ret) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_ent) */
 
 int outema_item(outema *ldp,cchar *vp,int vl) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		wlen = 0 ;
-
-	if (vl < 0) vl = strlen(vp) ;
-
-	if (vl > 0) {
-	    int	f_prevcomma = ldp->f.comma ;
-
-	    ldp->f.comma = TRUE ;
-	    rs = outema_value(ldp,vp,vl) ;
-	    wlen += rs ;
-	    ldp->c_items += 1 ;
-
-	    ldp->f.comma = f_prevcomma ;
-	} /* end if */
-
+	if ((rs = outema_magic(ldp)) >= 0) {
+	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl > 0) {
+	        bool	f_prevcomma = ldp->f.comma ;
+	        ldp->f.comma = true ;
+	        rs = outema_value(ldp,vp,vl) ;
+	        wlen += rs ;
+	        ldp->c_items += 1 ;
+	        ldp->f.comma = f_prevcomma ;
+	    } /* end if */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_item) */
@@ -221,7 +225,7 @@ int outema_value(outema *ldp,cchar *vp,int vl) noex {
 	int		nlen ;
 	int		cl, cl2 ;
 	int		wlen = 0 ;
-	int		f_comma = FALSE ;
+	int		f_comma = false ;
 	cchar	*fmt ;
 	cchar	*tp, *cp ;
 
@@ -236,7 +240,7 @@ int outema_value(outema *ldp,cchar *vp,int vl) noex {
 	ldp->c_values = 0 ;
 	while ((rs >= 0) && (vl > 0)) {
 
-	    if ((cl = nextqtoken(vp,vl,&cp)) > 0) {
+	    if ((cl = sfnextqtok(vp,vl,&cp)) > 0) {
 
 	        f_comma = (ldp->f.comma && (ldp->c_items > 0)) ;
 	        nlen = outema_needlength(ldp,cl) ;
@@ -246,8 +250,8 @@ int outema_value(outema *ldp,cchar *vp,int vl) noex {
 	            if (ldp->llen > 0) {
 	                fmt = "\n" ;
 	                if (f_comma) {
-	                    f_comma = FALSE ;
-	                    ldp->f.comma = FALSE ;
+	                    f_comma = false ;
+	                    ldp->f.comma = false ;
 	                    fmt = ",\n" ;
 	                }
 	                rs = filer_write(ldp->ofp,fmt,-1) ;
@@ -262,13 +266,13 @@ int outema_value(outema *ldp,cchar *vp,int vl) noex {
 
 	        if (rs >= 0) {
 	            if (f_comma) {
-	                ldp->f.comma = FALSE ;
+	                ldp->f.comma = false ;
 	            }
 	            rs = filer_outpart(ldp->ofp,f_comma,cp,cl) ;
 	            wlen += rs ;
 	            ldp->llen += rs ;
 	            ldp->rlen -= rs ;
-	            f_comma = FALSE ;
+	            f_comma = false ;
 	        }
 
 	        ldp->c_values += 1 ;
@@ -335,56 +339,55 @@ int outema_printf(outema *ldp,cchar *fmt,...) noex {
 #endif /* COMMENT */
 
 int outema_hdrkey(outema *ldp,cchar *kname) noex {
-	int		rs = SR_OK ;
-	int		nlen = 0 ;
+	int		rs ;
 	int		wlen = 0 ;
-
-	if (ldp == nullptr) return SR_FAULT ;
-	if (kname == nullptr) return SR_FAULT ;
-
-	if (kname[0] == '\0') return SR_INVALID ;
-
-	if ((rs >= 0) && (ldp->llen > 0)) {
-	    rs = filer_println(ldp->ofp,kname,0) ;
-	    wlen += rs ;
-	    ldp->llen = 0 ;
-	    ldp->rlen = ldp->maxlen ;
-	}
-
-	if (rs >= 0) {
-	    rs = filer_write(ldp->ofp,kname,-1) ;
-	    wlen += rs ;
-	    nlen += rs ;
-	}
-
-	if (rs >= 0) {
-	    char	buf[2] ;
-	    buf[0] = ':' ;
-	    buf[1] = '\0' ;
-	    rs = filer_write(ldp->ofp,buf,1) ;
-	    wlen += rs ;
-	    nlen += rs ;
-	}
-
-	if ((rs >= 0) && (nlen > 0)) {
-	    ldp->llen += nlen ;
-	    ldp->rlen -= nlen ;
-	}
-
-	ldp->wlen += wlen ;
+	int		nlen = 0 ;
+	if ((rs = outema_magic(ldp,kname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (kname[0]) {
+		rs = SR_OK ;
+	        if ((rs >= 0) && (ldp->llen > 0)) {
+	            rs = filer_println(ldp->ofp,kname,0) ;
+	            wlen += rs ;
+	            ldp->llen = 0 ;
+	            ldp->rlen = ldp->maxlen ;
+	        }
+	        if (rs >= 0) {
+	            rs = filer_write(ldp->ofp,kname,-1) ;
+	            wlen += rs ;
+	            nlen += rs ;
+	        }
+	        if (rs >= 0) {
+	            char	buf[2] ;
+	            buf[0] = ':' ;
+	            buf[1] = '\0' ;
+	            rs = filer_write(ldp->ofp,buf,1) ;
+	            wlen += rs ;
+	            nlen += rs ;
+	        }
+	        if ((rs >= 0) && (nlen > 0)) {
+	            ldp->llen += nlen ;
+	            ldp->rlen -= nlen ;
+	        }
+	        ldp->wlen += wlen ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outema_hdrkey) */
 
 int outema_needlength(outema *ldp,int cl) noex {
+	int		rs ;
 	int		nlen = (cl + 1) ;
-	if (ldp->llen == 0) {
-	    nlen += 1 ;
-	}
-	if (ldp->f.comma && (ldp->c_items > 0)) {
-	    nlen += 1 ;
-	}
-	return nlen ;
+	if ((rs = outema_magic(ldp)) >= 0) {
+	    if (ldp->llen == 0) {
+	        nlen += 1 ;
+	    }
+	    if (ldp->f.comma && (ldp->c_items > 0)) {
+	        nlen += 1 ;
+	    }
+	} /* end if (magic) */
+	return (rs >= 0) ? nlen : rs ;
 }
 /* end subroutine (outema_needlength) */
 
@@ -392,24 +395,22 @@ int outema_needlength(outema *ldp,int cl) noex {
 /* private subroutines */
 
 static int filer_outpart(filer *fbp,int f_comma,cchar *cp,int cl) noex {
-	int		rs = SR_OK ;
-	int		i ;
+	int		rs = SR_BUGCHECK ;
 	int		wlen = 0 ;
-	char		buf[3] ;
-
-	if (fbp == nullptr)
-	    return SR_FAULT ;
-
-	i = 0 ;
-	if (f_comma) buf[i++] = CH_COMMA ;
-	buf[i++] = ' ' ;
-	buf[i] = '\0' ;
-	if ((rs = filer_write(fbp,buf,i)) >= 0) {
-	    wlen += rs ;
-	    rs = filer_write(fbp,cp,cl) ;
-	    wlen += rs ;
-	}
-
+	if (fbp) {
+	    int		i = 0 ;
+	    char	buf[3] ;
+	    if (f_comma) {
+		buf[i++] = CH_COMMA ;
+	    }
+	    buf[i++] = ' ' ;
+	    buf[i] = '\0' ;
+	    if ((rs = filer_write(fbp,buf,i)) >= 0) {
+	        wlen += rs ;
+	        rs = filer_write(fbp,cp,cl) ;
+	        wlen += rs ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (filer_outpart) */
