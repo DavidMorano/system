@@ -50,6 +50,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<pwcache.h>
 #include	<filemap.h>
 #include	<field.h>
@@ -410,7 +411,6 @@ static int userports_procfile(UP *op) noex {
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-
 	if ((rs = pwcache_start(&pwc,MAXPWENT,MAXPWTTL)) >= 0) {
 	    USTAT	sb ;
 	    filemap	fm, *fmp = &fm ;
@@ -418,79 +418,70 @@ static int userports_procfile(UP *op) noex {
 	    int		ll ;
 	    cchar	*lp ;
 	    if ((rs = filemap_open(fmp,op->fname,fsize)) >= 0) {
-
 	        rs = filemap_stat(fmp,&sb) ;
 	        op->fi.mtime = sb.st_mtime ;
 	        op->fi.dev = sb.st_dev ;
 	        op->fi.ino = sb.st_ino ;
-
 	        while (rs >= 0) {
 	            rs = filemap_getln(fmp,&lp) ;
 	            ll = rs ;
 	            if (rs <= 0) break ;
-
 		    if (lp[ll-1] == '\n') ll -= 1 ;
-
 		    if (ll > 0) {
 	                rs = userports_procline(op,&pwc,lp,ll) ;
 	                if (rs > 0) c += rs ;
 		    }
-
 	        } /* end if (reading lines) */
-
-	        filemap_close(fmp) ;
+	        rs1 = filemap_close(fmp) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (filemap) */
-
 	    rs1 = pwcache_finish(&pwc) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (pwcache) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (userports_procfile) */
 
 static int userports_procline(UP *op,pwentpw *pwcp,cc *lp,int ll) noex {
-	field		fsb ;
-	cint	pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
-	char		*pwbuf ;
-
-	if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
-	if ((rs = field_start(&fsb,lp,ll)) >= 0) {
-	    int		fl ;
-	    cchar	*fp ;
-
-	    if ((fl = field_get(&fsb,fterms,&fp)) > 0) {
-		ucentpw		pw ;
-		char		un[USERNAMELEN+1] ;
-
-	        strdcpy1w(un,USERNAMELEN,fp,fl) ;
-
-	        if ((rs1 = pwcache_lookup(pwcp,&pw,pwbuf,pwlen,un)) >= 0) {
-	            uid_t	uid = pw.pw_uid ;
-
-		    while ((rs >= 0) && (fsb.term != '#')) {
-	                fl = field_get(&fsb,fterms,&fp) ;
-	                if (fl == 0) continue ;
-			if (fl < 0) break ;
-
-	                rs = userports_procent(op,uid,fp,fl) ;
-	                if (rs > 0) c += rs ;
-
-	            } /* end if (ports) */
-
-	        } else if (rs != SR_NOTFOUND) {
-	            rs = rs1 ;
-		}
-
-	    } /* end if */
-
-	    field_finish(&fsb) ;
-	} /* end if (field) */
-	    uc_free(pwbuf) ;
-	} /* end if (memory-allocation) */
+	char		*pwbuf{} ;
+	if ((rs = malloc_pw(&pwbuf)) >= 0) {
+	    field	fsb ;
+	    cint	pwlen = rs ;
+	    if ((rs = field_start(&fsb,lp,ll)) >= 0) {
+	        int	fl ;
+	        cchar	*fp ;
+	        if ((fl = field_get(&fsb,fterms,&fp)) > 0) {
+		    ucentpw	pw ;
+		    char	*ubuf{} ;
+		    if ((rs = malloc_un(&ubuf)) >= 0) {
+			cint	ulen = rs ;
+			auto	pwl = pwcache_lookup ;
+	                strdcpy1w(ubuf,ulen,fp,fl) ;
+	                if ((rs = pwl(pwcp,&pw,pwbuf,pwlen,un)) >= 0) {
+	                    uid_t	uid = pw.pw_uid ;
+		            while ((rs >= 0) && (fsb.term != '#')) {
+	                        fl = field_get(&fsb,fterms,&fp) ;
+	                        if (fl == 0) continue ;
+			        if (fl < 0) break ;
+	                        rs = userports_procent(op,uid,fp,fl) ;
+	                        if (rs > 0) c += rs ;
+	                    } /* end if (ports) */
+	                } else if (isNotPresent(rs)) {
+	                    rs = SR_OK ;
+		        }
+			rs1 = uc_free(ubuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+	        } /* end if */
+	        rs1 = field_finish(&fsb) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (field) */
+	    rs1 = uc_free(pwbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 
 	return (rs >= 0) ? c : rs ;
 }
