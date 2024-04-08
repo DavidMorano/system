@@ -23,7 +23,6 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
-#include	<envstandards.h>
 
 #include	"strlisthdr.h"		/* this is the hash-file-header */
 
@@ -94,7 +93,7 @@ extern int	strlist_curbegin(strlist *,strlist_cur *) noex ;
 extern int	strlist_look(strlist *,strlist_cur *,cchar *,int) noex ;
 extern int	strlist_enum(strlist *,strlist_cur *,char *,int) noex ;
 extern int	strlist_curend(strlist *,strlist_cur *) noex ;
-extern int	strlist_info(strlist *,strlist_info *) noex ;
+extern int	strlist_getinfo(strlist *,strlist_info *) noex ;
 extern int	strlist_audit(strlist *) noex ;
 extern int	strlist_close(strlist *) noex ;
 

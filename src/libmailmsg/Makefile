@@ -36,12 +36,16 @@ LINT= lint
 
 DEFS=
 
-LDRPATH= $(EXTRA)/lib
 
-LIBDIRS= -L$(LIBDIR)
+INCS= libmailmsg.h
+
 
 LIBS=
 
+
+LDRPATH= $(EXTRA)/lib
+
+LIBDIRS= -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -49,9 +53,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= libmailmsg.h
 
 
 OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
