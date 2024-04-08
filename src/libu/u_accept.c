@@ -16,16 +16,13 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -44,14 +41,10 @@
 
 /* external subroutines */
 
-extern int	msleep(int) ;
-
 
 /* exported subroutines */
 
-
-int u_accept(int s,const void *fromp,int *fromlenp)
-{
+int u_accept(int s,const void *fromp,int *fromlenp) noex {
 	SOCKADDR	*sap = (struct sockaddr *) fromp ;
 	SALEN_T		salen ;
 	int		rs ;

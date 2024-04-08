@@ -36,13 +36,10 @@
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<limits.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

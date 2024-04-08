@@ -16,8 +16,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<errno.h>
@@ -39,14 +38,10 @@
 
 /* external subroutines */
 
-extern int	msleep(int) ;
-
 
 /* exported subroutines */
 
-
-int u_bind(int s,void *asap,int asal)
-{
+int u_bind(int s,void *asap,int asal) noex {
 	struct sockaddr	*sap = (struct sockaddr *) asap ;
 	SALEN_T		sal ;
 	int		rs ;

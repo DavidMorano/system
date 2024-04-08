@@ -15,9 +15,7 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/wait.h>
 #include	<sys/times.h>
@@ -26,7 +24,6 @@
 #include	<unistd.h>
 #include	<poll.h>
 #include	<errno.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

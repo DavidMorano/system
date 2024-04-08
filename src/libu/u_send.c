@@ -23,22 +23,15 @@
         has not been a system call for almost two decades (on System V UNIX) but
         that is still OK! :-)
 
-
 *******************************************************************************/
 
-
-#define	LIBU_MASTER	1
-
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/uio.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<poll.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
