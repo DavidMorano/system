@@ -131,6 +131,7 @@ int outema_finish(outema *ldp) noex {
 	if ((rs = outema_magic(ldp)) >= 0) {
 	    rs = SR_BUGCHECK ;
 	    if (ldp->ofp) {
+		rs = SR_OK ;
 	        if (ldp->llen > 0) {
 	            rs = filer_println(ldp->ofp,nullptr,0) ;
 	            ldp->wlen += rs ;
@@ -157,8 +158,9 @@ int outema_ent(outema *ldp,EMA_ENT *ep) noex {
 	        int	c = 0 ;
 	        if ((rs >= 0) && (ep->ap != nullptr) && (ep->al > 0)) {
 	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
-	            if (rs >= 0)
+	            if (rs >= 0) {
 	                rs = buffer_strquote(bufp,ep->ap,ep->al) ;
+		    }
 	        }
 	        if ((rs >= 0) && (ep->rp != nullptr) && (ep->rl > 0)) {
 	            if (c++ > 0) rs = buffer_char(bufp,CH_SP) ;
@@ -226,9 +228,9 @@ int outema_value(outema *ldp,cchar *vp,int vl) noex {
 	int		wlen = 0 ;
 	if ((rs = outema_magic(ldp,vp)) >= 0) {
 	    if (vp && vp[0]) {		/* <- not an error to be empty */
-	        int		nlen ;
-	        int		cl, cl2 ;
-	        bool		f_comma = false ;
+	        int	nlen ;
+	        int	cl, cl2 ;
+	        bool	f_comma = false ;
 	        cchar	*fmt ;
 	        cchar	*tp, *cp ;
 	        if (vl < 0) vl = strlen(vp) ;
