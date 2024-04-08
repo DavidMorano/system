@@ -16,17 +16,16 @@
 
 /*******************************************************************************
 
+	Name:
+	userports
+
 	Descriptiopn:
 	This object reads the USERPORTS DB and provides for queries
 	to it.
 
 	Synopsis:
 
-	int userports_query(op,uid,protoname,port)
-	USERPORTS	*op ;
-	uid_t		uid ;
-	cchar	protoname[] ;
-	int		port ;
+	int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex
 
 	Arguments:
 	op		object pointer
@@ -37,7 +36,6 @@
 	Returns:
 	>=0		query found
 	<0		error, likely protocol not found (system-return)
-
 
 *******************************************************************************/
 
@@ -66,6 +64,8 @@
 
 /* local defines */
 
+#define	UP		userports
+
 #undef	ENTRY
 #define	ENTRY		struct entry_elem
 
@@ -93,6 +93,15 @@
 #endif
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -115,10 +124,68 @@ struct entry_elem {
 
 /* forward references */
 
-static int userports_procfile(USERPORTS *) noex ;
-static int userports_procline(USERPORTS *,PWCACHE *,cchar *,int) noex ;
-static int userports_procent(USERPORTS *,uid_t,cchar *,int) noex ;
-static int userports_procenter(USERPORTS *,uid_t,cchar *,cchar *) noex ;
+template<typename ... Args>
+static int userports_ctor(userports *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->elp = new(nothrow) vecobj) != np) {
+	        if ((op->plp = new(nothrow) vecpstr) != np) {
+	            if ((op->olp = new(nothrow) vecpstr) != np) {
+			rs = SR_OK ;
+		    } /* end if (new-vecpstr) */
+		    if (rs < 0) {
+		        delete op->plp ;
+		        op->plp = nullptr ;
+		    }
+		} /* end if (new-vecpstr) */
+		if (rs < 0) {
+		    delete op->elp ;
+		    op->elp = nullptr ;
+		}
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (userports_ctor) */
+
+static int userports_dtor(userports *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->olp) {
+		delete op->olp ;
+		op->olp = nullptr ;
+	    }
+	    if (op->plp) {
+		delete op->plp ;
+		op->plp = nullptr ;
+	    }
+	    if (op->elp) {
+		delete op->elp ;
+		op->elp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (userports_dtor) */
+
+template<typename ... Args>
+static int userports_magic(userports *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == USERPORTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (userports_magic) */
+
+static int userports_procfile(UP *) noex ;
+static int userports_procline(UP *,pwcache *,cchar *,int) noex ;
+static int userports_procent(UP *,uid_t,cchar *,int) noex ;
+static int userports_procenter(UP *,uid_t,cchar *,cchar *) noex ;
 
 
 /* local variables */
@@ -142,42 +209,40 @@ static constexpr cpcchar	defprotos[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int userports_open(USERPORTS *op,cchar *fname) noex {
-	cint	dents = DEFENTS ;
-	cint	dsize = DEFSIZE ;
-	cint	vo = 0 ; /* sorting is not needed (now) */
+int userports_open(UP *op,cchar *fname) noex {
 	int		rs ;
-	cchar	*cp ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if ((fname == nullptr) || (fname[0] == '\0'))
+	if ((fname == nullptr) || (fname[0] == '\0')) {
 	    fname = USERPORTS_FNAME ;
-
-	memclear(op) ;
-
+	}
+	if ((rs = userports_ctor(op)) >= 0) {
+	cint		dents = DEFENTS ;
+	cint		dsize = DEFSIZE ;
+	cint		vo = 0 ; /* sorting is not needed (now) */
+	cchar		*cp ;
 	if ((rs = uc_mallocstrw(fname,-1,&cp)) >= 0) {
-	    cint	size = sizeof(ENTRY) ;
+	    cint	sz = sizeof(ENTRY) ;
 	    op->fname = cp ;
-	    if ((rs = vecobj_start(&op->ents,size,dents,vo)) >= 0) {
-	        if ((rs = vecpstr_start(&op->protos,dents,dsize,0)) >= 0) {
-	            if ((rs = vecpstr_start(&op->ports,dents,dsize,0)) >= 0) {
+	    if ((rs = vecobj_start(op->elp,sz,dents,vo)) >= 0) {
+	        if ((rs = vecpstr_start(op->plp,dents,dsize,0)) >= 0) {
+	            if ((rs = vecpstr_start(op->olp,dents,dsize,0)) >= 0) {
 	                if ((rs = userports_procfile(op)) >= 0) {
 	                    op->magic = USERPORTS_MAGIC ;
 	                } /* end if (procfile) */
 		        if (rs < 0) {
-		            vecpstr_finish(&op->ports) ;
+		            vecpstr_finish(op->olp) ;
 			}
 	            } /* end if (ports) */
 		    if (rs < 0) {
-		        vecpstr_finish(&op->protos) ;
+		        vecpstr_finish(op->plp) ;
 		    }
 	        } /* end if (protos) */
 		if (rs < 0) {
-		    vecobj_finish(&op->ents) ;
+		    vecobj_finish(op->elp) ;
 		}
 	    } /* end if (ents) */
 	    if (rs < 0) {
@@ -187,42 +252,42 @@ int userports_open(USERPORTS *op,cchar *fname) noex {
 		}
 	    }
 	} /* end if (memory-allocation) */
-
+	    if (rs < 0) {
+		userports_dtor(op) ;
+	    }
+	} /* end if (userports_ctor) */
 	return rs ;
 }
 /* end subroutine (userports_open) */
 
-int userports_close(USERPORTS *op) noex {
-	int		rs = SR_OK ;
+int userports_close(UP *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr)
-	    return SR_FAULT ;
-
-	if (op->magic != USERPORTS_MAGIC)
-	    return SR_NOTOPEN ;
-
-	rs1 = vecpstr_finish(&op->ports) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vecpstr_finish(&op->protos) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vecobj_finish(&op->ents) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fname != nullptr) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = userports_magic(op)) >= 0) {
+	    {
+	        rs1 = vecpstr_finish(op->olp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecpstr_finish(op->plp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecobj_finish(op->elp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (userports_close) */
 
-int userports_query(USERPORTS *op,uid_t uid,cc *protoname,int port) noex {
+int userports_query(UP *op,uid_t uid,cc *protoname,int port) noex {
 	ENTRY		*ep ;
 	int		rs = SR_OK ;
 	int		protoidx = 0 ;
@@ -235,14 +300,14 @@ int userports_query(USERPORTS *op,uid_t uid,cc *protoname,int port) noex {
 	if (port < 0) return SR_INVALID ;
 
 	if ((protoname != nullptr) && (protoname[0] != '\0')) {
-	    rs = vecpstr_already(&op->protos,protoname,-1) ;
+	    rs = vecpstr_already(op->plp,protoname,-1) ;
 	    protoidx = rs ;
 	}
 
 	if (rs >= 0) {
 	    int	i ;
 	    int	f ;
-	    for (i = 0 ; (rs = vecobj_get(&op->ents,i,&ep)) >= 0 ; i += 1) {
+	    for (i = 0 ; (rs = vecobj_get(op->elp,i,&ep)) >= 0 ; i += 1) {
 	        if (ep) {
 		    f = (uid == ep->uid) ;
 		    f = f && (port == ep->port) ;
@@ -258,7 +323,7 @@ int userports_query(USERPORTS *op,uid_t uid,cc *protoname,int port) noex {
 }
 /* end subroutine (userports_query) */
 
-int userports_curbegin(USERPORTS *op,USERPORTS_CUR *curp) noex {
+int userports_curbegin(UP *op,USERPORTS_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -269,7 +334,7 @@ int userports_curbegin(USERPORTS *op,USERPORTS_CUR *curp) noex {
 }
 /* end subroutine (userports_curbegin) */
 
-int userports_curend(USERPORTS *op,USERPORTS_CUR *curp) noex {
+int userports_curend(UP *op,USERPORTS_CUR *curp) noex {
 	int		rs = SR_OK ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -280,7 +345,7 @@ int userports_curend(USERPORTS *op,USERPORTS_CUR *curp) noex {
 }
 /* end subroutine (userports_curend) */
 
-int userports_enum(USERPORTS *op,USERPORTS_CUR *curp,
+int userports_enum(UP *op,USERPORTS_CUR *curp,
 		USERPORTS_ENT *entp) noex {
 	ENTRY		*ep ;
 	int		rs = SR_OK ;
@@ -292,7 +357,7 @@ int userports_enum(USERPORTS *op,USERPORTS_CUR *curp,
 
 	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 
-	while ((rs = vecobj_get(&op->ents,i,&ep)) >= 0) {
+	while ((rs = vecobj_get(op->elp,i,&ep)) >= 0) {
 	    if (ep != nullptr) break ;
 	    i += 1 ;
 	} /* end while */
@@ -301,11 +366,11 @@ int userports_enum(USERPORTS *op,USERPORTS_CUR *curp,
 	    cchar	*cp ;
 	    entp->uid = ep->uid ;
 	    if (rs >= 0) {
-	        rs = vecpstr_get(&op->protos,ep->protoidx,&cp) ;
+	        rs = vecpstr_get(op->plp,ep->protoidx,&cp) ;
 	        entp->protocol = cp ;
 	    }
 	    if (rs >= 0) {
-	        rs = vecpstr_get(&op->ports,ep->portidx,&cp) ;
+	        rs = vecpstr_get(op->olp,ep->portidx,&cp) ;
 	        entp->portname = cp ;
 	    }
 	    curp->i = i ;
@@ -315,8 +380,7 @@ int userports_enum(USERPORTS *op,USERPORTS_CUR *curp,
 }
 /* end subroutine (userports_enum) */
 
-
-int userports_fetch(USERPORTS *op,USERPORTS_CUR *curp,uid_t uid,
+int userports_fetch(UP *op,USERPORTS_CUR *curp,uid_t uid,
 		USERPORTS_ENT *entp) noex {
 	ENTRY		*ep ;
 	int		rs = SR_OK ;
@@ -328,7 +392,7 @@ int userports_fetch(USERPORTS *op,USERPORTS_CUR *curp,uid_t uid,
 
 	i = (curp->i >= 0) ? (curp->i + 1) : 0 ;
 
-	while ((rs = vecobj_get(&op->ents,i,&ep)) >= 0) {
+	while ((rs = vecobj_get(op->elp,i,&ep)) >= 0) {
 	    if (ep != nullptr) {
 		if (ep->uid == uid) break ;
 	    }
@@ -339,11 +403,11 @@ int userports_fetch(USERPORTS *op,USERPORTS_CUR *curp,uid_t uid,
 	    cchar	*cp ;
 	    entp->uid = ep->uid ;
 	    if (rs >= 0) {
-	        rs = vecpstr_get(&op->protos,ep->protoidx,&cp) ;
+	        rs = vecpstr_get(op->plp,ep->protoidx,&cp) ;
 	        entp->protocol = cp ;
 	    }
 	    if (rs >= 0) {
-	        rs = vecpstr_get(&op->ports,ep->portidx,&cp) ;
+	        rs = vecpstr_get(op->olp,ep->portidx,&cp) ;
 	        entp->portname = cp ;
 	    }
 	    curp->i = i ;
@@ -356,15 +420,15 @@ int userports_fetch(USERPORTS *op,USERPORTS_CUR *curp,uid_t uid,
 
 /* private subroutines */
 
-static int userports_procfile(USERPORTS *op) noex {
-	PWCACHE		pwc ;
+static int userports_procfile(UP *op) noex {
+	pwcache		pwc ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
 
 	if ((rs = pwcache_start(&pwc,MAXPWENT,MAXPWTTL)) >= 0) {
 	    USTAT	sb ;
-	    FILEMAP	fm, *fmp = &fm ;
+	    filemap	fm, *fmp = &fm ;
 	    csize	fsize = MAXFSIZE ;
 	    int		ll ;
 	    cchar	*lp ;
@@ -400,7 +464,7 @@ static int userports_procfile(USERPORTS *op) noex {
 }
 /* end subroutine (userports_procfile) */
 
-static int userports_procline(USERPORTS *op,pwentpw *pwcp,cc *lp,int ll) noex {
+static int userports_procline(UP *op,pwentpw *pwcp,cc *lp,int ll) noex {
 	field		fsb ;
 	cint	pwlen = getbufsize(getbufsize_pw) ;
 	int		rs ;
@@ -447,58 +511,52 @@ static int userports_procline(USERPORTS *op,pwentpw *pwcp,cc *lp,int ll) noex {
 }
 /* end subroutine (userports_procline) */
 
-static int userports_procent(USERPORTS *op,uid_t uid,cc *fp,int fl) noex {
+static int userports_procent(UP *op,uid_t uid,cc *fp,int fl) noex {
 	nulstr		portstr ;
 	int		rs ;
+	int		rs1 ;
 	int		cl = 0 ;
 	int		c = 0 ;
-	cchar	*tp, *cp ;
-	cchar	*ps ;
-
-	cp = nullptr ;
+	cchar		*tp ;
+	cchar		*cp = nullptr ;
+	cchar		*ps ;
 	if ((tp = strnchr(fp,fl,':')) != nullptr) {
 	    cp = fp ;
 	    cl = (tp-fp) ;
 	    fl = ((fp+fl)-(tp+1)) ;
 	    fp = (tp+1) ;
 	}
-
 	if ((rs = nulstr_start(&portstr,fp,fl,&ps)) >= 0) {
 	    cchar	*pn ;
-
 	    if ((cp != nullptr) && (cl > 0)) {
 	        nulstr	protostr ;
-
 	        if ((rs = nulstr_start(&protostr,cp,cl,&pn)) >= 0) {
-
-	            rs = userports_procenter(op,uid,pn,ps) ;
-	            if (rs > 0) c += 1 ;
-
-	            nulstr_finish(&protostr) ;
+		    {
+	                rs = userports_procenter(op,uid,pn,ps) ;
+			c += rs ;
+		    }
+	            rs1 = nulstr_finish(&protostr) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (nulstr) */
-
 	    } else {
-	        int	i ;
-
-	        for (i = 0 ; defprotos[i] != nullptr ; i += 1) {
-	            pn = defprotos[i] ;
-
-	            rs = userports_procenter(op,uid,pn,ps) ;
-	            if (rs > 0) c += 1 ;
-
+	        for (int i = 0 ; defprotos[i] != nullptr ; i += 1) {
+		    {
+	                pn = defprotos[i] ;
+	                rs = userports_procenter(op,uid,pn,ps) ;
+	                c += rs ;
+		    }
 	            if (rs < 0) break ;
 	        } /* end for */
-
 	    } /* end if */
-
-	    nulstr_finish(&portstr) ;
+	    rs1 = nulstr_finish(&portstr) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (nulstr) */
 
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (userports_procent) */
 
-static int userports_procenter(USERPORTS *op,uid_t uid,cc *pn,cc *ps) noex {
+static int userports_procenter(UP *op,uid_t uid,cc *pn,cc *ps) noex {
 	ENTRY		e{} ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -511,21 +569,22 @@ static int userports_procenter(USERPORTS *op,uid_t uid,cc *pn,cc *ps) noex {
 	    f = true ;
 
 	    if (rs >= 0) {
-		vecpstr	*plp = &op->protos ;
+		vecpstr	*plp = op->plp ;
 	        rs = vecpstr_adduniq(plp,pn,-1) ;
 		if (rs == INT_MAX) rs = vecpstr_find(plp,pn) ;
 	        e.protoidx = rs ;
 	    }
 
 	    if (rs >= 0) {
-		vecpstr	*plp = &op->ports ;
+		vecpstr	*plp = op->olp ;
 	        rs = vecpstr_adduniq(plp,ps,-1) ;
 		if (rs == INT_MAX) rs = vecpstr_find(plp,ps) ;
 	        e.portidx = rs ;
 	    }
 
-	    if (rs >= 0)
-	        rs = vecobj_add(&op->ents,&e) ;
+	    if (rs >= 0) {
+	        rs = vecobj_add(op->elp,&e) ;
+	    }
 
 	} else if (rs1 != SR_NOTFOUND) {
 	    rs = rs1 ;

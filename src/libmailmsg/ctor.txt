@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int cachetime_ctor(cachetime *op,Args ... args) noex {
+static int userports_ctor(userports *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int cachetime_ctor(cachetime *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cachetime_ctor) */
+/* end subroutine (userports_ctor) */
 
-static int cachetime_dtor(cachetime *op) noex {
+static int userports_dtor(userports *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (cachetime_dtor) */
+/* end subroutine (userports_dtor) */
 
 template<typename ... Args>
-static int cachetime_magic(cachetime *op,Args ... args) noex {
+static int userports_magic(userports *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == CACHETIME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == USERPORTS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (cachetime_magic) */
+/* end subroutine (userports_magic) */
 

@@ -49,9 +49,9 @@ struct userports_file {
 } ;
 
 struct userports_head {
-	vecobj		ents ;
-	vecpstr		protos ;
-	vecpstr		ports ;
+	vecobj		*elp ;		/* entry-list-pointer */
+	vecpstr		*plp ;		/* protocol-list-pointer */
+	vecpstr		*olp ;		/* port-list-pinter */
 	cchar		*fname ;
 	USERPORTS_FL	f ;
 	USERPORTS_FI	fi ;
