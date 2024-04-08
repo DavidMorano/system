@@ -33,6 +33,7 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<ascii.h>
 #include	<estrings.h>
 #include	<buffer.h>
@@ -45,40 +46,8 @@
 
 /* local defines */
 
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 #undef	BUFLEN
 #define	BUFLEN		(2 * 1024)
-
-#ifndef	MAXMSGLINELEN
-#define	MAXMSGLINELEN	76
-#endif
-
-#define	BASE64LINELEN	72
-#define	BASE64BUFLEN	((BASE64LINELEN / 4) * 3)
-
-/* types of "content encodings" */
-#define	CE_7BIT		0
-#define	CE_8BIT		1
-#define	CE_BINARY	2
-#define	CE_BASE64	3
-
-#ifndef	FROM_ESCAPE
-#define	FROM_ESCAPE	'\b'
-#endif
-
-#undef	CHAR_TOKSEP
-#define	CHAR_TOKSEP(c)	(CHAR_ISWHITE(c) || (! isprintlatin(c)))
 
 
 /* external subroutines */
@@ -303,22 +272,27 @@ int outema_write(outema *ldp,cchar *v,int vlen) noex {
 
 int outema_printf(outema *ldp,cchar *fmt,...) noex {
 	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = outema_magic(ldp,fmt)) >= 0) {
 	    va_list	ap ;
-	    cint	flen = BUFLEN ;
-	    char	fbuf[BUFLEN + 1] ;
-	    va_begin(ap,fmt) ;
-	    if ((rs = vbufprintf(buf,BUFLEN,fmt,ap)) >= 0) {
-	    	cint	len = rs ;
-	        if ((rs = filer_write(ldp->ofp,buf,len)) >= 0) {
-	            wlen += rs ;
-	            ldp->wlen += rs ;
-	            ldp->llen += rs ;
-	            ldp->rlen -= rs ;
-		} /* end if (filer_write) */
-	    } /* end if (vbufprintf) */
-	    va_end(ap) ;
+	    char	*fbuf{} ;
+	    if ((rs = malloc_addr(&fbuf)) >= 0) {
+	        va_begin(ap,fmt) ;
+	        cint	flen = rs ;
+	        if ((rs = vbufprintf(fbuf,flen,fmt,ap)) >= 0) {
+	    	    cint	len = rs ;
+	            if ((rs = filer_write(ldp->ofp,fbuf,len)) >= 0) {
+	                wlen += rs ;
+	                ldp->wlen += rs ;
+	                ldp->llen += rs ;
+	                ldp->rlen -= rs ;
+		    } /* end if (filer_write) */
+	        } /* end if (vbufprintf) */
+	        va_end(ap) ;
+		rs1 = uc_free(fbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
