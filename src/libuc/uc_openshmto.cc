@@ -1,20 +1,18 @@
-/* uc_openshmto */
+/* uc_openshmto SUPPORT */
+/* lang=C++20 */
 
-/* interface component for UNIX®Â® library-3c */
+/* interface component for UNIX® library-3c */
 /* open POSIX share-memory (w/ time-out) */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* revision history:
 
-	= 1998-07-10, David AÂ­DÂ­ Morano
+	= 1998-07-10, David A­D­ Morano
 	This subroutine was originally written.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -22,7 +20,7 @@
 	uc_openshmto
 
 	Description:
-	This subroutine opens a POSIXÂ® shared-memory ('sem(3rt)')
+	This subroutine opens a POSIXÂ® shared-memory (|sem(3rt)|)
 	object but with a time-out. What does this mean to have a
 	time-out while trying to open a shared memory segment? It
 	means that if the segment is access protected, we continue
@@ -44,7 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<usystem.h>
@@ -54,9 +51,13 @@
 /* local defines */
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	msleep(int) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* local structures */

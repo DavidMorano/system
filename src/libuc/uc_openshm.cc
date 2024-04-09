@@ -22,11 +22,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
+#include	<cstring>
 #include	<usystem.h>
+#include	<snx.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -35,8 +35,6 @@
 
 
 /* external subroutines */
-
-extern int	snopenflags(char *,int,int) noex ;
 
 
 /* local structures */
@@ -71,7 +69,9 @@ int uc_openshm(cchar *shmname,int of,mode_t om) noex {
 	    if (rs >= 0) {
 	        repeat {
 	            errno = 0 ;
-	            if ((rs = shm_open(shmname,of,om)) < 0) rs = (- errno) ;
+	            if ((rs = shm_open(shmname,of,om)) < 0) {
+			rs = (- errno) ;
+		    }
 		    fd = rs ;
 	        } until (rs != SR_INTR) ;
 	        if (nbuf != nullptr) uc_libfree(nbuf) ;
