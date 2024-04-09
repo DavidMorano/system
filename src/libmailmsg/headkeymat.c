@@ -1,13 +1,15 @@
-/* headkeymat */
+/* headkeymat SUPPORT */
+/* lang=C++20 */
 
 /* match on header keys */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-        Module was originally written. This was written as part of the PCS
-        mailer code cleanup!
+	Module was originally written.  This was written as part of
+	the PCS mailer code cleanup!
 
 */
 
@@ -15,39 +17,34 @@
 
 /*******************************************************************************
 
-        Given a header key name 'key' such as "Subject", find if it is present
-        in the user supplied string given as 'buf'. Return 0 if there is no
-        match, else we return the character position of the start of the header
-        value string. The match is case independent.
+	Given a header key name 'key' such as "Subject", find if
+	it is present in the user supplied string given as 'buf'.
+	Return 0 if there is no match, else we return the character
+	position of the start of the header value string.  The match
+	is case independent.
 
 	Synopsis:
-
-	int headkeymat(key,buf,buflen)
-	const char	key[] ;
-	const char	buf[] ;
-	int		buflen ;
+	int headkeymat(cc *key,cc *sp,int sl) noex
 
 	Arguments:
-
 	key		key name to test for
-	buf		buffer holding string to test for a key in
-	buflen		number of characters in the buffer
+	sp		c-string to match pointer
+	sl		c-string to match length
 
 	Returns:
-
 	>0		the key was found and the position of the value (not 
 			the key) in the user supplied string under test is 
 			returned
-
 	==0		the key was not found
 	<0		not possible (hopefully)
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -58,14 +55,18 @@
 /* external subroutines */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int headkeymat(cchar *key,cchar *buf,int buflen)
-{
+int headkeymat(cchar *key,cchar *buf,int buflen) noex {
 	int		bl = buflen ;
-	const char	*bp = buf ;
-	const char	*kp = key ;
+	cchar	*bp = buf ;
+	cchar	*kp = key ;
 
 	if (buflen < 0) {
 
