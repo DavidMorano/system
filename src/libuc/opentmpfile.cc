@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -50,6 +49,7 @@
 #include	<ctime>
 #include	<usystem.h>
 #include	<ucgetpid.h>
+#include	<mallocxx.h>
 #include	<sigblocker.h>
 #include	<sockaddress.h>
 #include	<mkpathx.h>
@@ -81,6 +81,8 @@
 
 
 /* local typedefs */
+
+typedef SOCKADDR *	sockaddrp ;
 
 
 /* external subroutines */
@@ -139,21 +141,27 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	of |= O_RDWR ;
 
 	om |= 0600 ;
-	if (dname == nullptr) dname = getenv(VARTMPDNAME) ;
-	if ((dname == nullptr) || (dname[0] == '\0')) dname = TMPDNAME ;
+	if (dname == nullptr) {
+	    dname = getenv(VARTMPDNAME) ;
+	}
+	if ((dname == nullptr) || (dname[0] == '\0')) {
+	    dname = TMPDNAME ;
+	}
 
 	if ((rs = mkpath2(inname,dname,platename)) >= 0) {
-	    cint	olen = MAXPATHLEN ;
-	    char	*obuf ;
-	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
-	        sigblocker	blocker ;
-	        if ((rs = sigblocker_start(&blocker,nullptr)) >= 0) {
-		    cint		otm = OTM_STREAM ;
+	    char	*obuf{} ;
+	    if ((rs = malloc_mp(&obuf)) >= 0) {
+	        sigblocker	b ;
+	        if ((rs = b.start) >= 0) {
+		    cint	otm = OTM_STREAM ;
 	            if ((rs = opentmpx(inname,of,om,otm,obuf)) >= 0) {
 		        fd = rs ;
-	                if (obuf[0] != '\0') uc_unlink(obuf) ;
+	                if (obuf[0] != '\0') {
+			    uc_unlink(obuf) ;
+			    obuf[0] = '\0' ;
+			}
 	            }
-	            rs1 = sigblocker_finish(&blocker) ;
+	            rs1 = b.finish ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 		rs1 = uc_free(obuf) ;
@@ -169,12 +177,11 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 /* local subroutines */
 
 static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
-	cint		plen = MAXPATHLEN ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	char		*pbuf ;
-	if ((rs = uc_malloc((plen+1),&pbuf)) >= 0) {
+	char		*pbuf{} ;
+	if ((rs = malloc_mp(&pbuf)) >= 0) {
 	    if ((rs = mkexpandpath(pbuf,inname,-1)) > 0) {
 		rs = opentmpxer(pbuf,of,om,opt,obuf) ;
 		fd = rs ;
@@ -196,8 +203,8 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		stype = 0 ;
 	int		loop = 0 ;
 	int		fd = -1 ;
-	int		f_exit = FALSE ;
-	int		f_abuf = FALSE ;
+	int		f_exit = false ;
+	int		f_abuf = false ;
 	int		f ;
 
 	if (inname == nullptr) return SR_FAULT ;
@@ -220,7 +227,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	    cint		olen = MAXPATHLEN ;
 	    if ((rs = uc_malloc((olen+1),&obuf)) >= 0) {
 		obuf[0] = '\0' ;
-		f_abuf = TRUE ;
+		f_abuf = true ;
 	    }
 	}
 
@@ -230,7 +237,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 
 	while ((rs >= 0) && (loop < MAXLOOP) && (! f_exit)) {
 
-	    f_exit = TRUE ;
+	    f_exit = true ;
 
 /* put the file name together */
 
@@ -242,14 +249,14 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 
 	    if (S_ISDIR(om)) {
 
-	        rs = u_mkdir(obuf,operm) ;
+	        rs = uc_mkdir(obuf,operm) ;
 		if (rs < 0) {
 	            if ((rs == SR_EXIST) || (rs == SR_INTR))
-	                f_exit = FALSE ;
+	                f_exit = false ;
 	        } 
 
 	        if (rs >= 0) {
-	            rs = u_open(obuf,O_RDONLY,operm) ;
+	            rs = uc_open(obuf,O_RDONLY,operm) ;
 		    fd = rs ;
 	        }
 
@@ -257,34 +264,35 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	        int	ooflags = (of | O_CREAT | O_EXCL) ;
 
 		f = ((ooflags & O_WRONLY) || (ooflags & O_RDWR)) ;
-		if (! f)
+		if (! f) {
 		    ooflags |= O_WRONLY ;
+		}
 
-	        rs = u_open(obuf,ooflags,operm) ;
+	        rs = uc_open(obuf,ooflags,operm) ;
 	        fd = rs ;
 		if (rs < 0) {
-	            if ((rs == SR_EXIST) || (rs == SR_INTR)) f_exit = FALSE ;
+	            if ((rs == SR_EXIST) || (rs == SR_INTR)) f_exit = false ;
 	        }
 
 	    } else if (S_ISFIFO(om)) {
 
-	        if ((rs = u_mknod(obuf,operm,0)) >= 0) {
-	            rs = u_open(obuf,of,operm) ;
+	        if ((rs = uc_mknod(obuf,operm,0)) >= 0) {
+	            rs = uc_open(obuf,of,operm) ;
 	            fd = rs ;
 		} else {
 	            if ((rs == SR_EXIST) || (rs == SR_INTR)) {
-			f_exit = FALSE ;
+			f_exit = false ;
 		    }
 	        }
 
 	    } else if (S_ISSOCK(om)) {
 	        cint		pf = PF_UNIX ;
-	        if ((rs = u_socket(pf,stype,0)) >= 0) {
-	            SOCKADDRESS	sa ;
+	        if ((rs = uc_socket(pf,stype,0)) >= 0) {
+	            sockaddress	sa ;
 		    cint	af = AF_UNIX ;
 	            fd = rs ;
 	            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
-		        SOCKADDR	*sap = (SOCKADDR *) &sa ;
+		        SOCKADDR	*sap = sockaddrp(&sa) ;
 		        cint		sal = rs ;
 	                if ((rs = u_bind(fd,sap,sal)) >= 0) {
 			    rs = u_chmod(obuf,operm) ;
@@ -301,11 +309,11 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 		    }
 	        } /* end if (socket) */
 		if (rs < 0) {
-	            f_exit = FALSE ;
+	            f_exit = false ;
 		}
 	    } else {
 		rs = SR_INVALID ;
-	        f_exit = TRUE ;
+	        f_exit = true ;
 	    } /* end if */
 
 	    loop += 1 ;
@@ -333,27 +341,27 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 static int randload(ulong *rvp) noex {
 	int		rs = SR_FAULT ;
 	if (rvp) {
-	    const pid_t	pid = uc_getpid() ;
-	    const pid_t	sid = getsid(0) ;
-	    const uid_t	uid = getuid() ;
-	    ulong	rv = 0 ;
-	    ulong	v ;
-	    rs = SR_OK ;
-	    v = sid ;
-	    rv += (v << 48) ;
-	    v = pid ;
-	    rv += (v << 32) ;
-	    v = uid ;
-	    rv += (v << 16) ;
-	    {
-	        TIMEVAL	tod ;
-	        uc_gettimeofday(&tod,nullptr) ; /* cannot fail?! */
+	    cnullptr	np{} ;
+	    cuint	sid = getsid(0) ;
+	    cuint	uid = getuid() ;
+	    if ((rs = uc_getpid()) >= 0) {
+	        TIMEVAL		tod ;
+		cuint		pid = rs ;
+	        ulong		rv = 0 ;
+	        ulong		v = sid ;
+	        rv += (v << 48) ;
+	        v = pid ;
+	        rv += (v << 32) ;
+	        v = uid ;
+	        rv += (v << 16) ;
+	        if ((rs = uc_gettimeofday(&tod,np)) >= 0) {
 	            v = tod.tv_sec ;
 	            rv += (v << 32) ;
 	            rv += (v << 12) ;
 	            rv += tod.tv_usec ;
-	    } /* end block */
-	    *rvp = rv ;
+	        } /* end block */
+	        *rvp = rv ;
+	    } /* end if (uc_getpid) */
 	} /* end if (non-null) */
 	return rs ;
 }
@@ -365,17 +373,19 @@ static int mktmpname(char *obuf,ulong rv,cchar *inname) noex {
 	int		rs ;
 	char		randbuf[RANDBUFLEN+1] ;
 	if ((rs = cthex(randbuf,randlen,rv)) >= 0) {
-	    if ((rs = mkpath1(obuf,inname)) >= 0) {
+	    if ((rs = mkpath(obuf,inname)) >= 0) {
 	        int	j = rs ;
 	        int	i = randlen ;
 	        while (j > 0) {
 		    j -= 1 ;
 	            if (i > 0) {
-		        if (obuf[j] == 'X') obuf[j] = randbuf[--i] ;
+		        if (obuf[j] == 'X') {
+			    obuf[j] = randbuf[--i] ;
+			}
 	            }
 	        } /* end while */
 	    } /* end if (mkpath) */
-	} /* end if (cthexul) */
+	} /* end if (cthex) */
 	return rs ;
 }
 /* end subroutine (mktmpname) */
