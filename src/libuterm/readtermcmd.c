@@ -36,27 +36,23 @@
 	ich		initial (first) character if any (zero if none)
 
 	Returns:
-
-	<0		error
 	>=0		OK
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
-#include	<limits.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<cfdec.h>
 #include	<uterm.h>
 #include	<termcmd.h>
 #include	<sbuf.h>
+#include	<ndigit.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
 
 
@@ -77,16 +73,11 @@
 
 /* external subroutines */
 
-extern int	ndigits(int,int) ;
-extern int	isdigitlatin(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprint(cchar *,int) ;
 extern int	debugprintf(cchar *,...) ;
 extern int	strlinelen(cchar *,int,int) ;
 #endif
-
-extern char	*strnchr(cchar *,int,int) ;
 
 
 /* local structures */
@@ -208,7 +199,7 @@ static int sub_start(SUB *sip,TERMCMD *ckp,UTERM *utp,int to,int ich)
 {
 	int		rs = SR_OK ;
 	memset(sip,0,sizeof(SUB)) ;
-	sip->maxdig = ndigits(TERMCMD_MAXPVAL,10) ;
+	sip->maxdig = ndigit(TERMCMD_MAXPVAL,10) ;
 	sip->ckp = ckp ;
 	sip->utp = utp ;
 	sip->to = to ;

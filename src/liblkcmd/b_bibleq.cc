@@ -99,7 +99,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	ndigits(int,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecstr_adduniqs(vecstr *,cchar *,int) ;

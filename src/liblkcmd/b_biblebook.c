@@ -56,9 +56,10 @@
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<field.h>
-#include	<char.h>
-#include	<toxc.h>
 #include	<strn.h>
+#include	<ndigit.h>
+#include	<toxc.h>
+#include	<char.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -104,7 +105,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
-extern int	ndigits(int,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
 extern int	isNotPresent(int) ;
@@ -1338,8 +1338,9 @@ static int loadprecision(PROGINFO *pip)
 	    }
 	}
 
-	if (rs1 >= 0)
-	    prec = ndigits(rs1,10) ;
+	if (rs1 >= 0) {
+	    prec = ndigit(rs1,10) ;
+	}
 
 	lip->precision = prec ;
 

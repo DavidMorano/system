@@ -64,7 +64,7 @@ static int	bcontrol_lock(bfile *,FLOCK *,int,int,int) noex ;
 
 int bcontrol(bfile *op,int cmd,...) noex {
 	int		rs = SR_OK ;
-	if ((rs = bmagic(op)) > 0) {
+	if ((rs = bfile_magic(op)) > 0) {
 	    if ((rs = bfile_flush(op)) >= 0) {
 	        va_list	ap ;
 	        FLOCK	fl, *fsp ;

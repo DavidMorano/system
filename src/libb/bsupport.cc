@@ -24,12 +24,19 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
+#include	<intfloor.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
 
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -40,29 +47,40 @@
 
 /* exported subroutines */
 
-int bfile_flushn(bfile *fp,int n) noex {
+int bfile_access(bfile *op,bool fm) noex {	
+	cint		am = op->am ;
+	int		rs = SR_OK ;
+	
+	cbool		
+
+
+	return rs ;
+}
+/* end subroutine (bfile_access) */
+
+int bfile_flushn(bfile *op,int n) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (n != 0) {
-	    int	f_sa = (! fp->f.notseek) && (fp->oflags & O_APPEND) ;
+	    bool	f_sa = (! op->f.notseek) && (op->oflags & O_APPEND) ;
 	    if (f_sa) {
 	        off_t	o{} ;
-	        rs = u_seeko(fp->fd,0LL,SEEK_END,&o) ;
-	        fp->offset = o ;
+	        rs = u_seeko(op->fd,0LL,SEEK_END,&o) ;
+	        op->offset = o ;
 	    } /* end if (sa) */
-	    if ((rs >= 0) && (fp->len > 0)) {
-	        int	mlen = (fp->bp - fp->bbp) ;
+	    if ((rs >= 0) && (op->len > 0)) {
+	        int	mlen = (op->bp - op->bbp) ;
 	        if ((n > 0) && (n < mlen)) mlen = n ;
-	        if ((rs = uc_writen(fp->fd,fp->bbp,mlen)) >= 0) {
-	           len = rs ;
-	            fp->bbp += len ;
-	            fp->len -= len ;
-	            if (fp->len == 0) {
-		        fp->bbp = fp->bdata ;
-		        fp->bp = fp->bdata ;
+	        if ((rs = uc_writen(op->fd,op->bbp,mlen)) >= 0) {
+	            len = rs ;
+	            op->bbp += len ;
+	            op->len -= len ;
+	            if (op->len == 0) {
+		        op->bbp = op->bdata ;
+		        op->bp = op->bdata ;
 	            }
 	            if (f_sa) {
-	                fp->offset += len ;
+	                op->offset += len ;
 		    }
 	        }
 	    } /* end if (flush needed) */
@@ -71,23 +89,26 @@ int bfile_flushn(bfile *fp,int n) noex {
 }
 /* end subroutine (bfile_flushn) */
 
-int bfile_flush(bfile *fp) noex {
-	return bfile_flushn(fp,-1) ;
+int bfile_flush(bfile *op) noex {
+	return bfile_flushn(op,-1) ;
 }
 /* end subroutine (bfile_flush) */
 
-int bfile_pagein(bfile *fp,off_t off,int i) noex {
+int bfile_pagein(bfile *op,off_t off,int i) noex {
 	int		rs = SR_FAULT ;
-	if (fp) {
-	    size_t	ms = fp->pagesize ;
+	if (op) {
+	    cnullptr	np{} ;
+	    csize	ms = size_t(op->pagesize) ;
+	    coff	of = floor(off,op->pagesize) ;
 	    cint	mp = PROT_READ ;
 	    cint	mf = MAP_SHARED ;
+	    cint	fd = op->fd ;
 	    void	*vp ;
-	    off &= (fp->pagesize - 1) ;
-	    if ((rs = u_mmap(NULL,ms,mp,mf,fp->fd,off,&vp)) >= 0) {
-	        fp->maps[i].buf = (char *) vp ;
-	        fp->maps[i].f.valid = true ;
-	        fp->maps[i].offset = off ;
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,of,&vp)) >= 0) {
+	        op->maps[i].bdata = charp(vp) ;
+	        op->maps[i].bsize = ms ;
+	        op->maps[i].offset = of ;
+	        op->maps[i].f.valid = true ;
 	    }
 	} /* end if (non-null) */
 	return rs ;

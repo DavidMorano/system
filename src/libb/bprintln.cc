@@ -59,7 +59,7 @@
 int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = bmagic(fp,lbuf)) > 0) {
+	if ((rs = bfile_magic(fp,lbuf)) > 0) {
 	        bool	feol = false ;
 	        if (llen < 0) llen = strlen(lbuf) ;
 	        feol = feol || (llen == 0) ;

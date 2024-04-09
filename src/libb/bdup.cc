@@ -58,7 +58,7 @@
 
 int bdup(bfile *fp,bfile *fnewp) noex {
 	int		rs ;
-	if ((rs = bmagic(fp,fnewp)) > 0) {
+	if ((rs = bfile_magic(fp,fnewp)) > 0) {
 	    memcpy(fnewp,fp,sizeof(bfile)) ;	/* <- copy */
 	        if ((rs = bfile_flush(fp)) >= 0) {
 	            if ((rs = u_dup(fp->fd)) >= 0) {

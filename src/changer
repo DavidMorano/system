@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} fdliner_read "
+NAMES="${NAMES} bmagic"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/fdliner_read/s//fdliner_getln/g
+g/bmagic/s//bfile_magic/g
 	w
 	q
 EOF

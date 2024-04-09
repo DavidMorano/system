@@ -1,4 +1,4 @@
-/* debugsetfd SUPPORT */
+/* debsetfd SUPPORT */
 /* lang=C++20 */
 
 /* set debug file-descriptor */
@@ -19,10 +19,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cerrno>
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<usysrets.h>
 
 
 /* local defines */
@@ -30,12 +30,12 @@
 
 /* exported variables */
 
-int	err_fd = -1 ;
+int	debug_fd = -1 ;
 
 
 /* exported subroutines */
 
-int debugsetfd(int fd) noex {
+int debsetfd(int fd) noex {
 	USTAT		sb ;
 	int		rs = SR_BADF ;
 	if (fd < 256) {
@@ -48,6 +48,6 @@ int debugsetfd(int fd) noex {
 	}
 	return rs ;
 }
-/* end subroutine (debugsetfd) */
+/* end subroutine (debsetfd) */
 
 

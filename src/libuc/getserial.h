@@ -1,7 +1,7 @@
 /* getserial HEADER */
 /* lang=C20 */
 
-/* subroutines to access the 'passwd' and 'group' databases */
+/* get a (system-wide) serial number from a file */
 /* version %I% last-modified %G% */
 
 

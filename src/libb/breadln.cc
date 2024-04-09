@@ -78,7 +78,7 @@ int breadlnto(bfile *fp,char *ubuf,int ulen,int to) noex {
 		    rs = SR_OK ;
 	            if (! fp->f.nullfile) {
 	                if (fp->f.write) {
-	                    fp->f.write = FALSE ;
+	                    fp->f.write = false ;
 	                    if (fp->len > 0) rs = bfile_flush(fp) ;
 	                } /* end if (switching) */
 	                if (rs >= 0) {
@@ -107,7 +107,7 @@ static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 	int		i ;
 	int		pagemask = (fp->pagesize - 1) ;
 	int		tlen = 0 ;
-	int		f_partial = FALSE ;
+	int		f_partial = false ;
 	char		*dbp = ubuf ;
 
 	runoff = fp->offset ;
@@ -118,18 +118,18 @@ static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 	    mlen = (fp->fsize - runoff) ;
 
 	    if ((mlen > 0) &&
-	        ((fp->bp == NULL) || (fp->len == fp->pagesize))) {
+	        ((fp->bp == nullptr) || (fp->len == fp->pagesize))) {
 
 	        i = (runoff / fp->pagesize) & (BFILE_NMAPS - 1) ;
 	        baseoff = runoff & (~ pagemask) ;
-	        if ((! fp->maps[i].f.valid) || (fp->maps[i].buf == NULL)
+	        if ((! fp->maps[i].f.valid) || (fp->maps[i].bdata == nullptr)
 	            || (fp->maps[i].offset != baseoff)) {
 
 	            bfile_pagein(fp,runoff,i) ;
 	        }
 
 	        fp->len = runoff & pagemask ;
-	        fp->bp = fp->maps[i].buf + fp->len ;
+	        fp->bp = fp->maps[i].bdata + fp->len ;
 
 	    } /* end if (initializing memory mapping) */
 
@@ -148,7 +148,7 @@ static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 	        char	*lastp ;
 
 #if	CF_MEMCCPY
-	        if ((lastp = memccpy(dbp,fp->bp,'\n',mlen)) == NULL) {
+	        if ((lastp = memccpy(dbp,fp->bp,'\n',mlen)) == nullptr) {
 	            lastp = dbp + mlen ;
 	        }
 	        i = lastp - dbp ;
@@ -176,10 +176,10 @@ static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 	    if ((rs >= 0) && (runoff >= fp->fsize)) {
 	        if (f_partial) break ;
 
-	        rs = bfilefstat(fp->fd,&sb) ;
+	        rs = u_fstat(fp->fd,&sb) ;
 
 	        fp->fsize = sb.st_size ;
-	        f_partial = TRUE ;
+	        f_partial = true ;
 	    } /* end if (file size limited) */
 
 	} /* end while (reading) */
@@ -198,7 +198,7 @@ static int breadlnreg(bfile *fp,char *ubuf,int ulen,int to) noex {
 	int		mlen ;
 	int		i ;
 	int		tlen = 0 ;
-	int		f_partial = FALSE ;
+	int		f_partial = false ;
 	char		*dbp = ubuf ;
 
 	while ((rs >= 0) && (ulen > 0)) {
@@ -207,7 +207,7 @@ static int breadlnreg(bfile *fp,char *ubuf,int ulen,int to) noex {
 	        if (f_partial && fp->f.inpartline) break ;
 	        rs = breload(fp,to,opts) ;
 	        if (rs <= 0) break ;
-	        if (fp->len < fp->bsize) f_partial = TRUE ;
+	        if (fp->len < fp->bsize) f_partial = true ;
 	    } /* end if (refilling up buffer) */
 
 	    mlen = (fp->len < ulen) ? fp->len : ulen ;
@@ -217,7 +217,7 @@ static int breadlnreg(bfile *fp,char *ubuf,int ulen,int to) noex {
 	        char	*lastp ;
 
 #if	CF_MEMCCPY
-	        if ((lastp = memccpy(dbp,fp->bp,'\n',mlen)) == NULL) {
+	        if ((lastp = memccpy(dbp,fp->bp,'\n',mlen)) == nullptr) {
 	            lastp = dbp + mlen ;
 	        }
 	        i = lastp - dbp ;
@@ -277,7 +277,7 @@ static int breload(bfile *fp,int to,int opts) noex {
 }
 /* end subroutine (breload) */
 
-static int isoureol(int ch) noex {
+static inline int isoureol(int ch) noex {
 	return (ch == '\n') ;
 }
 /* end subroutine (isoureol) */

@@ -1,9 +1,8 @@
-/* pcsuserfile */
+/* pcsuserfile SUPPORT */
+/* lang=C++20 */
 
 /* update a record in a PCS userfile */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,33 +16,30 @@
 
 /*******************************************************************************
 
-	This subroutine maintains PCS "users" files.  These files are used to
-	maintain the names and counts of the users that invoke certain PCS
-	progams.  This is generally for development debugging purposes for the
-	programs that log the user invocations.
+	Name:
+	pcsuserfile
+
+	Description:
+	This subroutine maintains PCS "users" files.  These files
+	are used to maintain the names and counts of the users that
+	invoke certain PCS progams.  This is generally for development
+	debugging purposes for the programs that log the user
+	invocations.
 
 	Synopsis:
-
-	int pcsuserfile(pcs,userfname,nodename,username,name)
-	const char	pcs[] ;
-	const char	userfname[] ;
-	const char	nodename[] ;
-	const char	username[] ;
-	const char	name[] ;
+	int pcsuserfile(cc *pcs,cc *urfn,cc *nn,cc *un,cc *name) noex
 
 	Arguments:
-
 	pcs		PCS programroot
-	userfname	name of file relative to programroot
-	nodename	machine node name
-	username	user's login username
+	ufn		name of file relative to programroot
+	nn		machine node name
+	un		users login username
 	name		real or fullname of the user
 
 	Returns:
-
 	==1		record created
 	==0		record written
-	<0		error
+	<0		error code (system-return)
 
 
 	Format of file records:
@@ -61,28 +57,23 @@
       14 110103_0922:32_EST      rca!genserv (GENSERV)
 
 
-	Note that a special user field with the value of "TOTAL" maintains a
-	total count of all program invocations separately from the user
-	counts.
-
-	Oh, and finally, since file record locking sucks (that is: it is very
-	often BROKEN) on the stupid Sun platforms, we attempt to lock the file
-	to be a nice guy but we have relatively small timeouts after which we
-	proceed anyway !  This strategy is applied to all record locks used
-	throughout this subroutine.
+	Note that a special user field with the value of "TOTAL"
+	maintains a total count of all program invocations separately
+	from the user counts.  Oh, and finally, since file record
+	locking sucks (that is: it is very often BROKEN) on the
+	stupid Sun platforms, we attempt to lock the file to be a
+	nice guy but we have relatively small timeouts after which
+	we proceed anyway !  This strategy is applied to all record
+	locks used throughout this subroutine.
 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<useraccdb.h>
@@ -110,23 +101,22 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	ndigits(int,int) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	cfdeci(cchar *,int,int *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
+extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
 extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnrchr(cchar *,int,int) ;
 
 
 /* external variables */
@@ -142,17 +132,17 @@ extern char	*strnrchr(const char *,int,int) ;
 
 
 int pcsuserfile(prpcs,userfname,nodename,username,name)
-const char	prpcs[] ;
-const char	userfname[] ;
-const char	nodename[] ;
-const char	username[] ;
-const char	name[] ;
+cchar	prpcs[] ;
+cchar	userfname[] ;
+cchar	nodename[] ;
+cchar	username[] ;
+cchar	name[] ;
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		bnl ;
 	int		f_created = FALSE ;
-	const char	*bnp ;
+	cchar	*bnp ;
 
 	if (prpcs == NULL) return SR_FAULT ;
 	if (userfname == NULL) return SR_FAULT ;
@@ -175,12 +165,12 @@ const char	name[] ;
 
 	if ((bnl = sfbasename(userfname,-1,&bnp)) > 0) {
 	    const int	ulen = USERBUFLEN ;
-	    const char	*tp = strnrchr(bnp,bnl,'.') ;
+	    cchar	*tp = strnrchr(bnp,bnl,'.') ;
 	    char	ubuf[USERBUFLEN + 1] ;
 	    if (tp != NULL) bnl = (tp-bnp) ;
 	    if ((rs = sncpy3(ubuf,ulen,nodename,"!",username)) >= 0) {
 		NULSTR		dbs ;
-		const char	*dbname ;
+		cchar	*dbname ;
 	        if ((rs = nulstr_start(&dbs,bnp,bnl,&dbname)) >= 0) {
 	            USERACCDB	udb ;
 	            if ((rs = useraccdb_open(&udb,prpcs,dbname)) >= 0) {

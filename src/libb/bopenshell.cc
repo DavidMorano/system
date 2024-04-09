@@ -35,7 +35,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -74,18 +73,18 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mknpath2(char *,int,cchar *,cchar *) ;
 extern int	bio_mktmpfile(char *,mode_t,char *) ;
-extern int	findfilepath(const char *,char *,const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
+extern int	findfilepath(cchar *,char *,cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
 
-extern char	*strdcpy2(char *,int,const char *,const char *) ;
+extern char	*strdcpy2(char *,int,cchar *,cchar *) ;
 
 
 /* external variables */
@@ -96,11 +95,12 @@ extern char	*environ[] ;
 /* forward references */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bopenshell(bfile **fpa,cchar *cmd)
-{
+int bopenshell(bfile **fpa,cchar *cmd) noex {
 	pid_t		child_pid = 0 ;
 	int		rs = SR_OK ;
 	int		i, j, k ;
@@ -110,8 +110,8 @@ int bopenshell(bfile **fpa,cchar *cmd)
 	int		pipes[3][2] ;
 	char		cmdbuf[CMDBUFLEN + 1] ;
 	char		tmpfname[MAXPATHLEN + 1] ;
-	const char	*tmpdname = NULL ;
-	const char	*sp, *cp ;
+	cchar	*tmpdname = NULL ;
+	cchar	*sp, *cp ;
 
 #if	CF_DEBUGS
 	debugprintf("bopenshell: ent\n") ;
@@ -125,7 +125,7 @@ int bopenshell(bfile **fpa,cchar *cmd)
 
 #if	CF_DEBUGS
 	{
-	struct ustat	sb ;
+	USTAT	sb ;
 	if (fstat(2,&sb) >= 0)
 	    debugprintf("bopenshell: FD=2 is there!\n") ;
 	}

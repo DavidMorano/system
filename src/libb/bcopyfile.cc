@@ -61,7 +61,7 @@
 int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
 	int		rs ;
 	int		tlen = 0 ;
-	if ((rs = bmagic(ifp,ofp,ubuf)) > 0) {
+	if ((rs = bfile_magic(ifp,ofp,ubuf)) > 0) {
 	    rs = SR_INVALID ;
 	    if (ulen > 0) {
 		auto	bw = bwrite ;

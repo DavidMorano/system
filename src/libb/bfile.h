@@ -117,7 +117,8 @@ struct bfile_mapflags {
 } ;
 
 struct bfile_mapper {
-	char		*buf ;
+	char		*bdata ;	/* buffer data */
+	size_t		bsize ;		/* buffer size */
 	size_t		offset ;	/* file offset for page */
 	BFILE_MAPFLAGS	f ;
 } ;
@@ -154,6 +155,7 @@ struct bfile_head {
 	char		*bdata ;	/* allocated buffer space */
 	char		*bbp ;		/* base buffer pointer */
 	char		*bp ;		/* current pointer into buffer */
+	void		*escp ;		/* escape-pointer */
 	ino_t		ino ;
 	dev_t		dev ;
 	size_t		offset ; 	/* user view */
@@ -166,7 +168,8 @@ struct bfile_head {
 	int		oflags ;	/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
-	mode_t		mode ;
+	mode_t		om ;		/* open-mode */
+	mode_t		gm ;		/* file-mode */
 } ;
 
 typedef BFILE		bfile ;
@@ -176,7 +179,7 @@ EXTERNC_begin
 
 extern int	bopen(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopene(bfile *,cchar *,cchar *,mode_t,int) noex ;
-extern int	bopenprog(bfile *,cchar *,cchar *,cchar **,cchar **) noex ;
+extern int	bopenprog(bfile *,cchar *,cchar *,mainv,mainv) noex ;
 extern int	bopentmp(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopenmod(bfile *,cchar *,cchar *,mode_t) noex ;
 extern int	bopenlock(bfile *,cchar *,int,int) noex ;
@@ -199,7 +202,6 @@ extern int	bprintf(bfile *,cchar *,...) noex ;
 extern int	bvprintf(bfile *,cchar *,va_list) noex ;
 extern int	bprintln(bfile *,cchar *,int) noex ;
 extern int	bprint(bfile *,cchar *,int) noex ;
-extern int	bprintline(bfile *,cchar *,int) noex ;
 extern int	bcopyblock(bfile *,bfile *,int) noex ;
 extern int	bcopyfile(bfile *,bfile *,char *,int) noex ;
 extern int	btruncate(bfile *,off_t) noex ;
@@ -210,12 +212,10 @@ extern int	bflush(bfile *) noex ;
 extern int	bflushn(bfile *,int) noex ;
 extern int	bclose(bfile *) noex ;
 
+extern int	bfile_access(bfile *,bool) noex ;
 extern int	bfile_flush(bfile *) noex ;
 extern int	bfile_flushn(bfile *,int) noex ;
 extern int	bfile_pagein(bfile *,off_t,int) noex ;
-
-extern int	bfilestat(cchar *,int,USTAT *) noex ;
-extern int	bfilefstat(int,USTAT *) noex ;
 
 static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
@@ -226,7 +226,7 @@ EXTERNC_end
 #ifdef	__cplusplus
 
 template<typename ... Args>
-static inline int bmagic(bfile *op,Args ... args) noex {
+static inline int bfile_magic(bfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    rs = SR_NOTOPEN ;
@@ -236,7 +236,7 @@ static inline int bmagic(bfile *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (bmagic) */
+/* end subroutine (bfile_magic) */
 
 #endif /* __cplusplus */
 

@@ -120,7 +120,6 @@ extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	ndigits(int,int) ;
 extern int	strwcmp(const char *,const char *,int) ;
 extern int	initnow(struct timeb *,const char *,int) ;
 
