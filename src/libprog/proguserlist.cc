@@ -1,11 +1,8 @@
-/* proguserlist */
+/* proguserlist SUPPORT */
+/* lang=C++20 */
 
-/* user-list handling */
+/* user-list handling (in the background) */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable print-outs */
-#define	CF_DEBUG	0		/* switchable print-outs */
 
 
 /* revision history:
@@ -25,35 +22,26 @@
 
 	Here we do some user-list handling, in the background.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<upt.h>
 #include	<useraccdb.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |REALNAMELEN| */
 
 #include	"config.h"
 #include	"defs.h"
 
 
 /* local defines */
-
-#ifndef	REALNAMELEN
-#define	REALNAMELEN	100		/* real name length */
-#endif
 
 #ifndef	LOGCNAME
 #define	LOGCNAME	"log"
@@ -66,23 +54,17 @@
 #define	USERLIST	struct userlist
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
-extern int	matstr(cchar **,cchar *,int) ;
-extern int	matpstr(cchar **,int,cchar *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecti(cchar *,int,int *) ;
-extern int	isNotPresent(int) ;
-
-extern int	proglog_printf(PROGINFO *,cchar *,...) ;
-
-#if	CF_DEBUGS || CF_DEBUG
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,cchar *,int) ;
+extern "C" {
+    extern int	proglog_printf(PROGINFO *,cchar *,...) noex ;
+}
 
 
 /* external variables */
@@ -90,7 +72,9 @@ extern char	*strwcpy(char *,cchar *,int) ;
 
 /* local structures */
 
-typedef int (*workthr)(void *) ;
+extern "C" {
+    typedef int (*workthr)(void *) noex ;
+}
 
 struct userlist {
 	pthread_t	tid ;		/* thread ID */
@@ -105,59 +89,39 @@ static int	proguserlist_worker(PROGINFO *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int proguserlist_begin(PROGINFO *pip)
-{
+int proguserlist_begin(PROGINFO *pip) noex {
 	USERLIST	*ulp ;
-	const int	size = sizeof(USERLIST) ;
+	cint		sz = sizeof(USERLIST) ;
 	int		rs ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proguserlist_begin: ent\n") ;
-#endif
-
-	if ((rs = uc_malloc(size,&ulp)) >= 0) {
+	if ((rs = uc_malloc(sz,&ulp)) >= 0) {
 	    workthr	w = (workthr) proguserlist_worker ;
 	    pthread_t	tid ;
-	    memset(ulp,0,size) ;
+	    memset(ulp,0,sz) ;
 	    pip->userlist = ulp ;
-	    if ((rs = uptcreate(&tid,NULL,w,pip)) >= 0) {
+	    if ((rs = uptcreate(&tid,nullptr,w,pip)) >= 0) {
 	        ulp->tid = tid ;
 	    }
 	    if (rs < 0) {
 	        uc_free(ulp) ;
-	        pip->userlist = NULL ;
+	        pip->userlist = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proguserlist_begin: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (proguserlist_begin) */
 
-
-int proguserlist_end(PROGINFO *pip)
-{
+int proguserlist_end(PROGINFO *pip) noex {
 	USERLIST	*ulp = (USERLIST *) pip->userlist ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proguserlist_end: ent\n") ;
-#endif
-
-	if (pip->userlist != NULL) {
+	if (pip->userlist != nullptr) {
 	    pthread_t	tid = ulp->tid ;
 	    int		trs ;
-
 	    if ((rs1 = uptjoin(tid,&trs)) >= 0) {
 	        if (pip->open.logprog) {
 	            cchar	*fmt ;
@@ -171,17 +135,12 @@ int proguserlist_end(PROGINFO *pip)
 	        } /* end if */
 	    } /* end if (thread-join) */
 	    if (rs >= 0) rs = rs1 ;
-
-	    rs1 = uc_free(ulp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    pip->userlist = NULL ;
+	    {
+	        rs1 = uc_free(ulp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    pip->userlist = nullptr ;
 	} /* end if (enabled) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("proguserlist_end: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (proguserlist_end) */
@@ -189,10 +148,8 @@ int proguserlist_end(PROGINFO *pip)
 
 /* local subroutines */
 
-
-static int proguserlist_worker(PROGINFO *pip)
-{
-	const int	blen = REALNAMELEN ;
+static int proguserlist_worker(PROGINFO *pip) noex {
+	cint		blen = REALNAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		f_created = FALSE ;
@@ -202,7 +159,6 @@ static int proguserlist_worker(PROGINFO *pip)
 	cchar		*un = pip->username ;
 	cchar		*name = pip->name ;
 	char		bbuf[REALNAMELEN+1] ;
-
 	if ((rs = sncpy3(bbuf,blen,nn,"!",un)) >= 0) {
 	    USERACCDB	udb ;
 	    if ((rs = useraccdb_open(&udb,pr,sn)) >= 0) {
@@ -214,12 +170,6 @@ static int proguserlist_worker(PROGINFO *pip)
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (useraccdb) */
 	} /* end if (sncpy3) */
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	    debugprintf("proguserlist_worker: ret rs=%d f=%u\n",rs,f_created) ;
-#endif
-
 	return (rs >= 0) ? f_created : rs ;
 }
 /* end subroutine (proguserlist_worker) */
