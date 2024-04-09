@@ -59,8 +59,7 @@
 int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = bmagic(fp,lbuf)) >= 0) {
-	    if ((rs = bfile_active(fp)) > 0) {
+	if ((rs = bmagic(fp,lbuf)) > 0) {
 	        bool	feol = false ;
 	        if (llen < 0) llen = strlen(lbuf) ;
 	        feol = feol || (llen == 0) ;
@@ -76,7 +75,6 @@ int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
 	            rs = bputc(fp,CH_NL) ;
 	            wlen += rs ;
 	        }
-	    } /* end if (active) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }

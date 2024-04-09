@@ -310,6 +310,7 @@ int eigendb_curend(eigendb *op,eigendb_cur *curp) noex {
 int eigendb_enum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	int		len = 0 ;
+	cchar		*rp = nullptr ;
 	if ((rs = eigendb_magic(op,curp)) >= 0) {
 	    rs = SR_BUGCHECK ;
 	    if (curp->hcp) {
@@ -319,12 +320,11 @@ int eigendb_enum(eigendb *op,eigendb_cur *curp,cchar **rpp) noex {
 	        if (rpp) *rpp = nullptr ;
 	        if ((rs = hdb_enum(op->dbp,hcp,&key,&val)) >= 0) {
 	            len = key.len ;
-	            if (rpp) {
-	                *rpp = charp(key.buf) ;
-	            }
+		    rp = charp(key.buf) ;
 	        }
 	    } /* end if (valid HDB cursor) */
 	} /* end if (magic) */
+	if (rpp) *rpp = rp ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (eigendb_enum) */
@@ -342,18 +342,19 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	    cint	fd = rs ;
 	    if ((rs = u_fstat(fd,&sb)) >= 0) {
 	        if (! S_ISDIR(sb.st_mode)) {
-	            cint	mfsize = EIGENDB_MAXFILESIZE ;
-	            cint	fsize = sb.st_size ;
+	            csize	mfsize = EIGENDB_MAXFILESIZE ;
+	            csize	fsize = sb.st_size ;
 		    if (fsize > 0) {
+			cint	fsz = int(fsize) ;
 	                if (S_ISREG(sb.st_mode) && (fsize <= mfsize)) {
-	                    rs = eigendb_fileparsemap(op,fd,fsize) ;
+	                    rs = eigendb_fileparsemap(op,fd,fsz) ;
 	                } else {
-	                    rs = eigendb_fileparseread(op,fd,fsize) ;
+	                    rs = eigendb_fileparseread(op,fd,fsz) ;
 			}
-		    }
-	        } else {
-	            rs = SR_ISDIR ;
-		}
+		    } /* end if (non-zero positive) */
+	 	} else {
+		    rs = SR_ISDIR ;
+		} /* end if (not-directory) */
 	    } /* end if (stat) */
 	    rs1 = u_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;

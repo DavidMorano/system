@@ -91,8 +91,7 @@ static int	bfile_bufcpy(bfile *,cchar *,int) noex ;
 
 int bwrite(bfile *fp,cvoid *abuf,int alen) noex {
 	int		rs ;
-	if ((rs = bmagic(fp,abuf)) >= 0) {
-	    if ((rs = bfile_active(fp)) > 0) {
+	if ((rs = bmagic(fp,abuf)) > 0) {
 	cchar	*abp = charp(abuf) ;
 	int		f_bufnone ;
 
@@ -129,7 +128,6 @@ int bwrite(bfile *fp,cvoid *abuf,int alen) noex {
 	    }
 	}
 
-	   } /* end if (active) */
 	} /* end if (magic) */
 	return rs ;
 }

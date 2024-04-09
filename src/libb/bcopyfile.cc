@@ -39,7 +39,6 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<usystem.h>
-#include	<sysval.hh>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -53,8 +52,6 @@
 
 /* local variables */
 
-static sysval		pagesize(sysval_ps) ;
-
 
 /* exported variables */
 
@@ -63,27 +60,18 @@ static sysval		pagesize(sysval_ps) ;
 
 int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
 	int		rs ;
-	int		rs1 ;
 	int		tlen = 0 ;
-	if ((rs = bmagic(ifp,ofp,ubuf)) >= 0) {
-	    int		blen = ulen ;
-	    char	*bbuf = ubuf ;
-	    bool	falloc = false ;
-	    if ((ubuf == nullptr) || (ulen < 0)) {
-	        if ((rs = malloc_ps(&bbuf)) >= 0) {
-		    falloc = true ;
-	            ulen = rs ;
-		}
-	    }
-	    if (rs >= 0) {
+	if ((rs = bmagic(ifp,ofp,ubuf)) > 0) {
+	    rs = SR_INVALID ;
+	    if (ulen > 0) {
 		auto	bw = bwrite ;
 	        int	i{} ;
 	        int	bl ;
-	        while ((rs = bread(ifp,bbuf,blen)) > 0) {
+	        while ((rs = bread(ifp,ubuf,ulen)) > 0) {
 	            cint	len = rs ;
 	            i = 0 ;
 	            bl = len ;
-	            while ((bl > 0) && ((rs = bw(ofp,(bbuf + i),bl)) < bl)) {
+	            while ((bl > 0) && ((rs = bw(ofp,(ubuf + i),bl)) < bl)) {
 	                i += rs ;
 	                bl -= rs ;
 	                if (rs < 0) break ;
@@ -91,11 +79,7 @@ int bcopyfile(bfile *ifp,bfile *ofp,char *ubuf,int ulen) noex {
 	            tlen += len ;
 	            if (rs < 0) break ;
 	        } /* end while */
-	    } /* end if (ok) */
-	    if (falloc && bbuf) {
-	        rs1 = uc_free(bbuf) ;
-	        if (rs >= 0) rs = rs1 ;
-	    }
+	    } /* end if (valid) */
 	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }

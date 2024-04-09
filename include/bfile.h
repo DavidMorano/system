@@ -158,15 +158,15 @@ struct bfile_head {
 	dev_t		dev ;
 	size_t		offset ; 	/* user view */
 	size_t		fsize ;		/* current? file size */
-	mode_t		mode ;
-	uint		magic ;
 	BFILE_FLAGS	f ;
+	uint		magic ;
 	int		fd ;
 	int		pagesize ;	/* system page size */
 	int		bsize ;		/* allocated buffer size */
 	int		oflags ;	/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
+	mode_t		mode ;
 } ;
 
 typedef BFILE		bfile ;
@@ -221,10 +221,6 @@ static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
 }
 
-static inline int bfile_active(bfile *op) noex {
-	return (! op->f.nullfile) ;
-}
-
 EXTERNC_end
 
 #ifdef	__cplusplus
@@ -233,8 +229,11 @@ template<typename ... Args>
 static inline int bmagic(bfile *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == BFILE_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == BFILE_MAGIC) {
+		rs = (op->f.nullfile) ? 0 : 1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bmagic) */
