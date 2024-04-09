@@ -124,6 +124,18 @@
 #define	SOCKADDR	struct sockaddr
 #endif
 
+#ifndef	SOCKADDR_UN
+#define	SOCKADDR_UN	struct sockaddr_un
+#endif
+
+#ifndef	SOCKADDR_IN4
+#define	SOCKADDR_IN4	struct sockaddr_in
+#endif
+
+#ifndef	SOCKADDR_IN6
+#define	SOCKADDR_IN6	struct sockaddr_in6
+#endif
+
 #ifndef	MSGHDR
 #define	MSGHDR		struct msghdr
 #endif

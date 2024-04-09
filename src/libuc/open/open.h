@@ -1,7 +1,7 @@
-/* openshm HEADER */
+/* open HEADER */
 /* lang=C20 */
 
-/* open a shared-memory segment */
+/* open something (special) */
 /* version %I% last-modified %G% */
 
 
@@ -14,22 +14,24 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	OPENSHM_INCLUDE
-#define	OPENSHM_INCLUDE
+#ifndef	OPEN_INCLUDE
+#define	OPEN_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<usystem.h>
 
+#include	<openport.h>
+#include	<openportmsg.h>
 
-EXTERNC_begin
+#include	<openaddrinfo.h>
+#include	<opensockaddr.h>
+#include	<opendial.h>
+#include	<openqotd.h>
+#include	<openshm.h>
+#include	<opensysfs.h>
 
-extern int openshmtmpx(mode_t) noex ;
-extern int openshmtmp(char *,int,mode_t) noex ;
 
-EXTERNC_end
-
-
-#endif /* OPENSHM_INCLUDE */
+#endif /* OPEN_INCLUDE */
 
 

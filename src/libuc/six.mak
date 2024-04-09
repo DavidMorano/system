@@ -34,14 +34,18 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
+
+
+INCS += six.h
+
+
+LIBS +=
+
 
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
-LIBS=
-
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -49,9 +53,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= six.h
 
 
 OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o

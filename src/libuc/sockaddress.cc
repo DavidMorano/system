@@ -29,7 +29,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<netinet/in.h>
 #include	<climits>
 #include	<cstring>		/* for |strlen(3c)| */
@@ -69,6 +68,9 @@ constexpr int	inet4addrlen = int(INET4ADDRLEN) ;
 constexpr int	inet6addrlen = int(INET6ADDRLEN) ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int sockaddress_start(SA *sap,int af,cvoid *vaddr,int port,uint flow) noex {
@@ -81,9 +83,9 @@ int sockaddress_startaddr(SA *sap,int af,cvoid *vaddr,int alen,
 	int		rs = SR_FAULT ;
 	int		salen = 0 ;
 	if (sap && vaddr) {
-	    struct sockaddr	*x_sap ;
-	    struct sockaddr_in	*inet4_sap ;
-	    struct sockaddr_in6	*inet6_sap ;
+	    SOCKADDR		*x_sap ;
+	    SOCKADDR_IN4	*inet4_sap ;
+	    SOCKADDR_IN6	*inet6_sap ;
 	    int		ml ;
 	    cchar	*addr = charp(vaddr) ;
 	    rs = SR_OK ;
@@ -92,7 +94,7 @@ int sockaddress_startaddr(SA *sap,int af,cvoid *vaddr,int alen,
 	        {
 		    cint	plen = MAXPATHLEN ;
 		    char	*bp ;
-	            x_sap = (struct sockaddr *) sap ;
+	            x_sap = (SOCKADDR *) sap ;
 	            sap->a_unspec.sa_family = (ushort) htons(af) ;
 	            bp = strnwcpy(x_sap->sa_data,plen,addr,alen) ;
 		    *bp = '\0' ;
@@ -100,8 +102,8 @@ int sockaddress_startaddr(SA *sap,int af,cvoid *vaddr,int alen,
 	        }
 	        break ;
 	    case AF_INET4:
-	        inet4_sap = (struct sockaddr_in *) sap ;
-	        salen = sizeof(struct sockaddr_in) ;
+	        inet4_sap = (SOCKADDR_IN4 *) sap ;
+	        salen = sizeof(SOCKADDR_IN4) ;
 	        memset(inet4_sap,0,salen) ;
 	        inet4_sap->sin_family = (ushort) htons(af) ;
 	        inet4_sap->sin_port = (ushort) htons(port) ;
@@ -111,8 +113,8 @@ int sockaddress_startaddr(SA *sap,int af,cvoid *vaddr,int alen,
 	        }
 	        break ;
 	    case AF_INET6:
-	        inet6_sap = (struct sockaddr_in6 *) sap ;
-	        salen = sizeof(struct sockaddr_in6) ;
+	        inet6_sap = (SOCKADDR_IN6 *) sap ;
+	        salen = sizeof(SOCKADDR_IN6) ;
 	        memset(inet6_sap,0,salen) ;
 	        inet6_sap->sin6_family = (ushort) htons(af) ;
 	        inet6_sap->sin6_port = (ushort) htons(port) ;
@@ -131,7 +133,7 @@ int sockaddress_startaddr(SA *sap,int af,cvoid *vaddr,int alen,
 }
 /* end subroutine (sockaddress_startaddr) */
 
-int sockaddress_finish(SOCKADDRESS  *sap) noex {
+int sockaddress_finish(SA  *sap) noex {
 	int		rs = SR_FAULT ;
 	if (sap) {
 	    sap->a_unspec.sa_family = 0 ;
@@ -142,7 +144,7 @@ int sockaddress_finish(SOCKADDRESS  *sap) noex {
 /* end subroutine (sockaddress_finish) */
 
 /* get the address family type for this sockaddress */
-int sockaddress_getaf(SOCKADDRESS *sap) noex {
+int sockaddress_getaf(SA *sap) noex {
 	int		rs = SR_FAULT ;
 	if (sap) {
 	    rs = ntohs(sap->a_unspec.sa_family) & USHORT_MAX ;
@@ -152,21 +154,21 @@ int sockaddress_getaf(SOCKADDRESS *sap) noex {
 /* end subroutine (sockaddress_getaf) */
 
 /* get the port for this sockaddress (based on address family type) */
-int sockaddress_getport(SOCKADDRESS *sap) noex {
+int sockaddress_getport(SA *sap) noex {
 	int		rs = SR_FAULT ;
 	int		port = 0 ;
 	if (sap) {
-	    struct sockaddr_in	*inet4_sap ;
-	    struct sockaddr_in6	*inet6_sap ;
+	    SOCKADDR_IN4	*inet4_sap ;
+	    SOCKADDR_IN6	*inet6_sap ;
 	    cint	af = ntohs(sap->a_unspec.sa_family) & USHORT_MAX ;
 	    rs = SR_OK ;
 	    switch (af) {
 	    case AF_INET4:
-	        inet4_sap = (struct sockaddr_in *) sap ;
+	        inet4_sap = (SOCKADDR_IN4 *) sap ;
 	        port = ntohs(inet4_sap->sin_port) ;
 	        break ;
 	    case AF_INET6:
-	        inet6_sap = (struct sockaddr_in6 *) sap ;
+	        inet6_sap = (SOCKADDR_IN6 *) sap ;
 	        port = ntohs(inet6_sap->sin6_port) ;
 	        break ;
 	    default:
@@ -179,8 +181,8 @@ int sockaddress_getport(SOCKADDRESS *sap) noex {
 }
 /* end subroutine (sockaddress_getport) */
 
-int sockaddress_getflow(SOCKADDRESS *sap,uint *rp) noex {
-	struct sockaddr_in6	*inet6_sap ;
+int sockaddress_getflow(SA *sap,uint *rp) noex {
+	SOCKADDR_IN6	*inet6_sap ;
 	uint		flow = 0 ;
 	int		rs = SR_OK ;
 	int		af ;
@@ -194,7 +196,7 @@ int sockaddress_getflow(SOCKADDRESS *sap,uint *rp) noex {
 	    rs = SR_INVALID ;
 	    break ;
 	case AF_INET6:
-	    inet6_sap = (struct sockaddr_in6 *) sap ;
+	    inet6_sap = (SOCKADDR_IN6 *) sap ;
 	    flow = ntohs(inet6_sap->sin6_flowinfo) ;
 	    break ;
 	default:
@@ -210,10 +212,10 @@ int sockaddress_getflow(SOCKADDRESS *sap,uint *rp) noex {
 /* end subroutine (sockaddress_getflow) */
 
 /* get the address for this sockaddress (based on address type) */
-int sockaddress_getaddr(SOCKADDRESS *sap,char *abuf,int alen) noex {
-	struct sockaddr_un	*unix_sap ;
-	struct sockaddr_in	*inet4_sap ;
-	struct sockaddr_in6	*inet6_sap ;
+int sockaddress_getaddr(SA *sap,char *abuf,int alen) noex {
+	SOCKADDR_UN	*unix_sap ;
+	SOCKADDR_IN4	*inet4_sap ;
+	SOCKADDR_IN6	*inet6_sap ;
 	int		rs = SR_OK ;
 	int		af ;
 	cchar		*sp ;
@@ -225,13 +227,13 @@ int sockaddress_getaddr(SOCKADDRESS *sap,char *abuf,int alen) noex {
 
 	switch (af) {
 	case AF_UNIX:
-	    unix_sap = (struct sockaddr_un *) sap ;
+	    unix_sap = (SOCKADDR_UN *) sap ;
 	    sp = unix_sap->sun_path ;
 	    if (alen < 0) alen = MAXPATHLEN ;
 	    rs = snwcpy(abuf,alen,sp,MAXPATHLEN) ;
 	    break ;
 	case AF_INET4:
-	    inet4_sap = (struct sockaddr_in *) sap ;
+	    inet4_sap = (SOCKADDR_IN4 *) sap ;
 	    if (alen >= inet4addrlen) {
 	        rs = inet4addrlen ;
 	        memcpy(abuf,&inet4_sap->sin_addr,inet4addrlen) ;
@@ -240,7 +242,7 @@ int sockaddress_getaddr(SOCKADDRESS *sap,char *abuf,int alen) noex {
 	    }
 	    break ;
 	case AF_INET6:
-	    inet6_sap = (struct sockaddr_in6 *) sap ;
+	    inet6_sap = (SOCKADDR_IN6 *) sap ;
 	    if (alen >= inet4addrlen) {
 	        rs = inet6addrlen ;
 	        memcpy(abuf,&inet6_sap->sin6_addr,inet6addrlen) ;
@@ -257,8 +259,8 @@ int sockaddress_getaddr(SOCKADDRESS *sap,char *abuf,int alen) noex {
 }
 /* end subroutine (sockaddress_getaddr) */
 
-int sockaddress_getscope(SOCKADDRESS *sap,uint *rp) noex {
-	struct sockaddr_in6	*inet6_sap ;
+int sockaddress_getscope(SA *sap,uint *rp) noex {
+	SOCKADDR_IN6	*inet6_sap ;
 	uint		v = 0 ;
 	int		rs = SR_OK ;
 	int		af ;
@@ -272,7 +274,7 @@ int sockaddress_getscope(SOCKADDRESS *sap,uint *rp) noex {
 	    rs = SR_INVALID ;
 	    break ;
 	case AF_INET6:
-	    inet6_sap = (struct sockaddr_in6 *) sap ;
+	    inet6_sap = (SOCKADDR_IN6 *) sap ;
 	    v = ntohs(inet6_sap->sin6_scope_id) ;
 	    break ;
 	default:
@@ -287,8 +289,8 @@ int sockaddress_getscope(SOCKADDRESS *sap,uint *rp) noex {
 }
 /* end subroutine (sockaddress_getscope) */
 
-int sockaddress_getextra(SOCKADDRESS *sap,uint *rp) noex {
-	struct sockaddr_in6	*inet6_sap ;
+int sockaddress_getextra(SA *sap,uint *rp) noex {
+	SOCKADDR_IN6	*inet6_sap ;
 	uint		v = 0 ;
 	int		rs = SR_OK ;
 	int		af ;
@@ -304,7 +306,7 @@ int sockaddress_getextra(SOCKADDRESS *sap,uint *rp) noex {
 	case AF_INET6:
 	    {
 		uint	*ip ;
-	        inet6_sap = (struct sockaddr_in6 *) sap ;
+	        inet6_sap = (SOCKADDR_IN6 *) sap ;
 		ip = &inet6_sap->sin6_scope_id ;
 		ip += sizeof(uint) ;
 	        v = ntohs(*ip) ;
@@ -323,7 +325,7 @@ int sockaddress_getextra(SOCKADDRESS *sap,uint *rp) noex {
 /* end subroutine (sockaddress_getextra) */
 
 /* get the entire socket address (the TLI address) in HEXADECIMAL */
-int sockaddress_gethex(SOCKADDRESS *sap,char *rbuf,int rlen) noex {
+int sockaddress_gethex(SA *sap,char *rbuf,int rlen) noex {
 	int		rs = SR_OK ;
 	int		v ;
 	int		af ;
@@ -343,10 +345,10 @@ int sockaddress_gethex(SOCKADDRESS *sap,char *rbuf,int rlen) noex {
 	    }
 	    break ;
 	case AF_INET4:
-	    salen = sizeof(struct sockaddr_in) ;
+	    salen = sizeof(SOCKADDR_IN4) ;
 	    break ;
 	case AF_INET6:
-	    salen = sizeof(struct sockaddr_in6) ;
+	    salen = sizeof(SOCKADDR_IN6) ;
 	    break ;
 	default:
 	    rs = SR_NOTFOUND ;
@@ -358,7 +360,7 @@ int sockaddress_gethex(SOCKADDRESS *sap,char *rbuf,int rlen) noex {
 	}
 
 	if (rs >= 0) {
-	    int	i ;
+	    int	i ; /* used-afterwards */
 	    for (i = 0 ; i < salen ; i += 1) {
 	        v = MKCHAR(sap->str[i]) ;
 	        rbuf[j++] = getdig((v >> 4) & 15) ;
@@ -372,7 +374,7 @@ int sockaddress_gethex(SOCKADDRESS *sap,char *rbuf,int rlen) noex {
 /* end subroutine (sockaddress_gethex) */
 
 /* get the entire socket address length (like for a TPI address) */
-int sockaddress_getlen(SOCKADDRESS *sap) noex {
+int sockaddress_getlen(SA *sap) noex {
 	int		rs = SR_OK ;
 	int		af ;
 	int		salen = 0 ;
@@ -389,10 +391,10 @@ int sockaddress_getlen(SOCKADDRESS *sap) noex {
 	    }
 	    break ;
 	case AF_INET4:
-	    salen = sizeof(struct sockaddr_in) ;
+	    salen = sizeof(SOCKADDR_IN4) ;
 	    break ;
 	case AF_INET6:
-	    salen = sizeof(struct sockaddr_in6) ;
+	    salen = sizeof(SOCKADDR_IN6) ;
 	    break ;
 	default:
 	    rs = SR_NOTFOUND ;
@@ -403,7 +405,7 @@ int sockaddress_getlen(SOCKADDRESS *sap) noex {
 }
 /* end subroutine (sockaddress_getlen) */
 
-int sockaddress_getaddrlen(SOCKADDRESS *sap) noex {
+int sockaddress_getaddrlen(SA *sap) noex {
 	int		rs = SR_OK ;
 	int		af ;
 	int		addrlen = 0 ;
@@ -435,7 +437,7 @@ int sockaddress_getaddrlen(SOCKADDRESS *sap) noex {
 /* end subroutine (sockaddress_getaddrlen) */
 
 /* write the address family field */
-int sockaddress_putaf(SOCKADDRESS *sap,int af) noex {
+int sockaddress_putaf(SA *sap,int af) noex {
 	int		rs = SR_FAULT ;
 	if (sap) {
 	    sap->a_unspec.sa_family = htons(af) ;
@@ -446,9 +448,9 @@ int sockaddress_putaf(SOCKADDRESS *sap,int af) noex {
 /* end subroutine (sockaddress_putaf) */
 
 /* put a port number in there */
-int sockaddress_putport(SOCKADDRESS *sap,int port) noex {
-	struct sockaddr_in	*inet4_sap ;
-	struct sockaddr_in6	*inet6_sap ;
+int sockaddress_putport(SA *sap,int port) noex {
+	SOCKADDR_IN4	*inet4_sap ;
+	SOCKADDR_IN6	*inet6_sap ;
 	int		rs = SR_OK ;
 	int		af ;
 
@@ -461,11 +463,11 @@ int sockaddress_putport(SOCKADDRESS *sap,int port) noex {
 	    rs = SR_INVALID ;
 	    break ;
 	case AF_INET4:
-	    inet4_sap = (struct sockaddr_in *) sap ;
+	    inet4_sap = (SOCKADDR_IN4 *) sap ;
 	    inet4_sap->sin_port = htons(port) ;
 	    break ;
 	case AF_INET6:
-	    inet6_sap = (struct sockaddr_in6 *) sap ;
+	    inet6_sap = (SOCKADDR_IN6 *) sap ;
 	    inet6_sap->sin6_port = htons(port) ;
 	    break ;
 	default:
@@ -478,10 +480,10 @@ int sockaddress_putport(SOCKADDRESS *sap,int port) noex {
 /* end subroutine (sockaddress_putport) */
 
 /* put a transport-specific-part address */
-int sockaddress_putaddr(SOCKADDRESS *sap,cvoid *vaddr) noex {
-	struct sockaddr		*x_sap ;
-	struct sockaddr_in	*inet4_sap ;
-	struct sockaddr_in6	*inet6_sap ;
+int sockaddress_putaddr(SA *sap,cvoid *vaddr) noex {
+	SOCKADDR	*x_sap ;
+	SOCKADDR_IN4	*inet4_sap ;
+	SOCKADDR_IN6	*inet6_sap ;
 	int		rs = SR_OK ;
 	uint		af ;
 	cchar		*addr = charp(vaddr) ;
@@ -493,7 +495,7 @@ int sockaddress_putaddr(SOCKADDRESS *sap,cvoid *vaddr) noex {
 
 	switch (af) {
 	case AF_UNIX:
-	    x_sap = (struct sockaddr *) sap ;
+	    x_sap = (SOCKADDR *) sap ;
 	    {
 	        cint	plen = MAXPATHLEN ;
 		char	*bp ;
@@ -503,12 +505,12 @@ int sockaddress_putaddr(SOCKADDRESS *sap,cvoid *vaddr) noex {
 	    }
 	    break ;
 	case AF_INET4:
-	    inet4_sap = (struct sockaddr_in *) sap ;
+	    inet4_sap = (SOCKADDR_IN4 *) sap ;
 	    rs = inet4addrlen ;
 	    memcpy(&inet4_sap->sin_addr,addr,rs) ;
 	    break ;
 	case AF_INET6:
-	    inet6_sap = (struct sockaddr_in6 *) sap ;
+	    inet6_sap = (SOCKADDR_IN6 *) sap ;
 	    rs = inet6addrlen ;
 	    memcpy(&inet6_sap->sin6_addr,addr,rs) ;
 	    break ;
