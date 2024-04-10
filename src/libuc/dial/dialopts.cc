@@ -66,10 +66,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	uc_linger(int,int) noex ;
-}
-
 
 /* external variables */
 
@@ -122,7 +118,7 @@ int dialopts(int fd,int opts) noex {
 
 dialmgr::operator int () noex {
 	int		rs = SR_OK ;
-	for (int i = 0 ; (rs != SR_OK) && (i < dialopt_overlast) ; i += 1) {
+	for (int i = 0 ; (rs >= SR_OK) && (i < dialopt_overlast) ; i += 1) {
 	    if (batsti(&opts,i)) {
 		switch (i) {
 		case dialopt_keepalive:
