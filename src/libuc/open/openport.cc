@@ -304,31 +304,34 @@ static int procspawn(cc *un,cc *prog,mainv sargv,mainv senvv,
 	int		rs1 ;
 	int		fd = -1 ;
 	if ((rs = procspawn_begin(&psa,prog,sargv,senvv)) >= 0) {
-	                const pid_t	pid = rs ;
-	                cint	cfd = psa.fd[0] ;
-	                int		cs ;
-
-	                rs = procexchange(un,cfd,pf,pt,proto,sap) ;
-	                fd = rs ;
-	                u_close(cfd) ;
-
-	                rs1 = procspawn_end(pid,&cs) ;
-	                if (rs >= 0) rs = rs1 ;
-	            if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	    const pid_t	pid = rs ;
+	    cint	cfd = psa.fd[0] ;
+	    int		cs{} ;
+	    {
+	        rs = procexchange(un,cfd,pf,pt,proto,sap) ;
+	        fd = rs ;
+	        u_close(cfd) ;
+	    }
+	    rs1 = procspawn_end(pid,&cs) ;
+	    if (rs >= 0) rs = rs1 ;
+	    if ((rs >= 0) && (cs != 0)) rs = SR_IO ;
+	    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	} /* end if (spawned program) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (procspawn) */
 
 static int procspawn_begin(SP_CON *psp,cc *prog,mainv sargv,mainv senvv) noex {
-	int		rs ;
-	memclear(psp) ;
-	psp->opts |= SPAWNPROC_OIGNINTR ;
-	psp->opts |= SPAWNPROC_OSETPGRP ;
-	psp->disp[0] = SPAWNPROC_DOPEN ;
-	psp->disp[1] = SPAWNPROC_DCLOSE ;
-	psp->disp[2] = SPAWNPROC_DCLOSE ;
-	rs = spawnproc(psp,prog,sargv,senvv) ;
+	int		rs = SR_FAULT ;
+	if (psp && prog && sargv && senvv) {
+	    memclear(psp) ;
+	    psp->opts |= SPAWNPROC_OIGNINTR ;
+	    psp->opts |= SPAWNPROC_OSETPGRP ;
+	    psp->disp[0] = SPAWNPROC_DOPEN ;
+	    psp->disp[1] = SPAWNPROC_DCLOSE ;
+	    psp->disp[2] = SPAWNPROC_DCLOSE ;
+	    rs = spawnproc(psp,prog,sargv,senvv) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (procspawn_begin) */
