@@ -21,6 +21,7 @@
 
 #define	OPENPORTMSG_REQ		struct openportmsg_request
 #define	OPENPORTMSG_RES		struct openportmsg_response
+#define	OPENPORTMSG_UNLEN	USERNAMELEN
 
 
 struct openportmsg_request {
@@ -30,7 +31,7 @@ struct openportmsg_request {
 	int		proto ;		/* suitable for |socket(3xnet)| */
 	uint		msglen ;
 	uchar		msgtype ;
-	char		username[USERNAMELEN+1] ;
+	char		username[OPENPORTMSG_UNLEN + 1] ;
 } ;
 
 struct openportmsg_response {
@@ -50,8 +51,8 @@ typedef	OPENPORTMSG_RES		openportmsg_res ;
 
 EXTERNC_begin
 
-extern int openportmsg_msgrequest(openport_req *,int,char *,int) noex ;
-extern int openportmsg_msgresponse(openport_res *,int,char *,int) noex ;
+extern int openportmsg_msgrequest(openportmsg_req *,int,char *,int) noex ;
+extern int openportmsg_msgresponse(openportmsg_res *,int,char *,int) noex ;
 
 EXTERNC_end
 

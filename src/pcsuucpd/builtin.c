@@ -1607,9 +1607,9 @@ struct ipcmsg_testint	*ap ;
 
 	serialbuf_start(&reqbuf,(char *) buf,BUFLEN) ;
 
-	serialbuf_wchar(&reqbuf,100) ;
+	serialbuf_wc(&reqbuf,100) ;
 
-	serialbuf_wlong(&reqbuf,cip->mtype) ;
+	serialbuf_wl(&reqbuf,cip->mtype) ;
 
 	serialbuf_wstrn(&reqbuf,ap->sp,MIN(ap->sl,100)) ;
 
@@ -1646,7 +1646,7 @@ struct ipcmsg_testint	*ap ;
 	serialbuf_start(&reqbuf,buf,len) ;
 
 
-	serialbuf_rchar(&reqbuf,&ch) ;
+	serialbuf_rc(&reqbuf,&ch) ;
 
 	rc = (int) ((signed char) ch) ;
 

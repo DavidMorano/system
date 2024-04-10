@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} bmagic"
+NAMES="${NAMES} serialbuf_ "
 
 
 DN=/dev/null
@@ -12,7 +12,30 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/bmagic/s//bfile_magic/g
+g/serialbuf_rchar/s//serialbuf_rc/g
+g/serialbuf_rshort/s//serialbuf_rs/g
+g/serialbuf_rint/s//serialbuf_ri/g
+g/serialbuf_rinta/s//serialbuf_ria/g
+g/serialbuf_rlong/s//serialbuf_rl/g
+g/serialbuf_rlonga/s//serialbuf_rla/g
+g/serialbuf_ruchar/s//serialbuf_ruc/g
+g/serialbuf_rushort/s//serialbuf_rus/g
+g/serialbuf_ruint/s//serialbuf_rui/g
+g/serialbuf_ruinta/s//serialbuf_ruia/g
+g/serialbuf_rulong/s//serialbuf_rul/g
+g/serialbuf_rulonga/s//serialbuf_rula/g
+g/serialbuf_wchar/s//serialbuf_wc/g
+g/serialbuf_wshort/s//serialbuf_ws/g
+g/serialbuf_wint/s//serialbuf_wi/g
+g/serialbuf_winta/s//serialbuf_wia/g
+g/serialbuf_wlong/s//serialbuf_wl/g
+g/serialbuf_wlonga/s//serialbuf_wla/g
+g/serialbuf_wuchar/s//serialbuf_wuc/g
+g/serialbuf_wushort/s//serialbuf_wus/g
+g/serialbuf_wuint/s//serialbuf_wui/g
+g/serialbuf_wuinta/s//serialbuf_wuia/g
+g/serialbuf_wulong/s//serialbuf_wul/g
+g/serialbuf_wulonga/s//serialbuf_wula/g
 	w
 	q
 EOF

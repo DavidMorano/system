@@ -72,13 +72,13 @@ int			mlen ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	        serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
-	        serialbuf_rshort(&msgbuf,&sp->hostnamelen) ;
+	        serialbuf_rs(&msgbuf,&sp->hostnamelen) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->hostname,MAXHOSTNAMELEN) ;
 
@@ -93,11 +93,11 @@ int			mlen ;
 
 	        sp->msgtype = pingstatmsgtype_update ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	        serialbuf_wui(&msgbuf,sp->timestamp) ;
 
-	        serialbuf_wshort(&msgbuf,len) ;
+	        serialbuf_ws(&msgbuf,len) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->hostname,len) ;
 
@@ -132,17 +132,17 @@ int			mlen ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	        serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->timechange) ;
+	        serialbuf_rui(&msgbuf,&sp->timechange) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->count) ;
+	        serialbuf_rui(&msgbuf,&sp->count) ;
 
-	        serialbuf_rshort(&msgbuf,&sp->hostnamelen) ;
+	        serialbuf_rs(&msgbuf,&sp->hostnamelen) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->hostname,MAXHOSTNAMELEN) ;
 
@@ -157,15 +157,15 @@ int			mlen ;
 
 	        sp->msgtype = pingstatmsgtype_uptime ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	        serialbuf_wui(&msgbuf,sp->timestamp) ;
 
-	        serialbuf_wuint(&msgbuf,sp->timechange) ;
+	        serialbuf_wui(&msgbuf,sp->timechange) ;
 
-	        serialbuf_wuint(&msgbuf,sp->count) ;
+	        serialbuf_wui(&msgbuf,sp->count) ;
 
-	        serialbuf_wshort(&msgbuf,len) ;
+	        serialbuf_ws(&msgbuf,len) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->hostname,len) ;
 
@@ -201,7 +201,7 @@ int			mlen ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
@@ -209,7 +209,7 @@ int			mlen ;
 
 	        sp->msgtype = pingstatmsgtype_unknown ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;

@@ -603,7 +603,7 @@ char		buf[] ;
 	    ((rs = serialbuf_start(&retbuf,(char *) buf,MSGBUFLEN)) >= 0)) {
 
 	    v = (uint) sop->k.boottime ;
-	    serialbuf_wint(&retbuf,v) ;
+	    serialbuf_wi(&retbuf,v) ;
     
 	    len = serialbuf_finish(&retbuf) ;
 

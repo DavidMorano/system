@@ -77,16 +77,16 @@ int sesmsg_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen)
 	if ((rs = serialbuf_start(&mb,mbuf,mlen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 	        serialbuf_rstrw(&mb,sp->reason,SESMSG_REASONLEN) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_exit ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,hdr) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 	        serialbuf_wstrw(&mb,sp->reason,SESMSG_REASONLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -121,15 +121,15 @@ int sesmsg_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen)
 	if ((rs = serialbuf_start(&mb,mbuf,mlen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_noop ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,hdr) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
 	            stdorder_wuint(mbuf,hdr) ;
@@ -178,19 +178,19 @@ int sesmsg_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen)
 	if ((rs = serialbuf_start(&mb,mbuf,mlen)) >= 0) {
 	    uint	hdr ;
 	    if (f) { /* read */
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
-	        serialbuf_ruint(&mb,&sp->tag) ;
-	        serialbuf_ruint(&mb,&sp->pid) ;
-	        serialbuf_ruchar(&mb,&sp->rc) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->pid) ;
+	        serialbuf_ruc(&mb,&sp->rc) ;
 	    } else { /* write */
 	        sp->msgtype = sesmsgtype_response ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
-	        serialbuf_wuint(&mb,sp->tag) ;
-	        serialbuf_wuint(&mb,sp->pid) ;
-	        serialbuf_wuchar(&mb,sp->rc) ;
+	        serialbuf_wui(&mb,hdr) ;
+	        serialbuf_wui(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->pid) ;
+	        serialbuf_wuc(&mb,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
 	            stdorder_wuint(mbuf,hdr) ;
@@ -219,11 +219,11 @@ struct sesmsg_passfd	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
 	        serialbuf_rstrw(&mb,sp->svc,SESMSG_SVCLEN) ;
 
@@ -231,11 +231,11 @@ struct sesmsg_passfd	*sp ;
 
 	        sp->msgtype = sesmsgtype_passfd ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wchar(&mb,sp->msgtype) ;
+	        serialbuf_wc(&mb,sp->msgtype) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
 	        serialbuf_wstrw(&mb,sp->svc,SESMSG_SVCLEN) ;
 
@@ -270,19 +270,19 @@ struct sesmsg_getsysmisc	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_getsysmisc ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -315,43 +315,43 @@ struct sesmsg_sysmisc	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->la_1min) ;
+	        serialbuf_rui(&mb,&sp->la_1min) ;
 
-	        serialbuf_ruint(&mb,&sp->la_5min) ;
+	        serialbuf_rui(&mb,&sp->la_5min) ;
 
-	        serialbuf_ruint(&mb,&sp->la_15min) ;
+	        serialbuf_rui(&mb,&sp->la_15min) ;
 
-	        serialbuf_ruint(&mb,&sp->boottime) ;
+	        serialbuf_rui(&mb,&sp->boottime) ;
 
-	        serialbuf_ruint(&mb,&sp->nproc) ;
+	        serialbuf_rui(&mb,&sp->nproc) ;
 
-	        serialbuf_ruchar(&mb,&sp->rc) ;
+	        serialbuf_ruc(&mb,&sp->rc) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_sysmisc ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->la_1min) ;
+	        serialbuf_wui(&mb,sp->la_1min) ;
 
-	        serialbuf_wuint(&mb,sp->la_5min) ;
+	        serialbuf_wui(&mb,sp->la_5min) ;
 
-	        serialbuf_wuint(&mb,sp->la_15min) ;
+	        serialbuf_wui(&mb,sp->la_15min) ;
 
-	        serialbuf_wuint(&mb,sp->boottime) ;
+	        serialbuf_wui(&mb,sp->boottime) ;
 
-	        serialbuf_wuint(&mb,sp->nproc) ;
+	        serialbuf_wui(&mb,sp->nproc) ;
 
-	        serialbuf_wuchar(&mb,sp->rc) ;
+	        serialbuf_wuc(&mb,sp->rc) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -384,19 +384,19 @@ struct sesmsg_getloadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_getloadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -429,35 +429,35 @@ struct sesmsg_loadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->la_1min) ;
+	        serialbuf_rui(&mb,&sp->la_1min) ;
 
-	        serialbuf_ruint(&mb,&sp->la_5min) ;
+	        serialbuf_rui(&mb,&sp->la_5min) ;
 
-	        serialbuf_ruint(&mb,&sp->la_15min) ;
+	        serialbuf_rui(&mb,&sp->la_15min) ;
 
-	        serialbuf_ruchar(&mb,&sp->rc) ;
+	        serialbuf_ruc(&mb,&sp->rc) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_loadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->la_1min) ;
+	        serialbuf_wui(&mb,sp->la_1min) ;
 
-	        serialbuf_wuint(&mb,sp->la_5min) ;
+	        serialbuf_wui(&mb,sp->la_5min) ;
 
-	        serialbuf_wuint(&mb,sp->la_15min) ;
+	        serialbuf_wui(&mb,sp->la_15min) ;
 
-	        serialbuf_wuchar(&mb,sp->rc) ;
+	        serialbuf_wuc(&mb,sp->rc) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -490,55 +490,55 @@ struct sesmsg_reploadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->utag) ;
+	        serialbuf_rui(&mb,&sp->utag) ;
 
-	        serialbuf_ruint(&mb,&sp->duration) ;
+	        serialbuf_rui(&mb,&sp->duration) ;
 
-	        serialbuf_ruint(&mb,&sp->interval) ;
+	        serialbuf_rui(&mb,&sp->interval) ;
 
-	        serialbuf_rushort(&mb,&sp->addrfamily) ;
+	        serialbuf_rus(&mb,&sp->addrfamily) ;
 
-	        serialbuf_rushort(&mb,&sp->addrport) ;
+	        serialbuf_rus(&mb,&sp->addrport) ;
 
-	        serialbuf_ruint(&mb,&sp->addrhost[0]) ;
+	        serialbuf_rui(&mb,&sp->addrhost[0]) ;
 
-	        serialbuf_ruint(&mb,&sp->addrhost[1]) ;
+	        serialbuf_rui(&mb,&sp->addrhost[1]) ;
 
-	        serialbuf_ruint(&mb,&sp->addrhost[2]) ;
+	        serialbuf_rui(&mb,&sp->addrhost[2]) ;
 
-	        serialbuf_ruint(&mb,&sp->addrhost[3]) ;
+	        serialbuf_rui(&mb,&sp->addrhost[3]) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_reploadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->utag) ;
+	        serialbuf_wui(&mb,sp->utag) ;
 
-	        serialbuf_wuint(&mb,sp->duration) ;
+	        serialbuf_wui(&mb,sp->duration) ;
 
-	        serialbuf_wuint(&mb,sp->interval) ;
+	        serialbuf_wui(&mb,sp->interval) ;
 
-	        serialbuf_wushort(&mb,sp->addrfamily) ;
+	        serialbuf_wus(&mb,sp->addrfamily) ;
 
-	        serialbuf_wushort(&mb,sp->addrport) ;
+	        serialbuf_wus(&mb,sp->addrport) ;
 
-	        serialbuf_wuint(&mb,sp->addrhost[0]) ;
+	        serialbuf_wui(&mb,sp->addrhost[0]) ;
 
-	        serialbuf_wuint(&mb,sp->addrhost[1]) ;
+	        serialbuf_wui(&mb,sp->addrhost[1]) ;
 
-	        serialbuf_wuint(&mb,sp->addrhost[2]) ;
+	        serialbuf_wui(&mb,sp->addrhost[2]) ;
 
-	        serialbuf_wuint(&mb,sp->addrhost[4]) ;
+	        serialbuf_wui(&mb,sp->addrhost[4]) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -571,23 +571,23 @@ struct sesmsg_getlistener	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->idx) ;
+	        serialbuf_rui(&mb,&sp->idx) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_getlistener ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->idx) ;
+	        serialbuf_wui(&mb,sp->idx) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -620,19 +620,19 @@ struct sesmsg_listener	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->idx) ;
+	        serialbuf_rui(&mb,&sp->idx) ;
 
-	        serialbuf_ruint(&mb,&sp->pid) ;
+	        serialbuf_rui(&mb,&sp->pid) ;
 
-	        serialbuf_ruchar(&mb,&sp->rc) ;
+	        serialbuf_ruc(&mb,&sp->rc) ;
 
-	        serialbuf_ruchar(&mb,&sp->ls) ;
+	        serialbuf_ruc(&mb,&sp->ls) ;
 
 	        serialbuf_rstrw(&mb,sp->name,SESMSG_LNAMELEN) ;
 
@@ -642,17 +642,17 @@ struct sesmsg_listener	*sp ;
 
 	        sp->msgtype = sesmsgtype_listener ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->idx) ;
+	        serialbuf_wui(&mb,sp->idx) ;
 
-	        serialbuf_wuint(&mb,sp->pid) ;
+	        serialbuf_wui(&mb,sp->pid) ;
 
-	        serialbuf_wuchar(&mb,sp->rc) ;
+	        serialbuf_wuc(&mb,sp->rc) ;
 
-	        serialbuf_wuchar(&mb,sp->ls) ;
+	        serialbuf_wuc(&mb,sp->ls) ;
 
 	        serialbuf_wstrw(&mb,sp->name,SESMSG_LNAMELEN) ;
 
@@ -689,19 +689,19 @@ struct sesmsg_mark	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_mark ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -734,7 +734,7 @@ struct sesmsg_unknown	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
@@ -742,7 +742,7 @@ struct sesmsg_unknown	*sp ;
 
 	        sp->msgtype = sesmsgtype_unknown ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -775,23 +775,23 @@ struct sesmsg_gethelp	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->idx) ;
+	        serialbuf_rui(&mb,&sp->idx) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sesmsgtype_gethelp ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->idx) ;
+	        serialbuf_wui(&mb,sp->idx) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -824,17 +824,17 @@ struct sesmsg_help	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
-	        serialbuf_ruint(&mb,&sp->idx) ;
+	        serialbuf_rui(&mb,&sp->idx) ;
 
-	        serialbuf_ruint(&mb,&sp->pid) ;
+	        serialbuf_rui(&mb,&sp->pid) ;
 
-	        serialbuf_ruchar(&mb,&sp->rc) ;
+	        serialbuf_ruc(&mb,&sp->rc) ;
 
 	        serialbuf_rstrw(&mb,sp->name,SESMSG_LNAMELEN) ;
 
@@ -842,15 +842,15 @@ struct sesmsg_help	*sp ;
 
 	        sp->msgtype = sesmsgtype_help ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
-	        serialbuf_wuint(&mb,sp->idx) ;
+	        serialbuf_wui(&mb,sp->idx) ;
 
-	        serialbuf_wuint(&mb,sp->pid) ;
+	        serialbuf_wui(&mb,sp->pid) ;
 
-	        serialbuf_wuchar(&mb,sp->rc) ;
+	        serialbuf_wuc(&mb,sp->rc) ;
 
 	        serialbuf_wstrw(&mb,sp->name,SESMSG_LNAMELEN) ;
 
@@ -885,11 +885,11 @@ struct sesmsg_cmd	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&mb,&sp->tag) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
 
 	        serialbuf_rstrw(&mb,sp->cmd,SESMSG_CMDLEN) ;
 
@@ -897,9 +897,9 @@ struct sesmsg_cmd	*sp ;
 
 	        sp->msgtype = sesmsgtype_cmd ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 
-	        serialbuf_wuint(&mb,sp->tag) ;
+	        serialbuf_wui(&mb,sp->tag) ;
 
 	        serialbuf_wstrw(&mb,sp->cmd,SESMSG_CMDLEN) ;
 
@@ -938,23 +938,23 @@ int		mlen ;
 	    ulong	lw ;
 	    uint	hdr ;
 	    if (f) { /* read */
-	        serialbuf_ruint(&mb,&hdr) ;
+	        serialbuf_rui(&mb,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
-	        serialbuf_rulong(&mb,&lw) ;
+	        serialbuf_rul(&mb,&lw) ;
 		sp->stime = (time_t) lw ;
-	        serialbuf_ruint(&mb,&sp->tag) ;
-	        serialbuf_ruchar(&mb,&sp->rc) ;
+	        serialbuf_rui(&mb,&sp->tag) ;
+	        serialbuf_ruc(&mb,&sp->rc) ;
 	        serialbuf_rstrw(&mb,sp->user,ulen) ;
 	        serialbuf_rstrw(&mb,sp->nbuf,nlen) ;
 	    } else { /* write */
 	        sp->msgtype = (uchar) (mt&UCHAR_MAX) ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&mb,hdr) ;
+	        serialbuf_wui(&mb,hdr) ;
 		lw = (ulong) sp->stime ;
-	        serialbuf_wulong(&mb,lw) ;
-	        serialbuf_wuint(&mb,sp->tag) ;
-	        serialbuf_wuchar(&mb,sp->rc) ;
+	        serialbuf_wul(&mb,lw) ;
+	        serialbuf_wui(&mb,sp->tag) ;
+	        serialbuf_wuc(&mb,sp->rc) ;
 	        serialbuf_wstrw(&mb,sp->user,ulen) ;
 	        serialbuf_wstrw(&mb,sp->nbuf,nlen) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {

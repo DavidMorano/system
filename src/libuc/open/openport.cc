@@ -11,7 +11,7 @@
 	This subroutine was originally written so that dangerous
 	daemon programs do not have to be run as 'root' in order
 	to bind to a priveledge port (for those transport providers
-	that have priveledged ports). A good example of a dangerous
+	that have priveledged ports).  A good example of a dangerous
 	daemon program that this capability is especially useful
 	for is the infamous SENDMAIL daemon!
 
@@ -44,7 +44,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
@@ -339,18 +338,16 @@ static int procspawn_end(pid_t pid,int *csp) noex {
 /* end subroutine (procspawn_end) */
 
 static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
-	openportmsg_req	m0 ;
-	openportmsg_res	m1 ;
+	openportmsg_req	m0{} ;
+	openportmsg_res	m1{} ;
 	STRRECVFD	fds ;
 	int		rs ;
 	int		rs1 ;
-	int		sz ;
+	int		sz = sizeof(struct openportmsg_request) ;
 	int		ml ;
 	int		fd = -1 ;
 	char		mbuf[MBUFLEN+1] ;
 
-	sz = sizeof(struct openportmsg_request) ;
-	memset(&m0,0,size) ;
 	m0.msgtype = openportmsgtype_request ;
 	m0.pf = pf ;
 	m0.ptype = pt ;

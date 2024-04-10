@@ -76,33 +76,33 @@ struct ulmsg_update	*sp ;
 
 	if (f) { /* read */
 
-	    serialbuf_ruint(&msgbuf,&hdr) ;
+	    serialbuf_rui(&msgbuf,&hdr) ;
 	    sp->msgtype = (hdr & 0xff) ;
 	    sp->msglen = (hdr >> 8) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->ts) ;
+	    serialbuf_rui(&msgbuf,&sp->ts) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->ta) ;
+	    serialbuf_rui(&msgbuf,&sp->ta) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tm) ;
+	    serialbuf_rui(&msgbuf,&sp->tm) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tu_sec) ;
+	    serialbuf_rui(&msgbuf,&sp->tu_sec) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tu_usec) ;
+	    serialbuf_rui(&msgbuf,&sp->tu_usec) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->pid) ;
+	    serialbuf_rui(&msgbuf,&sp->pid) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->sid) ;
+	    serialbuf_rui(&msgbuf,&sp->sid) ;
 
-	    serialbuf_rushort(&msgbuf,&sp->termination) ;
+	    serialbuf_rus(&msgbuf,&sp->termination) ;
 
-	    serialbuf_rushort(&msgbuf,&sp->exit) ;
+	    serialbuf_rus(&msgbuf,&sp->exit) ;
 
-	    serialbuf_rshort(&msgbuf,&sp->utype) ;
+	    serialbuf_rs(&msgbuf,&sp->utype) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->stype) ;
+	    serialbuf_ruc(&msgbuf,&sp->stype) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->status) ;
+	    serialbuf_ruc(&msgbuf,&sp->status) ;
 
 	    serialbuf_rstrw(&msgbuf,sp->username,
 		ULMSG_LUSERNAME) ;
@@ -132,31 +132,31 @@ struct ulmsg_update	*sp ;
 
 	    sp->msgtype = ulmsgtype_update ;
 	    hdr = sp->msgtype ;
-	    serialbuf_wuint(&msgbuf,hdr) ;
+	    serialbuf_wui(&msgbuf,hdr) ;
 
-	    serialbuf_wuint(&msgbuf,sp->ts) ;
+	    serialbuf_wui(&msgbuf,sp->ts) ;
 
-	    serialbuf_wuint(&msgbuf,sp->ta) ;
+	    serialbuf_wui(&msgbuf,sp->ta) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tm) ;
+	    serialbuf_wui(&msgbuf,sp->tm) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tu_sec) ;
+	    serialbuf_wui(&msgbuf,sp->tu_sec) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tu_usec) ;
+	    serialbuf_wui(&msgbuf,sp->tu_usec) ;
 
-	    serialbuf_wuint(&msgbuf,sp->pid) ;
+	    serialbuf_wui(&msgbuf,sp->pid) ;
 
-	    serialbuf_wuint(&msgbuf,sp->sid) ;
+	    serialbuf_wui(&msgbuf,sp->sid) ;
 
-	    serialbuf_wushort(&msgbuf,sp->termination) ;
+	    serialbuf_wus(&msgbuf,sp->termination) ;
 
-	    serialbuf_wushort(&msgbuf,sp->exit) ;
+	    serialbuf_wus(&msgbuf,sp->exit) ;
 
-	    serialbuf_wshort(&msgbuf,sp->utype) ;
+	    serialbuf_ws(&msgbuf,sp->utype) ;
 
-	    serialbuf_wchar(&msgbuf,sp->stype) ;
+	    serialbuf_wc(&msgbuf,sp->stype) ;
 
-	    serialbuf_wchar(&msgbuf,sp->status) ;
+	    serialbuf_wc(&msgbuf,sp->status) ;
 
 	    serialbuf_wstrw(&msgbuf,sp->username,
 		ULMSG_LUSERNAME) ;
@@ -213,17 +213,17 @@ struct ulmsg_request	*sp ;
 
 	if (f) { /* read */
 
-	    serialbuf_ruint(&msgbuf,&hdr) ;
+	    serialbuf_rui(&msgbuf,&hdr) ;
 	    sp->msgtype = (hdr & 0xff) ;
 	    sp->msglen = (hdr >> 8) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tag) ;
+	    serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->ts) ;
+	    serialbuf_rui(&msgbuf,&sp->ts) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->expire) ;
+	    serialbuf_rui(&msgbuf,&sp->expire) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->stype) ;
+	    serialbuf_ruc(&msgbuf,&sp->stype) ;
 
 	    serialbuf_rstrw(&msgbuf,sp->username,
 		ULMSG_LUSERNAME) ;
@@ -253,15 +253,15 @@ struct ulmsg_request	*sp ;
 
 	    sp->msgtype = ulmsgtype_request ;
 	    hdr = sp->msgtype ;
-	    serialbuf_wuint(&msgbuf,hdr) ;
+	    serialbuf_wui(&msgbuf,hdr) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tag) ;
+	    serialbuf_wui(&msgbuf,sp->tag) ;
 
-	    serialbuf_wuint(&msgbuf,sp->ts) ;
+	    serialbuf_wui(&msgbuf,sp->ts) ;
 
-	    serialbuf_wuint(&msgbuf,sp->expire) ;
+	    serialbuf_wui(&msgbuf,sp->expire) ;
 
-	    serialbuf_wchar(&msgbuf,sp->stype) ;
+	    serialbuf_wc(&msgbuf,sp->stype) ;
 
 	    serialbuf_wstrw(&msgbuf,sp->username,
 		ULMSG_LUSERNAME) ;
@@ -318,37 +318,37 @@ struct ulmsg_response	*sp ;
 
 	if (f) { /* read */
 
-	    serialbuf_ruint(&msgbuf,&hdr) ;
+	    serialbuf_rui(&msgbuf,&hdr) ;
 	    sp->msgtype = (hdr & 0xff) ;
 	    sp->msglen = (hdr >> 8) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tag) ;
+	    serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->ts) ;
+	    serialbuf_rui(&msgbuf,&sp->ts) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->ta) ;
+	    serialbuf_rui(&msgbuf,&sp->ta) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tm) ;
+	    serialbuf_rui(&msgbuf,&sp->tm) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tu_sec) ;
+	    serialbuf_rui(&msgbuf,&sp->tu_sec) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tu_usec) ;
+	    serialbuf_rui(&msgbuf,&sp->tu_usec) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->pid) ;
+	    serialbuf_rui(&msgbuf,&sp->pid) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->sid) ;
+	    serialbuf_rui(&msgbuf,&sp->sid) ;
 
-	    serialbuf_rushort(&msgbuf,&sp->termination) ;
+	    serialbuf_rus(&msgbuf,&sp->termination) ;
 
-	    serialbuf_rushort(&msgbuf,&sp->exit) ;
+	    serialbuf_rus(&msgbuf,&sp->exit) ;
 
-	    serialbuf_rshort(&msgbuf,&sp->utype) ;
+	    serialbuf_rs(&msgbuf,&sp->utype) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->stype) ;
+	    serialbuf_ruc(&msgbuf,&sp->stype) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->status) ;
+	    serialbuf_ruc(&msgbuf,&sp->status) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	    serialbuf_ruc(&msgbuf,&sp->rc) ;
 
 	    serialbuf_rstrw(&msgbuf,sp->username,
 		ULMSG_LUSERNAME) ;
@@ -378,35 +378,35 @@ struct ulmsg_response	*sp ;
 
 	    sp->msgtype = ulmsgtype_request ;
 	    hdr = sp->msgtype ;
-	    serialbuf_wuint(&msgbuf,hdr) ;
+	    serialbuf_wui(&msgbuf,hdr) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tag) ;
+	    serialbuf_wui(&msgbuf,sp->tag) ;
 
-	    serialbuf_wuint(&msgbuf,sp->ts) ;
+	    serialbuf_wui(&msgbuf,sp->ts) ;
 
-	    serialbuf_wuint(&msgbuf,sp->ta) ;
+	    serialbuf_wui(&msgbuf,sp->ta) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tm) ;
+	    serialbuf_wui(&msgbuf,sp->tm) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tu_sec) ;
+	    serialbuf_wui(&msgbuf,sp->tu_sec) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tu_usec) ;
+	    serialbuf_wui(&msgbuf,sp->tu_usec) ;
 
-	    serialbuf_wuint(&msgbuf,sp->pid) ;
+	    serialbuf_wui(&msgbuf,sp->pid) ;
 
-	    serialbuf_wuint(&msgbuf,sp->sid) ;
+	    serialbuf_wui(&msgbuf,sp->sid) ;
 
-	    serialbuf_wushort(&msgbuf,sp->termination) ;
+	    serialbuf_wus(&msgbuf,sp->termination) ;
 
-	    serialbuf_wushort(&msgbuf,sp->exit) ;
+	    serialbuf_wus(&msgbuf,sp->exit) ;
 
-	    serialbuf_wshort(&msgbuf,sp->utype) ;
+	    serialbuf_ws(&msgbuf,sp->utype) ;
 
-	    serialbuf_wchar(&msgbuf,sp->stype) ;
+	    serialbuf_wc(&msgbuf,sp->stype) ;
 
-	    serialbuf_wchar(&msgbuf,sp->status) ;
+	    serialbuf_wc(&msgbuf,sp->status) ;
 
-	    serialbuf_wchar(&msgbuf,sp->rc) ;
+	    serialbuf_wc(&msgbuf,sp->rc) ;
 
 	    serialbuf_wstrw(&msgbuf,sp->username,
 		ULMSG_LUSERNAME) ;

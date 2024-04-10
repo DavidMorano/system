@@ -78,21 +78,21 @@ SRVREGE_ALL	*ep ;
 
 	if (f_read) {
 
-	    serialbuf_ruint(&msgbuf,&ep->utime) ;
+	    serialbuf_rui(&msgbuf,&ep->utime) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->stime) ;
+	    serialbuf_rui(&msgbuf,&ep->stime) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->hostid) ;
+	    serialbuf_rui(&msgbuf,&ep->hostid) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->itype) ;
+	    serialbuf_rui(&msgbuf,&ep->itype) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->pf) ;
+	    serialbuf_rui(&msgbuf,&ep->pf) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->ptype) ;
+	    serialbuf_rui(&msgbuf,&ep->ptype) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->proto) ;
+	    serialbuf_rui(&msgbuf,&ep->proto) ;
 
-	    serialbuf_ruint(&msgbuf,&ep->pid) ;
+	    serialbuf_rui(&msgbuf,&ep->pid) ;
 
 	    serialbuf_robj(&msgbuf,&ep->a,sizeof(union srvrege_addr)) ;
 
@@ -106,21 +106,21 @@ SRVREGE_ALL	*ep ;
 
 	} else {
 
-	    serialbuf_wuint(&msgbuf,ep->utime) ;
+	    serialbuf_wui(&msgbuf,ep->utime) ;
 
-	    serialbuf_wuint(&msgbuf,ep->stime) ;
+	    serialbuf_wui(&msgbuf,ep->stime) ;
 
-	    serialbuf_wuint(&msgbuf,ep->hostid) ;
+	    serialbuf_wui(&msgbuf,ep->hostid) ;
 
-	    serialbuf_wuint(&msgbuf,ep->itype) ;
+	    serialbuf_wui(&msgbuf,ep->itype) ;
 
-	    serialbuf_wuint(&msgbuf,ep->pf) ;
+	    serialbuf_wui(&msgbuf,ep->pf) ;
 
-	    serialbuf_wuint(&msgbuf,ep->ptype) ;
+	    serialbuf_wui(&msgbuf,ep->ptype) ;
 
-	    serialbuf_wuint(&msgbuf,ep->proto) ;
+	    serialbuf_wui(&msgbuf,ep->proto) ;
 
-	    serialbuf_wuint(&msgbuf,ep->pid) ;
+	    serialbuf_wui(&msgbuf,ep->pid) ;
 
 	    serialbuf_wobj(&msgbuf,&ep->a,sizeof(union srvrege_addr)) ;
 

@@ -66,16 +66,16 @@ TSE_ALL		*ep ;
 
 	if ((rs = serialbuf_start(mp,abuf,alen)) >= 0) {
 	    if (f_read) {
-	        serialbuf_ruint(mp,&ep->count) ;
-	        serialbuf_ruint(mp,&ep->utime) ;
-	        serialbuf_ruint(mp,&ep->ctime) ;
-	        serialbuf_ruint(mp,&ep->hash) ;
+	        serialbuf_rui(mp,&ep->count) ;
+	        serialbuf_rui(mp,&ep->utime) ;
+	        serialbuf_rui(mp,&ep->ctime) ;
+	        serialbuf_rui(mp,&ep->hash) ;
 	        serialbuf_rstrn(mp,ep->keyname,TSE_LKEYNAME) ;
 	    } else {
-	        serialbuf_wuint(mp,ep->count) ;
-	        serialbuf_wuint(mp,ep->utime) ;
-	        serialbuf_wuint(mp,ep->ctime) ;
-	        serialbuf_wuint(mp,ep->hash) ;
+	        serialbuf_wui(mp,ep->count) ;
+	        serialbuf_wui(mp,ep->utime) ;
+	        serialbuf_wui(mp,ep->ctime) ;
+	        serialbuf_wui(mp,ep->hash) ;
 	        serialbuf_wstrn(mp,ep->keyname,TSE_LKEYNAME) ;
 	    } /* end if */
 	    rs1 = serialbuf_finish(mp) ;
@@ -109,11 +109,11 @@ TSE_UPDATE	*ep ;
 
 	if ((rs = serialbuf_start(mp,abuf,alen)) >= 0) {
 	    if (f_read) {
-	        serialbuf_ruint(mp,&ep->count) ;
-	        serialbuf_ruint(mp,&ep->utime) ;
+	        serialbuf_rui(mp,&ep->count) ;
+	        serialbuf_rui(mp,&ep->utime) ;
 	    } else {
-	        serialbuf_wuint(mp,ep->count) ;
-	        serialbuf_wuint(mp,ep->utime) ;
+	        serialbuf_wui(mp,ep->count) ;
+	        serialbuf_wui(mp,ep->utime) ;
 	    } /* end if */
 	    rs1 = serialbuf_finish(mp) ;
 	    if (rs >= 0) rs = rs1 ;

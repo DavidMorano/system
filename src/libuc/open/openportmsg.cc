@@ -1,9 +1,8 @@
-/* openportmsg */
+/* openportmsg SUPPORT */
+/* lang=C++20 */
 
-/* message for 'openport(3dam)' support IPC */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* message for |openport(3dam)| support IPC */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,20 +17,12 @@
 /*******************************************************************************
 
         This module contains the code to make and parse the internal
-        messages to support 'openport(3dam)' IPC.
-
+        messages to support |openport(3dam)| IPC.
 
 *******************************************************************************/
 
-
-#define	MUXIMSG_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-
 #include	<usystem.h>
 #include	<stdorder.h>
 #include	<serialbuf.h>
@@ -42,12 +33,17 @@
 
 /* local defines */
 
+#define	OPM_REQ		struct openportmsg_request
+#define	OPM_RES		struct openportmsg_response
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
 
 
 /* local structures */
@@ -55,63 +51,57 @@ extern int	debugprintf(const char *,...) ;
 
 /* local variables */
 
+constexpr int		unlen = OPENPORTMSG_UNLEN ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int openportmsg_request(sp,f,mbuf,mlen)
-char			mbuf[] ;
-int			mlen ;
-int			f ;
-struct openportmsg_request	*sp ;
-{
-	SERIALBUF	msgbuf ;
+int openportmsg_request(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
 	if ((rs = serialbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
-	    uint	hdr ;
-	    int		size ;
+	    uint	hdr{} ;
+	    int		sz ;
 	    uchar	*ubp = (uchar *) &sp->sa ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_rint(&msgbuf,&sp->pf) ;
+	        serialbuf_ri(&msgbuf,&sp->pf) ;
 
-	        serialbuf_rint(&msgbuf,&sp->ptype) ;
+	        serialbuf_ri(&msgbuf,&sp->ptype) ;
 
-	        serialbuf_rint(&msgbuf,&sp->proto) ;
+	        serialbuf_ri(&msgbuf,&sp->proto) ;
 
-	        size = sizeof(struct sockaddress_inet6) ;
-	        serialbuf_rubuf(&msgbuf,ubp,size) ;
+	        sz = sizeof(SOCKADDRESS_IN6) ;
+	        serialbuf_rubuf(&msgbuf,ubp,sz) ;
 
-	        serialbuf_rstrw(&msgbuf,sp->username,USERNAMELEN) ;
+	        serialbuf_rstrw(&msgbuf,sp->username,unlen) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = openportmsgtype_request ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wint(&msgbuf,sp->pf) ;
+	        serialbuf_wi(&msgbuf,sp->pf) ;
 
-	        serialbuf_wint(&msgbuf,sp->ptype) ;
+	        serialbuf_wi(&msgbuf,sp->ptype) ;
 
-	        serialbuf_wint(&msgbuf,sp->proto) ;
+	        serialbuf_wi(&msgbuf,sp->proto) ;
 
-	        size = sizeof(struct sockaddress_inet6) ;
-	        rs1 = serialbuf_wubuf(&msgbuf,ubp,size) ;
+	        sz = sizeof(SOCKADDRESS_IN6) ;
+	        serialbuf_wubuf(&msgbuf,ubp,sz) ;
 
-#if	CF_DEBUGS
-	        debugprintf("openportmsg_request: serialbuf_wubuf() rs=%d\n",
-	            rs1) ;
-#endif
-
-	        serialbuf_wstrw(&msgbuf,sp->username,USERNAMELEN) ;
+	        serialbuf_wstrw(&msgbuf,sp->username,unlen) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -128,36 +118,30 @@ struct openportmsg_request	*sp ;
 }
 /* end subroutine (openportmsg_request) */
 
-
 /* general response message */
-int openportmsg_response(sp,f,mbuf,mlen)
-char			mbuf[] ;
-int			mlen ;
-int			f ;
-struct openportmsg_response	*sp ;
-{
-	SERIALBUF	msgbuf ;
+int openportmsg_response(OPM_RES *sp,int f,char *mbuf,int mlen) noex {
+	serialbuf	msgbuf ;
 	int		rs ;
 	int		rs1 ;
 
 	if ((rs = serialbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
-	    uint	hdr ;
+	    uint	hdr{} ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_rint(&msgbuf,&sp->rs) ;
+	        serialbuf_ri(&msgbuf,&sp->rs) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = openportmsgtype_response ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wint(&msgbuf,sp->rs) ;
+	        serialbuf_wi(&msgbuf,sp->rs) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;

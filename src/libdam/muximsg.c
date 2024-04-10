@@ -72,27 +72,27 @@ struct muximsg_response	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->pid) ;
+	        serialbuf_rui(&msgbuf,&sp->pid) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_response ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->pid) ;
+	        serialbuf_wui(&msgbuf,sp->pid) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -125,19 +125,19 @@ struct muximsg_noop	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_noop ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -170,11 +170,11 @@ struct muximsg_passfd	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->svc,MUXIMSG_SVCLEN) ;
 
@@ -182,11 +182,11 @@ struct muximsg_passfd	*sp ;
 
 	        sp->msgtype = muximsgtype_passfd ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wchar(&msgbuf,sp->msgtype) ;
+	        serialbuf_wc(&msgbuf,sp->msgtype) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->svc,MUXIMSG_SVCLEN) ;
 
@@ -221,11 +221,11 @@ struct muximsg_exit	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->reason,MUXIMSG_REASONLEN) ;
 
@@ -233,9 +233,9 @@ struct muximsg_exit	*sp ;
 
 	        sp->msgtype = muximsgtype_exit ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->reason,MUXIMSG_REASONLEN) ;
 
@@ -270,19 +270,19 @@ struct muximsg_getsysmisc	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_getsysmisc ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -315,43 +315,43 @@ struct muximsg_sysmisc	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_1min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_1min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_5min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_5min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_15min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_15min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->boottime) ;
+	        serialbuf_rui(&msgbuf,&sp->boottime) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->nproc) ;
+	        serialbuf_rui(&msgbuf,&sp->nproc) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_sysmisc ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_1min) ;
+	        serialbuf_wui(&msgbuf,sp->la_1min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_5min) ;
+	        serialbuf_wui(&msgbuf,sp->la_5min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_15min) ;
+	        serialbuf_wui(&msgbuf,sp->la_15min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->boottime) ;
+	        serialbuf_wui(&msgbuf,sp->boottime) ;
 
-	        serialbuf_wuint(&msgbuf,sp->nproc) ;
+	        serialbuf_wui(&msgbuf,sp->nproc) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -384,19 +384,19 @@ struct muximsg_getloadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_getloadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -429,35 +429,35 @@ struct muximsg_loadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_1min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_1min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_5min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_5min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_15min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_15min) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_loadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_1min) ;
+	        serialbuf_wui(&msgbuf,sp->la_1min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_5min) ;
+	        serialbuf_wui(&msgbuf,sp->la_5min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_15min) ;
+	        serialbuf_wui(&msgbuf,sp->la_15min) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -490,55 +490,55 @@ struct muximsg_reploadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->utag) ;
+	        serialbuf_rui(&msgbuf,&sp->utag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->duration) ;
+	        serialbuf_rui(&msgbuf,&sp->duration) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->interval) ;
+	        serialbuf_rui(&msgbuf,&sp->interval) ;
 
-	        serialbuf_rushort(&msgbuf,&sp->addrfamily) ;
+	        serialbuf_rus(&msgbuf,&sp->addrfamily) ;
 
-	        serialbuf_rushort(&msgbuf,&sp->addrport) ;
+	        serialbuf_rus(&msgbuf,&sp->addrport) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[0]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[0]) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[1]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[1]) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[2]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[2]) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[3]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[3]) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_reploadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->utag) ;
+	        serialbuf_wui(&msgbuf,sp->utag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->duration) ;
+	        serialbuf_wui(&msgbuf,sp->duration) ;
 
-	        serialbuf_wuint(&msgbuf,sp->interval) ;
+	        serialbuf_wui(&msgbuf,sp->interval) ;
 
-	        serialbuf_wushort(&msgbuf,sp->addrfamily) ;
+	        serialbuf_wus(&msgbuf,sp->addrfamily) ;
 
-	        serialbuf_wushort(&msgbuf,sp->addrport) ;
+	        serialbuf_wus(&msgbuf,sp->addrport) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[0]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[0]) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[1]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[1]) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[2]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[2]) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[4]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[4]) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -571,23 +571,23 @@ struct muximsg_getlistener	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->idx) ;
+	        serialbuf_rui(&msgbuf,&sp->idx) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_getlistener ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->idx) ;
+	        serialbuf_wui(&msgbuf,sp->idx) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -620,19 +620,19 @@ struct muximsg_listener	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->idx) ;
+	        serialbuf_rui(&msgbuf,&sp->idx) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->pid) ;
+	        serialbuf_rui(&msgbuf,&sp->pid) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->ls) ;
+	        serialbuf_ruc(&msgbuf,&sp->ls) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->name,MUXIMSG_LNAMELEN) ;
 
@@ -642,17 +642,17 @@ struct muximsg_listener	*sp ;
 
 	        sp->msgtype = muximsgtype_listener ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->idx) ;
+	        serialbuf_wui(&msgbuf,sp->idx) ;
 
-	        serialbuf_wuint(&msgbuf,sp->pid) ;
+	        serialbuf_wui(&msgbuf,sp->pid) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->ls) ;
+	        serialbuf_wuc(&msgbuf,sp->ls) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->name,MUXIMSG_LNAMELEN) ;
 
@@ -689,19 +689,19 @@ struct muximsg_mark	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_mark ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -734,7 +734,7 @@ struct muximsg_unknown	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
@@ -742,7 +742,7 @@ struct muximsg_unknown	*sp ;
 
 	        sp->msgtype = muximsgtype_unknown ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -775,23 +775,23 @@ struct muximsg_gethelp	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->idx) ;
+	        serialbuf_rui(&msgbuf,&sp->idx) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = muximsgtype_gethelp ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->idx) ;
+	        serialbuf_wui(&msgbuf,sp->idx) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
@@ -824,17 +824,17 @@ struct muximsg_help	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->idx) ;
+	        serialbuf_rui(&msgbuf,&sp->idx) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->pid) ;
+	        serialbuf_rui(&msgbuf,&sp->pid) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->name,MUXIMSG_LNAMELEN) ;
 
@@ -842,15 +842,15 @@ struct muximsg_help	*sp ;
 
 	        sp->msgtype = muximsgtype_help ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->idx) ;
+	        serialbuf_wui(&msgbuf,sp->idx) ;
 
-	        serialbuf_wuint(&msgbuf,sp->pid) ;
+	        serialbuf_wui(&msgbuf,sp->pid) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->name,MUXIMSG_LNAMELEN) ;
 
@@ -885,11 +885,11 @@ struct muximsg_cmd	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->cmd,MUXIMSG_CMDLEN) ;
 
@@ -897,9 +897,9 @@ struct muximsg_cmd	*sp ;
 
 	        sp->msgtype = muximsgtype_cmd ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->cmd,MUXIMSG_CMDLEN) ;
 

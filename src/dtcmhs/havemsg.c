@@ -76,13 +76,13 @@ struct havemsg_request	*sp ;
 
 	if (f) { /* read */
 
-	    serialbuf_ruchar(&msgbuf,&sp->type) ;
+	    serialbuf_ruc(&msgbuf,&sp->type) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->seq) ;
+	    serialbuf_ruc(&msgbuf,&sp->seq) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tag) ;
+	    serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	    serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
 	    serialbuf_rstrw(&msgbuf,sp->calendar,HAVEMSG_LCALENDAR) ;
 
@@ -90,13 +90,13 @@ struct havemsg_request	*sp ;
 
 	    sp->type = havemsgtype_request ;
 
-	    serialbuf_wchar(&msgbuf,sp->type) ;
+	    serialbuf_wc(&msgbuf,sp->type) ;
 
-	    serialbuf_wchar(&msgbuf,sp->seq) ;
+	    serialbuf_wc(&msgbuf,sp->seq) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tag) ;
+	    serialbuf_wui(&msgbuf,sp->tag) ;
 
-	    serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	    serialbuf_wui(&msgbuf,sp->timestamp) ;
 
 	    serialbuf_wstrw(&msgbuf,sp->calendar,HAVEMSG_LCALENDAR) ;
 
@@ -125,33 +125,33 @@ struct havemsg_report	*sp ;
 
 	if (f) { /* read */
 
-	    serialbuf_ruchar(&msgbuf,&sp->type) ;
+	    serialbuf_ruc(&msgbuf,&sp->type) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->seq) ;
+	    serialbuf_ruc(&msgbuf,&sp->seq) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tag) ;
+	    serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	    serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
 	    serialbuf_rstrw(&msgbuf,sp->calendar,HAVEMSG_LCALENDAR) ;
 
-	    serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	    serialbuf_ruc(&msgbuf,&sp->rc) ;
 
 	} else { /* write */
 
 	    sp->type = havemsgtype_request ;
 
-	    serialbuf_wchar(&msgbuf,sp->type) ;
+	    serialbuf_wc(&msgbuf,sp->type) ;
 
-	    serialbuf_wchar(&msgbuf,sp->seq) ;
+	    serialbuf_wc(&msgbuf,sp->seq) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tag) ;
+	    serialbuf_wui(&msgbuf,sp->tag) ;
 
-	    serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	    serialbuf_wui(&msgbuf,sp->timestamp) ;
 
 	    serialbuf_wstrw(&msgbuf,sp->calendar,HAVEMSG_LCALENDAR) ;
 
-	    serialbuf_wchar(&msgbuf,sp->rc) ;
+	    serialbuf_wc(&msgbuf,sp->rc) ;
 
 	} /* end if */
 

@@ -1750,19 +1750,19 @@ struct srvreg_filehead	*hp ;
 
 	if (f_read) { /* read */
 
-	    serialbuf_ruint(&msgbuf,&hp->wcount) ;
+	    serialbuf_rui(&msgbuf,&hp->wcount) ;
 
-	    serialbuf_ruint(&msgbuf,&hp->wtime) ;
+	    serialbuf_rui(&msgbuf,&hp->wtime) ;
 
-	    serialbuf_ruint(&msgbuf,&hp->nentries) ;
+	    serialbuf_rui(&msgbuf,&hp->nentries) ;
 
 	} else { /* write */
 
-	    serialbuf_wuint(&msgbuf,hp->wcount) ;
+	    serialbuf_wui(&msgbuf,hp->wcount) ;
 
-	    serialbuf_wuint(&msgbuf,hp->wtime) ;
+	    serialbuf_wui(&msgbuf,hp->wtime) ;
 
-	    serialbuf_wuint(&msgbuf,hp->nentries) ;
+	    serialbuf_wui(&msgbuf,hp->nentries) ;
 
 	} /* end if */
 
