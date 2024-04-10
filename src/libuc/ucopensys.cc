@@ -22,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -100,7 +99,7 @@ static constexpr cpcchar	sysnames[] = {
 	"userattr",
 	"banner",
 	"bandate",
-	NULL
+	nullptr
 } ;
 
 static constexpr int	whiches[] = {
@@ -139,7 +138,7 @@ int uc_opensys(cc *fname,int of,mode_t om,mainv envv,int to,int opts) noex {
 
 /* take off the '/sys' componenent */
 
-	if ((tp = strpbrk(fname,"/­")) != NULL) {
+	if ((tp = strpbrk(fname,"/­")) != nullptr) {
 	    fl = (tp-fname) ;
 	}
 
@@ -197,9 +196,9 @@ static int isRealName(cchar *fname,int fl) noex {
 	if ((cl = sfbasename(fname,fl,&cp)) > 0) {
 	    cchar	*suf = IPASSWD_SUF ;
 	    cchar	*tp ;
-	    if ((tp = strnrchr(cp,cl,'.')) != NULL) {
-		const int	w = sysname_realname ;
-		const int	suflen = strlen(suf) ;
+	    if ((tp = strnrchr(cp,cl,'.')) != nullptr) {
+		cint	w = sysname_realname ;
+		cint	suflen = strlen(suf) ;
 		if (strncmp((tp+1),suf,suflen) == 0) {
 		    cchar	*rn = sysnames[w] ;
 		    if (strwcmp(rn,cp,(tp-cp)) == 0) {

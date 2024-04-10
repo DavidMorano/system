@@ -46,7 +46,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<unistd.h>
@@ -92,19 +91,19 @@ int opensockaddr(int pf,int st,int proto,SOCKADDR *sap,int to) noex {
 	if (sap) {
 	    rs = SR_INVALID ;
 	    if ((pf >= 0) && (st >= 0) && (proto >= 0)) {
-	        if ((rs = u_socket(pf,st,proto)) >= 0) {
-	            SOCKADDRESS	*saddrp = (SOCKADDRESS *) sap ;
+	        if ((rs = uc_socket(pf,st,proto)) >= 0) {
+	            sockaddress		*saddrp = (sockaddress *) sap ;
 	            fd = rs ;
 	            if ((rs = sockaddress_getlen(saddrp)) > 0) {
 	                cint	sal = rs ;
 	                if (to >= 0) {
 	                    rs = uc_connecte(fd,sap,sal,to) ;
 	                } else {
-	                    rs = u_connect(fd,sap,sal) ;
+	                    rs = uc_connect(fd,sap,sal) ;
 	                }
 	            } /* end if (sockaddress_getlen) */
 	            if ((rs < 0) && (fd >= 0)) {
-	                u_close(fd) ;
+	                uc_close(fd) ;
 	            }
 	        } /* end if (u_socket) */
 	    } /* end if (valid) */
