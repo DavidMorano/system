@@ -867,6 +867,10 @@ ucsysauxinfo.o:		ucsysauxinfo.dir
 ucsysauxinfo.dir:
 	makesubdir $@
 
+open.o:			open.dir
+open.dir:
+	makesubdir $@
+
 dial.o:			dial.dir
 dial.dir:
 	makesubdir $@
