@@ -23,15 +23,16 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 
-#include	<ucenumgr.h>
-#include	<ucenumho.h>
-#include	<ucenumnw.h>
-#include	<ucenumpj.h>
-#include	<ucenumpr.h>
 #include	<ucenumpw.h>
 #include	<ucenumsp.h>
-#include	<ucenumsv.h>
 #include	<ucenumua.h>
+#include	<ucenumgr.h>
+#include	<ucenumpj.h>
+
+#include	<ucenumpr.h>
+#include	<ucenumnw.h>
+#include	<ucenumho.h>
+#include	<ucenumsv.h>
 
 
 #endif /* UCENUM_INCLUDE */
