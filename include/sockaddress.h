@@ -34,11 +34,12 @@
 
 #define	SOCKADDRESS_LEN		sizeof(union sockaddress_head)
 #define	SOCKADDRESS_NAMELEN	sizeof(union sockaddress_head)
+#define	SOCKADDRESS_MAXPATH	MAXPATHLEN
 
 
 struct sockaddress_path {
 	ushort	naf ;			/* address space */
-	char	path[MAXPATHLEN + 1] ;
+	char	path[SOCKADDRESS_MAXPATH + 1] ;
 } ;
 
 struct sockaddress_inet4 {
