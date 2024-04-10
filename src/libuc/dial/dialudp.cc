@@ -47,7 +47,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
@@ -76,6 +75,10 @@
 
 #define	PROTONAME	"udp"
 
+#ifndef	CF_PROTO
+#define	CF_PROTO	0		/* lookup protocol name */
+#endif
+
 
 /* external subroutines */
 
@@ -103,6 +106,8 @@ static constexpr int	pfs[] = {
 	0
 } ;
 
+constexpr bool		f_proto = CF_PROTO ;
+
 
 /* exported subroutines */
 
@@ -124,27 +129,21 @@ int dialudp(cchar *hostname,cchar *portspec,int af,int to,int) noex {
 static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	ADDRINFO	hint{} ;
 	int		rs = SR_OK ;
-
-#if	CF_PROTO
-	{
+	if constexpr (f_proto) {
 	    int		rs ;
 	    cchar	*pn = PROTONAME ;
 	    if ((rs = getproto_name(pn,-1)) >= 0) {
 	        hint.ai_protocol = rs ;
 	    }
-	}
-#else
-	hint.ai_protocol = IPPROTO_UDP ;
-#endif /* CF_PROTO */
-
+	} else {
+	    hint.ai_protocol = IPPROTO_UDP ;
+	} /* end if-constexpr (f_proto) */
 	if ((rs >= 0) && (af > 0)) {
 	    if ((rs = getprotofamily(af)) >= 0) {
 	        hint.ai_family = rs ; /* PF */
 	    }
 	}
-
 /* do the spin */
-
 	if (rs >= 0) {
 	    if (hint.ai_family == PF_UNSPEC) {
 	        rs = SR_NOTCONN ;
@@ -157,7 +156,6 @@ static int opendialudp(int af,cchar *hostname,cchar *portspec,int to) noex {
 	        rs = opendialudp_hint(&hint,hostname,portspec,to) ;
 	    }
 	} /* end if (ok) */
-
 	return rs ;
 }
 /* end subroutine (opendialudp) */

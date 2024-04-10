@@ -26,11 +26,11 @@
 	protocol and the optional TCP port specified.
 
 	Synopsis:
-	int dialtcp(cc *hostname,cc *portspec,int af,int to,int opts) noex
+	int dialtcp(cc *hn,cc *ps,int af,int to,int opts) noex
 
 	Arguments:
-	hostname	host to dial to
-	portspec	port specification to use
+	hn		host to dial to
+	ps		port specification to use
 	af		address family
 	to		to ('>0' means use one, '-1' means don't)
 	opts		any dial options
@@ -67,8 +67,8 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<csignal>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<usystem.h>
 #include	<hostinfo.h>
@@ -103,6 +103,12 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 extern "C" {
@@ -124,9 +130,9 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	cchar		*hostname ;
-	cchar		*portspec ;
-	cchar		*protoname ;
+	cchar		*hn ;
+	cchar		*ps ;
+	cchar		*pn ;
 	SUBINFO_FL	f ;
 	int		count ;
 	int		type ;
@@ -170,17 +176,16 @@ constexpr bool		f_proto = CF_PROTO ;
 
 /* exported subroutines */
 
-/* ARGSUSED */
-int dialtcp(cchar *hostname,cchar *portspec,int af,int to,int opts) noex {
+int dialtcp(cchar *hn,cchar *ps,int af,int to,int opts) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if (hostname && portspec) {
+	if (hn && ps) {
 	    rs = SR_INVALID ;
-	    if (hostname[0] && portspec[0]) {
+	    if (hn[0] && ps[0]) {
 	        SUBINFO		si, *sip = &si ;
 	        if (to == 0) to = 1 ;
-	        if ((rs = subinfo_start(sip,hostname,portspec,to)) >= 0) {
+	        if ((rs = subinfo_start(sip,hn,ps,to)) >= 0) {
 	            if ((rs = subinfo_proto(sip)) >= 0) {
 	                if ((rs = subinfo_svc(sip)) >= 0) {
 	                    if ((rs = subinfo_addr(sip,af)) >= 0) {
@@ -214,9 +219,9 @@ static int subinfo_start(SUBINFO *sip,cchar *hn,cchar *ps,int to) noex {
 	if (sip) {
 	    rs = SR_OK ;
 	    memclear(sip) ;
-	    sip->hostname = hn ;
-	    sip->portspec = ps ;
-	    sip->protoname = PROTONAME ;
+	    sip->hn = hn ;
+	    sip->ps = ps ;
+	    sip->pn = PROTONAME ;
 	    sip->type = SOCK_STREAM ;
 	    sip->to = to ;
 	} /* end if (non-null) */
@@ -236,8 +241,7 @@ static int subinfo_finish(SUBINFO *sip) noex {
 static int subinfo_proto(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	if constexpr (f_proto) {
-	    int		rs ;
-	    cchar	*pn = sip->protoname ;
+	    cchar	*pn = sip->pn ;
 	    if ((rs = getproto_name(pn,-1)) >= 0) {
 	        sip->proto = rs ;
 	    }
@@ -250,8 +254,8 @@ static int subinfo_proto(SUBINFO *sip) noex {
 
 static int subinfo_svc(SUBINFO *sip) noex {
 	int		rs ;
-	cchar		*pn = sip->protoname ;
-	cchar		*ps = sip->portspec ;
+	cchar		*pn = sip->pn ;
+	cchar		*ps = sip->ps ;
 	if ((rs = getportnum(pn,ps)) >= 0) {
 	    sip->port = rs ;
 	}
@@ -262,7 +266,7 @@ static int subinfo_svc(SUBINFO *sip) noex {
 static int subinfo_addr(SUBINFO *sip,int af) noex {
 	cint		addrlen = ADDRBUFLEN ;
 	int		rs ;
-	cchar		*hn = sip->hostname ;
+	cchar		*hn = sip->hn ;
 	if ((rs = inetpton(sip->addrbuf,addrlen,af,hn,-1)) >= 0) {
 	    af = rs ;
 	    sip->f.address = true ;
@@ -328,7 +332,7 @@ static int try_inet4(SUBINFO *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = hostinfo_start(&hi,af,sip->hostname)) >= 0) {
+	if ((rs = hostinfo_start(&hi,af,sip->hn)) >= 0) {
 	    sockaddress	server ;
 	    cint	pf = PF_INET4 ;
 	    uchar	da[2] = {} ; /* dummy address */
@@ -375,7 +379,7 @@ static int try_inet6(SUBINFO *sip) noex {
 	int		flags ;
 	int		fd = -1 ;
 	flags = AI_ADDRCONFIG ;
-	if ((rs = uc_getipnodebyname(&hep,sip->hostname,af,flags)) >= 0) {
+	if ((rs = uc_getipnodebyname(&hep,sip->hn,af,flags)) >= 0) {
 	    sockaddress	server ;
 	    cint	pf = PF_INET6 ;
 	    uchar	dummy[2] = {} ;
@@ -454,8 +458,8 @@ static int try_inet(SUBINFO *sip) noex {
 /* do the spin */
 	if (rs >= 0) {
 	    hostaddr	ha ;
-	    cchar	*hn = sip->hostname ;
-	    cchar	*ps = sip->portspec ;
+	    cchar	*hn = sip->hn ;
+	    cchar	*ps = sip->ps ;
 	    if ((rs = hostaddr_start(&ha,hn,ps,&hint)) >= 0) {
 	        hostaddr_cur	cur ;
 	        if ((rs = hostaddr_curbegin(&ha,&cur)) >= 0) {
@@ -496,9 +500,7 @@ static int subinfo_makeconn(SUBINFO *sip,int pf,SOCKADDR *sap) noex {
 	cint	st = sip->type ;
 	cint	proto = sip->proto ;
 	cint	to = sip->to ;
-	int	rs ;
-	rs = opensockaddr(pf,st,proto,sap,to) ;
-	return rs ;
+	return opensockaddr(pf,st,proto,sap,to) ;
 }
 /* end subroutine (subinfo_makeconn) */
 
