@@ -133,12 +133,12 @@ int opendial(int di,int af,cc *hn,cc *ps,cc *svc,
 	        case opendialer_open:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
-	            rs = uc_openenv(cp,of,0666,ev,to) ;
+	            rs = uc_openenv(cp,of,om,ev,to) ;
 	            break ;
 	        case opendialer_prog:
 	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
-	            rs = dialprog(cp,oflags,av,ev,np) ;
+	            rs = dialprog(cp,of,av,ev,np) ;
 	            break ;
 	        case opendialer_finger:
 	            rs = dialfinger(hn,ps,af,svc,av,to,opts) ;

@@ -24,6 +24,7 @@
 #include	<clanguage.h>
 
 #include	<dialopts.h>
+#include	<dialuss.h>
 #include	<dialudp.h>
 #include	<dialtcp.h>
 #include	<dialcprog.h>
@@ -37,6 +38,9 @@ extern int dialusd(cchar *,int,int) noex ;
 extern int dialussmux(cchar *,cchar *,mainv,int,int) noex ;
 extern int dialussnls(cchar *,cchar *,int,int) noex ;
 extern int dialpass(cchar *,int,int) noex ;
+extern int dialticotsord(cchar *,int,int,int) noex ;
+extern int dialticotsordmux(cc *,int,cc *,mainv,int,int) noex ;
+extern int dialticotsordnls(cc *,int,cc *,int,int) noex ;
 
 EXTERNC_end
 

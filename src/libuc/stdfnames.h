@@ -42,8 +42,8 @@
 #define	STDFNLOG	stdfnames[stdfile_log]
 #endif
 
-#ifndef	STDFNNUL
-#define	STDFNNUL	stdfnames[stdfile_null]
+#ifndef	STDFNNULL
+#define	STDFNNULL	stdfnames[stdfile_null]
 #endif
 
 
