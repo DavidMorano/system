@@ -1,7 +1,7 @@
 /* getserial HEADER */
 /* lang=C++20 */
 
-/* get the serial number for logging references */
+/* get a (system-wide) serial number from a file */
 /* version %I% last-modified %G% */
 
 
@@ -45,7 +45,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -59,16 +58,12 @@
 #include	<cfnum.h>
 #include	<ctdec.h>
 #include	<isnot.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"getserial.h"
 
 
 /* local defines */
-
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
 
 #define	DEFSERIAL	"/tmp/serial"
 #define	FILEMODE	0666
@@ -125,7 +120,9 @@ int getserial(cchar *sfname) noex {
 	int		rs ;
 	int		rs1 ;
 	int		serial = 0 ;
-	if ((sfname == NULL) || (sfname[0] == '\0')) sfname = DEFSERIAL ;
+	if ((sfname == nullptr) || (sfname[0] == '\0')) {
+		sfname = DEFSERIAL ;
+	}
 	if ((rs = getserial_open(sfname)) >= 0) {
 	    cint	fd = rs ;
 	    if ((rs = lockfile(fd,F_LOCK,0L,0L,TO_LOCK)) >= 0) {
@@ -136,10 +133,9 @@ int getserial(cchar *sfname) noex {
 	            rs = getserial_write(fd,dbuf,dlen,serial) ;
 	        }
 	    } /* end if (lockfile) */
-	    rs1 = u_close(fd) ;
+	    rs1 = uc_close(fd) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (opened successfully) */
-
 	return (rs >= 0) ? serial : rs ;
 }
 /* end subroutine (getserial) */
@@ -165,7 +161,7 @@ static int getserial_open(cchar *sfname) noex {
 	        fd = rs ;
 	        if ((rs = uc_fminmod(fd,m)) >= 0) {
 	            cint	cmd = _PC_CHOWN_RESTRICTED ;
-	            if ((rs = u_fpathconf(fd,cmd,NULL)) == 0) {
+	            if ((rs = u_fpathconf(fd,cmd,nullptr)) == 0) {
 	                USTAT	sb ;
 	                cchar	*cp{} ;
 	                if (int cl ; (cl = sfdirname(sfname,-1,&cp)) > 0) {
@@ -213,7 +209,7 @@ static int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	    if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) {
 	        dbuf[rs++] = '\n' ;
 	        if ((rs = u_write(fd,dbuf,rs)) >= 0) {
-	            const off_t	uoff = off_t(rs) ;
+	            coff	uoff = off_t(rs) ;
 	            rs = uc_ftruncate(fd,uoff) ;
 	        }
 	    } /* end if (ctdeci) */

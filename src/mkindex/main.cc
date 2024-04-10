@@ -1093,21 +1093,24 @@ static int hashinfo_begin(HASHINFO *hip,PROGINFO *pip,int hashn,cc *ifn) noex {
 	    if ((rs = mktmpfile(postfname,0660,tf)) >= 0) {
 	        cint	of = (O_RDWR | O_CREAT) ;
 	        if ((rs = uc_mallocstrw(postfname,rs,&cp)) >= 0) {
+		    cmode	om = 0660 ;
 	            hip->postfname = cp ;
-	            if ((rs = memfile_open(&hip->mf,postfname,of,0660)) >= 0) {
+	            if ((rs = memfile_open(&hip->mf,postfname,of,om)) >= 0) {
 	                char	tmpfname[MAXPATHLEN+1] ;
 	                mkfnamesuf1(tmpfname,ifn,"nnames") ;
-	                rs = bopen(&hip->namefile,tmpfname,"wct",0666) ;
-	                if (rs < 0)
+	                rs = bopen(&hip->namefile,tmpfname,"wct",om) ;
+	                if (rs < 0) {
 	                    memfile_close(&hip->mf) ;
+			}
 	            }
 	            if (rs < 0) {
 	                uc_free(hip->postfname) ;
 	                hip->postfname = nullptr ;
 	            }
 	        }
-	        if (rs < 0)
+	        if (rs < 0) {
 	            uc_unlink(postfname) ;
+		}
 	    }
 	    if (rs < 0) {
 	        uc_free(hip->hasha) ;

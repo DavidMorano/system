@@ -74,59 +74,59 @@ struct sysmisc_request	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->duration) ;
+	        serialbuf_rui(&msgbuf,&sp->duration) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->interval) ;
+	        serialbuf_rui(&msgbuf,&sp->interval) ;
 
-	        serialbuf_rushort(&msgbuf,&sp->addrfamily) ;
+	        serialbuf_rus(&msgbuf,&sp->addrfamily) ;
 
-	        serialbuf_rushort(&msgbuf,&sp->addrport) ;
+	        serialbuf_rus(&msgbuf,&sp->addrport) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[0]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[0]) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[1]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[1]) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[2]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[2]) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->addrhost[3]) ;
+	        serialbuf_rui(&msgbuf,&sp->addrhost[3]) ;
 
-	        serialbuf_rushort(&msgbuf,&sp->opts) ;
+	        serialbuf_rus(&msgbuf,&sp->opts) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sysmisctype_request ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->duration) ;
+	        serialbuf_wui(&msgbuf,sp->duration) ;
 
-	        serialbuf_wuint(&msgbuf,sp->interval) ;
+	        serialbuf_wui(&msgbuf,sp->interval) ;
 
-	        serialbuf_wushort(&msgbuf,sp->addrfamily) ;
+	        serialbuf_wus(&msgbuf,sp->addrfamily) ;
 
-	        serialbuf_wushort(&msgbuf,sp->addrport) ;
+	        serialbuf_wus(&msgbuf,sp->addrport) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[0]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[0]) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[1]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[1]) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[2]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[2]) ;
 
-	        serialbuf_wuint(&msgbuf,sp->addrhost[3]) ;
+	        serialbuf_wui(&msgbuf,sp->addrhost[3]) ;
 
-	        serialbuf_wushort(&msgbuf,sp->opts) ;
+	        serialbuf_wus(&msgbuf,sp->opts) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -155,51 +155,51 @@ struct sysmisc_loadave	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	        serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->providerid) ;
+	        serialbuf_rui(&msgbuf,&sp->providerid) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->hostid) ;
+	        serialbuf_rui(&msgbuf,&sp->hostid) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_1min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_1min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_5min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_5min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_15min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_15min) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sysmisctype_loadave ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
-	        serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	        serialbuf_wui(&msgbuf,sp->timestamp) ;
 
-	        serialbuf_wuint(&msgbuf,sp->providerid) ;
+	        serialbuf_wui(&msgbuf,sp->providerid) ;
 
-	        serialbuf_wuint(&msgbuf,sp->hostid) ;
+	        serialbuf_wui(&msgbuf,sp->hostid) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_1min) ;
+	        serialbuf_wui(&msgbuf,sp->la_1min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_5min) ;
+	        serialbuf_wui(&msgbuf,sp->la_5min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_15min) ;
+	        serialbuf_wui(&msgbuf,sp->la_15min) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -228,59 +228,59 @@ struct sysmisc_extra	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	        serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->providerid) ;
+	        serialbuf_rui(&msgbuf,&sp->providerid) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->hostid) ;
+	        serialbuf_rui(&msgbuf,&sp->hostid) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_1min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_1min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_5min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_5min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_15min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_15min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->boottime) ;
+	        serialbuf_rui(&msgbuf,&sp->boottime) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->nproc) ;
+	        serialbuf_rui(&msgbuf,&sp->nproc) ;
 
 	    } else { /* write */
 
 	        sp->msgtype = sysmisctype_extra ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
-	        serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	        serialbuf_wui(&msgbuf,sp->timestamp) ;
 
-	        serialbuf_wuint(&msgbuf,sp->providerid) ;
+	        serialbuf_wui(&msgbuf,sp->providerid) ;
 
-	        serialbuf_wuint(&msgbuf,sp->hostid) ;
+	        serialbuf_wui(&msgbuf,sp->hostid) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_1min) ;
+	        serialbuf_wui(&msgbuf,sp->la_1min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_5min) ;
+	        serialbuf_wui(&msgbuf,sp->la_5min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_15min) ;
+	        serialbuf_wui(&msgbuf,sp->la_15min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->boottime) ;
+	        serialbuf_wui(&msgbuf,sp->boottime) ;
 
-	        serialbuf_wuint(&msgbuf,sp->nproc) ;
+	        serialbuf_wui(&msgbuf,sp->nproc) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -310,33 +310,33 @@ struct sysmisc_hostinfo	*sp ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruchar(&msgbuf,&sp->rc) ;
+	        serialbuf_ruc(&msgbuf,&sp->rc) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->timestamp) ;
+	        serialbuf_rui(&msgbuf,&sp->timestamp) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->providerid) ;
+	        serialbuf_rui(&msgbuf,&sp->providerid) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->hostid) ;
+	        serialbuf_rui(&msgbuf,&sp->hostid) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_1min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_1min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_5min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_5min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->la_15min) ;
+	        serialbuf_rui(&msgbuf,&sp->la_15min) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->boottime) ;
+	        serialbuf_rui(&msgbuf,&sp->boottime) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->nproc) ;
+	        serialbuf_rui(&msgbuf,&sp->nproc) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->provider,SYSMISC_PROVIDERLEN) ;
 
-	        serialbuf_rushort(&msgbuf,&sp->hostnamelen) ;
+	        serialbuf_rus(&msgbuf,&sp->hostnamelen) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->hostname,(MAXHOSTNAMELEN - 1)) ;
 
@@ -344,29 +344,29 @@ struct sysmisc_hostinfo	*sp ;
 
 	        sp->msgtype = sysmisctype_hostinfo ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->msgtype) ;
+	        serialbuf_wuc(&msgbuf,sp->msgtype) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuchar(&msgbuf,sp->rc) ;
+	        serialbuf_wuc(&msgbuf,sp->rc) ;
 
-	        serialbuf_wuint(&msgbuf,sp->timestamp) ;
+	        serialbuf_wui(&msgbuf,sp->timestamp) ;
 
-	        serialbuf_wuint(&msgbuf,sp->providerid) ;
+	        serialbuf_wui(&msgbuf,sp->providerid) ;
 
-	        serialbuf_wuint(&msgbuf,sp->hostid) ;
+	        serialbuf_wui(&msgbuf,sp->hostid) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_1min) ;
+	        serialbuf_wui(&msgbuf,sp->la_1min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_5min) ;
+	        serialbuf_wui(&msgbuf,sp->la_5min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->la_15min) ;
+	        serialbuf_wui(&msgbuf,sp->la_15min) ;
 
-	        serialbuf_wuint(&msgbuf,sp->boottime) ;
+	        serialbuf_wui(&msgbuf,sp->boottime) ;
 
-	        serialbuf_wuint(&msgbuf,sp->nproc) ;
+	        serialbuf_wui(&msgbuf,sp->nproc) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->provider,
 	            SYSMISC_PROVIDERLEN) ;
@@ -375,13 +375,13 @@ struct sysmisc_hostinfo	*sp ;
 	        if (hostnamelen < 0)
 	            hostnamelen = strlen(sp->hostname) ;
 
-	        serialbuf_wushort(&msgbuf,hostnamelen) ;
+	        serialbuf_wus(&msgbuf,hostnamelen) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->hostname,hostnamelen) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

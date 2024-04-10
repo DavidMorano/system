@@ -691,7 +691,7 @@ static int fmq_isend(FMQ *op,const void *buf,int buflen,int opts)
 
 /* prepare the message header (the length) */
 
-	llen = stdorder_wuint(lenbuf,buflen) ;
+	llen = stdorder_wui(lenbuf,buflen) ;
 
 /* can we even write this message? */
 
@@ -922,7 +922,7 @@ static int fmq_irecv(FMQ *op,void *buf,int buflen,int opts)
 	if (rs >= llen) {
 
 	    tlen = rs - llen ;
-	    stdorder_ruint(lenbuf,&mlen) ;
+	    stdorder_rui(lenbuf,&mlen) ;
 
 #if	CF_DEBUGS
 	    debugprintf("fmq_irecv: tlen=%u mlen=%u\n",tlen,mlen) ;
@@ -1679,39 +1679,39 @@ static int filehead(char *buf,int f_read,FMQ_FH *hp)
 
 	if (f_read) {
 
-	    stdorder_ruint((table + 0),&hp->wcount) ;
+	    stdorder_rui((table + 0),&hp->wcount) ;
 
-	    stdorder_ruint((table + 1),&hp->wtime) ;
+	    stdorder_rui((table + 1),&hp->wtime) ;
 
-	    stdorder_ruint((table + 2),&hp->nmsg) ;
+	    stdorder_rui((table + 2),&hp->nmsg) ;
 
-	    stdorder_ruint((table + 3),&hp->size) ;
+	    stdorder_rui((table + 3),&hp->size) ;
 
-	    stdorder_ruint((table + 4),&hp->blen) ;
+	    stdorder_rui((table + 4),&hp->blen) ;
 
-	    stdorder_ruint((table + 5),&hp->len) ;
+	    stdorder_rui((table + 5),&hp->len) ;
 
-	    stdorder_ruint((table + 6),&hp->ri) ;
+	    stdorder_rui((table + 6),&hp->ri) ;
 
-	    stdorder_ruint((table + 7),&hp->wi) ;
+	    stdorder_rui((table + 7),&hp->wi) ;
 
 	} else {
 
-	    stdorder_wuint((table + 0),hp->wcount) ;
+	    stdorder_wui((table + 0),hp->wcount) ;
 
-	    stdorder_wuint((table + 1),hp->wtime) ;
+	    stdorder_wui((table + 1),hp->wtime) ;
 
-	    stdorder_wuint((table + 2),hp->nmsg) ;
+	    stdorder_wui((table + 2),hp->nmsg) ;
 
-	    stdorder_wuint((table + 3),hp->size) ;
+	    stdorder_wui((table + 3),hp->size) ;
 
-	    stdorder_wuint((table + 4),hp->blen) ;
+	    stdorder_wui((table + 4),hp->blen) ;
 
-	    stdorder_wuint((table + 5),hp->len) ;
+	    stdorder_wui((table + 5),hp->len) ;
 
-	    stdorder_wuint((table + 6),hp->ri) ;
+	    stdorder_wui((table + 6),hp->ri) ;
 
-	    stdorder_wuint((table + 7),hp->wi) ;
+	    stdorder_wui((table + 7),hp->wi) ;
 
 	} /* end if */
 

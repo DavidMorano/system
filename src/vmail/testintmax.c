@@ -1,5 +1,5 @@
-/* testintmax */
-/* lang=C99 */
+/* testintmax SUPPORT */
+/* lang=C++20 */
 
 
 /* revision history:
@@ -13,16 +13,15 @@
 
 
 #include	<envstandards.h>
-#include	<sys/types.h>
-#include	<limits.h>
-#include	<stdio.h>
-extern int	ndigits(int,int) ;
-int main()
-{
+#include	<climits>		/* |INT_MAX| */
+#include	<cstdio>
+#include	<ndigit.h>
+
+int main() {
 	int	n ;
 	int	v = INT_MAX ;
 
-	n = ndigits(v,10) ;
+	n = ndigit(v,10) ;
 
 	printf("v=%d n=%u\n",v,n) ;
 

@@ -54,7 +54,7 @@
 #include	<strwcpy.h>
 #include	<ndigit.h>
 #include	<ipow.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"mkx.h"
 
@@ -94,7 +94,7 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	    rs = SR_INVALID ;
 	    rbuf[0] = '\0' ;
 	    if (v >= 0) {
-		static int	rsm = ndigits(PID_MAX,10) ;
+		static int	rsm = ndigit(PID_MAX,10) ;
 		if ((rs = rsm) >= 0) {
 	            cint	maxdigs = rs ;
 		    int		modval ;
@@ -136,7 +136,7 @@ int mkplogid(char *rbuf,int rlen,cchar *nodename,int v) noex {
 	                    rs = SR_OVERFLOW ;
 	               }
 	            } /* end if (ctdeci) */
-	        } /* end if (ndigits) */
+	        } /* end if (ndigit) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? tl : rs ;

@@ -123,7 +123,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	ndigits(int) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	vecstr_adds(vecstr *,const char *,int) ;
 extern int	hasnonwhite(cchar *,int) ;

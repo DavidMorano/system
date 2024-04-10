@@ -1,7 +1,7 @@
-/* bufprintf SUPPOET */
+/* bufprintf SUPPORT */
 /* lang=C++20 */
 
-/* subroutine to format "buffered" output */
+/* subroutine to process a format-string into a buffer */
 /* version %I% last-modified %G% */
 
 
@@ -25,11 +25,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstdarg>
 #include	<usystem.h>
 #include	<format.h>
 #include	<localmisc.h>
+
+#include	"bufprintf.h"
 
 
 /* local defines */
@@ -50,22 +51,22 @@
 /* exported subroutines */
 
 int bufprintf(char *dbuf,int dlen,cchar *fmt,...) noex {
-	cint		m = 0 ;
 	int		rs = SR_FAULT ;
 	if (dbuf && fmt) {
 	    va_list	ap ;
+	    cint	m = 0 ;
 	    va_begin(ap,fmt) ;
 	    rs = format(dbuf,dlen,m,fmt,ap) ;
 	    va_end(ap) ;
-	}
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bufprintf) */
 
 int vbufprintf(char *dbuf,int dlen,cchar *fmt,va_list ap) noex {
-	cint		m = 0 ;
 	int		rs = SR_FAULT ;
-	if (dbuf && fmt) {
+	if (dbuf && fmt && ap) {
+	    cint	m = 0 ;
 	    rs = format(dbuf,dlen,m,fmt,ap) ;
 	} /* end if (non-null) */
 	return rs ;

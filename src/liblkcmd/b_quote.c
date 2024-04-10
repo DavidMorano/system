@@ -120,7 +120,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	ndigits(int,int) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;

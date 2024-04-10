@@ -60,6 +60,7 @@
 #include	<vecstr.h>
 #include	<wordfill.h>
 #include	<tmtime.h>
+#include	<ndigit.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -107,7 +108,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	ndigits(int,int) ;
 extern int	vecstr_adds(vecstr *,const char *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -1600,7 +1600,7 @@ static int loadprecision(PROGINFO *pip)
 #endif
 
 	if (rs >= 0) {
-	    prec = ndigits(lip->max,10) ;
+	    prec = ndigit(lip->max,10) ;
 	    lip->precision = prec ;
 	}
 

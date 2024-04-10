@@ -1453,7 +1453,7 @@ static int msgid_search(MSGID *op,MSGID_KEY *kp,uint khash,char **bepp) noex {
 
 	        {
 	            uint	uiw ;
-	            stdorder_ruint((bep + MSGIDE_OHASH),&uiw) ;
+	            stdorder_rui((bep + MSGIDE_OHASH),&uiw) ;
 	            f = (khash == uiw) ;
 	        }
 
@@ -1857,13 +1857,13 @@ static int filehead(char *mbuf,int f_read,MSGID_FH *hp) noex {
 	if ((rs = serialbuf_start(&msgbuf,mbuf,mlen)) >= 0) {
 
 	    if (f_read) { /* read */
-	        serialbuf_ruint(&msgbuf,&hp->wcount) ;
-	        serialbuf_ruint(&msgbuf,&hp->wtime) ;
-	        serialbuf_ruint(&msgbuf,&hp->nentries) ;
+	        serialbuf_rui(&msgbuf,&hp->wcount) ;
+	        serialbuf_rui(&msgbuf,&hp->wtime) ;
+	        serialbuf_rui(&msgbuf,&hp->nentries) ;
 	    } else { /* write */
-	        serialbuf_wuint(&msgbuf,hp->wcount) ;
-	        serialbuf_wuint(&msgbuf,hp->wtime) ;
-	        serialbuf_wuint(&msgbuf,hp->nentries) ;
+	        serialbuf_wui(&msgbuf,hp->wcount) ;
+	        serialbuf_wui(&msgbuf,hp->wtime) ;
+	        serialbuf_wui(&msgbuf,hp->nentries) ;
 	    } /* end if */
 
 	    rs1 = serialbuf_finish(&msgbuf) ;

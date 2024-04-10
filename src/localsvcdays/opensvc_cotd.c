@@ -76,6 +76,7 @@
 #include	<tmtime.h>
 #include	<filer.h>
 #include	<wordfill.h>
+#include	<ndigit.h>
 #include	<localmisc.h>
 
 #include	"opensvc_cotd.h"
@@ -122,7 +123,6 @@ extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getmjd(int,int,int) ;
 extern int	getyrd(int,int,int) ;
-extern int	ndigits(int,int) ;
 extern int	hasalldig(const char *,int) ;
 extern int	isdigitlatin(int) ;
 
@@ -260,7 +260,7 @@ int		to ;
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -351,7 +351,7 @@ int		to ;
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -595,13 +595,13 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 #endif
 
 	    if ((rs = commandment_max(cmp)) >= 0) {
-	        int	max = rs ;
+	        int	nmax = rs ;
 	        int	prec ;
 	        int	n ;
 	        int	ch ;
 		int	dl = strlen(dayspec) ;
 
-	        prec = ndigits(max,10) ;
+	        prec = ndigit(nmax,10) ;
 		if (prec > sizeof(blanks)) prec = sizeof(blanks) ;
 
 	        ch = (dayspec[0] & 0xff) ;
@@ -609,7 +609,7 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 
 	            if (ch == '+') {
 	                rs = subinfo_tmtime(sip) ;
-	                n = (max > 31) ? sip->yday : sip->mday ;
+	                n = (nmax > 31) ? sip->yday : sip->mday ;
 	            } else {
 	                rs = cfdeci(dayspec,-1,&n) ;
 	            }
@@ -624,7 +624,7 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 			    if (ds.m < 0) ds.m = sip->mon ;
 			    if (ds.d < 0) ds.d = sip->mday ;
 			}
-	                if ((rs >= 0) && (max > 31)) {
+	                if ((rs >= 0) && (nmax > 31)) {
 			    rs = dayspec_yday(&ds) ;
 			    n = rs ;
 			} else
@@ -634,10 +634,10 @@ static int subinfo_cotd(SUBINFO *sip,int wfd,cchar *dbname,cchar *dayspec)
 	        } /* end if */
 
 	        if (rs >= 0) {
-		    const int	clen = COMBUFLEN ;
+		    cint	clen = COMBUFLEN ;
 		    char	cbuf[COMBUFLEN + 1] ;
-	            int		cn = (n % max) ;
-	            if (cn == 0) cn = max ;
+	            int		cn = (n % nmax) ;
+	            if (cn == 0) cn = nmax ;
 	            if ((rs = commandment_get(cmp,cn,cbuf,clen)) >= 0) {
 	                int	cl = rs ;
 	                rs = subinfo_procout(sip,wfd,prec,cn,cbuf,cl) ;
@@ -670,7 +670,7 @@ static int subinfo_procout(SUBINFO *sip,int wfd,int prec,int n,
 
 	    if ((rs = wordfill_start(&w,cbuf,clen)) >= 0) {
 		int		cols = sip->linelen ;
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		ll ;
 		int		lw ;
 	        int		ln = 0 ;

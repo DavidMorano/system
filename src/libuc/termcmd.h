@@ -44,7 +44,7 @@ enum termcmdtypes {
 } ;
 
 struct termcmd_flags {
-	uint		priv:1 ;	/* private CSI */
+	uint		fpriv:1 ;	/* private CSI */
 	uint		iover:1 ;	/* intermediate-string overflow */
 	uint		dover:1 ;	/* device-control-string overflow */
 } ;
@@ -59,6 +59,7 @@ struct termcmd_head {
 } ;
 
 typedef	TERMCMD		termcmd ;
+typedef	TERMCMD_FL	termcmd_fl ;
 
 EXTERNC_begin
 

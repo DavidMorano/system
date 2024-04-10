@@ -1,7 +1,16 @@
 /* sockaddress HEADER */
 /* lang=C20 */
 
+/* manipulate socket addresses */
+/* version %I% last-modified %G% */
 
+
+/* revision history:
+
+	= 1998-08-13, David A­D­ Morano
+	This object module was originally written.
+
+*/
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -10,26 +19,27 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<sys/un.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<usystem.h>
-#include	<localmisc.h>
+#include	<localmisc.h>	/* |MAXPATHLEN| */
 
 
 #define	SOCKADDRESS		union sockaddress_head
-#define	SOCKADDRESS_INET	struct sockaddress_inet6
+#define	SOCKADDRESS_IN4		struct sockaddress_inet4
+#define	SOCKADDRESS_IN6		struct sockaddress_inet6
 
 #define	SOCKADDRESS_LEN		sizeof(union sockaddress_head)
 #define	SOCKADDRESS_NAMELEN	sizeof(union sockaddress_head)
+#define	SOCKADDRESS_MAXPATH	MAXPATHLEN
 
 
 struct sockaddress_path {
 	ushort	naf ;			/* address space */
-	char	path[MAXPATHLEN + 1] ;
+	char	path[SOCKADDRESS_MAXPATH + 1] ;
 } ;
 
 struct sockaddress_inet4 {
@@ -48,10 +58,10 @@ struct sockaddress_inet6 {
 } ;
 
 union sockaddress_head {
-	struct sockaddr			a_unspec ;
-	struct sockaddr_un		a_unix ;
-	struct sockaddr_in		a_in ;
-	struct sockaddr_in6		a_in6 ;
+	SOCKADDR			a_unspec ;
+	SOCKADDR_UN			a_unix ;
+	SOCKADDR_IN4			a_in ;
+	SOCKADDR_IN6			a_in6 ;
 	struct sockaddress_inet4	a_inet4 ;
 	struct sockaddress_inet6	a_inet6 ;
 	struct sockaddress_path		a_path ;
@@ -59,25 +69,26 @@ union sockaddress_head {
 } ;
 
 typedef	SOCKADDRESS		sockaddress ;
-typedef	SOCKADDRESS_INET	sockaddress_inet ;
+typedef	SOCKADDRESS_IN4		sockaddress_in4 ;
+typedef	SOCKADDRESS_IN6		sockaddress_in6 ;
 
 EXTERNC_begin
 
-extern int sockaddress_start(SOCKADDRESS *,int,cvoid *,int,int) noex ;
-extern int sockaddress_startaddr(SOCKADDRESS *,int,cvoid *,int,int,int) noex ;
-extern int sockaddress_getlen(SOCKADDRESS *) noex ;
-extern int sockaddress_getaddrlen(SOCKADDRESS *) noex ;
-extern int sockaddress_gethex(SOCKADDRESS *,char *,int) noex ;
-extern int sockaddress_getaf(SOCKADDRESS *) noex ;
-extern int sockaddress_getport(SOCKADDRESS *) noex ;
-extern int sockaddress_getflow(SOCKADDRESS *,uint *) noex ;
-extern int sockaddress_getaddr(SOCKADDRESS *,void *,int) noex ;
-extern int sockaddress_getscope(SOCKADDRESS *,uint *) noex ;
-extern int sockaddress_getextra(SOCKADDRESS *,uint *) noex ;
-extern int sockaddress_putaf(SOCKADDRESS *,int) noex ;
-extern int sockaddress_putport(SOCKADDRESS *,int) noex ;
-extern int sockaddress_putaddr(SOCKADDRESS *,cvoid *) noex ;
-extern int sockaddress_finish(SOCKADDRESS *) noex ;
+extern int sockaddress_start(sockaddress *,int,cvoid *,int,int) noex ;
+extern int sockaddress_startaddr(sockaddress *,int,cvoid *,int,int,int) noex ;
+extern int sockaddress_getlen(sockaddress *) noex ;
+extern int sockaddress_getaddrlen(sockaddress *) noex ;
+extern int sockaddress_gethex(sockaddress *,char *,int) noex ;
+extern int sockaddress_getaf(sockaddress *) noex ;
+extern int sockaddress_getport(sockaddress *) noex ;
+extern int sockaddress_getflow(sockaddress *,uint *) noex ;
+extern int sockaddress_getaddr(sockaddress *,void *,int) noex ;
+extern int sockaddress_getscope(sockaddress *,uint *) noex ;
+extern int sockaddress_getextra(sockaddress *,uint *) noex ;
+extern int sockaddress_putaf(sockaddress *,int) noex ;
+extern int sockaddress_putport(sockaddress *,int) noex ;
+extern int sockaddress_putaddr(sockaddress *,cvoid *) noex ;
+extern int sockaddress_finish(sockaddress *) noex ;
 
 EXTERNC_end
 

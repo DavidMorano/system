@@ -85,11 +85,11 @@ int		mlen ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruchar(&msgbuf,&sp->type) ;
+	        serialbuf_ruc(&msgbuf,&sp->type) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->pid) ;
+	        serialbuf_rui(&msgbuf,&sp->pid) ;
 
 	        serialbuf_rstrw(&msgbuf,sp->fname,MAXNAMELEN) ;
 
@@ -97,11 +97,11 @@ int		mlen ;
 
 	        sp->type = sigdumpmsgtype_request ;
 
-	        serialbuf_wchar(&msgbuf,sp->type) ;
+	        serialbuf_wc(&msgbuf,sp->type) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->pid) ;
+	        serialbuf_wui(&msgbuf,sp->pid) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->fname,MAXNAMELEN) ;
 

@@ -34,9 +34,11 @@
 
 #define	UTERMER_MAGIC	0x33442281
 #define	UTERMER		struct utermer_head
-#define	UTERMER_PROMPT	struct utermer_prompt
-#define	UTERMER_LOAD	struct utermer_load
-#define	UTERMER_CS	struct utermer_cs
+#define	UTERMER_FL	struct utermer_flags
+#define	UTERMER_PR	struct utermer_prompt
+#define	UTERMER_LD	struct utermer_load
+#define	UTERMER_CS	struct utermer_codespace
+#define	UTERMER_BD	struct utermer_bdesc
 
 
 struct utermer_bdesc {
@@ -44,7 +46,7 @@ struct utermer_bdesc {
 	int		dlen ;
 } ;
 
-struct utermer_cs {
+struct utermer_codespace {
 	PSEM		*sem ;
 	int		len ;
 	int		cs ;
@@ -60,10 +62,8 @@ struct utermer_flags {
 } ;
 
 struct utermer_head {
-	uint		magic ;
-	struct utermer_flags	f ;
-	struct termios	ts_old ;
-	struct termios	ts_new ;
+	TERMIOS		ts_old ;
+	TERMIOS		ts_new ;
 	PTM		mout ;
 	CHARIQ		taq ;		/* type-ahead */
 	CHARIQ		ecq ;		/* echo */
@@ -74,6 +74,8 @@ struct utermer_head {
 	PSEM		wq_sem ;
 	pthread_t	tid_read, tid_write, tid_int ;
 	time_t		basetime ;
+	UTERMER_FL	f ;
+	uint		magic ;
 	int		fd ;
 	int		loopcount ;
 	int		timeout ;	/* timeout timer counter */
@@ -82,33 +84,31 @@ struct utermer_head {
 	int		stat ;
 } ;
 
+typedef	UTERMER		utermer ;
+typedef	UTERMER_FL	utermer_fl ;
+typedef	UTERMER_PR	utermer_pr ;
+typedef	UTERMER_LD	utermer_ld ;
+typedef	UTERMER_CS	utermer_cs ;
 
-#if	(! defined(UTERMER_MASTER)) || (UTERMER_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int utermer_start(utermer *,int) noex ;
+extern int utermer_control(utermer *,int,...) noex ;
+extern int utermer_status(utermer *,int,...) noex ;
+extern int utermer_read(utermer *,char *,int) noex ;
+extern int utermer_reade(utermer *,char *,int,int,int,
+		ustermer_pr *,utermer_ld *) noex ;
+extern int utermer_reader(utermer *,utermer_cs *,char *,int,int,int,
+		utermer_bd *,utermer_bd *) noex ;
+extern int utermer_write(utermer *,cchar *,int) noex ;
+extern int utermer_suspend(utermer *) noex ;
+extern int utermer_resume(utermer *) noex ;
+extern int utermer_restore(utermer *) noex ;
+extern int utermer_ensure(utermer *) noex ;
+extern int utermer_finish(utermer *) noex ;
 
-extern int utermer_start(UTERMER *,int) ;
-extern int utermer_control(UTERMER *,int,...) ;
-extern int utermer_status(UTERMER *,int,...) ;
-extern int utermer_read(UTERMER *,char *,int) ;
-extern int utermer_reade(UTERMER *,char *,int,int,int,
-		UTERMER_PROMPT *,UTERMER_LOAD *) ;
-extern int utermer_reader(UTERMER *,UTERMER_CS *,char *,int,int,int,
-		UTERMER_BDESC *,UTERMER_BDESC *) ;
-extern int utermer_write(UTERMER *,const char *,int) ;
-extern int utermer_suspend(UTERMER *) ;
-extern int utermer_resume(UTERMER *) ;
-extern int utermer_restore(UTERMER *) ;
-extern int utermer_ensure(UTERMER *) ;
-extern int utermer_finish(UTERMER *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* UTERMER_MASTER */
 
 #endif /* UTERMER_INCLUDE */
 

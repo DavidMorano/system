@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<limits.h>
 #include	<usystem.h>
 
@@ -38,6 +37,7 @@ typedef	SERIALBUF	serialbuf ;
 EXTERNC_begin
 
 extern int serialbuf_start(serialbuf *,char *,int) noex ;
+
 extern int serialbuf_robj(serialbuf *,void *,int) noex ;
 extern int serialbuf_rc(serialbuf *,char *) noex ;
 extern int serialbuf_rs(serialbuf *,short *) noex ;
@@ -49,6 +49,7 @@ extern int serialbuf_rll(serialbuf *,longlong *) noex ;
 extern int serialbuf_rstrw(serialbuf *,char *,int) noex ;
 extern int serialbuf_rstrn(serialbuf *,char *,int) noex ;
 extern int serialbuf_rbuf(serialbuf *,char *,int) noex ;
+
 extern int serialbuf_ruc(serialbuf *,uchar *) noex ;
 extern int serialbuf_rus(serialbuf *,ushort *) noex ;
 extern int serialbuf_rui(serialbuf *,uint *) noex ;
@@ -61,7 +62,6 @@ extern int serialbuf_rustrn(serialbuf *,uchar *,int) noex ;
 extern int serialbuf_rubuf(serialbuf *,uchar *,int) noex ;
 
 extern int serialbuf_wobj(serialbuf *,cvoid *,int) noex ;
-
 extern int serialbuf_wc(serialbuf *,int) noex ;
 extern int serialbuf_ws(serialbuf *,int) noex ;
 extern int serialbuf_wi(serialbuf *,int) noex ;

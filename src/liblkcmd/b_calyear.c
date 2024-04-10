@@ -147,7 +147,6 @@ extern int	cfdecmfi(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	ndigits(int,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	bufprintf(char *,int,const char *,...) ;

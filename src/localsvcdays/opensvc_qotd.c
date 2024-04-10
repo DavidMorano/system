@@ -122,7 +122,6 @@ extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	getmjd(int,int,int) ;
 extern int	getyrd(int,int,int) ;
-extern int	ndigits(int,int) ;
 extern int	hasalldig(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 
@@ -250,7 +249,7 @@ int opensvc_qotd(cchar *pr,cchar *prn,int of,mode_t om,
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-	        const int ach = MKCHAR(argp[1]) ;
+	        cint 	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 

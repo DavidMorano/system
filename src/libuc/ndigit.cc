@@ -16,6 +16,9 @@
 
 /*******************************************************************************
 
+	Name:
+	ndigit{x}
+
 	Description:
 	This is a support subroutine that is supposed to be cheaper
 	than an integer-to-ascii conversion in order to get the
@@ -29,7 +32,7 @@
 	the old days), a divide can be very expensive!
 
 	Synopsis:
-	int ndigits(int v,int base) noex
+	int ndigit{x}(int v,int base) noex
 
 	Arguments:
 	v	value to find the number of ASCII digits for

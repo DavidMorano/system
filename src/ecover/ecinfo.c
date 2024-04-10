@@ -72,41 +72,41 @@ ECINFO_DATA		*sp ;
 
 	if (f) { /* read */
 
-	    serialbuf_ruint(&msgbuf,&sp->type) ;
+	    serialbuf_rui(&msgbuf,&sp->type) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->tag) ;
+	    serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->filelen) ;
+	    serialbuf_rui(&msgbuf,&sp->filelen) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->filetime) ;
+	    serialbuf_rui(&msgbuf,&sp->filetime) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->filesum) ;
+	    serialbuf_rui(&msgbuf,&sp->filesum) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->msglen) ;
+	    serialbuf_rui(&msgbuf,&sp->msglen) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->msgtime) ;
+	    serialbuf_rui(&msgbuf,&sp->msgtime) ;
 
-	    serialbuf_ruint(&msgbuf,&sp->msgsum) ;
+	    serialbuf_rui(&msgbuf,&sp->msgsum) ;
 
 	} else { /* write */
 
 	    sp->type = ecinfotype_data ;
 
-	    serialbuf_wuint(&msgbuf,sp->type) ;
+	    serialbuf_wui(&msgbuf,sp->type) ;
 
-	    serialbuf_wuint(&msgbuf,sp->tag) ;
+	    serialbuf_wui(&msgbuf,sp->tag) ;
 
-	    serialbuf_wuint(&msgbuf,sp->filelen) ;
+	    serialbuf_wui(&msgbuf,sp->filelen) ;
 
-	    serialbuf_wuint(&msgbuf,sp->filetime) ;
+	    serialbuf_wui(&msgbuf,sp->filetime) ;
 
-	    serialbuf_wuint(&msgbuf,sp->filesum) ;
+	    serialbuf_wui(&msgbuf,sp->filesum) ;
 
-	    serialbuf_wuint(&msgbuf,sp->msglen) ;
+	    serialbuf_wui(&msgbuf,sp->msglen) ;
 
-	    serialbuf_wuint(&msgbuf,sp->msgtime) ;
+	    serialbuf_wui(&msgbuf,sp->msgtime) ;
 
-	    serialbuf_wuint(&msgbuf,sp->msgsum) ;
+	    serialbuf_wui(&msgbuf,sp->msgsum) ;
 
 	} /* end if */
 

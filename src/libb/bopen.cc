@@ -44,6 +44,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<sysval.h>
 #include	<stdfnames.h>
 #include	<getfdfile.h>
 #include	<snx.h>
@@ -106,13 +107,15 @@ static int	extfd(cchar *) noex ;
 
 constexpr bool		f_mapable = CF_MAPABLE ;
 
+static sysval		pagesize(sysval_ps) ;
+
 
 /* exported variables */
 
 
 /* exported subroutines */
 
-int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
+int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 	USTAT		sb ;
 	off_t		soff ;
 	cint		maxopenfile = getdtablesize() ;
@@ -162,9 +165,9 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 	fp->pagesize = getpagesize() ;
 	bsize = (fp->pagesize * BFILE_BUFPAGES) ;
 
-	f_lessthan = (((ulong) name) < maxopenfile) ;
+	f_lessthan = (((ulong) fn) < maxopenfile) ;
 	if (f_lessthan)
-	    fd_existing = ((int) name) ;
+	    fd_existing = ((int) fn) ;
 
 	if (f_lessthan && (! (boflags & BO_FILEDESC))) {
 	    rs = SR_FAULT ;
@@ -173,7 +176,7 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 
 	if (! f_lessthan) {
 	    int		fd ;
-	    if ((fd = getfdfile(name,-1)) >= 0) {
+	    if ((fd = getfdfile(fn,-1)) >= 0) {
 		boflags |= BO_FILEDESC ;
 		fd_existing = fd ;
 	    } else if (fd == SR_EMPTY) {
@@ -224,14 +227,11 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 	        ooflags |= O_APPEND ;
 		f_setflags = true ;
 	    }
-
 #else /* CF_UNIXAPPEND */
-
 	    if ((rs >= 0) && f_addappend) {
 	        ooflags |= O_APPEND ;
 		f_setflags = true ;
 	    }
-
 #endif /* CF_UNIXAPPEND */
 
 	    if ((rs >= 0) && f_setflags) {
@@ -243,7 +243,7 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 	} else {
 
 	    if (oflags & O_CREAT) {
-	        rs = bfilestat(name,0,&sb) ;
+	        rs = u_stat(fn,0,&sb) ;
 	        if (rs == SR_NOENT) {
 		    rs = SR_OK ;
 		    fp->f.created = true ;
@@ -252,9 +252,9 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 
 	    oflags |= O_LARGEFILE ;
 
-	    if ((rs = uc_opene(name,oflags,perm,to)) >= 0) {
+	    if ((rs = uc_opene(fn,oflags,om,to)) >= 0) {
 	        fp->fd = rs ;
-		rs = bfile_opts(fp,oflags,perm) ;
+		rs = bfile_opts(fp,oflags,om) ;
 	        if (rs < 0) {
 		    u_close(fp->fd) ;
 		    fp->fd = -1 ;
@@ -270,11 +270,11 @@ int bopene(bfile *fp,cchar *name,cchar *os,mode_t perm,int to) noex {
 /* OK, we had our fun, now set all of the proper other modes for this file */
 
 	fp->oflags = oflags ;
-	rs = bfilefstat(fp->fd,&sb) ;
+	rs = u_fstat(fp->fd,&sb) ;
 	if (rs < 0) goto bad1 ;
 
 	fp->fsize = 0 ;
-	fp->mode = sb.st_mode ;
+	fp->fm = sb.st_mode ;
 	fp->ino = sb.st_ino ;
 	fp->dev = sb.st_dev ;
 	f_notseek = true ;
@@ -366,12 +366,12 @@ bad0:
 }
 /* end subroutine (bopene) */
 
-int bopen(bfile *fp,cchar *fname,cchar *os,mode_t perm) noex {
-	return bopene(fp,fname,os,perm,-1) ;
+int bopen(bfile *fp,cchar *fn,cchar *os,mode_t om) noex {
+	return bopene(fp,fn,os,om,-1) ;
 }
 /* end subroutine (bopen) */
 
-int bopenprog(bfile *fp,cc *pname,cc *os,cc **argv,cc **envv) noex {
+int bopenprog(bfile *fp,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	int		rs = SR_OK ;
 	int		oflags = 0 ;
 	int		boflags = 0 ;
@@ -430,7 +430,7 @@ int bopenprog(bfile *fp,cc *pname,cc *os,cc **argv,cc **envv) noex {
 int bclose(bfile *fp) noex {
 	int		rs ;
 	int		rs1 ;
-	if ((rs = bmagic(fp)) >= 0) {
+	if ((rs = bfile_magic(fp)) >= 0) {
 	    if ((rs = bfile_active(fp)) > 0) {
 	        if (fp->f.write && (fp->len > 0)) {
 	            rs1 = bfile_flush(fp) ;
@@ -461,7 +461,6 @@ int bclose(bfile *fp) noex {
 static int bfile_bufbegin(bfile *fp,int bsize) noex {
 	int		rs ;
 	char		*p ;
-	if (fp->pagesize == 0) fp->pagesize = getpagesize() ;
 	if (bsize == 0) bsize = fp->pagesize ;
 	if ((rs = uc_malloc(bsize,&p)) >= 0) {
 	    fp->bdata = p ;
@@ -508,7 +507,7 @@ static int bfile_mapbegin(bfile *fp) noex {
 	    fp->maps = maper(vp) ;
 	    for (int i = 0 ; i < BFILE_NMAPS ; i += 1) {
 	        fp->maps[i].f.valid = false ;
-	        fp->maps[i].buf = nullptr ;
+	        fp->maps[i].bdata = nullptr ;
 	    } /* end for */
 	    fp->bp = nullptr ;
 	    fp->f.mapinit = true ;
@@ -521,9 +520,9 @@ static int bfile_mapend(bfile *fp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	for (int i = 0 ; i < BFILE_NMAPS ; i += 1) {
-	    if ((fp->maps[i].f.valid) && fp->maps[i].buf) {
-		void	*md = fp->maps[i].buf ;
-		csize	ms = size_t(fp->pagesize) ;
+	    if ((fp->maps[i].f.valid) && fp->maps[i].bdata) {
+		void	*md = fp->maps[i].bdata ;
+		csize	ms = fp->maps[i].bsize ;
 	        rs1 = u_mmapend(md,ms) ;
 		if (rs >= 0) rs = rs1 ;
 	    }
@@ -541,7 +540,7 @@ static int mkoflags(cchar *os,int *bfp) noex {
 	int		oflags = 0 ;
 	int		bflags = 0 ;
 	while (*os) {
-	    cint	sc = (*os++ & 0xff) ;
+	    cint	sc = mkchar(*os++) ;
 	    switch (sc) {
 	    case 'd':
 	        bflags |= BO_FILEDESC ;

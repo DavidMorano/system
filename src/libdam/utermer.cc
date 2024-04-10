@@ -23,7 +23,6 @@
 
 	These routines provide a stand-alone TTY environment.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -96,8 +95,8 @@
 
 extern int	isprintlatin(int) ;
 
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -118,7 +117,7 @@ struct utermer_crp { /* "channel request packet"? */
 
 /* forward references */
 
-static int	utermer_writeproc(UTERMER *,const char *,int) ;
+static int	utermer_writeproc(UTERMER *,cchar *,int) ;
 
 static int	utermer_crpinit(UTERMER *) ;
 static int	utermer_crpfree(UTERMER *) ;
@@ -126,10 +125,10 @@ static int	utermer_crpget(UTERMER *,UTERMER_CRP **) ;
 static int	utermer_crprel(UTERMER *,UTERMER_CRP *) ;
 
 static int	tty_wait(), tty_echo(), tty_risr() ;
-static int	tty_wps(UTERMER *,const char *,int) ;
-static int	tty_loadchar(UTERMER *,const char *,int) ;
+static int	tty_wps(UTERMER *,cchar *,int) ;
+static int	tty_loadchar(UTERMER *,cchar *,int) ;
 
-static int	sinotprint(const char *,int) ;
+static int	sinotprint(cchar *,int) ;
 
 
 /* static variables */
@@ -513,7 +512,7 @@ int		rlen ;
 /* write routine */
 int utermer_write(op,wbuf,wlen)
 UTERMER		*op ;
-const char	wbuf[] ;
+cchar	wbuf[] ;
 int		wlen ;
 {
 	int		rs = SR_OK ;
@@ -885,7 +884,7 @@ ret0:
 
 static int utermer_writeproc(op,buf,buflen)
 UTERMER		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int		rs ;
@@ -948,7 +947,7 @@ ret0:
 /* write out a prompt string */
 static int tty_wps(op,buf,buflen)
 UTERMER		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	int	rs = SR_OK ;
@@ -1013,7 +1012,7 @@ ret0:
 
 static int tty_loadchar(op,pbuf,pbuflen)
 UTERMER		*op ;
-const char	pbuf[] ;
+cchar	pbuf[] ;
 int		pbuflen ;
 {
 	int	rs = SR_OK ;
@@ -1225,7 +1224,7 @@ ret0:
 /* check for receiver got some thing */
 static int tty_risr(op,buf,buflen)
 UTERMER		*op ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	uint	c ;
@@ -1340,7 +1339,7 @@ int		buflen ;
 
 
 static int sinotprint(buf,buflen)
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	uint	c ;

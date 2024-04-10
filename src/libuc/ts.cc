@@ -1173,13 +1173,13 @@ int		f_read ;
 
 	    int	hsize = sizeof(struct ts_h) ;
 
-	    stdorder_ruint(bp,&h.nentries) ;
+	    stdorder_rui(bp,&h.nentries) ;
 	    bp += sizeof(uint) ;
 
-	    stdorder_ruint(bp,&h.wtime) ;
+	    stdorder_rui(bp,&h.wtime) ;
 	    bp += sizeof(uint) ;
 
-	    stdorder_ruint(bp,&h.wcount) ;
+	    stdorder_rui(bp,&h.wcount) ;
 	    bp += sizeof(uint) ;
 
 	    f_changed = (memcmp(&h,&op->h,hsize) != 0) ;
@@ -1187,13 +1187,13 @@ int		f_read ;
 
 	} else {
 
-	    stdorder_wuint(bp,op->h.nentries) ;
+	    stdorder_wui(bp,op->h.nentries) ;
 	    bp += sizeof(uint) ;
 
-	    stdorder_wuint(bp,op->h.wtime) ;
+	    stdorder_wui(bp,op->h.wtime) ;
 	    bp += sizeof(uint) ;
 
-	    stdorder_wuint(bp,op->h.wcount) ;
+	    stdorder_wui(bp,op->h.wcount) ;
 	    bp += sizeof(uint) ;
 
 	} /* end if */

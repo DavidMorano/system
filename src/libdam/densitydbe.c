@@ -74,11 +74,11 @@ DENSITYDBE_ALL	*ep ;
 	if ((rs = serialbuf_start(&msgbuf,buf,buflen)) >= 0) {
 
 	    if (f_read) {
-	        serialbuf_ruint(&msgbuf,&ep->count) ;
-	        serialbuf_ruint(&msgbuf,&ep->utime) ;
+	        serialbuf_rui(&msgbuf,&ep->count) ;
+	        serialbuf_rui(&msgbuf,&ep->utime) ;
 	    } else {
-	        serialbuf_wuint(&msgbuf,ep->count) ;
-	        serialbuf_wuint(&msgbuf,ep->utime) ;
+	        serialbuf_wui(&msgbuf,ep->count) ;
+	        serialbuf_wui(&msgbuf,ep->utime) ;
 	    }
 
 	    rs1 = serialbuf_finish(&msgbuf) ;
@@ -112,11 +112,11 @@ DENSITYDBE_UPD	*ep ;
 	if ((rs = serialbuf_start(&msgbuf,buf,buflen)) >= 0) {
 
 	    if (f_read) {
-	        serialbuf_ruint(&msgbuf,&ep->count) ;
-	        serialbuf_ruint(&msgbuf,&ep->utime) ;
+	        serialbuf_rui(&msgbuf,&ep->count) ;
+	        serialbuf_rui(&msgbuf,&ep->utime) ;
 	    } else {
-	        serialbuf_wuint(&msgbuf,ep->count) ;
-	        serialbuf_wuint(&msgbuf,ep->utime) ;
+	        serialbuf_wui(&msgbuf,ep->count) ;
+	        serialbuf_wui(&msgbuf,ep->utime) ;
 	    }
 
 	    rs1 = serialbuf_finish(&msgbuf) ;

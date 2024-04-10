@@ -72,15 +72,15 @@ int			mlen ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->tag) ;
+	        serialbuf_rui(&msgbuf,&sp->tag) ;
 
-	        serialbuf_ruint(&msgbuf,&sp->delay) ;
+	        serialbuf_rui(&msgbuf,&sp->delay) ;
 
-	        serialbuf_rint(&msgbuf,&v) ;
+	        serialbuf_ri(&msgbuf,&v) ;
 	        sp->uid = v ;
 
 	        serialbuf_rstrw(&msgbuf,sp->fname,MAXPATHLEN) ;
@@ -89,20 +89,20 @@ int			mlen ;
 
 	        sp->msgtype = rmermsgtype_fname ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
-	        serialbuf_wuint(&msgbuf,sp->tag) ;
+	        serialbuf_wui(&msgbuf,sp->tag) ;
 
-	        serialbuf_wuint(&msgbuf,sp->delay) ;
+	        serialbuf_wui(&msgbuf,sp->delay) ;
 
 	        v = sp->uid ;
-	        serialbuf_wint(&msgbuf,v) ;
+	        serialbuf_wi(&msgbuf,v) ;
 
 	        serialbuf_wstrw(&msgbuf,sp->fname,-1) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -132,7 +132,7 @@ int			mlen ;
 
 	    if (f) { /* read */
 
-	        serialbuf_ruint(&msgbuf,&hdr) ;
+	        serialbuf_rui(&msgbuf,&hdr) ;
 	        sp->msgtype = (hdr & 0xff) ;
 	        sp->msglen = (hdr >> 8) ;
 
@@ -140,11 +140,11 @@ int			mlen ;
 
 	        sp->msgtype = rmermsgtype_unknown ;
 	        hdr = sp->msgtype ;
-	        serialbuf_wuint(&msgbuf,hdr) ;
+	        serialbuf_wui(&msgbuf,hdr) ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

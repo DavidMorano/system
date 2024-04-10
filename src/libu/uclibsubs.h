@@ -82,20 +82,11 @@
 
 EXTERNC_begin
 
-extern int	uc_exit(int) noex ;
-extern int	uc_atexit(void_f) noex ;
-extern int	uc_atforkrecord(void_f,void_f,void_f) noex ;
-extern int	uc_atforkexpunge(void_f,void_f,void_f) noex ;
-extern int	uc_atfork(void_f,void_f,void_f) noex ;
-extern int	uc_ftime(TIMEB *) noex ;
-extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
-extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
-extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
+/* system group */
 extern int	uc_gethostid(unsigned int *) noex ;
 extern int	uc_gethostname(char *,int) noex ;
 extern int	uc_getarchitecture(char *,int) noex ;
 extern int	uc_getnisdomain(char *,int) noex ;
-extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
 extern int	uc_getloadavg(double *,int) noex ;
 extern int	uc_nprocessors(int) noex ;
 extern int	uc_syspages(int) noex ;
@@ -103,6 +94,13 @@ extern int	uc_nprocs(int) noex ;
 extern int	uc_confsys(int,long *) noex ;
 extern int	uc_confstr(char *,int,int) noex ;
 extern int	uc_confmaxline() noex ;
+
+/* time group */
+extern int	uc_gettimeofday(TIMEVAL *,void *) noex ;
+extern int	uc_ftime(TIMEB *) noex ;
+extern int	uc_clockset(clockid_t,const TIMESPEC *) noex ;
+extern int	uc_clockget(clockid_t,TIMESPEC *) noex ;
+extern int	uc_clockres(clockid_t,TIMESPEC *) noex ;
 
 #if	SYSHAS_TIMER && (SYSHAS_TIMER > 0)
 extern int uc_timercreate(clockid_t,struct sigevent *,timer_t *) noex ;
@@ -119,6 +117,11 @@ extern int	uc_forklockend() noex ;
 extern int	uc_execve(cchar *,mainv,mainv) noex ;
 extern int	uc_isaexecve(cchar *,mainv,mainv) noex ;
 extern int	uc_initgroups(cchar *,gid_t) noex ;
+extern int	uc_exit(int) noex ;
+extern int	uc_atexit(void_f) noex ;
+extern int	uc_atforkrecord(void_f,void_f,void_f) noex ;
+extern int	uc_atforkexpunge(void_f,void_f,void_f) noex ;
+extern int	uc_atfork(void_f,void_f,void_f) noex ;
 
 extern int	uc_getcwd(char *,int) noex ;
 extern int	uc_swapcontext(ucontext_t *,const ucontext_t *) noex ;
@@ -129,39 +132,30 @@ extern int	uc_setpriority(int,id_t,int) noex ;
 extern int	uc_getpuid(pid_t) noex ;
 extern int	uc_procpid(cchar *,uid_t) noex ;
 
-extern int	uc_create(cchar *,mode_t) noex ;
-extern int	uc_createfile(cchar *,mode_t) noex ;
-extern int	uc_realpath(cchar *,char *) noex ;
-extern int	uc_truncate(cchar *,off_t) noex ;
-extern int	uc_open(cchar *,int,mode_t) noex ;
-extern int	uc_opene(cchar *,int,mode_t,int) noex ;
-extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
-extern int	uc_openenv(cchar *,int,mode_t,cchar **,int) noex ;
-extern int	uc_opensysdb(int,int,mode_t) noex ;
-extern int	uc_openpt(int) noex ;
-extern int	uc_fpassfd(int,int) noex ;
-extern int	uc_ftruncate(int,off_t) noex ;
-extern int	uc_fstat(int,USTAT *) noex ;
+/* double-special open group */
+extern int	uc_pipe(int *) noex ;
+extern int	uc_pipe2(int *,int) noex ;
+extern int	uc_sockpair(int,int,int,int *) noex ;
+
+/* operate group */
+extern int	uc_mknod(cchar *,mode_t,dev_t) noex ;
 extern int	uc_stat(cchar *,USTAT *) noex ;
 extern int	uc_lstat(cchar *,USTAT *) noex ;
 extern int	uc_readlink(cchar *,char *,int) noex ;
-extern int	uc_pipe2(int *,int) noex ;
 extern int	uc_chmod(cchar *,mode_t) noex ;
 extern int	uc_chown(cchar *,uid_t,gid_t) noex ;
 extern int	uc_rename(cchar *,cchar *) noex ;
 extern int	uc_utime(cchar *,const UTIMBUF *) noex ;
+extern int	uc_realpath(cchar *,char *) noex ;
+extern int	uc_truncate(cchar *,off_t) noex ;
 
-extern int	uc_isatty(int) noex ;
-extern int	uc_fsync(int) noex ;
-extern int	uc_fdatasync(int) noex ;
-extern int	uc_fattach(int,cchar *) noex ;
-extern int	uc_fdetach(cchar *) noex ;
-extern int	uc_minmod(cchar *,mode_t) noex ;
-extern int	uc_fminmod(int,mode_t) noex ;
-extern int	uc_fsize(int) noex ;
-extern int	uc_fuid(int) noex ;
-extern int	uc_fgid(int) noex ;
-
+/* open group */
+extern int	uc_create(cchar *,mode_t) noex ;
+extern int	uc_createfile(cchar *,mode_t) noex ;
+extern int	uc_open(cchar *,int,mode_t) noex ;
+extern int	uc_opene(cchar *,int,mode_t,int) noex ;
+extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
+extern int	uc_openenv(cchar *,int,mode_t,cchar **,int) noex ;
 extern int	uc_opensocket(cchar *,int,int) noex ;
 extern int	uc_openproto(cchar *,int,int,int) noex ;
 extern int	uc_openpass(cchar *,int,int,int) noex ;
@@ -180,9 +174,28 @@ extern int	uc_openfint(cchar *,cchar *,cchar *,
 extern int	uc_opensys(cchar *,int,mode_t,mainv,int,int) noex ;
 extern int	uc_opendev(cchar *,int,mode_t,mainv,int,int) noex ;
 
+/* special open group */
+extern int	uc_opensysdb(int,int,mode_t) noex ;
+extern int	uc_openpt(int) noex ;
+extern int	uc_socket(int,int,int) noex ;
+
+/* use group */
+extern int	uc_fpassfd(int,int) noex ;
+extern int	uc_ftruncate(int,off_t) noex ;
+extern int	uc_fstat(int,USTAT *) noex ;
+extern int	uc_isatty(int) noex ;
+extern int	uc_fsync(int) noex ;
+extern int	uc_fdatasync(int) noex ;
+extern int	uc_fattach(int,cchar *) noex ;
+extern int	uc_fdetach(cchar *) noex ;
+extern int	uc_minmod(cchar *,mode_t) noex ;
+extern int	uc_fminmod(int,mode_t) noex ;
+extern int	uc_fsize(int) noex ;
+extern int	uc_fuid(int) noex ;
+extern int	uc_fgid(int) noex ;
+
 extern int	uc_accepte(int,cvoid *,int *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
-
 extern int	uc_copy(int,int,int) noex ;
 
 extern int	uc_readn(int,void *,int) noex ;
@@ -219,17 +232,18 @@ extern int	uc_msgdiscard(int) noex ;
 extern int	uc_setappend(int,int) noex ;
 extern int	uc_closeonexec(int,int) noex ;
 extern int	uc_close(int) noex ;
+extern int	uc_locktail(int,int,int,int) noex ;
 
 extern int	uc_remove(cchar *) noex ;
 extern int	uc_link(cchar *,cchar *) noex ;
 extern int	uc_symlink(cchar *,cchar *) noex ;
 extern int	uc_unlink(cchar *) noex ;
-extern int	uc_locktail(int,int,int,int) noex ;
 extern int	uc_mkdir(cchar *,mode_t) noex ;
 extern int	uc_rmdir(cchar *) noex ;
 extern int	uc_access(cchar *,int) noex ;
 extern int	uc_pathconf(cchar *,int,long *) noex ;
 
+/* process-signal group */
 extern int	uc_raise(int) noex ;
 extern int	uc_sigdefault(int) noex ;
 extern int	uc_sigignore(int) noex ;

@@ -11,22 +11,28 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
-#include	<dirent.h>
+#include	<dirent.h>		/* possielbe preprocesor 'DT_{x}' */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
 
 enum filetypes {
-	filetype_unknown,
-	filetype_fifo,
-	filetype_chr,
-	filetype_dir = 4,
-	filetype_blk = 6,
-	filetype_reg = 8,
-	filetype_lnk = 10,
-	filetype_sock = 12,
-	filetype_wht = 14,
-	filetype_name,
+	filetype_unassigned0,		/* 0 */
+	filetype_fifo,			/* 1 */
+	filetype_chr,			/* 2 */
+	filetype_unassigned3,		/* 3 */
+	filetype_dir,			/* 4 */
+	filetype_name,			/* 5 - XENIX® special named file */
+	filetype_blk,			/* 6 */
+	filetype_unassigned7,		/* 7 */
+	filetype_reg,			/* 8 */
+	filetype_unassigned9,		/* 9 */
+	filetype_lnk,			/* 10 */
+	filetype_unassigned11,		/* 11 */
+	filetype_sock,			/* 12 */
+	filetype_door,			/* 13 */
+	filetype_wht,			/* 14 - "event port" on Solaris® */
+	filetype_unassigned15,		/* 15 */
 	filetype_overlast
 } ;
 
@@ -47,6 +53,10 @@ enum filetypes {
 #define	DT_DIR		filetype_dir
 #endif
 
+#ifndef	DT_NAME
+#define	DT_NAME		filetype_name
+#endif
+
 #ifndef	DT_BLK
 #define	DT_BLK		filetype_blk
 #endif
@@ -63,19 +73,19 @@ enum filetypes {
 #define	DT_SOCK		filetype_sock
 #endif
 
-#ifndef	DT_WHT
-#define	DT_WHT		filetype_wht
+#ifndef	DT_DOOR
+#define	DT_DOOR		filetype_door
 #endif
 
-#ifndef	DT_NAME
-#define	DT_NAME		filetype_name
+#ifndef	DT_WHT
+#define	DT_WHT		filetype_wht
 #endif
 
 
 EXTERNC_begin
 
 static inline int filetype(mode_t m) noex {
-	return ((m & 0170000) >> 12) ;
+	return ((m & S_IFMT)  >> 12) ;
 }
 
 EXTERNC_end
