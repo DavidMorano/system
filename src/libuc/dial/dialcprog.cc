@@ -1144,7 +1144,7 @@ static int dialremote(DI *dip,cchar *pfn,mainv av,mainv ev,int *fd2p) noex {
 	    goto ret1 ;
 	}
 
-	stdorder_rint(buf,&rs) ;
+	stdorder_ri(buf,&rs) ;
 
 #if	CF_DEBUGS
 	debugprintf("dialremote: CEXECER rs=%d\n", rs) ;
@@ -1402,7 +1402,7 @@ char		rnode[] ;
 	        case 1:
 	            nlenbuf[state] = (databuf[i] & 0xff) ;
 	            if (state == 1) {
-	                stdorder_rshort(nlenbuf,&sw) ;
+	                stdorder_rs(nlenbuf,&sw) ;
 	                nlen = sw ;
 #if	CF_DEBUGS && CF_DEBUGRNODE
 	                debugprintf("getrnode: sw=%d\n",sw) ;
@@ -1798,7 +1798,7 @@ static int filer_sendrecord(FILER *bp,int type,cchar *sp,int sl)
 #endif
 
 	data[0] = type ;
-	if ((rs = stdorder_wushort((data+1),(sl+1))) >= 0) {
+	if ((rs = stdorder_wus((data+1),(sl+1))) >= 0) {
 	    if ((rs = filer_write(bp,data,3)) >= 0) {
 	        tlen += rs ;
 	        if ((rs = filer_write(bp,sp,sl)) >= 0) {

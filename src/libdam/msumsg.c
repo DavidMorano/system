@@ -83,7 +83,7 @@ int msumsg_getstatus(struct msumsg_getstatus *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -132,7 +132,7 @@ int msumsg_status(struct msumsg_status *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -173,7 +173,7 @@ int msumsg_getsysmisc(struct msumsg_getsysmisc *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -242,7 +242,7 @@ int msumsg_sysmisc(struct msumsg_sysmisc *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -283,7 +283,7 @@ int msumsg_exit(struct msumsg_exit *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -324,7 +324,7 @@ int msumsg_mark(struct msumsg_mark *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -365,7 +365,7 @@ int msumsg_report(struct msumsg_report *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

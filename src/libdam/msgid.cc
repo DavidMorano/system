@@ -1453,7 +1453,7 @@ static int msgid_search(MSGID *op,MSGID_KEY *kp,uint khash,char **bepp) noex {
 
 	        {
 	            uint	uiw ;
-	            stdorder_ruint((bep + MSGIDE_OHASH),&uiw) ;
+	            stdorder_rui((bep + MSGIDE_OHASH),&uiw) ;
 	            f = (khash == uiw) ;
 	        }
 

@@ -96,7 +96,7 @@ struct muximsg_response	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -141,7 +141,7 @@ struct muximsg_noop	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -192,7 +192,7 @@ struct muximsg_passfd	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -241,7 +241,7 @@ struct muximsg_exit	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -286,7 +286,7 @@ struct muximsg_getsysmisc	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -355,7 +355,7 @@ struct muximsg_sysmisc	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -400,7 +400,7 @@ struct muximsg_getloadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -461,7 +461,7 @@ struct muximsg_loadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -542,7 +542,7 @@ struct muximsg_reploadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -591,7 +591,7 @@ struct muximsg_getlistener	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -660,7 +660,7 @@ struct muximsg_listener	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -705,7 +705,7 @@ struct muximsg_mark	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -746,7 +746,7 @@ struct muximsg_unknown	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -795,7 +795,7 @@ struct muximsg_gethelp	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -856,7 +856,7 @@ struct muximsg_help	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -905,7 +905,7 @@ struct muximsg_cmd	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

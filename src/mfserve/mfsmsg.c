@@ -79,7 +79,7 @@ int mfsmsg_getstatus(struct mfsmsg_getstatus *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wui(&m,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -115,7 +115,7 @@ int mfsmsg_status(struct mfsmsg_status *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wuc(&m,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -149,7 +149,7 @@ int mfsmsg_getval(struct mfsmsg_getval *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->key,MFSMSG_KEYLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -187,7 +187,7 @@ int mfsmsg_val(struct mfsmsg_val *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->val,REALNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -219,7 +219,7 @@ int mfsmsg_gethelp(struct mfsmsg_gethelp *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wuc(&m,sp->idx) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -257,7 +257,7 @@ int mfsmsg_help(struct mfsmsg_help *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->val,REALNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -289,7 +289,7 @@ int mfsmsg_getname(struct mfsmsg_getname *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->un,USERNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -323,7 +323,7 @@ int mfsmsg_name(struct mfsmsg_name *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->rn,REALNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -355,7 +355,7 @@ int mfsmsg_getuser(struct mfsmsg_getuser *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->spec,REALNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -389,7 +389,7 @@ int mfsmsg_user(struct mfsmsg_user *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->un,USERNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -421,7 +421,7 @@ int mfsmsg_exit(struct mfsmsg_exit *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&m,sp->reason,REALNAMELEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -451,7 +451,7 @@ int mfsmsg_mark(struct mfsmsg_mark *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wui(&m,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -483,7 +483,7 @@ int mfsmsg_ack(struct mfsmsg_ack *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wuc(&m,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&m)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&m) ;
@@ -525,7 +525,7 @@ int mfsmsg_getlistener(struct mfsmsg_getlistener *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -591,7 +591,7 @@ struct mfsmsg_listener *sp,int f,char *mbuf,int mlen)
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

@@ -644,7 +644,7 @@ int main(int argc,cchar **argv,cchar **envv)
 	i = pslen ;
 	cl = strlen(nodename) ;
 
-	stdorder_wshort((buf + i),cl) ;
+	stdorder_ws((buf + i),cl) ;
 
 	i += 2 ;
 	strncpy((buf + i),nodename,cl) ;
@@ -811,7 +811,7 @@ int main(int argc,cchar **argv,cchar **envv)
 #endif
 
 	if (rs >= 0) {
-	    stdorder_wint(buf,rs) ;
+	    stdorder_wi(buf,rs) ;
 	    rs1 = uc_writen(fd_output,buf,4) ;
 	}
 
@@ -1210,7 +1210,7 @@ TARGETINFO	*tip ;
 	        case dialcprogmsgtype_light:
 	            rs = filer_read(&rd,(buf + 1),2,to) ;
 	            if (rs >= 0) {
-	                stdorder_rushort((buf + 1),&usw) ;
+	                stdorder_rus((buf + 1),&usw) ;
 	                rs = filer_read(&rd,(buf + 3),(int) usw,to) ;
 	                mlen = (3 + rs) ;
 	                if (rs >= 0) {
@@ -1247,7 +1247,7 @@ TARGETINFO	*tip ;
 	            cl = rs ;
 	            if (rs >= 0) {
 	                if (cl < 2) rs = SR_INVALID ;
-	                stdorder_rushort((buf + 1),&usw) ;
+	                stdorder_rus((buf + 1),&usw) ;
 	                rs = filer_read(&rd,(buf + 3),(int) usw,to) ;
 	            }
 	            break ;
@@ -1294,7 +1294,7 @@ TARGETINFO	*tip ;
 	char		*envbuf = (rbuf + 3) ;
 
 	if ((rs = filer_read(fbp,lenbuf,2,to)) >= 0) {
-	    stdorder_rushort(lenbuf,&usw) ;
+	    stdorder_rus(lenbuf,&usw) ;
 	    len = usw & USHORT_MAX ;
 	    if (len <= (rlen-3)) {
 	        if ((rs = filer_read(fbp,envbuf,len,to)) >= 0) {

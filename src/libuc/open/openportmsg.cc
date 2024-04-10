@@ -105,7 +105,7 @@ int openportmsg_request(OPM_REQ *sp,int f,char *mbuf,int mlen) noex {
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -145,7 +145,7 @@ int openportmsg_response(OPM_RES *sp,int f,char *mbuf,int mlen) noex {
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

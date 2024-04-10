@@ -126,7 +126,7 @@ struct sysmisc_request	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -199,7 +199,7 @@ struct sysmisc_loadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -280,7 +280,7 @@ struct sysmisc_extra	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -381,7 +381,7 @@ struct sysmisc_hostinfo	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

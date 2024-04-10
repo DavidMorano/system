@@ -184,7 +184,7 @@ struct ulmsg_update	*sp ;
 
 	    if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	        hdr |= (sp->msglen << 8) ;
-		stdorder_wuint(buf,hdr) ;
+		stdorder_wui(buf,hdr) ;
 	    }
 
 	} /* end if */
@@ -289,7 +289,7 @@ struct ulmsg_request	*sp ;
 
 	    if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	        hdr |= (sp->msglen << 8) ;
-		stdorder_wuint(buf,hdr) ;
+		stdorder_wui(buf,hdr) ;
 	    }
 
 	} /* end if */
@@ -434,7 +434,7 @@ struct ulmsg_response	*sp ;
 
 	    if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	        hdr |= (sp->msglen << 8) ;
-		stdorder_wuint(buf,hdr) ;
+		stdorder_wui(buf,hdr) ;
 	    }
 
 	} /* end if */

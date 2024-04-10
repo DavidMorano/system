@@ -103,7 +103,7 @@ int			mlen ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -171,7 +171,7 @@ int			mlen ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -213,7 +213,7 @@ int			mlen ;
 
 	        if ((sp->msglen = serialbuf_getlen(&msgbuf)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */

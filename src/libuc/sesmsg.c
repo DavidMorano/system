@@ -90,7 +90,7 @@ int sesmsg_exit(SESMSG_EXIT *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wstrw(&mb,sp->reason,SESMSG_REASONLEN) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&mb) ;
@@ -132,7 +132,7 @@ int sesmsg_noop(SESMSG_NOOP *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wui(&mb,sp->tag) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&mb) ;
@@ -193,7 +193,7 @@ int sesmsg_response(SESMSG_RESPONSE *sp,int f,char *mbuf,int mlen)
 	        serialbuf_wuc(&mb,sp->rc) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&mb) ;
@@ -241,7 +241,7 @@ struct sesmsg_passfd	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -286,7 +286,7 @@ struct sesmsg_getsysmisc	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -355,7 +355,7 @@ struct sesmsg_sysmisc	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -400,7 +400,7 @@ struct sesmsg_getloadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -461,7 +461,7 @@ struct sesmsg_loadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -542,7 +542,7 @@ struct sesmsg_reploadave	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -591,7 +591,7 @@ struct sesmsg_getlistener	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -660,7 +660,7 @@ struct sesmsg_listener	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -705,7 +705,7 @@ struct sesmsg_mark	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -746,7 +746,7 @@ struct sesmsg_unknown	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -795,7 +795,7 @@ struct sesmsg_gethelp	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -856,7 +856,7 @@ struct sesmsg_help	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -905,7 +905,7 @@ struct sesmsg_cmd	*sp ;
 
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 
 	    } /* end if */
@@ -959,7 +959,7 @@ int		mlen ;
 	        serialbuf_wstrw(&mb,sp->nbuf,nlen) ;
 	        if ((sp->msglen = serialbuf_getlen(&mb)) > 0) {
 	            hdr |= (sp->msglen << 8) ;
-	            stdorder_wuint(mbuf,hdr) ;
+	            stdorder_wui(mbuf,hdr) ;
 	        }
 	    } /* end if */
 	    rs1 = serialbuf_finish(&mb) ;

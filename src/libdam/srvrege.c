@@ -162,11 +162,11 @@ SRVREGE_UTIME	*ep ;
 
 	if (f_read) {
 
-	    stdorder_ruint(bp,&ep->utime) ;
+	    stdorder_rui(bp,&ep->utime) ;
 
 	} else {
 
-	    stdorder_wuint(bp,ep->utime) ;
+	    stdorder_wui(bp,ep->utime) ;
 
 	}
 
