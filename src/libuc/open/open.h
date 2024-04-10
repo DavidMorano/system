@@ -32,6 +32,13 @@
 #include	<opensysfs.h>
 
 
+EXTERNC_begin
+
+extern int	opendefstds(int) noex ;
+
+EXTERNC_end
+
+
 #endif /* OPEN_INCLUDE */
 
 

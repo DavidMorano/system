@@ -18,6 +18,9 @@
 #include	<localmisc.h>
 
 
+#define	OPERPORT_PROGNAME	"openport"
+
+
 EXTERNC_begin
 
 extern int openport(int,int,int,sockaddress *) noex ;

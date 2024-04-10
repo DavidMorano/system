@@ -33,6 +33,8 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
+#include	"open.h"
+
 
 /* local defines */
 
@@ -70,7 +72,7 @@
 int opendefstds(int n) noex {
 	int		rs = SR_OK ;
 	cmode		om = 0666 ;
-	cchar		nfn = NULLFNAME ;
+	cchar		*nfn = NULLFNAME ;
 	for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
 	    if ((rs = u_fcntl(i,F_GETFD,0)) == SR_BADF) {
 	        cint	of = (i == 0) ? O_RDONLY : O_WRONLY ;
