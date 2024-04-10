@@ -12,6 +12,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<usystem.h>
 #include	<sockaddress.h>
 #include	<openportmsg.h>
 #include	<localmisc.h>
@@ -19,7 +20,7 @@
 
 EXTERNC_begin
 
-extern int openport(int,int,int,SOCKADDRESS *) ;
+extern int openport(int,int,int,sockaddress *) noex ;
 
 EXTERNC_end
 

@@ -65,7 +65,7 @@
 #include	<xperm.h>
 #include	<matxstr.h>
 #include	<isnot.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MSGBUFLEN| */
 
 #include	"openport.h"
 #include	"openportmsg.h"
@@ -83,13 +83,12 @@
 
 #define	PROG_OPENPORT	"openport"
 
-#define	ENVBUFLEN	(MAXPATHLEN + 20)
 #define	MBUFLEN		MSGBUFLEN
 
 #define	NENVS		10
 
 #define	SA		sockaddress
-#define	SP		spanwproc
+#define	SP_CON		spawnproc_con
 
 
 /* imported namespaces */
@@ -137,7 +136,7 @@ namespace {
 /* forward references */
 
 static int procspawn(cchar *,cchar *,mainv,mainv,int,int,int,SA *) noex ;
-static int procspawn_begin(SP *,cchar *,mainv,mainv) noex ;
+static int procspawn_begin(SP_CON *,cchar *,mainv,mainv) noex ;
 static int procspawn_end(pid_t,int *) noex ;
 
 static int procexchange(cchar *,int,int,int,int,SA *) noex ;
@@ -154,6 +153,8 @@ static constexpr cpcchar	prs[] = {
 	nullptr
 } ;
 
+constexpr int			unlen = OPENPORTMSG_UNLEN ;
+
 
 /* exported variables */
 
@@ -162,7 +163,6 @@ static constexpr cpcchar	prs[] = {
 
 int openport(int pf,int pt ,int proto,SA *sap) noex {
 	int		rs = SR_FAULT ;
-	int		rs1 ;
 	int		fd = -1 ;
 	if (sap) {
 	    rs = SR_INVALID ;
@@ -182,6 +182,7 @@ int openport(int pf,int pt ,int proto,SA *sap) noex {
 openporter::operator int () noex {
 	int		rs ;
 	int		rs1 ;
+	int		fd = -1 ;
 	if ((rs = start()) >= 0) {
 	    {
 		rs = opener() ;
@@ -195,7 +196,7 @@ openporter::operator int () noex {
 }
 /* end method (openporter::operator) */
 
-int operporter::start() noex {
+int openporter::start() noex {
 	int		rs ;
 	if ((rs = getbufsize(getbufsize_un)) >= 0) {
 	    ulen = rs ;
@@ -204,7 +205,7 @@ int operporter::start() noex {
 		plen = rs ;
 		if ((rs = uc_malloc(sz,&a)) >= 0) {
 		    ubuf = a ;
-		    pbuf = (ubuf + (ulen+1))
+		    pbuf = (ubuf + (ulen+1)) ;
 		    rs = getusername(ubuf,ulen,-1) ;
 		    if (rs < 0) {
 			uc_free(a) ;
@@ -298,7 +299,7 @@ int openporter::progproc(cchar *bn,int bl) noex {
 
 static int procspawn(cc *un,cc *prog,mainv sargv,mainv senvv,
 		int pf,int pt,int proto,SA *sap) noex {
-	SP		psa ;
+	SP_CON		psa ;
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -319,7 +320,7 @@ static int procspawn(cc *un,cc *prog,mainv sargv,mainv senvv,
 }
 /* end subroutine (procspawn) */
 
-static int procspawn_begin(SP *psp,cc *prog,mainv sargv,mainv senvv) noex {
+static int procspawn_begin(SP_CON *psp,cc *prog,mainv sargv,mainv senvv) noex {
 	int		rs ;
 	memclear(psp) ;
 	psp->opts |= SPAWNPROC_OIGNINTR ;
@@ -343,7 +344,6 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	STRRECVFD	fds ;
 	int		rs ;
 	int		rs1 ;
-	int		sz = sizeof(struct openportmsg_request) ;
 	int		ml ;
 	int		fd = -1 ;
 	char		mbuf[MBUFLEN+1] ;
@@ -353,9 +353,9 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	m0.ptype = pt ;
 	m0.proto = proto ;
 	m0.sa = *sap ;
-	strwcpy(m0.username,un,USERNAMELEN) ;
+	strwcpy(m0.username,un,unlen) ;
 
-	rs = openportmsg_request(&m0,0,mbuf,MBUFLEN) ;
+	rs = openportmsg_msgrequest(&m0,0,mbuf,MBUFLEN) ;
 	ml = rs ;
 
 	if (rs >= 0)
@@ -368,7 +368,7 @@ static int procexchange(cc *un,int cfd,int pf,int pt,int proto,SA *sap) noex {
 	    ml = rs1 ;
 
 	    if (rs1 >= 0) {
-	        rs1 = openportmsg_response(&m1,1,mbuf,ml) ;
+	        rs1 = openportmsg_msgresponse(&m1,1,mbuf,ml) ;
 	    }
 
 	    if ((rs1 > 0) && (m1.msgtype == mt)) {
