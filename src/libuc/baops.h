@@ -103,130 +103,130 @@
 #ifdef	__cplusplus
 
 template<typename T>
-inline constexpr bool baset(T *ap,int b) noex {
+constexpr inline bool baset(T *ap,int b) noex {
 	return BASET(ap,b) ;
 }
 template<typename T>
-inline constexpr bool baclr(T *ap,int b) noex {
+constexpr inline bool baclr(T *ap,int b) noex {
 	return BACLR(ap,b) ;
 }
 template<typename T>
-inline constexpr bool batst(const T *ap,int b) noex {
+constexpr inline bool batst(const T *ap,int b) noex {
 	return BATST(ap,b) ;
 }
 
 template<>
-inline constexpr bool baset(uchar *ap,int b) noex {
+constexpr inline bool baset(uchar *ap,int b) noex {
 	return BASETB(ap,b) ;
 }
 template<>
-inline constexpr bool baclr(uchar *ap,int b) noex {
+constexpr inline bool baclr(uchar *ap,int b) noex {
 	return BACLRB(ap,b) ;
 }
 template<>
-inline constexpr bool batst(const uchar *ap,int b) noex {
+constexpr inline bool batst(const uchar *ap,int b) noex {
 	return BATSTB(ap,b) ;
 }
 
 template<>
-inline constexpr bool baset(ushort *ap,int b) noex {
+constexpr inline bool baset(ushort *ap,int b) noex {
 	return BASETS(ap,b) ;
 }
 template<>
-inline constexpr bool baclr(ushort *ap,int b) noex {
+constexpr inline bool baclr(ushort *ap,int b) noex {
 	return BACLRS(ap,b) ;
 }
 template<>
-inline constexpr bool batst(const ushort *ap,int b) noex {
+constexpr inline bool batst(const ushort *ap,int b) noex {
 	return BATSTS(ap,b) ;
 }
 
 template<>
-inline constexpr bool baset(uint *ap,int b) noex {
+constexpr inline bool baset(uint *ap,int b) noex {
 	return BASETI(ap,b) ;
 }
 template<>
-inline constexpr bool baclr(uint *ap,int b) noex {
+constexpr inline bool baclr(uint *ap,int b) noex {
 	return BACLRI(ap,b) ;
 }
 template<>
-inline constexpr bool batst(const uint *ap,int b) noex {
+constexpr inline bool batst(const uint *ap,int b) noex {
 	return BATSTI(ap,b) ;
 }
 
 template<>
-inline constexpr bool baset(ulong *ap,int b) noex {
+constexpr inline bool baset(ulong *ap,int b) noex {
 	return BASETL(ap,b) ;
 }
 template<>
-inline constexpr bool baclr(ulong *ap,int b) noex {
+constexpr inline bool baclr(ulong *ap,int b) noex {
 	return BACLRL(ap,b) ;
 }
 template<>
-inline constexpr bool batst(const ulong *ap,int b) noex {
+constexpr inline bool batst(const ulong *ap,int b) noex {
 	return BATSTL(ap,b) ;
 }
 
 template<>
-inline constexpr bool baset(ulonglong *ap,int b) noex {
+constexpr inline bool baset(ulonglong *ap,int b) noex {
 	return BASETLL(ap,b) ;
 }
 template<>
-inline constexpr bool baclr(ulonglong *ap,int b) noex {
+constexpr inline bool baclr(ulonglong *ap,int b) noex {
 	return BACLRLL(ap,b) ;
 }
 template<>
-inline constexpr bool batst(const ulonglong *ap,int b) noex {
+constexpr inline bool batst(const ulonglong *ap,int b) noex {
 	return BATSTLL(ap,b) ;
 }
 
-inline constexpr bool basetb(uchar *ap,int b) noex {
+constexpr inline bool basetb(uchar *ap,int b) noex {
 	return BASETB(ap,b) ;
 }
-inline constexpr bool baclrb(uchar *ap,int b) noex {
+constexpr inline bool baclrb(uchar *ap,int b) noex {
 	return BACLRB(ap,b) ;
 }
-inline constexpr bool batstb(const uchar *ap,int b) noex {
+constexpr inline bool batstb(const uchar *ap,int b) noex {
 	return BATSTB(ap,b) ;
 }
 
-inline constexpr bool basets(ushort *ap,int b) noex {
+constexpr inline bool basets(ushort *ap,int b) noex {
 	return BASETS(ap,b) ;
 }
-inline constexpr bool baclrs(ushort *ap,int b) noex {
+constexpr inline bool baclrs(ushort *ap,int b) noex {
 	return BACLRS(ap,b) ;
 }
-inline constexpr bool batsts(const ushort *ap,int b) noex {
+constexpr inline bool batsts(const ushort *ap,int b) noex {
 	return BATSTS(ap,b) ;
 }
 
-inline constexpr bool baseti(uint *ap,int b) noex {
+constexpr inline bool baseti(uint *ap,int b) noex {
 	return BASETI(ap,b) ;
 }
-inline constexpr bool baclri(uint *ap,int b) noex {
+constexpr inline bool baclri(uint *ap,int b) noex {
 	return BACLRI(ap,b) ;
 }
-inline constexpr bool batsti(const uint *ap,int b) noex {
+constexpr inline bool batsti(const uint *ap,int b) noex {
 	return BATSTI(ap,b) ;
 }
 
-inline constexpr bool basetl(ulong *ap,int b) noex {
+constexpr inline bool basetl(ulong *ap,int b) noex {
 	return BASETL(ap,b) ;
 }
-inline constexpr bool baclrl(ulong *ap,int b) noex {
+constexpr inline bool baclrl(ulong *ap,int b) noex {
 	return BACLRL(ap,b) ;
 }
-inline constexpr bool batstl(const ulong *ap,int b) noex {
+constexpr inline bool batstl(const ulong *ap,int b) noex {
 	return BATSTL(ap,b) ;
 }
 
-inline constexpr bool basetll(ulonglong *ap,int b) noex {
+constexpr inline bool basetll(ulonglong *ap,int b) noex {
 	return BASETLL(ap,b) ;
 }
-inline constexpr bool baclrll(ulonglong *ap,int b) noex {
+constexpr inline bool baclrll(ulonglong *ap,int b) noex {
 	return BACLRLL(ap,b) ;
 }
-inline constexpr bool batstll(const ulonglong *ap,int b) noex {
+constexpr inline bool batstll(const ulonglong *ap,int b) noex {
 	return BATSTLL(ap,b) ;
 }
 

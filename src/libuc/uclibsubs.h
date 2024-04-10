@@ -198,6 +198,9 @@ extern int	uc_fgid(int) noex ;
 extern int	uc_accepte(int,cvoid *,int *,int) noex ;
 extern int	uc_connect(int,cvoid *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
+extern int	uc_setsockopt(int,int,int,int *,int) noex ;
+extern int	uc_linger(int,int) noex ;
+
 extern int	uc_copy(int,int,int) noex ;
 
 extern int	uc_readn(int,void *,int) noex ;
