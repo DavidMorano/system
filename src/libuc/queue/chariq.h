@@ -24,7 +24,7 @@
 #define	CHARIQ_INCLUDE
 
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 #include	<charq.h>
 #include	<ptm.h>

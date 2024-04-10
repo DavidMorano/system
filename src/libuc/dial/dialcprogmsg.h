@@ -11,8 +11,7 @@
 #define	DIALCPROGMSG_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/socket.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>

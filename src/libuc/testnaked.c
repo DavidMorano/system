@@ -1,4 +1,4 @@
-/* testnaked */
+/* testnaked SUPPORT */
 /* lang=C99 */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
@@ -19,8 +19,7 @@
 
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<time.h>
 #include	<stdarg.h>

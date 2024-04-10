@@ -4,13 +4,11 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSMISCS_INCLUDE
-#define	SYSMISCS_INCLUDE	1
+#define	SYSMISCS_INCLUDE
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 

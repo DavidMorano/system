@@ -1,7 +1,7 @@
 /* ucvariables SUPPORT */
 /* lang=C++20 */
 
-/* define various sytem (global) variables */
+/* define various system (global) variables */
 /* version %I% last-modified %G% */
 
 

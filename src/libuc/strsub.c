@@ -35,8 +35,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<string.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>

@@ -1,7 +1,7 @@
 /* ucvariables HEADER */
 /* lang=C++20 */
 
-/* this is a database of commonly used environment variable names */
+/* this is a database of commonly used global variables */
 /* version %I% last-modified %G% */
 
 
@@ -30,6 +30,7 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+
 #include	<syswords.hh>
 #include	<varnames.hh>
 #include	<valuelims.hh>

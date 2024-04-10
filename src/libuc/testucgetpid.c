@@ -17,7 +17,7 @@
 
 /* Copyright © 2000,2017 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<stdarg.h>
 #include	<stdio.h>

@@ -1,4 +1,4 @@
-/* ucsub */
+/* ucsysauxinfo SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® system-auxillary-information */
@@ -36,7 +36,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/utsname.h>

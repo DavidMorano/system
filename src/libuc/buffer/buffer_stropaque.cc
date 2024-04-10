@@ -39,7 +39,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<sfx.h>

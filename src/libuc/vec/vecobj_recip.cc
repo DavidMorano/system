@@ -31,7 +31,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>

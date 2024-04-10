@@ -40,8 +40,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<time.h>
 #include	<usystem.h>
 #include	<sbuf.h>

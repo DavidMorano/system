@@ -21,10 +21,9 @@
 
 	We defines some system (global) variables in this module.
 
-
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 
 /* USYSAUXINFO_SUNOS start */
 #if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)

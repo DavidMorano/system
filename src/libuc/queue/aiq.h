@@ -21,7 +21,7 @@
 #define	AIQ_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<stddef.h>		/* <- for |ptrdiff_t| */
 #include	<pthread.h>
 #include	<usystem.h>

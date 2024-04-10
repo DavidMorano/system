@@ -1,8 +1,5 @@
-/* llpow */
+/* llpow SUPPORT */
 /* lang=C99 */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,11 +15,9 @@
 
 	Find an integral power of a given number.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<localmisc.h>
 
@@ -45,14 +40,14 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-longlong_t llpow(longlong_t b,int n)
-{
+longlong_t llpow(longlong_t b,int n) noex {
 	longlong_t	v = 1 ;
-	int		i ;
-	for (i = 1 ; i < n ; i += 1) {
+	for (int i = 1 ; i < n ; i += 1) {
  	    v += v ;
 	}
 	return v ;

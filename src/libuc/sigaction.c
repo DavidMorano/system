@@ -17,16 +17,12 @@
 
 	We manage (a little bit) the SIGACTION object.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<signal.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 

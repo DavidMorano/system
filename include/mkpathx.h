@@ -18,7 +18,7 @@
 #define	MKPATHX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 #include	<mkpathxw.h>
 #include	<mknpathx.h>

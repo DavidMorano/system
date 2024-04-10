@@ -11,11 +11,13 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	COMMANDMENTS_INCLUDE
-#define	COMMANDMENTS_INCLUDE	1
+#define	COMMANDMENTS_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"cmi.h"
@@ -33,9 +35,8 @@
 #define	COMMANDMENTS_DBNAME	"ten"
 
 
-/* this is the shared-object description */
 struct commandments_obj {
-	const char	*name ;
+	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
 } ;
@@ -66,11 +67,11 @@ struct commandments_head {
 	COMMANDMENTS_FL	f ;
 	CMI		idx ;
 	void		*a ;
-	const char	*pr ;
-	const char	*dbname ;
-	const char	*uhome ;		/* user home dir */
-	const char 	*fname ;
-	const char	*data_db ;
+	cchar		*pr ;
+	cchar		*dbname ;
+	cchar		*uhome ;		/* user home dir */
+	cchar 		*fname ;
+	cchar		*data_db ;
 	size_t		size_db ;		/* srouce DB size */
 	time_t		ti_db ;			/* source DB m-time */
 	time_t		ti_idx ;		/* index modification */

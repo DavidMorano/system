@@ -36,7 +36,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
 #include	<stdint.h>		/* <- for |uintptr_t| */
