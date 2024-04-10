@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/poll.h>
 #include	<sys/socket.h>
@@ -47,6 +46,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
@@ -54,10 +54,16 @@
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
+#include	"dial.h"
+
 
 /* local defines */
 
-#define	BUFLEN		(8 * 1024)
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -88,16 +94,16 @@ int dialusd(cchar *dst,int to,int) noex {
 	        cint	af = AF_UNIX ;
 		cint	st = SOCK_DGRAM ;
 		cint	proto = 0 ;
-	        if ((rs = u_socket(pf,st,proto)) >= 0) {
+	        if ((rs = uc_socket(pf,st,proto)) >= 0) {
 	            sockaddress	sa ;
 	            fd = rs ;
 	            if ((rs = sockaddress_start(&sa,af,dst,0,0)) >= 0) {
 	 	        SOCKADDR	*sap = (SOCKADDR *) &sa ;
 	                int 		sal = rs ;
 	                if (to > 0) {
-	                    rs = u_connect(fd,sap,sal) ;
+	                    rs = uc_connect(fd,sap,sal) ;
 		        } else {
-	                    rs = u_connect(fd,sap,sal) ;
+	                    rs = uc_connect(fd,sap,sal) ;
 			}
 	                rs1 = sockaddress_finish(&sa) ;
 		        if (rs >= 0) rs = rs1 ;

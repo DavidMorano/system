@@ -34,14 +34,18 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
+
+
+INCS += dial.h dialopts.h
+
+
+LIBS +=
+
 
 LDRPATH= $(EXTRA)/lib
 
 LIBDIRS= -L$(LIBDIR)
-
-LIBS=
-
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -49,9 +53,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= dial.h dialopts.h
 
 
 OBJ0_DIAL= dialopts.o nlsdialassist.o

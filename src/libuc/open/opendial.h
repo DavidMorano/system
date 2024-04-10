@@ -15,6 +15,13 @@
 #define	OPENDIAL_INCLUDE
 
 
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
+
+
 /* options */
 #define	OPENDIAL_OLONG		(1<<0)		/* FINGER "long" option */
 
@@ -39,8 +46,7 @@ enum opendialers {
 
 EXTERNC_begin
 
-extern int opendial(int,int,cchar *,cchar *,cchar *,
-		cchar **,cchar **,int,int) noex ;
+extern int opendial(int,int,cc *,cc *,cc *,mainv,mainv,int,int) noex ;
 
 EXTERNC_end
 

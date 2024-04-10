@@ -180,6 +180,7 @@ extern int	uc_openpt(int) noex ;
 extern int	uc_socket(int,int,int) noex ;
 
 /* use group */
+extern int	uc_ioctl(int,int,...) noex ;
 extern int	uc_fpassfd(int,int) noex ;
 extern int	uc_ftruncate(int,off_t) noex ;
 extern int	uc_fstat(int,USTAT *) noex ;
@@ -195,6 +196,7 @@ extern int	uc_fuid(int) noex ;
 extern int	uc_fgid(int) noex ;
 
 extern int	uc_accepte(int,cvoid *,int *,int) noex ;
+extern int	uc_connect(int,cvoid *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
 extern int	uc_copy(int,int,int) noex ;
 

@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/poll.h>
@@ -46,11 +45,14 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
 #include	<usystem.h>
 #include	<localmisc.h>
+
+#include	"dial.h"
 
 
 /* local defines */
@@ -102,10 +104,10 @@ int dialpass(cchar *fname,int timeout,int) noex {
 		rs = SR_NOSYS ;
 		if constexpr (f_streams) {
 	            cint	of = (O_WRONLY | O_NDELAY) ;
-	            if ((rs = u_open(fname,of,0666)) >= 0) {
+	            if ((rs = uc_open(fname,of,0666)) >= 0) {
 	                USTAT	sb ;
 	                cint	fd_pass = rs ;
-	                if ((rs = u_fstat(fd_pass,&sb)) >= 0) {
+	                if ((rs = uc_fstat(fd_pass,&sb)) >= 0) {
 			    rs = SR_INVALID ;
 	                    if (S_ISFIFO(sb.st_mode) || S_ISCHR(sb.st_mode)) {
 			        rs = SR_OK ;
@@ -114,23 +116,23 @@ int dialpass(cchar *fname,int timeout,int) noex {
 	                        } /* end if (timeout) */
 	                        if (rs >= 0) {
 	                            int		pipes[2] ;
-	                            if ((rs = u_pipe(pipes)) >= 0) {
+	                            if ((rs = uc_pipe(pipes)) >= 0) {
 					cint	cmd = I_SENDFD ;
 	                                fd = pipes[0] ;
-	                                rs = u_ioctl(fd_pass,cmd,pipes[1]) ;
-	                                u_close(pipes[1]) ;
+	                                rs = uc_ioctl(fd_pass,cmd,pipes[1]) ;
+	                                uc_close(pipes[1]) ;
 	                                if (rs < 0) {
-	                                    u_close(fd) ;
+	                                    uc_close(fd) ;
 					    fd = -1 ;
 	                                }
-	                            } /* end if (u_pipe) */
+	                            } /* end if (uc_pipe) */
 	                        } /* end if (ok) */
 			    } /* end if (type of file) */
 	                } /* end if (stat) */
-	                rs1 = u_close(fd_pass) ;
+	                rs1 = uc_close(fd_pass) ;
 			if (rs >= 0) rs = rs1 ;
-	            } /* end if (u_open) */
-		    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	            } /* end if (uc_open) */
+		    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 		} /* end if-constexpr (f_streams) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */

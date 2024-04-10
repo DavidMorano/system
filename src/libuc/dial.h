@@ -33,8 +33,10 @@ EXTERNC_begin
 
 extern int dialprog(cchar *,int,mainv,mainv,int *) noex ;
 extern int dialuss(cchar *,int,int) noex ;
-extern int dialussmux(cc *,cc *,mainv,int,int) noex ;
+extern int dialusd(cchar *,int,int) noex ;
+extern int dialussmux(cchar *,cchar *,mainv,int,int) noex ;
 extern int dialussnls(cchar *,cchar *,int,int) noex ;
+extern int dialpass(cchar *,int,int) noex ;
 
 EXTERNC_end
 

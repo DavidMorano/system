@@ -36,8 +36,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
@@ -96,7 +95,7 @@ constexpr bool		f_linger = CF_LINGER ;
 int dialopts(int fd,int opts) noex {
 	int		rs = SR_BADF ;
 	if (fd >= 0) {
-	    int	one = 1 ;
+	    int		one = 1 ;
 	    rs = SR_INVALID ;
 	    if (opts & DIALOPT_KEEPALIVE) {
 	        cint	osz = sizeof(int) ;
