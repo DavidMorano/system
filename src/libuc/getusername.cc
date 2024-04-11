@@ -30,12 +30,12 @@
 	the user would expect.  Happily for us, the cheaper and
 	more likely methods come first, and the heavier and more
 	expensive methods come later (pretty much).  Although, in
-	all cases a lookup into the system PASSWD database is
+	all cases a lookup into the system ucentpw database is
 	required (itself not always a cheap or fast operation).  In
-	fact, a lookup to the system PASSWD database can be much
+	fact, a lookup to the system ucentpw database can be much
 	more expensive than a lookup into the system UTMPX database
-	(otherwise thought to be more expensive than a PASSWD
-	lookup).  We guard against making multiple PASSWD database
+	(otherwise thought to be more expensive than a ucentpw
+	lookup).  We guard against making multiple ucentpw database
 	requests for the same name (to save time).
 
 	The following are available:
@@ -70,10 +70,10 @@
 	= GETPWUSERNAME
 
 	Synopsis:
-	int getpwusername(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex
+	int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex
 
 	Arguments:
-	pwp		pointer to PASSWD structure (to receive results)
+	pwp		pointer to ucentpw structure (to receive results)
 	pwbuf		supplied buffer to hold information
 	pwlen		length of supplied buffer
 	uid		user-id
@@ -105,7 +105,7 @@
 	Forst we try to look up the name is the local program cache.
 	Failing the cache lookup, we go through various ways of
 	guessing what our username is. Each time we guess a name,
-	we have to verify it by looking it up in the system PASSWD
+	we have to verify it by looking it up in the system ucentpw
 	database. We do that by calling the subroutines
 	|getxusername_lookup()| below. As soon as a guess of a name
 	is verified, we return the guess as the answer. Finally,
@@ -238,11 +238,11 @@ constexpr strlibvals	strusers[] = {
 	strlibval_overlast
 } ;
 
-static strlibval	varusername(strlibval_username) ;
-static strlibval	varuser(strlibval_user) ;
-static strlibval	varlogname(strlibval_logname) ;
-static strlibval	varhome(strlibval_home) ;
-static strlibval	varmail(strlibval_mail) ;
+static strlibval	var_username(strlibval_username) ;
+static strlibval	var_user(strlibval_user) ;
+static strlibval	var_logname(strlibval_logname) ;
+static strlibval	var_home(strlibval_home) ;
+static strlibval	var_mail(strlibval_mail) ;
 
 constexpr bool		f_utmpacc = CF_UTMPACC ;
 constexpr bool		f_getutmpname = CF_GETUTMPNAME ;
@@ -268,7 +268,7 @@ int getusername(char *ubuf,int ulen,uid_t uid) noex {
 }
 /* end subroutine (getusername) */
 
-int getpwusername(PASSWD *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
+int getpwusername(ucentpw *pwp,char *pwbuf,int pwlen,uid_t uid) noex {
 	int		rs = SR_FAULT ;
 	if (pwp && pwbuf) {
 	    rs = SR_INVALID ;
@@ -316,7 +316,7 @@ int getxusername(getxuser *xup) noex {
 	                pwl = rs ;
 	                if ((rs > 0) && xup->f_self) {
 			    auto	upu = ucproguser_nameset ;
-		            PASSWD	*pwp = xup->pwp ;
+		            ucentpw	*pwp = xup->pwp ;
 		            rs = upu(pwp->pw_name,-1,xup->uid,ttl) ;
 	                } /* end if (cache store) */
 	                rs1 = vecstr_finish(xup->nlp) ;
@@ -339,7 +339,7 @@ static int getusernamer(char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	    PASSWD	pw ;
+	    ucentpw	pw ;
 	    cint	pwlen = rs ;
 	    char	*pwbuf{} ;
 	    if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
@@ -388,19 +388,19 @@ static int getxusername_varenv(getxuser *xup) noex {
 	    cchar	*vv = nullptr ;
 	    switch (sv) {
 	    case strlibval_username:
-		vv = varusername ;
+		vv = var_username ;
 		break ;
 	    case strlibval_user:
-		vv = varuser ;
+		vv = var_user ;
 		break ;
 	    case strlibval_logname:
-		vv = varlogname ;
+		vv = var_logname ;
 		break ;
 	    case strlibval_home:
-		vv = varhome ;
+		vv = var_home ;
 		break ;
 	    case strlibval_mail:
-		vv = varmail ;
+		vv = var_mail ;
 		break ;
 	    default:
 		rs = SR_BUGCHECK ;
@@ -418,7 +418,7 @@ static int getxusername_varenv(getxuser *xup) noex {
 static int getxusername_utmp(getxuser *xup) noex {
 	int		rs = SR_OK ;
 	if constexpr (f_utmpacc) {
-	    UTMPACC_ENT	ue{} ;
+	    utmpacc_ent	ue{} ;
 	    cint	uelen = UTMPACC_BUFLEN ;
 	    char	uebuf[UTMPACC_BUFLEN+1] ;
 	    if ((rs = utmpacc_entsid(&ue,uebuf,uelen,0)) >= 0) {

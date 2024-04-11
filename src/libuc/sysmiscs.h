@@ -1,10 +1,15 @@
-/* sysmiscs */
+/* sysmiscs HEADER */
+/* lang=C20 */
+
+/* return SYSMISC information from the system */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	SYSMISCS_INCLUDE
 #define	SYSMISCS_INCLUDE
+
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<utypealiases.h>
@@ -13,15 +18,14 @@
 
 
 #define	SYSMISCS	struct sysmiscs_head
-#define	SYSMISCS_OBJ	struct sysmiscs_obj
-#define	SYSMISCS_DATA	struct sysmiscs_d
+#define	SYSMISCS_D	struct sysmiscs_data
 #define	SYSMISCS_FL	struct sysmiscs_flags
 
 #define	SYSMISCS_MAGIC	0x66342125
 #define	SYSMISCS_PROG	"msu"
 
 
-struct sysmiscs_d {
+struct sysmiscs_data {
 	uint		utime ;
 	uint		btime ;
 	uint		ncpu ;
@@ -35,35 +39,31 @@ struct sysmiscs_flags {
 } ;
 
 struct sysmiscs_head {
-	uint		magic ;
-	const char	*pr ;
-	const char	*nodename ;
-	const char 	*dbname ;		/* DB-name */
-	const char 	*dbfname ;		/* DB file-name */
-	SYSMISCS_FL	f ;
+	cchar		*pr ;
+	cchar		*nodename ;
+	cchar 		*dbname ;		/* DB-name */
+	cchar 		*dbfname ;		/* DB file-name */
 	MSFILE		ms ;
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */
+	SYSMISCS_FL	f ;
+	uint		magic ;
 	int		nodenamelen ;
 } ;
 
+typedef	SYSMISCS	sysmiscs ;
+typedef	SYSMISCS_D	sysmiscs_d ;
+typedef	SYSMISCS_FL	sysmiscs_fl ;
 
-#if	(! defined(SYSMISCS_MASTER)) || (SYSMISCS_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	sysmiscs_open(sysmiscs *,cchar *) noex ;
+extern int	sysmiscs_get(sysmiscs *,time_t,sysmiscs_d *) noex ;
+extern int	sysmiscs_close(sysmiscs *) noex ;
 
-extern int	sysmiscs_open(SYSMISCS *,const char *) ;
-extern int	sysmiscs_get(SYSMISCS *,time_t,SYSMISCS_DATA *) ;
-extern int	sysmiscs_close(SYSMISCS *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SYSMISCS_MASTER */
 
 #endif /* SYSMISCS_INCLUDE */
 

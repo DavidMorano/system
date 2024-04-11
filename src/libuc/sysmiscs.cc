@@ -37,16 +37,17 @@
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecobj.h>
 #include	<msfile.h>
 #include	<spawnproc.h>
+#include	<hash.h>
 #include	<localmisc.h>
 
 
@@ -68,46 +69,45 @@
 
 /* external subroutines */
 
-extern uint	hash_elf(const char *,int) ;
 extern uint	hashagain(uint,int,int) ;
 extern uint	nextpowtwo(uint) ;
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,const char *,
-			const char *) ;
-extern int	sncpy5(char *,int,const char *,const char *,const char *,
-			const char *,const char *) ;
-extern int	sncpy6(char *,int,const char *,const char *,const char *,
-			const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfword(const char *,int,const char **) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	cfhexi(const char *,int,uint *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	sncpy4(char *,int,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	sncpy5(char *,int,cchar *,cchar *,cchar *,
+			cchar *,cchar *) ;
+extern int	sncpy6(char *,int,cchar *,cchar *,cchar *,
+			cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	sfdirname(cchar *,int,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfword(cchar *,int,cchar **) ;
+extern int	strnnlen(cchar *,int,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	cfhexi(cchar *,int,uint *) ;
 extern int	getnodename(char *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(const char *,int,int,char *) ;
-extern int	hasuc(const char *,int) ;
-extern int	vstrkeycmp(const char *,const char *) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	opentmpfile(cchar *,int,int,char *) ;
+extern int	hasuc(cchar *,int) ;
+extern int	vstrkeycmp(cchar *,cchar *) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -115,9 +115,9 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 
 /* exported variables */
 
-MODLOAD_MID	sysmiscs = {
+MODLOAD_MID	sysmiscs_mod = {
 	"sysmiscs",
-	sizeof(SYSMISCS)
+	sizeof(sysmiscs)
 } ;
 
 
@@ -126,15 +126,15 @@ MODLOAD_MID	sysmiscs = {
 
 /* forward references */
 
-static int	sysmiscs_msopen(SYSMISCS *) ;
-static int	sysmiscs_msget(SYSMISCS *,time_t) ;
-static int	sysmiscs_msgetone(SYSMISCS *,time_t,SYSMISCS_DATA *) ;
-static int	sysmiscs_nodename(SYSMISCS *) ;
+static int	sysmiscs_msopen(sysmiscs *) ;
+static int	sysmiscs_msget(sysmiscs *,time_t) ;
+static int	sysmiscs_msgetone(sysmiscs *,time_t,sysmiscs_d *) ;
+static int	sysmiscs_nodename(sysmiscs *) ;
 
 
 /* exported variables */
 
-SYSMISCS_OBJ	sysmiscs = {
+SYSMISCS_OBJ	sysmiscs_mod = {
 	"sysmiscs",
 	sizeof(SYSMISCS)
 } ;
@@ -142,60 +142,34 @@ SYSMISCS_OBJ	sysmiscs = {
 
 /* local variables */
 
-static const char	*prbins[] = {
+static cchar	*prbins[] = {
 	"bin",
 	"sbin",
 	NULL
 } ;
 
 
+/* exported variables */
+
 /* exported subroutines */
 
-
-int sysmiscs_open(op,pr)
-SYSMISCS	*op ;
-const char	pr[] ;
-{
-	SYSMISCS	si ;
-
-	int	rs = SR_OK ;
-	int	n = 0 ;
-	const char	*cp ;
-
-	if (op == NULL)
-	    return SR_FAULT ;
-
-	if (pr == NULL)
-	    return SR_FAULT ;
-
-	memset(op,0,sizeof(SYSMISCS)) ;
-
-	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
-	    op->pr = cp ;
-	    op->magic = SYSMISCS_MAGIC ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("sysmiscs_open: ret rs=%d\n",rs) ;
-#endif
-
+int sysmiscs_open(sysmiscs *op,cchar *pr) noex {
+	int	rs = SR_FAULT ;
+	if (op && pr) {
+	    cchar	*cp ;
+	    memclear(op) ;
+	    if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
+	        op->pr = cp ;
+	        op->magic = SYSMISCS_MAGIC ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
-
-/* bad stuff */
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (sysmiscs_open) */
 
-
-int sysmiscs_get(op,daytime,dp)
-SYSMISCS	*op ;
-time_t		daytime ;
-SYSMISCS_DATA	*dp ;
-{
+int sysmiscs_get(susmiscs *op,time_t daytime,sysmiscs_d *dp) noex {
 	int	rs = SR_OK ;
 	int	n = 0 ;
-
 
 	if (op == NULL)
 	    return SR_FAULT ;
@@ -256,13 +230,13 @@ SYSMISCS	*op ;
 static int sysmiscs_msget(op,daytime,dp)
 SYSMISCS	*op ;
 time_t		daytime ;
-SYSMISCS_DATA	*dp ;
+sysmiscs_d	*dp ;
 {
 	int	rs = SR_OK ;
 	int	nl ;
 	int	n = 0 ;
 
-	const char	*nn ;
+	cchar	*nn ;
 
 
 	if (! op->f.msinit)
@@ -320,7 +294,7 @@ ret0:
 static int sysmiscs_msgetone(op,daytime,dp)
 SYSMISCS	*op ;
 time_t		daytime ;
-SYSMISCS_DATA	*dp ;
+sysmiscs_d	*dp ;
 {
 	MSFILE_ENT	e ;
 
@@ -394,9 +368,9 @@ SYSMISCS	*op ;
 	int	cstat ;
 	int	cex ;
 
-	const char	*pn = SYSMISCS_PROG ;
-	const char	*av[3] ;
-	const char	**ev ;
+	cchar	*pn = SYSMISCS_PROG ;
+	cchar	*av[3] ;
+	cchar	**ev ;
 
 	char	progfname[MAXPATHLEN + 1] ;
 
@@ -410,7 +384,7 @@ SYSMISCS	*op ;
 	av[2] = "quick" ;
 	av[3] = "-d" ;
 
-	vecstr_getvec(&envs,(const char ***) &ev) ;
+	vecstr_getvec(&envs,(cchar ***) &ev) ;
 
 	memset(&ps,0,sizeof(SPAWNPROC)) ;
 

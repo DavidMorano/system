@@ -32,7 +32,7 @@
 
 
 struct getxuser_head {
-	PASSWD		*pwp ;		/* caller supplied */
+	ucentpw		*pwp ;		/* caller supplied */
 	char		*pwbuf ;	/* caller supplied */
 	char		*ubuf ;		/* caller supplied */
 	vecstr		*nlp ;		/* temporary storage */
@@ -40,7 +40,7 @@ struct getxuser_head {
 	int		pwlen ;		/* caller supplied */
 	int		ulen ;		/* caller supplied */
 	int		unl ;		/* result of lookup */
-	int		pwl ;		/* result of PASSWD lookup */
+	int		pwl ;		/* result of ucentpw lookup */
 	uint		f_self:1 ;	/* it is us */
 	uint		f_tried:1 ;	/* tried cache already */
 } ;
@@ -51,7 +51,7 @@ EXTERNC_begin
 
 extern int getxusername(getxuser *) noex ;
 extern int getusername(char *,int,uid_t) noex ;
-extern int getpwusername(PASSWD *,char *,int,uid_t) noex ;
+extern int getpwusername(ucentpw *,char *,int,uid_t) noex ;
 
 EXTERNC_end
 

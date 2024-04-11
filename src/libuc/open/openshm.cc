@@ -107,7 +107,7 @@ int openshmtmpx(mode_t om) noex {
 	    rs1 = uc_free(sbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */
-	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (openshmtmp) */
@@ -121,12 +121,12 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 		if (rlen < 0) rlen = rs ;
 	        if (ulong rv{} ; (rs = randinit(&rv)) >= 0) {
 	            sigblocker	b ;
-	            if ((rs = sigblocker_start(&b,nullptr)) >= 0) {
-	                cint	oflags = (O_CREAT | O_EXCL | O_RDWR) ;
+	            if ((rs = b.start) >= 0) {
+	                cint	of = (O_CREAT | O_EXCL | O_RDWR) ;
 	                cint	ntries = NTRIES ;
 	                for (int i = 0 ; i < ntries ; i += 1) {
 	                    if ((rs = mkshmname(rbuf,rlen,rv)) >= 0) {
-	                        rs = uc_openshm(rbuf,oflags,om) ;
+	                        rs = uc_openshm(rbuf,of,om) ;
 	                        fd = rs ;
 	                    }
 		            rv += 1 ;
@@ -135,10 +135,10 @@ int openshmtmp(char *rbuf,int rlen,mode_t om) noex {
 	                if (rs >= 0) {
 		            uc_unlinkshm(rbuf) ;
 	 	        }
-	                rs1 = sigblocker_finish(&b) ;
+	                rs1 = b.finish ;
 			if (rs >= 0) rs = rs1 ;
 	            } /* end if (sigblock) */
-		    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+		    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	        } /* end if (randinit) */
 	    } /* end if (maxnamelen) */
 	} /* end if (non-null) */
