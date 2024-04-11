@@ -48,13 +48,16 @@
 #include	<cstdlib>
 #include	<ctime>
 #include	<usystem.h>
+#include	<ucvariables.hh>
 #include	<ucgetpid.h>
+#include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<sigblocker.h>
 #include	<sockaddress.h>
 #include	<mkpathx.h>
 #include	<mkx.h>
 #include	<cthex.h>
+#include	<strlibval.hh>
 #include	<localmisc.h>
 
 
@@ -93,6 +96,10 @@ typedef SOCKADDR *	sockaddrp ;
 
 /* local structures */
 
+struct vars {
+	int		maxpathlen ;
+} ;
+
 
 /* forward reference */
 
@@ -100,9 +107,17 @@ static int	opentmpx(cchar *,int,mode_t,int,char *) noex ;
 static int	opentmpxer(cchar *,int,mode_t,int,char *) noex ;
 static int	randload(ulong *) noex ;
 static int	mktmpname(char *,ulong,cchar *) noex ;
+static int	mkvarsx() noex ;
+static int	mkvars() noex ;
 
 
 /* local variables */
+
+static strlibval	val_tmpdir(strlibval_tmpdir) ;
+
+constexpr static cchar	platename[] = "otXXXXXXXXXXXX" ;
+
+static vars		var ;
 
 
 /* exported variables */
@@ -131,44 +146,42 @@ int opentmpuss(cchar *inname,int of,mode_t om,char *rbuf) noex {
 /* end subroutine (opentmpuss) */
 
 int opentmp(cchar *dname,int of,mode_t om) noex {
-	int		rs ;
+	int		rs = SR_INVALID ;
 	int		rs1 ;
 	int		fd = -1 ;
-	cchar		*platename = "otXXXXXXXXXXXX" ;
-	char		inname[MAXPATHLEN + 1] ;
-
 	of &= (~ O_ACCMODE) ;
 	of |= O_RDWR ;
-
 	om |= 0600 ;
-	if (dname == nullptr) {
-	    dname = getenv(VARTMPDNAME) ;
-	}
-	if ((dname == nullptr) || (dname[0] == '\0')) {
-	    dname = TMPDNAME ;
-	}
-
-	if ((rs = mkpath2(inname,dname,platename)) >= 0) {
-	    char	*obuf{} ;
-	    if ((rs = malloc_mp(&obuf)) >= 0) {
-	        sigblocker	b ;
-	        if ((rs = b.start) >= 0) {
-		    cint	otm = OTM_STREAM ;
-	            if ((rs = opentmpx(inname,of,om,otm,obuf)) >= 0) {
-		        fd = rs ;
-	                if (obuf[0] != '\0') {
-			    uc_unlink(obuf) ;
-			    obuf[0] = '\0' ;
-			}
-	            }
-	            rs1 = b.finish ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (sigblock) */
-		rs1 = uc_free(obuf) ;
-		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
+	if (dname == nullptr) dname = val_tmpdir ;
+	if (dname && dname[0]) {
+	    if ((rs = mkvarsx()) >= 0) {
+		cint	maxpath = rs ;
+		cint	sz = (2 * (var.maxpathlen + 1)) ;
+		char	*a{} ;
+	        if ((rs = uc_malloc(sz,&a)) >= 0) {
+	            char	*ibuf = (a) ;
+	            char	*obuf = (a + (maxpath + 1)) ;
+	            if ((rs = mkpath(ibuf,dname,platename)) >= 0) {
+	                sigblocker	b ;
+	                if ((rs = b.start) >= 0) {
+		            cint	otm = OTM_STREAM ;
+	                    if ((rs = opentmpx(ibuf,of,om,otm,obuf)) >= 0) {
+		                fd = rs ;
+	                        if (obuf[0] != '\0') {
+			            uc_unlink(obuf) ;
+			            obuf[0] = '\0' ;
+			        }
+	                    } /* end if (opentempx) */
+	                    rs1 = b.finish ;
+		            if (rs >= 0) rs = rs1 ;
+	                } /* end if (sigblock) */
+	            } /* end if (mkpath) */
+	            rs1 = uc_free(a) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+	    } /* end if (mkvarx) */
 	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
-	} /* end if (mkpath) */
+	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opentmp) */
@@ -389,5 +402,20 @@ static int mktmpname(char *obuf,ulong rv,cchar *inname) noex {
 	return rs ;
 }
 /* end subroutine (mktmpname) */
+
+static int mkvarsx() noex {
+	static int	rsv = mkvars() ;
+	return rsv ;
+}
+/* end subroutine (mkvarsx) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    var.maxpathlen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
