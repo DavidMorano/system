@@ -17,12 +17,13 @@
 /* revision history:
 
 	= 2004-05-14, David A­D­ Morano
-        The program was written from scratch to do what the previous program by
-        the same name did. It used pieces from other (similar in some ways)
-        programs. It is linted out and should be very clean -- we depend on this
-        everyday to do what we need. Pieces not used in their full like where
-        they originally were, are sort of hacked up to minimal code. Try not to
-        get your knickers in a bunch over that.
+	The program was written from scratch to do what the previous
+	program by the same name did.  It used pieces from other
+	(similar in some ways) programs.  It is linted out and
+	should be very clean -- we depend on this everyday to do
+	what we need.  Pieces not used in their full like where
+	they originally were, are sort of hacked up to minimal code.
+	Try not to get your knickers in a bunch over that.
 
 */
 
@@ -30,15 +31,13 @@
 
 /*******************************************************************************
 
-        This is the main subroutine for MAKESAFE. This was a fairly generic
-        subroutine adpapted for this program. Note that parallel processing is
-        enabled by default. If you do not want parallel processing for some
-        reason use the '-o' invocation option to set the maximum parallelism to
-        '1'.
-
+	This is the main subroutine for MAKESAFE. This was a fairly
+	generic subroutine adpapted for this program.  Note that
+	parallel processing is enabled by default.  If you do not
+	want parallel processing for some reason use the '-o'
+	invocation option to set the maximum parallelism to '1'.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -80,6 +79,7 @@
 #include	<cachetime.h>
 #include	<upt.h>
 #include	<spawnproc.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -135,7 +135,6 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	getnprocessors(cchar **,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isNotPresent(int) ;

@@ -87,8 +87,6 @@
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	localgetorgcode(const char *,char *,int,const char *) ;
 extern int	isNotPresent(int) ;
 

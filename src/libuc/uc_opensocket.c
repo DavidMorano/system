@@ -41,6 +41,7 @@
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 
@@ -77,8 +78,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	matstr(const char **,const char *,int) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 

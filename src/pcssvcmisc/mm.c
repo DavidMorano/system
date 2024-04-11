@@ -105,8 +105,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	statvfsdir(const char *,struct statvfs *) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,const char *) ;

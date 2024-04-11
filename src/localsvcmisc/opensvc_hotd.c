@@ -66,6 +66,7 @@
 #include	<usystem.h>
 #include	<keyopt.h>
 #include	<mkfdfname.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -106,8 +107,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;
 extern int	isSpecialObject(void *) ;
 

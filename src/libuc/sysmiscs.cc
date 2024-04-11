@@ -96,7 +96,6 @@ extern int	cfhexi(cchar *,int,uint *) ;
 extern int	getnodename(char *,int) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(cchar *,int,int,char *) ;
 extern int	hasuc(cchar *,int) ;
 extern int	vstrkeycmp(cchar *,cchar *) ;
 

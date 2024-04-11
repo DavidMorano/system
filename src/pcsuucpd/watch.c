@@ -54,15 +54,12 @@
 
 	Returns:
 
-	OK	doesn't really matter in the current implementation
-	<0	error
-
+	>=0	does not really matter in the current implementation
+	<0	error code (system-return)
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -80,7 +77,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -91,6 +87,7 @@
 #include	<sockaddress.h>
 #include	<srvtab.h>
 #include	<acctab.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -134,7 +131,6 @@ extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	mktmpdir(struct proginfo *,char *) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 
 extern int	checklockfile(struct proginfo *,bfile *,char *,char *,

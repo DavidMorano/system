@@ -86,8 +86,6 @@
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	matkeystr(const char **,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	pcsgetprojinfo(const char *,char *,int,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;

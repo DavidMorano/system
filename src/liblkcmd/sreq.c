@@ -18,19 +18,13 @@
 
 /*******************************************************************************
 
-        This module is responsible for providing means to store a job and to
-        retrieve it later by its PID.  This is the lower half of a pair.
-	The SREQDB calls on this object for support.
-
+	This module is responsible for providing means to store a
+	job and to retrieve it later by its PID.  This is the lower
+	half of a pair.  The SREQDB calls on this object for support.
 
 *******************************************************************************/
 
-
-#define	SREQ_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -40,12 +34,12 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ctdec.h>
-#include	<toxc.h>
 #include	<upt.h>
+#include	<opentmp.h>
+#include	<toxc.h>
 #include	<localmisc.h>
 
 #include	"sreq.h"
@@ -77,7 +71,6 @@ extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	sfnext(cchar *,int,cchar **) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	chmods(cchar *,mode_t) ;
 extern int	vecstr_svcargs(vecstr *,int *,cchar *) ;
 extern int	vecstr_avmkstr(vecstr *,cchar **,int,char *,int) ;

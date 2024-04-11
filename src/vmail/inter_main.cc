@@ -68,6 +68,7 @@
 #include	<keysym.h>
 #include	<toxc.h>
 #include	<ansigr.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -154,7 +155,6 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	vbufprintf(char *,int,const char *,va_list) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	msleep(int) ;

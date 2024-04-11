@@ -48,6 +48,7 @@
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"mktmp.h"
@@ -57,10 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
-}
 
 
 /* external variables */

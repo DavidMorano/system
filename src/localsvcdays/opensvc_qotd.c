@@ -111,8 +111,6 @@ extern int	sncpy1(char *,int,cchar *) ;
 extern int	sncpy2(char *,int,cchar *,cchar *) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	matkeystr(cchar **,cchar *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	statvfsdir(cchar *,struct statvfs *) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;

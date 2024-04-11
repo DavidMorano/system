@@ -96,8 +96,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	matkeystr(const char **,const char *,int) ;
 extern int	openshmtmp(char *,int,mode_t) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;

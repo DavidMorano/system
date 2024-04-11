@@ -24,12 +24,9 @@
 
 	These subroutines handle some IPC related functions.
 
-
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -44,9 +41,9 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<sockaddress.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"defs.h"
@@ -88,8 +85,6 @@ extern int	snddd(char *,int,uint,uint) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 
 extern int	progtmpdir(struct proginfo *,char *) ;
 extern int	progcheckdir(struct proginfo *,char *,int,int) ;

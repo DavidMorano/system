@@ -44,26 +44,22 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<filer.h>
 #include	<holidays.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"opensvc_holidays.h"
@@ -83,8 +79,6 @@
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	matkeystr(const char **,const char *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;

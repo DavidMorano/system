@@ -91,8 +91,6 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	opentermnote(const char *,const char **,int,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	isdigitlatin(int) ;

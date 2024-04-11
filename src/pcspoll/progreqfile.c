@@ -76,7 +76,6 @@ extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;

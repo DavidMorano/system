@@ -50,7 +50,6 @@
         difficulty, but I have not done that yet.
 
 	Synopsis:
-
 	$ motd [-u <username>] [-a <admin(s)>] [-d[=<intrun>] [-V]
 
 	Design problems:
@@ -75,9 +74,7 @@
         identification down into the RESOLVES object. This new interface is
         'resolves_procid()'.
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* must be first to configure */
 
@@ -120,6 +117,7 @@
 #include	<getutmpent.h>
 #include	<fsdir.h>
 #include	<ptm.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -226,7 +224,6 @@ extern int	termwritable(const char *) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_envset(vecstr *,const char *,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	mkdirs(const char *,mode_t) ;

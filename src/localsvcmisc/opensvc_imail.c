@@ -129,6 +129,7 @@
 #include	<envhelp.h>
 #include	<spawnproc.h>
 #include	<mkfdfname.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"opensvc_imail.h"
@@ -187,8 +188,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	prgetprogpath(const char *,char *,const char *,int) ;
 extern int	isdigitlatin(int) ;

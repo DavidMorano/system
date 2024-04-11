@@ -105,7 +105,6 @@
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*timestr_log(time_t,char *) ;

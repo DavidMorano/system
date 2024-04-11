@@ -60,24 +60,14 @@
 #include	<strlibval.hh>
 #include	<localmisc.h>
 
+#include	"opentmp.h"
+
 
 /* local defines */
 
 #define	MAXLOOP		1000
 
-#define	OTM_DGRAM	(1<<0)		/* open-type-mask DGRAM */
-#define	OTM_STREAM	(1<<1)		/* open-type-mask STREAM */
-
-#ifndef	VARTMPDNAME
-#define	VARTMPDNAME	"TMPDIR"
-#endif
-
-#ifndef	TMPDNAME
-#define	TMPDNAME	"/tmp"
-#endif
-
-#undef	RANDBUFLEN
-#define	RANDBUFLEN	(sizeof(ulong)*2)
+#define	RANDBUFLEN	int(sizeof(ulong)*2)
 
 
 /* local namespæces */
@@ -153,7 +143,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	of |= O_RDWR ;
 	om |= 0600 ;
 	if (dname == nullptr) dname = val_tmpdir ;
-	if (dname && dname[0]) {
+	if (dname && dname[0] && (of >= 0)) {
 	    if ((rs = mkvarsx()) >= 0) {
 		cint	maxpath = rs ;
 		cint	sz = (2 * (var.maxpathlen + 1)) ;
@@ -180,7 +170,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 	    } /* end if (mkvarx) */
-	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -190,26 +180,112 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 /* local subroutines */
 
 static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
-	int		rs ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fd = -1 ;
-	char		*pbuf{} ;
-	if ((rs = malloc_mp(&pbuf)) >= 0) {
-	    if ((rs = mkexpandpath(pbuf,inname,-1)) > 0) {
-		rs = opentmpxer(pbuf,of,om,opt,obuf) ;
-		fd = rs ;
-	    } else if (rs == 0) {
-		rs = opentmpxer(inname,of,om,opt,obuf) ;
-		fd = rs ;
-	    }
-	    rs1 = uc_free(pbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a) */
+	if (inname && obuf) {
+	    rs = SR_INVALID ;
+	    if (inname[0] && (of >= 0) && (opt >= 0)) {
+	        char	*pbuf{} ;
+	        if ((rs = malloc_mp(&pbuf)) >= 0) {
+	            if ((rs = mkexpandpath(pbuf,inname,-1)) > 0) {
+		        rs = opentmpxer(pbuf,of,om,opt,obuf) ;
+		        fd = rs ;
+	            } else if (rs == 0) {
+		        rs = opentmpxer(inname,of,om,opt,obuf) ;
+		        fd = rs ;
+	            }
+	            rs1 = uc_free(pbuf) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (m-a-f) */
+		if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
+	    /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opentmpx) */
 
+namespace {
+    struct openmgr {
+	cchar		*dirp
+	cchar		*basep ;
+	char		*obuf ;
+	ulong		rv ;
+	int		dirl ;
+	int		basel ;
+	int		of ;
+	int		stype ;
+	mode_t		operm ;
+	mode_t		om ;
+	openmgr(int f,mode_t m,char *o) noex : of(f), om(m) { 
+	    obuf = o ;
+	} ;
+	operator () (cchar *) noex ;
+	int typeinit(int) noex ;
+	int split(cchar *) noex ;
+	int loop() noex ;
+    } ; /* end struct (openmgr) */
+}
+
 static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
+	int		rs = SR_FAULT ;
+	int		fd = -1 ;
+	if (inname && obuf) {
+	    rs = SR_INVALID ;
+	    obuf[0] = '\0' ;
+	    if (inname[0] && (of >= 0) && (opt >= 0)) {
+		openmgr		oo(of,om,obuf) ;
+		rs = oo(inname,opt) ;
+		fd = rs ;
+	    /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fd : rs ;
+}
+/* end subroutine (opentmpxer) */
+
+int openmgr::typeinit(int opt) noex {
+	int		rs = SR_OK ;
+	if (S_ISSOCK(om)) {
+	    if (opt & OTM_DGRAM) {
+		stype = SOCK_DGRAM ;
+	    } else if (opt & OTM_STREAM) {
+		stype = SOCK_STREAM ;
+	    } else {
+		rs = SR_INVALID ;
+	    }
+	}
+	return rs ;
+}
+/* end method (openmgr::typeinit) */
+
+int openmgr::split(cchar *inname) noex {
+	int		rs = SR_OK ;
+	if ((dirl = sfdirname(inname,-1,&dirp)) >= 0) {
+	    rs = SR_ISDIR ;
+	    if ((basel = sfbasename(inname,-1,&basep)) > 0) {
+		rs = SR_OK ;
+	    } /* end if (sfbasename) */
+	} /* end if (sfdirname) */
+	return rs ;
+}
+/* end method (openmgr::split) */
+
+int openmgr::operator () (cchar *inname,int opt) noex {
+	int		rs ;
+	int		fd = -1 ;
+	if ((rs = typeinit(opt)) >= 0) {
+	    if ((rs = split(inname)) >= 0) {
+	        if ((rs = randload(&rv)) >= 0) {
+		    rs = loop() ;
+		    fd = rs ;
+	        } /* end if (randload) */
+	    } /* end if (split) */
+	} /* end if (typeinit) */
+	return (rs >= 0) ? fd : rs ;
+}
+/* end method (openmgr::operator) */
+
+
 	ulong		rv ;
 	cmode		operm = (om & S_IAMB) ;
 	int		rs = SR_OK ;
@@ -220,21 +296,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		f_abuf = false ;
 	int		f ;
 
-	if (inname == nullptr) return SR_FAULT ;
-	if (obuf == nullptr) return SR_FAULT ;
 
-	if (inname[0] == '\0') return SR_INVALID ;
-
-	obuf[0] = '\0' ;
-
-	if (S_ISSOCK(om)) {
-	    if (opt & OTM_DGRAM) {
-		stype = SOCK_DGRAM ;
-	    } else if (opt & OTM_STREAM) {
-		stype = SOCK_STREAM ;
-	    } else
-		rs = SR_INVALID ;
-	}
 
 	if ((rs >= 0) && (obuf == nullptr)) {
 	    cint		olen = MAXPATHLEN ;
@@ -307,17 +369,17 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
 		        SOCKADDR	*sap = sockaddrp(&sa) ;
 		        cint		sal = rs ;
-	                if ((rs = u_bind(fd,sap,sal)) >= 0) {
-			    rs = u_chmod(obuf,operm) ;
+	                if ((rs = uc_bind(fd,sap,sal)) >= 0) {
+			    rs = uc_chmod(obuf,operm) ;
 			    if (rs < 0) {
-				u_unlink(obuf) ;
+				uc_unlink(obuf) ;
 				obuf[0] = '\0' ;
 			    }
 			} /* end if (bind) */
 	                sockaddress_finish(&sa) ;
 		    } /* end if (sockaddress) */
 		    if (rs < 0) {
-			u_close(fd) ;
+			uc_close(fd) ;
 			fd = -1 ;
 		    }
 	        } /* end if (socket) */
@@ -338,7 +400,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 
 	if (f_abuf) {
 	    if (obuf[0] != '\0') {
-		u_unlink(obuf) ;
+		uc_unlink(obuf) ;
 	    }
 	    uc_free(obuf) ;
 	} else if (rs < 0) {
@@ -358,10 +420,10 @@ static int randload(ulong *rvp) noex {
 	    cuint	sid = getsid(0) ;
 	    cuint	uid = getuid() ;
 	    if ((rs = uc_getpid()) >= 0) {
-	        TIMEVAL		tod ;
-		cuint		pid = rs ;
-	        ulong		rv = 0 ;
-	        ulong		v = sid ;
+	        TIMEVAL	tod ;
+		cuint	pid = rs ;
+	        ulong	rv = 0 ;
+	        ulong	v = sid ;
 	        rv += (v << 48) ;
 	        v = pid ;
 	        rv += (v << 32) ;

@@ -83,8 +83,9 @@
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<filer.h>
-#include	<localmisc.h>
+#include	<opentmp.h>
 #include	<hash.h>
+#include	<localmisc.h>
 
 #include	"varmks.h"
 #include	"varhdr.h"
@@ -128,7 +129,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfhexi(const char *,int,uint *) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	vstrkeycmp(const char *,const char *) ;
 extern int	filer_writefill(FILER *,cchar *,int) ;

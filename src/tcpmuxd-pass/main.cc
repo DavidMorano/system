@@ -23,15 +23,11 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ tcpmuxd-pass <passfile>
-
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -41,14 +37,13 @@
 #include	<time.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -86,7 +81,6 @@ extern int	cfdecmfui(const char *,int,int *) ;
 extern int	optbool(cchar *,int) ;
 extern int	optvalue(cchar *,int) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	isdigitlatin(int) ;
 
 extern int	printhelp(void *,const char *,const char *,const char *) ;

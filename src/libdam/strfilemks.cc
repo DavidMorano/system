@@ -85,6 +85,7 @@
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<filer.h>
+#include	<opentmp.h>
 #include	<hash.h>
 #include	<sncpyx.h>
 #include	<mkpath.h>
@@ -138,7 +139,6 @@ extern int	mkfnamesuf3(char *,cchar *,cchar *,cchar *,
 			cchar *) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	vstrkeycmp(cchar *,cchar *) ;
 extern int	isNotPresent(int) ;
 
@@ -849,8 +849,9 @@ static int idx_nfopentmp(IDX *ixp,cchar *fsuf)
 	    char	infname[MAXPATHLEN + 1] ;
 	    if (op->idname[0] != '\0') {
 		rs = mkpath2(infname,op->idname,cbuf) ;
-	    } else
+	    } else {
 		rs = mkpath1(infname,cbuf) ;
+	    }
 	    if (rs >= 0) {
 	        char	obuf[MAXPATHLEN + 1] = { 0 } ;
 		if ((rs = opentmpfile(infname,of,op->om,obuf)) >= 0) {

@@ -159,7 +159,6 @@ extern int	pathadd(char *,int,cchar *) ;
 extern int	pathaddw(char *,int,cchar *,int) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	bufprintf(const char *,int,...) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	dupup(int,int) ;
 extern int	passfd(cchar *,int) ;
 extern int	nlspeername(const char *,const char *,char *) ;

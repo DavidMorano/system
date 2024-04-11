@@ -32,7 +32,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -42,16 +41,12 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
@@ -59,9 +54,9 @@
 #include	<dlfcn.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<keyopt.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -101,8 +96,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	ctdeci(char *,int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;
 extern int	hasalldig(const char *,int) ;
 extern int	isSpecialObject(void *) ;

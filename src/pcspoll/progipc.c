@@ -22,12 +22,9 @@
 
 	These subroutines handle some IPC related functions.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -39,10 +36,10 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"defs.h"
@@ -84,8 +81,6 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmpusd(cchar *,int,mode_t,char *) ;
 
 extern int	progjobdir(PROGINFO *,char *) ;
 extern int	progcheckdir(PROGINFO *,cchar *,int,int) ;

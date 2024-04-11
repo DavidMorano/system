@@ -87,14 +87,22 @@ export OSNAME OSNUM
 
 case ${OSNAME}:${OSNUM} in
 Darwin:*)
-  : ${CO_GCCALL:=""}
+  : ${CO_GCCALL:="-g"}
   : ${CO_GCCDEB:="-Wall -Wextra"}
-  : ${CO_GCCOPT:="-O"}
+  : ${CO_GCCOPT:=""}
   : ${CO_GCCLIB:=""}
-  : ${CO_GPPALL:=""}
+  : ${CO_GPPALL:="-g"}
   : ${CO_GPPDEB:="-Wall -Wextra"}
-  : ${CO_GPPOPT:="-O"}
+  : ${CO_GPPOPT:=""}
   : ${CO_GPPLIB:=""}
+  case ${BUILDTYPE} in
+  debug)
+    ;;
+  deliver)
+    CO_GCCOPT="-O"
+    CO_GPPOPT="-O"
+    ;;
+  esac
   ;;
 SunOS:*)
   : ${CO_GCCALL:="-pthreads"}

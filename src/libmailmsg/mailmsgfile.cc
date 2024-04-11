@@ -48,6 +48,7 @@
 #include	<getbufsize.h>
 #include	<sysval.hh>
 #include	<mallocxx.h>
+#include	<opentmp.h>
 #include	<hdb.h>
 #include	<filer.h>
 #include	<linefold.h>
@@ -98,10 +99,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
-}
 
 
 /* external variables */

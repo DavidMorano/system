@@ -73,6 +73,7 @@
 #include	<mailmsgmathdr.h>
 #include	<mailmsg.h>
 #include	<msgentry.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"mailmsgstage.h"
@@ -113,10 +114,6 @@ typedef msgentry *	msgentryp ;
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
-}
 
 
 /* external variables */

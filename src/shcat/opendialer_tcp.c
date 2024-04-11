@@ -46,7 +46,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	svc		service name
@@ -57,24 +56,20 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
+#include	<dial.h>
 #include	<localmisc.h>
 
 #include	"opendialer_tcp.h"
@@ -95,9 +90,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	findxfile(IDS *,char *,const char *) ;
 extern int	getaf(const char *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
-extern int	dialtcp(const char *,const char *,int,int,int) ;
 extern int	uc_openprog(const char *,int,const char **,const char **) ;
 
 #if	CF_DEBUGS

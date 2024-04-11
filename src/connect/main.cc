@@ -19,15 +19,12 @@
 
 /*******************************************************************************
 
-	This subroutine forms a program that sends data to a remote INET host
-	to its 'echo' service.
-
+	This subroutine forms a program that sends data to a remote
+	INET host to its 'echo' service.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/conf.h>
 #include	<sys/socket.h>
@@ -39,13 +36,12 @@
 #include	<netdb.h>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
 #include	<logfile.h>
 #include	<sockaddress.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -83,8 +79,6 @@ extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	getsrcname(char *,int,int) ;
 extern int	getaf(const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	isasocket(int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;

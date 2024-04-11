@@ -62,15 +62,9 @@
 
 	O_CREAT		x		x		SR_OK (created)
 
-
 *******************************************************************************/
 
-
-#define	BVIMK_MASTER	0
-
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -80,12 +74,12 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<filer.h>
+#include	<opentmp.h>
 #include	<char.h>
 #include	<localmisc.h>
 
@@ -120,7 +114,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	cfhexi(cchar *,int,uint *) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	filer_writefill(FILER *,const void *,int) ;
 extern int	iceil(int,int) ;

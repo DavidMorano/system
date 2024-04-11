@@ -32,15 +32,12 @@
 	elp	vector list of exported variables
 
 	Returns:
-	OK	doesn't really matter in the current implementation
-
-
+	>=0	does not really matter in the current implementation
+	<0	error code (system-return)
 
 *****************************************************************************/
 
-
-
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -59,7 +56,6 @@
 #include	<limits.h>
 #include	<string.h>
 #include	<poll.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -67,6 +63,7 @@
 #include	<logfile.h>
 #include	<varsub.h>
 #include	<vecstr.h>
+#include	<opentmp.h>
 #include	<sockaddress.h>
 #include	<exitcodes.h>
 
@@ -95,7 +92,6 @@
 /* external subroutines */
 
 extern int	uc_moveup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	checklockfile(struct proginfo *,bfile *,char *,char *,
 			time_t,pid_t) ;
 extern int	handle(struct proginfo *, struct serverinfo *, 

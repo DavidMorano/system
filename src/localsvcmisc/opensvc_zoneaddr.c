@@ -23,6 +23,7 @@
 
 /*******************************************************************************
 
+	Description:
 	This is an open-facility-service module.
 
 	Synopsis:
@@ -37,7 +38,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	prn		facility name
 	of		open-flags
@@ -47,16 +47,12 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -65,7 +61,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -115,8 +110,6 @@ extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	matkeystr(const char **,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	statvfsdir(const char *,struct statvfs *) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	bufprintf(char *,int,const char *,...) ;

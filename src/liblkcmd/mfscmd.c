@@ -77,8 +77,6 @@ extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	matostr(const char **,int,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	isNotPresent(int) ;
 extern int	isBadSend(int) ;
 

@@ -23,12 +23,9 @@
 
 	This subroutine sends the message out to a host.
 
-
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -38,12 +35,11 @@
 #include	<signal.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<paramopt.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -65,7 +61,6 @@
 
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	isprintlatin(int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 
 /* external variables */
@@ -162,7 +157,6 @@ const char	fname[] ;
 	    mkpath2(template,pip->tmpdname,TMPFX) ;
 
 	    rs = opentmpfile(template,O_RDWR,0660,tmpfname) ;
-
 	    fd_tmp = rs ;
 	    u_unlink(tmpfname) ;
 

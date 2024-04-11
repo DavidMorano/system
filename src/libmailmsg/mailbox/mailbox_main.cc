@@ -35,7 +35,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
-#include	<csignal>		/* |INT_MAX| */
+#include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
@@ -54,6 +54,7 @@
 #include	<lockfile.h>
 #include	<intceil.h>
 #include	<hdrextnum.h>
+#include	<opentmp.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<ischarx.h>
@@ -121,7 +122,6 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int	tmpmailboxes(char *,int) noex ;
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
 }
 
 

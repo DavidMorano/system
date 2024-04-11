@@ -141,7 +141,6 @@ extern int	pathclean(char *,const char *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	vbufprintf(char *,int,const char *,va_list) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	hasallalnum(const char *,int) ;
