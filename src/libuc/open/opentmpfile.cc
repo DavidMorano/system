@@ -382,7 +382,7 @@ int openmgr::setft() noex {
 
 int openmgr::mkofname(ulong rv) noex {
 	int		rs = SR_OK ;
-	if ((rs = mkpath1w(obuf,dirp,dirl)) >= 0) {
+	if ((rs = mkpathw(obuf,dirp,dirl)) >= 0) {
 	    cint	pl = rs ;
 	    char	*bp = (obuf+rs) ;
 	    if ((rs = pathadd(obuf,rs,basep,basel)) >= 0) {

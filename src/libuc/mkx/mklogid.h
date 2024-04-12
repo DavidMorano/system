@@ -1,7 +1,7 @@
 /* mklogid HEADER */
 /* lang=C20 */
 
-/* make a character (8-bit) out of an integer */
+/* make a log-ID c-string, suitable for logging purposes */
 /* version %I% last-modified %G% */
 
 

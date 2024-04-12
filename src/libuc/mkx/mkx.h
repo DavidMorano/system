@@ -1,7 +1,7 @@
 /* mkx HEADER */
 /* lang=C20 */
 
-/* make a character (8-bit) out of an integer */
+/* provided are various general c-string creation subroutines */
 /* version %I% last-modified %G% */
 
 

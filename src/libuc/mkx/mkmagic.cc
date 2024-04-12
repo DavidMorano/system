@@ -1,7 +1,7 @@
 /* mkmagic SUPPORT */
 /* lang=C++20 */
 
-/* create a string with a (pretty much) standard magic string  */
+/* create a c-string that constitutes a "magic" string for file-ID purposes */
 /* version %I% last-modified %G% */
 
 

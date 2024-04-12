@@ -9,8 +9,9 @@
 
 	= 2001-12-03, David A­D­ Morano
 	This code was born out of frustration with cleaning up bad
-	legacy code (of which there is quite a bit -- like almost
-	all of it).
+	legacy code, originally back around 1992 (of which there
+	is quite a bit -- like almost all of it).  I will refrain
+	from naming names (at least at this time).
 
 */
 
@@ -38,6 +39,12 @@
 #define	MKNPATH_MAXPATHLEN	(4*1024)
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -53,6 +60,9 @@
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp,MKNPATH_MAXPATHLEN) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -97,7 +107,7 @@ int mknpathx(char *pbuf,int plen,int n,...) noex {
 	        int		rlen = (plen + 1) ;
 	        va_begin(ap,n) ;
 	        for (int i = 0 ; (rs >= 0) && (i < n) ; i += 1) {
-	            cc		*sp = (cchar *) va_arg(ap,char *) ;
+	            cc		*sp = (char *) va_arg(ap,char *) ;
 		    bool	f = true ;
 	            f = f && (i > 0) && ((bp == pbuf) || (bp[-1] != '/')) ;
 		    f = f && (sp[0] != '\0') && (sp[0] != '/') ;

@@ -1,7 +1,7 @@
 /* mkcleanline SUPPORT */
 /* lang=C++20 */
 
-/* print a clean (cleaned up) line of text */
+/* create a clean (cleaned up) line of text */
 /* version %I% last-modified %G% */
 
 #define	CF_CLEAN1	0		/* use CLEAN-1 */
