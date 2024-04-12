@@ -4,7 +4,6 @@
 
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_OPENTMP	1		/* use 'opentmp()' */
 
 
 /* revision history:
@@ -92,12 +91,12 @@
 /* external subroutines */
 
 extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
-
 
 int openint_hello(pr,dn,bn,prn,of,om,argv,envv,to)
 const char	*pr ;

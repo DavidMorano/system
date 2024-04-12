@@ -48,7 +48,7 @@ struct valuelimits {
 	ulonglong	ullmax = 0 ;
 	constexpr void mklonglong () noex {
 	    const longlong	one = 1 ;
-	    cint	n = (8*sizeof(longlong)) ;
+	    cint	n = int(8*sizeof(longlong)) ;
 	    ullmax = ~ullmax ;
 	    llmin = (one << (n-1)) ;
 	    llmax = longlong(ullmax >> 1) ;

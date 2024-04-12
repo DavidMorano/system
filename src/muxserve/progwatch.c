@@ -17,10 +17,10 @@
 /* revision history:
 
 	= 2008-06-23, David A­D­ Morano
-        I updated this subroutine to just poll for machine status and write the
-        Machine Status (MS) file. This was a cheap excuse for not writing a
-        whole new daemon program just to poll for machine status. I hope this
-        works out! :-)
+	I updated this subroutine to just poll for machine status
+	and write the Machine Status (MS) file. This was a cheap
+	excuse for not writing a whole new daemon program just to
+	poll for machine status. I hope this works out! :-)
 
 */
 
@@ -28,34 +28,29 @@
 
 /*******************************************************************************
 
-        This subroutine is responsible for listening on the given socket and
-        spawning off a program to handle any incoming connection. Some of the
-        "internal" messages are handled here (the easy ones -- or the ones that
-        fit here best). The rest (that look like client-sort-of requests) are
-        handled in the 'standing' object module.
+	This subroutine is responsible for listening on the given
+	socket and spawning off a program to handle any incoming
+	connection.  Some of the "internal" messages are handled
+	here (the easy ones -- or the ones that fit here best).
+	The rest (that look like client-sort-of requests) are handled
+	in the 'standing' object module.
 
 	Synopsis:
-
 	int progwatch(pip,nlp)
 	PROGINFO	*pip ;
 	vecstr		*nlp ;
 
 	Arguments:
-
 	pip	program information pointer
 	nlp	name-list pointer
 
 	Returns:
-
 	>=0	good
-	<0	error
-
+	<0	error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -68,7 +63,6 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<varsub.h>
@@ -140,7 +134,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	bufprintf(const char *,int,...) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	nlspeername(const char *,const char *,char *) ;
 extern int	mksublogid(char *,int,const char *,int) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;

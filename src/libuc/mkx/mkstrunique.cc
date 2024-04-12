@@ -36,8 +36,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<mkchar.h>

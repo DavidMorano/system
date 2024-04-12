@@ -51,7 +51,6 @@
 	since we only need to keep the smaller key string table
 	around for the main indexing!
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -69,13 +68,12 @@
 #include	<vecobj.h>
 #include	<vecstr.h>
 #include	<bfile.h>
+#include	<opentmp.h>
 #include	<field.h>
-#include	<char.h>
 #include	<kvsfile.h>
 #include	<ids.h>
 #include	<strtab.h>
 #include	<mkchar.h>
-#include	<localmisc.h>
 #include	<intceil.h>
 #include	<hash.h>
 #include	<sncpyx.h>
@@ -84,6 +82,8 @@
 #include	<mkpathx.h>
 #include	<sfx.h>
 #include	<strwcpy.h>
+#include	<char.h>
+#include	<localmisc.h>
 
 #include	"mailalias.h"
 
@@ -175,7 +175,6 @@ extern "C" int	randlc(int) ;
 extern "C" int	sperm(IDS *,USTAT *,int) ;
 extern "C" int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern "C" int	mkdirs(cchar *,mode_t) ;
-extern "C" int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern "C" int	isfsremote(int) ;
 extern "C" int	isNotPresent(int) ;
 extern "C" int	isNotAccess(int) ;

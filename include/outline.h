@@ -20,17 +20,13 @@
 
 	This object deals with printing lines.
 
-
 *******************************************************************************/
 
-
 #ifndef	OUTLINE_INCLUDE
-#define	OUTLINE_INCLUDE		1
+#define	OUTLINE_INCLUDE	
 
 
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>

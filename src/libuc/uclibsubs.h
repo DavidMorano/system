@@ -155,7 +155,7 @@ extern int	uc_createfile(cchar *,mode_t) noex ;
 extern int	uc_open(cchar *,int,mode_t) noex ;
 extern int	uc_opene(cchar *,int,mode_t,int) noex ;
 extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
-extern int	uc_openenv(cchar *,int,mode_t,cchar **,int) noex ;
+extern int	uc_openenv(cchar *,int,mode_t,mainv,int) noex ;
 extern int	uc_opensocket(cchar *,int,int) noex ;
 extern int	uc_openproto(cchar *,int,int,int) noex ;
 extern int	uc_openpass(cchar *,int,int,int) noex ;
@@ -180,9 +180,11 @@ extern int	uc_openpt(int) noex ;
 extern int	uc_socket(int,int,int) noex ;
 
 /* use group */
+extern int	uc_ioctl(int,int,...) noex ;
 extern int	uc_fpassfd(int,int) noex ;
 extern int	uc_ftruncate(int,off_t) noex ;
 extern int	uc_fstat(int,USTAT *) noex ;
+extern int	uc_fchown(int,uid_t,gid_t) noex ;
 extern int	uc_isatty(int) noex ;
 extern int	uc_fsync(int) noex ;
 extern int	uc_fdatasync(int) noex ;
@@ -193,9 +195,18 @@ extern int	uc_fminmod(int,mode_t) noex ;
 extern int	uc_fsize(int) noex ;
 extern int	uc_fuid(int) noex ;
 extern int	uc_fgid(int) noex ;
+extern int	uc_rewind(int) noex ;
+extern int	uc_lockf(int,int,off_t) noex ;
+extern int	uc_lockfile(int,int,off_t,off_t,int) noex ;
 
+extern int	uc_bind(int,void *,int) noex ;
 extern int	uc_accepte(int,cvoid *,int *,int) noex ;
+extern int	uc_connect(int,cvoid *,int) noex ;
 extern int	uc_connecte(int,cvoid *,int,int) noex ;
+extern int	uc_setsockopt(int,int,int,int *,int) noex ;
+extern int	uc_linger(int,int) noex ;
+extern int	uc_joinus(int,SOCKADDR *,int,int,mode_t) noex ;
+
 extern int	uc_copy(int,int,int) noex ;
 
 extern int	uc_readn(int,void *,int) noex ;
@@ -216,8 +227,6 @@ extern int	uc_sockatmark(int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
 extern int	uc_getsocktype(int) noex ;
 
-extern int	uc_lockf(int,int,off_t) noex ;
-extern int	uc_lockfile(int,int,off_t,off_t,int) noex ;
 extern int	uc_tcsetattr(int,int,TERMIOS *) noex ;
 extern int	uc_tcgetattr(int,TERMIOS *) noex ;
 extern int	uc_tcgetsid(int) noex ;

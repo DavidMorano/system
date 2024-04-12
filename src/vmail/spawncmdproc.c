@@ -19,23 +19,19 @@
 
 	This subroutine spawns a SHELL that executes a specified command.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<spawnproc.h>
 #include	<filer.h>
 #include	<ids.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 
@@ -85,7 +81,6 @@ extern int	vbufprintf(char *,int,const char *,va_list) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	isproc(pid_t) ;
 
 
@@ -211,10 +206,6 @@ static int mkcmdfname(char *cmdfname,cchar *shprog,cchar *cmd)
 		const int	cmdlen = CMDBUFLEN ;
 	        const int	sfd = rs ;
 	        char		*cmdbuf ;
-
-#if	CF_DEBUGS
-	debugprintf("spawncmdproc/mkcmdfname: opentmpfile() rs=%d\n",rs) ;
-#endif
 
 		if ((rs = uc_malloc((cmdlen+1),&cmdbuf)) >= 0) {
 	            FILER	b ;

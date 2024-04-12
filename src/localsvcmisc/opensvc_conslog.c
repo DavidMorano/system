@@ -97,8 +97,6 @@ extern int	sncpy1w(char *,int,const char *,int) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	matkeystr(const char **,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	getlogfac(const char *,int) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodedomain(char *,char *) ;

@@ -11,8 +11,8 @@
 /* revision history:
 
 	= 2008-09-01, David A­D­ Morano
-        This subroutine was adopted from the DWD program. I may not have changed
-        all of the comments correctly though!
+	This subroutine was adopted from the DWD program.  I may
+	not have changed all of the comments correctly though!
 
 */
 
@@ -22,12 +22,9 @@
 
 	These subroutines handle some IPC related functions.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -38,9 +35,9 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<sockaddress.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"defs.h"
@@ -81,8 +78,6 @@ extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 
 extern int	progjobdir(PROGINFO *,char *) ;
 extern int	progreqfile(PROGINFO *) ;

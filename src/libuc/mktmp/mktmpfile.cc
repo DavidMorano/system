@@ -42,13 +42,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"mktmp.h"
@@ -58,10 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
-}
 
 
 /* external variables */

@@ -69,7 +69,6 @@ extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	nlspeername(const char *,const char *,char *) ;
 extern int	isascoket(int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;

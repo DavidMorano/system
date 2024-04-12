@@ -82,6 +82,7 @@
 #include	<ascii.h>
 #include	<buffer.h>
 #include	<spawner.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -194,8 +195,6 @@ extern int	getnodedomain(char *,char *) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	termwritable(cchar *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;

@@ -16,6 +16,9 @@
 
 /*******************************************************************************
 
+	Name:
+	dialuss
+
 	Descrption:
 	This subroutine will dial out to an UNIX® domain socket
 	stream address.
@@ -35,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
@@ -93,7 +95,7 @@ int dialuss(cchar *pathname,int to,int opts) noex {
 	        USTAT	sb ;
 	        if ((rs = uc_stat(pathname,&sb)) >= 0) {
 	            if (S_ISSOCK(sb.st_mode)) {
-		        SOCKADDRESS	sa ;
+		        sockaddress	sa ;
 		        cint		af = AF_UNIX ;
 	                cvoid		*vp = voidp(pathname) ;
 	                if ((rs = sockaddress_start(&sa,af,vp,0,0)) >= 0) {

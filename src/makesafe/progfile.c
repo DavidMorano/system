@@ -26,12 +26,9 @@
 
 	"main.c", line 42: Can't find include file usystem.h
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -40,7 +37,6 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<vecstr.h>
@@ -49,6 +45,7 @@
 #include	<filer.h>
 #include	<sbuf.h>
 #include	<ascii.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -76,7 +73,6 @@ extern int	sfsub(const char *,int,const char *,const char **) ;
 extern int	sfdequote(const char *,int,const char **) ;
 extern int	nextfield(const char *,int,const char **) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 extern int	progeprintf(PROGINFO *,const char *,...) ;
 extern int	progout_printf(PROGINFO *,const char *,...) ;

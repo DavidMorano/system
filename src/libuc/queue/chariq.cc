@@ -20,7 +20,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 

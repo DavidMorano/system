@@ -109,7 +109,6 @@ extern int	matcasestr(const char **,const char *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	chmods(const char *,mode_t) ;
 extern int	getproviderid(const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 

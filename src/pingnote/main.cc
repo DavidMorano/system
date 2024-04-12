@@ -97,8 +97,6 @@ extern int	dialtcpmux(const char *,const char *,int,const char *,
 extern int	dialuss(const char *,int,int) ;
 extern int	dialusd(const char *,int,int) ;
 extern int	dialticotsordnls(const char *,int,const char *,int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	dater_setkey(DATER *,const char *,int,struct timeb *,
 			const char *) ;
 extern int	isdigitlatin(int) ;

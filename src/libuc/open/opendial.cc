@@ -46,10 +46,11 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<sigman.h>
+#include	<dial.h>
 #include	<localmisc.h>
 
 #include	"opendial.h"
@@ -79,67 +80,68 @@
 /* exported subroutines */
 
 int opendial(int di,int af,cc *hn,cc *ps,cc *svc,
-			mainv av,mainv ev,int to,int opts) noex {
+		mainv av,mainv ev,int to,int opts) noex {
 	int		rs = SR_FAULT ;
 	if (hn) {
+	    cnullptr	np{} ;
 	    rs = SR_INVALID ;
 	    if ((di >= 0) && (af >= 0)) {
 	        cint	of = O_RDWR ;
 		cmode	om = 0666 ;
 	        cchar	*cp ;
-	        switch (dialer) {
+	        switch (di) {
 	        case opendialer_udp:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
-	            rs = dialudp(hostspec,cp,af,to,opts) ;
+	            rs = dialudp(hn,cp,af,to,opts) ;
 	            break ;
 	        case opendialer_tcp:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
-	            rs = dialtcp(hostspec,cp,af,to,opts) ;
+	            rs = dialtcp(hn,cp,af,to,opts) ;
 	            break ;
 	        case opendialer_tcpmux:
-	            rs = dialtcpmux(hostspec,portspec,af,svc,av,to,opts) ;
+	            rs = dialtcpmux(hn,ps,af,svc,av,to,opts) ;
 	            break ;
 	        case opendialer_tcpnls:
-	            rs = dialtcpnls(hostspec,portspec,af,svc,to,opts) ;
+	            rs = dialtcpnls(hn,ps,af,svc,to,opts) ;
 	            break ;
 	        case opendialer_uss:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialuss(cp,to,opts) ;
 	            break ;
 	        case opendialer_ussmux:
-	            rs = dialussmux(portspec,svc,av,to,opts) ;
+	            rs = dialussmux(ps,svc,av,to,opts) ;
 	            break ;
 	        case opendialer_ussnls:
-	            rs = dialussnls(portspec,svc,to,opts) ;
+	            rs = dialussnls(ps,svc,to,opts) ;
 	            break ;
 	        case opendialer_ticotsord:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialticotsord(cp,-1,to,opts) ;
 	            break ;
 	        case opendialer_ticotsordnls:
-	            rs = dialticotsordnls(portspec,-1,svc,to,opts) ;
+	            rs = dialticotsordnls(ps,-1,svc,to,opts) ;
 	            break ;
 	        case opendialer_pass:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
 	            rs = dialpass(cp,to,opts) ;
 	            break ;
 	        case opendialer_open:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
-	            rs = uc_openenv(cp,of,0666,ev,to) ;
+	            rs = uc_openenv(cp,of,om,ev,to) ;
 	            break ;
 	        case opendialer_prog:
-	            cp = portspec ;
+	            cp = ps ;
 	            if ((cp == np) || (cp[0] == '\0')) cp = svc ;
-	            rs = dialprog(cp,oflags,av,ev,np) ;
+	            rs = dialprog(cp,of,av,ev,np) ;
 	            break ;
 	        case opendialer_finger:
-	            rs = dialfinger(hostspec,portspec,af,svc,av,to,opts) ;
+	            rs = dialfinger(hn,ps,af,svc,av,to,opts) ;
 	            break ;
 	        default:
 	            rs = SR_NOSYS ;

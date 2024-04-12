@@ -21,7 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>

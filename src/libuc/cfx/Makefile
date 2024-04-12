@@ -9,13 +9,14 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+
 
 CPP= cpp
 CC= gcc
@@ -36,12 +37,14 @@ LINT= lint
 
 DEFS=
 
-LDRPATH= $(EXTRA)/lib
 
-LIBDIRS= -L$(LIBDIR)
+INCS= cfxxxx.hh cfsysx.hh
+
 
 LIBS=
 
+
+LIBDIRS= -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -49,10 +52,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-# these are really algorithms
-INCS= cfxxxx.hh cfsysx.hh
 
 
 OBJ0_CFX= cfchars.o 

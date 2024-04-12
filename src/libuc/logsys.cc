@@ -112,7 +112,6 @@ extern "C" {
 }
 
 extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
     extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
 }
 

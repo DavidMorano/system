@@ -96,8 +96,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	findxfile(IDS *,char *,const char *) ;
 extern int	getpwd(char *,int) ;
 extern int	getprogpath(IDS *,VECSTR *,char *,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	vecstr_addpath(vecstr *,const char *,int) ;
 extern int	vecstr_addpathclean(vecstr *,const char *,int) ;
 extern int	vecstr_addcspath(vecstr *) ;

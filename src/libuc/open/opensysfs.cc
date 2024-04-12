@@ -61,6 +61,7 @@
 #include	<dirseen.h>
 #include	<envhelp.h>
 #include	<ctdec.h>
+#include	<stdfnames.h>
 #include	<spawnproc.h>
 #include	<localmisc.h>
 
@@ -424,7 +425,7 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 	        if ((rs = sncpyuc(zbuf,zlen,pn)) >= 0) {
 	            envhelp	env ;
 	            if ((rs = envhelp_start(&env,envbads,environ)) >= 0) {
-	                cchar	**ev = nullptr ;
+	                mainv	ev = nullptr ;
 	                if (rs >= 0) {
 	                    cchar	*cp ;
 	                    int		cl ;
@@ -446,7 +447,7 @@ static int runmkpwi(int w,cchar *dbp,int dbl) noex {
 			    }
 	                }
 	                if ((rs = envhelp_getvec(&env,&ev)) >= 0) {
-	                    SPAWNPROC	ps{} ;
+	                    spawnproc_con	ps{} ;
 	                    av[0] = zbuf ;
 	                    av[1] = nullptr ;
 	                    ps.disp[0] = SPAWNPROC_DCLOSE ;
@@ -479,7 +480,7 @@ static int runsysfs(int w) noex {
 	if ((rs = ids_load(&id)) >= 0) {
 	    char	pfname[MAXPATHLEN+1] ;
 	    if ((rs = findprog(&id,pfname,pn)) > 0) {
-	        SPAWNPROC	ps ;
+	        spawnproc_con	ps{} ;
 	        cint		alen = ABUFLEN ;
 	        int		cs = 0 ;
 	        cchar		*av[3] ;
@@ -491,7 +492,6 @@ static int runsysfs(int w) noex {
 	                av[0] = zbuf ;
 	                av[1] = abuf ;
 	                av[2] = nullptr ;
-	                memset(&ps,0,sizeof(SPAWNPROC)) ;
 	                ps.disp[0] = SPAWNPROC_DCLOSE ;
 	                ps.disp[1] = SPAWNPROC_DCLOSE ;
 	                ps.disp[2] = SPAWNPROC_DNULL ;

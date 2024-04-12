@@ -46,7 +46,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>

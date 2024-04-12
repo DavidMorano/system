@@ -21,8 +21,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<limits.h>
 #include	<string.h>
 #include	<usystem.h>

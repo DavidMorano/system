@@ -24,7 +24,7 @@
 #define	NLSDIALASSIST_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 
 

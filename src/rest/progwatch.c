@@ -140,7 +140,6 @@ extern int	matstr(const char **,const char *,int) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	bufprintf(const char *,int,...) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	nlspeername(const char *,const char *,char *) ;
 extern int	mksublogid(char *,int,const char *,int) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;

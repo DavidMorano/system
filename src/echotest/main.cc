@@ -23,12 +23,9 @@
 	This subroutine forms a program that sends data to a remote
 	INET host to its 'echo' service.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
@@ -38,13 +35,12 @@
 #include	<csignal>
 #include	<cstdlib>
 #include	<cstring>
-#include	<ctype.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
 #include	<sockaddress.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -79,8 +75,6 @@ extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
 extern int	dialuss(const char *,int,int) ;
 extern int	dialusd(const char *,int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	dialudp(const char *,const char *,int,int,int) ;
 extern int	dialtcp(const char *,const char *,int,int,int) ;
 extern int	dialtcpnls(const char *,const char *,int,const char *,int,int) ;

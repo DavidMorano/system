@@ -18,7 +18,7 @@
 #define	MKPATHROOTED_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 

@@ -19,26 +19,19 @@
 /*******************************************************************************
 
 	This object manages the mapping between keys and commands.
-
-        Using the "lookup" function, one can provide a key (in the form of a
-        KEYSYM value) and this object will return the index of a 'command'.
-
+	Using the "lookup" function, one can provide a key (in the
+	form of a KEYSYM value) and this object will return the
+	index of a 'command'.
 
 *******************************************************************************/
 
-
-#define	CMDMAP_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -56,7 +49,6 @@ extern int	snwcpy(char *,int,const char *,int) ;
 extern int	mkpath1(char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 
 #if	CF_DEBUGS

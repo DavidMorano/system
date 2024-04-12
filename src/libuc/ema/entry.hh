@@ -25,7 +25,7 @@
 #define	ENTRY_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<localmisc.h>

@@ -56,7 +56,6 @@ extern int	snwcpy(char *,int,const char *,int) ;
 extern int	mkpath1(char *,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	cfdecui(const char *,int,uint *) ;
 
 #if	CF_DEBUGS

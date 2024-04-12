@@ -63,7 +63,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* must be before others */
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -82,6 +82,7 @@
 #include	<filer.h>
 #include	<getpwd.h>
 #include	<xperm.h>
+#include	<opentmp.h>
 #include	<hash.h>
 #include	<sfx.h>
 #include	<sncpyx.h>
@@ -126,7 +127,6 @@
 
 extern "C" {
     extern uint	nextpowtwo(uint) noex ;
-    extern int	opentmpfile(char *,int,mode_t,char *) noex ;
 }
 
 

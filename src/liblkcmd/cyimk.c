@@ -84,8 +84,9 @@
 #include	<ids.h>
 #include	<storebuf.h>
 #include	<filer.h>
-#include	<char.h>
 #include	<tmtime.h>
+#include	<opentmp.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"cyimk.h"
@@ -115,7 +116,6 @@ extern int	cfhexi(const char *,int,uint *) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 extern int	filer_writefill(FILER *,const void *,int) ;

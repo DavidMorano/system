@@ -198,7 +198,7 @@ static int mkpathusername(char *rbuf,cchar *up,int ul,cchar *sp,int sl) noex {
 	    }
 	    if (rs >= 0) {
 	        if ((rs = getbufsize(getbufsize_pw)) >= 0) {
-	            PASSWD	pw ;
+	            ucentpw	pw ;
 	            cint	pwlen = rs ;
 	            char	*pwbuf{} ;
 	            if ((rs = uc_libmalloc((pwlen+1),&pwbuf)) >= 0) {

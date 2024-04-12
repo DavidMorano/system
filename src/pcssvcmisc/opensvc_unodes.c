@@ -81,8 +81,6 @@
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	matkeystr(const char **,const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	isNotPresent(int) ;
 
 extern cchar	*getourenv(cchar **,cchar *) ;

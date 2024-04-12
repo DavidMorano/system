@@ -47,7 +47,7 @@
 #define	BFILE_STDOUT	STDFNOUT
 #define	BFILE_STDERR	STDFNERR
 #define	BFILE_STDLOG	STDFNLOG
-#define	BFILE_STDNULL	STDFNNUL
+#define	BFILE_STDNULL	STDFNNULL
 
 /* user commands to 'bcontrol' */
 #define	BC_NOOP		0

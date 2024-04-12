@@ -1,5 +1,5 @@
 /* findinline */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* find a TeX-type in-line text escape */
 /* version %I% last-modified %G% */
@@ -24,7 +24,6 @@
 	This subroutine finds a TeX-like in-line text escape.
 
 	Synopsis:
-
 	int findinline(FINDLINLINE *fip,cchar *lp,int ll) noex
 
 	Arguments:
@@ -33,17 +32,15 @@
 	ll	length of supplied string to test
 
 	Returns:
-
 	>=0	length of result "thing" 
-	<0	error
+	<0	error code (system-return)
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ascii.h>

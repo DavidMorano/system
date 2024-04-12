@@ -113,7 +113,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -134,6 +133,7 @@
 #include	<pathadd.h>
 #include	<sfx.h>
 #include	<getmjd.h>		/* |getmjd(3uc)| */
+#include	<prmktmpdir.h>
 #include	<lockfile.h>
 #include	<hasx.h>
 #include	<isnot.h>		/* |isNotAccess(3uc)| */
@@ -342,9 +342,9 @@ int openqotd(cchar *pr,int mjd,int of,int to) noex {
 	                            }
 	                        }
 	                        if ((rs >= 0) && (of & O_NOCTTY)) {
-	                            u_unlink(qfname) ;
+	                            uc_unlink(qfname) ;
 	                        }
-	                        if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	                        if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	                    } /* end if (mkqfname) */
 			    rs1 = uc_free(qfname) ;
 			    if (rs >= 0) rs = rs1 ;
@@ -403,7 +403,7 @@ static int openqotd_open(OPENQOTD_SUB *sip) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
-	if ((rs = u_open(sip->qfname,sip->of,om)) >= 0) {
+	if ((rs = uc_open(sip->qfname,sip->of,om)) >= 0) {
 	    fd = rs ;
 	} else if (rs == SR_NOENT) {
 	    cmode	dm = sip->dm ;
@@ -457,7 +457,7 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	if ((rs = malloc_mp(&qdname)) >= 0) {
 	    if ((rs = mkqdname(qdname,vtd,rnp,rnl,cn)) >= 0) {
 	        USTAT	sb ;
-	        if ((rs = u_stat(qdname,&sb)) >= 0) {
+	        if ((rs = uc_stat(qdname,&sb)) >= 0) {
 	            if (S_ISDIR(sb.st_mode)) {
 	                cint	n = (sb.st_size / 10) ;
 	                cint	cs = (sb.st_size / 4) ;
@@ -468,7 +468,7 @@ static int qotdexpire(cc *vtd,cc *rnp,int rnl,cc *cn,time_t dt,int to) noex {
 	                        cchar	*fn{} ;
 	                        for (int i = 0 ; vg(&ds,i,&fn) >= 0 ; i += 1) {
 	                            if (fn) {
-	                                rs1 = u_unlink(fn) ;
+	                                rs1 = uc_unlink(fn) ;
 	                                if (rs1 >= 0) c += 1 ;
 				    }
 	                        } /* end for */
@@ -508,7 +508,7 @@ static int qotdexpireload(vecpstr *dsp,char *qfname,time_t dt,int to) noex {
 	            if (hasNotDots(ep,el)) {
 	                if ((rs = pathadd(qfname,dlen,ep)) >= 0) {
 	                    cint	fl = rs ;
-	                    if (u_stat(qfname,&sb) >= 0) {
+	                    if (uc_stat(qfname,&sb) >= 0) {
 	                        if (S_ISREG(sb.st_mode)) {
     
 	                            if ((dt-sb.st_mtime) >= to) {
@@ -543,7 +543,7 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	lof &= (~ O_TRUNC) ;
 	lof &= (~ O_EXCL) ;
 	lof |= (O_CREAT | O_RDWR) ;
-	if ((rs = u_open(qfname,lof,om)) >= 0) {
+	if ((rs = uc_open(qfname,lof,om)) >= 0) {
 	    fd = rs ;
 	    if ((rs = uc_fminmod(fd,om)) >= 0) {
 	        if ((rs = openqotd_init()) >= 0) {
@@ -555,11 +555,11 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	                        if ((rs = maintqotd(pr,mjd,of,ttl)) >= 0) {
 	                            cint	s = rs ;
 	                            if ((rs = uc_writedesc(fd,s,-1)) >= 0) {
-	                                if ((rs = u_rewind(fd)) >= 0) {
+	                                if ((rs = uc_rewind(fd)) >= 0) {
 	                                    rs = loadchown(pr,fd) ;
 					}
 	                            }
-	                            rs1 = u_close(s) ;
+	                            rs1 = uc_close(s) ;
 	                    	    if (rs >= 0) rs = rs1 ;
 	                        } /* end if (maintqotd) */
 	                    } /* end if (file-size-is-zero) */
@@ -571,7 +571,7 @@ static int qotdfetch(cc *pr,int mjd,int of,int ttl,cc *qfname) noex {
 	            } /* end if (capture-exclusion) */
 	        } /* end if (openqotd_init) */
 	    } /* end if (uc_fminmod) */
-	    if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	} /* end if (open-) */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -584,12 +584,12 @@ static int openmask(cchar *qfname,int of,mode_t om) noex {
 	int		fd = -1 ;
 	if ((rs = umaskset(0)) >= 0) {
 	    mode_t	pm = rs ;
-	    rs = u_open(qfname,of,om) ;
+	    rs = uc_open(qfname,of,om) ;
 	    fd = rs ;
 	    rs1 = umaskset(pm) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if */
-	if ((rs < 0) && (fd >= 0)) u_close(fd) ;
+	if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
 /* end if (openmask) */
@@ -598,12 +598,12 @@ static int openmask(cchar *qfname,int of,mode_t om) noex {
 static int loadchown(cchar *pr,int fd) noex {
 	USTAT		sb ;
 	int		rs ;
-	if ((rs = u_stat(pr,&sb)) >= 0) {
+	if ((rs = uc_stat(pr,&sb)) >= 0) {
 	    uid_t	euid = geteuid() ;
 	    if (euid != sb.st_uid) {
-	        u_fchown(fd,sb.st_uid,sb.st_gid) ;
+	        uc_fchown(fd,sb.st_uid,sb.st_gid) ;
 	    }
-	} /* end if (u_stat) */
+	} /* end if (uc_stat) */
 	return rs ;
 }
 /* end subroutine (loadchown) */

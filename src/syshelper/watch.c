@@ -10,14 +10,15 @@
 
 /* revision history:
 
-	= 91/09/01, David A­D­ Morano
+	= 1991-09-01, David A­D­ Morano
 
 	This subroutine was adopted from the DWD program.
 
 
 */
 
-
+/* Copyright © 1991 David A­D­ Morano.  All rights reserved. */
+/* Use is subject to license terms. */
 
 /*****************************************************************************
 
@@ -34,14 +35,9 @@
 	Returns:
 	OK	doesn't really matter in the current implementation
 
-
-
 *****************************************************************************/
 
-
-
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -59,7 +55,6 @@
 #include	<limits.h>
 #include	<string.h>
 #include	<poll.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -67,12 +62,12 @@
 #include	<varsub.h>
 #include	<vecstr.h>
 #include	<baops.h>
+#include	<srvtab.h>
+#include	<acctab.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
+#include	<localmisc.h>
 
-#include	"srvtab.h"
-#include	"acctab.h"
-
-#include	"localmisc.h"
 #include	"jobdb.h"
 #include	"builtin.h"
 #include	"config.h"
@@ -92,7 +87,6 @@
 
 /* external subroutines */
 
-extern int	opentmpfile(char *,int,mode_t,char *) ;
 extern int	checklockfile(struct proginfo *,bfile *,char *,char *,
 			time_t,pid_t) ;
 extern int	handle(struct proginfo *, struct serverinfo *, 

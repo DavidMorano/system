@@ -31,7 +31,7 @@
 #define	USYSAUXINFO_DARWIN_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 
 /* USYSAUXINFO_DARWIN start */
 #if	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)

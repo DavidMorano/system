@@ -136,8 +136,6 @@ extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	getnodename(char *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	attachso(cchar **,cchar *,cchar **,cchar **,int,void **) ;

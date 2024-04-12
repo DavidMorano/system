@@ -9,13 +9,14 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+
 
 CPP= cpp
 CC= gcc
@@ -43,7 +44,8 @@ INCS += open.h
 LIBS +=
 
 
-LDRPATH= $(EXTRA)/lib
+INCDIRS=
+
 
 LIBDIRS= -L$(LIBDIR)
 
@@ -135,7 +137,7 @@ openportmsg.o:		openportmsg.cc openportmsg.h	$(INCS)
 openaddrinfo.o:		openaddrinfo.cc openaddrinfo.h	$(INCS)
 opensockaddr.o:		opensockaddr.cc opensockaddr.h	$(INCS)
 opendefstds.o:		opendefstds.cc			$(INCS)
-opendial.o:		opendial.cc opendia.h		$(INCS)
+opendial.o:		opendial.cc opendial.h		$(INCS)
 openqotd.o:		openqotd.cc openqotd.h		$(INCS)
 openshm.o:		openshm.cc openshm.h		$(INCS)
 opensysfs.o:		opensysfs.cc opensysfs.h	$(INCS)

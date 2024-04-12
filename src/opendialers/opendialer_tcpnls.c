@@ -91,8 +91,6 @@ extern int	cfdeci(const char *,int,int *) ;
 extern int	findxfile(IDS *,char *,const char *) ;
 extern int	getaf(const char *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	dialtcp(const char *,const char *,int,int,int) ;
 extern int	dialtcpnls(cchar *,cchar *,int,cchar *, int,int) ;
 

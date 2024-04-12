@@ -19,18 +19,12 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that allows access
-	to the COMMANDMENTS datbase.
-
+	This module implements an interface (a trivial one) that
+	allows access to the COMMANDMENTS datbase.
 
 *******************************************************************************/
 
-
-#define	COMMANDMENTS_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -39,12 +33,12 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<sbuf.h>
-#include	<char.h>
 #include	<storebuf.h>
+#include	<opentmp.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"commandments.h"
@@ -93,7 +87,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	mkdirs(char *,mode_t) ;
 extern int	removes(cchar *) ;
 extern int	prmktmpdir(cchar *,char *,cchar *,cchar *,mode_t) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	isdigitlatin(int) ;

@@ -1,7 +1,7 @@
 /* dialusd SUPPORT */
 /* lang=C++20 */
 
-/* subroutine to dial over to a UNIX® domain socket in data-gram mode */
+/* subroutine to dial out to a UNIX® domain socket in data-gram mode */
 /* version %I% last-modified %G% */
 
 
@@ -35,18 +35,21 @@
 	>=0		file descriptor
 	<0		error in dialing (system-return)
 
+	Notes:
+	For listening for incomming connections on a UNIX® domain
+	(file-system) socket, see the subroutine |openusd(3uc)|.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<sys/poll.h>
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<ctime>
@@ -54,10 +57,16 @@
 #include	<sockaddress.h>
 #include	<localmisc.h>
 
+#include	"dial.h"
+
 
 /* local defines */
 
-#define	BUFLEN		(8 * 1024)
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -85,19 +94,19 @@ int dialusd(cchar *dst,int to,int) noex {
 	    rs = SR_INVALID ;
 	    if (dst[0]) {
 	        cint	pf = PF_UNIX ;
-	        cint	af = AF_UNIX ;
 		cint	st = SOCK_DGRAM ;
 		cint	proto = 0 ;
-	        if ((rs = u_socket(pf,st,proto)) >= 0) {
+	        if ((rs = uc_socket(pf,st,proto)) >= 0) {
 	            sockaddress	sa ;
+	            cint	af = AF_UNIX ;
 	            fd = rs ;
 	            if ((rs = sockaddress_start(&sa,af,dst,0,0)) >= 0) {
 	 	        SOCKADDR	*sap = (SOCKADDR *) &sa ;
 	                int 		sal = rs ;
 	                if (to > 0) {
-	                    rs = u_connect(fd,sap,sal) ;
+	                    rs = uc_connect(fd,sap,sal) ;
 		        } else {
-	                    rs = u_connect(fd,sap,sal) ;
+	                    rs = uc_connect(fd,sap,sal) ;
 			}
 	                rs1 = sockaddress_finish(&sa) ;
 		        if (rs >= 0) rs = rs1 ;

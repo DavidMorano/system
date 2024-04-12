@@ -3,7 +3,7 @@
 
 for N in "${@}" ; do
   if [[ -r "${N}" ]] ; then
-    gnm ${N} | fgrep ' T '
+    gnm --demangle ${N} | fgrep ' T '
   fi
 done
 

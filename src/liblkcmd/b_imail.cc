@@ -126,6 +126,7 @@
 #include	<linefold.h>
 #include	<mkuuid.h>
 #include	<pcsns.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
@@ -221,8 +222,6 @@ extern int	optvalue(cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	pathclean(char *,cchar *,int) ;
 extern int	getgroupname(char *,int,gid_t) ;
-extern int	opentmp(cchar *,int,mode_t) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	mailboxappend(cchar *,int,int,int) ;
 extern int	mkdirs(cchar *,mode_t) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;

@@ -9,13 +9,14 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+
 
 CPP= cpp
 CC= gcc
@@ -34,14 +35,18 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
 
-LDRPATH= $(EXTRA)/lib
+
+INCS += dial.h dialopts.h
+
+
+LIBS +=
+
+
+INCDIRS= 
 
 LIBDIRS= -L$(LIBDIR)
-
-LIBS=
-
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -49,9 +54,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= dial.h dialopts.h
 
 
 OBJ0_DIAL= dialopts.o nlsdialassist.o

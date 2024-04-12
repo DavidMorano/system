@@ -8,15 +8,15 @@ ALL= $(T).so $(T).a
 BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
-RUNDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+
 
 CPP= cpp
 CC= gcc
@@ -865,6 +865,10 @@ strdcpy.dir:
 # system-auxillary-information
 ucsysauxinfo.o:		ucsysauxinfo.dir
 ucsysauxinfo.dir:
+	makesubdir $@
+
+open.o:			open.dir
+open.dir:
 	makesubdir $@
 
 dial.o:			dial.dir

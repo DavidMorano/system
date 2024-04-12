@@ -59,6 +59,7 @@
 #include	<ascii.h>
 #include	<getnodename.h>
 #include	<lockfile.h>
+#include	<opentmp.h>
 #include	<strn.h>
 #include	<strw.h>
 #include	<strwcpy.h>
@@ -116,8 +117,6 @@ using std::max ;			/* subroutine-template */
 /* external subroutines */
 
 extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
-    extern int	opentmp(cchar *,int,mode_t) noex ;
     extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
 }
 

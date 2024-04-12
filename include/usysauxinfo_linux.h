@@ -29,7 +29,7 @@
 #define	USYSAUXINFO_LINUX_INCLUDE
 
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 
 /* USYSAUXINFO_LINUX start */
 #if	defined(OSNAME_Linux) && (OSNAME_Linux > 0)

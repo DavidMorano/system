@@ -44,7 +44,7 @@
 	we just first interacted with the Name-Server-Cache and
 	then the Automount server once after that.
 
-	Note that we NEVER 'stat(2)' a file directly within any of
+	Note that we NEVER |stat(2)| a file directly within any of
 	the possible base directories for home-directories without
 	first having a pretty good idea that it is actually there.
 	This is done to avoid those stupid SYSLOG entries saying
@@ -55,13 +55,13 @@
 	good course of action since even though we are going through
 	the name-server cache, it more often than not has to go out
 	to some weirdo-only-knows network NIS+ (whatever) server
-	to get the PASSWD information.  This is not unusual in a
+	to get the ucentpw information.  This is not unusual in a
 	large organization.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -70,6 +70,7 @@
 #include	<cstring>
 #include	<pwd.h>
 #include	<usystem.h>
+#include	<ucvariables.hh>
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<fsdir.h>
@@ -80,8 +81,9 @@
 #include	<mkpathx.h>
 #include	<hasx.h>
 #include	<cfdec.h>
-#include	<isnot.h>
 #include	<strwcmp.h>
+#include	<strlibval.hh>
+#include	<isnot.h>
 #include	<localmisc.h>
 
 #include	"getuserhome.h"
@@ -132,7 +134,7 @@ struct subinfo_flags {
 struct subinfo {
 	cchar		*un ;
 	char		*pwbuf ;
-	PASSWD		pw ;
+	ucentpw		pw ;
 	uid_t		uid ;
 	SUBINFO_FL	init ;
 	int		pwlen ;
@@ -167,6 +169,9 @@ static constexpr int	(*gethomes[])(SUBINFO *,char *,int) = {
 	subinfo_getsysdb,
 	nullptr
 } ;
+
+static strlibval	val_username(strlibval_username) ;
+static strlibval	val_home(strlibval_home) ;
 
 
 /* exported variables */
@@ -238,7 +243,7 @@ static int subinfo_getpw(SUBINFO *sip) noex {
 	int		rs = SR_OK ;
 	cchar		*un = sip->un ;
 	if (! sip->init.pw) {
-	    PASSWD	*pwp = &sip->pw ;
+	    ucentpw	*pwp = &sip->pw ;
 	    cint	pwlen = sip->pwlen ;
 	    sip->init.pw = true ;
 	    if (un[0] != '-') {
@@ -266,10 +271,10 @@ static int subinfo_getvar(SUBINFO *sip,char *rbuf,int rlen) noex {
 	int		len = 0 ;
 	cchar		*un = sip->un ;
 	if (un[0] == '-') {
-	    un = getenv(VARUSERNAME) ;
+	    un = val_username ;
 	}
 	if ((un != nullptr) && (un[0] != '\0')) {
-	    cchar	*hd = getenv(VARHOME) ;
+	    cchar	*hd = val_home ;
 	    if ((hd != nullptr) && (hd[0] != '\0')) {
 	        int	bl ;
 	        cchar	*bp{} ;

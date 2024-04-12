@@ -39,12 +39,9 @@
 	faster than reading the data in-place on the same page that it
 	was read in from disk on!  Who can figure? :-)
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -54,13 +51,12 @@
 #include	<signal.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<vecobj.h>
 #include	<paramopt.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -82,7 +78,6 @@
 
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	isprintlatin(int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 
 /* external variables */
@@ -181,7 +176,6 @@ const char	fname[] ;
 	    mkpath2(template,pip->tmpdname,TMPFX) ;
 
 	    rs = opentmpfile(template,O_RDWR,0660,tmpfname) ;
-
 	    fd_tmp = rs ;
 	    u_unlink(tmpfname) ;
 

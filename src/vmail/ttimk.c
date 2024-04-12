@@ -63,16 +63,9 @@
 
 	O_CREAT		x		x		SR_OK (created)
 
-
 *******************************************************************************/
 
-
-#define	TTIMK_MASTER	0
-
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
@@ -87,6 +80,7 @@
 #include	<filer.h>
 #include	<char.h>
 #include	<endian.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"ttimk.h"
@@ -131,7 +125,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfhexi(const char *,int,uint *) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	filer_writefill(FILER *,const void *,int) ;
 extern int	iceil(int,int) ;
 

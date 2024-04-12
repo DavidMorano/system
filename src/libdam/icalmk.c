@@ -44,7 +44,7 @@
 	Returns:
 
 	>=0		OK
-	<0		error code
+	<0		error code (system-return)
 
 
 	Notes:
@@ -73,15 +73,9 @@
 
 	O_CREAT		x		x		SR_OK (created)
 
-
 *******************************************************************************/
 
-
-#define	ICALMK_MASTER	0
-
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -91,14 +85,14 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
 #include	<usystem.h>
 #include	<endian.h>
 #include	<estrings.h>
 #include	<vecobj.h>
 #include	<filer.h>
-#include	<char.h>
 #include	<tmtime.h>
+#include	<opentmp.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"icalmk.h"
@@ -130,7 +124,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfhexi(const char *,int,uint *) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,const char *) ;
 
 #if	CF_DEBUGS

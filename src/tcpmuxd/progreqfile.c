@@ -11,8 +11,8 @@
 /* revision history:
 
 	= 2008-06-23, David A­D­ Morano
-        Hopefully, this subroutine will make life easier for everyone in the
-        future! :-)
+	Hopefully, this subroutine will make life easier for everyone
+	in the future! :-)
 
 */
 
@@ -20,16 +20,14 @@
 
 /*******************************************************************************
 
-        This subroutine creates (devines) the "req" filename. This is the "req"
-        file for shared (server) operations. When run in non-server mode, a
-        private "req" file is created without using this subroutine.
-
+	This subroutine creates (devines) the "req" filename. This
+	is the "req" file for shared (server) operations. When run
+	in non-server mode, a private "req" file is created without
+	using this subroutine.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -38,7 +36,6 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -76,7 +73,6 @@ extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
 extern int	debugprintf(const char *,...) ;

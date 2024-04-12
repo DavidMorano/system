@@ -18,12 +18,9 @@
 	Synopsis:
 	$ testucopen.x <file>
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<stdarg.h>
 #include	<stdio.h>
 #include	<usystem.h>

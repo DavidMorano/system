@@ -79,7 +79,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfhexi(const char *,int,uint *) ;
 extern int	getpwd(char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
 extern char	*strwcpylc(char *,const char *,int) ;

@@ -82,6 +82,7 @@
 #include	<cachetime.h>
 #include	<upt.h>
 #include	<spawnproc.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -140,8 +141,6 @@ extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
 extern int	vecpstr_adduniq(vecpstr *,cchar *,int) ;
 extern int	getnprocessors(cchar **,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	rmdirfiles(cchar *,cchar *,int) ;
 extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;

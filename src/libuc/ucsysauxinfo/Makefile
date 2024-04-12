@@ -9,13 +9,14 @@ BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
+
 
 CPP= cpp
 CC= gcc
@@ -36,12 +37,14 @@ LINT= lint
 
 DEFS=
 
-LDRPATH= $(EXTRA)/lib
 
-LIBDIRS= -L$(LIBDIR)
+INCS= usystem.h localmisc.h sysauxinfonames.h
+
 
 LIBS=
 
+
+LIBDIRS= -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -49,9 +52,6 @@ CFLAGS= $(MAKECFLAGS)
 CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
-
-
-INCS= usystem.h localmisc.h sysauxinfonames.h
 
 
 OBJ0_UCSYSAUXINFO= ucsub.o

@@ -9,9 +9,10 @@
 /* revision history:
 
 	= 2003-11-04, David A­D­ Morano
-        This code was started by taking the corresponding code from the
-        TCP-family module. In retrospect, that was a mistake. Rather I should
-        have started this code by using the corresponding UUX dialer module.
+	This code was started by taking the corresponding code from
+	the TCP-family module.  In retrospect, that was a mistake.
+	Rather I should have started this code by using the
+	corresponding UUX dialer module.
 
 */
 
@@ -19,6 +20,10 @@
 
 /******************************************************************************
 
+	Name:
+	openint_copyout
+
+	Description:
 	This is a facility-open-intercept module.
 
 	Synopsis:
@@ -35,7 +40,6 @@
 	int		to ;
 
 	Arguments:
-
 	pr		program-root
 	dn		dir-name
 	bn		base-name
@@ -47,16 +51,12 @@
 	to		time-out
 
 	Returns:
-
 	>=0		file-descriptor
-	<0		error
-
+	<0		error code (system-return)
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -65,8 +65,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<storebuf.h>
 #include	<localmisc.h>
@@ -85,8 +83,6 @@
 
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;

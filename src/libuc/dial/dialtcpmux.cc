@@ -59,7 +59,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<csignal>
 #include	<cstdlib>
 #include	<usystem.h>

@@ -58,16 +58,13 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<bits.h>
@@ -76,6 +73,7 @@
 #include	<getax.h>
 #include	<ugetpw.h>
 #include	<motd.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -105,8 +103,6 @@ extern int	matostr(const char **,int,const char *,int) ;
 extern int	matkeystr(const char **,const char *,int) ;
 extern int	optbool(const char *,int) ;
 extern int	optvalue(const char *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	getgroupname(char *,int,gid_t) ;
 extern int	getuserhome(char *,int,const char *) ;
 extern int	localgetorg(const char *,char *,int,const char *) ;

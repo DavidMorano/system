@@ -156,7 +156,6 @@ typedef buffer		mbuf ;
 /* external subroutines */
 
 extern "C" {
-    extern int	opentmpfile(cchar *,int,mode_t,char *) noex ;
     extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
     extern int	writeto(int,cvoid *,int,int) noex ;
 }

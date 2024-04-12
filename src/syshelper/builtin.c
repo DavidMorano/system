@@ -20,21 +20,14 @@
 
 /*******************************************************************************
 
-        This module contains the code for the built-in servers. There are not a
-        lot of built in servers because there is no way (currently) to shut them
-        off except to define a new one by the same name in the regular srver
-        table file.
-
+	This module contains the code for the built-in servers.
+	There are not a lot of built in servers because there is
+	no way (currently) to shut them off except to define a new
+	one by the same name in the regular srver table file.
 
 *******************************************************************************/
 
-
-#define	BUILTIN_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/systeminfo.h>
 #include	<sys/stat.h>
@@ -46,7 +39,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<buffer.h>
@@ -57,6 +49,7 @@
 #include	<svcfile.h>
 #include	<serialbuf.h>
 #include	<connection.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"nistinfo.h"
@@ -109,8 +102,6 @@ extern int	matcasestr(const char **,const char *,int) ;
 extern int	mkdirs(const char *,mode_t) ;
 extern int	chmods(const char *,mode_t) ;
 extern int	getproviderid(const char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmpusd(const char *,int,mode_t,char *) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 
 extern int	progtmpdir(PROGINFO *,char *) ;

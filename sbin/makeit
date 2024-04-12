@@ -7,10 +7,16 @@ export REPOROOT
 BUILDTYPE=debug
 
 
-: ${CGS_INCDIR:=${REPOROOT}/include}}
-: ${CGS_CRTDIR:=${REPOROOT}/lib}}
-: ${CGS_VALDIR:=${REPOROOT}/lib}}
-: ${CGS_LIBDIR:=${REPOROOT}/lib}}
+: ${CGS_BINDIR:=${REPOROOT}/bin}
+: ${CGS_INCDIR:=${REPOROOT}/include}
+: ${CGS_CRTDIR:=${REPOROOT}/lib}
+: ${CGS_VALDIR:=${REPOROOT}/lib}
+: ${CGS_LIBDIR:=${REPOROOT}/lib}
+: ${CGS_MANDIR:=${REPOROOT}/man}
+
+: ${CGS_INFODIR:=${REPOROOT}/info}
+: ${CGS_HELPDIR:=${REPOROOT}/share/help}
+: ${CGS_LDRPATH:=${REPOROOT}/lib}
 
 : ${CGS_CPP:=cpp}
 : ${CGS_CC:=clang}
@@ -29,9 +35,14 @@ BUILDTYPE=debug
 : ${CGS_GNM:=gnm13}
 : ${CGS_GCOV:=gcov13}
 
+export CGS_INCDIR
 export CGS_CRTDIR
 export CGS_VALDIR
 export CGS_LIBDIR
+
+export CGS_INFODIR
+export CGS_HELPDIR
+export CGS_LDRPATH
 
 export CGS_CPP
 export CGS_CC
@@ -76,14 +87,22 @@ export OSNAME OSNUM
 
 case ${OSNAME}:${OSNUM} in
 Darwin:*)
-  : ${CO_GCCALL:=""}
+  : ${CO_GCCALL:="-g"}
   : ${CO_GCCDEB:="-Wall -Wextra"}
-  : ${CO_GCCOPT:="-O"}
+  : ${CO_GCCOPT:=""}
   : ${CO_GCCLIB:=""}
-  : ${CO_GPPALL:=""}
+  : ${CO_GPPALL:="-g"}
   : ${CO_GPPDEB:="-Wall -Wextra"}
-  : ${CO_GPPOPT:="-O"}
+  : ${CO_GPPOPT:=""}
   : ${CO_GPPLIB:=""}
+  case ${BUILDTYPE} in
+  debug)
+    ;;
+  deliver)
+    CO_GCCOPT="-O"
+    CO_GPPOPT="-O"
+    ;;
+  esac
   ;;
 SunOS:*)
   : ${CO_GCCALL:="-pthreads"}

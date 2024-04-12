@@ -80,23 +80,20 @@
         output as the LOGINBLURB shell-builtin does! What we sometimes do to use
         an existing piece of some code is often quite amazingly complex!
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
 #include	<vechand.h>
 #include	<statmsg.h>
+#include	<opentmp.h>
 #include	<localmisc.h>
 
 #include	"opensvc_statmsg.h"
@@ -144,8 +141,6 @@ extern int	mkpath2(char *,const char *,const char *) ;
 extern int	matostr(const char **,int,const char *,int) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	getnodename(char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getgroupname(char *,int,gid_t) ;

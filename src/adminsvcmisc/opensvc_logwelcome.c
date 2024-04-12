@@ -133,8 +133,6 @@ extern int	sntmtime(char *,int,TMTIME *,cchar *) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
 extern int	matkeystr(cchar **,cchar *,int) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
 extern int	getnodename(char *,int) ;
 extern int	getdomainname(char *,int,cchar *) ;
 extern int	getnodedomain(char *,char *) ;

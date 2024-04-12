@@ -14,19 +14,16 @@
 
 /* revision history:
 
-	= 91/09/01, David A­D­ Morano
-
+	= 1991-09-01, David A­D­ Morano
 	This subroutine was adopted from the DWD program.  I may not
 	have changed all of the comments correctly though !
 
 
-	= 03/06/23, David A­D­ Morano
-
+	= 2003-06-23, David A­D­ Morano
 	I updated this subroutine to just poll for machine status and
 	write the Machine Status (MS) file.  This was a cheap excuse
 	for not writing a whole new daemon program just to poll for
 	machine status.  I hope this works out ! :-)
-
 
 */
 
@@ -34,6 +31,10 @@
 
 /*****************************************************************************
 
+	Name:
+	watch
+
+	Description:
 	This subroutine is responsible for listening on the given
 	socket and spawning off a program to handle any incoming
 	connection.  Some of the "internal" messages are handled here
@@ -42,25 +43,19 @@
 	'standing' object module.
 
 	Synopsis:
-
-	int watch(pip,bip)
-	struct proginfo	*pip ;
-	BUILTIN		*bip ;
+	int watch(PROGINFO pip,BUILTIN *bip) noex
 
 	Arguments:
-
 	pip	program information pointer
 	lfp	lockfile manager pointer (might be NULL)
 
 	Returns:
-
-	OK	doesn't really matter in the current implementation
-	<0	error
-
+	>=0	does not really matter in the current implementation
+	<0	error code (system-return)
 
 *****************************************************************************/
 
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -78,7 +73,6 @@
 #include	<limits.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<sfstr.h>
 #include	<baops.h>
@@ -90,6 +84,7 @@
 #include	<vecstr.h>
 #include	<sockaddress.h>
 #include	<acctab.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -124,7 +119,6 @@ extern int	snddd(char *,int,uint,uint) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	dupup(int,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpdir(struct proginfo *,char *) ;
 extern int	checkdirs(struct proginfo *,char *,int,int) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
@@ -868,15 +862,7 @@ char		fname[] ;
 
 /* create our socket there */
 
-	    rs = opentmpfile(template,
-	        O_SRVFLAGS,(S_IFSOCK | 0600),fname) ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(4))
-	debugprintf("watch/openipc: opentmpfile() rs=%d fname=%s\n",
-		rs,fname) ;
-#endif
-
+	    rs = opentmpfile(template,O_SRVFLAGS,(S_IFSOCK | 0600),fname) ;
 	    fd = rs ;
 	    if (rs < 0)
 	        return rs ;

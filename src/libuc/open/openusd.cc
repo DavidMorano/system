@@ -80,15 +80,15 @@ int openusd(cchar *sfn,int of,mode_t om) noex {
 	if (sfn) {
 	    rs = SR_INVALID ;
 	    if (sfn[0] && (of >= 0)) {
-	        cint		pf = PF_UNIX ;
-	        cint		st = SOCK_DGRAM ;
+	        cint	pf = PF_UNIX ;
+	        cint	st = SOCK_DGRAM ;
 	        if ((rs = uc_socket(pf,st,0)) >= 0) {
 	            sockaddress	sa ;
 	            cint	af = AF_UNIX ;
 	            fd = rs ;
 	            if ((rs = sockaddress_start(&sa,af,sfn,0,0)) >= 0) {
 		        SOCKADDR	*sap = (SOCKADDR *) &sa ;
-		        cint	sal = rs ;
+		        cint		sal = rs ;
 		        {
 		            rs = uc_joinus(fd,sap,sal,of,om) ;
 		        }

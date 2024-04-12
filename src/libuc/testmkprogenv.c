@@ -1,4 +1,5 @@
-/* mktestprogenv (C89) */
+/* mktestprogenv SUPPORT */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 
@@ -11,8 +12,7 @@
 
 /* Copyright © 2000 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<fcntl.h>
 #include	<stdio.h>
 

@@ -89,9 +89,10 @@
 #include	<strtab.h>
 #include	<bfile.h>
 #include	<filer.h>
+#include	<opentmp.h>
+#include	<hash.h>
 #include	<char.h>
 #include	<localmisc.h>
-#include	<hash.h>
 
 #include	"txtindexmks.h"
 #include	"txtindexhdr.h"
@@ -164,7 +165,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	cfhexi(const char *,int,uint *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	getpwd(char *,int) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	msleep(int) ;
 extern int	filer_writefill(FILER *,const char *,int) ;

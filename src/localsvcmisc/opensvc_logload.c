@@ -103,8 +103,6 @@ extern int	sncpy1w(char *,int,const char *,int) ;
 extern int	sfbasename(const char *,int,const char **) ;
 extern int	matkeystr(const char **,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	opentmpfile(const char *,int,mode_t,char *) ;
-extern int	opentmp(const char *,int,mode_t) ;
 extern int	getnodename(char *,int) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	getuserhome(char *,int,const char *) ;

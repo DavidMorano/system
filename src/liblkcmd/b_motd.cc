@@ -48,37 +48,38 @@
 
 /*******************************************************************************
 
-	This is a built-in command to the KSH shell.  It should also be able to
-	be made into a stand-alone program without much (if almost any)
-	difficulty, but I have not done that yet.
+	This is a built-in command to the KSH shell.  It should
+	also be able to be made into a stand-alone program without
+	much (if almost any) difficulty, but I have not done that
+	yet.
 
 	Synopsis:
-
 	$ motd [-u <username>] [-a <admin(s)>] [-d[=<intrun>] [-V]
 
 	Design problems:
 
-	I put a real hack into this code.  The MOTD object was supposed to
-	handle all aspects of the actual MOTD processing.  But a new issue
-	arose.  People want any subprograms executed as a result of reading
-	sub-MOTD files to know the client UID and GID (the only things that we
-	know).  We are currently doing this by placing these as special
-	environment variables into our own process environment before executing
-	'motd_process()'.  But switching out own actual environment in a way
-	that does not leak memory (meaning do not use 'putenv(3c)') adds a
-	little complication, which can be seen below.  Somehow in the future we
-	will try to move some kind of processing into the MOTD object itself.
+	I put a real hack into this code.  The MOTD object was
+	supposed to handle all aspects of the actual MOTD processing.
+	But a new issue arose.  People want any subprograms executed
+	as a result of reading sub-MOTD files to know the client
+	UID and GID (the only things that we know).  We are currently
+	doing this by placing these as special environment variables
+	into our own process environment before executing
+	'motd_process()'.  But switching out own actual environment
+	in a way that does not leak memory (meaning do not use
+	'putenv(3c)') adds a little complication, which can be seen
+	below.  Somehow in the future we will try to move some kind
+	of processing into the MOTD object itself.
 
 	Updated note on design problems:
 
-	The hack above to pass modified environment down to the MOTD object is
-	no longer needed.  The MOTD object itself now handles that.  A new MOTD
-	object method has been added to pass fuller specified identification
-	down into the MOTD object.  This new interface is 'motd_processid()'.
-
+	The hack above to pass modified environment down to the
+	MOTD object is no longer needed.  The MOTD object itself
+	now handles that.  A new MOTD object method has been added
+	to pass fuller specified identification down into the MOTD
+	object.  This new interface is 'motd_processid()'.
 
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -106,6 +107,7 @@
 #include	<netdb.h>
 
 #include	<usystem.h>
+#include	<ucmallreg.h>
 #include	<getbufsize.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -130,7 +132,7 @@
 #include	<ascii.h>
 #include	<buffer.h>
 #include	<spawner.h>
-#include	<ucmallreg.h>
+#include	<opentmp.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -242,8 +244,6 @@ extern int	getgroupname(char *,int,gid_t) ;
 extern int	getnodedomain(char *,char *) ;
 extern int	mkgecosname(char *,int,cchar *) ;
 extern int	termwritable(cchar *) ;
-extern int	opentmp(cchar *,int,mode_t) ;
-extern int	opentmpfile(cchar *,int,mode_t,char *) ;
 extern int	acceptpass(int,struct strrecvfd *,int) ;
 extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;

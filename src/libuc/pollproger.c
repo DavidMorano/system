@@ -42,17 +42,12 @@
 	pcp		PCSCONF pointer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<unistd.h>
