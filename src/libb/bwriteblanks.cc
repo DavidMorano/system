@@ -16,7 +16,16 @@
 
 /*******************************************************************************
 
-	This subroutine just prints out some blank characters.
+	Names:
+	bwriteblanks
+	bwritechrs
+
+	Description:
+	This subroutine just prints out some blank (or other) characters.
+
+	Returns:
+	>=0		number of characters written
+	<0		error-code (system-return)
 
 *******************************************************************************/
 
@@ -91,7 +100,7 @@ int bwritechrs(bfile *op,int ch,int n) noex {
 	    if (n >= 0) {
 		if (ch != ' ') {
 		    char	wbuf[nblanks+1] ;
-		    strwset(wbuf,nblanks,ch) ;
+		    strwset(wbuf,ch,nblanks) ;
 		    rs = bwritebuf(op,wbuf,n) ;
 		    wlen = rs ;
 		} else {
