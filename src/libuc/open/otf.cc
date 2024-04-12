@@ -58,6 +58,7 @@
 #include	<pathadd.h>
 #include	<mkpathx.h>
 #include	<mkx.h>
+#include	<sfx.h>
 #include	<cthex.h>
 #include	<strlibval.hh>
 #include	<splitfname.h>
@@ -208,7 +209,7 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
 		if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
-	    /* end if (valid) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -219,7 +220,7 @@ namespace {
     typedef int (openmgr::*openmgr_m)() noex ;
     struct openmgr {
 	openmgr_m	m ;
-	cchar		*dirp
+	cchar		*dirp ;
 	cchar		*basep ;
 	char		*obuf ;
 	ulong		rv ;
@@ -235,10 +236,12 @@ namespace {
 	    obuf = o ;
 	    am = (om & S_IAMB) ;	/* isolate access-mode */
 	} ;
-	operator () (cchar *) noex ;
+	int operator () (cchar *,int) noex ;
+	int obufbegin() noex ;
+	int obufend() noex ;
 	int typeinit(int) noex ;
 	int split(cchar *) noex ;
-	int setft() noex {
+	int setft() noex ;
 	int loop() noex ;
 	int mkofname(ulong) noex ;
 	int ofifo() noex ;
@@ -258,7 +261,7 @@ static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 		openmgr		oo(of,om,obuf) ;
 		rs = oo(inname,opt) ;
 		fd = rs ;
-	    /* end if (valid) */
+	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? fd : rs ;
 }
@@ -282,12 +285,12 @@ int openmgr::typeinit(int opt) noex {
 int openmgr::split(cchar *inname) noex {
 	int		rs = SR_OK ;
 	if constexpr (f_splitfname) {
-	if ((dirl = sfdirname(inname,-1,&dirp)) >= 0) {
-	    rs = SR_ISDIR ;
-	    if ((basel = sfbasename(inname,-1,&basep)) > 0) {
-		rs = SR_OK ;
-	    } /* end if (sfbasename) */
-	} /* end if (sfdirname) */
+	    if ((dirl = sfdirname(inname,-1,&dirp)) >= 0) {
+	        rs = SR_ISDIR ;
+	        if ((basel = sfbasename(inname,-1,&basep)) > 0) {
+		    rs = SR_OK ;
+	        } /* end if (sfbasename) */
+	    } /* end if (sfdirname) */
 	} else {
 	    if (splitfname so ; (rs = so(inname)) >= 0) {
 		dirp = so.dp ;
@@ -300,7 +303,7 @@ int openmgr::split(cchar *inname) noex {
 }
 /* end method (openmgr::split) */
 
-int oenmgr::obufbegin() noex {
+int openmgr::obufbegin() noex {
 	int		rs = SR_OK ;
 	if (obuf == nullptr) {
 	    if ((rs = malloc_mp(&obuf)) >= 0) {
@@ -312,7 +315,7 @@ int oenmgr::obufbegin() noex {
 }
 /* end method (openmgr::obufbegin) */
 
-int oenmgr::obufbegin() noex {
+int openmgr::obufend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (falloc && obuf) {
@@ -357,29 +360,30 @@ int openmgr::setft() noex {
 	cint		ft = ((om << 12) & 0x0F) ;
 	switch (ft) {
 	case filetype_fifo:
-	    m = &ofifo ;
+	    m = &openmgr::ofifo ;
 	    break ;
 	case filetype_dir:
-	    m = &odir ;
+	    m = &openmgr::odir ;
 	    break ;
 	case filetype_reg:
-	    m = &oreg ;
+	    m = &openmgr::oreg ;
 	    break ;
 	case filetype_sock:
-	    m = &osock ;
+	    m = &openmgr::osock ;
 	    break ;
 	default:
 	    rs = SR_NOSYS ;
 	    break ;
 	} /* end switch */
 	return rs ;
+}
 /* end method (openmgr::setft) */
 
 int openmgr::mkofname(ulong rv) noex {
 	int		rs = SR_OK ;
 	if ((rs = mkpath1w(obuf,dirp,dirl)) >= 0) {
 	    cint	pl = rs ;
-	    char	*bp = (pbuf+rs) ;
+	    char	*bp = (obuf+rs) ;
 	    if ((rs = pathadd(obuf,rs,basep,basel)) >= 0) {
 		cint	bl = (rs-pl) ;
 		rs = substr(bp,bl,rv) ;
@@ -393,12 +397,12 @@ int openmgr::loop() noex {
 	int		rs = SR_OK ;
 	for (int c = 0 ; (rs >= 0) && (c < MAXLOOP) ; c += 1) {
 	    if ((rs = mkofname(rv)) >= 0) {
-		rs = (this->*m) ;
+		rs = (this->*m)() ;
 	        rv += 1 ;
 	    } /* end if (mkofname) */
 	    if (fd >= 0) break ;
 	} /* end for */
-	if ((rs >= 0) && (c >= n)) {
+	if ((rs >= 0) && (fd < 0)) {
 	    rs = SR_ADDRINUSE ;
 	}
 	return rs ;
@@ -407,37 +411,42 @@ int openmgr::loop() noex {
 
 int openmgr::odir() noex {
 	int		rs ;
+	bool		f_exit = false ;
 	if ((rs = uc_mkdir(obuf,am)) >= 0) {
 	    if ((rs = uc_open(obuf,O_RDONLY,am)) >= 0) {
 	        fd = rs ;
 	    }
-	} else (rs < 0) {
-	            if ((rs == SR_EXIST) || (rs == SR_INTR))
+	} else if (rs < 0) {
+	        if ((rs == SR_EXIST) || (rs == SR_INTR)) {
 	                f_exit = false ;
 	        } 
 	}
-	return (rs >= 0) ? fd : rs ;
+	(void) f_exit ;
+	return rs ;
 }
 /* end method (openmgr::odir) */
 
-it openmgr::oreg() noex {
+int openmgr::oreg() noex {
 	int		rs = SR_OK ;
 	int		nof = (of | O_CREAT | O_EXCL) ;
+	bool		f_exit = false ;
 	bool		f ;
-		f = ((ooflags & O_WRONLY) || (ooflags & O_RDWR)) ;
+		f = ((nof & O_WRONLY) || (nof & O_RDWR)) ;
 		if (! f) {
-		    ooflags |= O_WRONLY ;
+		    nof |= O_WRONLY ;
 		}
 
-	        rs = uc_open(obuf,ooflags,operm) ;
+	        rs = uc_open(obuf,nof,om) ;
 	        fd = rs ;
 		if (rs < 0) {
 	            if ((rs == SR_EXIST) || (rs == SR_INTR)) f_exit = false ;
 	        }
+	(void) f_exit ;
 	return rs ;
+}
 /* end method (openmgr::oreg) */
 
-it openmgr::ofifo() noex {
+int openmgr::ofifo() noex {
 	int		rs ;
 	bool		f_exit = false ;
 	if ((rs = uc_mknod(obuf,am,0)) >= 0) {
@@ -448,13 +457,15 @@ it openmgr::ofifo() noex {
 			f_exit = false ;
 		    }
 	}
+	(void) f_exit ;
 	return rs ;
 }
 /* end method (openmgr::ofifo) */
 
-it openmgr::osock() noex {
+int openmgr::osock() noex {
 	cint		pf = PF_UNIX ;
 	int		rs ;
+	bool		f_exit = false ;
 	        if ((rs = uc_socket(pf,stype,0)) >= 0) {
 	            sockaddress	sa ;
 		    cint	af = AF_UNIX ;
@@ -463,7 +474,7 @@ it openmgr::osock() noex {
 		        SOCKADDR	*sap = sockaddrp(&sa) ;
 		        cint		sal = rs ;
 	                if ((rs = uc_bind(fd,sap,sal)) >= 0) {
-			    rs = uc_chmod(obuf,operm) ;
+			    rs = uc_chmod(obuf,om) ;
 			    if (rs < 0) {
 				uc_unlink(obuf) ;
 				obuf[0] = '\0' ;
@@ -475,14 +486,8 @@ it openmgr::osock() noex {
 			uc_close(fd) ;
 			fd = -1 ;
 		    }
-	        } /* end if (socket) */
-		if (rs < 0) {
-	            f_exit = false ;
-		}
-	    } else {
-		rs = SR_INVALID ;
-	        f_exit = true ;
-	    } /* end if */
+		} /* end if */
+	(void) f_exit ;
 	return rs ;
 }
 /* end method (openmgr::osock) */

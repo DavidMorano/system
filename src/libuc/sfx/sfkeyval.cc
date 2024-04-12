@@ -57,6 +57,11 @@
 	>=0		length of found value c-string
 	<0		no key was found
 
+
+	Notes (extra):
+	'sfochr'	return string FOLLOWING given character
+	'sfrchr'	return string FOLLOWING given character
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -99,7 +104,7 @@ int sfochr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
-	if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
+	if (cchar *tp ; (tp = strnochr(sp,sl,sch)) != nullptr) {
 	    rl = ((sp+sl) - (tp+1)) ;
 	    rp = (tp+1) ;
 	}

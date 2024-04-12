@@ -30,10 +30,6 @@
 	>=0		OK
 	<0		error-code (system-return)
 
-	Notes (extra):
-	'sfochr'	return string FOLLOWING given character
-	'sfrchr'	return string FOLLOWING given character
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
