@@ -94,6 +94,42 @@ typedef SOCKADDR *	sockaddrp ;
 
 /* local structures */
 
+namespace {
+    struct openmgr ;
+    typedef int (openmgr::*openmgr_m)() noex ;
+    struct openmgr {
+	openmgr_m	m ;
+	cchar		*dirp ;
+	cchar		*basep ;
+	char		*obuf ;
+	ulong		rv ;
+	int		dirl ;
+	int		basel ;
+	int		of ;
+	int		stype ;
+	int		fd = -1 ;
+	mode_t		am ;
+	mode_t		om ;
+	bool		falloc = false ;
+	openmgr(int f,mode_t m,char *o) noex : of(f), om(m) { 
+	    obuf = o ;
+	    am = (om & S_IAMB) ;	/* isolate access-mode */
+	} ;
+	int operator () (cchar *,int) noex ;
+	int obufbegin() noex ;
+	int obufend() noex ;
+	int typeinit(int) noex ;
+	int split(cchar *) noex ;
+	int setft() noex ;
+	int loop() noex ;
+	int mkofname(ulong) noex ;
+	int ofifo() noex ;
+	int odir() noex ;
+	int oreg() noex ;
+	int osock() noex ;
+    } ; /* end struct (openmgr) */
+}
+
 struct vars {
 	int		maxpathlen ;
 } ;
@@ -214,42 +250,6 @@ static int opentmpx(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (opentmpx) */
-
-namespace {
-    struct openmgr ;
-    typedef int (openmgr::*openmgr_m)() noex ;
-    struct openmgr {
-	openmgr_m	m ;
-	cchar		*dirp ;
-	cchar		*basep ;
-	char		*obuf ;
-	ulong		rv ;
-	int		dirl ;
-	int		basel ;
-	int		of ;
-	int		stype ;
-	int		fd = -1 ;
-	mode_t		am ;
-	mode_t		om ;
-	bool		falloc = false ;
-	openmgr(int f,mode_t m,char *o) noex : of(f), om(m) { 
-	    obuf = o ;
-	    am = (om & S_IAMB) ;	/* isolate access-mode */
-	} ;
-	int operator () (cchar *,int) noex ;
-	int obufbegin() noex ;
-	int obufend() noex ;
-	int typeinit(int) noex ;
-	int split(cchar *) noex ;
-	int setft() noex ;
-	int loop() noex ;
-	int mkofname(ulong) noex ;
-	int ofifo() noex ;
-	int odir() noex ;
-	int oreg() noex ;
-	int osock() noex ;
-    } ; /* end struct (openmgr) */
-}
 
 static int opentmpxer(cchar *inname,int of,mode_t om,int opt,char *obuf) noex {
 	int		rs = SR_FAULT ;
@@ -396,9 +396,8 @@ int openmgr::mkofname(ulong rv) noex {
 int openmgr::loop() noex {
 	int		rs = SR_OK ;
 	for (int c = 0 ; (rs >= 0) && (c < MAXLOOP) ; c += 1) {
-	    if ((rs = mkofname(rv)) >= 0) {
+	    if ((rs = mkofname(rv++)) >= 0) {
 		rs = (this->*m)() ;
-	        rv += 1 ;
 	    } /* end if (mkofname) */
 	    if (fd >= 0) break ;
 	} /* end for */
@@ -409,19 +408,28 @@ int openmgr::loop() noex {
 }
 /* end method (openmgr::loop) */
 
+int openmgr::ofifo() noex {
+	int		rs ;
+	if ((rs = uc_mkfifo(obuf,am)) >= 0) {
+	    rs = uc_open(obuf,of,am) ;
+	    fd = rs ;
+	} else if (rs == SR_EXIST) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end method (openmgr::ofifo) */
+
 int openmgr::odir() noex {
 	int		rs ;
-	bool		f_exit = false ;
 	if ((rs = uc_mkdir(obuf,am)) >= 0) {
-	    if ((rs = uc_open(obuf,O_RDONLY,am)) >= 0) {
+	    cint	nof = O_RDONLY ;
+	    if ((rs = uc_open(obuf,nof,am)) >= 0) {
 	        fd = rs ;
 	    }
-	} else if (rs < 0) {
-	        if ((rs == SR_EXIST) || (rs == SR_INTR)) {
-	                f_exit = false ;
-	        } 
+	} else if (rs == SR_EXIST) {
+	    rs = SR_OK ;
 	}
-	(void) f_exit ;
 	return rs ;
 }
 /* end method (openmgr::odir) */
@@ -429,65 +437,44 @@ int openmgr::odir() noex {
 int openmgr::oreg() noex {
 	int		rs = SR_OK ;
 	int		nof = (of | O_CREAT | O_EXCL) ;
-	bool		f_exit = false ;
-	bool		f ;
-		f = ((nof & O_WRONLY) || (nof & O_RDWR)) ;
-		if (! f) {
-		    nof |= O_WRONLY ;
-		}
-
-	        rs = uc_open(obuf,nof,om) ;
-	        fd = rs ;
-		if (rs < 0) {
-	            if ((rs == SR_EXIST) || (rs == SR_INTR)) f_exit = false ;
-	        }
-	(void) f_exit ;
+	cbool		f = ((nof & O_WRONLY) || (nof & O_RDWR)) ;
+	if (! f) {
+	    nof |= O_WRONLY ;
+	}
+	if ((rs = uc_open(obuf,nof,am)) >= 0) {
+	    fd = rs ;
+	} else if (rs == SR_EXIST) {
+	    rs = SR_OK ;
+	}
 	return rs ;
 }
 /* end method (openmgr::oreg) */
 
-int openmgr::ofifo() noex {
-	int		rs ;
-	bool		f_exit = false ;
-	if ((rs = uc_mknod(obuf,am,0)) >= 0) {
-	            rs = uc_open(obuf,of,am) ;
-	            fd = rs ;
-	} else {
-	            if ((rs == SR_EXIST) || (rs == SR_INTR)) {
-			f_exit = false ;
-		    }
-	}
-	(void) f_exit ;
-	return rs ;
-}
-/* end method (openmgr::ofifo) */
-
 int openmgr::osock() noex {
 	cint		pf = PF_UNIX ;
 	int		rs ;
-	bool		f_exit = false ;
-	        if ((rs = uc_socket(pf,stype,0)) >= 0) {
-	            sockaddress	sa ;
-		    cint	af = AF_UNIX ;
-	            fd = rs ;
-	            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
-		        SOCKADDR	*sap = sockaddrp(&sa) ;
-		        cint		sal = rs ;
-	                if ((rs = uc_bind(fd,sap,sal)) >= 0) {
-			    rs = uc_chmod(obuf,om) ;
-			    if (rs < 0) {
-				uc_unlink(obuf) ;
-				obuf[0] = '\0' ;
-			    }
-			} /* end if (bind) */
-	                sockaddress_finish(&sa) ;
-		    } /* end if (sockaddress) */
-		    if (rs < 0) {
-			uc_close(fd) ;
-			fd = -1 ;
-		    }
-		} /* end if */
-	(void) f_exit ;
+        if ((rs = uc_socket(pf,stype,0)) >= 0) {
+            sockaddress sa ;
+            cint        af = AF_UNIX ;
+            fd = rs ;
+            if ((rs = sockaddress_start(&sa,af,obuf,0,0)) >= 0) {
+                SOCKADDR        *sap = sockaddrp(&sa) ;
+                cint            sal = rs ;
+                if ((rs = uc_bind(fd,sap,sal)) >= 0) {
+		    cmode	nom = (om & (~ S_IFMT)) ;
+                    rs = uc_chmod(obuf,nom) ;
+                    if (rs < 0) {
+                        uc_unlink(obuf) ;
+                        obuf[0] = '\0' ;
+                    }
+                } /* end if (bind) */
+                sockaddress_finish(&sa) ;
+            } /* end if (sockaddress) */
+            if (rs < 0) {
+                uc_close(fd) ;
+                fd = -1 ;
+            }
+        } /* end if */
 	return rs ;
 }
 /* end method (openmgr::osock) */
