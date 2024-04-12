@@ -95,7 +95,7 @@
 
 /* exported subroutines */
 
-int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+int sfochr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
@@ -106,7 +106,20 @@ int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 	if (rpp) *rpp = rp ;
 	return rl ;
 }
-/* end subroutine (sfchr) */
+/* end subroutine (sfochr) */
+
+int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+	int		rl = -1 ;
+	cchar		*rp = nullptr ;
+	if (sl < 0) sl = strlen(sp) ;
+	if (cchar *tp ; (tp = strnrchr(sp,sl,sch)) != nullptr) {
+	    rl = ((sp+sl) - (tp+1)) ;
+	    rp = (tp+1) ;
+	}
+	if (rpp) *rpp = rp ;
+	return rl ;
+}
+/* end subroutine (sfrchr) */
 
 int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	int		rl = 0 ;

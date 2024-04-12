@@ -25,7 +25,7 @@
 #include	<localmisc.h>
 
 
-#define	LINEBUFFER		struct linebuffer_head
+#define	LINEBUFFER	struct linebuffer_head
 
 
 struct linebuffer_head {

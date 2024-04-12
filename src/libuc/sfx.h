@@ -29,7 +29,6 @@ extern int sfbrk(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcasesub(cchar *,int,cchar *,cchar **) noex ;
 extern int sfcontent(cchar *,int,cchar **) noex ;
 extern int sfcookkey(cchar *,int,cchar **) noex ;
-extern int sfchr(cchar *,int,int,cchar **) noex ; /* string following char */
 extern int sfdequote(cchar *,int,cchar **) noex ;
 extern int sfdirname(cchar *,int,cchar **) noex ;
 extern int sfkey(cchar *,int,cchar **) noex ;
@@ -51,11 +50,15 @@ extern int sfwhitedot(cchar *,int,cchar **) noex ;
 extern int sfword(cchar *,int,cchar **) noex ;
 extern int sfsign(cchar *,int,cchar **,bool *) noex ;
 extern int sfcenter(cchar *,int,cchar *,cchar **) noex ;
+extern int sfochr(cchar *,int,int,cchar **) noex ; /* returns str following */
+extern int sfrchr(cchar *,int,int,cchar **) noex ; /* returns str following */
 
 static inline int sfbreak(cchar *sp,int sl,cchar *s2,cchar **rpp) noex {
 	return sfbrk(sp,sl,s2,rpp) ;
 }
-
+static inline int sfchr(cchar *sp,int sl,int ch,cchar **rpp) noex {
+	return sfochr(sp,sl,ch,rpp) ;
+}
 static inline int getpr(cchar *pp,int pl,cchar **rpp) noex {
 	return sfprogroot(pp,pl,rpp) ;
 }

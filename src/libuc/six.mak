@@ -18,21 +18,21 @@ CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
 
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
+CPP=	cpp
+CC=	gcc
+CXX=	gpp
+LD=	gld
+RANLIB=	granlib
+AR=	gar
+NM=	gnm
+COV=	gcov
 
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+LORDER=	lorder
+TSORT=	tsort
+LINT=	lint
+RM=	rm -f
+TOUCH=	touch
+LINT=	lint
 
 
 DEFS +=
