@@ -40,6 +40,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -78,33 +79,35 @@ static int	notappend(bfile *op,off_t wo,int w) noex ;
 
 int bseek(bfile *op,off_t wo,int w) noex {
 	int		rs ;
+	int		ro = 0 ;
 	if ((rs = bfile_magic(op)) > 0) {
 	    rs = SR_NOTSEEK ;
 	    if (! op->f.notseek) {
+		ro = intsat(op->offset) ;
 		if ((rs = notappend(op,wo,w)) > 0) {
 		    off_t	ao = 0 ;
 	            if (op->f.write) {
 	                if (op->len > 0) {
 	                    rs = bfile_flush(op) ;
 	                }
-	            } else {
-	                if (w == SEEK_CUR) {
+		    } else {
+			if (w == SEEK_CUR) {
 	                    ao = (- op->len) ;
 	                }
 	            } /* end if */
 	            if (rs >= 0) {
-		        off_t	soff{} ;
-		        off_t	co ;
+		        const off_t	co = (wo + ao) ;
+		        off_t		soff{} ;
 	                op->bp = op->bdata ;
 	                op->len = 0 ;
-	                co = (wo + ao) ;
-	                rs = u_seeko(op->fd,co,w,&soff) ;
-	                op->offset = soff ;
+			rs = u_seeko(op->fd,co,w,&soff) ;
+			op->offset = soff ;
+			ro = intsat(soff) ;
 	            } /* end if */
-		} /* end if (not-appending) */
+		} /* end if (no shortcuts) */
 	    } /* end if (valid) */
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? ro : rs ;
 }
 /* end subroutine (bseek) */
 
@@ -115,10 +118,10 @@ static int notappend(bfile *op,off_t wo,int w) noex {
 	int		rs = 1 ;
 	if (! (op->oflags & O_APPEND)) {
 	    coff	foff = off_t(op->offset) ;
-	    if (((w == SEEK_CUR) && (wo == 0)) || 
-	        ((w == SEEK_SET) && (wo == foff))) {
-	        rs = 0 ;
-	    }
+	    bool	f = false ;
+	    f = f || ((w == SEEK_CUR) && (wo == 0)) ;
+	    f = f || ((w == SEEK_SET) && (wo == foff)) ;
+	    if (f) rs = 0 ;
 	}
 	return rs ;
 }

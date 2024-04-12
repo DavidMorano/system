@@ -23,6 +23,7 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
+
 #include	"bfile.h"
 
 
@@ -35,25 +36,26 @@
 /* external variables */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int bputc(bfile *fp,int ch) noex {
+int bputc(bfile *op,int ch) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	char		buf[2] ;
-
-#if	CF_SAFE
-	if (fp == NULL) return SR_FAULT ;
-#endif /* CF_SAFE */
-
-	buf[0] = ch ;
-	if ((rs = bwrite(fp,buf,1)) > 0) {
-	    wlen = rs ;
-	    if ((ch == '\n') && (fp->bm == bfile_bmline)) {
-	        rs = bfile_flush(fp) ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    char	wbuf[2] = { char(ch) } ;
+	    if ((rs = bwrite(op,wbuf,1)) > 0) {
+	        wlen = rs ;
+	        if ((ch == '\n') && (op->bm == bfile_bmline)) {
+	            rs = bfile_flush(op) ;
+	        }
 	    }
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bputc) */

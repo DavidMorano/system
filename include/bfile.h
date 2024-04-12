@@ -197,6 +197,8 @@ extern int	bgetc(bfile *) noex ;
 extern int	bwrite(bfile *,cvoid *,int) noex ;
 extern int	bwriteblock(bfile *,bfile *,int) noex ;
 extern int	bwritefile(bfile *,cchar *) noex ;
+extern int	bwriteblanks(bfile *,int) noex ;
+extern int	bwritechrs(bfile *,int,int) noex ;
 extern int	bputc(bfile *,int) noex ;
 extern int	bprintf(bfile *,cchar *,...) noex ;
 extern int	bvprintf(bfile *,cchar *,va_list) noex ;

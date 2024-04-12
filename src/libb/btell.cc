@@ -40,23 +40,21 @@
 /* external variables */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int btell(bfile *fp,off_t *rp) noex {
-	off_t	telloff = 0 ;
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (! fp->f.nullfile) {
-	    telloff = fp->offset ;
-	    if (! fp->f.notseek) rs = SR_NOTSEEK ;
-	}
-
-	if (rp != NULL) *rp = telloff ;
-	rs = (telloff & UINT_MAX) ;
+int btell(bfile *op,off_t *rp) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    coff	ro = op->offset ;
+	    if (rp) *rp = ro ;
+	    rs = intsat(ro) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (btell) */
