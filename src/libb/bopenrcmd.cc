@@ -4,7 +4,6 @@
 /* BASIC INPUT OUTPUT package */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DANGERHACK	1
 
 /* revision history:
@@ -23,9 +22,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/param.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<cstdlib>
@@ -48,10 +45,6 @@
 
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
 
 
 /* external variables */
@@ -76,10 +69,6 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 	cchar		*cmd_rsh ;
 	char		pfname[MAXPATHLEN + 1] ;
 
-#if	CF_DEBUGS
-	debugprintf("bopencmd: entered\n") ;
-#endif
-
 	if (fpa == NULL) return SR_FAULT ;
 
 /* check for bad input */
@@ -92,10 +81,6 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 
 	if ((strlen(cmd) + 6) > LINEBUFLEN)
 	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("bopencmd: got in\n") ;
-#endif
 
 /* where is the RSH program */
 
@@ -118,19 +103,8 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 	        if (fpa[i]->magic == BFILE_MAGIC) return SR_OPEN ;
 #endif
 
-#if	CF_DEBUGS
-	        debugprintf("bopencmd: pipes for %d r=%08X w=%08X ?=%08X\n",
-	            i,&pipes[i][0],
-	            &pipes[i][1],pipes[i]) ;
-#endif
-
 	        if ((rs = u_pipe(pipes[i])) < 0)
 	            goto badpipe ;
-
-#if	CF_DEBUGS
-	        debugprintf("bopencmd: got pipes for %d r=%d w=%d\n",
-			i,pipes[i][0], pipes[i][1]) ;
-#endif
 
 	    } /* end if */
 	    if (rs < 0) break ;
@@ -138,16 +112,8 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 
 /* we fork RSH */
 
-#if	CF_DEBUGS
-	debugprintf("bopencmd: about to fork\n") ;
-#endif
-
 	if (rs >= 0) {
 	if ((child_pid = uc_fork()) == 0) {
-
-#if	CF_DEBUGS
-	    debugprintf("bopencmd: inside fork\n") ;
-#endif
 
 	    for (i = 0 ; i < 3 ; i += 1) {
 
@@ -186,10 +152,6 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 	}
 	} /* end if (ok) */
 
-#if	CF_DEBUGS
-	debugprintf("bopencmd: main line continue\n") ;
-#endif
-
 /* close some pipe ends */
 
 	for (i = 0 ; i < 3 ; i += 1) {
@@ -202,24 +164,11 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 
 	for (i = 0 ; i < 3 ; i += 1) {
 
-#if	CF_DEBUGS
-	    debugprintf("bopencmd: checking to open BIO file %d\n",i) ;
-#endif
-
 	    if (fpa[i] != NULL) {
-
-#if	CF_DEBUGS
-	        debugprintf("bopencmd: found a non-NULL one FPA[%d]=%08X\n",
-			i,fpa[i]) ;
-#endif
 
 	        if ((rs = bopen(fpa[i],(char *) pipes[i][(i == 0) ? 1 : 0],
 	            (i == 0) ? "dw" : "dr",0666)) < 0)
 	            goto badbopen ;
-
-#if	CF_DEBUGS
-	        debugprintf("bopencmd: opened successfully %d\n",i) ;
-#endif
 
 #if	BFILE_DUP
 	        u_close(pipes[i][(i == 0) ? 1 : 0]) ;
@@ -229,18 +178,10 @@ int bopenrcmd(bfile **fpa,cchar *remotehost,cchar *cmd) noex {
 
 	} /* end for */
 
-#if	CF_DEBUGS
-	debugprintf("bopencmd: 'bopen'ed the proper stuff and exiting\n") ;
-#endif
-
 	return ((int) child_pid) ;
 
 /* handle the numberous possible errors */
 badbopen:
-
-#if	CF_DEBUGS
-	debugprintf("bopencmd: at bad open\n") ;
-#endif
 
 #if	BFILE_DUP
 	u_close(pipes[i][(i == 0) ? 1 : 0]) ;

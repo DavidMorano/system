@@ -1,11 +1,10 @@
-/* fdprintf */
+/* fdprintf SUPPORT */
+/* lang=C++20 */
 
 /* 'FileDescriptor' printf subroutine */
+/* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_EPRINT	1		/* link in '??' support */
-
 
 /* revision history:
 
@@ -18,39 +17,29 @@
 
 /******************************************************************************
 
-        This subroutine performs a 'printf' like function but to the named file
-        which is passed as the first argument.
+	Description:
+	This subroutine performs a 'printf' like function but to
+	the named file which is passed as the first argument.
 
 	Synopsis:
-
-	int fdprintf(fd,fmt,ap)
-	int		fd ;
-	const char	fmt[] ;
-	va_alist	ap ;
+	int fdprintf(int fd,cchar *fmt,va_list ap) noex
 
 	Arguments:
-
 	fd		file descriptor to write to
 	format		standard format string
 	...		enverything else
 
 	Returns:
-
 	>=0		length of data (in bytes) written to file
-	<0		failure
-
+	<0		error code (system-return)
 
 ******************************************************************************/
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<cstring>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -63,17 +52,18 @@
 
 /* external subroutines */
 
-extern int	format(char *,int,int,const char *,va_list) ;
+extern int	format(char *,int,int,cchar *,va_list) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int fdprintf(int fd,const char *fmt,...)
-{
+int fdprintf(int fd,cchar *fmt,...) noex {
 	va_list	ap ;
 
 	int	rs = SR_OK ;

@@ -1,10 +1,8 @@
-/* bseek */
+/* bseek SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package (BFILE) */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,17 +16,13 @@
 
 /*******************************************************************************
 
+	Description:
 	Seek in the file.
 
 	Synopsis:
-
-	int bseek(fp,wo,whence)
-	bfile		*fp ;
-	off_t	wo ;
-	int		whence ;
+	int bseek(bfile *fp,off_t wo,int whence) noex
 
 	Arguments:
-
 	- fp		file pointer
 	- wo		new offset relative to "whence"
 	- whence
@@ -37,22 +31,14 @@
 			SEEK_END	2 = from end of file
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -64,39 +50,22 @@
 
 /* external subroutines */
 
-extern int	bfile_flush(bfile *) ;
-
 
 /* external variables */
 
 
 /* local structures */
 
-#if	CF_DEBUGS
-struct trans {
-	int	w ;
-	char	*name ;
-} ;
-#endif
-
 
 /* local variables */
 
-#if	CF_DEBUGS
-static struct trans	t[] = {
-	{ SEEK_SET, "set" },
-	{ SEEK_CUR, "cur" },
-	{ SEEK_END, "end" },
-	{ 0 , NULL }
-} ;
-#endif
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bseek(bfile *fp,off_t wo,int whence)
-{
+int bseek(bfile *fp,off_t wo,int whence) noex {
 	off_t	co ;
 	off_t	soff, ao ;
 	int		rs = SR_OK ;

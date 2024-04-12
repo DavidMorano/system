@@ -1,12 +1,9 @@
-/* bwriteblanks */
+/* bwriteblanks SUPPORT */
+/* lang=C++20 */
 
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_TESTLINE	0		/* test long lines */
 #define	CF_MEMSET	0		/* use 'memset(3c)' */
-
 
 /* revision history:
 
@@ -21,16 +18,12 @@
 
 	This subroutine just prints out some blank characters.
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstring>
-
 #include	<usystem.h>
+#include	<strn.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -56,9 +49,6 @@
 
 /* external subroutines */
 
-extern int	strwset(char *,int,int) ;
-extern int	strnset(char *,int,int) ;
-
 
 /* external variables */
 
@@ -72,11 +62,12 @@ extern int	strnset(char *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bwriteblanks(bfile *ofp,int n)
-{
+int bwriteblanks(bfile *ofp,int n) noex {
 	int		rs = SR_OK ;
 	int		blen = n ;
 	int		mlen ;

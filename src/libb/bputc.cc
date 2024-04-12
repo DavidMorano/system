@@ -1,11 +1,8 @@
-/* bputc */
+/* bputc SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package similiar to "stdio" */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_SAFE		1		/* safe mode */
 
 
 /* revision history:
@@ -21,13 +18,9 @@
 
 	Print out a single character (within the BFILE framework).
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 #include	"bfile.h"
@@ -42,16 +35,9 @@
 /* external variables */
 
 
-/* externals within the library */
-
-extern int	bfile_flush(bfile *) ;
-
-
 /* exported subroutines */
 
-
-int bputc(bfile *fp,int ch)
-{
+int bputc(bfile *fp,int ch) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	char		buf[2] ;

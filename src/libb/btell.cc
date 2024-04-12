@@ -1,10 +1,8 @@
-/* btell */
+/* btell SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package (BIO) */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -20,19 +18,12 @@
 
 	We tell where we are (in a BFILE stream).
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -44,17 +35,13 @@
 
 /* external subroutines */
 
-extern int	bfile_flush(bfile *) ;
-
 
 /* external variables */
 
 
 /* exported subroutines */
 
-
-int btell(bfile *fp,off_t *rp)
-{
+int btell(bfile *fp,off_t *rp) noex {
 	off_t	telloff = 0 ;
 	int		rs = SR_OK ;
 

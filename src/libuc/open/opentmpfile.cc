@@ -107,7 +107,7 @@ namespace {
 	int		basel ;
 	int		of ;
 	int		stype ;
-	int		pl ;		/* partially filled 'obuf' */
+	int		pl = 0 ;	/* partially filled 'obuf' */
 	int		fd = -1 ;
 	mode_t		am ;
 	mode_t		om ;
@@ -330,9 +330,11 @@ int openmgr::split(cchar *inname) noex {
 /* end method (openmgr::split) */
 
 int openmgr::dirload() noex {
-	int		rs ;
-	if ((rs = mkpathw(obuf,dirp,dirl)) >= 0) {
-	    pl = rs ;
+	int		rs = SR_OK ;
+	if (dirl > 0) {
+	    if ((rs = mkpathw(obuf,dirp,dirl)) >= 0) {
+	        pl = rs ;
+	    }
 	}
 	return rs ;
 }

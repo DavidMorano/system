@@ -1,10 +1,8 @@
-/* breserve */
+/* breserve SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package */
 /* last modifed %G% version %I% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 
 /* reivsion history:
@@ -20,18 +18,11 @@
 
 	Some kind of reserve function.
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -43,19 +34,13 @@
 
 /* external subroutines */
 
-extern int	bfile_flushn(bfile *,int) ;
-
 
 /* external variables */
 
 
 /* exported subroutines */
 
-
-int breserve(fp,n)
-bfile		*fp ;
-int		n ;
-{
+int breserve(bfile *fp,int n) noex {
 	int		rs = SR_OK ;
 
 	if (fp == NULL) return SR_FAULT ;

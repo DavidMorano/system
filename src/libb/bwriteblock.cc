@@ -1,9 +1,8 @@
-/* bwriteblock */
+/* bwriteblock SUPPORT */
+/* lang=C++20 */
 
 /* write a block data from a given file to the current file */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -21,34 +20,22 @@
         file.
 
 	Synospsis:
-
-	int bwriteblock(ofp,ifp,ulen)
-	bfile		*ifp, *ofp ;
-	int		ulen ;
+	int bwriteblock(bfile *ofp,bfile *ifp,int ulen) noex
 
 	Arguments:
-
 	ofp		output file pointer to copy to
 	ifp		input file pointer to copy from
 	ulen		length of supplied buffer
 
 	Returns:
-
 	>=0		length of data copied or error return
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<cstdlib>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -63,17 +50,14 @@
 /* external subroutines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bwriteblock(bfile *ofp,bfile *ifp,int ulen)
-{
+int bwriteblock(bfile *ofp,bfile *ifp,int ulen) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bwriteblock: ent ulen=%d\n",ulen) ;
-#endif
 
 	if (ofp == NULL) return SR_FAULT ;
 	if (ifp == NULL) return SR_FAULT ;

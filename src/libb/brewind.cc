@@ -1,10 +1,8 @@
-/* brewind */
+/* brewind SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package similiar to "stdio" */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -20,15 +18,9 @@
 
 	We rewind the BFILE stream.
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -44,14 +36,12 @@
 /* external variables */
 
 
-/* externals within the library */
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int brewind(bfile *fp)
-{
+int brewind(bfile *fp) noex {
 	int		rs ;
 	rs = bseek(fp,0L,SEEK_SET) ;
 	return rs ;
