@@ -25,6 +25,7 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"

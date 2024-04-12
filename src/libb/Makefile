@@ -5,43 +5,47 @@ T= libb
 ALL= $(T).o $(T).a
 
 
-BINDIR= $(REPOROOT)/bin
 INCDIR= $(REPOROOT)/include
 LIBDIR= $(REPOROOT)/lib
 MANDIR= $(REPOROOT)/man
+
 INFODIR= $(REPOROOT)/info
 HELPDIR= $(REPOROOT)/share/help
-
+LDRPATH= $(REPOROOT)/lib
 
 CRTDIR= $(CGS_CRTDIR)
 VALDIR= $(CGS_VALDIR)
-LIBDIR= $(CGS_LIBDIR)
-
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
 
 
-DEFS=
+CPP=	cpp
+CC=	gcc
+CXX=	gpp
+LD=	gld
+RANLIB=	granlib
+AR=	gar
+NM=	gnm
+COV=	gcov
 
-LDRPATH= $(EXTRA)/lib
+LORDER=	lorder
+TSORT=	tsort
+LINT=	lint
+RM=	rm -f
+TOUCH=	touch
+LINT=	lint
+
+
+DEFS +=
+
+
+INCS += bfile.h
+
+
+LIBS +=
+
+
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
-
-LIBS=
-
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -50,8 +54,6 @@ CCFLAGS= $(MAKECCFLAGS)
 ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
-
-INCS= bfile.h
 
 
 OBJ00= bopen.o bopentmp.o bopencmd.o bopenrcmd.o bopenlock.o 

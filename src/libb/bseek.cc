@@ -20,12 +20,12 @@
 	Seek in the file.
 
 	Synopsis:
-	int bseek(bfile *fp,off_t wo,int whence) noex
+	int bseek(bfile *op,off_t wo,int w) noex
 
 	Arguments:
-	- fp		file pointer
-	- wo		new offset relative to "whence"
-	- whence
+	- op		file pointer
+	- wo		new offset relative to "w"
+	- w
 			SEEK_SET	0 = from beginning of file
 			SEEK_CUR	1 = from current pointer of file
 			SEEK_END	2 = from end of file
@@ -48,6 +48,12 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -55,6 +61,11 @@
 
 
 /* local structures */
+
+
+/* forward references */
+
+static int	notappend(bfile *op,off_t wo,int w) noex ;
 
 
 /* local variables */
@@ -65,74 +76,52 @@
 
 /* exported subroutines */
 
-int bseek(bfile *fp,off_t wo,int whence) noex {
-	off_t	co ;
-	off_t	soff, ao ;
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->f.nullfile) goto ret0 ;
-
-/* continue */
-
-	if (fp->f.notseek)
-	    return SR_NOTSEEK ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; t[i].name != NULL ; i += 1) {
-	        if (whence == t[i].w)
-	            break ;
-	    }
-	    debugprintf("bseek: offset=%lu whence=%s(%u)\n",
-	        wo,
-	        ((t[i].name == NULL) ? "unk" : t[i].name),
-	        whence) ;
-	}
-#endif /* CF_DEBUGS */
-
-/* check for an easy way out */
-
-	if (! (fp->oflags & O_APPEND)) {
-
-	    if (((whence == SEEK_CUR) && (wo == 0)) || 
-	        ((whence == SEEK_SET) && (wo == fp->offset)))
-	        goto done ;
-
-	}
-
-/* we have to do some real work! */
-
-	ao = 0 ;
-	if (fp->f.write) {
-	    if (fp->len > 0) {
-	        rs = bfile_flush(fp) ;
-	    }
-	} else {
-	    if (whence == SEEK_CUR) {
-	        ao = (- fp->len) ;
-	    }
-	} /* end if */
-
-	if (rs >= 0) {
-
-	    fp->bp = fp->bdata ;
-	    fp->len = 0 ;
-
-	    co = (wo + ao) ;
-	    rs = u_seeko(fp->fd,co,whence,&soff) ;
-	    fp->offset = soff ;
-
-	} /* end if */
-
-done:
-ret0:
+int bseek(bfile *op,off_t wo,int w) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    rs = SR_NOTSEEK ;
+	    if (! op->f.notseek) {
+		if ((rs = notappend(op,wo,w)) > 0) {
+		    off_t	ao = 0 ;
+	            if (op->f.write) {
+	                if (op->len > 0) {
+	                    rs = bfile_flush(op) ;
+	                }
+	            } else {
+	                if (w == SEEK_CUR) {
+	                    ao = (- op->len) ;
+	                }
+	            } /* end if */
+	            if (rs >= 0) {
+		        off_t	soff{} ;
+		        off_t	co ;
+	                op->bp = op->bdata ;
+	                op->len = 0 ;
+	                co = (wo + ao) ;
+	                rs = u_seeko(op->fd,co,w,&soff) ;
+	                op->offset = soff ;
+	            } /* end if */
+		} /* end if (not-appending) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (bseek) */
+
+
+/* local subroutines */
+
+static int notappend(bfile *op,off_t wo,int w) noex {
+	int		rs = 1 ;
+	if (! (op->oflags & O_APPEND)) {
+	    coff	foff = off_t(op->offset) ;
+	    if (((w == SEEK_CUR) && (wo == 0)) || 
+	        ((w == SEEK_SET) && (wo == foff))) {
+	        rs = 0 ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (notappend) */
 
 
