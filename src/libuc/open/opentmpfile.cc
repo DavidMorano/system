@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		file descriptor
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -319,6 +319,7 @@ int openmgr::obufend() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (falloc && obuf) {
+	    obuf[0] = '\0' ;
 	    rs1 = uc_free(obuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	    obuf = nullptr ;
@@ -357,7 +358,7 @@ int openmgr::operator () (cchar *inname,int opt) noex {
 
 int openmgr::setft() noex {
 	int		rs = SR_OK ;
-	cint		ft = ((om << 12) & 0x0F) ;
+	cint		ft = ((om >> 12) & 0x0F) ;
 	switch (ft) {
 	case filetype_fifo:
 	    m = &openmgr::ofifo ;
