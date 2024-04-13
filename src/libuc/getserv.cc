@@ -21,7 +21,7 @@
 
 	Description:
 	Get a service number (a port number really) given a protocol
-	name and a service name. Remember that each protocol can
+	name and a service name.  Remember that each protocol can
 	have its own port associated with any given service name.
 	So therefore each service name can have a separate port
 	depending on what protocol name it is associated with.

@@ -40,7 +40,7 @@
 	Returns:
 	>0		the serial number
 	==0		file was just created
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -124,8 +124,10 @@ int getserial(cchar *sfname) noex {
 		sfname = DEFSERIAL ;
 	}
 	if ((rs = getserial_open(sfname)) >= 0) {
+	    cint	to = TO_LOCK ;
+	    cint	cmd = F_LOCK ;
 	    cint	fd = rs ;
-	    if ((rs = lockfile(fd,F_LOCK,0L,0L,TO_LOCK)) >= 0) {
+	    if ((rs = lockfile(fd,cmd,0L,0L,to)) >= 0) {
 		cint	dlen = DIGBUFLEN ;
 		char	dbuf[DIGBUFLEN+1] ;
 	        if ((rs = getserial_read(fd,dbuf,dlen)) >= 0) {
@@ -179,7 +181,7 @@ static int getserial_open(cchar *sfname) noex {
 	            } /* end if (u_pathconf) */
 	        } /* end if (uc_fminmod) */
 	    } /* end if (uc_open) */
-	}
+	} /* end if (NOTENT) */
 	return (rs >= 0) ? fd : rs ;
 }
 /* end subroutine (getserial_open) */
@@ -192,7 +194,7 @@ static int getserial_read(int fd,char *dbuf,int dlen) noex {
 	    cchar	*cp{} ;
 	    if (int cl ; (cl = sfnext(dbuf,dl,&cp)) > 0) {
 	        if ((rs = cfnum(cp,cl,&serial)) >= 0) {
-	            rs = u_rewind(fd) ;
+	            rs = uc_rewind(fd) ;
 	        } else if (isNotValid(rs)) {
 	            serial = 0 ;
 	            rs = SR_OK ;
@@ -206,13 +208,13 @@ static int getserial_read(int fd,char *dbuf,int dlen) noex {
 static int getserial_write(int fd,char *dbuf,int dlen,int serial) noex {
 	cint		nserial = ((serial+1) & INT_MAX) ;
 	int		rs ;
-	    if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) {
-	        dbuf[rs++] = '\n' ;
-	        if ((rs = u_write(fd,dbuf,rs)) >= 0) {
-	            coff	uoff = off_t(rs) ;
-	            rs = uc_ftruncate(fd,uoff) ;
-	        }
-	    } /* end if (ctdeci) */
+	if ((rs = ctdec(dbuf,dlen,nserial)) >= 0) {
+	    dbuf[rs++] = '\n' ;
+	    if ((rs = uc_write(fd,dbuf,rs)) >= 0) {
+	        coff	uoff = off_t(rs) ;
+	        rs = uc_ftruncate(fd,uoff) ;
+	    }
+	} /* end if (ctdec) */
 	return rs ;
 }
 /* end subroutine (getserial_write) */
