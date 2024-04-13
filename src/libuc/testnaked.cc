@@ -59,8 +59,7 @@ extern char	*timestr_logz(time_t,char *) ;
 /* exported subroutines */
 
 /* ARGSUSED */
-int main(int argc,cchar **argv,cchar **envv)
-{
+int main(int argc,mainv argv,mainv envv) {
 	FILE		*ofp = stdout ;
 
 #if	CF_DEBUGS && CF_DEBUGMALL

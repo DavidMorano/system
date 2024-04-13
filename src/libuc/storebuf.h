@@ -142,6 +142,7 @@ inline int storebuf_hex(char *bp,int bl,int i,ulonglong uv) noex {
 struct storebuf {
 	char		*bufp ;
 	int		bufl ;
+	storebuf() = delete ;
 	storebuf(char *p,int l) noex : bufp(p), bufl(l) { } ;
 	int chr(int i,int ch) noex {
 	    return storebuf_chr(bufp,bufl,i,ch) ;
