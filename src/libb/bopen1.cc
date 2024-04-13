@@ -44,8 +44,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<bufsizevar.hh>
-#include	<sysval.hh>
+#include	<sysval.h>
 #include	<stdfnames.h>
 #include	<getfdfile.h>
 #include	<snx.h>
@@ -60,10 +59,13 @@
 
 /* local defines */
 
-#define	BOM_READ		(1<<0)
-#define	BOM_WRITE	(1<<1)
-#define	BOM_APPEND	(1<<2)
-#define	BOM_FILEDESC	(1<<3)
+#define	BO_READ		(1<<0)
+#define	BO_WRITE	(1<<1)
+#define	BO_APPEND	(1<<2)
+#define	BO_FILEDESC	(1<<3)
+
+#undef	FLBUFLEN
+#define	FLBUFLEN	100
 
 #ifndef	CF_MAPABLE
 #define	CF_MAPABLE	0	/* allow mapped files */
@@ -74,8 +76,6 @@
 
 
 /* local typedefs */
-
-typedef bfile_map *	maper ;
 
 
 /* external subroutines */
@@ -90,25 +90,6 @@ extern "C" {
 
 /* local structures */
 
-namespace {
-   struct bopenmgr {
-	bfile		*op ;
-	cchar		*fn ;
-	cchar		*os ;
-	int		to ;
-	cint		maxopenfile = getdtablesize() ;
-	mode_t		om ;
-	bopenmgr(bfile *aop,cchar *afn,cchar *aos,mode_t aom,int ato) noex {
-	    op = aop ;
-	    fn = afn ;
-	    os = aos ;
-	    om = aom ;
-	    to = ato ;
-	} ;
-	operator int () noex ;
-   } ;
-}
-
 
 /* forward references */
 
@@ -119,13 +100,13 @@ static int	bfile_mapbegin(bfile *) noex ;
 static int	bfile_mapend(bfile *) noex ;
 
 static int	mkoflags(cchar *,int *) noex ;
+static int	extfd(cchar *) noex ;
 
 
 /* local variables */
 
 constexpr bool		f_mapable = CF_MAPABLE ;
 
-static bufsizevar	maxlinelen(getbufsize_ml) ;
 static sysval		pagesize(sysval_ps) ;
 
 
@@ -134,23 +115,10 @@ static sysval		pagesize(sysval_ps) ;
 
 /* exported subroutines */
 
-int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
-	int		rs = SR_FAULT ;
-	if (op && fn && os) {
-	    memclear(op) ;
-	    rs = SR_INVALID ;
-	    if (fn[0]) {
-		bopenmgr	bo(op,fn,os,om,to) ;
-		rs = bo ;
-	    } /* end if (valid) */
-	} /* end if (non-null) */
-	return rs ;
-}
-/* end subroutine (bopene) */
-
-#ifdef	COMMENT
+int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 	USTAT		sb ;
 	off_t		soff ;
+	cint		maxopenfile = getdtablesize() ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		fd_existing = -1 ;
@@ -163,6 +131,12 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	int		f_created = false ;
 	int		f ;
 
+	if (fp == nullptr) return SR_FAULT ;
+	if (os == nullptr) return SR_FAULT ;
+
+	if (os[0] == '\0') return SR_INVALID ;
+
+	memset(fp,0,sizeof(bfile)) ;
 	fp->fd = -1 ;
 
 	oflags = mkoflags(os,&boflags) ;
@@ -174,13 +148,28 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 	if ((oflags & O_ACCMODE) == O_RDONLY) f_readonly = true ;
 
+#ifdef	COMMENT
+	if ((boflags & BO_READ) && (boflags & BO_WRITE)) {
+	    oflags |= O_RDWR ;
+	} else if (boflags & BO_WRITE) {
+	    oflags |= O_WRONLY ;
+	} else
+	    oflags |= O_RDONLY ;
+#endif /* COMMENT */
+
+#ifdef	COMMENT
+	if ((oflags & O_WRONLY) && (! (oflags & O_APPEND)))
+	    oflags |= (O_CREAT | O_TRUNC) ;
+#endif
+
+	fp->pagesize = getpagesize() ;
 	bsize = (fp->pagesize * BFILE_BUFPAGES) ;
 
 	f_lessthan = (((ulong) fn) < maxopenfile) ;
 	if (f_lessthan)
 	    fd_existing = ((int) fn) ;
 
-	if (f_lessthan && (! (boflags & BOM_FILEDESC))) {
+	if (f_lessthan && (! (boflags & BO_FILEDESC))) {
 	    rs = SR_FAULT ;
 	    goto bad0 ;
 	}
@@ -188,7 +177,7 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	if (! f_lessthan) {
 	    int		fd ;
 	    if ((fd = getfdfile(fn,-1)) >= 0) {
-		boflags |= BOM_FILEDESC ;
+		boflags |= BO_FILEDESC ;
 		fd_existing = fd ;
 	    } else if (fd == SR_EMPTY) {
 		fp->f.nullfile = true ;
@@ -199,14 +188,14 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 	if (fp->f.nullfie) goto ret1 ;
 
-	if (boflags & BOM_READ) {
-	    boflags &= (~ BOM_APPEND) ;
+	if (boflags & BO_READ) {
+	    boflags &= (~ BO_APPEND) ;
 	    oflags &= (~ O_APPEND) ;
 	}
 
 /* OK, go! */
 
-	if (boflags & BOM_FILEDESC) {
+	if (boflags & BO_FILEDESC) {
 	    int	ooflags ;
 	    int	f_setflags = false ;
 	    int	f_addappend = false ;
@@ -231,7 +220,7 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 /* if caller asked for "append", give it to her -- if even artificially */
 
-	    f_addappend = (boflags & BOM_APPEND) && (! (boflags & BOM_READ)) ;
+	    f_addappend = (boflags & BO_APPEND) && (! (boflags & BO_READ)) ;
 
 #if	CF_UNIXAPPEND
 	    if ((rs >= 0) && (f_addappend && (! (oflags & O_APPEND)))) {
@@ -376,7 +365,6 @@ bad0:
 	goto ret0 ;
 }
 /* end subroutine (bopene) */
-#endif /* COMMENT */
 
 int bopen(bfile *fp,cchar *fn,cchar *os,mode_t om) noex {
 	return bopene(fp,fn,os,om,-1) ;
@@ -398,6 +386,7 @@ int bopenprog(bfile *fp,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	if (os[0] == '\0') return SR_INVALID ;
 
 	memset(fp,0,sizeof(bfile)) ;
+	fp->pagesize = getpagesize() ;
 	fp->fd = -1 ;
 	fp->f.notseek = true ;
 
@@ -469,14 +458,6 @@ int bclose(bfile *fp) noex {
 
 /* private subroutines */
 
-bopenmgr::operator int () noex {
-	int		rs ;
-	if ((op->pagesize = pagesize) >= 0) {
-	    rs = 0 ;
-	}
-	return rs ;
-}
-
 static int bfile_bufbegin(bfile *fp,int bsize) noex {
 	int		rs ;
 	char		*p ;
@@ -518,8 +499,9 @@ static int bfile_opts(bfile *fp,int oflags,mode_t om) noex {
 /* end subroutine (bfile_opts) */
 
 static int bfile_mapbegin(bfile *fp) noex {
+	typedef bfile_map *	maper ;
 	int		rs ;
-	cint		sz = (BFILE_NMAPS * sizeof(bfile_map)) ;
+	cint		sz = = BFILE_NMAPS * sizeof(bfile_map) ;
 	void		*vp{} ;
 	if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	    fp->maps = maper(vp) ;
@@ -561,21 +543,21 @@ static int mkoflags(cchar *os,int *bfp) noex {
 	    cint	sc = mkchar(*os++) ;
 	    switch (sc) {
 	    case 'd':
-	        bflags |= BOM_FILEDESC ;
+	        bflags |= BO_FILEDESC ;
 	        break ;
 	    case 'r':
-	        bflags |= BOM_READ ;
+	        bflags |= BO_READ ;
 	        break ;
 	    case 'w':
-		bflags |= BOM_WRITE ;
+		bflags |= BO_WRITE ;
 	        break ;
 	    case 'm':
 	    case '+':
-	        bflags |= (BOM_READ | BOM_WRITE) ;
+	        bflags |= (BO_READ | BO_WRITE) ;
 	        break ;
 	    case 'a':
 	        oflags |= O_APPEND ;
-	        bflags |= BOM_APPEND ;
+	        bflags |= BO_APPEND ;
 	        break ;
 	    case 'c':
 	        oflags |= O_CREAT ;
@@ -603,8 +585,8 @@ static int mkoflags(cchar *os,int *bfp) noex {
 		break ;
 	    } /* end switch */
 	} /* end while (open flags) */
-	if (bflags & BOM_WRITE) {
-	   oflags |= ((bflags & BOM_READ) ? O_RDWR : O_WRONLY) ;
+	if (bflags & BO_WRITE) {
+	   oflags |= ((bflags & BO_READ) ? O_RDWR : O_WRONLY) ;
 	}
 	if (bfp) {
 	    *bfp = bflags ;
@@ -612,5 +594,18 @@ static int mkoflags(cchar *os,int *bfp) noex {
 	return oflags ;
 }
 /* end subroutine (mkoflags) */
+
+static int extfd(cchar *s) noex {
+	int	rs = SR_INVALID ;
+	int	fd = -1 ;
+	if (*s++ == BFILE_FDCH) {
+	   cint		ch = mkchar(s[0]) ;
+	   if (isdigitlatin(ch)) {
+		rs = cfdeci(s,-1,&fd) ;
+	    }
+	}
+	return (rs >= 0) ? fd : rs ;
+}
+/* end subroutine (extfd) */
 
 

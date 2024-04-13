@@ -42,6 +42,12 @@ extern "C" {
 /* external variables */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bflushn(bfile *fp,int n) noex {

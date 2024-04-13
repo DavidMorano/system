@@ -60,6 +60,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bisterm(bfile *fp) noex {

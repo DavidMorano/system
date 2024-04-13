@@ -169,7 +169,6 @@ struct bfile_head {
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
 	mode_t		om ;		/* open-mode */
-	mode_t		gm ;		/* file-mode */
 } ;
 
 typedef BFILE		bfile ;

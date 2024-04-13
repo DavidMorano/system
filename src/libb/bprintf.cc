@@ -4,8 +4,6 @@
 /* this is a home made "printf" routine */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* debug print-outs */
-#define	CF_DEBUGFLUSH	0		/* ? */
 
 /* revision history:
 
@@ -25,9 +23,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<cstdarg>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -35,23 +33,13 @@
 
 /* local defines */
 
-#undef	FD_WRITE
-#define	FD_WRITE	4
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
 
 /* external subroutines */
 
-extern int	bfile_flush(bfile *) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern "C" {
+    extern int	bufprintf(char *,int,cchar *,...) noex ;
+    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+}
 
 
 /* external variables */
@@ -62,84 +50,38 @@ extern int	vbufprintf(char *,int,const char *,va_list) ;
 
 /* forward references */
 
-static int	bwriteline(bfile *,const char *,int) ;
+static int	bwritefmt(bfile *,cchar *,va_list) noex ;
+static int	bwriteout(bfile *,cchar *,int) noex ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bprintf(bfile *fp,const char *fmt,...)
-{
-	int		llen = LINEBUFLEN ;
-	int		rs = SR_OK ;
-	int		fmtlen ;
+int bprintf(bfile *op,cchar *fmt,...) noex {
+	int		rs ;
 	int		wlen = 0 ;
-	char		lbuf[LINEBUFLEN + 1] ;
-
-	if (fp == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->f.nullfile) goto ret0 ;
-
-/* continue */
-
-	{
-	va_list	ap ;
-	va_begin(ap,fmt) ;
-	rs = vbufprintf(lbuf,llen,fmt,ap) ;
-	fmtlen = rs ;
-	va_end(ap) ;
-	}
-
-#if	CF_DEBUGS
-	debugprintf("bprintf: vbufprintf() rs=%d\n",rs) ;
-#endif
-
-	if ((rs >= 0) && (fmtlen > 0)) {
-	    rs = bwriteline(fp,lbuf,fmtlen) ;
-	    wlen = rs ;
-	} /* end if */
-
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("bprintf: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
+	if ((rs = bfile_magic(op,fmt)) > 0) {
+	    va_list	ap ;
+	    va_begin(ap,fmt) ;
+	    {
+	        rs = bwritefmt(op,fmt,ap)  ;
+	        wlen = rs ;
+	    }
+	    va_end(ap) ;
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintf) */
 
-
-/* 'vprintf'-like routine */
-int bvprintf(fp,fmt,ap)
-bfile		*fp ;
-const char	fmt[] ;
-va_list		ap ;
-{
-	const int	llen = LINEBUFLEN ;
-	int		rs = SR_OK ;
-	int		fmtlen ;
+int bvprintf(bfile *op,cchar *fmt,va_list ap) noex {
+	int		rs ;
 	int		wlen = 0 ;
-	char		lbuf[LINEBUFLEN + 1] ;
-
-	if (fp == NULL) return SR_FAULT ;
-	if (fmt == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->f.nullfile) goto ret0 ;
-
-	rs = vbufprintf(lbuf,llen,fmt,ap) ;
-	fmtlen = rs ;
-	if ((rs >= 0) && (fmtlen > 0)) {
-	    rs = bwriteline(fp,lbuf,fmtlen) ;
+	if ((rs = bfile_magic(op,fmt,ap)) > 0) {
+	    rs = bwritefmt(op,fmt,ap)  ;
 	    wlen = rs ;
-	}
-
-ret0:
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bvprintf) */
@@ -147,35 +89,40 @@ ret0:
 
 /* local subroutines */
 
-
-static int bwriteline(fp,lbuf,llen)
-bfile		*fp ;
-const char	lbuf[] ;
-int		llen ;
-{
-	int		rs = SR_OK ;
+static int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
+	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
-
-	if (llen > 0) {
-
-#if	CF_DEBUGS
-	debugprintf("bprintf/bwriteline: llen=%u line=>%t<\n",
-		llen,lbuf,strlinelen(lbuf,llen,40)) ;
-#endif
-
-	    rs = bwrite(fp,lbuf,llen) ;
-	    wlen = rs ;
-	    if ((rs >= 0) && (wlen > 0) && (lbuf[wlen-1] == '\n')) {
-		int	f = FALSE ;
-		f = f || (fp->bm == bfile_bmnone) ;
-	        f = f || (fp->bm == bfile_bmline) ;
-		if (f)
-	            rs = bfile_flush(fp) ;
+	char		*lbuf{} ;
+	if ((rs = malloc_ml(&lbuf)) >= 0) {
+	    cint	llen = rs ;
+	    if ((rs = vbufprintf(lbuf,llen,fmt,ap)) >= 0) {
+	        rs = bwriteout(op,lbuf,rs) ;
+	        wlen = rs ;
 	    }
-	}
-
+	    rs1 = uc_free(lbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? wlen : rs ;
 }
-/* end subroutine (bwriteline) */
+/* end subroutine (bwritefmt) */
+
+static int bwriteout(bfile *op,cchar *lbuf,int llen) noex {
+	int		rs ;
+	int		wlen = 0 ;
+	if ((rs = bwrite(op,lbuf,llen)) >= 0) {
+	    wlen = rs ;
+	    if ((wlen > 0) && (lbuf[wlen-1] == '\n')) {
+		bool	f = false ;
+		f = f || (op->bm == bfile_bmnone) ;
+	        f = f || (op->bm == bfile_bmline) ;
+		if (f) {
+	            rs = bfile_flush(op) ;
+		}
+	    } /* end if */
+	} /* end if (bwrite) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (bwriteout) */
 
 

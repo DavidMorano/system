@@ -44,11 +44,11 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<usystem.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<stdfnames.h>
 #include	<cfdec.h>
 #include	<matstr.h>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -71,11 +71,12 @@ static int	extfd(cchar *,int) noex ;
 
 /* local variables */
 
-constexpr int	ch_star = '*' ;
-
 constexpr bool	isstar(int ch) noex {
-	return (ch == ch_star) ;
+	return (ch == '*') ;
 }
+
+
+/* exported variables */
 
 
 /* exported subroutines */
