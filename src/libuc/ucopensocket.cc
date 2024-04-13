@@ -1,5 +1,5 @@
-/* uc_opensocket */
-/* lang=C20 */
+/* ucopensocket SUPPORT */
+/* lang=C++20 */
 
 /* open a UNIX® domain socket */
 /* version %I% last-modified %G% */
@@ -31,17 +31,20 @@
 #include	<sys/socket.h>
 #include	<netinet/in.h>
 #include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<netdb.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<hostent.h>
 #include	<sockaddress.h>
 #include	<inetaddr.h>
 #include	<opentmp.h>
+#include	<mkpathx.h>
+#include	<strwcpyx.h>
 #include	<localmisc.h>
 
 
@@ -74,20 +77,13 @@ typedef unsigned int	in_addr_t ;
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	makeconn(int,int,struct sockaddr *,int, int) ;
+static int	makeconn(int,int,SOCKADDR *,int, int) noex ;
 
 
 /* local variables */
@@ -96,9 +92,9 @@ static int	makeconn(int,int,struct sockaddr *,int, int) ;
 /* exported subroutines */
 
 int uc_opensocket(cchar *fname,int oflags,int timeout) noex {
-	struct sockaddr	*sap ;
-	const int	pf = PF_UNIX ;
-	const int	st = SOCK_STREAM ;
+	SOCKADDR	*sap ;
+	cint		pf = PF_UNIX ;
+	cint		st = SOCK_STREAM ;
 	int		rs ;
 	int		cl ;
 	int		s = -1 ;
@@ -108,7 +104,7 @@ int uc_opensocket(cchar *fname,int oflags,int timeout) noex {
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-	sap = (struct sockaddr *) buf ;
+	sap = (SOCKADDR *) buf ;
 	sap->sa_family = htons(AF_UNIX) ;
 	cl = (strwcpy(sap->sa_data,fname,MAXPATHLEN) - sap->sa_data) ;
 
@@ -133,14 +129,12 @@ int uc_opensocket(cchar *fname,int oflags,int timeout) noex {
 
 	return (rs >= 0) ? s : rs ;
 }
-/* end subroutine (opensocket) */
+/* end subroutine (uc_opensocket) */
 
 
 /* local subroutines */
 
-
-static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int timeout)
-{
+static int makeconn(int pf,int ptype,SOCKADDR *sap,int sal,int timeout) noex {
 	int		rs ;
 	int		s = 0 ;
 	char	sfname[MAXPATHLEN+1] = { 0 } ;
