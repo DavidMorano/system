@@ -109,7 +109,7 @@ extern char	*timestr_log(time_t,char *) ;
 
 /* exported variables */
 
-VARS_OBJ	vars = {
+VARS_OBJ	vars_mod = {
 	"vars",
 	sizeof(VARS),
 	sizeof(VARS_CUR)
@@ -145,11 +145,12 @@ static int	ismatkey(const char *,const char *,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int vars_open(VARS *op,cchar *dbname)
-{
+int vars_open(VARS *op,cchar *dbname) noex {
 	time_t		dt = time(NULL) ;
 	int		rs = SR_OK ;
 

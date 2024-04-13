@@ -81,7 +81,7 @@ using std::max ;			/* subroutine-template */
 
 /* exported subroutines */
 
-int vsnwprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
+int snwvprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (rbuf && fmt && ap) {
@@ -96,7 +96,7 @@ int vsnwprintf(char *rbuf,int rlen,cchar *fmt,va_list ap) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (vsnwprintf) */
+/* end subroutine (snwvprintf) */
 
 int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	int		rs = SR_FAULT ;
@@ -105,12 +105,12 @@ int snwprintf(char *rbuf,int rlen,cchar *fmt,...) noex {
 	    if ((rlen >= 0) && fmt[0]) {
 		va_list	ap ;
 		va_begin(ap,fmt) ;
-		rs = vsnwprintf(rbuf,rlen,fmt,ap) ;
+		rs = snwvprintf(rbuf,rlen,fmt,ap) ;
 		va_end(ap) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (vsnwprintf) */
+/* end subroutine (snwprintf) */
 
 

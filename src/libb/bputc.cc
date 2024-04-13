@@ -47,15 +47,13 @@
 int bputc(bfile *op,int ch) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = bfile_magic(op)) > 0) {
-	    char	wbuf[2] = { char(ch) } ;
-	    if ((rs = bwrite(op,wbuf,1)) > 0) {
-	        wlen = rs ;
-	        if ((ch == '\n') && (op->bm == bfile_bmline)) {
-	            rs = bfile_flush(op) ;
-	        }
+	char		wbuf[2] = { char(ch) } ;
+	if ((rs = bwrite(op,wbuf,1)) > 0) {
+	    wlen = rs ;
+	    if ((ch == '\n') && (op->bm == bfile_bmline)) {
+	        rs = bfile_flush(op) ;
 	    }
-	} /* end if (magic) */
+	}
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bputc) */

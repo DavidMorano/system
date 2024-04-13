@@ -175,6 +175,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
+typedef int (*getxuser_f)(getxuser *) noex ;
+
 
 /* external subroutines */
 
@@ -212,7 +214,7 @@ static int	getxusername_lookup(getxuser *,cchar *) noex ;
 
 constexpr uid_t		uidend = -1 ;
 
-static constexpr int	(*getxusernames[])(getxuser *) = {
+static constexpr getxuser_f	getxusernames[] = {
 	getxusername_self,
 	getxusername_varenv,
 	getxusername_utmp,
@@ -310,7 +312,8 @@ int getxusername(getxuser *xup) noex {
 	            }
 	            if ((rs = vecstr_start(xup->nlp,10,0)) >= 0) {
 	                for (int i = 0 ; getxusernames[i] ; i += 1) {
-	                    rs = (*getxusernames[i])(xup) ;
+			    getxuser_f	f = getxusernames[i] ;
+	                    rs = f(xup) ;
 	                    if (rs != 0) break ;
 	                } /* end for */
 	                pwl = rs ;

@@ -114,11 +114,12 @@ enum subs {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int varmk_open(VARMK *op,cchar dbname[],int of,mode_t om,int n)
-{
+int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	int		rs ;
 	const char	*objname = VARMK_OBJNAME ;
 	char		dn[MAXHOSTNAMELEN+1] ;

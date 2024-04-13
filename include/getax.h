@@ -1,7 +1,7 @@
 /* getax HEADER */
 /* lang=C20 */
 
-/* UNIX® System databases (ucentpw, SHADOW, ucentgr, and ucentpj) */
+/* UNIX® System databases (ucentpw, ucentsp, ucentgr, and ucentpj) */
 /* version %I% last-modified %G% */
 
 

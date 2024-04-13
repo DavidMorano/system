@@ -24,6 +24,7 @@
 #include	<openport.h>
 #include	<openportmsg.h>
 
+#include	<opentmp.h>
 #include	<openaddrinfo.h>
 #include	<opensockaddr.h>
 #include	<opendial.h>

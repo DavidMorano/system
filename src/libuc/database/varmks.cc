@@ -1,5 +1,5 @@
-/* varmks */
-/* lang=C20 */
+/* varmks SUPPORT */
+/* lang=C++20 */
 
 /* make a VAR database */
 /* version %I% last-modified %G% */
@@ -68,7 +68,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
@@ -151,7 +150,7 @@ extern int	strlinelen(cchar *,int,int) ;
 
 /* exported variables */
 
-VARMKS_OBJ	varmks = {
+VARMKS_OBJ	varmks_mod = {
 	"varmks",
 	sizeof(VARMKS)
 } ;
@@ -210,11 +209,12 @@ static int	hashindex(uint,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int varmks_open(VARMKS *op,cchar dbname[],int of,mode_t om,int n)
-{
+int varmks_open(VARMKS *op,cchar dbname[],int of,mode_t om,int n) noex {
 	int		rs ;
 	int		c = 0 ;
 	const char	*cp ;

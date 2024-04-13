@@ -36,14 +36,20 @@
 	>=0		file descriptor
 	<0		error code (system-return)
 
+	Notes:
+	Not to lecture, but these routines are a good example of
+	several mechanisms to achieve multithread safety.  These
+	routines are also async-signal-safe, although few really
+	care about that now-a-days.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/stat.h>
 #include	<sys/param.h>
 #include	<sys/socket.h>
-#include	<sys/time.h>		/* for |gethrtime(3c)| */
-#include	<unistd.h>		/* for |gethostid(3c)| */
+#include	<sys/time.h>		/* for |TIMEVAL| */
+#include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
 #include	<cstdlib>
@@ -217,7 +223,7 @@ int opentmp(cchar *dname,int of,mode_t om) noex {
 	            rs1 = uc_free(a) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end if (m-a-f) */
-	    } /* end if (mkvarx) */
+	    } /* end if (mkvarsx) */
 	    if ((rs < 0) && (fd >= 0)) uc_close(fd) ;
 	} /* end if (valid) */
 	return (rs >= 0) ? fd : rs ;

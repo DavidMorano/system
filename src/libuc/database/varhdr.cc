@@ -1,9 +1,8 @@
-/* varhdr */
+/* varhdr SUPPORT */
+/* lang=C++20 */
 
 /* text-index header for VAR-INDEX file */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,7 +19,6 @@
 	This subroutine writes out the hash file.
 
 	Synopsis:
-
 	int varhdr(ep,f,hbuf,hlen)
 	VARHDR		*ep ;
 	int		f ;
@@ -28,26 +26,19 @@
 	int		hlen ;
 
 	Arguments:
-
 	- ep		object pointer
 	- f		read=1, write=0
 	- hbuf		buffer containing object
 	- hlen		length of buffer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<localmisc.h>
@@ -101,11 +92,12 @@ enum his {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int varhdr(VARHDR *ep,int f,char hbuf[],int hlen)
-{
+int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
 	const int	headsize = hi_overlast * sizeof(uint) ;
 	const int	magicsize = VARHDR_MAGICSIZE ;
