@@ -18,7 +18,7 @@
 
 	This version of printf is compatible with the Version 7 C
 	printf. This function is implemented differently in that
-	the function that does the actual formatting is 'bufprintf(3dam)'.
+	the function that does the actual formatting is |bufprintf(3dam)|.
 
 *******************************************************************************/
 
@@ -67,28 +67,18 @@ static int	bwriteout(bfile *,cchar *,int) noex ;
 
 int bprintf(bfile *op,cchar *fmt,...) noex {
 	int		rs ;
-	int		wlen = 0 ;
-	if ((rs = bfile_magic(op,fmt)) > 0) {
-	    va_list	ap ;
-	    va_begin(ap,fmt) ;
-	    {
-	        rs = bwritefmt(op,fmt,ap)  ;
-	        wlen = rs ;
-	    }
-	    va_end(ap) ;
-	} /* end if (magic) */
-	return (rs >= 0) ? wlen : rs ;
+	va_list		ap ;
+	va_begin(ap,fmt) ;
+	{
+	    rs = bwritefmt(op,fmt,ap)  ;
+	}
+	va_end(ap) ;
+	return rs ;
 }
 /* end subroutine (bprintf) */
 
 int bvprintf(bfile *op,cchar *fmt,va_list ap) noex {
-	int		rs ;
-	int		wlen = 0 ;
-	if ((rs = bfile_magic(op,fmt,ap)) > 0) {
-	    rs = bwritefmt(op,fmt,ap)  ;
-	    wlen = rs ;
-	} /* end if (magic) */
-	return (rs >= 0) ? wlen : rs ;
+	return bwritefmt(op,fmt,ap)  ;
 }
 /* end subroutine (bvprintf) */
 
@@ -100,15 +90,17 @@ static int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
 	int		rs1 ;
 	int		wlen = 0 ;
 	char		*lbuf{} ;
-	if ((rs = malloc_ml(&lbuf)) >= 0) {
-	    cint	llen = rs ;
-	    if ((rs = vbufprintf(lbuf,llen,fmt,ap)) >= 0) {
-	        rs = bwriteout(op,lbuf,rs) ;
-	        wlen = rs ;
-	    }
-	    rs1 = uc_free(lbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a-f) */
+	if ((rs = bfile_magic(op,fmt,ap)) > 0) {
+	    if ((rs = malloc_ml(&lbuf)) >= 0) {
+	        cint	llen = rs ;
+	        if ((rs = vbufprintf(lbuf,llen,fmt,ap)) >= 0) {
+	            rs = bwriteout(op,lbuf,rs) ;
+	            wlen = rs ;
+	        }
+	        rs1 = uc_free(lbuf) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bwritefmt) */

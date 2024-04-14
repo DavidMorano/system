@@ -1,7 +1,7 @@
 /* bopen SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package */
+/* "Basic I-O" package */
 /* version %I% last-modified %G% */
 
 #define	CF_UNIXAPPEND	1	/* BRAINDAMAGED_IN_UNIX (on NFS mounted FSs) */

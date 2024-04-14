@@ -1,7 +1,7 @@
 /* bdup SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package */
+/* "Basic I-O" package */
 /* version %I% last-modified %G% */
 
 
@@ -12,7 +12,7 @@
 
 	= 1999-01-10, David A­D­ Morano
 	I added the little extra code to allow for memory mapped
-	I/O. It is all a waste because it is way slower than without
+	I-O. It is all a waste because it is way slower than without
 	it! This should teach me to leave old programs alone!!!
 
 */

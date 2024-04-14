@@ -1,7 +1,7 @@
 /* btruncate SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to "stdio" */
+/* "Basic I-O" package similiar to "stdio" */
 /* version %I% last-modified %G% */
 
 
@@ -38,24 +38,27 @@
 /* external variables */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
-int btruncate(bfile *fp,off_t off) noex {
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (! fp->f.nullfile) {
-	    if ((rs = bfile_flush(fp)) >= 0) {
-	        rs = uc_ftruncate(fp->fd,off) ;
-	    }
-	}
-
+int btruncate(bfile *op,off_t off) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (off >= 0) {
+	        if ((rs = bfile_flush(op)) >= 0) {
+		    csize	soff = size_t(off) ;
+		    if (soff < op->offset) {
+	                rs = uc_ftruncate(op->fd,off) ;
+		    }
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (btruncate) */

@@ -84,6 +84,10 @@
 #define	RLIMIT		struct rlimit
 #endif
 
+#ifndef	RUSAGE
+#define	RUSAGE		struct rusage
+#endif
+
 #ifndef	SIGACTION
 #define	SIGACTION	struct sigaction
 #endif
@@ -245,6 +249,10 @@
 
 #ifndef	CITIMERSPEC
 #define	CITIMERSPEC	const ITIMERSPEC
+#endif
+
+#ifndef	CUTIMBUF
+#define	CUTIMBUF	const UTIMBUF
 #endif
 
 #ifndef	CSOCKADDR

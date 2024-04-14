@@ -1,7 +1,7 @@
 /* bminmod SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
+/* "Basic I-O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
 #define	CF_MEMCPY	1		/* use 'memcpy(3c)' */

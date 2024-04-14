@@ -1,9 +1,8 @@
-/* uc_getrusage */
+/* uc_getrusage SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
-
-
-#define	CF_DEBUGS	0
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,38 +14,32 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<sys/stat.h>
 #include	<sys/resource.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<errno.h>
-
+#include	<cerrno>
+#include	<cstddef>
 #include	<usystem.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#define	TO_AGAIN	5
-
 
 /* external subroutines */
-
-extern int	msleep(int) ;
 
 
 /* forward references */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_getrusage(int who,struct rusage *rp)
+int uc_getrusage(int who,RUSAGE *rp)
 {
 	int		rs ;
 	int		to_again = TO_AGAIN ;

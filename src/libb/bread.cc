@@ -1,7 +1,7 @@
 /* bread SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
+/* "Basic I-O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
 #define	CF_MEMCPY	1		/* use |memcpy(3c)| */
@@ -14,7 +14,7 @@
 	= 1999-01-10, David A­D­ Morano
 	Wow, I finally got around to adding memory mapping to this
 	thing! Other subroutines of mine have been using memory
-	mapped I/O for years but this is one of those routines where
+	mapped I-O for years but this is one of those routines where
 	it should have been applied a long time ago because of its
 	big performance benefits! It is all a waste because it is
 	way slower than without it! This should teach me to leave
@@ -43,16 +43,18 @@
 
 /* local defines */
 
-#if	BFILE_LARGEFILE
-#define	BSTAT		struct stat64
-#else
-#define	BSTAT		struct ustat
+#ifndef	CF_MEMCPY
+#define	CF_MEMCPY	1		/* use |memcpy(3c)| */
 #endif
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	bfile_pagein(bfile *,off_t,int) noex ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -60,134 +62,108 @@ extern int	bfile_pagein(bfile *,off_t,int) noex ;
 
 /* forward references */
 
-static int bfile_readmapped(bfile *,void *,int,int,int) noex ;
-static int bfile_readreg(bfile *,void *,int,int,int) noex ;
+static int bfile_rdmap(bfile *,void *,int,int,int) noex ;
+static int bfile_rdreg(bfile *,void *,int,int,int) noex ;
+
+static inline int breading(bfile *op) noex {
+	cint	am = (op->oflags & 0x03) ;
+	return ((am == O_RDWR) || (am == O_RDONLY)) ? SR_OK : SR_BADF ;
+}
 
 
 /* local variables */
 
+constexpr bool		f_memcpy = CF_MEMCPY ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int breade(fp,ubuf,ulen,to,opts)
-bfile		*fp ;
-void		*ubuf ;
-int		ulen ;
-int		to ;
-int		opts ;
-{
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->f.nullfile) goto ret0 ;
-
-	if (fp->oflags & O_WRONLY)
-	    return SR_WRONLY ;
-
-	if (fp->f.write) {
-	    if (fp->len > 0) rs = bfile_flush(fp) ;
-	    fp->f.write = FALSE ;
-	} /* end if (switching from writing to reading) */
-
-/* decide how we want to transfer the data */
-
-	if (rs >= 0) {
-
-	    if (fp->f.mapinit) {
-	        rs = bfile_readmapped(fp,ubuf,ulen,to,opts) ;
-
-	    } else
-	        rs = bfile_readreg(fp,ubuf,ulen,to,opts) ;
-
-	} /* end if */
-
-ret0:
-
+int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op,ubuf)) > 0) {
+	    if ((rs = breading(op)) >= 0) {
+	        if (op->f.write) {
+	            if (op->len > 0) rs = bfile_flush(op) ;
+	            op->f.write = false ;
+	        } /* end if (switching from writing to reading) */
+	        if (rs >= 0) {
+	            if (op->f.mapinit) {
+	                rs = bfile_rdmap(op,ubuf,ulen,to,opts) ;
+	            } else {
+	                rs = bfile_rdreg(op,ubuf,ulen,to,opts) ;
+	            }
+	        } /* end if */
+	    } /* end if (reading) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end routine (breade) */
 
-
-int bread(fp,ubuf,ulen)
-bfile		*fp ;
-void		*ubuf ;
-int		ulen ;
-{
-
-	return breade(fp,ubuf,ulen,-1,0) ;
+int bread(bfile *op,void *ubuf,int ulen) noex {
+	return breade(op,ubuf,ulen,-1,0) ;
 }
 /* end routine (bread) */
 
 
 /* local subroutines */
 
-
-static int bfile_readmapped(fp,ubuf,ulen,to,opts)
-bfile		*fp ;
-void		*ubuf ;
-int		ulen ;
-int		to ;
-int		opts ;
-{
-	BSTAT		sb ;
+static int bfile_rdmap(bfile *op,void *ubuf,int ulen,int,int) noex {
+	USTAT		sb ;
 	int		rs ;
 	int		tlen = 0 ;
-	int		pagemask = fp->pagesize - 1 ;
+	int		pagemask = op->pagesize - 1 ;
 	int		i, mlen ;
 	int		f_already ;
 
-	f_already = FALSE ;
+	f_already = false ;
 	while (tlen < ulen) {
 
 /* is there more data in the file and are we at a map page boundary? */
 
-	    mlen = (fp->fsize - fp->offset) ;
+	    mlen = (op->fsize - op->offset) ;
 	    if ((mlen > 0) &&
-	        ((fp->bp == NULL) || (fp->len == fp->pagesize))) {
+	        ((op->bp == nullptr) || (op->len == op->pagesize))) {
 
-	        i = (fp->offset / fp->pagesize) & (BFILE_NMAPS - 1) ;
-	        if ((! fp->maps[i].f.valid) || (fp->maps[i].buf == NULL)
-	            || (fp->maps[i].offset != (fp->offset & (~ pagemask))))
-	            bfile_pagein(fp,fp->offset,i) ;
+	        i = (op->offset / op->pagesize) & (BFILE_NMAPS - 1) ;
+	        if ((! op->maps[i].f.valid) || (op->maps[i].bdata == nullptr)
+	            || (op->maps[i].offset != (op->offset & (~ pagemask))))
+	            bfile_pagein(op,op->offset,i) ;
 
-	        fp->len = fp->offset & pagemask ;
-	        fp->bp = fp->maps[i].buf + fp->len ;
+	        op->len = op->offset & pagemask ;
+	        op->bp = op->maps[i].bdata + op->len ;
 
 	    } /* end if (initializing memory mapping) */
 
 /* prepare to move data */
 
-	    if ((fp->pagesize - fp->len) < mlen)
-	        mlen = (fp->pagesize - fp->len) ;
-
-	    if ((ulen - tlen) < mlen)
+	    if ((op->pagesize - op->len) < mlen) {
+	        mlen = (op->pagesize - op->len) ;
+	    }
+	    if ((ulen - tlen) < mlen) {
 	        mlen = (ulen - tlen) ;
-
+	    }
 	    if (mlen > 0) {
-
-	        memcpy((ubuf + tlen),fp->bp,mlen) ;
-
-	        fp->bp += mlen ;
-	        fp->len += mlen ;
-	        fp->offset += mlen ;
+		char	*dp = charp(ubuf) ;
+	        memcpy((dp + tlen),op->bp,mlen) ;
+	        op->bp += mlen ;
+	        op->len += mlen ;
+	        op->offset += mlen ;
 	        tlen += mlen ;
-
 	    } /* end if (move it) */
 
 /* if we were file-size limited */
 
-	    if (fp->offset >= fp->fsize) {
+	    if (op->offset >= op->fsize) {
 	        if (f_already) break ;
 
-	        rs = u_fstat(fp->fd,&sb) ;
+	        rs = u_fstat(op->fd,&sb) ;
 	        if (rs < 0) break ;
 
-	        fp->fsize = sb.st_size ;
-	        f_already = TRUE ;
+	        op->fsize = sb.st_size ;
+	        f_already = true ;
 
 	    } /* end if (file size limited) */
 
@@ -195,82 +171,65 @@ int		opts ;
 
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (bfile_readmapped) */
+/* end subroutine (bfile_rdmap) */
 
-
-static int bfile_readreg(fp,ubuf,ulen,to,opts)
-bfile		*fp ;
-void		*ubuf ;
-int		ulen ;
-int		to ;
-int		opts ;
-{
+static int bfile_rdreg(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		rs = SR_OK ;
 	int		maxeof ;
 	int		neof = 0 ;
 	int		len ;
 	int		mlen ;
 	int		tlen = 0 ;
-	int		f_already = FALSE ;
+	int		f_already = false ;
 	char		*dbp ;
 
-	maxeof = (fp->f.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
-	dbp = ubuf ;
+	maxeof = (op->f.network && (to < 0)) ? BFILE_MAXNEOF : 1 ;
+	dbp = charp(ubuf) ;
 	while ((rs >= 0) && (ulen > 0) && (neof < maxeof)) {
 
-	    if (fp->len <= 0) {
-
-	        if (f_already)
-	            break ;
-
+	    if (op->len <= 0) {
+	        if (f_already) break ;
 		if (to >= 0) {
-	            rs = uc_reade(fp->fd,fp->bdata,fp->bsize,to,opts) ;
+	            rs = uc_reade(op->fd,op->bdata,op->bsize,to,opts) ;
 	            len = rs ;
 		} else {
-	            rs = u_read(fp->fd,fp->bdata,fp->bsize) ;
+	            rs = u_read(op->fd,op->bdata,op->bsize) ;
 	            len = rs ;
 		}
-
-	        if (rs < 0)
-	            break ;
-
-		    if (len == 0) {
-			neof += 1 ;
-		    } else {
-		        neof = 0 ;
-		    }
-	        if (fp->len < fp->bsize) {
-	            f_already = TRUE ;
+	        if (rs < 0) break ;
+		if (len == 0) {
+		    neof += 1 ;
+		} else {
+		    neof = 0 ;
 		}
-	        fp->bp = fp->bdata ;
-		fp->len = len ;
-
+	        if (op->len < op->bsize) {
+	            f_already = true ;
+		}
+	        op->bp = op->bdata ;
+		op->len = len ;
 	    } /* end if (refill buffer) */
 
-	    if ((rs >= 0) && (fp->len > 0)) {
-
-	        mlen = (fp->len < ulen) ? fp->len : ulen ;
-
-#if	CF_MEMCPY
-	        memcpy(dbp,fp->bp,mlen) ;
-	        fp->bp += mlen ;
-	        dbp += mlen ;
-#else
-	        for (i = 0 ; i < mlen ; i += 1)
-	            *dbp++ = *(fp->bp)++ ;
-#endif /* CF_MEMCPY */
-
-	        fp->offset += mlen ;
-	        fp->len -= mlen ;
+	    if ((rs >= 0) && (op->len > 0)) {
+	        mlen = (op->len < ulen) ? op->len : ulen ;
+		if constexpr (f_memcpy) {
+	            memcpy(dbp,op->bp,mlen) ;
+	            op->bp += mlen ;
+	            dbp += mlen ;
+		} else {
+	            for (int i = 0 ; i < mlen ; i += 1) {
+	                *dbp++ = *(op->bp)++ ;
+	 	    }
+		} /* end if-constexpr (f_memcpy) */
+	        op->offset += mlen ;
+	        op->len -= mlen ;
 	        tlen += mlen ;
 	        ulen -= mlen ;
-
 	    } /* end if */
 
 	} /* end while */
 
 	return (rs >= 0) ? tlen : rs ;
 }
-/* end subroutine (bfile_readreg) */
+/* end subroutine (bfile_rdreg) */
 
 
