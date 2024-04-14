@@ -1,4 +1,8 @@
-/* sesmsg */
+/* sesmsg SIPPORT */
+/* lang=C20 */
+
+/* create and parse the internal messages */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -15,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<utypedefs.h>
@@ -257,7 +260,6 @@ enum sesmsgrcs {
 	sesmsgrc_overflow,
 	sesmsgrc_overlast
 } ;
-
 
 EXTERNC_begin
 
