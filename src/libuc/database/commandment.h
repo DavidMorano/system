@@ -1,4 +1,8 @@
-/* commandment */
+/* commandment SUPPORT */
+/* lang=C++20 */
+
+/* COMMANDMENT object-load management */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -11,11 +15,13 @@
 /* Copyright © 2008 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	COMMANDMENT_INCLUDE
-#define	COMMANDMENT_INCLUDE	1
+#define	COMMANDMENT_INCLUDE
 
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* ordered first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<modload.h>
 #include	<localmisc.h>
 

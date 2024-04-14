@@ -1,12 +1,12 @@
-/* commandments */
+/* commandments SUPPORT */
+/* lang=C++20 */
 
 /* COMMANDMENTS object implementation */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUGLINE	0		/* special debug-line subroutine */
 #define	CF_EMPTYTERM	0		/* terminate entry on empty line */
-
 
 /* revision history:
 
@@ -25,7 +25,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>

@@ -1,10 +1,10 @@
-/* commandment */
+/* commandment SUPPORT */
+/* lang=C++20 */
 
 /* COMMANDMENT object-load management */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -17,22 +17,14 @@
 
 /*******************************************************************************
 
-	This module implements an interface (a trivial one) that allows access
-	to the COMMANDMENT datbase.
-
+	This module implements an interface (a trivial one) that
+	allows access to the COMMANDMENT datbase.
 
 *******************************************************************************/
 
-
-#define	COMMANDMENT_MASTER	1
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<string.h>
-
+#include	<cstring>
 #include	<usystem.h>
 #include	<modload.h>
 #include	<vecstr.h>

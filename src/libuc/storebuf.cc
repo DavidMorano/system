@@ -76,6 +76,9 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local subroutine-templates */
 
 template<typename T>
@@ -133,6 +136,9 @@ int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,cthex,v) ;
 }
 /* end subroutine-template (storebuf_hexx) */
+
+
+/* local variables */
 
 
 /* exported variables */
