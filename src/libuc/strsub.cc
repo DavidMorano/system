@@ -1,5 +1,5 @@
-/* strsub */
-/* lang=C20 */
+/* strsub SUPPORT */
+/* lang=C++20 */
 
 /* find a substring within a larger string */
 /* version %I% last-modified %G% */
@@ -36,10 +36,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<string.h>
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
+
+#include	"strsub.h"
 
 
 /* local defines */
@@ -48,7 +50,13 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

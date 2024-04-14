@@ -1,4 +1,4 @@
-/* setstr */
+/* setstr SUPPORT */
 /* lang=C99 */
 
 /* set of strings */
@@ -22,8 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<limits.h>
-#include	<string.h>
+#include	<climits>
+#include	<string>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -60,8 +60,9 @@ int setstr_finish(setstr *op) noex {
 	if (op) {
 	    rs = SR_OK ;
 	    {
-	        HDB_CUR		cur ;
-	        HDB_DATUM	key, val ;
+	        hdb_cur		cur ;
+	        hdb_dat		key ;
+	        hdb_dat		val ;
 	        cint		rsn = SR_NOTFOUND ;
 	        if ((rs1 = hdb_curbegin(op,&cur)) >= 0) {
 	            int		rs2 ;
@@ -91,7 +92,7 @@ int setstr_already(setstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		f = true ;
 	if (op && sp) {
-	    HDB_DATUM	key, val ;
+	    hdb_dat	key, val ;
 	    const int	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
@@ -111,7 +112,7 @@ int setstr_add(setstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (op && sp) {
-	    HDB_DATUM	key, val ;
+	    hdb_dat	key, val ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
@@ -140,7 +141,7 @@ int setstr_del(setstr *op,cchar *sp,int sl) noex {
 	int		rs1 ;
 	int		f = false ;
 	if (op && sp) {
-	    HDB_DATUM	key, val ;
+	    hdb_dat	key, val ;
 	    cint	rsn = SR_NOTFOUND ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    key.buf = sp ;
@@ -183,11 +184,12 @@ int setstr_enum(setstr *op,setstr_cur *curp,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;
 	if (op && curp && rpp) {
-	    HDB_DATUM	key, val ;
+	    hdb_dat	key ;
+	    hdb_dat	val ;
 	    if ((rs = hdb_enum(op,curp,&key,&val)) >= 0) {
 	        rl = val.len ;
 	        if (rpp) {
-	            *rpp = val.buf ;
+	            *rpp = charp(val.buf) ;
 	        }
 	    } else {
 	        if (rpp) *rpp = nullptr ;
