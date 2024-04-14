@@ -153,20 +153,16 @@ struct storebuf {
 	int buf(int i,cchar *sp,int sl = -1) noex {
 	    return storebuf_buf(bufp,bufl,i,sp,sl) ;
 	} ;
-	template<typename T>
-	int bin(int i,T v) noex {
+	int bin(int i,auto v) noex {
 	    return storebuf_bin(bufp,bufl,i,v) ;
 	} ;
-	template<typename T>
-	int oct(int i,T v) noex {
+	int oct(int i,auto v) noex {
 	    return storebuf_oct(bufp,bufl,i,v) ;
 	} ;
-	template<typename T>
-	int dec(int i,T v) noex {
+	int dec(int i,auto v) noex {
 	    return storebuf_dec(bufp,bufl,i,v) ;
 	} ;
-	template<typename T>
-	int hexn(int i,T v) noex {
+	int hexn(int i,auto v) noex {
 	    return storebuf_hex(bufp,bufl,i,v) ;
 	} ;
 } ; /* end struct (storebuf) */

@@ -1,4 +1,4 @@
-/* ipow SUPPORT */
+/* xpow SUPPORT */
 /* lang=C++20 */
 
 /* calculate integer-power */
@@ -125,7 +125,7 @@ int ipow(int b,int n) noex {
 }
 /* end subroutine (ipow) */
 
-long llpow(long b,int n) noex {
+long lpow(long b,int n) noex {
 	long		v = 1 ;
 	for (int i = 1 ; i < n ; i += 1) {
  	    v *= b ;
