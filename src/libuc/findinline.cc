@@ -1,4 +1,4 @@
-/* findinline */
+/* findinline SUPPORT */
 /* lang=C++20 */
 
 /* find a TeX-type in-line text escape */
@@ -24,7 +24,7 @@
 	This subroutine finds a TeX-like in-line text escape.
 
 	Synopsis:
-	int findinline(FINDLINLINE *fip,cchar *lp,int ll) noex
+	int findinline_esc(findinline *fip,cchar *lp,int ll) noex
 
 	Arguments:
 	fip	pinter to FINDINLINE structure
@@ -38,15 +38,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ascii.h>
-#include	<mkchar.h>
 #include	<strn.h>
 #include	<strwcpy.h>
+#include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -67,16 +66,19 @@
 
 /* forward references */
 
-static int	getdash(FINDINLINE *,cchar *,int) noex ;
-static int	getpair(FINDINLINE *,cchar *,int) noex ;
+static int	getdash(findinline *,cchar *,int) noex ;
+static int	getpair(findinline *,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int findinline(FINDINLINE *fip,cchar *lp,int ll) noex {
+int findinline_esc(findinline *fip,cchar *lp,int ll) noex {
 	int		rs = SR_FAULT ;
 	int		skiplen = 0 ;
 	if (fip && lp) {
@@ -110,7 +112,7 @@ int findinline(FINDINLINE *fip,cchar *lp,int ll) noex {
 
 /* local subroutines */
 
-static int getdash(FINDINLINE *fip,cchar *sp,int sl) noex {
+static int getdash(findinline *fip,cchar *sp,int sl) noex {
 	int		skiplen = 0 ;
 	cchar		*start = (sp-1) ;
 	fip->kp = sp ;
@@ -138,7 +140,7 @@ static int getdash(FINDINLINE *fip,cchar *sp,int sl) noex {
 }
 /* end subroutine (getdash) */
 
-static int getpair(FINDINLINE *fip,cchar *sp,int sl) noex {
+static int getpair(findinline *fip,cchar *sp,int sl) noex {
 	int		skiplen = 0 ;
 	cchar		*start = (sp-1) ;
 	cchar		*tp ;
