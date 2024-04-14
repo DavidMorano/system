@@ -51,9 +51,10 @@ int bfile_access(bfile *op,bool fm) noex {
 	cint		am = op->am ;
 	int		rs = SR_OK ;
 	
-	cbool		
 
 
+	(void) am ;
+	(void) fm ;
 	return rs ;
 }
 /* end subroutine (bfile_access) */

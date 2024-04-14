@@ -1,7 +1,7 @@
 /* mkgecosname HEADER */
 /* lang=C20 */
 
-/* make UUID (also a specialized object) */
+/* make (or get) a GECOS name out of the raw PASSWD c-string */
 /* version %I% last-modified %G% */
 
 

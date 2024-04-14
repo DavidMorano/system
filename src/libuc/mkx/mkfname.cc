@@ -1,7 +1,7 @@
 /* mkfname SUPPORT */
 /* lang=C++20 */
 
-/* make a file name from several parts */
+/* make a file name from several component parts */
 /* version %I% last-modified %G% */
 
 

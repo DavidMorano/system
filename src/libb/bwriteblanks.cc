@@ -1,11 +1,8 @@
-/* bwriteblanks */
+/* bwriteblanks SUPPORT */
+/* lang=C++20 */
 
+/* write blanks */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_TESTLINE	0		/* test long lines */
-#define	CF_MEMSET	0		/* use 'memset(3c)' */
 
 
 /* revision history:
@@ -19,18 +16,25 @@
 
 /*******************************************************************************
 
-	This subroutine just prints out some blank characters.
+	Names:
+	bwriteblanks
+	bwritechrs
 
+	Description:
+	This subroutine just prints out some blank (or other) characters.
+
+	Returns:
+	>=0		number of characters written
+	<0		error-code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstring>
-
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
+#include	<mallocxx.h>
+#include	<strw.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -38,26 +42,17 @@
 
 /* local defines */
 
-#if	CF_TESTLINE && CF_DEBUGS
-#undef	LINEBUFLEN
-#define	LINEBUFLEN	20
-#else
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-#endif
 
-#define	NBLANKS		32
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	strwset(char *,int,int) ;
-extern int	strnset(char *,int,int) ;
 
 
 /* external variables */
@@ -68,39 +63,72 @@ extern int	strnset(char *,int,int) ;
 
 /* forward references */
 
+static int	bwritebuf(bfile *,cchar *,int) noex ;
+
 
 /* local variables */
+
+constexpr static cchar	blanks[] = "        " ;
+
+static int		nblanks = strlen(blanks) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bwriteblanks(bfile *ofp,int n)
-{
-	int		rs = SR_OK ;
-	int		blen = n ;
-	int		mlen ;
+int bwriteblanks(bfile *op,int n) noex {
+	int		rs ;
 	int		wlen = 0 ;
-	char		blanks[NBLANKS+1] ;
-
-	if (n < 0) return SR_DOM ;
-
-	mlen = MIN(NBLANKS,n) ;
-#if	CF_MEMSET
-	memset(blanks,' ',mlen) ;
-#else
-	strnset(blanks,' ',mlen) ;
-#endif /* CF_MEMSET */
-
-	while ((rs >= 0) && (blen > 0)) {
-	    mlen = MIN(blen,NBLANKS) ;
-	    rs = bwrite(ofp,blanks,mlen) ;
-	    wlen += rs ;
-	    blen -= mlen ;
-	} /* end while */
-
+	if ((rs = bfile_magic(op)) > 0) {
+	    rs = SR_INVALID ;
+	    if (n >= 0) {
+		rs = bwritebuf(op,blanks,n) ;
+		wlen = rs ;
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bwriteblanks) */
+
+int bwritechrs(bfile *op,int ch,int n) noex {
+	int		rs ;
+	int		wlen = 0 ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    rs = SR_INVALID ;
+	    if (n >= 0) {
+		if (ch != ' ') {
+		    char	wbuf[nblanks+1] ;
+		    strwset(wbuf,ch,nblanks) ;
+		    rs = bwritebuf(op,wbuf,n) ;
+		    wlen = rs ;
+		} else {
+		    rs = bwritebuf(op,blanks,n) ;
+		    wlen = rs ;
+		}
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (bwritechrs) */
+
+
+/* local subroutines */
+
+static int bwritebuf(bfile *op,cchar *wbuf,int n) noex {
+	int		rs = SR_OK ;
+	int		wlen = 0 ;
+	int		mlen ;
+	int		blen = n ;
+	while ((rs >= 0) && (blen > 0)) {
+	    mlen = min(blen,nblanks) ;
+	    rs = bwrite(op,wbuf,mlen) ;
+	    wlen += rs ;
+	    blen -= mlen ;
+	} /* end while */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (bwritebuf) */
 
 

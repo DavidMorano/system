@@ -58,9 +58,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>
 #include	<usystem.h>
+#include	<ctbin.h>
+#include	<ctoct.h>
 #include	<ctdec.h>
 #include	<cthex.h>
 #include	<strwcpy.h>
@@ -73,6 +74,9 @@
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local subroutine-templates */
@@ -110,6 +114,18 @@ int storebuf_xxxx(char *rp,int rl,int i,int (*ctxxx)(char *,int,T),T v) noex {
 /* end subroutine-template (storebuf_xxxx) */
 
 template<typename T>
+int storebuf_binx(char *bp,int bl,int i,T v) noex {
+	return storebuf_xxxx(bp,bl,i,ctbin,v) ;
+}
+/* end subroutine-template (storebuf_binx) */
+
+template<typename T>
+int storebuf_octx(char *bp,int bl,int i,T v) noex {
+	return storebuf_xxxx(bp,bl,i,ctoct,v) ;
+}
+/* end subroutine-template (storebuf_octx) */
+
+template<typename T>
 int storebuf_decx(char *bp,int bl,int i,T v) noex {
 	return storebuf_xxxx(bp,bl,i,ctdec,v) ;
 }
@@ -122,12 +138,15 @@ int storebuf_hexx(char *bp,int bl,int i,T v) noex {
 /* end subroutine-template (storebuf_hexx) */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 
 /* exported subroutines */
 
-int storebuf_char(char *rbuf,int rlen,int i,int ch) noex {
+int storebuf_chr(char *rbuf,int rlen,int i,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (rbuf) {
 	    rs = SR_INVALID ;
@@ -144,7 +163,7 @@ int storebuf_char(char *rbuf,int rlen,int i,int ch) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
 }
-/* end subroutine (storebuf_char) */
+/* end subroutine (storebuf_chr) */
 
 int storebuf_buf(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
@@ -232,16 +251,73 @@ int storebuf_strw(char *rbuf,int rlen,int i,cchar *sp,int sl) noex {
 }
 /* end subroutine (storebuf_strw) */
 
+int storebuf_bini(char *rbuf,int rlen,int i,int v) noex {
+	uint		uv = uint(v) ;
+	return storebuf_binx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_binl(char *rbuf,int rlen,int i,long v) noex {
+	ulong		uv = ulong(v) ;
+	return storebuf_binx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_binll(char *rbuf,int rlen,int i,longlong v) noex {
+	ulonglong	uv = ulonglong(v) ;
+	return storebuf_binx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_binui(char *rbuf,int rlen,int i,uint uv) noex {
+	return storebuf_binx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_binul(char *rbuf,int rlen,int i,ulong uv) noex {
+	return storebuf_binx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_binull(char *rbuf,int rlen,int i,ulonglong uv) noex {
+	return storebuf_binx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_octi(char *rbuf,int rlen,int i,int v) noex {
+	uint		uv = uint(v) ;
+	return storebuf_octx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_octl(char *rbuf,int rlen,int i,long v) noex {
+	ulong		uv = ulong(v) ;
+	return storebuf_octx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_octll(char *rbuf,int rlen,int i,longlong v) noex {
+	ulonglong	uv = ulonglong(v) ;
+	return storebuf_octx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_octui(char *rbuf,int rlen,int i,uint uv) noex {
+	return storebuf_octx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_octul(char *rbuf,int rlen,int i,ulong uv) noex {
+	return storebuf_octx(rbuf,rlen,i,uv) ;
+}
+
+int storebuf_octull(char *rbuf,int rlen,int i,ulonglong uv) noex {
+	return storebuf_octx(rbuf,rlen,i,uv) ;
+}
+
 int storebuf_deci(char *rbuf,int rlen,int i,int v) noex {
-	return storebuf_decx(rbuf,rlen,i,v) ;
+	uint		uv = uint(v) ;
+	return storebuf_decx(rbuf,rlen,i,uv) ;
 }
 
 int storebuf_decl(char *rbuf,int rlen,int i,long v) noex {
-	return storebuf_decx(rbuf,rlen,i,v) ;
+	ulong		uv = ulong(v) ;
+	return storebuf_decx(rbuf,rlen,i,uv) ;
 }
 
 int storebuf_decll(char *rbuf,int rlen,int i,longlong v) noex {
-	return storebuf_decx(rbuf,rlen,i,v) ;
+	ulonglong	uv = ulonglong(v) ;
+	return storebuf_decx(rbuf,rlen,i,uv) ;
 }
 
 int storebuf_decui(char *rbuf,int rlen,int i,uint uv) noex {

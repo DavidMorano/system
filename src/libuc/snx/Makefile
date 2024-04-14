@@ -5,22 +5,21 @@ T= snx
 ALL= $(T).o $(T).a
 
 
+CPP=	cpp
+CC=	gcc
+CXX=	gpp
+LD=	gld
+RANLIB=	granlib
+AR=	gar
+NM=	gnm
+COV=	gcov
 
-CPP= cpp
-CC= gcc
-CXX= gpp
-LD= gld
-RANLIB= granlib
-AR= gar
-NM= gnm
-COV= gcov
-
-LORDER= lorder
-TSORT= tsort
-LINT= lint
-RM= rm -f
-TOUCH= touch
-LINT= lint
+LORDER=	lorder
+TSORT=	tsort
+LINT=	lint
+RM=	rm -f
+TOUCH=	touch
+LINT=	lint
 
 
 DEFS=
@@ -31,6 +30,8 @@ INCS= snx.h
 
 LIBS=
 
+
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 

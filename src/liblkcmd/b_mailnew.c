@@ -155,7 +155,6 @@ extern int	mkpath1(char *,const char *) ;
 extern int	mkpath2(char *,const char *,const char *) ;
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkcaselower(char *,int) ;
 extern int	sfdirname(const char *,int,const char **) ;
 extern int	sfshrink(const char *,int,const char **) ;
 extern int	sfskipwhite(cchar *,int,cchar **) ;

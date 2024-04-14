@@ -1,7 +1,7 @@
 /* mkcdpath SUPPORT */
 /* lang=C++11 */
 
-/* try to make a prefix-variable path */
+/* try to make a prefix-variable path of type CDPATH */
 /* version %I% last-modified %G% */
 
 

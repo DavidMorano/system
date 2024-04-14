@@ -29,7 +29,13 @@
 #include	"mkpathx.h"
 
 
-/* local defiknes */
+/* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

@@ -1,7 +1,7 @@
 /* mkgecosname SUPPORT */
 /* lang=C++20 */
 
-/* fix the GECOS name as it comes out of the password file ('/etc/passwd') */
+/* make (or get) a GECOS name out of the raw PASSWD c-string */
 /* version %I% last-modified %G% */
 
 

@@ -1,5 +1,5 @@
-/* findinline */
-/* lang=C++20 */
+/* findinline JEADER */
+/* lang=C20 */
 
 /* find a TeX-type in-line text escape */
 /* version %I% last-modified %G% */
@@ -35,7 +35,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -54,7 +53,7 @@ typedef FINDINLINE	findinline ;
 
 EXTERNC_begin
 
-extern int	findinline(FINDINLINE *,cchar *,int) noex ;
+extern int	findinline_esc(findinline *,cchar *,int) noex ;
 
 EXTERNC_end
 

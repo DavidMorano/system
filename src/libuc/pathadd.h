@@ -33,6 +33,14 @@ static inline int pathadd(char *pbuf,int pl,cchar *sp) noex {
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+static inline int pathadd(char *pbuf,int pl,cchar *sp,int sl) noex {
+	return pathaddw(pbuf,pl,sp,sl) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* PATHADD_INCLUDE */
 

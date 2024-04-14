@@ -49,7 +49,7 @@ extern int snshellunder(char *,int,pid_t,cchar *) noex ;
 extern int snfilemode(char *,int,mode_t) noex ;
 extern int sntid(char *,int,pthread_t) noex ;
 extern int snerrabbr(char *,int,int) noex ;
-extern int vsnwprintf(char *,int,cchar *,va_list) noex ;
+extern int snwvprintf(char *,int,cchar *,va_list) noex ;
 extern int snwprintf(char *,int,cchar *,...) noex ;
 extern int snrealname(char *,int,cchar **,int) noex ;
 extern int snloadavg(char *,int,uint,int,int,int) noex ;

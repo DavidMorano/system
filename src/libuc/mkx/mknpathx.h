@@ -1,7 +1,7 @@
 /* mknpathx HEADER */
 /* lang=C20 */
 
-/* make a file-path from multople component c-strings */
+/* make a file-path from multiple component c-strings */
 /* version %I% last-modified %G% */
 
 

@@ -24,7 +24,9 @@
 
 	These are the preferred interfaces:
 
-	preferred interfaces: getsv_name(), getsv_port() ;
+	preferred interfaces: 
+		getsv_name()
+		getsv_port() ;
 
 *******************************************************************************/
 

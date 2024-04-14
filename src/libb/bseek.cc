@@ -1,10 +1,8 @@
-/* bseek */
+/* bseek SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package (BFILE) */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -18,42 +16,31 @@
 
 /*******************************************************************************
 
+	Description:
 	Seek in the file.
 
 	Synopsis:
-
-	int bseek(fp,wo,whence)
-	bfile		*fp ;
-	off_t	wo ;
-	int		whence ;
+	int bseek(bfile *op,off_t wo,int w) noex
 
 	Arguments:
-
-	- fp		file pointer
-	- wo		new offset relative to "whence"
-	- whence
+	- op		file pointer
+	- wo		new offset relative to "w"
+	- w
 			SEEK_SET	0 = from beginning of file
 			SEEK_CUR	1 = from current pointer of file
 			SEEK_END	2 = from end of file
 
 	Returns:
-
 	>=0		OK
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -62,9 +49,13 @@
 /* local defines */
 
 
-/* external subroutines */
+/* imported namespaces */
 
-extern int	bfile_flush(bfile *) ;
+
+/* local typedefs */
+
+
+/* external subroutines */
 
 
 /* external variables */
@@ -72,98 +63,68 @@ extern int	bfile_flush(bfile *) ;
 
 /* local structures */
 
-#if	CF_DEBUGS
-struct trans {
-	int	w ;
-	char	*name ;
-} ;
-#endif
+
+/* forward references */
+
+static int	notappend(bfile *op,off_t wo,int w) noex ;
 
 
 /* local variables */
 
-#if	CF_DEBUGS
-static struct trans	t[] = {
-	{ SEEK_SET, "set" },
-	{ SEEK_CUR, "cur" },
-	{ SEEK_END, "end" },
-	{ 0 , NULL }
-} ;
-#endif
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int bseek(bfile *fp,off_t wo,int whence)
-{
-	off_t	co ;
-	off_t	soff, ao ;
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->f.nullfile) goto ret0 ;
-
-/* continue */
-
-	if (fp->f.notseek)
-	    return SR_NOTSEEK ;
-
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; t[i].name != NULL ; i += 1) {
-	        if (whence == t[i].w)
-	            break ;
-	    }
-	    debugprintf("bseek: offset=%lu whence=%s(%u)\n",
-	        wo,
-	        ((t[i].name == NULL) ? "unk" : t[i].name),
-	        whence) ;
-	}
-#endif /* CF_DEBUGS */
-
-/* check for an easy way out */
-
-	if (! (fp->oflags & O_APPEND)) {
-
-	    if (((whence == SEEK_CUR) && (wo == 0)) || 
-	        ((whence == SEEK_SET) && (wo == fp->offset)))
-	        goto done ;
-
-	}
-
-/* we have to do some real work! */
-
-	ao = 0 ;
-	if (fp->f.write) {
-	    if (fp->len > 0) {
-	        rs = bfile_flush(fp) ;
-	    }
-	} else {
-	    if (whence == SEEK_CUR) {
-	        ao = (- fp->len) ;
-	    }
-	} /* end if */
-
-	if (rs >= 0) {
-
-	    fp->bp = fp->bdata ;
-	    fp->len = 0 ;
-
-	    co = (wo + ao) ;
-	    rs = u_seeko(fp->fd,co,whence,&soff) ;
-	    fp->offset = soff ;
-
-	} /* end if */
-
-done:
-ret0:
-	return rs ;
+int bseek(bfile *op,off_t wo,int w) noex {
+	int		rs ;
+	int		ro = 0 ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    rs = SR_NOTSEEK ;
+	    if (! op->f.notseek) {
+		ro = intsat(op->offset) ;
+		if ((rs = notappend(op,wo,w)) > 0) {
+		    off_t	ao = 0 ;
+	            if (op->f.write) {
+	                if (op->len > 0) {
+	                    rs = bfile_flush(op) ;
+	                }
+		    } else {
+			if (w == SEEK_CUR) {
+	                    ao = (- op->len) ;
+	                }
+	            } /* end if */
+	            if (rs >= 0) {
+		        const off_t	co = (wo + ao) ;
+		        off_t		soff{} ;
+	                op->bp = op->bdata ;
+	                op->len = 0 ;
+			rs = u_seeko(op->fd,co,w,&soff) ;
+			op->offset = soff ;
+			ro = intsat(soff) ;
+	            } /* end if */
+		} /* end if (no shortcuts) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
+	return (rs >= 0) ? ro : rs ;
 }
 /* end subroutine (bseek) */
+
+
+/* local subroutines */
+
+static int notappend(bfile *op,off_t wo,int w) noex {
+	int		rs = 1 ;
+	if (! (op->oflags & O_APPEND)) {
+	    coff	foff = off_t(op->offset) ;
+	    bool	f = false ;
+	    f = f || ((w == SEEK_CUR) && (wo == 0)) ;
+	    f = f || ((w == SEEK_SET) && (wo == foff)) ;
+	    if (f) rs = 0 ;
+	}
+	return rs ;
+}
+/* end subroutine (notappend) */
 
 

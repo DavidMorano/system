@@ -1,10 +1,8 @@
-/* btell */
+/* btell SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package (BIO) */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -20,20 +18,14 @@
 
 	We tell where we are (in a BFILE stream).
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
@@ -44,31 +36,25 @@
 
 /* external subroutines */
 
-extern int	bfile_flush(bfile *) ;
-
 
 /* external variables */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int btell(bfile *fp,off_t *rp)
-{
-	off_t	telloff = 0 ;
-	int		rs = SR_OK ;
-
-	if (fp == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (! fp->f.nullfile) {
-	    telloff = fp->offset ;
-	    if (! fp->f.notseek) rs = SR_NOTSEEK ;
-	}
-
-	if (rp != NULL) *rp = telloff ;
-	rs = (telloff & UINT_MAX) ;
+int btell(bfile *op,off_t *rp) noex {
+	int		rs ;
+	if ((rs = bfile_magic(op)) > 0) {
+	    coff	ro = op->offset ;
+	    if (rp) *rp = ro ;
+	    rs = intsat(ro) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (btell) */

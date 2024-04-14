@@ -33,29 +33,26 @@ if [[ -z "${MANPATH}" ]] ; then
   fi
 fi
 
-if [[ -z "${1}" ]] || [[ -z "${MANPATH}" ]] ; then 
-  return 0
-fi
-
-CWD=${PWD:-$( pwd )}
-
-for E in "${@}" ; do
-  IFS=:
-  for I in ${MANPATH} ; do
-    if [[ -z "${I}" ]] ; then
-      for M in *man*/${E}.[0-9]* ; do
-        if [[ -f ${M} ]] ; then
-          print -- ${CWD}/${M}
-        fi
-      done
-    else
-      for M in ${I}/*man*/${E}.[0-9]* ; do
-        if [[ -f ${M} ]] ; then
-          print -- ${M}
-        fi
-      done
-    fi
+if [[ -n "${1}" ]] && [[ -n "${MANPATH}" ]] ; then 
+  CWD=${PWD:-$( pwd )}
+  for E in "${@}" ; do
+    IFS=:
+    for I in ${MANPATH} ; do
+      if [[ -z "${I}" ]] ; then
+        for M in *man*/${E}.[0-9]* ; do
+          if [[ -f ${M} ]] ; then
+            print -- ${CWD}/${M}
+          fi
+        done
+      else
+        for M in ${I}/*man*/${E}.[0-9]* ; do
+          if [[ -f ${M} ]] ; then
+            print -- ${M}
+          fi
+        done
+      fi
+    done
   done
-done
+fi
 
 

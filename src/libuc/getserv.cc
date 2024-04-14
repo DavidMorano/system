@@ -21,7 +21,7 @@
 
 	Description:
 	Get a service number (a port number really) given a protocol
-	name and a service name. Remember that each protocol can
+	name and a service name.  Remember that each protocol can
 	have its own port associated with any given service name.
 	So therefore each service name can have a separate port
 	depending on what protocol name it is associated with.
@@ -40,20 +40,28 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/socket.h>
-#include	<netinet/in.h>
-#include	<arpa/inet.h>
-#include	<netdb.h>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
+#include	<getxx.h>
 #include	<localmisc.h>
+
+#include	"getserv.h"
 
 
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -65,6 +73,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int getserv_name(cchar *pn,cchar *svc) noex {
@@ -74,19 +85,16 @@ int getserv_name(cchar *pn,cchar *svc) noex {
 	if (pn && svc) {
 	    rs = SR_INVALID ;
 	    if (pn[0] && svc[0]) {
-	        if ((rs = getbufsize(getbufsize_se)) >= 0) {
-	            SERVENT	se ;
-	            cint	selen = rs ;
-	            char	*sebuf{} ;
-	            if ((rs = uc_malloc((selen+1),&sebuf)) >= 0) {
-		        auto	gse = uc_getservbyname ;
-	                if ((rs = gse(svc,pn,&se,sebuf,selen)) >= 0) {
-	                    port = int(ntohs(se.s_port)) ;
-	                }
-	                rs1 = uc_free(sebuf) ;
-	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (memory-allocation) */
-	        } /* end if (getbufsize) */
+	        char	*svbuf{} ;
+	        if ((rs = malloc_sv(&svbuf)) >= 0) {
+	            ucentsv	sv ;
+		    cint	svlen = rs ;
+	            if ((rs = getsv_name(&sv,svbuf,svlen,pn,svc)) >= 0) {
+	                port = int(ntohs(sv.s_port)) ;
+	            }
+	            rs1 = uc_free(svbuf) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory-allocation) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? port : rs ;

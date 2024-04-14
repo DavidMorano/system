@@ -23,6 +23,15 @@
 #include	<clanguage.h>
 
 
+enum gethzes {
+	gethz_any,
+	gethz_const,
+	gethz_env,
+	gethz_tck,
+	gethz_conf,
+	gethz_overlast
+} ;
+
 EXTERNC_begin
 
 extern int	gethz(int) noex ;

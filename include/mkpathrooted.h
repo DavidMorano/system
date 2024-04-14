@@ -1,7 +1,7 @@
 /* mkpathrooted HEADER */
 /* lang=C20 */
 
-/* make a file rooted from the present-working-directory */
+/* make a file rooted from the present-working-directory (PWD) */
 /* version %I% last-modified %G% */
 
 

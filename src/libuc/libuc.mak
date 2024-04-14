@@ -70,8 +70,8 @@ OBJ009= uc_remove.o uc_connecte.o uc_stat.o uc_lstat.o uc_statvfs.o uc_fstat.o
 OBJ010= uc_fsync.o uc_fdatasync.o uc_fchmodsuid.o uc_chmodsuid.o uc_fsize.o
 OBJ011= uc_moveup.o uc_closeonexec.o uc_setappend.o uc_keepalive.o
 OBJ012= uc_nonblock.o uc_ndelay.o uc_msgdiscard.o uc_reuseaddr.o uc_linger.o
-OBJ013= uc_aioread.o uc_aiowrite.o uc_aioreturn.o uc_aiolist.o uc_aiosuspend.o
-OBJ014= uc_fattach.o uc_fdetach.o uc_mkfifo.o uc_msync.o uc_aiofsync.o 
+OBJ013=
+OBJ014= uc_fattach.o uc_fdetach.o ucmkfifo.o uc_msync.o
 OBJ015= uc_accepte.o uc_lockf.o uc_lockfile.o uc_lockend.o uc_fpassfd.o
 OBJ016= uc_close.o
 OBJ017= uc_realpath.o uc_readlink.o uc_rename.o
@@ -1051,6 +1051,11 @@ strlistx.o:		strlistx.dir
 strlistx.dir:
 	makesubdir $@
 
+# POW
+pow.o:			pow.dir
+pow.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
@@ -1134,6 +1139,7 @@ pathadd.o:		pathadd.cc pathadd.h
 pathclean.o:		pathclean.cc pathclean.h
 
 # UTILITY
+splitfname.o:		splitfname.cc splitfname.h
 strtabfind.o:		strtabfind.cc strtabfind.h
 findbit.o:		findbit.cc findbit.h
 termtypemat.o:		termtypemat.cc termtypemat.h

@@ -1,10 +1,8 @@
-/* btruncate */
+/* btruncate SUPPORT */
+/* lang=C++20 */
 
 /* "Basic I/O" package similiar to "stdio" */
 /* version %I% last-modified %G% */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -20,18 +18,11 @@
 
 	We truncate a BFILE stream.
 
-
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
 #include	<fcntl.h>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -47,16 +38,12 @@
 /* external variables */
 
 
-/* externals within the library */
-
-extern int	bfile_flush(bfile *) ;
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int btruncate(bfile *fp,off_t off)
-{
+int btruncate(bfile *fp,off_t off) noex {
 	int		rs = SR_OK ;
 
 	if (fp == NULL) return SR_FAULT ;

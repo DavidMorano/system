@@ -43,7 +43,6 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<usystem.h>
-#include	<baops.h>
 #include	<localmisc.h>
 
 #include	"dialopts.h"
@@ -92,6 +91,10 @@ namespace {
 
 /* forward references */
 
+static inline bool	btst(int w,int n) noex {
+	return ((w >> n) & 1) ;
+}
+
 
 /* local variables */
 
@@ -119,7 +122,7 @@ int dialopts(int fd,int opts) noex {
 dialmgr::operator int () noex {
 	int		rs = SR_OK ;
 	for (int i = 0 ; (rs >= SR_OK) && (i < dialopt_overlast) ; i += 1) {
-	    if (batsti(&opts,i)) {
+	    if (btst(opts,i)) {
 		switch (i) {
 		case dialopt_keepalive:
 		    rs = okeepalive() ;

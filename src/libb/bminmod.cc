@@ -22,8 +22,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<unistd.h>
+#include	<fcntl.h>
 #include	<cstring>
 #include	<usystem.h>
 #include	<localmisc.h>

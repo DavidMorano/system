@@ -4,7 +4,7 @@
 : ${REPOROOT=:${HOME}/github/system}
 export REPOROOT
 
-BUILDTYPE=debug
+BUILDTYPE=develope
 
 
 : ${CGS_BINDIR:=${REPOROOT}/bin}
@@ -87,16 +87,18 @@ export OSNAME OSNUM
 
 case ${OSNAME}:${OSNUM} in
 Darwin:*)
-  : ${CO_GCCALL:="-g"}
+  : ${CO_GCCALL:=""}
   : ${CO_GCCDEB:="-Wall -Wextra"}
   : ${CO_GCCOPT:=""}
   : ${CO_GCCLIB:=""}
-  : ${CO_GPPALL:="-g"}
+  : ${CO_GPPALL:=""}
   : ${CO_GPPDEB:="-Wall -Wextra"}
   : ${CO_GPPOPT:=""}
   : ${CO_GPPLIB:=""}
   case ${BUILDTYPE} in
   debug)
+    CO_GCCOPT="-g"
+    CO_GPPOPT="-g"
     ;;
   deliver)
     CO_GCCOPT="-O"
@@ -150,7 +152,7 @@ CFLAGS=
 CCFLAGS=
 
 case ${BUILDTYPE} in
-debug)
+develope|debug)
   MAKECPPFLAGS=
   MAKECFLAGS="${CO_GCCALL} ${CO_GCCDEB} ${CO_GCCOPT} ${CO_GCCLIB}"
   MAKECCFLAGS="${CO_GPPALL} ${CO_GPPDEB} ${CO_GPPOPT} ${CO_GPPLIB}"

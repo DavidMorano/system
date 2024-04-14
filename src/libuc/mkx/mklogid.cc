@@ -1,7 +1,7 @@
 /* mklogid SUPPORT */
 /* lang=C++20 */
 
-/* make a log ID */
+/* make a log-ID c-string, suitable for logging purposes */
 /* version %I% last-modified %G% */
 
 

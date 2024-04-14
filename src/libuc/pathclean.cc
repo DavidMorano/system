@@ -38,7 +38,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<cstring>
 #include	<usystem.h>
@@ -53,9 +52,9 @@
 
 #define	PATHBUF		struct pathbuf
 
-#define	PATHBUF_BUF	(pbp->pbuf)
-#define	PATHBUF_BUFLEN	(pbp->plen)
-#define	PATHBUF_INDEX	(pbp->i)
+#define	PATHBUF_BUFP	pbuf
+#define	PATHBUF_BUFPL	plen
+#define	PATHBUF__IDX	i
 
 
 /* imported namespaces */
@@ -69,11 +68,18 @@
 
 /* local structures */
 
-struct pathbuf {
-	char		*pbuf ;
-	int		plen ;
-	int		i ;
-} ;
+namespace {
+    struct pathbuf {
+	char		*pbuf{} ;
+	int		plen{} ;
+	int		i{} ;
+	int start(char *,int) noex ;
+	int chr(int) noex ;
+	int strw(cchar *,int) noex ;
+	int remslash() noex ;
+	int finish() noex ;
+    } ; /* end struct (pathbuf) */
+}
 
 
 /* local structures */
@@ -81,22 +87,15 @@ struct pathbuf {
 
 /* forward references */
 
-static int	pathbuf_start(PATHBUF *,char *,int) noex ;
-static int	pathbuf_char(PATHBUF *,int) noex ;
-static int	pathbuf_strw(PATHBUF *,cchar *,int) noex ;
-static int	pathbuf_remove(PATHBUF *) noex ;
-static int	pathbuf_finish(PATHBUF *) noex ;
-
-#ifdef	COMMENT
-static int	pathbuf_getlen(PATHBUF *) noex ;
-#endif
-
 static int	nextname(cchar *,int,cchar **) noex ;
 
 
 /* local variables */
 
 static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -113,16 +112,16 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	        bool	f_prev = false ;
 	        cchar	*pp = spathbuf ;
 	        if ((pl = strnlen(spathbuf,spathlen)) > 0) {
-	            PATHBUF	pb ;
+	            pathbuf	pb ;
 	            int		cl ;
 	            cchar	*cp ;
-	            if ((rs = pathbuf_start(&pb,rbuf,rlen)) >= 0) {
+	            if ((rs = pb.start(rbuf,rlen)) >= 0) {
 	                if (*pp == '/') {
 	                    pp += 1 ;
 	                    pl -= 1 ;
 	                    f_prev = true ;
 	                    if (*pp == '/') {
-	                        pathbuf_char(&pb,'/') ;
+	                        pb.chr('/') ;
 		            }
 	                } /* end if */
 			if (rs >= 0) {
@@ -130,29 +129,29 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	                        if (cp[0] == '.') {
 	                            if ((cp[1] == '.') && (cl == 2)) {
 	                                if (nc > 0) {
-	                                    pathbuf_remove(&pb) ;
+	                                    pb.remslash() ;
 	                                    nc -= 1 ;
 	                                } else {
 	                                    if (f_prev) {
-	                                        pathbuf_char(&pb,'/') ;
+	                                        pb.chr('/') ;
 					    }
-	                                    pathbuf_strw(&pb,cp,2) ;
+	                                    pb.strw(cp,2) ;
 	                                    f_prev = true ;
 	                                    nc = 0 ;
 	                                } /* end if */
 	                            } else if (cl > 1) {
 	                                if (f_prev) {
-	                                    pathbuf_char(&pb,'/') ;
+	                                    pb.chr('/') ;
 				        }
-	                                pathbuf_strw(&pb,cp,cl) ;
+	                                pb.strw(cp,cl) ;
 	                                f_prev = true ;
 	                                nc += 1 ;
 	                            } /* end if */
 	                        } else {
 	                            if (f_prev) {
-	                                pathbuf_char(&pb,'/') ;
+	                                pb.chr('/') ;
 			            }
-	                            pathbuf_strw(&pb,cp,cl) ;
+	                            pb.strw(cp,cl) ;
 	                            f_prev = true ;
 	                            nc += 1 ;
 	                        } /* end if */
@@ -160,7 +159,7 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 	                        pp = (cp + cl) ;
 	                    } /* end while */
 			} /* end if (ok) */
-	                rs1 = pathbuf_finish(&pb) ;
+	                rs1 = pb.finish() ;
 	                if (rs >= 0) rs = rs1 ;
 	                if (rs1 >= 0) rbuf[rs1] = '\0' ;
 	            } /* end if (pathbuf) */
@@ -174,37 +173,37 @@ int pathclean(char *rbuf,cchar *spathbuf,int spathlen) noex {
 
 /* local subroutines */
 
-static int pathbuf_start(PATHBUF *pbp,char *pbuf,int plen) noex {
+int pathbuf::start(char *pbuf,int plen) noex {
 	int		rs = SR_FAULT ;
-	if (pbp && pbuf) {
+	if (pbuf) {
 	    rs = SR_OK ;
-	    PATHBUF_BUF = pbuf ;
-	    PATHBUF_BUFLEN = plen ;
-	    PATHBUF_INDEX = 0 ;
+	    PATHBUF_BUFP = pbuf ;
+	    PATHBUF_BUFPL = plen ;
+	    PATHBUF__IDX = 0 ;
 	}
 	return rs ;
 }
 /* end subroutine (pathbuf_start) */
 
-static int pathbuf_finish(PATHBUF *pbp) noex {
+int pathbuf::finish() noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = PATHBUF_INDEX) >= 0) {
-	    len = PATHBUF_INDEX ;
-	    PATHBUF_BUF = nullptr ;
-	    PATHBUF_BUFLEN = 0 ;
-	    PATHBUF_INDEX = SR_NOTOPEN ;
+	if ((rs = PATHBUF__IDX) >= 0) {
+	    len = PATHBUF__IDX ;
+	    PATHBUF_BUFP = nullptr ;
+	    PATHBUF_BUFPL = 0 ;
+	    PATHBUF__IDX = SR_NOTOPEN ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (pathbuf_finish) */
+/* end method (pathbuf::finish) */
 
-static int pathbuf_strw(PATHBUF *pbp,cchar *sp,int sl) noex {
+int pathbuf::strw(cchar *sp,int sl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = PATHBUF_INDEX) >= 0) {
-	    char	*bp = (PATHBUF_BUF + PATHBUF_INDEX) ;
-	    if (PATHBUF_BUFLEN < 0) {
+	if ((rs = PATHBUF__IDX) >= 0) {
+	    char	*bp = (PATHBUF_BUFP + PATHBUF__IDX) ;
+	    if (PATHBUF_BUFPL < 0) {
 	        if (sl < 0) {
 	            while (*sp) {
 	                *bp++ = *sp++ ;
@@ -217,67 +216,60 @@ static int pathbuf_strw(PATHBUF *pbp,cchar *sp,int sl) noex {
 	        } /* end if */
 	    } else {
 	        if (sl < 0) {
-	            while (*sp && (bp < (PATHBUF_BUF + PATHBUF_BUFLEN - 1))) {
+	            while (*sp && (bp < (PATHBUF_BUFP + PATHBUF_BUFPL - 1))) {
 	                *bp++ = *sp++ ;
 		    }
 	        } else {
 	            while (*sp && (sl > 0) && 
-	                (bp < (PATHBUF_BUF + PATHBUF_BUFLEN - 1))) {
+	                (bp < (PATHBUF_BUFP + PATHBUF_BUFPL - 1))) {
 	                *bp++ = *sp++ ;
 	                sl -= 1 ;
 	            }
 	        } /* end if */
-	        if (bp >= (PATHBUF_BUF + PATHBUF_BUFLEN - 1)) {
-	            PATHBUF_INDEX = SR_TOOBIG ;
+	        if (bp >= (PATHBUF_BUFP + PATHBUF_BUFPL - 1)) {
+	            PATHBUF__IDX = SR_TOOBIG ;
 	            rs = SR_TOOBIG ;
 	        }
 	    } /* end if */
 	    if (rs >= 0) {
 	        *bp = '\0' ;
-	        len = bp - (PATHBUF_BUF + PATHBUF_INDEX) ;
-	        PATHBUF_INDEX = (bp - PATHBUF_BUF) ;
+	        len = bp - (PATHBUF_BUFP + PATHBUF__IDX) ;
+	        PATHBUF__IDX = (bp - PATHBUF_BUFP) ;
 	    }
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (pathbuf_strw) */
+/* end method (pathbuf::strw) */
 
-static int pathbuf_char(PATHBUF *pbp,int ch) noex {
+int pathbuf::chr(int ch) noex {
 	char		buf[2] ;
 	buf[0] = ch ;
 	buf[1] = '\0' ;
-	return pathbuf_strw(pbp,buf,1) ;
+	return strw(buf,1) ;
 }
-/* end subroutine (pathbuf_char) */
+/* end method (pathbuf::chr) */
 
-static int pathbuf_remove(PATHBUF *pbp) noex {
+int pathbuf::remslash() noex {
 	int		rs ;
-	if ((rs = PATHBUF_INDEX) >= 0) {
-	    char	*bp = (PATHBUF_BUF + PATHBUF_INDEX) ;
-	    if ((PATHBUF_BUFLEN > 0) && (bp[-1] == '/')) {
-	        PATHBUF_BUFLEN -= 1 ;
+	if ((rs = PATHBUF__IDX) >= 0) {
+	    char	*bp = (PATHBUF_BUFP + PATHBUF__IDX) ;
+	    if ((PATHBUF_BUFPL > 0) && (bp[-1] == '/')) {
+	        PATHBUF_BUFPL -= 1 ;
 	        bp -= 1 ;
 	    }
-	    while ((PATHBUF_BUFLEN > 0) && (bp[-1] != '/')) {
-	        PATHBUF_BUFLEN -= 1 ;
+	    while ((PATHBUF_BUFPL > 0) && (bp[-1] != '/')) {
+	        PATHBUF_BUFPL -= 1 ;
 	        bp -= 1 ;
 	    } /* end while */
-	    if ((PATHBUF_BUFLEN > 0) && (bp[-1] == '/')) {
-	        PATHBUF_BUFLEN -= 1 ;
+	    if ((PATHBUF_BUFPL > 0) && (bp[-1] == '/')) {
+	        PATHBUF_BUFPL -= 1 ;
 	        bp -= 1 ;
 	    }
-	    PATHBUF_INDEX = (bp - PATHBUF_BUF) ;
+	    PATHBUF__IDX = (bp - PATHBUF_BUFP) ;
 	} /* end if (ok) */
 	return rs ;
 }
-/* end subroutine (pathbuf_remove) */
-
-#ifdef	COMMENT /* not needed */
-static int pathbuf_getlen(PATHBUF *pbp) noex {
-	return PATHBUF_INDEX ;
-}
-/* end subroutine (pathbuf_getlen) */
-#endif /* COMMENT */
+/* end method (pathbuf::remslash) */
 
 static int nextname(cchar *sp,int sl,cchar **rpp) noex {
 	int		f_len = (sl >= 0) ;
@@ -286,7 +278,6 @@ static int nextname(cchar *sp,int sl,cchar **rpp) noex {
 	    sl -= 1 ;
 	} /* end while */
 	*rpp = sp ;
-/* skip the non-slash characters */
 	while ((((! f_len) && *sp) || (sl > 0)) && (*sp != '/')) {
 	    sp += 1 ;
 	    sl -= 1 ;

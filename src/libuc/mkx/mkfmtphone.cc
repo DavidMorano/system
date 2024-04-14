@@ -1,7 +1,7 @@
 /* mkfmtphone SUPPORT */
 /* lang=C++20 */
 
-/* similar to 'snwcpy(3dam)' but formatting a phone number */
+/* similar to |snwcpy(3dam)| but formatting a phone number */
 /* version %I% last-modified %G% */
 
 

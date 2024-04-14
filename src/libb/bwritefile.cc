@@ -1,9 +1,8 @@
-/* bwritefile */
+/* bwritefile SUPPORT */
+/* lang=C++20 */
 
 /* copy a file to another file */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,34 +16,27 @@
 
 /*******************************************************************************
 
-        This subroutine copies the contents of a given file to the current file.
+	Description:
+	This subroutine copies the contents of a given file to the
+	current file.
 
 	Synospsis:
-
-	int bwritefile(bfile *ofp,cchar *fname)
+	int bwritefile(bfile *ofp,cchar *fname) noex
 
 	Arguments:
-
 	ofp		output file pointer to copy to
 	fname		the file (which will be read) to copy to the current
 
 	Returns:
-
 	>=0		length of data copied
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-#define	BFILE_MASTER	0
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
-#include	<sys/param.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<unistd.h>
+#include	<fcntl.h>
 #include	<cstdlib>
-
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -57,18 +49,15 @@
 /* external subroutines */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bwritefile(bfile *ofp,cchar *fname)
-{
+int bwritefile(bfile *ofp,cchar *fname) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		tlen = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("bwritefile: ent fname=%s\n",fname) ;
-#endif
 
 	if (ofp == NULL) return SR_FAULT ;
 	if (fname == NULL) return SR_FAULT ;
