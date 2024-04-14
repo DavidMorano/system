@@ -33,12 +33,11 @@
 
 	Returns:
 	>=0		length of cleaned up path
-	<0		error
+	<0		error code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<cstring>
 #include	<usystem.h>
 #include	<bufsizevar.hh>
@@ -54,7 +53,7 @@
 
 #define	PATHBUF_BUFP	pbuf
 #define	PATHBUF_BUFPL	plen
-#define	PATHBUF__IDX	i
+#define	PATHBUF_IDX	i
 
 
 /* imported namespaces */
@@ -179,7 +178,7 @@ int pathbuf::start(char *pbuf,int plen) noex {
 	    rs = SR_OK ;
 	    PATHBUF_BUFP = pbuf ;
 	    PATHBUF_BUFPL = plen ;
-	    PATHBUF__IDX = 0 ;
+	    PATHBUF_IDX = 0 ;
 	}
 	return rs ;
 }
@@ -188,11 +187,11 @@ int pathbuf::start(char *pbuf,int plen) noex {
 int pathbuf::finish() noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = PATHBUF__IDX) >= 0) {
-	    len = PATHBUF__IDX ;
+	if ((rs = PATHBUF_IDX) >= 0) {
+	    len = PATHBUF_IDX ;
 	    PATHBUF_BUFP = nullptr ;
 	    PATHBUF_BUFPL = 0 ;
-	    PATHBUF__IDX = SR_NOTOPEN ;
+	    PATHBUF_IDX = SR_NOTOPEN ;
 	}
 	return (rs >= 0) ? len : rs ;
 }
@@ -201,8 +200,8 @@ int pathbuf::finish() noex {
 int pathbuf::strw(cchar *sp,int sl) noex {
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = PATHBUF__IDX) >= 0) {
-	    char	*bp = (PATHBUF_BUFP + PATHBUF__IDX) ;
+	if ((rs = PATHBUF_IDX) >= 0) {
+	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
 	    if (PATHBUF_BUFPL < 0) {
 	        if (sl < 0) {
 	            while (*sp) {
@@ -227,14 +226,14 @@ int pathbuf::strw(cchar *sp,int sl) noex {
 	            }
 	        } /* end if */
 	        if (bp >= (PATHBUF_BUFP + PATHBUF_BUFPL - 1)) {
-	            PATHBUF__IDX = SR_TOOBIG ;
+	            PATHBUF_IDX = SR_TOOBIG ;
 	            rs = SR_TOOBIG ;
 	        }
 	    } /* end if */
 	    if (rs >= 0) {
 	        *bp = '\0' ;
-	        len = bp - (PATHBUF_BUFP + PATHBUF__IDX) ;
-	        PATHBUF__IDX = (bp - PATHBUF_BUFP) ;
+	        len = bp - (PATHBUF_BUFP + PATHBUF_IDX) ;
+	        PATHBUF_IDX = (bp - PATHBUF_BUFP) ;
 	    }
 	} /* end if (ok) */
 	return (rs >= 0) ? len : rs ;
@@ -251,8 +250,8 @@ int pathbuf::chr(int ch) noex {
 
 int pathbuf::remslash() noex {
 	int		rs ;
-	if ((rs = PATHBUF__IDX) >= 0) {
-	    char	*bp = (PATHBUF_BUFP + PATHBUF__IDX) ;
+	if ((rs = PATHBUF_IDX) >= 0) {
+	    char	*bp = (PATHBUF_BUFP + PATHBUF_IDX) ;
 	    if ((PATHBUF_BUFPL > 0) && (bp[-1] == '/')) {
 	        PATHBUF_BUFPL -= 1 ;
 	        bp -= 1 ;
@@ -265,14 +264,14 @@ int pathbuf::remslash() noex {
 	        PATHBUF_BUFPL -= 1 ;
 	        bp -= 1 ;
 	    }
-	    PATHBUF__IDX = (bp - PATHBUF_BUFP) ;
+	    PATHBUF_IDX = (bp - PATHBUF_BUFP) ;
 	} /* end if (ok) */
 	return rs ;
 }
 /* end method (pathbuf::remslash) */
 
 static int nextname(cchar *sp,int sl,cchar **rpp) noex {
-	int		f_len = (sl >= 0) ;
+	bool		f_len = (sl >= 0) ;
 	while (((! f_len) || (sl > 0)) && (*sp == '/')) {
 	    sp += 1 ;
 	    sl -= 1 ;
