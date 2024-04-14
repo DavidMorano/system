@@ -45,6 +45,7 @@
 #include	<six.h>
 #include	<mkpathx.h>
 #include	<matxstr.h>
+#include	<strstdfname.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 
@@ -393,7 +394,7 @@ int mailmsgattent_analyze(MME *op,cchar *tmpdname) noex {
         int             code = 0 ;
 	if ((rs = mailmsgattent_magic(op,tmpdname)) >= 0) {
             bfile	infile, *ifp = &infile ;
-	    cchar	*atf = bfilestdfname(stdfile_in,op->attfname) ;
+	    cchar	*atf = strstdfname(stdfile_in,op->attfname) ;
             if ((rs = bopen(ifp,atf,"r",0666)) >= 0) {
                 USTAT       sb ;
                 if ((rs = bcontrol(ifp,BC_STAT,&sb)) >= 0) {

@@ -75,7 +75,7 @@ OBJ14=
 OBJ15=
 
 OBJ16= bfliner.o
-OBJ17= bfilestrfname.o
+OBJ17=
 OBJ18=
 OBJ19=
 OBJ20=
@@ -207,6 +207,5 @@ bdup.o:			bdup.cc			$(INCS)
 bsupport.o:		bsupport.cc		$(INCS)
 
 bfliner.o:		bfliner.cc bfliner.h
-bfilestdfnames.o:	bfilestdfname.cc bfilestdfname.h
 
 

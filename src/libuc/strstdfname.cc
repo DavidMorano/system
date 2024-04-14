@@ -1,4 +1,4 @@
-/* bfilestdfname SUPPORT */
+/* strstdfname SUPPORT */
 /* lang=C++20 */
 
 /* BFILE standard-file-name determination */
@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	Name:
-	bfilestdfname
+	strstdfname
 
 	Description:
 	Test and figure out if the caller intent was to really get
@@ -38,8 +38,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"bfile.h"
-#include	"bfilestdfname.h"
+#include	"strstdfname.h"
 
 
 /* local defines */
@@ -73,6 +72,6 @@ cchar *bfilestfname(int w,cchar *atf) noex {
 	}
 	return atf ;
 }
-/* end subroutine (bfilestdfname) */
+/* end subroutine (strstdfname) */
 
 

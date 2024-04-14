@@ -1,7 +1,7 @@
-/* bfilestdfname HEADER */
+/* strstdfname HEADER */
 /* lang=C20 */
 
-/* BFILE standard-file-name determination */
+/* return a c-string for a standard filename */
 /* version %I% last-modified %G% */
 
 
@@ -14,8 +14,8 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#ifndef	BFILESTDFNAME_INCLUDE
-#define	BFILESTDFNAME_INCLUDE
+#ifndef	STRSTDFNAME_INCLUDE
+#define	STRSTDFNAME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -26,11 +26,11 @@
 
 EXTERNC_begin
 
-extern cchar	*bfilestdfname(int,cchar *) noex ;
+extern cchar	*strstdfname(int,cchar *) noex ;
 
 EXTERNC_end
 
 
-#endif /* BFILESTDFNAME_INCLUDE */
+#endif /* STRSTDFNAME_INCLUDE */
 
 
