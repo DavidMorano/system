@@ -4,7 +4,6 @@
 /* manage printing lines */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -27,10 +26,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
@@ -41,49 +38,14 @@
 
 /* local defines */
 
-#ifndef	MAILADDRLEN
-#define	MAILADDRLEN	(3 * MAXHOSTNAMELEN)
-#endif
 
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(2048,LINE_MAX)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
+/* imported namespaces */
 
-#define	LOGLINELEN	(80 - 16)
 
-#define	DATEBUFLEN	80
-#define	STACKADDRBUFLEN	(2 * 1024)
-
-#undef	BUFLEN
-#define	BUFLEN		(2 * 1024)
-
-#define	BASE64LINELEN	72
-#define	BASE64BUFLEN	((BASE64LINELEN / 4) * 3)
-
-#ifndef	FROM_ESCAPE
-#define	FROM_ESCAPE	'\b'
-#endif
-
-#undef	CHAR_TOKSEP
-#define	CHAR_TOKSEP(c)	(CHAR_ISWHITE(c) || (! isprintlatin(c)))
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	nextfield(const char *,int,const char **) ;
-extern int	isprintlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
 
 
 /* external variables */
@@ -98,203 +60,173 @@ extern char	*strnpbrk(const char *,int,const char *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int outline_start(OUTLINE *op,bfile *ofp,int maxlen)
-{
-
-	if (op == NULL) return SR_FAULT ;
-	if (ofp == NULL) return SR_FAULT ;
-
-	memset(op,0,sizeof(OUTLINE)) ;
-	op->maxlen = maxlen ;
-	op->rlen = (maxlen -1) ;
-	op->ofp = ofp ;
-
-	return SR_OK ;
+int outline_start(outline *op,bfile *ofp,int maxlen) noex {
+	int		rs = SR_FAULT ;
+	if (op && ofp) {
+	    rs = memclear(op) ;
+	    op->maxlen = maxlen ;
+	    op->rlen = (maxlen -1) ;
+	    op->ofp = ofp ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (outline_start) */
 
-
-int outline_finish(OUTLINE *ldp)
-{
-	int		rs = SR_OK ;
+int outline_finish(outline *op) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-
-	if (ldp == NULL) return SR_FAULT ;
-	if (ldp->ofp == NULL) return SR_FAULT ;
-
-	if (ldp->llen > 0) {
-	    rs = bputc(ldp->ofp,'\n') ;
-	    wlen += rs ;
-	    ldp->wlen += rs ;
-	    ldp->rlen = (ldp->maxlen - 1) ;
-	    ldp->llen = 0 ;
-	}
-
-	ldp->ofp = NULL ;
+	if (op) {
+	    rs = SR_BUGCHECK ;
+	    if (op->ofp) {
+		rs = SR_OK ;
+	        if (op->llen > 0) {
+	            rs = bputc(op->ofp,'\n') ;
+	            wlen += rs ;
+	            op->wlen += rs ;
+	            op->rlen = (op->maxlen - 1) ;
+	            op->llen = 0 ;
+	        }
+	        op->ofp = nullptr ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outline_finish) */
 
-
-int outline_item(OUTLINE *ldp,cchar *vp,int vl)
-{
-	int		rs = SR_OK ;
+int outline_item(outline *op,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-
-	if (vp == NULL) return SR_FAULT ;
-
-	if (vl < 0)
-	    vl = strlen(vp) ;
-
-	if (vl > 0) {
-	    ldp->f.comma = TRUE ;
-	    rs = outline_value(ldp,vp,vl) ;
-	    wlen += rs ;
-	    ldp->c_items += 1 ;
-	}
-
+	if (op && vp) {
+	    rs = SR_OK ;
+	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl > 0) {
+	        op->f.comma = true ;
+	        rs = outline_value(op,vp,vl) ;
+	        wlen += rs ;
+	        op->c_items += 1 ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outline_item) */
 
-
-/* output a single value for a header (folding lines as needed) */
-int outline_value(OUTLINE *ldp,cchar *vp,int vl)
-{
-	int		rs = SR_OK ;
-	int		nlen ;
-	int		cl, cl2 ;
+int outline_value(outline *op,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-	int		f_comma = FALSE ;
-	const char	*fmt ;
-	const char	*tp, *cp ;
-
-	if (ldp == NULL) return SR_INVALID ;
-	if (vp == NULL) return SR_FAULT ;
-
-	if (vp[0] == '\0') return SR_OK ;
-
-	if (vl < 0)
-	    vl = strlen(vp) ;
-
-	ldp->c_values = 0 ;
-	while ((rs >= 0) && (vl > 0)) {
-
-	    if ((cl = nextfield(vp,vl,&cp)) > 0) {
-
-	        f_comma = (ldp->f.comma && (ldp->c_items > 0)) ;
-	        nlen = outline_needlength(ldp,cl) ;
-
-	        if (nlen > ldp->rlen) {
-
-	            if (ldp->llen > 0) {
-	                fmt = "\n" ;
-	                if (f_comma) {
-	                    f_comma = FALSE ;
-	                    ldp->f.comma = FALSE ;
-	                    fmt = ",\n" ;
-	                }
-	                rs = bwrite(ldp->ofp,fmt,-1) ;
-	                wlen += rs ;
+	if (op && vp) {
+	    rs = SR_OK ;
+	    if (vp[0]) {
+	        int	nlen ;
+	        int	cl, cl2 ;
+	        int	f_comma = FALSE ;
+	        cchar	*fmt ;
+	        cchar	*tp, *cp ;
+	        if (vl < 0) vl = strlen(vp) ;
+	        op->c_values = 0 ;
+	        while ((rs >= 0) && (vl > 0)) {
+	            if ((cl = sfnext(vp,vl,&cp)) > 0) {
+	                f_comma = (op->f.comma && (op->c_items > 0)) ;
+	                nlen = outline_needlength(op,cl) ;
+	                if (nlen > op->rlen) {
+	                    if (op->llen > 0) {
+	                        fmt = "\n" ;
+	                        if (f_comma) {
+	                            f_comma = FALSE ;
+	                            op->f.comma = FALSE ;
+	                            fmt = ",\n" ;
+	                        }
+	                        rs = bwrite(op->ofp,fmt,-1) ;
+	                        wlen += rs ;
+	                    }
+	                    op->rlen = (op->maxlen - 1) ;
+	                    op->llen = 0 ;
+	                    op->c_values = 0 ;
+	                } /* end if (overflow) */
+	                if (rs >= 0) {
+	                    fmt = " %t" ;
+	                    if (f_comma) {
+	                        f_comma = FALSE ;
+	                        op->f.comma = FALSE ;
+	                        fmt = ", %t" ;
+	                    }
+	                    rs = bprintf(op->ofp,fmt,cp,cl) ;
+	                    wlen += rs ;
+	                    op->llen += rs ;
+	                    op->rlen -= rs ;
+	                } /* end if (ok) */
+	                op->c_values += 1 ;
+	                cl2 = ((cp+cl) - vp) ;
+	                vp += cl2 ;
+	                vl -= cl2 ;
+	            } else if ((tp = strnchr(vp,vl,'\n')) != nullptr) {
+	                vl -= ((tp + 1) - vp) ;
+	                vp = (tp + 1) ;
+	            } else {
+	                vl = 0 ;
 	            }
-
-	            ldp->rlen = (ldp->maxlen - 1) ;
-	            ldp->llen = 0 ;
-	            ldp->c_values = 0 ;
-
-	        } /* end if (overflow) */
-
-	        if (rs >= 0) {
-	            fmt = " %t" ;
-	            if (f_comma) {
-	                f_comma = FALSE ;
-	                ldp->f.comma = FALSE ;
-	                fmt = ", %t" ;
-	            }
-	            rs = bprintf(ldp->ofp,fmt,cp,cl) ;
-	            wlen += rs ;
-	            ldp->llen += rs ;
-	            ldp->rlen -= rs ;
-	        }
-
-	        ldp->c_values += 1 ;
-	        cl2 = ((cp+cl) - vp) ;
-	        vp += cl2 ;
-	        vl -= cl2 ;
-
-	    } else if ((tp = strnchr(vp,vl,'\n')) != NULL) {
-	        vl -= ((tp + 1) - vp) ;
-	        vp = (tp + 1) ;
-	    } else
-	        vl = 0 ;
-
-	} /* end while */
-
-	ldp->wlen += wlen ;
+	        } /* end while */
+	        op->wlen += wlen ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outline_value) */
 
-
-int outline_write(OUTLINE *ldp,cchar *vp,int vl)
-{
-	int		rs = SR_OK ;
+int outline_write(outline *op,cchar *vp,int vl) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-
-	if (vl < 0) vl = strlen(vp) ;
-
-	if (vl > 0) {
-	    if ((rs = bwrite(ldp->ofp,vp,vl)) >= 0) {
-	        wlen += rs ;
-	        ldp->wlen += rs ;
-	        ldp->llen += rs ;
-	        ldp->rlen -= rs ;
+	if (op && vp) {
+	    rs = SR_OK ;
+	    if (vl < 0) vl = strlen(vp) ;
+	    if (vl > 0) {
+	        if ((rs = bwrite(op->ofp,vp,vl)) >= 0) {
+	            wlen += rs ;
+	            op->wlen += rs ;
+	            op->llen += rs ;
+	            op->rlen -= rs ;
+	        }
 	    }
-	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outline_write) */
 
-
-int outline_printf(OUTLINE *ldp,cchar *fmt,...)
-{
-	int		rs ;
+int outline_printf(outline *op,cchar *fmt,...) noex {
+	int		rs = SR_FAULT ;
 	int		wlen = 0 ;
-
-	{
+	if (op && fmt) {
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
-	    rs = bvprintf(ldp->ofp,fmt,ap) ;
+	    if ((rs = bvprintf(op->ofp,fmt,ap)) >= 0) {
+	        wlen += rs ;
+	        op->wlen += rs ;
+	        op->llen += rs ;
+	        op->rlen -= rs ;
+	    } /* end if (bvprintf) */
 	    va_end(ap) ;
-	}
-
-	if (rs >= 0) {
-	    wlen += rs ;
-	    ldp->wlen += rs ;
-	    ldp->llen += rs ;
-	    ldp->rlen -= rs ;
-	}
-
+	} /* end if (non-null) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (outline_printf) */
 
-
-int outline_needlength(OUTLINE *ldp,int cl)
-{
+int outline_needlength(outline *op,int cl) noex {
+	int		rs = SR_FAULT ;
 	int		nlen = (cl + 1) ;
-
-	if (ldp->llen == 0)
-	    nlen += 1 ;
-
-	if (ldp->f.comma && (ldp->c_items > 0))
-	    nlen += 1 ;
-
-	return nlen ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->llen == 0) {
+	        nlen += 1 ;
+	    }
+	    if (op->f.comma && (op->c_items > 0)) {
+	        nlen += 1 ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? nlen : rs ;
 }
 /* end subroutine (outline_needlength) */
 

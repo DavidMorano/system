@@ -1,6 +1,8 @@
-/* outline */
+/* outline HEADER */
+/* lang=C20 */
 
 /* output lines */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -32,12 +34,14 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<stdarg.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 
 
-#define	OUTLINE		struct outline
+#define	OUTLINE		struct outline_head
 #define	OUTLINE_FL	struct outline_flags
 
 
@@ -45,7 +49,7 @@ struct outline_flags {
 	uint		comma:1 ;
 } ;
 
-struct outline {
+struct outline_head {
 	bfile		*ofp ;
 	OUTLINE_FL	f ;
 	int		maxlen ;
@@ -56,26 +60,21 @@ struct outline {
 	int		c_items ;
 } ;
 
+typedef	OUTLINE		outline ;
+typedef	OUTLINE_FL	outline_fl ;
 
-#if	(! defined(OUTLINE_MASTER)) || (OUTLINE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int	outline_start(outline *,bfile *,int) noex ;
+extern int	outline_finish(outline *) noex ;
+extern int	outline_write(outline *,cchar *,int) noex ;
+extern int	outline_printf(outline *,cchar *,...) noex ;
+extern int	outline_item(outline *,cchar *,int) noex ;
+extern int	outline_value(outline *,cchar *,int) noex ;
+extern int	outline_needlength(outline *,int) noex ;
 
-extern int	outline_start(OUTLINE *,bfile *,int) ;
-extern int	outline_finish(OUTLINE *) ;
-extern int	outline_write(OUTLINE *,cchar *,int) ;
-extern int	outline_printf(OUTLINE *,cchar *,...) ;
-extern int	outline_item(OUTLINE *,cchar *,int) ;
-extern int	outline_value(OUTLINE *,cchar *,int) ;
-extern int	outline_needlength(OUTLINE *,int) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif	/* (! defined(OUTLINE_MASTER)) || (OUTLINE_MASTER == 0) */
 
 #endif	/* OUTLINE_INCLUDE */
 
