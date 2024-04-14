@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} stdorder_ "
+NAMES="${NAMES} I/O  "
 
 
 DN=/dev/null
@@ -12,22 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep ${N} $F > ${DN} ; then
       ed - $F <<\EOF
-g/stdorder_rchar/s//stdorder_rc/g
-g/stdorder_rshort/s//stdorder_rs/g
-g/stdorder_rint/s//stdorder_ri/g
-g/stdorder_rlong/s//stdorder_rl/g
-g/stdorder_ruchar/s//stdorder_ruc/g
-g/stdorder_rushort/s//stdorder_rus/g
-g/stdorder_ruint/s//stdorder_rui/g
-g/stdorder_rulong/s//stdorder_rul/g
-g/stdorder_wchar/s//stdorder_wc/g
-g/stdorder_wshort/s//stdorder_ws/g
-g/stdorder_wint/s//stdorder_wi/g
-g/stdorder_wlong/s//stdorder_wl/g
-g/stdorder_wuchar/s//stdorder_wuc/g
-g/stdorder_wushort/s//stdorder_wus/g
-g/stdorder_wuint/s//stdorder_wui/g
-g/stdorder_wulong/s//stdorder_wul/g
+g/I\/O/s//I-O/g
 	w
 	q
 EOF

@@ -1,7 +1,7 @@
 /* bcontrol SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to the standard UNIX® "stdio" package */
+/* "Basic I-O" package similiar to the standard UNIX® "stdio" package */
 /* version %I% last-modified %G% */
 
 #define	CF_UNIXAPPEND	1		/* file append works? */

@@ -1,7 +1,7 @@
 /* breadln SUPPORT */
 /* lang=C++11 */
 
-/* "Basic I/O" package similiar to "stdio" */
+/* "Basic I-O" package similiar to "stdio" */
 /* last modifed %G% version %I% */
 
 #define	CF_MEMCCPY	0		/* faster than |memccpy(3c)|! */
@@ -13,7 +13,7 @@
 
 	= 1999-01-10, David A­D­ Morano
 	I added the little extra code to allow for memory mapped
-	I/O. It is all a waste because it is way slower than without
+	I-O. It is all a waste because it is way slower than without
 	it! This should teach me to leave old programs alone!!!
 
 */
@@ -33,8 +33,9 @@
 #include	<sys/mman.h>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |memccpy(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -43,6 +44,18 @@
 
 
 /* local defines */
+
+#ifndef	CF_MEMCCPY
+#define	CF_MEMCCPY	0		/* faster than |memccpy(3c)|! */
+#endif
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -62,8 +75,17 @@ static int	breload(bfile *,int,int) noex ;
 
 static inline int	isoureol(int) noex ;
 
+static inline char *stpccpy(char *dp,cchar *sp,int ch,int n) noex {
+	return charp(memccpy(dp,sp,ch,n)) ;
+}
+
 
 /* local variables */
+
+constexpr bool		f_memcpy = CF_MEMCCPY ;
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -101,6 +123,7 @@ int breadlnto(bfile *fp,char *ubuf,int ulen,int to) noex {
 
 static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 	USTAT		sb ;
+	cnullptr	np{} ;
 	size_t		baseoff, runoff ;
 	int		rs = SR_OK ;
 	int		mlen ;
@@ -146,29 +169,26 @@ static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 	    if (mlen > 0) {
 	        char	*bp ;
 	        char	*lastp ;
-
-#if	CF_MEMCCPY
-	        if ((lastp = memccpy(dbp,fp->bp,'\n',mlen)) == nullptr) {
-	            lastp = dbp + mlen ;
-	        }
-	        i = lastp - dbp ;
-	        dbp += i ;
-	        fp->bp += i ;
-#else
-	        bp = fp->bp ;
-	        lastp = fp->bp + mlen ;
-	        while (bp < lastp) {
-	            if (isoureol(*dbp++ = *bp++)) break ;
-	        }
-	        i = bp - fp->bp ;
-	        fp->bp += i ;
-#endif /* CF_MEMCCPY */
-
+		if constexpr (f_memcpy) {
+	            if ((lastp = stpccpy(dbp,fp->bp,'\n',mlen)) == np) {
+	                lastp = dbp + mlen ;
+	            }
+	            i = lastp - dbp ;
+	            dbp += i ;
+	            fp->bp += i ;
+		} else {
+	            bp = fp->bp ;
+	            lastp = fp->bp + mlen ;
+	            while (bp < lastp) {
+	                if (isoureol(*dbp++ = *bp++)) break ;
+	            }
+	            i = bp - fp->bp ;
+	            fp->bp += i ;
+		} /* end if-constexpr (f_memcpy) */
 	        fp->len += i ;
 	        runoff += i ;
 	        tlen += i ;
 	        if ((i > 0) && isoureol(dbp[-1])) break ;
-
 	    } /* end if (move it) */
 
 /* if we were file size limited */
@@ -193,6 +213,7 @@ static int breadlnmap(bfile *fp,char *ubuf,int ulen) noex {
 /* end subroutine (breadlnmap) */
 
 static int breadlnreg(bfile *fp,char *ubuf,int ulen,int to) noex {
+	cnullptr	np{} ;
 	cint		opts = FM_TIMED ;
 	int		rs = SR_OK ;
 	int		mlen ;
@@ -215,30 +236,26 @@ static int breadlnreg(bfile *fp,char *ubuf,int ulen,int to) noex {
 	    if ((rs >= 0) && (mlen > 0)) {
 	        char	*bp ;
 	        char	*lastp ;
-
-#if	CF_MEMCCPY
-	        if ((lastp = memccpy(dbp,fp->bp,'\n',mlen)) == nullptr) {
-	            lastp = dbp + mlen ;
-	        }
-	        i = lastp - dbp ;
-	        dbp += i ;
-	        fp->bp += i ;
-#else
-	        bp = fp->bp ;
-	        lastp = fp->bp + mlen ;
-	        while (bp < lastp) {
-	            if (isoureol(*dbp++ = *bp++)) break ;
-	        } /* end while */
-	        i = bp - fp->bp ;
-	        fp->bp += i ;
-#endif /* CF_MEMCCPY */
-
+		if constexpr (f_memcpy) {
+	            if ((lastp = stpccpy(dbp,fp->bp,'\n',mlen)) == np) {
+	                lastp = dbp + mlen ;
+	            }
+	            i = lastp - dbp ;
+	            dbp += i ;
+	            fp->bp += i ;
+		} else {
+	            bp = fp->bp ;
+	            lastp = fp->bp + mlen ;
+	            while (bp < lastp) {
+	                if (isoureol(*dbp++ = *bp++)) break ;
+	            } /* end while */
+	            i = bp - fp->bp ;
+	            fp->bp += i ;
+		} /* end if-constexpr (f_memcpy) */
 	        fp->len -= i ;
 	        tlen += i ;
 	        if ((i > 0) && isoureol(dbp[-1])) break ;
-
 	        ulen -= mlen ;
-
 	    } /* end if (move it) */
 
 	} /* end while (trying to satisfy request) */

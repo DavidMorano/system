@@ -1,7 +1,7 @@
 /* bseek SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package (BFILE) */
+/* "Basic I-O" package (BFILE) */
 /* version %I% last-modified %G% */
 
 

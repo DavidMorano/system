@@ -1,7 +1,7 @@
 /* breserve SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package */
+/* "Basic I-O" package */
 /* last modifed %G% version %I% */
 
 

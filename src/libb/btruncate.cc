@@ -1,7 +1,7 @@
 /* btruncate SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to "stdio" */
+/* "Basic I-O" package similiar to "stdio" */
 /* version %I% last-modified %G% */
 
 

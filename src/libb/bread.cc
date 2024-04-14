@@ -1,7 +1,7 @@
 /* bread SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
+/* "Basic I-O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
 #define	CF_MEMCPY	1		/* use |memcpy(3c)| */
@@ -14,7 +14,7 @@
 	= 1999-01-10, David A­D­ Morano
 	Wow, I finally got around to adding memory mapping to this
 	thing! Other subroutines of mine have been using memory
-	mapped I/O for years but this is one of those routines where
+	mapped I-O for years but this is one of those routines where
 	it should have been applied a long time ago because of its
 	big performance benefits! It is all a waste because it is
 	way slower than without it! This should teach me to leave

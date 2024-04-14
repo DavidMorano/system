@@ -18,7 +18,7 @@
 
 /*******************************************************************************
 
-	Unlike the standard I/O library, all writes of this library
+	Unlike the standard I-O library, all writes of this library
 	are atomic in that the entire portion of each write request
 	is actually written to the file as a whole. Each write block
 	is either written to the file as a single block or in
@@ -32,7 +32,7 @@
 
 	Both of the above features, as well as some other features
 	unique to this library, would normally make this package
-	slower than the standard I/O library, but this package is
+	slower than the standard I-O library, but this package is
 	normally faster than most versions of the standard package
 	and probably close in performance with some of the latest
 	implemtations which use some of the buffer management

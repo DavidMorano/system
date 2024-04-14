@@ -1,7 +1,7 @@
 /* bsupport SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package (BFILE) */
+/* "Basic I-O" package (BFILE) */
 /* last modifed %G% version %I% */
 
 

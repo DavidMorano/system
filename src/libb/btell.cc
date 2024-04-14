@@ -1,7 +1,7 @@
 /* btell SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package (BIO) */
+/* "Basic I-O" package (BIO) */
 /* version %I% last-modified %G% */
 
 

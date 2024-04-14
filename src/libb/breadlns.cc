@@ -69,6 +69,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int breadlns(bfile *fp,char *lbuf,int llen,int to,int *lcp) noex {

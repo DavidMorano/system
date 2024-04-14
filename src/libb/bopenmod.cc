@@ -1,7 +1,7 @@
 /* bopenmod SUPPORT */
 /* lang=C++20 */
 
-/* "Basic I/O" package similiar to some other thing whose initials is "stdio" */
+/* "Basic I-O" package similiar to some other thing whose initials is "stdio" */
 /* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
