@@ -84,6 +84,10 @@
 #define	RLIMIT		struct rlimit
 #endif
 
+#ifndef	RUSAGE
+#define	RUSAGE		struct rusage
+#endif
+
 #ifndef	SIGACTION
 #define	SIGACTION	struct sigaction
 #endif
