@@ -43,7 +43,8 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<localmisc.h>		/* 'LONG' type */
+#include	<stdintx.h>
+#include	<localmisc.h>
 
 #include	"ipow.h"
 
@@ -108,7 +109,7 @@ int ipow(int b,int n) noex {
 	            r = b * b ;
 	        } else if (n > 2) {
 	            cint	t = ipow(b,(n/2)) ;
-	            if ((n&1) == 0) {
+	            if ((n & 1) == 0) {
 		        r = (t * t) ;
 	            } else {
 		        r = b * (t * t) ;
@@ -123,6 +124,24 @@ int ipow(int b,int n) noex {
 	return r ;
 }
 /* end subroutine (ipow) */
+
+long llpow(long b,int n) noex {
+	long		v = 1 ;
+	for (int i = 1 ; i < n ; i += 1) {
+ 	    v *= b ;
+	}
+	return v ;
+}
+/* end subroutine (lpow) */
+
+longlong llpow(longlong b,int n) noex {
+	longlong	v = 1 ;
+	for (int i = 1 ; i < n ; i += 1) {
+ 	    v *= b ;
+	}
+	return v ;
+}
+/* end subroutine (llpow) */
 
 
 /* local subroutines */

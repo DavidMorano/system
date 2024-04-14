@@ -39,7 +39,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<climits>		/* <- |CHAR_BIT| */
 #include	<bit>
 #include	<utypedefs.h>
@@ -47,6 +46,9 @@
 #include	<localmisc.h>
 
 #include	"powtwo.h"
+
+
+/* local defines */
 
 
 /* imported namespaces */
@@ -84,6 +86,9 @@ static inline int flbsi(int v) noex {
 	return bn ;
 }
 /* end subroutine-template (flbsi) */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

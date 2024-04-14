@@ -1051,6 +1051,11 @@ strlistx.o:		strlistx.dir
 strlistx.dir:
 	makesubdir $@
 
+# POW
+pow.o:			pow.dir
+pow.dir:
+	makesubdir $@
+
 
 # UCINET
 ucinetconv.o:		ucinetconv.cc ucinetconv.h
