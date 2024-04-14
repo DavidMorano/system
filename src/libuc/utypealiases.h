@@ -251,6 +251,10 @@
 #define	CITIMERSPEC	const ITIMERSPEC
 #endif
 
+#ifndef	CUTIMBUF
+#define	CUTIMBUF	const UTIMBUF
+#endif
+
 #ifndef	CSOCKADDR
 #define	CSOCKADDR	const SOCKADDR
 #endif
