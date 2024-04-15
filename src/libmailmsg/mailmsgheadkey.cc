@@ -1,4 +1,4 @@
-/* msgheadkey SUPPORT */
+/* mailmsgheadkey SUPPORT */
 /* lang=C++20 */
 
 /* extract the key from a mail-msg header field (c-string) */
@@ -16,12 +16,16 @@
 
 /*******************************************************************************
 
+	Name:
+	mailmsgheadkey
+
+	Description:
 	This subroutine extracts the key of a header key, if one
-	is present in the supplied buffer. A pointer to the key and
+	is present in the supplied buffer.  A pointer to the key and
 	the length of the key is returned (if a key was present).
 
 	Synopsis:
-	int msgheadkey(cchar *sp,int sl,cchar *kpp) noex
+	int mailmsgheadkey(cchar *sp,int sl,cchar *kpp) noex
 
 	Arguments:
 	sp		pointer to start of user supplied buffer
@@ -36,7 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
@@ -49,8 +52,14 @@
 
 /* local defines */
 
-#define	ISSPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
+#define	ISSPACETAB(c)	isspacetab(c)
 #define	ISKEYCHAR(c)	iskeychar(c)
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -61,8 +70,12 @@
 
 /* forward references */
 
-static inline bool iskeychar(int c) noex {
-	return (isalnumlatin(c) || ((c) == '-') || ((c) == '_')) ;
+static inline bool isspacetab(int ch) noex {
+	return ((ch == ' ') || (ch == '\t')) ;
+}
+
+static inline bool iskeychar(int ch) noex {
+	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
 }
 
 
