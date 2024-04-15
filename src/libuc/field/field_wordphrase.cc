@@ -21,6 +21,8 @@
 	Name:
 	field_wordphrase
 
+	Description:
+
 	Synopsis:
 	int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex
 
@@ -32,7 +34,7 @@
 
 	Returns:
 	>=0	length of field just parsed out (length of FIELD!)
-	<0	invalid field block pointer was passwd (system-return)
+	<0	invalid field block pointer was passed (system-return)
 
 	The return status block outputs are:
 	- length remaining in string
@@ -118,9 +120,9 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	int		fl = -1 ;
 	if (op && fbuf) {
 	    if (op->lp) {
-	        int		ll = op->ll ;
-	        int		term = '\0' ;
-	        cchar		*lp = op->lp ;
+	        int	term = '\0' ;
+	        int	ll = op->ll ;
+	        cchar	*lp = op->lp ;
 	        if (terms == nullptr) terms = shterms ;
 	        while ((ll > 0) && CHAR_ISWHITE(*lp)) {
 	            lp += 1 ;
@@ -131,7 +133,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	            int		ch = 0 ;
 	            char	*bp = fbuf ;
 	            while (ll > 0) {
-			int	nch ;
+			int	nch = 0 ;
 			int	qe ;
 	                ch = mkchar(*lp) ;
 	                if (BATST(terms,ch) & (! BATST(dquote,ch))) break ;
@@ -171,7 +173,7 @@ int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
 	                            lp += 1 ;
 	                            ll -= 1 ;
 	                        } /* end if */
-	                    } /* end while (processing the quoted portion) */
+	                    } /* end while (processing quoted portion) */
 	                } else if (ch == '\'') {
 		            qe = ch ;
 		            lp += 1 ;

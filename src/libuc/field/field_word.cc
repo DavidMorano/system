@@ -26,10 +26,10 @@
 	is assumed.
 
 	Synopsis:
-	int field_word(field *fsbp,cchar *terms,cchar **fpp) noex
+	int field_word(field *op,cchar *terms,cchar **fpp) noex
 
 	Arguments:
-	fsbp	address of return status block
+	op	address of return status block
 	terms	address of terminator block
 	fpp	pointer to result pointer
 
@@ -91,13 +91,13 @@ static constexpr cchar		wterms[] = {
 
 /* exported subroutines */
 
-int field_word(field *fsbp,cchar *terms,cchar **fpp) noex {
+int field_word(field *op,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
 	int		fl = -1 ;
-	if (fsbp) {
-	    int		ll = fsbp->ll ;
+	if (op) {
+	    int		ll = op->ll ;
 	    int		chterm = '\0' ;
-	    cchar	*lp = fsbp->lp ;
+	    cchar	*lp = op->lp ;
 	    cchar	*fp = nullptr ;
 	    rs = SR_OK ;
 	    if (terms == nullptr) terms = wterms ;
@@ -133,13 +133,13 @@ int field_word(field *fsbp,cchar *terms,cchar **fpp) noex {
 	            ll -= 1 ;
 	        } /* end if */
 	    } /* end if (positive) */
-	    fsbp->lp = lp ;
-	    fsbp->ll = ll ;
-	    fsbp->fp = (fl >= 0) ? fp : nullptr ;
-	    fsbp->fl = fl ;
-	    fsbp->term = chterm ;
+	    op->lp = lp ;
+	    op->ll = ll ;
+	    op->fp = (fl >= 0) ? fp : nullptr ;
+	    op->fl = fl ;
+	    op->term = chterm ;
 	    if (fpp) {
-	        *fpp = fsbp->fp ;
+	        *fpp = op->fp ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
