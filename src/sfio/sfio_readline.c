@@ -20,7 +20,7 @@
 
 /*******************************************************************************
 
-	This is a read subroutine for Safe-Fast (SF) Input-Output (I/O).
+	This is a read subroutine for Safe-Fast (SF) Input-Output (I-O).
 
 
 *******************************************************************************/

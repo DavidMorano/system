@@ -29,7 +29,7 @@
 	Notes:
 
 	1. If we are *outside* of KSH, we want to switch to using
-	the BFILE (our own) I/O even if the file we are to operate
+	the BFILE (our own) I-O even if the file we are to operate
 	on is one of the "standard" (in, out, err) files.  We do
 	this so that we do not have to use the crazy SFIO where we
 	do not really need it.  When we are *inside* KSH, we have

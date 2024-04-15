@@ -17,19 +17,44 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<climits>		/* <- for |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |atoi(3c)| */
 #include	<cstdio>
 #include	<cstring>
 #include	<iostream>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<baops.h>
+#include	<strn.h>
+#include	<sfx.h>
+#include	<ccfile.hh>
+#include	<strnul.hh>
+#include	<hasx.h>
+#include	<localmisc.h>		/* |MAXLINELEN| */
 
 
 /* local defines */
+
+#define	MAXLINE		MAXLINELEN
 
 
 /* local typedefs */
 
 static void showchars(cchar *) noexcept ;
 static void showterms(cchar *) noexcept ;
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* forward references */
+
+static void	procfile(cchar *) noex ;
 
 
 /* local variables */
@@ -224,11 +249,12 @@ static constexpr cchar	varsub_fterms[32] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int main(int,cchar **,cchar **) {
-	const char	a[] = R"xx( \r\n\" )xx" ;
-	showchars(a) ;
+int main(int argc,mainv argv,mainv) {
 	showterms(quotes) ;
 	showterms(doubles) ;
 	showterms(dterms) ;
@@ -247,6 +273,9 @@ int main(int,cchar **,cchar **) {
 	showterms(uterm_uterms) ;
 	printf("varsub_fterms\n") ;
 	showterms(varsub_fterms) ;
+	if (argc > 1) {
+	    procfile(argv[1]) ;
+	} /* end if (argument) */
 }
 /* end subroutine (main) */
 
@@ -279,5 +308,57 @@ static void showterms(cchar *terms) noexcept {
 	printf("\n") ;
 }
 /* end subroutine (showterms) */
+
+namespace {
+    struct termer {
+	int	idx = 0 ;
+	char	terms[termsize] = {} ;
+	accum(cchar *sp,int sl) noex {
+	} ;
+    } ; /* end struct (termer) */
+}
+
+static void procfile(cchar *fn) noex {
+	termer		to ;
+	int		rs ;
+	if ((rs = readterms(&to,fn)) >= 0) {
+	}
+}
+/* end subroutine (procfile) */
+
+static int procline(termer *top,cchar *lp,int ll) noex {
+	int		rs = SR_OK ;
+	int		cl ;
+	cchar		*cp{} ;
+
+	return rs ;
+}
+
+static int readterms(termer *top,cchar *fn) noex {
+        cint            llen = MAXLINE ;
+        char            *lbuf ;
+        int             rs = SR_NOMEM ;
+        int             rs1 ;
+        if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
+            try {
+                ccfile          fis ;
+                if ((rs = fis.open(fnshells)) >= 0) {
+                    while ((rs = fis.readln(lbuf,llen)) > 0) {
+			cchar	*cp{} ;
+			if (int cl ; (cl = sfcontent(lbuf,rs,&cp)) > 0) {
+			    rs = procline(top,cp,cl) ;
+                        } /* end if (hasnotempty) */
+                    } /* end while */
+                    rs1 = fis.close ;
+                    if (rs >= 0) rs = rs1 ;
+                } /* end if (opened) */
+            } catch (...) {
+                rs = SR_IO ;
+            }
+            delete [] lbuf ;            
+        } /* end if (m-a-f) */          
+        return rs ;
+}
+/* end subroutine (readterms) */
 
 

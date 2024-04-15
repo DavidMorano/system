@@ -1,4 +1,4 @@
-/* main */
+/* main SUPPORT */
 /* lang=C20 */
 
 /* show the bits set representing terminating characters */
@@ -25,7 +25,6 @@
 ******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<csignal>
 #include	<unistd.h>
@@ -92,15 +91,6 @@ static int	adesc_finish(struct adesc *) ;
 
 /* local variables */
 
-static const char *argopts[] = {
-	"ROOT",
-	"VERSION",
-	"VERBOSE",
-	"TMPDIR",
-	"HELP",
-	NULL
-} ;
-
 enum argopts {
 	argopt_root,
 	argopt_version,
@@ -108,6 +98,15 @@ enum argopts {
 	argopt_tmpdname,
 	argopt_help,
 	argopt_overlast
+} ;
+
+static constexpr cpcchar	argopts[] = {
+	"ROOT",
+	"VERSION",
+	"VERBOSE",
+	"TMPDIR",
+	"HELP",
+	nullptr
 } ;
 
 static const struct pivars	initvars = {
@@ -154,15 +153,15 @@ int main(int argc,cchar *argv[],cchar *envv[]) {
 	int		f ;
 
 	const char	*argp, *aop, *akp, *avp ;
-	const char	*afname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*ifname = NULL ;
-	const char	*pr = NULL ;
+	const char	*afname = nullptr ;
+	const char	*ofname = nullptr ;
+	const char	*ifname = nullptr ;
+	const char	*pr = nullptr ;
 	const char	*cp ;
 	char		argpresent[MAXARGGROUPS] ;
 
 #if	CF_DEBUGS || CF_DEBUG
-	if ((cp = getourenv(envv,VARDEBUGFNAME)) != NULL) {
+	if ((cp = getourenv(envv,VARDEBUGFNAME)) != nullptr) {
 	    rs = debugopen(cp) ;
 	    debugprintf("main: starting DFD=%d\n",rs) ;
 	}
@@ -174,10 +173,10 @@ int main(int argc,cchar *argv[],cchar *envv[]) {
 	    goto ret0 ;
 	}
 
-	if ((cp = getourenv(envv,VARBANNER)) == NULL) cp = BANNER ;
+	if ((cp = getourenv(envv,VARBANNER)) == nullptr) cp = BANNER ;
 	rs = proginfo_setbanner(pip,cp) ;
 
-	if ((cp = getenv(VARERRORFNAME)) != NULL) {
+	if ((cp = getenv(VARERRORFNAME)) != nullptr) {
 	    rs = bopen(&errfile,cp,"wca",0666) ;
 	} else
 	    rs = bopen(&errfile,BFILE_STDERR,"dwca",0666) ;
@@ -225,14 +224,14 @@ int main(int argc,cchar *argv[],cchar *envv[]) {
 	            akp = aop ;
 	            aol = argl - 1 ;
 	            f_optequal = FALSE ;
-	            if ((avp = strchr(aop,'=')) != NULL) {
+	            if ((avp = strchr(aop,'=')) != nullptr) {
 	                f_optequal = TRUE ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
 	                aol = akl ;
 	            } else {
-			avp = NULL ;
+			avp = nullptr ;
 	                avl = 0 ;
 	                akl = aol ;
 	            }
@@ -383,7 +382,7 @@ int main(int argc,cchar *argv[],cchar *envv[]) {
 	}
 
 	if (f_help)
-	    printhelp(NULL,pip->pr,pip->searchname,HELPFNAME) ;
+	    printhelp(nullptr,pip->pr,pip->searchname,HELPFNAME) ;
 
 	if (f_version || f_help || f_usage)
 	    goto retearly ;
@@ -416,8 +415,8 @@ int main(int argc,cchar *argv[],cchar *envv[]) {
 
 /* check a few more things */
 
-	if (pip->tmpdname == NULL) pip->tmpdname = getenv(VARTMPDNAME) ;
-	if (pip->tmpdname == NULL) pip->tmpdname = TMPDNAME ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = getenv(VARTMPDNAME) ;
+	if (pip->tmpdname == nullptr) pip->tmpdname = TMPDNAME ;
 
 /* OK, we do it */
 
@@ -442,7 +441,7 @@ int main(int argc,cchar *argv[],cchar *envv[]) {
 	    debugprintf("main: opening input\n") ;
 #endif
 
-	if (ifname != NULL) {
+	if (ifname != nullptr) {
 	    rs = bopen(ifp,ifname,"r",0666) ;
 	} else
 	    rs = bopen(ifp,BFILE_STDIN,"dr",0666) ;
@@ -570,8 +569,9 @@ goodret:
 done:
 retearly:
 ret1:
-	if (pip->efp != NULL)
+	if (pip->efp != nullptr) {
 	    bclose(pip->efp) ;
+	}
 
 	proginfo_finish(pip) ;
 
@@ -598,24 +598,18 @@ badarg:
 
 /* local subroutines */
 
-
-static int usage(pip)
-PROGINFO	*pip ;
-{
-	int	rs ;
-	int	wlen ;
-
-
-	wlen = 0 ;
-	rs = bprintf(pip->efp,
-	    "%s: USAGE> %s [-v]\n",
-	    pip->progname,pip->progname) ;
-
-	wlen += rs ;
+static int usage(PROGINFO *pip) noex {
+	int	rs = SR_OK ;
+	int	wlen = 0 ;
+	if (pip->efp) {
+	    cchar	*pn = pip->progname ;
+	    cchar	*fmt = "%s: USAGE> %s [-v]\n" ;
+	    rs = bprintf(pip->efp,fmt,pn,pn) ;
+	    wlen += rs ;
+	}
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (usage) */
-
 
 static int adesc_start(struct adesc *adp)
 {

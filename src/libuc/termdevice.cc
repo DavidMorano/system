@@ -13,7 +13,7 @@
         fact that the Sun Solaris 2.5.1 POSIX version of 'ttyname_r' does not
         appear to work. I got the idea for this subroutine from the GNU standard
         C library implementation. It seems like Slowlaris 5.x certainly had a
-        lot of buggy problems (sockets, I/O, virtual memory, more)!
+        lot of buggy problems (sockets, I-O, virtual memory, more)!
 
 	= 2011-10-12, David A­D­ Morano
         I am changing the order of attempts to put 'ttyname_r(3c)' before

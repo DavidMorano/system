@@ -295,7 +295,7 @@ char    *machine;
 #else
 	sockt_wr = dup(sockt_rd);
 	/*
-	 * Now we'll make file pointers (i.e., buffered I/O) out of
+	 * Now we'll make file pointers (i.e., buffered I-O) out of
 	 * the socket file descriptor.  Note that we can't just
 	 * open a fp for reading and writing -- we have to open
 	 * up two separate fp's, one for reading, one for writing.

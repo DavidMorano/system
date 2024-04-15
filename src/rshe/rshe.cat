@@ -250,8 +250,8 @@
 
           You cannot run an interactive command (such as vvvviiii(1) ); use
           rrrrllllooooggggiiiinnnn if you wish to do so.  This is a major short coming
-          of I/O development on the UNIX operating system platform.
-          Even with STREAMS, I/O has not progressed significantly to
+          of I-O development on the UNIX operating system platform.
+          Even with STREAMS, I-O has not progressed significantly to
           even match some of the capabilities of other (now almost
           obsolete) operating systems.  How will the UNIX operating
           system stack up to MS-Windows, MS-Windows NT, or Apple's
@@ -306,9 +306,9 @@
           gram along with its arguments (no funny business).
 
           The ----nnnn option should not have to exist.  It does exist
-          because of some fundamental flaws in the way in which I/O is
+          because of some fundamental flaws in the way in which I-O is
           handled in both old (non-STREAMS) and new (STREAMS) versions
-          of UNIX.  These I/O limitations do not exist in operating
+          of UNIX.  These I-O limitations do not exist in operating
           systems such as DEC's RSM-11M or DEC's VMS but, of course,
           these operating systems suffer from other problems (possibly
           quite numerous) also.  The ----nnnn option simple directs the rrrrsssshhhheeee
@@ -318,8 +318,8 @@
           naively, reads its standard input becuase it is too stupid
           to know when the remote command issues a read to its stan-
           dard input.  This behavior can be ultimately traced to a
-          fundamental flaw in the I/O subsystem of the UNIX operating
-          system.  The UNIX operating system's I/O STREAM head
+          fundamental flaw in the I-O subsystem of the UNIX operating
+          system.  The UNIX operating system's I-O STREAM head
           (STREAMS is assumed for this discussion) does not provide
 
 

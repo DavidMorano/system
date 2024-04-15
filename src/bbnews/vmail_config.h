@@ -181,7 +181,7 @@
 
 #define	SCANPERCENT	25		/* default percent of lines for SCAN */
 
-/* terminal I/O definitions */
+/* terminal I-O definitions */
 
 /* columns of fields: start with the number zero ('0'), not one ('1') */
 #define	COL_NEWMAIL	2		/* "new-mail" indicator */

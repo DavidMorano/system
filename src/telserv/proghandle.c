@@ -298,7 +298,7 @@ uchar_t	wont[] = { (uchar_t)IAC, (uchar_t)WONT, '%', 'c', 0 };
 struct sockaddr_in6 sin6 = { AF_INET6 };
 
 /*
- * I/O data buffers, pointers, and counters.
+ * I-O data buffers, pointers, and counters.
  */
 
 char	ptyibuf[BUFSIZ], *ptyip = ptyibuf;
@@ -3140,7 +3140,7 @@ showbanner()
 					oldshell = (char *)NULL;
 				if (fp = popen(evalbuf, "r")) {
 					/*
-					 *	Pipe I/O atomicity guarantees we
+					 *	Pipe I-O atomicity guarantees we
 					 *	need only one read.
 					 */
 					if (fread(buf, 1, sizeof (buf), fp)) {

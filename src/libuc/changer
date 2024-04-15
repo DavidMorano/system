@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} bfile_bm "
+NAMES="${NAMES} I/O "
 
 
 DN=/dev/null
@@ -10,11 +10,9 @@ DN=/dev/null
 for F in "${@}" ; do
   if [[ -r "${F}" ]] ; then
     for N in ${NAMES} ; do
-      if fgrep ${N} $F > ${DN} ; then
+      if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/bfile_bmall/s//bfilebm_all/g
-g/bfile_bmline/s//bfilebm_line/g
-g/bfile_bmnone/s//bfilebm_none/g
+g/I\/O/s//I-O/g
 	w
 	q
 EOF

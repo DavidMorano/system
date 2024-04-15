@@ -36,7 +36,7 @@
 
 	Returns:
 	>=0		number bytes returned to caller (not bytes read)
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -50,8 +50,7 @@
 
 #define	TO_READ		(5*60)
 
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
+#define	ISCONT(b,bl)	iscont(b,bl)
 
 
 /* external subroutines */
@@ -65,6 +64,14 @@
 
 /* forward references */
 
+static bool iscont(cchar *lp,int ll) noex {
+	bool		f = true ;
+	f = f && (ll >= 2) ;
+	f = f && (lp[ll - 1] == '\n') ;
+	f = f && (lp[ll - 2] == '\\') ;
+	return f ;
+}
+
 
 /* local variables */
 
@@ -76,22 +83,22 @@
 
 int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex {
 	int		rs ;
-	int		i = 0 ;		/* result-buffer length */
+	int		rl = 0 ;	/* result-buffer length */
 	int		lines = 0 ;
 	if ((rs = bfile_magic(op,lbuf)) > 0) {
 	    if ((rs = bfile_rd(op)) >= 0) {
 	        bool	f_cont = false ;
-	        while ((lines == 0) || (f_cont = ISCONT(lbuf,i))) {
-	            if (f_cont) i -= 2 ;
-	            rs = breadlnto(op,(lbuf + i),(llen - i),to) ;
+	        while ((lines == 0) || ((f_cont = ISCONT(lbuf,rl)))) {
+	            if (f_cont) rl -= 2 ;
+	            rs = breadlnto(op,(lbuf + rl),(llen - rl),to) ;
 	            if (rs <= 0) break ;
-	            i += rs ;
+	            rl += rs ;
 	            lines += 1 ;
 	        } /* end while */
 	    } /* end if (readling) */
 	} /* end if (magic) */
 	if (lcp) *lcp  = lines ;
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (breadlns) */
 

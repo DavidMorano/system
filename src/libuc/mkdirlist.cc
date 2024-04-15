@@ -24,7 +24,7 @@
 	Create a list of pathnames for each newsgroup in the spool
 	area.  This routine is called with the path to the spool
 	area directory.  The routine returns two open file pointers
-	(Basic I/O).  These file pointers must be eventually closed
+	(Basic I-O).  These file pointers must be eventually closed
 	by the calling routine or somebody!
 
 	One returned file pointer is to a file of the path names.

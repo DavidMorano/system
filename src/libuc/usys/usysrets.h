@@ -61,7 +61,7 @@ enum errnomssings {
 #define	SR_NOENT	(- ENOENT)	/* No such file or directory */
 #define	SR_SRCH		(- ESRCH)	/* No such process */
 #define	SR_INTR		(- EINTR)	/* interrupted system call */
-#define	SR_IO		(- EIO)		/* I/O error */
+#define	SR_IO		(- EIO)		/* I-O error */
 #define	SR_NXIO		(- ENXIO)	/* No such device or address */
 #define	SR_2BIG		(- E2BIG)	/* Arg list too long */
 #define	SR_NOEXEC	(- ENOEXEC)	/* Exec format error */

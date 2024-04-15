@@ -57,7 +57,7 @@
  *		sort of error (e.g., syntax error).
  *	EX_CANTCREAT (73) -- A (user specified) output file cannot be
  *		created.
- *	EX_IOERR (74) -- An error occurred while doing I/O on some file.
+ *	EX_IOERR (74) -- An error occurred while doing I-O on some file.
  *	EX_TEMPFAIL (75) -- temporary failure, indicating something that
  *		is not really an error.  In sendmail, this means
  *		that a mailer (e.g.) could not create a connection,

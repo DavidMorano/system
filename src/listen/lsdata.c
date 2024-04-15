@@ -62,7 +62,7 @@ errlist err_list[] = {
 
 {"An error occurred during network initialization",	61},
 
-{"An I/O error occurred while reading the listener data base", 71},
+{"An I-O error occurred while reading the listener data base", 71},
 
 {"ATT service: unknown version",			81},
 {"ATT service: bad message format",			82},

@@ -187,7 +187,7 @@ int main(int argc,cchar *argv,cchar *envv)
 	if (keyp == ((unsigned char *) 0)) goto nokey ;
 
 
-/* open the input file using Basic I/O */
+/* open the input file using Basic I-O */
 
 	if (ifname == NULL) ifname = BFILE_STDIN ;
 

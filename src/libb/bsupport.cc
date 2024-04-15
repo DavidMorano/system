@@ -47,7 +47,7 @@
 
 /* exported subroutines */
 
-int bfile_bufreset(bfile *) noex {
+int bfile_bufreset(bfile *op) noex {
 	op->bp = op->bdata ;
 	op->bbp = op->bdata ;
 	op->len = 0 ;
@@ -56,7 +56,7 @@ int bfile_bufreset(bfile *) noex {
 
 int bfile_acc(bfile *op,bool fwr) noex {
 	int		rs ;
-	if (fn) {
+	if (fwr) {
 	    rs = bfile_rd(op) ;
 	} else {
 	    rs = bfile_wr(op) ;
@@ -84,8 +84,8 @@ int bfile_wr(bfile *op) noex {
 	    rs = SR_OK ;
 	    if (! op->f.writing) {
 		if ((rs = bfile_bufreset(op)) >= 0) {
-	            if ((! fp->f.notseek) && (! op->f.append)) {
-	                rs = u_seek(fp->fd,fp->offset,SEEK_SET) ;
+	            if ((! op->f.notseek) && (! op->f.append)) {
+	                rs = u_seek(op->fd,op->offset,SEEK_SET) ;
 	            }
 		}
 		op->f.writing = true ;
