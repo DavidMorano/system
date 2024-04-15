@@ -47,23 +47,59 @@
 
 /* exported subroutines */
 
-int bfile_access(bfile *op,bool fm) noex {	
-	cint		am = op->am ;
-	int		rs = SR_OK ;
-	
+int bfile_bufreset(bfile *) noex {
+	op->bp = op->bdata ;
+	op->bbp = op->bdata ;
+	op->len = 0 ;
+	return SR_OK ;
+}
 
-
-	(void) am ;
-	(void) fm ;
+int bfile_acc(bfile *op,bool fwr) noex {
+	int		rs ;
+	if (fn) {
+	    rs = bfile_rd(op) ;
+	} else {
+	    rs = bfile_wr(op) ;
+	}
 	return rs ;
 }
-/* end subroutine (bfile_access) */
+/* end subroutine (bfile_acc) */
+
+int bfile_rd(bfile *op) noex {	
+	int		rs = SR_BADF ;
+	if (op->f.rd) {
+	    rs = SR_OK ;
+	    if (op->f.writing) {
+		rs = bfile_flush(op) ;
+		op->f.writing = false ;
+	    }
+	} /* end if (access allowed) */
+	return rs ;
+}
+/* end subroutine (bfile_rd) */
+
+int bfile_wr(bfile *op) noex {	
+	int		rs = SR_BADF ;
+	if (op->f.wr) {
+	    rs = SR_OK ;
+	    if (! op->f.writing) {
+		if ((rs = bfile_bufreset(op)) >= 0) {
+	            if ((! fp->f.notseek) && (! op->f.append)) {
+	                rs = u_seek(fp->fd,fp->offset,SEEK_SET) ;
+	            }
+		}
+		op->f.writing = true ;
+	    } /* end if (not previously writing */
+	} /* end if (access allowed) */
+	return rs ;
+}
+/* end subroutine (bfile_wr) */
 
 int bfile_flushn(bfile *op,int n) noex {
 	int		rs = SR_OK ;
 	int		len = 0 ;
 	if (n != 0) {
-	    bool	f_sa = (! op->f.notseek) && (op->oflags & O_APPEND) ;
+	    bool	f_sa = (! op->f.notseek) && (op->of & O_APPEND) ;
 	    if (f_sa) {
 	        off_t	o{} ;
 	        rs = u_seeko(op->fd,0LL,SEEK_END,&o) ;

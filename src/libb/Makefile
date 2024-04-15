@@ -37,7 +37,7 @@ LINT=	lint
 DEFS +=
 
 
-INCS += bfile.h
+INCS += libb.h bfile.h
 
 
 LIBS +=

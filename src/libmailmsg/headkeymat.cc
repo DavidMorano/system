@@ -54,8 +54,6 @@
 #include	<strn.h>
 #include	<strwcmp.h>
 #include	<sfx.h>
-#include	<six.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"headkeymat.h"
@@ -83,7 +81,7 @@ int headkeymat(cchar *key,cchar *hbuf,int hlen) noex {
 	int		len = 0 ;
 	if (key && hbuf) {
 	    if (char *tp ; (tp = strnochr(hbuf,hlen,':')) != nullptr) {
-		int	vi = ((tp + 1) - hbuf) ;
+		cint	vi = ((tp + 1) - hbuf) ;
 	        cchar	*cp{} ;
 		if (int cl ; (cl = sfshrink(hbuf,(tp - hbuf),&cp)) > 0) {
 		    if (strwcmp(key,cp,cl) == 0) {

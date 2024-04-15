@@ -65,11 +65,6 @@
 static int bfile_rdmap(bfile *,void *,int,int,int) noex ;
 static int bfile_rdreg(bfile *,void *,int,int,int) noex ;
 
-static inline int breading(bfile *op) noex {
-	cint	am = (op->oflags & 0x03) ;
-	return ((am == O_RDWR) || (am == O_RDONLY)) ? SR_OK : SR_BADF ;
-}
-
 
 /* local variables */
 
@@ -84,18 +79,12 @@ constexpr bool		f_memcpy = CF_MEMCPY ;
 int breade(bfile *op,void *ubuf,int ulen,int to,int opts) noex {
 	int		rs ;
 	if ((rs = bfile_magic(op,ubuf)) > 0) {
-	    if ((rs = breading(op)) >= 0) {
-	        if (op->f.write) {
-	            if (op->len > 0) rs = bfile_flush(op) ;
-	            op->f.write = false ;
-	        } /* end if (switching from writing to reading) */
-	        if (rs >= 0) {
-	            if (op->f.mapinit) {
-	                rs = bfile_rdmap(op,ubuf,ulen,to,opts) ;
-	            } else {
-	                rs = bfile_rdreg(op,ubuf,ulen,to,opts) ;
-	            }
-	        } /* end if */
+	    if ((rs = bfile_rd(op)) >= 0) {
+	        if (op->f.mapinit) {
+	            rs = bfile_rdmap(op,ubuf,ulen,to,opts) ;
+	        } else {
+	            rs = bfile_rdreg(op,ubuf,ulen,to,opts) ;
+	        }
 	    } /* end if (reading) */
 	} /* end if (magic) */
 	return rs ;

@@ -1,22 +1,21 @@
-/* msfile_best */
+/* msfile_best SUPPORT */
+/* lang=C++20 */
 
 /* find the "best" machine entry */
 /* version %I% last-modified %G% */
 
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_GETEXECNAME	1		/* get the 'exec(2)' name */
 #define	CF_FLOAT	0		/* use floating point */
 #define	CF_CPUSPEED	0		/* no use here */
 
-
 /* revision history:
 
 	= 2004-01-10, David A­D­ Morano
-        :-) It cracks me up how I take one program and make another from it! :-)
-        This program is now a built-in command (MSU) to the KSH program to
-        update the machine status for the current node in the cluster. [added
-        for program checking -- ((]
+	:-) It cracks me up how I take one program and make another
+	from it! :-) This program is now a built-in command (MSU)
+	to the KSH program to update the machine status for the
+	current node in the cluster. [added for program checking
+	-- ((]
 
 	= 2004-01-12, David A­D­ Morano
 	This program is now the MSINFO KSH built-in command.
@@ -27,26 +26,21 @@
 
 /*******************************************************************************
 
-        This subroutine provides an additional method to the MSFILE object. It
-        finds the best of the entries given a couple of optional restrictions.
-
+	This subroutine provides an additional method to the MSFILE
+	object. It finds the best of the entries given a couple of
+	optional restrictions.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<netdb.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
 #include	<vecobj.h>
@@ -67,20 +61,20 @@
 /* external subroutines */
 
 
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int msfile_best(msp,daytime,flags,ep)
-MSFILE		*msp ;
-time_t		daytime ;
-uint		flags ;
-MSFILE_ENT	*ep ;
-{
+int msfile_best(MSFILE *msp,time_t daytime,int flags,MSFILE_ENT *ep) noex {
 	MSFILE_CUR	cur ;
 	MSFILE_ENT	be ;
 	double		capacity, used ;
 	double		bestavail, avail, empty ;
-	const int	nl = MSFILE_NODENAMELEN ;
+	cint		nl = MSFILE_NODENAMELEN ;
 	int		rs ;
 	int		rs1 ;
 	int		minspeed = INT_MAX ;
@@ -104,7 +98,8 @@ MSFILE_ENT	*ep ;
 
 	} /* end while */
 
-	msfile_curend(msp,&cur) ;
+	rs1 = msfile_curend(msp,&cur) ;
+	if (rs >= 0) rs = rs1 ;
 	} /* end if *cursor) */
 
 /* then find the one with the most available computation */
@@ -133,27 +128,14 @@ MSFILE_ENT	*ep ;
 
 	        avail = capacity - used ;
 
-#if	CF_DEBUGS
-	        debugprintf("msfile_best: n=%-10s c=%8.2f "
-			"u=%8.2f avail=%8.2f\n",
-	            be.nodename,capacity,used,avail) ;
-#endif
-
 		if (((! (flags & 1)) || (! (be.flags & MSFLAG_DISABLED))) &&
 			((! (flags & 2)) || (empty > 0.0))) {
 
 	            c += 1 ;
 
-#if	CF_DEBUGS
-	            debugprintf("msfile_best: best node=%s avail=%8.2f\n",
-	                be.nodename,avail) ;
-#endif
-
 	        if (avail > bestavail) {
-
 	            bestavail = avail ;
 	            memcpy(ep,&be,sizeof(MSFILE_ENT)) ;
-
 	        } /* end if (better) */
 
 		} /* end if (found one at all) */
@@ -162,7 +144,8 @@ MSFILE_ENT	*ep ;
 
 	    } /* end while */
 
-	    msfile_curend(msp,&cur) ;
+	    rs1 = msfile_curend(msp,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
 	    } /* end if (cursor) */
 
 	} /* end if */

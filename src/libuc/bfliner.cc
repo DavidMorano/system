@@ -103,7 +103,7 @@ int bfliner_readpending(bfliner *op) noex {
 }
 /* end subroutine (bfliner_readpending) */
 
-int bfliner_readline(bfliner *op,int llen,cchar **lpp) noex {
+int bfliner_readln(bfliner *op,int llen,cchar **lpp) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (op) {
@@ -126,7 +126,7 @@ int bfliner_readline(bfliner *op,int llen,cchar **lpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (bfliner_readline) */
+/* end subroutine (bfliner_readln) */
 
 int bfliner_readover(bfliner *op) noex {
 	int		rs = SR_FAULT ;

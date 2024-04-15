@@ -1,7 +1,7 @@
 /* fbliner HEADER */
 /* lang=C20 */
 
-/* special file-read line handling */
+/* file-buf (now FILER) file-read line handling */
 /* version %I% last-modified %G% */
 
 
@@ -52,10 +52,10 @@ typedef	FBLINER		fbliner ;
 EXTERNC_begin
 
 extern int fbliner_start(fbliner *,filer *,off_t,int) noex ;
-extern int fbliner_finish(fbliner *) noex ;
 extern int fbliner_getln(fbliner *,cchar **) noex ;
 extern int fbliner_done(fbliner *) noex ;
 extern int fbliner_seek(fbliner *,int) noex ;
+extern int fbliner_finish(fbliner *) noex ;
 
 EXTERNC_end
 

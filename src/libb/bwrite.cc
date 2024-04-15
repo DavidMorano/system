@@ -89,45 +89,20 @@ static int	bfile_bufcpy(bfile *,cchar *,int) noex ;
 
 /* exported subroutines */
 
-int bwrite(bfile *fp,cvoid *abuf,int alen) noex {
+int bwrite(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
-	if ((rs = bfile_magic(fp,abuf)) > 0) {
-	cchar	*abp = charp(abuf) ;
-	int		f_bufnone ;
-
-	if ((fp->oflags & O_ACCMODE) == 0) return SR_RDONLY ;
-
-	if (alen < 0) alen = strlen(abp) ;
-
-	f_bufnone = (fp->bm == bfile_bmnone) ;
-
-/* if we were not previously writing, seek to the proper place */
-
-	if (! fp->f.write) {
-
-	    if ((! fp->f.notseek) &&
-	        (! (fp->oflags & O_APPEND))) {
-
-	        rs = u_seek(fp->fd,fp->offset,SEEK_SET) ;
-
-	    }
-
-	    fp->len = 0 ;
-	    fp->bp = fp->bdata ;
-	    fp->f.write = true ;
-
-	} /* end if (previously reading) */
-
-/* check for a large 'write' */
-
-	if (rs >= 0) {
-	    if (f_bufnone) {
-	        rs = bfile_wbig(fp,abuf,alen) ;
-	    } else {
-	        rs = bfile_wreg(fp,abuf,alen) ;
-	    }
-	}
-
+	if ((rs = bfile_magic(op,abuf)) > 0) {
+	    if ((rs = bfile_wr(op)) >= 0) {
+	        cchar	*abp = charp(abuf) ;
+	        if (alen < 0) alen = strlen(abp) ;
+	        if (rs >= 0) {
+	            if (op->bm == bfilebm_none) {
+	                rs = bfile_wbig(op,abuf,alen) ;
+	            } else {
+	                rs = bfile_wreg(op,abuf,alen) ;
+	            }
+	        } /* end if (ok) */
+	    } /* end if (access) */
 	} /* end if (magic) */
 	return rs ;
 }
@@ -136,15 +111,15 @@ int bwrite(bfile *fp,cvoid *abuf,int alen) noex {
 
 /* local subroutines */
 
-static int bfile_wbig(bfile *fp,cvoid *abuf,int alen) noex {
+static int bfile_wbig(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs ;
-	if ((rs = bfile_flush(fp)) >= 0) {
+	if ((rs = bfile_flush(op)) >= 0) {
 	    int		abl = alen ;
 	    cchar	*abp = charp(abuf) ;
 	    while ((rs >= 0) && (abl > 0)) {
-	        if ((rs = uc_writen(fp->fd,abp,abl)) >= 0) {
+	        if ((rs = uc_writen(op->fd,abp,abl)) >= 0) {
 	            cint	len = rs ;
-	            fp->offset += len ;
+	            op->offset += len ;
 	            abp += len ;
 	            abl -= len ;
 	        }
@@ -154,21 +129,21 @@ static int bfile_wbig(bfile *fp,cvoid *abuf,int alen) noex {
 }
 /* end subroutine (bfile_wbig) */
 
-static int bfile_wreg(bfile *fp,cvoid *abuf,int alen) noex {
+static int bfile_wreg(bfile *op,cvoid *abuf,int alen) noex {
 	int		rs = SR_OK ;
 	int		alenr = alen ;
 	int		mlen ;
 	int		len ;
-	int		f_bufline = (fp->bm == bfile_bmline) ;
+	int		f_bufline = (op->bm == bfilebm_line) ;
 	cchar	*abp = (cchar *) abuf ;
 
 	while ((rs >= 0) && (alenr > 0)) {
 
 #if	CF_CHUNKCPY
-	    if ((rs >= 0) && (fp->len == 0) && (alenr >= fp->bsize)) {
-		while ((rs >= 0) && (alenr >= fp->bsize)) {
-	            mlen = fp->bsize ;
-		    rs = bfile_wbig(fp,abuf,mlen)
+	    if ((rs >= 0) && (op->len == 0) && (alenr >= op->bsize)) {
+		while ((rs >= 0) && (alenr >= op->bsize)) {
+	            mlen = op->bsize ;
+		    rs = bfile_wbig(op,abuf,mlen)
 		    alenr -= mlen ;
 		}
 	    } /* end if */
@@ -176,29 +151,29 @@ static int bfile_wreg(bfile *fp,cvoid *abuf,int alen) noex {
 
 	    if ((rs >= 0) && (alenr > 0)) {
 	        int	n = 0 ;
-	        int	blenr = (fp->bdata + fp->bsize - fp->bp) ;
+	        int	blenr = (op->bdata + op->bsize - op->bp) ;
 
 	        mlen = MIN(alenr,blenr) ;
 	        if (f_bufline && (mlen > 0)) {
 	            cchar	*tp ;
 	            if ((tp = strnrchr(abp,mlen,'\n')) != NULL) {
-	                n = (fp->len + ((tp+1) - abp)) ;
+	                n = (op->len + ((tp+1) - abp)) ;
 	            }
 	        }
 
-	        len = bfile_bufcpy(fp,abp,mlen) ;
+	        len = bfile_bufcpy(op,abp,mlen) ;
 	        abp += len ;
 	        alenr -= len ;
 
 #if	CF_FLUSHPART
-	        if (fp->bp == (fp->bdata + fp->bsize)) {
-	            rs = bfile_flush(fp) ;
+	        if (op->bp == (op->bdata + op->bsize)) {
+	            rs = bfile_flush(op) ;
 	        } else if (f_bufline && (n > 0)) {
-	            rs = bfile_flushn(fp,n) ;
+	            rs = bfile_flushn(op,n) ;
 	        }
 #else /* CF_FLUSHPART */
-	        if (fp->bp == (fp->bdata + fp->bsize)) {
-	            rs = bfile_flush(fp) ;
+	        if (op->bp == (op->bdata + op->bsize)) {
+	            rs = bfile_flush(op) ;
 		}
 #endif /* CF_FLUSHPART */
 
@@ -210,18 +185,18 @@ static int bfile_wreg(bfile *fp,cvoid *abuf,int alen) noex {
 }
 /* end subroutine (bfile_wreg) */
 
-static int bfile_bufcpy(bfile *fp,cchar *abp,int mlen) noex {
+static int bfile_bufcpy(bfile *op,cchar *abp,int mlen) noex {
 	if (mlen > MEMCPYLEN) {
-	    memcpy(fp->bp,abp,mlen) ;
+	    memcpy(op->bp,abp,mlen) ;
 	} else {
-	    char	*bp = fp->bp ;
+	    char	*bp = op->bp ;
 	    for (int i = 0 ; i < mlen ; i += 1) {
 	        *bp++ = *abp++ ;
 	    }
 	}
-	fp->bp += mlen ;
-	fp->len += mlen ;
-	fp->offset += mlen ;
+	op->bp += mlen ;
+	op->len += mlen ;
+	op->offset += mlen ;
 	return mlen ;
 }
 /* end subroutine (bfile_bufcpy) */

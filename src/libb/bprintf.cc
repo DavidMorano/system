@@ -112,8 +112,8 @@ static int bwriteout(bfile *op,cchar *lbuf,int llen) noex {
 	    wlen = rs ;
 	    if ((wlen > 0) && (lbuf[wlen-1] == '\n')) {
 		bool	f = false ;
-		f = f || (op->bm == bfile_bmnone) ;
-	        f = f || (op->bm == bfile_bmline) ;
+		f = f || (op->bm == bfilebm_none) ;
+	        f = f || (op->bm == bfilebm_line) ;
 		if (f) {
 	            rs = bfile_flush(op) ;
 		}

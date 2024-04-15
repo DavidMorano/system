@@ -84,13 +84,13 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            }
 	            break ;
 	        case BC_BUF:
-	            op->bm = bfile_bmall ;
+	            op->bm = bfilebm_all ;
 	            break ;
 	        case BC_LINEBUF:
-	            op->bm = bfile_bmline ;
+	            op->bm = bfilebm_line ;
 	            break ;
 	        case BC_UNBUF:
-	            op->bm = bfile_bmnone ;
+	            op->bm = bfilebm_none ;
 	            break ;
 	        case BC_FD:
 	            {
@@ -274,36 +274,29 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            } /* end if (was able to flush) */
 	            break ;
 	        case BC_ISLINEBUF:
-	            rs = (op->bm == bfile_bmline) ;
+	            rs = (op->bm == bfilebm_line) ;
 	            break ;
 	        case BC_ISTERMINAL:
 	            rs = op->f.terminal ;
 	            break ;
-	        case BC_SETBUFWHOLE:
-	            {
-		        int f = (int) va_arg(ap,int) ;
-	                op->bm = bfile_bmall ;
-		        if (f) op->bm = bfile_bmwhole ;
-	            }
-	            break ;
 	        case BC_SETBUFLINE:
 	            {
 		        int f = (int) va_arg(ap,int) ;
-		        op->bm = (f) ? bfile_bmline : bfile_bmall ;
+		        op->bm = (f) ? bfilebm_line : bfilebm_all ;
 	            }
 	            break ;
 	        case BC_SETBUFNONE:
 	            {
 		        int f = (int) va_arg(ap,int) ;
-	                op->bm = bfile_bmall ;
-		        if (f) op->bm = bfile_bmnone ;
+	                op->bm = bfilebm_all ;
+		        if (f) op->bm = bfilebm_none ;
 	            }
 	            break ;
 	        case BC_SETBUFDEF:
 	            {
 		        int f = (int) va_arg(ap,int) ;
-	                op->bm = bfile_bmall ;
-		        if (f && op->f.terminal) op->bm = bfile_bmline ;
+	                op->bm = bfilebm_all ;
+		        if (f && op->f.terminal) op->bm = bfilebm_line ;
 	            }
 	            break ;
 	        case BC_GETBUFFLAGS:
@@ -314,13 +307,10 @@ int bcontrol(bfile *op,int cmd,...) noex {
 		            if (op->f.inpartline) v |= BFILE_FINPARTLINE ;
 		            if (op->f.terminal) v |= BFILE_FTERMINAL ;
 		            switch (op->bm) {
-		            case bfile_bmwhole:
-		                v |= BFILE_FBUFWHOLE ;
-			        break ;
-		            case bfile_bmline:
+		            case bfilebm_line:
 		                v |= BFILE_FBUFLINE ;
 			        break ;
-		            case bfile_bmnone:
+		            case bfilebm_none:
 		                v |= BFILE_FBUFNONE ;
 			        break ;
 		            } /* end switch */
@@ -333,14 +323,12 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            {
 		        int v = (int) va_arg(ap,int) ;
 		        if (v & BFILE_FBUFNONE) {
-		            op->bm = bfile_bmwhole ;
+		            op->bm = bfilebm_none ;
 		        } else if (v & BFILE_FBUFLINE) {
-		            op->bm = bfile_bmline ;
-		        } else if (v & BFILE_FBUFWHOLE) {
-		            op->bm = bfile_bmwhole ;
+		            op->bm = bfilebm_line ;
 		        } else if (v & BFILE_FBUFDEF) {
-		            int		bm = bfile_bmall ;
-		            if (op->f.terminal) bm = bfile_bmline ;
+		            int		bm = bfilebm_all ;
+		            if (op->f.terminal) bm = bfilebm_line ;
 		            op->bm = bm ;
 		        }
 		        op->f.inpartline = MKBOOL(v & BFILE_FINPARTLINE) ;

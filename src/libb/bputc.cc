@@ -50,10 +50,10 @@ int bputc(bfile *op,int ch) noex {
 	char		wbuf[2] = { char(ch) } ;
 	if ((rs = bwrite(op,wbuf,1)) > 0) {
 	    wlen = rs ;
-	    if ((ch == '\n') && (op->bm == bfile_bmline)) {
+	    if ((ch == '\n') && (op->bm == bfilebm_line)) {
 	        rs = bfile_flush(op) ;
 	    }
-	}
+	} /* end if (bwrite) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bputc) */

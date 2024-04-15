@@ -1,6 +1,9 @@
 /* bfliner HEADER */
 /* lang=C20 */
 
+/* BFILE-liner */
+/* version %I% last-modified %G% */
+
 
 /* revision history:
 
@@ -41,7 +44,7 @@ EXTERNC_begin
 
 extern int bfliner_start(bfliner *,bfile *,off_t,int) noex ;
 extern int bfliner_readpending(bfliner *) noex ;
-extern int bfliner_readline(bfliner *,int,cchar **) noex ;
+extern int bfliner_readln(bfliner *,int,cchar **) noex ;
 extern int bfliner_readover(bfliner *) noex ;
 extern int bfliner_getpoff(bfliner *,off_t *) noex ;
 extern int bfliner_finish(bfliner *) noex ;

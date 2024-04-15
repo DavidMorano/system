@@ -25,10 +25,10 @@
 	character.
 
 	Synopsis:
-	int breadlns(bfile *fp,char *lbuf,int llen,int to,int *lcp) noex
+	int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex
 
 	Arguments:
-	fp		pointer to object
+	op		pointer to object
 	lbuf		user buffer to receive data
 	llen		length of user supplied buffer
 	to		time-out (to=-1 mean "infinite")
@@ -74,25 +74,22 @@
 
 /* exported subroutines */
 
-int breadlns(bfile *fp,char *lbuf,int llen,int to,int *lcp) noex {
-	int		rs = SR_FAULT ;
+int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex {
+	int		rs ;
 	int		i = 0 ;		/* result-buffer length */
 	int		lines = 0 ;
-	if (fp && lbuf) {
-	    rs = SR_NOTOPEN ;
-	    lbuf[0] = '\0' ;
-	    if (fp->magic == BFILE_MAGIC) {
-		rs = SR_OK ;
+	if ((rs = bfile_magic(op,lbuf)) > 0) {
+	    if ((rs = bfile_rd(op)) >= 0) {
 	        bool	f_cont = false ;
 	        while ((lines == 0) || (f_cont = ISCONT(lbuf,i))) {
 	            if (f_cont) i -= 2 ;
-	            rs = breadlnto(fp,(lbuf + i),(llen - i),to) ;
+	            rs = breadlnto(op,(lbuf + i),(llen - i),to) ;
 	            if (rs <= 0) break ;
 	            i += rs ;
 	            lines += 1 ;
 	        } /* end while */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	    } /* end if (readling) */
+	} /* end if (magic) */
 	if (lcp) *lcp  = lines ;
 	return (rs >= 0) ? i : rs ;
 }

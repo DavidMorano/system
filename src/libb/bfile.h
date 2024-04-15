@@ -31,7 +31,7 @@
 #define	BFILE_BD	struct bfile_bd
 #define	BFILE_BDFLAGS	struct bfile_bdflags
 #define	BFILE_MAP	struct bfile_mapper
-#define	BFILE_FLAGS	struct bfile_flags
+#define	BFILE_FL	struct bfile_flags
 #define	BFILE_MAPFLAGS	struct bfile_mapflags
 
 #define	BFILE_MAGIC	0x20052615
@@ -101,12 +101,12 @@
 
 
 /* buffering modes */
-enum bfile_bms {
-	bfile_bmall,
-	bfile_bmwhole,
-	bfile_bmline,
-	bfile_bmnone,
-	bfile_bmoverlast
+enum bfilebms {
+	bfilebm_reg,			/* buffering reg (default) */
+	bfilebm_atomic,			/* buffering atomic */
+	bfilebm_line,			/* buffering line */
+	bfilebm_none,			/* buffering none */
+	bfilebm_overlast
 } ;
 
 struct bfile_mapflags {
@@ -135,7 +135,9 @@ struct bfile_bd {
 
 struct bfile_flags {
 	uint		created:1 ;
-	uint		write:1 ;
+	uint		writing:1 ;	/* 0=reading, 1=writing */
+	uint		rd:1 ;		/* reading allowed */
+	uint		wr:1 ;		/* writing allowed */
 	uint		notseek:1 ;
 	uint		terminal:1 ;
 	uint		network:1 ;
@@ -158,18 +160,19 @@ struct bfile_head {
 	dev_t		dev ;
 	size_t		offset ; 	/* user view */
 	size_t		fsize ;		/* current? file size */
-	BFILE_FLAGS	f ;
+	BFILE_FL	f ;
 	uint		magic ;
 	int		fd ;
 	int		pagesize ;	/* system page size */
 	int		bsize ;		/* allocated buffer size */
-	int		oflags ;	/* open flags */
+	int		of ;		/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
-	mode_t		om ;		/* open-mode */
+	mode_t		om ;		/* open-mode (permissions) */
 } ;
 
 typedef BFILE		bfile ;
+typedef BFILE_FL	bfile_fl ;
 typedef BFILE_MAP	bfile_map ;
 
 EXTERNC_begin
@@ -211,7 +214,10 @@ extern int	bflush(bfile *) noex ;
 extern int	bflushn(bfile *,int) noex ;
 extern int	bclose(bfile *) noex ;
 
-extern int	bfile_access(bfile *,bool) noex ;
+extern int	bfile_bufreset(bfile *) noex ;
+extern int	bfile_acc(bfile *,bool) noex ;
+extern int	bfile_rd(bfile *) noex ;
+extern int	bfile_wr(bfile *) noex ;
 extern int	bfile_flush(bfile *) noex ;
 extern int	bfile_flushn(bfile *,int) noex ;
 extern int	bfile_pagein(bfile *,off_t,int) noex ;
