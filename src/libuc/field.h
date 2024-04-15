@@ -32,6 +32,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<vecstr.h>
 #include	<localmisc.h>
 
 
@@ -96,6 +97,11 @@ extern int	field_getterm(field *,cchar *,cchar **) noex ;
 extern int	field_sharg(field *,cchar *,char *,int) noex ;
 extern int	field_remaining(field *,cchar **) noex ;
 extern int	field_finish(field *) noex ;
+
+extern int	field_word(field *,cchar *,cchar **) noex ;
+extern int	field_wordphrase(field *,cchar *,char *,int) noex ;
+extern int	field_srvarg(field *,cchar *,char *,int) noex ;
+extern int	field_svcargs(field *,vecstr *) noex ;
 
 static inline int field_term(field *op,cchar *tp,cchar **rpp) noex {
 	return field_getterm(op,tp,rpp) ;

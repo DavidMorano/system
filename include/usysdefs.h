@@ -124,11 +124,11 @@ enum signalmissings {
 #endif
 
 #ifndef	S_ISNAM
-#ifndef	S_ISNAM(fm)	(((fm) & S_IFMT) == S_IFNAM)
+#define	S_ISNAM(fm)	(((fm) & S_IFMT) == S_IFNAM)
 #endif
 
 #ifndef	S_ISDOOR
-#ifndef	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
+#define	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
 #endif
 
 /* various limits (that might be missing) */

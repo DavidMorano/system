@@ -22,10 +22,10 @@
 	field_wordphrase
 
 	Synopsis:
-	int field_wordphrase(field *fsbp,cchar *terms,char *fbuf,int flen) noex
+	int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex
 
 	Arguments:
-	fsbp		field status block pointer
+	op		field status block pointer
 	terms		bit array of terminating characters
 	fbuf		buffer to store result
 	flen		length of buffer to hold result
@@ -48,10 +48,11 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
-#include	<field.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"field.h"
 
 
 /* local defines */
@@ -85,22 +86,14 @@ static constexpr cchar	dquote[] = {
 
 /* 'double quote', 'back slash', 'pound', 'back accent', et cetera */
 static constexpr cchar	doubles[] = {
-	0x00, 0x00, 
-	0x00, 0x00,
-	0x14, 0x00, 
-	0x00, 0x00,
-	0x00, 0x00, 
-	0x00, 0x10,
-	0x01, 0x00, 
-	0x00, 0x00,
-	0x00, 0x00, 
-	0x00, 0x00,
-	0x00, 0x00, 
-	0x00, 0x00,
-	0x00, 0x00, 
-	0x00, 0x00,
-	0x00, 0x00, 
-	0x00, 0x00
+	0x00, 0x00, 0x00, 0x00,
+	0x14, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x10,
+	0x01, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00
 } ;
 
 static constexpr cchar	shterms[] = {
@@ -120,178 +113,126 @@ static constexpr cchar	shterms[] = {
 
 /* exported subroutines */
 
-int field_wordphrase(FIELD *fsbp,cchar *terms,char *fbuf,int flen) noex {
-	int		ll, fl ;
-	int		qe ;
-	int		ch = 0 ;
-	int		nch ;
-	int		term = '\0' ;
-	cchar		*lp ;
-	char		*bp = fbuf ;
-
-	if (fsbp == NULL) return SR_FAULT ;
-	if (fbuf == NULL) return SR_FAULT ;
-
-	if (fsbp->lp == NULL) return SR_NOTOPEN ;
-
-/* get the parameters */
-
-	lp = fsbp->lp ;
-	ll = fsbp->ll ;
-
-	if (terms == NULL)
-	    terms = shterms ;
-
-/* skip all initial white space */
-
-	while ((ll > 0) && CHAR_ISWHITE(*lp)) {
-	    lp += 1 ;
-	    ll -= 1 ;
-	}
-
-	fl = -1 ;			/* end-of-arguments indicator */
-	if (ll > 0)  {
-
-/* process the standard SHELL string */
-
-	while (ll > 0) {
-
-	    ch = mkchar(*lp) ;
-	    if (BATST(terms,ch) & (! BATST(dquote,ch))) 
-		break ;
-
-	    if (CHAR_ISWHITE(ch)) 
-		break ;
-
-	    if (ch == '\"') {
-
-	        qe = ch ;
-		lp += 1 ;
-	        ll -= 1 ;
-	        while (ll > 0) {
-
-		    ch = mkchar(*lp) ;
-		    if (ll > 1)
-			nch = mkchar(lp[1]) ;
-
-	            if ((ch == '\\') && (ll > 1) && BATST(doubles,nch)) {
-
-	                lp += 1 ;
-	                ll -= 1 ;
-		        ch = mkchar(*lp) ;
-	                if (flen > 0) {
-	                    *bp++ = ch ;
-	                    flen -= 1 ;
-	                }
-
-	                lp += 1 ;
-	                ll -= 1 ;
-
-	            } else if (ch == qe) {
-
-	                lp += 1 ;
-	                ll -= 1 ;
-	                break ;
-
-	            } else {
-
-	                if (flen > 0) {
-	                    *bp++ = ch ;
-	                    flen -= 1 ;
-	                }
-
-	                lp += 1 ;
-	                ll -= 1 ;
-
-	            } /* end if */
-
-	        } /* end while (processing the quoted portion) */
-
-	    } else if (ch == '\'') {
-
-		qe = ch ;
-		lp += 1 ;
-	        ll -= 1 ;
-	        while (ll > 0) {
-
-		    ch = mkchar(*lp) ;
-	            if (ch == qe) {
-
-	                lp += 1 ;
-	                ll -= 1 ;
-	                break ;
-
-	            } else {
-
-	                if (flen > 0) {
-	                    *bp++ = ch ;
-	                    flen -= 1 ;
-	                }
-
-	                lp += 1 ;
-	                ll -= 1 ;
-
-	            } /* end if */
-
-	        } /* end while (processing the quoted portion) */
-
-	    } else if ((ch == '\\') && (ll > 1)) {
-
-	        lp += 1 ;
-	        ll -= 1 ;
-		ch = mkchar(*lp) ;
-	        if (flen > 0) {
-	            *bp++ = ch ;
-	            flen -= 1 ;
+int field_wordphrase(field *op,cchar *terms,char *fbuf,int flen) noex {
+	int		rs = SR_FAULT ;
+	int		fl = -1 ;
+	if (op && fbuf) {
+	    if (op->lp) {
+	        int		ll = op->ll ;
+	        int		term = '\0' ;
+	        cchar		*lp = op->lp ;
+	        if (terms == nullptr) terms = shterms ;
+	        while ((ll > 0) && CHAR_ISWHITE(*lp)) {
+	            lp += 1 ;
+	            ll -= 1 ;
 	        }
-
-	        lp += 1 ;
-	        ll -= 1 ;
-
-	    } else {
-
-	        if (flen > 0) {
-	            *bp++ = ch ;
-	            flen -= 1 ;
-	        }
-
-	        lp += 1 ;
-	        ll -= 1 ;
-
-	    } /* end if */
-
-	} /* end while (main loop) */
-
-/* do the terminator processing */
-
-	while ((ll > 0) && CHAR_ISWHITE(*lp)) {
-	    lp += 1 ;
-	    ll -= 1 ;
-	} /* end while */
-
-/* we are at the end */
-
-	term = ' ' ;
-	ch = mkchar(*lp) ;
-	if (BATST(terms,ch) && (! BATST(dquote,ch))) {
-	    term = ch ;			/* save terminator */
-	    lp += 1 ;
-	    ll -= 1 ;			/* skip over the terminator */
-	} /* end if */
-
-	fl = (bp - fbuf) ;
-
-	} /* end if (positive) */
-
-/* we are out of here! */
-
-	fsbp->ll = ll ;
-	fsbp->lp = lp ;
-	fsbp->fl = fl ;
-	fsbp->fp = fbuf ;
-	fsbp->term = term ;
-
-	return fl ;			/* return length of field */
+	        fl = -1 ;		/* end-of-arguments indicator */
+	        if (ll > 0)  {
+	            int		ch = 0 ;
+	            char	*bp = fbuf ;
+	            while (ll > 0) {
+			int	nch ;
+			int	qe ;
+	                ch = mkchar(*lp) ;
+	                if (BATST(terms,ch) & (! BATST(dquote,ch))) break ;
+	                if (CHAR_ISWHITE(ch)) break ;
+	                if (ch == '\"') {
+	                    qe = ch ;
+		            lp += 1 ;
+	                    ll -= 1 ;
+	                    while (ll > 0) {
+				bool	f = true ;
+		                ch = mkchar(*lp) ;
+		                if (ll > 1) {
+			            nch = mkchar(lp[1]) ;
+				}
+	                        f = f && (ch == '\\') ;
+				f = f && (ll > 1) ;
+				f = f && BATST(doubles,nch) ;
+				if (f) {
+	                            lp += 1 ;
+	                            ll -= 1 ;
+		                    ch = mkchar(*lp) ;
+	                            if (flen > 0) {
+	                                *bp++ = ch ;
+	                                flen -= 1 ;
+	                            }
+	                            lp += 1 ;
+	                            ll -= 1 ;
+	                        } else if (ch == qe) {
+	                            lp += 1 ;
+	                            ll -= 1 ;
+	                            break ;
+	                        } else {
+	                            if (flen > 0) {
+	                                *bp++ = ch ;
+	                                flen -= 1 ;
+	                            }
+	                            lp += 1 ;
+	                            ll -= 1 ;
+	                        } /* end if */
+	                    } /* end while (processing the quoted portion) */
+	                } else if (ch == '\'') {
+		            qe = ch ;
+		            lp += 1 ;
+	                    ll -= 1 ;
+	                    while (ll > 0) {
+		                ch = mkchar(*lp) ;
+	                        if (ch == qe) {
+	                            lp += 1 ;
+	                            ll -= 1 ;
+	                            break ;
+	                        } else {
+	                            if (flen > 0) {
+	                                *bp++ = ch ;
+	                                flen -= 1 ;
+	                            }
+	                            lp += 1 ;
+	                            ll -= 1 ;
+	                        } /* end if */
+	                    } /* end while (processing the quoted portion) */
+	                } else if ((ch == '\\') && (ll > 1)) {
+	                    lp += 1 ;
+	                    ll -= 1 ;
+		            ch = mkchar(*lp) ;
+	                    if (flen > 0) {
+	                        *bp++ = ch ;
+	                        flen -= 1 ;
+	                    }
+	                    lp += 1 ;
+	                    ll -= 1 ;
+	                } else {
+	                    if (flen > 0) {
+	                        *bp++ = ch ;
+	                        flen -= 1 ;
+	                    }
+	                    lp += 1 ;
+	                    ll -= 1 ;
+	                } /* end if */
+	            } /* end while (main loop) */
+    		    /* do the terminator processing */
+	            while ((ll > 0) && CHAR_ISWHITE(*lp)) {
+	                lp += 1 ;
+	                ll -= 1 ;
+	            } /* end while */
+            	    /* we are at the end */
+	            term = ' ' ;
+	            ch = mkchar(*lp) ;
+	            if (BATST(terms,ch) && (! BATST(dquote,ch))) {
+	                term = ch ;		/* save terminator */
+	                lp += 1 ;
+	                ll -= 1 ;		/* skip over the terminator */
+	            } /* end if */
+	            fl = (bp - fbuf) ;
+	        } /* end if (positive) */
+	        op->ll = ll ;
+	        op->lp = lp ;
+	        op->fl = fl ;
+	        op->fp = fbuf ;
+	        op->term = term ;
+	    } /* end if (non-null) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (field_wordphrase) */
 

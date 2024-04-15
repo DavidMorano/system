@@ -28,11 +28,11 @@
 
 
 #define	BFILE		struct bfile_head
-#define	BFILE_BD	struct bfile_bd
-#define	BFILE_BDFLAGS	struct bfile_bdflags
+#define	BFILE_BD	struct bfile_bufdesc
+#define	BFILE_BDFL	struct bfile_bdflags
 #define	BFILE_MAP	struct bfile_mapper
 #define	BFILE_FL	struct bfile_flags
-#define	BFILE_MAPFLAGS	struct bfile_mapflags
+#define	BFILE_MAPFL	struct bfile_mapflags
 
 #define	BFILE_MAGIC	0x20052615
 #define	BFILE_BUFPAGES	16
@@ -92,10 +92,11 @@
 /* flags */
 #define	BFILE_FINPARTLINE	(1<<0)
 #define	BFILE_FTERMINAL 	(1<<1)
-#define	BFILE_FBUFWHOLE		(1<<2)
+#define	BFILE_FBUFWHOLE		(1<<2)	/* aka "atomic" */
 #define	BFILE_FBUFLINE		(1<<3)
 #define	BFILE_FBUFNONE		(1<<4)
 #define	BFILE_FBUFDEF		(1<<5)
+#define	BFILE_FBUFATOMIC	BFILE_FBUFWHOLE
 
 #define	BFILE_DEBUGFNAME	"bfile.deb"
 
@@ -118,17 +119,17 @@ struct bfile_mapper {
 	char		*bdata ;	/* buffer data */
 	size_t		bsize ;		/* buffer size */
 	size_t		offset ;	/* file offset for page */
-	BFILE_MAPFLAGS	f ;
+	BFILE_MAPFL	f ;
 } ;
 
 struct bfile_bdflags {
 	uint		dirty:1 ;	/* needs to be written back */
 } ;
 
-struct bfile_bd {
+struct bfile_bufdesc {
 	char		*bdata ;	/* base of buffer */
 	size_t		boff ;		/* base of buffer */
-	BFILE_BDFLAGS	f ;
+	BFILE_BDFL	f ;
 	int		bsize ;		/* size of buffer */
 	int		blen ;		/* length of data (buffer index) */
 } ;
@@ -139,6 +140,7 @@ struct bfile_flags {
 	uint		rd:1 ;		/* reading allowed */
 	uint		wr:1 ;		/* writing allowed */
 	uint		append:1 ;	/* append-mode */
+	uint		filedesc:1 ;	/* file-descriptor type of filename */
 	uint		notseek:1 ;
 	uint		terminal:1 ;
 	uint		network:1 ;
@@ -175,6 +177,9 @@ struct bfile_head {
 typedef BFILE		bfile ;
 typedef BFILE_FL	bfile_fl ;
 typedef BFILE_MAP	bfile_map ;
+typedef	BFILE_BD	bfile_bd ;
+typedef	BFILE_BDFL	bfile_bdfl ;
+typedef	BFILE_MAPFL	bfile_mapfl ;
 
 EXTERNC_begin
 

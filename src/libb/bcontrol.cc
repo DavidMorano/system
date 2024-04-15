@@ -60,10 +60,13 @@ static int	bcontrol_lock(bfile *,FLOCK *,int,int,int) noex ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int bcontrol(bfile *op,int cmd,...) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = bfile_magic(op)) > 0) {
 	    if ((rs = bfile_flush(op)) >= 0) {
 	        va_list	ap ;
@@ -76,7 +79,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            {
 		        off_t	*bop ;
 	                bop = (off_t *) va_arg(ap,void *) ;
-		        if (bop != NULL) {
+		        if (bop != nullptr) {
 	                    *bop = op->offset ;
 		        } else {
 		            rs = SR_FAULT ;
@@ -84,7 +87,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            }
 	            break ;
 	        case BC_BUF:
-	            op->bm = bfilebm_all ;
+	            op->bm = bfilebm_reg ;
 	            break ;
 	        case BC_LINEBUF:
 	            op->bm = bfilebm_line ;
@@ -96,13 +99,13 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            {
 	                int *rip = (int *) va_arg(ap,int *) ;
 	                rs = op->fd ;
-		        if (rip != NULL) *rip = op->fd ;
+		        if (rip != nullptr) *rip = op->fd ;
 	            }
 	            break ;
 	        case BC_STAT:
 	            {
 	    	        USTAT	*ssp = (USTAT *) va_arg(ap,void *) ;
-		        if (ssp != NULL) {
+		        if (ssp != nullptr) {
 	                    rs = u_fstat(op->fd,ssp) ;
 	                } else {
 		            rs = SR_FAULT ;
@@ -149,14 +152,16 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	            fsp->l_whence = SEEK_SET ;
 	            fsp->l_start = 0L ;
 	            fsp->l_len = 0L ;
+		    fallthrough ;
         /* fall through to next case */
         /* FALLTHROUGH */
         /* enter here for a lock (or unlock) of a requested area of the file */
 	        case BC_SETLK:
 	        case BC_SETLKW:
-	            if (op->f.write && (op->len > 0)) {
+	            if (op->f.writing && (op->len > 0)) {
 	                rs = bfile_flush(op) ;
 	            }
+		    fallthrough ;
         /* fall through to next case */
         /* FALLTHROUGH */
 	        case BC_GETLK:
@@ -199,7 +204,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 		        int *rip = (int *) va_arg(ap,int *) ;
 	                rs = u_fcntl(op->fd,F_GETFL,0) ;
 	                oflags = rs ;
-	                if (rip != NULL) {
+	                if (rip != nullptr) {
 	                    *rip = (rs >= 0) ? oflags : 0 ;
 		        }
 	            }
@@ -207,7 +212,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	        case BC_SETFL:
 	            {
 		        int *rip = (int *) va_arg(ap,int *) ;
-		        if (rip != NULL) {
+		        if (rip != nullptr) {
 		            int	v = *rip ;
 	                    rs = u_fcntl(op->fd,F_SETFL,v) ;
 	 	        } else {
@@ -218,7 +223,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	        case BC_GETFDFL:
 	            {
 		        int *rip = (int *) va_arg(ap,int *) ;
-		        if (rip != NULL) {
+		        if (rip != nullptr) {
 		            int	v ;
 	                    rs = u_fcntl(op->fd,F_GETFD,0) ;
 		            v = rs ;
@@ -231,7 +236,7 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	        case BC_SETFDFL:
 	            {
 		        int *rip = (int *) va_arg(ap,int *) ;
-		        if (rip != NULL) {
+		        if (rip != nullptr) {
 		            int v = *rip ;
 	                    rs = u_fcntl(op->fd,F_SETFD,v) ;
 		        } else {
@@ -282,31 +287,37 @@ int bcontrol(bfile *op,int cmd,...) noex {
 	        case BC_SETBUFLINE:
 	            {
 		        int f = (int) va_arg(ap,int) ;
-		        op->bm = (f) ? bfilebm_line : bfilebm_all ;
+		        op->bm = (f) ? bfilebm_line : bfilebm_reg ;
 	            }
 	            break ;
 	        case BC_SETBUFNONE:
 	            {
 		        int f = (int) va_arg(ap,int) ;
-	                op->bm = bfilebm_all ;
+	                op->bm = bfilebm_reg ;
 		        if (f) op->bm = bfilebm_none ;
 	            }
 	            break ;
 	        case BC_SETBUFDEF:
 	            {
 		        int f = (int) va_arg(ap,int) ;
-	                op->bm = bfilebm_all ;
+	                op->bm = bfilebm_reg ;
 		        if (f && op->f.terminal) op->bm = bfilebm_line ;
 	            }
 	            break ;
 	        case BC_GETBUFFLAGS:
 	            {
 		        int *rip = (int *) va_arg(ap,int *) ;
-		        if (rip != NULL) {
-		            int v = 0 ;
+		        if (rip != nullptr) {
+		            int 	v = 0 ;
 		            if (op->f.inpartline) v |= BFILE_FINPARTLINE ;
 		            if (op->f.terminal) v |= BFILE_FTERMINAL ;
 		            switch (op->bm) {
+		            case bfilebm_reg:
+		                v |= BFILE_FBUFDEF ;
+			        break ;
+		            case bfilebm_atomic:
+		                v |= BFILE_FBUFATOMIC ;
+			        break ;
 		            case bfilebm_line:
 		                v |= BFILE_FBUFLINE ;
 			        break ;
@@ -326,8 +337,10 @@ int bcontrol(bfile *op,int cmd,...) noex {
 		            op->bm = bfilebm_none ;
 		        } else if (v & BFILE_FBUFLINE) {
 		            op->bm = bfilebm_line ;
+		        } else if (v & BFILE_FBUFATOMIC) {
+		            op->bm = bfilebm_atomic ;
 		        } else if (v & BFILE_FBUFDEF) {
-		            int		bm = bfilebm_all ;
+		            int		bm = bfilebm_reg ;
 		            if (op->f.terminal) bm = bfilebm_line ;
 		            op->bm = bm ;
 		        }
