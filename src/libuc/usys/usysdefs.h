@@ -49,8 +49,8 @@
 /* extra "open" flags */
 
 enum extraopenflags {
-	extraopenflag_largefile = 24,
-	extraopenflag_minmod,
+	extraopenflag_start = 28,
+	extraopenflag_minmode = 28,
 	extraopenflag_minfd,
 	extraopenflag_network,
 	extraopenflag_overlast
@@ -89,12 +89,16 @@ enum signalmissings {
 
 /* missing file open-flags */
 
-#ifndef	O_LARGEFILE
-#define	O_LARGEFILE	(1 << extraopenflag_largefile)
+#ifndef	O_SPECIALMASK
+#define	O_SPECIALMASK	((~ 0) << extraopenflag_start)
 #endif
 
-#ifndef	O_MINMOD
-#define	O_MINMOD	(1 << extraopenflag_minmod)
+#ifndef	O_LARGEFILE
+#define	O_LARGEFILE	0
+#endif
+
+#ifndef	O_MINMODE
+#define	O_MINMODE	(1 << extraopenflag_minmode)
 #endif
 
 #ifndef	O_MINFD

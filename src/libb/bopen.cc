@@ -106,6 +106,7 @@ namespace {
 	    to = ato ;
 	} ;
 	operator int () noex ;
+	int mkoflags(cchar *) noex ;
    } ;
 }
 
@@ -147,6 +148,15 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	return rs ;
 }
 /* end subroutine (bopene) */
+
+bopenmgr::operator int () noex {
+	int		rs ;
+	if ((rs = mkoflags(os)) >= 0) {
+	    rs = SR_OK ;
+	} /* end if (mkoflags) */
+	return rs ;
+}
+/* end method (bopenmgr::operator) */
 
 #ifdef	COMMENT
 	USTAT		sb ;
@@ -576,6 +586,7 @@ int bopenmgr::mkoflags(cchar *os) noex {
 	        break ;
 	    case 'a':
 	        of |= O_APPEND ;
+		op->f.append = true ;
 	        break ;
 	    case 'c':
 	        of |= O_CREAT ;
@@ -602,6 +613,7 @@ int bopenmgr::mkoflags(cchar *os) noex {
 		break ;
 	    case 'N':
 	        of |= O_NETWORK ;	/* "network" file */
+		op->f.network = true ;
 		break ;
 	    case 'M':
 	        of |= O_MINMODE ;	/* minimum file-permissions-mode */
