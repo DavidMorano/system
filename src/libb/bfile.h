@@ -138,6 +138,7 @@ struct bfile_flags {
 	uint		writing:1 ;	/* 0=reading, 1=writing */
 	uint		rd:1 ;		/* reading allowed */
 	uint		wr:1 ;		/* writing allowed */
+	uint		append:1 ;	/* append-mode */
 	uint		notseek:1 ;
 	uint		terminal:1 ;
 	uint		network:1 ;

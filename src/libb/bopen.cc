@@ -554,9 +554,9 @@ static int bfile_mapend(bfile *fp) noex {
 }
 /* end subroutine (bfile_mapend) */
 
-static int mkoflags(cchar *os,int *bfp) noex {
-	int		oflags = 0 ;
-	int		bflags = 0 ;
+int bopenmgr::mkoflags(cchar *os) noex {
+	int		rs = SR_OK ;
+	int		of = 0 ;
 	while (*os) {
 	    cint	sc = mkchar(*os++) ;
 	    switch (sc) {
@@ -564,59 +564,60 @@ static int mkoflags(cchar *os,int *bfp) noex {
 	        bflags |= BOM_FILEDESC ;
 	        break ;
 	    case 'r':
-	        bflags |= BOM_READ ;
+	        op->f.rd = true ;
 	        break ;
 	    case 'w':
-		bflags |= BOM_WRITE ;
+		op->f.wr = true ;
 	        break ;
 	    case 'm':
 	    case '+':
-	        bflags |= (BOM_READ | BOM_WRITE) ;
+	        op->f.rd = true ;
+		op->f.wr = true ;
 	        break ;
 	    case 'a':
-	        oflags |= O_APPEND ;
-	        bflags |= BOM_APPEND ;
+	        of |= O_APPEND ;
 	        break ;
 	    case 'c':
-	        oflags |= O_CREAT ;
+	        of |= O_CREAT ;
 	        break ;
 	    case 'e':
-	        oflags |= (O_CREAT | O_EXCL) ;
+	        of |= (O_CREAT | O_EXCL) ;
 	        break ;
 	    case 't':
-	        oflags |= (O_CREAT | O_TRUNC) ;
+	        of |= (O_CREAT | O_TRUNC) ;
 	        break ;
 	    case 'n':
-	        oflags |= O_NDELAY ;
+	        of |= O_NDELAY ;
 	        break ;
-/* POSIX "binary" mode -- does nothing on real UNIXes® */
-	    case 'b':
+	    case 'b': /* POSIX "binary" mode -- nothing on real UNIXes® */
 	        break ;
 	    case 'x':
-	        oflags |= O_EXCL ;
+	        of |= O_EXCL ;
 		break ;
 	    case 'C':
-		oflags |= O_CLOEXEC ;
+		of |= O_CLOEXEC ;
 		break ;
 	    case 'F':
-		oflags |= O_MINFD ;
+		of |= O_MINFD ;		/* minimum-file-descriptor */
 		break ;
 	    case 'N':
-	        oflags |= O_NETWORK ;
+	        of |= O_NETWORK ;	/* "network" file */
 		break ;
 	    case 'M':
-	        oflags |= O_MINMODE ;
+	        of |= O_MINMODE ;	/* minimum file-permissions-mode */
 		break ;
 	    } /* end switch */
 	} /* end while (open flags) */
-	if (bflags & BOM_WRITE) {
-	   oflags |= ((bflags & BOM_READ) ? O_RDWR : O_WRONLY) ;
+	if (op->f.rd && op->f.wr) {
+	    of |= O_RDWR ;
+	} else if (op->f.wr) {
+	    of |= O_WRONLY ;
+	} else {
+	    of |= O_RDONLY ;
 	}
-	if (bfp) {
-	    *bfp = bflags ;
-	}
-	return oflags ;
+	op->of = of ;
+	return rs ;
 }
-/* end subroutine (mkoflags) */
+/* end method (bopenmgr::mkoflags) */
 
 

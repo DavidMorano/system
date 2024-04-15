@@ -46,6 +46,17 @@
 #endif
 
 
+/* extra "open" flags */
+
+enum extraopenflags {
+	extraopenflag_largefile = 24,
+	extraopenflag_minmod,
+	extraopenflag_minfd,
+	extraopenflag_network,
+	extraopenflag_overlast
+} ;
+
+
 /* missing UNIX® signals */
 
 enum signalmissings {
@@ -79,7 +90,19 @@ enum signalmissings {
 /* missing file open-flags */
 
 #ifndef	O_LARGEFILE
-#define	O_LARGEFILE	0		/* specify "largefile" */
+#define	O_LARGEFILE	(1 << extraopenflag_largefile)
+#endif
+
+#ifndef	O_MINMOD
+#define	O_MINMOD	(1 << extraopenflag_minmod)
+#endif
+
+#ifndef	O_MINFD
+#define	O_MINFD		(1 << extraopenflag_minfd)
+#endif
+
+#ifndef	O_NETWORK
+#define	O_NETWORK	(1 << extraopenflag_network)
 #endif
 
 /* missing from some operating systems */
@@ -94,6 +117,14 @@ enum signalmissings {
 
 #ifndef	S_IFDOOR
 #define	S_IFDOOR	0xD000		/* Solaris® "door" file */
+#endif
+
+#ifndef	S_ISNAM
+#ifndef	S_ISNAM(fm)	(((fm) & S_IFMT) == S_IFNAM)
+#endif
+
+#ifndef	S_ISDOOR
+#ifndef	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
 #endif
 
 /* various limits (that might be missing) */
