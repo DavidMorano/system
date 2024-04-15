@@ -71,8 +71,9 @@
 #include	<baops.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<field.h>
 #include	<localmisc.h>
+
+#include	"field.h"
 
 
 /* local defines */
@@ -306,7 +307,7 @@ int field_srvarg(field *fsbp,cchar *terms,char *abuf,int alen) noex {
 /* local subroutines */
 
 static void fieldinit_terms() noex {
-	static constexpr bool	f_retain = true ;
+	constexpr bool	f_retain = true ;
 	fieldterms(dterms,f_retain,",") ;
 	fieldterms(doubles,f_retain,"\"$\\`") ;
 }

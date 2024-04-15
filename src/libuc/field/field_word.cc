@@ -51,9 +51,10 @@
 #include	<usystem.h>
 #include	<baops.h>
 #include	<char.h>
-#include	<field.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
+
+#include	"field.h"
 
 
 /* local defines */
@@ -91,87 +92,57 @@ static constexpr cchar	wterms[] = {
 /* exported subroutines */
 
 int field_word(field *fsbp,cchar *terms,cchar **fpp) noex {
-	int		ll, fl ;
-	int		ch ;
-	int		chterm = '\0' ;
-	cchar		*lp, *fp ;
-
-	if (fsbp == NULL) return SR_FAULT ;
-
-/* get the parameters */
-
-	lp = fsbp->lp ;
-	ll = fsbp->ll ;
-
-	if (terms == NULL)
-	    terms = wterms ;
-
-/* skip all initial white space */
-
-	while ((ll > 0) && CHAR_ISWHITE(*lp)) {
-	    lp += 1 ;
-	    ll -= 1 ;
-	} /* end while */
-
-	fp = NULL ;
-	fl = -1 ;
-	if (ll > 0) {
-
-	fl = 0 ;
-	ch = mkchar(*lp) ;
-	if (! BATST(terms,ch)) {
-
-	    fp = lp ;	 		/* save field address */
-	    while (ll > 0) {
-
-		ch = mkchar(*lp) ;
-	        if (BATST(terms,ch))
-	            break ;
-
-	        if (CHAR_ISWHITE(ch))
-	            break ;
-
+	int		rs = SR_FAULT ;
+	int		fl = -1 ;
+	if (fsbp) {
+	    int		ll = fsbp->ll ;
+	    int		chterm = '\0' ;
+	    cchar	*lp = fsbp->lp ;
+	    cchar	*fp = nullptr ;
+	    rs = SR_OK ;
+	    if (terms == nullptr) terms = wterms ;
+	    while ((ll > 0) && CHAR_ISWHITE(*lp)) {
 	        lp += 1 ;
 	        ll -= 1 ;
-
 	    } /* end while */
-
-	    fl = (lp - fp) ;
-
-	    if ((ll > 0) && CHAR_ISWHITE(*lp)) {
-
-	        chterm = ' ' ;
-	        while ((ll > 0) && CHAR_ISWHITE(*lp)) {
+	    if (ll > 0) {
+		int	ch = mkchar(*lp) ;
+	        fl = 0 ;
+	        if (! BATST(terms,ch)) {
+	            fp = lp ;	 		/* save field address */
+	            while (ll > 0) {
+		        ch = mkchar(*lp) ;
+	                if (BATST(terms,ch)) break ;
+	                if (CHAR_ISWHITE(ch)) break ;
+	                lp += 1 ;
+	                ll -= 1 ;
+	            } /* end while */
+	            fl = (lp - fp) ;
+	            if ((ll > 0) && CHAR_ISWHITE(*lp)) {
+	                chterm = ' ' ;
+	                while ((ll > 0) && CHAR_ISWHITE(*lp)) {
+	                    lp += 1 ;
+	                    ll -= 1 ;
+	                } /* end while */
+	            } /* end if */
+	        } /* end if (processing a field) */
+	        ch = mkchar(*lp) ;
+	        if ((ll > 0) && BATST(terms,ch)) {
+	            chterm = ch ;
 	            lp += 1 ;
 	            ll -= 1 ;
-	        } /* end while */
-
-	    } /* end if */
-
-	} /* end if (processing a field) */
-
-	ch = mkchar(*lp) ;
-	if ((ll > 0) && BATST(terms,ch)) {
-	    chterm = ch ;
-	    lp += 1 ;
-	    ll -= 1 ;
-	} /* end if */
-
-	} /* end if (positive) */
-
-/* update the return status block */
-
-	fsbp->lp = lp ;
-	fsbp->ll = ll ;
-	fsbp->fp = (fl >= 0) ? fp : NULL ;
-	fsbp->fl = fl ;
-	fsbp->term = chterm ;
-
-	if (fpp) {
-	    *fpp = fsbp->fp ;
-	}
-
-	return fl ;
+	        } /* end if */
+	    } /* end if (positive) */
+	    fsbp->lp = lp ;
+	    fsbp->ll = ll ;
+	    fsbp->fp = (fl >= 0) ? fp : nullptr ;
+	    fsbp->fl = fl ;
+	    fsbp->term = chterm ;
+	    if (fpp) {
+	        *fpp = fsbp->fp ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? fl : rs ;
 }
 /* end subroutine (field_word) */
 

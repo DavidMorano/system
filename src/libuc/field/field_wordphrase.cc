@@ -8,9 +8,9 @@
 /* revision history:
 
 	= 1998-07-01, David A­D­ Morano
-        This code module was originally written in C language but modeled
-        (roughly) from a prior VAX assembly language version of mine (circa 1980
-        perhaps). This is why is looks so "ugly"!
+	This code module was originally written in C language but
+	modeled (roughly) from a prior VAX assembly language version
+	of mine (circa 1980 perhaps). This is why is looks so "ugly"!
 
 */
 
@@ -48,8 +48,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<baops.h>
-#include	<char.h>
 #include	<field.h>
+#include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
 

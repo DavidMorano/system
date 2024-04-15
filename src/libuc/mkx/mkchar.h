@@ -37,7 +37,7 @@
 
 #ifdef	__cplusplus
 
-inline constexpr int mkchar(int ch) noex {
+constexpr inline int mkchar(int ch) noex {
 	return (ch & 255) ;
 }
 
