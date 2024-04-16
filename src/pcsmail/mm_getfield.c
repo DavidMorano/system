@@ -51,7 +51,7 @@ int	hmatch() ;
 	header value strings are returned separated by a comma.
 
 	Arguments:
-		mfp	Basic I/O file pointer to mail message file
+		mfp	Basic I-O file pointer to mail message file
 		offset	byte offset from the beginning of the mail message
 			file to the start of the message.
 		mlen	message length (length of message itself in file)

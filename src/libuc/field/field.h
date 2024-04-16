@@ -20,7 +20,7 @@
 
 /*******************************************************************************
 
-	This is a classic, ported forward from the old VAX-11/70
+	This is a classic, ported forward from the old VAX-11/780
 	days. This was translated from VAX assembly language.
 
 *******************************************************************************/
@@ -32,16 +32,12 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+#include	<vecstr.h>
 #include	<localmisc.h>
 
 
 #define	FIELD		struct field_head
 
-
-#ifndef	TYPEDEF_UCHAR
-#define	TYPEDEF_UCHAR
-typedef unsigned char	uchar ;
-#endif /* TYPEDEF_UCHAR */
 
 struct field_head {
 	cchar		*lp ;		/* line pointer */
@@ -51,7 +47,44 @@ struct field_head {
 	int		term ;		/* terminating character */
 } ; /* end struct (field_head) */
 
+#ifdef	__cplusplus
+enum fieldmems {
+	fieldmem_finish,
+	fieldmem_overlast
+} ;
+struct field ;
+struct field_co {
+	field		*op = nullptr ;
+	int		w = -1 ;
+	void operator () (field *p,int m) noex {
+	    op = p ;
+	    w = m ;
+	} ;
+	operator int () noex ;
+	int operator () () noex { 
+	    return operator int () ;
+	} ;
+} ; /* end struct (field_co) */
+struct field : field_head {
+	field_co	finish ;
+	field() noex {
+	    finish(this,fieldmem_finish) ;
+	} ;
+	field(const field &) = delete ;
+	field &operator = (const field &) = delete ;
+	int start(cchar *,int = -1) noex ;
+	int get(cchar *,cchar **) noex ;
+	int getterm(cchar *,cchar **) noex ;
+	int sharg(cchar *,char *,int) noex ;
+	int remaining(cchar ** = nullptr) noex ;
+	void dtor() noex ;
+	~field() noex {
+	    dtor() ;
+	} ;
+} ; /* end struct (field) */
+#else
 typedef FIELD		field ;
+#endif /* __cplusplus */
 
 EXTERNC_begin
 
@@ -60,10 +93,19 @@ extern int	fieldtermsx(char *,int,int,...) noex ;
 
 extern int	field_start(field *,cchar *,int) noex ;
 extern int	field_get(field *,cchar *,cchar **) noex ;
-extern int	field_term(field *,cchar *,cchar **) noex ;
+extern int	field_getterm(field *,cchar *,cchar **) noex ;
 extern int	field_sharg(field *,cchar *,char *,int) noex ;
 extern int	field_remaining(field *,cchar **) noex ;
 extern int	field_finish(field *) noex ;
+
+extern int	field_word(field *,cchar *,cchar **) noex ;
+extern int	field_wordphrase(field *,cchar *,char *,int) noex ;
+extern int	field_srvarg(field *,cchar *,char *,int) noex ;
+extern int	field_svcargs(field *,vecstr *) noex ;
+
+static inline int field_term(field *op,cchar *tp,cchar **rpp) noex {
+	return field_getterm(op,tp,rpp) ;
+}
 
 EXTERNC_end
 

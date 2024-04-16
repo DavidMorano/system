@@ -301,7 +301,7 @@ int bopencmd(bfile *fpa[3],cchar *cmd) noex {
 
 #ifdef	COMMENT
 	        if ((i == 1) || (i == 2)) {
-	            fpa[i]->bm = bfile_bmline ;
+	            fpa[i]->bm = bfilebm_line ;
 		}
 #endif
 

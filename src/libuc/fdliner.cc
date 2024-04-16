@@ -175,7 +175,7 @@ int fdliner_getln(fdliner *op,cchar **lpp) noex {
 	        }
 	    } /* end if (needed a new line) */
 	    if (lpp) {
-	        *lpp = (rs >= 0) ? op->lbuf : NULL ;
+	        *lpp = (rs >= 0) ? op->lbuf : nullptr ;
 	    }
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;

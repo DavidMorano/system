@@ -30,9 +30,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
-#include	<msleep.h>
-#include	<localmisc.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 
 #ifndef	POLLMULT
@@ -41,7 +42,7 @@
 
 
 class timewatch {
-	int		mto ;
+	int		mto ;		/* millisecond-timeout */
 public:
 	timewatch(int a) : mto(a * POLLMULT) { } ;
 	timewatch(const timewatch &) = delete ;

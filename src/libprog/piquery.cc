@@ -88,9 +88,6 @@ extern int	cfdecui(cchar *,int,uint *) ;
 extern int	optbool(cchar *,int) ;
 extern int	mkexpandpath(char *,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
-extern int	vecstr_adds(vecstr *,cchar *,int) ;
-extern int	field_wordphrase(FIELD *,const uchar *,char *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUG || CF_DEBUGS
@@ -276,7 +273,7 @@ cchar	dbname[] ;
 	    if (strcmp(afname,"-") == 0) afname = BFILE_STDIN ;
 
 	    if ((rs = bopen(afp,afname,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 		int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -311,7 +308,7 @@ cchar	dbname[] ;
 	    bfile	infile, *ifp = &infile ;
 
 	    if ((rs = bopen(ifp,BFILE_STDIN,"dr",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 		int		len ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
@@ -367,7 +364,7 @@ int		sl ;
 	    FIELD	fsb ;
 
 	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-		const int	wlen = WPBUFLEN ;
+		cint	wlen = WPBUFLEN ;
 		int		fl ;
 		cchar		*fp ;
 		char		wbuf[WPBUFLEN + 1] ;
@@ -470,15 +467,10 @@ vecstr		*qsp ;
 }
 /* end subroutine (procspec) */
 
-
-static int procout(pip,ofp,tagp)
-PROGINFO	*pip ;
-bfile		*ofp ;
-TEXTLOOK_TAG	*tagp ;
-{
+static int procout(PROGINFO *pip,bfile *ofp,TEXTLOOK_TAG *tagp) noex {
 	uint		recoff ;
 	uint		reclen ;
-	const int	olen = OUTBUFLEN ;
+	cint	olen = OUTBUFLEN ;
 	int		rs = SR_OK ;
 	int		len ;
 	int		wlen = 0 ;

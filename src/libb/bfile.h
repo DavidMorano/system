@@ -28,13 +28,14 @@
 
 
 #define	BFILE		struct bfile_head
-#define	BFILE_BD	struct bfile_bd
-#define	BFILE_BDFLAGS	struct bfile_bdflags
+#define	BFILE_BD	struct bfile_bufdesc
+#define	BFILE_BDFL	struct bfile_bdflags
 #define	BFILE_MAP	struct bfile_mapper
-#define	BFILE_FLAGS	struct bfile_flags
-#define	BFILE_MAPFLAGS	struct bfile_mapflags
+#define	BFILE_FL	struct bfile_flags
+#define	BFILE_MAPFL	struct bfile_mapflags
 
 #define	BFILE_MAGIC	0x20052615
+#define	BFILE_MINFD	10
 #define	BFILE_BUFPAGES	16
 #define	BFILE_FDCH	'*'
 #define	BFILE_FDNAMELEN	22
@@ -92,21 +93,22 @@
 /* flags */
 #define	BFILE_FINPARTLINE	(1<<0)
 #define	BFILE_FTERMINAL 	(1<<1)
-#define	BFILE_FBUFWHOLE		(1<<2)
+#define	BFILE_FBUFWHOLE		(1<<2)	/* aka "atomic" */
 #define	BFILE_FBUFLINE		(1<<3)
 #define	BFILE_FBUFNONE		(1<<4)
 #define	BFILE_FBUFDEF		(1<<5)
+#define	BFILE_FBUFATOMIC	BFILE_FBUFWHOLE
 
 #define	BFILE_DEBUGFNAME	"bfile.deb"
 
 
 /* buffering modes */
-enum bfile_bms {
-	bfile_bmall,
-	bfile_bmwhole,
-	bfile_bmline,
-	bfile_bmnone,
-	bfile_bmoverlast
+enum bfilebms {
+	bfilebm_reg,			/* buffering reg (default) */
+	bfilebm_atomic,			/* buffering atomic */
+	bfilebm_line,			/* buffering line */
+	bfilebm_none,			/* buffering none */
+	bfilebm_overlast
 } ;
 
 struct bfile_mapflags {
@@ -118,24 +120,28 @@ struct bfile_mapper {
 	char		*bdata ;	/* buffer data */
 	size_t		bsize ;		/* buffer size */
 	size_t		offset ;	/* file offset for page */
-	BFILE_MAPFLAGS	f ;
+	BFILE_MAPFL	f ;
 } ;
 
 struct bfile_bdflags {
 	uint		dirty:1 ;	/* needs to be written back */
 } ;
 
-struct bfile_bd {
+struct bfile_bufdesc {
 	char		*bdata ;	/* base of buffer */
 	size_t		boff ;		/* base of buffer */
-	BFILE_BDFLAGS	f ;
+	BFILE_BDFL	f ;
 	int		bsize ;		/* size of buffer */
 	int		blen ;		/* length of data (buffer index) */
 } ;
 
 struct bfile_flags {
 	uint		created:1 ;
-	uint		write:1 ;
+	uint		writing:1 ;	/* 0=reading, 1=writing */
+	uint		rd:1 ;		/* reading allowed */
+	uint		wr:1 ;		/* writing allowed */
+	uint		append:1 ;	/* append-mode */
+	uint		filedesc:1 ;	/* file-descriptor type of filename */
 	uint		notseek:1 ;
 	uint		terminal:1 ;
 	uint		network:1 ;
@@ -158,19 +164,23 @@ struct bfile_head {
 	dev_t		dev ;
 	size_t		offset ; 	/* user view */
 	size_t		fsize ;		/* current? file size */
-	BFILE_FLAGS	f ;
+	BFILE_FL	f ;
 	uint		magic ;
 	int		fd ;
 	int		pagesize ;	/* system page size */
 	int		bsize ;		/* allocated buffer size */
-	int		oflags ;	/* open flags */
+	int		of ;		/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
-	mode_t		om ;		/* open-mode */
+	mode_t		om ;		/* open-mode (permissions) */
 } ;
 
 typedef BFILE		bfile ;
+typedef BFILE_FL	bfile_fl ;
 typedef BFILE_MAP	bfile_map ;
+typedef	BFILE_BD	bfile_bd ;
+typedef	BFILE_BDFL	bfile_bdfl ;
+typedef	BFILE_MAPFL	bfile_mapfl ;
 
 EXTERNC_begin
 
@@ -211,7 +221,10 @@ extern int	bflush(bfile *) noex ;
 extern int	bflushn(bfile *,int) noex ;
 extern int	bclose(bfile *) noex ;
 
-extern int	bfile_access(bfile *,bool) noex ;
+extern int	bfile_bufreset(bfile *) noex ;
+extern int	bfile_acc(bfile *,bool) noex ;
+extern int	bfile_rd(bfile *) noex ;
+extern int	bfile_wr(bfile *) noex ;
 extern int	bfile_flush(bfile *) noex ;
 extern int	bfile_flushn(bfile *,int) noex ;
 extern int	bfile_pagein(bfile *,off_t,int) noex ;

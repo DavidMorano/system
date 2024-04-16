@@ -116,7 +116,7 @@ int bseek(bfile *op,off_t wo,int w) noex {
 
 static int notappend(bfile *op,off_t wo,int w) noex {
 	int		rs = 1 ;
-	if (! (op->oflags & O_APPEND)) {
+	if (! (op->of & O_APPEND)) {
 	    coff	foff = off_t(op->offset) ;
 	    bool	f = false ;
 	    f = f || ((w == SEEK_CUR) && (wo == 0)) ;

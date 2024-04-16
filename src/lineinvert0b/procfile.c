@@ -33,8 +33,8 @@
 	section and we write these lines out to the output file.
 
 	Although this algorithm is a masterpiece of software engineering
-	it still doesn't beat doing regular I/O using READ(2) !
-	Somehow the Solaris engineers did I/O in Solaris so well that
+	it still doesn't beat doing regular I-O using READ(2) !
+	Somehow the Solaris engineers did I-O in Solaris so well that
 	even copying data around from page to page to page is STILL
 	faster than reading the data in-place on the same page that it
 	was read in from disk on!  Who can figure? :-)

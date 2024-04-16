@@ -103,7 +103,7 @@ namespace {
 	int isocket(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
-	int fdcloseonexec(int) noex ;
+	int icloseonexec(int) noex ;
 	void fderror(int) noex ;
     } ; /* end struct (opener) */
     struct openlock {
@@ -122,7 +122,7 @@ static aflag		oguard ;
 constexpr bool		f_sunos = F_SUNOS ;
 
 
-/* external subroutines */
+/* exported variables */
 
 
 /* exported subroutines */
@@ -196,7 +196,7 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	int		to_nosr = utimeout[uto_nosr] ;
 	int		fd = -1 ;
 	int		f_exit = false ;
-	of &= (~ OM_SPECIAL) ;
+	of &= (~ OF_SPECIALMASK) ;
 	repeat {
 	    if ((rs = (this->*m)(fname,of,om)) < 0) rs = (- errno) ;
 	    fd = rs ;
@@ -227,7 +227,7 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	} until ((rs >= 0) || f_exit) ;
 	if constexpr (f_sunos) {
 	    if ((rs >= 0) && (of & O_CLOEXEC)) {
-		rs = fdcloseonexec(fd) ;
+		rs = icloseonexec(fd) ;
 	    }
 	} /* end if-constexpr (f_sunos) */
 	return (rs >= 0) ? fd : rs ;
@@ -298,7 +298,7 @@ int opener::ipipe(cchar *,int,mode_t) noex {
 }
 /* end method (opener::ipipe) */
 
-int opener::fdcloseonexec(int fd) noex {
+int opener::icloseonexec(int fd) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	switch (flavor) {
@@ -321,7 +321,7 @@ int opener::fdcloseonexec(int fd) noex {
 	} /* end switch */
 	return rs ;
 }
-/* end method (opener::fdcloseonexec) */
+/* end method (opener::icloseonexec) */
 
 void opener::fderror(int fd) noex {
 	switch (flavor) {

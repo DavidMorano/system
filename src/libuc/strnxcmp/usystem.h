@@ -78,6 +78,7 @@
 #include	<usyscalls.h>
 
 #include	<ucfunctioncodes.h>
+#include	<ucopen.h>
 #include	<uclibsubs.h>
 
 #include	<uxti.h>

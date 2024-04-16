@@ -22,7 +22,7 @@
 	Description:
 	This subroutine will read (process) an "def" (define) file
 	and put all of the define-variables into an VECSTR
-	object (supplied). New define-variables just get added
+	object (supplied).  New define-variables just get added
 	to the list.  Old define-variables already on the list
 	are deleted with a new definition is encountered.
 

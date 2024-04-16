@@ -25,10 +25,10 @@
 	character.
 
 	Synopsis:
-	int breadlns(bfile *fp,char *lbuf,int llen,int to,int *lcp) noex
+	int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex
 
 	Arguments:
-	fp		pointer to object
+	op		pointer to object
 	lbuf		user buffer to receive data
 	llen		length of user supplied buffer
 	to		time-out (to=-1 mean "infinite")
@@ -36,7 +36,7 @@
 
 	Returns:
 	>=0		number bytes returned to caller (not bytes read)
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -48,10 +48,7 @@
 
 /* local defines */
 
-#define	TO_READ		(5*60)
-
-#define	ISCONT(b,bl)	\
-	(((bl) >= 2) && ((b)[(bl) - 1] == '\n') && ((b)[(bl) - 2] == '\\'))
+#define	ISCONT(b,bl)	iscont(b,bl)
 
 
 /* external subroutines */
@@ -65,6 +62,14 @@
 
 /* forward references */
 
+static bool iscont(cchar *lp,int ll) noex {
+	bool		f = true ;
+	f = f && (ll >= 2) ;
+	f = f && (lp[ll - 1] == '\n') ;
+	f = f && (lp[ll - 2] == '\\') ;
+	return f ;
+}
+
 
 /* local variables */
 
@@ -74,27 +79,24 @@
 
 /* exported subroutines */
 
-int breadlns(bfile *fp,char *lbuf,int llen,int to,int *lcp) noex {
-	int		rs = SR_FAULT ;
-	int		i = 0 ;		/* result-buffer length */
+int breadlns(bfile *op,char *lbuf,int llen,int to,int *lcp) noex {
+	int		rs ;
+	int		rl = 0 ;	/* result-buffer length */
 	int		lines = 0 ;
-	if (fp && lbuf) {
-	    rs = SR_NOTOPEN ;
-	    lbuf[0] = '\0' ;
-	    if (fp->magic == BFILE_MAGIC) {
-		rs = SR_OK ;
+	if ((rs = bfile_magic(op,lbuf)) > 0) {
+	    if ((rs = bfile_rd(op)) >= 0) {
 	        bool	f_cont = false ;
-	        while ((lines == 0) || (f_cont = ISCONT(lbuf,i))) {
-	            if (f_cont) i -= 2 ;
-	            rs = breadlnto(fp,(lbuf + i),(llen - i),to) ;
+	        while ((lines == 0) || ((f_cont = ISCONT(lbuf,rl)))) {
+	            if (f_cont) rl -= 2 ;
+	            rs = breadlnto(op,(lbuf + rl),(llen - rl),to) ;
 	            if (rs <= 0) break ;
-	            i += rs ;
+	            rl += rs ;
 	            lines += 1 ;
 	        } /* end while */
-	    } /* end if (open) */
-	} /* end if (non-null) */
+	    } /* end if (readling) */
+	} /* end if (magic) */
 	if (lcp) *lcp  = lines ;
-	return (rs >= 0) ? i : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (breadlns) */
 

@@ -1,7 +1,7 @@
 /* defproc HEADER */
 /* lang=C20 */
 
-/* get the Default-Something */
+/* process a "def" (define) file */
 /* version %I% last-modified %G% */
 
 

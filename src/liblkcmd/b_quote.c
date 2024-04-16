@@ -105,26 +105,23 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	sfcasesub(const char *,int,const char *,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
-extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
-extern int	field_wordphrase(FIELD *,const uchar *,char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	sfcasesub(cchar *,int,cchar *,cchar **) ;
+extern int	sfshrink(cchar *,int,cchar **) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
+extern int	bufprintf(char *,int,cchar *,...) ;
+extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	hasnonwhite(cchar *,int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -135,14 +132,14 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUG || CF_DEBUGS
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* external variables */
@@ -169,10 +166,10 @@ struct locinfo_flags {
 
 struct locinfo {
 	void		*ofp ;
-	const char	*homedname ;
-	const char	*org ;
-	const char	*name ;
-	const char	*fullname ;
+	cchar	*homedname ;
+	cchar	*org ;
+	cchar	*name ;
+	cchar	*fullname ;
 	char		*ndbname ;
 	PROGINFO	*pip ;
 	LOCINFO_FL	have, f, changed, final ;
@@ -207,7 +204,7 @@ static int	mainsub(int,cchar **,cchar **,void *) ;
 
 static int	usage(PROGINFO *) ;
 
-static int	config_init(struct config *,PROGINFO *,const char *) ;
+static int	config_init(struct config *,PROGINFO *,cchar *) ;
 static int	config_check(struct config *) ;
 static int	config_read(struct config *) ;
 static int	config_free(struct config *) ;
@@ -215,12 +212,12 @@ static int	config_files(struct config *,vecstr *) ;
 static int	config_loadcooks(struct config *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
-static int	procspecs(PROGINFO *,const char *,int) ;
+static int	procspecs(PROGINFO *,cchar *,int) ;
 static int	procspec(PROGINFO *,vecstr *) ;
 static int	procnames(PROGINFO *,PARAMOPT *) ;
 
-static int	procout(PROGINFO *,const char *,int) ;
-static int	procoutline(PROGINFO *,int,const char *,int) ;
+static int	procout(PROGINFO *,cchar *,int) ;
+static int	procoutline(PROGINFO *,int,cchar *,int) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
@@ -230,7 +227,7 @@ static int	locinfo_nlookup(LOCINFO *,int,char *,int) ;
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"HELP",
@@ -278,7 +275,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*akonames[] = {
+static cchar	*akonames[] = {
 	"audit",
 	"linelen",
 	"indent",
@@ -298,7 +295,7 @@ enum akonames {
 	akoname_overlast
 } ;
 
-static const char	*params[] = {
+static cchar	*params[] = {
 	"logsize",
 	"logfile",
 	"quotedirs",
@@ -314,7 +311,7 @@ enum params {
 	param_overlast
 } ;
 
-static const char	*schedconf[] = {
+static cchar	*schedconf[] = {
 	"%r/etc/%n/%n.%f",
 	"%r/etc/%n/%f",
 	"%r/etc/%n.%f",
@@ -322,7 +319,7 @@ static const char	*schedconf[] = {
 	NULL
 } ;
 
-static const char	blanks[] = "                    " ;
+static cchar	blanks[] = "                    " ;
 
 static const uchar	aterms[] = {
 	0x00, 0x2E, 0x00, 0x00,
@@ -346,7 +343,7 @@ int b_quote(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    cchar	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -402,17 +399,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_help = FALSE ;
 	int		f ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*configfname = NULL ;
-	const char	*ndbname = NULL ;
-	const char	*vdbname = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*configfname = NULL ;
+	cchar	*ndbname = NULL ;
+	cchar	*vdbname = NULL ;
+	cchar	*cp ;
 	char		userbuf[USERINFO_LEN + 1] ;
 
 
@@ -474,7 +471,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	    f_optminus = (*argp == '-') ;
 	    f_optplus = (*argp == '+') ;
 	    if ((argl > 1) && (f_optminus || f_optplus)) {
-		const int	ach = MKCHAR(argp[1]) ;
+		cint	ach = MKCHAR(argp[1]) ;
 
 	        if (isdigitlatin(ach)) {
 
@@ -657,7 +654,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            } else {
 
 	                while (akl--) {
-	                    const int	kc = MKCHAR(*akp) ;
+	                    cint	kc = MKCHAR(*akp) ;
 
 	                    switch (kc) {
 
@@ -979,8 +976,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 #endif
 
 	{
-	    const char	**quotedirs = NULL ;
-	    const char	**quotenames = NULL ;
+	    cchar	**quotedirs = NULL ;
+	    cchar	**quotenames = NULL ;
 
 	    if (rs >= 0) {
 		rs = locinfo_getstuff(lip,&quotedirs,&quotenames) ;
@@ -1106,7 +1103,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        afname = STDFNIN ;
 
 	    if ((rs = shio_open(afp,afname,"r",0666)) >= 0) {
-		const int	llen = LINEBUFLEN ;
+		cint	llen = LINEBUFLEN ;
 	        char		lbuf[LINEBUFLEN + 1] ;
 
 	        while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1263,7 +1260,7 @@ static int locinfo_finish(LOCINFO *lip)
 
 static int locinfo_deflinelen(LOCINFO *lip)
 {
-	const int	def = (DEFPRECISION + 2) ;
+	cint	def = (DEFPRECISION + 2) ;
 	int		rs = SR_OK ;
 	if (lip->linelen < def) {
 	    PROGINFO	*pip = lip->pip ;
@@ -1337,8 +1334,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	fmt = "%s: USAGE> %s [<word(s) ...] [-w <width>]\n" ;
 	if (rs >= 0) rs = shio_printf(pip->efp,fmt,pn,pn) ;
@@ -1361,7 +1358,7 @@ static int usage(PROGINFO *pip)
 static int config_init(cfp,pip,configfname)
 struct config	*cfp ;
 PROGINFO	*pip ;
-const char	*configfname ;
+cchar	*configfname ;
 {
 	EXPCOOK		*ckp ;
 	PARAMFILE	*pp ;
@@ -1492,7 +1489,7 @@ vecstr		*flp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
-	const char	*cfn = CONFIGFNAME ;
+	cchar	*cfn = CONFIGFNAME ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	lip = pip->lip ;
@@ -1670,8 +1667,8 @@ struct config	*cfp ;
 	char		pbuf[PBUFLEN + 1] ;
 	char		vbuf[VBUFLEN + 1] ;
 	char		ebuf[EBUFLEN + 1] ;
-	const char	*ccp ;
-	const char	*kp, *vp ;
+	cchar	*ccp ;
+	cchar	*kp, *vp ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	pfp = &cfp->params ;
@@ -1792,7 +1789,7 @@ PARAMOPT	*app ;
 	int		rs1 ;
 	int		nl ;
 	int		c = 0 ;
-	const char	*po_name = PO_NAME ;
+	cchar	*po_name = PO_NAME ;
 	char		*np ;
 
 	if ((rs = paramopt_curbegin(app,&cur)) >= 0) {
@@ -1827,7 +1824,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1934,7 +1931,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 
 static int procspecs(pip,sp,sl)
 PROGINFO	*pip ;
-const char	*sp ;
+cchar	*sp ;
 int		sl ;
 {
 	LOCINFO	*lip = pip->lip ;
@@ -1951,10 +1948,10 @@ int		sl ;
 	if ((rs = vecstr_start(&qstr,5,0)) >= 0) {
 	    FIELD	fsb ;
 	    if ((rs = field_start(&fsb,sp,sl)) >= 0) {
-	        const int	flen = WPBUFLEN ;
+	        cint	flen = WPBUFLEN ;
 		int		fl ;
 	        char		fbuf[WPBUFLEN + 1] ;
-	        const char	*fp = fbuf ;
+	        cchar	*fp = fbuf ;
 
 	        while ((fl = field_wordphrase(&fsb,aterms,fbuf,flen)) >= 0) {
 		    if (fl > 0) {
@@ -1991,7 +1988,7 @@ vecstr		*qsp ;
 	int		qopts = 0 ;
 	int		c = 0 ;
 	int		f_cur = FALSE ;
-	const char	**qkeya ;
+	cchar	**qkeya ;
 	char		combuf[COMBUFLEN + 1] ;
 
 	if (qsp == NULL)
@@ -2043,7 +2040,7 @@ ret0:
 
 static int procout(pip,buf,buflen)
 PROGINFO	*pip ;
-const char	buf[] ;
+cchar	buf[] ;
 int		buflen ;
 {
 	LOCINFO	*lip = pip->lip ;
@@ -2054,7 +2051,7 @@ int		buflen ;
 	int		line ;
 	int		wlen = 0 ;
 	int		f_havebook = FALSE ;
-	const char	*fmt ;
+	cchar	*fmt ;
 	char		colbuf[COLBUFLEN + 1] ;
 
 	if (buflen <= 0)
@@ -2138,13 +2135,7 @@ ret0:
 }
 /* end subroutine (procout) */
 
-
-static int procoutline(pip,line,lp,ll)
-PROGINFO	*pip ;
-int		line ;
-const char	*lp ;
-int		ll ;
-{
+static int procoutline(PROGINFO *pip,int line,cchar *lp,int ll) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		rs ;
 	int		indent ;

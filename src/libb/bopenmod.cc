@@ -67,7 +67,7 @@ int bopenmod(bfile *fp,cchar *fname,cchar *of,mode_t om) noex {
 	if ((rs = bopen(fp,fname,of,om)) >= 0) {
 	    if (strchr(of,'M') == NULL) { /* not already done! */
 	        if ((rs = hasallof(of,-1,"wc")) > 0) {
-	            fp->oflags |= O_MINMODE ;
+	            fp->of |= O_MINMODE ;
 	            rs = uc_fminmod(fp->fd,om) ;
 	        }
 	    }

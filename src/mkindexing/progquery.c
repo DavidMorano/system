@@ -31,28 +31,21 @@
 	char		ofname[] ;
 
 	Arguments:
-
 	- pip		program information pointer
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<bfile.h>
@@ -91,9 +84,6 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	optbool(const char *,int) ;
 extern int	mkexpandpath(char *,const char *,int) ;
 extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	vecstr_adds(vecstr *,const char *,int) ;
-extern int	field_wordphrase(FIELD *,const uchar *,char *,int) ;
 extern int	isdigitlatin(int) ;
 
 #if	CF_DEBUG || CF_DEBUGS

@@ -1564,7 +1564,7 @@ wallmsg(struct filed *f, char *from, char *msg)
  * or long-running operation) this routine gets called as a new
  * detached, unbound thread. This allows writes to many devices
  * to proceed nearly in parallel, without having to resort to
- * asynchronous I/O or forking.
+ * asynchronous I-O or forking.
  */
 static void *
 writetodev(void *ap)

@@ -111,9 +111,8 @@ int rmeol(cchar *sp,int sl) noex {
 /* end subroutine (rmeol) */
 
 int rmochr(cchar *sp,int sl,int ch) noex {
-	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
-	if ((tp = strnochr(sp,sl,ch)) != nullptr) {
+	if (cchar *tp ; (tp = strnochr(sp,sl,ch)) != nullptr) {
 	    sl = (tp-sp) ;
 	} /* end if */
 	return sl ;
@@ -121,9 +120,8 @@ int rmochr(cchar *sp,int sl,int ch) noex {
 /* end subroutine (rmochr) */
 
 int rmrchr(cchar *sp,int sl,int ch) noex {
-	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
-	if ((tp = strnrchr(sp,sl,ch)) != nullptr) {
+	if (cchar *tp ; (tp = strnrchr(sp,sl,ch)) != nullptr) {
 	    sl = (tp-sp) ;
 	} /* end if */
 	return sl ;
@@ -131,9 +129,8 @@ int rmrchr(cchar *sp,int sl,int ch) noex {
 /* end subroutine (rmrchr) */
 
 int rmext(cchar *sp,int sl) noex {
-	cchar		*tp ;
 	if (sl < 0) sl = strlen(sp) ;
-	if ((tp = strnrchr(sp,sl,'.')) != nullptr) {
+	if (cchar *tp ; (tp = strnrchr(sp,sl,'.')) != nullptr) {
 	    cint	el = ((sp+sl)-(tp+1)) ;
 	    cchar	*ep = (tp+1) ;
 	    if (matstr(exts,ep,el) >= 0) {

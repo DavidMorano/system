@@ -83,4 +83,16 @@ int uc_socket(int pf,int pt,int proto) noex {
 }
 /* end subroutine (uc_socket) */
 
+int uc_dupmin(int fd,int mfd) noex {
+	cint	cmd = F_DUPFD ;
+	return u_fcntl(fd,cmd,mfd) ;
+}
+/* end subroutine (uc_dupmin) */
+
+int uc_dupmince(int fd,int mfd) noex {
+	cint	cmd = F_DUPFD_CLOEXEC ;
+	return u_fcntl(fd,cmd,mfd) ;
+}
+/* end subroutine (uc_dupmince) */
+
 

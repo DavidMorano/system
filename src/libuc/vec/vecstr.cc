@@ -80,9 +80,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>		/* <- |strlen(3c)| */
-#include	<algorithm>
+#include	<algorithm>		/* |sort(3c++)| */
 #include	<usystem.h>
 #include	<nulstr.h>
 #include	<nleadstr.h>
@@ -96,8 +97,12 @@
 
 /* local defines */
 
+#ifndef	CF_QSORT
+#define	CF_QSORT	0		/* use |qsort(3c)| */
+#endif
 
-/* namespaces */
+
+/* imported namespaces */
 
 using std::sort ;
 
@@ -111,6 +116,9 @@ extern "C" {
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* forward references */

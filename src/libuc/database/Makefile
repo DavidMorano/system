@@ -56,11 +56,11 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_DATABASE= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_DATABASE= databasechr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_DATABASE= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_DATABASE= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_DATABASE= sifext.o
+OBJ0_DATABASE= 
+OBJ1_DATABASE= 
+OBJ2_DATABASE= 
+OBJ3_DATABASE= 
+OBJ4_DATABASE= 
 
 
 OBJA_DATABASE= obj0_database.o obj1_database.o
@@ -126,8 +126,6 @@ obj3_database.o:	$(OBJ3_DATABASE)
 
 obj4_database.o:	$(OBJ4_DATABASE)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_DATABASE)
-
-
 
 
 

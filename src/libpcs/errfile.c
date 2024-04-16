@@ -10,7 +10,7 @@
 
 	= 1994-06-01, David A­D­ Morano
         This module was created so that a file to store debugging or error
-        information could be accessed independent from the regular I/O of the
+        information could be accessed independent from the regular I-O of the
         program.
 
 */
@@ -20,7 +20,7 @@
 /*******************************************************************************
 
         This module implements a sort of debugging or error interface so that
-        the regular I/O of the program is not interfered with.
+        the regular I-O of the program is not interfered with.
 
 
 *******************************************************************************/

@@ -255,6 +255,18 @@
 #define	CUTIMBUF	const UTIMBUF
 #endif
 
+#ifndef	CTIMEB
+#define	CTIMEB		const TIMEB
+#endif
+
+#ifndef	CTM
+#define	CTM		const TM
+#endif
+
+#ifndef	CTERMIOS
+#define	CTERMIOS	const TERMIOS
+#endif
+
 #ifndef	CSOCKADDR
 #define	CSOCKADDR	const SOCKADDR
 #endif

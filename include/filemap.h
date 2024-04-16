@@ -17,7 +17,7 @@
 /*******************************************************************************
 
         This little object supports some buffered file operations for
-        low-overhead buffered I/O operations (read-only).
+        low-overhead buffered I-O operations (read-only).
 
 *******************************************************************************/
 

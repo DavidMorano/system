@@ -26,9 +26,9 @@
 	1. The fields of the UTIMBUF object are:
 		actime 		- access time in seconds
 		modtime 	- modification time in seconds
-	2. Although Apple-Darwin does not advertise this system-call,
-	it is still supported (both its include file and the call
-	itself).
+	2. In the Apple-Darwin operating system, this system-call,
+	it is supported (both its include file and the call itself)
+	but as a library call rather than a system-call.
 
 *******************************************************************************/
 

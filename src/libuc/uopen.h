@@ -37,8 +37,8 @@
 
 
 /* extra system flags for 'openXXX(2)' and friends */
-#ifndef	OM_SPECIAL
-#define	OM_SPECIAL	0xFF000000
+#ifndef	OF_SPECIALMASK
+#define	OF_SPECIALMASK	0xF0000000
 #endif
 
 #ifndef	O_SETSID

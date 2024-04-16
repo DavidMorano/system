@@ -60,7 +60,7 @@
 
 /* local defines */
 
-#define	BOM_READ		(1<<0)
+#define	BOM_READ	(1<<0)
 #define	BOM_WRITE	(1<<1)
 #define	BOM_APPEND	(1<<2)
 #define	BOM_FILEDESC	(1<<3)
@@ -106,6 +106,7 @@ namespace {
 	    to = ato ;
 	} ;
 	operator int () noex ;
+	int mkoflags(cchar *) noex ;
    } ;
 }
 
@@ -147,6 +148,53 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	return rs ;
 }
 /* end subroutine (bopene) */
+
+bopenmgr::operator int () noex {
+	int		rs ;
+	op->fd = -1 ;
+	if ((rs = mkoflags(os)) >= 0) {
+	    if ((rs = getfile()) > 0) {
+	        rs = SR_OK ;
+	    }
+	} /* end if (mkoflags) */
+	return rs ;
+}
+/* end method (bopenmgr::operator) */
+
+int bopenmgr::getfile() noex {
+	int		rs = SR_OK ;
+	if ((rs = getfdfile(fn,-1)) >= 0) {	/* "standard" file */
+	    op->f.filedesc = true ;
+	    rs = openfd(rs) ;
+	} else if (rs == SR_EMPTY) {		/* "null" file */
+	    fp->f.nullfile = true ;
+	} else if (rs != SR_DOM) {
+	    rs = openreg() ;
+	}
+	return rs ;
+}
+/* end method (bopenmgr::getfile) */
+
+int bopenmgr::openfd(int idx) noex {
+	int		rs = SR_OK ;
+	if ((rs = uc_dupmince(idx,BFILE_MINFD)) >= 0) {
+	    op->fd = rs ;
+	    rs = openadj() ;
+	} /* end if (uc_dupmin) */
+	return rs ;
+}
+/* end method (bopenmgr::openfd) */
+
+int bopenmgr::openadj() noex {
+	int		rs ;
+	if ((rs = uc_fcntl(fp->fd,F_GETFL,0)) >= 0) {
+	    cint	fl = rs ;
+
+	}
+	return rs ;
+}
+/* end method (bopenmgr::openadj) */
+
 
 #ifdef	COMMENT
 	USTAT		sb ;
@@ -280,7 +328,7 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 /* OK, we had our fun, now set all of the proper other modes for this file */
 
-	fp->oflags = oflags ;
+	fp->of = oflags ;
 	rs = u_fstat(fp->fd,&sb) ;
 	if (rs < 0) goto bad1 ;
 
@@ -305,17 +353,17 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	    f_notseek = false ;
 	} else if (S_ISFIFO(sb.st_mode)) {
 	    bsize = MIN(LINEBUFLEN,2048) ;
-	    fp->bm = bfile_bmline ;
+	    fp->bm = bfilebm_line ;
 	} else if (S_ISCHR(sb.st_mode)) {
 	    if (isatty(fp->fd)) {
 	        bsize = MIN(LINEBUFLEN,2048) ;
 	        fp->f.terminal = true ;
-	        fp->bm = bfile_bmline ;
+	        fp->bm = bfilebm_line ;
 	    } /* end if (is a terminal) */
 	} else if (S_ISSOCK(sb.st_mode)) {
 	    fp->f.network = true ;
 	    bsize = (64*1024) ;
-	    fp->bm = bfile_bmline ;
+	    fp->bm = bfilebm_line ;
 	}
 
 	if (! f_notseek) {
@@ -422,8 +470,8 @@ int bopenprog(bfile *fp,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	    if ((rs = bfile_opts(fp,oflags,0)) >= 0) {
 		    cint	bsize = MIN(LINEBUFLEN,2048) ;
 	            if ((rs = bfile_bufbegin(fp,bsize)) >= 0) {
-			fp->oflags = oflags ;
-		        fp->bm = bfile_bmline ;
+			fp->of = oflags ;
+		        fp->bm = bfilebm_line ;
 	                fp->magic = BFILE_MAGIC ;
 	            } /* end if (buffer-allocation) */
 	    }
@@ -508,9 +556,10 @@ static int bfile_bufend(bfile *fp) noex {
 
 static int bfile_opts(bfile *fp,int oflags,mode_t om) noex {
 	int		rs ;
-	rs = uc_closeonexec(fp->fd,true) ;
-	if ((rs >= 0) && (oflags & O_MINMODE) && (om > 0)) {
-	    rs = uc_fminmod(fp->fd,om) ;
+	if ((rs = uc_closeonexec(fp->fd,true)) >= 0) {
+	    if ((oflags & O_MINMODE) && (om > 0)) {
+	        rs = uc_fminmod(fp->fd,om) ;
+	    }
 	}
 	if (oflags & O_NETWORK) fp->f.network = true ;
 	return rs ;
@@ -554,9 +603,9 @@ static int bfile_mapend(bfile *fp) noex {
 }
 /* end subroutine (bfile_mapend) */
 
-static int mkoflags(cchar *os,int *bfp) noex {
-	int		oflags = 0 ;
-	int		bflags = 0 ;
+int bopenmgr::mkoflags(cchar *os) noex {
+	int		rs = SR_OK ;
+	int		of = 0 ;
 	while (*os) {
 	    cint	sc = mkchar(*os++) ;
 	    switch (sc) {
@@ -564,53 +613,59 @@ static int mkoflags(cchar *os,int *bfp) noex {
 	        bflags |= BOM_FILEDESC ;
 	        break ;
 	    case 'r':
-	        bflags |= BOM_READ ;
+	        op->f.rd = true ;
 	        break ;
 	    case 'w':
-		bflags |= BOM_WRITE ;
+		op->f.wr = true ;
 	        break ;
 	    case 'm':
 	    case '+':
-	        bflags |= (BOM_READ | BOM_WRITE) ;
+	        op->f.rd = true ;
+		op->f.wr = true ;
 	        break ;
 	    case 'a':
-	        oflags |= O_APPEND ;
-	        bflags |= BOM_APPEND ;
+	        of |= O_APPEND ;
+		op->f.append = true ;
 	        break ;
 	    case 'c':
-	        oflags |= O_CREAT ;
+	        of |= O_CREAT ;
 	        break ;
 	    case 'e':
-	        oflags |= (O_CREAT | O_EXCL) ;
+	        of |= (O_CREAT | O_EXCL) ;
 	        break ;
 	    case 't':
-	        oflags |= (O_CREAT | O_TRUNC) ;
+	        of |= (O_CREAT | O_TRUNC) ;
 	        break ;
 	    case 'n':
-	        oflags |= O_NDELAY ;
+	        of |= O_NDELAY ;
 	        break ;
-/* POSIX "binary" mode -- does nothing on real UNIXes® */
-	    case 'b':
+	    case 'b': /* POSIX "binary" mode -- nothing on real UNIXes® */
 	        break ;
 	    case 'x':
-	        oflags |= O_EXCL ;
+	        of |= O_EXCL ;
+		break ;
+	    case 'F':
+		of |= O_MINFD ;		/* minimum-file-descriptor */
 		break ;
 	    case 'N':
-	        oflags |= O_NETWORK ;
+	        of |= O_NETWORK ;	/* "network" file */
+		op->f.network = true ;
 		break ;
 	    case 'M':
-	        oflags |= O_MINMODE ;
+	        of |= O_MINMODE ;	/* minimum file-permissions-mode */
 		break ;
 	    } /* end switch */
 	} /* end while (open flags) */
-	if (bflags & BOM_WRITE) {
-	   oflags |= ((bflags & BOM_READ) ? O_RDWR : O_WRONLY) ;
+	if (op->f.rd && op->f.wr) {
+	    of |= O_RDWR ;
+	} else if (op->f.wr) {
+	    of |= O_WRONLY ;
+	} else {
+	    of |= O_RDONLY ;
 	}
-	if (bfp) {
-	    *bfp = bflags ;
-	}
-	return oflags ;
+	op->of = of ;
+	return rs ;
 }
-/* end subroutine (mkoflags) */
+/* end method (bopenmgr::mkoflags) */
 
 

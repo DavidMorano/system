@@ -54,7 +54,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_FIELD= field_main.o
+OBJ0_FIELD= field_main.o field_obj.o
 OBJ1_FIELD= field_srvarg.o field_svcargs.o
 OBJ2_FIELD= field_word.o 
 OBJ3_FIELD= field_wordphrase.o
@@ -123,6 +123,7 @@ obj3_field.o:	$(OBJ3_FIELD)
 
 
 field_main.o:		field_main.cc		$(INCS)
+field_obj.o:		field_obj.cc		$(INCS)
 field_srvarg.o:		field_srvarg.cc		$(INCS)
 field_svcargs.o:	field_svcargs.cc	$(INCS)
 field_word.o:		field_word.cc		$(INCS)

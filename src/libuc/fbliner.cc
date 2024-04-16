@@ -1,15 +1,16 @@
 /* fbliner SUPPORT */
 /* lang=C++20 */
 
-/* special file-read line handling */
+/* file-buf (now FILER) file-read line handling */
 /* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 2009-01-10, David A­D­ Morano
-        This is being written from scratch to finally get an abstracted
-        "mailbox" that is fast enough for interactive use.
+	This is being written from scratch to finally get an
+	abstracted "mailbox" that is fast enough for interactive
+	use.
 
 */
 

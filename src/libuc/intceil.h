@@ -53,10 +53,11 @@ inline long ceil(long v,int m) noex {
 inline longlong ceil(longlong v,int m) noex {
 	return llceil(v,m) ;
 }
-#ifdef	COMMENT
 inline off_t ceil(off_t v,int m) noex {
 	return ofceil(v,m) ;
 }
+
+#ifdef	COMMENT
 inline intptr_t ceil(intptr_t v,int m) noex {
 	return ipceil(v,m) ;
 }
@@ -71,6 +72,7 @@ inline ulong ceil(ulong v,int m) noex {
 inline ulonglong ceil(ulonglong v,int m) noex {
 	return ullceil(v,m) ;
 }
+
 #ifdef	COMMENT
 inline size_t ceil(size_t v,int m) noex {
 	return szceil(v,m) ;

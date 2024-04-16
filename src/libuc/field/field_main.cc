@@ -78,7 +78,7 @@
 
 
 	Notes:
-	This is a classic, ported forward from the old VAX-11/70
+	This is a classic, ported forward from the old VAX-11/780
 	days. This was translated from VAX assembly language.
 
 	Note:
@@ -93,13 +93,13 @@
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstdarg>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
+#include	<strop.h>
 #include	<char.h>
 #include	<mkchar.h>
-#include	<strop.h>
 #include	<localmisc.h>
 
 #include	"field.h"
@@ -301,7 +301,7 @@ int field_get(field *fsbp,cchar *terms,cchar **fpp) noex {
 }
 /* end subroutine (field_get) */
 
-int field_term(field *fsbp,cchar *terms,cchar **fpp) noex {
+int field_getterm(field *fsbp,cchar *terms,cchar **fpp) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		fl = 0 ;
@@ -342,7 +342,7 @@ int field_term(field *fsbp,cchar *terms,cchar **fpp) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? fl : rs ;
 }
-/* end subroutine (field_term) */
+/* end subroutine (field_getterm) */
 
 int field_sharg(field *fsbp,cchar *terms,char *fbuf,int flen) noex {
 	int		rs = SR_FAULT ;
@@ -456,7 +456,7 @@ int field_remaining(field *fsbp,cchar **lpp) noex {
 		rs = SR_OK ;
 		ll = fsbp->ll ;
 	        if (lpp) {
-	            *lpp = (cchar *) fsbp->lp ;
+	            *lpp = fsbp->lp ;
 	        }
 	    } /* end if (open) */
 	} /* end if (non-null) */

@@ -1,9 +1,9 @@
-/* upload a JEDEC file from Data I/O */
+/* upload a JEDEC file from Data I-O */
 
 
 /* 
 	This program will read a JEDEC file as it is uploaded
-	from the Data I/O Unisite programmer.
+	from the Data I-O Unisite programmer.
 
 	$ dioup file
 

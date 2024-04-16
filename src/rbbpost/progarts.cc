@@ -457,7 +457,7 @@ vecstr		*nlp ;
 		    f_hdr = FALSE ;
 		    f_eoh = FALSE ;
 	            f_bol = TRUE ;
-	       while ((rs = bfliner_readline(blp,llen,&lp)) > 0) {
+	       while ((rs = bfliner_readln(blp,llen,&lp)) > 0) {
 	                ll = rs ;
 	                if (ll == 0) break ;
 
@@ -586,7 +586,7 @@ int		f_eoh ;
 /* process the MAILMSG file */
 
 	    if (! f_eoh) {
-	        while ((rs = bfliner_readline(blp,llen,&lp)) > 0) {
+	        while ((rs = bfliner_readln(blp,llen,&lp)) > 0) {
 	            ll = rs ;
 	            if ((rs = mailmsg_loadline(msgp,lp,ll)) >= 0) {
 	                pdp->offset += rs ;
@@ -2803,7 +2803,7 @@ PROCDATA	*pdp ;
 	    lenr = aip->clen ;
 	    while ((rs >= 0) && (lenr > 0)) {
 	        int	rl = MIN(lenr,llen) ;
-	        rs = bfliner_readline(blp,rl,&lp) ;
+	        rs = bfliner_readln(blp,rl,&lp) ;
 	        ll = rs ;
 	        pdp->f.eof = (ll == 0) ;
 	        if (rs <= 0) break ;
@@ -2854,7 +2854,7 @@ PROCDATA	*pdp ;
 
 	    f_bol = TRUE ;
 	    while (rs >= 0) {
-	        rs = bfliner_readline(blp,llen,&lp) ;
+	        rs = bfliner_readln(blp,llen,&lp) ;
 	        ll = rs ;
 	        pdp->f.eof = (ll == 0) ;
 

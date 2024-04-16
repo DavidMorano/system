@@ -269,7 +269,7 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 /* OK, we had our fun, now set all of the proper other modes for this file */
 
-	fp->oflags = oflags ;
+	fp->of = oflags ;
 	rs = u_fstat(fp->fd,&sb) ;
 	if (rs < 0) goto bad1 ;
 
@@ -294,17 +294,17 @@ int bopene(bfile *fp,cchar *fn,cchar *os,mode_t om,int to) noex {
 	    f_notseek = false ;
 	} else if (S_ISFIFO(sb.st_mode)) {
 	    bsize = MIN(LINEBUFLEN,2048) ;
-	    fp->bm = bfile_bmline ;
+	    fp->bm = bfilebm_line ;
 	} else if (S_ISCHR(sb.st_mode)) {
 	    if (isatty(fp->fd)) {
 	        bsize = MIN(LINEBUFLEN,2048) ;
 	        fp->f.terminal = true ;
-	        fp->bm = bfile_bmline ;
+	        fp->bm = bfilebm_line ;
 	    } /* end if (is a terminal) */
 	} else if (S_ISSOCK(sb.st_mode)) {
 	    fp->f.network = true ;
 	    bsize = (64*1024) ;
-	    fp->bm = bfile_bmline ;
+	    fp->bm = bfilebm_line ;
 	}
 
 	if (! f_notseek) {
@@ -411,8 +411,8 @@ int bopenprog(bfile *fp,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	    if ((rs = bfile_opts(fp,oflags,0)) >= 0) {
 		    cint	bsize = MIN(LINEBUFLEN,2048) ;
 	            if ((rs = bfile_bufbegin(fp,bsize)) >= 0) {
-			fp->oflags = oflags ;
-		        fp->bm = bfile_bmline ;
+			fp->of = oflags ;
+		        fp->bm = bfilebm_line ;
 	                fp->magic = BFILE_MAGIC ;
 	            } /* end if (buffer-allocation) */
 	    }

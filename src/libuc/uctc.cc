@@ -22,7 +22,10 @@
 #include	<poll.h>
 #include	<cerrno>
 #include	<cstdlib>
-#include	<usystem.h>		/* |msleep(3u)| */
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<localmisc.h>
 
 #include	"uctc.h"
@@ -58,10 +61,10 @@ namespace {
 	int drain(int) noex ;
 	int flow(int) noex ;
 	int flush(int) noex ;
-	int getattr(int) noex ;
 	int getpgrp(int) noex ;
 	int getsid(int) noex ;
-	int setattr(int) noex ;
+	int attrget(int) noex ;
+	int attrset(int) noex ;
 	int setpgrp(int) noex ;
     } ; /* end struct (uctc) */
 }
@@ -96,11 +99,11 @@ int uc_tcflush(int fd,int cmd) noex {
 	return to(fd) ;
 }
 
-int uc_tcgetattr(int fd,TERMIOS *tip) noex {
+int uc_tcattrget(int fd,TERMIOS *tip) noex {
 	int		rs = SR_FAULT ;
 	if (tip) {
 	    uctc	to(tip) ;
-	    to.m = &uctc::getattr ;
+	    to.m = &uctc::attrget ;
 	    rs = to(fd) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -118,11 +121,11 @@ int uc_tcgetsid(int fd) noex {
 	return to(fd) ;
 }
 
-int uc_tcsetattr(int fd,int cmd,TERMIOS *tip) noex {
+int uc_tcattrset(int fd,int cmd,TERMIOS *tip) noex {
 	int		rs = SR_FAULT ;
 	if (tip) {
 	    uctc	to(tip,cmd) ;
-	    to.m = &uctc::setattr ;
+	    to.m = &uctc::attrset ;
 	    rs = to(fd) ;
 	} /* end if (non-null) */
 	return rs ;
@@ -188,15 +191,6 @@ int uctc::flush(int fd) noex {
 	return rs ;
 }
 
-int uctc::getattr(int fd) noex {
-	int		rs ;
-	if ((rs = tcgetattr(fd,tip)) < 0) {
-	    rs = (- errno) ;
-	}
-	return rs ;
-}
-/* end method (uctc::getattr) */
-
 int uctc::getpgrp(int fd) noex {
 	int		rs ;
 	if ((rs = tcgetpgrp(fd)) < 0) {
@@ -215,14 +209,23 @@ int uctc::getsid(int fd) noex {
 }
 /* end method (uctc::getsid) */
 
-int uctc::setattr(int fd) noex {
+int uctc::attrget(int fd) noex {
+	int		rs ;
+	if ((rs = tcgetattr(fd,tip)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uctc::attrget) */
+
+int uctc::attrset(int fd) noex {
 	int		rs ;
 	if ((rs = tcsetattr(fd,cmd,tip)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
-/* end method (uctc::setattr) */
+/* end method (uctc::attrset) */
 
 int uctc::setpgrp(int fd) noex {
 	int		rs ;

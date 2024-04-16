@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} I/O  "
+NAMES="${NAMES} I/O "
 
 
 DN=/dev/null
@@ -10,7 +10,7 @@ DN=/dev/null
 for F in "${@}" ; do
   if [[ -r "${F}" ]] ; then
     for N in ${NAMES} ; do
-      if fgrep ${N} $F > ${DN} ; then
+      if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
 g/I\/O/s//I-O/g
 	w

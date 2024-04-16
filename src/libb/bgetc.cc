@@ -43,11 +43,11 @@
 
 /* exported subroutines */
 
-int bgetc(bfile *fp) noex {
+int bgetc(bfile *op) noex {
 	int		rs ;
 	int		ch = 0 ;
 	char		buf[2] ;
-	if ((rs = bread(fp,buf,1)) > 0) {
+	if ((rs = bread(op,buf,1)) > 0) {
 	    ch = mkchar(buf[0]) ;
 	} else if (rs == 0) {
 	    rs = SR_EOF ;
