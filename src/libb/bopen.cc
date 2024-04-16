@@ -14,8 +14,10 @@
 
 	= 1999-01-10, David A­D­ Morano
 	I added the little extra code to allow for memory mapped
-	I-O. It is all a waste because it is way slower than without
-	it! This should teach me to leave old programs alone!!!
+	I-O.  It is all a waste because it manual memory mapping
+	is less performatice than the regular pre-reading done by
+	the operating system itself.  This should teach me to leave
+	old programs alone!
 
 */
 
@@ -38,11 +40,12 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cstdlib>
 #include	<cstring>
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<sysval.hh>
@@ -50,6 +53,7 @@
 #include	<getfdfile.h>
 #include	<snx.h>
 #include	<cfdec.h>
+#include	<intsat.h>
 #include	<intceil.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
@@ -72,6 +76,10 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
 
 /* local typedefs */
 
@@ -91,19 +99,29 @@ extern "C" {
 /* local structures */
 
 namespace {
-   struct bopenmgr {
+   struct sub_bopen ;
+   struct sub_isreadonly {
+	sub_bopen	*sop ;
+	void operator () (sub_bopen *p) noex {
+	   sop = p ;
+	} ;
+	operator bool () noex ;
+   } ;
+   struct sub_bopen {
 	bfile		*op ;
 	cchar		*fn ;
 	cchar		*os ;
 	int		to ;
 	cint		maxopenfile = getdtablesize() ;
-	bopenmgr(bfile *aop,cchar *afn,cchar *aos,mode_t aom,int ato) noex {
+	sub_isreadonly	isreadonly ;
+	sub_bopen(bfile *aop,cchar *afn,cchar *aos,mode_t aom,int ato) noex {
+	    isreadonly(this) ;
 	    op = aop ;
 	    fn = afn ;
 	    os = aos ;
 	    aop->om = aom ;
 	    to = ato ;
-	} ;
+	} ; /* end ctor */
 	operator int () noex ;
 	int mkoflags(cchar *) noex ;
 	int getfile() noex ;
@@ -112,6 +130,7 @@ namespace {
 	int openoffset() noex ;
 	int openreg() noex ;
 	int iclose() noex ;
+	int bufsize() noex ;
    } ;
 }
 
@@ -144,7 +163,7 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	    memclear(op) ;
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
-		bopenmgr	bo(op,fn,os,om,to) ;
+		sub_bopen	bo(op,fn,os,om,to) ;
 		rs = bo ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
@@ -152,19 +171,21 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 }
 /* end subroutine (bopene) */
 
-bopenmgr::operator int () noex {
+sub_bopen::operator int () noex {
 	int		rs ;
 	op->fd = -1 ;
 	if ((rs = mkoflags(os)) >= 0) {
 	    if ((rs = getfile()) > 0) {
-	        rs = SR_OK ;
+		if ((rs = bufsize()) >= 0) {
+	            rs = SR_OK ;
+		}
 	    }
 	} /* end if (mkoflags) */
 	return rs ;
 }
-/* end method (bopenmgr::operator) */
+/* end method (sub_bopen::operator) */
 
-int bopenmgr::getfile() noex {
+int sub_bopen::getfile() noex {
 	int		rs = SR_OK ;
 	if ((rs = getfdfile(fn,-1)) >= 0) {	/* "standard" file */
 	    op->f.filedesc = true ;
@@ -176,9 +197,9 @@ int bopenmgr::getfile() noex {
 	}
 	return rs ;
 }
-/* end method (bopenmgr::getfile) */
+/* end method (sub_bopen::getfile) */
 
-int bopenmgr::openfd(int idx) noex {
+int sub_bopen::openfd(int idx) noex {
 	int		rs = SR_OK ;
 	if ((rs = uc_dupmince(idx,BFILE_MINFD)) >= 0) {
 	    op->fd = rs ;
@@ -191,9 +212,9 @@ int bopenmgr::openfd(int idx) noex {
 	} /* end if (uc_dupmin) */
 	return rs ;
 }
-/* end method (bopenmgr::openfd) */
+/* end method (sub_bopen::openfd) */
 
-int bopenmgr::openadj() noex {
+int sub_bopen::openadj() noex {
 	int		rs ;
 	if ((rs = uc_fcntl(op->fd,F_GETFL,0)) >= 0) {
 	    cint	fl = rs ;
@@ -215,9 +236,9 @@ int bopenmgr::openadj() noex {
 	} /* end if (uc_fcntl) */
 	return rs ;
 }
-/* end method (bopenmgr::openadj) */
+/* end method (sub_bopen::openadj) */
 
-int bopenmgr::openoffset() noex {
+int sub_bopen::openoffset() noex {
 	int		rs ;
 	off_t		fo{} ;
 	if ((rs = uc_tell(op->fd,&fo)) >= 0) {
@@ -225,9 +246,9 @@ int bopenmgr::openoffset() noex {
 	}
 	return rs ;
 }
-/* end method (bopenmgr::openoffset) */
+/* end method (sub_bopen::openoffset) */
 
-int bopenmgr::openreg() noex {
+int sub_bopen::openreg() noex {
 	cint		of = op->of ;
 	int		rs ;
 	cmode		om = op->om ;
@@ -240,7 +261,60 @@ int bopenmgr::openreg() noex {
 	}
 	return rs ;
 }
-/* end method (bopenmgr::openreg) */
+/* end method (sub_bopen::openreg) */
+
+int sub_bopen::bufsize() noex {
+	int		rs ;
+	if ((rs = pagesize) >= 0) {
+	    op->pagesize = rs ;
+	    if ((rs = maxlinelen) >= 0) {
+	        cint	maxline = rs ;
+	        USTAT	sb ;
+	        if ((rs = u_fstat(op->fd,&sb)) >= 0) {
+		    int		bsize = 0 ;
+	            bool	f = false ;
+	            bool	f_notseek = true ;
+	            op->fsize = 0 ;
+	            op->fm = sb.st_mode ;	/* save file-mode */
+	            op->ino = sb.st_ino ;
+	            op->dev = sb.st_dev ;
+	            f = f || S_ISREG(sb.st_mode) ;
+	            f = f || S_ISDIR(sb.st_mode) ;
+	            f = f || S_ISBLK(sb.st_mode) ;
+	            if (f) {
+	                if (isreadonly) {
+	                    cint	ps = op->pagesize ;
+	                    int		fs = intsat(sb.st_size) ;
+	                    int		cs ;
+		            if (fs == 0) fs = 1 ;
+	                    cs = ceil(fs,512) ;
+		            bsize = min(cs,ps) ;
+	                }
+	                f_notseek = false ;
+	            } else if (S_ISFIFO(sb.st_mode)) {
+	                bsize = min(maxline,2048) ;
+	                op->bm = bfilebm_line ;
+	            } else if (S_ISCHR(sb.st_mode)) {
+	                if (isatty(op->fd)) {
+	                    bsize = min(maxline,2048) ;
+	                    op->f.terminal = true ;
+	                    op->bm = bfilebm_line ;
+	                } /* end if (is a terminal) */
+	            } else if (S_ISSOCK(sb.st_mode)) {
+	                op->f.network = true ;
+	                bsize = (64*1024) ;
+	                op->bm = bfilebm_line ;
+	            }
+		    op->f.notseek = f_notseek ;
+		    op->bsize = bsize ;
+	        } /* end if (fstat) */
+	    } /* end if (maxlinelen) */
+	} /* end if (pagesize) */
+	return rs ;
+}
+/* end method (sub_bopen::bufsize) */
+
+
 
 #ifdef	COMMENT
 	USTAT		sb ;
@@ -646,7 +720,7 @@ static int bfile_mapend(bfile *op) noex {
 }
 /* end subroutine (bfile_mapend) */
 
-int bopenmgr::mkoflags(cchar *os) noex {
+int sub_bopen::mkoflags(cchar *os) noex {
 	int		rs = SR_OK ;
 	int		of = O_CLOEXEC ;
 	while (*os) {
@@ -706,9 +780,9 @@ int bopenmgr::mkoflags(cchar *os) noex {
 	op->of = of ;
 	return rs ;
 }
-/* end method (bopenmgr::mkoflags) */
+/* end method (sub_bopen::mkoflags) */
 
-int bopenmgr::iclose() noex {
+int sub_bopen::iclose() noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->fd >= 0) {
@@ -718,6 +792,11 @@ int bopenmgr::iclose() noex {
 	}
 	return rs ;
 }
-/* end method (bopenmgr::iclose) */
+/* end method (sub_bopen::iclose) */
+
+sub_isreadonly::operator bool () noex {
+	bfile		*op = sop->op ;
+	return (op->f.rd && (! op->f.wr)) ;
+}
 
 

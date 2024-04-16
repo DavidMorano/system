@@ -172,6 +172,7 @@ struct bfile_head {
 	int		of ;		/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
+	mode_t		fm ;		/* file mode */
 	mode_t		om ;		/* open-mode (permissions) */
 } ;
 
