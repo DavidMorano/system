@@ -1,15 +1,15 @@
-/* u_fcntl */
+/* u_fcntl SUPPORT */
+/* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -27,31 +27,49 @@
 
 /* local defines */
 
-#define	TO_INTR		5
-
 
 /* external subroutines */
 
-extern int	msleep(int) ;
+
+/* forward refeferences */
+
+static int	ufcntl(int,int,caddr_t) noex ;
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
+int u_fcntl(int fd,int cmd,...) noex {
+	int		rs = SR_BADF ;
+	if (fd >= 0) {
+	    rs = SR_INVALID ;
+	    if (cmd >= 0) {
+	        va_list		ap ;
+	        caddr_t		any ;
+	        va_begin(ap,cmd) ;
+		{
+	            any = va_arg(ap,caddr_t) ;
+		    rs = ufcntl(fd,cmd,any) ;
+		}
+	        va_end(ap) ;
+	    } /* end if (plausible-command) */
+	} /* end if (good-FD) */
+	return rs ;
+}
+/* end subroutine (u_fcntl) */
 
-int u_fcntl(int fd,int cmd,...)
-{
-	caddr_t		any ;
+
+/* local subroutines */
+
+static int ufcntl(int fd,int cmd,caddr_t any) noex {
 	int		rs ;
-	int		to_intr = TO_INTR ;
-	int		f_exit = FALSE ;
-
-	{
-	va_list	ap ;
-	va_begin(ap,cmd) ;
-	any = va_arg(ap,caddr_t) ;
-	va_end(ap) ;
-	}
-
+	int		to_intr = utimeout[uto_intr] ;
+	int		f_exit = false ;
 	repeat {
 	    if ((rs = fcntl(fd,cmd,any)) == -1) rs = (- errno) ;
 	    if (rs < 0) {
@@ -60,33 +78,26 @@ int u_fcntl(int fd,int cmd,...)
 	            if (to_intr-- > 0) {
 	                msleep(1000) ;
 		    } else {
-			f_exit = TRUE ;
+			f_exit = true ;
 		    }
 	            break ;
 		default:
-		    f_exit = TRUE ;
+		    f_exit = true ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	if (rs == SR_ACCESS) {
 	    switch (cmd) {
 	    case F_GETLK:
 	    case F_SETLK:
 	    case F_SETLKW:
-#if	defined(LARGEFILE64_SOURCE) && (LARGEFILE64_SOURCE == 1)
-	    case F_GETLK64:
-	    case F_SETLK64:
-	    case F_SETLKW64:
-#endif
 	        rs = SR_AGAIN ;
 		break ;
 	    } /* end switch */
 	} /* end if (old mess-up) */
-
 	return rs ;
 }
-/* end subroutine (u_fcntl) */
+/* end subroutine (ufcntl) */
 
 

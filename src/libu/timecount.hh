@@ -29,11 +29,10 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<utypedefs.h>
 #include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
 #include	<clanguage.h>
-#include	<msleep.h>
-#include	<localmisc.h>
 
 
 #ifndef	POLLMULT
@@ -47,17 +46,7 @@ public:
 	timecount(int a) : to(a*POLLMULT) { } ;
 	timecount(const timecount &) = delete ;
 	timecount &operator = (const timecount &) = delete ;
-	operator int () noex {
-	    int		rs = SR_TIMEDOUT ;
-	    int		f = true ;
-	    if (to-- > 0) {
-		f = false ;
-		if ((rs = msleep(1)) > 0) {
-		    rs = SR_OK ;
-		}
-	    } /* end if (counting down) */
-	    return (rs >= 0) ? f : rs ;
-	} ; /* end method (operator) */
+	operator int () noex ;
 } ; /* end class (timecount) */
 
 

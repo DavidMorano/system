@@ -1,4 +1,4 @@
-/* ucopen SUPPORT */
+/* ucfiledesc SUPPORT */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -30,8 +30,7 @@
 #include	<usystem.h>
 #include	<localmisc.h>
 
-#include	"ucopeninfo.h"
-#include	"ucopen.h"
+#include	"ucfiledesc.h"
 
 
 /* local defines */
@@ -54,39 +53,10 @@
 
 /* exported subroutines */
 
-int uc_open(cchar *fn,int of,mode_t om) noex {
-	int		oo = 0 ;
-	return uc_openex(fn,of,om,-1,oo) ;
+int uc_fcntl(int fd,int cmd,...) noex {
+	return u_fcntl(fd,cmd,0) ;
 }
-/* end subroutine (uc_open) */
+/* end subroutine (uc_fcntl) */
 
-int uc_opene(cchar *fn,int of,mode_t om,int to) noex {
-	int		oo = 0 ;
-	return uc_openex(fn,of,om,to,oo) ;
-}
-/* end subroutine (uc_opene) */
-
-int uc_openenv(cchar *fn,int of,mode_t om,mainv ev,int to) noex {
-	UCOPENINFO	oi{} ;
-	oi.fname = fn ;
-	oi.oflags = of ;
-	oi.operms = om ;
-	oi.to = to ;
-	oi.opts = 0 ;
-	oi.envv = ev ;
-	return uc_openinfo(&oi) ;
-}
-/* end subroutine (uc_openenv) */
-
-int uc_socket(int pf,int pt,int proto) noex {
-	return u_socket(pf,pt,proto) ;
-}
-/* end subroutine (uc_socket) */
-
-int uc_dupmin(int fd,int mfd) noex {
-	cint	cmd = F_DUPFD ;
-	return u_fcntl(fd,cmd,mfd) ;
-}
-/* end subroutine (uc_dupmin) */
 
 

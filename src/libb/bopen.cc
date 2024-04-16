@@ -179,11 +179,22 @@ int bopenmgr::openfd(int idx) noex {
 	int		rs = SR_OK ;
 	if ((rs = uc_dupmin(idx,BFILE_MINFD)) >= 0) {
 	    op->fd = rs ;
-
+	    if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
+		rs = openadj() ;
+	    }
 	} /* end if (uc_dupmin) */
 	return rs ;
 }
 /* end method (bopenmgr::openfd) */
+
+int bopenmgr::openadj() noex {
+	int		rs ;
+	if ((rs = uc_fcntl(fp->fd,F_GETFL,0)) >= 0) {
+
+	}
+	return rs ;
+}
+/* end method (bopenmgr::openadj) */
 
 
 #ifdef	COMMENT
@@ -546,9 +557,10 @@ static int bfile_bufend(bfile *fp) noex {
 
 static int bfile_opts(bfile *fp,int oflags,mode_t om) noex {
 	int		rs ;
-	rs = uc_closeonexec(fp->fd,true) ;
-	if ((rs >= 0) && (oflags & O_MINMODE) && (om > 0)) {
-	    rs = uc_fminmod(fp->fd,om) ;
+	if ((rs = uc_closeonexec(fp->fd,true)) >= 0) {
+	    if ((oflags & O_MINMODE) && (om > 0)) {
+	        rs = uc_fminmod(fp->fd,om) ;
+	    }
 	}
 	if (oflags & O_NETWORK) fp->f.network = true ;
 	return rs ;
@@ -632,9 +644,6 @@ int bopenmgr::mkoflags(cchar *os) noex {
 	        break ;
 	    case 'x':
 	        of |= O_EXCL ;
-		break ;
-	    case 'C':
-		of |= O_CLOEXEC ;
 		break ;
 	    case 'F':
 		of |= O_MINFD ;		/* minimum-file-descriptor */

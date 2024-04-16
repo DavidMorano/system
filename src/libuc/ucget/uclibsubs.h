@@ -227,8 +227,8 @@ extern int	uc_sockatmark(int) noex ;
 extern int	uc_peek(int,void *,int) noex ;
 extern int	uc_getsocktype(int) noex ;
 
-extern int	uc_tcsetattr(int,int,TERMIOS *) noex ;
-extern int	uc_tcgetattr(int,TERMIOS *) noex ;
+extern int	uc_tcattrset(int,int,const TERMIOS *) noex ;
+extern int	uc_tcattrget(int,TERMIOS *) noex ;
 extern int	uc_tcgetsid(int) noex ;
 extern int	uc_tcsetpgrp(int,pid_t) noex ;
 extern int	uc_tcgetpgrp(int) noex ;
