@@ -89,4 +89,10 @@ int uc_dupmin(int fd,int mfd) noex {
 }
 /* end subroutine (uc_dupmin) */
 
+int uc_dupmince(int fd,int mfd) noex {
+	cint	cmd = F_DUPFD_CLOEXEC ;
+	return u_fcntl(fd,cmd,mfd) ;
+}
+/* end subroutine (uc_dupmince) */
+
 

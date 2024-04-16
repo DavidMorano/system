@@ -177,11 +177,9 @@ int bopenmgr::getfile() noex {
 
 int bopenmgr::openfd(int idx) noex {
 	int		rs = SR_OK ;
-	if ((rs = uc_dupmin(idx,BFILE_MINFD)) >= 0) {
+	if ((rs = uc_dupmince(idx,BFILE_MINFD)) >= 0) {
 	    op->fd = rs ;
-	    if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
-		rs = openadj() ;
-	    }
+	    rs = openadj() ;
 	} /* end if (uc_dupmin) */
 	return rs ;
 }
@@ -190,6 +188,7 @@ int bopenmgr::openfd(int idx) noex {
 int bopenmgr::openadj() noex {
 	int		rs ;
 	if ((rs = uc_fcntl(fp->fd,F_GETFL,0)) >= 0) {
+	    cint	fl = rs ;
 
 	}
 	return rs ;
