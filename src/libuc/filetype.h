@@ -10,7 +10,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/stat.h>
+#include	<sys/stat.h>		/* |S_IFMT| */
 #include	<dirent.h>		/* possielbe preprocesor 'DT_{x}' */
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -85,7 +85,8 @@ enum filetypes {
 EXTERNC_begin
 
 static inline int filetype(mode_t m) noex {
-	return ((m & S_IFMT)  >> 12) ;
+	cint	uv = int(m) ;
+	return ((uv & S_IFMT) >> 12) ;
 }
 
 EXTERNC_end

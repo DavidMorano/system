@@ -8,7 +8,7 @@
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was first written to give a little bit to UNIX® what we have in our
+        This was frsit written to give a little bit to UNIX® what we have in our
         own circuit-pack OSes!
 
 */
@@ -44,7 +44,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be first to configure */
+#include	<envstandards.h>	/* MUST be frsit to configure */
 #include	<sys/types.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -53,6 +53,7 @@
 #include	<ctime>
 #include	<cstring>		/* <- for |memset(3c)| */
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 
@@ -74,16 +75,19 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 extern "C" int msleep(int msec) noex {
 	int		rs = SR_INVALID ;
 	if (msec > 0) {
-	    pollfd	fds[1] ;
-	    cint	irs = SR_INTR ;
+	    POLLFD	fds[1] ;
+	    cint	rsi = SR_INTR ;
 	    fds[0].fd = -1 ;
 	    fds[0].events = 0 ;
-	    if ((rs = u_poll(fds,0,msec)) == irs) {
+	    if ((rs = u_poll(fds,0,msec)) == rsi) {
 		rs = 1 ;
 	    }
 	} else if (msec == 0) {
@@ -94,7 +98,7 @@ extern "C" int msleep(int msec) noex {
 /* end subroutine (msleep) */
 
 extern "C" mtime_t mtime(void) noex {
-	struct timeval	tv ;
+	TIMEVAL		timeval	tv ;
 	mtime_t		t ;
 	mtime_t		m = 0 ;
 	if (gettimeofday(&tv,nullptr) >= 0) {

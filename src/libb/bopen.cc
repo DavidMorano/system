@@ -151,12 +151,40 @@ int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 
 bopenmgr::operator int () noex {
 	int		rs ;
+	op->fd = -1 ;
 	if ((rs = mkoflags(os)) >= 0) {
-	    rs = SR_OK ;
+	    if ((rs = getfile()) > 0) {
+	        rs = SR_OK ;
+	    }
 	} /* end if (mkoflags) */
 	return rs ;
 }
 /* end method (bopenmgr::operator) */
+
+int bopenmgr::getfile() noex {
+	int		rs = SR_OK ;
+	if ((rs = getfdfile(fn,-1)) >= 0) {	/* "standard" file */
+	    op->f.filedesc = true ;
+	    rs = openfd(rs) ;
+	} else if (rs == SR_EMPTY) {		/* "null" file */
+	    fp->f.nullfile = true ;
+	} else if (rs != SR_DOM) {
+	    rs = openreg() ;
+	}
+	return rs ;
+}
+/* end method (bopenmgr::getfile) */
+
+int bopenmgr::openfd(int idx) noex {
+	int		rs = SR_OK ;
+	if ((rs = uc_dupmin(idx,BFILE_MINFD)) >= 0) {
+	    op->fd = rs ;
+
+	} /* end if (uc_dupmin) */
+	return rs ;
+}
+/* end method (bopenmgr::openfd) */
+
 
 #ifdef	COMMENT
 	USTAT		sb ;

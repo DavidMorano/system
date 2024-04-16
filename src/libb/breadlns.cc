@@ -48,8 +48,6 @@
 
 /* local defines */
 
-#define	TO_READ		(5*60)
-
 #define	ISCONT(b,bl)	iscont(b,bl)
 
 

@@ -40,6 +40,11 @@
 EXTERNC_begin
 
 extern int uc_socket(int,int,int) noex ;
+extern int uc_dupmin(int,int) noex ;
+
+static inline int uc_dup(int fd) noex {
+	return uc_dupmin(fd,-1) ;
+}
 
 EXTERNC_end
 

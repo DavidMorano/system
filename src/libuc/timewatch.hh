@@ -41,7 +41,7 @@
 
 
 class timewatch {
-	int		mto ;
+	int		mto ;		/* millisecond-timeout */
 public:
 	timewatch(int a) : mto(a * POLLMULT) { } ;
 	timewatch(const timewatch &) = delete ;

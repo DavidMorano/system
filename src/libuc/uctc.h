@@ -33,7 +33,7 @@ extern int uc_tcflush(int,int) noex ;
 extern int uc_tcgetattr(int,TERMIOS *) noex ;
 extern int uc_tcgetpgrp(int) noex ;
 extern int uc_tcgetsid(int) noex ;
-extern int uc_tcsetattr(int,int,TERMIOS *) noex ;
+extern int uc_tcsetattr(int,int,const TERMIOS *) noex ;
 extern int uc_tcsetpgrp(int,pid_t) noex ;
 
 EXTERNC_end

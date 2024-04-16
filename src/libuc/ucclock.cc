@@ -1,4 +1,4 @@
-/* uc_clock SUPPORT */
+/* ucclock SUPPORT */
 /* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
@@ -28,16 +28,22 @@
 #include	<usystem.h>
 
 
+/* local defines */
+
+
 /* external subroutines */
 
 
 /* external variables */
 
 
-/* local defines */
-
-
 /* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

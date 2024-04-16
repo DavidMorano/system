@@ -35,6 +35,7 @@
 #define	BFILE_MAPFL	struct bfile_mapflags
 
 #define	BFILE_MAGIC	0x20052615
+#define	BFILE_MINFD	10
 #define	BFILE_BUFPAGES	16
 #define	BFILE_FDCH	'*'
 #define	BFILE_FDNAMELEN	22

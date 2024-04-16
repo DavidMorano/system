@@ -22,15 +22,10 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<utimeout.h>
-#include	<msleep.h>
-#include	<mtime.h>
 #include	<timecount.hh>
 #include	<ulogerror.h>
 #include	<filetype.h>
-
-#ifdef	__cplusplus
 #include	<aflag.hh>
-#endif /* __cplusplus */
 
 
 #ifndef	SUBROUTINE_MEMCLEAR
@@ -55,10 +50,31 @@ int memclear(T *op) noex {
 #endif /* TEMPLATE_MEMCLEAR */
 
 
+#ifndef	TYPEDEF_MTIME
+#define	TYPEDEF_MTIME
+typedef int64_t		mtime_t ;
+#endif
+
+#ifndef	SUBROUTINE_MTIME
+#define	SUBROUTINE_MTIME
+EXTERNC_begin
+extern mtime_t	mtime(void) ;
+EXTERNC_end
+#endif
+
+
+#ifndef	SUBROUTINE_MSLEEP
+#define	SUBROUTINE_MSLEEP
+EXTERNC_begin
+extern int	msleep(int) noex ;
+EXTERNC_end
+#endif
+
+
 #ifndef	SUBROUTINE_FILETYPE
 #define	SUBROUTINE_FILETYPE
 EXTERNC_begin
-extern int filetype(mode_t) noex ;
+extern int	filetype(mode_t) noex ;
 EXTERNC_end
 #endif /* SUBROUTINE_FILETYPE */
 
