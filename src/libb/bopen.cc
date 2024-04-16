@@ -97,12 +97,11 @@ namespace {
 	cchar		*os ;
 	int		to ;
 	cint		maxopenfile = getdtablesize() ;
-	mode_t		om ;
 	bopenmgr(bfile *aop,cchar *afn,cchar *aos,mode_t aom,int ato) noex {
 	    op = aop ;
 	    fn = afn ;
 	    os = aos ;
-	    om = aom ;
+	    aop->om = aom ;
 	    to = ato ;
 	} ;
 	operator int () noex ;
@@ -110,7 +109,9 @@ namespace {
 	int getfile() noex ;
 	int openfd(int) noex ;
 	int openadj() noex ;
+	int openoffset() noex ;
 	int openreg() noex ;
+	int iclose() noex ;
    } ;
 }
 
@@ -119,7 +120,7 @@ namespace {
 
 static int	bfile_bufbegin(bfile *,int) noex ;
 static int	bfile_bufend(bfile *) noex ;
-static int	bfile_opts(bfile *,int,mode_t) noex ;
+static int	bfile_opts(bfile *) noex ;
 static int	bfile_mapbegin(bfile *) noex ;
 static int	bfile_mapend(bfile *) noex ;
 
@@ -181,7 +182,12 @@ int bopenmgr::openfd(int idx) noex {
 	int		rs = SR_OK ;
 	if ((rs = uc_dupmince(idx,BFILE_MINFD)) >= 0) {
 	    op->fd = rs ;
-	    rs = openadj() ;
+	    if ((rs = openadj()) >= 0) {
+		rs = openoffset() ;
+	    }
+	    if (rs < 0) {
+		iclose() ;
+	    }
 	} /* end if (uc_dupmin) */
 	return rs ;
 }
@@ -211,8 +217,28 @@ int bopenmgr::openadj() noex {
 }
 /* end method (bopenmgr::openadj) */
 
+int bopenmgr::openoffset() noex {
+	int		rs ;
+	off_t		fo{} ;
+	if ((rs = uc_tell(op->fd,&fo)) >= 0) {
+	    op->offset = size_t(fo) ;
+	}
+	return rs ;
+}
+/* end method (bopenmgr::openoffset) */
+
 int bopenmgr::openreg() noex {
-	return 0 ;
+	cint		of = op->of ;
+	int		rs ;
+	cmode		om = op->om ;
+	if ((rs = uc_opene(fn,of,om,to)) >= 0) {
+	    op->fd = rs ;
+	    rs = bfile_opts(op) ;
+	    if (rs < 0) {
+		iclose() ;
+	    }
+	}
+	return rs ;
 }
 /* end method (bopenmgr::openreg) */
 
@@ -569,14 +595,16 @@ static int bfile_bufend(bfile *op) noex {
 }
 /* end subroutine (bfile_bufend) */
 
-static int bfile_opts(bfile *op,int oflags,mode_t om) noex {
-	int		rs ;
-	if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
-	    if ((oflags & O_MINMODE) && (om > 0)) {
-	        rs = uc_fminmod(op->fd,om) ;
-	    }
+static int bfile_opts(bfile *op) noex {
+	cint		of = op->of ;
+	int		rs = SR_OK ;
+	cmode		om = op->om ;
+	if ((rs >= 0) & (of & O_MINMODE) && (om > 0)) {
+	    rs = uc_fminmod(op->fd,om) ;
 	}
-	if (oflags & O_NETWORK) op->f.network = true ;
+	if ((rs >= 0) && (of & O_NETWORK)) {
+	    op->f.network = true ;
+	}
 	return rs ;
 }
 /* end subroutine (bfile_opts) */
@@ -620,7 +648,7 @@ static int bfile_mapend(bfile *op) noex {
 
 int bopenmgr::mkoflags(cchar *os) noex {
 	int		rs = SR_OK ;
-	int		of = 0 ;
+	int		of = O_CLOEXEC ;
 	while (*os) {
 	    cint	sc = mkchar(*os++) ;
 	    switch (sc) {
@@ -679,5 +707,17 @@ int bopenmgr::mkoflags(cchar *os) noex {
 	return rs ;
 }
 /* end method (bopenmgr::mkoflags) */
+
+int bopenmgr::iclose() noex {
+	int		rs = SR_OK ;
+	int		rs1 ;
+	if (op->fd >= 0) {
+	    rs1 = uc_close(op->fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	    op->fd = -1 ;
+	}
+	return rs ;
+}
+/* end method (bopenmgr::iclose) */
 
 

@@ -1,9 +1,8 @@
-/* u_tell */
+/* u_tell SUPPORT */
+/* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -22,35 +21,32 @@
 #include	<fcntl.h>
 #include	<errno.h>
 #include	<usystem.h>
+#include	<intsat.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-
-int u_tell(int fd,off_t *rp)
-{
-	off_t	ro ;
+int u_tell(int fd,off_t *rp) noex {
+	off_t		ro ;
 	int		rs ;
-
-#if	CF_DEBUGS
-	debugprintf("u_tell: ent fd=%d\n",fd) ;
-#endif
-
 	repeat {
 	    rs = SR_OK ;
 	    if ((ro = lseek(fd,0L,SEEK_CUR)) < 0) rs = (- errno) ;
 	} until (rs != SR_INTR) ;
-	if (rs >= 0) rs = (ro & INT_MAX) ;
-
-	if (rp != NULL) {
+	if (rs >= 0) rs = intsat(ro) ;
+	if (rp) {
 	    *rp = (rs >= 0) ? ro : 0 ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("u_tell: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (u_tell) */

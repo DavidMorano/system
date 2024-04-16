@@ -27,6 +27,8 @@
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -54,9 +56,34 @@
 /* exported subroutines */
 
 int uc_fcntl(int fd,int cmd,...) noex {
-	return u_fcntl(fd,cmd,0) ;
+	int		rs ;
+	va_list		ap ;
+	va_begin(ap,cmd) ;
+	{
+	    caddr_t	any = va_arg(ap,caddr_t) ;
+	    rs = u_fcntl(fd,cmd,any) ;
+	}
+	va_end(ap) ;
+	return rs ;
 }
 /* end subroutine (uc_fcntl) */
 
+int uc_ioctl(int fd,int cmd,...) noex {
+	int		rs ;
+	va_list		ap ;
+	va_begin(ap,cmd) ;
+	{
+	    caddr_t	any = va_arg(ap,caddr_t) ;
+	    rs = u_ioctl(fd,cmd,any) ;
+	}
+	va_end(ap) ;
+	return rs ;
+}
+/* end subroutine (uc_ioctl) */
+
+int uc_tell(int fd,off_t *offp) noex {
+	return u_tell(fd,offp) ;
+}
+/* end subroutine (uc_tell) */
 
 
