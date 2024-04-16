@@ -49,12 +49,18 @@
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<poll.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
 #include	<cstring>		/* <- for |memset(3c)| */
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usyscalls.h>
+#include	<clanguage.h>
 #include	<intsat.h>
 #include	<localmisc.h>
+
+#include	"usupport.h"
 
 
 /* local defines */
@@ -80,7 +86,23 @@
 
 /* exported subroutines */
 
-extern "C" int msleep(int msec) noex {
+mtime_t mtime(void) noex {
+	TIMEVAL		tv ;
+	mtime_t		t ;
+	mtime_t		m = 0 ;
+	if (gettimeofday(&tv,nullptr) >= 0) {
+	    t = tv.tv_sec ;
+	    m += (t*1000) ;
+	    m += (tv.tv_usec / 1000) ;
+	} else {
+	    t = time(nullptr) ;
+	    m += (t*1000) ;
+	}
+	return m ;
+}
+/* end subroutine (mtime) */
+
+int msleep(int msec) noex {
 	int		rs = SR_INVALID ;
 	if (msec > 0) {
 	    POLLFD	fds[1] ;
@@ -97,26 +119,10 @@ extern "C" int msleep(int msec) noex {
 }
 /* end subroutine (msleep) */
 
-extern "C" mtime_t mtime(void) noex {
-	TIMEVAL		timeval	tv ;
-	mtime_t		t ;
-	mtime_t		m = 0 ;
-	if (gettimeofday(&tv,nullptr) >= 0) {
-	    t = tv.tv_sec ;
-	    m += (t*1000) ;
-	    m += (tv.tv_usec / 1000) ;
-	} else {
-	    t = time(nullptr) ;
-	    m += (t*1000) ;
-	}
-	return m ;
-}
-/* end subroutine (mtime) */
-
-extern "C" int memclear(void *vp,size_t sz) noex {
+int memclear(void *vp,size_t sz) noex {
 	int		rs = SR_FAULT ;
 	if (vp) {
-	    rs = int(sz & INT_MAX) ;
+	    rs = intsat(sz) ;
 	    memset(vp,0,sz) ;
 	}
 	return rs ;

@@ -27,7 +27,12 @@
 #include	<fcntl.h>
 #include	<poll.h>
 #include	<cerrno>
-#include	<usystem.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 #include	<localmisc.h>
 
 #include	"ucopeninfo.h"

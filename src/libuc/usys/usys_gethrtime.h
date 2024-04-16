@@ -36,7 +36,7 @@
 /* GETHRTIME begin */
 #if	defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0)
 
-/* nothing needed */
+/* » nothing needed « */
 
 #else /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
 

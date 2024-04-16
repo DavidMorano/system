@@ -16,51 +16,11 @@
 
 /*******************************************************************************
 
-	We defines some system (global) variables in this module.
+	We defines some missing OS interfaces.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/time.h>		/* <- the money shot */
-#include	<cerrno>
-#include	<ctime>			/* Darwin |clock_xx(3)| */
-#include	<usysflag.h>
-#include	<clanguage.h>
-
-#include	"usys_gethrtime.h"
-
-
-/* local defines */
-
-
-/* local typedefs */
-
-
-/* external variables */
-
-
-/* external subroutines */
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
-
-constexpr bool		f_sunos		= F_SUNOS ;
-constexpr bool		f_darwin	= F_DARWIN ;
-constexpr bool		f_linux		= F_LINUX ;
-
-constexpr unsigned long	onebillion = 1000000000 ;
-
-
-/* exported variables */
-
-
-/* exported subroutines */
 
 /* GETHRTIME begin */
 #if	defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0)
@@ -69,21 +29,48 @@ constexpr unsigned long	onebillion = 1000000000 ;
 
 #else /* defined(SYSHAS_GETHRTIME) && (SYSHAS_GETHRTIME > 0) */
 
+#include	<sys/time.h>		/* <- the money shot */
+#include	<cerrno>
+#include	<ctime>			/* Darwin |clock_xx(3)| */
+#include	<usysflag.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+
+#include	"usys_gethrtime.h"
+
+
+#if	defined(OSNAME_DARWIN) && (OSNAME_DARWIN > 0)
+
 hrtime_t gethrtime() noex {
 	const clockid_t	cid = CLOCK_MONOTONIC_RAW ;
+	return clock_gettime_nsec_np(cid) ;
+}
+
+#elif	defined(OSNAME_LINUX) && (OSNAME_LINUX > 0)
+
+constexpr unsigned long	onebillion = 1000000000 ;
+
+hrtime_t gethrtime() noex {
+	TIMESPEC	ts ;
+	const clockid_t	cid = CLOCK_MONOTONIC_RAW ;
 	hrtime_t	r = 0 ;
-	if constexpr (f_darwin) {
-	    r = clock_gettime_nsec_np(cid) ;
-	} else {
-	    struct timespec	ts ;
-	    if (clock_gettime(cid,&ts) >= 0) {
-		hrtime_t	t = ts.tv_sec ;
-		r = ts.tv_nsec ;
-		r += (t * onebillion) ;
-	    }
-	} /* end if-constexpr (f_darwin) */
+	if (clock_gettime(cid,&ts) >= 0) {
+	    hrtime_t	t = ts.tv_sec ;
+	    r = ts.tv_nsec ;
+	    r += (t * onebillion) ;
+	}
 	return r ;
 }
+
+#else /* all other OSes */
+
+hrtime_t gethrtime() noex {
+	return 0 ;
+}
+
+#endif /* which OS */
+
 
 #endif /* (!defined(SYSHAS_GETHRTIME)) || (SYSHAS_GETHRTIME == 0) */
 /* GETHRTIME end */
