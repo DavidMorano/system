@@ -179,7 +179,7 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 
 	    rs1 = uc_free(fbuf) ;
 	    if (rs >= 0) rs = rs1 ;
-	} /* end if (m-a) */
+	} /* end if (m-a-f) */
 
 	    } /* end if (writing) */
 	} /* end if (magic) */

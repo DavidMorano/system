@@ -27,11 +27,12 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<bfile.h>
+#include	<linefold.h>
+#include	<rmx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>		/* |COLUMNS| */
 
-#include	"linefold.h"
+#include	"bfile.h"
 
 
 /* local defines */
@@ -120,37 +121,15 @@ static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
 
 static int bprintcleanliner(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
-	int		ml ;
+	int		rl = rmeol(lp,ll) ;
 	int		wlen = 0 ;
-	bool		f_end = false ;
-
-	while ((ll > 0) && iseol(lp[ll - 1])) {
-	    f_end = true ;
-	    ll -= 1 ;
-	}
-
-	while ((rs >= 0) && ((ll > 0) || f_end)) {
-
-	    f_end = false ;
-	    ml = min(ll,linelen) ;
-
-#ifdef	COMMENT /* what is this? */
-	    if ((ml < ll) && iseol(lp[ml-1])) {
-	        ml += 1 ;
-	        if ((lp[-1] == '\r') && (ml < ll) && (lp[0] == '\n')) {
-	            ml += 1 ;
-	        }
-	    }
-#endif /* COMMENT */
-
+	while ((rs >= 0) && (rl > 0)) {
+	    cint	ml = min(rl,linelen) ;
 	    rs = bprintcleanln(op,lp,ml) ;
 	    wlen += rs ;
-
 	    lp += ml ;
-	    ll -= ml ;
-
+	    rl -= ml ;
 	} /* end while */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintcleanliner) */
