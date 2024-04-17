@@ -50,7 +50,7 @@
 #include	<strn.h>
 #include	<sfx.h>
 #include	<snx.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |COLUMNS| + |NTABCOLS| */
 
 #include	"bfile.h"
 
@@ -63,10 +63,6 @@
 #else
 #define	LINEBUFLEN	2048
 #endif
-#endif
-
-#ifndef	COLUMNS
-#define	COLUMNS		80
 #endif
 
 

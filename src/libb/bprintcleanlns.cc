@@ -4,7 +4,7 @@
 /* print a clean (cleaned up) line of text */
 /* version %I% last-modified %G% */
 
-#define	CF_LINEFOLD	1		/* use 'linefold(3dam)' */
+#define	CF_LINEFOLD	1		/* use |linefold(3dam)| */
 
 /* revision history:
 
@@ -38,7 +38,7 @@
 /* local defines */
 
 #ifndef	CF_LINEFOLD
-#define	CF_LINEFOLD	1		/* use 'linefold(3dam)' */
+#define	CF_LINEFOLD	1		/* use |linefold(3dam)| */
 #endif
 
 
@@ -104,15 +104,15 @@ static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	if ((rs = linefold_start(&lf,linelen,0,lp,ll)) >= 0) {
+	if ((rs = lf.start(linelen,0,lp,ll)) >= 0) {
 	    int		sl ;
 	    cchar	*sp ;
-	    for (int i = 0 ; (sl = linefold_get(&lf,i,&sp)) >= 0 ; i += 1) {
+	    for (int i = 0 ; (sl = lf.getln(i,&sp)) >= 0 ; i += 1) {
 		rs = bprintcleanliner(op,linelen,sp,sl) ;
 		wlen += rs ;
 		if (rs < 0) break ;
 	    } /* end for */
-	    rs1 = linefold_finish(&lf) ;
+	    rs1 = lf.finish ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (linefold) */
 	return (rs >= 0) ? wlen : rs ;

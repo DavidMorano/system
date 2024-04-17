@@ -78,9 +78,8 @@ struct linefold_iter {
 	} ;
 	void increment(int = 1) noex ;
 } ; /* end struct linefold_iter) */
-struct linefold ;
 struct linefold_co {
-	linefold		*op = nullptr ;
+	linefold	*op = nullptr ;
 	int		w = -1 ;
 	void operator () (linefold *p,int m) noex {
 	    op = p ;
