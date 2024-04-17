@@ -212,6 +212,8 @@ extern int	bputc(bfile *,int) noex ;
 extern int	bprintf(bfile *,cchar *,...) noex ;
 extern int	bvprintf(bfile *,cchar *,va_list) noex ;
 extern int	bprintln(bfile *,cchar *,int) noex ;
+extern int	bprintcleanln(bfile *,cchar *,int) noex ;
+extern int	bprintcleanlns(bfile *,int,cchar *,int) noex ;
 extern int	bcopyblock(bfile *,bfile *,int) noex ;
 extern int	bcopyfile(bfile *,bfile *,char *,int) noex ;
 extern int	btruncate(bfile *,off_t) noex ;
