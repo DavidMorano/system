@@ -21,17 +21,11 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<csignal>
 #include	<climits>		/* |INT_MAX| */
-#include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<mallocxx.h>
 #include	<linebuffer.h>
 #include	<rmx.h>
 #include	<mkchar.h>

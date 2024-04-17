@@ -34,13 +34,13 @@
 
 	Returns:
 	>=0		number of characters printed
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<localmisc.h>
@@ -49,6 +49,12 @@
 
 
 /* local defines */
+
+
+/* external subroutines */
+
+
+/* local variables */
 
 
 /* exported variables */
@@ -60,34 +66,24 @@ int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(fp,lbuf)) > 0) {
-	        bool	feol = false ;
-	        if (llen < 0) llen = strlen(lbuf) ;
-	        feol = feol || (llen == 0) ;
-		feol = feol || (lbuf[llen-1] != CH_NL) ;
-	        if (feol) {
-		    rs = breserve(fp,(llen+1)) ;
-		}
-	        if ((rs >= 0) && (llen > 0)) {
-	            rs = bwrite(fp,lbuf,llen) ;
-	            wlen += rs ;
-	        }
-	        if ((rs >= 0) && feol) {
-	            rs = bputc(fp,CH_NL) ;
-	            wlen += rs ;
-	        }
+	    bool	feol = false ;
+	    if (llen < 0) llen = strlen(lbuf) ;
+	    feol = feol || (llen == 0) ;
+	    feol = feol || (lbuf[llen-1] != CH_NL) ;
+	    if (feol) {
+		rs = breserve(fp,(llen+1)) ;
+	    }
+	    if ((rs >= 0) && (llen > 0)) {
+	        rs = bwrite(fp,lbuf,llen) ;
+	        wlen += rs ;
+	    }
+	    if ((rs >= 0) && feol) {
+	        rs = bputc(fp,CH_NL) ;
+	        wlen += rs ;
+	    }
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintln) */
-
-int bprint(bfile *fp,cchar *lbuf,int llen) noex {
-	return bprintln(fp,lbuf,llen) ;
-}
-/* end subroutine (bprint) */
-
-int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
-	return bprintln(fp,lbuf,llen) ;
-}
-/* end subroutine (bprintline) */
 
 
