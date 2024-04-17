@@ -122,6 +122,8 @@ struct linefold : linefold_head {
 typedef LINEFOLD	linefold ;
 #endif /* __cplusplus */
 
+typedef	LINEFOLD_FL	linefold_fl ;
+
 EXTERNC_begin
 
 extern int linefold_start(linefold *,int,int,cchar *,int) noex ;
@@ -129,10 +131,6 @@ extern int linefold_get(linefold *,int,cchar **) noex ;
 extern int linefold_getln(linefold *,int,cchar **) noex ;
 extern int linefold_count(linefold *) noex ;
 extern int linefold_finish(linefold *) noex ;
-
-static inline int linefold_getline(linefold *op,int li,cchar **rpp) noex {
-	return linefold_getln(op,li,rpp) ;
-}
 
 EXTERNC_end
 

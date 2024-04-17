@@ -75,6 +75,12 @@
 #endif
 #endif /* __cplusplus */
 
+#ifdef	__cplusplus
+#ifndef	if_constexpr
+#define	if_constexpr		if constexpr
+#endif
+#endif /* __cplusplus */
+
 #ifndef	EXTERNC_begin
 #ifdef	__cplusplus
 #define	EXTERNC_begin	extern "C" {

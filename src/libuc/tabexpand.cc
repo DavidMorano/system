@@ -25,7 +25,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<ascii.h>
 #include	<sbuf.h>
 #include	<tabcols.h>
 #include	<char.h>

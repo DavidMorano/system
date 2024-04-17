@@ -171,7 +171,7 @@ static int	locinfo_finish(LOCINFO *) ;
 static int	locinfo_setentry(LOCINFO *,cchar **,cchar *,int) ;
 #endif
 
-static int	isOther(int) ;
+static bool	isOther(int) noex ;
 
 
 /* local variables */
@@ -300,9 +300,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	int		v ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 
 	const char	*argp, *aop, *akp, *avp ;
 	const char	*argval = NULL ;
@@ -387,9 +387,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -408,7 +408,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -417,7 +417,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -428,7 +428,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -446,7 +446,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* open time-out */
 	                case argopt_to:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            tos_open = avp ;
 	                    } else {
@@ -464,7 +464,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* read time-out */
 	                case argopt_tr:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            tos_read = avp ;
 	                    } else {
@@ -482,7 +482,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* line-indent */
 	                case argopt_indent:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            tos_read = avp ;
 	                    } else {
@@ -498,13 +498,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -522,7 +522,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* argument-list file */
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -540,7 +540,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -558,7 +558,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -576,7 +576,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 /* input file name */
 	                case argopt_if:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ifname = avp ;
 	                    } else {
@@ -609,7 +609,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -619,7 +619,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -636,7 +636,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* options */
@@ -671,14 +671,14 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 
 /* line-buffered */
 	                    case 'u':
-	                        pip->f.bufline = TRUE ;
+	                        pip->f.bufline = true ;
 	                        break ;
 
 /* verbose mode */
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -700,7 +700,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -732,8 +732,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -826,7 +826,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp) noex {
 	if (pip->to_read == 0)
 	    pip->to_read = 1 ;
 
-	if (lip->f.pass && (! lip->have.geekout)) lip->f.geekout = FALSE ;
+	if (lip->f.pass && (! lip->have.geekout)) lip->f.geekout = false ;
 
 /* linewidth (for geek-out mode -- the default) */
 
@@ -910,13 +910,13 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    keyopt_finish(&akopts) ;
 	}
 
@@ -967,7 +967,7 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
 	lip->indent = DEFINDENT ;
 	lip->to = -1 ;
 
-	lip->f.geekout = TRUE ;
+	lip->f.geekout = true ;
 
 	return rs ;
 }
@@ -980,7 +980,7 @@ static int locinfo_finish(LOCINFO *lip) noex {
 	if (lip == NULL) return SR_FAULT ;
 
 	if (lip->open.stores) {
-	    lip->open.stores = FALSE ;
+	    lip->open.stores = false ;
 	    rs1 = vecstr_finish(&lip->stores) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1098,16 +1098,16 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	                    break ;
 	                case progopt_sanity:
 	                case progopt_geekout:
-	                    lip->have.geekout = TRUE ;
-	                    lip->f.geekout = TRUE ;
+	                    lip->have.geekout = true ;
+	                    lip->f.geekout = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
 	                        lip->f.geekout = (rs > 0) ;
 	                    }
 	                    break ;
 	                case progopt_pass:
-	                    lip->have.pass = TRUE ;
-	                    lip->f.pass = TRUE ;
+	                    lip->have.pass = true ;
+	                    lip->f.pass = true ;
 	                    if (vl > 0) {
 	                        rs = optbool(vp,vl) ;
 	                        lip->f.pass = (rs > 0) ;
@@ -1155,7 +1155,7 @@ const char	*afn ;
 	    cchar	*cp ;
 
 	    if (pip->f.bufline)
-	        shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
+	        shio_control(ofp,SHIO_CSETBUFLINE,true) ;
 
 /* go through the loops */
 
@@ -1258,8 +1258,8 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 	int		len ;
 	int		cl ;
 	int		wlen = 0 ;
-	int		f_stdin = FALSE ;
-	int		f_fifo = FALSE ;
+	int		f_stdin = false ;
+	int		f_fifo = false ;
 	const char	*cp ;
 	char		lbuf[LINEBUFLEN + 1] ;
 	char		geekbuf[LINEBUFLEN + 1] ;
@@ -1273,7 +1273,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 
 	if ((fname[0] == '\0') || (strcmp(fname,"-") == 0)) {
 	    fname = STDFNIN ;
-	    f_stdin = TRUE ;
+	    f_stdin = true ;
 	}
 
 	if (! f_stdin) {
@@ -1299,7 +1299,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 
 #if	CF_LINEBUFIN
 	        if (pip->f.bufline)
-	            shio_control(ofp,SHIO_CSETBUFLINE,TRUE) ;
+	            shio_control(ofp,SHIO_CSETBUFLINE,true) ;
 #endif
 
 	        while ((rs = shio_readline(ifp,lbuf,llen)) > 0) {
@@ -1374,9 +1374,7 @@ static int procfile(PROGINFO *pip,void *ofp,cchar *fname)
 }
 /* end subroutine (procfile) */
 
-
-static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
-{
+static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen) noex {
 	LOCINFO		*lip = pip->lip ;
 	LINEFOLD	liner ;
 	int		rs ;
@@ -1392,7 +1390,7 @@ static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 	ni = MIN(NBLANKS,lip->indent) ;
 	if ((rs = linefold_start(&liner,n,ni,lbuf,llen)) >= 0) {
 	    int	i ;
-	    for (i = 0 ; (ll = linefold_getline(&liner,i,&lp)) > 0 ; i += 1) {
+	    for (i = 0 ; (ll = linefold_get(&liner,i,&lp)) > 0 ; i += 1) {
 	        if (i > 0) {
 	            rs = shio_printf(ofp,fmt,blanks,ni,lp,ll) ;
 	        } else {
@@ -1409,9 +1407,7 @@ static int procoutline(PROGINFO *pip,void *ofp,cchar *lbuf,int llen)
 }
 /* end if (procoutline) */
 
-
-static int mkgeekout(PROGINFO *pip,char *gbuf,int glen,cchar *sp,int sl)
-{
+static int mkgeekout(PROGINFO *pip,char *gbuf,int glen,cchar *sp,int sl) noex {
 	LOCINFO		*lip = pip->lip ;
 	int		linelen ;
 	int		i ;
@@ -1419,16 +1415,7 @@ static int mkgeekout(PROGINFO *pip,char *gbuf,int glen,cchar *sp,int sl)
 	int		n = 0 ;
 	int		nw = 0 ;
 	int		ch ;
-
 	linelen = lip->linelen ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5)) {
-	debugprintf("mkgeekout: ent linelen=%u glen=%u\n",linelen,glen) ;
-	debugprintf("mkgeekout: sl=%u\n",sl) ;
-	}
-#endif
-
 	for (i = 0 ; (i < sl) && (j < glen) ; i += 1) {
 	    ch = (*sp++ & 0xff) ;
 	    if (ch == '\n') {
@@ -1458,10 +1445,8 @@ static int mkgeekout(PROGINFO *pip,char *gbuf,int glen,cchar *sp,int sl)
 }
 /* end subroutine (mkgeekout) */
 
-
-static int isOther(int ch)
-{
-	int	f = FALSE ;
+static bool isOther(int ch) noex {
+	bool	f = false ;
 	ch &= UCHAR_MAX ;
 	f = f || (ch == CH_SP) ;
 	f = f || (ch == CH_TAB) ;
