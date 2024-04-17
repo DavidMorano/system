@@ -19,7 +19,6 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<limits.h>
 #include	<usystem.h>
 #include	<vecobj.h>
@@ -38,7 +37,7 @@ struct linefold_flags {
 } ;
 
 struct linefold_head {
-	vecobj		lines ;
+	vecobj		*llp ;
 	LINEFOLD_FL	f ;
 	uint		magic ;
 } ;
@@ -47,10 +46,14 @@ typedef LINEFOLD	linefold ;
 
 EXTERNC_begin
 
-extern int linefold_start(LINEFOLD *,int,int,cchar *,int) noex ;
-extern int linefold_get(LINEFOLD *,int,cchar **) noex ;
-extern int linefold_getline(LINEFOLD *,int,cchar **) noex ;
-extern int linefold_finish(LINEFOLD *) noex ;
+extern int linefold_start(linefold *,int,int,cchar *,int) noex ;
+extern int linefold_get(linefold *,int,cchar **) noex ;
+extern int linefold_getln(linefold *,int,cchar **) noex ;
+extern int linefold_finish(linefold *) noex ;
+
+static inline int linefold_getline(linefold *op,int li,cchar **rpp) noex {
+	return linefold_getln(op,li,rpp) ;
+}
 
 EXTERNC_end
 
