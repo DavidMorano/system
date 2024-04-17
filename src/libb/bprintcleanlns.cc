@@ -36,6 +36,10 @@
 
 /* local defines */
 
+#ifndef	CF_LINEFOLD
+#define	CF_LINEFOLD	1		/* use 'linefold(3dam)' */
+#endif
+
 
 /* imported namespaces */
 
@@ -57,10 +61,13 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
+static int	bprintfold(bfile *,int,cchar *,int) noex ;
 static int	bprintcleanliner(bfile *,int,cchar *,int) noex ;
 
 
 /* local variables */
+
+constexpr bool	f_linefold = CF_LINEFOLD ;
 
 
 /* exported variables */
@@ -72,30 +79,17 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(op,lp)) > 0) {
-	if (linelen <= 0) linelen = COLUMNS ;
-	if (ll < 0) ll = strlen(lp) ;
-
-#if	CF_LINEFOLD
-	{
-	    linefold	lf ;
-	    int		sl ;
-	    cchar	*sp ;
-	    if ((rs = linefold_start(&lf,linelen,0,lp,ll)) >= 0) {
-	        for (int i = 0 ; (sl = linefold_get(&lf,i,&sp)) >= 0 ; i += 1) {
-	            rs = bprintcleanliner(op,linelen,sp,sl) ;
+	    if ((rs = bfile_wr(op)) >= 0) {
+	        if (linelen <= 0) linelen = COLUMNS ;
+	        if (ll < 0) ll = strlen(lp) ;
+	        if constexpr (f_linefold) {
+		    rs = bprintfold(op,linelen,lp,ll) ;
+		    wlen += rs ;
+	        } else {
+	            rs = bprintcleanliner(op,linelen,lp,ll) ;
 	            wlen += rs ;
-	            if (rs < 0) break ;
-	        } /* end while */
-	        linefold_finish(&lf) ;
-	    } /* end if (linefold) */
-	}
-#else /* CF_LINEFOLD */
-	{
-	rs = bprintcleanliner(op,linelen,lp,ll) ;
-	wlen += rs ;
-	}
-#endif /* CF_LINEFOLD */
-
+	        } /* end if-constexpr (f_linefold) */
+	    } /* end if (writig) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
@@ -103,6 +97,26 @@ int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
 
 
 /* local subroutines */
+
+static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
+	linefold	lf ;
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	if ((rs = linefold_start(&lf,linelen,0,lp,ll)) >= 0) {
+	    int		sl ;
+	    cchar	*sp ;
+	    for (int i = 0 ; (sl = linefold_get(&lf,i,&sp)) >= 0 ; i += 1) {
+		rs = bprintcleanliner(op,linelen,sp,sl) ;
+		wlen += rs ;
+		if (rs < 0) break ;
+	    } /* end for */
+	    rs1 = linefold_finish(&lf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (linefold) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (bprintfold) */
 
 static int bprintcleanliner(bfile *op,int linelen,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
