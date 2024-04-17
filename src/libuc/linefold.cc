@@ -16,24 +16,44 @@
 
 /*******************************************************************************
 
+	Name:
+	linefold
+
+	Description:
 	This object module takes a line of text as input and breaks
 	it up into pieces that are folded so as to fit in a specified
 	number of cols.
+
+	Synopsis:
+	int linefold_start(linefold *op,int cols,int ind,
+		cchar *lbuf,int llen) noex {
+
+	Arguments:
+	op	object pointer
+	cols	number of columns in a line (normally '80')
+	ind	number of columns to indent for 2nd and subsequent lines
+	lbuf	source line (c-string) pointer
+	llen	source line (c-string) length
+
+	Returns:
+	>=0	OK
+	<0	error code (system-return)
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstddef>		/* |nullptr_t| */
-#include	<cstdlib>
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ucvariables.hh>	/* |varnames| */
 #include	<vecobj.h>
 #include	<cfdec.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
-#include	<rmx.h>
-#include	<char.h>
-#include	<ischarx.h>
+#include	<rmx.h>			/* |rmeol(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
+#include	<mkchar.h>
+#include	<ischarx.h>		/* |iseol(3uc)| */
 #include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
 
 #include	"linefold.h"
@@ -309,9 +329,8 @@ static int getcols(int cols) noex {
 	int		rs = SR_OK ;
 	if (cols <= 0) {
 	    static cchar	*vcols = getenv(vncols) ;
-	    int			v ;
-	    if (vcols && (cfdeci(vcols,-1,&v) >= 0)) {
-	            cols = v ;
+	    if (int v ; vcols && (cfdeci(vcols,-1,&v) >= 0)) {
+	        cols = v ;
 	    }
 	    if (cols <= 0) {
 	        cols = COLUMNS ;
@@ -322,22 +341,22 @@ static int getcols(int cols) noex {
 /* end subroutine (getcols) */
 
 static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
+	int		pl = 0 ;
 	int		ncs = 0 ;
 	int		cl = sl ;
-	int		n ;
-	int		pl = 0 ;
+	int		ch ;
 	cchar		*cp = sp ;
 /* skip over whitespace */
-	while (cl && CHAR_ISWHITE(cp[0])) {
-	    n = charcols(ntabcols,ncol,cp[0]) ;
+	while (cl && ((ch = mkchar(cp[0])),CHAR_ISWHITE(ch))) {
+	    cint	n = charcols(ntabcols,ncol,ch) ;
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;
 	    ncol += n ;
 	} /* end while */
 /* skip over the non-whitespace */
-	while (cl && cp[0] && (! CHAR_ISWHITE(cp[0]))) {
-	    n = charcols(ntabcols,ncol,cp[0]) ;
+	while (cl && ((ch = mkchar(cp[0]))) && (! CHAR_ISWHITE(ch))) {
+	    cint	n = charcols(ntabcols,ncol,ch) ;
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;

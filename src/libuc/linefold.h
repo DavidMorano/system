@@ -28,7 +28,6 @@
 #define	LINEFOLD_MAGIC		0x88431773
 #define	LINEFOLD		struct linefold_head
 #define	LINEFOLD_FL		struct linefold_flags
-
 #define	LINEFOLD_MCARRIAGE	0x0001
 
 
