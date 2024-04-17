@@ -4,7 +4,6 @@
 /* print a clean (cleaned up) line of text */
 /* version %I% last-modified %G% */
 
-#define	CF_BADSUB	1		/* fill with NBSP */
 
 /* revision history:
 
@@ -26,16 +25,21 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<climits>		/* |INT_MAX| */
 #include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<ascii.h>
+#include	<mallocxx.h>
+#include	<linebuffer.h>
+#include	<rmx.h>
 #include	<mkchar.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"bfile.h"
+#include	"snclean.h"
 
 
 /* local defines */
@@ -55,15 +59,6 @@
 
 /* forward references */
 
-#if	CF_BADSUB
-static int	clean_nbsp(char *,int) noex ;
-#else
-static int	clean_del(char *,int) noex ;
-#endif
-
-static bool	ischarok(int) noex ;
-static bool	isend(int) noex ;
-
 
 /* local variables */
 
@@ -73,104 +68,24 @@ static bool	isend(int) noex ;
 
 /* exported subroutines */
 
-int bprintcleanln(bfile *ofp,cchar *lp,int ll) noex {
-	int		rs = SR_OK ;
-	int		oli = 0 ;
-	int		f_needeol = FALSE ;
-
-	if (ofp == NULL) return SR_FAULT ;
-	if (lp == NULL) return SR_FAULT ;
-
-	if (ofp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (ofp->f.nullfile) goto ret0 ;
-
-/* continue */
-
-	if (ll < 0)
-	    ll = strlen(lp) ;
-
-	while ((ll > 0) && isend(lp[ll - 1])) {
-	    ll -= 1 ;
-	}
-
-#if	CF_BADSUB
-	oli = clean_nbsp(lp,ll) ;
-#else
-	oli = clean_del(lp,ll) ;
-#endif
-
-	if ((oli == 0) || (lp[oli - 1] != '\n')) {
-	    f_needeol = TRUE ;
-	}
-
-	if ((rs >= 0) && (oli > 0)) {
-	    rs = bwrite(ofp,lp,oli) ;
-	}
-
-	if ((rs >= 0) && f_needeol) {
-	    oli += 1 ;
-	    rs = bputc(ofp,'\n') ;
-	}
-
-ret0:
-
-	return (rs >= 0) ? oli : rs ;
+int bprintcleanln(bfile *op,cchar *lp,int ll) noex {
+	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
+	if ((rs = bfile_magic(op,lp)) > 0) {
+	    linebuffer	lo ;
+	    cint	rl = rmeol(lp,ll) ;
+	    if ((rs = lo.start) >= 0) {
+		if ((rs = snclean(lo.lbuf,lo.llen,lp,rl)) >= 0) {
+	            rs = bprintln(op,lo.lbuf,rs) ;
+		    wlen = rs ;
+		} /* end if (snclean) */
+		rs1 = lo.finish ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (linebuffer) */
+	} /* end if (magic) */
+	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintcleanln) */
-
-
-/* local subroutines */
-
-
-#if	CF_BADSUB
-
-static int clean_nbsp(char *lp,int ll) noex {
-	int		ili = 0 ;
-	bool		f ;
-	for (ili = 0 ; ili < ll ; ili += 1) {
-	    cint	ch = mkchar(lp[ili]) ;
-	    f = isprintlatin(ch) || ischarok(ch) ;
-	    if (! f) {
-	        lp[ili] = cchar('¿') ;
-	    }
-	} /* end for */
-	return ili ;
-}
-/* end subroutine (clean_nbsp) */
-
-#else /* CF_BADSUB */
-static int clean_del(char *lp,int ll) noex {
-	int		oli = 0 ;
-	int		f_flipped = FALSE ;
-	bool		f ;
-	for (int ili = 0 ; ili < ll ; ili += 1) {
-	    cint	ch = mkchar(lp[ili]) ;
-	    f = isprintlatin(ch) || ischarok(ch) ;
-	    if (f) {
-	        if (f_flipped) {
-	            lp[oli++] = lp[ili] ;
-	        } else {
-	            oli += 1 ;
-		}
-	    } else {
-	        f_flipped = TRUE ;
-	    }
-	} /* end for */
-	return oli ;
-}
-/* end subroutine (cleandel) */
-
-#endif /* CF_BADSUB */
-
-static bool ischarok(int ch) noex {
-	return ((ch == '\t') || (ch == '\n')) ;
-}
-/* end subroutine (ischarok) */
-
-static int isend(int ch) noex {
-	return ((ch == '\n') || (ch == '\r')) ;
-}
-/* end subroutine (isend) */
 
 

@@ -31,6 +31,7 @@
 	code piece:
 
 	- bopen
+	- bopene
 	- bopenprog
 	- bclose
 
@@ -129,9 +130,10 @@ namespace {
 	int openfd(int) noex ;
 	int openadj() noex ;
 	int openoffset() noex ;
-	int openreg() noex ;
-	int iclose() noex ;
 	int bufsize() noex ;
+	int openreg() noex ;
+	int openprog() noex ;
+	int iclose() noex ;
    } ;
 }
 
@@ -190,7 +192,41 @@ int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (bopene) */
+/* end subroutine (bopenprog) */
+
+int bopen(bfile *op,cchar *fn,cchar *os,mode_t om) noex {
+	return bopene(op,fn,os,om,-1) ;
+}
+/* end subroutine (bopen) */
+
+int bclose(bfile *op) noex {
+	int		rs ;
+	int		rs1 ;
+	if ((rs = bfile_magic(op)) >= 0) {
+            if (op->f.writing && (op->len > 0)) {
+                rs1 = bfile_flush(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            if (op->maps) {
+                rs1 = bfile_mapend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            if (op->bdata) {
+                rs1 = bfile_bufend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = uc_close(op->fd) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            op->magic = 0 ;
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (bclose) */
+
+
+/* local subroutines */
 
 int sub_bopen::operator () (mainv av,mainv ev) noex {
 	int		rs ;
@@ -221,14 +257,18 @@ int sub_bopen::getfile() noex {
 	} else if (rs == SR_EMPTY) {		/* "null" file */
 	    op->f.nullfile = true ;
 	} else if (rs != SR_DOM) {
-	    rs = openreg() ;
+	    if (op->f.program) {
+		rs = openprog() ;
+	    } else {
+	        rs = openreg() ;
+	    }
 	}
 	return rs ;
 }
 /* end method (sub_bopen::getfile) */
 
 int sub_bopen::openfd(int idx) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	if ((rs = uc_dupmince(idx,BFILE_MINFD)) >= 0) {
 	    op->fd = rs ;
 	    if ((rs = openadj()) >= 0) {
@@ -275,21 +315,6 @@ int sub_bopen::openoffset() noex {
 	return rs ;
 }
 /* end method (sub_bopen::openoffset) */
-
-int sub_bopen::openreg() noex {
-	cint		of = op->of ;
-	int		rs ;
-	cmode		om = op->om ;
-	if ((rs = uc_opene(fn,of,om,to)) >= 0) {
-	    op->fd = rs ;
-	    rs = bfile_opts(op) ;
-	    if (rs < 0) {
-		iclose() ;
-	    }
-	}
-	return rs ;
-}
-/* end method (sub_bopen::openreg) */
 
 int sub_bopen::bufsize() noex {
 	int		rs ;
@@ -340,10 +365,26 @@ int sub_bopen::bufsize() noex {
 }
 /* end method (sub_bopen::bufsize) */
 
-int bopen(bfile *op,cchar *fn,cchar *os,mode_t om) noex {
-	return bopene(op,fn,os,om,-1) ;
+int sub_bopen::openreg() noex {
+	cint		of = op->of ;
+	int		rs ;
+	cmode		om = op->om ;
+	if ((rs = uc_opene(fn,of,om,to)) >= 0) {
+	    op->fd = rs ;
+	    rs = bfile_opts(op) ;
+	    if (rs < 0) {
+		iclose() ;
+	    }
+	}
+	return rs ;
 }
-/* end subroutine (bopen) */
+/* end method (sub_bopen::openreg) */
+
+int sub_bopen::openprog() noex {
+	int		rs = SR_OK ;
+	return rs ;
+}
+/* end method (sub_bopen::openprog) */
 
 #ifdef	COMMENT
 int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
@@ -401,35 +442,6 @@ int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
 }
 /* end subroutine (bopenprog) */
 #endif /* COMMENT */
-
-int bclose(bfile *op) noex {
-	int		rs ;
-	int		rs1 ;
-	if ((rs = bfile_magic(op)) >= 0) {
-            if (op->f.writing && (op->len > 0)) {
-                rs1 = bfile_flush(op) ;
-                if (rs >= 0) rs = rs1 ;
-            }
-            if (op->maps) {
-                rs1 = bfile_mapend(op) ;
-                if (rs >= 0) rs = rs1 ;
-            }
-            if (op->bdata) {
-                rs1 = bfile_bufend(op) ;
-                if (rs >= 0) rs = rs1 ;
-            }
-            {
-                rs1 = uc_close(op->fd) ;
-                if (rs >= 0) rs = rs1 ;
-            }
-            op->magic = 0 ;
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (bclose) */
-
-
-/* private subroutines */
 
 static int bfile_bufbegin(bfile *op,int bsize) noex {
 	int		rs ;
