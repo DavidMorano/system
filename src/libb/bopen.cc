@@ -110,10 +110,12 @@ namespace {
 	bfile		*op ;
 	cchar		*fn ;
 	cchar		*os ;
+	mainv		argv = nullptr ;
+	mainv		envv = nullptr ;
 	int		to ;
 	int		bsize = 0 ;
 	sub_isreadonly	isreadonly ;
-	sub_bopen(bfile *aop,cchar *afn,cchar *aos,mode_t aom,int ato) noex {
+	sub_bopen(bfile *aop,cc *afn,cc *aos,mode_t aom,int ato) noex {
 	    isreadonly(this) ;
 	    op = aop ;
 	    fn = afn ;
@@ -121,7 +123,7 @@ namespace {
 	    aop->om = aom ;
 	    to = ato ;
 	} ; /* end ctor */
-	operator int () noex ;
+	int operator () (mainv av,mainv ev) noex ;
 	int mkoflags(cchar *) noex ;
 	int getfile() noex ;
 	int openfd(int) noex ;
@@ -159,19 +161,41 @@ static sysval		pagesize(sysval_ps) ;
 int bopene(bfile *op,cchar *fn,cchar *os,mode_t om,int to) noex {
 	int		rs = SR_FAULT ;
 	if (op && fn && os) {
+	    cnullptr	np{} ;
 	    memclear(op) ;
 	    rs = SR_INVALID ;
 	    if (fn[0]) {
 		sub_bopen	bo(op,fn,os,om,to) ;
-		rs = bo ;
+		rs = bo(np,np) ;
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (bopene) */
 
-sub_bopen::operator int () noex {
+int bopenprog(bfile *op,cc *pname,cc *os,mainv argv,mainv envv) noex {
+	int		rs = SR_FAULT ;
+	if (op && pname && os) {
+	    cint	osl = strlen(os) ;
+	    cmode	om = 0 ;
+	    memclear(op) ;
+	    rs = SR_INVALID ;
+	    if (pname[0]) {
+		char	nos[(osl+2)] ;
+		if ((rs = sncpy(nos,(osl+2),"p",os)) >= 0) {
+		    sub_bopen	bo(op,pname,nos,om,-1) ;
+		    rs = bo(argv,envv) ;
+		}
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (bopene) */
+
+int sub_bopen::operator () (mainv av,mainv ev) noex {
 	int		rs ;
+	argv = av ;
+	envv = ev ;
 	op->fd = -1 ;
 	if ((rs = mkoflags(os)) >= 0) {
 	    if ((rs = getfile()) > 0) {
@@ -382,23 +406,23 @@ int bclose(bfile *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = bfile_magic(op)) >= 0) {
-	        if (op->f.writing && (op->len > 0)) {
-	            rs1 = bfile_flush(op) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        if (op->bdata) {
-	            rs1 = bfile_bufend(op) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        if (op->maps) {
-	            rs1 = bfile_mapend(op) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        {
-	            rs1 = uc_close(op->fd) ;
-	            if (rs >= 0) rs = rs1 ;
-	        }
-	        op->magic = 0 ;
+            if (op->f.writing && (op->len > 0)) {
+                rs1 = bfile_flush(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            if (op->maps) {
+                rs1 = bfile_mapend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            if (op->bdata) {
+                rs1 = bfile_bufend(op) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            {
+                rs1 = uc_close(op->fd) ;
+                if (rs >= 0) rs = rs1 ;
+            }
+            op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }

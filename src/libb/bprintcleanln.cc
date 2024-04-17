@@ -4,7 +4,6 @@
 /* print a clean (cleaned up) line of text */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_BADSUB	1		/* fill with NBSP */
 
 /* revision history:
@@ -27,45 +26,25 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<csignal>
+#include	<ctime>
 #include	<cstdlib>
 #include	<cstring>
-#include	<netdb.h>
-#include	<time.h>
-
 #include	<usystem.h>
-#include	<bfile.h>
 #include	<ascii.h>
+#include	<mkchar.h>
+#include	<ischarx.h>
 #include	<localmisc.h>
+
+#include	"bfile.h"
 
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	isprintlatin(int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strcpylc(char *,const char *) ;
-extern char	*strcpyuc(char *,const char *) ;
+/* external variables */
 
 
 /* external variables */
@@ -77,16 +56,13 @@ extern char	*strcpyuc(char *,const char *) ;
 /* forward references */
 
 #if	CF_BADSUB
-static int	clean_nbsp(char *,int) ;
+static int	clean_nbsp(char *,int) noex ;
 #else
-static int	clean_del(char *,int) ;
+static int	clean_del(char *,int) noex ;
 #endif
 
-static int	ischarok(int) ;
-static int	isend(int) ;
-
-
-/* module global variables */
+static bool	ischarok(int) noex ;
+static bool	isend(int) noex ;
 
 
 /* local variables */
@@ -118,11 +94,6 @@ int bprintcleanln(bfile *ofp,cchar *lp,int ll) noex {
 	    ll -= 1 ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("bprintcleanline: ll=%u lp=>%t<¬\n",ll,
-		lp,strlinelen(lp,ll,40)) ;
-#endif 
-
 #if	CF_BADSUB
 	oli = clean_nbsp(lp,ll) ;
 #else
@@ -144,13 +115,9 @@ int bprintcleanln(bfile *ofp,cchar *lp,int ll) noex {
 
 ret0:
 
-#if	CF_DEBUGS
-	debugprintf("bprintcleanline: ret rs=%d oli=%u\n",rs,oli) ;
-#endif /* CF_DEBUGS */
-
 	return (rs >= 0) ? oli : rs ;
 }
-/* end subroutine (bprintcleanline) */
+/* end subroutine (bprintcleanln) */
 
 
 /* local subroutines */
@@ -158,39 +125,27 @@ ret0:
 
 #if	CF_BADSUB
 
-static int clean_nbsp(lp,ll)
-char		*lp ;
-int		ll ;
-{
-	int		ili ;
-	int		ch ;
-	int		f ;
-
+static int clean_nbsp(char *lp,int ll) noex {
+	int		ili = 0 ;
+	bool		f ;
 	for (ili = 0 ; ili < ll ; ili += 1) {
-	    ch = (lp[ili] & 0xff) ;
+	    cint	ch = mkchar(lp[ili]) ;
 	    f = isprintlatin(ch) || ischarok(ch) ;
 	    if (! f) {
-	        lp[ili] = (char) '¿' ;
+	        lp[ili] = cchar('¿') ;
 	    }
 	} /* end for */
-
 	return ili ;
 }
 /* end subroutine (clean_nbsp) */
 
 #else /* CF_BADSUB */
-
-static int clean_del(char *lp,int ll)
-{
-	int		ili, oli ;
-	int		ch ;
+static int clean_del(char *lp,int ll) noex {
+	int		oli = 0 ;
 	int		f_flipped = FALSE ;
-	int		f ;
-
-	oli = 0 ;
-	for (ili = 0 ; ili < ll ; ili += 1) {
-
-	    ch = (lp[ili] & 0xff) ;
+	bool		f ;
+	for (int ili = 0 ; ili < ll ; ili += 1) {
+	    cint	ch = mkchar(lp[ili]) ;
 	    f = isprintlatin(ch) || ischarok(ch) ;
 	    if (f) {
 	        if (f_flipped) {
@@ -198,32 +153,23 @@ static int clean_del(char *lp,int ll)
 	        } else {
 	            oli += 1 ;
 		}
-	    } else 
+	    } else {
 	        f_flipped = TRUE ;
-
+	    }
 	} /* end for */
-
 	return oli ;
 }
 /* end subroutine (cleandel) */
 
 #endif /* CF_BADSUB */
 
-
-static int ischarok(int ch)
-{
-	int		f ;
-	f = (ch == '\t') || (ch == '\n') ;
-	return f ;
+static bool ischarok(int ch) noex {
+	return ((ch == '\t') || (ch == '\n')) ;
 }
 /* end subroutine (ischarok) */
 
-
-static int isend(int ch)
-{
-	int		f ;
-	f = (ch == '\n') || (ch == '\r') ;
-	return f ;
+static int isend(int ch) noex {
+	return ((ch == '\n') || (ch == '\r')) ;
 }
 /* end subroutine (isend) */
 
