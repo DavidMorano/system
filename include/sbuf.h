@@ -19,6 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdarg.h>		/* |va_list(3c)| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -44,6 +45,7 @@ enum sbufmems {
 	sbufmem_rem,
 	sbufmem_getlen,
 	sbufmem_getprev,
+	sbufmem_reset,
 	sbufmem_finish,
 	sbufmem_overlast
 } ;
@@ -99,6 +101,7 @@ struct sbuf : sbuf_head {
 	sbuf_co		rem ;
 	sbuf_co		getlen ;
 	sbuf_co		getprev ;
+	sbuf_co		reset ;
 	sbuf_co		finish ;
 	sbuf() noex {
 	    deci(this,sbufmem_deci) ;
@@ -109,12 +112,13 @@ struct sbuf : sbuf_head {
 	    rem(this,sbufmem_rem) ;
 	    getlen(this,sbufmem_getlen) ;
 	    getprev(this,sbufmem_getprev) ;
+	    reset(this,sbufmem_reset) ;
 	    finish(this,sbufmem_finish) ;
 	} ;
 	sbuf(const sbuf &) = delete ;
 	sbuf &operator = (const sbuf &) = delete ;
 	int start(char *,int) noex ;
-	int nchr(int,int = 1) noex ;
+	int chrs(int,int = 1) noex ;
 	int strw(cchar *sp,int sl = -1) noex {
 	    return sbuf_strw(this,sp,sl) ;
 	} ;
@@ -144,6 +148,7 @@ EXTERNC_begin
 
 extern int	sbuf_start(sbuf *,char *,int) noex ;
 extern int	sbuf_finish(sbuf *) noex ;
+extern int	sbuf_reset(sbuf *) noex ;
 extern int	sbuf_buf(sbuf *,cchar *,int) noex ;
 extern int	sbuf_strw(sbuf *,cchar *,int) noex ;
 extern int	sbuf_strs(sbuf *,int,cchar **) noex ;
@@ -161,8 +166,8 @@ extern int	sbuf_hexuc(sbuf *,uint) noex ;
 extern int	sbuf_hexui(sbuf *,uint) noex ;
 extern int	sbuf_hexul(sbuf *,ulong) noex ;
 extern int	sbuf_hexull(sbuf *,ulonglong) noex ;
-extern int	sbuf_char(sbuf *,int) noex ;
-extern int	sbuf_nchar(sbuf *,int,int) noex ;
+extern int	sbuf_chr(sbuf *,int) noex ;
+extern int	sbuf_chrs(sbuf *,int,int) noex ;
 extern int	sbuf_blanks(sbuf *,int) noex ;
 extern int	sbuf_adv(sbuf *,int,char **) noex ;
 extern int	sbuf_rem(sbuf *) noex ;
@@ -171,11 +176,12 @@ extern int	sbuf_getbuf(sbuf *,cchar **) noex ;
 extern int	sbuf_getpoint(sbuf *,cchar **) noex ;
 extern int	sbuf_getprev(sbuf *) noex ;
 extern int	sbuf_printf(sbuf *,cchar *,...) noex ;
+extern int	sbuf_vprintf(sbuf *,cchar *,va_list) noex ;
 extern int	sbuf_termconseq(sbuf *,int,cchar *,int,...) noex ;
 extern int	sbuf_addquoted(sbuf *,cchar *,int) noex ;
 
-static inline int sbuf_chr(sbuf *op,int ch) noex {
-	return sbuf_char(op,ch) ;
+static inline int sbuf_char(sbuf *op,int ch) noex {
+	return sbuf_chr(op,ch) ;
 }
 
 EXTERNC_end

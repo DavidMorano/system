@@ -48,6 +48,7 @@
 #include	<estrings.h>
 #include	<sbuf.h>
 #include	<strn.h>
+#include	<sfx.h>
 #include	<snx.h>
 #include	<localmisc.h>
 
@@ -90,7 +91,7 @@
 /* exported subroutines */
 
 int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
 	if ((rs = bfile_magic(fp,lbuf)) > 0) {
@@ -118,7 +119,7 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	        rs = sbuf_start(&b,fbuf,flen) ;
 	        f_sbuf = (rs >= 0) ;
 
-	        while ((rs >= 0) && ((cl = nextfield(sp,sl,&cp)) > 0)) {
+	        while ((rs >= 0) && ((cl = sfnext(sp,sl,&cp)) > 0)) {
 
 	            if ((len + (cl + 1)) > flen) {
 

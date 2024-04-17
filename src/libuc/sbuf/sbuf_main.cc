@@ -91,9 +91,6 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-int		sbuf_buf(sbuf *,cchar *,int) noex ;
-int		sbuf_vprintf(sbuf *,cchar *,va_list) noex ;
-
 static int	sbuf_addstrw(sbuf *,cchar *,int) noex ;
 
 
@@ -180,6 +177,18 @@ int sbuf_finish(sbuf *sbp) noex {
 }
 /* end subroutine (sbuf_finish) */
 
+int sbuf_reset(sbuf *sbp) noex {
+	int		rs = SR_FAULT ;
+	if (sbp) {
+	    char	*bp = SBUF_RBUF ;
+	    rs = SR_OK ;
+	    SBUF_INDEX = 0 ;
+	    *bp = '\0' ;
+	}
+	return rs ;
+}
+/* end subroutine (sbuf_reset) */
+
 int sbuf_buf(sbuf *sbp,cchar *sp,int sl) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -237,7 +246,7 @@ int sbuf_strs(sbuf *bp,int sch,cchar **sv) noex {
 	    for (int i = 0 ; sv[i] ; i += 1) {
 	        cchar	*sp = sv[i] ;
 		if (sp[0]) {
-	            if (sch && (i > 0)) rs = sbuf_char(bp,sch) ;
+	            if (sch && (i > 0)) rs = sbuf_chr(bp,sch) ;
 	            if (rs >= 0) rs = sbuf_strw(bp,sp,-1) ;
 		}
 	        if (rs < 0) break ;
@@ -337,7 +346,7 @@ int sbuf_hexull(sbuf *sbp,ulonglong v) noex {
 }
 /* end subroutine (sbuf_hexull) */
 
-int sbuf_char(sbuf *sbp,int ch) noex {
+int sbuf_chr(sbuf *sbp,int ch) noex {
 	cint		len = 1 ;
 	int		rs = SR_FAULT ;
 	if (sbp) {
@@ -357,10 +366,10 @@ int sbuf_char(sbuf *sbp,int ch) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (sbuf_char) */
+/* end subroutine (sbuf_chr) */
 
 /* store a character (n-times) */
-int sbuf_nchar(sbuf *sbp,int ch,int len) noex {
+int sbuf_chrs(sbuf *sbp,int ch,int len) noex {
 	int		rs = SR_FAULT ;
 	if (sbp) {
 	    if ((rs = SBUF_INDEX) >= 0) {
@@ -384,7 +393,7 @@ int sbuf_nchar(sbuf *sbp,int ch,int len) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (sbuf_nchar) */
+/* end subroutine (sbuf_chrs) */
 
 int sbuf_blanks(sbuf *sbp,int n) noex {
 	int		rs = SR_FAULT ;
@@ -404,7 +413,6 @@ int sbuf_blanks(sbuf *sbp,int n) noex {
 }
 /* end subroutine (sbuf_blanks) */
 
-/* vprintf-like thing */
 int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
@@ -431,12 +439,10 @@ int sbuf_vprintf(sbuf *sbp,cchar *fmt,va_list ap) noex {
 /* PRINTFLIKE2 */
 int sbuf_printf(sbuf *op,cchar *fmt,...) noex {
 	int		rs ;
-	{
-	        va_list	ap ;
-	        va_begin(ap,fmt) ;
-	        rs = sbuf_vprintf(op,fmt,ap) ;
-	        va_end(ap) ;
-	} /* end block */
+	va_list	ap ;
+	va_begin(ap,fmt) ;
+	rs = sbuf_vprintf(op,fmt,ap) ;
+	va_end(ap) ;
 	return rs ;
 }
 /* end subroutine (sbuf_printf) */
@@ -521,10 +527,10 @@ int sbuf::start(char *rp,int rl) noex {
 }
 /* end subroutine (sbuf::start) */
 
-int sbuf::nchr(int ch,int nc) noex {
-	return sbuf_nchar(this,ch,nc) ;
+int sbuf::chrs(int ch,int nc) noex {
+	return sbuf_chrs(this,ch,nc) ;
 }
-/* end subroutine (sbuf::nchr) */
+/* end subroutine (sbuf::chrs) */
 
 void sbuf::dtor() noex {
 	cint	rs = sbuf_finish(this) ;
@@ -587,7 +593,7 @@ int sbuf_co::operator () (int a) noex {
 		rs = sbuf_hexi(op,a) ;
 		break ;
 	    case sbufmem_chr:
-		rs = sbuf_char(op,a) ;
+		rs = sbuf_chr(op,a) ;
 		break ;
 	    case sbufmem_blanks:
 		rs = sbuf_blanks(op,a) ;
@@ -600,6 +606,9 @@ int sbuf_co::operator () (int a) noex {
 		break ;
 	    case sbufmem_getprev:
 		rs = sbuf_getprev(op) ;
+		break ;
+	    case sbufmem_reset:
+		rs = sbuf_reset(op) ;
 		break ;
 	    case sbufmem_finish:
 		rs = sbuf_finish(op) ;
