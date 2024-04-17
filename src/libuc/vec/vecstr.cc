@@ -891,8 +891,8 @@ static void vecstr_arrsort(vecstr *op,vecstr_vcmp vcf) noex {
 }
 /* end subroutine (vecstr_arrsort) */
 
-int vecstr::start(int n,int o) noex {
-	return vecstr_start(this,n,o) ;
+int vecstr::start(int an,int ao) noex {
+	return vecstr_start(this,an,ao) ;
 }
 
 int vecstr::add(cchar *sp,int sl) noex {
@@ -903,13 +903,17 @@ int vecstr::adduniq(cchar *sp,int sl) noex {
 	return vecstr_adduniq(this,sp,sl) ;
 }
 
-int vecstr::insert(int i,cchar *sp,int sl) noex {
-	return vecstr_insert(this,i,sp,sl) ;
+int vecstr::insert(int ai,cchar *sp,int sl) noex {
+	return vecstr_insert(this,ai,sp,sl) ;
 }
 
-int vecstr::del(int i) noex {
-	if (i < 0) i = 0 ;
-	return vecstr_del(this,i) ;
+int vecstr::get(int ai,cchar **rpp) noex {
+	return vecstr_get(this,ai,rpp) ;
+}
+
+int vecstr::del(int ai) noex {
+	if (ai < 0) ai = 0 ;
+	return vecstr_del(this,ai) ;
 }
 
 void vecstr::dtor() noex {

@@ -245,6 +245,18 @@ int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 }
 /* end subroutine (linefold_getln) */
 
+int linefold_count(linefold *op) noex {
+	int		rs ;
+	if ((rs = linefold_magic(op)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (op->llp) {
+	        rs = vecobj_count(op->llp) ;
+	    }
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (linefold_count) */
+
 
 /* private subroutines */
 
@@ -368,5 +380,85 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 	return pl ;
 }
 /* end subroutine (nextpiece) */
+
+int linefold::start(int cols,int ind,cchar *sp,int sl) noex {
+	return linefold_start(this,cols,ind,sp,sl) ;
+}
+
+int linefold::get(int ai,cchar **rpp) noex {
+	return linefold_get(this,ai,rpp) ;
+}
+
+int linefold::getln(int ai,cchar **rpp) noex {
+	return linefold_getln(this,ai,rpp) ;
+}
+
+void linefold::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("linefold",rs,"fini-finish") ;
+	}
+}
+
+linefold_co::operator int () noex {
+	int	rs = SR_BUGCHECK ;
+	switch (w) {
+	case linefoldmem_count:
+	    rs = linefold_count(op) ;
+	    break ;
+	case linefoldmem_finish:
+	    rs = linefold_finish(op) ;
+	    break ;
+	} /* end switch */
+	return rs ;
+}
+/* end method (linefold_co::operator) */
+
+bool linefold_iter::operator == (const linefold_iter &oit) noex {
+	return (i == oit.i) ;
+}
+
+bool linefold_iter::operator != (const linefold_iter &oit) noex {
+	return (i != oit.i) ;
+}
+
+linefold_iter linefold_iter::operator + (int n) const noex {
+	linefold_iter	rit(op,i) ;
+	rit.i = ((i + n) >= 0) ? (i + n) : 0 ;
+	return rit ;
+}
+
+linefold_iter linefold_iter::operator += (int n) noex {
+	linefold_iter	rit(op,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
+}
+
+linefold_iter linefold_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
+}
+
+linefold_iter linefold_iter::operator ++ (int) noex { /* post */
+	linefold_iter	pre(*this) ;
+	increment() ;
+	return pre ;
+}
+
+void linefold_iter::increment(int n) noex {
+	i += n ;
+}
+/* end method (linefold_iter::increment) */
+
+cchar *linefold_iter::operator * () noex {
+	cchar		*rp = nullptr ;
+	cchar		*cp{} ;
+	if (op->getln(i,&cp) >= 0) {
+	    rp = cp ;
+	}
+	return rp ;
+}
+/* end method (linefold_iter::operator) */
 
 
