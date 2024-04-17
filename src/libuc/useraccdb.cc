@@ -1,9 +1,8 @@
-/* useraccdb */
+/* useraccdb SUPPORT */
+/* lang=C++20 */
 
 /* user-access (user-access-logging) data-base management */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,8 +16,12 @@
 
 /*******************************************************************************
 
-        This object implements a small database for storing the last time a user
-        accesses something (usually a program).
+	Name:
+	useraccdb
+
+	Description:
+	This object implements a small database for storing the
+	last time a user accesses something (usually a program).
 
 	Format of file database records:
 
@@ -37,32 +40,28 @@
       14 110103_0922:32_EST      rca!genserv (GENSERV)
 
 
-        Note that a special user field with the value of "TOTAL" maintains a
-        total count of all program invocations separately from the user counts.
-
+	Note that a special user field with the value of "TOTAL"
+	maintains a total count of all program invocations separately
+	from the user counts.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/timeb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<time.h>
-
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ascii.h>
 #include	<filer.h>
 #include	<storeitem.h>
 #include	<dater.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"useraccdb.h"
 
@@ -106,32 +105,23 @@
 
 #define	TOTALNAME	"TOTAL"
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* external subroutines */
 
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
+extern int	snsds(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	strwcmp(const char *,const char *,int) ;
-extern int	initnow(struct timeb *,const char *,int) ;
+extern int	strwcmp(cchar *,cchar *,int) ;
+extern int	initnow(TIMEB *,cchar *,int) ;
 
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strdcpy3(char *,int,const char *,const char *,const char *) ;
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(const char *,int,int) ;
+extern char	*strnchr(cchar *,int,int) ;
 extern char	*strnset(char *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
@@ -150,14 +140,14 @@ struct upinfo_rec {
 struct upinfo {
 	UPINFO_REC	user, total ;
 	USERACCDB	*op ;
-	const char	*arguser ;
-	const char	*argname ;
+	cchar	*arguser ;
+	cchar	*argname ;
 	time_t		utime ;
 	char		tbuf[UAFILE_LDATE+1] ;
 } ;
 
 struct useraccdb_item {
-	const char	*sp ;
+	cchar	*sp ;
 	int		sl ;
 } ;
 
@@ -179,9 +169,9 @@ static int	useraccdb_fileclose(USERACCDB *) ;
 static int	useraccdb_lock(USERACCDB *,int) ;
 static int	useraccdb_recparse(USERACCDB *,USERACCDB_REC *,cchar *,int) ;
 static int	useraccdb_recproc(USERACCDB *,USERACCDB_REC *) ;
-static int	useraccdb_datethis(USERACCDB *,time_t *,const char *,int) ;
+static int	useraccdb_datethis(USERACCDB *,time_t *,cchar *,int) ;
 
-static int	upinfo_start(UPINFO *,USERACCDB *,const char *,const char *) ;
+static int	upinfo_start(UPINFO *,USERACCDB *,cchar *,cchar *) ;
 static int	upinfo_match(UPINFO *,off_t,USERACCDB_REC *) ;
 static int	upinfo_update(UPINFO *) ;
 static int	upinfo_finish(UPINFO *) ;
@@ -195,7 +185,7 @@ static int	mkts(char *,int,time_t) ;
 
 /* local variables */
 
-static const char	*totaluser = TOTALNAME ;
+static cchar	*totaluser = TOTALNAME ;
 
 
 /* exported subroutines */
@@ -204,12 +194,12 @@ static const char	*totaluser = TOTALNAME ;
 int useraccdb_open(USERACCDB *op,cchar *pr,cchar *dbname)
 {
 	int		rs ;
-	const char	*logdname = USERACCDB_LOGDNAME ;
+	cchar	*logdname = USERACCDB_LOGDNAME ;
 	char		cname[MAXNAMELEN+1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 	if (dbname[0] == '\0') return SR_INVALID ;
@@ -221,8 +211,8 @@ int useraccdb_open(USERACCDB *op,cchar *pr,cchar *dbname)
 	if ((rs = snsds(cname,MAXNAMELEN,dbname,UAFILE_SUF)) >= 0) {
 	    char	fname[MAXPATHLEN+1] ;
 	    if ((rs = mkpath3(fname,pr,logdname,cname)) >= 0) {
-		const int	pl = rs ;
-		const char	*cp ;
+		cint	pl = rs ;
+		cchar	*cp ;
 		if ((rs = uc_mallocstrw(fname,pl,&cp)) >= 0) {
 		    op->fname = cp ;
 		    if ((rs = useraccdb_fileopen(op)) >= 0) {
@@ -230,15 +220,11 @@ int useraccdb_open(USERACCDB *op,cchar *pr,cchar *dbname)
 		    }
 		    if (rs < 0) {
 	    		uc_free(op->fname) ;
-	    		op->fname = NULL ;
+	    		op->fname = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (mkpath) */
 	} /* end if (make-component) */
-
-#if	CF_DEBUGS
-	debugprintf("useraccdb_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -250,12 +236,12 @@ int useraccdb_close(USERACCDB *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
 	if (op->f.dater) {
-	    op->f.dater = FALSE ;
+	    op->f.dater = false ;
 	    rs1 = dater_finish(&op->dm) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -263,10 +249,10 @@ int useraccdb_close(USERACCDB *op)
 	rs1 = useraccdb_fileclose(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->fname != NULL) {
+	if (op->fname != nullptr) {
 	    rs1 = uc_free(op->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->fname = NULL ;
+	    op->fname = nullptr ;
 	}
 
 	return rs ;
@@ -281,10 +267,10 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 	int		rs ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
-	if (ebuf == NULL) return SR_FAULT ;
-	if (user == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if (ebuf == nullptr) return SR_FAULT ;
+	if (user == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
@@ -294,7 +280,7 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 
 	    if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
 	        USERACCDB_REC	rec ;
-	        const int	llen = LINEBUFLEN ;
+	        cint	llen = LINEBUFLEN ;
 	        int		ll, sl ;
 	        cchar		*sp ;
 	        char		lbuf[LINEBUFLEN+1] ;
@@ -322,7 +308,7 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (filer) */
 
-	    rs1 = useraccdb_lock(op,FALSE) ;
+	    rs1 = useraccdb_lock(op,false) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (lock) */
 
@@ -337,98 +323,48 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 	int		rs ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (user == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (user == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
 	if (op->eo >= 0) return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_update: user=%s\n",user) ;
-	debugprintf("useraccdb_update: name=>%s<\n",name) ;
-#endif
-
 	if ((rs = upinfo_start(&ui,op,user,name)) >= 0) {
-
-#if	CF_DEBUGS
-	debugprintf("useraccdb_update: upinfo_start() rs=%d\n",rs) ;
-#endif
-	    if ((rs = useraccdb_openlock(op)) >= 0) {
 		FILER	b ;
-
-#if	CF_DEBUGS
-	debugprintf("useraccdb_update: _openlock() rs=%d\n",rs) ;
-#endif
 	        if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
 	            USERACCDB_REC	rec ;
 	            off_t	ro = 0L ;
-	            const int	llen = LINEBUFLEN ;
+	            cint	llen = LINEBUFLEN ;
 		    int		ll ;
 	            char	lbuf[LINEBUFLEN+1] ;
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_update: filer_start() rs=%d\n",rs) ;
-#endif
 	            while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 	                ll = rs ;
-#if	CF_DEBUGS
-	                debugprintf("useraccdb_update: ll=%u\n",ll) ;
-	                debugprintf("useraccdb_update: line=>%t<\n",
-				lbuf,strlinelen(lbuf,ll,60)) ;
-#endif
 	                rs = useraccdb_recparse(op,&rec,lbuf,ll) ;
-#if	CF_DEBUGS
-	                debugprintf("useraccdb_update: _recparse() rs=%d\n",
-				rs) ;
-#endif
-
 	                if (rs >= 0) {
 	                    rs = upinfo_match(&ui,ro,&rec) ;
-#if	CF_DEBUGS
-	                debugprintf("useraccdb_update: "
-				"upinfo_match() rs=%d\n",
-				rs) ;
-#endif
-
 	                    if (rs > 0) break ;
 	                }
 	                if (rs < 0) break ;
 	                ro += ll ;
 	            } /* end while (reading lines) */
 
-#if	CF_DEBUGS
-	            debugprintf("useraccdb_update: while-end rs=%d\n",rs) ;
-#endif
-
 	            filer_finish(&b) ;
 	        } /* end if (filer) */
-
-#if	CF_DEBUGS
-	            debugprintf("useraccdb_update: filer-end rs=%d\n",rs) ;
-#endif
 
 	        if (rs >= 0) {
 	            rs1 = upinfo_update(&ui) ;
 	            if (rs >= 0) rs = rs1 ;
-#if	CF_DEBUGS
-	            debugprintf("useraccdb_update: upinfo_update() rs=%d\n",
-			rs1) ;
-#endif
-
 	        }
 
-	        rs1 = useraccdb_lock(op,FALSE) ;
+	        rs1 = useraccdb_lock(op,false) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (lock) */
 
 	    rs1 = upinfo_finish(&ui) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (upinfo) */
-
-#if	CF_DEBUGS
-	debugprintf("useraccdb_update: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -439,8 +375,8 @@ int useraccdb_curbegin(USERACCDB *op,USERACCDB_CUR *curp)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
@@ -460,8 +396,8 @@ int useraccdb_curend(USERACCDB *op,USERACCDB_CUR *curp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
@@ -471,7 +407,7 @@ int useraccdb_curend(USERACCDB *op,USERACCDB_CUR *curp)
 	    if (rs >= 0) rs = rs1 ;
 	}
 
-	rs1 = useraccdb_lock(op,FALSE) ;
+	rs1 = useraccdb_lock(op,false) ;
 	if (rs >= 0) rs = rs1 ;
 
 	op->eo = -1 ;
@@ -490,10 +426,10 @@ int		elen ;
 	int		rs = SR_OK ;
 	int		ll ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
-	if (ebuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if (ebuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
@@ -505,7 +441,7 @@ int		elen ;
 	}
 
 	if (rs >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    char	lbuf[LINEBUFLEN+1] ;
 	    off_t	eo = curp->eo ;
 	    if ((rs = filer_readln(&curp->b,lbuf,llen,-1)) >= 0) {
@@ -533,15 +469,15 @@ int		elen ;
 int useraccdb_check(USERACCDB *op,time_t ti_now)
 {
 	int		rs = SR_OK ;
-	int		f_changed = FALSE ;
+	int		f_changed = false ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
-	if (ti_now == 0) ti_now = time(NULL) ;
+	if (ti_now == 0) ti_now = time(nullptr) ;
 
-	if (ti_now == 1) f_changed = TRUE ; /* fake out LINT */
+	if (ti_now == 1) f_changed = true ; /* fake out LINT */
 
 	return (rs >= 0) ? f_changed : rs ;
 }
@@ -560,7 +496,7 @@ static int useraccdb_openlock(USERACCDB *op)
 	}
 
 	if (rs >= 0) {
-	    rs = useraccdb_lock(op,TRUE) ;
+	    rs = useraccdb_lock(op,true) ;
 	}
 
 	return rs ;
@@ -572,19 +508,12 @@ static int useraccdb_fileopen(USERACCDB *op)
 {
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_fileopen: fname=%s\n",op->fname) ;
-#endif
-
 	if (op->fd < 0) {
-	    const mode_t	om = 0666 ;
-	    const int		of = (O_RDWR | O_CREAT) ;
+	    cmode	om = 0666 ;
+	    cint	of = (O_RDWR | O_CREAT) ;
 	    if ((rs = uc_open(op->fname,of,om)) >= 0) {
 	        op->fd = rs ;
-#if	CF_DEBUGS
-	debugprintf("useraccdb_fileopen: open() rs=%d\n",rs) ;
-#endif
-	        if ((rs = uc_closeonexec(op->fd,TRUE)) >= 0) {
+	        if ((rs = uc_closeonexec(op->fd,true)) >= 0) {
 		    USTAT	sb ;
 		    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 		        op->dev = sb.st_dev ;
@@ -599,69 +528,50 @@ static int useraccdb_fileopen(USERACCDB *op)
 	    } /* end if (open) */
 	} /* end if (open was needed) */
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_fileopen: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (useraccdb_fileopen) */
 
-
-static int useraccdb_fileclose(USERACCDB *op)
-{
+static int useraccdb_fileclose(USERACCDB *op) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd >= 0) {
 	    rs = u_close(op->fd) ;
 	    op->fd = -1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (useraccdb_fileclose) */
 
-
-static int useraccdb_lock(USERACCDB *op,int f)
-{
+static int useraccdb_lock(USERACCDB *op,int f) noex {
 	int		rs = SR_OK ;
-
 	if (f) {
 	    if (! op->f.locked) {
 	        rs = u_rewind(op->fd) ;
 	        if (rs >= 0) {
 	            rs = uc_lockf(op->fd,F_LOCK,0L) ;
-	            if (rs >= 0) op->f.locked = TRUE ;
+	            if (rs >= 0) op->f.locked = true ;
 	        }
 	    }
 	} else {
 	    if (op->f.locked) {
 	        rs = u_rewind(op->fd) ;
 	        if (rs >= 0) {
-	            op->f.locked = FALSE ;
+	            op->f.locked = false ;
 	            rs = uc_lockf(op->fd,F_UNLOCK,0L) ;
 	        }
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (useraccdb_lock) */
 
-
 static int useraccdb_recparse(USERACCDB *op,USERACCDB_REC *recp,
-		cchar *lp,int ll)
-{
+		cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*tp, *cp ;
+	cchar	*tp, *cp ;
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_recparse: line=>%t<\n",
-		lp,strlinelen(lp,ll,40)) ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	memset(recp,0,sizeof(USERACCDB_REC)) ;
 
@@ -687,43 +597,20 @@ static int useraccdb_recparse(USERACCDB *op,USERACCDB_REC *recp,
 	ll -= (UAFILE_LDATE + 1) ;
 #endif /* COMMENT */
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_recparse: count=>%t<\n",
-		recp->countstr.sp, recp->countstr.sl) ;
-	debugprintf("useraccdb_recparse: date=>%t<\n",
-		recp->datestr.sp, recp->datestr.sl) ;
-#endif
-
 	cl = nextfield(lp,ll,&cp) ;
 	recp->userstr.sp = cp ;
 	recp->userstr.sl = MIN(cl,UAFILE_MAXUSERLEN) ;
 	ll = ((lp+ll)-(cp+cl)) ;
 	lp = (cp+cl) ;
 
-#if	CF_DEBUGS
-	debugprintf("useraccdb_recparse: l=%u user=>%t<\n",
-		recp->userstr.sl,
-		recp->userstr.sp, recp->userstr.sl) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("useraccdb_recparse: rline=>%t<\n",
-		lp,strlinelen(lp,ll,40)) ;
-#endif
-
-	if ((tp = strnchr(lp,ll,CH_LPAREN)) != NULL) {
+	if ((tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
 	    ll = ((lp+ll)-(tp+1)) ;
 	    lp = (tp+1) ;
 	    cp = lp ;
-	    if ((tp = strnchr(lp,ll,CH_RPAREN)) != NULL) {
+	    if ((tp = strnchr(lp,ll,CH_RPAREN)) != nullptr) {
 	        cl = (tp-lp) ;
 	        recp->namestr.sp = cp ;
 	        recp->namestr.sl = MIN(cl,UAFILE_MAXNAMELEN) ;
-#if	CF_DEBUGS
-	debugprintf("useraccdb_recparse: name=>%t<\n",
-		recp->namestr.sp, recp->namestr.sl) ;
-#endif
-
 	    }
 	}
 
@@ -736,12 +623,12 @@ static int useraccdb_recproc(USERACCDB *op,USERACCDB_REC *recp)
 {
 	int		rs = SR_OK ;
 	int		sl ;
-	const char	*sp ;
+	cchar	*sp ;
 
 	if (rs >= 0) {
 	    sl = recp->datestr.sl ;
 	    sp = recp->datestr.sp ;
-	    if (sp != NULL) {
+	    if (sp != nullptr) {
 	        rs = useraccdb_datethis(op,&recp->atime,sp,sl) ;
 	    } else {
 	        rs = SR_INVALID ;
@@ -751,7 +638,7 @@ static int useraccdb_recproc(USERACCDB *op,USERACCDB_REC *recp)
 	if (rs >= 0) {
 	    sl = recp->countstr.sl ;
 	    sp = recp->countstr.sp ;
-	    if (sp != NULL) {
+	    if (sp != nullptr) {
 	        rs = cfdecui(sp,sl,&recp->count) ;
 	    } else {
 	        rs = SR_INVALID ;
@@ -768,8 +655,8 @@ static int useraccdb_datethis(USERACCDB *op,time_t *timep,cchar *tsp,int tsl)
 	int		rs = SR_OK ;
 
 	if (! op->f.dater) {
-	    struct timeb	now ;
-	    const int		zlen = DATER_ZNAMELEN ;
+	    TIMEB	now ;
+	    cint		zlen = DATER_ZNAMELEN ;
 	    char		zbuf[DATER_ZNAMELEN+1] ;
 	    if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
 	        rs = dater_start(&op->dm,&now,zbuf,zlen) ;
@@ -791,48 +678,39 @@ static int useraccdb_datethis(USERACCDB *op,time_t *timep,cchar *tsp,int tsl)
 static int upinfo_start(uip,op,arguser,argname)
 UPINFO		*uip ;
 USERACCDB	*op ;
-const char	*arguser ;
-const char	*argname ;
+cchar	*arguser ;
+cchar	*argname ;
 {
 	int		rs ;
-
-	memset(uip,0,sizeof(UPINFO)) ;
+	memclear(uip) ;
 	uip->op = op ;
-	uip->utime = time(NULL) ;
+	uip->utime = time(nullptr) ;
 	uip->arguser = arguser ;
 	uip->argname = argname ;
-	uip->utime = time(NULL) ;
-
+	uip->utime = time(nullptr) ;
 	rs = mkts(uip->tbuf,UAFILE_LDATE,uip->utime) ;
-
 	return rs ;
 }
 /* end subroutine (upinfo_start) */
 
-
-static int upinfo_finish(UPINFO *uip)
-{
-
-	if (uip == NULL) return SR_FAULT ;
-
-	return SR_OK ;
+static int upinfo_finish(UPINFO *uip) noex {
+	int		rs = SR_FAULT ;
+	if (uip) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (upinfo_finish) */
 
-
-static int upinfo_match(uip,ro,recp)
-UPINFO		*uip ;
-off_t	ro ;
-USERACCDB_REC	*recp ;
-{
-	UPINFO_REC	*urp = NULL ;
+static int upinfo_match(UPINFO *uip,off_t ro,USERACCDB_REC *recp) noex {
+	UPINFO_REC	*urp = nullptr ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		sl = recp->userstr.sl ;
 	int		rc = 0 ;
-	const char	*sp = recp->userstr.sp ;
+	cchar	*sp = recp->userstr.sp ;
 
-	if (sp != NULL) {
+	if (sp != nullptr) {
 
 	if (strwcmp(uip->arguser,sp,sl) == 0) {
 	    urp = &uip->user ;
@@ -841,13 +719,13 @@ USERACCDB_REC	*recp ;
 
 	} /* end if */
 
-	if ((urp != NULL) && (! urp->found)) {
-	    urp->found = TRUE ;
+	if ((urp != nullptr) && (! urp->found)) {
+	    urp->found = true ;
 	    urp->ro = ro ;
 	    urp->count = 0 ;
 	    sl = recp->countstr.sl ;
 	    sp = recp->countstr.sp ;
-	    if (sp != NULL) {
+	    if (sp != nullptr) {
 	        uint	c ;
 	        rs1 = cfdecui(sp,sl,&c) ;
 	        if (rs1 >= 0) urp->count = c ;
@@ -863,65 +741,36 @@ USERACCDB_REC	*recp ;
 /* end subroutine (upinfo_match) */
 
 
-static int upinfo_update(UPINFO	 *uip)
-{
+static int upinfo_update(UPINFO	 *uip) noex {
 	UPINFO_REC	*urp ;
 	int		rs = SR_OK ;
-
 	if (rs >= 0) {
 	    urp = &uip->total ;
 	    rs = upinfo_upone(uip,urp,0) ;
-#if	CF_DEBUGS
-	debugprintf("upinfo_update: 0 _upone() rs=%d\n",rs) ;
-#endif
 	}
-
 	if (rs >= 0) {
 	    urp = &uip->user ;
 	    rs = upinfo_upone(uip,urp,1) ;
-#if	CF_DEBUGS
-	debugprintf("upinfo_update: 1 _upone() rs=%d\n",rs) ;
-#endif
 	}
-
-#if	CF_DEBUGS
-	debugprintf("upinfo_update: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (upinfo_update) */
 
-
-static int upinfo_upone(UPINFO *uip,UPINFO_REC *urp,int type)
-{
-	const int	rlen = UAFILE_RECLEN ;
+static int upinfo_upone(UPINFO *uip,UPINFO_REC *urp,int type) noex {
+	cint		rlen = UAFILE_RECLEN ;
 	int		rs ;
 	char		rbuf[UAFILE_RECLEN+1] ;
-
-#if	CF_DEBUGS
-	debugprintf("upinfo_upone: type=%u\n",type) ;
-#endif
 	if ((rs = upinfo_mkrec(uip,urp,rbuf,rlen,type)) >= 0) {
 	    USERACCDB	*op = uip->op ;
 	    int		rl = rs ;
-
-#if	CF_DEBUGS
-	debugprintf("upinfo_upone: f_found=%u\n",urp->found) ;
-#endif
 	    if (urp->found) {
 	        rs = u_pwrite(op->fd,rbuf,rl,urp->ro) ;
 	    } else {
-	        rs = u_seek(op->fd,0L,SEEK_END) ;
-	        if (rs >= 0)
+	        if ((rs = u_seek(op->fd,0L,SEEK_END)) >= 0) {
 	            rs = u_write(op->fd,rbuf,rl) ;
+		}
 	    }
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("upinfo_upone: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (upinfo_upone) */
@@ -941,19 +790,11 @@ int		type ;
 	char		*dbp = digbuf ;
 	char		*rbp = rbuf ;
 
-#if	CF_DEBUGS
-	debugprintf("upinfo_mkrec: type=%u\n",type) ;
-	debugprintf("upinfo_mkrec: count=%u\n", urp->count) ;
-#endif
 	if (rlen > UAFILE_RECLEN)
 	    return SR_OVERFLOW ;
 
 	rs = ctdecui(digbuf,DIGBUFLEN,(urp->count+1)) ;
 	dbl = rs ;
-#if	CF_DEBUGS
-	debugprintf("upinfo_mkrec: ctdecui() rs=%u\n",rs) ;
-#endif
-
 	if (rs >= 0) {
 	    int	n = (UAFILE_LCOUNT - dbl) ;
 	    if (dbl > UAFILE_LCOUNT) { /* truncate from left as necessary */
@@ -965,9 +806,6 @@ int		type ;
 	    rbp = strwcpy(rbp,dbp,dbl) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("upinfo_mkrec: rbuf=>%s<\n",rbuf) ;
-#endif
 	if (rs >= 0) {
 	    *rbp++ = ' ' ;
 	}
@@ -978,10 +816,10 @@ int		type ;
 	}
 
 	if ((rs >= 0) && (! urp->found)) {
-	    const char	*up = (type) ? uip->arguser : totaluser ;
+	    cchar	*up = (type) ? uip->arguser : totaluser ;
 	    *rbp++ = ' ' ;
 	    rbp = strwcpy(rbp,up,UAFILE_MAXUSERLEN) ;
-	    if (type && (uip->argname != NULL)) {
+	    if (type && (uip->argname != nullptr)) {
 	        *rbp++ = ' ' ;
 	        *rbp++ = CH_LPAREN ;
 	        rbp = strwcpy(rbp,uip->argname,UAFILE_MAXNAMELEN) ;
@@ -991,9 +829,6 @@ int		type ;
 	    rl = (rbp - rbuf) ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("upinfo_mkrec: ret rs=%d rl=%u\n",rs,rl) ;
-#endif
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (upinfo_mkrec) */
@@ -1001,15 +836,15 @@ int		type ;
 
 static int entry_load(USERACCDB_ENT *ep,char *ebuf,int elen,USERACCDB_REC *recp)
 {
-	STOREITEM	s ;
+	storeitem	s ;
 	int		rs ;
 	int		rs1 ;
 
-	memset(ep,0,sizeof(USERACCDB_ENT)) ;
+	memclear(ep) ;
 
 	if ((rs = storeitem_start(&s,ebuf,elen)) >= 0) {
 	    USERACCDB_ITEM	*ip ;
-	    const char		*cp ;
+	    cchar		*cp ;
 
 	    ep->atime = recp->atime ;
 	    ep->count = recp->count ;
@@ -1032,20 +867,15 @@ static int entry_load(USERACCDB_ENT *ep,char *ebuf,int elen,USERACCDB_REC *recp)
 }
 /* end subroutine (entry_load) */
 
-
-static int mkts(char *tbuf,int tlen,time_t t)
-{
+static int mkts(char *tbuf,int tlen,time_t t) noex {
 	int		tl = 0 ;
-
 	timestr_logz(t,tbuf) ;
-
 	tl = strlen(tbuf) ;
 	if (tl < tlen) {
 	    char	*bp = (tbuf + tl) ;
 	    int		bl = (tlen - tl) ;
 	    strnset(bp,' ',bl) ;
 	}
-
 	return tl ;
 }
 /* end subroutine (mkts) */

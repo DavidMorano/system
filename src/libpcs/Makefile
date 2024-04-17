@@ -122,3 +122,6 @@ obj3_libpcs.o:	$(OBJ3_LIBPCS)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_LIBPCS)
 
 
+pcsuserfile.o:		pcsuserfile.cc pcsuserfile.h
+
+

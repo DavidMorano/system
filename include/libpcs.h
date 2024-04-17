@@ -27,6 +27,7 @@
 #include	<pcsconf.h>
 #include	<pcsconf_config.h>
 #include	<pcsconfs.h>
+#include	<pcsuserfile.h>
 #include	<pcsopendircache.h>
 #include	<pcsngdname.h>
 #include	<pcsgetnames.h>
