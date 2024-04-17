@@ -25,10 +25,10 @@
 	:-)
 
 	Synopsis:
-	int bprintline(bfile *fp,cchar *lbuf,int llen) noex
+	int bprintline(bfile *op,cchar *lbuf,int llen) noex
 
 	Arguments:
-	fp		file-pointer
+	op		file-pointer
 	lbuf		buffer of characters to print out
 	llen		length of characters to print
 
@@ -62,25 +62,27 @@
 
 /* exported subroutines */
 
-int bprintln(bfile *fp,cchar *lbuf,int llen) noex {
+int bprintln(bfile *op,cchar *lbuf,int llen) noex {
 	int		rs ;
 	int		wlen = 0 ;
-	if ((rs = bfile_magic(fp,lbuf)) > 0) {
-	    bool	feol = false ;
-	    if (llen < 0) llen = strlen(lbuf) ;
-	    feol = feol || (llen == 0) ;
-	    feol = feol || (lbuf[llen-1] != CH_NL) ;
-	    if (feol) {
-		rs = breserve(fp,(llen+1)) ;
-	    }
-	    if ((rs >= 0) && (llen > 0)) {
-	        rs = bwrite(fp,lbuf,llen) ;
-	        wlen += rs ;
-	    }
-	    if ((rs >= 0) && feol) {
-	        rs = bputc(fp,CH_NL) ;
-	        wlen += rs ;
-	    }
+	if ((rs = bfile_magic(op,lbuf)) > 0) {
+	    if ((rs = bfile_wr(op)) >= 0) {
+	        bool	feol = false ;
+	        if (llen < 0) llen = strlen(lbuf) ;
+	        feol = feol || (llen == 0) ;
+	        feol = feol || (lbuf[llen-1] != CH_NL) ;
+	        if (feol) {
+		    rs = breserve(op,(llen+1)) ;
+	        }
+	        if ((rs >= 0) && (llen > 0)) {
+	            rs = bwrite(op,lbuf,llen) ;
+	            wlen += rs ;
+	        }
+	        if ((rs >= 0) && feol) {
+	            rs = bputc(op,CH_NL) ;
+	            wlen += rs ;
+	        }
+	    } /* end if (writing) */
 	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }

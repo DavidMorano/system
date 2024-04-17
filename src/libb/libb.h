@@ -212,6 +212,7 @@ extern int	bputc(bfile *,int) noex ;
 extern int	bprintf(bfile *,cchar *,...) noex ;
 extern int	bvprintf(bfile *,cchar *,va_list) noex ;
 extern int	bprintln(bfile *,cchar *,int) noex ;
+extern int	bprintlns(bfile *,int,cchar *,int) noex ;
 extern int	bprintcleanln(bfile *,cchar *,int) noex ;
 extern int	bprintcleanlns(bfile *,int,cchar *,int) noex ;
 extern int	bcopyblock(bfile *,bfile *,int) noex ;
@@ -242,6 +243,10 @@ static inline int bprint(bfile *fp,cchar *lbuf,int llen) noex {
 
 static inline int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
 	return bprintln(fp,lbuf,llen) ;
+}
+
+static inline int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
+	return bprintlns(fp,flen,lbuf,llen) ;
 }
 
 EXTERNC_end

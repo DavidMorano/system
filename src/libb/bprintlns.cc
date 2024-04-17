@@ -41,13 +41,17 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
-#include	<bfile.h>
 #include	<sbuf.h>
+#include	<strn.h>
+#include	<snx.h>
 #include	<localmisc.h>
+
+#include	"bfile.h"
 
 
 /* local defines */
@@ -66,12 +70,6 @@
 
 
 /* external subroutines */
-
-extern int	bprintln(bfile *,cchar *,int) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -95,29 +93,18 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	char		*fbuf = NULL ;
-
-	if (fp == NULL) return SR_FAULT ;
-	if (lbuf == NULL) return SR_FAULT ;
-
-	if (fp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (fp->f.nullfile) goto ret0 ;
-
-/* continue */
-
-	if (flen < 2)
-	    flen = LINEBUFLEN ;
-
-	if (llen < 0)
-	    llen = strlen(lbuf) ;
+	if ((rs = bfile_magic(fp,lbuf)) > 0) {
+	    if ((rs = bfile_wr(fp)) >= 0) {
+	char		*fbuf = nullptr ;
+	if (flen < 2) flen = LINEBUFLEN ;
+	if (llen < 0) llen = strlen(lbuf) ;
 
 	if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
-	    SBUF	b ;
+	    sbuf	b ;
 	    int		ll = llen ;
 	    int		sl, cl ;
 	    int		wc, len ;
-	    int		f_sbuf = FALSE ;
+	    int		f_sbuf = false ;
 	    cchar	*lp = lbuf ;
 	    cchar	*tp, *sp ;
 	    cchar	*cp ;
@@ -135,7 +122,7 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 
 	            if ((len + (cl + 1)) > flen) {
 
-	                f_sbuf = FALSE ;
+	                f_sbuf = false ;
 	                sbuf_finish(&b) ;
 
 	                if ((rs = bprintln(fp,fbuf,len)) >= 0) {
@@ -166,7 +153,7 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	        } /* end while (grabbing white-space separated words) */
 
 	        if (f_sbuf) {
-	            f_sbuf = FALSE ;
+	            f_sbuf = false ;
 	            sbuf_finish(&b) ;
 	        }
 
@@ -175,7 +162,7 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	            wlen += rs ;
 	        }
 
-	        if ((tp = strnchr(sp,sl,'\n')) == NULL) {
+	        if ((tp = strnchr(sp,sl,'\n')) == nullptr) {
 	            tp = (sp + sl - 1) ;
 	 	}
 
@@ -193,15 +180,10 @@ int bprintlns(bfile *fp,int flen,cchar *lbuf,int llen) noex {
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a) */
 
-ret0:
-
+	    } /* end if (writing) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintlns) */
-
-int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
-	return bprintlns(fp,flen,lbuf,llen) ;
-}
-/* end subroutine (bprintlines) */
 
 
