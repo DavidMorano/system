@@ -151,6 +151,7 @@ struct bfile_flags {
 	uint		mapinit:1 ;
 	uint		mapped:1 ;
 	uint		nullfile:1 ;
+	uint		program:1 ;
 } ;
 
 struct bfile_head {
