@@ -98,13 +98,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    int		dater_settmzon(DATER *,TM *,int,cchar *,int) noex ;
-    int		dater_settmzo(DATER *,TM *,int) noex ;
-    int		dater_settmzn(DATER *,TM *,cchar *,int) noex ;
-    int		dater_mkdatestr(DATER *,int,char *,int) noex ;
-}
-
 
 /* external variables */
 

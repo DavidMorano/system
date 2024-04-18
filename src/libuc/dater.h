@@ -19,11 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/timeb.h>		/* for 'struct timeb' */
 #include	<usystem.h>
 #include	<snx.h>
 #include	<strwcpy.h>
+#include	<date.h>
 #include	<localmisc.h>		/* |TZABBRLEN| */
 
 
@@ -115,6 +115,10 @@ extern int dater_getzonename(dater *,char *,int) noex ;
 extern int dater_getzinfo(dater *,DATER_ZINFO *) noex ;
 extern int dater_diff(dater *,DATER *,time_t *) noex ;
 extern int dater_finish(dater *) noex ;
+
+extern int dater_getdate(dater *,date *) noex ;
+extern int dater_getbbtime(dater *,cchar *,int,time_t *) noex ;
+extern int dater_setkey(dater *,cc *,int,TIMEB *,cc *) noex ;
 
 #ifdef	COMMENT
 extern int dater_nzones(dater *) noex ;

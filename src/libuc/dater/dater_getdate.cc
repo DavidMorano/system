@@ -25,10 +25,10 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<cstring>
 #include	<usystem.h>
+#include	<date.h>
 #include	<localmisc.h>		/* |NYEARS_CENTURY| + |TIMEBUFLEN| */
 
 #include	"dater.h"
-#include	"date.h"
 
 
 /* local defines */

@@ -20,6 +20,9 @@
 
 /******************************************************************************
 
+	Name:
+
+	Description:
 	This subroutine will parse out a date that has been specified
 	with a syntax like:
 
@@ -32,7 +35,6 @@
 
 
 	Synopsis:
-
 	int dater_setkey(dater *dp,cc *dbuf,int dlen,TIMEB *nowp,cc *zn) noex
 
 	Arguments:
