@@ -16,38 +16,56 @@
 
 /*******************************************************************************
 
+	Name:
+	linefold
+
+	Description:
 	This object module takes a line of text as input and breaks
 	it up into pieces that are folded so as to fit in a specified
 	number of cols.
 
+	Synopsis:
+	int linefold_start(linefold *op,int cols,int ind,
+		cchar *lbuf,int llen) noex {
+
+	Arguments:
+	op	object pointer
+	cols	number of columns in a line (normally '80')
+	ind	number of columns to indent for 2nd and subsequent lines
+	lbuf	source line (c-string) pointer
+	llen	source line (c-string) length
+
+	Returns:
+	>=0	OK
+	<0	error code (system-return)
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<cstdlib>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>		/* |getenv(3c)| */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ucvariables.hh>	/* |varnames| */
 #include	<vecobj.h>
-#include	<ascii.h>
 #include	<cfdec.h>
 #include	<ncol.h>		/* |charcols(3uc)| */
-#include	<char.h>
-#include	<localmisc.h>		/* |NTABCOLS| */
+#include	<rmx.h>			/* |rmeol(3uc)| */
+#include	<char.h>		/* |CHAR_ISWHITE(3uc)| */
+#include	<mkchar.h>
+#include	<ischarx.h>		/* |iseol(3uc)| */
+#include	<localmisc.h>		/* |NTABCOLS| + |COLUMNS| */
 
 #include	"linefold.h"
 
 
 /* local defines */
 
-#ifndef	COLUMNS
-#define	COLUMNS		80		/* output cols (should be 80) */
-#endif
-
 
 /* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
@@ -77,17 +95,57 @@ typedef liner *		linerp ;
 
 /* forward references */
 
+template<typename ... Args>
+static int linefold_ctor(linefold *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->llp = new(nothrow) vecobj) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-vecobj) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (linefold_ctor) */
+
+static int linefold_dtor(linefold *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->llp) {
+		delete op->llp ;
+		op->llp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (linefold_dtor) */
+
+template<typename ... Args>
+static int linefold_magic(linefold *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LINEFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (linefold_magic) */
+
 static int	linefold_process(linefold *,int,int,cchar *,int) noex ;
 
 static int	params_load(params *,int,int) noex ;
 static int	params_nextline(params *,cchar *,int,cchar **) noex ;
 static int	params_nline(params *) noex ;
 
+static int	getcols(int) noex ;
 static int	nextpiece(int,cchar *,int,int *) noex ;
-static bool	isend(int) noex ;
 
 
 /* local variables */
+
+constexpr int	ntabcols = NTABCOLS ;
 
 
 /* exported variables */
@@ -96,113 +154,108 @@ static bool	isend(int) noex ;
 /* exported subroutines */
 
 int linefold_start(linefold *op,int cols,int ind,cchar *lbuf,int llen) noex {
-	cchar		*vncols = varname.columns ;
-	int		rs = SR_OK ;
+	int		rs ;
 	int		nlines = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (lbuf == nullptr) return SR_FAULT ;
-
-	if (llen < 0) llen = strlen(lbuf) ;
-
-	memclear(op) ;
-	if (cols <= 0) {
-	    static cchar	*vvp = getenv(vncols) ;
-	    int			v ;
-	    if (vvp && (cfdeci(vvp,-1,&v) >= 0)) {
-	        cols = v ;
+	if ((rs = linefold_ctor(op,lbuf)) >= 0) {
+	    if ((rs = getcols(cols)) >= 0) {
+	        cint	sz = sizeof(liner) ;
+		cint	ne = 10 ;
+	        cint	vo = (VECOBJ_OCOMPACT) ;
+		cols = rs ;
+	        if ((rs = vecobj_start(op->llp,sz,ne,vo)) >= 0) {
+		    cint	ll = rmeol(lbuf,llen) ;
+	            if ((rs = linefold_process(op,cols,ind,lbuf,ll)) >= 0) {
+	                nlines = rs ;
+	                op->magic = LINEFOLD_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        vecobj_finish(op->llp) ;
+		    }
+	        } /* end if (vecobj_start) */
+	    } /* end if (ok) */
+	    if (rs < 0) {
+		linefold_dtor(op) ;
 	    }
-	    if (cols <= 0) {
-	        cols = COLUMNS ;
-	    }
-	} /* end if (default cols) */
-
-	if (rs >= 0) {
-	    cint	size = sizeof(liner) ;
-	    cint	vo = (VECOBJ_OCOMPACT) ;
-	    if ((rs = vecobj_start(&op->lines,size,10,vo)) >= 0) {
-	        if (llen < 0) llen = strlen(lbuf) ;
-	        while ((llen > 0) && isend(lbuf[llen-1])) llen -= 1 ;
-	        if ((rs = linefold_process(op,cols,ind,lbuf,llen)) >= 0) {
-	            nlines = rs ;
-	            op->magic = LINEFOLD_MAGIC ;
-	        }
-	        if (rs < 0) {
-		    vecobj_finish(&op->lines) ;
-		}
-	    } /* end if (vecobj_start) */
-	} /* end if (ok) */
-
+	} /* end if (linefold_ctor) */
 	return (rs >= 0) ? nlines : rs ;
 }
 /* end subroutine (linefold_start) */
 
 int linefold_finish(linefold *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LINEFOLD_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = vecobj_finish(&op->lines) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = linefold_magic(op)) >= 0) {
+	    if (op->llp) {
+	        rs1 = vecobj_finish(op->llp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = linefold_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (linefold_finish) */
 
 int linefold_get(linefold *op,int li,cchar **rpp) noex {
-	liner		*lep ;
 	int		rs ;
 	int		ll = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LINEFOLD_MAGIC) return SR_NOTOPEN ;
-
-	if (li < 0) return SR_INVALID ;
-
-	void		*vp{} ;
-	if ((rs = vecobj_get(&op->lines,li,&vp)) >= 0) {
-	    lep = linerp(vp) ;
-	    ll = lep->ll ;
-	}
-
+	cchar		*rp = nullptr ;
+	if ((rs = linefold_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (li >= 0) {
+	        void	*vp{} ;
+	        if ((rs = vecobj_get(op->llp,li,&vp)) >= 0) {
+	            liner	*lep = linerp(vp) ;
+	            ll = lep->ll ;
+	            rp = lep->lp ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	if (rpp) {
-	    *rpp = (rs >= 0) ? lep->lp : nullptr ;
+	    *rpp = (rs >= 0) ? rp : nullptr ;
 	}
-
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (linefold_get) */
 
-int linefold_getline(linefold *op,int li,cchar **rpp) noex {
-	liner		*lep ;
+int linefold_getln(linefold *op,int li,cchar **rpp) noex {
 	int		rs ;
 	int		ll = 0 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LINEFOLD_MAGIC) return SR_NOTOPEN ;
-
-	if (li < 0) return SR_INVALID ;
-
-	void		*vp{} ;
-	if ((rs = vecobj_get(&op->lines,li,&vp)) >= 0) {
-	    lep = linerp(vp) ;
-	    ll = lep->ll ;
-	} else if (rs == SR_NOTFOUND)
-	    rs = SR_OK ;
-
+	cchar		*rp = nullptr ;
+	if ((rs = linefold_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (li >= 0) {
+	        void	*vp{} ;
+	        if ((rs = vecobj_get(op->llp,li,&vp)) >= 0) {
+	            liner	*lep = linerp(vp) ;
+	            ll = lep->ll ;
+	            rp = lep->lp ;
+	        } else if (rs == SR_NOTFOUND) {
+	            rs = SR_OK ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	if (rpp) {
-	    *rpp = ((rs >= 0) && (ll > 0)) ? lep->lp : nullptr ;
+	    *rpp = ((rs >= 0) && (ll > 0)) ? rp : nullptr ;
 	}
-
 	return (rs >= 0) ? ll : rs ;
 }
-/* end subroutine (linefold_getline) */
+/* end subroutine (linefold_getln) */
+
+int linefold_count(linefold *op) noex {
+	int		rs ;
+	if ((rs = linefold_magic(op)) >= 0) {
+	    rs = SR_BUGCHECK ;
+	    if (op->llp) {
+	        rs = vecobj_count(op->llp) ;
+	    }
+	} /* end if (magic) */
+	return rs ;
+}
+/* end subroutine (linefold_count) */
 
 
 /* private subroutines */
@@ -212,22 +265,19 @@ static int linefold_process(linefold *op,int cols,int ind,
 	liner		le ;
 	params		p ;
 	int		rs = SR_OK ;
-	int		sl, ll ;
+	int		sl ;
+	int		ll ;
 	int		nline = 0 ;
 	cchar		*sp ;
 	cchar		*lp ;
-
 	params_load(&p,cols,ind) ;
-
-	if (llen < 0)
-	    llen = strlen(lbuf) ;
-
+	if (llen < 0) llen = strlen(lbuf) ;
 	sp = lbuf ;
 	sl = llen ;
 	while ((ll = params_nextline(&p,sp,sl,&lp)) > 0) {
-	    le.lp = (cchar *) lp ;
+	    le.lp = lp ;
 	    le.ll = ll ;
-	    rs = vecobj_add(&op->lines,&le) ;
+	    rs = vecobj_add(op->llp,&le) ;
 	    sl -= ((lp + ll) - sp) ;
 	    sp = (lp + ll) ;
 	    if (rs < 0) break ;
@@ -235,7 +285,6 @@ static int linefold_process(linefold *op,int cols,int ind,
 	if (rs >= 0) {
 	    nline = params_nline(&p) ;
 	}
-
 	return (rs >= 0) ? nline : rs ;
 }
 /* end subroutine (linefold_process) */
@@ -257,39 +306,27 @@ static int params_nextline(params *pp,cchar *sp,int sl,cchar **rpp) noex {
 	int		ncs ;
 	int		pl ;
 	int		ll = 0 ;
-
-/* move up to the first non-whitespace character */
-
 	if (pp->nline > 0) {
 	    while (sl && CHAR_ISWHITE(sp[0])) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
 	}
-
 	*rpp = sp ;
 	ncol = (pp->nline > 0) ? pp->ind : 0 ;
-
-/* continue */
-
 	while ((pl = nextpiece(ncol,sp,sl,&ncs)) > 0) {
-
 	    if ((ncol + ncs) > pp->cols) {
 		if (ll == 0) ll = pl ;
 	        break ;
 	    }
-
 	    ll += pl ;
 	    ncol += ncs ;
-
 	    sp += pl ;
 	    sl -= pl ;
-
 	} /* end while */
-
-	if ((rs >= 0) && (ll > 0))
+	if ((rs >= 0) && (ll > 0)) {
 	    pp->nline += 1 ;
-
+	}
 	return (rs >= 0) ? ll : rs ;
 }
 /* end subroutine (params_nextline) */
@@ -299,23 +336,39 @@ static int params_nline(params *pp) noex {
 }
 /* end subroutine (params_nline) */
 
+static int getcols(int cols) noex {
+	cchar		*vncols = varname.columns ;
+	int		rs = SR_OK ;
+	if (cols <= 0) {
+	    static cchar	*vcols = getenv(vncols) ;
+	    if (int v ; vcols && (cfdeci(vcols,-1,&v) >= 0)) {
+	        cols = v ;
+	    }
+	    if (cols <= 0) {
+	        cols = COLUMNS ;
+	    }
+	} /* end if (default cols) */
+	return (rs >= 0) ? cols : rs ;
+}
+/* end subroutine (getcols) */
+
 static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
+	int		pl = 0 ;
 	int		ncs = 0 ;
 	int		cl = sl ;
-	int		n ;
-	int		pl = 0 ;
+	int		ch ;
 	cchar		*cp = sp ;
 /* skip over whitespace */
-	while (cl && CHAR_ISWHITE(cp[0])) {
-	    n = charcols(NTABCOLS,ncol,cp[0]) ;
+	while (cl && ((ch = mkchar(cp[0])),CHAR_ISWHITE(ch))) {
+	    cint	n = charcols(ntabcols,ncol,ch) ;
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;
 	    ncol += n ;
 	} /* end while */
 /* skip over the non-whitespace */
-	while (cl && cp[0] && (! CHAR_ISWHITE(cp[0]))) {
-	    n = charcols(NTABCOLS,ncol,cp[0]) ;
+	while (cl && ((ch = mkchar(cp[0]))) && (! CHAR_ISWHITE(ch))) {
+	    cint	n = charcols(ntabcols,ncol,ch) ;
 	    cp += 1 ;
 	    cl -= 1 ;
 	    ncs += n ;
@@ -328,9 +381,84 @@ static int nextpiece(int ncol,cchar *sp,int sl,int *ncp) noex {
 }
 /* end subroutine (nextpiece) */
 
-static bool isend(int ch) noex {
-	return ((ch == '\n') || (ch == '\r')) ;
+int linefold::start(int cols,int ind,cchar *sp,int sl) noex {
+	return linefold_start(this,cols,ind,sp,sl) ;
 }
-/* end subroutine (isend) */
+
+int linefold::get(int ai,cchar **rpp) noex {
+	return linefold_get(this,ai,rpp) ;
+}
+
+int linefold::getln(int ai,cchar **rpp) noex {
+	return linefold_getln(this,ai,rpp) ;
+}
+
+void linefold::dtor() noex {
+	cint	rs = int(finish) ;
+	if (rs < 0) {
+	    ulogerror("linefold",rs,"fini-finish") ;
+	}
+}
+
+linefold_co::operator int () noex {
+	int	rs = SR_BUGCHECK ;
+	switch (w) {
+	case linefoldmem_count:
+	    rs = linefold_count(op) ;
+	    break ;
+	case linefoldmem_finish:
+	    rs = linefold_finish(op) ;
+	    break ;
+	} /* end switch */
+	return rs ;
+}
+/* end method (linefold_co::operator) */
+
+bool linefold_iter::operator == (const linefold_iter &oit) noex {
+	return (i == oit.i) ;
+}
+
+bool linefold_iter::operator != (const linefold_iter &oit) noex {
+	return (i != oit.i) ;
+}
+
+linefold_iter linefold_iter::operator + (int n) const noex {
+	linefold_iter	rit(op,i) ;
+	rit.i = ((i + n) >= 0) ? (i + n) : 0 ;
+	return rit ;
+}
+
+linefold_iter linefold_iter::operator += (int n) noex {
+	linefold_iter	rit(op,i) ;
+	i = ((i + n) >= 0) ? (i + n) : 0 ;
+	rit.i = i ;
+	return rit ;
+}
+
+linefold_iter linefold_iter::operator ++ () noex { /* pre */
+	increment() ;
+	return (*this) ;
+}
+
+linefold_iter linefold_iter::operator ++ (int) noex { /* post */
+	linefold_iter	pre(*this) ;
+	increment() ;
+	return pre ;
+}
+
+void linefold_iter::increment(int n) noex {
+	i += n ;
+}
+/* end method (linefold_iter::increment) */
+
+cchar *linefold_iter::operator * () noex {
+	cchar		*rp = nullptr ;
+	cchar		*cp{} ;
+	if (op->getln(i,&cp) >= 0) {
+	    rp = cp ;
+	}
+	return rp ;
+}
+/* end method (linefold_iter::operator) */
 
 

@@ -58,7 +58,7 @@ typedef int64_t		mtime_t ;
 #ifndef	SUBROUTINE_MTIME
 #define	SUBROUTINE_MTIME
 EXTERNC_begin
-extern mtime_t	mtime(void) ;
+extern mtime_t	mtime(void) noex ;
 EXTERNC_end
 #endif
 

@@ -154,6 +154,7 @@ struct vecstr : vecstr_head {
 	int add(cchar *,int = -1) noex ;
 	int adduniq(cchar *,int = -1) noex ;
 	int insert(int,cchar *,int = -1) noex ;
+	int get(int,cchar **) noex ;
 	int del(int = -1) noex ;
 	vecstr_iter begin() noex {
 	    vecstr_iter		it(va,0,i) ;
@@ -169,8 +170,10 @@ struct vecstr : vecstr_head {
 	} ;
 } ; /* end struct (vecstr) */
 #else	/* __cplusplus */
-typedef struct vecstr_head	vecstr ;
+typedef VECSTR		vecstr ;
 #endif /* __cplusplus */
+
+typedef	VECSTR_FL	vecstr_fl ;
 
 EXTERNC_begin
 

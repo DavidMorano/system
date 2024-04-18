@@ -207,5 +207,6 @@ bdup.o:			bdup.cc			$(INCS)
 bsupport.o:		bsupport.cc		$(INCS)
 
 bfliner.o:		bfliner.cc bfliner.h
+snclean.o:		snclean.cc snclean.h
 
 

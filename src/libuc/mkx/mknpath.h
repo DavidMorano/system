@@ -20,7 +20,8 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<utypedefs.h>
-#include	<clnaguage.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 
 #include	<mknpathx.h>
 #include	<mknpathxw.h>

@@ -151,6 +151,7 @@ struct bfile_flags {
 	uint		mapinit:1 ;
 	uint		mapped:1 ;
 	uint		nullfile:1 ;
+	uint		program:1 ;
 } ;
 
 struct bfile_head {
@@ -172,6 +173,7 @@ struct bfile_head {
 	int		of ;		/* open flags */
 	int		len ;		/* data remaining(r) or filled(w) */
 	int		bm ;		/* buffer mode */
+	mode_t		fm ;		/* file mode */
 	mode_t		om ;		/* open-mode (permissions) */
 } ;
 
@@ -210,7 +212,9 @@ extern int	bputc(bfile *,int) noex ;
 extern int	bprintf(bfile *,cchar *,...) noex ;
 extern int	bvprintf(bfile *,cchar *,va_list) noex ;
 extern int	bprintln(bfile *,cchar *,int) noex ;
-extern int	bprint(bfile *,cchar *,int) noex ;
+extern int	bprintlns(bfile *,int,cchar *,int) noex ;
+extern int	bprintcleanln(bfile *,cchar *,int) noex ;
+extern int	bprintcleanlns(bfile *,int,cchar *,int) noex ;
 extern int	bcopyblock(bfile *,bfile *,int) noex ;
 extern int	bcopyfile(bfile *,bfile *,char *,int) noex ;
 extern int	btruncate(bfile *,off_t) noex ;
@@ -231,6 +235,18 @@ extern int	bfile_pagein(bfile *,off_t,int) noex ;
 
 static inline int breadln(bfile *fp,char *ubuf,int ulen) noex {
 	return breadlnto(fp,ubuf,ulen,-1) ;
+}
+
+static inline int bprint(bfile *fp,cchar *lbuf,int llen) noex {
+	return bprintln(fp,lbuf,llen) ;
+}
+
+static inline int bprintline(bfile *fp,cchar *lbuf,int llen) noex {
+	return bprintln(fp,lbuf,llen) ;
+}
+
+static inline int bprintlines(bfile *fp,int flen,cchar *lbuf,int llen) noex {
+	return bprintlns(fp,flen,lbuf,llen) ;
 }
 
 EXTERNC_end

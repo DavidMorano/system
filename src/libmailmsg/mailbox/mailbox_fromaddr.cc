@@ -200,7 +200,7 @@ static int mailmsg_msgfrom(mailmsg *mmp,MAILMSGFROM *fip) noex {
 	    cint	rlen = vl ;
 	    char	*rbuf ;
 	    if ((rs = uc_malloc((rlen+1),&rbuf)) >= 0) {
-		if ((rs = mkbestfrom(rbuf,rlen,vp,vl)) >= 0) {
+		if ((rs = mkaddrfrom(rbuf,rlen,vp,vl)) >= 0) {
 	            rs = mailmsgfrom_loadfrom(fip,rbuf,rs) ;
 		    len = rs ;
 		}

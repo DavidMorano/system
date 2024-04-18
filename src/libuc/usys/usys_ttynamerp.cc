@@ -66,14 +66,19 @@ int ttyname_rp(int fd,char *rbuf,int rlen) noex {
 		if (rlen >= 0) {
 		    csize	sz = size_t(rlen) ;
 		    int		rs ;
-		    if ((rs = mxiguardbegin) >= 0) {
+		    int		rs1 ;
+		    if ((rs = mx.guardbegin) >= 0) {
 		        if (char *p ; (p = ttyname(fd)) != nullptr) {
 			    char	*dp = stpncpy(rbuf,p,sz) ;
 			    *dp = '\0' ;
 		        } else {
 			    ec = errno ;
 		        } /* end if (ttyname) */
-			mx.guardend ;
+			rs1 = mx.guardend ;
+			if (rs >= 0) rs = rs1 ;
+			if (rs < 0) {
+			    ec = (- rs) ;
+			}
 		    } else {
 		        ec = (- rs) ;
 		    } /* end if (aflag-mx) */

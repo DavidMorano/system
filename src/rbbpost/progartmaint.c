@@ -124,7 +124,6 @@ extern int	matcasestr(cchar **,cchar *,int) ;
 extern int	cfdeci(cchar *,int,int *) ;
 extern int	strwcmp(cchar *,cchar *,int) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
-extern int	mkbestaddr(char *,int,cchar *,int) ;
 extern int	pathadd(char *,int,cchar *) ;
 extern int	removes(cchar *) ;
 extern int	bufprintf(char *,int,char *,...) ;

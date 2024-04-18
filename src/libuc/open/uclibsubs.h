@@ -72,6 +72,7 @@
 #include	<ucmallocx.h>
 #include	<ucstrtox.h>
 #include	<ucopeninfo.h>
+#include	<ucopen.h>
 #include	<uctc.h>		/* terminal interface */
 #include	<ucpts.h>		/* pseudo-terminal management */
 #include	<ucfdmanip.h>
@@ -180,7 +181,9 @@ extern int	uc_openpt(int) noex ;
 extern int	uc_socket(int,int,int) noex ;
 
 /* use group */
+extern int	uc_fcntl(int,int,...) noex ;
 extern int	uc_ioctl(int,int,...) noex ;
+extern int	uc_tell(int,off_t *) noex ;
 extern int	uc_fpassfd(int,int) noex ;
 extern int	uc_ftruncate(int,off_t) noex ;
 extern int	uc_fstat(int,USTAT *) noex ;

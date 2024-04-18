@@ -67,7 +67,7 @@ int linebuffer_finish(linebuffer *op) noex {
 	    rs = SR_OK ;
 	    if (op->lbuf) {
 		op->lbuf[0] = '\0' ;
-	        rs1 = uc_libfree(op->lbuf) ;
+	        rs1 = uc_free(op->lbuf) ;
 	        if (rs >= 0) rs = rs1 ;
 	        op->lbuf = nullptr ;
 		op->llen = 0 ;

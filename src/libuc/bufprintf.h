@@ -27,7 +27,7 @@
 EXTERNC_begin
 
 extern int bufprintf(char *,int,cchar *,...) noex ;
-extern int vbufprintf(char *,int,cchar *,va_list) noex ;
+extern int bufvprintf(char *,int,cchar *,va_list) noex ;
 
 EXTERNC_end
 

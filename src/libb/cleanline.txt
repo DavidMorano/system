@@ -1,0 +1,47 @@
+
+
+#ifndef	CF_BADSUB
+#define	CF_BADSUB	1
+#endif
+
+constexpr bool		f_badsub = CF_BADSUB ;
+
+
+#ifdef	COMMENT
+static int cleanline(char *lp,int ll) noex {
+	int		oli = 0 ;
+	bool		f ;
+	if constexpr (f_badsub) {
+	    for (oli = 0 ; oli < ll ; oli += 1) {
+	        cint	ch = mkchar(lp[ili]) ;
+	        f = isprintlatin(ch) || ischarok(ch) ;
+	        if (! f) {
+	            lp[oli] = cchar('¿') ;
+	        }
+	    } /* end for */
+	} else {
+	    bool	f_flipped = false ;
+	    for (int ili = 0 ; ili < ll ; ili += 1) {
+	        cint	ch = mkchar(lp[ili]) ;
+	        f = isprintlatin(ch) || ischarok(ch) ;
+	        if (f) {
+	            if (f_flipped) {
+	                lp[oli++] = lp[ili] ;
+	            } else {
+	                oli += 1 ;
+		    }
+	        } else {
+	            f_flipped = true ;
+	        }
+	    } /* end for */
+	} /* end if-constexpr (f_badsub)  */
+	return oli ;
+}
+/* end subroutine (cleanline) */
+static bool ischarok(int ch) noex {
+	return ((ch == '\t') || (ch == '\n')) ;
+}
+/* end subroutine (ischarok) */
+#endif /* COMMENT */
+
+

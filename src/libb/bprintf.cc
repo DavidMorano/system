@@ -16,8 +16,8 @@
 
 /*******************************************************************************
 
-	This version of printf is compatible with the Version 7 C
-	printf. This function is implemented differently in that
+	This version of PRINTF is compatible with the Version 7 C
+	PRINTF.  This function is implemented differently in that
 	the function that does the actual formatting is |bufprintf(3dam)|.
 
 *******************************************************************************/
@@ -44,7 +44,7 @@
 
 extern "C" {
     extern int	bufprintf(char *,int,cchar *,...) noex ;
-    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
 }
 
 
@@ -93,7 +93,7 @@ static int bwritefmt(bfile *op,cchar *fmt,va_list ap) noex {
 	if ((rs = bfile_magic(op,fmt,ap)) > 0) {
 	    if ((rs = malloc_ml(&lbuf)) >= 0) {
 	        cint	llen = rs ;
-	        if ((rs = vbufprintf(lbuf,llen,fmt,ap)) >= 0) {
+	        if ((rs = bufvprintf(lbuf,llen,fmt,ap)) >= 0) {
 	            rs = bwriteout(op,lbuf,rs) ;
 	            wlen = rs ;
 	        }

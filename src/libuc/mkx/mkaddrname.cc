@@ -9,9 +9,9 @@
 /* revision history:
 
 	= 1998-06-01, David A­D­ Morano
-	This code piece was part of the 'pcsmailcheck(3pcs)' subroutine and I
-	pulled it out to make a subroutine that can be used in multiple
-	places.
+	This code piece was part of the |pcsmailcheck(3pcs)|
+	subroutine and I pulled it out to make a subroutine that
+	can be used in multiple places.
 
 */
 
@@ -53,7 +53,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<estrings.h>
@@ -76,7 +75,7 @@
 /* external subroutines */
 
 extern "C" {
-    extern int	mkdisphdr(char *,int,cchar *,int) noex ;
+    extern int	mkaddrdisp(char *,int,cchar *,int) noex ;
 }
 
 
@@ -95,8 +94,8 @@ enum atypes {
 
 /* forward references */
 
-static int	emaentry_addrname(EMA_ENT *,char *,int) noex ;
-static int	isBadAddr(int) noex ;
+static int	emaentry_addrname(ema_ent *,char *,int) noex ;
+static bool	isBadAddr(int) noex ;
 
 
 /* local variables */
@@ -107,7 +106,7 @@ static constexpr int	rsbadaddr[] = {
 	0
 } ;
 
-constexpr bool	f_massage = CF_MASSAGE ;
+constexpr bool		f_massage = CF_MASSAGE ;
 
 
 /* exported variables */
@@ -124,8 +123,8 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 	    if (sl < 0) sl = strlen(sp) ;
 	    fbuf[0] = '\0' ;
 	    if (sl > 0)  {
-	        EMA		a ;
-	        EMA_ENT		*ep{} ;
+	        ema		a ;
+	        ema_ent		*ep{} ;
 	        if ((rs = ema_start(&a)) >= 0) {
 	            if ((rs = ema_parse(&a,sp,sl)) >= 0) {
 			auto	eg = ema_get ;
@@ -151,58 +150,58 @@ int mkaddrname(char *fbuf,int flen,cchar *sp,int sl) noex {
 
 /* local subroutines */
 
-static int emaentry_addrname(EMA_ENT *ep,char *fbuf,int flen) noex {
+static int emaentry_addrname(ema_ent *ep,char *fbuf,int flen) noex {
 	int		rs = SR_OK ;
 	int		nl = 0 ;
 	int		atype = -1 ;
 	int		len = 0 ;
-	cchar		*np = nullptr ;
-	if ((np == nullptr) || (nl == 0)) {
+	cchar		*sp = nullptr ;
+	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->cp != nullptr) {
 	        atype = atype_comment ;
-	        nl = sfshrink(ep->cp,ep->cl,&np) ;
+	        nl = sfshrink(ep->cp,ep->cl,&sp) ;
 	    }
 	}
-	if ((np == nullptr) || (nl == 0)) {
+	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->ap != nullptr) {
 	        atype = atype_address ;
-	        nl = sfshrink(ep->ap,ep->al,&np) ;
+	        nl = sfshrink(ep->ap,ep->al,&sp) ;
 	    }
 	}
-	if ((np == nullptr) || (nl == 0)) {
+	if ((sp == nullptr) || (nl == 0)) {
 	    if (ep->rp != nullptr) {
 	        atype = atype_route ;
-	        nl = sfshrink(ep->rp,ep->rl,&np) ;
+	        nl = sfshrink(ep->rp,ep->rl,&sp) ;
 	    }
 	}
 	if constexpr (f_massage) {
-	    if ((np != nullptr) && (nl > 0)) {
-	        int		cl ;
+	    if ((sp != nullptr) && (nl > 0)) {
+	        int	cl ;
 	        cchar	*cp ;
 	        switch (atype) {
 	        case atype_comment:
-	            if ((cl = sfsubstance(np,nl,&cp)) > 0) {
+	            if ((cl = sfsubstance(sp,nl,&cp)) > 0) {
 	                rs = snwcpy(fbuf,flen,cp,cl) ;
 	                len = rs ;
 	            }
 	            break ;
 	        case atype_address:
-	            rs = mkdisphdr(fbuf,flen,np,nl) ;
+	            rs = mkaddrdisp(fbuf,flen,sp,nl) ;
 	            len = rs ;
 	            break ;
 	        case atype_route:
-	            rs = snwcpy(fbuf,flen,np,nl) ;
+	            rs = snwcpy(fbuf,flen,sp,nl) ;
 	            len = rs ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (positive) */
 	} else {
-	    if ((np != nullptr) && (nl > 0)) {
+	    if ((sp != nullptr) && (nl > 0)) {
 	        switch (atype) {
 	        case atype_comment:
 	        case atype_address:
 	        case atype_route:
-	            rs = snwcpy(fbuf,flen,np,nl) ;
+	            rs = snwcpy(fbuf,flen,sp,nl) ;
 	            len = rs ;
 		    break ;
 	        } /* end switch */
@@ -212,7 +211,7 @@ static int emaentry_addrname(EMA_ENT *ep,char *fbuf,int flen) noex {
 }
 /* end subroutine (emaentry_addrname) */
 
-static int isBadAddr(int rs) noex {
+static bool isBadAddr(int rs) noex {
 	return isOneOf(rsbadaddr,rs) ;
 }
 /* end subroutine (emaentry_addrname) */

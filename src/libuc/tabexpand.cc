@@ -25,7 +25,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<ascii.h>
 #include	<sbuf.h>
 #include	<tabcols.h>
 #include	<char.h>
@@ -35,8 +34,6 @@
 
 
 /* local defines */
-
-#define	DSTORE		struct dstore
 
 
 /* imported namespaces */
@@ -62,9 +59,9 @@ struct dstore {
 
 /* forward references */
 
-static int	dstore_start(DSTORE *,char *,int) noex ;
-static int	dstore_add(DSTORE *,int) noex ;
-static int	dstore_finish(DSTORE *) noex ;
+static int	dstore_start(dstore *,char *,int) noex ;
+static int	dstore_add(dstore *,int) noex ;
+static int	dstore_finish(dstore *) noex ;
 
 
 /* local variables */
@@ -79,7 +76,7 @@ int tabexpand(char *dbuf,int dlen,int ntabcols,cchar *sbuf,int slen) noex {
 	int		rs = SR_FAULT ;
 	int		dcol = 0 ;
 	if (dbuf && sbuf) {
-	    DSTORE	d ;
+	    dstore	d ;
 	    if ((rs = dstore_start(&d,dbuf,dlen)) >= 0) {
 	        int	sl = slen ;
 	        cchar	*sp = sbuf ;
@@ -106,7 +103,7 @@ int tabexpand(char *dbuf,int dlen,int ntabcols,cchar *sbuf,int slen) noex {
 
 /* local subroutines */
 
-static int dstore_start(DSTORE *dp,char *dbuf,int dlen) noex {
+static int dstore_start(dstore *dp,char *dbuf,int dlen) noex {
 	int		rs = SR_FAULT ;
 	if (dp && dbuf) {
 	    rs = SR_OK ;
@@ -118,7 +115,7 @@ static int dstore_start(DSTORE *dp,char *dbuf,int dlen) noex {
 }
 /* end subroutine (dstore_start) */
 
-static int dstore_add(DSTORE *dp,int c) noex {
+static int dstore_add(dstore *dp,int c) noex {
 	int		rs = SR_OVERFLOW ;
 	if (dp->dl < dp->dlen) {
 	    *(dp->dp)++ = c ;
@@ -129,7 +126,7 @@ static int dstore_add(DSTORE *dp,int c) noex {
 }
 /* end subroutine (dstore_add) */
 
-static int dstore_finish(DSTORE *dp) noex {
+static int dstore_finish(dstore *dp) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    char	*bp = dp->dp ;

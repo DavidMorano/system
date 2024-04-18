@@ -242,7 +242,7 @@ enum nonpaths {
 	nonpath_overlast
 } ;
 
-static cchar	*nonpaths = "/¥§~" ;
+static cchar	nonpaths[] = "/¥§~" ;
 
 #if	CF_ISMORE
 static cint	rsmore[] = {

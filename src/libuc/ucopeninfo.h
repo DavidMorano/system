@@ -52,6 +52,7 @@ typedef UCOPENINFO	ucopeninfo ;
 
 EXTERNC_begin
 
+extern int	uc_openex(cchar *,int,mode_t,int,int) noex ;
 extern int	uc_openinfo(ucopeninfo *) noex ;
 
 EXTERNC_end

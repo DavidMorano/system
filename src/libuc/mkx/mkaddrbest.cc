@@ -63,7 +63,16 @@
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* forward references */
+
+
 /* local subroutines */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -81,15 +90,15 @@ int mkaddrbest(char *rbuf,int rlen,cchar *abuf,int alen) noex {
 	            for (int i = 0 ; ema_get(&a,i,&ep) >= 0 ; i += 1) {
 	                if (ep) {
 	                    int		sl = 0 ;
-	                    cchar	*sp = NULL ;
+	                    cchar	*sp = nullptr ;
 			    if (sl == 0) {
-	                        if ((ep->rp != NULL) && (ep->rl > 0)) {
+	                        if ((ep->rp != nullptr) && (ep->rl > 0)) {
 				    sp = ep->rp ;
 				    sl = ep->rl ;
 			        }
 			    }
 			    if (sl == 0) {
-	                        if ((ep->ap != NULL) && (ep->al > 0)) {
+	                        if ((ep->ap != nullptr) && (ep->al > 0)) {
 				    sp = ep->ap ;
 				    sl = ep->al ;
 	                        }

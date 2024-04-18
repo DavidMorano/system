@@ -1,4 +1,4 @@
-/* mkenvfrom */
+/* mkenvfrom SUPPORT */
 /* lang=C20 */
 
 /* create an environment FROM address */
@@ -39,13 +39,13 @@
 ******************************************************************************/
 
 #include	<envstandards.h>
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
 #include	<sncpyx.h>
+#include	<mkx.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -61,7 +61,8 @@
 
 /* external subroutines */
 
-extern int	mkbestaddr(char *,int,cchar *,int) noex ;
+
+/* external variables */
 
 
 /* local structures */
@@ -71,6 +72,9 @@ extern int	mkbestaddr(char *,int,cchar *,int) noex ;
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -83,7 +87,7 @@ int mkenvfrom(PROGINFO *pip,char *dbuf,int dlen,cchar *fap) noex {
 
 	dbuf[0] = '\0' ;
 	if (fap != NULL) {
-	    rs = mkbestaddr(dbuf,dlen,fap,-1) ;
+	    rs = mkaddrbest(dbuf,dlen,fap,-1) ;
 	} else {
 	    rs = sncpy1(dbuf,dlen,pip->username) ;
 	}

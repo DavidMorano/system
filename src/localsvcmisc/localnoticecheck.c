@@ -26,10 +26,10 @@
 	Synopsis:
 
 	int localnoticecheck(pr,rbuf,rlen,username,period)
-	const char	pr[] ;
+	cchar	pr[] ;
 	char		rbuf[] ;
 	int		rlen ;
-	const char	username[] ;
+	cchar	username[] ;
 	int		period ;
 
 	Arguments:
@@ -135,40 +135,40 @@
 
 /* external subroutines */
 
-extern int	sncpy1w(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mknpath1(char *,int,const char *) ;
-extern int	mknpath2(char *,int,const char *,const char *) ;
-extern int	sfsubstance(const char *,int,const char **) ;
-extern int	matkeystr(const char **,char *,int) ;
-extern int	vstrkeycmp(const char **,const char **) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	mkbestfrom(char *,int,const char *,int) ;
+extern int	sncpy1w(char *,int,cchar *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mknpath1(char *,int,cchar *) ;
+extern int	mknpath2(char *,int,cchar *,cchar *) ;
+extern int	sfsubstance(cchar *,int,cchar **) ;
+extern int	matkeystr(cchar **,char *,int) ;
+extern int	vstrkeycmp(cchar **,cchar **) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	mkaddrfrom(char *,int,cchar *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	compactstr(char *,int) ;
 extern int	isNotPresent(int) ;
-extern int	isOneOf(const int *,int) ;
+extern int	isOneOf(cint *,int) ;
 
 #ifdef	COMMENT
 extern int	mailmsg_loadfile(MAILMSG *,bfile *) ;
 #endif /* COMMENT */
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-extern int	nprintf(const char *,const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
+extern int	nprintf(cchar *,cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -183,9 +183,9 @@ struct subinfo_flags {
 } ;
 
 struct subinfo {
-	const char	*pr ;
-	const char	*varusername ;
-	const char	*username ;
+	cchar	*pr ;
+	cchar	*varusername ;
+	cchar	*username ;
 	char		*fbuf ;
 	SUBINFO_FL	init, f ;
 	time_t		dt ;
@@ -197,16 +197,16 @@ struct subinfo {
 
 /* forward references */
 
-static int	subinfo_start(struct subinfo *,const char *,
-			char *,int,const char *,int) ;
+static int	subinfo_start(struct subinfo *,cchar *,
+			char *,int,cchar *,int) ;
 static int	subinfo_finish(struct subinfo *) ;
-static int	subinfo_username(struct subinfo *,const char *) ;
+static int	subinfo_username(struct subinfo *,cchar *) ;
 
 static int	procmailfile(char *,int,cchar *,time_t) ;
 static int	procmailmsg(MBCACHE *,time_t,char *,int,int,int) ;
 
 #ifdef	COMMENT
-static int	mailbox_getfrom(MAILBOX *,const char *,int,char *,int) ;
+static int	mailbox_getfrom(MAILBOX *,cchar *,int,char *,int) ;
 #endif
 
 
@@ -217,10 +217,10 @@ static int	mailbox_getfrom(MAILBOX *,const char *,int,char *,int) ;
 
 
 int localnoticecheck(pr,dbuf,dlen,un,period)
-const char	pr[] ;
+cchar	pr[] ;
 char		dbuf[] ;
 int		dlen ;
-const char	un[] ;
+cchar	un[] ;
 int		period ;
 {
 	struct subinfo	si, *sip = &si ;
@@ -245,7 +245,7 @@ int		period ;
 
 	dbuf[0] = '\0' ;
 	if ((rs = subinfo_start(sip,pr,dbuf,dlen,un,period)) >= 0) {
-	    const int	hlen = MAXPATHLEN ;
+	    cint	hlen = MAXPATHLEN ;
 	    char	hbuf[MAXPATHLEN+1] ;
 	    if ((rs = getuserhome(hbuf,hlen,sip->username)) >= 0) {
 	        cchar	*folder = "mail" ;
@@ -277,10 +277,10 @@ int		period ;
 
 static int subinfo_start(sip,pr,fbuf,flen,un,period)
 struct subinfo	*sip ;
-const char	*pr ;
+cchar	*pr ;
 char		fbuf[] ;
 int		flen ;
-const char	un[] ;
+cchar	un[] ;
 int		period ;
 {
 	int		rs ;
@@ -320,13 +320,13 @@ struct subinfo	*sip ;
 
 static int subinfo_username(sip,un)
 struct subinfo	*sip ;
-const char	un[] ;
+cchar	un[] ;
 {
 	int		rs = SR_OK ;
 
 	sip->username = un ;
 	if ((un == NULL) || (un[0] == '\0') || (un[0] == '-')) {
-	    const char	*cp ;
+	    cchar	*cp ;
 	    if ((cp = getenv(sip->varusername)) != NULL) {
 	        sip->username = cp ;
 	    } else {
@@ -404,7 +404,7 @@ static int procmailfile(char *rbuf,int rlen,cchar *mbfname,time_t nt)
 #ifdef	COMMENT
 static int mailbox_getfrom(mbp,fname,mi,rbuf,rlen)
 MAILBOX		*mbp ;
-const char	fname[] ;
+cchar	fname[] ;
 int		mi ;
 char		rbuf[] ;
 int		rlen ;
@@ -415,7 +415,7 @@ int		rlen ;
 	int		rs1 ;
 	int		sl ;
 	int		len = 0 ;
-	const char	*sp ;
+	cchar	*sp ;
 
 #if	CF_DEBUGS
 	debugprintf("pcsmailcheck/mailbox_getfrom: mi=%d\n",mi) ;
@@ -429,11 +429,10 @@ int		rlen ;
 
 	if (mi < 0) {
 	    MAILBOX_INFO	mbinfo ;
-
-	    rs1 = mailbox_info(mbp,&mbinfo) ;
-	    if ((rs1 >= 0) && (mbinfo.nmsgs > 0))
+	    rs1 = mailbox_getinfo(mbp,&mbinfo) ;
+	    if ((rs1 >= 0) && (mbinfo.nmsgs > 0)) {
 	        mi = (mbinfo.nmsgs - 1) ;
-
+	    }
 	} /* end if (default) */
 
 	if (mi >= 0) {
@@ -470,7 +469,7 @@ int		rlen ;
 /* parse the EMAs */
 
 	                    if ((rs1 >= 0) && (sl > 0)) {
-	                        rs = mkbestfrom(rbuf,rlen,sp,sl) ;
+	                        rs = mkaddrfrom(rbuf,rlen,sp,sl) ;
 	                        len = rs ;
 	                    }
 
@@ -501,9 +500,9 @@ static int procmailmsg(MBCACHE *mbp,time_t nt,char *rbuf,int rlen,int mi,int c)
 #endif
 	if ((rs = mbcache_msgscan(mbp,mi,&msp)) >= 0) {
 	        time_t		t = msp->htime ;
-	        const int	*vl = msp->vl ;
+	        cint	*vl = msp->vl ;
 		int		fl ;
-	        const char	**vs = msp->vs ;
+	        cchar	**vs = msp->vs ;
 #if	CF_DEBUGS
 	{
 	    char	tbuf[TIMEBUFLEN+1] ;

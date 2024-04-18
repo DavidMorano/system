@@ -55,13 +55,13 @@ LDFLAGS= $(MAKELDFLAGS)
 
 
 OBJ0_LCOALGET= localgetnetload.o
-OBJ1_LCOALGET= localgetorg.o
-OBJ2_LCOALGET= localgetorgcode.o
-OBJ3_LCOALGET= localgetorgloc.o localgetsystat.o
+OBJ1_LCOALGET= localgetorg.o localgetorgcode.o
+OBJ2_LCOALGET= localgetorgloc.o localgetsystat.o
+OBJ3_LCOALGET= 
 
 
 OBJA_LCOALGET= obj0_localget.o obj1_localget.o
-OBJB_LCOALGET= obj2_localget.o obj3_localget.o
+OBJB_LCOALGET= obj2_localget.o
 
 OBJ_LCOALGET= $(OBJA_LCOALGET) $(OBJB_LCOALGET)
 

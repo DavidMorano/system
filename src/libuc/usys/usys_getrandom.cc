@@ -79,6 +79,7 @@ int getrandom(void *rbuf,size_t rlen,uint) noex {
 	int		rc = 0 ;
 	int		rl = 0 ;
 	if (rbuf) {
+	    if (rlen > 0) {
 		csize		inc = 256 ;
 		const caddr_t	ca = caddr_t(rbuf) ;
 		while ((rc >= 0) && (rlen > 0)) {
@@ -88,6 +89,7 @@ int getrandom(void *rbuf,size_t rlen,uint) noex {
 			rlen -= rc ;
 		    } /* end if */
 	 	} /* end while */
+	    } /* end if (non-negative) */
 	} else {
 	    rc = -1 ;
 	    errno = EFAULT ;

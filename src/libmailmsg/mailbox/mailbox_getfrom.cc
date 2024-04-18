@@ -171,7 +171,7 @@ static int mailmsg_fromer(mailmsg *mmp,char *rbuf,int rlen) noex {
 	    }
 	}
 	if ((rs >= 0) && (vl > 0)) {
-	    rs = mkbestfrom(rbuf,rlen,vp,vl) ;
+	    rs = mkaddrfrom(rbuf,rlen,vp,vl) ;
 	    len = rs ;
 	}
 	return (rs >= 0) ? len : rs ;

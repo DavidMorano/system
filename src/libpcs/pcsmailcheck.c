@@ -152,8 +152,8 @@ extern int	sfsubstance(const char *,int,const char **) ;
 extern int	matkeystr(const char **,char *,int) ;
 extern int	vstrkeycmp(const char **,const char **) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	mkbestfrom(char *,int,const char *,int) ;
-extern int	mkdisphdr(char *,int,cchar *,int) ;
+extern int	mkaddrfrom(char *,int,const char *,int) ;
+extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuid_name(cchar *,int) ;
 extern int	mailbox_getfrom(MAILBOX *,char *,int,cchar *,int) ;
@@ -507,14 +507,8 @@ static int subinfo_mailfile(SUBINFO *sip)
 		MAILBOX_INFO	mbinfo ;
 		const int	mo = (MAILBOX_ORDONLY | MAILBOX_ONOCLEN) ;
 		if ((rs = mailbox_open(&mb,mfn,mo)) >= 0) {
-	    	    if ((rs = mailbox_info(&mb,&mbinfo)) >= 0) {
+	    	    if ((rs = mailbox_getinfo(&mb,&mbinfo)) >= 0) {
 	                c = mbinfo.nmsgs ;
-
-#if	CF_DEBUGS
-	        	debugprintf("pcsmailcheck/subinfo_mailfile: nmsgs=%u\n",
-				c) ;
-#endif
-
 	        	if (c > 0) {
 			    const int	mi = (c-1) ;
 			    const int	tl = sip->flen ;
@@ -599,7 +593,7 @@ static int subinfo_cvtfrom(SUBINFO *sip)
 		    if ((rs = uc_malloc((dlen+1),&dbuf)) >= 0) {
 			if (wl > sip->rlen) wl = sip->rlen ;
 		        if ((rs = snwcpywidehdr(dbuf,dlen,wbuf,wl)) >= 0) {
-			    rs = mkdisphdr(sip->rbuf,sip->rlen,dbuf,rs) ;
+			    rs = mkaddrdisp(sip->rbuf,sip->rlen,dbuf,rs) ;
 		            len = rs ;
 		        }
 			rs1 = uc_free(dbuf) ;

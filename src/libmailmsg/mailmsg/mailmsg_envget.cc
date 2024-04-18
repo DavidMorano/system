@@ -27,6 +27,7 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<mailmsgmatenv.h>
+#include	<isoneof.h>
 #include	<localmisc.h>
 
 #include	"mailmsg.h"
@@ -34,6 +35,10 @@
 
 
 /* local defines */
+
+#ifndef	CF_DIRECT
+#define	CF_DIRECT	1		/* try the more direct approach */
+#endif
 
 
 /* imported namespaces */
@@ -53,22 +58,18 @@
 
 /* forward references */
 
-#if	CF_DIRECT
-#else
-static int	isNotField(int) ;
-#endif
+static inline bool	isNotField(int) noex ;
 
 
 /* local variables */
 
-#if	CF_DIRECT
-#else /* CF_DIRECT */
-static const int	rsnofield[] = {
+static cint		rsnofield[] = {
 	SR_NOENT,
 	SR_NOMSG,
 	0
 } ;
-#endif /* CF_DIRECT */
+
+constexpr bool		f_direct = CF_DIRECT ;
 
 
 /* exported variables */
@@ -76,59 +77,49 @@ static const int	rsnofield[] = {
 
 /* exported subroutines */
 
-#if	CF_DIRECT
 int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
 	int		rs ;
 	if ((rs = mailmsg_magic(op,mep)) >= 0) {
-	    void	*vp{} ;
-	    if ((rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
-	        mmenvdat	*ep = (mmenvdat *) vp ;
-	        mep->a.ep = ep->a.ep ;
-	        mep->a.el = ep->a.el ;
-	        mep->d.ep = ep->d.ep ;
-	        mep->d.el = ep->d.el ;
-	        mep->r.ep = ep->r.ep ;
-	        mep->r.el = ep->r.el ;
-	    }
-	} /* end if (magic) */
-	return rs ;
-}
-/* end subroutine (mailmsg_envget) */
-#else /* CF_DIRECT */
-int mailmsg_envget(mailmsg *op,int ei,mailmsg_envdat *mep) noex {
-	int		rs ;
-	if ((rs = mailmsg_magic(op,mep)) >= 0) {
-	    cchar	*sp{} ;
 	    memclear(mep) ;
-	    if ((rs = mailmsg_envaddress(op,ei,&sp)) >= 0) {
-	        mep->a.el = rs ;
-	        mep->a.ep = sp ;
-	        if ((rs = mailmsg_envdate(op,ei,&sp)) >= 0) {
-	            mep->d.el = rs ;
-	            mep->d.ep = sp ;
-	            if ((rs = mailmsg_envremote(op,ei,&sp)) >= 0) {
-	                mep->r.el = rs ;
-	                mep->r.ep = sp ;
-	            } else if (isNotField(rs)) {
-	                rs = SR_OK ;
-		    }
-	        } /* end if (mailmsg_envdate) */
-	    } /* end if (mailmsg_envaddress) */
+	    if_constexpr (f_direct) {
+	        void	*vp{} ;
+	        if ((rs = vecobj_get(op->elp,ei,&vp)) >= 0) {
+	            mmenvdat	*ep = (mmenvdat *) vp ;
+	            mep->a.ep = ep->a.ep ;
+	            mep->a.el = ep->a.el ;
+	            mep->d.ep = ep->d.ep ;
+	            mep->d.el = ep->d.el ;
+	            mep->r.ep = ep->r.ep ;
+	            mep->r.el = ep->r.el ;
+	        }
+	    } else {
+	        cchar	*sp{} ;
+	        if ((rs = mailmsg_envaddress(op,ei,&sp)) >= 0) {
+	            mep->a.el = rs ;
+	            mep->a.ep = sp ;
+	            if ((rs = mailmsg_envdate(op,ei,&sp)) >= 0) {
+	                mep->d.el = rs ;
+	                mep->d.ep = sp ;
+	                if ((rs = mailmsg_envremote(op,ei,&sp)) >= 0) {
+	                    mep->r.el = rs ;
+	                    mep->r.ep = sp ;
+	                } else if (isNotField(rs)) {
+	                    rs = SR_OK ;
+		        }
+	            } /* end if (mailmsg_envdate) */
+	        } /* end if (mailmsg_envaddress) */
+	    } /* end if_constexpr (f_direct) */
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailmsg_envget) */
-#endif /* CF_DIRECT */
 
 
 /* provate subroutines */
 
-#if	CF_DIRECT
-#else /* CF_DIRECT */
-static int isNotField(int rs) noex {
+static bool isNotField(int rs) noex {
 	return isOneOf(rsnofield,rs) ;
 }
 /* end subroutine (isNotField) */
-#endif /* CF_DIRECT */
 
 

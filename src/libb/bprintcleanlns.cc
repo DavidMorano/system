@@ -4,8 +4,7 @@
 /* print a clean (cleaned up) line of text */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_LINEFOLD	1		/* use 'linefold(3dam)' */
+#define	CF_LINEFOLD	1		/* use |linefold(3dam)| */
 
 /* revision history:
 
@@ -23,51 +22,36 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<csignal>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3c++)| */
 #include	<usystem.h>
-#include	<bfile.h>
-#include	<localmisc.h>
+#include	<linefold.h>
+#include	<rmx.h>
+#include	<ischarx.h>
+#include	<localmisc.h>		/* |COLUMNS| */
 
-#include	"linefold.h"
+#include	"bfile.h"
 
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
+#ifndef	CF_LINEFOLD
+#define	CF_LINEFOLD	1		/* use |linefold(3dam)| */
 #endif
 
-#ifndef	COLUMNS
-#define	COLUMNS		80		/* output columns (should be 80) */
-#endif
+
+/* imported namespaces */
+
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
-
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	bprintcleanline(bfile *,const char *,int) ;
-extern int	isprintlatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif /* CF_DEBUGS */
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strcpylc(char *,const char *) ;
-extern char	*strcpyuc(char *,const char *) ;
 
 
 /* external variables */
@@ -78,14 +62,13 @@ extern char	*strcpyuc(char *,const char *) ;
 
 /* forward references */
 
-static int	bprintcleanliner(bfile *,int,const char *,int) ;
-static int	isend(int) ;
-
-
-/* module global variables */
+static int	bprintfold(bfile *,int,cchar *,int) noex ;
+static int	bprintcleanliner(bfile *,int,cchar *,int) noex ;
 
 
 /* local variables */
+
+constexpr bool	f_linefold = CF_LINEFOLD ;
 
 
 /* exported variables */
@@ -93,64 +76,22 @@ static int	isend(int) ;
 
 /* exported subroutines */
 
-int bprintcleanlns(bfile *ofp,int linelen,cchar *lp,int ll) noex {
-	int		rs = SR_OK ;
+int bprintcleanlns(bfile *op,int linelen,cchar *lp,int ll) noex {
+	int		rs ;
 	int		wlen = 0 ;
-
-	if (ofp == NULL) return SR_FAULT ;
-	if (lp == NULL) return SR_FAULT ;
-
-	if (ofp->magic != BFILE_MAGIC) return SR_NOTOPEN ;
-
-	if (ofp->f.nullfile) goto ret0 ;
-
-/* continue */
-
-	if (linelen <= 0)
-	    linelen = COLUMNS ;
-
-	if (ll < 0)
-	    ll = strlen(lp) ;
-
-#if	CF_DEBUGS
-	debugprintf("bprintcleanlines: ent linelen=%u ll=%u\n",
-	    linelen,ll) ;
-#endif /* CF_DEBUGS */
-
-#if	CF_LINEFOLD
-	{
-	    LINEFOLD	lf ;
-	    int		sl ;
-	    const char	*sp ;
-	    if ((rs = linefold_start(&lf,linelen,0,lp,ll)) >= 0) {
-		int	i ;
-	        for (i = 0 ; (sl = linefold_get(&lf,i,&sp)) >= 0 ; i += 1) {
-#if	CF_DEBUGS
-	            debugprintf("bprintcleanlines: linefold_get() sl=%d\n",sl) ;
-	            debugprintf("bprintcleanlines: line=>%t<\n",
-	                sp,strlinelen(sp,sl,40)) ;
-#endif
-	            rs = bprintcleanliner(ofp,linelen,sp,sl) ;
+	if ((rs = bfile_magic(op,lp)) > 0) {
+	    if ((rs = bfile_wr(op)) >= 0) {
+	        if (linelen <= 0) linelen = COLUMNS ;
+	        if (ll < 0) ll = strlen(lp) ;
+	        if constexpr (f_linefold) {
+		    rs = bprintfold(op,linelen,lp,ll) ;
+		    wlen += rs ;
+	        } else {
+	            rs = bprintcleanliner(op,linelen,lp,ll) ;
 	            wlen += rs ;
-	            if (rs < 0) break ;
-	        } /* end while */
-	        linefold_finish(&lf) ;
-	    } /* end if (linefold) */
-	}
-#else /* CF_LINEFOLD */
-	{
-	rs = bprintcleanliner(ofp,linelen,lp,ll) ;
-	wlen += rs ;
-	}
-#endif /* CF_LINEFOLD */
-
-ret0:
-
-#if	CF_DEBUGS
-	debugprintf("bprintcleanlines: ret rs=%d wlen=%u\n",
-	    rs,wlen) ;
-#endif /* CF_DEBUGS */
-
+	        } /* end if-constexpr (f_linefold) */
+	    } /* end if (writig) */
+	} /* end if (magic) */
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintcleanlines) */
@@ -158,61 +99,39 @@ ret0:
 
 /* local subroutines */
 
-
-static int bprintcleanliner(ofp,linelen,lp,ll)
-bfile		*ofp ;
-int		linelen ;
-const char	*lp ;
-int		ll ;
-{
-	int		rs = SR_OK ;
-	int		ml ;
+static int bprintfold(bfile *op,int linelen,cchar *lp,int ll) noex {
+	linefold	lf ;
+	int		rs ;
+	int		rs1 ;
 	int		wlen = 0 ;
-	int		f_end = FALSE ;
+	if ((rs = lf.start(linelen,0,lp,ll)) >= 0) {
+	    int		sl ;
+	    cchar	*sp ;
+	    for (int i = 0 ; (sl = lf.getln(i,&sp)) >= 0 ; i += 1) {
+		rs = bprintcleanliner(op,linelen,sp,sl) ;
+		wlen += rs ;
+		if (rs < 0) break ;
+	    } /* end for */
+	    rs1 = lf.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (linefold) */
+	return (rs >= 0) ? wlen : rs ;
+}
+/* end subroutine (bprintfold) */
 
-	while ((ll > 0) && isend(lp[ll - 1])) {
-	    f_end = TRUE ;
-	    ll -= 1 ;
-	}
-
-	while ((rs >= 0) && ((ll > 0) || f_end)) {
-
-	    f_end = FALSE ;
-	    ml = MIN(ll,linelen) ;
-
-#ifdef	COMMENT /* what is this? */
-	    if ((ml < ll) && isend(lp[ml-1])) {
-	        ml += 1 ;
-	        if ((lp[-1] == '\r') && (ml < ll) && (lp[0] == '\n')) {
-	            ml += 1 ;
-	        }
-	    }
-#endif /* COMMENT */
-
-#if	CF_DEBUGS
-	    debugprintf("bprintcleanlines: "
-	        "bprintcleanline() ml=%u\n",ml) ;
-#endif /* CF_DEBUGS */
-
-	    rs = bprintcleanline(ofp,lp,ml) ;
+static int bprintcleanliner(bfile *op,int linelen,cchar *lp,int ll) noex {
+	int		rs = SR_OK ;
+	int		rl = rmeol(lp,ll) ;
+	int		wlen = 0 ;
+	while ((rs >= 0) && (rl > 0)) {
+	    cint	ml = min(rl,linelen) ;
+	    rs = bprintcleanln(op,lp,ml) ;
 	    wlen += rs ;
-
 	    lp += ml ;
-	    ll -= ml ;
-
+	    rl -= ml ;
 	} /* end while */
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (bprintcleanliner) */
-
-
-static int isend(int ch)
-{
-	int		f ;
-	f = (ch == '\n') || (ch == '\r') ;
-	return f ;
-}
-/* end subroutine (isend) */
 
 
