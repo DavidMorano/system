@@ -149,7 +149,7 @@ extern int	sfsubstance(const char *,int,const char **) ;
 extern int	matkeystr(const char **,char *,int) ;
 extern int	vstrkeycmp(const char **,const char **) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	mkbestfrom(char *,int,const char *,int) ;
+extern int	mkaddrfrom(char *,int,const char *,int) ;
 extern int	getusername(char *,int,uid_t) ;
 extern int	getuserhome(char *,int,cchar *) ;
 extern int	compactstr(char *,int) ;
@@ -470,7 +470,7 @@ int		rlen ;
 /* parse the EMAs */
 
 	                    if ((rs1 >= 0) && (sl > 0)) {
-	                        rs = mkbestfrom(rbuf,rlen,sp,sl) ;
+	                        rs = mkaddrfrom(rbuf,rlen,sp,sl) ;
 	                        len = rs ;
 	                    }
 

@@ -56,8 +56,8 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ00_MKX= mkaddrname.o mkaddrpart.o mkaddrbest.o mkaltext.o
-OBJ01_MKX= mkbestfrom.o 
+OBJ00_MKX= mkaddrname.o mkaddrdisp.o mkaddrbest.o mkaddrfrom.o
+OBJ01_MKX= mkaltext.o
 OBJ02_MKX= mkcaselower.o mkcdpath.o mkcexsync.o mkbasename.o
 OBJ03_MKX= mkchar.o mkcleanline.o
 OBJ04_MKX= mkdisplayable.o
@@ -210,8 +210,9 @@ mksublogid.o:		mksublogid.cc $(INCS)
 mkmid.o:		mkmid.cc $(INCS)
 
 mkaddrname.o:		mkaddrname.cc  $(INCS)
-mkaddrpart.o:		mkaddrpart.cc  $(INCS)
+mkaddrdisp.o:		mkaddrdisp.cc  $(INCS)
 mkaddrbest.o:		mkaddrbest.cc  $(INCS)
+mkaddrfrom.o:		mkaddrfrom.cc  $(INCS)
 
 mkbasename.o:		mkbasename.cc $(INCS)
 mkshlibname.o:		mkshlibname.cc $(INCS)
@@ -219,7 +220,6 @@ mksofname.o:		mksofname.cc $(INCS)
 
 mkintfname.o:		mkintfname.cc $(INCS)
 mkonefrom.o:		mkonefrom.cc $(INCS)
-mkbestfrom.o:		mkbestfrom.cc $(INCS)
 mkvarpath.o:		mkvarpath.cc $(INCS)
 mkufname.o:		mkufname.cc $(INCS)
 mkaltext.o:		mkaltext.cc $(INCS)

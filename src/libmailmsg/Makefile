@@ -150,6 +150,7 @@ mailmsgmatenv.o:	mailmsgmatenv.cc mailmsgmatenv.h	$(INCS)
 mailmsgmathdr.o:	mailmsgmathdr.cc mailmsgmathdr.h	$(INCS)
 
 mailmsgstage.o:		mailmsgstage.cc mailmsgstage.h	$(INCS)
+mbcache.o:		mbcache.cc mbcache.h		$(INCS)
 msgentry.o:		msgentry.cc msgentry.h		$(INCS)
 
 mhcom.o:		mhcom.cc mhcom.h

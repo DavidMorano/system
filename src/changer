@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} I/O "
+NAMES="${NAMES} mkbestfrom "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/I\/O/s//I-O/g
+g/mkbestfrom/s//mkaddrfrom/g
 	w
 	q
 EOF

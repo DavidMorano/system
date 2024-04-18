@@ -176,7 +176,7 @@ static int emaentry_bestfrom(ema_ent *ep,char *fbuf,int flen) noex {
 	            }
 	            break ;
 	        case atype_address:
-	            rs = mkdisphdr(fbuf,flen,rp,nl) ;
+	            rs = mkaddrdisp(fbuf,flen,rp,nl) ;
 	            len = rs ;
 	            break ;
 	        case atype_route:

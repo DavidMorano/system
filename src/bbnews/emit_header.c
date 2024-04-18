@@ -114,7 +114,7 @@
 extern int	mkpath3(char *,const char *,const char *,const char *) ;
 extern int	sfcenter(const char *,int,const char *,const char **) ;
 extern int	mkmailname(char *,int,cchar *,int) ;
-extern int	mkbestfrom(char *,int,cchar *,int) ;
+extern int	mkaddrfrom(char *,int,cchar *,int) ;
 extern int	hdrextid(char *,int,const char *,int) ;
 
 extern int	bbcpy(char *,const char *) ;
@@ -348,7 +348,7 @@ static int emit_headerfrom(PROGINFO *pip,ARTLIST_ENT *ap)
 	    if ((rs = uc_malloc((flen+1),&fbuf)) >= 0) {
 		int	c = flen ;
 		if (c > MAXFIELDLEN) c = MAXFIELDLEN ;
-		if ((rs = mkbestfrom(fbuf,flen,ap->from,-1)) >= 0) {
+		if ((rs = mkaddrfrom(fbuf,flen,ap->from,-1)) >= 0) {
 		    rs = bprintf(pip->ofp,"  %t\n",fbuf,rs) ;
 		}
 		uc_free(fbuf) ;

@@ -174,7 +174,7 @@ extern int	permsched(const char **,vecstr *,char *,int,const char *,int) ;
 extern int	mkplogid(char *,int,const char *,int) ;
 extern int	mksublogid(char *,int,const char *,int) ;
 extern int	mkcleanline(char *,int,int) ;
-extern int	mkdisphdr(char *,int,cchar *,int) ;
+extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	tolc(int) ;
 extern int	isdigitlatin(int) ;
@@ -2351,7 +2351,7 @@ static int outinfo_cvt(OUTINFO *oip,HDRDECODE *hdp,
 		tlen = (n*2) ;
 		if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		    if ((rs = snwcpywidehdr(tbuf,tlen,wbuf,n)) >= 0) {
-			rs = mkdisphdr(rbuf,rlen,tbuf,rs) ;
+			rs = mkaddrdisp(rbuf,rlen,tbuf,rs) ;
 		        rl = rs ;
 		    }
 		    uc_free(tbuf) ;

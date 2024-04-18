@@ -38,7 +38,7 @@
 
 	Things to do:
 
-	Change use of 'sfsubstance()' to 'mkdisphdr()'.
+	Change use of 'sfsubstance()' to 'mkaddrdisp()'.
 
 *******************************************************************************/
 

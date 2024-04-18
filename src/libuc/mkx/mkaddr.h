@@ -32,11 +32,10 @@
 
 EXTERNC_begin
 
-extern int mkaddrpart(char *,int,cchar *,int) noex ;
 extern int mkaddrbest(char *,int,cchar *,int) noex ;
+extern int mkaddrfrom(char *,int,cchar *,int) noex ;
 extern int mkaddrname(char *,int,cchar *,int) noex ;
-extern int mkaddrpart(char *,int,cchar *,int) noex ;
-extern int mkdisphdr(char *,int,cchar *,int) noex ;
+extern int mkaddrdisp(char *,int,cchar *,int) noex ;
 
 EXTERNC_end
 

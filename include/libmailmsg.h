@@ -32,6 +32,7 @@
 #include	<mailmsgmathdr.h>
 
 #include	<mailmsgstage.h>
+#include	<mbcache.h>
 #include	<emainfo.h>
 
 #include	<mhcom.h>

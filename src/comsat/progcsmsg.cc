@@ -136,8 +136,8 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	compactstr(char *,int) ;
 extern int	mkaddrname(char *,int,cchar *,int) ;
-extern int	mkdisphdr(char *,int,cchar *,int) ;
-extern int	mkbestfrom(char *,int,cchar *,int) ;
+extern int	mkaddrdisp(char *,int,cchar *,int) ;
+extern int	mkaddrfrom(char *,int,cchar *,int) ;
 extern int	mkcleanline(char *,int,int) ;
 extern int	mailmsg_loadfd(MAILMSG *,int,off_t) ;
 extern int	isOneOf(const int *,int) ;
@@ -1074,7 +1074,7 @@ static int outinfo_termbeginfrom(OUTINFO *oip)
 		char		*tbuf ;
 		if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		    if ((rs = snwcpywidehdr(tbuf,tlen,fp,fl)) >= 0) {
-		        if ((rs = mkdisphdr(ofbuf,oflen,tbuf,rs)) >= 0) {
+		        if ((rs = mkaddrdisp(ofbuf,oflen,tbuf,rs)) >= 0) {
 		            oip->ofbuf = ofbuf ;
 		            oip->oflen = rs ;
 		        }

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int linefold_ctor(linefold *op,Args ... args) noex {
+static int mbcache_ctor(mbcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int linefold_ctor(linefold *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (linefold_ctor) */
+/* end subroutine (mbcache_ctor) */
 
-static int linefold_dtor(linefold *op) noex {
+static int mbcache_dtor(mbcache *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (linefold_dtor) */
+/* end subroutine (mbcache_dtor) */
 
 template<typename ... Args>
-static int linefold_magic(linefold *op,Args ... args) noex {
+static int mbcache_magic(mbcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == LINEFOLD_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MBCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (linefold_magic) */
+/* end subroutine (mbcache_magic) */
 

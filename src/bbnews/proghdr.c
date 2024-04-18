@@ -48,7 +48,7 @@
 /* external subroutines */
 
 extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	mkdisphdr(char *,int,cchar *,int) ;
+extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	isNotPresent(int) ;
 
 
@@ -122,7 +122,7 @@ int proghdr_trans(PROGINFO *pip,char *rbuf,int rlen,cchar *sp,int sl,int c)
 		    tlen = (n*2) ;
 		    if ((rs = uc_malloc((tlen+1),&tbuf)) >= 0) {
 		        if ((rs = snwcpywidehdr(tbuf,tlen,wbuf,n)) >= 0) {
-			    rs = mkdisphdr(rbuf,rlen,tbuf,rs) ;
+			    rs = mkaddrdisp(rbuf,rlen,tbuf,rs) ;
 		            rl = rs ;
 		        }
 		        uc_free(tbuf) ;

@@ -92,7 +92,7 @@ extern int	ctdecui(char *,int,uint) ;
 extern int	ctdecpi(char *,int,int,int) ;
 extern int	iceil(int,int) ;
 extern int	strwcmp(cchar *,cchar *,int) ;
-extern int	mkdisphdr(char *,int,cchar *,int) ;
+extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	vbufprintf(char *,int,cchar *,va_list) ;
 extern int	isprintlatin(int) ;
@@ -1123,7 +1123,7 @@ static int display_scancvtbegin(DISPLAY *op,DISPLAY_SS *ssp,DISPLAY_SDATA *ddp)
 		        if ((rs = snwcpywidehdr(tbuf,tlen,wbuf,wl)) >= 0) {
 		            cint	flen = sap->flen ;
 			    char	*fbuf = (char *) sap->fbuf ;
-			    if ((rs = mkdisphdr(fbuf,flen,tbuf,rs)) >= 0) {
+			    if ((rs = mkaddrdisp(fbuf,flen,tbuf,rs)) >= 0) {
 			        ddp->fbuf = sap->fbuf ;
 			        ddp->flen = rs ;
 			    }
