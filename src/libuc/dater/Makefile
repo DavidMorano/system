@@ -1,6 +1,6 @@
-# MAKEFILES (chrono)
+# MAKEFILES (dater)
 
-T= chrono
+T= dater
 
 ALL= $(T).o $(T).a
 
@@ -35,14 +35,16 @@ TOUCH=	touch
 LINT=	lint
 
 
-DEFS=
+DEFS +=
 
 
-INCS= chrono.h
+INCS += dater.h
 
 
-LIBS=
+LIBS +=
 
+
+INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
@@ -54,16 +56,16 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_CHRONO= tmstrs.o zdb.o
-OBJ1_CHRONO= date.o
-OBJ2_CHRONO= tmz.o zos.o zoffparts.o
-OBJ3_CHRONO= tmtime.o
+OBJ0_DATER= dater_main.o
+OBJ1_DATER= dater_getdate.o
+OBJ2_DATER= dater_getbbtime.o
+OBJ3_DATER= dater_setkey.o
 
 
-OBJA_CHRONO= obj0_chrono.o obj1_chrono.o
-OBJB_CHRONO= obj2_chrono.o obj3_chrono.o
+OBJA_DATER= obj0_dater.o obj1_dater.o
+OBJB_DATER= obj2_dater.o obj3_dater.o
 
-OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
+OBJ_DATER= $(OBJA_DATER)
 
 
 default:		$(T).o
@@ -86,10 +88,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_CHRONO)
+$(T).o:			$(OBJ_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DATER)
 
-$(T).a:			$(OBJ_CHRONO)
+$(T).a:			$(OBJ_DATER)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -109,25 +111,22 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_chrono.o:	$(OBJ0_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CHRONO)
+obj0_dater.o:	$(OBJ0_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DATER)
 
-obj1_chrono.o:	$(OBJ1_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CHRONO)
+obj1_dater.o:	$(OBJ1_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DATER)
 
-obj2_chrono.o:	$(OBJ2_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CHRONO)
+obj2_dater.o:	$(OBJ2_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DATER)
 
-obj3_chrono.o:	$(OBJ3_CHRONO)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CHRONO)
+obj3_dater.o:	$(OBJ3_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_DATER)
 
 
-date.o:			date.cc	date.h $(INCS)
-tmstrs.o:		tmstrs.cc tmstrs.h $(INCS)
-tmtime.o:		tmtime.cc tmtime.h $(INCS)
-tmz.o:			tmz.cc tmz.h $(INCS)
-zdb.o:			zdb.cc zdb.h $(INCS)
-zos.o:			zos.cc zos.h $(INCS)
-zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
+dater_main.o:		dater_main.cc		$(INCS)
+dater_getdate.o:	dater_getdate.cc	$(INCS)
+dater_getbbtime.o:	dater_getbbtime.cc	$(INCS)
+dater_setkey.o:		dater_setkey.cc		$(INCS)
 
 

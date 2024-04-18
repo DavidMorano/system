@@ -123,6 +123,19 @@ extern int dater_zinfo(dater *,DATER_ZINFO *,int) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+template<typename ... Args>
+static inline int dater_magic(dater *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == DATER_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* DATER_INCLUDE */
 

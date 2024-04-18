@@ -1,4 +1,4 @@
-/* dater SUPPORT */
+/* dater_main SUPPORT */
 /* lang=C++20 */
 
 /* general dater object */
@@ -42,7 +42,7 @@
 	Comment parseing for RFC-822 dates:
 	Note that dates given to us for MSG (RFC-822) processing,
 	might have comments in them.  These comments are those
-	specified in RFC-822.  Note that the TMZ object does some
+	specified in RFC-822.  Note that the tmz object does some
 	comment processing on MSG dates but only in the same way
 	that NetNews does ; namely, only for a comment at the end
 	of the string and which contains a time-zone-name.
@@ -66,17 +66,17 @@
 #include	<calstrs.h>
 #include	<sbuf.h>
 #include	<getdefzinfo.h>
-#include	<tmtime.h>
+#include	<tmtime.h>		/* CHRONO */
+#include	<zos.h>			/* CHRONO */
+#include	<comparse.h>		/* CHRONO */
+#include	<tmz.h>			/* CHRONO */
+#include	<zdb.h>			/* CHRONO */
 #include	<mkchar.h>
 #include	<hasx.h>		/* |hasalldig(3uc)| */
 #include	<ischarx.h>		/* |isdigitlatin(3uc)| */
 #include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"dater.h"
-#include	"zos.h"
-#include	"comparse.h"		/* should be handled elsewhere? */
-#include	"tmz.h"
-#include	"zdb.h"
 
 
 /* local defines */
@@ -120,31 +120,21 @@ struct knownzone {
 
 /* forward references */
 
-template<typename ... Args>
-static inline int dater_magic(dater *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == DATER_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (dater_magic) */
+static int	dater_initcur(dater *) noex ;
+static int	dater_ldname(dater *,cchar *,int) noex ;
+static int	dater_pname(dater *) noex ;
+static int	dater_pnum(dater *) noex ;
+static int	dater_findzname(dater *) noex ;
+static int	dater_findzoff(dater *,TM *) noex ;
+static int	dater_mkptime(dater *,TM *,int) noex ;
+static int	dater_mktime(dater *,TM *) noex ;
+static int	dater_mkpzoff(dater *,TM *,int) noex ;
 
-static int	dater_initcur(DATER *) noex ;
-static int	dater_ldname(DATER *,cchar *,int) noex ;
-static int	dater_pname(DATER *) noex ;
-static int	dater_pnum(DATER *) noex ;
-static int	dater_findzname(DATER *) noex ;
-static int	dater_findzoff(DATER *,TM *) noex ;
-static int	dater_mkptime(DATER *,TM *,int) noex ;
-static int	dater_mktime(DATER *,TM *) noex ;
-static int	dater_mkpzoff(DATER *,TM *,int) noex ;
-
-static int	dater_initbase(DATER *) noex ;
-static int	dater_ldtmz(DATER *,TMZ *) noex ;
-static int	dater_ldcomzone(DATER *,comparse *) noex ;
-static int	dater_ldzname(DATER *,cchar *,int) noex ;
-static int	dater_defs(DATER *,TMZ *) noex ;
+static int	dater_initbase(dater *) noex ;
+static int	dater_ldtmz(dater *,tmz *) noex ;
+static int	dater_ldcomzone(dater *,comparse *) noex ;
+static int	dater_ldzname(dater *,cchar *,int) noex ;
+static int	dater_defs(dater *,tmz *) noex ;
 
 
 /* local variables */
@@ -157,7 +147,7 @@ constexpr int		znamelen = DATER_ZNAMELEN ;
 
 /* exported subroutines */
 
-int dater_start(DATER *dp,TIMEB *nowp,cchar *znp,int znl) noex {
+int dater_start(dater *dp,TIMEB *nowp,cchar *znp,int znl) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    rs = memclear(dp) ;
@@ -177,16 +167,16 @@ int dater_start(DATER *dp,TIMEB *nowp,cchar *znp,int znl) noex {
 }
 /* end subroutine (dater_start) */
 
-int dater_startcopy(DATER *dp,DATER *d2p) noex {
+int dater_startcopy(dater *dp,dater *d2p) noex {
 	int		rs ;
 	if ((rs = dater_magic(d2p,dp)) >= 0) {
-	    memcpy(dp,d2p,sizeof(DATER)) ;
+	    memcpy(dp,d2p,sizeof(dater)) ;
 	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (dater_startcopy) */
 
-int dater_finish(DATER *dp) noex {
+int dater_finish(dater *dp) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp)) >= 0) {
 	    dp->b.time = 0 ;
@@ -197,7 +187,7 @@ int dater_finish(DATER *dp) noex {
 /* end subroutine (dater_finish) */
 
 /* copy one dater to another */
-int dater_setcopy(DATER *dp,DATER *d2p) noex {
+int dater_setcopy(dater *dp,DATER *d2p) noex {
 	int		rs ;
 	if ((rs = dater_magic(d2p,dp)) >= 0) {
 	    memcpy(dp,d2p,sizeof(DATER)) ;
@@ -206,10 +196,10 @@ int dater_setcopy(DATER *dp,DATER *d2p) noex {
 }
 /* end subroutine (dater_setcopy) */
 
-int dater_setstd(DATER *dp,cchar *sp,int sl) noex {
+int dater_setstd(dater *dp,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,sp)) >= 0) {
-	    TMZ		stz ;
+	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_std(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
@@ -224,7 +214,7 @@ int dater_setstd(DATER *dp,cchar *sp,int sl) noex {
 /* end subroutine (dater_setstd) */
 
 /* set the dater from a message-type string */
-int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
+int dater_setmsg(dater *dp,cchar *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = dater_magic(dp,sp)) >= 0) {
@@ -234,7 +224,7 @@ int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
 	        int	vl ;
 	        cchar	*vp{} ;
 	        if ((rs = comparse_getval(&vc,&vp)) >= 0) {
-	            TMZ		stz ;
+	            tmz		stz ;
 	            vl = rs ;
 	            if ((rs = tmz_msg(&stz,vp,vl)) >= 0) {
 	                TM	dst = stz.st ;
@@ -255,10 +245,10 @@ int dater_setmsg(DATER *dp,cchar *sp,int sl) noex {
 
 /* set from a dater-like or decimal digit time string */
 /* format> [CC]YYMMDDhhmm[ss][±<zoff>][<zname>] */
-int dater_setstrdig(DATER *dp,cchar *sp,int sl) noex {
+int dater_setstrdig(dater *dp,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,sp)) >= 0) {
-	    TMZ		stz ;
+	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_strdig(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
@@ -278,13 +268,13 @@ int dater_setstrdig(DATER *dp,cchar *sp,int sl) noex {
 /*
 This amounts to a conversion from the string:
       990704_1647:33_EDT
-to the DATER object.
+to the dater object.
 */
 
-int dater_setlogz(DATER *dp,cchar *sp,int sl) noex {
+int dater_setlogz(dater *dp,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,sp)) >= 0) {
-	    TMZ		stz ;
+	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_logz(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
@@ -299,10 +289,10 @@ int dater_setlogz(DATER *dp,cchar *sp,int sl) noex {
 /* end subroutine (dater_setlogz) */
 
 /* set from TOUCH (original) time string */
-int dater_settouch(DATER *dp,cchar *sp,int sl) noex {
+int dater_settouch(dater *dp,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,sp)) >= 0) {
-	    TMZ		stz ;
+	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_touch(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
@@ -317,10 +307,10 @@ int dater_settouch(DATER *dp,cchar *sp,int sl) noex {
 /* end subroutine (dater_settouch) */
 
 /* set from TOUCH-t (new '-t' version) time string */
-int dater_settoucht(DATER *dp,cchar *sp,int sl) noex {
+int dater_settoucht(dater *dp,cchar *sp,int sl) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,sp)) >= 0) {
-	    TMZ		stz ;
+	    tmz		stz ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rs = tmz_toucht(&stz,sp,sl)) >= 0) {
 	        TM	dst = stz.st ;
@@ -335,7 +325,7 @@ int dater_settoucht(DATER *dp,cchar *sp,int sl) noex {
 /* end subroutine (dater_settoucht) */
 
 /* set from a split-out time, zone offset, and zone-name */
-int dater_settmzon(DATER *dp,TM *stp,int zoff,cchar *zstr,int zlen) noex {
+int dater_settmzon(dater *dp,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,stp)) >= 0) {
 	    rs = SR_INVALID ;
@@ -374,7 +364,7 @@ int dater_settmzon(DATER *dp,TM *stp,int zoff,cchar *zstr,int zlen) noex {
 /* end subroutine (dater_settmzon) */
 
 /* set from split-out time and zone offset only (minutes west of GMT) */
-int dater_settmzo(DATER *dp,TM *stp,int zoff) noex {
+int dater_settmzo(dater *dp,TM *stp,int zoff) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,stp)) >= 0) {
 	    rs = SR_INVALID ;
@@ -393,7 +383,7 @@ int dater_settmzo(DATER *dp,TM *stp,int zoff) noex {
 /* end subroutine (dater_settmzo) */
 
 /* set from a split-out time and zone-name only */
-int dater_settmzn(DATER *dp,TM *stp,cchar *zstr,int zlen) noex {
+int dater_settmzn(dater *dp,TM *stp,cchar *zstr,int zlen) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,stp)) >= 0) {
 	    int		zoff = TZO_EMPTY ;
@@ -422,7 +412,7 @@ int dater_settmzn(DATER *dp,TM *stp,cchar *zstr,int zlen) noex {
 /* end subroutine (dater_settmzn) */
 
 /* set from ( time, timezone_name, DST_indication ) */
-int dater_settimezn(DATER *dp,time_t t,cchar *zname,int isdst) noex {
+int dater_settimezn(dater *dp,time_t t,cchar *zname,int isdst) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp)) >= 0) {
 	    rs = dater_initbase(dp) ;
@@ -453,7 +443,7 @@ int dater_settimezn(DATER *dp,time_t t,cchar *zname,int isdst) noex {
 /* end subroutine (dater_settimezn) */
 
 /* set from ( time, tz-offset, tz-name, tz-DST_indication ) */
-int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst) noex {
+int dater_settimezon(dater *dp,time_t t,int zoff,cchar *zname,int isdst) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp)) >= 0) {
 /* initialize */
@@ -488,7 +478,7 @@ int dater_settimezon(DATER *dp,time_t t,int zoff,cchar *zname,int isdst) noex {
 }
 /* end subroutine (dater_settimezon) */
 
-int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen) noex {
+int dater_mkdatestr(dater *dp,int type,char *dbuf,int dlen) noex {
 	int		rs = SR_OK ;
 	int		sl = 0 ;
 	if ((rs = dater_magic(dp,dbuf)) >= 0) {
@@ -567,48 +557,48 @@ int dater_mkdatestr(DATER *dp,int type,char *dbuf,int dlen) noex {
 /* end subroutine (dater_mkdatestr) */
 
 /* make a mail envelope-type dater string */
-int dater_mkstd(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mkstd(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSENV,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkstd) */
 
 /* make a mail envelope-type dater string */
-int dater_mkenv(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mkenv(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSENV,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkenv) */
 
 /* make a mail envelope-type dater string */
-int dater_mkmsg(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mkmsg(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSMSG,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkmsg) */
 
 /* make a mail header dater string */
-int dater_mkhdr(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mkhdr(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSHDR,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkhdr) */
 
 /* make the old STRDIG type of dater string */
-int dater_mkstrdig(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mkstrdig(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSSTRDIG,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkstrdig) */
 
 /* make the familiar LOGZ-type dater string */
-int dater_mklogz(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mklogz(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSLOGZ,dbuf,dlen) ;
 }
 /* end subroutine (dater_mklogz) */
 
 /* make the familiar LOGZ-type dater string */
-int dater_mkgmtlogz(DATER *dp,char *dbuf,int dlen) noex {
+int dater_mkgmtlogz(dater *dp,char *dbuf,int dlen) noex {
 	return dater_mkdatestr(dp,DATER_DTSGMLOGZ,dbuf,dlen) ;
 }
 /* end subroutine (dater_mkgmlogz) */
 
-int dater_setzinfo(DATER *dp,DATER_ZINFO *zip) noex {
+int dater_setzinfo(dater *dp,dater_zinfo *zip) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,zip)) >= 0) {
 	    dp->b.timezone = zip->zoff ;
@@ -619,8 +609,8 @@ int dater_setzinfo(DATER *dp,DATER_ZINFO *zip) noex {
 }
 /* end subroutine (dater_setzinfo) */
 
-/* return the UNIX® time out of DATER object */
-int dater_gettime(DATER *dp,time_t *tp) noex {
+/* return the UNIX® time out of dater object */
+int dater_gettime(dater *dp,time_t *tp) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,tp)) >= 0) {
 	    *tp = dp->b.time ;
@@ -630,7 +620,7 @@ int dater_gettime(DATER *dp,time_t *tp) noex {
 /* end subroutine (dater_gettime) */
 
 /* return the timezone in minutes west of GMT */
-int dater_getzoneoff(DATER *dp,int *zp) noex {
+int dater_getzoneoff(dater *dp,int *zp) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,zp)) >= 0) {
 	    if (! dp->f.zoff) {
@@ -645,7 +635,7 @@ int dater_getzoneoff(DATER *dp,int *zp) noex {
 /* end subroutine (dater_getzoneoff) */
 
 /* return the timezone in minutes west of GMT */
-int dater_getzonename(DATER *dp,char *rbuf,int rlen) noex {
+int dater_getzonename(dater *dp,char *rbuf,int rlen) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,rbuf)) >= 0) {
 	    rbuf[0] = '\0' ;
@@ -659,7 +649,7 @@ int dater_getzonename(DATER *dp,char *rbuf,int rlen) noex {
 }
 /* end subroutine (dater_getzonename) */
 
-int dater_getzinfo(DATER *dp,DATER_ZINFO *zip) noex {
+int dater_getzinfo(dater *dp,dater_zinfo *zip) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,zip)) >= 0) {
 	    zip->zoff = dp->b.timezone ;
@@ -674,7 +664,7 @@ int dater_getzinfo(DATER *dp,DATER_ZINFO *zip) noex {
 /* end subroutine (dater_getzinfo) */
 
 /* get the difference in seconds between two daters */
-int dater_diff(DATER *dp,DATER *d2p,time_t *rp) noex {
+int dater_diff(dater *dp,DATER *d2p,time_t *rp) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,d2p)) >= 0) {
 	    if (rp) {
@@ -688,7 +678,7 @@ int dater_diff(DATER *dp,DATER *d2p,time_t *rp) noex {
 #ifdef	COMMENT
 
 /* return the number of time zones that we have */
-int dater_nzones(DATER *dp) noex {
+int dater_nzones(dater *dp) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp)) >= 0) {
 	    rs  = zdb_count(&zr) ;
@@ -697,7 +687,7 @@ int dater_nzones(DATER *dp) noex {
 }
 /* end subroutine (dater_nzones) */
 
-int dater_zinfo(DATER *dp,DATER_ZINFO *zip,int ei) noex {
+int dater_zinfo(dater *dp,dater_zinfo *zip,int ei) noex {
 	cint		n = DATER_NZONES ;
 	int		rs ;
 	int		zl = 0 ;
@@ -720,7 +710,7 @@ int dater_zinfo(DATER *dp,DATER_ZINFO *zip,int ei) noex {
 
 /* private subroutines */
 
-static int dater_initcur(DATER *dp) noex {
+static int dater_initcur(dater *dp) noex {
 	int		rs = SR_OK ;
 	if (! dp->f.cyear) {
 	    TMTIME	tmt ;
@@ -744,7 +734,7 @@ static int dater_initcur(DATER *dp) noex {
 /* end subroutine (dater_initcur) */
 
 /* get any possible zone-name information from the zone offset */
-static int dater_mkpzoff(DATER *dp,TM *stp,int zoff) noex {
+static int dater_mkpzoff(dater *dp,TM *stp,int zoff) noex {
 	ZDB		zr ;
 	int		rs ;
 	dp->zname[0] = '\0' ;
@@ -757,7 +747,7 @@ static int dater_mkpzoff(DATER *dp,TM *stp,int zoff) noex {
 }
 /* end subroutine (dater_mkpzoff) */
 
-static int dater_ldtmz(DATER *dp,TMZ *tp) noex {
+static int dater_ldtmz(dater *dp,tmz *tp) noex {
 	dp->b.dstflag = tmz_getdst(tp) ;
 	dp->b.timezone = tmz_getzoff(tp) ;
 	dp->f.zoff = tp->f.zoff ;
@@ -769,7 +759,7 @@ static int dater_ldtmz(DATER *dp,TMZ *tp) noex {
 }
 /* end subroutine (dater_ldtmz) */
 
-static int dater_ldzname(DATER *dp,cchar *sp,int sl) noex {
+static int dater_ldzname(dater *dp,cchar *sp,int sl) noex {
 	int		len = 0 ;
 	if (cchar *tp ; (tp = strnpbrk(sp,sl," \t")) != nullptr) {
 	    sl = (tp - sp) ;
@@ -779,7 +769,7 @@ static int dater_ldzname(DATER *dp,cchar *sp,int sl) noex {
 }
 /* end subroutine (dater_ldzname) */
 
-static int dater_ldcomzone(DATER *dp,comparse *cpp) noex {
+static int dater_ldcomzone(dater *dp,comparse *cpp) noex {
 	int		rs = SR_OK ;
 	if (dp->zname[0] == '\0') {
 	    cchar	*cp{} ;
@@ -791,7 +781,7 @@ static int dater_ldcomzone(DATER *dp,comparse *cpp) noex {
 }
 /* end subroutine (dater_ldcomzone) */
 
-static int dater_defs(DATER *dp,TMZ *tp) noex {
+static int dater_defs(dater *dp,tmz *tp) noex {
 	cbool		f_year = tmz_hasyear(tp) ;
 	cbool		f_zoff = tmz_haszoff(tp) ;
 	cbool		f_zone = tmz_haszone(tp) ;
@@ -820,7 +810,7 @@ static int dater_defs(DATER *dp,TMZ *tp) noex {
 /* end subroutine (dater_defs) */
 
 /* store a time zone-name into the object */
-static int dater_ldname(DATER *dp,cchar *znp,int znl) noex {
+static int dater_ldname(dater *dp,cchar *znp,int znl) noex {
 	int		rs = SR_OK ;
 	char		*dnp = dp->zname ;
 	if ((znl < 0) || (znl > DATER_ZNAMELEN)) {
@@ -851,7 +841,7 @@ TIMEB {
 } ;
 #endif /* COMMENT */
 
-static int dater_pname(DATER *dp) noex {
+static int dater_pname(dater *dp) noex {
 	ZDB		zr ;
 	int		rs ;
 	int		zl = -1 ;
@@ -874,7 +864,7 @@ static int dater_pname(DATER *dp) noex {
 /* end subroutine (dater_pname) */
 
 /* get the timezone information out of an RFC822-type number string */
-static int dater_pnum(DATER *dp) noex {
+static int dater_pnum(dater *dp) noex {
 	int		rs = SR_OK ;
 	if (!dp->f.zoff) {
 	    int		zo{} ;
@@ -888,7 +878,7 @@ static int dater_pnum(DATER *dp) noex {
 }
 /* end subroutine (dater_pnum) */
 
-static int dater_findzname(DATER *dp) noex {
+static int dater_findzname(dater *dp) noex {
 	int		rs = SR_OK ;
 	if (dp->zname[0] == '\0') {
 	    cint	znl = DATER_ZNAMELEN ;
@@ -904,7 +894,7 @@ static int dater_findzname(DATER *dp) noex {
 }
 /* end subroutine (dater_findzname) */
 
-static int dater_findzoff(DATER *dp,TM *stp) noex {
+static int dater_findzoff(dater *dp,TM *stp) noex {
 	int		rs = SR_FAULT ;
 	int		zoff = 0 ;
 	if (stp) {
@@ -930,7 +920,7 @@ static int dater_findzoff(DATER *dp,TM *stp) noex {
 /* end subroutine (dater_findzoff) */
 
 /* try to make a time for the given date */
-static int dater_mkptime(DATER *dp,TM *stp,int zoff) noex {
+static int dater_mkptime(dater *dp,TM *stp,int zoff) noex {
 	TMTIME		tmt{} ;
 	int		rs = SR_OK ;
 	if ((zoff == TZO_EMPTY) || (! dp->f.zoff)) {
@@ -954,7 +944,7 @@ static int dater_mkptime(DATER *dp,TM *stp,int zoff) noex {
 /* end subroutine (dater_mkptime) */
 
 /* try to make a time for the given date */
-static int dater_mktime(DATER *dp,TM *stp) noex {
+static int dater_mktime(dater *dp,TM *stp) noex {
 	time_t		t ;
 	int		rs = SR_OK ;
 	if (dp->f.zoff) {
@@ -987,7 +977,7 @@ static int dater_mktime(DATER *dp,TM *stp) noex {
 }
 /* end subroutine (dater_mktime) */
 
-static int dater_initbase(DATER *dp) noex {
+static int dater_initbase(dater *dp) noex {
 	int		rs = SR_FAULT ;
 	if (dp) {
 	    rs = SR_OK ;

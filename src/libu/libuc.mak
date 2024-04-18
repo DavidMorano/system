@@ -976,6 +976,11 @@ chrono.o:		chrono.dir
 chrono.dir:
 	makesubdir $@
 
+# DATER
+dater.o:		dater.dir
+dater.dir:
+	makesubdir $@
+
 # LOCALSET
 localset.o:		localset.dir
 localset.dir:
