@@ -507,14 +507,8 @@ static int subinfo_mailfile(SUBINFO *sip)
 		MAILBOX_INFO	mbinfo ;
 		const int	mo = (MAILBOX_ORDONLY | MAILBOX_ONOCLEN) ;
 		if ((rs = mailbox_open(&mb,mfn,mo)) >= 0) {
-	    	    if ((rs = mailbox_info(&mb,&mbinfo)) >= 0) {
+	    	    if ((rs = mailbox_getinfo(&mb,&mbinfo)) >= 0) {
 	                c = mbinfo.nmsgs ;
-
-#if	CF_DEBUGS
-	        	debugprintf("pcsmailcheck/subinfo_mailfile: nmsgs=%u\n",
-				c) ;
-#endif
-
 	        	if (c > 0) {
 			    const int	mi = (c-1) ;
 			    const int	tl = sip->flen ;
