@@ -35,9 +35,10 @@
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<mailbox.h>
-#include	<mailmsg.h>
 #include	<rmx.h>
 #include	<localmisc.h>
+
+#include	"mailmsg.h"
 
 
 /* local defines */
@@ -55,9 +56,6 @@
 
 
 /* forward references */
-
-
-/* global variables */
 
 
 /* local variables */

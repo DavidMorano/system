@@ -92,8 +92,6 @@
 
 #define	RECORDFNAME	"envelopes.log"
 
-#define	TI_LOCK		120
-
 #ifndef	COL_SCANFROM
 #define	COL_SCANFROM	2
 #endif
@@ -106,6 +104,14 @@
 #ifndef	COL_SCANLINES
 #define	COL_SCANLINES	75
 #endif
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef mbcache_scan **		mepp ;
 
 
 /* external subroutines */
@@ -210,10 +216,10 @@ static constexpr int	rsnomsg[] = {
 
 #ifdef	COMMENT
 static constexpr struct scantitle	scantitles[] = {
-	{ "FROM", COL_SCANFROM },
-	{ "SUBJECT", COL_SCANSUBJECT },
-	{ "DATE", COL_SCANDATE },
-	{ "LINES", COL_SCANLINES },
+	{ "FROM",	COL_SCANFROM },
+	{ "SUBJECT",	COL_SCANSUBJECT },
+	{ "DATE",	COL_SCANDATE },
+	{ "LINES",	COL_SCANLINES },
 	{ nullptr, 0 }
 } ;
 #endif /* COMMENT */
@@ -224,7 +230,7 @@ static constexpr struct scantitle	scantitles[] = {
 
 /* exported subroutines */
 
-int mbcache_start(mbcache *op,cchar *mbfname,int mflags,MAILBOX *mbp) noex {
+int mbcache_start(mbcache *op,cchar *mbfname,int mflags,mailbox *mbp) noex {
 	int		rs ;
 	int		nmsgs = 0 ;
 	if ((rs = mbcache_ctor(op,mbfname,mbp)) >= 0) {
@@ -243,11 +249,11 @@ int mbcache_start(mbcache *op,cchar *mbfname,int mflags,MAILBOX *mbp) noex {
 	                cint	mssize = sizeof(ME **) ;
 	                if (mip->nmsgs >= 0) {
 	                    cint	sz = ((mip->nmsgs + 1) * mssize) ;
-	                    void	*p ;
+	                    void	*vp{} ;
 	                    nmsgs = mip->nmsgs ;
-	                    if ((rs = uc_malloc(sz,&p)) >= 0) {
+	                    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	                        cint	csize = (mip->nmsgs * 6 * 20) ;
-	                        op->msgs = p ;
+	                        op->msgs = mepp(vp) ;
 	                        memset(op->msgs,0,sz) ;
 	                        if ((rs = strpack_start(psp,csize)) >= 0) {
 				    dater	*dp = &op->dm ;
@@ -446,7 +452,7 @@ int mbcache_msgdeldup(mbcache *op) noex {
 		                }
 		            } /* end if (non-null) */
 		        } /* end if (not already being deleted) */
-	            } /* end (_msginfo) */
+	            } /* end (mbcache_msginfo) */
 		    if (rs < 0) break ;
 	        } /* end for */
 	        rs1 = mapstrint_finish(&mm) ;
@@ -761,32 +767,29 @@ static int mbcache_msgfins(mbcache *op) noex {
 
 static int mbcache_msgframing(mbcache *op,int mi,ME **mpp) noex {
 	int		rs = SR_OK ;
-
 	if (op->msgs[mi] == nullptr) {
-	    mailbox_mi	minfo ;
-	    if ((rs = mailbox_msginfo(op->mbp,mi,&minfo)) >= 0) {
+	    mailbox_mi	*mip{} ;
+	    if ((rs = mailbox_msgret(op->mbp,mi,&mip)) >= 0) {
 	        ME	*mep = nullptr ;
 	        cint	sz = sizeof(ME) ;
-
 	        if ((rs = uc_malloc(sz,&mep)) >= 0) {
 	            if ((rs = msgentry_start(mep,mi)) >= 0) {
-	                if ((rs = msgentry_frame(mep,&minfo)) >= 0) {
+	                if ((rs = msgentry_frame(mep,mip)) >= 0) {
 	                    op->msgs[mi] = mep ;
 	                }
-	                if (rs < 0)
+	                if (rs < 0) {
 	                    msgentry_finish(mep) ;
+			}
 	            } /* end if (msgentry_start) */
-	            if (rs < 0)
+	            if (rs < 0) {
 	                uc_free(mep) ;
+		    }
 	        } /* end if (memory-allocation) */
-
-	    } /* end if (mailbox_msginfo) */
+	    } /* end if (mailbox_getret) */
 	} /* end if (needed) */
-
 	if (mpp) {
 	    *mpp = (rs >= 0) ? op->msgs[mi] : nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (mbcache_msgframing) */
@@ -910,37 +913,33 @@ static int msgentry_finish(ME *mep) noex {
 /* end subroutine (msgentry_finish) */
 
 static int msgentry_frame(ME *mep,mailbox_mi *mip) noex {
-	int		rs = SR_OK ;
-
-	if (mep == nullptr) return SR_FAULT ;
-	if (mip == nullptr) return SR_FAULT ;
-
-	mep->moff = mip->moff ;
-	mep->hoff = mip->hoff ;
-	mep->boff = mip->boff ;
-	mep->mlen = mip->mlen ;
-	mep->hlen = mip->hlen ;
-	mep->blen = mip->blen ;
-
-	mep->hdr.clen = mip->hdr.clen ;
-	mep->hdr.clines = mip->hdr.clines ;
-	mep->hdr.lines = mip->hdr.lines ;
-	mep->hdr.xlines = mip->hdr.xlines ;
-
-	mep->hdrval.clen = mip->hdrval.clen ;
-	mep->hdrval.clines = mip->hdrval.clines ;
-	mep->hdrval.lines = mip->hdrval.lines ;
-	mep->hdrval.xlines = mip->hdrval.xlines ;
-
-	if ((mep->nlines < 0) && mip->hdrval.clines)
-	    mep->nlines = mip->clines ;
-
-	if ((mep->nlines < 0) && mip->hdrval.lines)
-	    mep->nlines = mip->lines ;
-
-	if ((mep->nlines < 0) && mip->hdrval.xlines)
-	    mep->nlines = mip->xlines ;
-
+	int		rs = SR_FAULT ;
+	if (mep && mip) {
+	    rs = SR_OK ;
+	    mep->moff = mip->moff ;
+	    mep->hoff = mip->hoff ;
+	    mep->boff = mip->boff ;
+	    mep->mlen = mip->mlen ;
+	    mep->hlen = mip->hlen ;
+	    mep->blen = mip->blen ;
+	    mep->hdr.clen = mip->hdr.clen ;
+	    mep->hdr.clines = mip->hdr.clines ;
+	    mep->hdr.lines = mip->hdr.lines ;
+	    mep->hdr.xlines = mip->hdr.xlines ;
+	    mep->hdrval.clen = mip->hdrval.clen ;
+	    mep->hdrval.clines = mip->hdrval.clines ;
+	    mep->hdrval.lines = mip->hdrval.lines ;
+	    mep->hdrval.xlines = mip->hdrval.xlines ;
+	    if ((mep->nlines < 0) && mip->hdrval.clines) {
+	        mep->nlines = mip->clines ;
+	    }
+	    if ((mep->nlines < 0) && mip->hdrval.lines) {
+	        mep->nlines = mip->lines ;
+	    }
+	    if ((mep->nlines < 0) && mip->hdrval.xlines) {
+	        mep->nlines = mip->xlines ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (msgentry_frame) */
@@ -952,7 +951,7 @@ static int msgentry_load(ME *mep,mbcache *op) noex {
 	    mailmsg	m ;
 	    mep->f.info = true ;
 	    if ((rs = mailmsg_start(&m)) >= 0) {
-	        MAILBOX		*mbp = op->mbp ;
+	        mailbox	*mbp = op->mbp ;
 	        off_t	mbo = mep->moff ;
 	        if ((rs = mailmsg_loadmb(&m,mbp,mbo)) >= 0) {
 

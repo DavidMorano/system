@@ -118,7 +118,7 @@ struct mbcache_head {
 	mailbox		*mbp ;
 	cchar		*mbfname ;
 	MBCACHE_SCAN	**msgs ;
-	MAILBOX_INFO	mbi ;
+	mailbox_info	mbi ;
 	strpack		strs ;
 	dater		dm ;		/* dater-manager */
 	MBCACHE_FL	f ;

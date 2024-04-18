@@ -25,6 +25,7 @@
 #include	<clanguage.h>
 #include	<vecobj.h>
 #include	<strpack.h>
+#include	<mailbox.h>
 #include	<localmisc.h>
 
 
@@ -47,6 +48,7 @@ typedef MAILMSG		mailmsg ;
 EXTERNC_begin
 
 extern int mailmsg_start(mailmsg *) noex ;
+extern int mailmsg_loadmb(mailmsg *,mailbox *,off_t) noex ;
 extern int mailmsg_loadline(mailmsg *,cchar *,int) noex ;
 extern int mailmsg_envcount(mailmsg *) noex ;
 extern int mailmsg_envaddress(mailmsg *,int,cchar **) noex ;
