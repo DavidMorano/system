@@ -1,6 +1,6 @@
-# MAKEFILES (six)
+# MAKEFILES (dater)
 
-T= six
+T= dater
 
 ALL= $(T).o $(T).a
 
@@ -38,15 +38,15 @@ LINT=	lint
 DEFS +=
 
 
-INCS += six.h
+INCS += dater.h
 
 
 LIBS +=
 
 
-INCDIRS +=
+INCDIRS=
 
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS= -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -56,17 +56,16 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_SIX= sifext.o
+OBJ0_DATER= dater_main.o
+OBJ1_DATER= dater_getdate.o
+OBJ2_DATER= dater_getbbtime.o
+OBJ3_DATER= dater_setkey.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
+OBJA_DATER= obj0_dater.o obj1_dater.o
+OBJB_DATER= obj2_dater.o obj3_dater.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_DATER= $(OBJA_DATER)
 
 
 default:		$(T).o
@@ -89,10 +88,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_DATER)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_DATER)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -112,22 +111,22 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_dater.o:	$(OBJ0_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_DATER)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_dater.o:	$(OBJ1_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_DATER)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_dater.o:	$(OBJ2_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_DATER)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
-
-obj4_six.o:	$(OBJ4_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
+obj3_dater.o:	$(OBJ3_DATER)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_DATER)
 
 
-sifext.o:		sifext.cc sifext.h
+dater_main.o:		dater_main.cc		$(INCS)
+dater_getdate.o:	dater_getdate.cc	$(INCS)
+dater_getbbtime.o:	dater_getbbtime.cc	$(INCS)
+dater_setkey.o:		dater_setkey.cc		$(INCS)
 
 

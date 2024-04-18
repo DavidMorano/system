@@ -35,7 +35,7 @@
 
 	Returns:
 	>=0		length of created result
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 

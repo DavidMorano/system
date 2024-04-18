@@ -36,7 +36,7 @@
 
 	Returns:
 	>=0		length of resulting string
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 

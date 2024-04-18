@@ -1,6 +1,6 @@
-# MAKEFILE (macuser)
+# MAKEFILE (showterms)
 
-T= macuser
+T= showterms
 
 ALL= $(T).x
 
@@ -38,10 +38,10 @@ LINT= lint
 DEFS +=
 
 
-INCS += usystem.h localmisc.h
+INCS +=
 
 
-LIBS += -lmacuser
+LIBS +=
 
 
 INCDIRS +=

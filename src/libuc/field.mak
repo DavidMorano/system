@@ -1,6 +1,6 @@
-# MAKEFILES (six)
+# MAKEFILES (field)
 
-T= six
+T= field
 
 ALL= $(T).o $(T).a
 
@@ -35,18 +35,16 @@ TOUCH=	touch
 LINT=	lint
 
 
-DEFS +=
+DEFS=
 
 
-INCS += six.h
+INCS= field.h
 
 
-LIBS +=
+LIBS=
 
 
-INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS= -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -56,17 +54,16 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_SIX= sifext.o
+OBJ0_FIELD= field_main.o field_obj.o
+OBJ1_FIELD= field_srvarg.o field_svcargs.o
+OBJ2_FIELD= field_word.o 
+OBJ3_FIELD= field_wordphrase.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
+OBJA_FIELD= obj0_field.o obj1_field.o
+OBJB_FIELD= obj2_field.o obj3_field.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_FIELD= $(OBJA_FIELD) $(OBJB_FIELD)
 
 
 default:		$(T).o
@@ -89,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_FIELD)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_FIELD)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_FIELD)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -112,22 +109,24 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_field.o:	$(OBJ0_FIELD)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_FIELD)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_field.o:	$(OBJ1_FIELD)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_FIELD)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_field.o:	$(OBJ2_FIELD)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_FIELD)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
-
-obj4_six.o:	$(OBJ4_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
+obj3_field.o:	$(OBJ3_FIELD)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_FIELD)
 
 
-sifext.o:		sifext.cc sifext.h
+field_main.o:		field_main.cc		$(INCS)
+field_obj.o:		field_obj.cc		$(INCS)
+field_srvarg.o:		field_srvarg.cc		$(INCS)
+field_svcargs.o:	field_svcargs.cc	$(INCS)
+field_word.o:		field_word.cc		$(INCS)
+field_wordphrase.o:	field_wordphrase.cc	$(INCS)
 
 

@@ -58,6 +58,7 @@
 #include	<storebuf.h>		/* <- not used! */
 #include	<sncpyx.h>		/* <- not used! */
 #include	<snwcpy.h>
+#include	<localmisc.h>		/* |eol(3uc)| */
 
 #include	"readln.hh"
 

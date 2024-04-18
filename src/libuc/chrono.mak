@@ -1,6 +1,6 @@
-# MAKEFILES (six)
+# MAKEFILES (chrono)
 
-T= six
+T= chrono
 
 ALL= $(T).o $(T).a
 
@@ -35,18 +35,16 @@ TOUCH=	touch
 LINT=	lint
 
 
-DEFS +=
+DEFS=
 
 
-INCS += six.h
+INCS= chrono.h
 
 
-LIBS +=
+LIBS=
 
 
-INCDIRS +=
-
-LIBDIRS += -L$(LIBDIR)
+LIBDIRS= -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -56,17 +54,16 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_SIX= sialnum.o sialpha.o sibasename.o sibreak.o
-OBJ1_SIX= sixchr.o sicasechr.o sicite.o sidigit.o sidquote.o
-OBJ2_SIX= sihyphen.o silbrace.o sileader.o sinext.o
-OBJ3_SIX= siskipwhite.o sispan.o sisub.o sicasesub.o siterm.o
-OBJ4_SIX= sifext.o
+OBJ0_CHRONO= tmstrs.o zdb.o
+OBJ1_CHRONO= date.o
+OBJ2_CHRONO= tmz.o zos.o zoffparts.o
+OBJ3_CHRONO= tmtime.o
 
 
-OBJA_SIX= obj0_six.o obj1_six.o
-OBJB_SIX= obj2_six.o obj3_six.o obj4_six.o
+OBJA_CHRONO= obj0_chrono.o obj1_chrono.o
+OBJB_CHRONO= obj2_chrono.o obj3_chrono.o
 
-OBJ_SIX= $(OBJA_SIX) $(OBJB_SIX)
+OBJ_CHRONO= $(OBJA_CHRONO) $(OBJB_CHRONO)
 
 
 default:		$(T).o
@@ -89,10 +86,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_SIX)
+$(T).o:			$(OBJ_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_CHRONO)
 
-$(T).a:			$(OBJ_SIX)
+$(T).a:			$(OBJ_CHRONO)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -112,22 +109,25 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obj0_six.o:	$(OBJ0_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_SIX)
+obj0_chrono.o:	$(OBJ0_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_CHRONO)
 
-obj1_six.o:	$(OBJ1_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_SIX)
+obj1_chrono.o:	$(OBJ1_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_CHRONO)
 
-obj2_six.o:	$(OBJ2_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_SIX)
+obj2_chrono.o:	$(OBJ2_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_CHRONO)
 
-obj3_six.o:	$(OBJ3_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_SIX)
-
-obj4_six.o:	$(OBJ4_SIX)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_SIX)
+obj3_chrono.o:	$(OBJ3_CHRONO)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_CHRONO)
 
 
-sifext.o:		sifext.cc sifext.h
+date.o:			date.cc	date.h $(INCS)
+tmstrs.o:		tmstrs.cc tmstrs.h $(INCS)
+tmtime.o:		tmtime.cc tmtime.h $(INCS)
+tmz.o:			tmz.cc tmz.h $(INCS)
+zdb.o:			zdb.cc zdb.h $(INCS)
+zos.o:			zos.cc zos.h $(INCS)
+zoffparts.o:		zoffparts.cc zoffparts.h	$(INCS)
 
 

@@ -44,9 +44,9 @@ INCS += six.h
 LIBS +=
 
 
-INCDIRS=
+INCDIRS +=
 
-LIBDIRS= -L$(LIBDIR)
+LIBDIRS += -L$(LIBDIR)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
