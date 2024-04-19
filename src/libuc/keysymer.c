@@ -1,10 +1,10 @@
-/* keysymer */
+/* keysymer SUPPORT */
+/* lang=C++20 */
 
 /* keysym name-value database */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -19,27 +19,20 @@
 
 	This object provides access to a keysym name-value database.
 
-
 *******************************************************************************/
 
-
-#define	KEYSYMER_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<strings.h>		/* |strncasecmp(3c)| */
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<mapstrint.h>
 #include	<bfile.h>
 #include	<ascii.h>
+#include	<sfx.h>
 #include	<char.h>
 #include	<localmisc.h>
 

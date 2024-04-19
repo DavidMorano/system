@@ -20,7 +20,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<cstring.h>		/* |strlen(3c)| */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 

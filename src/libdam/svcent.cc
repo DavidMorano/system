@@ -1,16 +1,16 @@
-/* svcent */
+/* svcent SUPPORT */
+/* lang=C++20 */
 
 /* service file entry (SVCENT) */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 2017-10-13, David A­D­ Morano
-	This was split out of the HOMEPAGE program (where it was originally
-	local).
+	This was split out of the HOMEPAGE program (where it was
+	originally local).
 
 */
 
@@ -20,16 +20,11 @@
 
 	We perform some slight management on SVCENT objects.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>
@@ -41,12 +36,7 @@
 /* local defines */
 
 
-/* typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef cchar	cchar ;
-#endif
+/* local typedefs */
 
 
 /* external subroutines */
@@ -56,7 +46,6 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfdequote(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	nextfieldterm(cchar *,int,cchar *,cchar **) ;
 extern int	nchr(cchar *,int,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;

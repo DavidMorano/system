@@ -16,27 +16,21 @@
 
 /*******************************************************************************
 
-	This object mediates filling out text lines for a specified line length.
-
+	This object mediates filling out text lines for a specified
+	line length.
 
 *******************************************************************************/
 
-
-#define	WORDFILL_MASTER	0
-
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<fifostr.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"wordfill.h"
@@ -73,6 +67,7 @@ int		wordfill_addlines(WORDFILL *,const char *,int) ;
 
 
 /* exported subroutines */
+
 
 int wordfill_start(WORDFILL *op,cchar *lp,int ll)
 {

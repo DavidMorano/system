@@ -1,16 +1,16 @@
-/* svckv */
+/* svckv SUPPORT */
+/* lang=C++20 */
 
 /* key-value type functions */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
-
 
 /* revision history:
 
 	= 2017-10-13, David A­D­ Morano
-	This was split out of the HOMEPAGE program (where it was originally
-	local).
+	This was split out of the HOMEPAGE program (where it was
+	originally local).
 
 */
 
@@ -23,13 +23,9 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<localmisc.h>
@@ -40,12 +36,7 @@
 /* local defines */
 
 
-/* typedefs */
-
-#ifndef	TYPEDEF_CCHAR
-#define	TYPEDEF_CCHAR	1
-typedef const char	cchar ;
-#endif
+/* local typedefs */
 
 
 /* external subroutines */
@@ -55,7 +46,6 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfdequote(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	nextfieldterm(cchar *,int,cchar *,cchar **) ;
 extern int	nchr(cchar *,int,int) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	matstr(cchar **,cchar *,int) ;

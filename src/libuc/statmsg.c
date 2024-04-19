@@ -1,20 +1,20 @@
-/* statmsg */
+/* statmsg SUPPORT */
+/* lang=C++20 */
 
 /* object to help (manage) STATMSG messages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
 #define	CF_WRITETO	1		/* time out writes */
 #define	CF_PARAMFILE	1		/* use 'paramfile(3dam)' */
 
-
 /* revision history:
 
 	= 2003-10-01, David A­D­ Morano
-        This is a hack from numerous previous hacks (not enumerated here). This
-        is a new version of this hack that is entirely different (much simpler).
+	This is a hack from numerous previous hacks (not enumerated
+	here).  This is a new version of this hack that is entirely
+	different (much simpler).
 
 */
 
@@ -22,26 +22,23 @@
 
 /*******************************************************************************
 
-        This object module writes the contents of various STATMSGs (as specified
-        by the caller) to an open file descriptor (also specified by the
-        caller).
+	This object module writes the contents of various STATMSGs
+	(as specified by the caller) to an open file descriptor
+	(also specified by the caller).
 
 	Implementation notes:
 
-        When processing, we time-out writes to the caller-supplied
-        file-descriptor because we don't know if it is a non-regular file that
-        might be flow-controlled. We don't wait forever for those sorts of
-        outputs. So let's say that the output is a terminal that is currently
-        flow-controlled. We will time-out on our writes and the user will not
-        get this whole STATMSG text!
-
+	When processing, we time-out writes to the caller-supplied
+	file-descriptor because we do not  know if it is a non-regular
+	file that might be flow-controlled.  We do not wait forever
+	for those sorts of outputs.  So let us say that the output
+	is a terminal that is currently flow-controlled.  We will
+	time-out on our writes and the user will not get this whole
+	STATMSG text!
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
@@ -50,7 +47,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ids.h>
@@ -66,6 +62,7 @@
 #include	<bfile.h>
 #include	<fsdir.h>
 #include	<ascii.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"statmsg.h"

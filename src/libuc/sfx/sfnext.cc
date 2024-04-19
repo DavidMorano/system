@@ -16,6 +16,11 @@
 
 /*******************************************************************************
 
+	Names:
+	sfnext
+	sfnextchr
+	sfnextbrk
+
 	Name:
 	sfnext
 
@@ -33,6 +38,7 @@
 	the caller determines that a NL was present, the caller
 	should arrange to "step over" the NL before making new calls
 	in order to get the fields beyond the NL.
+	The returned string is white-space shrunken.
 
 	Synopsis:
 	int sfnext(cchar *sp,int sl,cchar **spp) noex
@@ -54,6 +60,7 @@
 	This subroutine will extract the next white-space-separated
 	or a combination of white-space and a trailing termination
 	character c-string from a counted sourse c-string.
+	The returned string is white-space shrunken.
 
 	Synopsis:
 	int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **spp) noex

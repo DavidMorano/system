@@ -27,6 +27,7 @@
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<fifostr.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"sfill.h"

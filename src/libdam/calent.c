@@ -24,13 +24,13 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<sbuf.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"calent.h"

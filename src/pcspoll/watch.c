@@ -25,23 +25,17 @@
 
 */
 
-
 /*****************************************************************************
 
-        This subroutine is responsible for processing the jobs that have been
-        handed to us from the initialization code.
+	This subroutine is responsible for processing the jobs that
+	have been handed to us from the initialization code.
 
 	Returns:
-
 	OK	may not really matter in the current implementation!
-
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/wait.h>
@@ -54,7 +48,6 @@
 #include	<string.h>
 #include	<netdb.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<logfile.h>
@@ -63,14 +56,14 @@
 #include	<vecstr.h>
 #include	<field.h>
 #include	<ids.h>
+#include	<srvtab.h>
+#include	<acctab.h>
+#include	<cq.h>
+#include	<sfx.h>
 #include	<exitcodes.h>
-
-#include	"srvtab.h"
-#include	"acctab.h"
-#include	"progentry.h"
-#include	"cq.h"
 #include	<localmisc.h>
 
+#include	"progentry.h"
 #include	"config.h"
 #include	"defs.h"
 

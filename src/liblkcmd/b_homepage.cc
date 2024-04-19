@@ -60,7 +60,6 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<tzfile.h>		/* for TM_YEAR_BASE */
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<getbufsize.h>
@@ -92,6 +91,7 @@
 #include	<tmtime.h>
 #include	<querystr.h>
 #include	<ucmallreg.h>
+#include	<sfx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -160,7 +160,6 @@ extern int	sfshrink(cchar *,int,cchar **) ;
 extern int	sfdequote(cchar *,int,cchar **) ;
 extern int	sfbasename(cchar *,int,cchar **) ;
 extern int	sfdirname(cchar *,int,cchar **) ;
-extern int	nextfieldterm(cchar *,int,cchar *,cchar **) ;
 extern int	nchr(cchar *,int,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	matostr(cchar **,int,cchar *,int) ;
@@ -5045,7 +5044,7 @@ static int locinfo_svclistadd(LOCINFO *lip,cchar *vp,int vl)
 	    cchar	*sp ;
 	    if (vl < 0) vl = strlen(vp) ;
 	    while (vl > 0) {
-	        if ((sl = nextfieldterm(vp,vl,st,&sp)) < 0) break ;
+	        if ((sl = sfnextbrk(vp,vl,st,&sp)) < 0) break ;
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(3))
 	            debugprintf("main/locinfo_svclistadd: s=>%t<\n",sp,sl) ;

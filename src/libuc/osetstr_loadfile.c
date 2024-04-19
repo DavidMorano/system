@@ -18,15 +18,15 @@
 
 /*******************************************************************************
 
-	This subroutine will read (process) a file and put all of the strings
-	found into the string (supplied) list, consisting of a OSETSTR object.
+	This subroutine will read (process) a file and put all of
+	the strings found into the string (supplied) list, consisting
+	of a OSETSTR object.
 
 	Synopsis:
-
 	int osetstr_loadfile(vsp,fo,fname)
 	osetstr		*vsp ;
 	int		fo ;
-	const char	fname[] ;
+	cchar	fname[] ;
 
 	Arguments:
 
@@ -41,15 +41,15 @@
 
 	Notes:
 
-        Why use FILER over BFILE? Yes, FILER is a tiny bit more lightweight
-        than BFILE -- on a good day. But the real reason may be so that we don't
-        need to load BFILE in code that resides very deep in a software stack if
-        we don't need it -- like deep inside loadable modules. Anyway, just a
-        thought!
+	Why use FILER over BFILE?  Yes, FILER is a tiny bit more
+	lightweight than BFILE -- on a good day. But the real reason
+	may be so that we don't need to load BFILE in code that
+	resides very deep in a software stack if we don't need it
+	-- like deep inside loadable modules.  Anyway, just a thought!
 
-        Why are we using FIELD as opposed to 'nextfield()' or something similar?
-        Because our sematics are to process quoted strings as a single OSETSTR
-        entry!
+	Why are we using FIELD as opposed to |sfnext(3uc)| or
+	something similar?  Because our sematics are to process
+	quoted strings as a single OSETSTR entry!
 
 	Note_on_uniqueness:
 
@@ -57,13 +57,9 @@
 		0=ignore
 		1=replace
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
@@ -71,7 +67,6 @@
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<osetstr.h>
 #include	<filer.h>
@@ -98,11 +93,11 @@
 
 /* external subroutines */
 
-extern int	osetstr_adduniq(osetstr *,const char *,int) ;
+extern int	osetstr_adduniq(osetstr *,cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	debugprintf(cchar *,...) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 
@@ -112,7 +107,7 @@ extern int	strlinelen(const char *,int,int) ;
 /* forward references */
 
 static int	osetstr_loadfd(OSETSTR *,int,int) ;
-static int	osetstr_loadline(OSETSTR *,int,const char *,int) ;
+static int	osetstr_loadline(OSETSTR *,int,cchar *,int) ;
 
 
 /* local structures */
@@ -227,7 +222,7 @@ static int osetstr_loadfd(osetstr *vsp,int fu,int fd)
 /* end subroutine (osetstr_loadfd) */
 
 
-static int osetstr_loadline(OSETSTR *vsp,int fu,const char *lbuf,int len)
+static int osetstr_loadline(OSETSTR *vsp,int fu,cchar *lbuf,int len)
 {
 	FIELD		fsb ;
 	int		rs ;

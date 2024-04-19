@@ -22,7 +22,7 @@
 
 	Description:
 	This subroutine retrieves the substring *before* the first
-	dot character.
+	dot character.  The returned string is white-space shrunken.
 
 	Synopsis:
 	int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex
@@ -60,6 +60,9 @@ typedef charp (*strxchr_f)(cchar *,int,int) noex ;
 
 
 /* external subroutines */
+
+
+/* external variables */
 
 
 /* local structures */
@@ -105,21 +108,23 @@ int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (sl > 0) {
-	    while (sl && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    }
-	    if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
-	        sl = (tp - sp) ;
-		rp = sp ;
-	    }
-	    while (sl && CHAR_ISWHITE(sp[sl - 1])) {
-	        sl -= 1 ;
-	    }
-	    if (rp) rl = sl ;
-	} /* end if (non-zero positive) */
+	if (sp) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (sl > 0) {
+	        while (sl && CHAR_ISWHITE(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        }
+	        if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
+	            sl = (tp - sp) ;
+		    rp = sp ;
+	        }
+	        while (sl && CHAR_ISWHITE(sp[sl - 1])) {
+	            sl -= 1 ;
+	        }
+	        if (rp) rl = sl ;
+	    } /* end if (non-zero positive) */
+	} /* end if (non-null) */
 	if (rpp) *rpp = rp ;
 	return rl ;
 }

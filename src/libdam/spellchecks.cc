@@ -59,6 +59,7 @@
 #include	<ascii.h>
 #include	<hash.h>
 #include	<strn.h>
+#include	<sfx.h>
 #include	<six.h>
 #include	<snx.h>
 #include	<mkpathx.h>

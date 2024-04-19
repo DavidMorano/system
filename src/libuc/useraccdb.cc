@@ -61,6 +61,7 @@
 #include	<filer.h>
 #include	<storeitem.h>
 #include	<dater.h>
+#include	<sfx.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"useraccdb.h"
