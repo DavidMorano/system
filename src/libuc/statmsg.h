@@ -60,8 +60,6 @@ struct statmsg_check {
 } ;
 
 struct statmsg_head {
-	uint		magic ;
-	STATMSG_FL	f ;
 	STATMSG_MAP	mapper ;
 	ptm		m ;		/* this is for all of the data */
 	cchar		**envv ;
@@ -70,6 +68,8 @@ struct statmsg_head {
 	cchar		*userhome ;
 	cchar		*fe ;		/* file-ending */
 	time_t		ti_lastcheck ;
+	STATMSG_FL	f ;
+	uint		magic ;
 	int		nmaps ;
 	int		nenv ;
 } ;

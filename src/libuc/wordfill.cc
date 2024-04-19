@@ -1,8 +1,9 @@
-/* wordfill */
+/* wordfill HEADER */
+/* lang=C++20 */
 
 /* text (word) fill */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* used for little object below */
 #define	CF_SAFE		1		/* (some) safety */
 
 /* revision history:
@@ -23,13 +24,15 @@
 
 #include	<envstandards.h>	/* must be before others */
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<fifostr.h>
+#include	<strn.h>
 #include	<sfx.h>
 #include	<localmisc.h>
 
@@ -45,10 +48,6 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,char **) ;
-
 
 /* external variables */
 
@@ -58,24 +57,23 @@ extern char	*strnpbrk(const char *,int,char **) ;
 
 /* forward references */
 
-static int	wordfill_mkline(WORDFILL *,int,char *,int) ;
-
-int		wordfill_addlines(WORDFILL *,const char *,int) ;
+static int	wordfill_mkline(WORDFILL *,int,char *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int wordfill_start(WORDFILL *op,cchar *lp,int ll)
-{
+int wordfill_start(WORDFILL *op,cchar *lp,int ll) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	memset(op,0,sizeof(WORDFILL)) ;
+	memclear(op) ;
 
 	if ((rs = fifostr_start(&op->sq)) >= 0) {
 	    op->magic = WORDFILL_MAGIC ;
@@ -92,9 +90,7 @@ int wordfill_start(WORDFILL *op,cchar *lp,int ll)
 }
 /* end subroutine (wordfill_start) */
 
-
-int wordfill_finish(WORDFILL *op)
-{
+int wordfill_finish(WORDFILL *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -112,9 +108,7 @@ int wordfill_finish(WORDFILL *op)
 }
 /* end subroutine (wordfill_finish) */
 
-
-int wordfill_addword(WORDFILL *op,cchar *lbuf,int llen)
-{
+int wordfill_addword(WORDFILL *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -140,13 +134,11 @@ int wordfill_addword(WORDFILL *op,cchar *lbuf,int llen)
 }
 /* end subroutine (wordfill_addword) */
 
-
-int wordfill_addline(WORDFILL *op,cchar *lbuf,int llen)
-{
+int wordfill_addline(WORDFILL *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		sl, cl ;
 	int		c = 0 ;
-	const char	*sp, *cp ;
+	cchar	*sp, *cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (lbuf == NULL) return SR_FAULT ;
@@ -178,13 +170,11 @@ int wordfill_addline(WORDFILL *op,cchar *lbuf,int llen)
 }
 /* end subroutine (wordfill_addline) */
 
-
-int wordfill_addlines(WORDFILL *op,cchar *lbuf,int llen)
-{
+int wordfill_addlines(WORDFILL *op,cchar *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		sl, cl ;
 	int		c = 0 ;
-	const char	*tp, *sp, *cp ;
+	cchar	*tp, *sp, *cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (lbuf == NULL) return SR_FAULT ;
@@ -227,18 +217,12 @@ int wordfill_addlines(WORDFILL *op,cchar *lbuf,int llen)
 }
 /* end subroutine (wordfill_addlines) */
 
-
-int wordfill_mklinefull(WORDFILL *op,char *lbuf,int llen)
-{
-
+int wordfill_mklinefull(WORDFILL *op,char *lbuf,int llen) noex {
 	return wordfill_mkline(op,FALSE,lbuf,llen) ;
 }
 /* end subroutine (wordfill_mklinefull) */
 
-
-int wordfill_mklinepart(WORDFILL *op,char *lbuf,int llen)
-{
-
+int wordfill_mklinepart(WORDFILL *op,char *lbuf,int llen) noex {
 	return wordfill_mkline(op,TRUE,lbuf,llen) ;
 }
 /* end subroutine (wordfill_mklinepart) */
@@ -246,9 +230,7 @@ int wordfill_mklinepart(WORDFILL *op,char *lbuf,int llen)
 
 /* private subroutines */
 
-
-static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
-{
+static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ll ;
@@ -267,10 +249,6 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
 #endif
 
 	if (llen < 1) return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("wordfill_mkline: f_p=%u ll=%u\n",f_part,llen) ;
-#endif
 
 	if (! f_part) {
 
@@ -303,10 +281,6 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
 
 	} /* end if (not requested partial) */
 
-#if	CF_DEBUGS
-	debugprintf("wordfill_mkline: f_g=%u\n",f_give) ;
-#endif
-
 	if (f_give) {
 
 	    c = 0 ;
@@ -316,10 +290,6 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
 
 	        rs1 = fifostr_headlen(&op->sq) ;
 	        wl = rs1 ;
-
-#if	CF_DEBUGS
-	debugprintf("wordfill_mkline: fifostr_headlen() rs=%d\n",rs1) ;
-#endif
 
 	        if (rs1 == SR_NOTFOUND)
 	            break ;
@@ -331,10 +301,6 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
 /* calculate needed-length ('nl') for this word */
 
 	        nl = (c > 0) ? (wl + 1) : wl ;
-
-#if	CF_DEBUGS
-	debugprintf("wordfill_mkline: nl=%u ll=%u\n",nl,ll) ;
-#endif
 
 /* can this word fit in the current line? */
 
@@ -349,13 +315,6 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
 	        }
 
 	        rs = fifostr_remove(&op->sq,lp,ll) ;
-
-#if	CF_DEBUGS
-	debugprintf("wordfill_mkline: fifostr_remove() rs=%d\n",rs) ;
-	if (rs >= 0)
-	debugprintf("wordfill_mkline: w=>%t<\n",lp,rs) ;
-#endif
-
 		if (rs >= 0) {
 		    op->wc -= 1 ;
 		    op->cc -= wl ;
@@ -370,10 +329,6 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen)
 	    tlen = (llen - ll) ;
 
 	} /* end if (giving) */
-
-#if	CF_DEBUGS
-	debugprintf("wordfill_mkline: ret rs=%d tlen=%u\n",rs,tlen) ;
-#endif
 
 	return (rs >= 0) ? tlen : rs ;
 }
