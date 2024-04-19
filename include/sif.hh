@@ -20,16 +20,31 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<cstring.h>		/* |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 
 
 struct sif {
-	cchar	*sbuf ;
-	int	slen ;
-	sif(cchar *p,int l) noex ; sbuf(p), slen(l) { } ;
+	cchar		*sp ;
+	cchar		*sstr = nullptr ;
+	int		sl ;
+	int		sch = 0 ;
+	sif(cchar *p) noex : sp(p) {
+	    sl = strlen(sp) ;
+	} ;
+	sif(cchar *p,int l,int c = 0) noex : sp(p), sl(l), sch(c) { 
+	    if (sl < 0) sl = strlen(sp) ;
+	} ;
+	sif(cchar *p,int l,cchar *s = nullptr) noex : sp(p), sl(l) { 
+	    if (sl < 0) sl = strlen(sp) ;
+	    sstr = s ;
+	} ;
 	int next(cchar **) noex ;
-} ;
+	int operator () (cchar **rpp) noex {
+	    return next(rpp) ;
+	} ;
+} ; /* end struct (sif) */
 
 
 #endif /* __cplusplus */

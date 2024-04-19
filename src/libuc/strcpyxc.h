@@ -1,7 +1,7 @@
 /* strcpyxc HEADER */
 /* lang=C20 */
 
-/* string-copy variant */
+/* copy a c-string to destination buffer a/ a case conversion */
 /* version %I% last-modified %G% */
 
 
@@ -21,7 +21,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<localmisc.h>
 
 
 EXTERNC_begin

@@ -1,9 +1,10 @@
 /* strcpyxc SUPPORT */
 /* lang=C++20 */
 
-/* copy a c-string to given case */
+/* copy a c-string to destination buffer a/ a case conversion */
 /* version %I% last-modified %G% */
 
+#define	CF_STPCPY	1		/* use |stpcpy(3c)| */
 
 /* revision history:
 
@@ -16,11 +17,32 @@
 
 /*******************************************************************************
 
-	This subroutine converts a string to *changed* case.
+	Names:
+	strcpybc
+	strcpylc
+	strcpyuc
+	strcpyfc
+
+	Description:
+	These subroutines copy a source c-string to a (uncounted)
+	destination while converting the case of the characters
+	(according to which subroutine is called).
+
+	Synopsis:
+	rp = *strcpy{x}c(char *dst,cchar *src) noex
+
+	Arguments:
+	dst	destination result buffer (pointer)
+	src	source c-string pointer
+	rp	result pointer (pointing to resulting NUL character in 'dst'
+
+	Returns:
+	-	a pointer to the NUL character in the destination buffer
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<toxc.h>
@@ -30,6 +52,10 @@
 
 
 /* local defines */
+
+#ifndef	CF_STPCPY
+#define	CF_STPCPY	1		/* use |stpcpy(3c)| */
+#endif
 
 
 /* imported namespaces */
@@ -45,10 +71,13 @@ extern "C" {
 /* external subroutines */
 
 
-/* local varialbes */
+/* external variables */
 
 
-/* local subroutines */
+/* local structures */
+
+
+/* forward references */
 
 static char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
 	while (*sp) {
@@ -60,10 +89,24 @@ static char *strcpyxc(toxc_f toxc,char *dp,cchar *sp) noex {
 /* end subroutine (strcpyxc) */
 
 
+/* local variables */
+
+constexpr bool		f_stpcpy = CF_STPCPY ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 char *strcpybc(char *dp,cchar *sp) noex {
-	return strcpyxc(tobc,dp,sp) ;
+	char		*rp ;
+	if_constexpr (f_stpcpy) {
+	    rp = stpcpy(dp,sp) ;
+	} else {
+	    rp = strcpyxc(tobc,dp,sp) ;
+	}
+	return rp ;
 }
 
 char *strcpylc(char *dp,cchar *sp) noex {

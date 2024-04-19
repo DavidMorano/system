@@ -1,20 +1,19 @@
-/* b_sysvar */
+/* b_sysvar SUPPORT */
+/* lang=C++20 */
 
 /* set the "system" variables at boot-up time */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_DEBUGFORK	0		/* debug fork problem */
 
-
 /* revision history:
 
 	= 2004-01-10, David A­D­ Morano
-	This is a complete rewrite of the previous code that performed this
-	function.
+	This is a complete rewrite of the previous code that performed
+	this function.
 
 */
 
@@ -22,23 +21,22 @@
 
 /*******************************************************************************
 
-	This subroutine is the front-end for the program that sets the "system"
-	varialbes at machine boot-up time.
+	Description:
+	This subroutine is the front-end for the program that sets
+	the "system" variables at machine boot-up time.
 
 	Synopsis:
-
 	$ sysvar [-s] [-f <file(s)>] [<var(s)>]
 
-
-	This code can be a built-in command to the KSH shell.  But it really
-	needs to be SUID to either user or group to really work properly, so it
-	is always made to be stand-alone for the time being.
-
+	Notes:
+	This code can be a built-in command to the KSH shell.  But
+	it really needs to be SUID to either user or group to really
+	work properly, so it is always made to be stand-alone for
+	the time being.
 
 *******************************************************************************/
 
-
-#include	<envstandards.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 
 #if	defined(SFIO) && (SFIO > 0)
 #define	CF_SFIO	1
@@ -50,7 +48,6 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>

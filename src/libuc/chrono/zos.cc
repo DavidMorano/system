@@ -39,7 +39,7 @@
 
 	Returns:
 	>=0		length of created string
-	<0		error (system-return)
+	<0		error code (system-return)
 
 
 	Name:
@@ -59,7 +59,7 @@
 
 	Returns:
 	>=0		OK
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -125,7 +125,7 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 		bool	fneg = false ;
 		if (int cl ; (cl = sfsign(sp,sl,&cp,&fneg)) > 0) {
 		    cchar	*zp{} ;
-		    if (int zl ; (zl = sfbrk(cp,cl," ,",&zp)) >= 3) {
+		    if (int zl ; (zl = sfnextchr(cp,cl,',',&zp)) >= 3) {
 			if (hasalldig(zp,zl)) {
 	                    int	zoff ;
 	                    int	sign = (fneg) ? 1 : -1 ; /* reverse */
@@ -145,7 +145,7 @@ int zos_get(cchar *sp,int sl,int *zop) noex {
 	                    }
 		            rs = (zp - sp) ;
 			} /* end if (hasalldig) */
-		    } /* end if (sfbrk) */
+		    } /* end if (sfbnextchr) */
 	        } /* end if (sfsign) */
 	    } /* end if (valid) */
 	} /* end if (non-null) */

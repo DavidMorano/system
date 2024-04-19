@@ -20,21 +20,25 @@
 	sfsign
 
 	Description:
-	This subroutine will search for numeric sign character
+	This subroutine will search for a numeric sign character
 	(these are either '+' or '-') and skip over any white-space
-	before the sign character.
+	before the sign character.  It then returns the c-string
+	found *after* the sign character (found above).
 
 	Synopsis:
 	int sfsign(cchar *sp,int sl,cchar **rpp,bool *bp) noex
 
 	Arguments:
-	sp		base string pointer
-	sl		base string length
+	sp		base source c-string pointer
+	sl		base source c-string length
 	rpp		pointer to result pointer to store found value
 	bp		pointer to boolen to hold sign-result
 
 	Returns:
 	>=0		length of c-string after any found sign character
+
+	Notes:
+	This subroutine returns the string found *after* the search item.
 
 *******************************************************************************/
 

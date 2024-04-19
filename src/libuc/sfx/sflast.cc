@@ -42,7 +42,6 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<char.h>
 
 #include	"sfx.h"
 

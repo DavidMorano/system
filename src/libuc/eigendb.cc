@@ -139,7 +139,7 @@ static int eigendb_magic(eigendb *op,Args ... args) noex {
 /* end subroutine (eigendb_magic) */
 
 static int	eigendb_fileparse(eigendb *,cchar *) noex ;
-static int	eigendb_fileparseread(eigendb *,int,int) noex ;
+static int	eigendb_fileparsereg(eigendb *,int,int) noex ;
 static int	eigendb_fileparsemap(eigendb *,int,int) noex ;
 
 
@@ -350,7 +350,7 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	                if (S_ISREG(sb.st_mode) && (fsize <= mfsize)) {
 	                    rs = eigendb_fileparsemap(op,fd,fsz) ;
 	                } else {
-	                    rs = eigendb_fileparseread(op,fd,fsz) ;
+	                    rs = eigendb_fileparsereg(op,fd,fsz) ;
 			}
 		    } /* end if (non-zero positive) */
 	 	} else {
@@ -364,7 +364,7 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 }
 /* end subroutine (eigendb_fileparse) */
 
-static int eigendb_fileparseread(eigendb *op,int fd,int fsize) noex {
+static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
 	linebuffer	lb ;
 	cint		to = TO_READ ;
 	int		rs ;
@@ -423,7 +423,7 @@ static int eigendb_fileparseread(eigendb *op,int fd,int fsize) noex {
 	} /* end if (linebuffer) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (eigendb_fileparseread) */
+/* end subroutine (eigendb_fileparsereg) */
 
 static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	cnullptr	np{} ;

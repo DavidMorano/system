@@ -1,7 +1,7 @@
 /* sfwhitedot SUPPORT */
 /* lang=C++20 */
 
-/* get a substring present before the first dot */
+/* get a substring present *before* the first dot */
 /* version %I% last-modified %G% */
 
 
@@ -21,7 +21,7 @@
 	sfwhitedot
 
 	Description:
-	This subroutine retrieves the substring before the first
+	This subroutine retrieves the substring *before* the first
 	dot character.
 
 	Synopsis:
@@ -51,10 +51,26 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef charp (*strxchr_f)(cchar *,int,int) noex ;
+
+
 /* external subroutines */
 
 
 /* local structures */
+
+namespace {
+    struct sub_sfxchr {
+	strxchr_f	fun ;
+	sub_sfxchr(strxchr_f f) noex : fun(f) { } ;
+	int operator () (cchar *,int,int,cchar **) noex ;
+    } ; /* end struct (sub_sfxchr) */
+}
 
 
 /* forward references */
@@ -68,7 +84,25 @@
 
 /* exported subroutines */
 
+int sfochr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+	sub_sfxchr	so(strnochr) ;
+	return so(sp,sl,sch,rpp) ;
+}
+
+int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+	sub_sfxchr	so(strnrchr) ;
+	return so(sp,sl,sch,rpp) ;
+}
+
 int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
+	return sfochr(sp,sl,'.',rpp) ;
+}
+/* end subroutine (sfwhitedot) */
+
+
+/* local subroutines */
+
+int sub_sfxchr::operator () (cchar *sp,int sl,int sch,cchar **rpp) noex {
 	int		rl = -1 ;
 	cchar		*rp = nullptr ;
 	if (sl < 0) sl = strlen(sp) ;
@@ -77,7 +111,7 @@ int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    }
-	    if (cchar *tp ; (tp = strnchr(sp,sl,'.')) != nullptr) {
+	    if (cchar *tp ; (tp = fun(sp,sl,sch)) != nullptr) {
 	        sl = (tp - sp) ;
 		rp = sp ;
 	    }
@@ -89,6 +123,6 @@ int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex {
 	if (rpp) *rpp = rp ;
 	return rl ;
 }
-/* end subroutine (sfwhitedot) */
+/* end method (sub_sfxchr::operator) */
 
 

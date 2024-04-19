@@ -35,7 +35,6 @@ extern int sialnum(cchar *,int) noex ;
 extern int sidquote(cchar *,int) noex ;
 extern int sibasename(cchar *,int) noex ;
 extern int sibreak(cchar *,int,cchar *) noex ;
-extern int sibrk(cchar *,int,cchar *) noex ;
 extern int sicasesub(cchar *,int,cchar *) noex ;
 extern int sihyphen(cchar *,int) noex ;
 extern int siskipwhite(cchar *,int) noex ;
@@ -47,6 +46,9 @@ extern int siterm(cchar *,int,cchar *) noex ;
 
 static inline int sichr(cchar *sp,int sl,int sch) noex {
 	return siochr(sp,sl,sch) ;
+}
+static inline int sibrk(cchar *sp,int sl,cchar *ss) noex {
+	return sibreak(sp,sl,ss) ;
 }
 
 EXTERNC_end
