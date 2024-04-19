@@ -140,7 +140,6 @@ extern int	getuserhome(char *,int,cchar *) ;
 extern int	getgid_group(cchar *,int) ;
 extern int	mkuserpath(char *,cchar *,cchar *,int) ;
 extern int	vecstr_envset(vecstr *,cchar *,cchar *,int) ;
-extern int	msleep(int) ;
 extern int	haslc(cchar *,int) ;
 extern int	hasuc(cchar *,int) ;
 extern int	hasalldig(cchar *,int) ;
@@ -172,11 +171,11 @@ extern cchar	**environ ;
 
 struct statmsg_mapdir {
 	LOCKRW		rwm ;
-	cchar	*username ;
-	cchar	*userhome ;
-	cchar	*admin ;
-	cchar	*dirname ;	/* raw */
-	cchar	*dname ;	/* expanded */
+	cchar		*username ;
+	cchar		*userhome ;
+	cchar		*admin ;
+	cchar		*dirname ;	/* raw */
+	cchar		*dname ;	/* expanded */
 } ;
 
 
@@ -280,11 +279,12 @@ enum envstrs {
 static cchar	*envpre = "STATMSG_" ;	/* environment prefix */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int statmsg_open(STATMSG *op,cchar username[])
-{
+int statmsg_open(STATMSG *op,cchar *username) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 
@@ -301,7 +301,7 @@ int statmsg_open(STATMSG *op,cchar username[])
 	debugprintf("statmsg_open: sizeof(STATMSG)=%u\n",sizeof(STATMSG)) ;
 #endif
 
-	memset(op,0,sizeof(STATMSG)) ;
+	memclear(op) ;
 	op->fe = STATMSG_DIRSFNAME ;
 
 	if ((rs = ptm_create(&op->m,NULL)) >= 0) {

@@ -4,7 +4,6 @@
 /* keysym name-value database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -31,9 +30,12 @@
 #include	<estrings.h>
 #include	<mapstrint.h>
 #include	<bfile.h>
+#include	<cfnum.h>
 #include	<ascii.h>
 #include	<sfx.h>
+#include	<strwcpy.h>
 #include	<char.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"keysymer.h"
@@ -47,41 +49,6 @@
 
 /* external subroutines */
 
-#if	defined(BSD) && (! defined(EXTERN_STRNCASECMP))
-extern int	strncasecmp(const char *,const char *,int) ;
-#endif
-
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath2w(char *,const char *,const char *,int) ;
-extern int	sfshrink(cchar *,int,cchar **) ;
-extern int	cfnumi(const char *,int,int *) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	strwcmp(cchar *,cchar *,int) ;
-extern int	hasuc(const char *,int) ;
-extern int	isdigitlatin(int) ;
-extern int	isalphalatin(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strlinelen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpyblanks(char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strwcpyuc(char *,const char *,int) ;
-extern char	*strncpylc(char *,const char *,int) ;
-extern char	*strncpyuc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
-extern char	*strnrpbrk(const char *,int,const char *) ;
-
 
 /* external variables */
 
@@ -91,23 +58,24 @@ extern char	*strnrpbrk(const char *,int,const char *) ;
 
 /* forward references */
 
-static int keysymer_parse(KEYSYMER *,const char *) ;
-static int keysymer_parseline(KEYSYMER *,const char *,int) ;
-static int keysymer_process(KEYSYMER *,const char *,int,int) ;
-static int keysymer_finishthem(KEYSYMER *) ;
-static int keysymer_seen(KEYSYMER *,const char *,int,int *) ;
+static int keysymer_parse(keysymer *,cchar *) noex ;
+static int keysymer_parseline(keysymer *,cchar *,int) noex ;
+static int keysymer_process(keysymer *,cchar *,int,int) noex ;
+static int keysymer_finishthem(keysymer *) noex ;
+static int keysymer_seen(keysymer *,cchar *,int,int *) noex ;
 
-static int cfliteral(const char *,int,int *) ;
+static int cfliteral(cchar *,int,int *) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int keysymer_open(KEYSYMER *op,cchar *pr)
-{
+int keysymer_open(keysymer *op,cchar *pr) noex {
 	int		rs = SR_OK ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
@@ -140,19 +108,13 @@ int keysymer_open(KEYSYMER *op,cchar *pr)
 }
 /* end subroutine (keysymer_open) */
 
-
-int keysymer_close(KEYSYMER *op)
-{
+int keysymer_close(keysymer *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != KEYSYMER_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("keysymer_close: ent\n") ;
-#endif
 
 	rs1 = keysymer_finishthem(op) ;
 	if (rs >= 0) rs = rs1 ;
@@ -165,9 +127,7 @@ int keysymer_close(KEYSYMER *op)
 }
 /* end subroutine (keysymer_close) */
 
-
-int keysymer_count(KEYSYMER *op)
-{
+int keysymer_count(keysymer *op) noex {
 	int		rs = SR_OK ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -180,9 +140,7 @@ int keysymer_count(KEYSYMER *op)
 }
 /* end subroutine (keysymer_count) */
 
-
-int keysymer_lookup(KEYSYMER *op,cchar *kp,int kl)
-{
+int keysymer_lookup(keysymer *op,cchar *kp,int kl) noex {
 	int		rs = SR_OK ;
 	int		v = 0 ;
 	char		knbuf[KEYSYMER_NAMELEN + 1] ;
@@ -201,23 +159,13 @@ int keysymer_lookup(KEYSYMER *op,cchar *kp,int kl)
 	    kp = knbuf ;
 	}
 
-#if	CF_DEBUGS
-	debugprintf("keysymer_lookup: k=%t\n",kp,kl) ;
-#endif
-
 	rs = mapstrint_fetch(&op->map,kp,kl,NULL,&v) ;
-
-#if	CF_DEBUGS
-	debugprintf("keysymer_lookup: ret rs=%d v=%u\n",rs,v) ;
-#endif
 
 	return (rs >= 0) ? v : rs ;
 }
 /* end subroutine (keysymer_lookup) */
 
-
-int keysymer_curbegin(KEYSYMER *op,KEYSYMER_CUR *curp)
-{
+int keysymer_curbegin(keysymer *op,KEYSYMER_CUR *curp) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -231,9 +179,7 @@ int keysymer_curbegin(KEYSYMER *op,KEYSYMER_CUR *curp)
 }
 /* end subroutine (keysymer_curbegin) */
 
-
-int keysymer_curend(KEYSYMER *op,KEYSYMER_CUR *curp)
-{
+int keysymer_curend(keysymer *op,KEYSYMER_CUR *curp) noex {
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -247,13 +193,11 @@ int keysymer_curend(KEYSYMER *op,KEYSYMER_CUR *curp)
 }
 /* end subroutine (keysymer_curend) */
 
-
-int keysymer_enum(KEYSYMER *op,KEYSYMER_CUR *curp,KEYSYMER_KE *rp)
-{
+int keysymer_enum(keysymer *op,KEYSYMER_CUR *curp,KEYSYMER_KE *rp) noex {
 	int		rs ;
 	int		nl = 0 ;
 	int		v ;
-	const char	*np = NULL ;
+	cchar	*np = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -278,9 +222,7 @@ int keysymer_enum(KEYSYMER *op,KEYSYMER_CUR *curp,KEYSYMER_KE *rp)
 
 /* private subroutines */
 
-
-static int keysymer_parse(KEYSYMER *op,cchar *fname)
-{
+static int keysymer_parse(keysymer *op,cchar *fname) noex {
 	bfile		dfile, *dfp = &dfile ;
 	int		rs ;
 	int		rs1 ;
@@ -289,10 +231,10 @@ static int keysymer_parse(KEYSYMER *op,cchar *fname)
 	if (fname == NULL) return SR_FAULT ;
 
 	if ((rs = bopen(dfp,fname,"r",0666)) >= 0) {
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		sl ;
-	    const char	*sp ;
+	    cchar	*sp ;
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    while ((rs = breadln(dfp,lbuf,llen)) > 0) {
@@ -315,27 +257,16 @@ static int keysymer_parse(KEYSYMER *op,cchar *fname)
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (open-file) */
 
-#if	CF_DEBUGS
-	debugprintf("keysymer_parse: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (keysymer_parse) */
 
-
-static int keysymer_parseline(KEYSYMER *op,cchar *lp,int ll)
-{
+static int keysymer_parseline(keysymer *op,cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		c = 0 ;
 
 	if (ll < 0) ll = strlen(lp) ;
-
-#if	CF_DEBUGS
-	debugprintf("keysymer_parseline: l=>%t<\n",
-		lp,strlinelen(lp,ll,40)) ;
-#endif
 
 	if ((ll > 1) && (lp[0] == '#')) {
 	    int		sl = (ll-1) ;
@@ -350,24 +281,16 @@ static int keysymer_parseline(KEYSYMER *op,cchar *lp,int ll)
 			cchar	*tp ;
 		        if ((tp = strnchr(cp,cl,'_')) != NULL) {
 		            if (strncmp("KEYSYM",cp,(tp-cp)) == 0) {
-				const int	kl = ((cp+cl) - (tp+1)) ;
+				cint	kl = ((cp+cl) - (tp+1)) ;
 			        int		nl ;
 				cchar		*kp = (tp+1) ;
 				cchar		*np ;
 				if (strncasecmp("include",cp,cl) != 0) {
 
-#if	CF_DEBUGS
-	debugprintf("keysymer_parseline: k=>%t<\n",kp,kl) ;
-#endif
-
 	sl -= ((cp + cl) - sp) ;
 	sp = (cp + cl) ;
 	if ((nl = nextfield(sp,sl,&np)) > 0) {
 		int		kn ;
-
-#if	CF_DEBUGS
-	debugprintf("keysymer_parseline: n=>%t<\n",np,nl) ;
-#endif
 
 	if (np[0] == CH_SQUOTE) {
 	    rs1 = cfliteral(np,nl,&kn) ;
@@ -376,10 +299,6 @@ static int keysymer_parseline(KEYSYMER *op,cchar *lp,int ll)
 	} else {
 	    rs1 = cfnumi(np,nl,&kn) ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("keysymer_parseline: mid rs1=%d kn=%d\n",rs1,kn) ;
-#endif
 
 	if (rs1 >= 0) {
 	    rs = keysymer_process(op,kp,kl,kn) ;
@@ -396,17 +315,11 @@ static int keysymer_parseline(KEYSYMER *op,cchar *lp,int ll)
 	    } /* end if (deine-key) */
 	} /* end if (pound) */
 
-#if	CF_DEBUGS
-	debugprintf("keysymer_parseline: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (keysymer_parseline) */
 
-
-static int keysymer_process(KEYSYMER *op,cchar *kp,int kl,int kn)
-{
+static int keysymer_process(keysymer *op,cchar *kp,int kl,int kn) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	char		knbuf[KEYSYMER_NAMELEN + 1] ;
@@ -423,20 +336,16 @@ static int keysymer_process(KEYSYMER *op,cchar *kp,int kl,int kn)
 }
 /* end subroutine (keysymer_process) */
 
-
-static int keysymer_finishthem(KEYSYMER *op)
-{
+static int keysymer_finishthem(keysymer *op) noex {
 	if (op == NULL) return SR_FAULT ;
 	return SR_OK ; /* nothing to do */
 }
 /* end subroutine (keysymer_finishthem) */
 
-
-static int keysymer_seen(KEYSYMER *op,cchar *np,int nl,int *rp)
-{
+static int keysymer_seen(keysymer *op,cchar *np,int nl,int *rp) noex {
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
-	const char	*tp ;
+	cchar	*tp ;
 
 	if (nl < 0) nl = strlen(np) ;
 
@@ -445,27 +354,22 @@ static int keysymer_seen(KEYSYMER *op,cchar *np,int nl,int *rp)
 	    cchar	*kp = (tp + 1) ;
 	    char	knbuf[KEYSYMER_NAMELEN + 1] ;
 	    if (hasuc(kp,kl)) {
-	        const int	ml = MIN(kl,KEYSYMER_NAMELEN) ;
+	        cint	ml = MIN(kl,KEYSYMER_NAMELEN) ;
 	        kl = strwcpylc(knbuf,kp,ml) - knbuf ;
 	        kp = knbuf ;
 	    }
 	    rs = mapstrint_fetch(&op->map,kp,kl,NULL,&v) ;
 	}
 
-	if (rp != NULL)
+	if (rp) {
 	    *rp = (rs >= 0) ? v : 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("keysymer_seen: rs=%d\n",rs) ;
-#endif
+	}
 
 	return rs ;
 }
 /* end subroutine (keysymer_seen) */
 
-
-static int cfliteral(cchar *np,int nl,int *rp)
-{
+static int cfliteral(cchar *np,int nl,int *rp) noex {
 	int		rs = SR_INVALID ;
 	int		v = 0 ;
 
@@ -483,8 +387,9 @@ static int cfliteral(cchar *np,int nl,int *rp)
 	    }
 	}
 
-	if (rp != NULL)
+	if (rp) {
 	    *rp = (rs >= 0) ? v : 0 ;
+	}
 
 	return rs ;
 }

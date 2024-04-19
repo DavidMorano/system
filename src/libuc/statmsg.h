@@ -1,17 +1,21 @@
-/* statmsg */
+/* statmsg HEADER */
+/* lang=C20 */
+
+/* object to help (manage) STATMSG messages */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	STATMSG_INCLUDE
-#define	STATMSG_INCLUDE	1
+#define	STATMSG_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<sys/param.h>
-
+#include	<sys/types.h>		/* |uid_t| + |gid_t| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<ptm.h>
 #include	<lockrw.h>
 #include	<paramfile.h>
@@ -21,12 +25,12 @@
 
 #define	STATMSG_MAGIC	0x75648942
 #define	STATMSG		struct statmsg_head
-#define	STATMSG_ID	struct statmsg_id
-#define	STATMSG_MAPPER	struct statmsg_mapper
+#define	STATMSG_ID	struct statmsg_ident
+#define	STATMSG_MAP	struct statmsg_mapper
 #define	STATMSG_FL	struct statmsg_flags
 
 
-struct statmsg_id {
+struct statmsg_ident {
 	cchar		*groupname ;
 	cchar		*username ;
 	uid_t		uid ;
@@ -35,8 +39,8 @@ struct statmsg_id {
 
 struct statmsg_mapper {
 	uint		magic ;
-	LOCKRW		rwm ;
-	PARAMFILE	dirsfile ;
+	lockrw		rwm ;
+	paramfile	dirsfile ;
 	vechand		mapdirs ;
 	cchar		*username ;
 	cchar		*userhome ;
@@ -50,7 +54,7 @@ struct statmsg_flags {
 } ;
 
 struct statmsg_check {
-	PTM		m ;
+	ptm		m ;
 	time_t		ti_lastcheck ;	/* needs mutex protection */
 	int		nmaps ;
 } ;
@@ -58,8 +62,8 @@ struct statmsg_check {
 struct statmsg_head {
 	uint		magic ;
 	STATMSG_FL	f ;
-	STATMSG_MAPPER	mapper ;
-	PTM		m ;		/* this is for all of the data */
+	STATMSG_MAP	mapper ;
+	ptm		m ;		/* this is for all of the data */
 	cchar		**envv ;
 	cchar		*useralloc ;
 	cchar		*username ;
@@ -70,26 +74,23 @@ struct statmsg_head {
 	int		nenv ;
 } ;
 
+typedef	STATMSG		statmsg ;
+typedef	STATMSG_ID	statmsg_id ;
+typedef	STATMSG_MAP	statmsg_map ;
+typedef	STATMSG_FL	statmsg_fl ;
 
-#if	(! defined(STATMSG_MASTER)) || (STATMSG_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int statmsg_open(statmsg *,cchar *) noex ;
+extern int statmsg_check(statmsg *,time_t) noex ;
+extern int statmsg_process(statmsg *,cchar *,cchar **,cchar *,int) noex ;
+extern int statmsg_processid(statmsg *,statmsg_id *,cchar **,cchar *,int) noex ;
+extern int statmsg_close(statmsg *) noex ;
 
-extern int	statmsg_open(STATMSG *,cchar *) ;
-extern int	statmsg_check(STATMSG *,time_t) ;
-extern int	statmsg_process(STATMSG *,cchar *,cchar **,cchar *,int) ;
-extern int	statmsg_processid(STATMSG *,STATMSG_ID *,cchar **,cchar *,int) ;
-extern int	statmsg_close(STATMSG *) ;
+extern int statmsgid_load(statmsg_id *,cchar *,cchar *,uid_t,gid_t) noex ;
 
-extern int	statmsgid_load(STATMSG_ID *,cchar *,cchar *,uid_t,gid_t) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* STATMSG_MASTER */
 
 #endif /* STATMSG_INCLUDE */
 
