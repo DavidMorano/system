@@ -37,7 +37,7 @@
 
 	Returns:
 	>=0		count of environment variables
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 

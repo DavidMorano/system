@@ -32,8 +32,14 @@
 	int dater_getbbtime(dater *dp,cchar *sp,int sl,time_t *tp) noex
 
 	Arguments:
+	dp	DATER object pointer
+	sp	source c-string pointer
+	sl	source c-string length
+	tp	result time
 
 	Returns:
+	>=0	OK
+	<0	error code (system-return)
 
 *******************************************************************************/
 

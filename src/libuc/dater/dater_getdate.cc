@@ -17,8 +17,23 @@
 
 /*******************************************************************************
  
-	This subroutine is a method of the DATER object. It creates
+	Name:
+	dater_getdate
+
+	Description:
+	This subroutine is a method of the DATER object.  It creates
 	a DATE object from the DATER object.
+
+	Synopsis:
+	int dater_getdate(dater *dp,date *dop) noex
+
+	Arguments:
+	dp	DATER object pointer
+	dop	pointer to result DATE object
+
+	Returns:
+	>=0	OK
+	<0	error code (system-return)
 
 *******************************************************************************/
 
@@ -57,15 +72,12 @@
 int dater_getdate(dater *dp,date *dop) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,dop)) >= 0) {
-	    rs = SR_NOTOPEN ;
-	    if (dp->magic == DATER_MAGIC) {
-	        time_t	t = dp->b.time ;
-	        int	zoff = dp->b.timezone ;
-	        int	isdst = dp->b.dstflag ;
-	        int	zl = DATER_ZNAMELEN ;
-	        cchar	*zp = dp->zname ;
-	        rs = date_start(dop,t,zoff,isdst,zp,zl) ;
-	    } /* end if (valid) */
+	    const time_t	t = dp->b.time ;
+	    cint	zoff = dp->b.timezone ;
+	    cint	isdst = dp->b.dstflag ;
+	    cint	zl = DATER_ZNAMELEN ;
+	    cchar	*zp = dp->zname ;
+	    rs = date_start(dop,t,zoff,isdst,zp,zl) ;
 	} /* end if (magic) */
 	return rs ;
 }

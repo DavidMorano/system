@@ -22,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<cstddef>		/* |nullptr_t| */
@@ -36,7 +35,9 @@
 #include	<naturalwords.h>
 #include	<intceil.h>
 #include	<strn.h>
+#include	<sfx.h>
 #include	<strwcpyx.h>
+#include	<linebuffer.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -364,26 +365,25 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 /* end subroutine (eigendb_fileparse) */
 
 static int eigendb_fileparseread(eigendb *op,int fd,int fsize) noex {
-	filer		fb ;
+	linebuffer	lb ;
 	cint		to = TO_READ ;
 	int		rs ;
-	int		bufsize = 0 ;
+	int		rs1 ;
+	int		bsize = 0 ;
 	int		c = 0 ;
-
 	if (fsize >= 0) {
-	    bufsize = iceil(fsize,1024) ;
+	    bsize = iceil(fsize,1024) ;
 	}
-	if ((rs = filer_start(&fb,fd,0L,bufsize,0)) >= 0) {
-	    cint	llen = MAXPATHLEN ;
+	if ((rs = lb.start) >= 0) {
+	filer		fb ;
+	if ((rs = filer_start(&fb,fd,0L,bsize,0)) >= 0) {
+	    cint	llen = lb.llen ;
 	    int		len ;
 	    int		sl, cl ;
 	    int		f_bol, f_eol ;
 	    cchar	*tp, *sp ;
 	    cchar	*cp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-/* read the file */
-
+	    char	*lbuf = lb.lbuf ;
 	    f_bol = true ;
 	    while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
 	        len = rs ;
@@ -402,29 +402,25 @@ static int eigendb_fileparseread(eigendb *op,int fd,int fsize) noex {
 		}
 
 	        if ((len > 0) && f_bol) {
-
 	            sp = lbuf ;
 	            sl = len ;
-	            while ((cl = nextfield(sp,sl,&cp)) > 0) {
-
+	            while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	                c += 1 ;
 	                rs = eigendb_addword(op,cp,cl) ;
-
 	                sl -= ((cp + cl) - sp) ;
 	                sp = (cp + cl) ;
-
 	                if (rs < 0) break ;
 	            } /* end while (words) */
-
 	        } /* end if (line w/ feasible data) */
-
 	        f_bol = f_eol ;
 	        if (rs < 0) break ;
 	    } /* end while (lines) */
-
-	    filer_finish(&fb) ;
-	} /* end if (filer-finish) */
-
+	    rs1 = filer_finish(&fb) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (filer) */
+	    rs1 = lb.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (linebuffer) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (eigendb_fileparseread) */
@@ -436,20 +432,18 @@ static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	int		rs1 ;
 	int		mp = PROT_READ ;
 	int		mf = MAP_SHARED ;
-	int		ll, cl ;
 	int		c = 0 ;
-	cchar		*tp ;
-	cchar		*lp ;
-	cchar		*cp ;
 	void		*md{} ;
 	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	    cchar	*tp ;
 	    char	*sp = charp(md) ;
 	    int		sl = int(ms) ;
-	    int		len ;
 	    while ((tp = strnpbrk(sp,sl,"\n#")) != np) {
-	        lp = sp ;
-	        ll = (tp - sp) ;
-	        len = ((tp + 1) - sp) ;
+	        cchar	*lp = sp ;
+		cchar	*cp ;
+	        int	ll = (tp - sp) ;
+		int	cl ;
+	        int	len = ((tp + 1) - sp) ;
 	        if (*tp == '#') {
 	            if ((tp = strnchr((tp+1),(sp+sl-(tp+1)),'\n')) != np) {
 	                len = ((tp + 1) - sp) ;

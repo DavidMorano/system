@@ -21,6 +21,7 @@
 /******************************************************************************
 
 	Name:
+	dater_setkey
 
 	Description:
 	This subroutine will parse out a date that has been specified
@@ -119,11 +120,11 @@ constexpr cpcchar	datetypes[] = {
 int dater_setkey(dater *dp,cc *dbuf,int dlen,TIMEB *nowp,cc *zn) noex {
 	int		rs ;
 	if ((rs = dater_magic(dp,dbuf,nowp,zn)) >= 0) {
-            int             tlen = 0 ;
-            int             ti = -1 ;
-            cchar           *tname = nullptr ;
-            cchar           *sp ;
-            cchar           *cp ;
+            int		tlen = 0 ;
+            int		ti = -1 ;
+            cchar	*tname = nullptr ;
+            cchar	*sp ;
+            cchar	*cp ;
     /* get the key name first (if it has one) */
             if ((cp = strchr(dbuf,'=')) != nullptr) {
                 sp = cp + 1 ;
@@ -169,9 +170,9 @@ int dater_setkey(dater *dp,cc *dbuf,int dlen,TIMEB *nowp,cc *zn) noex {
                 case datetype_current:
                 case datetype_now:
                     {
-                        time_t      t = nowp->time ;
-                        int         zoff = nowp->timezone ;
-                        int         isdst = nowp->dstflag ;
+                        const time_t	t = nowp->time ;
+                        cint	zoff = nowp->timezone ;
+                        cint	isdst = nowp->dstflag ;
                         rs = dater_settimezon(dp,t,zoff,zn,isdst) ;
                     }
                     break ;
