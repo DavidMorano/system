@@ -73,18 +73,23 @@
 
 int sif::next(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		cl = sl ;
+	int		rl = sl ;
+	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
 	    if (sstr) {
-		cl = 0 ;
+		rl = 0 ;
 	    } else if (sch) {
-		cl = 0 ;
+		rl = 0 ;
 	    } else {
-		cl = sfnext(sp,sl,rpp) ;
+		if ((rl = sfnext(sp,sl,&rp)) > 0) {
+		    sl -= ((rp + rl) - sp) ;
+		    sp = (rp + rl) ;
+		}
 	    }
+	    *rpp = rp ;
 	} /* end if (non-null) */
-	return (rs >= 0) ? cl : rs ;
+	return (rs >= 0) ? rl : rs ;
 }
 /* end method (sif::next) */
 

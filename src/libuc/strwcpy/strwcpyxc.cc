@@ -81,6 +81,9 @@ char *strwcpyxc(char *dp,cchar *sp,int sl) noex {
 /* end subroutine-template (strwcpyxc) */
 
 
+/* local variables */
+
+
 /* exported variables */
 
 

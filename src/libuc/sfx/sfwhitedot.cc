@@ -22,7 +22,9 @@
 
 	Description:
 	This subroutine retrieves the substring *before* the first
-	dot character.  The returned string is white-space shrunken.
+	dot character.  If there is no explict terminator (dot
+	character), an empty indication (result = 0) is returned.
+	The returned string is white-space shrunken.
 
 	Synopsis:
 	int sfwhitedot(cchar *sp,int sl,cchar **rpp) noex
@@ -35,6 +37,10 @@
 	Returns:
 	>=0		length of retrieved nodename
 	<0		error
+
+	Philosophy:
+	The terminator is *required* in order for a non-empty result
+	string to be returned.
 
 *******************************************************************************/
 

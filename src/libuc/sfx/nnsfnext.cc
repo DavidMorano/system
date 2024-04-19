@@ -85,6 +85,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>		/* <- for |strchr(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
@@ -97,11 +99,43 @@
 /* local defines */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
 /* external variables */
 
+
+/* local structures */
+
+namespace {
+   struct termobj {
+	virtual bool termx(int ch) noex {
+	    return (ch == 0) ;
+	} ;
+   } ;
+   struct sfnextx {
+	termobj		*tp ;
+	cchar		**rpp ;
+	cchar		*sp ;
+	int		sl ;
+	sfnextx(cchar *p,int l,cchar **r) noex : rpp(r), sp(p), sl(l) { } ;
+	int operator () (termobj *) noex ;
+	bool term(int ch) noex {
+	    bool	f = false ;
+	    ch &= UCHAR_MAX ;
+	    f = f || (ch == '\n') ;
+	    f = f || CHAR_ISWHITE(ch) ;
+	    f = f || tp->termx(ch) ;
+	    return f ;
+	} ;
+   } ; /* end struct (sfnextx) */
+}
 
 /* forward references */
 
@@ -114,75 +148,64 @@
 
 /* exported subroutines */
 
-int sfnext(cchar *sp,int sl,cchar **spp) noex {
-	int		rl = 0 ;
-	if (sp && spp) {
-	    while (sl && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    *spp = sp ;
-	    while (sl && *sp) {
-		cint	ch = mkchar(*sp) ;
-		bool	f = false ;
-		f = f || (ch == '\n') ;
-		f = f || CHAR_ISWHITE(ch) ;
-		if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    rl = (sp - (*spp)) ;
-	} /* end if (non-null) */
-	return rl ;
+int sfnext(cchar *sp,int sl,cchar **rpp) noex {
+	sfnextx		sf(sp,sl,rpp) ;
+	termobj		to ;
+	return sf(&to) ;
 }
-/* end subroutine (sfnext) */
 
-int sfnextchr(cchar *sp,int sl,int sch,cchar **spp) noex {
-	int		rl = 0 ;
-	if (sp && spp) {
-	    while (sl && CHAR_ISWHITE(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    *spp = sp ;
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-		bool	f = false ;
-	        f = f || (ch == '\n') ;
-	        f = f || CHAR_ISWHITE(ch) ;
-	        f = f || (ch == sch) ;
-		if (f) break ;
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    rl = (sp - (*spp)) ;
-	} /* end if (non-null) */
-	return rl ;
+int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
+	struct eterm : termobj {
+	    int		sch ;
+	    eterm(int c) noex : sch(c) { } ;
+	    bool termx(int ch) noex override {
+		return (ch == sch) ;
+	    } ;
+	} ; /* end struct */
+	sfnextx		sf(sp,sl,rpp) ;
+	eterm		to(sch) ;
+	return sf(&to) ;
 }
-/* end subroutine (sfnextchr) */
 
-int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **spp) noex {
+int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 	int		rl = 0 ;
-	if (sp && terms && spp) {
+	struct eterm : termobj {
+	    cchar	*terms ;
+	    eterm(cchar *t) noex : terms(t) { } ;
+	    bool termx (int ch) noex override {
+		return (strchr(terms,ch) != nullptr) ;
+	    } ;
+	} ; /* end struct */
+	if (terms) {
+	    sfnextx	sf(sp,sl,rpp) ;
+	    eterm	to(terms) ;
+	    rl = sf(&to) ;
+	} /* end if (non-null) */
+	return rl ;
+}
+
+
+/* local subroutines */
+
+int sfnextx::operator () (termobj *p) noex {
+	int		rl = 0 ;
+	cchar		*rp = nullptr ;
+	tp = p ;
+	if (sp && rpp) {
 	    while (sl && CHAR_ISWHITE(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    *spp = sp ;
-	    while (sl && *sp) {
-	        cint	ch = mkchar(*sp) ;
-		bool	f = false ;
-	        f = f || (ch == '\n') ;
-	        f = f || CHAR_ISWHITE(ch) ;
-		f = f || (strchr(terms,ch) != nullptr) ;
-		if (f) break ;
+	    rp = sp ;
+	    while (sl && *sp && (! term(*sp))) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    rl = (sp - (*spp)) ;
+	    rl = (sp - rp) ;
+	    *rpp = rp ;
 	} /* end if (non-null) */
 	return rl ;
 }
-/* end subroutine (sfnextbrk) */
+/* end subroutine (sfnextx:operator) */
 
 

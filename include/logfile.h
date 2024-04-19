@@ -20,6 +20,7 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<stdarg.h>		/* |va_list| */
+#include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
