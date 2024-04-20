@@ -53,21 +53,22 @@
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<char.h>
 #include	<mailmsgmatenv.h>
+#include	<mailmsgmathdr.h>
 #include	<mailmsg.h>
 #include	<mailmsg_enver.h>
 #include	<mailmsghdrs.h>
 #include	<ema.h>
 #include	<emainfo.h>
-#include	<dater.h>
+#include	<hdrextnum.h>
 #include	<mhcom.h>
 #include	<comparse.h>
+#include	<dater.h>
 #include	<logzones.h>
 #include	<nulstr.h>
 #include	<buffer.h>
 #include	<ascii.h>
-#include	<hdrextnum.h>
+#include	<char.h>
 #include	<hasx.h>
 #include	<localmisc.h>
 

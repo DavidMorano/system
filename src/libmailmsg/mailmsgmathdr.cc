@@ -37,7 +37,7 @@
 	Returns:
 	>0		yes-matched: length of found header-key
 	==0		no-match: did not get a match
-	<0		error (system-return)
+	<0		error code (system-return)
 
 	Design notes:
 
@@ -55,7 +55,6 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"mailmsgmathdr.h"
