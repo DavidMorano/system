@@ -234,105 +234,60 @@ int wordfill_mklinepart(wordfill *op,char *lbuf,int llen) noex {
 /* private subroutines */
 
 static int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-	int		ll ;
-	int		wl, nl ;
-	int		ql ;
-	int		c ;
-	int		f_give = f_part ;
 	int		tlen = 0 ;
-	char		*lp ;			/* pointer to write to */
-
-	if (op == NULL) return SR_FAULT ;
-	if (lbuf == NULL) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != WORDFILL_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (llen < 1) return SR_INVALID ;
-
-	if (! f_part) {
-
-#ifdef	COMMENT
-	    {
-	        int	i = 0 ;
-	        ql = 0 ;
-	        c = 0 ;
-	        while ((wl = fifostr_entlen(op->sqp,i)) >= 0) {
-	            if (wl >  0) {
-	                if (c++ > 0) ql += 1 ;
-	                ql += wl ; 
-		        if (ql >= (llen - 1)) {
-	                    f_give = true ; break ;
-	                }
-		    } /* end if (greater-than-zero) */
-		    i += 1 ;
-	        } /* end while */
-	    } /* end block */
-#else /* COMMENT */
-	    {
-	        ql = op->chrc ;
-	        if (op->wc > 0)
-		    ql += (op->wc - 1) ;
-
-	        if (ql >= (llen - 1))
-	            f_give = true ;
-	    } /* end block */
-#endif /* COMMENT */
-
-	} /* end if (not requested partial) */
-
-	if (f_give) {
-
-	    c = 0 ;
-	    lp = lbuf ;
-	    ll = llen ;
-	    while (ll > 0) {
-
-	        rs1 = fifostr_headlen(op->sqp) ;
-	        wl = rs1 ;
-
-	        if (rs1 == SR_NOTFOUND)
-	            break ;
-
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (llen >= 1) {
+	        int		ll ;
+	        int		wl, nl ;
+	        int		ql ;
+	        int		c ;
+	        int		f_give = f_part ;
+	        char		*lp ;		/* pointer to write to */
+		rs = SR_OK ;
+	        if (! f_part) {
+	            ql = op->chrc ;
+	            if (op->wc > 0) {
+		        ql += (op->wc - 1) ;
+		    }
+	            if (ql >= (llen - 1)) {
+	                f_give = true ;
+		    }
+	        } /* end if (not requested partial) */
+	        if (f_give) {
+	            c = 0 ;
+	            lp = lbuf ;
+	            ll = llen ;
+	            while (ll > 0) {
+	                rs1 = fifostr_headlen(op->sqp) ;
+	                wl = rs1 ;
+	                if (rs1 == SR_NOTFOUND) break ;
 /* ignore zero-length words */
-
-	        if (wl == 0) continue ;
-
+	                if (wl == 0) continue ;
 /* calculate needed-length ('nl') for this word */
-
-	        nl = (c > 0) ? (wl + 1) : wl ;
-
+	                nl = (c > 0) ? (wl + 1) : wl ;
 /* can this word fit in the current line? */
-
-	        if (nl > ll)
-	            break ;
-
+	                if (nl > ll) break ;
 /* yes: so remove the word from the FIFO to the line */
-
-	        if (c++ > 0) {
-	            *lp++ = ' ' ;
-	            ll -= 1 ;
-	        }
-
-	        rs = fifostr_remove(op->sqp,lp,ll) ;
-		if (rs >= 0) {
-		    op->wc -= 1 ;
-		    op->chrc -= wl ;
-		}
-
-	        lp += wl ;
-	        ll -= wl ;
-
-	        if (rs < 0) break ;
-	    } /* end while (getting words) */
-
-	    tlen = (llen - ll) ;
-
-	} /* end if (giving) */
-
+	                if (c++ > 0) {
+	                    *lp++ = ' ' ;
+	                    ll -= 1 ;
+	                }
+	                rs = fifostr_remove(op->sqp,lp,ll) ;
+		        if (rs >= 0) {
+		            op->wc -= 1 ;
+		            op->chrc -= wl ;
+		        }
+	                lp += wl ;
+	                ll -= wl ;
+	                if (rs < 0) break ;
+	            } /* end while (getting words) */
+	            tlen = (llen - ll) ;
+	        } /* end if (giving) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? tlen : rs ;
 }
 /* end subroutine (wordfill_mkline) */
