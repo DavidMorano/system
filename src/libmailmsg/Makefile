@@ -57,10 +57,10 @@ LDFLAGS= $(MAKELDFLAGS)
 
 OBJ0_LIBMAILMSG= mailmsgstage.o mailmsg.o msgentry.o mailbox.o
 OBJ1_LIBMAILMSG= mailmsgmatenv.o mailmsgmathdr.o
-OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o 
+OBJ2_LIBMAILMSG= mailmsghdrfold.o mailmsghdrval.o mailmsgheadkey.o
 OBJ3_LIBMAILMSG= mhcom.o mcmsg.o mimetypes.o hdrextnum.o contypevals.o
 OBJ4_LIBMAILMSG= emainfo.o hdrdecode.o
-OBJ5_LIBMAILMSG= mailmsgheadkey.o
+OBJ5_LIBMAILMSG= mbcache.o
 
 
 OBJA_LIBMAILMSG= obj0_mailmsg.o obj1_mailmsg.o

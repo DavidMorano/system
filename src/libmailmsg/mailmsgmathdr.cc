@@ -4,7 +4,6 @@
 /* match on a message header (returns the key-name) */
 /* version %I% last-modified %G% */
 
-#define	CF_SPACETAB	1		/* header whitespace is space-tab */
 #define	CF_ALT1		0		/* use alternative-1 */
 
 /* revision history:
@@ -54,7 +53,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<char.h>
 #include	<localmisc.h>
@@ -63,14 +62,6 @@
 
 
 /* local defines */
-
-#define	SPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
-
-#if	CF_SPACETAB
-#define	HEADERWHITE(c)	SPACETAB(c)
-#else
-#define	HEADERWHITE(c)	CHAR_ISWHITE(c)
-#endif
 
 #ifndef	CF_ALT1
 #define	CF_ALT1		0		/* use alternative-1 */
@@ -87,6 +78,10 @@
 
 
 /* forward references */
+
+static inline bool ishdrwht(int ch) noex {
+        return ((ch == ' ') || (ch == '\t')) ;
+}
 
 
 /* local variables */
@@ -115,20 +110,20 @@ int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
 	        while (tl) {
 	            cint	ch = *tp ;
 		    f = (ch == 0) ;
-	            f = f || HEADERWHITE(ch) ;
+	            f = f || ishdrwht(ch) ;
 	            f = f || (ch == ':') ;
 		    if (f) break ;
 	            tp += 1 ;
 	            tl -= 1 ;
 	        } /* end while */
 	    } else {
-	        while (tl && *tp && (! HEADERWHITE(*tp)) && (*tp != ':')) {
+	        while (tl && *tp && (! ishdrwht(*tp)) && (*tp != ':')) {
 	            tp += 1 ;
 	            tl -= 1 ;
 	        } /* end while */
 	    } /* end if-constexpr (f_alt) */
 	    kl = (tp - ts) ;
-	    while (tl && HEADERWHITE(*tp)) {
+	    while (tl && ishdrwht(*tp)) {
 	        tp += 1 ;
 	        tl -= 1 ;
 	    } /* end while */

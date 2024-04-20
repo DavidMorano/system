@@ -40,7 +40,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<unistd.h>
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -51,9 +50,6 @@
 
 
 /* local defines */
-
-#define	ISSPACETAB(c)	isspacetab(c)
-#define	ISKEYCHAR(c)	iskeychar(c)
 
 
 /* imported namespaces */
@@ -95,19 +91,19 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	    bool	f_len = (sl >= 0) ;
 	    rs = SR_OK ;
 /* skip leading white space (not including NLs) */
-	    while (((! f_len) || (sl > 0)) && ISSPACETAB(*sp)) {
+	    while (((! f_len) || (sl > 0)) && isspacetab(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
 	    *kpp = charp(sp) ;
 /* skip the non-white space */
-	    while ((((! f_len) && *sp) || (sl > 0)) && ISKEYCHAR(*sp)) {
+	    while ((((! f_len) && *sp) || (sl > 0)) && iskeychar(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
 	    kl = (sp - (*kpp)) ;
 /* skip any trailing whitespace */
-	    while (((! f_len) || (sl > 0)) && ISSPACETAB(*sp)) {
+	    while (((! f_len) || (sl > 0)) && isspacetab(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
