@@ -12,8 +12,10 @@
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<msfile.h>
 #include	<localmisc.h>
 
 
@@ -43,7 +45,7 @@ struct sysmiscs_head {
 	cchar		*nodename ;
 	cchar 		*dbname ;		/* DB-name */
 	cchar 		*dbfname ;		/* DB file-name */
-	MSFILE		ms ;
+	msfile		ms ;
 	time_t		ti_db ;			/* DB file modification */
 	time_t		ti_map ;		/* DB map */
 	time_t		ti_lastcheck ;		/* last check of file */

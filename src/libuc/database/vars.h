@@ -22,19 +22,17 @@
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<varhdr.h>		/* <- the money shot */
 #include	<localmisc.h>
-
-#include	"varhdr.h"		/* this is the hash-file-header */
 
 
 #define	VARS_MAGIC	0x88773421
 #define	VARS		struct vars_head
 #define	VARS_INFO	struct vars_information
-
-#define	VARS_OBJ	struct vars_obj
+#define	VARS_OBJ	struct vars_object
 #define	VARS_CUR	struct vars_cursor
-#define	VARS_FM		struct vars_fm
-#define	VARS_MI		struct vars_mi
+#define	VARS_FM		struct vars_fmap
+#define	VARS_MI		struct vars_mindex
 
 
 struct vars_information {
@@ -45,7 +43,7 @@ struct vars_information {
 } ;
 
 /* this is the shared-object description */
-struct vars_obj {
+struct vars_object {
 	cchar		*name ;
 	uint		objsize ;
 	uint		cursize ;
@@ -56,14 +54,14 @@ struct vars_cursor {
 	int		i ;
 } ;
 
-struct vars_fm {
+struct vars_fmap {
 	char		*mdata ;	/* file map */
 	time_t		ti_mod ;
 	time_t		ti_map ;
 	size_t		msize ;
 } ;
 
-struct vars_mi {
+struct vars_mindex {
 	int		(*rt)[2] ;	/* mapped record table */
 	int		(*it)[3] ;	/* mapped key-index table */
 	char		*kst ;		/* mapped key-string table */
@@ -80,6 +78,13 @@ struct vars_head {
 	int		ncursors ;
 } ;
 
+typedef	VARS		vars ;
+typedef	VARS_INFO	vars_info ;
+typedef	VARS_OBJ	vars_obj ;
+typedef	VARS_CUR	vars_cur ;
+typedef	VARS_FM		vars_fm ;
+typedef	VARS_MI		vars_mi ;
+
 EXTERNC_begin
 
 extern int	vars_open(vars *,cchar *) noex ;
@@ -88,7 +93,7 @@ extern int	vars_curbegin(vars *,vars_cur *) noex ;
 extern int	vars_fetch(vars *,cchar *,int,vars_cur *,char *,int) noex ;
 extern int	vars_enum(vars *,vars_cur *,char *,int,char *,int) noex ;
 extern int	vars_curend(vars *,vars_cur *) noex ;
-extern int	vars_info(vars *,vars_info *) noex ;
+extern int	vars_getinfo(vars *,vars_info *) noex ;
 extern int	vars_audit(vars *) noex ;
 extern int	vars_close(vars *) noex ;
 

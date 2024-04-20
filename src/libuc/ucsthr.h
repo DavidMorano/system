@@ -22,13 +22,16 @@
 #include	<usystem.h>
 
 
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+
+
 EXTERNC_begin
 
 typedef int (*shtr_sub)(void *) noex ;
 typedef void (*shtr_keyf)(void *) noex ;
 
 extern int uc_sthrcreate(caddr_t,size_t,sthr_sub,cvoid *,long) noex ;
-extern int uc_sthrexit(intex) noex ;
+extern int uc_sthrexit(int) noex ;
 extern int uc_sthrjoin(thread_t,int *) noex ;
 extern int uc_sthrsuspend(thread_t) noex ;
 extern int uc_sthrcontinue(thread_t) noex ;
@@ -46,6 +49,9 @@ extern int uc_sthrgetconcurrency() noex ;
 extern int uc_sthrsetconcurrency(int) noex ;
 
 EXTERNC_end
+
+
+#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
 #endif /* UCSTHR_INCLUDE */

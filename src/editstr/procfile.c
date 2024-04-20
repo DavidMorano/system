@@ -1,19 +1,17 @@
-/* procfile */
+/* procfile SUPPORT */
+/* lang=C++20 */
 
 /* process a file */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUG	0		/* time-time debug print-outs */
 
-
 /* revision history:
 
 	= 1996-03-01, David A­D­ Morano
-
-	The subroutine was adapted from others programs that did similar
-	types of functions.
-
+	The subroutine was adapted from others programs that did
+	similar types of functions.
 
 */
 
@@ -24,13 +22,9 @@
 	This subroutine provides the actual check and fix on the files
 	specified.
 
-
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<signal.h>
@@ -38,11 +32,11 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<paramopt.h>
 #include	<vecstr.h>
+#include	<mailmsgmathdr.h>
 #include	<localmisc.h>
 
 #include	"config.h"
@@ -58,17 +52,16 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matcasestr(const char **,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	mailmsgmathdr(const char *,int,int *) ;
-extern int	mktmpfile(char *,mode_t,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matcasestr(cchar **,cchar *,int) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	mktmpfile(char *,mode_t,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnrchr(const char *,int,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnrchr(cchar *,int,int) ;
 extern char	*timestr_logz(time_t,char *) ;
 
 
@@ -91,7 +84,7 @@ enum progmodes {
 	progmode_overlast
 } ;
 
-static const char	*leaders[] = {
+static cchar	*leaders[] = {
 	"TO",
 	"CC",
 	"BCC",
@@ -100,15 +93,15 @@ static const char	*leaders[] = {
 } ;
 
 
+/* exported variables */
 
 
-
-
+/* exported subroutines */
 
 int procfile(pip,pop,fname)
 struct proginfo	*pip ;
 PARAMOPT	*pop ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile	infile ;
 

@@ -1,13 +1,12 @@
-/* b_mxalias */
+/* b_mxalias SUPPORT */
+/* lang=C++20 */
 
 /* front-end subroutine */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* debug print-outs (non-switchable) */
 #define	CF_DEBUG	0		/* debug print-outs switchable */
 #define	CF_DEBUGMALL	1		/* debug memory-allocations */
-
 
 /* revision history:
 
@@ -24,12 +23,9 @@
 	corresponding values.
 
 	Synopsis:
-
 	$ mxalias <alias(es)>
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -43,14 +39,12 @@
 #include	<shell.h>
 #endif
 
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -60,6 +54,7 @@
 #include	<hdbstr.h>
 #include	<getusername.h>
 #include	<ucmallreg.h>
+#include	<sfx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -90,18 +85,18 @@
 
 /* external subroutines */
 
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	sfskipwhite(const char *,int,const char **) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	matostr(const char **,int,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	optbool(const char *,int) ;
-extern int	optvalue(const char *,int) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	sfskipwhite(cchar *,int,cchar **) ;
+extern int	matstr(cchar **,cchar *,int) ;
+extern int	matostr(cchar **,int,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	cfdecui(cchar *,int,uint *) ;
+extern int	optbool(cchar *,int) ;
+extern int	optvalue(cchar *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
-extern int	haswhite(const char *,int) ;
+extern int	haswhite(cchar *,int) ;
 extern int	isalphalatin(int) ;
 extern int	isdigitlatin(int) ;
 extern int	isFailOpen(int) ;
@@ -111,17 +106,17 @@ extern int	printhelp(void *,cchar *,cchar *,cchar *) ;
 extern int	proginfo_setpiv(PROGINFO *,cchar *,const struct pivars *) ;
 
 #if	CF_DEBUGS || CF_DEBUG
-extern int	debugopen(const char *) ;
-extern int	debugprintf(const char *,...) ;
+extern int	debugopen(cchar *) ;
+extern int	debugprintf(cchar *,...) ;
 extern int	debugclose() ;
-extern int	strlinelen(const char *,int,int) ;
+extern int	strlinelen(cchar *,int,int) ;
 #endif
 
 extern cchar	*getourenv(cchar **,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* external variables */
@@ -157,20 +152,20 @@ static int	usage(PROGINFO *) ;
 
 static int	procopts(PROGINFO *,KEYOPT *) ;
 static int	procargs(PROGINFO *,ARGINFO *,BITS *,cchar *,cchar *) ;
-static int	procname(PROGINFO *,SHIO *,const char *,int) ;
-static int	procmxdump(PROGINFO *,const char *) ;
+static int	procname(PROGINFO *,SHIO *,cchar *,int) ;
+static int	procmxdump(PROGINFO *,cchar *) ;
 static int	procmxprint(PROGINFO *,SHIO *,cchar *,cchar *) ;
 static int	procvalprint(PROGINFO *,SHIO *,cchar *,int) ;
 
 static int	locinfo_start(LOCINFO *,PROGINFO *) ;
 static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_outadd(LOCINFO *,const char *,int) ;
+static int	locinfo_outadd(LOCINFO *,cchar *,int) ;
 static int	locinfo_outprint(LOCINFO *,SHIO *) ;
 
 
 /* local variables */
 
-static const char	*argopts[] = {
+static cchar	*argopts[] = {
 	"ROOT",
 	"VERSION",
 	"DEBUG",
@@ -225,7 +220,7 @@ static const MAPEX	mapexs[] = {
 	{ 0, 0 }
 } ;
 
-static const char	*progopts[] = {
+static cchar	*progopts[] = {
 	"unresolved",
 	"addr",
 	"audit",
@@ -239,7 +234,7 @@ enum progopts {
 	progopt_overlast
 } ;
 
-static const char	blanks[] =
+static cchar	blanks[] =
 	"                    "
 	"                    " ;
 
@@ -254,7 +249,7 @@ int b_mxalias(int argc,cchar *argv[],void *contextp)
 	int		ex = EX_OK ;
 
 	if ((rs = lib_kshbegin(contextp,NULL)) >= 0) {
-	    const char	**envv = (const char **) environ ;
+	    cchar	**envv = (cchar **) environ ;
 	    ex = mainsub(argc,argv,envv,contextp) ;
 	    rs1 = lib_kshend() ;
 	    if (rs >= 0) rs = rs1 ;
@@ -300,16 +295,16 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		f_usage = FALSE ;
 	int		f_help = FALSE ;
 
-	const char	*argp, *aop, *akp, *avp ;
-	const char	*argval = NULL ;
-	const char	*pr = NULL ;
-	const char	*sn = NULL ;
-	const char	*afname = NULL ;
-	const char	*efname = NULL ;
-	const char	*ofname = NULL ;
-	const char	*dfname = NULL ;
-	const char	*un = NULL ;
-	const char	*cp ;
+	cchar	*argp, *aop, *akp, *avp ;
+	cchar	*argval = NULL ;
+	cchar	*pr = NULL ;
+	cchar	*sn = NULL ;
+	cchar	*afname = NULL ;
+	cchar	*efname = NULL ;
+	cchar	*ofname = NULL ;
+	cchar	*dfname = NULL ;
+	cchar	*un = NULL ;
+	cchar	*cp ;
 
 
 #if	CF_DEBUGS || CF_DEBUG
@@ -794,8 +789,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	        if (dfname != NULL) {
 	            rs = procmxdump(pip,dfname) ;
 	        } else {
-	            const char	*ofn = ofname ;
-	            const char	*afn = afname ;
+	            cchar	*ofn = ofname ;
+	            cchar	*afn = afname ;
 	            if (lip->f.addr) {
 	                if ((rs = hdbstr_start(&lip->addrs,10)) >= 0) {
 	                    lip->open.addr = TRUE ;
@@ -883,7 +878,7 @@ badprogstart:
 	        UCMALLREG_CUR	cur ;
 	        UCMALLREG_REG	reg ;
 	        const int	size = (10*sizeof(uint)) ;
-	        const char	*ids = "main" ;
+	        cchar	*ids = "main" ;
 	        uc_mallinfo(mi,size) ;
 	        debugprintf("b_mxalias: MIoutnum=%u\n",mi[ucmallreg_outnum]) ;
 	        debugprintf("b_mxalias: "
@@ -935,8 +930,8 @@ static int usage(PROGINFO *pip)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*pn = pip->progname ;
-	const char	*fmt ;
+	cchar	*pn = pip->progname ;
+	cchar	*fmt ;
 
 	if (pip->efp != NULL) {
 
@@ -1046,7 +1041,7 @@ static int procopts(PROGINFO *pip,KEYOPT *kop)
 	LOCINFO		*lip = (LOCINFO *) pip->lip ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cp = getourenv(pip->envv,VAROPTS)) != NULL) {
 	    rs = keyopt_loads(kop,cp,-1) ;
@@ -1131,7 +1126,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	    LOCINFO	*lip = (LOCINFO *) pip->lip ;
 	    int		pan = 0 ;
 	    int		cl ;
-	    const char	*cp ;
+	    cchar	*cp ;
 
 	    if (rs >= 0) {
 	        int	ai ;
@@ -1175,7 +1170,7 @@ static int procargs(PROGINFO *pip,ARGINFO *aip,BITS *bop,cchar *ofn,cchar *afn)
 	            const int	llen = LINEBUFLEN ;
 	            int		len ;
 	            int		sl ;
-	            const char	*tp, *sp ;
+	            cchar	*tp, *sp ;
 	            char	lbuf[LINEBUFLEN + 1] ;
 
 	            while ((rs = shio_readline(afp,lbuf,llen)) > 0) {
@@ -1398,7 +1393,7 @@ static int procvalprint(PROGINFO *pip,SHIO *ofp,cchar *vp,int vl)
 {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-	const char	*fmt ;
+	cchar	*fmt ;
 	char		spre[2] ;
 	char		ssuf[2] ;
 

@@ -4,7 +4,6 @@
 /* read or audit a VAR database */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 
 /* revision history:
 
@@ -74,35 +73,6 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	getpwd(char *,int) ;
-extern int	hasuc(const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-
-#if	CF_DEBUGS
-extern char	*timestr_log(time_t,char *) ;
-#endif
-
 
 /* external variables */
 
@@ -132,14 +102,14 @@ static int	vars_dbloadbegin(VARS *,time_t) ;
 static int	vars_dbloadend(VARS *) ;
 static int	vars_dbmapcreate(VARS *,time_t) ;
 static int	vars_dbmapdestroy(VARS *) ;
-static int	vars_filemapcreate(VARS *,VARS_FM *,const char *,time_t) ;
+static int	vars_filemapcreate(VARS *,VARS_FM *,cchar *,time_t) ;
 static int	vars_filemapdestroy(VARS *,VARS_FM *) ;
 static int	vars_dbproc(VARS *,time_t) ;
 static int	vars_viverify(VARS *,time_t) ;
 static int	vars_ouraudit(VARS *) ;
 
 static int	hashindex(uint,int) ;
-static int	ismatkey(const char *,const char *,int) ;
+static int	ismatkey(cchar *,cchar *,int) ;
 
 
 /* local variables */
@@ -157,10 +127,6 @@ int vars_open(VARS *op,cchar *dbname) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (dbname == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("vars_open: dbname=%s\n",dbname) ;
-#endif
-
 	if (dbname[0] == '\0') return SR_INVALID ;
 
 	memset(op,0,sizeof(VARS)) ;
@@ -177,7 +143,7 @@ int vars_open(VARS *op,cchar *dbname) noex {
 	        }
 	    }
 	    if (rs >= 0) {
-	    	const char	*cp ;
+	    	cchar	*cp ;
 	        if ((rs = uc_mallocstrw(dbname,pl,&cp)) >= 0) {
 	            op->dbname = cp ;
 		    if ((rs = vars_dbloadbegin(op,dt)) >= 0) {
@@ -191,10 +157,6 @@ int vars_open(VARS *op,cchar *dbname) noex {
 		} /* end if (memory-allocation) */
 	    } /* end if */
 	} /* end block */
-
-#if	CF_DEBUGS
-	debugprintf("vars_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -210,10 +172,6 @@ int vars_close(VARS *op)
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("vars_close: ent\n") ;
-#endif
-
 	rs1 = vars_dbloadend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
@@ -228,9 +186,7 @@ int vars_close(VARS *op)
 }
 /* end subroutine (vars_close) */
 
-
-int vars_info(VARS *op,VARS_INFO *vip)
-{
+int vars_getinfo(VARS *op,VARS_INFO *vip) noex {
 	VARS_FM		*fip ;
 	VARHDR		*hip ;
 	int		rs = SR_OK ;
@@ -240,7 +196,7 @@ int vars_info(VARS *op,VARS_INFO *vip)
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
 
-	memset(vip,0,sizeof(VARS_INFO)) ;
+	memclear(vip) ;
 
 	fip = &op->vf ;
 	hip = &op->ifi ;
@@ -268,10 +224,6 @@ int vars_audit(VARS *op)
 
 	rs = vars_ouraudit(op) ;
 
-#if	CF_DEBUGS
-	debugprintf("vars_audit: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (vars_audit) */
@@ -296,18 +248,10 @@ int vars_count(VARS *op)
 int vars_curbegin(VARS *op,VARS_CUR *curp)
 {
 
-#if	CF_DEBUGS
-	debugprintf("vars_curbegin: thinking about it\n") ;
-#endif
-
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
 
 	if (op->magic != VARS_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("vars_curbegin: ent\n") ;
-#endif
 
 	curp->i = 0 ;
 	curp->chash = 0 ;
@@ -350,9 +294,9 @@ int vars_fetch(VARS *op,cchar *kp,int kl,VARS_CUR *curp,char vbuf[],int vlen)
 	int		(*it)[3] ;
 	int		vl = 0 ;
 	int		f_mat = FALSE ;
-	const char	*kst, *vst ;
-	const char	*vp ;
-	const char	*cp ;
+	cchar	*kst, *vst ;
+	cchar	*vp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (kp == NULL) return SR_FAULT ;
@@ -483,7 +427,7 @@ int vars_enum(VARS *op,VARS_CUR *curp,char *kbuf,int klen,char *vbuf,int vlen)
 	uint		ri, ki, vi ;
 	int		rs = SR_OK ;
 	int		vl = 0 ;
-	const char	*kp, *vp ;
+	cchar	*kp, *vp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -566,7 +510,7 @@ static int vars_dbloadend(VARS *op)
 static int vars_dbmapcreate(VARS *op,time_t dt)
 {
 	int		rs ;
-	const char	*end = ENDIANSTR ;
+	cchar	*end = ENDIANSTR ;
 	char		tmpfname[MAXPATHLEN + 1] ;
 
 	if ((rs = mkfnamesuf2(tmpfname,op->dbname,FE_VI,end)) >= 0) {
@@ -657,10 +601,6 @@ static int vars_dbproc(VARS *op,time_t dt)
 	    } /* end if (vars_viverify) */
 	} /* end if (varhdr) */
 
-#if	CF_DEBUGS
-	debugprintf("vars_dbproc: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (vars_dbproc) */
@@ -678,21 +618,7 @@ static int vars_viverify(VARS *op,time_t dt)
 
 	f = f && (hip->fsize == fip->msize) ;
 
-#if	CF_DEBUGS
-	debugprintf("vars_viverify: fsize=%u f=%u\n",
-	    hip->fsize,f) ;
-#endif
-
 	f = f && (hip->wtime > 0) && (hip->wtime <= (utime + SHIFTINT)) ;
-
-#if	CF_DEBUGS
-	{
-	    char	tbuf[TIMEBUFLEN + 1] ;
-	    time_t	t = (time_t) hip->wtime ;
-	    timestr_log(t,tbuf) ;
-	    debugprintf("vars_viverify: wtime=%s f=%u\n",tbuf,f) ;
-	}
-#endif
 
 	f = f && (hip->ksoff <= fip->msize) ;
 	f = f && ((hip->ksoff + hip->kslen) <= fip->msize) ;
@@ -712,19 +638,10 @@ static int vars_viverify(VARS *op,time_t dt)
 
 	f = f && (hip->nvars == (hip->rtlen - 1)) ;
 
-#if	CF_DEBUGS
-	debugprintf("vars_viverify: nvars=%u rtlen=%u\n",
-	    hip->nvars,hip->rtlen) ;
-#endif
-
 /* get out */
 
 	if (! f)
 	    rs = SR_BADFMT ;
-
-#if	CF_DEBUGS
-	debugprintf("vars_viverify: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -742,8 +659,8 @@ static int vars_ouraudit(VARS *op)
 	int		cl ;
 	int		(*rt)[2] ;
 	int		(*it)[3] ;
-	const char	*kst ;
-	const char	*cp ;
+	cchar	*kst ;
+	cchar	*cp ;
 
 	rt = mip->rt ;
 	it = mip->it ;
@@ -778,10 +695,6 @@ static int vars_ouraudit(VARS *op)
 
 	    if (rs < 0) break ;
 	} /* end for (record table entries) */
-
-#if	CF_DEBUGS
-	debugprintf("vars_ouraudit: RT rs=%d\n",rs) ;
-#endif
 
 /* index table */
 
@@ -820,10 +733,6 @@ static int vars_ouraudit(VARS *op)
 	    } /* end if */
 
 	} /* end for (index table entries) */
-
-#if	CF_DEBUGS
-	debugprintf("vars_ouraudit: IT rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }

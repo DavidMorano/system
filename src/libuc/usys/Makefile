@@ -2,7 +2,7 @@
 
 T= usys
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR= $(REPOROOT)/bin
@@ -22,10 +22,10 @@ CPP= cpp
 CC= gcc
 CXX= gpp
 LD= gld
-RANLIB= $(CGS_GRANLIB)
-AR= $(CGS_GAR)
-NM= $(CGS_GNM)
-COV= $(CGS_GCOV)
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
@@ -35,7 +35,7 @@ TOUCH= touch
 LINT= lint
 
 
-DEFS=
+DEFS +=
 
 
 INCS= usys.h

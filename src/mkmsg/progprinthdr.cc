@@ -46,6 +46,7 @@
 #include	<ema.h>
 #include	<emainfo.h>
 #include	<outline.h>
+#include	<sfx.h>
 #include	<localmisc.h>		/* |NTABCOLS| */
 
 #include	"config.h"

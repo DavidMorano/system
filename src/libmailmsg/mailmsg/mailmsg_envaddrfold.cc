@@ -33,7 +33,7 @@
 
 	Returns:
 	>=0		length of result (in bytes)
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -43,11 +43,11 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
-#include	<mailmsg.h>
 #include	<emainfo.h>
 #include	<sbuf.h>
 #include	<localmisc.h>
 
+#include	"mailmsg.h"
 #include	"mailmsg_envget.h"
 
 

@@ -3,10 +3,8 @@
 /* handle a connect request for a service when we have a server entry */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	F_ALWAYSDEFAULT	0		/* always use default access */
-
 
 /* revision history:
 
@@ -21,13 +19,9 @@
 
 	Handle a request for which we have a matching server entry.
 
-
 ***************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -36,7 +30,6 @@
 #include	<pwd.h>
 #include	<grp.h>
 #include	<time.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -47,6 +40,7 @@
 #include	<srvtab.h>
 #include	<acctab.h>
 #include	<quoteshellarg.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"srventry.h"

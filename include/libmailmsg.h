@@ -40,6 +40,7 @@
 
 #include	<hdrextnum.h>
 #include	<contypevals.h>
+#include	<headkeymat.h>
 
 #include	<mailmsgatt.h>
 #include	<mailmsgattent.h>

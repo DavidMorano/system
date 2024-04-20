@@ -1,13 +1,12 @@
-/* handle_login */
+/* handle_login SUPPORT */
+/* lang=C++20 */
 
 /* handle the login-based serivce */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_ALLDEF	0		/* always use default access */
 #define	CF_ACCESSCHECK	0
-
 
 /* revision history:
 
@@ -26,13 +25,9 @@
 
 	Handle a request for which we have a matching login entry.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -43,7 +38,6 @@
 #include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -51,6 +45,7 @@
 #include	<vecstr.h>
 #include	<storebuf.h>
 #include	<acctab.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"connection.h"
@@ -72,10 +67,10 @@
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 extern int	findfilepath(char *,char *,int,char *) ;
 extern int	vstrkeycmp(char *const *,char *const *) ;
-extern int	mkquoted(char *,int,const char *,int) ;
+extern int	mkquoted(char *,int,cchar *,int) ;
 
 extern char	*strbasename(char *) ;
 

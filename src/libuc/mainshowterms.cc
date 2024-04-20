@@ -1,4 +1,4 @@
-/* mainshowfield SUPPORT */
+/* mainshowterms SUPPORT */
 /* lang=C++20 */
 
 /* show (display) the terminator block characters */
@@ -21,6 +21,8 @@
 #include	<cstdlib>		/* |atoi(3c)| */
 #include	<cstdio>
 #include	<cstring>
+#include	<new>
+#include	<exception>
 #include	<iostream>
 #include	<usysrets.h>
 #include	<utypedefs.h>
@@ -31,6 +33,7 @@
 #include	<sfx.h>
 #include	<ccfile.hh>
 #include	<strnul.hh>
+#include	<cfdec.h>
 #include	<hasx.h>
 #include	<localmisc.h>		/* |MAXLINELEN| */
 
@@ -313,7 +316,12 @@ namespace {
     struct termer {
 	int	idx = 0 ;
 	char	terms[termsize] = {} ;
-	accum(cchar *sp,int sl) noex {
+	int accum(cchar *sp,int sl) noex {
+	    int		rs ;
+	    if (int v ; (rs = cfhex(sp,sl,&v)) >= 0) {
+		terms[idx++] = uchar(v) ;
+	    }
+	    return rs ;
 	} ;
     } ; /* end struct (termer) */
 }
@@ -323,23 +331,29 @@ static void procfile(cchar *fn) noex {
 	int		rs ;
 	if ((rs = readterms(&to,fn)) >= 0) {
 	}
+	return rs ;
 }
 /* end subroutine (procfile) */
 
 static int procline(termer *top,cchar *lp,int ll) noex {
+	sof		fo(lp,ll) ;
 	int		rs = SR_OK ;
 	int		cl ;
 	cchar		*cp{} ;
-
+	while ((sl = fo.next(&cp)) > 0) {
+	    rs = top->accum(cp,sl) ;
+	    if (rs < 0) break ;
+	} /* end while */
 	return rs ;
 }
+/* end subroutine (procline) */
 
 static int readterms(termer *top,cchar *fn) noex {
+	cnullptr	np{} ;
         cint            llen = MAXLINE ;
-        char            *lbuf ;
         int             rs = SR_NOMEM ;
         int             rs1 ;
-        if ((lbuf = new(nothrow) char[llen+1]) != nullptr) {
+        if (char *lbuf ; (lbuf = new(nothrow) char[llen+1]) != np) {
             try {
                 ccfile          fis ;
                 if ((rs = fis.open(fnshells)) >= 0) {
@@ -352,6 +366,8 @@ static int readterms(termer *top,cchar *fn) noex {
                     rs1 = fis.close ;
                     if (rs >= 0) rs = rs1 ;
                 } /* end if (opened) */
+	    } catch (std::bad_alloc) {
+		rs = SR_NOMEM ;
             } catch (...) {
                 rs = SR_IO ;
             }

@@ -42,14 +42,14 @@
 	-		length of resulting word
 
 	Notes:
-	= CF_ALLOWSMORE: I don't know but this was a (vain?) attempt
-	at speeding up this subroutine. Profiles show that time is
-	being spent in here (how much compared with everything
-	else?). There is not much to improve upon, without removing
-	nice old faithful subroutine calls (like 'sfshrink(3dam)').
-	Instead we play around (elsewhere) with removing the string
-	conversion to lower-case before an array comparison. You
-	be the judge.
+	= CF_ALLOWSMORE: I do not know for sure but this was a
+	(vain?) attempt at speeding up this subroutine.  Profiles
+	show that time is being spent in here (how much compared
+	with everything else?).  There is not much to improve upon,
+	without removing nice old faithful subroutine calls (like
+	|sfshrink(3dam)|).  Instead we play around (elsewhere) with
+	removing the string conversion to lower-case before an array
+	comparison. You be the judge.
 
 *******************************************************************************/
 
@@ -80,7 +80,7 @@
 /* forward references */
 
 static int	sfshrinkmore(cchar *,int,cchar **) noex ;
-static int	iswhitemore(int) noex ;
+static bool	iswhitemore(int) noex ;
 
 
 /* local variables */
@@ -172,7 +172,7 @@ static int sfshrinkmore(cchar *sp,int sl,cchar **rpp) noex {
 }
 /* end subroutine (sfshrinkmore) */
 
-static int iswhitemore(int ch) noex {
+static bool iswhitemore(int ch) noex {
 	return CHAR_ISWHITE(ch) || (ch == '-') ;
 }
 /* end subroutine (iswhitemore) */

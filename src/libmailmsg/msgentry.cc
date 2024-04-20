@@ -31,7 +31,6 @@
 #include	<mallocxx.h>
 #include	<fdliner.h>
 #include	<mailmsghdrs.h>
-#include	<mailmsgmathdr.h>
 #include	<mailmsg.h>
 #include	<comparse.h>
 #include	<mhcom.h>

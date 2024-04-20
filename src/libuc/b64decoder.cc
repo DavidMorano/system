@@ -26,7 +26,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<climits>
 #include	<cstring>
@@ -37,6 +36,7 @@
 #include	<sfx.h>
 #include	<intfloor.h>
 #include	<strwcpy.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"b64decoder.h"

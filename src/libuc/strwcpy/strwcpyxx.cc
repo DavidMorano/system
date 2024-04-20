@@ -63,8 +63,8 @@
 	Description:
 	We copy a source string to a destination until either the
 	end of the source string is reached (by its end-marker) or
-	the length of the source string is exhausted. During the
-	copy white-space characters are removed.
+	the length of the source string is exhausted.  During the
+	copy all white-space characters are removed.
 
 	Synopsis:
 	char *strwcpyopaque(char *dp,cchar *sp,int sl) noex
@@ -129,6 +129,7 @@
 #include	<sfx.h>
 #include	<strwcpy.h>
 #include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"strwcpyxx.h"
@@ -203,13 +204,13 @@ char *strwcpywide(char *dp,const wchar_t *sp,int sl) noex {
 	int		ch ;
 	if (sl >= 0) {
 	    while (sl-- && *sp) {
-		if ((ch = (int) *sp++) >= UCHAR_MAX) ch = '¿' ;
-	        *dp++ = (char) ch ;
+		if ((ch = mkchar(*sp++)) >= UCHAR_MAX) ch = '¿' ;
+	        *dp++ = char(ch) ;
 	    }
 	} else {
 	    while (*sp) {
-		if ((ch = (int) *sp++) >= UCHAR_MAX) ch = '¿' ;
-	        *dp++ = (char) ch ;
+		if ((ch = mkchar(*sp++)) >= UCHAR_MAX) ch = '¿' ;
+	        *dp++ = char(ch) ;
 	    }
 	} /* end if */
 	*dp = '\0' ;

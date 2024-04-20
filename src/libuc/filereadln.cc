@@ -89,8 +89,8 @@ int filereadln(cchar *fn,char *rbuf,int rlen) noex {
 		    cint	of = O_RDONLY ;
 		    cmode	om = 0666 ;
 	            if ((rs = uc_open(fn,of,om)) >= 0) {
-	                filer		b ;
-	                cint		fd = rs ;
+	                filer	b ;
+	                cint	fd = rs ;
 	                if ((rs = filer_start(&b,fd,0L,512,0)) >= 0) {
 	                    while ((rs = filer_readln(&b,lbuf,llen,to)) > 0) {
 				int	cl ;

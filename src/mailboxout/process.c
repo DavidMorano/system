@@ -1,13 +1,13 @@
-/* process */
+/* process SUPPORT */
+/* lang=C++20 */
 
 /* process the input messages and spool them up */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUG	0		/* switchable debug print-outs */
 #define	CF_FRESHDAYTIME	1		/* use fresh daytime */
 #define	CF_SPAMSUBJECT	1		/* check SUBJECT for spam */
 #define	CF_SPAMFLAG	1		/* check spam flag for spam */
-
 
 /* revision history:
 
@@ -15,8 +15,9 @@
 	This subroutine was originally written.
 
 	= 1999-02-01, David A­D­ Morano
-        I added a little code to "post" articles that do not have a valid
-        newsgroup to a special "dead article" directory in the BB spool area.
+	I added a little code to "post" articles that do not have
+	a valid newsgroup to a special "dead article" directory in
+	the BB spool area.
 
 */
 
@@ -24,17 +25,14 @@
 
 /*******************************************************************************
 
-        This module processes one or more mail messages (in appropriate mailbox
-        format if more than one) on STDIN. The output is a single file that is
-        ready to be added to each individual mailbox in the spool area.
-
+	This module processes one or more mail messages (in appropriate
+	mailbox format if more than one) on STDIN.  The output is a
+	single file that is ready to be added to each individual
+	mailbox in the spool area.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -44,7 +42,6 @@
 #include	<stdlib.h>
 #include	<strings.h>		/* for |strcasecmp(3c)| */
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -53,6 +50,7 @@
 #include	<vecobj.h>
 #include	<pcsconf.h>
 #include	<mailmsgmatenv.h>
+#include	<mailmsgmathdr.h>
 #include	<msg.h>
 #include	<msgheaders.h>
 #include	<ema.h>
@@ -96,7 +94,6 @@ extern int	nextfield(const char *,int,const char **) ;
 extern int	sfsub(const char *,int,const char *,const char **) ;
 extern int	sisub(const char *,int,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	mailmsgmathdr(const char *,int,char *,int *) ;
 extern int	unlinkd(const char *,int) ;
 extern int	mkmsgid(struct proginfo *,char *,int,int) ;
 

@@ -19,6 +19,11 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+
+
+#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
+
+
 #include	<sys/log.h>
 #include	<sys/strlog.h>
 #include	<sys/syslog.h>
@@ -61,6 +66,9 @@ extern int logsys_flush(logsys *) noex ;
 extern int logsys_close(logsys *) noex ;
 
 EXTERNC_end
+
+
+#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
 #endif /* LOGSYS_INCLUDE */

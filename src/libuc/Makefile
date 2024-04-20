@@ -337,8 +337,8 @@ UOBJ11= strmgr.o
 
 UOBJ12= ufstat.o ucttyname.o
 UOBJ13=
-UOBJ14=
-UOBJ15= ustat.o ulogerror.o
+UOBJ14= ucsys.o
+UOBJ15= usys.o ustat.o ulogerror.o
 
 UOBJ=
 UOBJ+= $(UOBJ00) $(UOBJ01) $(UOBJ02) $(UOBJ03) 
@@ -974,6 +974,11 @@ ctx.dir:
 # CHRONO
 chrono.o:		chrono.dir
 chrono.dir:
+	makesubdir $@
+
+# DATER
+dater.o:		dater.dir
+dater.dir:
 	makesubdir $@
 
 # LOCALSET

@@ -17,26 +17,6 @@
 /*******************************************************************************
 
 	Name:
-	sfchr
-
-	Description:
-	Find a substring following a given search character.
-
-	Synopsis:
-	int sfchr(cchar *sp,int sl,int sch,cchar **rpp) noex
-
-	Arguments:
-	sp		string to search pointer
-	sl		string to search length
-	sch		search character
-	rpp		pointer to result pointer to store found substring
-
-	Returns:
-	>=0		length of found substring
-	<0		no search-character was found
-
-
-	Name:
 	sfkeyval
 
 	Description:
@@ -56,11 +36,6 @@
 	Returns:
 	>=0		length of found value c-string
 	<0		no key was found
-
-
-	Notes (extra):
-	'sfochr'	return string FOLLOWING given character
-	'sfrchr'	return string FOLLOWING given character
 
 *******************************************************************************/
 
@@ -99,32 +74,6 @@
 
 
 /* exported subroutines */
-
-int sfochr(cchar *sp,int sl,int sch,cchar **rpp) noex {
-	int		rl = -1 ;
-	cchar		*rp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (cchar *tp ; (tp = strnochr(sp,sl,sch)) != nullptr) {
-	    rl = ((sp+sl) - (tp+1)) ;
-	    rp = (tp+1) ;
-	}
-	if (rpp) *rpp = rp ;
-	return rl ;
-}
-/* end subroutine (sfochr) */
-
-int sfrchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
-	int		rl = -1 ;
-	cchar		*rp = nullptr ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (cchar *tp ; (tp = strnrchr(sp,sl,sch)) != nullptr) {
-	    rl = ((sp+sl) - (tp+1)) ;
-	    rp = (tp+1) ;
-	}
-	if (rpp) *rpp = rp ;
-	return rl ;
-}
-/* end subroutine (sfrchr) */
 
 int sfcontent(cchar *sp,int sl,cchar **rpp) noex {
 	int		rl = 0 ;

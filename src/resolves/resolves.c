@@ -1,8 +1,8 @@
-/* resolves */
+/* resolves SUPPORT */
+/* lang=C++20 */
 
 /* object to help (manage) RESOLVES messages */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_DEBUGN	0		/* extra-special debugging */
@@ -11,14 +11,12 @@
 #define	CF_TESTPROC	0		/* test using 'uc_openfsvc(3uc)' */
 #define	CF_FINDUID	1		/* use 'finduid(3c)' */
 
-
 /* revision history:
 
 	= 2003-10-01, David A­D­ Morano
-
-	This is a hack from numerous previous hacks (not enumerated here).
-	This is a new version of this hack that is entirely different
-	(much simpler).
+	This is a hack from numerous previous hacks (not enumerated
+	here).  This is a new version of this hack that is entirely
+	different (much simpler).
 
 
 */
@@ -27,54 +25,53 @@
 
 /**************************************************************************
 
-	This object module writes the contents of various RESOLVESs (as
-	specified by the caller) to an open file descriptor (also
-	specified by the caller).
+	This object module writes the contents of various RESOLVESs
+	(as specified by the caller) to an open file descriptor
+	(also specified by the caller).
 
 	Implementation notes:
 
 	When processing, we time-out writes to the caller-supplied
-	file-descriptor because we don't know if it is a non-regular file
-	that might be flow-controlled.	We don't wait forever for those
-	sorts of outputs.  So let's say that the output is a terminal
-	that is currently flow-controlled.  We will time-out on our
-	writes and the user will not get this whole RESOLVES text!
+	file-descriptor because we don't know if it is a non-regular
+	file that might be flow-controlled.  We don't wait forever
+	for those sorts of outputs.  So let's say that the output
+	is a terminal that is currently flow-controlled.  We will
+	time-out on our writes and the user will not get this whole
+	RESOLVES text!
 
 	The FINDUID feature:
 
-	This has got to be a feature that has more code than is ever
-	executed of all features.  This feature handles an extremely small
-	corner case where there are two or more USERNAMEs sharing a single
-	UID (in the system PASSWD database).  Further, the code comes into
-	play when one of the users is already logged in and one of the
-	other users sharing the same UID goes to log in.  Without this
-	code a random username among those sharing the same UID would be
-	selected for the new user logging in.  The reason for this is
-	that in daemon mode we only get UIDs back from the kernel on a
-	connection request.  So we have to guess what the corresponding
-	username might be for that connection request.	With the FINDUID
-	feature, we do this guessing a little bit more intelligently by
-	using the username from that last user with the given UID who
-	logged into the system (by searching the system UTMPX database).
-	The latest user logged in will get his own username (within a
-	few split seconds or so) but a consequence is that all other
-	users sharing that same UID will also see this same username.
-	But this is not usually a big problem since the read-out of the
-	RESOLVES file is usually done at login time and often only done
-	at that time.  Outside of daemon mode, or stand-alone mode,
-	the feature does not come into play and the correct username
-	(within extremely broad limits) is always divined.  So there it
-	is, good and bad.  But there are not a lot of ways to handle it
-	better and this feature already handles these cases much better
-	than nothing at all.
-
+	This has got to be a feature that has more code than is
+	ever executed of all features.  This feature handles an
+	extremely small corner case where there are two or more
+	USERNAMEs sharing a single UID (in the system PASSWD
+	database).  Further, the code comes into play when one of
+	the users is already logged in and one of the other users
+	sharing the same UID goes to log in.  Without this code a
+	random username among those sharing the same UID would be
+	selected for the new user logging in.  The reason for this
+	is that in daemon mode we only get UIDs back from the kernel
+	on a connection request.  So we have to guess what the
+	corresponding username might be for that connection request.
+	With the FINDUID feature, we do this guessing a little bit
+	more intelligently by using the username from that last
+	user with the given UID who logged into the system (by
+	searching the system UTMPX database).  The latest user
+	logged in will get his own username (within a few split
+	seconds or so) but a consequence is that all other users
+	sharing that same UID will also see this same username.
+	But this is not usually a big problem since the read-out
+	of the RESOLVES file is usually done at login time and often
+	only done at that time.  Outside of daemon mode, or stand-alone
+	mode, the feature does not come into play and the correct
+	username (within extremely broad limits) is always divined.
+	So there it is, good and bad.  But there are not a lot of
+	ways to handle it better and this feature already handles
+	these cases much better than nothing at all.
 
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<limits.h>
@@ -84,8 +81,6 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<ids.h>
@@ -99,6 +94,7 @@
 #include	<paramfile.h>
 #include	<strpack.h>
 #include	<bfile.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"resolves.h"

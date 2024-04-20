@@ -1,5 +1,5 @@
-/* inetping */
-/* lang=C20 */
+/* inetping SUPPORT */
+/* lang=C++20 */
 
 /* PING an INET machine */
 /* version %I% last-modified %G% */
@@ -41,7 +41,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/socket.h>
@@ -59,6 +58,7 @@
 #include	<hostent.h>
 #include	<inetaddr.h>
 #include	<spawnproc.h>
+#include	<sfx.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 

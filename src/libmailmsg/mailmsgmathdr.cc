@@ -4,7 +4,6 @@
 /* match on a message header (returns the key-name) */
 /* version %I% last-modified %G% */
 
-#define	CF_SPACETAB	1		/* header whitespace is space-tab */
 #define	CF_ALT1		0		/* use alternative-1 */
 
 /* revision history:
@@ -22,7 +21,7 @@
 	mailmsgmathdr
 
 	Description:
-	This subroutine tests whether a MSG-header is in the suppled
+	This subroutine tests whether a MSG-header is in the supplied
 	test string.  If a MSG-header is present, then the subroutine
 	returns the length of the MSG-header key, otherwise it
 	returns zero (0).
@@ -38,7 +37,7 @@
 	Returns:
 	>0		yes-matched: length of found header-key
 	==0		no-match: did not get a match
-	<0		error (system-return)
+	<0		error code (system-return)
 
 	Design notes:
 
@@ -54,23 +53,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
-#include	<char.h>
 #include	<localmisc.h>
 
 #include	"mailmsgmathdr.h"
 
 
 /* local defines */
-
-#define	SPACETAB(c)	(((c) == ' ') || ((c) == '\t'))
-
-#if	CF_SPACETAB
-#define	HEADERWHITE(c)	SPACETAB(c)
-#else
-#define	HEADERWHITE(c)	CHAR_ISWHITE(c)
-#endif
 
 #ifndef	CF_ALT1
 #define	CF_ALT1		0		/* use alternative-1 */
@@ -87,6 +77,10 @@
 
 
 /* forward references */
+
+static inline bool ishdrwht(int ch) noex {
+        return ((ch == ' ') || (ch == '\t')) ;
+}
 
 
 /* local variables */
@@ -115,20 +109,20 @@ int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
 	        while (tl) {
 	            cint	ch = *tp ;
 		    f = (ch == 0) ;
-	            f = f || HEADERWHITE(ch) ;
+	            f = f || ishdrwht(ch) ;
 	            f = f || (ch == ':') ;
 		    if (f) break ;
 	            tp += 1 ;
 	            tl -= 1 ;
 	        } /* end while */
 	    } else {
-	        while (tl && *tp && (! HEADERWHITE(*tp)) && (*tp != ':')) {
+	        while (tl && *tp && (! ishdrwht(*tp)) && (*tp != ':')) {
 	            tp += 1 ;
 	            tl -= 1 ;
 	        } /* end while */
 	    } /* end if-constexpr (f_alt) */
 	    kl = (tp - ts) ;
-	    while (tl && HEADERWHITE(*tp)) {
+	    while (tl && ishdrwht(*tp)) {
 	        tp += 1 ;
 	        tl -= 1 ;
 	    } /* end while */

@@ -1,19 +1,18 @@
 /* ddb (unneeded, unfinished) */
+/* lang=C++20 */
 
 /* domain data-base */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_SAFE		1
 
-
 /* revision history:
 
 	= 1998-10-01, David A­D­ Morano
-
-	I made up this idea for supporting multiple domains on the same
-	machine at the same time!  We'll see where this idea leads.
-
+	I made up this idea for supporting multiple domains on the
+	same machine at the same time!  We'll see where this idea
+	leads.
 
 */
 
@@ -27,13 +26,9 @@
 	relative to the programroot directory that is optionally
 	supplied.  If no programroot is supplied, then '/' is used.
 
-
 ******************************************************************************/ 
 
-
-#include	<envstandards.h>
-
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -41,27 +36,23 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<netdb.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<bfile.h>
 #include	<vecstr.h>
 #include	<hdb.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#ifndef	LINEBUFLEN
-#define	LINEBUFLEN	2048
-#endif
-
 
 /* external subroutines */
 
-extern int	mkpath2(char *,const char *,const char *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* exported subroutines */
@@ -69,8 +60,8 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 static int ddb_open(op,pr,fname)
 DDB		*op ;
-const char	pr[] ;
-const char	fname[] ;
+cchar	pr[] ;
+cchar	fname[] ;
 {
 	int	rs ;
 
@@ -89,7 +80,7 @@ const char	fname[] ;
 
 static int ddb_search(op,key,value)
 DDB		*op ;
-const char	key[] ;
+cchar	key[] ;
 char		value[] ;
 {
 	int	rs ;
@@ -151,7 +142,7 @@ DDB		*op ;
 
 int ddb_parse(op,fname)
 DDB		*op ;
-const char	fname[] ;
+cchar	fname[] ;
 {
 	bfile	udfile ;
 
@@ -160,8 +151,8 @@ const char	fname[] ;
 	int	sl, cl ;
 	int	ml = 0 ;
 
-	const char	*sp, *cp ;
-	const char	*fname ;
+	cchar	*sp, *cp ;
+	cchar	*fname ;
 
 	char	udfname[MAXPATHLEN + 1] ;
 	char	linebuf[LINEBUFLEN + 1] ;

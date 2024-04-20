@@ -80,10 +80,6 @@
 
 /* local defines */
 
-#ifndef	DEFNAMELEN
-#define	DEFNAMELEN	120
-#endif
-
 #ifndef	ENVNAMELEN
 #define	ENVNAMELEN	120
 #endif
@@ -164,6 +160,7 @@ static int	mkterms() noex ;
 
 constexpr int		rsn = SR_NOTFOUND ;
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
+constexpr int		envnamelen = ENVNAMELEN ;
 
 static char		vterms[termsize] ;
 
@@ -281,15 +278,15 @@ int subinfo::expln(cchar *sp,int sl) noex {
 
 int subinfo::ln(cchar *sp,int sl) noex {
 	AT		at{} ;
+	cnullptr	np{} ;
 	int		rs = 1 ; /* something positive (see code below) */
 	int		el ;
 	int		enl = 0 ;
 	int		len = 0 ;
-	const nullptr_t	np{} ;
 	cchar		*scl = "?+:;¶µ­=#\t " ;
 	cchar		*tp, *ep ;
 	cchar		*enp = nullptr ;
-	char		envname[ENVNAMELEN + 1] ;
+	char		envnamebuf[envnamelen+ 1] ;
 	while (sl && char_iswhite(*sp)) {
 	    sp += 1 ;
 	    sl -= 1 ;
@@ -306,8 +303,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	    } /* end if (subinfo::deps) */
 	} /* end if (getting dependencies) */
 	if (rs > 0) { /* greater-than */
-	    if ((el = sfbreak(sp,sl,strassign,&ep)) > 0) {
-	        int	ach ;
+	    if ((el = sfbrk(sp,sl,strassign,&ep)) > 0) {
 	        int	sch = 0 ;
 	        bool	f_exit = false ;
 	        bool	f_go = true ;
@@ -318,7 +314,7 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	            sl -= 1 ;
 	        }
 	        while ((tp = strnpbrk(sp,1,strassign)) != nullptr) {
-	            ach = mkchar(tp[0]) ;
+	            cint	ach = mkchar(tp[0]) ;
 	            switch (ach) {
 	            case '+':
 	                at.add = true ;
@@ -368,24 +364,23 @@ int subinfo::ln(cchar *sp,int sl) noex {
 	        while (sl && char_iswhite(*sp)) {
 	            sp += 1 ;
 	            sl -= 1 ;
-	        }
+	        } /* end while */
 	        {
-	            int		cl ;
 	            cchar	*cp ;
-	            if ((cl = sfshrink(ep,el,&cp)) > 0) {
-	                enp = envname ;
+	            if (int cl ; (cl = sfshrink(ep,el,&cp)) > 0) {
+	                enp = envnamebuf ;
 	                enl = cl ;
-	                if (snwcpy(envname,ENVNAMELEN,cp,cl) < 0) {
+	                if (snwcpy(envnamebuf,envnamelen,cp,cl) < 0) {
 	                    f_go = false ;
 			}
 	            }
-	        }
+	        } /* end block */
 /* do we already have this definition? */
 /* loop processing the values */
 	        if (f_go) {
 	            rs = lner(enp,enl,&at,sch,sp,sl) ;
 		}
-	    } /* end if (sfbreak) */
+	    } /* end if (sfbrk) */
 	} /* end if (positive) */
 	return (rs >= 0) ? len : rs ;
 }
@@ -456,7 +451,7 @@ int subinfo::lner(cc *enp,int enl,AT *atp,int sch,cc *sp,int sl) noex {
 /* end method (subinfo::lner) */
 
 int subinfo::deps(cchar *sp,int sl) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	field		fsb ;
 	int		rs ;
 	int		rs1 = 0 ;

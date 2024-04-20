@@ -45,10 +45,7 @@
 #include	<cstring>		/* <- for |strlen(3c)| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
-#include	<ascii.h>
-#include	<toxc.h>
 #include	<mkchar.h>
-#include	<ischarx.h>
 #include	<localmisc.h>
 
 #include	"six.h"
@@ -58,6 +55,9 @@
 
 
 /* external subroutines */
+
+
+/* local variables */
 
 
 /* exported variables */

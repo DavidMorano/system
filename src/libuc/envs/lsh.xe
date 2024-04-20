@@ -1,0 +1,419 @@
+# XE
+
+#
+# COOKIES
+# substitution cookies:
+#
+# MACHINE	machine-name
+# ARCHITECTURE	machine-architecture
+# NCPU		number of machine CPUs
+# SYSNAME	OS system-name
+# RELEASE	OS system-release
+# VERSION	OS system-version
+# HZ		OS clock tics
+# U		current user username
+# G		current user groupname
+# HOME		current user home directory
+# SHELL		current user shell
+# GECOSNAME	current user gecos-name
+# REALNAME	current user real-name
+# NAME		current user name
+# ORGANIZATION	current user organization name
+# TZ		current user time-zone
+# N		nodename
+# D		INET domainname (for current user)
+# H		INET hostname
+# R		program-root
+# V		program-version
+#
+# Cookies are introducted with the '%' character.  If a cookie has
+# only a single-character name, the form:
+#	%c
+# can be used, where 'c' is the single-character name of the cookie.
+# If the cookie has a multi-character name, it is interpolated as:
+#	%{cccc}
+# where 'cccc' is the multi-character name of the cookie.
+#
+
+
+#
+# ENVIRONMENT_VARIABLES
+# These environment variables are automatically exported:
+#
+# MACHINE
+# ARCHITECTURE
+# NCPU
+# SYSNAME
+# RELEASE
+# VERSION
+# HZ
+# NODE
+# USERNAME
+# TZ
+# DOMAIN
+# HOME
+## ORGANIZATION
+# LOGNAME (only if it is a login session)
+#
+
+# Environment variables are interpolated with the familiar expression:
+#	${ccc}
+# where 'ccc' is the name of the environment variable.
+# Note that there is no mechanism for determing if an environment
+# variables is set or not.  Unset or empty environment variables
+# are interpolated as an empty string.
+#
+
+
+#
+# DEFINES_VARIABLES
+# Defines are similar to environment variables but they are sourced from a
+# "define" database.  Defines are the primary administrative input to the
+# system since they generally contain information that is entirely new
+# to the system and can only generally be input by direct administrative
+# action.  Defines are interpolated in a simliar way as environment
+# variables except that parentheses are used for the interpolation rather
+# than braces.  To wit:
+#	$(ccc)
+# where 'ccc' is the name of the define variable.
+#
+
+
+
+# set variables that define the machine-architecture compilation environment
+
+		OSNAME			%{SYSNAME}
+		OSREL			%{RELEASE}
+		OSVERS			%{VERSION}
+		OSNUM			8
+		OSNAME_SunOS		8
+		OSTYPE			SYSV
+
+
+# general system configuration
+
+MAILDIR?	MAILDIR=		$(MAILDIR)
+
+
+# path setup
+
+		PATH:= 
+
+
+#HOME?		HOME=			%{HOME}
+
+		PATH:= 			%{HOME}/bin
+		LD_LIBRARY_PATH:=	%{HOME}/lib
+		FPATH:=			%{HOME}/fbin
+		MANPATH:=		%{HOME}/man
+
+
+LOCAL?		LOCAL=			$(LOCAL)
+
+LOCAL?		PATH:= 			$(LOCAL)/bin
+LOCAL?		LD_LIBRARY_PATH:=	$(LOCAL)/lib
+LOCAL?		FPATH:=			$(LOCAL)/fbin
+LOCAL?		MANPATH:=		$(LOCAL)/man
+LOCAL?		XUSERFILESEARCHPATH:=	$(LOCAL)/lib/X11/%%T/%%N%%S
+
+
+# AT&T Advanced-Software-Technologies (AST)
+AST?		AST=			$(AST)
+
+AST?		PATH:= 			$(AST)/bin
+AST?		LD_LIBRARY_PATH:=	$(AST)/lib
+AST?		FPATH:=			$(AST)/fbin
+AST?		MANPATH:=		$(AST)/man
+
+
+# AT&T Documenters-Work-Bench (DWB)
+DWB?		DWB=			$(DWB)
+DWB?		DWBHOME=		$(DWB)
+
+DWB?		PATH:= 			$(DWB)/bin
+DWB?		LD_LIBRARY_PATH:=	$(DWB)/lib
+DWB?		MANPATH:=		$(DWB)/man
+
+
+# AT&T "NCMP" software tools distribution
+NCMP?		NCMP=			$(NCMP)
+
+NCMP?		PATH:=			$(NCMP)/bin
+NCMP?		LD_LIBRARY_PATH:=	$(NCMP)/lib
+NCMP?		FPATH:=			$(NCMP)/fbin
+NCMP?		MANPATH:=		$(NCMP)/man
+NCMP?		XUSERFILESEARCHPATH:=	$(NCMP)/lib/X11/%%T/%%N%%S
+NCMP?		XFILESEARCHPATH:=	$(NCMP)/lib/X11/%%T/%%N%%S
+
+
+# X11
+XDIR?		XDIR=			$(XDIR)
+
+XDIR?		PATH:=			$(XDIR)/bin
+XDIR?		LD_LIBRARY_PATH:=	$(XDIR)/lib
+XDIR?		MANPATH:=		$(XDIR)/man
+XDIR?		XFILESEARCHPATH:=	$(XDIR)/lib/X11/%%T/%%N%%S
+
+
+# Common-DeskTop-Environment (CDE)
+DT?		DT=			$(DT)
+
+DT?		PATH:=			$(DT)/bin
+DT?		LD_LIBRARY_PATH:=	$(DT)/lib
+DT?		MANPATH:=		$(DT)/man
+
+
+# OpenWindows (X11 on Sun-Microsystems platform)
+OPENWIN?	OPENWIN=		$(OPENWIN)
+OPENWIN?	OPENWINHOME=		$(OPENWIN)
+
+OPENWIN?	PATH:=			$(OPENWIN)/bin
+OPENWIN?	PATH:=			$(OPENWIN)/demo
+OPENWIN?	LD_LIBRARY_PATH:=	$(OPENWIN)/lib
+OPENWIN?	MANPATH:=		$(OPENWIN)/man
+OPENWIN?	XFILESEARCHPATH:=	\
+			$(OPENWINHOME)/lib/locale/%%L/%%T/%%N%%S
+
+
+# "preroot" on some systems
+PREROOT?	PREROOT=		$(PREROOT)
+
+PREROOT?	PATH:=			$(PREROOT)/bin
+PREROOT?	LD_LIBRARY_PATH:=	$(PREROOT)/lib
+PREROOT?	FPATH:=			$(PREROOT)/fbin
+PREROOT?	MANPATH:=		$(PREROOT)/man
+PREROOT?	XUSERFILESEARCHPATH:=	$(PREROOT)/lib/X11/%%T/%%N%%S
+
+
+# X/Open-Portability-Guide (XPG) version 4
+XPG4?		XPG4=			$(XPG4)
+
+XPG4?		PATH:=			$(XPG4)/bin
+#XPG4?		LD_LIBRARY_PATH:=	$(XPG4)/lib # danger:bad!
+XPG4?		MANPATH:=		$(XPG4)/man
+
+
+		PATH:=			/usr/bin
+#		LD_LIBRARY_PATH:=	/usr/lib
+		MANPATH:=		/usr/man
+
+
+# Sun-Microsystems Software-Generation-Ssystem (SGS) tools
+SUNWSPRO?	SUNWSPRO=		$(SUNWSPRO)
+
+SUNWSPRO?	PATH:=			$(SUNWSPRO)/bin
+SUNWSPRO?	LD_LIBRARY_PATH:=	$(SUNWSPRO)/lib
+SUNWSPRO?	MANPATH:=		$(SUNWSPRO)/man
+
+
+# Sun-Microsystems compilation tools
+CCS?		CCS=			$(CCS)
+
+CCS?		PATH:=			$(CCS)/bin
+CCS?		LD_LIBRARY_PATH:=	$(CCS)/lib
+CCS?		MANPATH:=		$(CCS)/man
+
+
+GNU?		GNU=			$(GNU)
+
+GNU?		PATH:=			$(GNU)/bin
+GNU?		LD_LIBRARY_PATH:=	$(GNU)/lib
+GNU?		MANPATH:=		$(GNU)/man
+GNU?		XUSERFILESEARCHPATH:=	$(GNU)/lib/X11/%%T/%%N%%S
+
+
+# Personal-Communication-Services (PCS)
+PCS?		PCS=			$(PCS)
+
+PCS?		PATH:=			$(PCS)/bin
+PCS?		LD_LIBRARY_PATH:=	$(PCS)/lib
+PCS?		FPATH:=			$(PCS)/fbin
+PCS?		MANPATH:=		$(PCS)/man
+
+
+# Writers-Work-Bench (WWB)
+WWB?		WWB=			$(WWB)
+
+WWB?		PATH:=			$(WWB)/bin
+WWB?		LD_LIBRARY_PATH:=	$(WWB)/lib
+WWB?		MANPATH:=		$(WWB)/man
+
+
+# TeX
+TETEX?		TETEX=			$(TETEX)
+TETEX?		TETEXDIR:=		$(TETEX)
+
+TETEX?		PATH:=			$(TETEX)/bin
+TETEX?		LD_LIBRARY_PATH:=	$(TETEX)/lib
+TETEX?		MANPATH:=		$(TETEX)/man
+TETEX?		INFOPATH:=		$(TETEX)/info
+
+TETEX?		TEXMF:=			$(TETEX)/share/texmf
+
+
+ADMIN?		ADMIN=			$(ADMIN)
+
+ADMIN?		PATH:=			$(ADMIN)/bin
+ADMIN?		LD_LIBRARY_PATH:=	$(ADMIN)/lib
+ASMIN?		FPATH:=			$(ADMIN)/fbin
+ADMIN?		MANPATH:=		$(ADMIN)/man
+
+
+POSTFIX?	POSTFIX=		$(POSTFIX)
+
+POSTFIX?	PATH:=			$(POSTFIX)/bin
+POSTFIX?	LD_LIBRARY_PATH:=	$(POSTFIX)/lib
+POSTFIX?	MANPATH:=		$(POSTFIX)/man
+
+
+# AppleTalk management
+ATALK?		ATALK=			$(ATALK)
+
+ATALK?		PATH:=			$(ATALK)/bin
+ATALK?		LD_LIBRARY_PATH:=	$(ATALK)/lib
+ATALK?		MANPATH:=		$(ATALK)/man
+
+
+# Secure-Login (SL)
+SL?		SL=			$(SL)
+
+SL?		PATH:=			$(SL)/bin
+SL?		LD_LIBRARY_PATH:=	$(SL)/lib
+SL?		MANPATH:=		$(SL)/man
+
+
+IPF?		IPF=			$(IPF)
+
+IPF?		PATH:=			$(IPF)/bin
+IPF?		LD_LIBRARY_PATH:=	$(IPF)/lib
+IPF?		MANPATH:=		$(IPF)/man
+
+
+# HP printer management and tools
+HPNP?		HPNP=			$(HPNP)
+
+HPNP?		PATH:=			$(HPNP)/bin
+HPNP?		LD_LIBRARY_PATH:=	$(HPNP)/lib
+HPNP?		MANPATH:=		$(HPNP)/man
+
+
+JAVA?		JAVA=			$(JAVA)
+JAVA?		JAVA_HOME=		$(JAVA)
+
+JAVA?		PATH:=			$(JAVA)/bin
+JAVA?		LD_LIBRARY_PATH:=	$(JAVA)/lib
+JAVA?		MANPATH:=		$(JAVA)/man
+
+
+SOUND?		SOUND=			$(SOUND)
+
+SOUND?		PATH:=			$(SOUND)/bin
+SOUND?		LD_LIBRARY_PATH:=	$(SOUND)/lib
+SOUND?		MANPATH:=		$(SOUND)/man
+
+# AT&T ExpTools software distribution
+TOOLS?		TOOLS=			$(TOOLS)
+
+TOOLS?		PATH:=			$(TOOLS)/bin
+TOOLS?		LD_LIBRARY_PATH:=	$(TOOLS)/lib
+# there are no real man pages in EXPTOOLS!
+#TOOLS?		MANPATH:=		$(TOOLS)/man
+
+
+# projects
+
+# Lucent Technologies "Starbase" switch development
+STARBASE?	STARBASE=		$(STARBASE)
+
+STARBASE?	PATH:=			$(STARBASE)/bin
+STARBASE?	LD_LIBRARY_PATH:=	$(STARBASE)/lib
+STARBASE?	FPATH:=			$(STARBASE)/fbin
+STARBASE?	MANPATH:=		$(STARBASE)/man
+
+
+EXTRA?		EXTRA=			$(EXTRA)
+
+EXTRA?		PATH:=			$(EXTRA)/bin
+EXTRA?		LD_LIBRARY_PATH:=	$(EXTRA)/lib
+EXTRA?		MANPATH:=		$(EXTRA)/man
+
+# Apache Foundation servers and management
+APACHE?		APACHE=			$(APACHE)
+
+APACHE?		PATH:=			$(APACHE)/bin
+APACHE?		MANPATH:=		$(APACHE)/man
+
+
+
+# system-admins get their own system path
+
+		PATH:=			%{HOME}/sbin
+
+# other system paths
+
+#		PATH:=			/home/admin/bin
+#		PATH:=			/home/admin/sbin
+
+		PATH:=			/usr/sbin
+#LOCAL?		PATH:=			$(LOCAL)/sbin
+#NCMP?		PATH:=			$(NCMP)/sbin
+#PCS?		PATH:=			$(PCS)/sbin
+POSTFIX?	PATH:=			$(POSTFIX)/sbin
+#ATALK?		PATH:=			$(ATALK)/sbin
+#SL?		PATH:=			$(SL)/sbin
+
+		PATH:=			/usr/games
+		PATH:=			/usr/lib/nis
+
+EXTRA?		PATH:=			$(EXTRA)/sbin
+
+
+# the old "games" distribution on older Sun-Microsystems OSes
+GAMES?		GAMES=			$(GAMES)
+
+
+# media
+
+CATMAN?		CATMAN=			$(CATMAN)
+ARTICLES?	ARTICLES=		$(ARTICLES)
+DOCUMENTS?	DOCUMENTS=		$(DOCUMENTS)
+MUSIC?		MUSIC=			$(MUSIC)
+MOVIES?		MOVIES=			$(MOVIES)
+SOUNDS?		SOUNDS=			$(SOUNDS)
+INTERVIEWS?	INTERVIEWS=		$(INTERVIEWS)
+REPORTS?	REPORTS=		$(REPORTS)
+IMAGES?		IMAGES=			$(IMAGES)
+LECTURES?	LECTURES=		$(LECTURES)
+PATCHES?	PATCHES=		$(PATCHES)
+
+
+# common
+		WWW=			/common/www
+
+
+# program-roots
+
+# Magick
+NCMP?		MAGICK_HOME=		$(NCMP)
+
+
+# miscellaneous
+
+GNU?		CC=			gcc
+GNU?		GPP=			g++
+
+		CDPATH:=		
+		CDPATH:=		%{HOME}
+		CDPATH:=		/usr/add-on
+
+
+# other environment variables (other than paths!)
+
+PREROOT?	ENV=			%{HOME}/.kshrc
+PREROOT?	SHELL=			$(PREROOT)/bin/ksh
+
+
+# hpefully some compilers will pick this up and *use* it!
+		TMPDIR=			/tmp
+
+

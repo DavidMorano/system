@@ -5,6 +5,7 @@
 export REPOROOT
 
 BUILDTYPE=develope
+#BUILDTYPE=deliver
 
 
 : ${CGS_BINDIR:=${REPOROOT}/bin}
@@ -165,6 +166,10 @@ analyze)
 profile)
   ;;
 deliver)
+  MAKECPPFLAGS=
+  MAKECFLAGS="${CO_GCCALL} ${CO_GCCOPT} ${CO_GCCLIB}"
+  MAKECCFLAGS="${CO_GPPALL} ${CO_GPPOPT} ${CO_GPPLIB}"
+  MAKELDFLAGS=
   ;;
 esac
 

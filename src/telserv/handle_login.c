@@ -26,13 +26,9 @@
 
 	Handle a request for which we have a matching login entry.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -40,10 +36,8 @@
 #include	<signal.h>
 #include	<stdlib.h>
 #include	<string.h>
-#include	<ctype.h>
 #include	<pwd.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
@@ -51,6 +45,7 @@
 #include	<vecstr.h>
 #include	<storebuf.h>
 #include	<acctab.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"connection.h"

@@ -1,5 +1,5 @@
 /* main SUPPORT */
-/* lang=C20 */
+/* lang=C++20 */
 
 /* show the bits set representing terminating characters */
 /* version %I% last-modified %G% */
@@ -130,9 +130,12 @@ static const struct mapex	mapexs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-int main(int argc,cchar *argv[],cchar *envv[]) {
+int main(int argc,mainv argv,mainv envv) {
 	PROGINFO	pi, *pip = &pi ;
 	struct adesc	array ;
 	bfile		errfile ;

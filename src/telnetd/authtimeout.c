@@ -1,18 +1,15 @@
-/* authtimeout */
+/* authtimeout SUPPORT */
+/* lang=C++20 */
 
 /* authorization time-out */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
 	= 1998-05-01, David Morano
-
 	This was created along with the DATE object.
-
 
 */
 
@@ -22,13 +19,9 @@
 
 	This small code piece provides for authoriation time-outs.
 
-
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
@@ -36,7 +29,6 @@
 #include	<unistd.h>
 #include	<string.h>
 #include	<stdarg.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<estrings.h>
@@ -47,6 +39,7 @@
 #include	<ptma.h>
 #include	<ptm.h>
 #include	<endian.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 

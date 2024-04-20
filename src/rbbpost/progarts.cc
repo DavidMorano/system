@@ -58,22 +58,23 @@
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<vecobj.h>
-#include	<char.h>
 #include	<mailmsgmatenv.h>
+#include	<mailmsgmathdr.h>
 #include	<mailmsg.h>
 #include	<mailmsg_enver.h>
 #include	<mailmsghdrs.h>
+#include	<hdrextnum.h>
 #include	<ema.h>
 #include	<emainfo.h>
-#include	<dater.h>
 #include	<mhcom.h>
 #include	<comparse.h>
+#include	<dater.h>
 #include	<logzones.h>
 #include	<nulstr.h>
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<ascii.h>
-#include	<hdrextnum.h>
+#include	<char.h>
 #include	<localmisc.h>
 
 #include	"bfliner.h"
@@ -166,7 +167,6 @@ extern int	cfdeci(cchar *,int,int *) ;
 extern int	mktmpfile(char *,mode_t,cchar *) ;
 extern int	mkartfile(char *,mode_t,cchar *,cchar *,int) ;
 extern int	mkbestaddr(char *,int,cchar *,int) ;
-extern int	mailmsgmathdr(cchar *,int,int *) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
 extern int	hasuc(cchar *,int) ;
 extern int	isprintlatin(int) ;

@@ -48,8 +48,7 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>
-#include	<sys/types.h>
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/param.h>
 #include	<unistd.h>
 #include	<fcntl.h>
@@ -75,7 +74,7 @@
 #include	<mapex.h>
 #include	<getourenv.h>
 #include	<exitcodes.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |NAXPATHLEN| */
 
 
 /* local defines */

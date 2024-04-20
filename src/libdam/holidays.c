@@ -1,5 +1,5 @@
-/* holidays */
-/* lang=C20 */
+/* holidays SUPPORT */
+/* lang=C++20 */
 
 /* access for the HOLIDAYS database */
 /* version %I% last-modified %G% */
@@ -18,12 +18,11 @@
 /*******************************************************************************
 
 	This object module provides an interface to the HOLIDAYS (see
-	'holidays(4)') database.
+	|holidays(4)|) database.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -36,10 +35,11 @@
 #include	<vecobj.h>
 #include	<strtab.h>
 #include	<tmtime.h>
+#include	<sfx.h>
 #include	<ids.h>
+#include	<hash.h>
 #include	<char.h>
 #include	<localmisc.h>
-#include	<hash.h>
 
 #include	"holidays.h"
 

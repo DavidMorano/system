@@ -2,10 +2,8 @@
 
 /* text fill for line-centering */
 
-
 #define	CF_DEBUGS	0		/* used for little object below */
 #define	CF_SAFE		1		/* (some) safety */
-
 
 /* revision history:
 
@@ -18,29 +16,22 @@
 
 /*******************************************************************************
 
-	This object mediates filling out text to an output file using the BFILE
-	package.
-
+	This object mediates filling out text to an output file
+	using the BFILE package.
 
 *******************************************************************************/
 
-
-#define	LINECENTER_MASTER	0
-
-
 #include	<envstandards.h>	/* must be before others */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<limits.h>
 #include	<unistd.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<estrings.h>
 #include	<fifostr.h>
 #include	<ascii.h>
+#include	<sfx.h>
 #include	<localmisc.h>
 
 #include	"linecenter.h"

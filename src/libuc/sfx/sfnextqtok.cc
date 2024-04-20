@@ -55,9 +55,6 @@
 /* local typedefs */
 
 
-/* exported variables */
-
-
 /* external subroutines */
 
 extern "C" {
@@ -75,6 +72,9 @@ extern "C" {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -105,6 +105,6 @@ int sfnextqtok(cchar *sp,int sl,cchar **rpp) noex {
 	len = (len - sl) ;
 	return len ;
 }
-/* end subroutine (nextqtoken) */
+/* end subroutine (sfnextqtok) */
 
 

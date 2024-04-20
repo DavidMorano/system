@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		length of resulting string
-	<0		error (system-return)
+	<0		error code (system-return)
 
 	Notes:
 	1. Massaging the result:
@@ -64,6 +64,10 @@
 
 
 /* local defines */
+
+#ifndef	CF_MASSAGE
+#define	CF_MASSAGE	0		/* allow for massaging */
+#endif
 
 
 /* local namespace */
@@ -95,6 +99,7 @@ enum atypes {
 /* forward references */
 
 static int	emaentry_addrname(ema_ent *,char *,int) noex ;
+
 static bool	isBadAddr(int) noex ;
 
 

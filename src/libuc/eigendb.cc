@@ -22,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
 #include	<cstddef>		/* |nullptr_t| */
@@ -36,7 +35,11 @@
 #include	<naturalwords.h>
 #include	<intceil.h>
 #include	<strn.h>
+#include	<six.h>
+#include	<sfx.h>
+#include	<sif.hh>
 #include	<strwcpyx.h>
+#include	<linebuffer.h>
 #include	<char.h>
 #include	<hasx.h>
 #include	<localmisc.h>
@@ -47,16 +50,8 @@
 /* local defines */
 
 #define	EIGENDB_DEFENT		150
-#define	EIGENDB_CHUCKSIZE	720
+#define	EIGENDB_CHUNKSIZE	720
 #define	EIGENDB_MAXFILESIZE	(40 * 1024 * 1024)
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
 
 #ifndef	KEYBUFLEN
 #ifdef	NATURALWORDLEN
@@ -138,11 +133,14 @@ static int eigendb_magic(eigendb *op,Args ... args) noex {
 /* end subroutine (eigendb_magic) */
 
 static int	eigendb_fileparse(eigendb *,cchar *) noex ;
-static int	eigendb_fileparseread(eigendb *,int,int) noex ;
+static int	eigendb_fileparsereg(eigendb *,int,int) noex ;
 static int	eigendb_fileparsemap(eigendb *,int,int) noex ;
+static int	eigendb_fileline(eigendb *,cchar *,int) noex ;
 
 
 /* local variables */
+
+constexpr int	keybuflen = KEYBUFLEN ;
 
 
 /* exported variables */
@@ -154,7 +152,7 @@ int eigendb_open(eigendb *op,cchar *fname) noex {
 	int		rs ;
 	if ((rs = eigendb_ctor(op)) >= 0) {
 	    cint	ne = EIGENDB_DEFENT ;
-	    cint	chsz = EIGENDB_CHUCKSIZE ;
+	    cint	chsz = EIGENDB_CHUNKSIZE ;
 	    if ((rs = strpack_start(op->spp,chsz)) >= 0) {
 		cnullptr	np{} ;
 	        if ((rs = hdb_start(op->dbp,ne,1,np,np)) >= 0) {
@@ -195,6 +193,10 @@ int eigendb_close(eigendb *op) noex {
 	        rs1 = strpack_finish(op->spp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
+	    {
+		rs1 = eigendb_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
 	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
@@ -220,9 +222,9 @@ int eigendb_addword(eigendb *op,cchar *wp,int wl) noex {
 		cint		rsn = SR_NOTFOUND ;
 	        hdb_dat		key ;
 	        hdb_dat		value ;
-	        char		keybuf[KEYBUFLEN + 1] ;
+	        char		keybuf[keybuflen + 1] ;
 	        if (hasuc(wp,wl)) {
-	            if (wl > KEYBUFLEN) wl = KEYBUFLEN ;
+	            if (wl > keybuflen) wl = keybuflen ;
 	            strwcpylc(keybuf,wp,wl) ;
 	            wp = keybuf ;
 	        }
@@ -252,9 +254,9 @@ int eigendb_exists(eigendb *op,cchar *wp,int wl) noex {
 	    if (wl > 0) {
 		cnullptr	np{} ;
 	        hdb_dat		key ;
-	        char		keybuf[KEYBUFLEN + 1] ;
+	        char		keybuf[keybuflen + 1] ;
 	        if (hasuc(wp,wl)) {
-	            if (wl > KEYBUFLEN) wl = KEYBUFLEN ;
+	            if (wl > keybuflen) wl = keybuflen ;
 	            strwcpylc(keybuf,wp,wl) ;
 	            wp = keybuf ;
 	        }
@@ -349,7 +351,7 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 	                if (S_ISREG(sb.st_mode) && (fsize <= mfsize)) {
 	                    rs = eigendb_fileparsemap(op,fd,fsz) ;
 	                } else {
-	                    rs = eigendb_fileparseread(op,fd,fsz) ;
+	                    rs = eigendb_fileparsereg(op,fd,fsz) ;
 			}
 		    } /* end if (non-zero positive) */
 	 	} else {
@@ -363,71 +365,35 @@ static int eigendb_fileparse(eigendb *op,cchar *fname) noex {
 }
 /* end subroutine (eigendb_fileparse) */
 
-static int eigendb_fileparseread(eigendb *op,int fd,int fsize) noex {
-	filer		fb ;
+static int eigendb_fileparsereg(eigendb *op,int fd,int fsize) noex {
+	linebuffer	lb ;
 	cint		to = TO_READ ;
 	int		rs ;
-	int		bufsize = 0 ;
+	int		rs1 ;
+	int		bsize = 0 ;
 	int		c = 0 ;
-
 	if (fsize >= 0) {
-	    bufsize = iceil(fsize,1024) ;
+	    bsize = iceil(fsize,1024) ;
 	}
-	if ((rs = filer_start(&fb,fd,0L,bufsize,0)) >= 0) {
-	    cint	llen = MAXPATHLEN ;
-	    int		len ;
-	    int		sl, cl ;
-	    int		f_bol, f_eol ;
-	    cchar	*tp, *sp ;
-	    cchar	*cp ;
-	    char	lbuf[LINEBUFLEN + 1] ;
-
-/* read the file */
-
-	    f_bol = true ;
-	    while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
-	        len = rs ;
-
-	        f_eol = (lbuf[len - 1] == '\n') ;
-	        if (f_eol) len -= 1 ;
-
-	        if (! f_eol) {
-	            while ((len > 0) && (! CHAR_ISWHITE(lbuf[len - 1]))) {
-	                len -= 1 ;
-		    }
-	        }
-
-	        if ((tp = strnchr(lbuf,len,'#')) != nullptr) {
-	            len = (tp - lbuf) ;
-		}
-
-	        if ((len > 0) && f_bol) {
-
-	            sp = lbuf ;
-	            sl = len ;
-	            while ((cl = nextfield(sp,sl,&cp)) > 0) {
-
-	                c += 1 ;
-	                rs = eigendb_addword(op,cp,cl) ;
-
-	                sl -= ((cp + cl) - sp) ;
-	                sp = (cp + cl) ;
-
-	                if (rs < 0) break ;
-	            } /* end while (words) */
-
-	        } /* end if (line w/ feasible data) */
-
-	        f_bol = f_eol ;
-	        if (rs < 0) break ;
-	    } /* end while (lines) */
-
-	    filer_finish(&fb) ;
-	} /* end if (filer-finish) */
-
+	if ((rs = lb.start) >= 0) {
+	    filer	fb ;
+	    if ((rs = filer_start(&fb,fd,0L,bsize,0)) >= 0) {
+	        cint	llen = lb.llen ;
+	        char	*lbuf = lb.lbuf ;
+	        while ((rs = filer_readln(&fb,lbuf,llen,to)) > 0) {
+		    rs = eigendb_fileline(op,lbuf,rs) ;
+		    c += rs ;
+		    if (rs < 0) break ;
+	        } /* end while (lines) */
+	        rs1 = filer_finish(&fb) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (filer) */
+	    rs1 = lb.finish ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (linebuffer) */
 	return (rs >= 0) ? c : rs ;
 }
-/* end subroutine (eigendb_fileparseread) */
+/* end subroutine (eigendb_fileparsereg) */
 
 static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	cnullptr	np{} ;
@@ -436,41 +402,42 @@ static int eigendb_fileparsemap(eigendb *op,int fd,int fsize) noex {
 	int		rs1 ;
 	int		mp = PROT_READ ;
 	int		mf = MAP_SHARED ;
-	int		ll, cl ;
 	int		c = 0 ;
-	cchar		*tp ;
-	cchar		*lp ;
-	cchar		*cp ;
 	void		*md{} ;
 	if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
 	    char	*sp = charp(md) ;
 	    int		sl = int(ms) ;
-	    int		len ;
-	    while ((tp = strnpbrk(sp,sl,"\n#")) != np) {
-	        lp = sp ;
-	        ll = (tp - sp) ;
-	        len = ((tp + 1) - sp) ;
-	        if (*tp == '#') {
-	            if ((tp = strnchr((tp+1),(sp+sl-(tp+1)),'\n')) != np) {
-	                len = ((tp + 1) - sp) ;
-		    }
-	        }
-	        while ((cl = sfnext(lp,ll,&cp)) > 0) {
-	            c += 1 ;
-	            rs = eigendb_addword(op,cp,cl) ;
-	            ll -= ((cp + cl) - lp) ;
-	            lp = (cp + cl) ;
-	            if (rs < 0) break ;
-	        } /* end while (words) */
-	        sp += len ;
-	        sl -= len ;
-	        if (rs < 0) break ;
-	    } /* end while (lines) */
+	    int		si ;
+	    while ((si = siochr(sp,sl,'\n')) >= 0) {
+		rs = eigendb_fileline(op,sp,si) ;
+		c += rs ;
+		sl -= (si+1) ;
+		sp += (si+1) ;
+		if (rs < 0) break ;
+	    } /* end while */
 	    rs1 = u_mmapend(md,ms) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (map-file) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (eigendb_fileparsemap) */
+
+static int eigendb_fileline(eigendb *op,cchar *lbuf,int llen) noex {
+	int		rs = SR_OK ;
+	int		c = 0 ;
+	cchar		*sp{} ;
+	if (int sl ; (sl = sfcontent(lbuf,llen,&sp)) > 0) {
+	    sif		sfo(sp,sl) ;
+	    int		cl ;
+	    cchar	*cp{} ;
+	    while ((cl = sfo.next(&cp)) > 0) {
+		c += 1 ;
+		rs = eigendb_addword(op,cp,cl) ;
+		if (rs < 0) break ;
+	    } /* end while */
+	} /* end if (sfcontent) */
+	return (rs >= 0) ? c : rs ;
+}
+/* end subroutine (eigendb_fileline) */
 
 
