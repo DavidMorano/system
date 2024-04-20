@@ -226,7 +226,7 @@ longlong strtoxll(cchar *nptr,char **endptr,int base) noex {
 	if (endptr != nullptr) {
 	    *endptr = (char *) (any ? (s - 1) : nptr) ;
 	}
-	return (acc);
+	return acc ;
 }
 /* end subroutine (strtoxll) */
 
@@ -315,7 +315,7 @@ ulonglong strtoxull(cchar *nptr, char **endptr, int base) noex {
 	if (endptr != nullptr) {
 	    *endptr = (char *) (any ? (s - 1) : nptr) ;
 	}
-	return (acc);
+	return acc ;
 }
 /* end subroutine (strtoxull) */
 

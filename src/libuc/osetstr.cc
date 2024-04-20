@@ -91,7 +91,7 @@ int osetstr_start(osetstr *op,int n) noex {
 	        op->setp = setp ;
 		op->magic = OSETSTR_MAGIC ;
 		rs = SR_OK ;
-	    }
+	    } /* end if (new-setsrt) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -102,7 +102,7 @@ int osetstr_finish(osetstr *op) noex {
 	if ((rs = osetstr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    delete setp ;
-	    op->setp = NULL ;
+	    op->setp = nullptr ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -217,7 +217,7 @@ int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
 	        set<string>::iterator *interp = 
 		    (set<string>::iterator *) curp->interp ;
 	        delete interp ;
-	        curp->interp = NULL ;
+	        curp->interp = nullptr ;
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }

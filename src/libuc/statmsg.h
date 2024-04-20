@@ -28,6 +28,7 @@
 #define	STATMSG_ID	struct statmsg_ident
 #define	STATMSG_MAP	struct statmsg_mapper
 #define	STATMSG_FL	struct statmsg_flags
+#define	STATMSG_CK	struct statmsg_check
 
 
 struct statmsg_ident {
@@ -38,7 +39,6 @@ struct statmsg_ident {
 } ;
 
 struct statmsg_mapper {
-	uint		magic ;
 	lockrw		rwm ;
 	paramfile	dirsfile ;
 	vechand		mapdirs ;
@@ -47,6 +47,7 @@ struct statmsg_mapper {
 	cchar		*fname ;
 	time_t		ti_mtime ;
 	time_t		ti_check ;
+	uint		magic ;
 } ;
 
 struct statmsg_flags {
@@ -75,9 +76,10 @@ struct statmsg_head {
 } ;
 
 typedef	STATMSG		statmsg ;
+typedef	STATMSG_FL	statmsg_fl ;
 typedef	STATMSG_ID	statmsg_id ;
 typedef	STATMSG_MAP	statmsg_map ;
-typedef	STATMSG_FL	statmsg_fl ;
+typedef	STATMSG_CK	statmsg_ch ;
 
 EXTERNC_begin
 
