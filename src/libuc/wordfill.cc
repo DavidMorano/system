@@ -4,7 +4,6 @@
 /* text (word) fill */
 /* version %I% last-modified %G% */
 
-#define	CF_SAFE		1		/* (some) safety */
 
 /* revision history:
 
@@ -23,9 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/param.h>
-#include	<unistd.h>
-#include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -34,6 +30,7 @@
 #include	<fifostr.h>
 #include	<strn.h>
 #include	<sfx.h>
+#include	<sif.hh>
 #include	<localmisc.h>
 
 #include	"wordfill.h"
@@ -44,6 +41,15 @@
 #ifndef	WORDBUFLEN
 #define	WORDBUFLEN	100
 #endif
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -57,7 +63,45 @@
 
 /* forward references */
 
-static int	wordfill_mkline(WORDFILL *,int,char *,int) noex ;
+template<typename ... Args>
+static int wordfill_ctor(wordfill *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->sqp = new(nothrow) fifostr) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-fifostr) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (wordfill_ctor) */
+
+static int wordfill_dtor(wordfill *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->sqp) {
+		delete op->sqp ;
+		op->sqp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (wordfill_dtor) */
+
+template<typename ... Args>
+static int wordfill_magic(wordfill *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == WORDFILL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (wordfill_magic) */
+
+static int	wordfill_mkline(wordfill *,int,char *,int) noex ;
 
 
 /* local variables */
@@ -68,169 +112,128 @@ static int	wordfill_mkline(WORDFILL *,int,char *,int) noex ;
 
 /* exported subroutines */
 
-int wordfill_start(WORDFILL *op,cchar *lp,int ll) noex {
-	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	memclear(op) ;
-
-	if ((rs = fifostr_start(&op->sq)) >= 0) {
-	    op->magic = WORDFILL_MAGIC ;
-	    if (lp != NULL) {
-	        rs = wordfill_addlines(op,lp,ll) ;
-	    }
+int wordfill_start(wordfill *op,cchar *lp,int ll) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    if ((rs = fifostr_start(op->sqp)) >= 0) {
+	        op->magic = WORDFILL_MAGIC ;
+	        if (lp) {
+	            rs = wordfill_addlines(op,lp,ll) ;
+	        }
+	        if (rs < 0) {
+		    fifostr_finish(op->sqp) ;
+	            op->magic = 0 ;
+	        }
+	    } /* end if (fifostr-start) */
 	    if (rs < 0) {
-		fifostr_finish(&op->sq) ;
-	        op->magic = 0 ;
+		wordfill_dtor(op) ;
 	    }
-	} /* end if (fifostr-start) */
-
+	} /* end if (wordfill_ctor) */
 	return rs ;
 }
 /* end subroutine (wordfill_start) */
 
-int wordfill_finish(WORDFILL *op) noex {
-	int		rs = SR_OK ;
+int wordfill_finish(wordfill *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != WORDFILL_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	rs1 = fifostr_finish(&op->sq) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = wordfill_magic(op)) >= 0) {
+	    {
+	        rs1 = fifostr_finish(op->sqp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = wordfill_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (wordfill_finish) */
 
-int wordfill_addword(WORDFILL *op,cchar *lbuf,int llen) noex {
-	int		rs = SR_OK ;
+int wordfill_addword(wordfill *op,cchar *lbuf,int llen) noex {
+	int		rs ;
 	int		c = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (lbuf == NULL) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != WORDFILL_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (llen < 0)
-	    llen = strlen(lbuf) ;
-
-	if (llen > 0) {
-	    c += 1 ;
-	    if ((rs = fifostr_add(&op->sq,lbuf,llen)) >= 0) {
-	        op->wc += 1 ;
-	        op->cc += llen ;
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen > 0) {
+	        c += 1 ;
+	        if ((rs = fifostr_add(op->sqp,lbuf,llen)) >= 0) {
+	            op->wc += 1 ;
+	            op->chrc += llen ;
+	        }
 	    }
-	}
-
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (wordfill_addword) */
 
-int wordfill_addline(WORDFILL *op,cchar *lbuf,int llen) noex {
-	int		rs = SR_OK ;
-	int		sl, cl ;
+int wordfill_addline(wordfill *op,cchar *lbuf,int llen) noex {
+	int		rs ;
 	int		c = 0 ;
-	cchar	*sp, *cp ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (lbuf == NULL) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != WORDFILL_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (llen < 0)
-	    llen = strlen(lbuf) ;
-
-	sp = lbuf ;
-	sl = llen ;
-	while ((cl = nextfield(sp,sl,&cp)) > 0) {
-
-	    c += 1 ;
-	    rs = fifostr_add(&op->sq,cp,cl) ;
-
-	    op->wc += 1 ;
-	    op->cc += cl ;
-
-	    sl -= ((cp + cl) - sp) ;
-	    sp = (cp + cl) ;
-
-	    if (rs < 0) break ;
-	} /* end while */
-
+	if ((rs = wordfill_magic(op,lbuf)) >= 0) {
+	    if (llen < 0) llen = strlen(lbuf) ;
+	    if (llen > 0) {
+		sif	so(lbuf,llen) ;
+		int	cl ;
+		cchar	*cp ;
+		while ((cl = so(&cp)) > 0) {
+	            c += 1 ;
+	            rs = fifostr_add(op->sqp,cp,cl) ;
+	            op->wc += 1 ;
+	            op->chrc += cl ;
+	            if (rs < 0) break ;
+	        } /* end while */
+	    } /* end if (non-zero positive) */
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (wordfill_addline) */
 
-int wordfill_addlines(WORDFILL *op,cchar *lbuf,int llen) noex {
-	int		rs = SR_OK ;
-	int		sl, cl ;
+int wordfill_addlines(wordfill *op,cchar *lbuf,int llen) noex {
+	int		rs ;
 	int		c = 0 ;
-	cchar	*tp, *sp, *cp ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (lbuf == NULL) return SR_FAULT ;
-
-#if	CF_SAFE
-	if (op->magic != WORDFILL_MAGIC) return SR_NOTOPEN ;
-#endif
-
-	if (llen < 0)
-	    llen = strlen(lbuf) ;
-
-	sp = lbuf ;
-	sl = llen ;
-	while (sl > 0) {
-
-	    while ((cl = nextfield(sp,sl,&cp)) > 0) {
-
-	        c += 1 ;
-	        rs = fifostr_add(&op->sq,cp,cl) ;
-
-		op->wc += 1 ;
-		op->cc += cl ;
-
-	        sl -= ((cp + cl) - sp) ;
-	        sp = (cp + cl) ;
-
+	if ((rs = wordfill_magic(op)) >= 0) {
+	    int		ll = (llen < 0) ? int(strlen(lbuf)) : llen ;
+	    cchar	*lp = lbuf ;
+	    cchar	*tp ;
+	    while ((tp = strnchr(lp,ll,'\n')) != nullptr) {
+		cchar	*sp ;
+		if (int sl ; (sl = sfcontent(lp,(tp-lp),&sp)) > 0) {
+		    sif		so(sp,sl) ;
+		    int		cl ;
+		    cchar	*cp ;
+		    while ((cl = so(&cp)) > 0) {
+	                c += 1 ;
+	                rs = fifostr_add(op->sqp,cp,cl) ;
+		        op->wc += 1 ;
+		        op->chrc += cl ;
+			if (rs < 0) break ;
+	            } /* end while */
+		} /* end if (sfcontent) */
+		ll -= ((tp+1) - lp) ;
+		lp = (tp+1) ;
 	        if (rs < 0) break ;
 	    } /* end while */
-
-	    if ((tp = strnchr(sp,sl,'\n')) == NULL)
-	        break ;
-
-	    sl -= ((tp + 1) - sp) ;
-	    sp = (tp + 1) ;
-
-	    if (rs < 0) break ;
-	} /* end while */
-
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (wordfill_addlines) */
 
-int wordfill_mklinefull(WORDFILL *op,char *lbuf,int llen) noex {
-	return wordfill_mkline(op,FALSE,lbuf,llen) ;
+int wordfill_mklinefull(wordfill *op,char *lbuf,int llen) noex {
+	return wordfill_mkline(op,false,lbuf,llen) ;
 }
 /* end subroutine (wordfill_mklinefull) */
 
-int wordfill_mklinepart(WORDFILL *op,char *lbuf,int llen) noex {
-	return wordfill_mkline(op,TRUE,lbuf,llen) ;
+int wordfill_mklinepart(wordfill *op,char *lbuf,int llen) noex {
+	return wordfill_mkline(op,true,lbuf,llen) ;
 }
 /* end subroutine (wordfill_mklinepart) */
 
 
 /* private subroutines */
 
-static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen) noex {
+static int wordfill_mkline(wordfill *op,int f_part,char *lbuf,int llen) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		ll ;
@@ -257,12 +260,12 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen) noex {
 	        int	i = 0 ;
 	        ql = 0 ;
 	        c = 0 ;
-	        while ((wl = fifostr_entlen(&op->sq,i)) >= 0) {
+	        while ((wl = fifostr_entlen(op->sqp,i)) >= 0) {
 	            if (wl >  0) {
 	                if (c++ > 0) ql += 1 ;
 	                ql += wl ; 
 		        if (ql >= (llen - 1)) {
-	                    f_give = TRUE ; break ;
+	                    f_give = true ; break ;
 	                }
 		    } /* end if (greater-than-zero) */
 		    i += 1 ;
@@ -270,12 +273,12 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen) noex {
 	    } /* end block */
 #else /* COMMENT */
 	    {
-	        ql = op->cc ;
+	        ql = op->chrc ;
 	        if (op->wc > 0)
 		    ql += (op->wc - 1) ;
 
 	        if (ql >= (llen - 1))
-	            f_give = TRUE ;
+	            f_give = true ;
 	    } /* end block */
 #endif /* COMMENT */
 
@@ -288,7 +291,7 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen) noex {
 	    ll = llen ;
 	    while (ll > 0) {
 
-	        rs1 = fifostr_headlen(&op->sq) ;
+	        rs1 = fifostr_headlen(op->sqp) ;
 	        wl = rs1 ;
 
 	        if (rs1 == SR_NOTFOUND)
@@ -314,10 +317,10 @@ static int wordfill_mkline(WORDFILL *op,int f_part,char *lbuf,int llen) noex {
 	            ll -= 1 ;
 	        }
 
-	        rs = fifostr_remove(&op->sq,lp,ll) ;
+	        rs = fifostr_remove(op->sqp,lp,ll) ;
 		if (rs >= 0) {
 		    op->wc -= 1 ;
-		    op->cc -= wl ;
+		    op->chrc -= wl ;
 		}
 
 	        lp += wl ;

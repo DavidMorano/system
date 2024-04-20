@@ -31,10 +31,10 @@
 
 
 struct wordfill_head {
-	fifostr		sq ;
+	fifostr		*sqp ;		/* string-queue-pointer */
 	uint		magic ;
 	int		wc ;		/* word-count */
-	int		cc ;		/* character count (w/ blanks) */
+	int		chrc ;		/* character count (w/ blanks) */
 } ;
 
 typedef	WORDFILL	wordfill ;
