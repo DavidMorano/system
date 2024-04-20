@@ -164,7 +164,7 @@ int sfnextchr(cchar *sp,int sl,int sch,cchar **rpp) noex {
 }
 
 int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
-	int		rl = -1 ;
+	int		rl = 0 ;
 	struct esfx : sfnextx {
 	    cchar	*terms ;
 	    esfx(cchar *p,int l,cchar **r) noex : sfnextx(p,l,r) { } ;
@@ -184,7 +184,7 @@ int sfnextbrk(cchar *sp,int sl,cchar *terms,cchar **rpp) noex {
 /* local subroutines */
 
 sfnextx::operator int () noex {
-	int		rl = -1 ;
+	int		rl = 0 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    while (sl && CHAR_ISWHITE(*sp)) {

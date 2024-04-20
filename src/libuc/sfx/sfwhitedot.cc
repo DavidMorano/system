@@ -17,6 +17,16 @@
 
 /*******************************************************************************
 
+	Names:
+	sfochr
+	afrchr
+	sfwhitedot
+
+	Philosophy:
+	The terminator is *required* in order for a non-empty result
+	string to be returned.
+
+
 	Name:
 	sfwhitedot
 
