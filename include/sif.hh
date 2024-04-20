@@ -36,7 +36,7 @@ struct sif {
 	sif(cchar *p,int l,int c = 0) noex : sp(p), sl(l), sch(c) { 
 	    if (sl < 0) sl = strlen(sp) ;
 	} ;
-	sif(cchar *p,int l,cchar *s = nullptr) noex : sp(p), sl(l) { 
+	sif(cchar *p,int l,cchar *s) noex : sp(p), sl(l) { 
 	    if (sl < 0) sl = strlen(sp) ;
 	    sstr = s ;
 	} ;

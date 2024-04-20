@@ -67,6 +67,9 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 int strkeycmp(cchar *e1p,cchar *e2p) noex {

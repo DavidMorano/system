@@ -67,9 +67,6 @@ extern "C" {
 /* external variables */
 
 
-/* local variables */
-
-
 /* subroutine-templates */
 
 template<int (*toxc)(int)>
@@ -92,6 +89,9 @@ char *strncpyxc(scxc_f scxc,char *dst,cchar *src,int n) noex {
 	return dst ;
 }
 /* end subroutine-template (strncpyxc) */
+
+
+/* local variables */
 
 
 /* exported variables */

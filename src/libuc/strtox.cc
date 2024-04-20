@@ -120,6 +120,9 @@ struct llhelper {
 constexpr llhelper	llhelp ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
 /*
