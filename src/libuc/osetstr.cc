@@ -50,6 +50,9 @@ using std::nothrow ;			/* constant */
 typedef set<string>	setstr ;
 typedef set<string> *	setstrp ;
 
+typedef	set<string>::iterator	iter ;
+typedef	set<string>::iterator *	iterp ;
+
 
 /* external subroutines */
 
@@ -103,6 +106,7 @@ int osetstr_finish(osetstr *op) noex {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    delete setp ;
 	    op->setp = nullptr ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -110,16 +114,16 @@ int osetstr_finish(osetstr *op) noex {
 
 int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
 	int		rs ;
-	int		f = TRUE ;
+	int		f = true ;
 	if ((rs = osetstr_magic(op,sp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
-	        set<string>::iterator it_end = setp->end() ;
-	        set<string>::iterator it ;
-	        if ((it = setp->find(*strp)) == it_end) {
-	            f = FALSE ;
+	        iter	ite = setp->end() ;
+	        iter	it ;
+	        if ((it = setp->find(*strp)) == ite) {
+	            f = false ;
 		}
 		delete strp ;
 	    } else {
@@ -132,11 +136,11 @@ int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
 
 int osetstr_add(osetstr *op,cchar *sp,int sl) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = osetstr_magic(op,sp)) >= 0) {
 	    if (sl < 0) sl = strlen(sp) ;
 	    setstr	*setp  = setstrp(op->setp) ;
-	    pair<set<string>::iterator,bool>	ret ;
+	    pair<iter,bool>	ret ;
 	    string	v(sp,sl) ;
 	    ret = setp->insert(v) ;
 	    f = (ret.second == false) ;
@@ -147,15 +151,16 @@ int osetstr_add(osetstr *op,cchar *sp,int sl) noex {
 
 int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
 	int		rs ;
-	int		f = FALSE ;
+	int		f = false ;
 	if ((rs = osetstr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    {
-	        set<string>::iterator	it, end = setp->end() ;
-	        string			v(sp,sl) ;
-	        if ((it = setp->find(v)) != end) {
-		    f = TRUE ;
+	        iter		it ;
+	        iter		ite = setp->end() ;
+	        string		v(sp,sl) ;
+	        if ((it = setp->find(v)) != ite) {
+		    f = true ;
 		    setp->erase(it) ;
 	        }
 	    }
@@ -169,10 +174,10 @@ int osetstr_delall(osetstr *op) noex {
 	if ((rs = osetstr_magic(op)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
  	    {
-	        set<string>::iterator it = setp->begin() ;
-	        set<string>::iterator itend = setp->end() ;
-	        if (it != itend) {
-		    setp->erase(it,itend) ;
+	        iter	it = setp->begin() ;
+	        iter	ite = setp->end() ;
+	        if (it != ite) {
+		    setp->erase(it,ite) ;
 	        }
 	    }
 	} /* end if (magic) */
@@ -198,10 +203,10 @@ int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
 	if ((rs = osetstr_magic(op,curp)) >= 0) {
 	    cnullptr	np{} ;
 	    setstr	*setp  = setstrp(op->setp) ;
-	    set<string>::iterator	*interp ;
-	    if ((interp = new(nothrow) set<string>::iterator) != np) {
-	        *interp = setp->begin() ;
-	        curp->interp = interp ;
+	    iter	*itp ;
+	    if ((itp = new(nothrow) iter) != np) {
+	        *itp = setp->begin() ;
+	        curp->itp = itp ;
 	    } else {
 		rs = SR_NOMEM ;
 	    }
@@ -213,11 +218,10 @@ int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
 int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
 	int		rs ;
 	if ((rs = osetstr_magic(op,curp)) >= 0) {
-	    if (curp->interp) {
-	        set<string>::iterator *interp = 
-		    (set<string>::iterator *) curp->interp ;
-	        delete interp ;
-	        curp->interp = nullptr ;
+	    if (curp->itp) {
+	        iter	*itp = iterp(curp->itp) ;
+	        delete itp ;
+	        curp->itp = nullptr ;
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
@@ -230,15 +234,13 @@ int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	int		rs ;
 	if ((rs = osetstr_magic(op,curp,rpp)) >= 0) {
 	    setstr	*setp  = setstrp(op->setp) ;
-	    if (curp->interp) {
-	        set<string>::iterator it_end ;
-	        set<string>::iterator *interp = 
-			    (set<string>::iterator *) curp->interp ;
-	        it_end = setp->end() ;
-	        if (*interp != it_end) {
-		    *rpp = (*(*interp)).c_str() ;
-		    rs = (*(*interp)).length() ;
-	            (*interp)++ ;
+	    if (curp->itp) {
+	        iter	ite = setp->end() ;
+	        iter	*itp = iterp(curp->itp) ;
+	        if (*itp != ite) {
+		    *rpp = (*(*itp)).c_str() ;
+		    rs = (*(*itp)).length() ;
+	            (*itp)++ ;
 	        } else {
 		    rs = SR_NOTFOUND ;
 	        }

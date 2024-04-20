@@ -30,7 +30,7 @@
 
 
 struct osetstr_cursor {
-	void		*interp ;
+	void		*itp ;
 } ;
 
 struct osetstr_head {
