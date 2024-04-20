@@ -72,6 +72,7 @@
 #include	<xperm.h>
 #include	<matxstr.h>
 #include	<ctdec.h>
+#include	<hasx.h>
 #include	<isnot.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
@@ -226,6 +227,8 @@ static int	mapdir_procouter(MD *,cchar **,
 
 static int	writeto(int,cchar *,int,int) noex ;
 static int	loadstrs(cchar **,cchar *,cchar *,cchar *,cchar *) noex ;
+static int	narr(mainv) noex ;
+
 static bool	isBaseMatch(cchar *,cchar *,cchar *) noex ;
 
 
@@ -617,7 +620,7 @@ static int statmsg_envbegin(STATMSG *op) noex {
 	    op->envv = va ;
 	    for (i = 0 ; environ[i] != nullptr ; i += 1) {
 	        ep = environ[i] ;
-	        f = TRUE ;
+	        f = true ;
 	        f = f && (ep[0] != '-') ;
 	        f = f && (matstr(envbad,ep,-1) < 0) ;
 	        if (f && (ep[0] == 'M')) f = (strncmp(envpre,ep,5) != 0) ;
@@ -1215,7 +1218,7 @@ static int mapdir_process(MD *ep,cchar **ev,cchar **adms,
 	int		wlen = 0 ;
 
 	if (ep->dirname[0] != '\0') {
-	    int	f_continue = TRUE ;
+	    int	f_continue = true ;
 	    if ((adms != nullptr) && (adms[0] != nullptr)) {
 	        f_continue = (matstr(adms,ep->admin,-1) >= 0) ;
 	    } /* end if (adms) */
@@ -1297,53 +1300,50 @@ static int mapdir_expander(MD *ep) noex {
 }
 /* end subroutine (mapdir_expander) */
 
-static int mapdir_processor(MD *ep,cchar **ev,cchar *gn,
-		cchar *kn,int fd) noex {
-	USTAT	sb ;
-	vecstr		nums ;
+static int mapdir_processor(MD *ep,cchar **ev,cchar *,cchar *kn,int fd) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		n ;
 	int		wlen = 0 ;
-	int		f_continue = TRUE ;
+	int		f_continue = true ;
 	cchar		*defname = STATMSG_DEFGROUP ;
 	cchar		*allname = STATMSG_ALLGROUP ;
 	cchar		*suf = STATMSG_SUF ;
-	cchar		*dn ;
+	cchar		*dn = ep->dirname ;
 	char		env_admin[ENVBUFLEN+1] ;
 	char		env_admindir[ENVBUFLEN+1] ;
 
-	dn = ep->dirname ;
 	if (dn[0] == '~') {
 	    dn = ep->dname ;
 	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
+		USTAT	sb ;
 	    if ((rs1 = u_stat(dn,&sb)) >= 0) {
+		vecstr	nums ;
 	        cint	envlen = ENVBUFLEN ;
-	        cchar		*post ;
-	        post = envstrs[envstr_admin] ;
+		int	n = narr(ev) ;
+	        cchar	*post = envstrs[envstr_admin] ;
 	        strdcpy4(env_admin,envlen,envpre,post,"=",ep->admin) ;
 	        post = envstrs[envstr_admindir] ;
 	        strdcpy4(env_admindir,envlen,envpre,post,"=",dn) ;
-	        for (n = 0 ; ev[n] != nullptr ; n += 1) ;
 	        ev[n+0] = env_admin ;
 	        ev[n+1] = env_admindir ;
 	        ev[n+2] = nullptr ;
 	        if ((rs = vecstr_start(&nums,0,0)) >= 0) {
-	            FSDIR	d ;
-	            FSDIR_ENT	de ;
-	            int		i ;
 	            cchar	*strs[5] ;
+			char	*nbuf{} ;
+		    if ((rs = malloc_mn(&nbuf)) >= 0) {
+	            fsdir	d ;
+	            fsdir_ent	de ;
+			cint	nlen = rs ;
 	            loadstrs(strs,kn,defname,allname,suf) ;
 	            if ((rs = fsdir_open(&d,dn)) >= 0) {
-	                cchar	*tp ;
-	                while ((rs = fsdir_read(&d,&de)) > 0) {
+	                while ((rs = fsdir_read(&d,&de,nbuf,nlen)) > 0) {
 	                    cchar	*den = de.name ;
 	                    if (den[0] != '.') {
-	            	        tp = strchr(den,'.') ;
-	            		if ((tp != nullptr) && (strcmp((tp+1),suf) == 0)) {
-				    int		f = TRUE ;
+	                	cchar	*tp = strchr(den,'.') ;
+	            		if (tp && (strcmp((tp+1),suf) == 0)) {
+				    int		f = true ;
 	   			    cchar	*digp ;
 	                	    digp = strnpbrk(den,(tp-den),"0123456789") ;
 	                	    if (digp != nullptr) {
@@ -1351,7 +1351,7 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *gn,
 				    }
 				    if (f) {
 	                	        if ((kn[0] != '\0') && (kn[0] != '-')) {
-			    		    for (i = 0 ; i < 3 ; i += 1) {
+			    		    for (int i = 0 ; i < 3 ; i += 1) {
 					    f = isBaseMatch(den,strs[i],digp) ;
 					    if (f) break ;
 			    		    } /* end for */
@@ -1367,12 +1367,16 @@ static int mapdir_processor(MD *ep,cchar **ev,cchar *gn,
 	        	rs1 = fsdir_close(&d) ;
 			if (rs >= 0) rs = rs1 ;
 	  	    } /* end if (fsdir) */
+			rs1 = uc_free(nbuf) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
 		    if (rs >= 0) {
 	        	vecstr_sort(&nums,nullptr) ;
 	        	rs = mapdir_processorthem(ep,ev,dn,&nums,strs,fd) ;
 	        	wlen += rs ;
 	   	    } /* end if */
-	   	    vecstr_finish(&nums) ;
+	   	    rs1 = vecstr_finish(&nums) ;
+		    if (rs >= 0) rs = rs1 ;
 		} /* end if (vecstr-nums) */
 		{
 	    	    ev[n] = nullptr ;
@@ -1389,10 +1393,8 @@ static int mapdir_processorthem(MD *ep,cchar **ev,cchar *dn,
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	cchar		*kn ;
+	cchar		*kn = strs[0] ;
 	char		kbuf[2] ;
-
-	kn = strs[0] ;
 
 	if (kn[0] == '-') {
 	    kn = kbuf ;
@@ -1618,8 +1620,15 @@ static int loadstrs(cc **strs,cc *gn,cc *def,cc *all,cc *name) noex {
 }
 /* end subroutine (loadstrs) */
 
+static int narr(mainv ev) noex {
+	int		c = 0 ;
+	while (ev[c]) c += 1 ;
+	return c ;
+}
+/* end subroutine (narr) */
+
 static bool isBaseMatch(cchar *den,cchar *bname,cchar *digp) noex {
-	bool		f = FALSE ;
+	bool		f = false ;
 	if (digp == nullptr) {
 	    int	bl = strlen(bname) ;
 	    int	m = nleadstr(den,bname,bl) ;
