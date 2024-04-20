@@ -10,9 +10,16 @@
 	= 1998-03-01, David A­D­ Morano
 	This subroutine was originally written.
 
+	= 2024-05-20, David A-D- Morano
+	In review, I could not find any subroutines (anywhere) that
+	still use this subroutine.  I do not know what happened,
+	but there it is.  There might be stuff in a long (lost)
+	source code respository (someplace), but I am (currently)
+	unaware of any such thing.
+
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 1998,2024 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -34,14 +41,16 @@
 
 	Returns:
 	>0		length of found key field
-	==0		an empty (zero-length) key was found
-	<0		no key was found (system-return)
+	==0		no key was found
+	<0		error code (system-return)
+
+	Usage-note:
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
@@ -85,32 +94,36 @@ static inline bool iskeychar(int ch) noex {
 
 int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	int		rs = SR_FAULT ;
-	int		klen = 0 ;
+	int		kl = 0 ;
 	if (sp && kpp) {
-	    int		kl ;
-	    bool	f_len = (sl >= 0) ;
+	    cchar	*kp = nullptr ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    rs = SR_OK ;
 /* skip leading white space (not including NLs) */
-	    while (((! f_len) || (sl > 0)) && isspacetab(*sp)) {
+	    while (sl && isspacetab(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    *kpp = charp(sp) ;
+	    kp = sp ;
 /* skip the non-white space */
-	    while ((((! f_len) && *sp) || (sl > 0)) && iskeychar(*sp)) {
+	    while (sl && iskeychar(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
-	    kl = (sp - (*kpp)) ;
+	    kl = (sp - kp) ;
 /* skip any trailing whitespace */
-	    while (((! f_len) || (sl > 0)) && isspacetab(*sp)) {
+	    while (sl && isspacetab(*sp)) {
 	        sp += 1 ;
 	        sl -= 1 ;
 	    } /* end while */
 /* this character must be a colon (':') or else we did not have a head-key */
-	    klen = (*sp == ':') ? kl : -1 ;
+	    if (*sp == ':') {
+		*kpp = kp ;
+	    } else {
+		kl = 0 ;
+	    }
 	} /* end if (non-null) */
-	return (rs >= 0) ? klen : rs ;
+	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (mailmsgheadkey) */
 

@@ -21,7 +21,7 @@
 	mailmsgmathdr
 
 	Description:
-	This subroutine tests whether a MSG-header is in the suppled
+	This subroutine tests whether a MSG-header is in the supplied
 	test string.  If a MSG-header is present, then the subroutine
 	returns the length of the MSG-header key, otherwise it
 	returns zero (0).
