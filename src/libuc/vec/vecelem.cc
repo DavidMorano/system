@@ -27,7 +27,8 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<algorithm>
@@ -59,6 +60,7 @@ extern "C" {
 /* forward references */
 
 static int	vecelem_ctor(vecelem *) noex ;
+static int	vecelem_dtor(vecelem *) noex ;
 static int	vecelem_extend(vecelem *) noex ;
 static int	vecelem_setopts(vecelem *,int) noex ;
 
@@ -107,9 +109,9 @@ int vecelem_start(vecelem *op,int esize,int n,int opts) noex {
 	        op->esize = esize ;
 	        if ((rs = vecelem_setopts(op,opts)) >= 0) {
 	            if (n > 0) {
-	                cint	size = (n + 1) * op->esize ;
+	                cint	sz = (n + 1) * op->esize ;
 	                char	*p ;
-	                if ((rs = uc_libmalloc(size,&p)) >= 0) {
+	                if ((rs = uc_libmalloc(sz,&p)) >= 0) {
 	                    op->va = (void **) p ;
 	    	            op->n = n ;
 		            op->magic = VECELEM_MAGIC ;
@@ -117,7 +119,10 @@ int vecelem_start(vecelem *op,int esize,int n,int opts) noex {
 	            }
 	        } /* end if */
 	    } /* end if (valid) */
-	} /* end if (non-null) */
+	    if (rs < 0) {
+		vecelem_dtor(op) ;
+	    }
+	} /* end if (vecelem_ctor) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (vecelem_start) */
@@ -126,15 +131,19 @@ int vecelem_finish(vecelem *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = vecelem_magic(op)) >= 0) {
-	        if (op->va) {
-		    rs1 = uc_libfree(op->va) ;
-		    if (rs >= 0) rs = rs1 ;
-		    op->va = nullptr ;
-	        }
-	        op->c = 0 ;
-	        op->i = 0 ;
-	        op->n = 0 ;
-	        op->magic = 0 ;
+	    if (op->va) {
+		rs1 = uc_libfree(op->va) ;
+		if (rs >= 0) rs = rs1 ;
+		op->va = nullptr ;
+	    }
+	    {
+		rs1 = vecelem_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->c = 0 ;
+	    op->i = 0 ;
+	    op->n = 0 ;
+	    op->magic = 0 ;
 	} /* end if (magic) */
 	return rs ;
 }
@@ -272,7 +281,7 @@ int vecelem_audit(vecelem *op) noex {
 		        void	*ep = nullptr ;
 	                cint	esize = op->esize ;
 	                if ((rs = uc_libmalloc(esize,&ep)) >= 0) {
-		            int		i ;
+		            int		i ; /* used-afterwards */
 	                    for (i = 0 ; i < op->i ; i += 1) {
 		                caddr_t		cap = caddr_t(op->va) ;
 		                cap += (i * esize) ;
@@ -311,6 +320,15 @@ static int vecelem_ctor(vecelem *op) noex {
 	return rs ;
 }
 /* end subroutine (vecelem_ctor) */
+
+static int vecelem_dtor(vecelem *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	}
+	return rs ;
+}
+/* end subroutine (vecelem_dtor) */
 
 static int vecelem_setopts(vecelem *op,int vo) noex {
 	int		rs = SR_INVALID ;

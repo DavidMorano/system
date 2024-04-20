@@ -19,7 +19,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* |caddr_t| */
 #include	<utypedefs.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
@@ -55,17 +55,18 @@ struct vecelem_flags {
 } ;
 
 struct vecelem_head {
-	void		*va ;
+	caddr_t		va ;
+	VECELEM_FL	f ;
 	uint		magic ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
 	int		esize ;		/* element size */
-	VECELEM_FL	f ;
 } ;
 
-typedef struct vecelem_head	vecelem ;
+typedef VECELEM		vecelem ;
+typedef VECELEM_FL	vecelem_fl ;
 
 EXTERNC_begin
 

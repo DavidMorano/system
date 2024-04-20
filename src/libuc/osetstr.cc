@@ -4,7 +4,6 @@
 /* ordered set of strings */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -23,7 +22,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<sys/types.h>
 #include	<climits>
 #include	<cstring>
 #include	<new>
@@ -43,13 +41,13 @@
 
 using namespace		std ;		/* yes, we want punishment! */
 
+using std::nullptr_t ;			/* type */
+using std::set ;			/* type */
+using std::string ;			/* type */
+using std::nothrow ;			/* constant */
+
 
 /* external subroutines */
-
-#if	CF_DEBUGS
-extern "C" int	debugprintf(cchar *,...) ;
-extern "C" int	strlinelen(cchar *,int,int) ;
-#endif
 
 
 /* forward references */
@@ -58,11 +56,12 @@ extern "C" int	strlinelen(cchar *,int,int) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int osetstr_start(osetstr *op,int n)
-{
+int osetstr_start(osetstr *op,int n) noex {
 	set<string>	*setp ;
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
@@ -76,9 +75,7 @@ int osetstr_start(osetstr *op,int n)
 }
 /* end subroutine (osetstr_start) */
 
-
-int osetstr_finish(osetstr *op)
-{
+int osetstr_finish(osetstr *op) noex {
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->setp != NULL) {
@@ -92,17 +89,12 @@ int osetstr_finish(osetstr *op)
 }
 /* end subroutine (osetstr_finish) */
 
-
-int osetstr_already(osetstr *op,cchar *sp,int sl)
-{
+int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		f = TRUE ;
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
 	if (sl < 0) sl = strlen(sp) ;
-#if	CF_DEBUGS
-	debugprintf("osetstr_already: ent s=%t\n",sp,sl) ;
-#endif
 	if (op->setp != NULL) {
 	    set<string>	*setp  = (set<string> *) op->setp ;
 	    string	*strp ;
@@ -119,24 +111,16 @@ int osetstr_already(osetstr *op,cchar *sp,int sl)
 	} else {
 	    rs = SR_NOTOPEN ;
 	}
-#if	CF_DEBUGS
-	debugprintf("osetstr_already: ret rs=%d f=%u\n",rs,f) ;
-#endif
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (osetstr_already) */
 
-
-int osetstr_add(osetstr *op,cchar *sp,int sl)
-{
+int osetstr_add(osetstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 	if (op == NULL) return SR_FAULT ;
 	if (sp == NULL) return SR_FAULT ;
 	if (sl < 0) sl = strlen(sp) ;
-#if	CF_DEBUGS
-	debugprintf("osetstr_add: ent s=%t\n",sp,sl) ;
-#endif
 	if (op->setp != NULL) {
 	    set<string>	*setp  = (set<string> *) op->setp ;
 	    pair<set<string>::iterator,bool>	ret ;
@@ -146,16 +130,11 @@ int osetstr_add(osetstr *op,cchar *sp,int sl)
 	} else {
 	    rs = SR_NOTOPEN ;
 	}
-#if	CF_DEBUGS
-	debugprintf("osetstr_add: ret rs=%d f=%u\n",rs,f) ;
-#endif
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (osetstr_add) */
 
-
-int osetstr_del(osetstr *op,cchar *sp,int sl)
-{
+int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
 	int		rs = SR_OK ;
 	int		f = FALSE ;
 	if (op == NULL) return SR_FAULT ;
@@ -177,9 +156,7 @@ int osetstr_del(osetstr *op,cchar *sp,int sl)
 }
 /* end subroutine (osetstr_del) */
 
-
-int osetstr_delall(osetstr *op)
-{
+int osetstr_delall(osetstr *op) noex {
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
 	if (op->setp != NULL) {
@@ -198,10 +175,7 @@ int osetstr_delall(osetstr *op)
 }
 /* end subroutine (osetstr_delall) */
 
-
-/* return the count of the number of items in this list */
-int osetstr_count(osetstr *op)
-{
+int osetstr_count(osetstr *op) noex {
 	int		rs = SR_OK ;
 	int		c = 0 ;
 	if (op == NULL) return SR_FAULT ;
@@ -215,9 +189,7 @@ int osetstr_count(osetstr *op)
 }
 /* end subroutine (osetstr_count) */
 
-
-int osetstr_curbegin(osetstr *op,osetstr_cur *curp)
-{
+int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
 	set<string>::iterator	*interp ;
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
@@ -233,9 +205,7 @@ int osetstr_curbegin(osetstr *op,osetstr_cur *curp)
 }
 /* end subroutine (osetstr_curbegin) */
 
-
-int osetstr_curend(osetstr *op,osetstr_cur *curp)
-{
+int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;
@@ -251,9 +221,7 @@ int osetstr_curend(osetstr *op,osetstr_cur *curp)
 }
 /* end subroutine (osetstr_curend) */
 
-
-int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp)
-{
+int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	int		rs = SR_OK ;
 	if (op == NULL) return SR_FAULT ;
 	if (curp == NULL) return SR_FAULT ;

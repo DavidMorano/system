@@ -44,6 +44,8 @@ INCS= vec.h
 LIBS=
 
 
+INCDIRS += 
+
 LIBDIRS= -L$(LIBDIR)
 
 # flag setting
