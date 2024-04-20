@@ -1913,7 +1913,7 @@ static int mkshmname(char *rbuf,int rlen,const char *rn,int rl,const char *suf)
 	int		rs = SR_OK ;
 	int		i = 0 ;
 	if ((rl != 0) && (rn[0] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += 1 ;
 	}
 	if (rs >= 0) {
@@ -1921,7 +1921,7 @@ static int mkshmname(char *rbuf,int rlen,const char *rn,int rl,const char *suf)
 	    i += rs ;
 	}
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,'$') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'$') ;
 	    i += rs ;
 	}
 	if (rs >= 0) {

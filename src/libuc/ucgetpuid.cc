@@ -124,7 +124,7 @@ static int mkpidfname(char *fname,cchar *dev,pid_t pid) noex {
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && (i > 0) && (fname[i-1] != '/')) {
-	        rs = storebuf_char(fname,flen,i,'/') ;
+	        rs = storebuf_chr(fname,flen,i,'/') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {

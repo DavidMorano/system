@@ -338,7 +338,7 @@ char	pathbuf[] ;
 	    debugprintf("findfilepath/checkit: 1 rs=%d i=%d\n",rs,i) ;
 #endif
 
-	    rs = storebuf_char(pathbuf,(MAXPATHLEN - 1),i,'/') ;
+	    rs = storebuf_chr(pathbuf,(MAXPATHLEN - 1),i,'/') ;
 
 	    if (rs < 0)
 	        goto ret0 ;

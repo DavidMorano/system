@@ -1526,7 +1526,7 @@ static int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl)
 	int		i = 0 ;
 
 	if (rs >= 0) {
-	    rs = storebuf_char(shmbuf,shmlen,i,'/') ;
+	    rs = storebuf_chr(shmbuf,shmlen,i,'/') ;
 	    i += rs ;
 	}
 
@@ -1542,7 +1542,7 @@ static int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(shmbuf,shmlen,i,'$') ;
+	    rs = storebuf_chr(shmbuf,shmlen,i,'$') ;
 	    i += rs ;
 	}
 

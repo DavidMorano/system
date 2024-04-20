@@ -110,7 +110,7 @@ int mkfnamesufx(char *rbuf,int n,cc *p1,...) noex {
 	        rl += rs ;
 	    }
 	    if ((rs >= 0) && (n > 0)) {
-	        rs = storebuf_char(rbuf,rlen,rl,'.') ;
+	        rs = storebuf_chr(rbuf,rlen,rl,'.') ;
 	        rl += rs ;
 	    }
 	    if (rs >= 0) {

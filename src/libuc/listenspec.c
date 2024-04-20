@@ -982,7 +982,7 @@ static int listenspec_tcpinfo(LISTENSPEC *op,LISTENSPEC_INFO *lip)
 	    rs = storebuf_strw(bp,bl,i,ip->af,-1) ;
 	    i += rs ;
 	    if (rs >= 0) {
-	        rs = storebuf_char(bp,bl,i,':') ;
+	        rs = storebuf_chr(bp,bl,i,':') ;
 	        i += rs ;
 	    }
 	}
@@ -991,7 +991,7 @@ static int listenspec_tcpinfo(LISTENSPEC *op,LISTENSPEC_INFO *lip)
 	    rs = storebuf_strw(bp,bl,i,ip->host,-1) ;
 	    i += rs ;
 	    if (rs >= 0) {
-	        rs = storebuf_char(bp,bl,i,':') ;
+	        rs = storebuf_chr(bp,bl,i,':') ;
 	        i += rs ;
 	    }
 	}

@@ -3186,7 +3186,7 @@ static int mkmsfname(char rbuf[],cchar mbuf[],int mlen,cchar *mup)
 	}
 
 	if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
 	}
 

@@ -91,7 +91,7 @@ int mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex {
 	                i += rs ;
 	            }
 	            if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	                rs = storebuf_char(rbuf,rlen,i,'/') ;
+	                rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	                i += rs ;
 	            }
 	        } /* end if (had a directory) */
@@ -100,7 +100,7 @@ int mkintfname(char *rbuf,cchar *dn,cchar *prn,cchar *inter) noex {
 	            i += rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = storebuf_char(rbuf,rlen,i,'º') ;
+	            rs = storebuf_chr(rbuf,rlen,i,'º') ;
 	            i += rs ;
 	        }
 	        if (rs >= 0) {

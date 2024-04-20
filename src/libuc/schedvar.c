@@ -508,7 +508,7 @@ int		vl ;
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(dbuf,dlen,i,'=') ;
+	    rs = storebuf_chr(dbuf,dlen,i,'=') ;
 	    i += rs ;
 	}
 

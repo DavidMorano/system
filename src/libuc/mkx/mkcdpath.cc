@@ -242,7 +242,7 @@ int mkcdpathsub::mkjoin(cchar *cp,int cl) noex {
 	        el += rs ;
 	    }
 	    if ((rs >= 0) && el && (ebuf[el-1] != '/')) {
-	        rs = storebuf_char(ebuf,elen,el,'/') ;
+	        rs = storebuf_chr(ebuf,elen,el,'/') ;
 	        el += rs ;
 	    }
 	    if (rs >= 0) {

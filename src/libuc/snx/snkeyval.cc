@@ -79,7 +79,7 @@ int snkeyval(char *dbuf,int dlen,cchar *kp,int kl,cchar *vp,int vl) noex {
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = storebuf_char(dbuf,dlen,i,CHX_MIDDLE) ;
+	        rs = storebuf_chr(dbuf,dlen,i,CHX_MIDDLE) ;
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && vp) {

@@ -353,7 +353,7 @@ static int mkdfname(char *rbuf,cchar *dp,int dl,cchar *sp,int sl) noex {
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && (i > 0) && (rbuf[i - 1] != '/')) {
-	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {

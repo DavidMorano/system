@@ -471,7 +471,7 @@ const char	*cp ;
 	if ((rs >= 0) && ((tp = strchr(cp,'=')) != NULL)) {
 
 	    if ((tp+1)[0] != '\0') {
-	        rs = storebuf_char(newfname,buflen,i,'.') ;
+	        rs = storebuf_chr(newfname,buflen,i,'.') ;
 	        i += rs ;
 	        if (rs >= 0) {
 	            rs = storebuf_strw(newfname,buflen,i,(tp + 1),-1) ;

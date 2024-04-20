@@ -23,7 +23,8 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
-#include	<ascii.h>
+
+#include	"mkx.h"
 
 
 /* local defines */

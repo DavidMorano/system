@@ -199,7 +199,7 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 #endif
 
 	            c += 1 ;
-	            rs = storebuf_char(pathbuf,PATHBUFLEN,pbi,':') ;
+	            rs = storebuf_chr(pathbuf,PATHBUFLEN,pbi,':') ;
 
 			pbi += rs ;
 			if (rs >= 0)
@@ -246,7 +246,7 @@ int procfilepaths(cchar *programroot,cchar *fname,vecdtr *lp) noex {
 	if ((rs >= 0) && (strnvaluecmp(pathbuf,cp,-1) != 0)) {
 
 	    c += 1 ;
-	    rs = storebuf_char(pathbuf,PATHBUFLEN,pbi,':') ;
+	    rs = storebuf_chr(pathbuf,PATHBUFLEN,pbi,':') ;
 
 		pbi += rs ;
 		if (rs >= 0)

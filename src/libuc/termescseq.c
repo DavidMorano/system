@@ -84,7 +84,7 @@ int termescseq(char *dp,int dl,int final,int a1,int a2,int a3,int a4)
 	if (final > 0) {
 
 	if (rs >= 0) {
-	    rs = storebuf_char(dp,dl,i,'\033') ;
+	    rs = storebuf_chr(dp,dl,i,'\033') ;
 	    i += rs ;
 	}
 
@@ -106,7 +106,7 @@ int termescseq(char *dp,int dl,int final,int a1,int a2,int a3,int a4)
 	    } /* end switch */
 	    if (a >= 0) {
 	        if ((a >= 0x20) && (a < 0x2f)) {
-		    rs = storebuf_char(dp,dl,i,a) ;
+		    rs = storebuf_chr(dp,dl,i,a) ;
 		    i += rs ;
 	        } else
 		    rs = SR_ILSEQ ;
@@ -115,7 +115,7 @@ int termescseq(char *dp,int dl,int final,int a1,int a2,int a3,int a4)
 
 	if (rs >= 0) {
 	    if ((final >= 0x30) && (final <= 0x7e)) {
-	        rs = storebuf_char(dp,dl,i,final) ;
+	        rs = storebuf_chr(dp,dl,i,final) ;
 	        i += rs ;
 	    } else
 		rs = SR_ILSEQ ;

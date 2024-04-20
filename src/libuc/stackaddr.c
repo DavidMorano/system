@@ -8,18 +8,18 @@
 
 /* revision history:
 
-	= 1998-03-24, David AÂ­DÂ­ Morano
+	= 1998-03-24, David A­D­ Morano
 	This object module was originally written.
 
 */
 
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
+/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
 	We manage stack-addresses.
 
-        We needed something like this because SBUF and BUFFER do not have the
+        We needed something like this because SBUF and BUFFER to not have the
         back-up facility that we need.
 
 	Synopsis:
@@ -149,7 +149,7 @@ int stackaddr_add(STACKADDR *op,cchar *hp,int hl,cchar *up,int ul)
 	            }
 
 	            if (rs >= 0) {
-	                rs = storebuf_char(op->dbuf,op->dlen,op->i,'!') ;
+	                rs = storebuf_chr(op->dbuf,op->dlen,op->i,'!') ;
 	                op->i += rs ;
 	                len += rs ;
 	                op->ri = op->i ;

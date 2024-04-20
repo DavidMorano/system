@@ -199,7 +199,7 @@ static int mkourpath(char *pbuf,cc *dnp,int dnl,cc *fn) noex {
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && (! isendslash(dnp,dnl))) {
-	        rs = storebuf_char(pbuf,plen,i,'/') ;
+	        rs = storebuf_chr(pbuf,plen,i,'/') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {

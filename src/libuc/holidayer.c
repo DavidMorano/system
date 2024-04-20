@@ -712,7 +712,7 @@ static int holidayer_mkdir(HOLIDAYER *op,char *rbuf,cchar *dn)
 	    if ((rs = storebuf_strw(rbuf,rlen,i,pr,prl)) >= 0) {
 	        i += rs ;
 	        if (pr[prl-1] != '/') {
-	            rs = storebuf_char(rbuf,rlen,i,'/') ;
+	            rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	            i += rs ;
 	        }
 	    }
@@ -741,7 +741,7 @@ static int holidayer_mkfname(HOLIDAYER *op,char *rbuf,cchar *dn,uint y)
 	    if ((rs = storebuf_strw(rbuf,rlen,i,pr,prl)) >= 0) {
 	        i += rs ;
 	        if (pr[prl-1] != '/') {
-	            rs = storebuf_char(rbuf,rlen,i,'/') ;
+	            rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	            i += rs ;
 	        }
 	    }
@@ -753,7 +753,7 @@ static int holidayer_mkfname(HOLIDAYER *op,char *rbuf,cchar *dn,uint y)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
 	}
 

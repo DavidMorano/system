@@ -72,7 +72,7 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	    if (pid >= 0) {
 	        cint	mch = '*' ;
 	        if (rs >= 0) {
-	            rs = storebuf_char(dbuf,dlen,i,mch) ;
+	            rs = storebuf_chr(dbuf,dlen,i,mch) ;
 	            i += rs ;
 	        }
 	        if (rs >= 0) {
@@ -81,7 +81,7 @@ int snshellunder(char *dbuf,int dlen,pid_t pid,cchar *execfname) noex {
 	            i += rs ;
 	        }
 	        if (rs >= 0) {
-	            rs = storebuf_char(dbuf,dlen,i,mch) ;
+	            rs = storebuf_chr(dbuf,dlen,i,mch) ;
 	            i += rs ;
 	        }
 	    } /* end if (PID included) */

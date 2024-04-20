@@ -184,7 +184,7 @@ int		flen ;
 	    }
 
 	    if ((rs >= 0) && (pl > 0) && (pbuf[pl - 1] != '/')) {
-	        rs = storebuf_char(pbuf,plen,pl,'/') ;
+	        rs = storebuf_chr(pbuf,plen,pl,'/') ;
 	        pl += rs ;
 	    }
 

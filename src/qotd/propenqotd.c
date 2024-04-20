@@ -1653,12 +1653,12 @@ static int mkqfname(char *rbuf,cchar *qdname,int mjd)
 	}
 
 	if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,'q') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'q') ;
 	    i += rs ;
 	}
 

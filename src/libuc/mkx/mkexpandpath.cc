@@ -42,8 +42,16 @@
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
 
 
 /* external subroutines */

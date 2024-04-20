@@ -129,7 +129,7 @@ int termcharset(char *dp,int dl,int setnum,int f96,cchar *fontname)
 
 	if (rs >= 0) {
 	    int		ich = inter[setnum][f96] ;
-	    rs = storebuf_char(dp,dl,i,ich) ;
+	    rs = storebuf_chr(dp,dl,i,ich) ;
 	    i += rs ;
 	}
 

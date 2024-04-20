@@ -170,6 +170,8 @@ struct statmsg_mapdir {
 	cchar		*dname ;	/* expanded */
 } ;
 
+typedef statmsg_mapdir *	mdp ;
+
 
 /* forward references */
 
@@ -941,7 +943,6 @@ static int mapper_process(MA *mmp,cc **ev,cc **adms,
 
 static int mapper_processor(MA *mmp,cc **ev,cc **adms,
 		cc *gn,cc *kn,int fd) noex {
-	MD	*ep ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		wlen = 0 ;
@@ -950,8 +951,10 @@ static int mapper_processor(MA *mmp,cc **ev,cc **adms,
 
 	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
 
-	for (i = 0 ; vechand_get(&mmp->mapdirs,i,&ep) >= 0 ; i += 1) {
-	    if (ep != nullptr) {
+	void	*vp{} ;
+	for (i = 0 ; vechand_get(&mmp->mapdirs,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		MD	*ep = mdp(vp) ;
 	        rs = mapdir_process(ep,ev,adms,gn,kn,fd) ;
 	        wlen += rs ;
 	    }
@@ -1106,7 +1109,6 @@ static int mapper_mapadd(MA *mmp,cchar *kp,int kl,cchar *vp,int vl) noex {
 /* end subroutine (mapper_mapadd) */
 
 static int mapper_mapfins(MA *mmp) noex {
-	MD	*ep ;
 	vechand		*mlp = &mmp->mapdirs ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -1116,14 +1118,22 @@ static int mapper_mapfins(MA *mmp) noex {
 
 	if (mmp->magic != MAMAGIC) return SR_NOTOPEN ;
 
-	for (i = 0 ; vechand_get(mlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != nullptr) {
+	void	*vp{} ;
+	for (i = 0 ; vechand_get(mlp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		MD	*ep = mdp(vp) ;
+		{
 	        rs1 = mapdir_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
+		}
+		{
 	        rs1 = vechand_del(mlp,i--) ;
 	        if (rs >= 0) rs = rs1 ;
+		}
+		{
 	        rs1 = uc_free(ep) ;
 	        if (rs >= 0) rs = rs1 ;
+		}
 	    }
 	} /* end for */
 

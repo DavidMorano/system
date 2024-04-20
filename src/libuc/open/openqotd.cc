@@ -632,7 +632,7 @@ static int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -640,7 +640,7 @@ static int mkqdname(char *rbuf,cc *vtmpdname,cc *rnp,int rnl,cc *qcname) noex {
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -662,11 +662,11 @@ static int mkqfname(char *rbuf,cc *vtdn,cc *rnp,int rnl,cc *qcn,int mjd) noex {
 	        i += rs ;
 	    }
 	    if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = storebuf_char(rbuf,rlen,i,'q') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'q') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {

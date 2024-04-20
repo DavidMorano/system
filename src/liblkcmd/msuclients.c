@@ -459,7 +459,7 @@ static int msuclients_tmpourdname(MSUCLIENTS *op)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(tmpourdname,pathlen,i,'/') ;
+	    rs = storebuf_chr(tmpourdname,pathlen,i,'/') ;
 	    i += rs ;
 	}
 
@@ -469,7 +469,7 @@ static int msuclients_tmpourdname(MSUCLIENTS *op)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(tmpourdname,pathlen,i,'/') ;
+	    rs = storebuf_chr(tmpourdname,pathlen,i,'/') ;
 	    i += rs ;
 	}
 

@@ -144,7 +144,7 @@ int snxxx::operator () (char *dbuf,int dlen) noex {
 	        }
 	    }
 	    if ((rs >= 0) && mch) {
-	        rs = storebuf_char(dbuf,dlen,i,mch) ;
+	        rs = storebuf_chr(dbuf,dlen,i,mch) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
