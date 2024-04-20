@@ -63,7 +63,7 @@ using std::max ;			/* subroutine-template */
 
 /* forward references */
 
-static int filemap_opener(filemap *,cchar *,int) noex ;
+static int filemap_opener(filemap *,cchar *) noex ;
 static int filemap_openmap(filemap *,int,size_t) noex ;
 
 
@@ -187,7 +187,7 @@ int filemap_seek(filemap *op,off_t off,int w) noex {
 	            break ;
 	        case SEEK_CUR:
 	            {
-		        cchar	*bdata = (cchar *) op->mapdata ;
+		        cchar	*bdata = charp(op->mapdata) ;
 	                noff = ((op->bp - bdata) + off) ;
 	            }
 	            break ;
@@ -270,7 +270,7 @@ static int filemap_opener(filemap *op,cchar *fn) noex {
 /* end subroutine (filemap_opener) */
 
 static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
-	const nullptr_t	np{} ;
+	cnullptr	np{} ;
 	size_t		ms ;
 	int		rs ;
 	if ((rs = pagesize) >= 0) {
@@ -280,7 +280,7 @@ static int filemap_openmap(filemap *op,int fd,size_t fsize) noex {
 	    void	*md{} ;
 	    ms = max(ps,fsize) ;
 	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0L,&md)) >= 0) {
-	        cint		madv = MADV_SEQUENTIAL ;
+	        cint	madv = MADV_SEQUENTIAL ;
 	        if ((rs = u_madvise(md,ms,madv)) >= 0) {
 	            op->mapdata = md ;
 	            op->mapsize = ms ;
