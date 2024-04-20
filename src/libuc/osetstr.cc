@@ -22,10 +22,9 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<climits>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<new>
-#include	<utility>
+#include	<utility>		/* |pair(3c++)| */
 #include	<set>
 #include	<string>
 #include	<usystem.h>
@@ -39,18 +38,39 @@
 
 /* imported namespaces */
 
-using namespace		std ;		/* yes, we want punishment! */
-
 using std::nullptr_t ;			/* type */
+using std::pair ;			/* type */
 using std::set ;			/* type */
 using std::string ;			/* type */
 using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef set<string>	setstr ;
+typedef set<string> *	setstrp ;
 
 
 /* external subroutines */
 
 
 /* forward references */
+
+template<typename ... Args>
+static inline int osetstr_magic(osetstr *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_NOTOPEN ;
+	    if (op->magic == OSETSTR_MAGIC) {
+		rs = SR_BUGCHECK ;
+		if (op->setp != nullptr) {
+		    rs = SR_OK ;
+		}
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (osetstr_magic) */
 
 
 /* local variables */
@@ -62,43 +82,40 @@ using std::nothrow ;			/* constant */
 /* exported subroutines */
 
 int osetstr_start(osetstr *op,int n) noex {
-	set<string>	*setp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
+	int		rs = SR_FAULT ;
 	if (n < 0) n = 0 ;
-	if ((setp = new(nothrow) set<string>) != NULL) {
-	    op->setp = (void *) setp ;
-	} else {
+	if (op) {
+	    cnullptr	np{} ;
 	    rs = SR_NOMEM ;
-	}
+	    if (setstr *setp ; (setp = new(nothrow) setstr) != np) {
+	        op->setp = setp ;
+		op->magic = OSETSTR_MAGIC ;
+		rs = SR_OK ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (osetstr_start) */
 
 int osetstr_finish(osetstr *op) noex {
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<string>	*setp  = (set<string> *) op->setp ;
+	int		rs ;
+	if ((rs = osetstr_magic(op)) >= 0) {
+	    setstr	*setp  = setstrp(op->setp) ;
 	    delete setp ;
 	    op->setp = NULL ;
-	} else {
-	    rs = SR_NOTOPEN ;
-	}
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (osetstr_finish) */
 
 int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = TRUE ;
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (op->setp != NULL) {
-	    set<string>	*setp  = (set<string> *) op->setp ;
-	    string	*strp ;
-	    if ((strp = new(nothrow) string(sp,sl)) != NULL) {
+	if ((rs = osetstr_magic(op,sp)) >= 0) {
+	    cnullptr	np{} ;
+	    setstr	*setp  = setstrp(op->setp) ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (string *strp ; (strp = new(nothrow) string(sp,sl)) != np) {
 	        set<string>::iterator it_end = setp->end() ;
 	        set<string>::iterator it ;
 	        if ((it = setp->find(*strp)) == it_end) {
@@ -108,39 +125,32 @@ int osetstr_already(osetstr *op,cchar *sp,int sl) noex {
 	    } else {
 		rs = SR_NOMEM ;
 	    }
-	} else {
-	    rs = SR_NOTOPEN ;
-	}
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (osetstr_already) */
 
 int osetstr_add(osetstr *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = FALSE ;
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (op->setp != NULL) {
-	    set<string>	*setp  = (set<string> *) op->setp ;
+	if ((rs = osetstr_magic(op,sp)) >= 0) {
+	    if (sl < 0) sl = strlen(sp) ;
+	    setstr	*setp  = setstrp(op->setp) ;
 	    pair<set<string>::iterator,bool>	ret ;
 	    string	v(sp,sl) ;
 	    ret = setp->insert(v) ;
 	    f = (ret.second == false) ;
-	} else {
-	    rs = SR_NOTOPEN ;
-	}
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (osetstr_add) */
 
 int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = FALSE ;
-	if (op == NULL) return SR_FAULT ;
-	if (sl < 0) sl = strlen(sp) ;
-	if (op->setp != NULL) {
-	    set<string>		*setp  = (set<string> *) op->setp ;
+	if ((rs = osetstr_magic(op)) >= 0) {
+	    setstr	*setp  = setstrp(op->setp) ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    {
 	        set<string>::iterator	it, end = setp->end() ;
 	        string			v(sp,sl) ;
@@ -149,18 +159,15 @@ int osetstr_del(osetstr *op,cchar *sp,int sl) noex {
 		    setp->erase(it) ;
 	        }
 	    }
-	} else {
-	    rs = SR_NOTOPEN ;
-	}
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (osetstr_del) */
 
 int osetstr_delall(osetstr *op) noex {
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<string>		*setp  = (set<string> *) op->setp ;
+	int		rs ;
+	if ((rs = osetstr_magic(op)) >= 0) {
+	    setstr	*setp  = setstrp(op->setp) ;
  	    {
 	        set<string>::iterator it = setp->begin() ;
 	        set<string>::iterator itend = setp->end() ;
@@ -168,67 +175,62 @@ int osetstr_delall(osetstr *op) noex {
 		    setp->erase(it,itend) ;
 	        }
 	    }
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (osetstr_delall) */
 
 int osetstr_count(osetstr *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		c = 0 ;
-	if (op == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    set<string>		*setp = (set<string> *) op->setp ;
-	    c = setp->size() ;
-	} else {
-	    rs = SR_NOTOPEN ;
-	}
+	if ((rs = osetstr_magic(op)) >= 0) {
+	    setstr	*setp  = setstrp(op->setp) ;
+	    {
+	        c = setp->size() ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (osetstr_count) */
 
 int osetstr_curbegin(osetstr *op,osetstr_cur *curp) noex {
-	set<string>::iterator	*interp ;
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if ((interp = new(nothrow) set<string>::iterator) != NULL) {
-	    set<string>	*setp  = (set<string> *) op->setp ;
-	    *interp = setp->begin() ;
-	    curp->interp = (void *) interp ;
-	} else {
-	    rs = SR_NOMEM ;
-	}
+	int		rs ;
+	if ((rs = osetstr_magic(op,curp)) >= 0) {
+	    cnullptr	np{} ;
+	    setstr	*setp  = setstrp(op->setp) ;
+	    set<string>::iterator	*interp ;
+	    if ((interp = new(nothrow) set<string>::iterator) != np) {
+	        *interp = setp->begin() ;
+	        curp->interp = interp ;
+	    } else {
+		rs = SR_NOMEM ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (osetstr_curbegin) */
 
 int osetstr_curend(osetstr *op,osetstr_cur *curp) noex {
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (curp->interp != NULL) {
-	    set<string>::iterator *interp = 
-		(set<string>::iterator *) curp->interp ;
-	    delete interp ;
-	    curp->interp = NULL ;
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
+	int		rs ;
+	if ((rs = osetstr_magic(op,curp)) >= 0) {
+	    if (curp->interp) {
+	        set<string>::iterator *interp = 
+		    (set<string>::iterator *) curp->interp ;
+	        delete interp ;
+	        curp->interp = NULL ;
+	    } else {
+	        rs = SR_BUGCHECK ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (osetstr_curend) */
 
 int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
-	int		rs = SR_OK ;
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rpp == NULL) return SR_FAULT ;
-	if (op->setp != NULL) {
-	    if (curp->interp != NULL) {
-	        set<string>	*setp  = (set<string> *) op->setp ;
+	int		rs ;
+	if ((rs = osetstr_magic(op,curp,rpp)) >= 0) {
+	    setstr	*setp  = setstrp(op->setp) ;
+	    if (curp->interp) {
 	        set<string>::iterator it_end ;
 	        set<string>::iterator *interp = 
 			    (set<string>::iterator *) curp->interp ;
@@ -243,9 +245,7 @@ int osetstr_enum(osetstr *op,osetstr_cur *curp,cchar **rpp) noex {
 	    } else {
 	        rs = SR_BUGCHECK ;
 	    }
-	} else {
-	    rs = SR_BUGCHECK ;
-	}
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (osetstr_enum) */
