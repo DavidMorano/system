@@ -52,8 +52,8 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<strn.h>
-#include	<strwcmp.h>
 #include	<sfx.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>
 
 #include	"headkeymat.h"
@@ -80,6 +80,7 @@ int headkeymat(cchar *key,cchar *hbuf,int hlen) noex {
 	int		rs = SR_FAULT ;
 	int		len = 0 ;
 	if (key && hbuf) {
+	    rs = SR_OK ;
 	    if (char *tp ; (tp = strnochr(hbuf,hlen,':')) != nullptr) {
 		cint	vi = ((tp + 1) - hbuf) ;
 	        cchar	*cp{} ;

@@ -4,6 +4,7 @@
 /* extract the key from a mail-msg header field (c-string) */
 /* version %I% last-modified %G% */
 
+#define	CF_PROGRESSIVE		0	/* use progressive access */
 
 /* revision history:
 
@@ -27,9 +28,10 @@
 	mailmsgheadkey
 
 	Description:
-	This subroutine extracts the key of a header key, if one
-	is present in the supplied buffer.  A pointer to the key and
-	the length of the key is returned (if a key was present).
+	This subroutine extracts the key of a mail-message header
+	field, if one is present in the supplied buffer.  A pointer
+	to the key and the length of the key is returned (if a key
+	was present).
 
 	Synopsis:
 	int mailmsgheadkey(cchar *sp,int sl,cchar *kpp) noex
@@ -52,6 +54,9 @@
 #include	<cstdlib>
 #include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<strn.h>
+#include	<sfx.h>
+#include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -59,6 +64,10 @@
 
 
 /* local defines */
+
+#ifndef	CF_PROGRESSIVE
+#define	CF_PROGRESSIVE		0
+#endif
 
 
 /* imported namespaces */
@@ -75,16 +84,10 @@
 
 /* forward references */
 
-static inline bool isspacetab(int ch) noex {
-	return ((ch == ' ') || (ch == '\t')) ;
-}
-
-static inline bool iskeychar(int ch) noex {
-	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
-}
-
 
 /* local variables */
+
+constexpr bool		f_progressive = CF_PROGRESSIVE ;
 
 
 /* exported variables */
@@ -96,32 +99,40 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
 	if (sp && kpp) {
-	    cchar	*kp = nullptr ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    rs = SR_OK ;
-/* skip leading white space (not including NLs) */
-	    while (sl && isspacetab(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    kp = sp ;
-/* skip the non-white space */
-	    while (sl && iskeychar(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-	    kl = (sp - kp) ;
-/* skip any trailing whitespace */
-	    while (sl && isspacetab(*sp)) {
-	        sp += 1 ;
-	        sl -= 1 ;
-	    } /* end while */
-/* this character must be a colon (':') or else we did not have a head-key */
-	    if (*sp == ':') {
-		*kpp = kp ;
+	    if_constexpr (f_progressive) {
+	        cchar	*kp = nullptr ;
+	        while (sl && isspacetab(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        kp = sp ;
+	        while (sl && ishdrkey(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        kl = (sp - kp) ;
+	        while (sl && isspacetab(*sp)) {
+	            sp += 1 ;
+	            sl -= 1 ;
+	        } /* end while */
+	        if (*sp == ':') {
+		    *kpp = kp ;
+	        } else {
+		    kl = 0 ;
+	        }
 	    } else {
-		kl = 0 ;
-	    }
+	        if (char *tp ; (tp = strnochr(sp,sl,':')) != nullptr) {
+	            cchar	*cp{} ;
+		    if (int cl ; (cl = sfshrink(sp,(tp-sp),&cp)) > 0) {
+		        if (hasallhdrkey(cp,cl)) {
+		            *kpp = cp ;
+			    kl = cl ;
+		        }
+		    }
+	        } /* end if (had ':') */
+	    } /* end if_constexpr (f_progressive) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? kl : rs ;
 }

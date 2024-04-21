@@ -69,12 +69,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system types */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<climits>
 #include	<unistd.h>
 #include	<fcntl.h>
+#include	<climits>
 #include	<time.h>
 #include	<cstdlib>
 #include	<cstring>
@@ -151,6 +151,14 @@
 #define	NLPS		2		/* number ? polls per second */
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+typedef mmainv		mv ;
+
+
 /* external subroutines */
 
 extern int	snsds(char *,int,cchar *,cchar *) ;
@@ -170,7 +178,7 @@ extern int	mknpath3(char *,int,cchar *,cchar *,cchar *) ;
 extern int	sichr(cchar *,int,int) ;
 extern int	matstr(cchar **,cchar *,int) ;
 extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	sperm(IDS *,struct ustat *,int) ;
+extern int	sperm(IDS *,USTAT *,int) ;
 extern int	permsched(cchar **,vecstr *,char *,int,cchar *,int) ;
 extern int	getgid_group(cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
@@ -205,7 +213,7 @@ extern cchar	**environ ;
 /* local structures */
 
 struct motd_mapdir {
-	LOCKRW		rwm ;
+	lockrw 		rwm ;
 	cchar		*admin ;
 	cchar		*dirname ;	/* raw */
 	cchar		*dname ;	/* expanded */
@@ -214,46 +222,44 @@ struct motd_mapdir {
 
 /* forward references */
 
-int 		motd_processid(MOTD *,MOTD_ID *,cchar **,int) ;
+static int	motd_mapfind(motd *,time_t) noex ;
+static int	motd_maplose(motd *) noex ;
+static int	motd_mapfname(motd *,char *) noex ;
+static int	motd_schedload(motd *,vecstr *) noex ;
+static int	motd_checker(motd *,time_t) noex ;
+static int	motd_envbegin(motd *) noex ;
+static int	motd_envend(motd *) noex ;
+static int	motd_envadds(motd *,strpack *,cchar **,motd_id *) noex ;
+static int	motd_envstore(motd *,strpack *,cchar **,int,cchar *,int) noex ;
+static int 	motd_processor(motd *,cchar **,cchar **,cchar *,int) noex ;
+static int	motd_idcheck(motd *,motd_id *,char *) noex ;
+static int	motd_ufindbegin(motd *) noex ;
+static int	motd_ufindend(motd *) noex ;
+static int	motd_ufindlook(motd *,char *,uid_t) noex ;
 
-static int	motd_mapfind(MOTD *,time_t) ;
-static int	motd_maplose(MOTD *) ;
-static int	motd_mapfname(MOTD *,char *) ;
-static int	motd_schedload(MOTD *,vecstr *) ;
-static int	motd_checker(MOTD *,time_t) ;
-static int	motd_envbegin(MOTD *) ;
-static int	motd_envend(MOTD *) ;
-static int	motd_envadds(MOTD *,STRPACK *,cchar **,MOTD_ID *) ;
-static int	motd_envstore(MOTD *,STRPACK *,cchar **,int,cchar *,int) ;
-static int 	motd_processor(MOTD *,cchar **,cchar **,cchar *,int) ;
-static int	motd_idcheck(MOTD *,MOTD_ID *,char *) ;
-static int	motd_ufindbegin(MOTD *) ;
-static int	motd_ufindend(MOTD *) ;
-static int	motd_ufindlook(MOTD *,char *,uid_t) ;
-
-static int	mapper_start(MOTD_MAPPER *,time_t,cchar *) ;
-static int	mapper_finish(MOTD_MAPPER *) ;
-static int	mapper_check(MOTD_MAPPER *,time_t) ;
-static int	mapper_process(MOTD_MAPPER *,cchar **,cchar **,cchar *,int) ;
-static int	mapper_processor(MOTD_MAPPER *,cchar **,cchar **,cchar *,int) ;
-static int	mapper_mapload(MOTD_MAPPER *) ;
-static int	mapper_mapadd(MOTD_MAPPER *,cchar *,int,cchar *,int) ;
-static int	mapper_mapfins(MOTD_MAPPER *) ;
+static int	mapper_start(MOTD_MAPPER *,time_t,cchar *) noex ;
+static int	mapper_finish(MOTD_MAPPER *) noex ;
+static int	mapper_check(MOTD_MAPPER *,time_t) noex ;
+static int	mapper_process(MOTD_MAPPER *,cc **,cc **,cc *,int) noex ;
+static int	mapper_processor(MOTD_MAPPER *,cc **,cc **,cc *,int) noex ;
+static int	mapper_mapload(MOTD_MAPPER *) noex ;
+static int	mapper_mapadd(MOTD_MAPPER *,cchar *,int,cchar *,int) noex ;
+static int	mapper_mapfins(MOTD_MAPPER *) noex ;
 
 #if	CF_TESTPROC
-static int	mapper_lockcheck(MOTD_MAPPER *,cchar *) ;
+static int	mapper_lockcheck(MOTD_MAPPER *,cchar *) noex ;
 #endif
 
-static int	mapdir_start(MOTD_MAPDIR *,cchar *,int,cchar *,int) ;
-static int	mapdir_finish(MOTD_MAPDIR *) ;
-static int	mapdir_process(MOTD_MAPDIR *,cchar **,cchar **,cchar *,int) ;
-static int	mapdir_expand(MOTD_MAPDIR *) ;
-static int	mapdir_expander(MOTD_MAPDIR *) ;
-static int	mapdir_processor(MOTD_MAPDIR *,cchar **,cchar *,int) ;
-static int	mapdir_procout(MOTD_MAPDIR *,cchar **,cchar *,cchar *,int) ;
-static int	mapdir_procouter(MOTD_MAPDIR *,cchar **,cchar *,int) ;
+static int	mapdir_start(MOTD_MAPDIR *,cchar *,int,cchar *,int) noex ;
+static int	mapdir_finish(MOTD_MAPDIR *) noex ;
+static int	mapdir_process(MOTD_MAPDIR *,cc **,cc **,cc *,int) noex ;
+static int	mapdir_expand(MOTD_MAPDIR *) noex ;
+static int	mapdir_expander(MOTD_MAPDIR *) noex ;
+static int	mapdir_processor(MOTD_MAPDIR *,cchar **,cchar *,int) noex ;
+static int	mapdir_procout(MOTD_MAPDIR *,cc **,cc *,cc *,int) noex ;
+static int	mapdir_procouter(MOTD_MAPDIR *,cc **,cc *,int) noex ;
 
-static int	writeto(int,cchar *,int,int) ;
+static int	writeto(int,cchar *,int,int) noex ;
 
 
 /* local variables */
@@ -302,7 +308,7 @@ static constexpt cchar	envpre[] = "MOTD_" ;	/* environment prefix */
 
 /* exported subroutines */
 
-int motd_open(MOTD *op,cchar *pr) noex {
+int motd_open(motd *op,cchar *pr) noex {
 	const time_t	dt = time(NULL) ;
 	int		rs ;
 	cchar		*cp ;
@@ -348,7 +354,7 @@ int motd_open(MOTD *op,cchar *pr) noex {
 /* end subroutine (motd_open) */
 
 
-int motd_close(MOTD *op)
+int motd_close(motd *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -381,7 +387,7 @@ int motd_close(MOTD *op)
 /* end subroutine (motd_close) */
 
 
-int motd_check(MOTD *op,time_t dt)
+int motd_check(motd *op,time_t dt)
 {
 	int		rs ;
 
@@ -395,8 +401,8 @@ int motd_check(MOTD *op,time_t dt)
 }
 /* end subroutine (motd_check) */
 
-int motd_process(MOTD *op,cchar groupname[],cchar *admins[],int fd) noex {
-	MOTD_ID		id{} ;
+int motd_process(motd *op,cchar groupname[],cchar *admins[],int fd) noex {
+	motd_id		id{} ;
 	int		rs ;
 	id.groupname = groupname ;
 	id.uid = -1 ;
@@ -406,8 +412,8 @@ int motd_process(MOTD *op,cchar groupname[],cchar *admins[],int fd) noex {
 }
 /* end subroutine (motd_process) */
 
-int motd_processid(MOTD *op,MOTD_ID *idp,cchar *admins[],int fd) noex {
-	MOTD_ID		id{} ;
+int motd_processid(motd *op,motd_id *idp,cchar *admins[],int fd) noex {
+	motd_id		id{} ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		*groupname ;
@@ -445,12 +451,12 @@ int motd_processid(MOTD *op,MOTD_ID *idp,cchar *admins[],int fd) noex {
 
 	id = *idp ;			/* copy for possible modification */
 	if ((rs = motd_idcheck(op,&id,ubuf)) >= 0) {
-	    const int	n = nelem(envstrs) ;
+	    cint	n = nelem(envstrs) ;
 	    int		size ;
 	    void	*p ;
 	    size = (op->nenv + n + 1) * sizeof(cchar *) ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
-	        STRPACK	packer ;
+	        strpack	packer ;
 	        cchar	**ev = (cchar **) p ;
 	        if ((rs = strpack_start(&packer,128)) >= 0) {
 	            if ((rs = motd_envadds(op,&packer,ev,&id)) >= 0) {
@@ -472,12 +478,12 @@ int motd_processid(MOTD *op,MOTD_ID *idp,cchar *admins[],int fd) noex {
 /* end subroutine (motd_processid) */
 
 
-int motdid_load(MOTD_ID *idp,cchar *un,cchar *gn,uid_t uid,gid_t gid)
+int motdid_load(motd_id *idp,cchar *un,cchar *gn,uid_t uid,gid_t gid)
 {
 
 	if (idp == NULL) return SR_FAULT ;
 
-	memset(idp,0,sizeof(MOTD_ID)) ;
+	memset(idp,0,sizeof(motd_id)) ;
 	idp->uid = uid ;
 	idp->gid = gid ;
 	idp->username = un ;
@@ -491,7 +497,7 @@ int motdid_load(MOTD_ID *idp,cchar *un,cchar *gn,uid_t uid,gid_t gid)
 /* private subroutines */
 
 
-static int motd_mapfind(MOTD *op,time_t dt)
+static int motd_mapfind(motd *op,time_t dt)
 {
 	int		rs ;
 	char		mapfname[MAXPATHLEN + 1] ;
@@ -514,7 +520,7 @@ static int motd_mapfind(MOTD *op,time_t dt)
 /* end subroutine (motd_mapfind) */
 
 
-static int motd_maplose(MOTD *op)
+static int motd_maplose(motd *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -530,7 +536,7 @@ static int motd_maplose(MOTD *op)
 /* end subroutine (motd_maplose) */
 
 
-static int motd_mapfname(MOTD *op,char fbuf[])
+static int motd_mapfname(motd *op,char fbuf[])
 {
 	vecstr		scheds ;
 	int		rs = SR_OK ;
@@ -540,7 +546,7 @@ static int motd_mapfname(MOTD *op,char fbuf[])
 	fbuf[0] = '\0' ;
 	if ((rs = vecstr_start(&scheds,6,0)) >= 0) {
 	    if ((rs = motd_schedload(op,&scheds)) >= 0) {
-	        const int	flen = MAXPATHLEN ;
+	        cint	flen = MAXPATHLEN ;
 
 	        rs1 = permsched(schedmaps,&scheds,fbuf,flen,op->fe,R_OK) ;
 
@@ -574,14 +580,14 @@ static int motd_mapfname(MOTD *op,char fbuf[])
 /* end subroutine (motd_mapfname) */
 
 
-static int motd_schedload(MOTD *op,vecstr *slp)
+static int motd_schedload(motd *op,vecstr *slp)
 {
 	int		rs = SR_OK ;
 	int		i ;
 	cchar		*keys = "pen" ;
 	cchar		*name = MOTD_NAME ;
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
-	    const int	kch = MKCHAR(keys[i]) ;
+	    cint	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
 	    cchar	*vp = NULL ;
 	    switch (kch) {
@@ -607,7 +613,7 @@ static int motd_schedload(MOTD *op,vecstr *slp)
 /* end subroutine (motd_schedload) */
 
 
-static int motd_checker(MOTD *op,time_t dt)
+static int motd_checker(motd *op,time_t dt)
 {
 	int		rs = SR_OK ;
 	int		nchanged = 0 ;
@@ -627,10 +633,10 @@ static int motd_checker(MOTD *op,time_t dt)
 /* end subroutine (motd_checker) */
 
 
-static int motd_envbegin(MOTD *op)
+static int motd_envbegin(motd *op)
 {
-	const int	es = envpre[0] ;
-	const int	envprelen = strlen(envpre) ;
+	cint	es = envpre[0] ;
+	cint	envprelen = strlen(envpre) ;
 	int		rs = SR_OK ;
 	int		size ;
 	int		i ;
@@ -647,7 +653,7 @@ static int motd_envbegin(MOTD *op)
 	    op->envv = va ;
 	    for (i = 0 ; environ[i] != NULL ; i += 1) {
 	        ep = environ[i] ;
-	        f = TRUE ;
+	        f = true ;
 	        f = f && (ep[0] != '_') ;
 	        f = f && (matstr(envbad,ep,-1) < 0) ;
 	        if (f && (ep[0] == es)) {
@@ -666,7 +672,7 @@ static int motd_envbegin(MOTD *op)
 /* end subroutine (motd_envbegin) */
 
 
-static int motd_envend(MOTD *op)
+static int motd_envend(motd *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -682,9 +688,9 @@ static int motd_envend(MOTD *op)
 /* end subroutine (motd_envend) */
 
 
-static int motd_envadds(MOTD *op,STRPACK *spp,cchar **ev,MOTD_ID *idp)
+static int motd_envadds(motd *op,strpack *spp,cchar **ev,motd_id *idp)
 {
-	const int	envlen = ENVBUFLEN ;
+	cint	envlen = ENVBUFLEN ;
 	uint		uv ;
 	int		rs = SR_OK ;
 	int		n, i ;
@@ -750,7 +756,7 @@ static int motd_envadds(MOTD *op,STRPACK *spp,cchar **ev,MOTD_ID *idp)
 /* end subroutine (motd_envadds) */
 
 
-static int motd_envstore(MOTD *op,STRPACK *spp,cchar *ev[],int n,
+static int motd_envstore(motd *op,strpack *spp,cchar *ev[],int n,
 		cchar *ep,int el)
 {
 	int		rs = SR_OK ;
@@ -771,7 +777,7 @@ static int motd_envstore(MOTD *op,STRPACK *spp,cchar *ev[],int n,
 /* end subroutine (motd_envstore) */
 
 
-static int motd_idcheck(MOTD *op,MOTD_ID *idp,char *ubuf)
+static int motd_idcheck(motd *op,motd_id *idp,char *ubuf)
 {
 	int		rs = SR_OK ;
 
@@ -822,7 +828,7 @@ static int motd_idcheck(MOTD *op,MOTD_ID *idp,char *ubuf)
 /* end subroutine (motd_idcheck) */
 
 
-static int motd_processor(MOTD *op,cchar **ev,cchar *adms[],cchar *gn,int fd)
+static int motd_processor(motd *op,cchar **ev,cchar *adms[],cchar *gn,int fd)
 {
 	int		rs ;
 	int		wlen = 0 ;
@@ -847,10 +853,10 @@ static int motd_processor(MOTD *op,cchar **ev,cchar *adms[],cchar *gn,int fd)
 /* end subroutine (motd_processor) */
 
 
-static int motd_ufindbegin(MOTD *op)
+static int motd_ufindbegin(motd *op)
 {
-	const int	maxent = 30 ;
-	const int	ttl = (1*60*60) ;
+	cint	maxent = 30 ;
+	cint	ttl = (1*60*60) ;
 	int		rs = SR_OK ;
 
 	if (! op->open.ufind) {
@@ -863,13 +869,13 @@ static int motd_ufindbegin(MOTD *op)
 /* end subroutine (motd_ufindbegin) */
 
 
-static int motd_ufindend(MOTD *op)
+static int motd_ufindend(motd *op)
 {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
 	if (op->open.ufind) {
-	    op->open.ufind = FALSE ;
+	    op->open.ufind = false ;
 	    rs1 = finduid_finish(&op->ufind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -879,7 +885,7 @@ static int motd_ufindend(MOTD *op)
 /* end subroutine (motd_ufindend) */
 
 
-static int motd_ufindlook(MOTD *op,char *ubuf,uid_t uid)
+static int motd_ufindlook(motd *op,char *ubuf,uid_t uid)
 {
 	int		rs ;
 	int		rs1 ;
@@ -920,7 +926,7 @@ static int mapper_start(MOTD_MAPPER *mmp,time_t dt,cchar fname[])
 		if ((rs = vechand_start(&mmp->mapdirs,4,0)) >= 0) {
 		    cchar	*fn = mmp->fname ;
 		    if ((rs = paramfile_open(&mmp->dirsfile,evp,fn)) >= 0) {
-			const int	to = TO_MAPCHECK ;
+			cint	to = TO_MAPCHECK ;
 			if ((rs = paramfile_checkint(&mmp->dirsfile,to)) >= 0) {
 	    		    mmp->magic = MOTD_MAPPERMAGIC ;
 	    		    rs = mapper_mapload(mmp) ;
@@ -992,7 +998,7 @@ static int mapper_finish(MOTD_MAPPER *mmp)
 
 static int mapper_check(MOTD_MAPPER *mmp,time_t dt)
 {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs ;
 	int		rs1 ;
 	int		nchanged = 0 ;
@@ -1002,7 +1008,7 @@ static int mapper_check(MOTD_MAPPER *mmp,time_t dt)
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
 	if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
-	    const int	to = TO_MAPCHECK ;
+	    cint	to = TO_MAPCHECK ;
 
 	    if (dt == 0) dt = time(NULL) ;
 
@@ -1038,7 +1044,7 @@ static int mapper_check(MOTD_MAPPER *mmp,time_t dt)
 static int mapper_process(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 		cchar *gn,int fd)
 {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1066,8 +1072,8 @@ static int mapper_process(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 #if	CF_TESTPROC
 	    {
 	        const mode_t	om = 0666 ;
-	        const int	of = O_RDONLY ;
-	        const int	to = 5 ;
+	        cint	of = O_RDONLY ;
+	        cint	to = 5 ;
 	        cchar		*pr = "/home/genserv" ;
 	        cchar		*prn = "genserv" ;
 	        cchar		*svc = "hello" ;
@@ -1076,7 +1082,7 @@ static int mapper_process(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 	        argv[0] = svc ;
 	        argv[1] = NULL ;
 	        if ((rs = uc_openfsvc(pr,prn,svc,of,om,argv,ev,to)) >= 0) {
-	            const int	rfd = rs ;
+	            cint	rfd = rs ;
 	            char	buf[BUFLEN+1] ;
 	            while ((rs = uc_reade(rfd,buf,BUFLEN,5,0)) > 0) {
 	                int	len = rs ;
@@ -1155,7 +1161,7 @@ static int mapper_processor(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 
 static int mapper_mapload(MOTD_MAPPER *mmp)
 {
-	struct ustat	sb ;
+	USTAT		sb ;
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
@@ -1164,12 +1170,12 @@ static int mapper_mapload(MOTD_MAPPER *mmp)
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
 	if (u_stat(mmp->fname,&sb) >= 0) {
-	    PARAMFILE		*pfp = &mmp->dirsfile ;
-	    PARAMFILE_ENT	pe ;
-	    PARAMFILE_CUR	cur ;
+	    paramfile		*pfp = &mmp->dirsfile ;
+	    paramfile_ent	pe ;
+	    paramfile_cur	cur ;
 	    mmp->ti_mtime = sb.st_mtime ;
 	    if ((rs = paramfile_curbegin(pfp,&cur)) >= 0) {
-	        const int	plen = PBUFLEN ;
+	        cint	plen = PBUFLEN ;
 	        int		kl, vl ;
 		int		fl ;
 	        cchar		*kp, *vp ;
@@ -1214,7 +1220,7 @@ static int mapper_mapload(MOTD_MAPPER *mmp)
 static int mapper_mapadd(MOTD_MAPPER *mmp,cchar *kp,int kl,cchar *vp,int vl)
 {
 	MOTD_MAPDIR	*ep ;
-	const int	size = sizeof(MOTD_MAPDIR) ;
+	cint	size = sizeof(MOTD_MAPDIR) ;
 	int		rs ;
 
 	if ((kp == NULL) || (vp == NULL)) return SR_FAULT ;
@@ -1268,7 +1274,7 @@ static int mapper_mapfins(MOTD_MAPPER *mmp)
 
 static int mapper_lockcheck(MOTD_MAPPER *mmp,cchar *s)
 {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs ;
 	int		rs1 ;
 
@@ -1314,7 +1320,7 @@ static int mapdir_start(MOTD_MAPDIR *ep,cchar *kp,int kl,cchar *vp,int vl)
 	    vl = strlen(vp) ;
 
 	{
-	    const int	size = (kl + 1 + vl + 1) ;
+	    cint	size = (kl + 1 + vl + 1) ;
 	    char	*p ;
 	    if ((rs = uc_malloc(size,&p)) >= 0) {
 	        char	*bp = p ;
@@ -1366,7 +1372,7 @@ static int mapdir_finish(MOTD_MAPDIR *ep)
 static int mapdir_process(MOTD_MAPDIR *ep,cchar **ev,cchar **admins,
 		cchar *gn,int fd)
 {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
@@ -1386,7 +1392,7 @@ static int mapdir_process(MOTD_MAPDIR *ep,cchar **ev,cchar **admins,
 #endif /* CF_DEBUGS */
 
 	if (ep->dirname[0] != '\0') {
-	    int		f_continue = TRUE ;
+	    int		f_continue = true ;
 	    if ((admins != NULL) && (admins[0] != NULL)) {
 	        f_continue = (matstr(admins,ep->admin,-1) >= 0) ;
 	    } /* end if (admins) */
@@ -1421,7 +1427,7 @@ static int mapdir_process(MOTD_MAPDIR *ep,cchar **ev,cchar **admins,
 
 static int mapdir_expand(MOTD_MAPDIR *ep)
 {
-	const int	to_lock = TO_LOCK ;
+	cint	to_lock = TO_LOCK ;
 	int		rs ;
 	int		rs1 ;
 
@@ -1486,7 +1492,7 @@ static int mapdir_expander(MOTD_MAPDIR *ep)
 	    }
 	    if ((rs = getbufsize(getbufsize_pw)) >= 0) {
 	        struct passwd	pw ;
-	        const int	pwlen = rs ;
+	        cint	pwlen = rs ;
 	        char		*pwbuf ;
 	        if ((rs = uc_malloc((pwlen+1),&pwbuf)) >= 0) {
 	            if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
@@ -1525,7 +1531,7 @@ static int mapdir_processor(MOTD_MAPDIR *ep,cchar **ev,cchar *gn,int fd)
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		wlen = 0 ;
-	int		f_continue = TRUE ;
+	int		f_continue = true ;
 	cchar		*dn = ep->dirname ;
 
 #if	CF_DEBUGS
@@ -1537,7 +1543,7 @@ static int mapdir_processor(MOTD_MAPDIR *ep,cchar **ev,cchar *gn,int fd)
 	    f_continue = ((dn != NULL) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
-	    const int	envlen = ENVBUFLEN ;
+	    cint	envlen = ENVBUFLEN ;
 	    int		n ;
 	    cchar	*pre = envpre ;
 	    cchar	*post ;
@@ -1590,7 +1596,7 @@ static int mapdir_processor(MOTD_MAPDIR *ep,cchar **ev,cchar *gn,int fd)
 static int mapdir_procout(MOTD_MAPDIR *ep,cchar **ev,cchar *dn,
 		cchar	*gn,int fd)
 {
-	const int	clen = MAXNAMELEN ;
+	cint	clen = MAXNAMELEN ;
 	int		rs ;
 	int		wlen = 0 ;
 	cchar		*name = MOTD_NAME ;
@@ -1622,10 +1628,10 @@ static int mapdir_procout(MOTD_MAPDIR *ep,cchar **ev,cchar *dn,
 static int mapdir_procouter(MOTD_MAPDIR *ep,cchar **ev,cchar *fname,int ofd)
 {
 	const mode_t	operms = 0664 ;
-	const int	oflags = O_RDONLY ;
-	const int	to_open = TO_OPEN ;
-	const int	to_read = TO_READ ;
-	const int	to_write = TO_WRITE ;
+	cint	oflags = O_RDONLY ;
+	cint	to_open = TO_OPEN ;
+	cint	to_read = TO_READ ;
+	cint	to_write = TO_WRITE ;
 	int		rs ;
 	int		wlen = 0 ;
 
@@ -1636,8 +1642,8 @@ static int mapdir_procouter(MOTD_MAPDIR *ep,cchar **ev,cchar *fname,int ofd)
 #endif
 
 	if ((rs = uc_openenv(fname,oflags,operms,ev,to_open)) >= 0) {
-	    const int	mfd = rs ;
-	    const int	olen = MSGBUFLEN ;
+	    cint	mfd = rs ;
+	    cint	olen = MSGBUFLEN ;
 	    char	obuf[MSGBUFLEN + 1] ;
 #if	CF_DEBUGS
 	    debugprintf("motd/mapdir_procouter: uc_openenv() rs=%d\n",rs) ;
@@ -1707,7 +1713,7 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 
 	    dt = time(NULL) ;
 	    if (rs > 0) {
-	        const int	re = fds[0].revents ;
+	        cint	re = fds[0].revents ;
 
 	        if (re & POLLOUT) {
 	            rs = u_write(wfd,(wbuf+tlen),(wlen-tlen)) ;

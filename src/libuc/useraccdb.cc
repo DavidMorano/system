@@ -47,14 +47,14 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/timeb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<ctime>
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
+#include	<algorithm>		/* |min(3c++)| + |max(3++)| */
 #include	<usystem.h>
 #include	<bufsizevar.hh>
 #include	<mallocxx.h>
@@ -109,6 +109,8 @@
 /* imported namespaces */
 
 using std::nullptr_t ;			/* type */
+using std::min ;			/* subroutine-template */
+using std::max ;			/* subroutine-template */
 using std::nothrow ;			/* constant */
 
 
@@ -797,7 +799,7 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 #endif /* COMMENT */
 	cl = sfnext(lp,ll,&cp) ;
 	recp->userstr.sp = cp ;
-	recp->userstr.sl = MIN(cl,UAFILE_MAXUSERLEN) ;
+	recp->userstr.sl = min(cl,UAFILE_MAXUSERLEN) ;
 	ll = ((lp+ll)-(cp+cl)) ;
 	lp = (cp+cl) ;
 	if ((tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
@@ -807,15 +809,14 @@ static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
 	    if ((tp = strnchr(lp,ll,CH_RPAREN)) != nullptr) {
 	        cl = (tp-lp) ;
 	        recp->namestr.sp = cp ;
-	        recp->namestr.sl = MIN(cl,UAFILE_MAXNAMELEN) ;
+	        recp->namestr.sl = min(cl,UAFILE_MAXNAMELEN) ;
 	    }
 	}
 	return rs ;
 }
 /* end subroutine (rec_parse) */
 
-static int entry_load(UAD_ENT *ep,char *ebuf,int elen,
-		UAD_REC *recp) noex {
+static int entry_load(UAD_ENT *ep,char *ebuf,int elen,UAD_REC *recp) noex {
 	storeitem	s ;
 	int		rs ;
 	int		rs1 ;

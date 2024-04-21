@@ -74,7 +74,6 @@ namespace {
 }
 
 
-
 /* forward references */
 
 static int	vecitem_setopts(vecitem *,int) noex ;
@@ -476,20 +475,21 @@ static int vecitem_extend(vecitem *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
 	    cint	esize = sizeof(char **) ;
-	    int		nn, size ;
-	    void	*np{} ;
+	    int		nn ;
+	    int		sz ;
+	    void	*na{} ;
 	    if (op->va == nullptr) {
 	        nn = VECITEM_DEFENTS ;
-	        size = (nn + 1) * esize ;
-	        rs = uc_malloc(size,&np) ;
+	        sz = (nn + 1) * esize ;
+	        rs = uc_malloc(sz,&na) ;
 	    } else {
 	        nn = (op->n + 1) * 2 ;
-	        size = (nn + 1) * esize ;
-	        rs = uc_realloc(op->va,size,&np) ;
+	        sz = (nn + 1) * esize ;
+	        rs = uc_realloc(op->va,sz,&na) ;
 	        op->va = nullptr ;
 	    }
 	    if (rs >= 0) {
-	        op->va = (void **) np ;
+	        op->va = (void **) na ;
 	        op->n = nn ;
 	    }
 	} /* end if (extension required) */

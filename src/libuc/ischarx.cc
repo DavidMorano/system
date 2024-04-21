@@ -421,6 +421,11 @@ bool iscmdstart(int ch) noex {
 }
 /* end subroutine (iscmdstart) */
 
+bool ishdrkey(int ch) noex {
+	return (isalnumlatin(ch) || (ch == '-') || (ch == '_')) ;
+}
+/* end subroutine (ishdrkey) */
+
 
 /* COMMENTS */
 

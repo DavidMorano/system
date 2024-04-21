@@ -1,17 +1,16 @@
-/* getuserterms */
+/* getuserterms SUPPORT */
+/* lang=C++20 */
 
-/* get the name of the controlling terminal for the current session */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* get a list (returned as vector of c-strings) of the logged in user terms */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1999-01-10, David A­D­ Morano
-        This subroutine was originally written. It was prompted by the failure
-        of other terminal message programs from finding the proper controlling
-        terminal.
+	This subroutine was originally written.  It was prompted by
+	the failure of other terminal message programs from finding
+	the proper controlling terminal.
 
 */
 
@@ -19,32 +18,27 @@
 
 /*******************************************************************************
 
-        This subroutine will find and return the name of the controlling
-        terminal for the given session ID.
+	Name:
+	getuserterms
+
+	Descrption:
+	This subroutine will find and return a list (in a VECSTR
+	object) of the logged-in terminals of the given username.
 
 	Synopsis:
-
-	int getuserterms(lp,username)
-	VECSTR		*lp ;
-	const char	username[] ;
+	int getuserterms(vecstr *lp,cchar *username) noex
 
 	Arguments:
-
 	- listp		pointer to VECSTR to receive terminals
 	- username	session ID to find controlling terminal for
 
 	Returns:
-
 	>=	number of entries returned
-	<0	error
-
+	<0	error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
@@ -52,12 +46,14 @@
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<vecitem.h>
 #include	<tmpx.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
+
+#include	"getuserterms.h"
 
 
 /* local defines */
@@ -66,41 +62,46 @@
 #define	DEVDNAME	"/dev/"
 #endif
 
+#define	TE		termentry
+
+
+/* imported namespaces */
+
+
+/* local typedefs */
+
 
 /* external subroutines */
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* local structures */
 
-struct termentry {
-	const char	*devpath ;
+struct xtermentry {
+	cchar		*devpath ;
 	time_t		atime ;
 } ;
 
 
 /* forward references */
 
-static int	entry_start(struct termentry *,char *,int,time_t) ;
-static int	entry_finish(struct termentry *) ;
+static int	entry_start(TE *,char *,int,time_t) noex ;
+static int	entry_finish(TE *) noex ;
 
-static int	getatime(const char *,time_t *) ;
-static int	revsortfunc(struct termentry **,struct termentry **) ;
+static int	getatime(cchar *,time_t *) ;
+static int	revsortfunc(TE **,TE **) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int getuserterms(lp,username)
-VECSTR		*lp ;
-const char	username[] ;
-{
-	TMPX		utmp ;
-	TMPX_ENT	ue ;
+int getuserterms(vecstr *lp,cchar *username) noex {
+	tmpx		utmp ;
+	tmpx_ent	ue ;
 
 	VECITEM		el ;
 
@@ -115,19 +116,11 @@ const char	username[] ;
 	char	termfname[MAXPATHLEN + 1] ;
 
 
-	if (lp == NULL)
+	if (lp == nullptr)
 	    return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("getuserterms: entered, sid=%d\n",sid) ;
-#endif
-
-	if ((username == NULL) || (username[0] == '\0'))
+	if ((username == nullptr) || (username[0] == '\0'))
 	    return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("getuserterms: username=%s\n",username) ;
-#endif
 
 	rs = vecitem_start(&el,10,VECITEM_PSORTED) ;
 	if (rs < 0)
@@ -137,12 +130,8 @@ const char	username[] ;
 
 	strcpy(termfname,DEVDNAME) ;
 
-	if ((rs = tmpx_open(&utmp,NULL,O_RDONLY)) >= 0) {
-	    TMPX_CUR	cur ;
-
-#if	CF_DEBUGS
-	    debugprintf("getuserterms: tmpx_open() rs=%d\n",rs) ;
-#endif
+	if ((rs = tmpx_open(&utmp,nullptr,O_RDONLY)) >= 0) {
+	    tmpx_cur	cur ;
 
 	    if ((rs = tmpx_curbegin(&utmp,&cur)) >= 0) {
 
@@ -152,11 +141,7 @@ const char	username[] ;
 		    rs = rs1 ;
 		    if (rs < 0) break ;
 
-#if	CF_DEBUGS
-	            debugprintf("getuserterms: tmpx_fetchuser() rs=%d\n",rs) ;
-#endif
-
-		    f = FALSE ;
+		    f = false ;
 	            f = f || (ue.ut_type != TMPX_TUSERPROC) ;
 	            f = f || (ue.ut_line[0] == '\0') ;
 #ifdef	COMMENT
@@ -172,12 +157,12 @@ const char	username[] ;
 	            rs = getatime(termfname,&ti_access) ;
 
 	            if (rs >= 0) {
-	                struct termentry	te ;
+	                TE	te ;
 
 	                rs = entry_start(&te,termfname,tlen,ti_access) ;
 
 	                if (rs >= 0) {
-	                    int	size = sizeof(struct termentry) ;
+	                    int	size = sizeof(TE) ;
 	                    rs = vecitem_add(&el,&te,size) ;
 	                }
 
@@ -197,12 +182,12 @@ const char	username[] ;
 	} /* end if (UTMPX open) */
 
 	if ((rs >= 0) && (n > 0)) {
-	    struct termentry	*ep ;
+	    TE	*ep ;
 
 	    vecitem_sort(&el,revsortfunc) ;
 
 	    for (i = 0 ; vecitem_get(&el,i,&ep) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 	            rs = vecstr_add(lp,ep->devpath,-1) ;
 	            entry_finish(ep) ;
 	        }
@@ -212,9 +197,9 @@ const char	username[] ;
 	} /* end if */
 
 	{
-	    struct termentry	*ep ;
+	    TE	*ep ;
 	    for (i = 0 ; vecitem_get(&el,i,&ep) >= 0 ; i += 1) {
-	        if (ep != NULL) {
+	        if (ep != nullptr) {
 	            entry_finish(ep) ;
 		}
 	    } /* end for */
@@ -231,85 +216,60 @@ ret0:
 
 /* local subroutines */
 
-
-static int entry_start(ep,name,nlen,t)
-struct termentry	*ep ;
-char			name[] ;
-int			nlen ;
-time_t			t ;
-{
-	int	rs ;
-
-	const char	*cp ;
-
-
+static int entry_start(TE *ep,cc *name,int nlen,time_t t) noex {
+	int		rs ;
+	cchar		*cp ;
 	ep->atime = t ;
-	rs = uc_mallocstrw(name,nlen,&cp) ;
-	if (rs >= 0) ep->devpath = cp ;
-
+	if ((rs = uc_mallocstrw(name,nlen,&cp)) >= 0) {
+	    ep->devpath = cp ;
+	}
 	return rs ;
 }
 /* end subroutine (entry_start) */
 
-
-static int entry_finish(ep)
-struct termentry	*ep ;
-{
-
-
-	if (ep == NULL)
-	    return SR_FAULT ;
-
-	if (ep->devpath != NULL) {
-	    uc_free(ep->devpath) ;
-	    ep->devpath = NULL ;
-	}
-
-	return SR_OK ;
+static int entry_finish(TE *ep) noex {
+	int		rs = SR_FAULT ;
+	int		rs1 ;
+	if (ep) {
+	    rs = SR_OK ;
+	    if (ep->devpath) {
+	        rs1 = uc_free(ep->devpath) ;
+	        if (rs >= 0) rs = rs1 ;
+	        ep->devpath = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (entry_finish) */
 
-
-static int getatime(termdev,tp)
-const char	termdev[] ;
-time_t		*tp ;
-{
-	struct ustat	sb ;
-
+static int getatime(cc *termdev,time_t *tp) noex {
+	USTAT	sb ;
 	int	rs ;
-
-
 	*tp = 0 ;
 	if ((rs = u_stat(termdev,&sb)) >= 0) {
-
 	    *tp = sb.st_atime ;
-	    if ((sb.st_mode & S_IWGRP) != S_IWGRP)
-	        rs = SR_INVALID ;
-
+	    if ((sb.st_mode & S_IWGRP) != S_IWGRP) {
+	        rs = SR_RDONLY ;
+	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (getatime) */
 
-
-static int revsortfunc(f1pp,f2pp)
-struct termentry	**f1pp, **f2pp ;
-{
-
-
-	if ((f1pp == NULL) && (f2pp == NULL))
+static int revsortfunc(TE **f1pp,RE **f2pp) noex {
+	int		rc = 0 ;
+	if ((f1pp == nullptr) && (f2pp == nullptr))
 	    return 0 ;
 
-	if (f1pp == NULL)
+	if (f1pp == nullptr)
 	    return 1 ;
 
-	if (f2pp == NULL)
+	if (f2pp == nullptr)
 	    return -1 ;
 
-	return ((*f2pp)->atime - (*f1pp)->atime) ;
+		rc = ((*f2pp)->atime - (*f1pp)->atime) ;
+	return rc ;
 }
 /* end subroutine (revsortfunc) */
-
 
 
