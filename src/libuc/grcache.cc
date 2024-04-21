@@ -1,12 +1,12 @@
-/* grcache */
+/* grcache SUPPORT */
+/* lang=C++20 */
 
 /* GROUP cache */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_SEARCHGID	0		/* compile in 'searchgid()' */
 #define	CF_MAINTEXTRA	0		/* perform extra maintenance */
-
 
 /* revision history:
 
@@ -21,25 +21,22 @@
 
 	This object provides a crude cache for GROUP-DB entries.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<getbufsize.h>
 #include	<vechand.h>
 #include	<cq.h>
 #include	<getax.h>
 #include	<groupent.h>
+#include	<strwcpy.h>
 #include	<localmisc.h>
 
 #include	"grcache.h"
@@ -55,7 +52,8 @@
 
 /* external subroutines */
 
-extern char	*strwcpy(char *,const char *,int) ;
+
+/* external variables */
 
 
 /* local structures */
@@ -67,12 +65,12 @@ enum cts {
 } ;
 
 struct grcache_r {
-	uint		magic ;
 	char		*grbuf ;
-	struct group	gr ;
+	ucentgr		gr ;
 	time_t		ti_create ;		/* creation time */
 	time_t		ti_access ;		/* access time (last) */
 	gid_t		gid ;
+	uint		magic ;
 	int		wcount ;
 	int		grl ;
 	char		gn[GROUPNAMELEN+1] ;
@@ -107,39 +105,40 @@ static int record_finish(GRCACHE_REC *) ;
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int grcache_start(GRCACHE *op,int max,int ttl)
-{
-	const int	defnum = GRCACHE_DEFENTS ;
+int grcache_start(GRCACHE *op,int nmax,int ttl) noex {
+	cint		defnum = GRCACHE_DEFENTS ;
 	int		rs ;
 
 	if (op == NULL) return SR_FAULT ;
 
-	if (max < 4) max = GRCACHE_DEFMAX ;
+	if (nmax < 4) nmax = GRCACHE_DEFMAX ;
 
 	if (ttl < 1) ttl = GRCACHE_DEFTTL ;
 
-	memset(op,0,sizeof(GRCACHE)) ;
+	memclear(op) ;
 
 	if ((rs = cq_start(&op->recsfree)) >= 0) {
-	    if ((rs = vechand_start(&op->recs,defnum,0)) >= 0)
-		op->max = max ;
+	    if ((rs = vechand_start(&op->recs,defnum,0)) >= 0) {
+		op->nmax = nmax ;
 		op->ttl = ttl ;
 		op->ti_check = time(NULL) ;
 		op->magic = GRCACHE_MAGIC ;
-	    if (rs < 0)
+	    }
+	    if (rs < 0) {
 		cq_finish(&op->recsfree) ;
+	    }
 	} /* end if (cq-start) */
 
 	return rs ;
 }
 /* end subroutine (grcache_start) */
 
-
-int grcache_finish(GRCACHE *op)
-{
+int grcache_finish(GRCACHE *op) noex {
 	GRCACHE_REC	*rp ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -223,12 +222,9 @@ int grcache_lookname(GRCACHE *op,GROUPENT *grp,char *grbuf,int grlen,cchar *gn)
 	    rs = SR_NOTFOUND ;
 	} /* end if */
 
-	if (rs <= 0)
-	    memset(grp,0,sizeof(struct group)) ;
-
-#if	CF_DEBUGS
-	debugprintf("grcache_lookname: ret rs=%d\n",rs) ;
-#endif
+	if (rs <= 0) {
+	    memclear(grp) ;
+	}
 
 	return rs ;
 }
@@ -330,7 +326,7 @@ static int grcache_mkrec(GRCACHE *op,time_t dt,GRCACHE_REC **epp,cchar *gn)
 	*epp = NULL ;
 	if ((rs = vechand_count(&op->recs)) >= 0) {
 	    int	n = rs ;
-	    if (n >= op->max) {
+	    if (n >= op->nmax) {
 	        rs = grcache_getrec(op,dt,epp) ;
 	    } else {
 	        rs = grcache_allocrec(op,epp) ;
@@ -517,7 +513,7 @@ static int grcache_maintenance(GRCACHE *op,time_t dt)
 /* delete entries (at least one) if we are too big */
 
 	if ((rs >= 0) && (iold >= 0)) {
-	    if ((rs = vechand_count(&op->recs)) > op->max) {
+	    if ((rs = vechand_count(&op->recs)) > op->nmax) {
 	        if ((rs = vechand_get(&op->recs,iold,&rp)) >= 0) {
 	            if (rp != NULL)) {
 	                grcache_recdel(op,iold,rp) ;
@@ -537,9 +533,9 @@ static int grcache_allocrec(GRCACHE *op,GRCACHE_REC **rpp)
 	int		rs ;
 
 	if ((rs = cq_rem(&op->recsfree,rpp)) == SR_NOTFOUND) {
-	    const int	size = sizeof(GRCACHE_REC) ;
+	    cint	sz = sizeof(GRCACHE_REC) ;
 	    void	*vp ;
-	    if ((rs = uc_malloc(size,&vp)) >= 0) {
+	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
 	        *rpp = vp ;
 	    }
 	}
@@ -584,9 +580,7 @@ static int grcache_record(GRCACHE *op,int ct,int rs)
 }
 /* end subroutine (grcache_record) */
 
-
-static int record_start(GRCACHE_REC *rp,time_t dt,int wc,cchar *gn)
-{
+static int record_start(GRCACHE_REC *rp,time_t dt,int wc,cchar *gn) noex {
 	int		rs ;
 	int		rs1 ;
 	int		grl = 0 ;
@@ -598,18 +592,18 @@ static int record_start(GRCACHE_REC *rp,time_t dt,int wc,cchar *gn)
 
 	if (dt == 0) dt = time(NULL) ;
 
-	memset(rp,0,sizeof(GRCACHE_REC)) ;
+	memclear(rp) ;
 
 	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	    const int	grlen = rs ;
+	    cint	grlen = rs ;
 	    char	*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-	        struct group	gr ;
+	        ucentgr		gr ;
 	        if ((rs1 = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
-	            const int	size = (rs1+1) ;
+	            cint	sz = (rs1+1) ;
 	            void	*p ;
 	            grl = rs1 ; /* indicates entry found */
-	            if ((rs = uc_malloc(size,&p)) >= 0) {
+	            if ((rs = uc_malloc(sz,&p)) >= 0) {
 		        char	*grbuf = (char *) p ; /* nested variable */
 		        if ((rs = group_load(&rp->gr,grbuf,grl,&gr)) >= 0) {
 	                    rp->grbuf = grbuf ;
@@ -678,9 +672,7 @@ static int record_access(GRCACHE_REC *ep,time_t dt)
 }
 /* end subroutine (record_access) */
 
-
-static int record_refresh(GRCACHE_REC *ep,time_t dt,int wc)
-{
+static int record_refresh(GRCACHE_REC *ep,time_t dt,int wc) noex {
 	int		rs ;
 	int		rs1 ;
 	int		grl = 0 ;
@@ -690,10 +682,10 @@ static int record_refresh(GRCACHE_REC *ep,time_t dt,int wc)
 	if (ep->magic != GRCACHE_RECMAGIC) return SR_NOTFOUND ;
 
 	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	    const int	grlen = rs ;
+	    cint	grlen = rs ;
 	    char	*grbuf ;
 	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-		struct group	gr ;
+		ucentgr		gr ;
 	        if ((rs1 = getgr_name(&gr,grbuf,grlen,ep->gn)) >= 0) {
 	            void	*p ;
 	            grl = rs1 ; /* indicates entry found */

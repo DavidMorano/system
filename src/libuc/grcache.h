@@ -1,24 +1,28 @@
-/* grcache */
+/* grcache HEADER */
+/* lang=C20 */
+
+/* GROUP cache */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	GRCACHE_INCLUDE
-#define	GRCACHE_INCLUDE	1
+#define	GRCACHE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
-#include	<grp.h>
-
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<vechand.h>
 #include	<cq.h>
 #include	<localmisc.h>
 
 
 #define	GRCACHE			struct grcache_head
-#define	GRCACHE_STATS		struct grcache_s
+#define	GRCACHE_ST		struct grcache_stats
 
 #define	GRCACHE_MAGIC		0x98643162
 #define	GRCACHE_DEFENTS		10
@@ -27,7 +31,7 @@
 #define	GRCACHE_MAXFREE		4
 
 
-struct grcache_s {
+struct grcache_stats {
 	uint		nentries ;		/* number of current entries */
 	uint		total ;			/* accesses */
 	uint		refreshes ;		/* refreshes */
@@ -36,35 +40,30 @@ struct grcache_s {
 } ;
 
 struct grcache_head {
-	uint		magic ;
-	GRCACHE_STATS	s ;
-	CQ		recsfree ;
+	cq		recsfree ;
 	vechand		recs ;
 	time_t		ti_check ;
+	GRCACHE_STATS	s ;
+	uint		magic ;
 	uint		wcount ;
 	int		ttl ;		/* time-to-live */
-	int		max ;		/* maximum entries */
+	int		nmax ;		/* maximum entries */
 } ;
 
+typedef	GRCACHE		grcache ;
+typedef	GRCACHE_ST	grcache_st ;
 
-#if	(! defined(GRCACHE_MASTER)) || (GRCACHE_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int grcache_start(grcache *,int,int) noex ;
+extern int grcache_lookname(grcache *,ucentgr *,char *,int,cchar *) noex ;
+extern int grcache_lookgid(grcache *,ucentgr *,char *,int,gid_t) noex ;
+extern int grcache_check(grcache *,time_t) noex ;
+extern int grcache_stats(grcache *,grcache_st *) noex ;
+extern int grcache_finish(grcache *) noex ;
 
-extern int grcache_start(GRCACHE *,int,int) ;
-extern int grcache_lookname(GRCACHE *,struct group *,char *,int,const char *) ;
-extern int grcache_lookgid(GRCACHE *,struct group *,char *,int,gid_t) ;
-extern int grcache_check(GRCACHE *,time_t) ;
-extern int grcache_stats(GRCACHE *,GRCACHE_STATS *) ;
-extern int grcache_finish(GRCACHE *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* GRCACHE_MASTER */
 
 #endif /* GRCACHE_INCLUDE */
 

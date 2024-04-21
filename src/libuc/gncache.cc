@@ -1,10 +1,10 @@
-/* gncache */
+/* gncache SUPPORT */
+/* lang=C++20 */
 
 /* group-name cache */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -19,19 +19,15 @@
 
 	This object provides a crude cache for GROUP-DB entries.
 
-
 *******************************************************************************/
 
-
-#include	<envstandards.h>
-
+#include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<time.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<grp.h>
-
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<cq.h>
