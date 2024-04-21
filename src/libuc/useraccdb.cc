@@ -300,56 +300,49 @@ int useraccdb_close(UAD *op) noex {
 
 int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
 		cchar *user) noex {
-	filer		b ;
 	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (ep == nullptr) return SR_FAULT ;
-	if (ebuf == nullptr) return SR_FAULT ;
-	if (user == nullptr) return SR_FAULT ;
-
-	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
-
-	if (op->eo >= 0) return SR_INVALID ;
-
-	if ((rs = useraccdb_openlock(op)) >= 0) {
-
-	    if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
-	        UAD_REC		rec ;
-	        cint	llen = LINEBUFLEN ;
-	        int		ll, sl ;
-	        cchar		*sp ;
-	        char		lbuf[LINEBUFLEN+1] ;
-
-	        while ((rs1 = filer_readln(&b,lbuf,llen,-1)) > 0) {
-	            ll = rs ;
-	            rs = useraccdb_recparse(op,&rec,lbuf,ll) ;
-	            if (rs >= 0) {
-	                sp = rec.userstr.sp ;
-	                sl = rec.userstr.sl ;
-	                if (strwcmp(user,sp,sl) == 0) {
-	                    rs = useraccdb_recproc(op,&rec) ;
-	                    if (rs >= 0) {
-	                        rs = entry_load(ep,ebuf,elen,&rec) ;
-			    }
-	                    break ;
-	                }
-	            }
-	            if (rs < 0) break ;
-	        } /* end while (reading lines) */
-	        if ((rs >= 0) && (rs1 <= 0)) {
-	            rs = (rs1 < 0) ? rs1 : SR_NOTFOUND ;
-	        }
-
-	        rs1 = filer_finish(&b) ;
-	        if (rs >= 0) rs = rs1 ;
-	    } /* end if (filer) */
-
-	    rs1 = useraccdb_lock(op,false) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (lock) */
-
+	if ((rs = useraccdb_magic(op,ep,ebuf,user)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (op->eo < 0) {
+	        if ((rs = useraccdb_openlock(op)) >= 0) {
+		    linebuffer	lb ;
+		    if ((rs = lb.start) >= 0) {
+	                filer	b ;
+	                if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
+	                    UAD_REC	rec ;
+	                    cint	llen = lb.llen ;
+	                    char	*lbuf = lb.lbuf ;
+	                    while ((rs1 = filer_readln(&b,lbuf,llen,-1)) > 0) {
+				auto	uad_pe = useraccdb_recparse ;
+	                        cint	ll = rs ;
+	                        if ((rs = uad_pe(op,&rec,lbuf,ll)) >= 0) {
+	                            cchar	*sp = rec.userstr.sp ;
+	                            cint	sl = rec.userstr.sl ;
+	                            if (strwcmp(user,sp,sl) == 0) {
+					auto	uad_pc = useraccdb_recproc ;
+	                                if ((rs = uad_pc(op,&rec)) >= 0) {
+	                                    rs = entry_load(ep,ebuf,elen,&rec) ;
+			                }
+	                                break ;
+	                            }
+	                        }
+	                        if (rs < 0) break ;
+	                    } /* end while (reading lines) */
+	                    if ((rs >= 0) && (rs1 <= 0)) {
+	                        rs = (rs1 < 0) ? rs1 : SR_NOTFOUND ;
+	                    }
+	                    rs1 = filer_finish(&b) ;
+	                    if (rs >= 0) rs = rs1 ;
+	                } /* end if (filer) */
+		        rs1 = lb.finish ;
+		        if (rs >= 0) rs = rs1 ;
+		    } /* end if (linebuffer) */
+	            rs1 = useraccdb_lock(op,false) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end if (lock) */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (useraccdb_find) */
@@ -793,51 +786,45 @@ static int upinfo_upone(UPINFO *uip,UPINFO_REC *urp,int type) noex {
 
 static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
 		int type) noex {
-	int		rs ;
-	int		dbl ;
+	int		rs = SR_OVERFLOW ;
 	int		rl = 0 ;
-	char		digbuf[DIGBUFLEN+1] ;
-	char		*dbp = digbuf ;
-	char		*rbp = rbuf ;
-
-	if (rlen > UAFILE_RECLEN)
-	    return SR_OVERFLOW ;
-
-	if ((rs = ctdecui(digbuf,DIGBUFLEN,(urp->count+1))) >= 0) {
-	    int		n = (UAFILE_LCOUNT - rs) ;
-	    dbl = rs ;
-	    if (dbl > UAFILE_LCOUNT) { /* truncate from left as necessary */
-	        int	dld = (dbl-UAFILE_LCOUNT) ;
-	        dbp += dld ;
-	        dbl -= dld ;
+	if (rlen <= UAFILE_RECLEN) {
+	    int		dbl ;
+	    char		digbuf[DIGBUFLEN+1] ;
+	    char		*dbp = digbuf ;
+	    char		*rbp = rbuf ;
+	    if ((rs = ctdecui(digbuf,DIGBUFLEN,(urp->count+1))) >= 0) {
+	        int		n = (UAFILE_LCOUNT - rs) ;
+	        dbl = rs ;
+	        if (dbl > UAFILE_LCOUNT) { /* truncate from left as necessary */
+	            int	dld = (dbl-UAFILE_LCOUNT) ;
+	            dbp += dld ;
+	            dbl -= dld ;
+	        }
+	        if (n > 0) rbp = strnset(rbp,' ',n) ;
+	        rbp = strwcpy(rbp,dbp,dbl) ;
 	    }
-	    if (n > 0) rbp = strnset(rbp,' ',n) ;
-	    rbp = strwcpy(rbp,dbp,dbl) ;
-	}
-
-	if (rs >= 0) {
-	    *rbp++ = ' ' ;
-	}
-
-	if (rs >= 0) {
-	    rbp = strwcpy(rbp,uip->tbuf,UAFILE_LDATE) ;
-	    rl = (rbp - rbuf) ;
-	}
-
-	if ((rs >= 0) && (! urp->found)) {
-	    cchar	*up = (type) ? uip->arguser : totaluser ;
-	    *rbp++ = ' ' ;
-	    rbp = strwcpy(rbp,up,UAFILE_MAXUSERLEN) ;
-	    if (type && (uip->argname != nullptr)) {
+	    if (rs >= 0) {
 	        *rbp++ = ' ' ;
-	        *rbp++ = CH_LPAREN ;
-	        rbp = strwcpy(rbp,uip->argname,UAFILE_MAXNAMELEN) ;
-	        *rbp++ = CH_RPAREN ;
 	    }
-	    *rbp++ = '\n' ;
-	    rl = (rbp - rbuf) ;
-	}
-
+	    if (rs >= 0) {
+	        rbp = strwcpy(rbp,uip->tbuf,UAFILE_LDATE) ;
+	        rl = (rbp - rbuf) ;
+	    }
+	    if ((rs >= 0) && (! urp->found)) {
+	        cchar	*up = (type) ? uip->arguser : totaluser ;
+	        *rbp++ = ' ' ;
+	        rbp = strwcpy(rbp,up,UAFILE_MAXUSERLEN) ;
+	        if (type && (uip->argname != nullptr)) {
+	            *rbp++ = ' ' ;
+	            *rbp++ = CH_LPAREN ;
+	            rbp = strwcpy(rbp,uip->argname,UAFILE_MAXNAMELEN) ;
+	            *rbp++ = CH_RPAREN ;
+	        }
+	        *rbp++ = '\n' ;
+	        rl = (rbp - rbuf) ;
+	    }
+	} /* end if (valid) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (upinfo_mkrec) */
@@ -847,30 +834,23 @@ static int entry_load(UAD_ENT *ep,char *ebuf,int elen,
 	storeitem	s ;
 	int		rs ;
 	int		rs1 ;
-
 	memclear(ep) ;
-
 	if ((rs = storeitem_start(&s,ebuf,elen)) >= 0) {
 	    UAD_ITEM	*ip ;
 	    cchar	*cp ;
-
 	    ep->atime = recp->atime ;
 	    ep->count = recp->count ;
-
 	    ip = &recp->userstr ;
 	    rs = storeitem_strw(&s,ip->sp,ip->sl,&cp) ;
 	    ep->user = cp ;
-
 	    if (rs >= 0) {
 	        ip = &recp->namestr ;
 	        rs = storeitem_strw(&s,ip->sp,ip->sl,&cp) ;
 	        ep->name = cp ;
 	    }
-
 	    rs1 = storeitem_finish(&s) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (storeitem) */
-
 	return rs ;
 }
 /* end subroutine (entry_load) */
