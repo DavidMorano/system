@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int wordfill_ctor(wordfill *op,Args ... args) noex {
+static int useraccdb_ctor(useraccdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int wordfill_ctor(wordfill *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (wordfill_ctor) */
+/* end subroutine (useraccdb_ctor) */
 
-static int wordfill_dtor(wordfill *op) noex {
+static int useraccdb_dtor(useraccdb *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (wordfill_dtor) */
+/* end subroutine (useraccdb_dtor) */
 
 template<typename ... Args>
-static int wordfill_magic(wordfill *op,Args ... args) noex {
+static int useraccdb_magic(useraccdb *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == WORDFILL_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == USERACCDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (wordfill_magic) */
+/* end subroutine (useraccdb_magic) */
 

@@ -141,7 +141,7 @@ static int initnow_gettime(TIMEB *tbp,char *zbuf,int zlen) noex {
 	TIMEVAL		tv{} ;
 	int		rs ;
 	int		len = 0 ;
-	if ((rs = uc_gettimeofday(&tv,NULL)) >= 0) {
+	if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
             TMTIME          tmt ;
             tbp->time = tv.tv_sec ;
             tbp->millitm = (tv.tv_usec / 1000) ;

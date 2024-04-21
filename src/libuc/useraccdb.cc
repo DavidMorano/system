@@ -1,4 +1,4 @@
-/* useraccdb SUPPORT */
+/* UAD SUPPORT */
 /* lang=C++20 */
 
 /* user-access (user-access-logging) data-base management */
@@ -56,12 +56,18 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<estrings.h>
 #include	<ascii.h>
 #include	<filer.h>
 #include	<storeitem.h>
+#include	<initnow.h>
 #include	<dater.h>
+#include	<timestr.h>
+#include	<cfdec.h>
+#include	<ctdec.h>
 #include	<sfx.h>
+#include	<strwcmp.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"useraccdb.h"
@@ -72,8 +78,6 @@
 #define	USERACCDB_LOGDNAME	"var/log"
 #define	USERACCDB_MAGIC		0x11359299
 #define	USERACCDB_INTCHECK	5
-#define	USERACCDB_REC		struct useraccdb_rec
-#define	USERACCDB_ITEM		struct useraccdb_item
 
 #define	UAFILE_SUF		"users"
 #define	UAFILE_LCOUNT		8
@@ -84,7 +88,13 @@
 	(UAFILE_LCOUNT + 1 + UAFILE_LDATE + 1 + \
 	UAFILE_MAXUSERLEN + 2 + UAFILE_MAXNAMELEN + 2) 
 
-#define	UPINFO			struct upinfo
+#define	UAD		useraccdb
+#define	UAD_CUR		useraccdb_cur
+#define	UAD_ENT		useraccdb_ent
+#define	UAD_REC		useraccdb_rec
+#define	UAD_ITEM	useraccdb_item
+
+#define	UPINFO		upinfo
 #define	UPINFO_REC		struct upinfo_rec
 
 #ifndef	LINEBUFLEN
@@ -95,10 +105,6 @@
 #endif
 #endif
 
-#ifndef	DIGBUFLEN
-#define	DIGBUFLEN	40		/* can hold int128_t in decimal */
-#endif
-
 #define	BUFLEN		(MAXPATHLEN + USERNAMELEN + 3)
 
 #define	TO_CHECK	5		/* check interval */
@@ -107,24 +113,16 @@
 #define	TOTALNAME	"TOTAL"
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
-
-extern int	snsds(char *,int,cchar *,cchar *) ;
-extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern int	mkpath2(char *,cchar *,cchar *) ;
-extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	strwcmp(cchar *,cchar *,int) ;
-extern int	initnow(TIMEB *,cchar *,int) ;
-
-extern char	*strdcpy3(char *,int,cchar *,cchar *,cchar *) ;
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(cchar *,int,int) ;
-extern char	*strnset(char *,int,int) ;
-extern char	*timestr_logz(time_t,char *) ;
 
 
 /* external variables */
@@ -133,30 +131,30 @@ extern char	*timestr_logz(time_t,char *) ;
 /* local structures */
 
 struct upinfo_rec {
-	off_t	ro ;		/* record offset */
+	off_t		ro ;		/* record offset */
 	uint		count ;
 	uint		found:1 ;
 } ;
 
 struct upinfo {
 	UPINFO_REC	user, total ;
-	USERACCDB	*op ;
-	cchar	*arguser ;
-	cchar	*argname ;
+	useraccdb	*op ;
+	cchar		*arguser ;
+	cchar		*argname ;
 	time_t		utime ;
 	char		tbuf[UAFILE_LDATE+1] ;
 } ;
 
 struct useraccdb_item {
-	cchar	*sp ;
+	cchar		*sp ;
 	int		sl ;
 } ;
 
 struct useraccdb_rec {
-	USERACCDB_ITEM	countstr ;
-	USERACCDB_ITEM	datestr ;
-	USERACCDB_ITEM	userstr ;
-	USERACCDB_ITEM	namestr ;
+	UAD_ITEM	countstr ;
+	UAD_ITEM	datestr ;
+	UAD_ITEM	userstr ;
+	UAD_ITEM	namestr ;
 	time_t		atime ;
 	uint		count ;
 } ;
@@ -164,24 +162,62 @@ struct useraccdb_rec {
 
 /* forward references */
 
-static int	useraccdb_fileopen(USERACCDB *) ;
-static int	useraccdb_openlock(USERACCDB *) ;
-static int	useraccdb_fileclose(USERACCDB *) ;
-static int	useraccdb_lock(USERACCDB *,int) ;
-static int	useraccdb_recparse(USERACCDB *,USERACCDB_REC *,cchar *,int) ;
-static int	useraccdb_recproc(USERACCDB *,USERACCDB_REC *) ;
-static int	useraccdb_datethis(USERACCDB *,time_t *,cchar *,int) ;
+template<typename ... Args>
+static int useraccdb_ctor(UAD *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    op->magic = 0 ;
+	    if ((op->dmp = new(nothrow) dater) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-dater) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (useraccdb_ctor) */
 
-static int	upinfo_start(UPINFO *,USERACCDB *,cchar *,cchar *) ;
-static int	upinfo_match(UPINFO *,off_t,USERACCDB_REC *) ;
-static int	upinfo_update(UPINFO *) ;
-static int	upinfo_finish(UPINFO *) ;
-static int	upinfo_upone(UPINFO *,UPINFO_REC *,int) ;
-static int	upinfo_mkrec(UPINFO *,UPINFO_REC *,char *,int,int) ;
+static int useraccdb_dtor(UAD *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->dmp) {
+		delete op->dmp ;
+		op->dmp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (useraccdb_dtor) */
 
-static int	entry_load(USERACCDB_ENT *,char *,int,USERACCDB_REC *) ;
+template<typename ... Args>
+static int useraccdb_magic(UAD *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == USERACCDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (useraccdb_magic) */
 
-static int	mkts(char *,int,time_t) ;
+static int	useraccdb_fileopen(UAD *) noex ;
+static int	useraccdb_openlock(UAD *) noex ;
+static int	useraccdb_fileclose(UAD *) noex ;
+static int	useraccdb_lock(UAD *,int) noex ;
+static int	useraccdb_recparse(UAD *,UAD_REC *,cc *,int) noex ;
+static int	useraccdb_recproc(UAD *,UAD_REC *) noex ;
+static int	useraccdb_doit(UAD *,time_t *,cchar *,int) noex ;
+
+static int	upinfo_start(UPINFO *,UAD *,cchar *,cchar *) noex ;
+static int	upinfo_match(UPINFO *,off_t,UAD_REC *) noex ;
+static int	upinfo_update(UPINFO *) noex ;
+static int	upinfo_finish(UPINFO *) noex ;
+static int	upinfo_upone(UPINFO *,UPINFO_REC *,int) noex ;
+static int	upinfo_mkrec(UPINFO *,UPINFO_REC *,char *,int,int) noex ;
+
+static int	entry_load(UAD_ENT *,char *,int,UAD_REC *) noex ;
+
+static int	mkts(char *,int,time_t) noex ;
 
 
 /* local variables */
@@ -189,82 +225,77 @@ static int	mkts(char *,int,time_t) ;
 static cchar	*totaluser = TOTALNAME ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int useraccdb_open(USERACCDB *op,cchar *pr,cchar *dbname)
-{
+int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
-	cchar	*logdname = USERACCDB_LOGDNAME ;
-	char		cname[MAXNAMELEN+1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (pr[0] == '\0') return SR_INVALID ;
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memset(op,0,sizeof(USERACCDB)) ;
-	op->eo = -1 ;
-	op->fd = -1 ;
-
-	if ((rs = snsds(cname,MAXNAMELEN,dbname,UAFILE_SUF)) >= 0) {
-	    char	fname[MAXPATHLEN+1] ;
-	    if ((rs = mkpath3(fname,pr,logdname,cname)) >= 0) {
-		cint	pl = rs ;
-		cchar	*cp ;
-		if ((rs = uc_mallocstrw(fname,pl,&cp)) >= 0) {
-		    op->fname = cp ;
-		    if ((rs = useraccdb_fileopen(op)) >= 0) {
-			op->magic = USERACCDB_MAGIC ;
-		    }
-		    if (rs < 0) {
-	    		uc_free(op->fname) ;
-	    		op->fname = nullptr ;
-		    }
-		} /* end if (memory-allocation) */
-	    } /* end if (mkpath) */
-	} /* end if (make-component) */
-
+	if ((rs = useraccdb_ctor(op,pr,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (pr[0] && dbname[0]) {
+	        cchar	*logdname = USERACCDB_LOGDNAME ;
+	        char	cname[MAXNAMELEN+1] ;
+	        op->eo = -1 ;
+	        op->fd = -1 ;
+	        if ((rs = snsds(cname,MAXNAMELEN,dbname,UAFILE_SUF)) >= 0) {
+	            char	fname[MAXPATHLEN+1] ;
+	            if ((rs = mkpath3(fname,pr,logdname,cname)) >= 0) {
+		        cint	pl = rs ;
+		        cchar	*cp ;
+		        if ((rs = uc_mallocstrw(fname,pl,&cp)) >= 0) {
+		            op->fname = cp ;
+		            if ((rs = useraccdb_fileopen(op)) >= 0) {
+			        op->magic = USERACCDB_MAGIC ;
+		            }
+		            if (rs < 0) {
+	    		        uc_free(op->fname) ;
+	    		        op->fname = nullptr ;
+		            }
+		        } /* end if (memory-allocation) */
+	            } /* end if (mkpath) */
+	        } /* end if (make-component) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		useraccdb_dtor(op) ;
+	    }
+	} /* end if (useraccdb_ctor) */
 	return rs ;
 }
 /* end subroutine (useraccdb_open) */
 
-
-int useraccdb_close(USERACCDB *op)
-{
-	int		rs = SR_OK ;
+int useraccdb_close(UAD *op) noex {
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
-
-	if (op->f.dater) {
-	    op->f.dater = false ;
-	    rs1 = dater_finish(&op->dm) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = useraccdb_fileclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->fname != nullptr) {
-	    rs1 = uc_free(op->fname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->fname = nullptr ;
-	}
-
+	if ((rs = useraccdb_magic(op)) >= 0) {
+	    if (op->f.dater) {
+	        op->f.dater = false ;
+	        rs1 = dater_finish(op->dmp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = useraccdb_fileclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->fname) {
+	        rs1 = uc_free(op->fname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->fname = nullptr ;
+	    }
+	    {
+		rs1 = useraccdb_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (useraccdb_close) */
 
-
-int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
-		cchar *user)
-{
-	FILER		b ;
+int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
+		cchar *user) noex {
+	filer		b ;
 	int		rs ;
 	int		rs1 ;
 
@@ -280,7 +311,7 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 	if ((rs = useraccdb_openlock(op)) >= 0) {
 
 	    if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
-	        USERACCDB_REC	rec ;
+	        UAD_REC	rec ;
 	        cint	llen = LINEBUFLEN ;
 	        int		ll, sl ;
 	        cchar		*sp ;
@@ -317,9 +348,7 @@ int useraccdb_find(USERACCDB *op,USERACCDB_ENT *ep,char *ebuf,int elen,
 }
 /* end subroutine (useraccdb_find) */
 
-
-int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
-{
+int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 	UPINFO		ui ;
 	int		rs ;
 	int		rs1 ;
@@ -332,9 +361,10 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 	if (op->eo >= 0) return SR_INVALID ;
 
 	if ((rs = upinfo_start(&ui,op,user,name)) >= 0) {
-		FILER	b ;
+	    if ((rs = useraccdb_openlock(op)) >= 0) {
+		filer	b ;
 	        if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
-	            USERACCDB_REC	rec ;
+	            UAD_REC	rec ;
 	            off_t	ro = 0L ;
 	            cint	llen = LINEBUFLEN ;
 		    int		ll ;
@@ -351,29 +381,24 @@ int useraccdb_update(USERACCDB *op,cchar *user,cchar *name)
 	                ro += ll ;
 	            } /* end while (reading lines) */
 
-	            filer_finish(&b) ;
+	            rs1 = filer_finish(&b) ;
+		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (filer) */
-
 	        if (rs >= 0) {
 	            rs1 = upinfo_update(&ui) ;
 	            if (rs >= 0) rs = rs1 ;
 	        }
-
 	        rs1 = useraccdb_lock(op,false) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (lock) */
-
 	    rs1 = upinfo_finish(&ui) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (upinfo) */
-
 	return rs ;
 }
 /* end subroutine (useraccdb_update) */
 
-
-int useraccdb_curbegin(USERACCDB *op,USERACCDB_CUR *curp)
-{
+int useraccdb_curbegin(UAD *op,USERACCDB_CUR *curp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -381,7 +406,7 @@ int useraccdb_curbegin(USERACCDB *op,USERACCDB_CUR *curp)
 
 	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(USERACCDB_CUR)) ;
+	memclear(curp) ;
 	curp->eo = -1 ;
 	op->eo = 0L ;
 
@@ -391,9 +416,7 @@ int useraccdb_curbegin(USERACCDB *op,USERACCDB_CUR *curp)
 }
 /* end subroutine (useraccdb_curbegin) */
 
-
-int useraccdb_curend(USERACCDB *op,USERACCDB_CUR *curp)
-{
+int useraccdb_curend(UAD *op,USERACCDB_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -416,14 +439,8 @@ int useraccdb_curend(USERACCDB *op,USERACCDB_CUR *curp)
 }
 /* end subroutine (useraccdb_curend) */
 
-
-int useraccdb_enum(op,curp,ep,ebuf,elen)
-USERACCDB	*op ;
-USERACCDB_CUR	*curp ;
-USERACCDB_ENT	*ep ;
-char		ebuf[] ;
-int		elen ;
-{
+int useraccdb_enum(USERACCDB *op,USERACCDB_CUR *curp,
+		UAD_ENT *ep,char *ebuf,int elen) noex {
 	int		rs = SR_OK ;
 	int		ll ;
 
@@ -448,7 +465,7 @@ int		elen ;
 	    if ((rs = filer_readln(&curp->b,lbuf,llen,-1)) >= 0) {
 		ll = rs ;
 	        if (ll > 0) {
-	            USERACCDB_REC	rec ;
+	            UAD_REC	rec ;
 	            if ((rs = useraccdb_recparse(op,&rec,lbuf,ll)) >= 0) {
 	                if ((rs = useraccdb_recproc(op,&rec)) >= 0) {
 	                    rs = entry_load(ep,ebuf,elen,&rec) ;
@@ -466,9 +483,7 @@ int		elen ;
 }
 /* end subroutine (useraccdb_enum) */
 
-
-int useraccdb_check(USERACCDB *op,time_t ti_now)
-{
+int useraccdb_check(UAD *op,time_t ti_now) noex {
 	int		rs = SR_OK ;
 	int		f_changed = false ;
 
@@ -487,9 +502,7 @@ int useraccdb_check(USERACCDB *op,time_t ti_now)
 
 /* private subroutines */
 
-
-static int useraccdb_openlock(USERACCDB *op)
-{
+static int useraccdb_openlock(UAD *op) noex {
 	int		rs = SR_OK ;
 
 	if (op->fd < 0) {
@@ -504,9 +517,7 @@ static int useraccdb_openlock(USERACCDB *op)
 }
 /* end subroutine (useraccdb_openlock) */
 
-
-static int useraccdb_fileopen(USERACCDB *op)
-{
+static int useraccdb_fileopen(UAD *op) noex {
 	int		rs = SR_OK ;
 
 	if (op->fd < 0) {
@@ -533,7 +544,7 @@ static int useraccdb_fileopen(USERACCDB *op)
 }
 /* end subroutine (useraccdb_fileopen) */
 
-static int useraccdb_fileclose(USERACCDB *op) noex {
+static int useraccdb_fileclose(UAD *op) noex {
 	int		rs = SR_OK ;
 	if (op->fd >= 0) {
 	    rs = u_close(op->fd) ;
@@ -543,7 +554,7 @@ static int useraccdb_fileclose(USERACCDB *op) noex {
 }
 /* end subroutine (useraccdb_fileclose) */
 
-static int useraccdb_lock(USERACCDB *op,int f) noex {
+static int useraccdb_lock(UAD *op,int f) noex {
 	int		rs = SR_OK ;
 	if (f) {
 	    if (! op->f.locked) {
@@ -566,7 +577,7 @@ static int useraccdb_lock(USERACCDB *op,int f) noex {
 }
 /* end subroutine (useraccdb_lock) */
 
-static int useraccdb_recparse(USERACCDB *op,USERACCDB_REC *recp,
+static int useraccdb_recparse(UAD *op,UAD_REC *recp,
 		cchar *lp,int ll) noex {
 	int		rs = SR_OK ;
 	int		cl ;
@@ -574,7 +585,7 @@ static int useraccdb_recparse(USERACCDB *op,USERACCDB_REC *recp,
 
 	if (op == nullptr) return SR_FAULT ;
 
-	memset(recp,0,sizeof(USERACCDB_REC)) ;
+	memclear(recp) ;
 
 #ifdef	COMMENT
 	cl = nextfield(lp,ll,&cp) ;
@@ -619,9 +630,7 @@ static int useraccdb_recparse(USERACCDB *op,USERACCDB_REC *recp,
 }
 /* end subroutine (useraccdb_recparse) */
 
-
-static int useraccdb_recproc(USERACCDB *op,USERACCDB_REC *recp)
-{
+static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 	int		rs = SR_OK ;
 	int		sl ;
 	cchar	*sp ;
@@ -630,7 +639,7 @@ static int useraccdb_recproc(USERACCDB *op,USERACCDB_REC *recp)
 	    sl = recp->datestr.sl ;
 	    sp = recp->datestr.sp ;
 	    if (sp != nullptr) {
-	        rs = useraccdb_datethis(op,&recp->atime,sp,sl) ;
+	        rs = useraccdb_doit(op,&recp->atime,sp,sl) ;
 	    } else {
 	        rs = SR_INVALID ;
 	    }
@@ -650,47 +659,35 @@ static int useraccdb_recproc(USERACCDB *op,USERACCDB_REC *recp)
 }
 /* end subroutine (useraccdb_recproc) */
 
-
-static int useraccdb_datethis(USERACCDB *op,time_t *timep,cchar *tsp,int tsl)
-{
+static int useraccdb_doit(UAD *op,time_t *timep,cc *tsp,int tsl) noex {
 	int		rs = SR_OK ;
-
 	if (! op->f.dater) {
 	    TIMEB	now ;
-	    cint		zlen = DATER_ZNAMELEN ;
-	    char		zbuf[DATER_ZNAMELEN+1] ;
+	    cint	zlen = DATER_ZNAMELEN ;
+	    char	zbuf[DATER_ZNAMELEN+1] ;
 	    if ((rs = initnow(&now,zbuf,zlen)) >= 0) {
-	        rs = dater_start(&op->dm,&now,zbuf,zlen) ;
+	        rs = dater_start(op->dmp,&now,zbuf,zlen) ;
 	        op->f.dater = (rs >= 0) ;
 	    }
 	}
-
-	if (rs >= 0)
-	    rs = dater_setlogz(&op->dm,tsp,tsl) ;
-
-	if (rs >= 0)
-	    rs = dater_gettime(&op->dm,timep) ;
-
+	if (rs >= 0) {
+	    rs = dater_setlogz(op->dmp,tsp,tsl) ;
+	}
+	if (rs >= 0) {
+	    rs = dater_gettime(op->dmp,timep) ;
+	}
 	return rs ;
 }
-/* end subroutine (useraccdb_datethis) */
+/* end subroutine (useraccdb_doit) */
 
-
-static int upinfo_start(uip,op,arguser,argname)
-UPINFO		*uip ;
-USERACCDB	*op ;
-cchar	*arguser ;
-cchar	*argname ;
-{
-	int		rs ;
+static int upinfo_start(UPINFO *uip,UAD *op,cc *au,cc *an) noex {
 	memclear(uip) ;
 	uip->op = op ;
 	uip->utime = time(nullptr) ;
-	uip->arguser = arguser ;
-	uip->argname = argname ;
+	uip->arguser = au ;
+	uip->argname = an ;
 	uip->utime = time(nullptr) ;
-	rs = mkts(uip->tbuf,UAFILE_LDATE,uip->utime) ;
-	return rs ;
+	return mkts(uip->tbuf,UAFILE_LDATE,uip->utime) ;
 }
 /* end subroutine (upinfo_start) */
 
@@ -703,7 +700,7 @@ static int upinfo_finish(UPINFO *uip) noex {
 }
 /* end subroutine (upinfo_finish) */
 
-static int upinfo_match(UPINFO *uip,off_t ro,USERACCDB_REC *recp) noex {
+static int upinfo_match(UPINFO *uip,off_t ro,UAD_REC *recp) noex {
 	UPINFO_REC	*urp = nullptr ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -741,7 +738,6 @@ static int upinfo_match(UPINFO *uip,off_t ro,USERACCDB_REC *recp) noex {
 }
 /* end subroutine (upinfo_match) */
 
-
 static int upinfo_update(UPINFO	 *uip) noex {
 	UPINFO_REC	*urp ;
 	int		rs = SR_OK ;
@@ -776,14 +772,8 @@ static int upinfo_upone(UPINFO *uip,UPINFO_REC *urp,int type) noex {
 }
 /* end subroutine (upinfo_upone) */
 
-
-static int upinfo_mkrec(uip,urp,rbuf,rlen,type)
-UPINFO		*uip ;
-UPINFO_REC	*urp ;
-char		rbuf[] ;
-int		rlen ;
-int		type ;
-{
+static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
+		int type) noex {
 	int		rs ;
 	int		dbl ;
 	int		rl = 0 ;
@@ -834,9 +824,8 @@ int		type ;
 }
 /* end subroutine (upinfo_mkrec) */
 
-
-static int entry_load(USERACCDB_ENT *ep,char *ebuf,int elen,USERACCDB_REC *recp)
-{
+static int entry_load(UAD_ENT *ep,char *ebuf,int elen,
+		UAD_REC *recp) noex {
 	storeitem	s ;
 	int		rs ;
 	int		rs1 ;
@@ -844,8 +833,8 @@ static int entry_load(USERACCDB_ENT *ep,char *ebuf,int elen,USERACCDB_REC *recp)
 	memclear(ep) ;
 
 	if ((rs = storeitem_start(&s,ebuf,elen)) >= 0) {
-	    USERACCDB_ITEM	*ip ;
-	    cchar		*cp ;
+	    UAD_ITEM	*ip ;
+	    cchar	*cp ;
 
 	    ep->atime = recp->atime ;
 	    ep->count = recp->count ;

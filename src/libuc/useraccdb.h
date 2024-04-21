@@ -42,7 +42,7 @@ struct useraccdb_flags {
 } ;
 
 struct useraccdb_head {
-	DATER		dm ;		/* dater-manager */
+	dater		*dmp ;		/* dater-manager-pointer */
 	cchar		*fname ;
 	off_t		eo ;
 	time_t		ti_check ;
@@ -67,7 +67,7 @@ extern int useraccdb_update(useraccdb *,cchar *,cchar *) noex ;
 extern int useraccdb_curbegin(useraccdb *,useraccdb_cur *) noex ;
 extern int useraccdb_curend(useraccdb *,useraccdb_cur *) noex ;
 extern int useraccdb_enum(useraccdb *,useraccdb_cur *,
-		useraccdb_ent *,char *,int) ;
+		useraccdb_ent *,char *,int) noex ;
 extern int useraccdb_check(useraccdb *,time_t) noex ;
 extern int useraccdb_close(useraccdb *) noex ;
 
