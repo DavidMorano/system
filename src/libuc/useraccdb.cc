@@ -1,4 +1,4 @@
-/* UAD SUPPORT */
+/* useraccdb SUPPORT */
 /* lang=C++20 */
 
 /* user-access (user-access-logging) data-base management */
@@ -98,16 +98,6 @@
 
 #define	UPINFO		upinfo
 #define	UPINFO_REC		struct upinfo_rec
-
-#ifndef	LINEBUFLEN
-#ifdef	LINE_MAX
-#define	LINEBUFLEN	MAX(LINE_MAX,2048)
-#else
-#define	LINEBUFLEN	2048
-#endif
-#endif
-
-#define	BUFLEN		(MAXPATHLEN + USERNAMELEN + 3)
 
 #define	TO_CHECK	5		/* check interval */
 #define	TO_LOCK		4		/* time-out */
@@ -224,7 +214,7 @@ static int	mkts(char *,int,time_t) noex ;
 
 /* local variables */
 
-static cchar	*totaluser = TOTALNAME ;
+constexpr cchar		totaluser[] = TOTALNAME ;
 
 
 /* exported variables */
@@ -614,12 +604,12 @@ static int useraccdb_recparse(UAD *op,UAD_REC *recp,
 	memclear(recp) ;
 
 #ifdef	COMMENT
-	cl = nextfield(lp,ll,&cp) ;
+	cl = sfnext(lp,ll,&cp) ;
 	recp->countstr.sp = cp ;
 	recp->countstr.sl = cl ;
 	ll = ((lp+ll)-(cp+cl)) ;
 	lp = (cp+cl) ;
-	cl = nextfield(lp,ll,&cp) ;
+	cl = sfnext(lp,ll,&cp) ;
 	recp->datestr.sp = cp ;
 	recp->datestr.sl = cl ;
 	ll = ((lp+ll)-(cp+cl)) ;
@@ -635,7 +625,7 @@ static int useraccdb_recparse(UAD *op,UAD_REC *recp,
 	ll -= (UAFILE_LDATE + 1) ;
 #endif /* COMMENT */
 
-	cl = nextfield(lp,ll,&cp) ;
+	cl = sfnext(lp,ll,&cp) ;
 	recp->userstr.sp = cp ;
 	recp->userstr.sl = MIN(cl,UAFILE_MAXUSERLEN) ;
 	ll = ((lp+ll)-(cp+cl)) ;
