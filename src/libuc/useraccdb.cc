@@ -403,7 +403,7 @@ int useraccdb_update(UAD *op,cchar *user,cchar *name) noex {
 }
 /* end subroutine (useraccdb_update) */
 
-int useraccdb_curbegin(UAD *op,USERACCDB_CUR *curp) noex {
+int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -421,7 +421,7 @@ int useraccdb_curbegin(UAD *op,USERACCDB_CUR *curp) noex {
 }
 /* end subroutine (useraccdb_curbegin) */
 
-int useraccdb_curend(UAD *op,USERACCDB_CUR *curp) noex {
+int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -444,28 +444,39 @@ int useraccdb_curend(UAD *op,USERACCDB_CUR *curp) noex {
 }
 /* end subroutine (useraccdb_curend) */
 
-int useraccdb_enum(USERACCDB *op,USERACCDB_CUR *curp,
-		UAD_ENT *ep,char *ebuf,int elen) noex {
-	int		rs = SR_OK ;
-	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (ep == nullptr) return SR_FAULT ;
-	if (ebuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
-
-	if (op->fd <= 0) return SR_INVALID ;
-
-	if (curp->eo < 0) {
-	    if ((rs = filer_start(&curp->b,op->fd,0L,0,0)) >= 0) {
-	        curp->eo = 0 ;
+namespace {
+    struct sub_enum {
+	UAD		*op ;
+	UAD_CUR		*curp ;
+	UAD_ENT		*ep ;
+	char		*ebuf ;
+	int		elen ;
+	sub_enum(UAD *o,UAD_CUR *c,UAD_ENT *e,char *b,int l) noex {
+	    op = o ;
+	    curp = c ;
+	    ep = e ;
+	    ebuf = b ;
+	    elen = l ;
+	} ;
+	operator int () noex {
+	    int		rs ;
+	    if ((rs = prelude()) >= 0) {
+		rs = read() ;
 	    }
-	}
-
-	if (rs >= 0) {
+	    return rs ;
+	} ;
+	int prelude() noex {
+	    int		rs = SR_OK ;
+	    if (op->fd >= 0) {
+		sub_enum	so(op,curp,ep,ebuf,elen) ;
+		rs = so ;
+	    }
+	    return rs ;
+	} ;
+ 	int read() noex {
 	    off_t	eo = curp->eo ;
+	    int		rs ;
+	    int		rs1 ;
 	    char	*lbuf{} ;
 	    if ((rs = malloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
@@ -488,8 +499,20 @@ int useraccdb_enum(USERACCDB *op,USERACCDB_CUR *curp,
 		rs1 = uc_free(lbuf) ;
 		if (rs >= 0) rs = rs1 ;
 	    } /* end if (m-a-f) */
-	} /* end if (ok) */
+	    return rs ;
+	} ;
+    } ; /* end struct (sub_enum) */
+}
 
+int useraccdb_enum(UAD *op,UAD_CUR *curp,UAD_ENT *ep,char *ebuf,int elen) noex {
+	int		rs ;
+	if ((rs = useraccdb_magic(op,curp,ep,ebuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (op->fd >= 0) {
+		sub_enum	so(op,curp,ep,ebuf,elen) ;
+		rs = so ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (useraccdb_enum) */
