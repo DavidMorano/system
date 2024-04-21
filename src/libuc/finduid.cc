@@ -52,6 +52,7 @@
 #include	<getbufsize.h>
 #include	<mallocxx.h>
 #include	<getpwd.h>
+#include	<snx.h>
 #include	<mkpath.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
@@ -275,9 +276,9 @@ int finduid_stats(finduid *op,finduid_st *sp) noex {
 
 /* private subroutines */
 
-static int finduid_lookuper(finduid *op,char *rbuf,int rlen,uid_t uid) noex {
+static int finduid_lookuper(finduid *op,char *ubuf,int ulen,uid_t uid) noex {
 	int		rs ;
-	int		rs1 ;
+	int		rs1 = SR_OK ;
 	int		ul = 0 ;
 	char		*pwbuf{} ;
 	if ((rs = malloc_pw(&pwbuf)) >= 0) {
@@ -286,37 +287,33 @@ static int finduid_lookuper(finduid *op,char *rbuf,int rlen,uid_t uid) noex {
 	    cint	utype = TMPX_TPROCUSER ;
 	    int		pwlen = rs ;
 	    if ((rs = tmpx_curbegin(op->utp,&uc)) >= 0) {
-		ucentpw		pw ;
 		pwcache		*pwc = op->ucp ;
+		ucentpw		pw ;
 		time_t		ti_create = 0 ;
 		time_t		ut ;
-		char		*ubuf{} ;
-		if ((rs = malloc_un(&ubuf)) >= 0) {
-		    cint	ulen = rs ;
-	            while (rs >= 0) { /* loop finding latest */
-		        rs1 = tmpx_enum(op->utp,&uc,&ue) ;
-		        if (rs1 == SR_NOTFOUND) break ;
-		        ut = ue.ut_tv.tv_sec ;
-	                if ((ue.ut_type == utype) && (ut > ti_create)) {
-			    auto	pwl = pwcache_lookup ;
-		            strwcpy(ubuf,ue.ut_user,ulen) ;
+	        while (rs >= 0) { /* loop finding latest */
+		    rs1 = tmpx_enum(op->utp,&uc,&ue) ;
+		    if (rs1 == SR_NOTFOUND) break ;
+		    ut = ue.ut_tv.tv_sec ;
+	            if ((ue.ut_type == utype) && (ut > ti_create)) {
+			auto	pwl = pwcache_lookup ;
+		        if ((rs = sncpy(ubuf,ulen,ue.ut_user)) >= 0) {
+			    cint	tl = rs ;
 		            if ((rs = pwl(pwc,&pw,pwbuf,pwlen,ubuf)) >= 0) {
 				if (pw.pw_uid == uid) {
 				    ti_create = ut ;
-			            ul = strwcpy(rbuf,ubuf,rlen) - rbuf ;
+			            ul = tl ;	/* <- set found */
 			        }
 		            } else if (rs == SR_NOTFOUND) {
 				rs = SR_OK ;
 			    }
-		        } /* end if (got a user process) */
-	            } /* end while (finding latest entry) */
-	            if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
-		    rs1 = tmpx_curend(op->utp,&uc) ;
-		    if (rs >= 0) rs = rs1 ;
-	        } /* end if (TMPX cursor) */
-		rs1 = uc_free(pwbuf) ;
+			} /* end if (sncpy) */
+		    } /* end if (got a user process) */
+	        } /* end while (finding latest entry) */
+	        if ((rs >= 0) && (rs1 != SR_NOTFOUND)) rs = rs1 ;
+		rs1 = tmpx_curend(op->utp,&uc) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (m-a) */
+	    } /* end if (TMPX cursor) */
 	    rs1 = uc_free(pwbuf) ;
 	    if (rs >= 0) rs = rs1 ;
 	} /* end if (m-a-f) */

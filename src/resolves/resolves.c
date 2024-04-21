@@ -32,9 +32,9 @@
 	Implementation notes:
 
 	When processing, we time-out writes to the caller-supplied
-	file-descriptor because we don't know if it is a non-regular
+	file-descriptor because we do not know if it is a non-regular
 	file that might be flow-controlled.  We don't wait forever
-	for those sorts of outputs.  So let's say that the output
+	for those sorts of outputs.  So let us say that the output
 	is a terminal that is currently flow-controlled.  We will
 	time-out on our writes and the user will not get this whole
 	RESOLVES text!
@@ -74,20 +74,22 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/param.h>
 #include	<sys/stat.h>
-#include	<limits.h>
-#include	<signal.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<climits>
+#include	<csignal>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<getbufsize.h>
 #include	<estrings.h>
 #include	<ids.h>
-#include	<vecstr.h>
-#include	<vechand.h>
 #include	<getax.h>
 #include	<getusername.h>
+#include	<vecstr.h>
+#include	<vechand.h>
 #include	<ptma.h>
 #include	<ptm.h>
 #include	<lockrw.h>
@@ -102,13 +104,12 @@
 
 /* local defines */
 
-#define	RESOLVES_MAGIC	0x75648941
-#define	RESOLVES_MAPDIR	struct resolves_mapdir
+#define	RESOLVES_MAGIC		0x75648941
+#define	RESOLVES_MAPDIR		struct resolves_mapdir
 #define	RESOLVES_DEFGROUP	"default"
 #define	RESOLVES_ALLGROUP	"all"
-#define	RESOLVES_NAME	"resolves"
+#define	RESOLVES_NAME		"resolves"
 #define	RESOLVES_DIRSFNAME	"dirs"
-
 #define	RESOLVES_MAPPERMAGIC	0x21367425
 
 #define	NDEBFNAME	"resolves.deb"
@@ -1093,36 +1094,27 @@ RESOLVES		*op ;
 }
 /* end subroutine (resolves_ufindfinish) */
 
-
-static int resolves_ufindlook(op,ubuf,uid)
-RESOLVES		*op ;
-char		ubuf[] ;
-uid_t		uid ;
-{
-	int	rs ;
-
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-
-	    if (! op->open.ufind) rs = resolves_ufindstart(op) ;
-
-	    if (rs >= 0) {
-		rs = finduid_lookup(&op->ufind,ubuf,uid) ;
-#if	CF_DEBUGS
-	debugprintf("resolves_ufindlook: finduid_lookup() rs=%d uid=%u u=%s\n",
-		rs,uid,ubuf) ;
-#endif
-	    } /* end if */
-
-	    ptm_unlock(&op->m) ;
-	} /* end if (mutex) */
-
- /* "not-found" is a zero return, "found" is > zero */
-
-	return rs ;
+static int resolves_ufindlook(RESOLVES *op,char *ubuf,uid_t uid) noex {
+	int		rs ;
+	int		rs1 ;
+	int		ul = 0 ;
+	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    ulen = rs ;
+	    if ((rs = ptm_lock(&op->m)) >= 0) {
+	        if (! op->open.ufind) {
+		    rs = resolves_ufindstart(op) ;
+	        }
+	        if (rs >= 0) {
+		    rs = finduid_lookup(&op->ufind,ubuf,ulen,uid) ;
+		    ul = rs ;
+	        } /* end if */
+	        rs1 = ptm_unlock(&op->m) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex) */
+	} /* end if (getbufsize) */
+	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (resolves_ufindlook) */
-
 
 static int mapper_start(mmp,daytime,fname)
 RESOLVES_MAPPER	*mmp ;

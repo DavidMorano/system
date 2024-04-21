@@ -30,10 +30,10 @@
 
 	Implementation notes:
 	When processing, we time-out writes to the caller-supplied
-	file-descriptor because we don't know if it is a non-regular
-	file that might be flow-controlled. We don't wait forever
-	for those sorts of outputs. So let's say that the output
-	is a terminal that is currently flow-controlled. We will
+	file-descriptor because we do not know if it is a non-regular
+	file that might be flow-controlled.  We don't wait forever
+	for those sorts of outputs.  So let us say that the output
+	is a terminal that is currently flow-controlled.  We will
 	time-out on our writes and the user will not get this whole
 	MOTD text!
 
@@ -270,13 +270,13 @@ static constexpr cpcchar	schedmaps[] = {
 	"%p/%e/%n.%f",
 	"%p/%n.%f",
 	"%n.%f",
-	NULL
+	nullptr
 } ;
 
 static constexpr cpcchar	envbad[] = {
 	"TMOUT",
 	"A__z",
-	NULL
+	nullptr
 
 } ;
 
@@ -287,7 +287,7 @@ static constexpr cpcchar	envstrs[] = {
 	"GID",
 	"ADMIN",
 	"ADMINDIR",
-	NULL
+	nullptr
 } ;
 
 enum envstrs {
@@ -309,12 +309,12 @@ static constexpt cchar	envpre[] = "MOTD_" ;	/* environment prefix */
 /* exported subroutines */
 
 int motd_open(motd *op,cchar *pr) noex {
-	const time_t	dt = time(NULL) ;
+	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	cchar		*cp ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (pr == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (pr == nullptr) return SR_FAULT ;
 
 	if (pr[0] == '\0') return SR_INVALID ;
 
@@ -327,7 +327,7 @@ int motd_open(motd *op,cchar *pr) noex {
 
 	if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
 	    op->pr = cp ;
-	    if ((rs = ptm_create(&op->m,NULL)) >= 0) {
+	    if ((rs = ptm_create(&op->m,nullptr)) >= 0) {
 	        if ((rs = motd_mapfind(op,dt)) >= 0) {
 	            if ((rs = motd_envbegin(op)) >= 0) {
 	                op->ti_lastcheck = dt ;
@@ -341,7 +341,7 @@ int motd_open(motd *op,cchar *pr) noex {
 	    } /* end if (ptm_begin) */
 	    if (rs < 0) {
 		uc_free(op->pr) ;
-		op->pr = NULL ;
+		op->pr = nullptr ;
 	    }
 	} /* end if (memory-allocation) */
 
@@ -359,7 +359,7 @@ int motd_close(motd *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MOTD_MAGIC) return SR_NOTOPEN ;
 
@@ -375,10 +375,10 @@ int motd_close(motd *op)
 	rs1 = ptm_destroy(&op->m) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (op->pr != NULL) {
+	if (op->pr != nullptr) {
 	    rs1 = uc_free(op->pr) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->pr = NULL ;
+	    op->pr = nullptr ;
 	}
 
 	op->magic = 0 ;
@@ -391,7 +391,7 @@ int motd_check(motd *op,time_t dt)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != MOTD_MAGIC) return SR_NOTOPEN ;
 
@@ -419,15 +419,15 @@ int motd_processid(motd *op,motd_id *idp,cchar *admins[],int fd) noex {
 	cchar		*groupname ;
 	char		ubuf[USERNAMELEN + 1] ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (idp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (idp == nullptr) return SR_FAULT ;
 
 	if (op->magic != MOTD_MAGIC) return SR_NOTOPEN ;
 
 	if (fd < 0) return SR_BADF ;
 
 	groupname = idp->groupname ;
-	if (groupname == NULL)
+	if (groupname == nullptr)
 	    return SR_FAULT ;
 
 	if (groupname[0] == '\0')
@@ -438,9 +438,9 @@ int motd_processid(motd *op,motd_id *idp,cchar *admins[],int fd) noex {
 	    debugprintf("motd_processid: tar groupname=%s\n",groupname) ;
 	    debugprintf("motd_processid: tar username=%s\n",idp->username) ;
 	    debugprintf("motd_processid: tar uid=%d\n",idp->uid) ;
-	    if (admins != NULL) {
+	    if (admins != nullptr) {
 	        int	i ;
-	        for (i = 0 ; admins[i] != NULL ; i += 1) {
+	        for (i = 0 ; admins[i] != nullptr ; i += 1) {
 	            debugprintf("motd_processid: a[%u]=%s\n",i,admins[i]) ;
 		}
 	    }
@@ -481,7 +481,7 @@ int motd_processid(motd *op,motd_id *idp,cchar *admins[],int fd) noex {
 int motdid_load(motd_id *idp,cchar *un,cchar *gn,uid_t uid,gid_t gid)
 {
 
-	if (idp == NULL) return SR_FAULT ;
+	if (idp == nullptr) return SR_FAULT ;
 
 	memset(idp,0,sizeof(motd_id)) ;
 	idp->uid = uid ;
@@ -589,7 +589,7 @@ static int motd_schedload(motd *op,vecstr *slp)
 	for (i = 0 ; keys[i] != '\0' ; i += 1) {
 	    cint	kch = MKCHAR(keys[i]) ;
 	    int		vl = -1 ;
-	    cchar	*vp = NULL ;
+	    cchar	*vp = nullptr ;
 	    switch (kch) {
 	    case 'p':
 		vp = op->pr ;
@@ -601,7 +601,7 @@ static int motd_schedload(motd *op,vecstr *slp)
 		vp = name ;
 		break ;
 	    } /* end switch */
-	    if ((rs >= 0) && (vp != NULL)) {
+	    if ((rs >= 0) && (vp != nullptr)) {
 		char	kbuf[2] = { 0, 0 } ;
 		kbuf[0] = kch ;
 		rs = vecstr_envset(slp,kbuf,vp,vl) ;
@@ -619,7 +619,7 @@ static int motd_checker(motd *op,time_t dt)
 	int		nchanged = 0 ;
 	if (op->nmaps > 0) {
 	    if ((rs = ptm_lock(&op->m)) >= 0) {
-	        if (dt == 0) dt = time(NULL) ;
+	        if (dt == 0) dt = time(nullptr) ;
 	        if ((dt - op->ti_lastcheck) >= TO_CHECK) {
 	            rs = mapper_check(&op->mapper,dt) ;
 	            nchanged = rs ;
@@ -644,14 +644,14 @@ static int motd_envbegin(motd *op)
 	int		f ;
 	void		*p ;
 
-	for (i = 0 ; environ[i] != NULL ; i += 1) ;
+	for (i = 0 ; environ[i] != nullptr ; i += 1) ;
 
 	size = (i + 1) * sizeof(cchar *) ;
 	if ((rs = uc_malloc(size,&p)) >= 0) {
 	    cchar	*ep ;
 	    cchar	**va = (cchar **) p ;
 	    op->envv = va ;
-	    for (i = 0 ; environ[i] != NULL ; i += 1) {
+	    for (i = 0 ; environ[i] != nullptr ; i += 1) {
 	        ep = environ[i] ;
 	        f = true ;
 	        f = f && (ep[0] != '_') ;
@@ -663,7 +663,7 @@ static int motd_envbegin(motd *op)
 	            va[c++] = ep ;
 		}
 	    } /* end for */
-	    va[c] = NULL ;
+	    va[c] = nullptr ;
 	    op->nenv = c ;
 	} /* end if (memory-allocation) */
 
@@ -677,10 +677,10 @@ static int motd_envend(motd *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->envv != NULL) {
+	if (op->envv != nullptr) {
 	    rs1 = uc_free(op->envv) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->envv = NULL ;
+	    op->envv = nullptr ;
 	}
 
 	return rs ;
@@ -705,7 +705,7 @@ static int motd_envadds(motd *op,strpack *spp,cchar **ev,motd_id *idp)
 	    ev[n] = envv[n] ;
 	}
 
-	for (i = 0 ; (rs >= 0) && (envstrs[i] != NULL) ; i += 1) {
+	for (i = 0 ; (rs >= 0) && (envstrs[i] != nullptr) ; i += 1) {
 	    envbuf[0] = '\0' ;
 	    el = -1 ;
 	    switch (i) {
@@ -731,14 +731,14 @@ static int motd_envadds(motd *op,strpack *spp,cchar **ev,motd_id *idp)
 	        break ;
 	    case envstr_username:
 	        cp = idp->username ;
-	        if ((cp != NULL) && (cp[0] != '\0')) {
+	        if ((cp != nullptr) && (cp[0] != '\0')) {
 	            rs = sncpy4(envbuf,envlen,pre,envstrs[i],"=",cp) ;
 	            el = rs ;
 	        }
 	        break ;
 	    case envstr_groupname:
 	        cp = idp->groupname ;
-	        if ((cp != NULL) && (cp[0] != '\0')) {
+	        if ((cp != nullptr) && (cp[0] != '\0')) {
 	            rs = sncpy4(envbuf,envlen,pre,envstrs[i],"=",cp) ;
 	            el = rs ;
 	        }
@@ -749,7 +749,7 @@ static int motd_envadds(motd *op,strpack *spp,cchar **ev,motd_id *idp)
 	        if (rs > 0) n += 1 ;
 	    }
 	} /* end for */
-	ev[n] = NULL ; /* very important! */
+	ev[n] = nullptr ; /* very important! */
 
 	return (rs >= 0) ? n : rs ;
 }
@@ -762,9 +762,9 @@ static int motd_envstore(motd *op,strpack *spp,cchar *ev[],int n,
 	int		rs = SR_OK ;
 	cchar		*cp ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-	if (ep != NULL) {
+	if (ep != nullptr) {
 	    rs = strpack_store(spp,ep,el,&cp) ;
 	    if (rs >= 0) {
 	        ev[n++] = cp ;
@@ -781,11 +781,11 @@ static int motd_idcheck(motd *op,motd_id *idp,char *ubuf)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (idp == NULL) return SR_FAULT ;
-	if (ubuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (idp == nullptr) return SR_FAULT ;
+	if (ubuf == nullptr) return SR_FAULT ;
 
-	if (idp->groupname == NULL) return SR_FAULT ;
+	if (idp->groupname == nullptr) return SR_FAULT ;
 
 	if (idp->groupname[0] == '\0') return SR_INVALID ;
 
@@ -804,11 +804,11 @@ static int motd_idcheck(motd *op,motd_id *idp,char *ubuf)
 
 	if (rs >= 0) {
 	    cchar	*tun = idp->username ;
-	    if ((tun == NULL) || (tun[0] == '\0') || (tun[0] == '-')) {
+	    if ((tun == nullptr) || (tun[0] == '\0') || (tun[0] == '-')) {
 	        ubuf[0] = '\0' ;
 	        rs = SR_OK ; /* needed for later test */
 #if	CF_FINDUID
-	        if ((tun == NULL) || (tun[0] == '\0')) {
+	        if ((tun == nullptr) || (tun[0] == '\0')) {
 	            rs = motd_ufindlook(op,ubuf,idp->uid) ;
 	        }
 #endif /* CF_FINDUID */
@@ -827,98 +827,72 @@ static int motd_idcheck(motd *op,motd_id *idp,char *ubuf)
 }
 /* end subroutine (motd_idcheck) */
 
-
-static int motd_processor(motd *op,cchar **ev,cchar *adms[],cchar *gn,int fd)
-{
+static int motd_processor(motd *op,cchar **ev,cchar **adms,cchar *gn,
+		int fd) noex {
 	int		rs ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("motd_processor: ent gn=%s\n",gn) ;
-#endif
-
 	if ((rs = motd_checker(op,0)) >= 0) {
 	    if (op->nmaps > 0) {
 	        rs = mapper_process(&op->mapper,ev,adms,gn,fd) ;
 	        wlen += rs ;
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("motd_processor: ret rs=%d wlen=%u\n",rs,wlen) ;
-#endif
-
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (motd_processor) */
 
-
-static int motd_ufindbegin(motd *op)
-{
-	cint	maxent = 30 ;
-	cint	ttl = (1*60*60) ;
+static int motd_ufindbegin(motd *op) noex {
+	cint		maxent = 30 ;
+	cint		ttl = (1*60*60) ;
 	int		rs = SR_OK ;
-
 	if (! op->open.ufind) {
-	    rs = finduid_start(&op->ufind,NULL,maxent,ttl) ;
+	    rs = finduid_start(&op->ufind,nullptr,maxent,ttl) ;
 	    op->open.ufind = (rs >= 0) ;
 	}
-
 	return rs ;
 }
 /* end subroutine (motd_ufindbegin) */
 
-
-static int motd_ufindend(motd *op)
-{
+static int motd_ufindend(motd *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->open.ufind) {
 	    op->open.ufind = false ;
 	    rs1 = finduid_finish(&op->ufind) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (motd_ufindend) */
 
-
-static int motd_ufindlook(motd *op,char *ubuf,uid_t uid)
-{
+static int motd_ufindlook(motd *op,char *ubuf,uid_t uid) noex {
 	int		rs ;
 	int		rs1 ;
 	int		ul = 0 ;
-
-	if ((rs = ptm_lock(&op->m)) >= 0) {
-	    if (! op->open.ufind) rs = motd_ufindbegin(op) ;
-	    if (rs >= 0) {
-	        rs = finduid_lookup(&op->ufind,ubuf,uid) ;
-		ul = rs ;
-	    } /* end if */
-	    rs1 = ptm_unlock(&op->m) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end if (mutex) */
-
-/* "not-found" is a zero return, "found" is > zero */
-
+	if ((rs = getbufsize(getbufsize_un)) >= 0) {
+	    cint	ulen = rs ;
+	    if ((rs = ptm_lock(&op->m)) >= 0) {
+	        if (! op->open.ufind) {
+		    rs = motd_ufindbegin(op) ;
+		}
+	        if (rs >= 0) {
+	            rs = finduid_lookup(&op->ufind,ubuf,ulen,uid) ;
+		    ul = rs ;
+	        } /* end if */
+	        rs1 = ptm_unlock(&op->m) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (mutex) */
+	} /* end if (getbusize) */
 	return (rs >= 0) ? ul : rs ;
 }
 /* end subroutine (motd_ufindlook) */
 
-
-static int mapper_start(MOTD_MAPPER *mmp,time_t dt,cchar fname[])
-{
+static int mapper_start(MOTD_MAPPER *mmp,time_t dt,cchar *fname) noex {
 	int		rs ;
 	cchar		**evp = (cchar **) environ ;
 	cchar		*ccp ;
 
-#if	CF_DEBUGS
-	debugprintf("mapper_start: sizeof(PTM)=%u\n", sizeof(PTM)) ;
-#endif
-
-	memset(mmp,0,sizeof(MOTD_MAPPER)) ;
+	memclear(mmp) ;
 
 	if ((rs = lockrw_create(&mmp->rwm,0)) >= 0) {
 	    if ((rs = uc_mallocstrw(fname,-1,&ccp)) >= 0) {
@@ -942,7 +916,7 @@ static int mapper_start(MOTD_MAPPER *mmp,time_t dt,cchar fname[])
 		} /* end if (vechand_start) */
 		if (rs < 0) {
 		    uc_free(mmp->fname) ;
-		    mmp->fname = NULL ;
+		    mmp->fname = nullptr ;
 		}
 	    } /* end if (memory-allocation) */
 	    if (rs < 0)
@@ -963,7 +937,7 @@ static int mapper_finish(MOTD_MAPPER *mmp)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -976,10 +950,10 @@ static int mapper_finish(MOTD_MAPPER *mmp)
 	rs1 = vechand_finish(&mmp->mapdirs) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (mmp->fname != NULL) {
+	if (mmp->fname != nullptr) {
 	    rs1 = uc_free(mmp->fname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    mmp->fname = NULL ;
+	    mmp->fname = nullptr ;
 	}
 
 	rs1 = lockrw_destroy(&mmp->rwm) ;
@@ -1003,14 +977,14 @@ static int mapper_check(MOTD_MAPPER *mmp,time_t dt)
 	int		rs1 ;
 	int		nchanged = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
 	if ((rs = lockrw_wrlock(&mmp->rwm,to_lock)) >= 0) {
 	    cint	to = TO_MAPCHECK ;
 
-	    if (dt == 0) dt = time(NULL) ;
+	    if (dt == 0) dt = time(nullptr) ;
 
 	    if ((dt - mmp->ti_check) >= to) {
 
@@ -1049,7 +1023,7 @@ static int mapper_process(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 	int		rs1 ;
 	int		wlen = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1061,9 +1035,9 @@ static int mapper_process(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 
 #if	CF_DEBUGS
 	    debugprintf("motd/mapper_process: gn=%s\n",gn) ;
-	    if (adms != NULL) {
+	    if (adms != nullptr) {
 	        int	i ;
-	        for (i = 0 ; adms[i] != NULL ; i += 1) {
+	        for (i = 0 ; adms[i] != nullptr ; i += 1) {
 	            debugprintf("motd/mapper_process: a%u=%s\n",i,adms[i]) ;
 		}
 	    }
@@ -1080,7 +1054,7 @@ static int mapper_process(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 	        cchar		*argv[2] ;
 
 	        argv[0] = svc ;
-	        argv[1] = NULL ;
+	        argv[1] = nullptr ;
 	        if ((rs = uc_openfsvc(pr,prn,svc,of,om,argv,ev,to)) >= 0) {
 	            cint	rfd = rs ;
 	            char	buf[BUFLEN+1] ;
@@ -1134,7 +1108,7 @@ static int mapper_processor(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 	int		i ;
 	int		wlen = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1143,7 +1117,7 @@ static int mapper_processor(MOTD_MAPPER *mmp,cchar **ev,cchar **adms,
 #endif
 
 	for (i = 0 ; vechand_get(&mmp->mapdirs,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	    if (ep != nullptr) {
 	        rs = mapdir_process(ep,ev,adms,gn,fd) ;
 	        wlen += rs ;
 	    }
@@ -1165,7 +1139,7 @@ static int mapper_mapload(MOTD_MAPPER *mmp)
 	int		rs = SR_OK ;
 	int		c = 0 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1223,7 +1197,7 @@ static int mapper_mapadd(MOTD_MAPPER *mmp,cchar *kp,int kl,cchar *vp,int vl)
 	cint	size = sizeof(MOTD_MAPDIR) ;
 	int		rs ;
 
-	if ((kp == NULL) || (vp == NULL)) return SR_FAULT ;
+	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
 
 	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
 
@@ -1250,12 +1224,12 @@ static int mapper_mapfins(MOTD_MAPPER *mmp)
 	int		rs1 ;
 	int		i ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
 	for (i = 0 ; vechand_get(mlp,i,&ep) >= 0 ; i += 1) {
-	    if (ep != NULL) {
+	    if (ep != nullptr) {
 	        rs1 = mapdir_finish(ep) ;
 	        if (rs >= 0) rs = rs1 ;
 	        rs1 = vechand_del(mlp,i--) ;
@@ -1278,7 +1252,7 @@ static int mapper_lockcheck(MOTD_MAPPER *mmp,cchar *s)
 	int		rs ;
 	int		rs1 ;
 
-	if (mmp == NULL) return SR_FAULT ;
+	if (mmp == nullptr) return SR_FAULT ;
 
 	if (mmp->magic != MOTD_MAPPERMAGIC) return SR_NOTOPEN ;
 
@@ -1306,8 +1280,8 @@ static int mapdir_start(MOTD_MAPDIR *ep,cchar *kp,int kl,cchar *vp,int vl)
 {
 	int		rs ;
 
-	if (ep == NULL) return SR_FAULT ;
-	if ((kp == NULL) || (vp == NULL)) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
+	if ((kp == nullptr) || (vp == nullptr)) return SR_FAULT ;
 
 	if ((kl == 0) || (vl == 0)) return SR_INVALID ;
 
@@ -1331,7 +1305,7 @@ static int mapdir_start(MOTD_MAPDIR *ep,cchar *kp,int kl,cchar *vp,int vl)
 	        rs = lockrw_create(&ep->rwm,0) ;
 	        if (rs < 0) {
 	            uc_free(ep->admin) ;
-	            ep->admin = NULL ;
+	            ep->admin = nullptr ;
 	        }
 	    } /* end if (memory-allocation) */
 	} /* end if (memory-allocation) */
@@ -1346,22 +1320,22 @@ static int mapdir_finish(MOTD_MAPDIR *ep)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
-	if (ep->dname != NULL) {
+	if (ep->dname != nullptr) {
 	    rs1 = uc_free(ep->dname) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->dname = NULL ;
+	    ep->dname = nullptr ;
 	}
 
 	rs1 = lockrw_destroy(&ep->rwm) ;
 	if (rs >= 0) rs = rs1 ;
 
-	if (ep->admin != NULL) {
+	if (ep->admin != nullptr) {
 	    rs1 = uc_free(ep->admin) ;
 	    if (rs >= 0) rs = rs1 ;
-	    ep->admin = NULL ;
-	    ep->dirname = NULL ;
+	    ep->admin = nullptr ;
+	    ep->dirname = nullptr ;
 	}
 
 	return rs ;
@@ -1382,8 +1356,8 @@ static int mapdir_process(MOTD_MAPDIR *ep,cchar **ev,cchar **admins,
 	    int	i ;
 	    debugprintf("motd/mapdir_process: ent gn=%s\n",gn) ;
 	    debugprintf("motd/mapdir_process: dirname=%s\n",ep->dirname) ;
-	    if (admins != NULL) {
-	        for (i = 0 ; admins[i] != NULL ; i += 1) {
+	    if (admins != nullptr) {
+	        for (i = 0 ; admins[i] != nullptr ; i += 1) {
 	            debugprintf("motd/mapdir_process: a[%u]=%s\n",
 	                i,admins[i]) ;
 		}
@@ -1393,18 +1367,18 @@ static int mapdir_process(MOTD_MAPDIR *ep,cchar **ev,cchar **admins,
 
 	if (ep->dirname[0] != '\0') {
 	    int		f_continue = true ;
-	    if ((admins != NULL) && (admins[0] != NULL)) {
+	    if ((admins != nullptr) && (admins[0] != nullptr)) {
 	        f_continue = (matstr(admins,ep->admin,-1) >= 0) ;
 	    } /* end if (admins) */
 	    if (f_continue) {
-	        if ((ep->dirname[0] == '~') && (ep->dname == NULL)) {
+	        if ((ep->dirname[0] == '~') && (ep->dname == nullptr)) {
 	            rs = mapdir_expand(ep) ;
 	        }
 	        if (rs >= 0) {
-	            if ((ep->dirname[0] != '~') || (ep->dname != NULL)) {
+	            if ((ep->dirname[0] != '~') || (ep->dname != nullptr)) {
 	                if ((rs = lockrw_rdlock(&ep->rwm,to_lock)) >= 0) {
 			    cchar	*dn = ep->dirname ;
-	                    if ((dn[0] != '~') || (ep->dname != NULL)) {
+	                    if ((dn[0] != '~') || (ep->dname != nullptr)) {
 	            		rs = mapdir_processor(ep,ev,gn,fd) ;
 	            		wlen += rs ;
 	    		    } /* end if */
@@ -1438,7 +1412,7 @@ static int mapdir_expand(MOTD_MAPDIR *ep)
 
 	if ((rs =  lockrw_wrlock(&ep->rwm,to_lock)) >= 0) {
 
-	    if ((ep->dirname[0] == '~') && (ep->dname == NULL)) {
+	    if ((ep->dirname[0] == '~') && (ep->dname == nullptr)) {
 	        rs = mapdir_expander(ep) ;
 
 #if	CF_DEBUGS
@@ -1472,13 +1446,13 @@ static int mapdir_expander(MOTD_MAPDIR *ep)
 	debugprintf("motd/mapdir_expander: dirname=%s\n",ep->dirname) ;
 #endif
 
-	if ((ep->dirname != NULL) && (ep->dirname[0] == '~')) {
+	if ((ep->dirname != nullptr) && (ep->dirname[0] == '~')) {
 	    int		unl = -1 ;
 	    cchar	*un = (ep->dirname+1) ;
 	    cchar	*tp ;
-	    cchar	*pp = NULL ;
+	    cchar	*pp = nullptr ;
 	    char	ubuf[USERNAMELEN + 1] ;
-	    if ((tp = strchr(un,'/')) != NULL) {
+	    if ((tp = strchr(un,'/')) != nullptr) {
 	        unl = (tp - un) ;
 	        pp = tp ;
 	    }
@@ -1498,7 +1472,7 @@ static int mapdir_expander(MOTD_MAPDIR *ep)
 	            if ((rs = GETPW_NAME(&pw,pwbuf,pwlen,un)) >= 0) {
 		        cchar	*uh = pw.pw_dir ;
 	    	        char	hbuf[MAXPATHLEN + 1] ;
-	                if (pp != NULL) {
+	                if (pp != nullptr) {
 	                    rs = mkpath2(hbuf,uh,pp) ;
 	                    fl = rs ;
 	                } else {
@@ -1540,7 +1514,7 @@ static int mapdir_processor(MOTD_MAPDIR *ep,cchar **ev,cchar *gn,int fd)
 
 	if (dn[0] == '~') {
 	    dn = ep->dname ;
-	    f_continue = ((dn != NULL) && (dn[0] != '\0')) ;
+	    f_continue = ((dn != nullptr) && (dn[0] != '\0')) ;
 	}
 	if (f_continue) {
 	    cint	envlen = ENVBUFLEN ;
@@ -1555,10 +1529,10 @@ static int mapdir_processor(MOTD_MAPDIR *ep,cchar **ev,cchar *gn,int fd)
 	    strdcpy4(env_admin,envlen,pre,post,"=",ep->admin) ;
 	    post = envstrs[envstr_admindir] ;
 	    strdcpy4(env_admindir,envlen,pre,post,"=",dn) ;
-	    for (n = 0 ; ev[n] != NULL ; n += 1) ;
+	    for (n = 0 ; ev[n] != nullptr ; n += 1) ;
 	    ev[n+0] = env_admin ;
 	    ev[n+1] = env_admindir ;
-	    ev[n+2] = NULL ;
+	    ev[n+2] = nullptr ;
 	    rs1 = mapdir_procout(ep,ev,dn,gn,fd) ;
 	    if (isNotPresent(rs1)) {
 	        gn = defname ;
@@ -1575,7 +1549,7 @@ static int mapdir_processor(MOTD_MAPDIR *ep,cchar **ev,cchar *gn,int fd)
 	        if (rs > 0) wlen += rs ;
 	    }
 	    {
-	        ev[n] = NULL ;
+	        ev[n] = nullptr ;
 	    }
 	} /* end if (continued) */
 
@@ -1635,7 +1609,7 @@ static int mapdir_procouter(MOTD_MAPDIR *ep,cchar **ev,cchar *fname,int ofd)
 	int		rs ;
 	int		wlen = 0 ;
 
-	if (ep == NULL) return SR_FAULT ;
+	if (ep == nullptr) return SR_FAULT ;
 
 #if	CF_DEBUGS
 	debugprintf("motd/mapdir_procouter: fname=%s\n",fname) ;
@@ -1681,7 +1655,7 @@ static int mapdir_procouter(MOTD_MAPDIR *ep,cchar **ev,cchar *fname,int ofd)
 static int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 {
 	struct pollfd	fds[2] ;
-	time_t		dt = time(NULL) ;
+	time_t		dt = time(nullptr) ;
 	time_t		ti_write ;
 	int		rs = SR_OK ;
 	int		i ;
@@ -1689,7 +1663,7 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 	int		pto ;
 	int		tlen = 0 ;
 
-	if (wbuf == NULL) return SR_FAULT ;
+	if (wbuf == nullptr) return SR_FAULT ;
 	if (wfd < 0) return SR_BADF ;
 
 	if (wlen < 0)
@@ -1708,13 +1682,10 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 	ti_write = dt ;
 	pto = (pt * POLLMULT) ;
 	while ((rs >= 0) && (tlen < wlen)) {
-
 	    rs = u_poll(fds,1,pto) ;
-
-	    dt = time(NULL) ;
+	    dt = time(nullptr) ;
 	    if (rs > 0) {
 	        cint	re = fds[0].revents ;
-
 	        if (re & POLLOUT) {
 	            rs = u_write(wfd,(wbuf+tlen),(wlen-tlen)) ;
 	            tlen += rs ;
@@ -1726,11 +1697,9 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 	        } else if (re & POLLNVAL) {
 	            rs = SR_NOTOPEN ;
 	        } /* end if (poll returned) */
-
 	    } else if (rs == SR_INTR) {
 		rs = SR_OK ;
 	    } /* end if (got something) */
-
 	    if ((dt - ti_write) >= wto) break ;
 	} /* end while */
 

@@ -62,7 +62,7 @@ typedef	FINDUID_ST	finduid_st ;
 EXTERNC_begin
 
 extern int finduid_start(finduid *,int,int) noex ;
-extern int finduid_lookup(finduid *,char *,uid_t) noex ;
+extern int finduid_lookup(finduid *,char *,int,uid_t) noex ;
 extern int finduid_invalidate(finduid *,cchar *) noex ;
 extern int finduid_check(finduid *,time_t) noex ;
 extern int finduid_stats(finduid *,finduid_st *) noex ;
