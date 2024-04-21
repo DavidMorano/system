@@ -61,6 +61,7 @@
 #include	<ascii.h>
 #include	<filer.h>
 #include	<storeitem.h>
+#include	<linebuffer.h>
 #include	<initnow.h>
 #include	<dater.h>
 #include	<timestr.h>
@@ -232,14 +233,16 @@ static cchar	*totaluser = TOTALNAME ;
 
 int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 	int		rs ;
+	int		rs1 ;
 	if ((rs = useraccdb_ctor(op,pr,dbname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && dbname[0]) {
+		cchar	*suf = UAFILE_SUF ;
 	        cchar	*logdname = USERACCDB_LOGDNAME ;
 	        char	cname[MAXNAMELEN+1] ;
 	        op->eo = -1 ;
 	        op->fd = -1 ;
-	        if ((rs = snsds(cname,MAXNAMELEN,dbname,UAFILE_SUF)) >= 0) {
+	        if ((rs = snsds(cname,MAXNAMELEN,dbname,suf)) >= 0) {
 	            char	fname[MAXPATHLEN+1] ;
 	            if ((rs = mkpath3(fname,pr,logdname,cname)) >= 0) {
 		        cint	pl = rs ;
@@ -256,6 +259,7 @@ int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 		        } /* end if (memory-allocation) */
 	            } /* end if (mkpath) */
 	        } /* end if (make-component) */
+		(void) rs1 ;
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		useraccdb_dtor(op) ;
@@ -311,7 +315,7 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
 	if ((rs = useraccdb_openlock(op)) >= 0) {
 
 	    if ((rs = filer_start(&b,op->fd,0L,0,0)) >= 0) {
-	        UAD_REC	rec ;
+	        UAD_REC		rec ;
 	        cint	llen = LINEBUFLEN ;
 	        int		ll, sl ;
 	        cchar		*sp ;
@@ -325,8 +329,9 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
 	                sl = rec.userstr.sl ;
 	                if (strwcmp(user,sp,sl) == 0) {
 	                    rs = useraccdb_recproc(op,&rec) ;
-	                    if (rs >= 0)
+	                    if (rs >= 0) {
 	                        rs = entry_load(ep,ebuf,elen,&rec) ;
+			    }
 	                    break ;
 	                }
 	            }
@@ -442,7 +447,7 @@ int useraccdb_curend(UAD *op,USERACCDB_CUR *curp) noex {
 int useraccdb_enum(USERACCDB *op,USERACCDB_CUR *curp,
 		UAD_ENT *ep,char *ebuf,int elen) noex {
 	int		rs = SR_OK ;
-	int		ll ;
+	int		rs1 ;
 
 	if (op == nullptr) return SR_FAULT ;
 	if (curp == nullptr) return SR_FAULT ;
@@ -454,29 +459,35 @@ int useraccdb_enum(USERACCDB *op,USERACCDB_CUR *curp,
 	if (op->fd <= 0) return SR_INVALID ;
 
 	if (curp->eo < 0) {
-	    rs = filer_start(&curp->b,op->fd,0L,0,0) ;
-	    if (rs >= 0) curp->eo = 0L ;
+	    if ((rs = filer_start(&curp->b,op->fd,0L,0,0)) >= 0) {
+	        curp->eo = 0 ;
+	    }
 	}
 
 	if (rs >= 0) {
-	    cint	llen = LINEBUFLEN ;
-	    char	lbuf[LINEBUFLEN+1] ;
 	    off_t	eo = curp->eo ;
-	    if ((rs = filer_readln(&curp->b,lbuf,llen,-1)) >= 0) {
-		ll = rs ;
-	        if (ll > 0) {
-	            UAD_REC	rec ;
-	            if ((rs = useraccdb_recparse(op,&rec,lbuf,ll)) >= 0) {
-	                if ((rs = useraccdb_recproc(op,&rec)) >= 0) {
-	                    rs = entry_load(ep,ebuf,elen,&rec) ;
-			}
+	    char	*lbuf{} ;
+	    if ((rs = malloc_ml(&lbuf)) >= 0) {
+		cint	llen = rs ;
+	        if ((rs = filer_readln(&curp->b,lbuf,llen,-1)) >= 0) {
+		    cint	ll = rs ;
+	            if (ll > 0) {
+	                UAD_REC	rec ;
+	                if ((rs = useraccdb_recparse(op,&rec,lbuf,ll)) >= 0) {
+	                    if ((rs = useraccdb_recproc(op,&rec)) >= 0) {
+	                        rs = entry_load(ep,ebuf,elen,&rec) ;
+			    }
+		        }
+	            } else {
+	                rs = SR_NOTFOUND ;
 		    }
-	        } else {
-	            rs = SR_NOTFOUND ;
-		}
-	        if (rs >= 0)
-	            curp->eo = (eo + ll) ;
-	    } /* end if (filer_readln) */
+	            if (rs >= 0) {
+	                curp->eo = (eo + ll) ;
+		    }
+	        } /* end if (filer_readln) */
+		rs1 = uc_free(lbuf) ;
+		if (rs >= 0) rs = rs1 ;
+	    } /* end if (m-a-f) */
 	} /* end if (ok) */
 
 	return rs ;
@@ -784,10 +795,9 @@ static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
 	if (rlen > UAFILE_RECLEN)
 	    return SR_OVERFLOW ;
 
-	rs = ctdecui(digbuf,DIGBUFLEN,(urp->count+1)) ;
-	dbl = rs ;
-	if (rs >= 0) {
-	    int	n = (UAFILE_LCOUNT - dbl) ;
+	if ((rs = ctdecui(digbuf,DIGBUFLEN,(urp->count+1))) >= 0) {
+	    int		n = (UAFILE_LCOUNT - rs) ;
+	    dbl = rs ;
 	    if (dbl > UAFILE_LCOUNT) { /* truncate from left as necessary */
 	        int	dld = (dbl-UAFILE_LCOUNT) ;
 	        dbp += dld ;
