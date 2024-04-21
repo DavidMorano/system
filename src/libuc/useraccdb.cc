@@ -56,6 +56,7 @@
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
+#include	<bufsizevar.hh>
 #include	<mallocxx.h>
 #include	<linebuffer.h>
 #include	<estrings.h>
@@ -196,7 +197,6 @@ static int	useraccdb_fileopen(UAD *) noex ;
 static int	useraccdb_openlock(UAD *) noex ;
 static int	useraccdb_fileclose(UAD *) noex ;
 static int	useraccdb_lock(UAD *,int) noex ;
-static int	useraccdb_recparse(UAD *,UAD_REC *,cc *,int) noex ;
 static int	useraccdb_recproc(UAD *,UAD_REC *) noex ;
 static int	useraccdb_doit(UAD *,time_t *,cchar *,int) noex ;
 
@@ -207,12 +207,18 @@ static int	upinfo_finish(UPINFO *) noex ;
 static int	upinfo_upone(UPINFO *,UPINFO_REC *,int) noex ;
 static int	upinfo_mkrec(UPINFO *,UPINFO_REC *,char *,int,int) noex ;
 
+static int	rec_parse(UAD_REC *,cc *,int) noex ;
+
 static int	entry_load(UAD_ENT *,char *,int,UAD_REC *) noex ;
 
 static int	mkts(char *,int,time_t) noex ;
 
 
 /* local variables */
+
+static bufsizevar	maxpathlen(getbufsize_mp) ;
+
+constexpr int		diglen = DIGBUFLEN ;
 
 constexpr cchar		totaluser[] = TOTALNAME ;
 
@@ -228,29 +234,37 @@ int useraccdb_open(UAD *op,cchar *pr,cchar *dbname) noex {
 	if ((rs = useraccdb_ctor(op,pr,dbname)) >= 0) {
 	    rs = SR_INVALID ;
 	    if (pr[0] && dbname[0]) {
-		cchar	*suf = UAFILE_SUF ;
-	        cchar	*logdname = USERACCDB_LOGDNAME ;
-	        char	cname[MAXNAMELEN+1] ;
-	        op->eo = -1 ;
-	        op->fd = -1 ;
-	        if ((rs = snsds(cname,MAXNAMELEN,dbname,suf)) >= 0) {
-	            char	fname[MAXPATHLEN+1] ;
-	            if ((rs = mkpath3(fname,pr,logdname,cname)) >= 0) {
-		        cint	pl = rs ;
-		        cchar	*cp ;
-		        if ((rs = uc_mallocstrw(fname,pl,&cp)) >= 0) {
-		            op->fname = cp ;
-		            if ((rs = useraccdb_fileopen(op)) >= 0) {
-			        op->magic = USERACCDB_MAGIC ;
-		            }
-		            if (rs < 0) {
-	    		        uc_free(op->fname) ;
-	    		        op->fname = nullptr ;
-		            }
-		        } /* end if (memory-allocation) */
-	            } /* end if (mkpath) */
-	        } /* end if (make-component) */
-		(void) rs1 ;
+		if ((rs = maxpathlen) >= 0) {
+		    cint	sz = (2 * (rs + 1)) ;
+		    cint	maxpath = rs ;
+		    caddr_t	a{} ;
+		    if ((rs = uc_malloc(sz,&a)) >= 0) {
+		        cchar	*suf = UAFILE_SUF ;
+	                cchar	*logdname = USERACCDB_LOGDNAME ;
+	                char	*cname = (a + (0 * (maxpath + 1))) ;
+	                op->eo = -1 ;
+	                op->fd = -1 ;
+	                if ((rs = snsds(cname,maxpath,dbname,suf)) >= 0) {
+	                    char	*fname = (a + (1 * (maxpath + 1))) ;
+	                    if ((rs = mkpath(fname,pr,logdname,cname)) >= 0) {
+		                cint	pl = rs ;
+		                cchar	*cp ;
+		                if ((rs = uc_mallocstrw(fname,pl,&cp)) >= 0) {
+		                    op->fname = cp ;
+		                    if ((rs = useraccdb_fileopen(op)) >= 0) {
+			                op->magic = USERACCDB_MAGIC ;
+		                    }
+		                    if (rs < 0) {
+	    		                uc_free(op->fname) ;
+	    		                op->fname = nullptr ;
+		                    }
+		                } /* end if (memory-allocation) */
+	                    } /* end if (mkpath) */
+	                } /* end if (make-component) */
+		        rs1 = uc_free(a) ;
+			if (rs >= 0) rs = rs1 ;
+		    } /* end if (m-a-f) */
+		} /* end if (maxpathlen) */
 	    } /* end if (valid) */
 	    if (rs < 0) {
 		useraccdb_dtor(op) ;
@@ -304,9 +318,8 @@ int useraccdb_find(UAD *op,UAD_ENT *ep,char *ebuf,int elen,
 	                    cint	llen = lb.llen ;
 	                    char	*lbuf = lb.lbuf ;
 	                    while ((rs1 = filer_readln(&b,lbuf,llen,-1)) > 0) {
-				auto	uad_pe = useraccdb_recparse ;
 	                        cint	ll = rs ;
-	                        if ((rs = uad_pe(op,&rec,lbuf,ll)) >= 0) {
+	                        if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
 	                            cchar	*sp = rec.userstr.sp ;
 	                            cint	sl = rec.userstr.sl ;
 	                            if (strwcmp(user,sp,sl) == 0) {
@@ -378,7 +391,7 @@ int useraccdb_updater(UAD *op,UPINFO *uip) noex {
 		off_t	ro = 0z ;
 		while ((rs = filer_readln(&b,lbuf,llen,-1)) > 0) {
 		    cint	ll = rs ;
-	            if ((rs = useraccdb_recparse(op,&rec,lbuf,ll)) >= 0) {
+	            if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
 			rs = upinfo_match(uip,ro,&rec) ;
 			if (rs > 0) break ;
 		    }
@@ -397,41 +410,31 @@ int useraccdb_updater(UAD *op,UPINFO *uip) noex {
 
 int useraccdb_curbegin(UAD *op,UAD_CUR *curp) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
-
-	memclear(curp) ;
-	curp->eo = -1 ;
-	op->eo = 0L ;
-
-	rs = useraccdb_openlock(op) ;
-
+	if ((rs = useraccdb_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    curp->eo = -1 ;
+	    op->eo = 0 ;
+	    rs = useraccdb_openlock(op) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (useraccdb_curbegin) */
 
 int useraccdb_curend(UAD *op,UAD_CUR *curp) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != USERACCDB_MAGIC) return SR_NOTOPEN ;
-
-	if (curp->eo >= 0) {
-	    curp->eo = -1 ;
-	    rs1 = filer_finish(&curp->b) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = useraccdb_lock(op,false) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->eo = -1 ;
+	if ((rs = useraccdb_magic(op,curp)) >= 0) {
+	    if (curp->eo >= 0) {
+	        curp->eo = -1 ;
+	        rs1 = filer_finish(&curp->b) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = useraccdb_lock(op,false) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->eo = -1 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (useraccdb_curend) */
@@ -475,8 +478,8 @@ namespace {
 	        if ((rs = filer_readln(&curp->b,lbuf,llen,-1)) >= 0) {
 		    cint	ll = rs ;
 	            if (ll > 0) {
-	                UAD_REC	rec ;
-	                if ((rs = useraccdb_recparse(op,&rec,lbuf,ll)) >= 0) {
+	                UAD_REC		rec ;
+	                if ((rs = rec_parse(&rec,lbuf,ll)) >= 0) {
 	                    if ((rs = useraccdb_recproc(op,&rec)) >= 0) {
 	                        rs = entry_load(ep,ebuf,elen,&rec) ;
 			    }
@@ -592,59 +595,6 @@ static int useraccdb_lock(UAD *op,int f) noex {
 	return rs ;
 }
 /* end subroutine (useraccdb_lock) */
-
-static int useraccdb_recparse(UAD *op,UAD_REC *recp,
-		cchar *lp,int ll) noex {
-	int		rs = SR_OK ;
-	int		cl ;
-	cchar	*tp, *cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	memclear(recp) ;
-
-#ifdef	COMMENT
-	cl = sfnext(lp,ll,&cp) ;
-	recp->countstr.sp = cp ;
-	recp->countstr.sl = cl ;
-	ll = ((lp+ll)-(cp+cl)) ;
-	lp = (cp+cl) ;
-	cl = sfnext(lp,ll,&cp) ;
-	recp->datestr.sp = cp ;
-	recp->datestr.sl = cl ;
-	ll = ((lp+ll)-(cp+cl)) ;
-	lp = (cp+cl) ;
-#else
-	recp->countstr.sp = lp ;
-	recp->countstr.sl = UAFILE_LCOUNT ;
-	lp += (UAFILE_LCOUNT + 1) ;
-	ll -= (UAFILE_LCOUNT + 1) ;
-	recp->datestr.sp = lp ;
-	recp->datestr.sl = UAFILE_LDATE ;
-	lp += (UAFILE_LDATE + 1) ;
-	ll -= (UAFILE_LDATE + 1) ;
-#endif /* COMMENT */
-
-	cl = sfnext(lp,ll,&cp) ;
-	recp->userstr.sp = cp ;
-	recp->userstr.sl = MIN(cl,UAFILE_MAXUSERLEN) ;
-	ll = ((lp+ll)-(cp+cl)) ;
-	lp = (cp+cl) ;
-
-	if ((tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
-	    ll = ((lp+ll)-(tp+1)) ;
-	    lp = (tp+1) ;
-	    cp = lp ;
-	    if ((tp = strnchr(lp,ll,CH_RPAREN)) != nullptr) {
-	        cl = (tp-lp) ;
-	        recp->namestr.sp = cp ;
-	        recp->namestr.sl = MIN(cl,UAFILE_MAXNAMELEN) ;
-	    }
-	}
-
-	return rs ;
-}
-/* end subroutine (useraccdb_recparse) */
 
 static int useraccdb_recproc(UAD *op,UAD_REC *recp) noex {
 	int		rs = SR_OK ;
@@ -780,11 +730,11 @@ static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
 	int		rl = 0 ;
 	if (rlen <= UAFILE_RECLEN) {
 	    int		dbl ;
-	    char		digbuf[DIGBUFLEN+1] ;
-	    char		*dbp = digbuf ;
-	    char		*rbp = rbuf ;
-	    if ((rs = ctdecui(digbuf,DIGBUFLEN,(urp->count+1))) >= 0) {
-	        int		n = (UAFILE_LCOUNT - rs) ;
+	    char	digbuf[diglen +1] ;
+	    char	*dbp = digbuf ;
+	    char	*rbp = rbuf ;
+	    if ((rs = ctdecui(digbuf,diglen,(urp->count+1))) >= 0) {
+	        cint	n = (UAFILE_LCOUNT - rs) ;
 	        dbl = rs ;
 	        if (dbl > UAFILE_LCOUNT) { /* truncate from left as necessary */
 	            int	dld = (dbl-UAFILE_LCOUNT) ;
@@ -818,6 +768,51 @@ static int upinfo_mkrec(UPINFO *uip,UPINFO_REC *urp,char *rbuf,int rlen,
 	return (rs >= 0) ? rl : rs ;
 }
 /* end subroutine (upinfo_mkrec) */
+
+static int rec_parse(UAD_REC *recp,cchar *lp,int ll) noex {
+	int		rs = SR_OK ;
+	int		cl ;
+	cchar	*tp, *cp ;
+	memclear(recp) ;
+#ifdef	COMMENT
+	cl = sfnext(lp,ll,&cp) ;
+	recp->countstr.sp = cp ;
+	recp->countstr.sl = cl ;
+	ll = ((lp+ll)-(cp+cl)) ;
+	lp = (cp+cl) ;
+	cl = sfnext(lp,ll,&cp) ;
+	recp->datestr.sp = cp ;
+	recp->datestr.sl = cl ;
+	ll = ((lp+ll)-(cp+cl)) ;
+	lp = (cp+cl) ;
+#else
+	recp->countstr.sp = lp ;
+	recp->countstr.sl = UAFILE_LCOUNT ;
+	lp += (UAFILE_LCOUNT + 1) ;
+	ll -= (UAFILE_LCOUNT + 1) ;
+	recp->datestr.sp = lp ;
+	recp->datestr.sl = UAFILE_LDATE ;
+	lp += (UAFILE_LDATE + 1) ;
+	ll -= (UAFILE_LDATE + 1) ;
+#endif /* COMMENT */
+	cl = sfnext(lp,ll,&cp) ;
+	recp->userstr.sp = cp ;
+	recp->userstr.sl = MIN(cl,UAFILE_MAXUSERLEN) ;
+	ll = ((lp+ll)-(cp+cl)) ;
+	lp = (cp+cl) ;
+	if ((tp = strnchr(lp,ll,CH_LPAREN)) != nullptr) {
+	    ll = ((lp+ll)-(tp+1)) ;
+	    lp = (tp+1) ;
+	    cp = lp ;
+	    if ((tp = strnchr(lp,ll,CH_RPAREN)) != nullptr) {
+	        cl = (tp-lp) ;
+	        recp->namestr.sp = cp ;
+	        recp->namestr.sl = MIN(cl,UAFILE_MAXNAMELEN) ;
+	    }
+	}
+	return rs ;
+}
+/* end subroutine (rec_parse) */
 
 static int entry_load(UAD_ENT *ep,char *ebuf,int elen,
 		UAD_REC *recp) noex {

@@ -1,14 +1,14 @@
-/* uunames */
+/* uunames SUPPORT */
+/* lang=C++20 */
 
 /* uunames-query database manager */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_DEBUGEXISTS	0		/* debug 'uunames_exists(3uux)' */
 #define	CF_NULSTR	0		/* use 'nulstr(3)' */
 #define	CF_WITHENDIAN	0		/* use ENDIANness */
 #define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
-
 
 /* revision history:
 
@@ -21,24 +21,20 @@
 
 /******************************************************************************
 
-	This little object provides access to the UUNAMES database and index
-	(if any).
-
+	This little object provides access to the UUNAMES database
+	and index (if any).
 
 ******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<char.h>
@@ -182,48 +178,48 @@
 
 /* external subroutines */
 
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy4(char *,int, const char *,const char *,
-			const char *,const char *) ;
-extern int	sncpylc(char *,int,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	snwcpylc(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	mkfnamesuf2(char *,const char *,const char *,const char *) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	pathclean(char *,const char *,int) ;
-extern int	cfdeci(const char *,int,int *) ;
-extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
-extern int	vecstr_insert(vecstr *,int,const char *,int) ;
-extern int	vecstr_adduniq(vecstr *,const char *,int) ;
-extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
-extern int	mkdirs(const char *,mode_t) ;
-extern int	prgetprogpath(const char *,char *,const char *,int) ;
-extern int	getprogroot(const char *,const char **,
-			int *,char *,const char *) ;
-extern int	strpcmp(const char *,const char *) ;
-extern int	hasuc(const char *,int) ;
+extern int	sncpy1(char *,int,cchar *) ;
+extern int	sncpy2(char *,int,cchar *,cchar *) ;
+extern int	sncpy4(char *,int, cchar *,cchar *,
+			cchar *,cchar *) ;
+extern int	sncpylc(char *,int,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	snwcpylc(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	mkfnamesuf2(char *,cchar *,cchar *,cchar *) ;
+extern int	sfbasename(cchar *,int,cchar **) ;
+extern int	pathclean(char *,cchar *,int) ;
+extern int	cfdeci(cchar *,int,int *) ;
+extern int	vecstr_envadd(vecstr *,cchar *,cchar *,int) ;
+extern int	vecstr_insert(vecstr *,int,cchar *,int) ;
+extern int	vecstr_adduniq(vecstr *,cchar *,int) ;
+extern int	perm(cchar *,uid_t,gid_t,gid_t *,int) ;
+extern int	mkdirs(cchar *,mode_t) ;
+extern int	prgetprogpath(cchar *,char *,cchar *,int) ;
+extern int	getprogroot(cchar *,cchar **,
+			int *,char *,cchar *) ;
+extern int	strpcmp(cchar *,cchar *) ;
+extern int	hasuc(cchar *,int) ;
 extern int	isalnumlatin(int) ;
 extern int	isNotPresent(int) ;
 extern int	isNotAccess(int) ;
 
 #if	CF_DEBUGS
-extern int	strnnlen(const char *,int,int) ;
+extern int	strnnlen(cchar *,int,int) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwcpylc(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
+extern char	*strwcpy(char *,cchar *,int) ;
+extern char	*strwcpylc(char *,cchar *,int) ;
+extern char	*strnchr(cchar *,int,int) ;
+extern char	*strnpbrk(cchar *,int,cchar *) ;
 
 
 /* exported variables */
 
-UUNAMES_OBJ	uunames = {
+UUNAMES_OBJ	uunames_mod = {
 	"uunames",
 	sizeof(UUNAMES),
 	sizeof(UUNAMES_CUR)
@@ -233,46 +229,46 @@ UUNAMES_OBJ	uunames = {
 /* local structures */
 
 struct liner {
-	const char	*lp ;
+	cchar	*lp ;
 	int		ll ;
 } ;
 
 struct envpop {
-	const char	*name ;
-	const char	*sub1dname ;
-	const char	*sub2dname ;
+	cchar	*name ;
+	cchar	*sub1dname ;
+	cchar	*sub2dname ;
 } ;
 
 
 /* forward references */
 
-static int	uunames_infoloadbegin(UUNAMES *,const char *,const char *) ;
+static int	uunames_infoloadbegin(UUNAMES *,cchar *,cchar *) ;
 static int	uunames_infoloadend(UUNAMES *) ;
 static int	uunames_indopen(UUNAMES *,time_t) ;
 static int	uunames_indopenpr(UUNAMES *,time_t) ;
 static int	uunames_indopentmp(UUNAMES *,time_t) ;
-static int	uunames_indopendname(UUNAMES *,const char *,time_t) ;
+static int	uunames_indopendname(UUNAMES *,cchar *,time_t) ;
 static int	uunames_indclose(UUNAMES *) ;
-static int	uunames_mkuunamesi(UUNAMES *,const char *) ;
+static int	uunames_mkuunamesi(UUNAMES *,cchar *) ;
 static int	uunames_envpaths(UUNAMES *,vecstr *) ;
-static int	uunames_indtest(UUNAMES *,const char *,time_t) ;
-static int	uunames_indmapcreate(UUNAMES *,const char *,time_t) ;
+static int	uunames_indtest(UUNAMES *,cchar *,time_t) ;
+static int	uunames_indmapcreate(UUNAMES *,cchar *,time_t) ;
 static int	uunames_indmapdestroy(UUNAMES *) ;
 static int	uunames_filemapcreate(UUNAMES *,time_t) ;
 static int	uunames_filemapdestroy(UUNAMES *) ;
-static int	uunames_indmk(UUNAMES *,const char *,time_t) ;
+static int	uunames_indmk(UUNAMES *,cchar *,time_t) ;
 static int	uunames_indlist(UUNAMES *) ;
 static int	uunames_indcheck(UUNAMES *,time_t) ;
 
 static int	checkdname(cchar *) ;
 
-static int	vecstr_defenvs(vecstr *,const char **) ;
-static int	vecstr_loadpath(vecstr *,const char *) ;
+static int	vecstr_defenvs(vecstr *,cchar **) ;
+static int	vecstr_loadpath(vecstr *,cchar *) ;
 static int	mkpathval(vecstr *,char *,int) ;
 
 #ifdef	COMMENT
-static int	mkindfname(char *,const char *,const char *,const char *,
-			const char *) ;
+static int	mkindfname(char *,cchar *,cchar *,cchar *,
+			cchar *) ;
 #endif
 
 static int	vesrch(void *,void *) ;
@@ -280,7 +276,7 @@ static int	vesrch(void *,void *) ;
 
 /* local variables */
 
-static const char	*envsys[] = {
+static cchar	*envsys[] = {
 	VARSYSNAME,
 	VARRELEASE,
 	VARVERSION,
@@ -297,7 +293,7 @@ static const char	*envsys[] = {
 	NULL
 } ;
 
-static const char	*prnames[] = {
+static cchar	*prnames[] = {
 	"LOCAL",
 	"NCMP",
 	"EXTRA",
@@ -310,7 +306,7 @@ static const char	*prnames[] = {
 	NULL
 } ;
 
-static const char	*envdefs[] = {
+static cchar	*envdefs[] = {
 	"LOCALDOMAIN",
 	"USER",
 	"MAIL",
@@ -487,7 +483,7 @@ int uunames_exists(UUNAMES *op,cchar *s,int slen)
 	struct liner	le ;
 	int		rs = SR_OK ;
 	int		kl ;
-	const char	*kp = NULL ;
+	cchar	*kp = NULL ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (s == NULL) return SR_FAULT ;
@@ -637,8 +633,8 @@ UUNAMES		*op ;
 
 static int uunames_infoloadbegin(op,pr,dbname)
 UUNAMES		*op ;
-const char	pr[] ;
-const char	dbname[] ;
+cchar	pr[] ;
+cchar	dbname[] ;
 {
 	int		rs = SR_OK ;
 
@@ -831,9 +827,9 @@ static int uunames_indopenpr(UUNAMES *op,time_t dt)
 static int uunames_indopentmp(UUNAMES *op,time_t dt)
 {
 	int		rs ;
-	const char	*tmpdname = TMPVARDNAME ;
-	const char	*inddname = INDDNAME ;
-	const char	*prname ;
+	cchar	*tmpdname = TMPVARDNAME ;
+	cchar	*inddname = INDDNAME ;
+	cchar	*prname ;
 	char		idname[MAXPATHLEN + 1] ;
 
 	if ((rs = sfbasename(op->pr,-1,&prname)) > 0) {
@@ -1029,7 +1025,7 @@ static int uunames_indclose(UUNAMES *op)
 /* make the index */
 static int uunames_mkuunamesi(op,dname)
 UUNAMES		*op ;
-const char	dname[] ;
+cchar	dname[] ;
 {
 	SPAWNPROC	ps ;
 
@@ -1041,10 +1037,10 @@ const char	dname[] ;
 	int	i, cstat, cex ;
 	int	prlen = 0 ;
 
-	const char	*varprmkuu = VARPRMKUU ;
-	const char	*pn = PROG_MKUUNAMES ;
-	const char	*av[10] ;
-	const char	**ev ;
+	cchar	*varprmkuu = VARPRMKUU ;
+	cchar	*pn = PROG_MKUUNAMES ;
+	cchar	*av[10] ;
+	cchar	**ev ;
 
 	char	progfname[MAXPATHLEN + 1] ;
 	char	dbname[MAXPATHLEN + 1] ;
@@ -1140,7 +1136,7 @@ const char	dname[] ;
 
 /* go */
 
-	vecstr_getvec(&envs,(const char ***) &ev) ;
+	vecstr_getvec(&envs,(cchar ***) &ev) ;
 
 	memset(&ps,0,sizeof(SPAWNPROC)) ;
 	ps.opts |= SPAWNPROC_OIGNINTR ;
@@ -1216,8 +1212,8 @@ vecstr		*elp ;
 	int	size ;
 	int	bl, pl ;
 
-	const char	*subdname ;
-	const char	*np ;
+	cchar	*subdname ;
+	cchar	*np ;
 
 	char	pathbuf[MAXPATHLEN + 1] ;
 	char	*bp = NULL ;
@@ -1300,12 +1296,12 @@ UUNAMES		*op ;
 	int	len ;
 	int	n = 0 ;
 
-	const char	*mp ;
-	const char	*tp ;
-	const char	*filemagic = UUNAMES_DBMAGICSTR ;
+	cchar	*mp ;
+	cchar	*tp ;
+	cchar	*filemagic = UUNAMES_DBMAGICSTR ;
 
 
-	mp = (const char *) op->indfmap ;
+	mp = (cchar *) op->indfmap ;
 	ml = op->indfsize ;
 
 	lineoff = 0 ;
@@ -1393,10 +1389,10 @@ static int checkdname(cchar *dname)
 
 static int mkindfname(buf,dname,name,suf,end)
 char		buf[] ;
-const char	dname[] ;
-const char	name[] ;
-const char	suf[] ;
-const char	end[] ;
+cchar	dname[] ;
+cchar	name[] ;
+cchar	suf[] ;
+cchar	end[] ;
 {
 	int	rs = SR_OK ;
 	int	buflen = MAXPATHLEN ;
@@ -1516,7 +1512,7 @@ int		vbuflen ;
 	int		c = 0 ;
 	int		rlen = 0 ;
 	int		f_semi = FALSE ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (vbuflen >= 0) {
 	vbuf[0] = '\0' ;
