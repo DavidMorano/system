@@ -99,7 +99,6 @@ int mailmsgheadkey(cchar *sp,int sl,cchar **kpp) noex {
 	int		rs = SR_FAULT ;
 	int		kl = 0 ;
 	if (sp && kpp) {
-	    if (sl < 0) sl = strlen(sp) ;
 	    rs = SR_OK ;
 	    if_constexpr (f_progressive) {
 	        cchar	*kp = nullptr ;

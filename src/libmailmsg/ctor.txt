@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int useraccdb_ctor(useraccdb *op,Args ... args) noex {
+static int finduid_ctor(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int useraccdb_ctor(useraccdb *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (useraccdb_ctor) */
+/* end subroutine (finduid_ctor) */
 
-static int useraccdb_dtor(useraccdb *op) noex {
+static int finduid_dtor(finduid *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (useraccdb_dtor) */
+/* end subroutine (finduid_dtor) */
 
 template<typename ... Args>
-static int useraccdb_magic(useraccdb *op,Args ... args) noex {
+static int finduid_magic(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == USERACCDB_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (useraccdb_magic) */
+/* end subroutine (finduid_magic) */
 

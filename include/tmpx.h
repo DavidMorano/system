@@ -28,10 +28,10 @@
 
 /* object defines */
 #define	TMPX		struct tmpx_head
-#define	TMPX_CUR	struct tmpx_cursor
 #define	TMPX_FL		struct tmpx_flags
-#define	TMPX_MAGIC	1092387456
+#define	TMPX_CUR	struct tmpx_cursor
 #define	TMPX_ENT	struct utmpx
+#define	TMPX_MAGIC	1092387456
 #define	TMPX_ENTSIZE	sizeof(TMPX_ENT)
 
 /* other defines */
@@ -115,6 +115,7 @@ struct tmpx_head {
 } ;
 
 typedef TMPX		tmpx ;
+typedef TMPX_FL		tmpx_fl ;
 typedef TMPX_CUR	tmpx_cur ;
 typedef TMPX_ENT	tmpx_ent ;
 

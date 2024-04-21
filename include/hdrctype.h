@@ -38,6 +38,7 @@ struct hdrctype_head {
 } ;
 
 typedef HDRCTYPE	hdrctype ;
+typedef	HDRCTYPE_T	hdrctype_t ;
 
 EXTERNC_begin
 
