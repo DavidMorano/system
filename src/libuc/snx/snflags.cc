@@ -75,7 +75,7 @@ int snflags_addstrw(snflags *op,cchar *sp,int sl) noex {
 	    if ((sl > 0) || sp[0]) {
 	        if (op->c++ > 0) {
 	            cint	ch_comma = ',' ;
-	            rs = storebuf_char(op->bp,op->bl,op->bi,ch_comma) ;
+	            rs = storebuf_chr(op->bp,op->bl,op->bi,ch_comma) ;
 	            op->bi += rs ;
 		    rl += rs ;
 	        }

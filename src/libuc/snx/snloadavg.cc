@@ -125,7 +125,7 @@ int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
 	        i += rs ;
 	    } /* end if (ctdec) */
 	    if ((rs >= 0) && (p >= 0)) {
-	        if ((rs = storebuf_char(dbuf,dlen,i,'.')) >= 0) {
+	        if ((rs = storebuf_chr(dbuf,dlen,i,'.')) >= 0) {
 	            i += rs ;
 	            if (p > 0) {
 	                if ((rs = ctdecpui(digbuf,diglen,p,pp->partf)) >= 0) {
@@ -135,7 +135,7 @@ int snloadavg(char *dbuf,int dlen,uint la,int w,int p,int fill) noex {
 	                    i += rs ;
 	                } /* end if (ctdec) */
 		    } /* end if (p positive) */
-	        } /* end if (storebuf_char) */
+	        } /* end if (storebuf_chr) */
 	    } /* end if */
 	} /* end if (non-null) */
 	return (rs >= 0) ? i : rs ;

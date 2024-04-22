@@ -2335,7 +2335,7 @@ static int mknewfname(char *rbuf,cchar *dname,cchar *fname,cchar *sp,cchar *cp)
 	    rs = storebuf_strw(rbuf,rlen,i,dname,-1) ;
 	    i += rs ;
 	    if (rs >= 0) {
-	        rs = storebuf_char(rbuf,rlen,i,'/') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	        i += rs ;
 	    }
 	}
@@ -2349,7 +2349,7 @@ static int mknewfname(char *rbuf,cchar *dname,cchar *fname,cchar *sp,cchar *cp)
 	if ((rs >= 0) && (cp != NULL) && ((tp = strchr(cp,'=')) != NULL)) {
 
 	    if ((tp+1)[0] != '\0') {
-	        rs = storebuf_char(rbuf,rlen,i,'.') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'.') ;
 	        i += rs ;
 	        if (rs >= 0) {
 	            rs = storebuf_strw(rbuf,rlen,i,(tp + 1),-1) ;
@@ -2384,7 +2384,7 @@ static int sufclean(char *rbuf,int rlen,cchar *sp,int sl)
 	    sp = (tp + 1) ;
 
 	    if (rs >= 0) {
-	        rs = storebuf_char(rbuf,rlen,i,'=') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'=') ;
 	        i += rs ;
 	    }
 

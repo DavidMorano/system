@@ -82,7 +82,7 @@ int mkshlibname(char *shlibname,cchar *pnp,int pnl) noex {
 	                i += rs ;
 	            }
 	            if (rs >= 0) {
-	                rs = storebuf_char(shlibname,shliblen,i,'.') ;
+	                rs = storebuf_chr(shlibname,shliblen,i,'.') ;
 	                i += rs ;
 	            }
 	            if (rs >= 0) {

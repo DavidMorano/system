@@ -510,7 +510,7 @@ static int mailmsgfile_proclines(MMF *op,MMF_MI *mip,filer *fbp,
 	    int		li = 0 ;
 	    bool	f{} ;
 	    cchar	*sp ;
-	    while ((rs = linefold_getline(&ff,li,&sp)) > 0) {
+	    while ((rs = linefold_getln(&ff,li,&sp)) > 0) {
 		int	sl = rs ;
 	        while ((rs >= 0) && (sl > 0)) {
 	            int		plen = sl ;

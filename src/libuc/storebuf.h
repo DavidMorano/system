@@ -51,13 +51,13 @@ extern int storebuf_hexui(char *,int,int,uint) noex ;
 extern int storebuf_hexul(char *,int,int,ulong) noex ;
 extern int storebuf_hexull(char *,int,int,ulonglong) noex ;
 
+static inline int storebuf_char(char *bp,int bl,int i,int ch) noex {
+	return storebuf_chr(bp,bl,i,ch) ;
+}
+
 EXTERNC_end
 
 #ifdef	__cplusplus
-
-inline int storebuf_char(char *bp,int bl,int i,int ch) noex {
-	return storebuf_chr(bp,bl,i,ch) ;
-}
 
 inline int storebuf_bin(char *bp,int bl,int i,int v) noex {
 	return storebuf_bini(bp,bl,i,v) ;

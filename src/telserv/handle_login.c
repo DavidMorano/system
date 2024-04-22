@@ -135,7 +135,7 @@ struct passwd	*pep ;
 #endif
 
 	    if (si > 0)
-	        si += storebuf_char(svcargbuf,BUFLEN,si,' ') ;
+	        si += storebuf_chr(svcargbuf,BUFLEN,si,' ') ;
 
 	    qlen = mkquoted(qbuf,BUFLEN,ap,-1) ;
 	    if (qlen > 0)

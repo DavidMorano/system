@@ -1816,7 +1816,7 @@ int		dl ;
 
 
 	if (rs >= 0) {
-	    rs = storebuf_char(shmbuf,shmlen,i,'/') ;
+	    rs = storebuf_chr(shmbuf,shmlen,i,'/') ;
 	    i += rs ;
 	}
 
@@ -1832,7 +1832,7 @@ int		dl ;
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(shmbuf,shmlen,i,'$') ;
+	    rs = storebuf_chr(shmbuf,shmlen,i,'$') ;
 	    i += rs ;
 	}
 

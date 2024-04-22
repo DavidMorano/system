@@ -27,11 +27,11 @@
 	returns zero (0).
 
 	Synopsis:
-	int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex
+	int mailmsgmathdr(cchar *sp,int sl,int *ip) noex
 
 	Arguments:
-	ts		string to test for header
-	tslen		length of input string
+	sp		test c-string pointer
+	sl		test c-string length
 	ip		pointer to string-index of header-value
 
 	Returns:
@@ -93,17 +93,17 @@ constexpr bool		f_alt = CF_ALT1 ;
 
 /* exported subroutines */
 
-int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
+int mailmsgmathdr(cchar *sp,int sl,int *ip) noex {
 	int		rs = SR_FAULT ;
-	if (ts) {
+	if (sp) {
 	    int		tl ;
 	    int		kl = 0 ;
-	    cchar	*tp = ts ;
+	    cchar	*tp = sp ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    if (ip) {
 	        *ip = 0 ;
 	    }
-	    if (tslen < 0) tslen = strlen(ts) ;
-	    tl = tslen ;
+	    tl = sl ;
 	    if constexpr (f_alt) {
 	        bool	f = false ;
 	        while (tl) {
@@ -121,13 +121,13 @@ int mailmsgmathdr(cchar *ts,int tslen,int *ip) noex {
 	            tl -= 1 ;
 	        } /* end while */
 	    } /* end if-constexpr (f_alt) */
-	    kl = (tp - ts) ;
+	    kl = (tp - sp) ;
 	    while (tl && ishdrwht(*tp)) {
 	        tp += 1 ;
 	        tl -= 1 ;
 	    } /* end while */
 	    if (ip) {
-	        *ip = ((tp + 1) - ts) ;
+	        *ip = ((tp + 1) - sp) ;
 	    }
 	    rs = (tl && (*tp == ':')) ? kl : 0 ;
 	} /* end if (non-null) */

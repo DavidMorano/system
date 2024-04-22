@@ -41,11 +41,16 @@
 #include	<usystem.h>
 #include	<char.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 
 
 /* external subroutines */
+
+
+/* local variables */
 
 
 /* exported variables */

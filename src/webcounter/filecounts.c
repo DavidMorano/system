@@ -1067,7 +1067,7 @@ const char	name[] ;
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,' ') ;
+	    rs = storebuf_chr(rbuf,rlen,i,' ') ;
 	    i += rs ;
 	}
 
@@ -1085,7 +1085,7 @@ const char	name[] ;
 
 	if ((rs >= 0) && (name != NULL)) {
 	    if (rs >= 0) {
-	        rs = storebuf_char(rbuf,rlen,i,' ') ;
+	        rs = storebuf_chr(rbuf,rlen,i,' ') ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
@@ -1093,7 +1093,7 @@ const char	name[] ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = storebuf_char(rbuf,rlen,i,'\n') ;
+	        rs = storebuf_chr(rbuf,rlen,i,'\n') ;
 	        i += rs ;
 	    }
 	} /* end if */

@@ -67,6 +67,7 @@ extern int	mkonefrom(char *,int,cchar *,int) noex ;
 extern int	mkmailname(char *,int,cchar *,int) noex ;
 extern int	mkvarpath(char *,cchar *,int) noex ;
 extern int	mkexpandpath(char *,cchar *,int) noex ;
+extern int	mkuserpath(char *,cchar *,cchar *,int) noex ;
 extern int	mkufname(char *,cchar *,cchar *) noex ;
 extern int	mkaltext(char *,cchar *,cchar *) noex ;
 extern int	mkufname(char *,cchar *,cchar *) noex ;
@@ -76,6 +77,10 @@ extern int	mkstrunique(char *,int) noex ;
 extern int	mkcleanline(char *,int,int) noex ;
 extern int	mkfmtphone(char *,int,cchar *,int) noex ;
 extern int	mkfingerquery(char *,int,int,cchar *,mainv) noex ;
+
+/* obsolete */
+extern int	mkcaselower(char *,int) noex ;
+extern int	mkrevstr(char *,int) noex ;
 
 EXTERNC_end
 

@@ -61,6 +61,7 @@ extern bool hasallwhite(cchar *,int) noex ;
 extern bool hasalllc(cchar *,int) noex ;
 extern bool hasalluc(cchar *,int) noex ;
 extern bool hasalldig(cchar *,int) noex ;
+extern bool hasallhdrkey(cchar *,int) noex ;
 
 extern bool hasallbase(cchar *,int,int) noex ;
 extern bool hasallchr(cchar *,int,int) noex ;

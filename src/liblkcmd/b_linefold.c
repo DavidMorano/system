@@ -1427,14 +1427,9 @@ static int procfoldline(PROGINFO *pip,void *ofp,cchar sbuf[],int slen)
 	debugprintf("linefold/procfoldline: ent lw=%u ind=%u\n",lw,ind) ;
 #endif
 	if ((rs = linefold_start(&f,lw,ind,sbuf,slen)) >= 0) {
-	    int		i ;
 	    cchar	*lp ;
-	    for (i = 0 ; (rs = linefold_getline(&f,i,&lp)) > 0 ; i += 1) {
-		const int	ll = rs ;
-#if	CF_DEBUG
-	if (DEBUGLEVEL(5))
-	debugprintf("linefold/procfoldline: i=%u ll=%u\n",i,ll) ;
-#endif
+	    for (int i = 0 ; (rs = linefold_getln(&f,i,&lp)) > 0 ; i += 1) {
+		cint	ll = rs ;
 		if (i > 0) {
 		    rs = shio_writeblanks(ofp,ind) ;
 		    wlen += rs ;

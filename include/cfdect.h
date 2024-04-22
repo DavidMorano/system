@@ -31,6 +31,20 @@ extern int cfdecti(cchar *,int,int *) noex ;
 
 EXTERNC_end
 
+#ifdef	__cplusplus
+
+static inline int cfdect(cchar *sp,int sl,int *rp = nullptr) noex {
+	return cfdect(sp,sl,rp) ;
+}
+
+#else 
+
+static inline int cfdect(cchar *sp,int sl,int *rp) noex {
+	return cfdect(sp,sl,rp) ;
+}
+
+#endif /* __cplusplus */
+
 
 #endif /* CFDECT_INCLUDE */
 

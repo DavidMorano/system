@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} mkbestfrom "
+NAMES="${NAMES} storebuf_char "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/mkbestfrom/s//mkaddrfrom/g
+g/storebuf_char/s//storebuf_chr/g
 	w
 	q
 EOF

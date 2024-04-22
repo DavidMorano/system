@@ -56,7 +56,7 @@
 #include	<mallocxx.h>
 #include	<getax.h>
 #include	<recarr.h>
-#include	<vecelem.h>
+#include	<vecobj.h>
 #include	<ascii.h>
 #include	<strn.h>
 #include	<sncpyx.h>
@@ -76,10 +76,6 @@
 #define	GRMEMS_DEFMAX		20	/* default maximum entries */
 #define	GRMEMS_DEFTTL		(10*60)	/* default time-to-live */
 
-#define	GRMEMS_REC		struct grmems_r
-#define	GRMEMS_USER		struct grmems_u
-#define	GRMEMS_USERGID		struct grmems_ug
-
 
 /* imported namespaces */
 
@@ -90,8 +86,6 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
-
-typedef GRMEMS_REC		grmems_rec ;
 
 #ifndef	STDSORTF_TYPEDEF
 #define	STDSORTF_TYPEDEF
@@ -119,7 +113,7 @@ enum cts {
 	ct_overlast
 } ;
 
-struct grmems_r : pq_ent {
+struct grmems_rec : pq_ent {
 	cchar		**mems ;
 	time_t		ti_create ;
 	time_t		ti_access ;
@@ -136,7 +130,7 @@ struct grmems_u {
 
 struct grmems_ug {
 	gid_t		gid ;
-	char		un[USERNAMELEN] ;
+	char		un[USERNAMELEN+1] ;
 } ;
 
 
@@ -146,7 +140,7 @@ template<typename ... Args>
 static int grmems_ctor(grmems *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    const nullptr_t	np{} ;
+	    cnullptr	np{} ;
 	    memclear(op) ;		/* dangerous */
 	    rs = SR_NOMEM ;
 	    if ((op->lrup = new(nothrow) pq) != np) {
@@ -193,28 +187,28 @@ static int	grmems_recfins(grmems *) noex ;
 static int	grmems_upstats(grmems *,int,int) noex ;
 
 static int	grmems_mkug(grmems *,time_t) noex ;
-static int	grmems_mkugload(grmems *,time_t,vecelem *) noex ;
-static int	grmems_mkugstore(grmems *,time_t,vecelem *) noex ;
+static int	grmems_mkugload(grmems *,time_t,vecobj *) noex ;
+static int	grmems_mkugstore(grmems *,time_t,vecobj *) noex ;
 
-static int	grmems_recusers(grmems *,time_t,vecelem *,gid_t) noex ;
+static int	grmems_recusers(grmems *,time_t,vecobj *,gid_t) noex ;
 
 static int	grmems_pwmapbegin(grmems *,time_t,cchar *) noex ;
 static int	grmems_pwmapend(grmems *) noex ;
 
-static int record_start(grmems_rec *,time_t,int,vecelem *,GROUP *) noex ;
-static int record_loadgruns(grmems_rec *,vecelem *,GROUP *) noex ;
+static int record_start(grmems_rec *,time_t,int,vecobj *,GROUP *) noex ;
+static int record_loadgruns(grmems_rec *,vecobj *,GROUP *) noex ;
 static int record_access(grmems_rec *,time_t) noex ;
-static int record_refresh(grmems_rec *,time_t,int,vecelem *,GROUP *) noex ;
-static int record_mems(grmems_rec *,time_t,int,vecelem *,GROUP *) noex ;
+static int record_refresh(grmems_rec *,time_t,int,vecobj *,GROUP *) noex ;
+static int record_mems(grmems_rec *,time_t,int,vecobj *,GROUP *) noex ;
 static int record_isold(grmems_rec *,time_t,int) noex ;
 static int record_getgnp(grmems_rec *,cchar **) noex ;
 static int record_finish(grmems_rec *) noex ;
 
-static int	usergid_load(GRMEMS_USERGID *,cchar *,int,gid_t) noex ;
+static int	usergid_load(grmems_ug *,cchar *,int,gid_t) noex ;
 
 static int	pwentparse(cchar *,int,gid_t *) noex ;
 
-static int	vecelem_addouruniq(vecelem *,GRMEMS_USER *) noex ;
+static int	vecobj_addouruniq(vecobj *,grmems_u *) noex ;
 
 static int	ugcmp(cvoid *,cvoid *) noex ;
 
@@ -465,7 +459,7 @@ int grmems_check(grmems *op,time_t dt) noex {
 }
 /* end subroutine (grmems_check) */
 
-int grmems_stats(grmems *op,GRMEMS_STATS *sp) noex {
+int grmems_stats(grmems *op,grmems_st *sp) noex {
 	int		rs ;
 	if ((rs = grmems_magic(op,sp)) >= 0) {
 	    if (op->recs) {
@@ -596,10 +590,10 @@ static int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 	        ucentgr	gr{} ;
 	        cint	grlen = rs ;
 	        if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
-	            vecelem	u ;
+	            vecobj	u ;
 	            const gid_t	gid = gr.gr_gid ;
-	            cint	esize = sizeof(GRMEMS_USER) ;
-	            if ((rs = vecelem_start(&u,esize,10,0)) >= 0) {
+	            cint	esize = sizeof(grmems_u) ;
+	            if ((rs = vecobj_start(&u,esize,10,0)) >= 0) {
 	                if ((rs = grmems_recusers(op,dt,&u,gid)) >= 0) {
 	                    if ((rs = record_start(ep,dt,wc,&u,&gr)) >= 0) {
 	                        if ((rs = recarr_add(op->recs,ep)) >= 0) {
@@ -611,9 +605,9 @@ static int grmems_recstart(grmems *op,time_t dt,grmems_rec *ep,
 			        }
 	                    } /* end if (entry-start) */
 	                } /* end if (grmems-recusers) */
-	                rs1 = vecelem_finish(&u) ;
+	                rs1 = vecobj_finish(&u) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (vecelem-user) */
+	            } /* end if (vecobj-user) */
 	        } /* end if (getgr-name) */
 	        rs1 = uc_free(grbuf) ;
 	        if (rs >= 0) rs = rs1 ;
@@ -634,16 +628,16 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 	        ucentgr		gr ;
 		cint		grlen = rs ;
 	        if ((rs = getgr_name(&gr,grbuf,grlen,gnp)) >= 0) {
-	            vecelem	u ;
+	            vecobj	u ;
 	            const gid_t	gid = gr.gr_gid ;
-	            cint	esize = sizeof(GRMEMS_USER) ;
-	            if ((rs = vecelem_start(&u,esize,10,0)) >= 0) {
+	            cint	esize = sizeof(grmems_u) ;
+	            if ((rs = vecobj_start(&u,esize,10,0)) >= 0) {
 	                if ((rs = grmems_recusers(op,dt,&u,gid)) >= 0) {
 	                    rs = record_refresh(ep,dt,wc,&u,&gr) ;
 	                } /* end if (grmems-recusers) */
-	                rs1 = vecelem_finish(&u) ;
+	                rs1 = vecobj_finish(&u) ;
 	                if (rs >= 0) rs = rs1 ;
-	            } /* end if (vecelem-user) */
+	            } /* end if (vecobj-user) */
 	        } /* end if (getgr-name) */
 	        rs1 = uc_free(grbuf) ;
 		if (rs >= 0) rs = rs1 ;
@@ -654,17 +648,17 @@ static int grmems_recrefresh(grmems *op,time_t dt,grmems_rec *ep) noex {
 /* end subroutine (grmems_recrefresh) */
 
 /* get all users w/ this specified GID */
-static int grmems_recusers(grmems *op,time_t dt,vecelem *ulp,gid_t gid) noex {
+static int grmems_recusers(grmems *op,time_t dt,vecobj *ulp,gid_t gid) noex {
 	int		rs ;
 	int		c = 0 ;
 	if ((rs = grmems_mkug(op,dt)) >= 0) {
-	    GRMEMS_USERGID	k, *ugp ;
-	    GRMEMS_USERGID	*ugs = (GRMEMS_USERGID *) op->usergids ;
-	    cint		esize = sizeof(GRMEMS_USERGID) ;
+	    grmems_ug	k, *ugp ;
+	    grmems_ug	*ugs = (grmems_ug *) op->usergids ;
+	    cint		esize = sizeof(grmems_ug) ;
 	    cint		n = op->nusergids ;
 	    stdsort_f		scf = stdsort_f(ugcmp) ;
 	    k.gid = gid ;
-	    ugp = (GRMEMS_USERGID *) bsearch(&k,ugs,n,esize,scf) ;
+	    ugp = (grmems_ug *) bsearch(&k,ugs,n,esize,scf) ;
 	    if (ugp != nullptr) {
 		cint	ulen = var.usernamelen ;
 	        while (ugp > ugs) {
@@ -672,10 +666,10 @@ static int grmems_recusers(grmems *op,time_t dt,vecelem *ulp,gid_t gid) noex {
 	            ugp -= 1 ;
 	        }
 	        while ((ugp < (ugs+n)) && (ugp->gid == gid)) {
-	            GRMEMS_USER		u ;
+	            grmems_u		u ;
 	            u.up = ugp->un ;
 	            u.ul = strnlen(ugp->un,ulen) ;
-	            rs = vecelem_add(ulp,&u) ;
+	            rs = vecobj_add(ulp,&u) ;
 	            c += 1 ;
 	            ugp += 1 ;
 	            if (rs < 0) break ;
@@ -691,25 +685,25 @@ static int grmems_mkug(grmems *op,time_t dt) noex {
 	int		rs1 ;
 	int		c = 0 ;
 	if (op->usergids == nullptr) {
-	    vecelem	ug ;
-	    cint	esize = sizeof(GRMEMS_USERGID) ;
-	    if ((rs = vecelem_start(&ug,esize,10,0)) >= 0) {
+	    vecobj	ug ;
+	    cint	esize = sizeof(grmems_ug) ;
+	    if ((rs = vecobj_start(&ug,esize,10,0)) >= 0) {
 	        if ((rs = grmems_mkugload(op,dt,&ug)) >= 0) {
-		    vecelem_vcmp	vcf = vecelem_vcmp(ugcmp) ;
+		    vecobj_vcf	vcf = vecobj_vcf(ugcmp) ;
 	            c = rs ;
-	            if ((rs = vecelem_sort(&ug,vcf)) >= 0) {
+	            if ((rs = vecobj_sort(&ug,vcf)) >= 0) {
 	                rs = grmems_mkugstore(op,dt,&ug) ;
 		    }
 	        } /* end if (grmems-mkugload) */
-	        rs1 = vecelem_finish(&ug) ;
+	        rs1 = vecobj_finish(&ug) ;
 		if (rs >= 0) rs = rs1 ;
-	    } /* end if (vecelem) */
+	    } /* end if (vecobj) */
 	} /* end if (usergids) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (grmems_mkug) */
 
-static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
+static int grmems_mkugload(grmems *op,time_t dt,vecobj *ulp) noex {
 	const nullptr_t	np{} ;
 	int		rs ;
 	int		rs1 ;
@@ -724,11 +718,11 @@ static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
 	            gid_t	gid{} ;
 	            cint	len = (tp-mp) ;
 	            if ((rs = pwentparse(mp,len,&gid)) > 0) {
-	                GRMEMS_USERGID	ug ;
+	                grmems_ug	ug ;
 		        cint		ul = rs ;
 	                if (usergid_load(&ug,mp,ul,gid) > 0) {
 	                    c += 1 ;
-	                    rs = vecelem_add(ulp,&ug) ;
+	                    rs = vecobj_add(ulp,&ug) ;
 	                }
 	            } /* end if (pwentparse) */
 	            ml -= ((tp+1)-mp) ;
@@ -743,20 +737,20 @@ static int grmems_mkugload(grmems *op,time_t dt,vecelem *ulp) noex {
 }
 /* end subroutine (grmems_mkugload) */
 
-static int grmems_mkugstore(grmems *op,time_t dt,vecelem *ulp) noex {
+static int grmems_mkugstore(grmems *op,time_t dt,vecobj *ulp) noex {
 	int		rs ;
 	int		sz ;
 	int		c = 0 ;
-	if ((rs = vecelem_count(ulp)) >= 0) {
-	    cint	esize = sizeof(GRMEMS_USERGID) ;
+	if ((rs = vecobj_count(ulp)) >= 0) {
+	    cint	esize = sizeof(grmems_ug) ;
 	    cint	n = rs ;
 	    void	*vp{} ;
 	    sz = ((n+1) * esize) ;
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
-	        GRMEMS_USERGID	*ugs = (GRMEMS_USERGID *) vp ;
-	        GRMEMS_USERGID	*ugp ;
-	        for (int i = 0 ; vecelem_get(ulp,i,&ugp) >= 0 ; i += 1) {
-	            if (ugp) {
+	        grmems_ug	*ugs = (grmems_ug *) vp ;
+	        for (int i = 0 ; vecobj_get(ulp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	        	grmems_ug	*ugp = (grmems_ug *) vp ;
 	                ugs[c++] = *ugp ;
 		    }
 	        } /* end for */
@@ -765,7 +759,7 @@ static int grmems_mkugstore(grmems *op,time_t dt,vecelem *ulp) noex {
 	        op->nusergids = c ;
 	        op->ti_usergids = dt ;
 	    } /* end if (memory-allocation) */
-	} /* end if (vecelem-count) */
+	} /* end if (vecobj-count) */
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (grmems_mkugstore) */
@@ -914,7 +908,7 @@ static int grmems_pwmapend(grmems *op) noex {
 /* end subroutine (grmems_pwmapend) */
 
 static int record_start(grmems_rec *ep,time_t dt,int wc,
-		vecelem *ulp,GROUP *grp) noex {
+		vecobj *ulp,GROUP *grp) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (ep && ulp && grp) {
@@ -945,7 +939,7 @@ static int record_finish(grmems_rec *ep) noex {
 /* end subroutine (record_finish) */
 
 static int record_refresh(grmems_rec *ep,time_t dt,int wc,
-		vecelem *ulp,GROUP *grp) noex {
+		vecobj *ulp,GROUP *grp) noex {
 	int		rs = SR_FAULT ;
 	int		n = 0 ;
 	if (ep) {
@@ -965,36 +959,38 @@ static int record_refresh(grmems_rec *ep,time_t dt,int wc,
 /* end subroutine (record_refresh) */
 
 static int record_mems(grmems_rec *ep,time_t dt,int wc,
-		vecelem *ulp,GROUP *grp) noex {
+		vecobj *ulp,GROUP *grp) noex {
 	int		rs ;
 	int		n = 0 ;
 	if ((rs = record_loadgruns(ep,ulp,grp)) >= 0) {
-	    if ((rs = vecelem_count(ulp)) >= 0) {
-	        GRMEMS_USER	*up ;
+	    if ((rs = vecobj_count(ulp)) >= 0) {
 		cint		ulen = var.usernamelen ;
 	        int		sz = 0 ;
 	        int		masize ;
 		int		ul ;
 	        char		*bp ;
+		void		*vp{} ;
 	        n = rs ;
 	        masize = ((n + 1) * sizeof(cchar *)) ;
 	        sz += masize ;
-	        for (int i = 0 ; vecelem_get(ulp,i,&up) >= 0 ; i += 1) {
-	            if (up) {
+	        for (int i = 0 ; vecobj_get(ulp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	        	grmems_u	*up = (grmems_u *) vp ;
 		        ul = up->ul ;
 		        if (ul < 0) {
 			    ul = strnlen(up->up,ulen) ;
 			    up->ul = ul ;
 		        }
 	                sz += (ul+1) ;
-		    }
+		    } /* end if (non-null) */
 	        } /* end for */
 	        if ((rs = uc_malloc(sz,&bp)) >= 0) {
 	            cchar	**mems = (cchar **) bp ;
 	            int		c = 0 ;
 	            bp += masize ;
-	            for (int i = 0 ; vecelem_get(ulp,i,&up) >= 0 ; i += 1) {
-	                if (up) {
+	            for (int i = 0 ; vecobj_get(ulp,i,&vp) >= 0 ; i += 1) {
+	                if (vp) {
+	        	    grmems_u	*up = (grmems_u *) vp ;
 	                    mems[c++] = bp ;
 	                    bp = (strwcpy(bp,up->up,up->ul) + 1) ;
 			}
@@ -1006,13 +1002,13 @@ static int record_mems(grmems_rec *ep,time_t dt,int wc,
 	            ep->mems = mems ;
 	            ep->nmems = c ;
 	        } /* end if (memory-allocation) */
-	    } /* end if (vecelem-count) */
+	    } /* end if (vecobj-count) */
 	} /* end if (load user members) */
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (record_mems) */
 
-static int record_loadgruns(grmems_rec *op,vecelem *ulp,GROUP *grp) noex {
+static int record_loadgruns(grmems_rec *op,vecobj *ulp,GROUP *grp) noex {
 	int		rs = SR_FAULT ;
 	int		c = 0 ;
 	if (op) {
@@ -1020,10 +1016,10 @@ static int record_loadgruns(grmems_rec *op,vecelem *ulp,GROUP *grp) noex {
 	    if (grp->gr_mem != nullptr) {
 	        cchar	**mems = (cchar **) grp->gr_mem ;
 	        for (int i = 0 ; mems[i] != nullptr ; i += 1) {
-	            GRMEMS_USER		u ;
+	            grmems_u		u ;
 	            u.up = mems[i] ;
 	            u.ul = -1 ;
-	            rs = vecelem_addouruniq(ulp,&u) ;
+	            rs = vecobj_addouruniq(ulp,&u) ;
 	            if (rs < INT_MAX) c += 1 ;
 	            if (rs < 0) break ;
 	        } /* end for */
@@ -1069,7 +1065,7 @@ static int record_getgnp(grmems_rec *ep,cchar **rpp) noex {
 }
 /* end subroutine (record_getgnp) */
 
-static int usergid_load(GRMEMS_USERGID *ugp,cchar *unp,int unl,gid_t gid) noex {
+static int usergid_load(grmems_ug *ugp,cchar *unp,int unl,gid_t gid) noex {
 	cint		unlen = var.usernamelen ;
 	int		ul ;
 	ul = strnwcpy(ugp->un,unlen,unp,unl) - ugp->un ;
@@ -1112,32 +1108,32 @@ static int pwentparse(cchar *lbuf,int llen,gid_t *gp) noex {
 }
 /* end subroutine (pwentparse) */
 
-static int vecelem_addouruniq(vecelem *ulp,GRMEMS_USER *unp) noex {
-	GRMEMS_USER	*ep{} ;
+static int vecobj_addouruniq(vecobj *ulp,grmems_u *unp) noex {
 	cint		ulen = var.usernamelen ;
-	int		rs = SR_OK ;
+	int		rs ;
 	bool		f = false ;
-	for (int i = 0 ; (rs = vecelem_get(ulp,i,&ep)) >= 0 ; i += 1) {
-	    if (ep) {
-	        f = (ep->up[0] == unp->up[0]) ;
-	        f = f && (strncmp(ep->up,unp->up,ulen) == 0) ;
+	void		*vp{} ;
+	for (int i = 0 ; (rs = vecobj_get(ulp,i,&vp)) >= 0 ; i += 1) {
+	    if (vp) {
+	        grmems_u	*up = (grmems_u *) vp ;
+	        f = (up->up[0] == unp->up[0]) ;
+	        f = f && (strncmp(up->up,unp->up,ulen) == 0) ;
 	        if (f) break ;
 	    }
 	} /* end for */
 	if (rs == SR_NOTFOUND) {
-	    rs = vecelem_add(ulp,unp) ;
+	    rs = vecobj_add(ulp,unp) ;
 	} else {
 	    rs = INT_MAX ;
 	}
 	return rs ;
 }
-/* end subroutine (vecelem_addouruniq) */
+/* end subroutine (vecobj_addouruniq) */
 
 static int ugcmp(cvoid *v1p,cvoid *v2p) noex {
-	GRMEMS_USERGID	*g1p = (GRMEMS_USERGID *) v1p ;
-	GRMEMS_USERGID	*g2p = (GRMEMS_USERGID *) v2p ;
-	cint		rc = (g1p->gid - g2p->gid) ;
-	return rc ;
+	grmems_ug	*g1p = (grmems_ug *) v1p ;
+	grmems_ug	*g2p = (grmems_ug *) v2p ;
+	return (g1p->gid - g2p->gid) ;
 }
 /* end subroutine (ugcmp) */
 

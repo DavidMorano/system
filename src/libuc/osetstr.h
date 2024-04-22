@@ -24,16 +24,18 @@
 #include	<clanguage.h>
 
 
+#define	OSETSTR_MAGIC	0x97351229
 #define	OSETSTR		struct osetstr_head
 #define	OSETSTR_CUR	struct osetstr_cursor
 
 
 struct osetstr_cursor {
-	void		*interp ;
+	void		*itp ;
 } ;
 
 struct osetstr_head {
 	void		*setp ;
+	uint		magic ;
 } ;
 
 typedef OSETSTR		osetstr ;

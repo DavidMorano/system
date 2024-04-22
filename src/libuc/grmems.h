@@ -32,17 +32,17 @@
 #define	GRMEMS_MAGIC		0x98643169
 #define	GRMEMS_CURMAGIC		0x9864316a
 #define	GRMEMS			struct grmems_head
-#define	GRMEMS_STATS		struct grmems_s
-#define	GRMEMS_CUR		struct grmems_c
+#define	GRMEMS_ST		struct grmems_statdata
+#define	GRMEMS_CUR		struct grmems_cursor
 
 
-struct grmems_c {
+struct grmems_cursor {
 	uint		magic ;
 	int		ri ;		/* record index */
 	int		i ;		/* index through members */
 } ;
 
-struct grmems_s {
+struct grmems_statdata {
 	uint		nentries ;		/* number of current entries */
 	uint		total ;			/* accesses */
 	uint		refreshes ;		/* refreshes */
@@ -60,7 +60,7 @@ struct grmems_head {
 	time_t		ti_open ;
 	time_t		ti_access ;
 	time_t		ti_usergids ;
-	GRMEMS_STATS	s ;
+	GRMEMS_ST	s ;
 	uint		magic ;
 	uint		wcount ;	/* write-count */
 	int		pagesize ;
@@ -74,6 +74,7 @@ struct grmems_head {
 
 typedef GRMEMS		grmems ;
 typedef GRMEMS_CUR	grmems_cur ;
+typedef GRMEMS_ST	grmems_st ;
 
 EXTERNC_begin
 
@@ -84,7 +85,7 @@ extern int grmems_lookread(grmems *,grmems_cur *,char *,int) noex ;
 extern int grmems_curend(grmems *,grmems_cur *) noex ;
 extern int grmems_invalidate(grmems *,cchar *,int) noex ;
 extern int grmems_check(grmems *,time_t) noex ;
-extern int grmems_stats(grmems *,GRMEMS_STATS *) noex ;
+extern int grmems_stats(grmems *,grmems_st *) noex ;
 extern int grmems_finish(grmems *) noex ;
 
 EXTERNC_end

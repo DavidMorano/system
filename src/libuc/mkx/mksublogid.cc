@@ -190,7 +190,7 @@ static int mkjoin(char *dbuf,int dlen,cchar *bp,int bl,cchar *vp,int vl) noex {
 	if ((rs = storebuf_strw(dbuf,dlen,i,bp,bl)) >= 0) {
 	    i += rs ;
 	    if ((vl >= 0) && vp[0]) {
-	        if ((rs = storebuf_char(dbuf,dlen,i,MIDDLECHAR)) >= 0) {
+	        if ((rs = storebuf_chr(dbuf,dlen,i,MIDDLECHAR)) >= 0) {
 	    	    i += rs ;
 	            rs = storebuf_strw(dbuf,dlen,i,vp,vl) ;
 	            i += rs ;

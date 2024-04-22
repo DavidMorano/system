@@ -109,7 +109,7 @@ int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	                cint	a = (int) va_arg(ap,int) ;
 	                if (a >= 0) {
 	                    if ((rs >= 0) && (c++ > 0)) {
-	                        rs = storebuf_char(dp,dl,i,';') ;
+	                        rs = storebuf_chr(dp,dl,i,';') ;
 	                        i += rs ;
 	                    }
 	                    if (rs >= 0) {
@@ -121,7 +121,7 @@ int termconseqva(char *dp,int dl,int name,cchar *is,int na,va_list ap) noex {
 	            } /* end for */
 	        } /* end if */
 	        if (rs >= 0) {
-	            rs = storebuf_char(dp,dl,i,name) ;
+	            rs = storebuf_chr(dp,dl,i,name) ;
 	            i += rs ;
 	        }
 	    } /* end if (valid) */

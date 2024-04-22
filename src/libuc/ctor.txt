@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int mbcache_ctor(mbcache *op,Args ... args) noex {
+static int finduid_ctor(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,24 @@ static int mbcache_ctor(mbcache *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mbcache_ctor) */
+/* end subroutine (finduid_ctor) */
 
-static int mbcache_dtor(mbcache *op) noex {
+static int finduid_dtor(finduid *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (mbcache_dtor) */
+/* end subroutine (finduid_dtor) */
 
 template<typename ... Args>
-static int mbcache_magic(mbcache *op,Args ... args) noex {
+static int finduid_magic(finduid *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == MBCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (mbcache_magic) */
+/* end subroutine (finduid_magic) */
 

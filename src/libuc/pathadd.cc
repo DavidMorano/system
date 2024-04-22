@@ -111,7 +111,7 @@ int pathaddw(char *pbuf,int pl,cchar *sp,int sl) noex {
 	        if ((rs = maxpathlen) >= 0) {
 		    cint	plen = rs ;
 	            if ((pl > 0) && (pbuf[pl-1] != '/')) {
-	                rs = storebuf_char(pbuf,plen,pl,'/') ;
+	                rs = storebuf_chr(pbuf,plen,pl,'/') ;
 	                pl += rs ;
 	            }
 	            if (rs >= 0) {

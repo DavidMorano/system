@@ -1077,7 +1077,7 @@ static int mksymname(char *rbuf,const char *sp,int sl,const char *sub)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,nl,'_') ;
+	    rs = storebuf_chr(rbuf,rlen,nl,'_') ;
 	    nl += rs ;
 	}
 

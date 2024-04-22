@@ -78,7 +78,7 @@ int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex {
 	                i += rs ;
 	            }
 	            if ((rs >= 0) && (i > 0) && (rbuf[i-1] != '/')) {
-	                rs = storebuf_char(rbuf,rlen,i,'/') ;
+	                rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	                i += rs ;
 	            }
 	            if (rs >= 0) {
@@ -87,7 +87,7 @@ int mksofname(char *rbuf,cchar *dn,cchar *name,cchar *ext) noex {
 	            }
 	            if (ext[0]) {
 	                if ((rs >= 0) && (ext[0] != '.')) {
-	                    rs = storebuf_char(rbuf,rlen,i,'.') ;
+	                    rs = storebuf_chr(rbuf,rlen,i,'.') ;
 	                    i += rs ;
 	                }
 	                if (rs >= 0) {

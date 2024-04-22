@@ -49,6 +49,8 @@
 #include	<usystem.h>
 #include	<realname.h>
 
+#include	"mkx.h"
+
 
 /* local defines */
 

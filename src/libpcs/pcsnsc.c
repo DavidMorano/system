@@ -949,7 +949,7 @@ static int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
 	}
 
@@ -963,7 +963,7 @@ static int mksrvdname(char *rbuf,cchar *td,cchar *pr,cchar *fn)
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(rbuf,rlen,i,'/') ;
+	    rs = storebuf_chr(rbuf,rlen,i,'/') ;
 	    i += rs ;
 	}
 

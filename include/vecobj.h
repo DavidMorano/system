@@ -60,12 +60,12 @@ struct vecobj_flags {
 struct vecobj_head {
 	void		**va ;
 	lookaside	*lap ;
+	VECOBJ_FL	f ;
 	int		c ;		/* count of items in list */
 	int		i ;		/* highest index */
 	int		n ;		/* extent of array */
 	int		fi ;		/* free index */
 	int		esize ;		/* object size */
-	VECOBJ_FL	f ;
 } ;
 
 struct vecobj_cursor {

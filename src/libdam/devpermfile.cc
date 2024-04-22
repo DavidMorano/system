@@ -1362,7 +1362,7 @@ static int mkcatfile(char *buf,int i,const char *fname)
 
 
 	if ((rs >= 0) && (i > 0) && (buf[i-1] != '/')) {
-	    rs = storebuf_char(buf,blen,i,'/') ;
+	    rs = storebuf_chr(buf,blen,i,'/') ;
 	    i += rs ;
 	}
 
@@ -1395,7 +1395,7 @@ int		dnl ;
 	}
 
 	if ((rs >= 0) && (i > 0) && (buf[i-1] != '/')) {
-	    rs = storebuf_char(buf,blen,i,'/') ;
+	    rs = storebuf_chr(buf,blen,i,'/') ;
 	    i += rs ;
 	}
 

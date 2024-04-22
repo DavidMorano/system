@@ -68,7 +68,7 @@ int snrealname(char *dbuf,int dlen,cchar **a,int n) noex {
 	for (int i = 0 ; (rs >= 0) && (i < n) && a[i] ; i += 1) {
 	    if (a[i][0] != '\0') {
 		if (c++ > 0) {
-		    rs = storebuf_char(dbuf,dlen,si,'.') ;
+		    rs = storebuf_chr(dbuf,dlen,si,'.') ;
 		    si += rs ;
 		}
 		if (rs >= 0) {

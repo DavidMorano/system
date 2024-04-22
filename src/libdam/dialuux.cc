@@ -513,7 +513,7 @@ int		vbuflen ;
 	            } else
 	                sch = ':' ;
 
-	            rs = storebuf_char(vbuf,vbuflen,rlen,sch) ;
+	            rs = storebuf_chr(vbuf,vbuflen,rlen,sch) ;
 	            rlen += rs ;
 
 	        } /* end if */
@@ -628,7 +628,7 @@ const char	svc[] ;
 	}
 
 	if (rs >= 0) {
-	    rs = storebuf_char(buf,buflen,i,'!') ;
+	    rs = storebuf_chr(buf,buflen,i,'!') ;
 	    i += rs ;
 	}
 

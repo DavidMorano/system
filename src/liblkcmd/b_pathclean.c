@@ -929,7 +929,7 @@ static int locinfo_mkjoin(LOCINFO *lip,char pbuf[],int plen)
 	                    ch = ';' ;
 		        } else
 	                    ch = ':' ;
-		        rs = storebuf_char(pbuf,plen,bl,ch) ;
+		        rs = storebuf_chr(pbuf,plen,bl,ch) ;
 		        bl += rs ;
 		    }
 

@@ -157,7 +157,7 @@ int emainfo_mktype(EMAINFO *eip,int type,char *rbuf,int rlen) noex {
 	                rs = storebuf_strw(rbuf,rlen,i,hp,hl) ;
 	                i += rs ;
 		        if (rs >= 0) {
-	                    rs = storebuf_char(rbuf,rlen,i,'!') ;
+	                    rs = storebuf_chr(rbuf,rlen,i,'!') ;
 	                    i += rs ;
 		        }
 	            } /* end if (had a host part) */
@@ -170,7 +170,7 @@ int emainfo_mktype(EMAINFO *eip,int type,char *rbuf,int rlen) noex {
 	            rs = storebuf_strw(rbuf,rlen,i,eip->local,eip->llen) ;
 	            i += rs ;
 	            if ((rs >= 0) && eip->host && (eip->hlen >= 0)) {
-	                rs = storebuf_char(rbuf,rlen,i,'@') ;
+	                rs = storebuf_chr(rbuf,rlen,i,'@') ;
 	                i += rs ;
 	                if (rs >= 0) {
 		            cint	hl = eip->hlen ;
@@ -182,7 +182,7 @@ int emainfo_mktype(EMAINFO *eip,int type,char *rbuf,int rlen) noex {
 	            break ;
 	        case EMAINFO_TARPAROUTE:
 	            if (eip->host && (eip->hlen >= 0)) {
-	                rs = storebuf_char(rbuf,rlen,i,'@') ;
+	                rs = storebuf_chr(rbuf,rlen,i,'@') ;
 	                i += rs ;
 		        if (rs >= 0) {
 		            cint	hl = eip->hlen ;
@@ -192,10 +192,10 @@ int emainfo_mktype(EMAINFO *eip,int type,char *rbuf,int rlen) noex {
 		        }
 		        if (rs >= 0) {
 	                    if (strnchr(eip->local,eip->llen,':') != np) {
-	                        rs = storebuf_char(rbuf,rlen,i,',') ;
+	                        rs = storebuf_chr(rbuf,rlen,i,',') ;
 			        i += rs ;
 	                    } else {
-	                        rs = storebuf_char(rbuf,rlen,i,':') ;
+	                        rs = storebuf_chr(rbuf,rlen,i,':') ;
 	                        i += rs ;
 		            }
 		        }

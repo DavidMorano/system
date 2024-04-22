@@ -71,7 +71,7 @@ int logfile_printfold(logfile *lhp,cchar *pre,cchar *sp,int sl) noex {
 	if ((rs = linefold_start(&fo,n,0,sp,sl)) >= 0) {
 	    int		c = 0 ;
 	    cchar	*sp{} ;
-	    for (int i = 0 ; (rs = linefold_getline(&fo,i,&sp)) > 0 ; i += 1) {
+	    for (int i = 0 ; (rs = linefold_getln(&fo,i,&sp)) > 0 ; i += 1) {
 		int	sl = rs ;
 		while (sl > n) {
 	            rs = logfile_printfi(lhp,c++,pre,pl,sp,n) ;

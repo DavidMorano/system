@@ -125,7 +125,7 @@ int zoffparts_mkstr(zoffparts *zop,char *rbuf,int rlen) noex {
 	    rs = SR_OK ;
 	    if (rs >= 0) {
 	        cint	ch = ((zop->zoff >= 0) ? '-' : '+') ;
-	        rs = storebuf_char(rbuf,rlen,i,ch) ;
+	        rs = storebuf_chr(rbuf,rlen,i,ch) ;
 	        i += rs ;
 	    }
 	    if (rs >= 0) {

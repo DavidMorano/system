@@ -17,7 +17,7 @@
 /*******************************************************************************
 
 	This subroutine converts a character string representing a
-	number into an integer.
+	time-interval.  The time-interval is returned in an integer.
 
 *******************************************************************************/
 
@@ -29,8 +29,9 @@
 #include	<strn.h>
 #include	<sfx.h>
 #include	<cfdec.h>
-#include	<char.h>
 #include	<mkchar.h>
+
+#include	"cfdect.h"
 
 
 /* local defines */
@@ -72,7 +73,7 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	            sp += 1 ;
 	            sl -= 1 ;
 	        }
-	        while ((tp = strnpbrk(sp,sl,"YMWDwdhms")) != NULL) {
+	        while ((tp = strnpbrk(sp,sl,"YMWDwdhms")) != nullptr) {
 		    cint	mch = mkchar(*tp) ;
 	            rs = convert(sp,(tp - sp),mch,&res) ;
 	            if (rs < 0) break ;
@@ -82,7 +83,9 @@ int cfdecti(cchar *sbuf,int slen,int *rp) noex {
 	        if ((rs >= 0) && (sl > 0)) {
 	    	    rs = convert(sp,sl,0,&res) ;
 	        }
-	        if (f_negative) res = (- res) ;
+	        if (f_negative) {
+		    res = (- res) ;
+		}
 	    } /* end if (valid) */
 	} /* end if (non-null) */
 	if (rp) *rp = ((rs >= 0) ? res : 0) ;

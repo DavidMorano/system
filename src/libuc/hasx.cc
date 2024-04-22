@@ -304,6 +304,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<climits>		/* |UCHAR_MAX| */
 #include	<cstring>		/* |strlen(3c)| + |strcmp(3c)| */
 #include	<ucvariables.hh>
 #include	<ascii.h>
@@ -644,6 +645,19 @@ bool hasallchr(cchar *sp,int sl,int sch) noex {
 	return f ;
 }
 /* end subroutine (hasallchr) */
+
+bool hasallhdrkey(cchar *sp,int sl) noex {
+	bool		f = true ;
+	while (sl && *sp) {
+	    cint	ch = mkchar(*sp) ;
+	    f = ishdrkey(ch) ;
+	    if (! f) break ;
+	    sp += 1 ;
+	    sl -= 1 ;
+	} /* end while */
+	return f ;
+}
+/* end subroutine (hasallhdrkey) */
 
 bool hasonlyminus(cchar *sp,int sl) noex {
         bool            f = false ;

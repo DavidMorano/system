@@ -42,10 +42,6 @@
 
 /* external subroutines */
 
-extern "C" {
-    extern int	bwriteblanks(bfile *,int) noex ;
-}
-
 
 /* external variables */
 
@@ -57,6 +53,9 @@ extern "C" {
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
