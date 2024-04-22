@@ -44,6 +44,7 @@
 #include	<cstdarg>
 #include	<cstring>
 #include	<usystem.h>
+#include	<mallocxx.h>
 #include	<ascii.h>
 #include	<getnodename.h>
 #include	<strw.h>		/* |strwset(3uc)| */
@@ -91,6 +92,10 @@
 #define	F_LOCK		1
 #define	F_TLOCK		2
 #define	F_TEST		3
+#endif
+
+#ifndef	CF_LOGIDTAB
+#define	CF_LOGIDTAB	0
 #endif
 
 
@@ -223,7 +228,7 @@ int logsys_open(logsys *op,int logfac,cc *logtag,cc *logid,int opts) noex {
 	            if ((logid == nullptr) || (logid[0] == '\0')) {
 	                cl = logsys_mklogid(op) ;
 	            } else {
-	                cl = loadlogid(op->logid,LOGSYS_LOGIDLEN,logid) ;
+	                cl = loadlogid(op->logid,logidlen,logid) ;
 	            }
 	            logsys_fixlogid(op,cl) ;
 	            op->magic = LOGSYS_MAGIC ;
@@ -303,108 +308,78 @@ int logsys_vprintf(logsys *op,int logpri,cchar *fmt,va_list ap) noex {
 
 /* set (or reset) the log ID */
 int logsys_setid(logsys *op,cchar *logid) noex {
-	int		rs = SR_OK ;
-	int		cl ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LOGSYS_MAGIC) return SR_NOTOPEN ;
-
-	if (logid == nullptr)
-	    logid = "*null*" ;
-
-	cl = loadlogid(op->logid,LOGSYS_LOGIDLEN,logid) ;
-
-	rs = logsys_fixlogid(op,cl) ;
-
+	int		rs ;
+	if ((rs = logsys_magic(op)) >= 0) {
+	    if (logid == nullptr) logid = "*null*" ;
+	    if ((rs = loadlogid(op->logid,logidlen,logid)) >= 0) {
+	        rs = logsys_fixlogid(op,rs) ;
+    	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (logsys_setid) */
 
 int logsys_check(logsys *op,time_t dt) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		f = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LOGSYS_MAGIC) return SR_NOTOPEN ;
-
-	if (op->lfd < 0) return SR_OK ;
-
-	f = f || ((dt - op->ti_write) >= TO_WRITE) ;
-	f = f || ((dt - op->ti_open) >= TO_OPEN) ;
-	if (f) {
-	    rs = logsys_fileclose(op) ;
-	} else {
-	    if ((dt - op->ti_write) >= TO_FLUSH) {
-	        if (op->c > 0) {
-		    rs = logsys_iflush(op) ;
-		}
-	    }
-	}
-
+	if ((rs = logsys_magic(op)) >= 0) {
+	    if (op->lfd >= 0) {
+	        f = f || ((dt - op->ti_write) >= TO_WRITE) ;
+	        f = f || ((dt - op->ti_open) >= TO_OPEN) ;
+	        if (f) {
+	            rs = logsys_fileclose(op) ;
+	        } else {
+	            if ((dt - op->ti_write) >= TO_FLUSH) {
+	                if (op->c > 0) {
+		            rs = logsys_iflush(op) ;
+		        }
+	            }
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (logsys_check) */
 
 int logsys_flush(logsys *op) noex {
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LOGSYS_MAGIC) return SR_NOTOPEN ;
-
-	if (op->c > 0) rs = logsys_iflush(op) ;
-
+	int		rs ;
+	if ((rs = logsys_magic(op)) >= 0) {
+	    if (op->c > 0) rs = logsys_iflush(op) ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (logsys_flush) */
 
 int logsys_write(logsys *op,int logpri,cchar *wbuf,int wlen) noex {
-	colstate	cs ;
-	int		rs = SR_OK ;
-	int		outlen ;
-	int		blen ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (wbuf == nullptr) return SR_FAULT ;
-
-	if (wlen < 0)
-	    wlen = strlen(wbuf) ;
-
-	if (wbuf[wlen-1] == '\n')
-	    wlen -= 1 ;
-
-	colstate_load(&cs,LOGSYS_LINELEN,(LOGSYS_LOGIDLEN + 1)) ;
-
-	blen = colstate_linecols(&cs,wbuf,wlen) ;
-
-	outlen = (op->logidlen + blen + 1) ;
-
-/* do we need a flush? */
-
-	if (op->c > 0) {
-	    rs = logsys_iflush(op) ;
-	}
-
-	if (rs >= 0) {
-	    int		bl = wlen ;
-	    cchar	*bp = wbuf ;
-	    char	tmpbuf[LOGSYS_USERLEN + 1] ;
-
-	if (hasourbad(wbuf,blen)) {
-	    bp = tmpbuf ;
-	    bl = mkclean(tmpbuf,LOGSYS_USERLEN,wbuf,wlen) ;
-	}
-
-/* OK, put it all together and write it to the log device */
-
-	    if ((rs = logsys_logdevice(op,logpri,bp,bl)) >= 0) {
-	        op->c += 1 ;
+	int		rs ;
+	int		outlen = 0 ;
+	if ((rs = logsys_magic(op,vbuf)) >= 0) {
+	    colstate	cs ;
+	    int		blen ;
+	    if (wlen < 0) wlen = strlen(wbuf) ;
+	    if (wbuf[wlen-1] == '\n') {
+	        wlen -= 1 ;
 	    }
-
-	} /* end if (ok) */
-
+	    colstate_load(&cs,LOGSYS_LINELEN,(logidlen + 1)) ;
+	    blen = colstate_linecols(&cs,wbuf,wlen) ;
+	    outlen = (op->logidlen + blen + 1) ;
+    /* do we need a flush? */
+	    if (op->c > 0) {
+	        rs = logsys_iflush(op) ;
+	    }
+	    if (rs >= 0) {
+	        int	bl = wlen ;
+	        cchar	*bp = wbuf ;
+	        char	tmpbuf[LOGSYS_USERLEN + 1] ;
+	        if (hasourbad(wbuf,blen)) {
+	            bp = tmpbuf ;
+	            bl = mkclean(tmpbuf,LOGSYS_USERLEN,wbuf,wlen) ;
+	        }
+	        if ((rs = logsys_logdevice(op,logpri,bp,bl)) >= 0) {
+	            op->c += 1 ;
+	        }
+	    } /* end if (ok) */
+	} /* end if (magic) */
 	return (rs >= 0) ? outlen : rs ;
 }
 /* end subroutine (logsys_write) */
@@ -413,54 +388,46 @@ int logsys_write(logsys *op,int logpri,cchar *wbuf,int wlen) noex {
 /* private subroutines */
 
 static int logsys_mklogid(logsys *op) noex {
-	cint		nlen = NODENAMELEN ;
 	int		rs ;
+	int		rs1 ;
 	int		cl = 0 ;
-	char		nbuf[NODENAMELEN + 1] ;
-	char		*unp = "pid" ;
-
-	if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	    const pid_t	pid = getpid() ;
-
-	    unp = nbuf ;
-	cl = snsd(op->logid,LOGSYS_LOGIDLEN,unp,(uint) pid) ;
-
-	if (cl < 0) {
-	    int		rl, ml ;
-	    char	digbuf[LOGSYS_LOGIDLEN + 1] ;
-	    char	*cp ;
-
-	    ctdecui(digbuf,LOGSYS_LOGIDLEN,(uint) pid) ;
-
-	    cp = op->logid ;
-	    rl = LOGSYS_LOGIDLEN ;
-	    ml = 9 ;
-	    cp = strwcpy(cp,unp,ml) ;
-	    rl -= ml ;
-
-	    ml = 6 ;
-	    cp = strwcpy(cp,digbuf,ml) ;
-	    rl -= ml ;
-
-	    cl = (cp - op->logid) ;
-
-	} /* end if (first try failed) */
-
-	} /* end if (getnodename) */
-
+	char		*nbuf{} ;
+	if ((rs = malloc_nn(&nbuf)) >= 0) {
+	    cint	nlen = rs ;
+	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
+	        cuint	pid = getpid() ;
+	        char	*unp = nbuf ;
+	        if ((cl = snsd(op->logid,logidlen,unp,pid)) < 0) {
+	            int		rl, ml ;
+	            char	digbuf[logidlen + 1] ;
+	            char	*cp ;
+	            ctdecui(digbuf,logidlen,pid) ;
+	            cp = op->logid ;
+	            rl = logidlen ;
+	            ml = 9 ;
+	            cp = strwcpy(cp,unp,ml) ;
+	            rl -= ml ;
+	            ml = 6 ;
+	            cp = strwcpy(cp,digbuf,ml) ;
+	            rl -= ml ;
+	            cl = (cp - op->logid) ;
+	        } /* end if (first try failed) */
+	    } /* end if (getnodename) */
+	    rs1 = uc_free(nbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? cl : rs ;
 }
 /* end subroutine (logsys_mklogid) */
 
 static int logsys_fixlogid(logsys *op,int cl) noex {
-#if	CF_LOGIDTAB
-	if (cl < NTABCOLS) {
-	    strwset((op->logid + cl),' ',(NTABCOLS - cl)) ;
-	    cl = NTABCOLS ;
-	}
-	op->logid[cl++] = '\t' ;
-#else /* CF_LOGIDTAB */
-#endif /* CF_LOGIDTAB */
+	if_constexpr (f_logidtab) {
+	    if (cl < NTABCOLS) {
+	        strwset((op->logid + cl),' ',(NTABCOLS - cl)) ;
+	        cl = NTABCOLS ;
+	    }
+	    op->logid[cl++] = '\t' ;
+	} /* end if_constexpr (f_logidtab) */
 	op->logid[cl] = '\0' ;
 	op->logidlen = cl ;
 	return cl ;
@@ -491,18 +458,15 @@ static int logsys_fileclose(logsys *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		len = 0 ;
-
 	if (op->c > 0) {
 	    len = logsys_iflush(op) ;
 	    if (rs >= 0) rs = len ;
 	}
-
 	if (op->lfd >= 0) {
 	    rs1 = uc_close(op->lfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->lfd = -1 ;
 	}
-
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (logsys_fileclose) */
@@ -522,42 +486,31 @@ static int logsys_logdevice(logsys *op,int logpri,cchar *wp,int wl) noex {
 	int		rs = SR_OK ;
 	int		ll ;
 	char		logbuf[LOGBUFLEN+1], *lp = logbuf ;
-
 	if (op->lfd < 0) {
 	    rs = logsys_fileopen(op) ;
 	}
 	if (rs >= 0) {
-
-	logpri &= LOG_PRIMASK ;		/* truncate any garbage */
-
+	    logpri &= LOG_PRIMASK ;		/* truncate any garbage */
 /* formulate the string to write */
-
 	    {
 	        cchar	*lt = op->logtag ;
 	        cchar	*li = op->logid ;
 	        ll = strdcpy5w(lp,llen,lt,"-",li,": ",wp,wl) - lp ;
 	    }
-
 /* write it to the LOG device */
-
-	lc.flags = SL_CONSOLE ;
-	lc.level = 0 ;
-	lc.pri = (op->logfac | logpri) ;
-
-	/* set up the strbufs */
-	cmsg.maxlen = sizeof(struct log_ctl) ;
-	cmsg.len = sizeof(struct log_ctl) ;
-	cmsg.buf = (caddr_t) &lc ;
-
-	dmsg.maxlen = (ll+1) ;
-	dmsg.len = ll ;
-	dmsg.buf = logbuf ;
-
-	/* output the message to the local logger */
-	rs = u_putmsg(op->lfd,&cmsg,&dmsg,0) ;
-
+	    lc.flags = SL_CONSOLE ;
+	    lc.level = 0 ;
+	    lc.pri = (op->logfac | logpri) ;
+	    /* set up the strbufs */
+	    cmsg.maxlen = sizeof(struct log_ctl) ;
+	    cmsg.len = sizeof(struct log_ctl) ;
+	    cmsg.buf = (caddr_t) &lc ;
+	    dmsg.maxlen = (ll+1) ;
+	    dmsg.len = ll ;
+	    dmsg.buf = logbuf ;
+	    /* output the message to the local logger */
+	    rs = u_putmsg(op->lfd,&cmsg,&dmsg,0) ;
 	} /* end if (ok) */
-
 	return rs ;
 }
 /* end subroutine (logsys_logdevice) */
