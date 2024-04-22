@@ -77,7 +77,7 @@ int progout_printf(PROGINFO *pip,const char *fmt,...)
 	    char	lbuf[LINEBUFLEN + 1] ;
 
 	    va_begin(ap,fmt) ;
-	    rs = vbufprintf(lbuf,llen,fmt,ap) ;
+	    rs = bufvprintf(lbuf,llen,fmt,ap) ;
 	    len = rs ;
 	    va_end(ap) ;
 

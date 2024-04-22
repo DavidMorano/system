@@ -19,23 +19,17 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-
-
-#include	<sys/log.h>
-#include	<sys/strlog.h>
-#include	<sys/syslog.h>
 #include	<stdarg.h>
-#include	<vecstr.h>
-#include	<localmisc.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>		/* |COLUMNS| + |LOGIDLEN| */
 
 
 #define	LOGSYS_MAGIC		0x13f3c201
 #define	LOGSYS			struct logsys_head
-#define	LOGSYS_LOGIDLEN		15
-#define	LOGSYS_LINELEN		80
+#define	LOGSYS_LOGIDLEN		LOGIDLEN	/* <- from 'localmisc' */
+#define	LOGSYS_LINELEN		COLUMNS		/* <- from 'localmisc' */
 #define	LOGSYS_USERLEN		(LOGSYS_LINELEN - (LOGSYS_LOGIDLEN + 1))
 
 
@@ -66,9 +60,6 @@ extern int logsys_flush(logsys *) noex ;
 extern int logsys_close(logsys *) noex ;
 
 EXTERNC_end
-
-
-#endif /* defined(OSNAME_SunOS) && (OSNAME_SunOS > 0) */
 
 
 #endif /* LOGSYS_INCLUDE */

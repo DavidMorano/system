@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int finduid_ctor(finduid *op,Args ... args) noex {
+static int logsys_ctor(logsys *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,14 @@ static int finduid_ctor(finduid *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (finduid_ctor) */
+/* end subroutine (logsys_ctor) */
 
-static int finduid_dtor(finduid *op) noex {
+static int logsys_dtor(logsys *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (finduid_dtor) */
-
-template<typename ... Args>
-static int finduid_magic(finduid *op,Args ... args) noex {
-	int		rs = SR_FAULT ;
-	if (op && (args && ...)) {
-	    rs = (op->magic == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
-	}
-	return rs ;
-}
-/* end subroutine (finduid_magic) */
+/* end subroutine (logsys_dtor) */
 

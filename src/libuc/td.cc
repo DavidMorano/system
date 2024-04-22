@@ -105,7 +105,7 @@ using std::nothrow ;			/* constant */
 
 extern "C" {
     extern int	bufprintf(char *,int,cchar *,...) noex ;
-    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
 }
 
 extern "C" {
@@ -542,7 +542,7 @@ int td_vpprintf(td *tdp,int wn,int r,int c,cchar *fmt,va_list ap) noex {
 	    char	*lbuf{} ;
 	    if ((rs = malloc_ml(&lbuf)) >= 0) {
 		cint	llen = rs ;
-	        if ((rs = vbufprintf(lbuf,llen,fmt,ap)) > 0) {
+	        if ((rs = bufvprintf(lbuf,llen,fmt,ap)) > 0) {
 	            rs = td_pwrite(tdp,wn,r,c,lbuf,rs) ;
 		    len = rs ;
 	        }

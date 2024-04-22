@@ -117,7 +117,7 @@ using std::max ;			/* subroutine-template */
 /* external subroutines */
 
 extern "C" {
-    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
 }
 
 
@@ -273,7 +273,7 @@ int logfile_vprintf(logfile *op,cchar *fmt,va_list ap) noex {
 	if ((rs = logfile_magic(op,fmt,ap)) >= 0) {
 	    cint	olen = OUTBUFLEN ;
 	    char	obuf[OUTBUFLEN + 1] ;
-	    if ((rs = vbufprintf(obuf,olen,fmt,ap)) >= 0) {
+	    if ((rs = bufvprintf(obuf,olen,fmt,ap)) >= 0) {
 	        int	sl = rs ;
 	        cchar	*sp = obuf ;
 	        cchar	*tp ;
@@ -290,7 +290,7 @@ int logfile_vprintf(logfile *op,cchar *fmt,va_list ap) noex {
 	            rs = logfile_write(op,sp,sl) ;
 	            len += rs ;
 	        }
-	    } /* end if (vbufprintf) */
+	    } /* end if (bufvprintf) */
 	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }

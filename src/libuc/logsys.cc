@@ -93,10 +93,6 @@
 #define	F_TEST		3
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
 
 /* imported namespaces */
 
@@ -112,7 +108,7 @@ extern "C" {
 }
 
 extern "C" {
-    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
 }
 
 
@@ -128,6 +124,35 @@ struct colstate {
 
 
 /* forward references */
+
+template<typename ... Args>
+static int logsys_ctor(logsys *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (logsys_ctor) */
+
+static int logsys_dtor(logsys *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (logsys_dtor) */
+
+template<typename ... Args>
+static inline int logsys_magic(logsys *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == LOGSYS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (logsys_magic) */
 
 static int	logsys_mklogid(logsys *) noex ;
 static int	logsys_fixlogid(logsys *,int) noex ;
@@ -171,6 +196,10 @@ static constexpr int	logfacs[] = {
 	-1
 } ;
 
+constexpr int		logidlen = LOGSYS_LOGIDLEN ;
+
+constexpr bool		f_logidtab = CF_LOGIDTAB ;
+
 
 /* exported variables */
 
@@ -178,62 +207,57 @@ static constexpr int	logfacs[] = {
 /* exported subroutines */
 
 int logsys_open(logsys *op,int logfac,cc *logtag,cc *logid,int opts) noex {
-	int		rs = SR_OK ;
-	int		cl ;
-	cchar		*cp ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (logtag == nullptr) return SR_FAULT ;
-
-	if (logtag[0] == '\0') return SR_INVALID ;
-	if (! isLogFac(logfac)) return SR_INVALID ;
-
-	memclear(op) ;			/* dangerous */
-	op->n = LOGSYS_NMSGS ;
-	op->logfac = logfac ;
-	op->opts = opts ;
-	op->lfd = -1 ;
-
-	if ((rs = uc_mallocstrw(logtag,-1,&cp)) >= 0) {
-	    op->logtag = cp ;
-
-/* the log ID */
-
-	    if ((logid == nullptr) || (logid[0] == '\0')) {
-	        cl = logsys_mklogid(op) ;
-	    } else {
-	        cl = loadlogid(op->logid,LOGSYS_LOGIDLEN,logid) ;
+	int		rs ;
+	if ((rs = logsys_ctor(op,logtag)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (logtag[0] && isLogFac(logfac)) {
+	        int		cl ;
+	        cchar		*cp ;
+	        rs = memclear(op) ; /* dangerous */
+	        op->n = LOGSYS_NMSGS ;
+	        op->logfac = logfac ;
+	        op->opts = opts ;
+	        op->lfd = -1 ;
+	        if ((rs = uc_mallocstrw(logtag,-1,&cp)) >= 0) {
+	            op->logtag = cp ;
+	            if ((logid == nullptr) || (logid[0] == '\0')) {
+	                cl = logsys_mklogid(op) ;
+	            } else {
+	                cl = loadlogid(op->logid,LOGSYS_LOGIDLEN,logid) ;
+	            }
+	            logsys_fixlogid(op,cl) ;
+	            op->magic = LOGSYS_MAGIC ;
+	        } else {
+	            op->lfd = rs ; /* error */
+	        } /* end if (m-a) */
+	    } /* end if (valid) */
+	    if (rs < 0) {
+		logsys_dtor(op) ;
 	    }
-
-	    logsys_fixlogid(op,cl) ;
-	    op->magic = LOGSYS_MAGIC ;
-
-	} else {
-	    op->lfd = rs ;
-	} /* end if (m-a) */
-
+	} /* end if (logsys_ctor) */
 	return rs ;
 }
 /* end subroutine (logsys_open) */
 
 int logsys_close(logsys *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LOGSYS_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = logsys_fileclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->logtag != nullptr) {
-	    rs1 = uc_free(op->logtag) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->logtag = nullptr ;
-	}
-
-	op->magic = 0 ;
+	if ((rs = logsys_magic(op)) >= 0) {
+	    {
+	        rs1 = logsys_fileclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->logtag) {
+	        rs1 = uc_free(op->logtag) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->logtag = nullptr ;
+	    }
+	    {
+	        rs1 = logsys_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (logsys_close) */
@@ -251,46 +275,28 @@ int logsys_printf(logsys *op,int logpri,cchar *fmt,...) noex {
 /* end subroutine (logsys_printf) */
 
 int logsys_vprintf(logsys *op,int logpri,cchar *fmt,va_list ap) noex {
-	int		rs = SR_OK ;
-	int		sl ;
-	int		ol ;
+	int		rs ;
 	int		len = 0 ;
-	cchar		*tp, *sp ;
-	char		outbuf[OUTBUFLEN + 1] ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != LOGSYS_MAGIC) return SR_BADF ;
-
-/* format the user's portion */
-
-	ol = vbufprintf(outbuf,OUTBUFLEN,fmt,ap) ;
-	if (ol < 0) ol = 0 ;
-
-#ifdef	COMMENT
-	if (ol > LOGSYS_USERLEN)
-	    ol = LOGSYS_USERLEN ;
-#endif
-
-	sp = outbuf ;
-	sl = ol ;
-	while ((tp = strnchr(sp,sl,'\n')) != nullptr) {
-
-	    rs = logsys_write(op,logpri,sp,(tp - sp)) ;
-	    len += rs ;
-	    if (rs < 0)
-		break ;
-
-	    sl -= ((tp + 1) - sp) ;
-	    sp = (tp + 1) ;
-
-	} /* end while */
-
-	if ((rs >= 0) && (sl > 0)) {
-	    rs = logsys_write(op,logpri,sp,sl) ;
-	    len += rs ;
-	}
-
+	if ((rs = logsys_magic(op,fmt,ap)) >= 0) {
+	    cint	olen = OUTBUFLEN ;
+	    char	obuf[OUTBUFLEN + 1] ;
+	    if ((rs = bufvprintf(obuf,olen,fmt,ap)) >= 0) {
+	        cchar	*sp = obuf ;
+	        cchar	*tp ;
+	        int	sl = rs ;
+	        while ((tp = strnchr(sp,sl,'\n')) != nullptr) {
+	            rs = logsys_write(op,logpri,sp,(tp - sp)) ;
+	            len += rs ;
+	            if (rs < 0) break ;
+	            sl -= ((tp + 1) - sp) ;
+	            sp = (tp + 1) ;
+	        } /* end while */
+	        if ((rs >= 0) && (sl > 0)) {
+	            rs = logsys_write(op,logpri,sp,sl) ;
+	            len += rs ;
+	        }
+	    } /* end if (bufvprintf) */
+	} /* end if (magic) */
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (logsys_vprintf) */
@@ -405,7 +411,6 @@ int logsys_write(logsys *op,int logpri,cchar *wbuf,int wlen) noex {
 
 
 /* private subroutines */
-
 
 static int logsys_mklogid(logsys *op) noex {
 	cint		nlen = NODENAMELEN ;

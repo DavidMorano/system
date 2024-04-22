@@ -43,7 +43,7 @@
 /* external subroutines */
 
 extern int	bufprintf(char *,int,const char *,...) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	bufvprintf(char *,int,const char *,va_list) ;
 
 extern int	fbwrite(FILE *,cchar *,int) ;
 
@@ -65,7 +65,7 @@ int fbprintf(FILE *fp,cchar *fmt,...)
 	{
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
-	    rs = vbufprintf(lbuf,llen,fmt,ap) ;
+	    rs = bufvprintf(lbuf,llen,fmt,ap) ;
 	    flen = rs ;
 	    va_end(ap) ;
 	}

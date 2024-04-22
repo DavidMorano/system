@@ -74,7 +74,7 @@ extern int	snsd(char *,int,const char *,uint) ;
 extern int	sncpy1(char *,int,const char *) ;
 extern int	sncpy2(char *,int,const char *,const char *) ;
 extern int	ctdecui(char *,int,uint) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	isprintlatin(int) ;
 
 extern char	*strwcpy(char *,const char *,int) ;
@@ -205,7 +205,7 @@ int conslog_vprintf(CONSLOG *op,int logpri,cchar *fmt,va_list ap)
 
 /* format the user's portion */
 
-	ol = vbufprintf(outbuf,OUTBUFLEN,fmt,ap) ;
+	ol = bufvprintf(outbuf,OUTBUFLEN,fmt,ap) ;
 	if (ol < 0) ol = 0 ;
 
 #ifdef	COMMENT

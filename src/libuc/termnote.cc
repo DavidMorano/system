@@ -156,7 +156,7 @@ typedef buffer		mbuf ;
 /* external subroutines */
 
 extern "C" {
-    extern int	vbufprintf(char *,int,cchar *,va_list) noex ;
+    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
     extern int	writeto(int,cvoid *,int,int) noex ;
 }
 
@@ -392,7 +392,7 @@ int termnote_vprintf(termnote *op,cc **rpp,int n,int o,
 	    char	*obuf{} ;
 	    if ((rs = malloc_ml(&obuf)) >= 0) {
 		cint	olen = rs ;
-	        if ((rs = vbufprintf(obuf,olen,fmt,ap)) >= 0) {
+	        if ((rs = bufvprintf(obuf,olen,fmt,ap)) >= 0) {
 	            rs = termnote_write(op,rpp,n,o,obuf,rs) ;
 	            wlen = rs ;
 	        }

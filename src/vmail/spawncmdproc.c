@@ -77,7 +77,7 @@ extern int	cfdecui(const char *,int,uint *) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	pathclean(char *,const char *,int) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	bufprintf(char *,int,const char *,...) ;
 extern int	findfilepath(const char *,char *,const char *,int) ;
 extern int	getpwd(char *,int) ;
