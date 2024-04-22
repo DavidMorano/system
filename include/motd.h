@@ -28,7 +28,7 @@
 #define	MOTD_MAGIC	0x75648941
 #define	MOTD		struct motd_head
 #define	MOTD_ID		struct motd_ident
-#define	MOTD_MAPPER	struct motd_mapper
+#define	MOTD_MR		struct motd_mapper
 #define	MOTD_FL		struct motd_flags
 
 
@@ -40,8 +40,8 @@ struct motd_ident {
 } ;
 
 struct motd_mapper {
-	LOCKRW		rwm ;
-	PARAMFILE	dirsfile ;
+	lockrw		rwm ;
+	paramfile	dirsfile ;
 	vechand		mapdirs ;
 	cchar		*fname ;
 	time_t		ti_mtime ;
@@ -54,14 +54,14 @@ struct motd_flags {
 } ;
 
 struct motd_head {
-	MOTD_FL		open ;
-	MOTD_MAPPER	mapper ;
-	PTM		m ;		/* this is for all of the data */
-	FINDUID		ufind ;
+	MOTD_MR		mapper ;
+	ptm		*mxp ;		/* this is for all of the data */
+	finduid		*ufp ;
 	cchar		**envv ;
 	cchar		*pr ;
 	cchar		*fe ;		/* file-ending */
 	time_t		ti_lastcheck ;
+	MOTD_FL		open ;
 	uint		magic ;
 	int		nmaps ;
 	int		nenv ;
@@ -70,6 +70,7 @@ struct motd_head {
 typedef	MOTD		motd ;
 typedef	MOTD_FL		motd_fl ;
 typedef	MOTD_ID		motd_id ;
+typedef	MOTD_MR		motd_mr ;
 
 EXTERNC_begin
 

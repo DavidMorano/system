@@ -70,6 +70,7 @@
 #include	<strwcpy.h>
 #include	<nleadstr.h>
 #include	<xperm.h>
+#include	<writeto.h>
 #include	<matxstr.h>
 #include	<ctdec.h>
 #include	<hasx.h>
@@ -141,6 +142,10 @@
 
 #undef	NLPS
 #define	NLPS		2		/* number ? polls per second */
+
+#ifndef	CF_WRITETO
+#define	CF_WRITETO	1		/* time out writes */
+#endif
 
 
 /* imported namespaces */
@@ -225,7 +230,6 @@ static int	mapdir_procout(MD *,cchar **,cchar *,
 static int	mapdir_procouter(MD *,cchar **,
 			cchar *,int) noex ;
 
-static int	writeto(int,cchar *,int,int) noex ;
 static int	loadstrs(cchar **,cchar *,cchar *,cchar *,cchar *) noex ;
 static int	narr(mainv) noex ;
 
@@ -275,6 +279,8 @@ constexpr uid_t		uidend = -1 ;
 constexpr gid_t		gidend = -1 ;
 
 constexpr cchar		envpre[] = "STATMSG_" ;	/* environment prefix */
+
+constexpr bool		f_writeto = CF_WRITETO ;
 
 
 /* exported variables */
@@ -1499,16 +1505,16 @@ static int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 	    cint	olen = MSGBUFLEN ;
 	    char	obuf[MSGBUFLEN + 1] ;
 
-#if	CF_WRITETO
-	    while ((rs = uc_reade(mfd,obuf,olen,to_read,0)) > 0) {
-	        rs = writeto(ofd,obuf,rs,to_write) ;
+	    if_constexpr (f_writeto) {
+	        while ((rs = uc_reade(mfd,obuf,olen,to_read,0)) > 0) {
+	            rs = writeto(ofd,obuf,rs,to_write) ;
+	            wlen += rs ;
+	            if (rs < 0) break ;
+	        } /* end while */
+	    } else {
+	        rs = uc_writedesc(ofd,mfd,-1) ;
 	        wlen += rs ;
-	        if (rs < 0) break ;
-	    } /* end while */
-#else /* CF_WRITETO */
-	    rs = uc_writedesc(ofd,mfd,-1) ;
-	    wlen += rs ;
-#endif /* CF_WRITETO */
+	    } /* end if_constexpr (f_writeto) */
 
 	    u_close(mfd) ;
 	} /* end if (open) */
@@ -1516,73 +1522,6 @@ static int mapdir_procouter(MD *ep,cchar **ev,cchar *fn,int ofd) noex {
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mapdir_procouter) */
-
-#if	CF_WRITETO
-
-static int writeto(int wfd,cchar *wbuf,int wlen,int wto) noex {
-	POLLFD		fds[2] ;
-	time_t		dt = time(nullptr) ;
-	time_t		ti_write ;
-	int		rs = SR_OK ;
-	int		i ;
-	int		pt = TO_POLL ;
-	int		pto ;
-	int		tlen = 0 ;
-
-	if (wbuf == nullptr) return SR_FAULT ;
-
-	if (wfd < 0) return SR_BADF ;
-
-	if (wlen < 0)
-	    wlen = strlen(wbuf) ;
-
-	if (pt > wto)
-	    pt = wto ;
-
-	i = 0 ;
-	fds[i].fd = wfd ;
-	fds[i].events = POLLOUT ;
-	i += 1 ;
-	fds[i].fd = -1 ;
-	fds[i].events = 0 ;
-
-	ti_write = dt ;
-	pto = (pt * POLLMULT) ;
-	while ((rs >= 0) && (tlen < wlen)) {
-
-	    rs = u_poll(fds,1,pto) ;
-
-	    dt = time(nullptr) ;
-	    if (rs > 0) {
-	        cint	re = fds[0].revents ;
-
-	        if (re & POLLOUT) {
-	            rs = u_write(wfd,(wbuf+tlen),(wlen-tlen)) ;
-	            tlen += rs ;
-	            ti_write = dt ;
-	        } else if (re & POLLHUP) {
-	            rs = SR_HANGUP ;
-	        } else if (re & POLLERR) {
-	            rs = SR_POLLERR ;
-	        } else if (re & POLLNVAL) {
-	            rs = SR_NOTOPEN ;
-	        } /* end if (poll returned) */
-
-	    } /* end if (got something) */
-
-	    if (rs == SR_INTR)
-	        rs = SR_OK ;
-
-	    if ((dt - ti_write) >= wto)
-	        break ;
-
-	} /* end while */
-
-	return (rs >= 0) ? tlen : rs ;
-}
-/* end subroutine (writeto) */
-
-#endif /* CF_WRITETO */
 
 static int loadstrs(cc **strs,cc *gn,cc *def,cc *all,cc *name) noex {
 	int		i = 0 ;
