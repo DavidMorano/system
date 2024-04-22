@@ -1,11 +1,10 @@
-/* uc_accepte */
+/* uc_accepte SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug printo-outs */
-
 
 /* revision history:
 
@@ -19,11 +18,13 @@
 
 /*******************************************************************************
 
+	Name:
+
+	Description:
         Accept a connection on a socket and time it also so that we can abort if
         it times out.
 
 	Synopsis:
-
 	int uc_accepte(fd,sap,sal,to)
 	int		fd ;
 	struct sockaddr	*sap ;
@@ -31,30 +32,24 @@
 	int		to ;
 
 	Arguments:
-
 	fd		file descriptor
 	sap		address to buffer to receive the "from" address
 	sal		pointer to the length of the "from" buffer
 	to		time in seconds to wait
 
 	Returns:
-
-	<0		error
 	>=0		socket of new connection
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-
+#include	<climits>
 #include	<usystem.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>
 
 
@@ -74,11 +69,12 @@ static char	*d_reventstr() ;
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_accepte(int fd,const void *sap,int *salp,int to)
-{
+int uc_accepte(int fd,const void *sap,int *salp,int to) noex {
 	int		rs = SR_OK ;
 	int		s = -1 ;
 

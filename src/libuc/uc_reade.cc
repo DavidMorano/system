@@ -1,18 +1,17 @@
-/* uc_reade */
+/* uc_reade SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_NONBLOCK	1		/* use nonblocking mode */
-
 
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was first written to give a little bit to UNIX® what we have in our
-        own circuit pack OSes!
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit pack OSes!
 
 */
 
@@ -20,11 +19,14 @@
 
 /*******************************************************************************
 
-        Get some amount of data and time it also so that we can abort if it
-        times out.
+	Name:
+	uc_reade
+
+	Description:
+	Get some amount of data and time it also so that we can
+	abort if it times out.
 
 	Synopsis:
-
 	int uc_reade(fd,rbuf,rlen,to,opts)
 	int		fd ;
 	void		*rbuf ;
@@ -33,7 +35,6 @@
 	int		opts ;
 
 	Arguments:
-
 	fd		file descriptor
 	rbuf		user buffer to receive daa
 	rlen		maximum amount of data the user wants
@@ -41,93 +42,97 @@
 	opts		user options for time-out handling
 
 	Returns:
-
 	>=0		amount of data returned
-	<0		error
+	<0		error code (system-return)
 
 	= The question:
 
-        What do we want to return on a timeout? This is the big unanswered
-        question of the ages? Do we want to treat the input FD like a STREAM or
-        a SOCKET (returning SR_AGAIN) or do we want to treat it like a FIFO or
-        TERMINAL (returning SR_OK == 0)? We will let this be determined by the
-        caller by setting (or not setting) 'FM_AGAIN' in the options!
+	What do we want to return on a timeout? This is the big
+	unanswered question of the ages? Do we want to treat the
+	input FD like a STREAM or a SOCKET (returning SR_AGAIN) or
+	do we want to treat it like a FIFO or TERMINAL (returning
+	SR_OK == 0)? We will let this be determined by the caller
+	by setting (or not setting) 'FM_AGAIN' in the options!
 
-        If the caller sets 'FM_AGAIN' in the options, we return SR_AGAIN if
-        there is no data (it timed out). If the caller sets 'FM_TIMED', then we
-        return SR_TIMEDOUT if it times out. Finally, if the caller doesn't set
-        that, we will return the amount of data received at the time of the
-        timeout (which can inlucde the value ZERO).
+	If the caller sets 'FM_AGAIN' in the options, we return
+	SR_AGAIN if there is no data (it timed out). If the caller
+	sets 'FM_TIMED', then we return SR_TIMEDOUT if it times
+	out. Finally, if the caller doesn't set that, we will return
+	the amount of data received at the time of the timeout
+	(which can inlucde the value ZERO).
 
-        An explicit read of 0 bytes (EOF) always return 0 (EOF). If FM_EXACT was
-        specified and the requested number of bytes has not yet arrived an EOF
-        will be ignored and an attempt will be made to read more data in. Also
-        if FM_EXACT is specified and the required number of bytes has not
-        arrived (but some have), we continue reading until the required number
-        of bytes arrives of if a time-out occurs.
+	An explicit read of 0 bytes (EOF) always return 0 (EOF).
+	If FM_EXACT was specified and the requested number of bytes
+	has not yet arrived an EOF will be ignored and an attempt
+	will be made to read more data in. Also if FM_EXACT is
+	specified and the required number of bytes has not arrived
+	(but some have), we continue reading until the required
+	number of bytes arrives of if a time-out occurs.
 
 	Read sematics are as follow:
 
 	1. The default semantic (neither "FM_AGAIN" nor "FM_TIMED"):
 
-        + If a non-negative timeout value is given and the timeout occurs when
-        no data has arrived, then we return ZERO.
+	+ If a non-negative timeout value is given and the timeout
+	occurs when no data has arrived, then we return ZERO.
 
-        + If a non-negative timeout value is given and the timeout occurs when
-        some data has arrived, then we return the amount of data received.
+	+ If a non-negative timeout value is given and the timeout
+	occurs when some data has arrived, then we return the amount
+	of data received.
 
 	2. The "FM_AGAIN" semantic:
 
-        + If a non-negative timeout value is given and the timeout occurs when
-        no data has arrived, then we return SR_AGAIN.
+	+ If a non-negative timeout value is given and the timeout
+	occurs when no data has arrived, then we return SR_AGAIN.
 
-        + If a non-negative timeout value is given and the timeout occurs when
-        some data has arrived, then we return the amount of data received.
+	+ If a non-negative timeout value is given and the timeout
+	occurs when some data has arrived, then we return the amount
+	of data received.
 
 	3. The "FM_TIMED" semantic:
 
-        + If a non-negative timeout value is given and the timeout occurs when
-        no data has arrived, then we return SR_TIMEDOUT.
+	+ If a non-negative timeout value is given and the timeout
+	occurs when no data has arrived, then we return SR_TIMEDOUT.
 
-        + If a non-negative timeout value is given and the timeout occurs when
-        some data has arrived, then we return the amount of data received.
+	+ If a non-negative timeout value is given and the timeout
+	occurs when some data has arrived, then we return the amount
+	of data received.
 
 	= Some notes:
 
-        Watch out for receiving hang-ups! This can happen when the
-        file-descriptor used for these reads is also used for some writes
-        elsewhere. How should we handle a hang-up? That is a good question.
-        Since input is not supposed to be affected by a hang-up, we just
-        continue on a hang-up unless there was data read. If we get a hang-up
-        and no data was read, then it is an EOF condition and we will return as
-        if we received an EOF (like we assume that we must have).
+	Watch out for receiving hang-ups! This can happen when the
+	file-descriptor used for these reads is also used for some
+	writes elsewhere. How should we handle a hang-up? That is
+	a good question.  Since input is not supposed to be affected
+	by a hang-up, we just continue on a hang-up unless there
+	was data read. If we get a hang-up and no data was read,
+	then it is an EOF condition and we will return as if we
+	received an EOF (like we assume that we must have).
 
 	= The observation:
 
-        Is it poossible to receive an EOF condition on the input *without*
-        receiving a POLLIN? Amazingly, the answer is YES! If a hang-up is
-        present on the input, then a hang-up condition will be received
-        (POLLHUP) *rather* than a usual EOF condition. Amazing as it is, this is
-        possible. In my opinion, this should not be possible (an EOF should
-        always create a POLLIN) but believe it or not that is not what happens
-        in real life.
-
+	Is it poossible to receive an EOF condition on the input
+	*without* receiving a POLLIN? Amazingly, the answer is YES!
+	If a hang-up is present on the input, then a hang-up condition
+	will be received (POLLHUP) *rather* than a usual EOF
+	condition. Amazing as it is, this is possible. In my opinion,
+	this should not be possible (an EOF should always create a
+	POLLIN) but believe it or not that is not what happens in
+	real life.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/uio.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>
 
 
@@ -153,12 +158,9 @@
 
 /* external subroutines */
 
-extern int	msleep(int) ;
-
 #if	CF_DEBUGS
 extern int	debugprintf(const char *,...) ;
 extern int	strlinelen(const char *,int,int) ;
-extern int	bufprintf(char *,int,cchar *,...) ;
 #endif
 
 
@@ -576,10 +578,8 @@ static int subinfo_readpoll(SUBINFO *sip)
 }
 /* end subroutine (subinfo_readpoll) */
 
-
 #if	CF_DEBUGS
-static char *d_reventstr(int revents,char *dbuf,int dlen)
-{
+static char *d_reventstr(int revents,char *dbuf,int dlen) noex {
 	dbuf[0] = '\0' ;
 	bufprintf(dbuf,dlen,"%s %s %s %s %s %s %s %s %s",
 	    (revents & POLLIN) ? "I " : "  ",

@@ -1,17 +1,16 @@
-/* uc_recvmsge */
+/* uc_recvmsge SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug printo-outs */
-
 
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was first written to give a little bit to UNIX® what we have in our
-        own circuit pack OSes!
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit pack OSes!
 
 */
 
@@ -19,11 +18,10 @@
 
 /*******************************************************************************
 
-        Get some amount of data and time it also so that we can abort if it
-        times out.
+	Get some amount of data and time it also so that we can
+	abort if it times out.
 
 	Synopsis:
-
 	int uc_recvmsge(fd,msgp,flags,timeout,opts)
 	int		fd ;
 	struct msghdr	*msgp ;
@@ -32,7 +30,6 @@
 	int		opts ;
 
 	Arguments:
-
 	fd		file descriptor
 	msgp		pointer to MSG structure
 	flags		option flags for the reception of MSG
@@ -40,27 +37,23 @@
 	opts		options
 
 	Returns:
-
 	>=0		amount of data returned
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/socket.h>
 #include	<sys/uio.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<poll.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>
 
 
@@ -85,8 +78,10 @@ static char	*d_reventstr() ;
 #endif
 
 
-/* exported subroutines */
+/* exported variables */
 
+
+/* exported subroutines */
 
 int uc_recvmsge(fd,msgp,flags,timeout,opts)
 int		fd ;
@@ -181,7 +176,6 @@ int		opts ;
 	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (uc_recvmsge) */
-
 
 #if	CF_DEBUGS
 static char *d_reventstr(revents,buf,buflen)

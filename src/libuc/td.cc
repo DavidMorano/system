@@ -50,6 +50,7 @@
 #include	<termstr.h>
 #include	<termconseq.h>
 #include	<tabcols.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>		/* |HEXBUFLEN| + |NTABCOLS| */
 
 #include	"td.h"
@@ -102,11 +103,6 @@ using std::nothrow ;			/* constant */
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	bufprintf(char *,int,cchar *,...) noex ;
-    extern int	bufvprintf(char *,int,cchar *,va_list) noex ;
-}
 
 extern "C" {
     int		td_vprintf(td *,int,cchar *,va_list) noex ;

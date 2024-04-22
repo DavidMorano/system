@@ -37,8 +37,6 @@
 
 #define	NDF		"testnaked.deb"
 
-extern int	bufprintf(char *,int,cchar *,...) ;
-
 #if	CF_DEBUGS
 extern int	debugopen(cchar *) ;
 extern int	debugprintf(cchar *,...) ;
