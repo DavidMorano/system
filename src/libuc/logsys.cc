@@ -52,6 +52,7 @@
 #include	<strdcpy.h>
 #include	<strn.h>
 #include	<snx.h>
+#include	<mkx.h>			/* |mklogid(3uc)| */
 #include	<ncol.h>		/* |charcols(3uc)| */
 #include	<ctdec.h>
 #include	<mkchar.h>		/* |mkchar(3uc)| */
@@ -390,28 +391,15 @@ int logsys_write(logsys *op,int logpri,cchar *wbuf,int wlen) noex {
 static int logsys_mklogid(logsys *op) noex {
 	int		rs ;
 	int		rs1 ;
-	int		cl = 0 ;
+	int		ll = 0 ;
 	char		*nbuf{} ;
 	if ((rs = malloc_nn(&nbuf)) >= 0) {
 	    cint	nlen = rs ;
 	    if ((rs = getnodename(nbuf,nlen)) >= 0) {
-	        cuint	pid = getpid() ;
-	        char	*unp = nbuf ;
-	        if ((cl = snsd(op->logid,logidlen,unp,pid)) < 0) {
-	            int		rl, ml ;
-	            char	digbuf[logidlen + 1] ;
-	            char	*cp ;
-	            ctdecui(digbuf,logidlen,pid) ;
-	            cp = op->logid ;
-	            rl = logidlen ;
-	            ml = 9 ;
-	            cp = strwcpy(cp,unp,ml) ;
-	            rl -= ml ;
-	            ml = 6 ;
-	            cp = strwcpy(cp,digbuf,ml) ;
-	            rl -= ml ;
-	            cl = (cp - op->logid) ;
-	        } /* end if (first try failed) */
+	        cint	pid = getpid() ;
+		if ((rs = mklogid(op->logid,logidlen,nbuf,rs,pid)) >= 0) {
+		    ll = rs ;
+		} /* end if (mklogid) */
 	    } /* end if (getnodename) */
 	    rs1 = uc_free(nbuf) ;
 	    if (rs >= 0) rs = rs1 ;

@@ -49,8 +49,8 @@
 #include	<sbuf.h>
 #include	<ctdec.h>
 #include	<ndigit.h>
-#include	<ipow.h>
-#include	<localmisc.h>
+#include	<pow.h>
+#include	<localmisc.h>		/* |LOGIDLEN| */
 
 #include	"mkx.h"
 
@@ -101,6 +101,8 @@ static int	mkmaxstrlen(int,int) noex ;
 
 
 /* local variables */
+
+constexpr int		logidlen = LOGIDLEN ;
 
 
 /* exported variables */
@@ -195,8 +197,8 @@ static int mkmaxstrlen(int maxdigs,int rlen) noex {
 	if (rlen > maxdigs) {
 	    maxstrlen = (rlen - maxdigs) ;
 	} else if (rlen < 0) {
-	    maxstrlen = (LOGIDLEN - maxdigs) ;
-	    rlen = LOGIDLEN ;
+	    maxstrlen = (logidlen - maxdigs) ;
+	    rlen = logidlen ;
 	} else {
 	    rs = SR_OVERFLOW ;
 	}
