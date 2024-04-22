@@ -40,12 +40,12 @@
 #define	GNCACHE_MAXFREE		4
 
 
-struct gncache_e {
+struct gncache_entry {
 	gid_t		gid ;
 	char		groupname[GROUPNAMELEN + 1] ;
 } ;
 
-struct gncache_s {
+struct gncache_stats {
 	uint		nentries ;
 	uint		total ;			/* access */
 	uint		refreshes ;

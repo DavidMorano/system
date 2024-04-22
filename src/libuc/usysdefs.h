@@ -177,6 +177,10 @@ enum signalmissings {
 #endif
 #endif
 
+#ifndef	TIME_MAX
+#define	TIME_MAX	LONG_MAX
+#endif
+
 /* node-name */
 #ifndef	NNBUFLEN
 #ifdef	_POSIX_HOST_NAME_MAX

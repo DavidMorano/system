@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int logsys_ctor(logsys *op,Args ... args) noex {
+static int grcache_ctor(grcache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,14 +8,23 @@ static int logsys_ctor(logsys *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (logsys_ctor) */
+/* end subroutine (grcache_ctor) */
 
-static int logsys_dtor(logsys *op) noex {
+static int grcache_dtor(grcache *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (logsys_dtor) */
+/* end subroutine (grcache_dtor) */
 
+template<typename ... Args>
+static inline int grcache_magic(grcache *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == GRCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (grcache_magic) */

@@ -4,18 +4,17 @@
 /* GROUP cache */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_SEARCHGID	0		/* compile in 'searchgid()' */
 #define	CF_MAINTEXTRA	0		/* perform extra maintenance */
 
 /* revision history:
 
-	= 2004-01-10, David A­D­ Morano
+	= 2004-01-10, David A�D� Morano
 	This code was originally written.
 
 */
 
-/* Copyright © 2004 David A­D­ Morano.  All rights reserved. */
+/* Copyright � 2004 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
@@ -26,16 +25,16 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<grp.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<getbufsize.h>
+#include	<mallocxx.h>
+#include	<getax.h>
 #include	<vechand.h>
 #include	<cq.h>
-#include	<getax.h>
-#include	<groupent.h>
 #include	<strwcpy.h>
 #include	<localmisc.h>
 
@@ -44,10 +43,24 @@
 
 /* local defines */
 
-#define	GRCACHE_RECMAGIC	0x98643163
-#define	GRCACHE_REC		struct grcache_r
+#define	RECORD_MAGIC	0x98643163
 
-#define	TO_CHECK		5
+#define	GE		ucentgr
+
+#define	TO_CHECK	5
+
+#ifndef	CF_MAINTEXTRA
+#define	CF_MAINTEXTRA	0		/* perform extra maintenance */
+#endif
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* type */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
@@ -64,7 +77,7 @@ enum cts {
 	ct_overlast
 } ;
 
-struct grcache_r {
+struct grcache_rec {
 	char		*grbuf ;
 	ucentgr		gr ;
 	time_t		ti_create ;		/* creation time */
@@ -76,33 +89,90 @@ struct grcache_r {
 	char		gn[GROUPNAMELEN+1] ;
 } ;
 
+typedef grcache_rec	rec ;
+typedef grcache_rec *	recp ;
+
 
 /* forward references */
 
-static int grcache_searchname(GRCACHE *,GRCACHE_REC **,const char *) ;
-static int grcache_mkrec(GRCACHE *,time_t,GRCACHE_REC **,const char *) ;
-static int grcache_getrec(GRCACHE *,time_t,GRCACHE_REC **) ;
-static int grcache_allocrec(GRCACHE *,GRCACHE_REC **) ;
-static int grcache_recstart(GRCACHE *,time_t,GRCACHE_REC *,const char *) ;
-static int grcache_recrear(GRCACHE *,GRCACHE_REC *) ;
-static int grcache_recaccess(GRCACHE *,time_t,GRCACHE_REC *) ;
-static int grcache_recdel(GRCACHE *,int,GRCACHE_REC *) ;
-static int grcache_recfree(GRCACHE *,GRCACHE_REC *) ;
-static int grcache_maintenance(GRCACHE *,time_t) ;
-static int grcache_record(GRCACHE *,int,int) ;
+template<typename ... Args>
+static int grcache_ctor(grcache *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->flp = new(nothrow) cq) != np) {
+	        if ((op->rlp = new(nothrow) vechand) != np) {
+		    rs = SR_OK ;
+		}
+		if (rs < 0) {
+		    delete op->flp ;
+		    op->flp = nullptr ;
+		}
+	    } /* end if (new-cq) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (grcache_ctor) */
+
+static int grcache_dtor(grcache *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->rlp) {
+		delete op->rlp ;
+		op->rlp = nullptr ;
+	    }
+	    if (op->flp) {
+		delete op->flp ;
+		op->flp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (grcache_dtor) */
+
+template<typename ... Args>
+static inline int grcache_magic(grcache *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == GRCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (grcache_magic) */
+
+static int grcache_searchname(grcache *,rec **,cchar *) noex ;
+static int grcache_mkrec(grcache *,time_t,rec **,cchar *) noex ;
+static int grcache_getrec(grcache *,time_t,rec **) noex ;
+static int grcache_allocrec(grcache *,rec **) noex ;
+static int grcache_recstart(grcache *,time_t,rec *,cchar *) noex ;
+static int grcache_recrear(grcache *,rec *) noex ;
+static int grcache_recaccess(grcache *,time_t,rec *) noex ;
+static int grcache_recdel(grcache *,int,rec *) noex ;
+static int grcache_recfree(grcache *,rec *) noex ;
+static int grcache_maintenance(grcache *,time_t) noex ;
+static int grcache_record(grcache *,int,int) noex ;
 
 #if	CF_SEARCHGID
-static int grcache_searchgid(GRCACHE *,GRCACHE_REC **,gid_t) ;
+static int grcache_searchgid(grcache *,rec **,gid_t) noex ;
 #endif /* CF_SEARCHGID */
 
-static int record_start(GRCACHE_REC *,time_t,int,const char *) ;
-static int record_access(GRCACHE_REC *,time_t) ;
-static int record_refresh(GRCACHE_REC *,time_t,int) ;
-static int record_old(GRCACHE_REC *,time_t,int) ;
-static int record_finish(GRCACHE_REC *) ;
+static int record_start(rec *,time_t,int,cchar *) noex ;
+static int record_access(rec *,time_t) noex ;
+static int record_refresh(rec *,time_t,int) noex ;
+static int record_old(rec *,time_t,int) noex ;
+static int record_finish(rec *) noex ;
 
 
 /* local variables */
+
+constexpr time_t	timemax = TIME_MAX ;
+
+constexpr gid_t		gidend = -1 ;
+
+constexpr bool		f_maintextra = CF_MAINTEXTRA ;
 
 
 /* exported variables */
@@ -110,206 +180,157 @@ static int record_finish(GRCACHE_REC *) ;
 
 /* exported subroutines */
 
-int grcache_start(GRCACHE *op,int nmax,int ttl) noex {
+int grcache_start(grcache *op,int nmax,int ttl) noex {
 	cint		defnum = GRCACHE_DEFENTS ;
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (nmax < 4) nmax = GRCACHE_DEFMAX ;
-
-	if (ttl < 1) ttl = GRCACHE_DEFTTL ;
-
-	memclear(op) ;
-
-	if ((rs = cq_start(&op->recsfree)) >= 0) {
-	    if ((rs = vechand_start(&op->recs,defnum,0)) >= 0) {
-		op->nmax = nmax ;
-		op->ttl = ttl ;
-		op->ti_check = time(NULL) ;
-		op->magic = GRCACHE_MAGIC ;
-	    }
+	if ((rs = grcache_ctor(op)) >= 0) {
+	    if (nmax < 4) nmax = GRCACHE_DEFMAX ;
+	    if (ttl < 1) ttl = GRCACHE_DEFTTL ;
+	    if ((rs = cq_start(op->flp)) >= 0) {
+	        if ((rs = vechand_start(op->rlp,defnum,0)) >= 0) {
+		    op->nmax = nmax ;
+		    op->ttl = ttl ;
+		    op->ti_check = time(nullptr) ;
+		    op->magic = GRCACHE_MAGIC ;
+	        }
+	        if (rs < 0) {
+		    cq_finish(op->flp) ;
+	        }
+	    } /* end if (cq-start) */
 	    if (rs < 0) {
-		cq_finish(&op->recsfree) ;
+		grcache_dtor(op) ;
 	    }
-	} /* end if (cq-start) */
-
+	} /* end if (grcache_start) */
 	return rs ;
 }
 /* end subroutine (grcache_start) */
 
-int grcache_finish(GRCACHE *op) noex {
-	GRCACHE_REC	*rp ;
-	int		rs = SR_OK ;
+int grcache_finish(grcache *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-	void		*vp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != GRCACHE_MAGIC) return SR_NOTOPEN ;
-
-/* loop freeing up all cache entries */
-
-	for (i = 0 ; vechand_get(&op->recs,i,&rp) >= 0 ; i += 1) {
-	    if (rp == NULL) continue ;
-	    record_finish(rp) ;
-	    uc_free(rp) ;
-	} /* end while */
-
-	rs1 = vechand_finish(&op->recs) ;
-	if (rs >= 0) rs = rs1 ;
-
-	while (cq_rem(&op->recsfree,&vp) >= 0) {
-	    rs1 = uc_free(vp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = cq_finish(&op->recsfree) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = grcache_magic(op)) >= 0) {
+	    void	*vp{} ;
+	    for (int i = 0 ; vechand_get(op->rlp,i,&vp) >= 0 ; i += 1) {
+	        if (vp) {
+	            rec		*rp = recp(vp) ;
+	            record_finish(rp) ;
+	            uc_free(rp) ;
+	        }
+	    } /* end while */
+	    {
+	        rs1 = vechand_finish(op->rlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    while (cq_rem(op->flp,&vp) >= 0) {
+	        rs1 = uc_free(vp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = cq_finish(op->flp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (grcache_finish) */
 
-
-int grcache_lookname(GRCACHE *op,GROUPENT *grp,char *grbuf,int grlen,cchar *gn)
-{
-	GRCACHE_REC	*rp ;
-	time_t		dt = time(NULL) ;
+int grcache_lookname(grcache *op,GE *grp,char *grbuf,int grlen,cc *gn) noex {
+	time_t		dt = time(nullptr) ;
 	int		rs ;
-	int		ct ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (grp == NULL) return SR_FAULT ;
-	if (grbuf == NULL) return SR_FAULT ;
-	if (gn == NULL) return SR_FAULT ;
-
-	if (op->magic != GRCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if (gn[0] == '\0') return SR_INVALID ;
-
-#if	CF_DEBUGS
-	debugprintf("grcache_lookname: gn=%s\n",gn) ;
-#endif
-
-	op->s.total += 1 ;
-
-	if ((rs = grcache_searchname(op,&rp,gn)) >= 0) {
-	    ct = ct_hit ;
-	    rs = grcache_recaccess(op,dt,rp) ;
-	} else if (rs == SR_NOTFOUND) {
-	    ct = ct_miss ;
-	    rs = grcache_mkrec(op,dt,&rp,gn) ;
-	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("grcache_lookname: mid rs=%d\n",rs) ;
-#endif
-
-	grcache_record(op,ct,rs) ;
-
-	if (rs > 0) {
-	    rs = group_load(grp,grbuf,grlen,&rp->gr) ;
-#if	CF_MAINTEXTRA
-	    if ((dt - op->ti_check) >= TO_CHECK) {
-	        op->ti_check = dt ;
-	        grcache_maintenance(op,dt) ;
-	    }
-#endif /* CF_MAINTEXTRA */
-	} else if (rs == 0) {
-	    rs = SR_NOTFOUND ;
-	} /* end if */
-
-	if (rs <= 0) {
-	    memclear(grp) ;
-	}
-
+	if ((rs = grcache_magic(op,grp,grbuf,gn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (gn[0]) {
+		rec	*rp{} ;
+	        int	ct ;
+	        op->s.total += 1 ;
+	        if ((rs = grcache_searchname(op,&rp,gn)) >= 0) {
+	            ct = ct_hit ;
+	            rs = grcache_recaccess(op,dt,rp) ;
+	        } else if (rs == SR_NOTFOUND) {
+	            ct = ct_miss ;
+	            rs = grcache_mkrec(op,dt,&rp,gn) ;
+	        } /* end if */
+	        grcache_record(op,ct,rs) ;
+	        if (rs > 0) {
+	            if ((rs = grp->load(grbuf,grlen,&rp->gr)) >= 0) {
+	                if_constexpr (f_maintextra) {
+	                    if ((dt - op->ti_check) >= TO_CHECK) {
+	                        op->ti_check = dt ;
+	                        grcache_maintenance(op,dt) ;
+	                    }
+	                } /* end if_constexpr (f_maintextra) */
+		    }
+	        } else if (rs == 0) {
+	            rs = SR_NOTFOUND ;
+	        } /* end if */
+	        if (rs <= 0) {
+	            memclear(grp) ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (grcache_lookname) */
 
-
 #ifdef	COMMENT
-int grcache_lookgid(GRCACHE *op,GROUPENT *grp,char *grbuf,int grlen,gid_t gid)
-{
-	GRCACHE_REC	*rp ;
-	time_t		dt = time(NULL) ;
+int grcache_lookgid(grcache *op,GE *grp,char *grbuf,int grlen,gid_t gid) noex {
+	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		grl = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (grp == NULL) return SR_FAULT ;
-	if (grbuf == NULL) return SR_FAULT ;
-
-	if (op->magic != GRCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if (gid < 0) return SR_INVALID ;
-
-	op->s.total += 1 ;
-
-	if ((rs = grcache_searchgid(op,&rp,gid)) >= 0) {
-	    rs = grcache_recaccess(op,dt,rp) ;
-	    grl = rs ;
-	} else if (rs == SR_NOTFOUND) {
-	    char	groupname[GROUPNAMELEN + 1] ;
-
-	    if ((rs = getgroupname(groupname,GROUPNAMELEN,gid)) >= 0) {
-	        rs = grcache_newrec(op,dt,&rp,gid,groupname) ;
-	        grl = rs ;
-	    }
-
-	} /* end if */
-
-	if (rs > 0) {
-	    if (grp != NULL) rs = group_load(grp,grbuf,grlen,&rp->gr) ;
-	    grcache_maintenance(op,dt) ;
-	} /* end if */
-
+	if ((rs = grcache_magic(op,grp,grbuf)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (gid != gidend) {
+	        rec	*rp{} ;
+	        op->s.total += 1 ;
+	        if ((rs = grcache_searchgid(op,&rp,gid)) >= 0) {
+	            rs = grcache_recaccess(op,dt,rp) ;
+	            grl = rs ;
+	        } else if (rs == SR_NOTFOUND) {
+	            char	groupname[GROUPNAMELEN + 1] ;
+	            if ((rs = getgroupname(groupname,GROUPNAMELEN,gid)) >= 0) {
+	                rs = grcache_newrec(op,dt,&rp,gid,groupname) ;
+	                grl = rs ;
+	            }
+	        } /* end if */
+	        if (rs > 0) {
+	            if (grp) {
+		        rs = grp->load(grbuf,grlen,&rp->gr) ;
+	            }
+	            if (rs >= 0) {
+	                grcache_maintenance(op,dt) ;
+	            }
+	        } /* end if */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? grl : rs ;
 }
 /* end subroutine (grcache_lookgid) */
 #endif /* COMMENT */
 
-
-int grcache_stats(GRCACHE *op,GRCACHE_STATS *sp)
-{
+int grcache_stats(grcache *op,grcache_st *sp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	if (op->magic != GRCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = vechand_count(&op->recs)) >= 0) {
-	    *sp = op->s ;
-	    sp->nentries = rs ;
-	}
-
+	if ((rs = grcache_magic(op,sp)) >= 0) {
+	    if ((rs = vechand_count(op->rlp)) >= 0) {
+	        *sp = op->s ;
+	        sp->nentries = rs ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (grcache_stats) */
 
-
-int grcache_check(GRCACHE *op,time_t dt)
-{
-	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != GRCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if (dt == 0)
-	    dt = time(NULL) ;
-
-	if ((dt - op->ti_check) >= TO_CHECK) {
-	    f = TRUE ;
-	    op->ti_check = dt ;
-	    rs = grcache_maintenance(op,dt) ;
-	}
-
+int grcache_check(grcache *op,time_t dt) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = grcache_magic(op)) >= 0) {
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((dt - op->ti_check) >= TO_CHECK) {
+	        f = true ;
+	        op->ti_check = dt ;
+	        rs = grcache_maintenance(op,dt) ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (grcache_check) */
@@ -317,15 +338,12 @@ int grcache_check(GRCACHE *op,time_t dt)
 
 /* private subroutines */
 
-
-static int grcache_mkrec(GRCACHE *op,time_t dt,GRCACHE_REC **epp,cchar *gn)
-{
+static int grcache_mkrec(grcache *op,time_t dt,rec **epp,cc *gn) noex {
 	int		rs ;
 	int		grl = 0 ;
-
-	*epp = NULL ;
-	if ((rs = vechand_count(&op->recs)) >= 0) {
-	    int	n = rs ;
+	*epp = nullptr ;
+	if ((rs = vechand_count(op->rlp)) >= 0) {
+	    int		n = rs ;
 	    if (n >= op->nmax) {
 	        rs = grcache_getrec(op,dt,epp) ;
 	    } else {
@@ -336,34 +354,27 @@ static int grcache_mkrec(GRCACHE *op,time_t dt,GRCACHE_REC **epp,cchar *gn)
 		grl = rs ;
 	    }
 	} /* end if */
-
 	return (rs >= 0) ? grl : rs ;
 }
 /* end subroutine (grcache_mkrec) */
 
-
-static int grcache_recstart(GRCACHE *op,time_t dt,GRCACHE_REC *ep,cchar *gn)
-{
-	const int	wc = op->wcount++ ;
+static int grcache_recstart(grcache *op,time_t dt,rec *ep,cc *gn) noex {
+	cint		wc = op->wcount++ ;
 	int		rs ;
 	int		grl = 0 ;
-
 	if ((rs = record_start(ep,dt,wc,gn)) >= 0) {
 	    grl = rs ;
-	    rs = vechand_add(&op->recs,ep) ;
-	    if (rs < 0)
+	    rs = vechand_add(op->rlp,ep) ;
+	    if (rs < 0) {
 	        record_finish(ep) ;
+	    }
 	} /* end if (record-start) */
-
 	return (rs >= 0) ? grl : rs ;
 }
 /* end subroutine (grcache_recstart) */
 
-
-static int grcache_recaccess(GRCACHE *op,time_t dt,GRCACHE_REC *ep)
-{
+static int grcache_recaccess(grcache *op,time_t dt,rec *ep) noex {
 	int		rs ;
-
 	if ((rs = grcache_recrear(op,ep)) >= 0) {
 	    if ((rs = record_old(ep,dt,op->ttl)) > 0) {
 		int	wc = op->wcount++ ;
@@ -373,198 +384,189 @@ static int grcache_recaccess(GRCACHE *op,time_t dt,GRCACHE_REC *ep)
 	        rs = record_access(ep,dt) ;
 	    }
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (grcache_recaccess) */
 
-
-static int grcache_recrear(GRCACHE *op,GRCACHE_REC *ep)
-{
-	if (op == NULL) return SR_FAULT ;
-	if (ep == NULL) return SR_FAULT ;
-	return SR_OK ;
+static int grcache_recrear(grcache *op,rec *ep) noex {
+	int		rs = SR_FAULT ;
+	if (op && ep) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (grcache_recrear) */
 
-
-static int grcache_recdel(GRCACHE *op,int ri,GRCACHE_REC *ep)
-{
+static int grcache_recdel(grcache *op,int ri,rec *ep) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (ri >= 0) {
-	    rs1 = vechand_del(&op->recs,ri) ;
+	    rs1 = vechand_del(op->rlp,ri) ;
 	} else {
-	    if ((rs1 = vechand_ent(&op->recs,ep)) >= 0) {
-	        rs1 = vechand_del(&op->recs,rs1) ;
+	    if ((rs1 = vechand_ent(op->rlp,ep)) >= 0) {
+	        rs1 = vechand_del(op->rlp,rs1) ;
 	    }
 	}
 	if (rs >= 0) rs = rs1 ;
-
-	rs1 = record_finish(ep) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = record_finish(ep) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (grcache_recdel) */
 
-
-static int grcache_searchname(GRCACHE *op,GRCACHE_REC **rpp,cchar *gn)
-{
+static int grcache_searchname(grcache *op,rec **rpp,cchar *gn) noex {
+	vechand		*rlp = op->rlp ;
 	int		rs ;
-	int		i ;
-
-	for (i = 0 ; (rs = vechand_get(&op->recs,i,rpp)) >= 0 ; i += 1) {
-	    if (*rpp == NULL) continue ;
-	    if ((*rpp)->gn[0] == gn[0]) {
-		if (strcmp((*rpp)->gn,gn) == 0) break ;
+	rec		*rp = nullptr ;
+	void		*vp{} ;
+	bool		f = false ;
+	for (int i = 0 ; (rs = vechand_get(rlp,i,&vp)) >= 0 ; i += 1) {
+	    if (vp) {
+		rp = recp(vp) ;
+	        if (rp->gn[0] == gn[0]) {
+		    f = (strcmp(rp->gn,gn) == 0) ;
+	        }
 	    }
+	    if (f) break ;
 	} /* end for */
-
+	if (rpp) {
+	    *rpp = (f) ? rp : nullptr ;
+	}
 	return rs ;
 }
 /* end subroutine (grcache_searchname) */
 
-
 #if	CF_SEARCHGID
-static int grcache_searchgid(GRCACHE *op,GRCACHE_REC **rpp,gid_t gid)
-{
+static int grcache_searchgid(grcache *op,rec **rpp,gid_t gid) noex {
+	vechand		*rlp = op->rlp ;
 	int		rs ;
-	int		i ;
-
-	for (i = 0 ; (rs = vechand_get(&op->recs,i,rpp)) >= 0 ; i += 1) {
-	    if (*rpp == NULL) continue ;
-	    if ((*rpp)->gid == gid) break ;
+	rec		*rp = nullptr ;
+	void		*vp{} ;
+	bool		f = false ;
+	for (int i = 0 ; (rs = vechand_get(op->rlp,i,vp)) >= 0 ; i += 1) {
+	    if (vp) {
+		rp = recp(vp) ;
+	        f = (rp->gid == gid) ;
+	    }
+	    if (f) break ;
 	} /* end for */
-
+	if (rpp) {
+	    *rpp = (f) ? rp : nullptr ;
+	}
 	return rs ;
 }
 /* end subroutine (grcache_searchgid) */
 #endif /* CF_SEARCHGID */
 
-
-static int grcache_getrec(GRCACHE *op,time_t dt,GRCACHE_REC **rpp)
-{
-	GRCACHE_REC	*rp ;
-	VECHAND		*rlp = &op->recs ;
-	time_t		ti_oldest = LONG_MAX ;
+static int grcache_getrec(grcache *op,time_t dt,rec **rpp) noex {
+	rec		*rp = nullptr ;
+	vechand		*rlp = op->rlp ;
+	time_t		ti_oldest = timemax ;
 	int		rs = SR_OK ;
 	int		iold = -1 ;
-	int		i ;
-	int		f_exp = FALSE ;
-
-	for (i = 0 ; vechand_get(rlp,i,&rp) >= 0 ; i += 1) {
-	    if (rp == NULL) continue ;
-
-	    if (record_old(rp,dt,op->ttl) > 0) {
-	        grcache_recdel(op,i,rp) ;
-	        grcache_recfree(op,rp) ;
-		f_exp = TRUE ;
-	    } else {
-	        if (rp->ti_access < ti_oldest) {
-	            ti_oldest = rp->ti_access ;
-	            iold = i ;
+	int		f_exp = false ;
+	void		*vp{} ;
+	for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		rec	*rp = recp(vp) ;
+	        if (record_old(rp,dt,op->ttl) > 0) {
+	            grcache_recdel(op,i,rp) ;
+	            grcache_recfree(op,rp) ;
+		    f_exp = true ;
+	        } else {
+	            if (rp->ti_access < ti_oldest) {
+	                ti_oldest = rp->ti_access ;
+	                iold = i ;
+	            }
 	        }
 	    }
-
 	    if (rs < 0) break ;
 	} /* end for */
-
 	if (rs >= 0) {
 	    if (f_exp || (iold < 0)) {
-		rs = grcache_allocrec(op,rpp) ;
+		rs = grcache_allocrec(op,&rp) ;
 	    } else {
-	        if ((rs = vechand_get(rlp,iold,rpp)) >= 0) {
+	        if ((rs = vechand_get(rlp,iold,&vp)) >= 0) {
+		    rp = recp(vp) ;
 		    vechand_del(rlp,iold) ;
-		    record_finish(*rpp) ;
+		    record_finish(rp) ;
 		}
 	    }
+	} /* end if (ok) */
+	if (rpp) {
+	    *rpp = (rs >= 0) ? rp : nullptr ;
 	}
-
 	return rs ;
 }
 /* end subroutine (grcache_getrec) */
 
-
-static int grcache_maintenance(GRCACHE *op,time_t dt)
-{
-	GRCACHE_REC	*rp ;
-	time_t		ti_oldest = LONG_MAX ;
+static int grcache_maintenance(grcache *op,time_t dt) noex {
+	rec		*rp = nullptr ;
+	time_t		ti_oldest = timemax ;
 	int		rs = SR_OK ;
 	int		iold = -1 ;
-	int		i ;
-
 /* delete expired entries */
-
-	for (i = 0 ; vechand_get(&op->recs,i,&rp) >= 0 ; i += 1) {
-	    if (rp == NULL) continue ;
-	    if ((dt - rp->ti_create) >= op->ttl) {
-	        grcache_recdel(op,i,rp) ;
-	        grcache_recfree(op,rp) ;
-	    } else {
-	        if (rp->ti_access < ti_oldest) {
-	            ti_oldest = rp->ti_access ;
-	            iold = i ;
-	        }
-	    }
+	void		*vp{} ;
+	for (int i = 0 ; vechand_get(op->rlp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		rec	*rp = recp(vp) ;
+	        if ((dt - rp->ti_create) >= op->ttl) {
+	            grcache_recdel(op,i,rp) ;
+	            grcache_recfree(op,rp) ;
+	        } else {
+	            if (rp->ti_access < ti_oldest) {
+	                ti_oldest = rp->ti_access ;
+	                iold = i ;
+	            }
+	        } /* end if */
+	    } /* end if (non-null) */
 	} /* end for */
-
 /* delete entries (at least one) if we are too big */
-
 	if ((rs >= 0) && (iold >= 0)) {
-	    if ((rs = vechand_count(&op->recs)) > op->nmax) {
-	        if ((rs = vechand_get(&op->recs,iold,&rp)) >= 0) {
-	            if (rp != NULL)) {
+	    if ((rs = vechand_count(op->rlp)) > op->nmax) {
+	        if ((rs = vechand_get(op->rlp,iold,&vp)) >= 0) {
+	            if (rp) {
+			rec	*rp = recp(vp) ;
 	                grcache_recdel(op,iold,rp) ;
 	                grcache_recfree(op,rp) ;
 		    } /* end if (have) */
 	        } /* end if (get) */
 	    } /* enbd if (count) */
 	} /* end if (iold) */
-
 	return rs ;
 }
 /* end subroutine (grcache_maintenance) */
 
-
-static int grcache_allocrec(GRCACHE *op,GRCACHE_REC **rpp)
-{
+static int grcache_allocrec(grcache *op,rec **rpp) noex {
 	int		rs ;
-
-	if ((rs = cq_rem(&op->recsfree,rpp)) == SR_NOTFOUND) {
-	    cint	sz = sizeof(GRCACHE_REC) ;
-	    void	*vp ;
+	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
+	    cint	sz = sizeof(rec) ;
+	    void	*vp{} ;
 	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
-	        *rpp = vp ;
+	        *rpp = recp(vp) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (grcache_allocrec) */
 
-
-static int grcache_recfree(GRCACHE *op,GRCACHE_REC *rp)
-{
+static int grcache_recfree(grcache *op,rec *rp) noex {
 	int		rs ;
-
-	if ((rs = cq_count(&op->recsfree)) >= 0) {
-	    const int	n = rs ;
+	if ((rs = cq_count(op->flp)) >= 0) {
+	    cint	n = rs ;
 	    if (n < GRCACHE_MAXFREE) {
-	        rs = cq_ins(&op->recsfree,rp) ;
+	        rs = cq_ins(op->flp,rp) ;
 	    } else {
 	        uc_free(rp) ;
 	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (grcache_recfree) */
 
-
-static int grcache_record(GRCACHE *op,int ct,int rs)
-{
+static int grcache_record(grcache *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
 	switch (ct) {
 	case ct_hit:
@@ -580,159 +582,163 @@ static int grcache_record(GRCACHE *op,int ct,int rs)
 }
 /* end subroutine (grcache_record) */
 
-static int record_start(GRCACHE_REC *rp,time_t dt,int wc,cchar *gn) noex {
-	int		rs ;
+static int record_start(rec *rp,time_t dt,int wc,cchar *gn) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		grl = 0 ;
-
-	if (rp == NULL) return SR_FAULT ;
-	if (gn == NULL) return SR_FAULT ;
-
-	if (gn[0] == '\0') return SR_INVALID ;
-
-	if (dt == 0) dt = time(NULL) ;
-
-	memclear(rp) ;
-
-	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	    cint	grlen = rs ;
-	    char	*grbuf ;
-	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-	        ucentgr		gr ;
-	        if ((rs1 = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
-	            cint	sz = (rs1+1) ;
-	            void	*p ;
-	            grl = rs1 ; /* indicates entry found */
-	            if ((rs = uc_malloc(sz,&p)) >= 0) {
-		        char	*grbuf = (char *) p ; /* nested variable */
-		        if ((rs = group_load(&rp->gr,grbuf,grl,&gr)) >= 0) {
-	                    rp->grbuf = grbuf ;
-	    	            rp->grl = grl ;
-		        }
-		        if (rs < 0) uc_free(p) ;
-	            } /* end if (memory-allocation) */
-	        } else if (rs1 == SR_NOTFOUND) {
-	            rp->grl = 0 ; /* optional */
-	            grl = 0 ; /* indicates an empty (not-found) entry */
-	        } else {
-	            rs = rs1 ;
-		}
-	        uc_free(grbuf) ; /* free first one up at top */
-	    } /* end if (memory-allocation) */
-	    if (rs >= 0) {
-	        strwcpy(rp->gn,gn,GROUPNAMELEN) ;
-	        rp->ti_create = dt ;
-	        rp->ti_access = dt ;
-	        rp->wcount = wc ;
-	        rp->magic = GRCACHE_RECMAGIC ;
-	    }
-	} /* end if (getbufsize) */
-
+	if (rp && gn) {
+	    rs = SR_INVALID ;
+	    if (gn[0]) {
+		cint	rsn = SR_NOTFOUND ;
+	        char	*grbuf{} ;
+	        if (dt == 0) dt = time(nullptr) ;
+	        memclear(rp) ;
+	        if ((rs = malloc_gr(&grbuf)) >= 0) {
+	            ucentgr	gr ;
+	            cint	grlen = rs ;
+	            if ((rs = getgr_name(&gr,grbuf,grlen,gn)) >= 0) {
+	                cint	sz = (rs+1) ;
+	                void	*p{} ;
+	                grl = rs ; /* indicates entry found */
+	                if ((rs = uc_malloc(sz,&p)) >= 0) {
+			    ucentgr	*grp = &rp->gr ;
+		            char	*grbuf = charp(p) ;
+		            if ((rs = grp->load(grbuf,grl,&gr)) >= 0) {
+	                        rp->grbuf = grbuf ;
+	    	                rp->grl = grl ;
+		            }
+		            if (rs < 0) {
+				uc_free(p) ;
+			    }
+	                } /* end if (memory-allocation) */
+	            } else if (rs == rsn) {
+	                rp->grl = 0 ; /* optional */
+	                grl = 0 ; /* indicates an empty (not-found) entry */
+		    }
+	            rs1 = uc_free(grbuf) ; /* free first one up at top */
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory-allocation) */
+	        if (rs >= 0) {
+	            strwcpy(rp->gn,gn,GROUPNAMELEN) ;
+	            rp->ti_create = dt ;
+	            rp->ti_access = dt ;
+	            rp->wcount = wc ;
+	            rp->magic = RECORD_MAGIC ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? grl : rs ;
 }
 /* end subroutine (record_start) */
 
-
-static int record_finish(GRCACHE_REC *rp)
-{
-	int		rs = SR_OK ;
+static int record_finish(rec *rp) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	if (rp == NULL) return SR_FAULT ;
-
-	if (rp->magic != GRCACHE_RECMAGIC) return SR_NOTFOUND ;
-
-	if (rp->grbuf != NULL) {
-	    rs1 = uc_free(rp->grbuf) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rp->grbuf = NULL ;
-	}
-
-	rp->grl = 0 ;
-	rp->gid = -1 ;
-	rp->gn[0] = '\0' ;
-	rp->magic = 0 ;
+	if (rp) {
+	    rs = SR_NOTOPEN ;
+	    if (rp->magic == RECORD_MAGIC) {
+		rs = SR_OK ;
+	        if (rp->grbuf) {
+	            rs1 = uc_free(rp->grbuf) ;
+	            if (rs >= 0) rs = rs1 ;
+	            rp->grbuf = nullptr ;
+	        }
+	        rp->grl = 0 ;
+	        rp->gid = -1 ;
+	        rp->gn[0] = '\0' ;
+	        rp->magic = 0 ;
+	    } /* end if (was open) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (record_finish) */
 
-
-static int record_access(GRCACHE_REC *ep,time_t dt)
-{
-	int		rs = SR_OK ;
+static int record_access(rec *ep,time_t dt) noex {
+	int		rs = SR_FAULT ;
 	int		grl ;
-
-	if (ep == NULL) return SR_FAULT ;
-
-	if (ep->magic != GRCACHE_RECMAGIC) return SR_NOTFOUND ;
-
-	ep->ti_access = dt ;
-	grl  = ep->grl ;
+	if (ep) {
+	    rs = SR_NOTFOUND ;
+	    if (ep->magic == RECORD_MAGIC) {
+		rs = SR_OK ;
+	        ep->ti_access = dt ;
+	        grl  = ep->grl ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? grl : rs ;
 }
 /* end subroutine (record_access) */
 
-static int record_refresh(GRCACHE_REC *ep,time_t dt,int wc) noex {
-	int		rs ;
+static int record_reload(rec *ep,int grl,ucentgr *ngrp) noex {
+	int		rs = SR_OK ;
+        void    	*p{} ;
+        if (ep->grbuf) {
+            rs = uc_realloc(ep->grbuf,(grl+1),&p) ;
+        } else {
+            rs = uc_malloc((grl+1),&p) ;
+        }
+        if (rs >= 0) {
+            char        *grbuf = charp(p) ; /* new variable */
+	    ucentgr	*grp = &ep->gr ;
+            ep->grbuf = charp(p) ;
+            ep->grl = grl ;
+            rs = grp->load(grbuf,grl,ngrp) ;
+            if (rs < 0) {
+                uc_free(p) ;
+            }
+        } /* end if (ok) */
+	return rs ;
+}
+/* end subroutine (record_reload) */
+
+static int record_refresh(rec *ep,time_t dt,int wc) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		grl = 0 ;
-
-	if (ep == NULL) return SR_FAULT ;
-
-	if (ep->magic != GRCACHE_RECMAGIC) return SR_NOTFOUND ;
-
-	if ((rs = getbufsize(getbufsize_gr)) >= 0) {
-	    cint	grlen = rs ;
-	    char	*grbuf ;
-	    if ((rs = uc_malloc((grlen+1),&grbuf)) >= 0) {
-		ucentgr		gr ;
-	        if ((rs1 = getgr_name(&gr,grbuf,grlen,ep->gn)) >= 0) {
-	            void	*p ;
-	            grl = rs1 ; /* indicates entry found */
-	            if (ep->grbuf != NULL) {
-	                rs = uc_realloc(ep->grbuf,(grl+1),&p) ;
-	            } else {
-	                rs = uc_malloc((grl+1),&p) ;
-		    }
-	            if (rs >= 0) {
-		        char	*grbuf = (char *) p ; /* new nested variable */
-	                ep->grbuf = (char *) p ;
-	                ep->grl = grl ;
-		        rs = group_load(&ep->gr,grbuf,grl,&gr) ;
-		        if (rs < 0) uc_free(p) ;
-	            }
-	        } else if (rs1 == SR_NOTFOUND) {
-	            if (ep->grbuf != NULL) {
-		        uc_free(ep->grbuf) ;
-		        ep->grbuf = NULL ;
-	            }
-	            ep->grl = 0 ; /* signal whatever? */
-	            grl = 0 ; /* indicates an empty (not-found) entry */
-	        } else {
-	            rs = rs1 ;
-		}
-	        uc_free(grbuf) ; /* free first one up top */
-	    } /* end if (memory-allocation) */
-	    if (rs >= 0) {
-	        ep->ti_create = dt ;
-	        ep->ti_access = dt ;
-	        ep->wcount = wc ;
-	    }
-	} /* end if (getbufsize) */
-
+	if (ep) {
+	    rs = SR_NOTFOUND ;
+	    if (ep->magic == RECORD_MAGIC) {
+	        char	*grbuf{} ;
+	        if ((rs = malloc_gr(&grbuf)) >= 0) {
+		    ucentgr	gr ;
+		    cint	rsn = SR_NOTFOUND ;
+	            cint	grlen = rs ;
+	            if ((rs = getgr_name(&gr,grbuf,grlen,ep->gn)) >= 0) {
+	                grl = rs ; /* <- indicates entry found */
+			rs = record_reload(ep,grl,&gr) ;
+	            } else if (rs == rsn) {
+	                if (ep->grbuf) {
+		            uc_free(ep->grbuf) ;
+		            ep->grbuf = nullptr ;
+	                }
+	                ep->grl = 0 ; /* signal whatever? */
+	                grl = 0 ; /* indicates an empty (not-found) entry */
+		    } /* end if */
+	            rs1 = uc_free(grbuf) ; /* free first one up top */
+		    if (rs >= 0) rs = rs1 ;
+	        } /* end if (memory-allocation) */
+	        if (rs >= 0) {
+	            ep->ti_create = dt ;
+	            ep->ti_access = dt ;
+	            ep->wcount = wc ;
+	        }
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? grl : rs ;
 }
 /* end subroutine (record_refresh) */
 
-
-/* is it old? */
-static int record_old(GRCACHE_REC *ep,time_t dt,int ttl)
-{
-	int		f_old ;
-	if (ep == NULL) return SR_FAULT ;
-	if (ep->magic != GRCACHE_RECMAGIC) return SR_NOTFOUND ;
-	f_old = ((dt - ep->ti_create) >= ttl) ;
-	return f_old ;
+static int record_old(rec *ep,time_t dt,int ttl) noex {
+	int		rs = SR_FAULT ;
+	int		f_old = false ;
+	if (ep) {
+	    rs = SR_NOTFOUND ;
+	    if (ep->magic == RECORD_MAGIC) {
+		rs = SR_OK ;
+		f_old = ((dt - ep->ti_create) >= ttl) ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? f_old : rs ;
 }
 /* end subroutine (record_old) */
+
 

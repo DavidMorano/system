@@ -40,10 +40,10 @@ struct grcache_stats {
 } ;
 
 struct grcache_head {
-	cq		recsfree ;
-	vechand		recs ;
+	cq		*flp ;		/* free-list-pointer */
+	vechand		*rlp ;		/* record-list-pointer */
 	time_t		ti_check ;
-	GRCACHE_STATS	s ;
+	GRCACHE_ST	s ;
 	uint		magic ;
 	uint		wcount ;
 	int		ttl ;		/* time-to-live */

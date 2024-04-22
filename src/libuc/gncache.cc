@@ -4,7 +4,6 @@
 /* group-name cache */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -31,7 +30,7 @@
 #include	<usystem.h>
 #include	<vechand.h>
 #include	<cq.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |GROUPNAMELEN| */
 
 #include	"gncache.h"
 
