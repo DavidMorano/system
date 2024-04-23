@@ -4,7 +4,6 @@
 /* uunames-query database manager */
 /* version %I% last-modified %G% */
 
-#define	CF_WITHENDIAN	0		/* use ENDIANness */
 #define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
 
 /* revision history:
@@ -538,40 +537,32 @@ static int uunames_infoloadend(UU *op) noex {
 /* end subroutine (uunames_infoloadend) */
 
 static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
-	int		rs = SR_OK ;
-	int		fl ;
-	char		indfname[MAXPATHLEN + 1] ;
-
+	int		rs ;
+	int		rs1 ;
+	char		*indfname{} ;
 	op->indfname = nullptr ;
-#if	CF_WITHENDIAN
-	rs = mkfnamesuf2(indfname,indname,INDSUF,ENDIANSTR) ;
-#else
-	rs = mkfnamesuf1(indfname,indname,INDSUF) ;
-#endif
-	fl = rs ;
-	if (rs < 0)
-	    goto bad0 ;
-
-	rs = uc_mallocstrw(indfname,fl,&op->indfname) ;
-	if (rs < 0)
-	    goto bad0 ;
-
-	rs = uunames_filemapcreate(op,dt) ;
-	if (rs < 0)
-	    goto bad1 ;
-
-	rs = uunames_indlist(op) ;
-
-ret0:
+	if ((rs = malloc_mp(&indfname)) >= 0) {
+	    cchar	*suf = INDSUF ;
+	    cchar	*end = ENDIANSTR ;
+	    if ((rs = mkfnamesuf2(indfname,indname,suf,end)) >= 0) {
+		cint	fl = rs ;
+	        cchar	*cp{} ;
+	        if ((rs = uc_mallocstrw(indfname,fl,&cp)) >= 0) {
+		    op->indfname = cp ;
+		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) {
+			{
+			    rs = uunames_indlist(op) ;
+			}
+		    } /* end if */
+	            if (rs < 0) {
+	                 rs1 = uc_free(op->indfname) ;
+	                 if (rs >= 0) rs = rs1 ;
+	                 op->dbname = nullptr ;
+	            }
+		} /* end if (memory-allocation) */
+	    } /* end if (mkfnamesuf) */
+	} /* end if (m-a-f) */
 	return rs ;
-
-/* bad stuff */
-bad1:
-	uc_free(op->indfname) ;
-	op->dbname = nullptr ;
-
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (uunames_indmapcreate) */
 
@@ -651,14 +642,12 @@ ret0:
 static int uunames_filemapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->indfmap != nullptr) {
 	    rs1 = u_munmap(op->indfmap,op->indfsize) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->indfmap = nullptr ;
 	    op->indfsize = 0 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (uunames_filemapdestroy) */
@@ -680,31 +669,37 @@ static int uunames_indopen(UU *op,time_t dt) noex {
 
 static int uunames_indopenpr(UU *op,time_t dt) noex {
 	int		rs ;
-	char		idname[MAXPATHLEN + 1] ;
-
-	if ((rs = mkpath3(idname,op->pr,VARDNAME,INDDNAME)) >= 0) {
-	    rs = uunames_indopendname(op,idname,dt) ;
-	}
-
+	int		rs1 ;
+	char		*idname{} ;
+	if ((rs = malloc_mp(&idname)) >= 0) {
+	    if ((rs = mkpath(idname,op->pr,VARDNAME,INDDNAME)) >= 0) {
+	        rs = uunames_indopendname(op,idname,dt) ;
+	    }
+	    rs1 = uc_free(idname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_indopenpr) */
 
 static int uunames_indopentmp(UU *op,time_t dt) noex {
 	int		rs ;
-	cchar	*tmpdname = TMPVARDNAME ;
-	cchar	*inddname = INDDNAME ;
-	cchar	*prname ;
-	char		idname[MAXPATHLEN + 1] ;
-
-	if ((rs = sfbasename(op->pr,-1,&prname)) > 0) {
-	    if ((rs = mkpath3(idname,tmpdname,prname,inddname)) >= 0) {
-	        rs = uunames_indopendname(op,idname,dt) ;
+	int		rs1 ;
+	cchar		*tmpdname = TMPVARDNAME ;
+	cchar		*inddname = INDDNAME ;
+	char		*idname{} ;
+	if ((rs = malloc_mp(&idname)) >= 0) {
+	    cchar	*prname{} ;
+	    if ((rs = sfbasename(op->pr,-1,&prname)) > 0) {
+	        if ((rs = mkpath(idname,tmpdname,prname,inddname)) >= 0) {
+	            rs = uunames_indopendname(op,idname,dt) ;
+	        }
+	    } else {
+	        rs = SR_INVALID ;
 	    }
-	} else {
-	    rs = SR_INVALID ;
-	}
-
+	    rs1 = uc_free(idname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_indopentmp) */
@@ -756,37 +751,32 @@ ret0:
 /* end subroutine (uunames_indopendname) */
 
 static int uunames_indtest(UU *op,cchar *indname,time_t dt) noex {
-	USTAT		sb ;
-	time_t		ti_ind ;
 	int		rs ;
 	int		rs1 ;
 	int		f = false ;
-	char		indfname[MAXPATHLEN + 1] ;
-
-#if	CF_WITHENDIAN
-	rs = mkfnamesuf2(indfname,indname,INDSUF,ENDIANSTR) ;
-#else
-	rs = mkfnamesuf1(indfname,indname,INDSUF) ;
-#endif
-
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs1 = u_stat(indfname,&sb) ;
-	ti_ind = sb.st_mtime ;
-
-	if ((rs1 >= 0) && ((sb.st_size == 0) || (ti_ind == 0)))
-	    rs1 = SR_NOTFOUND ;
-
-	if ((rs1 >= 0) && (op->ti_mod > ti_ind))
-	    rs1 = SR_NOTFOUND ;
-
-	if ((rs1 >= 0) && ((dt - ti_ind) >= TO_FILEMOD))
-	    rs1 = SR_TIMEDOUT ;
-
-	f = (rs1 >= 0) ;
-
-ret0:
+	char		*indfname{} ;
+	if ((rs = malloc_mp(&indfname)) >= 0) {
+	    cchar	*suf = INDSUF ;
+	    cchar	*end = ENDIANSTR ;
+	    if ((rs = mkfnamesuf2(indfname,indname,suf,end)) >= 0) {
+	         USTAT		sb ;
+	         time_t		ti_ind ;
+	         rs1 = u_stat(indfname,&sb) ;
+	         ti_ind = sb.st_mtime ;
+	         if ((rs1 >= 0) && ((sb.st_size == 0) || (ti_ind == 0))) {
+	             rs1 = SR_NOTFOUND ;
+	         }
+	         if ((rs1 >= 0) && (op->ti_mod > ti_ind)) {
+	             rs1 = SR_NOTFOUND ;
+	         }
+	         if ((rs1 >= 0) && ((dt - ti_ind) >= TO_FILEMOD)) {
+	             rs1 = SR_TIMEDOUT ;
+	         }
+	         f = (rs1 >= 0) ;
+	    } /* end if (mkfnamesuf) */
+	    rs1 = uc_free(indfname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (uunames_indtest) */
