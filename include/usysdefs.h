@@ -177,6 +177,7 @@ enum signalmissings {
 #endif
 #endif
 
+/* the following could be determined dynamically, but we choose not to */
 #ifndef	TIME_MAX
 #define	TIME_MAX	LONG_MAX
 #endif

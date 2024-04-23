@@ -28,7 +28,6 @@
 #include	<clanguage.h>
 
 
-
 #ifndef	TRUE
 #define	TRUE		1
 #endif

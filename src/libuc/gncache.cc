@@ -53,8 +53,8 @@ using std::nothrow ;			/* constant */
 
 /* local typedefs */
 
-typedef gncach_ent	ent ;
-typedef gncach_ent *	entp ;
+typedef gncache_ent	ent ;
+typedef gncache_ent *	entp ;
 
 
 /* external subroutines */
@@ -246,7 +246,7 @@ int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
 	int		gl = 0 ;
 	if ((rs = gncache_magic(op,gn)) >= 0) {
 	    rs = SR_INVALID ;
-	    if (gid != gidend) && gn[0]) {
+	    if ((gid != gidend) && gn[0]) {
 	       rec	*rp{} ;
 	       if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
 	           gl = rs ;
@@ -389,30 +389,33 @@ static int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
 
 static int gncache_maintenance(GN *op,time_t dt) noex {
 	vechand		*rlp = op->rlp ;
-	rec	*rp ;
 	time_t		ti_oldest = TIME_MAX ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		iold = -1 ; /* the oldest one */
 /* delete expired entries */
-	for (int i = 0 ; vechand_get(rlp,i,&rp) >= 0 ; i += 1) {
-	    if (rp == nullptr) continue ;
-	    if ((dt - rp->ti_create) >= op->ttl) {
-	        vechand_del(op->rlp,i) ;
-	        record_finish(rp) ;
-	        gncache_recfree(op,rp) ;
-	    } else {
-	        if (rp->ti_access < ti_oldest) {
-	            ti_oldest = rp->ti_access ;
-	            iold = i ;
-	        }
-	    }
+	void		*vp{} ;
+	for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		rec	*rp = recp(vp) ;
+	        if ((dt - rp->ti_create) >= op->ttl) {
+	            vechand_del(rlp,i) ;
+	            record_finish(rp) ;
+	            gncache_recfree(op,rp) ;
+	        } else {
+	            if (rp->ti_access < ti_oldest) {
+	                ti_oldest = rp->ti_access ;
+	                iold = i ;
+	            }
+	        } /* end if */
+	    } /* end if (non-null) */
 	} /* end for */
 /* delete entries (at least one) if we are too big */
 	if ((rs >= 0) && (iold >= 0)) {
 	    if ((rs = vechand_count(rlp)) > op->nmax) {
-	        rs1 = vechand_get(op->rlp,iold,&rp) ;
-	        if ((rs1 >= 0) && rp) {
+	        rs1 = vechand_get(op->rlp,iold,&vp) ;
+	        if ((rs1 >= 0) && vp) {
+		    rec		*rp = recp(vp) ;
 	            vechand_del(op->rlp,iold) ;
 	            record_finish(rp) ;
 	            gncache_recfree(op,rp) ;
@@ -485,7 +488,7 @@ static int gncache_record(GN *op,int ct,int rs) noex {
 /* end subroutine (gncache_record) */
 
 static int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
-	int		rs = SR_FAULT OK ;
+	int		rs = SR_FAULT ;
 	int		gl = 0 ;
 	if (rp && gn) {
 	    rs = SR_INVALID ;
