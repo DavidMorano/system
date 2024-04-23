@@ -43,7 +43,9 @@ enum errnomssings {
 	errnomissing_proto,
 	errnomissing_badfd,
 	errnomissing_libacc,
-	errnomissing_hostdownn,
+	errnomissing_libbad,
+	errnomissing_hostdown,
+	errnomissing_unatch,
 	errnomissing_overlast
 } ;
 
@@ -110,7 +112,13 @@ enum errnomssings {
 #define	SR_L3RST	(- errnomissing_l3rst)
 #endif
 #define	SR_LNRNG	(- ELNRNG)	/* Link number out of range */
+
+#ifdef	EUNATCH
 #define	SR_UNATCH	(- EUNATCH)	/* Protocol driver not attached */
+#else
+#define	SR_UNATCH	(- errnomissing_unatch)
+#endif
+
 #define	SR_NOCSI	(- ENOCSI)	/* No CSI structure available */
 #define	SR_L2HLT	(- EL2HLT)	/* Level 2 halted */
 #define	SR_DEADLK	(- EDEADLK)	/* Deadlock condition */
@@ -220,7 +228,12 @@ enum errnomssings {
 #define	SR_LIBACC	(- errnomissing_libacc)
 #endif
 
+#ifdef	ELIBBAD
 #define	SR_LIBBAD	(- ELIBBAD)	/* Accessing a corrupted shared lib */
+#else
+#define	SR_LIBBAD	(- errnomissing_libbad)
+#endif
+
 #define	SR_LIBSCN	(- ELIBSCN)	/* .lib section in a.out corrupted */
 #define	SR_LIBMAX	(- ELIBMAX)	/* Attempting link in too many libs */
 #define	SR_LIBEXEC	(- ELIBEXEC)	/* Attempting to exec shared library */

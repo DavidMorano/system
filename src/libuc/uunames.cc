@@ -825,10 +825,10 @@ static int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 	int	i, cstat, cex ;
 	int	prlen = 0 ;
 
-	cchar	*varprmkuu = VARPRMKUU ;
-	cchar	*pn = PROG_MKUU ;
-	cchar	*av[10] ;
-	cchar	**ev ;
+	cchar		*varprmkuu = VARPRMKUU ;
+	cchar		*pn = PROG_MKUU ;
+	cchar		*av[10] ;
+	mainv		ev ;
 
 	char	progfname[MAXPATHLEN + 1] ;
 	char	dbname[MAXPATHLEN + 1] ;
@@ -902,7 +902,7 @@ static int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 
 /* go */
 
-	vecstr_getvec(&envs,(cchar ***) &ev) ;
+	vecstr_getvec(&envs,&ev) ;
 	ps.opts |= SPAWNPROC_OIGNINTR ;
 	ps.opts |= SPAWNPROC_OSETPGRP ;
 
@@ -915,8 +915,6 @@ static int uunames_mkuunamesi(UU *op,cchar *dname) noex {
 
 ret2:
 	vecstr_finish(&envs) ;
-
-ret1:
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -942,11 +940,11 @@ ret0:
 /* end subroutine (uunames_mkuunamesi) */
 
 static int uunames_envpaths(UU *op,vecstr *elp) noex {
-	vecstr	pathcomps ;
+	cint		vo = VECSTR_OORDERED ;
+	vecstr		pathcomps ;
 
 	int	rs ;
 	int	i ;
-	int	opts ;
 	int	sz ;
 	int	bl, pl ;
 
@@ -957,8 +955,7 @@ static int uunames_envpaths(UU *op,vecstr *elp) noex {
 	char	*vp ;
 
 
-	opts = VECSTR_OORDERED | VECSTR_OSTSIZE ;
-	rs = vecstr_start(&pathcomps,40,opts) ;
+	rs = vecstr_start(&pathcomps,40,vo) ;
 	if (rs < 0)
 	    goto ret0 ;
 
@@ -1003,8 +1000,6 @@ static int uunames_envpaths(UU *op,vecstr *elp) noex {
 	    vecstr_delall(&pathcomps) ;
 	    if (rs < 0) break ;
 	} /* end for */
-
-ret1:
 	vecstr_finish(&pathcomps) ;
 
 ret0:
@@ -1052,8 +1047,6 @@ static int uunames_indlist(UU *op) noex {
 	    ml -= len ;
 
 	} /* end while (processing lines) */
-
-ret0:
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (uunames_indlist) */
@@ -1231,9 +1224,9 @@ static int vesrch(cvoid **v1pp,cvoid **v2pp) noex {
 	liner		*l1p ;
 	liner		*l2p ;
 	int		rc = 0 ;
+	l1p = *e1pp ;
+	l2p = *e2pp ;
 	if (l1p || l2p) {
-	    l1p = *e1pp ;
-	    l2p = *e2pp ;
 	    if (l1p) {
 	        if (l2p) {
 		    if ((rc = (l1p->lp[0] - l2p->lp[0])) == 0) {

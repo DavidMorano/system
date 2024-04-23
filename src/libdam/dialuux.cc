@@ -1,12 +1,11 @@
-/* dialuux */
+/* dialuux SUPPORT */
+/* lang=C++20 */
 
 /* perform remote UUX service execution */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
-
 
 /* revision history:
 
@@ -19,10 +18,13 @@
 
 /*******************************************************************************
 
+	Name:
+	dialuux
+
+	Description:
 	This is a dialer to connect to the UUX facility.
 
 	Synopsis:
-
 	int dialuux(pr,node,svc,argv,u,g,opts)
 	const char	pr[] ;
 	const char	node[] ;
@@ -33,7 +35,6 @@
 	int		opts ;
 
 	Arguments:
-
 	pr		program-root
 	node		target node
 	svc		target service
@@ -41,16 +42,12 @@
 	opts		options
 
 	Returns:
-
 	>=0		file descriptor to program STDIN and STDOUT
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -58,7 +55,6 @@
 #include	<fcntl.h>
 #include	<cstdlib>
 #include	<cstring>
-
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<storebuf.h>
@@ -555,7 +551,7 @@ vecstr		*elp ;
 	char	*bp = NULL ;
 
 
-	opts = VECSTR_OORDERED | VECSTR_OSTSIZE ;
+	opts = VECSTR_OORDERED ;
 	if ((rs = vecstr_start(&pathcomps,40,opts)) >= 0) {
 
 	for (i = 0 ; envpops[i].name != NULL ; i += 1) {
