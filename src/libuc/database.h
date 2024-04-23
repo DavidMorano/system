@@ -31,6 +31,12 @@
 #include	<uuname.h>
 #include	<uunames.h>
 
+#include	<babycalc.h>
+#include	<babycalcs.h>
+
+#include	<commandment.h>
+#include	<commandments.h>
+
 
 #endif /* DATABASE_INCLUDE */
 

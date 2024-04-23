@@ -581,8 +581,8 @@ static int uunames_indmapdestroy(UU *op) noex {
 	    c += 1 ;
 	}
 	{
-	rs1 = uunames_filemapdestroy(op) ;
-	if (rs >= 0) rs = rs1 ;
+	    rs1 = uunames_filemapdestroy(op) ;
+	    if (rs >= 0) rs = rs1 ;
 	}
 	if (op->indfname) {
 	    rs1 = uc_free(op->indfname) ;

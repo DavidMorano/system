@@ -1,11 +1,10 @@
-/* babycalcs */
+/* babycalcs SUPPORT */
+/* lang=C++20 */
 
 /* baby calculator */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
-
 
 /* revision history:
 
@@ -18,40 +17,39 @@
 
 /*******************************************************************************
 
-        This small module takes a date (in UNIX® 'time(2)' format) and uses it
-        as a query to calculate the number of events corresponding to that date.
-        Both past and future dates are possible. Extrapolations are made for
-        future requests.
+	This small module takes a date (in UNIX® |time(2)| format)
+	and uses it as a query to calculate the number of events
+	corresponding to that date.  Both past and future dates are
+	possible. Extrapolations are made for future requests.
 
-        Implementation note: We use a heap-sort rather than a quick-sort on the
-        database (which eventually needs to be sorted) since the data is
-        normally or most probably already completely sorted. This is supposed to
-        give better performance!? (?)
+	Implementation note: We use a heap-sort rather than a
+	quick-sort on the database (which eventually needs to be
+	sorted) since the data is normally or most probably already
+	completely sorted.  This is supposed to give better
+	performance!? (?)
 
-        The database is kept in shared memory if at all possible. Developers
-        should note that the 'table' member of the object is shared
-        alternatively between stages of DB loading or reloading.
+	The database is kept in shared memory if at all possible.
+	Developers should note that the 'table' member of the object
+	is shared alternatively between stages of DB loading or
+	reloading.
 
-        Postscript note: This object allows for very robust dynamic creation and
-        update of a shared-memory database. The cost for this is quite complex
-        and perhaps less capability could have been tolerated for (far) less
-        implementation complexity.
-
+	Postscript note: This object allows for very robust dynamic
+	creation and update of a shared-memory database.  The cost
+	for this is quite complex and perhaps less capability could
+	have been tolerated for (far) less implementation complexity.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<sigblocker.h>
@@ -113,50 +111,13 @@
 
 #define	SHIFTINT	(6 * 60)	/* possible time-shift */
 
-#ifndef	USTAT
-#define	USTAT		struct ustat
-#endif
-
 
 /* external subroutines */
-
-extern uint	uceil(uint,int) ;
-
-extern int	snsds(char *,int,const char *,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	sncpy4(char *,int,const char *,const char *,cchar *,cchar *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	matstr(const char **,const char *,int) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	nextfield(const char *,int,const char **) ;
-extern int	strnnlen(const char *,int,int) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	msleep(uint) ;
-extern int	iceil(int,int) ;
-extern int	filer_writefill(FILER *,const char *,int) ;
-extern int	filer_writezero(FILER *,int) ;
-extern int	isOneOf(const int *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
-extern int	strllen(const char *,int,int) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
-#if	CF_DEBUGS
-extern char	*timestr_log(time_t,char *) ;
-#endif
 
 
 /* exported variables */
 
-BABYCALCS_OBJ	babycalcs = {
+BABYCALCS_OBJ	babycalcs_mod = {
 	BABYCALCS_OBJNAME,
 	sizeof(BABYCALCS)
 } ;
@@ -180,7 +141,7 @@ static int	babycalcs_proctxtline(BABYCALCS *,vecobj *,CVTDATER *,
 
 static int	babycalcs_shmwr(BABYCALCS *,time_t,int,mode_t) ;
 static int	babycalcs_shmwrer(BABYCALCS *,time_t,int,mode_t,BABIESFU *) ;
-static int	babycalcs_openshmwait(BABYCALCS *,const char *) ;
+static int	babycalcs_openshmwait(BABYCALCS *,cchar *) ;
 static int	babycalcs_mutexinit(BABYCALCS *) ;
 static int	babycalcs_procmap(BABYCALCS *,time_t) ;
 static int	babycalcs_verify(BABYCALCS *,time_t) ;
@@ -199,7 +160,7 @@ static int	babycalcs_shmupdate(BABYCALCS *,time_t,USTAT *,int) ;
 static int	babycalcs_shmaddwrite(BABYCALCS *,int) ;
 static int	babycalcs_shminfo(BABYCALCS *,BABYCALCS_INFO *) ;
 
-static int	mkshmname(char *,const char *,int,const char *,int) ;
+static int	mkshmname(char *,cchar *,int,cchar *,int) ;
 
 static int	vcmpentry(BABYCALCS_ENT **,BABYCALCS_ENT **) ;
 
@@ -212,7 +173,7 @@ static BABYCALCS_ENT	defs[] = {
 	{ 0, 0 }
 } ;
 
-static const int	loadrs[] = {
+static cint	loadrs[] = {
 	SR_NOENT,
 	SR_NOTSUP,
 	SR_NOSYS,
@@ -220,14 +181,15 @@ static const int	loadrs[] = {
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int babycalcs_open(BABYCALCS *op,cchar *pr,cchar *dbname)
-{
-	const mode_t	om = BABYCALCS_PERMS ;
+int babycalcs_open(BABYCALCS *op,cchar *pr,cchar *dbname) noex {
+	cmode	om = BABYCALCS_PERMS ;
 	int		rs ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
@@ -409,7 +371,7 @@ static int babycalcs_shmload(BABYCALCS *op,mode_t om)
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	op->mapsize = 0 ;
 	op->table = NULL ;
@@ -425,7 +387,7 @@ static int babycalcs_shmload(BABYCALCS *op,mode_t om)
 	            const time_t	dt = time(NULL) ;
 	            op->shmname = smp ;
 	            if ((rs = babycalcs_shmopen(op,dt,shmname,om)) >= 0) {
-	                const int	fd = rs ;
+	                cint	fd = rs ;
 
 	                if (op->shmsize == 0) {
 	                    rs = uc_fsize(fd) ;
@@ -481,13 +443,13 @@ static int babycalcs_shmload(BABYCALCS *op,mode_t om)
 
 static int babycalcs_shmopen(BABYCALCS *op,time_t dt,cchar *shmname,mode_t om)
 {
-	const int	rsn = SR_NOENT ;
+	cint	rsn = SR_NOENT ;
 	int		of = O_RDWR ;
 	int		rs ;
 	int		fd = -1 ;
 
 	if ((rs = uc_openshm(shmname,of,om)) == rsn) {
-	    const mode_t	mom = (om & 0444) ;
+	    cmode	mom = (om & 0444) ;
 
 	    of = (O_RDWR | O_CREAT | O_EXCL) ;
 	    if ((rs = uc_openshm(shmname,of,mom)) >= 0) {
@@ -523,8 +485,8 @@ static int babycalcs_shmopen(BABYCALCS *op,time_t dt,cchar *shmname,mode_t om)
 static int babycalcs_mapbegin(BABYCALCS *op,time_t dt,int fd)
 {
 	const size_t	msize = op->shmsize ;
-	const int	mprot = PROT_READ | PROT_WRITE ;
-	const int	mflags = MAP_SHARED ;
+	cint	mprot = PROT_READ | PROT_WRITE ;
+	cint	mflags = MAP_SHARED ;
 	int		rs ;
 	int		c = 0 ;
 	void		*md ;
@@ -693,7 +655,7 @@ static int babycalcs_proctxt(BABYCALCS *op,vecobj *tlp)
 	if ((rs = cvtdater_start(&cdater,0)) >= 0) {
 	    USTAT	sb ;
 	    bfile	txtfile, *tfp = &txtfile ;
-	    const int	llen = LINEBUFLEN ;
+	    cint	llen = LINEBUFLEN ;
 	    int		len ;
 	    int		ll ;
 	    cchar	*tp, *lp ;
@@ -760,7 +722,7 @@ static int babycalcs_proctxtline(BABYCALCS *op,vecobj *tlp,CVTDATER *cdp,
 	int		rs = SR_OK ;
 	int		cl ;
 	int		c = 0 ;
-	const char	*cp ;
+	cchar	*cp ;
 
 	if ((cl = nextfield(lbuf,llen,&cp)) > 0) {
 	    time_t	datereq ;
@@ -826,7 +788,7 @@ static int babycalcs_shmwr(BABYCALCS *op,time_t dt,int fd,mode_t om)
 	if ((rs = babycalcs_shmwrer(op,dt,fd,om,&hf)) >= 0) {
 	    foff = rs ;
 	    if ((rs = u_rewind(fd)) >= 0) {
-		const int	hlen = HDRBUFLEN ;
+		cint	hlen = HDRBUFLEN ;
 		char		hbuf[HDRBUFLEN+1] ;
 
 	        if ((rs = babiesfu(&hf,0,hbuf,hlen)) >= 0) {
@@ -848,12 +810,12 @@ static int babycalcs_shmwrer(BABYCALCS *op,time_t dt,int fd,mode_t om,
 		BABIESFU *hfp)
 {
 	FILER		babyfile ;
-	const int	bsize = op->pagesize ;
+	cint	bsize = op->pagesize ;
 	int		rs ;
 	int		rs1 ;
 	int		foff = 0 ;
 	if ((rs = filer_start(&babyfile,fd,0,bsize,0)) >= 0) {
-	    const int	hlen = HDRBUFLEN ;
+	    cint	hlen = HDRBUFLEN ;
 	    int		bl ;
 	    char	hbuf[HDRBUFLEN + 1] ;
 
@@ -926,7 +888,7 @@ static int babycalcs_mutexinit(BABYCALCS *op)
 	memset(mp,0,sizeof(PTM)) ;
 
 	if ((rs = ptma_create(&ma)) >= 0) {
-	    const int	cmd = PTHREAD_PROCESS_SHARED ;
+	    cint	cmd = PTHREAD_PROCESS_SHARED ;
 	    if ((rs = ptma_setpshared(&ma,cmd)) >= 0) {
 	        rs = ptm_create(mp,&ma) ;
 	    }
@@ -940,7 +902,7 @@ static int babycalcs_mutexinit(BABYCALCS *op)
 
 static int babycalcs_openshmwait(BABYCALCS *op,cchar *shmname)
 {
-	const int	om = BABYCALCS_PERMS ;
+	cint	om = BABYCALCS_PERMS ;
 	int		rs = SR_OK ;
 	int		oflags = O_RDWR ;
 	int		to = TO_WAITSHM ;
@@ -1270,8 +1232,8 @@ static int babycalcs_dbwait(BABYCALCS *op,time_t dt,USTAT *sbp)
 
 static int babycalcs_reloadshm(BABYCALCS *op,time_t dt,USTAT *sbp)
 {
-	const mode_t	om = BABYCALCS_PERMS ;
-	const int	oflags = O_RDWR ;
+	cmode	om = BABYCALCS_PERMS ;
+	cint	oflags = O_RDWR ;
 	int		rs ;
 	int		rs1 ;
 	int		c = 0 ;
@@ -1282,7 +1244,7 @@ static int babycalcs_reloadshm(BABYCALCS *op,time_t dt,USTAT *sbp)
 
 	if ((rs = uc_openshm(op->shmname,oflags,om)) >= 0) {
 	    SIGBLOCK	sb ;
-	    const int	fd = rs ;
+	    cint	fd = rs ;
 	    int		neo = op->nentries ;
 	    int		mapsize = op->mapsize ;
 	    int		mapextent ;
@@ -1370,7 +1332,7 @@ static int babycalcs_shmupdate(BABYCALCS *op,time_t dt,USTAT *sbp,int fd)
 
 	if ((rs = babycalcs_loadtxt(op)) >= 0) {
 	    uint	*hwp ;
-	    const int	es = sizeof(BABYCALCS_ENT) ;
+	    cint	es = sizeof(BABYCALCS_ENT) ;
 	    int		nen = op->nentries ;
 	    int		neo = op->nentries ;
 	    int		tblsize ;
@@ -1433,7 +1395,7 @@ static int babycalcs_shmaddwrite(BABYCALCS *op,int fd)
 {
 	off_t	tbloff ;
 	uint		*hwp ;
-	const int	es = sizeof(BABYCALCS_ENT) ;
+	cint	es = sizeof(BABYCALCS_ENT) ;
 	int		rs ;
 	int		tblsize ;
 	int		shmsize = 0 ;
@@ -1520,7 +1482,7 @@ static int babycalcs_shmaccess(BABYCALCS *op,time_t dt)
 
 static int mkshmname(char *shmbuf,cchar *fp,int fl,cchar *dp,int dl)
 {
-	const int	shmlen = SHMNAMELEN ;
+	cint	shmlen = SHMNAMELEN ;
 	int		rs = SR_OK ;
 	int		ml ;
 	int		i = 0 ;

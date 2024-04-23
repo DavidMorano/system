@@ -57,25 +57,25 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkpath4(char *,const char *,const char *,const char *,
-			const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
+extern int	sncpy3(char *,int,cchar *,cchar *,cchar *) ;
+extern int	snwcpy(char *,int,cchar *,int) ;
+extern int	mkpath1(char *,cchar *) ;
+extern int	mkpath1w(char *,cchar *,int) ;
+extern int	mkpath2(char *,cchar *,cchar *) ;
+extern int	mkpath3(char *,cchar *,cchar *,cchar *) ;
+extern int	mkpath4(char *,cchar *,cchar *,cchar *,
+			cchar *) ;
+extern int	mkfnamesuf1(char *,cchar *,cchar *) ;
+extern int	nleadstr(cchar *,cchar *,int) ;
 extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
+extern int	mkpr(char *,int,cchar *,cchar *) ;
+extern int	pathclean(char *,cchar *,int) ;
 
 #if	CF_DEBUGS
-extern int	debugprintf(const char *,...) ;
+extern int	debugprintf(cchar *,...) ;
 #endif
 
-extern char	*strwcpy(char *,const char *,int) ;
+extern char	*strwcpy(char *,cchar *,int) ;
 
 
 /* local structures */
@@ -83,9 +83,9 @@ extern char	*strwcpy(char *,const char *,int) ;
 
 /* forward references */
 
-static int	varmk_objloadbegin(VARMK *,const char *,const char *) ;
+static int	varmk_objloadbegin(VARMK *,cchar *,cchar *) ;
 static int	varmk_objloadend(VARMK *) ;
-static int	varmk_loadcalls(VARMK *,const char *) ;
+static int	varmk_loadcalls(VARMK *,cchar *) ;
 
 static int	isrequired(int) ;
 
@@ -95,7 +95,7 @@ static int	isrequired(int) ;
 
 /* local variables */
 
-static const char	*subs[] = {
+static cchar	*subs[] = {
 	"open",
 	"addvar",
 	"abort",
@@ -121,7 +121,7 @@ enum subs {
 
 int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	int		rs ;
-	const char	*objname = VARMK_OBJNAME ;
+	cchar	*objname = VARMK_OBJNAME ;
 	char		dn[MAXHOSTNAMELEN+1] ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -136,8 +136,8 @@ int varmk_open(VARMK *op,cchar *dbname,int of,mode_t om,int n) noex {
 	memset(op,0,sizeof(VARMK)) ;
 
 	if ((rs = getnodedomain(NULL,dn)) >= 0) {
-	    const int	prlen = MAXPATHLEN ;
-	    const char	*pn = VARPRLOCAL ;
+	    cint	prlen = MAXPATHLEN ;
+	    cchar	*pn = VARPRLOCAL ;
 	    char	prbuf[MAXPATHLEN+1] ;
 	    if ((rs = mkpr(prbuf,prlen,pn,dn)) >= 0) {
 	        if ((rs = varmk_objloadbegin(op,prbuf,objname)) >= 0) {
@@ -246,8 +246,8 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+	cint	n = nelem(subs) ;
+	cint	vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
@@ -256,11 +256,11 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname)
 #endif
 
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	snl = SYMNAMELEN ;
+	    cint	snl = SYMNAMELEN ;
 	    int		i ;
 	    int		f_modload = FALSE ;
-	    const char	**sv ;
-	    const char	*on = objname ;
+	    cchar	**sv ;
+	    cchar	*on = objname ;
 	    char	snb[SYMNAMELEN + 1] ;
 
 	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
@@ -274,8 +274,8 @@ static int varmk_objloadbegin(VARMK *op,cchar *pr,cchar *objname)
 
 	    if (rs >= 0) {
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*mn = VARMK_MODBNAME ;
-	            const char	*on = objname ;
+	            cchar	*mn = VARMK_MODBNAME ;
+	            cchar	*on = objname ;
 	            int		mo = 0 ;
 	            mo |= MODLOAD_OLIBVAR ;
 	            mo |= MODLOAD_OPRS ;
@@ -340,17 +340,14 @@ static int varmk_objloadend(VARMK *op)
 }
 /* end subroutine (varmk_objloadend) */
 
-
-static int varmk_loadcalls(VARMK *op,cchar soname[])
-{
-	MODLOAD		*lp = &op->loader ;
+static int varmk_loadcalls(VARMK *op,cchar *soname) noex {
+	modload		*lp = &op->loader ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
 	char		symname[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (int i = 0 ; subs[i] != NULL ; i += 1) {
 
 	    if ((rs = sncpy3(symname,SYMNAMELEN,soname,"_",subs[i])) >= 0) {
 	        if ((rs = modload_getsym(lp,symname,&snp)) == SR_NOTFOUND) {
@@ -374,12 +371,12 @@ static int varmk_loadcalls(VARMK *op,cchar soname[])
 
 	        case sub_open:
 	            op->call.open = (int (*)(void *,
-	                const char *,int,mode_t,int)) snp ;
+	                cchar *,int,mode_t,int)) snp ;
 	            break ;
 
 	        case sub_addvar:
-	            op->call.addvar = (int (*)(void *,const char *,
-	                const char *,int)) snp ;
+	            op->call.addvar = (int (*)(void *,cchar *,
+	                cchar *,int)) snp ;
 	            break ;
 
 	        case sub_abort:

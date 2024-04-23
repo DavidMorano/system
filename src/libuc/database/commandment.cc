@@ -434,7 +434,7 @@ static int commandment_objloadbegin(COMMANDMENT *op,cchar *pr,cchar *objname)
 	    MODLOAD	*lp = &op->loader ;
 	    int		mv[2] ;
 	    if ((rs = modload_getmva(lp,mv,2)) >= 0) {
-		const int	objsize = rs ;
+		cint	objsize = rs ;
 		void		*p ;
 #if	CF_DEBUGS
 		debugprintf("commandment_objloadbegin: "
@@ -475,8 +475,8 @@ static int commandment_objloadbeginer(COMMANDMENT *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+	cint	n = nelem(subs) ;
+	cint	vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
@@ -485,7 +485,7 @@ static int commandment_objloadbeginer(COMMANDMENT *op,cchar *pr,cchar *objname)
 #endif
 
 	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
+	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
 	    int		f_modload = FALSE ;
 	    char	nbuf[SYMNAMELEN + 1] ;
@@ -502,7 +502,7 @@ static int commandment_objloadbeginer(COMMANDMENT *op,cchar *pr,cchar *objname)
 	    if (rs >= 0) {
 		cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
+	            cint	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 	            cchar	*modbname = COMMANDMENT_MODBNAME ;
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		    f_modload = (rs >= 0)  ;
@@ -547,12 +547,12 @@ static int commandment_objloadend(COMMANDMENT *op)
 static int commandment_loadcalls(COMMANDMENT *op,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp = NULL ;
+	cvoid	*snp = NULL ;
 
 #if	CF_DEBUGS
 	debugprintf("commandment_loadcalls: ent objname=%s\n",objname) ;

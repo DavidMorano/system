@@ -1,10 +1,10 @@
-/* babycalc */
+/* babycalc SUPPORT */
+/* lang=C++20 */
 
 /* object load management for the BABYCALCS object */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-
 
 /* revision history:
 
@@ -17,27 +17,20 @@
 
 /*******************************************************************************
 
-        This module implements an interface (a trivial one) that provides access
-        to the BABYCALC object (which is dynamically loaded).
-
+	This module implements an interface (a trivial one) that
+	provides access to the BABYCALC object (which is dynamically
+	loaded).
 
 *******************************************************************************/
 
-
-#define	BABYCALC_MASTER		0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<dlfcn.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
@@ -65,35 +58,17 @@
 
 /* external subroutines */
 
-extern int	snwcpy(char *,int,const char *,int) ;
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-extern int	mkpath1(char *,const char *) ;
-extern int	mkpath1w(char *,const char *,int) ;
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	mkfnamesuf1(char *,const char *,const char *) ;
-extern int	nleadstr(const char *,const char *,int) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	mkpr(char *,int,const char *,const char *) ;
-extern int	pathclean(char *,const char *,int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-#endif
-
-extern char	*strwcpy(char *,const char *,int) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	babycalc_objloadbegin(BABYCALC *,const char *,const char *) ;
-static int	babycalc_objloadend(BABYCALC *) ;
-static int	babycalc_loadcalls(BABYCALC *,const char *) ;
+static int	babycalc_objloadbegin(BABYCALC *,cchar *,cchar *) noex ;
+static int	babycalc_objloadend(BABYCALC *) noex ;
+static int	babycalc_loadcalls(BABYCALC *,cchar *) noex ;
 
-static int	isrequired(int) ;
+static bool	isrequired(int) noex ;
 
 
 /* global variables */
@@ -126,7 +101,7 @@ enum subs {
 int babycalc_open(BABYCALC *op,cchar *pr,cchar *dbname)
 {
 	int		rs ;
-	const char	*objname = BABYCALC_OBJNAME ;
+	cchar	*objname = BABYCALC_OBJNAME ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (pr == NULL) return SR_FAULT ;
@@ -245,7 +220,7 @@ static int babycalc_objloadbegin(BABYCALC *op,cchar *pr,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
 	VECSTR		syms ;
-	const int	n = nelem(subs) ;
+	cint	n = nelem(subs) ;
 	int		rs ;
 	int		rs1 ;
 	int		opts ;
@@ -257,9 +232,9 @@ static int babycalc_objloadbegin(BABYCALC *op,cchar *pr,cchar *objname)
 
 	opts = VECSTR_OCOMPACT ;
 	if ((rs = vecstr_start(&syms,n,opts)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
+	    cint	nlen = SYMNAMELEN ;
 	    int		i ;
-	    int		f_modload = FALSE ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN+1] ;
 
 	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
@@ -274,7 +249,7 @@ static int babycalc_objloadbegin(BABYCALC *op,cchar *pr,cchar *objname)
 	    if (rs >= 0) {
 	        cchar	**sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = BABYCALC_MODBNAME ;
+	            cchar	*modbname = BABYCALC_MODBNAME ;
 	            opts = (MODLOAD_OLIBVAR | MODLOAD_OPRS | MODLOAD_OSDIRS) ;
 	            rs = modload_open(lp,pr,modbname,objname,opts,sv) ;
 		    f_modload = (rs >= 0) ;
@@ -305,8 +280,9 @@ static int babycalc_objloadbegin(BABYCALC *op,cchar *pr,cchar *objname)
 	    	    op->obj = NULL ;
 		}
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 		modload_close(lp) ;
+	    }
 	} /* end if (modload-open) */
 
 	return rs ;
@@ -336,12 +312,12 @@ static int babycalc_objloadend(BABYCALC *op)
 static int babycalc_loadcalls(BABYCALC *op,cchar *objname)
 {
 	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+	cint	nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
 	for (i = 0 ; subs[i] != NULL ; i += 1) {
 
@@ -364,32 +340,24 @@ static int babycalc_loadcalls(BABYCALC *op,cchar *objname)
 
 	        c += 1 ;
 		switch (i) {
-
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
-
 		case sub_check:
 		    op->call.check = (int (*)(void *,time_t)) snp ;
 		    break ;
-
 		case sub_lookup:
 		    op->call.lookup = (int (*)(void *,time_t,uint *)) snp ;
 		    break ;
-
 		case sub_info:
 		    op->call.info = (int (*)(void *,BABYCALCS_INFO *)) snp ;
 		    break ;
-
 		case sub_close:
 		    op->call.close = (int (*)(void *)) snp ;
 		    break ;
-
 		} /* end switch */
-
 	    } /* end if (it had the call) */
-
 	} /* end for (subs) */
 
 #if	CF_DEBUGS
@@ -400,17 +368,15 @@ static int babycalc_loadcalls(BABYCALC *op,cchar *objname)
 }
 /* end subroutine (babycalc_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int	f = FALSE ;
+static bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_check:
 	case sub_lookup:
 	case sub_info:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;

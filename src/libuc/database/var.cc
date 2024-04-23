@@ -567,17 +567,14 @@ static int var_objloadend(VAR *op)
 }
 /* end subroutine (var_objloadend) */
 
-
-static int var_loadcalls(VAR *op,cchar objname[])
-{
-	MODLOAD		*lp = &op->loader ;
+static int var_loadcalls(VAR *op,cchar *objname) noex {
+	modload		*lp = &op->loader ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
 	char		symname[SYMNAMELEN + 1] ;
-	const void	*snp ;
+	cvoid	*snp ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (int i = 0 ; subs[i] != NULL ; i += 1) {
 
 	    if ((rs = sncpy3(symname,SYMNAMELEN,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,symname,&snp)) == SR_NOTFOUND) {

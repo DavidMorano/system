@@ -215,86 +215,73 @@ int uuname_count(uuname *op) noex {
 /* end subroutine (uuname_count) */
 
 int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
-	int		rs = SR_NOSYS ;
-	void		*p ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	memclear(curp) ;
-
-	if (op->call.curbegin != nullptr) {
-	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
-	        curp->scp = p ;
-	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
-	            curp->magic = UUNAME_MAGIC ;
-	        }
-	        if (rs < 0) {
-		    uc_free(curp->scp) ;
-		    curp->scp = nullptr ;
-	        }
-	    } /* end if (m-a) */
-	} /* end if (have SO method) */
-
+	int		rs ;
+	if ((rs = uuname_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    if (op->call.curbegin != nullptr) {
+	        void		*p ;
+	        if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
+	            curp->scp = p ;
+	            if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
+	                curp->magic = UUNAME_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        uc_free(curp->scp) ;
+		        curp->scp = nullptr ;
+	            }
+	        } /* end if (m-a) */
+	    } /* end if (have SO method) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_curbegin) */
 
 int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
-	int		rs = SR_NOSYS ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	if (curp->scp == nullptr) return SR_BADFMT ;
-
-	if (op->call.curend != nullptr) {
-	    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = uc_free(curp->scp) ;
-	if (rs >= 0) rs = rs1 ;
-	curp->scp = nullptr ;
-
-	curp->magic = 0 ;
+	if ((rs = uuname_magic(op,curp)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic == UUNAME_MAGIC) {
+		rs = SR_BUGCHECK ;
+	        if (curp->scp) {
+		    rs = SR_OK ;
+	            if (op->call.curend != nullptr) {
+	                rs1 = (*op->call.curend)(op->obj,curp->scp) ;
+	                if (rs >= 0) rs = rs1 ;
+	            }
+	            {
+	                rs1 = uc_free(curp->scp) ;
+	                if (rs >= 0) rs = rs1 ;
+	                curp->scp = nullptr ;
+	            }
+		} /* end if (cursor) */
+	        curp->magic = 0 ;
+	    } /* end if (cursor-magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_curend) */
 
 int uuname_exists(uuname *op,cchar *sp,int sl) noex {
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	rs = (*op->call.exists)(op->obj,sp,sl) ;
-
+	if ((rs = uuname_magic(op)) >= 0) {
+	    rs = (*op->call.exists)(op->obj,sp,sl) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_exists) */
 
 int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-	if (rbuf == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-	if (curp->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.enumerate != nullptr) {
-	    rs = (*op->call.enumerate)(op->obj,curp->scp,rbuf,rlen) ;
-	}
-
+	int		rs ;
+	if ((rs = uuname_magic(op,curp,rbuf)) >= 0) {
+	    rs = SR_NOTOPEN ;
+	    if (curp->magic) {
+		rs = SR_NOSYS ;
+	        if (op->call.enumerate != nullptr) {
+	            rs = (*op->call.enumerate)(op->obj,curp->scp,rbuf,rlen) ;
+	        }
+	    } /* end if (cursor-magic) */
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_enum) */
@@ -304,7 +291,6 @@ int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 
 static int uuname_objloadbegin(uuname *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
-
 	if ((rs = uuname_objloadbeginer(op,pr,objname)) >= 0) {
 	    modload	*lp = op->loader ;
 	    if ((rs = modload_getmv(lp,0)) >= 0) {
@@ -319,10 +305,10 @@ static int uuname_objloadbegin(uuname *op,cchar *pr,cchar *objname) noex {
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (getmv) */
-	    if (rs < 0)
+	    if (rs < 0) {
 		modload_close(lp) ;
+	    }
 	} /* end if (ok) */
-
 	return rs ;
 }
 /* end subroutine (uuname_objloadbegin) */
@@ -334,12 +320,10 @@ static int uuname_objloadbeginer(uuname *op,cchar *pr,cchar *objname) noex {
 	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
-
 	if ((rs = vecstr_start(&syms,ne,vo)) >= 0) {
 	    cint	nlen = SYMNAMELEN ;
 	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
-
 	    for (int i = 0 ; (i < ne) && subs[i] ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
@@ -348,7 +332,6 @@ static int uuname_objloadbeginer(uuname *op,cchar *pr,cchar *objname) noex {
 		}
 		if (rs < 0) break ;
 	    } /* end for */
-
 	    if (rs >= 0) {
 		mainv	sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
@@ -358,14 +341,12 @@ static int uuname_objloadbeginer(uuname *op,cchar *pr,cchar *objname) noex {
 		    f_modload = (rs >= 0)  ;
 		}
 	    }
-
 	    rs1 = vecstr_finish(&syms) ;
 	    if (rs >= 0) rs = rs1 ;
 	    if ((rs < 0) && f_modload) {
 		modload_close(lp) ;
 	    }
-	} /* end if (allocation) */
-
+	} /* end if (vecstr) */
 	return rs ;
 }
 /* end subroutine (uuname_objloadbeginer) */
@@ -373,16 +354,15 @@ static int uuname_objloadbeginer(uuname *op,cchar *pr,cchar *objname) noex {
 static int uuname_objloadend(uuname *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->obj = nullptr ;
 	}
-
-	rs1 = modload_close(op->loader) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op->loader) {
+	    rs1 = modload_close(op->loader) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (uuname_objloadend) */
@@ -391,23 +371,17 @@ static int uuname_loadcalls(uuname *op,cchar *objname) noex {
 	modload		*lp = op->loader ;
 	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	cvoid	*snp = nullptr ;
-
-	for (i = 0 ; subs[i] != nullptr ; i += 1) {
-
+	cvoid		*snp = nullptr ;
+	for (int i = 0 ; (rs >= 0) && subs[i] ; i += 1) {
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
 		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
-
-	    if (rs < 0) break ;
-
-	    if (snp != nullptr) {
+	    if ((rs >= 0) && snp) {
 	        c += 1 ;
 		switch (i) {
 		case sub_open:
@@ -441,9 +415,7 @@ static int uuname_loadcalls(uuname *op,cchar *objname) noex {
 		    break ;
 		} /* end switch */
 	    } /* end if (it had the call) */
-
 	} /* end for (subs) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (uuname_loadcalls) */
