@@ -23,7 +23,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system-types */
 #include	<sys/param.h>
 #include	<ctime>
 #include	<cstddef>		/* |nullptr_t| */
@@ -209,21 +209,32 @@ int grcache_finish(grcache *op) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs = grcache_magic(op)) >= 0) {
+	    vechand	*rlp = op->rlp ;
 	    void	*vp{} ;
-	    for (int i = 0 ; vechand_get(op->rlp,i,&vp) >= 0 ; i += 1) {
-	        if (vp) {
-	            rec		*rp = recp(vp) ;
-	            record_finish(rp) ;
-	            uc_free(rp) ;
-	        }
-	    } /* end while */
 	    {
-	        rs1 = vechand_finish(op->rlp) ;
+	        for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	                rec	*rp = recp(vp) ;
+			{
+	                    rs1 = record_finish(rp) ;
+			    if (rs >= 0) rs = rs1 ;
+			}
+			{
+	                    rs1 = uc_free(rp) ;
+			    if (rs >= 0) rs = rs1 ;
+			}
+	            }
+	        } /* end while */
+	    }
+	    {
+	        rs1 = vechand_finish(rlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    while (cq_rem(op->flp,&vp) >= 0) {
-	        rs1 = uc_free(vp) ;
-	        if (rs >= 0) rs = rs1 ;
+	    {
+	        while (cq_rem(op->flp,&vp) >= 0) {
+	            rs1 = uc_free(vp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end while */
 	    }
 	    {
 	        rs1 = cq_finish(op->flp) ;

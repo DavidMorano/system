@@ -25,8 +25,10 @@
 #include	<ctime>			/* |time(2)| */
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
-#include	<cstring>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
 #include	<vechand.h>
 #include	<cq.h>
 #include	<strwcpy.h>
@@ -37,12 +39,26 @@
 
 /* local defines */
 
+#define	GN		gncache
+
 #define	TO_CHECK	5
+
+
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef gncach_ent	ent ;
+typedef gncach_ent *	entp ;
 
 
 /* external subroutines */
 
-extern int	getgroupname(char *,int,gid_t) ;
+extern int	getgroupname(char *,int,gid_t) noex ;
 
 
 /* local structures */
@@ -62,6 +78,10 @@ struct gncache_rec {
 
 typedef	gncache_rec	rec ;
 typedef	gncache_rec *	recp ;
+
+struct vars {
+	int		groupnamelen ;
+} ;
 
 
 /* forward references */
@@ -114,29 +134,33 @@ static inline int gncache_magic(gncache *op,Args ... args) noex {
 }
 /* end subroutine (gncache_magic) */
 
-static int gncache_searchgid(GNCACHE *,GNCACHE_REC **,gid_t) ;
-static int gncache_newrec(GNCACHE *,time_t,GNCACHE_REC **,gid_t,cchar *) ;
-static int gncache_recaccess(GNCACHE *,GNCACHE_REC *,time_t) ;
-static int gncache_allocrec(GNCACHE *,GNCACHE_REC **) ;
-static int gncache_recfree(GNCACHE *,GNCACHE_REC *) ;
-static int gncache_maintenance(GNCACHE *,time_t) ;
-static int gncache_record(GNCACHE *,int,int) ;
+static int gncache_searchgid(GN *,rec **,gid_t) noex ;
+static int gncache_newrec(GN *,time_t,rec **,gid_t,cc *) noex ;
+static int gncache_recaccess(GN *,rec *,time_t) noex ;
+static int gncache_allocrec(GN *,rec **) noex ;
+static int gncache_recfree(GN *,rec *) noex ;
+static int gncache_maintenance(GN *,time_t) noex ;
+static int gncache_record(GN *,int,int) noex ;
 
 #ifdef	COMMENT
-static int gncache_recdel(GNCACHE *,GNCACHE_REC *) ;
+static int gncache_recdel(GN *,rec *) noex ;
 #endif
 
-static int record_start(GNCACHE_REC *,time_t,gid_t,const char *) ;
-static int record_old(GNCACHE_REC *,time_t,int) ;
-static int record_refresh(GNCACHE_REC *,time_t) ;
-static int record_update(GNCACHE_REC *,time_t,const char *) ;
-static int record_access(GNCACHE_REC *,time_t) ;
-static int record_finish(GNCACHE_REC *) ;
+static int record_start(rec *,time_t,gid_t,cchar *) noex ;
+static int record_old(rec *,time_t,int) noex ;
+static int record_refresh(rec *,time_t) noex ;
+static int record_update(rec *,time_t,cchar *) noex ;
+static int record_access(rec *,time_t) noex ;
+static int record_finish(rec *) noex ;
 
-static int	entry_load(GNCACHE_ENT *,GNCACHE_REC *) ;
+static int	entry_load(ent *,rec *) noex ;
+
+static int mkvars() noex ;
 
 
 /* local variables */
+
+static vars	var ;
 
 
 /* exported variables */
@@ -144,23 +168,26 @@ static int	entry_load(GNCACHE_ENT *,GNCACHE_REC *) ;
 
 /* exported subroutines */
 
-int gncache_start(GNCACHE *op,int nmax,int to) noex {
+int gncache_start(GN *op,int nmax,int to) noex {
 	cint		defnum = GNCACHE_DEFENT ;
 	int		rs ;
 	if ((rs = gncache_ctor(op)) >= 0) {
-	    if (nmax < 4) nmax = GNCACHE_DEFMAX ;
-	    if (to < 1) to = GNCACHE_DEFTTL ;
-	    if ((rs = cq_start(op->flp)) >= 0) {
-	        if ((rs = vechand_start(&op->recs,defnum,0)) >= 0) {
-	            op->nmax = nmax ;
-	            op->ttl = to ;
-	            op->ti_check = time(nullptr) ;
-	            op->magic = GNCACHE_MAGIC ;
-	        }
-	        if (rs < 0) {
-	            cq_finish(op->flp) ;
-	        }
-	    } /* end if (cq-start) */
+	    static int	rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	        if (nmax < 4) nmax = GNCACHE_DEFMAX ;
+	        if (to < 1) to = GNCACHE_DEFTTL ;
+	        if ((rs = cq_start(op->flp)) >= 0) {
+	            if ((rs = vechand_start(&op->recs,defnum,0)) >= 0) {
+	                op->nmax = nmax ;
+	                op->ttl = to ;
+	                op->ti_check = time(nullptr) ;
+	                op->magic = GNCACHE_MAGIC ;
+	            }
+	            if (rs < 0) {
+	                cq_finish(op->flp) ;
+	            }
+	        } /* end if (cq-start) */
+	    } /* end if (mkvars) */
 	    if (rs < 0) {
 		gncache_dtor(op) ;
 	    }
@@ -169,50 +196,49 @@ int gncache_start(GNCACHE *op,int nmax,int to) noex {
 }
 /* end subroutine (gncache_start) */
 
-
-int gncache_finish(GNCACHE *op)
-{
-	GNCACHE_REC	*rp ;
-	int		rs = SR_OK ;
+int gncache_finish(GN *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-	void		*vp ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != GNCACHE_MAGIC) return SR_NOTOPEN ;
-
-/* loop freeing up all cache entries */
-
-	for (i = 0 ; vechand_get(&op->recs,i,&rp) >= 0 ; i += 1) {
-	    if (rp == nullptr) continue ;
-	    rs1 = record_finish(rp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(rp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end while */
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vechand_finish(&op->recs) ;
-	if (rs >= 0) rs = rs1 ;
-
-	while (cq_rem(op->flp,&vp) >= 0) {
-	    rs1 = uc_free(vp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = cq_finish(op->flp) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = gncache_magic(op)) >= 0) {
+	    vechand	*rlp = op->rlp ;
+	    void	*vp{} ;
+	    {
+	        for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	                rec	*rp = recp(vp) ;
+	                {
+	                    rs1 = record_finish(rp) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	                {
+	                    rs1 = uc_free(rp) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	            }
+	        } /* end for */
+	    }
+	    {
+	        rs1 = vechand_finish(rlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        while (cq_rem(op->flp,&vp) >= 0) {
+	            rs1 = uc_free(vp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end while */
+	    }
+	    {
+	        rs1 = cq_finish(op->flp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (gncache_finish) */
 
-
-int gncache_add(GNCACHE *op,gid_t gid,cchar gn[])
-{
-	GNCACHE_REC	*rp ;
+int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
+	rec	*rp ;
 	time_t		dt = time(nullptr) ;
 	int		rs = SR_OK ;
 	int		gl = 0 ;
@@ -239,9 +265,9 @@ int gncache_add(GNCACHE *op,gid_t gid,cchar gn[])
 /* end subroutine (gncache_add) */
 
 
-int gncache_lookgid(GNCACHE *op,GNCACHE_ENT *ep,gid_t gid)
+int gncache_lookgid(GN *op,ent *ep,gid_t gid)
 {
-	GNCACHE_REC	*rp ;
+	rec	*rp ;
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		ct ;
@@ -278,9 +304,7 @@ int gncache_lookgid(GNCACHE *op,GNCACHE_ENT *ep,gid_t gid)
 }
 /* end subroutine (gncache_lookgid) */
 
-
-int gncache_stats(GNCACHE *op,GNCACHE_STATS *sp)
-{
+int gncache_stats(GN *op,gncache_st *sp) noex {
 	int		rs ;
 
 	if (op == nullptr) return SR_FAULT ;
@@ -297,7 +321,7 @@ int gncache_stats(GNCACHE *op,GNCACHE_STATS *sp)
 /* end subroutine (gncache_stats) */
 
 
-int gncache_check(GNCACHE *op,time_t dt)
+int gncache_check(GN *op,time_t dt)
 {
 	int		rs = SR_OK ;
 	int		f = false ;
@@ -322,9 +346,9 @@ int gncache_check(GNCACHE *op,time_t dt)
 
 /* private subroutines */
 
-static int gncache_newrec(GNCACHE *op,time_t dt,GNCACHE_REC **rpp,gid_t gid,
+static int gncache_newrec(GN *op,time_t dt,rec **rpp,gid_t gid,
 		cchar *gn) noex {
-	GNCACHE_REC	*rp{} ;
+	rec	*rp{} ;
 	int		rs ;
 	int		gl = 0 ;
 	if ((rs = gncache_allocrec(op,&rp)) >= 0) {
@@ -346,7 +370,7 @@ static int gncache_newrec(GNCACHE *op,time_t dt,GNCACHE_REC **rpp,gid_t gid,
 }
 /* end subroutine (gncache_newrec) */
 
-static int gncache_recaccess(GNCACHE *op,GNCACHE_REC *rp,time_t dt) noex {
+static int gncache_recaccess(GN *op,rec *rp,time_t dt) noex {
 	int		rs ;
 	int		gl = 0 ;
 	if ((rs = record_old(rp,dt,op->ttl)) > 0) {
@@ -360,7 +384,7 @@ static int gncache_recaccess(GNCACHE *op,GNCACHE_REC *rp,time_t dt) noex {
 }
 /* end subroutine (gncache_recaccess) */
 
-static int gncache_searchgid(GNCACHE *op,GNCACHE_REC **rpp,gid_t gid) noex {
+static int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
 	vechand		*rlp = op->rlp ;
 	int		rs = SR_OK ;
 	int		gl = 0 ;
@@ -376,9 +400,9 @@ static int gncache_searchgid(GNCACHE *op,GNCACHE_REC **rpp,gid_t gid) noex {
 }
 /* end subroutine (gncache_searchgid) */
 
-static int gncache_maintenance(GNCACHE *op,time_t dt) noex {
+static int gncache_maintenance(GN *op,time_t dt) noex {
 	vechand		*rlp = op->rlp ;
-	GNCACHE_REC	*rp ;
+	rec	*rp ;
 	time_t		ti_oldest = TIME_MAX ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -414,8 +438,8 @@ static int gncache_maintenance(GNCACHE *op,time_t dt) noex {
 }
 /* end subroutine (gncache_maintenance) */
 
-static int gncache_allocrec(GNCACHE *op,GNCACHE_REC **rpp) noex {
-	cint		sz = sizeof(GNCACHE_REC) ;
+static int gncache_allocrec(GN *op,rec **rpp) noex {
+	cint		sz = sizeof(rec) ;
 	int		rs ;
 	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
 	    void	*vp ;
@@ -427,7 +451,7 @@ static int gncache_allocrec(GNCACHE *op,GNCACHE_REC **rpp) noex {
 /* end subroutine (gncache_allocrec) */
 
 #ifdef	COMMENT
-static int gncache_recdel(GNCACHE *op,GNCACHE_REC *ep) noex {
+static int gncache_recdel(GN *op,rec *ep) noex {
 	int		rs ;
 	int		rs1 ;
 	if ((rs1 = vechand_ent(&op->db,ep)) >= 0) {
@@ -443,7 +467,7 @@ static int gncache_recdel(GNCACHE *op,GNCACHE_REC *ep) noex {
 /* end subroutine (gncache_recdel) */
 #endif /* COMMENT */
 
-static int gncache_recfree(GNCACHE *op,GNCACHE_REC *rp) noex {
+static int gncache_recfree(GN *op,rec *rp) noex {
 	int		rs = SR_OK ;
 	int		n = cq_count(op->flp) ;
 	if (n < GNCACHE_MAXFREE) {
@@ -458,7 +482,7 @@ static int gncache_recfree(GNCACHE *op,GNCACHE_REC *rp) noex {
 }
 /* end subroutine (gncache_recfree) */
 
-static int gncache_record(GNCACHE *op,int ct,int rs) noex {
+static int gncache_record(GN *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
 	switch (ct) {
 	case ct_hit:
@@ -474,7 +498,7 @@ static int gncache_record(GNCACHE *op,int ct,int rs) noex {
 }
 /* end subroutine (gncache_record) */
 
-static int record_start(GNCACHE_REC *rp,time_t dt,gid_t gid,cchar *gn) noex {
+static int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
 	int		rs = SR_FAULT OK ;
 	int		gl = 0 ;
 	if (rp && gn) {
@@ -492,7 +516,7 @@ static int record_start(GNCACHE_REC *rp,time_t dt,gid_t gid,cchar *gn) noex {
 }
 /* end subroutine (record_start) */
 
-static int record_finish(GNCACHE_REC *rp) noex {
+static int record_finish(rec *rp) noex {
 	int		rs = SR_FAULT ;
 	if (rp) {
 	    rs = SR_OK ;
@@ -503,7 +527,7 @@ static int record_finish(GNCACHE_REC *rp) noex {
 }
 /* end subroutine (record_finish) */
 
-static int record_old(GNCACHE_REC *rp,time_t dt,int ttl) noex {
+static int record_old(rec *rp,time_t dt,int ttl) noex {
 	int		rs = SR_FAULT ;
 	int		f = false ;
 	if (rp) {
@@ -514,7 +538,7 @@ static int record_old(GNCACHE_REC *rp,time_t dt,int ttl) noex {
 }
 /* end subroutine (record_old) */
 
-static int record_refresh(GNCACHE_REC *rp,time_t dt) noex {
+static int record_refresh(rec *rp,time_t dt) noex {
 	int		rs ;
 	int		gl = 0 ;
 	char		gn[GROUPNAMELEN + 1] ;
@@ -526,7 +550,7 @@ static int record_refresh(GNCACHE_REC *rp,time_t dt) noex {
 }
 /* end subroutine (record_refresh) */
 
-static int record_update(GNCACHE_REC *rp,time_t dt,cchar *gn) noex {
+static int record_update(rec *rp,time_t dt,cchar *gn) noex {
 	int		rs = SR_FAULT ;
 	int		f_changed = false ;
 	if (rp) {
@@ -541,16 +565,14 @@ static int record_update(GNCACHE_REC *rp,time_t dt,cchar *gn) noex {
 }
 /* end subroutine (record_update) */
 
-static int record_access(GNCACHE_REC *rp,time_t dt) noex {
-{
-	int		gl ;
+static int record_access(rec *rp,time_t dt) noex {
+	cint		gl = strlen(rp->gn) ;
 	rp->ti_access = dt ;
-	gl = strlen(rp->gn) ;
 	return gl ;
 }
 /* end subroutine (record_access) */
 
-static int entry_load(GNCACHE_ENT *ep,GNCACHE_REC *rp) noex {
+static int entry_load(ent *ep,rec *rp) noex {
 	cint		gnl = GROUPNAMELEN ;
 	int		gl ;
 	ep->gid = rp->gid ;
@@ -558,5 +580,14 @@ static int entry_load(GNCACHE_ENT *ep,GNCACHE_REC *rp) noex {
 	return gl ;
 }
 /* end subroutine (entry_load) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_gn)) >= 0) {
+	    var.groupnamelen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
