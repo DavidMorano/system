@@ -31,13 +31,10 @@ struct sif {
 	int		sl ;
 	int		sch = 0 ;
 	sif(cchar *p) noex : sp(p) {
-	    sl = strlen(sp) ;
+	    sl = -1 ;
 	} ;
-	sif(cchar *p,int l,int c = 0) noex : sp(p), sl(l), sch(c) { 
-	    if (sl < 0) sl = strlen(sp) ;
-	} ;
+	sif(cchar *p,int l,int c = 0) noex : sp(p), sl(l), sch(c) { } ;
 	sif(cchar *p,int l,cchar *s) noex : sp(p), sl(l) { 
-	    if (sl < 0) sl = strlen(sp) ;
 	    sstr = s ;
 	} ;
 	int next(cchar **) noex ;

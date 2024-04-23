@@ -35,6 +35,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
@@ -79,10 +80,11 @@ int sif::operator () (cchar **rpp) noex {
 	if (sp && rpp) {
 	    rs = SR_OK ;
 	    if (sstr) {
-		rl = brk(rpp) ;
+		rl = nextbrk(rpp) ;
 	    } else if (sch) {
-		rl = chr(rpp) ;
+		rl = nextchr(rpp) ;
 	    } else {
+		if (sl < 0) sl = strlen(sp) ;
 		if ((rl = sfnext(sp,sl,&rp)) > 0) {
 		    sl -= ((rp + rl) - sp) ;
 		    sp = (rp + rl) ;
@@ -100,6 +102,7 @@ int sif::next(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    if ((rl = sfnext(sp,sl,&rp)) > 0) {
 		sl -= ((rp + rl) - sp) ;
 		sp = (rp + rl) ;
@@ -116,6 +119,7 @@ int sif::nextchr(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
 	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
 		    rl = sfshrink(sp,(tp-sp),&rp) ;
@@ -135,6 +139,7 @@ int sif::nextbrk(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
 	        if (cchar *tp ; (tp = strnpbrk(sp,sl,sstr)) != nullptr) {
 		    rl = sfshrink(sp,(tp-sp),&rp) ;
@@ -154,6 +159,7 @@ int sif::chr(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
 		rp = sp ;
 		rl = (tp - sp) ;
@@ -172,6 +178,7 @@ int sif::brk(cchar **rpp) noex {
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
 	    if (cchar *tp ; (tp = strnpbrk(sp,sl,sstr)) != nullptr) {
 		rp = sp ;
 		rl = (tp - sp) ;

@@ -42,6 +42,7 @@
 #include	<spawnproc.h>
 #include	<getprogroot.h>
 #include	<storebuf.h>
+#include	<sbuf.h>
 #include	<ids.h>
 #include	<mkdirs.h>
 #include	<xperm.h>
@@ -56,6 +57,7 @@
 #include	<mkpathx.h>
 #include	<pathadd.h>
 #include	<pathclean.h>
+#include	<sif.hh>
 #include	<strwcpy.h>
 #include	<char.h>
 #include	<isnot.h>
@@ -284,7 +286,7 @@ static int	uunames_indmapcreate(UU *,cchar *,time_t) noex ;
 static int	uunames_indmapdestroy(UU *) noex ;
 static int	uunames_filemapcreate(UU *,time_t) noex ;
 static int	uunames_filemapdestroy(UU *) noex ;
-static int	uunames_indmk(UU *,cchar *,time_t) noex ;
+static int	uunames_indfn(UU *,cchar *,time_t) noex ;
 static int	uunames_indlist(UU *) noex ;
 static int	uunames_indcheck(UU *,time_t) noex ;
 
@@ -733,7 +735,7 @@ static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 
 	if (((rs < 0) && (rs != SR_NOMEM)) || (! f_ok)) {
 	    f_mk = true ;
-	    rs = uunames_indmk(op,dname,dt) ;
+	    rs = uunames_indfn(op,dname,dt) ;
 	}
 
 	if (rs >= 0) {
@@ -742,8 +744,7 @@ static int uunames_indopendname(UU *op,cchar *dname,time_t dt) noex {
 	}
 
 	if ((rs < 0) && (rs != SR_BADFMT) && (! f_mk)) {
-	    rs = uunames_indmk(op,dname,dt) ;
-	    if (rs >= 0) {
+	    if ((rs = uunames_indfn(op,dname,dt)) >= 0) {
 		rs = uunames_indmapcreate(op,indname,dt) ;
 	        op->f.varind = (rs >= 0) ;
 	    }
@@ -790,19 +791,25 @@ ret0:
 }
 /* end subroutine (uunames_indtest) */
 
-static int uunames_indmk(UU *op,cchar *dname,time_t) noex {
+static int uunames_indfn(UU *op,cchar *dname,time_t) noex {
 	int		rs ;
-	int		c = 0 ;
-	char		indname[MAXPATHLEN + 1] ;
-	if ((rs = checkdname(dname)) == SR_NOENT) {
-	    rs = mkdirs(dname,TMPDMODE) ;
-	}
-	if (rs >= 0) {
-	    rs = mkpath2(indname,dname,op->dbname) ;
-	}
-	return (rs >= 0) ? c : rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	char		*indname{} ;
+	if ((rs = malloc_mp(&indname)) >= 0) {
+	    if ((rs = checkdname(dname)) == SR_NOENT) {
+	        rs = mkdirs(dname,TMPDMODE) ;
+	    }
+	    if (rs >= 0) {
+	        rs = mkpath2(indname,dname,op->dbname) ;
+		len = rs ;
+	    }
+	    rs1 = uc_free(indname) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
+	return (rs >= 0) ? len : rs ;
 }
-/* end subroutine (uunames_indmk) */
+/* end subroutine (uunames_indfn) */
 
 static int uunames_indclose(UU *op) noex {
 	int		rs = SR_OK ;
@@ -940,96 +947,77 @@ ret0:
 /* end subroutine (uunames_mkuunamesi) */
 
 static int uunames_envpaths(UU *op,vecstr *elp) noex {
-	cint		vo = VECSTR_OORDERED ;
 	vecstr		pathcomps ;
-
-	int	rs ;
-	int	i ;
-	int	sz ;
-	int	bl, pl ;
-
-	cchar	*subdname ;
-
-	char	pathbuf[MAXPATHLEN + 1] ;
-	char	*bp = nullptr ;
-	char	*vp ;
-
-
-	rs = vecstr_start(&pathcomps,40,vo) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	for (i = 0 ; envpops[i].name != nullptr ; i += 1) {
-	    cchar	*enp = envpops[i].name ;
-
-	    subdname = envpops[i].sub1dname ;
-	    if ((rs >= 0) && (subdname != nullptr)) {
-
-	        rs = mkpath2(pathbuf,op->pr,subdname) ;
-	        pl = rs ;
-	        if (rs >= 0)
-	            rs = vecstr_add(&pathcomps,pathbuf,pl) ;
-
-	    } /* end if */
-
-	    subdname = envpops[i].sub2dname ;
-	    if ((rs >= 0) && (subdname != nullptr)) {
-
-	        rs = mkpath2(pathbuf,op->pr,subdname) ;
-	        pl = rs ;
-	        if (rs >= 0)
-	            rs = vecstr_add(&pathcomps,pathbuf,pl) ;
-
-	    } /* end if */
-
-	    if ((rs >= 0) && ((vp = getenv(enp)) != nullptr)) {
-	        rs = vecstr_loadpath(&pathcomps,vp) ;
-	    }
-
-	    if (rs >= 0) {
-	        sz = vecstr_strsize(&pathcomps) ;
-	    }
-
-	    if ((rs >= 0) && ((rs = uc_malloc(sz,&bp)) >= 0)) {
-	        if ((rs = mkpathval(&pathcomps,bp,(sz-1))) >= 0) {
-	            bl = rs ;
-	            rs = vecstr_envadd(elp,enp,bp,bl) ;
-		}
-	        uc_free(bp) ;
-	    } /* end if (memory allocation) */
-	    vecstr_delall(&pathcomps) ;
-	    if (rs < 0) break ;
-	} /* end for */
-	vecstr_finish(&pathcomps) ;
-
-ret0:
+	cnullptr	np{} ;
+	cint		vo = VECSTR_OORDERED ;
+	cint		ne = 40 ;
+	int		rs ;
+	int		rs1 ;
+	char		*pbuf{} ;
+	if ((rs = malloc_mp(&pbuf)) >= 0) {
+	    if ((rs = vecstr_start(&pathcomps,ne,vo)) >= 0) {
+	        int	bl ;
+	        int	pl ;
+	        char	*bp = nullptr ;
+	        for (int i = 0 ; envpops[i].name ; i += 1) {
+		    int		sz = 0 ;
+	            cchar	*enp = envpops[i].name ;
+	            cchar	*subdname = envpops[i].sub1dname ;
+	            if ((rs >= 0) && (subdname != nullptr)) {
+	                if ((rs = mkpath(pbuf,op->pr,subdname)) >= 0) {
+	                    pl = rs ;
+	                    rs = vecstr_add(&pathcomps,pbuf,pl) ;
+		        }
+	            } /* end if */
+	            subdname = envpops[i].sub2dname ;
+	            if ((rs >= 0) && (subdname != nullptr)) {
+	                if ((rs = mkpath2(pbuf,op->pr,subdname)) >= 0) {
+	                    pl = rs ;
+	                    rs = vecstr_add(&pathcomps,pbuf,pl) ;
+		        }
+	            } /* end if */
+	            if (cchar *vp ; (rs >= 0) && ((vp = getenv(enp)) != np)) {
+	                rs = vecstr_loadpath(&pathcomps,vp) ;
+	            }
+	            if (rs >= 0) {
+	                rs = vecstr_strsize(&pathcomps) ;
+		        sz = rs ;
+	            }
+	            if ((rs >= 0) && ((rs = uc_malloc((sz+1),&bp)) >= 0)) {
+	                if ((rs = mkpathval(&pathcomps,bp,sz)) >= 0) {
+	                    bl = rs ;
+	                    rs = vecstr_envadd(elp,enp,bp,bl) ;
+		        }
+	                rs1 = uc_free(bp) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (memory allocation) */
+	            vecstr_delall(&pathcomps) ;
+	            if (rs < 0) break ;
+	        } /* end for */
+	        rs1 = vecstr_finish(&pathcomps) ;
+	        if (rs >= 0) rs = rs1 ;
+	    } /* end if (vecstr) */
+	    rs1 = uc_free(pbuf) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (m-a-f) */
 	return rs ;
 }
 /* end subroutine (uunames_envpaths) */
 
 static int uunames_indlist(UU *op) noex {
-	liner	le ;
-	uint	lineoff = 0 ;
-	int	rs = SR_OK ;
-	int	ml ;
-	int	len ;
-	int	n = 0 ;
-
-	cchar	*mp ;
-	cchar	*tp ;
-	cchar	*filemagic = UUNAMES_DBMAGICSTR ;
-
-
-	mp = (cchar *) op->indfmap ;
-	ml = op->indfsize ;
-
+	liner		le ;
+	uint		lineoff = 0 ;
+	int		rs = SR_OK ;
+	int		ml = op->indfsize ;
+	int		n = 0 ;
+	cchar		*mp = charp(op->indfmap) ;
+	cchar		*tp ;
+	cchar		*filemagic = UUNAMES_DBMAGICSTR ;
 	lineoff = 0 ;
 	while ((tp = strnchr(mp,ml,'\n')) != nullptr) {
-
-	    len = ((tp + 1) - mp) ;
+	    cint	len = ((tp + 1) - mp) ;
 	    le.lp = mp ;
 	    le.ll = (len - 1) ;
-
 	    if (lineoff > 0) {
 		if ((le.ll > 0) && (le.lp[0] != '#')) {
 		    n += 1 ;
@@ -1041,11 +1029,9 @@ static int uunames_indlist(UU *op) noex {
 		}
 	    }
 	    if (rs < 0) break ;
-
 	    lineoff += len ;
 	    mp += len ;
 	    ml -= len ;
-
 	} /* end while (processing lines) */
 	return (rs >= 0) ? n : rs ;
 }
@@ -1081,44 +1067,30 @@ static int checkdname(cchar *dname) noex {
 
 #ifdef	COMMENT
 
-static int mkindfname(char *buf,cc *dname,cc *name,cc *suf,cc *end) noex {
-	int	rs = SR_OK ;
-	int	buflen = MAXPATHLEN ;
-	int	dnl = 0 ;
-	int	i = 0 ;
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,dname,-1) ;
-	    i += rs ;
-	    dnl = rs ;
-	}
-
-	if ((rs >= 0) && (dname[dnl - 1] != '/')) {
-	    rs = storebuf_chr(buf,buflen,i,'/') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,name,-1) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_chr(buf,buflen,i,'.') ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,suf,-1) ;
-	    i += rs ;
-	}
-
-	if (rs >= 0) {
-	    rs = storebuf_strw(buf,buflen,i,end,-1) ;
-	    i += rs ;
-	}
-
-	return (rs >= 0) ? i : rs ;
+static int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
+	int		rs ;
+	int		rs1 ;
+	int		len = 0 ;
+	if ((rs = getbufsize(getbufsize_mp)) >= 0) {
+	    sbuf	sb ;
+	    int		dnl = 0 ;
+	    if ((rs = sb.start(rbuf,rs)) >= 0) {
+	        if ((rs = sb.strw(dname,-1)) >= 0) {
+	            dnl = rs ;
+		}
+	        if ((rs >= 0) && (dname[dnl - 1] != '/')) {
+	            rs = sb.chr('/') ;
+	        }
+	        if (rs >= 0) rs = sb.strw(name) ;
+	        if (rs >= 0) rs = sb.chr('.') ;
+	        if (rs >= 0) rs = sb.strw(suf) ;
+	        if (rs >= 0) rs = sb.strw(end) ;
+		rs1 = sb.finish ;
+		if (rs >= 0) rs = rs1 ;
+		len = rs1 ;
+	    } /* end if (sbuf) */
+	} /* end if (getbufsize) */
+	return (rs >= 0) ? len : rs ;
 }
 /* end subroutine (mkindfname) */
 
@@ -1138,43 +1110,27 @@ static int vecstr_defenvs(vecstr *elp,mainv ea) noex {
 /* end subroutine (vecstr_defenvs) */
 
 static int vecstr_loadpath(vecstr *clp,cchar *pp) noex {
-	int		rs = SR_OK ;
+	cint		rsn = SR_NOTFOUND ;
+	int		rs ;
 	int		rs1 ;
-	int		cl ;
 	int		c = 0 ;
-	char		tmpfname[MAXPATHLEN + 1] ;
-	char		*cp ;
-
-	while ((cp = strpbrk(pp,":;")) != nullptr) {
-
-	    cl = pathclean(tmpfname,pp,(cp - pp)) ;
-
-	    rs1 = vecstr_findn(clp,tmpfname,cl) ;
-	    if (rs1 == SR_NOTFOUND) {
-	        c += 1 ;
-		rs = vecstr_add(clp,tmpfname,cl) ;
-	    }
-
-	    if ((rs >= 0) && (cp[0] == ';')) {
-		rs = vecstr_adduniq(clp,";",1) ;
-	    }
-
-	    pp = (cp + 1) ;
-	    if (rs < 0) break ;
-	} /* end while */
-
-	if ((rs >= 0) && (pp[0] != '\0')) {
-
-	    cl = pathclean(tmpfname,pp,-1) ;
-
-	    rs1 = vecstr_findn(clp,tmpfname,cl) ;
-	    if (rs1 == SR_NOTFOUND) {
-	        c += 1 ;
-	        rs = vecstr_add(clp,tmpfname,cl) ;
-	    }
-
+	char		*tbuf{} ;
+	if ((rs = malloc_mp(&tbuf)) >= 0) {
+	    sif		of(pp,-1,":;") ;
+	    int		cl ;
+	    cchar	*cp ;
+	    while ((cl = of(&cp)) > 0) {
+	        if ((rs = pathclean(tbuf,cp,cl)) >= 0) {
+	            if ((rs = vecstr_findn(clp,tbuf,cl)) == rsn) {
+	                c += 1 ;
+		        rs = vecstr_add(clp,tbuf,cl) ;
+	            }
+		} /* end if (pathclean) */
+	        if (rs < 0) break ;
+	    } /* end while */
+	    rs1 = uc_free(tbuf) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (trailing one) */
-
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (vecstr_loadpath) */
