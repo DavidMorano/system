@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int grcache_ctor(grcache *op,Args ... args) noex {
+static int gncache_ctor(gncache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int grcache_ctor(grcache *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (grcache_ctor) */
+/* end subroutine (gncache_ctor) */
 
-static int grcache_dtor(grcache *op) noex {
+static int gncache_dtor(gncache *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (grcache_dtor) */
+/* end subroutine (gncache_dtor) */
 
 template<typename ... Args>
-static inline int grcache_magic(grcache *op,Args ... args) noex {
+static inline int gncache_magic(gncache *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == GRCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == GNCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (grcache_magic) */
+/* end subroutine (gncache_magic) */

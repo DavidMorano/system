@@ -19,14 +19,14 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<unistd.h>
-#include	<fcntl.h>
+#include	<sys/types.h>		/* system-types */
+#include	<time.h>		/* |time_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<vechand.h>
 #include	<cq.h>
-#include	<localmisc.h>		/* |GROUPNAME| */
+#include	<localmisc.h>		/* |GROUPNAMELEN| */
 
 
 #define	GNCACHE			struct gncache_head
@@ -54,8 +54,8 @@ struct gncache_stats {
 } ;
 
 struct gncache_head {
-	cq		recsfree ;
-	vechand		recs ;
+	cq		*flp ;
+	vechand		*rlp ;
 	time_t		ti_check ;
 	GNCACHE_ST	s ;
 	uint		magic ;
