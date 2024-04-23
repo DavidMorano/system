@@ -1,8 +1,9 @@
-/* uuname */
+/* uuname SUPPORT */
+/* lang=C++20 */
 
 /* caller interface to a UUNAME database */
+/* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 
 /* revision history:
 
@@ -15,23 +16,21 @@
 
 /*******************************************************************************
 
-        This module implements an interface (a trivial one) that provides access
-        to the UUNAME object (which is dynamically loaded).
-
+	This module implements an interface (a trivial one) that
+	provides access to the UUNAME object (which is dynamically
+	loaded).
 
 *******************************************************************************/
-
-
-#define	UUNAME_MASTER		0
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<string.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstring>
 #include	<usystem.h>
 #include	<modload.h>
 #include	<vecstr.h>
+#include	<sncpyx.h>
 #include	<localmisc.h>
 
 #include	"uuname.h"
@@ -52,38 +51,24 @@
 
 /* external subroutines */
 
-extern int	sncpy3(char *,int,const char *,const char *,const char *) ;
-
 
 /* local structures */
 
 
 /* forward references */
 
-static int	uuname_objloadbegin(UUNAME *,cchar *,cchar *) ;
-static int	uuname_objloadbeginer(UUNAME *,cchar *,cchar *) ;
-static int	uuname_objloadend(UUNAME *) ;
-static int	uuname_loadcalls(UUNAME *,const char *) ;
+static int	uuname_objloadbegin(uuname *,cchar *,cchar *) noex ;
+static int	uuname_objloadbeginer(uuname *,cchar *,cchar *) noex ;
+static int	uuname_objloadend(uuname *) noex ;
+static int	uuname_loadcalls(uuname *,cchar *) noex ;
 
-static int	isrequired(int) ;
+static bool	isrequired(int) noex ;
 
 
 /* global variables */
 
 
 /* local variables */
-
-static cchar	*subs[] = {
-	"open",
-	"count",
-	"exists",
-	"curbegin",
-	"enum",
-	"curend",
-	"audit",
-	"close",
-	NULL
-} ;
 
 enum subs {
 	sub_open,
@@ -97,48 +82,53 @@ enum subs {
 	sub_overlast
 } ;
 
+constexpr cpcchar	subs[] = {
+	"open",
+	"count",
+	"exists",
+	"curbegin",
+	"enum",
+	"curend",
+	"audit",
+	"close",
+	nullptr
+} ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int uuname_open(UUNAME *op,cchar *pr,cchar *dbname)
-{
-	const char	*objname = UUNAME_OBJNAME ;
+int uuname_open(uuname *op,cchar *pr,cchar *dbname) noex {
+	cchar		*objname = UUNAME_OBJNAME ;
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (dbname == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (dbname == nullptr) return SR_FAULT ;
 
-#ifdef	COMMENT
 	if (dbname[0] == '\0') return SR_INVALID ;
-#endif
 
-	memset(op,0,sizeof(UUNAME)) ;
+	memclear(op) ;
 
 	if ((rs = uuname_objloadbegin(op,pr,objname)) >= 0) {
 	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
 	        op->magic = UUNAME_MAGIC ;
 	    }
-	    if (rs < 0)
+	    if (rs < 0) {
 		uuname_objloadend(op) ;
+	    }
 	} /* end if )uuname_objloadbegin) */
-
-#if	CF_DEBUGS
-	debugprintf("uuname_open: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (uuname_open) */
 
-
-/* free up the entire vector string data structure object */
-int uuname_close(UUNAME *op)
-{
+int uuname_close(uuname *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
@@ -153,16 +143,14 @@ int uuname_close(UUNAME *op)
 }
 /* end subroutine (uuname_close) */
 
-
-int uuname_audit(UUNAME *op)
-{
+int uuname_audit(uuname *op) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.audit != NULL) {
+	if (op->call.audit != nullptr) {
 	    rs = (*op->call.audit)(op->obj) ;
 	}
 
@@ -170,16 +158,14 @@ int uuname_audit(UUNAME *op)
 }
 /* end subroutine (uuname_audit) */
 
-
-int uuname_count(UUNAME *op)
-{
+int uuname_count(uuname *op) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.count != NULL) {
+	if (op->call.count != nullptr) {
 	    rs = (*op->call.count)(op->obj) ;
 	}
 
@@ -187,20 +173,18 @@ int uuname_count(UUNAME *op)
 }
 /* end subroutine (uuname_count) */
 
-
-int uuname_curbegin(UUNAME *op,UUNAME_CUR *curp)
-{
+int uuname_curbegin(uuname *op,UUNAME_CUR *curp) noex {
 	int		rs = SR_NOSYS ;
 	void		*p ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
-	memset(curp,0,sizeof(UUNAME_CUR)) ;
+	memclear(curp) ;
 
-	if (op->call.curbegin != NULL) {
+	if (op->call.curbegin != nullptr) {
 	    if ((rs = uc_malloc(op->cursize,&p)) >= 0) {
 	        curp->scp = p ;
 	        if ((rs = (*op->call.curbegin)(op->obj,curp->scp)) >= 0) {
@@ -208,7 +192,7 @@ int uuname_curbegin(UUNAME *op,UUNAME_CUR *curp)
 	        }
 	        if (rs < 0) {
 		    uc_free(curp->scp) ;
-		    curp->scp = NULL ;
+		    curp->scp = nullptr ;
 	        }
 	    } /* end if (m-a) */
 	} /* end if (have SO method) */
@@ -217,72 +201,56 @@ int uuname_curbegin(UUNAME *op,UUNAME_CUR *curp)
 }
 /* end subroutine (uuname_curbegin) */
 
-
-int uuname_curend(UUNAME *op,UUNAME_CUR *curp)
-{
+int uuname_curend(uuname *op,UUNAME_CUR *curp) noex {
 	int		rs = SR_NOSYS ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
-	if (curp->scp == NULL) return SR_BADFMT ;
+	if (curp->scp == nullptr) return SR_BADFMT ;
 
-	if (op->call.curend != NULL) {
+	if (op->call.curend != nullptr) {
 	    rs1 = (*op->call.curend)(op->obj,curp->scp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	rs1 = uc_free(curp->scp) ;
 	if (rs >= 0) rs = rs1 ;
-	curp->scp = NULL ;
+	curp->scp = nullptr ;
 
 	curp->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (uuname_curend) */
 
-
-/* check for existence */
-int uuname_exists(UUNAME *op,cchar *sp,int sl)
-{
+int uuname_exists(uuname *op,cchar *sp,int sl) noex {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
-#if	CF_DEBUGS
-	debugprintf("uuname_exists: call.exists()\n") ;
-#endif
-
 	rs = (*op->call.exists)(op->obj,sp,sl) ;
-
-#if	CF_DEBUGS
-	debugprintf("uuname_exists: call.exists() rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
 /* end subroutine (uuname_exists) */
 
-
-/* enumerate entries */
-int uuname_enum(UUNAME *op,UUNAME_CUR *curp,char *rbuf,int rlen)
-{
+int uuname_enum(uuname *op,UUNAME_CUR *curp,char *rbuf,int rlen) noex {
 	int		rs = SR_NOSYS ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (curp == NULL) return SR_FAULT ;
-	if (rbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (curp == nullptr) return SR_FAULT ;
+	if (rbuf == nullptr) return SR_FAULT ;
 
 	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 	if (curp->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
 
-	if (op->call.enumerate != NULL) {
+	if (op->call.enumerate != nullptr) {
 	    rs = (*op->call.enumerate)(op->obj,curp->scp,rbuf,rlen) ;
 	}
 
@@ -293,18 +261,11 @@ int uuname_enum(UUNAME *op,UUNAME_CUR *curp,char *rbuf,int rlen)
 
 /* private subroutines */
 
-
-static int uuname_objloadbegin(UUNAME *op,cchar *pr,cchar *objname)
-{
+static int uuname_objloadbegin(uuname *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
 
-#if	CF_DEBUGS
-	debugprintf("uuname_objloadbegin: pr=%s\n",pr) ;
-	debugprintf("uuname_objloadbegin: objname=%s\n",objname) ;
-#endif
-
 	if ((rs = uuname_objloadbeginer(op,pr,objname)) >= 0) {
-	    MODLOAD	*lp = &op->loader ;
+	    modload	*lp = &op->loader ;
 	    if ((rs = modload_getmv(lp,0)) >= 0) {
 		int	objsize = rs ;
 		void	*p ;
@@ -313,7 +274,7 @@ static int uuname_objloadbegin(UUNAME *op,cchar *pr,cchar *objname)
 		    rs = uuname_loadcalls(op,objname) ;
 		    if (rs < 0) {
 			uc_free(op->obj) ;
-			op->obj = NULL ;
+			op->obj = nullptr ;
 		    }
 		} /* end if (memory-allocation) */
 	    } /* end if (getmv) */
@@ -325,23 +286,20 @@ static int uuname_objloadbegin(UUNAME *op,cchar *pr,cchar *objname)
 }
 /* end subroutine (uuname_objloadbegin) */
 
-
-static int uuname_objloadbeginer(UUNAME *op,cchar *pr,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	VECSTR		syms ;
-	const int	n = nelem(subs) ;
-	const int	vo = VECSTR_OCOMPACT ;
+static int uuname_objloadbeginer(uuname *op,cchar *pr,cchar *objname) noex {
+	modload		*lp = &op->loader ;
+	vecstr		syms ;
+	cint		ne = nelem(subs) ;
+	cint		vo = VECSTR_OCOMPACT ;
 	int		rs ;
 	int		rs1 ;
 
-	if ((rs = vecstr_start(&syms,n,vo)) >= 0) {
-	    const int	nlen = SYMNAMELEN ;
-	    int		i ;
-	    int		f_modload = FALSE ;
+	if ((rs = vecstr_start(&syms,ne,vo)) >= 0) {
+	    cint	nlen = SYMNAMELEN ;
+	    int		f_modload = false ;
 	    char	nbuf[SYMNAMELEN + 1] ;
 
-	    for (i = 0 ; (i < n) && (subs[i] != NULL) ; i += 1) {
+	    for (int i = 0 ; (i < ne) && subs[i] ; i += 1) {
 	        if (isrequired(i)) {
 	            if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 			rs = vecstr_add(&syms,nbuf,rs) ;
@@ -351,10 +309,10 @@ static int uuname_objloadbeginer(UUNAME *op,cchar *pr,cchar *objname)
 	    } /* end for */
 
 	    if (rs >= 0) {
-		const char	**sv ;
+		mainv	sv ;
 	        if ((rs = vecstr_getvec(&syms,&sv)) >= 0) {
-	            const char	*modbname = UUNAME_MODBNAME ;
-	            const int	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
+	            cchar	*modbname = UUNAME_MODBNAME ;
+	            cint	mo = (MODLOAD_OLIBVAR | MODLOAD_OSDIRS) ;
 	            rs = modload_open(lp,pr,modbname,objname,mo,sv) ;
 		    f_modload = (rs >= 0)  ;
 		}
@@ -371,16 +329,14 @@ static int uuname_objloadbeginer(UUNAME *op,cchar *pr,cchar *objname)
 }
 /* end subroutine (uuname_objloadbeginer) */
 
-
-static int uuname_objloadend(UUNAME *op)
-{
+static int uuname_objloadend(uuname *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op->obj != NULL) {
+	if (op->obj) {
 	    rs1 = uc_free(op->obj) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->obj = NULL ;
+	    op->obj = nullptr ;
 	}
 
 	rs1 = modload_close(&op->loader) ;
@@ -390,47 +346,39 @@ static int uuname_objloadend(UUNAME *op)
 }
 /* end subroutine (uuname_objloadend) */
 
-
-static int uuname_loadcalls(UUNAME *op,cchar *objname)
-{
-	MODLOAD		*lp = &op->loader ;
-	const int	nlen = SYMNAMELEN ;
+static int uuname_loadcalls(uuname *op,cchar *objname) noex {
+	modload		*lp = &op->loader ;
+	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;
 	int		c = 0 ;
 	char		nbuf[SYMNAMELEN + 1] ;
-	const void	*snp = NULL ;
+	cvoid	*snp = nullptr ;
 
-	for (i = 0 ; subs[i] != NULL ; i += 1) {
+	for (i = 0 ; subs[i] != nullptr ; i += 1) {
 
 	    if ((rs = sncpy3(nbuf,nlen,objname,"_",subs[i])) >= 0) {
 	         if ((rs = modload_getsym(lp,nbuf,&snp)) == SR_NOTFOUND) {
-		     snp = NULL ;
+		     snp = nullptr ;
 		     if (! isrequired(i)) rs = SR_OK ;
 		}
 	    }
 
 	    if (rs < 0) break ;
 
-#if	CF_DEBUGS
-	    debugprintf("uuname_loadcalls: call=%s %c\n",
-		subs[i],
-		((snp != NULL) ? 'Y' : 'N')) ;
-#endif
-
-	    if (snp != NULL) {
+	    if (snp != nullptr) {
 	        c += 1 ;
 		switch (i) {
 		case sub_open:
 		    op->call.open = 
-			(int (*)(void *,const char *,const char *)) snp ;
+			(int (*)(void *,cchar *,cchar *)) snp ;
 		    break ;
 		case sub_count:
 		    op->call.count = (int (*)(void *)) snp ;
 		    break ;
 		case sub_exists:
 		    op->call.exists = 
-			(int (*)(void *,const char *,int)) snp ;
+			(int (*)(void *,cchar *,int)) snp ;
 		    break ;
 		case sub_curbegin:
 		    op->call.curbegin = 
@@ -459,10 +407,8 @@ static int uuname_loadcalls(UUNAME *op,cchar *objname)
 }
 /* end subroutine (uuname_loadcalls) */
 
-
-static int isrequired(int i)
-{
-	int		f = FALSE ;
+static bool isrequired(int i) noex {
+	bool		f = false ;
 	switch (i) {
 	case sub_open:
 	case sub_exists:
@@ -470,7 +416,7 @@ static int isrequired(int i)
 	case sub_enum:
 	case sub_curend:
 	case sub_close:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
