@@ -1127,6 +1127,7 @@ thrcomm.o:		thrcomm.cc	thrcomm.h
 thrbase.o:		thrbase.cc	thrbase.h thrcomm.h
 pwentry.o:		pwentry.cc	pwentry.h
 pwfile.o:		pwfile.cc	pwfile.h
+sif.o:			sif.cc		sif.hh
 
 
 # sring-comparisons

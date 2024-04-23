@@ -49,6 +49,15 @@
 #endif
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
@@ -56,6 +65,44 @@
 
 
 /* forward references */
+
+template<typename ... Args>
+static int uuname_ctor(uuname *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->loader = new(nothrow) modload) != np) {
+		rs = SR_OK ;
+	    } /* end if (new-modload) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (uuname_ctor) */
+
+static int uuname_dtor(uuname *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->loader) {
+		delete op->loader ;
+		op->loader = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (uuname_dtor) */
+
+template<typename ... Args>
+static inline int uuname_magic(uuname *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (uuname_magic) */
 
 static int	uuname_objloadbegin(uuname *,cchar *,cchar *) noex ;
 static int	uuname_objloadbeginer(uuname *,cchar *,cchar *) noex ;
@@ -103,72 +150,66 @@ constexpr cpcchar	subs[] = {
 int uuname_open(uuname *op,cchar *pr,cchar *dbname) noex {
 	cchar		*objname = UUNAME_OBJNAME ;
 	int		rs ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (dbname == nullptr) return SR_FAULT ;
-
-	if (dbname[0] == '\0') return SR_INVALID ;
-
-	memclear(op) ;
-
-	if ((rs = uuname_objloadbegin(op,pr,objname)) >= 0) {
-	    if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
-	        op->magic = UUNAME_MAGIC ;
-	    }
+	if ((rs = uuname_ctor(op,pr,dbname)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (dbname[0]) {
+	        if ((rs = uuname_objloadbegin(op,pr,objname)) >= 0) {
+	            if ((rs = (*op->call.open)(op->obj,pr,dbname)) >= 0) {
+	                op->magic = UUNAME_MAGIC ;
+	            }
+	            if (rs < 0) {
+		        uuname_objloadend(op) ;
+	            }
+	        } /* end if )uuname_objloadbegin) */
+	    } /* end if (valid) */
 	    if (rs < 0) {
-		uuname_objloadend(op) ;
+		uuname_dtor(op) ;
 	    }
-	} /* end if )uuname_objloadbegin) */
-
+	} /* end if (uuname_ctor) */
 	return rs ;
 }
 /* end subroutine (uuname_open) */
 
 int uuname_close(uuname *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = (*op->call.close)(op->obj) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = uuname_objloadend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = uuname_magic(op)) >= 0) {
+	    if (op->obj) {
+	        rs1 = (*op->call.close)(op->obj) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = uuname_objloadend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = uuname_dtor(op) ;
+		if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_close) */
 
 int uuname_audit(uuname *op) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.audit != nullptr) {
-	    rs = (*op->call.audit)(op->obj) ;
-	}
-
+	int		rs ;
+	if ((rs = uuname_magic(op)) >= 0) {
+	    if (op->call.audit != nullptr) {
+	        rs = (*op->call.audit)(op->obj) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_audit) */
 
 int uuname_count(uuname *op) noex {
-	int		rs = SR_NOSYS ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAME_MAGIC) return SR_NOTOPEN ;
-
-	if (op->call.count != nullptr) {
-	    rs = (*op->call.count)(op->obj) ;
-	}
-
+	int		rs ;
+	if ((rs = uuname_magic(op)) >= 0) {
+	    if (op->call.count != nullptr) {
+	        rs = (*op->call.count)(op->obj) ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uuname_count) */
@@ -265,7 +306,7 @@ static int uuname_objloadbegin(uuname *op,cchar *pr,cchar *objname) noex {
 	int		rs ;
 
 	if ((rs = uuname_objloadbeginer(op,pr,objname)) >= 0) {
-	    modload	*lp = &op->loader ;
+	    modload	*lp = op->loader ;
 	    if ((rs = modload_getmv(lp,0)) >= 0) {
 		int	objsize = rs ;
 		void	*p ;
@@ -287,7 +328,7 @@ static int uuname_objloadbegin(uuname *op,cchar *pr,cchar *objname) noex {
 /* end subroutine (uuname_objloadbegin) */
 
 static int uuname_objloadbeginer(uuname *op,cchar *pr,cchar *objname) noex {
-	modload		*lp = &op->loader ;
+	modload		*lp = op->loader ;
 	vecstr		syms ;
 	cint		ne = nelem(subs) ;
 	cint		vo = VECSTR_OCOMPACT ;
@@ -339,7 +380,7 @@ static int uuname_objloadend(uuname *op) noex {
 	    op->obj = nullptr ;
 	}
 
-	rs1 = modload_close(&op->loader) ;
+	rs1 = modload_close(op->loader) ;
 	if (rs >= 0) rs = rs1 ;
 
 	return rs ;
@@ -347,7 +388,7 @@ static int uuname_objloadend(uuname *op) noex {
 /* end subroutine (uuname_objloadend) */
 
 static int uuname_loadcalls(uuname *op,cchar *objname) noex {
-	modload		*lp = &op->loader ;
+	modload		*lp = op->loader ;
 	cint		nlen = SYMNAMELEN ;
 	int		rs = SR_OK ;
 	int		i ;

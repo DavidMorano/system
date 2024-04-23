@@ -24,9 +24,12 @@
 
 #include	<varhdr.h>
 #include	<var.h>
+#include	<vars.h>
 #include	<varmk.h>
 #include	<varmks.h>
-#include	<vars.h>
+
+#include	<uuname.h>
+#include	<uunames.h>
 
 
 #endif /* DATABASE_INCLUDE */

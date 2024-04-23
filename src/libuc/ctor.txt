@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int uunames_ctor(uunames *op,Args ... args) noex {
+static int uuname_ctor(uuname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int uunames_ctor(uunames *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uunames_ctor) */
+/* end subroutine (uuname_ctor) */
 
-static int uunames_dtor(uunames *op) noex {
+static int uuname_dtor(uuname *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uunames_dtor) */
+/* end subroutine (uuname_dtor) */
 
 template<typename ... Args>
-static inline int uunames_magic(uunames *op,Args ... args) noex {
+static inline int uuname_magic(uuname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == UUNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (uunames_magic) */
+/* end subroutine (uuname_magic) */

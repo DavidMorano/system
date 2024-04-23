@@ -41,6 +41,8 @@ struct sif {
 	    sstr = s ;
 	} ;
 	int next(cchar **) noex ;
+	int chr(cchar **) noex ;
+	int brk(cchar **) noex ;
 	int operator () (cchar **rpp) noex {
 	    return next(rpp) ;
 	} ;

@@ -53,7 +53,7 @@ struct uuname_caller {
 
 struct uuname_head {
 	void		*obj ;		/* object pointer */
-	modload		loader ;
+	modload		*loader ;
 	UUNAME_CALLS	call ;
 	uint		magic ;
 	int		objsize ;	/* object size */
