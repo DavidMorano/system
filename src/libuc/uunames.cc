@@ -463,7 +463,9 @@ int uunames_curend(UU *op,cur *curp) noex {
 }
 /* end subroutine (uunames_curend) */
 
+/* returns 0=not-found, (>0)=found-with-this-length */
 int uunames_exists(UU *op,cchar *sp,int sl) noex {
+	cint		rsn = SR_NOTFOUND ;
 	int		rs ;
 	int		rs1 ;
 	int		kl = 0 ;
@@ -471,13 +473,17 @@ int uunames_exists(UU *op,cchar *sp,int sl) noex {
 	    rs = SR_INVALID ;
 	    if (sp[0]) {
 	        if ((rs = uunames_indcheck(op,0)) >= 0) {
-		    cchar	*kp = nullptr ;
+		    cchar	*kp{} ;
 	            if ((rs = uc_mallocstrw(sp,sl,&kp)) >= 0) {
 			cnullptr	np{} ;
 	                kl = rs ;
 			{
+			    vecobj	*nlp = op->nlp ;
 			    liner	le(kp,kl) ;
-	                    rs = vecobj_search(op->nlp,&le,vesrch,np) ;
+			    auto	vcf = vesrch ;
+	                    if ((rs = vecobj_search(nlp,&le,vcf,np)) == rsn) {
+				kl = 0 ;
+			    }
 			} /* end block */
 	                rs1 = uc_free(kp) ;
 			if (rs >= 0) rs = rs1 ;
@@ -509,12 +515,14 @@ int uunames_enum(UU *op,cur *curp,char *ubuf,int ulen) noex {
 
 int uunames_count(UU *op) noex {
 	int		rs ;
+	int		c = 0 ;
 	if ((rs = uunames_magic(op)) >= 0) {
 	    if ((rs = uunames_indcheck(op,0)) >= 0) {
 	        rs = vecobj_count(op->nlp) ;
+		c = rs ;
 	    }
 	} /* end if (magic) */
-	return rs ;
+	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (uunames_count) */
 
@@ -539,6 +547,7 @@ static int uunames_infoloadend(UU *op) noex {
 static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	int		rs ;
 	int		rs1 ;
+	int		rv = 0 ;
 	char		*indfname{} ;
 	op->indfname = nullptr ;
 	if ((rs = malloc_mp(&indfname)) >= 0) {
@@ -550,9 +559,8 @@ static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 	        if ((rs = uc_mallocstrw(indfname,fl,&cp)) >= 0) {
 		    op->indfname = cp ;
 		    if ((rs = uunames_filemapcreate(op,dt)) >= 0) {
-			{
 			    rs = uunames_indlist(op) ;
-			}
+			    rv = rs ;
 		    } /* end if */
 	            if (rs < 0) {
 	                 rs1 = uc_free(op->indfname) ;
@@ -562,7 +570,7 @@ static int uunames_indmapcreate(UU *op,cchar *indname,time_t dt) noex {
 		} /* end if (memory-allocation) */
 	    } /* end if (mkfnamesuf) */
 	} /* end if (m-a-f) */
-	return rs ;
+	return (rs >= 0) ? rv : rs ;
 }
 /* end subroutine (uunames_indmapcreate) */
 
@@ -587,54 +595,38 @@ static int uunames_indmapdestroy(UU *op) noex {
 /* end subroutine (uunames_indmapdestroy) */
 
 static int uunames_filemapcreate(UU *op,time_t dt) noex {
-	USTAT		sb ;
-	int		rs = SR_OK ;
-	int		fd ;
-	int		mprot, mflags ;
-
+	cint		of = O_RDONLY ;
+	cmode		om = 0666 ;
+	int		rs ;
+	int		rs1 ;
 	if (dt == 0) dt = time(nullptr) ;
-
-/* open it */
-
-	rs = u_open(op->indfname,O_RDONLY,0666) ;
-	fd = rs ;
-	if (rs < 0)
-	    goto ret0 ;
-
-	rs = u_fstat(fd,&sb) ;
-	if (rs < 0)
-	    goto ret1 ;
-
-	if (! S_ISREG(sb.st_mode)) {
-	    rs = SR_NOTSUP ;
-	    goto ret1 ;
-	}
-
-	if ((sb.st_size > INT_MAX) || (sb.st_size < 0)) {
-	    rs = SR_TOOBIG ;
-	    goto ret1 ;
-	}
-
-	op->indfsize = sb.st_size ;
-	op->ti_mod = sb.st_mtime ;
-
-/* map it */
-
-	mprot = PROT_READ ;
-	mflags = MAP_SHARED ;
-	rs = u_mmap(nullptr,(size_t) op->indfsize,mprot,mflags,
-	    fd,0L,&op->indfmap) ;
-
-	if (rs >= 0) {
-	    op->ti_map = dt ;
-	    op->ti_lastcheck = dt ;
-	}
-
-/* close it */
-ret1:
-	u_close(fd) ;
-
-ret0:
+	if ((rs = uc_open(op->indfname,of,om)) >= 0) {
+	    USTAT	sb ;
+	    cint	fd = rs ;
+	    if ((rs = uc_fstat(fd,&sb)) >= 0) {
+		rs = SR_NOTSUP ;
+	        if (S_ISREG(sb.st_mode)) {
+		    cnullptr	np{} ;
+		    rs = SR_TOOBIG ;
+	            if (sb.st_size <= INT_MAX) {
+			csize	ms = size_t(sb.st_size) ;
+			cint	mp = PROT_READ ;
+			cint	mf = MAP_SHARED ;
+			void	*md{} ;
+	                op->ti_mod = sb.st_mtime ;
+			if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	    		    op->ti_map = dt ;
+	    	            op->ti_lastcheck = dt ;
+			    op->mapdata = caddr_t(md) ;
+	                    op->mapsize = ms ;
+	                    op->ti_mod = sb.st_mtime ;
+			} /* end if (memory-mapped) */
+		    } /* end if (not-toobig) */
+		} /* end if (regular-file) */
+	    } /* end if (stat) */
+	    rs1 = uc_close(fd) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (file) */
 	return rs ;
 }
 /* end subroutine (uunames_filemapcreate) */
@@ -642,11 +634,11 @@ ret0:
 static int uunames_filemapdestroy(UU *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	if (op->indfmap != nullptr) {
-	    rs1 = u_munmap(op->indfmap,op->indfsize) ;
+	if (op->mapdata != nullptr) {
+	    rs1 = u_mmapend(op->mapdata,op->mapsize) ;
 	    if (rs >= 0) rs = rs1 ;
-	    op->indfmap = nullptr ;
-	    op->indfsize = 0 ;
+	    op->mapdata = nullptr ;
+	    op->mapsize = 0 ;
 	}
 	return rs ;
 }
@@ -998,9 +990,9 @@ static int uunames_indlist(UU *op) noex {
 	liner		le ;
 	uint		lineoff = 0 ;
 	int		rs = SR_OK ;
-	int		ml = op->indfsize ;
+	int		ml = op->mapsize ;
 	int		n = 0 ;
-	cchar		*mp = charp(op->indfmap) ;
+	cchar		*mp = charp(op->mapdata) ;
 	cchar		*tp ;
 	cchar		*filemagic = UUNAMES_DBMAGICSTR ;
 	lineoff = 0 ;
@@ -1030,7 +1022,7 @@ static int uunames_indlist(UU *op) noex {
 static int uunames_indcheck(UU *op,time_t) noex {
 	int		rs = SR_NOTFOUND ;
 	int		f = false ;
-	if (op->indfmap) {
+	if (op->mapdata) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? f : rs ;
@@ -1047,7 +1039,7 @@ static int checkdname(cchar *dname) noex {
 		} else {
 	            rs = SR_NOTDIR ;
 		}
-	    }
+	    } /* end if (stat) */
 	} else {
 	    rs = SR_INVALID ;
 	}
@@ -1065,16 +1057,18 @@ static int mkindfname(char *rbuf,cc *dname,cc *name,cc *suf,cc *end) noex {
 	    sbuf	sb ;
 	    int		dnl = 0 ;
 	    if ((rs = sb.start(rbuf,rs)) >= 0) {
-	        if ((rs = sb.strw(dname,-1)) >= 0) {
-	            dnl = rs ;
-		}
-	        if ((rs >= 0) && (dname[dnl - 1] != '/')) {
-	            rs = sb.chr('/') ;
-	        }
-	        if (rs >= 0) rs = sb.strw(name) ;
-	        if (rs >= 0) rs = sb.chr('.') ;
-	        if (rs >= 0) rs = sb.strw(suf) ;
-	        if (rs >= 0) rs = sb.strw(end) ;
+		{
+	            if ((rs = sb.strw(dname,-1)) >= 0) {
+	                dnl = rs ;
+		    }
+	            if ((rs >= 0) && (dname[dnl - 1] != '/')) {
+	                rs = sb.chr('/') ;
+	            }
+	            if (rs >= 0) rs = sb.strw(name) ;
+	            if (rs >= 0) rs = sb.chr('.') ;
+	            if (rs >= 0) rs = sb.strw(suf) ;
+	            if (rs >= 0) rs = sb.strw(end) ;
+		} /* end block */
 		rs1 = sb.finish ;
 		if (rs >= 0) rs = rs1 ;
 		len = rs1 ;
@@ -1092,6 +1086,7 @@ static int vecstr_defenvs(vecstr *elp,mainv ea) noex {
 	for (int i = 0 ; ea[i] != nullptr ; i += 1) {
 	    if (cchar *cp ; (cp = getenv(ea[i])) != nullptr) {
 		rs = vecstr_envadd(elp,ea[i],cp,-1) ;
+		c += !!(rs < INT_MAX) ;
 	    }
 	    if (rs < 0) break ;
 	} /* end for */

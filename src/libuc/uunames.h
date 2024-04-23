@@ -50,13 +50,13 @@ struct uunames_head {
 	cchar		*dbname ;
 	cchar		*indfname ;		/* index file-name */
 	vecobj		*nlp ;			/* name-list-pointer */
-	caddr_t		indfmap ;		/* index file-map */
+	caddr_t		mapdata ;		/* index map-data */
+	size_t		mapsize ;		/* index map-size */
 	time_t		ti_mod ;		/* DB file modification */
 	time_t		ti_map ;		/* map */
 	time_t		ti_lastcheck ;
 	UUNAMES_FL	f ;
 	uint		magic ;
-	int		indfsize ;		/* index file-size */
 	int		ncursors ;
 } ;
 
