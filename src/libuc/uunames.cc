@@ -4,7 +4,6 @@
 /* uunames-query database manager */
 /* version %I% last-modified %G% */
 
-#define	CF_NULSTR	0		/* use 'nulstr(3)' */
 #define	CF_WITHENDIAN	0		/* use ENDIANness */
 #define	CF_GETPROGROOT	1		/* use 'getprogroot(3dam)' */
 
@@ -55,7 +54,6 @@
 #include	<localmisc.h>
 
 #include	"uunames.h"
-#include	"nulstr.h"
 
 
 /* local defines */
@@ -193,6 +191,8 @@ using std::nothrow ;			/* constant */
 
 
 /* local typedefs */
+
+typedef int (*uunames_f)(uunames *,time_t) noex ;
 
 
 /* external subroutines */
@@ -340,7 +340,7 @@ constexpr envpop	envpops[] = {
 	{ nullptr, nullptr, nullptr }
 } ;
 
-static int	(*indopens[])(UU *,time_t) = {
+constexpr uunames_f	indopens[] = {
 	uunames_indopenpr,
 	uunames_indopentmp,
 	nullptr
@@ -410,105 +410,63 @@ int uunames_close(UU *op) noex {
 }
 /* end subroutine (uunames_close) */
 
-
-int uunames_audit(UU *op)
-{
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAMES_MAGIC) return SR_NOTOPEN ;
-
-	rs = uunames_indcheck(op,0) ;
-
+int uunames_audit(UU *op) noex {
+	int		rs ;
+	if ((rs = gncache_magic(op)) >= 0) {
+	    rs = uunames_indcheck(op,0) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uunames_audit) */
 
-
-int uunames_curbegin(UU *op,UUNAMES_CUR *curp)
-{
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAMES_MAGIC) return SR_NOTOPEN ;
-
-	memset(curp,0,sizeof(UUNAMES_CUR)) ;
-	curp->i = -1 ;
-	op->ncursors += 1 ;
-
-	rs = uunames_indcheck(op,0) ;
-
+int uunames_curbegin(UU *op,UUNAMES_CUR *curp) noex {
+	int		rs ;
+	if ((rs = gncache_magic(op,curp)) >= 0) {
+	    memclear(curp) ;
+	    curp->i = -1 ;
+	    op->ncursors += 1 ;
+	    rs = uunames_indcheck(op,0) ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uunames_curbegin) */
 
-
-int uunames_curend(UU *op,UUNAMES_CUR *curp)
-{
-	int		rs = SR_OK ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (curp == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAMES_MAGIC) return SR_NOTOPEN ;
-
-	curp->i = -1 ;
-	if (op->ncursors > 0)
-	    op->ncursors -= 1 ;
-
+int uunames_curend(UU *op,UUNAMES_CUR *curp) noex {
+	int		rs ;
+	if ((rs = gncache_magic(op,curp)) >= 0) {
+	    curp->i = -1 ;
+	    if (op->ncursors > 0) {
+	        op->ncursors -= 1 ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (uunames_curend) */
 
-
-int uunames_exists(UU *op,cchar *s,int slen)
-{
-	LINER	le ;
-	int		rs = SR_OK ;
-	int		kl ;
-	cchar	*kp = nullptr ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (s == nullptr) return SR_FAULT ;
-
-	if (op->magic != UUNAMES_MAGIC) return SR_NOTOPEN ;
-
-	if (s[0] == '\0') return SR_INVALID ;
-
-	rs = uunames_indcheck(op,0) ;
-	if (rs < 0)
-	    goto ret0 ;
-
-#if	CF_NULSTR
-	{
-	    nulstr	ss ;
-	    if ((rs = nulstr_start(&ss,s,slen,&kp)) >= 0) {
-	        kl = rs ;
-		le.lp = kp ;
-		le.ll = kl ;
-	        rs = vecobj_search(op->nlp,&le,vesrch,nullptr) ;
-	        nulstr_finish(&ss) ;
-	    } /* end if (nulstr) */
-	}
-#else
-	{
-	    if ((rs = uc_mallocstrw(s,slen,&kp)) >= 0) {
-	        kl = rs ;
-
-	        le.lp = kp ;
-	        le.ll = kl ;
-	        rs = vecobj_search(op->nlp,&le,vesrch,nullptr) ;
-	        uc_free(kp) ;
-	    } /* end if (allocation) */
-
-	}
-#endif /* CF_NULSTR */
-
-ret0:
-	return rs ;
+int uunames_exists(UU *op,cchar *sp,int sl) noex {
+	int		rs ;
+	int		rs1 ;
+	int		kl = 0 ;
+	if ((rs = gncache_magic(op,sp)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (sp[0]) {
+	        if ((rs = uunames_indcheck(op,0)) >= 0) {
+		    cchar	*kp = nullptr ;
+	            if ((rs = uc_mallocstrw(s,slen,&kp)) >= 0) {
+			cnullptr	np{} ;
+			{
+	                    kl = rs ;
+	                    le.lp = kp ;
+	                    le.ll = kl ;
+	                    rs = vecobj_search(op->nlp,&le,vesrch,np) ;
+			} /* end block */
+	                rs1 = uc_free(kp) ;
+			if (rs >= 0) rs = rs1 ;
+	            } /* end if (allocation) */
+	        } /* end if (uunames_indcheck) */
+	    } /* end if (valid) */
+	} /* end if (non-null) */
+	return (rs >= 0) ? kl : rs ;
 }
 /* end subroutine (uunames_exists) */
 
@@ -1368,25 +1326,27 @@ int		vbuflen ;
 
 static int vesrch(void *v1p,void *v2p) noex {
 	LINER		**e1pp = (LINER **) v1p ;
-	LINER	**e2pp = (LINER **) v2p ;
-	LINER	*l1 ;
-	LINER	*l2 ;
+	LINER		**e2pp = (LINER **) v2p ;
+	LINER		*l1p ;
+	LINER		*l2p ;
 	int		rc = 0 ;
-	l1 = *e1pp ;
-	l2 = *e2pp ;
-	if (l1 != nullptr) {
-	    if (l2 != nullptr) {
-		if ((rc = (l1->lp[0] - l2->lp[0])) == 0) {
-	    	    if ((rc = strncmp(l1->lp,l2->lp,l1->ll)) == 0) {
-	    		rc = (l1->ll - l2->ll) ;
+	if (l1p || l2p) {
+	    l1p = *e1pp ;
+	    l2p = *e2pp ;
+	    if (l1p) {
+	        if (l2p) {
+		    if ((rc = (l1p->lp[0] - l2p->lp[0])) == 0) {
+	    	        if ((rc = strncmp(l1p->lp,l2p->lp,l1p->ll)) == 0) {
+	    		    rc = (l1p->ll - l2->pll) ;
+		        }
 		    }
-		}
+	        } else {
+	            rc = +1 ;
+	        }
 	    } else {
-	        rc = +1 ;
+	        rc = -1 ;
 	    }
-	} else {
-	    rc = -1 ;
-	}
+	} /* end if (at least one is non-null) */
 	return rc ;
 }
 /* end subroutine (vesrch) */
