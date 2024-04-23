@@ -23,6 +23,7 @@
 #include	<envstandards.h>	/* ordered first to configure */
 #include        <sys/types.h>		/* |uid_t| */
 #include        <sys/param.h>
+#include	<cstddef>		/* |nullptr_t| */
 #include        <cstdlib>
 #include        <cstring>		/* <- for |strlen(3c)| */
 #include        <ctime>
@@ -47,6 +48,7 @@
 
 /* imported namespaces */
 
+using std::nullptr_t ;			/* type */
 using std::nothrow ;			/* constant */
 
 
@@ -203,7 +205,7 @@ int pwcache_finish(pwcache *op) noex {
         int             rs ;
         int             rs1 ;
 	if ((rs = pwcache_magic(op)) >= 0) {
-            {
+            if (op->lrup) {
                 rs1 = pq_finish(op->lrup) ; /* finish up the LRU queue */
                 if (rs >= 0) rs = rs1 ;
             }
@@ -211,7 +213,7 @@ int pwcache_finish(pwcache *op) noex {
                 rs1 = pwcache_recfins(op) ; /* freeing all cache entries */
                 if (rs >= 0) rs = rs1 ;
             }
-            {
+            if (op->dbp) {
                 rs1 = hdb_finish(op->dbp) ; /* free up everything else */
                 if (rs >= 0) rs = rs1 ;
             }

@@ -205,7 +205,7 @@ int gncache_finish(GN *op) noex {
 	if ((rs = gncache_magic(op)) >= 0) {
 	    vechand	*rlp = op->rlp ;
 	    void	*vp{} ;
-	    {
+	    if (rlp) {
 	        for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
 	            if (vp) {
 	                rec	*rp = recp(vp) ;
@@ -220,18 +220,22 @@ int gncache_finish(GN *op) noex {
 	            }
 	        } /* end for */
 	    }
-	    {
+	    if (rlp) {
 	        rs1 = vechand_finish(rlp) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
-	    {
+	    if (op->flp) {
 	        while (cq_rem(op->flp,&vp) >= 0) {
 	            rs1 = uc_free(vp) ;
 	            if (rs >= 0) rs = rs1 ;
 	        } /* end while */
 	    }
-	    {
+	    if (op->flp) {
 	        rs1 = cq_finish(op->flp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = gncache_dtor(op) ;
 	        if (rs >= 0) rs = rs1 ;
 	    }
 	    op->magic = 0 ;

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int gncache_ctor(gncache *op,Args ... args) noex {
+static int uunames_ctor(uunames *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int gncache_ctor(gncache *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (gncache_ctor) */
+/* end subroutine (uunames_ctor) */
 
-static int gncache_dtor(gncache *op) noex {
+static int uunames_dtor(uunames *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (gncache_dtor) */
+/* end subroutine (uunames_dtor) */
 
 template<typename ... Args>
-static inline int gncache_magic(gncache *op,Args ... args) noex {
+static inline int uunames_magic(uunames *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == GNCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == UUNAMES_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (gncache_magic) */
+/* end subroutine (uunames_magic) */

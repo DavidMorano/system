@@ -34,7 +34,7 @@
 
 	Returns:
 	>=0		nominally -> (strlen(string) + 1)
-	<0		error
+	<0		error code (system-return)
 
 
 	Name:
@@ -55,7 +55,7 @@
 
 	Returns:
 	>=0		length of allocated space
-	<0		error
+	<0		error code (system-return)
 
 
 	Name:
@@ -78,7 +78,6 @@
 	>=0		nominally -> strnlen(sp,sl)
 	<0		error
 
-
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
@@ -98,13 +97,19 @@
 #endif
 
 
+/* imported namespaces */
+
+
+/* local typedefs */
+
+
 /* external subroutines */
 
 
-/* local variables */
+/* external variables */
 
 
-/* local subroutines */
+/* forward references */
 
 static inline void ourstrwcpy(char *bp,cchar *sp,int sl) noex {
 	constexpr bool		f = CF_STRNCPY ;
@@ -117,6 +122,12 @@ static inline void ourstrwcpy(char *bp,cchar *sp,int sl) noex {
 	}
 }
 /* end subroutine (ourcpywstr) */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */

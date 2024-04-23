@@ -16,6 +16,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<time.h>		/* |time_t| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -48,8 +49,8 @@ struct uunames_head {
 	cchar		*pr ;
 	cchar		*dbname ;
 	cchar		*indfname ;		/* index file-name */
+	vecobj		*nlp ;			/* name-list-pointer */
 	caddr_t		indfmap ;		/* index file-map */
-	vecobj		list ;
 	time_t		ti_mod ;		/* DB file modification */
 	time_t		ti_map ;		/* map */
 	time_t		ti_lastcheck ;
