@@ -354,7 +354,7 @@ static int grcache_mkrec(grcache *op,time_t dt,rec **epp,cc *gn) noex {
 	int		grl = 0 ;
 	*epp = nullptr ;
 	if ((rs = vechand_count(op->rlp)) >= 0) {
-	    int		n = rs ;
+	    cint	n = rs ;
 	    if (n >= op->nmax) {
 	        rs = grcache_getrec(op,dt,epp) ;
 	    } else {
