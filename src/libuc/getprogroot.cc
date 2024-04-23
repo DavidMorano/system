@@ -28,7 +28,7 @@
 	supplied program root directories.
 
 	Synopsis:
-	int getprogroot(char *pr,cc **prnames,int prlenp,char *obuf,cc *name)
+	int getprogroot(char *pr,mv prnames,int prlenp,char *obuf,cc *name)
 
 	Arguments:
 	pr		program root path
@@ -106,7 +106,7 @@ struct subinfo {
 
 static int	subinfo_start(subinfo *) noex ;
 static int	subinfo_local(subinfo *,char *,cchar *,int) noex ;
-static int	subinfo_prs(subinfo *,cchar **,char *,cchar *,int) noex ;
+static int	subinfo_prs(subinfo *,mainv,char *,cchar *,int) noex ;
 static int	subinfo_pr(subinfo *,cchar *,char *,cchar *,int) noex ;
 static int	subinfo_other(subinfo *,char *,cchar *,int) noex ;
 static int	subinfo_check(subinfo *,cchar *,int,char *,cchar *,int) noex ;
@@ -130,7 +130,7 @@ static bufsizevar	maxpathlen(getbufsize_mp) ;
 
 /* exported subroutines */
 
-int getprogroot(cc *pr,cc **prnames,int *prlenp,char *obuf,cc *name) noex {
+int getprogroot(cc *pr,mainv prnames,int *prlenp,char *obuf,cc *name) noex {
 	int		rs = SR_FAULT ;
 	int		rs1 ;
 	int		outlen = 0 ;
@@ -207,23 +207,23 @@ static int subinfo_finish(subinfo *sip) noex {
 }
 /* end subroutine (subinfo_finish) */
 
-static int subinfo_other(SI *sip,char *obuf,cc *np,int nl) noex {
+static int subinfo_other(SI *sip,char *obuf,cc *sp,int sl) noex {
 	int		rs = SR_NOENT ;
 	int		outlen = 0 ;
-	cchar		*sp = getenv(varpath) ;
+	static cchar	*valp = getenv(varpath) ;
 	sip->prlen = 0 ;
-	if (sp) {
+	if (valp) {
 	    cchar	*tp ;
-	    while ((tp = strpbrk(sp,":;")) != nullptr) {
+	    while ((tp = strpbrk(valp,":;")) != nullptr) {
 	        {
-	            rs = subinfo_check(sip,sp,(tp - sp),obuf,np,nl) ;
+	            rs = subinfo_check(sip,valp,(tp - valp),obuf,sp,sl) ;
 	            outlen = rs ;
 	        }
-	        sp = (tp + 1) ;
+	        valp = (tp + 1) ;
 	        if ((rs >= 0) || (rs == SR_NOMEM)) break ;
 	    } /* end while */
-	    if ((rs < 0) && (rs != SR_NOMEM) && (sp[0] != '\0')) {
-	        rs = subinfo_check(sip,sp,-1,obuf,np,nl) ;
+	    if ((rs < 0) && (rs != SR_NOMEM) && (valp[0] != '\0')) {
+	        rs = subinfo_check(sip,valp,-1,obuf,sp,sl) ;
 	        outlen = rs ;
 	    }
 	} /* end if (non-null) */
@@ -231,7 +231,7 @@ static int subinfo_other(SI *sip,char *obuf,cc *np,int nl) noex {
 }
 /* end subroutine (subinfo_other) */
 
-static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *np,int nl) noex {
+static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *sp,int sl) noex {
 	cint		rsn = SR_NOTFOUND ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -251,7 +251,7 @@ static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *np,int nl) noex {
 		} else if (rs == rsn) {
 	            rs = SR_OK ;
 		}
-		if ((rs = mkdfname(obuf,d,dlen,np,nl)) >= 0) {
+		if ((rs = mkdfname(obuf,d,dlen,sp,sl)) >= 0) {
 		    outlen = rs ;
 		    if ((rs = subinfo_xfile(sip,obuf)),isNotAccess(rs)) {
 	    		rs = subinfo_record(sip,&sb,d,dlen) ;
@@ -263,10 +263,10 @@ static int subinfo_check(SI *sip,cc *d,int dlen,char *obuf,cc *np,int nl) noex {
 }
 /* end subroutine (subinfo_check) */
 
-static int subinfo_local(SI *sip,char *obuf,cc *np,int nl) noex {
+static int subinfo_local(SI *sip,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		outlen = 0 ;
-	if ((rs = mkpath1w(obuf,np,nl)) >= 0) {
+	if ((rs = mkpath1w(obuf,sp,sl)) >= 0) {
 	    outlen = rs ;
 	    rs = subinfo_xfile(sip,obuf) ;
 	}
@@ -274,7 +274,7 @@ static int subinfo_local(SI *sip,char *obuf,cc *np,int nl) noex {
 }
 /* end subroutine (subinfo_local) */
 
-static int subinfo_prs(SI *sip,cc **prnames,char *obuf,cc *np,int nl) noex {
+static int subinfo_prs(SI *sip,mainv prnames,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	char		*dn{} ;
@@ -286,7 +286,7 @@ static int subinfo_prs(SI *sip,cc **prnames,char *obuf,cc *np,int nl) noex {
 	            rs = SR_NOENT ;
 	            for (int i = 0 ; prnames[i] ; i += 1) {
 	                if ((rs1 = mkpr(pr,maxlen,prnames[i],dn)) >= 0) {
-	                    rs = subinfo_pr(sip,pr,obuf,np,nl) ;
+	                    rs = subinfo_pr(sip,pr,obuf,sp,sl) ;
 	                }
 	                if ((rs >= 0) || (rs == SR_NOMEM)) break ;
 	            } /* end for */
@@ -301,20 +301,19 @@ static int subinfo_prs(SI *sip,cc **prnames,char *obuf,cc *np,int nl) noex {
 }
 /* end subroutine (subinfo_prs) */
 
-static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *np,int nl) noex {
+static int subinfo_pr(SI *sip,cc *pr,char *obuf,cc *sp,int sl) noex {
 	int		rs ;
 	int		rs1 ;
 	int		outlen = 0 ;
 	char		*dbuf{} ;
 	if ((rs = malloc_mp(&dbuf)) >= 0) {
-	    rs = mkpath2(dbuf,pr,"bin") ;
-	    if (rs >= 0) {
-	        rs = subinfo_check(sip,dbuf,-1,obuf,np,nl) ;
+	    if ((rs = mkpath2(dbuf,pr,"bin")) >= 0) {
+	        rs = subinfo_check(sip,dbuf,-1,obuf,sp,sl) ;
 	        outlen = rs ;
 	    }
 	    if ((rs < 0) && (rs != SR_NOMEM)) {
 	        if ((rs = mkpath2(dbuf,pr,"sbin")) >= 0) {
-	            rs = subinfo_check(sip,dbuf,-1,obuf,np,nl) ;
+	            rs = subinfo_check(sip,dbuf,-1,obuf,sp,sl) ;
 	            outlen = rs ;
 	        }
 	    } /* end if */
@@ -372,7 +371,7 @@ static int subinfo_xfile(SI *sip,cc *name) noex {
 }
 /* end subroutine (subinfo_xfile) */
 
-static int mkdfname(char *rbuf,cc *d,int dlen,cc *np,int nl) noex {
+static int mkdfname(char *rbuf,cc *d,int dlen,cc *sp,int sl) noex {
 	int		rs ;
 	int		i = 0 ;
 	if ((rs = maxpathlen) >= 0) {
@@ -386,7 +385,7 @@ static int mkdfname(char *rbuf,cc *d,int dlen,cc *np,int nl) noex {
 	        i += rs ;
 	    }
 	    if (rs >= 0) {
-	        rs = storebuf_strw(rbuf,rlen,i,np,nl) ;
+	        rs = storebuf_strw(rbuf,rlen,i,sp,sl) ;
 	        i += rs ;
 	    }
 	} /* end if (maxpathlen) */
