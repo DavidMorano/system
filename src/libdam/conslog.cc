@@ -1,14 +1,15 @@
-/* conslog */
-/* lang=C20 */
+/* conslog SUPPORT */
+/* lang=C++20 */
 
 /* send log messages to the system logger device */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
 
 	= 1998-02-01, David A­D­ Morano
-        This object module was originally written to create a logging mechanism
-        for PCS application programs.
+	This object module was originally written to create a logging
+	mechanism for PCS application programs.
 
 */
 
@@ -36,10 +37,11 @@
 #include	<sys/syslog.h>		/* for all other 'LOG_xxx' */
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<char.h>
@@ -70,17 +72,6 @@
 
 /* external subroutines */
 
-extern int	snsd(char *,int,const char *,uint) ;
-extern int	sncpy1(char *,int,const char *) ;
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	bufvprintf(char *,int,const char *,va_list) ;
-extern int	isprintlatin(int) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strwset(char *,int,int) ;
-extern char	*strnchr(const char *,int,int) ;
-
 
 /* external variables */
 
@@ -95,19 +86,16 @@ struct colstate {
 
 /* forward references */
 
-int		conslog_write(CONSLOG *,int,const char *,int) ;
-int		conslog_vprintf(CONSLOG *,int,const char *,va_list) ;
+static int	conslog_fileopen(CONSLOG *) noex ;
+static int	conslog_fileclose(CONSLOG *) noex ;
+static int	conslog_logdevice(CONSLOG *,int,cchar *,int) noex ;
 
-static int	conslog_fileopen(CONSLOG *) ;
-static int	conslog_fileclose(CONSLOG *) ;
-static int	conslog_logdevice(CONSLOG *,int,const char *,int) ;
-
-static int	isLogFac(int) ;
+static boolt	isLogFac(int) noex ;
 
 
 /* local variables */
 
-static const int	logfacs[] = {
+static cint	logfacs[] = {
 	LOG_KERN,
 	LOG_USER,
 	LOG_MAIL,
@@ -137,7 +125,7 @@ int conslog_open(CONSLOG *op,int logfac)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (! isLogFac(logfac)) return SR_INVALID ;
 
@@ -155,7 +143,7 @@ int conslog_close(CONSLOG *op)
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != CONSLOG_MAGIC) return SR_NOTOPEN ;
 
@@ -169,7 +157,7 @@ int conslog_close(CONSLOG *op)
 
 
 /* make a log entry */
-int conslog_printf(CONSLOG *op,int logpri,const char fmt[],...)
+int conslog_printf(CONSLOG *op,int logpri,cchar fmt[],...)
 {
 	int		rs ;
 
@@ -192,14 +180,14 @@ int conslog_vprintf(CONSLOG *op,int logpri,cchar *fmt,va_list ap)
 	int		sl ;
 	int		ol ;
 	int		len = 0 ;
-	const char	*tp, *sp ;
+	cchar	*tp, *sp ;
 	char		outbuf[OUTBUFLEN + 1] ;
 
 #if	CF_DEBUGS
 	debugprintf("conslog_printf: ent\n") ;
 #endif
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != CONSLOG_MAGIC) return SR_BADF ;
 
@@ -215,7 +203,7 @@ int conslog_vprintf(CONSLOG *op,int logpri,cchar *fmt,va_list ap)
 
 	sp = outbuf ;
 	sl = ol ;
-	while ((tp = strnchr(sp,sl,'\n')) != NULL) {
+	while ((tp = strnchr(sp,sl,'\n')) != nullptr) {
 
 	    rs = conslog_write(op,logpri,sp,(tp - sp)) ;
 	    len += rs ;
@@ -240,12 +228,12 @@ int conslog_check(CONSLOG *op,time_t dt)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != CONSLOG_MAGIC) return SR_NOTOPEN ;
 
 	if (op->lfd >= 0) {
-	    int		f = FALSE ;
+	    int		f = false ;
 	    f = f || ((dt - op->ti_write) >= TO_WRITE) ;
 	    f = f || ((dt - op->ti_open) >= TO_OPEN) ;
 	    if (f) {
@@ -262,8 +250,8 @@ int conslog_write(CONSLOG *op,int logpri,cchar *wbuf,int wlen)
 {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
-	if (wbuf == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
+	if (wbuf == nullptr) return SR_FAULT ;
 
 	if (wlen < 0)
 	    wlen = strlen(wbuf) ;
@@ -295,7 +283,7 @@ int conslog_count(CONSLOG *op)
 {
 	int		rs ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	rs = op->c ;
 	return rs ;
@@ -305,49 +293,39 @@ int conslog_count(CONSLOG *op)
 
 /* private subroutines */
 
-
-static int conslog_fileopen(CONSLOG *op)
-{
+static int conslog_fileopen(CONSLOG *op) noex {
 	int		rs = SR_OK ;
-
 	if (op->lfd < 0) {
-	    const mode_t	om = 0666 ;
-	    const int		of = O_WRONLY ;
-	    const char		*logdev = LOGDEV ;
+	    cint	of = O_WRONLY ;
+	    cmode	om = 0666 ;
+	    cchar	*logdev = LOGDEV ;
 	    if ((rs = u_open(logdev,of,om)) >= 0) {
 	        op->lfd = rs ;
-	        rs = uc_closeonexec(op->lfd,TRUE) ;
-	        op->ti_open = time(NULL) ;
+	        rs = uc_closeonexec(op->lfd,true) ;
+	        op->ti_open = time(nullptr) ;
 	        if (rs < 0) {
 	            u_close(op->lfd) ;
 	            op->lfd = -1 ;
 	        }
 	    } /* end if (open) */
 	} /* end if (need an open) */
-
 	return rs ;
 }
 /* end subroutine (conslog_fileopen) */
 
-
-static int conslog_fileclose(CONSLOG *op)
-{
+static int conslog_fileclose(CONSLOG *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-
 	if (op->lfd >= 0) {
 	    rs1 = uc_close(op->lfd) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->lfd = -1 ;
 	}
-
 	return rs ;
 }
 /* end subroutine (conslog_fileclose) */
 
-
-static int conslog_logdevice(CONSLOG *op,int logpri,cchar *bp,int bl)
-{
+static int conslog_logdevice(CONSLOG *op,int logpri,cchar *bp,int bl) noex {
 	struct strbuf	cmsg, dmsg ;
 	struct log_ctl	lc ;
 	int		rs = SR_OK ;
@@ -383,12 +361,9 @@ static int conslog_logdevice(CONSLOG *op,int logpri,cchar *bp,int bl)
 }
 /* end subroutine (conslog_logdevice) */
 
-
-int isLogFac(int fac)
-{
-	int		i ;
-	int		f = FALSE ;
-	for (i = 0 ; logfacs[i] >= 0 ; i += 1) {
+static bool isLogFac(int fac) noex {
+	bool		f = false ;
+	for (int i = 0 ; logfacs[i] >= 0 ; i += 1) {
 	    f = (fac == logfacs[i]) ;
 	    if (f) break ;
 	} /* end if */
