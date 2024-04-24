@@ -1,20 +1,25 @@
-/* sreq */
+/* sreq HEADER */
+/* lang=C++20 */
+
 /* Service-Request */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	SREQ_INCLUDE
-#define	SREQ_INCLUDE	1
+#define	SREQ_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>		/* for MAXPATHLEN */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<sockaddress.h>
 #include	<osetstr.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MAXPATHLEN| */
 
 #include	"mfslocinfo.h"
 #include	"mfserve.h"
@@ -23,7 +28,7 @@
 
 #define	SREQ		struct sreq
 #define	SREQ_FL		struct sreq_flags
-#define	SREQ_SNCUR	struct sreq_sncur
+#define	SREQ_SNCUR	struct sreq_sncursor
 #define	SREQ_MAGIC	0x65918233
 #define	SREQ_JOBIDLEN	15		/* same as LOGIDLEN? */
 #define	SREQ_SVCBUFLEN	(5*MAXPATHLEN)	/* max service-buffer length */
@@ -38,7 +43,7 @@ enum sreqstates {
 	sreqstate_overlast
 } ;
 
-struct sreq_sncur {
+struct sreq_sncursor {
 	OSETSTR_CUR	cur ;
 } ;
 
@@ -53,9 +58,7 @@ struct sreq_flags {
 	uint		namesvcs:1 ;		/* service names (for 'help') */
 } ;
 
-struct sreq {
-	uint		magic ;
-	SREQ_FL		open, f ;
+struct sreq_head {
 	SOCKADDRESS	sa ;			/* peername socket address */
 	SVCENTSUB	ss ;
 	OSETSTR		namesvcs ;		/* service names (for 'help') */
@@ -76,6 +79,8 @@ struct sreq {
 	time_t		etime ;			/* time-end */
 	pid_t		pid ;			/* child PID */
 	pthread_t	tid ;			/* child thread ID */
+	SREQ_FL		open, f ;
+	uint		magic ;
 	volatile int	f_exiting ;
 	int		ji ;			/* job number in DB */
 	int		jsn ;			/* job serial number */
@@ -93,59 +98,54 @@ struct sreq {
 	char		logid[SREQ_JOBIDLEN+1] ;
 } ;
 
+typedef	SREQ		sreq ;
+typedef	SREQ_FL		sreq_fl ;
+typedef	SREQ_SNCUR	sreq_sncur ;
 
-#if	(! defined(SREQ_MASTER)) || (SREQ_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int sreq_start(SREQ *,cchar *,cchar *,int,int) noex ;
+extern int sreq_typeset(SREQ *,int,int) noex ;
+extern int sreq_getfd(SREQ *) noex ;
+extern int sreq_havefd(SREQ *,int) noex ;
+extern int sreq_svcaccum(SREQ *,cchar *,int) noex ;
+extern int sreq_svcmunge(SREQ *) noex ;
+extern int sreq_svcparse(SREQ *,int) noex ;
+extern int sreq_setlong(SREQ *,int) noex ;
+extern int sreq_setstate(SREQ *,int) noex ;
+extern int sreq_getjsn(SREQ *) noex ;
+extern int sreq_getsvc(SREQ *,cchar **) noex ;
+extern int sreq_getsubsvc(SREQ *,cchar **) noex ;
+extern int sreq_getav(SREQ *,cchar ***) noex ;
+extern int sreq_getstate(SREQ *) noex ;
+extern int sreq_getstdin(SREQ *) noex ;
+extern int sreq_getstdout(SREQ *) noex ;
+extern int sreq_ofd(SREQ *) noex ;
+extern int sreq_closestdin(SREQ *) noex ;
+extern int sreq_closestdout(SREQ *) noex ;
+extern int sreq_closefds(SREQ *) noex ;
+extern int sreq_svcentbegin(SREQ *,LOCINFO *,SVCENT *) noex ;
+extern int sreq_svcentend(SREQ *) noex ;
+extern int sreq_exiting(SREQ *) noex ;
+extern int sreq_thrdone(SREQ *) noex ;
+extern int sreq_sncreate(SREQ *) noex ;
+extern int sreq_snadd(SREQ *,cchar *,int) noex ;
+extern int sreq_snbegin(SREQ *,SREQ_SNCUR *) noex ;
+extern int sreq_snenum(SREQ *,SREQ_SNCUR *,cchar **) noex ;
+extern int sreq_snend(SREQ *,SREQ_SNCUR *) noex ;
+extern int sreq_sndestroy(SREQ *) noex ;
+extern int sreq_builtload(SREQ *,MFSERVE_INFO *) noex ;
+extern int sreq_builtrelease(SREQ *) noex ;
+extern int sreq_objstart(SREQ *,cchar *,cchar **) noex ;
+extern int sreq_objcheck(SREQ *) noex ;
+extern int sreq_objabort(SREQ *) noex ;
+extern int sreq_objfinish(SREQ *) noex ;
+extern int sreq_stderrbegin(SREQ *,cchar *) noex ;
+extern int sreq_stderrclose(SREQ *) noex ;
+extern int sreq_stderrend(SREQ *) noex ;
+extern int sreq_finish(SREQ *) noex ;
 
-extern int sreq_start(SREQ *,cchar *,cchar *,int,int) ;
-extern int sreq_typeset(SREQ *,int,int) ;
-extern int sreq_getfd(SREQ *) ;
-extern int sreq_havefd(SREQ *,int) ;
-extern int sreq_svcaccum(SREQ *,cchar *,int) ;
-extern int sreq_svcmunge(SREQ *) ;
-extern int sreq_svcparse(SREQ *,int) ;
-extern int sreq_setlong(SREQ *,int) ;
-extern int sreq_setstate(SREQ *,int) ;
-extern int sreq_getjsn(SREQ *) ;
-extern int sreq_getsvc(SREQ *,cchar **) ;
-extern int sreq_getsubsvc(SREQ *,cchar **) ;
-extern int sreq_getav(SREQ *,cchar ***) ;
-extern int sreq_getstate(SREQ *) ;
-extern int sreq_getstdin(SREQ *) ;
-extern int sreq_getstdout(SREQ *) ;
-extern int sreq_ofd(SREQ *) ;
-extern int sreq_closestdin(SREQ *) ;
-extern int sreq_closestdout(SREQ *) ;
-extern int sreq_closefds(SREQ *) ;
-extern int sreq_svcentbegin(SREQ *,LOCINFO *,SVCENT *) ;
-extern int sreq_svcentend(SREQ *) ;
-extern int sreq_exiting(SREQ *) ;
-extern int sreq_thrdone(SREQ *) ;
-extern int sreq_sncreate(SREQ *) ;
-extern int sreq_snadd(SREQ *,cchar *,int) ;
-extern int sreq_snbegin(SREQ *,SREQ_SNCUR *) ;
-extern int sreq_snenum(SREQ *,SREQ_SNCUR *,cchar **) ;
-extern int sreq_snend(SREQ *,SREQ_SNCUR *) ;
-extern int sreq_sndestroy(SREQ *) ;
-extern int sreq_builtload(SREQ *,MFSERVE_INFO *) ;
-extern int sreq_builtrelease(SREQ *) ;
-extern int sreq_objstart(SREQ *,cchar *,cchar **) ;
-extern int sreq_objcheck(SREQ *) ;
-extern int sreq_objabort(SREQ *) ;
-extern int sreq_objfinish(SREQ *) ;
-extern int sreq_stderrbegin(SREQ *,cchar *) ;
-extern int sreq_stderrclose(SREQ *) ;
-extern int sreq_stderrend(SREQ *) ;
-extern int sreq_finish(SREQ *) ;
-
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* SREQ_MASTER */
+EXTERNC_end
 
 
 #endif /* SREQ_INCLUDE */

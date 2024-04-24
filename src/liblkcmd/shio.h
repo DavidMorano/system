@@ -1,4 +1,4 @@
-/* shio */
+/* shio HEADER */
 /* lang=C++20 */
 
 /* the SHell-IO hack */
@@ -21,6 +21,9 @@
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<stdarg.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<bfile.h>
 #include	<localmisc.h>
 

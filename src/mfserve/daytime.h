@@ -1,6 +1,8 @@
-/* daytime */
+/* daytime HEADER */
+/* lang=C20 */
 
 /* DAYTIME loadable service for MFSERVE */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -13,15 +15,19 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	DAYTIME_INCLUDE
-#define	DAYTIME_INCLUDE	1
+#define	DAYTIME_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
+#include	<sys/types.h>		/* system-types */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<pthread.h>
 #include	<ptm.h>
 #include	<ptc.h>
 #include	<vecpstr.h>
+#include	<sreq.h>
 #include	<localmisc.h>
 
 #include	"sreq.h"
@@ -40,38 +46,34 @@ struct daytime_flags {
 } ;
 
 struct daytime_head {
-	uint		magic ;
-	PTM		m ;		/* mutex */
-	PTC		c ;		/* condition variable */
-	DAYTIME_FL	f ;
+	cchar		*pr ;
+	mainv		envv ;
+	ptmM		m ;		/* mutex */
+	ptc		c ;		/* condition variable */
 	SREQ		*jep ;
-	VECPSTR		args ;
+	vecpstr		args ;
 	volatile int	f_abort ;	/* command from parent thread */
 	volatile int	f_exiting ;	/* thread is exiting */
 	pid_t		pid ;
 	pthread_t	tid ;
-	int		ifd, ofd ;
-	cchar		*pr ;
-	cchar		**envv ;
+	DAYTIME_FL	f ;
+	uint		magic ;
+	int		ifd ;
+	int		ofd ;
 } ;
 
+typedef	DAYTIME		daytime ;
+typedef	DAYTIME_FL	daytime_fl ;
 
-#if	(! defined(DAYTIME_MASTER)) || (DAYTIME_MASTER == 0)
+EXTERNC_begin
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+extern int daytime_start(daytime *,cchar *,SREQ *,mainv,mainv) noex ;
+extern int daytime_check(daytime *) noex ;
+extern int daytime_abort(daytime *) noex ;
+extern int daytime_finish(daytime *) noex ;
 
-extern int daytime_start(DAYTIME *,cchar *,SREQ *,cchar **,cchar **) ;
-extern int daytime_check(DAYTIME *) ;
-extern int daytime_abort(DAYTIME *) ;
-extern int daytime_finish(DAYTIME *) ;
+EXTERNC_end
 
-#ifdef	__cplusplus
-}
-#endif
-
-#endif /* DAYTIME_MASTER */
 
 #endif /* DAYTIME_INCLUDE */
 

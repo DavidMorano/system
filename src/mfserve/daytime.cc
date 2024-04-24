@@ -1,10 +1,8 @@
-/* daytime (DAYTIME) */
+/* daytime SUPPORT (DAYTIME) */
+/* lang=C++20 */
 
 /* this is a MFSERVE loadable service-module */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-#define	CF_DEBUGN	0		/* special debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -18,21 +16,16 @@
 
 /*******************************************************************************
 
-	Description:
+	Name:
+	daytime
 
+	Description:
 	This object is a MFSERVE loadable service-module.
 
 	Synopsis:
-
-	int daytime_start(op,pr,jep,argv,envv)
-	DAYTIME		*op ;
-	const char	*pr ;
-	SREQ		*jep ;
-	const char	**argv ;
-	const char	**envv ;
+	int daytime_start(DAYTIME *op,cc *pr,SREQ *jep,mv argv,mv envv) noex
 
 	Arguments:
-
 	op		object pointer
 	pr		program-root
 	sn		search-name (of program calling us)
@@ -40,28 +33,24 @@
 	envv		array-environment array
 
 	Returns:
-
 	>=0		OK
-	<0		error code
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<estrings.h>
+#include	<modload.h>
 #include	<upt.h>
 #include	<nistinfo.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |MAXNAMELEN| + |USERNAMELEN| */
 
 #include	"mfserve.h"
 #include	"daytime.h"
@@ -82,37 +71,16 @@
 #define	NDF		"daytime.nd"
 
 
-/* typedefs */
+/* imported namespaces */
 
-typedef int	(*thrsub_t)(void *) ;
+
+/* local typedefs */
+
+typedef int	(*thrsub_f)(void *) noex ;
+typedef mainv	mv ;
 
 
 /* external subroutines */
-
-extern int	nleadstr(cchar *,cchar *,int) ;
-extern int	cfdeci(cchar *,int,int *) ;
-extern int	cfdecui(cchar *,int,uint *) ;
-extern int	getusername(char *,int,uid_t) ;
-extern int	localgetorg(cchar *,char *,int,cchar *) ;
-extern int	localgetorgcode(cchar *,char *,int,cchar *) ;
-extern int	hasNotDots(cchar *,int) ;
-extern int	isNotPresent(int) ;
-
-#if	CF_DEBUGS
-extern int	debugprintf(cchar *,...) ;
-extern int	strlinelen(cchar *,int,int) ;
-#endif
-
-#if	CF_DEBUGN
-extern int	nprintf(cchar *,cchar *,...) ;
-#endif
-
-extern cchar	*getourenv(const char **,const char *) ;
-
-extern char	*strwcpy(char *,cchar *,int) ;
-extern char	*strnchr(const char *,int,int) ;
-extern char	*strnpbrk(const char *,int,const char *) ;
-extern char	*timestr_nist(time_t,NISTINFO *,char *) ;
 
 
 /* external variables */
@@ -123,9 +91,9 @@ extern char	*timestr_nist(time_t,NISTINFO *,char *) ;
 
 /* forward references */
 
-static int daytime_argsbegin(DAYTIME *,cchar **) ;
-static int daytime_argsend(DAYTIME *) ;
-static int daytime_worker(DAYTIME *) ;
+static int daytime_argsbegin(DAYTIME *,cchar **) noex ;
+static int daytime_argsend(DAYTIME *) noex ;
+static int daytime_worker(DAYTIME *) noex ;
 
 
 /* local variables */
@@ -133,32 +101,28 @@ static int daytime_worker(DAYTIME *) ;
 
 /* exported variables */
 
-MFSERVE_MOD	daytime = {
+MFSERVE_OBJ	daytime_mod = {
 	"daytime",
 	sizeof(DAYTIME),
 	0
 } ;
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int daytime_start(DAYTIME *op,cchar *pr,SREQ *jep,cchar **argv,cchar **envv)
-{
+int daytime_start(DAYTIME *op,cc *pr,SREQ *jep,mv argv,mv envv) noex {
 	int		rs = SR_OK ;
 
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("daytime_start: ent {%p}\n",op) ;
-	debugprintf("daytime_start: pr=%s\n",pr) ;
-#endif
+	if (pr == nullptr) return SR_FAULT ;
+	if (argv == nullptr) return SR_FAULT ;
+	if (envv == nullptr) return SR_FAULT ;
 
-	if (pr == NULL) return SR_FAULT ;
-	if (argv == NULL) return SR_FAULT ;
-	if (envv == NULL) return SR_FAULT ;
-
-	memset(op,0,sizeof(DAYTIME)) ;
+	memclear(op) ;
 	op->pr = pr ;
 	op->jep = jep ;
 	op->envv = envv ;
@@ -167,56 +131,39 @@ int daytime_start(DAYTIME *op,cchar *pr,SREQ *jep,cchar **argv,cchar **envv)
 	    op->ofd = rs ;
 	    if ((rs = daytime_argsbegin(op,argv)) >= 0) {
 	        pthread_t	tid ;
-	        thrsub_t	thr = (thrsub_t) daytime_worker ;
-	        if ((rs = uptcreate(&tid,NULL,thr,op)) >= 0) {
-	            op->f.working = TRUE ;
+	        thrsub_f	thr = (thrsub_f) daytime_worker ;
+	        if ((rs = uptcreate(&tid,nullptr,thr,op)) >= 0) {
+	            op->f.working = true ;
 	            op->tid = tid ;
 	            op->magic = DAYTIME_MAGIC ;
-#if	CF_DEBUGS
-	            debugprintf("daytime_start: magic=%08x\n",op->magic) ;
-#endif
 	        }
 	        if (rs < 0)
 	            daytime_argsend(op) ;
 	    } /* end if (daytime_argsbegin) */
 	} /* end if (sreq_getstdout) */
 
-#if	CF_DEBUGS
-	debugprintf("daytime_start: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (daytime_start) */
 
-
-int daytime_finish(DAYTIME *op)
-{
+int daytime_finish(DAYTIME *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("daytime_finish: ent {%p}\n",op) ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DAYTIME_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("daytime_finish: f_working=%d\n",op->f.working) ;
-#endif
 
 	if (op->f.working) {
 	    const pid_t	pid = getpid() ;
 	    if (pid == op->pid) {
 	        int	trs = 0 ;
-	        op->f.working = FALSE ;
+	        op->f.working = false ;
 	        rs1 = uptjoin(op->tid,&trs) ;
 	        if (rs >= 0) rs = rs1 ;
 	        if (rs >= 0) rs = trs ;
 	    } else {
-	        op->f.working = FALSE ;
+	        op->f.working = false ;
 	        op->tid = 0 ;
 	    }
 	}
@@ -224,27 +171,17 @@ int daytime_finish(DAYTIME *op)
 	rs1 = daytime_argsend(op) ;
 	if (rs >= 0) rs = rs1 ;
 
-#if	CF_DEBUGS
-	debugprintf("daytime_finish: ret rs=%d\n",rs) ;
-#endif
-
 	op->magic = 0 ;
 	return rs ;
 }
 /* end subroutine (daytime_finish) */
 
-
-int daytime_check(DAYTIME *op)
-{
+int daytime_check(DAYTIME *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		f = FALSE ;
+	int		f = false ;
 
-#if	CF_DEBUGS
-	debugprintf("daytime_check: ent {%p}\n",op) ;
-#endif
-
-	if (op == NULL) return SR_FAULT ;
+	if (op == nullptr) return SR_FAULT ;
 
 	if (op->magic != DAYTIME_MAGIC) return SR_NOTOPEN ;
 
@@ -253,40 +190,28 @@ int daytime_check(DAYTIME *op)
 	    if (pid == op->pid) {
 	        if (op->f_exiting) {
 	            int		trs = 0 ;
-	            op->f.working = FALSE ;
+	            op->f.working = false ;
 	            rs1 = uptjoin(op->tid,&trs) ;
 	            if (rs >= 0) rs = rs1 ;
 	            if (rs >= 0) rs = trs ;
-	            f = TRUE ;
+	            f = true ;
 	        }
 	    } else {
-	        op->f.working = FALSE ;
+	        op->f.working = false ;
 	    }
 	} else {
-	    f = TRUE ;
+	    f = true ;
 	} /* end if (working) */
-
-#if	CF_DEBUGS
-	debugprintf("daytime_check: ret rs=%d f=%u\n",rs,f) ;
-#endif
 
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (daytime_check) */
 
-
-int daytime_abort(DAYTIME *op)
-{
-	const int	f = op->f_exiting ;
-#if	CF_DEBUGS
-	debugprintf("daytime_abort: ent {%p}\n",op) ;
-#endif
-	if (op == NULL) return SR_FAULT ;
+int daytime_abort(DAYTIME *op) noex {
+	cint	f = op->f_exiting ;
+	if (op == nullptr) return SR_FAULT ;
 	if (op->magic != DAYTIME_MAGIC) return SR_NOTOPEN ;
-#if	CF_DEBUGS
-	debugprintf("daytime_abort: cont f=%u\n",f) ;
-#endif
-	op->f_abort = TRUE ;
+	op->f_abort = true ;
 	return f ;
 }
 /* end subroutine (daytime_abort) */
@@ -294,20 +219,18 @@ int daytime_abort(DAYTIME *op)
 
 /* provate subroutines */
 
-
-static int daytime_argsbegin(DAYTIME *op,cchar **argv)
-{
-	VECPSTR		*alp = &op->args ;
-	const int	ss = DAYTIME_CSIZE ;
+static int daytime_argsbegin(DAYTIME *op,cchar **argv) noex {
+	vecpstr		*alp = &op->args ;
+	cint		ss = DAYTIME_CSIZE ;
 	int		rs ;
 	if ((rs = vecpstr_start(alp,5,0,ss)) >= 0) {
 	    int		i ;
-	    op->f.args = TRUE ;
-	    for (i = 0 ; (rs >= 0) && (argv[i] != NULL) ; i += 1) {
+	    op->f.args = true ;
+	    for (i = 0 ; (rs >= 0) && (argv[i] != nullptr) ; i += 1) {
 	        rs = vecpstr_add(alp,argv[i],-1) ;
 	    }
 	    if (rs < 0) {
-	        op->f.args = FALSE ;
+	        op->f.args = false ;
 	        vecpstr_finish(alp) ;
 	    }
 	} /* end if (m-a) */
@@ -315,13 +238,11 @@ static int daytime_argsbegin(DAYTIME *op,cchar **argv)
 }
 /* end subroutine (daytime_argsbegin) */
 
-
-static int daytime_argsend(DAYTIME *op)
-{
+static int daytime_argsend(DAYTIME *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->f.args) {
-	    VECPSTR	*alp = &op->args ;
+	    vecpstr	*alp = &op->args ;
 	    rs1 = vecpstr_finish(alp) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -329,46 +250,26 @@ static int daytime_argsend(DAYTIME *op)
 }
 /* end subroutine (daytime_argsend) */
 
-
-/* independent thread */
-static int daytime_worker(DAYTIME *op)
-{
+static int daytime_worker(DAYTIME *op) noex {
 	int		rs = SR_OK ;
 	int		wlen = 0 ;
-
-#if	CF_DEBUGS
-	debugprintf("daytime_worker: ent\n") ;
-#endif
 
 	if (! op->f_abort) {
 	    USTAT	sb ;
 	    cchar	*pr = op->pr ;
 	    if ((rs = uc_stat(pr,&sb)) >= 0) {
 	        const uid_t	uid = sb.st_uid ;
-	        const int	ulen = USERNAMELEN ;
+	        cint	ulen = USERNAMELEN ;
 	        char		ubuf[USERNAMELEN+1] ;
 	        if ((rs = getusername(ubuf,ulen,uid)) >= 0) {
-	            const int	olen = ORGCODELEN ;
+	            cint	olen = ORGCODELEN ;
 	            char	obuf[ORGCODELEN+1] ;
 	            if ((rs = localgetorgcode(pr,obuf,olen,ubuf)) >= 0) {
-	                NISTINFO	ni ;
-	                const time_t	dt = time(NULL) ;
+	                NISTINFO	ni{} ;
+	                const time_t	dt = time(nullptr) ;
 	                char		ntbuf[NISTINFO_BUFLEN+1+1] ;
-#if	CF_DEBUGS
-			debugprintf("daytime: obuf=%s\n",obuf) ;
-#endif
-#if	CF_DEBUGN
-			nprintf(NDF,"daytime: obuf=%s\n",obuf) ;
-#endif
-	                memset(&ni,0,sizeof(NISTINFO)) ;
 	                strdcpy1(ni.org,NISTINFO_ORGLEN,obuf) ;
-#if	CF_DEBUGN
-			nprintf(NDF,"daytime: timestr_nist()\n") ;
-#endif
 	                timestr_nist(dt,&ni,ntbuf) ;
-#if	CF_DEBUGN
-			nprintf(NDF,"daytime: t=>%s<\n",ntbuf) ;
-#endif
 	                {
 	                    int	tl = strlen(ntbuf) ;
 			    ntbuf[tl++] = '\n' ;
@@ -383,11 +284,7 @@ static int daytime_worker(DAYTIME *op)
 	    } /* end if (uc_stat) */
 	} /* end if (not aborting) */
 
-#if	CF_DEBUGS
-	debugprintf("daytime/work_start: ret rs=%d\n",rs) ;
-#endif
-
-	op->f_exiting = TRUE ;
+	op->f_exiting = true ;
 	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (daytime_worker) */

@@ -1,4 +1,4 @@
-/* shio */
+/* shio SUPPORT */
 /* lang=C++20 */
 
 /* the SHell-IO hack */
@@ -73,14 +73,14 @@
 
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<dlfcn.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<bfile.h>
