@@ -1,5 +1,5 @@
-/* manstr */
-/* lang=C20 */
+/* manstr SUPPORT */
+/* lang=C++20 */
 
 /* special string manipulations */
 /* version %I% last-modified %G% */
@@ -22,10 +22,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
 #include	<usystem.h>
-#include	<char.h>
 #include	<six.h>
+#include	<char.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"manstr.h"
@@ -42,11 +42,26 @@
 
 /* local structures */
 
+namespace {
+    struct whitestop {
+	manstr	*sop ;
+	int	sch ;
+	whitestop(manstr *p,int c) noex : sop(p), sch(c) { } ;
+	operator bool () noex {
+	    cint	ch = mkchar(sop->sp[0]) ;
+	    return CHAR_ISWHITE(ch) && (ch != sch) ;
+	} ;
+    } ; /* end struct (whitestop) */
+}
+
 
 /* forward references */
 
 
 /* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -64,7 +79,7 @@ int manstr_start(manstr *sop,cchar *sp,int sl) noex {
 
 int manstr_finish(manstr *sop) noex {
 	int		rs = SR_FAULT ;
-	if (sop && sp) {
+	if (sop) {
 	    rs = sop->sl ;
 	    sop->sp = nullptr ;
 	    sop->sl = 0 ;
@@ -76,7 +91,7 @@ int manstr_finish(manstr *sop) noex {
 int manstr_breakfield(manstr *sop,cchar *ss,cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = -1 ;
-	if (sop && ss & rpp) {
+	if (sop && ss && rpp) {
 	    int		si = -1 ;
 	    rs = SR_OK ;
 	    *rpp = nullptr ;
@@ -102,9 +117,10 @@ int manstr_breakfield(manstr *sop,cchar *ss,cchar **rpp) noex {
 }
 /* end subroutine (manstr_breakfield) */
 
+/* skip white-space until reach terminator character */
 int manstr_whitecolon(manstr *sop) noex {
-	while ((sop->sl > 0) && 
-	    (CHAR_ISWHITE(sop->sp[0]) || (sop->sp[0] == ':'))) {
+	whitestop	pred(sop,':') ;
+	while ((sop->sl > 0) && pred) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	}
@@ -112,9 +128,10 @@ int manstr_whitecolon(manstr *sop) noex {
 }
 /* end subroutine (manstr_whitecolon) */
 
+/* skip white-space until reach terminator character */
 int manstr_whitedash(manstr *sop) noex {
-	while ((sop->sl > 0) && 
-	    (CHAR_ISWHITE(sop->sp[0]) || (sop->sp[0] == '-'))) {
+	whitestop	pred(sop,'-') ;
+	while ((sop->sl > 0) && pred) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
 	}

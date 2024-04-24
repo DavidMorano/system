@@ -32,8 +32,8 @@ EXTERNC_begin
 extern int	manstr_start(manstr *,cchar *,int) noex ;
 extern int	manstr_breakfield(manstr *,cchar *,cchar **) noex ;
 extern int	manstr_span(manstr *,cchar *) noex ;
-extern int	manstr_whitedash(manstr *) noex ;
-extern int	manstr_whitecolon(manstr *) noex ;
+extern int	manstr_whitedash(manstr *) noex ;	/* skip wht until */
+extern int	manstr_whitecolon(manstr *) noex ;	/* skip wht until */
 extern int	manstr_finish(manstr *) noex ;
 
 EXTERNC_end
