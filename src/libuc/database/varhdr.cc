@@ -16,6 +16,9 @@
 
 /*******************************************************************************
 
+	Name:
+
+	Description:
 	This subroutine writes out the hash file.
 
 	Synopsis:
@@ -90,8 +93,8 @@ enum his {
 
 int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = VARHDR_MAGICSIZE ;
+	cint	headsize = hi_overlast * sizeof(uint) ;
+	cint	magicsize = VARHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
 	cchar		*magicstr = VARHDR_MAGICSTR ;

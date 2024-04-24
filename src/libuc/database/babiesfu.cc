@@ -1,9 +1,8 @@
-/* babiesfu */
+/* babiesfu SUPPORT */
+/* lang=C++20 */
 
 /* header management for BABIES shared-memory segment */
-
-
-#define	CF_DEBUGS 	0		/* run-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,11 +16,13 @@
 
 /*******************************************************************************
 
-	This subroutine reads and writes the BABIES shared-memory segment
-	header.
+	Name:
+
+	Description:
+	This subroutine reads and writes the BABIES shared-memory
+	segment header.
 
 	Synopsis:
-
 	int babiesfu(ep,f,hbuf,hlen)
 	BABIESFU	*ep ;
 	int		f ;
@@ -41,8 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -75,17 +74,18 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int babiesfu(BABIESFU *ep,int f,char *hbuf,int hlen)
-{
+int babiesfu(BABIESFU *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = babiesfuh_overlast * sizeof(uint) ;
-	const int	magicsize = BABIESFU_MAGICSIZE ;
+	cint	headsize = babiesfuh_overlast * sizeof(uint) ;
+	cint	magicsize = BABIESFU_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	const char	*magicstr = BABIESFU_MAGICSTR ;
+	cchar	*magicstr = BABIESFU_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;

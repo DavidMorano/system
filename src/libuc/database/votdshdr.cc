@@ -1,9 +1,8 @@
-/* votdchdr */
+/* votdchdr SUPPORT */
+/* lang=C++20 */
 
 /* header for VOTDs shared-memory segment */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,6 +19,9 @@
 
 /*******************************************************************************
 
+	Name:
+
+	Description:
 	This subroutine reads and writes the VOTDs shared-memory
 	segment header.
 
@@ -43,8 +45,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -77,14 +77,15 @@
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int votdchdr(VOTDCHDR *ep,int f,char *hbuf,int hlen)
-{
+int votdchdr(VOTDCHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = votdchdrh_overlast * sizeof(uint) ;
-	const int	magicsize = VOTDCHDR_MAGICSIZE ;
+	cint	headsize = votdchdrh_overlast * sizeof(uint) ;
+	cint	magicsize = VOTDCHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
 	cchar		*magicstr = VOTDCHDR_MAGICSTR ;
