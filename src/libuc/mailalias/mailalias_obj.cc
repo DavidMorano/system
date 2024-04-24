@@ -4,9 +4,6 @@
 /* manage a MAILALIAS object */
 /* lang=C20 */
 
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
-#define	CF_DEBUGSFILE	1		/* file parsing */
-#define	CF_DEBUGSSHIFT	0
 #define	CF_SAFE		1		/* safe mode */
 #define	CF_FASTKEYMATCH	1		/* faster key matching */
 #define	CF_DEFPROFILE	0		/* always use default MA-profile */
@@ -93,6 +90,7 @@
 #include	<char.h>
 #include	<mkchar.h>
 #include	<hasx.h>
+#include	<isfiledesc.h>
 #include	<isnot.h>
 #include	<iserror.h>
 #include	<ischarx.h>
@@ -120,8 +118,6 @@
 #define	MA_INFO			MAILALIAS_INFO
 
 #define	DBMAKE			class dbmake
-
-#define	RECORD			class record
 
 #define	MODP2(v,n)	((v) & ((n) - 1))
 
@@ -169,6 +165,8 @@ using std::nothrow ;			/* constant */
 typedef mode_t		m_t ;
 #endif
 
+typedef int (*rt_t)[2] ;
+
 
 /* external subroutines */
 
@@ -205,59 +203,90 @@ namespace {
 	    fd = afd ;
 	    f_havekey = false ;
 	} ;
+	int procline(cchar *,int) noex ;
     } ; /* end class (dbmake) */
     class record {
     public:
-	record() noex : key(0), val(0) { } ;
 	uint		key ;
 	uint		val ;
+	record() noex : key(0), val(0) { } ;
+	record(uint k,uint v) noex : key(k), val(v) { } ;
     } ; /* end class (record) */
+    typedef record *	recordp ;
 }
 
 
 /* forward references */
 
-static int	mailalias_hdrload(MAILALIAS *) noex ;
-static int	mailalias_hdrloader(MAILALIAS *) noex ;
-static int	mailalias_enterbegin(MAILALIAS *,time_t) noex ;
-static int	mailalias_enterend(MAILALIAS *,time_t) noex ;
+template<typename ... Args>
+static int mailalias_ctor(mailalias *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = SR_OK ;
+	    memclear(op) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailalias_ctor) */
 
-static int	mailalias_fileopen(MAILALIAS *,time_t) noex ;
-static int	mailalias_fileclose(MAILALIAS *) noex ;
-static int	mailalias_filechanged(MAILALIAS *,USTAT *) noex ;
-static int	mailalias_mapbegin(MAILALIAS *,time_t dt) noex ;
-static int	mailalias_mapend(MAILALIAS *) noex ;
+static int mailalias_dtor(mailalias *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (mailalias_dtor) */
+
+template<typename ... Args>
+static inline int mailalias_magic(mailalias *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == MAILALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (mailalias_magic) */
+
+static int	mailalias_hdrload(MA *) noex ;
+static int	mailalias_hdrloader(MA *) noex ;
+static int	mailalias_enterbegin(MA *,time_t) noex ;
+static int	mailalias_enterend(MA *,time_t) noex ;
+
+static int	mailalias_fileopen(MA *,time_t) noex ;
+static int	mailalias_fileclose(MA *) noex ;
+static int	mailalias_filechanged(MA *,USTAT *) noex ;
+static int	mailalias_mapbegin(MA *,time_t dt) noex ;
+static int	mailalias_mapend(MA *) noex ;
 
 #if	(! CF_FASTKEYMATCH)
-static int	mailalias_keymatch(MAILALIAS *,int,int,cchar *) noex ;
+static int	mailalias_keymatch(MA *,int,int,cchar *) noex ;
 #endif
 
-static int	mailalias_dbopen(MAILALIAS *,time_t) noex ;
-static int	mailalias_dbopenfile(MAILALIAS *,time_t) noex ;
-static int	mailalias_dbopenmake(MAILALIAS *,time_t) noex ;
-static int	mailalias_dbopenwait(MAILALIAS *) noex ;
-static int	mailalias_isremote(MAILALIAS *) noex ;
-static int	mailalias_dbclose(MAILALIAS *) noex ;
-static int	mailalias_dbmake(MAILALIAS *,time_t) noex ;
-static int	mailalias_dbmaker(MAILALIAS *,time_t,cchar *) noex ;
-static int	mailalias_dbmaking(MAILALIAS *,int,time_t,int) noex ;
-static int	mailalias_procfile(MAILALIAS *,DBMAKE *,cchar *) noex ;
-static int	mailalias_procfileline(MAILALIAS *,DBMAKE *,cchar *,int) noex ;
-static int	mailalias_wrfile(MAILALIAS *,DBMAKE *, time_t) noex ;
-static int	mailalias_wrfiler(MAILALIAS *,DBMAKE *, time_t) noex ;
-static int	mailalias_wrfilekeytab(MAILALIAS *,DBMAKE *) noex ;
-static int	mailalias_wrfilerec(MAILALIAS *,DBMAKE *) noex ;
-static int	mailalias_wrfilekeys(MAILALIAS *,DBMAKE *) noex ;
-static int	mailalias_wrfilevals(MAILALIAS *,DBMAKE *) noex ;
-static int	mailalias_mkind(MAILALIAS *,vecobj *,cchar *,
-			int (*)[2],int) noex ;
-static int	mailalias_fileold(MAILALIAS *,time_t) noex ;
-static int	mailalias_aprofile(MAILALIAS *,time_t) noex ;
+static int	mailalias_dbopen(MA *,time_t) noex ;
+static int	mailalias_dbopenfile(MA *,time_t) noex ;
+static int	mailalias_dbopenmake(MA *,time_t) noex ;
+static int	mailalias_dbopenwait(MA *) noex ;
+static int	mailalias_isremote(MA *) noex ;
+static int	mailalias_dbclose(MA *) noex ;
+static int	mailalias_dbmake(MA *,time_t) noex ;
+static int	mailalias_dbmaker(MA *,time_t,cchar *) noex ;
+static int	mailalias_dbmaking(MA *,int,time_t,int) noex ;
+static int	mailalias_procfile(MA *,DBMAKE *,cchar *) noex ;
+static int	mailalias_wrfile(MA *,DBMAKE *, time_t) noex ;
+static int	mailalias_wrfiler(MA *,DBMAKE *, time_t) noex ;
+static int	mailalias_wrfilekeytab(MA *,DBMAKE *) noex ;
+static int	mailalias_wrfilerec(MA *,DBMAKE *) noex ;
+static int	mailalias_wrfilekeys(MA *,DBMAKE *) noex ;
+static int	mailalias_wrfilevals(MA *,DBMAKE *) noex ;
+static int	mailalias_mkind(MA *,vecobj *,cchar *,rt_t,int) noex ;
+static int	mailalias_fileold(MA *,time_t) noex ;
+static int	mailalias_aprofile(MA *,time_t) noex ;
 
-static int	mailalias_checkchanged(MAILALIAS *,time_t) noex ;
-static int	mailalias_checkold(MAILALIAS *,time_t) noex ;
+static int	mailalias_checkchanged(MA *,time_t) noex ;
+static int	mailalias_checkold(MA *,time_t) noex ;
 
-static int	mailalias_mapcheck(MAILALIAS *,time_t) noex ;
+static int	mailalias_mapcheck(MA *,time_t) noex ;
 
 static int	hashindex(uint,int) noex ;
 
@@ -308,7 +337,7 @@ constexpr cchar		kterms[] = {
 } ;
 
 /* all white space plus comma (',') */
-static const uchar	vterms[] = {
+constexpr cchar		vterms[] = {
 	0x00, 0x1F, 0x00, 0x00,
 	0x01, 0x10, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00,
@@ -329,28 +358,16 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	const time_t	dt = time(nullptr) ;
 	int		rs ;
 	int		f_create = false ;
-
-	if (op == nullptr) return SR_FAULT ;
-	if (pr == nullptr) return SR_FAULT ;
-	if (pname == nullptr) return SR_FAULT ;
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_open: ent\n") ;
-#endif
-
-	memclear(op) ;
+	if ((rs = mailalias_ctor(op,pr,pname)) >= 0) {
 	op->fd = -1 ;
 	op->oflags = of ;
 	op->operm = om ;
 	op->otype = ot ;
-
 	op->f.ocreate = ((of & O_CREAT) == O_CREAT) ;
 	op->f.owrite |= ((of & O_WRONLY) == O_WRONLY) ;
 	op->f.owrite |= ((of & O_RDWR) == O_RDWR) ;
-
 	op->aprofile = defprofile ;
 	op->pagesize = getpagesize() ;
-
 	if ((rs = ids_load(&op->id)) >= 0) {
 	    cchar	*cp ;
 	    if ((rs = uc_mallocstrw(pr,-1,&cp)) >= 0) {
@@ -375,8 +392,9 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	                                f_create = (rs > 0) ;
 	                                op->magic = MAILALIAS_MAGIC ;
 	                            }
-	                            if (rs < 0)
+	                            if (rs < 0) {
 	                                vecstr_finish(&op->apfiles) ;
+				    }
 	                        } /* end if (vecstr_start) */
 	                        if (rs < 0) {
 	                            uc_free(op->dbfname) ;
@@ -395,55 +413,52 @@ int mailalias_open(MA *op,cc *pr,cc *pname,int of,m_t om,int ot) noex {
 	            op->pr = nullptr ;
 	        }
 	    } /* end if (m-a) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        ids_release(&op->id) ;
+	    }
 	} /* end if (ids_load) */
 
-#if	CF_DEBUGS
-	debugprintf("mailalias_open: ret rs=%d f_create=%u\n",
-	    rs,f_create) ;
-#endif
-
+	    if (rs < 0) {
+		mailalias_dtor(op) ;
+	    }
+	} /* end if (mailalias_ctor) */
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_open) */
 
 int mailalias_close(MA *op) noex {
-	int		rs = SR_OK ;
+	int		rs ;
 	int		rs1 ;
-
-	if (op == nullptr) return SR_FAULT ;
-
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	rs1 = mailalias_dbclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vecstr_finish(&op->apfiles) ;
-	if (rs >= 0) rs = rs1 ;
-
-	if (op->dbfname != nullptr) {
-	    rs1 = uc_free(op->dbfname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->dbfname = nullptr ;
-	}
-
-	if (op->apname != nullptr) {
-	    rs1 = uc_free(op->apname) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->apname = nullptr ;
-	}
-
-	if (op->pr != nullptr) {
-	    rs1 = uc_free(op->pr) ;
-	    if (rs >= 0) rs = rs1 ;
-	    op->pr = nullptr ;
-	}
-
-	rs1 = ids_release(&op->id) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    {
+	        rs1 = mailalias_dbclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = vecstr_finish(&op->apfiles) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->dbfname) {
+	        rs1 = uc_free(op->dbfname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->dbfname = nullptr ;
+	    }
+	    if (op->apname) {
+	        rs1 = uc_free(op->apname) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->apname = nullptr ;
+	    }
+	    if (op->pr) {
+	        rs1 = uc_free(op->pr) ;
+	        if (rs >= 0) rs = rs1 ;
+	        op->pr = nullptr ;
+	    }
+	    {
+	        rs1 = ids_release(&op->id) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (mailalias_close) */
@@ -533,10 +548,6 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 
 	ri = (curp->i < 1) ? 1 : (curp->i + 1) ;
 
-#if	CF_DEBUGS
-	debugprintf("mailalias_enum: ri=%d\n",ri) ;
-#endif
-
 /* capture a hold on the file */
 
 	if ((rs = mailalias_enterbegin(op,dt)) >= 0) {
@@ -547,10 +558,6 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	        ai = op->rectab[ri][0] ;
 	        vi = op->rectab[ri][1] ;
 
-#if	CF_DEBUGS
-	        debugprintf("mailalias_enum: ai=%u vi=%u\n",ai,vi) ;
-#endif
-
 	        if ((ai < op->sklen) && (vi < op->svlen)) {
 	            char	*bp ;
 
@@ -558,7 +565,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 
 	                cl = ALIASNAMELEN ;
 	                if (klen >= 0)
-	                    cl = MIN(klen,ALIASNAMELEN) ;
+	                    cl = min(klen,ALIASNAMELEN) ;
 
 	                bp = strwcpy(kbuf,(op->skey + ai),cl) ;
 	                vl = (bp - kbuf) ;
@@ -570,7 +577,7 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	            if (vbuf != nullptr) {
 	                cl = MAILADDRLEN ;
 	                if (vlen >= 0) {
-	                    cl = MIN(vlen,MAILADDRLEN) ;
+	                    cl = min(vlen,MAILADDRLEN) ;
 	                }
 	                strwcpy(vbuf,(op->sval + vi),cl) ;
 	            } /* end if (value buffer present) */
@@ -643,10 +650,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	        if (curp->i < 0) {
 	            char	keybuf[ALIASNAMELEN + 1] ;
 
-#if	CF_DEBUGS
-	            debugprintf("mailalias_fetch: new cursor\n") ;
-#endif
-
 	            f = (strcasecmp(aname,"Postmaster") == 0) ;
 
 	            if (f) {
@@ -662,29 +665,12 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 
 	            hi = hashindex(khash,op->rilen) ;
 
-#if	CF_DEBUGS
-	            debugprintf("mailalias_fetch: khash=%08x hi=%d\n",
-	                khash,hi) ;
-#endif
-
 /* start searching! */
 
 	            if (op->ropts & MAILALIAS_OSEC) {
 			int	c = 0 ;
-	                int	f ;
-
-#if	CF_DEBUGS
-	                debugprintf("mailalias_fetch: "
-	                    "secondary initial ri=%d\n",(op->indtab)[hi][0]) ;
-#endif
-
-	                c = 0 ;
+	                bool	f{} ;
 	                while ((ri = (op->indtab)[hi][0]) != 0) {
-
-#if	CF_DEBUGS
-	                    debugprintf("mailalias_fetch: trymatch ri=%d\n",
-	                        ri) ;
-#endif
 
 #if	CF_FASTKEYMATCH
 	                    ki = op->rectab[ri][0] ;
@@ -705,20 +691,9 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	                    }
 
 	                    hi = hashindex(khash,n) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("mailalias_fetch: "
-	                        "new khash=%08x hi=%d\n", khash,hi) ;
-#endif
-
 	                    c += 1 ;
 
 	                } /* end while */
-
-#if	CF_DEBUGS
-	                debugprintf("mailalias_fetch: index-key-match ri=%d\n",
-	                    ri) ;
-#endif
 
 	                if (ri == 0) {
 	                    rs = SR_NOTFOUND ;
@@ -729,10 +704,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	        } else {
 
 /* get the next record index (if there is one) */
-
-#if	CF_DEBUGS
-	            debugprintf("mailalias_fetch: old cursor\n") ;
-#endif
 
 	            hi = curp->i ;
 	            if (hi != 0) {
@@ -752,11 +723,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	            }
 
 	        } /* end if (preparation) */
-
-#if	CF_DEBUGS
-	        debugprintf("mailalias_fetch: match search rs=%d hi=%d\n",
-	            rs,hi) ;
-#endif
 
 	        if (rs >= 0) {
 
@@ -783,23 +749,13 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	            }
 
 	        } /* end if (following the existing chain) */
-
-#if	CF_DEBUGS
-	        debugprintf("mailalias_fetch: searched rs=%d ri=%u hi=%u\n",
-	            rs,ri,hi) ;
-#endif
-
 /* if successful, retrieve value */
-
 	        if (rs >= 0) {
 
 	            vi = op->rectab[ri][1] ;
 	            if (vbuf != nullptr) {
-	                cl = MIN(vlen,ALIASNAMELEN) ;
+	                cl = min(vlen,ALIASNAMELEN) ;
 	                cp = strwcpy(vbuf,(op->sval + vi),cl) ;
-#if	CF_DEBUGS
-	                debugprintf("mailalias_fetch: value=%s\n",vbuf) ;
-#endif
 	                vl = (cp - vbuf) ;
 	            } else {
 	                vl = strlen(op->sval + vi) ;
@@ -808,10 +764,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 /* update cursor */
 
 	            if (f_cur) {
-#if	CF_DEBUGS
-	                debugprintf("mailalias_fetch: cursor update hi=%u\n",
-	                    hi) ;
-#endif
 	                curp->i = hi ;
 	            }
 
@@ -821,10 +773,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mailalias-enter) */
 	} /* end if (ok) */
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_fetch: ret rs=%d vl=%d\n",rs,vl) ;
-#endif
 
 	return (rs >= 0) ? vl : rs ;
 }
@@ -938,16 +886,6 @@ static int mailalias_hdrloader(MA *op) noex {
 	uint		*table = (uint *) (op->mapdata + MAILALIAS_IDLEN) ;
 	int		rs = SR_OK ;
 
-#if	CF_DEBUGS
-	{
-	    int	i ;
-	    for (i = 0 ; i < header_overlast ; i += 1) {
-	        debugprintf("mailalias_hdrload: header[%3u]=%u\n",
-	            i,table[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
-
 #ifdef	COMMENT
 	op->i.wtime = table[header_wtime] ;
 	op->i.wcount = table[header_wcount] ;
@@ -971,10 +909,6 @@ static int mailalias_hdrloader(MA *op) noex {
 
 static int mailalias_fileopen(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_fileopen: fname=%s\n",op->dbfname) ;
-#endif
 
 	if (op->fd < 0) {
 	    int	oflags = op->oflags ;
@@ -1013,15 +947,16 @@ static int mailalias_mapbegin(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		f = false ;
 	if (op->mapdata == nullptr) {
-	    size_t	ms = ulceil(op->fi.fsize,op->pagesize) ;
+	    cnullptr	np{} ;
+	    size_t	ms = ceil(op->fi.fsize,op->pagesize) ;
 	    cint	fd = op->fd ;
 	    int		mp = PROT_READ ;
 	    int		mf = MAP_SHARED ;
-	    void	*md ;
+	    void	*md{} ;
 	    if (ms == 0) ms = op->pagesize ;
 	    if (dt == 0) dt = time(nullptr) ;
-	    if ((rs = u_mmap(nullptr,ms,mp,mf,fd,0L,&md)) >= 0) {
-	        op->mapdata = (cchar *) md ;
+	    if ((rs = u_mmapbegin(np,ms,mp,mf,fd,0z,&md)) >= 0) {
+	        op->mapdata = charp(md) ;
 	        op->mapsize = ms ;
 	        op->ti_map = dt ;
 	        f = true ;
@@ -1035,7 +970,7 @@ static int mailalias_mapend(MA *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 	if (op->mapdata != nullptr) {
-	    rs1 = u_munmap(op->mapdata,op->mapsize) ;
+	    rs1 = u_mmapend(op->mapdata,op->mapsize) ;
 	    if (rs >= 0) rs = rs1 ;
 	    op->mapdata = nullptr ;
 	    op->mapsize = 0 ;
@@ -1046,19 +981,9 @@ static int mailalias_mapend(MA *op) noex {
 
 #if	(! CF_FASTKEYMATCH)
 static int mailalias_keymatch(MA *op,int opts,int ri,cchar *aname) noex {
-	int		ki ;
+	cint		ki = op->rectab[ri][0] ;
 	int		f ;
-
-	ki = op->rectab[ri][0] ;
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_keymatch: ri=%u ki=%u aname=%s key=%s\n",
-	    ri,ki,aname,(op->skey + ki)) ;
-#endif
-
-
 	f = (strcmp((op->skey + ki),aname) == 0) ;
-
 	return f ;
 }
 /* end subroutine (mailalias_keymatch) */
@@ -1071,10 +996,6 @@ static int mailalias_dbopen(MA *op,time_t dt) noex {
 
 	if ((rs = mailalias_dbopenfile(op,dt)) >= 0) {
 	    f_create = rs ;
-#if	CF_DEBUGS
-	    debugprintf("mailalias_dbopen: open-out rs=%d\n",rs) ;
-	    debugprintf("mailalias_dbopen: f_ocreate=%u\n",op->f.ocreate) ;
-#endif
 	    if ((rs = mailalias_dbopenmake(op,dt)) >= 0) {
 	        if ((rs = mailalias_isremote(op)) >= 0) {
 	            if ((rs = mailalias_dbopenwait(op)) >= 0) {
@@ -1093,11 +1014,6 @@ static int mailalias_dbopen(MA *op,time_t dt) noex {
 	    }
 	} /* end if (mailalias_dbopenfile) */
 
-#if	CF_DEBUGS
-	debugprintf("mailalias_dbopen: ret rs=%d f_create=%u\n",
-	    rs,f_create) ;
-#endif
-
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_dbopen) */
@@ -1110,14 +1026,6 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	of &= (~ O_RDWR) ;
 	of &= (~ O_WRONLY) ;
 	of |= O_RDONLY ;
-#if	CF_DEBUGS
-	{
-	    char	obuf[100+1] ;
-	    snopenflags(obuf,100,of) ;
-	    debugprintf("mailalias_dbopenfile: ent of=%s\n",obuf) ;
-	}
-#endif /* CF_DEBUGS */
-
 	if ((rs = u_open(op->dbfname,of,op->operm)) >= 0) {
 	    USTAT	sb ;
 	    op->fd = rs ;
@@ -1197,14 +1105,7 @@ static int mailalias_dbopenwait(MA *op) noex {
 	int		i ;
 
 	msize = (MAILALIAS_TOPLEN) ;
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_dbopen: rs=%d filesize=%d headersize=%d\n",
-	    rs,sb.st_size,msize) ;
-#endif
-
 /* wait for the file to come in if it is not yet available */
-
 	if ((rs = u_fstat(op->fd,&sb)) >= 0) {
 	    op->fi.fsize = sb.st_size ;
 	    for (i = 0 ; (i < to) && (sb.st_size < msize) ; i += 1) {
@@ -1347,7 +1248,7 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 /* end subroutine (mailalias_dbmaker) */
 
 static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
-	cint	sz = sizeof(RECORD) ;
+	cint	sz = sizeof(record) ;
 	int		rs ;
 	int		rs1 ;
 	vecobj		recs ;
@@ -1368,20 +1269,12 @@ static int mailalias_dbmaking(MA *op,int fd,time_t dt,int n) noex {
 	                        cp = tmpfname ;
 	                        rs = mkpath2(tmpfname,op->pr,ap) ;
 	                    }
-#if	CF_DEBUGS
-	                    debugprintf("mailalias_dbmake: "
-	                        "proc file=%s\n",cp) ;
-#endif
 	                    if (rs >= 0) {
 	                        rs = mailalias_procfile(op,&data,cp) ;
 	                    }
 	                    if (rs < 0) break ;
 	                } /* end for */
 /* where are we? */
-#if	CF_DEBUGS
-	                debugprintf("mailalias_dbmake: "
-	                    "record count=%d\n",n) ;
-#endif
 /* OK, write out the file */
 	                if (rs >= 0) {
 	                    if ((rs = mailalias_wrfile(op,&data,dt)) >= 0) {
@@ -1413,10 +1306,6 @@ static int mailalias_procfile(MA *op,DBMAKE *dp,cchar *fname) noex {
 
 	if (fname[0] == '\0') return SR_INVALID ;
 
-#if	CF_DEBUGS
-	debugprintf("mailalias_procfile: ent fname=%s\n",fname) ;
-#endif
-
 	if ((rs = bopen(&afile,fname,"r",0666)) >= 0) {
 	    cint	llen = LINEBUFLEN ;
 	    int		f_bol = true ;
@@ -1438,7 +1327,7 @@ static int mailalias_procfile(MA *op,DBMAKE *dp,cchar *fname) noex {
 	                    dp->c = 0 ;
 	                    dp->f_havekey = false ;
 	                }
-	                rs = mailalias_procfileline(op,dp,lbuf,len) ;
+	                rs = dp->procline(lbuf,len) ;
 	                c_rec += rs ;
 	            }
 	        } /* end if (BOL and EOL) */
@@ -1446,134 +1335,19 @@ static int mailalias_procfile(MA *op,DBMAKE *dp,cchar *fname) noex {
 	        f_bol = f_eol ;
 	        if (rs < 0) break ;
 	    } /* end while (reading extended lines) */
-
-#if	CF_DEBUGS
-	    debugprintf("mailalias_procfile: while-out rs=%d\n",rs) ;
-#endif
-
-#if	CF_DEBUGS && CF_DEBUGSFILE
-	    {
-	        RECORD	*rep ;
-	        int	i ;
-	        debugprintf("mailalias_procfile: record dump:\n") ;
-	        for (i = 0 ; vecobj_get(dp->rlp,i,&rep) >= 0 ; i += 1) {
-	            if (rep != nullptr) {
-	                debugprintf("mailalias_procfile: k=%u v=%u\n",
-	                    rep->key,rep->val) ;
-#ifdef	COMMENT
-	                rs1 = strtab_get(dp->klp,rep->key,&cp) ;
-	                debugprintf("mailalias_procfile: key=%s \n",cp) ;
-	                rs1 = strtab_get(dp->vlp,rep->val,&cp) ;
-	                debugprintf("mailalias_procfile: val=%s \n",cp) ;
-#endif /* COMMENT */
-	            }
-	        } /* end for */
-	    }
-#endif /* CF_DEBUGS */
-
-#if	CF_DEBUGS
-	    debugprintf("mailalias_procfile: mid-bclose rs=%d\n",rs) ;
-#endif
-
 	    rs1 = bclose(&afile) ;
 	    if (rs >= 0) rs = rs1 ;
 	} else if (isNotPresent(rs)) {
-#if	CF_DEBUGS
-	    debugprintf("mailalias_procfile: not-found\n") ;
-#endif
 	    rs = SR_OK ;
 	} /* end if (afile) */
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_procfile: ret rs=%d\n",rs) ;
-#endif
 
 	return (rs >= 0) ? c_rec : rs ;
 }
 /* end subroutine (mailalias_procfile) */
 
-static int mailalias_procfileline(MA *op,DBMAKE *dp,
-		cchar *lbuf,int llen) noex {
-	FIELD		fsb ;
-	int		rs ;
-	int		c_rec = 0 ;
-	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
-	    strtab	*skp = dp->klp ;
-	    strtab	*svp = dp->vlp ;
-	    vecobj	*rlp = dp->rlp ;
-	    cint	rsn = SR_NOTFOUND ;
-	    char	kbuf[ALIASNAMELEN+1] = { 0 } ;
-	    dp->c = 0 ;
-	    if (! dp->f_havekey) {
-	        int	kl ;
-	        cchar	*kp ;
-	        if ((kl = field_get(&fsb,kterms,&kp)) >= 0) {
-	            if (kl > 0) {
-	                int	f ;
-	                cchar	*pm = "Postmaster" ;
-	                dp->f_havekey = true ;
-	                dp->c = 0 ;
-	                f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
-	                if (f) {
-	                    strwcpylc(kbuf,kp,MIN(kl,ALIASNAMELEN)) ;
-	                } else {
-	                    strwcpy(kbuf,kp,MIN(kl,ALIASNAMELEN)) ;
-	                }
-	            } /* end if (positive) */
-	        } /* end if (field_get) */
-	    } /* end if (didn't have a key already) */
-	    if (dp->f_havekey && (fsb.term != '#')) {
-	        int	vl ;
-	        cchar	*vp ;
-	        while ((vl = field_get(&fsb,vterms,&vp)) >= 0) {
-	            if (vl > 0) {
-	                int	ival = 0 ;
-	                if (dp->c == 0) { /* enter into key-string table */
-	                    if ((rs = strtab_already(skp,kbuf,-1)) == rsn) {
-	                        rs = strtab_add(skp,kbuf,-1) ;
-	                        dp->ikey = rs ;
-	                    } else {
-	                        dp->ikey = rs ;
-	                    }
-	                } /* end if (entering key) */
-/* enter value into string table */
-	                if (rs >= 0) { /* enter into val-string table */
-	                    if ((rs = strtab_already(svp,vp,vl)) == rsn) {
-	                        rs = strtab_add(svp,vp,vl) ;
-	                        ival = rs ;
-	                    } else if (rs >= 0) {
-	                        ival = rs ;
-	                    }
-/* enter record */
-	                    if ((rs >= 0) && (ival > 0)) {
-	                        RECORD	re ;
-	                        re.key = dp->ikey ;
-	                        re.val = ival ;
-	                        if ((rs = vecobj_find(rlp,&re)) == rsn) {
-	                            rs = vecobj_add(rlp,&re) ;
-	                        }
-	                        if (rs >= 0) {
-	                            dp->c += 1 ;
-	                            dp->nrecs += 1 ;
-	                            c_rec += 1 ;
-	                        }
-	                    } /* end if (new entry) */
-	                } /* end if (ok) */
-	                if (fsb.term == '#') break ;
-	                if (rs < 0) break ;
-	            } /* end while (fields) */
-	        } /* end if (retrieved key) */
-	    } /* end if (have key) */
-	    field_finish(&fsb) ;
-	} /* end if (field) */
-	return (rs >= 0) ? c_rec : rs ;
-}
-/* end subroutine (mailalias_procfileline) */
-
 /* write out the cache file */
 static int mailalias_wrfile(MA *op,DBMAKE *dp,time_t dt) noex {
 	int		rs ;
-
 	if ((rs = strtab_count(dp->klp)) >= 0) {
 	    dp->ktlen = (rs+1) ;
 	    dp->ktsize = (dp->ktlen + 1) * sizeof(int) ;
@@ -1592,11 +1366,6 @@ static int mailalias_wrfile(MA *op,DBMAKE *dp,time_t dt) noex {
 		}
 	    }
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_wrfile: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (mailalias_wrfile) */
@@ -1609,10 +1378,6 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 	int		ml ;
 	char		fidbuf[MAILALIAS_IDLEN + 1] ;
 	char		*bp ;
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_wrfiler: ent\n") ;
-#endif
 
 /* prepare the file magic */
 
@@ -1664,15 +1429,6 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 
 /* write out the header */
 
-#if	CF_DEBUGS
-	    {
-	    int	i ;
-	    for (i = 0 ; i < header_overlast ; i += 1)
-	        debugprintf("mailalis_wrfiler: header[%2u]=%08x\n",
-			i,header[i]) ;
-	    }
-#endif /* CF_DEBUGS */
-
 	    if ((rs = u_write(dp->fd,header,hsize)) >= 0) {
 		if ((rs = mailalias_wrfilekeytab(op,dp)) >= 0) {
 	            if ((rs = mailalias_wrfilerec(op,dp)) >= 0) {
@@ -1684,10 +1440,6 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 	    } /* end if (ok) */
 
 	} /* end if (write of id-section) */
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_wrfiler: ret rs=%d\n",rs) ;
-#endif
 
 	return rs ;
 }
@@ -1710,17 +1462,20 @@ static int mailalias_wrfilekeytab(MA *op,DBMAKE *dp) noex {
 
 /* write the record table */
 static int mailalias_wrfilerec(MA *op,DBMAKE *dp) noex {
-	cint	recsize = dp->recsize ;
+	cint		recsize = dp->recsize ;
 	int		rs ;
+	int		rs1 ;
+	int		wlen = 0 ;
 	int		(*rectab)[2] ;
 	if ((rs = uc_malloc(recsize,&rectab)) >= 0) {
-	    RECORD	*rep ;
+	    vecobj	*rlp = dp->rlp ;
+	    void	*vp{} ;
 	    int		ri = 0 ;
-	    int		i ;
 	    rectab[ri][0] = 0 ;
 	    rectab[ri][1] = 0 ;
 	    ri += 1 ;
-	    for (i = 0 ; vecobj_get(dp->rlp,i,&rep) >= 0 ; i += 1) {
+	    for (int i = 0 ; vecobj_get(rlp,i,&vp) >= 0 ; i += 1) {
+	    	record	*rep = (record *) vp ;
 	        rectab[ri][0] = rep->key ;
 	        rectab[ri][1] = rep->val ;
 	        ri += 1 ;
@@ -1728,16 +1483,19 @@ static int mailalias_wrfilerec(MA *op,DBMAKE *dp) noex {
 	    rectab[ri][0] = -1 ;
 	    rectab[ri][1] = 0 ;
 	    rs = u_write(dp->fd,rectab,recsize) ;
-	    uc_free(rectab) ;
+	    wlen = rs ;
+	    rs1 = uc_free(rectab) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (record table) */
-	return rs ;
+	return (rs >= 0) ? wlen : rs ;
 }
 /* end subroutine (mailalias_wrfilerec) */
 
 /* make the index table and the key-string table */
 static int mailalias_wrfilekeys(MA *op,DBMAKE *dp) noex {
-	cint	risize = dp->risize ;
+	cint		risize = dp->risize ;
 	int		rs ;
+	int		rs1 ;
 	int		(*indtab)[2] ;
 	if ((rs = uc_malloc(risize,&indtab)) >= 0) {
 	    cint	sksize = dp->sksize ;
@@ -1753,9 +1511,11 @@ static int mailalias_wrfilekeys(MA *op,DBMAKE *dp) noex {
 	                }
 	            }
 	        }
-	        uc_free(kstab) ;
+	        rs1 = uc_free(kstab) ;
+		if (rs >= 0) rs = rs1 ;
 	    } /* end if (memory allocation) */
-	    uc_free(indtab) ;
+	    rs1 = uc_free(indtab) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (memory allocation) */
 	return rs ;
 }
@@ -1763,27 +1523,24 @@ static int mailalias_wrfilekeys(MA *op,DBMAKE *dp) noex {
 
 /* make the value-string table */
 static int mailalias_wrfilevals(MA *op,DBMAKE *dp) noex {
-	cint	svsize = dp->svsize ;
+	cint		svsize = dp->svsize ;
 	int		rs ;
+	int		rs1 ;
 	char		*vstab ;
 	if ((rs = uc_malloc(svsize,&vstab)) >= 0) {
 	    if ((rs = strtab_strmk(dp->vlp,vstab,svsize)) >= 0) {
 	        rs = u_write(dp->fd,vstab,svsize) ;
 	    }
-	    uc_free(vstab) ;
+	    rs1 = uc_free(vstab) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (value string-table) */
 	return rs ;
 }
 /* end subroutine (mailalias_wrfilevals) */
 
 /* make the (only) index for this file */
-static int mailalias_mkind(MA *op,vecobj *rp,cchar *skey,
-		int it[][2],int itsize) noex {
-#if	CF_DEBUGSSHIFT
-	int		ns = (nshift > 0) ? nshift : NSHIFT ;
-#else
-	cint	ns = NSHIFT ;
-#endif
+static int mailalias_mkind(MA *op,vecobj *rp,cc *skey,rt_t it,int itsz) noex {
+	cint		ns = NSHIFT ;
 	int		rs ;
 	int		sz ;
 	int		n = 0 ; /* ¥ GCC false complaint */
@@ -1796,64 +1553,28 @@ static int mailalias_mkind(MA *op,vecobj *rp,cchar *skey,
 
 	    sz = (n * 2 * sizeof(uint)) ;
 
-#if	CF_DEBUGS
-	    debugprintf("mailalias_mkind: size calc=%u given=%u\n",
-	        sz,itsize) ;
-#endif
-
-	    if (sz <= itsize) {
-	        RECORD		*rep ;
+	    if (sz <= itsz) {
+		void		*vp{} ;
 	        uint		khash ;
-	        int		i, ri, hi, ki ;
+	        int		ri, hi, ki ;
 	        int		v, c ;
 	        int		kl ;
 	        int		f ;
 	        cchar	*kp ;
 
-#if	CF_DEBUGS
-	        {
-	            debugprintf("mailalias_mkind: key string dump¬\n") ;
-	            kp = (skey + 1) ;
-	            while (kp[0] != '\0') {
-	                kl = strlen(kp) ;
-	                debugprintf("mailalias_mkind: sl=%u skey=%s\n",kl,kp) ;
-	                kp += (kl + 1) ;
-	            }
-	            debugprintf("mailalias_mkind: end dump\n") ;
-	        }
-#endif /* CF_DEBUGS */
-
 	        memset(it,0,sz) ;
 	        ri = 1 ;
-	        for (i = 0 ; vecobj_get(rp,i,&rep) >= 0 ; i += 1) {
-
-#if	CF_DEBUGS
-	            debugprintf("mailalias_mkind: rec ri=%u k=%u\n",
-	                ri,rep->key) ;
-#endif
-
-	            kp = (cchar *) (skey + rep->key) ;
+	        for (int i = 0 ; vecobj_get(rp,i,&vp) >= 0 ; i += 1) {
+	            record	*rep = recordp(vp) ;
+	            kp = charp(skey + rep->key) ;
 	            kl = strlen(kp) ;
-
-#if	CF_DEBUGS
-	            debugprintf("mailalias_mkind: kl=%d key=%s\n",kl,kp) ;
-#endif
 
 	            khash = hash_elf(kp,kl) ;
 
 	            hi = hashindex(khash,n) ;
 
-#if	CF_DEBUGS
-	            debugprintf("mailalias_mkind: khash=%08x hi=%u\n",
-	                khash,hi) ;
-#endif
-
 	            c = 0 ;
 	            if ((op->ropts & MAILALIAS_OSEC) && (it[hi][0] != 0)) {
-
-#if	CF_DEBUGS
-	                debugprintf("mailalias_mkind: collision ri=%d\n",ri) ;
-#endif
 
 	                while ((v = it[hi][0]) != 0) {
 
@@ -1869,12 +1590,6 @@ static int mailalias_mkind(MA *op,vecobj *rp,cchar *skey,
 	                    }
 
 	                    hi = hashindex(khash,n) ;
-
-#if	CF_DEBUGS
-	                    debugprintf("mailalias_mkind: "
-	                        "new khash=%08x hi=%u\n", khash,hi) ;
-#endif
-
 	                    c += 1 ;
 
 	                } /* end while */
@@ -1883,11 +1598,6 @@ static int mailalias_mkind(MA *op,vecobj *rp,cchar *skey,
 
 	            if (it[hi][0] != 0) {
 	                int	lhi ;
-
-#if	CF_DEBUGS
-	                debugprintf("mailalias_mkind: collision same key\n") ;
-#endif
-
 	                c += 1 ;
 	                while (it[hi][1] != 0) {
 	                    c += 1 ;
@@ -1909,32 +1619,24 @@ static int mailalias_mkind(MA *op,vecobj *rp,cchar *skey,
 	            it[hi][0] = ri ;
 	            it[hi][1] = 0 ;
 
-#if	CF_DEBUGS
-	            debugprintf("mailalias_mkind: ri=%u hi=%u\n",ri,hi) ;
-#endif
-
 #ifdef	COMMENT
 	            op->s.c_l1 += c ;
 	            recorder_cden(asp,wi,c) ;
 #endif
-
 	            ri += 1 ;
-
 	        } /* end for (looping through records) */
-
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
 	} /* end if (vecobj_count) */
-
 	return (rs >= 0) ? n : rs ;
 }
 /* end subroutine (mailalias_mkind) */
 
 static int mailalias_filechanged(MA *op,USTAT *sbp) noex {
+	csize		fsz = size_t(sbp->st_size) ;
 	int		f = false ;
-	f = f || (op->fi.fsize != sbp->st_size) ;
+	f = f || (op->fi.fsize != fsz) ;
 	f = f || (op->fi.mtime != sbp->st_mtime) ;
 	f = f || (op->fi.ino != sbp->st_ino) ;
 	f = f || (op->fi.dev != sbp->st_dev) ;
@@ -1976,8 +1678,7 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 	cint	tlen = MAXPATHLEN ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		i ;
-	cchar	*cp ;
+	cchar		*profp = nullptr ;
 	char		tbuf[MAXPATHLEN + 1] ;
 
 	if ((dt - op->ti_aprofile) <= TO_APROFILE)
@@ -1988,19 +1689,14 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 /* get the mailalias profile (AP) table */
 
 	rs1 = SR_NOENT ;
-	for (i = 0 ; aptabsched[i] != nullptr ; i += 1) {
-
-	    up = charp(aptabsched[i]) ;
-	    if (*cp != '/') {
-	        cp = tbuf ;
-	        mkpath2(tbuf,op->pr,aptabsched[i]) ;
+	for (int i = 0 ; aptabsched[i] ; i += 1) {
+	    profp = charp(aptabsched[i]) ;
+	    if (profp[0] != '/') {
+	        rs = mkpath2(tbuf,op->pr,profp) ;
+	        profp = tbuf ;
 	    }
 
-#if	CF_DEBUGS
-	    debugprintf("mailalias_aprofile: aptab=%s\n",cp) ;
-#endif
-
-	    rs1 = u_stat(cp,&sb) ;
+	    rs1 = u_stat(profp,&sb) ;
 
 	    if ((rs1 >= 0) && S_ISDIR(sb.st_mode))
 	        rs1 = SR_ISDIR ;
@@ -2013,36 +1709,24 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 
 	} /* end for */
 
-	if (aptabsched[i] != nullptr) {
-
-	    if ((rs = kvsfile_open(&aptab,0,cp)) >= 0) {
+	if (profp) {
+	    if ((rs = kvsfile_open(&aptab,0,profp)) >= 0) {
+		vecstr		*app = &op->apfiles ;
 	        kvsfile_cur	cur ;
-
-	        for (i = 0 ; vecstr_get(&op->apfiles,i,&cp) >= 0 ; i += 1) {
-	            if (cp != nullptr) {
+		cchar		*fp{} ;
+	        for (int i = 0 ; vecstr_get(app,i,&fp) >= 0 ; i += 1) {
+	            if (fp) {
 	                vecstr_del(&op->apfiles,i--) ;
 	            }
 	        } /* end for */
-
 	        if ((rs = kvsfile_curbegin(&aptab,&cur)) >= 0) {
-
 	            while (rs >= 0) {
-
 	                rs1 = kvsfile_fetch(&aptab,op->apname,&cur,tbuf,tlen) ;
 	                if (rs1 < 0) break ;
-
-#if	CF_DEBUGS
-	                debugprintf("mailalias_aprofile: "
-			    "kvsfile_fetch() v=%s\n",tbuf) ;
-#endif
-
 	                rs = vecstr_add(&op->apfiles,tbuf,rs1) ;
-
 	            } /* end while */
-
 	            kvsfile_curend(&aptab,&cur) ;
 		} /* end if (kvsfile-cur) */
-
 	        if (rs >= 0) {
 	            rs = vecstr_getvec(&op->apfiles,&op->aprofile) ;
 	        }
@@ -2050,23 +1734,14 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 	    } /* end if (opened key-values table) */
 
 #if	CF_DEFPROFILE
-	    if (op->aprofile[0] == nullptr)
+	    if (op->aprofile[0] == nullptr) {
 	        op->aprofile = defprofile ;
+	    }
 #endif
 
 	} else {
 	    op->aprofile = defprofile ;
 	}
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_aprofile: ret rs=%d enum\n",rs) ;
-	if (rs >= 0) {
-	    for (i = 0 ; op->aprofile[i] != nullptr ; i += 1) {
-	        debugprintf("mailalias_aprofile: aprofile file=%s\n",
-	            op->aprofile[i]) ;
-	    }
-	}
-#endif /* CF_DEBUGS */
 
 	return rs ;
 }
@@ -2076,10 +1751,6 @@ static int mailalias_aprofile(MA *op,time_t dt) noex {
 static int mailalias_enterbegin(MA *op,time_t dt) noex {
 	int		rs ;
 	int		f = false ;
-
-#if	CF_DEBUGS
-	debugprintf("mailalias_enterbegin: ent\n") ;
-#endif
 
 	if ((rs = mailalias_mapcheck(op,dt)) > 0) {
 	    f = true ;
@@ -2093,11 +1764,10 @@ static int mailalias_enterbegin(MA *op,time_t dt) noex {
 /* ARGSUSED */
 static int mailalias_enterend(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
+	(void) dt ;
 	if (op->f.held) {
 	    op->f.held = false ;
 	}
-
 	return rs ;
 }
 /* end subroutine (mailalias_enterend) */
@@ -2123,10 +1793,81 @@ static int mailalias_mapcheck(MA *op,time_t dt) noex {
 }
 /* end subroutine (mailalias_mapcheck) */
 
+int dbmake::procline(cchar *lbuf,int llen) noex {
+	field		fsb ;
+	int		rs ;
+	int		rs1 ;
+	int		c_rec = 0 ;
+	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
+	    cint	rsn = SR_NOTFOUND ;
+	    char	kbuf[ALIASNAMELEN+1] = { 0 } ;
+	    c = 0 ;
+	    if (! f_havekey) {
+	        cchar	*kp ;
+	        if (int kl ; (kl = field_get(&fsb,kterms,&kp)) >= 0) {
+	            if (kl > 0) {
+	                bool	f ;
+	                cchar	*pm = "Postmaster" ;
+	                f_havekey = true ;
+	                c = 0 ;
+	                f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
+	                if (f) {
+	                    strwcpylc(kbuf,kp,min(kl,ALIASNAMELEN)) ;
+	                } else {
+	                    strwcpy(kbuf,kp,min(kl,ALIASNAMELEN)) ;
+	                }
+	            } /* end if (positive) */
+	        } /* end if (field_get) */
+	    } /* end if (didn't have a key already) */
+	    if (f_havekey && (fsb.term != '#')) {
+	        int	vl ;
+	        cchar	*vp ;
+	        while ((vl = field_get(&fsb,vterms,&vp)) >= 0) {
+	            if (vl > 0) {
+	                int	ival = 0 ;
+	                if (c == 0) { /* enter into key-string table */
+	                    if ((rs = strtab_already(klp,kbuf,-1)) == rsn) {
+	                        rs = strtab_add(klp,kbuf,-1) ;
+	                        ikey = rs ;
+	                    } else {
+	                        ikey = rs ;
+	                    }
+	                } /* end if (entering key) */
+/* enter value into string table */
+	                if (rs >= 0) { /* enter into val-string table */
+	                    if ((rs = strtab_already(vlp,vp,vl)) == rsn) {
+	                        rs = strtab_add(vlp,vp,vl) ;
+	                        ival = rs ;
+	                    } else if (rs >= 0) {
+	                        ival = rs ;
+	                    }
+/* enter record */
+	                    if ((rs >= 0) && (ival > 0)) {
+	                        record	re(ikey,ival) ;
+	                        if ((rs = vecobj_find(rlp,&re)) == rsn) {
+	                            rs = vecobj_add(rlp,&re) ;
+	                        }
+	                        if (rs >= 0) {
+	                            c += 1 ;
+	                            nrecs += 1 ;
+	                            c_rec += 1 ;
+	                        }
+	                    } /* end if (new entry) */
+	                } /* end if (ok) */
+	                if (fsb.term == '#') break ;
+	                if (rs < 0) break ;
+	            } /* end while (fields) */
+	        } /* end if (retrieved key) */
+	    } /* end if (have key) */
+	    rs1 = field_finish(&fsb) ;
+	    if (rs >= 0) rs = rs1 ;
+	} /* end if (field) */
+	return (rs >= 0) ? c_rec : rs ;
+}
+/* end method (dbmake::procline) */
 
 /* calculate the next hash table index from a given one */
-static int hashindex(uint i,int n)
-{
+static int hashindex(uint i,int n) noex {
 	int		hi = MODP2(i,n) ;
 	if (hi == 0) hi = 1 ;
 	return hi ;

@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int uuname_ctor(uuname *op,Args ... args) noex {
+static int mailalias_ctor(mailalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,23 +8,23 @@ static int uuname_ctor(uuname *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uuname_ctor) */
+/* end subroutine (mailalias_ctor) */
 
-static int uuname_dtor(uuname *op) noex {
+static int mailalias_dtor(mailalias *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (uuname_dtor) */
+/* end subroutine (mailalias_dtor) */
 
 template<typename ... Args>
-static inline int uuname_magic(uuname *op,Args ... args) noex {
+static inline int mailalias_magic(mailalias *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == MAILALIAS_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (uuname_magic) */
+/* end subroutine (mailalias_magic) */

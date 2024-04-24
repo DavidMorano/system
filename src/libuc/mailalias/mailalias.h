@@ -92,7 +92,7 @@ struct mailalias_head {
 	int		*keytab ;
 	int		(*rectab)[2] ;
 	int		(*indtab)[2] ;
-	cchar		*mapdata ;
+	char		*mapdata ;
 	vecstr		apfiles ;
 	ids		id ;
 	time_t		ti_aprofile ;
