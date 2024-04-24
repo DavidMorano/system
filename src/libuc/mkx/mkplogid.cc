@@ -22,8 +22,8 @@
 	Description:
 	This subroutine makes a prefix log ID for the PCSPOLL program
 	(or other programs that have sub-jobs associated with them
-	and where they require a prefix log ID). This "prefix" ID
-	is a string which is suitable to be combined with a second
+	and where they require a prefix log ID).  This "prefix" ID
+	is a string that is suitable to be combined with a second
 	string (the sub-ID) to form a complete ID suitable for use
 	in identifying a sub-job of a daemon (or other) program.
 
@@ -38,7 +38,7 @@
 
 	Returns:
 	>=0		length of result
-	<0		error (system-return)
+	<0		error code (system-return)
 
 *******************************************************************************/
 
@@ -53,7 +53,7 @@
 #include	<ctdec.h>
 #include	<strwcpy.h>
 #include	<ndigit.h>
-#include	<ipow.h>
+#include	<pow.h>
 #include	<localmisc.h>		/* |DIGBUFLEN| */
 
 #include	"mkx.h"

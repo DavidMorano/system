@@ -1,5 +1,5 @@
 template<typename ... Args>
-static int finduid_ctor(finduid *op,Args ... args) noex {
+static int uuname_ctor(uuname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
 	    cnullptr	np{} ;
@@ -8,24 +8,23 @@ static int finduid_ctor(finduid *op,Args ... args) noex {
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (finduid_ctor) */
+/* end subroutine (uuname_ctor) */
 
-static int finduid_dtor(finduid *op) noex {
+static int uuname_dtor(uuname *op) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
 	} /* end if (non-null) */
 	return rs ;
 }
-/* end subroutine (finduid_dtor) */
+/* end subroutine (uuname_dtor) */
 
 template<typename ... Args>
-static int finduid_magic(finduid *op,Args ... args) noex {
+static inline int uuname_magic(uuname *op,Args ... args) noex {
 	int		rs = SR_FAULT ;
 	if (op && (args && ...)) {
-	    rs = (op->magic == FINDUID_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	    rs = (op->magic == UUNAME_MAGIC) ? SR_OK : SR_NOTOPEN ;
 	}
 	return rs ;
 }
-/* end subroutine (finduid_magic) */
-
+/* end subroutine (uuname_magic) */

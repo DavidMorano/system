@@ -272,7 +272,7 @@ int outema_printf(outema *ldp,cchar *fmt,...) noex {
 	    if ((rs = malloc_addr(&fbuf)) >= 0) {
 	        va_begin(ap,fmt) ;
 	        cint	flen = rs ;
-	        if ((rs = vbufprintf(fbuf,flen,fmt,ap)) >= 0) {
+	        if ((rs = bufvprintf(fbuf,flen,fmt,ap)) >= 0) {
 	    	    cint	len = rs ;
 	            if ((rs = filer_write(ldp->ofp,fbuf,len)) >= 0) {
 	                wlen += rs ;
@@ -280,7 +280,7 @@ int outema_printf(outema *ldp,cchar *fmt,...) noex {
 	                ldp->llen += rs ;
 	                ldp->rlen -= rs ;
 		    } /* end if (filer_write) */
-	        } /* end if (vbufprintf) */
+	        } /* end if (bufvprintf) */
 	        va_end(ap) ;
 		rs1 = uc_free(fbuf) ;
 		if (rs >= 0) rs = rs1 ;

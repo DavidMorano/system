@@ -12,8 +12,8 @@
 	This subroutine was written for Rightcore Network Services.
 
 	= 2023-10-07, David A­D­ Morano
-	I updated this to match the updates applied to this object back
-	in 2018 in other projects (that used this same object).
+	I updated this to match the updates applied to this object
+	back in 2018 in other projects (that used this same object).
 
 */
 
@@ -21,11 +21,12 @@
 
 /*******************************************************************************
 
-	These routines are used when the caller wants to store a COPY of the
-	passed string data into a vector.  These routines will copy and store
-	the copied data in the list.  The advantage is that the caller does not
-	have to keep the orginal data around in order for the list data to be
-	accessed later.  String data (unlike "element" data) can not contain
+	These routines are used when the caller wants to store a
+	COPY of the passed string data into a vector.  These routines
+	will copy and store the copied data in the list.  The
+	advantage is that the caller does not have to keep the
+	orginal data around in order for the list data to be accessed
+	later.  String data (unlike "element" data) can not contain
 	nullptr characters-bytes.
 
 	Notes:
@@ -53,7 +54,7 @@
 	Returns:
 	INT_MAX		string was already in container
 	>=0		OK
-	<0		error
+	<0		error code (system-return)
 
 	Implementation reminders:
 	1. The central vector table is zeroth based. That is, read
@@ -802,7 +803,8 @@ static int vecstr_setopts(vecstr *op,int vo) noex {
 static int vecstr_extvec(vecstr *op) noex {
 	int		rs = SR_OK ;
 	if ((op->i + 1) > op->n) {
-	    int		nn, size ;
+	    int		nn ;
+	    int		size ;
 	    void	*na{} ;
 	    if (op->va == nullptr) {
 	        nn = VECSTR_DEFENTS ;

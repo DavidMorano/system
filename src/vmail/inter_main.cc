@@ -154,7 +154,7 @@ extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
 extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	msleep(int) ;
@@ -2814,7 +2814,7 @@ int inter_charin(INTER *iap,const char *fmt,...)
 	{
 	    va_list	ap ;
 	    va_begin(ap,fmt) ;
-	    rs = vbufprintf(lbuf,LINEBUFLEN,fmt,ap) ;
+	    rs = bufvprintf(lbuf,LINEBUFLEN,fmt,ap) ;
 	    len += rs ;
 	    va_end(ap) ;
 	}

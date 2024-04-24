@@ -35,10 +35,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usysrets.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
+#include	<strn.h>
 #include	<sfx.h>
 #include	<localmisc.h>
 
@@ -71,26 +73,122 @@
 
 /* local subroutines */
 
-int sif::next(cchar **rpp) noex {
+int sif::operator () (cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = sl ;
+	int		rl = 0 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
 	    if (sstr) {
-		rl = 0 ;
+		rl = nextbrk(rpp) ;
 	    } else if (sch) {
-		rl = 0 ;
+		rl = nextchr(rpp) ;
 	    } else {
+		if (sl < 0) sl = strlen(sp) ;
 		if ((rl = sfnext(sp,sl,&rp)) > 0) {
 		    sl -= ((rp + rl) - sp) ;
 		    sp = (rp + rl) ;
 		}
+	        *rpp = rp ;
+	    }
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (sif::operator) */
+
+int sif::next(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	cchar		*rp = nullptr ;
+	if (sp && rpp) {
+	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if ((rl = sfnext(sp,sl,&rp)) > 0) {
+		sl -= ((rp + rl) - sp) ;
+		sp = (rp + rl) ;
 	    }
 	    *rpp = rp ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (sif::next) */
+
+int sif::nextchr(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	cchar		*rp = nullptr ;
+	if (sp && rpp) {
+	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    while ((sl > 0) && (rl <= 0)) {
+	        if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
+		    rl = sfshrink(sp,(tp-sp),&rp) ;
+		    sl -= ((tp + 1) - sp) ;
+		    sp = (tp + 1) ;
+	        } /* end if */
+	    } /* end while */
+	    *rpp = rp ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (sif::nextchr) */
+
+int sif::nextbrk(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	cchar		*rp = nullptr ;
+	if (sp && rpp) {
+	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    while ((sl > 0) && (rl <= 0)) {
+	        if (cchar *tp ; (tp = strnpbrk(sp,sl,sstr)) != nullptr) {
+		    rl = sfshrink(sp,(tp-sp),&rp) ;
+		    rp = sp ;
+		    sp = (tp + 1) ;
+	        } /* end if */
+	    } /* end while */
+	    *rpp = rp ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (sif::nextbrk) */
+
+int sif::chr(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	cchar		*rp = nullptr ;
+	if (sp && rpp) {
+	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (cchar *tp ; (tp = strnchr(sp,sl,sch)) != nullptr) {
+		rp = sp ;
+		rl = (tp - sp) ;
+		sl -= ((tp + 1) - sp) ;
+		sp = (tp + 1) ;
+	    }
+	    *rpp = rp ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (sif::chr) */
+
+int sif::brk(cchar **rpp) noex {
+	int		rs = SR_FAULT ;
+	int		rl = 0 ;
+	cchar		*rp = nullptr ;
+	if (sp && rpp) {
+	    rs = SR_OK ;
+	    if (sl < 0) sl = strlen(sp) ;
+	    if (cchar *tp ; (tp = strnpbrk(sp,sl,sstr)) != nullptr) {
+		rp = sp ;
+		rl = (tp - sp) ;
+		sl -= ((tp + 1) - sp) ;
+		sp = (tp + 1) ;
+	    }
+	    *rpp = rp ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? rl : rs ;
+}
+/* end method (sif::brk) */
 
 

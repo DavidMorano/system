@@ -1,5 +1,5 @@
-/* uc_connecte */
-/* lang=C20 */
+/* uc_connecte SUPPORT */
+/* lang=C++20 */
 
 /* connection a socket */
 /* version %I% last-modified %G% */
@@ -32,7 +32,6 @@
 	from the beginning!
 
 	Synopsis:
-
 	int uc_connecte(fd,sap,sal,to)
 	int		fd ;
 	struct sockaddr	*sap ;
@@ -40,38 +39,28 @@
 	int		to ;
 
 	Arguments:
-
 	fd		file descriptor
 	sap		socket address pointer
 	sal		socket address length
 	to		time in seconds to wait
 
 	Returns:
-
 	>=0		amount of data returned
-	<0		error
-
+	<0		error code (system-return)
 
 *******************************************************************************/
 
-
-#undef	LOCAL_SOLARIS
-#define	LOCAL_SOLARIS	\
-	(defined(OSNAME_SunOS) && (OSNAME_SunOS > 0))
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/uio.h>
 #include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<time.h>
-
+#include	<climits>
+#include	<ctime>
 #include	<usystem.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>
 
 
@@ -86,8 +75,6 @@
 
 
 /* external subroutines */
-
-extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS
 extern int	debugprintf(cchar *,...) ;
@@ -111,11 +98,12 @@ static char	*d_reventstr() ;
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_connecte(int fd,const void *vsap,int sal,int to)
-{
+int uc_connecte(int fd,const void *vsap,int sal,int to) noex {
 	SOCKADDR	*sap = (SOCKADDR *) vsap ;
 	int		rs = SR_OK ;
 	int		rs1 ;
@@ -132,8 +120,8 @@ int uc_connecte(int fd,const void *vsap,int sal,int to)
 
 	if (to >= 0) {
 	    if ((rs = uc_nonblock(fd,TRUE)) >= 0) {
-	        const int	rsin = SR_INPROGRESS ;
-	        const int	f_nonblock = (rs > 0) ;
+	        cint	rsin = SR_INPROGRESS ;
+	        cint	f_nonblock = (rs > 0) ;
 	        if ((rs = u_connect(fd,sap,sal)) == rsin) {
 	             rs = connwait(fd,sap,sal,to) ;
 	        } /* end if (type of response from |connect| */
@@ -189,7 +177,7 @@ static int connwait(int fd,SOCKADDR *sap,int sal,int to)
 #endif
 
 	    if ((rs = u_poll(fds,nfds,POLLTIMEOUT)) > 0) {
-	        const int	re = fds[0].revents ;
+	        cint	re = fds[0].revents ;
 
 #if	CF_DEBUGS && CF_REVENT
 	        debugprintf("uc_connecte/connwait: back poll re=%s\n", 

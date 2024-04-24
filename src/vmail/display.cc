@@ -94,7 +94,7 @@ extern int	iceil(int,int) ;
 extern int	strwcmp(cchar *,cchar *,int) ;
 extern int	mkaddrdisp(char *,int,cchar *,int) ;
 extern int	bufprintf(char *,int,cchar *,...) ;
-extern int	vbufprintf(char *,int,cchar *,va_list) ;
+extern int	bufvprintf(char *,int,cchar *,va_list) ;
 extern int	isprintlatin(int) ;
 extern int	isdigitlatin(int) ;
 

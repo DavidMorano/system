@@ -1,4 +1,5 @@
-/* ffile */
+/* ffile HEADER */
+/* lang=C++20 */
 
 
 /* Copyright © 1986 David A­D­ Morano.  All rights reserved. */
@@ -9,34 +10,35 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<stdio.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
 #define	FFILE	struct ffile_head
 
 
 struct ffile_head {
-	FILE	*sfp ;
+	FILE		*sfp ;
 } ;
 
-typedef	struct ffile_head	ffile ;
+typedef	FFILE		ffile ;
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	ffopen(FFILE *,const char *,const char *) ;
-extern int	ffread(FFILE *,void *,int) ;
-extern int	ffgetc(FFILE *) ;
-extern int	ffwrite(FFILE *,const void *,int) ;
-extern int	ffprintf(FFILE *,const char *,...) ;
-extern int	ffputc(FFILE *,int) ;
-extern int	ffseek(FFILE *,off_t,int) ;
-extern int	fftell(FFILE *,off_t *) ;
-extern int	ffclose(FFILE *) ;
+extern int	ffopen(ffile *,cchar *,cchar *) noex ;
+extern int	ffread(ffile *,void *,int) noex ;
+extern int	ffgetc(ffile *) noex ;
+extern int	ffwrite(ffile *,cvoid *,int) noex ;
+extern int	ffprintf(ffile *,cchar *,...) noex ;
+extern int	ffputc(ffile *,int) noex ;
+extern int	ffseek(ffile *,off_t,int) noex ;
+extern int	fftell(ffile *,off_t *) noex ;
+extern int	ffclose(ffile *) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
 
 
 #endif /* FFILE_INCLUDE */

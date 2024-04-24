@@ -24,9 +24,18 @@
 
 #include	<varhdr.h>
 #include	<var.h>
+#include	<vars.h>
 #include	<varmk.h>
 #include	<varmks.h>
-#include	<vars.h>
+
+#include	<uuname.h>
+#include	<uunames.h>
+
+#include	<babycalc.h>
+#include	<babycalcs.h>
+
+#include	<commandment.h>
+#include	<commandments.h>
 
 
 #endif /* DATABASE_INCLUDE */

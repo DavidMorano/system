@@ -1,4 +1,4 @@
-/* testugetpid */
+/* testugetpid SUPPORT */
 /* lang=C99 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
@@ -33,8 +33,6 @@
 #define	VARDEBUGFNAME	"TESTUGETPID_DEBUGFILE"
 
 #define	NDF		"testugetpid.deb"
-
-extern int	bufprintf(char *,int,cchar *,...) ;
 
 #if	CF_DEBUGS
 extern int	debugopen(cchar *) ;

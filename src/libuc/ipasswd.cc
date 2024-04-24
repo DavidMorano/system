@@ -85,6 +85,8 @@
 #include	<intsat.h>
 #include	<randlc.h>
 #include	<matxstr.h>
+#include	<mkx.h>
+#include	<hasx.h>
 #include	<ischarx.h>
 #include	<localmisc.h>
 
@@ -116,7 +118,6 @@
 /* external subroutines */
 
 extern int	getfstype(char *,int,int) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
 
 
 /* local structures */
@@ -1004,7 +1005,7 @@ static int ipasswd_hdrload(IPASSWD *op) noex {
 	debugprintf("ipasswd_hdrload: magic=%s\n",cp) ;
 #endif
 
-	if (isValidMagic(cp,PWIHDR_MAGICSIZE,PWIHDR_MAGICSTR)) {
+	if (hasValidMagic(cp,PWIHDR_MAGICSIZE,PWIHDR_MAGICSTR)) {
 	    uint	*table = (uint *) (op->mapdata + IPASSWD_IDLEN) ;
 	    const uchar	*vetu = (const uchar *) (cp + 16) ;
 	    if (vetu[0] == PWIHDR_VERSION) {

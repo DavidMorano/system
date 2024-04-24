@@ -220,7 +220,7 @@ int uclibmemalloc::stdmalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = (void **) vp ;
 	errno = 0 ;
-	if (void *rp ; (rp = malloc(msize))) {
+	if (void *rp ; (rp = malloc(msize)) != nullptr) {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -236,7 +236,7 @@ int uclibmemalloc::stdvalloc(int sz,void *vp) noex {
 	int		rs ;
 	void		**rpp = (void **) vp ;
 	errno = 0 ;
-	if (void *rp ; (rp = valloc(msize))) {
+	if (void *rp ; (rp = valloc(msize)) != nullptr) {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {
@@ -253,7 +253,7 @@ int uclibmemalloc::stdrealloc(int sz,void *vp) noex {
 	void		**rpp = (void **) vp ;
 	int		rs ;
 	errno = 0 ;
-	if (void *rp ; (rp = realloc(fvp,msize))) {
+	if (void *rp ; (rp = realloc(fvp,msize)) != nullptr) {
 	    rs = sz ;
 	    *rpp = rp ;
 	} else {

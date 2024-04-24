@@ -1,71 +1,61 @@
-# MAKEFILE
+# MAKEFILE (libff)
 
 T= libff
 
-ALL= $(T).a
-
-SRCROOT= $(LOCAL)
+ALL= $(T).so $(T).a
 
 
-INCDIR= $(SRCROOT)/include
-LIBDIR= $(SRCROOT)/lib
+BINDIR= $(REPOROOT)/bin
+INCDIR= $(REPOROOT)/include
+LIBDIR= $(REPOROOT)/lib
+MANDIR= $(REPOROOT)/man
 
+INFODIR= $(REPOROOT)/info
+HELPDIR= $(REPOROOT)/share/help
+LDRPATH= $(REPOROOT)/lib
 
-CC= gcc
-GPP= g++
+CRTDIR= $(CGS_CRTDIR)
+VALDIR= $(CGS_VALDIR)
 
-CCOPTS= $(CCOPTS_GCCALL) $(CCOPTS_GCCOPT) $(CCOPTS_GCCLIB)
-#CCOPTS= $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB)
-#CCOPTS= $(CCOPTS_GCCALL) $(CCOPTS_GCCLIB) -g -Wstrict-aliasing
-
-# HyperSPARC
-#CCOPTS= -xO5 -Kpic -xtarget=ss20/hs22 -dalign -xdepend
-
-# UltraSPARC
-#CCOPTS= -xO5 -Kpic -xtarget=ultra -xsafe=mem -dalign -xdepend
-
-
-DEF0=
-DEF1=
-DEF2=
-DEF3=
-DEF4=
-DEF5=
-DEF6=
-DEF7= $(LF_DEFS)
-
-DEFS= $(DEF0) $(DEF1) $(DEF2) $(DEF3) $(DEF4) $(DEF5) $(DEF6) $(DEF7)
-
-
-INCDIRS= -I$(INCDIR)
-
-CPPFLAGS= $(DEFS) $(INCDIRS)
-
-CFLAGS= $(CCOPTS)
-
-#LD= $(CC)
-
-LDFLAGS=
-LIBDIRS=
-LIBS=
-
-RANLIB= ranlib
-
-LINT= lint
-LINTFLAGS= -uxn -Dlint
-
-NM= nm
-NMFLAGS= -sx
 
 CPP= cpp
+CC= gcc
+CXX= gpp
+LD= gld
+RANLIB= granlib
+AR= gar
+NM= gnm
+COV= gcov
 
 LORDER= lorder
 TSORT= tsort
-
+LINT= lint
 RM= rm -f
+TOUCH= touch
+LINT= lint
 
 
-INCS= ffile.h
+DEFS +=
+
+
+INCS +=
+INCS +=
+
+
+LIBS=
+
+
+INCDIRS=
+
+LIBDIRS= -L$(LIBDIR)
+
+
+# flag setting
+CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
+CFLAGS= $(MAKECFLAGS)
+CCFLAGS= $(MAKECCFLAGS)
+ARFLAGS= $(MAKEARFLAGS)
+LDFLAGS= $(MAKELDFLAGS)
 
 
 OBJ00=

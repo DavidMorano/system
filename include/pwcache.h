@@ -13,7 +13,6 @@
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>		/* |uid_t| */
-#include	<pwd.h>
 #include	<usystem.h>
 #include	<hdb.h>
 #include	<pq.h>
@@ -53,8 +52,8 @@ typedef PWCACHE_ST	pwcache_st ;
 EXTERNC_begin
 
 extern int pwcache_start(pwcache *,int,int) noex ;
-extern int pwcache_lookup(pwcache *,PASSWD *,char *,int,cchar *) noex ;
-extern int pwcache_uid(pwcache *,PASSWD *,char *,int,uid_t) noex ;
+extern int pwcache_lookup(pwcache *,ucentpw *,char *,int,cchar *) noex ;
+extern int pwcache_uid(pwcache *,ucentpw *,char *,int,uid_t) noex ;
 extern int pwcache_invalidate(pwcache *,cchar *) noex ;
 extern int pwcache_check(pwcache *,time_t) noex ;
 extern int pwcache_stats(pwcache *,pwcache_st *) noex ;

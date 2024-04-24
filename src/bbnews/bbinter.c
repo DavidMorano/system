@@ -140,7 +140,7 @@ extern int	sperm(IDS *,struct ustat *,int) ;
 extern int	pathclean(char *,const char *,int) ;
 extern int	pcsmailcheck(const char *,char *,int,const char *) ;
 extern int	mkdirs(const char *,mode_t) ;
-extern int	vbufprintf(char *,int,const char *,va_list) ;
+extern int	bufvprintf(char *,int,const char *,va_list) ;
 extern int	spawncmdproc(SPAWNPROC *,const char *,const char *) ;
 extern int	uterm_readcmd(UTERM *,TERMCMD *,int,int) ;
 extern int	hasallalnum(const char *,int) ;
@@ -2657,7 +2657,7 @@ int bbinter_charin(BBINTER *iap,const char *fmt,...)
 	to = pip->to_read ;
 	{
 	    va_begin(ap,fmt) ;
-	    rs = vbufprintf(linebuf,LINEBUFLEN,fmt,ap) ;
+	    rs = bufvprintf(linebuf,LINEBUFLEN,fmt,ap) ;
 	    len += rs ;
 	    va_end(ap) ;
 	}

@@ -807,58 +807,47 @@ static int usage(PROGINFO *pip)
 }
 /* end subroutine (usage) */
 
-
-static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
-{
+static int locinfo_start(LOCINFO *lip,PROGINFO *pip) noex {
+	cint		ne = 10 ;
+	cint		vo = (VECSTR_OORDERED | VECSTR_OREUSE) ;
 	int		rs ;
-	int		size ;
-	int		opts ;
-
-	size = sizeof(LOCINFO) ;
-	memset(lip,0,size) ;
+	memclear(lip) ;
 	lip->pip = pip ;
 	lip->nmax = -1 ;
-
-	opts = VECSTR_OORDERED | VECSTR_OSTSIZE | VECSTR_OREUSE ;
-	if ((rs = vecstr_start(&lip->paths,10,opts)) >= 0) {
+	if ((rs = vecstr_start(&lip->paths,ne,vo)) >= 0) {
 	    lip->magic = LOCINFO_MAGIC ;
 	}
-
 	return rs ;
 }
 /* end subroutine (locinfo_start) */
 
-
-static int locinfo_finish(LOCINFO *lip)
-{
-	int		rs = SR_OK ;
+static int locinfo_finish(LOCINFO *lip) noex {
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	rs1 = vecstr_finish(&lip->paths) ;
-	if (rs >= 0) rs = rs1 ;
-
-	lip->magic = 0 ;
+	if (lip) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = vecstr_finish(&lip->paths) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    lip->magic = 0 ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (locinfo_finish) */
 
-
-static int locinfo_nmax(LOCINFO *lip,int nmax)
-{
-
+static int locinfo_nmax(LOCINFO *lip,int nmax) noex {
 	lip->nmax = nmax ;
 	return SR_OK ;
 }
 /* end subroutine (locinfo_nmax) */
-
 
 #if	CF_LOCLOADPATHS
 static int locinfo_loadpaths(LOCINFO *lip,cchar *sp,int sl)
 {
 	int		rs = SR_OK ;
 	int		cl ;
-	const char	*tp, *cp ;
-
+	cchar		*tp, *cp ;
 	while ((tp = strnpbrk(sp,sl," \r\n\t,")) != NULL) {
 
 	    cp = sp ;
@@ -869,7 +858,7 @@ static int locinfo_loadpaths(LOCINFO *lip,cchar *sp,int sl)
 
 	    sl -= ((tp + 1) - sp) ;
 	    sp = (tp + 1) ;
-	        if (rs < 0) break ;
+	    if (rs < 0) break ;
 	} /* end while */
 
 	if ((rs >= 0) && (sl > 0)) {

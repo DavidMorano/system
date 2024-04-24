@@ -1,17 +1,16 @@
-/* uc_recve */
+/* uc_recve SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-
 #define	CF_DEBUGS	0		/* non-switchable debug printo-outs */
-
 
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was first written to give a little bit to UNIX® what we have in our
-        own circuit pack OSes!
+	This was first written to give a little bit to UNIX® what
+	we have in our own circuit pack OSes!
 
 */
 
@@ -19,50 +18,45 @@
 
 /*******************************************************************************
 
-        Get some amount of data, and time it also so that we can abort if it
-        times out.
+	Get some amount of data, and time it also so that we can
+	abort if it times out.
 
 	Synopsis:
-
-	int uc_recve(fd,rbuf,rlen,mflags,timeout,opts)
+	int uc_recve(fd,rbuf,rlen,mflags,to,opts)
 	int		fd ;
 	char		rbuf[] ;
 	int		rlen ;
 	int		mflags ;
-	int		timeout ;
+	int		to ;
 	int		opts ;
 
 	Arguments:
-
 	fd		file descriptor
 	rbuf		user buffer to receive daa
 	rlen		maximum amount of data the user wants
 	mflags		option flags for MSG reception
-	timeout		time in seconds to wait
+	to		time in seconds to wait
 	opts		options
 
 	Returns:
-
 	>=0		amount of data returned
-	<0		error
+	<0		error code (system-return)
 
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
+#include	<sys/stat.h>
 #include	<sys/socket.h>
 #include	<sys/uio.h>
-#include	<sys/stat.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<poll.h>
-#include	<time.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<ctime>
+#include	<cstring>
 #include	<usystem.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>
 
 
@@ -91,18 +85,13 @@ static char	*d_reventstr() ;
 #endif
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int uc_recve(fd,rbuf,rlen,mflags,timeout,opts)
-int		fd ;
-void		*rbuf ;
-int		rlen ;
-int		mflags ;
-int		timeout ;
-int		opts ;
-{
-	struct pollfd	fds[2] ;
+int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
+	POLLFD		fds[2] ;
 	time_t		previous = time(NULL) ;
 	time_t		current ;
 	int		rs = SR_OK ;
@@ -118,16 +107,13 @@ int		opts ;
 
 #if	CF_DEBUGS
 	debugprintf("uc_recve: ent rlen=%u to=%d opts=%08x\n",
-		rlen,timeout,opts) ;
+		rlen,to,opts) ;
 #endif
 
 	if (rlen <= 0)
 	    return SR_OK ;
 
-	if (timeout < 0)
-	    timeout = INT_MAX ;
-
-	to = timeout ;
+	if (to < 0) to = INT_MAX ;
 
 #ifdef	POLLRDNORM
 	events |= POLLRDNORM ;
@@ -136,7 +122,7 @@ int		opts ;
 	events |= POLLRDBAND ;
 #endif
 
-	pollint = MIN(timeout,POLLTIMEINT) ;
+	pollint = MIN(to,POLLTIMEINT) ;
 
 	memset(fds,0,sizeof(fds)) ;
 	fds[0].fd = fd ;
@@ -148,7 +134,7 @@ int		opts ;
 
 #if	CF_DEBUGS
 	    debugprintf("uc_recve: u_poll() pollint=%d to=%d\n",
-	        pollint,timeout) ;
+	        pollint,to) ;
 #endif
 
 	    if ((rs = u_poll(fds,1,(pollint * POLLMULT))) > 0) {
@@ -212,10 +198,8 @@ int		opts ;
 }
 /* end subroutine (uc_recve) */
 
-
 #if	CF_DEBUGS
-static char *d_reventstr(int revents,char *rbuf,int rlen)
-{
+static char *d_reventstr(int revents,char *rbuf,int rlen) noex {
 	rbuf[0] = '\0' ;
 	bufprintf(rbuf,rlen,"%s %s %s %s %s %s %s %s %s",
 	    (revents & POLLIN) ? "I " : "  ",

@@ -1,5 +1,5 @@
-/* testucopen */
-/* lang=C89 */
+/* testucopen SUPPORT */
+/* lang=C++20 */
 
 #define	CF_DEBUGS	1		/* compile-time debugging */
 #define	CF_DEBUGMALL	1		/* debugging memory-allocations */
@@ -26,6 +26,7 @@
 #include	<usystem.h>
 #include	<fsdir.h>
 #include	<filer.h>
+#include	<bufprintf.h>
 #include	<localmisc.h>
 
 #ifndef FILER_RCNET
@@ -39,7 +40,6 @@
 #define	VARDEBUGFNAME	"TESTUCOPEN_DEBUGFILE"
 
 extern int	fbwrite(FILE *,const void *,int) ;
-extern int	bufprintf(char *,int,const char *,...) ;
 
 #if	CF_DEBUGS
 extern int	debugopen(const char *) ;
@@ -191,18 +191,13 @@ static int dumpfile(int fd,int of)
 }
 /* end subroutine (dumpfile) */
 
-
-static int dumpdir(int fd,int of)
-{
+static int dumpdir(int fd,int of) noex {
 	FSDIR		d ;
 	FSDIR_ENT	de ;
-	const int	dlen = MAXPATHLEN ;
+	cint		dlen = MAXPATHLEN ;
 	int		rs ;
 	char		dbuf[USERNAMELEN+1] ;
 
-#if	CF_DEBUGS
-	debugprintf("main/dumpdir: ent\n") ;
-#endif
 	if ((rs = bufprintf(dbuf,dlen,"/dev/fd/%u",fd)) >= 0) {
 	    if ((rs = fsdir_open(&d,dbuf)) >= 0) {
 	        while ((rs = fsdir_read(&d,&de)) > 0) {
@@ -212,9 +207,6 @@ static int dumpdir(int fd,int of)
 	    } /* end if (fsdir) */
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("main/dumpdir: ret rs=%d\n",rs) ;
-#endif
 	return rs ;
 }
 /* end subroutine (dumpdir) */

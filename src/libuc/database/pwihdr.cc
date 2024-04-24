@@ -10,7 +10,7 @@
 	This subroutine was originally written.
 
 	= 2017-08-17, David A­D­ Morano
-	I enhanced to use |isValidMagic()|.
+	I enhanced to use |hasValidMagic()|.
 
 */
 
@@ -47,6 +47,8 @@
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
+#include	<mkx.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"pwihdr.h"
@@ -56,11 +58,6 @@
 
 
 /* external subroutines */
-
-extern "C" {
-    extern int	mkmagic(char *,int,cchar *) noex ;
-    extern int	isValidMagic(cchar *,int,cchar *) noex ;
-}
 
 
 /* external variables */
@@ -90,7 +87,7 @@ int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex {
 	if (hbuf == NULL) return SR_FAULT ;
 
 	if (f) { /* read */
-	    if ((bl > magicsize) && isValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 
@@ -147,7 +144,7 @@ int pwihdr(PWIHDR *ep,int f,char *hbuf,int hlen) noex {
 
 	    } /* end if (item) */
 
-	    } /* end if (isValidMagic) */
+	    } /* end if (hasValidMagic) */
 	} else { /* write */
 
 	    if (bl >= (magicsize + 4)) {

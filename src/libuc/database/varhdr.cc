@@ -38,9 +38,12 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
+#include	<mkx.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"varhdr.h"
@@ -50,18 +53,6 @@
 
 
 /* external subroutines */
-
-extern int	sncpy2(char *,int,const char *,const char *) ;
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	sfshrink(const char *,int,const char **) ;
-extern int	sfbasename(const char *,int,const char **) ;
-extern int	sfdirname(const char *,int,const char **) ;
-extern int	cfhexi(const char *,int,uint *) ;
-extern int	cfdecui(const char *,int,uint *) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
-extern char	*strnchr(const char *,int,int) ;
 
 
 /* external variables */
@@ -110,7 +101,7 @@ int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 	if (hbuf == NULL) return SR_FAULT ;
 
 	if (f) { /* read */
-	    if ((bl > magicsize) && isValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 
@@ -159,7 +150,7 @@ int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 		    }
 	        } /* end if (item) */
 
-	    } /* end if (isValidMagic) */
+	    } /* end if (hasValidMagic) */
 	} else { /* write */
 
 	    if (bl >= (magicsize + 4)) {

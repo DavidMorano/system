@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} storebuf_char "
+NAMES="${NAMES} isValidMagic "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/storebuf_char/s//storebuf_chr/g
+g/isValidMagic/s//hasValidMagic/g
 	w
 	q
 EOF

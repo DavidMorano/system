@@ -4,7 +4,6 @@
 /* group-name cache */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debug print-outs */
 
 /* revision history:
 
@@ -22,32 +21,45 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<grp.h>
+#include	<sys/types.h>		/* system-types */
+#include	<ctime>			/* |time(2)| */
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>		/* |strlen(3c)| */
 #include	<usystem.h>
+#include	<getbufsize.h>
+#include	<mallocxx.h>
+#include	<getgroupname.h>
 #include	<vechand.h>
 #include	<cq.h>
-#include	<localmisc.h>
+#include	<strwcpy.h>
+#include	<localmisc.h>		/* |GROUPNAMELEN| + |TIME_MAX| */
 
 #include	"gncache.h"
 
 
 /* local defines */
 
-#define	GNCACHE_REC	struct gncache_r
+#define	GN		gncache
 
 #define	TO_CHECK	5
 
 
+/* imported namespaces */
+
+using std::nullptr_t ;			/* type */
+using std::nothrow ;			/* constant */
+
+
+/* local typedefs */
+
+typedef gncache_ent	ent ;
+typedef gncache_ent *	entp ;
+
+
 /* external subroutines */
 
-extern int	getgroupname(char *,int,gid_t) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
+extern int	getgroupname(char *,int,gid_t) noex ;
 
 
 /* local structures */
@@ -58,218 +70,259 @@ enum cts {
 	ct_overlast
 } ;
 
-struct gncache_r {
+struct gncache_rec {
 	time_t		ti_create ;		/* creation time */
 	time_t		ti_access ;		/* last access time */
 	gid_t		gid ;
 	char		gn[GROUPNAMELEN + 1] ;
 } ;
 
+typedef	gncache_rec	rec ;
+typedef	gncache_rec *	recp ;
+
+struct vars {
+	int		groupnamelen ;
+} ;
+
 
 /* forward references */
 
-static int gncache_searchgid(GNCACHE *,GNCACHE_REC **,gid_t) ;
-static int gncache_newrec(GNCACHE *,time_t,GNCACHE_REC **,gid_t,cchar *) ;
-static int gncache_recaccess(GNCACHE *,GNCACHE_REC *,time_t) ;
-static int gncache_allocrec(GNCACHE *,GNCACHE_REC **) ;
-static int gncache_recfree(GNCACHE *,GNCACHE_REC *) ;
-static int gncache_maintenance(GNCACHE *,time_t) ;
-static int gncache_record(GNCACHE *,int,int) ;
+template<typename ... Args>
+static int gncache_ctor(gncache *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    cnullptr	np{} ;
+	    rs = SR_NOMEM ;
+	    memclear(op) ;
+	    if ((op->flp = new(nothrow) cq) != np) {
+	        if ((op->rlp = new(nothrow) vechand) != np) {
+		    rs = SR_OK ;
+		}
+		if (rs < 0) {
+		    delete op->flp ;
+		    op->flp = nullptr ;
+		}
+	    } /* end if (new-cq) */
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (gncache_ctor) */
+
+static int gncache_dtor(gncache *op) noex {
+	int		rs = SR_FAULT ;
+	if (op) {
+	    rs = SR_OK ;
+	    if (op->rlp) {
+		delete op->rlp ;
+		op->rlp = nullptr ;
+	    }
+	    if (op->flp) {
+		delete op->flp ;
+		op->flp = nullptr ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (gncache_dtor) */
+
+template<typename ... Args>
+static inline int gncache_magic(gncache *op,Args ... args) noex {
+	int		rs = SR_FAULT ;
+	if (op && (args && ...)) {
+	    rs = (op->magic == GNCACHE_MAGIC) ? SR_OK : SR_NOTOPEN ;
+	}
+	return rs ;
+}
+/* end subroutine (gncache_magic) */
+
+static int gncache_searchgid(GN *,rec **,gid_t) noex ;
+static int gncache_newrec(GN *,time_t,rec **,gid_t,cc *) noex ;
+static int gncache_recaccess(GN *,rec *,time_t) noex ;
+static int gncache_allocrec(GN *,rec **) noex ;
+static int gncache_recfree(GN *,rec *) noex ;
+static int gncache_maintenance(GN *,time_t) noex ;
+static int gncache_record(GN *,int,int) noex ;
 
 #ifdef	COMMENT
-static int gncache_recdel(GNCACHE *,GNCACHE_REC *) ;
+static int gncache_recdel(GN *,rec *) noex ;
 #endif
 
-static int record_start(GNCACHE_REC *,time_t,gid_t,const char *) ;
-static int record_old(GNCACHE_REC *,time_t,int) ;
-static int record_refresh(GNCACHE_REC *,time_t) ;
-static int record_update(GNCACHE_REC *,time_t,const char *) ;
-static int record_access(GNCACHE_REC *,time_t) ;
-static int record_finish(GNCACHE_REC *) ;
+static int record_start(rec *,time_t,gid_t,cchar *) noex ;
+static int record_old(rec *,time_t,int) noex ;
+static int record_refresh(rec *,time_t) noex ;
+static int record_update(rec *,time_t,cchar *) noex ;
+static int record_access(rec *,time_t) noex ;
+static int record_finish(rec *) noex ;
 
-static int	entry_load(GNCACHE_ENT *,GNCACHE_REC *) ;
+static int	entry_load(ent *,rec *) noex ;
+
+static int mkvars() noex ;
 
 
 /* local variables */
 
+static vars		var ;
+
+constexpr gid_t		gidend = -1 ;
+
+
+/* exported variables */
+
 
 /* exported subroutines */
 
-
-int gncache_start(GNCACHE *op,int max,int to)
-{
-	const int	defnum = GNCACHE_DEFENT ;
+int gncache_start(GN *op,int nmax,int to) noex {
+	cint		defnum = GNCACHE_DEFENT ;
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (max < 4) max = GNCACHE_DEFMAX ;
-
-	if (to < 1) to = GNCACHE_DEFTTL ;
-
-	memset(op,0,sizeof(GNCACHE)) ;
-
-	if ((rs = cq_start(&op->recsfree)) >= 0) {
-	    if ((rs = vechand_start(&op->recs,defnum,0)) >= 0) {
-	        op->max = max ;
-	        op->ttl = to ;
-	        op->ti_check = time(NULL) ;
-	        op->magic = GNCACHE_MAGIC ;
+	if ((rs = gncache_ctor(op)) >= 0) {
+	    static int	rsv = mkvars() ;
+	    if ((rs = rsv) >= 0) {
+	        if (nmax < 4) nmax = GNCACHE_DEFMAX ;
+	        if (to < 1) to = GNCACHE_DEFTTL ;
+	        if ((rs = cq_start(op->flp)) >= 0) {
+	            if ((rs = vechand_start(op->rlp,defnum,0)) >= 0) {
+	                op->nmax = nmax ;
+	                op->ttl = to ;
+	                op->ti_check = time(nullptr) ;
+	                op->magic = GNCACHE_MAGIC ;
+	            }
+	            if (rs < 0) {
+	                cq_finish(op->flp) ;
+	            }
+	        } /* end if (cq-start) */
+	    } /* end if (mkvars) */
+	    if (rs < 0) {
+		gncache_dtor(op) ;
 	    }
-	    if (rs < 0)
-	        cq_finish(&op->recsfree) ;
-	} /* end if (cq-start) */
-
+	} /* end if (gncache_dtor) */
 	return rs ;
 }
 /* end subroutine (gncache_start) */
 
-
-int gncache_finish(GNCACHE *op)
-{
-	GNCACHE_REC	*rp ;
-	int		rs = SR_OK ;
+int gncache_finish(GN *op) noex {
+	int		rs ;
 	int		rs1 ;
-	int		i ;
-	void		*vp ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != GNCACHE_MAGIC) return SR_NOTOPEN ;
-
-/* loop freeing up all cache entries */
-
-	for (i = 0 ; vechand_get(&op->recs,i,&rp) >= 0 ; i += 1) {
-	    if (rp == NULL) continue ;
-	    rs1 = record_finish(rp) ;
-	    if (rs >= 0) rs = rs1 ;
-	    rs1 = uc_free(rp) ;
-	    if (rs >= 0) rs = rs1 ;
-	} /* end while */
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = vechand_finish(&op->recs) ;
-	if (rs >= 0) rs = rs1 ;
-
-	while (cq_rem(&op->recsfree,&vp) >= 0) {
-	    rs1 = uc_free(vp) ;
-	    if (rs >= 0) rs = rs1 ;
-	}
-
-	rs1 = cq_finish(&op->recsfree) ;
-	if (rs >= 0) rs = rs1 ;
-
-	op->magic = 0 ;
+	if ((rs = gncache_magic(op)) >= 0) {
+	    vechand	*rlp = op->rlp ;
+	    void	*vp{} ;
+	    if (rlp) {
+	        for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	            if (vp) {
+	                rec	*rp = recp(vp) ;
+	                {
+	                    rs1 = record_finish(rp) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	                {
+	                    rs1 = uc_free(rp) ;
+	                    if (rs >= 0) rs = rs1 ;
+		        }
+	            }
+	        } /* end for */
+	    }
+	    if (rlp) {
+	        rs1 = vechand_finish(rlp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    if (op->flp) {
+	        while (cq_rem(op->flp,&vp) >= 0) {
+	            rs1 = uc_free(vp) ;
+	            if (rs >= 0) rs = rs1 ;
+	        } /* end while */
+	    }
+	    if (op->flp) {
+	        rs1 = cq_finish(op->flp) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+		rs1 = gncache_dtor(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    op->magic = 0 ;
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (gncache_finish) */
 
-
-int gncache_add(GNCACHE *op,gid_t gid,cchar gn[])
-{
-	GNCACHE_REC	*rp ;
-	time_t		dt = time(NULL) ;
-	int		rs = SR_OK ;
+int gncache_add(GN *op,gid_t gid,cchar *gn) noex {
+	time_t		dt = time(nullptr) ;
+	int		rs ;
 	int		gl = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (gn == NULL) return SR_FAULT ;
-
-	if (op->magic != GNCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if (gid < 0) return SR_INVALID ;
-
-	if (gn[0] == '\0') return SR_INVALID ;
-
-	if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
-	    gl = rs ;
-	    rs = record_update(rp,dt,gn) ;
-	} else if (rs == SR_NOTFOUND) {
-	    rs = gncache_newrec(op,dt,NULL,gid,gn) ;
-	    gl = rs ;
-	}
-
+	if ((rs = gncache_magic(op,gn)) >= 0) {
+	    rs = SR_INVALID ;
+	    if ((gid != gidend) && gn[0]) {
+	       rec	*rp{} ;
+	       if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
+	           gl = rs ;
+	           rs = record_update(rp,dt,gn) ;
+	       } else if (rs == SR_NOTFOUND) {
+	           rs = gncache_newrec(op,dt,nullptr,gid,gn) ;
+	           gl = rs ;
+	       }
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (gncache_add) */
 
-
-int gncache_lookgid(GNCACHE *op,GNCACHE_ENT *ep,gid_t gid)
-{
-	GNCACHE_REC	*rp ;
-	const time_t	dt = time(NULL) ;
+int gncache_lookgid(GN *op,ent *ep,gid_t gid) noex {
+	const time_t	dt = time(nullptr) ;
 	int		rs ;
-	int		ct ;
 	int		gl = 0 ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != GNCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if (gid < 0) return SR_INVALID ;
-
-	if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
-	    ct = ct_hit ;
-	    rs = gncache_recaccess(op,rp,dt) ;
-	    gl = rs ;
-	} else if (rs == SR_NOTFOUND) {
-	    char	gn[GROUPNAMELEN + 1] ;
-	    ct = ct_miss ;
-	    if ((rs = getgroupname(gn,GROUPNAMELEN,gid)) >= 0) {
-	        rs = gncache_newrec(op,dt,&rp,gid,gn) ;
-	        gl = rs ;
-	    }
-	} /* end if (search-gid) */
-
-	gncache_record(op,ct,rs) ;
-	if (rs == 0) rs = SR_NOTFOUND ;
-
-	if (rs >= 0) {
-	    if (ep != NULL) rs = entry_load(ep,rp) ;
-	    gncache_maintenance(op,dt) ;
-	} /* end if */
-
+	if ((rs = gncache_magic(op)) >= 0) {
+	    rs = SR_INVALID ;
+	    if (gid != gidend) {
+	        int	ct ;
+	        rec	*rp{} ;
+	        if ((rs = gncache_searchgid(op,&rp,gid)) >= 0) {
+	            ct = ct_hit ;
+	            rs = gncache_recaccess(op,rp,dt) ;
+	            gl = rs ;
+	        } else if (rs == SR_NOTFOUND) {
+	            char	gn[GROUPNAMELEN + 1] ;
+	            ct = ct_miss ;
+	            if ((rs = getgroupname(gn,GROUPNAMELEN,gid)) >= 0) {
+	                rs = gncache_newrec(op,dt,&rp,gid,gn) ;
+	                gl = rs ;
+	            }
+	        } /* end if (search-gid) */
+	        {
+	            gncache_record(op,ct,rs) ;
+	            if (rs == 0) rs = SR_NOTFOUND ;
+	        }
+	        if (rs >= 0) {
+	            if (ep) rs = entry_load(ep,rp) ;
+	            gncache_maintenance(op,dt) ;
+	        } /* end if */
+	    } /* end if (valid) */
+	} /* end if (magic) */
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (gncache_lookgid) */
 
-
-int gncache_stats(GNCACHE *op,GNCACHE_STATS *sp)
-{
+int gncache_stats(GN *op,gncache_st *sp) noex {
 	int		rs ;
-
-	if (op == NULL) return SR_FAULT ;
-	if (sp == NULL) return SR_FAULT ;
-
-	if (op->magic != GNCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if ((rs = vechand_count(&op->recs)) >= 0) {
-	    *sp = op->s ;
-	    sp->nentries = rs ;
-	}
+	if ((rs = gncache_magic(op,sp)) >= 0) {
+	    if ((rs = vechand_count(op->rlp)) >= 0) {
+	        *sp = op->s ;
+	        sp->nentries = rs ;
+	    }
+	} /* end if (magic) */
 	return rs ;
 }
 /* end subroutine (gncache_stats) */
 
-
-int gncache_check(GNCACHE *op,time_t dt)
-{
-	int		rs = SR_OK ;
-	int		f = FALSE ;
-
-	if (op == NULL) return SR_FAULT ;
-
-	if (op->magic != GNCACHE_MAGIC) return SR_NOTOPEN ;
-
-	if (dt == 0)
-	    dt = time(NULL) ;
-
-	if ((dt - op->ti_check) >= TO_CHECK) {
-	    f = TRUE ;
-	    op->ti_check = dt ;
-	    rs = gncache_maintenance(op,dt) ;
-	}
-
+int gncache_check(GN *op,time_t dt) noex {
+	int		rs ;
+	int		f = false ;
+	if ((rs = gncache_magic(op)) >= 0) {
+	    if (dt == 0) dt = time(nullptr) ;
+	    if ((dt - op->ti_check) >= TO_CHECK) {
+	        f = true ;
+	        op->ti_check = dt ;
+	        rs = gncache_maintenance(op,dt) ;
+	    }
+	} /* end if (magic) */
 	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (gncache_check) */
@@ -277,38 +330,32 @@ int gncache_check(GNCACHE *op,time_t dt)
 
 /* private subroutines */
 
-
-static int gncache_newrec(GNCACHE *op,time_t dt,GNCACHE_REC **rpp,gid_t gid,
-		cchar *gn)
-{
-	GNCACHE_REC	*rp ;
+static int gncache_newrec(GN *op,time_t dt,rec **rpp,gid_t gid,cc *gn) noex {
+	rec	*rp{} ;
 	int		rs ;
 	int		gl = 0 ;
-
 	if ((rs = gncache_allocrec(op,&rp)) >= 0) {
 	    if ((rs = record_start(rp,dt,gid,gn)) >= 0) {
 	        gl = rs ;
-	        rs = vechand_add(&op->recs,rp) ;
-	        if (rs < 0)
+	        rs = vechand_add(op->rlp,rp) ;
+	        if (rs < 0) {
 	            record_finish(rp) ;
+		}
 	    } /* end if (record-start) */
-	    if (rs < 0)
+	    if (rs < 0) {
 	        uc_free(rp) ;
+	    }
 	} /* end if */
-
-	if (rpp != NULL)
-	    *rpp = (rs >= 0) ? rp : NULL ;
-
+	if (rpp) {
+	    *rpp = (rs >= 0) ? rp : nullptr ;
+	}
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (gncache_newrec) */
 
-
-static int gncache_recaccess(GNCACHE *op,GNCACHE_REC *rp,time_t dt)
-{
+static int gncache_recaccess(GN *op,rec *rp,time_t dt) noex {
 	int		rs ;
 	int		gl = 0 ;
-
 	if ((rs = record_old(rp,dt,op->ttl)) > 0) {
 	    rs = record_refresh(rp,dt) ;
 	    gl = rs ;
@@ -316,132 +363,119 @@ static int gncache_recaccess(GNCACHE *op,GNCACHE_REC *rp,time_t dt)
 	    rs = record_access(rp,dt) ;
 	    gl = rs ;
 	}
-
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (gncache_recaccess) */
 
-
-static int gncache_searchgid(GNCACHE *op,GNCACHE_REC **rpp,gid_t gid)
-{
+static int gncache_searchgid(GN *op,rec **rpp,gid_t gid) noex {
+	vechand		*rlp = op->rlp ;
 	int		rs = SR_OK ;
-	int		i ;
 	int		gl = 0 ;
-
-	for (i = 0 ; (rs = vechand_get(&op->recs,i,rpp)) >= 0 ; i += 1) {
-	    if (*rpp == NULL) continue ;
-	    if ((*rpp)->gid == gid)
-	        break ;
+	rec		*rp = nullptr ;
+	void		*vp{} ;
+	bool		f = false ;
+	for (int i = 0 ; (rs = vechand_get(rlp,i,&vp)) >= 0 ; i += 1) {
+	    if (vp) {
+		rp = recp(vp) ;
+	        f = (rp->gid == gid) ;
+	    }
+	    if (f) break ;
 	} /* end for */
-
-	if (rs >= 0)
-	    gl = strlen((*rpp)->gn) ;
-
+	if ((rs >= 0) && f && rp) {
+	    gl = strlen(rp->gn) ;
+	}
+	if (rpp) {
+	    *rpp = ((rs >= 0) && f) ? rp : nullptr ;
+	}
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (gncache_searchgid) */
 
-
-static int gncache_maintenance(GNCACHE *op,time_t dt)
-{
-	GNCACHE_REC	*rp ;
-	time_t		ti_oldest = LONG_MAX ;
+static int gncache_maintenance(GN *op,time_t dt) noex {
+	vechand		*rlp = op->rlp ;
+	time_t		ti_oldest = TIME_MAX ;
 	int		rs = SR_OK ;
 	int		rs1 ;
-	int		n ;
 	int		iold = -1 ; /* the oldest one */
-	int		i ;
-
 /* delete expired entries */
-
-	for (i = 0 ; vechand_get(&op->recs,i,&rp) >= 0 ; i += 1) {
-	    if (rp == NULL) continue ;
-	    if ((dt - rp->ti_create) >= op->ttl) {
-	        vechand_del(&op->recs,i) ;
-	        record_finish(rp) ;
-	        gncache_recfree(op,rp) ;
-	    } else {
-	        if (rp->ti_access < ti_oldest) {
-	            ti_oldest = rp->ti_access ;
-	            iold = i ;
-	        }
-	    }
+	void		*vp{} ;
+	for (int i = 0 ; vechand_get(rlp,i,&vp) >= 0 ; i += 1) {
+	    if (vp) {
+		rec	*rp = recp(vp) ;
+	        if ((dt - rp->ti_create) >= op->ttl) {
+	            vechand_del(rlp,i) ;
+	            record_finish(rp) ;
+	            gncache_recfree(op,rp) ;
+	        } else {
+	            if (rp->ti_access < ti_oldest) {
+	                ti_oldest = rp->ti_access ;
+	                iold = i ;
+	            }
+	        } /* end if */
+	    } /* end if (non-null) */
 	} /* end for */
-
 /* delete entries (at least one) if we are too big */
-
 	if ((rs >= 0) && (iold >= 0)) {
-	    n = vechand_count(&op->recs) ;
-	    if (n > op->max) {
-	        rs1 = vechand_get(&op->recs,iold,&rp) ;
-	        if ((rs1 >= 0) && (rp != NULL)) {
-	            vechand_del(&op->recs,iold) ;
+	    if ((rs = vechand_count(rlp)) > op->nmax) {
+	        rs1 = vechand_get(op->rlp,iold,&vp) ;
+	        if ((rs1 >= 0) && vp) {
+		    rec		*rp = recp(vp) ;
+	            vechand_del(op->rlp,iold) ;
 	            record_finish(rp) ;
 	            gncache_recfree(op,rp) ;
 	        }
-	    }
+	    } /* end if (vechand_get) */
 	} /* end if */
-
 	return rs ;
 }
 /* end subroutine (gncache_maintenance) */
 
-
-static int gncache_allocrec(GNCACHE *op,GNCACHE_REC **rpp)
-{
-	const int	size = sizeof(GNCACHE_REC) ;
+static int gncache_allocrec(GN *op,rec **rpp) noex {
 	int		rs ;
-
-	if ((rs = cq_rem(&op->recsfree,rpp)) == SR_NOTFOUND) {
-	    void	*vp ;
-	    rs = uc_malloc(size,&vp) ;
-	    if (rs >= 0) *rpp = vp ;
+	if ((rs = cq_rem(op->flp,rpp)) == SR_NOTFOUND) {
+	    cint	sz = sizeof(rec) ;
+	    void	*vp{} ;
+	    if ((rs = uc_malloc(sz,&vp)) >= 0) {
+	        *rpp = recp(vp) ;
+	    }
 	}
-
 	return rs ;
 }
 /* end subroutine (gncache_allocrec) */
 
-
 #ifdef	COMMENT
-static int gncache_recdel(GNCACHE *op,GNCACHE_REC *ep)
-{
-	int		rs = SR_OK ;
+static int gncache_recdel(GN *op,rec *ep) noex {
+	int		rs ;
 	int		rs1 ;
-
 	if ((rs1 = vechand_ent(&op->db,ep)) >= 0) {
 	    rs1 = vechand_del(rs1) ;
 	}
 	if (rs >= 0) rs = rs1 ;
-
-	rs1 = record_finish(ep) ;
-	if (rs >= 0) rs = rs1 ;
-
+	{
+	    rs1 = record_finish(ep) ;
+	    if (rs >= 0) rs = rs1 ;
+	}
 	return rs ;
 }
 /* end subroutine (gncache_recdel) */
 #endif /* COMMENT */
 
-
-static int gncache_recfree(GNCACHE *op,GNCACHE_REC *rp)
-{
+static int gncache_recfree(GN *op,rec *rp) noex {
 	int		rs = SR_OK ;
-	int		n = cq_count(&op->recsfree) ;
-
+	int		n = cq_count(op->flp) ;
 	if (n < GNCACHE_MAXFREE) {
-	    rs = cq_ins(&op->recsfree,rp) ;
-	    if (rs < 0)
+	    rs = cq_ins(op->flp,rp) ;
+	    if (rs < 0) {
 	        uc_free(rp) ;
-	} else
+	    }
+	} else {
 	    uc_free(rp) ;
-
+	}
 	return rs ;
 }
 /* end subroutine (gncache_recfree) */
 
-
-static int gncache_record(GNCACHE *op,int ct,int rs)
-{
+static int gncache_record(GN *op,int ct,int rs) noex {
 	int		f_got = (rs > 0) ;
 	switch (ct) {
 	case ct_hit:
@@ -457,58 +491,47 @@ static int gncache_record(GNCACHE *op,int ct,int rs)
 }
 /* end subroutine (gncache_record) */
 
-
-static int record_start(GNCACHE_REC *rp,time_t dt,gid_t gid,cchar gn[])
-{
-	int		rs = SR_OK ;
+static int record_start(rec *rp,time_t dt,gid_t gid,cchar *gn) noex {
+	int		rs = SR_FAULT ;
 	int		gl = 0 ;
-
-	if (rp == NULL) return SR_FAULT ;
-	if (gn == NULL) return SR_FAULT ;
-
-	if (gn[0] == '\0') return SR_INVALID ;
-
-	if (dt == 0)
-	    dt = time(NULL) ;
-
-	memset(rp,0,sizeof(GNCACHE_REC)) ;
-
-	rp->gid = gid ;
-	rp->ti_create = dt ;
-	rp->ti_access = dt ;
-	gl = strwcpy(rp->gn,gn,GROUPNAMELEN) - rp->gn ;
-
+	if (rp && gn) {
+	    rs = SR_INVALID ;
+	    if (gn[0]) {
+	     if (dt == 0) dt = time(nullptr) ;
+	     memclear(rp) ;
+	     rp->gid = gid ;
+	     rp->ti_create = dt ;
+	     rp->ti_access = dt ;
+	     gl = strwcpy(rp->gn,gn,GROUPNAMELEN) - rp->gn ;
+	    } /* end if (valid) */
+	} /* end if (non-null) */
 	return (rs >= 0) ? gl : rs ;
 }
 /* end subroutine (record_start) */
 
-
-static int record_finish(GNCACHE_REC *rp)
-{
-
-	if (rp == NULL) return SR_FAULT ;
-
-	rp->gid = -1 ;
-	rp->gn[0] = '\0' ;
-	return SR_OK ;
+static int record_finish(rec *rp) noex {
+	int		rs = SR_FAULT ;
+	if (rp) {
+	    rs = SR_OK ;
+	    rp->gid = -1 ;
+	    rp->gn[0] = '\0' ;
+	} /* end if (non-null) */
+	return rs ;
 }
 /* end subroutine (record_finish) */
 
-
-static int record_old(GNCACHE_REC *rp,time_t dt,int ttl)
-{
-	int		f = FALSE ;
-
-	if (rp == NULL) return SR_FAULT ;
-
-	f = ((dt - rp->ti_create) >= ttl) ;
-	return f ;
+static int record_old(rec *rp,time_t dt,int ttl) noex {
+	int		rs = SR_FAULT ;
+	int		f = false ;
+	if (rp) {
+	    rs = SR_OK ;
+	    f = ((dt - rp->ti_create) >= ttl) ;
+	} /* end if (non-null) */
+	return (rs >= 0) ? f : rs ;
 }
 /* end subroutine (record_old) */
 
-
-static int record_refresh(GNCACHE_REC *rp,time_t dt)
-{
+static int record_refresh(rec *rp,time_t dt) noex {
 	int		rs ;
 	int		gl = 0 ;
 	char		gn[GROUPNAMELEN + 1] ;
@@ -520,47 +543,44 @@ static int record_refresh(GNCACHE_REC *rp,time_t dt)
 }
 /* end subroutine (record_refresh) */
 
-
-static int record_update(GNCACHE_REC *rp,time_t dt,cchar gn[])
-{
-	int		rs = SR_OK ;
-	int		f_changed = FALSE ;
-
-	if (rp == NULL) return SR_FAULT ;
-
-	rp->ti_create = dt ;
-	rp->ti_access = dt ;
-	f_changed = (strcmp(rp->gn,gn) != 0) ;
-
-	if (f_changed)
-	    strwcpy(rp->gn,gn,GROUPNAMELEN) ;
-
+static int record_update(rec *rp,time_t dt,cchar *gn) noex {
+	int		rs = SR_FAULT ;
+	int		f_changed = false ;
+	if (rp) {
+	    rp->ti_create = dt ;
+	    rp->ti_access = dt ;
+	    f_changed = (strcmp(rp->gn,gn) != 0) ;
+	    if (f_changed) {
+	        strwcpy(rp->gn,gn,GROUPNAMELEN) ;
+	    }
+	} /* end if (non-null) */
 	return (rs >= 0) ? f_changed : rs ;
 }
 /* end subroutine (record_update) */
 
-
-static int record_access(GNCACHE_REC *rp,time_t dt)
-{
-	int		gl ;
-
+static int record_access(rec *rp,time_t dt) noex {
+	cint		gl = strlen(rp->gn) ;
 	rp->ti_access = dt ;
-	gl = strlen(rp->gn) ;
-
 	return gl ;
 }
 /* end subroutine (record_access) */
 
-
-static int entry_load(GNCACHE_ENT *ep,GNCACHE_REC *rp)
-{
-	const int	gnl = GROUPNAMELEN ;
+static int entry_load(ent *ep,rec *rp) noex {
+	cint		gnl = GROUPNAMELEN ;
 	int		gl ;
-
 	ep->gid = rp->gid ;
 	gl = strwcpy(ep->groupname,rp->gn,gnl) - ep->groupname ;
 	return gl ;
 }
 /* end subroutine (entry_load) */
+
+static int mkvars() noex {
+	int		rs ;
+	if ((rs = getbufsize(getbufsize_gn)) >= 0) {
+	    var.groupnamelen = rs ;
+	}
+	return rs ;
+}
+/* end subroutine (mkvars) */
 
 
