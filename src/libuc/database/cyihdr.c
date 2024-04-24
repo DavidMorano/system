@@ -1,8 +1,9 @@
-/* cmihdr SUPPORT */
-/* lang=C++20 */
+/* cyihdr */
 
-/* index for Commandment-entry file */
-/* version %I% last-modified %G% */
+/* text-index for VAR-INDEX file */
+
+
+#define	CF_DEBUGS 	0		/* compile-time debugging */
 
 
 /* revision history:
@@ -10,7 +11,7 @@
 	= 1998-03-01, David A­D­ Morano
 	This subroutine was originally written.
 
-	= 2017-08-23, David A­D­ Morano
+	= 2017-08-22, David A­D­ Morano
 	I enhanced to use |hasValidMagic()|.
 
 */
@@ -19,14 +20,15 @@
 
 /*******************************************************************************
 
-	Name:
-	cmihdrx
-
-	Description:
-	This subroutine reads and write a commandment-entry index file.
+	This subroutine writes out the hash file.
 
 	Synopsis:
-	int cmihdr_msg(cmihdr *ep,int f,char *hbuf,int hlen) noex
+
+	int cyihdr(ep,f,hbuf,hlen)
+	CYIHDR		*ep ;
+	int		f ;
+	char		hbuf[] ;
+	int		hlen ;
 
 	Arguments:
 	- ep		object pointer
@@ -40,10 +42,12 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<envstandards.h>	/* must be before others */
+#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -52,7 +56,7 @@
 #include	<hasx.h>
 #include	<localmisc.h>
 
-#include	"cmihdr.h"
+#include	"cyihdr.h"
 
 
 /* local defines */
@@ -67,16 +71,17 @@
 /* local structures */
 
 enum his {
-	hi_dbsize,			/* DB file size */
-	hi_dbtime,			/* DB modification-time */
-	hi_idxsize,			/* IDX file size */
-	hi_idxtime,			/* IDX modification-time */
+	hi_fsize,			/* file size */
+	hi_wtime,			/* creation time */
+	hi_diroff,			/* directory-name */
+	hi_caloff,			/* calendar-name */
 	hi_vioff,			/* key-string table */
 	hi_vilen,
 	hi_vloff,			/* key-string table */
 	hi_vllen,
-	hi_nents,			/* number of entries */
-	hi_maxent,			/* maximum commandment-number */
+	hi_nentries,
+	hi_nskip,			/* used in hash-collision algorithm */
+	hi_year,			/* the year index was created */
 	hi_overlast
 } ;
 
@@ -87,18 +92,17 @@ enum his {
 /* local variables */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
-int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
+
+int cyihdr(CYIHDR *ep,int f,char *hbuf,int hlen)
+{
 	uint		*header ;
-	cint	headsize = hi_overlast * sizeof(uint) ;
-	cint	magicsize = CMIHDR_MAGICSIZE ;
+	const int	headsize = hi_overlast * sizeof(uint) ;
+	const int	magicsize = CYIHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	cchar	*magicstr = CMIHDR_MAGICSTR ;
+	const char	*magicstr = CYIHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
@@ -111,48 +115,47 @@ int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 
 /* read out the VETU information */
 
-	        if (bl >= 4) {
+		if (bl >= 4) {
 
-	            memcpy(ep->vetu,bp,4) ;
+	        memcpy(ep->vetu,bp,4) ;
 
-	            if (ep->vetu[0] != CMIHDR_VERSION) {
-	                rs = SR_PROTONOSUPPORT ;
-		    }
+	        if (ep->vetu[0] != CYIHDR_VERSION)
+	            rs = SR_PROTONOSUPPORT ;
 
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
-	                rs = SR_PROTOTYPE ;
-		    }
+	        if ((rs >= 0) && (ep->vetu[1] != ENDIAN))
+	            rs = SR_PROTOTYPE ;
 
-	            bp += 4 ;
-	            bl -= 4 ;
+	        bp += 4 ;
+	        bl -= 4 ;
 
-	        } else {
-	            rs = SR_ILSEQ ;
+		} else {
+		    rs = SR_ILSEQ ;
 		}
 
 	        if (rs >= 0) {
-	            if (bl >= headsize) {
+		    if (bl >= headsize) {
 	                header = (uint *) bp ;
-	                ep->dbsize = header[hi_dbsize] ;
-	                ep->dbtime = header[hi_dbtime] ;
-	                ep->idxsize = header[hi_idxsize] ;
-	                ep->idxtime = header[hi_idxtime] ;
+	                ep->fsize = header[hi_fsize] ;
+	                ep->wtime = header[hi_wtime] ;
+	                ep->diroff = header[hi_diroff] ;
+	                ep->caloff = header[hi_caloff] ;
 	                ep->vioff = header[hi_vioff] ;
 	                ep->vilen = header[hi_vilen] ;
 	                ep->vloff = header[hi_vloff] ;
 	                ep->vllen = header[hi_vllen] ;
-	                ep->nents = header[hi_nents] ;
-	                ep->maxent = header[hi_maxent] ;
+	                ep->nentries = header[hi_nentries] ;
+	                ep->nskip = header[hi_nskip] ;
+	                ep->year = header[hi_year] ;
 	                bp += headsize ;
-	                bl -= headsize ;
+	        	bl -= headsize ;
 	            } else {
-	                rs = SR_ILSEQ ;
+	                rs = SR_OVERFLOW ;
 	            }
-	        } /* end if (item) */
+	        } /* end if (mkmagic) */
 
 	    } else {
-	        rs = SR_ILSEQ ;
-	    } /* end if (hasValidMagic) */
+	        rs = SR_OVERFLOW ;
+	    }
 	} else { /* write */
 
 	    if (bl >= (magicsize + 4)) {
@@ -160,22 +163,23 @@ int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 	            bp += magicsize ;
 	            bl -= magicsize ;
 	    	    memcpy(bp,ep->vetu,4) ;
-	    	    bp[0] = CMIHDR_VERSION ;
+	    	    bp[0] = CYIHDR_VERSION ;
 	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
 	        	header = (uint *) bp ;
-	        	header[hi_dbsize] = ep->dbsize ;
-	        	header[hi_dbtime] = ep->dbtime ;
-	        	header[hi_idxsize] = ep->idxsize ;
-	        	header[hi_idxtime] = ep->idxtime ;
+	        	header[hi_fsize] = ep->fsize ;
+	        	header[hi_wtime] = ep->wtime ;
+	        	header[hi_diroff] = ep->diroff ;
+	        	header[hi_caloff] = ep->caloff ;
 	        	header[hi_vioff] = ep->vioff ;
 	        	header[hi_vilen] = ep->vilen ;
 	        	header[hi_vloff] = ep->vloff ;
 	        	header[hi_vllen] = ep->vllen ;
-	        	header[hi_nents] = ep->nents ;
-	        	header[hi_maxent] = ep->maxent ;
+	        	header[hi_nentries] = ep->nentries ;
+	        	header[hi_nskip] = ep->nskip ;
+	        	header[hi_year] = ep->year ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 	            } else {
@@ -190,6 +194,6 @@ int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 
 	return (rs >= 0) ? (bp - hbuf) : rs ;
 }
-/* end subroutine (cmihdr) */
+/* end subroutine (cyihdr) */
 
 

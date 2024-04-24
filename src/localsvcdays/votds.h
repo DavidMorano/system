@@ -1,15 +1,22 @@
-/* votds */
+/* votds HEADER (VOTD system Shared-memoty management) */
+/* lang=C20 */
+
+/* VOTDs system Cache management */
+/* version %I% last-modified %G% */
 
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 #ifndef	VOTDS_INCLUDE
-#define	VOTDS_INCLUDE	1
+#define	VOTDS_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
 #include	<sys/param.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
 #include	<ptm.h>
 #include	<shmalloc.h>
 #include	<localmisc.h>
@@ -43,13 +50,13 @@
 
 
 struct votds_obj {
-	const char	*name ;
+	cchar	*name ;
 	uint		objsize ;
 } ;
 
 struct votds_titlecache {
-	const char	**titles ;
-	const char	*a ;
+	cchar	**titles ;
+	cchar	*a ;
 	int		wmark ;
 	int		amark ;
 	char		lang[VOTDS_LANGLEN+1] ;
@@ -100,9 +107,9 @@ struct votds_flags {
 struct votds_head {
 	uint		magic ;
 	VOTDS_FL	f ;
-	const char	*pr ;
-	const char	*lang ;
-	const char	*shmname ;
+	cchar	*pr ;
+	cchar	*lang ;
+	cchar	*shmname ;
 	caddr_t		mapdata ;	/* SHM data */
 	PTM		*mp ;		/* pointer to SHM mutex */
 	VOTDS_LANG	*langs ;	/* lang-records */
@@ -130,15 +137,15 @@ struct votds_head {
 extern "C" {
 #endif
 
-extern int	votds_open(VOTDS *,const char *,const char *,int) ;
-extern int	votds_titlelang(VOTDS *,const char *) ;
-extern int	votds_titleloads(VOTDS *,const char *,const char **) ;
-extern int	votds_titlefetch(VOTDS *,char *,int,const char *,int) ;
-extern int	votds_titlematch(VOTDS *,const char *,const char *,int) ;
-extern int	votds_verseload(VOTDS *,const char *,
-			VOTDS_CITE *,int,const char *,int) ;
+extern int	votds_open(VOTDS *,cchar *,cchar *,int) ;
+extern int	votds_titlelang(VOTDS *,cchar *) ;
+extern int	votds_titleloads(VOTDS *,cchar *,cchar **) ;
+extern int	votds_titlefetch(VOTDS *,char *,int,cchar *,int) ;
+extern int	votds_titlematch(VOTDS *,cchar *,cchar *,int) ;
+extern int	votds_verseload(VOTDS *,cchar *,
+			VOTDS_CITE *,int,cchar *,int) ;
 extern int	votds_versefetch(VOTDS *,VOTDS_CITE *,
-			char *,int,const char *,int) ;
+			char *,int,cchar *,int) ;
 extern int	votds_info(VOTDS *,VOTDS_INFO *) ;
 extern int	votds_close(VOTDS *) ;
 

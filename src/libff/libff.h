@@ -1,53 +1,47 @@
-/* libff */
+/* ffile HEADER */
+/* lang=C++20 */
 
-/* header file for the FORTMAT subroutine */
+
+/* Copyright © 1986 David A­D­ Morano.  All rights reserved. */
 
 
-/* revision history:
-
-	= 1998-07-01, David A­D­ Morano
-	This file was originally written.
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
-#ifndef	LIBFF_INCLUDE
-#define	LIBFF_INCLUDE	1
+#ifndef	FFILE_INCLUDE
+#define	FFILE_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-
-#include	<sys/types.h>
 #include	<stdio.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
 
 
-#if	(! defined(LIBFF_MASTER)) || (LIBFF_MASTER == 0)
+#define	FFILE	struct ffile_head
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
-extern int ffclearerr(FILE *) ;
-extern int ffclose(FILE *) ;
-extern int ffeof(FILE *) ;
-extern int fferror(FILE *) ;
-extern int ffflush(FILE *) ;
-extern int ffgetc(FILE *) ;
-extern int ffprintf(FILE *,const char *,...) ;
-extern int ffputc(FILE *,int) ;
-extern int ffread(FILE *,void *,int) ;
-extern int ffreadline(FILE *,char *,int) ;
-extern int ffseek(FILE *,off_t,int) ;
-extern int fftell(FILE *,off_t *) ;
-extern int ffwrite(FILE *,const void *,int) ;
+struct ffile_head {
+	FILE		*sfp ;
+} ;
 
-#ifdef	__cplusplus
-}
-#endif
+typedef	FFILE		ffile ;
 
-#endif /* LIBFF_MASTER */
+EXTERNC_begin
 
-#endif /* LIBFF_INCLUDE */
+extern int	ffopen(ffile *,cchar *,cchar *) noex ;
+extern int	ffread(ffile *,void *,int) noex ;
+extern int	ffgetc(ffile *) noex ;
+extern int	ffwrite(ffile *,cvoid *,int) noex ;
+extern int	ffprintf(ffile *,cchar *,...) noex ;
+extern int	ffputc(ffile *,int) noex ;
+extern int	ffseek(ffile *,off_t,int) noex ;
+extern int	fftell(ffile *,off_t *) noex ;
+extern int	ffclose(ffile *) noex ;
+
+EXTERNC_end
+
+
+#endif /* FFILE_INCLUDE */
+
 
 

@@ -139,13 +139,16 @@
 #include	<netdb.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>
+#include	<ctime>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
 #include	<mapstrint.h>
 #include	<stdorder.h>
+#include	<mkx.h>
+#include	<hasx.h>
 #include	<matxstr.h>
 #include	<localmisc.h>
 
@@ -184,11 +187,9 @@
 
 /* external subroutines */
 
-extern int	mkmagic(char *,int,cchar *) ;
 extern int	lockfile(int,int,off_t,off_t,int) ;
 extern int	getfstype(char *,int,int) ;
 extern int	iceil(int,int) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
 extern int	isNotPresent(int) ;
 
 #if	CF_DEBUGS
@@ -1254,7 +1255,7 @@ static int msfile_fileverify(MSFILE *op) noex {
 #if	CF_DEBUGS
 	    debugprintf("msfile_fileverify: ms=%t\n",cp,strlinelen(cp,-1,40)) ;
 #endif
-	    if (isValidMagic(cp,msize,MSFILE_FILEMAGIC)) {
+	    if (hasValidMagic(cp,msize,MSFILE_FILEMAGIC)) {
 	        cp += msize ;
 	        if (cp[0] <= MSFILE_FILEVERSION) {
 	            op->fileversion = cp[0] ;

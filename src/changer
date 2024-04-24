@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} vbufprintf"
+NAMES="${NAMES} isValidMagic "
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/vbufprintf/s//bufvprintf/g
+g/isValidMagic/s//hasValidMagic/g
 	w
 	q
 EOF

@@ -42,18 +42,17 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* must be before others */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
+#include	<mkx.h>
+#include	<hasx.h>
 #include	<localmisc.h>
 
 #include	"uunamefu.h"
@@ -98,9 +97,6 @@ enum his {
 
 /* forward references */
 
-extern int	mkmagic(char *,int,cchar *) ;
-extern int	isValidMagic(cchar *,int,cchar *) ;
-
 
 /* local variables */
 
@@ -130,7 +126,7 @@ int		hlen ;
 	if (buflen < 1) return SR_OVERFLOW ;
 
 	if (f) { /* read */
-	    if ((bl > magicsize) && isValidMagic(bp,magicsize,magicstr)) {
+	    if ((bl > magicsize) && hasValidMagic(bp,magicsize,magicstr)) {
 	        bp += magicsize ;
 	        bl -= magicsize ;
 
@@ -177,7 +173,7 @@ int		hlen ;
 
 	    } else {
 	        rs = SR_ILSEQ ;
-	    } /* end if (isValidMagic) */
+	    } /* end if (hasValidMagic) */
 	} else { /* write */
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {

@@ -1,26 +1,32 @@
-/* varhdr SUPPORT */
-/* lang=C++20 */
+/* bvshdr */
 
-/* text-index header for VAR-INDEX file */
-/* version %I% last-modified %G% */
+/* index for Bible-Verse-Structure (BVS) file */
+
+
+#define	CF_DEBUGS 	0		/* compile-time debugging */
 
 
 /* revision history:
 
-	= 1998-03-01, David A­D­ Morano
-	This subroutine was originally written.
+	= 2008-10-01, David A­D­ Morano
+	This module was originally written.
+
+	= 2017-08-17, David A­D­ Morano
+	I enhanced to use |hasValidMagic()|.
 
 */
 
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
+/* Copyright © 2009,2017 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	This subroutine writes out the hash file.
+        This subroutine reads or writes the file header for
+        bible-verse-structure (BVS) files.
 
 	Synopsis:
-	int varhdr(ep,f,hbuf,hlen)
-	VARHDR		*ep ;
+
+	int bvshdr(ep,f,hbuf,hlen)
+	BVSHDR		*ep ;
 	int		f ;
 	char		hbuf[] ;
 	int		hlen ;
@@ -38,7 +44,10 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
+#include	<sys/types.h>
+#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
 #include	<endian.h>
@@ -46,7 +55,7 @@
 #include	<hasx.h>
 #include	<localmisc.h>
 
-#include	"varhdr.h"
+#include	"bvshdr.h"
 
 
 /* local defines */
@@ -63,16 +72,13 @@
 enum his {
 	hi_fsize,			/* file size */
 	hi_wtime,			/* creation time */
-	hi_ksoff,			/* key-string table */
-	hi_kslen,
-	hi_vsoff,			/* value-string table */
-	hi_vslen,
-	hi_rtoff,			/* record table */
-	hi_rtlen,			
-	hi_itoff,			/* index (hash) table */
-	hi_itlen,			
-	hi_nvars,			/* number of variables */
-	hi_nskip,
+	hi_nverses,			/* total verses */
+	hi_nzverses,			/* non-zero verses */
+	hi_nzbooks,			/* number of non-zero books */
+	hi_btoff,			/* book-table */
+	hi_btlen,
+	hi_ctoff,			/* chapter-table */
+	hi_ctlen,
 	hi_overlast
 } ;
 
@@ -83,18 +89,17 @@ enum his {
 /* local variables */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
-int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
+
+int bvshdr(BVSHDR *ep,int f,char *hbuf,int hlen)
+{
 	uint		*header ;
 	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = VARHDR_MAGICSIZE ;
+	const int	magicsize = BVSHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	cchar		*magicstr = VARHDR_MAGICSTR ;
+	const char	*magicstr = BVSHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
@@ -111,11 +116,13 @@ int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 
 	            memcpy(ep->vetu,bp,4) ;
 
-	            if (ep->vetu[0] != VARHDR_VERSION)
+	            if (ep->vetu[0] != BVSHDR_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
+		    }
 
-	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN))
+	            if ((rs >= 0) && (ep->vetu[1] != ENDIAN)) {
 	                rs = SR_PROTOTYPE ;
+		    }
 
 	            bp += 4 ;
 	            bl -= 4 ;
@@ -131,16 +138,13 @@ int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 
 	            ep->fsize = header[hi_fsize] ;
 	            ep->wtime = header[hi_wtime] ;
-	            ep->ksoff = header[hi_ksoff] ;
-	            ep->kslen = header[hi_kslen] ;
-	            ep->vsoff = header[hi_vsoff] ;
-	            ep->vslen = header[hi_vslen] ;
-	            ep->rtoff = header[hi_rtoff] ;
-	            ep->rtlen = header[hi_rtlen] ;
-	            ep->itoff = header[hi_itoff] ;
-	            ep->itlen = header[hi_itlen] ;
-	            ep->nvars = header[hi_nvars] ;
-	            ep->nskip = header[hi_nskip] ;
+	            ep->nverses = header[hi_nverses] ;
+	            ep->nzverses = header[hi_nzverses] ;
+	            ep->nzbooks = header[hi_nzbooks] ;
+	            ep->btoff = header[hi_btoff] ;
+	            ep->btlen = header[hi_btlen] ;
+	            ep->ctoff = header[hi_ctoff] ;
+	            ep->ctlen = header[hi_ctlen] ;
 
 	            bp += headsize ;
 	            bl -= headsize ;
@@ -158,35 +162,35 @@ int varhdr(VARHDR *ep,int f,char *hbuf,int hlen) noex {
 	            bp += magicsize ;
 	            bl -= magicsize ;
 	    	    memcpy(bp,ep->vetu,4) ;
-	    	    *bp = VARHDR_VERSION ;
+	    	    bp[0] = BVSHDR_VERSION ;
+	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
-	            if (bl >= headsize) {
+	    	    if (bl >= headsize) {
 	        	header = (uint *) bp ;
 	        	header[hi_fsize] = ep->fsize ;
 	        	header[hi_wtime] = ep->wtime ;
-	        	header[hi_ksoff] = ep->ksoff ;
-	        	header[hi_kslen] = ep->kslen ;
-	        	header[hi_vsoff] = ep->vsoff ;
-	        	header[hi_vslen] = ep->vslen ;
-	        	header[hi_rtoff] = ep->rtoff ;
-	        	header[hi_rtlen] = ep->rtlen ;
-	        	header[hi_itoff] = ep->itoff ;
-	        	header[hi_itlen] = ep->itlen ;
-	        	header[hi_nvars] = ep->nvars ;
-	        	header[hi_nskip] = ep->nskip ;
+	        	header[hi_nverses] = ep->nverses ;
+	        	header[hi_nzverses] = ep->nzverses ;
+	        	header[hi_nzbooks] = ep->nzbooks ;
+	        	header[hi_btoff] = ep->btoff ;
+	        	header[hi_btlen] = ep->btlen ;
+	        	header[hi_ctoff] = ep->ctoff ;
+	        	header[hi_ctlen] = ep->ctlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
-		    } /* end if */
-		} /* end if (mkmagic) */
+	            } else {
+	                rs = SR_OVERFLOW ;
+	            }
+	        } /* end if (mkmagic) */
 	    } else {
 	        rs = SR_OVERFLOW ;
-	    } /* end if */
+	    }
 
 	} /* end if (read-write) */
 
 	return (rs >= 0) ? (bp - hbuf) : rs ;
 }
-/* end subroutine (varhdr) */
+/* end subroutine (bvshdr) */
 
 

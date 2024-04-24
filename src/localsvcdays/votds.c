@@ -1,20 +1,17 @@
-/* votds */
+/* votds SUPPORT (VOTD syustem Shared-memory management) */
+/* lang=C++20 */
 
-/* VOTDs system cache management */
+/* VOTDs system Cache management */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* compile-time debug print-outs */
 #define	CF_GETACOUNT	0		/* |votds_getacount()| */
 #define	CF_UPDATE	0		/* |votds_update()| */
 
-
 /* revision history:
 
 	= 1998-05-01, David A­D­ Morano
-
 	This was created along with the DATE object.
-
 
 */
 
@@ -22,24 +19,22 @@
 
 /*******************************************************************************
 
-	This modules provides management for the system Verse-of-the-Day (VOTD)
-	cache.
-
+	This modules provides management for the system Verse-of-the-Day
+	(VOTD) cache.
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/mman.h>
-#include	<limits.h>
 #include	<unistd.h>
-#include	<string.h>
-#include	<stdarg.h>
-
+#include	<climit.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstdarg>
+#include	<cstring>
 #include	<usystem.h>
 #include	<intceil.h>
 #include	<estrings.h>

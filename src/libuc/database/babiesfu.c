@@ -1,8 +1,9 @@
-/* cmihdr SUPPORT */
-/* lang=C++20 */
+/* babiesfu */
 
-/* index for Commandment-entry file */
-/* version %I% last-modified %G% */
+/* header management for BABIES shared-memory segment */
+
+
+#define	CF_DEBUGS 	0		/* run-time debugging */
 
 
 /* revision history:
@@ -10,23 +11,22 @@
 	= 1998-03-01, David A­D­ Morano
 	This subroutine was originally written.
 
-	= 2017-08-23, David A­D­ Morano
-	I enhanced to use |hasValidMagic()|.
-
 */
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
 
-	Name:
-	cmihdrx
-
-	Description:
-	This subroutine reads and write a commandment-entry index file.
+	This subroutine reads and writes the BABIES shared-memory segment
+	header.
 
 	Synopsis:
-	int cmihdr_msg(cmihdr *ep,int f,char *hbuf,int hlen) noex
+
+	int babiesfu(ep,f,hbuf,hlen)
+	BABIESFU	*ep ;
+	int		f ;
+	char		hbuf[] ;
+	int		hlen ;
 
 	Arguments:
 	- ep		object pointer
@@ -40,10 +40,12 @@
 
 *******************************************************************************/
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
+#include	<envstandards.h>	/* must be before others */
+#include	<sys/types.h>
 #include	<sys/param.h>
-#include	<climits>
 #include	<unistd.h>
+#include	<climits>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
 #include	<usystem.h>
@@ -52,7 +54,7 @@
 #include	<hasx.h>
 #include	<localmisc.h>
 
-#include	"cmihdr.h"
+#include	"babiesfu.h"
 
 
 /* local defines */
@@ -66,20 +68,6 @@
 
 /* local structures */
 
-enum his {
-	hi_dbsize,			/* DB file size */
-	hi_dbtime,			/* DB modification-time */
-	hi_idxsize,			/* IDX file size */
-	hi_idxtime,			/* IDX modification-time */
-	hi_vioff,			/* key-string table */
-	hi_vilen,
-	hi_vloff,			/* key-string table */
-	hi_vllen,
-	hi_nents,			/* number of entries */
-	hi_maxent,			/* maximum commandment-number */
-	hi_overlast
-} ;
-
 
 /* forward references */
 
@@ -87,18 +75,17 @@ enum his {
 /* local variables */
 
 
-/* exported variables */
-
-
 /* exported subroutines */
 
-int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
+
+int babiesfu(BABIESFU *ep,int f,char *hbuf,int hlen)
+{
 	uint		*header ;
-	cint	headsize = hi_overlast * sizeof(uint) ;
-	cint	magicsize = CMIHDR_MAGICSIZE ;
+	const int	headsize = babiesfuh_overlast * sizeof(uint) ;
+	const int	magicsize = BABIESFU_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	cchar	*magicstr = CMIHDR_MAGICSTR ;
+	const char	*magicstr = BABIESFU_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
@@ -115,7 +102,7 @@ int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 
 	            memcpy(ep->vetu,bp,4) ;
 
-	            if (ep->vetu[0] != CMIHDR_VERSION) {
+	            if (ep->vetu[0] != BABIESFU_VERSION) {
 	                rs = SR_PROTONOSUPPORT ;
 		    }
 
@@ -133,49 +120,46 @@ int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 	        if (rs >= 0) {
 	            if (bl >= headsize) {
 	                header = (uint *) bp ;
-	                ep->dbsize = header[hi_dbsize] ;
-	                ep->dbtime = header[hi_dbtime] ;
-	                ep->idxsize = header[hi_idxsize] ;
-	                ep->idxtime = header[hi_idxtime] ;
-	                ep->vioff = header[hi_vioff] ;
-	                ep->vilen = header[hi_vilen] ;
-	                ep->vloff = header[hi_vloff] ;
-	                ep->vllen = header[hi_vllen] ;
-	                ep->nents = header[hi_nents] ;
-	                ep->maxent = header[hi_maxent] ;
+	                ep->shmsize = header[babiesfuh_shmsize] ;
+	                ep->dbsize = header[babiesfuh_dbsize] ;
+	                ep->dbtime = header[babiesfuh_dbtime] ;
+	                ep->wtime = header[babiesfuh_wtime] ;
+	                ep->atime = header[babiesfuh_atime] ;
+	                ep->acount = header[babiesfuh_acount] ;
+	                ep->muoff = header[babiesfuh_muoff] ;
+	                ep->musize = header[babiesfuh_musize] ;
+	                ep->btoff = header[babiesfuh_btoff] ;
+	                ep->btlen = header[babiesfuh_btlen] ;
 	                bp += headsize ;
 	                bl -= headsize ;
 	            } else {
 	                rs = SR_ILSEQ ;
-	            }
-	        } /* end if (item) */
+		    }
+	        } /* end if (ok) */
 
-	    } else {
-	        rs = SR_ILSEQ ;
 	    } /* end if (hasValidMagic) */
 	} else { /* write */
-
 	    if (bl >= (magicsize + 4)) {
 	        if ((rs = mkmagic(bp,magicsize,magicstr)) >= 0) {
 	            bp += magicsize ;
 	            bl -= magicsize ;
 	    	    memcpy(bp,ep->vetu,4) ;
-	    	    bp[0] = CMIHDR_VERSION ;
+	    	    bp[0] = BABIESFU_VERSION ;
 	    	    bp[1] = ENDIAN ;
 	    	    bp += 4 ;
 	    	    bl -= 4 ;
 	    	    if (bl >= headsize) {
 	        	header = (uint *) bp ;
-	        	header[hi_dbsize] = ep->dbsize ;
-	        	header[hi_dbtime] = ep->dbtime ;
-	        	header[hi_idxsize] = ep->idxsize ;
-	        	header[hi_idxtime] = ep->idxtime ;
-	        	header[hi_vioff] = ep->vioff ;
-	        	header[hi_vilen] = ep->vilen ;
-	        	header[hi_vloff] = ep->vloff ;
-	        	header[hi_vllen] = ep->vllen ;
-	        	header[hi_nents] = ep->nents ;
-	        	header[hi_maxent] = ep->maxent ;
+	        	header[babiesfuh_shmsize] = ep->shmsize ;
+	        	header[babiesfuh_dbsize] = ep->dbsize ;
+	        	header[babiesfuh_dbtime] = ep->dbtime ;
+	        	header[babiesfuh_wtime] = ep->wtime ;
+	        	header[babiesfuh_atime] = ep->atime ;
+	        	header[babiesfuh_acount] = ep->acount ;
+	        	header[babiesfuh_muoff] = ep->muoff ;
+	        	header[babiesfuh_musize] = ep->musize ;
+	        	header[babiesfuh_btoff] = ep->btoff ;
+	        	header[babiesfuh_btlen] = ep->btlen ;
 	        	bp += headsize ;
 	        	bl -= headsize ;
 	            } else {
@@ -185,11 +169,10 @@ int cmihdr_msg(CMIHDR *ep,int f,char *hbuf,int hlen) noex {
 	    } else {
 	        rs = SR_OVERFLOW ;
 	    }
-
 	} /* end if (read-write) */
 
 	return (rs >= 0) ? (bp - hbuf) : rs ;
 }
-/* end subroutine (cmihdr) */
+/* end subroutine (babiesfu) */
 
 
