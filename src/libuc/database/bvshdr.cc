@@ -1,9 +1,8 @@
-/* bvshdr */
+/* bvshdr SUPPORT */
+/* lang=C++20 */
 
 /* index for Bible-Verse-Structure (BVS) file */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -20,11 +19,13 @@
 
 /*******************************************************************************
 
+	NameL
+
+	Description:
         This subroutine reads or writes the file header for
         bible-verse-structure (BVS) files.
 
 	Synopsis:
-
 	int bvshdr(ep,f,hbuf,hlen)
 	BVSHDR		*ep ;
 	int		f ;
@@ -44,8 +45,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdlib>
 #include	<cstring>
@@ -89,17 +88,18 @@ enum his {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int bvshdr(BVSHDR *ep,int f,char *hbuf,int hlen)
-{
+int bvshdr(BVSHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = BVSHDR_MAGICSIZE ;
+	cint	headsize = hi_overlast * sizeof(uint) ;
+	cint	magicsize = BVSHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	const char	*magicstr = BVSHDR_MAGICSTR ;
+	cchar	*magicstr = BVSHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;

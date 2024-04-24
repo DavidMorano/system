@@ -1,9 +1,6 @@
-/* cyihdr */
+/* cyihdr SUPPORT */
 
-/* text-index for VAR-INDEX file */
-
-
-#define	CF_DEBUGS 	0		/* compile-time debugging */
+/* text-index for CYI-INDEX file */
 
 
 /* revision history:
@@ -20,10 +17,12 @@
 
 /*******************************************************************************
 
+	Name:
+
+	Description:
 	This subroutine writes out the hash file.
 
 	Synopsis:
-
 	int cyihdr(ep,f,hbuf,hlen)
 	CYIHDR		*ep ;
 	int		f ;
@@ -43,8 +42,6 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* must be before others */
-#include	<sys/types.h>
-#include	<sys/param.h>
 #include	<unistd.h>
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
@@ -92,17 +89,18 @@ enum his {
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cyihdr(CYIHDR *ep,int f,char *hbuf,int hlen)
-{
+int cyihdr(CYIHDR *ep,int f,char *hbuf,int hlen) noex {
 	uint		*header ;
-	const int	headsize = hi_overlast * sizeof(uint) ;
-	const int	magicsize = CYIHDR_MAGICSIZE ;
+	cint	headsize = hi_overlast * sizeof(uint) ;
+	cint	magicsize = CYIHDR_MAGICSIZE ;
 	int		rs = SR_OK ;
 	int		bl = hlen ;
-	const char	*magicstr = CYIHDR_MAGICSTR ;
+	cchar	*magicstr = CYIHDR_MAGICSTR ;
 	char		*bp = hbuf ;
 
 	if (ep == NULL) return SR_FAULT ;
