@@ -125,6 +125,8 @@ struct sbuf : sbuf_head {
 	int addquoted(cchar *sp,int sl = -1) noex {
 	    return sbuf_addquoted(this,sp,sl) ;
 	} ;
+	template<typename Binary> int bin(Binary) noex ;
+	template<typename Octal> int oct(Octal) noex ;
 	template<typename Decimal> int dec(Decimal) noex ;
 	template<typename Hexadecimal> int hex(Hexadecimal) noex ;
 	sbuf_iter begin() noex {
@@ -152,6 +154,18 @@ extern int	sbuf_reset(sbuf *) noex ;
 extern int	sbuf_buf(sbuf *,cchar *,int) noex ;
 extern int	sbuf_strw(sbuf *,cchar *,int) noex ;
 extern int	sbuf_strs(sbuf *,int,cchar **) noex ;
+extern int	sbuf_bini(sbuf *,int) noex ;
+extern int	sbuf_binl(sbuf *,long) noex ;
+extern int	sbuf_binll(sbuf *,longlong) noex ;
+extern int	sbuf_binui(sbuf *,uint) noex ;
+extern int	sbuf_binul(sbuf *,ulong) noex ;
+extern int	sbuf_binull(sbuf *,ulonglong) noex ;
+extern int	sbuf_octi(sbuf *,int) noex ;
+extern int	sbuf_octl(sbuf *,long) noex ;
+extern int	sbuf_octll(sbuf *,longlong) noex ;
+extern int	sbuf_octui(sbuf *,uint) noex ;
+extern int	sbuf_octul(sbuf *,ulong) noex ;
+extern int	sbuf_octull(sbuf *,ulonglong) noex ;
 extern int	sbuf_deci(sbuf *,int) noex ;
 extern int	sbuf_decl(sbuf *,long) noex ;
 extern int	sbuf_decll(sbuf *,longlong) noex ;
@@ -187,6 +201,54 @@ static inline int sbuf_char(sbuf *op,int ch) noex {
 EXTERNC_end
 
 #ifdef	__cplusplus
+
+inline int sbuf_bin(sbuf *op,int v) noex {
+	return sbuf_bini(op,v) ;
+}
+inline int sbuf_bin(sbuf *op,long v) noex {
+	return sbuf_binl(op,v) ;
+}
+inline int sbuf_bin(sbuf *op,longlong v) noex {
+	return sbuf_binll(op,v) ;
+}
+
+inline int sbuf_bin(sbuf *op,uint v) noex {
+	return sbuf_binui(op,v) ;
+}
+inline int sbuf_bin(sbuf *op,ulong v) noex {
+	return sbuf_binul(op,v) ;
+}
+inline int sbuf_bin(sbuf *op,ulonglong v) noex {
+	return sbuf_binull(op,v) ;
+}
+
+template<typename Binary> int sbuf::bin(Binary v) noex {
+	return sbuf_bin(this,v) ;
+} ;
+
+inline int sbuf_oct(sbuf *op,int v) noex {
+	return sbuf_octi(op,v) ;
+}
+inline int sbuf_oct(sbuf *op,long v) noex {
+	return sbuf_octl(op,v) ;
+}
+inline int sbuf_oct(sbuf *op,longlong v) noex {
+	return sbuf_octll(op,v) ;
+}
+
+inline int sbuf_oct(sbuf *op,uint v) noex {
+	return sbuf_octui(op,v) ;
+}
+inline int sbuf_oct(sbuf *op,ulong v) noex {
+	return sbuf_octul(op,v) ;
+}
+inline int sbuf_oct(sbuf *op,ulonglong v) noex {
+	return sbuf_octull(op,v) ;
+}
+
+template<typename Octal> int sbuf::oct(Octal v) noex {
+	return sbuf_oct(this,v) ;
+} ;
 
 inline int sbuf_dec(sbuf *op,int v) noex {
 	return sbuf_deci(op,v) ;
