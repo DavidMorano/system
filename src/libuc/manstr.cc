@@ -118,8 +118,8 @@ int manstr_breakfield(manstr *sop,cchar *ss,cchar **rpp) noex {
 /* end subroutine (manstr_breakfield) */
 
 /* skip white-space until reach terminator character */
-int manstr_whitecolon(manstr *sop) noex {
-	whitestop	pred(sop,':') ;
+int manstr_whitechr(manstr *sop,int sch) noex {
+	whitestop	pred(sop,sch) ;
 	while ((sop->sl > 0) && pred) {
 	    sop->sp += 1 ;
 	    sop->sl -= 1 ;
@@ -127,17 +127,6 @@ int manstr_whitecolon(manstr *sop) noex {
 	return sop->sl ;
 }
 /* end subroutine (manstr_whitecolon) */
-
-/* skip white-space until reach terminator character */
-int manstr_whitedash(manstr *sop) noex {
-	whitestop	pred(sop,'-') ;
-	while ((sop->sl > 0) && pred) {
-	    sop->sp += 1 ;
-	    sop->sl -= 1 ;
-	}
-	return sop->sl ;
-}
-/* end subroutine (manstr_whitedash) */
 
 int manstr_span(manstr *sop,cchar *stuff) noex {
 	int		si ;
