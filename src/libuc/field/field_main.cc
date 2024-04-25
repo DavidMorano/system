@@ -100,6 +100,7 @@
 #include	<strop.h>
 #include	<char.h>
 #include	<mkchar.h>
+#include	<terminit.hh>
 #include	<localmisc.h>
 
 #include	"field.h"
@@ -121,20 +122,6 @@
 
 
 /* local structures */
-
-constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
-
-namespace {
-    struct terminit {
-	char		terms[termsize] = {} ;
-	constexpr terminit(cchar *s) noex {
-	    while (*s) {
-		cint	ch = mkchar(*s++) ;
-		baset(terms,ch) ;
-	    }
-	} ;
-    } ; /* end struct (terminit) */
-}
 
 
 /* forward references */
