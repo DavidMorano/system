@@ -568,8 +568,9 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	            if (kbuf != nullptr) {
 
 	                cl = ALIASNAMELEN ;
-	                if (klen >= 0)
+	                if (klen >= 0) {
 	                    cl = min(klen,ALIASNAMELEN) ;
+			}
 
 	                bp = strwcpy(kbuf,(op->skey + ai),cl) ;
 	                vl = (bp - kbuf) ;
@@ -615,7 +616,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	int		vl = 0 ;
 	int		rs1 ;
 	int		f_cur = false ;
-	(void) opts ;;
+	(void) opts ;
 
 #if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
@@ -706,9 +707,7 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	            } /* end if (secondary hasing) */
 
 	        } else {
-
 /* get the next record index (if there is one) */
-
 	            hi = curp->i ;
 	            if (hi != 0) {
 	                ri = (op->indtab)[hi][0] ;
@@ -755,7 +754,6 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	        } /* end if (following the existing chain) */
 /* if successful, retrieve value */
 	        if (rs >= 0) {
-
 	            vi = op->rectab[ri][1] ;
 	            if (vbuf != nullptr) {
 	                cl = min(vlen,ALIASNAMELEN) ;
@@ -764,15 +762,11 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	            } else {
 	                vl = strlen(op->sval + vi) ;
 	            }
-
 /* update cursor */
-
 	            if (f_cur) {
 	                curp->i = hi ;
 	            }
-
 	        } /* end if (got one) */
-
 	        rs1 = mailalias_enterend(op,dt) ;
 	        if (rs >= 0) rs = rs1 ;
 	    } /* end if (mailalias-enter) */
@@ -1611,6 +1605,7 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	int		c_rec = 0 ;
 	if ((rs = field_start(&fsb,lbuf,llen)) >= 0) {
 	    cint	rsn = SR_NOTFOUND ;
+	    cint	klen = ALIASNAMELEN ;
 	    char	kbuf[ALIASNAMELEN+1] = { 0 } ;
 	    if (! f_havekey) {
 	        cchar	*pm = "Postmaster" ;
@@ -1620,9 +1615,9 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	                cbool	f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
 	                f_havekey = true ;
 	                if (f) {
-	                    strwcpylc(kbuf,kp,min(kl,ALIASNAMELEN)) ;
+	                    strwcpylc(kbuf,kp,min(kl,klen)) ;
 	                } else {
-	                    strwcpy(kbuf,kp,min(kl,ALIASNAMELEN)) ;
+	                    strwcpy(kbuf,kp,min(kl,klen)) ;
 	                }
 	            } /* end if (positive) */
 	        } /* end if (field_get) */

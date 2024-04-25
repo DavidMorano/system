@@ -241,7 +241,7 @@ int ccfile::seek(off_t o,int w) noex {
 int ccfile::iclose() noex {
 	int		rs = SR_OK ;
 	clear() ;
-	fstream::close() ;
+	fstream::close() ; /* superclass */
 	if (fail()) {
 	    rs = SR_IO ;
 	}

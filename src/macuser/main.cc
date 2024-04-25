@@ -87,8 +87,9 @@
 
 using std::string ;			/* type */
 using std::ifstream ;			/* type */
-using std::cout ;			/* variable */
 using std::clog ;			/* variable */
+using std::cerr ;			/* variable */
+using std::cout ;			/* variable */
 using std::nothrow ;			/* constant */
 
 
@@ -174,7 +175,7 @@ constexpr cchar		fnshells[] = FNSHELLS ;
 
 int main(int argc,mainv argv,mainv) noex {
 	const uid_t	uid = getuid() ;
-	int		ex = EXIT_FAILURE ;
+	int		ex = EXIT_SUCCESS ;
 	int		rs = 0 ;
 	if ((rs = getpn(argc,argv,prognames)) >= 0) {
 	    userinfo	ui ;
@@ -213,9 +214,6 @@ int main(int argc,mainv argv,mainv) noex {
 		        rs = SR_BUGCHECK ;
 		        break ;
 		    } /* end switch */
-		    if (rs >- 0) {
-		        ex = EXIT_SUCCESS ;
-		    }
 	        } /* end if (userinfo::find) */
 		break ;
 	    } /* end switch */
