@@ -38,7 +38,7 @@ LINT=	lint
 DEFS=
 
 
-INCS= field.h
+INCS= field.h fieldterms.h
 
 
 LIBS=
