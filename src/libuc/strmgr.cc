@@ -1,7 +1,7 @@
 /* strmgr SUPPORT */
 /* lang=C++20 */
 
-/* string management */
+/* string compostion management */
 /* version %I% last-modified %G% */
 
 
@@ -16,7 +16,14 @@
 
 /*******************************************************************************
 
-	We perform some simple string management.
+	Name:
+	strmgr
+
+	Description:
+	We perform some simple string composition management.  The
+	caller supplies a destination (result) string-buffer (with
+	a length), and then using "builder" methods composes what
+	she wants in the result.
 
 *******************************************************************************/
 
@@ -100,7 +107,7 @@ int strmgr_str(strmgr *op,cchar *sp,int sl) noex {
 }
 /* end subroutine (strmgr_str) */
 
-int strmgr_char(strmgr *op,int ch) noex {
+int strmgr_chr(strmgr *op,int ch) noex {
 	int		rs = SR_FAULT ;
 	if (op) {
 	    rs = SR_OK ;
@@ -113,7 +120,7 @@ int strmgr_char(strmgr *op,int ch) noex {
 	} /* end if (non-null) */
 	return (rs >= 0) ? 1 : rs ;
 }
-/* end subroutine (strmgr_char) */
+/* end subroutine (strmgr_chr) */
 
 int strmgr_finish(strmgr *op) noex {
 	int		rs = SR_FAULT ;

@@ -107,7 +107,7 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
 	    cwchar	*wp ;
 	    while ((wl = wsfnext(wsp,wsl,&wp)) > 0) {
 	        if (dl > 0) {
-	            rs = strmgr_char(&m,' ') ;
+	            rs = strmgr_chr(&m,' ') ;
 	            if (rs >= 0) dl += 1 ;
 	        }
 	        if (rs >= 0) {
@@ -120,11 +120,11 @@ int snwcpywidehdr(char *dbuf,int dlen,cwchar *wsp,int wsl) noex {
 	                        rs = strmgr_str(&m,ss,-1) ;
 			    } else {
 			        wch = '¿' ;
-	                        rs = strmgr_char(&m,wch) ;
+	                        rs = strmgr_chr(&m,wch) ;
 			    }
 			} else {
 			    if (isprintbad(wch)) wch = '¿' ;
-	                    rs = strmgr_char(&m,wch) ;
+	                    rs = strmgr_chr(&m,wch) ;
 			}
 	            } /* end for */
 	            if (rs >= 0) dl += i ;

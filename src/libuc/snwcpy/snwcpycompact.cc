@@ -99,7 +99,7 @@ int snwcpycompact(char *dbuf,int dlen,cchar *sp,int sl) noex {
 	    cchar	*cp ;
 	    while ((cl = sfnext(sp,sl,&cp)) > 0) {
 	        if (dl > 0) {
-	            rs = strmgr_char(&m,' ') ;
+	            rs = strmgr_chr(&m,' ') ;
 	            if (rs >= 0) dl += 1 ;
 	        }
 	        if (rs >= 0) {

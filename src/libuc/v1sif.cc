@@ -201,6 +201,16 @@ int sif::brk(cchar **rpp) noex {
 
 /* local subroutines */
 
+bool sif::co_iswhitechr() noex {
+	cint	ch = mkchar(*sp) ;
+	return CHAR_ISWHITE(ch) && (ch != sch) ;
+}
+
+bool sif::co_iswhitestr() noex {
+	cint	ch = mkchar(*sp) ;
+	return CHAR_ISWHITE(ch) && (strchr(sstr,ch) == nullptr) ;
+}
+
 sif_co::operator bool () noex {
 	cint		ch = mkchar(op->sp[0]) ;
 	bool		f = false ;

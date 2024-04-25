@@ -40,7 +40,7 @@ extern int strmgr_start(strmgr *,char *,int) noex ;
 extern int strmgr_avail(strmgr *) noex ;
 extern int strmgr_rem(strmgr *) noex ;
 extern int strmgr_str(strmgr *,cchar *,int) noex ;
-extern int strmgr_char(strmgr *,int) noex ;
+extern int strmgr_chr(strmgr *,int) noex ;
 extern int strmgr_finish(strmgr *) noex ;
 
 EXTERNC_end

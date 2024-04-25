@@ -28,13 +28,13 @@
 enum sifmems {
 	sifmem_iswhitechr,
 	sifmem_iswhitestr,
-	sifmem_isspanchr,
+	sifmem_isspanechr,
 	sifmem_isspanstr,
-	sifmem_overlast
+	sigmem_overlast
 } ;
 struct sif ;
 struct sif_co {
-	sif		*op = nullptr ;
+	sig		*op = nullptr ;
 	int		w = -1 ;
 	void operator () (sif *p,int m) noex {
 	    op = p ;
@@ -49,13 +49,11 @@ struct sif {
 	int		sch = 0 ;
 	sif_co		iswhitechr ;
 	sif_co		iswhitestr ;
-	sif_co		isspanchr ;
-	sif_co		isspanstr ;
 	void sif_init() noex {
-	    iswhitechr(this,sifmem_iswhitechr) ;
-	    iswhitestr(this,sifmem_iswhitestr) ;
-	    isspanchr(this,sifmem_isspanchr) ;
-	    isspanstr(this,sifmem_isspanstr) ;
+	    iswhitechr(this,sifmem_siwhitechr) ;
+	    iswhitestr(this,sifmem_siwhitestr) ;
+	    iswspanchr(this,sifmem_sispanchr) ;
+	    isspanstr(this,sifmem_sipantr) ;
 	} ;
 	sif(cchar *p,int l = -1,int c = 0) noex : sp(p), sl(l), sch(c) { 
 	    sif_init() ;
@@ -70,6 +68,9 @@ struct sif {
 	int chr(cchar **) noex ;
 	int brk(cchar **) noex ;
 	int operator () (cchar **rpp) noex ;
+private:
+	bool co_iswhitechr() noex ;
+	bool co_iswhitestr() noex ;
 } ; /* end struct (sif) */
 
 

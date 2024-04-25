@@ -70,6 +70,9 @@ struct sif {
 	int chr(cchar **) noex ;
 	int brk(cchar **) noex ;
 	int operator () (cchar **rpp) noex ;
+private:
+	bool co_iswhitechr() noex ;
+	bool co_iswhitestr() noex ;
 } ; /* end struct (sif) */
 
 

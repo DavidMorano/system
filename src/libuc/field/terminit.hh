@@ -31,6 +31,7 @@
 
 
 #include	<envstandards.h>	/* ordered first to configure */
+#include	<climits>		/* |UCHAR_MAX| | |CHAR_BIT| */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<clanguage.h>
@@ -43,7 +44,7 @@ namespace {
 	char		terms[termsize] = {} ;
 	constexpr terminit(cchar *s) noex {
 	    while (*s) {
-		cint	ch = mkchar(*s++) ;
+		cint	ch = int(*s++ & UCHAR_MAX) ;
 		baset(terms,ch) ;
 	    }
 	} ;

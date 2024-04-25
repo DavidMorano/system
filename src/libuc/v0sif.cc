@@ -42,8 +42,6 @@
 #include	<clanguage.h>
 #include	<strn.h>
 #include	<sfx.h>
-#include	<char.h>
-#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"sif.hh"
@@ -71,6 +69,9 @@
 
 
 /* exported subroutines */
+
+
+/* local subroutines */
 
 int sif::operator () (cchar **rpp) noex {
 	int		rs = SR_FAULT ;
@@ -114,7 +115,7 @@ int sif::next(cchar **rpp) noex {
 
 int sif::nextchr(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;		/* <- indicate zero result */
+	int		rl = 0 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
@@ -124,13 +125,9 @@ int sif::nextchr(cchar **rpp) noex {
 		    rl = sfshrink(sp,(tp-sp),&rp) ;
 		    sl -= ((tp + 1) - sp) ;
 		    sp = (tp + 1) ;
-		} else {
-		    rl = sfshrink(sp,sl,&rp) ;
-		    sp += sl ;
-		    sl = 0 ;
 	        } /* end if */
 	    } /* end while */
-	    *rpp = (rl > 0) ? rp : nullptr ;
+	    *rpp = rp ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -138,7 +135,7 @@ int sif::nextchr(cchar **rpp) noex {
 
 int sif::nextbrk(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = 0 ;		/* <- indicate zero result */
+	int		rl = 0 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
@@ -148,10 +145,6 @@ int sif::nextbrk(cchar **rpp) noex {
 		    rl = sfshrink(sp,(tp-sp),&rp) ;
 		    rp = sp ;
 		    sp = (tp + 1) ;
-		} else {
-		    rl = sfshrink(sp,sl,&rp) ;
-		    sp += sl ;
-		    sl = 0 ;
 	        } /* end if */
 	    } /* end while */
 	    *rpp = rp ;
@@ -162,7 +155,7 @@ int sif::nextbrk(cchar **rpp) noex {
 
 int sif::chr(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = -1 ;		/* <- indicate not-found */
+	int		rl = 0 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
@@ -181,7 +174,7 @@ int sif::chr(cchar **rpp) noex {
 
 int sif::brk(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
-	int		rl = -1 ;		/* <- indicate not-found */
+	int		rl = 0 ;
 	cchar		*rp = nullptr ;
 	if (sp && rpp) {
 	    rs = SR_OK ;
@@ -197,29 +190,5 @@ int sif::brk(cchar **rpp) noex {
 	return (rs >= 0) ? rl : rs ;
 }
 /* end method (sif::brk) */
-
-
-/* local subroutines */
-
-sif_co::operator bool () noex {
-	cint		ch = mkchar(op->sp[0]) ;
-	bool		f = false ;
-	switch (w) {
-	case sifmem_iswhitechr:
-	    f = CHAR_ISWHITE(ch) && (ch != op->sch) ;
-	    break ;
-	case sifmem_iswhitestr:
-	    f = CHAR_ISWHITE(ch) && (strchr(op->sstr,ch) == nullptr) ;
-	    break ;
-	case sifmem_isspanchr:
-	    f = (! CHAR_ISWHITE(ch)) && (ch != op->sch) ;
-	    break ;
-	case sifmem_isspanstr:
-	    f = (! CHAR_ISWHITE(ch)) && (strchr(op->sstr,ch) == nullptr) ;
-	    break ;
-	} /* end switch */
-	return f ;
-}
-/* end method (sif_co::operator) */
 
 
