@@ -49,6 +49,7 @@ INCDIRS=
 
 LIBDIRS= -L$(LIBDIR)
 
+LIBINFO= $(LIBDIRS) $(LIBS)
 
 # flag setting
 CPPFLAGS= $(DEFS) $(INCDIRS) $(MAKECPPFLAGS)
@@ -104,8 +105,14 @@ OBJ42=
 OBJ43= 
 OBJ44=
 OBJ45=
-OBJ46= usignal.o
-OBJ47= utimeout.o
+OBJ46= 
+OBJ47= utimeout.o utimeouts.o
+
+#
+#uexec.cc ugetdents.cc ulogerror.cc um.cc
+#umkdir.cc ushm.cc usig.cc ustat.cc
+#ustr.cc usysdata.cc usysinfo.cc 
+#
 
 OBJ48= usupport.o timewatch.o
 OBJ49= utimeouts.o
@@ -116,17 +123,20 @@ OBJ53=
 OBJ54=
 OBJ55=
 
-OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
-OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
-OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
-OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
-OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
-OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
-OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
+#OBJA= $(OBJ00) $(OBJ01) $(OBJ02) $(OBJ03) $(OBJ04) $(OBJ05) $(OBJ06) $(OBJ07) 
+#OBJB= $(OBJ08) $(OBJ09) $(OBJ10) $(OBJ11) $(OBJ12) $(OBJ13) $(OBJ14) $(OBJ15)
+#OBJC= $(OBJ16) $(OBJ17) $(OBJ18) $(OBJ19) $(OBJ20) $(OBJ21) $(OBJ22) $(OBJ23)
+#OBJD= $(OBJ24) $(OBJ25) $(OBJ26) $(OBJ27) $(OBJ28) $(OBJ29) $(OBJ30) $(OBJ31)
+#OBJE= $(OBJ32) $(OBJ33) $(OBJ34) $(OBJ35) $(OBJ36) $(OBJ37) $(OBJ38) $(OBJ39)
+#OBJF= $(OBJ40) $(OBJ41) $(OBJ42) $(OBJ43) $(OBJ44) $(OBJ45) $(OBJ46) $(OBJ47)
+#OBJG= $(OBJ48) $(OBJ49) $(OBJ50) $(OBJ51) $(OBJ52) $(OBJ53) $(OBJ54) $(OBJ55)
 
-OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
+#OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
-OBJS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
+OBJA= 
+
+#OBJS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
+OBJS= obja.o objb.o objc.o objd.o
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -178,7 +188,7 @@ $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
 $(T).so:		$(OBJS) Makefile localmisc.h
-	$(LD) -G -m -o $@ $(LDFLAGS) $(OBJS) $(SLIBINFO) > $(T).lm
+	$(LD) -G -m -o $@ $(LDFLAGS) $(OBJS) $(LIBINFO) > $(T).lm
 
 $(T).nm:		$(T).so
 	$(NM) $(NMFLAGS) $(T).so > $(T).nm
@@ -210,6 +220,7 @@ clean:
 control:
 	(uname -n ; date) > Control
 
+
 # SUPPORT
 utimeout.o:		utimeout.c utimeout.h
 utimeouts.o:		utimeouts.cc utimeouts.h
@@ -224,23 +235,6 @@ usysauxinfo.o:		isysauxinfo.cc
 uopen.o:		uopen.cc uopen.h
 
 # OTHER
-u_poll.o:		u_poll.c $(INCS)
-u_statvfs.o:		u_statvfs.c $(INCS)
-u_fstatvfs.o:		u_fstatvfs.c $(INCS)
 
-
-
-# testing
-
-X01= testsigpending
-
-X01OBJ= $(X01).o
-
-X01OBJS= $(CRTFRONT) $(X01OBJ) $(CRTC) $(CRTBACK)
-
-$(X01).o:		$(X01).c
-
-$(X01).x:		$(X01OBJ) Makefile
-	$(LD) -o $@ $(X01OBJS) $(XLIBDIRS) $(XLIBS) -lc
 
 

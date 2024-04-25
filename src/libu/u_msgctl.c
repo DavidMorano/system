@@ -1,4 +1,4 @@
-/* u_shmctl */
+/* u_msgctl */
 
 /* translation layer interface for UNIX® equivalents */
 
@@ -15,21 +15,33 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
+/*******************************************************************************
+
+	Note: We have no reason to believe that this subroutine can generate an
+	SR_NOSPC or even a SR_INTR.  But we have code included to handle these
+	(with retries).  If these error types never occur, then no harm was
+	done.
+
+
+*******************************************************************************/
+
+
+#include	<envstandards.h>
+
 #include	<sys/types.h>
 #include	<sys/wait.h>
-#include	<sys/ipc.h>
-#include	<sys/shm.h>
+#include	<sys/msg.h>
 #include	<unistd.h>
 #include	<poll.h>
 #include	<errno.h>
-#include	<usystem.h>
+
+#include	<vsystem.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#define	TO_NOMEM	5
+#define	TO_NOSPC	5
 
 
 /* external subroutines */
@@ -40,37 +52,35 @@ extern int	msleep(int) ;
 /* exported subroutines */
 
 
-int u_shmctl(shmid,cmd,buf)
-int		shmid ;
-int		cmd ;
-struct shmid_ds	*buf ;
+int u_msgctl(int msgid,int cmd,struct msqid_ds *buf)
 {
 	int		rs ;
-	int		to_nomem = TO_NOMEM ;
+	int		to_nospc = TO_NOSPC ;
 	int		f_exit = FALSE ;
 
 	repeat {
-	    if ((rs = shmctl(shmid,cmd,buf)) < 0) rs = (- errno) ;
+	    if ((rs = msgctl(msgid,cmd,buf)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
 	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-	                msleep(1000) ;
+	        case SR_NOSPC:
+	            if (to_nospc-- > 0) {
+	        	msleep(1000) ;
 		    } else {
 			f_exit = TRUE ;
 		    }
-	            break ;
+		    break ;
+	        case SR_AGAIN:
 	        case SR_INTR:
 	            break ;
 		default:
 		    f_exit = TRUE ;
 		    break ;
-	        } /* end switch */
+	       } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 
 	return rs ;
 }
-/* end subroutine (u_shmctl) */
+/* end subroutine (u_msgctl) */
 
 

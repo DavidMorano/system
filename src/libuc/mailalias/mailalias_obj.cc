@@ -327,10 +327,10 @@ constexpr cpcchar	aptabsched[] = {
 } ;
 
 /* all white space plus colon (':') */
-static terminit		keys("\b\t\n\f\v :") ;
+constexpr terminit	keys("\b\t\n\f\v :") ;
 
 /* all white space plus comma (',') */
-static terminit		vals("\b\t\n\f\v ,") ;
+constexpr terminit	vals("\b\t\n\f\v ,") ;
 
 
 /* exported variables */

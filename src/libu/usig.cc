@@ -1,7 +1,7 @@
-/* usignal */
+/* usignal SUPPORT */
 /* lang=C++20 */
 
-/* UNIX csignalandling */
+/* UNIX® signal handling */
 /* translation layer interface for UNIX® equivalents */
 
 
@@ -18,22 +18,25 @@
 
 	Notes:
 	|u_sigprocmask(3u)|
-	Set the process signal mask (to something).  When there are more than
-	one thread in the proces, this only sets the signal mask of the thread
-	it is called from.
-        A cousin of this system call is the call |pt_sigmask(3u)|, which is
+	Set the process signal mask (to something).  When there are
+	more than one thread in the proces, this only sets the
+	signal mask of the thread it is called from.  A cousin of
+	this system call is the call |pt_sigmask(3u)|, which is
 	supposed to be for thread specific use.
-
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<csignal>
 #include	<unistd.h>
+#include	<csignal>
 #include	<cerrno>
+#include	<climits>		/* |INT_MAX| */
 #include	<usystem.h>
 #include	<localmisc.h>
+
+
+/* local defines */
 
 
 /* exported subroutines */
@@ -86,7 +89,7 @@ int u_sigprocmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 int u_sigsuspend(const sigset_t *ssp) noex {
 	int		rs ;
 	int		to_intr = utimeout[uto_intr] ;
-	int		f_exit = FALSE ;
+	int		f_exit = false ;
 	repeat {
 	    rs = SR_OK ;
 	    if (sigsuspend(ssp) == -1) rs = (- errno) ;
@@ -96,11 +99,11 @@ int u_sigsuspend(const sigset_t *ssp) noex {
 	            if (to_intr-- > 0) {
 			msleep(1000) ;
 		    } else {
-			f_exit = TRUE ;
+			f_exit = true ;
 		    }
 	            break ;
 		default:
-		    f_exit = TRUE ;
+		    f_exit = true ;
 		    break ;
 	        } /* end switch */
 	    } /* end if (error) */
@@ -156,7 +159,7 @@ int u_sigwait(const sigset_t *ssp,int *rp) noex {
 	if ((rs = sigwait(ssp,&sig)) < 0) {
 	    rs = (- errno) ;
 	}
-	if (rp != NULL) *rp = sig ;
+	if (rp) *rp = sig ;
 	sig &= INT_MAX ;
 	return (rs >= 0) ? sig : rs ;
 }

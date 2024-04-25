@@ -1,4 +1,4 @@
-/* u_shmdt */
+/* u_msgrcv */
 
 /* translation layer interface for UNIX® equivalents */
 
@@ -15,31 +15,45 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
+
+#include	<envstandards.h>
+
 #include	<sys/types.h>
 #include	<sys/wait.h>
-#include	<sys/ipc.h>
-#include	<sys/shm.h>
+#include	<sys/msg.h>
 #include	<unistd.h>
 #include	<poll.h>
 #include	<errno.h>
-#include	<usystem.h>
+
+#include	<vsystem.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+#define	TO_NOSPC	5
 
 
 /* exported subroutines */
 
 
-int u_shmdt(void *shmaddr)
+int u_msgrcv(msqid,msgp,msgsz,msgtype,msgflag)
+int	msqid ;
+void	*msgp ;
+int	msgsz ;
+long	msgtype ;
+int	msgflag ;
 {
 	int		rs ;
 
 	repeat {
-	    if ((rs = shmdt(shmaddr)) < 0) rs = (- errno) ;
+	    if ((rs = msgrcv(msqid,msgp,msgsz,msgtype,msgflag)) < 0) {
+	        rs = (- errno) ;
+	    }
 	} until (rs != SR_INTR) ;
 
 	return rs ;
 }
-/* end subroutine (u_shmdt) */
+/* end subroutine (u_msgrcv) */
 
 

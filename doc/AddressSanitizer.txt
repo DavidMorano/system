@@ -1,0 +1,14 @@
+Address-Sanitizer
+
++ Compiler-Options:
+	-g
+	-fsanitize-address
+	-fno-omit-frame-pointer
+
++ Environment-Variable-Options:
+	ASAN_OPTIONS
+		key­value:key-value
+		help=true
+		exit-code=0
+
+

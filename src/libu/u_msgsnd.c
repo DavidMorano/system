@@ -1,4 +1,4 @@
-/* u_sigaction */
+/* u_msgsnd */
 
 /* translation layer interface for UNIX® equivalents */
 
@@ -15,26 +15,42 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
+
+#include	<envstandards.h>
+
 #include	<sys/types.h>
-#include	<signal.h>
+#include	<sys/wait.h>
+#include	<sys/msg.h>
+#include	<unistd.h>
+#include	<poll.h>
 #include	<errno.h>
-#include	<usystem.h>
+
+#include	<vsystem.h>
 #include	<localmisc.h>
+
+
+/* local defines */
+
+#define	TO_NOSPC	5
 
 
 /* exported subroutines */
 
 
-int u_sigaction(int sn,SIGACTION *nsp,SIGACTION *osp)
+int u_msgsnd(msqid,msgp,msgsz,msgflag)
+int	msqid ;
+void	*msgp ;
+int	msgsz ;
+int	msgflag ;
 {
 	int		rs ;
 
-	if ((rs = sigaction(sn,nsp,osp)) < 0)
-	    rs = (- errno) ;
+	repeat {
+	    if ((rs = msgsnd(msqid,msgp,msgsz,msgflag)) < 0) rs = (- errno) ;
+	} until (rs != SR_INTR) ;
 
 	return rs ;
 }
-/* end subroutine (u_sigaction) */
+/* end subroutine (u_msgsnd) */
 
 

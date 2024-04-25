@@ -185,6 +185,8 @@
 #define	WINSIZE		struct winsize
 #endif
 
+/* UNIX® System V STREAMS® */
+
 #ifndef	POLLFD
 #define	POLLFD		struct pollfd		/* UNIX® Sys-V (STREAMS) */
 #endif
@@ -205,13 +207,28 @@
 #define	STRIOCTL	struct strioctl		/* UNIX® Sys-V STREAMS */
 #endif
 
-#ifndef	MQATTR
-#define	MQATTR		struct mq_attr		/* for SysV-IPC */
-#endif
+/* UNIX® System V Inter-Process-Communication (IPC) */
 
 #ifndef	MSQIDDS
-#define	MSQIDDS		struct msqid_ds		/* for SysV-IPC */
+#define	MSQIDDS		struct msqid_ds		/* for UNIX® SysV-IPC MQ */
 #endif
+
+#ifndef	MQATTR
+#define	MQATTR		struct mq_attr		/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	MSQPERM		/* this is an ALIAS of |MSGPERM| */
+#define	MSQPERM		struct msg_perm		/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	MSGPERM
+#define	MSGPERM		struct msg_perm		/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	SHMIDDS
+#define	SHMIDDS		struct shmid_ds		/* for UNIX® SysV-IPC SHM */
+#endif
+
 
 /* UTMPX */
 
@@ -368,6 +385,24 @@
 
 #ifndef	CADDRINFO
 #define	CADDRINFO	const struct addrinfo
+#endif
+
+/* UNIX® System V Inter-Process-Communication (IPC) */
+
+#ifndef	CMSQIDDS
+#define	CMSQIDDS	const struct msqid_ds	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CMQATTR
+#define	CMQATTR		const struct mq_attr	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CMSQPERM		/* this is an ALIAS of |MSGPERM| */
+#define	CMSQPERM	const struct msg_perm	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CMSGPERM
+#define	CMSGPERM	const struct msg_perm	/* for UNIX® SysV-IPC MQ */
 #endif
 
 

@@ -1,4 +1,4 @@
-/* u_shmat */
+/* u_msgget */
 
 /* translation layer interface for UNIX® equivalents */
 
@@ -15,21 +15,22 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-#include	<envstandards.h>	/* MUST be ordered first to configure */
+
+#include	<envstandards.h>
+
 #include	<sys/types.h>
-#include	<sys/wait.h>
-#include	<sys/ipc.h>
-#include	<sys/shm.h>
+#include	<sys/msg.h>
 #include	<unistd.h>
 #include	<poll.h>
 #include	<errno.h>
-#include	<usystem.h>
+
+#include	<vsystem.h>
 #include	<localmisc.h>
 
 
 /* local defines */
 
-#define	TO_MFILE	5
+#define	TO_NOSPC	5
 
 
 /* external subroutines */
@@ -40,30 +41,24 @@ extern int	msleep(int) ;
 /* exported subroutines */
 
 
-int u_shmat(shmid,shmaddr,flags,app)
-int	shmid ;
-void	*shmaddr ;
-int	flags ;
-void	**app ;
+int u_msgget(key_t key,int msgflag)
 {
 	int		rs ;
-	int		to_mfile = TO_MFILE ;
+	int		to_nospc = TO_NOSPC ;
 	int		f_exit = FALSE ;
 
-	if (app == NULL) return SR_FAULT ;
-
 	repeat {
-	    *app = shmat(shmid,shmaddr,flags) ;
-	    rs = (((int) *app) == -1) ? (- errno) : 0 ;
+	    if ((rs = msgget(key,msgflag)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
 	        switch (rs) {
-	        case SR_MFILE:
-	            if (to_mfile-- > 0) {
-		        msleep(1000) ;
+	        case SR_NOSPC:
+	            if (to_nospc-- > 0) {
+	                msleep(1000) ;
 		    } else {
 			f_exit = TRUE ;
 		    }
-	            break ;
+		    break ;
+	        case SR_AGAIN:
 	        case SR_INTR:
 	            break ;
 		default:
@@ -75,6 +70,6 @@ void	**app ;
 
 	return rs ;
 }
-/* end subroutine (u_shmat) */
+/* end subroutine (u_msgget) */
 
 

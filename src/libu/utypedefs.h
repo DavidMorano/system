@@ -26,8 +26,8 @@
 #include	<sys/types.h>
 #include	<sys/utsname.h>
 #include	<sys/uio.h>
-#include	<sys/time.h>		/* for 'u_adjtime(3u)' */
-#include	<sys/timeb.h>		/* for 'uc_ftime(3uc)' */
+#include	<sys/time.h>		/* for |u_adjtime(3u)| */
+#include	<sys/timeb.h>		/* for |uc_ftime(3uc)| */
 #include	<sys/resource.h>
 #include	<sys/resource.h>
 #include	<sys/stat.h>
@@ -43,8 +43,8 @@
 
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<time.h>		/* for 'u_utime(2)' */
-#include	<utime.h>		/* for 'u_utime(2)' */
+#include	<time.h>		/* for |u_utime(2)| */
+#include	<utime.h>		/* for |u_utime(2)| */
 #include	<pthread.h>
 #include	<termios.h>
 #include	<errno.h>
@@ -70,7 +70,7 @@
 #include	<usys.h>	/* <- auxilllary OS support */
 
 
-/* for 'stat(2)' and its many friends */
+/* for |stat(2)| and its many friends */
 
 #ifndef	STRUCT_USTAT
 #define	STRUCT_USTAT

@@ -1,6 +1,9 @@
 /* filetype HEADER */
 /* lang=C20 */
 
+/* define file types according to the S_IFMT field of |mode_t| */
+/* version %I% last-modified %G% */
+
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
@@ -14,6 +17,11 @@
 #include	<dirent.h>		/* possielbe preprocesor 'DT_{x}' */
 #include	<utypedefs.h>
 #include	<clanguage.h>
+
+
+#ifndef	S_IFMT
+#define	S_IFMT	(0x0F << 12)
+#endif
 
 
 enum filetypes {
@@ -85,7 +93,7 @@ enum filetypes {
 EXTERNC_begin
 
 static inline int filetype(mode_t m) noex {
-	cint	uv = int(m) ;
+	cuint	uv = (uint) m ;
 	return ((uv & S_IFMT) >> 12) ;
 }
 
