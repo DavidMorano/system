@@ -56,8 +56,8 @@ LDFLAGS= $(MAKELDFLAGS)
 
 OBJ0_FIELD= field_main.o field_obj.o
 OBJ1_FIELD= field_srvarg.o field_svcargs.o
-OBJ2_FIELD= field_word.o 
-OBJ3_FIELD= field_wordphrase.o
+OBJ2_FIELD= field_word.o field_wordphrase.o
+OBJ3_FIELD= fieldterms.o
 
 
 OBJA_FIELD= obj0_field.o obj1_field.o
@@ -128,5 +128,7 @@ field_srvarg.o:		field_srvarg.cc		$(INCS)
 field_svcargs.o:	field_svcargs.cc	$(INCS)
 field_word.o:		field_word.cc		$(INCS)
 field_wordphrase.o:	field_wordphrase.cc	$(INCS)
+
+fieldterms.o:		fieldterms.cc fieldterms.h
 
 

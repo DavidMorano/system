@@ -3,17 +3,13 @@
 /* perform various functions on a job */
 /* version %I% last-modified %G% */
 
-
 #define	CF_DEBUG	1
 #define	CF_ACCCESSCHECK	0
-
 
 /* revision history:
 
 	= 1991-09-10, David A­D­ Morano
-
 	This subroutine was originally written.
-
 
 */
 
@@ -24,12 +20,9 @@
 	This subroutine is responsible for processing a job that
 	we have received in full.
 
-
 *****************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
@@ -41,13 +34,10 @@
 #include	<dirent.h>
 #include	<limits.h>
 #include	<string.h>
-#include	<ctype.h>
-#include	<pwd.h>
-#include	<grp.h>
-
 #include	<usystem.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<baops.h>

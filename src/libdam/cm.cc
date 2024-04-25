@@ -1,9 +1,8 @@
-/* cm */
+/* cm SUPPORT */
+/* lang=C++20 */
 
 /* Connection Manager */
-
-
-#define	CF_DEBUGS	0		/* non-switchable debug print-outs */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -17,35 +16,34 @@
 
 /*******************************************************************************
 
-	This is a communications connection manager object.  This object
-	abstracts the details of a particular connection from the calling
-	program.
+	Name:
+	cm
 
+	Description:
+	This is a communications connection manager object.  This
+	object abstracts the details of a particular connection
+	from the calling program.
 
 *******************************************************************************/
 
-
-#define	CM_MASTER	0
-
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<expcook.h>
 #include	<vecstr.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<sbuf.h>
 #include	<buffer.h>
 #include	<getusername.h>
-#include	<localmisc.h>
+#include	<localmisc.h>		/* |TIMEBUFLEN| */
 
 #include	"cm.h"
 
@@ -63,22 +61,11 @@
 #define	ARGBUFLEN	((2 * MAXPATHLEN) + 20)
 #endif
 
-#ifndef	TIMEBUFLEN
-#define	TIMEBUFLEN	80
-#endif
-
-#define	SUBINFO		struct subinfo
+#define	EC		expcook
+#define	SI		subinfo
 
 
 /* external subroutines */
-
-extern int	mkpath2(char *,const char *,const char *) ;
-extern int	mkpath3(char *,const char *,const char *,const char *) ;
-extern int	ctdecui(char *,int,uint) ;
-extern int	getnodedomain(char *,char *) ;
-extern int	snsds(char *,int,const char *,const char *) ;
-
-extern char	*strwcpy(char *,const char *,int) ;
 
 
 /* external variables */
@@ -93,152 +80,109 @@ struct subinfo {
 
 /* forward references */
 
-static int cm_loadcooks(CM *,SUBINFO *,EXPCOOK *,CM_ARGS *,
-		const char *, const char *, const char **) ;
-static int cm_trysys(CM *,SUBINFO *,SYSDIALER *,SYSDIALER_ARGS *,
-			EXPCOOK *,
-			SYSTEMS_ENT *,
-			const char *,const char *,const char **) ;
-static int cm_trysysargs(CM *,SUBINFO *,vecstr *,const char *,int) ;
+static int cm_loadcooks(CM *,SI *,expcook *,cm_args *,
+		cchar *,cchar *,mainv) noex ;
+static int cm_trysys(CM *,SI *,SYSDIALER *,SYSDIALER_ARGS *,
+			EC *,SYSTEMS_ENT *,cchar *,cchar *,mainv) noex ;
+static int cm_trysysargs(CM *,SI *,vecstr *,cchar *,int) noex ;
 
 
 /* local variables */
 
 
+/* exported variables */
+
+
 /* exported subroutines */
 
-
-int cm_open(op,ap,hostname,svcname,av)
-CM		*op ;
-CM_ARGS		*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
-{
+int cm_open(cm *op,cm_args *ap,cc *hostname,cc *svcname,mainv av) noex {
 	SUBINFO		si ;
 	SYSTEMS_CUR	cur ;
 	SYSTEMS_ENT	*sep ;
 	SYSDIALER_ARGS	da ;
-	EXPCOOK		cooks ;
+	expcook		cooks ;
 	int		rs ;
+	int		rs1 ;
 
 	if (op == NULL) return SR_FAULT ;
 	if (hostname == NULL) return SR_FAULT ;
 	if (svcname == NULL) return SR_FAULT ;
 	if (ap == NULL) return SR_FAULT ;
 
-#if	CF_DEBUGS
-	debugprintf("cm_open: ent hostname=%s svcname=%s\n",
-	    hostname,svcname) ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("cm_open: pr=%s\n",ap->pr) ;
-#endif
-
 /* do we have the necessary helper objects */
 
 	if ((ap->dp == NULL) || (ap->sp == NULL)) return SR_INVALID ;
 
-	memset(op,0,sizeof(CM)) ;
+	memclear(op) ;
 
 	memset(&si,0,sizeof(SUBINFO)) ;
 
-/* setup or calculate the cookie values for later */
-
-	rs = expcook_start(&cooks) ;
-	if (rs < 0)
-	    goto bad0 ;
-
-	rs = cm_loadcooks(op,&si,&cooks,ap,hostname,svcname,av) ;
-	if (rs < 0)
-	    goto bad1 ;
-
 /* setup dialer arguments */
 
-	memset(&da,0,sizeof(SYSDIALER_ARGS)) ;
-
+	memclear(&da) ;
 	da.pr = ap->pr ;
 	da.prn = ap->prn ;
 	da.timeout = ap->timeout ;
 	da.options = ap->options ;
 
+/* setup or calculate the cookie values for later */
+
+	if ((rs = expcook_start(&cooks)) >= 0) {
+	    cchar	*hn = hostname ;
+	    cchar	*sn = svcname ;
+	    if ((rs = cm_loadcooks(op,&si,&cooks,ap,hn,sn,av)) >= 0) {
+
 /* search the SYSTEMS file for our host */
 
-#if	CF_DEBUGS
-	debugprintf("cm_open: search-begin hostname=%s\n",hostname) ;
-#endif
-
 	if ((rs = systems_curbegin(ap->sp,&cur)) >= 0) {
-	    const char	*hn = hostname ;
-	    const char	*sn = svcname ;
+	    cchar	*hn = hostname ;
+	    cchar	*sn = svcname ;
 
 	    while ((rs = systems_fetch(ap->sp,hn,&cur,&sep)) >= 0) {
-
-#if	CF_DEBUGS
-	        debugprintf("cm_open: systems_fetch() sysname=%s\n",
-		    sep->sysname) ;
-#endif
-
 	        rs = cm_trysys(op,&si,ap->dp,&da,&cooks,sep,hn,sn,av) ;
-
-#if	CF_DEBUGS
-	        debugprintf("cm_open: cm_trysys() rs=%d\n",rs) ;
-#endif
-
 	        if (rs >= 0) break ;
 	    } /* end while */
 
 	    systems_curend(ap->sp,&cur) ;
 	} /* end if (cursor) */
 
-#if	CF_DEBUGS
-	debugprintf("cm_open: search-end rs=%d\n",rs) ;
-#endif
-
-	if (rs < 0)
-	    goto bad1 ;
-
 /* save the dialer name */
 
-	{
-	    const char	*cp ;
-	    rs = uc_mallocstrw(sep->dialername,sep->dialernamelen,&cp) ;
-	    if (rs >= 0) op->dname = cp ;
+	if (rs >= 0) {
+	    int		nl = sep->dialernamelen ;
+	    cchar	*np = sep->dialername ;
+	    cchar	*cp ;
+	    if ((rs = uc_mallocstrw(np,nl,&cp)) >= 0) {
+		op->magic = CM_MAGIC ;
+	        op->dname = cp ;
+	    }
 	}
-	if (rs < 0) goto bad2 ;
 
-/* finish up and get out */
+	    } /* end if (load-cooks) */
+	    rs1 = expcook_finish(&cooks) ;
+            if (rs >= 0) rs = rs1 ;
+	} /* end if (expcook) */
 
-	expcook_finish(&cooks) ;
+	if (rs < 0) {
+	    if (op->dobj != NULL) {
+	        if (op->c.close != NULL) {
+	            (*op->c.close)(op->dobj) ;
+		}
+	        uc_free(op->dobj) ;
+	        op->dobj = NULL ;
+	    }
+#ifdef	COMMENT
+	    sysdialer_loadout(ap->dp,sep->dialername) ;
+#endif
+	    op->magic = 0 ;
+	}
 
-	op->magic = CM_MAGIC ;
-
-ret0:
 	return rs ;
-
-/* bad stuff */
-bad2:
-	if (op->c.close != NULL) {
-	    (*op->c.close)(op->dobj) ;
-	}
-
-	uc_free(op->dobj) ;
-
-	sysdialer_loadout(ap->dp,sep->dialername) ;
-
-bad1:
-	expcook_finish(&cooks) ;
-
-bad0:
-	goto ret0 ;
 }
 /* end subroutine (cm_open) */
 
-
 /* free up the resources occupied by this CM */
-int cm_close(CM *op)
-{
+int cm_close(CM *op) noex {
 	int		rs = SR_OK ;
 	int		rs1 ;
 
@@ -271,10 +215,7 @@ int cm_close(CM *op)
 }
 /* end subroutine (cm_close) */
 
-
-int cm_info(CM *op,CM_INFO *ip)
-{
-
+int cm_getinfo(CM *op,CM_INFO *ip) noex {
 	if (op == NULL) return SR_FAULT ;
 	if (ip == NULL) return SR_FAULT ;
 
@@ -288,23 +229,12 @@ int cm_info(CM *op,CM_INFO *ip)
 }
 /* end subroutine (cm_info) */
 
-
-int cm_reade(op,buf,buflen,timeout,opts)
-CM		*op ;
-char		buf[] ;
-int		buflen ;
-int		timeout ;
-int		opts ;
-{
+int cm_reade(CM *op,char *buf,int buflen,int timeout,int opts) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == NULL) return SR_FAULT ;
 
 	if (op->magic != CM_MAGIC) return SR_NOTOPEN ;
-
-#if	CF_DEBUGS
-	debugprintf("cm_reade: timeout=%d opts=%08x\n",timeout,opts) ;
-#endif
 
 	if (op->c.reade != NULL) {
 	    rs = (*op->c.reade)(op->dobj,buf,buflen,timeout,opts) ;
@@ -314,15 +244,7 @@ int		opts ;
 }
 /* end subroutine (cm_reade) */
 
-
-int cm_recve(op,buf,buflen,flags,timeout,opts)
-CM		*op ;
-char		buf[] ;
-int		buflen ;
-int		flags ;
-int		timeout ;
-int		opts ;
-{
+int cm_recve(CM *op,char *buf,int buflen,int flags,int timeout,int opts) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -337,12 +259,7 @@ int		opts ;
 }
 /* end subroutine (cm_recve) */
 
-
-int cm_write(op,buf,buflen)
-CM		*op ;
-const char	buf[] ;
-int		buflen ;
-{
+int cm_write(CM *op,cchar *buf,int buflen) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -357,10 +274,7 @@ int		buflen ;
 }
 /* end subroutine (cm_write) */
 
-
-/* shutdown all of part of the connection */
-int cm_shutdown(CM *op,int cmd)
-{
+int cm_shutdown(CM *op,int cmd) noex {
 	int		rs = SR_NOTSUP ;
 
 	if (op == NULL) return SR_FAULT ;
@@ -380,16 +294,8 @@ int cm_shutdown(CM *op,int cmd)
 
 /* private subroutines */
 
-
-static int cm_loadcooks(op,sip,cookp,ap,hostname,svcname,av)
-CM		*op ;
-SUBINFO		*sip ;
-EXPCOOK		*cookp ;
-CM_ARGS		*ap ;
-const char	hostname[] ;
-const char	svcname[] ;
-const char	*av[] ;
-{
+static int cm_loadcooks(cm *op,SI *sip,EC *cookp,cm_args *ap,
+		cc *hostname,cc *svcname,mainv av) noex {
 	int		rs = SR_OK ;
 	int		size ;
 	int		i ;
@@ -408,7 +314,7 @@ const char	*av[] ;
 	    rs = expcook_add(cookp,"RN",ap->prn,-1) ;
 
 	if (rs >= 0) {
-	    const char	*nnp, *dnp ;
+	    cchar	*nnp, *dnp ;
 	    char	domainname[MAXHOSTNAMELEN + 1] ;
 	    char	nodename[NODENAMELEN + 1] ;
 
@@ -500,38 +406,18 @@ const char	*av[] ;
 }
 /* end subroutine (cm_loadcooks) */
 
-
-static int cm_trysys(op,sip,dp,dap,cookp,sep,sysname,svcname,av)
-CM		*op ;
-SUBINFO		*sip ;
-SYSDIALER	*dp ;
-SYSDIALER_ARGS	*dap ;
-EXPCOOK		*cookp ;
-SYSTEMS_ENT	*sep ;
-const char	sysname[] ;
-const char	svcname[] ;
-const char	*av[] ;
-{
+static int cm_trysys(cm *op,SI *sip,SYSDIALER *dp,SYSDIALER_ARGS *dap,
+	    EC *cookp,SYSTEMS_ENT *sep,cc *sysname,cc *svcname,mainv av) noex {
 	SYSDIALER_ENT	*dep ;
-	VECSTR		args ;
-	BUFFER		barg ;
+	vecstr		args ;
+	buffer		barg ;
 	int		rs ;
 	int		f_loaded = FALSE ;
 	int		f_args = FALSE ;
 
-#if	CF_DEBUGS
-	debugprintf("cm_trysys: dialername=%s\n",sep->dialername) ;
-	debugprintf("cm_trysys: sysname=%s\n",sysname) ;
-	debugprintf("cm_trysys: svcname=%s\n",svcname) ;
-#endif
-
 	op->dobj = NULL ;
 	rs = sysdialer_loadin(dp,sep->dialername,&dep) ;
 	f_loaded = (rs >= 0) ;
-
-#if	CF_DEBUGS
-	debugprintf("cm_trysys: sysdialer_loadin() rs=%d\n",rs) ;
-#endif
 
 /* does this module have our attributes */
 
@@ -554,12 +440,8 @@ const char	*av[] ;
 	}
 
 	if ((rs >= 0) && ((rs = buffer_start(&barg,sip->argslen)) >= 0)) {
-	    const char	*abuf = NULL ;
+	    cchar	*abuf = NULL ;
 	    int		alen = 0 ;
-
-#if	CF_DEBUGS
-	    debugprintf("cm_trysys: zeroing size=%u\n",op->dsize) ;
-#endif
 
 	    memset(op->dobj,0,op->dsize) ;
 
@@ -569,25 +451,14 @@ const char	*av[] ;
 
 /* expand out the dialer arguments */
 
-#if	CF_DEBUGS
-	    debugprintf("cm_trysys: dialerargs=>%t<\n",
-	    	sep->dialerargs,sep->dialerargslen) ;
-#endif
-
 	    if ((rs >= 0) && (sep->dialerargs != NULL)) {
-		const int	dal = sep->dialerargslen ;
+		cint	dal = sep->dialerargslen ;
 		cchar		*dap = sep->dialerargs ;
 
 	    	if ((rs = expcook_expbuf(cookp,0,&barg,dap,dal)) >= 0) {
 		    rs = buffer_get(&barg,&abuf) ;
 		    alen = rs ;
 		}
-
-#if	CF_DEBUGS
-	    debugprintf("cm_trysys: alen=%d \n",alen) ;
-		if (alen >= 0)
-	    debugprintf("cm_trysys: argsbuf=>%t<\n",abuf,alen) ;
-#endif
 
 	    } /* end if */
 
@@ -598,25 +469,16 @@ const char	*av[] ;
 	    }
 
 	    if (rs >= 0) {
- 	        const char	**tav ;
-	        vecstr_getvec(&args,&tav) ;
-	        dap->argv = tav ;
+		if (op->c.open != NULL) {
+ 	            cchar	**tav ;
+	            if ((rs = vecstr_getvec(&args,&tav)) >= 0) {
+	                dap->argv = tav ;
+	                rs = (op->c.open)(op->dobj,dap,sysname,svcname,av) ;
+		    }
+		} else {
+	            rs = SR_LIBACC ;
+		}
 	    }
-
-#if	CF_DEBUGS
-	    debugprintf("cm_trysys: calling dialobj_open(%p)\n",op->c.open) ;
-#endif
-
-	    if (op->c.open == NULL)
-	        rs = SR_LIBACC ;
-
-	    if (rs >= 0) {
-	        rs = (op->c.open)(op->dobj,dap,sysname,svcname,av) ;
-	    }
-
-#if	CF_DEBUGS
-	    debugprintf("cm_trysys: dialobj_open() rs=%d\n",rs) ;
-#endif
 
 	    buffer_finish(&barg) ;
 	} /* end if (open the module) */
@@ -635,23 +497,13 @@ const char	*av[] ;
 	    }
 	} /* end if */
 
-#if	CF_DEBUGS
-	debugprintf("cm_trysys: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (cm_trysys) */
 
-
-static int cm_trysysargs(op,sip,alp,abuf,alen)
-CM		*op ;
-SUBINFO		*sip ;
-vecstr		*alp ;
-const char	abuf[] ;
-int		alen ;
-{
-	FIELD		fsb ;
+static int cm_trysysargs(cm *op,SI *sip,vecstr *alp,
+		char *abuf,int alen) noex {
+	field		fsb ;
 	int		rs ;
 	uchar		terms[32] ;
 
@@ -661,9 +513,9 @@ int		alen ;
 	fieldterms(terms,0," \t") ;
 
 	if ((rs = field_start(&fsb,abuf,alen)) >= 0) {
-	    const int	flen = ARGBUFLEN ;
+	    cint	flen = ARGBUFLEN ;
 	    int		fl ;
-	    const char	*fp ;
+	    cchar	*fp ;
 	    char	fbuf[ARGBUFLEN+1] ;
 
 	    fp = fbuf ;

@@ -321,7 +321,7 @@ OBJ= $(OBJg0) $(OBJg1) $(OBJg2)
 
 
 UOBJ00= matxstr.o toxc.o char.o 
-UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o
+UOBJ01= strn.o strnxcmp.o sfx.o six.o rmx.o sif.o
 UOBJ02= snwcpy.o strcpyxc.o strwcpy.o strdcpy.o
 UOBJ03= varnames.o syswords.o stdfnames.o
 
@@ -332,7 +332,7 @@ UOBJ07= getourenv.o
 
 UOBJ08= strkeycmp.o strwcmp.o
 UOBJ09= readln.o ccfile.o
-UOBJ10= 
+UOBJ10= cfx.o
 UOBJ11= strmgr.o
 
 UOBJ12= ufstat.o ucttyname.o

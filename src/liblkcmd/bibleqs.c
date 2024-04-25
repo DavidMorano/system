@@ -219,7 +219,6 @@ extern int	sfskipwhite(const char *,int,const char **) ;
 extern int	siskipwhite(const char *,int) ;
 extern int	nleadstr(const char *,const char *,int) ;
 extern int	cfdeci(const char *,int,int *) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	pathclean(char *,const char *,int) ;
@@ -354,7 +353,7 @@ static int	eigenfind(EIGENDB *,const char *,const char *,int) ;
 static int	isstart(const char *,int,BIBLEQS_Q *,int *) ;
 static int	mkfieldterms(uchar *) ;
 
-static int	vesrch(const void *,const void *) ;
+static int	vesrch(cvoid *,cvoid *) ;
 static int	vcmpint(const int *,const int *) ;
 
 static int	isNeedIndex(int) ;
@@ -452,7 +451,7 @@ int bibleqs_open(BIBLEQS *op,cchar *pr,cchar *dbname)
 	debugprintf("bibleqs_open: dbname=%s\n",dbname) ;
 #endif
 
-	memset(op,0,sizeof(BIBLEQS)) ;
+	memclear(op) ;
 
 	if ((rs = subinfo_start(&si)) >= 0) {
 	    op->minwlen = BIBLEQS_MINWLEN ;
@@ -2582,14 +2581,11 @@ int		minwlen ;
 
 #endif /* CF_EXTRASTRONG */
 
-
-static int mkfieldterms(uchar *wterms)
-{
-	int		i ;
-	for (i = 0 ; i < 32 ; i += 1) {
+static int mkfieldterms(uchar *wterms) noex {
+	for (int i = 0 ; i < 32 ; i += 1) {
 	    wterms[i] = 0xFF ;
 	}
-	for (i = 0 ; i < 256 ; i += 1) {
+	for (int i = 0 ; i < 256 ; i += 1) {
 	    if (isalnumlatin(i)) {
 	        BACLR(wterms,i) ;
 	    }
@@ -2601,8 +2597,7 @@ static int mkfieldterms(uchar *wterms)
 
 
 /* find if two entries match (we don't need a "comparison") */
-static int vesrch(const void *v1p,const void *v2p)
-{
+static int vesrch(cvoid *v1p,cvoid *v2p) noex {
 	KTAG_KEY	**e1pp = (KTAG_KEY **) v1p ;
 	KTAG_KEY	**e2pp = (KTAG_KEY **) v2p ;
 	int		rc = 0 ;

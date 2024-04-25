@@ -54,6 +54,7 @@
 #include	<utimeout.h>
 #include	<filer.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<sfx.h>
 #include	<strcpyx.h>
 #include	<strdcpyxw.h>

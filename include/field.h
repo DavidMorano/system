@@ -9,7 +9,7 @@
 
 	= 1998-05-01, David A­D­ Morano
 	This code module was originally written in VAX assembly
-	(back around 1980 or so). It was then written into C-language
+	(back around 1980 or so).  It was then written into C-language
 	perhaps around 1983 (at AT&T Bell Laboratories).  This
 	(below) is a new incarnation based on that older C-language
 	code.
@@ -21,7 +21,7 @@
 /*******************************************************************************
 
 	This is a classic, ported forward from the old VAX-11/780
-	days. This was translated from VAX assembly language.
+	days.  This was translated from VAX assembly language.
 
 *******************************************************************************/
 
@@ -88,9 +88,6 @@ typedef FIELD		field ;
 
 EXTERNC_begin
 
-extern int	fieldterms(char *,int,cchar *) noex ;
-extern int	fieldtermsx(char *,int,int,...) noex ;
-
 extern int	field_start(field *,cchar *,int) noex ;
 extern int	field_get(field *,cchar *,cchar **) noex ;
 extern int	field_getterm(field *,cchar *,cchar **) noex ;
@@ -108,16 +105,6 @@ static inline int field_term(field *op,cchar *tp,cchar **rpp) noex {
 }
 
 EXTERNC_end
-
-#ifdef	__cplusplus
-
-template<typename ... Args>
-static inline int fieldterms(char *t,int f,Args ... args) noex {
-	cint		na = npack(Args) ;
-	return fieldtermsx(t,f,na,args ...) ;
-}
-
-#endif /* __cplusplus */
 
 
 #endif /* FIELD_INCLUDE */

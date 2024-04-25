@@ -466,27 +466,29 @@ int mailalias_close(MA *op) noex {
 /* end subroutine (mailalias_close) */
 
 int mailalias_audit(MA *op) noex {
-	int		rs = SR_OK ;
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    rs = SR_OK ;
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailalias_audit) */
 
 int mailalias_count(MA *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	return (op->rtlen - 1) ;
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    rs = (op->rtlen - 1) ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (mailalias_count) */
 
 int mailalias_indcount(MA *op) noex {
-	if (op == nullptr) return SR_FAULT ;
-	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-
-	return op->rilen ;
+	int		rs ;
+	if ((rs = mailalias_magic(op)) >= 0) {
+	    rs = op->rilen ;
+	} /* end if (magic) */
+	return rs ;
 }
 /* end subroutine (mailalias_indcount) */
 
@@ -1386,7 +1388,7 @@ static int mailalias_wrfiler(MA *op,DBMAKE *dp,time_t dt) noex {
 
 	fidbuf[16] = MAILALIAS_FILEVERSION ;
 	fidbuf[17] = ENDIAN ;
-	fidbuf[18] = op->ropts ;
+	fidbuf[18] = dp->ropts ;
 	fidbuf[19] = 0 ;
 
 /* write magic along with version encoding */
@@ -1778,64 +1780,64 @@ int dbmake::mkind(vecobj *rp,cc *skey,rt_t it,int itsz) noex {
 	int		n = 0 ; /* ¥ GCC false complaint */
 	if (it) {
 	    int		sz ;
-	if ((rs = vecobj_count(rp)) >= 0) {
-	    n = nextpowtwo(rs) ;
-	    if (n < 4) n = 4 ;
-	    sz = (n * 2 * sizeof(uint)) ;
-	    if (sz <= itsz) {
-		void		*vp{} ;
-	        uint		khash ;
-	        int		ri, hi, ki ;
-	        int		v ;
-	        int		kl ;
-	        int		f ;
-	        cchar	*kp ;
-	        memset(it,0,sz) ;
-	        ri = 1 ;
-	        for (int i = 0 ; vecobj_get(rp,i,&vp) >= 0 ; i += 1) {
-	            record	*rep = recordp(vp) ;
-	            int		c = 0 ;
-	            kp = charp(skey + rep->key) ;
-	            kl = strlen(kp) ;
-	            khash = hash_elf(kp,kl) ;
-	            hi = hashindex(khash,n) ;
-	            if ((ropts & MAILALIAS_OSEC) && (it[hi][0] != 0)) {
-	                while ((v = it[hi][0]) != 0) {
-	                    ki = rectab[v][0] ;
-	                    f = (strcmp(kp,(skey + ki)) == 0) ;
-	                    if (! f) break ;
-	                    if (ropts & MAILALIAS_ORANDLC) {
-	                        khash = randlc(khash + c) ;
-	                    } else {
-	                        khash = ((khash<<(32-ns))|(khash>>ns))+c ;
+	    if ((rs = vecobj_count(rp)) >= 0) {
+	        n = nextpowtwo(rs) ;
+	        if (n < 4) n = 4 ;
+	        sz = (n * 2 * sizeof(uint)) ;
+	        if (sz <= itsz) {
+		    void	*vp{} ;
+	            uint	khash ;
+	            int		ri, hi, ki ;
+	            int		v ;
+	            int		kl ;
+	            int		f ;
+	            cchar	*kp ;
+	            memset(it,0,sz) ;
+	            ri = 1 ;
+	            for (int i = 0 ; vecobj_get(rp,i,&vp) >= 0 ; i += 1) {
+	                record	*rep = recordp(vp) ;
+	                int	c = 0 ;
+	                kp = charp(skey + rep->key) ;
+	                kl = strlen(kp) ;
+	                khash = hash_elf(kp,kl) ;
+	                hi = hashindex(khash,n) ;
+	                if ((ropts & MAILALIAS_OSEC) && (it[hi][0] != 0)) {
+	                    while ((v = it[hi][0]) != 0) {
+	                        ki = rectab[v][0] ;
+	                        f = (strcmp(kp,(skey + ki)) == 0) ;
+	                        if (! f) break ;
+	                        if (ropts & MAILALIAS_ORANDLC) {
+	                            khash = randlc(khash + c) ;
+	                        } else {
+	                            khash = ((khash<<(32-ns))|(khash>>ns))+c ;
+	                        }
+	                        hi = hashindex(khash,n) ;
+	                        c += 1 ;
+	                    } /* end while */
+	                } /* end if (secondary hash on collision) */
+	                if (it[hi][0] != 0) {
+	                    int	lhi ;
+	                    c += 1 ;
+	                    while (it[hi][1] != 0) {
+	                        c += 1 ;
+	                        hi = it[hi][1] ;
 	                    }
-	                    hi = hashindex(khash,n) ;
-	                    c += 1 ;
-	                } /* end while */
-	            } /* end if (secondary hash on collision) */
-	            if (it[hi][0] != 0) {
-	                int	lhi ;
-	                c += 1 ;
-	                while (it[hi][1] != 0) {
-	                    c += 1 ;
-	                    hi = it[hi][1] ;
-	                }
-	                lhi = hi ;		/* save last hash-index value */
-	                hi = hashindex((hi + 1),n) ;
-	                while (it[hi][0] != 0) {
-	                    c += 1 ;
+	                    lhi = hi ;	/* save last hash-index value */
 	                    hi = hashindex((hi + 1),n) ;
-	                } /* end while */
-	                it[lhi][1] = hi ;	/* update the previous slot */
-	            } /* end if (got a hash collision) */
-	            it[hi][0] = ri ;
-	            it[hi][1] = 0 ;
-	            ri += 1 ;
-	        } /* end for (looping through records) */
-	    } else {
-	        rs = SR_OVERFLOW ;
-	    }
-	} /* end if (vecobj_count) */
+	                    while (it[hi][0] != 0) {
+	                        c += 1 ;
+	                        hi = hashindex((hi + 1),n) ;
+	                    } /* end while */
+	                    it[lhi][1] = hi ; /* update the previous slot */
+	                } /* end if (got a hash collision) */
+	                it[hi][0] = ri ;
+	                it[hi][1] = 0 ;
+	                ri += 1 ;
+	            } /* end for (looping through records) */
+	        } else {
+	            rs = SR_OVERFLOW ;
+	        }
+	    } /* end if (vecobj_count) */
 	} /* end if (non-null) */
 	return (rs >= 0) ? n : rs ;
 }

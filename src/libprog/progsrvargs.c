@@ -35,6 +35,7 @@
 
 #include	<usystem.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecstr.h>
 #include	<localmisc.h>
 

@@ -148,7 +148,6 @@ extern int	nleadstr(const char *,const char *,int) ;
 extern int	strpcmp(const char *,const char *) ;
 extern int	cfdeci(const char *,int,int *) ;
 extern int	cfdecui(const char *,int,uint *) ;
-extern int	field_word(FIELD *,const uchar *,const char **) ;
 extern int	vecstr_envadd(vecstr *,const char *,const char *,int) ;
 extern int	vecstr_adduniq(vecstr *,const char *,int) ;
 extern int	perm(const char *,uid_t,gid_t,gid_t *,int) ;
@@ -1817,14 +1816,11 @@ static int tagq_rem(TAGQ *tqp,TXTINDEX_TAG *tagp)
 }
 /* end subroutine (tagq_rem) */
 
-
-static int mkfieldterms(uchar *wterms)
-{
-	int		i ;
-	for (i = 0 ; i < 32 ; i += 1) {
+static int mkfieldterms(uchar *wterms) noex {
+	for (int i = 0 ; i < 32 ; i += 1) {
 	    wterms[i] = 0xFF ;
 	}
-	for (i = 0 ; i < 256 ; i += 1) {
+	for (int i = 0 ; i < 256 ; i += 1) {
 	    if (isalnumlatin(i)) {
 	        BACLR(wterms,i) ;
 	    }
@@ -1832,7 +1828,7 @@ static int mkfieldterms(uchar *wterms)
 	BACLR(wterms,CH_SQUOTE) ;		/* allow apostrophe */
 	BACLR(wterms,'_') ;			/* allow under-score */
 	BACLR(wterms,'-') ;			/* allow minus-sign */
-	return i ;
+	return SR_OK ;
 }
 /* end subroutine (mkfieldterms) */
 

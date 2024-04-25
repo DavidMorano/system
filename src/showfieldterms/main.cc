@@ -34,6 +34,7 @@
 #include	<bfile.h>
 #include	<baops.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<ascii.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>

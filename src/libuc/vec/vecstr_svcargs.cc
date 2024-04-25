@@ -27,10 +27,11 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<strn.h>
 #include	<strwcmp.h>
-#include	<mkchar.h>
 #include	<toxc.h>
+#include	<mkchar.h>
 #include	<localmisc.h>
 
 #include	"vecstr.h"

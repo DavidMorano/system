@@ -69,6 +69,7 @@
 #include	<bufsizevar.hh>
 #include	<filer.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<localmisc.h>
 
 #include	"vecpstr.h"

@@ -32,6 +32,7 @@
 #include	<cstring>		/* for |strlen(3c)| */
 #include	<usystem.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<localmisc.h>
 
 #include	"vecstr.h"

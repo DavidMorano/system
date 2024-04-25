@@ -39,13 +39,11 @@
 #include	<usystem.h>
 #include	<bits.h>
 #include	<bfile.h>
-#include	<field.h>
 #include	<logfile.h>
 #include	<vecstr.h>
 #include	<userinfo.h>
 #include	<varsub.h>
 #include	<hdb.h>
-#include	<field.h>
 #include	<ascii.h>
 #include	<localmisc.h>
 #include	<exitcodes.h>
@@ -137,10 +135,6 @@ static int	procargs(struct proginfo *,struct arginfo *,BITS *,
 static int	hashinfo_begin(HASHINFO *,struct proginfo *,int,cchar *) ;
 static int	hashinfo_end(HASHINFO *) ;
 static int	hashinfo_post(HASHINFO *,cchar *) ;
-
-#ifdef	COMMENT
-static int	mkfieldterms(uchar *) ;
-#endif
 
 
 /* local variables */
@@ -1179,37 +1173,5 @@ static int hashinfo_post(HASHINFO *hip,cchar *idxname) noex {
 	return rs ;
 }
 /* end subroutine (hashinfo_post) */
-
-#ifdef	COMMENT
-static int mkfieldterms(uchar *terms) noex {
-	int	ch ;
-	int	c = 256 ;
-
-	for (int i = 0 ; i < 32 ; i += 1) {
-	    terms[i] = 0xFF ;
-	}
-
-	BACLR(terms,'_') ;
-	c -= 1 ;
-
-	for (ch = 'a' ; ch <= 'z' ; ch += 1) {
-	    BACLR(terms,ch) ;
-	    c -= 1 ;
-	}
-
-	for (ch = 'A' ; ch <= 'Z' ; ch += 1) {
-	    BACLR(terms,ch) ;
-	    c -= 1 ;
-	}
-
-	for (ch = '0' ; ch <= '9' ; ch += 1) {
-	    BACLR(terms,ch) ;
-	    c -= 1 ;
-	}
-
-	return c ;
-}
-/* end subroutine (mkfieldterms) */
-#endif /* COMMENT */
 
 

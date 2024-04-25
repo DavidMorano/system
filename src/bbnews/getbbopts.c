@@ -63,6 +63,7 @@
 #include	<userinfo.h>
 #include	<baops.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecstr.h>
 #include	<pcsconf.h>
 #include	<mallocstuff.h>

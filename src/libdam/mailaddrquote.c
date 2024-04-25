@@ -45,18 +45,16 @@
 
 *******************************************************************************/
 
-
 #include	<envstandards.h>	/* MUST be first to configure */
-
 #include	<sys/types.h>
 #include	<sys/param.h>
 #include	<stdlib.h>
 #include	<string.h>
-
 #include	<usystem.h>
 #include	<baops.h>
 #include	<ascii.h>
 #include	<bufstr.h>
+#include	<fieldterms.h>
 #include	<localmisc.h>
 
 #include	"mailaddrquote.h"
@@ -65,7 +63,6 @@
 /* external subroutines */
 
 extern int	snwcpy(char *,int,const char *,int) ;
-extern int	fieldterms(uchar *,int,const char *) ;
 extern int	haswhite(const char *,int) ;
 
 extern char	*strnpbrk(const char *,int,const char *) ;

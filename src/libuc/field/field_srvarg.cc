@@ -69,6 +69,7 @@
 #include	<usystem.h>
 #include	<ascii.h>
 #include	<baops.h>
+#include	<fieldterms.h>
 #include	<char.h>
 #include	<mkchar.h>
 #include	<localmisc.h>
@@ -116,10 +117,10 @@ namespace {
 constexpr int		termsize = ((UCHAR_MAX+1)/CHAR_BIT) ;
 
 /* 'double quote', 'back-slash', 'pound', 'back-accent', et cetera */
-static char		doubles[termsize] = {} ;
+static char		doubles[termsize] ;
 
 /* default parse terminators for server arguments! */
-static char		dterms[termsize] = {} ;
+static char		dterms[termsize] ;
 
 constexpr bool		f_trailwhite = CF_TRAILWHITE ;
 

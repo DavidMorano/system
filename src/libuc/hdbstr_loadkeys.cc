@@ -47,6 +47,7 @@
 #include	<hdbstr.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<localmisc.h>
 
 

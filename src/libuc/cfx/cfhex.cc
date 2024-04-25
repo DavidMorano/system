@@ -42,7 +42,7 @@
 #include	<stdintx.h>
 
 #include	"cfsysx.hh"
-#include	"cfdec.h"
+#include	"cfhex.h"
 
 
 /* local defines */

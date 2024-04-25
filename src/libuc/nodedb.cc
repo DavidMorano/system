@@ -49,6 +49,7 @@
 #include	<mallocxx.h>
 #include	<bfile.h>
 #include	<field.h>
+#include	<fieldterms.h>
 #include	<vecobj.h>
 #include	<hdb.h>
 #include	<char.h>
