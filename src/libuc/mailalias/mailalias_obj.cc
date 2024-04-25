@@ -68,6 +68,7 @@
 #include	<bfile.h>
 #include	<opentmp.h>
 #include	<field.h>
+#include	<terminit.hh>
 #include	<kvsfile.h>
 #include	<strtab.h>
 #include	<intceil.h>
@@ -327,28 +328,10 @@ constexpr cpcchar	aptabsched[] = {
 } ;
 
 /* all white space plus colon (':') */
-constexpr cchar		kterms[] = {
-	0x00, 0x1F, 0x00, 0x00,
-	0x01, 0x00, 0x00, 0x04,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+static terminit		keys("\b\t\n\f\v :") ;
 
 /* all white space plus comma (',') */
-constexpr cchar		vterms[] = {
-	0x00, 0x1F, 0x00, 0x00,
-	0x01, 0x10, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00,
-	0x00, 0x00, 0x00, 0x00
-} ;
+static terminit		vals("\b\t\n\f\v ,") ;
 
 
 /* exported variables */
@@ -1608,9 +1591,10 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	    cint	klen = ALIASNAMELEN ;
 	    char	kbuf[ALIASNAMELEN+1] = { 0 } ;
 	    if (! f_havekey) {
+		cchar	*kt = keys.terms ;
 	        cchar	*pm = "Postmaster" ;
 	        cchar	*kp ;
-	        if (int kl ; (kl = field_get(&fsb,kterms,&kp)) >= 0) {
+	        if (int kl ; (kl = field_get(&fsb,kt,&kp)) >= 0) {
 	            if (kl > 0) {
 	                cbool	f = (kl == 10) && (strncasecmp(pm,kp,kl) == 0) ;
 	                f_havekey = true ;
@@ -1625,8 +1609,9 @@ int dbmake::procline(cchar *lbuf,int llen) noex {
 	    if (f_havekey && (fsb.term != '#')) {
 		int	c = 0 ;
 	        int	vl ;
+		cchar	*vt = vals.terms ;
 	        cchar	*vp ;
-	        while ((vl = field_get(&fsb,vterms,&vp)) >= 0) {
+	        while ((vl = field_get(&fsb,vt,&vp)) >= 0) {
 	            if (vl > 0) {
 	                int	ival = 0 ;
 	                if (c == 0) { /* enter into key-string table */

@@ -140,7 +140,7 @@ int sif::nextbrk(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = 0 ;		/* <- indicate zero result */
 	cchar		*rp = nullptr ;
-	if (sp && rpp) {
+	if (sp && sstr && rpp) {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    while ((sl > 0) && (rl <= 0)) {
@@ -183,7 +183,7 @@ int sif::brk(cchar **rpp) noex {
 	int		rs = SR_FAULT ;
 	int		rl = -1 ;		/* <- indicate not-found */
 	cchar		*rp = nullptr ;
-	if (sp && rpp) {
+	if (sp && sstr && rpp) {
 	    rs = SR_OK ;
 	    if (sl < 0) sl = strlen(sp) ;
 	    if (cchar *tp ; (tp = strnpbrk(sp,sl,sstr)) != nullptr) {
