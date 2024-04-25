@@ -154,7 +154,7 @@ int sif::nextbrk(cchar **rpp) noex {
 		    sl = 0 ;
 	        } /* end if */
 	    } /* end while */
-	    *rpp = rp ;
+	    *rpp = (rl > 0) ? rp : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -173,7 +173,7 @@ int sif::chr(cchar **rpp) noex {
 		sl -= ((tp + 1) - sp) ;
 		sp = (tp + 1) ;
 	    }
-	    *rpp = rp ;
+	    *rpp = (rl > 0) ? rp : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }
@@ -192,7 +192,7 @@ int sif::brk(cchar **rpp) noex {
 		sl -= ((tp + 1) - sp) ;
 		sp = (tp + 1) ;
 	    }
-	    *rpp = rp ;
+	    *rpp = (rl > 0) ? rp : nullptr ;
 	} /* end if (non-null) */
 	return (rs >= 0) ? rl : rs ;
 }

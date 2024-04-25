@@ -4,7 +4,6 @@
 /* manage a MAILALIAS object */
 /* lang=C20 */
 
-#define	CF_SAFE		1		/* safe mode */
 #define	CF_FASTKEYMATCH	1		/* faster key matching */
 #define	CF_DEFPROFILE	0		/* always use default MA-profile */
 
@@ -521,11 +520,8 @@ int mailalias_enum(MA *op,MA_CUR *curp,char *kbuf,int klen,
 	int		ri = 0 ;
 	int		vl = 0 ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-#endif
 
 	if (curp == nullptr) return SR_FAULT ;
 
@@ -601,11 +597,8 @@ int mailalias_fetch(MA *op,int opts,cchar *aname,MA_CUR *curp,
 	int		f_cur = false ;
 	(void) opts ;
 
-#if	CF_SAFE
 	if (op == nullptr) return SR_FAULT ;
-
 	if (op->magic != MAILALIAS_MAGIC) return SR_NOTOPEN ;
-#endif
 
 	if (aname == nullptr) return SR_INVALID ;
 
@@ -841,7 +834,7 @@ static int mailalias_checkold(MA *op,time_t dt) noex {
 
 /* read the file header and check it out */
 static int mailalias_hdrload(MA *op) noex {
-	cint	msize = MAILALIAS_FILEMAGICSIZE ;
+	cint		msize = MAILALIAS_FILEMAGICSIZE ;
 	int		rs = SR_OK ;
 	cchar		*cp = (cchar *) op->mapdata ;
 	if (hasValidMagic(cp,msize,MAILALIAS_FILEMAGIC)) {
@@ -890,9 +883,8 @@ static int mailalias_hdrloader(MA *op) noex {
 
 static int mailalias_fileopen(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
-
 	if (op->fd < 0) {
-	    int	oflags = op->oflags ;
+	    int		oflags = op->oflags ;
 	    oflags &= (~ O_CREAT) ;
 	    oflags &= (~ O_RDWR) ;
 	    oflags &= (~ O_WRONLY) ;
@@ -907,7 +899,6 @@ static int mailalias_fileopen(MA *op,time_t dt) noex {
 		}
 	    } /* end if */
 	} /* end if (needed open) */
-
 	return (rs >= 0) ? op->fd : rs ;
 }
 /* end subroutine (mailalias_fileopen) */
@@ -974,7 +965,6 @@ static int mailalias_keymatch(MA *op,int opts,int ri,cchar *aname) noex {
 static int mailalias_dbopen(MA *op,time_t dt) noex {
 	int		rs ;
 	int		f_create = false ;
-
 	if ((rs = mailalias_dbopenfile(op,dt)) >= 0) {
 	    f_create = rs ;
 	    if ((rs = mailalias_dbopenmake(op,dt)) >= 0) {
@@ -984,8 +974,9 @@ static int mailalias_dbopen(MA *op,time_t dt) noex {
 	                    if ((rs = mailalias_hdrload(op)) >= 0) {
 	                        op->ti_access = dt ;
 	                    }
-	                    if (rs < 0)
+	                    if (rs < 0) {
 	                        mailalias_mapend(op) ;
+			    }
 	                } /* end if (mailalias_mapbegin) */
 	            } /* end if (mailalias_dbopenwait) */
 	        } /* end if (mailalias_isremote) */
@@ -994,7 +985,6 @@ static int mailalias_dbopen(MA *op,time_t dt) noex {
 	        mailalias_fileclose(op) ;
 	    }
 	} /* end if (mailalias_dbopenfile) */
-
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_dbopen) */
@@ -1010,16 +1000,12 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	if ((rs = u_open(op->dbfname,of,op->operm)) >= 0) {
 	    USTAT	sb ;
 	    op->fd = rs ;
-
 	    if ((rs = u_fstat(op->fd,&sb)) >= 0) {
-
 	        op->fi.mtime = sb.st_mtime ;
 	        op->fi.fsize = sb.st_size ;
 	        op->fi.ino = sb.st_ino ;
 	        op->fi.dev = sb.st_dev ;
-
 	        op->ti_open = dt ;
-
 	        if (op->f.ocreate && op->f.owrite) {
 	            f_create = (sb.st_size == 0) ;
 	            if (! f_create) {
@@ -1031,9 +1017,7 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	                mailalias_fileclose(op) ;
 	            }
 	        } /* end if (we can possibly create the DB) */
-
 	    } /* end if (stat) */
-
 	    if (rs < 0) {
 	        u_close(op->fd) ;
 	        op->fd = -1 ;
@@ -1043,11 +1027,9 @@ static int mailalias_dbopenfile(MA *op,time_t dt) noex {
 	    f_create = true ;
 	    op->f.needcreate = true ;
 	} /* end if (successful file open) */
-
 	if ((rs >= 0) && f_create) {
 	    op->f.needcreate = true ;
 	}
-
 	return (rs >= 0) ? f_create : rs ;
 }
 /* end subroutine (mailalias_dbopenfile) */
@@ -1080,7 +1062,7 @@ static int mailalias_dbopenmake(MA *op,time_t dt) noex {
 
 static int mailalias_dbopenwait(MA *op) noex {
 	USTAT		sb ;
-	cint	to = TO_FILECOME ;
+	cint		to = TO_FILECOME ;
 	int		rs = SR_OK ;
 	int		msize ; /* minimum size */
 	int		i ;
@@ -1118,15 +1100,19 @@ static int mailalias_isremote(MA *op) noex {
 /* end subroutine (mailalias_isremote) */
 
 static int mailalias_dbclose(MA *op) noex {
-	int		rs = SR_OK ;
+	int		rs = SR_FAULT ;
 	int		rs1 ;
-
-	rs1 = mailalias_mapend(op) ;
-	if (rs >= 0) rs = rs1 ;
-
-	rs1 = mailalias_fileclose(op) ;
-	if (rs >= 0) rs = rs1 ;
-
+	if (op) {
+	    rs = SR_OK ;
+	    {
+	        rs1 = mailalias_mapend(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	    {
+	        rs1 = mailalias_fileclose(op) ;
+	        if (rs >= 0) rs = rs1 ;
+	    }
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (mailalias_dbclose) */
@@ -1135,12 +1121,9 @@ static int mailalias_dbclose(MA *op) noex {
 static int mailalias_dbmake(MA *op,time_t dt) noex {
 	int		rs = SR_OK ;
 	int		cl ;
-	cchar	*cp ;
-
+	cchar		*cp ;
 	if (dt == 0) dt = time(nullptr) ;
-
 /* get the directory of the DB file and see if it is writable to us */
-
 	if ((cl = sfdirname(op->dbfname,-1,&cp)) > 0) {
 	    char	dbuf[MAXPATHLEN + 1] ;
 	    if ((rs = mkpath1w(dbuf,cp,cl)) >= 0) {
@@ -1166,8 +1149,8 @@ static int mailalias_dbmake(MA *op,time_t dt) noex {
 /* end subroutine (mailalias_dbmake) */
 
 static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
-	cint	sz = MAILALIAS_TOPLEN ;
-	cint	clen = MAXNAMELEN ;
+	cint		sz = MAILALIAS_TOPLEN ;
+	cint		clen = MAXNAMELEN ;
 	int		n = NREC_GUESS ;
 	int		rs ;
 	int		rs1 ;
@@ -1184,9 +1167,9 @@ static int mailalias_dbmaker(MA *op,time_t dt,cchar *dname) noex {
 	            fd = rs ;
 	        } else if (rs == SR_EXIST) {
 	            USTAT	sb ;
-	            int		i ;
+	            int		i ; /* used-afterwards */
 	            for (i = 0 ; i < TO_FILECOME ; i += 1) {
-	                sleep(1) ;
+	                msleep(1) ;
 	                rs1 = u_stat(op->dbfname,&sb) ;
 	                if ((rs1 >= 0) && (sb.st_size >= sz)) break ;
 	            } /* end for */
