@@ -1,4 +1,4 @@
-/* ushm SUPPORT (UNIX Shared Memory) */
+/* ushm SUPPORT (UNIX® System V IPC - Shared Memory) */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -36,7 +36,6 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>		/* |intptr_t| */
-#include	<envstandards.h>	/* ordered first to configure */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
@@ -45,11 +44,15 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	"uipc.h"
+
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using namespace	uipc ;			/* namespace */
 
 using std::nullptr_t ;			/* type */
 

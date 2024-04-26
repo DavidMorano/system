@@ -1,4 +1,4 @@
-/* umsg SUPPORT (UNIX® System V Inter-Process-Communication - Message Queues) */
+/* umsg SUPPORT (UNIX® System V IPC - Message Queues) */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -42,21 +42,38 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	"uipc.h"
+
 
 /* local defines */
+
+
+/* imported namespaces */
+
+using namespace	uipc ;			/* namespace */
+
+
+/* local typedefs */
 
 
 /* external subroutines */
 
 
+/* external variables */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
-int u_msgget(key_t key,int msgflag)
-{
+int u_msgget(key_t key,int msgflag) noex {
 	int		rs ;
-	int		to_nospc = TO_NOSPC ;
+	int		to_nospc = utimeout[uto_nospc] ;
 	int		f_exit = false ;
-
 	repeat {
 	    if ((rs = msgget(key,msgflag)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
@@ -77,42 +94,26 @@ int u_msgget(key_t key,int msgflag)
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	return rs ;
 }
 /* end subroutine (u_msgget) */
 
-int u_msgsnd(msqid,msgp,msgsz,msgflag)
-int	msqid ;
-void	*msgp ;
-int	msgsz ;
-int	msgflag ;
-{
+int u_msgsnd(int msqid,void *msgp,int msgsz,int msgflag) noex {
 	int		rs ;
-
 	repeat {
 	    if ((rs = msgsnd(msqid,msgp,msgsz,msgflag)) < 0) rs = (- errno) ;
 	} until (rs != SR_INTR) ;
-
 	return rs ;
 }
 /* end subroutine (u_msgsnd) */
 
-int u_msgrcv(msqid,msgp,msgsz,msgtype,msgflag)
-int	msqid ;
-void	*msgp ;
-int	msgsz ;
-long	msgtype ;
-int	msgflag ;
-{
+int u_msgrcv(int msqid,void *msgp,int msgsz,long msgtype,int msgflag) noex {
 	int		rs ;
-
 	repeat {
 	    if ((rs = msgrcv(msqid,msgp,msgsz,msgtype,msgflag)) < 0) {
 	        rs = (- errno) ;
 	    }
 	} until (rs != SR_INTR) ;
-
 	return rs ;
 }
 /* end subroutine (u_msgrcv) */
@@ -131,7 +132,7 @@ int	msgflag ;
 
 int u_msgctl(int msgid,int cmd,MSQIDDS *buf) noex {
 	int		rs ;
-	int		to_nospc = TO_NOSPC ;
+	int		to_nospc = utimeout[uto_nospc] ;
 	int		f_exit = false ;
 
 	repeat {
