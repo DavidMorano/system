@@ -103,6 +103,10 @@ extern int u_msgsnd(int,void *,int,int) noex ;
 extern int u_msgrcv(int,void *,int,long,int) noex ;
 extern int u_msgctl(int,int,MSQIDDS *) noex ;
 
+extern int u_semget(key_t,int,int) noex ;
+extern int u_shmop(int,SEMBUF *,size_t) noex ;
+extern int u_semctl(int,int,int,...) noex ;
+
 EXTERNC_end
 
 

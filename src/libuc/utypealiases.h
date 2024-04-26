@@ -33,7 +33,9 @@
 #include	<sys/statvfs.h>
 #include	<sys/socket.h>
 #include	<sys/poll.h>
-#include	<sys/msg.h>
+#include	<sys/shm.h>		/* UNIX® Sys-V IPC - Shared-Memory */
+#include	<sys/msg.h>		/* UNIX® Sys-V IPC - Message-Queues */
+#include	<sys/sem.h>		/* UNIX® Sys-V IPC - Semaphores */
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)
 #include	<sys/acl.h>
@@ -209,6 +211,10 @@
 
 /* UNIX® System V Inter-Process-Communication (IPC) */
 
+#ifndef	SHMIDDS
+#define	SHMIDDS		struct shmid_ds		/* for UNIX® SysV-IPC SHM */
+#endif
+
 #ifndef	MSQIDDS
 #define	MSQIDDS		struct msqid_ds		/* for UNIX® SysV-IPC MQ */
 #endif
@@ -225,8 +231,12 @@
 #define	MSGPERM		struct msg_perm		/* for UNIX® SysV-IPC MQ */
 #endif
 
-#ifndef	SHMIDDS
-#define	SHMIDDS		struct shmid_ds		/* for UNIX® SysV-IPC SHM */
+#ifndef	SEMIDDS
+#define	SEMIDDS		struct semid_ds		/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	SEMBUF
+#define	SEMBUF		struct sembuf		/* for UNIX® SysV-IPC SEM */
 #endif
 
 
@@ -389,6 +399,10 @@
 
 /* UNIX® System V Inter-Process-Communication (IPC) */
 
+#ifndef	CSHMIDDS
+#define	CSHMIDDS	const struct shmid_ds	/* for UNIX® SysV-IPC SHM */
+#endif
+
 #ifndef	CMSQIDDS
 #define	CMSQIDDS	const struct msqid_ds	/* for UNIX® SysV-IPC MQ */
 #endif
@@ -403,6 +417,14 @@
 
 #ifndef	CMSGPERM
 #define	CMSGPERM	const struct msg_perm	/* for UNIX® SysV-IPC MQ */
+#endif
+
+#ifndef	CSEMIDDS
+#define	CSEMIDDS	const struct semid_ds	/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	CSEMBUF
+#define	CSEMBUF		const struct sembuf	/* for UNIX® SysV-IPC SEM */
 #endif
 
 

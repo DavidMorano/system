@@ -30,6 +30,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
+#include	<sys/ipc.h>
 #include	<sys/msg.h>
 #include	<unistd.h>
 #include	<climits>
