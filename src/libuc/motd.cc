@@ -256,16 +256,6 @@ static constexpr cpcchar	envbad[] = {
 
 } ;
 
-static constexpr cpcchar	envstrs[] = {
-	"USERNAME",
-	"GROUPNAME",
-	"UID",
-	"GID",
-	"ADMIN",
-	"ADMINDIR",
-	nullptr
-} ;
-
 enum envstrs {
 	envstr_username,
 	envstr_groupname,
@@ -274,6 +264,16 @@ enum envstrs {
 	envstr_admin,
 	envstr_admindir,
 	envstr_overlast
+} ;
+
+static constexpr cpcchar	envstrs[] = {
+	"USERNAME",
+	"GROUPNAME",
+	"UID",
+	"GID",
+	"ADMIN",
+	"ADMINDIR",
+	nullptr
 } ;
 
 constexpr uid_t		uidend = -1 ;

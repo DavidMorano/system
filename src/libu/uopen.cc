@@ -37,8 +37,10 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
+#include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<numeric>		/* |saturate_cast(3c++)| */
 #include	<usystem.h>
 #include	<usupport.h>
 #include	<usysflag.h>
@@ -72,8 +74,10 @@ namespace {
     typedef int (opener::*opener_m)(cchar *,int,mode_t) noex ;
     struct opener {
 	opener_m	m ;
+	SOCKADDR	*sap ;
 	int		*pipes ;
 	cchar		*fname ;
+	int		*lenp ;
 	int		dfd ;
 	int		tfd ;
 	int		pf ;
@@ -91,17 +95,29 @@ namespace {
 		pipes[1] = -1 ;
 	    }
 	} ;
+	opener(int afd,SOCKADDR *fp,int *lp) noex : dfd(afd), sap(fp) {
+	   lenp = lp ;
+	} ;
 	opener(int *apipes) noex : pipes(apipes) { 
 	    if (pipes) {
 		pipes[0] = -1 ;
 		pipes[1] = -1 ;
 	    }
 	} ;
-	int operator () (cchar *,int,mode_t) noex ;
+	int operator () (cchar *fn,int of,mode_t om) noex {
+	    return openreg(fn,of,om) ;
+	} ;
+	operator int () noex {
+	    cnullptr	np{} ;
+	    return openreg(np,0,0) ;
+	} ;
+	int openreg(cchar *,int,mode_t) noex ;
 	int openjack(cchar *,int,mode_t) noex ;
 	int iopen(cchar *,int,mode_t) noex ;
 	int iopenat(cchar *,int,mode_t) noex ;
 	int isocket(cchar *,int,mode_t) noex ;
+	int iaccept(cchar *,int,mode_t) noex ;
+	int iacceptpass(cchar *,int,mode_t) noex ;
 	int idup1(cchar *,int,mode_t) noex ;
 	int idup2(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
@@ -151,48 +167,57 @@ int u_creat(cchar *fname,mode_t om) noex {
 
 int u_socket(int pf,int st,int pr) noex {
 	opener		oo(pf,st,pr) ;
-	cnullptr	np{} ;
 	oo.m = &opener::isocket ;
 	oo.flavor = flavor_single ;
-	return oo(np,0,0) ;
+	return oo ;
+}
+
+int u_accept(int fd,SOCKADDR *fromp,int *fromlenp) noex {
+	opener		oo(fd,fromp,fromlenp) ;
+	oo.m = &opener::iaccept ;
+	oo.flavor = flavor_single ;
+	return oo ;
+}
+
+int u_acceptpass(int fd) noex {
+	opener		oo(fd) ;
+	oo.m = &opener::iacceptpass ;
+	oo.flavor = flavor_single ;
+	return oo ;
 }
 
 int u_dup(int sfd) noex {
 	opener		oo(sfd) ;
-	cnullptr	np{} ;
 	oo.m = &opener::idup1 ;
-	return oo(np,0,0) ;
+	return oo ;
 }
 /* end subroutine (u_dup) */
 
 int u_dup2(int sfd,int tfd) noex {
 	opener		oo(sfd,tfd) ;
-	cnullptr	np{} ;
 	oo.m = &opener::idup2 ;
-	return oo(np,0,0) ;
+	return oo ;
 }
 /* end subroutine (u_dup2) */
 
 int u_socketpair(int pf,int st,int pr,int *pipes) noex {
 	opener		oo(pf,st,pr,pipes) ;
-	cnullptr	np{} ;
 	oo.m = &opener::isocketpair ;
 	oo.flavor = flavor_pipes ;
-	return oo(np,0,0) ;
+	return oo ;
 }
 
 int u_pipe(int *pipes) noex {
 	opener		oo(pipes) ;
-	cnullptr	np{} ;
 	oo.m = &opener::ipipe ;
 	oo.flavor = flavor_pipes ;
-	return oo(np,0,0) ;
+	return oo ;
 }
 
 
 /* local subroutines */
 
-int opener::operator () (cchar *fname,int of,mode_t om) noex {
+int opener::openreg(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		rs1 ;
 	int		fd = -1 ;
@@ -207,7 +232,7 @@ int opener::operator () (cchar *fname,int of,mode_t om) noex {
 	if (rs < 0) fderror(fd) ;
 	return (rs >= 0) ? fd : rs ;
 }
-/* end method (opener::operator) */
+/* end method (opener::openreg) */
 
 int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
@@ -315,6 +340,26 @@ int opener::isocket(cchar *,int,mode_t) noex {
 }
 /* end method (opener::isocket) */
 
+int opener::iaccept(cchar *,int,mode_t) noex {
+	int		rs = SR_FAULT ;
+	if (sap && lenp) {
+	    socklen_t	salen = socklen_t(*lenp) ;
+	    if ((rs = accept(dfd,sap,&salen)) < 0) {
+		rs = (- errno) ;
+	    }
+	    if (rs >= 0) {
+	        *lenp = int(salen & INT_MAX) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (opener::iaccept) */
+
+int opener::iacceptpass(cchar *,int,mode_t) noex {
+	return SR_NOSYS ;
+}
+/* end method (opener::iacceptpass) */
+
 int opener::idup1(cchar *,int,mode_t) noex {
 	int		rs ;
 	if ((rs = dup(dfd)) < 0) {
@@ -403,4 +448,5 @@ void opener::fderror(int fd) noex {
 	} /* end switch */
 }
 /* end method (opener::fderror) */
+
 

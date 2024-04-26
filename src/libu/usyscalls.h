@@ -132,19 +132,23 @@ extern int	u_pathconf(cchar *,int,long *) noex ;
 extern int	u_statvfs(cchar *,USTATVFS *) noex ;
 extern int	u_stat(cchar *,USTAT *) noex ;
 extern int	u_lstat(cchar *,USTAT *) noex ;
+
 extern int	u_creat(cchar *,mode_t) noex ;
 extern int	u_open(cchar *,int,mode_t) noex ;
+extern int	u_socket(int,int,int) noex ;
+extern int	u_acceptpass(int) noex ;
+extern int	u_accept(int,cvoid *,int *) noex ;
+extern int	u_pipe(int *) noex ;
+extern int	u_socketpair(int,int,int,int *) noex ;
 
 extern int	u_getdents(int,dirent_t *,int) noex ;
 extern int	u_fchdir(int) noex ;
 extern int	u_fsync(int) noex ;
 extern int	u_pipe(int *) noex ;
-extern int	u_socket(int,int,int) noex ;
+extern int	u_accept(int,cvoid *,int *) noex ;
 extern int	u_getsockopt(int,int,int,void *,int *) noex ;
 extern int	u_setsockopt(int,int,int,cvoid *,int) noex ;
-extern int	u_socketpair(int,int,int,int *) noex ;
 extern int	u_connect(int,cvoid *,int) noex ;
-extern int	u_accept(int,cvoid *,int *) noex ;
 
 extern int	u_closeonexec(int,bool) noex ;
 extern int	u_poll(POLLFD *,int,int) noex ;
