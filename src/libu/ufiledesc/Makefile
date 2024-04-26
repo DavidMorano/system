@@ -1,8 +1,8 @@
-# MAKEFILES (uipc)
+# MAKEFILES (ufiledesc)
 
-T= uipc
+T= ufiledesc
 
-TARS= $(T).o $(T).a
+ALL= $(T).o $(T).a
 
 
 BINDIR= $(REPOROOT)/bin
@@ -38,7 +38,7 @@ LINT=	lint
 DEFS +=
 
 
-INCS += uipc.h
+INCS += ufiledesc.h
 
 
 LIBS +=
@@ -56,12 +56,22 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ_UIPC= ushm.o umsg.o usem.o
+OBJ0_UFILEDESC= 
+OBJ1_UFILEDESC= 
+OBJ2_UFILEDESC= 
+OBJ3_UFILEDESC= 
+OBJ4_UFILEDESC= 
+
+
+OBJA_UFILEDESC= obj0_ufiledesc.o obj1_ufiledesc.o
+OBJB_UFILEDESC= obj2_ufiledesc.o obj3_ufiledesc.o obj4_ufiledesc.o
+
+OBJ_UFILEDESC= $(OBJA_UFILEDESC) $(OBJB_UFILEDESC)
 
 
 default:		$(T).o
 
-all:			$(TARS)
+all:			$(ALL)
 
 .c.ln:
 	$(LINT) -c $(LINTFLAGS) $(CPPFLAGS) $<
@@ -79,10 +89,10 @@ all:			$(TARS)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_UIPC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UIPC)
+$(T).o:			$(OBJ_UFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEDESC)
 
-$(T).a:			$(OBJ_UIPC)
+$(T).a:			$(OBJ_UFILEDESC)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -94,25 +104,30 @@ $(T).order:		$(OBJ) $(T).a
 	while read O ; do $(AR) $(ARFLAGS) -cr $(T).a $${O} ; done < $(T).order
 
 again:
-	rm -f $(TARS)
+	rm -f $(ALL)
 
 clean:
-	makeclean $(TARS)
+	makeclean $(ALL)
 
 control:
 	(uname -n ; date) > Control
 
-printalls:
-	printalls $(TARS)
+obj0_ufiledesc.o:	$(OBJ0_UFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ0_UFILEDESC)
 
-printincs:
-	printincs $(INCS)
+obj1_ufiledesc.o:	$(OBJ1_UFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ1_UFILEDESC)
+
+obj2_ufiledesc.o:	$(OBJ2_UFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ2_UFILEDESC)
+
+obj3_ufiledesc.o:	$(OBJ3_UFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ3_UFILEDESC)
+
+obj4_ufiledesc.o:	$(OBJ4_UFILEDESC)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ4_UFILEDESC)
 
 
-uipc.o:		uipc.cc		$(INCS)
 
-ushm.o:		ushm.cc		$(INCS)
-umsg.o:		umsg.cc		$(INCS)
-usem.o:		usem.cc		$(INCS)
 
 

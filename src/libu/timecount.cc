@@ -16,15 +16,31 @@
 
 /*******************************************************************************
 
-	This object provides a florified count-down timer.
+	This object provides a glorified count-down timer.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* ordered first to configure */
-#include	<usystem.h>
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usupport.h>
+#include	<usyscalls.h>
+#include	<clanguage.h>
 
 #include	"timecount.hh"
 
+
+/* local defines */
+
+
+/* local variables */
+
+
+/* exported variables */
+
+
+/* external subroutines */
 
 timecount::operator int () noex {
 	    int		rs = SR_TIMEDOUT ;

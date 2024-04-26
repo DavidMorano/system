@@ -78,7 +78,7 @@ int u_shmget(key_t key,size_t sz,int msgflag) noex {
 	int		rs ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
 	    if ((rs = shmget(key,sz,msgflag)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
@@ -115,7 +115,7 @@ int u_shmat(int shmid,void *shmaddr,int flags,void **app) noex {
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
 	int		to_mfile = utimeout[uto_mfile] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	if (shmaddr && app) {
 	    repeat {
 	        *app = shmat(shmid,shmaddr,flags) ;
@@ -165,7 +165,7 @@ int u_shmat(int shmid,void *shmaddr,int flags,void **app) noex {
 int u_shmctl(int shmid,int cmd,SHMIDDS *buf) noex {
 	int		rs ;
 	int		to_nomem = utimeout[uto_nomem] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
 	    if ((rs = shmctl(shmid,cmd,buf)) < 0) rs = (- errno) ;
 	    if (rs < 0) {

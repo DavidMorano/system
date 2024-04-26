@@ -2,14 +2,6 @@
 # MAKEBELOW
 
 
-PROG_WHICH=/bin/which
-PROG_DOMAINNAME=/bin/domainname
-PROG_FGREP=/bin/fgrep
-PROG_CUT=/bin/cut
-PROG_UNAME=/bin/uname
-PROG_BASENAME=/bin/basename
-
-
 PN=${0##*/}
 
 TARGETS=

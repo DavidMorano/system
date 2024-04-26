@@ -39,7 +39,7 @@
 #define	va_finish(ap)		va_end((ap))
 #endif
 #ifndef	va_get
-#define	va_get(ap,atype)	va_arg((ap),(atype))
+#define	va_get(ap,atype)	va_arg(ap,atype)
 #endif
 
 #ifndef	repeat

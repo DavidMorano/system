@@ -35,6 +35,7 @@
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<cstdint>		/* |intptr_t| */
+#include	<cstdarg>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
@@ -77,7 +78,7 @@ int u_semget(key_t key,int nsems,int semflag) noex {
 	int		rs ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
 	    if ((rs = semget(key,nsems,semflag)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
@@ -114,7 +115,7 @@ int u_semop(int semid,SEMBUF *sops,size_t nsops) noex {
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
 	int		to_mfile = utimeout[uto_mfile] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	if (sops) {
 	    repeat {
 	        if ((rs = semop(semid,sops,nsops)) < 0) {
@@ -156,12 +157,16 @@ int u_semop(int semid,SEMBUF *sops,size_t nsops) noex {
 }
 /* end subroutine (u_semop) */
 
-int u_semctl(int semid,int semnum,int cmd,caddr_t carg) noex {
+int u_semctl(int semid,int semnum,int cmd,...) noex {
+	va_list		ap ;
 	int		rs ;
 	int		to_nomem = utimeout[uto_nomem] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
+	SEMUN		*unp ;
+	va_begin(ap,cmd) ;
+	unp = (SEMUN *) va_arg(ap,SEMUN *) ;
 	repeat {
-	    if ((rs = semctl(semid,semnum,cmd,carg)) < 0) {
+	    if ((rs = semctl(semid,semnum,cmd,unp)) < 0) {
 		rs = (- errno) ;
 	    }
 	    if (rs < 0) {
@@ -181,6 +186,7 @@ int u_semctl(int semid,int semnum,int cmd,caddr_t carg) noex {
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
+	va_end(ap) ;
 	return rs ;
 }
 /* end subroutine (u_semctl) */

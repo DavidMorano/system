@@ -234,7 +234,16 @@ usysauxinfo.o:		isysauxinfo.cc
 # OPEN
 uopen.o:		uopen.cc uopen.h
 
-# OTHER
+# UIPC
+ufiledesc.o:		ufiledesc.dir
+ufiledes.dir:
+	makesubdir $@
 
+# UIPC
+uipc.o:			uipc.dir
+uipc.dir:
+	makesubdir $@
+
+# OTHER
 
 

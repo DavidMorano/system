@@ -34,12 +34,13 @@
 #ifndef	UIPC_INCLUDE
 #define	UIPC_INCLUDE
 
+
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/ipc.h>
-#include	<sys/shm.h>
-#include	<sys/msg.h>
-#include	<sys/sem.h>
+#include	<sys/ipc.h>		/* UNIX® System V IPC */
+#include	<sys/shm.h>		/* UNIX® System V IPC - SHM */
+#include	<sys/msg.h>		/* UNIX® System V IPC - MSG */
+#include	<sys/sem.h>		/* UNIX® System V IPC - SEM */
 #include	<unistd.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
@@ -60,31 +61,8 @@ namespace uipc {
     typedef int (uipc::*uipc_m)(int,void *) noex ;
     struct uipc {
 	uipc_m		m ;
-	char		*vec ;
-	void		*vp ;
-	void		*arg ;
-	off_t		off ;
-	int		pr ;
-	int		fl ;
-	int		fd ;
-	int		attr ;
-	int		mask ;
+	key_t		key ;
 	uipc() noex { } ;
-	uipc(int p,int f,int d,off_t o,void *v) noex {
-	    pr = p ;
-	    fl = f ;
-	    fd = d ;
-	    off = o ;
-	    vp = v ;
-	} ;
-	uipc(int f) noex : fl(f) { } ;
-	uipc(char *v) noex : vec(v) { } ;
-	uipc(int c,void *a,int t,int m) noex {
-	    fl = c ;
-	    arg = a ;
-	    attr = t ;
-	    mask = m ;
-	} ;
 	int operator () (int,void *) noex ;
     } ; /* end struct (uipc) */
 }
@@ -104,7 +82,7 @@ extern int u_msgrcv(int,void *,int,long,int) noex ;
 extern int u_msgctl(int,int,MSQIDDS *) noex ;
 
 extern int u_semget(key_t,int,int) noex ;
-extern int u_shmop(int,SEMBUF *,size_t) noex ;
+extern int u_semop(int,SEMBUF *,size_t) noex ;
 extern int u_semctl(int,int,int,...) noex ;
 
 EXTERNC_end

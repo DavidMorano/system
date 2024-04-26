@@ -67,23 +67,22 @@
 #include	<usysdefs.h>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
+#include	<usysrets.h>
 #include	<usupport.h>
 
 #include	<ustat.h>
-#include	<ucent.h>
 #include	<uinet.h>
 #include	<ulimits.h>
 #include	<uopen.h>
-#include	<usysrets.h>
 #include	<usyscalls.h>
+#include	<uxti.h>
+#include	<upthread.h>
 
+#include	<ucent.h>
 #include	<ucfunctioncodes.h>
 #include	<ucopen.h>
 #include	<uclibsubs.h>
 
-#include	<uxti.h>
-
-#include	<upthread.h>
 
 
 #endif /* USYSTEM_INCLUDE */

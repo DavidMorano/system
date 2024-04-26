@@ -176,7 +176,7 @@ constexpr cchar		fnshells[] = FNSHELLS ;
 int main(int argc,mainv argv,mainv) noex {
 	const uid_t	uid = getuid() ;
 	int		ex = EXIT_SUCCESS ;
-	int		rs = 0 ;
+	int		rs = SR_OK ;
 	if ((rs = getpn(argc,argv,prognames)) >= 0) {
 	    userinfo	ui ;
 	    cint	pm = rs ;
@@ -198,18 +198,18 @@ int main(int argc,mainv argv,mainv) noex {
 	        if ((rs = ui.find(uid)) > 0) {
 		    switch (pm) {
 		    case progmode_username:
-		            cout << ui.un << eol ;
-		            break ;
+		        cout << ui.un << eol ;
+		        break ;
 		    case progmode_userhome:
-		            cout << ui.uh << eol ;
-		            break ;
+		        cout << ui.uh << eol ;
+		        break ;
 		    case progmode_usershell:
-		            cout << ui.us << eol ;
-		            break ;
+		        cout << ui.us << eol ;
+		        break ;
 		    case progmode_gid:
 		    case progmode_groupname:
-			    rs = procgroup(pm,&ui) ;
-			    break ;
+			rs = procgroup(pm,&ui) ;
+			break ;
 		    default:
 		        rs = SR_BUGCHECK ;
 		        break ;

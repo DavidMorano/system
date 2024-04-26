@@ -25,10 +25,10 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/ipc.h>		/* Sys-V IPC */
-#include	<sys/shm.h>		/* Sys-V IPC */
-#include	<sys/msg.h>		/* Sys-V IPC */
-#include	<sys/sem.h>		/* Sys-V IPC */
+#include	<sys/ipc.h>		/* UNIX® Sys-V IPC */
+#include	<sys/shm.h>		/* UNIX® Sys-V IPC - SHM */
+#include	<sys/msg.h>		/* UNIX® Sys-V IPC - MSG */
+#include	<sys/sem.h>		/* UNIX® Sys-V IPC - SEM */
 #include	<unistd.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
@@ -68,14 +68,14 @@ using std::nullptr_t ;			/* type */
 
 /* exported subroutines */
 
-int uipc::operator int () noex {
+int uipc::operator int (int id,void *vp) noex {
 	int		rs = SR_FAULT ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
 	int		to_mfile = utimeout[uto_mfile] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
-	    if ((rs = (this->*m)()) < o) {
+	    if ((rs = (this->*m)(id,vp)) < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
 	                if (to_nomem-- > 0) {

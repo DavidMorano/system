@@ -41,11 +41,8 @@
 
 /* external subroutines */
 
-extern int	msleep(int) ;
-
 
 /* exported subroutines */
-
 
 int u_close(int fd)
 {
@@ -90,4 +87,5 @@ int u_close(int fd)
 	return rs ;
 }
 /* end subroutine (u_close) */
+
 

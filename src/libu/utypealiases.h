@@ -239,6 +239,10 @@
 #define	SEMBUF		struct sembuf		/* for UNIX® SysV-IPC SEM */
 #endif
 
+#ifndef	SEMUN
+#define	SEMUN		union semun		/* for UNIX® SysV-IPC SEM */
+#endif
+
 
 /* UTMPX */
 
@@ -425,6 +429,10 @@
 
 #ifndef	CSEMBUF
 #define	CSEMBUF		const struct sembuf	/* for UNIX® SysV-IPC SEM */
+#endif
+
+#ifndef	CSEMUN
+#define	CSEMUN		const union semun	/* for UNIX® SysV-IPC SEM */
 #endif
 
 

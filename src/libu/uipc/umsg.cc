@@ -74,7 +74,7 @@ using namespace	uipc ;			/* namespace */
 int u_msgget(key_t key,int msgflag) noex {
 	int		rs ;
 	int		to_nospc = utimeout[uto_nospc] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
 	    if ((rs = msgget(key,msgflag)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
@@ -134,8 +134,7 @@ int u_msgrcv(int msqid,void *msgp,int msgsz,long msgtype,int msgflag) noex {
 int u_msgctl(int msgid,int cmd,MSQIDDS *buf) noex {
 	int		rs ;
 	int		to_nospc = utimeout[uto_nospc] ;
-	int		f_exit = false ;
-
+	bool		f_exit = false ;
 	repeat {
 	    if ((rs = msgctl(msgid,cmd,buf)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
@@ -156,7 +155,6 @@ int u_msgctl(int msgid,int cmd,MSQIDDS *buf) noex {
 	       } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	return rs ;
 }
 /* end subroutine (u_msgctl) */

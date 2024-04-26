@@ -121,14 +121,10 @@ int u_pause() noex {
 }
 /* end subroutine (u_pause) */
 
-int u_alarm(const uint secs) noex {
-	uint		rem ;
+int u_alarm(const uint usec) noex {
+	uint		rem = alarm(usec) ;
 	int		rs ;
-	int		sec = (secs & INT_MAX) ;
-	if ((rem = alarm(sec)) < 0) {
-	    rs = (- errno) ;
-	}
-	if (rs >= 0) rs = (rem & INT_MAX) ;
+	rs = int(rem & INT_MAX) ;
 	return rs ;
 }
 /* end subroutine (u_alarm) */

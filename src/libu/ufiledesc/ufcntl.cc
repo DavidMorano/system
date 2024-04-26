@@ -1,4 +1,4 @@
-/* u_fcntl SUPPORT */
+/* ufcntl SUPPORT */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -20,6 +20,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<errno.h>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<stdlib.h>
 #include	<stdarg.h>
 #include	<usystem.h>
 #include	<localmisc.h>
@@ -50,11 +52,11 @@ int u_fcntl(int fd,int cmd,...) noex {
 	    rs = SR_INVALID ;
 	    if (cmd >= 0) {
 	        va_list		ap ;
-	        caddr_t		any ;
+	        caddr_t		cany ;
 	        va_begin(ap,cmd) ;
 		{
-	            any = va_arg(ap,caddr_t) ;
-		    rs = ufcntl(fd,cmd,any) ;
+	            cany = va_arg(ap,caddr_t) ;
+		    rs = ufcntl(fd,cmd,cany) ;
 		}
 	        va_end(ap) ;
 	    } /* end if (plausible-command) */
@@ -66,12 +68,14 @@ int u_fcntl(int fd,int cmd,...) noex {
 
 /* local subroutines */
 
-static int ufcntl(int fd,int cmd,caddr_t any) noex {
+static int ufcntl(int fd,int cmd,caddr_t cany) noex {
 	int		rs ;
 	int		to_intr = utimeout[uto_intr] ;
-	int		f_exit = false ;
+	bool		f_exit = false ;
 	repeat {
-	    if ((rs = fcntl(fd,cmd,any)) == -1) rs = (- errno) ;
+	    if ((rs = fcntl(fd,cmd,cany)) == -1) {
+		rs = (- errno) ;
+	    }
 	    if (rs < 0) {
 	        switch (rs) {
 	        case SR_INTR:

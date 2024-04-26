@@ -19,7 +19,7 @@
 
 /*******************************************************************************
 
-	This object provides a florified count-down timer.
+	This object provides a glorified count-down timer.
 
 *******************************************************************************/
 
@@ -43,7 +43,7 @@
 class timecount {
 	int		to ;
 public:
-	timecount(int a) : to(a*POLLMULT) { } ;
+	timecount(int a) : to(a * POLLMULT) { } ;
 	timecount(const timecount &) = delete ;
 	timecount &operator = (const timecount &) = delete ;
 	operator int () noex ;

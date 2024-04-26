@@ -75,12 +75,13 @@ namespace {
 	int		*pipes ;
 	cchar		*fname ;
 	int		dfd ;
+	int		tfd ;
 	int		pf ;
 	int		st ;
 	int		pr ;
 	int		flavor{} ;
 	opener() noex { } ;
-	opener(int adfd) noex : dfd(adfd) { } ;
+	opener(int adfd,int atfd = -1) noex : dfd(adfd), tfd(atfd) { } ;
 	opener(int apf,int ast,int apr,int *ap = nullptr) noex : pf(apf) {
 	    st = ast ;
 	    pr = apr ;
@@ -101,6 +102,8 @@ namespace {
 	int iopen(cchar *,int,mode_t) noex ;
 	int iopenat(cchar *,int,mode_t) noex ;
 	int isocket(cchar *,int,mode_t) noex ;
+	int idup1(cchar *,int,mode_t) noex ;
+	int idup2(cchar *,int,mode_t) noex ;
 	int isocketpair(cchar *,int,mode_t) noex ;
 	int ipipe(cchar *,int,mode_t) noex ;
 	int icloseonexec(int) noex ;
@@ -154,6 +157,22 @@ int u_socket(int pf,int st,int pr) noex {
 	return oo(np,0,0) ;
 }
 
+int u_dup(int sfd) noex {
+	opener		oo(sfd) ;
+	cnullptr	np{} ;
+	oo.m = &opener::idup1 ;
+	return oo(np,0,0) ;
+}
+/* end subroutine (u_dup) */
+
+int u_dup2(int sfd,int tfd) noex {
+	opener		oo(sfd,tfd) ;
+	cnullptr	np{} ;
+	oo.m = &opener::idup2 ;
+	return oo(np,0,0) ;
+}
+/* end subroutine (u_dup2) */
+
 int u_socketpair(int pf,int st,int pr,int *pipes) noex {
 	opener		oo(pf,st,pr,pipes) ;
 	cnullptr	np{} ;
@@ -194,6 +213,9 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 	int		rs ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nosr = utimeout[uto_nosr] ;
+	int		to_mfile = utimeout[uto_mfile] ;
+	int		to_nfile = utimeout[uto_nfile] ;
+	int		to_again = utimeout[uto_again] ;
 	int		fd = -1 ;
 	int		f_exit = false ;
 	of &= (~ OF_SPECIALMASK) ;
@@ -216,7 +238,27 @@ int opener::openjack(cchar *fname,int of,mode_t om) noex {
 			f_exit = true ;
 		    }
 		    break ;
-	        case SR_AGAIN:
+	            case SR_MFILE:
+	                if (to_mfile-- > 0) {
+			    msleep(1000) ;
+		        } else {
+			    f_exit = true ;
+		        }
+	                break ;
+	            case SR_NFILE:
+	                if (to_nfile-- > 0) {
+			    msleep(1000) ;
+		        } else {
+			    f_exit = true ;
+		        }
+	                break ;
+	            case SR_AGAIN:
+	                if (to_again-- > 0) {
+			    msleep(1000) ;
+		        } else {
+			    f_exit = true ;
+		        }
+	                break ;
 	        case SR_INTR:
 		    break ;
 		default:
@@ -272,6 +314,26 @@ int opener::isocket(cchar *,int,mode_t) noex {
 	return rs ;
 }
 /* end method (opener::isocket) */
+
+int opener::idup1(cchar *,int,mode_t) noex {
+	int		rs ;
+	if ((rs = dup(dfd)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (opener::idup1) */
+
+int opener::idup2(cchar *,int,mode_t) noex {
+	int		rs = SR_INVALID ;
+	if ((dfd >= 0) && (tfd >= 0)) {
+	    if ((rs = dup2(dfd,tfd)) < 0) {
+	        rs = (- errno) ;
+	    }
+	}
+	return rs ;
+}
+/* end method (opener::idup2) */
 
 int opener::isocketpair(cchar *,int,mode_t) noex {
 	int		rs = SR_FAULT ;
