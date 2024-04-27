@@ -33,7 +33,6 @@
 #include	<utypealiases.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
-#include	<localmisc.h>
 
 #include	"ucopeninfo.h"
 #include	"ucopen.h"

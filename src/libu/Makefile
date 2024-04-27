@@ -231,10 +231,10 @@ timewatch.o:		timewatch.cc timewatch.hh
 uuname.o:		uuname.cc
 usysauxinfo.o:		isysauxinfo.cc
 
-# OPEN
+# UOPEN
 uopen.o:		uopen.cc uopen.h
 
-# UIPC
+# UFILEDESC
 ufiledesc.o:		ufiledesc.dir
 ufiledes.dir:
 	makesubdir $@

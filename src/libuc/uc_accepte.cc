@@ -4,7 +4,6 @@
 /* interface component for UNIX® library-3c */
 /* extended read */
 
-#define	CF_DEBUGS	0		/* non-switchable debug printo-outs */
 
 /* revision history:
 
@@ -25,16 +24,12 @@
         it times out.
 
 	Synopsis:
-	int uc_accepte(fd,sap,sal,to)
-	int		fd ;
-	struct sockaddr	*sap ;
-	int		*sal ;
-	int		to ;
+	int uc_accepte(int fd,SOCKADDR *sap,int *salp,int to) noex
 
 	Arguments:
 	fd		file descriptor
 	sap		address to buffer to receive the "from" address
-	sal		pointer to the length of the "from" buffer
+	salp		pointer to the length of the "from" buffer
 	to		time in seconds to wait
 
 	Returns:
@@ -47,7 +42,8 @@
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<poll.h>
-#include	<climits>
+#include	<climits>		/* |INT_MAX| */
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
 #include	<bufprintf.h>
 #include	<localmisc.h>
@@ -64,9 +60,8 @@
 
 /* forward references */
 
-#if	CF_DEBUGS
-static char	*d_reventstr() ;
-#endif
+
+/* local variables */
 
 
 /* exported variables */
@@ -74,46 +69,18 @@ static char	*d_reventstr() ;
 
 /* exported subroutines */
 
-int uc_accepte(int fd,const void *sap,int *salp,int to) noex {
+int uc_accepte(int fd,cvoid *sap,int *salp,int to) noex {
 	int		rs = SR_OK ;
 	int		s = -1 ;
-
-#if	CF_DEBUGS
-	char	ebuf[EBUFLEN + 1] ;
-#endif
-
-#if	CF_DEBUGS
-	debugprintf("uc_accepte: fd=%d to=%d\n",
-	    fd,to) ;
-#endif
-
-	if (to < 0)
-	    to = INT_MAX ;
-
+	if (to < 0) to = INT_MAX ;
 	if (to >= 0) {
-	    POLLFD	fds[1] ;
-
+	    POLLFD	fds[1] = {} ;
 	    fds[0].fd = fd ;
 	    fds[0].events = POLLIN ;
-
 	    while (rs >= 0) {
 	        if ((rs = u_poll(fds,1,POLLINTMULT)) >= 0) {
-
-#if	CF_DEBUGS
-	            debugprintf("uc_accepte: back from POLL w/ rs=%d\n",
-	                rs) ;
-#endif
-
 	            if (rs > 0) {
-	                const int	re = fds[0].revents ;
-
-#if	CF_DEBUGS
-	                debugprintf("uc_accepte: events %s\n",
-	                    d_reventstr(fds[0].revents,ebuf,EBUFLEN)) ;
-
-	                debugprintf("uc_accepte: u_accept()\n") ;
-#endif
-
+	                cint	re = fds[0].revents ;
 	                if (re & POLLIN) {
 	                    rs = u_accept(fd,sap,salp) ;
 	                    s = rs ;
@@ -132,48 +99,15 @@ int uc_accepte(int fd,const void *sap,int *salp,int to) noex {
 	            if (s >= 0) break ;
 	        } else if (rs == SR_INTR) rs = SR_OK ;
 	    } /* end while */
-
-#if	CF_DEBUGS
-	    debugprintf("uc_accepte: rs=%d \n", rs) ;
-#endif
-
-	    if ((rs == 0) && (s < 0) && (to <= 0))
+	    if ((rs == 0) && (s < 0) && (to <= 0)) {
 	        rs = SR_TIMEDOUT ;
-
+	    }
 	} else {
 	    rs = u_accept(fd,sap,salp) ;
 	    s = rs ;
 	} /* end if */
-
-#if	CF_DEBUGS
-	debugprintf("uc_accepte: ret rs=%d \n", rs) ;
-#endif
-
 	return (rs >= 0) ? s : rs ;
 }
 /* end subroutine (uc_accepte) */
-
-
-#if	CF_DEBUGS
-static char *d_reventstr(revents,buf,buflen)
-int	revents ;
-char	buf[] ;
-int	buflen ;
-{
-	buf[0] = '\0' ;
-	bufprintf(buf,buflen,"%s %s %s %s %s %s %s %s %s",
-	    (revents & POLLIN) ? "I " : "  ",
-	    (revents & POLLRDNORM) ? "IN" : "  ",
-	    (revents & POLLRDBAND) ? "IB" : "  ",
-	    (revents & POLLPRI) ? "PR" : "  ",
-	    (revents & POLLWRNORM) ? "WN" : "  ",
-	    (revents & POLLWRBAND) ? "WB" : "  ",
-	    (revents & POLLERR) ? "ER" : "  ",
-	    (revents & POLLHUP) ? "HU" : "  ",
-	    (revents & POLLNVAL) ? "NV" : "  ") ;
-	return buf ;
-}
-/* end subroutine (d_reventstr) */
-#endif /* CF_DEBUGS */
 
 

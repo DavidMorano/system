@@ -57,14 +57,14 @@
 #ifdef	__cplusplus
 
 namespace uipc {
-    struct uipc ;
-    typedef int (uipc::*uipc_m)(int,void *) noex ;
-    struct uipc {
-	uipc_m		m ;
+    struct uipcbase ;
+    typedef int (uipcbase::*uipcbase_m)(int,void *) noex ;
+    struct uipcbase {
+	uipcbase_m	m = nullptr ;
 	key_t		key ;
-	uipc() noex { } ;
+	uipcbase() noex : key(0) { } ;
 	int operator () (int,void *) noex ;
-    } ; /* end struct (uipc) */
+    } ; /* end struct (uipcbase) */
 }
 
 #endif /* __cplusplus */

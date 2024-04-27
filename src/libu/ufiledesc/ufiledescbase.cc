@@ -1,4 +1,4 @@
-/* uipc SUPPORT (UNIX® System V IPC) */
+/* ufiledescbase SUPPORT (UNIX® System V IPC) */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -19,21 +19,19 @@
 	Names:
 
 	Description:
-	UNIX® System V Inter-Process-Communication (IPC)
+	UNIX® File-Descriptor system calls.
 
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-#include	<sys/ipc.h>		/* UNIX® Sys-V IPC */
-#include	<sys/shm.h>		/* UNIX® Sys-V IPC - SHM */
-#include	<sys/msg.h>		/* UNIX® Sys-V IPC - MSG */
-#include	<sys/sem.h>		/* UNIX® Sys-V IPC - SEM */
 #include	<unistd.h>
 #include	<climits>		/* |INT_MAX| */
 #include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
+#include	<cstdlib>
 #include	<cstdint>		/* |intptr_t| */
+#include	<cstring>
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
@@ -42,11 +40,15 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	"ufiledesc.h"
+
 
 /* local defines */
 
 
 /* imported namespaces */
+
+using namespace	ufiledesc ;		/* namespace */
 
 using std::nullptr_t ;			/* type */
 
@@ -68,14 +70,14 @@ using std::nullptr_t ;			/* type */
 
 /* exported subroutines */
 
-int uipc::operator int (int id,void *vp) noex {
+int ufiledescbase::operator () (int fd) noex {
 	int		rs = SR_FAULT ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
 	int		to_mfile = utimeout[uto_mfile] ;
 	bool		f_exit = false ;
 	repeat {
-	    if ((rs = (this->*m)(id,vp)) < 0) {
+	    if ((rs = (this->*m)(fd)) < 0) {
 	            switch (rs) {
 	            case SR_NOMEM:
 	                if (to_nomem-- > 0) {
@@ -108,6 +110,6 @@ int uipc::operator int (int id,void *vp) noex {
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
 }
-/* end method (uipc::operator) */
+/* end method (ufiledescbase::operator) */
 
 

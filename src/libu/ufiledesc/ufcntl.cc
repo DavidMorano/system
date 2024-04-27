@@ -19,10 +19,10 @@
 #include	<sys/types.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<errno.h>
+#include	<cerrno>
 #include	<cstddef>		/* |nullptr_t| */
-#include	<stdlib.h>
-#include	<stdarg.h>
+#include	<cstdlib>
+#include	<cstdarg>
 #include	<usystem.h>
 #include	<localmisc.h>
 

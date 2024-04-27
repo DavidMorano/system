@@ -30,6 +30,7 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
+#include	<sys/socket.h>		/* |SOCKADDR| */
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<climits>		/* |INT_MAX| */
@@ -43,6 +44,23 @@
 #include	<usupport.h>
 #include	<clanguage.h>
 
+
+#ifdef	__cplusplus
+
+namespace ufiledesc {
+    struct ufiledescbase ;
+    typedef int (ufiledescbase::*ufiledescbase_m)(int) noex ;
+    struct ufiledescbase {
+	ufiledescbase_m	m ;
+	int		fd ;
+	int		sal ;
+	SOCKADDR	*sap = nullptr ;
+	ufiledescbase() noex : fd(-1), sal(0) { } ;
+	int operator () (int) noex ;
+    } ; /* end struct (ufiledescbase) */
+}
+
+#endif /* __cplusplus */
 
 
 #endif /* UFILEDESC_INCLUDE */

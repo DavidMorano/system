@@ -58,6 +58,12 @@
 #define	POLLMULT	1000
 #endif
 
+#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
+#define	F_STREAMS	1
+#else
+#define	F_STREAMS	0
+#endif
+
 
 /* external subroutines */
 
@@ -79,6 +85,8 @@ static int acceptpass_poll(int,STRRECVFD *,int) noex ;
 
 /* local variables */
 
+constexpr bool		f_streams = F_STREAMS ;
+
 
 /* exported variables */
 
@@ -86,15 +94,18 @@ static int acceptpass_poll(int,STRRECVFD *,int) noex ;
 /* exported subroutines */
 
 int u_acceptpass(int fd_pass,STRRECVFD *sp,int to) noex {
-	STRRECVFD	dummy ;
 	int		rs = SR_BADF ;
-	if (sp == nullptr) sp = &dummy ;
 	if (fd_pass >= 0) {
-	    if (to >= 0) {
-	        rs = acceptpass_poll(fd_pass,sp,to) ;
-	    } else {
-	        rs = acceptpass_stall(fd_pass,sp) ;
-	    }
+	    rs = SR_NOSYS ;
+	    if_constexpr (f_streams) {
+	        STRRECVFD	dummy ;
+	        if (sp == nullptr) sp = &dummy ;
+	        if (to >= 0) {
+	            rs = acceptpass_poll(fd_pass,sp,to) ;
+	        } else {
+	            rs = acceptpass_stall(fd_pass,sp) ;
+	        }
+	    } /* enf if_constexpr (f_streams) */
 	} /* end if (valid) */
 	return rs ;
 }
@@ -148,10 +159,9 @@ static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 static int acceptpass_stall(int fd_pass,STRRECVFD *sp) noex {
 	int		rs = SR_OK ;
 	int		pfd = -1 ;
-	while (rs >= 0) {
+	while (rs != SR_OK) {
 	    rs = u_ioctl(fd_pass,I_RECVFD,sp) ;
 	    pfd = sp->fd ;
-	    if (rs >= 0) break ;
 	    if ((rs == SR_BADMSG) || (rs == SR_INTR)) {
 		rs = SR_OK ;
 	    }

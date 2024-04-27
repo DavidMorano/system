@@ -29,6 +29,7 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 #include	<sys/types.h>
+#include	<sys/socket.h>
 #include	<unistd.h>
 #include	<fcntl.h>
 #include	<utypedefs.h>
@@ -83,6 +84,8 @@ EXTERNC_begin
 extern int u_open(cchar *,int,mode_t) noex ;
 extern int u_openat(int,cchar *,int,mode_t) noex ;
 extern int u_socket(int,int,int) noex ;
+extern int u_accept(int,SOCKADDR *,int *) noex ;
+extern int u_acceptpass(int) noex ;
 extern int u_dup(int) noex ;
 extern int u_dup2(int,int) noex ;
 /* special */

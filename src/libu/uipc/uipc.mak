@@ -56,7 +56,7 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ_UIPC= ushm.o umsg.o usem.o
+OBJ_UIPC= uipcbase.o ushm.o umsg.o usem.o
 
 
 default:		$(T).o
@@ -109,7 +109,7 @@ printincs:
 	printincs $(INCS)
 
 
-uipc.o:		uipc.cc		$(INCS)
+uipcbase.o:	uipcbase.cc	$(INCS)
 
 ushm.o:		ushm.cc		$(INCS)
 umsg.o:		umsg.cc		$(INCS)
