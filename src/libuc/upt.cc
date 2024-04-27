@@ -88,14 +88,14 @@ int uptcreate(pthread_t *rp,PTA *ptap,uptsub_f start,void *arg) noex {
 	        sigset_t	osm ;
 	        sigset_t	nsm ;
 	        uc_sigsetfill(&nsm) ;
-	        if ((rs = pt_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
+	        if ((rs = u_sigmask(SIG_BLOCK,&nsm,&osm)) >= 0) {
 	            oap->ap = arg ;
 	            oap->start = start ;
 		    if ((rs = uptcreator(rp,ptap,oap)) >= 0) {
 			uintptr_t	ut = uintptr_t(*rp) ;
 		        tid = int(ut & INT_MAX) ;
 		    }
-		    rs1 = pt_sigmask(SIG_SETMASK,&osm,nullptr) ;
+		    rs1 = u_sigmask(SIG_SETMASK,&osm,nullptr) ;
 		    if (rs >= 0) rs = rs1 ;
 	        } /* end if (sigblock) */
 	        if ((rs < 0) && (tid < 0)) {

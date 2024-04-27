@@ -101,6 +101,7 @@ extern int	u_setsid() noex ;
 
 extern int	u_sigaction(int,SIGACTION *,SIGACTION *) noex ;
 extern int	u_sigprocmask(int,sigset_t *,sigset_t *) noex ;
+extern int	u_sigmask(int,sigset_t *,sigset_t *) noex ;
 extern int	u_sigsuspend(const sigset_t *) noex ;
 extern int	u_sigwait(const sigset_t *,int *) noex ;
 extern int	u_sigpending(sigset_t *) noex ;
@@ -114,6 +115,7 @@ extern int	u_setcontext(const ucontext_t *) noex ;
 
 extern int	u_fork() noex ;
 extern int	u_vfork() noex ;
+extern int	u_atfork(void_f,void_f,void_f) noex ;
 extern int	u_execve(cchar *,mainv,mainv) noex ;
 extern int	u_execv(cchar *,mainv) noex ;
 extern int	u_execvp(cchar *,mainv) noex ;

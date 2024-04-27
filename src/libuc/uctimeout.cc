@@ -673,7 +673,7 @@ int uctimeout::sigbegin() noex {
 	int		rs ;
 	uc_sigsetempty(&ss) ;
 	uc_sigsetadd(&ss,sig) ;
-	if ((rs = pt_sigmask(scmd,&ss,&oss)) >= 0) {
+	if ((rs = u_sigmask(scmd,&ss,&oss)) >= 0) {
 	    if ((rs = uc_sigsetismem(&ss,sig)) > 0) {
 	        fl.wasblocked = true ;
 	    }
@@ -690,7 +690,7 @@ int uctimeout::sigend() noex {
 	    cint	sig = SIGTIMEOUT ;
 	    uc_sigsetempty(&ss) ;
 	    uc_sigsetadd(&ss,sig) ;
-	    rs = pt_sigmask(scmd,&ss,nullptr) ;
+	    rs = u_sigmask(scmd,&ss,nullptr) ;
 	}
 	return rs ;
 }

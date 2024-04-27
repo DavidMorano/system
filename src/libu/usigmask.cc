@@ -1,5 +1,5 @@
-/* pt_sigmask */
-/* lang=C20 */
+/* u_sigmask SUPPORT */
+/* lang=C++20 */
 
 /* set a p-thread signal mask */
 /* version %I% last-modified %G% */
@@ -25,20 +25,34 @@
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
 #include	<pthread.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
+#include	<climits>
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<clanguage.h>
+
+
+/* local defines */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
 
-int pt_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
+int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
 	int		rs ;
 	errno = 0 ;
 	rs = pthread_sigmask(how,setp,osetp) ;
 	if (rs != 0) rs = (- errno) ;
 	return rs ;
 }
-/* end subroutine (pt_sigmask) */
+/* end subroutine (u_sigmask) */
 
 

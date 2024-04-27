@@ -44,8 +44,7 @@ EXTERNC_begin
 typedef void (*void_f)() noex ;
 #endif
 
-extern int	pt_sigmask(int,sigset_t *,sigset_t *) noex ;
-extern int	pt_atfork(void_f,void_f,void_f) noex ;
+extern int	u_sigmask(int,sigset_t *,sigset_t *) noex ;
 
 EXTERNC_end
 

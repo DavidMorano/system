@@ -51,8 +51,7 @@ namespace ufiledesc {
     struct ufiledescbase ;
     typedef int (ufiledescbase::*ufiledescbase_m)(int) noex ;
     struct ufiledescbase {
-	ufiledescbase_m	m ;
-	int		fd ;
+	ufiledescbase_m	m = nullptr ;
 	int		sal ;
 	SOCKADDR	*sap = nullptr ;
 	ufiledescbase() noex : fd(-1), sal(0) { } ;

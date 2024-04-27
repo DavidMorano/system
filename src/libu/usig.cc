@@ -21,7 +21,7 @@
 	Set the process signal mask (to something).  When there are
 	more than one thread in the proces, this only sets the
 	signal mask of the thread it is called from.  A cousin of
-	this system call is the call |pt_sigmask(3u)|, which is
+	this system call is the call |u_sigmask(3u)|, which is
 	supposed to be for thread specific use.
 
 *******************************************************************************/

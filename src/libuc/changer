@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} isValidMagic "
+NAMES="${NAMES} pt_sigmask"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/isValidMagic/s//hasValidMagic/g
+g/pt_sigmask/s//u_sigmask/g
 	w
 	q
 EOF
