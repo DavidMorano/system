@@ -67,6 +67,16 @@ extern int u_bind(int,cvoid *,int) noex ;
 extern int u_listen(int,int) noex ;
 extern int u_setsockopt(int,int,int,cvoid *,int) noex ;
 extern int u_getsockopt(int,int,int,void *,int *) noex ;
+extern int u_getpeername(int,void *,int *) noex ;
+extern int u_getsockname(int,void *,int *) noex ;
+extern int u_send(int,cvoid *,int,int) noex ;
+extern int u_sendmsg(int,CMSGHDR *,int) noex ;
+extern int u_sendto(int,cvoid *,int,int,cvoid *,int) noex ;
+extern int u_recv(int,void *,int,int) noex ;
+extern int u_recvmsg(int,MSGHDR *,int) noex ;
+extern int u_recvfrom(int,void *,int,int,void *,int *) noex ;
+extern int u_connect(int,cvoid *,int) noex ;
+extern int u_shutdown(int,int) noex ;
 
 EXTERNC_end
 

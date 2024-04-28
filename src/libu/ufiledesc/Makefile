@@ -131,5 +131,6 @@ obj4_ufiledesc.o:	$(OBJ4_UFILEDESC)
 ufiledescbase.o:	ufiledescbase.cc	$(INCS)
 
 usocket.o:		usocket.cc		$(INCS)
+uconnect.o:		uconnect.cc		$(INCS)
 
 
