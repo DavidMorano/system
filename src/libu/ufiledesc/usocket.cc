@@ -185,6 +185,7 @@ namespace {
 	int irecv(int) noex ;
 	int irecvmsg(int) noex ;
 	int irecvfrom(int) noex ;
+	int ishutdown(int) noex ;
     } ; /* end struct (usocket) */
 }
 
@@ -315,6 +316,13 @@ int u_recvfrom(int fd,void *rbuf,int rlen,int flags,void *vp,int *lenp) noex {
 	return rs ;
 }
 /* end subroutine (u_recvfrom) */
+
+int u_shutdown(int fd,int dir) noex {
+	usocket	so(dir) ;
+	so.m = &usocket::ishutdown ;
+	return so(fd) ;
+}
+/* end subroutine (u_shutdown) */
 
 
 /* local subroutines */
@@ -456,62 +464,13 @@ int usocket::irecvfrom(int fd) noex {
 }
 /* end method (usocket::irecvfrom) */
 
-
-#ifdef	COMMENT
-
-
-int u_recvmsg(int fd,MSGHDR *msgp,int fl) noex {
+int usocket::ishutdown(int fd) noex {
 	int		rs ;
-	repeat {
-	    rs = recvmsg(fd,msgp,fl) ;
-	    if (rs < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	if ((rs = shutdown(fd,sal)) < 0) {
+	    rs = (- errno) ;
+	}
 	return rs ;
 }
-/* end subroutine (u_recvmsg) */
-
-int u_shutdown(int fd,int dir) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = shutdown(fd,dir)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_AGAIN:
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
-}
-/* end subroutine (u_shutdown) */
-
-#endif /* COMMENT */
+/* end method (usocket::ishutdown) */
 
 
