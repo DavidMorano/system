@@ -78,8 +78,8 @@
 #define	CODEBUFLEN	40
 #endif
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	NOFILE
@@ -1372,7 +1372,7 @@ static int procserve(PROGINFO *pip,cchar *mntfname)
 	fds[nfds].fd = -1 ;
 	fds[nfds].events = 0 ;
 
-	pto = (to * POLLMULT) ;
+	pto = (to * POLL_INTMULT) ;
 	while ((rs >= 0) && (! if_exit) && (! if_int)) {
 
 	    rs = u_poll(fds,nfds,pto) ;

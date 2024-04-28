@@ -135,8 +135,8 @@
 
 #define	O_SRVFLAGS	(O_RDWR | O_CREAT)
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	TIMEBUFLEN
@@ -454,7 +454,7 @@ int mfswatch_service(PROGINFO *pip)
 static int mfswatch_uptimer(PROGINFO *pip)
 {
 	MFSWATCH	*wip = pip->watch ;
-	const int	max = (pip->intpoll * POLLINTMULT) ;
+	const int	max = (pip->intpoll * POLL_INTMULT) ;
 	int		njobs ;
 
 	njobs = (wip->nprocs + wip->nthrs + wip->nbuilts) ;

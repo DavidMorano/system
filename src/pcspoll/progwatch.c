@@ -97,7 +97,7 @@
 
 #define	TO_STAMPLOCK	0		/* stamp-file lock */
 
-#define	POLLMULT	1000
+#define	POLL_INTMULT	1000
 
 #define	JOBFRACTION	10
 
@@ -577,7 +577,7 @@ vecstr		*snp ;
 	if (rs >= 0) {
 #if	CF_POLL
 	    {
-		cint	pto = (to_poll * POLLMULT) ;
+		cint	pto = (to_poll * POLL_INTMULT) ;
 	        fds[0].fd = -1 ;
 	        rs1 = u_poll(fds,0,pto) ;
 	    }

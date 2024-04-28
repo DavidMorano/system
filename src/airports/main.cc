@@ -133,8 +133,8 @@
 #define	MAXARGINDEX	10000
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #define	DEBUGFNAME	"/tmp/msu.deb"

@@ -62,8 +62,8 @@
 
 /* local defines */
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000		/* poll() takes milliseconds ! */
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000		/* poll() takes milliseconds ! */
 #endif
 
 #ifndef	POLLTIMEINT
@@ -137,7 +137,7 @@ int uc_recve(int fd,void *rbuf,int rlen,int mflags,int to,int opts) noex {
 	        pollint,to) ;
 #endif
 
-	    if ((rs = u_poll(fds,1,(pollint * POLLMULT))) > 0) {
+	    if ((rs = u_poll(fds,1,(pollint * POLL_INTMULT))) > 0) {
 
 #if	CF_DEBUGS
 	        debugprintf("uc_recve: events %s\n",

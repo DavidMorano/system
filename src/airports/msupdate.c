@@ -242,7 +242,7 @@ LFM		*lp ;
 
 	        for (i = 0 ; (! if_int) && (i < pip->pollint) ; i += 1) {
 
-	            rs1 = u_poll(fds,nfds,POLLINTMULT) ;
+	            rs1 = u_poll(fds,nfds,POLL_INTMULT) ;
 
 	            if (rs1 < 0)
 	                if_int = TRUE ;

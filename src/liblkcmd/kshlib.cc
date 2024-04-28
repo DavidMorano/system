@@ -2013,7 +2013,7 @@ static int kshlib_reqrecv(KSHLIB *uip,MSGDATA *mip)
 {
 	struct pollfd	fds[1] ;
 	const int	fd = uip->sfd ;
-	const int	mto = (uip->intpoll*POLLINTMULT) ;
+	const int	mto = (uip->intpoll*POLL_INTMULT) ;
 	const int	nfds = 1 ;
 	int		size ;
 	int		rs ;

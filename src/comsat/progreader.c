@@ -72,8 +72,8 @@
 
 #define	DISP		struct disp
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000		/* poll-time multiplier */
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000		/* poll-time multiplier */
 #endif
 
 #define	NFDS		2
@@ -407,7 +407,7 @@ static int subinfo_reader(SUBINFO *sip,DISP *dop)
 #endif
 
 	while (rs >= 0) {
-	    int	pollwait = (to_poll*POLLINTMULT) ;
+	    int	pollwait = (to_poll*POLL_INTMULT) ;
 
 #if	CF_DEBUG && 0
 	    if (DEBUGLEVEL(4)) {

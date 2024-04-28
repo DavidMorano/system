@@ -66,8 +66,8 @@
 
 #define	INTPOLL		10		/* seconds */
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 
@@ -95,7 +95,7 @@ int uc_waitwritable(int fd,int timeout)
 	time_t		dt = 0 ;
 	time_t		ti_timeout = 0 ;
 	int		rs = SR_OK ;
-	int		pollto = (INTPOLL*POLLMULT) ;
+	int		pollto = (INTPOLL*POLL_INTMULT) ;
 	int		nfds = 0 ;
 	int		f = FALSE ;
 
@@ -107,7 +107,7 @@ int uc_waitwritable(int fd,int timeout)
 	if (timeout >= 0) {
 	    dt = time(NULL) ;
 	    ti_timeout = (dt + timeout) ;
-	    pollto = MIN(timeout,5) * POLLMULT ;
+	    pollto = MIN(timeout,5) * POLL_INTMULT ;
 	}
 
 	polls[nfds].fd = fd ;

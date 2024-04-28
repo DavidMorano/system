@@ -183,8 +183,8 @@ typedef const char	cchar ;
 #define	ENVBUFLEN	2048
 #endif
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #define	COLS_USERNAME	8
@@ -2272,7 +2272,7 @@ static int procserver(PROGINFO *pip,LFM *plp,int sfd)
 	        fds[i].fd = -1 ;
 	        fds[i].events = 0 ;
 
-	        pto = (to * POLLMULT) ;
+	        pto = (to * POLL_INTMULT) ;
 	        while (rs >= 0) {
 
 	            if ((rs = u_poll(fds,1,pto)) > 0) {

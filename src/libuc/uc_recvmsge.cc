@@ -59,7 +59,7 @@
 
 /* local defines */
 
-#define	POLLMULT	1000		/* poll() takes milliseconds! */
+#define	POLL_INTMULT	1000		/* poll() takes milliseconds! */
 #define	TO_POLL		10
 #define	EBUFLEN		100
 
@@ -132,7 +132,7 @@ int		opts ;
 	    int	f_break = FALSE ;
 	    f_first = FALSE ;
 
-	    if ((rs = u_poll(fds,nfds,(pollint * POLLMULT))) > 0) {
+	    if ((rs = u_poll(fds,nfds,(pollint * POLL_INTMULT))) > 0) {
 		const int	re = fds[0].revents ;
 
 		if ((re & POLLIN) || (re & POLLPRI)) {

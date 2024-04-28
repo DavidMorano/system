@@ -129,8 +129,8 @@
 #define	MAXARGINDEX	10000
 #define	MAXARGGROUPS	(MAXARGINDEX/8 + 1)
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #define	DEBUGFNAME	"/tmp/msu.deb"
@@ -1923,7 +1923,7 @@ LFM		*lp ;
 
 	        for (i = 0 ; (! if_int) && (i < pip->pollint) ; i += 1) {
 
-	            rs1 = u_poll(fds,nfds,POLLINTMULT) ;
+	            rs1 = u_poll(fds,nfds,POLL_INTMULT) ;
 
 	            if (rs1 < 0)
 	                if_int = TRUE ;

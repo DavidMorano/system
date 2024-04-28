@@ -2,7 +2,7 @@
 # CHANGER
 
 NAMES=
-NAMES="${NAMES} pt_sigmask"
+NAMES="${NAMES} POLLINTMULT"
 
 
 DN=/dev/null
@@ -12,7 +12,7 @@ for F in "${@}" ; do
     for N in ${NAMES} ; do
       if fgrep "${N}" $F > ${DN} ; then
       ed - $F <<\EOF
-g/pt_sigmask/s//u_sigmask/g
+g/POLLINTMULT/s//POLL_INTMULT/g
 	w
 	q
 EOF

@@ -58,8 +58,8 @@
 
 /* local defines */
 
-#ifndef	TO_POLLMULT
-#define	TO_POLLMULT	1000
+#ifndef	TO_POLL_INTMULT
+#define	TO_POLL_INTMULT	1000
 #endif
 
 #ifndef	PBUFLEN

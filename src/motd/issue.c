@@ -114,8 +114,8 @@
 #define	DIGBUFLEN	40		/* can hold int128_t in decimal */
 #endif
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #define	PBUFLEN		MAXPATHLEN
@@ -1640,7 +1640,7 @@ static int writeto(int wfd,cchar *wbuf,int wlen,int wto)
 	fds[i].events = 0 ;
 
 	ti_write = dt ;
-	pto = (pt * POLLMULT) ;
+	pto = (pt * POLL_INTMULT) ;
 	while ((rs >= 0) && (tlen < wlen)) {
 
 	    rs = u_poll(fds,1,pto) ;

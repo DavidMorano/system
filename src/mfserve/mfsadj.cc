@@ -66,8 +66,8 @@
 #define	MFSADJ		struct mfsadj
 #define	MFSADJ_FL	struct mfsadj_fl
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	PBUFLEN

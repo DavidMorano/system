@@ -54,8 +54,8 @@
 #define	STRRECVFD	struct strrecvfd
 #endif
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
@@ -126,7 +126,7 @@ static int acceptpass_poll(int fd_pass,STRRECVFD *sp,int to) noex {
 	pfds[nfds].events = (POLLIN | POLLPRI) ;
 	nfds += 1 ;
 	ti_start = ti_now ;
-	while ((rs = u_poll(pfds,nfds,POLLMULT)) >= 0) {
+	while ((rs = u_poll(pfds,nfds,POLL_INTMULT)) >= 0) {
 	    ti_now = time(nullptr) ;
 	    if (rs > 0) {
 		for (int i = 0 ; (rs >= 0) && (i < nfds) ; i += 1) {

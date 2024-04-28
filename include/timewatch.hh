@@ -37,15 +37,15 @@
 #include	<clanguage.h>
 
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 
 class timewatch {
 	int		mto ;		/* millisecond-timeout */
 public:
-	timewatch(int a) : mto(a * POLLMULT) { } ;
+	timewatch(int a) : mto(a * POLL_INTMULT) { } ;
 	timewatch(const timewatch &) = delete ;
 	timewatch &operator = (const timewatch &) = delete ;
 	template<typename L>

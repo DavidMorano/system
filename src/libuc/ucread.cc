@@ -96,8 +96,8 @@
 
 #define	BUFLEN		2048
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #define	POLLEVENTS	(POLLIN | POLLPRI)
@@ -241,7 +241,7 @@ static int readline_stream(int fd,char *lbuf,int llen,int to) noex {
 	while ((rs >= 0) && (tlen < llen) && (to >= 0)) {
 	    pd.databuf.buf = (lbuf + tlen) ;
 	    pd.databuf.maxlen = (llen - tlen) ;
-	    if ((rs = u_poll(fds,1,POLLINTMULT)) > 0) {
+	    if ((rs = u_poll(fds,1,POLL_INTMULT)) > 0) {
 	        if ((rs = u_ioctl(fd,I_PEEK,&pd)) >= 0) {
 	            len = pd.databuf.len ;
 /* is there a NL present? */

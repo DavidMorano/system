@@ -119,8 +119,8 @@
 #define	NOFILE		20
 #endif
 
-#ifndef	INTPOLLMULT
-#define	INTPOLLMULT	1000
+#ifndef	INTPOLL_INTMULT
+#define	INTPOLL_INTMULT	1000
 #endif
 
 #ifndef	VBUFLEN
@@ -1657,7 +1657,7 @@ LFM		*lp ;
 
 	        for (i = 0 ; (i < pip->intpoll) ; i += 1) {
 
-	            rs1 = u_poll(fds,nfds,INTPOLLMULT) ;
+	            rs1 = u_poll(fds,nfds,INTPOLL_INTMULT) ;
 
 	        } /* end for */
 

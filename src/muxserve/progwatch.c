@@ -104,8 +104,8 @@
 
 #define	O_SRVFLAGS	(O_RDWR | O_CREAT)
 
-#ifndef	POLLINTMULT
-#define	POLLINTMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	TIMEBUFLEN
@@ -835,8 +835,8 @@ static int procwatchpoll(PROGINFO *pip,SUBINFO *wip)
 
 	if (wip->mintpoll < 10) {
 	    wip->mintpoll = 10 ;
-	} else if (wip->mintpoll > POLLINTMULT) {
-	    wip->mintpoll = POLLINTMULT ;
+	} else if (wip->mintpoll > POLL_INTMULT) {
+	    wip->mintpoll = POLL_INTMULT ;
 	}
 
 	if (if_child) {

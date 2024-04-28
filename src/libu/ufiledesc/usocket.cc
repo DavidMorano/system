@@ -123,6 +123,13 @@ namespace {
 	    lenp = vlp ;
 	} ;
 	usocket() noex { } ;
+	int callstd(int fd) noex override {
+	    int		rs = SR_BUGCHECK ;
+	    if (m) {
+		rs = (this->*m)(fd) ;
+	    }
+	    return rs ;
+	} ;
 	int ibind(int) noex ;
 	int ilisten(int) noex ;
 	int isetsockopt(int) noex ;

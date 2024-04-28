@@ -35,15 +35,15 @@
 #include	<clanguage.h>
 
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 
 class timecount {
-	int		to ;
+	int		to ;		/* milliseconds */
 public:
-	timecount(int a) : to(a * POLLMULT) { } ;
+	timecount(int a) : to(a * POLL_INTMULT) { } ;
 	timecount(const timecount &) = delete ;
 	timecount &operator = (const timecount &) = delete ;
 	operator int () noex ;

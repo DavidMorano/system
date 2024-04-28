@@ -49,12 +49,13 @@
 
 namespace ufiledesc {
     struct ufiledescbase {
-	char		*rbuf ;
 	cchar		*wbuf ;
-	int		rlen ;
+	char		*rbuf ;
 	int		wlen ;
+	int		rlen ;
 	ufiledescbase() noex { } ;
 	int operator () (int) noex ;
+	virtual int callstd(int) noex = 0 ;
     } ; /* end struct (ufiledescbase) */
 }
 

@@ -51,7 +51,7 @@
 
 /* local defines */
 
-#define	POLLINTMULT	1000		/* poll-time multiplier */
+#define	POLL_INTMULT	1000		/* poll-time multiplier */
 #define	EBUFLEN		100
 
 
@@ -78,7 +78,7 @@ int uc_accepte(int fd,cvoid *sap,int *salp,int to) noex {
 	    fds[0].fd = fd ;
 	    fds[0].events = POLLIN ;
 	    while (rs >= 0) {
-	        if ((rs = u_poll(fds,1,POLLINTMULT)) >= 0) {
+	        if ((rs = u_poll(fds,1,POLL_INTMULT)) >= 0) {
 	            if (rs > 0) {
 	                cint	re = fds[0].revents ;
 	                if (re & POLLIN) {

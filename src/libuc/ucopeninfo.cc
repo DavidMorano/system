@@ -119,7 +119,7 @@
 #define	SVCBUFLEN	MAXNAMELEN
 
 #define	NPOLLS		2
-#define	POLLMULT	1000
+#define	POLL_INTMULT	1000
 
 
 /* external subroutines */
@@ -814,7 +814,7 @@ static int waitready(int fd,int oflags,int timeout) noex {
 	    time_t	ti_timeout ;
 	    time_t	daytime = time(nullptr) ;
 	    int		sz = NPOLLS * sizeof(POLLFD) ;
-	    int		pollto = ((timeout > 0) ? POLLMULT : 0) ;
+	    int		pollto = ((timeout > 0) ? POLL_INTMULT : 0) ;
 
 	    polls[0].fd = fd ;
 	    polls[0].events = (f_rdonly) ? POLLIN : POLLOUT ;

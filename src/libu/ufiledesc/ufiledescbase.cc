@@ -38,6 +38,7 @@
 #include	<usyscalls.h>
 #include	<usupport.h>
 #include	<clanguage.h>
+#include	<errtimer.hh>
 #include	<localmisc.h>
 
 #include	"ufiledesc.h"
@@ -71,51 +72,39 @@ using std::nullptr_t ;			/* type */
 /* exported subroutines */
 
 int ufiledescbase::operator () (int fd) noex {
-	int		rs = SR_FAULT ;
-	int		to_nomem = utimeout[uto_nomem] ;
-	int		to_nospc = utimeout[uto_nospc] ;
-	int		to_nobufs = utime[uto_nobufs] ;
-	int		to_mfile = utimeout[uto_mfile] ;
-	bool		f_exit = false ;
+	int		rs ;
+	errtimer	to_nomem = utimeout[uto_nomem] ;
+	errtimer	to_nospc = utimeout[uto_nospc] ;
+	errtimer	to_nobufs = utimeout[uto_nobufs] ;
+	errtimer	to_mfile = utimeout[uto_mfile] ;
+	errtimer	to_nfile = utimeout[uto_nfile] ;
+	reterr		r ;
 	repeat {
-	    if ((rs = (this->*m)(fd)) < 0) {
+	    if ((rs = callstd(fd)) < 0) {
+		r(rs) ;
                 switch (rs) {
                 case SR_NOMEM:
-                    if (to_nomem-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
+                    r = to_nomem(rs) ;
                     break ;
                 case SR_NOSPC:
-                    if (to_nospc-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
-                    break ;
+                    r = to_nospc(rs) ;
+		    break ;
 	        case SR_NOBUFS:
-	            if (to_nobufs-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
+	            r = to_nobufs(rs) ;
 	            break ;
                 case SR_MFILE:
-                    if (to_mfile-- > 0) {
-                        msleep(1000) ;
-                    } else {
-                        f_exit = true ;
-                    }
+                    r = to_mfile(rs) ;
+                    break ;
+                case SR_NFILE:
+                    r = to_nfile(rs) ;
                     break ;
                 case SR_INTR:
-                    break ;
-                default:
-                    f_exit = true ;
+		    r(false) ;
                     break ;
                 } /* end switch */
+		rs = r ;
             } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
+	} until ((rs >= 0) || r.fexit) ;
 	return rs ;
 }
 /* end method (ufiledescbase::operator) */

@@ -66,7 +66,7 @@
 
 /* local defines */
 
-#define	POLLINTMULT	1000		/* poll-time multiplier */
+#define	POLL_INTMULT	1000		/* poll-time multiplier */
 #define	POLLTIMEOUT	200		/* milliseconds */
 
 #ifndef	HEXBUFLEN

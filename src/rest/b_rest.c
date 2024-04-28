@@ -82,8 +82,8 @@ typedef cchar	cchar ;
 
 #define	PCSPOLL_NAME	"poll"
 
-#ifndef	POLLMULT
-#define	POLLMULT	1000
+#ifndef	POLL_INTMULT
+#define	POLL_INTMULT	1000
 #endif
 
 #ifndef	VARHOME

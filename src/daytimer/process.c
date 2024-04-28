@@ -428,7 +428,7 @@ MAILFILES	*mfp ;
 #if	CF_POLL
 	    if (! f_displaying) {
 
-	        rs1 = u_poll(fds,1,(POLLMULT * pip->pollint)) ;
+	        rs1 = u_poll(fds,1,(POLL_INTMULT * pip->pollint)) ;
 
 	        if (rs1 >= 0) {
 
