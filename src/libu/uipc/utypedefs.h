@@ -197,6 +197,11 @@ typedef const void		cvoid ;
 typedef const size_t		csize ;
 #endif /* TYPEDEF_CSIZE */
 
+#ifndef	TYPEDEF_CSOCKLEN
+#define	TYPEDEF_CSOCKLEN
+typedef const socklen_t		csocklen ;
+#endif /* TYPEDEF_CSOCKLEN */
+
 #ifndef	TYPEDEF_CMODE
 #define	TYPEDEF_CMODE
 typedef const mode_t		cmode ;

@@ -49,8 +49,8 @@
 
 namespace ufiledesc {
     struct ufiledescbase {
-	cchar		*wbuf ;
-	char		*rbuf ;
+	cvoid		*wbuf ;
+	void		*rbuf ;
 	int		wlen ;
 	int		rlen ;
 	ufiledescbase() noex { } ;

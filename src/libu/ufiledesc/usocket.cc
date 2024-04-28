@@ -82,6 +82,8 @@
 
 /* local defines */
 
+#define	CSA	CSOCKADDR
+
 
 /* imported namespaces */
 
@@ -105,6 +107,7 @@ namespace {
     struct usocket : ufiledescbase {
 	usocket_m	m = nullptr ;
 	CSOCKADDR	*sap ;
+	MSGHDR		*msgp ;
 	cvoid		*valp ;
 	int		*lenp ;
 	int		sal ;
@@ -132,16 +135,20 @@ namespace {
 	} ;
 	usocket(cvoid *vp,int *lp) noex : lenp(lp) { 
 	    sap = (CSOCKADDR *) vp ;
-	} ;
-	usocket(cchar *wb,int wl,int fl) noex {
+	} 
+	usocket(cvoid *wb,int wl,int fl,cvoid *vp = nullptr,int l = 0) noex {
+	    sap = (CSA *) vp ;
+	    sal = l ;
 	    wbuf = wb ;
 	    wlen = wl ;
 	    flags = fl ;
 	} ;
-	usocket(char *rb,int rl,int fl) noex {
+	usocket(void *rb,int rl,int fl) noex : flags(fl) {
 	    rbuf = rb ;
 	    rlen = rl ;
-	    flags = fl ;
+	} ;
+	usocket(MSGHDR *mp,int fl) noex : flags(fl) {
+	    msgp = mp ;
 	} ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
@@ -157,6 +164,8 @@ namespace {
 	int igetpeername(int) noex ;
 	int igetsockname(int) noex ;
 	int isend(int) noex ;
+	int isendmsg(int) noex ;
+	int isendto(int) noex ;
     } ; /* end struct (usocket) */
 }
 
@@ -222,16 +231,38 @@ int u_getsockname(int fd,void *sap,int *lenp) noex {
 }
 /* end subroutine (u_getsockname) */
 
-int u_send(int fd,char *rbuf,int rlen,int flags) noex {
+int u_send(int fd,cvoid *wbuf,int wlen,int flags) noex {
 	int		rs = SR_FAULT ;
-	if (rbuf) {
-	    usocket	so(rbuf,rlen,flags) ;
+	if (wbuf) {
+	    usocket	so(wbuf,wlen,flags) ;
 	    so.m = &usocket::isend ;
 	    rs = so(fd) ;
 	}
 	return rs ;
 } 
 /* end subroutine (u_send) */
+
+int u_sendmsg(int fd,MSGHDR *msgp,int flags) noex {
+	int		rs = SR_FAULT ;
+	if (msgp) {
+	    usocket	so(msgp,flags) ;
+	    so.m = &usocket::isendmsg ;
+	    rs = so(fd) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_sendmsg) */
+
+int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
+	int		rs = SR_FAULT ;
+	if (wbuf && sap) {
+	    usocket	so(wbuf,wlen,flags,sap,sal) ;
+	    so.m = &usocket::isendto ;
+	    rs = so(fd) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_sendto) */
 
 
 /* local subroutines */
@@ -312,95 +343,37 @@ int usocket::igetsockname(int fd) noex {
 
 int usocket::isend(int fd) noex {
 	int		rs ;
-	if ((rs = send(fd,rbuf,(size_t) rlen,flags)) < 0) {
+	csize		wsz = size_t(wlen) ;
+	if ((rs = send(fd,wbuf,wsz,flags)) < 0) {
 	    rs = (- errno) ;
 	}
 	return rs ;
 }
 /* end method (usocket::isend) */
 
+int usocket::isendmsg(int fd) noex {
+	int		rs ;
+	if ((rs = sendmsg(fd,msgp,flags)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usocket::isendmsg) */
+
+int usocket::isendto(int fd) noex {
+	int		rs ;
+	csize		wsz = size_t(wlen) ;
+	csocklen	slen = socklen_t(sal) ;
+	if ((rs = sendto(fd,wbuf,wsz,flags,sap,slen)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usocket::isendmsg) */
+
 
 #ifdef	COMMENT
 
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    rs = send(fd,rbuf,(size_t) rlen,flags) ;
-	    if (rs < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs)  {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
-}
-/* end subroutine (u_send) */
-
-int u_sendmsg(int fd,MSGHDR *msgp,int flags) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
-
-
-	repeat {
-	    rs = sendmsg(fd,msgp,flags) ;
-	    if (rs < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs)  {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
-}
-/* end subroutine (u_sendmsg) */
 
 int u_sendto(int fd,cvoid *mbuf,int mlen,int flags,void *asap,int sal) noex {
 	SOCKADDR	*sap = (SOCKADDR *) asap ;
