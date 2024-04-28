@@ -60,7 +60,7 @@ static int	msgdata_setrecv(msgdata *) noex ;
 /* exported subroutines */
 
 int msgdata_init(msgdata *mip,int mlen) noex {
-	cint		clen = MAX(CMSGBUFLEN,sizeof(CMSGHDR)) ;
+	cint		clen = MAX(CMSGBUFLEN,sizeof(CONMSGHDR)) ;
 	int		rs ;
 	int		size = 0 ;
 	int		ml = 0 ;
@@ -81,7 +81,7 @@ int msgdata_init(msgdata *mip,int mlen) noex {
 	    mip->mbuf = bp ;
 	    mip->mlen = mlen ;
 	    bp += (mlen+1) ;
-	    mip->cmsgp = (CMSGHDR *) bp ;
+	    mip->cmsgp = (CONMSGHDR *) bp ;
 	    mip->clen = clen ;
 	    bp += (clen+1) ;
 
@@ -199,7 +199,7 @@ int msgdata_conpass(msgdata *mip,int f_passfd) noex {
 	int		f = false ;
 	mip->ns = -1 ;
 	if (mp->msg_controllen > 0) {
-	    CMSGHDR	*cmp = CMSG_FIRSTHDR(mp) ;
+	    CONMSGHDR	*cmp = CMSG_FIRSTHDR(mp) ;
 	    int		fd ;
 	    while (cmp != nullptr) {
 		if ((fd = cmsghdr_passed(cmp)) >= 0) {

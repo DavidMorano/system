@@ -147,8 +147,8 @@
 #endif
 
 /* not constant - "Control-Message-Header" */
-#ifndef	CMSGHDR
-#define	CMSGHDR		struct cmsghdr
+#ifndef	CONMSGHDR
+#define	CONMSGHDR	const cmsghdr
 #endif
 
 #ifndef	TIMEVAL
@@ -300,6 +300,10 @@
 
 #ifndef	CSOCKADDR
 #define	CSOCKADDR	const SOCKADDR
+#endif
+
+#ifndef	CMSGHDR
+#define	CMSGHDR		const MSGHDR
 #endif
 
 #ifndef	CRLIMIT

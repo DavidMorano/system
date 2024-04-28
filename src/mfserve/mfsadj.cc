@@ -107,7 +107,7 @@ extern int	cfdecmfi(const char *,int,int *) ;
 extern int	ctdeci(char *,int,int) ;
 extern int	listenusd(const char *,mode_t,int) ;
 extern int	msghdr_size(MSGHDR *) ;
-extern int	cmsghdr_passed(CMSGHDR *) ;
+extern int	cmsghdr_passed(CONMSGHDR *) ;
 extern int	isBadSend(int) ;
 extern int	isBadMsg(int) ;
 extern int	isNotPresent(int) ;

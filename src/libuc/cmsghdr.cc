@@ -58,7 +58,7 @@
 
 /* exported subroutines */
 
-int cmsghdr_passed(CMSGHDR *cmp) noex {
+int cmsghdr_passed(CONMSGHDR *cmp) noex {
 	cint		fdlen = sizeof(int) ;
 	int		fd = -1 ;
 	int		*ip = (int *) CMSG_DATA(cmp) ;

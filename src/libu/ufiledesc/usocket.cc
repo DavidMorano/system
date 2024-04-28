@@ -22,6 +22,15 @@
 	u_listen
 	u_setsockopt
 	u_getsockopt
+	u_getsockname
+	u_getpeername
+	u_send
+	u_sendmsg
+	u_sendto
+	u_recv
+	u_recvmsg
+	u_recvfrom
+	u_shutdown
 
 	Description:
 	This module contains the UNIX® socket system calls (yes,
@@ -89,6 +98,8 @@
 
 using namespace	ufiledesc ;		/* namespace */
 
+using std::nullptr_t ;			/* type */
+
 
 /* local typedefs */
 
@@ -101,13 +112,15 @@ using namespace	ufiledesc ;		/* namespace */
 
 /* local structures */
 
+constexpr nullptr_t		np{} ;
+
 namespace {
     struct usocket ;
     typedef int (usocket::*usocket_m)(int) noex ;
     struct usocket : ufiledescbase {
 	usocket_m	m = nullptr ;
 	CSOCKADDR	*sap ;
-	MSGHDR		*msgp ;
+	CMSGHDR		*msgp ;
 	cvoid		*valp ;
 	int		*lenp ;
 	int		sal ;
@@ -143,11 +156,14 @@ namespace {
 	    wlen = wl ;
 	    flags = fl ;
 	} ;
-	usocket(void *rb,int rl,int fl) noex : flags(fl) {
+	usocket(void *rb,int rl,int fl,void *vp = np,int *lp = np) noex {
+	    sap = (CSA *) vp ;
+	    lenp = lp ;
 	    rbuf = rb ;
 	    rlen = rl ;
+	    flags = fl ;
 	} ;
-	usocket(MSGHDR *mp,int fl) noex : flags(fl) {
+	usocket(CMSGHDR *mp,int fl) noex : flags(fl) {
 	    msgp = mp ;
 	} ;
 	int callstd(int fd) noex override {
@@ -166,6 +182,9 @@ namespace {
 	int isend(int) noex ;
 	int isendmsg(int) noex ;
 	int isendto(int) noex ;
+	int irecv(int) noex ;
+	int irecvmsg(int) noex ;
+	int irecvfrom(int) noex ;
     } ; /* end struct (usocket) */
 }
 
@@ -242,7 +261,7 @@ int u_send(int fd,cvoid *wbuf,int wlen,int flags) noex {
 } 
 /* end subroutine (u_send) */
 
-int u_sendmsg(int fd,MSGHDR *msgp,int flags) noex {
+int u_sendmsg(int fd,CMSGHDR *msgp,int flags) noex {
 	int		rs = SR_FAULT ;
 	if (msgp) {
 	    usocket	so(msgp,flags) ;
@@ -263,6 +282,39 @@ int u_sendto(int fd,cvoid *wbuf,int wlen,int flags,cvoid *sap,int sal) noex {
 	return rs ;
 }
 /* end subroutine (u_sendto) */
+
+int u_recv(int fd,void *rbuf,int rlen,int flags) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    usocket	so(rbuf,rlen,flags) ;
+	    so.m = &usocket::irecv ;
+	    rs = so(fd) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_recv) */
+
+int u_recvmsg(int fd,MSGHDR *msgp,int flags) noex {
+	int		rs = SR_FAULT ;
+	if (msgp) {
+	    usocket	so(msgp,flags) ;
+	    so.m = &usocket::irecvmsg ;
+	    rs = so(fd) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_recvmsg) */
+
+int u_recvfrom(int fd,void *rbuf,int rlen,int flags,void *vp,int *lenp) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf && vp && lenp) {
+	    usocket	so(rbuf,rlen,flags,vp,lenp) ;
+	    so.m = &usocket::irecvfrom ;
+	    rs = so(fd) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_recvfrom) */
 
 
 /* local subroutines */
@@ -371,197 +423,51 @@ int usocket::isendto(int fd) noex {
 }
 /* end method (usocket::isendmsg) */
 
+int usocket::irecv(int fd) noex {
+	int		rs ;
+	if ((rs = recv(fd,rbuf,rlen,flags)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usocket::irecv) */
+
+int usocket::irecvmsg(int fd) noex {
+	int		rs ;
+	MSGHDR		*mp = const_cast<MSGHDR *>(msgp) ;
+	if ((rs = recvmsg(fd,mp,flags)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usocket::irecvmsg) */
+
+int usocket::irecvfrom(int fd) noex {
+	int		rs ;
+	csize		rsz = size_t(rlen) ;
+	socklen_t	slen = socklen_t(*lenp) ;
+	SOCKADDR	*sp = const_cast<SOCKADDR *>(sap) ;
+	if ((rs = recvfrom(fd,rbuf,rsz,flags,sp,&slen)) < 0) {
+	    rs = (- errno) ;
+	} else {
+	    *lenp = intsat(slen) ;
+	}
+	return rs ;
+}
+/* end method (usocket::irecvfrom) */
+
 
 #ifdef	COMMENT
 
 
-int u_sendto(int fd,cvoid *mbuf,int mlen,int flags,void *asap,int sal) noex {
-	SOCKADDR	*sap = (SOCKADDR *) asap ;
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    rs = sendto(fd,mbuf,mlen,flags,sap,sal) ;
-	    if (rs < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs)  {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
-}
-/* end subroutine (u_sendto) */
-
-int u_recv(int fd,void *vbuf,int vlen,int flags) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		to_nobufs = TO_NOBUFS ;
-	int		f_exit = FALSE ;
-
-
-	repeat {
-	    if ((rs = recv(fd,vbuf,vlen,flags)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs)  {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_NOBUFS:
-	            if (to_nobufs-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
-}
-/* end subroutine (u_recv) */
-
-int u_recvfrom(int fd,void *dbuf,int dlen,int fl,void *asap,int *asalp) noex {
-	SOCKADDR	*sap = (SOCKADDR *) asap ;
-	SALEN_T		sal ;
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		to_nobufs = TO_NOBUFS ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if (sap != NULL) sal = (SALEN_T) *asalp ;
-	    if ((rs = recvfrom(fd,dbuf,dlen,fl,sap,&sal)) < 0) {
-		rs = (- errno) ;
-	    }
-	    if (rs < 0) {
-	        switch (rs)  {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_NOBUFS:
-	            if (to_nobufs-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	if (asalp != NULL) *asalp = (int) sal ;
-
-	return rs ;
-}
-/* end subroutine (u_recvfrom) */
-
 int u_recvmsg(int fd,MSGHDR *msgp,int fl) noex {
 	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		to_nobufs = TO_NOBUFS ;
-	int		f_exit = FALSE ;
-
 	repeat {
 	    rs = recvmsg(fd,msgp,fl) ;
 	    if (rs < 0) rs = (- errno) ;
 	    if (rs < 0) {
-	        switch (rs)  {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_NOBUFS:
-	            if (to_nobufs-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	return rs ;
 }
 /* end subroutine (u_recvmsg) */

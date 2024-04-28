@@ -34,8 +34,8 @@
 #define	MSGHDR		srtuct msghdr
 #endif
 
-#ifndef	CMSGHDR
-#define	CMSGHDR		srtuct cmsghdr
+#ifndef	CONMSGHDR
+#define	CONMSGHDR		srtuct cmsghdr
 #endif
 
 #define	MSGDATA		struct msgdata_head
@@ -45,7 +45,7 @@ struct msgdata_head {
 	struct msghdr	msg ;
 	SOCKADDRESS	from ;
 	struct iovec	vecs[1] ;
-	CMSGHDR		*cmsgp ;	/* Control-Message-Header */
+	CONMSGHDR		*cmsgp ;	/* Control-Message-Header */
 	void		*a ;		/* allocation */
 	char		*mbuf ;		/* buffer */
 	int		clen ;		/* Control-Message length */
