@@ -56,15 +56,15 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJ0_UFILEDESC= 
-OBJ1_UFILEDESC= 
+OBJ0_UFILEDESC= ufiledescbase.o
+OBJ1_UFILEDESC= usocket.o
 OBJ2_UFILEDESC= 
 OBJ3_UFILEDESC= 
 OBJ4_UFILEDESC= 
 
 
 OBJA_UFILEDESC= obj0_ufiledesc.o obj1_ufiledesc.o
-OBJB_UFILEDESC= obj2_ufiledesc.o obj3_ufiledesc.o obj4_ufiledesc.o
+#OBJB_UFILEDESC= obj2_ufiledesc.o obj3_ufiledesc.o obj4_ufiledesc.o
 
 OBJ_UFILEDESC= $(OBJA_UFILEDESC) $(OBJB_UFILEDESC)
 

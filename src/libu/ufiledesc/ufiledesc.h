@@ -1,4 +1,4 @@
-/* ufiledesc SUPPORT (UNIX® System V System C Inter-Process-Communication) */
+/* ufiledesc SUPPORT (UNIX® file operations) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -60,6 +60,15 @@ namespace ufiledesc {
 }
 
 #endif /* __cplusplus */
+
+EXTERNC_begin
+
+extern int u_bind(int,cvoid *,int) noex ;
+extern int u_listen(int,int) noex ;
+extern int u_setsockopt(int,int,int,cvoid *,int) noex ;
+extern int u_getsockopt(int,int,int,void *,int *) noex ;
+
+EXTERNC_end
 
 
 #endif /* UFILEDESC_INCLUDE */

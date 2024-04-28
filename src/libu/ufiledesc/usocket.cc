@@ -17,17 +17,22 @@
 /*******************************************************************************
 
 	Names:
+	usocket (module)
+	u_bind
+	u_listen
+	u_setsockopt
+	u_getsockopt
 
 	Description:
-	This module contains the UNIX® socket system calls (yes, they 
-	are sustem calls now-a-days).
+	This module contains the UNIX® socket system calls (yes,
+	they are sustem calls now-a-days).
 
 	Name:
 	u_send
 
 	Description:
 	This is the famous (infamous) old |send(2)| system call.
-	Of course, it has not been a system call for almost two
+	Of course, it has now been a system call for almost two
 	decades (on System V UNIX) but that is still OK! :-)
 
 	Name:
@@ -41,7 +46,7 @@
 		SHUT_RDWR
 
 	Synopsis:
-	int u_shutdown(int fd,int dir) noex{
+	int u_shutdown(int fd,int dir) noex
 
 	Arguments:
 	fd	socket file-descriptor
@@ -69,6 +74,7 @@
 #include	<usysrets.h>
 #include	<usyscalls.h>
 #include	<clanguage.h>
+#include	<intsat.h>
 #include	<localmisc.h>
 
 #include	"ufiledesc.h"
@@ -98,18 +104,20 @@ namespace {
     typedef int (usocket::*usocket_m)(int) noex ;
     struct usocket : ufiledescbase {
 	usocket_m	m = nullptr ;
-	SOCKADDR	*sap ;
+	CSOCKADDR	*sap ;
 	cvoid		*valp ;
 	int		*lenp ;
 	int		sal ;
 	int		len ;
 	int		level ;
 	int		name ;
+	int		flags ;
+	usocket() noex { } ;
 	usocket(int backlog) noex {
 	    sal = backlog ;
 	} ;
-	usocket(void *vp,int l) noex {
-	    sap = (SOCKADDR *) vp ;
+	usocket(cvoid *vp,int l) noex {
+	    sap = (CSOCKADDR *) vp ;
 	    sal = l ;
 	} ;
 	usocket(int lev,int n,cvoid *vp,int vl) noex : level(lev) {
@@ -122,7 +130,19 @@ namespace {
 	    valp = vp ;
 	    lenp = vlp ;
 	} ;
-	usocket() noex { } ;
+	usocket(cvoid *vp,int *lp) noex : lenp(lp) { 
+	    sap = (CSOCKADDR *) vp ;
+	} ;
+	usocket(cchar *wb,int wl,int fl) noex {
+	    wbuf = wb ;
+	    wlen = wl ;
+	    flags = fl ;
+	} ;
+	usocket(char *rb,int rl,int fl) noex {
+	    rbuf = rb ;
+	    rlen = rl ;
+	    flags = fl ;
+	} ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -134,6 +154,9 @@ namespace {
 	int ilisten(int) noex ;
 	int isetsockopt(int) noex ;
 	int igetsockopt(int) noex ;
+	int igetpeername(int) noex ;
+	int igetsockname(int) noex ;
+	int isend(int) noex ;
     } ; /* end struct (usocket) */
 }
 
@@ -149,7 +172,7 @@ namespace {
 
 /* exported subroutines */
 
-int u_bind(int fd,void *sap,int sal) noex {
+int u_bind(int fd,cvoid *sap,int sal) noex {
 	usocket		so(sap,sal) ;
 	so.m = &usocket::ibind ;
 	return so(fd) ;
@@ -176,6 +199,39 @@ int u_getsockopt(int fd,int level,int optname,void *valp,int *lenp) noex {
 	return so(fd) ;
 }
 /* end subroutine (u_getsockopt) */
+
+int u_getpeername(int fd,void *sap,int *lenp) noex {
+	int		rs = SR_FAULT ;
+	if (sap && lenp) {
+	    usocket	so(sap,lenp) ;
+	    so.m = &usocket::igetpeername ;
+	    rs = so(fd) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_getpeername) */
+
+int u_getsockname(int fd,void *sap,int *lenp) noex {
+	int		rs = SR_FAULT ;
+	if (sap && lenp) {
+	    usocket	so(sap,lenp) ;
+	    so.m = &usocket::igetsockname ;
+	    rs = so(fd) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_getsockname) */
+
+int u_send(int fd,char *rbuf,int rlen,int flags) noex {
+	int		rs = SR_FAULT ;
+	if (rbuf) {
+	    usocket	so(rbuf,rlen,flags) ;
+	    so.m = &usocket::isend ;
+	    rs = so(fd) ;
+	}
+	return rs ;
+} 
+/* end subroutine (u_send) */
 
 
 /* local subroutines */
@@ -218,128 +274,54 @@ int usocket::igetsockopt(int fd) noex {
 	    if ((rs = getsockopt(fd,level,name,vp,&slen)) < 0) {
 	        rs = (- errno) ;
 	    } else {
-	        *lenp = int(slen) ;
+	        *lenp = intsat(slen) ;
+		rs = intsat(slen) ;
 	    }
 	} /* end if (non-null) */
 	return rs ;
 }
 /* end method (usocket::igetsockopt) */
 
-#ifdef	COMMENT
-
-int u_getsockopt(int s,int level,int optname,int *optvalp,int *optlen) noex {
+int usocket::igetpeername(int fd) noex {
+	SOCKADDR	*fromp = const_cast<SOCKADDR *>(sap) ;
+	socklen_t	slen = socklen_t(*lenp) ;
 	int		rs ;
-
-	    if ((rs = getsockopt(s,level,optname,optvalp,optlen)) < 0) {
-	        rs = (- errno) ;
-	    }
+	if ((rs = getpeername(fd,fromp,&slen)) < 0) {
+	    rs = (- errno) ;
+	} else {
+	    *lenp = intsat(slen) ;
+	    rs = intsat(slen) ;
+	}
 	return rs ;
 }
-/* end subroutine (u_getsockopt) */
+/* end method (usocket::igetpeername) */
 
-int u_getpeername(int s,void *fromp,int *lenp) noex {
-	SOCKADDR	*sap = (SOCKADDR *) fromp ;
-	SALEN_T		sal ;
+int usocket::igetsockname(int fd) noex {
+	SOCKADDR	*fromp = const_cast<SOCKADDR *>(sap) ;
+	socklen_t	slen = socklen_t(*lenp) ;
 	int		rs ;
-	int		dummy ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		len = 0 ;
-	int		f_exit = FALSE ;
-
-	if (lenp == NULL) {
-	    dummy = 0 ;
-	    lenp = &dummy ;
+	if ((rs = getsockname(fd,fromp,&slen)) < 0) {
+	    rs = (- errno) ;
+	} else {
+	    *lenp = intsat(slen) ;
+	    rs = intsat(slen) ;
 	}
-
-	repeat {
-	    sal = (SALEN_T) *lenp ;
-	    if ((rs = getpeername(s,sap,&sal)) < 0) rs = (- errno) ;
-	    *lenp = (int) sal ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	len = *lenp ;
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 }
-/* end subroutine (u_getpeername) */
+/* end method (usocket::igetsockname) */
 
-int u_getsockname(int s,void *fromp,int *lenp) noex {
-	SOCKADDR	*sap = (SOCKADDR *) fromp ;
-	SALEN_T		sal ;
+int usocket::isend(int fd) noex {
 	int		rs ;
-	int		dummy ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		len = 0 ;
-	int		f_exit = FALSE ;
-
-	if (lenp == NULL) {
-	    dummy = 0 ;
-	    lenp = &dummy ;
+	if ((rs = send(fd,rbuf,(size_t) rlen,flags)) < 0) {
+	    rs = (- errno) ;
 	}
-
-	repeat {
-	    sal = *lenp ;
-	    if ((rs = getsockname(s,sap,&sal)) < 0) rs = (- errno) ;
-	    *lenp = sal ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	len = *lenp ;
-	return (rs >= 0) ? len : rs ;
+	return rs ;
 }
-/* end subroutine (u_getsockname) */
+/* end method (usocket::isend) */
 
-int u_send(int fd,char *rbuf,int rlen,int flags) noex {
+
+#ifdef	COMMENT
+
 	int		rs ;
 	int		to_nomem = TO_NOMEM ;
 	int		to_nosr = TO_NOSR ;

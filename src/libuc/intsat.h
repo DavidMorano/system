@@ -33,6 +33,7 @@ extern int intsatl(long) noex ;
 extern int intsato(off_t) noex ;
 extern int intsatll(longlong) noex ;
 
+extern int intsatui(uint) noex ;
 extern int intsatul(ulong) noex ;
 extern int intsats(size_t) noex ;
 extern int intsatull(ulonglong) noex ;
@@ -59,6 +60,9 @@ static inline int intsat(longlong v) noex {
 	return intsatll(v) ;
 }
 
+static inline int intsat(uint v) noex {
+	return intsatui(v) ;
+}
 static inline int intsat(ulong v) noex {
 	return intsatul(v) ;
 }

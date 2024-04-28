@@ -1,4 +1,4 @@
-/* ufiledescbase SUPPORT (UNIX® System V IPC) */
+/* ufiledescbase SUPPORT (UNIX® file operations) */
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -73,11 +73,11 @@ using std::nullptr_t ;			/* type */
 
 int ufiledescbase::operator () (int fd) noex {
 	int		rs ;
-	errtimer	to_nomem = utimeout[uto_nomem] ;
-	errtimer	to_nospc = utimeout[uto_nospc] ;
-	errtimer	to_nobufs = utimeout[uto_nobufs] ;
-	errtimer	to_mfile = utimeout[uto_mfile] ;
-	errtimer	to_nfile = utimeout[uto_nfile] ;
+	errtimer	to_nomem	= utimeout[uto_nomem] ;
+	errtimer	to_nospc	= utimeout[uto_nospc] ;
+	errtimer	to_nobufs	= utimeout[uto_nobufs] ;
+	errtimer	to_mfile	= utimeout[uto_mfile] ;
+	errtimer	to_nfile	= utimeout[uto_nfile] ;
 	reterr		r ;
 	repeat {
 	    if ((rs = callstd(fd)) < 0) {

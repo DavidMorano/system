@@ -302,16 +302,20 @@
 #define	CSOCKADDR	const SOCKADDR
 #endif
 
-#ifndef	CUTMPX
-#define	CUTMPX		const UTMPX
-#endif
-
 #ifndef	CRLIMIT
 #define	CRLIMIT		const RLIMIT
 #endif
 
 #ifndef	CIOVEC
 #define	CIOVEC		const IOVEC
+#endif
+
+#ifndef	CUTMPX
+#define	CUTMPX		const UTMPX
+#endif
+
+#ifndef	CSCHEDPARAM
+#define	CSCHEDPARAM	const SCHEDPARAM
 #endif
 
 

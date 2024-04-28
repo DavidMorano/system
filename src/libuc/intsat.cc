@@ -76,6 +76,12 @@ int intsatll(longlong v) noex {
 	return intsatx(v) ;
 }
 
+int intsatui(uint v) noex {
+	uint		im = uint(INT_MAX) ;
+	if (v > im) v = im ;
+	return int(v) ;
+}
+
 int intsatul(ulong v) noex {
 	ulong		im = ulong(INT_MAX) ;
 	if (v > im) v = im ;

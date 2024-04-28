@@ -147,9 +147,6 @@ extern int	u_pipe(int *) noex ;
 extern int	u_getdents(int,dirent_t *,int) noex ;
 extern int	u_fchdir(int) noex ;
 extern int	u_fsync(int) noex ;
-extern int	u_getsockopt(int,int,int,void *,int *) noex ;
-extern int	u_setsockopt(int,int,int,cvoid *,int) noex ;
-extern int	u_connect(int,cvoid *,int) noex ;
 
 extern int	u_closeonexec(int,bool) noex ;
 extern int	u_poll(POLLFD *,int,int) noex ;
@@ -173,10 +170,13 @@ extern int	u_seek(int,off_t,int) noex ;
 extern int	u_tell(int,off_t *) noex ;
 extern int	u_seeko(int,off_t,int,off_t *) noex ;
 
-extern int	u_bind(int,void *,int) noex ;
+extern int	u_bind(int,cvoid *,int) noex ;
+extern int	u_listen(int,int) noex ;
+extern int	u_getsockopt(int,int,int,void *,int *) noex ;
+extern int	u_setsockopt(int,int,int,cvoid *,int) noex ;
+extern int	u_connect(int,cvoid *,int) noex ;
 extern int	u_getsockname(int,void *,int *) noex ;
 extern int	u_getpeername(int,void *,int *) noex ;
-extern int	u_listen(int,int) noex ;
 extern int	u_send(int,cvoid *,int,int) noex ;
 extern int	u_sendto(int,cvoid *,int,int,void *,int) noex ;
 extern int	u_sendmsg(int,MSGHDR *,int) noex ;
