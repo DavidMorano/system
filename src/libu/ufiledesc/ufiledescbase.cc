@@ -74,39 +74,47 @@ int ufiledescbase::operator () (int fd) noex {
 	int		rs = SR_FAULT ;
 	int		to_nomem = utimeout[uto_nomem] ;
 	int		to_nospc = utimeout[uto_nospc] ;
+	int		to_nobufs = utime[uto_nobufs] ;
 	int		to_mfile = utimeout[uto_mfile] ;
 	bool		f_exit = false ;
 	repeat {
 	    if ((rs = (this->*m)(fd)) < 0) {
-	            switch (rs) {
-	            case SR_NOMEM:
-	                if (to_nomem-- > 0) {
-			    msleep(1000) ;
-		        } else {
-			    f_exit = true ;
-		        }
-	                break ;
-	            case SR_NOSPC:
-	                if (to_nospc-- > 0) {
-			    msleep(1000) ;
-		        } else {
-			    f_exit = true ;
-		        }
-	                break ;
-	            case SR_MFILE:
-	                if (to_mfile-- > 0) {
-		            msleep(1000) ;
-		        } else {
-			    f_exit = true ;
-		        }
-	                break ;
-	            case SR_INTR:
-	                break ;
-		    default:
-		        f_exit = true ;
-		        break ;
-	            } /* end switch */
-	        } /* end if (error) */
+                switch (rs) {
+                case SR_NOMEM:
+                    if (to_nomem-- > 0) {
+                        msleep(1000) ;
+                    } else {
+                        f_exit = true ;
+                    }
+                    break ;
+                case SR_NOSPC:
+                    if (to_nospc-- > 0) {
+                        msleep(1000) ;
+                    } else {
+                        f_exit = true ;
+                    }
+                    break ;
+	        case SR_NOBUFS:
+	            if (to_nobufs-- > 0) {
+			msleep(1000) ;
+		    } else {
+			f_exit = true ;
+		    }
+	            break ;
+                case SR_MFILE:
+                    if (to_mfile-- > 0) {
+                        msleep(1000) ;
+                    } else {
+                        f_exit = true ;
+                    }
+                    break ;
+                case SR_INTR:
+                    break ;
+                default:
+                    f_exit = true ;
+                    break ;
+                } /* end switch */
+            } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
 	return rs ;
 }

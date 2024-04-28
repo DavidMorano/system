@@ -48,13 +48,12 @@
 #ifdef	__cplusplus
 
 namespace ufiledesc {
-    struct ufiledescbase ;
-    typedef int (ufiledescbase::*ufiledescbase_m)(int) noex ;
     struct ufiledescbase {
-	ufiledescbase_m	m = nullptr ;
-	int		sal ;
-	SOCKADDR	*sap = nullptr ;
-	ufiledescbase() noex : fd(-1), sal(0) { } ;
+	char		*rbuf ;
+	cchar		*wbuf ;
+	int		rlen ;
+	int		wlen ;
+	ufiledescbase() noex { } ;
 	int operator () (int) noex ;
     } ; /* end struct (ufiledescbase) */
 }

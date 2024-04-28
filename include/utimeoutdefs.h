@@ -69,6 +69,8 @@
 #define	UTO_AGAIN	10
 #define	UTO_INTR	(10 * 60)
 #define	UTO_NOMEM	(5 * 60)
+#define	UTO_NOSR	(5 * 60)
+#define	UTO_NOBUFS	(5 * 60)
 #define	UTO_BUSY	5
 #define	UTO_GET		3
 #define	UTO_DEADLOCK	50
@@ -80,7 +82,6 @@
 #define	UTO_READ	(1*60)
 #define	UTO_MFILE	5
 #define	UTO_NFILE	5
-#define	UTO_NOSR	(5 * 60)
 #define	UTO_POLL	10
 #define	UTO_NOLCK	10
 #define	UTO_CAPURE	5

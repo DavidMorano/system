@@ -1,5 +1,5 @@
-/* uc_ftime */
-/* lang=C20 */
+/* uc_ftime SUPPORT */
+/* lang=C++20 */
 
 /* interface component for UNIX® library-3c */
 /* cleaned up version of 'ftime(3c)' */
@@ -41,16 +41,23 @@ struct timeb {
 	short		dstflag ;	// DST flag
 } ;
 
+	Note:
+	Only Apple Darwin still fully supports this subroutine.
+	Solaris® supports it only partially (not filling in the
+	POSIX® optional fields).  Linux does not (no longer) supports
+	this subroutine at all.
+
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
 #include	<sys/types.h>
-#include	<sys/timeb.h>
+#include	<sys/timeb.h>		/* <- the money shot */
 #include	<unistd.h>
-#include	<time.h>
-#include	<stdlib.h>
-#include	<string.h>
+#include	<ctime>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
+#include	<usysflag.h>
 #include	<tmtime.h>
 
 
@@ -66,23 +73,36 @@ struct timeb {
 /* forward references */
 
 
+/* local variables */
+
+constexpr bool		f_darwin = F_DARWIN ;
+
+
+/* exported variables */
+
+
 /* exported subroutines */
 
 int uc_ftime(TIMEB *tbp) noex {
 	int		rs = SR_FAULT ;
 	if (tbp) {
-	    TIMEVAL	tv ;
-	    memclear(tbp) ;
-	    if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
-	        TMTIME	tmt{} ;
-	        tbp->time = tv.tv_sec ;
-	        tbp->millitm = (tv.tv_usec / 1000) ;
-	        if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
-	            tbp->timezone = (tmt.gmtoff / 60) ;
-	            tbp->dstflag = tmt.isdst ;
-	            rs = (tmt.isdst > 0) ? 1 : 0 ;
-	        } /* end if (tmtime_localtime) */
-	    } /* end if (uc_gettimeofday) */
+	    if_constexpr (f_darwin) {
+		ftime(tbp) ;
+		rs = SR_OK ;
+	    } else {
+	        TIMEVAL		tv ;
+	        memclear(tbp) ;
+	        if ((rs = uc_gettimeofday(&tv,nullptr)) >= 0) {
+	            TMTIME	tmt ;
+	            tbp->time = tv.tv_sec ;
+	            tbp->millitm = (tv.tv_usec / 1000) ;
+	            if ((rs = tmtime_localtime(&tmt,tbp->time)) >= 0) {
+	                tbp->timezone = (tmt.gmtoff / 60) ;
+	                tbp->dstflag = tmt.isdst ;
+	                rs = (tmt.isdst > 0) ? 1 : 0 ;
+	            } /* end if (tmtime_localtime) */
+	        } /* end if (uc_gettimeofday) */
+	    } /* end if_constexpr (f_darwin) */
 	} /* end if (non-null) */
 	return rs ;
 }

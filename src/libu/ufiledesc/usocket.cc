@@ -71,6 +71,8 @@
 #include	<clanguage.h>
 #include	<localmisc.h>
 
+#include	"ufiledesc.h"
+
 
 /* local defines */
 
@@ -91,11 +93,42 @@ using namespace	ufiledesc ;		/* namespace */
 
 /* local structures */
 
-struct usocket : ufiledesc {
-	void		*sap ;
+namespace {
+    struct usocket ;
+    typedef int (usocket::*usocket_m)(int) noex ;
+    struct usocket : ufiledescbase {
+	usocket_m	m = nullptr ;
+	SOCKADDR	*sap ;
+	cvoid		*valp ;
+	int		*lenp ;
 	int		sal ;
-	usocket(int afd) noex : ufiledesc(afd) { } ;
-} ; /* end struct (usocket) */
+	int		len ;
+	int		level ;
+	int		name ;
+	usocket(int backlog) noex {
+	    sal = backlog ;
+	} ;
+	usocket(void *vp,int l) noex {
+	    sap = (SOCKADDR *) vp ;
+	    sal = l ;
+	} ;
+	usocket(int lev,int n,cvoid *vp,int vl) noex : level(lev) {
+	    name = n ;
+	    valp = vp ;
+	    len = vl ;
+	} ;
+	usocket(int lev,int n,cvoid *vp,int *vlp) noex : level(lev) {
+	    name = n ;
+	    valp = vp ;
+	    lenp = vlp ;
+	} ;
+	usocket() noex { } ;
+	int ibind(int) noex ;
+	int ilisten(int) noex ;
+	int isetsockopt(int) noex ;
+	int igetsockopt(int) noex ;
+    } ; /* end struct (usocket) */
+}
 
 
 /* forward references */
@@ -110,141 +143,89 @@ struct usocket : ufiledesc {
 /* exported subroutines */
 
 int u_bind(int fd,void *sap,int sal) noex {
-	usocket		so(sa,sal) ;
+	usocket		so(sap,sal) ;
 	so.m = &usocket::ibind ;
-	return oo(fd) ;
+	return so(fd) ;
 }
 /* end subroutine (u_bind) */
 
-int usocket::ibind(int fd) noex {
-
-	SOCKADDR	*sap = (SOCKADDR *) asap ;
-	SALEN_T		sal ;
-	int		rs ;
-
-	    sal = (SALEN_T) asal ;
-	    if ((rs = bind(s,sap,sal)) < 0) rs = (- errno) ;
-
-	return rs ;
-}
-/* end subroutine (u_bind) */
-
-int u_listen(int s,int backlog) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = listen(s,backlog)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_NOBUFS:
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+int u_listen(int fd,int backlog) noex {
+	usocket		so(backlog) ;
+	so.m = &usocket::ilisten ;
+	return so(fd) ;
 }
 /* end subroutine (u_listen) */
 
-int u_setsockopt(int s,int level,int optname,cvoid *optvalp,int optlen) noex {
-	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
-
-	repeat {
-	    if ((rs = setsockopt(s,level,optname,optvalp,optlen)) < 0) {
-	        rs = (- errno) ;
-	    }
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
-	return rs ;
+int u_setsockopt(int fd,int level,int optname,cvoid *valp,int len) noex {
+	usocket		so(level,optname,valp,len) ;
+	so.m = &usocket::isetsockopt ;
+	return so(fd) ;
 }
 /* end subroutine (u_setsockopt) */
 
+int u_getsockopt(int fd,int level,int optname,void *valp,int *lenp) noex {
+	usocket		so(level,optname,valp,lenp) ;
+	so.m = &usocket::igetsockopt ;
+	return so(fd) ;
+}
+/* end subroutine (u_getsockopt) */
+
+
+/* local subroutines */
+
+int usocket::ibind(int fd) noex {
+	int		rs = SR_FAULT ;
+	if (sap) {
+	    if ((rs = bind(fd,sap,sal)) < 0) {
+		rs = (- errno) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (usocket::bind) */
+
+int usocket::ilisten(int fd) noex {
+	int		rs ;
+	if ((rs = listen(fd,sal)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usocket::listen) */
+
+int usocket::isetsockopt(int fd) noex {
+	int		rs ;
+	socklen_t	slen = socklen_t(len) ;
+	if ((rs = setsockopt(fd,level,name,valp,slen)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (usocket::isetsockopt) */
+
+int usocket::igetsockopt(int fd) noex {
+	int		rs = SR_FAULT ;
+	if (valp && lenp) {
+	    void	*vp = const_cast<void *>(valp) ;
+	    socklen_t	slen = socklen_t(*lenp) ;
+	    if ((rs = getsockopt(fd,level,name,vp,&slen)) < 0) {
+	        rs = (- errno) ;
+	    } else {
+	        *lenp = int(slen) ;
+	    }
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end method (usocket::igetsockopt) */
+
+#ifdef	COMMENT
+
 int u_getsockopt(int s,int level,int optname,int *optvalp,int *optlen) noex {
 	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = FALSE ;
 
-	repeat {
 	    if ((rs = getsockopt(s,level,optname,optvalp,optlen)) < 0) {
 	        rs = (- errno) ;
 	    }
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = TRUE ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		default:
-		    f_exit = TRUE ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
 	return rs ;
 }
 /* end subroutine (u_getsockopt) */
@@ -662,5 +643,7 @@ int u_shutdown(int fd,int dir) noex {
 	return rs ;
 }
 /* end subroutine (u_shutdown) */
+
+#endif /* COMMENT */
 
 
