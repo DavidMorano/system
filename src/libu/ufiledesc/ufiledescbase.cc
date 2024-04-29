@@ -73,6 +73,7 @@ using std::nullptr_t ;			/* type */
 
 int ufiledescbase::operator () (int fd) noex {
 	int		rs ;
+	int		to_closewait	= utimeout[uto_closewait] ;
 	errtimer	to_nomem	= utimeout[uto_nomem] ;
 	errtimer	to_nospc	= utimeout[uto_nospc] ;
 	errtimer	to_nobufs	= utimeout[uto_nobufs] ;
@@ -98,6 +99,12 @@ int ufiledescbase::operator () (int fd) noex {
                 case SR_NFILE:
                     r = to_nfile(rs) ;
                     break ;
+		case SR_INPROGRESS: /* who thought up this? */
+		    if (f.fclose) {
+		        msleep(to_closewait * 1000) ;
+		        rs = SR_OK ;
+		    }
+		    break ;
                 case SR_INTR:
 		    r(false) ;
                     break ;

@@ -4,7 +4,6 @@
 /* translation layer interface for UNIX® equivalents */
 /* version %I% last-modified %G% */
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_INTR		0		/* do not return on an interrupt */
 
 /* revision history:

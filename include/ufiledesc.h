@@ -48,11 +48,16 @@
 #ifdef	__cplusplus
 
 namespace ufiledesc {
+    struct ufiledescflags {
+	uint		fclose:1 ;
+	uint		fwrite:1 ;
+    } ;
     struct ufiledescbase {
 	cvoid		*wbuf ;
 	void		*rbuf ;
 	int		wlen ;
 	int		rlen ;
+	ufiledescflags	f ;
 	ufiledescbase() noex { } ;
 	int operator () (int) noex ;
 	virtual int callstd(int) noex = 0 ;

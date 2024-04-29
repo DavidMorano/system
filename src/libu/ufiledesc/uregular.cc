@@ -42,17 +42,21 @@
 	Notes:
 	1. Note that the stupid developers of the File Locking
 	mechanism un UNIX® System V did not distinguish a real
-	deadlock from a temporary lack of system resources. We
+	deadlock from a temporary lack of system resources.  We
 	attempt to make up for this screw ball bug in UNIX® with
 	our retries on DEADLOCK.
-	2. I can hardly believe how f*cked up the Apple Darwin
+	2. I can hardly believe how flipped up the Apple Darwin
 	operating system is (or was).  In the old days of Darwin,
 	I actually had to write my own version of |poll(2)| (in
 	terms of |select(2)|) because Darwin did not (yet) have any
-	|poll(2)|.  That is how f*cked up Apple Darwin was!  My and
+	|poll(2)|.  That is how flipped up Apple Darwin was!  My and
 	one million other people on this planet all (independently)
-	had to write out own versions of |poll(2)|.  F*ck that ever
-	again (if we can help it)!
+	had to write out own versions of |poll(2)|.  Flip if that
+	that ever happens again (if we can help it)!
+	3.  Added code to wait (sleep) if we receive a return from
+	|close(2)| with a resturn-status of SR_INPROGRESS.  In such
+	a case, we wait for TO_CLOSEWAIT seconds and then we ourself
+	return w/ SR_OK.
 
 *******************************************************************************/
 
@@ -147,19 +151,10 @@ namespace {
 	    }
 	    return rs ;
 	} ;
-	int ibind(int) noex ;
-	int ilisten(int) noex ;
-	int isetsockopt(int) noex ;
-	int igetsockopt(int) noex ;
-	int igetpeername(int) noex ;
-	int igetsockname(int) noex ;
-	int isend(int) noex ;
-	int isendmsg(int) noex ;
-	int isendto(int) noex ;
-	int irecv(int) noex ;
-	int irecvmsg(int) noex ;
-	int irecvfrom(int) noex ;
-	int ishutdown(int) noex ;
+	void submem(uregular_m mem) noex {
+	    m = mem ;
+	} ;
+	int iclose(int) noex ;
     } ; /* end struct (uregular) */
 }
 
@@ -240,6 +235,16 @@ int u_writen(int fd,cvoid *wbuf,int wlen) noex {
 }
 /* end subroutine (u_writen) */
 
+int u_rewind(int fd) noex {
+	return u_seek(fd,0L,SEEK_SET) ;
+}
+/* end subroutine (u_rewind) */
+
+int u_seekable(int fd) noex {
+	return u_seek(fd,0L,SEEK_CUR) ;
+}
+/* end subroutine (u_seekable) */
+
 int u_fchdir(int fd) noex {
 	int		rs ;
 	repeat {
@@ -274,6 +279,18 @@ int u_fchown(int fd,uid_t uid,gid_t gid) noex {
 }
 /* end subroutine (u_fchown) */
 
+int u_close(int fd) noex {
+	uregular	ro ;
+	ro.m = &uregular::iclose ;
+	ro.f.fclose = true ;
+	return ro(fd) ;
+}
+/* end subroutine (u_close) */
+
+
+
+#ifdef	COMMENT
+
 int u_fpathconf(int fd,int name,long *rp) noex {
 	long		lw ;
 	int		rs = SR_OK ;
@@ -297,7 +314,7 @@ int u_fpathconf(int fd,int name,long *rp) noex {
 }
 /* end subroutine (u_fpathconf) */
 
-#ifdef	defined(SYSHAS_STATVFS) && (SYSHAS_STATVFS > 0)
+#if	defined(SYSHAS_STATVFS) && (SYSHAS_STATVFS > 0)
 
 int u_fstatvfs(int fd,struct statvfs *sbp) noex {
 	int		rs ;
@@ -312,43 +329,36 @@ int u_fstatvfs(int fd,struct statvfs *sbp) noex {
 
 #else /* SYSHAS_STATVFS */
 
-int u_fstatvfs(int fd,struct statvfs *sbp)
-{
-	struct ustatfs	sfs ;
-	int		rs ;
-	int		cl ;
-
-	if (sbp == NULL) return SR_FAULT ;
-
-	memclear(sbp) ;
-
-	if ((rs = u_fstatfs(fd,&sfs)) >= 0) {
-
-	    sbp->f_bsize = sfs.f_bsize ;
-	    sbp->f_blocks = sfs.f_blocks ;
-	    sbp->f_bfree = sfs.f_bfree ;
-	    sbp->f_bavail = sfs.f_bavail ;
-	    sbp->f_files = sfs.f_files ;
-	    sbp->f_ffree = sfs.f_ffree ;
-	    sbp->f_favail = sfs.f_ffree ;	/* Darwin does not have */
-	    sbp->f_fsid = 0 ; 			/* hassles w/ Darwin */
-	    cl = MIN(MFSNAMELEN,FSTYPSZ) ;
-	    strncpy(sbp->f_basetype,sfs.f_fstypename,cl) ;
-
-	    if (sfs.f_flags & MNT_RDONLY)
-	        sbp->f_flag |= ST_RDONLY ;
-
-	    if (sfs.f_flags & MNT_NOSUID)
-	        sbp->f_flag |= ST_NOSUID ;
-
-	} /* end if (successful STAT) */
-
+int u_fstatvfs(int fd,struct statvfs *sbp) noex {
+	int		rs = SR_FAULT ;
+	if (sbp) {
+	    struct ustatfs	sfs ;
+	    memclear(sbp) ;
+	    if ((rs = u_fstatfs(fd,&sfs)) >= 0) {
+	        int	cl ;
+	        sbp->f_bsize = sfs.f_bsize ;
+	        sbp->f_blocks = sfs.f_blocks ;
+	        sbp->f_bfree = sfs.f_bfree ;
+	        sbp->f_bavail = sfs.f_bavail ;
+	        sbp->f_files = sfs.f_files ;
+	        sbp->f_ffree = sfs.f_ffree ;
+	        sbp->f_favail = sfs.f_ffree ;	/* Darwin does not have */
+	        sbp->f_fsid = 0 ;		/* hassles w/ Darwin */
+	        cl = MIN(MFSNAMELEN,FSTYPSZ) ;
+	        strncpy(sbp->f_basetype,sfs.f_fstypename,cl) ;
+	        if (sfs.f_flags & MNT_RDONLY) {
+	            sbp->f_flag |= ST_RDONLY ;
+	        }
+	        if (sfs.f_flags & MNT_NOSUID) {
+	            sbp->f_flag |= ST_NOSUID ;
+	        }
+	    } /* end if (successful STAT) */
+	} /* end if (non-null) */
 	return rs ;
 }
 /* end subroutine (u_fstatvfs) */
 
-static int u_fstatfs(int fd,struct ustatfs *ssp)
-{
+static int u_fstatfs(int fd,struct ustatfs *ssp) noex {
 	int		rs ;
 
 	rs = fstatfs(fd,ssp) ;
@@ -389,7 +399,6 @@ int u_fsync(int fd) noex {
 /* end subroutine (u_fsync) */
 
 int u_ioctl(int fd,int cmd,...) noex {
-{
 	caddr_t		any ;
 	int		rs ;
 	int		to_nomem = TO_NOMEM ;
@@ -486,8 +495,7 @@ int u_poll(POLLFD *fds,int n,int timeout) noex {
 }
 /* end subroutine (u_poll) */
 
-int u_pread(int fd,void *buf,int len,off_t offset)
-{
+int u_pread(int fd,void *buf,int len,off_t offset) noex {
 	int		rs ;
 	int		to_nolck = TO_NOLCK ;
 	int		f_exit = false ;
@@ -696,76 +704,8 @@ int		n ;
 }
 /* end subroutine (u_readv) */
 
-
-/* u_rewind */
-
-/* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
-/* revision history:
-
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* exported subroutines */
-
-
-int u_rewind(int fd)
-{
-	return u_seek(fd,0L,SEEK_SET) ;
-}
-/* end subroutine (u_rewind) */
-
-
-/* u_seek */
-
-/* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
-/* revision history:
-
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* exported subroutines */
-
-
-int u_seek(int fd,off_t o,int w)
-{
-	off_t	ro ;
+int u_seek(int fd,off_t o,int w) noex {
+	off_t		ro ;
 	int		rs ;
 
 	repeat {
@@ -777,76 +717,6 @@ int u_seek(int fd,off_t o,int w)
 	return rs ;
 }
 /* end subroutine (u_seek) */
-
-
-/* u_seekable */
-
-/* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
-/* revision history:
-
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* exported subroutines */
-
-
-int u_seekable(nt fd)
-{
-
-	return u_seek(fd,0L,SEEK_CUR) ;
-}
-/* end subroutine (u_seekable) */
-
-
-/* u_seeko (seek-off) */
-
-/* perform a seek and get the new offset also (like 'lseek(2)') */
-/* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time debugging */
-
-
-/* revision history:
-
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/param.h>
-#include	<limits.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* exported subroutines */
-
 
 int u_seeko(fd,wo,w,offp)
 int		fd ;
@@ -893,45 +763,6 @@ off_t	*offp ;
 }
 /* end subroutine (u_oseek) */
 
-
-/* u_tell SUPPORT */
-/* lang=C++20 */
-
-/* translation layer interface for UNIX® equivalents */
-/* version %I% last-modified %G% */
-
-
-/* revision history:
-
-	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
-
-*/
-
-/* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/stat.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<intsat.h>
-#include	<localmisc.h>
-
-
-/* local defines */
-
-
-/* local variables */
-
-
-/* exported variables */
-
-
-/* exported subroutines */
-
 int u_tell(int fd,off_t *rp) noex {
 	off_t		ro ;
 	int		rs ;
@@ -961,13 +792,14 @@ int u_tell(int fd,off_t *rp) noex {
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This subroutine was originally written to get around some stupid UNIX®
-        sematics of their stupid system calls!
+	This subroutine was originally written to get around some
+	stupid UNIX® sematics of their stupid system calls!
 
 	= 2003-02-21, David A­D­ Morano
-        The interrupt code below was changed so that stupid UNIX® would not ____
-        up when the file descriptor got a HANUP on the other end. This problem
-        surfaced in connection with networking stuff.
+	The interrupt code below was changed so that stupid UNIX®
+	would not ____ up when the file descriptor got a HANUP on
+	the other end. This problem surfaced in connection with
+	networking stuff.
 
 */
 
@@ -1115,61 +947,6 @@ int		wlen ;
 }
 /* end subroutine (u_write) */
 
-/* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time */
-#define	CF_UPOLL	0		/* use 'u_poll(3u)' ? */
-
-
-/* revision history:
-
-	= 1998-03-26, David A­D­ Morano
-        This subroutine was originally written to get around some stupid UNIX®
-        sematics of their stupid system calls!
-
-	= 2003-02-21, David A­D­ Morano
-        This interrupt code below was changed so that stupid UNIX® would not
-        ____ up when the file descriptor got a HANUP on the other end. This
-        problem surfaced in connection with networking stuff.
-
-*/
-
-/* Copyright © 1998,2003 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* local defines */
-
-#define	TO_NOSR		(10 * 60)
-#define	TO_NOSPC	(10 * 60)
-#define	TO_NOLCK	10
-#define	TO_AGAIN	2
-
-
-/* external subroutines */
-
-extern int	msleep(int) ;
-
-
-/* local structures */
-
-#if	defined(DARWIN)
-typedef unsigned long		nfds_t ;
-#endif
-
-
-/* exported subroutines */
-
-
 int u_writev(fd,iop,n)
 int		fd ;
 const struct iovec	*iop ;
@@ -1264,97 +1041,18 @@ int		n ;
 }
 /* end subroutine (u_writev) */
 
-
-/* u_close */
-
-/* translation layer interface for UNIXÂ® equivalents */
+#endif /* COMMENT */
 
 
-#define	CF_DEBUGS	0		/* compile-time debugging */
+/* local subroutines */
 
-
-/* revision history:
-
-	= 1998-11-01, David AÂ­DÂ­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
-	
-	= 2018-09-17, David A.D. Morano
-	Added code to wait (sleep) if we receive a return from 
-	|close(2)| with a resturn-status of SR_INPROGRESS. 
-	In such a case, we wait for TO_CLOSEWAIT seconds and then
-	we outself return w/ SR_OK.
-
-*/
-
-/* Copyright Â© 1998 David AÂ­DÂ­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/wait.h>
-#include	<unistd.h>
-#include	<fcntl.h>
-#include	<poll.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* local defines */
-
-#define	TO_NOMEM	5
-#define	TO_NOSR		(5 * 60)
-#define	TO_CLOSEWAIT	5		/* seconds */
-
-
-/* external subroutines */
-
-
-/* exported subroutines */
-
-int u_close(int fd)
-{
+int uregular::iclose(int fd) noex {
 	int		rs ;
-	int		to_nomem = TO_NOMEM ;
-	int		to_nosr = TO_NOSR ;
-	int		f_exit = false ;
-
-	repeat {
-	    if ((rs = close(fd)) < 0) rs = (- errno) ;
-	    if (rs < 0) {
-	        switch (rs) {
-	        case SR_NOMEM:
-	            if (to_nomem-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-#if	defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0)
-	        case SR_NOSR:
-	            if (to_nosr-- > 0) {
-			msleep(1000) ;
-		    } else {
-			f_exit = true ;
-		    }
-	            break ;
-#endif /* defined(SYSHAS_STREAMS) && (SYSHAS_STREAMS > 0) */
-	        case SR_INTR:
-	            break ;
-		case SR_INPROGRESS: /* new proposal */
-		    msleep(TO_CLOSEWAIT*1000) ;
-		    rs = SR_OK ;
-		    break ;
-		default:
-		    f_exit = true ;
-		    break ;
-	        } /* end switch */
-	    } /* end if (error) */
-	} until ((rs >= 0) || f_exit) ;
-
+	if ((rs = close(fd)) < 0) {
+	    rs = (- errno) ;
+	}
 	return rs ;
 }
-/* end subroutine (u_close) */
-
-#endif /* COMMENT */
+/* end method (uregular::iclose) */
 
 

@@ -45,6 +45,7 @@ enum utos {
 	uto_nolck,
 	uto_capture,
 	uto_txtbusy,
+	uto_closewait,
 	uto_overlast
 } ; /* end enum (utos) */
 
