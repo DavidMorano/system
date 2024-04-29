@@ -55,7 +55,7 @@ struct reterr {
 	void operator () (bool f = true) noex {
 	    fexit = f ;
 	} ;
-	operator int () noex {
+	operator int () const noex {
 	    return rs ;
 	} ;
 } ; /* end struct (reterr) */
@@ -69,7 +69,7 @@ struct errtimer {
 	void operator = (cint &ato) noex {
 	    mto = (ato * POLL_INTMULT) ;
 	} ;
-	const reterr operator () (int ars) noex ;
+	const reterr operator () (int) noex ;
 	operator reterr () noex ;
 } ; /* end struct (errtimer) */
 

@@ -51,13 +51,14 @@ namespace ufiledesc {
     struct ufiledescflags {
 	uint		fclose:1 ;
 	uint		fwrite:1 ;
+	uint		fintr:1 ;	/* allow interrupts to return */
     } ;
     struct ufiledescbase {
 	cvoid		*wbuf ;
 	void		*rbuf ;
 	int		wlen ;
 	int		rlen ;
-	ufiledescflags	f ;
+	ufiledescflags	f{} ;
 	ufiledescbase() noex { } ;
 	int operator () (int) noex ;
 	virtual int callstd(int) noex = 0 ;

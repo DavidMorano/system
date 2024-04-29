@@ -130,8 +130,11 @@ namespace {
     typedef int (uregular::*uregular_m)(int) noex ;
     struct uregular : ufiledescbase {
 	uregular_m	m = nullptr ;
+	POLLFD		*fds ;
 	cvoid		*valp ;
 	int		*lenp ;
+	int		nfds ;
+	int		to ;
 	int		len ;
 	int		name ;
 	int		flags ;
@@ -144,6 +147,7 @@ namespace {
 	    wbuf = wb ;
 	    wlen = wl ;
 	} 
+	uregular(POLLFD *s,int n,int t) noex : fds(s), nfds(n), to(t) { } ;
 	int callstd(int fd) noex override {
 	    int		rs = SR_BUGCHECK ;
 	    if (m) {
@@ -155,6 +159,7 @@ namespace {
 	    m = mem ;
 	} ;
 	int iclose(int) noex ;
+	int ipoll(int) noex ;
     } ; /* end struct (uregular) */
 }
 
@@ -282,10 +287,23 @@ int u_fchown(int fd,uid_t uid,gid_t gid) noex {
 int u_close(int fd) noex {
 	uregular	ro ;
 	ro.m = &uregular::iclose ;
-	ro.f.fclose = true ;
+	ro.f.fclose = true ;		/* special treatment */
 	return ro(fd) ;
 }
 /* end subroutine (u_close) */
+
+/* this is (sort of) a spæcial case */
+int u_poll(POLLFD *fds,int n,int to) noex {
+	int		rs = SR_FAULT ;
+	if (fds) {
+	    uregular	ro(fds,n,to) ;
+	    ro.m = &uregular::ipoll ;
+	    ro.f.fintr = true ;
+	    rs = ro(0) ;
+	} /* end if (non-null) */
+	return rs ;
+}
+/* end subroutine (u_poll) */
 
 
 
@@ -501,10 +519,6 @@ int u_pread(int fd,void *buf,int len,off_t offset) noex {
 	int		f_exit = false ;
 	char		*bp = (char *) buf ;
 
-#if	CF_DEBUGS
-	debugprintf("u_pread: ent fd=%d len=%d\n",fd,len) ;
-#endif
-
 	repeat {
 	    if ((rs = pread(fd,bp,(size_t) len,offset)) < 0) rs = (- errno) ;
 	    if (rs < 0) {
@@ -546,10 +560,6 @@ off_t	off ;
 	int		to_again = TO_AGAIN ;
 	int		f_exit = false ;
 	char		*bp = (char *) buf ;
-
-#if	CF_DEBUGS
-	debugprintf("u_pwrite: ent FD=%d len=%d\n",fd,len) ;
-#endif
 
 	repeat {
 	    if ((rs = pwrite(fd,bp,(size_t) len,off)) < 0) rs = (- errno) ;
@@ -599,9 +609,6 @@ off_t	off ;
 #else
 	            if ((rs1 = poll(fds,nfds,0)) < 0) rs1 = (- errno) ;
 #endif
-#if	CF_DEBUGS 
-	            debugprintf("watch: back from poll w/ rs=%08X\n",rs) ;
-#endif
 	            if (rs1 > 0) {
 	                const int	re = fds[0].revents ;
 	                if (re & POLLHUP) {
@@ -621,10 +628,6 @@ off_t	off ;
 	    } /* end if (some kind of error) */
 	} until ((rs >= 0) || f_exit) ;
 
-#if	CF_DEBUGS
-	debugprintf("u_pwrite: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (u_pwrite) */
@@ -638,10 +641,6 @@ int		ulen ;
 	int		rs ;
 	int		to_nolck = TO_NOLCK ;
 	int		f_exit = false ;
-
-#if	CF_DEBUGS
-	debugprintf("u_read: ent fd=%d ulen=%d\n",fd,ulen) ;
-#endif
 
 	repeat {
 	    if ((rs = read(fd,ubuf,rlen)) < 0) rs = (- errno) ;
@@ -675,10 +674,6 @@ int		n ;
 	int		rs ;
 	int		to_nolck = TO_NOLCK ;
 	int		f_exit = false ;
-
-#if	CF_DEBUGS
-	debugprintf("u_readv: ent fd=%d len=%d\n",fd,len) ;
-#endif
 
 	repeat {
 	    if ((rs = readv(fd,iop,n)) < 0) rs = (- errno) ;
@@ -778,75 +773,6 @@ int u_tell(int fd,off_t *rp) noex {
 }
 /* end subroutine (u_tell) */
 
-
-/* u_write */
-
-/* UNIX write system call subroutine */
-/* translation layer interface for UNIX® equivalents */
-
-
-#define	CF_DEBUGS	0		/* compile-time */
-#define	CF_UPOLL	0		/* use 'u_poll(2u)' ? */
-
-
-/* revision history:
-
-	= 1998-03-26, David A­D­ Morano
-	This subroutine was originally written to get around some
-	stupid UNIX® sematics of their stupid system calls!
-
-	= 2003-02-21, David A­D­ Morano
-	The interrupt code below was changed so that stupid UNIX®
-	would not ____ up when the file descriptor got a HANUP on
-	the other end. This problem surfaced in connection with
-	networking stuff.
-
-*/
-
-/* Copyright © 1998,2003 David A­D­ Morano.  All rights reserved. */
-
-#include	<envstandards.h>	/* MUST be ordered first to configure */
-#include	<sys/types.h>
-#include	<sys/uio.h>
-#include	<unistd.h>
-#include	<poll.h>
-#include	<errno.h>
-#include	<usystem.h>
-#include	<localmisc.h>
-
-
-/* local defines */
-
-#define	TO_NOSR		(10 * 60)
-#define	TO_NOSPC	(10 * 60)
-#define	TO_NOLCK	10
-#define	TO_AGAIN	2
-
-
-/* external subroutines */
-
-extern int	msleep(int) ;
-
-
-/* external variables */
-
-
-/* local structures */
-
-#if	defined(DARWIN)
-typedef unsigned long		nfds_t ;
-#endif
-
-
-/* forward references */
-
-
-/* local variables */
-
-
-/* exported subroutines */
-
-
 int u_write(fd,wbuf,wlen)
 int		fd ;
 const void	*wbuf ;
@@ -863,10 +789,6 @@ int		wlen ;
 	int		to_again = TO_AGAIN ;
 	int		f_init = false ;
 	int		f_exit = false ;
-
-#if	CF_DEBUGS
-	debugprintf("u_write: ent FD=%d len=%d\n",fd,wlen) ;
-#endif
 
 	repeat {
 	    if ((rs = write(fd,wbuf,wsize)) < 0) rs = (- errno) ;
@@ -939,10 +861,6 @@ int		wlen ;
 	    } /* end if (some kind of error) */
 	} until ((rs >= 0) || f_exit) ;
 
-#if	CF_DEBUGS
-	debugprintf("u_write: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (u_write) */
@@ -961,10 +879,6 @@ int		n ;
 	int		to_nolck = TO_NOLCK ;
 	int		to_again = TO_AGAIN ;
 	int		f_exit = false ;
-
-#if	CF_DEBUGS
-	debugprintf("u_writev: ent FD=%d len=%d\n",fd,len) ;
-#endif
 
 	repeat {
 	    if ((rs = writev(fd,iop,n)) < 0) rs = (- errno) ;
@@ -1014,7 +928,7 @@ int		n ;
 #else
 	            if ((rs1 = poll(fds,nfds,0)) < 0) rs1 = (- errno) ;
 #endif
-	            if (rs1 > 0) {
+	            if (> 0) {
 	                const int	re = fds[0].revents ;
 	                if (re & POLLHUP) {
 	                    rs = SR_HANGUP ;	/* same as SR_IO */
@@ -1033,10 +947,6 @@ int		n ;
 	    } /* end if (some kind of error) */
 	} until ((rs >= 0) || f_exit) ;
 
-#if	CF_DEBUGS
-	debugprintf("u_writev: ret rs=%d\n",rs) ;
-#endif
-
 	return rs ;
 }
 /* end subroutine (u_writev) */
@@ -1054,5 +964,16 @@ int uregular::iclose(int fd) noex {
 	return rs ;
 }
 /* end method (uregular::iclose) */
+
+int uregular::ipoll(int) noex {
+	cnfds		n = nfds_t(nfds) ;
+	cint		mto = (to * POLL_INTMULT) ;
+	int		rs ;
+	if ((rs = poll(fds,n,mto)) < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end method (uregular::ipoll) */
 
 

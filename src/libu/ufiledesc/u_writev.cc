@@ -124,7 +124,7 @@ int		n ;
 	            if ((rs1 = poll(fds,nfds,0)) < 0) rs1 = (- errno) ;
 #endif
 	            if (rs1 > 0) {
-	                const int	re = fds[0].revents ;
+	                cint	re = fds[0].revents ;
 	                if (re & POLLHUP) {
 	                    rs = SR_HANGUP ;	/* same as SR_IO */
 	                } else if (re & POLLERR) {

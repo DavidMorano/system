@@ -11,13 +11,14 @@
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This subroutine was originally written to get around some stupid UNIX®
-        sematics of their stupid system calls!
+	This subroutine was originally written to get around some
+	stupid UNIX® sematics of their stupid system calls!
 
 	= 2003-02-21, David A­D­ Morano
-        The interrupt code below was changed so that stupid UNIX® would not ____
-        up when the file descriptor got a HANUP on the other end. This problem
-        surfaced in connection with networking stuff.
+	The interrupt code below was changed so that stupid UNIX®
+	would not ____ up when the file descriptor got a HANUP on
+	the other end. This problem surfaced in connection with
+	networking stuff.
 
 */
 

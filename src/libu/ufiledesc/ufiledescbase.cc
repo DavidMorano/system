@@ -82,7 +82,7 @@ int ufiledescbase::operator () (int fd) noex {
 	reterr		r ;
 	repeat {
 	    if ((rs = callstd(fd)) < 0) {
-		r(rs) ;
+		r(rs) ;			/* <- default causes exit */
                 switch (rs) {
                 case SR_NOMEM:
                     r = to_nomem(rs) ;
@@ -101,12 +101,11 @@ int ufiledescbase::operator () (int fd) noex {
                     break ;
 		case SR_INPROGRESS: /* who thought up this? */
 		    if (f.fclose) {
-		        msleep(to_closewait * 1000) ;
-		        rs = SR_OK ;
+		        rs = msleep(to_closewait * 1000) ;
 		    }
 		    break ;
                 case SR_INTR:
-		    r(false) ;
+		    if (! f.fintr) r(false) ;
                     break ;
                 } /* end switch */
 		rs = r ;
