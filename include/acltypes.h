@@ -1,4 +1,8 @@
-/* acltypes */
+/* acltypes HEADER */
+/* lang=C++20 */
+
+/* ACL types (types of ACLs) */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -10,12 +14,20 @@
 
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
-
 #ifndef	ACLTYPES_INCLUDE
-#define	ACLTYPES_INCLUDE	1
+#define	ACLTYPES_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<utypedefs.h>
+#include	<utypealiases.h>
+#include	<usysrets.h>
+#include	<usyscalls.h>
+#include	<clanguage.h>
+#include	<localmisc.h>
+
+
+#define	ACLTYPES	struct acltypes
 
 
 enum acltypes {
@@ -31,15 +43,12 @@ enum acltypes {
 } ;
 
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
+EXTERNC_begin
 
-extern int	getacltype(const char *,int) ;
+extern int	getacltype(cchar *,int) noex ;
 
-#ifdef	__cplusplus
-}
-#endif
+EXTERNC_end
+
 
 #endif /* ACLTYPES_INCLUDE */
 
