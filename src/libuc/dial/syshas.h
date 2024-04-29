@@ -41,10 +41,10 @@
 /* Solaris®: system has |poll(2)| call and friends */
 #define	SYSHAS_POLL		1
 
-/* Solaris®: system has STREAMS framework */
+/* Solaris®: system has STREAMS® framework */
 #define	SYSHAS_STREAMS		1
 
-/* Solaris®: has POSIX real-time timers */
+/* Solaris®: sustem has POSIX® real-time timers */
 #define	SYSHAS_TIMER		1
 
 /* Solaris®: system has ACL framework */
@@ -240,7 +240,7 @@
 #define	SYSHAS_POLL		0
 #endif
 
-/* Darwin: STREAMS */
+/* Darwin: system has STREAMS® framework */
 #define	SYSHAS_STREAMS		0
 
 /* Darwin: does *not* have POSIX real-time timers */
@@ -443,14 +443,14 @@
 /* Linux: system has |poll(2)| call and friends */
 #define	SYSHAS_POLL		1
 
-/* Linux: system has STREAMS framework */
+/* Linux: system has STREAMS® framework */
 #define	SYSHAS_STREAMS		1
 
-/* Linux: has POSIX real-time timers */
+/* Linux: sustem has POSIX® real-time timers */
 #define	SYSHAS_TIMER		1
 
 /* Linux: system has ACL framework */
-#define	SYSHAS_ACL		1
+#define	SYSHAS_ACL		0
 
 /* Linux: system has user attributes framework */
 #define	SYSHAS_USERATTR		0

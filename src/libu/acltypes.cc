@@ -24,6 +24,7 @@
 *******************************************************************************/
 
 #include	<envstandards.h>	/* MUST be first to configure */
+#include	<sys/param.h>		/* |MAX_ACL_ENTRIES| */
 #include	<climits>
 #include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
@@ -48,7 +49,13 @@
 /* external variables */
 
 
-/* global variables */
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
 
 constexpr cpcchar	acltypes[] = {
 	"user",
@@ -61,15 +68,6 @@ constexpr cpcchar	acltypes[] = {
 	"dmask",
 	nullptr
 } ;
-
-
-/* local structures */
-
-
-/* forward references */
-
-
-/* local variables */
 
 
 /* exported variables */

@@ -1,15 +1,14 @@
-/* b_chacl */
+/* b_chacl SUPPORT */
+/* lang=C++20 */
 
 /* change ACLs (on OSes that have them) */
 /* version %I% last-modified %G% */
-
 
 #define	CF_DEBUGS	0		/* non-switchable debug print-outs */
 #define	CF_DEBUG	0		/* switchable at invocation */
 #define	CF_DEBUGMALL	1		/* debug memory allocations */
 #define	CF_DEFMAXACLS	1		/* use MAXACLS as default */
 #define	CF_NOSOCKETS	1		/* do not process sockets */
-
 
 /* revision history:
 
@@ -23,12 +22,9 @@
 /*******************************************************************************
 
 	Synopsis:
-
 	$ chacl <acl(s)> [<file(s) ...>]
 
-
 *******************************************************************************/
-
 
 #include	<envstandards.h>	/* MUST be first to configure */
 
@@ -46,12 +42,11 @@
 #include	<sys/param.h>
 #include	<sys/stat.h>
 #include	<sys/acl.h>
-#include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<stdlib.h>
-#include	<string.h>
-
+#include	<climits>
+#include	<cstdlib>
+#include	<cstring>
 #include	<usystem.h>
 #include	<bits.h>
 #include	<keyopt.h>
@@ -62,6 +57,7 @@
 #include	<fsdirtree.h>
 #include	<getax.h>
 #include	<ugetpw.h>
+#include	<mkchar.h>
 #include	<exitcodes.h>
 #include	<localmisc.h>
 
@@ -244,10 +240,10 @@ static int	locinfo_ftypes(LOCINFO *) ;
 static int	locinfo_isfsuffix(LOCINFO *,cchar *) ;
 static int	locinfo_isftype(LOCINFO *,cchar *,FSDIRTREE_STAT *) ;
 static int	locinfo_finish(LOCINFO *) ;
-static int	locinfo_addacl(LOCINFO *,aclinfo_t *) ;
+static int	locinfo_addacl(LOCINFO *,aclinfo *) ;
 static int	locinfo_mksol(LOCINFO *) ;
 
-static int	aclents_match(aclent_t *,int,aclinfo_t *) ;
+static int	aclents_match(aclent_t *,int,aclinfo *) ;
 static int	aclents_minmax(aclent_t *,int,int *,int *) ;
 static int	aclents_compact(aclent_t *,int) ;
 static int	aclents_maskmat(aclent_t *,int) ;
@@ -440,9 +436,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	int		cl ;
 	int		ex = EX_INFO ;
 	int		f_optminus, f_optplus, f_optequal ;
-	int		f_version = FALSE ;
-	int		f_usage = FALSE ;
-	int		f_help = FALSE ;
+	int		f_version = false ;
+	int		f_usage = false ;
+	int		f_help = false ;
 	int		f ;
 
 	cchar		*argp, *aop, *akp, *avp ;
@@ -527,9 +523,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	            aop = argp + 1 ;
 	            akp = aop ;
 	            aol = argl - 1 ;
-	            f_optequal = FALSE ;
+	            f_optequal = false ;
 	            if ((avp = strchr(aop,'=')) != NULL) {
-	                f_optequal = TRUE ;
+	                f_optequal = true ;
 	                akl = avp - aop ;
 	                avp += 1 ;
 	                avl = aop + argl - 1 - avp ;
@@ -546,7 +542,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                case argopt_version:
-	                    f_version = TRUE ;
+	                    f_version = true ;
 	                    if (f_optequal)
 	                        rs = SR_INVALID ;
 	                    break ;
@@ -555,7 +551,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                case argopt_verbose:
 	                    pip->verboselevel = 2 ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optvalue(avp,avl) ;
 	                            pip->verboselevel = rs ;
@@ -566,7 +562,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* program root */
 	                case argopt_root:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            pr = avp ;
 	                    } else {
@@ -582,13 +578,13 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_help:
-	                    f_help = TRUE ;
+	                    f_help = true ;
 	                    break ;
 
 /* program search-name */
 	                case argopt_sn:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            sn = avp ;
 	                    } else {
@@ -605,7 +601,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 	                case argopt_af:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            afname = avp ;
 	                    } else {
@@ -623,7 +619,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* error file name */
 	                case argopt_ef:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            efname = avp ;
 	                    } else {
@@ -641,7 +637,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* output file name */
 	                case argopt_of:
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl)
 	                            ofname = avp ;
 	                    } else {
@@ -657,9 +653,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_min:
-	                    lip->f.min = TRUE ;
+	                    lip->f.min = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->f.min = (rs > 0) ;
@@ -668,9 +664,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_max:
-	                    lip->f.max = TRUE ;
+	                    lip->f.max = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->f.max = (rs > 0) ;
@@ -679,10 +675,10 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_mm:
-	                    lip->f.min = TRUE ;
-	                    lip->f.max = TRUE ;
+	                    lip->f.min = true ;
+	                    lip->f.max = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->f.min = (rs > 0) ;
@@ -692,9 +688,9 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_mc:
-	                    lip->f.maskcalc = TRUE ;
+	                    lip->f.maskcalc = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->f.maskcalc = (rs > 0) ;
@@ -703,11 +699,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_suid:
-	                    lip->have.suid = TRUE ;
-	                    lip->final.suid = TRUE ;
-	                    lip->f.suid = TRUE ;
+	                    lip->have.suid = true ;
+	                    lip->final.suid = true ;
+	                    lip->f.suid = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->f.suid = (rs > 0) ;
@@ -716,11 +712,11 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    break ;
 
 	                case argopt_sgid:
-	                    lip->have.sgid = TRUE ;
-	                    lip->final.sgid = TRUE ;
-	                    lip->f.sgid = TRUE ;
+	                    lip->have.sgid = true ;
+	                    lip->final.sgid = true ;
+	                    lip->f.sgid = true ;
 	                    if (f_optequal) {
-	                        f_optequal = FALSE ;
+	                        f_optequal = false ;
 	                        if (avl) {
 	                            rs = optbool(avp,avl) ;
 	                            lip->f.sgid = (rs > 0) ;
@@ -774,7 +770,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'D':
 	                        pip->debuglevel = 1 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->debuglevel = rs ;
@@ -784,7 +780,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* quiet mode */
 	                    case 'Q':
-	                        pip->f.quiet = TRUE ;
+	                        pip->f.quiet = true ;
 	                        break ;
 
 /* program-root */
@@ -801,17 +797,17 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 
 /* version */
 	                    case 'V':
-	                        f_version = TRUE ;
+	                        f_version = true ;
 	                        break ;
 
 /* delete empty ACLs */
 	                    case 'd':
-	                        lip->f.delempty = TRUE ;
+	                        lip->f.delempty = true ;
 	                        break ;
 
 /* follow symbolic links */
 	                    case 'f':
-	                        lip->f.follow = TRUE ;
+	                        lip->f.follow = true ;
 	                        break ;
 
 	                    case 'g':
@@ -830,12 +826,12 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 /* no stopping on error */
 	                    case 'n':
 	                    case 'c':
-	                        lip->f.nostop = TRUE ;
+	                        lip->f.nostop = true ;
 	                        break ;
 
 /* recurse */
 	                    case 'r':
-	                        lip->f.recurse = TRUE ;
+	                        lip->f.recurse = true ;
 	                        break ;
 
 /* program options */
@@ -856,7 +852,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 's':
 	                        cp = NULL ;
 	                        cl = -1 ;
-	                        lip->f.fsuffixes = TRUE ;
+	                        lip->f.fsuffixes = true ;
 	                        if (argr > 0) {
 	                            argp = argv[++ai] ;
 	                            argr -= 1 ;
@@ -913,7 +909,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                    case 'v':
 	                        pip->verboselevel = 2 ;
 	                        if (f_optequal) {
-	                            f_optequal = FALSE ;
+	                            f_optequal = false ;
 	                            if (avl) {
 	                                rs = optvalue(avp,avl) ;
 	                                pip->verboselevel = rs ;
@@ -922,7 +918,7 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	                        break ;
 
 	                    case '?':
-	                        f_usage = TRUE ;
+	                        f_usage = true ;
 	                        break ;
 
 	                    default:
@@ -954,8 +950,8 @@ static int mainsub(int argc,cchar *argv[],cchar *envv[],void *contextp)
 	if (efname == NULL) efname = STDFNERR ;
 	if ((rs1 = shio_open(&errfile,efname,"wca",0666)) >= 0) {
 	    pip->efp = &errfile ;
-	    pip->open.errfile = TRUE ;
-	    shio_control(&errfile,SHIO_CSETBUFLINE,TRUE) ;
+	    pip->open.errfile = true ;
+	    shio_control(&errfile,SHIO_CSETBUFLINE,true) ;
 	} else if (! isFailOpen(rs1)) {
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -1138,7 +1134,7 @@ retearly:
 #endif
 
 	if (pip->efp != NULL) {
-	    pip->open.errfile = FALSE ;
+	    pip->open.errfile = false ;
 	    shio_close(pip->efp) ;
 	    pip->efp = NULL ;
 	}
@@ -1273,7 +1269,7 @@ static int procacl(PROGINFO *pip,cchar *abuf,int alen)
 	cchar		*tp ;
 
 	if ((tp = strnpbrk(abuf,alen,"=+-")) != NULL) {
-	    aclinfo_t	ai ;
+	    aclinfo	ai ;
 	    int		idlen = 0 ;
 	    int		typelen = (tp - abuf) ;
 	    int		permlen ;
@@ -1495,14 +1491,14 @@ static int procname(PROGINFO *pip,cchar *fname)
 
 	if (fname[0] != '-') {
 	    FSDIRTREE_STAT	sb, ssb ;
-	    int			f_done = FALSE ;
-	    int			f_islnk = FALSE ;
+	    int			f_done = false ;
+	    int			f_islnk = false ;
 	    int			f_dir ;
 
 	    if ((rs = fsdirtreestat(fname,1,&sb)) >= 0) {
 	        f_dir = S_ISDIR(sb.st_mode) ;
 	        if (S_ISLNK(sb.st_mode)) {
-	            f_islnk = TRUE ;
+	            f_islnk = true ;
 	            if (lip->f.follow) {
 
 #if	CF_DEBUG
@@ -1515,7 +1511,7 @@ static int procname(PROGINFO *pip,cchar *fname)
 	                    if (f_dir) {
 	                        sb = ssb ;
 	                    } else {
-	                        f_islnk = FALSE ;
+	                        f_islnk = false ;
 			    }
 	                }
 
@@ -1524,7 +1520,7 @@ static int procname(PROGINFO *pip,cchar *fname)
 	    } /* end if (following symbolic link) */
 
 	    if ((rs >= 0) && S_ISLNK(sb.st_mode) && (! lip->f.follow)) {
-	        f_done = TRUE ;
+	        f_done = true ;
 	    }
 
 	    if ((! f_done) && (rs < 0)) {
@@ -1539,7 +1535,7 @@ static int procname(PROGINFO *pip,cchar *fname)
 	        } /* end if */
 
 	        if (lip->f.nostop) {
-	            f_done = TRUE ;
+	            f_done = true ;
 	            rs = SR_OK ;
 	        }
 
@@ -1649,12 +1645,12 @@ static int procnamer(PROGINFO *pip,cchar *fname)
 static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 {
 	LOCINFO		*lip = pip->lip ;
-	aclinfo_t	*ap ;
+	aclinfo	*ap ;
 	aclent_t	*aclbuf = (aclent_t *) pip->buffer ;
 	int		rs = SR_OK ;
 	int		fd = -1 ;
 	int		nacls ;
-	int		f_changed = FALSE ;
+	int		f_changed = false ;
 
 #if	CF_DEBUG
 	if (DEBUGLEVEL(4))
@@ -1709,16 +1705,16 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 	if (rs >= 0) {
 	    mode_t	fm = sbp->st_mode ;
-	    int		f_set = FALSE ;
+	    int		f_set = false ;
 	    if (lip->f.suid && S_ISREG(fm)) {
 		if (! (fm & S_ISUID)) {
-		    f_set = TRUE ;
+		    f_set = true ;
 		    fm |= S_ISUID ;
 		}
 	    }
 	    if (lip->f.sgid && (S_ISREG(fm) || S_ISDIR(fm))) {
 		if (! (fm & S_ISGID)) {
-		    f_set = TRUE ;
+		    f_set = true ;
 		    fm |= S_ISGID ;
 		}
 	    }
@@ -1756,7 +1752,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	    int		perm_new ;
 	    int		perm_min = 0 ;
 	    int		perm_max = 0 ;
-	    int		f_minus = FALSE ;
+	    int		f_minus = false ;
 	    int		f_idtype ;
 
 /* find the minimum and the maximum perms */
@@ -1781,7 +1777,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	            debugprintf("checkname: processing one\n") ;
 #endif
 
-	        f_idtype = FALSE ;
+	        f_idtype = false ;
 	        j = aclents_match(aclbuf,nacls,ap) ;
 
 #if	CF_DEBUG
@@ -1799,7 +1795,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	            if (ap->op == aclop_add) {
 	                perm_new = aclbuf[j].a_perm | ap->perm ;
 	            } else {
-	                f_minus = TRUE ;
+	                f_minus = true ;
 	                perm_new = aclbuf[j].a_perm & (~ ap->perm) ;
 	            }
 
@@ -1817,7 +1813,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	            }
 
 	            if (aclbuf[j].a_perm != perm_new) {
-	                f_changed = TRUE ;
+	                f_changed = true ;
 	                aclbuf[j].a_perm = (short) perm_new ;
 	            }
 
@@ -1844,7 +1840,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                    ((ap->type == acltype_user) ||
 	                    (ap->type == acltype_defuser))) {
 
-	                    f_idtype = TRUE ;
+	                    f_idtype = true ;
 	                    aclbuf[j].a_id = ap->uid ;
 
 	                } else if ((ap->gid >= 0) &&
@@ -1856,7 +1852,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                        debugprintf("checkname: group or defgroup\n") ;
 #endif
 
-	                    f_idtype = TRUE ;
+	                    f_idtype = true ;
 	                    aclbuf[j].a_id = ap->gid ;
 
 	                } /* end if */
@@ -1897,12 +1893,12 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 #endif
 
 	                        if ((perm_min & perm_new) != perm_new) {
-	                            f_changed = TRUE ;
+	                            f_changed = true ;
 	                            aclbuf[nacls++].a_perm = (short) perm_new ;
 	                        }
 
 	                    } else {
-	                        f_changed = TRUE ;
+	                        f_changed = true ;
 	                        aclbuf[nacls++].a_perm = (short) perm_new ;
 	                    }
 
@@ -1929,7 +1925,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 #endif
 
 	    if (lip->f.min && f_minus) {
-	        int	f_gotone = FALSE ;
+	        int	f_gotone = false ;
 
 #if	CF_DEBUG
 	        if (DEBUGLEVEL(4))
@@ -1945,8 +1941,8 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 	                if ((j >= 0) && 
 	                    (aclbuf[j].a_perm == perm_min)) {
-	                    f_changed = TRUE ;
-	                    f_gotone = TRUE ;
+	                    f_changed = true ;
+	                    f_gotone = true ;
 	                    aclbuf[j].a_type = -1 ;
 	                }
 
@@ -1975,7 +1971,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 	            if (aclent_empty(aclbuf + j) > 0) {
 
-	                f_changed = TRUE ;
+	                f_changed = true ;
 	                if (j < (nacls - 1)) {
 	                    aclbuf[j] = aclbuf[nacls - 1] ;
 	                } /* end if (swapping) */
@@ -2030,7 +2026,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                aclbuf[j].a_type = ACLTYPE_DEFCLASSOBJ ;
 	                aclbuf[j].a_id = 0 ;
 	                aclbuf[j].a_perm = 0007 ;
-	                f_changed = TRUE ;
+	                f_changed = true ;
 
 	            } /* end if */
 
@@ -2060,7 +2056,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                aclbuf[j].a_type = ACLTYPE_CLASSOBJ ;
 	                aclbuf[j].a_id = 0 ;
 	                aclbuf[j].a_perm = 07 ;
-	                f_changed = TRUE ;
+	                f_changed = true ;
 
 	            } /* end if */
 
@@ -2075,7 +2071,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	                aclbuf[j].a_type = ACLTYPE_CLASSOBJ ;
 	                aclbuf[j].a_id = 0 ;
 	                aclbuf[j].a_perm = 0 ;
-	                f_changed = TRUE ;
+	                f_changed = true ;
 
 	            } /* end if */
 
@@ -2119,7 +2115,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 /* re-calculate the "mask" entry */
 
-	            rc = aclsort(nacls,TRUE,aclbuf) ;
+	            rc = aclsort(nacls,true,aclbuf) ;
 	            rs = (rc == 0) ? SR_OK : SR_INVALID ;
 
 	            if (rs >= 0) {
@@ -2128,7 +2124,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 
 	                if ((j >= 0) &&
 	                    (aclbuf[j].a_perm != perm_mask))
-	                    f_changed = TRUE ;
+	                    f_changed = true ;
 
 	            } /* end if */
 
@@ -2194,7 +2190,7 @@ static int checkname(PROGINFO *pip,cchar *fname,FSDIRTREE_STAT *sbp)
 	if (rs != SR_PERM) {
 	    if ((rs < 0) && isNotPresent(rs)) {
 	        lip->errored += 1 ;
-	        f_changed = FALSE ;
+	        f_changed = false ;
 	        if (! pip->f.quiet) {
 		    cchar	*pn = pip->progname ;
 		    cchar	*fmt ;
@@ -2298,20 +2294,20 @@ static int locinfo_start(LOCINFO *lip,PROGINFO *pip)
 	lip->gid_new = -1 ;
 
 	if ((rs = keyopt_start(&lip->akopts)) >= 0) {
-	    pip->open.akopts = TRUE ;
+	    pip->open.akopts = true ;
 	    if ((rs = paramopt_start(&lip->aparams)) >= 0) {
-	        const int	esize = sizeof(aclinfo_t) ;
-	        pip->open.aparams = TRUE ;
+	        cint	esize = sizeof(aclinfo) ;
+	        pip->open.aparams = true ;
 	        if ((rs = vecobj_start(&lip->acls,esize,10,0)) >= 0) {
-	            lip->f.acls = TRUE ;
+	            lip->f.acls = true ;
 	        }
 	        if (rs < 0) {
-	            pip->open.aparams = FALSE ;
+	            pip->open.aparams = false ;
 	            paramopt_finish(&lip->aparams) ;
 	        }
 	    } /* end if (paramopt_start) */
 	    if (rs < 0) {
-	        pip->open.akopts = FALSE ;
+	        pip->open.akopts = false ;
 	        keyopt_finish(&lip->akopts) ;
 	    }
 	} /* end if (keyopt_start) */
@@ -2328,19 +2324,19 @@ static int locinfo_finish(LOCINFO *lip)
 	int		rs1 ;
 
 	if (lip->f.acls) {
-	    lip->f.acls = FALSE ;
+	    lip->f.acls = false ;
 	    rs1 = vecobj_finish(&lip->acls) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (pip->open.aparams) {
-	    pip->open.aparams = FALSE ;
+	    pip->open.aparams = false ;
 	    rs1 = paramopt_finish(&lip->aparams) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
 
 	if (pip->open.akopts) {
-	    pip->open.akopts = FALSE ;
+	    pip->open.akopts = false ;
 	    rs1 = keyopt_finish(&lip->akopts) ;
 	    if (rs >= 0) rs = rs1 ;
 	}
@@ -2379,9 +2375,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                switch (oi) {
 	                case progopt_nhf:
 			    if (! lip->final.nhf) {
-	                        lip->final.nhf = TRUE ;
-	                        lip->have.nhf = TRUE ;
-	                        lip->f.nhf = TRUE ;
+	                        lip->final.nhf = true ;
+	                        lip->have.nhf = true ;
+	                        lip->f.nhf = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.nhf = (rs > 0) ;
@@ -2390,9 +2386,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    break ;
 	                case progopt_suid:
 			    if (! lip->final.suid) {
-	                        lip->final.suid = TRUE ;
-	                        lip->have.suid = TRUE ;
-	                        lip->f.suid = TRUE ;
+	                        lip->final.suid = true ;
+	                        lip->have.suid = true ;
+	                        lip->f.suid = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.suid = (rs > 0) ;
@@ -2401,9 +2397,9 @@ static int locinfo_procopts(LOCINFO *lip)
 	                    break ;
 	                case progopt_sgid:
 			    if (! lip->final.sgid) {
-	                        lip->final.sgid = TRUE ;
-	                        lip->have.sgid = TRUE ;
-	                        lip->f.sgid = TRUE ;
+	                        lip->final.sgid = true ;
+	                        lip->have.sgid = true ;
+	                        lip->f.sgid = true ;
 	                        if (vl > 0) {
 	                            rs = optbool(vp,vl) ;
 	                            lip->f.sgid = (rs > 0) ;
@@ -2426,115 +2422,85 @@ static int locinfo_procopts(LOCINFO *lip)
 }
 /* end subroutine (locinfo_procopts) */
 
-
-static int locinfo_ftypes(LOCINFO *lip)
-{
+static int locinfo_ftypes(LOCINFO *lip) noex {
 	PROGINFO	*pip = lip->pip ;
-	PARAMOPT_CUR	cur ;
-	int		rs = SR_OK ;
-	int		sl ;
-	int		fti ;
+	int		rs ;
+	int		rs1 ;
 	int		c = 0 ;
-	cchar		*sp ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("chacl/locinfo_ftypes: ent\n") ;
-#endif
-
 	if ((rs = paramopt_curbegin(&lip->aparams,&cur)) >= 0) {
-
+	    PARAMOPT_CUR	cur ;
+	    int			sl ;
+	    int			fti ;
+	    cchar		*sp ;
 	    while (rs >= 0) {
-
 	        sl = paramopt_fetch(&lip->aparams,PO_TYPE,&cur,&sp) ;
 	        if (sl == SR_NOTFOUND) break ;
-
 	        if (sl == 0) continue ;
-
 	        rs = sl ;
 	        if (rs < 0) break ;
-
 	        if ((fti = matostr(ftypes,1,sp,sl)) >= 0) {
-	            int	f_prior = FALSE ;
+	            bool	f_prior = false ;
 	            switch (fti) {
-
 	            case ftype_regular:
 	            case ftype_file:
 	                f_prior = lip->ft.f ;
-	                lip->ft.f = TRUE ;
+	                lip->ft.f = true ;
 	                break ;
-
 	            case ftype_directory:
 	                f_prior = lip->ft.d ;
-	                lip->ft.d = TRUE ;
+	                lip->ft.d = true ;
 	                break ;
-
 	            case ftype_block:
 	                f_prior = lip->ft.b ;
-	                lip->ft.b = TRUE ;
+	                lip->ft.b = true ;
 	                break ;
-
 	            case ftype_character:
 	                f_prior = lip->ft.c ;
-	                lip->ft.c = TRUE ;
+	                lip->ft.c = true ;
 	                break ;
-
 	            case ftype_pipe:
 	            case ftype_fifo:
 	                f_prior = lip->ft.p ;
-	                lip->ft.p = TRUE ;
+	                lip->ft.p = true ;
 	                break ;
-
 	            case ftype_socket:
 	                f_prior = lip->ft.s ;
-	                lip->ft.s = TRUE ;
+	                lip->ft.s = true ;
 	                break ;
-
 	            case ftype_link:
 	                f_prior = lip->ft.l ;
-	                lip->ft.l = TRUE ;
+	                lip->ft.l = true ;
 	                break ;
-
 	            case ftype_door:
 	                f_prior = lip->ft.D ;
-	                lip->ft.D = TRUE ;
+	                lip->ft.D = true ;
 	                break ;
-
 	            } /* end switch */
 	            c += 1 ;
 	            if ((pip->debuglevel > 0) && (! f_prior)) {
-	                shio_printf(pip->efp,"%s: ftype=%s\n",
-	                    pip->progname,ftypes[fti]) ;
+			cchar	*fmt = "%s: ftype=%s\n" ;
+	                shio_printf(pip->efp,fmt,pip->progname,ftypes[fti]) ;
 	            }
 	        } /* end if */
-
 	    } /* end while */
-
-	    paramopt_curend(&lip->aparams,&cur) ;
+	    rs1 = paramopt_curend(&lip->aparams,&cur) ;
+	    if (rs >= 0) rs = rs1 ;
 	} /* end if (cursor) */
-
-	if (c > 0)
-	    lip->f.ftypes = TRUE ;
-
-#if	CF_DEBUG
-	if (DEBUGLEVEL(3))
-	    debugprintf("chacl/locinfo_ftypes: ret rs=%d c=%u\n",rs,c) ;
-#endif
-
+	if (c > 0) {
+	    lip->f.ftypes = true ;
+	}
 	return (rs >= 0) ? c : rs ;
 }
 /* end subroutine (locinfo_ftypes) */
 
-
-static int locinfo_isfsuffix(LOCINFO *lip,cchar fname[])
-{
+static int locinfo_isfsuffix(LOCINFO *lip,cchar *fname) noex {
 	PROGINFO	*pip = lip->pip ;
 	PARAMOPT	*pp = &lip->aparams ;
 	PARAMOPT_CUR	cur ;
 	int		rs = SR_OK ;
 	int		sl ;
 	int		bl ;
-	int		f = FALSE ;
+	int		f = false ;
 	cchar		*po = PO_SUFFIX ;
 	cchar		*tp ;
 	cchar		*sp ;
@@ -2601,147 +2567,86 @@ static int locinfo_isfsuffix(LOCINFO *lip,cchar fname[])
 }
 /* end subroutine (locinfo_isfsuffix) */
 
-
-static int locinfo_isftype(LOCINFO *lip,cchar fname[],FSDIRTREE_STAT *sbp)
-{
-	const mode_t	m = sbp->st_mode ;
-	int		f = FALSE ;
-
-	if (fname == NULL) return SR_FAULT ;
-
-	if (S_ISREG(m)) {
-	    f = lip->ft.f ;
-
-	} else if (S_ISDIR(m)) {
-	    f = lip->ft.d ;
-
-	} else if (S_ISCHR(m)) {
-	    f = lip->ft.c ;
-
-	} else if (S_ISBLK(m)) {
-	    f = lip->ft.b ;
-
-	} else if (S_ISFIFO(m)) {
-	    f = lip->ft.p ;
-
-	} else if (S_ISSOCK(m)) {
-	    f = lip->ft.s ;
-
-	} else if ((m & S_IFMT) == S_IFNAM) {
-	    f = lip->ft.n ;
-
-	} else if (S_ISLNK(m)) {
-	    f = lip->ft.l ;
-
-	} else if (S_ISDOOR(m))
-	    f = lip->ft.D ;
-
-	return f ;
+static int locinfo_isftype(LOCINFO *lip,cc *fn,FSDIRTREE_STAT *sbp) noex {
+	int		rs = SR_FAULT ;
+	int		f = false ;
+	if (fn) {
+	    cmode	m = sbp->st_mode ;
+	    rs = SR_OK ;
+	    if (S_ISREG(m)) { 
+		f = lip->ft.f ;
+	    } else if (S_ISDIR(m)) {
+	        f = lip->ft.d ;
+	    } else if (S_ISCHR(m)) {
+	        f = lip->ft.c ;
+	    } else if (S_ISBLK(m)) {
+	        f = lip->ft.b ;
+	    } else if (S_ISFIFO(m)) {
+	        f = lip->ft.p ;
+	    } else if (S_ISSOCK(m)) {
+	        f = lip->ft.s ;
+	    } else if ((m & S_IFMT) == S_IFNAM) {
+	        f = lip->ft.n ;
+	    } else if (S_ISLNK(m)) {
+	        f = lip->ft.l ;
+	    } else if (S_ISDOOR(m))
+	        f = lip->ft.D ;
+	    }
+	} /* end if (not-null) */
+	return (rs >= 0) ? rs : f ;
 }
 /* end subroutine (locinfo_isftype) */
 
-
-static int locinfo_addacl(LOCINFO *lip,aclinfo_t *aip)
-{
+static int locinfo_addacl(LOCINFO *lip,aclinfo *aip) noex {
 	return vecobj_add(&lip->acls,aip) ;
 }
 /* end subroutine (locinfo_addacl) */
 
-
-static int locinfo_mksol(LOCINFO *lip)
-{
+static int locinfo_mksol(LOCINFO *lip) noex {
 	vecobj		*alp = &lip->acls ;
-	aclinfo_t	*ap ;
-	int		i ;
-	for (i = 0 ; vecobj_get(alp,i,&ap) >= 0 ; i += 1) {
-	        if (ap != NULL) {
-	            aclinfo_mksol(ap) ;
-	        }
+	aclinfo		*ap ;
+	for (int i = 0 ; vecobj_get(alp,i,&ap) >= 0 ; i += 1) {
+	    if (ap) {
+	        aclinfo_mksol(ap) ;
+	    }
 	} /* end for */
 	return 0 ;
 } 
 /* end subroutine (locinfo_mksol) */
 
-
 /* aclents (ACL entries) */
-static int aclents_match(aclent_t aclbuf[],int nacls,struct aclinfo *ap)
-{
-	int		j ;
-	int		f = FALSE ;
-
-#if	CF_DEBUGS
-	debugprintf("aclents_match: searching soltype=%u uid=%d gid=%d\n",
-	    ap->soltype,ap->uid,ap->gid) ;
-#endif
-
+static int aclents_match(aclent_t *aclbuf,int nacls,aclinfo *ap) noex {
+	int		j ; /* used-afterwards */
+	bool		f = false ;
 	for (j = 0 ; j < nacls ; j += 1) {
-
-#if	CF_DEBUGS
-	    debugprintf("aclents_match: existing soltype=%u\n", 
-	        aclbuf[j].a_type) ;
-	    debugprintf("aclents_match: id=%d\n",aclbuf[j].a_id) ;
-#endif
-
 	    if (aclbuf[j].a_type == ap->soltype) {
-
-#if	CF_DEBUGS
-	        debugprintf("aclents_match: soltype match\n") ;
-#endif
-
-	        f = TRUE ;
+	        f = true ;
 	        if ((ap->type == acltype_user) ||
 	            (ap->type == acltype_defuser)) {
-
-#if	CF_DEBUGS
-	            debugprintf("aclents_match: user type eid=%d\n",
-	                aclbuf[j].a_id) ;
-#endif
-
-	            if (ap->uid >= 0)
+	            if (ap->uid >= 0) {
 	                f = (ap->uid == aclbuf[j].a_id) ;
-
+		    }
 	        } else if ((ap->type == acltype_group) ||
 	            (ap->type == acltype_defgroup)) {
-
-#if	CF_DEBUGS
-	            debugprintf("aclents_match: before group type f=%u\n",f) ;
-#endif
-
-	            if (ap->gid >= 0)
+	            if (ap->gid >= 0) {
 	                f = (ap->gid == aclbuf[j].a_id) ;
-
-#if	CF_DEBUGS
-	            debugprintf("aclents_match: group type f=%u\n",f) ;
-#endif
-
+		    }
 	        } /* end if */
-
 	        if (f) break ;
 	    } /* end if (soltype match) */
-
 	} /* end for */
-
-#if	CF_DEBUGS
-	debugprintf("aclents_match: match=%u j=%d\n",f,j) ;
-#endif
-
 	return (f) ? j : -1 ;
 }
 /* end subroutine (aclents_match) */
 
-
-static int aclents_maskmat(aclent_t aclbuf[],int nacls)
-{
-	int		j ;
-
+static int aclents_maskmat(aclent_t *aclbuf,int nacls) noex {
+	int		j ; /* used-afterwards */
 	for (j = 0 ; j < nacls ; j += 1) {
 	    if (aclbuf[j].a_type == ACLTYPE_CLASSOBJ) break ;
 	} /* end for */
-
 	return (j < nacls) ? j : -1 ;
 }
 /* end subroutine (aclents_maskmat) */
-
 
 /* does this set need a MASK ACL? */
 
@@ -2752,11 +2657,9 @@ static int aclents_maskmat(aclent_t aclbuf[],int nacls)
 	-2	did not have mask and need one
 ****/
 
-static int aclents_maskneed(aclent_t aclbuf[],int nacls)
-{
-	int		j ;
-	int		f_need = FALSE ;
-
+static int aclents_maskneed(aclent_t aclbuf[],int nacls) noex {
+	int		j ; /* used-afterwards */
+	bool		f_need = false ;
 	for (j = 0 ; j < nacls ; j += 1) {
 	    if (aclbuf[j].a_type == ACLTYPE_CLASSOBJ) break ;
 	    if (! f_need) {
@@ -2764,11 +2667,9 @@ static int aclents_maskneed(aclent_t aclbuf[],int nacls)
 	        f_need = f_need || (aclbuf[j].a_type == ACLTYPE_GROUP) ;
 	    }
 	} /* end for */
-
 	return (j < nacls) ? j : ((f_need) ? -2 : -1) ;
 }
 /* end subroutine (aclents_maskneed) */
-
 
 /* does this set need a DEFAULT MASK ACL? */
 
@@ -2779,150 +2680,116 @@ static int aclents_maskneed(aclent_t aclbuf[],int nacls)
 	-2	did not have mask and need one
 ****/
 
-static int aclents_defmaskneed(aclent_t aclbuf[],int nacls)
-{
-	int		j ;
-	int		f_need = FALSE ;
-
-	for (j = 0 ; j < nacls ; j += 1) {
+static int aclents_defmaskneed(aclent_t *aclbuf,int nacls) noex {
+	int		j ; /* used-afterwards */
+	bool		f_need = false ;
+	for (int j = 0 ; j < nacls ; j += 1) {
 	    if (aclbuf[j].a_type == ACLTYPE_DEFCLASSOBJ) break ;
 	    if (! f_need) {
 	        f_need = f_need || (aclbuf[j].a_type == ACLTYPE_DEFUSER) ;
 	        f_need = f_need || (aclbuf[j].a_type == ACLTYPE_DEFGROUP) ;
 	    }
 	} /* end for */
-
 	return (j < nacls) ? j : ((f_need) ? -2 : -1) ;
 }
 /* end subroutine (aclents_defmaskneed) */
 
-
 /* find the minimum and maximum permissions for this set */
-static int aclents_minmax(aclent_t aclbuf[],int nacls,int *pminp,int *pmaxp)
-{
-	int		i ;
+static int aclents_minmax(aclent_t *abuf,int nacls,int *pminp,int *pmaxp) noex {
 	int		c = 0 ;
-
 	*pminp = -1 ;
 	*pmaxp = -1 ;
-	for (i = 0 ; (c < 2) && (i < nacls) ; i += 1) {
-	    if (aclbuf[i].a_type == USER_OBJ) {
+	for (int i = 0 ; (c < 2) && (i < nacls) ; i += 1) {
+	    if (abuf[i].a_type == USER_OBJ) {
 	        c += 1 ;
-	        *pmaxp = aclbuf[i].a_perm ;
-	    } else if (aclbuf[i].a_type == OTHER_OBJ) {
+	        *pmaxp = abuf[i].a_perm ;
+	    } else if (abuf[i].a_type == OTHER_OBJ) {
 	        c += 1 ;
-	        *pminp = aclbuf[i].a_perm ;
+	        *pminp = abuf[i].a_perm ;
 	    } /* end if */
 	} /* end for */
-
 	return c ;
 }
 /* end subroutine (aclents_minmax) */
 
-
 #if	CF_DEBUGS || CF_DEBUG
 
-static int aclents_print(aclent_t aclbuf[],int nacls)
-{
+static int aclents_print(aclent_t *aclbuf,int nacls) noex {
 	cchar		*textbuf ;
 	cchar		*tp, *sp ;
-
 	if ((textbuf = acltotext(aclbuf,nacls)) != NULL) {
-
 	    sp = textbuf ;
 	    while ((tp = strchr(sp,',')) != NULL) {
-
 	        debugprintf("chacl/aclents_print: | %t\n",
 	            sp,(tp - sp)) ;
-
 	        sp = (tp + 1) ;
-
 	    } /* end while */
-
-	    if (*sp != '\0')
+	    if (*sp != '\0') {
 	        debugprintf("chacl/aclents_print: | %s\n",sp) ;
-
+	    }
 	    uc_free(textbuf) ;
-	} else
+	} else {
 	    debugprintf("chacl/aclents_print: couldn't get text\n") ;
-
+	}
 	return 0 ;
 }
 /* end subroutine (aclents_print) */
 
 #endif /* CF_DEBUGS || CF_DEBUG */
 
-
-static int aclents_compact(aclent_t aclbuf[],int nacls)
-{
-	int		i ;
+static int aclents_compact(aclent_t *aclbuf,int nacls) noex {
 	int		c = 0 ;
-	int		f_flipped = FALSE ;
-
+	bool		f_flipped = false ;
 	while ((nacls > 0) && (aclbuf[nacls - 1].a_type < 0)) {
 	    nacls -= 1 ;
 	}
-
-	for (i = 0 ; i < nacls ; i += 1) {
+	for (int i = 0 ; i < nacls ; i += 1) {
 	    if (aclbuf[i].a_type >= 0) {
 	        if (f_flipped) aclbuf[c] = aclbuf[i] ;
 	        c += 1 ;
-	    } else
-	        f_flipped = TRUE ;
+	    } else {
+	        f_flipped = true ;
+	    }
 	} /* end for */
-
 	return c ;
 }
 /* end subroutine (aclents_compact) */
 
-
 /* aclent (ACL entry, a single entry) */
-static int aclent_empty(aclent_t *aclp)
-{
-	int		f = FALSE ;
-
+static int aclent_empty(aclent_t *aclp) noex {
+	int		f = false ;
 	if (aclp->a_perm == 0) {
 	    switch (aclp->a_type) {
 	    case USER:
 	    case GROUP:
 	    case DEF_USER:
 	    case DEF_GROUP:
-	        f = TRUE ;
+	        f = true ;
 	        break ;
 	    } /* end switch */
 	} /* end if (no perms) */
-
 	return f ;
 }
 /* end subroutine (aclent_empty) */
 
-
-static int aclent_idtype(aclent_t *aclp)
-{
-	int		f = FALSE ;
-
+static int aclent_idtype(aclent_t *aclp) noex {
+	int		f = false ;
 	switch (aclp->a_type) {
 	case USER:
 	case GROUP:
 	case DEF_USER:
 	case DEF_GROUP:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
-
 	return f ;
 }
 /* end subroutine (aclent_idtype) */
 
-
-static int parseperms(cchar *psp,int psl)
-{
-	int		i ;
-	int		ch ;
+static int parseperms(cchar *psp,int psl) noex {
 	int		rc = 0 ;
-
-	for (i = 0 ; (rc >= 0) && (i < psl) && (psp[i] != '\0') ; i += 1) {
-	    ch = (psp[i] & 0xff) ;
+	for (int i = 0 ; (rc >= 0) && (i < psl) && (psp[i] != '\0') ; i += 1) {
+	    cint	ch = mkchar(psp[i]) ;
 	    switch (ch) {
 	    case 't':
 	        rc |= T_OK ;
@@ -2944,7 +2811,6 @@ static int parseperms(cchar *psp,int psl)
 	        break ;
 	    } /* end switch */
 	} /* end for */
-
 	return rc ;
 }
 /* end subroutine (parseperms) */

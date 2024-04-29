@@ -1,16 +1,17 @@
-/* u_poll */
+/* u_poll SUPPORT */
+/* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
-
+/* version %I% last-modified %G% */
 
 #define	CF_DEBUGS	0		/* compile-time debugging */
 #define	CF_INTR		0		/* do not return on an interrupt */
 
-
 /* revision history:
 
 	= 1998-11-01, David A­D­ Morano
-	This subroutine was written for Rightcore Network Services (RNS).
+	This subroutine was written for Rightcore Network Services
+	(RNS).
 
 */
 
@@ -18,17 +19,11 @@
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
 #include	<sys/types.h>
-
-#if	(defined(SYSHAS_POLL) && (SYSHAS_POLL > 0))
-#else
-#include	<sys/time.h>
-#include	<sys/sockio.h>
-#endif
-
+#include	<sys/select.h>
 #include	<unistd.h>
-#include	<poll.h>
-#include	<errno.h>
-
+#include	<poll.h>		/* <- might be fake if no |poll(2)| */
+#include	<cerrno>
+#include	<cstddef>		/* |nullptr_t| */
 #include	<usystem.h>
 #include	<localmisc.h>
 
@@ -61,6 +56,10 @@
 #define	POLLWRBAND	0
 #endif
 
+#define	TV		TIMEVAL
+
+#define	FDS		fd_xset
+
 #define	TO_AGAIN	10
 
 
@@ -79,7 +78,7 @@ typedef unsigned long		nfds_t ;
 /* forward references */
 
 #if	(UPOLL_NATIVE == 0)
-static int	uc_select(int,fd_set *,fd_set *,fd_set *,struct timeval *) ;
+static int	uselect(int,FDS *,FDS *,FDS *,TV *) ;
 #endif
 
 
@@ -91,8 +90,7 @@ static int	uc_select(int,fd_set *,fd_set *,fd_set *,struct timeval *) ;
 
 #if	defined(SYSHAS_POLL) && (SYSHAS_POLL == 1)
 
-int u_poll(struct pollfd *fds,int n,int timeout)
-{
+int u_poll(POLLFD *fds,int n,int timeout) noex {
 	const nfds_t	nfds = (nfds_t) n ; /* duh! 'int' wasn't good enough */
 	int		rs ;
 	int		to_again = TO_AGAIN ;
@@ -126,10 +124,9 @@ int u_poll(struct pollfd *fds,int n,int timeout)
 
 #else /* SYSHAS_POLL */
 
-int u_poll(struct pollfd *fds,int n,int timeout)
-{
-	struct timeval	tv ;
-	fd_set		rset, wset, eset ;
+int u_poll(POLLFD *fds,int n,int timeout) noex {
+	TV		tv ;
+	FDS		rset, wset, eset ;
 	int		rs = SR_OK ;
 	int		rs1 ;
 	int		i ;
@@ -183,7 +180,7 @@ int u_poll(struct pollfd *fds,int n,int timeout)
 	}
 
 	if (rs >= 0)
-	    rs = uc_select(n,&rset,&wset,&eset,&tv) ;
+	    rs = uselect(n,&rset,&wset,&eset,&tv) ;
 
 	if (rs >= 0) {
 	    int	v ;
@@ -246,23 +243,14 @@ int u_poll(struct pollfd *fds,int n,int timeout)
 }
 /* end subroutine (u_poll) */
 
-
-static int uc_select(nfds,readfds,writefds,errorfds,tp)
-int	nfds ;
-fd_set	*readfds ;
-fd_set	*writefds ;
-fd_set	*errorfds ;
-struct timeval	*tp ;
-{
+static int uselect(int nfds,FDS *rfds,FDS *wfds,FDS *efds,TV *tp) noex {
 	int		rs ;
-
-	rs = select(nfds,readfds,writefds,errorfds,tp) ;
-	if (rs < 0)
+	if ((rs = select(nfds,rfds,wfds,efds,tp)) < 0) {
 	    rs = (- errno) ;
-
+	}
 	return rs ;
 }
-/* end subroutine (uc_select) */
+/* end subroutine (uselect) */
 
 #endif /* SYSHAS_POLL */
 

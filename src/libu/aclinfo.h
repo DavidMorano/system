@@ -12,8 +12,7 @@
 
 
 #include	<envstandards.h>	/* MUST be first to configure */
-#include	<sys/types.h>
-#include	<sys/acl.h>
+#include	<sys/types.h>		/* system types */
 #include	<utypedefs.h>
 #include	<utypealiases.h>
 #include	<usysrets.h>
@@ -24,26 +23,25 @@
 #include	"acltypes.h"
 
 
-#define	ACLINFO		struct aclinfo
+#define	ACLINFO		struct aclinfo_head
 
 
 struct aclinfo {
-	uid_t		uid ;
-	gid_t		gid ;
+	uid		uid ;
+	gid		gid ;
 	int		type ;
 	int		soltype ;
 	int		op ;		/* add or subtract */
 	int		perm ;		/* permission bits */
 } ;
 
-typedef ACLINFO		aclinfo_t ;
-
+typedef ACLINFO		aclinfo ;
 
 EXTERNC_begin
 
-extern int	aclinfo_mksol(ACLINFO *) noex ;
-extern int	aclinfo_isdeftype(ACLINFO *) noex ;
-extern int	aclinfo_isidtype(ACLINFO *) noex ;
+extern int	aclinfo_mksol(aclinfo *) noex ;
+extern int	aclinfo_isdeftype(aclinfo *) noex ;
+extern int	aclinfo_isidtype(aclinfo *) noex ;
 
 EXTERNC_end
 

@@ -67,14 +67,14 @@ constexpr gid_t		gidend = gid_t(-1) ;
 
 /* exported subroutines */
 
-int aclinfo_mksol(struct aclinfo *ap) noex {
+int aclinfo_mksol(aclinfo *ap) noex {
 	int		soltype = -1 ;
 	switch (ap->type) {
 	case acltype_user:
-	    soltype = (ap->uid >= 0) ? USER : USER_OBJ ;
+	    soltype = (ap->uid != uidend) ? USER : USER_OBJ ;
 	    break ;
 	case acltype_group:
-	    soltype = (ap->gid >= 0) ? GROUP : GROUP_OBJ ;
+	    soltype = (ap->gid != gidend) ? GROUP : GROUP_OBJ ;
 	    break ;
 	case acltype_other:
 	    soltype = OTHER_OBJ ;
@@ -83,10 +83,10 @@ int aclinfo_mksol(struct aclinfo *ap) noex {
 	    soltype = CLASS_OBJ ;
 	    break ;
 	case acltype_defuser:
-	    soltype = (ap->uid >= 0) ? DEF_USER : DEF_USER_OBJ ;
+	    soltype = (ap->uid != uid_end) ? DEF_USER : DEF_USER_OBJ ;
 	    break ;
 	case acltype_defgroup:
-	    soltype = (ap->gid >= 0) ? DEF_GROUP : DEF_GROUP_OBJ ;
+	    soltype = (ap->gid != gidend) ? DEF_GROUP : DEF_GROUP_OBJ ;
 	    break ;
 	case acltype_defother:
 	    soltype = DEF_OTHER_OBJ ;
@@ -100,21 +100,21 @@ int aclinfo_mksol(struct aclinfo *ap) noex {
 }
 /* end subroutine (aclinfo_mksol) */
 
-int aclinfo_isdeftype(struct aclinfo *ap) noex {
+int aclinfo_isdeftype(aclinfo *ap) noex {
 	int		f = false ;
 	switch (ap->type) {
 	case acltype_defuser:
 	case acltype_defgroup:
 	case acltype_defother:
 	case acltype_defmask:
-	    f = TRUE ;
+	    f = true ;
 	    break ;
 	} /* end switch */
 	return f ;
 }
 /* end subroutine (aclinfo_isdeftype) */
 
-int aclinfo_isidtype(struct aclinfo *ap) noex {
+int aclinfo_isidtype(aclinfo *ap) noex {
 	int		f = false ;
 	switch (ap->type) {
 	case acltype_user:
