@@ -42,7 +42,7 @@
 #include	<limits.h>
 #include	<unistd.h>
 #include	<fcntl.h>
-#include	<utime.h>		/* for 'u_utime(2)' */
+#include	<utime.h>		/* for old UNIX® |u_utime(2)| */
 #include	<pthread.h>
 #include	<termios.h>
 #include	<time.h>
@@ -55,13 +55,6 @@
 
 #if	defined(SYSHAS_XTI) && (SYSHAS_XTI > 0)
 #include	<xti.h>
-#endif
-
-#if	defined(OSNAME_SunOS) && (OSNAME_SunOS > 0)
-#include	<thread.h>
-#include	<shadow.h>
-#include	<project.h>
-#include	<user_attr.h>
 #endif
 
 #include	<utypedefs.h>
