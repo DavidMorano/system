@@ -2,7 +2,7 @@
 
 T= ufileop
 
-ALL= $(T).o $(T).a
+ALL= $(T).o
 
 
 BINDIR= $(REPOROOT)/bin
@@ -56,10 +56,10 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJA_UFILEDESC= ufileopbase.o usocket.o uconnect.o 
-OBJB_UFILEDESC= uregular.o ufcntl.o uacceptpass.o
+OBJA_UFILEOP= ufileopbase.o ufiler.o
+OBJB_UFILEOP= 
 
-OBJ_UFILEDESC= obja_ufileop.o objb_ufileop.o
+OBJ_UFILEOP= obja_ufileop.o 
 
 
 default:		$(T).o
@@ -82,10 +82,10 @@ all:			$(ALL)
 	$(CXX)  $(CPPFLAGS) $(CCFLAGS) -c $<
 
 
-$(T).o:			$(OBJ_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEDESC)
+$(T).o:			$(OBJ_UFILEOP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJ_UFILEOP)
 
-$(T).a:			$(OBJ_UFILEDESC)
+$(T).a:			$(OBJ_UFILEOP)
 	$(AR) $(ARFLAGS) -rc $@ $?
 
 $(T).nm:		$(T).so
@@ -105,13 +105,14 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obja_ufileop.o:	$(OBJA_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEDESC)
+obja_ufileop.o:	$(OBJA_UFILEOP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEOP)
 
-objb_ufileop.o:	$(OBJB_UFILEDESC)
-	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEDESC)
+objb_ufileop.o:	$(OBJB_UFILEOP)
+	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEOP)
 
 
-ufileopbase.o:	ufileopbase.cc	$(INCS)
+ufileopbase.o:		ufileopbase.cc	$(INCS)
+ufiler.o:		ufiler.cc	$(INCS)
 
 

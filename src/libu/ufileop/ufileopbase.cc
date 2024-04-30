@@ -91,6 +91,8 @@ int ufileopbase::operator () (int fd) noex {
 	    errtimer	to_nfile	= utimeout[uto_nfile] ;
 	    errtimer	to_nolck	= utimeout[uto_nolck] ;
 	    errtimer	to_nospc	= utimeout[uto_nospc] ;
+	    errtimer	to_dquot	= utimeout[uto_dquot] ;
+	    errtimer	to_io		= utimeout[uto_io] ;
 	    reterr	r ;
 	    repeat {
 	        if ((rs = callstd(fd)) < 0) {
@@ -119,6 +121,12 @@ int ufileopbase::operator () (int fd) noex {
 		        break ;
                     case SR_NOSPC:
                         r = to_nospc(rs) ;
+		        break ;
+	            case SR_DQUOT:
+                        r = to_dquot(rs) ;
+		        break ;
+	            case SR_IO:
+                        r = to_io(rs) ;
 		        break ;
 		    case SR_INPROGRESS: /* who thought up this? */
 		        if (f.fclose) {
