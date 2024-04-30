@@ -38,8 +38,7 @@ LINT= lint
 DEFS +=
 
 
-INCS += usystem.h localmisc.h
-INCS += uclibsubs.h
+INCS += usyscalls.h localmisc.h
 
 
 LIBS +=
@@ -114,8 +113,8 @@ OBJ47= utimeout.o utimeouts.o
 #ustr.cc usysdata.cc usysinfo.cc 
 #
 
-OBJ48= usupport.o timewatch.o
-OBJ49= utimeouts.o
+OBJ48= usupport.o timewatch.o utimeouts.o unanosleep.o
+OBJ49= 
 OBJ50=
 OBJ51=
 OBJ52=
@@ -245,5 +244,6 @@ uipc.dir:
 	makesubdir $@
 
 # OTHER
+unanosleep.o:		unanosleep.cc	$(INCS)
 
 

@@ -131,6 +131,12 @@ enum signalmissings {
 #define	S_ISDOOR(fm)	(((fm) & S_IFMT) == S_IFDOOR)
 #endif
 
+/* PATHCONF preprocessor defines */
+
+#ifndef	_PC_CHOWN_RESTRICTED
+#define	_PC_CHOWN_RESTRICTED	-1
+#endif
+
 /* various limits (that might be missing) */
 
 #ifndef	SIZE_MAX

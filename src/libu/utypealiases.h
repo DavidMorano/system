@@ -106,8 +106,12 @@
 #define	USTAT		struct ustat
 #endif
 
-#ifndef	USTATVFS
-#define	USTATVFS	struct ustatvfs
+#ifndef	STATFS
+#define	STATFS		struct statfs
+#endif
+
+#ifndef	STATVFS
+#define	STATVFS		struct statvfs
 #endif
 
 #ifndef	DIRENT

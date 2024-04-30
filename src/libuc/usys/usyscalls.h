@@ -125,7 +125,6 @@ extern int	u_mkdir(cchar *,mode_t) noex ;
 extern int	u_chdir(cchar *) noex ;
 extern int	u_readlink(cchar *,char *,int) noex ;
 extern int	u_pathconf(cchar *,int,long *) noex ;
-extern int	u_statvfs(cchar *,USTATVFS *) noex ;
 extern int	u_stat(cchar *,USTAT *) noex ;
 extern int	u_lstat(cchar *,USTAT *) noex ;
 
@@ -142,7 +141,7 @@ extern int	u_getdents(int,dirent_t *,int) noex ;
 extern int	u_fchdir(int) noex ;
 extern int	u_fsync(int) noex ;
 
-extern int	u_closeonexec(int,bool) noex ;
+extern int	u_closeonexec(int,int) noex ;
 extern int	u_poll(POLLFD *,int,int) noex ;
 extern int	u_read(int,void *,int) noex ;
 extern int	u_readv(int,IOVEC *,int) noex ;
@@ -153,8 +152,6 @@ extern int	u_pwrite(int,cvoid *,int,off_t) noex ;
 
 extern int	u_fpathconf(int,int,long *) noex ;
 extern int	u_fstat(int,USTAT *) noex ;
-extern int	u_fstatvfs(int,USTATVFS *) noex ;
-
 extern int	u_fchown(int,uid_t,gid_t) noex ;
 extern int	u_fcntl(int,int,...) noex ;
 extern int	u_ioctl(int,int,...) noex ;
@@ -177,6 +174,7 @@ extern int	u_lchown(cchar *,uid_t,gid_t) noex ;
 extern int	u_chmod(cchar *,mode_t) noex ;
 extern int	u_utime(cchar *,const UTIMBUF *) noex ;
 extern int	u_utimes(cchar *,const TIMEVAL *) noex ;
+extern int	u_nanosleep(CTIMESPEC *,TIMESPEC *) noex ;
 extern int	u_sync() noex ;
 
 #if	defined(SYSHAS_ACL) && (SYSHAS_ACL > 0)

@@ -8,8 +8,8 @@
 /* revision history:
 
 	= 1998-03-26, David A­D­ Morano
-        This was frsit written to give a little bit to UNIX® what we have in our
-        own circuit-pack OSes!
+	This was frsit written to give a little bit to UNIX® what
+	we have in our own circuit-pack OSes!
 
 */
 
@@ -133,11 +133,10 @@ int memclear(void *vp,size_t sz) noex {
 
 static int isleep(int mto) noex {
 	POLLFD		fds[1] = {} ;
-	cnfds		nfds = 1 ;
 	int		rs ;
 	bool		fexit = false ;
 	repeat {
-	    if ((rs = poll(fds,nfds,mto)) < 0) {
+	    if ((rs = poll(fds,0,mto)) < 0) {
 		rs = (- errno) ;
 	    }
 	    if (rs < 0) {

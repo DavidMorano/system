@@ -51,8 +51,8 @@ namespace ufiledesc {
     struct ufiledescflags {
 	uint		fclose:1 ;
 	uint		fwrite:1 ;
-	uint		fintr:1 ;	/* allow interrupts to return */
-    } ;
+	uint		fintr:1 ;	/* request interrupts to return */
+    } ; /* end struct (ufiledescflags) */
     struct ufiledescbase {
 	cvoid		*wbuf ;
 	void		*rbuf ;
@@ -73,6 +73,7 @@ extern int u_bind(int,cvoid *,int) noex ;
 extern int u_listen(int,int) noex ;
 extern int u_setsockopt(int,int,int,cvoid *,int) noex ;
 extern int u_getsockopt(int,int,int,void *,int *) noex ;
+extern int u_connect(int,cvoid *,int) noex ;
 extern int u_getpeername(int,void *,int *) noex ;
 extern int u_getsockname(int,void *,int *) noex ;
 extern int u_send(int,cvoid *,int,int) noex ;
@@ -81,8 +82,43 @@ extern int u_sendto(int,cvoid *,int,int,cvoid *,int) noex ;
 extern int u_recv(int,void *,int,int) noex ;
 extern int u_recvmsg(int,MSGHDR *,int) noex ;
 extern int u_recvfrom(int,void *,int,int,void *,int *) noex ;
-extern int u_connect(int,cvoid *,int) noex ;
 extern int u_shutdown(int,int) noex ;
+
+extern int u_closeonexec(int,int) noex ;
+extern int u_readn(int,void *,int) noex ;
+extern int u_writen(int,cvoid *,int) noex ;
+extern int u_fchdir(int) noex ;
+extern int u_fchmod(int,mode_t) noex ;
+extern int u_fchown(int,uid_t,gid_t) noex ;
+extern int u_close(int) noex ;
+extern int u_poll(POLLFD *,int,int) noex ;
+extern int u_fstatfs(int,STATFS *) noex ;
+extern int u_fstatvfs(int,STATVFS *) noex ;
+extern int u_fpathconf(int,int,long *) noex ;
+extern int u_fsync(int) noex ;
+extern int u_ioctl(int,int,...) noex ;
+extern int u_lockf(int,int,off_t) noex ;
+extern int u_pread(int,void *,int,off_t) noex ;
+extern int u_pwrite(int,cvoid *,int,off_t) noex ;
+extern int u_read(int,void *,int) noex ;
+extern int u_readv(int,IOVEC *,int) noex ;
+extern int u_seeko(int,off_t,int,off_t *) noex ;
+extern int u_tell(int,off_t *) noex ;
+extern int u_write(int,cvoid *,int) noex ;
+extern int u_writev(int,CIOVEC *,int) noex ;
+
+static inline int u_seek(int fd,off_t wo,int w) noex {
+	return u_seeko(fd,wo,w,nullptr) ;
+}
+static inline int u_seekoff(int fd,off_t wo,int w,off_t *offp) noex {
+	return u_seeko(fd,wo,w,offp) ;
+}
+static inline int u_rewind(int fd) noex {
+	return u_seek(fd,0z,SEEK_SET) ;
+}
+static inline int u_seekable(int fd) noex {
+	return u_seek(fd,0z,SEEK_CUR) ;
+}
 
 EXTERNC_end
 
