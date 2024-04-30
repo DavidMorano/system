@@ -211,8 +211,6 @@ namespace {
 
 /* forward references */
 
-static int	uwrcheck(int) noex ;
-
 
 /* local variables */
 
@@ -471,12 +469,9 @@ int u_pread(int fd,void *rbuf,int rlen,off_t off) noex {
 
 int u_pwrite(int fd,cvoid *wbuf,int wlen,off_t off) noex {
 	uregular	ro(wbuf,wlen,off) ;
-	int		rs ;
 	ro.m = &uregular::ipwrite ;
-	if ((rs = ro(fd)) == SR_INTR) {
-	    rs = uwrcheck(fd) ;
-	}
-	return rs ;
+	ro.f.fwrite = true ;
+	return ro(fd) ;
 }
 /* end subroutine (u_pwrite) */
 
@@ -532,23 +527,17 @@ int u_tell(int fd,off_t *rp) noex {
 
 int u_write(int fd,cvoid *wbuf,int wlen) noex {
 	uregular	ro(wbuf,wlen) ;
-	int		rs ;
 	ro.m = &uregular::iwrite ;
-	if ((rs = ro(fd)) == SR_INTR) {
-	    rs = uwrcheck(fd) ;
-	}
-	return rs ;
+	ro.f.fwrite = true ;
+	return ro(fd) ;
 }
 /* end subroutine (u_write) */
 
 int u_writev(int fd,CIOVEC *iop,int n) noex {
 	uregular	ro(iop,n) ;
-	int		rs ;
 	ro.m = &uregular::iwritev ;
-	if ((rs = ro(fd)) == SR_INTR) {
-	    rs = uwrcheck(fd) ;
-	}
-	return rs ;
+	ro.f.fwrite = true ;
+	return ro(fd) ;
 }
 /* end subroutine (u_writev) */
 
@@ -652,24 +641,5 @@ int uregular::iwritev(int fd) noex {
 	return rs ;
 }
 /* end method (uregular::iwritev) */
-
-static int uwrcheck(int fd) noex {
-	POLLFD		fds[1] = {} ;
-	int		rs ;
-	int		n = 0 ;
-	fds[n++].fd = fd ;
-	if ((rs = u_poll(fds,nfds_t(n),0)) > 0) {
-	    cint	re = fds[0].revents ;
-	    if (re & POLLHUP) {
-		rs = SR_HANGUP ;	/* same as SR_IO */
-	    } else if (re & POLLERR) {
-		rs = SR_POLLERR ;
-	    } else if (re & POLLNVAL) {
-		rs = SR_NOTOPEN ;
-	    }
-	} /* end if (we had some poll results) */
-	return rs ;
-}
-/* end subroutine (uwrcheck) */
 
 

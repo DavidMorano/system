@@ -114,7 +114,7 @@ OBJ47= utimeout.o utimeouts.o
 #
 
 OBJ48= usupport.o timewatch.o utimeouts.o unanosleep.o
-OBJ49= 
+OBJ50= ufiledesc.o
 OBJ50=
 OBJ51=
 OBJ52=
@@ -132,10 +132,13 @@ OBJ55=
 
 #OBJ= $(OBJA) $(OBJB) $(OBJC) $(OBJD) $(OBJE) $(OBJF) $(OBJG)
 
-OBJA= 
+OBJA= usupport.o timeout.o utimeouts.o timewatch.o
+OBJB= ufiledesc.o uipc.o unanosleep.o
+OBJC= usysauxinfo.o uopen.o
+OBJD= 
 
 #OBJS= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
-OBJS= obja.o objb.o objc.o objd.o
+OBJS= obja.o objb.o objc.o
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -227,15 +230,14 @@ usupport.o:		usupport.cc usupport.h
 timewatch.o:		timewatch.cc timewatch.hh
 
 # ADAPTATION
-uuname.o:		uuname.cc
-usysauxinfo.o:		isysauxinfo.cc
+usysauxinfo.o:		usysauxinfo.cc
 
 # UOPEN
 uopen.o:		uopen.cc uopen.h
 
 # UFILEDESC
 ufiledesc.o:		ufiledesc.dir
-ufiledes.dir:
+ufiledesc.dir:
 	makesubdir $@
 
 # UIPC

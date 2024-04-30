@@ -1,4 +1,4 @@
-/* ustr SUPPORT (UNIX® Streams) */
+/* ustr SUPPORT (UNIX® STREAMS®) */
 /* lang=C++23 */
 
 /* UNIX® STREAMS management system-call subroutines */
@@ -16,11 +16,15 @@
 
 /*******************************************************************************
 
-	This module manages UNIX® STREAMS.  These are the STREAMS
-	invented by Dennis Ritchie (and ported by others) for UNIX®
-	System V Release 4. For completeness, the people who ported
-	STREAMS to UNIX® System V Release 4 were: Robert Israel,
-	Gil McGrath, Dave Olander, Her-Daw Che, and Maury Bach.
+	This module manages UNIX® STREAMS®.  These are the STREAMS®
+	invented by Dennis Ritchie (of AT&T Bell Laboratories fame).
+	The STREAMS® framework first appeared in UNIX® System V
+	Release 3 (and in my opinion was a huge success there; I
+	used it myself back in the day).  The STREAMS® framework
+	was ported to UNIX® System V Release 4 by others.  For
+	completeness, the people who ported STREAMS® to UNIX® System
+	V Release 4 were: Robert Israel, Gil McGrath, Dave Olander,
+	Her-Daw Che, and Maury Bach.
 
 *******************************************************************************/
 

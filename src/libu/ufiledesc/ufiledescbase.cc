@@ -63,6 +63,14 @@ using std::nullptr_t ;			/* type */
 /* external variables */
 
 
+/* local structures */
+
+
+/* forward references */
+
+static int	uwrcheck(int) noex ;
+
+
 /* local variables */
 
 
@@ -118,7 +126,13 @@ int ufiledescbase::operator () (int fd) noex {
 		        }
 		        break ;
                     case SR_INTR:
-		        if (! f.fintr) {
+			if (f.fwrite) {
+			    if ((rs = uwrcheck(fd)) >= 0) {
+				r(false) ;
+			    } else {
+				r(rs) ;
+			    }
+			} else if (! f.fintr) {
 			    r(false) ;
 		        }
                         break ;
@@ -130,5 +144,24 @@ int ufiledescbase::operator () (int fd) noex {
 	return rs ;
 }
 /* end method (ufiledescbase::operator) */
+
+static int uwrcheck(int fd) noex {
+	POLLFD		fds[1] = {} ;
+	int		rs ;
+	int		n = 0 ;
+	fds[n++].fd = fd ;
+	if ((rs = u_poll(fds,nfds_t(n),0)) > 0) {
+	    cint	re = fds[0].revents ;
+	    if (re & POLLHUP) {
+		rs = SR_HANGUP ;	/* same as SR_IO */
+	    } else if (re & POLLERR) {
+		rs = SR_POLLERR ;
+	    } else if (re & POLLNVAL) {
+		rs = SR_NOTOPEN ;
+	    }
+	} /* end if (we had some poll results) */
+	return rs ;
+}
+/* end subroutine (uwrcheck) */
 
 
