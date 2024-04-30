@@ -43,6 +43,7 @@
 #include	<usys_getrandom.h>
 #include	<usys_ttynamerp.h>
 #include	<usys_ugetnisdom.h>
+#include	<usys_stime.h>
 
 
 #endif /* USYS_INCLUDE */

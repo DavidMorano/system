@@ -131,9 +131,10 @@ OBJA= usupport.o utimeout.o utimeouts.o timewatch.o
 OBJB= ufiledesc.o uipc.o unanosleep.o usig.o
 OBJC= uopen.o ustr.o usysdata.o uatfork.o
 OBJD= aflag.o errtimer.o intsat.o ulogerror.o
+OBJE= usys.o
 
 #OBJ= obja.o objb.o objc.o objd.o obje.o objf.o objg.o
-OBJ= obja.o objb.o objc.o objd.o
+OBJ= obja.o objb.o objc.o objd.o obje.o
 
 
 .SUFFIXES:		.ls .i .cx .cs
@@ -212,7 +213,7 @@ again:
 	rm -f $(ALL)
 
 clean:
-	rm -f *.x *.o $(T).a
+	makeclean $(ALL)
 
 control:
 	(uname -n ; date) > Control
@@ -226,6 +227,11 @@ timewatch.o:		timewatch.cc timewatch.hh
 
 # ADAPTATION
 usysauxinfo.o:		usysauxinfo.cc
+
+# USYS
+usys.o:			usys.dir
+usys.dir:
+	makesubdir $@
 
 # UOPEN
 uopen.o:		uopen.cc uopen.h

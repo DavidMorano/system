@@ -217,6 +217,9 @@
 /* Solaris®: |mkdirp(3gen)| */
 #define	SYSHAS_MKDIRP		1
 
+/* Solaris®: |stime(2)| */
+#define	SYSHAS_STIME		1
+
 /******************************************************************************/
 #elif	defined(OSNAME_Darwin) && (OSNAME_Darwin > 0)
 
@@ -428,6 +431,9 @@
 /* Darwin: |mkdirp(3gen)| */
 #define	SYSHAS_MKDIRP		0
 
+/* Darwin: |stime(2)| */
+#define	SYSHAS_STIME		0
+
 /******************************************************************************/
 #elif	defined(OSNAME_Linux) && (OSNAME_Linux > 0)
 
@@ -618,6 +624,9 @@
 
 /* Linux: |mkdirp(3gen)| */
 #define	SYSHAS_MKDIRP		0
+
+/* Linux: |stime(2)| */
+#define	SYSHAS_STIME		0
 
 /******************************************************************************/
 #endif /* OSNAME */
