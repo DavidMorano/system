@@ -1,4 +1,4 @@
-/* usignal SUPPORT */
+/* usig SUPPORT */
 /* lang=C++20 */
 
 /* UNIX® signal handling */
@@ -15,6 +15,9 @@
 /* Copyright © 1998 David A­D­ Morano.  All rights reserved. */
 
 /*******************************************************************************
+
+	Names:
+	u_sigprocmask
 
 	Notes:
 	|u_sigprocmask(3u)|
@@ -37,6 +40,24 @@
 
 
 /* local defines */
+
+
+/* external subroutines */
+
+
+/* external variables */
+
+
+/* local structures */
+
+
+/* forward references */
+
+
+/* local variables */
+
+
+/* exported variables */
 
 
 /* exported subroutines */
@@ -160,5 +181,17 @@ int u_sigwait(const sigset_t *ssp,int *rp) noex {
 	return (rs >= 0) ? sig : rs ;
 }
 /* end subroutine (u_sigwait) */
+
+int u_sigmask(int how,sigset_t *setp,sigset_t *osetp) noex {
+	int		rs ;
+	errno = 0 ;
+	if ((rs = pthread_sigmask(how,setp,osetp)) > 0) {
+	    rs = (- rs) ;
+	} else if (rs < 0) {
+	    rs = (- errno) ;
+	}
+	return rs ;
+}
+/* end subroutine (u_sigmask) */
 
 

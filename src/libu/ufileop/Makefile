@@ -1,6 +1,6 @@
-# MAKEFILES (ufiledesc)
+# MAKEFILES (ufileop)
 
-T= ufiledesc
+T= ufileop
 
 ALL= $(T).o $(T).a
 
@@ -38,7 +38,7 @@ LINT=	lint
 DEFS +=
 
 
-INCS += ufiledesc.h
+INCS += ufileop.h
 
 
 LIBS +=
@@ -56,10 +56,10 @@ ARFLAGS= $(MAKEARFLAGS)
 LDFLAGS= $(MAKELDFLAGS)
 
 
-OBJA_UFILEDESC= ufiledescbase.o usocket.o uconnect.o 
+OBJA_UFILEDESC= ufileopbase.o usocket.o uconnect.o 
 OBJB_UFILEDESC= uregular.o ufcntl.o uacceptpass.o
 
-OBJ_UFILEDESC= obja_ufiledesc.o objb_ufiledesc.o
+OBJ_UFILEDESC= obja_ufileop.o objb_ufileop.o
 
 
 default:		$(T).o
@@ -105,19 +105,13 @@ clean:
 control:
 	(uname -n ; date) > Control
 
-obja_ufiledesc.o:	$(OBJA_UFILEDESC)
+obja_ufileop.o:	$(OBJA_UFILEDESC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJA_UFILEDESC)
 
-objb_ufiledesc.o:	$(OBJB_UFILEDESC)
+objb_ufileop.o:	$(OBJB_UFILEDESC)
 	$(LD) $(LDFLAGS) -r -o $@ $(OBJB_UFILEDESC)
 
 
-ufiledescbase.o:	ufiledescbase.cc	$(INCS)
-
-usocket.o:		usocket.cc		$(INCS)
-uconnect.o:		uconnect.cc		$(INCS)
-uregular.o:		uregular.cc		$(INCS)
-uacceptpass.o:		uacceptpass.cc		$(INCS)
-ufcntl.o:		ufcntl.cc		$(INCS)
+ufileopbase.o:	ufileopbase.cc	$(INCS)
 
 

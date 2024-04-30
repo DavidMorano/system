@@ -1,4 +1,4 @@
-/* uuname SUPPORT */
+/* usysdata SUPPORT */
 /* lang=C++23 */
 
 /* translation layer interface for UNIX® equivalents */

@@ -91,7 +91,6 @@ extern int u_fchdir(int) noex ;
 extern int u_fchmod(int,mode_t) noex ;
 extern int u_fchown(int,uid_t,gid_t) noex ;
 extern int u_close(int) noex ;
-extern int u_poll(POLLFD *,int,int) noex ;
 extern int u_fstatfs(int,STATFS *) noex ;
 extern int u_fstatvfs(int,STATVFS *) noex ;
 extern int u_fpathconf(int,int,long *) noex ;
@@ -103,7 +102,6 @@ extern int u_pwrite(int,cvoid *,int,off_t) noex ;
 extern int u_read(int,void *,int) noex ;
 extern int u_readv(int,IOVEC *,int) noex ;
 extern int u_seeko(int,off_t,int,off_t *) noex ;
-extern int u_tell(int,off_t *) noex ;
 extern int u_write(int,cvoid *,int) noex ;
 extern int u_writev(int,CIOVEC *,int) noex ;
 
@@ -113,12 +111,17 @@ static inline int u_seek(int fd,off_t wo,int w) noex {
 static inline int u_seekoff(int fd,off_t wo,int w,off_t *offp) noex {
 	return u_seeko(fd,wo,w,offp) ;
 }
-static inline int u_rewind(int fd) noex {
-	return u_seek(fd,0z,SEEK_SET) ;
+static inline int u_tell(int fd,off_t *rp) noex {
+	return u_seeko(fd,0z,SEEK_CUR,rp) ;
 }
 static inline int u_seekable(int fd) noex {
 	return u_seek(fd,0z,SEEK_CUR) ;
 }
+static inline int u_rewind(int fd) noex {
+	return u_seek(fd,0z,SEEK_SET) ;
+}
+
+extern int u_poll(POLLFD *,int,int) noex ;	/* <- special case */
 
 EXTERNC_end
 

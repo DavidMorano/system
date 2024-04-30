@@ -98,7 +98,7 @@ int utimeout[uto_overlast] = {
 	[uto_nolck] = UTO_NOLCK,
 	[uto_capture] = UTO_NOLCK,
 	[uto_txtbusy] = UTO_TXTBUSY,
-	[uto_closwait] = UTO_TXTBUSY
+	[uto_closewait] = UTO_TXTBUSY
 } ; /* end array (utimeout) */
 
 

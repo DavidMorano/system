@@ -508,23 +508,6 @@ int u_seeko(int fd,off_t wo,int w,off_t *offp) noex {
 }
 /* end subroutine (u_seeko) */
 
-int u_tell(int fd,off_t *rp) noex {
-	off_t		ro ;
-	int		rs ;
-	repeat {
-	    rs = SR_OK ;
-	    if ((ro = lseek(fd,0z,SEEK_CUR)) < 0) {
-		rs = (- errno) ;
-	    }
-	} until (rs != SR_INTR) ;
-	if (rs >= 0) rs = intsat(ro) ;
-	if (rp) {
-	    *rp = (rs >= 0) ? ro : 0z ;
-	}
-	return rs ;
-}
-/* end subroutine (u_tell) */
-
 int u_write(int fd,cvoid *wbuf,int wlen) noex {
 	uregular	ro(wbuf,wlen) ;
 	ro.m = &uregular::iwrite ;

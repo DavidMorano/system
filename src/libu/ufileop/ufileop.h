@@ -1,4 +1,4 @@
-/* ufiledesc SUPPORT (UNIX® file operations) */
+/* ufileop SUPPORT (UNIX® file operations) */
 /* lang=C20 */
 
 /* translation layer interface for UNIX® equivalents */
@@ -24,8 +24,8 @@
 
 *******************************************************************************/
 
-#ifndef	UFILEDESC_INCLUDE
-#define	UFILEDESC_INCLUDE
+#ifndef	UFILEOP_INCLUDE
+#define	UFILEOP_INCLUDE
 
 
 #include	<envstandards.h>	/* MUST be ordered first to configure */
@@ -47,22 +47,23 @@
 
 #ifdef	__cplusplus
 
-namespace ufiledesc {
-    struct ufiledescflags {
+namespace ufileop {
+    struct ufileopflags {
 	uint		fclose:1 ;
 	uint		fwrite:1 ;
 	uint		fintr:1 ;	/* request interrupts to return */
-    } ; /* end struct (ufiledescflags) */
-    struct ufiledescbase {
+    } ; /* end struct (ufileopflags) */
+    struct ufileopbase {
+	cchar		*fn ;
 	cvoid		*wbuf ;
 	void		*rbuf ;
 	int		wlen ;
 	int		rlen ;
-	ufiledescflags	f{} ;
-	ufiledescbase() noex { } ;
+	ufileopflags	f{} ;
+	ufileopbase() noex { } ;
 	int operator () (int) noex ;
 	virtual int callstd(int) noex = 0 ;
-    } ; /* end struct (ufiledescbase) */
+    } ; /* end struct (ufileopbase) */
 }
 
 #endif /* __cplusplus */
@@ -126,6 +127,6 @@ extern int u_poll(POLLFD *,int,int) noex ;	/* <- special case */
 EXTERNC_end
 
 
-#endif /* UFILEDESC_INCLUDE */
+#endif /* UFILEOP_INCLUDE */
 
 

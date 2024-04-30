@@ -2,7 +2,7 @@
 
 T= uipc
 
-TARS= $(T).o $(T).a
+TARS= $(T).o
 
 
 BINDIR= $(REPOROOT)/bin

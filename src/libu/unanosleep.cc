@@ -2,7 +2,7 @@
 /* lang=C++20 */
 
 /* translation layer interface for UNIX® equivalents */
-/* lang=C++20 */
+/* version %I% last-modified %G% */
 
 
 /* revision history:
@@ -24,6 +24,9 @@
 #include	<usyscalls.h>
 #include	<clanguage.h>
 #include	<localmisc.h>
+
+
+/* local defines */
 
 
 /* external subroutines */

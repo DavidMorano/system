@@ -14,9 +14,9 @@ Names:
 username
 userhome
 usershell
-gid
 groupname
 uid
+gid
 sid
 shells
 
