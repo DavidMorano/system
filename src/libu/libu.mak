@@ -185,6 +185,9 @@ objg.o:			$(OBJG)
 $(T).a:			$(OBJ)
 	$(AR) -rc $(T).a $?
 
+$(T).o:			$(OBJ) Makefile localmisc.h
+	$(LD) -r -o $@ $(LDFLAGS) $(OBJ)
+
 $(T).so:		$(OBJ) Makefile localmisc.h
 	$(LD) -shared -o $@ $(LDFLAGS) $(OBJ) $(LIBINFO) > $(T).lm
 
