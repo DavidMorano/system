@@ -321,6 +321,10 @@ enum errnomssings {
 
 /* missing codes -- backwards */
 
+#ifndef	ETOOBIG
+#define	ETOOBIG		E2BIG
+#endif
+
 #ifndef	EBADFD
 #define	EBADFD		(- SR_BADFD)		/* bad-FD */
 #endif

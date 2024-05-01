@@ -23,8 +23,8 @@
 
 #include	<envstandards.h>	/* ordered first to configure */
 
-/* GETRANDOM start */
-#if	(!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0)
+/* RESOLVEPATH start */
+#if	(!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0)
 
 #include	<climits>		/* |PATH_MAX| + |INT_MAX| */
 #include	<cerrno>
@@ -41,15 +41,8 @@
 
 /* local defines */
 
-#ifndef	PATH_MAX
-#define	PATH_MAX	(4 * 1024)	/* maximum seen in the wild */
-#endif
-
 
 /* imported namespaces */
-
-using std::min ;			/* subroutine-template */
-using std::max ;			/* subroutine-template */
 
 
 /* local typedefs */
@@ -68,8 +61,6 @@ using std::max ;			/* subroutine-template */
 
 
 /* local variables */
-
-constexpr int		maxpath = PATH_MAX ;
 
 
 /* exported variables */
@@ -90,7 +81,7 @@ int resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 			strcpy(rbuf,rp) ;
 		    } else {
 			rc = -1 ;
-			errno = E2BIG ;
+			errno = EOVERFLOW ;
 		    }
 		    free(rp) ;
 		} else {
@@ -99,7 +90,7 @@ int resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	    } else {
 		rc = -1 ;
 		errno = EINVAL ;
-	    } /* end if (non-negative) */
+	    } /* end if (valid) */
 	} else {
 	    rc = -1 ;
 	    errno = EFAULT ;
@@ -107,7 +98,7 @@ int resolvepath(cchar *fname,char *rbuf,size_t rsz) noex {
 	return (rc >= 0) ? rl : rc ;
 }
 
-#endif /* (!defined(SYSHAS_GETRANDOM)) || (SYSHAS_GETRANDOM == 0) */
-/* GETRANDOM end */
+#endif /* (!defined(SYSHAS_RESOLVEPATH)) || (SYSHAS_RESOLVEPATH == 0) */
+/* RESOLVEPATH end */
 
 

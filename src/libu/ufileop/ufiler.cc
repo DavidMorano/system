@@ -67,7 +67,7 @@
 
 	Description:
 	This subroutine takes an existing path and creates a new
-	path that does not contain any symbolic components.
+	path that does not contain any symbolic or relative components.
 
 *******************************************************************************/
 

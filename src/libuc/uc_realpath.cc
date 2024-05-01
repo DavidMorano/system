@@ -4,7 +4,6 @@
 /* resolve a path without symbolic or relative components */
 /* version %I% last-modified %G% */
 
-
 #define	CF_MKPATH	0		/* use |mkpath(3u)| */
 
 /* revision history:

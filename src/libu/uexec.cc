@@ -84,7 +84,6 @@ int u_execve(cchar *p,mainv argv,mainv envv) noex {
 	        } /* end switch */
 	    } /* end if (error) */
 	} until ((rs >= 0) || f_exit) ;
-
 	return rs ;
 }
 /* end subroutine (u_execve) */
